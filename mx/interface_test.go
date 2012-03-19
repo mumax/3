@@ -33,7 +33,7 @@ func TestInterface(t *testing.T) {
 	uniformScalar = uniform1
 	fmt.Println(QString(uniform))
 
-	uniform3 := NewUniformVector([3]float{1, 2, 3})
+	uniform3 := NewUniformVector([3]float32{1, 2, 3})
 	quant = uniform3
 	uniform = uniform3
 	vector = uniform3

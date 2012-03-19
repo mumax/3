@@ -1,0 +1,10 @@
+digraph whiteboard{
+
+node [ shape = "record" ]
+
+Quant [label="{Quant | Name() \l Unit() \l IGet(comp, index)}"]
+
+Scalar [label="{Scalar | IGetS(index)}"]
+Quant->Scalar
+
+}

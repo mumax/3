@@ -1,8 +1,6 @@
 package mx
 
-import (
-	"fmt"
-)
+import ()
 
 type Quant interface {
 	Name() string
@@ -11,19 +9,28 @@ type Quant interface {
 	IGet(comp, index int) float32
 }
 
-// Abstract Quantity, has only name+unit.
-type AQuant struct {
-	name string
-	unit string
+// Uniform quantity is uniform over space.
+type Uniform interface {
+	Quant
+	Get(comp int) float32
 }
 
-func (this *AQuant) Name() string {
-	if this.name != "" {
-		return this.name
-	}
-	return fmt.Sprintf("Q%p", &this) // default name if none set: Q0x000abcd
+type Scalar interface {
+	Quant
+	IGet1(index int) float32
 }
 
-func (this *AQuant) Unit() string {
-	return this.unit
+type UniformScalar interface {
+	Quant
+	Get1() float32
+}
+
+type Vector interface {
+	Quant
+	IGet3(index int) [3]float32
+}
+
+type UniformVector interface {
+	Quant
+	IGet3(index int) [3]float32
 }

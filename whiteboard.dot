@@ -21,5 +21,12 @@ Quant->UniformScalar
 UniformVector [label="{UniformVector | Get3(): [3]float32}"]
 Quant->UniformVector
 
+UniformN [label="{UniformN}"]
+Uniform->UniformN
+
+Uniform1 [label="{Uniform1}"]
+Uniform->Uniform1
+Scalar->Uniform1
+UniformScalar->Uniform1
 
 }

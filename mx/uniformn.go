@@ -9,7 +9,8 @@ type UniformN struct {
 }
 
 func (this *UniformN) Init(value []float32) {
-	this.value = value
+	this.value = make([]float32, len(value))
+	copy(this.value, value)
 }
 
 func NewUniform(value []float32) *UniformN {
@@ -18,17 +19,17 @@ func NewUniform(value []float32) *UniformN {
 	return this
 }
 
-// Implements Uniform
+// Implements Uniform.
 func (this *UniformN) Get(comp int) float32 {
 	return this.value[comp]
 }
 
-// Implements Quant
+// Implements Quant.
 func (this *UniformN) IGet(comp, index int) float32 {
 	return this.value[comp]
 }
 
-// Implements Quant
+// Implements Quant.
 func (this *UniformN) NComp() int {
 	return len(this.value)
 }

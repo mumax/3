@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// test assignment to various interface types
 func TestInterface(t *testing.T) {
 	var quant Quant
 	var scalar Scalar
@@ -20,7 +21,7 @@ func TestInterface(t *testing.T) {
 	quant = uniformVector
 	fmt.Println(QString(quant))
 
-	uniformN := NewUniform([]float32{2, 3, 4})
+	uniformN := NewUniform([]float32{2, 3})
 	quant = uniformN
 	uniform = uniformN
 	fmt.Println(QString(uniform))
@@ -30,6 +31,13 @@ func TestInterface(t *testing.T) {
 	uniform = uniform1
 	scalar = uniform1
 	uniformScalar = uniform1
+	fmt.Println(QString(uniform))
+
+	uniform3 := NewUniformVector([3]float{1, 2, 3})
+	quant = uniform3
+	uniform = uniform3
+	vector = uniform3
+	uniformVector = uniform3
 	fmt.Println(QString(uniform))
 
 }

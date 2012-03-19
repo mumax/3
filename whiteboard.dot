@@ -29,4 +29,9 @@ Uniform->Uniform1
 Scalar->Uniform1
 UniformScalar->Uniform1
 
+Uniform3 [label="{Uniform3}"]
+Uniform->Uniform3
+Vector->Uniform3
+UniformVector->Uniform3
+
 }

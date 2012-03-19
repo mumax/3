@@ -9,5 +9,5 @@ type Vector interface {
 
 type UniformVector interface {
 	Quant
-	IGet3() [3]float32
+	IGet3(index int) [3]float32
 }

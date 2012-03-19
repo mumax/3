@@ -1,0 +1,2 @@
+all: *.go
+	go install

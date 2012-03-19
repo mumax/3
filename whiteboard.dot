@@ -2,9 +2,24 @@ digraph whiteboard{
 
 node [ shape = "record" ]
 
-Quant [label="{Quant | Name() \l Unit() \l IGet(comp, index)}"]
+Quant [label="{Quant | Name(): string \l Unit(): string \l NComp(): int \l IGet(comp, index): float32}"]
 
-Scalar [label="{Scalar | IGetS(index)}"]
+Scalar [label="{Scalar | IGet1(index): float32}"]
 Quant->Scalar
+
+
+Vector [label="{Vector | IGet3(index): [3]float32}"]
+Quant->Vector
+
+
+Uniform [label="{Uniform | Get(comp): float32}"]
+Quant->Uniform
+
+UniformScalar [label="{UniformScalar | Get1(): float32}"]
+Quant->UniformScalar
+
+UniformVector [label="{UniformVector | Get3(): [3]float32}"]
+Quant->UniformVector
+
 
 }

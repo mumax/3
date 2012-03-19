@@ -25,3 +25,7 @@ func (this *Sum) IGet(comp, index int) float32 {
 func (this *Sum) NComp() int {
 	return this.a.NComp()
 }
+
+func (this *Sum) Update() {
+	println("nop")
+}

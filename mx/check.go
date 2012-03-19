@@ -4,18 +4,18 @@ import (
 	"fmt"
 )
 
-func CheckUnits(a, b string) { //←[ leaking param: a  leaking param: b]
+func CheckUnits(a, b string) {
 	if a != b {
-		Panic("unit mismatch:", a, b) //←[ ... argument escapes to heap]
+		Panic("unit mismatch:", a, b)
 	}
 }
 
 func CheckNComp(a, b int) {
 	if a != b {
-		Panic("components mismatch:", a, b) //←[ ... argument escapes to heap]
+		Panic("components mismatch:", a, b)
 	}
 }
 
-func Panic(msg ...interface{}) { //←[ leaking param: msg]
-	panic(fmt.Sprint(msg)) //←[ Panic ... argument does not escape]
+func Panic(msg ...interface{}) {
+	panic(fmt.Sprint(msg))
 }

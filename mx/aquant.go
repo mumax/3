@@ -10,18 +10,18 @@ type AQuant struct {
 	unit string
 }
 
-func (this *AQuant) Name() string { //←[ moved to heap: this]
+func (this *AQuant) Name() string {
 	if this.name != "" {
 		return this.name
 	}
-	return fmt.Sprintf("Q%p", &this) // default name if none set: Q0x000abcd//←[ &this escapes to heap  (*AQuant).Name ... argument does not escape]
+	return fmt.Sprintf("Q%p", &this) // default name if none set: Q0x000abcd
 }
 
-func (this *AQuant) Unit() string { //←[ can inline (*AQuant).Unit  (*AQuant).Unit this does not escape]
+func (this *AQuant) Unit() string {
 	return this.unit
 }
 
 // Empty implementation
-func (this *AQuant) Update() { //←[ can inline (*AQuant).Update  (*AQuant).Update this does not escape]
+func (this *AQuant) Update() {
 
 }

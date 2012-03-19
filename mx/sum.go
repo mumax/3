@@ -7,8 +7,8 @@ type Sum struct {
 	a, b Quant
 }
 
-func NewSum(a, b Quant) *Sum { //←[ leaking param: a  leaking param: b]
-	this := new(Sum) //←[ new(Sum) escapes to heap]
+func NewSum(a, b Quant) *Sum {
+	this := new(Sum)
 	CheckUnits(a.Unit(), b.Unit())
 	CheckNComp(a.NComp(), b.NComp())
 	this.a = a
@@ -18,38 +18,38 @@ func NewSum(a, b Quant) *Sum { //←[ leaking param: a  leaking param: b]
 	return this
 }
 
-func (this *Sum) IGet(comp, index int) float32 { //←[ (*Sum).IGet this does not escape]
+func (this *Sum) IGet(comp, index int) float32 {
 	/*var A, B float32
 
 	switch a := this.a.(type) {
 	default:
 		A = a.IGet(comp, index)
 	case *Uniform1:
-		A = a.IGet(comp, index)//←[ inlining call to (*Uniform1).IGet]
+		A = a.IGet(comp, index)
 	case *Uniform3:
-		A = a.IGet(comp, index)//←[ inlining call to (*Uniform3).IGet]
+		A = a.IGet(comp, index)
 	case *UniformN:
-		A = a.IGet(comp, index)//←[ inlining call to (*UniformN).IGet]
+		A = a.IGet(comp, index)
 	}
 
 	switch b := this.b.(type) {
 	default:
 		B = b.IGet(comp, index)
 	case *Uniform1:
-		B = b.IGet(comp, index)//←[ inlining call to (*Uniform1).IGet]
+		B = b.IGet(comp, index)
 	case *Uniform3:
-		B = b.IGet(comp, index)//←[ inlining call to (*Uniform3).IGet]
+		B = b.IGet(comp, index)
 	case *UniformN:
-		B = b.IGet(comp, index)//←[ inlining call to (*UniformN).IGet]
+		B = b.IGet(comp, index)
 	}
 	return A + B*/
 	return this.a.IGet(comp, index) + this.b.IGet(comp, index)
 }
 
-func (this *Sum) NComp() int { //←[ (*Sum).NComp this does not escape]
+func (this *Sum) NComp() int {
 	return this.a.NComp()
 }
 
-func (this *Sum) Update() { //←[ can inline (*Sum).Update  (*Sum).Update this does not escape]
+func (this *Sum) Update() {
 	println("nop")
 }

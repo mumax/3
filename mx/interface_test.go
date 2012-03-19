@@ -39,5 +39,4 @@ func TestInterface(t *testing.T) {
 	vector = uniform3
 	uniformVector = uniform3
 	fmt.Println(QString(uniform))
-
 }

@@ -20,3 +20,8 @@ func (this *AQuant) Name() string {
 func (this *AQuant) Unit() string {
 	return this.unit
 }
+
+// Empty implementation
+func (this *AQuant) Update() {
+
+}

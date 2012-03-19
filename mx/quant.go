@@ -6,6 +6,7 @@ type Quant interface {
 	Name() string
 	Unit() string
 	NComp() int
+	Update()
 	IGet(comp, index int) float32
 }
 

@@ -19,31 +19,31 @@ func NewSum(a, b Quant) *Sum { //←[ leaking param: a  leaking param: b]
 }
 
 func (this *Sum) IGet(comp, index int) float32 { //←[ (*Sum).IGet this does not escape]
-	var A, B float32
+	/*var A, B float32
 
 	switch a := this.a.(type) {
 	default:
 		A = a.IGet(comp, index)
 	case *Uniform1:
-		A = a.IGet(comp, index)
+		A = a.IGet(comp, index)//←[ inlining call to (*Uniform1).IGet]
 	case *Uniform3:
-		A = a.IGet(comp, index)
+		A = a.IGet(comp, index)//←[ inlining call to (*Uniform3).IGet]
 	case *UniformN:
-		A = a.IGet(comp, index)
+		A = a.IGet(comp, index)//←[ inlining call to (*UniformN).IGet]
 	}
 
 	switch b := this.b.(type) {
 	default:
 		B = b.IGet(comp, index)
 	case *Uniform1:
-		B = b.IGet(comp, index)
+		B = b.IGet(comp, index)//←[ inlining call to (*Uniform1).IGet]
 	case *Uniform3:
-		B = b.IGet(comp, index)
+		B = b.IGet(comp, index)//←[ inlining call to (*Uniform3).IGet]
 	case *UniformN:
-		B = b.IGet(comp, index)
+		B = b.IGet(comp, index)//←[ inlining call to (*UniformN).IGet]
 	}
-
-	return A + B
+	return A + B*/
+	return this.a.IGet(comp, index) + this.b.IGet(comp, index)
 }
 
 func (this *Sum) NComp() int { //←[ (*Sum).NComp this does not escape]

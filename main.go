@@ -1,14 +1,13 @@
 package main
 
 import (
+	. "fe-mumax/mx"
 	"fmt"
 )
 
 func main() {
 
 	a := NewUniformScalar(0)
-	a.name = "a"
-
 	fmt.Println(QString(a))
 }
 

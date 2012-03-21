@@ -34,4 +34,13 @@ Uniform->Uniform3
 Vector->Uniform3
 UniformVector->Uniform3
 
+List [label="{List}"]
+Quant->List
+
+ScalarList [label="{ScalarList}"]
+Scalar->ScalarList
+
+VectorList [label="{VectorList}"]
+Vector->VectorList
+
 }

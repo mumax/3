@@ -44,10 +44,20 @@ func TestInterface(t *testing.T) {
 // test assignment of List to various interface types
 func TestListInterface(t *testing.T) {
 	var quant Quant
-	//var scalar Scalar
-	//var vector Vector
+	var scalar Scalar
+	var vector Vector
 
 	list := NewList(3, 100)
 	quant = list
 	fmt.Println(QString(quant))
+
+	scalarList := NewScalarList(100)
+	quant = scalarList
+	scalar = scalarList
+	fmt.Println(QString(scalar))
+
+	vectorList := NewVectorList(100)
+	quant = vectorList
+	vector = vectorList
+	fmt.Println(QString(vector))
 }

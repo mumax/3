@@ -40,3 +40,14 @@ func TestInterface(t *testing.T) {
 	uniformVector = uniform3
 	fmt.Println(QString(uniform))
 }
+
+// test assignment of List to various interface types
+func TestListInterface(t *testing.T) {
+	var quant Quant
+	//var scalar Scalar
+	//var vector Vector
+
+	list := NewList(3, 100)
+	quant = list
+	fmt.Println(QString(quant))
+}

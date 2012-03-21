@@ -2,12 +2,13 @@ package mx
 
 import ()
 
+// Quant represents a physical quantity. 
 type Quant interface {
 	Name() string
 	Unit() string
-	NComp() int
+	NComp() int // Number of components
 	Update()
-	IGet(comp, index int) float32
+	IGet(comp, index int) float32 // Get value of the specified component at position index.
 }
 
 // Uniform quantity is uniform over space.

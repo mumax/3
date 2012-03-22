@@ -1,46 +1,54 @@
 digraph whiteboard{
 
+rankdir=BT
+
 node [ shape = "record" ]
 
+#master interface
 Quant [label="{Quant | Name(): string \l Unit(): string \l NComp(): int \l IGet(comp, index): float32}"]
 
+#subinterfaces
 Scalar [label="{Scalar | IGet1(index): float32}"]
-Quant->Scalar
-
+Scalar->Quant
 
 Vector [label="{Vector | IGet3(index): [3]float32}"]
-Quant->Vector
-
+Vector->Quant
 
 Uniform [label="{Uniform | Get(comp): float32}"]
-Quant->Uniform
+Uniform->Quant
 
 UniformScalar [label="{UniformScalar | Get1(): float32}"]
-Quant->UniformScalar
+UniformScalar->Quant
 
 UniformVector [label="{UniformVector | Get3(): [3]float32}"]
-Quant->UniformVector
+UniformVector->Quant
 
+rank=same{Scalar; Vector; Uniform; UniformScalar; UniformVector}
+
+#concrete
 UniformN [label="{UniformN}"]
-Uniform->UniformN
+UniformN->Uniform
 
 Uniform1 [label="{Uniform1}"]
-Uniform->Uniform1
-Scalar->Uniform1
-UniformScalar->Uniform1
+Uniform1->Uniform
+Uniform1->Scalar
+Uniform1->UniformScalar
 
 Uniform3 [label="{Uniform3}"]
-Uniform->Uniform3
-Vector->Uniform3
-UniformVector->Uniform3
+Uniform3->Uniform
+Uniform3->Vector
+Uniform3->UniformVector
 
 List [label="{List}"]
-Quant->List
+List->Quant
 
 ScalarList [label="{ScalarList}"]
-Scalar->ScalarList
+ScalarList->Scalar
+ScalarList->List
 
 VectorList [label="{VectorList}"]
-Vector->VectorList
+VectorList->Vector 
+VectorList->List
 
+rank=same{Uniform1; UniformN; Uniform3; List; VectorList; ScalarList}
 }

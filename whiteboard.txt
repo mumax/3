@@ -1,0 +1,4 @@
+todo
+
+* experiment with PTX code gen; functions defined in headers usable in kernel?
+* perfectly wrap cuda driver api

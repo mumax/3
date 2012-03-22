@@ -6,8 +6,7 @@ import ()
 type Quant interface {
 	Name() string
 	Unit() string
-	NComp() int // Number of components
-	Update()
+	NComp() int                   // Number of components
 	IGet(comp, index int) float32 // Get value of the specified component at position index.
 }
 

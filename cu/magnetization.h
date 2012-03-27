@@ -1,13 +1,10 @@
 #ifndef magnetization_h
 #define magnetization_h
 
-#include "geom.h"
+#include "load.h"
 
-__device__ extern float* magnetization;
+__device__ extern float* magnetization_array;
 
-#define load_magnetization(mx, my, mz, i)\
-	mx = magnetization[0*N+i]; \
-	my = magnetization[1*N+i]; \
-	mz = magnetization[2*N+i];
+#define load_magnetization(mx, my, mz, i) load_vector(mx, my, mz, magnetization_array, i)
 
 #endif

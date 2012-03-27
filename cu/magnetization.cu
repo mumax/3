@@ -1,4 +1,4 @@
 #include "magnetization.h"
 
-__device__ float* magnetization;
+__device__ float* magnetization_array;
 

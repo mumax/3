@@ -3,6 +3,8 @@
 
 #include "geom.h"
 
+/// masker's value is array[i]*value.
+/// If array == NULL, it represents uniform 1's.
 typedef struct{
 	float* array;
 	float value;
@@ -15,6 +17,7 @@ typedef struct{
 		out = in.value * in.array[i];\
 	}\
 }
+
 #define load_vector(out_x, out_y, out_z, in, i){\
 	out_x = in[0*Ncell + i]; \
 	out_y = in[1*Ncell + i]; \

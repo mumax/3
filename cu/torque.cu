@@ -4,7 +4,7 @@
 
 extern "C" {
 
-__global__ void torque() {
+__global__ void update_torque() {
 
 	int i = threadindex;
 	if (i >= Ncell) { return; }

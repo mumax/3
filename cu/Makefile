@@ -1,10 +1,11 @@
-NVCC=nvcc
+NVCC=nvcc -g 
+
 cufiles=$(wildcard *.cu)
 ptxfiles=$(cufiles:.cu=.ptx)
 
 all: $(ptxfiles)
 
-$(ptxfiles): %.ptx: %.cu
+$(ptxfiles): %.ptx: %.cu %.h
 	rm -f $@
 	$(NVCC) -ptx $(@:.ptx=.cu)
 

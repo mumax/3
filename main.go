@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "fe-mumax/mx"
 	"fmt"
+	. "mumax3/mx"
 )
 
 func main() {

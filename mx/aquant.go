@@ -22,6 +22,5 @@ func (this *AQuant) Unit() string {
 }
 
 // Empty implementation
-func (this *AQuant) Update() {
-
-}
+//func (this *AQuant) Update() {
+//}

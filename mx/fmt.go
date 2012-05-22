@@ -6,7 +6,7 @@ import (
 
 func QString(q Quant) string {
 	if q == nil {
-		return "Q<nil>"
+		return "<nil Quant>"
 	}
-	return fmt.Sprintf("%s: %#v", q.Name(), q)
+	return fmt.Sprintf("%#v", q)
 }

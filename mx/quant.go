@@ -6,8 +6,8 @@ import ()
 type Quant interface {
 	Name() string
 	Unit() string
-	NComp() int                   // Number of components
-	IGet(comp, index int) float32 // Get value of the specified component at position index.
+	NComp() int                                  // Number of components
+	IGet(comp int, index1, index2 int) []float32 // Get values of the specified component between index1 (incl.) and index2 (excl).
 }
 
 // Uniform quantity is uniform over space.

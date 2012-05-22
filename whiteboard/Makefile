@@ -1,11 +1,11 @@
 dotfiles=$(wildcard *.dot)
-pngfiles=$(dotfiles:.dot=.png)
+pdffiles=$(dotfiles:.dot=.pdf)
 
-all:$(pngfiles)
+all:$(pdffiles)
 
-$(pngfiles): %.png: %.dot
-	dot -Tpng $(@:.png=.dot) > $@
+$(pdffiles): %.pdf: %.dot
+	dot -Tpdf $(@:.pdf=.dot) > $@
 
 .PHONY: clean
 clean:
-	rm -f $(pngfiles)
+	rm -f $(pdffiles)

@@ -3,6 +3,7 @@ package mx
 import ()
 
 // UniformN is an in-memory N-component uniform quantity.
+// TODO: rename UniformTuple?
 type UniformN struct {
 	AQuant
 	value []float32

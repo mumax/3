@@ -4,7 +4,7 @@ import ()
 
 type Sum struct {
 	AQuant
-	Buffer32
+	Buffer
 	a, b Quant
 }
 
@@ -23,20 +23,20 @@ func NewSum(a, b Quant) *Sum {
 	return this
 }
 
-func (this *Sum) IGet(comp, i1, i2 int) []float32 {
-	a := this.a.IGet(comp, i1, i2)
-	b := this.b.IGet(comp, i1, i2)
-	c := this.Buffer(i2 - i1)
-	for i := range c {
-		c[i] = a[i] + b[i]
+func (s *Sum) IGet(comp, i1, i2 int) []float32 {
+	a := s.a.IGet(comp, i1, i2)
+	b := s.b.IGet(comp, i1, i2)
+	s.MakeBuffer(i2 - i1)
+	for i := range s.Buffer {
+		s.Buffer[i] = a[i] + b[i]
 	}
-	return c
+	return s.Buffer
 }
 
 func (this *Sum) NComp() int {
 	return this.a.NComp()
 }
 
-func (this *Sum) Update() {
-	println("nop")
-}
+//func (this *Sum) Update() {
+//	println("nop")
+//}

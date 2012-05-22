@@ -19,8 +19,8 @@ func NewList(nComp, length int) *List {
 	return this
 }
 
-func (this *List) IGet(comp, index int) float32 {
-	return this.Comp[comp][index]
+func (this *List) IGet(comp, i1, i2 int) []float32 {
+	return this.Comp[comp][i1:i2]
 }
 
 func (this *List) NComp() int {

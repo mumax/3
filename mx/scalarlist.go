@@ -17,6 +17,6 @@ func NewScalarList(length int) *ScalarList {
 	return this
 }
 
-func (this *ScalarList) IGet1(index int) float32 {
-	return this.IGet(0, index)
+func (this *ScalarList) IGet1(i1, i2 int) []float32 {
+	return this.IGet(0, i1, i2)
 }

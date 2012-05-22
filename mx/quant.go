@@ -19,7 +19,7 @@ type Uniform interface {
 // Scalar quantity has 1 component.
 type Scalar interface {
 	Quant
-	IGet1(index int) float32 // Get the scalar value for this position index.
+	IGet1(i1, i2 int) []float32 // Get the scalar value for this position index.
 }
 
 // UniformScalar is uniform over space and has 1 component.
@@ -29,10 +29,10 @@ type UniformScalar interface {
 }
 
 // Vector quantity has 3 components.
-type Vector interface {
-	Quant
-	IGet3(index int) [3]float32 // Get the vector value for this position index.
-}
+//type Vector interface {
+//Quant
+//IGet3() [3][]float32 // Get the vector value for this position index.
+//}
 
 // UniformVector is uniform over space and has 3 components.
 type UniformVector interface {

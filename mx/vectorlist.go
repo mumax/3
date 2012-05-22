@@ -17,6 +17,6 @@ func NewVectorList(length int) *VectorList {
 	return this
 }
 
-func (this *VectorList) IGet3(index int) [3]float32 {
-	return [3]float32{this.IGet(0, index), this.IGet(1, index), this.IGet(2, index)}
-}
+//func (this *VectorList) IGet3(index int) [3]float32 {
+//	return [3]float32{this.IGet(0, index), this.IGet(1, index), this.IGet(2, index)}
+//}

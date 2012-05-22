@@ -1,16 +1,20 @@
 package mx
 
-type Buffer32 struct {
-	buf []float32
+// Buffers a small []float32, growing it as necessary.
+type Buffer []float32
+
+// Return a buffer of size n, valid until the next call.
+// Re-uses the previous buffer if possible.
+func (b *Buffer) MakeBuffer(n int) {
+	if len(*b) == n {
+		return
+	}
+	if cap(*b) >= n {
+		*b = (*b)[:n]
+	}
+	*b = make([]float32, n)
 }
 
-func (b *Buffer32) Buffer(n int) []float32 {
-	if len(b.buf) == n {
-		return b.buf
-	}
-	if cap(b.buf) >= n {
-		return b.buf[:n]
-	}
-	b.buf = make([]float32, n)
-	return b.buf
+func (b *Buffer) Reset() {
+	*b = (*b)[0:1]
 }

@@ -13,4 +13,3 @@ func NewSlice(length int) Slice {
 func (s Slice) Range(i1, i2 int) []float32 {
 	return ([]float32(s))[i1:i2]
 }
-

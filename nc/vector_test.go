@@ -1,15 +1,16 @@
 package nc
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func ExampleVectorString() {
-		v := Vector{1, 2, 3}
-        fmt.Println(v)
-        // Output: [1 2 3]
+	v := Vector{1, 2, 3}
+	fmt.Println(v)
+	// Output: [1 2 3]
 }
+
 func TestVectorAdd(test *testing.T) {
 	a := Vector{1, 2, 3}
 	b := Vector{4, 5, 6}

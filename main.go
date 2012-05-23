@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	. "mumax3/mx"
+	_ "nimble-cube/nc"
 )
 
 func main() {
-	a := NewUniformScalar(0)
-	fmt.Println(QString(a))
+	fmt.Println("Nimble Cube")
 }

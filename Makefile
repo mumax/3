@@ -1,9 +1,9 @@
 all: *.go 
-	make -C mx
+	go install -v
 	go tool vet *.go
 	gofmt -w *.go
-	go install
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 
 test:
-	make test -C mx
+	make test -C nc
+	make test -C mm

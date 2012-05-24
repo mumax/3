@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func BenchmarkNop(bench *testing.B) { //←[ BenchmarkNop bench does not escape]
+func BenchmarkNop(bench *testing.B) {
 	for i := 0; i < bench.N; i++ {
 	}
 }

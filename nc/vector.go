@@ -16,11 +16,11 @@ const (
 )
 
 // Vector addition
-func (a Vector) Add(b Vector) Vector { //←[ can inline Vector.Add]
+func (a Vector) Add(b Vector) Vector {
 	return Vector{a[X] + b[X], a[Y] + b[Y], a[Z] + b[Z]}
 }
 
 // Vector subtraction
-func (a Vector) Sub(b Vector) Vector { //←[ can inline Vector.Sub]
+func (a Vector) Sub(b Vector) Vector {
 	return Vector{a[X] - b[X], a[Y] - b[Y], a[Z] - b[Z]}
 }

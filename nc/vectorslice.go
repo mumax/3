@@ -9,7 +9,7 @@ type VectorSlice [VECCOMP][]float32
 // Make a VectorSlice with N vector elements.
 func MakeVectorSlice(N int) VectorSlice {
 	var v VectorSlice
-	storage := make([]float32, VECCOMP*N) //←[ cannot make type VectorSlice]
+	storage := make([]float32, VECCOMP*N)
 	for c := 0; c < VECCOMP; c++ {
 		v[c] = storage[c*N : (c+1)*N]
 	}

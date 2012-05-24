@@ -20,7 +20,7 @@ func ExampleVectorSlice() {
 	vec[Z][7] = 6
 	fmt.Println("y:", y)
 	fmt.Println("vec:", vec)
-	//fmt.Println("vec.Get(7):", vec.Get(7)) //←[ vec.Get undefined (type VectorSlice has no field or method Get)]
+	//fmt.Println("vec.Get(7):", vec.Get(7)) 
 
 	// Output: 
 	// vec.N(): 10 len(vec): 3
@@ -44,6 +44,6 @@ func BenchmarkVectorSliceComponent(bench *testing.B) {
 //	N := 100
 //	vec := MakeVectorSlice(N)
 //	for i := 0; i < bench.N; i++ {
-//		vec.Set(42, Vector{1, 2, 3}) //←[ vec.Set undefined (type VectorSlice has no field or method Set)]
+//		vec.Set(42, Vector{1, 2, 3}) 
 //	}
 //}

@@ -16,6 +16,13 @@ func (s Slice) N() int {
 	return len(s)
 }
 
+// Set all elements to a
+func (s Slice) Set(a float32) {
+	for i := range s {
+		s[i] = a
+	}
+}
+
 func (s Slice) Range(i1, i2 int) []float32 {
 	return ([]float32(s))[i1:i2]
 }

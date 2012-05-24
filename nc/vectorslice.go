@@ -4,7 +4,7 @@ import ()
 
 // VectorSlice is a slice of Vectors,
 // stored component-by-component (first all x, then all y, ...).
-type VectorSlice [VECCOMP][]float32
+type VectorSlice [VECCOMP]Slice
 
 // Make a VectorSlice with N vector elements.
 func MakeVectorSlice(N int) VectorSlice {
@@ -14,12 +14,6 @@ func MakeVectorSlice(N int) VectorSlice {
 		v[c] = storage[c*N : (c+1)*N]
 	}
 	return v
-}
-
-// Get a component as a scalar slice.
-// Shares the underlying storage.
-func (v VectorSlice) VectorComp(c int) Slice {
-	return Slice(v[c])
 }
 
 // Get the i'th Vector element.

@@ -2,7 +2,6 @@ package nc
 
 import (
 	"fmt"
-	"testing"
 )
 
 func ExampleVectorSlice() {
@@ -11,7 +10,7 @@ func ExampleVectorSlice() {
 	fmt.Println("vec.N():", vec.N(), "len(vec):", len(vec))
 
 	// Take the Y-component.
-	y := vec.VectorComp(Y)
+	y := vec[Y]
 	fmt.Println("y.N():", y.N(), "len(y):", len(y))
 
 	y.Memset(2)
@@ -28,16 +27,6 @@ func ExampleVectorSlice() {
 	// y: [2 2 2 2 2 2 2 5 2 2]
 	// vec: [[0 0 0 0 0 0 0 4 0 0] [2 2 2 2 2 2 2 5 2 2] [0 0 0 0 0 0 0 6 0 0]]
 
-}
-
-func BenchmarkVectorSliceComponent(bench *testing.B) {
-	N := 100
-	vec := MakeVectorSlice(N)
-	var a Slice
-	for i := 0; i < bench.N; i++ {
-		a = vec.VectorComp(Y)
-	}
-	use(a)
 }
 
 //func BenchmarkVectorSliceSet(bench *testing.B) {

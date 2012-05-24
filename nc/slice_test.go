@@ -16,7 +16,7 @@ func ExampleSlice() {
 
 	y.Set(2)
 	fmt.Println("y:", y)
-	fmt.Println("vec:",vec)
+	fmt.Println("vec:", vec)
 
 	// Output: 
 	// vec.N(): 10 len(vec): 30
@@ -25,18 +25,17 @@ func ExampleSlice() {
 	//vec: [0 0 0 0 0 0 0 0 0 0 2 2 2 2 2 2 2 2 2 2 0 0 0 0 0 0 0 0 0 0]
 }
 
-
-func BenchmarkVectorSliceComponent(bench *testing.B){
-	N:=100
-	vec:=MakeVectorSlice(N)
+func BenchmarkVectorSliceComponent(bench *testing.B) {
+	N := 100
+	vec := MakeVectorSlice(N)
 	var a Slice
-	for i:=0; i<bench.N; i++{
-		a=vec.VectorComp(Y)
+	for i := 0; i < bench.N; i++ {
+		a = vec.VectorComp(Y)
 	}
 	use(a)
 }
 
-func BenchmarkNop(bench *testing.B){
-	for i:=0; i<bench.N; i++{
+func BenchmarkNop(bench *testing.B) {
+	for i := 0; i < bench.N; i++ {
 	}
 }

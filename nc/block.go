@@ -2,9 +2,22 @@ package nc
 
 import ()
 
+// Block is a [][][]float32 with square layout and contiguous underlying storage:
+// 	len(block[0]) == len(block[1]) == ...
+// 	len(block[i][0]) == len(block[i][1]) == ...
+// 	len(block[i][j][0]) == len(block[i][j][1]) == ...
 type Block [][][]float32
 
 func MakeBlock(N0, N1, N2 int) Block {
+	if N0 < 1 {
+		Panic("MakeBlock: N0 out of range")
+	}
+	if N1 < 1 {
+		Panic("MakeBlock: N1 out of range")
+	}
+	if N2 < 1 {
+		Panic("MakeBlock: N2 out of range")
+	}
 	sliced := make([][][]float32, N0)
 	for i := range sliced {
 		sliced[i] = make([][]float32, N1)
@@ -15,13 +28,24 @@ func MakeBlock(N0, N1, N2 int) Block {
 			sliced[i][j] = storage[(i*N1+j)*N2+0 : (i*N1+j)*N2+N2]
 		}
 	}
-
 	return Block(sliced)
 }
 
 // Total number of scalar elements.
 func (v Block) N() int {
 	return len(v) * len(v[0]) * len(v[0][0])
+}
+
+func (v Block) N0() int {
+	return len(v)
+}
+
+func (v Block) N1() int {
+	return len(v[0])
+}
+
+func (v Block) N2() int {
+	return len(v[0][0])
 }
 
 // Returns the contiguous underlying storage.

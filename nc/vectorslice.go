@@ -3,7 +3,7 @@ package nc
 import ()
 
 // VectorSlice is a slice of Vectors,
-// stored component-by-component (first all x, then all y, ...).
+// stored component-by-component (first all x, than all y, ...).
 type VectorSlice [VECCOMP]Slice
 
 // Make a VectorSlice with N vector elements.
@@ -31,4 +31,10 @@ func (v VectorSlice) Set(i int, value Vector) { //←[ can inline VectorSlice.Se
 // Number of vector elements
 func (s VectorSlice) N() int { //←[ can inline VectorSlice.N  VectorSlice.N s does not escape]
 	return len(s[0])
+}
+
+// Returns the contiguous underlying storage.
+// Contains first all X component, than Y, than Z.
+func (v VectorSlice) Contiguous() Slice { //←[ leaking param: v]
+	return ([]float32)(v[0])[:VECCOMP*v.N()] //←[ inlining call to VectorSlice.N]
 }

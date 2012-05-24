@@ -18,6 +18,20 @@ func (v VectorSlice) VectorComp(c int) Slice {
 	return Slice([]float32(v)[c*N : (c+1)*N])
 }
 
+// Get the i'th Vector element.
+func (v VectorSlice) Get(i int) Vector {
+	N := v.N()
+	return Vector{v[X*N+i], v[Y*N+i], v[Z*N+i]}
+}
+
+// Set the i'th Vector element.
+func (v VectorSlice) Set(i int, value Vector) {
+	N := v.N()
+	v[X*N+i] = value[X]
+	v[Y*N+i] = value[Y]
+	v[Z*N+i] = value[Z]
+}
+
 // Number of vector elements
 func (s VectorSlice) N() int {
 	return len(s) / VECCOMP

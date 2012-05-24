@@ -17,7 +17,7 @@ func (s Slice) N() int {
 }
 
 // Set all elements to a
-func (s Slice) Set(a float32) {
+func (s Slice) Memset(a float32) {
 	for i := range s {
 		s[i] = a
 	}

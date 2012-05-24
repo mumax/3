@@ -9,15 +9,7 @@ import ()
 type Block [][][]float32
 
 func MakeBlock(N0, N1, N2 int) Block {
-	if N0 < 1 {
-		Panic("MakeBlock: N0 out of range")
-	}
-	if N1 < 1 {
-		Panic("MakeBlock: N1 out of range")
-	}
-	if N2 < 1 {
-		Panic("MakeBlock: N2 out of range")
-	}
+	checkPositive(N0, N1, N2)
 	sliced := make([][][]float32, N0)
 	for i := range sliced {
 		sliced[i] = make([][]float32, N1)
@@ -59,5 +51,17 @@ func (v Block) Memset(a float32) {
 	storage := v.Contiguous()
 	for i := range storage {
 		storage[i] = a
+	}
+}
+
+func checkPositive(N0, N1, N2 int) {
+	if N0 < 1 {
+		Panic("MakeBlock: N0 out of range")
+	}
+	if N1 < 1 {
+		Panic("MakeBlock: N1 out of range")
+	}
+	if N2 < 1 {
+		Panic("MakeBlock: N2 out of range")
 	}
 }

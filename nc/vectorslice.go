@@ -19,15 +19,20 @@ func MakeVectorSlice(N int) VectorSlice {
 	return v
 }
 
-// Number of vector elements
-func (s VectorSlice) N() int {
+// Number of scalar elements.
+func (s VectorSlice) NFloat() int {
+	return len(s) * len(s[0])
+}
+
+// Number of vector elements.
+func (s VectorSlice) NVector() int {
 	return len(s[0])
 }
 
 // Returns the contiguous underlying storage.
 // Contains first all X component, than Y, than Z.
 func (v VectorSlice) Contiguous() Slice {
-	return ([]float32)(v[0])[:VECCOMP*v.N()]
+	return ([]float32)(v[0])[:v.NFloat()]
 }
 
 // Get the i'th Vector element.

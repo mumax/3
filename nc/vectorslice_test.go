@@ -8,11 +8,12 @@ import (
 func ExampleVectorSlice() {
 	N := 10
 	vec := MakeVectorSlice(N)
-	fmt.Println("vec.N():", vec.N(), "len(vec):", len(vec))
+	fmt.Println("vec.NVector():", vec.NVector())
+	fmt.Println("vec.NFloat):", vec.NFloat())
 
 	// Take the Y-component.
 	y := vec[Y]
-	fmt.Println("y.N():", y.N(), "len(y):", len(y))
+	fmt.Println("y.N():", y.N())
 
 	y.Memset(2)
 	vec.Set(7, Vector{4, 5, 6})
@@ -22,13 +23,13 @@ func ExampleVectorSlice() {
 	fmt.Println("vec.Contiguous():", vec.Contiguous())
 
 	// Output: 
-	// vec.N(): 10 len(vec): 3
-	// y.N(): 10 len(y): 10
+	// vec.NVector(): 10
+	// vec.NFloat): 30
+	// y.N(): 10
 	// y: [2 2 2 2 2 2 2 5 2 2]
 	// vec: [[0 0 0 0 0 0 0 4 0 0] [2 2 2 2 2 2 2 5 2 2] [0 0 0 0 0 0 0 6 0 0]]
 	// vec.Get(7): [4 5 6]
 	// vec.Contiguous(): [0 0 0 0 0 0 0 4 0 0 2 2 2 2 2 2 2 5 2 2 0 0 0 0 0 0 0 6 0 0]
-
 }
 
 func BenchmarkVectorSliceSet(bench *testing.B) {

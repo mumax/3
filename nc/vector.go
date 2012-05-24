@@ -3,7 +3,10 @@ package nc
 import ()
 
 // 3-component vector.
-type Vector [3]float32
+type Vector [VECCOMP]float32
+
+// Number of vector components.
+const VECCOMP = 3
 
 // Index for vector component x,y,z.
 const (

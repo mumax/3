@@ -8,18 +8,18 @@ import (
 func ExampleVectorSlice() {
 	N := 10
 	vec := MakeVectorSlice(N)
-	fmt.Println("vec.N():", vec.N(), "len(vec):", len(vec)) //←[ inlining call to VectorSlice.N  ExampleVectorSlice ... argument does not escape]
+	fmt.Println("vec.N():", vec.N(), "len(vec):", len(vec))
 
 	// Take the Y-component.
 	y := vec[Y]
-	fmt.Println("y.N():", y.N(), "len(y):", len(y)) //←[ inlining call to Slice.N  ExampleVectorSlice ... argument does not escape]
+	fmt.Println("y.N():", y.N(), "len(y):", len(y))
 
 	y.Memset(2)
-	vec.Set(7, Vector{4, 5, 6})                        //←[ inlining call to VectorSlice.Set]
-	fmt.Println("y:", y)                               //←[ ExampleVectorSlice ... argument does not escape]
-	fmt.Println("vec:", vec)                           //←[ ExampleVectorSlice ... argument does not escape]
-	fmt.Println("vec.Get(7):", vec.Get(7))             //←[ inlining call to VectorSlice.Get  ExampleVectorSlice ... argument does not escape]
-	fmt.Println("vec.Contiguous():", vec.Contiguous()) //←[ ExampleVectorSlice ... argument does not escape]
+	vec.Set(7, Vector{4, 5, 6})
+	fmt.Println("y:", y)
+	fmt.Println("vec:", vec)
+	fmt.Println("vec.Get(7):", vec.Get(7))
+	fmt.Println("vec.Contiguous():", vec.Contiguous())
 
 	// Output: 
 	// vec.N(): 10 len(vec): 3
@@ -31,16 +31,16 @@ func ExampleVectorSlice() {
 
 }
 
-func BenchmarkVectorSliceSet(bench *testing.B) { //←[ BenchmarkVectorSliceSet bench does not escape]
+func BenchmarkVectorSliceSet(bench *testing.B) {
 	N := 100
 	vec := MakeVectorSlice(N)
 	v := Vector{1, 2, 3}
 	for i := 0; i < bench.N; i++ {
-		vec.Set(42, v) //←[ inlining call to VectorSlice.Set]
+		vec.Set(42, v)
 	}
 }
 
-func BenchmarkVectorSliceSetInline(bench *testing.B) { //←[ BenchmarkVectorSliceSetInline bench does not escape]
+func BenchmarkVectorSliceSetInline(bench *testing.B) {
 	N := 100
 	vec := MakeVectorSlice(N)
 	for i := 0; i < bench.N; i++ {
@@ -50,22 +50,22 @@ func BenchmarkVectorSliceSetInline(bench *testing.B) { //←[ BenchmarkVectorSli
 	}
 }
 
-func BenchmarkVectorSliceGet(bench *testing.B) { //←[ BenchmarkVectorSliceGet bench does not escape]
+func BenchmarkVectorSliceGet(bench *testing.B) {
 	N := 100
 	vec := MakeVectorSlice(N)
 	var v Vector
 	for i := 0; i < bench.N; i++ {
-		v = vec.Get(42) //←[ inlining call to VectorSlice.Get]
+		v = vec.Get(42)
 	}
-	use(v) //←[ inlining call to use]
+	use(v)
 }
 
-func BenchmarkVectorSliceContiguous(bench *testing.B) { //←[ BenchmarkVectorSliceContiguous bench does not escape]
+func BenchmarkVectorSliceContiguous(bench *testing.B) {
 	N := 100
 	vec := MakeVectorSlice(N)
 	var s Slice
 	for i := 0; i < bench.N; i++ {
 		s = vec.Contiguous()
 	}
-	use(s) //←[ inlining call to use]
+	use(s)
 }

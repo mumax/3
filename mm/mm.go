@@ -1,9 +1,9 @@
 package mm
 
-import (
+import(
 	. "nimble-cube/nc"
 )
 
-var (
+var(
 	m VectorSlice // reduced magnetization
 )

@@ -11,12 +11,12 @@ func MakeSlice(N int) Slice {
 	return make(Slice, N)
 }
 
-// Number of scalar elements
+// Number of scalar elements.
 func (s Slice) N() int {
 	return len(s)
 }
 
-// Set all elements to a
+// Set all elements to a.
 func (s Slice) Memset(a float32) {
 	for i := range s {
 		s[i] = a

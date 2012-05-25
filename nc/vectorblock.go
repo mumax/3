@@ -1,5 +1,9 @@
 package nc
 
+import (
+	//"math"
+)
+
 type VectorBlock [3]Block
 
 func MakeVectorBlock(N [3]int) VectorBlock {
@@ -56,10 +60,13 @@ func (v VectorBlock) Normalize() {
 	sx := v[X].Contiguous()
 	sy := v[Y].Contiguous()
 	sz := v[Z].Contiguous()
-	for i := range sx {
-		norm := Sqrtf(sx[i]*sx[i] + sy[i]*sy[i] + sz[i]*sz[i])
-		sx[i] /= norm
-		sy[i] /= norm
-		sz[i] /= norm
+	for i,x := range sx {
+		y := sy[i]
+		z := sz[i]
+		norm:=float32(7)
+		//norm := 1 / float32(math.Sqrt(float64(x*x+y*y+z*z)))
+		sx[i] = x * norm
+		sy[i] = y * norm
+		sz[i] = z * norm
 	}
 }

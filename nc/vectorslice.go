@@ -35,6 +35,10 @@ func (v VectorSlice) Contiguous() Slice {
 	return ([]float32)(v[0])[:v.NFloat()]
 }
 
+func (v VectorSlice) Range(i1, i2 int) [3][]float32 {
+	return [3][]float32{v[X][i1:i2], v[Y][i1:i2], v[Z][i1:i2]}
+}
+
 // Get the i'th Vector element.
 func (v VectorSlice) Get(i int) Vector {
 	return Vector{v[X][i], v[Y][i], v[Z][i]}

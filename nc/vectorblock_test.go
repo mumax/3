@@ -7,7 +7,8 @@ import (
 
 func ExampleVectorBlock() {
 	N0, N1, N2 := 1, 2, 3
-	block := MakeVectorBlock(N0, N1, N2)
+	size := [3]int{N0, N1, N2}
+	block := MakeVectorBlock(size)
 	fmt.Println("block.NVector():", block.NVector()) // N0*N1*N2
 	fmt.Println("block.NFloat():", block.NFloat())   // 3*N0*N1*N2
 
@@ -32,20 +33,15 @@ func ExampleVectorBlock() {
 
 func TestVectorBlock(test *testing.T) {
 	N0, N1, N2 := 2, 3, 4
-	b := MakeBlock(N0, N1, N2)
-	if b.N0() != N0 {
+	size := [3]int{N0, N1, N2}
+	b := MakeVectorBlock(size)
+	if b.BlockSize() != size {
 		test.Fail()
 	}
-	if b.N1() != N1 {
+	if b.NVector() != N0*N1*N2 {
 		test.Fail()
 	}
-	if b.N2() != N2 {
-		test.Fail()
-	}
-	if b.N() != N0*N1*N2 {
-		test.Fail()
-	}
-	if b.N() != len(b.Contiguous()) {
+	if b.NFloat() != len(b.Contiguous()) {
 		test.Fail()
 	}
 }

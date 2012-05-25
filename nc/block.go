@@ -8,42 +8,34 @@ import ()
 // 	len(block[i][j][0]) == len(block[i][j][1]) == ...
 type Block [][][]float32
 
-func MakeBlock(N0, N1, N2 int) Block {
-	checkPositive(N0, N1, N2)
-	sliced := make([][][]float32, N0)
+func MakeBlock(N [3]int) Block {
+	checkSize(N[:])
+	sliced := make([][][]float32, N[0])
 	for i := range sliced {
-		sliced[i] = make([][]float32, N1)
+		sliced[i] = make([][]float32, N[1])
 	}
-	storage := make([]float32, N0*N1*N2)
+	storage := make([]float32, N[0]*N[1]*N[2])
 	for i := range sliced {
 		for j := range sliced[i] {
-			sliced[i][j] = storage[(i*N1+j)*N2+0 : (i*N1+j)*N2+N2]
+			sliced[i][j] = storage[(i*N[1]+j)*N[2]+0 : (i*N[1]+j)*N[2]+N[2]]
 		}
 	}
 	return Block(sliced)
 }
 
 // Total number of scalar elements.
-func (v Block) N() int {
+func (v Block) NFloat() int {
 	return len(v) * len(v[0]) * len(v[0][0])
 }
 
-func (v Block) N0() int {
-	return len(v)
-}
-
-func (v Block) N1() int {
-	return len(v[0])
-}
-
-func (v Block) N2() int {
-	return len(v[0][0])
+func (v Block) BlockSize() [3]int {
+	return [3]int{len(v), len(v[0]), len(v[0][0])}
 }
 
 // Returns the contiguous underlying storage.
 // Contains first all X component, than Y, than Z.
 func (v Block) Contiguous() Slice {
-	return [][][]float32(v)[0][0][:v.N()]
+	return [][][]float32(v)[0][0][:v.NFloat()]
 }
 
 // Set all elements to a.
@@ -54,14 +46,10 @@ func (v Block) Memset(a float32) {
 	}
 }
 
-func checkPositive(N0, N1, N2 int) {
-	if N0 < 1 {
-		Panic("MakeBlock: N0 out of range")
-	}
-	if N1 < 1 {
-		Panic("MakeBlock: N1 out of range")
-	}
-	if N2 < 1 {
-		Panic("MakeBlock: N2 out of range")
+func checkSize(size []int) {
+	for i, s := range size {
+		if s < 1 {
+			Panic("MakeBlock: N", i, " out of range:", s)
+		}
 	}
 }

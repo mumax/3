@@ -2,22 +2,22 @@ package nc
 
 type VectorBlock [3]Block
 
-func MakeVectorBlock(N0, N1, N2 int) VectorBlock {
-	checkPositive(N0, N1, N2)
+func MakeVectorBlock(N [3]int) VectorBlock {
+	checkSize(N[:])
 	var sliced [VECCOMP]Block
 	for i := range sliced {
-		sliced[i] = make(Block, N0)
+		sliced[i] = make(Block, N[0])
 	}
 	for i := range sliced {
 		for j := range sliced[i] {
-			sliced[i][j] = make([][]float32, N1)
+			sliced[i][j] = make([][]float32, N[1])
 		}
 	}
-	list := make([]float32, VECCOMP*N0*N1*N2)
+	list := make([]float32, VECCOMP*N[0]*N[1]*N[2])
 	for i := range sliced {
 		for j := range sliced[i] {
 			for k := range sliced[i][j] {
-				sliced[i][j][k] = list[((i*N0+j)*N1+k)*N2+0 : ((i*N0+j)*N1+k)*N2+N2]
+				sliced[i][j][k] = list[((i*N[0]+j)*N[1]+k)*N[2]+0 : ((i*N[0]+j)*N[1]+k)*N[2]+N[2]]
 			}
 		}
 	}
@@ -34,16 +34,8 @@ func (v VectorBlock) NVector() int {
 	return len(v[0]) * len(v[0][0]) * len(v[0][0][0])
 }
 
-func (v VectorBlock) N0() int {
-	return len(v[0])
-}
-
-func (v VectorBlock) N1() int {
-	return len(v[0][0])
-}
-
-func (v VectorBlock) N2() int {
-	return len(v[0][0][0])
+func (v VectorBlock) BlockSize() [3]int {
+	return [3]int{len(v[0]), len(v[0][0]), len(v[0][0][0])}
 }
 
 // Returns the contiguous underlying storage.

@@ -5,5 +5,8 @@ import(
 )
 
 var(
+	size [3]int
 	m VectorSlice // reduced magnetization
 )
+
+

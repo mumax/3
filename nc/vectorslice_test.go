@@ -13,7 +13,7 @@ func ExampleVectorSlice() {
 
 	// Take the Y-component.
 	y := vec[Y]
-	fmt.Println("y.N():", y.N())
+	fmt.Println("y.NScalar():", y.NScalar())
 
 	y.Memset(2)
 	vec.Set(7, Vector{4, 5, 6})
@@ -25,7 +25,7 @@ func ExampleVectorSlice() {
 	// Output: 
 	// vec.NVector(): 10
 	// vec.NFloat): 30
-	// y.N(): 10
+	// y.NScalar(): 10
 	// y: [2 2 2 2 2 2 2 5 2 2]
 	// vec: [[0 0 0 0 0 0 0 4 0 0] [2 2 2 2 2 2 2 5 2 2] [0 0 0 0 0 0 0 6 0 0]]
 	// vec.Get(7): [4 5 6]

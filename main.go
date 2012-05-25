@@ -1,14 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"runtime"
+	"nimble-cube/nc"
+	"os"
 )
 
 func main() {
-	PrintHello()
-}
-
-func PrintHello() {
-	fmt.Println("Nimble Cube", runtime.Compiler, runtime.GOOS, runtime.GOARCH)
+	nc.PrintInfo(os.Stdout)
 }

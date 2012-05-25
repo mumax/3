@@ -12,7 +12,7 @@ func MakeSlice(N int) Slice {
 }
 
 // Number of scalar elements.
-func (s Slice) N() int {
+func (s Slice) NScalar() int {
 	return len(s)
 }
 

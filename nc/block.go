@@ -29,6 +29,11 @@ func (b Block) NFloat() int {
 	return len(b) * len(b[0]) * len(b[0][0])
 }
 
+// Total number of scalar elements.
+func (b Block) NScalar() int {
+	return len(b) * len(b[0]) * len(b[0][0])
+}
+
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
 func (b Block) BlockSize() [3]int {

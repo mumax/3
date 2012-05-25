@@ -1,21 +1,21 @@
 package mm
 
 import (
-	"log"
 	. "nimble-cube/nc"
+	"os"
 )
 
 var (
 	size   [3]int
 	m      VectorBlock // reduced magnetization
 	Heff   VectorBlock // effective field
-	gamma  AnyScalarBlock
-	alpha  AnyScalarBlock
+	gamma  AnyScalar
+	alpha  AnyScalar
 	torque VectorBlock
 )
 
 func Main() {
-	log.Println("nimble-cube/mm")
+	PrintInfo(os.Stdout)
 
 	N0, N1, N2 := 1, 4, 8
 	size = [3]int{N0, N1, N2}
@@ -30,6 +30,9 @@ func Main() {
 	a := MakeBlock(size)
 	a.Memset(0.01)
 	alpha = a
+
+	Println(alpha)
+
 }
 
 func UpdateTorque() {

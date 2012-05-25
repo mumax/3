@@ -56,6 +56,7 @@ func (v VectorBlock) Memset(a float32) {
 	}
 }
 
+// TODO: move to vectorslice!
 func (v VectorBlock) Normalize() {
 	sx := v[X].Contiguous()
 	sy := v[Y].Contiguous()
@@ -63,8 +64,8 @@ func (v VectorBlock) Normalize() {
 	for i,x := range sx {
 		y := sy[i]
 		z := sz[i]
-		norm:=float32(7)
-		//norm := 1 / float32(math.Sqrt(float64(x*x+y*y+z*z)))
+		//norm:=float32(7)
+		norm := 1 / float32(math.Sqrt(float64(x*x+y*y+z*z))) // BOTTLENECK
 		sx[i] = x * norm
 		sy[i] = y * norm
 		sz[i] = z * norm

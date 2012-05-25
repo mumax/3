@@ -49,7 +49,7 @@ func TestVectorBlock(test *testing.T) {
 //TODO: move to vectorslice
 func BenchmarkVectorBlockNormalize(bench *testing.B) {
 	bench.StopTimer()
-	N0, N1, N2 := 200, 300, 400
+	N0, N1, N2 := 16, 1024, 1024
 	size := [3]int{N0, N1, N2}
 	b := MakeVectorBlock(size)
 	b.Memset(7)

@@ -5,15 +5,16 @@ import (
 	"os"
 )
 
-var magnet struct {
-	size   [3]int      // 3D geom size
-	warp   int         // buffer size for Range()
+var magnet struct{
+	size   [3]int // 3D geom size
+	warp int // buffer size for Range()
 	m      VectorBlock // reduced magnetization
 	Heff   VectorBlock // effective field
 	gamma  AnyScalar
 	alpha  AnyScalar
 	torque VectorBlock
 }
+
 
 func Main() {
 	PrintInfo(os.Stdout)
@@ -27,7 +28,7 @@ func Main() {
 
 	// Find some nice warp size
 	warp := 1024
-	for N%warp != 0 {
+	for N%warp != 0{
 		warp--
 	}
 	magnet.warp = warp
@@ -60,11 +61,14 @@ func UpdateTorque() {
 	N := magnet.torque.NVector()
 	Torque := magnet.torque.Contiguous()
 	M := magnet.m.Contiguous()
-	for I := 0; I < N; I += warp {
+	for I := 0; I < N; I+= warp{
 		torque := Torque.Range(I, I+warp)
 		m := M.Range(I, I+warp)
-		for i := 0; i < warp; i++ {
+		for i:=0; i<warp; i++{
 			torque[i] = m[i]
 		}
 	}
 }
+
+
+

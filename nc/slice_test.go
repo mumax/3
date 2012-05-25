@@ -11,7 +11,7 @@ func benchmarknop(bench *testing.B) {
 
 func BenchmarkCopy(bench *testing.B) {
 	bench.StopTimer()
-	N := 3 * 64 * 1024 * 1024
+	N := 3 * 16 * 1024 * 1024
 	s := MakeSlice(N)
 	t := MakeSlice(N)
 	bench.SetBytes(4 * int64(N))
@@ -23,7 +23,7 @@ func BenchmarkCopy(bench *testing.B) {
 
 func BenchmarkSliceCopy(bench *testing.B) {
 	bench.StopTimer()
-	N := 3 * 64 * 1024 * 1024
+	N := 3 * 16 * 1024 * 1024
 	s := MakeSlice(N)
 	d := MakeSlice(N)
 	bench.SetBytes(4 * int64(N))

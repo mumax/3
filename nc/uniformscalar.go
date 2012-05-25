@@ -1,17 +1,21 @@
 package nc
 
-type UniformSlice struct {
+import (
+	"fmt"
+)
+
+type UniformScalar struct {
 	value float32
 	buf   []float32
 }
 
-func MakeUniformSlice() UniformSlice { return UniformSlice{0, []float32{0}} }
+func NewUniformScalar() *UniformScalar { return &UniformScalar{0, []float32{0}} }
 
-func (s *UniformSlice) SetValue(value float32) {
+func (s *UniformScalar) SetValue(value float32) {
 	s.value = value
 }
 
-func (s *UniformSlice) Range(i1, i2 int) []float32 {
+func (s *UniformScalar) Range(i1, i2 int) []float32 {
 	lenHave := len(s.buf)
 	lenWant := i2 - i1
 	if lenWant == 0 {
@@ -27,6 +31,8 @@ func (s *UniformSlice) Range(i1, i2 int) []float32 {
 	Memset(s.buf, s.value)
 	return s.buf
 }
+
+func (s *UniformScalar) String() string { return fmt.Sprint(s.value) }
 
 func Memset(a []float32, value float32) {
 	for i := range a {

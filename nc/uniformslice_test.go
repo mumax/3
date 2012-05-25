@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestUniformSlice(test *testing.T) {
-	b := MakeUniformSlice()
+func TestUniformScalar(test *testing.T) {
+	b := NewUniformScalar()
 
 	for i := 0; i < 1000; i++ {
 		i1 := rand.Int() % 10
@@ -23,4 +23,18 @@ func TestUniformSlice(test *testing.T) {
 			}
 		}
 	}
+}
+
+func BenchmarkUniformScalar(bench *testing.B) {
+	const (
+		A = 1000
+		B = 1000
+	)
+
+	b := NewUniformScalar()
+	var r []float32
+	for i := 0; i < bench.N; i++ {
+		r = b.Range(A, A+B)
+	}
+	use(r)
 }

@@ -33,6 +33,10 @@ func Main() {
 
 	Println(alpha)
 
+	a2 := NewUniformScalar()
+	a2.SetValue(0.02)
+	alpha = a2
+	Println(alpha)
 }
 
 func UpdateTorque() {

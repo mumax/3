@@ -1,5 +1,5 @@
 all: *.go 
-	go install
+	go install -v
 	go tool vet *.go
 	gofmt -w *.go
 

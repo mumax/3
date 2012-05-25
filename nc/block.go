@@ -25,25 +25,25 @@ func MakeBlock(N [3]int) Block {
 }
 
 // Total number of scalar elements.
-func (v Block) NFloat() int {
-	return len(v) * len(v[0]) * len(v[0][0])
+func (b Block) NFloat() int {
+	return len(b) * len(b[0]) * len(b[0][0])
 }
 
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
-func (v Block) BlockSize() [3]int {
-	return [3]int{len(v), len(v[0]), len(v[0][0])}
+func (b Block) BlockSize() [3]int {
+	return [3]int{len(b), len(b[0]), len(b[0][0])}
 }
 
 // Returns the contiguous underlying storage.
 // Contains first all X component, than Y, than Z.
-func (v Block) Contiguous() Slice {
-	return [][][]float32(v)[0][0][:v.NFloat()]
+func (b Block) Contiguous() Slice {
+	return [][][]float32(b)[0][0][:b.NFloat()]
 }
 
 // Set all elements to a.
-func (v Block) Memset(a float32) {
-	storage := v.Contiguous()
+func (b Block) Memset(a float32) {
+	storage := b.Contiguous()
 	for i := range storage {
 		storage[i] = a
 	}
@@ -56,4 +56,8 @@ func checkSize(size []int) {
 			Panic("MakeBlock: N", i, " out of range:", s)
 		}
 	}
+}
+
+func (b Block) Range(i1, i2 int) []float32 {
+	return b.Contiguous().Range(i1, i2)
 }

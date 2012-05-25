@@ -57,7 +57,7 @@ func (v VectorBlock) Normalize() {
 	sy := v[Y].Contiguous()
 	sz := v[Z].Contiguous()
 	for i := range sx {
-		norm := Vector{sx[i], sy[i], sz[i]}.Norm()
+		norm := Sqrtf(sx[i]*sx[i] + sy[i]*sy[i] + sz[i]*sz[i])
 		sx[i] /= norm
 		sy[i] /= norm
 		sz[i] /= norm

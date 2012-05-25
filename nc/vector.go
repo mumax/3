@@ -1,6 +1,8 @@
 package nc
 
-import ()
+import (
+	"math"
+)
 
 // 3-component vector.
 type Vector [VECCOMP]float32
@@ -27,7 +29,7 @@ func (a Vector) Sub(b Vector) Vector {
 
 // Vector norm.
 func (a Vector) Norm() float32 {
-	return Sqrtf(a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z])
+	return float32(math.Sqrt(float64(a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z])))
 }
 
 // Vector norm squared.

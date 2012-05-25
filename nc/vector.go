@@ -15,12 +15,22 @@ const (
 	Z = 2
 )
 
-// Vector addition
+// Vector addition.
 func (a Vector) Add(b Vector) Vector {
 	return Vector{a[X] + b[X], a[Y] + b[Y], a[Z] + b[Z]}
 }
 
-// Vector subtraction
+// Vector subtraction.
 func (a Vector) Sub(b Vector) Vector {
 	return Vector{a[X] - b[X], a[Y] - b[Y], a[Z] - b[Z]}
+}
+
+// Vector norm.
+func (a Vector) Norm() float32 {
+	return Sqrtf(a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z])
+}
+
+// Vector norm squared.
+func (a Vector) Norm2() float32 {
+	return a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z]
 }

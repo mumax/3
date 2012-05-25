@@ -52,14 +52,14 @@ func (v VectorBlock) Memset(a float32) {
 	}
 }
 
-// Get the i'th Vector element.
-//func (v VectorBlock) Get(i int) Vector {
-//	return Vector{v[X][i], v[Y][i], v[Z][i]}
-//}
-//
-//// Set the i'th Vector element.
-//func (v VectorSlice) Set(i int, value Vector) {
-//	v[X][i] = value[X]
-//	v[Y][i] = value[Y]
-//	v[Z][i] = value[Z]
-//}
+func (v VectorBlock) Normalize() {
+	sx := v[X].Contiguous()
+	sy := v[Y].Contiguous()
+	sz := v[Z].Contiguous()
+	for i := range sx {
+		norm := Vector{sx[i], sy[i], sz[i]}.Norm()
+		sx[i] /= norm
+		sy[i] /= norm
+		sz[i] /= norm
+	}
+}

@@ -45,3 +45,18 @@ func TestVectorBlock(test *testing.T) {
 		test.Fail()
 	}
 }
+
+func BenchmarkVectorBlockNormalize(bench *testing.B) {
+	bench.StopTimer()
+	N0, N1, N2 := 200, 300, 400
+	size := [3]int{N0, N1, N2}
+	b := MakeVectorBlock(size)
+	b.Memset(7)
+	bytes := 4 * int64(b.NFloat())
+	bench.SetBytes(bytes)
+	bench.Log("size: ", size, "=", bytes/(1024*1024), "MB")
+	bench.StartTimer()
+	for i := 0; i < bench.N; i++ {
+		b.Normalize()
+	}
+}

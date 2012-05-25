@@ -8,6 +8,7 @@ import ()
 // 	len(block[i][j][0]) == len(block[i][j][1]) == ...
 type Block [][][]float32
 
+// Make a block of float32's of size N[0] x N[1] x N[2].
 func MakeBlock(N [3]int) Block {
 	checkSize(N[:])
 	sliced := make([][][]float32, N[0])
@@ -28,6 +29,8 @@ func (v Block) NFloat() int {
 	return len(v) * len(v[0]) * len(v[0][0])
 }
 
+// BlockSize is the size of the block (N0, N1, N2)
+// as was passed to MakeBlock()
 func (v Block) BlockSize() [3]int {
 	return [3]int{len(v), len(v[0]), len(v[0][0])}
 }
@@ -46,6 +49,7 @@ func (v Block) Memset(a float32) {
 	}
 }
 
+// Check if all sizes are > 0
 func checkSize(size []int) {
 	for i, s := range size {
 		if s < 1 {

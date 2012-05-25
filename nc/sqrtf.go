@@ -1,6 +1,8 @@
 package nc
 
-import ( "math")
+import (
+	"math"
+)
 
 // Portable sqrtf.
 func Sqrtf(x float32) float32 {

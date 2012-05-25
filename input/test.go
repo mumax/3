@@ -1,9 +1,9 @@
 package main
 
-import(
+import (
 	"nimble-cube/mm"
 )
 
-func main(){
+func main() {
 	mm.Main()
 }

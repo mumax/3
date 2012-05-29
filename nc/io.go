@@ -1,9 +1,13 @@
 package nc
 
 import (
-	"fmt"
+	"log"
 )
 
+func init(){
+	log.SetFlags(log.Lmicroseconds|log.Lshortfile)
+}
+
 func Println(msg ...interface{}) {
-	fmt.Println(msg...)
+	log.Println(msg...)
 }

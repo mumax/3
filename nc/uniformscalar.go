@@ -34,12 +34,6 @@ func (s *UniformScalar) Range(i1, i2 int) []float32 {
 
 func (s *UniformScalar) String() string { return fmt.Sprint(s.value) }
 
-func Memset(a []float32, value float32) {
-	for i := range a {
-		a[i] = value
-	}
-}
-
 func ResizeBuffer(buf []float32, lenWant int) []float32 {
 	lenHave := len(buf)
 	switch {

@@ -29,11 +29,6 @@ func (b Block) NFloat() int {
 	return len(b) * len(b[0]) * len(b[0][0])
 }
 
-// Total number of scalar elements.
-func (b Block) NScalar() int {
-	return len(b) * len(b[0]) * len(b[0][0])
-}
-
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
 func (b Block) BlockSize() [3]int {
@@ -42,17 +37,17 @@ func (b Block) BlockSize() [3]int {
 
 // Returns the contiguous underlying storage.
 // Contains first all X component, than Y, than Z.
-func (b Block) Contiguous() Slice {
-	return [][][]float32(b)[0][0][:b.NFloat()]
+func (b Block) Contiguous() []float32 {
+	return ([][][]float32)(b)[0][0][:b.NFloat()]
 }
 
 // Set all elements to a.
-func (b Block) Memset(a float32) {
-	storage := b.Contiguous()
-	for i := range storage {
-		storage[i] = a
-	}
-}
+//func (b Block) Memset(a float32) {
+//	storage := b.Contiguous()
+//	for i := range storage {
+//		storage[i] = a
+//	}
+//}
 
 // Check if all sizes are > 0
 func checkSize(size []int) {
@@ -64,5 +59,5 @@ func checkSize(size []int) {
 }
 
 func (b Block) Range(i1, i2 int) []float32 {
-	return b.Contiguous().Range(i1, i2)
+	return b.Contiguous()[i1:i2]
 }

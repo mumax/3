@@ -13,8 +13,10 @@ func ExampleVectorBlock() {
 	fmt.Println("block.NFloat():", block.NFloat())   // 3*N0*N1*N2
 
 	storage := block.Contiguous()
-	for i := range storage {
-		storage[i] = float32(i)
+	for i := range storage[X] {
+		storage[X][i] = float32(i)
+		storage[Y][i] = float32(10 * i)
+		storage[Z][i] = float32(100 * i)
 	}
 
 	fmt.Println("block:", block)
@@ -25,8 +27,8 @@ func ExampleVectorBlock() {
 	// Output:
 	// block.NVector(): 6
 	// block.NFloat(): 18
-	// block: [[[[0 1 2] [3 4 5]]] [[[6 7 8] [9 10 11]]] [[[12 13 14] [15 16 17]]]]
-	// block.Contiguous(): [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17]
+	// block: [[[[0 1 2] [3 4 5]]] [[[0 10 20] [30 40 50]]] [[[0 100 200] [300 400 500]]]]
+	// block.Contiguous(): [[0 1 2 3 4 5] [0 10 20 30 40 50] [0 100 200 300 400 500]]
 	// block[X]: [[[0 1 2] [3 4 5]]]
 	// block[X].Contiguous(): [0 1 2 3 4 5]
 }
@@ -39,9 +41,6 @@ func TestVectorBlock(test *testing.T) {
 		test.Fail()
 	}
 	if b.NVector() != N0*N1*N2 {
-		test.Fail()
-	}
-	if b.NFloat() != len(b.Contiguous()) {
 		test.Fail()
 	}
 }

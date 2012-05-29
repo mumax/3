@@ -8,7 +8,7 @@ type VectorBlock [3]Block
 
 func MakeVectorBlock(N [3]int) VectorBlock {
 	checkSize(N[:])
-	var sliced [VECCOMP]Block
+	var sliced [3]Block
 	for i := range sliced {
 		sliced[i] = make(Block, N[0])
 	}
@@ -17,7 +17,7 @@ func MakeVectorBlock(N [3]int) VectorBlock {
 			sliced[i][j] = make([][]float32, N[1])
 		}
 	}
-	list := make([]float32, VECCOMP*N[0]*N[1]*N[2])
+	list := make([]float32, 3*N[0]*N[1]*N[2])
 	for i := range sliced {
 		for j := range sliced[i] {
 			for k := range sliced[i][j] {
@@ -43,17 +43,12 @@ func (v VectorBlock) BlockSize() [3]int {
 }
 
 // Returns the contiguous underlying storage.
-// Contains first all X component, than Y, than Z.
-func (v VectorBlock) Contiguous() Slice {
-	return (([3]Block)(v))[0][0][0][:v.NFloat()]
+func (v VectorBlock) Contiguous() [3][]float32 {
+	return [3][]float32{v[X].Contiguous(), v[Y].Contiguous(), v[Z].Contiguous()}
 }
 
 // Set all elements to a.
 func (v VectorBlock) Memset(a float32) {
-	storage := v.Contiguous()
-	for i := range storage {
-		storage[i] = a
-	}
 }
 
 // TODO: move to vectorslice!

@@ -45,7 +45,7 @@ func BenchmarkBlockContiguous(bench *testing.B) {
 	N0, N1, N2 := 20, 300, 400
 	size := [3]int{N0, N1, N2}
 	b := MakeBlock(size)
-	var s Slice
+	var s []float32
 	bench.StartTimer()
 	for i := 0; i < bench.N; i++ {
 		s = b.Contiguous()

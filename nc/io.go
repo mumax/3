@@ -4,8 +4,8 @@ import (
 	"log"
 )
 
-func init(){
-	log.SetFlags(log.Lmicroseconds|log.Lshortfile)
+func init() {
+	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
 }
 
 func Println(msg ...interface{}) {

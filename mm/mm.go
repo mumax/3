@@ -7,6 +7,7 @@ import (
 
 var (
 	size   [3]int      // 3D geom size
+	N      int         // product of size
 	warp   int         // buffer size for Range()
 	m0, m1 VectorBlock // reduced magnetization, at old and new t
 	heff   VectorBlock // effective field
@@ -19,6 +20,7 @@ func Main() {
 
 	N0, N1, N2 := 1, 4, 8
 	size := [3]int{N0, N1, N2}
+	N = N0 * N1 * N2
 
 	log.Println("size:", size)
 	N := N0 * N1 * N2
@@ -45,7 +47,11 @@ func Main() {
 
 func UpdateTorque() {
 	N := torque.NVector()
-	Torque := torque.Contiguous()
+
+	τx := torque[X].Contiguous()
+	τy := torque[X].Contiguous()
+	τz := torque[X].Contiguous()
+
 	M := m0.Contiguous()
 	//H := heff.Contiguous()
 

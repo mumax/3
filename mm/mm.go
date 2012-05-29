@@ -26,6 +26,9 @@ func Main() {
 	N := N0 * N1 * N2
 	log.Println("N:", N)
 
+	gamma = 1
+	log.Println("gamma:", gamma)
+
 	// Find some nice warp size
 	warp = 8
 	for N%warp != 0 {
@@ -37,30 +40,30 @@ func Main() {
 	heff = MakeVectorBlock(size)
 	torque = MakeVectorBlock(size)
 
-	Memset(m0[X].Contiguous(), 1)
-	Memset(m0[Y].Contiguous(), 0)
-	Memset(m0[Z].Contiguous(), 0)
+	Vecset(m0.Contiguous(), Vector{1, 0, 0})
+	Vecset(heff.Contiguous(), Vector{0, 1, 0})
 
 	UpdateTorque()
 	log.Println(torque)
 }
 
 func UpdateTorque() {
-	N := torque.NVector()
-
-	τ := torque.Contiguous()
-
-	M := m0.Contiguous()
-	//H := heff.Contiguous()
 
 	for I := 0; I < N; I += warp {
 
-		torque := Torque.Range(I, I+warp)
-		m := M.Range(I, I+warp)
-		//heff := H.Range(I, I+warp)
+		τ_ := torque.Range(I, I+warp)
+		m_ := m0.Range(I, I+warp)
+		h_ := heff.Range(I, I+warp)
 
 		for i := 0; i < warp; i++ {
-			torque[i] = m[i]
+			m := Vector{m_[X][i], m_[Y][i], m_[Z][i]}
+			h := Vector{h_[X][i], h_[Y][i], h_[Z][i]}
+
+			τ := m.Cross(h)
+
+			τ_[X][i] = gamma * τ[X]
+			τ_[Y][i] = gamma * τ[Y]
+			τ_[Z][i] = gamma * τ[Z]
 		}
 	}
 }

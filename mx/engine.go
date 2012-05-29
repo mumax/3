@@ -1,5 +1,0 @@
-package mx
-
-import ()
-
-var ()

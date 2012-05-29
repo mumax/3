@@ -46,6 +46,11 @@ func (v VectorBlock) Contiguous() [3][]float32 {
 	return [3][]float32{v[X].Contiguous(), v[Y].Contiguous(), v[Z].Contiguous()}
 }
 
+// Returns the X,Y,Z components of elements i1 through i2 (excl.).
+func (b VectorBlock) Range(i1, i2 int) [3][]float32 {
+	return [3][]float32{b[X].Range(i1, i2), b[Y].Range(i1, i2), b[Z].Range(i1, i2)}
+}
+
 //// TODO: move to vectorslice!
 //func (v VectorBlock) Normalize() {
 //	sx := v[X].Contiguous()

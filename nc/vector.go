@@ -24,6 +24,10 @@ func (a Vector) Sub(b Vector) Vector {
 	return Vector{a[X] - b[X], a[Y] - b[Y], a[Z] - b[Z]}
 }
 
+func (a Vector) Cross(b Vector) Vector {
+	return Vector{a[Y]*b[Z] - a[Z]*b[Y], -a[X]*b[Z] + a[Z]*b[X], a[X]*b[Y] - a[Y]*b[X]}
+}
+
 // Vector norm.
 func (a Vector) Norm() float32 {
 	return float32(math.Sqrt(float64(a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z])))

@@ -1,9 +1,8 @@
 package nc
 
-import (
-	"math"
-)
+import ()
 
+// Block of vectors. See Block.
 type VectorBlock [3]Block
 
 func MakeVectorBlock(N [3]int) VectorBlock {
@@ -47,22 +46,18 @@ func (v VectorBlock) Contiguous() [3][]float32 {
 	return [3][]float32{v[X].Contiguous(), v[Y].Contiguous(), v[Z].Contiguous()}
 }
 
-// Set all elements to a.
-func (v VectorBlock) Memset(a float32) {
-}
-
-// TODO: move to vectorslice!
-func (v VectorBlock) Normalize() {
-	sx := v[X].Contiguous()
-	sy := v[Y].Contiguous()
-	sz := v[Z].Contiguous()
-	for i, x := range sx {
-		y := sy[i]
-		z := sz[i]
-		//norm:=float32(7)
-		norm := 1 / float32(math.Sqrt(float64(x*x+y*y+z*z))) // BOTTLENECK
-		sx[i] = x * norm
-		sy[i] = y * norm
-		sz[i] = z * norm
-	}
-}
+//// TODO: move to vectorslice!
+//func (v VectorBlock) Normalize() {
+//	sx := v[X].Contiguous()
+//	sy := v[Y].Contiguous()
+//	sz := v[Z].Contiguous()
+//	for i, x := range sx {
+//		y := sy[i]
+//		z := sz[i]
+//		//norm:=float32(7)
+//		norm := 1 / float32(math.Sqrt(float64(x*x+y*y+z*z))) // BOTTLENECK
+//		sx[i] = x * norm
+//		sy[i] = y * norm
+//		sz[i] = z * norm
+//	}
+//}

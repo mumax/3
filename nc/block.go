@@ -8,7 +8,8 @@ import ()
 // 	len(block[i][j][0]) == len(block[i][j][1]) == ...
 type Block [][][]float32
 
-// Make a block of float32's of size N[0] x N[1] x N[2].
+// Make a block of float32's of size N[0] x N[1] x N[2]
+// with contiguous underlying storage.
 func MakeBlock(N [3]int) Block {
 	checkSize(N[:])
 	sliced := make([][][]float32, N[0])
@@ -36,28 +37,11 @@ func (b Block) BlockSize() [3]int {
 }
 
 // Returns the contiguous underlying storage.
-// Contains first all X component, than Y, than Z.
 func (b Block) Contiguous() []float32 {
 	return ([][][]float32)(b)[0][0][:b.NFloat()]
 }
 
-// Set all elements to a.
-//func (b Block) Memset(a float32) {
-//	storage := b.Contiguous()
-//	for i := range storage {
-//		storage[i] = a
-//	}
-//}
-
-// Check if all sizes are > 0
-func checkSize(size []int) {
-	for i, s := range size {
-		if s < 1 {
-			Panic("MakeBlock: N", i, " out of range:", s)
-		}
-	}
-}
-
+// Returns elements i1 through i2 (excl.) of the underlying storage.
 func (b Block) Range(i1, i2 int) []float32 {
 	return b.Contiguous()[i1:i2]
 }

@@ -37,9 +37,9 @@ func Main() {
 	heff = MakeVectorBlock(size)
 	torque = MakeVectorBlock(size)
 
-	m0[X].Memset(1)
-	m0[Y].Memset(0)
-	m0[Z].Memset(0)
+	Memset(m0[X].Contiguous(), 1)
+	Memset(m0[Y].Contiguous(), 0)
+	Memset(m0[Z].Contiguous(), 0)
 
 	UpdateTorque()
 	log.Println(torque)
@@ -48,9 +48,7 @@ func Main() {
 func UpdateTorque() {
 	N := torque.NVector()
 
-	τx := torque[X].Contiguous()
-	τy := torque[X].Contiguous()
-	τz := torque[X].Contiguous()
+	τ := torque.Contiguous()
 
 	M := m0.Contiguous()
 	//H := heff.Contiguous()

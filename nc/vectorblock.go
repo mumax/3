@@ -1,7 +1,7 @@
 package nc
 
 import (
-	//"math"
+	"math"
 )
 
 type VectorBlock [3]Block
@@ -61,7 +61,7 @@ func (v VectorBlock) Normalize() {
 	sx := v[X].Contiguous()
 	sy := v[Y].Contiguous()
 	sz := v[Z].Contiguous()
-	for i,x := range sx {
+	for i, x := range sx {
 		y := sy[i]
 		z := sz[i]
 		//norm:=float32(7)

@@ -15,18 +15,18 @@ gccgo:
 test: 6gtest gccgotest
 
 6gtest: 
-	go test $(LIB)
+	go test
 
 gccgotest: 
-	go test -compiler $(GCCGO) $(LIB)
+	go test -compiler $(GCCGO)
 
 bench: 6gbench gccgobench
 
 6gbench:
-	go test -bench=. $(LIB)
+	go test -bench=.
 
 gccgobench:
-	go test -bench=. -compiler $(GCCGO) $(LIB)
+	go test -bench=. -compiler $(GCCGO)
 
 clean:
 	go clean

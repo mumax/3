@@ -2,14 +2,15 @@ package cufft
 
 import (
 	"github.com/barnex/cuda4/cu"
-	"testing"
 	"unsafe"
+	"fmt"
 )
 
-func ExampleFFT1D(test *testing.T) {
-	N := 5
+func ExampleFFT1D() {
+	N := 8
 
 	hostIn := make([]float32, N)
+	hostIn[0] = 1
 	devIn := cu.MemAlloc(int64(len(hostIn)) * cu.SIZEOF_FLOAT32)
 	defer cu.MemFree(&devIn)
 	cu.MemcpyHtoD(devIn, unsafe.Pointer(&hostIn[0]), devIn.Bytes())
@@ -19,12 +20,14 @@ func ExampleFFT1D(test *testing.T) {
 	defer cu.MemFree(&devOut)
 
 	plan := Plan1d(N, R2C, 1)
-	plan.ExecR2C(devIn, devOut)
+	plan.ExecR2C(uintptr(devIn), uintptr(devOut))
 
-	cu.MemcpyDtoH(unsafe.Pointer(&hostOut[0]), devOut)
+	cu.MemcpyDtoH(unsafe.Pointer(&hostOut[0]), devOut, devOut.Bytes())
 
-	fmt.Println(hostOut)
+	fmt.Println("hostIn:" ,hostIn)
+	fmt.Println("hostOut:", hostOut)
 
 	// Output:
-	// a
+	// hostIn: [1 0 0 0 0 0 0 0]
+	// hostOut: [(1+0i) (+1+0i) (+1+0i) (+1-0i) (+1+0i)]
 }

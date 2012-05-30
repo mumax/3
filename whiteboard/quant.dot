@@ -1,5 +1,7 @@
 digraph whiteboard{
 
+label="Excessive hierarchy idea"
+
 rankdir=BT
 
 node [ shape = "record" ]

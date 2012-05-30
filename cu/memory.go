@@ -11,7 +11,6 @@ import (
 )
 
 type DevicePtr uintptr
-type HostPtr unsafe.Pointer
 
 // Allocates a number of bytes of device memory.
 func MemAlloc(bytes int64) DevicePtr {
@@ -81,8 +80,8 @@ func MemcpyDtoDAsync(dst, src DevicePtr, bytes int64, stream Stream) {
 }
 
 // Copies a number of bytes from host to device.
-func MemcpyHtoD(dst DevicePtr, src HostPtr, bytes int64) {
-	err := Result(C.cuMemcpyHtoD(C.CUdeviceptr(dst), unsafe.Pointer(src), C.size_t(bytes)))
+func MemcpyHtoD(dst DevicePtr, src unsafe.Pointer, bytes int64) {
+	err := Result(C.cuMemcpyHtoD(C.CUdeviceptr(dst), src, C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
 	}
@@ -90,16 +89,16 @@ func MemcpyHtoD(dst DevicePtr, src HostPtr, bytes int64) {
 
 // Asynchronously copies a number of bytes from host to device.
 // The host memory must be page-locked (see MemRegister)
-func MemcpyHtoDAsync(dst DevicePtr, src HostPtr, bytes int64, stream Stream) {
-	err := Result(C.cuMemcpyHtoDAsync(C.CUdeviceptr(dst), unsafe.Pointer(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
+func MemcpyHtoDAsync(dst DevicePtr, src unsafe.Pointer, bytes int64, stream Stream) {
+	err := Result(C.cuMemcpyHtoDAsync(C.CUdeviceptr(dst), src, C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
 	}
 }
 
 // Copies a number of bytes from device to host.
-func MemcpyDtoH(dst HostPtr, src DevicePtr, bytes int64) {
-	err := Result(C.cuMemcpyDtoH(unsafe.Pointer(dst), C.CUdeviceptr(src), C.size_t(bytes)))
+func MemcpyDtoH(dst unsafe.Pointer, src DevicePtr, bytes int64) {
+	err := Result(C.cuMemcpyDtoH(dst, C.CUdeviceptr(src), C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
 	}
@@ -107,8 +106,8 @@ func MemcpyDtoH(dst HostPtr, src DevicePtr, bytes int64) {
 
 // Asynchronously copies a number of bytes device host to host.
 // The host memory must be page-locked (see MemRegister)
-func MemcpyDtoHAsync(dst HostPtr, src DevicePtr, bytes int64, stream Stream) {
-	err := Result(C.cuMemcpyDtoHAsync(unsafe.Pointer(dst), C.CUdeviceptr(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
+func MemcpyDtoHAsync(dst unsafe.Pointer, src DevicePtr, bytes int64, stream Stream) {
+	err := Result(C.cuMemcpyDtoHAsync(dst, C.CUdeviceptr(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
 	}
@@ -169,16 +168,16 @@ func MemGetInfo() (free, total int64) {
 // Page-locks memory specified by the pointer and bytes.
 // The pointer and byte size must be aligned to the host page size (4KB)
 // See also: MemHostUnregister()
-func MemHostRegister(ptr HostPtr, bytes int64, flags MemHostRegisterFlag) {
-	err := Result(C.cuMemHostRegister(unsafe.Pointer(ptr), C.size_t(bytes), C.uint(flags)))
+func MemHostRegister(ptr unsafe.Pointer, bytes int64, flags MemHostRegisterFlag) {
+	err := Result(C.cuMemHostRegister(ptr, C.size_t(bytes), C.uint(flags)))
 	if err != SUCCESS {
 		panic(err)
 	}
 }
 
 // Unmaps memory locked by MemHostRegister().
-func MemHostUnregister(ptr HostPtr) {
-	err := Result(C.cuMemHostUnregister(unsafe.Pointer(ptr)))
+func MemHostUnregister(ptr unsafe.Pointer) {
+	err := Result(C.cuMemHostUnregister(ptr))
 	if err != SUCCESS {
 		panic(err)
 	}
@@ -197,3 +196,11 @@ const (
 func (p DevicePtr) String() string {
 	return fmt.Sprint(unsafe.Pointer(uintptr(p)))
 }
+
+// Type size in bytes
+const (
+	SIZEOF_FLOAT32    = 4
+	SIZEOF_FLOAT64    = 8
+	SIZEOF_COMPLEX64  = 8
+	SIZEOF_COMPLEX128 = 16
+)

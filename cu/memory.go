@@ -171,3 +171,8 @@ const (
 	// Maps the allocation in CUDA address space. TODO(a): cuMemHostGetDevicePointer()
 	MEMHOSTREGISTER_DEVICEMAP MemHostRegisterFlag = C.CU_MEMHOSTREGISTER_DEVICEMAP
 )
+
+const(
+	SIZEOF_FLOAT32 = 4
+	SIZEOF_FLOAT64 = 8
+)

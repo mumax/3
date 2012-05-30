@@ -1,7 +1,5 @@
 all: 6g gccgo
 
-LIB=cu
-
 6g:
 	go install -v
 	go tool vet *.go

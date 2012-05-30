@@ -59,11 +59,11 @@ func TestMemsetAsync(t *testing.T) {
 	}
 	host2 := make([]float32, N)
 	dev1 := MemAlloc(int64(4 * N))
-	MemcpyHtoD(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N)
+	MemcpyHtoD(dev1, (unsafe.Pointer(&host1[0])), 4*N)
 	str := StreamCreate()
 	MemsetD32Async(dev1, math.Float32bits(42), N, str)
 	MemsetD32Async(dev1, math.Float32bits(21), N/2, str)
-	MemcpyDtoH(HostPtr(unsafe.Pointer(&host2[0])), dev1, 4*N)
+	MemcpyDtoH((unsafe.Pointer(&host2[0])), dev1, 4*N)
 	str.Synchronize()
 	(&str).Destroy()
 	for i := 0; i < len(host2)/2; i++ {
@@ -87,10 +87,10 @@ func TestMemset(t *testing.T) {
 	}
 	host2 := make([]float32, N)
 	dev1 := MemAlloc(int64(4 * N))
-	MemcpyHtoD(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N)
+	MemcpyHtoD(dev1, (unsafe.Pointer(&host1[0])), 4*N)
 	MemsetD32(dev1, math.Float32bits(42), N)
 	MemsetD32(dev1, math.Float32bits(21), N/2)
-	MemcpyDtoH(HostPtr(unsafe.Pointer(&host2[0])), dev1, 4*N)
+	MemcpyDtoH((unsafe.Pointer(&host2[0])), dev1, 4*N)
 	for i := 0; i < len(host2)/2; i++ {
 		if host2[i] != 21 {
 			t.Fail()
@@ -113,9 +113,9 @@ func TestMemcpy(t *testing.T) {
 	host2 := make([]float32, N)
 	dev1 := MemAlloc(int64(4 * N))
 	dev2 := MemAlloc(int64(4 * N))
-	MemcpyHtoD(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N)
+	MemcpyHtoD(dev1, (unsafe.Pointer(&host1[0])), 4*N)
 	MemcpyDtoD(dev2, dev1, 4*N)
-	MemcpyDtoH(HostPtr(unsafe.Pointer(&host2[0])), dev2, 4*N)
+	MemcpyDtoH((unsafe.Pointer(&host2[0])), dev2, 4*N)
 	for i := range host2 {
 		if host2[i] != float32(i) {
 			t.Fail()
@@ -135,9 +135,9 @@ func TestMemcpyAsync(t *testing.T) {
 	dev1 := MemAlloc(int64(4 * N))
 	dev2 := MemAlloc(int64(4 * N))
 	stream := StreamCreate()
-	MemcpyHtoDAsync(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N, stream)
+	MemcpyHtoDAsync(dev1, (unsafe.Pointer(&host1[0])), 4*N, stream)
 	MemcpyDtoDAsync(dev2, dev1, 4*N, stream)
-	MemcpyDtoHAsync(HostPtr(unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
+	MemcpyDtoHAsync((unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
 	stream.Synchronize()
 	for i := range host2 {
 		if host2[i] != float32(i) {
@@ -158,9 +158,9 @@ func TestMemcpyAsyncRegistered(t *testing.T) {
 	dev1 := MemAlloc(int64(4 * N))
 	dev2 := MemAlloc(int64(4 * N))
 	stream := StreamCreate()
-	MemcpyHtoDAsync(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N, stream)
+	MemcpyHtoDAsync(dev1, (unsafe.Pointer(&host1[0])), 4*N, stream)
 	MemcpyDtoDAsync(dev2, dev1, 4*N, stream)
-	MemcpyDtoHAsync(HostPtr(unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
+	MemcpyDtoHAsync((unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
 	stream.Synchronize()
 	for i := range host2 {
 		if host2[i] != float32(i) {
@@ -183,9 +183,9 @@ func BenchmarkMemcpy(b *testing.B) {
 	b.SetBytes(4 * N)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		MemcpyHtoD(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N)
+		MemcpyHtoD(dev1, (unsafe.Pointer(&host1[0])), 4*N)
 		MemcpyDtoD(dev2, dev1, 4*N)
-		MemcpyDtoH(HostPtr(unsafe.Pointer(&host2[0])), dev2, 4*N)
+		MemcpyDtoH((unsafe.Pointer(&host2[0])), dev2, 4*N)
 	}
 }
 
@@ -202,9 +202,9 @@ func BenchmarkMemcpyAsync(b *testing.B) {
 	b.SetBytes(4 * N)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		MemcpyHtoDAsync(dev1, HostPtr(unsafe.Pointer(&host1[0])), 4*N, stream)
+		MemcpyHtoDAsync(dev1, (unsafe.Pointer(&host1[0])), 4*N, stream)
 		MemcpyDtoDAsync(dev2, dev1, 4*N, stream)
-		MemcpyDtoHAsync(HostPtr(unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
+		MemcpyDtoHAsync((unsafe.Pointer(&host2[0])), dev2, 4*N, stream)
 		stream.Synchronize()
 	}
 }
@@ -227,7 +227,7 @@ func MakeLockedFloat32Slice(length int) []float32 {
 		l += 4
 	}
 
-	MemHostRegister(HostPtr(&slice[0]), l, MEMHOSTREGISTER_PORTABLE)
+	MemHostRegister(unsafe.Pointer(&slice[0]), l, MEMHOSTREGISTER_PORTABLE)
 	return slice
 }
 

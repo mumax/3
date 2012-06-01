@@ -18,19 +18,16 @@ func TestModule(test *testing.T) {
 	aptr := unsafe.Pointer(&a[0])
 	MemcpyHtoD(A, aptr, N4)
 
-	var array uintptr
-	array = uintptr(A)
-
 	var value float32
 	value = 42
 
 	var n int
 	n = N / 2
 
-	args := []unsafe.Pointer{unsafe.Pointer(&array), unsafe.Pointer(&value), unsafe.Pointer(&n)}
 	block := 128
 	grid := DivUp(N, block)
 	shmem := 0
+	args := []unsafe.Pointer{unsafe.Pointer(&A), unsafe.Pointer(&value), unsafe.Pointer(&n)}
 	LaunchKernel(f, grid, 1, 1, block, 1, 1, shmem, 0, args)
 
 	MemcpyDtoH(aptr, A, N4)

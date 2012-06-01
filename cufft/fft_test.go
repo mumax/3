@@ -11,6 +11,7 @@ func ExampleFFT1D() {
 
 	hostIn := make([]float32, N)
 	hostIn[0] = 1
+
 	devIn := cu.MemAlloc(int64(len(hostIn)) * cu.SIZEOF_FLOAT32)
 	defer cu.MemFree(&devIn)
 	cu.MemcpyHtoD(devIn, unsafe.Pointer(&hostIn[0]), devIn.Bytes())

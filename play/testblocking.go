@@ -3,11 +3,14 @@ package main
 import (
 	"github.com/barnex/cuda4/cu"
 	"log"
-	"unsafe"
 	"runtime"
+	"time"
+	"unsafe"
 )
 
-var (ctx cu.Context)
+var (
+	ctx cu.Context
+)
 
 func init() {
 	log.SetFlags(log.Lmicroseconds)
@@ -17,28 +20,11 @@ func init() {
 
 	log.Println("cu.CtxCreate")
 	ctx = cu.CtxCreate(cu.CTX_SCHED_YIELD, 0)
-
-	log.Println("ctx.SetCurrent()")
-	ctx.SetCurrent()
-
-	// Workaround to try to set the same context for all go threads,
-	// avoids CUDA_INVALID_CONTEXT
-	N := runtime.GOMAXPROCS(-1)
-	done := make(chan int, N)
-	for i:=0; i<N; i++{
-		go func(){
-			log.Println("ctx.SetCurrent()")
-			ctx.SetCurrent()
-			done <- 1
-		}()
-	}
-	for i:=0; i<N; i++{
-		<-done
-	}
-	log.Println("set", N, "contexts")
 }
 
 func main() {
+
+	ctx.SetCurrent()
 
 	log.Println(`cu.ModuleLoad("testmodule.ptx")`)
 	mod := cu.ModuleLoad("testmodule.ptx")
@@ -57,7 +43,7 @@ func main() {
 	array = uintptr(A)
 
 	var load int
-	load = 10000
+	load = 1000
 
 	var n int
 	n = N / 2
@@ -68,18 +54,32 @@ func main() {
 	shmem := 0
 	log.Println("block:", block, "grid", grid)
 	done := make(chan int)
+	Nthr := 16
+
+	for I := 0; I < Nthr; I++ {
+		go func(i int) {
+			ctx.SetCurrent()
+			stream := cu.StreamCreate()
+			log.Println("start", i)
+			cu.LaunchKernel(f, grid, 1, 1, block, 1, 1, shmem, stream, args)
+			log.Println("waitforsync", i)
+			runtime.Gosched()
+			stream.Synchronize()
+			log.Println("done", i)
+			done <- 1
+		}(I)
+	}
 	go func() {
-		// ctx.SetCurrent()
-		stream := cu.StreamCreate()
-		log.Println("start")
-		cu.LaunchKernel(f, grid, 1, 1, block, 1, 1, shmem, stream, args)
-		stream.Synchronize()
-		log.Println("done")
-		done <- 1
+		for {
+			log.Println("tick")
+			time.Sleep(100 * 1e6)
+		}
 	}()
-	
-	log.Println("waiting for <-done")
-	<-done
+	log.Println("waiting for ", Nthr, " x <-done")
+
+	for I := 0; I < Nthr; I++ {
+		<-done
+	}
 	log.Println("<-done OK")
 
 	cu.MemcpyDtoH(aptr, A, bytes)

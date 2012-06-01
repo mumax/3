@@ -3,6 +3,7 @@ package cu
 import (
 	"testing"
 	"unsafe"
+	//"fmt"
 )
 
 func TestModule(test *testing.T) {
@@ -13,6 +14,7 @@ func TestModule(test *testing.T) {
 	N4 := 4 * int64(N)
 	a := make([]float32, N)
 	A := MemAlloc(N4)
+	defer A.Free()
 	aptr := unsafe.Pointer(&a[0])
 	MemcpyHtoD(A, aptr, N4)
 

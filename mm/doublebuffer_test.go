@@ -1,5 +1,0 @@
-package mm
-
-import (
-	"testing"
-)

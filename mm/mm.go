@@ -20,14 +20,8 @@ var (
 func Main() {
 
 	initSize()
+	go RunGC()
 
-	m := MakeDoubleBuffer(N)
-
-	pipe := MakePipe()
-	m.SendPipe = pipe.SendPipe()
-	m.RecvPipe = pipe.RecvPipe()
-
-	m.Cycle()
 }
 
 func initSize() {
@@ -45,4 +39,27 @@ func initSize() {
 		warp--
 	}
 	log.Println("warp:", warp)
+}
+
+
+CONCEPT:
+
+go RunTorque()
+
+func RunTorque(){
+	// replace by := notation
+	var recvm chan<- float32[] = recv(m) // engine inserts tee if needed 
+		// engine uses runtime.Caller to construct (purely informative) dependency graph:  torque <- RunTorque <- (m, h)
+	var recvh chan<- float32[] = recv(h)
+	var sendtorque <-chan[]float32 = send(torque)
+
+	for{
+		buf := <- getbuffer
+		m:=<-recvm
+		h:=<-recvh
+		torque(buf, m, h)
+		sendtorque <- torque
+		recycle <- m
+		recycle <- h
+	}
 }

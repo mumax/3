@@ -5,7 +5,7 @@ var (
 	//giveback chan<-[]float32
 )
 
-func RunRecycler() {
+func RunGC() {
 	out := make(chan []float32)
 	take = out
 
@@ -16,3 +16,6 @@ func RunRecycler() {
 		out <- make([]float32, warp)
 	}
 }
+
+func Buffer() []float32       { return <-take }
+func VecBuffer() [3][]float32 { return [3][]float32{<-take, <-take, <-take} }

@@ -37,3 +37,7 @@ func (a Vector) Norm() float32 {
 func (a Vector) Norm2() float32 {
 	return a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z]
 }
+
+func (a Vector) Scale(s float32) Vector {
+	return Vector{s * a[X], s * a[Y], s * a[Z]}
+}

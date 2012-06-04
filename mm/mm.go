@@ -2,15 +2,13 @@ package mm
 
 import (
 	"log"
-	"nimble-cube/nc"
-	"runtime"
+	. "nimble-cube/nc"
 )
 
 var (
-	size  [3]int // 3D geom size
-	N     int    // product of size
-	warp  int    // buffer size for Range()
-	Debug = false
+	size [3]int // 3D geom size
+	N    int    // product of size
+	warp int    // buffer size for Range()
 
 	mChan     VecChan
 	alphaChan Chan
@@ -22,17 +20,13 @@ func Main() {
 	initSize()
 	go RunGC()
 
-	mChan = MakeVecChan(N / warp)
-	alphaChan = MakeChan(0)
-	hChan = MakeVecChan(0)
-
 	// send const H
 	go func() {
 		var h [3][]float32
 		h[X] = make([]float32, warp)
 		h[Y] = make([]float32, warp)
 		h[Z] = make([]float32, warp)
-		nc.Memset(h[Y], 1)
+		Memset(h[Y], 1)
 
 		for {
 			hChan.Send(h)
@@ -42,7 +36,7 @@ func Main() {
 	// send const alpha
 	go func() {
 		alpha := make([]float32, warp)
-		nc.Memset(alpha, 0.05)
+		Memset(alpha, 0.05)
 
 		for {
 			alphaChan.Send(alpha)
@@ -52,11 +46,11 @@ func Main() {
 	const dt = 0.001
 	const Nsteps = 10
 
-	// seed m
+	// init buffered m channel with starting value.
 	mx := make([]float32, warp)
 	my := make([]float32, warp)
 	mz := make([]float32, warp)
-	nc.Memset(mx, 1)
+	Memset(mx, 1)
 	mInit := [3][]float32{mx, my, mz}
 	mOffline := MakeVecChan(N / warp)
 	for I := 0; I < N; I += warp {
@@ -71,6 +65,8 @@ func Main() {
 
 }
 
+// Take mOffline as input, take Nsteps time steps and
+// return the result in mOffline (which should be buffered).
 func RunSolver(mOffline VecChan, Nsteps int, dt float32) {
 
 	for I := 0; I < N; I += warp {
@@ -89,9 +85,9 @@ func RunSolver(mOffline VecChan, Nsteps int, dt float32) {
 
 			// loop inside blocks
 			for i := range newMList[X] {
-				var m nc.Vector
-				var h nc.Vector
-				var newM nc.Vector
+				var m Vector
+				var h Vector
+				var newM Vector
 				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Z][i]
 				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Z][i]
 				//alpha := alphaList[i]

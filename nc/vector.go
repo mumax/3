@@ -7,13 +7,6 @@ import (
 // 3-component vector.
 type Vector [3]float32
 
-// Index for vector component x,y,z.
-const (
-	X = 0
-	Y = 1
-	Z = 2
-)
-
 // Vector addition.
 func (a Vector) Add(b Vector) Vector {
 	return Vector{a[X] + b[X], a[Y] + b[Y], a[Z] + b[Z]}
@@ -46,3 +39,10 @@ func (a Vector) Norm2() float32 {
 func (a Vector) Scale(s float32) Vector {
 	return Vector{s * a[X], s * a[Y], s * a[Z]}
 }
+
+// Index for vector component.
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

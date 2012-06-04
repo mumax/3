@@ -20,11 +20,12 @@ var (
 
 func Main() {
 
+	log.Println("1058")
 	initSize()
 	go RunGC()
 
 	mChan := MakeVecChan(0)
-	alphaChan := make(chan []float32)
+	alphaChan := MakeChan(0)
 	hChan := MakeVecChan(0)
 	torqueChan := MakeVecChan(0)
 
@@ -60,7 +61,7 @@ func Main() {
 		nc.Memset(alpha, 0.05)
 
 		for {
-			alphaChan <- alpha
+			alphaChan.Send(alpha)
 		}
 	}()
 
@@ -68,19 +69,19 @@ func Main() {
 	go func() {
 		for {
 			torque := VecBuffer()
-			alpha := <-alphaChan
+			//alphaList := alphaChan.Recv()
 			mList := mChan.Recv()
 			hList := hChan.Recv()
 
-			for i := range torque {
+			for i := range torque[X] {
 				var m nc.Vector
 				var h nc.Vector
 				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Y][i]
 				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Y][i]
-				alpha := alpha[i]
+				//alpha := alphaList[i]
 
 				mxh := m.Cross(h)
-				tq := mxh.Sub(m.Cross(mxh).Scale(alpha))
+				tq := mxh //.Sub(m.Cross(mxh).Scale(alpha))
 				torque[X][i] = tq[X]
 				torque[Y][i] = tq[Y]
 				torque[Z][i] = tq[Z]

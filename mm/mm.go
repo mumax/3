@@ -76,8 +76,8 @@ func Main() {
 			for i := range torque[X] {
 				var m nc.Vector
 				var h nc.Vector
-				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Y][i]
-				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Y][i]
+				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Z][i]
+				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Z][i]
 				//alpha := alphaList[i]
 
 				mxh := m.Cross(h)

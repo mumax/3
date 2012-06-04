@@ -35,6 +35,18 @@ func TestVectorSub(test *testing.T) {
 	}
 }
 
+func TestVectorCross(test *testing.T) {
+	a := Vector{1, 0, 0}
+	b := Vector{0, 1, 0}
+	cross := Vector{0, 0, 1}
+	if a.Cross(b) != cross {
+		test.Error(a.Cross(b))
+	}
+	if a != (Vector{1, 0, 0}) || b != (Vector{0, 1, 0}) {
+		test.Fail()
+	}
+}
+
 func BenchmarkVectorAdd(bench *testing.B) {
 	var a, b Vector
 	for i := 0; i < bench.N; i++ {

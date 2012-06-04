@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	log.SetFlags(log.Lmicroseconds)// | log.Lshortfile)
+	log.SetFlags(log.Lmicroseconds) // | log.Lshortfile)
 }
 
 func Println(msg ...interface{}) {

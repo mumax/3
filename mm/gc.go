@@ -17,5 +17,9 @@ func RunGC() {
 	}
 }
 
-func Buffer() []float32       { return <-take }
-func VecBuffer() [3][]float32 { return [3][]float32{<-take, <-take, <-take} }
+func Buffer() []float32 {
+	return make([]float32, warp) //<-take
+}
+func VecBuffer() [3][]float32 {
+	return [3][]float32{Buffer(), Buffer(), Buffer()}
+}

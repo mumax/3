@@ -3,6 +3,7 @@ package mm
 import (
 	"log"
 	"nimble-cube/nc"
+	"runtime"
 )
 
 var (
@@ -10,11 +11,10 @@ var (
 	N     int    // product of size
 	warp  int    // buffer size for Range()
 	Debug = false
-	//m0, m1 VectorBlock // reduced magnetization, at old and new t
-	//heff   VectorBlock // effective field
-	//gamma  float32     // gyromagnetic ratio
-	//alpha  float32     // damping coefficient
-	//torque VectorBlock // dm/dt
+
+	mChan     VecChan
+	alphaChan Chan
+	hChan     VecChan
 )
 
 func Main() {
@@ -22,9 +22,9 @@ func Main() {
 	initSize()
 	go RunGC()
 
-	mChan := MakeVecChan(N / warp)
-	alphaChan := MakeChan(0)
-	hChan := MakeVecChan(0)
+	mChan = MakeVecChan(N / warp)
+	alphaChan = MakeChan(0)
+	hChan = MakeVecChan(0)
 
 	// send const H
 	go func() {
@@ -52,15 +52,42 @@ func Main() {
 	const dt = 0.001
 	const Nsteps = 10
 
-	// run solver
-	tick := make(chan int)
-	go func() {
-		for step := 0; step < Nsteps; step++ {
+	// seed m
+	mx := make([]float32, warp)
+	my := make([]float32, warp)
+	mz := make([]float32, warp)
+	nc.Memset(mx, 1)
+	mInit := [3][]float32{mx, my, mz}
+	mOffline := MakeVecChan(N / warp)
+	for I := 0; I < N; I += warp {
+		mOffline.Send(mInit) // [I]
+	}
+
+	RunSolver(mOffline, Nsteps, dt)
+
+	for I := 0; I < N; I += warp {
+		log.Println(mOffline.Recv())
+	}
+
+}
+
+func RunSolver(mOffline VecChan, Nsteps int, dt float32) {
+
+	for I := 0; I < N; I += warp {
+		mChan.Send(mOffline.Recv())
+	}
+
+	for step := 0; step < Nsteps; step++ {
+
+		// loop over blocks
+		for I := 0; I < N; I += warp {
+
 			newMList := VecBuffer()
 			//alphaList := alphaChan.Recv()
 			mList := mChan.Recv()
 			hList := hChan.Recv()
 
+			// loop inside blocks
 			for i := range newMList[X] {
 				var m nc.Vector
 				var h nc.Vector
@@ -77,28 +104,13 @@ func Main() {
 				newMList[Y][i] = newM[Y]
 				newMList[Z][i] = newM[Z]
 			}
+			if step != Nsteps-1 {
+				mChan.Send(newMList)
+			} else {
+				mOffline.Send(newMList)
+			}
 
-			mChan.Send(newMList)
-			tick <- step
 		}
-	}()
-
-	// seed m
-	mx := make([]float32, warp)
-	my := make([]float32, warp)
-	mz := make([]float32, warp)
-	nc.Memset(mx, 1)
-	mInit := [3][]float32{mx, my, mz}
-	for I := 0; I < N; I += warp {
-		mChan.Send(mInit)
-	}
-
-	for step := 0; step < Nsteps; step++ {
-		log.Println("step", <-tick)
-	}
-
-	for I := 0; I < N; I += warp {
-		log.Println(mChan.Recv())
 	}
 
 }

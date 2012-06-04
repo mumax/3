@@ -19,6 +19,11 @@ func (a Vector) Add(b Vector) Vector {
 	return Vector{a[X] + b[X], a[Y] + b[Y], a[Z] + b[Z]}
 }
 
+// Multiply-add.
+func (a Vector) MAdd(s float32, b Vector) Vector {
+	return Vector{a[X] + s*b[X], a[Y] + s*b[Y], a[Z] + s*b[Z]}
+}
+
 // Vector subtraction.
 func (a Vector) Sub(b Vector) Vector {
 	return Vector{a[X] - b[X], a[Y] - b[Y], a[Z] - b[Z]}

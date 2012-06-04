@@ -11,14 +11,22 @@ func MakeChan(buf int) Chan {
 }
 
 func (v Chan) Send(data []float32) {
-	log.Println(v, ".Send", data)
+	if Debug {
+		log.Println(v, ".Send", data)
+	}
 	v <- data
-	log.Println(v, ".Send", "OK")
+	if Debug {
+		log.Println(v, ".Send", "OK")
+	}
 }
 
 func (v Chan) Recv() (data []float32) {
-	log.Println(v, ".Recv", "waiting")
+	if Debug {
+		log.Println(v, ".Recv", "waiting")
+	}
 	data = <-v
-	log.Println(v, ".Recv", data)
+	if Debug {
+		log.Println(v, ".Recv", data)
+	}
 	return
 }

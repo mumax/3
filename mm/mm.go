@@ -1,16 +1,15 @@
 package mm
 
 import (
-	"fmt"
 	"log"
 	"nimble-cube/nc"
 )
 
 var (
-	size [3]int // 3D geom size
-	N    int    // product of size
-	warp int    // buffer size for Range()
-
+	size  [3]int // 3D geom size
+	N     int    // product of size
+	warp  int    // buffer size for Range()
+	Debug = false
 	//m0, m1 VectorBlock // reduced magnetization, at old and new t
 	//heff   VectorBlock // effective field
 	//gamma  float32     // gyromagnetic ratio
@@ -20,27 +19,12 @@ var (
 
 func Main() {
 
-	log.Println("1058")
 	initSize()
 	go RunGC()
 
-	mChan := MakeVecChan(0)
+	mChan := MakeVecChan(N / warp)
 	alphaChan := MakeChan(0)
 	hChan := MakeVecChan(0)
-	torqueChan := MakeVecChan(0)
-
-	// send const M
-	go func() {
-		var m [3][]float32
-		m[X] = make([]float32, warp)
-		m[Y] = make([]float32, warp)
-		m[Z] = make([]float32, warp)
-		nc.Memset(m[X], 1)
-
-		for {
-			mChan.Send(m)
-		}
-	}()
 
 	// send const H
 	go func() {
@@ -65,34 +49,56 @@ func Main() {
 		}
 	}()
 
-	// run torque
+	const dt = 0.001
+	const Nsteps = 10
+
+	// run solver
+	tick := make(chan int)
 	go func() {
-		for {
-			torque := VecBuffer()
+		for step := 0; step < Nsteps; step++ {
+			newMList := VecBuffer()
 			//alphaList := alphaChan.Recv()
 			mList := mChan.Recv()
 			hList := hChan.Recv()
 
-			for i := range torque[X] {
+			for i := range newMList[X] {
 				var m nc.Vector
 				var h nc.Vector
+				var newM nc.Vector
 				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Z][i]
 				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Z][i]
 				//alpha := alphaList[i]
 
 				mxh := m.Cross(h)
 				tq := mxh //.Sub(m.Cross(mxh).Scale(alpha))
-				torque[X][i] = tq[X]
-				torque[Y][i] = tq[Y]
-				torque[Z][i] = tq[Z]
+				newM = m.MAdd(dt, tq)
+
+				newMList[X][i] = newM[X]
+				newMList[Y][i] = newM[Y]
+				newMList[Z][i] = newM[Z]
 			}
 
-			torqueChan.Send(torque)
+			mChan.Send(newMList)
+			tick <- step
 		}
 	}()
 
+	// seed m
+	mx := make([]float32, warp)
+	my := make([]float32, warp)
+	mz := make([]float32, warp)
+	nc.Memset(mx, 1)
+	mInit := [3][]float32{mx, my, mz}
 	for I := 0; I < N; I += warp {
-		fmt.Println("torque:", torqueChan.Recv())
+		mChan.Send(mInit)
+	}
+
+	for step := 0; step < Nsteps; step++ {
+		log.Println("step", <-tick)
+	}
+
+	for I := 0; I < N; I += warp {
+		log.Println(mChan.Recv())
 	}
 
 }
@@ -112,6 +118,7 @@ func initSize() {
 		warp--
 	}
 	log.Println("warp:", warp)
+
 }
 
 //CONCEPT:

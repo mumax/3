@@ -20,6 +20,39 @@ var (
 func Main() {
 
 	initSize()
+
+
+	-------
+	CONCEPT:
+
+	magnet struct{
+		m, h VecChan
+	}
+
+	TorqueBox struct{
+		m, h VecRecv
+		alpha Recv
+	}
+
+	t := TorqueBox
+	Read(&t.m, magnet.m)	
+	Read(&t.a, magnet.a)	
+	Read(&t.h, magnet.h)	
+	//Write(magnet.torque, t)
+	//Register(t.Start())
+
+	h := VecConst
+	Connect(	
+
+	// start all now
+	go torque.Run()	
+	go h.Run()	
+	go alpha.Run()	
+	...
+
+	-----
+
+
 	go RunGC()
 
 	go SendConst(tChan.Fanout(1), alphaChan, 0.05)

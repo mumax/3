@@ -10,9 +10,11 @@ var (
 	N    int    // product of size
 	warp int    // buffer size for Range()
 
-	mChan     VecChan
-	alphaChan Chan
-	hChan     VecChan
+	tChan      ScalarChan // Distributes time. Close means teardown listeners.
+	mChan      VecChan
+	alphaChan  Chan
+	hChan      VecChan
+	torqueChan VecChan
 )
 
 func Main() {
@@ -20,28 +22,9 @@ func Main() {
 	initSize()
 	go RunGC()
 
-	// send const H
-	go func() {
-		var h [3][]float32
-		h[X] = make([]float32, warp)
-		h[Y] = make([]float32, warp)
-		h[Z] = make([]float32, warp)
-		Memset(h[Y], 1)
-
-		for {
-			hChan.Send(h)
-		}
-	}()
-
-	// send const alpha
-	go func() {
-		alpha := make([]float32, warp)
-		Memset(alpha, 0.05)
-
-		for {
-			alphaChan.Send(alpha)
-		}
-	}()
+	go SendConst(tChan.Fanout(1), alphaChan, 0.05)
+	go SendVecConst(tChan.Fanout(1), hChan, Vector{0, 1, 0})
+	go RunTorque(tChan.Fanout(1), torqueChan, mChan.Fanout(1), hChan.Fanout(1), alphaChan.Fanout(1))
 
 	const dt = 0.001
 	const Nsteps = 10
@@ -52,61 +35,56 @@ func Main() {
 	mz := make([]float32, warp)
 	Memset(mx, 1)
 	mInit := [3][]float32{mx, my, mz}
-	mOffline := MakeVecChan(N / warp)
+
+	mOffline := MakeVecChan()
+	mOffRecv := mOffline.Fanout(N / warp)
 	for I := 0; I < N; I += warp {
 		mOffline.Send(mInit) // [I]
 	}
 
-	RunSolver(mOffline, Nsteps, dt)
+	go func() {
 
-	for I := 0; I < N; I += warp {
-		log.Println(mOffline.Recv())
-	}
+		mRecv := mChan.Fanout(N / warp)
+		torqueRecv := torqueChan.Fanout(1)
 
-}
-
-// Take mOffline as input, take Nsteps time steps and
-// return the result in mOffline (which should be buffered).
-func RunSolver(mOffline VecChan, Nsteps int, dt float32) {
-
-	for I := 0; I < N; I += warp {
-		mChan.Send(mOffline.Recv())
-	}
-
-	for step := 0; step < Nsteps; step++ {
-
-		// loop over blocks
-		for I := 0; I < N; I += warp {
-
-			newMList := VecBuffer()
-			//alphaList := alphaChan.Recv()
-			mList := mChan.Recv()
-			hList := hChan.Recv()
-
-			// loop inside blocks
-			for i := range newMList[X] {
-				var m Vector
-				var h Vector
-				var newM Vector
-				m[X], m[Y], m[Z] = mList[X][i], mList[Y][i], mList[Z][i]
-				h[X], h[Y], h[Z] = hList[X][i], hList[Y][i], hList[Z][i]
-				//alpha := alphaList[i]
-
-				mxh := m.Cross(h)
-				tq := mxh //.Sub(m.Cross(mxh).Scale(alpha))
-				newM = m.MAdd(dt, tq)
-
-				newMList[X][i] = newM[X]
-				newMList[Y][i] = newM[Y]
-				newMList[Z][i] = newM[Z]
-			}
-			if step != Nsteps-1 {
-				mChan.Send(newMList)
-			} else {
-				mOffline.Send(newMList)
-			}
-
+		for I := 0; I < warp; I += warp {
+			mChan.Send(mOffRecv.Recv())
 		}
+
+		for step := 0; step < Nsteps; step++ {
+
+			// loop over blocks
+			for I := 0; I < N; I += warp {
+
+				newMList := VecBuffer()
+				mList := mRecv.Recv()
+				tqList := torqueRecv.Recv()
+
+				// loop inside blocks
+				for i := range newMList[X] {
+					newMList[X][i] = dt*tqList[X][i] + mList[X][i]
+					newMList[Y][i] = dt*tqList[Y][i] + mList[Y][i]
+					newMList[Z][i] = dt*tqList[Z][i] + mList[Z][i]
+
+				}
+				if step != Nsteps-1 {
+					mChan.Send(newMList)
+				} else {
+					mOffline.Send(newMList)
+				}
+
+			}
+		}
+
+	}()
+
+	go func(){for s:=0; s<Nsteps; s++{
+		log.Println("tick")
+		tChan.Send(1)
+	}}()
+
+	for I := 0; I < N; I += warp {
+		log.Println("m:", mOffRecv.Recv())
 	}
 
 }

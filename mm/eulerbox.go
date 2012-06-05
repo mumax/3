@@ -5,10 +5,10 @@ import (
 )
 
 type EulerBox struct {
-	m   FanIn3
-	mIn FanOut3
-	t   FanOut3
-	dt  float32
+	m      FanIn3
+	mIn    FanOut3
+	torque FanOut3
+	dt     float32
 }
 
 // m0: initial value, to be overwritten by result when done.
@@ -30,7 +30,7 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 		for I := 0; I < N; I += warp {
 
 			m0Slice := box.mIn.Recv()
-			tSlice := box.t.Recv()
+			tSlice := box.torque.Recv()
 			m1Slice := Buffer3()
 
 			for i := range m1Slice[X] {

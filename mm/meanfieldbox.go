@@ -33,6 +33,5 @@ func (b *MeanFieldBox) Run() {
 			Memset3(hSlice, Vector{hx, hy, hz})
 			b.h.Send(hSlice)
 		}
-
 	}
 }

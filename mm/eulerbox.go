@@ -6,6 +6,8 @@ import (
 
 type EulerBox struct {
 	m      FanIn3
+	time   FanInScalar
+	t      float64
 	mIn    FanOut3
 	torque FanOut3
 	dt     float32
@@ -25,8 +27,8 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 		box.m.Send(m0Slice)
 	}
 
-	//TODO: select over components?
 	for s := 0; s < steps; s++ {
+		time.Send(t)
 		for I := 0; I < N; I += warp {
 
 			m0Slice := box.mIn.Recv()
@@ -53,5 +55,6 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 				//RECYCLE
 			}
 		}
+		t += (float64(dt))
 	}
 }

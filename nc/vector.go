@@ -36,7 +36,16 @@ func (a Vector) Norm2() float32 {
 	return a[X]*a[X] + a[Y]*a[Y] + a[Z]*a[Z]
 }
 
-func (a Vector) Scale(s float32) Vector {
+// Normalized vector.
+func(a Vector)Normalized()Vector{
+	norm := a.Norm()
+	if norm == 0{return Vector{0,0,0}}
+	inorm := 1/norm
+	return Vector{inorm*a[X], inorm*a[Y], inorm*a[Z]}
+}
+
+// Scalar x Vector product.
+func (a Vector) Scaled(s float32) Vector {
 	return Vector{s * a[X], s * a[Y], s * a[Z]}
 }
 

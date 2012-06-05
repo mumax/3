@@ -1,17 +1,19 @@
 package mm
 
-import (."nimble-cube/nc")
+import (
+	. "nimble-cube/nc"
+)
 
-type TorqueBox struct{
+type TorqueBox struct {
 	m, h FanOut3
-	t FanIn3
+	t    FanIn3
 }
 
-func(b*TorqueBox)Run(){
-	for{
-		mSlice:=b.m.Recv()
-		hSlice:=b.h.Recv()
-		tSlice:=Buffer3()	
+func (b *TorqueBox) Run() {
+	for {
+		mSlice := b.m.Recv()
+		hSlice := b.h.Recv()
+		tSlice := Buffer3()
 
 		for i := range tSlice[X] {
 			var m Vector

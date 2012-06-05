@@ -15,7 +15,7 @@ func MakeFanIn3() (v FanIn3) {
 
 // Add a new fanout and return it.
 // All fanouts should be created before using the channel.
-func (v *FanIn3) Fanout(buf int) FanOut3 {
+func (v *FanIn3) FanOut(buf int) FanOut3 {
 	v.fanout = append(v.fanout, [3]chan []float32{
 		make(chan []float32, buf),
 		make(chan []float32, buf),

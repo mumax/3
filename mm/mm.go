@@ -1,8 +1,9 @@
 package mm
 
 import (
-	. "nimble-cube/nc"
+	"fmt"
 	"log"
+	. "nimble-cube/nc"
 )
 
 var (
@@ -22,10 +23,39 @@ func Main() {
 	initSize()
 
 	m := MakeFanIn3()
-	h := MakeFanIn3()
-	t := MakeFanIn3()
 
-	
+	tBox := new(TorqueBox)
+	hBox := new(MeanFieldBox)
+
+	Connect3(&(hBox.m), &m)
+	Connect3(&(tBox.m), &m)
+	Connect3(&(tBox.h), &(hBox.h))
+
+	t := tBox.t.FanOut(0)
+
+	go tBox.Run()
+	go hBox.Run()
+
+	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
+	Memset3(m0, Vector{1, 0, 0})
+	go func() {
+		for I := 0; I < N; I += warp {
+			m.Send([3][]float32{
+				m0[X][I : I+warp],
+				m0[Y][I : I+warp],
+				m0[Z][I : I+warp]})
+		}
+	}()
+
+	for I := 0; I < N; I += warp {
+		fmt.Println("t", t.Recv())
+	}
+
+}
+
+func Connect3(dst *FanOut3, src *FanIn3) {
+	buf := N / warp
+	*dst = src.FanOut(buf)
 }
 
 //	-------

@@ -1,7 +1,6 @@
 package mm
 
 import (
-	"fmt"
 	"log"
 	. "nimble-cube/nc"
 )
@@ -31,13 +30,17 @@ func Main() {
 	Connect3(&(tBox.m), &m)
 	Connect3(&(tBox.h), &(hBox.h))
 
+	Probe3(&m, "m")
+	Probe3(&(hBox.h), "h")
+	Probe3(&(tBox.t), "t")
+
 	t := tBox.t.FanOut(0)
 
 	go tBox.Run()
 	go hBox.Run()
 
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
-	Memset3(m0, Vector{1, 0, 0})
+	Memset3(m0, Vector{0.1, 0.99, 0})
 	go func() {
 		for I := 0; I < N; I += warp {
 			m.Send([3][]float32{
@@ -47,14 +50,19 @@ func Main() {
 		}
 	}()
 
+	// drain
 	for I := 0; I < N; I += warp {
-		fmt.Println("t", t.Recv())
+		t.Recv()
 	}
+
+	<-make(chan int) // Deliberate deadlock
 
 }
 
+func DefaultBufSize() int { return N / warp }
+
 func Connect3(dst *FanOut3, src *FanIn3) {
-	buf := N / warp
+	buf := DefaultBufSize()
 	*dst = src.FanOut(buf)
 }
 

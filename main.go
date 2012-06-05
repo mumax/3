@@ -1,9 +1,9 @@
 package main
 
 import (
+	"log"
 	"nimble-cube/mm"
 	"nimble-cube/nc"
-	"log"
 	"os"
 )
 

@@ -27,12 +27,12 @@ func Main() {
 	solver := new(EulerBox)
 	solver.dt = 0.01
 
-	alpha := MakeFanIn()
+	alphaBox := NewConstBox(0.1)
 
 	Connect3(&(hBox.m), &(solver.m))
 	Connect3(&(torqueBox.m), &(solver.m))
 	Connect3(&(torqueBox.h), &(hBox.h))
-	Connect(&(torqueBox.alpha), &alpha)
+	Connect(&(torqueBox.alpha), &(alphaBox.output))
 	Connect3(&(solver.torque), &(torqueBox.t))
 
 	//	Probe3(&(solver.m), "m")
@@ -41,6 +41,7 @@ func Main() {
 
 	go torqueBox.Run()
 	go hBox.Run()
+	go alphaBox.Run()
 
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})
@@ -55,6 +56,11 @@ func Main() {
 func DefaultBufSize() int { return N / warp }
 
 func Connect3(dst *FanOut3, src *FanIn3) {
+	buf := DefaultBufSize()
+	*dst = src.FanOut(buf)
+}
+
+func Connect(dst *FanOut, src *FanIn) {
 	buf := DefaultBufSize()
 	*dst = src.FanOut(buf)
 }

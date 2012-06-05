@@ -21,41 +21,27 @@ func Main() {
 
 	initSize()
 
-	m := MakeFanIn3()
-
 	tBox := new(TorqueBox)
 	hBox := new(MeanFieldBox)
+	eBox := new(EulerBox)
+	eBox.dt = 0.001
 
-	Connect3(&(hBox.m), &m)
-	Connect3(&(tBox.m), &m)
+	Connect3(&(hBox.m), &(eBox.m))
+	Connect3(&(tBox.m), &(eBox.m))
 	Connect3(&(tBox.h), &(hBox.h))
+	Connect3(&(eBox.t), &(tBox.t))
 
-	Probe3(&m, "m")
+	Probe3(&(eBox.m), "m")
 	Probe3(&(hBox.h), "h")
 	Probe3(&(tBox.t), "t")
-
-	t := tBox.t.FanOut(0)
 
 	go tBox.Run()
 	go hBox.Run()
 
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})
-	go func() {
-		for I := 0; I < N; I += warp {
-			m.Send([3][]float32{
-				m0[X][I : I+warp],
-				m0[Y][I : I+warp],
-				m0[Z][I : I+warp]})
-		}
-	}()
 
-	// drain
-	for I := 0; I < N; I += warp {
-		t.Recv()
-	}
-
-	<-make(chan int) // Deliberate deadlock
+	eBox.Run(m0, 10)
 
 }
 

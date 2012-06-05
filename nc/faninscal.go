@@ -5,35 +5,27 @@ import ()
 // ScalarChan is like a chan float32, but with fan-out
 // (replicate data over multiple output channels).
 // It can only have one input side though.
-type ScalarChan struct {
+type FanInScal struct {
 	fanout []chan float32
 }
 
-func MakeSclarChan() (c ScalarChan) {
+func MakeFanInScal() (c FanInScal) {
 	return
 }
 
 // Add a new fanout and return it.
 // All fanouts should be created before using the channel.
-func (v *ScalarChan) Fanout(buf int) ScalarRecv {
+func (v *FanInScal) Fanout(buf int) FanoutScal {
 	v.fanout = append(v.fanout, make(chan float32, buf))
 	return v.fanout[len(v.fanout)-1]
 }
 
 // Send operator.
-func (v *ScalarChan) Send(data float32) {
+func (v *FanInScal) Send(data float32) {
 	if len(v.fanout) == 0 {
-		panic("ScalarChan.Send: no fanout")
+		panic("FanInScal.Send: no fanout")
 	}
 	for i := range v.fanout {
 		v.fanout[i] <- data
 	}
-}
-
-// Receive-only side of a ScalarChan.
-type ScalarRecv <-chan float32
-
-// Receive operator.
-func (r ScalarRecv) ScalarRecv() float32 {
-	return <-r
 }

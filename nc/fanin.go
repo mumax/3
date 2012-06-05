@@ -29,3 +29,9 @@ func (v *FanIn) Send(data []float32) {
 		v.fanout[i] <- data
 	}
 }
+
+func(f*FanIn)Close(){
+	for i:=range f.fanout{
+		close(f.fanout[i])
+	}
+}

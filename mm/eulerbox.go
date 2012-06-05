@@ -5,12 +5,12 @@ import (
 )
 
 type EulerBox struct {
-	m      FanIn3
-	time   FanInScalar
-	t      float64
-	mIn    FanOut3
-	torque FanOut3
-	dt     float32
+	m      FanIn3      // magnetization, output
+	time   FanInScalar // time, output
+	torque FanOut3     // torque, input
+	mIn    FanOut3     // AUTOMATICALLY SET: magnetization input
+	t      float64     // local copy of time
+	dt     float32     // local copy of time step
 }
 
 // m0: initial value, to be overwritten by result when done.
@@ -28,7 +28,9 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 	}
 
 	for s := 0; s < steps; s++ {
-		time.Send(t)
+		// Send time first, so others can prepare my input.
+		box.time.Send(float32(box.t))
+
 		for I := 0; I < N; I += warp {
 
 			m0Slice := box.mIn.Recv()
@@ -55,6 +57,11 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 				//RECYCLE
 			}
 		}
-		t += (float64(dt))
+		box.t += (float64(box.dt))
 	}
+}
+
+func (box *EulerBox) Close() {
+	box.m.Close()
+	box.time.Close()
 }

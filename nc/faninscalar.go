@@ -1,6 +1,8 @@
 package nc
 
-import ()
+import (
+	"log"
+)
 
 // ScalarChan is like a chan float32, but with fan-out
 // (replicate data over multiple output channels).
@@ -23,9 +25,13 @@ func (v *FanInScalar) Fanout(buf int) FanoutScalar {
 // Send operator.
 func (v *FanInScalar) Send(data float32) {
 	if len(v.fanout) == 0 {
-		panic("FanInScalar.Send: no fanout")
+		log.Println("[WARNING] FanInScalar.Send: no fanout")
 	}
 	for i := range v.fanout {
 		v.fanout[i] <- data
 	}
+}
+
+func (f*FanInScalar)Close(){
+	for i:=range f.fanout{close(f.fanout[i])}
 }

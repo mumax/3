@@ -1,6 +1,7 @@
 package mm
 
 import (
+	"fmt"
 	"log"
 	. "nimble-cube/nc"
 )
@@ -24,16 +25,16 @@ func Main() {
 	tBox := new(TorqueBox)
 	hBox := new(MeanFieldBox)
 	eBox := new(EulerBox)
-	eBox.dt = 0.001
+	eBox.dt = 0.01
 
 	Connect3(&(hBox.m), &(eBox.m))
 	Connect3(&(tBox.m), &(eBox.m))
 	Connect3(&(tBox.h), &(hBox.h))
 	Connect3(&(eBox.t), &(tBox.t))
 
-	Probe3(&(eBox.m), "m")
-	Probe3(&(hBox.h), "h")
-	Probe3(&(tBox.t), "t")
+	//	Probe3(&(eBox.m), "m")
+	//	Probe3(&(hBox.h), "h")
+	//	Probe3(&(tBox.t), "t")
 
 	go tBox.Run()
 	go hBox.Run()
@@ -41,7 +42,10 @@ func Main() {
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})
 
-	eBox.Run(m0, 10)
+	for i := 0; i < 1000; i++ {
+		eBox.Run(m0, 10)
+		fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
+	}
 
 }
 

@@ -37,11 +37,13 @@ func (a Vector) Norm2() float32 {
 }
 
 // Normalized vector.
-func(a Vector)Normalized()Vector{
+func (a Vector) Normalized() Vector {
 	norm := a.Norm()
-	if norm == 0{return Vector{0,0,0}}
-	inorm := 1/norm
-	return Vector{inorm*a[X], inorm*a[Y], inorm*a[Z]}
+	if norm == 0 {
+		return Vector{0, 0, 0}
+	}
+	inorm := 1 / norm
+	return Vector{inorm * a[X], inorm * a[Y], inorm * a[Z]}
 }
 
 // Scalar x Vector product.

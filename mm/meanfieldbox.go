@@ -25,8 +25,8 @@ func (b *MeanFieldBox) Run() {
 		}
 
 		hx := mSum[X] * -0.01 / float32(N)
-		hy := mSum[Y] * -0.02 / float32(N)
-		hz := mSum[Z] * -0.97 / float32(N)
+		hy := mSum[Y] * -0.04 / float32(N)
+		hz := mSum[Z] * -0.95 / float32(N)
 
 		for s := 0; s < N/warp; s++ {
 			hSlice := Buffer3()

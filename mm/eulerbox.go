@@ -1,9 +1,11 @@
 package mm
 
 import (
+	"log"
 	. "nimble-cube/nc"
 )
 
+// Euler solver.
 type EulerBox struct {
 	m      FanIn3      // magnetization, output
 	time   FanInScalar // time, output
@@ -66,6 +68,10 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 }
 
 func (box *EulerBox) Close() {
+	if Debug {
+		log.Println("EulerBox.Close()")
+	}
 	box.m.Close()
 	box.time.Close()
+	box.step.Close()
 }

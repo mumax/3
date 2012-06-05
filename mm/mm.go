@@ -20,13 +20,14 @@ var (
 
 func Main() {
 
+	// 0) initialize size, warp, etc
 	initSize()
 
+	// 1) make and connect boxes
 	torqueBox := new(TorqueBox)
 	hBox := new(MeanFieldBox)
 	solver := new(EulerBox)
 	solver.dt = 0.01
-
 	alphaBox := NewConstBox(0.1)
 
 	Connect3(&(hBox.m), &(solver.m))
@@ -39,6 +40,7 @@ func Main() {
 	//	Probe3(&(hBox.h), "h")
 	//	Probe3(&(torqueBox.t), "t")
 
+	// 3) run boxes, no more should be created from now
 	go torqueBox.Run()
 	go hBox.Run()
 	go alphaBox.Run()
@@ -46,15 +48,25 @@ func Main() {
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})
 
+	// Solver box runs synchronous.
+	// Could be async with return channel...
 	for i := 0; i < 1000; i++ {
 		solver.Run(m0, 10)
 		fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
 	}
 
+	// 4) tear-down and wait for boxes to finish
+	// needed to cleanly close down output boxes, e.g.
+	// Use runtime.NumGoroutine() to assert all is well and panic(Bug()) otherwise
+	// to enforce good implementation.
+	// ...
 }
 
 func DefaultBufSize() int { return N / warp }
 
+// TODO: use reflection:
+// Connect3(hBox, "m", solver, "m")
+// to set up an informative graph.
 func Connect3(dst *FanOut3, src *FanIn3) {
 	buf := DefaultBufSize()
 	*dst = src.FanOut(buf)

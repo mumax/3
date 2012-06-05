@@ -24,7 +24,7 @@ func (v *FanInScalar) Fanout(buf int) FanoutScalar {
 
 // Send operator.
 func (v *FanInScalar) Send(data float32) {
-	if len(v.fanout) == 0 {
+	if Debug && len(v.fanout) == 0 {
 		log.Println("[WARNING] FanInScalar.Send: no fanout")
 	}
 	for i := range v.fanout {
@@ -32,6 +32,8 @@ func (v *FanInScalar) Send(data float32) {
 	}
 }
 
-func (f*FanInScalar)Close(){
-	for i:=range f.fanout{close(f.fanout[i])}
+func (f *FanInScalar) Close() {
+	for i := range f.fanout {
+		close(f.fanout[i])
+	}
 }

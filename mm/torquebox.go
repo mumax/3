@@ -4,6 +4,7 @@ import (
 	. "nimble-cube/nc"
 )
 
+// Landau-Lifshitz torque.
 type TorqueBox struct {
 	m, h  FanOut3
 	alpha FanOut

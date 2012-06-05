@@ -38,8 +38,8 @@ func (v *FanIn3) Send(data [3][]float32) {
 	}
 }
 
-func(f *FanIn3)Close(){
-	for i:=range f.fanout{
+func (f *FanIn3) Close() {
+	for i := range f.fanout {
 		close(f.fanout[i][X])
 		close(f.fanout[i][Y])
 		close(f.fanout[i][Z])

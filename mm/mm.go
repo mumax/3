@@ -36,6 +36,8 @@ func Main() {
 	Connect(torqueBox, &torqueBox.alpha, alphaBox, &alphaBox.output, "alpha")
 	Connect3(solver, &solver.torque, torqueBox, &(torqueBox.torque), "torque")
 
+	dot.Close() // how to automate?
+
 	//	Probe3(&(solver.m), "m")
 	//	Probe3(&(hBox.h), "h")
 	//	Probe3(&(torqueBox.t), "t")

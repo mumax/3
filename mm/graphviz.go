@@ -17,11 +17,12 @@ type graphvizwriter struct {
 }
 
 func (dot *graphvizwriter) Init() {
+	if dot.out != nil {
+		return // already inited.
+	}
+
 	dot.fname = "plumber.dot"
 	var err error
-	if dot.out != nil {
-		return
-	}
 
 	dot.out, err = os.OpenFile(dot.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
@@ -29,16 +30,19 @@ func (dot *graphvizwriter) Init() {
 		return
 	}
 	dot.Println("digraph dot{")
+	dot.Println("rankdir=LR")
 }
 
 func (dot *graphvizwriter) Println(msg ...interface{}) {
+	dot.Init()
 	fmt.Fprintln(dot.out, msg...)
 }
 
-func (dot *graphvizwriter) Connect3(dst string, src string, label string) {
+func (dot *graphvizwriter) Connect(dst string, src string, label string, thickness int) {
+	dot.Init()
 	dot.Println(src, `[shape="rect"];`)
 	dot.Println(dst, `[shape="rect"];`)
-	dot.Println(src, "->", dst, "[label=", label, `];`)
+	dot.Println(src, "->", dst, "[label=", label, `penwidth=`, thickness, `];`)
 }
 
 func (dot *graphvizwriter) Close() {

@@ -3,12 +3,14 @@ package mm
 import ()
 
 func Connect3(dst Box, dstFanout *[3]<-chan []float32, src Box, srcChan *[3][]chan<- []float32, name string) {
+	dot.Connect(boxname(dst), boxname(src), name, 3)
 	for i := 0; i < 3; i++ {
 		connect(&(*dstFanout)[i], &(*srcChan)[i])
 	}
 }
 
-func Connect(dstBox Box, dstChan *<-chan []float32, srcBox Box, srcChan *[]chan<- []float32, name string) {
+func Connect(dst Box, dstChan *<-chan []float32, src Box, srcChan *[]chan<- []float32, name string) {
+	dot.Connect(boxname(dst), boxname(src), name, 1)
 	connect(dstChan, srcChan)
 }
 

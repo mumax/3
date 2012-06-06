@@ -6,16 +6,16 @@ import (
 
 // Landau-Lifshitz torque.
 type TorqueBox struct {
-	m, h  FanOut3
-	alpha FanOut
+	m, h  chan[3][]float32
+	alpha chan []float32
 	t     FanIn3
 }
 
 func (box *TorqueBox) Run() {
 	for {
-		mSlice := box.m.Recv()
-		hSlice := box.h.Recv()
-		aSlice := box.alpha.Recv()
+		mSlice := <-box.m
+		hSlice := <-box.h
+		aSlice := <-box.alpha
 		tSlice := Buffer3()
 
 		for i := range tSlice[X] {

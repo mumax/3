@@ -30,11 +30,11 @@ func Main() {
 	solver.dt = 0.01
 	alphaBox := NewConstBox(0.1)
 
-	Connect3(&(hBox.m), &(solver.m))
-	Connect3(&(torqueBox.m), &(solver.m))
-	Connect3(&(torqueBox.h), &(hBox.h))
-	Connect(&(torqueBox.alpha), &(alphaBox.output))
-	Connect3(&(solver.torque), &(torqueBox.t))
+	Connect(&hBox, "m", &solver, "m")
+	//Connect3(&(torqueBox.m), &(solver.m))
+	//Connect3(&(torqueBox.h), &(hBox.h))
+	//Connect(&(torqueBox.alpha), &(alphaBox.output))
+	//Connect3(&(solver.torque), &(torqueBox.t))
 
 	//	Probe3(&(solver.m), "m")
 	//	Probe3(&(hBox.h), "h")
@@ -60,21 +60,6 @@ func Main() {
 	// Use runtime.NumGoroutine() to assert all is well and panic(Bug()) otherwise
 	// to enforce good implementation.
 	// ...
-}
-
-func DefaultBufSize() int { return N / warp }
-
-// TODO: use reflection:
-// Connect3(hBox, "m", solver, "m")
-// to set up an informative graph.
-func Connect3(dst *FanOut3, src *FanIn3) {
-	buf := DefaultBufSize()
-	*dst = src.FanOut(buf)
-}
-
-func Connect(dst *FanOut, src *FanIn) {
-	buf := DefaultBufSize()
-	*dst = src.FanOut(buf)
 }
 
 func initSize() {

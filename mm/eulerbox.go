@@ -7,23 +7,23 @@ import (
 
 // Euler solver.
 type EulerBox struct {
-	m      FanIn3      // magnetization, output
-	time   FanInScalar // time, output
-	step   FanInScalar // time step, output
-	torque FanOut3     // torque, input
-	mIn    FanOut3     // AUTOMATICALLY SET: magnetization input
-	t      float64     // local copy of time
-	dt     float32     // local copy of time step
-	steps  int         // local copy of total time steps
+	m      FanIn3            // magnetization, output
+	time   FanInScalar       // time, output
+	step   FanInScalar       // time step, output
+	torque chan [3][]float32 // torque, input
+	mIn    chan [3][]float32 // AUTOMATICALLY SET: magnetization input ??
+	t      float64           // local copy of time
+	dt     float32           // local copy of time step
+	steps  int               // local copy of total time steps
 }
 
 // m0: initial value, to be overwritten by result when done.
 func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 
 	// Fan-out input m buffer if not yet done so.
-	if box.mIn.IsNil() {
-		box.mIn = box.m.FanOut(DefaultBufSize())
-	}
+	//	if box.mIn==nil{
+	//		box.mIn = box.m.FanOut(DefaultBufSize())
+	//	}
 
 	// send initial value m0 down the m pipe
 	for I := 0; I < N; I += warp {
@@ -38,8 +38,8 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 
 		for I := 0; I < N; I += warp {
 
-			m0Slice := box.mIn.Recv()
-			tSlice := box.torque.Recv()
+			m0Slice := <-box.mIn
+			tSlice := <-box.torque
 			m1Slice := Buffer3()
 
 			for i := range m1Slice[X] {

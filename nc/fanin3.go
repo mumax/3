@@ -5,7 +5,7 @@ import ()
 // Like a [3]chan[]float32, but with fan-out
 // (replicate data over multiple output channels).
 // It can only have one input side though.
-type FanIn3 [][3]chan []float32
+type FanIn3 [3][]chan []float32
 
 // Add a new fanout and return it.
 // All fanouts should be created before using the channel.

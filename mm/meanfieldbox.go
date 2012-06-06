@@ -5,7 +5,7 @@ import (
 )
 
 type MeanFieldBox struct {
-	m <-chan [3][]float32
+	m [3]<-chan []float32
 	h FanIn3
 }
 
@@ -14,9 +14,14 @@ func (b *MeanFieldBox) Run() {
 	for {
 
 		var mSum Vector
+		var mSlice [3][]float32
 
 		for s := 0; s < N/warp; s++ {
-			mSlice := <-b.m
+
+			mSlice[X] = <-b.m[X]
+			mSlice[Y] = <-b.m[Y]
+			mSlice[Z] = <-b.m[Z]
+
 			for i := range mSlice[X] {
 				mSum[X] += mSlice[X][i]
 				mSum[Y] += mSlice[Y][i]

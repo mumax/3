@@ -6,7 +6,7 @@ import (
 
 type ConstBox struct {
 	value  float32
-	output FanIn
+	output []chan<- []float32
 }
 
 func NewConstBox(value float32) *ConstBox {
@@ -21,6 +21,6 @@ func (box *ConstBox) Run() {
 	Memset(data, box.value)
 
 	for {
-		box.output.Send(data)
+		Send(box.output, data)
 	}
 }

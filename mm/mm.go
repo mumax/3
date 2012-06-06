@@ -31,10 +31,10 @@ func Main() {
 	alphaBox := NewConstBox(0.1)
 
 	Connect3(hBox, &hBox.m, solver, &solver.mOut, "m")
-	//Connect3(&(torqueBox.m), &(solver.m))
-	//Connect3(&(torqueBox.h), &(hBox.h))
-	//Connect(&(torqueBox.alpha), &(alphaBox.output))
-	//Connect3(&(solver.torque), &(torqueBox.t))
+	Connect3(torqueBox, &torqueBox.m, solver, &solver.mOut, "m")
+	Connect3(torqueBox, &torqueBox.h, hBox, &hBox.h, "H")
+	Connect(torqueBox, &torqueBox.alpha, alphaBox, &alphaBox.output, "alpha")
+	Connect3(solver, &solver.torque, torqueBox, &(torqueBox.torque), "torque")
 
 	//	Probe3(&(solver.m), "m")
 	//	Probe3(&(hBox.h), "h")

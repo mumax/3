@@ -42,8 +42,6 @@ func Main() {
 
 	// 3) run boxes, no more should be created from now
 
-	ConnectNow() // TODO -> Start()
-
 	go torqueBox.Run()
 	go hBox.Run()
 	go alphaBox.Run()

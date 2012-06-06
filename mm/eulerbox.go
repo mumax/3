@@ -6,14 +6,14 @@ import (
 
 // Euler solver.
 type EulerBox struct {
-	mOut   [][3]chan<- []float32 // magnetization, output
+	mOut   [3][]chan<- []float32 // magnetization, output
 	time   []chan<- float64      // time, output
 	step   []chan<- float64      // time step, output
-	torque [3]<-chan []float32 // torque, input
-	mIn    [3]<-chan []float32 // AUTOMATICALLY SET: magnetization input ??
-	t      float64             // local copy of time
-	dt     float32             // local copy of time step
-	steps  int                 // local copy of total time steps
+	torque [3]<-chan []float32   // torque, input
+	mIn    [3]<-chan []float32   // AUTOMATICALLY SET: magnetization input ??
+	t      float64               // local copy of time
+	dt     float32               // local copy of time step
+	steps  int                   // local copy of total time steps
 }
 
 // m0: initial value, to be overwritten by result when done.
@@ -32,7 +32,7 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 
 	for s := 0; s < steps; s++ {
 		// Send time first, so others can prepare my input.
-		SendFloat64(box.time , box.t)
+		SendFloat64(box.time, box.t)
 		SendFloat64(box.step, float64(box.steps))
 
 		for I := 0; I < N; I += warp {

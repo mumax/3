@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -65,14 +66,15 @@ func ConnectNow() {
 		}
 
 	}
-	WriteDot()
+	WriteDot("plumber.dot")
 }
 
-func WriteDot() {
+func WriteDot(fname string) {
 
-	dot, err := os.OpenFile("plumber.dot", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	dot, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		log.Println(err) //far from fatal
+		return
 	} else {
 		defer dot.Close()
 	}
@@ -81,13 +83,20 @@ func WriteDot() {
 
 	for name, c := range connections {
 
+		fmt.Fprintln(dot, c.srcName, `[shape="rect"];`)
 		if len(c.dstPtr) == 1 {
-			fmt.Fprintln(dot, c.srcName, "->", c.dstName[0], "[label=", name, "]")
+			fmt.Fprintln(dot, c.dstName[0], `[shape="rect"];`)
+			fmt.Fprintln(dot, c.srcName, "->", c.dstName[0], "[label=", name, `];`)
 		}
 
 	}
 
 	fmt.Fprintln(dot, "}")
+
+	err = exec.Command("dot", "-O", "-Tpdf", fname).Run()
+	if err != nil {
+		log.Println(err)
+	}
 
 }
 

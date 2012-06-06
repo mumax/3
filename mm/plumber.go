@@ -8,14 +8,14 @@ func Connect3(dst Box, dstFanout *[3]<-chan []float32, src Box, srcChan *[3][]ch
 	}
 }
 
-func Connect(dstBox Box, dstChan *<-chan []float32, srcBox Box, srcChan *chan<- []float32, name string) {
+func Connect(dstBox Box, dstChan *<-chan []float32, srcBox Box, srcChan *[]chan<- []float32, name string) {
 	connect(dstChan, srcChan)
 }
 
-func connect(dstFanout *[]<-chan []float32, srcChan *chan<- []float32) {
+func connect(dst *<-chan []float32, src *[]chan<- []float32) {
 	ch := make(chan []float32, DefaultBufSize()) // TODO: revise buffer size?
-	*dstFanout = append(*dstFanout, ch)
-	*srcChan = ch
+	*src = append(*src, ch)
+	*dst = ch
 }
 
 //func WriteDot(fname string) {

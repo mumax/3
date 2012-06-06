@@ -10,8 +10,8 @@ type EulerBox struct {
 	m      FanIn3            // magnetization, output
 	time   FanInScalar       // time, output
 	step   FanInScalar       // time step, output
-	torque chan [3][]float32 // torque, input
-	mIn    chan [3][]float32 // AUTOMATICALLY SET: magnetization input ??
+	torque <-chan [3][]float32 // torque, input
+	mIn    <-chan [3][]float32 // AUTOMATICALLY SET: magnetization input ??
 	t      float64           // local copy of time
 	dt     float32           // local copy of time step
 	steps  int               // local copy of total time steps

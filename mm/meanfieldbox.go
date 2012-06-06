@@ -5,7 +5,7 @@ import (
 )
 
 type MeanFieldBox struct {
-	m chan [3][]float32
+	m <-chan [3][]float32
 	h FanIn3
 }
 

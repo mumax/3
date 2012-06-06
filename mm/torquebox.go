@@ -6,8 +6,8 @@ import (
 
 // Landau-Lifshitz torque.
 type TorqueBox struct {
-	m, h  chan[3][]float32
-	alpha chan []float32
+	m, h  <-chan [3][]float32
+	alpha <-chan []float32
 	t     FanIn3
 }
 

@@ -5,13 +5,13 @@ import (
 )
 
 // Landau-Lifshitz torque.
-type TorqueBox struct {
+type LLGBox struct {
 	m, h   [3]<-chan []float32   // input
 	alpha  <-chan []float32      //input
 	torque [3][]chan<- []float32 // torque output
 }
 
-func (box *TorqueBox) Run() {
+func (box *LLGBox) Run() {
 	for {
 		mSlice := Recv3(box.m)
 		hSlice := Recv3(box.h)

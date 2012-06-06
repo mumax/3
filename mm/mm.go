@@ -24,7 +24,7 @@ func Main() {
 	initSize()
 
 	// 1) make and connect boxes
-	torqueBox := new(TorqueBox)
+	torqueBox := new(LLGBox)
 	hBox := new(MeanFieldBox)
 	solver := new(EulerBox)
 	solver.dt = 0.01

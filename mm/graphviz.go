@@ -1,5 +1,7 @@
 package mm
 
+// This file implements the plumber's graphviz output
+
 import (
 	"fmt"
 	"io"
@@ -55,5 +57,9 @@ func (dot *graphvizwriter) Close() {
 }
 func boxname(value interface{}) string {
 	typ := fmt.Sprintf("%T", value)
-	return typ[strings.Index(typ, ".")+1:]
+	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
+	if strings.HasSuffix(clean, "Box") {
+		clean = clean[:len(clean)-len("Box")]
+	}
+	return clean
 }

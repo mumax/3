@@ -35,6 +35,7 @@ func Main() {
 	Connect3(torqueBox, &torqueBox.h, hBox, &hBox.h, "H")
 	Connect(torqueBox, &torqueBox.alpha, alphaBox, &alphaBox.output, "alpha")
 	Connect3(solver, &solver.torque, torqueBox, &(torqueBox.torque), "torque")
+	Connect3(solver, &solver.mIn, solver, &(solver.mOut), "m")
 
 	dot.Close() // how to automate?
 

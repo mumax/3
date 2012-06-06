@@ -19,11 +19,6 @@ type EulerBox struct {
 // m0: initial value, to be overwritten by result when done.
 func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 
-	// Fan-out input m buffer if not yet done so.
-	//	if box.mIn==nil{
-	//		box.mIn = box.m.FanOut(DefaultBufSize())
-	//	}
-
 	// send initial value m0 down the m pipe
 	for I := 0; I < N; I += warp {
 		m0Slice := [3][]float32{m0[X][I : I+warp], m0[Y][I : I+warp], m0[Z][I : I+warp]}

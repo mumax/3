@@ -6,7 +6,7 @@ import (
 
 type MeanFieldBox struct {
 	m [3]<-chan []float32 // magnetization input
-	h [3]chan<- []float32 // field output
+	h [][3]chan<- []float32 // field output
 }
 
 func (box *MeanFieldBox) Run() {

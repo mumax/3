@@ -8,7 +8,7 @@ import (
 type TorqueBox struct {
 	m, h   [3]<-chan []float32 // input
 	alpha  <-chan []float32    //input
-	torque [3]chan<- []float32 // torque output
+	torque [][3]chan<- []float32 // torque output
 }
 
 func (box *TorqueBox) Run() {

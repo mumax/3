@@ -9,13 +9,9 @@ import (
 )
 
 func Connect3(dst Box, dstChan *[3]<-chan []float32, src Box, srcChan *[3]chan<- []float32, name string) {
-
-	//stack runner here
-
 	for i := 0; i < 3; i++ {
 		Connect(dst, &(*dstChan)[i], src, &(*srcChan)[i], name+[3]string{"X", "Y", "Z"}[i])
 	}
-
 }
 
 type conn struct {
@@ -60,9 +56,12 @@ func ConnectNow() {
 	for _, c := range connections {
 
 		if len(c.dstPtr) == 1 {
-			ch := make(chan []float32, DefaultBufSize())
+			// direct connection
+			ch := make(chan []float32, DefaultBufSize()) // TODO: revise buffer size
 			*(c.dstPtr[0]) = ch
 			*(c.srcPtr) = ch
+		}else{
+			
 		}
 
 	}

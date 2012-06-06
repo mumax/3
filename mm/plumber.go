@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func Connect3(dst Box, dstChan *[3]<-chan []float32, src Box, srcChan *[3]chan<- []float32, name string) {
@@ -48,29 +49,46 @@ func Connect(dstBox Box, dstChan *<-chan []float32, srcBox Box, srcChan *chan<- 
 }
 
 func boxname(value interface{}) string {
-	return fmt.Sprintf("%T%p", value, value)
+	typ := fmt.Sprintf("%T", value)
+	return typ[strings.Index(typ, ".")+1:]
 }
 
 func ConnectNow() {
 
-	dot, err := os.OpenFile("plumber.dot", os.O_WRONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Println(err) //far from fatal
-	} else {
-		defer dot.Close()
-	}
-
 	// also run boxes here? +log: started...
-	for name, c := range connections {
+	for _, c := range connections {
 
 		if len(c.dstPtr) == 1 {
-			fmt.Fprintln(dot, c.srcName, "->", c.dstName[0], "[label=", name, "]")
 			ch := make(chan []float32, DefaultBufSize())
 			*(c.dstPtr[0]) = ch
 			*(c.srcPtr) = ch
 		}
 
 	}
+	WriteDot()
+}
+
+func WriteDot() {
+
+	dot, err := os.OpenFile("plumber.dot", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		log.Println(err) //far from fatal
+	} else {
+		defer dot.Close()
+	}
+
+	fmt.Fprintln(dot, "digraph dot{")
+
+	for name, c := range connections {
+
+		if len(c.dstPtr) == 1 {
+			fmt.Fprintln(dot, c.srcName, "->", c.dstName[0], "[label=", name, "]")
+		}
+
+	}
+
+	fmt.Fprintln(dot, "}")
+
 }
 
 func DefaultBufSize() int {

@@ -30,7 +30,7 @@ func Main() {
 	solver.dt = 0.01
 	alphaBox := NewConstBox(0.1)
 
-	Connect3(&hBox, &hBox.m, &solver, &solver.m, "m")
+	Connect3(hBox, &hBox.m, solver, &solver.mOut, "m")
 	//Connect3(&(torqueBox.m), &(solver.m))
 	//Connect3(&(torqueBox.h), &(hBox.h))
 	//Connect(&(torqueBox.alpha), &(alphaBox.output))
@@ -41,6 +41,9 @@ func Main() {
 	//	Probe3(&(torqueBox.t), "t")
 
 	// 3) run boxes, no more should be created from now
+
+	ConnectNow() // TODO -> Start()
+
 	go torqueBox.Run()
 	go hBox.Run()
 	go alphaBox.Run()

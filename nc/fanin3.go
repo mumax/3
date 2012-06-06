@@ -5,7 +5,7 @@ import ()
 // Like a [3]chan[]float32, but with fan-out
 // (replicate data over multiple output channels).
 // It can only have one input side though.
-type FanIn3 [3][]chan []float32
+// type FanIn3 [3][]chan []float32
 
 // Add a new fanout and return it.
 // All fanouts should be created before using the channel.
@@ -21,21 +21,21 @@ type FanIn3 [3][]chan []float32
 
 // Send operator.
 // TODO: select loop so we can send in any order?
-func (v FanIn3) Send(data [3][]float32) {
-	if len(v) == 0 {
-		panic("FanIn3.Send: no fanouts")
-	}
-	for i := range v {
-		v[i][X] <- data[X]
-		v[i][Y] <- data[Y]
-		v[i][Z] <- data[Z]
-	}
-}
-
-func (f FanIn3) Close() {
-	for i := range f {
-		close(f[i][X])
-		close(f[i][Y])
-		close(f[i][Z])
-	}
-}
+//func (v FanIn3) Send(data [3][]float32) {
+//	if len(v) == 0 {
+//		panic("FanIn3.Send: no fanouts")
+//	}
+//	for i := range v {
+//		v[i][X] <- data[X]
+//		v[i][Y] <- data[Y]
+//		v[i][Z] <- data[Z]
+//	}
+//}
+//
+//func (f FanIn3) Close() {
+//	for i := range f {
+//		close(f[i][X])
+//		close(f[i][Y])
+//		close(f[i][Z])
+//	}
+//}

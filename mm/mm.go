@@ -35,7 +35,10 @@ func Main() {
 	Connect3(torqueBox, &torqueBox.h, hBox, &hBox.h, "H")
 	Connect(torqueBox, &torqueBox.alpha, alphaBox, &alphaBox.output, "alpha")
 	Connect3(solver, &solver.torque, torqueBox, &(torqueBox.torque), "torque")
-	Connect3(solver, &solver.mIn, solver, &(solver.mOut), "m")
+	Connect3(solver, &solver.mIn, solver, &solver.mOut, "m")
+
+	avg := new(AverageBox)
+	Connect(avg, &avg.in, solver, &solver.mOut[X], "mx")
 
 	dot.Close() // how to automate?
 
@@ -48,6 +51,7 @@ func Main() {
 	go torqueBox.Run()
 	go hBox.Run()
 	go alphaBox.Run()
+	go avg.Run()
 
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})

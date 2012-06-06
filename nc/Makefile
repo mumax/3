@@ -28,3 +28,4 @@ gccgobench:
 
 clean:
 	go clean
+	rm -f *.{5,6,8}

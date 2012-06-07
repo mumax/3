@@ -10,12 +10,6 @@ var (
 	size [3]int // 3D geom size
 	N    int    // product of size
 	warp int    // buffer size for Range()
-
-//	tChan      ScalarChan // Distributes time. Close means teardown listeners.
-//	mChan      VecChan
-//	alphaChan  Chan
-//	hChan      VecChan
-//	torqueChan VecChan
 )
 
 func Main() {
@@ -51,7 +45,7 @@ func Main() {
 	//	Probe3(&(torqueBox.t), "t")
 
 	// 3) run boxes, no more should be created from now
-
+	// -> let plumber do this.
 	go torqueBox.Run()
 	go hBox.Run()
 	go alphaBox.Run()
@@ -69,10 +63,6 @@ func Main() {
 	}
 
 	// 4) tear-down and wait for boxes to finish
-	// needed to cleanly close down output boxes, e.g.
-	// Use runtime.NumGoroutine() to assert all is well and panic(Bug()) otherwise
-	// to enforce good implementation.
-	// ...
 }
 
 func initSize() {

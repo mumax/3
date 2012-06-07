@@ -1,5 +1,8 @@
 package mm
 
+// Plumber connects the input/output channels of boxes.
+// The resulting graph is saved in plumber.dot.
+
 import ()
 
 func Connect3(dst Box, dstFanout *[3]<-chan []float32, src Box, srcChan *[3][]chan<- []float32, name string) {

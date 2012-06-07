@@ -5,7 +5,6 @@ package mm
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -27,10 +26,7 @@ func (dot *graphvizwriter) Init() {
 	var err error
 
 	dot.out, err = os.OpenFile(dot.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		log.Println(err) //far from fatal
-		return
-	}
+	CheckLog(err)
 	dot.Println("digraph dot{")
 	dot.Println("rankdir=LR")
 }
@@ -51,10 +47,9 @@ func (dot *graphvizwriter) Close() {
 	dot.Println("}")
 	dot.out.Close()
 	err := exec.Command("dot", "-O", "-Tpdf", dot.fname).Run()
-	if err != nil {
-		log.Println(err)
-	}
+	CheckLog(err)
 }
+
 func boxname(value interface{}) string {
 	typ := fmt.Sprintf("%T", value)
 	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."

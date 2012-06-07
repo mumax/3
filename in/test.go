@@ -1,12 +1,11 @@
-package mm
+package main
 
 import (
-	"fmt"
+	"nimble-cube/mm"
 	. "nimble-cube/nc"
 )
 
-func Main() {
-
+func main() {
 	// 0) initialize size, warp, etc
 	InitSize(1, 4, 8)
 
@@ -57,4 +56,3 @@ func Main() {
 
 	// 4) tear-down and wait for boxes to finish
 }
-

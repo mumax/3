@@ -25,3 +25,8 @@ func CheckLog(err error) {
 		log.Println("[error  ]", err)
 	}
 }
+
+// Logs.
+func Log(msg ...interface{}) {
+	log.Println(msg...)
+}

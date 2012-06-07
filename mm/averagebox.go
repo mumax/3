@@ -1,6 +1,9 @@
 package mm
 
-import(."nimble-cube/nc")
+import (
+	. "nimble-cube/nc"
+)
+
 type AverageBox struct {
 	in  <-chan []float32
 	out []chan<- float64

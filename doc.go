@@ -4,7 +4,9 @@
 package main
 
 // Dummy imports to compile the entire suite.
-import(
-_ "nimble-cube/nc"
-_ "nimble-cube/mm"
+import (
+	"nimble-cube/mm"
+	_ "nimble-cube/nc"
 )
+
+func main() { mm.Main() }

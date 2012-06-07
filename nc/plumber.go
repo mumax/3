@@ -30,6 +30,14 @@ func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<-
 	*dstChan = ch
 }
 
+// dst has multiple inputs. Table, e.g.
+func ConnectManyFloat64(dst Box, dstChan *[]<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
+	dot.Connect(boxname(dst), boxname(src), name, 1)
+	ch := make(chan float64, 1)
+	*srcChan = append(*srcChan, ch)
+	*dstChan = append(*dstChan, ch)
+}
+
 type Box interface{}
 
 // http://www.smbc-comics.com/index.php?db=comics&id=1330#comic

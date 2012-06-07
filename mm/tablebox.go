@@ -12,9 +12,9 @@ import (
 //Use type info for nice output, recycling decissions...
 
 type TableBox struct {
-	input  <-chan float64
+	input  []<-chan float64
 	time   <-chan float64
-	writer io.Writer
+	writer io.WriteCloser
 }
 
 func NewTableBox(file string) *TableBox {
@@ -26,11 +26,19 @@ func NewTableBox(file string) *TableBox {
 }
 
 func (box *TableBox) Run() {
-	ok := true
-	for ok {
+	for {
 		var time float64
-		time, ok = <-box.time
-		value := <-box.input
-		fmt.Fprintln(box.writer, time, "\t", value)
+		time, ok := <-box.time
+		if !ok {
+			box.writer.Close()
+			// sync
+			break
+		}
+		fmt.Fprint(box.writer, time)
+		for _, in := range box.input {
+			value := <-in
+			fmt.Fprint(box.writer, "\t", value)
+		}
+		fmt.Fprintln(box.writer)
 	}
 }

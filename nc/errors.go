@@ -20,6 +20,8 @@ func CheckIO(err error) {
 }
 
 // Logs the error of non-nil.
-func CheckLog(err error){
-	if err != nil{log.Println("[error  ]", err)}
+func CheckLog(err error) {
+	if err != nil {
+		log.Println("[error  ]", err)
+	}
 }

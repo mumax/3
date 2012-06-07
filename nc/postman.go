@@ -1,8 +1,6 @@
-package mm
+package nc
 
-import (
-	. "nimble-cube/nc"
-)
+// Postman sends/receives data to/from arrays of channels.
 
 func SendFloat64(fanout []chan<- float64, value float64) {
 	for _, ch := range fanout {

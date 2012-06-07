@@ -17,7 +17,7 @@ func NewConstBox(value float32) *ConstBox {
 
 func (box *ConstBox) Run() {
 
-	data := make([]float32, warp) // no Buffer(): should not be GC'd
+	data := make([]float32, WarpLen()) // no Buffer(): should not be GC'd
 	Memset(data, box.value)
 
 	for {

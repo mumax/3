@@ -16,7 +16,7 @@ func (box *MeanFieldBox) Run() {
 		var mSum Vector
 		var mSlice [3][]float32
 
-		for s := 0; s < N/warp; s++ {
+		for s := 0; s < NumWarp(); s++ {
 
 			mSlice[X] = <-box.m[X]
 			mSlice[Y] = <-box.m[Y]
@@ -29,11 +29,11 @@ func (box *MeanFieldBox) Run() {
 			}
 		}
 
-		hx := mSum[X] * -0.01 / float32(N)
-		hy := mSum[Y] * -0.04 / float32(N)
-		hz := mSum[Z] * -0.95 / float32(N)
+		hx := mSum[X] * -0.01 / float32(N())
+		hy := mSum[Y] * -0.04 / float32(N())
+		hz := mSum[Z] * -0.95 / float32(N())
 
-		for s := 0; s < N/warp; s++ {
+		for s := 0; s < NumWarp(); s++ {
 			hSlice := Buffer3()
 			Memset3(hSlice, Vector{hx, hy, hz})
 			Send3(box.h, hSlice)

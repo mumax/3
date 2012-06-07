@@ -1,4 +1,4 @@
-package mm
+package nc
 
 // Plumber connects the input/output channels of boxes.
 // The resulting graph is saved in plumber.dot.
@@ -28,10 +28,6 @@ func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<-
 	ch := make(chan float64, 1)
 	*srcChan = append(*srcChan, ch)
 	*dstChan = ch
-}
-
-func DefaultBufSize() int {
-	return N / warp
 }
 
 type Box interface{}

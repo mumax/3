@@ -20,6 +20,13 @@ func connect(dst *<-chan []float32, src *[]chan<- []float32) {
 	*dst = ch
 }
 
+func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
+	dot.Connect(boxname(dst), boxname(src), name, 1)
+	ch := make(chan float64, 1)
+	*srcChan = append(*srcChan, ch)
+	*dstChan = ch
+}
+
 func DefaultBufSize() int {
 	return N / warp
 }

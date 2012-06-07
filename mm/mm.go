@@ -40,6 +40,10 @@ func Main() {
 	avg := new(AverageBox)
 	Connect(avg, &avg.in, solver, &solver.mOut[X], "mx")
 
+	out := NewTableBox("mx.txt")
+	ConnectFloat64(out, &out.input, avg, &avg.out, "<mx>")
+	ConnectFloat64(out, &out.time, solver, &solver.time, "t")
+
 	dot.Close() // how to automate?
 
 	//	Probe3(&(solver.m), "m")
@@ -52,6 +56,7 @@ func Main() {
 	go hBox.Run()
 	go alphaBox.Run()
 	go avg.Run()
+	go out.Run()
 
 	m0 := [3][]float32{make([]float32, N), make([]float32, N), make([]float32, N)}
 	Memset3(m0, Vector{0.1, 0.99, 0})

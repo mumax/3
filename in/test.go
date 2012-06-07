@@ -1,8 +1,8 @@
 package main
 
 import (
-	"nimble-cube/mm"
 	. "nimble-cube/nc"
+	. "nimble-cube/mm"
 )
 
 func main() {

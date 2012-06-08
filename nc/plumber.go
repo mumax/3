@@ -69,6 +69,18 @@ func RegisterChannel(box Box, chanPtr Chan, name string) {
 	srcBoxFor[name] = box
 	srcChanFor[name] = chanPtr
 	log.Println("[plumber]", boxname(box), "provides", name)
+	RegisterComponentChannels(box, chanPtr, name)
+}
+
+func RegisterComponentChannels(box Box, chanPtr Chan, name string) {
+	switch c := chanPtr.(type) {
+	default:
+		return // nothing to see here
+	case *[3][]chan<- []float32:
+		RegisterChannel(box, &c[X], name+".x")
+		RegisterChannel(box, &c[Y], name+".y")
+		RegisterChannel(box, &c[Z], name+".z")
+	}
 }
 
 func AutoConnectAll() {

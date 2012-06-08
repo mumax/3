@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	boxes           []Box
+	boxes []Box
+	// TODO: Quant type
 	srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
 	srcChanForQuant = make(map[string]Chan) //IDEA: store vector/scalar kind here too
 )
@@ -45,8 +46,6 @@ func setChanFor(quant string, c Chan) {
 	}
 	srcChanForQuant[quant] = c
 }
-
-type Chan interface{}
 
 func Start() {
 	AutoConnectAll()
@@ -98,6 +97,7 @@ func RegisterQuant(box Box, chanPtr Chan, name string) {
 	registerComponentQuants(box, chanPtr, name)
 }
 
+// Automatically register components of vector quantities as "quant.x", ...
 func registerComponentQuants(box Box, chanPtr Chan, name string) {
 	Assert(IsOutputChan(chanPtr))
 	switch c := chanPtr.(type) {
@@ -114,35 +114,12 @@ func registerComponentQuants(box Box, chanPtr Chan, name string) {
 	}
 }
 
+// Auto-connect all registered boxes
 func AutoConnectAll() {
 	// connect all input channels using output channels from Register()
 	for _, box := range boxes {
 		AutoConnect(box)
 	}
-}
-
-// Check if v, a pointer, can be used as an input channel.
-// E.g.:
-// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
-func IsInputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
-		return true
-	}
-	return false
-}
-
-// pure reflection should do even better here
-
-// Check if v, a pointer, can be used as an output channel.
-// E.g.:
-// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
-func IsOutputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
-		return true
-	}
-	return false
 }
 
 // Connect fields with equal struct tags
@@ -181,6 +158,29 @@ func ConnectToQuant(box Box, boxInput Chan, chanName string) {
 	ManualConnect(box, boxInput, srcBoxFor(chanName), srcChanFor(chanName), chanName)
 }
 
+// Check if v, a pointer, can be used as an input channel.
+// E.g.:
+// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
+func IsInputChan(ptr interface{}) bool {
+	switch ptr.(type) {
+	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
+		return true
+	}
+	return false
+}
+
+// Check if v, a pointer, can be used as an output channel.
+// E.g.:
+// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
+func IsOutputChan(ptr interface{}) bool {
+	switch ptr.(type) {
+	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
+		return true
+	}
+	return false
+}
+
+// Retrieve a field by struct tag (instead of name).
 func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {
 	t := v.Type()
 	for i := 0; i < t.NumField(); i++ {
@@ -250,7 +250,11 @@ func ConnectChanOfFloat64(dst *<-chan float64, src interface{}) {
 	}
 }
 
+// Type alias for documentation
 type Box interface{}
+
+// Type alias for documentation
+type Chan interface{}
 
 type Runner interface {
 	Run()

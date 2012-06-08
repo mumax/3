@@ -10,16 +10,13 @@ func Main() {
 
 	// 1) make and connect boxes
 	torqueBox := new(LLGBox)
-	go torqueBox.Run()
 
 	hBox := new(MeanFieldBox)
-	go hBox.Run()
 
 	solver := new(EulerBox)
 	solver.dt = 0.01
 
 	alphaBox := NewConstBox(0.1)
-	go alphaBox.Run()
 
 	Connect3(hBox, &hBox.m, solver, &solver.mOut, "m")
 	Connect3(torqueBox, &torqueBox.m, solver, &solver.mOut, "m")
@@ -30,11 +27,9 @@ func Main() {
 	Connect3(solver, &solver.mIn, solver, &solver.mOut, "m")
 
 	avg := new(AverageBox)
-	go avg.Run()
 	Connect(avg, &avg.in, solver, &solver.mOut[X], "mx")
 
 	out := NewTableBox("mx.txt")
-	go out.Run()
 	ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
 	ConnectFloat64(out, &out.time, solver, &solver.time, "t")
 
@@ -42,6 +37,8 @@ func Main() {
 
 	// 3) run boxes, no more should be created from now
 	// -> let plumber do this.
+
+	GoRunBoxes()
 
 	// TODO: makearray
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}

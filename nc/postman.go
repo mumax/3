@@ -24,17 +24,23 @@ func Send3(vectorFanout [3][]chan<- []float32, value [3][]float32) {
 }
 
 func Recv(Chan <-chan []float32) []float32 {
-	if Chan == nil{panic("Recv on nil chan")}
+	if Chan == nil {
+		panic("Recv on nil chan")
+	}
 	return <-Chan
 }
 
-func RecvFloat64(Chan<-chan float64)float64{
-	if Chan == nil{panic("RecvFloat64 on nil chan")}
-	return <-Chan	
+func RecvFloat64(Chan <-chan float64) float64 {
+	if Chan == nil {
+		panic("RecvFloat64 on nil chan")
+	}
+	return <-Chan
 }
 
 func Recv3(vectorChan [3]<-chan []float32) [3][]float32 {
-	if vectorChan[X] == nil{panic("Recv3 on nil chan")}
+	if vectorChan[X] == nil {
+		panic("Recv3 on nil chan")
+	}
 	return [3][]float32{<-vectorChan[X], <-vectorChan[Y], <-vectorChan[Z]}
 }
 

@@ -6,11 +6,11 @@ import (
 
 // Euler solver.
 type EulerBox struct {
-	mOut   [3][]chan<- []float32 // magnetization, output
-	time   []chan<- float64      // time, output
-	step   []chan<- float64      // time step, output
-	torque [3]<-chan []float32   // torque, input
-	mIn    [3]<-chan []float32   // AUTOMATICALLY SET: magnetization input ??
+	MOut   [3][]chan<- []float32 "m"
+	Time   []chan<- float64      "time"
+	Step   []chan<- float64      "step"
+	Torque [3]<-chan []float32   "torque"
+	MIn    [3]<-chan []float32   "m"
 	t      float64               // local copy of time
 	dt     float32               // local copy of time step
 	steps  int                   // local copy of total time steps
@@ -22,18 +22,18 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 	// send initial value m0 down the m pipe
 	for I := 0; I < N(); I += WarpLen() {
 		m0Slice := [3][]float32{m0[X][I : I+WarpLen()], m0[Y][I : I+WarpLen()], m0[Z][I : I+WarpLen()]}
-		Send3(box.mOut, m0Slice)
+		Send3(box.MOut, m0Slice)
 	}
 
 	for s := 0; s < steps; s++ {
 		// Send time first, so others can prepare my input.
-		SendFloat64(box.time, box.t)
-		SendFloat64(box.step, float64(box.steps))
+		SendFloat64(box.Time, box.t)
+		SendFloat64(box.Step, float64(box.steps))
 
 		for I := 0; I < N(); I += WarpLen() {
 
-			m0Slice := Recv3(box.mIn)
-			tSlice := Recv3(box.torque)
+			m0Slice := Recv3(box.MIn)
+			tSlice := Recv3(box.Torque)
 			m1Slice := Buffer3()
 
 			for i := range m1Slice[X] {
@@ -48,7 +48,7 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 			}
 
 			if s < steps-1 {
-				Send3(box.mOut, m1Slice)
+				Send3(box.MOut, m1Slice)
 			} else {
 				copy(m0[X][I:I+WarpLen()], m1Slice[X])
 				copy(m0[Y][I:I+WarpLen()], m1Slice[Y])

@@ -9,23 +9,14 @@ func Main() {
 	InitSize(1, 4, 8)
 
 	// 1) make and connect boxes
-	//torqueBox := new(LLGBox)
-
-	hBox := new(MeanFieldBox)
+	Register(new(LLGBox))
+	Register(new(MeanFieldBox))
 
 	solver := new(EulerBox)
 	solver.dt = 0.01
+	Register(solver)
 
 	//alphaBox := NewConstBox(0.1)
-
-	Register(hBox)
-	//	Connect3(hBox, &hBox.m, solver, &solver.mOut, "m")
-	//	Connect3(torqueBox, &torqueBox.m, solver, &solver.mOut, "m")
-	//	Connect3(torqueBox, &torqueBox.h, hBox, &hBox.h, "H")
-	//	Connect1(torqueBox, &torqueBox.alpha, alphaBox, &alphaBox.output, "alpha")
-	//	ConnectFloat64(alphaBox, &alphaBox.time, solver, &solver.time, "t")
-	//	Connect3(solver, &solver.torque, torqueBox, &(torqueBox.torque), "torque")
-	//	Connect3(solver, &solver.mIn, solver, &solver.mOut, "m")
 
 	//	avg := new(AverageBox)
 	//	Connect1(avg, &avg.in, solver, &solver.mOut[X], "mx")
@@ -33,8 +24,6 @@ func Main() {
 	//	out := NewTableBox("mx.txt")
 	//	ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
 	//	ConnectFloat64(out, &out.time, solver, &solver.time, "t")
-
-	//dot.Close() // how to automate?
 
 	// 3) run boxes, no more should be created from now
 	// -> let plumber do this.

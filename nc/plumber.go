@@ -12,6 +12,7 @@ var boxes []Box
 
 func Start() {
 	connectBoxes()
+	dot.Close()
 	startBoxes()
 }
 
@@ -21,7 +22,7 @@ func startBoxes() {
 			log.Println("[plumber] starting:", boxname(r))
 			go r.Run()
 		} else {
-			log.Println("[plumber] NOT STARTING:", boxname(b))
+			log.Println("[plumber] not starting:", boxname(b), ": needs input")
 		}
 	}
 }
@@ -48,7 +49,6 @@ func connectBoxes() {
 			if name == "" {
 				continue
 			}
-			sourceBoxForChanName[name] = boxname(box)
 			// store pointer to output channel
 			fieldaddr := val.Field(i).Addr().Interface()
 			switch ptr := fieldaddr.(type) {
@@ -62,11 +62,13 @@ func connectBoxes() {
 			case *[]chan<- float64:
 				chanF64Ptr[name] = append(chanF64Ptr[name], ptr)
 			}
+			// found one = ok
+			sourceBoxForChanName[name] = boxname(box)
 			log.Println("[plumber]", boxname(box), "->", name)
 		}
 	}
 
-	//log.Println("[plumber] output fields:", chanPtr, chan3Ptr, chanF64Ptr)
+	log.Println("[plumber] output fields:", chanPtr, chan3Ptr, chanF64Ptr)
 
 	// 2) connect all input channels
 	for _, box := range boxes {
@@ -78,23 +80,29 @@ func connectBoxes() {
 			if name == "" {
 				continue
 			}
-			sBoxName := sourceBoxForChanName[name]
-			if sBoxName == "" {
-				log.Println("[plumber] NO INPUT FOR", boxname(box), name)
-				continue
-			}
 			fieldaddr := val.Field(i).Addr().Interface()
+			sBoxName := sourceBoxForChanName[name]
 			switch ptr := fieldaddr.(type) {
 			default:
 				continue
 			case *<-chan []float32:
-				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 1)
+				if chanPtr[name] == nil {
+					log.Println("[plumber] no input for", boxname(box), name)
+					break
+				}
 				connect(ptr, chanPtr[name][0]) // TODO: handle multiple/none
+				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 1)
 			case *[3]<-chan []float32:
-				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 3)
+				if chan3Ptr[name] == nil {
+					log.Println("[plumber] no input for", boxname(box), name)
+					break
+				}
 				connect3(ptr, chan3Ptr[name][0]) // TODO: handle multiple/none
+				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 3)
 			}
-			log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))
+			if sBoxName != "" {
+				log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))
+			}
 		}
 	}
 }

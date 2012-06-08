@@ -6,17 +6,17 @@ import (
 
 // Landau-Lifshitz torque.
 type LLGBox struct {
-	m      [3]<-chan []float32   "m"
-	h      [3]<-chan []float32   "Heff"
-	alpha  <-chan []float32      "alpha"
-	torque [3][]chan<- []float32 "torque"
+	M      [3]<-chan []float32   "m"
+	H      [3]<-chan []float32   "H"
+	Alpha  <-chan []float32      "alpha"
+	Torque [3][]chan<- []float32 "torque"
 }
 
 func (box *LLGBox) Run() {
 	for {
-		mSlice := Recv3(box.m)
-		hSlice := Recv3(box.h)
-		aSlice := <-box.alpha
+		mSlice := Recv3(box.M)
+		hSlice := Recv3(box.H)
+		aSlice := Recv(box.Alpha)
 		tSlice := Buffer3()
 
 		for i := range tSlice[X] {
@@ -34,6 +34,6 @@ func (box *LLGBox) Run() {
 			tSlice[Y][i] = t[Y]
 			tSlice[Z][i] = t[Z]
 		}
-		Send3(box.torque, tSlice)
+		Send3(box.Torque, tSlice)
 	}
 }

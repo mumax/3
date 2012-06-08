@@ -5,19 +5,19 @@ import (
 )
 
 type AverageBox struct {
-	in  <-chan []float32
-	out []chan<- float64
+	Input  <-chan []float32
+	Output []chan<- float64
 }
 
 func (box *AverageBox) Run() {
 	for {
 		sum := 0.0
 		for I := 0; I < N(); I += WarpLen() {
-			in := <-box.in
+			in := <-box.Input
 			for _, value := range in {
 				sum += float64(value)
 			}
 		}
-		SendFloat64(box.out, sum/float64(N()))
+		SendFloat64(box.Output, sum/float64(N()))
 	}
 }

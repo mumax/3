@@ -132,6 +132,11 @@ func AutoConnect(box Box) {
 	}
 }
 
+func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr interface{}, name string) {
+	ConnectChannels(dstChanPtr, srcChanPtr)
+	dot.Connect(boxname(dstBox), boxname(srcBox), name, 2)
+}
+
 func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {
 	t := v.Type()
 	for i := 0; i < t.NumField(); i++ {

@@ -17,12 +17,13 @@ func Main() {
 	solver.dt = 0.01
 	Register(solver)
 
-	//	avg := new(AverageBox)
-	//	Connect1(avg, &avg.in, solver, &solver.mOut[X], "mx")
-	//
-	//	out := NewTableBox("mx.txt")
-	//	ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
-	//	ConnectFloat64(out, &out.time, solver, &solver.time, "t")
+	avg := new(AverageBox)
+	Register(avg)
+	ManualConnect(avg, &avg.Input, solver, &solver.MOut[X], "mx")
+
+	//out := NewTableBox("mx.txt")
+	//ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
+	//ConnectFloat64(out, &out.time, solver, &solver.time, "t")
 
 	Start()
 

@@ -58,7 +58,6 @@ func Register(box Box, structTag ...string) {
 		fieldaddr := val.Field(i).Addr().Interface()
 		switch ptr := fieldaddr.(type) {
 		default:
-			delete(sourceBoxForChanName, name)
 			continue
 		case *[]chan<- []float32:
 			chanPtr[name] = append(chanPtr[name], ptr)
@@ -95,14 +94,14 @@ func connectBoxes() {
 					break
 				}
 				connect(ptr, chanPtr[name][0]) // TODO: handle multiple/none
-				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 1)
+				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 1)
 			case *[3]<-chan []float32:
 				if chan3Ptr[name] == nil {
 					log.Println("[plumber] no input for", boxname(box), name)
 					break
 				}
 				connect3(ptr, chan3Ptr[name][0]) // TODO: handle multiple/none
-				dot.Connect(sourceBoxForChanName[name], boxname(box), name, 3)
+				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 3)
 			}
 			if sBoxName != "" {
 				log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))

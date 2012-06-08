@@ -12,33 +12,29 @@ import (
 //Use type info for nice output, recycling decissions...
 
 type TableBox struct {
-	input  []<-chan float64
-	time   <-chan float64
+	Input  <-chan float64
+	Time   <-chan float64
 	writer io.WriteCloser
 }
 
-func NewTableBox(file string) *TableBox {
+func NewTableBox(file string, quant string) *TableBox {
 	box := new(TableBox)
 	var err error
 	box.writer, err = os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	CheckIO(err)
+
+	ConnectToQuant(box, &box.Input, quant)
+
 	return box
 }
 
 func (box *TableBox) Run() {
+	defer box.writer.Close()
 	for {
-		var time float64
-		time, ok := <-box.time
-		if !ok {
-			box.writer.Close()
-			// sync
-			break
-		}
+		time := RecvFloat64(box.Time)
 		fmt.Fprint(box.writer, time)
-		for _, in := range box.input {
-			value := <-in
-			fmt.Fprint(box.writer, "\t", value)
-		}
+		value := RecvFloat64(box.Input)
+		fmt.Fprint(box.writer, "\t", value)
 		fmt.Fprintln(box.writer)
 	}
 }

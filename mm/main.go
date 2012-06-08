@@ -17,10 +17,9 @@ func Main() {
 	solver.dt = 0.01
 	Register(solver)
 
-	avg := new(AverageBox)
-	Register(avg)
-	ManualConnect(avg, &avg.Input, solver, &solver.MOut[X], "mx")
+	Register(NewAverage3Box("m"))
 
+	Register(NewTableBox("m.txt", "<m>.x"))
 	//Output("m.x", "mx.txt")
 
 	Start()

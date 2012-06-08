@@ -41,7 +41,7 @@ func StartBoxes() {
 }
 
 // 
-func Register(box Box) { //, structTag ...string) {
+func Register(box Box) {
 	boxes = append(boxes, box)
 	dot.AddBox(boxname(box))
 
@@ -108,7 +108,7 @@ func IsInputChan(ptr interface{}) bool {
 // 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
 func IsOutputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64:
+	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<-float64:
 		return true
 	}
 	return false
@@ -143,6 +143,11 @@ func AutoConnect(box Box) {
 func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr interface{}, name string) {
 	ConnectChannels(dstChanPtr, srcChanPtr)
 	dot.Connect(boxname(dstBox), boxname(srcBox), name, 2)
+	log.Println("connect:", boxname(dstBox), "<-", name, "<-", boxname(srcBox))
+}
+
+func ConnectToQuant(box Box, boxInput Chan, chanName string){
+	ManualConnect(box, boxInput, srcBoxFor[chanName], srcChanFor[chanName], chanName)
 }
 
 func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {

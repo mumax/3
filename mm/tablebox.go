@@ -13,7 +13,7 @@ import (
 
 type TableBox struct {
 	Input  <-chan float64
-	Time   <-chan float64
+	Time   <-chan float64 "time"
 	writer io.WriteCloser
 }
 

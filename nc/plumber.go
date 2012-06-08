@@ -13,11 +13,8 @@ import (
 )
 
 var (
-	boxes []Box
-	//	chanPtr              = make(map[string][]*[]chan<- []float32)
-	//	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
-	//	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	srcBoxFor  = make(map[string]Box)  //IDEA: store vector/scalar kind here too
+	boxes      []Box
+	srcBoxFor  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
 	srcChanFor = make(map[string]Chan) //IDEA: store vector/scalar kind here too
 )
 
@@ -40,7 +37,7 @@ func StartBoxes() {
 	}
 }
 
-// 
+// Registers quantities for all tagged output channels.
 func Register(box Box) {
 	boxes = append(boxes, box)
 	dot.AddBox(boxname(box))
@@ -59,27 +56,33 @@ func Register(box Box) {
 			if prev, ok := srcBoxFor[name]; ok {
 				panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
 			}
-			RegisterChannel(box, chanPtr, name)
+			RegisterQuant(box, chanPtr, name)
 		}
 	}
 }
 
-func RegisterChannel(box Box, chanPtr Chan, name string) {
+// Register a quantity taken form channel, give it a name.
+func RegisterQuant(box Box, chanPtr Chan, name string) {
 	Assert(IsOutputChan(chanPtr))
 	srcBoxFor[name] = box
 	srcChanFor[name] = chanPtr
 	log.Println("[plumber]", boxname(box), "provides", name)
-	RegisterComponentChannels(box, chanPtr, name)
+	registerComponentQuants(box, chanPtr, name)
 }
 
-func RegisterComponentChannels(box Box, chanPtr Chan, name string) {
+func registerComponentQuants(box Box, chanPtr Chan, name string) {
+	Assert(IsOutputChan(chanPtr))
 	switch c := chanPtr.(type) {
 	default:
 		return // nothing to see here
 	case *[3][]chan<- []float32:
-		RegisterChannel(box, &c[X], name+".x")
-		RegisterChannel(box, &c[Y], name+".y")
-		RegisterChannel(box, &c[Z], name+".z")
+		RegisterQuant(box, &c[X], name+".x")
+		RegisterQuant(box, &c[Y], name+".y")
+		RegisterQuant(box, &c[Z], name+".z")
+	case *[3][]chan<- float64:
+		RegisterQuant(box, &c[X], name+".x")
+		RegisterQuant(box, &c[Y], name+".y")
+		RegisterQuant(box, &c[Z], name+".z")
 	}
 }
 
@@ -108,7 +111,7 @@ func IsInputChan(ptr interface{}) bool {
 // 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
 func IsOutputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<-float64:
+	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
 		return true
 	}
 	return false
@@ -146,7 +149,7 @@ func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr in
 	log.Println("connect:", boxname(dstBox), "<-", name, "<-", boxname(srcBox))
 }
 
-func ConnectToQuant(box Box, boxInput Chan, chanName string){
+func ConnectToQuant(box Box, boxInput Chan, chanName string) {
 	ManualConnect(box, boxInput, srcBoxFor[chanName], srcChanFor[chanName], chanName)
 }
 

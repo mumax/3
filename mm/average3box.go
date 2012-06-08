@@ -12,7 +12,7 @@ type Average3Box struct {
 func NewAverage3Box(quant string) *Average3Box {
 	avg := new(Average3Box)
 	ConnectToQuant(avg, &avg.Input, quant)
-	RegisterChannel(avg, &avg.Output, "<"+quant+">")
+	RegisterQuant(avg, &avg.Output, "<"+quant+">")
 	return avg
 }
 

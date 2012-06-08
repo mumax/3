@@ -13,10 +13,38 @@ import (
 )
 
 var (
-	boxes      []Box
-	srcBoxFor  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
-	srcChanFor = make(map[string]Chan) //IDEA: store vector/scalar kind here too
+	boxes           []Box
+	srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
+	srcChanForQuant = make(map[string]Chan) //IDEA: store vector/scalar kind here too
 )
+
+func srcBoxFor(quant string) Box {
+	if b, ok := srcBoxForQuant[quant]; ok {
+		return b
+	}
+	panic("no such quantity " + quant)
+}
+
+func srcChanFor(quant string) Chan {
+	if b, ok := srcChanForQuant[quant]; ok {
+		return b
+	}
+	panic("no such quantity " + quant)
+}
+
+func setBoxFor(quant string, box Box) {
+	if _, ok := srcBoxForQuant[quant]; ok {
+		panic("already defined " + quant)
+	}
+	srcBoxForQuant[quant] = box
+}
+
+func setChanFor(quant string, c Chan) {
+	if _, ok := srcChanForQuant[quant]; ok {
+		panic("already defined " + quant)
+	}
+	srcChanForQuant[quant] = c
+}
 
 type Chan interface{}
 
@@ -53,7 +81,7 @@ func Register(box Box) {
 		}
 		chanPtr := val.Field(i).Addr().Interface()
 		if IsOutputChan(chanPtr) {
-			if prev, ok := srcBoxFor[name]; ok {
+			if prev, ok := srcBoxForQuant[name]; ok {
 				panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
 			}
 			RegisterQuant(box, chanPtr, name)
@@ -64,8 +92,8 @@ func Register(box Box) {
 // Register a quantity taken form channel, give it a name.
 func RegisterQuant(box Box, chanPtr Chan, name string) {
 	Assert(IsOutputChan(chanPtr))
-	srcBoxFor[name] = box
-	srcChanFor[name] = chanPtr
+	setBoxFor(name, box)
+	setChanFor(name, chanPtr)
 	log.Println("[plumber]", boxname(box), "provides", name)
 	registerComponentQuants(box, chanPtr, name)
 }
@@ -131,7 +159,7 @@ func AutoConnect(box Box) {
 		if !IsInputChan(fieldaddr) {
 			continue
 		}
-		srcbox := srcBoxFor[name]
+		srcbox := srcBoxFor(name)
 		if srcbox == nil {
 			log.Println("autoconnect:", boxname(box), name, "has no input")
 		} else {
@@ -150,7 +178,7 @@ func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr in
 }
 
 func ConnectToQuant(box Box, boxInput Chan, chanName string) {
-	ManualConnect(box, boxInput, srcBoxFor[chanName], srcChanFor[chanName], chanName)
+	ManualConnect(box, boxInput, srcBoxFor(chanName), srcChanFor(chanName), chanName)
 }
 
 func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {

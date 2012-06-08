@@ -16,7 +16,7 @@ func Main() {
 	solver.dt = 0.01
 	Register(solver)
 
-	//alphaBox := NewConstBox(0.1)
+	Register(NewConstBox(0.1), `Output:"alpha"`)
 
 	//	avg := new(AverageBox)
 	//	Connect1(avg, &avg.in, solver, &solver.mOut[X], "mx")

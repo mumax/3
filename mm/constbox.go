@@ -6,8 +6,8 @@ import (
 
 type ConstBox struct {
 	value  float32
-	output []chan<- []float32
-	time   <-chan float64 "time"
+	Output []chan<- []float32
+	Time   <-chan float64 "time"
 }
 
 func NewConstBox(value float32) *ConstBox {
@@ -22,7 +22,7 @@ func (box *ConstBox) Run() {
 	Memset(data, box.value)
 
 	for {
-		RecvFloat64(box.time)
-		Send(box.output, data)
+		RecvFloat64(box.Time)
+		Send(box.Output, data)
 	}
 }

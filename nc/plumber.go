@@ -8,7 +8,13 @@ import (
 	"reflect"
 )
 
-var boxes []Box
+var (
+	boxes                []Box
+	chanPtr              = make(map[string][]*[]chan<- []float32)
+	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
+	chanF64Ptr           = make(map[string][]*[]chan<- float64)
+	sourceBoxForChanName = make(map[string]string)
+)
 
 func Start() {
 	connectBoxes()
@@ -27,50 +33,48 @@ func startBoxes() {
 	}
 }
 
-func Register(box Box) {
+func Register(box Box, structTag ...string) {
+	if len(structTag) > 1 {
+		panic("too many struct tags")
+	}
 	boxes = append(boxes, box)
-	log.Println("[plumber] register:", boxname(box))
+
+	// find and map all output channels
+	val := reflect.ValueOf(box).Elem()
+	typ := val.Type()
+	for i := 0; i < typ.NumField(); i++ {
+		// use the field's struct tag as channel name
+		name := string(typ.Field(i).Tag)
+		if name == "" && len(structTag) > 0 {
+			name = reflect.StructTag(structTag[0]).Get(typ.Field(i).Name)
+			if name != "" {
+				log.Println("[plumber]", boxname(box), typ.Field(i).Name, "used as", name)
+			}
+		}
+		if name == "" {
+			continue
+		}
+		// store pointer to output channel
+		fieldaddr := val.Field(i).Addr().Interface()
+		switch ptr := fieldaddr.(type) {
+		default:
+			delete(sourceBoxForChanName, name)
+			continue
+		case *[]chan<- []float32:
+			chanPtr[name] = append(chanPtr[name], ptr)
+		case *[3][]chan<- []float32:
+			chan3Ptr[name] = append(chan3Ptr[name], ptr)
+		case *[]chan<- float64:
+			chanF64Ptr[name] = append(chanF64Ptr[name], ptr)
+		}
+		// found one = ok
+		sourceBoxForChanName[name] = boxname(box)
+		log.Println("[plumber]", boxname(box), "->", name)
+	}
 }
 
 func connectBoxes() {
-
-	chanPtr := make(map[string][]*[]chan<- []float32)
-	chan3Ptr := make(map[string][]*[3][]chan<- []float32)
-	chanF64Ptr := make(map[string][]*[]chan<- float64)
-	sourceBoxForChanName := make(map[string]string)
-
-	// 1) find all output channels
-	for _, box := range boxes {
-		val := reflect.ValueOf(box).Elem()
-		typ := val.Type()
-		for i := 0; i < typ.NumField(); i++ {
-			// use the field's struct tag as channel name
-			name := string(typ.Field(i).Tag)
-			if name == "" {
-				continue
-			}
-			// store pointer to output channel
-			fieldaddr := val.Field(i).Addr().Interface()
-			switch ptr := fieldaddr.(type) {
-			default:
-				delete(sourceBoxForChanName, name)
-				continue
-			case *[]chan<- []float32:
-				chanPtr[name] = append(chanPtr[name], ptr)
-			case *[3][]chan<- []float32:
-				chan3Ptr[name] = append(chan3Ptr[name], ptr)
-			case *[]chan<- float64:
-				chanF64Ptr[name] = append(chanF64Ptr[name], ptr)
-			}
-			// found one = ok
-			sourceBoxForChanName[name] = boxname(box)
-			log.Println("[plumber]", boxname(box), "->", name)
-		}
-	}
-
-	log.Println("[plumber] output fields:", chanPtr, chan3Ptr, chanF64Ptr)
-
-	// 2) connect all input channels
+	// connect all input channels using output channels from Register()
 	for _, box := range boxes {
 		val := reflect.ValueOf(box).Elem()
 		typ := val.Type()

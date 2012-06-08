@@ -64,16 +64,14 @@ func Register(box Box) { //, structTag ...string) {
 			continue
 		}
 		fieldaddr := val.Field(i).Addr().Interface()
-		switch fieldaddr.(type) {
-		default:
+		if !IsOutputChan(fieldaddr) {
 			continue
-		case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64:
-			if prev, ok := srcBoxFor[name]; ok {
-				panic(name + " provided by both" + boxname(prev) + " and " + boxname(box))
-			}
-			srcBoxFor[name] = box
-			log.Println("[plumber]", boxname(box), "provides", name)
 		}
+		if prev, ok := srcBoxFor[name]; ok {
+			panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
+		}
+		srcBoxFor[name] = box
+		log.Println("[plumber]", boxname(box), "provides", name)
 	}
 }
 
@@ -87,8 +85,8 @@ func AutoConnectAll() {
 // Check if v, a pointer, can be used as an input channel.
 // E.g.:
 // 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
-func IsInput(v interface{}) bool {
-	switch v.(type) {
+func IsInputChan(ptr interface{}) bool {
+	switch ptr.(type) {
 	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
 		return true
 	}
@@ -100,9 +98,9 @@ func IsInput(v interface{}) bool {
 // Check if v, a pointer, can be used as an output channel.
 // E.g.:
 // 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
-func IsOutput(v interface{}) bool {
-	switch v.(type) {
-	case *[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64:
+func IsOutputChan(ptr interface{}) bool {
+	switch ptr.(type) {
+	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64:
 		return true
 	}
 	return false
@@ -119,7 +117,7 @@ func AutoConnect(box Box) {
 			continue
 		}
 		fieldaddr := val.Field(i).Addr().Interface()
-		if !IsInput(fieldaddr) {
+		if !IsInputChan(fieldaddr) {
 			continue
 		}
 		srcbox := srcBoxFor[name]

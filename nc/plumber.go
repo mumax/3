@@ -17,8 +17,11 @@ var (
 	//	chanPtr              = make(map[string][]*[]chan<- []float32)
 	//	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
 	//	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	srcBoxFor = make(map[string]Box) //IDEA: store vector/scalar kind here too
+	srcBoxFor  = make(map[string]Box)  //IDEA: store vector/scalar kind here too
+	srcChanFor = make(map[string]Chan) //IDEA: store vector/scalar kind here too
 )
+
+type Chan interface{}
 
 func Start() {
 	AutoConnectAll()
@@ -38,13 +41,7 @@ func StartBoxes() {
 }
 
 // 
-// Ad-hoc struct tags may be provided to map 
-// field names of generic boxes to channel names.
-// E.g.: `Output:alpha,Input:Time`
 func Register(box Box) { //, structTag ...string) {
-	//	if len(structTag) > 1 {
-	//		panic("too many struct tags")
-	//	}
 	boxes = append(boxes, box)
 	dot.AddBox(boxname(box))
 
@@ -54,25 +51,24 @@ func Register(box Box) { //, structTag ...string) {
 	for i := 0; i < typ.NumField(); i++ {
 		// use the field's struct tag as channel name
 		name := string(typ.Field(i).Tag)
-		//if name == "" && len(structTag) > 0 {
-		//	name = reflect.StructTag(structTag[0]).Get(typ.Field(i).Name)
-		//	if name != "" {
-		//		log.Println("[plumber]", boxname(box), typ.Field(i).Name, "used as", name)
-		//	}
-		//}
 		if name == "" {
 			continue
 		}
-		fieldaddr := val.Field(i).Addr().Interface()
-		if !IsOutputChan(fieldaddr) {
-			continue
+		chanPtr := val.Field(i).Addr().Interface()
+		if IsOutputChan(chanPtr) {
+			if prev, ok := srcBoxFor[name]; ok {
+				panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
+			}
+			RegisterChannel(box, chanPtr, name)
 		}
-		if prev, ok := srcBoxFor[name]; ok {
-			panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
-		}
-		srcBoxFor[name] = box
-		log.Println("[plumber]", boxname(box), "provides", name)
 	}
+}
+
+func RegisterChannel(box Box, chanPtr Chan, name string) {
+	Assert(IsOutputChan(chanPtr))
+	srcBoxFor[name] = box
+	srcChanFor[name] = chanPtr
+	log.Println("[plumber]", boxname(box), "provides", name)
 }
 
 func AutoConnectAll() {

@@ -21,9 +21,7 @@ func Main() {
 	Register(avg)
 	ManualConnect(avg, &avg.Input, solver, &solver.MOut[X], "mx")
 
-	//out := NewTableBox("mx.txt")
-	//ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
-	//ConnectFloat64(out, &out.time, solver, &solver.time, "t")
+	//Output("m.x", "mx.txt")
 
 	Start()
 

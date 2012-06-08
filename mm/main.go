@@ -11,7 +11,7 @@ func Main() {
 	// 1) make and connect boxes
 	Register(new(LLGBox))
 	Register(new(MeanFieldBox))
-	//Register(NewConstBox(0.1), `Output:"alpha"`)
+	Register(NewConstBox(0.1))//, `Output:"alpha"`)
 
 	solver := new(EulerBox)
 	solver.dt = 0.01

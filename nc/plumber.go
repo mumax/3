@@ -42,6 +42,7 @@ func Register(box Box, structTag ...string) {
 		panic("too many struct tags")
 	}
 	boxes = append(boxes, box)
+	dot.AddBox(boxname(box))
 
 	// find and map all output channels
 	val := reflect.ValueOf(box).Elem()
@@ -142,30 +143,8 @@ func connectF64(dst *<-chan float64, src *[]chan<- float64) {
 	*dst = ch
 }
 
-// Connect scalar slices.
-
-//
-//
-//// Connect single numbers (not space-dependent arrays).
-//func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
-//	dot.Connect(boxname(dst), boxname(src), name, 1)
-//	ch := make(chan float64, 1)
-//	*srcChan = append(*srcChan, ch)
-//	*dstChan = ch
-//	stackBox(dst)
-//	stackBox(src)
-//}
-//
-//// dst has multiple inputs. Table, e.g.
-//// TODO: -> output
-//func ConnectManyFloat64(dst Box, dstChan *[]<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
-//	dot.Connect(boxname(dst), boxname(src), name, 1)
-//	ch := make(chan float64, 1)
-//	*srcChan = append(*srcChan, ch)
-//	*dstChan = append(*dstChan, ch)
-//}
-
 type Box interface{}
+
 type Runner interface {
 	Run()
 }

@@ -41,9 +41,11 @@ func (dot *graphvizwriter) Connect(dst string, src string, label string, thickne
 	if dst == "" || src == "" {
 		Panic("connect", dst, src, label, thickness)
 	}
-	dot.Println(src, `[shape="rect"];`)
-	dot.Println(dst, `[shape="rect"];`)
 	dot.Println(src, "->", dst, "[label=", label, `penwidth=`, thickness, `];`)
+}
+
+func (dot *graphvizwriter) AddBox(name string) {
+	dot.Println(name, `[shape="rect"];`)
 }
 
 func (dot *graphvizwriter) Close() {

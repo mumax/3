@@ -41,7 +41,7 @@ func (dot *graphvizwriter) Connect(dst string, src string, label string, thickne
 	if dst == "" || src == "" {
 		Panic("connect", dst, src, label, thickness)
 	}
-	dot.Println(src, "->", dst, "[label=", label, `penwidth=`, thickness, `];`)
+	dot.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }
 
 func (dot *graphvizwriter) AddBox(name string) {
@@ -62,4 +62,10 @@ func boxname(value interface{}) string {
 		clean = clean[:len(clean)-len("Box")]
 	}
 	return clean
+}
+
+// replaces characters that graphviz cannot handle as labels.
+func escape(in string) (out string) {
+	return `"` + in + `"`
+	return
 }

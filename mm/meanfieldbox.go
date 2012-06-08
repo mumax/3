@@ -4,9 +4,11 @@ import (
 	. "nimble-cube/nc"
 )
 
+// IDEA: Connect(box, "H_*") regex match.
+
 type MeanFieldBox struct {
-	m [3]<-chan []float32   // magnetization input
-	h [3][]chan<- []float32 // field output
+	M [3]<-chan []float32   "m"
+	H [3][]chan<- []float32 "H"
 }
 
 func (box *MeanFieldBox) Run() {
@@ -14,13 +16,10 @@ func (box *MeanFieldBox) Run() {
 	for {
 
 		var mSum Vector
-		var mSlice [3][]float32
 
 		for s := 0; s < NumWarp(); s++ {
 
-			mSlice[X] = <-box.m[X]
-			mSlice[Y] = <-box.m[Y]
-			mSlice[Z] = <-box.m[Z]
+			mSlice := Recv3(box.M)
 
 			for i := range mSlice[X] {
 				mSum[X] += mSlice[X][i]
@@ -36,7 +35,7 @@ func (box *MeanFieldBox) Run() {
 		for s := 0; s < NumWarp(); s++ {
 			hSlice := Buffer3()
 			Memset3(hSlice, Vector{hx, hy, hz})
-			Send3(box.h, hSlice)
+			Send3(box.H, hSlice)
 		}
 	}
 }

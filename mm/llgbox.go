@@ -6,9 +6,10 @@ import (
 
 // Landau-Lifshitz torque.
 type LLGBox struct {
-	m, h   [3]<-chan []float32   // input
-	alpha  <-chan []float32      //input
-	torque [3][]chan<- []float32 // torque output
+	m      [3]<-chan []float32   "m"
+	h      [3]<-chan []float32   "Heff"
+	alpha  <-chan []float32      "alpha"
+	torque [3][]chan<- []float32 "torque"
 }
 
 func (box *LLGBox) Run() {

@@ -7,7 +7,7 @@ import (
 type ConstBox struct {
 	value  float32
 	output []chan<- []float32
-	time   <-chan float64
+	time   <-chan float64 "time"
 }
 
 func NewConstBox(value float32) *ConstBox {

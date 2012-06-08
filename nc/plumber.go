@@ -33,6 +33,10 @@ func startBoxes() {
 	}
 }
 
+// 
+// Ad-hoc struct tags may be provided to map 
+// field names of generic boxes to channel names.
+// E.g.: `Output:alpha,Input:Time`
 func Register(box Box, structTag ...string) {
 	if len(structTag) > 1 {
 		panic("too many struct tags")
@@ -94,7 +98,7 @@ func connectBoxes() {
 					break
 				}
 				connect(ptr, chanPtr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 1)
+				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 2)
 			case *[3]<-chan []float32:
 				if chan3Ptr[name] == nil {
 					log.Println("[plumber] no input for", boxname(box), name)
@@ -102,6 +106,13 @@ func connectBoxes() {
 				}
 				connect3(ptr, chan3Ptr[name][0]) // TODO: handle multiple/none
 				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 3)
+			case *<-chan float64:
+				if chanF64Ptr[name] == nil {
+					log.Println("[plumber] no input for", boxname(box), name)
+					break
+				}
+				connectF64(ptr, chanF64Ptr[name][0]) // TODO: handle multiple/none
+				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 1)
 			}
 			if sBoxName != "" {
 				log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))
@@ -122,6 +133,13 @@ func connect3(dstFanout *[3]<-chan []float32, srcChan *[3][]chan<- []float32) {
 	for i := 0; i < 3; i++ {
 		connect(&(*dstFanout)[i], &(*srcChan)[i])
 	}
+}
+
+// Connect float64 channels.
+func connectF64(dst *<-chan float64, src *[]chan<- float64) {
+	ch := make(chan float64, 1)
+	*src = append(*src, ch)
+	*dst = ch
 }
 
 // Connect scalar slices.
@@ -145,8 +163,6 @@ func connect3(dstFanout *[3]<-chan []float32, srcChan *[3][]chan<- []float32) {
 //	ch := make(chan float64, 1)
 //	*srcChan = append(*srcChan, ch)
 //	*dstChan = append(*dstChan, ch)
-//	stackBox(dst)
-//	stackBox(src)
 //}
 
 type Box interface{}

@@ -3,21 +3,25 @@ package nc
 // Plumber connects the input/output channels of boxes.
 // The resulting graph is saved in plumber.dot.
 
+// TODO: Plumber type with methods, one global plumber.
+// just for readability.
+// or plumber package? plumber.Connect()...
+
 import (
 	"log"
 	"reflect"
 )
 
 var (
-	boxes                []Box
-	chanPtr              = make(map[string][]*[]chan<- []float32)
-	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
-	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	sourceBoxForChan = make(map[string]Box)
+	boxes []Box
+	//	chanPtr              = make(map[string][]*[]chan<- []float32)
+	//	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
+	//	chanF64Ptr           = make(map[string][]*[]chan<- float64)
+	srcBoxFor = make(map[string]Box)
 )
 
 func Start() {
-	connectBoxes()
+	AutoConnectAll()
 	dot.Close()
 	startBoxes()
 }
@@ -37,10 +41,10 @@ func startBoxes() {
 // Ad-hoc struct tags may be provided to map 
 // field names of generic boxes to channel names.
 // E.g.: `Output:alpha,Input:Time`
-func Register(box Box, structTag ...string) {
-	if len(structTag) > 1 {
-		panic("too many struct tags")
-	}
+func Register(box Box) { //, structTag ...string) {
+	//	if len(structTag) > 1 {
+	//		panic("too many struct tags")
+	//	}
 	boxes = append(boxes, box)
 	dot.AddBox(boxname(box))
 
@@ -50,90 +54,142 @@ func Register(box Box, structTag ...string) {
 	for i := 0; i < typ.NumField(); i++ {
 		// use the field's struct tag as channel name
 		name := string(typ.Field(i).Tag)
-		if name == "" && len(structTag) > 0 {
-			name = reflect.StructTag(structTag[0]).Get(typ.Field(i).Name)
-			if name != "" {
-				log.Println("[plumber]", boxname(box), typ.Field(i).Name, "used as", name)
-			}
-		}
+		//if name == "" && len(structTag) > 0 {
+		//	name = reflect.StructTag(structTag[0]).Get(typ.Field(i).Name)
+		//	if name != "" {
+		//		log.Println("[plumber]", boxname(box), typ.Field(i).Name, "used as", name)
+		//	}
+		//}
 		if name == "" {
 			continue
 		}
-		// store pointer to output channel
 		fieldaddr := val.Field(i).Addr().Interface()
-		switch ptr := fieldaddr.(type) {
+		switch fieldaddr.(type) {
 		default:
 			continue
-		case *[]chan<- []float32:
-			chanPtr[name] = append(chanPtr[name], ptr)
-		case *[3][]chan<- []float32:
-			chan3Ptr[name] = append(chan3Ptr[name], ptr)
-		case *[]chan<- float64:
-			chanF64Ptr[name] = append(chanF64Ptr[name], ptr)
+		case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64:
+			if prev, ok := srcBoxFor[name]; ok {
+				panic(name + " provided by both" + boxname(prev) + " and " + boxname(box))
+			}
+			srcBoxFor[name] = box
+			log.Println("[plumber]", boxname(box), "provides", name)
 		}
-		// found one = ok
-		sourceBoxForChan[name] = box
-		log.Println("[plumber]", boxname(box), "->", name)
 	}
 }
 
-func connectBoxes() {
+func AutoConnectAll() {
 	// connect all input channels using output channels from Register()
 	for _, box := range boxes {
-		val := reflect.ValueOf(box).Elem()
-		typ := val.Type()
-		for i := 0; i < typ.NumField(); i++ {
-			// use the field's struct tag as channel name
-			name := string(typ.Field(i).Tag)
-			if name == "" {
-				continue
-			}
-			fieldaddr := val.Field(i).Addr().Interface()
-			sBoxName := boxname(sourceBoxForChan[name])
-			switch ptr := fieldaddr.(type) {
-			default:
-				continue
-			case *<-chan []float32:
-				if chanPtr[name] == nil {
-					log.Println("[plumber] no input for", boxname(box), name)
-					break
-				}
-				connect(ptr, chanPtr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 2)
-			case *[3]<-chan []float32:
-				if chan3Ptr[name] == nil {
-					log.Println("[plumber] no input for", boxname(box), name)
-					break
-				}
-				connect3(ptr, chan3Ptr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 3)
-			case *<-chan float64:
-				if chanF64Ptr[name] == nil {
-					log.Println("[plumber] no input for", boxname(box), name)
-					break
-				}
-				connectF64(ptr, chanF64Ptr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 1)
-			}
-			if sBoxName != "" {
-				log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))
-			}
+		AutoConnect(box)
+	}
+}
+
+// Check if v, a pointer, can be used as an input channel.
+// E.g.:
+// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
+func IsInput(v interface{}) bool {
+	switch v.(type) {
+	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
+		return true
+	}
+	return false
+}
+
+// pure reflection should do even better here
+
+// Check if v, a pointer, can be used as an output channel.
+// E.g.:
+// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
+func IsOutput(v interface{}) bool {
+	switch v.(type) {
+	case *[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64:
+		return true
+	}
+	return false
+}
+
+// Connect fields with equal struct tags
+func AutoConnect(box Box) {
+	val := reflect.ValueOf(box).Elem()
+	typ := val.Type()
+	for i := 0; i < typ.NumField(); i++ {
+		// use the field's struct tag as channel name
+		name := string(typ.Field(i).Tag)
+		if name == "" {
+			continue
+		}
+		fieldaddr := val.Field(i).Addr().Interface()
+		if !IsInput(fieldaddr) {
+			continue
+		}
+		srcbox := srcBoxFor[name]
+		if srcbox == nil {
+			log.Println("autoconnect:", boxname(box), name, "has no input")
+		} else {
+			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
+			srcaddr := FieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
+			Connect(fieldaddr, srcaddr)
 		}
 	}
 }
 
-// Connect slice channels.
-func connect(dst *<-chan []float32, src *[]chan<- []float32) {
-	ch := make(chan []float32, DefaultBufSize())
-	*src = append(*src, ch)
-	*dst = ch
+func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {
+	t := v.Type()
+	for i := 0; i < t.NumField(); i++ {
+		if string(t.Field(i).Tag) == tag {
+			return v.Field(i)
+		}
+	}
+	Panic(v, "has no tag", tag)
+	return
+}
+
+// Try to connect dst and src based on their type.
+// In any case, dst and src should hold pointers to
+// some type of channel or an array of channels.
+func Connect(dst, src interface{}) {
+	switch d := dst.(type) {
+	default:
+		Panic("plumber cannot handle destination", reflect.TypeOf(d))
+	case *<-chan []float32:
+		ConnectChanOfSlice(d, src)
+	case *[3]<-chan []float32:
+		Connect3ChanOfSlice(d, src)
+	case *<-chan float64:
+		//ConnectChanOfFloat64(d, src)
+	}
+}
+
+// Try to connect dst based on the type of src.
+// In any case, src should hold a pointer to
+// some type of channel or an array of channels.
+func ConnectChanOfSlice(dst *<-chan []float32, src interface{}) {
+	switch s := src.(type) {
+	default:
+		Panic("plumber cannot handle", reflect.TypeOf(s))
+	case *[]chan<- []float32:
+		ch := make(chan []float32, DefaultBufSize())
+		*s = append(*s, ch)
+		*dst = ch
+	}
+}
+
+// Try to connect dst based on the type of src.
+// In any case, src should hold a pointer to
+// some type of channel or an array of channels.
+func Connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
+	switch s := src.(type) {
+	default:
+		Panic("plumber cannot handle", reflect.TypeOf(s))
+	case *[3][]chan<- []float32:
+		for i := 0; i < 3; i++ {
+			ConnectChanOfSlice(&(*dst)[i], &(*s)[i])
+		}
+	}
 }
 
 // Connect vector slice channels.
 func connect3(dstFanout *[3]<-chan []float32, srcChan *[3][]chan<- []float32) {
-	for i := 0; i < 3; i++ {
-		connect(&(*dstFanout)[i], &(*srcChan)[i])
-	}
 }
 
 // Connect float64 channels.

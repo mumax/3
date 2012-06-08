@@ -3,8 +3,8 @@ package nc
 // Plumber connects the input/output channels of boxes.
 // The resulting graph is saved in plumber.dot.
 
-import ()
 
+// Connect vector slices.
 func Connect3(dst Box, dstFanout *[3]<-chan []float32, src Box, srcChan *[3][]chan<- []float32, name string) {
 	dot.Connect(boxname(dst), boxname(src), name, 3)
 	for i := 0; i < 3; i++ {
@@ -12,6 +12,7 @@ func Connect3(dst Box, dstFanout *[3]<-chan []float32, src Box, srcChan *[3][]ch
 	}
 }
 
+// Connect scalar slices.
 func Connect(dst Box, dstChan *<-chan []float32, src Box, srcChan *[]chan<- []float32, name string) {
 	dot.Connect(boxname(dst), boxname(src), name, 1)
 	connect(dstChan, srcChan)
@@ -23,6 +24,7 @@ func connect(dst *<-chan []float32, src *[]chan<- []float32) {
 	*dst = ch
 }
 
+// Connect single numbers (not space-dependent arrays).
 func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
 	dot.Connect(boxname(dst), boxname(src), name, 1)
 	ch := make(chan float64, 1)
@@ -31,6 +33,7 @@ func ConnectFloat64(dst Box, dstChan *<-chan float64, src Box, srcChan *[]chan<-
 }
 
 // dst has multiple inputs. Table, e.g.
+// TODO: -> output
 func ConnectManyFloat64(dst Box, dstChan *[]<-chan float64, src Box, srcChan *[]chan<- float64, name string) {
 	dot.Connect(boxname(dst), boxname(src), name, 1)
 	ch := make(chan float64, 1)

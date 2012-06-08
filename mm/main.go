@@ -11,12 +11,11 @@ func Main() {
 	// 1) make and connect boxes
 	Register(new(LLGBox))
 	Register(new(MeanFieldBox))
+	Register(NewConstBox(0.1), `Output:"alpha"`)
 
 	solver := new(EulerBox)
 	solver.dt = 0.01
 	Register(solver)
-
-	Register(NewConstBox(0.1), `Output:"alpha"`)
 
 	//	avg := new(AverageBox)
 	//	Connect1(avg, &avg.in, solver, &solver.mOut[X], "mx")
@@ -24,9 +23,6 @@ func Main() {
 	//	out := NewTableBox("mx.txt")
 	//	ConnectManyFloat64(out, &out.input, avg, &avg.out, "<mx>")
 	//	ConnectFloat64(out, &out.time, solver, &solver.time, "t")
-
-	// 3) run boxes, no more should be created from now
-	// -> let plumber do this.
 
 	Start()
 

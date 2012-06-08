@@ -13,7 +13,7 @@ var (
 	chanPtr              = make(map[string][]*[]chan<- []float32)
 	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
 	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	sourceBoxForChanName = make(map[string]string)
+	sourceBoxForChan = make(map[string]Box)
 )
 
 func Start() {
@@ -72,7 +72,7 @@ func Register(box Box, structTag ...string) {
 			chanF64Ptr[name] = append(chanF64Ptr[name], ptr)
 		}
 		// found one = ok
-		sourceBoxForChanName[name] = boxname(box)
+		sourceBoxForChan[name] = box
 		log.Println("[plumber]", boxname(box), "->", name)
 	}
 }
@@ -89,7 +89,7 @@ func connectBoxes() {
 				continue
 			}
 			fieldaddr := val.Field(i).Addr().Interface()
-			sBoxName := sourceBoxForChanName[name]
+			sBoxName := boxname(sourceBoxForChan[name])
 			switch ptr := fieldaddr.(type) {
 			default:
 				continue
@@ -99,21 +99,21 @@ func connectBoxes() {
 					break
 				}
 				connect(ptr, chanPtr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 2)
+				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 2)
 			case *[3]<-chan []float32:
 				if chan3Ptr[name] == nil {
 					log.Println("[plumber] no input for", boxname(box), name)
 					break
 				}
 				connect3(ptr, chan3Ptr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 3)
+				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 3)
 			case *<-chan float64:
 				if chanF64Ptr[name] == nil {
 					log.Println("[plumber] no input for", boxname(box), name)
 					break
 				}
 				connectF64(ptr, chanF64Ptr[name][0]) // TODO: handle multiple/none
-				dot.Connect(boxname(box), sourceBoxForChanName[name], name, 1)
+				dot.Connect(boxname(box), boxname(sourceBoxForChan[name]), name, 1)
 			}
 			if sBoxName != "" {
 				log.Println("[plumber]", sBoxName, "->", name, "->", boxname(box))

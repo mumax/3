@@ -17,16 +17,16 @@ var (
 	//	chanPtr              = make(map[string][]*[]chan<- []float32)
 	//	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
 	//	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	srcBoxFor = make(map[string]Box)//IDEA: store vector/scalar kind here too
+	srcBoxFor = make(map[string]Box) //IDEA: store vector/scalar kind here too
 )
 
 func Start() {
 	AutoConnectAll()
 	dot.Close()
-	startBoxes()
+	StartBoxes()
 }
 
-func startBoxes() {
+func StartBoxes() {
 	for _, b := range boxes {
 		if r, ok := b.(Runner); ok {
 			log.Println("[plumber] starting:", boxname(r))
@@ -157,7 +157,7 @@ func ConnectChannels(dst, src interface{}) {
 	case *[3]<-chan []float32:
 		Connect3ChanOfSlice(d, src)
 	case *<-chan float64:
-		//ConnectChanOfFloat64(d, src)
+		ConnectChanOfFloat64(d, src)
 	}
 }
 
@@ -189,15 +189,18 @@ func Connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 	}
 }
 
-// Connect vector slice channels.
-func connect3(dstFanout *[3]<-chan []float32, srcChan *[3][]chan<- []float32) {
-}
-
-// Connect float64 channels.
-func connectF64(dst *<-chan float64, src *[]chan<- float64) {
-	ch := make(chan float64, 1)
-	*src = append(*src, ch)
-	*dst = ch
+// Try to connect dst based on the type of src.
+// In any case, src should hold a pointer to
+// some type of channel or an array of channels.
+func ConnectChanOfFloat64(dst *<-chan float64, src interface{}) {
+	switch s := src.(type) {
+	default:
+		Panic("plumber cannot handle", reflect.TypeOf(s))
+	case *[]chan<- float64:
+		ch := make(chan float64, 1)
+		*s = append(*s, ch)
+		*dst = ch
+	}
 }
 
 type Box interface{}

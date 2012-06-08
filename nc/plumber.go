@@ -17,7 +17,7 @@ var (
 	//	chanPtr              = make(map[string][]*[]chan<- []float32)
 	//	chan3Ptr             = make(map[string][]*[3][]chan<- []float32)
 	//	chanF64Ptr           = make(map[string][]*[]chan<- float64)
-	srcBoxFor = make(map[string]Box)
+	srcBoxFor = make(map[string]Box)//IDEA: store vector/scalar kind here too
 )
 
 func Start() {
@@ -128,7 +128,8 @@ func AutoConnect(box Box) {
 		} else {
 			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
 			srcaddr := FieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
-			Connect(fieldaddr, srcaddr)
+			ConnectChannels(fieldaddr, srcaddr)
+			dot.Connect(boxname(box), boxname(srcbox), name, 2)
 		}
 	}
 }
@@ -147,7 +148,7 @@ func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {
 // Try to connect dst and src based on their type.
 // In any case, dst and src should hold pointers to
 // some type of channel or an array of channels.
-func Connect(dst, src interface{}) {
+func ConnectChannels(dst, src interface{}) {
 	switch d := dst.(type) {
 	default:
 		Panic("plumber cannot handle destination", reflect.TypeOf(d))

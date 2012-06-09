@@ -17,6 +17,15 @@ var (
 	// TODO: Quant type
 	srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
 	srcChanForQuant = make(map[string]Chan) //IDEA: store vector/scalar kind here too
+	boxForChanPtr
+	quantForChanPtr
+
+	->
+
+	Quant: Box, srcChan
+
+	QuantForName
+	BoxForChan
 )
 
 func srcBoxFor(quant string) Box {
@@ -89,7 +98,7 @@ func Register(box Box) {
 }
 
 // Register a quantity taken form channel, give it a name.
-func RegisterQuant(box Box, chanPtr Chan, name string) {
+func RegisterQuant(box Box, chanPtr Chan, name string) { // rm box, use boxforchanptr, mv SendQuant
 	Assert(IsOutputChan(chanPtr))
 	setBoxFor(name, box)
 	setChanFor(name, chanPtr)
@@ -98,7 +107,7 @@ func RegisterQuant(box Box, chanPtr Chan, name string) {
 }
 
 // Automatically register components of vector quantities as "quant.x", ...
-func registerComponentQuants(box Box, chanPtr Chan, name string) {
+func registerComponentQuants(box Box, chanPtr Chan, name string) { // rm box
 	Assert(IsOutputChan(chanPtr))
 	switch c := chanPtr.(type) {
 	default:
@@ -154,7 +163,7 @@ func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr in
 	log.Println("connect:", boxname(dstBox), "<-", name, "<-", boxname(srcBox))
 }
 
-func ConnectToQuant(box Box, boxInput Chan, chanName string) {
+func ConnectToQuant(box Box, boxInput Chan, chanName string) { // rm box, mv RecvQuant
 	ManualConnect(box, boxInput, srcBoxFor(chanName), srcChanFor(chanName), chanName)
 }
 

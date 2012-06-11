@@ -13,30 +13,25 @@ func Main() {
 	torque := new(LLGBox)
 	heff := new(MeanFieldBox)
 	alpha := NewConstBox(0.1)
-
-	Connect(&torque.Alpha, &alpha.Output)
-
 	solver := new(EulerBox)
 	solver.dt = 0.01
-
-	Connect(&solver.MIn, &solver.MOut)
-	Connect(&solver.Torque, &torque.Torque)
-
-	Connect(&alpha.Time, &solver.Time)
-
-	Connect(&torque.H, &heff.H)
-	Connect(&torque.M, &solver.MOut)
-
-	Connect(&heff.M, &solver.MOut)
-
 	avg := new(Average3Box)
 	table := NewTableBox("m.txt")
 
+	Register(torque, alpha, solver, heff, avg, table)
+
+	Connect(&torque.Alpha, &alpha.Output)
+	Connect(&solver.MIn, &solver.MOut)
+	Connect(&solver.Torque, &torque.Torque)
+	Connect(&alpha.Time, &solver.Time)
+	Connect(&torque.H, &heff.H)
+	Connect(&torque.M, &solver.MOut)
+	Connect(&heff.M, &solver.MOut)
 	Connect(&avg.Input, &solver.MOut)
 	Connect(&table.Input, &avg.Output[X])
 	Connect(&table.Time, &solver.Time)
 
-	Register(torque, alpha, solver, heff, avg, table)
+	AutoConnect(torque, alpha, solver, heff, avg, table)
 	WriteGraph()
 
 	GoRun(torque, alpha, heff, avg, table)

@@ -28,26 +28,43 @@ type Box interface{}
 func AutoConnect(boxes ...Box) {
 	Register(boxes...)
 
-	for box := range boxes {
+	for _, box := range boxes {
 
 		val := reflect.ValueOf(box).Elem()
 		typ := val.Type()
 		for i := 0; i < typ.NumField(); i++ {
+			field := val.Field(i)
 
-			// only consider tagged fields
+			// skip untagged fields
 			tag := string(typ.Field(i).Tag)
 			if tag == "" {
 				continue
 			}
 
 			// only consider input channels
-			dst := val.Field(i).Addr().Interface()
+			dst := field.Addr().Interface()
 			if !isInputChan(dst) {
+				continue
+			}
+
+			// skip already connected destinations
+			alreadyConnected := false
+			switch {
+			default:
+				Panic("autoconnect: unexpected kind:", field.Kind())
+			case field.Kind() == reflect.Array:
+				alreadyConnected = !field.Index(0).IsNil()
+			case field.Kind() == reflect.Chan:
+				alreadyConnected = !field.IsNil()
+			}
+			if alreadyConnected {
+				log.Println("autoconnect: skipping", boxname(box), tag, ": already connected")
 				continue
 			}
 
 			src := chanOfTag[tag]
 			if src != nil {
+				log.Println("autoconnect:", boxname(box), tag, "<-", channame(src))
 				Connect(dst, src)
 			} else {
 				log.Println("autoconnect: no source for", boxname(box), tag, channame(dst))

@@ -67,6 +67,12 @@ func isChan(ptr interface{}) bool {
 }
 
 func registerBox(box Box) {
+	for _, b := range boxes {
+		if b == box {
+			return
+		}
+	}
+
 	boxes = append(boxes, box)
 
 	// find and map all output channels

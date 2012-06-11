@@ -81,15 +81,42 @@ func isConnected(field reflect.Value) bool {
 	return false // silence 6g
 }
 
+// Check boxes for unconnected inputs.
+// TODO: sources connected to the same dest box twice might also need checking
 func Vet(boxes ...Box) {
-	//for _,box:=range boxes{
+	Register(boxes...)
+	for _, box := range boxes {
+		val := reflect.ValueOf(box).Elem()
+		typ := val.Type()
 
-	//}
+		for i := 0; i < typ.NumField(); i++ {
+			field := val.Field(i)
+
+			// skip unexported
+			if unicode.IsLower(rune(typ.Field(i).Name[0])) {
+				continue
+			}
+
+			// only consider input channels
+			dst := field.Addr().Interface()
+			if !isInputChan(dst) {
+				continue
+			}
+
+			// skip already connected destinations
+			tag := string(typ.Field(i).Tag)
+			if !isConnected(field) {
+				log.Println("vet: not connected:", boxname(box), typ.Field(i).Name, tag)
+			}
+
+		}
+	}
 }
 
-// Call go box.Run() on all boxes.
+// Vet and Run all boxes.
 func GoRun(box ...Runner) {
 	for _, b := range box {
+		Vet(b)
 		log.Println("starting: " + boxname(b))
 		go b.Run()
 	}

@@ -9,6 +9,12 @@ type Average3Box struct {
 	Output [3][]chan<- float64
 }
 
+func NewAverage3Box() *Average3Box {
+	box := new(Average3Box)
+	Register(box)
+	return box
+}
+
 func (box *Average3Box) Run() {
 	for {
 		for c := 0; c < 3; c++ {

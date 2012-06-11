@@ -67,12 +67,12 @@ func isChan(ptr interface{}) bool {
 }
 
 func registerBox(box Box) {
+	// append to boxes if not yet done so
 	for _, b := range boxes {
 		if b == box {
 			return
 		}
 	}
-
 	boxes = append(boxes, box)
 
 	// find and map all output channels
@@ -88,18 +88,24 @@ func registerBox(box Box) {
 			continue
 		}
 
+		// set box of chan
 		ptr := field.Addr().Interface()
-
 		if isChan(ptr) {
 			boxOfChan[ptr] = box
+			// also set for components
+			if field.Kind() == reflect.Array {
+				for i := 0; i < field.Len(); i++ {
+					boxOfChan[field.Index(i).Addr().Interface()] = box
+				}
+			}
 		}
 
+		// set tag of chan, chan of tag
 		if isOutputChan(ptr) && tag != "" {
 			tagOfChan[ptr] = tag
 			chanOfTag[tag] = ptr // TODO: check multiple-defined
 			log.Println("tag of chan " + channame(ptr) + " = " + tag)
 		}
-
 	}
 }
 

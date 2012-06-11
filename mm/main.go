@@ -14,11 +14,13 @@ func Main() {
 	alpha := NewConstBox(0.1)
 	solver := new(EulerBox)
 	solver.dt = 0.01
-	avg := new(Average3Box)
+	avg := NewAverage3Box()
+	Register(avg)
 	table := NewTableBox("m.txt")
 
 	Connect(&avg.Input, &solver.MOut)
 	Connect(&table.Input, &avg.Output[X])
+
 	AutoConnect(torque, alpha, heff, avg, table, solver)
 	AutoRun()
 	WriteGraph()

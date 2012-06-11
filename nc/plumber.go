@@ -6,24 +6,13 @@ package nc
 // But not all combinations of channels types are supported.
 
 import (
-	"log"
 	"reflect"
 )
-
-func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr interface{}, name string) {
-	ConnectChannels(dstChanPtr, srcChanPtr)
-	dot.Connect(boxname(dstBox), boxname(srcBox), name, 2)
-	log.Println("connect:", boxname(dstBox), "<-", name, "<-", boxname(srcBox))
-}
-
-func ConnectToTag(box Box, boxInput Chan, chanName string) { // rm box, mv RecvQuant
-	ManualConnect(box, boxInput, srcBoxFor(chanName), srcChanFor(chanName), chanName)
-}
 
 // Try to connect dst and src based on their type.
 // In any case, dst and src should hold pointers to
 // some type of channel or an array of channels.
-func ConnectChannels(dst, src interface{}) {
+func Connect(dst, src Chan) {
 	switch d := dst.(type) {
 	default:
 		Panic("plumber cannot handle destination", reflect.TypeOf(d))
@@ -34,6 +23,7 @@ func ConnectChannels(dst, src interface{}) {
 	case *<-chan float64:
 		connectChanOfFloat64(d, src)
 	}
+	RegisterConn(dst, src)
 }
 
 // Try to connect dst based on the type of src.
@@ -79,13 +69,6 @@ func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
 }
 
 // Type alias for documentation
-type Box interface{}
-
-// Type alias for documentation
 type Chan interface{}
-
-type Runner interface {
-	Run()
-}
 
 // http://www.smbc-comics.com/index.php?db=comics&id=1330#comic

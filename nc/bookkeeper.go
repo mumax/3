@@ -4,11 +4,15 @@ package nc
 // so that an informative graphviz graph can be made.
 
 import (
+	"fmt"
 	"log"
 	"reflect"
+	"strings"
 )
 
 var (
+	connections [][2]Chan
+
 	boxes []Box
 	// TODO: Quant type
 	srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
@@ -23,6 +27,20 @@ var (
 	//QuantForName
 	//BoxForChan
 )
+
+func WriteGraph() {
+	var dot graphvizwriter
+	dot.Init("plumbing.dot")
+	defer dot.Close()
+
+	for _, box := range boxes {
+		dot.AddBox(boxname(box))
+	}
+}
+
+func RegisterConn(dst, src Chan) {
+	connections = append(connections, [2]Chan{dst, src})
+}
 
 // Registers quantities for all tagged output channels.
 func RegisterBox(box Box) {
@@ -100,4 +118,13 @@ func setChanFor(quant string, c Chan) {
 		panic("already defined " + quant)
 	}
 	srcChanForQuant[quant] = c
+}
+
+func boxname(value interface{}) string {
+	typ := fmt.Sprintf("%T", value)
+	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
+	if strings.HasSuffix(clean, "Box") {
+		clean = clean[:len(clean)-len("Box")]
+	}
+	return clean
 }

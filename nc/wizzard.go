@@ -9,6 +9,13 @@ import (
 	"reflect"
 )
 
+type Runner interface {
+	Run()
+}
+
+// Type alias for documentation
+type Box interface{}
+
 // Auto-connect all registered boxes
 func AutoConnectAll() {
 	// connect all input channels using output channels from Register()
@@ -37,7 +44,7 @@ func AutoConnect(box Box) {
 		} else {
 			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
 			srcaddr := fieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
-			ConnectChannels(fieldaddr, srcaddr)
+			Connect(fieldaddr, srcaddr)
 			dot.Connect(boxname(box), boxname(srcbox), name, 2)
 		}
 	}

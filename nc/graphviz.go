@@ -1,13 +1,12 @@
 package nc
 
-// This file implements the plumber's graphviz output
+// This file implements graphviz output.
 
 import (
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 var dot graphvizwriter
@@ -17,27 +16,23 @@ type graphvizwriter struct {
 	out   io.WriteCloser
 }
 
-func (dot *graphvizwriter) Init() {
+func (dot *graphvizwriter) Init(fname string) {
 	if dot.out != nil {
 		return // already inited.
 	}
-
-	dot.fname = "plumber.dot"
+	dot.fname = fname
 	var err error
-
-	dot.out, err = os.OpenFile(dot.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	dot.out, err = os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	CheckLog(err)
 	dot.Println("digraph dot{")
 	dot.Println("rankdir=LR")
 }
 
 func (dot *graphvizwriter) Println(msg ...interface{}) {
-	dot.Init()
 	fmt.Fprintln(dot.out, msg...)
 }
 
 func (dot *graphvizwriter) Connect(dst string, src string, label string, thickness int) {
-	dot.Init()
 	if dst == "" || src == "" {
 		Panic("connect", dst, src, label, thickness)
 	}
@@ -53,15 +48,6 @@ func (dot *graphvizwriter) Close() {
 	dot.out.Close()
 	err := exec.Command("dot", "-O", "-Tpdf", dot.fname).Run()
 	CheckLog(err)
-}
-
-func boxname(value interface{}) string {
-	typ := fmt.Sprintf("%T", value)
-	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
-	if strings.HasSuffix(clean, "Box") {
-		clean = clean[:len(clean)-len("Box")]
-	}
-	return clean
 }
 
 // replaces characters that graphviz cannot handle as labels.

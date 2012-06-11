@@ -1,161 +1,14 @@
 package nc
 
-// Plumber connects the input/output channels of boxes.
-// The resulting graph is saved in plumber.dot.
-
-// TODO: Plumber type with methods, one global plumber.
-// just for readability.
-// or plumber package? plumber.Connect()...
+// Plumber connects the input/output channels of boxes
+// on a best-effort basis. I.e. channels various types
+// are connected, inserting conversions if necessary.
+// But not all combinations of channels types are supported.
 
 import (
 	"log"
 	"reflect"
 )
-
-var (
-	boxes []Box
-	// TODO: Quant type
-	srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
-	srcChanForQuant = make(map[string]Chan) //IDEA: store vector/scalar kind here too
-	boxForChanPtr
-	quantForChanPtr
-
-	->
-
-	Quant: Box, srcChan
-
-	QuantForName
-	BoxForChan
-)
-
-func srcBoxFor(quant string) Box {
-	if b, ok := srcBoxForQuant[quant]; ok {
-		return b
-	}
-	panic("no such quantity " + quant)
-}
-
-func srcChanFor(quant string) Chan {
-	if b, ok := srcChanForQuant[quant]; ok {
-		return b
-	}
-	panic("no such quantity " + quant)
-}
-
-func setBoxFor(quant string, box Box) {
-	if _, ok := srcBoxForQuant[quant]; ok {
-		panic("already defined " + quant)
-	}
-	srcBoxForQuant[quant] = box
-}
-
-func setChanFor(quant string, c Chan) {
-	if _, ok := srcChanForQuant[quant]; ok {
-		panic("already defined " + quant)
-	}
-	srcChanForQuant[quant] = c
-}
-
-func Start() {
-	AutoConnectAll()
-	dot.Close()
-	StartBoxes()
-}
-
-func StartBoxes() {
-	for _, b := range boxes {
-		if r, ok := b.(Runner); ok {
-			log.Println("[plumber] starting:", boxname(r))
-			go r.Run()
-		} else {
-			log.Println("[plumber] not starting:", boxname(b), ": needs input")
-		}
-	}
-}
-
-// Registers quantities for all tagged output channels.
-func Register(box Box) {
-	boxes = append(boxes, box)
-	dot.AddBox(boxname(box))
-
-	// find and map all output channels
-	val := reflect.ValueOf(box).Elem()
-	typ := val.Type()
-	for i := 0; i < typ.NumField(); i++ {
-		// use the field's struct tag as channel name
-		name := string(typ.Field(i).Tag)
-		if name == "" {
-			continue
-		}
-		chanPtr := val.Field(i).Addr().Interface()
-		if IsOutputChan(chanPtr) {
-			if prev, ok := srcBoxForQuant[name]; ok {
-				panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
-			}
-			RegisterQuant(box, chanPtr, name)
-		}
-	}
-}
-
-// Register a quantity taken form channel, give it a name.
-func RegisterQuant(box Box, chanPtr Chan, name string) { // rm box, use boxforchanptr, mv SendQuant
-	Assert(IsOutputChan(chanPtr))
-	setBoxFor(name, box)
-	setChanFor(name, chanPtr)
-	log.Println("[plumber]", boxname(box), "provides", name)
-	registerComponentQuants(box, chanPtr, name)
-}
-
-// Automatically register components of vector quantities as "quant.x", ...
-func registerComponentQuants(box Box, chanPtr Chan, name string) { // rm box
-	Assert(IsOutputChan(chanPtr))
-	switch c := chanPtr.(type) {
-	default:
-		return // nothing to see here
-	case *[3][]chan<- []float32:
-		RegisterQuant(box, &c[X], name+".x")
-		RegisterQuant(box, &c[Y], name+".y")
-		RegisterQuant(box, &c[Z], name+".z")
-	case *[3][]chan<- float64:
-		RegisterQuant(box, &c[X], name+".x")
-		RegisterQuant(box, &c[Y], name+".y")
-		RegisterQuant(box, &c[Z], name+".z")
-	}
-}
-
-// Auto-connect all registered boxes
-func AutoConnectAll() {
-	// connect all input channels using output channels from Register()
-	for _, box := range boxes {
-		AutoConnect(box)
-	}
-}
-
-// Connect fields with equal struct tags
-func AutoConnect(box Box) {
-	val := reflect.ValueOf(box).Elem()
-	typ := val.Type()
-	for i := 0; i < typ.NumField(); i++ {
-		// use the field's struct tag as channel name
-		name := string(typ.Field(i).Tag)
-		if name == "" {
-			continue
-		}
-		fieldaddr := val.Field(i).Addr().Interface()
-		if !IsInputChan(fieldaddr) {
-			continue
-		}
-		srcbox := srcBoxFor(name)
-		if srcbox == nil {
-			log.Println("autoconnect:", boxname(box), name, "has no input")
-		} else {
-			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
-			srcaddr := FieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
-			ConnectChannels(fieldaddr, srcaddr)
-			dot.Connect(boxname(box), boxname(srcbox), name, 2)
-		}
-	}
-}
 
 func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr interface{}, name string) {
 	ConnectChannels(dstChanPtr, srcChanPtr)
@@ -163,42 +16,8 @@ func ManualConnect(dstBox Box, dstChanPtr interface{}, srcBox Box, srcChanPtr in
 	log.Println("connect:", boxname(dstBox), "<-", name, "<-", boxname(srcBox))
 }
 
-func ConnectToQuant(box Box, boxInput Chan, chanName string) { // rm box, mv RecvQuant
+func ConnectToTag(box Box, boxInput Chan, chanName string) { // rm box, mv RecvQuant
 	ManualConnect(box, boxInput, srcBoxFor(chanName), srcChanFor(chanName), chanName)
-}
-
-// Check if v, a pointer, can be used as an input channel.
-// E.g.:
-// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
-func IsInputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
-		return true
-	}
-	return false
-}
-
-// Check if v, a pointer, can be used as an output channel.
-// E.g.:
-// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
-func IsOutputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
-		return true
-	}
-	return false
-}
-
-// Retrieve a field by struct tag (instead of name).
-func FieldByTag(v reflect.Value, tag string) (field reflect.Value) {
-	t := v.Type()
-	for i := 0; i < t.NumField(); i++ {
-		if string(t.Field(i).Tag) == tag {
-			return v.Field(i)
-		}
-	}
-	Panic(v, "has no tag", tag)
-	return
 }
 
 // Try to connect dst and src based on their type.
@@ -209,18 +28,18 @@ func ConnectChannels(dst, src interface{}) {
 	default:
 		Panic("plumber cannot handle destination", reflect.TypeOf(d))
 	case *<-chan []float32:
-		ConnectChanOfSlice(d, src)
+		connectChanOfSlice(d, src)
 	case *[3]<-chan []float32:
-		Connect3ChanOfSlice(d, src)
+		connect3ChanOfSlice(d, src)
 	case *<-chan float64:
-		ConnectChanOfFloat64(d, src)
+		connectChanOfFloat64(d, src)
 	}
 }
 
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func ConnectChanOfSlice(dst *<-chan []float32, src interface{}) {
+func connectChanOfSlice(dst *<-chan []float32, src interface{}) {
 	switch s := src.(type) {
 	default:
 		Panic("plumber cannot handle", reflect.TypeOf(s))
@@ -234,13 +53,13 @@ func ConnectChanOfSlice(dst *<-chan []float32, src interface{}) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func Connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
+func connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 	switch s := src.(type) {
 	default:
 		Panic("plumber cannot handle", reflect.TypeOf(s))
 	case *[3][]chan<- []float32:
 		for i := 0; i < 3; i++ {
-			ConnectChanOfSlice(&(*dst)[i], &(*s)[i])
+			connectChanOfSlice(&(*dst)[i], &(*s)[i])
 		}
 	}
 }
@@ -248,7 +67,7 @@ func Connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func ConnectChanOfFloat64(dst *<-chan float64, src interface{}) {
+func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
 	switch s := src.(type) {
 	default:
 		Panic("plumber cannot handle", reflect.TypeOf(s))

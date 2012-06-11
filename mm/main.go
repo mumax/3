@@ -17,7 +17,8 @@ func Main() {
 	avg := new(Average3Box)
 	table := NewTableBox("m.txt")
 
-	Register(torque, alpha, heff, avg, table, solver)
+	Connect(&avg.Input, &solver.MOut)
+	Connect(&table.Input, &avg.Output[X])
 	AutoConnect(torque, alpha, heff, avg, table, solver)
 	AutoRun()
 	WriteGraph()

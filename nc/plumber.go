@@ -40,17 +40,17 @@ func cannotConnect(dst, src Chan) {
 		cannotHandleType(src)
 	}
 	if isInputChan(src) {
-		panic("plumber: " + reflect.TypeOf(src).String() + " is a source, cannot use it as destination")
+		panic("connect: " + reflect.TypeOf(src).String() + " is a source, cannot use it as destination")
 	}
 	if isOutputChan(dst) {
-		panic("plumber: " + reflect.TypeOf(dst).String() + " is a destination, cannot use it as source")
+		panic("connect: " + reflect.TypeOf(dst).String() + " is a destination, cannot use it as source")
 	}
-	panic("plumber: cannot match dst " + reflect.TypeOf(dst).String() + " to src " + reflect.TypeOf(src).String())
+	panic("connect: cannot match dst " + reflect.TypeOf(dst).String() + " to src " + reflect.TypeOf(src).String())
 }
 
 func cannotHandleType(v interface{}) {
 	typstr := reflect.TypeOf(v).String()
-	msg := "plumber: cannot handle " + typstr + ": need pointer to known channel type"
+	msg := "connect: cannot handle " + typstr + ": need pointer to known channel type"
 	if !strings.HasPrefix(typstr, "*") {
 		msg += ": need pointer"
 	}

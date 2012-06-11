@@ -2,8 +2,6 @@ package nc
 
 // Garbageman recycles garbage slices.
 
-// TODO!!
-
 func Buffer() []float32 {
 	return make([]float32, WarpLen())
 }

@@ -14,9 +14,9 @@ var (
 func init() {
 	flag.Parse()
 
-	if *flag_version{
-	PrintInfo(os.Stdout)
-os.Exit(0)
+	if *flag_version {
+		PrintInfo(os.Stdout)
+		os.Exit(0)
 	}
 
 	MAX_WARP = *flag_maxwarp

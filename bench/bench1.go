@@ -1,12 +1,12 @@
 package main
 
 import (
-	. "nimble-cube/nc"
-	. "nimble-cube/mm"
 	"flag"
+	"fmt"
+	. "nimble-cube/mm"
+	. "nimble-cube/nc"
 	"strconv"
 	"time"
-	"fmt"
 )
 
 func main() {
@@ -28,10 +28,10 @@ func main() {
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}
 	Memset3(m0, Vector{0.1, 0.99, 0})
 
-	start:=time.Now()
+	start := time.Now()
 	solver.Run(m0, 1000)
-	duration:=time.Now().Sub(start)
+	duration := time.Now().Sub(start)
 	fmt.Println("# N	warp	ms/step")
-	fmt.Println(n*n*n, "\t", WarpLen(), "\t",float64(duration)/(1e9))
+	fmt.Println(n*n*n, "\t", WarpLen(), "\t", float64(duration)/(1e9))
 
 }

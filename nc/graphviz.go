@@ -9,8 +9,6 @@ import (
 	"os/exec"
 )
 
-var dot graphvizwriter
-
 type graphvizwriter struct {
 	fname string
 	out   io.WriteCloser

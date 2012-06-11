@@ -17,42 +17,41 @@ type Runner interface {
 type Box interface{}
 
 // Auto-connect all registered boxes
-func AutoConnectAll() {
-	// connect all input channels using output channels from Register()
-	for _, box := range boxes {
-		AutoConnect(box)
-	}
-}
+//func AutoConnectAll() {
+//	// connect all input channels using output channels from Register()
+//	for _, box := range boxes {
+//		AutoConnect(box)
+//	}
+//}
 
 // Connect fields with equal struct tags
-func AutoConnect(box Box) {
-	val := reflect.ValueOf(box).Elem()
-	typ := val.Type()
-	for i := 0; i < typ.NumField(); i++ {
-		// use the field's struct tag as channel name
-		name := string(typ.Field(i).Tag)
-		if name == "" {
-			continue
-		}
-		fieldaddr := val.Field(i).Addr().Interface()
-		if !isInputChan(fieldaddr) {
-			continue
-		}
-		srcbox := srcBoxFor(name)
-		if srcbox == nil {
-			log.Println("autoconnect:", boxname(box), name, "has no input")
-		} else {
-			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
-			srcaddr := fieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
-			Connect(fieldaddr, srcaddr)
-			dot.Connect(boxname(box), boxname(srcbox), name, 2)
-		}
-	}
-}
+//func AutoConnect(box Box) {
+//	val := reflect.ValueOf(box).Elem()
+//	typ := val.Type()
+//	for i := 0; i < typ.NumField(); i++ {
+//		// use the field's struct tag as channel name
+//		name := string(typ.Field(i).Tag)
+//		if name == "" {
+//			continue
+//		}
+//		fieldaddr := val.Field(i).Addr().Interface()
+//		if !isInputChan(fieldaddr) {
+//			continue
+//		}
+//		srcbox := srcBoxFor(name)
+//		if srcbox == nil {
+//			log.Println("autoconnect:", boxname(box), name, "has no input")
+//		} else {
+//			log.Println("autoconnect:", boxname(box), "<-", name, "<-", boxname(srcbox))
+//			srcaddr := fieldByTag(reflect.ValueOf(srcbox).Elem(), name).Addr().Interface()
+//			Connect(fieldaddr, srcaddr)
+//			dot.Connect(boxname(box), boxname(srcbox), name, 2)
+//		}
+//	}
+//}
 
 func Start() {
-	AutoConnectAll()
-	dot.Close()
+	//AutoConnectAll()
 	StartBoxes()
 }
 

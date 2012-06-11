@@ -3,11 +3,14 @@ package nc
 // Plumber connects the input/output channels of boxes
 // on a best-effort basis. I.e. channels various types
 // are connected, inserting conversions if necessary.
-// But not all combinations of channels types are supported.
+// Not all combinations of channels types are supported.
 
 import (
 	"reflect"
 )
+
+// Type alias for documentation
+type Chan interface{}
 
 // Try to connect dst and src based on their type.
 // In any case, dst and src should hold pointers to
@@ -67,8 +70,5 @@ func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
 		*dst = ch
 	}
 }
-
-// Type alias for documentation
-type Chan interface{}
 
 // http://www.smbc-comics.com/index.php?db=comics&id=1330#comic

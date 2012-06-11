@@ -30,14 +30,13 @@ func Connect(dst, src Chan) {
 	RegisterConn(dst, src)
 }
 
-
-func cannothandle(what string, v interface{}){
-		typstr := reflect.TypeOf(v).String()
-		msg := "plumber cannot handle " + what + " " + typstr
-		if !strings.HasPrefix(typstr, "*"){
-			msg += ": need pointer"
-		}
-		panic(msg)
+func cannothandle(what string, v interface{}) {
+	typstr := reflect.TypeOf(v).String()
+	msg := "plumber cannot handle " + what + " " + typstr
+	if !strings.HasPrefix(typstr, "*") {
+		msg += ": need pointer"
+	}
+	panic(msg)
 }
 
 // Try to connect dst based on the type of src.

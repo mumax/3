@@ -16,7 +16,7 @@ func Main() {
 	solver := new(EulerBox)
 	solver.dt = 0.01
 
-	Connect(&solver.Torque, torque.Torque)
+	Connect(&solver.Torque, &torque.Torque)
 	Register(torque, heff, alpha, solver)
 	WriteGraph()
 

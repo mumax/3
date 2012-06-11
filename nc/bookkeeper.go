@@ -9,17 +9,17 @@ import (
 	"reflect"
 	"strings"
 	"unicode"
-	"unsafe"
 )
 
-type ChanPtr unsafe.Pointer
+//type ChanPtr unsafe.Pointer
 
 var (
 	connections [][2]Chan
 
 	boxes []Box
 
-	boxOfChan = make(map[ChanPtr]Box)
+	boxOfChan = make(map[Chan]Box)
+	tagOfChan = make(map[Chan]string)
 
 	// TODO: Quant type
 	//srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
@@ -43,6 +43,21 @@ func WriteGraph() {
 	for _, box := range boxes {
 		dot.AddBox(boxname(box))
 	}
+
+	for _, conn := range connections {
+		// connect to the parent box if registered,
+		// use channel name otherwise.
+		var boxName [2]string
+		for i := 0; i < 2; i++ {
+			if box, ok := boxOfChan[conn[i]]; ok {
+				boxName[i] = boxname(box)
+			} else {
+				boxName[i] = fmt.Sprint(conn[i])
+			}
+		}
+		dot.Connect(boxName[0], boxName[1], tagOfChan[conn[0]], 1)
+	}
+
 }
 
 func RegisterConn(dst, src Chan) {
@@ -54,8 +69,10 @@ func isChan(ptr interface{}) bool {
 	return isInputChan(ptr) || isOutputChan(ptr)
 }
 
-func Register(box ...Box){
-	for _,b:=range box{RegisterBox(b)}
+func Register(box ...Box) {
+	for _, b := range box {
+		RegisterBox(b)
+	}
 }
 
 // Registers quantities for all tagged output channels.
@@ -78,7 +95,7 @@ func RegisterBox(box Box) {
 		ptr := field.Addr().Interface()
 
 		if isChan(ptr) {
-			boxOfChan[ChanPtr(unsafe.Pointer(field.UnsafeAddr()))] = box // .Addr().Unsa..?
+			boxOfChan[ptr] = box // .Addr().Unsa..?
 		}
 
 		if isInputChan(ptr) {

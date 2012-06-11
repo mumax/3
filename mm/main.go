@@ -20,12 +20,18 @@ func Main() {
 
 	Connect(&solver.MIn, &solver.MOut)
 	Connect(&solver.Torque, &torque.Torque)
+
 	Connect(&alpha.Time, &solver.Time)
 
-	Register(torque, alpha, solver, heff)
 	Connect(&torque.H, &heff.H)
+	Connect(&torque.M, &solver.MOut)
+
 	Connect(&heff.M, &solver.MOut)
+
+	Register(torque, alpha, solver, heff)
 	WriteGraph()
+
+	GoRun(torque, alpha, heff)
 
 	//RegisterBox(NewAverage3Box("m"))
 	//RegisterBox(NewTableBox("m.txt", "<m>.x"))

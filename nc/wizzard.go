@@ -50,6 +50,14 @@ type Box interface{}
 //	}
 //}
 
+// Call go box.Run() on all boxes.
+func GoRun(box ...Runner) {
+	for _, b := range box {
+		log.Println("starting: " + boxname(b))
+		go b.Run()
+	}
+}
+
 func Start() {
 	//AutoConnectAll()
 	StartBoxes()

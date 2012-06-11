@@ -5,7 +5,7 @@ package nc
 
 import (
 	"fmt"
-	//"log"
+	"log"
 	"reflect"
 	"strings"
 	"unicode"
@@ -44,6 +44,8 @@ func WriteGraph() {
 		dot.AddBox(boxname(box))
 	}
 
+	const DST = 0
+	const SRC = 1
 	for _, conn := range connections {
 		// connect to the parent box if registered,
 		// use channel name otherwise.
@@ -55,7 +57,7 @@ func WriteGraph() {
 				boxName[i] = channame(conn[i])
 			}
 		}
-		dot.Connect(boxName[0], boxName[1], tagOfChan[conn[0]], 1)
+		dot.Connect(boxName[DST], boxName[SRC], tagOfChan[conn[SRC]], 1)
 	}
 
 }
@@ -84,7 +86,7 @@ func RegisterBox(box Box) {
 	typ := val.Type()
 	for i := 0; i < typ.NumField(); i++ {
 		name := typ.Field(i).Name
-		tag := typ.Field(i).Tag
+		tag := string(typ.Field(i).Tag)
 		field := val.Field(i)
 
 		// skip non-exported fields
@@ -95,16 +97,12 @@ func RegisterBox(box Box) {
 		ptr := field.Addr().Interface()
 
 		if isChan(ptr) {
-			boxOfChan[ptr] = box // .Addr().Unsa..?
+			boxOfChan[ptr] = box
 		}
 
-		if isInputChan(ptr) {
-
-		}
-
-		// use the field's struct tag as channel name
-		if tag == "" {
-			continue
+		if isOutputChan(ptr) {
+			tagOfChan[ptr] = tag
+			log.Println("tag of chan " + channame(ptr) + " = " + tag)
 		}
 
 		//	if isOutputChan(chanPtr) {

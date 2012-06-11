@@ -10,7 +10,12 @@ import (
 	"strings"
 )
 
-// Type alias for documentation
+// Chan is a pointer to one of many supported channel types,
+// as defined by isChan(). E.g.:
+// 	*chan<-float32
+// 	*<-chan float32
+// 	*[3]<-chan[]float32
+// 	...
 type Chan interface{}
 
 // Try to connect dst and src based on their type.
@@ -29,7 +34,7 @@ func Connect(dst, src Chan) {
 	case *[3]<-chan float64:
 		connect3ChanOfFloat64(d, src)
 	}
-	RegisterConn(dst, src)
+	registerConn(dst, src)
 }
 
 func cannotConnect(dst, src Chan) {

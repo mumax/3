@@ -10,11 +10,15 @@ import (
 	"unicode"
 )
 
+// Runner is usually a Box whose Run() will loop forever
+// processing Chan input.
 type Runner interface {
 	Run()
 }
 
-// Type alias for documentation
+// Box represents a struct with input and output channels
+// used to send data. Boxes usually have a Run() method
+// that will loop forever reading input and writing output.
 type Box interface{}
 
 // Try to connect the boxes on a best-effort basis.

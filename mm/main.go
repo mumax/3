@@ -10,15 +10,21 @@ func Main() {
 
 	// 1) make and connect boxes
 	torque := new(LLGBox)
-	//heff := new(MeanFieldBox)
+	heff := new(MeanFieldBox)
 	alpha := NewConstBox(0.1)
+
+	Connect(&torque.Alpha, &alpha.Output)
 
 	solver := new(EulerBox)
 	solver.dt = 0.01
 
+	Connect(&solver.MIn, &solver.MOut)
 	Connect(&solver.Torque, &torque.Torque)
-	Register(torque, alpha, solver)
-	//Connect(&torque.H, &heff.H)
+	Connect(&alpha.Time, &solver.Time)
+
+	Register(torque, alpha, solver, heff)
+	Connect(&torque.H, &heff.H)
+	Connect(&heff.M, &solver.MOut)
 	WriteGraph()
 
 	//RegisterBox(NewAverage3Box("m"))

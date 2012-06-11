@@ -52,7 +52,7 @@ func WriteGraph() {
 			if box, ok := boxOfChan[conn[i]]; ok {
 				boxName[i] = boxname(box)
 			} else {
-				boxName[i] = fmt.Sprint(conn[i])
+				boxName[i] = channame(conn[i])
 			}
 		}
 		dot.Connect(boxName[0], boxName[1], tagOfChan[conn[0]], 1)
@@ -170,11 +170,15 @@ func RegisterBox(box Box) {
 //	srcChanForQuant[quant] = c
 //}
 
-func boxname(value interface{}) string {
+func boxname(value Box) string {
 	typ := fmt.Sprintf("%T", value)
 	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
 	if strings.HasSuffix(clean, "Box") {
 		clean = clean[:len(clean)-len("Box")]
 	}
 	return clean
+}
+
+func channame(c Chan) string {
+	return fmt.Sprintf("chan0x%x", int(reflect.ValueOf(c).Elem().UnsafeAddr()))
 }

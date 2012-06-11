@@ -9,20 +9,22 @@ func Main() {
 	InitSize(1, 4, 8)
 
 	// 1) make and connect boxes
-	Register(new(LLGBox))
-	Register(new(MeanFieldBox))
-	Register(NewConstBox(0.1)) //, `Output:"alpha"`)
+	torque := new(LLGBox)
+	heff := new(MeanFieldBox)
+	alpha := NewConstBox(0.1)
 
 	solver := new(EulerBox)
 	solver.dt = 0.01
-	Register(solver)
 
-	Register(NewAverage3Box("m"))
+	Connect(&solver.Torque, torque.Torque)
+	Register(torque, heff, alpha, solver)
+	WriteGraph()
 
-	Register(NewTableBox("m.txt", "<m>.x"))
+	//RegisterBox(NewAverage3Box("m"))
+	//RegisterBox(NewTableBox("m.txt", "<m>.x"))
 	//Output("m.x", "mx.txt")
 
-	Start()
+	//Start()
 
 	// TODO: makearray
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}

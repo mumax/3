@@ -1,9 +1,10 @@
 package mm
 
 import (
-	. "nimble-cube/nc"
+//. "nimble-cube/nc"
 )
 
+/*
 type Average3Box struct {
 	Input  [3]<-chan []float32
 	Output [3][]chan<- float64
@@ -30,3 +31,4 @@ func (box *Average3Box) Run() {
 		}
 	}
 }
+*/

@@ -54,6 +54,10 @@ func isChan(ptr interface{}) bool {
 	return isInputChan(ptr) || isOutputChan(ptr)
 }
 
+func Register(box ...Box){
+	for _,b:=range box{RegisterBox(b)}
+}
+
 // Registers quantities for all tagged output channels.
 func RegisterBox(box Box) {
 	boxes = append(boxes, box)

@@ -16,6 +16,7 @@ var (
 	connections [][2]Chan               // registered connections (dst, src)
 	boxOfChan   = make(map[Chan]Box)    // maps channel onto its parent box
 	tagOfChan   = make(map[Chan]string) // maps source channel onto its struct tag, if any.
+	chanOfTag   = make(map[string]Chan) // maps struct tag on source channel.
 )
 
 // Write graphviz output.
@@ -85,17 +86,12 @@ func registerBox(box Box) {
 			boxOfChan[ptr] = box
 		}
 
-		if isOutputChan(ptr) {
+		if isOutputChan(ptr) && tag != ""{
 			tagOfChan[ptr] = tag
+			chanOfTag[tag] = ptr // TODO: check multiple-defined
 			log.Println("tag of chan " + channame(ptr) + " = " + tag)
 		}
 
-		//	if isOutputChan(chanPtr) {
-		//		if prev, ok := srcBoxForQuant[name]; ok {
-		//			panic(name + " provided by both " + boxname(prev) + " and " + boxname(box))
-		//		}
-		//		RegisterTag(box, chanPtr, name)
-		//	}
 	}
 }
 

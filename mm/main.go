@@ -2,6 +2,7 @@ package mm
 
 import (
 	. "nimble-cube/nc"
+	"log"
 )
 
 func Main() {
@@ -45,10 +46,11 @@ func Main() {
 
 	// Solver box runs synchronous.
 	// Could be async with return channel...
-	for i := 0; i < 1000; i++ {
-		solver.Run(m0, 10)
+	//for i := 0; i < 1000; i++ {
+		log.Println("start running")
+		solver.Run(m0, 10000)
+log.Println("done running")
 		//fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
-	}
+	//}
 
-	// 4) tear-down and wait for boxes to finish
 }

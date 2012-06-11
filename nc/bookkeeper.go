@@ -11,30 +11,14 @@ import (
 	"unicode"
 )
 
-//type ChanPtr unsafe.Pointer
-
 var (
-	connections [][2]Chan
-
-	boxes []Box
-
-	boxOfChan = make(map[Chan]Box)
-	tagOfChan = make(map[Chan]string)
-
-	// TODO: Quant type
-	//srcBoxForQuant  = make(map[string]Box)  //IDEA: store vector/scalar kind here too: Quant
-	//srcChanForQuant = make(map[string]Chan) //IDEA: store vector/scalar kind here too
-
-	//boxForChanPtr
-	//quantForChanPtr
-	//->
-
-	//Quant: Box, srcChan
-
-	//QuantForName
-	//BoxForChan
+	boxes       []Box                   // registered boxes
+	connections [][2]Chan               // registered connections (dst, src)
+	boxOfChan   = make(map[Chan]Box)    // maps channel onto its parent box
+	tagOfChan   = make(map[Chan]string) // maps source channel onto its struct tag, if any.
 )
 
+// Write graphviz output.
 func WriteGraph() {
 	var dot graphvizwriter
 	dot.Init("plumbing.dot")
@@ -62,8 +46,16 @@ func WriteGraph() {
 
 }
 
+// Register a connection to appear in WriteGraph()
 func RegisterConn(dst, src Chan) {
 	connections = append(connections, [2]Chan{dst, src})
+}
+
+// Register boxes to appear in WriteGraph()
+func Register(box ...Box) {
+	for _, b := range box {
+		registerBox(b)
+	}
 }
 
 // Checks if ptr is the address of a supported channel type.
@@ -71,14 +63,7 @@ func isChan(ptr interface{}) bool {
 	return isInputChan(ptr) || isOutputChan(ptr)
 }
 
-func Register(box ...Box) {
-	for _, b := range box {
-		RegisterBox(b)
-	}
-}
-
-// Registers quantities for all tagged output channels.
-func RegisterBox(box Box) {
+func registerBox(box Box) {
 	boxes = append(boxes, box)
 
 	// find and map all output channels
@@ -112,6 +97,19 @@ func RegisterBox(box Box) {
 		//		RegisterTag(box, chanPtr, name)
 		//	}
 	}
+}
+
+func boxname(value Box) string {
+	typ := fmt.Sprintf("%T", value)
+	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
+	if strings.HasSuffix(clean, "Box") {
+		clean = clean[:len(clean)-len("Box")]
+	}
+	return clean
+}
+
+func channame(c Chan) string {
+	return fmt.Sprintf("chan0x%x", int(reflect.ValueOf(c).Elem().UnsafeAddr()))
 }
 
 // Register a quantity taken form channel, give it a name.
@@ -167,16 +165,3 @@ func RegisterBox(box Box) {
 //	}
 //	srcChanForQuant[quant] = c
 //}
-
-func boxname(value Box) string {
-	typ := fmt.Sprintf("%T", value)
-	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
-	if strings.HasSuffix(clean, "Box") {
-		clean = clean[:len(clean)-len("Box")]
-	}
-	return clean
-}
-
-func channame(c Chan) string {
-	return fmt.Sprintf("chan0x%x", int(reflect.ValueOf(c).Elem().UnsafeAddr()))
-}

@@ -1,7 +1,12 @@
 package mm
 
 import (
-	"io"
+	//"io"
+	"bufio"
+	"fmt"
+	"log"
+	. "nimble-cube/nc"
+	"os"
 )
 
 //CONCEPT: Send interfaces over the fannels
@@ -11,27 +16,31 @@ import (
 type TableBox struct {
 	Input  <-chan float64
 	Time   <-chan float64 "time"
-	writer io.WriteCloser
+	writer *bufio.Writer
 }
 
-//func NewTableBox(file string, quant string) *TableBox {
-//	box := new(TableBox)
-//	var err error
-//	box.writer, err = os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-//	CheckIO(err)
-//
-//	ConnectToQuant(box, &box.Input, quant)
-//
-//	return box
-//}
-//
-//func (box *TableBox) Run() {
-//	defer box.writer.Close()
-//	for {
-//		time := RecvFloat64(box.Time)
-//		fmt.Fprint(box.writer, time)
-//		value := RecvFloat64(box.Input)
-//		fmt.Fprint(box.writer, "\t", value)
-//		fmt.Fprintln(box.writer)
-//	}
-//}
+func NewTableBox(file string) *TableBox {
+	box := new(TableBox)
+	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	CheckIO(err)
+	box.writer = bufio.NewWriter(out)
+	return box
+}
+
+func (box *TableBox) Run() {
+	defer box.Close()
+	//defer func(){err := recover()
+	//Log(err)
+	//box.Close()
+	//}()
+	for {
+		time := RecvFloat64(box.Time)
+		value := RecvFloat64(box.Input)
+		fmt.Fprintln(box.writer, time, "\t", value)
+	}
+}
+
+func (box *TableBox) Close() {
+	log.Println("closing", box.writer)
+	box.writer.Flush()
+}

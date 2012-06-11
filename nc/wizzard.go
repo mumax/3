@@ -85,25 +85,3 @@ func fieldByTag(v reflect.Value, tag string) (field reflect.Value) {
 	Panic(v, "has no tag", tag)
 	return
 }
-
-// Check if v, a pointer, can be used as an input channel.
-// E.g.:
-// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
-func isInputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64:
-		return true
-	}
-	return false
-}
-
-// Check if v, a pointer, can be used as an output channel.
-// E.g.:
-// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
-func isOutputChan(ptr interface{}) bool {
-	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
-		return true
-	}
-	return false
-}

@@ -1,8 +1,8 @@
 package mm
 
 import (
-	. "nimble-cube/nc"
 	"log"
+	. "nimble-cube/nc"
 )
 
 func Main() {
@@ -29,14 +29,17 @@ func Main() {
 
 	Connect(&heff.M, &solver.MOut)
 
-	Register(torque, alpha, solver, heff)
+	avg := new(Average3Box)
+	table := NewTableBox("m.txt")
+
+	Connect(&avg.Input, &solver.MOut)
+	Connect(&table.Input, &avg.Output[X])
+	Connect(&table.Time, &solver.Time)
+
+	Register(torque, alpha, solver, heff, avg, table)
 	WriteGraph()
 
-	GoRun(torque, alpha, heff)
-
-	//RegisterBox(NewAverage3Box("m"))
-	//RegisterBox(NewTableBox("m.txt", "<m>.x"))
-	//Output("m.x", "mx.txt")
+	GoRun(torque, alpha, heff, avg, table)
 
 	//Start()
 
@@ -47,10 +50,10 @@ func Main() {
 	// Solver box runs synchronous.
 	// Could be async with return channel...
 	//for i := 0; i < 1000; i++ {
-		log.Println("start running")
-		solver.Run(m0, 10000)
-log.Println("done running")
-		//fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
+	log.Println("start running")
+	solver.Run(m0, 10000)
+	log.Println("done running")
+	//fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
 	//}
 
 }

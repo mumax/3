@@ -1,0 +1,11 @@
+#! /usr/bin/gnuplot
+set term svg;
+set output "bench1.svg";
+set log x;
+set log y;
+set xlabel "N";
+set ylabel "ms/step";
+set key off;
+set title "cube geom, mean field, warp=N"
+plot "bench1.txt" u 1:3 w linesp pt 5;
+set output;

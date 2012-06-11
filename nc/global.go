@@ -13,7 +13,7 @@ var (
 	nWarp int    // slice size
 )
 
-const MAX_WARP = 4096
+var MAX_WARP = 8192
 
 func InitSize(N0, N1, N2 int) {
 	size = [3]int{N0, N1, N2}

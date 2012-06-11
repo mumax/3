@@ -3,6 +3,22 @@ package nc
 // Postman sends/receives data to/from arrays of channels.
 // TODO: Recv*(): check ok, close outputs + goExit()+log if not
 
+****
+Need to debug data flow.
+IDEA:
+plumber.connect registers channels (not pointers, the actual channels)
+at bookkeeper. There will be chan float64 and chan []float32.
+no tag names required, just the master channels.
+use them to index fill map
+var fill64 map[chan float64]int
+user master channels for count (equality for <- and -> chan)
+fill--, fill++
+if debug: output to animation file, use runtime.Caller to identify caller
+who incs, decs the chan.
+there should be just one sender, one receiver.
+output to animation file
+
+
 func SendFloat64(fanout []chan<- float64, value float64) {
 	for _, ch := range fanout {
 		ch <- value
@@ -44,4 +60,4 @@ func Recv3(vectorChan [3]<-chan []float32) [3][]float32 {
 	return [3][]float32{<-vectorChan[X], <-vectorChan[Y], <-vectorChan[Z]}
 }
 
-// The postman always rings three times.
+// The postman always syncs twice.

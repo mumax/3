@@ -34,7 +34,7 @@ func InitSize(N0, N1, N2 int) {
 }
 
 func DefaultBufSize() int {
-	return n / warp
+	return nWarp
 }
 
 func Size() [3]int { return size }

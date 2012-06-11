@@ -19,7 +19,7 @@ type Chan interface{}
 func Connect(dst, src Chan) {
 	switch d := dst.(type) {
 	default:
-		cannothandle("dst", dst)
+		cannotHandleDst(dst)
 	case *<-chan []float32:
 		connectChanOfSlice(d, src)
 	case *[3]<-chan []float32:
@@ -30,9 +30,23 @@ func Connect(dst, src Chan) {
 	RegisterConn(dst, src)
 }
 
-func cannothandle(what string, v interface{}) {
+func cannotHandleDst(v interface{}) {
 	typstr := reflect.TypeOf(v).String()
-	msg := "plumber cannot handle " + what + " " + typstr
+	if isOutputChan(v) {
+		panic("plumber: " + typstr + " is a source, cannot use it as destination")
+	}
+	cannotHandle(typstr)
+}
+
+func cannotHandleSrc(v interface{}) {
+	typstr := reflect.TypeOf(v).String()
+	if isInputChan(v) {
+		panic("plumber: " + typstr + " is a destination, cannot use it as source")
+	}
+	cannotHandle(typstr)
+}
+func cannotHandle(typstr string) {
+	msg := "plumber: cannot handle " + typstr + ": need pointer to known channel type"
 	if !strings.HasPrefix(typstr, "*") {
 		msg += ": need pointer"
 	}
@@ -45,7 +59,7 @@ func cannothandle(what string, v interface{}) {
 func connectChanOfSlice(dst *<-chan []float32, src interface{}) {
 	switch s := src.(type) {
 	default:
-		cannothandle("src", src)
+		cannotHandleSrc(src)
 	case *[]chan<- []float32:
 		ch := make(chan []float32, DefaultBufSize())
 		*s = append(*s, ch)
@@ -59,7 +73,7 @@ func connectChanOfSlice(dst *<-chan []float32, src interface{}) {
 func connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 	switch s := src.(type) {
 	default:
-		cannothandle("src", src)
+		cannotHandleSrc(src)
 	case *[3][]chan<- []float32:
 		for i := 0; i < 3; i++ {
 			connectChanOfSlice(&(*dst)[i], &(*s)[i])
@@ -73,7 +87,7 @@ func connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
 	switch s := src.(type) {
 	default:
-		cannothandle("src", src)
+		cannotHandleSrc(src)
 	case *[]chan<- float64:
 		ch := make(chan float64, 1)
 		*s = append(*s, ch)

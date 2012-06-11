@@ -7,6 +7,7 @@ package nc
 import (
 	"log"
 	"reflect"
+	"unicode"
 )
 
 type Runner interface {
@@ -16,28 +17,23 @@ type Runner interface {
 // Type alias for documentation
 type Box interface{}
 
-// Auto-connect all registered boxes
-//func AutoConnectAll() {
-//	// connect all input channels using output channels from Register()
-//	for _, box := range boxes {
-//		AutoConnect(box)
-//	}
-//}
-
-// Connect fields with equal struct tags
+// Try to connect the boxes on a best-effort basis.
+// Will connect fields with equal struct tags (e.g. "m") 
+// that have not yet been connected.
+// For lazy people.
 func AutoConnect(boxes ...Box) {
 	Register(boxes...)
 
 	for _, box := range boxes {
-
 		val := reflect.ValueOf(box).Elem()
 		typ := val.Type()
+
 		for i := 0; i < typ.NumField(); i++ {
 			field := val.Field(i)
 
-			// skip untagged fields
-			tag := string(typ.Field(i).Tag)
-			if tag == "" {
+			// skip unexported
+			if unicode.IsLower(rune(typ.Field(i).Name[0])) {
+				log.Println("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": unexported")
 				continue
 			}
 
@@ -47,21 +43,20 @@ func AutoConnect(boxes ...Box) {
 				continue
 			}
 
-			// skip already connected destinations
-			alreadyConnected := false
-			switch {
-			default:
-				Panic("autoconnect: unexpected kind:", field.Kind())
-			case field.Kind() == reflect.Array:
-				alreadyConnected = !field.Index(0).IsNil()
-			case field.Kind() == reflect.Chan:
-				alreadyConnected = !field.IsNil()
+			// skip untagged fields
+			tag := string(typ.Field(i).Tag)
+			if tag == "" {
+				log.Println("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": no struct tag")
+				continue
 			}
-			if alreadyConnected {
+
+			// skip already connected destinations
+			if isConnected(field) {
 				log.Println("autoconnect: skipping", boxname(box), tag, ": already connected")
 				continue
 			}
 
+			// now the easy part: actually connect.
 			src := chanOfTag[tag]
 			if src != nil {
 				log.Println("autoconnect:", boxname(box), tag, "<-", channame(src))
@@ -69,10 +64,27 @@ func AutoConnect(boxes ...Box) {
 			} else {
 				log.Println("autoconnect: no source for", boxname(box), tag, channame(dst))
 			}
-
 		}
-
 	}
+}
+
+func isConnected(field reflect.Value) bool {
+	switch {
+	default:
+		Panic("isconnected: unexpected kind:", field.Kind())
+	case field.Kind() == reflect.Array:
+		return !field.Index(0).IsNil() // [3]chan is connected if elem 0 is connected
+	case field.Kind() == reflect.Chan:
+		return !field.IsNil() // chan is connected if not nil
+	}
+	panic(0)
+	return false // silence 6g
+}
+
+func Vet(boxes ...Box) {
+	//for _,box:=range boxes{
+
+	//}
 }
 
 // Call go box.Run() on all boxes.
@@ -80,6 +92,16 @@ func GoRun(box ...Runner) {
 	for _, b := range box {
 		log.Println("starting: " + boxname(b))
 		go b.Run()
+	}
+}
+
+// Run all boxes that have been registered or autoconnected.
+// For lazy people.
+func AutoRun() {
+	for _, b := range boxes {
+		if r, ok := b.(Runner); ok {
+			GoRun(r)
+		}
 	}
 }
 

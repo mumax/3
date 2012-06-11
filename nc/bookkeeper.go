@@ -50,8 +50,8 @@ func WriteGraph() {
 // Register a connection to appear in WriteGraph()
 func RegisterConn(dst, src Chan) {
 	connections = append(connections, [2]Chan{dst, src})
-	log.Println("connect", boxname(boxOfChan[dst]), tagOfChan[dst], channame(dst),
-		"<-", boxname(boxOfChan[src]), tagOfChan[src], channame(src))
+	//log.Println("connect", boxname(boxOfChan[dst]), tagOfChan[dst], channame(dst),
+	//"<-", boxname(boxOfChan[src]), tagOfChan[src], channame(src))
 }
 
 // Register boxes to appear in WriteGraph()

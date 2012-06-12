@@ -2,6 +2,8 @@ package nc
 
 // This file implements graphviz output.
 
+*** need separate box name and box label: Const0x0656732 "label=const", ...
+
 import (
 	"fmt"
 	"io"

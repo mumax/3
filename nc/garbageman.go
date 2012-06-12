@@ -90,7 +90,7 @@ func Recycle(garbages ...[]float32) {
 				log.Println("recycle", &g[0])
 			default:
 				log.Println("spilling", &g[0])
-				delete(refcount, &g[0]) // allow it to be GC'd
+				delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
 			}
 		} else { // cannot be recycled, just yet
 			refcount[&g[0]] = count - 1

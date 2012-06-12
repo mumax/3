@@ -18,12 +18,14 @@ func NewConstBox(value float32) *ConstBox {
 
 func (box *ConstBox) Run() {
 
-	data := make([]float32, WarpLen()) // no Buffer(): should not be GC'd
-	Memset(data, box.value)
+	//data := make([]float32, WarpLen()) // no Buffer(): should not be GC'd
+	//Memset(data, box.value)
 
 	for {
 		RecvFloat64(box.Time)
 		for s := 0; s < NumWarp(); s++ {
+	data := Buffer()
+	Memset(data, box.value)
 			Send(box.Output, data)
 		}
 	}

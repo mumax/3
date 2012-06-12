@@ -24,12 +24,15 @@ func InitSize(N0, N1, N2 int) {
 
 	// Find some nice warp size
 	warp = MAX_WARP
+	Assert(warp >= 1)
 	for n%warp != 0 {
 		warp--
 	}
 	log.Println("WarpLen:", warp)
 	nWarp = n / warp
 	log.Println("NumWarp:", nWarp)
+
+	initGarbageman()
 
 }
 

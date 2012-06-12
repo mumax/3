@@ -30,10 +30,6 @@ func NewTableBox(file string) *TableBox {
 
 func (box *TableBox) Run() {
 	defer box.Close()
-	//defer func(){err := recover()
-	//Log(err)
-	//box.Close()
-	//}()
 	for {
 		time := RecvFloat64(box.Time)
 		value := RecvFloat64(box.Input)

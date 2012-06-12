@@ -35,5 +35,8 @@ func (box *LLGBox) Run() {
 			tSlice[Z][i] = t[Z]
 		}
 		Send3(box.Torque, tSlice)
+
+		Recycle3(mSlice, hSlice)
+		Recycle(aSlice)
 	}
 }

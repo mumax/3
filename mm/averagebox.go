@@ -13,10 +13,11 @@ func (box *AverageBox) Run() {
 	for {
 		sum := 0.0
 		for I := 0; I < N(); I += WarpLen() {
-			in := <-box.Input
+			in := Recv(box.Input)
 			for _, value := range in {
 				sum += float64(value)
 			}
+			Recycle(in)
 		}
 		SendFloat64(box.Output, sum/float64(N()))
 	}

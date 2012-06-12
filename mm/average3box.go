@@ -24,6 +24,7 @@ func (box *Average3Box) Run() {
 				for _, value := range in {
 					sum += float64(value)
 				}
+				Recycle(in)
 			}
 			SendFloat64(box.Output[c], sum/float64(N()))
 		}

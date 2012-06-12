@@ -25,12 +25,14 @@ func SendFloat64(fanout []chan<- float64, value float64) {
 }
 
 func Send(fanout []chan<- []float32, value []float32) {
+	incr(value, len(fanout))
 	for _, ch := range fanout {
 		ch <- value
 	}
 }
 
 func Send3(vectorFanout [3][]chan<- []float32, value [3][]float32) {
+	incr3(value, len(vectorFanout))
 	for comp := 0; comp < 3; comp++ {
 		for _, ch := range vectorFanout[comp] {
 			ch <- value[comp]

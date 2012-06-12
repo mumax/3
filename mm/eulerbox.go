@@ -53,8 +53,8 @@ func (box *EulerBox) Run(m0 [3][]float32, steps int) {
 				copy(m0[X][I:I+WarpLen()], m1Slice[X])
 				copy(m0[Y][I:I+WarpLen()], m1Slice[Y])
 				copy(m0[Z][I:I+WarpLen()], m1Slice[Z])
-				//RECYCLE
 			}
+			Recycle3(m0Slice, tSlice)
 		}
 		box.t += (float64(box.dt))
 		box.steps++

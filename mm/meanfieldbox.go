@@ -26,6 +26,8 @@ func (box *MeanFieldBox) Run() {
 				mSum[Y] += mSlice[Y][i]
 				mSum[Z] += mSlice[Z][i]
 			}
+
+			Recycle3(mSlice)
 		}
 
 		hx := mSum[X] * -0.01 / float32(N())

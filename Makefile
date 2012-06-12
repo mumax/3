@@ -13,7 +13,7 @@ gccgo:
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 
-test: 6gtest gccgotest
+test: 6gtest gccgotest testdir
 
 6gtest: 
 	go test nimble-cube/nc
@@ -22,6 +22,9 @@ test: 6gtest gccgotest
 gccgotest: 
 	go test -compiler $(GCCGO) nimble-cube/nc
 	go test -compiler $(GCCGO) nimble-cube/mm
+
+testdir:
+	make -C test
 
 bench: 6gbench gccgobench
 

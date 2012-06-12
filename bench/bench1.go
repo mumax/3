@@ -21,7 +21,7 @@ func main() {
 	solver := new(EulerBox)
 	//solver.dt = 0.01
 
-	AutoConnect(torque, alpha, heff, solver)
+	AutoConnect(torque, alpha, heff, solver, alpha)
 	AutoRun()
 	WriteGraph()
 

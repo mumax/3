@@ -1,8 +1,10 @@
 package main
 
 import (
-	. "nimble-cube/nc"
 	"log"
+	"os"
+	"fmt"
+	. "nimble-cube/nc"
 )
 
 func main() {
@@ -18,6 +20,11 @@ func main() {
 
 	go source.Run()
 	sink.Run(100)
+
+	if NumAlloc > 10{
+		fmt.Println("NumAlloc:", NumAlloc)
+		os.Exit(1)
+	}
 }
 
 type Source struct {

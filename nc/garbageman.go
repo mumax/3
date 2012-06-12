@@ -3,15 +3,14 @@ package nc
 // Garbageman recycles garbage slices.
 
 import (
-	"fmt"
 	"log"
-	"runtime"
 	"sync"
 )
 
 var (
 	fresh    chan []float32 // used as fifo, replace by hand-written stack!
 	refcount = make(map[*float32]int)
+	NumAlloc int
 	lock     sync.Mutex
 )
 
@@ -54,6 +53,7 @@ func Buffer() []float32 {
 		return f
 	default:
 		slice := make([]float32, WarpLen())
+		NumAlloc++
 		log.Println("alloc", &slice[0])
 		refcount[&slice[0]] = 0
 		return slice
@@ -61,10 +61,10 @@ func Buffer() []float32 {
 	return nil // silence gc
 }
 
-func caller() string {
-	_, file, line, _ := runtime.Caller(2)
-	return fmt.Sprint(file, ":", line)
-}
+//func caller() string {
+//	_, file, line, _ := runtime.Caller(2)
+//	return fmt.Sprint(file, ":", line)
+//}
 
 func Buffer3() [3][]float32 {
 	return [3][]float32{Buffer(), Buffer(), Buffer()}
@@ -100,7 +100,6 @@ func Recycle(garbages ...[]float32) {
 
 func Recycle3(garbages ...[3][]float32) {
 	for _, g := range garbages {
-		//log.Println("recycle3 for", caller())
 		Recycle(g[X], g[Y], g[Z])
 	}
 }

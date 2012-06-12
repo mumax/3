@@ -24,8 +24,8 @@ func (box *ConstBox) Run() {
 	for {
 		RecvFloat64(box.Time)
 		for s := 0; s < NumWarp(); s++ {
-	data := Buffer()
-	Memset(data, box.value)
+			data := Buffer()
+			Memset(data, box.value)
 			Send(box.Output, data)
 		}
 	}

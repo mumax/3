@@ -23,6 +23,7 @@ func main() {
 
 	AutoConnect(torque, alpha, heff, solver)
 	AutoRun()
+	WriteGraph()
 
 	// TODO: makearray
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}

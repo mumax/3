@@ -23,6 +23,8 @@ func (box *ConstBox) Run() {
 
 	for {
 		RecvFloat64(box.Time)
-		Send(box.Output, data)
+		for s := 0; s < NumWarp(); s++ {
+			Send(box.Output, data)
+		}
 	}
 }

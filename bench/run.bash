@@ -5,6 +5,6 @@ for n in 1 2 4 8 16 24 32; do
 	echo
 	echo n=$n
 	echo
-	go run bench1.go -warp $(( $n*$n*$n )) $n >> bench1.txt
+	go run bench1.go -warp $(( $n*$n*$n/4 )) $n >> bench1.txt
 done;
 ./bench1.gplot

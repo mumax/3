@@ -14,11 +14,13 @@ func main() {
 
 	source := new(Source)
 	sink := new(Sink)
+	sink2 := new(Sink)
 
-	AutoConnect(source, sink)
+	AutoConnect(source, sink, sink2)
 	WriteGraph()
 
 	go source.Run()
+	go sink2.Run(100)
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)

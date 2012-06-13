@@ -16,22 +16,22 @@ var (
 // increment the reference count by count.
 func incr(s []float32, count int) {
 	lock.Lock()
-	defer lock.Unlock()
 	if prev, ok := refcount[&s[0]]; ok {
 		refcount[&s[0]] = prev + count
 	}
-	Assert(len(refcount) == NumAlloc)
+	lock.Unlock()
+	//Assert(len(refcount) == NumAlloc)
 }
 
 // increment the reference count by count.
 func incr3(s [3][]float32, count int) {
 	lock.Lock()
-	defer lock.Unlock()
 	for c := 0; c < 3; c++ {
 		if prev, ok := refcount[&s[c][0]]; ok {
 			refcount[&s[c][0]] = prev + count
 		}
 	}
+	lock.Unlock()
 }
 
 // Return a buffer, recycle an old one if possible.

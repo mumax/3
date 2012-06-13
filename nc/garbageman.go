@@ -12,61 +12,61 @@ var (
 	refcount              = make(map[*float32]int)
 	gpuRefcount           = make(map[GpuFloats]int)
 	NumAlloc, NumGpuAlloc int
-	lock                  sync.Mutex
+	cpulock, gpulock      sync.Mutex
 )
 
 // increment the reference count by count.
 func incr(s []float32, count int) {
-	lock.Lock()
+	cpulock.Lock()
 	if prev, ok := refcount[&s[0]]; ok {
 		refcount[&s[0]] = prev + count
 	}
-	lock.Unlock()
+	cpulock.Unlock()
 	//Assert(len(refcount) == NumAlloc)
 }
 
 func incrGpu(s GpuFloats, count int) {
-	lock.Lock()
+	gpulock.Lock()
 	if prev, ok := gpuRefcount[s]; ok {
 		gpuRefcount[s] = prev + count
 	}
-	lock.Unlock()
+	gpulock.Unlock()
 	Assert(len(gpuRefcount) == NumGpuAlloc)
 }
 
 // increment the reference count by count.
 func incr3(s [3][]float32, count int) {
-	lock.Lock()
+	cpulock.Lock()
 	for c := 0; c < 3; c++ {
 		if prev, ok := refcount[&s[c][0]]; ok {
 			refcount[&s[c][0]] = prev + count
 		}
 	}
-	lock.Unlock()
+	cpulock.Unlock()
 }
 
 // Return a buffer, recycle an old one if possible.
 // Buffers created in this way should be Recyle()d
 // when not used anymore, i.e., if not Send() elsewhere.
 func Buffer() []float32 {
-	lock.Lock()
+	cpulock.Lock()
 	b := buffer()
-	lock.Unlock()
+	cpulock.Unlock()
 	return b
 }
 
 func GpuBuffer() GpuFloats {
-	lock.Lock()
+	gpulock.Lock()
 	b := gpuBuffer()
-	lock.Unlock()
+	gpulock.Unlock()
 	return b
 }
 
 // See Buffer()
 func Buffer3() [3][]float32 {
-	lock.Lock()
+	cpulock.Lock()
 	b := [3][]float32{buffer(), buffer(), buffer()}
-	lock.Unlock()
+	cpulock.Unlock()
 	return b
 }
 
@@ -96,7 +96,7 @@ func gpuBuffer() GpuFloats {
 }
 
 func Recycle(garbages ...[]float32) {
-	lock.Lock()
+	cpulock.Lock()
 
 	for _, g := range garbages {
 		count, ok := refcount[&g[0]]
@@ -114,7 +114,28 @@ func Recycle(garbages ...[]float32) {
 		}
 
 	}
-	lock.Unlock()
+	cpulock.Unlock()
+}
+
+func RecycleGpu(garbages ...GpuFloats) {
+	gpulock.Lock()
+
+	for _, g := range garbages {
+		count, ok := gpuRefcount[g]
+		if !ok {
+			Debug("skipping", g)
+			continue // slice does not originate from here
+		}
+		if count == 0 { // can be recycled
+			gpuRecycled.push(g)
+			Debug("recycling", g)
+		} else { // cannot be recycled, just yet
+			Debug("decrementing", g, ":", count-1)
+			gpuRefcount[g] = count - 1
+		}
+
+	}
+	gpulock.Unlock()
 }
 
 func Recycle3(garbages ...[3][]float32) {

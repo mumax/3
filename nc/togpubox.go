@@ -3,8 +3,8 @@ package nc
 // Copies to gpu.
 
 import (
-	"github.com/barnex/cuda4/cu"
-	"unsafe"
+//"github.com/barnex/cuda4/cu"
+//"unsafe"
 )
 
 type ToGpuBox struct {
@@ -22,7 +22,8 @@ func (box *ToGpuBox) Run() {
 	for {
 		in := Recv(box.Input)
 		buffer := GpuBuffer()
-		cu.MemcpyHtoD(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]), cu.SIZEOF_FLOAT32*int64(WarpLen()))
+		//cu.MemcpyHtoD(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]), cu.SIZEOF_FLOAT32*int64(WarpLen()))
+		Recycle(in)
 		SendGpu(box.Output, buffer)
 	}
 }

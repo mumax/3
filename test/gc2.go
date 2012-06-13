@@ -17,7 +17,7 @@ func main() {
 	sink2 := new(Sink)
 
 	AutoConnect(source, sink, sink2)
-	WriteGraph()
+//	WriteGraph()
 
 	go source.Run()
 	go sink2.Run(100)

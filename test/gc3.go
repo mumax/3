@@ -24,7 +24,7 @@ func main() {
 
 	Register(source, sink, sink2, sink3, c)
 	AutoConnect(source, sink, sink2)
-	WriteGraph()
+	//WriteGraph()
 
 	go source.Run()
 	go sink2.Run(100)

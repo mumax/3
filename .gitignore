@@ -1,6 +1,12 @@
 *.swp
+*.5
 *.6
-fe-mumax
-whiteboard.dot.png
-test.log
+*.8
+*.o
+*.a
+*.dot.*
+*.dot
+*.svg
+*.log
 nimble-cube
+*.txt

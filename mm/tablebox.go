@@ -1,7 +1,6 @@
 package mm
 
 import (
-	//"io"
 	"bufio"
 	"fmt"
 	"log"
@@ -9,10 +8,7 @@ import (
 	"os"
 )
 
-//CONCEPT: Send interfaces over the fannels
-//Slice, Slice3, Scalar, Vector, GPUSlice, ...
-//Use type info for nice output, recycling decissions...
-
+// Writes time + data table to a file.
 type TableBox struct {
 	Input  <-chan float64
 	Time   <-chan float64 "time"

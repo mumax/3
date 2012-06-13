@@ -23,6 +23,8 @@ var (
 func init() {
 	flag.Parse()
 
+	initLog()
+
 	initCpuProf()
 
 	if *flag_version {
@@ -32,7 +34,9 @@ func init() {
 	initWarp()
 
 	initCUDA()
+}
 
+func initLog(){
 	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
 	log.SetPrefix("#")
 }

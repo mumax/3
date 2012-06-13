@@ -2,8 +2,6 @@ package nc
 
 // This file implements graphviz output.
 
-//*** need separate box name and box label: Const0x0656732 "label=const", ...
-
 import (
 	"fmt"
 	"io"
@@ -39,8 +37,8 @@ func (dot *graphvizwriter) Connect(dst string, src string, label string, thickne
 	dot.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }
 
-func (dot *graphvizwriter) AddBox(name string) {
-	dot.Println(name, `[shape="rect"];`)
+func (dot *graphvizwriter) AddBox(box Box) {
+	dot.Println(boxname(box), `[label="`+boxlabel(box)+`"shape="rect"];`)
 }
 
 func (dot *graphvizwriter) Close() {

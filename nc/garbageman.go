@@ -20,6 +20,7 @@ func incr(s []float32, count int) {
 	if prev, ok := refcount[&s[0]]; ok {
 		refcount[&s[0]] = prev + count
 	}
+	Assert(len(refcount) == NumAlloc)
 }
 
 func incr3(s [3][]float32, count int) {

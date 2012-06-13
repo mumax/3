@@ -26,7 +26,7 @@ func WriteGraph() {
 	defer dot.Close()
 
 	for _, box := range boxes {
-		dot.AddBox(boxname(box))
+		dot.AddBox(box)
 	}
 
 	const DST = 0
@@ -116,8 +116,11 @@ func registerBox(box Box) {
 	}
 }
 
-func boxname(value Box) string {
-	typ := fmt.Sprintf("%T", value)
+// Human-readable, but not necessarily unique, name for the box.
+// E.g.:
+// 	Euler, LLG, Const
+func boxlabel(box Box) string {
+	typ := fmt.Sprintf("%T", box)
 	clean := typ[strings.Index(typ, ".")+1:] // strip "*mm."
 	if strings.HasSuffix(clean, "Box") {
 		clean = clean[:len(clean)-len("Box")]
@@ -125,6 +128,20 @@ func boxname(value Box) string {
 	return clean
 }
 
+// Unique name for the box.
+// E.g.:
+// 	Euler0x84000123
+func boxname(box Box) string {
+	return boxlabel(box) + ptrname(box)
+}
+
+// Unique name for the chan
+// E.g.:
+// 	chan0x84000123
 func channame(c Chan) string {
-	return fmt.Sprintf("chan0x%x", int(reflect.ValueOf(c).Elem().UnsafeAddr()))
+	return fmt.Sprint("chan", ptrname(c))
+}
+
+func ptrname(ptr interface{}) string {
+	return fmt.Sprintf("0x%x", int(reflect.ValueOf(ptr).Elem().UnsafeAddr()))
 }

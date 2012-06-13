@@ -3,7 +3,7 @@ package nc
 // Garbageman recycles garbage slices.
 
 import (
-	"log"
+	//"log"
 	"sync"
 )
 
@@ -39,22 +39,17 @@ func Buffer() []float32 {
 
 	select {
 	case f := <-fresh:
-		log.Println("re-use", &f[0])
+		//log.Println("re-use", &f[0])
 		return f
 	default:
 		slice := make([]float32, WarpLen())
 		NumAlloc++
-		log.Println("alloc", &slice[0])
+		//log.Println("alloc", &slice[0])
 		refcount[&slice[0]] = 0
 		return slice
 	}
 	return nil // silence gc
 }
-
-//func caller() string {
-//	_, file, line, _ := runtime.Caller(2)
-//	return fmt.Sprint(file, ":", line)
-//}
 
 func Buffer3() [3][]float32 {
 	return [3][]float32{Buffer(), Buffer(), Buffer()}
@@ -69,22 +64,22 @@ func Recycle(garbages ...[]float32) {
 	defer lock.Unlock()
 
 	for _, g := range garbages {
-		log.Println("Recycle(", &g[0], ")")
+		//log.Println("Recycle(", &g[0], ")")
 		count, ok := refcount[&g[0]]
 		if !ok {
-			log.Println("skipping", &g[0])
+			//log.Println("skipping", &g[0])
 			continue // slice does not originate from here
 		}
 		if count == 0 { // can be recycled
 			select {
 			case fresh <- g:
-				log.Println("recycling", &g[0])
+				//log.Println("recycling", &g[0])
 			default:
-				log.Println("spilling", &g[0])
+				//log.Println("spilling", &g[0])
 				delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
 			}
 		} else { // cannot be recycled, just yet
-			log.Println("decrementing", &g[0], ":", count-1)
+			//log.Println("decrementing", &g[0], ":", count-1)
 			refcount[&g[0]] = count - 1
 		}
 	}

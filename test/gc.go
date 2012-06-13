@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
-	"os"
 	"fmt"
+	"log"
 	. "nimble-cube/nc"
+	"os"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 10{
+	if NumAlloc > 10 {
 		os.Exit(1)
 	}
 }

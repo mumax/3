@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"os"
 	"fmt"
-	. "nimble-cube/nc"
+	"log"
 	"nimble-cube/mm"
+	. "nimble-cube/nc"
+	"os"
 )
 
 func main() {
@@ -19,7 +19,6 @@ func main() {
 	sink3 := new(Sink)
 	c := mm.NewConstBox(1)
 
-
 	Connect(&sink3.Input, &c.Output)
 
 	Register(source, sink, sink2, sink3, c)
@@ -32,7 +31,7 @@ func main() {
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 10{
+	if NumAlloc > 10 {
 		os.Exit(1)
 	}
 }

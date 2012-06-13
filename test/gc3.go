@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	. "nimble-cube/nc"
 	"os"
-	"fmt"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	sink := new(Sink3)
 	//sink2 := new(Sink3)
 
-	AutoConnect(source, sink)//, sink2)
+	AutoConnect(source, sink) //, sink2)
 	WriteGraph("gc3")
 
 	go source.Run()
@@ -23,7 +23,7 @@ func main() {
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 10{
+	if NumAlloc > 10 {
 		os.Exit(1)
 	}
 }
@@ -43,7 +43,7 @@ type Sink3 struct {
 }
 
 func (box *Sink3) Run(n int) {
-	for i:=0; i<n;i++{
+	for i := 0; i < n; i++ {
 		Recycle3(Recv3(box.Input))
 	}
 }

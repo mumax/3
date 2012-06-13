@@ -23,7 +23,7 @@ func main() {
 
 	AutoConnect(torque, alpha, heff, solver, alpha)
 	AutoRun()
-	WriteGraph()
+	WriteGraph("bench1")
 
 	// TODO: makearray
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}
@@ -35,45 +35,4 @@ func main() {
 	fmt.Println("# N	warp	ms/step")
 	fmt.Println(n*n*n, "\t", WarpLen(), "\t", float64(duration)/(1e9))
 
-}
-
-
-type Source struct {
-	Output []chan<- []float32
-}
-
-func (box *Source) Run() {
-	for {
-		Send(box.Output, Buffer())
-	}
-}
-
-type Sink struct {
-	Input <-chan []float32
-}
-
-func (box *Sink) Run() {
-	for {
-		Recycle(Recv(box.Input))
-	}
-}
-
-type Source3 struct {
-	Output [3][]chan<- []float32
-}
-
-func (box *Source3) Run() {
-	for {
-		Send3(box.Output, Buffer3())
-	}
-}
-
-type Sink3 struct {
-	Input <-chan [3][]float32
-}
-
-func (box *Sink3) Run() {
-	for {
-		Recycle3(Recv3(box.Input))
-	}
 }

@@ -19,10 +19,10 @@ func NewToGpuBox() *ToGpuBox {
 }
 
 func (box *ToGpuBox) Run() {
-
 	for {
 		in := Recv(box.Input)
 		buffer := GpuBuffer()
 		cu.MemcpyHtoD(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]), cu.SIZEOF_FLOAT32*int64(WarpLen()))
+		SendGpu(box.Output, buffer)
 	}
 }

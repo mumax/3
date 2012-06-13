@@ -22,7 +22,7 @@ type TableBox struct {
 func NewTableBox(file string) *TableBox {
 	box := new(TableBox)
 	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	CheckIO(err)
+	PanicErr(err)
 	box.writer = bufio.NewWriter(out)
 	Register(box)
 	return box

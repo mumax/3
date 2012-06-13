@@ -1,11 +1,9 @@
 package main
 
 import (
-	"log"
+	. "nimble-cube/nc"
 	"os"
 	"fmt"
-	. "nimble-cube/nc"
-	"nimble-cube/mm"
 )
 
 func main() {
@@ -13,22 +11,15 @@ func main() {
 	n := 1
 	InitSize(n, n, n)
 
-	source := new(Source)
-	sink := new(Sink)
-	sink2 := new(Sink)
-	sink3 := new(Sink)
-	c := mm.NewConstBox(1)
+	source := new(Source3)
+	sink := new(Sink3)
+	//sink2 := new(Sink3)
 
-
-	Connect(&sink3.Input, &c.Output)
-
-	Register(source, sink, sink2, sink3, c)
-	AutoConnect(source, sink, sink2)
-	//WriteGraph()
+	AutoConnect(source, sink)//, sink2)
+	WriteGraph("gc3")
 
 	go source.Run()
-	go sink2.Run(100)
-	go sink3.Run(100)
+	//go sink2.Run(100)
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
@@ -37,23 +28,22 @@ func main() {
 	}
 }
 
-type Source struct {
-	Output []chan<- []float32 "data"
+type Source3 struct {
+	Output [3][]chan<- []float32 "data"
 }
 
-func (box *Source) Run() {
+func (box *Source3) Run() {
 	for {
-		Send(box.Output, Buffer())
+		Send3(box.Output, Buffer3())
 	}
 }
 
-type Sink struct {
-	Input <-chan []float32 "data"
+type Sink3 struct {
+	Input [3]<-chan []float32 "data"
 }
 
-func (box *Sink) Run(n int) {
-	for i := 0; i < n; i++ {
-		log.Println("step", i)
-		Recycle(Recv(box.Input))
+func (box *Sink3) Run(n int) {
+	for i:=0; i<n;i++{
+		Recycle3(Recv3(box.Input))
 	}
 }

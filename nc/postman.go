@@ -39,7 +39,7 @@ func Send3(fanout [3][]chan<- []float32, value [3][]float32) {
 	if len(fanout[X]) == 0 {
 		panic("Send to nil")
 	}
-	incr3(value, len(fanout)-1)
+	incr3(value, len(fanout[X])-1)
 	for comp := 0; comp < 3; comp++ {
 		for _, ch := range fanout[comp] {
 			ch <- value[comp]

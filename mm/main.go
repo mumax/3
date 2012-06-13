@@ -23,7 +23,7 @@ func Main() {
 
 	AutoConnect(torque, alpha, heff, avg, table, solver)
 	AutoRun()
-	WriteGraph()
+	WriteGraph("mm")
 
 	// TODO: makearray
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}

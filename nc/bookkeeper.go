@@ -20,9 +20,12 @@ var (
 )
 
 // Write graphviz output.
-func WriteGraph() {
+func WriteGraph(file string) {
+	if !strings.HasSuffix(file, ".dot") {
+		file += ".dot"
+	}
 	var dot graphvizwriter
-	dot.Init("plumbing.dot")
+	dot.Init(file)
 	defer dot.Close()
 
 	for _, box := range boxes {

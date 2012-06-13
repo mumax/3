@@ -61,7 +61,7 @@ func Buffer3() [3][]float32 {
 }
 
 func initGarbageman() {
-	fresh = make(chan []float32, 5*NumWarp()) // need big buffer to avoid spilling
+	fresh = make(chan []float32, 10*NumWarp()) // need big buffer to avoid spilling
 }
 
 func Recycle(garbages ...[]float32) {
@@ -69,20 +69,22 @@ func Recycle(garbages ...[]float32) {
 	defer lock.Unlock()
 
 	for _, g := range garbages {
-
+		log.Println("Recycle(", &g[0], ")")
 		count, ok := refcount[&g[0]]
 		if !ok {
+			log.Println("skipping", &g[0])
 			continue // slice does not originate from here
 		}
 		if count == 0 { // can be recycled
 			select {
 			case fresh <- g:
-				log.Println("recycle", &g[0])
+				log.Println("recycling", &g[0])
 			default:
 				log.Println("spilling", &g[0])
 				delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
 			}
 		} else { // cannot be recycled, just yet
+			log.Println("decrementing", &g[0], ":", count-1)
 			refcount[&g[0]] = count - 1
 		}
 	}

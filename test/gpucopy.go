@@ -15,24 +15,26 @@ func main() {
 
 	source := new(Source)
 	to := NewToGpuBox()
-	//gpusink := new(GpuSink)
+	gpusink := new(GpuSink)
 
 	from := NewFromGpuBox()
 	sink := new(Sink)
 
-	Register(source, to, sink)
+	Register(source, to, sink, gpusink)
 
 	Connect(&to.Input, &source.Output)
 	Connect(&from.Input, &to.Output)
+	Connect(&gpusink.Input, &to.Output)
 	Connect(&sink.Input, &from.Output)
 
-	Vet(source, to, sink)
+	Vet(source, to, sink, gpusink)
 	WriteGraph("gpucopy")
 
 	//GoRun(source, to)
 	go func(){SetCudaCtx(); source.Run()}()
 	go func(){SetCudaCtx(); to.Run()}()
 	go func(){SetCudaCtx(); from.Run()}()
+	go func(){SetCudaCtx(); gpusink.Run()}()
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
@@ -83,9 +85,8 @@ type GpuSink struct {
 	Input <-chan GpuFloats
 }
 
-func (box *GpuSink) Run(n int) {
-	for i := 0; i < n; i++ {
-		log.Println("step", i)
+func (box *GpuSink) Run() {
+	for {
 		RecycleGpu(RecvGpu(box.Input))
 	}
 }

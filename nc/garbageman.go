@@ -16,32 +16,21 @@ var (
 
 func incr(s []float32, count int) {
 	lock.Lock()
-	refcount[&s[0]] += count
-	lock.Unlock()
+	defer lock.Unlock()
+	if prev, ok := refcount[&s[0]]; ok {
+		refcount[&s[0]] = prev + count
+	}
 }
 
 func incr3(s [3][]float32, count int) {
 	lock.Lock()
 	defer lock.Unlock()
-	refcount[&s[X][0]] += count
-	refcount[&s[Y][0]] += count
-	refcount[&s[Z][0]] += count
+	for c := 0; c < 3; c++ {
+		if prev, ok := refcount[&s[c][0]]; ok {
+			refcount[&s[c][0]] = prev + count
+		}
+	}
 }
-
-//func decr(s []float32) (count int) {
-//	lock.Lock()
-//	defer lock.Unlock()
-//	count = refcount[&s[0]]
-//	count--
-//	refcount[&s[0]] = count
-//	return count
-//}
-
-//func count(s []float32) (count int) {
-//	lock.Lock()
-//	defer lock.Unlock()
-//	return refcount[&s[0]]
-//}
 
 func Buffer() []float32 {
 	lock.Lock()

@@ -33,6 +33,8 @@ func Connect(dst, src Chan) {
 		connectChanOfFloat64(d, src)
 	case *[3]<-chan float64:
 		connect3ChanOfFloat64(d, src)
+	case *<-chan GpuFloats:
+		connectChanOfGpuFloats(d, src)
 	}
 	registerConn(dst, src)
 }
@@ -65,7 +67,7 @@ func cannotHandleType(v interface{}) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func connectChanOfSlice(dst *<-chan []float32, src interface{}) {
+func connectChanOfSlice(dst *<-chan []float32, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
@@ -76,10 +78,21 @@ func connectChanOfSlice(dst *<-chan []float32, src interface{}) {
 	}
 }
 
+func connectChanOfGpuFloats(dst *<-chan GpuFloats, src Chan) {
+	switch s := src.(type) {
+	default:
+		cannotConnect(dst, src)
+	case *[]chan<- GpuFloats:
+		ch := make(chan GpuFloats, DefaultBufSize())
+		*s = append(*s, ch)
+		*dst = ch
+	}
+}
+
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
+func connect3ChanOfSlice(dst *[3]<-chan []float32, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
@@ -93,7 +106,7 @@ func connect3ChanOfSlice(dst *[3]<-chan []float32, src interface{}) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
+func connectChanOfFloat64(dst *<-chan float64, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
@@ -104,7 +117,7 @@ func connectChanOfFloat64(dst *<-chan float64, src interface{}) {
 	}
 }
 
-func connect3ChanOfFloat64(dst *[3]<-chan float64, src interface{}) {
+func connect3ChanOfFloat64(dst *[3]<-chan float64, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
@@ -120,7 +133,11 @@ func connect3ChanOfFloat64(dst *[3]<-chan float64, src interface{}) {
 // 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
 func isInputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *<-chan []float32, *[3]<-chan []float32, *<-chan float64, *[3]<-chan float64:
+	case *<-chan []float32,
+		*[3]<-chan []float32,
+		*<-chan float64,
+		*[3]<-chan float64,
+		*<-chan GpuFloats:
 		return true
 	}
 	return false
@@ -131,7 +148,11 @@ func isInputChan(ptr interface{}) bool {
 // 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
 func isOutputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *[]chan<- []float32, *[3][]chan<- []float32, *[]chan<- float64, *[3][]chan<- float64:
+	case *[]chan<- []float32,
+		*[3][]chan<- []float32,
+		*[]chan<- float64,
+		*[3][]chan<- float64,
+		*[]chan<- GpuFloats:
 		return true
 	}
 	return false

@@ -36,7 +36,7 @@ func init() {
 	initCUDA()
 }
 
-func initLog(){
+func initLog() {
 	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
 	log.SetPrefix("#")
 }

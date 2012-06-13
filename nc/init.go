@@ -5,12 +5,15 @@ import (
 	"github.com/barnex/cuda4/cu"
 	"log"
 	"os"
+	"runtime/pprof"
 )
 
 var (
-	flag_version         = flag.Bool("V", false, "print version")
-	flag_maxwarp         = flag.Int("warp", MAX_WARP, "maximum elements per warp")
-	flag_sched   *string = flag.String("sched", "auto", "CUDA scheduling: auto|spin|yield|sync")
+	flag_version = flag.Bool("V", false, "print version")
+	flag_maxwarp = flag.Int("warp", MAX_WARP, "maximum elements per warp")
+	flag_sched   = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
+	flag_cpuprof = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
+	//flag_memprof    = flag.String("memprof", "", "Write gopprof memory profile to file")
 )
 
 var (
@@ -19,6 +22,8 @@ var (
 
 func init() {
 	flag.Parse()
+
+	initCpuProf()
 
 	if *flag_version {
 		PrintInfo(os.Stdout)
@@ -38,5 +43,31 @@ func initWarp() {
 }
 
 func initCUDA() {
+	var flag uint
+	switch *flag_sched {
+	default:
+		panic("sched flag: expecting auto,spin,yield or sync: " + *flag_sched)
+	case "auto":
+		flag = cu.CTX_SCHED_AUTO
+	case "spin":
+		flag = cu.CTX_SCHED_SPIN
+	case "yield":
+		flag = cu.CTX_SCHED_YIELD
+	case "sync":
+		flag = cu.CTX_BLOCKING_SYNC
+	}
+	cu.Init(0)
+	context = cu.CtxCreate(flag, 0)
+}
 
+func initCpuProf() {
+	if *flag_cpuprof != "" {
+		f, err := os.Create(*flag_cpuprof)
+		if err != nil {
+			Log(err)
+		}
+		Log("Writing CPU profile to", *flag_cpuprof)
+		pprof.StartCPUProfile(f)
+		// TODO: flush!
+	}
 }

@@ -4,10 +4,12 @@ package nc
 
 import (
 	"sync"
+
+//	"log"
 )
 
 var (
-	fresh    chan []float32 // used as fifo, replace by hand-written stack!
+	fresh    stack
 	refcount = make(map[*float32]int)
 	NumAlloc int
 	lock     sync.Mutex
@@ -54,48 +56,40 @@ func Buffer3() [3][]float32 {
 
 // not synchronized.
 func buffer() []float32 {
-	select {
-	case f := <-fresh:
+	if f := fresh.pop(); f != nil {
 		//log.Println("re-use", &f[0])
 		return f
-	default:
-		slice := make([]float32, WarpLen())
-		NumAlloc++
-		//log.Println("alloc", &slice[0])
-		refcount[&slice[0]] = 0
-		return slice
 	}
-	return nil // silence gc
+	slice := make([]float32, WarpLen())
+	NumAlloc++
+	//log.Println("alloc", &slice[0])
+	refcount[&slice[0]] = 0
+	return slice
 }
 
 func initGarbageman() {
-	fresh = make(chan []float32, 10*NumWarp()) // need big buffer to avoid spilling
+	//fresh = make(chan []float32, 10*NumWarp()) // need big buffer to avoid spilling
 }
 
 func Recycle(garbages ...[]float32) {
 	lock.Lock()
 
 	for _, g := range garbages {
-		//log.Println("Recycle(", &g[0], ")")
 		count, ok := refcount[&g[0]]
 		if !ok {
 			//log.Println("skipping", &g[0])
 			continue // slice does not originate from here
 		}
 		if count == 0 { // can be recycled
-			select {
-			case fresh <- g:
-				//log.Println("recycling", &g[0])
-			default:
-				//log.Println("spilling", &g[0])
-				delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
-			}
+			fresh.push(g)
+			//log.Println("spilling", &g[0])
+			//delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
 		} else { // cannot be recycled, just yet
 			//log.Println("decrementing", &g[0], ":", count-1)
 			refcount[&g[0]] = count - 1
 		}
-	}
 
+	}
 	lock.Unlock()
 }
 
@@ -103,4 +97,19 @@ func Recycle3(garbages ...[3][]float32) {
 	for _, g := range garbages {
 		Recycle(g[X], g[Y], g[Z])
 	}
+}
+
+type stack [][]float32
+
+func (s *stack) push(slice []float32) {
+	(*s) = append((*s), slice)
+}
+
+func (s *stack) pop() (slice []float32) {
+	if len(*s) == 0 {
+		return nil
+	}
+	slice = (*s)[len(*s)-1]
+	*s = (*s)[:len(*s)-1]
+	return
 }

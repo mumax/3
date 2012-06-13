@@ -74,7 +74,6 @@ func initGarbageman() {
 
 func Recycle(garbages ...[]float32) {
 	lock.Lock()
-	defer lock.Unlock()
 
 	for _, g := range garbages {
 		//log.Println("Recycle(", &g[0], ")")
@@ -96,6 +95,8 @@ func Recycle(garbages ...[]float32) {
 			refcount[&g[0]] = count - 1
 		}
 	}
+
+	lock.Unlock()
 }
 
 func Recycle3(garbages ...[3][]float32) {

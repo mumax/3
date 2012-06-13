@@ -80,6 +80,8 @@ func isConnected(field reflect.Value) bool {
 		return !field.Index(0).IsNil() // [3]chan is connected if elem 0 is connected
 	case field.Kind() == reflect.Chan:
 		return !field.IsNil() // chan is connected if not nil
+	case field.Kind() == reflect.Slice: // Output fanout
+		return !(field.Len() == 0)
 	}
 	panic(0)
 	return false // silence 6g
@@ -89,6 +91,7 @@ func isConnected(field reflect.Value) bool {
 // TODO: sources connected to the same dest box twice might also need checking
 func Vet(boxes ...Box) {
 	Register(boxes...)
+	ok := true
 	for _, box := range boxes {
 		val := reflect.ValueOf(box).Elem()
 		typ := val.Type()
@@ -101,26 +104,36 @@ func Vet(boxes ...Box) {
 				continue
 			}
 
-			// only consider input channels
+			// only consider channels
 			dst := field.Addr().Interface()
-			if !isInputChan(dst) {
+			if !isChan(dst) {
 				continue
 			}
 
-			// skip already connected destinations
+			// check connected
 			tag := string(typ.Field(i).Tag)
 			if !isConnected(field) {
 				log.Println("vet: not connected:", boxname(box), typ.Field(i).Name, tag)
+				ok = false
 			}
-
 		}
+	}
+	if !ok {
+		Panic("vet error(s)")
 	}
 }
 
 // Vet and Run all boxes.
 func GoRun(box ...Runner) {
+	// first vet all boxes at once
+	var boxes []Box
 	for _, b := range box {
-		Vet(b)
+		boxes = append(boxes, Box(b))
+	}
+	Vet(boxes...)
+
+	// only then run them
+	for _, b := range box {
 		log.Println("starting: " + boxname(b))
 		go b.Run()
 	}

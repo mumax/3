@@ -31,10 +31,10 @@ func main() {
 	WriteGraph("gpucopy")
 
 	//GoRun(source, to)
-	go func(){SetCudaCtx(); source.Run()}()
-	go func(){SetCudaCtx(); to.Run()}()
-	go func(){SetCudaCtx(); from.Run()}()
-	go func(){SetCudaCtx(); gpusink.Run()}()
+	go func() { SetCudaCtx(); source.Run() }()
+	go func() { SetCudaCtx(); to.Run() }()
+	go func() { SetCudaCtx(); from.Run() }()
+	go func() { SetCudaCtx(); gpusink.Run() }()
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
@@ -90,4 +90,3 @@ func (box *GpuSink) Run() {
 		RecycleGpu(RecvGpu(box.Input))
 	}
 }
-

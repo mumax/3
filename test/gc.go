@@ -52,13 +52,13 @@ func (box *Sink) Run(n int) {
 	}
 }
 
-type Pass struct{
-	Input <-chan []float32
+type Pass struct {
+	Input  <-chan []float32
 	Output []chan<- []float32
 }
 
-func (box*Pass)Run(){
-	for{
+func (box *Pass) Run() {
+	for {
 		in := Recv(box.Input)
 		out := Buffer()
 		copy(out, in)

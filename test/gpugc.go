@@ -1,9 +1,9 @@
 package main
 
 import (
-	. "nimble-cube/nc"
 	"fmt"
 	"log"
+	. "nimble-cube/nc"
 	"os"
 )
 
@@ -51,4 +51,3 @@ func (box *GpuSink) Run(n int) {
 		RecycleGpu(RecvGpu(box.Input))
 	}
 }
-

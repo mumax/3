@@ -17,7 +17,7 @@ var (
 )
 
 var (
-	context cu.Context // gpu context to be used by all threads
+	cudaCtx cu.Context // gpu context to be used by all threads
 )
 
 func init() {
@@ -56,8 +56,9 @@ func initCUDA() {
 	case "sync":
 		flag = cu.CTX_BLOCKING_SYNC
 	}
+	Log("initializing CUDA")
 	cu.Init(0)
-	context = cu.CtxCreate(flag, 0)
+	cudaCtx = cu.CtxCreate(flag, 0)
 }
 
 func initCpuProf() {

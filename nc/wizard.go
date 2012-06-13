@@ -98,7 +98,10 @@ func GoRun(box ...Runner) {
 	// only then run them
 	for _, b := range box {
 		Debug("starting: " + boxname(b))
-		go b.Run()
+		go func() {
+			cudaCtx.SetCurrent()
+			b.Run()
+		}()
 	}
 }
 

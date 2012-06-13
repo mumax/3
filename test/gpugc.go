@@ -14,12 +14,15 @@ func main() {
 
 	source := new(Source)
 	sink := new(Sink)
-	Register(source, sink)
+	sink2 := new(Sink)
+	Register(source, sink, sink2)
 
 	Connect(&sink.Input, &source.Output)
+	Connect(&sink2.Input, &source.Output)
 	WriteGraph("gc")
 
 	GoRun(source)
+	go sink2.Run(100)
 	sink.Run(100)
 
 	fmt.Println("NumGpuAlloc:", NumGpuAlloc)

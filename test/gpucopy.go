@@ -54,9 +54,9 @@ type Source struct {
 func (box *Source) Run() {
 	Debug("run source")
 	for {
-		Debug("sending")
+		Debug("source sending")
 		Send(box.Output, Buffer())
-		Debug("sent")
+		Debug("source sent")
 	}
 }
 

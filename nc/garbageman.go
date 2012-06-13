@@ -3,7 +3,6 @@ package nc
 // Garbageman recycles garbage slices.
 
 import (
-	//"log"
 	"sync"
 )
 
@@ -14,6 +13,7 @@ var (
 	lock     sync.Mutex
 )
 
+// increment the reference count by count.
 func incr(s []float32, count int) {
 	lock.Lock()
 	defer lock.Unlock()
@@ -23,6 +23,7 @@ func incr(s []float32, count int) {
 	Assert(len(refcount) == NumAlloc)
 }
 
+// increment the reference count by count.
 func incr3(s [3][]float32, count int) {
 	lock.Lock()
 	defer lock.Unlock()
@@ -33,10 +34,26 @@ func incr3(s [3][]float32, count int) {
 	}
 }
 
+// Return a buffer, recycle an old one if possible.
+// Buffers created in this way should be Recyle()d
+// when not used anymore, i.e., if not Send() elsewhere.
 func Buffer() []float32 {
 	lock.Lock()
-	defer lock.Unlock()
+	b := buffer()
+	lock.Unlock()
+	return b
+}
 
+// See Buffer()
+func Buffer3() [3][]float32 {
+	lock.Lock()
+	b := [3][]float32{buffer(), buffer(), buffer()}
+	lock.Unlock()
+	return b
+}
+
+// not synchronized.
+func buffer() []float32 {
 	select {
 	case f := <-fresh:
 		//log.Println("re-use", &f[0])
@@ -49,10 +66,6 @@ func Buffer() []float32 {
 		return slice
 	}
 	return nil // silence gc
-}
-
-func Buffer3() [3][]float32 {
-	return [3][]float32{Buffer(), Buffer(), Buffer()}
 }
 
 func initGarbageman() {

@@ -5,6 +5,7 @@ import (
 	"github.com/barnex/cuda4/cu"
 	"log"
 	"os"
+	"runtime"
 	"runtime/pprof"
 )
 
@@ -66,6 +67,7 @@ func initCUDA() {
 }
 
 func SetCudaCtx() {
+	runtime.LockOSThread() // TODO: may kill multi-threading performance, set only in GPU boxes?
 	cudaCtx.SetCurrent()
 }
 

@@ -2,9 +2,7 @@ package nc
 
 // Globals
 
-import (
-	"log"
-)
+import ()
 
 var (
 	size  [3]int // 3D geom size
@@ -19,8 +17,8 @@ func InitSize(N0, N1, N2 int) {
 	size = [3]int{N0, N1, N2}
 	n = N0 * N1 * N2
 
-	log.Println("Size:", size)
-	log.Println("N:", n)
+	Log("Size:", size)
+	Debug("N:", n)
 
 	// Find some nice warp size
 	warp = MAX_WARP
@@ -28,9 +26,9 @@ func InitSize(N0, N1, N2 int) {
 	for n%warp != 0 {
 		warp--
 	}
-	log.Println("WarpLen:", warp)
+	Debug("WarpLen:", warp)
 	nWarp = n / warp
-	log.Println("NumWarp:", nWarp)
+	Debug("NumWarp:", nWarp)
 }
 
 func DefaultBufSize() int {

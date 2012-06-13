@@ -3,7 +3,6 @@ package nc
 // Vets for bad connections between boxes.
 
 import (
-	"log"
 	"reflect"
 	"unicode"
 )
@@ -34,7 +33,7 @@ func Vet(boxes ...Box) {
 			// check connected
 			tag := string(typ.Field(i).Tag)
 			if !isConnected(field) {
-				log.Println("vet: not connected:", boxname(box), typ.Field(i).Name, tag)
+				Error("vet: not connected:", boxname(box), typ.Field(i).Name, tag)
 				ok = false
 			}
 		}

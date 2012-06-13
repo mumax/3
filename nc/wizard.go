@@ -5,7 +5,6 @@ package nc
 // Only channels with the same struct tag are connected.
 
 import (
-	"log"
 	"reflect"
 	"unicode"
 )
@@ -37,7 +36,7 @@ func AutoConnect(boxes ...Box) {
 
 			// skip unexported
 			if unicode.IsLower(rune(typ.Field(i).Name[0])) {
-				log.Println("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": unexported")
+				Debug("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": unexported")
 				continue
 			}
 
@@ -50,23 +49,23 @@ func AutoConnect(boxes ...Box) {
 			// skip untagged fields
 			tag := string(typ.Field(i).Tag)
 			if tag == "" {
-				log.Println("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": no struct tag")
+				Debug("autoconnect: skipping", boxname(box), typ.Field(i).Name, ": no struct tag")
 				continue
 			}
 
 			// skip already connected destinations
 			if isConnected(field) {
-				log.Println("autoconnect: skipping", boxname(box), tag, ": already connected")
+				Debug("autoconnect: skipping", boxname(box), tag, ": already connected")
 				continue
 			}
 
 			// now the easy part: actually connect.
 			src := chanOfTag[tag]
 			if src != nil {
-				log.Println("autoconnect:", boxname(box), tag, "<-", channame(src))
+				Log("autoconnect:", boxname(box), tag, "<-", channame(src))
 				Connect(dst, src)
 			} else {
-				log.Println("autoconnect: no source for", boxname(box), tag, channame(dst))
+				Log("autoconnect: no source for", boxname(box), tag, channame(dst))
 			}
 		}
 	}
@@ -98,7 +97,7 @@ func GoRun(box ...Runner) {
 
 	// only then run them
 	for _, b := range box {
-		log.Println("starting: " + boxname(b))
+		Debug("starting: " + boxname(b))
 		go b.Run()
 	}
 }

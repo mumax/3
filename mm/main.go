@@ -20,6 +20,7 @@ func Main() {
 
 	Connect(&avg.Input, &solver.MOut)
 	Connect(&table.Input, &avg.Output[X])
+	Connect(&torque.Alpha, &alpha.Output)
 
 	AutoConnect(torque, alpha, heff, avg, table, solver)
 	AutoRun()

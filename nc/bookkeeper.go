@@ -5,7 +5,6 @@ package nc
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 	"unicode"
@@ -60,7 +59,7 @@ func WriteGraph(file string) {
 // Register a connection to appear in WriteGraph()
 func registerConn(dst, src Chan) {
 	connections = append(connections, [2]Chan{dst, src})
-	//log.Println("connect", boxname(boxOfChan[dst]), tagOfChan[dst], channame(dst),
+	//Log("connect", boxname(boxOfChan[dst]), tagOfChan[dst], channame(dst),
 	//"<-", boxname(boxOfChan[src]), tagOfChan[src], channame(src))
 }
 
@@ -114,7 +113,7 @@ func registerBox(box Box) {
 		if isOutputChan(ptr) && tag != "" {
 			tagOfChan[ptr] = tag
 			chanOfTag[tag] = ptr // TODO: check multiple-defined
-			log.Println("tag of chan " + channame(ptr) + " = " + tag)
+			Debug("tag of chan " + channame(ptr) + " = " + tag)
 		}
 	}
 }

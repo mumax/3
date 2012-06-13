@@ -21,7 +21,7 @@ func (dot *graphvizwriter) Init(fname string) {
 	dot.fname = fname
 	var err error
 	dot.out, err = os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	CheckLog(err)
+	LogErr(err)
 	dot.Println("digraph dot{")
 	dot.Println("rankdir=LR")
 }
@@ -45,7 +45,7 @@ func (dot *graphvizwriter) Close() {
 	dot.Println("}")
 	dot.out.Close()
 	err := exec.Command("dot", "-O", "-Tpdf", dot.fname).Run()
-	CheckLog(err)
+	LogErr(err)
 }
 
 // replaces characters that graphviz cannot handle as labels.

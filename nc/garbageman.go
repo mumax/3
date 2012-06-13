@@ -4,12 +4,10 @@ package nc
 
 import (
 	"sync"
-
-//	"log"
 )
 
 var (
-	fresh    stack
+	recycled stack
 	refcount = make(map[*float32]int)
 	NumAlloc int
 	lock     sync.Mutex
@@ -56,7 +54,7 @@ func Buffer3() [3][]float32 {
 
 // not synchronized.
 func buffer() []float32 {
-	if f := fresh.pop(); f != nil {
+	if f := recycled.pop(); f != nil {
 		//log.Println("re-use", &f[0])
 		return f
 	}
@@ -65,10 +63,6 @@ func buffer() []float32 {
 	//log.Println("alloc", &slice[0])
 	refcount[&slice[0]] = 0
 	return slice
-}
-
-func initGarbageman() {
-	//fresh = make(chan []float32, 10*NumWarp()) // need big buffer to avoid spilling
 }
 
 func Recycle(garbages ...[]float32) {
@@ -81,7 +75,7 @@ func Recycle(garbages ...[]float32) {
 			continue // slice does not originate from here
 		}
 		if count == 0 { // can be recycled
-			fresh.push(g)
+			recycled.push(g)
 			//log.Println("spilling", &g[0])
 			//delete(refcount, &g[0]) // allow it to be GC'd TODO: spilltest
 		} else { // cannot be recycled, just yet

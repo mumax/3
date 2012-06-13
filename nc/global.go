@@ -31,9 +31,6 @@ func InitSize(N0, N1, N2 int) {
 	log.Println("WarpLen:", warp)
 	nWarp = n / warp
 	log.Println("NumWarp:", nWarp)
-
-	initGarbageman()
-
 }
 
 func DefaultBufSize() int {

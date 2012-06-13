@@ -98,13 +98,12 @@ func GoRun(box ...Runner) {
 
 	// only then run them
 	for _, b := range box {
-		go func() {
-			//Debug("setting cuda context")
-			//setCudaCtx()
+		go func(b Runner) {
+			Debug("setting cuda context")
+			SetCudaCtx()
 			Debug("starting: " + boxname(b))
 			b.Run()
-			//Debug("started: " + boxname(b))
-		}()
+		}(b) // damn you closures, damn you.
 	}
 }
 

@@ -30,11 +30,11 @@ func main() {
 	Vet(source, to, sink, gpusink)
 	WriteGraph("gpucopy")
 
-	//GoRun(source, to)
-	go func() { SetCudaCtx(); source.Run() }()
-	go func() { SetCudaCtx(); to.Run() }()
-	go func() { SetCudaCtx(); from.Run() }()
-	go func() { SetCudaCtx(); gpusink.Run() }()
+	GoRun(source, to, from, gpusink)
+//	go func() { SetCudaCtx(); source.Run() }()
+//	go func() { SetCudaCtx(); to.Run() }()
+//	go func() { SetCudaCtx(); from.Run() }()
+//	go func() { SetCudaCtx(); gpusink.Run() }()
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)

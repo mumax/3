@@ -67,6 +67,7 @@ func initCUDA() {
 }
 
 func SetCudaCtx() {
+	Debug("setting cuda context on locked os thread")
 	runtime.LockOSThread() // TODO: may kill multi-threading performance, set only in GPU boxes?
 	cudaCtx.SetCurrent()
 }

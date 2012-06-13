@@ -21,6 +21,7 @@ func NewToGpuBox() *ToGpuBox {
 }
 
 func (box *ToGpuBox) Run() {
+	SetCudaCtx()
 	for {
 		in := Recv(box.Input)
 		buffer := GpuBuffer()

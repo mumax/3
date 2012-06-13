@@ -59,6 +59,10 @@ type Pass struct{
 
 func (box*Pass)Run(){
 	for{
-		Send(box.Output, Recv(box.Input))
+		in := Recv(box.Input)
+		out := Buffer()
+		copy(out, in)
+		Recycle(in)
+		Send(box.Output, out)
 	}
 }

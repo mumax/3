@@ -26,6 +26,7 @@ func incr(s []float32, count int) {
 }
 
 func incrGpu(s GpuFloats, count int) {
+	Debug("incrgpu", s, count)
 	gpulock.Lock()
 	if prev, ok := gpuRefcount[s]; ok {
 		gpuRefcount[s] = prev + count

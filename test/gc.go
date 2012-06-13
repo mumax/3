@@ -14,11 +14,15 @@ func main() {
 
 	source := new(Source)
 	sink := new(Sink)
+	pass := new(Pass)
+	Register(source, pass, sink)
 
-	AutoConnect(source, sink)
-	//WriteGraph()
+	Connect(&sink.Input, &pass.Output)
+	Connect(&pass.Input, &source.Output)
+	WriteGraph("gc")
 
 	go source.Run()
+	go pass.Run()
 	sink.Run(100)
 
 	fmt.Println("NumAlloc:", NumAlloc)
@@ -28,7 +32,7 @@ func main() {
 }
 
 type Source struct {
-	Output []chan<- []float32 "data"
+	Output []chan<- []float32
 }
 
 func (box *Source) Run() {
@@ -38,12 +42,23 @@ func (box *Source) Run() {
 }
 
 type Sink struct {
-	Input <-chan []float32 "data"
+	Input <-chan []float32
 }
 
 func (box *Sink) Run(n int) {
 	for i := 0; i < n; i++ {
 		log.Println("step", i)
 		Recycle(Recv(box.Input))
+	}
+}
+
+type Pass struct{
+	Input <-chan []float32
+	Output []chan<- []float32
+}
+
+func (box*Pass)Run(){
+	for{
+		Send(box.Output, Recv(box.Input))
 	}
 }

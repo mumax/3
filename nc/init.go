@@ -65,6 +65,10 @@ func initCUDA() {
 	cudaCtx = cu.CtxCreate(flag, 0)
 }
 
+func SetCudaCtx() {
+	cudaCtx.SetCurrent()
+}
+
 func initCpuProf() {
 	if *flag_cpuprof != "" {
 		f, err := os.Create(*flag_cpuprof)

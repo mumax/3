@@ -12,14 +12,14 @@ func main() {
 	n := 1
 	InitSize(n, n, n)
 
-	source := new(Source)
-	sink := new(Sink)
-	sink2 := new(Sink)
+	source := new(GpuSource)
+	sink := new(GpuSink)
+	sink2 := new(GpuSink)
 	Register(source, sink, sink2)
 
 	Connect(&sink.Input, &source.Output)
 	Connect(&sink2.Input, &source.Output)
-	WriteGraph("gc")
+	WriteGraph("gpugc")
 
 	GoRun(source)
 	go sink2.Run(100)
@@ -31,21 +31,21 @@ func main() {
 	}
 }
 
-type Source struct {
+type GpuSource struct {
 	Output []chan<- GpuFloats
 }
 
-func (box *Source) Run() {
+func (box *GpuSource) Run() {
 	for {
 		SendGpu(box.Output, GpuBuffer())
 	}
 }
 
-type Sink struct {
+type GpuSink struct {
 	Input <-chan GpuFloats
 }
 
-func (box *Sink) Run(n int) {
+func (box *GpuSink) Run(n int) {
 	for i := 0; i < n; i++ {
 		log.Println("step", i)
 		RecycleGpu(RecvGpu(box.Input))

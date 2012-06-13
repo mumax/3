@@ -87,6 +87,7 @@ func isConnected(field reflect.Value) bool {
 }
 
 // Vet and Run all boxes.
+// TODO: buggy??
 func GoRun(box ...Runner) {
 	// first vet all boxes at once
 	var boxes []Box
@@ -97,10 +98,12 @@ func GoRun(box ...Runner) {
 
 	// only then run them
 	for _, b := range box {
-		Debug("starting: " + boxname(b))
 		go func() {
-			cudaCtx.SetCurrent()
+			//Debug("setting cuda context")
+			//setCudaCtx()
+			Debug("starting: " + boxname(b))
 			b.Run()
+			//Debug("started: " + boxname(b))
 		}()
 	}
 }

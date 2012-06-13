@@ -7,10 +7,12 @@ import (
 )
 
 var (
-	recycled stack
-	refcount = make(map[*float32]int)
-	NumAlloc int
-	lock     sync.Mutex
+	recycled              stack
+	gpuRecycled           gpuStack
+	refcount              = make(map[*float32]int)
+	gpuRefcount           = make(map[GpuFloats]int)
+	NumAlloc, NumGpuAlloc int
+	lock                  sync.Mutex
 )
 
 // increment the reference count by count.
@@ -21,6 +23,15 @@ func incr(s []float32, count int) {
 	}
 	lock.Unlock()
 	//Assert(len(refcount) == NumAlloc)
+}
+
+func incrGpu(s GpuFloats, count int) {
+	lock.Lock()
+	if prev, ok := gpuRefcount[s]; ok {
+		gpuRefcount[s] = prev + count
+	}
+	lock.Unlock()
+	Assert(len(gpuRefcount) == NumGpuAlloc)
 }
 
 // increment the reference count by count.
@@ -44,6 +55,13 @@ func Buffer() []float32 {
 	return b
 }
 
+func GpuBuffer() GpuFloats {
+	lock.Lock()
+	b := gpuBuffer()
+	lock.Unlock()
+	return b
+}
+
 // See Buffer()
 func Buffer3() [3][]float32 {
 	lock.Lock()
@@ -62,6 +80,18 @@ func buffer() []float32 {
 	NumAlloc++
 	//log.Println("alloc", &slice[0])
 	refcount[&slice[0]] = 0
+	return slice
+}
+
+func gpuBuffer() GpuFloats {
+	if f := gpuRecycled.pop(); f != 0 {
+		Debug("re-use", f)
+		return f
+	}
+	slice := MakeGpuFloats(WarpLen())
+	NumGpuAlloc++
+	Debug("alloc", slice)
+	gpuRefcount[slice] = 0
 	return slice
 }
 
@@ -91,19 +121,4 @@ func Recycle3(garbages ...[3][]float32) {
 	for _, g := range garbages {
 		Recycle(g[X], g[Y], g[Z])
 	}
-}
-
-type stack [][]float32
-
-func (s *stack) push(slice []float32) {
-	(*s) = append((*s), slice)
-}
-
-func (s *stack) pop() (slice []float32) {
-	if len(*s) == 0 {
-		return nil
-	}
-	slice = (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
-	return
 }

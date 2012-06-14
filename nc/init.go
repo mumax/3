@@ -23,6 +23,8 @@ func init() {
 
 	initLog()
 
+	Debug("initializing")
+
 	initGOMAXPROCS()
 
 	initCpuProf()
@@ -57,11 +59,10 @@ func initWarp() {
 func initCpuProf() {
 	if *flag_cpuprof != "" {
 		f, err := os.Create(*flag_cpuprof)
-		if err != nil {
-			Log(err)
-		}
+		PanicErr(err)
 		Log("Writing CPU profile to", *flag_cpuprof)
-		pprof.StartCPUProfile(f)
-		// TODO: flush!
+		err = pprof.StartCPUProfile(f)
+		PanicErr(err)
+		AtExit(pprof.StopCPUProfile)
 	}
 }

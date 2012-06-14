@@ -39,4 +39,5 @@ func main() {
 	fmt.Println("# N	warp	ms/step")
 	fmt.Println(n*n*n, "\t", WarpLen(), "\t", float64(duration)/(1e9))
 
+	CleanExit()
 }

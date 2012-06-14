@@ -7,10 +7,16 @@ import (
 )
 
 func initCUDA() {
-
 	gomaxprocs = runtime.GOMAXPROCS(0)
 	Debug("GOMAXPROCS:", gomaxprocs)
 
+	// If we're not using CUDA, we should not ask CUDA to page-lock.
+	if !*flag_cuda {
+		*flag_pagelock = false
+		return
+	}
+
+	Log("initializing CUDA")
 	var flag uint
 	switch *flag_sched {
 	default:
@@ -24,7 +30,6 @@ func initCUDA() {
 	case "sync":
 		flag = cu.CTX_BLOCKING_SYNC
 	}
-	Log("initializing CUDA")
 	cu.Init(0)
 	cudaCtx = cu.CtxCreate(flag, 0)
 }
@@ -39,6 +44,9 @@ var (
 // Cheap function that assures the cuda context is set for this thread.
 // To be called before any cuda function.
 func SetCudaCtx() {
+	if cudaCtx == 0 {
+		return // allow to run if there's no GPU.
+	}
 	culock.Lock()
 	defer culock.Unlock()
 	if true { //cuprocs != gomaxprocs {

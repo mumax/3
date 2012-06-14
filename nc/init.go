@@ -10,6 +10,7 @@ import (
 
 var (
 	flag_version  = flag.Bool("V", false, "print version")
+	flag_cuda     = flag.Bool("cuda", true, "use CUDA")
 	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
 	flag_pagelock = flag.Bool("lock", true, "enable CUDA memeory page-locking")
 	flag_maxwarp  = flag.Int("warp", MAX_WARP, "maximum elements per warp")

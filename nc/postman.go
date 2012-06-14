@@ -28,10 +28,17 @@ func SendFloat64(fanout []chan<- float64, value float64) {
 // Send to channels with bookkeeping. 
 // Should always be used instead of the <- operator.
 func Send(fanout []chan<- []float32, value []float32) {
+	// safety first
 	if len(fanout) == 0 {
 		panic("Send to nil")
 	}
-	incr(value, len(fanout)-1) // Send adds len() copies, but removes one as sender looses a reference.
+
+	// reference counting: Send adds len() copies, but removes one as sender looses a reference.
+	count := len(fanout) - 1
+	if count != 0 { // many are 0
+		incr(value, count)
+	}
+
 	for _, ch := range fanout {
 		ch <- value
 	}
@@ -41,7 +48,12 @@ func SendGpu(fanout []chan<- GpuFloats, value GpuFloats) {
 	if len(fanout) == 0 {
 		panic("Send to nil")
 	}
-	incrGpu(value, len(fanout)-1)
+
+	count := len(fanout) - 1
+	if count != 0 {
+		incrGpu(value, count)
+	}
+
 	for _, ch := range fanout {
 		ch <- value
 	}
@@ -51,7 +63,10 @@ func Send3(fanout [3][]chan<- []float32, value [3][]float32) {
 	if len(fanout[X]) == 0 {
 		panic("Send to nil")
 	}
-	incr3(value, len(fanout[X])-1)
+	count := len(fanout[X]) - 1
+	if count != 0 {
+		incr3(value, count)
+	}
 	for comp := 0; comp < 3; comp++ {
 		for _, ch := range fanout[comp] {
 			ch <- value[comp]

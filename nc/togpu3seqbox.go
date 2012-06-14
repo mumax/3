@@ -1,8 +1,8 @@
 package nc
 
 import (
-	"github.com/barnex/cuda4/cu"
-	"unsafe"
+//"github.com/barnex/cuda4/cu"
+//"unsafe"
 )
 
 // Copies a 3-vector to GPU,
@@ -24,13 +24,6 @@ func NewToGpu3SeqBox() *ToGpu3SeqBox {
 
 func (box *ToGpu3SeqBox) Run() {
 	for {
-		in := Recv(box.Input)
-		buffer := GpuBuffer()
-		SetCudaCtx()
-		cu.MemcpyHtoDAsync(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]),
-			cu.SIZEOF_FLOAT32*int64(WarpLen()), box.stream)
-		box.stream.Synchronize()
-		Recycle(in)
-		SendGpu(box.Output, buffer)
+
 	}
 }

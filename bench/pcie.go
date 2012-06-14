@@ -39,6 +39,8 @@ func main() {
 	MB := float64((8 * int64(N()) * runs) / 1e6)
 	seconds := float64(duration) / 1e9
 	fmt.Println(N(), "\t", WarpLen(), "\t", MB, seconds, float64(MB)/seconds)
+
+	CleanExit()
 }
 
 type Source struct {

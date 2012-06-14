@@ -26,7 +26,7 @@ gccgotest:
 testdir:
 	make -C test
 
-bench: 6gbench gccgobench
+bench: 6gbench gccgobench benchdir
 
 6gbench:
 	go test -bench=. nimble-cube/nc
@@ -35,6 +35,9 @@ bench: 6gbench gccgobench
 gccgobench:
 	go test -bench=. -compiler $(GCCGO) nimble-cube/nc
 	go test -bench=. -compiler $(GCCGO) nimble-cube/mm
+
+benchdir:
+	make -C bench
 
 clean:
 	go clean

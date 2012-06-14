@@ -15,7 +15,7 @@ var (
 	flag_maxwarp  = flag.Int("warp", MAX_WARP, "maximum elements per warp")
 	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
-	//flag_memprof    = flag.String("memprof", "", "Write gopprof memory profile to file")
+	flag_memprof  = flag.String("memprof", "", "Write gopprof memory profile to file")
 )
 
 func init() {
@@ -28,6 +28,8 @@ func init() {
 	initGOMAXPROCS()
 
 	initCpuProf()
+
+	initMemProf()
 
 	if *flag_version {
 		PrintInfo(os.Stdout)
@@ -64,5 +66,16 @@ func initCpuProf() {
 		err = pprof.StartCPUProfile(f)
 		PanicErr(err)
 		AtExit(pprof.StopCPUProfile)
+	}
+}
+func initMemProf() {
+	if *flag_memprof != "" {
+		AtExit(func() {
+			f, err := os.Create(*flag_memprof)
+			defer f.Close()
+			PanicErr(err)
+			Log("Writing memory profile to", *flag_memprof)
+			pprof.WriteHeapProfile(f)
+		})
 	}
 }

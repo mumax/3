@@ -26,7 +26,7 @@ func incr(s []float32, count int) {
 }
 
 func incrGpu(s GpuFloats, count int) {
-	Debug("incrgpu", s, count)
+	//Debug("incrgpu", s, count)
 	gpulock.Lock()
 	if prev, ok := gpuRefcount[s]; ok {
 		gpuRefcount[s] = prev + count
@@ -86,12 +86,12 @@ func buffer() []float32 {
 
 func gpuBuffer() GpuFloats {
 	if f := gpuRecycled.pop(); f != 0 {
-		Debug("re-use", f)
+		//Debug("re-use", f)
 		return f
 	}
 	slice := MakeGpuFloats(WarpLen())
 	NumGpuAlloc++
-	Debug("alloc", slice)
+	//Debug("alloc", slice)
 	gpuRefcount[slice] = 0
 	return slice
 }
@@ -124,14 +124,14 @@ func RecycleGpu(garbages ...GpuFloats) {
 	for _, g := range garbages {
 		count, ok := gpuRefcount[g]
 		if !ok {
-			Debug("skipping", g)
+			//Debug("skipping", g)
 			continue // slice does not originate from here
 		}
 		if count == 0 { // can be recycled
 			gpuRecycled.push(g)
-			Debug("recycling", g)
+			//Debug("recycling", g)
 		} else { // cannot be recycled, just yet
-			Debug("decrementing", g, ":", count-1)
+			//Debug("decrementing", g, ":", count-1)
 			gpuRefcount[g] = count - 1
 		}
 

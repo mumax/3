@@ -2,9 +2,7 @@ package main
 
 import (
 	. "nimble-cube/nc"
-	//"runtime"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -48,11 +46,14 @@ type Source struct {
 }
 
 func (box *Source) Run() {
-	Debug("run source")
+	count:=0
 	for {
-		Debug("source sending")
-		Send(box.Output, Buffer())
-		Debug("source sent")
+		b:=Buffer()
+		for i:=range b{
+			b[i]=float32(count)
+			count++
+		}		
+		Send(box.Output,b )
 	}
 }
 
@@ -61,9 +62,15 @@ type Sink struct {
 }
 
 func (box *Sink) Run(n int) {
-	for i := 0; i < n; i++ {
-		log.Println("step", i)
-		Recycle(Recv(box.Input))
+	count:=0
+	for s := 0; s < n; s++ {
+		in:= Recv(box.Input)
+		//Debug(in)
+		for i:=range in{
+			if in[i] != float32(count){Panic(in)}
+		count++
+		}	
+		Recycle(in)
 	}
 }
 

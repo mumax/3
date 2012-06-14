@@ -30,6 +30,9 @@ func main() {
 	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}
 	Memset3(m0, Vector{0.1, 0.99, 0})
 
+	// warmup
+	solver.Run(m0, 1)
+
 	start := time.Now()
 	solver.Run(m0, 1000)
 	duration := time.Now().Sub(start)

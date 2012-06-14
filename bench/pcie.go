@@ -28,6 +28,9 @@ func main() {
 	Register(sink)
 	WriteGraph("pcie")
 
+	// warmup
+	sink.Run(1)
+
 	const runs = 100
 	start := time.Now()
 	sink.Run(runs)

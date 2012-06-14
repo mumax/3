@@ -1,9 +1,13 @@
-all:
-	go build gpucopy.go
-	go build gc.go
-	go build gc2.go
-	go build gc3.go
-	go run gpucopy.go
-	go run gc.go
-	go run gc2.go
-	go run gc3.go
+GOFILES = $(wildcard *.go)
+
+all: $(GOFILES)
+
+.PHONY: $(GOFILES)
+$(GOFILES):
+	go run $(@)
+
+.PHONY: clean
+clean:
+	rm -f $(GOFILES:.go=)
+	rm -f $(GOFILES:.go=.dot)
+	rm -f $(GOFILES:.go=.dot.pdf)

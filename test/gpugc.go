@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	. "nimble-cube/nc"
 	"os"
 )
@@ -49,7 +48,7 @@ type GpuSink struct {
 func (box *GpuSink) Run(n int) {
 	SetCudaCtx()
 	for i := 0; i < n; i++ {
-		log.Println("step", i)
+		//log.Println("step", i)
 		RecycleGpu(RecvGpu(box.Input))
 	}
 }

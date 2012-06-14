@@ -25,6 +25,7 @@ func (box *ToGpuBox) Run() {
 	for {
 		in := Recv(box.Input)
 		buffer := GpuBuffer()
+		SetCudaCtx()
 		cu.MemcpyHtoDAsync(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]),
 			cu.SIZEOF_FLOAT32*int64(WarpLen()), box.stream)
 		box.stream.Synchronize()

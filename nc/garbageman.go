@@ -82,6 +82,7 @@ func buffer() []float32 {
 	slice := make([]float32, WarpLen())
 
 	if *flag_pagelock {
+		SetCudaCtx()
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]),
 			int64(len(slice))*cu.SIZEOF_FLOAT32,
 			cu.MEMHOSTREGISTER_PORTABLE)

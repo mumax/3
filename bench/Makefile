@@ -1,4 +1,8 @@
-.PHONY: all
-all:
-	go build *.go
-	./run.bash
+GOFILES=$(wildcard *.go)
+
+all: $(GOFILES)
+
+.PHONY: $(GOFILES)
+$(GOFILES):
+	go build $(@)
+	./$(@:.go=.bash)

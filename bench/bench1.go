@@ -12,7 +12,7 @@ import (
 func main() {
 
 	n, err := strconv.Atoi(flag.Arg(0))
-	CheckIO(err)
+	PanicErr(err)
 	InitSize(n, n, n)
 
 	torque := new(LLGBox)
@@ -21,7 +21,8 @@ func main() {
 	solver := new(EulerBox)
 	//solver.dt = 0.01
 
-	AutoConnect(torque, alpha, heff, solver, alpha)
+	Connect(&torque.Alpha, &alpha.Output)
+	AutoConnect(torque, heff, solver, alpha)
 	AutoRun()
 	WriteGraph("bench1")
 

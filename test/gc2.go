@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"nimble-cube/mm"
 	. "nimble-cube/nc"
 	"os"
@@ -52,7 +51,7 @@ type Sink struct {
 
 func (box *Sink) Run(n int) {
 	for i := 0; i < n; i++ {
-		log.Println("step", i)
+		//log.Println("step", i)
 		Recycle(Recv(box.Input))
 	}
 }

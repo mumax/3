@@ -22,7 +22,9 @@ func InitSize(N0, N1, N2 int) {
 
 	// Find some nice warp size
 	warp = MAX_WARP
-	Assert(warp >= 1)
+	if warp < 1 {
+		Panic("invalid warp size:", warp)
+	}
 	for n%warp != 0 {
 		warp--
 	}

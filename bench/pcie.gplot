@@ -3,6 +3,7 @@ set term svg;
 set output "pcie.svg";
 set xlabel "warp (MB)";
 set ylabel "bandwidth (MB/s)";
+set log x;
 set key off;
 plot "pcie.txt" u (4*$2/1e6):5 w lines
 set output;

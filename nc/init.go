@@ -10,10 +10,11 @@ import (
 )
 
 var (
-	flag_version = flag.Bool("V", false, "print version")
-	flag_maxwarp = flag.Int("warp", MAX_WARP, "maximum elements per warp")
-	flag_sched   = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
-	flag_cpuprof = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
+	flag_version  = flag.Bool("V", false, "print version")
+	flag_maxwarp  = flag.Int("warp", MAX_WARP, "maximum elements per warp")
+	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
+	flag_pagelock = flag.Bool("lock", true, "enable CUDA memeory page-locking")
+	flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	//flag_memprof    = flag.String("memprof", "", "Write gopprof memory profile to file")
 )
 

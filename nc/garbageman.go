@@ -3,7 +3,9 @@ package nc
 // Garbageman recycles garbage slices.
 
 import (
+	"github.com/barnex/cuda4/cu"
 	"sync"
+	"unsafe"
 )
 
 var (
@@ -78,6 +80,13 @@ func buffer() []float32 {
 		return f
 	}
 	slice := make([]float32, WarpLen())
+
+	if *flag_pagelock {
+		cu.MemHostRegister(unsafe.Pointer(&slice[0]),
+			int64(len(slice))*cu.SIZEOF_FLOAT32,
+			cu.MEMHOSTREGISTER_PORTABLE)
+	}
+
 	NumAlloc++
 	//log.Println("alloc", &slice[0])
 	refcount[&slice[0]] = 0

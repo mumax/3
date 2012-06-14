@@ -8,5 +8,6 @@ import (
 type GpuFloats cu.DevicePtr
 
 func MakeGpuFloats(length int) GpuFloats {
+	SetCudaCtx()
 	return GpuFloats(cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(length)))
 }

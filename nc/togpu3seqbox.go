@@ -1,8 +1,8 @@
 package nc
 
 import (
-//"github.com/barnex/cuda4/cu"
-//"unsafe"
+	//"github.com/barnex/cuda4/cu"
+	//"unsafe"
 )
 
 // Copies a 3-vector to GPU,
@@ -24,6 +24,6 @@ func NewToGpu3SeqBox() *ToGpu3SeqBox {
 
 func (box *ToGpu3SeqBox) Run() {
 	for {
-
+		selecting over input channels is safe according to postman.
 	}
 }

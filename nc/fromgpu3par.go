@@ -10,7 +10,8 @@ import (
 // However, if a component is ready to be sent it is skipped,
 // so the box will not idle.
 
-//  ISSUE: SHOULD BE AWARE OF BUFFER, NOT OVERFULL BUFFER.
+//  Source should not be eager, push at most 1 frame at a time -> test files
+//  ISSUE: SHOULD BE AWARE OF BUFFER, NOT OVERFULL BUFFER.?
 
 type FromGpu3Par struct {
 	Input  [3]<-chan GpuFloats
@@ -36,13 +37,13 @@ func (box *FromGpu3Par) Run() {
 	input := box.Input
 
 	for {
-		x := <-input[X]
+		x := RecvGpu(input[X])
 		Debug("send X")
 		sendToHost(x, box.Output[X], box.stream)
-		y := <-input[Y]
+		y := RecvGpu(input[Y])
 		Debug("send Y")
 		sendToHost(y, box.Output[Y], box.stream)
-		z := <-input[Z]
+		z := RecvGpu(input[Z])
 		Debug("send Z")
 		sendToHost(z, box.Output[Z], box.stream)
 	}

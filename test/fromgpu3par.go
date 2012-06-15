@@ -12,7 +12,7 @@ func main() {
 	n := 4
 	InitSize(n, n, n)
 
-	sourceX := new(GpuSource)
+	sourceX := new(GpuSource)  // source is too eager !
 	sourceY := new(GpuSource)
 	sourceZ := new(GpuSource)
 	from := NewFromGpu3Par()
@@ -29,14 +29,14 @@ func main() {
 	WriteGraph("fromgpu3par")
 
 	GoRun(from, sourceX, sourceY, sourceZ)
-	sink.Run(50)
+	sink.Run(500)
 
 	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 30 {
+	if NumAlloc > 60 {
 		os.Exit(1)
 	}
 	fmt.Println("NumGpuAlloc:", NumGpuAlloc)
-	if NumGpuAlloc > 30 {
+	if NumGpuAlloc > 60 {
 		os.Exit(1)
 	}
 }

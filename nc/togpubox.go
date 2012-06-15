@@ -23,12 +23,16 @@ func NewToGpuBox() *ToGpuBox {
 func (box *ToGpuBox) Run() {
 	for {
 		in := Recv(box.Input)
-		buffer := GpuBuffer()
-		SetCudaCtx()
-		cu.MemcpyHtoDAsync(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]),
-			cu.SIZEOF_FLOAT32*int64(WarpLen()), box.stream)
-		box.stream.Synchronize()
-		Recycle(in)
-		SendGpu(box.Output, buffer)
+		sendToGpu(in, box.Output, box.stream)
 	}
+}
+
+func sendToGpu(in []float32, out []chan<- GpuFloats, stream cu.Stream) {
+	buffer := GpuBuffer()
+	SetCudaCtx()
+	cu.MemcpyHtoDAsync(cu.DevicePtr(buffer), unsafe.Pointer(&in[0]),
+		cu.SIZEOF_FLOAT32*int64(WarpLen()), stream)
+	stream.Synchronize()
+	Recycle(in)
+	SendGpu(out, buffer)
 }

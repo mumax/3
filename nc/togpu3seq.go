@@ -9,20 +9,20 @@ import (
 // I.e.: Tries to copy first all X, then Y and finally Z components.
 // However, if no X component is ready to be sent, the box will not idle
 // but rather start copying the next component.
-type ToGpu3Seq struct {
+type ToGpu3SeqBox struct {
 	Input  [3]<-chan []float32
 	Output [3][]chan<- GpuFloats
 	stream cu.Stream
 }
 
-func NewToGpu3Seq() *ToGpu3Seq {
-	box := new(ToGpu3Seq)
+func NewToGpu3SeqBox() *ToGpu3SeqBox {
+	box := new(ToGpu3SeqBox)
 	box.stream = cu.StreamCreate()
 	Register(box)
 	return box
 }
 
-func (box *ToGpu3Seq) Run() {
+func (box *ToGpu3SeqBox) Run() {
 	Vet(box)
 	input := box.Input
 	output := box.Output

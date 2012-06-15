@@ -8,12 +8,12 @@ import (
 
 func main() {
 
-	MAX_WARP=4
+	MAX_WARP = 4
 	n := 4
 	InitSize(n, n, n)
 
 	source := new(Source3)
-	to := NewToGpu3SeqBox()
+	to := NewToGpu3Seq()
 	gpusinkX := new(GpuSink)
 	gpusinkY := new(GpuSink)
 	gpusinkZ := new(GpuSink)
@@ -25,12 +25,12 @@ func main() {
 	Connect(&gpusinkY.Input, &to.Output[Y])
 	Connect(&gpusinkZ.Input, &to.Output[Z])
 
-	Vet(source, to, gpusinkX,gpusinkY,  gpusinkZ )
+	Vet(source, to, gpusinkX, gpusinkY, gpusinkZ)
 	WriteGraph("togpuseq3")
 
 	GoRun(to, gpusinkX, gpusinkY, gpusinkZ)
 	source.Run(50)
-	
+
 	fmt.Println("NumAlloc:", NumAlloc)
 	if NumAlloc > 30 {
 		os.Exit(1)
@@ -46,17 +46,16 @@ type Source3 struct {
 }
 
 func (box *Source3) Run(n int) {
-	for i:=0; i<n; i++{
+	for i := 0; i < n; i++ {
 		b := Buffer3()
 		for c := range b {
-		for i := range b[c] {
-			b[c][i] = float32(c)
+			for i := range b[c] {
+				b[c][i] = float32(c)
+			}
+			Send3(box.Output, b)
 		}
-		Send3(box.Output, b)
 	}
 }
-}
-
 
 type GpuSink struct {
 	Input <-chan GpuFloats

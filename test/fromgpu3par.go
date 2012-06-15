@@ -41,9 +41,6 @@ func main() {
 	}
 }
 
-
-
-
 type Sink3 struct {
 	Input [3]<-chan []float32
 }
@@ -51,7 +48,7 @@ type Sink3 struct {
 func (box *Sink3) Run(n int) {
 	Log("sinking", n)
 	for s := 0; s < n; s++ {
-		Log("step", s)
+		//Log("step", s)
 		in := Recv3(box.Input)
 		Recycle3(in)
 	}
@@ -66,4 +63,3 @@ func (box *GpuSource) Run() {
 		SendGpu(box.Output, GpuBuffer())
 	}
 }
-

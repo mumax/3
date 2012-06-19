@@ -6,22 +6,25 @@ import (
 
 // Euler solver.
 type EulerBox struct {
-	MOut   [3][]chan<- []float32 "m"
-	Time   []chan<- float64      "time"
-	Step   []chan<- float64      "step"
-	Torque [3]<-chan []float32   "torque"
-	MIn    [3]<-chan []float32   "m"
-	t      float64               // local copy of time
-	dt     float32               // local copy of time step
-	steps  int                   // local copy of total time steps
+	MOut   [3][]chan<- Block "m"
+	Time   []chan<- float64  "time"
+	Step   []chan<- float64  "step"
+	Torque [3]<-chan Block   "torque"
+	MIn    [3]<-chan Block   "m"
+	t      float64           // local copy of time
+	dt     float32           // local copy of time step
+	steps  int               // local copy of total time steps
 }
 
 // m0: initial value, to be overwritten by result when done.
-func (box *EulerBox) Run(m0 [3][]float32, steps int) {
+func (box *EulerBox) Run(m0 [3]Block, steps int) {
 
 	// send initial value m0 down the m pipe
-	for I := 0; I < N(); I += WarpLen() {
-		m0Slice := [3][]float32{m0[X][I : I+WarpLen()], m0[Y][I : I+WarpLen()], m0[Z][I : I+WarpLen()]}
+	for s := 0; s < NumWarp(); s++{
+		m0Slice := [3]Block{
+			m0[X].Slice(s),
+			m0[Y].Slice(s),
+			m0[Z].Slice(s)}
 		Send3(box.MOut, m0Slice)
 	}
 

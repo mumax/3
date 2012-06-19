@@ -21,7 +21,7 @@ func (box *Average3Box) Run() {
 			sum := 0.0
 			for I := 0; I < N(); I += WarpLen() {
 				in := Recv(box.Input[c])
-				for _, value := range in.Contiguous() {
+				for _, value := range in.List {
 					sum += float64(value)
 				}
 				Recycle(in)

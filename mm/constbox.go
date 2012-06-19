@@ -19,7 +19,7 @@ func NewConstBox(value float32) *ConstBox {
 func (box *ConstBox) Run() {
 
 	data := MakeBlock(WarpSize()) // no Buffer(): should not be GC'd
-	Memset(data.Contiguous(), box.value)
+	Memset(data.List, box.value)
 
 	for {
 		RecvFloat64(box.Time)

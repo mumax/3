@@ -16,6 +16,10 @@ func MakeGpuBlock(size [3]int) GpuBlock {
 	return GpuBlock{cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(N)), size}
 }
 
+func Make3GpuBlock(size [3]int) [3]GpuBlock {
+	return [3]GpuBlock{MakeGpuBlock(size), MakeGpuBlock(size), MakeGpuBlock(size)}
+}
+
 func (b *GpuBlock) Pointer() cu.DevicePtr {
 	return b.ptr
 }

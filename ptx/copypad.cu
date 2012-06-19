@@ -1,5 +1,6 @@
 
 // Copies src (3D array, size S0 x S1 x S2) to larger dst (3D array, size D0 x D1 x D2).
+// src data is offset by o0,o1,o2.
 // The remainder of dst is NOT zero-padded.
 // E.g.:
 //	a    ->  a x

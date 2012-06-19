@@ -72,6 +72,13 @@ func Buffer3() [3]Block {
 	return b
 }
 
+func GpuBuffer3() [3]GpuBlock {
+	gpulock.Lock()
+	b := [3]GpuBlock{gpuBuffer(), gpuBuffer(), gpuBuffer()}
+	gpulock.Unlock()
+	return b
+}
+
 // not synchronized.
 func buffer() Block {
 	if f := recycled.pop(); !f.IsNil() {

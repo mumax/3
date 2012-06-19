@@ -44,7 +44,7 @@ func Send(fanout []chan<- []float32, value []float32) {
 	}
 }
 
-func SendGpu(fanout []chan<- GpuFloats, value GpuFloats) {
+func SendGpu(fanout []chan<- GpuBlock, value GpuBlock) {
 	if len(fanout) == 0 {
 		panic("Send to nil")
 	}
@@ -83,7 +83,7 @@ func Recv(Chan <-chan []float32) []float32 {
 	return <-Chan
 }
 
-func RecvGpu(Chan <-chan GpuFloats) GpuFloats {
+func RecvGpu(Chan <-chan GpuBlock) GpuBlock {
 	if Chan == nil {
 		panic("Recv on nil chan")
 	}

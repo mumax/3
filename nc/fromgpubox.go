@@ -8,7 +8,7 @@ import (
 )
 
 type FromGpuBox struct {
-	Input  <-chan GpuFloats
+	Input  <-chan GpuBlock
 	Output []chan<- []float32
 	stream cu.Stream
 }
@@ -27,10 +27,10 @@ func (box *FromGpuBox) Run() {
 	}
 }
 
-func sendToHost(in GpuFloats, out []chan<- []float32, stream cu.Stream) {
+func sendToHost(in GpuBlock, out []chan<- []float32, stream cu.Stream) {
 	buffer := Buffer()
 	SetCudaCtx()
-	cu.MemcpyDtoHAsync(unsafe.Pointer(&buffer[0]), cu.DevicePtr(in),
+	cu.MemcpyDtoHAsync(unsafe.Pointer(&buffer[0]), in.Pointer(),
 		cu.SIZEOF_FLOAT32*int64(WarpLen()), stream)
 	stream.Synchronize()
 	RecycleGpu(in)

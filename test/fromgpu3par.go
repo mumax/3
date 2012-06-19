@@ -55,7 +55,7 @@ func (box *Sink3) Run(n int) {
 }
 
 type GpuSource struct {
-	Output []chan<- GpuFloats
+	Output []chan<- GpuBlock
 }
 
 func (box *GpuSource) Run() {

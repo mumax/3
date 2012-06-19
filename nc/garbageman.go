@@ -12,7 +12,7 @@ var (
 	recycled              stack
 	gpuRecycled           gpuStack
 	refcount              = make(map[*float32]int)
-	gpuRefcount           = make(map[GpuFloats]int)
+	gpuRefcount           = make(map[GpuBlock]int)
 	NumAlloc, NumGpuAlloc int
 	cpulock, gpulock      sync.Mutex
 )
@@ -27,7 +27,7 @@ func incr(s []float32, count int) {
 	//Assert(len(refcount) == NumAlloc)
 }
 
-func incrGpu(s GpuFloats, count int) {
+func incrGpu(s GpuBlock, count int) {
 	//Debug("incrgpu", s, count)
 	gpulock.Lock()
 	if prev, ok := gpuRefcount[s]; ok {
@@ -58,7 +58,7 @@ func Buffer() []float32 {
 	return b
 }
 
-func GpuBuffer() GpuFloats {
+func GpuBuffer() GpuBlock {
 	gpulock.Lock()
 	b := gpuBuffer()
 	gpulock.Unlock()
@@ -94,12 +94,12 @@ func buffer() []float32 {
 	return slice
 }
 
-func gpuBuffer() GpuFloats {
-	if f := gpuRecycled.pop(); f != 0 {
+func gpuBuffer() GpuBlock {
+	if f := gpuRecycled.pop(); f.Pointer() != 0 {
 		//Debug("re-use", f)
 		return f
 	}
-	slice := MakeGpuFloats(WarpLen())
+	slice := MakeGpuBlock(WarpSize())
 	NumGpuAlloc++
 	//Debug("alloc", slice)
 	gpuRefcount[slice] = 0
@@ -128,7 +128,7 @@ func Recycle(garbages ...[]float32) {
 	cpulock.Unlock()
 }
 
-func RecycleGpu(garbages ...GpuFloats) {
+func RecycleGpu(garbages ...GpuBlock) {
 	gpulock.Lock()
 
 	for _, g := range garbages {

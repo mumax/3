@@ -11,7 +11,7 @@ import (
 // but rather start copying the next component.
 type ToGpu3SeqBox struct {
 	Input  [3]<-chan []float32
-	Output [3][]chan<- GpuFloats
+	Output [3][]chan<- GpuBlock
 	stream cu.Stream
 }
 

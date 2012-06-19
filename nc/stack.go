@@ -15,15 +15,15 @@ func (s *stack) pop() (slice []float32) {
 	return
 }
 
-type gpuStack []GpuFloats
+type gpuStack []GpuBlock
 
-func (s *gpuStack) push(slice GpuFloats) {
+func (s *gpuStack) push(slice GpuBlock) {
 	(*s) = append((*s), slice)
 }
 
-func (s *gpuStack) pop() (slice GpuFloats) {
+func (s *gpuStack) pop() (slice GpuBlock) {
 	if len(*s) == 0 {
-		return 0
+		return
 	}
 	slice = (*s)[len(*s)-1]
 	*s = (*s)[:len(*s)-1]

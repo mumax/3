@@ -5,8 +5,8 @@ import (
 )
 
 type GpuDemagBox struct {
-	M [3]<-chan GpuFloats   "m"
-	H [3][]chan<- GpuFloats "H"
+	M [3]<-chan GpuBlock   "m"
+	H [3][]chan<- GpuBlock "H"
 }
 
 func (box *GpuDemagBox) Run() {

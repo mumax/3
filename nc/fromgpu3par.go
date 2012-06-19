@@ -14,7 +14,7 @@ import (
 //  ISSUE: SHOULD BE AWARE OF BUFFER, NOT OVERFULL BUFFER.?
 
 type FromGpu3Par struct {
-	Input  [3]<-chan GpuFloats
+	Input  [3]<-chan GpuBlock
 	Output [3][]chan<- []float32
 	stream cu.Stream
 	//	score  [3]int

@@ -6,7 +6,7 @@ import (
 
 type ConstBox struct {
 	value  float32
-	Output []chan<- []float32
+	Output []chan<- Block
 	Time   <-chan float64 "time"
 }
 
@@ -18,8 +18,8 @@ func NewConstBox(value float32) *ConstBox {
 
 func (box *ConstBox) Run() {
 
-	data := make([]float32, WarpLen()) // no Buffer(): should not be GC'd
-	Memset(data, box.value)
+	data := MakeBlock(WarpSize()) // no Buffer(): should not be GC'd
+	Memset(data.Contiguous(), box.value)
 
 	for {
 		RecvFloat64(box.Time)

@@ -15,7 +15,7 @@ import (
 
 type FromGpu3Par struct {
 	Input  [3]<-chan GpuBlock
-	Output [3][]chan<- []float32
+	Output [3][]chan<- Block
 	stream cu.Stream
 	//	score  [3]int
 	//	comp1  int // preferred component to send

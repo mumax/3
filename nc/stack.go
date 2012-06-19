@@ -1,14 +1,14 @@
 package nc
 
-type stack [][]float32
+type stack []Block
 
-func (s *stack) push(slice []float32) {
+func (s *stack) push(slice Block) {
 	(*s) = append((*s), slice)
 }
 
-func (s *stack) pop() (slice []float32) {
+func (s *stack) pop() (slice Block) {
 	if len(*s) == 0 {
-		return nil
+		return // nil
 	}
 	slice = (*s)[len(*s)-1]
 	*s = (*s)[:len(*s)-1]

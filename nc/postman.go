@@ -7,7 +7,7 @@ package nc
 //Need to debug data flow.
 //IDEA:
 //plumber.connect registers channels (not pointers, the actual channels)
-//at bookkeeper. There will be chan float64 and chan []float32.
+//at bookkeeper. There will be chan float64 and chan Block.
 //no tag names required, just the master channels.
 //use them to index fill map
 //var fill64 map[chan float64]int
@@ -27,7 +27,7 @@ func SendFloat64(fanout []chan<- float64, value float64) {
 
 // Send to channels with bookkeeping. 
 // Should always be used instead of the <- operator.
-func Send(fanout []chan<- []float32, value []float32) {
+func Send(fanout []chan<- Block, value Block) {
 	// safety first
 	if len(fanout) == 0 {
 		panic("Send to nil")
@@ -59,7 +59,7 @@ func SendGpu(fanout []chan<- GpuBlock, value GpuBlock) {
 	}
 }
 
-func Send3(fanout [3][]chan<- []float32, value [3][]float32) {
+func Send3(fanout [3][]chan<- Block, value [3]Block) {
 	if len(fanout[X]) == 0 {
 		panic("Send to nil")
 	}
@@ -76,7 +76,7 @@ func Send3(fanout [3][]chan<- []float32, value [3][]float32) {
 
 // Receive from channel with bookkeeping. 
 // Should always be used instead of the <- operator.
-func Recv(Chan <-chan []float32) []float32 {
+func Recv(Chan <-chan Block) Block {
 	if Chan == nil {
 		panic("Recv on nil chan")
 	}
@@ -97,11 +97,11 @@ func RecvFloat64(Chan <-chan float64) float64 {
 	return <-Chan
 }
 
-func Recv3(vectorChan [3]<-chan []float32) [3][]float32 {
+func Recv3(vectorChan [3]<-chan Block) [3]Block {
 	if vectorChan[X] == nil {
 		panic("Recv3 on nil chan")
 	}
-	return [3][]float32{<-vectorChan[X], <-vectorChan[Y], <-vectorChan[Z]}
+	return [3]Block{<-vectorChan[X], <-vectorChan[Y], <-vectorChan[Z]}
 }
 
 // The postman always syncs twice.

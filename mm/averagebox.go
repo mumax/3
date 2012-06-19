@@ -5,7 +5,7 @@ import (
 )
 
 type AverageBox struct {
-	Input  <-chan []float32
+	Input  <-chan Block
 	Output []chan<- float64
 }
 
@@ -14,7 +14,7 @@ func (box *AverageBox) Run() {
 		sum := 0.0
 		for I := 0; I < N(); I += WarpLen() {
 			in := Recv(box.Input)
-			for _, value := range in {
+			for _, value := range in.Contiguous() {
 				sum += float64(value)
 			}
 			Recycle(in)

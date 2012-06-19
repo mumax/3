@@ -4,11 +4,10 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
-	"unsafe"
 )
 
 type ToGpuBox struct {
-	Input  <-chan []float32
+	Input  <-chan Block
 	Output []chan<- GpuBlock
 	stream cu.Stream
 }
@@ -27,11 +26,11 @@ func (box *ToGpuBox) Run() {
 	}
 }
 
-func sendToGpu(in []float32, out []chan<- GpuBlock, stream cu.Stream) {
+func sendToGpu(in Block, out []chan<- GpuBlock, stream cu.Stream) {
 	buffer := GpuBuffer()
 	SetCudaCtx()
-	cu.MemcpyHtoDAsync(buffer.Pointer(), unsafe.Pointer(&in[0]),
-		cu.SIZEOF_FLOAT32*int64(WarpLen()), stream)
+	cu.MemcpyHtoDAsync(buffer.Pointer(), in.UnsafePointer(),
+		in.Bytes(), stream)
 	stream.Synchronize()
 	Recycle(in)
 	SendGpu(out, buffer)

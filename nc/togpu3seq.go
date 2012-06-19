@@ -10,7 +10,7 @@ import (
 // However, if no X component is ready to be sent, the box will not idle
 // but rather start copying the next component.
 type ToGpu3SeqBox struct {
-	Input  [3]<-chan []float32
+	Input  [3]<-chan Block
 	Output [3][]chan<- GpuBlock
 	stream cu.Stream
 }

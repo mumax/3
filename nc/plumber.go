@@ -14,7 +14,7 @@ import (
 // as defined by isChan(). E.g.:
 // 	*chan<-float32
 // 	*<-chan float32
-// 	*[3]<-chan[]float32
+// 	*[3]<-chan Block
 // 	...
 type Chan interface{}
 
@@ -25,9 +25,9 @@ func Connect(dst, src Chan) {
 	switch d := dst.(type) {
 	default:
 		cannotConnect(dst, src)
-	case *<-chan []float32:
+	case *<-chan Block:
 		connectChanOfSlice(d, src)
-	case *[3]<-chan []float32:
+	case *[3]<-chan Block:
 		connect3ChanOfSlice(d, src)
 	case *<-chan float64:
 		connectChanOfFloat64(d, src)
@@ -67,12 +67,12 @@ func cannotHandleType(v interface{}) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func connectChanOfSlice(dst *<-chan []float32, src Chan) {
+func connectChanOfSlice(dst *<-chan Block, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
-	case *[]chan<- []float32:
-		ch := make(chan []float32, DefaultBufSize())
+	case *[]chan<- Block:
+		ch := make(chan Block, DefaultBufSize())
 		*s = append(*s, ch)
 		*dst = ch
 	}
@@ -92,11 +92,11 @@ func connectChanOfGpuBlock(dst *<-chan GpuBlock, src Chan) {
 // Try to connect dst based on the type of src.
 // In any case, src should hold a pointer to
 // some type of channel or an array of channels.
-func connect3ChanOfSlice(dst *[3]<-chan []float32, src Chan) {
+func connect3ChanOfSlice(dst *[3]<-chan Block, src Chan) {
 	switch s := src.(type) {
 	default:
 		cannotConnect(dst, src)
-	case *[3][]chan<- []float32:
+	case *[3][]chan<- Block:
 		for i := 0; i < 3; i++ {
 			connectChanOfSlice(&(*dst)[i], &(*s)[i])
 		}
@@ -130,11 +130,11 @@ func connect3ChanOfFloat64(dst *[3]<-chan float64, src Chan) {
 
 // Check if v, a pointer, can be used as an input channel.
 // E.g.:
-// 	*<-chan []float32, *[3]<-chan []float32, *<-chan float64
+// 	*<-chan Block, *[3]<-chan Block, *<-chan float64
 func isInputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *<-chan []float32,
-		*[3]<-chan []float32,
+	case *<-chan Block,
+		*[3]<-chan Block,
 		*<-chan float64,
 		*[3]<-chan float64,
 		*<-chan GpuBlock:
@@ -145,11 +145,11 @@ func isInputChan(ptr interface{}) bool {
 
 // Check if v, a pointer, can be used as an output channel.
 // E.g.:
-// 	*[]chan<- []float32, *[][3]chan<- []float32, *[]chan<- float64
+// 	*[]chan<- Block, *[][3]chan<- Block, *[]chan<- float64
 func isOutputChan(ptr interface{}) bool {
 	switch ptr.(type) {
-	case *[]chan<- []float32,
-		*[3][]chan<- []float32,
+	case *[]chan<- Block,
+		*[3][]chan<- Block,
 		*[]chan<- float64,
 		*[3][]chan<- float64,
 		*[]chan<- GpuBlock:

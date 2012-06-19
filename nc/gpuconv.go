@@ -33,17 +33,22 @@ func (box *GpuConvBox) Run() {
 		padded[2] + 2}
 
 	box.fftBuf = Make3GpuBlock(fftSize)
+	fftBuf := box.fftBuf
 
 	for {
 		for s := 0; s < NumWarp(); s++ {
 			for c := 0; c < 3; c++ {
 
-				//m := Recv(box.M[c])
-				//copyPad(
+				m := RecvGpu(box.M[c])
+				copyPad(fftBuf[c], m, sliceOffset(s))
 
 			}
 		}
 	}
+}
+
+func sliceOffset(s int) [3]int {
+	return [3]int{0, 0, 0} // TODO
 }
 
 var (
@@ -51,10 +56,11 @@ var (
 )
 
 func PtxDir() string {
-	return ExecutableDir() + "../src/nimble-cube/ptx/"
+	return "/home/arne/go/src/nimble-cube/ptx"
+	//return ExecutableDir() + "../src/nimble-cube/ptx/" // KO with go run
 }
 
-func copyPad(dst GpuBlock, src GpuBlock, slice int) {
+func copyPad(dst GpuBlock, src GpuBlock, offset [3]int) {
 
 	if copyPadKern == 0 {
 		ptx := PtxDir() + "/copypad.ptx"
@@ -80,7 +86,10 @@ func copyPad(dst GpuBlock, src GpuBlock, slice int) {
 		unsafe.Pointer(&srcptr),
 		unsafe.Pointer(&srcsize[0]),
 		unsafe.Pointer(&srcsize[1]),
-		unsafe.Pointer(&srcsize[2])}
+		unsafe.Pointer(&srcsize[2]),
+		unsafe.Pointer(&offset[0]),
+		unsafe.Pointer(&offset[1]),
+		unsafe.Pointer(&offset[2])}
 
 	cu.LaunchKernel(copyPadKern, gridJ, gridK, 1, block, block, 1, shmem, 0, args)
 }

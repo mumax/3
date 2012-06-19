@@ -19,8 +19,8 @@ func main() {
 	Vet(m, conv)
 	WriteGraph("gpuconv")
 
-	GoRun(conv)
-	m.Run() // once
+	GoRun(m)
+	conv.Run() // once
 
 }
 

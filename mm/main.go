@@ -1,13 +1,19 @@
 package mm
 
 import (
+	"flag"
 	"log"
 	. "nimble-cube/nc"
+	"strconv"
 )
 
 func Main() {
 
-	InitSize(1, 4, 8)
+	N0 := intFlag(0)
+	N1 := intFlag(1)
+	N2 := intFlag(2)
+
+	InitSize(N0, N1, N2)
 
 	torque := new(LLGBox)
 	heff := new(MeanFieldBox)
@@ -39,4 +45,10 @@ func Main() {
 	//fmt.Println(m0[X][0], m0[Y][0], m0[Z][0])
 	//}
 
+}
+
+func intFlag(i int) int {
+	v, err := strconv.Atoi(flag.Arg(i))
+	PanicErr(err)
+	return v
 }

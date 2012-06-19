@@ -13,7 +13,7 @@ var (
 	flag_cuda     = flag.Bool("cuda", true, "use CUDA")
 	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
 	flag_pagelock = flag.Bool("lock", true, "enable CUDA memeory page-locking")
-	flag_maxwarp  = flag.Int("warp", MAX_WARP, "maximum elements per warp")
+	flag_maxwarp  = flag.Int("warp", MAX_WARPLEN, "maximum elements per warp")
 	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	flag_memprof  = flag.String("memprof", "", "Write gopprof memory profile to file")
@@ -55,8 +55,7 @@ func initGOMAXPROCS() {
 }
 
 func initWarp() {
-	MAX_WARP = *flag_maxwarp
-	Log("max WarpLen:", MAX_WARP)
+	MAX_WARPLEN = *flag_maxwarp
 }
 
 func initCpuProf() {

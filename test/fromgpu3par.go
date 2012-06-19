@@ -8,11 +8,11 @@ import (
 
 func main() {
 
-	MAX_WARP = 4
+	MAX_WARPLEN = 4
 	n := 4
 	InitSize(n, n, n)
 
-	sourceX := new(GpuSource)  // source is too eager !
+	sourceX := new(GpuSource) // source is too eager !
 	sourceY := new(GpuSource)
 	sourceZ := new(GpuSource)
 	from := NewFromGpu3Par()

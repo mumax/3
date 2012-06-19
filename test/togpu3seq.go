@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	MAX_WARP = 4
+	MAX_WARPLEN = 4
 	n := 4
 	InitSize(n, n, n)
 

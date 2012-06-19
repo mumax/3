@@ -1,6 +1,6 @@
 CUFILES = $(wildcard *.cu)
 PTXFILES = $(CUFILES:.cu=.ptx)
-NVCC = nvcc
+NVCC = nvcc 
 
 all: $(PTXFILES)
 

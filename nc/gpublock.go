@@ -21,12 +21,12 @@ func (b *GpuBlock) Pointer() cu.DevicePtr {
 }
 
 // Total number of scalar elements.
-func (b *GpuBlock) NFloat() int {
+func (b *GpuBlock) N() int {
 	return b.size[0] * b.size[1] * b.size[2]
 }
 
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
-func (b *GpuBlock) BlockSize() [3]int {
+func (b *GpuBlock) Size() [3]int {
 	return b.size
 }

@@ -33,8 +33,10 @@ func Main() {
 	WriteGraph("mm")
 
 	// TODO: makearray
-	m0 := [3][]float32{make([]float32, N()), make([]float32, N()), make([]float32, N())}
-	Memset3(m0, Vector{0.1, 0.99, 0})
+	m0 := [3]Block{MakeBlock(Size()), MakeBlock(Size()), MakeBlock(Size())}
+	Memset(m0[X].List, 0.1)
+	Memset(m0[X].List, 0.99)
+	Memset(m0[X].List, 0)
 
 	// Solver box runs synchronous.
 	// Could be async with return channel...

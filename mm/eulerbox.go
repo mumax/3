@@ -20,7 +20,7 @@ type EulerBox struct {
 func (box *EulerBox) Run(m0 [3]Block, steps int) {
 
 	// send initial value m0 down the m pipe
-	for s := 0; s < NumWarp(); s++{
+	for s := 0; s < NumWarp(); s++ {
 		m0Slice := [3]Block{
 			m0[X].Slice(s),
 			m0[Y].Slice(s),
@@ -39,23 +39,25 @@ func (box *EulerBox) Run(m0 [3]Block, steps int) {
 			tSlice := Recv3(box.Torque)
 			m1Slice := Buffer3()
 
-			for i := range m1Slice[X] {
+			for i := range m1Slice[X].List {
 				var m1 Vector
-				m1[X] = m0Slice[X][i] + box.dt*tSlice[X][i]
-				m1[Y] = m0Slice[Y][i] + box.dt*tSlice[Y][i]
-				m1[Z] = m0Slice[Z][i] + box.dt*tSlice[Z][i]
+				m1[X] = m0Slice[X].List[i] + box.dt*tSlice[X].List[i]
+				m1[Y] = m0Slice[Y].List[i] + box.dt*tSlice[Y].List[i]
+				m1[Z] = m0Slice[Z].List[i] + box.dt*tSlice[Z].List[i]
 				m1 = m1.Normalized()
-				m1Slice[X][i] = m1[X]
-				m1Slice[Y][i] = m1[Y]
-				m1Slice[Z][i] = m1[Z]
+				m1Slice[X].List[i] = m1[X]
+				m1Slice[Y].List[i] = m1[Y]
+				m1Slice[Z].List[i] = m1[Z]
 			}
 
 			if s < steps-1 {
+				// still need to step
 				Send3(box.MOut, m1Slice)
 			} else {
-				copy(m0[X][I:I+WarpLen()], m1Slice[X])
-				copy(m0[Y][I:I+WarpLen()], m1Slice[Y])
-				copy(m0[Z][I:I+WarpLen()], m1Slice[Z])
+				// done stepping, copy result back to m0
+				copy(m0[X].List[I:I+WarpLen()], m1Slice[X].List)
+				copy(m0[Y].List[I:I+WarpLen()], m1Slice[Y].List)
+				copy(m0[Z].List[I:I+WarpLen()], m1Slice[Z].List)
 				Recycle3(m1Slice)
 			}
 			Recycle3(m0Slice, tSlice)

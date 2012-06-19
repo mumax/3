@@ -7,8 +7,8 @@ import (
 // IDEA: Connect(box, "H_*") regex match.
 
 type MeanFieldBox struct {
-	M [3]<-chan []float32   "m"
-	H [3][]chan<- []float32 "H"
+	M [3]<-chan Block   "m"
+	H [3][]chan<- Block "H"
 }
 
 func (box *MeanFieldBox) Run() {
@@ -21,10 +21,10 @@ func (box *MeanFieldBox) Run() {
 
 			mSlice := Recv3(box.M)
 
-			for i := range mSlice[X] {
-				mSum[X] += mSlice[X][i]
-				mSum[Y] += mSlice[Y][i]
-				mSum[Z] += mSlice[Z][i]
+			for i := range mSlice[X].List {
+				mSum[X] += mSlice[X].List[i]
+				mSum[Y] += mSlice[Y].List[i]
+				mSum[Z] += mSlice[Z].List[i]
 			}
 
 			Recycle3(mSlice)
@@ -36,7 +36,9 @@ func (box *MeanFieldBox) Run() {
 
 		for s := 0; s < NumWarp(); s++ {
 			hSlice := Buffer3()
-			Memset3(hSlice, Vector{hx, hy, hz})
+			Memset(hSlice[X].List, hx)
+			Memset(hSlice[Y].List, hy)
+			Memset(hSlice[Z].List, hz) // TODO: memset on [3]Block
 			Send3(box.H, hSlice)
 		}
 	}

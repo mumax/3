@@ -42,15 +42,15 @@ func main() {
 }
 
 type Source3 struct {
-	Output [3][]chan<- []float32
+	Output [3][]chan<- Block
 }
 
 func (box *Source3) Run(n int) {
 	for i := 0; i < n; i++ {
 		b := Buffer3()
 		for c := range b {
-			for i := range b[c] {
-				b[c][i] = float32(c)
+			for i := range b[c].List {
+				b[c].List[i] = float32(c)
 			}
 			Send3(box.Output, b)
 		}

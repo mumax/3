@@ -42,7 +42,7 @@ func main() {
 }
 
 type Sink3 struct {
-	Input [3]<-chan []float32
+	Input [3]<-chan Block
 }
 
 func (box *Sink3) Run(n int) {

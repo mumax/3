@@ -42,15 +42,15 @@ func main() {
 }
 
 type Source struct {
-	Output []chan<- []float32
+	Output []chan<- Block
 }
 
 func (box *Source) Run() {
 	count := 0
 	for {
 		b := Buffer()
-		for i := range b {
-			b[i] = float32(count)
+		for i := range b.List {
+			b.List[i] = float32(count)
 			count++
 		}
 		Send(box.Output, b)
@@ -58,7 +58,7 @@ func (box *Source) Run() {
 }
 
 type Sink struct {
-	Input <-chan []float32
+	Input <-chan Block
 }
 
 func (box *Sink) Run(n int) {
@@ -66,8 +66,8 @@ func (box *Sink) Run(n int) {
 	for s := 0; s < n; s++ {
 		in := Recv(box.Input)
 		//Debug(in)
-		for i := range in {
-			if in[i] != float32(count) {
+		for i := range in.List {
+			if in.List[i] != float32(count) {
 				Panic(in)
 			}
 			count++

@@ -31,7 +31,7 @@ func main() {
 }
 
 type Source struct {
-	Output []chan<- []float32
+	Output []chan<- Block
 }
 
 func (box *Source) Run() {
@@ -41,7 +41,7 @@ func (box *Source) Run() {
 }
 
 type Sink struct {
-	Input <-chan []float32
+	Input <-chan Block
 }
 
 func (box *Sink) Run(n int) {
@@ -52,15 +52,15 @@ func (box *Sink) Run(n int) {
 }
 
 type Pass struct {
-	Input  <-chan []float32
-	Output []chan<- []float32
+	Input  <-chan Block
+	Output []chan<- Block
 }
 
 func (box *Pass) Run() {
 	for {
 		in := Recv(box.Input)
 		out := Buffer()
-		copy(out, in)
+		copy(out.List, in.List)
 		Recycle(in)
 		Send(box.Output, out)
 	}

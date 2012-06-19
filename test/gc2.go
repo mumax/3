@@ -36,7 +36,7 @@ func main() {
 }
 
 type Source struct {
-	Output []chan<- []float32 "data"
+	Output []chan<- Block "data"
 }
 
 func (box *Source) Run() {
@@ -46,7 +46,7 @@ func (box *Source) Run() {
 }
 
 type Sink struct {
-	Input <-chan []float32 "data"
+	Input <-chan Block "data"
 }
 
 func (box *Sink) Run(n int) {

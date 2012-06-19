@@ -29,7 +29,7 @@ func main() {
 }
 
 type Source3 struct {
-	Output [3][]chan<- []float32 "data"
+	Output [3][]chan<- Block "data"
 }
 
 func (box *Source3) Run() {
@@ -39,7 +39,7 @@ func (box *Source3) Run() {
 }
 
 type Sink3 struct {
-	Input [3]<-chan []float32 "data"
+	Input [3]<-chan Block "data"
 }
 
 func (box *Sink3) Run(n int) {

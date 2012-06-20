@@ -2,6 +2,7 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda4/cufft"
 	"unsafe"
 )
 
@@ -19,9 +20,9 @@ func NewGpuConvBox() *GpuConvBox {
 }
 
 func (box *GpuConvBox) Run() {
-
 	size := Size()
 
+	// zero-padded size
 	padded := [3]int{
 		size[0] * 2,
 		size[1] * 2,
@@ -30,21 +31,38 @@ func (box *GpuConvBox) Run() {
 		padded[0] = 1 // no need to pad 1 layer thickness
 	}
 
+	// size of fft'd data
 	fftSize := [3]int{
 		padded[0],
 		padded[1],
 		padded[2] + 2}
 
+	// buffer for fft'd data
 	box.fftBuf = Make3GpuBlock(fftSize)
 	fftBuf := box.fftBuf
 
+	// setup fft plans
+	var fftPlan [3]cufft.Handle
+	var fftStream [3]cu.Stream
+	for i := range fftPlan {
+		fftPlan[i] = cufft.Plan3d(fftSize[0], fftSize[1], fftSize[2], cufft.R2C)
+		fftStream[i] = cu.StreamCreate()
+		fftPlan[i].SetStream(fftStream[i])
+	}
+
+	// run Convolution, run!
 	for {
 		for c := 0; c < 3; c++ {
-			fftBuf[c].Memset(0)
+
+			fftBuf[c].Memset(0) // todo: async
 			for s := 0; s < NumWarp(); s++ {
 				m := RecvGpu(box.M[c])
-				copyPad(fftBuf[c], m, sliceOffset(s))
+				copyPad(fftBuf[c], m, sliceOffset(s)) // todo: async
 			}
+			Debug("fftbuf:", fftBuf[c].Host())
+
+			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer())
+
 			Debug("fftbuf:", fftBuf[c].Host())
 		}
 	}

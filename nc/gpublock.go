@@ -3,6 +3,7 @@ package nc
 import (
 	"github.com/barnex/cuda4/cu"
 	"math"
+	"unsafe"
 )
 
 // Block of float32's on the GPU.
@@ -66,6 +67,36 @@ func (dst *GpuBlock) CopyHtoD(src Block) {
 	cu.MemcpyHtoD(dst.Pointer(), src.UnsafePointer(), src.Bytes())
 }
 
+// Set all values to v.
 func (b *GpuBlock) Memset(v float32) {
 	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.N()))
+}
+
+// Set the value at index i,j,k to v.
+// Intended for debugging, prohibitively slow.
+func (b *GpuBlock) Set(i, j, k int, v float32) {
+	size := b.size
+	V := v // addressable
+	if i < 0 || j < 0 || k < 0 ||
+		i >= size[0] || j >= size[1] || k >= size[2] {
+		Panic("index out of bounds:", i, j, k, "size:", size)
+	}
+	I := i*size[1]*size[2] + j*size[2] + k
+	offsetDst := cu.DevicePtr(uintptr(b.Pointer()) + SIZEOF_FLOAT32*uintptr(I))
+	cu.MemcpyHtoD(offsetDst, unsafe.Pointer(&V), SIZEOF_FLOAT32)
+}
+
+// Get the value at index i,j,k to v.
+// Intended for debugging, prohibitively slow.
+func (b *GpuBlock) Get(i, j, k int) float32 {
+	size := b.size
+	var V float32 // addressable
+	if i < 0 || j < 0 || k < 0 ||
+		i >= size[0] || j >= size[1] || k >= size[2] {
+		Panic("index out of bounds:", i, j, k, "size:", size)
+	}
+	I := i*size[1]*size[2] + j*size[2] + k
+	offsetSrc := cu.DevicePtr(uintptr(b.Pointer()) + SIZEOF_FLOAT32*uintptr(I))
+	cu.MemcpyDtoH(unsafe.Pointer(&V), offsetSrc, SIZEOF_FLOAT32)
+	return V
 }

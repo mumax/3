@@ -29,17 +29,21 @@ type GpuSource3 struct {
 }
 
 func (box *GpuSource3) Run() {
-	for s:=0;s<NumWarp();s++{
+	SetCudaCtx()
+	for s := 0; s < NumWarp(); s++ {
 		buf := GpuBuffer()
-		buf.Memset(1)
+		buf.Memset(0)
+		buf.Set(0, 0, 0, 1)
 		SendGpu(box.Output[0], buf)
 
 		buf = GpuBuffer()
-		buf.Memset(2)
+		buf.Memset(0)
+		buf.Set(0, 0, 0, 2)
 		SendGpu(box.Output[1], buf)
 
 		buf = GpuBuffer()
-		buf.Memset(3)
+		buf.Memset(0)
+		buf.Set(0, 0, 0, 3)
 		SendGpu(box.Output[2], buf)
 	}
 }

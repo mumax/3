@@ -29,8 +29,35 @@ func (b *GpuBlock) N() int {
 	return b.size[0] * b.size[1] * b.size[2]
 }
 
+func (b *GpuBlock) Bytes() int64 {
+	return SIZEOF_FLOAT32 * int64(b.N())
+}
+
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
 func (b *GpuBlock) Size() [3]int {
 	return b.size
+}
+
+// Make a copy on the host. Handy for debugging.
+func (b *GpuBlock) Host() Block {
+	host := MakeBlock(b.Size())
+	b.CopyDtoH(host)
+	return host
+}
+
+// Copy from device to host.
+func (src *GpuBlock) CopyDtoH(dst Block) {
+	if src.Size() != dst.Size() {
+		Panic("size mismatch:", src.Size(), dst.Size())
+	}
+	cu.MemcpyDtoH(dst.UnsafePointer(), src.Pointer(), src.Bytes())
+}
+
+// Copy from host to device.
+func (dst *GpuBlock) CopyHtoD(src Block) {
+	if src.Size() != dst.Size() {
+		Panic("size mismatch:", src.Size(), dst.Size())
+	}
+	cu.MemcpyHtoD(dst.Pointer(), src.UnsafePointer(), src.Bytes())
 }

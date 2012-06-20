@@ -27,10 +27,10 @@ gccgobench:
 	go test -bench=. -compiler $(GCCGO)
 
 clean:
-	go-optview -w -c 6g -m *.go
+	go-optview -w -c *.go
 	gofmt -w *.go	
 	go clean
 	rm -f *.{5,6,8}
 
 opt:
-	go-optview -w 6g -m *.go
+	go-optview -w *.go

@@ -58,7 +58,7 @@ func (b *Block) Bytes() int64 {
 
 // BlockSize is the size of the block (N0, N1, N2)
 // as was passed to MakeBlock()
-func (b *Block) BlockSize() [3]int {
+func (b *Block) Size() [3]int {
 	a := b.Array
 	return [3]int{len(a), len(a[0]), len(a[0][0])}
 }

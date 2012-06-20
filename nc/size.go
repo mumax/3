@@ -69,3 +69,8 @@ func WarpLen() int { return warpLen }
 func NumWarp() int { return nWarp }
 
 func WarpSize() [3]int { return warpSize }
+
+// Position of 3D slice number s in its full 3D block.
+func SliceOffset(s int) [3]int {
+	return [3]int{0, 0, 0} // TODO
+}

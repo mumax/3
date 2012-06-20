@@ -6,7 +6,7 @@ import (
 
 func main() {
 
-	MAX_WARPLEN=32
+	MAX_WARPLEN = 32
 	InitSize(1, 8, 16)
 
 	m := new(GpuSource3)

@@ -26,6 +26,9 @@ func (box *GpuConvBox) Run() {
 		size[0] * 2,
 		size[1] * 2,
 		size[2] * 2}
+	if padded[0] == 2 {
+		padded[0] = 1 // no need to pad 1 layer thickness
+	}
 
 	fftSize := [3]int{
 		padded[0],

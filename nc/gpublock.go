@@ -14,7 +14,6 @@ type GpuBlock struct {
 }
 
 func MakeGpuBlock(size [3]int) GpuBlock {
-	SetCudaCtx()
 	N := size[0] * size[1] * size[2]
 	return GpuBlock{cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(N)), size}
 }

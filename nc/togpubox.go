@@ -20,6 +20,7 @@ func NewToGpuBox() *ToGpuBox {
 }
 
 func (box *ToGpuBox) Run() {
+	LockCudaCtx()
 	for {
 		in := Recv(box.Input)
 		sendToGpu(in, box.Output, box.stream)
@@ -28,7 +29,6 @@ func (box *ToGpuBox) Run() {
 
 func sendToGpu(in Block, out []chan<- GpuBlock, stream cu.Stream) {
 	buffer := GpuBuffer()
-	SetCudaCtx()
 	cu.MemcpyHtoDAsync(buffer.Pointer(), in.UnsafePointer(),
 		in.Bytes(), stream)
 	stream.Synchronize()

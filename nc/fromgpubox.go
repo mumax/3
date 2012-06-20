@@ -29,7 +29,6 @@ func (box *FromGpuBox) Run() {
 
 func sendToHost(in GpuBlock, out []chan<- Block, stream cu.Stream) {
 	buffer := Buffer()
-	SetCudaCtx()
 	cu.MemcpyDtoHAsync(unsafe.Pointer(buffer.Pointer()), in.Pointer(),
 		cu.SIZEOF_FLOAT32*int64(WarpLen()), stream)
 	stream.Synchronize()

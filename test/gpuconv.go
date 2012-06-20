@@ -29,7 +29,7 @@ type GpuSource3 struct {
 }
 
 func (box *GpuSource3) Run() {
-	SetCudaCtx()
+	LockCudaCtx()
 	for s := 0; s < NumWarp(); s++ {
 		buf := GpuBuffer()
 		buf.Memset(0)

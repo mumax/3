@@ -88,7 +88,6 @@ func buffer() Block {
 	slice := MakeBlock(WarpSize())
 
 	if *flag_pagelock {
-		SetCudaCtx()
 		cu.MemHostRegister(slice.UnsafePointer(),
 			slice.Bytes(),
 			cu.MEMHOSTREGISTER_PORTABLE)

@@ -20,7 +20,7 @@ func NewGpuConvBox() *GpuConvBox {
 }
 
 func (box *GpuConvBox) Run() {
-	SetCudaCtx()
+	LockCudaCtx()
 
 	size := Size()
 
@@ -56,7 +56,6 @@ func (box *GpuConvBox) Run() {
 
 	// run Convolution, run!
 	for {
-		SetCudaCtx()
 		for c := 0; c < 3; c++ {
 
 			fftBuf[c].Memset(0) // todo: async

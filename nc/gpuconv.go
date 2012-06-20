@@ -45,7 +45,7 @@ func (box *GpuConvBox) Run() {
 	var fftPlan [3]cufft.Handle
 	var fftStream [3]cu.Stream
 	for i := range fftPlan {
-		fftPlan[i] = cufft.Plan3d(fftSize[0], fftSize[1], fftSize[2], cufft.R2C)
+		fftPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.R2C)
 		fftStream[i] = cu.StreamCreate()
 		fftPlan[i].SetStream(fftStream[i])
 	}

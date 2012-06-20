@@ -61,13 +61,15 @@ func (box *GpuConvBox) Run() {
 			fftBuf[c].Memset(0) // todo: async
 			for s := 0; s < NumWarp(); s++ {
 				m := RecvGpu(box.M[c])
-				copyPad(fftBuf[c], m, SliceOffset(s)) // todo: async
+				off := SliceOffset(s)
+				Debug("offset", s, off)
+				copyPad(fftBuf[c], m, off) // todo: async
 			}
 			Debug("fftbuf:", fftBuf[c].Host())
 
 			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?
 			fftStream[c].Synchronize()
-			Debug("fftbuf:", fftBuf[c].Host())
+			//Debug("fftbuf:", fftBuf[c].Host())
 		}
 
 		// kernel mul

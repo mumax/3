@@ -5,11 +5,12 @@ package nc
 import ()
 
 var (
-	size     [3]int // 3D geom size
-	n        int    // product of size
-	nWarp    int    // number of slices
-	warpSize [3]int // slice size
-	warpLen  int    // product of slice size
+	size      [3]int // 3D geom size
+	n         int    // product of size
+	nWarp     int    // number of slices
+	warpSize  [3]int // slice size
+	warpLen   int    // product of slice size
+	warpPitch [3]int
 )
 
 var MAX_WARPLEN = 8192 // elements. 
@@ -72,5 +73,14 @@ func WarpSize() [3]int { return warpSize }
 
 // Position of 3D slice number s in its full 3D block.
 func SliceOffset(s int) [3]int {
-	return [3]int{0, 0, 0} // TODO
+	N0 := size[0]
+	N1 := size[1]
+	if nWarp <= N0 { // slice along I
+		i := s * (N0 / nWarp)
+		return [3]int{i, 0, 0}
+	} //else
+	j := s * (N1 / nWarp)
+	i := j / (N0*N1)
+	j %= N1
+	return [3]int{i, j, 0}
 }

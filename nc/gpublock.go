@@ -2,9 +2,11 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"math"
 )
 
 // Block of float32's on the GPU.
+// TODO: could embed gpufloats
 type GpuBlock struct {
 	ptr  cu.DevicePtr
 	size [3]int
@@ -20,6 +22,7 @@ func Make3GpuBlock(size [3]int) [3]GpuBlock {
 	return [3]GpuBlock{MakeGpuBlock(size), MakeGpuBlock(size), MakeGpuBlock(size)}
 }
 
+// Pointer to first element on the GPU.
 func (b *GpuBlock) Pointer() cu.DevicePtr {
 	return b.ptr
 }
@@ -29,6 +32,7 @@ func (b *GpuBlock) N() int {
 	return b.size[0] * b.size[1] * b.size[2]
 }
 
+// Number of bytes for underlying storage.
 func (b *GpuBlock) Bytes() int64 {
 	return SIZEOF_FLOAT32 * int64(b.N())
 }
@@ -60,4 +64,8 @@ func (dst *GpuBlock) CopyHtoD(src Block) {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
 	cu.MemcpyHtoD(dst.Pointer(), src.UnsafePointer(), src.Bytes())
+}
+
+func (b *GpuBlock) Memset(v float32) {
+	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.N()))
 }

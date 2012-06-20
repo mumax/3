@@ -24,50 +24,23 @@ func main() {
 
 }
 
-type Source struct {
-	Output []chan<- Block
-}
-
-func (box *Source) Run() {
-	count := 0
-	for {
-		b := Buffer()
-		for i := range b.List {
-			b.List[i] = float32(count)
-			count++
-		}
-		Send(box.Output, b)
-	}
-}
-
-type Sink struct {
-	Input <-chan Block
-}
-
-func (box *Sink) Run(n int) {
-	count := 0
-	for s := 0; s < n; s++ {
-		in := Recv(box.Input)
-		//Debug(in)
-		for i := range in.List {
-			if in.List[i] != float32(count) {
-				Panic(in)
-			}
-			count++
-		}
-		Recycle(in)
-	}
-}
-
 type GpuSource3 struct {
 	Output [3][]chan<- GpuBlock
 }
 
 func (box *GpuSource3) Run() {
 	for s:=0;s<NumWarp();s++{
-		SendGpu(box.Output[0], GpuBuffer())
-		SendGpu(box.Output[1], GpuBuffer())
-		SendGpu(box.Output[2], GpuBuffer())
+		buf := GpuBuffer()
+		buf.Memset(1)
+		SendGpu(box.Output[0], buf)
+
+		buf = GpuBuffer()
+		buf.Memset(2)
+		SendGpu(box.Output[1], buf)
+
+		buf = GpuBuffer()
+		buf.Memset(3)
+		SendGpu(box.Output[2], buf)
 	}
 }
 

@@ -1,6 +1,8 @@
 package nc
 
 import (
+	"bytes"
+	"fmt"
 	"unsafe"
 )
 
@@ -73,6 +75,21 @@ func (b *Block) IsNil() bool {
 func (b *Block) Slice(index int) Block {
 	storage := b.List[index*WarpLen() : (index+1)*WarpLen()]
 	return Block{slice(storage, WarpSize()), storage}
+}
+
+func (b Block) String() string {
+	buf := bytes.NewBufferString("\n")
+	a := b.Array
+	for i := range a {
+		for j := range a[i] {
+			for _, v := range a[i][j] {
+				fmt.Fprint(buf, v, " ")
+			}
+			fmt.Fprintln(buf)
+		}
+		fmt.Fprintln(buf)
+	}
+	return buf.String()
 }
 
 const (

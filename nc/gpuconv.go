@@ -36,12 +36,13 @@ func (box *GpuConvBox) Run() {
 	fftBuf := box.fftBuf
 
 	for {
-		for s := 0; s < NumWarp(); s++ {
-			for c := 0; c < 3; c++ {
+		for c := 0; c < 3; c++ {
+			fftBuf[c].Memset(0)
+			for s := 0; s < NumWarp(); s++ {
 				m := RecvGpu(box.M[c])
 				copyPad(fftBuf[c], m, sliceOffset(s))
-				Debug("fftbuf:", fftBuf[c])
 			}
+			Debug("fftbuf:", fftBuf[c].Host())
 		}
 	}
 }

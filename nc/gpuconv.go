@@ -56,6 +56,7 @@ func (box *GpuConvBox) Run() {
 
 	// run Convolution, run!
 	for {
+		// FW all components
 		for c := 0; c < 3; c++ {
 
 			fftBuf[c].Memset(0) // todo: async
@@ -65,13 +66,14 @@ func (box *GpuConvBox) Run() {
 			}
 			Debug("fftbuf:", fftBuf[c].Host())
 
-			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: wait for stream
-
+			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?
+			fftStream[c].Synchronize()
 			Debug("fftbuf:", fftBuf[c].Host())
+		}
 
-			bwPlan[c].ExecC2R(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: wait for stream
-
-			Debug("fftbuf:", fftBuf[c].Host())
+		// kernel mul
+		for slice := 0; slice < NumWarp(); slice++ {
+			//kernmul(fftBuf[0].Slice(slice), fftBuf[1].Slice(slice), fftBuf[2].Slice(slice))
 		}
 	}
 }

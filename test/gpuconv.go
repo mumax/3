@@ -6,6 +6,7 @@ import (
 
 func main() {
 
+	MAX_WARPLEN=32
 	InitSize(1, 8, 16)
 
 	m := new(GpuSource3)
@@ -32,18 +33,18 @@ func (box *GpuSource3) Run() {
 	LockCudaCtx()
 	for s := 0; s < NumWarp(); s++ {
 		buf := GpuBuffer()
-		buf.Memset(0)
-		buf.Set(0, 0, 0, 1)
+		buf.Memset(1)
+		buf.Set(0, 0, 0, 2)
 		SendGpu(box.Output[0], buf)
 
 		buf = GpuBuffer()
-		buf.Memset(0)
-		buf.Set(0, 0, 0, 2)
+		buf.Memset(2)
+		buf.Set(0, 0, 0, 3)
 		SendGpu(box.Output[1], buf)
 
 		buf = GpuBuffer()
-		buf.Memset(0)
-		buf.Set(0, 0, 0, 3)
+		buf.Memset(3)
+		buf.Set(0, 0, 0, 4)
 		SendGpu(box.Output[2], buf)
 	}
 }

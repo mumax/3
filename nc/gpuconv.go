@@ -20,6 +20,8 @@ func NewGpuConvBox() *GpuConvBox {
 }
 
 func (box *GpuConvBox) Run() {
+	SetCudaCtx()
+
 	size := Size()
 
 	// zero-padded size
@@ -42,16 +44,19 @@ func (box *GpuConvBox) Run() {
 	fftBuf := box.fftBuf
 
 	// setup fft plans
-	var fftPlan [3]cufft.Handle
+	var fftPlan, bwPlan [3]cufft.Handle
 	var fftStream [3]cu.Stream
 	for i := range fftPlan {
 		fftPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.R2C)
+		bwPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.C2R)
 		fftStream[i] = cu.StreamCreate()
 		fftPlan[i].SetStream(fftStream[i])
+		bwPlan[i].SetStream(fftStream[i])
 	}
 
 	// run Convolution, run!
 	for {
+		SetCudaCtx()
 		for c := 0; c < 3; c++ {
 
 			fftBuf[c].Memset(0) // todo: async
@@ -61,7 +66,11 @@ func (box *GpuConvBox) Run() {
 			}
 			Debug("fftbuf:", fftBuf[c].Host())
 
-			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer())
+			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: wait for stream
+
+			Debug("fftbuf:", fftBuf[c].Host())
+
+			bwPlan[c].ExecC2R(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: wait for stream
 
 			Debug("fftbuf:", fftBuf[c].Host())
 		}

@@ -1,8 +1,8 @@
 package cufft
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"fmt"
+	"github.com/barnex/cuda4/cu"
 )
 
 // needed for all other tests.

@@ -8,6 +8,7 @@ package cufft
 import "C"
 
 import (
+	"github.com/barnex/cuda4/cu"
 	"unsafe"
 )
 
@@ -101,11 +102,11 @@ func PlanMany(n []int, inembed []int, istride int, oembed []int, ostride int, ty
 }
 
 // Execute Complex-to-Complex plan
-func (plan Handle) ExecC2C(idata, odata uintptr, direction int) {
+func (plan Handle) ExecC2C(idata, odata cu.DevicePtr, direction int) {
 	err := Result(C.cufftExecC2C(
 		C.cufftHandle(plan),
-		(*C.cufftComplex)(unsafe.Pointer(idata)),
-		(*C.cufftComplex)(unsafe.Pointer(odata)),
+		(*C.cufftComplex)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftComplex)(unsafe.Pointer(uintptr(odata))),
 		C.int(direction)))
 	if err != SUCCESS {
 		panic(err)
@@ -113,33 +114,33 @@ func (plan Handle) ExecC2C(idata, odata uintptr, direction int) {
 }
 
 // Execute Real-to-Complex plan
-func (plan Handle) ExecR2C(idata, odata uintptr) {
+func (plan Handle) ExecR2C(idata, odata cu.DevicePtr) {
 	err := Result(C.cufftExecR2C(
 		C.cufftHandle(plan),
-		(*C.cufftReal)(unsafe.Pointer(idata)),
-		(*C.cufftComplex)(unsafe.Pointer(odata))))
+		(*C.cufftReal)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftComplex)(unsafe.Pointer(uintptr(odata)))))
 	if err != SUCCESS {
 		panic(err)
 	}
 }
 
 // Execute Complex-to-Real plan
-func (plan Handle) ExecC2R(idata, odata uintptr) {
+func (plan Handle) ExecC2R(idata, odata cu.DevicePtr) {
 	err := Result(C.cufftExecC2R(
 		C.cufftHandle(plan),
-		(*C.cufftComplex)(unsafe.Pointer(idata)),
-		(*C.cufftReal)(unsafe.Pointer(odata))))
+		(*C.cufftComplex)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftReal)(unsafe.Pointer(uintptr(odata)))))
 	if err != SUCCESS {
 		panic(err)
 	}
 }
 
 // Execute Double Complex-to-Complex plan
-func (plan Handle) ExecZ2Z(idata, odata uintptr, direction int) {
+func (plan Handle) ExecZ2Z(idata, odata cu.DevicePtr, direction int) {
 	err := Result(C.cufftExecZ2Z(
 		C.cufftHandle(plan),
-		(*C.cufftDoubleComplex)(unsafe.Pointer(idata)),
-		(*C.cufftDoubleComplex)(unsafe.Pointer(odata)),
+		(*C.cufftDoubleComplex)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftDoubleComplex)(unsafe.Pointer(uintptr(odata))),
 		C.int(direction)))
 	if err != SUCCESS {
 		panic(err)
@@ -147,22 +148,22 @@ func (plan Handle) ExecZ2Z(idata, odata uintptr, direction int) {
 }
 
 // Execute Double Real-to-Complex plan
-func (plan Handle) ExecD2Z(idata, odata uintptr) {
+func (plan Handle) ExecD2Z(idata, odata cu.DevicePtr) {
 	err := Result(C.cufftExecD2Z(
 		C.cufftHandle(plan),
-		(*C.cufftDoubleReal)(unsafe.Pointer(idata)),
-		(*C.cufftDoubleComplex)(unsafe.Pointer(odata))))
+		(*C.cufftDoubleReal)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftDoubleComplex)(unsafe.Pointer(uintptr(odata)))))
 	if err != SUCCESS {
 		panic(err)
 	}
 }
 
 // Execute Double Complex-to-Real plan
-func (plan Handle) ExecZ2D(idata, odata uintptr) {
+func (plan Handle) ExecZ2D(idata, odata cu.DevicePtr) {
 	err := Result(C.cufftExecZ2D(
 		C.cufftHandle(plan),
-		(*C.cufftDoubleComplex)(unsafe.Pointer(idata)),
-		(*C.cufftDoubleReal)(unsafe.Pointer(odata))))
+		(*C.cufftDoubleComplex)(unsafe.Pointer(uintptr(idata))),
+		(*C.cufftDoubleReal)(unsafe.Pointer(uintptr(odata)))))
 	if err != SUCCESS {
 		panic(err)
 	}
@@ -178,10 +179,10 @@ func (plan *Handle) Destroy() {
 }
 
 // Sets the cuda stream for this plan
-func (plan Handle) SetStream(stream uintptr) {
+func (plan Handle) SetStream(stream cu.Stream) {
 	err := Result(C.cufftSetStream(
 		C.cufftHandle(plan),
-		C.cudaStream_t(unsafe.Pointer(stream))))
+		C.cudaStream_t(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
 	}

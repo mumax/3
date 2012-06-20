@@ -1,9 +1,9 @@
 package cufft
 
 import (
+	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"unsafe"
-	"fmt"
 )
 
 func ExampleFFT1D() {
@@ -21,11 +21,11 @@ func ExampleFFT1D() {
 	defer cu.MemFree(&devOut)
 
 	plan := Plan1d(N, R2C, 1)
-	plan.ExecR2C(uintptr(devIn), uintptr(devOut))
+	plan.ExecR2C(devIn, devOut)
 
 	cu.MemcpyDtoH(unsafe.Pointer(&hostOut[0]), devOut, devOut.Bytes())
 
-	fmt.Println("hostIn:" ,hostIn)
+	fmt.Println("hostIn:", hostIn)
 	fmt.Println("hostOut:", hostOut)
 
 	// Output:

@@ -32,6 +32,7 @@ func NewFromGpu3Par() *FromGpu3Par {
 }
 
 func (box *FromGpu3Par) Run() {
+	LockCudaCtx()
 
 	Vet(box)
 	input := box.Input

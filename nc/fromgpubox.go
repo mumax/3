@@ -4,7 +4,6 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
-	"unsafe"
 )
 
 type FromGpuBox struct {
@@ -21,6 +20,7 @@ func NewFromGpuBox() *FromGpuBox {
 }
 
 func (box *FromGpuBox) Run() {
+	LockCudaCtx()
 	for {
 		in := RecvGpu(box.Input)
 		sendToHost(in, box.Output, box.stream)
@@ -29,8 +29,7 @@ func (box *FromGpuBox) Run() {
 
 func sendToHost(in GpuBlock, out []chan<- Block, stream cu.Stream) {
 	buffer := Buffer()
-	cu.MemcpyDtoHAsync(unsafe.Pointer(buffer.Pointer()), in.Pointer(),
-		cu.SIZEOF_FLOAT32*int64(WarpLen()), stream)
+	in.CopyDtoHAsync(buffer, stream)
 	stream.Synchronize()
 	RecycleGpu(in)
 	Send(out, buffer)

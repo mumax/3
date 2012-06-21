@@ -23,6 +23,7 @@ func NewToGpu3SeqBox() *ToGpu3SeqBox {
 }
 
 func (box *ToGpu3SeqBox) Run() {
+	LockCudaCtx()
 	Vet(box)
 	input := box.Input
 	output := box.Output

@@ -58,30 +58,16 @@ func (box *GpuConvBox) Run() {
 		// FW all components
 		for c := 0; c < 3; c++ {
 
+			// copy + zeropad slice
 			fftBuf[c].Memset(0) // todo: async
-
 			for s := 0; s < NumWarp(); s++ {
-				/////
-				size := Size()
-				w := WarpSize()
-				off0, off1 := 0, 0
-				if w[0] > 1 {
-					off0 = (s * w[0]) % size[0]
-				} else {
-					off1 = (s * w[1]) % size[1]
-					off0 = ((s * w[1]) / size[1]) % size[0]
-				}
-				/////
-
-				Debug("offset", s, off0, off1, 0)
-
+				offset := sliceOffset(s)
 				m := RecvGpu(box.M[c])
-				copyPad(fftBuf[c], m, [3]int{off0, off1, 0}) // todo: async
-
+				copyPad(fftBuf[c], m, offset) // todo: async
 			}
-
 			Debug("fftbuf:", fftBuf[c].Host())
 
+			// fw fft
 			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?
 			fftStream[c].Synchronize()
 			//Debug("fftbuf:", fftBuf[c].Host())
@@ -92,4 +78,19 @@ func (box *GpuConvBox) Run() {
 			//kernmul(fftBuf[0].Slice(slice), fftBuf[1].Slice(slice), fftBuf[2].Slice(slice))
 		}
 	}
+}
+
+// Position of slice block number s in its parent block.
+func sliceOffset(s int) [3]int {
+	Assert(s < NumWarp())
+	size := Size()
+	w := WarpSize()
+	off0, off1 := 0, 0
+	if w[0] > 1 {
+		off0 = (s * w[0]) % size[0]
+	} else {
+		off1 = (s * w[1]) % size[1]
+		off0 = ((s * w[1]) / size[1]) % size[0]
+	}
+	return [3]int{off0, off1, 0}
 }

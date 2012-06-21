@@ -10,17 +10,39 @@ func main() {
 	InitSize(4, 8, 16)
 
 	m := new(GpuSource3)
-	conv := NewGpuConvBox()
-	Register(m, conv)
+	conv := NewConvBox()
+	kern := NewKernelBox()
+	Register(m, conv, kern)
 
 	Connect(&conv.M[X], &m.Output[X])
 	Connect(&conv.M[Y], &m.Output[Y])
 	Connect(&conv.M[Z], &m.Output[Z])
 
-	Vet(m, conv)
+	to := make([]*ToGpuBox, 6)
+	for i := range to {
+		to[i] = NewToGpuBox()
+	}
+
+	Connect(&conv.Kii, &to[0].Output)
+	Connect(&conv.Kjj, &to[1].Output)
+	Connect(&conv.Kkk, &to[2].Output)
+	Connect(&conv.Kjk, &to[3].Output)
+	Connect(&conv.Kik, &to[4].Output)
+	Connect(&conv.Kij, &to[5].Output)
+
+	Connect(&to[0].Input, &kern.Kii)
+	Connect(&to[1].Input, &kern.Kjj)
+	Connect(&to[2].Input, &kern.Kkk)
+	Connect(&to[3].Input, &kern.Kjk)
+	Connect(&to[4].Input, &kern.Kik)
+	Connect(&to[5].Input, &kern.Kij)
+
 	WriteGraph("gpuconv")
 
-	GoRun(m)
+	GoRun(m, kern)
+	for i := range to {
+		GoRun(to[i])
+	}
 	conv.Run() // once
 
 }

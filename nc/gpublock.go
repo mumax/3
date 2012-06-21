@@ -66,6 +66,22 @@ func (dst *GpuBlock) CopyHtoD(src Block) {
 	cu.MemcpyHtoD(dst.Pointer(), src.UnsafePointer(), src.Bytes())
 }
 
+// Copy from device to host.
+func (src *GpuBlock) CopyDtoHAsync(dst Block, str cu.Stream) {
+	if src.Size() != dst.Size() {
+		Panic("size mismatch:", src.Size(), dst.Size())
+	}
+	cu.MemcpyDtoHAsync(dst.UnsafePointer(), src.Pointer(), src.Bytes(), str)
+}
+
+// Copy from host to device.
+func (dst *GpuBlock) CopyHtoDAsync(src Block, str cu.Stream) {
+	if src.Size() != dst.Size() {
+		Panic("size mismatch:", src.Size(), dst.Size())
+	}
+	cu.MemcpyHtoDAsync(dst.Pointer(), src.UnsafePointer(), src.Bytes(), str)
+}
+
 // Set all values to v.
 func (b *GpuBlock) Memset(v float32) {
 	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.N()))

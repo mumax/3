@@ -1,9 +1,11 @@
-all: 6g gccgo
+all: 6g #gccgo vet
 
 6g:
 	go install -v
-	go tool vet *.go
 	gofmt -w *.go
+
+vet:
+	go tool vet *.go
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 

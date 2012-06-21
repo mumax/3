@@ -8,11 +8,16 @@ import (
 type GpuConvBox struct {
 	M      [3]<-chan GpuBlock
 	B      [][3]chan<- GpuBlock
-	Kernel [3][3]<-chan GpuBlock
+	Kii    <-chan GpuBlock
+	Kjj    <-chan GpuBlock
+	Kkk    <-chan GpuBlock
+	Kjk    <-chan GpuBlock
+	Kik    <-chan GpuBlock
+	Kij    <-chan GpuBlock
 	fftBuf [3]GpuBlock
 }
 
-func NewGpuConvBox() *GpuConvBox {
+func NewConvBox() *GpuConvBox {
 	box := new(GpuConvBox)
 	Register(box)
 	return box
@@ -57,7 +62,7 @@ func (box *GpuConvBox) Run() {
 				m := RecvGpu(box.M[c])
 				copyPad(fftBuf[c], m, offset) // todo: async
 			}
-			Debug("fftbuf:", fftBuf[c].Host())
+			//Debug("fftbuf:", fftBuf[c].Host())
 
 			// fw fft
 			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?
@@ -67,13 +72,14 @@ func (box *GpuConvBox) Run() {
 
 		// kernel mul
 		for slice := 0; slice < NumWarp(); slice++ {
-			Kii := RecvGpu(box.Kernel[0][0])
-			Kjj := RecvGpu(box.Kernel[1][1])
-			Kkk := RecvGpu(box.Kernel[2][2])
-			Kjk := RecvGpu(box.Kernel[1][2])
-			Kik := RecvGpu(box.Kernel[0][2])
-			Kij := RecvGpu(box.Kernel[0][1])
-			kernMul(fftBuf, Kii, Kjj, Kkk, Kjk, Kik, Kij, slice) // todo: async
+			kernMul(fftBuf,
+				RecvGpu(box.Kii),
+				RecvGpu(box.Kjj),
+				RecvGpu(box.Kkk),
+				RecvGpu(box.Kjk),
+				RecvGpu(box.Kik),
+				RecvGpu(box.Kij),
+				slice) // todo: async
 		}
 	}
 }

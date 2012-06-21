@@ -89,6 +89,10 @@ func (b *Block) Slice(index int) Block {
 }
 
 func (b Block) String() string {
+	return fmt.Sprint("block:", b.Size(), ",len:", len(b.List))
+}
+
+func (b Block) Format() string {
 	buf := bytes.NewBufferString("\n")
 	a := b.Array
 	for i := range a {

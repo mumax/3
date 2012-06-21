@@ -75,7 +75,13 @@ func (box *GpuConvBox) Run() {
 
 		// kernel mul
 		for slice := 0; slice < NumWarp(); slice++ {
-			//kernmul(fftBuf[0].Slice(slice), fftBuf[1].Slice(slice), fftBuf[2].Slice(slice))
+			Kii := RecvGpu(box.Kernel[0][0])
+			Kjj := RecvGpu(box.Kernel[1][1])
+			Kkk := RecvGpu(box.Kernel[2][2])
+			Kjk := RecvGpu(box.Kernel[1][2])
+			Kik := RecvGpu(box.Kernel[0][2])
+			Kij := RecvGpu(box.Kernel[0][1])
+			kernMul(fftBuf, Kii, Kjj, Kkk, Kjk, Kik, Kij, slice) // todo: async
 		}
 	}
 }

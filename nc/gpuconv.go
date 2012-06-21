@@ -59,12 +59,27 @@ func (box *GpuConvBox) Run() {
 		for c := 0; c < 3; c++ {
 
 			fftBuf[c].Memset(0) // todo: async
+
+			off0, off1 := 0, 0
 			for s := 0; s < NumWarp(); s++ {
+
+				Debug("offset", s, off0, off1, 0)
+
 				m := RecvGpu(box.M[c])
-				off := SliceOffset(s)
-				Debug("offset", s, off)
-				copyPad(fftBuf[c], m, off) // todo: async
+				copyPad(fftBuf[c], m, [3]int{off0, off1, 0}) // todo: async
+
+				// last: update slice offset
+				if WarpSize()[0] > 1 {
+					off0 += WarpSize()[0]
+				} else {
+					off1 += WarpSize()[1]
+					if off1 >= Size()[1] {
+						off1 = 0
+						off0++
+					}
+				}
 			}
+
 			Debug("fftbuf:", fftBuf[c].Host())
 
 			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?

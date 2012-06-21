@@ -80,7 +80,7 @@ func SliceOffset(s int) [3]int {
 		return [3]int{i, 0, 0}
 	} //else
 	j := s * (N1 / nWarp)
-	i := j / (N0*N1)
+	i := j / (N0 * N1)
 	j %= N1
 	return [3]int{i, j, 0}
 }

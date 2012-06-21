@@ -7,7 +7,7 @@ import (
 func main() {
 
 	MAX_WARPLEN = 32
-	InitSize(2, 8, 16)
+	InitSize(4, 8, 16)
 
 	m := new(GpuSource3)
 	conv := NewGpuConvBox()

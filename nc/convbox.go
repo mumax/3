@@ -22,15 +22,7 @@ func (box *GpuConvBox) Run() {
 	LockCudaCtx()
 
 	size := Size()
-
-	// zero-padded size
-	padded := [3]int{
-		size[0] * 2,
-		size[1] * 2,
-		size[2] * 2}
-	if padded[0] == 2 {
-		padded[0] = 1 // no need to pad 1 layer thickness
-	}
+	padded := PadSize(size)
 
 	// size of fft'd data
 	fftSize := [3]int{

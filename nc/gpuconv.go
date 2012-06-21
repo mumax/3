@@ -53,6 +53,8 @@ func (box *GpuConvBox) Run() {
 		bwPlan[i].SetStream(fftStream[i])
 	}
 
+	off0, off1 := 0, 0
+
 	// run Convolution, run!
 	for {
 		// FW all components
@@ -60,7 +62,6 @@ func (box *GpuConvBox) Run() {
 
 			fftBuf[c].Memset(0) // todo: async
 
-			off0, off1 := 0, 0
 			for s := 0; s < NumWarp(); s++ {
 
 				Debug("offset", s, off0, off1, 0)
@@ -71,11 +72,13 @@ func (box *GpuConvBox) Run() {
 				// last: update slice offset
 				if WarpSize()[0] > 1 {
 					off0 += WarpSize()[0]
+					off0 %= Size()[0]
 				} else {
 					off1 += WarpSize()[1]
 					if off1 >= Size()[1] {
 						off1 = 0
 						off0++
+						off0 %= Size()[0]
 					}
 				}
 			}

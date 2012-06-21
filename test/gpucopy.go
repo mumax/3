@@ -68,7 +68,7 @@ func (box *Sink) Run(n int) {
 		//Debug(in)
 		for i := range in.List {
 			if in.List[i] != float32(count) {
-				Panic(in)
+				Panic("fail test:",in.Array)
 			}
 			count++
 		}

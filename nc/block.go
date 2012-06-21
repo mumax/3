@@ -18,9 +18,20 @@ type Block struct {
 // Make a block of float32's of size N[0] x N[1] x N[2]
 // with contiguous underlying storage.
 func MakeBlock(size [3]int) Block {
+	var b Block
+	b.Init(size)
+	return b
+}
+
+func (b *Block) Init(size [3]int) {
 	checkSize(size[:])
 	storage := make([]float32, size[0]*size[1]*size[2])
-	return Block{slice(storage, size), storage}
+	b.Array = slice(storage, size)
+	b.List = storage
+}
+
+func Make3Block(size [3]int) [3]Block {
+	return [3]Block{MakeBlock(size), MakeBlock(size), MakeBlock(size)}
 }
 
 func slice(storage []float32, size [3]int) [][][]float32 {

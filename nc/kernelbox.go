@@ -1,0 +1,6 @@
+package nc
+
+import (
+	"math"
+)
+

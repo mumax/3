@@ -11,7 +11,7 @@ import (
 type GpuBlock struct {
 	ptr      cu.DevicePtr
 	size     [3]int
-	refcount *int32
+	Refcount
 }
 
 func MakeGpuBlock(size [3]int) GpuBlock {

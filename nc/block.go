@@ -13,7 +13,7 @@ import (
 type Block struct {
 	Array    [][][]float32
 	List     []float32
-	refcount *int32
+	*Refcount
 }
 
 // Make a block of float32's of size N[0] x N[1] x N[2]
@@ -86,7 +86,7 @@ func (b *Block) IsNil() bool {
 // sharing underlying storage.
 func (b *Block) Slice(index int) Block {
 	storage := b.List[index*WarpLen() : (index+1)*WarpLen()]
-	return Block{slice(storage, WarpSize()), storage, b.refcount}
+	return Block{slice(storage, WarpSize()), storage, b.Refcount}
 }
 
 func (b Block) String() string {

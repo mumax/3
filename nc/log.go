@@ -7,6 +7,11 @@ import (
 	"log"
 )
 
+var (
+	LOG   = true
+	DEBUG = true
+)
+
 // Panics on the message.
 func Panic(msg ...interface{}) {
 	panic(fmt.Sprint(msg...))
@@ -28,12 +33,16 @@ func LogErr(err error) {
 
 // Log message.
 func Log(msg ...interface{}) {
-	log.Println(msg...)
+	if LOG {
+		log.Println(msg...)
+	}
 }
 
 // Debug message.
 func Debug(msg ...interface{}) {
-	Log(msg...)
+	if DEBUG {
+		Log(msg...)
+	}
 }
 
 // Error message

@@ -5,6 +5,7 @@ import (
 )
 
 func BenchmarkGpuBufferRecycle(b *testing.B) {
+	LOG=false
 	b.StopTimer()
 
 	// init and warmup
@@ -20,6 +21,7 @@ func BenchmarkGpuBufferRecycle(b *testing.B) {
 }
 
 func BenchmarkBufferRecycle(b *testing.B) {
+	LOG=false
 	b.StopTimer()
 
 	// init and warmup

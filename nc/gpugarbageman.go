@@ -58,21 +58,3 @@ func (g *GpuGarbageman) Init(warpSize [3]int, buffer int) {
 	g.recycled = make(chan GpuBlock, buffer)
 	g.size = warpSize
 }
-
-//func Recycle3(garbages ...[3]GpuBlock) {
-//	for _, g := range garbages {
-//		Recycle(g[X], g[Y], g[Z])
-//	}
-//}
-
-//func GpuBuffer() GpuGpuBlock {
-//	if f := gpuRecycled.pop(); f.Pointer() != 0 {
-//		Assert(f.N() == g.size
-//		f.size = g.size
-//		return f
-//	}
-//	slice := MakeGpuGpuBlock(WarpSize())
-//	NumGpuAlloc++
-//	slice.refcount = new(int32)
-//	return slice
-//}

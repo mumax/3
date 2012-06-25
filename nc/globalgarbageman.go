@@ -47,6 +47,6 @@ func NumGpuAlloc() int {
 
 func InitGarbageman() {
 	// recycling buffer may be huge, it should not waste any memory.
-	garbageman.Init(WarpSize(), 1000*NumWarp()) 
+	garbageman.Init(WarpSize(), 1000*NumWarp())
 	gpugarbageman.Init(WarpSize(), 1000*NumWarp())
 }

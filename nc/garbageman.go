@@ -58,7 +58,7 @@ func (m *Garbageman) Recycle(garbages ...Block) {
 	}
 }
 
-func (g *Garbageman) Init(warpSize [3]int, buffer int) {
-	g.recycled = make(chan Block, buffer)
+func (g *Garbageman) Init(warpSize [3]int) {
+	g.recycled = make(chan Block, BUFSIZE*NumWarp())
 	g.size = warpSize
 }

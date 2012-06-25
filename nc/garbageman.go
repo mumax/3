@@ -103,7 +103,8 @@ func buffer() Block {
 
 func gpuBuffer() GpuBlock {
 	if f := gpuRecycled.pop(); f.Pointer() != 0 {
-		//Debug("re-use", f)
+		Assert(f.N() == WarpLen())
+		f.size = WarpSize()
 		return f
 	}
 	slice := MakeGpuBlock(WarpSize())

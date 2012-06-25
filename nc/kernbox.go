@@ -33,6 +33,6 @@ func (box *KernelBox) Run() {
 // Infinitely sends the block down chan.
 func SendBlock(Chan []chan<- Block, block Block) {
 	for s := 0; s < NumWarp(); s++ {
-		Send(Chan, block)
+		//Send(Chan, block.Slice())
 	}
 }

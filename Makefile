@@ -26,7 +26,7 @@ gccgotest:
 testdir:
 	make -C test
 
-bench: 6gbench gccgobench benchdir
+bench: 6gbench benchdir #gccgobench 
 
 6gbench:
 	go test -bench=. nimble-cube/nc

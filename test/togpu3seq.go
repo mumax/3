@@ -31,12 +31,12 @@ func main() {
 	GoRun(to, gpusinkX, gpusinkY, gpusinkZ)
 	source.Run(50)
 
-	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 30 {
+	fmt.Println("NumAlloc:", NumAlloc())
+	if NumAlloc() > 30 {
 		os.Exit(1)
 	}
-	fmt.Println("NumGpuAlloc:", NumGpuAlloc)
-	if NumGpuAlloc > 30 {
+	fmt.Println("NumGpuAlloc:", NumGpuAlloc())
+	if NumGpuAlloc() > 30 {
 		os.Exit(1)
 	}
 }

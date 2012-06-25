@@ -24,6 +24,12 @@ func Make3GpuBlock(size [3]int) [3]GpuBlock {
 	return [3]GpuBlock{MakeGpuBlock(size), MakeGpuBlock(size), MakeGpuBlock(size)}
 }
 
+func (g *GpuBlock) Free() {
+	g.ptr.Free()
+	g.size = [3]int{0, 0, 0}
+	g.refcount = nil
+}
+
 // Pointer to first element on the GPU.
 func (b *GpuBlock) Pointer() cu.DevicePtr {
 	return b.ptr

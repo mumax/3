@@ -24,8 +24,8 @@ func main() {
 	go sink2.Run(100)
 	sink.Run(100)
 
-	fmt.Println("NumGpuAlloc:", NumGpuAlloc)
-	if NumAlloc > 10 {
+	fmt.Println("NumGpuAlloc:", NumGpuAlloc())
+	if NumAlloc() > 10 {
 		os.Exit(1)
 	}
 }

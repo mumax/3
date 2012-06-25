@@ -3,12 +3,11 @@ package nc
 // Garbageman recycles garbage slices.
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"sync/atomic"
 )
 
-type Garbageman struct {
-	recycled chan Block
+type GpuGarbageman struct {
+	recycled chan GpuBlock
 	size     [3]int
 	numAlloc int32
 }
@@ -16,7 +15,7 @@ type Garbageman struct {
 // Return a buffer, recycle an old one if possible.
 // Buffers created in this way should be Recyle()d
 // when not used anymore, i.e., if not Send() elsewhere.
-func (g *Garbageman) Get() Block {
+func (g *GpuGarbageman) Get() GpuBlock {
 	select {
 	case b := <-g.recycled:
 		return b
@@ -28,19 +27,15 @@ func (g *Garbageman) Get() Block {
 }
 
 // Return a freshly allocated & managed block.
-func (g *Garbageman) Alloc() Block {
-	slice := MakeBlock(g.size)
-	if *flag_pagelock {
-		SetCudaCtx()
-		cu.MemHostRegister(slice.UnsafePointer(), slice.Bytes(), cu.MEMHOSTREGISTER_PORTABLE)
-	}
+func (g *GpuGarbageman) Alloc() GpuBlock {
+	slice := MakeGpuBlock(g.size)
 	atomic.AddInt32(&g.numAlloc, 1)
 	slice.refcount = new(Refcount)
 	return slice
 }
 
 // Recycle the block.
-func (m *Garbageman) Recycle(garbages ...Block) {
+func (m *GpuGarbageman) Recycle(garbages ...GpuBlock) {
 	for _, g := range garbages {
 		Assert(g.Size() == m.size)
 		if g.refcount == nil {
@@ -51,6 +46,7 @@ func (m *Garbageman) Recycle(garbages ...Block) {
 			case m.recycled <- g: //Debug("recycling", g)
 			default:
 				Debug("spilling", g)
+				g.Free()
 			}
 		} else { // cannot be recycled, just yet
 			g.refcount.Add(-1)
@@ -58,13 +54,25 @@ func (m *Garbageman) Recycle(garbages ...Block) {
 	}
 }
 
-func (g *Garbageman) Init(warpSize [3]int, buffer int) {
-	g.recycled = make(chan Block, buffer)
+func (g *GpuGarbageman) Init(warpSize [3]int, buffer int) {
+	g.recycled = make(chan GpuBlock, buffer)
 	g.size = warpSize
 }
 
-//func Recycle3(garbages ...[3]Block) {
+//func Recycle3(garbages ...[3]GpuBlock) {
 //	for _, g := range garbages {
 //		Recycle(g[X], g[Y], g[Z])
 //	}
+//}
+
+//func GpuBuffer() GpuGpuBlock {
+//	if f := gpuRecycled.pop(); f.Pointer() != 0 {
+//		Assert(f.N() == g.size
+//		f.size = g.size
+//		return f
+//	}
+//	slice := MakeGpuGpuBlock(WarpSize())
+//	NumGpuAlloc++
+//	slice.refcount = new(int32)
+//	return slice
 //}

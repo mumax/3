@@ -79,12 +79,6 @@ func GpuBuffer3() [3]GpuBlock {
 	return b
 }
 
-func assureCtx() {
-	if cu.CtxGetCurrent() != cudaCtx {
-		cudaCtx.SetCurrent()
-	}
-}
-
 // not synchronized.
 func buffer() Block {
 	if f := recycled.pop(); !f.IsNil() {
@@ -94,7 +88,7 @@ func buffer() Block {
 	slice := MakeBlock(WarpSize())
 
 	if *flag_pagelock {
-		assureCtx()
+		SetCudaCtx()
 		// runtime.Pray("please don't swap my OS thread right now, dear Dymitry!")
 		cu.MemHostRegister(slice.UnsafePointer(),
 			slice.Bytes(),

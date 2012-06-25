@@ -17,13 +17,13 @@ type ToGpu3SeqBox struct {
 
 func NewToGpu3SeqBox() *ToGpu3SeqBox {
 	box := new(ToGpu3SeqBox)
+	SetCudaCtx()
 	box.stream = cu.StreamCreate()
 	Register(box)
 	return box
 }
 
 func (box *ToGpu3SeqBox) Run() {
-	LockCudaCtx()
 	Vet(box)
 	input := box.Input
 	output := box.Output

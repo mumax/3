@@ -25,14 +25,11 @@ type FromGpu3Par struct {
 func NewFromGpu3Par() *FromGpu3Par {
 	box := new(FromGpu3Par)
 	box.stream = cu.StreamCreate()
-	//box.comp1 = X
-	//box.comp2 = Y
 	Register(box)
 	return box
 }
 
 func (box *FromGpu3Par) Run() {
-	LockCudaCtx()
 
 	Vet(box)
 	input := box.Input

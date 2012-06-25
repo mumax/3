@@ -24,7 +24,6 @@ func NewConvBox() *GpuConvBox {
 }
 
 func (box *GpuConvBox) Run() {
-	LockCudaCtx()
 
 	size := Size()
 	padded := PadSize(size)
@@ -42,6 +41,7 @@ func (box *GpuConvBox) Run() {
 	// setup fft plans
 	var fftPlan, bwPlan [3]cufft.Handle
 	var fftStream [3]cu.Stream
+	SetCudaCtx()
 	for i := range fftPlan {
 		fftPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.R2C)
 		bwPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.C2R)
@@ -65,6 +65,7 @@ func (box *GpuConvBox) Run() {
 			//Debug("fftbuf:", fftBuf[c].Host())
 
 			// fw fft
+			SetCudaCtx()
 			fftPlan[c].ExecR2C(fftBuf[c].Pointer(), fftBuf[c].Pointer()) // todo: async?
 			fftStream[c].Synchronize()
 			//Debug("fftbuf:", fftBuf[c].Host())

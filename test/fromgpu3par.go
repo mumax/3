@@ -46,7 +46,6 @@ type Sink3 struct {
 }
 
 func (box *Sink3) Run(n int) {
-	LockCudaCtx()
 	Log("sinking", n)
 	for s := 0; s < n; s++ {
 		//Log("step", s)
@@ -60,7 +59,6 @@ type GpuSource struct {
 }
 
 func (box *GpuSource) Run() {
-	LockCudaCtx()
 	for {
 		SendGpu(box.Output, GpuBuffer())
 	}

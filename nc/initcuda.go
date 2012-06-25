@@ -2,13 +2,11 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
-	"runtime"
-	"sync/atomic"
 )
 
+var cudaCtx cu.Context // gpu context to be used by all threads
+
 func initCUDA() {
-	gomaxprocs = runtime.GOMAXPROCS(0)
-	Debug("GOMAXPROCS:", gomaxprocs)
 
 	// If we're not using CUDA, we should not ask CUDA to page-lock.
 	if !*flag_cuda {
@@ -34,22 +32,10 @@ func initCUDA() {
 	cudaCtx = cu.CtxCreate(flag, 0)
 }
 
-var (
-	cudaCtx    cu.Context // gpu context to be used by all threads
-	gomaxprocs int
-	cuprocs    int32
-)
-
-// To be called by any goroutine that wants to use cuda.
-func LockCudaCtx() {
+// To be called before any cuda call :(
+func SetCudaCtx() {
 	if cudaCtx == 0 {
 		return // allow to run if there's no GPU.
 	}
-	runtime.LockOSThread()
-	ctx := cu.CtxGetCurrent()
-	if ctx != cudaCtx {
-		cudas := atomic.AddInt32(&cuprocs, 1)
-		Debug("locking CUDA context:", "GOMAXPROCS:", gomaxprocs, ",CUDA-enabled threads:", cudas)
-		cudaCtx.SetCurrent()
-	}
+	cudaCtx.SetCurrent() // super cheap.
 }

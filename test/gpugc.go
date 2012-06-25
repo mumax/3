@@ -35,7 +35,6 @@ type GpuSource struct {
 }
 
 func (box *GpuSource) Run() {
-	LockCudaCtx()
 	for {
 		SendGpu(box.Output, GpuBuffer())
 	}

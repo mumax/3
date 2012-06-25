@@ -51,7 +51,7 @@ func initGOMAXPROCS() {
 		*flag_maxprocs = runtime.NumCPU()
 	}
 	procs := runtime.GOMAXPROCS(*flag_maxprocs) // sets it
-	Log("using up to", procs, "CPU threads")
+	Log("GOMAXPROCS:", procs)
 }
 
 func initWarp() {

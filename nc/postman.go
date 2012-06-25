@@ -36,7 +36,7 @@ func Send(fanout []chan<- Block, value Block) {
 	// reference counting: Send adds len() copies, but removes one as sender looses a reference.
 	count := int32(len(fanout)) - 1
 	if count != 0 { // many are 0
-		incr(value, count)
+		value.refcount.Add(count)
 	}
 
 	for _, ch := range fanout {
@@ -51,7 +51,7 @@ func SendGpu(fanout []chan<- GpuBlock, value GpuBlock) {
 
 	count := int32(len(fanout)) - 1
 	if count != 0 {
-		incrGpu(value, count)
+		value.refcount.Add(count)
 	}
 
 	for _, ch := range fanout {
@@ -65,7 +65,9 @@ func Send3(fanout [3][]chan<- Block, value [3]Block) {
 	}
 	count := int32(len(fanout[X])) - 1
 	if count != 0 {
-		incr3(value, count)
+		value[X].refcount.Add(count)
+		value[Y].refcount.Add(count)
+		value[Z].refcount.Add(count)
 	}
 	for comp := 0; comp < 3; comp++ {
 		for _, ch := range fanout[comp] {

@@ -22,8 +22,8 @@ func main() {
 	//go sink2.Run(100)
 	sink.Run(100)
 
-	fmt.Println("NumAlloc:", NumAlloc)
-	if NumAlloc > 10 {
+	fmt.Println("NumAlloc:", NumAlloc())
+	if NumAlloc() > 10 {
 		os.Exit(1)
 	}
 }

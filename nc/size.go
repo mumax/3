@@ -61,6 +61,8 @@ func InitSize(N0, N1, N2 int) {
 	Assert(WarpSize()[0]*WarpSize()[1]*WarpSize()[2] == WarpLen())
 	Assert(Size()[0]*Size()[1]*Size()[2] == N())
 	Assert(WarpLen()*NumWarp() == N())
+
+	InitGarbageman()
 }
 
 func DefaultBufSize() int {

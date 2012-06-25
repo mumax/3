@@ -17,6 +17,8 @@ var (
 	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	flag_memprof  = flag.String("memprof", "", "Write gopprof memory profile to file")
+	flag_debug    = flag.Bool("debug", DEBUG, "Generate debug info")
+	flag_log      = flag.Bool("log", LOG, "Generate log info")
 )
 
 func init() {
@@ -42,6 +44,8 @@ func init() {
 }
 
 func initLog() {
+	LOG = *flag_log
+	DEBUG = *flag_debug
 	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
 	log.SetPrefix("#")
 }

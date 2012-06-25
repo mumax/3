@@ -1,31 +1,49 @@
 package nc
 
-type stack []Block
+import "sync"
 
-func (s *stack) push(slice Block) {
-	(*s) = append((*s), slice)
+type stack struct {
+	array []Block
+	sync.Mutex
 }
 
+// thread-safe
+func (s *stack) push(slice Block) {
+	s.Lock()
+	s.array = append(s.array, slice)
+	s.Unlock()
+}
+
+// thread-safe
 func (s *stack) pop() (slice Block) {
-	if len(*s) == 0 {
-		return // nil
+	s.Lock()
+	if len(s.array) != 0 {
+		slice = (s.array)[len(s.array)-1]
+		s.array = s.array[:len(s.array)-1]
 	}
-	slice = (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
+	s.Unlock()
 	return
 }
 
-type gpuStack []GpuBlock
-
-func (s *gpuStack) push(slice GpuBlock) {
-	(*s) = append((*s), slice)
+type gpuStack struct {
+	array []GpuBlock
+	sync.Mutex
 }
 
+// thread-safe
+func (s *gpuStack) push(slice GpuBlock) {
+	s.Lock()
+	s.array = append(s.array, slice)
+	s.Unlock()
+}
+
+// thread-safe
 func (s *gpuStack) pop() (slice GpuBlock) {
-	if len(*s) == 0 {
-		return
+	s.Lock()
+	if len(s.array) != 0 {
+		slice = s.array[len(s.array)-1]
+		s.array = s.array[:len(s.array)-1]
 	}
-	slice = (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
+	s.Unlock()
 	return
 }

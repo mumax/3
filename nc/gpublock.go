@@ -9,14 +9,15 @@ import (
 // Block of float32's on the GPU.
 // TODO: could embed gpufloats
 type GpuBlock struct {
-	ptr  cu.DevicePtr
-	size [3]int
+	ptr      cu.DevicePtr
+	size     [3]int
+	refcount *int32
 }
 
 func MakeGpuBlock(size [3]int) GpuBlock {
 	N := size[0] * size[1] * size[2]
 	SetCudaCtx()
-	return GpuBlock{cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(N)), size}
+	return GpuBlock{cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(N)), size, nil}
 }
 
 func Make3GpuBlock(size [3]int) [3]GpuBlock {

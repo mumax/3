@@ -9,7 +9,7 @@ func MakeFloat32s(len_ int) Float32s {
 }
 
 func (s Float32s) Slice(start, stop int) Float32s {
-	return Float32s{s.slice.slice(start, stop)}
+	return Float32s{s.slice.slice(start, stop, sizeofFloat32)}
 }
 
 const sizeofFloat32 = 4

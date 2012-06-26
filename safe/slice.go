@@ -4,12 +4,28 @@ import (
 	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"unsafe"
+	"sync"
+)
+
+var( 
+stream cu.Stream
+streamlock sync.Mutex
 )
 
 // internal base func for all makeXXX() functions
 func makeslice(len_ int, elemsize int) slice {
-	ptr := cu.MemAlloc(int64(len_) * int64(elemsize))
+	if stream == 0{ initStream() }	
+	bytes :=  int64(len_) * int64(elemsize)
+	ptr := cu.MemAlloc(bytes)
+	cu.MemsetD8Async(ptr, 0, bytes, stream)	
+	stream.Synchronize()
 	return slice{ptr, len_, len_}
+}
+
+func initStream(){
+	streamlock.Lock()
+	if stream == 0{stream = cu.StreamCreate()}
+	streamlock.Unlock()
 }
 
 // internal base type for all slices

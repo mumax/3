@@ -2,8 +2,11 @@ package safe
 
 import "unsafe"
 
+// Slice of float32's on the GPU.
 type Float32s struct{ slice }
 
+// Make a slice of float32's on the GPU.
+// Initialized to zero.
 func MakeFloat32s(len_ int) Float32s {
 	return Float32s{makeslice(len_, sizeofFloat32)}
 }

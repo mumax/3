@@ -57,4 +57,3 @@ func (src Complex64s) Host() []complex64 {
 	src.CopyDtoH(cpy)
 	return cpy
 }
-

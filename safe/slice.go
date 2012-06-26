@@ -1,5 +1,9 @@
 package safe
 
+// INTERNAL.
+// This file implements common functionality for all slice types
+// (Float32s, Float64s, Complex64s, ...).
+
 import (
 	"fmt"
 	"github.com/barnex/cuda4/cu"

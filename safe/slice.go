@@ -18,6 +18,11 @@ type slice struct {
 func (s *slice) Pointer() cu.DevicePtr { return s.ptr_ }
 func (s *slice) Len() int              { return s.len_ }
 func (s *slice) Cap() int              { return s.cap_ }
+func (s *slice) Free() {
+	s.ptr_.Free()
+	s.len_ = 0
+	s.cap_ = 0
+}
 
 func (s *slice) slice(start, stop int) slice {
 	if start >= s.cap_ || start < 0 || stop >= s.cap_ || stop < 0 {
@@ -26,5 +31,5 @@ func (s *slice) slice(start, stop int) slice {
 	if start > stop {
 		panic("inverted slice range")
 	}
-	return slice{cu.DevicePtr(uintptr(s.ptr_) + uintptr(start)), stop - start, s.cap_ - stop}
+	return slice{cu.DevicePtr(uintptr(s.ptr_) + uintptr(start)), stop - start, s.cap_ - start}
 }

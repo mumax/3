@@ -96,7 +96,7 @@ func TestFloat32sCopy(test *testing.T) {
 	c := MakeFloat32s(100)
 	defer c.Free()
 
-	d := make([]float32, 100)
+	d := make([]float32, 200)
 
 	for i := range a {
 		a[i] = float32(i)
@@ -106,9 +106,12 @@ func TestFloat32sCopy(test *testing.T) {
 
 	c.CopyDtoD(b)
 
-	c.CopyDtoH(d)
+	c.CopyDtoH(d[:100])
 
-	if !reflect.DeepEqual(a, d) {
+	if !reflect.DeepEqual(a, d[:100]) {
+		test.Error(d)
+	}
+	if !reflect.DeepEqual(d[100:], make([]float32, 100)) {
 		test.Error(d)
 	}
 }

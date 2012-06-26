@@ -33,34 +33,54 @@ func TestFloat32sSlice(test *testing.T) {
 	if c.Cap() != cap(d) {
 		test.Error("sliced cap:", c.Cap(), "!=", cap(d))
 	}
+
+	e := a.Slice(0, 50)
+	f := b[0:50]
+
+	if e.Len() != len(f) {
+		test.Error("sliced len:", e.Len(), "!=", cap(f))
+	}
+	if e.Cap() != cap(f) {
+		test.Error("sliced cap:", e.Cap(), "!=", cap(f))
+	}
 }
 
-func TestFloat32sPanic(test *testing.T) {
+func TestFloat32sPanic1(test *testing.T) {
 	runtime.LockOSThread()
 	cu.Init(0)
 	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
 
+	defer func() {
+		err := recover()
+		test.Log("recovered:", err)
+		if err == nil {
+			test.Fail()
+		}
+	}()
+
 	a := MakeFloat32s(100)
 	defer a.Free()
 
-	b := make([]float32, 100)
+	a.Slice(-1, 10)
+}
 
-	if a.Len() != len(b) {
-		test.Error("len:", a.Len(), "!=", cap(b))
-	}
-	if a.Cap() != cap(b) {
-		test.Error("cap:", a.Cap(), "!=", cap(b))
-	}
+func TestFloat32sPanic2(test *testing.T) {
+	runtime.LockOSThread()
+	cu.Init(0)
+	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
 
-	c := a.Slice(20, 30)
-	d := b[20:30]
+	defer func() {
+		err := recover()
+		test.Log("recovered:", err)
+		if err == nil {
+			test.Fail()
+		}
+	}()
 
-	if c.Len() != len(d) {
-		test.Error("sliced len:", c.Len(), "!=", cap(d))
-	}
-	if c.Cap() != cap(d) {
-		test.Error("sliced cap:", c.Cap(), "!=", cap(d))
-	}
+	a := MakeFloat32s(100)
+	defer a.Free()
+
+	a.Slice(0, 101)
 }
 
 func TestFloat32sCopy(test *testing.T) {

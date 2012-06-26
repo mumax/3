@@ -24,22 +24,22 @@ func TestMalloc(t *testing.T) {
 }
 
 func BenchmarkMallocFree1B(b *testing.B) {
-	for i:=0; i<b.N; i++{
+	for i := 0; i < b.N; i++ {
 		m := MemAlloc(1)
 		m.Free()
 	}
 }
 
 func BenchmarkMallocFree1kB(b *testing.B) {
-	for i:=0; i<b.N; i++{
+	for i := 0; i < b.N; i++ {
 		m := MemAlloc(1024)
 		m.Free()
 	}
 }
 
 func BenchmarkMallocFree1MB(b *testing.B) {
-	for i:=0; i<b.N; i++{
-		m := MemAlloc(1024*1024)
+	for i := 0; i < b.N; i++ {
+		m := MemAlloc(1024 * 1024)
 		m.Free()
 	}
 }

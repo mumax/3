@@ -27,4 +27,11 @@ func (dst Float32s) CopyDtoD(src Float32s) {
 	dst.copyDtoD(&src.slice, sizeofFloat32)
 }
 
+// Returns a fresh copy on host.
+func (src Float32s) Host() []float32 {
+	cpy := make([]float32, src.Len())
+	src.CopyDtoH(cpy)
+	return cpy
+}
+
 const sizeofFloat32 = 4

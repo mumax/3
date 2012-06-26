@@ -15,6 +15,10 @@ func TestFloat32sSlice(test *testing.T) {
 	a := MakeFloat32s(100)
 	defer a.Free()
 
+	if !reflect.DeepEqual(a.Host(), make([]float32, 100)) {
+		test.Error(a.Host())
+	}
+
 	b := make([]float32, 100)
 
 	if a.Len() != len(b) {

@@ -1,7 +1,6 @@
 all: 6g gccgo
 
 6g:
-	./subs.sh
 	go install -v
 	go tool vet *.go
 	gofmt -w *.go

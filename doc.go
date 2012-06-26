@@ -10,4 +10,5 @@ package cuda4
 import (
 	_ "github.com/barnex/cuda4/cu"
 	_ "github.com/barnex/cuda4/cufft"
+	_ "github.com/barnex/cuda4/safe"
 )

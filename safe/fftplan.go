@@ -34,7 +34,13 @@ func FFT1DR2C(size, batch int) FFT1DR2CPlan {
 }
 
 func (p FFT1DR2CPlan) Exec(src Float32s, dst Complex64s) {
-	if src.Len() != p.batch*p.Size() {
-		panic(fmt.Errorf("size mismatch: expecting src len %v, got %v", p.batch*p.Size(), src.Len()))
+	oksrclen := p.batch * p.Size()
+	if src.Len() != oksrclen {
+		panic(fmt.Errorf("size mismatch: expecting src len %v, got %v", oksrclen, src.Len()))
 	}
+	okdstlen := p.batch * (p.Size()/2 + 1)
+	if dst.Len() != okdstlen {
+		panic(fmt.Errorf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
+	}
+	p.handle.ExecR2C(src.Pointer(), dst.Pointer())
 }

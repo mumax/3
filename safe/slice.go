@@ -73,3 +73,24 @@ func (dst *slice) copyDtoD(src *slice, elemsize int) {
 	}
 	cu.MemcpyDtoD(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()))
 }
+
+func (dst *slice) copyHtoDAsync(src unsafe.Pointer, srclen int, elemsize int, stream cu.Stream) {
+	if srclen != dst.Len() {
+		panic(fmt.Errorf("len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
+	}
+	cu.MemcpyHtoDAsync(dst.Pointer(), src, int64(elemsize)*int64(srclen), stream)
+}
+
+func (src *slice) copyDtoHAsync(dst unsafe.Pointer, dstlen int, elemsize int, stream cu.Stream) {
+	if dstlen != src.Len() {
+		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
+	}
+	cu.MemcpyDtoHAsync(dst, src.Pointer(), int64(elemsize)*int64(dstlen), stream)
+}
+
+func (dst *slice) copyDtoDAsync(src *slice, elemsize int, stream cu.Stream) {
+	if dst.Len() != src.Len() {
+		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
+	}
+	cu.MemcpyDtoDAsync(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()), stream)
+}

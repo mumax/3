@@ -1,7 +1,9 @@
 package safe
 
 import (
+	"fmt"
 	"github.com/barnex/cuda4/cu"
+	"unsafe"
 )
 
 // internal base func for all makeXXX() functions
@@ -46,4 +48,25 @@ func (s *slice) slice(start, stop int, elemsize uintptr) slice {
 		panic("inverted slice range")
 	}
 	return slice{cu.DevicePtr(uintptr(s.ptr_) + uintptr(start)*elemsize), stop - start, s.cap_ - start}
+}
+
+func (dst *slice) copyHtoD(src unsafe.Pointer, srclen int, elemsize int) {
+	if srclen != dst.Len() {
+		panic(fmt.Errorf("len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
+	}
+	cu.MemcpyHtoD(dst.Pointer(), src, int64(elemsize)*int64(srclen))
+}
+
+func (src *slice) copyDtoH(dst unsafe.Pointer, dstlen int, elemsize int) {
+	if dstlen != src.Len() {
+		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
+	}
+	cu.MemcpyDtoH(dst, src.Pointer(), int64(elemsize)*int64(dstlen))
+}
+
+func (dst *slice) copyDtoD(src *slice, elemsize int) {
+	if dst.Len() != src.Len() {
+		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
+	}
+	cu.MemcpyDtoD(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()))
 }

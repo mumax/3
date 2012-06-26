@@ -1,4 +1,4 @@
 /*
-	Safe wrappers for low-level cuda functions.
+	Safe and more idiomatic wrappers for the low-level CUDA functions.
 */
 package safe

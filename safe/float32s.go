@@ -2,6 +2,7 @@ package safe
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"math"
 	"unsafe"
 )
 
@@ -56,6 +57,17 @@ func (src Float32s) Host() []float32 {
 	cpy := make([]float32, src.Len())
 	src.CopyDtoH(cpy)
 	return cpy
+}
+
+// Set the entire slice to this value.
+func (s Float32s) Memset(value float32) {
+	cu.MemsetD32(s.Pointer(), math.Float32bits(value), int64(s.Len()))
+	cu.CtxSynchronize()
+}
+
+// Set the entire slice to this value, asynchronously.
+func (s Float32s) MemsetAsync(value float32, stream cu.Stream) {
+	cu.MemsetD32Async(s.Pointer(), math.Float32bits(value), int64(s.Len()), stream)
 }
 
 const sizeofFloat32 = 4

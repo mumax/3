@@ -17,11 +17,17 @@ type fftplan struct {
 // For the sake of embedding.
 type size1D int
 
+// Returns the logical size of the FFT:
+// the number of elements (real or complex)
+// it transforms.
 func (s size1D) Size() int { return int(s) }
 
+// Releases all resources associated with the FFT plan.
 func (p fftplan) Destroy() { p.handle.Destroy() }
 
 // Associates a CUDA stream with the FFT plan.
+// If a stream is set, plan.Stream().Synchronize() can
+// to be called to wait for the execution to finish.
 func (p fftplan) SetStream(stream cu.Stream) {
 	p.handle.SetStream(stream)
 	p.stream = stream

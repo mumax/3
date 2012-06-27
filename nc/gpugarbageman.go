@@ -31,7 +31,7 @@ func (m *GpuGarbageman) GetSize(size [3]int) GpuBlock {
 	runtime.Gosched() // good idea? give others the chance to recycle first.
 	select {
 	case buffer := <-chute:
-		Assert(buffer.N() == prod(size))
+		Assert(buffer.Len() == prod(size))
 		buffer.size = size
 		return buffer
 	default:
@@ -63,7 +63,7 @@ func (m *GpuGarbageman) Recycle(garbages ...GpuBlock) {
 		if g.refcount == nil {
 			continue // slice does not originate from here
 		}
-		chute := m.bysize[g.N()]
+		chute := m.bysize[g.Len()]
 		if g.refcount.Load() == 0 {
 			select {
 			case chute <- g: //Debug("recycling", g)

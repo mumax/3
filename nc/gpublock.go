@@ -2,6 +2,7 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda4/safe"
 	"math"
 	"unsafe"
 )
@@ -9,7 +10,7 @@ import (
 // Block of float32's on the GPU.
 // TODO: could embed gpufloats
 type GpuBlock struct {
-	ptr      cu.DevicePtr
+	safe.Float32s
 	size     [3]int
 	refcount *Refcount
 }
@@ -17,7 +18,7 @@ type GpuBlock struct {
 func MakeGpuBlock(size [3]int) GpuBlock {
 	N := size[0] * size[1] * size[2]
 	SetCudaCtx()
-	return GpuBlock{cu.MemAlloc(cu.SIZEOF_FLOAT32 * int64(N)), size, nil}
+	return GpuBlock{safe.MakeFloat32s(N), size, nil}
 }
 
 func Make3GpuBlock(size [3]int) [3]GpuBlock {
@@ -25,24 +26,24 @@ func Make3GpuBlock(size [3]int) [3]GpuBlock {
 }
 
 func (g *GpuBlock) Free() {
-	g.ptr.Free()
+	g.Float32s.Free()
 	g.size = [3]int{0, 0, 0}
 	g.refcount = nil
 }
 
 // Pointer to first element on the GPU.
-func (b *GpuBlock) Pointer() cu.DevicePtr {
-	return b.ptr
-}
+//func (b *GpuBlock) Pointer() cu.DevicePtr {
+//return b.ptr
+//}
 
 // Total number of scalar elements.
-func (b *GpuBlock) N() int {
-	return b.size[0] * b.size[1] * b.size[2]
-}
+//func (b *GpuBlock) N() int {
+//return b.size[0] * b.size[1] * b.size[2]
+//}
 
 // Number of bytes for underlying storage.
 func (b *GpuBlock) Bytes() int64 {
-	return SIZEOF_FLOAT32 * int64(b.N())
+	return SIZEOF_FLOAT32 * int64(b.Len())
 }
 
 // BlockSize is the size of the block (N0, N1, N2)
@@ -97,7 +98,7 @@ func (dst *GpuBlock) CopyHtoDAsync(src Block, str cu.Stream) {
 // Set all values to v.
 func (b *GpuBlock) Memset(v float32) {
 	SetCudaCtx()
-	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.N()))
+	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.Len()))
 }
 
 // Set the value at index i,j,k to v.

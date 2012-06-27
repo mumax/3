@@ -21,6 +21,7 @@ func ExampleFFT1D() {
 	defer cu.MemFree(&devOut)
 
 	plan := Plan1d(N, R2C, 1)
+	defer plan.Destroy()
 	plan.ExecR2C(devIn, devOut)
 
 	cu.MemcpyDtoH(unsafe.Pointer(&hostOut[0]), devOut, devOut.Bytes())

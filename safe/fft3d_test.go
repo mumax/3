@@ -10,7 +10,7 @@ func ExampleFFT3DR2C() {
 	Nx, Ny, Nz := 2, 4, 8
 
 	fft := FFT3DR2C(Nx, Ny, Nz)
-	//defer fft.Destroy()
+	defer fft.Destroy()
 
 	input := MakeFloat32s(fft.InputLen())
 	defer input.Free()
@@ -26,9 +26,10 @@ func ExampleFFT3DR2C() {
 	fft.Exec(input, output)
 
 	fmt.Println("input:", Reshape3DFloat32(input.Host(), Nx, Ny, Nz))
-	fmt.Println("output:", output.Host())
+	Ox, Oy, Oz := fft.OutputSize()
+	fmt.Println("output:", Reshape3DComplex64(output.Host(), Ox, Oy, Oz))
 
 	// Output:
-	// input: [1 0 0 0 0 0 0 0]
-	// output: [(1+0i) (+1+0i) (+1+0i) (+1-0i) (+1+0i)]
+	// input: [[[1 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]] [[1 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]]]
+	// output: [[[(2+0i) (+2+0i) (+2+0i) (+2-0i) (+2+0i)] [(+2+0i) (+2+0i) (+2+0i) (+2-0i) (+2+0i)] [(+2+0i) (+2+0i) (+2+0i) (+2-0i) (+2+0i)] [(+2+0i) (+2+0i) (+2+0i) (+2-0i) (+2+0i)]] [[(+0+0i) (+0+0i) (+0+0i) (+0-0i) (+0+0i)] [(+0+0i) (+0+0i) (+0+0i) (+0-0i) (+0+0i)] [(+0+0i) (+0+0i) (+0+0i) (+0-0i) (+0+0i)] [(+0+0i) (+0+0i) (+0+0i) (+0-0i) (+0+0i)]]]
 }

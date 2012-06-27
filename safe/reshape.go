@@ -1,6 +1,11 @@
 package safe
 
+import "fmt"
+
 func Reshape3DFloat32(array []float32, Nx, Ny, Nz int) [][][]float32 {
+	if Nx*Ny*Nz != len(array) {
+		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
+	}
 	sliced := make([][][]float32, Nx)
 	for i := range sliced {
 		sliced[i] = make([][]float32, Ny)
@@ -14,6 +19,9 @@ func Reshape3DFloat32(array []float32, Nx, Ny, Nz int) [][][]float32 {
 }
 
 func Reshape3DComplex64(array []complex64, Nx, Ny, Nz int) [][][]complex64 {
+	if Nx*Ny*Nz != len(array) {
+		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
+	}
 	sliced := make([][][]complex64, Nx)
 	for i := range sliced {
 		sliced[i] = make([][]complex64, Ny)

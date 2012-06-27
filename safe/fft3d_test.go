@@ -95,3 +95,34 @@ func ExampleFFT3D() {
 	// input: [[[0 0 0 0 0 1 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]] [[0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]]]
 	// forward+inverse: [[[0 0 0 0 0 64 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]] [[0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]]]
 }
+
+func ExampleFFT3D64() {
+	InitCuda()
+
+	Nx, Ny, Nz := 2, 4, 8
+
+	forward := FFT3DD2Z(Nx, Ny, Nz)
+	defer forward.Destroy()
+
+	input := MakeFloat64s(forward.InputLen())
+	defer input.Free()
+
+	inputData := make([]float64, forward.InputLen())
+	inputData[5] = 1
+	input.CopyHtoD(inputData)
+
+	output := MakeComplex128s(forward.OutputLen())
+	defer output.Free()
+
+	forward.Exec(input, output)
+
+	backward := FFT3DZ2D(Nx, Ny, Nz)
+	backward.Exec(output, input)
+
+	fmt.Println("input:", Reshape3DFloat64(inputData, Nx, Ny, Nz))
+	fmt.Println("forward+inverse:", Reshape3DFloat64(input.Host(), Nx, Ny, Nz))
+
+	// Output:
+	// input: [[[0 0 0 0 0 1 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]] [[0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]]]
+	// forward+inverse: [[[0 0 0 0 0 64 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]] [[0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0] [0 0 0 0 0 0 0 0]]]
+}

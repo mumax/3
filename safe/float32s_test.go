@@ -1,16 +1,12 @@
 package safe
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"reflect"
-	"runtime"
 	"testing"
 )
 
 func TestFloat32sSlice(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	a := MakeFloat32s(100)
 	defer a.Free()
@@ -50,9 +46,7 @@ func TestFloat32sSlice(test *testing.T) {
 }
 
 func TestFloat32sPanic1(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	defer func() {
 		err := recover()
@@ -69,9 +63,7 @@ func TestFloat32sPanic1(test *testing.T) {
 }
 
 func TestFloat32sPanic2(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	defer func() {
 		err := recover()
@@ -88,9 +80,7 @@ func TestFloat32sPanic2(test *testing.T) {
 }
 
 func TestFloat32sCopy(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	a := make([]float32, 100)
 

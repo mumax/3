@@ -1,16 +1,12 @@
 package safe
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"reflect"
-	"runtime"
 	"testing"
 )
 
 func TestComplex128sSlice(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	a := MakeComplex128s(100)
 	defer a.Free()
@@ -50,9 +46,7 @@ func TestComplex128sSlice(test *testing.T) {
 }
 
 func TestComplex128sPanic1(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	defer func() {
 		err := recover()
@@ -69,9 +63,7 @@ func TestComplex128sPanic1(test *testing.T) {
 }
 
 func TestComplex128sPanic2(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	defer func() {
 		err := recover()
@@ -88,9 +80,7 @@ func TestComplex128sPanic2(test *testing.T) {
 }
 
 func TestComplex128sCopy(test *testing.T) {
-	runtime.LockOSThread()
-	cu.Init(0)
-	cu.CtxCreate(cu.CTX_SCHED_AUTO, 0).SetCurrent()
+	InitCuda()
 
 	a := make([]complex128, 100)
 

@@ -5,6 +5,8 @@ import (
 )
 
 func ExampleFFT1DR2C() {
+	InitCuda()
+
 	N := 8
 	batch := 1
 
@@ -29,6 +31,8 @@ func ExampleFFT1DR2C() {
 }
 
 func ExampleFFT1DC2R() {
+	InitCuda()
+
 	N := 8
 	batch := 1
 

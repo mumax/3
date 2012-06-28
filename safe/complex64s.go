@@ -57,3 +57,10 @@ func (src Complex64s) Host() []complex64 {
 	src.CopyDtoH(cpy)
 	return cpy
 }
+
+// Re-interpret the array as float numbers,
+// in interleaved format. Underlying storage
+// is shared.
+func (s Complex64s) Float() Float32s {
+	return Float32s{slice{s.ptr_, s.len_ * 2, s.cap_ * 2}}
+}

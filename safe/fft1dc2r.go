@@ -15,6 +15,7 @@ type FFT1DC2RPlan struct {
 // 1D single-precission complex-to-real FFT plan.
 func FFT1DC2R(size, batch int) FFT1DC2RPlan {
 	handle := cufft.Plan1d(size, cufft.C2R, batch)
+	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
 	return FFT1DC2RPlan{fftplan{handle, 0}, size1D(size), batch}
 }
 

@@ -1,6 +1,7 @@
 package safe
 
 import (
+	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"unsafe"
 )
@@ -56,4 +57,14 @@ func (src Float64s) Host() []float64 {
 	cpy := make([]float64, src.Len())
 	src.CopyDtoH(cpy)
 	return cpy
+}
+
+// Re-interpret the array as complex numbers,
+// in interleaved format. Underlying storage
+// is shared.
+func (s Float64s) Complex() Complex128s {
+	if s.Len()%2 != 0 {
+		panic(fmt.Errorf("complex: need even number of elements, have:%v", s.Len()))
+	}
+	return Complex128s{slice{s.ptr_, s.len_ / 2, s.cap_ / 2}}
 }

@@ -14,6 +14,7 @@ type FFT3DZ2DPlan struct {
 // 3D single-precission real-to-complex FFT plan.
 func FFT3DZ2D(Nx, Ny, Nz int) FFT3DZ2DPlan {
 	handle := cufft.Plan3d(Nx, Ny, Nz, cufft.Z2D)
+	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
 	return FFT3DZ2DPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
 }
 

@@ -1,6 +1,7 @@
 package safe
 
 import (
+	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"math"
 	"unsafe"
@@ -68,4 +69,14 @@ func (s Float32s) Memset(value float32) {
 // Set the entire slice to this value, asynchronously.
 func (s Float32s) MemsetAsync(value float32, stream cu.Stream) {
 	cu.MemsetD32Async(s.Pointer(), math.Float32bits(value), int64(s.Len()), stream)
+}
+
+// Re-interpret the array as complex numbers,
+// in interleaved format. Underlying storage
+// is shared.
+func (s Float32s) Complex() Complex64s {
+	if s.Len()%2 != 0 {
+		panic(fmt.Errorf("complex: need even number of elements, have:%v", s.Len()))
+	}
+	return Complex64s{slice{s.ptr_, s.len_ / 2, s.cap_ / 2}}
 }

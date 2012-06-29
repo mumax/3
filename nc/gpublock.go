@@ -3,7 +3,6 @@ package nc
 import (
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
-	"math"
 	"unsafe"
 )
 
@@ -55,7 +54,7 @@ func (src *GpuBlock) CopyDtoH(dst Block) {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
 	SetCudaCtx()
-	cu.MemcpyDtoH(dst.UnsafePointer(), src.Pointer(), src.Bytes())
+	src.Float32s.CopyDtoH(dst.List)
 }
 
 // Copy from host to device.
@@ -64,7 +63,7 @@ func (dst *GpuBlock) CopyHtoD(src Block) {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
 	SetCudaCtx()
-	cu.MemcpyHtoD(dst.Pointer(), src.UnsafePointer(), src.Bytes())
+	dst.Float32s.CopyHtoD(src.List)
 }
 
 // Copy from device to host.
@@ -73,7 +72,7 @@ func (src *GpuBlock) CopyDtoHAsync(dst Block, str cu.Stream) {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
 	SetCudaCtx()
-	cu.MemcpyDtoHAsync(dst.UnsafePointer(), src.Pointer(), src.Bytes(), str)
+	src.Float32s.CopyDtoHAsync(dst.List, str)
 }
 
 // Copy from host to device.
@@ -82,13 +81,7 @@ func (dst *GpuBlock) CopyHtoDAsync(src Block, str cu.Stream) {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
 	SetCudaCtx()
-	cu.MemcpyHtoDAsync(dst.Pointer(), src.UnsafePointer(), src.Bytes(), str)
-}
-
-// Set all values to v.
-func (b *GpuBlock) Memset(v float32) {
-	SetCudaCtx()
-	cu.MemsetD32(b.Pointer(), math.Float32bits(v), int64(b.Len()))
+	dst.Float32s.CopyHtoDAsync(src.List, str)
 }
 
 // Set the value at index i,j,k to v.

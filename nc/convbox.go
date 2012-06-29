@@ -34,11 +34,14 @@ func (box *GpuConvBox) initKern() {
 	size := Size()
 	padded := PadSize(size)
 	ffted := FFTOutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
 
 	acc := 4
 	Debug("Initializing magnetostatic kernel")
 	kern := magKernel(padded, CellSize(), Periodic(), acc)
 	Debug("Magnetostatic kernel ready")
+	Debug("kern:", kern)
 
 	box.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
 	box.bwPlan = safe.FFT3DC2R(padded[0], padded[1], padded[2])
@@ -54,10 +57,13 @@ func (box *GpuConvBox) initKern() {
 			k := kern[i][j]
 			input.CopyHtoD(k.List)
 			fwPlan.Exec(input, output)
-			box.fftKern[i][j] = MakeBlock(ffted)
+			//Debug("fft output:", output.Host())
+			box.fftKern[i][j] = MakeBlock(realsize)
 			scaleRealParts(box.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
+			Debug("fftKern", i, j, ":", box.fftKern[i][j].Array)
 		}
 	}
+
 }
 
 // Extract real parts, copy them from src to dst.
@@ -71,7 +77,7 @@ func scaleRealParts(dst Block, src safe.Float32s, scale float32) {
 	// so we only store the real parts...
 	maximg := float32(0.)
 	maxreal := float32(0.)
-	for i := range dstList {
+	for i := 0; i < src.Len()/2; i++ {
 		dstList[i] = srcList[2*i] * scale
 		if fmath.Abs(srcList[2*i+0]) > maxreal {
 			maxreal = fmath.Abs(srcList[2*i+0])
@@ -90,37 +96,17 @@ func scaleRealParts(dst Block, src safe.Float32s, scale float32) {
 	}
 }
 
-func (box *GpuConvBox) initFFT() {
-	//	size := Size()
-	//	padded := PadSize(size)
-	//
-	//	// buffer for fft'd data
-	//	fftSize := FFTOutputSize(padded)
-	//	box.fftBuf = Make3GpuBlock(fftSize)
-	//
-	//	// setup fft plans
-	//	SetCudaCtx()
-	//	for i := range box.fftPlan {
-	//		box.fftStream[i] = cu.StreamCreate()
-	//		box.fwPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.R2C)
-	//		box.fwPlan[i].SetStream(box.fftStream[i])
-	//		box.bwPlan[i] = cufft.Plan3d(padded[0], padded[1], padded[2], cufft.C2R)
-	//		box.bwPlan[i].SetStream(box.fftStream[i])
-	//	}
-}
-
 func FFTOutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
 func (box *GpuConvBox) init() {
-	box.initFFT()
 	box.initKern()
 }
 
 func (box *GpuConvBox) Run() {
 
-	//	box.init()
+	box.init()
 	//
 	//	// run Convolution, run!
 	//	for {

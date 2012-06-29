@@ -46,7 +46,7 @@ func init() {
 func initLog() {
 	LOG = *flag_log
 	DEBUG = *flag_debug
-	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
+	log.SetFlags(log.Lmicroseconds)
 	log.SetPrefix("#")
 }
 

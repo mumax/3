@@ -17,6 +17,7 @@ type GpuConvBox struct {
 	Kij <-chan GpuBlock
 
 	fftKern [3][3]Block
+	//fftKern[]Block
 
 	fftBuf [3]GpuBlock
 	fwPlan safe.FFT3DR2CPlan
@@ -60,7 +61,7 @@ func (box *GpuConvBox) initKern() {
 			//Debug("fft output:", output.Host())
 			box.fftKern[i][j] = MakeBlock(realsize)
 			scaleRealParts(box.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
-			Debug("fftKern", i, j, ":", box.fftKern[i][j].Array)
+			//Debug("fftKern", i, j, ":", box.fftKern[i][j].Array)
 		}
 	}
 

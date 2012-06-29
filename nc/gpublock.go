@@ -31,16 +31,6 @@ func (g *GpuBlock) Free() {
 	g.refcount = nil
 }
 
-// Pointer to first element on the GPU.
-//func (b *GpuBlock) Pointer() cu.DevicePtr {
-//return b.ptr
-//}
-
-// Total number of scalar elements.
-//func (b *GpuBlock) N() int {
-//return b.size[0] * b.size[1] * b.size[2]
-//}
-
 // Number of bytes for underlying storage.
 func (b *GpuBlock) Bytes() int64 {
 	return SIZEOF_FLOAT32 * int64(b.Len())

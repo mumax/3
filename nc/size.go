@@ -48,11 +48,7 @@ func InitSize(N0, N1, N2 int) {
 	}
 	warpLen = n / nWarp
 
-	if nWarp <= N0 { // slice along I
-		warpSize = [3]int{N0 / nWarp, N1, N2}
-	} else { // slice along I and J 
-		warpSize = [3]int{1, (N0 * N1) / nWarp, N2}
-	}
+	warpSize = SliceSize(size)
 
 	Debug("NumWarp:", nWarp)
 	Debug("WarpLen:", warpLen)
@@ -63,6 +59,15 @@ func InitSize(N0, N1, N2 int) {
 	Assert(WarpLen()*NumWarp() == N())
 
 	InitGarbageman()
+}
+
+func SliceSize(size [3]int) (warpSize [3]int) {
+	if nWarp <= size[0] { // slice along I
+		warpSize = [3]int{size[0] / nWarp, size[1], size[2]}
+	} else { // slice along I and J 
+		warpSize = [3]int{1, (size[0] * size[1]) / nWarp, size[2]}
+	}
+	return warpSize
 }
 
 func DefaultBufSize() int {

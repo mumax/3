@@ -24,6 +24,11 @@ func MakeBlock(size [3]int) Block {
 	return b
 }
 
+func AsBlock(list []float32, size [3]int) Block {
+	Assert(len(list) == prod(size))
+	return Block{slice(list, size), list, nil}
+}
+
 func (b *Block) Init(size [3]int) {
 	checkSize(size[:])
 	storage := make([]float32, size[0]*size[1]*size[2])

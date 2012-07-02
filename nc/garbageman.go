@@ -5,6 +5,7 @@ package nc
 import (
 	"github.com/barnex/cuda4/cu"
 	"sync/atomic"
+	"unsafe"
 )
 
 type Garbageman struct {
@@ -27,13 +28,17 @@ func (g *Garbageman) Get() Block {
 	return g.Alloc()
 }
 
+func MemHostRegister(slice []float32) {
+	if *flag_pagelock {
+		SetCudaCtx()
+		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
+	}
+}
+
 // Return a freshly allocated & managed block.
 func (g *Garbageman) Alloc() Block {
 	slice := MakeBlock(g.size)
-	if *flag_pagelock {
-		SetCudaCtx()
-		cu.MemHostRegister(slice.UnsafePointer(), slice.Bytes(), cu.MEMHOSTREGISTER_PORTABLE)
-	}
+	MemHostRegister(slice.List)
 	atomic.AddInt32(&g.numAlloc, 1)
 	slice.refcount = new(Refcount)
 	return slice

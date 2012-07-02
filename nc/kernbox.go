@@ -6,7 +6,7 @@ import (
 )
 
 type KernelBox struct {
-	FFTKernel []chan Block
+	FFTKernel []chan<- Block
 
 	fftKBlocks []Block // len=numwarp, kernel components packed: xx, yy, zz, ...
 
@@ -22,6 +22,12 @@ func NewKernelBox() *KernelBox {
 
 func (box *KernelBox) Run() {
 	box.initKern()
+	s := 0
+	for {
+		Send(box.FFTKernel, box.fftKBlocks[s])
+		s++
+		s %= NumWarp()
+	}
 }
 
 func (box *KernelBox) initKern() {
@@ -74,6 +80,7 @@ func (box *KernelBox) initKern() {
 			kind++
 		}
 	}
+
 }
 
 // Extract real parts, copy them from src to dst.

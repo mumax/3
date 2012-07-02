@@ -6,7 +6,7 @@ type GpuConvBox struct {
 	M [3]<-chan GpuBlock
 	B [][3]chan<- GpuBlock
 
-	FFTKernel chan GpuBlock
+	FFTKernel <-chan GpuBlock
 
 	fftBuf [3]GpuBlock
 }
@@ -21,12 +21,8 @@ func FFTOutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
-func (box *GpuConvBox) init() {
-}
-
 func (box *GpuConvBox) Run() {
 
-	box.init()
 	//
 	//	// run Convolution, run!
 	//	for {

@@ -1,9 +1,9 @@
 package nc
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
+	"runtime"
 )
 
 type KernelBox struct {
@@ -23,6 +23,7 @@ func NewKernelBox() *KernelBox {
 
 func (box *KernelBox) Run() {
 	box.initKern()
+
 	s := 0
 	for {
 		Send(box.FFTKernel, box.fftKBlocks[s])
@@ -32,6 +33,8 @@ func (box *KernelBox) Run() {
 }
 
 func (box *KernelBox) initKern() {
+	runtime.LockOSThread()
+	SetCudaCtx()
 
 	size := Size()
 	padded := PadSize(size)
@@ -67,8 +70,6 @@ func (box *KernelBox) initKern() {
 		box.fftKBlocks[s] = AsBlock(fftK[s*blocklen:(s+1)*blocklen], blocksize)
 	}
 
-	str := cu.StreamCreate()
-	defer str.Destroy()
 	kind := 0
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
@@ -77,12 +78,7 @@ func (box *KernelBox) initKern() {
 			Debug("input:", input)
 			Debug("k.List:", &k.List[0])
 
-			SetCudaCtx()
-			cu.CtxSynchronize()
 			input.CopyHtoD(k.List)
-			//			input.CopyHtoDAsync(k.List, str)
-			//			str.Synchronize()
-			cu.CtxSynchronize()
 
 			//fwPlan.Exec(input, output)
 
@@ -92,7 +88,7 @@ func (box *KernelBox) initKern() {
 			kind++
 		}
 	}
-
+	runtime.UnlockOSThread()
 }
 
 // Extract real parts, copy them from src to dst.

@@ -4,6 +4,7 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"runtime"
 )
 
 type ToGpuBox struct {
@@ -20,6 +21,8 @@ func NewToGpuBox() *ToGpuBox {
 }
 
 func (box *ToGpuBox) Run() {
+	runtime.LockOSThread()
+	SetCudaCtx()
 	for {
 		in := Recv(box.Input)
 		sendToGpu(in, box.Output, box.stream)
@@ -27,7 +30,6 @@ func (box *ToGpuBox) Run() {
 }
 
 func sendToGpu(in Block, out []chan<- GpuBlock, stream cu.Stream) {
-	SetCudaCtx()
 	buffer := GpuBuffer()
 	buffer.CopyHtoDAsync(in, stream)
 	stream.Synchronize()

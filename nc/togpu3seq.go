@@ -12,22 +12,21 @@ import (
 type ToGpu3SeqBox struct {
 	Input  [3]<-chan Block
 	Output [3][]chan<- GpuBlock
-	stream cu.Stream
 }
 
 func NewToGpu3SeqBox() *ToGpu3SeqBox {
 	box := new(ToGpu3SeqBox)
-	SetCudaCtx()
-	box.stream = cu.StreamCreate()
 	Register(box)
 	return box
 }
 
 func (box *ToGpu3SeqBox) Run() {
 	Vet(box)
+	LockCudaThread()
 	input := box.Input
 	output := box.Output
-	str := box.stream
+	str := cu.StreamCreate()
+	defer str.Destroy()
 	for {
 		//selecting over input channels is safe according to postman.
 		select {

@@ -4,6 +4,7 @@ package nc
 
 import (
 	"github.com/barnex/cuda4/cu"
+	"runtime"
 	"sync/atomic"
 	"unsafe"
 )
@@ -30,8 +31,9 @@ func (g *Garbageman) Get() Block {
 
 func MemHostRegister(slice []float32) {
 	if *flag_pagelock {
-		SetCudaCtx()
+		LockCudaThread()
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
+		runtime.UnlockOSThread()
 	}
 }
 

@@ -34,7 +34,7 @@ func (box *KernelBox) Run() {
 
 func (box *KernelBox) initKern() {
 	runtime.LockOSThread()
-	SetCudaCtx()
+	LockCudaThread()
 
 	size := Size()
 	padded := PadSize(size)

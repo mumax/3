@@ -6,7 +6,7 @@ import (
 )
 
 func TestGpuBlock(test *testing.T) {
-	SetCudaCtx()
+	LockCudaThread()
 
 	size := [3]int{2, 3, 4}
 	h1 := MakeBlock(size)

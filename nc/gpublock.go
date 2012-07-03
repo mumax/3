@@ -16,7 +16,6 @@ type GpuBlock struct {
 
 func MakeGpuBlock(size [3]int) GpuBlock {
 	N := size[0] * size[1] * size[2]
-	SetCudaCtx()
 	return GpuBlock{safe.MakeFloat32s(N), size, nil}
 }
 
@@ -53,7 +52,6 @@ func (src *GpuBlock) CopyDtoH(dst Block) {
 	if src.Size() != dst.Size() {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
-	SetCudaCtx()
 	src.Float32s.CopyDtoH(dst.List)
 }
 
@@ -62,7 +60,6 @@ func (dst *GpuBlock) CopyHtoD(src Block) {
 	if src.Size() != dst.Size() {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
-	SetCudaCtx()
 	dst.Float32s.CopyHtoD(src.List)
 }
 
@@ -71,7 +68,6 @@ func (src *GpuBlock) CopyDtoHAsync(dst Block, str cu.Stream) {
 	if src.Size() != dst.Size() {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
-	SetCudaCtx()
 	src.Float32s.CopyDtoHAsync(dst.List, str)
 }
 
@@ -80,7 +76,6 @@ func (dst *GpuBlock) CopyHtoDAsync(src Block, str cu.Stream) {
 	if src.Size() != dst.Size() {
 		Panic("size mismatch:", src.Size(), dst.Size())
 	}
-	SetCudaCtx()
 	dst.Float32s.CopyHtoDAsync(src.List, str)
 }
 
@@ -95,7 +90,6 @@ func (b *GpuBlock) Set(i, j, k int, v float32) {
 	}
 	I := i*size[1]*size[2] + j*size[2] + k
 	offsetDst := cu.DevicePtr(uintptr(b.Pointer()) + SIZEOF_FLOAT32*uintptr(I))
-	SetCudaCtx()
 	cu.MemcpyHtoD(offsetDst, unsafe.Pointer(&V), SIZEOF_FLOAT32)
 }
 
@@ -110,7 +104,6 @@ func (b *GpuBlock) Get(i, j, k int) float32 {
 	}
 	I := i*size[1]*size[2] + j*size[2] + k
 	offsetSrc := cu.DevicePtr(uintptr(b.Pointer()) + SIZEOF_FLOAT32*uintptr(I))
-	SetCudaCtx()
 	cu.MemcpyDtoH(unsafe.Pointer(&V), offsetSrc, SIZEOF_FLOAT32)
 	return V
 }

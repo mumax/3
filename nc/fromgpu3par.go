@@ -16,7 +16,6 @@ import (
 type FromGpu3Par struct {
 	Input  [3]<-chan GpuBlock
 	Output [3][]chan<- Block
-	stream cu.Stream
 	//	score  [3]int
 	//	comp1  int // preferred component to send
 	//	comp2  int // next preferred component to send
@@ -24,7 +23,6 @@ type FromGpu3Par struct {
 
 func NewFromGpu3Par() *FromGpu3Par {
 	box := new(FromGpu3Par)
-	box.stream = cu.StreamCreate()
 	Register(box)
 	return box
 }
@@ -33,17 +31,19 @@ func (box *FromGpu3Par) Run() {
 
 	Vet(box)
 	input := box.Input
+	str := cu.StreamCreate()
+	defer str.Destroy()
 
 	for {
 		x := RecvGpu(input[X])
 		Debug("send X")
-		sendToHost(x, box.Output[X], box.stream)
+		sendToHost(x, box.Output[X], str)
 		y := RecvGpu(input[Y])
 		Debug("send Y")
-		sendToHost(y, box.Output[Y], box.stream)
+		sendToHost(y, box.Output[Y], str)
 		z := RecvGpu(input[Z])
 		Debug("send Z")
-		sendToHost(z, box.Output[Z], box.stream)
+		sendToHost(z, box.Output[Z], str)
 	}
 
 }

@@ -23,6 +23,11 @@ func FFTOutputSizeFloats(logicSize [3]int) [3]int {
 
 func (box *GpuConvBox) Run() {
 
+	for s := 0; s < NumWarp(); s++ {
+		k := RecvGpu(box.FFTKernel)
+		Debug("k", s, ":", k.Host())
+	}
+
 	//
 	//	// run Convolution, run!
 	//	for {

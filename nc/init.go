@@ -9,37 +9,33 @@ import (
 )
 
 var (
-	flag_version  = flag.Bool("V", false, "print version")
-	flag_cuda     = flag.Bool("cuda", true, "use CUDA")
-	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
-	flag_pagelock = flag.Bool("lock", true, "enable CUDA memeory page-locking")
-	flag_maxwarp  = flag.Int("warp", MAX_WARPLEN, "maximum elements per warp")
-	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
-	flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
-	flag_memprof  = flag.String("memprof", "", "Write gopprof memory profile to file")
-	flag_debug    = flag.Bool("debug", DEBUG, "Generate debug info")
-	flag_log      = flag.Bool("log", LOG, "Generate log info")
+	flag_version    = flag.Bool("V", false, "print version")
+	flag_cuda       = flag.Bool("cuda", true, "use CUDA")
+	flag_sched      = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
+	flag_pagelock   = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
+	flag_threadlock = flag.Bool("threadlock", false, "lock main goroutine to one OS thread")
+	flag_maxwarp    = flag.Int("warp", MAX_WARPLEN, "maximum elements per warp")
+	flag_maxprocs   = flag.Int("threads", 1, "maximum number of CPU threads, 0=auto")
+	flag_cpuprof    = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
+	flag_memprof    = flag.String("memprof", "", "Write gopprof memory profile to file")
+	flag_debug      = flag.Bool("debug", DEBUG, "Generate debug info")
+	flag_log        = flag.Bool("log", LOG, "Generate log info")
 )
 
 func init() {
 	flag.Parse()
 
 	initLog()
-
 	Debug("initializing")
 
+	initThreadLock()
 	initGOMAXPROCS()
-
 	initCpuProf()
-
 	initMemProf()
-
 	if *flag_version {
 		PrintInfo(os.Stdout)
 	}
-
 	initWarp()
-
 	initCUDA()
 }
 
@@ -48,6 +44,14 @@ func initLog() {
 	DEBUG = *flag_debug
 	log.SetFlags(log.Lmicroseconds)
 	log.SetPrefix("#")
+}
+
+func initThreadLock() {
+	if *flag_threadlock {
+		*flag_maxprocs = 1
+		runtime.LockOSThread()
+		Log("Locked OS Thread, set GOMAXPROCS=1")
+	}
 }
 
 func initGOMAXPROCS() {

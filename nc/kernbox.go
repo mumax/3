@@ -50,7 +50,7 @@ func (box *KernelBox) initKern() {
 	//bwPlan := box.bwPlan
 
 	output := safe.MakeComplex64s(fwPlan.OutputLen())
-	defer output.Free()
+	//defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	ksize := realsize
@@ -71,11 +71,15 @@ func (box *KernelBox) initKern() {
 		for j := i; j < 3; j++ {
 
 			k := kern[i][j]
+			Debug("input:", input)
+			Debug("k.List:", k.List)
+
+			SetCudaCtx()
 			input.CopyHtoD(k.List)
-			fwPlan.Exec(input, output)
+			//fwPlan.Exec(input, output)
 
 			for s := 0; s < NumWarp(); s++ {
-				scaleRealParts(fftK[s*blocklen+kind*(blocklen/6):s*blocklen+(kind+1)*(blocklen/6)], output.Float().Slice(s*blocklen, (s+1)*blocklen), 1/float32(fwPlan.InputLen()))
+				scaleRealParts(fftK[s*blocklen+kind*(blocklen/6):s*blocklen+(kind+1)*(blocklen/6)], output.Float().Slice(s*blocklen/6, (s+1)*(blocklen/6)), 1/float32(fwPlan.InputLen()))
 			}
 			kind++
 		}
@@ -113,8 +117,8 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 }
 
 // Infinitely sends the block down chan.
-func SendBlock(Chan []chan<- Block, block Block) {
-	for s := 0; s < NumWarp(); s++ {
-		Send(Chan, block.Slice(s))
-	}
-}
+//func SendBlock(Chan []chan<- Block, block Block) {
+//	for s := 0; s < NumWarp(); s++ {
+//		Send(Chan, block.Slice(s))
+//	}
+//}

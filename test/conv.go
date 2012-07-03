@@ -2,6 +2,7 @@ package main
 
 import (
 	. "nimble-cube/nc"
+	"runtime"
 )
 
 func main() {
@@ -16,7 +17,14 @@ func main() {
 	Connect(&togpu.Input, &kern.FFTKernel)
 	Connect(&conv.FFTKernel, &togpu.Output)
 	WriteGraph("conv")
-	GoRun(kern, togpu)
+	go func() {
+		runtime.LockOSThread()
+		kern.Run()
+	}()
+	go func() {
+		runtime.LockOSThread()
+		togpu.Run()
+	}()
 	conv.Run() // once
 
 }

@@ -1,6 +1,7 @@
 package nc
 
 import (
+	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
 )
@@ -66,16 +67,23 @@ func (box *KernelBox) initKern() {
 		box.fftKBlocks[s] = AsBlock(fftK[s*blocklen:(s+1)*blocklen], blocksize)
 	}
 
+	str := cu.StreamCreate()
+	defer str.Destroy()
 	kind := 0
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 
 			k := kern[i][j]
 			Debug("input:", input)
-			Debug("k.List:", k.List)
+			Debug("k.List:", &k.List[0])
 
 			SetCudaCtx()
+			cu.CtxSynchronize()
 			input.CopyHtoD(k.List)
+			//			input.CopyHtoDAsync(k.List, str)
+			//			str.Synchronize()
+			cu.CtxSynchronize()
+
 			//fwPlan.Exec(input, output)
 
 			for s := 0; s < NumWarp(); s++ {

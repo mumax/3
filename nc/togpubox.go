@@ -28,7 +28,7 @@ func (box *ToGpuBox) Run() {
 }
 
 func sendToGpu(in Block, out []chan<- GpuBlock, stream cu.Stream) {
-	buffer := GpuBuffer()
+	buffer := GpuBufferSize(in.Size())
 	buffer.CopyHtoDAsync(in, stream)
 	stream.Synchronize()
 	Recycle(in)

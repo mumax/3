@@ -36,7 +36,7 @@ func initCUDA() {
 
 var lockCount int32
 
-// To be called before any cuda call :(
+// To be called by any fresh goroutine that will do cuda interaction
 func LockCudaThread() {
 	if cudaCtx == 0 {
 		return // allow to run if there's no GPU.
@@ -45,4 +45,13 @@ func LockCudaThread() {
 	cudaCtx.SetCurrent() // super cheap.
 	c := atomic.AddInt32(&lockCount, 1)
 	Debug("Locked thread", c, "to CUDA context")
+}
+
+func UnlockCudaThread() {
+	if cudaCtx == 0 {
+		return // allow to run if there's no GPU.
+	}
+	runtime.UnlockOSThread()
+	c := atomic.AddInt32(&lockCount, -1)
+	Debug("Unlocked OS thread,", c, "remain locked")
 }

@@ -37,6 +37,10 @@ func GpuBuffer() GpuBlock {
 	return gpugarbageman.Get()
 }
 
+func GpuBufferSize(size [3]int) GpuBlock {
+	return gpugarbageman.GetSize(size)
+}
+
 func RecycleGpu(g ...GpuBlock) {
 	gpugarbageman.Recycle(g...)
 }

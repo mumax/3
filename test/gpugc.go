@@ -35,6 +35,7 @@ type GpuSource struct {
 }
 
 func (box *GpuSource) Run() {
+	LockCudaThread()
 	for {
 		SendGpu(box.Output, GpuBuffer())
 	}
@@ -45,7 +46,7 @@ type GpuSink struct {
 }
 
 func (box *GpuSink) Run(n int) {
-	SetCudaCtx()
+	LockCudaThread()
 	for i := 0; i < n; i++ {
 		//log.Println("step", i)
 		RecycleGpu(RecvGpu(box.Input))

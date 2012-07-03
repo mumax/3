@@ -28,7 +28,7 @@ func NewFromGpu3Par() *FromGpu3Par {
 }
 
 func (box *FromGpu3Par) Run() {
-
+	LockCudaThread()
 	Vet(box)
 	input := box.Input
 	str := cu.StreamCreate()

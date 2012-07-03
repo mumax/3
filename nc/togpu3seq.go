@@ -21,8 +21,9 @@ func NewToGpu3SeqBox() *ToGpu3SeqBox {
 }
 
 func (box *ToGpu3SeqBox) Run() {
-	Vet(box)
+	panic("ah")
 	LockCudaThread()
+	Vet(box)
 	input := box.Input
 	output := box.Output
 	str := cu.StreamCreate()

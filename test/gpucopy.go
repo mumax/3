@@ -81,6 +81,7 @@ type GpuSource struct {
 }
 
 func (box *GpuSource) Run() {
+	LockCudaThread()
 	for {
 		SendGpu(box.Output, GpuBuffer())
 	}
@@ -91,6 +92,7 @@ type GpuSink struct {
 }
 
 func (box *GpuSink) Run() {
+	LockCudaThread()
 	for {
 		RecycleGpu(RecvGpu(box.Input))
 	}

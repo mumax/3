@@ -9,7 +9,10 @@ var garbageman Garbageman
 
 // Get a buffer from the global garbageman.
 func Buffer() Block {
-	return garbageman.Get()
+	b := MakeBlock(WarpSize())
+	b.refcount = new(Refcount)
+	return b
+	//return garbageman.Get()
 }
 
 func Buffer3() [3]Block {
@@ -17,7 +20,9 @@ func Buffer3() [3]Block {
 }
 
 // Recyle a buffer from the global garbageman.
-func Recycle(g ...Block) { garbageman.Recycle(g...) }
+func Recycle(g ...Block) {
+	//garbageman.Recycle(g...) 
+}
 
 func Recycle3(garbages ...[3]Block) {
 	for _, g := range garbages {
@@ -34,15 +39,28 @@ var gpugarbageman GpuGarbageman
 
 // Get a buffer form the global garbageman.
 func GpuBuffer() GpuBlock {
-	return gpugarbageman.Get()
+	return GpuBufferSize(WarpSize())
 }
 
 func GpuBufferSize(size [3]int) GpuBlock {
-	return gpugarbageman.GetSize(size)
+	//return gpugarbageman.GetSize(size)
+	b := MakeGpuBlock(size)
+	b.refcount = new(Refcount)
+	return b
 }
 
-func RecycleGpu(g ...GpuBlock) {
-	gpugarbageman.Recycle(g...)
+func RecycleGpu(garbages ...GpuBlock) {
+	for _, g := range garbages {
+		if g.refcount == nil {
+			continue // slice does not originate from here
+		}
+		if g.refcount.Load() == 0 {
+			g.Free()
+		} else { // cannot be recycled, just yet
+			g.refcount.Add(-1)
+		}
+	}
+	//gpugarbageman.Recycle(g...)
 }
 
 func NumGpuAlloc() int {

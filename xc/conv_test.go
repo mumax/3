@@ -2,10 +2,12 @@ package xc
 
 import (
 	"testing"
+	"nimble-cube/core"
 )
 
 func TestConv(test *testing.T) {
 	size := [3]int{2, 4, 8}
+	core.InitSize(size[0], size[1], size[2])
 	N := prod(size)
 
 	in := make([]float32, 3*N)
@@ -20,4 +22,6 @@ func TestConv(test *testing.T) {
 	conv.Push(2)
 	conv.Push(3)
 	conv.Push(4)
+	conv.Push(5)
+	conv.Push(core.N())
 }

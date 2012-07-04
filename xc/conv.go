@@ -9,13 +9,15 @@ import (
 
 type Conv struct {
 	size          [3]int
+	n             int
 	input, output [3][]float32
 	realBuf       [3]safe.Float32s
 	fftBuf        [3]safe.Float32s
 	fwPlan        safe.FFT3DR2CPlan
 	bwPlan        safe.FFT3DC2RPlan
 	fftKern       [3][3][]float32
-	push          chan int
+	push, pull    chan int
+	inframe       chan int // signals one full input frame has been processed
 }
 
 func NewConv(input, output [3][]float32, size [3]int) *Conv {
@@ -27,9 +29,12 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 		}
 	}
 	c.size = size
+	c.n = prod(size)
 	c.input = input
 	c.output = output
-	c.push = make(chan int)
+	c.push = make(chan int, core.NumWarp())
+	c.pull = make(chan int)
+	c.inframe = make(chan int)
 	go c.run()
 	return c
 }
@@ -43,19 +48,33 @@ func (c *Conv) run() {
 
 	for {
 		upper := <-c.push
-		for {
+		for havemore := true; havemore; {
 			select {
-			case upper = <-c.push: // 
+			case upper = <-c.push: // there's 
 			default:
-				break
+				havemore = false
 			}
 		}
 		core.Debug("upper:", upper)
 	}
 }
 
+// Signals input[0:upper] is ready to be uploaded.
+// Only blocks if upper == len(input), after which
+// input may safely be overwritten.
 func (c *Conv) Push(upper int) {
+	if upper > c.n {
+		panic(fmt.Errorf("xc.Conv: upper out of bounds: %v", upper))
+	}
 	c.push <- upper
+	if upper == c.n {
+		core.Debug("xc.Conv: waiting to release input frame")
+		<-c.inframe
+	}
+}
+
+func (c *Conv) Pull() int {
+	return <-c.pull
 }
 
 func (c *Conv) init() {
@@ -90,9 +109,7 @@ func (c *Conv) initFFTKern() {
 	realsize[2] /= 2
 
 	acc := 4
-	core.Debug("Initializing magnetostatic kernel")
 	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
-	core.Debug("Magnetostatic kernel ready")
 	//core.Debug("kern:", kern)
 
 	c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
@@ -109,7 +126,7 @@ func (c *Conv) initFFTKern() {
 			c.fwPlan.Exec(input, output)
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(c.fwPlan.InputLen()))
-			core.Debug("fftKern", i, j, ":", c.fftKern[i][j])
+			//core.Debug("fftKern", i, j, ":", c.fftKern[i][j])
 		}
 	}
 }
@@ -135,8 +152,8 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	}
 	// ...however, we check that the imaginary parts are nearly zero,
 	// just to be sure we did not make a mistake during kernel creation.
-	core.Debug("FFT Kernel max imaginary part=", maximg)
-	core.Debug("FFT Kernel max real part=", maxreal)
+	//core.Debug("FFT Kernel max imaginary part=", maximg)
+	//core.Debug("FFT Kernel max real part=", maxreal)
 	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
 		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=", maximg/maxreal))

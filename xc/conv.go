@@ -12,12 +12,10 @@ type Conv struct {
 	input, output [3][]float32
 	realBuf       [3]safe.Float32s
 	fftBuf        [3]safe.Float32s
-
-	fwPlan  safe.FFT3DR2CPlan
-	bwPlan  safe.FFT3DC2RPlan
-	fftKern [3][3][]float32
-
-	push chan int
+	fwPlan        safe.FFT3DR2CPlan
+	bwPlan        safe.FFT3DC2RPlan
+	fftKern       [3][3][]float32
+	push          chan int
 }
 
 func NewConv(input, output [3][]float32, size [3]int) *Conv {
@@ -31,13 +29,13 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 	c.size = size
 	c.input = input
 	c.output = output
+	for i := 0; i < 3; i++ {
+		core.MemHostRegister(input[i])
+		core.MemHostRegister(output[i])
+	}
 	c.push = make(chan int)
 	go c.run()
 	return c
-}
-
-func (c *Conv) Push(upper int) {
-	c.push <- upper
 }
 
 func (c *Conv) run() {
@@ -48,6 +46,10 @@ func (c *Conv) run() {
 	c.init()
 
 	_ = <-c.push
+}
+
+func (c *Conv) Push(upper int) {
+	c.push <- upper
 }
 
 func (c *Conv) init() {

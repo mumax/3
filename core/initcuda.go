@@ -4,6 +4,7 @@ import (
 	"github.com/barnex/cuda4/cu"
 	"runtime"
 	"sync/atomic"
+	"unsafe"
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
@@ -54,4 +55,10 @@ func UnlockCudaThread() {
 	runtime.UnlockOSThread()
 	c := atomic.AddInt32(&lockCount, -1)
 	Debug("Unlocked OS thread,", c, "remain locked")
+}
+
+func MemHostRegister(slice []float32) {
+	if *flag_pagelock {
+		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
+	}
 }

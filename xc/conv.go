@@ -3,6 +3,7 @@ package xc
 import (
 	"fmt"
 	"github.com/barnex/cuda4/safe"
+	"github.com/barnex/fmath"
 	"nimble-cube/core"
 )
 
@@ -51,15 +52,22 @@ func (c *Conv) run() {
 
 func (c *Conv) init() {
 	core.Debug("xc.Conv.init")
-	N := prod(c.size)
 
+	c.initFFTKern()
+	c.initBuffers() // alloc after kernel, when memory has been freed.
+}
+
+func (c *Conv) initBuffers() {
+	N := prod(c.size)
 	// don't leak on 2nd init
 	c.realBuf[0].Free()
 	c.fftBuf[0].Free()
 
 	r := safe.MakeFloat32s(3 * N)
 	c.realBuf = [3]safe.Float32s{r.Slice(0*N, 1*N), r.Slice(1*N, 2*N), r.Slice(2*N, 3*N)}
+}
 
+func (c *Conv) initFFTKern() {
 	padded := PadSize(c.size)
 	ffted := FFTR2COutputSizeFloats(padded)
 	realsize := ffted
@@ -81,12 +89,41 @@ func (c *Conv) init() {
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-
 			input.CopyHtoD(kern[i][j])
 			c.fwPlan.Exec(input, output)
-
-			//scaleRealParts(fftK[s*blocklen+kind*(blocklen/6):s*blocklen+(kind+1)*(blocklen/6)], output.Float().Slice(s*blocklen/6, (s+1)*(blocklen/6)), 1/float32(fwPlan.InputLen()))
+			c.fftKern[i][j] = make([]float32, prod(realsize))
+			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(c.fwPlan.InputLen()))
+			core.Debug("fftKern", i, j, ":", c.fftKern[i][j])
 		}
+	}
+}
+
+// Extract real parts, copy them from src to dst.
+// In the meanwhile, check if imaginary parts are nearly zero
+// and scale the kernel to compensate for unnormalized FFTs.
+func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
+	srcList := src.Host()
+
+	// Normally, the FFT'ed kernel is purely real because of symmetry,
+	// so we only store the real parts...
+	maximg := float32(0.)
+	maxreal := float32(0.)
+	for i := 0; i < src.Len()/2; i++ {
+		dstList[i] = srcList[2*i] * scale
+		if fmath.Abs(srcList[2*i+0]) > maxreal {
+			maxreal = fmath.Abs(srcList[2*i+0])
+		}
+		if fmath.Abs(srcList[2*i+1]) > maximg {
+			maximg = fmath.Abs(srcList[2*i+1])
+		}
+	}
+	// ...however, we check that the imaginary parts are nearly zero,
+	// just to be sure we did not make a mistake during kernel creation.
+	core.Debug("FFT Kernel max imaginary part=", maximg)
+	core.Debug("FFT Kernel max real part=", maxreal)
+	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
+	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
+		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=", maximg/maxreal))
 	}
 }
 

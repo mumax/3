@@ -29,10 +29,6 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 	c.size = size
 	c.input = input
 	c.output = output
-	for i := 0; i < 3; i++ {
-		core.MemHostRegister(input[i])
-		core.MemHostRegister(output[i])
-	}
 	c.push = make(chan int)
 	go c.run()
 	return c
@@ -45,7 +41,17 @@ func (c *Conv) run() {
 	// continue initialization here, inside locked CUDA thread
 	c.init()
 
-	_ = <-c.push
+	for {
+		upper := <-c.push
+		for {
+			select {
+			case upper = <-c.push: // 
+			default:
+				break
+			}
+		}
+		core.Debug("upper:", upper)
+	}
 }
 
 func (c *Conv) Push(upper int) {
@@ -55,8 +61,16 @@ func (c *Conv) Push(upper int) {
 func (c *Conv) init() {
 	core.Debug("xc.Conv.init")
 
+	c.initPageLock()
 	c.initFFTKern()
 	c.initBuffers() // alloc after kernel, when memory has been freed.
+}
+
+func (c *Conv) initPageLock() {
+	for i := 0; i < 3; i++ {
+		core.MemHostRegister(c.input[i])
+		core.MemHostRegister(c.output[i])
+	}
 }
 
 func (c *Conv) initBuffers() {

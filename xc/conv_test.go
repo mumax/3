@@ -14,5 +14,6 @@ func TestConv(test *testing.T) {
 	out := make([]float32, 3*N)
 	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
 
-	NewConv(input, output, size)
+	conv := NewConv(input, output, size)
+	conv.Push(1)
 }

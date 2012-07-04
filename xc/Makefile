@@ -12,7 +12,7 @@ GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 gccgo:
 	go build -v -compiler $(GCCGO)
 
-test: 6gtest #gccgotest
+test: 6gtest gccgotest
 
 6gtest: 
 	go test 

@@ -27,8 +27,8 @@ func (c *Conv) Init(input, output [3][]float32, size [3]int) {
 	c.realBuf[0].Free()
 	c.fftBuf[0].Free()
 
-	r := safe.MakeFloat32s(3 * N)
-	c.realBuf = [3]safe.Float32s{r.Slice(0*N, 1*N), r.Slice(1*N, 2*N), r.Slice(2*N, 3*N)}
+	r := safe.MakeFloat32s(3*N)
+	c.realBuf = [3]safe.Float32s{r.Slice(0*N,1*N), r.Slice(1*N,2*N), r.Slice(2*N, 3*N)}
 }
 
 func prod(size [3]int) int {

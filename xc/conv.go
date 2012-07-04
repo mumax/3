@@ -32,6 +32,7 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 	c.n = prod(size)
 	c.input = input
 	c.output = output
+	core.Assert(core.NumWarp() > 0)
 	c.push = make(chan int, core.NumWarp())
 	c.pull = make(chan int)
 	c.inframe = make(chan int)
@@ -50,7 +51,8 @@ func (c *Conv) run() {
 		upper := <-c.push
 		for havemore := true; havemore; {
 			select {
-			case upper = <-c.push: // there's 
+			case upper = <-c.push:
+				core.Debug("have more")
 			default:
 				havemore = false
 			}

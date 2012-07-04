@@ -48,6 +48,7 @@ func initLog() {
 func initGOMAXPROCS() {
 	if *flag_maxprocs == 0 {
 		*flag_maxprocs = runtime.NumCPU()
+		Log("Num CPU:", *flag_maxprocs)
 	}
 	procs := runtime.GOMAXPROCS(*flag_maxprocs) // sets it
 	Log("GOMAXPROCS:", procs)

@@ -48,53 +48,53 @@ func (s *slice) Free() {
 
 // internal base func for all slice() functions
 func (s *slice) slice(start, stop int, elemsize uintptr) slice {
-	if start >= s.cap_ || start < 0 || stop >= s.cap_ || stop < 0 {
-		panic("slice index out of bounds")
+	if start >= s.cap_ || start < 0 || stop > s.cap_ || stop < 0 {
+		panic("cuda4/safe: slice index out of bounds")
 	}
 	if start > stop {
-		panic("inverted slice range")
+		panic("cuda4/safe: inverted slice range")
 	}
 	return slice{cu.DevicePtr(uintptr(s.ptr_) + uintptr(start)*elemsize), stop - start, s.cap_ - start}
 }
 
 func (dst *slice) copyHtoD(src unsafe.Pointer, srclen int, elemsize int) {
 	if srclen != dst.Len() {
-		panic(fmt.Errorf("len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
 	}
 	cu.MemcpyHtoD(dst.Pointer(), src, int64(elemsize)*int64(srclen))
 }
 
 func (src *slice) copyDtoH(dst unsafe.Pointer, dstlen int, elemsize int) {
 	if dstlen != src.Len() {
-		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
 	}
 	cu.MemcpyDtoH(dst, src.Pointer(), int64(elemsize)*int64(dstlen))
 }
 
 func (dst *slice) copyDtoD(src *slice, elemsize int) {
 	if dst.Len() != src.Len() {
-		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
 	}
 	cu.MemcpyDtoD(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()))
 }
 
 func (dst *slice) copyHtoDAsync(src unsafe.Pointer, srclen int, elemsize int, stream cu.Stream) {
 	if srclen != dst.Len() {
-		panic(fmt.Errorf("len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: len(src)=%v (host), dst.Len()=%v (device)", srclen, dst.Len()))
 	}
 	cu.MemcpyHtoDAsync(dst.Pointer(), src, int64(elemsize)*int64(srclen), stream)
 }
 
 func (src *slice) copyDtoHAsync(dst unsafe.Pointer, dstlen int, elemsize int, stream cu.Stream) {
 	if dstlen != src.Len() {
-		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: src.Len()=%v (device), len(dst)=%v (host)", src.Len(), dstlen))
 	}
 	cu.MemcpyDtoHAsync(dst, src.Pointer(), int64(elemsize)*int64(dstlen), stream)
 }
 
 func (dst *slice) copyDtoDAsync(src *slice, elemsize int, stream cu.Stream) {
 	if dst.Len() != src.Len() {
-		panic(fmt.Errorf("len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
+		panic(fmt.Errorf("cuda4/safe: len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
 	}
 	cu.MemcpyDtoDAsync(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()), stream)
 }

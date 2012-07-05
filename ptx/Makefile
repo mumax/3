@@ -1,8 +1,16 @@
 CUFILES = $(wildcard *.cu)
 PTXFILES = $(CUFILES:.cu=.ptx)
-NVCC = nvcc -G
+GOFILES=$(CUFILES:.cu=.go)
 
-all: $(PTXFILES)
+NVCC = nvcc
+
+all: $(GOFILES) install
+
+install: $(GOFILES)
+	go install -v
+
+$(GOFILES): %.go: %.ptx
+	./ptx2go $(@:.go=.ptx) $@ $(@:.go=)
 
 $(PTXFILES): %.ptx: %.cu
 	rm -f $@
@@ -11,4 +19,5 @@ $(PTXFILES): %.ptx: %.cu
 .PHONY: clean
 clean:
 	rm -f $(PTXFILES)
+	rm -f $(GOFILES)
 

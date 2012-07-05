@@ -203,7 +203,6 @@ func (c *Conv) initFFTKern() {
 		c.bwPlan[i].SetStream(c.fftStr[i])
 	}
 	fwPlan := c.fwPlan[0] // could use any
-	bwPlan := c.bwPlan[0]
 
 	output := safe.MakeComplex64s(fwPlan.OutputLen())
 	defer output.Free()
@@ -215,7 +214,7 @@ func (c *Conv) initFFTKern() {
 			input.CopyHtoD(kern[i][j])
 			fwPlan.Exec(input, output)
 			c.fftKern[i][j] = make([]float32, prod(realsize))
-			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(c.fwPlan.InputLen()))
+			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 			//core.Debug("fftKern", i, j, ":", c.fftKern[i][j])
 		}
 	}

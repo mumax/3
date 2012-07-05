@@ -1,0 +1,12 @@
+#! /bin/bash
+ptxfile=$1
+gofile=$2
+varname=$3
+tmpfile=$gofile.tmp
+
+echo "package ptx" > $tmpfile
+echo "const" "${varname^^}" "=" "\`" >> $tmpfile
+cat $tmpfile $ptxfile > $gofile
+rm $tmpfile
+echo "\`" >> $gofile
+gofmt -w $gofile

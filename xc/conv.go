@@ -14,8 +14,8 @@ type Conv struct {
 	input, output [3][]float32
 	realBuf       [3]safe.Float32s
 	fftBuf        [3]safe.Float32s
-	fwPlan        safe.FFT3DR2CPlan
-	bwPlan        safe.FFT3DC2RPlan
+	fwPlan        [3]safe.FFT3DR2CPlan
+	bwPlan        [3]safe.FFT3DC2RPlan
 	fftKern       [3][3][]float32
 	push, pull    chan int
 	inframe       chan int // signals one full input frame has been processed
@@ -50,6 +50,12 @@ func (c *Conv) Pull() int {
 
 func (c *Conv) downloadOutputFrame() {
 
+}
+
+// _________________________________________________ fft input
+
+func (c *Conv) fwFFTComp(i int) {
+	core.Debug("xc.Conv: fw FFT component", i)
 }
 
 // ________________________________________________ upload input
@@ -112,6 +118,9 @@ func (c *Conv) sendSomeInput() {
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper
+			if c.inSent[i] == c.n { // component ready
+				c.fwFFTComp(i) // start FFT'ing it
+			}
 			return // stop here so new input can first flow in
 		}
 	}
@@ -157,9 +166,6 @@ func (c *Conv) init() {
 	c.initFFTKern()
 	c.initBuffers() // alloc after kernel, when memory has been freed.
 	c.cpyStr = cu.StreamCreate()
-	for i := range c.fftStr {
-		c.fftStr[i] = cu.StreamCreate()
-	}
 }
 
 func (c *Conv) initPageLock() {
@@ -189,18 +195,25 @@ func (c *Conv) initFFTKern() {
 	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
 	//core.Debug("kern:", kern)
 
-	c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
-	c.bwPlan = safe.FFT3DC2R(padded[0], padded[1], padded[2])
+	for i := range c.fwPlan {
+		c.fftStr[i] = cu.StreamCreate()
+		c.fwPlan[i] = safe.FFT3DR2C(padded[0], padded[1], padded[2])
+		c.fwPlan[i].SetStream(c.fftStr[i])
+		c.bwPlan[i] = safe.FFT3DC2R(padded[0], padded[1], padded[2])
+		c.bwPlan[i].SetStream(c.fftStr[i])
+	}
+	fwPlan := c.fwPlan[0] // could use any
+	bwPlan := c.bwPlan[0]
 
-	output := safe.MakeComplex64s(c.fwPlan.OutputLen())
+	output := safe.MakeComplex64s(fwPlan.OutputLen())
 	defer output.Free()
 	//defer output.Free()
-	input := output.Float().Slice(0, c.fwPlan.InputLen())
+	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			input.CopyHtoD(kern[i][j])
-			c.fwPlan.Exec(input, output)
+			fwPlan.Exec(input, output)
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(c.fwPlan.InputLen()))
 			//core.Debug("fftKern", i, j, ":", c.fftKern[i][j])

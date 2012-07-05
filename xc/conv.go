@@ -21,8 +21,11 @@ type Conv struct {
 	inframe       chan int // signals one full input frame has been processed
 	inAvailable   int
 	inSent        [3]int
-	cpyStr        cu.Stream // stream for copies
+	cpyStr        cu.Stream    // stream for copies
+	fftStr        [3]cu.Stream // streams for ffts of each component
 }
+
+// _______________________________________________ run
 
 func (c *Conv) run() {
 	core.LockCudaThread()
@@ -32,15 +35,44 @@ func (c *Conv) run() {
 	c.init()
 
 	for {
-		c.uploadInputFrame()
+		c.uploadInputFrameAndFFT()
+		// wait for fft
+		//c.downloadOutputFrame()
 	}
+
+}
+
+// _______________________________________________ download output
+
+func (c *Conv) Pull() int {
+	return <-c.pull
+}
+
+func (c *Conv) downloadOutputFrame() {
 
 }
 
 // ________________________________________________ upload input
 
-// upload one full input array to the GPU
-func (c *Conv) uploadInputFrame() {
+// Signals input[0:upper] is ready to be uploaded.
+// Only blocks if upper == len(input), after which
+// input may safely be overwritten by a new frame.
+func (c *Conv) Push(upper int) {
+	if upper > c.n {
+		panic(fmt.Errorf("xc.Conv: upper out of bounds: %v", upper))
+	}
+	c.push <- upper
+	if upper == c.n {
+		core.Debug("xc.Push: waiting to release input frame")
+		<-c.inframe
+		core.Debug("xc.Push: waiting to release input frame done")
+	}
+}
+
+// Upload one full input array to the GPU.
+// Start asynchronous FFT's on each component as soon as possible.
+// Wait for them by c.fftStr.Synchronize()
+func (c *Conv) uploadInputFrameAndFFT() {
 	ready := false
 	for !ready {
 
@@ -116,24 +148,7 @@ func (c *Conv) updInAvailbleNoWait() {
 	}
 }
 
-// Signals input[0:upper] is ready to be uploaded.
-// Only blocks if upper == len(input), after which
-// input may safely be overwritten by a new frame.
-func (c *Conv) Push(upper int) {
-	if upper > c.n {
-		panic(fmt.Errorf("xc.Conv: upper out of bounds: %v", upper))
-	}
-	c.push <- upper
-	if upper == c.n {
-		core.Debug("xc.Push: waiting to release input frame")
-		<-c.inframe
-		core.Debug("xc.Push: waiting to release input frame done")
-	}
-}
-
-func (c *Conv) Pull() int {
-	return <-c.pull
-}
+// _______________________________________________________  init
 
 func (c *Conv) init() {
 	core.Debug("xc.Conv.init")
@@ -142,6 +157,9 @@ func (c *Conv) init() {
 	c.initFFTKern()
 	c.initBuffers() // alloc after kernel, when memory has been freed.
 	c.cpyStr = cu.StreamCreate()
+	for i := range c.fftStr {
+		c.fftStr[i] = cu.StreamCreate()
+	}
 }
 
 func (c *Conv) initPageLock() {
@@ -252,8 +270,8 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 	c.input = input
 	c.output = output
 	core.Assert(core.NumWarp() > 0)
-	c.push = make(chan int, core.NumWarp())
-	c.pull = make(chan int)
+	c.push = make(chan int, core.NumWarp()) // Buffer up to one frame. Less should not deadlock though.
+	c.pull = make(chan int, core.NumWarp())
 	c.inframe = make(chan int)
 	go c.run()
 	return c

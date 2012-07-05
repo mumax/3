@@ -37,6 +37,8 @@ func (c *Conv) run() {
 
 }
 
+// ________________________________________________ upload input
+
 // upload one full input array to the GPU
 func (c *Conv) uploadInputFrame() {
 	ready := false
@@ -62,6 +64,10 @@ func (c *Conv) uploadInputFrame() {
 
 var maxXfer = 16 // TODO: increase.
 
+// Send part of the available input to the GPU.
+// preferentially send X component if possible, then Y, then Z.
+// Transfer sizes are limited to avoid sending a huge Z block
+// when not all X's have been transferred yet, e.g.
 func (c *Conv) sendSomeInput() {
 	for i, sent := range c.inSent {
 		if sent < c.inAvailable {
@@ -74,11 +80,13 @@ func (c *Conv) sendSomeInput() {
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper
-			return // !
+			return // stop here so new input can first flow in
 		}
 	}
 }
 
+// Is new  input available? 
+// I.e.: input that is ready but has not yet been sent.
 func (c *Conv) haveInput() bool {
 	for _, sent := range c.inSent {
 		if sent < c.inAvailable {
@@ -88,11 +96,15 @@ func (c *Conv) haveInput() bool {
 	return false
 }
 
+// Update c.inAvailable, the upper bound of ready input data.
+// Blocks until some new input becomes available due to a Push().
 func (c *Conv) updInAvailableWait() {
 	c.inAvailable = <-c.push
 	c.updInAvailbleNoWait()
 }
 
+// Update c.inAvailable, the upper bound of ready input data.
+// Does not block. If no new input is available, nothing is updated.
 func (c *Conv) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
@@ -106,7 +118,7 @@ func (c *Conv) updInAvailbleNoWait() {
 
 // Signals input[0:upper] is ready to be uploaded.
 // Only blocks if upper == len(input), after which
-// input may safely be overwritten.
+// input may safely be overwritten by a new frame.
 func (c *Conv) Push(upper int) {
 	if upper > c.n {
 		panic(fmt.Errorf("xc.Conv: upper out of bounds: %v", upper))

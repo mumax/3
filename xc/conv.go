@@ -2,6 +2,7 @@ package xc
 
 import (
 	"fmt"
+	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
 	"nimble-cube/core"
@@ -18,26 +19,9 @@ type Conv struct {
 	fftKern       [3][3][]float32
 	push, pull    chan int
 	inframe       chan int // signals one full input frame has been processed
-}
-
-func NewConv(input, output [3][]float32, size [3]int) *Conv {
-	c := new(Conv)
-	N := prod(size)
-	for c := 0; c < 3; c++ {
-		if len(output[c]) != N || len(input[c]) != N {
-			panic(fmt.Errorf("xc.Conv.Init: inconsistent sizes"))
-		}
-	}
-	c.size = size
-	c.n = prod(size)
-	c.input = input
-	c.output = output
-	core.Assert(core.NumWarp() > 0)
-	c.push = make(chan int, core.NumWarp())
-	c.pull = make(chan int)
-	c.inframe = make(chan int)
-	go c.run()
-	return c
+	inAvailable   int
+	inSent        [3]int
+	cpyStr        cu.Stream // stream for copies
 }
 
 func (c *Conv) run() {
@@ -48,16 +32,60 @@ func (c *Conv) run() {
 	c.init()
 
 	for {
-		upper := <-c.push
-		for havemore := true; havemore; {
-			select {
-			case upper = <-c.push:
-				core.Debug("have more")
-			default:
-				havemore = false
-			}
+
+		core.Debug("xc.Conv: waiting for input")
+		c.updInAvailableWait()
+		for c.haveInput() {
+			core.Debug("xc.Conv: have input")
+			c.sendSomeInput()
+			c.updInAvailbleNoWait()
 		}
-		core.Debug("upper:", upper)
+
+	}
+
+}
+
+var maxXfer = 8
+
+func (c *Conv) sendSomeInput() {
+	for i, sent := range c.inSent {
+		if sent < c.inAvailable {
+			upper := c.inAvailable
+			if upper-sent > maxXfer {
+				upper = sent + maxXfer
+				core.Debug("xc.Conv: limiting xfer")
+			}
+			core.Debug("xc.Conv: sending comp", i, "elems:", upper-sent)
+			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
+			c.cpyStr.Synchronize()
+			c.inSent[i] = upper
+			return // !
+		}
+	}
+}
+
+func (c *Conv) haveInput() bool {
+	for _, sent := range c.inSent {
+		if sent < c.inAvailable {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Conv) updInAvailableWait() {
+	c.inAvailable = <-c.push
+	c.updInAvailbleNoWait()
+}
+
+func (c *Conv) updInAvailbleNoWait() {
+	for havemore := true; havemore; {
+		select {
+		case c.inAvailable = <-c.push:
+			core.Debug("xc.Conv: splicing :-)")
+		default:
+			havemore = false
+		}
 	}
 }
 
@@ -85,6 +113,7 @@ func (c *Conv) init() {
 	c.initPageLock()
 	c.initFFTKern()
 	c.initBuffers() // alloc after kernel, when memory has been freed.
+	c.cpyStr = cu.StreamCreate()
 }
 
 func (c *Conv) initPageLock() {
@@ -180,4 +209,24 @@ func PadSize(size [3]int) [3]int {
 
 func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
+}
+
+func NewConv(input, output [3][]float32, size [3]int) *Conv {
+	c := new(Conv)
+	N := prod(size)
+	for c := 0; c < 3; c++ {
+		if len(output[c]) != N || len(input[c]) != N {
+			panic(fmt.Errorf("xc.Conv.Init: inconsistent sizes"))
+		}
+	}
+	c.size = size
+	c.n = prod(size)
+	c.input = input
+	c.output = output
+	core.Assert(core.NumWarp() > 0)
+	c.push = make(chan int, core.NumWarp())
+	c.pull = make(chan int)
+	c.inframe = make(chan int)
+	go c.run()
+	return c
 }

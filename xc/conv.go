@@ -32,20 +32,35 @@ func (c *Conv) run() {
 	c.init()
 
 	for {
-
-		core.Debug("xc.Conv: waiting for input")
-		c.updInAvailableWait()
-		for c.haveInput() {
-			core.Debug("xc.Conv: have input")
-			c.sendSomeInput()
-			c.updInAvailbleNoWait()
-		}
-
+		c.uploadInputFrame()
 	}
 
 }
 
-var maxXfer = 8
+// upload one full input array to the GPU
+func (c *Conv) uploadInputFrame() {
+	ready := false
+	for !ready {
+
+		core.Debug("xc.Conv: waiting for input")
+		c.updInAvailableWait()
+		core.Debug("xc.Conv: done waiting for input")
+		for c.haveInput() {
+			//core.Debug("xc.Conv: have input")
+			c.sendSomeInput()
+			c.updInAvailbleNoWait()
+		}
+		ready = c.inSent[0] == c.n &&
+			c.inSent[1] == c.n &&
+			c.inSent[2] == c.n
+	}
+	core.Debug("xc.Conv: finished frame")
+	c.inframe <- 1
+	core.Debug("xc.Conv: frame released")
+	c.inSent = [3]int{0, 0, 0}
+}
+
+var maxXfer = 16 // TODO: increase.
 
 func (c *Conv) sendSomeInput() {
 	for i, sent := range c.inSent {
@@ -53,9 +68,9 @@ func (c *Conv) sendSomeInput() {
 			upper := c.inAvailable
 			if upper-sent > maxXfer {
 				upper = sent + maxXfer
-				core.Debug("xc.Conv: limiting xfer")
+				//core.Debug("xc.Conv: limiting xfer")
 			}
-			core.Debug("xc.Conv: sending comp", i, "elems:", upper-sent)
+			//core.Debug("xc.Conv: sending comp", i, "elems:", upper-sent)
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper
@@ -82,7 +97,7 @@ func (c *Conv) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
 		case c.inAvailable = <-c.push:
-			core.Debug("xc.Conv: splicing :-)")
+			//core.Debug("xc.Conv: splicing :-)")
 		default:
 			havemore = false
 		}
@@ -98,8 +113,9 @@ func (c *Conv) Push(upper int) {
 	}
 	c.push <- upper
 	if upper == c.n {
-		core.Debug("xc.Conv: waiting to release input frame")
+		core.Debug("xc.Push: waiting to release input frame")
 		<-c.inframe
+		core.Debug("xc.Push: waiting to release input frame done")
 	}
 }
 

@@ -56,6 +56,11 @@ func (c *Conv) downloadOutputFrame() {
 
 func (c *Conv) fwFFTComp(i int) {
 	core.Debug("xc.Conv: fw FFT component", i)
+	fw := c.fwPlan[i]
+	str := c.fftStr[i]
+	copyPad(c.fftBuf[i], c.realBuf[i], PadSize(c.size), c.size, str)
+	str.Synchronize()
+	Debug("padded", i, ":", safe.Reshape c.fftBuf[i].Host()
 }
 
 // ________________________________________________ upload input

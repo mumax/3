@@ -10,10 +10,10 @@ import (
 var copyPadKern cu.Function
 
 // Copies src into dst (which is larger), at offset position.
-func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int) {
+func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.Stream) {
 
 	if copyPadKern == 0 {
-		mod := cu.ModuleLoadData(ptx.COPYPAD)
+		mod := cu.ModuleLoadData(ptx.COPYPAD) // TODO: target higher SM's as well.
 		copyPadKern = mod.GetFunction("copypad")
 	}
 
@@ -37,7 +37,7 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int) {
 		unsafe.Pointer(&offset[1]),
 		unsafe.Pointer(&offset[2])}
 
-	cu.LaunchKernel(copyPadKern, gridJ, gridK, 1, block, block, 1, shmem, 0, args)
+	cu.LaunchKernel(copyPadKern, gridJ, gridK, 1, block, block, 1, shmem, stream, args)
 }
 
 // Integer division rounded up.

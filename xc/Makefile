@@ -36,3 +36,4 @@ clean:
 
 opt:
 	go-optview -w *.go
+	gofmt -w *.go

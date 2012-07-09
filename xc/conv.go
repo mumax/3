@@ -9,20 +9,20 @@ import (
 )
 
 type Conv struct {
-	size          [3]int
-	n             int
-	input, output [3][]float32
-	realBuf       [3]safe.Float32s
-	fftBuf        [3]safe.Float32s
-	fwPlan        [3]safe.FFT3DR2CPlan
-	bwPlan        [3]safe.FFT3DC2RPlan
-	fftKern       [3][3][]float32
-	push, pull    chan int
-	inframe       chan int // signals one full input frame has been processed
-	inAvailable   int
-	inSent        [3]int
-	cpyStr        cu.Stream    // stream for copies
-	fftStr        [3]cu.Stream // streams for ffts of each component
+	size                [3]int
+	n                   int
+	input, output       [3][]float32
+	realBuf             [3]safe.Float32s
+	fftInBuf, fftOutBuf [3]safe.Float32s // Input/output buffers for FFT, share underlying storage for in-place FFT
+	fwPlan              [3]safe.FFT3DR2CPlan
+	bwPlan              [3]safe.FFT3DC2RPlan
+	fftKern             [3][3][]float32
+	push, pull          chan int
+	inframe             chan int     // signals one full input frame has been processed
+	inAvailable         int          // upper bound to where the input array is ready
+	inSent              [3]int       // upper bounds to where the input has been sent to device, per component
+	cpyStr              cu.Stream    // stream for copies
+	fftStr              [3]cu.Stream // streams for ffts of each component
 }
 
 // _______________________________________________ run
@@ -56,11 +56,11 @@ func (c *Conv) downloadOutputFrame() {
 
 func (c *Conv) fwFFTComp(i int) {
 	core.Debug("xc.Conv: fw FFT component", i)
-	fw := c.fwPlan[i]
-	str := c.fftStr[i]
-	copyPad(c.fftBuf[i], c.realBuf[i], PadSize(c.size), c.size, str)
-	str.Synchronize()
-	Debug("padded", i, ":", safe.Reshape c.fftBuf[i].Host()
+	padded := PadSize(c.size)
+	offset := [3]int{0, 0, 0}
+	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, 0)
+	//str.Synchronize()
+	core.Debug("padded", i, ":", safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2]))
 }
 
 // ________________________________________________ upload input
@@ -184,10 +184,17 @@ func (c *Conv) initBuffers() {
 	N := prod(c.size)
 	// don't leak on 2nd init
 	c.realBuf[0].Free()
-	c.fftBuf[0].Free()
+	c.fftOutBuf[0].Free() // also frees fftInBuf, which shares storage
 
 	r := safe.MakeFloat32s(3 * N)
 	c.realBuf = [3]safe.Float32s{r.Slice(0*N, 1*N), r.Slice(1*N, 2*N), r.Slice(2*N, 3*N)}
+
+	outN := 2 * c.fwPlan[0].OutputLen() // floats
+	inN := c.fwPlan[0].InputLen()
+	core.Debug("outN:", outN, "inN", inN)
+	f := safe.MakeFloat32s(3 * outN)
+	c.fftOutBuf = [3]safe.Float32s{f.Slice(0*outN, 1*outN), f.Slice(1*outN, 2*outN), f.Slice(2*outN, 3*outN)}
+	c.fftInBuf = [3]safe.Float32s{f.Slice(0*outN, 1*inN), f.Slice(1*outN, 1*outN+inN), f.Slice(2*outN, 2*outN+inN)} // same stride but smaller slices
 }
 
 func (c *Conv) initFFTKern() {

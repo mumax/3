@@ -58,8 +58,9 @@ func (c *Conv) fwFFTComp(i int) {
 	core.Debug("xc.Conv: fw FFT component", i)
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
-	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, 0)
-	//str.Synchronize()
+	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
+	c.fwPlan[i].Exec(c.fftInBuf[i], c.fftOutBuf[i])
+	str.Synchronize() // TODO: remove !!!!!!!!!
 	core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2])))
 }
 
@@ -225,6 +226,7 @@ func (c *Conv) initFFTKern() {
 		for j := i; j < 3; j++ {
 			input.CopyHtoD(kern[i][j])
 			fwPlan.Exec(input, output)
+			fwPlan.Stream().Synchronize() // !!
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 			//core.Debug("fftKern", i, j, ":", c.fftKern[i][j])

@@ -19,6 +19,10 @@ func TestConv(test *testing.T) {
 
 	conv := NewConv(input, output, size)
 
+	for i := range input[0] {
+		input[0][i] = float32(i)
+	}
+
 	conv.Push(1)
 	conv.Push(6)
 	conv.Push(core.N())

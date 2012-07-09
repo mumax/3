@@ -60,7 +60,7 @@ func (c *Conv) fwFFTComp(i int) {
 	offset := [3]int{0, 0, 0}
 	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, 0)
 	//str.Synchronize()
-	core.Debug("padded", i, ":", safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2]))
+	core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2])))
 }
 
 // ________________________________________________ upload input

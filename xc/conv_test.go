@@ -3,7 +3,6 @@ package xc
 import (
 	"nimble-cube/core"
 	"testing"
-	//"time"
 )
 
 func TestConv(test *testing.T) {
@@ -19,9 +18,10 @@ func TestConv(test *testing.T) {
 
 	conv := NewConv(input, output, size)
 
-	for i := range input[0] {
-		input[0][i] = float32(i)
-	}
+	input[0][0] = 1
+	//	for i := range input[0] {
+	//		input[0][i] = float32(i)
+	//	}
 
 	conv.Push(1)
 	conv.Push(6)

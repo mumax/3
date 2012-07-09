@@ -59,9 +59,12 @@ func (c *Conv) fwFFTComp(i int) {
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
-	c.fwPlan[i].Exec(c.fftInBuf[i], c.fftOutBuf[i])
-	str.Synchronize() // TODO: remove !!!!!!!!!
+	c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
 	core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2])))
+	c.fwPlan[i].Exec(c.fftInBuf[i], c.fftOutBuf[i].Complex())
+	c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
+	fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
+	core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftOutBuf[i].Complex().Host(), fftd0, fftd1, fftd2)))
 }
 
 // ________________________________________________ upload input

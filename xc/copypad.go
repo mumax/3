@@ -17,6 +17,8 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 		copyPadKern = mod.GetFunction("copypad")
 	}
 
+	dst.MemsetAsync(0, stream)
+
 	dstptr := dst.Pointer()
 	srcptr := src.Pointer()
 

@@ -37,5 +37,4 @@ func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 
 	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
-
 }

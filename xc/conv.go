@@ -9,22 +9,24 @@ import (
 )
 
 type Conv struct {
-	size          [3]int
-	n             int
-	input, output [3][]float32
-	realBuf       [3]safe.Float32s
+	size          [3]int             // 3D size of the input/output data
+	n             int                // product of size
+	input, output [3][]float32       // input/output arrays, 3 component vectors
+	realBuf       [3]safe.Float32s   // gpu buffer for real-space, unpadded input/output data
 	fftRBuf       [3]safe.Float32s   // Real ("input") buffers for FFT, share underlying storage with fftCBuf
 	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, share underlying storage with fftRBuf
 	fwPlan        [3]safe.FFT3DR2CPlan
 	bwPlan        [3]safe.FFT3DC2RPlan
-	fftKern       [3][3][]float32
-	push, pull    chan int
-	inframe       chan int // signals one full input frame has been processed
-	inAvailable   int      // upper bound to where the input array is ready
-	inSent        [3]int   // upper bounds to where the input has been sent to device, per component
-	outAvailable  int
-	cpyStr        cu.Stream    // stream for copies
-	fftStr        [3]cu.Stream // streams for ffts of each component
+	fftKern       [3][3][]float32     // FFT kernel on host
+	gpuKern       [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	push          chan int            // signals input is ready up to the upper limit sent here
+	pull          chan int            // signals output is ready up to upper limit sent here
+	inframe       chan int            // signals one full input frame has been processed
+	inAvailable   int                 // upper bound to where the input array is ready
+	inSent        [3]int              // upper bounds to where the input has been sent to device, per component
+	outAvailable  int                 // portion of output that is ready
+	cpyStr        cu.Stream           // stream for copies
+	fftStr        [3]cu.Stream        // streams for ffts of each component
 }
 
 // _______________________________________________ run
@@ -124,7 +126,8 @@ func (c *Conv) kernMul() {
 	for i := 0; i < 3; i++ {
 		c.fftStr[i].Synchronize()
 	}
-	// TODO
+	kernMul(c.fftCBuf, c.fftKern[0][0], c.fftKern[1][1], c.fftKern[2][2], c.fftKern[1][2], c.fftKern[0][2], c.fftKern[0][1], c.cpyStr)
+	c.cpyStr.Synchronize()
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),

@@ -10,10 +10,6 @@ import (
 
 var kernMulKern cu.Function
 
-//kernmul(float* fftMx,  float* fftMy,  float* fftMz,
-//        float* fftKxx, float* fftKyy, float* fftKzz,
-//        float* fftKyz, float* fftKxz, float* fftKxy, int N){
-
 func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s, stream cu.Stream) {
 
 	core.Assert(fftM[0].Len() == 2*K00.Len())
@@ -35,7 +31,8 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 		unsafe.Pointer(K22.Pointer()),
 		unsafe.Pointer(K12.Pointer()),
 		unsafe.Pointer(K02.Pointer()),
-		unsafe.Pointer(K01.Pointer())}
+		unsafe.Pointer(K01.Pointer()),
+		unsafe.Pointer(&N)}
 
 	shmem := 0
 	cu.LaunchKernel(copyPadKern, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)

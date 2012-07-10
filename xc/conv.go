@@ -47,7 +47,10 @@ func (c *Conv) run() {
 // _______________________________________________ download output
 
 func (c *Conv) Pull() int {
-	return <-c.pull
+	core.Debug("xc.Conv: Pull: waiting")
+	u := <-c.pull
+	core.Debug("xc.Conv: Pull: return", u)
+	return u
 }
 
 func (c *Conv) downloadOutputFrame() {
@@ -57,7 +60,12 @@ func (c *Conv) downloadOutputFrame() {
 		if stop > N {
 			stop = N
 		}
-		///...
+		for i := 0; i < 3; i++ {
+			c.fftRBuf[i].Slice(start, stop).CopyDtoHAsync(c.output[i][start:stop], c.cpyStr)
+		}
+		c.cpyStr.Synchronize()
+		core.Debug("xc.Conv: downloaded up to", stop)
+		c.pull <- stop
 	}
 }
 

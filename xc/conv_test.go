@@ -26,6 +26,8 @@ func TestConv(test *testing.T) {
 		input[2][i] = float32(i)
 	}
 
+	conv.Test()
+
 	conv.Push(1)
 	conv.Push(6)
 	conv.Push(core.N())

@@ -23,15 +23,15 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 	gridDim, blockDim := Make1DConf(N)
 
 	args := []unsafe.Pointer{
-		unsafe.Pointer(fftM[0].Pointer()),
-		unsafe.Pointer(fftM[1].Pointer()),
-		unsafe.Pointer(fftM[2].Pointer()),
-		unsafe.Pointer(K00.Pointer()),
-		unsafe.Pointer(K11.Pointer()),
-		unsafe.Pointer(K22.Pointer()),
-		unsafe.Pointer(K12.Pointer()),
-		unsafe.Pointer(K02.Pointer()),
-		unsafe.Pointer(K01.Pointer()),
+		unsafe.Pointer(uintptr(fftM[0].Pointer())),
+		unsafe.Pointer(uintptr(fftM[1].Pointer())),
+		unsafe.Pointer(uintptr(fftM[2].Pointer())),
+		unsafe.Pointer(uintptr(K00.Pointer())),
+		unsafe.Pointer(uintptr(K11.Pointer())),
+		unsafe.Pointer(uintptr(K22.Pointer())),
+		unsafe.Pointer(uintptr(K12.Pointer())),
+		unsafe.Pointer(uintptr(K02.Pointer())),
+		unsafe.Pointer(uintptr(K01.Pointer())),
 		unsafe.Pointer(&N)}
 
 	shmem := 0

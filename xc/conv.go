@@ -50,18 +50,18 @@ func (c *Conv) run() {
 // Update the output array at least to upto.
 // Blocks if needed.
 func (c *Conv) Pull(upto int) {
-	core.Debug("xc.Conv: Pull:", upto, "waiting")
+	core.Debug("xc.Conv: Pull: upto", upto, "outAvailable:", c.outAvailable)
 
 	if upto > c.n {
 		panic(fmt.Errorf("xc.Conv: Pull: upto out of bounds: %v", upto))
 	}
 
-	core.Debug("upto:", upto, "c.outAvailable:", c.outAvailable)
 	for upto > c.outAvailable {
 		core.Debug("xc.Conv: Pull: recv")
 		c.outAvailable = <-c.pull
+		core.Debug("xc.Conv: Pull: recv", c.outAvailable)
 	}
-	if c.outAvailable == c.n {
+	if upto == c.n {
 		c.outAvailable = 0
 		core.Debug("xc.Conv: Pull: finished frame")
 	}

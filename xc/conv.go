@@ -52,22 +52,16 @@ func (c *Conv) run() {
 // Update the output array at least to upto.
 // Blocks if needed.
 func (c *Conv) Pull(upto int) {
-	//core.Debug("xc.Conv: Pull: upto", upto, "outAvailable:", c.outAvailable)
-
 	if upto > c.n {
 		panic(fmt.Errorf("xc.Conv: Pull: upto out of bounds: %v", upto))
 	}
 
 	for upto > c.outAvailable {
-		//core.Debug("xc.Conv: Pull: recv")
 		c.outAvailable = <-c.pull
-		//core.Debug("xc.Conv: Pull: recv", c.outAvailable)
 	}
-	if upto == c.n { // !!
+	if upto == c.n { // finished a frame, start over
 		c.outAvailable = 0
-		//core.Debug("xc.Conv: Pull: finished frame")
 	}
-	//core.Debug("xc.Conv: Pull: return")
 }
 
 func (c *Conv) downloadOutputFrame() {
@@ -123,17 +117,11 @@ func (c *Conv) kernMul() {
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
 func (c *Conv) fwFFTAsyncComp(i int) {
-	//core.Debug("xc.Conv: fw FFT component", i)
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
 	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
-	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	//core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
 	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
-	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	//fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
-	//core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), fftd0, fftd1, fftd2)))
 }
 
 // ________________________________________________ upload input

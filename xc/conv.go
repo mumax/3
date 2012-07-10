@@ -120,6 +120,7 @@ func (c *Conv) bwFFT() {
 // then do kernel multiplication.
 func (c *Conv) kernMul() {
 	core.Debug("xc.Conv: kernMul()")
+	// FFTs were started async, first wait for them.
 	for i := 0; i < 3; i++ {
 		c.fftStr[i].Synchronize()
 	}

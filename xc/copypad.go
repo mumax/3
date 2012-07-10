@@ -43,15 +43,3 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 
 	cu.LaunchKernel(copyPadKern, gridJ, gridK, 1, block, block, 1, shmem, stream, args)
 }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// Integer division rounded up.
-func DivUp(x, y int) int {
-	return ((x - 1) / y) + 1
-}

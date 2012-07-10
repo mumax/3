@@ -28,3 +28,9 @@ gccgobench:
 
 clean:
 	go clean
+	go-optview -c -w *.go
+	gofmt -w *.go
+
+opt:
+	go-optview -w *.go
+	gofmt -w *.go

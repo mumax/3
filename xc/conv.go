@@ -19,9 +19,10 @@ type Conv struct {
 	bwPlan        [3]safe.FFT3DC2RPlan
 	fftKern       [3][3][]float32
 	push, pull    chan int
-	inframe       chan int     // signals one full input frame has been processed
-	inAvailable   int          // upper bound to where the input array is ready
-	inSent        [3]int       // upper bounds to where the input has been sent to device, per component
+	inframe       chan int // signals one full input frame has been processed
+	inAvailable   int      // upper bound to where the input array is ready
+	inSent        [3]int   // upper bounds to where the input has been sent to device, per component
+	outAvailable  int
 	cpyStr        cu.Stream    // stream for copies
 	fftStr        [3]cu.Stream // streams for ffts of each component
 }
@@ -46,14 +47,29 @@ func (c *Conv) run() {
 
 // _______________________________________________ download output
 
-func (c *Conv) Pull() int {
-	core.Debug("xc.Conv: Pull: waiting")
-	u := <-c.pull
-	core.Debug("xc.Conv: Pull: return", u)
-	return u
+// Update the output array at least to upto.
+// Blocks if needed.
+func (c *Conv) Pull(upto int) {
+	core.Debug("xc.Conv: Pull:", upto, "waiting")
+
+	if upto > c.n {
+		panic(fmt.Errorf("xc.Conv: Pull: upto out of bounds: %v", upto))
+	}
+
+	core.Debug("upto:", upto, "c.outAvailable:", c.outAvailable)
+	for upto > c.outAvailable {
+		core.Debug("xc.Conv: Pull: recv")
+		c.outAvailable = <-c.pull
+	}
+	if c.outAvailable == c.n {
+		c.outAvailable = 0
+		core.Debug("xc.Conv: Pull: finished frame")
+	}
+	core.Debug("xc.Conv: Pull: return")
 }
 
 func (c *Conv) downloadOutputFrame() {
+	core.Debug("xc.Conv: downloadOutputFrame()")
 	N := prod(c.size)
 	for start := 0; start < N; start += maxXfer {
 		stop := start + maxXfer
@@ -128,7 +144,7 @@ func (c *Conv) fwFFTAsyncComp(i int) {
 // input may safely be overwritten by a new frame.
 func (c *Conv) Push(upper int) {
 	if upper > c.n {
-		panic(fmt.Errorf("xc.Conv: upper out of bounds: %v", upper))
+		panic(fmt.Errorf("xc.Conv: Push: upper out of bounds: %v", upper))
 	}
 	c.push <- upper
 	if upper == c.n {
@@ -351,7 +367,7 @@ func NewConv(input, output [3][]float32, size [3]int) *Conv {
 	c.output = output
 	core.Assert(core.NumWarp() > 0)
 	c.push = make(chan int, core.NumWarp()) // Buffer up to one frame. Less should not deadlock though.
-	c.pull = make(chan int, core.NumWarp())
+	c.pull = make(chan int, core.NumWarp()) // !! should buffer up to N/maxXfer ??
 	c.inframe = make(chan int)
 	go c.run()
 	return c

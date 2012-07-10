@@ -28,11 +28,11 @@ func TestConv(test *testing.T) {
 
 	conv.Test()
 
-	conv.Push(1)
-	conv.Push(6)
-	conv.Push(core.N())
-	conv.Push(1)
-	conv.Push(core.N())
-	conv.Push(1)
-	conv.Push(core.N())
+	//	conv.Push(1)
+	//	conv.Push(6)
+	//	conv.Push(core.N())
+	//	conv.Push(1)
+	//	conv.Push(core.N())
+	//	conv.Push(1)
+	//	conv.Push(core.N())
 }

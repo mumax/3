@@ -39,7 +39,7 @@ func (c *Conv) run() {
 	c.init()
 
 	for {
-		c.uploadInputFrameAndFFT()
+		c.uploadInputFrameAndFFTAsync()
 		c.kernMul()
 		c.bwFFT()
 		c.downloadOutputFrame()
@@ -71,7 +71,6 @@ func (c *Conv) Pull(upto int) {
 }
 
 func (c *Conv) downloadOutputFrame() {
-	//core.Debug("xc.Conv: downloadOutputFrame()")
 
 	for i := 0; i < 3; i++ {
 		c.realBuf[i].CopyDtoH(c.output[i])
@@ -95,27 +94,18 @@ func (c *Conv) downloadOutputFrame() {
 // _________________________________________________ convolution
 
 func (c *Conv) bwFFT() {
-	//core.Debug("xc.Conv: bw FFT")
 
+	// TODO: start copying back as soon as one component is ready
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	for i := 0; i < 3; i++ {
-		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i])
+		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i]) // uses stream c.fftStr[i]
 		copyPad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
-		// TODO: remove:
+	}
+	for i := 0; i < 3; i++ {
 		c.fftStr[i].Synchronize()
-		//core.Debug("fftout:", core.Format(safe.Reshape3DFloat32(c.realBuf[i].Host(), c.size[0], c.size[1], c.size[2])))
 	}
 
-	//	padded := PadSize(c.size)
-	//	offset := [3]int{0, 0, 0}
-	//	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
-	//	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	//	//core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
-	//	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
-	//	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	//	//fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
-	//	//core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), fftd0, fftd1, fftd2)))
 }
 
 // First wait for all FFTs to finish, 
@@ -126,8 +116,8 @@ func (c *Conv) kernMul() {
 	for i := 0; i < 3; i++ {
 		c.fftStr[i].Synchronize()
 	}
-	kernMul(c.fftCBuf, c.fftKern[0][0], c.fftKern[1][1], c.fftKern[2][2], c.fftKern[1][2], c.fftKern[0][2], c.fftKern[0][1], c.cpyStr)
-	c.cpyStr.Synchronize()
+	//	kernMul(c.fftCBuf, c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1], c.cpyStr)
+	//	c.cpyStr.Synchronize()
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
@@ -157,24 +147,20 @@ func (c *Conv) Push(upper int) {
 	}
 	c.push <- upper
 	if upper == c.n {
-		//core.Debug("xc.Push: waiting to release input frame")
+		// wait until input is uploaded before allowing overwrite
 		<-c.inframe
-		//core.Debug("xc.Push: waiting to release input frame done")
 	}
 }
 
 // Upload one full input array to the GPU.
 // Start asynchronous FFT's on each component as soon as possible.
 // Wait for them by c.fftStr.Synchronize()
-func (c *Conv) uploadInputFrameAndFFT() {
+func (c *Conv) uploadInputFrameAndFFTAsync() {
 	ready := false
 	for !ready {
 
-		//core.Debug("xc.Conv: waiting for input")
 		c.updInAvailableWait()
-		//core.Debug("xc.Conv: done waiting for input")
 		for c.haveInput() {
-			//core.Debug("xc.Conv: have input")
 			c.sendSomeInput()
 			c.updInAvailbleNoWait()
 		}
@@ -182,9 +168,7 @@ func (c *Conv) uploadInputFrameAndFFT() {
 			c.inSent[1] == c.n &&
 			c.inSent[2] == c.n
 	}
-	//core.Debug("xc.Conv: uploaded input frame")
-	c.inframe <- 1
-	//core.Debug("xc.Conv: input frame released")
+	c.inframe <- 1 // allow overwrite of input frame
 	c.inSent = [3]int{0, 0, 0}
 }
 
@@ -199,10 +183,9 @@ func (c *Conv) sendSomeInput() {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
 			if upper-sent > maxXfer {
+				// limit transfered block size
 				upper = sent + maxXfer
-				//core.Debug("xc.Conv: limiting xfer")
 			}
-			//core.Debug("xc.Conv: sending comp", i, "elems:", upper-sent)
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper
@@ -237,8 +220,7 @@ func (c *Conv) updInAvailableWait() {
 func (c *Conv) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
-		case c.inAvailable = <-c.push:
-			//core.Debug("xc.Conv: splicing :-)")
+		case c.inAvailable = <-c.push: // splice input blocks together
 		default:
 			havemore = false
 		}
@@ -285,7 +267,6 @@ func (c *Conv) initFFTKern() {
 
 	acc := 4
 	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
-	//core.Debug("kern:", kern)
 
 	for i := range c.fwPlan {
 		c.fftStr[i] = cu.StreamCreate()
@@ -298,7 +279,6 @@ func (c *Conv) initFFTKern() {
 
 	output := safe.MakeComplex64s(fwPlan.OutputLen())
 	defer output.Free()
-	//defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	for i := 0; i < 3; i++ {
@@ -308,7 +288,6 @@ func (c *Conv) initFFTKern() {
 			fwPlan.Stream().Synchronize() // !!
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
-			//core.Debug("fftKern", i, j, ":", c.fftKern[i][j])
 		}
 	}
 }

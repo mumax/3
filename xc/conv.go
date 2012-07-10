@@ -70,19 +70,24 @@ func (c *Conv) Pull(upto int) {
 
 func (c *Conv) downloadOutputFrame() {
 	core.Debug("xc.Conv: downloadOutputFrame()")
-	N := prod(c.size)
-	for start := 0; start < N; start += maxXfer {
-		stop := start + maxXfer
-		if stop > N {
-			stop = N
-		}
-		for i := 0; i < 3; i++ {
-			c.fftRBuf[i].Slice(start, stop).CopyDtoHAsync(c.output[i][start:stop], c.cpyStr)
-		}
-		c.cpyStr.Synchronize()
-		core.Debug("xc.Conv: downloaded up to", stop)
-		c.pull <- stop
+
+	for i := 0; i < 3; i++ {
+		c.realBuf[i].CopyDtoH(c.output[i])
 	}
+	c.pull <- c.n
+	//N := prod(c.size)
+	//for start := 0; start < N; start += maxXfer {
+	//	stop := start + maxXfer
+	//	if stop > N {
+	//		stop = N
+	//	}
+	//	for i := 0; i < 3; i++ {
+	//		c.fftRBuf[i].Slice(start, stop).CopyDtoHAsync(c.output[i][start:stop], c.cpyStr)
+	//	}
+	//	c.cpyStr.Synchronize()
+	//	core.Debug("xc.Conv: downloaded up to", stop)
+	//	c.pull <- stop
+	//}
 }
 
 // _________________________________________________ convolution

@@ -19,6 +19,9 @@ copypad(float* dst, int D0, int D1, int D2,
 	if(j>=S1 || k>=S2){
  		return;	// out of src bounds
 	}
+	if(j>=D1 || k>=D2){
+ 		return;	// out of dst bounds
+	}
 
 	int J = j + o1;  // index in full src
 	int K = k + o2; 

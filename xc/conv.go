@@ -13,8 +13,8 @@ type Conv struct {
 	n             int
 	input, output [3][]float32
 	realBuf       [3]safe.Float32s
-	fftInBuf      [3]safe.Float32s   // Input buffers for FFT, share underlying storage with fftOutBuf
-	fftOutBuf     [3]safe.Complex64s // Output buffers for FFT, share underlying storage with fftInBuf
+	fftRBuf       [3]safe.Float32s   // Real ("input") buffers for FFT, share underlying storage with fftCBuf
+	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, share underlying storage with fftRBuf
 	fwPlan        [3]safe.FFT3DR2CPlan
 	bwPlan        [3]safe.FFT3DC2RPlan
 	fftKern       [3][3][]float32
@@ -37,8 +37,9 @@ func (c *Conv) run() {
 
 	for {
 		c.uploadInputFrameAndFFT()
-		// wait for fft
-		//c.downloadOutputFrame()
+		c.kernMul()
+		c.bwFFT()
+		c.downloadOutputFrame()
 	}
 
 }
@@ -50,22 +51,65 @@ func (c *Conv) Pull() int {
 }
 
 func (c *Conv) downloadOutputFrame() {
-
+	N := prod(c.size)
+	for start := 0; start < N; start += maxXfer {
+		stop := start + maxXfer
+		if stop > N {
+			stop = N
+		}
+		///...
+	}
 }
 
-// _________________________________________________ fft input
+// _________________________________________________ convolution
 
-func (c *Conv) fwFFTComp(i int) {
+func (c *Conv) bwFFT() {
+	core.Debug("xc.Conv: bw FFT")
+
+	padded := PadSize(c.size)
+	offset := [3]int{0, 0, 0}
+	for i := 0; i < 3; i++ {
+		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i])
+		copyUnpad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
+		// TODO: remove:
+		c.fftStr[i].Synchronize()
+		core.Debug("fftout:", core.Format(safe.Reshape3DFloat32(c.realBuf[i].Host(), c.size[0], c.size[1], c.size[2])))
+	}
+
+	//	padded := PadSize(c.size)
+	//	offset := [3]int{0, 0, 0}
+	//	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
+	//	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
+	//	//core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
+	//	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
+	//	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
+	//	//fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
+	//	//core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), fftd0, fftd1, fftd2)))
+}
+
+// First wait for all FFTs to finish, 
+// then do kernel multiplication.
+func (c *Conv) kernMul() {
+	core.Debug("xc.Conv: kernMul()")
+	for i := 0; i < 3; i++ {
+		c.fftStr[i].Synchronize()
+	}
+	// TODO
+}
+
+// Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
+// then in-place FFT. Asynchronous.
+func (c *Conv) fwFFTAsyncComp(i int) {
 	core.Debug("xc.Conv: fw FFT component", i)
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
-	copyPad(c.fftInBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
-	c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftInBuf[i].Host(), padded[0], padded[1], padded[2])))
-	c.fwPlan[i].Exec(c.fftInBuf[i], c.fftOutBuf[i])
-	c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
-	fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
-	core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftOutBuf[i].Host(), fftd0, fftd1, fftd2)))
+	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
+	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
+	//core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
+	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
+	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
+	//fftd0, fftd1, fftd2 := c.fwPlan[i].OutputSize()
+	//core.Debug("fftd", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), fftd0, fftd1, fftd2)))
 }
 
 // ________________________________________________ upload input
@@ -104,9 +148,9 @@ func (c *Conv) uploadInputFrameAndFFT() {
 			c.inSent[1] == c.n &&
 			c.inSent[2] == c.n
 	}
-	core.Debug("xc.Conv: finished frame")
+	core.Debug("xc.Conv: uploaded input frame")
 	c.inframe <- 1
-	core.Debug("xc.Conv: frame released")
+	core.Debug("xc.Conv: input frame released")
 	c.inSent = [3]int{0, 0, 0}
 }
 
@@ -129,7 +173,7 @@ func (c *Conv) sendSomeInput() {
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper
 			if c.inSent[i] == c.n { // component ready
-				c.fwFFTComp(i) // start FFT'ing it
+				c.fwFFTAsyncComp(i) // start FFT'ing it
 			}
 			return // stop here so new input can first flow in
 		}
@@ -189,13 +233,13 @@ func (c *Conv) initBuffers() {
 	// don't leak on 2nd init
 	for i := 0; i < 3; i++ {
 		c.realBuf[i].Free()
-		c.fftOutBuf[i].Free() // also frees fftInBuf, which shares storage
+		c.fftCBuf[i].Free() // also frees fftRBuf, which shares storage
 	}
 
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
-		c.fftOutBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
-		c.fftInBuf[i] = c.fftOutBuf[i].Float().Slice(0, c.fwPlan[i].InputLen())
+		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
+		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, c.fwPlan[i].InputLen())
 	}
 }
 

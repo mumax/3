@@ -2,7 +2,7 @@ CUFILES = $(wildcard *.cu)
 PTXFILES = $(CUFILES:.cu=.ptx)
 GOFILES=$(CUFILES:.cu=.go)
 
-NVCC = nvcc
+NVCC = nvcc -G
 
 all: $(GOFILES) install
 

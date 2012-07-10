@@ -70,7 +70,7 @@ func (c *Conv) bwFFT() {
 	offset := [3]int{0, 0, 0}
 	for i := 0; i < 3; i++ {
 		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i])
-		copyUnpad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
+		copyPad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
 		// TODO: remove:
 		c.fftStr[i].Synchronize()
 		core.Debug("fftout:", core.Format(safe.Reshape3DFloat32(c.realBuf[i].Host(), c.size[0], c.size[1], c.size[2])))
@@ -103,6 +103,7 @@ func (c *Conv) fwFFTAsyncComp(i int) {
 	core.Debug("xc.Conv: fw FFT component", i)
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
+	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
 	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
 	//c.fftStr[i].Synchronize() // TODO: remove !!!!!!!!!
 	//core.Debug("padded", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))

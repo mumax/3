@@ -30,13 +30,14 @@ func (c *Conv) Test() {
 	//c.Push(N)
 	//c.Pull(N)
 
+	NFFT := prod(PadSize(c.size))
 	rms := 0.0
 	for i := 0; i < 3; i++ {
 		for j := range c.input[i] {
-			rms += sqr(float64(input[i][j]) - float64(c.output[i][j])/float64(N))
+			rms += sqr(float64(input[i][j]) - float64(c.output[i][j])/float64(NFFT))
 		}
 	}
-	rms = math.Sqrt(rms / float64(3*N))
+	rms = math.Sqrt(rms / float64(3*NFFT))
 
 	for i := 0; i < 3; i++ {
 		core.Debug("output:", i, core.Format(safe.Reshape3DFloat32(c.output[i], c.size[0], c.size[1], c.size[2])))

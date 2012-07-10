@@ -82,7 +82,7 @@ func (c *Conv) downloadOutputFrame() {
 	//		stop = N
 	//	}
 	//	for i := 0; i < 3; i++ {
-	//		c.fftRBuf[i].Slice(start, stop).CopyDtoHAsync(c.output[i][start:stop], c.cpyStr)
+	//		c.realBuf[i].Slice(start, stop).CopyDtoHAsync(c.output[i][start:stop], c.cpyStr)
 	//	}
 	//	c.cpyStr.Synchronize()
 	//	core.Debug("xc.Conv: downloaded up to", stop)

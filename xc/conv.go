@@ -13,8 +13,8 @@ type Conv struct {
 	n             int                // product of size
 	input, output [3][]float32       // input/output arrays, 3 component vectors
 	realBuf       [3]safe.Float32s   // gpu buffer for real-space, unpadded input/output data
-	fftRBuf       [3]safe.Float32s   // Real ("input") buffers for FFT, share underlying storage with fftCBuf
-	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, share underlying storage with fftRBuf
+	fftRBuf       [3]safe.Float32s   // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
+	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, shares underlying storage with fftRBuf
 	fwPlan        [3]safe.FFT3DR2CPlan
 	bwPlan        [3]safe.FFT3DC2RPlan
 	fftKern       [3][3][]float32     // FFT kernel on host
@@ -32,11 +32,10 @@ type Conv struct {
 // _______________________________________________ run
 
 func (c *Conv) run() {
-	core.LockCudaThread()
 	core.Debug("xc.Conv.run")
 
-	// continue initialization here, inside locked CUDA thread
-	c.init()
+	core.LockCudaThread()
+	c.init() // continue initialization here, inside locked CUDA thread
 
 	for {
 		c.uploadInputFrameAndFFTAsync()
@@ -238,6 +237,9 @@ func (c *Conv) initBuffers() {
 	for i := 0; i < 3; i++ {
 		c.realBuf[i].Free()
 		c.fftCBuf[i].Free() // also frees fftRBuf, which shares storage
+		for j := 0; j < 3; j++ {
+			c.gpuKern[i][j].Free()
+		}
 	}
 
 	for i := 0; i < 3; i++ {
@@ -276,6 +278,10 @@ func (c *Conv) initFFTKern() {
 			fwPlan.Stream().Synchronize() // !!
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
+
+			// TODO: partially if low on mem.
+			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
+			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
 		}
 	}
 }

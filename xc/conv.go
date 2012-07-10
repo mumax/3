@@ -50,26 +50,26 @@ func (c *Conv) run() {
 // Update the output array at least to upto.
 // Blocks if needed.
 func (c *Conv) Pull(upto int) {
-	core.Debug("xc.Conv: Pull: upto", upto, "outAvailable:", c.outAvailable)
+	//core.Debug("xc.Conv: Pull: upto", upto, "outAvailable:", c.outAvailable)
 
 	if upto > c.n {
 		panic(fmt.Errorf("xc.Conv: Pull: upto out of bounds: %v", upto))
 	}
 
 	for upto > c.outAvailable {
-		core.Debug("xc.Conv: Pull: recv")
+		//core.Debug("xc.Conv: Pull: recv")
 		c.outAvailable = <-c.pull
-		core.Debug("xc.Conv: Pull: recv", c.outAvailable)
+		//core.Debug("xc.Conv: Pull: recv", c.outAvailable)
 	}
-	if upto == c.n {
+	if upto == c.n { // !!
 		c.outAvailable = 0
-		core.Debug("xc.Conv: Pull: finished frame")
+		//core.Debug("xc.Conv: Pull: finished frame")
 	}
-	core.Debug("xc.Conv: Pull: return")
+	//core.Debug("xc.Conv: Pull: return")
 }
 
 func (c *Conv) downloadOutputFrame() {
-	core.Debug("xc.Conv: downloadOutputFrame()")
+	//core.Debug("xc.Conv: downloadOutputFrame()")
 
 	for i := 0; i < 3; i++ {
 		c.realBuf[i].CopyDtoH(c.output[i])
@@ -93,7 +93,7 @@ func (c *Conv) downloadOutputFrame() {
 // _________________________________________________ convolution
 
 func (c *Conv) bwFFT() {
-	core.Debug("xc.Conv: bw FFT")
+	//core.Debug("xc.Conv: bw FFT")
 
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
@@ -129,7 +129,7 @@ func (c *Conv) kernMul() {
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
 func (c *Conv) fwFFTAsyncComp(i int) {
-	core.Debug("xc.Conv: fw FFT component", i)
+	//core.Debug("xc.Conv: fw FFT component", i)
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
@@ -153,9 +153,9 @@ func (c *Conv) Push(upper int) {
 	}
 	c.push <- upper
 	if upper == c.n {
-		core.Debug("xc.Push: waiting to release input frame")
+		//core.Debug("xc.Push: waiting to release input frame")
 		<-c.inframe
-		core.Debug("xc.Push: waiting to release input frame done")
+		//core.Debug("xc.Push: waiting to release input frame done")
 	}
 }
 
@@ -166,9 +166,9 @@ func (c *Conv) uploadInputFrameAndFFT() {
 	ready := false
 	for !ready {
 
-		core.Debug("xc.Conv: waiting for input")
+		//core.Debug("xc.Conv: waiting for input")
 		c.updInAvailableWait()
-		core.Debug("xc.Conv: done waiting for input")
+		//core.Debug("xc.Conv: done waiting for input")
 		for c.haveInput() {
 			//core.Debug("xc.Conv: have input")
 			c.sendSomeInput()
@@ -178,9 +178,9 @@ func (c *Conv) uploadInputFrameAndFFT() {
 			c.inSent[1] == c.n &&
 			c.inSent[2] == c.n
 	}
-	core.Debug("xc.Conv: uploaded input frame")
+	//core.Debug("xc.Conv: uploaded input frame")
 	c.inframe <- 1
-	core.Debug("xc.Conv: input frame released")
+	//core.Debug("xc.Conv: input frame released")
 	c.inSent = [3]int{0, 0, 0}
 }
 

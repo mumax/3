@@ -24,9 +24,9 @@ func (c *Conv) Test() {
 		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
 	}
 
-	c.Push(N)
-	c.Pull(N)
-	c.checkError()
+	//c.Push(N)
+	//c.Pull(N)
+	//c.checkError()
 
 	c.Push(N / 2)
 	c.Push(N)

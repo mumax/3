@@ -5,6 +5,8 @@ package core
 import (
 	"fmt"
 	"log"
+	"path"
+	"runtime"
 )
 
 var (
@@ -41,7 +43,13 @@ func Log(msg ...interface{}) {
 // Debug message.
 func Debug(msg ...interface{}) {
 	if DEBUG {
-		Log(msg...)
+		_, file, line, ok := runtime.Caller(1)
+		file = path.Base(file)
+		caller := ""
+		if ok {
+			caller = fmt.Sprint(file, ":", line, ":")
+		}
+		Log(append([]interface{}{caller}, msg...)...)
 	}
 }
 

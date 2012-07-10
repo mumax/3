@@ -102,7 +102,7 @@ func (c *Conv) bwFFT() {
 		copyPad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
 		// TODO: remove:
 		c.fftStr[i].Synchronize()
-		core.Debug("fftout:", core.Format(safe.Reshape3DFloat32(c.realBuf[i].Host(), c.size[0], c.size[1], c.size[2])))
+		//core.Debug("fftout:", core.Format(safe.Reshape3DFloat32(c.realBuf[i].Host(), c.size[0], c.size[1], c.size[2])))
 	}
 
 	//	padded := PadSize(c.size)

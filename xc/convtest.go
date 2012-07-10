@@ -2,7 +2,7 @@ package xc
 
 import (
 	"fmt"
-	"github.com/barnex/cuda4/safe"
+	//"github.com/barnex/cuda4/safe"
 	"math"
 	"math/rand"
 	"nimble-cube/core"
@@ -20,9 +20,9 @@ func (c *Conv) Test() {
 			copy(input[i], c.input[i])
 		}
 	}
-	for i := 0; i < 3; i++ {
-		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
-	}
+	//	for i := 0; i < 3; i++ {
+	//		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
+	//	}
 
 	//c.Push(N)
 	//c.Pull(N)

@@ -109,8 +109,8 @@ func (c *Conv) kernMul() {
 	for i := 0; i < 3; i++ {
 		c.fftStr[i].Synchronize()
 	}
-	//	kernMul(c.fftCBuf, c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1], c.cpyStr)
-	//	c.cpyStr.Synchronize()
+	kernMul(c.fftCBuf, c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1], c.cpyStr)
+	c.cpyStr.Synchronize()
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
@@ -233,14 +233,12 @@ func (c *Conv) initPageLock() {
 }
 
 func (c *Conv) initBuffers() {
+	// bad sequence: gpuKern should stay by now...
 	// don't leak on 2nd init
-	for i := 0; i < 3; i++ {
-		c.realBuf[i].Free()
-		c.fftCBuf[i].Free() // also frees fftRBuf, which shares storage
-		for j := 0; j < 3; j++ {
-			c.gpuKern[i][j].Free()
-		}
-	}
+	//for i := 0; i < 3; i++ {
+	//	c.realBuf[i].Free()
+	//	c.fftCBuf[i].Free() // also frees fftRBuf, which shares storage
+	//}
 
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))

@@ -14,7 +14,7 @@ var (
 	periodic [3]int
 )
 
-var MAX_WARPLEN = 16 // elements. // TODO: change
+var MAX_WARPLEN = 256 * 1024 / 4 // TODO: optimize
 
 func InitCellSize(size0, size1, size2 float64) {
 	cellSize = [3]float64{size0, size1, size2}

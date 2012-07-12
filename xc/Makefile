@@ -16,9 +16,11 @@ test: 6gtest gccgotest
 
 6gtest: 
 	go test -i
+	go test
 
 gccgotest: 
 	go test -i -compiler $(GCCGO)
+	go test -compiler $(GCCGO)
 
 bench: 6gbench #gccgobench
 

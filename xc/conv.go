@@ -27,6 +27,7 @@ type Conv struct {
 	outAvailable  int                 // portion of output that is ready
 	cpyStr        cu.Stream           // stream for copies
 	fftStr        [3]cu.Stream        // streams for ffts of each component
+	noKernMul     bool                // disable kernel multiplication, used for self-test
 }
 
 // _______________________________________________ run
@@ -39,6 +40,9 @@ func (c *Conv) run() {
 
 	for {
 		c.uploadInputFrameAndFFTAsync()
+		for _, s := range c.fftStr {
+			s.Synchronize()
+		}
 		c.kernMul()
 		c.bwFFT()
 		c.downloadOutputFrame()
@@ -104,13 +108,26 @@ func (c *Conv) bwFFT() {
 // First wait for all FFTs to finish, 
 // then do kernel multiplication.
 func (c *Conv) kernMul() {
+	if c.noKernMul {
+		return
+	}
+
 	core.Debug("xc.Conv: kernMul()")
 	// FFTs were started async, first wait for them.
 	for i := 0; i < 3; i++ {
-		c.fftStr[i].Synchronize()
+		for j := i; j < 3; j++ {
+			core.Debug("gpuKern", i, j, ":", c.gpuKern[i][j].Host())
+		}
 	}
-	kernMul(c.fftCBuf, c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1], c.cpyStr)
+	kernMul(c.fftCBuf,
+		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2],
+		c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1],
+		c.cpyStr)
 	c.cpyStr.Synchronize()
+	for i := 0; i < 3; i++ {
+		out0, out1, out2 := c.fwPlan[i].OutputSize()
+		core.Debug("kernmul output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
+	}
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
@@ -120,7 +137,13 @@ func (c *Conv) fwFFTAsyncComp(i int) {
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
 	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
+	core.Debug("fft input", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
 	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
+	// RM!!
+	c.fftStr[i].Synchronize()
+
+	out0, out1, out2 := c.fwPlan[i].OutputSize()
+	core.Debug("fft output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
 }
 
 // ________________________________________________ upload input

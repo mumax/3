@@ -24,18 +24,23 @@ func (c *Conv) Test() {
 	//		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
 	//	}
 
-	c.Push(N)
-	c.Pull(N - 1)
-	c.Pull(N)
-	c.checkError()
+	{
+		c.noKernMul = true
 
-	c.Push(N / 2)
-	c.Push(N)
-	c.Pull(N / 4)
-	c.Pull(N - 1)
-	c.Pull(N)
-	c.checkError()
+		c.Push(N)
+		c.Pull(N - 1)
+		c.Pull(N)
+		c.checkError()
 
+		c.Push(N / 2)
+		c.Push(N)
+		c.Pull(N / 4)
+		c.Pull(N - 1)
+		c.Pull(N)
+		c.checkError()
+
+		c.noKernMul = false
+	}
 }
 
 const FFT_TOLERANCE = 1e-6
@@ -48,7 +53,7 @@ func (c *Conv) checkError() {
 			rms += sqr(float64(c.input[i][j]) - float64(c.output[i][j])/float64(NFFT))
 		}
 	}
-	rms = math.Sqrt(rms / float64(3*NFFT))
+	rms = math.Sqrt(rms / 1) //float64(3*NFFT))
 
 	core.Debug("RMS fft error:", rms)
 	if rms > FFT_TOLERANCE {

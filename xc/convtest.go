@@ -43,7 +43,7 @@ func (c *Conv) Test() {
 	}
 }
 
-const FFT_TOLERANCE = 1e-4
+const FFT_TOLERANCE = 1e-5 
 
 func (c *Conv) checkError() {
 	NFFT := prod(PadSize(c.size))
@@ -53,7 +53,7 @@ func (c *Conv) checkError() {
 			rms += sqr(float64(c.input[i][j]) - float64(c.output[i][j])/float64(NFFT))
 		}
 	}
-	rms = math.Sqrt(rms / 1) //float64(3*NFFT))
+	rms = math.Sqrt(rms / float64(3*NFFT))
 
 	core.Debug("RMS fft error:", rms)
 	if rms > FFT_TOLERANCE {

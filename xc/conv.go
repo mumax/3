@@ -186,6 +186,8 @@ func (c *Conv) uploadInputFrameAndFFTAsync() {
 	c.inSent = [3]int{0, 0, 0}
 }
 
+// when X,Y,Z components compete for bandwith, use
+// this xfer block size.
 var maxXfer = 1024 * 1024 / 4 // 1MB todo: optimize.
 
 // Send part of the available input to the GPU.
@@ -196,10 +198,17 @@ func (c *Conv) sendSomeInput() {
 	for i, sent := range c.inSent {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
-			if upper-sent > maxXfer {
-				// limit transfered block size
-				upper = sent + maxXfer
+
+			// limit xfer size only when needed
+			if i > 0 { // X is never limited
+				if c.inSent[i-1] != c.n { // limit only if previous not yet ready
+					if upper-sent > maxXfer {
+						// limit transfered block size
+						upper = sent + maxXfer
+					}
+				}
 			}
+
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.cpyStr)
 			c.cpyStr.Synchronize()
 			c.inSent[i] = upper

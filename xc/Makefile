@@ -7,7 +7,7 @@ all: 6g #gccgo vet
 vet:
 	go tool vet *.go
 
-GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
+GCCGO=gccgo -gccgoflags '-static-libgcc -O3 -g'
 
 gccgo:
 	go build -v -compiler $(GCCGO)
@@ -15,10 +15,10 @@ gccgo:
 test: 6gtest gccgotest
 
 6gtest: 
-	go test 
+	go test -i
 
 gccgotest: 
-	go test -compiler $(GCCGO)
+	go test -i -compiler $(GCCGO)
 
 bench: 6gbench #gccgobench
 

@@ -33,16 +33,14 @@ type Conv struct {
 // _______________________________________________ run
 
 func (c *Conv) run() {
-	core.Debug("xc.Conv.run")
+	core.Debug("run")
 
 	core.LockCudaThread()
 	c.init() // continue initialization here, inside locked CUDA thread
 
 	for {
 		c.uploadInputFrameAndFFTAsync()
-		for _, s := range c.fftStr {
-			s.Synchronize()
-		}
+		c.syncFFTs()
 		c.kernMul()
 		c.bwFFT()
 		c.downloadOutputFrame()
@@ -90,6 +88,13 @@ func (c *Conv) downloadOutputFrame() {
 
 // _________________________________________________ convolution
 
+func (c *Conv) syncFFTs() {
+	core.Debug("syncing FFTs")
+	for _, s := range c.fftStr {
+		s.Synchronize()
+	}
+}
+
 func (c *Conv) bwFFT() {
 
 	// TODO: start copying back as soon as one component is ready
@@ -99,35 +104,33 @@ func (c *Conv) bwFFT() {
 		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i]) // uses stream c.fftStr[i]
 		copyPad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
 	}
-	for i := 0; i < 3; i++ {
-		c.fftStr[i].Synchronize()
-	}
-
+	c.syncFFTs()
 }
 
-// First wait for all FFTs to finish, 
-// then do kernel multiplication.
+// Kernel multiplication. 
+// FFT's have to be synced first.
 func (c *Conv) kernMul() {
 	if c.noKernMul {
+		core.Debug("skipping kernMul")
 		return
 	}
 
-	core.Debug("xc.Conv: kernMul()")
-	// FFTs were started async, first wait for them.
-	for i := 0; i < 3; i++ {
-		for j := i; j < 3; j++ {
-			core.Debug("gpuKern", i, j, ":", c.gpuKern[i][j].Host())
-		}
-	}
+	core.Debug("kernMul")
+	//	for i := 0; i < 3; i++ {
+	//		for j := i; j < 3; j++ {
+	//			core.Debug("gpuKern", i, j, ":", c.gpuKern[i][j].Host())
+	//		}
+	//	}
 	kernMul(c.fftCBuf,
 		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2],
 		c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1],
 		c.cpyStr)
 	c.cpyStr.Synchronize()
-	for i := 0; i < 3; i++ {
-		out0, out1, out2 := c.fwPlan[i].OutputSize()
-		core.Debug("kernmul output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
-	}
+
+	//	for i := 0; i < 3; i++ {
+	//		out0, out1, out2 := c.fwPlan[i].OutputSize()
+	//		core.Debug("kernmul output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
+	//	}
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
@@ -137,13 +140,13 @@ func (c *Conv) fwFFTAsyncComp(i int) {
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
 	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
-	core.Debug("fft input", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
+	//core.Debug("fft input", i, ":", core.Format(safe.Reshape3DFloat32(c.fftRBuf[i].Host(), padded[0], padded[1], padded[2])))
 	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
 	// RM!!
-	c.fftStr[i].Synchronize()
+	//c.fftStr[i].Synchronize()
 
-	out0, out1, out2 := c.fwPlan[i].OutputSize()
-	core.Debug("fft output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
+	//out0, out1, out2 := c.fwPlan[i].OutputSize()
+	//core.Debug("fft output", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), out0, out1, out2)))
 }
 
 // ________________________________________________ upload input
@@ -240,7 +243,7 @@ func (c *Conv) updInAvailbleNoWait() {
 // _______________________________________________________  init
 
 func (c *Conv) init() {
-	core.Debug("xc.Conv.init")
+	core.Debug("init")
 
 	c.initPageLock()
 	c.initFFTKern()

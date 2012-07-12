@@ -16,9 +16,9 @@ func (c *Conv) Test() {
 	for i := 0; i < 3; i++ {
 		for j := range c.input[i] {
 			c.input[i][j] = 2*rand.Float32() - 1
-			input[i] = make([]float32, N)
-			copy(input[i], c.input[i])
 		}
+		copy(input[i], c.input[i])
+		input[i] = make([]float32, N)
 	}
 	//	for i := 0; i < 3; i++ {
 	//		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
@@ -43,7 +43,7 @@ func (c *Conv) Test() {
 	}
 }
 
-const FFT_TOLERANCE = 1e-5 
+const FFT_TOLERANCE = 1e-5
 
 func (c *Conv) checkError() {
 	NFFT := prod(PadSize(c.size))

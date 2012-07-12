@@ -43,7 +43,7 @@ func (c *Conv) Test() {
 	}
 }
 
-const FFT_TOLERANCE = 1e-6
+const FFT_TOLERANCE = 1e-4
 
 func (c *Conv) checkError() {
 	NFFT := prod(PadSize(c.size))

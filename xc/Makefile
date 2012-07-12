@@ -28,7 +28,7 @@ bench: 6gbench #gccgobench
 	go test -bench=.
 
 gccgobench:
-	go test -bench=. -compiler $(GCCGO)
+	go test -compiler $(GCCGO) -bench=. 
 
 clean:
 	go-optview -w -c *.go

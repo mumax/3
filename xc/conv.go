@@ -185,7 +185,7 @@ func (c *Conv) uploadInputFrameAndFFTAsync() {
 	c.inSent = [3]int{0, 0, 0}
 }
 
-var maxXfer = 16 // TODO: increase.
+var maxXfer = 1024 * 1024 / 4 // 1MB todo: optimize.
 
 // Send part of the available input to the GPU.
 // preferentially send X component if possible, then Y, then Z.
@@ -259,13 +259,6 @@ func (c *Conv) initPageLock() {
 }
 
 func (c *Conv) initBuffers() {
-	// bad sequence: gpuKern should stay by now...
-	// don't leak on 2nd init
-	//for i := 0; i < 3; i++ {
-	//	c.realBuf[i].Free()
-	//	c.fftCBuf[i].Free() // also frees fftRBuf, which shares storage
-	//}
-
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
 		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())

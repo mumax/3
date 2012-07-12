@@ -68,8 +68,9 @@ func (c *Conv) Pull(upto int) {
 func (c *Conv) downloadOutputFrame() {
 
 	for i := 0; i < 3; i++ {
-		c.realBuf[i].CopyDtoH(c.output[i])
+		c.realBuf[i].CopyDtoHAsync(c.output[i], c.cpyStr)
 	}
+	c.cpyStr.Synchronize()
 	c.pull <- c.n
 	//N := prod(c.size)
 	//for start := 0; start < N; start += maxXfer {

@@ -199,20 +199,19 @@ func (c *Conv) sendSomeInput() {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
 
-			// limit xfer size only when needed
-			if i > 0{ // X is never limited
-			if c.inSent[i-1] != c.n { // limit only if previous not yet ready
-			if upper-sent > maxXfer {
-				// limit transfered block size
-				upper = sent + maxXfer
+			// limit xfer size when sensible
+			if i > 0 { // X is never limited: should be first
+				if c.inSent[i-1] != c.n { // limit only if previous component not yet ready
+					if upper-sent > maxXfer {
+						upper = sent + maxXfer 
+					}
+				}
 			}
-			}}
 
 			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.fftStr[i])
-			//c.cpyStr.Synchronize()
 			c.inSent[i] = upper
 			if c.inSent[i] == c.n { // component ready
-				c.fwFFTAsyncComp(i) // start FFT'ing it
+				c.fwFFTAsyncComp(i) // start FFT'ing it, uses c.fftStr[i]
 			}
 			return // stop here so new input can first flow in
 		}

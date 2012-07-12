@@ -34,7 +34,7 @@ func main() {
 	conv.Push(core.N())
 	conv.Pull(core.N())
 
-	loops := [...]int{30}
+	loops := [...]int{10, 30}
 	for _, loop := range loops {
 		start := time.Now()
 		fmt.Println("running", loop, "loops")

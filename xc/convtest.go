@@ -8,7 +8,8 @@ import (
 	"nimble-cube/core"
 )
 
-// Run self-test and report estimated relative RMS error.
+// Run self-test and report estimated relative RMS error
+// on forward+backward transform on data of magnitude order 1.
 func (c *Conv) Test() {
 	N := c.n
 
@@ -18,12 +19,9 @@ func (c *Conv) Test() {
 			c.input[i][j] = 2*rand.Float32() - 1
 		}
 	}
-	//	for i := 0; i < 3; i++ {
-	//		core.Debug("input:", i, core.Format(safe.Reshape3DFloat32(input[i], c.size[0], c.size[1], c.size[2])))
-	//	}
 
 	{
-		c.noKernMul = true
+		c.noKernMul = true // don't do kernel multiplication, only fw+bw transform
 
 		c.Push(N)
 		c.Pull(N - 1)
@@ -43,6 +41,7 @@ func (c *Conv) Test() {
 
 const FFT_TOLERANCE = 1e-5 // panic if RMS error of fw+bw transform on random data is larger than this.
 
+// Check if the rms error introduced by fw+bw transform is < FFT_TOLERANCE
 func (c *Conv) checkError() {
 	NFFT := prod(PadSize(c.size))
 	rms := 0.0
@@ -58,6 +57,7 @@ func (c *Conv) checkError() {
 		panic(fmt.Errorf("FFT RMS error: %v > tolerance (%v)", rms, FFT_TOLERANCE))
 	}
 	if rms == 0 {
+		// Something is wrong with the test
 		panic(fmt.Errorf("FFT RMS error: %v: too good to be true", rms))
 	}
 }

@@ -23,12 +23,8 @@ func magKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) 
 		}
 	}
 
-	//array[0][0][0][0][0] = 1
-
-	//return kern
-
-	B := [3]float64{0, 0, 0} //NewVector()
-	R := [3]float64{0, 0, 0} //NewVector()
+	B := [3]float64{0, 0, 0}
+	R := [3]float64{0, 0, 0}
 
 	x1 := -(size[X] - 1) / 2
 	x2 := size[X]/2 - 1
@@ -112,14 +108,6 @@ func magKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) 
 			}
 		}
 	}
-
-	//	if core.DEBUG {
-	//		for i := 0; i < 3; i++ {
-	//			for j := i; j < 3; j++ {
-	//				core.Debug("kern", i, j, ":", core.Format(array[i][j]))
-	//			}
-	//		}
-	//	}
 	return kern
 }
 

@@ -277,10 +277,6 @@ func (c *Conv2) initFFTKern() {
 		c.fftKern[i][j] = make([]float32, prod(realsize))
 		scaleRealPartsSymm(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 
-		//	if core.DEBUG {
-		//		core.Debug("~kern:", i, j, ":", core.Format(safe.Reshape3DFloat32(c.fftKern[i][j], realsize[0], realsize[1], realsize[2])))
-		//	}
-
 		// TODO: partially if low on mem.
 		c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 		c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])

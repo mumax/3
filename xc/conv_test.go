@@ -6,7 +6,7 @@ import (
 )
 
 func TestConv(test *testing.T) {
-	size := [3]int{2, 4, 8}
+	size := [3]int{1, 4, 8}
 	core.InitSize(size[0], size[1], size[2])
 	N := prod(size)
 

@@ -171,7 +171,7 @@ func (c *Conv) sendSomeInput() {
 			if i > 0 { // X is never limited: should be first
 				if c.inSent[i-1] != c.n { // limit only if previous component not yet ready
 					if upper-sent > maxXfer {
-						upper = sent + maxXfer 
+						upper = sent + maxXfer
 					}
 				}
 			}
@@ -272,6 +272,10 @@ func (c *Conv) initFFTKern() {
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 
+			if core.DEBUG {
+				core.Debug("~kern:", i, j, ":", core.Format(safe.Reshape3DFloat32(c.fftKern[i][j], realsize[0], realsize[1], realsize[2])))
+			}
+
 			// TODO: partially if low on mem.
 			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
@@ -306,6 +310,7 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
 		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=", maximg/maxreal))
 	}
+
 }
 
 func prod(size [3]int) int {

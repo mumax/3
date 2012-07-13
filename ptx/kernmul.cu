@@ -40,5 +40,3 @@ kernmul(float* fftMx,  float* fftMy,  float* fftMz,
   }
 }
 
-
-

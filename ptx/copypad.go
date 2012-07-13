@@ -7,7 +7,7 @@ const COPYPAD = `
 	// nvopencc 4.1 built on 2012-04-05
 
 	//-----------------------------------------------------------
-	// Compiling /tmp/tmpxft_00003b09_00000000-9_copypad.cpp3.i (/tmp/ccBI#.688BBJ)
+	// Compiling /tmp/tmpxft_00006e5d_00000000-9_copypad.cpp3.i (/tmp/ccBI#.SyUvSd)
 	//-----------------------------------------------------------
 
 	//-----------------------------------------------------------
@@ -20,7 +20,7 @@ const COPYPAD = `
 	//-----------------------------------------------------------
 
 	.file	1	"<command-line>"
-	.file	2	"/tmp/tmpxft_00003b09_00000000-8_copypad.cudafe2.gpu"
+	.file	2	"/tmp/tmpxft_00006e5d_00000000-8_copypad.cudafe2.gpu"
 	.file	3	"/usr/lib/gcc/x86_64-linux-gnu/4.6/include/stddef.h"
 	.file	4	"/usr/local/cuda/bin/../include/crt/device_runtime.h"
 	.file	5	"/usr/local/cuda/bin/../include/host_defines.h"
@@ -189,7 +189,7 @@ $LDWend_copypad:
 	@@DWARF .byte	0x2f, 0x04, 0x00, 0x00, 0x02, 0x00
 	@@DWARF .4byte	.debug_abbrev
 	@@DWARF .4byte	0x742f0108, 0x742f706d, 0x6678706d, 0x30305f74
-	@@DWARF .4byte	0x62333030, 0x305f3930, 0x30303030, 0x2d303030
+	@@DWARF .4byte	0x65363030, 0x305f6435, 0x30303030, 0x2d303030
 	@@DWARF .4byte	0x6f635f39, 0x61707970, 0x70632e64, 0x692e3370
 	@@DWARF .4byte	0x6f682f00, 0x612f656d, 0x2f656e72, 0x732f6f67
 	@@DWARF .4byte	0x6e2f6372, 0x6c626d69, 0x75632d65, 0x702f6562

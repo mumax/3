@@ -37,6 +37,14 @@ func (c *Conv) Test() {
 
 		c.noKernMul = false
 	}
+
+	// Set i/o arrays back to 0
+	for i := 0; i < 3; i++ {
+		for j := range c.input[i] {
+			c.input[i][j] = 0
+			c.output[i][j] = 0
+		}
+	}
 }
 
 const FFT_TOLERANCE = 1e-5 // panic if RMS error of fw+bw transform on random data is larger than this.

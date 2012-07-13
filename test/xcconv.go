@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 	. "nimble-cube/xc"
 	"strconv"
@@ -20,7 +21,7 @@ func main() {
 
 	size := [3]int{n0, n1, n2}
 	core.InitSize(size[0], size[1], size[2])
-	C:=1e-9
+	C := 1e-9
 	core.InitCellSize(C, C, C)
 	N := size[0] * size[1] * size[2]
 
@@ -31,8 +32,12 @@ func main() {
 	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
 
 	conv := NewConv(input, output, size)
-
 	conv.Test()
+
+	for i := range input[0] {
+		input[0][i] = 1
+	}
+
 	conv.Push(core.N())
 	conv.Pull(core.N())
 
@@ -54,5 +59,10 @@ func main() {
 		seconds := float64(duration) / float64(time.Second)
 		fmt.Println("bandwidth:", float32((float64(bytes)/seconds)/1000000), "MB/s")
 	}
+
+	for i := range output {
+		fmt.Println(core.Format(safe.Reshape3DFloat32(output[i], n0, n1, n2)))
+	}
+
 	core.CleanExit()
 }

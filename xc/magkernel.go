@@ -113,13 +113,13 @@ func magKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) 
 		}
 	}
 
-	if core.DEBUG {
-		for i := 0; i < 3; i++ {
-			for j := i; j < 3; j++ {
-				core.Debug("kern", i, j, ":", core.Format(array[i][j]))
-			}
-		}
-	}
+	//	if core.DEBUG {
+	//		for i := 0; i < 3; i++ {
+	//			for j := i; j < 3; j++ {
+	//				core.Debug("kern", i, j, ":", core.Format(array[i][j]))
+	//			}
+	//		}
+	//	}
 	return kern
 }
 

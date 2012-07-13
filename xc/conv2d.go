@@ -269,22 +269,22 @@ func (c *Conv2) initFFTKern() {
 	defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
-	for ι,i := range[...]int{0,1,2,1}{
-		 j := [...]int{0,1,2,2}[ι]
-			input.CopyHtoD(kern[i][j])
-			fwPlan.Exec(input, output)
-			fwPlan.Stream().Synchronize() // !!
-			c.fftKern[i][j] = make([]float32, prod(realsize))
-			scaleRealPartsSymm(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
+	for ι, i := range [...]int{0, 1, 2, 1} {
+		j := [...]int{0, 1, 2, 2}[ι]
+		input.CopyHtoD(kern[i][j])
+		fwPlan.Exec(input, output)
+		fwPlan.Stream().Synchronize() // !!
+		c.fftKern[i][j] = make([]float32, prod(realsize))
+		scaleRealPartsSymm(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 
 		//	if core.DEBUG {
 		//		core.Debug("~kern:", i, j, ":", core.Format(safe.Reshape3DFloat32(c.fftKern[i][j], realsize[0], realsize[1], realsize[2])))
 		//	}
 
-			// TODO: partially if low on mem.
-			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
-		}
+		// TODO: partially if low on mem.
+		c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
+		c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
+	}
 }
 
 // Extract real parts, copy them from src to dst.

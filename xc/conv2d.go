@@ -6,6 +6,7 @@ import (
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
 	"nimble-cube/core"
+	"runtime"
 )
 
 // 2D convolution.
@@ -269,18 +270,23 @@ func (c *Conv2) initFFTKern() {
 	defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
+	// TODO: check slicing
+	nonredundant := (realsize[1]/2 + 1) * realsize[2] // length of non-redundant half of real ~kernel
 	for ι, i := range [...]int{0, 1, 2, 1} {
 		j := [...]int{0, 1, 2, 2}[ι]
 		input.CopyHtoD(kern[i][j])
+		kern[i][j] = nil // "free" real-space kernel on host
 		fwPlan.Exec(input, output)
 		fwPlan.Stream().Synchronize() // !!
-		c.fftKern[i][j] = make([]float32, prod(realsize))
-		scaleRealPartsSymm(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
+		c.fftKern[i][j] = make([]float32, nonredundant)
+		scaleRealPartsSymm(c.fftKern[i][j], output.Float().Slice(0, nonredundant), 1/float32(fwPlan.InputLen()))
+		// TODO: check symmetry
 
-		// TODO: partially if low on mem.
-		c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-		c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
+		c.gpuKern[i][j] = safe.MakeFloat32s(nonredundant)
+		c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j][:nonredundant])
 	}
+
+	runtime.GC()
 }
 
 // Extract real parts, copy them from src to dst.

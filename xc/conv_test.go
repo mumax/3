@@ -8,6 +8,7 @@ import (
 func TestConv(test *testing.T) {
 	size := [3]int{1, 4, 8}
 	core.InitSize(size[0], size[1], size[2])
+	core.InitCellSize(1e-9, 1e-9, 1e-9)
 	N := prod(size)
 
 	in := make([]float32, 3*N)
@@ -26,6 +27,7 @@ func BenchmarkConv2DSmall(b *testing.B) {
 
 	size := [3]int{1, 128, 128}
 	core.InitSize(size[0], size[1], size[2])
+	core.InitCellSize(1e-9, 1e-9, 1e-9)
 	N := prod(size)
 
 	in := make([]float32, 3*N)

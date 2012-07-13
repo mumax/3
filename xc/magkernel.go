@@ -10,6 +10,8 @@ import (
 func magKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) [3][3][]float32 {
 	core.Debug("Calculating demag kernel", "size:", size, "cellsize:", cellsize, "accuracy:", accuracy, "periodic:", periodic)
 
+	core.Assert(size[0] > 0 && size[1] > 0 && size[2] > 0)
+	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
 	N := prod(size)
 
 	var kern [3][3][]float32

@@ -12,7 +12,6 @@ var kernMulKern cu.Function
 
 func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s, stream cu.Stream) {
 
-	core.Debug(fftM[0].Len(), K00.Len())
 	core.Assert(fftM[0].Len() == K00.Len())
 
 	if kernMulKern == 0 {
@@ -33,8 +32,6 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 	k4ptr := K02.Pointer()
 	k5ptr := K01.Pointer()
 
-	core.Debug(m0ptr, m1ptr, m2ptr, k0ptr, k1ptr, k2ptr, k3ptr, k4ptr, k5ptr)
-
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&m0ptr),
 		unsafe.Pointer(&m1ptr),
@@ -48,6 +45,5 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 		unsafe.Pointer(&N)}
 
 	shmem := 0
-	core.Debug("cu.LaunchKernel", kernMulKern, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 	cu.LaunchKernel(kernMulKern, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 }

@@ -20,6 +20,8 @@ func main() {
 
 	size := [3]int{n0, n1, n2}
 	core.InitSize(size[0], size[1], size[2])
+	C:=1e-9
+	core.InitCellSize(C, C, C)
 	N := size[0] * size[1] * size[2]
 
 	in := make([]float32, 3*N)
@@ -34,7 +36,7 @@ func main() {
 	conv.Push(core.N())
 	conv.Pull(core.N())
 
-	loops := [...]int{10, 30}
+	loops := [...]int{10}
 	for _, loop := range loops {
 		start := time.Now()
 		fmt.Println("running", loop, "loops")

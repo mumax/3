@@ -32,7 +32,7 @@ func kernMul2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, size [
 		}
 
 		gridDim.X = DivUp(N2, BLOCKSIZE)
-		gridDim.Y = N1
+		gridDim.Y = N1/2 + 1 // bottom half is symmetric, apart from 1st row
 		gridDim.Z = 1
 
 		blockDim.X = BLOCKSIZE

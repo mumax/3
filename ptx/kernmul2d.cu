@@ -37,30 +37,48 @@ kernmul2D(float* fftMx,  float* fftMy,  float* fftMz,
 
 	int I = j*N2 + k; // linear index
 
+    float Kxx = fftKxx[I];
+    float Kyy = fftKyy[I];
+    float Kzz = fftKzz[I];
+    float Kyz = fftKyz[I];
+
+
   	int e = 2 * I;
 
     float reMx = fftMx[e  ];
     float imMx = fftMx[e+1];
-
     float reMy = fftMy[e  ];
     float imMy = fftMy[e+1];
-
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
-    float Kxx = fftKxx[I];
-    float Kyy = fftKyy[I];
-    float Kzz = fftKzz[I];
-
-    float Kyz = fftKyz[I];
-
     fftMx[e  ] = reMx * Kxx;
     fftMx[e+1] = imMx * Kxx;
-
     fftMy[e  ] =            reMy * Kyy + reMz * Kyz;
     fftMy[e+1] =            imMy * Kyy + imMz * Kyz;
-
     fftMz[e  ] =            reMy * Kyz + reMz * Kzz;
     fftMz[e+1] =            imMy * Kyz + imMz * Kzz;
+
+	// Re-use same kernel for bottom half.
+	// Last row may be written twice.
+	if (j > 0){
+		j = N1 - j;
+	 	I = j*N2 + k;
+  		e = 2 * I;
+
+    	reMx = fftMx[e  ];
+    	imMx = fftMx[e+1];
+    	reMy = fftMy[e  ];
+    	imMy = fftMy[e+1];
+    	reMz = fftMz[e  ];
+    	imMz = fftMz[e+1];
+
+    	fftMx[e  ] = reMx * Kxx;
+    	fftMx[e+1] = imMx * Kxx;
+    	fftMy[e  ] =            reMy *  Kyy  + reMz *(-Kyz);
+    	fftMy[e+1] =            imMy *  Kyy  + imMz *(-Kyz);
+    	fftMz[e  ] =            reMy *(-Kyz) + reMz *  Kzz ;
+    	fftMz[e+1] =            imMy *(-Kyz) + imMz *  Kzz ;
+	}
 }
 

@@ -60,8 +60,10 @@ func main() {
 		fmt.Println("bandwidth:", float32((float64(bytes)/seconds)/1000000), "MB/s")
 	}
 
-	for i := range output {
-		fmt.Println(core.Format(safe.Reshape3DFloat32(output[i], n0, n1, n2)))
+	if core.DEBUG {
+		for i := range output {
+			fmt.Println(core.Format(safe.Reshape3DFloat32(output[i], n0, n1, n2)))
+		}
 	}
 
 	core.CleanExit()

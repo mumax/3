@@ -8,7 +8,8 @@ import (
 	"nimble-cube/core"
 )
 
-type Conv2 struct {
+// Straightforward convolution for 2D and 3D.
+type Conv1 struct {
 	size          [3]int             // 3D size of the input/output data
 	n             int                // product of size
 	input, output [3][]float32       // input/output arrays, 3 component vectors
@@ -32,7 +33,7 @@ type Conv2 struct {
 
 // _______________________________________________ run
 
-func (c *Conv2) run() {
+func (c *Conv1) run() {
 	core.Debug("run")
 
 	core.LockCudaThread()
@@ -53,9 +54,9 @@ func (c *Conv2) run() {
 
 // Update the output array at least to upto.
 // Blocks if needed.
-func (c *Conv2) Pull(upto int) {
+func (c *Conv1) Pull(upto int) {
 	if upto > c.n {
-		panic(fmt.Errorf("xc.Conv2: Pull: upto out of bounds: %v", upto))
+		panic(fmt.Errorf("xc.Conv1: Pull: upto out of bounds: %v", upto))
 	}
 
 	for upto > c.outAvailable {
@@ -66,19 +67,19 @@ func (c *Conv2) Pull(upto int) {
 	}
 }
 
-func (c *Conv2) downloadOutputFrame() {
+func (c *Conv1) downloadOutputFrame() {
 	c.pull <- c.n
 }
 
 // _________________________________________________ convolution
 
-func (c *Conv2) syncFFTs() {
+func (c *Conv1) syncFFTs() {
 	for _, s := range c.fftStr {
 		s.Synchronize()
 	}
 }
 
-func (c *Conv2) bwFFTAndDownloadAsync() {
+func (c *Conv1) bwFFTAndDownloadAsync() {
 
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
@@ -94,29 +95,23 @@ func (c *Conv2) bwFFTAndDownloadAsync() {
 
 // Kernel multiplication. 
 // FFT's have to be synced first.
-func (c *Conv2) kernMul() {
+func (c *Conv1) kernMul() {
 	if c.noKernMul {
 		core.Debug("skipping kernMul")
 		return
 	}
 
-	// TODO: should we store size centrally?
-	padded := PadSize(c.size)
-	ffted := FFTR2COutputSizeFloats(padded)
-	realsize := ffted
-	realsize[2] /= 2
-
 	core.Debug("kernMul")
-	kernMul2D(c.fftCBuf,
-		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2],
-		realsize, c.cpyStr)
+	kernMul(c.fftCBuf,
+		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2],
+		c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1],
+		c.cpyStr)
 	c.cpyStr.Synchronize()
-
 }
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
-func (c *Conv2) fwFFTAsyncComp(i int) {
+func (c *Conv1) fwFFTAsyncComp(i int) {
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
@@ -129,9 +124,9 @@ func (c *Conv2) fwFFTAsyncComp(i int) {
 // Signals input[0:upper] is ready to be uploaded.
 // Only blocks if upper == len(input), after which
 // input may safely be overwritten by a new frame.
-func (c *Conv2) Push(upper int) {
+func (c *Conv1) Push(upper int) {
 	if upper > c.n {
-		panic(fmt.Errorf("xc.Conv2: Push: upper out of bounds: %v", upper))
+		panic(fmt.Errorf("xc.Conv1: Push: upper out of bounds: %v", upper))
 	}
 	c.push <- upper
 	if upper == c.n {
@@ -143,7 +138,7 @@ func (c *Conv2) Push(upper int) {
 // Upload one full input array to the GPU.
 // Start asynchronous FFT's on each component as soon as possible.
 // Wait for them by c.fftStr.Synchronize()
-func (c *Conv2) uploadInputFrameAndFFTAsync() {
+func (c *Conv1) uploadInputFrameAndFFTAsync() {
 	ready := false
 	for !ready {
 
@@ -160,11 +155,15 @@ func (c *Conv2) uploadInputFrameAndFFTAsync() {
 	c.inSent = [3]int{0, 0, 0}
 }
 
+// when X,Y,Z components compete for bandwith, use
+// this xfer block size.
+var maxXfer = 1024 * 1024 / 4 // 1MB todo: optimize.
+
 // Send part of the available input to the GPU.
 // preferentially send X component if possible, then Y, then Z.
 // Transfer sizes are limited to avoid sending a huge Z block
 // when not all X's have been transferred yet, e.g.
-func (c *Conv2) sendSomeInput() {
+func (c *Conv1) sendSomeInput() {
 	for i, sent := range c.inSent {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
@@ -190,7 +189,7 @@ func (c *Conv2) sendSomeInput() {
 
 // Is new  input available? 
 // I.e.: input that is ready but has not yet been sent.
-func (c *Conv2) haveInput() bool {
+func (c *Conv1) haveInput() bool {
 	for _, sent := range c.inSent {
 		if sent < c.inAvailable {
 			return true
@@ -201,14 +200,14 @@ func (c *Conv2) haveInput() bool {
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Blocks until some new input becomes available due to a Push().
-func (c *Conv2) updInAvailableWait() {
+func (c *Conv1) updInAvailableWait() {
 	c.inAvailable = <-c.push
 	c.updInAvailbleNoWait()
 }
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Does not block. If no new input is available, nothing is updated.
-func (c *Conv2) updInAvailbleNoWait() {
+func (c *Conv1) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
 		case c.inAvailable = <-c.push: // splice input blocks together
@@ -220,7 +219,7 @@ func (c *Conv2) updInAvailbleNoWait() {
 
 // _______________________________________________________  init
 
-func (c *Conv2) init() {
+func (c *Conv1) init() {
 	core.Debug("init")
 
 	c.initPageLock()
@@ -229,14 +228,14 @@ func (c *Conv2) init() {
 	c.cpyStr = cu.StreamCreate()
 }
 
-func (c *Conv2) initPageLock() {
+func (c *Conv1) initPageLock() {
 	for i := 0; i < 3; i++ {
 		core.MemHostRegister(c.input[i])
 		core.MemHostRegister(c.output[i])
 	}
 }
 
-func (c *Conv2) initBuffers() {
+func (c *Conv1) initBuffers() {
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
 		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
@@ -244,7 +243,7 @@ func (c *Conv2) initBuffers() {
 	}
 }
 
-func (c *Conv2) initFFTKern() {
+func (c *Conv1) initFFTKern() {
 	padded := PadSize(c.size)
 	ffted := FFTR2COutputSizeFloats(padded)
 	realsize := ffted
@@ -272,7 +271,7 @@ func (c *Conv2) initFFTKern() {
 			fwPlan.Exec(input, output)
 			fwPlan.Stream().Synchronize() // !!
 			c.fftKern[i][j] = make([]float32, prod(realsize))
-			scaleRealPartsSymm(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
+			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 
 			if core.DEBUG {
 				core.Debug("~kern:", i, j, ":", core.Format(safe.Reshape3DFloat32(c.fftKern[i][j], realsize[0], realsize[1], realsize[2])))
@@ -288,7 +287,7 @@ func (c *Conv2) initFFTKern() {
 // Extract real parts, copy them from src to dst.
 // In the meanwhile, check if imaginary parts are nearly zero
 // and scale the kernel to compensate for unnormalized FFTs.
-func scaleRealPartsSymm(dstList []float32, src safe.Float32s, scale float32) {
+func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	srcList := src.Host()
 
 	// Normally, the FFT'ed kernel is purely real because of symmetry,
@@ -315,12 +314,32 @@ func scaleRealPartsSymm(dstList []float32, src safe.Float32s, scale float32) {
 
 }
 
-func NewConv2(input, output [3][]float32, size [3]int) *Conv2 {
-	c := new(Conv2)
+func prod(size [3]int) int {
+	return size[0] * size[1] * size[2]
+}
+
+// Zero-padded size.
+func PadSize(size [3]int) [3]int {
+	padded := [3]int{
+		size[0] * 2,
+		size[1] * 2,
+		size[2] * 2}
+	if padded[0] == 2 {
+		padded[0] = 1 // no need to pad 1 layer thickness
+	}
+	return padded
+}
+
+func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
+	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
+}
+
+func NewConv1(input, output [3][]float32, size [3]int) *Conv1 {
+	c := new(Conv1)
 	N := prod(size)
 	for c := 0; c < 3; c++ {
 		if len(output[c]) != N || len(input[c]) != N {
-			panic(fmt.Errorf("xc.Conv2.Init: inconsistent sizes"))
+			panic(fmt.Errorf("xc.Conv1.Init: inconsistent sizes"))
 		}
 	}
 	c.size = size

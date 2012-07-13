@@ -4,7 +4,6 @@
 	Transfers are done asynchronously, i.e., The GPU work
 	is overlapped with data transfers.
 
-	TODO: output copy does not overlap yet
 	TODO: kernel parts could be kept on host when GPU memory is full.
 
 	Author: Arne Vansteenkiste

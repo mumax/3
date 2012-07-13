@@ -10,7 +10,7 @@ import (
 
 // Run self-test and report estimated relative RMS error
 // on forward+backward transform on data of magnitude order 1.
-func (c *Conv) Test() {
+func (c *Conv1) Test() {
 	N := c.n
 
 	// make random input data between -1 and 1
@@ -50,7 +50,7 @@ func (c *Conv) Test() {
 const FFT_TOLERANCE = 1e-5 // panic if RMS error of fw+bw transform on random data is larger than this.
 
 // Check if the rms error introduced by fw+bw transform is < FFT_TOLERANCE
-func (c *Conv) checkError() {
+func (c *Conv1) checkError() {
 	NFFT := prod(PadSize(c.size))
 	rms := 0.0
 	for i := 0; i < 3; i++ {

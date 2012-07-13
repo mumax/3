@@ -8,7 +8,7 @@ import (
 	"nimble-cube/core"
 )
 
-type Conv struct {
+type Conv1 struct {
 	size          [3]int             // 3D size of the input/output data
 	n             int                // product of size
 	input, output [3][]float32       // input/output arrays, 3 component vectors
@@ -32,7 +32,7 @@ type Conv struct {
 
 // _______________________________________________ run
 
-func (c *Conv) run() {
+func (c *Conv1) run() {
 	core.Debug("run")
 
 	core.LockCudaThread()
@@ -53,9 +53,9 @@ func (c *Conv) run() {
 
 // Update the output array at least to upto.
 // Blocks if needed.
-func (c *Conv) Pull(upto int) {
+func (c *Conv1) Pull(upto int) {
 	if upto > c.n {
-		panic(fmt.Errorf("xc.Conv: Pull: upto out of bounds: %v", upto))
+		panic(fmt.Errorf("xc.Conv1: Pull: upto out of bounds: %v", upto))
 	}
 
 	for upto > c.outAvailable {
@@ -66,19 +66,19 @@ func (c *Conv) Pull(upto int) {
 	}
 }
 
-func (c *Conv) downloadOutputFrame() {
+func (c *Conv1) downloadOutputFrame() {
 	c.pull <- c.n
 }
 
 // _________________________________________________ convolution
 
-func (c *Conv) syncFFTs() {
+func (c *Conv1) syncFFTs() {
 	for _, s := range c.fftStr {
 		s.Synchronize()
 	}
 }
 
-func (c *Conv) bwFFTAndDownloadAsync() {
+func (c *Conv1) bwFFTAndDownloadAsync() {
 
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
@@ -94,7 +94,7 @@ func (c *Conv) bwFFTAndDownloadAsync() {
 
 // Kernel multiplication. 
 // FFT's have to be synced first.
-func (c *Conv) kernMul() {
+func (c *Conv1) kernMul() {
 	if c.noKernMul {
 		core.Debug("skipping kernMul")
 		return
@@ -110,7 +110,7 @@ func (c *Conv) kernMul() {
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
-func (c *Conv) fwFFTAsyncComp(i int) {
+func (c *Conv1) fwFFTAsyncComp(i int) {
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
@@ -123,9 +123,9 @@ func (c *Conv) fwFFTAsyncComp(i int) {
 // Signals input[0:upper] is ready to be uploaded.
 // Only blocks if upper == len(input), after which
 // input may safely be overwritten by a new frame.
-func (c *Conv) Push(upper int) {
+func (c *Conv1) Push(upper int) {
 	if upper > c.n {
-		panic(fmt.Errorf("xc.Conv: Push: upper out of bounds: %v", upper))
+		panic(fmt.Errorf("xc.Conv1: Push: upper out of bounds: %v", upper))
 	}
 	c.push <- upper
 	if upper == c.n {
@@ -137,7 +137,7 @@ func (c *Conv) Push(upper int) {
 // Upload one full input array to the GPU.
 // Start asynchronous FFT's on each component as soon as possible.
 // Wait for them by c.fftStr.Synchronize()
-func (c *Conv) uploadInputFrameAndFFTAsync() {
+func (c *Conv1) uploadInputFrameAndFFTAsync() {
 	ready := false
 	for !ready {
 
@@ -162,7 +162,7 @@ var maxXfer = 1024 * 1024 / 4 // 1MB todo: optimize.
 // preferentially send X component if possible, then Y, then Z.
 // Transfer sizes are limited to avoid sending a huge Z block
 // when not all X's have been transferred yet, e.g.
-func (c *Conv) sendSomeInput() {
+func (c *Conv1) sendSomeInput() {
 	for i, sent := range c.inSent {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
@@ -188,7 +188,7 @@ func (c *Conv) sendSomeInput() {
 
 // Is new  input available? 
 // I.e.: input that is ready but has not yet been sent.
-func (c *Conv) haveInput() bool {
+func (c *Conv1) haveInput() bool {
 	for _, sent := range c.inSent {
 		if sent < c.inAvailable {
 			return true
@@ -199,14 +199,14 @@ func (c *Conv) haveInput() bool {
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Blocks until some new input becomes available due to a Push().
-func (c *Conv) updInAvailableWait() {
+func (c *Conv1) updInAvailableWait() {
 	c.inAvailable = <-c.push
 	c.updInAvailbleNoWait()
 }
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Does not block. If no new input is available, nothing is updated.
-func (c *Conv) updInAvailbleNoWait() {
+func (c *Conv1) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
 		case c.inAvailable = <-c.push: // splice input blocks together
@@ -218,7 +218,7 @@ func (c *Conv) updInAvailbleNoWait() {
 
 // _______________________________________________________  init
 
-func (c *Conv) init() {
+func (c *Conv1) init() {
 	core.Debug("init")
 
 	c.initPageLock()
@@ -227,14 +227,14 @@ func (c *Conv) init() {
 	c.cpyStr = cu.StreamCreate()
 }
 
-func (c *Conv) initPageLock() {
+func (c *Conv1) initPageLock() {
 	for i := 0; i < 3; i++ {
 		core.MemHostRegister(c.input[i])
 		core.MemHostRegister(c.output[i])
 	}
 }
 
-func (c *Conv) initBuffers() {
+func (c *Conv1) initBuffers() {
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
 		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
@@ -242,7 +242,7 @@ func (c *Conv) initBuffers() {
 	}
 }
 
-func (c *Conv) initFFTKern() {
+func (c *Conv1) initFFTKern() {
 	padded := PadSize(c.size)
 	ffted := FFTR2COutputSizeFloats(padded)
 	realsize := ffted
@@ -333,12 +333,12 @@ func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
-func NewConv(input, output [3][]float32, size [3]int) *Conv {
-	c := new(Conv)
+func NewConv1(input, output [3][]float32, size [3]int) *Conv1 {
+	c := new(Conv1)
 	N := prod(size)
 	for c := 0; c < 3; c++ {
 		if len(output[c]) != N || len(input[c]) != N {
-			panic(fmt.Errorf("xc.Conv.Init: inconsistent sizes"))
+			panic(fmt.Errorf("xc.Conv1.Init: inconsistent sizes"))
 		}
 	}
 	c.size = size

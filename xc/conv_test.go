@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestConv(test *testing.T) {
+func TestConv1(test *testing.T) {
 	size := [3]int{1, 4, 8}
 	core.InitSize(size[0], size[1], size[2])
 	core.InitCellSize(1e-9, 1e-9, 1e-9)
@@ -17,12 +17,12 @@ func TestConv(test *testing.T) {
 	out := make([]float32, 3*N)
 	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
 
-	conv := NewConv(input, output, size)
+	conv := NewConv1(input, output, size)
 
 	conv.Test()
 }
 
-func BenchmarkConv2DSmall(b *testing.B) {
+func BenchmarkConv1_2DSmall(b *testing.B) {
 	b.StopTimer()
 
 	size := [3]int{1, 128, 128}
@@ -36,7 +36,7 @@ func BenchmarkConv2DSmall(b *testing.B) {
 	out := make([]float32, 3*N)
 	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
 
-	conv := NewConv(input, output, size)
+	conv := NewConv1(input, output, size)
 
 	b.SetBytes(int64(prod(size)) * 4 * 2) // *2: xfer back and forth
 

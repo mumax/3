@@ -100,11 +100,16 @@ func (c *Conv2) kernMul() {
 		return
 	}
 
+	// TODO: should we store size centrally?
+	padded := PadSize(c.size)
+	ffted := FFTR2COutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
+
 	core.Debug("kernMul")
-	kernMul(c.fftCBuf,
-		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2],
-		c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1],
-		c.cpyStr)
+	kernMul2D(c.fftCBuf,
+		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2], c.gpuKern[1][2],
+		realsize, c.cpyStr)
 	c.cpyStr.Synchronize()
 }
 

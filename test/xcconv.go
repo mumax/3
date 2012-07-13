@@ -31,8 +31,8 @@ func main() {
 	out := make([]float32, 3*N)
 	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
 
-	conv := NewConv(input, output, size)
-	conv.Test()
+	conv := NewConv2(input, output, size)
+	//conv.Test()
 
 	for i := range input[0] {
 		input[0][i] = 1

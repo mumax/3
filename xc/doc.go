@@ -3,6 +3,7 @@
  Transfers are done asynchronously, i.e., The GPU work
  is overlapped with data transfers.
 
+ TODO: mv package -> demag_gpu
  TODO: use only one FFT plan, cufft plans use huge buffer space.
  TODO: kernel parts could be kept on host when GPU memory is full.
  TODO: do not keep kernel in host ram if on GPU

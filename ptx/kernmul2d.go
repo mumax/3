@@ -7,7 +7,7 @@ const KERNMUL2D = `
 	// nvopencc 4.1 built on 2012-04-05
 
 	//-----------------------------------------------------------
-	// Compiling /tmp/tmpxft_00000987_00000000-9_kernmul2d.cpp3.i (/tmp/ccBI#.F8UcRp)
+	// Compiling /tmp/tmpxft_00000aa4_00000000-9_kernmul2d.cpp3.i (/tmp/ccBI#.EnZ5iA)
 	//-----------------------------------------------------------
 
 	//-----------------------------------------------------------
@@ -20,7 +20,7 @@ const KERNMUL2D = `
 	//-----------------------------------------------------------
 
 	.file	1	"<command-line>"
-	.file	2	"/tmp/tmpxft_00000987_00000000-8_kernmul2d.cudafe2.gpu"
+	.file	2	"/tmp/tmpxft_00000aa4_00000000-8_kernmul2d.cudafe2.gpu"
 	.file	3	"/usr/lib/gcc/x86_64-linux-gnu/4.6/include/stddef.h"
 	.file	4	"/usr/local/cuda/bin/../include/crt/device_runtime.h"
 	.file	5	"/usr/local/cuda/bin/../include/host_defines.h"
@@ -59,7 +59,7 @@ const KERNMUL2D = `
 		.param .s32 __cudaparm_kernmul2D_N1,
 		.param .s32 __cudaparm_kernmul2D_N2)
 	{
-	.reg .u32 %r<45>;
+	.reg .u32 %r<58>;
 	.reg .u64 %rd<114>;
 	.reg .f32 %f<92>;
 	.reg .pred %p<4>;
@@ -92,9 +92,9 @@ $LDWbeginblock_234_1:
 	or.b32 	%r21, %r16, %r20;
 	mov.u32 	%r22, 0;
 	setp.eq.s32 	%p1, %r21, %r22;
-	@%p1 bra 	$L_0_2050;
+	@%p1 bra 	$L_0_2306;
 	bra.uni 	$LBB7_kernmul2D;
-$L_0_2050:
+$L_0_2306:
 	.loc	14	38	0
 	mov.s32 	%r23, %r12;
 	ld.param.s32 	%r24, [__cudaparm_kernmul2D_N2];
@@ -242,70 +242,83 @@ $L_0_2050:
 	mul.wide.s32 	%rd63, %r31, 4;
 	add.u64 	%rd64, %rd61, %rd63;
 	st.global.f32 	[%rd64+4], %f50;
-	.loc	14	64	0
+	.loc	14	63	0
 	mov.s32 	%r32, %r6;
-	mov.u32 	%r33, 0;
-	setp.le.s32 	%p2, %r32, %r33;
-	@%p2 bra 	$L_0_2306;
+	mov.s32 	%r33, 0;
+	set.gt.u32.s32 	%r34, %r32, %r33;
+	neg.s32 	%r35, %r34;
+	mov.s32 	%r36, %r6;
+	ld.param.s32 	%r37, [__cudaparm_kernmul2D_N1];
+	shr.s32 	%r38, %r37, 31;
+	mov.s32 	%r39, 1;
+	and.b32 	%r40, %r38, %r39;
+	add.s32 	%r41, %r40, %r37;
+	shr.s32 	%r42, %r41, 1;
+	set.lt.u32.s32 	%r43, %r36, %r42;
+	neg.s32 	%r44, %r43;
+	and.b32 	%r45, %r35, %r44;
+	mov.u32 	%r46, 0;
+	setp.eq.s32 	%p2, %r45, %r46;
+	@%p2 bra 	$L_0_2562;
+	.loc	14	64	0
+	ld.param.s32 	%r47, [__cudaparm_kernmul2D_N1];
+	mov.s32 	%r48, %r6;
+	sub.s32 	%r49, %r47, %r48;
+	mov.s32 	%r6, %r49;
 	.loc	14	65	0
-	ld.param.s32 	%r34, [__cudaparm_kernmul2D_N1];
-	mov.s32 	%r35, %r6;
-	sub.s32 	%r36, %r34, %r35;
-	mov.s32 	%r6, %r36;
+	mov.s32 	%r50, %r12;
+	ld.param.s32 	%r51, [__cudaparm_kernmul2D_N2];
+	mov.s32 	%r52, %r6;
+	mul.lo.s32 	%r53, %r51, %r52;
+	add.s32 	%r54, %r50, %r53;
+	mov.s32 	%r28, %r54;
 	.loc	14	66	0
-	mov.s32 	%r37, %r12;
-	ld.param.s32 	%r38, [__cudaparm_kernmul2D_N2];
-	mov.s32 	%r39, %r6;
-	mul.lo.s32 	%r40, %r38, %r39;
-	add.s32 	%r41, %r37, %r40;
-	mov.s32 	%r28, %r41;
-	.loc	14	67	0
-	mov.s32 	%r42, %r28;
-	mul.lo.s32 	%r43, %r42, 2;
-	mov.s32 	%r31, %r43;
-	.loc	14	69	0
+	mov.s32 	%r55, %r28;
+	mul.lo.s32 	%r56, %r55, 2;
+	mov.s32 	%r31, %r56;
+	.loc	14	68	0
 	ld.param.u64 	%rd65, [__cudaparm_kernmul2D_fftMx];
 	cvt.s64.s32 	%rd66, %r31;
 	mul.wide.s32 	%rd67, %r31, 4;
 	add.u64 	%rd68, %rd65, %rd67;
 	ld.global.f32 	%f51, [%rd68+0];
 	mov.f32 	%f10, %f51;
-	.loc	14	70	0
+	.loc	14	69	0
 	ld.param.u64 	%rd69, [__cudaparm_kernmul2D_fftMx];
 	cvt.s64.s32 	%rd70, %r31;
 	mul.wide.s32 	%rd71, %r31, 4;
 	add.u64 	%rd72, %rd69, %rd71;
 	ld.global.f32 	%f52, [%rd72+4];
 	mov.f32 	%f12, %f52;
-	.loc	14	71	0
+	.loc	14	70	0
 	ld.param.u64 	%rd73, [__cudaparm_kernmul2D_fftMy];
 	cvt.s64.s32 	%rd74, %r31;
 	mul.wide.s32 	%rd75, %r31, 4;
 	add.u64 	%rd76, %rd73, %rd75;
 	ld.global.f32 	%f53, [%rd76+0];
 	mov.f32 	%f14, %f53;
-	.loc	14	72	0
+	.loc	14	71	0
 	ld.param.u64 	%rd77, [__cudaparm_kernmul2D_fftMy];
 	cvt.s64.s32 	%rd78, %r31;
 	mul.wide.s32 	%rd79, %r31, 4;
 	add.u64 	%rd80, %rd77, %rd79;
 	ld.global.f32 	%f54, [%rd80+4];
 	mov.f32 	%f16, %f54;
-	.loc	14	73	0
+	.loc	14	72	0
 	ld.param.u64 	%rd81, [__cudaparm_kernmul2D_fftMz];
 	cvt.s64.s32 	%rd82, %r31;
 	mul.wide.s32 	%rd83, %r31, 4;
 	add.u64 	%rd84, %rd81, %rd83;
 	ld.global.f32 	%f55, [%rd84+0];
 	mov.f32 	%f18, %f55;
-	.loc	14	74	0
+	.loc	14	73	0
 	ld.param.u64 	%rd85, [__cudaparm_kernmul2D_fftMz];
 	cvt.s64.s32 	%rd86, %r31;
 	mul.wide.s32 	%rd87, %r31, 4;
 	add.u64 	%rd88, %rd85, %rd87;
 	ld.global.f32 	%f56, [%rd88+4];
 	mov.f32 	%f20, %f56;
-	.loc	14	76	0
+	.loc	14	75	0
 	mov.f32 	%f57, %f2;
 	mov.f32 	%f58, %f10;
 	mul.f32 	%f59, %f57, %f58;
@@ -314,7 +327,7 @@ $L_0_2050:
 	mul.wide.s32 	%rd91, %r31, 4;
 	add.u64 	%rd92, %rd89, %rd91;
 	st.global.f32 	[%rd92+0], %f59;
-	.loc	14	77	0
+	.loc	14	76	0
 	mov.f32 	%f60, %f2;
 	mov.f32 	%f61, %f12;
 	mul.f32 	%f62, %f60, %f61;
@@ -323,7 +336,7 @@ $L_0_2050:
 	mul.wide.s32 	%rd95, %r31, 4;
 	add.u64 	%rd96, %rd93, %rd95;
 	st.global.f32 	[%rd96+4], %f62;
-	.loc	14	78	0
+	.loc	14	77	0
 	mov.f32 	%f63, %f8;
 	mov.f32 	%f64, %f18;
 	mul.f32 	%f65, %f63, %f64;
@@ -336,7 +349,7 @@ $L_0_2050:
 	mul.wide.s32 	%rd99, %r31, 4;
 	add.u64 	%rd100, %rd97, %rd99;
 	st.global.f32 	[%rd100+0], %f69;
-	.loc	14	79	0
+	.loc	14	78	0
 	mov.f32 	%f70, %f8;
 	mov.f32 	%f71, %f20;
 	mul.f32 	%f72, %f70, %f71;
@@ -349,7 +362,7 @@ $L_0_2050:
 	mul.wide.s32 	%rd103, %r31, 4;
 	add.u64 	%rd104, %rd101, %rd103;
 	st.global.f32 	[%rd104+4], %f76;
-	.loc	14	80	0
+	.loc	14	79	0
 	mov.f32 	%f77, %f8;
 	mov.f32 	%f78, %f14;
 	mul.f32 	%f79, %f77, %f78;
@@ -362,7 +375,7 @@ $L_0_2050:
 	mul.wide.s32 	%rd107, %r31, 4;
 	add.u64 	%rd108, %rd105, %rd107;
 	st.global.f32 	[%rd108+0], %f83;
-	.loc	14	81	0
+	.loc	14	80	0
 	mov.f32 	%f84, %f8;
 	mov.f32 	%f85, %f16;
 	mul.f32 	%f86, %f84, %f85;
@@ -375,10 +388,10 @@ $L_0_2050:
 	mul.wide.s32 	%rd111, %r31, 4;
 	add.u64 	%rd112, %rd109, %rd111;
 	st.global.f32 	[%rd112+4], %f90;
-$L_0_2306:
+$L_0_2562:
 $LDWendblock_234_1:
 $LBB7_kernmul2D:
-	.loc	14	83	0
+	.loc	14	82	0
 	exit;
 $LDWend_kernmul2D:
 	} // kernmul2D
@@ -387,7 +400,7 @@ $LDWend_kernmul2D:
 	@@DWARF .byte	0x9a, 0x04, 0x00, 0x00, 0x02, 0x00
 	@@DWARF .4byte	.debug_abbrev
 	@@DWARF .4byte	0x742f0108, 0x742f706d, 0x6678706d, 0x30305f74
-	@@DWARF .4byte	0x39303030, 0x305f3738, 0x30303030, 0x2d303030
+	@@DWARF .4byte	0x61303030, 0x305f3461, 0x30303030, 0x2d303030
 	@@DWARF .4byte	0x656b5f39, 0x756d6e72, 0x2e64326c, 0x33707063
 	@@DWARF .4byte	0x2f00692e, 0x656d6f68, 0x6e72612f, 0x6f672f65
 	@@DWARF .4byte	0x6372732f, 0x6d696e2f, 0x2d656c62, 0x65627563

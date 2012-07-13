@@ -60,8 +60,7 @@ kernmul2D(float* fftMx,  float* fftMy,  float* fftMz,
     fftMz[e+1] =            imMy * Kyz + imMz * Kzz;
 
 	// Re-use same kernel for bottom half.
-	// Last row may be written twice.
-	if (j > 0){
+	if (j > 0 && j < N1/2){
 		j = N1 - j;
 	 	I = j*N2 + k;
   		e = 2 * I;

@@ -10,7 +10,7 @@ import (
 
 var kernMul2DKern cu.Function
 
-func kernMul2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, size [3]int, stream cu.Stream) {
+func kernMul2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, kernsize [3]int, stream cu.Stream) {
 
 	//core.Assert(fftM[0].Len() >  K00.Len())
 
@@ -19,8 +19,8 @@ func kernMul2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, size [
 		kernMul2DKern = mod.GetFunction("kernmul2D")
 	}
 
-	N1 := size[1]
-	N2 := size[2]
+	N1 := kernsize[1]
+	N2 := kernsize[2]
 	core.Assert(N1*N2 == fftM[0].Len())
 
 	// Launch config: 2D, loop over rows.

@@ -7,7 +7,7 @@ const KERNMUL2D = `
 	// nvopencc 4.1 built on 2012-04-05
 
 	//-----------------------------------------------------------
-	// Compiling /tmp/tmpxft_000002e5_00000000-9_kernmul2d.cpp3.i (/tmp/ccBI#.L7cCxj)
+	// Compiling /tmp/tmpxft_00000987_00000000-9_kernmul2d.cpp3.i (/tmp/ccBI#.F8UcRp)
 	//-----------------------------------------------------------
 
 	//-----------------------------------------------------------
@@ -20,7 +20,7 @@ const KERNMUL2D = `
 	//-----------------------------------------------------------
 
 	.file	1	"<command-line>"
-	.file	2	"/tmp/tmpxft_000002e5_00000000-8_kernmul2d.cudafe2.gpu"
+	.file	2	"/tmp/tmpxft_00000987_00000000-8_kernmul2d.cudafe2.gpu"
 	.file	3	"/usr/lib/gcc/x86_64-linux-gnu/4.6/include/stddef.h"
 	.file	4	"/usr/local/cuda/bin/../include/crt/device_runtime.h"
 	.file	5	"/usr/local/cuda/bin/../include/host_defines.h"
@@ -61,7 +61,7 @@ const KERNMUL2D = `
 	{
 	.reg .u32 %r<45>;
 	.reg .u64 %rd<114>;
-	.reg .f32 %f<88>;
+	.reg .f32 %f<92>;
 	.reg .pred %p<4>;
 	.loc	14	29	0
 $LDWbegin_kernmul2D:
@@ -329,48 +329,52 @@ $L_0_2050:
 	mul.f32 	%f65, %f63, %f64;
 	mov.f32 	%f66, %f4;
 	mov.f32 	%f67, %f14;
-	mad.f32 	%f68, %f66, %f67, %f65;
+	mul.f32 	%f68, %f66, %f67;
+	sub.f32 	%f69, %f68, %f65;
 	ld.param.u64 	%rd97, [__cudaparm_kernmul2D_fftMy];
 	cvt.s64.s32 	%rd98, %r31;
 	mul.wide.s32 	%rd99, %r31, 4;
 	add.u64 	%rd100, %rd97, %rd99;
-	st.global.f32 	[%rd100+0], %f68;
+	st.global.f32 	[%rd100+0], %f69;
 	.loc	14	79	0
-	mov.f32 	%f69, %f8;
-	mov.f32 	%f70, %f20;
-	mul.f32 	%f71, %f69, %f70;
-	mov.f32 	%f72, %f4;
-	mov.f32 	%f73, %f16;
-	mad.f32 	%f74, %f72, %f73, %f71;
+	mov.f32 	%f70, %f8;
+	mov.f32 	%f71, %f20;
+	mul.f32 	%f72, %f70, %f71;
+	mov.f32 	%f73, %f4;
+	mov.f32 	%f74, %f16;
+	mul.f32 	%f75, %f73, %f74;
+	sub.f32 	%f76, %f75, %f72;
 	ld.param.u64 	%rd101, [__cudaparm_kernmul2D_fftMy];
 	cvt.s64.s32 	%rd102, %r31;
 	mul.wide.s32 	%rd103, %r31, 4;
 	add.u64 	%rd104, %rd101, %rd103;
-	st.global.f32 	[%rd104+4], %f74;
+	st.global.f32 	[%rd104+4], %f76;
 	.loc	14	80	0
-	mov.f32 	%f75, %f8;
-	mov.f32 	%f76, %f14;
-	mul.f32 	%f77, %f75, %f76;
-	mov.f32 	%f78, %f6;
-	mov.f32 	%f79, %f18;
-	mad.f32 	%f80, %f78, %f79, %f77;
+	mov.f32 	%f77, %f8;
+	mov.f32 	%f78, %f14;
+	mul.f32 	%f79, %f77, %f78;
+	mov.f32 	%f80, %f6;
+	mov.f32 	%f81, %f18;
+	mul.f32 	%f82, %f80, %f81;
+	sub.f32 	%f83, %f82, %f79;
 	ld.param.u64 	%rd105, [__cudaparm_kernmul2D_fftMz];
 	cvt.s64.s32 	%rd106, %r31;
 	mul.wide.s32 	%rd107, %r31, 4;
 	add.u64 	%rd108, %rd105, %rd107;
-	st.global.f32 	[%rd108+0], %f80;
+	st.global.f32 	[%rd108+0], %f83;
 	.loc	14	81	0
-	mov.f32 	%f81, %f8;
-	mov.f32 	%f82, %f16;
-	mul.f32 	%f83, %f81, %f82;
-	mov.f32 	%f84, %f6;
-	mov.f32 	%f85, %f20;
-	mad.f32 	%f86, %f84, %f85, %f83;
+	mov.f32 	%f84, %f8;
+	mov.f32 	%f85, %f16;
+	mul.f32 	%f86, %f84, %f85;
+	mov.f32 	%f87, %f6;
+	mov.f32 	%f88, %f20;
+	mul.f32 	%f89, %f87, %f88;
+	sub.f32 	%f90, %f89, %f86;
 	ld.param.u64 	%rd109, [__cudaparm_kernmul2D_fftMz];
 	cvt.s64.s32 	%rd110, %r31;
 	mul.wide.s32 	%rd111, %r31, 4;
 	add.u64 	%rd112, %rd109, %rd111;
-	st.global.f32 	[%rd112+4], %f86;
+	st.global.f32 	[%rd112+4], %f90;
 $L_0_2306:
 $LDWendblock_234_1:
 $LBB7_kernmul2D:
@@ -383,7 +387,7 @@ $LDWend_kernmul2D:
 	@@DWARF .byte	0x9a, 0x04, 0x00, 0x00, 0x02, 0x00
 	@@DWARF .4byte	.debug_abbrev
 	@@DWARF .4byte	0x742f0108, 0x742f706d, 0x6678706d, 0x30305f74
-	@@DWARF .4byte	0x32303030, 0x305f3565, 0x30303030, 0x2d303030
+	@@DWARF .4byte	0x39303030, 0x305f3738, 0x30303030, 0x2d303030
 	@@DWARF .4byte	0x656b5f39, 0x756d6e72, 0x2e64326c, 0x33707063
 	@@DWARF .4byte	0x2f00692e, 0x656d6f68, 0x6e72612f, 0x6f672f65
 	@@DWARF .4byte	0x6372732f, 0x6d696e2f, 0x2d656c62, 0x65627563

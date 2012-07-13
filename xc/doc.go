@@ -5,6 +5,9 @@
 	is overlapped with data transfers.
 
 	TODO: kernel parts could be kept on host when GPU memory is full.
+	TODO: check how much memory is used by fft plans, use only one plan?
+	TODO: use additional kernel symmetry
+	TODO: get rid of conv.realBuf: use 2 small buffers, copyHtoD while copyPadding other.
 
 	Author: Arne Vansteenkiste
 */

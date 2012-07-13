@@ -22,7 +22,23 @@ func kernMul2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, size [
 	N1 := size[1]
 	N2 := size[2]
 	core.Assert(N1*N2 == fftM[0].Len())
-	gridDim, blockDim := Make2DConf(N1, N2)
+
+	// Launch config: 2D, loop over rows.
+	var gridDim, blockDim cu.Dim3
+	{
+		BLOCKSIZE := 512
+		for BLOCKSIZE > N2 {
+			BLOCKSIZE /= 2
+		}
+
+		gridDim.X = DivUp(N2, BLOCKSIZE)
+		gridDim.Y = N1
+		gridDim.Z = 1
+
+		blockDim.X = BLOCKSIZE
+		blockDim.Y = 1
+		blockDim.Z = 1
+	}
 
 	m0ptr := fftM[0].Pointer()
 	m1ptr := fftM[1].Pointer()

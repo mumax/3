@@ -17,6 +17,7 @@ func DivUp(x, y int) int {
 	return ((x - 1) / y) + 1
 }
 
+// Make a 1D kernel launch configuration suited for N threads.
 func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 
 	const maxBlockSize = 512

@@ -270,8 +270,8 @@ func (c *Conv2) initFFTKern() {
 	defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
-	for i := 0; i < 3; i++ {
-		for j := i; j < 3; j++ {
+	for ι,i := range[...]int{0,1,2,1}{
+		 j := [...]int{0,1,2,2}[ι]
 			input.CopyHtoD(kern[i][j])
 			fwPlan.Exec(input, output)
 			fwPlan.Stream().Synchronize() // !!
@@ -286,7 +286,6 @@ func (c *Conv2) initFFTKern() {
 			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
 		}
-	}
 }
 
 // Extract real parts, copy them from src to dst.

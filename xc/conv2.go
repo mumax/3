@@ -42,15 +42,6 @@ func (c *Conv2) run() {
 		c.uploadInputFrameAndFFTAsync()
 		c.syncFFTs()
 		c.kernMul()
-
-		{
-			padded := PadSize(c.size)
-			ffted := FFTR2COutputSizeFloats(padded)
-			for i := range c.fftCBuf {
-				core.Debug("~H", i, ":", core.FormatComplex(safe.Reshape3DComplex64(c.fftCBuf[i].Host(), ffted[0], ffted[1], ffted[2]/2)))
-			}
-		}
-
 		c.bwFFTAndDownloadAsync()
 		c.syncFFTs()
 		c.downloadOutputFrame()

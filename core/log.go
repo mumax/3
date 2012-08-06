@@ -5,6 +5,7 @@ package core
 import (
 	"fmt"
 	"log"
+	"os"
 	"path"
 	"runtime"
 )
@@ -13,6 +14,15 @@ var (
 	LOG   = true
 	DEBUG = true
 )
+
+// 
+func Fatal(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		Cleanup()
+		os.Exit(1)
+	}
+}
 
 // Panics on the message.
 func Panic(msg ...interface{}) {

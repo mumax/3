@@ -8,8 +8,7 @@ func AtExit(cleanup func()) {
 	Debug("atexit:", cleanup)
 }
 
-func CleanExit() {
-	Log("exiting")
+func Cleanup() {
 	for _, f := range atexit {
 		Log("cleanup:", f)
 		f()

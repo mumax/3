@@ -21,7 +21,7 @@ func TestConv(conv *Conv2) {
 
 	in[2][0][0][0] = 1
 
-	out := BruteConvolution(in_, conv.kern, size)
+	out := BruteSymmetricConvolution(in_, conv.kern, size)
 
 	core.Log("Brute-force convolution:")
 	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[0], size[0], size[1], size[2])))

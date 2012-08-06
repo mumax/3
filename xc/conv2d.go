@@ -19,8 +19,10 @@ type Conv2 struct {
 	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, shares underlying storage with fftRBuf
 	fwPlan        [3]safe.FFT3DR2CPlan
 	bwPlan        [3]safe.FFT3DC2RPlan
+	kern          [3][3][]float32     // Real-space kernel
 	fftKern       [3][3][]float32     // FFT kernel on host
 	gpuKern       [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	initiated     chan int            // signals initialization complete
 	push          chan int            // signals input is ready up to the upper limit sent here
 	pull          chan int            // signals output is ready up to upper limit sent here
 	inframe       chan int            // signals one full input frame has been processed
@@ -231,6 +233,7 @@ func (c *Conv2) init() {
 	free, total := cu.MemGetInfo()
 	const Mb = 1024 * 1024
 	core.Log("conv initiated. Mem free:", free/Mb, "/", total/Mb, "MB")
+	c.initiated <- 1
 }
 
 func (c *Conv2) initPageLock() {
@@ -256,7 +259,9 @@ func (c *Conv2) initFFTKern() {
 
 	acc := 4
 	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
+	c.kern = kern
 
+	// init FFT plans
 	for i := range c.fwPlan {
 		c.fftStr[i] = cu.StreamCreate()
 		c.fwPlan[i] = safe.FFT3DR2C(padded[0], padded[1], padded[2])
@@ -335,7 +340,9 @@ func NewConv2(input, output [3][]float32, size [3]int) *Conv2 {
 	core.Assert(core.NumWarp() > 0)
 	c.push = make(chan int, core.NumWarp()) // Buffer up to one frame. Less should not deadlock though.
 	c.pull = make(chan int, core.NumWarp()) // !! should buffer up to N/maxXfer ??
+	c.initiated = make(chan int)
 	c.inframe = make(chan int)
 	go c.run()
+	<-c.initiated
 	return c
 }

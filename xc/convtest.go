@@ -2,11 +2,32 @@ package xc
 
 import (
 	"fmt"
-	//"github.com/barnex/cuda4/safe"
+	"github.com/barnex/cuda4/safe"
 	"math"
 	"math/rand"
 	"nimble-cube/core"
 )
+
+func TestConv(conv *Conv2) {
+	core.Log("Testing convolution")
+	size := conv.size
+	N := prod(size)
+	var in_ [3][]float32
+	var in [3][][][]float32
+	for c := 0; c < 3; c++ {
+		in_[c] = make([]float32, N)
+		in[c] = safe.Reshape3DFloat32(in_[c], size[0], size[1], size[2])
+	}
+
+	in[2][0][0][0] = 1
+
+	out := BruteConvolution(in_, conv.kern, size)
+
+	core.Log("Brute-force convolution:")
+	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[0], size[0], size[1], size[2])))
+	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[1], size[0], size[1], size[2])))
+	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[2], size[0], size[1], size[2])))
+}
 
 // Run self-test and report estimated relative RMS error
 // on forward+backward transform on data of magnitude order 1.

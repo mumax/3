@@ -3,6 +3,7 @@ package xc
 import (
 	"fmt"
 	"github.com/barnex/cuda4/safe"
+	"github.com/barnex/fmath"
 	"math"
 	"math/rand"
 	"nimble-cube/core"
@@ -19,7 +20,9 @@ func TestConv(conv *Conv2) {
 		in[c] = safe.Reshape3DFloat32(in_[c], size[0], size[1], size[2])
 	}
 
-	in[2][0][0][0] = 1 // TODO
+	for i := range in_[0] {
+		in_[0][i] = 1
+	}
 
 	ref := BruteSymmetricConvolution(conv.input, conv.kern, size)
 
@@ -29,21 +32,22 @@ func TestConv(conv *Conv2) {
 	core.Log("brute:", ref)
 	core.Log("ffted:", conv.output)
 
-	rms := 0.0
+	var max float32
 	for c := 0; c < 3; c++ {
 		for i := range ref[c] {
-			rms += sqr(float64(ref[c][i]) - float64(conv.output[c][i]))
+			if fmath.Abs(ref[c][i]-conv.output[c][i]) > max {
+				max = fmath.Abs(ref[c][i] - conv.output[c][i])
+			}
 		}
 	}
-	rms = math.Sqrt(rms / float64(N))
 
-	core.Debug("conv RMS error:", rms)
-	if rms > FFT_TOLERANCE {
-		panic(fmt.Errorf("conv RMS error: %v > tolerance (%v)", rms, FFT_TOLERANCE))
+	core.Debug("conv max error:", max)
+	if max > FFT_TOLERANCE {
+		panic(fmt.Errorf("conv max error: %v > tolerance (%v)", max, FFT_TOLERANCE))
 	}
-	if rms == 0 {
+	if max == 0 {
 		// Something is wrong with the test
-		panic(fmt.Errorf("conv RMS error: %v: too good to be true", rms))
+		panic(fmt.Errorf("conv max error: %v: too good to be true", max))
 	}
 
 }

@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestConv2(test *testing.T) {
-	size := [3]int{1, 4, 8}
+func TestConv1(test *testing.T) {
+	size := [3]int{1, 16, 16}
 	core.InitSize(size[0], size[1], size[2])
 	core.InitCellSize(1e-9, 1e-9, 1e-9)
 	N := prod(size)

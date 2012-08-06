@@ -18,6 +18,7 @@ type Conv1 struct {
 	fftCBuf       [3]safe.Complex64s // Complex ("output") for FFT, shares underlying storage with fftRBuf
 	fwPlan        [3]safe.FFT3DR2CPlan
 	bwPlan        [3]safe.FFT3DC2RPlan
+	kern          [3][3][]float32     // Real-space kernel
 	fftKern       [3][3][]float32     // FFT kernel on host
 	gpuKern       [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 	push          chan int            // signals input is ready up to the upper limit sent here
@@ -251,6 +252,7 @@ func (c *Conv1) initFFTKern() {
 
 	acc := 4
 	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
+	c.kern = kern
 
 	for i := range c.fwPlan {
 		c.fftStr[i] = cu.StreamCreate()

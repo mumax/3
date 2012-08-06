@@ -24,9 +24,12 @@ func TestConv(conv *Conv2) {
 	out := BruteSymmetricConvolution(in_, conv.kern, size)
 
 	core.Log("Brute-force convolution:")
-	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[0], size[0], size[1], size[2])))
-	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[1], size[0], size[1], size[2])))
-	core.Log("out:", core.Format(safe.Reshape3DFloat32(out[2], size[0], size[1], size[2])))
+
+	var out3 [3][][][]float32
+	for c := 0; c < 3; c++ {
+		out3[c] = safe.Reshape3DFloat32(out[c], size[0], size[1], size[2])
+	}
+	core.Save(out3, "brute_out.gob")
 }
 
 // Run self-test and report estimated relative RMS error

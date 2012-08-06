@@ -71,5 +71,5 @@ func BenchmarkConv1_2DSmall(b *testing.B) {
 		conv.Pull(core.N())
 	}
 	b.StopTimer()
-	core.CleanExit()
+	core.Cleanup()
 }

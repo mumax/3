@@ -41,10 +41,10 @@ func BruteSymmetricConvolution(in_ [3][]float32, kern_ [3][3][]float32, size [3]
 					}
 
 					for dc := 0; dc < 3; dc++ {
-						k:=kern[sc][dc]
+						k := kern[sc][dc]
 						// nil-element means: use symmetric one
-						if k == nil{
-							k=kern[dc][sc]
+						if k == nil {
+							k = kern[dc][sc]
 						}
 						// skip zero kernel
 						if k == nil {

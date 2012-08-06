@@ -10,6 +10,7 @@ import (
 )
 
 func Save(v interface{}, file string) {
+	Debug("saving to", file)
 	out_, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	Fatal(err)
 	out := bufio.NewWriter(out_)

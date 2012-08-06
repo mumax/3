@@ -12,24 +12,40 @@ func TestConv(conv *Conv2) {
 	core.Log("Testing convolution")
 	size := conv.size
 	N := prod(size)
-	var in_ [3][]float32
+
+	in_ := conv.input
 	var in [3][][][]float32
 	for c := 0; c < 3; c++ {
-		in_[c] = make([]float32, N)
 		in[c] = safe.Reshape3DFloat32(in_[c], size[0], size[1], size[2])
 	}
 
-	in[2][0][0][0] = 1
+	in[2][0][0][0] = 1 // TODO
 
-	out := BruteSymmetricConvolution(in_, conv.kern, size)
+	ref := BruteSymmetricConvolution(conv.input, conv.kern, size)
 
-	core.Log("Brute-force convolution:")
+	conv.Push(N)
+	conv.Pull(N)
 
-	var out3 [3][][][]float32
+	core.Log("brute:", ref)
+	core.Log("ffted:", conv.output)
+
+	rms := 0.0
 	for c := 0; c < 3; c++ {
-		out3[c] = safe.Reshape3DFloat32(out[c], size[0], size[1], size[2])
+		for i := range ref[c] {
+			rms += sqr(float64(ref[c][i]) - float64(conv.output[c][i]))
+		}
 	}
-	core.Save(out3, "brute_out.gob")
+	rms = math.Sqrt(rms / float64(N))
+
+	core.Debug("conv RMS error:", rms)
+	if rms > FFT_TOLERANCE {
+		panic(fmt.Errorf("conv RMS error: %v > tolerance (%v)", rms, FFT_TOLERANCE))
+	}
+	if rms == 0 {
+		// Something is wrong with the test
+		panic(fmt.Errorf("conv RMS error: %v: too good to be true", rms))
+	}
+
 }
 
 // Run self-test and report estimated relative RMS error

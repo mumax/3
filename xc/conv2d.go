@@ -305,7 +305,8 @@ func scaleRealPartsSymm(dstList []float32, src safe.Float32s, scale float32) {
 	maximg := float32(0.)
 	maxreal := float32(0.)
 	for i := 0; i < src.Len()/2; i++ {
-		dstList[i] = srcList[2*i] * scale
+		dstList[i] = srcList[2*i] * scale // actual scaling
+
 		if fmath.Abs(srcList[2*i+0]) > maxreal {
 			maxreal = fmath.Abs(srcList[2*i+0])
 		}
@@ -315,11 +316,11 @@ func scaleRealPartsSymm(dstList []float32, src safe.Float32s, scale float32) {
 	}
 	// ...however, we check that the imaginary parts are nearly zero,
 	// just to be sure we did not make a mistake during kernel creation.
-	//core.Debug("FFT Kernel max imaginary part=", maximg)
-	//core.Debug("FFT Kernel max real part=", maxreal)
+	core.Debug("FFT Kernel max imaginary part=", maximg)
+	core.Debug("FFT Kernel max real part=", maxreal)
 	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
-		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=", maximg/maxreal))
+		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal))
 	}
 
 }

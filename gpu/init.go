@@ -1,15 +1,15 @@
 package gpu
 
 import (
-	"nimble-cube/core"
-	"github.com/barnex/cuda4/cu"
 	"flag"
+	"github.com/barnex/cuda4/cu"
+	"nimble-cube/core"
 	"runtime"
 	"sync/atomic"
 	"unsafe"
 )
 
-var(
+var (
 	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
 	flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 	// TODO: need -gpu=NUM flag

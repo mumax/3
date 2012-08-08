@@ -1,11 +1,11 @@
-package xc
+package gpu
 
 import (
 	"github.com/barnex/cuda4/cu"
 	"nimble-cube/core"
 )
 
-func min(a, b int) int {
+func Min(a, b int) int {
 	if a < b {
 		return a
 	}

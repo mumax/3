@@ -1,10 +1,11 @@
-package xc
+package conv
 
 import (
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
-	"nimble-cube/ptx"
+	"nimble-cube/gpu"
+	"nimble-cube/gpu/ptx"
 	"unsafe"
 )
 
@@ -12,8 +13,8 @@ var copyPadKern cu.Function
 
 // Copies src into dst (which is larger or smaller), at offset position.
 func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.Stream) {
-	core.Assert(dst.Len() == prod(dstsize))
-	core.Assert(src.Len() == prod(srcsize))
+	core.Assert(dst.Len() == core.Prod(dstsize))
+	core.Assert(src.Len() == core.Prod(srcsize))
 	// TODO: either remove offset or check offset
 
 	if copyPadKern == 0 {
@@ -25,8 +26,8 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 	srcptr := src.Pointer()
 
 	block := 16
-	gridJ := DivUp(min(dstsize[1], srcsize[1]), block)
-	gridK := DivUp(min(dstsize[2], srcsize[2]), block)
+	gridJ := gpu.DivUp(gpu.Min(dstsize[1], srcsize[1]), block)
+	gridK := gpu.DivUp(gpu.Min(dstsize[2], srcsize[2]), block)
 	shmem := 0
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&dstptr),

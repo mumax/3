@@ -5,11 +5,11 @@ import (
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
-	"nimble-cube/gpu"
 	"nimble-cube/core"
+	"nimble-cube/gpu"
 )
 
-// Straightforward convolution for 2D and 3D.
+// Straightforward convolution for 2D and 3D with symmetric kernel matrix.
 type Conv1 struct {
 	size          [3]int             // 3D size of the input/output data
 	n             int                // product of size
@@ -25,6 +25,7 @@ type Conv1 struct {
 	push          chan int            // signals input is ready up to the upper limit sent here
 	pull          chan int            // signals output is ready up to upper limit sent here
 	inframe       chan int            // signals one full input frame has been processed
+	initialized   chan int            // signals one full input frame has been processed
 	inAvailable   int                 // upper bound to where the input array is ready
 	inSent        [3]int              // upper bounds to where the input has been sent to device, per component
 	outAvailable  int                 // portion of output that is ready
@@ -251,10 +252,6 @@ func (c *Conv1) initFFTKern() {
 	realsize := ffted
 	realsize[2] /= 2
 
-	acc := 4
-	kern := magKernel(padded, core.CellSize(), core.Periodic(), acc)
-	c.kern = kern
-
 	for i := range c.fwPlan {
 		c.fftStr[i] = cu.StreamCreate()
 		c.fwPlan[i] = safe.FFT3DR2C(padded[0], padded[1], padded[2])
@@ -270,15 +267,11 @@ func (c *Conv1) initFFTKern() {
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			input.CopyHtoD(kern[i][j])
+			input.CopyHtoD(c.kern[i][j])
 			fwPlan.Exec(input, output)
 			fwPlan.Stream().Synchronize() // !!
 			c.fftKern[i][j] = make([]float32, prod(realsize))
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
-
-			if core.DEBUG {
-				core.Debug("~kern:", i, j, ":", core.Format(safe.Reshape3DFloat32(c.fftKern[i][j], realsize[0], realsize[1], realsize[2])))
-			}
 
 			// TODO: partially if low on mem.
 			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
@@ -312,7 +305,7 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	//core.Debug("FFT Kernel max real part=", maxreal)
 	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
-		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=", maximg/maxreal))
+		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal))
 	}
 
 }
@@ -337,7 +330,7 @@ func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
-func NewConv1(input, output [3][]float32, size [3]int) *Conv1 {
+func NewConv1(input, output [3][]float32, kernel [3][3][]float32, size [3]int) *Conv1 {
 	c := new(Conv1)
 	N := prod(size)
 	for c := 0; c < 3; c++ {
@@ -349,10 +342,12 @@ func NewConv1(input, output [3][]float32, size [3]int) *Conv1 {
 	c.n = prod(size)
 	c.input = input
 	c.output = output
-	core.Assert(core.NumWarp() > 0)
-	c.push = make(chan int, core.NumWarp()) // Buffer up to one frame. Less should not deadlock though.
-	c.pull = make(chan int, core.NumWarp()) // !! should buffer up to N/maxXfer ??
+	c.kern = kernel
+	c.push = make(chan int, core.DEFAULT_BUF) // Buffer a bit. Less should not deadlock though.
+	c.pull = make(chan int, core.DEFAULT_BUF) // !! should buffer up to N/maxXfer ??
 	c.inframe = make(chan int)
+	c.initialized = make(chan int)
 	go c.run()
+	<-c.initialized
 	return c
 }

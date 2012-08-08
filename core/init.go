@@ -21,6 +21,10 @@ var (
 	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")
 )
 
+var (
+	DEFAULT_BUF = 16 // Buffer size for channels
+)
+
 func init() {
 	flag.Parse()
 

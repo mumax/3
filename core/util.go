@@ -26,3 +26,11 @@ func Wrap(number, max int) int {
 	}
 	return number
 }
+
+func CheckEqualSize(a,b [3]int) {
+	for i, s := range a {
+		if s != b[i]{
+			Panic("Size mismatch:", a, "!=", b)
+		}
+	}
+}

@@ -9,10 +9,9 @@ import (
 	"nimble-cube/gpu"
 )
 
-// Straightforward convolution for 2D and 3D with symmetric kernel matrix.
-type Conv1 struct {
+type Symmetric struct {
 	size          [3]int             // 3D size of the input/output data
-	kernSize [3]int // Size of kernel and logical FFT size.
+	kernSize      [3]int             // Size of kernel and logical FFT size.
 	n             int                // product of size
 	input, output [3][]float32       // input/output arrays, 3 component vectors
 	realBuf       [3]safe.Float32s   // gpu buffer for real-space, unpadded input/output data
@@ -37,7 +36,7 @@ type Conv1 struct {
 
 // _______________________________________________ run
 
-func (c *Conv1) run() {
+func (c *Symmetric) run() {
 	core.Debug("run")
 
 	gpu.LockCudaThread()
@@ -58,9 +57,9 @@ func (c *Conv1) run() {
 
 // Update the output array at least to upto.
 // Blocks if needed.
-func (c *Conv1) Pull(upto int) {
+func (c *Symmetric) Pull(upto int) {
 	if upto > c.n {
-		panic(fmt.Errorf("xc.Conv1: Pull: upto out of bounds: %v", upto))
+		panic(fmt.Errorf("xc.Symmetric: Pull: upto out of bounds: %v", upto))
 	}
 
 	for upto > c.outAvailable {
@@ -71,20 +70,20 @@ func (c *Conv1) Pull(upto int) {
 	}
 }
 
-func (c *Conv1) downloadOutputFrame() {
+func (c *Symmetric) downloadOutputFrame() {
 	c.pull <- c.n
 }
 
 // _________________________________________________ convolution
 
-func (c *Conv1) syncFFTs() {
+func (c *Symmetric) syncFFTs() {
 	for _, s := range c.fftStr {
 		s.Synchronize()
 	}
 }
 
-func (c *Conv1) bwFFTAndDownloadAsync() {
-	padded := PadSize(c.size)
+func (c *Symmetric) bwFFTAndDownloadAsync() {
+	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
 	for i := 0; i < 3; i++ {
 		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i]) // uses stream c.fftStr[i]
@@ -98,7 +97,7 @@ func (c *Conv1) bwFFTAndDownloadAsync() {
 
 // Kernel multiplication. 
 // FFT's have to be synced first.
-func (c *Conv1) kernMul() {
+func (c *Symmetric) kernMul() {
 	if c.noKernMul {
 		core.Debug("skipping kernMul")
 		return
@@ -114,8 +113,8 @@ func (c *Conv1) kernMul() {
 
 // Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
-func (c *Conv1) fwFFTAsyncComp(i int) {
-	padded := PadSize(c.size)
+func (c *Symmetric) fwFFTAsyncComp(i int) {
+	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
 	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
@@ -127,9 +126,9 @@ func (c *Conv1) fwFFTAsyncComp(i int) {
 // Signals input[0:upper] is ready to be uploaded.
 // Only blocks if upper == len(input), after which
 // input may safely be overwritten by a new frame.
-func (c *Conv1) Push(upper int) {
+func (c *Symmetric) Push(upper int) {
 	if upper > c.n {
-		panic(fmt.Errorf("xc.Conv1: Push: upper out of bounds: %v", upper))
+		panic(fmt.Errorf("xc.Symmetric: Push: upper out of bounds: %v", upper))
 	}
 	c.push <- upper
 	if upper == c.n {
@@ -141,7 +140,7 @@ func (c *Conv1) Push(upper int) {
 // Upload one full input array to the GPU.
 // Start asynchronous FFT's on each component as soon as possible.
 // Wait for them by c.fftStr.Synchronize()
-func (c *Conv1) uploadInputFrameAndFFTAsync() {
+func (c *Symmetric) uploadInputFrameAndFFTAsync() {
 	ready := false
 	for !ready {
 
@@ -166,7 +165,7 @@ var maxXfer = 1024 * 1024 / 4 // 1MB todo: optimize.
 // preferentially send X component if possible, then Y, then Z.
 // Transfer sizes are limited to avoid sending a huge Z block
 // when not all X's have been transferred yet, e.g.
-func (c *Conv1) sendSomeInput() {
+func (c *Symmetric) sendSomeInput() {
 	for i, sent := range c.inSent {
 		if sent < c.inAvailable {
 			upper := c.inAvailable
@@ -192,7 +191,7 @@ func (c *Conv1) sendSomeInput() {
 
 // Is new  input available? 
 // I.e.: input that is ready but has not yet been sent.
-func (c *Conv1) haveInput() bool {
+func (c *Symmetric) haveInput() bool {
 	for _, sent := range c.inSent {
 		if sent < c.inAvailable {
 			return true
@@ -203,14 +202,14 @@ func (c *Conv1) haveInput() bool {
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Blocks until some new input becomes available due to a Push().
-func (c *Conv1) updInAvailableWait() {
+func (c *Symmetric) updInAvailableWait() {
 	c.inAvailable = <-c.push
 	c.updInAvailbleNoWait()
 }
 
 // Update c.inAvailable, the upper bound of ready input data.
 // Does not block. If no new input is available, nothing is updated.
-func (c *Conv1) updInAvailbleNoWait() {
+func (c *Symmetric) updInAvailbleNoWait() {
 	for havemore := true; havemore; {
 		select {
 		case c.inAvailable = <-c.push: // splice input blocks together
@@ -222,7 +221,7 @@ func (c *Conv1) updInAvailbleNoWait() {
 
 // _______________________________________________________  init
 
-func (c *Conv1) init() {
+func (c *Symmetric) init() {
 	core.Debug("init")
 
 	c.initPageLock()
@@ -231,14 +230,14 @@ func (c *Conv1) init() {
 	c.cpyStr = cu.StreamCreate()
 }
 
-func (c *Conv1) initPageLock() {
+func (c *Symmetric) initPageLock() {
 	for i := 0; i < 3; i++ {
 		gpu.MemHostRegister(c.input[i])
 		gpu.MemHostRegister(c.output[i])
 	}
 }
 
-func (c *Conv1) initBuffers() {
+func (c *Symmetric) initBuffers() {
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
 		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
@@ -246,8 +245,8 @@ func (c *Conv1) initBuffers() {
 	}
 }
 
-func (c *Conv1) initFFTKern() {
-	padded := PadSize(c.size)
+func (c *Symmetric) initFFTKern() {
+	padded := c.kernSize
 	ffted := FFTR2COutputSizeFloats(padded)
 	realsize := ffted
 	realsize[2] /= 2
@@ -314,29 +313,35 @@ func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }
 
-
 func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
-func NewSymmetric(input, output [3][]float32, kernel [3][3][]float32, size [3]int) *Conv1 {
-	c := new(Conv1)
-	N := prod(size)
-	for c := 0; c < 3; c++ {
-		if len(output[c]) != N || len(input[c]) != N {
-			panic(fmt.Errorf("xc.Conv1.Init: inconsistent sizes"))
+// Straightforward convolution for 2D and 3D with symmetric kernel matrix.
+func NewSymmetric(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *Symmetric {
+
+	c := new(Symmetric)
+
+	c.size = core.SizeOf(input_[0])
+	c.n = core.Prod(c.size)
+	for i := 0; i < 3; i++ {
+		core.CheckEqualSize(core.SizeOf(input_[i]), c.size)
+		core.CheckEqualSize(core.SizeOf(output_[i]), c.size)
+		c.input[i] = core.Contiguous(input_[i])
+		c.output[i] = core.Contiguous(output_[i])
+		for j := 0; j < 3; j++ {
+			if kernel[i][j] != nil {
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
+			}
 		}
 	}
-	c.size = size
-	c.n = prod(size)
-	c.input = input
-	c.output = output
-	c.kern = kernel
+	c.kernSize = core.SizeOf(kernel[0][0])
 	c.push = make(chan int, core.DEFAULT_BUF) // Buffer a bit. Less should not deadlock though.
 	c.pull = make(chan int, core.DEFAULT_BUF) // !! should buffer up to N/maxXfer ??
 	c.inframe = make(chan int)
 	c.initialized = make(chan int)
-	go c.run()
+
+	go c.run() // does further CUDA initialization in locked thread, then runs.
 	<-c.initialized
 	return c
 }

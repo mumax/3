@@ -113,16 +113,6 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 	return kern
 }
 
-// Wraps an index to [0, max] by adding/subtracting a multiple of max.
-func Wrap(number, max int) int {
-	for number < 0 {
-		number += max
-	}
-	for number >= max {
-		number -= max
-	}
-	return number
-}
 
 const (
 	X = 0

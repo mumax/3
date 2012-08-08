@@ -1,10 +1,6 @@
-package xc
+package core
 
 // Brute-force convolution.
-
-import (
-	"github.com/barnex/cuda4/safe"
-)
 
 // Brute-force O(N²) vector convolution. 
 // Used to verify FFT convolution.
@@ -12,24 +8,11 @@ import (
 // Kernel assumed symmtetric. 
 // If kern[i][j] is nil, use kern[j][i]. 
 // If that is nil too, use all 0's.
-func BruteSymmetricConvolution(in_ [3][]float32, kern_ [3][3][]float32, size [3]int) (out_ [3][]float32) {
+func BruteSymmetricConvolution(in [3][][][]float32, kern [3][3][][][]float32) [3][][][]float32 {
 
-	// setup 3D arrays
-	var in, out [3][][][]float32
-	for i := 0; i < 3; i++ {
-		in[i] = safe.Reshape3DFloat32(in_[i], size[0], size[1], size[2])
-		out_[i] = make([]float32, len(in_[i]))
-		out[i] = safe.Reshape3DFloat32(out_[i], size[0], size[1], size[2])
-	}
-	ksize := PadSize(size)
-	var kern [3][3][][][]float32
-	for s := 0; s < 3; s++ {
-		for d := 0; d < 3; d++ {
-			if kern_[s][d] != nil {
-				kern[s][d] = safe.Reshape3DFloat32(kern_[s][d], ksize[0], ksize[1], ksize[2])
-			}
-		}
-	}
+	size := SizeOf(in[0])
+	ksize := SizeOf(kern[0][0])
+	out := MakeVectors(size)
 
 	for sc := 0; sc < 3; sc++ {
 		for sx := 0; sx < size[0]; sx++ {
@@ -64,6 +47,5 @@ func BruteSymmetricConvolution(in_ [3][]float32, kern_ [3][3][]float32, size [3]
 			}
 		}
 	}
-
-	return
+	return out
 }

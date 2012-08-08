@@ -1,0 +1,4 @@
+/*
+ Magnetism functions.
+*/
+package mag

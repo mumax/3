@@ -1,10 +1,11 @@
-package xc
+package conv
 
 import (
 	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"github.com/barnex/fmath"
+	"nimble-cube/gpu"
 	"nimble-cube/core"
 )
 
@@ -37,7 +38,7 @@ type Conv1 struct {
 func (c *Conv1) run() {
 	core.Debug("run")
 
-	core.LockCudaThread()
+	gpu.LockCudaThread()
 	c.init() // continue initialization here, inside locked CUDA thread
 
 	for {
@@ -231,8 +232,8 @@ func (c *Conv1) init() {
 
 func (c *Conv1) initPageLock() {
 	for i := 0; i < 3; i++ {
-		core.MemHostRegister(c.input[i])
-		core.MemHostRegister(c.output[i])
+		gpu.MemHostRegister(c.input[i])
+		gpu.MemHostRegister(c.output[i])
 	}
 }
 

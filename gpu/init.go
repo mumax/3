@@ -1,23 +1,23 @@
 package gpu
 
 import (
-	"flag"
-	"github.com/barnex/cuda4/cu"
 	"nimble-cube/core"
+	"github.com/barnex/cuda4/cu"
+	"flag"
 	"runtime"
 	"sync/atomic"
 	"unsafe"
 )
 
-var (
+var(
 	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
 	flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
+	// TODO: need -gpu=NUM flag
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
 
 func init() {
-	core.Log("initializing CUDA")
 	var flag uint
 	switch *flag_sched {
 	default:
@@ -33,6 +33,8 @@ func init() {
 	}
 	cu.Init(0)
 	cudaCtx = cu.CtxCreate(flag, 0)
+	core.Log("CUDA version:", cu.Version())
+	// TODO: set device, Log device info
 }
 
 var lockCount int32

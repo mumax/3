@@ -12,6 +12,7 @@ import (
 // Straightforward convolution for 2D and 3D with symmetric kernel matrix.
 type Conv1 struct {
 	size          [3]int             // 3D size of the input/output data
+	kernSize [3]int // Size of kernel and logical FFT size.
 	n             int                // product of size
 	input, output [3][]float32       // input/output arrays, 3 component vectors
 	realBuf       [3]safe.Float32s   // gpu buffer for real-space, unpadded input/output data
@@ -83,7 +84,6 @@ func (c *Conv1) syncFFTs() {
 }
 
 func (c *Conv1) bwFFTAndDownloadAsync() {
-
 	padded := PadSize(c.size)
 	offset := [3]int{0, 0, 0}
 	for i := 0; i < 3; i++ {
@@ -314,23 +314,12 @@ func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }
 
-// Zero-padded size.
-func PadSize(size [3]int) [3]int {
-	padded := [3]int{
-		size[0] * 2,
-		size[1] * 2,
-		size[2] * 2}
-	if padded[0] == 2 {
-		padded[0] = 1 // no need to pad 1 layer thickness
-	}
-	return padded
-}
 
 func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
-func NewConv1(input, output [3][]float32, kernel [3][3][]float32, size [3]int) *Conv1 {
+func NewSymmetric(input, output [3][]float32, kernel [3][3][]float32, size [3]int) *Conv1 {
 	c := new(Conv1)
 	N := prod(size)
 	for c := 0; c < 3; c++ {

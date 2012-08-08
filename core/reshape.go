@@ -25,6 +25,14 @@ func SizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }
 
+// Reshape the block to one contiguous list.
+// Assumes the block's storage is contiguous,
+// like returned by MakeFloats.
+func Contiguous(block [][][]float32) []float32 {
+	N := Prod(SizeOf(block))
+	return block[0][0][:N]
+}
+
 //func Reshape3DFloat64(array []float64, Nx, Ny, Nz int) [][][]float64 {
 //	if Nx*Ny*Nz != len(array) {
 //		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))

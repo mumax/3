@@ -228,6 +228,7 @@ func (c *Symmetric) init() {
 	c.initFFTKern()
 	c.initBuffers() // alloc after kernel, when memory has been freed.
 	c.cpyStr = cu.StreamCreate()
+	c.initialized <- 1
 }
 
 func (c *Symmetric) initPageLock() {
@@ -343,5 +344,7 @@ func NewSymmetric(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) 
 
 	go c.run() // does further CUDA initialization in locked thread, then runs.
 	<-c.initialized
+
+	// TODO: verify here!
 	return c
 }

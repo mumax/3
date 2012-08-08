@@ -1,7 +1,6 @@
 package mag
 
 import (
-	"github.com/barnex/cuda4/safe"
 	"math"
 	"nimble-cube/core"
 )
@@ -9,19 +8,16 @@ import (
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces. Fields are evaluated at the
 // cell center (not averaged).
-func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) [3][3][]float32 {
+func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) [3][3][][][]float32 {
 	core.Debug("Calculating demag kernel", "size:", size, "cellsize:", cellsize, "accuracy:", accuracy, "periodic:", periodic)
 
 	core.Assert(size[0] > 0 && size[1] > 0 && size[2] > 0)
 	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-	N := core.Prod(size)
 
-	var kern [3][3][]float32
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			kern[i][j] = make([]float32, N)
-			array[i][j] = safe.Reshape3DFloat32(kern[i][j], size[0], size[1], size[2])
+			array[i][j] = core.MakeFloats(size)
 		}
 	}
 
@@ -53,11 +49,11 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 
 	for s := 0; s < 3; s++ { // source index Ksdxyz
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped. 
-			xw := Wrap(x, size[X])
+			xw := core.Wrap(x, size[X])
 			for y := y1; y <= y2; y++ {
-				yw := Wrap(y, size[Y])
+				yw := core.Wrap(y, size[Y])
 				for z := z1; z <= z2; z++ {
-					zw := Wrap(z, size[Z])
+					zw := core.Wrap(z, size[Z])
 					R[X] = float64(x) * cellsize[X]
 					R[Y] = float64(y) * cellsize[Y]
 					R[Z] = float64(z) * cellsize[Z]
@@ -110,7 +106,7 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 			}
 		}
 	}
-	return kern
+	return array
 }
 
 

@@ -1,10 +1,13 @@
-all: githook 6g #gccgo
+all: githook gofmt 6g #gccgo
 
 PKGS=\
 	core
 
 6g:
 	go install -v nimble-cube/$(PKGS)
+
+gofmt:
+	gofmt -w $(PKGS)/*.go
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 

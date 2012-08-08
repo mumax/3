@@ -1,10 +1,11 @@
-package xc
+package conv
 
 import (
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
-	"nimble-cube/ptx"
+	"nimble-cube/gpu"
+	"nimble-cube/gpu/ptx"
 	"unsafe"
 )
 
@@ -20,7 +21,7 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 	}
 
 	N := fftM[0].Len()
-	gridDim, blockDim := Make1DConf(N)
+	gridDim, blockDim := gpu.Make1DConf(N)
 
 	m0ptr := fftM[0].Pointer()
 	m1ptr := fftM[1].Pointer()

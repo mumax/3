@@ -33,6 +33,7 @@ func process(in io.Reader) {
 	err := r.Read()
 	for err != io.EOF {
 		core.Fatal(err)
+		r.Fprint(os.Stdout)
 		err = r.Read()
 	}
 }

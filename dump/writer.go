@@ -1,10 +1,10 @@
 package dump
 
 import (
-	"encoding/binary"
 	"hash"
 	"hash/crc64"
 	"io"
+	"encoding/binary"
 	"math"
 )
 
@@ -24,32 +24,36 @@ func NewWriter(out io.Writer) *Writer {
 }
 
 func (w *Writer) WriteHeader() {
-
+	w.writeString(MAGIC)
 	w.writeString(w.TimeLabel)
 	w.writeFloat64(w.Time)
 	w.writeString(w.SpaceLabel)
-	for _, c := range w.CellSize {
+	for _, c:=range w.CellSize{
 		w.writeFloat64(c)
 	}
-	//CellSize   [3]float64
-	//Rank       int
-	//Size       []int
-	//Precission int64
+	w.writeInt(w.Rank)
+	for _,s:=range w.Size{
+	w.writeInt(s)
+	}
+	w.writeInt(FLOAT32)
+	
+}
+
+func(w*Writer)count(n int, err error){
 
 }
 
-func (w *Writer) count(n int, err error) {
-
+func(w*Writer)writeFloat64(x float64){
+	w.writeUInt64(math.Float64bits(x)
 }
 
-func (w *Writer) writeFloat64(x float64) {
+func(w*Writer)writeString(x string){
+	w.count(w.out.Write(	
+}
+func(w*Writer)writeUInt64(x uint64){
 	var buf [8]byte
-	binary.PutUvarint(buf[:], math.Float64bits(w.Time))
+	binary.PutUvarint(buf[:], x)
 	w.count(w.out.Write(buf[:]))
-}
-
-func (w *Writer) writeString(x string) {
-
 }
 
 func (w *Writer) WriteData(data []float32) error {

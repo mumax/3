@@ -1,7 +1,14 @@
 package dump
 
+// Magic number
 const MAGIC = "#dump10\n"
 
+// Precision identifier
+const(
+	FLOAT32 = 4
+)
+
+// Header for dump data frame
 type Header struct {
 	TimeLabel  string
 	Time       float64

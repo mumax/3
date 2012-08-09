@@ -9,31 +9,37 @@ import (
 )
 
 var (
-	flag_crc = flag.Bool("crc", true, "Generate/check CRC64 checksums.")
+	flag_crc  = flag.Bool("crc", true, "Generate/check CRC checksums")
+	flag_show = flag.Bool("show", false, "Human-readible output to stdout")
 )
 
 func main() {
 	flag.Parse()
 	core.LOG = false
 
-	if flag.NArg() == 0 {
-		process(os.Stdin)
-	} else {
-		for _, arg := range flag.Args() {
-			f, err := os.Open(arg)
-			core.Fatal(err)
-			process(f)
-			f.Close()
-		}
+	for _, arg := range flag.Args() {
+		f, err := os.Open(arg)
+		core.Fatal(err)
+		read(f, arg)
+		f.Close()
 	}
 }
 
-func process(in io.Reader) {
+func read(in io.Reader, name string) {
 	r := dump.NewReader(in, *flag_crc)
 	err := r.Read()
 	for err != io.EOF {
 		core.Fatal(err)
-		r.Fprint(os.Stdout)
+		process(r, name)
 		err = r.Read()
+	}
+}
+
+func process(r *dump.Reader, name string) {
+	haveOutput := false
+
+	if !haveOutput || *flag_show {
+		r.Fprint(os.Stdout)
+		haveOutput = true
 	}
 }

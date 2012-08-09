@@ -30,12 +30,12 @@ func NewReader(in io.Reader, enableCRC bool) *Reader {
 // Reads one frame and stores it in r.Frame.
 func (r *Reader) Read() error {
 	r.Err = nil // clear previous error, if any
-	magic := r.readString()
+	r.Magic = r.readString()
 	if r.Err != nil {
 		return r.Err
 	}
-	if magic != MAGIC {
-		r.Err = fmt.Errorf("dump: bad magic number:%v", magic)
+	if r.Magic != MAGIC {
+		r.Err = fmt.Errorf("dump: bad magic number:%v", r.Magic)
 		return r.Err
 	}
 	r.TimeLabel = r.readString()
@@ -44,10 +44,10 @@ func (r *Reader) Read() error {
 	for i := range r.CellSize {
 		r.CellSize[i] = r.readFloat64()
 	}
-	r.Rank = int(r.readUint64())
+	r.Rank = r.toUInt(r.readUint64())
 	r.Size = make([]int, r.Rank)
 	for i := 0; i < r.Rank; i++ {
-		r.Size[i] = int(r.readUint64())
+		r.Size[i] = r.toUInt(r.readUint64())
 	}
 	r.Precission = r.readUint64()
 	if r.Err != nil {
@@ -66,6 +66,13 @@ func (r *Reader) Read() error {
 		r.Err = fmt.Errorf("dump CRC error: expected %x, got %x", r.CRC, mycrc)
 	}
 	return r.Err
+}
+
+func (r *Reader) toUInt(x uint64) int {
+	if uint64(int(x)) != x {
+		r.Err = fmt.Errorf("header value overflows int: %v", x)
+	}
+	return int(x)
 }
 
 // read until the buffer is full
@@ -127,7 +134,7 @@ func (r *Reader) Fprint(out io.Writer) {
 		fmt.Fprintln(out, r.Err)
 		return
 	}
-	fmt.Fprintf(out, "%#v\n", r.Header)
-	fmt.Fprintf(out, "Data%v\n", r.Data)
+	fmt.Fprintln(out, r.Header.String())
+	fmt.Fprintln(out, r.Data)
 	fmt.Fprintf(out, "ISO CRC64:%x\n", r.CRC)
 }

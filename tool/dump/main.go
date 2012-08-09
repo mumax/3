@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io"
+	"fmt"
 	"os"
 )
 
@@ -22,7 +22,7 @@ func main() {
 	}
 }
 
-func process(in io.Reader) {
+func process(in io.Reader){
 
 }
 

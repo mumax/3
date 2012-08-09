@@ -3,32 +3,26 @@ package main
 import (
 	"flag"
 	"io"
-	"fmt"
+	"nimble-cube/core"
 	"os"
 )
 
 func main() {
 	flag.Parse()
+	core.LOG = false
 
 	if flag.NArg() == 0 {
 		process(os.Stdin)
 	} else {
 		for _, arg := range flag.Args() {
 			f, err := os.Open(arg)
-			check(err)
+			core.Fatal(err)
 			process(f)
 			f.Close()
 		}
 	}
 }
 
-func process(in io.Reader){
+func process(in io.Reader) {
 
-}
-
-func check(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
 }

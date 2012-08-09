@@ -9,26 +9,31 @@ import (
 	"unsafe"
 )
 
+// Reads successive data frames in dump format.
 type Reader struct {
-	Frame
+	Frame       // Frame read by the last Read().
 	Bytes int64 // Total number of bytes read.
 	Err   error // Stores the latest I/O error, if any.
 	in    io.Reader
 	crc   hash.Hash64
 }
 
-func NewReader(in io.Reader) *Reader {
+func NewReader(in io.Reader, enableCRC bool) *Reader {
 	r := new(Reader)
 	r.in = in
-	r.crc = crc64.New(table)
+	if enableCRC {
+		r.crc = crc64.New(table)
+	}
 	return r
 }
 
-func (r *Reader) Read() {
+// Reads one frame and stores it in r.Frame.
+func (r *Reader) Read() error {
+	r.Err = nil // clear previous error, if any
 	magic := r.readString()
 	if magic != MAGIC {
 		r.Err = fmt.Errorf("dump: bad magic number:%v", magic)
-		return
+		return r.Err
 	}
 	r.TimeLabel = r.readString()
 	r.Time = r.readFloat64()
@@ -45,28 +50,32 @@ func (r *Reader) Read() {
 
 	r.readData()
 
-	mycrc := r.crc.Sum64()
-	r.CRC = r.readUint64()
-	if mycrc != r.CRC && r.Err == nil {
+	// Check CRC
+	var mycrc uint64 // checksum by this reader
+	if r.crc != nil {
+		mycrc = r.crc.Sum64()
+		r.crc.Reset() // reset for next frame
+	}
+	r.CRC = r.readUint64() // checksum from data stream. 0 means not set
+	if r.CRC != 0 && mycrc != r.CRC && r.Err == nil {
 		r.Err = fmt.Errorf("dump CRC error: expected %x, got %x", r.CRC, mycrc)
 	}
-	r.crc.Reset()
+	return r.Err
 }
 
-//w.count(w.out.Write((*(*[1<<31 - 1]byte)(unsafe.Pointer(&list[0])))[0 : 4*len(list)]))
-
+// read until the buffer is full
 func (r *Reader) read(buf []byte) {
 	n, err := io.ReadFull(r.in, buf[:])
 	r.Bytes += int64(n)
 	if err != nil {
 		r.Err = err
 	}
-	n, err = r.crc.Write(buf)
-	if err != nil {
-		panic(err)
+	if r.crc != nil {
+		r.crc.Write(buf)
 	}
 }
 
+// read a maximum 8-byte string
 func (r *Reader) readString() string {
 	var buf [8]byte
 	r.read(buf[:])
@@ -90,6 +99,8 @@ func (r *Reader) readUint64() uint64 {
 	return *((*uint64)(unsafe.Pointer(&buf[0])))
 }
 
+// read the data array, 
+// enlarging the previous one if needed.
 func (r *Reader) readData() {
 	N := 1
 	for _, s := range r.Size {
@@ -105,6 +116,7 @@ func (r *Reader) readData() {
 	r.read(buf)
 }
 
+// Print the last frame in human readable form
 func (r *Reader) Fprint(out io.Writer) {
 	if r.Err != nil {
 		fmt.Fprintln(out, r.Err)

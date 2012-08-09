@@ -11,7 +11,7 @@ import (
 func TestDump(t *testing.T) {
 	var buf_ bytes.Buffer
 	buf := &buf_
-	w := NewWriter(buf, CRC_ENABLED)
+	w := NewWriter(buf, CRC_DISABLED)
 
 	w.TimeLabel = "t(s)"
 	w.Time = 1e-15
@@ -33,9 +33,10 @@ func TestDump(t *testing.T) {
 		panic(w.Err)
 	}
 
+	//buf.Bytes()[17]=42// intro error
 	fmt.Println(hex.Dump(buf.Bytes()))
 
-	r := NewReader(buf)
+	r := NewReader(buf, CRC_ENABLED)
 	r.Read()
 	r.Fprint(os.Stdout)
 }

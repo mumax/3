@@ -15,6 +15,14 @@ const (
 	CRC_DISABLED = false
 )
 
+// Writes data frames in dump format.
+// Usage:
+// 	w := NewWriter(out, CRC_ENABLED)
+// 	// set desired w.Header fields
+// 	w.WriteHeader()
+// 	w.WriteData(array) // may be repeated
+// 	w.WriteHash()      // closes this frame.
+// 	// may be repeated.
 type Writer struct {
 	Header       // Written by WriteHeader().
 	Bytes  int64 // Total number of bytes written.
@@ -34,6 +42,7 @@ func NewWriter(out io.Writer, enableCRC bool) *Writer {
 	return w
 }
 
+// Writes the current header.
 func (w *Writer) WriteHeader() {
 	w.writeString(MAGIC)
 	w.writeString(w.TimeLabel)
@@ -49,10 +58,12 @@ func (w *Writer) WriteHeader() {
 	w.writeUInt64(FLOAT32)
 }
 
+// Writes the data.
 func (w *Writer) WriteData(list []float32) {
 	w.count(w.out.Write((*(*[1<<31 - 1]byte)(unsafe.Pointer(&list[0])))[0 : 4*len(list)]))
 }
 
+// Writes the accumulated hash of this frame, closing the frame.
 func (w *Writer) WriteHash() {
 	if w.crc == nil {
 		w.writeUInt64(0)

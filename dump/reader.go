@@ -25,18 +25,32 @@ func NewReader(in io.Reader) *Reader {
 }
 
 func (r *Reader) Read() {
-	//magic := r.readString()
+	magic := r.readString()
+	if magic != MAGIC {
+		r.Err = fmt.Errorf("dump: bad magic number:%v", magic)
+		return
+	}
 	r.TimeLabel = r.readString()
-	//r.writeFloat64(w.Time)
-	//r.writeString(w.SpaceLabel)
-	//for _, c := range w.CellSize {
-	//	w.writeFloat64(c)
-	//}
-	//w.writeUInt64(uint64(w.Rank))
-	//for _, s := range w.Size {
-	//	w.writeUInt64(uint64(s))
-	//}
-	//w.writeUInt64(FLOAT32)
+	r.Time = r.readFloat64()
+	r.SpaceLabel = r.readString()
+	for i := range r.CellSize {
+		r.CellSize[i] = r.readFloat64()
+	}
+	r.Rank = int(r.readUint64())
+	r.Size = make([]int, r.Rank)
+	for i := 0; i < r.Rank; i++ {
+		r.Size[i] = int(r.readUint64())
+	}
+	r.Precission = r.readUint64()
+
+	r.readData()
+
+	mycrc := r.crc.Sum64()
+	r.CRC = r.readUint64()
+	if mycrc != r.CRC && r.Err == nil {
+		r.Err = fmt.Errorf("dump CRC error: expected %x, got %x", r.CRC, mycrc)
+	}
+	r.crc.Reset()
 }
 
 //w.count(w.out.Write((*(*[1<<31 - 1]byte)(unsafe.Pointer(&list[0])))[0 : 4*len(list)]))
@@ -47,7 +61,10 @@ func (r *Reader) read(buf []byte) {
 	if err != nil {
 		r.Err = err
 	}
-	r.crc.Write(buf)
+	n, err = r.crc.Write(buf)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (r *Reader) readString() string {
@@ -63,7 +80,7 @@ func (r *Reader) readString() string {
 	return string(buf[:i])
 }
 
-func (r *Reader) ReadFloat64() float64 {
+func (r *Reader) readFloat64() float64 {
 	return math.Float64frombits(r.readUint64())
 }
 
@@ -73,8 +90,27 @@ func (r *Reader) readUint64() uint64 {
 	return *((*uint64)(unsafe.Pointer(&buf[0])))
 }
 
+func (r *Reader) readData() {
+	N := 1
+	for _, s := range r.Size {
+		N *= s
+	}
+	if cap(r.Data) < N {
+		r.Data = make([]float32, N)
+	}
+	if len(r.Data) < N {
+		r.Data = r.Data[:N]
+	}
+	buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&r.Data[0])))[0 : 4*len(r.Data)]
+	r.read(buf)
+}
+
 func (r *Reader) Fprint(out io.Writer) {
+	if r.Err != nil {
+		fmt.Fprintln(out, r.Err)
+		return
+	}
 	fmt.Fprintf(out, "%#v\n", r.Header)
-	fmt.Fprintf(out, "dump.Data%v\n", r.Data)
-	fmt.Fprintf(out, "dump.CRC%v\n", r.CRC)
+	fmt.Fprintf(out, "Data%v\n", r.Data)
+	fmt.Fprintf(out, "ISO CRC64:%x\n", r.CRC)
 }

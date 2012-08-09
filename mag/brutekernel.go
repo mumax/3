@@ -109,7 +109,6 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 	return array
 }
 
-
 const (
 	X = 0
 	Y = 1

@@ -9,5 +9,5 @@ type Header struct {
 	CellSize   [3]float64
 	Rank       int
 	Size       []int
-	Precission uint64
+	Precission int64
 }

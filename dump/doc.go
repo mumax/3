@@ -10,7 +10,7 @@
 	4 sizes for each direction, like: 3  128 256 1024
  	Precission of data: 4 for float32, 8 for float64
  	DATA
- 	crc64 of DATA and header.
+ 	crc64 of DATA and header using ISO polynomial 0xD800000000000000.
 */
 package dump
 

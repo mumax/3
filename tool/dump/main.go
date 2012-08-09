@@ -4,7 +4,12 @@ import (
 	"flag"
 	"io"
 	"nimble-cube/core"
+	"nimble-cube/dump"
 	"os"
+)
+
+var (
+	flag_crc = flag.Bool("crc", true, "Generate/check CRC64 checksums.")
 )
 
 func main() {
@@ -24,5 +29,10 @@ func main() {
 }
 
 func process(in io.Reader) {
-
+	r := dump.NewReader(in, *flag_crc)
+	err := r.Read()
+	for err != io.EOF {
+		core.Fatal(err)
+		err = r.Read()
+	}
 }

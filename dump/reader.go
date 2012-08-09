@@ -31,6 +31,9 @@ func NewReader(in io.Reader, enableCRC bool) *Reader {
 func (r *Reader) Read() error {
 	r.Err = nil // clear previous error, if any
 	magic := r.readString()
+	if r.Err != nil {
+		return r.Err
+	}
 	if magic != MAGIC {
 		r.Err = fmt.Errorf("dump: bad magic number:%v", magic)
 		return r.Err
@@ -47,7 +50,9 @@ func (r *Reader) Read() error {
 		r.Size[i] = int(r.readUint64())
 	}
 	r.Precission = r.readUint64()
-
+	if r.Err != nil {
+		return r.Err
+	}
 	r.readData()
 
 	// Check CRC

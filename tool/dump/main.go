@@ -6,12 +6,16 @@ import (
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"os"
+	"path"
 )
 
 var (
-	flag_crc    = flag.Bool("crc", true, "Generate/check CRC checksums")
-	flag_show   = flag.Bool("show", false, "Human-readible output to stdout")
-	flag_format = flag.String("f", "%v", "Printf format string")
+	flag_crc        = flag.Bool("crc", true, "Generate/check CRC checksums")
+	flag_show       = flag.Bool("show", false, "Human-readible output to stdout")
+	flag_format     = flag.String("f", "%v", "Printf format string")
+	flag_png        = flag.Bool("png", false, "PNG output")
+	flag_jpeg       = flag.Bool("jpeg", false, "JPEG output")
+	flag_colorscale = flag.String("colorscale", "auto", `Color scale: "auto" or min:max range`)
 )
 
 func main() {
@@ -42,8 +46,23 @@ func read(in io.Reader, name string) {
 func process(f *dump.Frame, name string) {
 	haveOutput := false
 
+	if *flag_jpeg {
+		dumpImage(f, noExt(name)+".jpg")
+		haveOutput = true
+	}
+
+	if *flag_png {
+		dumpImage(f, noExt(name)+".png")
+		haveOutput = true
+	}
+
 	if !haveOutput || *flag_show {
 		f.Fprintf(os.Stdout, *flag_format)
 		haveOutput = true
 	}
+}
+
+func noExt(file string) string {
+	ext := path.Ext(file)
+	return file[:len(file)-len(ext)]
 }

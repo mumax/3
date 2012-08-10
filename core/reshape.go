@@ -4,6 +4,8 @@ package core
 
 import "fmt"
 
+// Re-interpret a contiguous array as a multi-dimensional array of given size.
+// Underlying storage is shared.
 func Reshape(array []float32, size [3]int) [][][]float32 {
 	Nx, Ny, Nz := size[0], size[1], size[2]
 	if Nx*Ny*Nz != len(array) {
@@ -21,6 +23,8 @@ func Reshape(array []float32, size [3]int) [][][]float32 {
 	return sliced
 }
 
+// Re-interpret a contiguous array as a multi-dimensional array of given size.
+// Underlying storage is shared.
 func Reshape4D(list []float32, size []int) [][][][]float32 {
 	sliced := make([][][][]float32, size[0])
 	for i := range sliced {
@@ -48,56 +52,8 @@ func SizeOf(block [][][]float32) [3]int {
 
 // Reshape the block to one contiguous list.
 // Assumes the block's storage is contiguous,
-// like returned by MakeFloats.
+// like returned by MakeFloats or Reshape.
 func Contiguous(block [][][]float32) []float32 {
 	N := Prod(SizeOf(block))
 	return block[0][0][:N]
 }
-
-//func Reshape3DFloat64(array []float64, Nx, Ny, Nz int) [][][]float64 {
-//	if Nx*Ny*Nz != len(array) {
-//		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
-//	}
-//	sliced := make([][][]float64, Nx)
-//	for i := range sliced {
-//		sliced[i] = make([][]float64, Ny)
-//	}
-//	for i := range sliced {
-//		for j := range sliced[i] {
-//			sliced[i][j] = array[(i*Ny+j)*Nz+0 : (i*Ny+j)*Nz+Nz]
-//		}
-//	}
-//	return sliced
-//}
-//
-//func Reshape3DComplex64(array []complex64, Nx, Ny, Nz int) [][][]complex64 {
-//	if Nx*Ny*Nz != len(array) {
-//		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
-//	}
-//	sliced := make([][][]complex64, Nx)
-//	for i := range sliced {
-//		sliced[i] = make([][]complex64, Ny)
-//	}
-//	for i := range sliced {
-//		for j := range sliced[i] {
-//			sliced[i][j] = array[(i*Ny+j)*Nz+0 : (i*Ny+j)*Nz+Nz]
-//		}
-//	}
-//	return sliced
-//}
-//
-//func Reshape3DComplex128(array []complex128, Nx, Ny, Nz int) [][][]complex128 {
-//	if Nx*Ny*Nz != len(array) {
-//		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
-//	}
-//	sliced := make([][][]complex128, Nx)
-//	for i := range sliced {
-//		sliced[i] = make([][]complex128, Ny)
-//	}
-//	for i := range sliced {
-//		for j := range sliced[i] {
-//			sliced[i][j] = array[(i*Ny+j)*Nz+0 : (i*Ny+j)*Nz+Nz]
-//		}
-//	}
-//	return sliced
-//}

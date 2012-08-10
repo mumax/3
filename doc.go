@@ -3,10 +3,15 @@
 */
 package main
 
-import(
-_ "nimble-cube/core"
+import (
+	_ "nimble-cube/cli"
+	_ "nimble-cube/core"
+	_ "nimble-cube/dump"
+	_ "nimble-cube/gpu"
+	_ "nimble-cube/mag"
+	_ "nimble-cube/unit"
 )
 
-func main(){
+func main() {
 	// just a dummy. this file exists only for documentation
 }

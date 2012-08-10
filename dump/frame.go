@@ -49,13 +49,13 @@ precission: %v
 }
 
 // Print the frame in human readable form.
-func (f *Frame) Fprint(out io.Writer) {
+func (f *Frame) Fprintf(out io.Writer, format string) {
 	if f.Err != nil {
 		fmt.Fprintln(out, f.Err)
 		return
 	}
 	fmt.Fprintln(out, f.Header.String())
-	core.FprintTensors(out, f.Tensors())
+	core.Fprintf(out, format, f.Tensors())
 	fmt.Fprintf(out, "ISO CRC64:%x\n", f.CRC)
 }
 
@@ -65,7 +65,6 @@ func (f *Frame) Floats() [][][]float32 {
 		panic(fmt.Errorf("size should be [1, x, x, x], got %v", f.Size))
 	}
 	return x[0]
-
 }
 
 func (f *Frame) Vectors() [3][][][]float32 {

@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	flag_crc  = flag.Bool("crc", true, "Generate/check CRC checksums")
-	flag_show = flag.Bool("show", false, "Human-readible output to stdout")
+	flag_crc    = flag.Bool("crc", true, "Generate/check CRC checksums")
+	flag_show   = flag.Bool("show", false, "Human-readible output to stdout")
+	flag_format = flag.String("f", "%v", "Printf format string")
 )
 
 func main() {
@@ -33,16 +34,16 @@ func read(in io.Reader, name string) {
 	err := r.Read()
 	for err != io.EOF {
 		core.Fatal(err)
-		process(r, name)
+		process(&r.Frame, name)
 		err = r.Read()
 	}
 }
 
-func process(r *dump.Reader, name string) {
+func process(f *dump.Frame, name string) {
 	haveOutput := false
 
 	if !haveOutput || *flag_show {
-		r.Fprint(os.Stdout)
+		f.Fprintf(os.Stdout, *flag_format)
 		haveOutput = true
 	}
 }

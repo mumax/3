@@ -2,6 +2,7 @@ package dump
 
 import (
 	"fmt"
+	//"nimble-cube/core"
 	"hash"
 	"hash/crc64"
 	"io"
@@ -11,9 +12,7 @@ import (
 
 // Reads successive data frames in dump format.
 type Reader struct {
-	Frame       // Frame read by the last Read().
-	Bytes int64 // Total number of bytes read.
-	Err   error // Stores the latest I/O error, if any.
+	Frame // Frame read by the last Read().
 	in    io.Reader
 	crc   hash.Hash64
 }
@@ -126,15 +125,4 @@ func (r *Reader) readData() {
 	}
 	buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&r.Data[0])))[0 : 4*len(r.Data)]
 	r.read(buf)
-}
-
-// Print the last frame in human readable form
-func (r *Reader) Fprint(out io.Writer) {
-	if r.Err != nil {
-		fmt.Fprintln(out, r.Err)
-		return
-	}
-	fmt.Fprintln(out, r.Header.String())
-	fmt.Fprintln(out, r.Data)
-	fmt.Fprintf(out, "ISO CRC64:%x\n", r.CRC)
 }

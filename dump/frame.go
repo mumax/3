@@ -2,6 +2,8 @@ package dump
 
 import (
 	"fmt"
+	"io"
+	"nimble-cube/core"
 )
 
 // Magic number
@@ -15,8 +17,10 @@ const (
 // Header+data frame.
 type Frame struct {
 	Header
-	Data []float32
-	CRC  uint64
+	Data  []float32
+	CRC   uint64
+	Bytes int64 // Total number of bytes read.
+	Err   error // Stores the latest I/O error, if any.
 }
 
 // Header for dump data frame
@@ -42,4 +46,39 @@ func (h *Header) String() string {
       size: %v
 precission: %v
 `, h.Magic, h.TimeLabel, h.Time, h.SpaceLabel, h.CellSize, h.Rank, h.Size, h.Precission)
+}
+
+// Print the frame in human readable form.
+func (f *Frame) Fprint(out io.Writer) {
+	if f.Err != nil {
+		fmt.Fprintln(out, f.Err)
+		return
+	}
+	fmt.Fprintln(out, f.Header.String())
+	core.FprintTensors(out, f.Tensors())
+	fmt.Fprintf(out, "ISO CRC64:%x\n", f.CRC)
+}
+
+func (f *Frame) Floats() [][][]float32 {
+	x := f.Tensors()
+	if len(x) != 1 {
+		panic(fmt.Errorf("size should be [1, x, x, x], got %v", f.Size))
+	}
+	return x[0]
+
+}
+
+func (f *Frame) Vectors() [3][][][]float32 {
+	x := f.Tensors()
+	if len(x) != 3 {
+		panic(fmt.Errorf("size should be [3, x, x, x], got %v", f.Size))
+	}
+	return [3][][][]float32{x[0], x[1], x[2]}
+}
+
+func (f *Frame) Tensors() [][][][]float32 {
+	if f.Rank != 4 {
+		panic(fmt.Errorf("only rank 4 supported, got %v", f.Rank))
+	}
+	return core.Reshape4D(f.Data, f.Size)
 }

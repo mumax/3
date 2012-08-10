@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 	core.LOG = false
 
-	if flag.NArg() == 0{
+	if flag.NArg() == 0 {
 		read(os.Stdin, "")
 	}
 	for _, arg := range flag.Args() {

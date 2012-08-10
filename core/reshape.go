@@ -21,6 +21,27 @@ func Reshape(array []float32, size [3]int) [][][]float32 {
 	return sliced
 }
 
+func Reshape4D(list []float32, size []int) [][][][]float32 {
+	sliced := make([][][][]float32, size[0])
+	for i := range sliced {
+		sliced[i] = make([][][]float32, size[1])
+	}
+	for i := range sliced {
+		for j := range sliced[i] {
+			sliced[i][j] = make([][]float32, size[2])
+		}
+	}
+
+	for i := range sliced {
+		for j := range sliced[i] {
+			for k := range sliced[i][j] {
+				sliced[i][j][k] = list[((i*size[1]+j)*size[2]+k)*size[3]+0 : ((i*size[1]+j)*size[2]+k)*size[3]+size[3]]
+			}
+		}
+	}
+	return sliced
+}
+
 func SizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }

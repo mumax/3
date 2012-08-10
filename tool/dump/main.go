@@ -15,6 +15,7 @@ var (
 	flag_format     = flag.String("f", "%v", "Printf format string")
 	flag_png        = flag.Bool("png", false, "PNG output")
 	flag_jpeg       = flag.Bool("jpeg", false, "JPEG output")
+	flag_gnuplot    = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_colorscale = flag.String("colorscale", "auto", `Color scale: "auto" or min:max range`)
 )
 
@@ -53,6 +54,11 @@ func process(f *dump.Frame, name string) {
 
 	if *flag_png {
 		dumpImage(f, noExt(name)+".png")
+		haveOutput = true
+	}
+
+	if *flag_gnuplot {
+		dumpGnuplot(f, noExt(name)+".gplot")
 		haveOutput = true
 	}
 

@@ -1,4 +1,0 @@
-/*
-	Micromagnetism module
-*/
-package mm

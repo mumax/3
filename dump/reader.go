@@ -61,7 +61,9 @@ func (r *Reader) Read() error {
 		r.crc.Reset() // reset for next frame
 	}
 	r.CRC = r.readUint64() // checksum from data stream. 0 means not set
-	if r.CRC != 0 && mycrc != r.CRC && r.Err == nil {
+	if r.crc != nil && r.CRC != 0 &&
+		mycrc != r.CRC &&
+		r.Err == nil {
 		r.Err = fmt.Errorf("dump CRC error: expected %x, got %x", r.CRC, mycrc)
 	}
 	return r.Err

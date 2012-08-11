@@ -38,5 +38,5 @@ func TestDump(t *testing.T) {
 
 	r := NewReader(buf, CRC_ENABLED)
 	r.Read()
-	r.Fprintf(os.Stdout, "%v")
+	//r.Fprintf(os.Stdout, "%v")
 }

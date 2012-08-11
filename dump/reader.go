@@ -37,17 +37,17 @@ func (r *Reader) Read() error {
 		r.Err = fmt.Errorf("dump: bad magic number:%v", r.Magic)
 		return r.Err
 	}
-	r.TimeLabel = r.readString()
+	r.Components = r.readInt()
+	for i := range r.MeshSize {
+		r.MeshSize[i] = r.readInt()
+	}
+	for i := range r.MeshStep {
+		r.MeshStep[i] = r.readFloat64()
+	}
+	r.MeshUnit = r.readString()
 	r.Time = r.readFloat64()
-	r.SpaceLabel = r.readString()
-	for i := range r.CellSize {
-		r.CellSize[i] = r.readFloat64()
-	}
-	r.Rank = r.toUInt(r.readUint64())
-	r.Size = make([]int, r.Rank)
-	for i := 0; i < r.Rank; i++ {
-		r.Size[i] = r.toUInt(r.readUint64())
-	}
+	r.TimeUnit = r.readString()
+	r.DataLabel = r.readString()
 	r.Precission = r.readUint64()
 	if r.Err != nil {
 		return r.Err
@@ -64,14 +64,15 @@ func (r *Reader) Read() error {
 	if r.crc != nil && r.CRC != 0 &&
 		mycrc != r.CRC &&
 		r.Err == nil {
-		r.Err = fmt.Errorf("dump CRC error: expected %x, got %x", r.CRC, mycrc)
+		r.Err = fmt.Errorf("dump CRC error: expected %32x, got %32x", r.CRC, mycrc)
 	}
 	return r.Err
 }
 
-func (r *Reader) toUInt(x uint64) int {
+func (r *Reader) readInt() int {
+	x := r.readUint64()
 	if uint64(int(x)) != x {
-		r.Err = fmt.Errorf("header value overflows int: %v", x)
+		r.Err = fmt.Errorf("value overflows int: %v", x)
 	}
 	return int(x)
 }
@@ -116,7 +117,7 @@ func (r *Reader) readUint64() uint64 {
 // enlarging the previous one if needed.
 func (r *Reader) readData() {
 	N := 1
-	for _, s := range r.Size {
+	for _, s := range r.Size() {
 		N *= s
 	}
 	if cap(r.Data) < N {

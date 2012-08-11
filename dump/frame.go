@@ -26,26 +26,34 @@ type Frame struct {
 // Header for dump data frame
 type Header struct {
 	Magic      string
-	TimeLabel  string
+	Components int
+	MeshSize   [3]int
+	MeshStep   [3]float64
+	MeshUnit   string
 	Time       float64
-	SpaceLabel string
-	CellSize   [3]float64
-	Rank       int
-	Size       []int
+	TimeUnit   string
+	DataLabel  string
+	DataUnit   string
 	Precission uint64
+}
+
+func (h *Header) Size() []int {
+	return []int{h.Components, h.MeshSize[0], h.MeshSize[1], h.MeshSize[2]}
 }
 
 func (h *Header) String() string {
 	return fmt.Sprintf(
-		`     magic: %v
-    tlabel: %v
-         t: %v
-    rlabel: %v
-  cellsize: %v
-      rank: %v
-      size: %v
-precission: %v
-`, h.Magic, h.TimeLabel, h.Time, h.SpaceLabel, h.CellSize, h.Rank, h.Size, h.Precission)
+		`     Magic: %v
+Components: %v
+  MeshSize: %v
+  MeshStep: %v
+  MeshUnit: %v
+      Time: %v
+  TimeUnit: %v
+ DataLabel: %v
+  DataUnit: %v
+Precission: %v
+`, h.Magic, h.Components, h.MeshSize, h.MeshStep, h.MeshUnit, h.Time, h.TimeUnit, h.DataLabel, h.DataUnit, h.Precission)
 }
 
 // Print the frame in human readable form.
@@ -62,7 +70,7 @@ func (f *Frame) Fprintf(out io.Writer, format string) {
 func (f *Frame) Floats() [][][]float32 {
 	x := f.Tensors()
 	if len(x) != 1 {
-		panic(fmt.Errorf("size should be [1, x, x, x], got %v", f.Size))
+		panic(fmt.Errorf("expecting 1 component, got %v", f.Components))
 	}
 	return x[0]
 }
@@ -70,14 +78,11 @@ func (f *Frame) Floats() [][][]float32 {
 func (f *Frame) Vectors() [3][][][]float32 {
 	x := f.Tensors()
 	if len(x) != 3 {
-		panic(fmt.Errorf("size should be [3, x, x, x], got %v", f.Size))
+		panic(fmt.Errorf("expecting 3 components, got %v", f.Components))
 	}
 	return [3][][][]float32{x[0], x[1], x[2]}
 }
 
 func (f *Frame) Tensors() [][][][]float32 {
-	if f.Rank != 4 {
-		panic(fmt.Errorf("only rank 4 supported, got %v", f.Rank))
-	}
-	return core.Reshape4D(f.Data, f.Size)
+	return core.Reshape4D(f.Data, f.Size())
 }

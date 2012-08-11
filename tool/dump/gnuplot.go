@@ -22,8 +22,8 @@ func dumpGnuplot(f *dump.Frame, file string) {
 	defer out.Close()
 
 	data := f.Tensors()
-	gridsize := f.Size[1:]
-	cellsize := f.CellSize
+	gridsize := f.Size()[1:]
+	cellsize := f.MeshStep
 	ncomp := len(data)
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because

@@ -53,8 +53,8 @@ func writeOmfData(out io.Writer, q *dump.Frame, dataformat string) {
 
 // Writes the OMF header
 func writeOmfHeader(out io.Writer, q *dump.Frame) {
-	gridsize := q.Size[1:]
-	cellsize := q.CellSize
+	gridsize := q.Size()[1:]
+	cellsize := q.MeshStep
 
 	hdr(out, "OOMMF", "rectangular mesh v1.0")
 	hdr(out, "Segment count", "1")
@@ -63,9 +63,9 @@ func writeOmfHeader(out io.Writer, q *dump.Frame) {
 	hdr(out, "Begin", "Header")
 
 	dsc(out, "Time", q.Time)
-	hdr(out, "Title", "frame dump")
+	hdr(out, "Title", q.DataLabel)
 	hdr(out, "meshtype", "rectangular")
-	hdr(out, "meshunit", q.SpaceLabel)
+	hdr(out, "meshunit", q.MeshUnit)
 	hdr(out, "xbase", cellsize[Z]/2)
 	hdr(out, "ybase", cellsize[Y]/2)
 	hdr(out, "zbase", cellsize[X]/2)
@@ -92,7 +92,7 @@ func writeOmfHeader(out io.Writer, q *dump.Frame) {
 // Writes data in OMF Binary 4 format
 func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 	data := array.Tensors()
-	gridsize := array.Size[1:]
+	gridsize := array.Size()[1:]
 
 	var bytes []byte
 
@@ -106,7 +106,7 @@ func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
-	ncomp := array.Size[0]
+	ncomp := array.Size()[0]
 	for i := 0; i < gridsize[X]; i++ {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
@@ -125,15 +125,15 @@ func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 func writeOmfText(out io.Writer, tens *dump.Frame) {
 
 	data := tens.Tensors()
-	gridsize := tens.Size[1:]
+	gridsize := tens.Size()[1:]
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
 	for i := 0; i < gridsize[X]; i++ {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
-				for c := 0; c < tens.Size[0]; c++ {
-					_, err := fmt.Fprint(out, data[core.SwapIndex(c, tens.Size[0])][i][j][k], " ") // converts to user space.
+				for c := 0; c < tens.Size()[0]; c++ {
+					_, err := fmt.Fprint(out, data[core.SwapIndex(c, tens.Size()[0])][i][j][k], " ") // converts to user space.
 					core.Fatal(err)
 				}
 				_, err := fmt.Fprint(out, "\n")

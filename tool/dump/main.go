@@ -17,6 +17,7 @@ var (
 	flag_jpeg    = flag.Bool("jpeg", false, "JPEG output")
 	flag_gnuplot = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_omf     = flag.String("omf", "", `"text" or "binary" OMF output`)
+	flag_vtk     = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_min     = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max     = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 )
@@ -66,6 +67,11 @@ func process(f *dump.Frame, name string) {
 
 	if *flag_omf != "" {
 		dumpOmf(noExt(name)+".omf", f, *flag_omf)
+		haveOutput = true
+	}
+
+	if *flag_vtk != "" {
+		dumpVTK(noExt(name)+".vtk", f, *flag_vtk)
 		haveOutput = true
 	}
 

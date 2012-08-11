@@ -15,7 +15,7 @@ import (
 func dumpImage(f *dump.Frame, file string) {
 	var img *image.NRGBA
 	{
-		dim := f.Size[0]
+		dim := f.Size()[0]
 		switch dim {
 		default:
 			core.Fatal(fmt.Errorf("unsupported number of components: %v", dim))

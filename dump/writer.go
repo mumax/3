@@ -42,17 +42,6 @@ func NewWriter(out io.Writer, enableCRC bool) *Writer {
 	return w
 }
 
-//	Magic      string
-//	Components       int
-//	MeshSize       [3]int
-//	MeshStep   [3]float64
-//	MeshUnit string
-//	Time       float64
-//	TimeUnit  string
-//	DataLabel string
-//	DataUnit string
-//	Precission uint64
-
 // Writes the current header.
 func (w *Writer) WriteHeader() {
 	w.writeString(MAGIC)

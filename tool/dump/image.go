@@ -20,6 +20,9 @@ func dumpImage(f *dump.Frame, file string) {
 			core.Fatal(fmt.Errorf("unsupported number of components: %v", dim))
 		case 3:
 			img = DrawVectors(f.Vectors())
+		case 1:
+			min, max := extrema(f.Data)
+			img = DrawFloats(f.Floats(), min, max)
 		}
 	}
 

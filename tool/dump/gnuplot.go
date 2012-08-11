@@ -48,5 +48,4 @@ func dumpGnuplot(f *dump.Frame, file string) {
 		}
 		core.Fatal(err)
 	}
-
 }

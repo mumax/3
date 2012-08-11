@@ -10,13 +10,14 @@ import (
 )
 
 var (
-	flag_crc        = flag.Bool("crc", true, "Generate/check CRC checksums")
-	flag_show       = flag.Bool("show", false, "Human-readible output to stdout")
-	flag_format     = flag.String("f", "%v", "Printf format string")
-	flag_png        = flag.Bool("png", false, "PNG output")
-	flag_jpeg       = flag.Bool("jpeg", false, "JPEG output")
-	flag_gnuplot    = flag.Bool("gplot", false, "Gnuplot-compatible output")
-	flag_colorscale = flag.String("colorscale", "auto", `Color scale: "auto" or min:max range`)
+	flag_crc     = flag.Bool("crc", true, "Generate/check CRC checksums")
+	flag_show    = flag.Bool("show", false, "Human-readible output to stdout")
+	flag_format  = flag.String("f", "%v", "Printf format string")
+	flag_png     = flag.Bool("png", false, "PNG output")
+	flag_jpeg    = flag.Bool("jpeg", false, "JPEG output")
+	flag_gnuplot = flag.Bool("gplot", false, "Gnuplot-compatible output")
+	flag_min     = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
+	flag_max     = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 )
 
 func main() {

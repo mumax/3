@@ -9,6 +9,7 @@ import (
 	"nimble-cube/dump"
 	"os"
 	"path"
+	"strconv"
 )
 
 func dumpImage(f *dump.Frame, file string) {
@@ -22,6 +23,16 @@ func dumpImage(f *dump.Frame, file string) {
 			img = DrawVectors(f.Vectors())
 		case 1:
 			min, max := extrema(f.Data)
+			if *flag_min != "auto" {
+				m, err := strconv.ParseFloat(*flag_min, 32)
+				core.Fatal(err)
+				min = float32(m)
+			}
+			if *flag_max != "auto" {
+				m, err := strconv.ParseFloat(*flag_max, 32)
+				core.Fatal(err)
+				max = float32(m)
+			}
 			img = DrawFloats(f.Floats(), min, max)
 		}
 	}

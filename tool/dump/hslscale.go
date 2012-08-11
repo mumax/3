@@ -12,6 +12,7 @@ import (
 func DrawVectors(arr [3][][][]float32) *image.NRGBA {
 	h, w := len(arr[0][0]), len(arr[0][0][0])
 	d := len(arr[0])
+	norm := float32(d)
 	img := image.NewNRGBA(image.Rect(0, 0, w, h))
 	for i := 0; i < h; i++ {
 		for j := 0; j < w; j++ {
@@ -21,9 +22,9 @@ func DrawVectors(arr [3][][][]float32) *image.NRGBA {
 				y += arr[1][k][i][j]
 				z += arr[2][k][i][j]
 			}
-			x /= float32(d)
-			y /= float32(d)
-			z /= float32(d)
+			x /= norm
+			y /= norm
+			z /= norm
 			img.Set(j, (h-1)-i, HSLMap(z, y, x))
 		}
 	}

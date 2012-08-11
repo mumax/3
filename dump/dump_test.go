@@ -11,19 +11,19 @@ import (
 func TestDump(t *testing.T) {
 	var buf_ bytes.Buffer
 	buf := &buf_
-	w := NewWriter(buf, CRC_DISABLED)
+	w := NewWriter(buf, CRC_ENABLED)
 
-	w.TimeLabel = "t(s)"
+	w.TimeUnit = "s"
 	w.Time = 1e-15
-	w.SpaceLabel = "r(m)"
-	w.CellSize = [3]float64{1e-9, 2e-9, 3e-9}
-	size := [4]int{1, 2, 4, 9}
-	w.Rank = 4 // TODO: remove, detect form size
-	w.Size = size[:]
+	w.MeshUnit = "m"
+	w.MeshStep = [3]float64{1e-9, 2e-9, 3e-9}
+	size := [3]int{2, 4, 9}
+	w.Components = 1
+	w.MeshSize = size
 	w.Precission = FLOAT32
 
 	w.WriteHeader()
-	list := make([]float32, size[0]*size[1]*size[2]*size[3])
+	list := make([]float32, size[0]*size[1]*size[2]*1)
 	for i := range list {
 		list[i] = float32(i)
 	}
@@ -38,5 +38,5 @@ func TestDump(t *testing.T) {
 
 	r := NewReader(buf, CRC_ENABLED)
 	r.Read()
-	r.Fprint(os.Stdout)
+	r.Fprintf(os.Stdout, "%v")
 }

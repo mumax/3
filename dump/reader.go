@@ -48,6 +48,7 @@ func (r *Reader) Read() error {
 	r.Time = r.readFloat64()
 	r.TimeUnit = r.readString()
 	r.DataLabel = r.readString()
+	r.DataUnit = r.readString()
 	r.Precission = r.readUint64()
 	if r.Err != nil {
 		return r.Err
@@ -64,7 +65,7 @@ func (r *Reader) Read() error {
 	if r.crc != nil && r.CRC != 0 &&
 		mycrc != r.CRC &&
 		r.Err == nil {
-		r.Err = fmt.Errorf("dump CRC error: expected %32x, got %32x", r.CRC, mycrc)
+		r.Err = fmt.Errorf("dump CRC error: expected %16x, got %16x", r.CRC, mycrc)
 	}
 	return r.Err
 }

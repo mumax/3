@@ -1,7 +1,7 @@
 /*
  Binary output format.
  Header contains all 64-bit words. Strings are 8 bytes long.
-	Magic number "#dump101"
+	Magic number "#dump002"
 	Components int
 	MeshSize   [3]int
 	MeshStep   [3]float64

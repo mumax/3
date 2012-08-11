@@ -7,7 +7,7 @@ import (
 )
 
 // Magic number
-const MAGIC = "#dump101"
+const MAGIC = "#dump002"
 
 // Precision identifier
 const (

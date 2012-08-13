@@ -13,14 +13,18 @@ type LLGBox struct {
 	alpha          []float32
 	Torque         [3][]float32
 	hplan          *conv.Symmetric
+	//solver *Euler
 }
 
 func (box *LLGBox) Run() {
 
 	for {
 		for w := 0; w < box.nWarp; w++ {
-			start := w * box.WarpLen
+			start := w * box.warpLen
 			stop := (w + 1) * box.warpLen
+
+			box.hplan.Pull(stop)
+
 			for i := start; i < stop; i++ {
 
 				var m Vector
@@ -37,6 +41,8 @@ func (box *LLGBox) Run() {
 				box.Torque[Y][i] = t[Y]
 				box.Torque[Z][i] = t[Z]
 			}
+
+			//solver.
 		}
 	}
 }

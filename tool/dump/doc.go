@@ -4,5 +4,6 @@
  TODO: add dump output format :-)
  TODO: on error: print rouge file and continue with the others.
  TODO: add gzip support
+ TODO: add -update flag that updates only out-of-date files.
 */
 package main

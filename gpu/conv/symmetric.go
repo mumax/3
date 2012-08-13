@@ -248,7 +248,7 @@ func (c *Symmetric) initBuffers() {
 
 func (c *Symmetric) initFFTKern() {
 	padded := c.kernSize
-	ffted := FFTR2COutputSizeFloats(padded)
+	ffted := fftR2COutputSizeFloats(padded)
 	realsize := ffted
 	realsize[2] /= 2
 
@@ -314,7 +314,7 @@ func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }
 
-func FFTR2COutputSizeFloats(logicSize [3]int) [3]int {
+func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
@@ -337,8 +337,8 @@ func NewSymmetric(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) 
 		}
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
-	c.push = make(chan int, core.DEFAULT_BUF) // Buffer a bit. Less should not deadlock though.
-	c.pull = make(chan int, core.DEFAULT_BUF) // !! should buffer up to N/maxXfer ??
+	c.push = make(chan int, 100) // Buffer a bit. Less should not deadlock though.
+	c.pull = make(chan int, 100) // !! should buffer up to N/maxXfer ??
 	c.inframe = make(chan int)
 	c.initialized = make(chan int)
 

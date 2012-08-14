@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"nimble-cube/core"
+	"os"
 )
 
 // Magic number
@@ -65,6 +66,11 @@ func (f *Frame) Fprintf(out io.Writer, format string) {
 	fmt.Fprintln(out, f.Header.String())
 	core.Fprintf(out, format, f.Tensors())
 	fmt.Fprintf(out, "ISO CRC64:%x\n", f.CRC)
+}
+
+// Print the frame in human readable form to stdout using default formatting.
+func (f *Frame) Print() {
+	f.Fprintf(os.Stdout, "%v")
 }
 
 func (f *Frame) Floats() [][][]float32 {

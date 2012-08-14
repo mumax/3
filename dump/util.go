@@ -26,9 +26,10 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 				panic(err)
 			}
 			in := NewReader(f, crcEnabled)
+			in.Read()
 			for in.Err != io.EOF {
-				in.Read()
 				c <- &in.Frame
+				in.Read()
 			}
 		}
 		close(c)

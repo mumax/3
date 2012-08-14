@@ -1,4 +1,4 @@
-all: gofmt 6g #gccgo
+all: gccgo #6g
 
 6g:
 	go install -v 
@@ -9,5 +9,5 @@ gofmt:
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 
 gccgo:
-	go build -v -compiler $(GCCGO)
+	go install -v -compiler $(GCCGO)
 

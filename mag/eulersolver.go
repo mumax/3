@@ -1,15 +1,29 @@
 package mag
 
-import ()
+import (
+	"nimble-cube/core"
+)
 
 // Euler solver.
 type EulerBox struct {
+	size [3]int
+	n int
 	M              [3][]float32
+	Torque         [3][]float32
 	Time           float64
 	Dt             float64
 	Step           int
-	Torque         [3][]float32
-	nWarp, warpLen int
+	numSlice, sliceLen int
+}
+
+func NewEuler(size [3]int, numSlice)*EulerBox{
+	e := new(EulerBox)
+	e.size = size
+	e.n = core.Prod(size)
+	e.numSlice = numSlice
+	core.Assert(n%numSlice == 0)
+	e.sliceLen = n/numSlice	
+	return e
 }
 
 func (box *EulerBox) Run(steps int) {

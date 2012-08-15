@@ -10,7 +10,9 @@ func Exchange6(m [3][][][]float32, Hex [3][][][]float32) {
 	N0, N1, N2 := len(m[0]), len(m[0][0]), len(m[0][0][0])
 
 	for i := range m[0] {
+		// could hack in here (for 3D)...
 		for j := range m[0][i] {
+			// or here (for 2D) and synchronize
 			for k := range m[0][i][j] {
 				m0 := Vector{m[X][i][j][k],
 					m[Y][i][j][k],

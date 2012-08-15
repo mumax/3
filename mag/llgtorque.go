@@ -5,6 +5,24 @@ import (
 	"nimble-cube/gpu/conv"
 )
 
+func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
+	for i := range torque[0] {
+
+		var m_ Vector
+		var H_ Vector
+		m_[X], m_[Y], m_[Z] = m[X][i], m[Y][i], m[Z][i]
+		H_[X], H_[Y], H_[Z] = H[X][i], H[Y][i], H[Z][i]
+
+		mxh := m_.Cross(H_)
+		t_ := mxh.Sub(m_.Cross(mxh).Scaled(alpha[i]))
+
+		torque[X][i] = t_[X]
+		torque[Y][i] = t_[Y]
+		torque[Z][i] = t_[Z]
+	}
+}
+
+
 // Landau-Lifshitz torque.
 type LLGBox struct {
 	nWarp, warpLen int

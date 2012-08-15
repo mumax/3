@@ -13,7 +13,7 @@ func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
 		m_[X], m_[Y], m_[Z] = m[X][i], m[Y][i], m[Z][i]
 		H_[X], H_[Y], H_[Z] = H[X][i], H[Y][i], H[Z][i]
 
-		mxh := m_.Cross(H_)
+		mxh := m_.Cross(H_) // not inlined for some reason...
 		t_ := mxh.Sub(m_.Cross(mxh).Scaled(alpha[i]))
 
 		torque[X][i] = t_[X]
@@ -21,7 +21,6 @@ func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
 		torque[Z][i] = t_[Z]
 	}
 }
-
 
 // Landau-Lifshitz torque.
 type LLGBox struct {

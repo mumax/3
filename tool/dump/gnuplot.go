@@ -7,17 +7,15 @@ import (
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"os"
-)
-
-const (
-	X = iota
-	Y
-	Z
+	"bufio"
 )
 
 func dumpGnuplot(f *dump.Frame, file string) {
 
 	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	
+	out_buffered := bufio.NewWriter(out)
+	
 	core.Fatal(err)
 	defer out.Close()
 
@@ -37,7 +35,7 @@ func dumpGnuplot(f *dump.Frame, file string) {
 				_, err := fmt.Fprint(out, z, " ", y, " ", x, "\t")
 				core.Fatal(err)
 				for c := 0; c < ncomp; c++ {
-					_, err := fmt.Fprint(out, data[core.SwapIndex(c, ncomp)][i][j][k], " ") // converts to user space.
+					_, err := fmt.Fprint(out_buffered, data[core.SwapIndex(c, ncomp)][i][j][k], " ") // converts to user space.
 					core.Fatal(err)
 				}
 				_, err = fmt.Fprint(out, "\n")

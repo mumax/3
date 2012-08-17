@@ -31,6 +31,7 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 				c <- &in.Frame
 				in.Read()
 			}
+			f.Close()
 		}
 		close(c)
 	}()

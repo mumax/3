@@ -7,10 +7,12 @@ import (
 	"nimble-cube/dump"
 	"os"
 	"path"
+	"fmt"
 )
 
 var (
 	flag_crc     = flag.Bool("crc", true, "Generate/check CRC checksums")
+	flag_onefile = flag.Bool("onefile", false, "Using one file for output")
 	flag_show    = flag.Bool("show", false, "Human-readible output to stdout")
 	flag_format  = flag.String("f", "%v", "Printf format string")
 	flag_png     = flag.Bool("png", false, "PNG output")
@@ -40,10 +42,19 @@ func main() {
 func read(in io.Reader, name string) {
 	r := dump.NewReader(in, *flag_crc)
 	err := r.Read()
+	i := 0
+	ext := path.Ext(name)
+    woext := noExt(name)
 	for err != io.EOF {
 		core.Fatal(err)
-		process(&r.Frame, name)
+		tname := name
+		if !(*flag_onefile) {
+		    num := fmt.Sprintf("%06d", i)
+		    tname = woext + num + ext
+		}
+		process(&r.Frame, tname)
 		err = r.Read()
+		i = i + 1
 	}
 }
 

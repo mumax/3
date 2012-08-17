@@ -53,15 +53,20 @@ func (r *Reader) Read() error {
 	if r.Err != nil {
 		return r.Err
 	}
+
 	r.readData()
 
 	// Check CRC
 	var mycrc uint64 // checksum by this reader
 	if r.crc != nil {
 		mycrc = r.crc.Sum64()
-		r.crc.Reset() // reset for next frame
 	}
 	r.CRC = r.readUint64() // checksum from data stream. 0 means not set
+
+	if r.crc != nil {
+		r.crc.Reset() // reset for next frame
+	}
+
 	if r.crc != nil && r.CRC != 0 &&
 		mycrc != r.CRC &&
 		r.Err == nil {

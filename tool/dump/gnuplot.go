@@ -3,19 +3,19 @@ package main
 // Implements output for gnuplot's "splot"
 
 import (
+	"bufio"
 	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"os"
-	"bufio"
 )
 
 func dumpGnuplot(f *dump.Frame, file string) {
 
 	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	
+
 	out_buffered := bufio.NewWriter(out)
-	
+
 	core.Fatal(err)
 	defer out.Close()
 

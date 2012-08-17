@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"os"
 	"path"
-	"fmt"
 )
 
 var (
@@ -51,13 +51,13 @@ func read(in io.Reader, name string) {
 	err := r.Read()
 	i := 0
 	ext := path.Ext(name)
-    woext := noExt(name)
+	woext := noExt(name)
 	for err != io.EOF {
 		core.Fatal(err)
 		tname := name
 		if !(*flag_onefile) {
-		    num := fmt.Sprintf("%06d", i)
-		    tname = woext + num + ext
+			num := fmt.Sprintf("%06d", i)
+			tname = woext + num + ext
 		}
 		process(&r.Frame, tname)
 		err = r.Read()
@@ -82,12 +82,12 @@ func process(f *dump.Frame, name string) {
 		dumpGnuplot(f, noExt(name)+".gplot")
 		haveOutput = true
 	}
-    
-    if *flag_gnuplotgzip {
+
+	if *flag_gnuplotgzip {
 		dumpGnuplotGZip(f, noExt(name)+".gplot.gz")
 		haveOutput = true
 	}
-	
+
 	if *flag_omf != "" {
 		dumpOmf(noExt(name)+".omf", f, *flag_omf)
 		haveOutput = true

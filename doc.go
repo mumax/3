@@ -8,6 +8,8 @@ import (
 	_ "nimble-cube/core"
 	_ "nimble-cube/dump"
 	_ "nimble-cube/gpu"
+	_ "nimble-cube/gpu/ptx"
+	_ "nimble-cube/gpu/conv"
 	_ "nimble-cube/mag"
 	_ "nimble-cube/unit"
 )

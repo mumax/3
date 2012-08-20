@@ -18,6 +18,12 @@ test: 6gtest gccgotest
 
 6gtest:
 	go test 
+	make -C test
+	go test nimble-cube/core
+	go test nimble-cube/gpu
+	go test nimble-cube/dump
+	go test nimble-cube/mag
+	go test nimble-cube/unit
 
 gccgotest:
 	go test -compiler $(GCCGO)

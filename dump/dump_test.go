@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"testing"
 )
 

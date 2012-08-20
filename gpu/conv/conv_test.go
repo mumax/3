@@ -3,6 +3,7 @@ package conv
 import (
 	"nimble-cube/core"
 	"testing"
+	"time"
 )
 
 // some test sizes
@@ -13,11 +14,12 @@ var (
 )
 
 func TestSymmetric(test *testing.T) {
-	core.LOG = false
+	//core.LOG = false
 	for _, N0 := range N0s {
 		for _, N1 := range N1s {
 			for _, N2 := range N2s {
 				size := [3]int{N0, N1, N2}
+				core.Log("size:", size)
 				//cellsize := [3]float64{1e-9, 1e-9, 1e-9}
 				N := core.Prod(size)
 
@@ -48,6 +50,9 @@ func TestSymmetric(test *testing.T) {
 					output[1][N0/2][N1/2][N2/2] != 4 ||
 					output[2][N0/2][N1/2][N2/2] != 9 {
 					test.Error("size=", size, "got:", output[0][N0/2][N1/2][N2/2], output[1][N0/2][N1/2][N2/2], output[2][N0/2][N1/2][N2/2])
+					core.Log("FAIL size:", size)
+				} else {
+					core.Log(" OK  size:", size)
 				}
 				//conv.Free()
 			}

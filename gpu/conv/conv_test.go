@@ -5,20 +5,55 @@ import (
 	"testing"
 )
 
+// some test sizes
+var (
+	N0s = []int{1}
+	N1s = []int{1, 2, 3, 8, 32, 48, 63}
+	N2s = []int{1, 2, 3, 8, 32, 48, 128, 255}
+)
+
 func TestSymmetric(test *testing.T) {
-	size := [3]int{1, 32, 32}
-	cellsize := [3]float64{1e-9, 1e-9, 1e-9}
-	N := core.Prod(size)
+	core.LOG = false
+	for _, N0 := range N0s {
+		for _, N1 := range N1s {
+			for _, N2 := range N2s {
+				size := [3]int{N0, N1, N2}
+				//cellsize := [3]float64{1e-9, 1e-9, 1e-9}
+				N := core.Prod(size)
 
-	in := make([]float32, 3*N)
-	input := [3][]float32{in[0*N : 1*N], in[1*N : 2*N], in[2*N : 3*N]}
+				input := core.MakeVectors(size)
+				input[0][N0/2][N1/2][N2/2] = 1
+				input[1][N0/2][N1/2][N2/2] = 2
+				input[2][N0/2][N1/2][N2/2] = 3
+				output := core.MakeVectors(size)
 
-	out := make([]float32, 3*N)
-	output := [3][]float32{out[0*N : 1*N], out[1*N : 2*N], out[2*N : 3*N]}
+				ksize := core.PadSize(size, [3]int{0, 0, 0})
+				var kern [3][3][][][]float32
+				for i := 0; i < 3; i++ {
+					for j := i; j < 3; j++ {
+						kern[i][j] = core.MakeFloats(ksize)
+					}
+				}
+				kern[0][0][0][0][0] = 1
+				kern[1][1][0][0][0] = 2
+				kern[2][2][0][0][0] = 3
 
-	conv := NewSymmetric(input, output, kern, size)
+				conv := NewSymmetric(input, output, kern)
+				conv.Push(N)
+				conv.Pull(N)
 
-	TestConv(conv)
+				//core.Print(output)
+
+				if output[0][N0/2][N1/2][N2/2] != 1 ||
+					output[1][N0/2][N1/2][N2/2] != 4 ||
+					output[2][N0/2][N1/2][N2/2] != 9 {
+					test.Error("size=", size, "got:", output[0][N0/2][N1/2][N2/2], output[1][N0/2][N1/2][N2/2], output[2][N0/2][N1/2][N2/2])
+				}
+				//conv.Free()
+			}
+		}
+	}
+
 }
 
 //func BenchmarkConv1_2DSmall(b *testing.B) {

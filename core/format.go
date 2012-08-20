@@ -3,10 +3,20 @@ package core
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
 // Produces nicely formatted output for multi-dimensional arrays.
-// The format is applied to the individual numbers.
+func Print(array ...interface{}) {
+	Fprint(os.Stdout, array...)
+}
+
+// Produces nicely formatted output for multi-dimensional arrays.
+func Fprint(out io.Writer, array ...interface{}) {
+	Fprintf(out, "%v", array...)
+}
+
+// Produces nicely formatted output for multi-dimensional arrays.
 func Fprintf(out io.Writer, format string, array ...interface{}) {
 	for _, arr := range array {
 		switch a := arr.(type) {
@@ -20,11 +30,6 @@ func Fprintf(out io.Writer, format string, array ...interface{}) {
 			fmt.Fprintf(out, format, a)
 		}
 	}
-}
-
-// Produces nicely formatted output for multi-dimensional arrays.
-func Fprint(out io.Writer, array ...interface{}) {
-	Fprintf(out, "%v", array...)
 }
 
 // Produces nicely formatted output.

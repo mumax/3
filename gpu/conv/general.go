@@ -48,7 +48,13 @@ func (c *General) initFFTKern() {
 			c.gpuKern[i][j] = safe.MakeFloat32s(fftedlen)
 			c.gpuKern[i][j].Slice(0, reallen).CopyHtoD(c.kern[i][j])
 			fwPlan.Exec(c.gpuKern[i][j].Slice(0, reallen), c.gpuKern[i][j].Complex())
-			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
+			c.gpuKern[i][j].CopyDtoH(c.fftKern[i][j])
 		}
 	}
+
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			core.Print("kern", i, j, "\n", core.Reshape(c.kern[i][j],c.kernSize))
+	}}
+
 }

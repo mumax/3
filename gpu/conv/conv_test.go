@@ -9,12 +9,16 @@ import (
 // some test sizes
 var (
 	N0s = []int{1}
-	N1s = []int{1, 2, 3, 8, 32, 48, 63}
-	N2s = []int{1, 2, 3, 8, 32, 48, 128, 255}
+	N1s = []int{4}
+	N2s = []int{8}
+//	N0s = []int{1}
+//	N1s = []int{1, 2, 3, 8, 32, 48, 63}
+//	N2s = []int{1, 2, 3, 8, 32, 48, 128, 255}
 )
 
 func TestGeneral(test *testing.T) {
 	gpu.LockCudaThread()
+
 	//core.LOG = false
 	for _, N0 := range N0s {
 		for _, N1 := range N1s {

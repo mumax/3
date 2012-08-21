@@ -3,6 +3,7 @@ package conv
 import (
 	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
+	"nimble-cube/gpu"
 )
 
 // common data for all convolutions
@@ -23,8 +24,8 @@ type deviceData3 struct {
 	gpuKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 }
 
+// initialize host arrays and check sizes.
 func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) {
-
 	c.size = core.SizeOf(input_[0])
 	c.n = core.Prod(c.size)
 	for i := 0; i < 3; i++ {
@@ -39,4 +40,17 @@ func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]flo
 		}
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
+}
+
+// Page-lock host arrays if applicable.
+// Should be run in CUDA locked thread.
+func (c *hostData) initPageLock() {
+	for i := 0; i < 3; i++ {
+		gpu.MemHostRegister(c.input[i])
+		gpu.MemHostRegister(c.output[i])
+	}
+}
+
+func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
+	return [3]int{logicSize[0], logicSize[1], 2 * (logicSize[2]/2 + 1)}
 }

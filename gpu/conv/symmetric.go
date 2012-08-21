@@ -223,13 +223,6 @@ func (c *Symmetric) init() {
 	c.initialized <- 1
 }
 
-func (c *Symmetric) initPageLock() {
-	for i := 0; i < 3; i++ {
-		gpu.MemHostRegister(c.input[i])
-		gpu.MemHostRegister(c.output[i])
-	}
-}
-
 func (c *Symmetric) initBuffers() {
 	for i := 0; i < 3; i++ {
 		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
@@ -304,10 +297,6 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 
 func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
-}
-
-func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
-	return [3]int{logicSize[0], logicSize[1], logicSize[2] + 2}
 }
 
 // Straightforward convolution for 2D and 3D with symmetric kernel matrix.

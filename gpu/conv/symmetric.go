@@ -10,25 +10,20 @@ import (
 )
 
 type Symmetric struct {
-	common
-	realBuf      [3]safe.Float32s   // gpu buffer for real-space, unpadded input/output data
-	fftRBuf      [3]safe.Float32s   // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
-	fftCBuf      [3]safe.Complex64s // Complex ("output") for FFT, shares underlying storage with fftRBuf
+	hostData
+	deviceData3
 	fwPlan       [3]safe.FFT3DR2CPlan
 	bwPlan       [3]safe.FFT3DC2RPlan
-	kern         [3][3][]float32     // Real-space kernel
-	fftKern      [3][3][]float32     // FFT kernel on host
-	gpuKern      [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
-	push         chan int            // signals input is ready up to the upper limit sent here
-	pull         chan int            // signals output is ready up to upper limit sent here
-	inframe      chan int            // signals one full input frame has been processed
-	initialized  chan int            // signals one full input frame has been processed
-	inAvailable  int                 // upper bound to where the input array is ready
-	inSent       [3]int              // upper bounds to where the input has been sent to device, per component
-	outAvailable int                 // portion of output that is ready
-	cpyStr       cu.Stream           // stream for copies
-	fftStr       [3]cu.Stream        // streams for ffts of each component
-	noKernMul    bool                // disable kernel multiplication, used for self-test
+	push         chan int     // signals input is ready up to the upper limit sent here
+	pull         chan int     // signals output is ready up to upper limit sent here
+	inframe      chan int     // signals one full input frame has been processed
+	initialized  chan int     // signals one full input frame has been processed
+	inAvailable  int          // upper bound to where the input array is ready
+	inSent       [3]int       // upper bounds to where the input has been sent to device, per component
+	outAvailable int          // portion of output that is ready
+	cpyStr       cu.Stream    // stream for copies
+	fftStr       [3]cu.Stream // streams for ffts of each component
+	noKernMul    bool         // disable kernel multiplication, used for self-test
 }
 
 // _______________________________________________ run

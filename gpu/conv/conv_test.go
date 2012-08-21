@@ -3,7 +3,6 @@ package conv
 import (
 	"nimble-cube/core"
 	"testing"
-	"time"
 )
 
 // some test sizes

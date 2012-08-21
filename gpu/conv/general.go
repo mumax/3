@@ -2,7 +2,7 @@ package conv
 
 import (
 	"github.com/barnex/cuda4/safe"
-	//"nimble-cube/core"
+	"nimble-cube/core"
 )
 
 // General convolution, not optimized for specific cases.
@@ -48,7 +48,7 @@ func (c *General) initFFTKern() {
 			c.gpuKern[i][j] = safe.MakeFloat32s(fftedlen)
 			c.gpuKern[i][j].Slice(0, reallen).CopyHtoD(c.kern[i][j])
 			fwPlan.Exec(c.gpuKern[i][j].Slice(0, reallen), c.gpuKern[i][j].Complex())
-			c.gpuKern[i][j].CopyDtoH(c.fftKern[i][j])
+			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
 		}
 	}
 }

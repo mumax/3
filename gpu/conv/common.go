@@ -2,6 +2,7 @@ package conv
 
 import (
 	"github.com/barnex/cuda4/safe"
+	"nimble-cube/core"
 )
 
 // common data for all convolutions
@@ -20,4 +21,22 @@ type deviceData3 struct {
 	fftRBuf [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
 	fftCBuf [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
 	gpuKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+}
+
+func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) {
+
+	c.size = core.SizeOf(input_[0])
+	c.n = core.Prod(c.size)
+	for i := 0; i < 3; i++ {
+		core.CheckEqualSize(core.SizeOf(input_[i]), c.size)
+		core.CheckEqualSize(core.SizeOf(output_[i]), c.size)
+		c.input[i] = core.Contiguous(input_[i])
+		c.output[i] = core.Contiguous(output_[i])
+		for j := 0; j < 3; j++ {
+			if kernel[i][j] != nil {
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
+			}
+		}
+	}
+	c.kernSize = core.SizeOf(kernel[0][0])
 }

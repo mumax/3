@@ -315,20 +315,7 @@ func NewSymmetric(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) 
 
 	c := new(Symmetric)
 
-	c.size = core.SizeOf(input_[0])
-	c.n = core.Prod(c.size)
-	for i := 0; i < 3; i++ {
-		core.CheckEqualSize(core.SizeOf(input_[i]), c.size)
-		core.CheckEqualSize(core.SizeOf(output_[i]), c.size)
-		c.input[i] = core.Contiguous(input_[i])
-		c.output[i] = core.Contiguous(output_[i])
-		for j := 0; j < 3; j++ {
-			if kernel[i][j] != nil {
-				c.kern[i][j] = core.Contiguous(kernel[i][j])
-			}
-		}
-	}
-	c.kernSize = core.SizeOf(kernel[0][0])
+	c.hostData.init(input_, output_, kernel)
 	c.push = make(chan int, 100) // Buffer a bit. Less should not deadlock though.
 	c.pull = make(chan int, 100) // !! should buffer up to N/maxXfer ??
 	c.inframe = make(chan int)

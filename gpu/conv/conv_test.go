@@ -27,13 +27,11 @@ func TestGeneral(test *testing.T) {
 
 				size := [3]int{N0, N1, N2}
 				core.Log("size:", size)
-				//cellsize := [3]float64{1e-9, 1e-9, 1e-9}
-				//N := core.Prod(size)
 
 				input := core.MakeVectors(size)
-				input[0][N0/2][N1/2][N2/2] = 10
-				input[1][N0/2][N1/2][N2/2] = 20
-				input[2][N0/2][N1/2][N2/2] = 30
+				input[0][0][0][1] = 1
+				input[1][0][0][1] = 2
+				input[2][0][0][1] = 3
 				output := core.MakeVectors(size)
 
 				ksize := core.PadSize(size, [3]int{0, 0, 0})
@@ -44,28 +42,13 @@ func TestGeneral(test *testing.T) {
 						kern[j][i] = kern[i][j]
 					}
 				}
-				kern[0][0][0][0][0] = 1
-				kern[1][1][0][0][0] = 2
-				kern[2][2][0][0][0] = 3
-
-				//core.Print("kernel\n", kern)
+				kern[0][0][0][1][0] = 1
+				kern[1][1][0][1][0] = 1
+				kern[2][2][0][1][0] = 1
 
 				c := NewGeneral(input, output, kern)
 				c.Exec()
-				//	conv.Push(N)
-				//	conv.Pull(N)
 
-				//	//core.Print(output)
-
-				//	if output[0][N0/2][N1/2][N2/2] != 1 ||
-				//		output[1][N0/2][N1/2][N2/2] != 4 ||
-				//		output[2][N0/2][N1/2][N2/2] != 9 {
-				//		test.Error("size=", size, "got:", output[0][N0/2][N1/2][N2/2], output[1][N0/2][N1/2][N2/2], output[2][N0/2][N1/2][N2/2])
-				//		core.Log("FAIL size:", size)
-				//	} else {
-				//		core.Log(" OK  size:", size)
-				//	}
-				//conv.Free()
 			}
 		}
 	}

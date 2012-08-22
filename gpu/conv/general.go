@@ -2,7 +2,6 @@ package conv
 
 import (
 	"github.com/barnex/cuda4/safe"
-	"nimble-cube/core"
 )
 
 // General convolution, not optimized for specific cases.
@@ -17,25 +16,27 @@ type General struct {
 func (c *General) Exec() {
 	// Zero padding and forward FFTs.
 	for i := 0; i < 3; i++ {
-		core.Print("input", i, "\n", core.Reshape(c.input[i], c.IOSize()))
+		//core.Print("input", i, "\n", core.Reshape(c.input[i], c.IOSize()))
 		c.ioBuf[i].CopyHtoD(c.input[i])
-		core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
+		//core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
 		c.copyPadIOBuf(i)
-		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
+		//core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+		//core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 	}
 
+	// Kernel multiplication
 	kernMulC(c.fftCBuf, c.gpuFFTKern, stream0)
 
+	// Backward FFT and unpadding
 	for i := 0; i < 3; i++ {
-		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+		//core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
+		//core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
 		c.copyUnpadIOBuf(i)
-		core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
+		//core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
 		c.ioBuf[i].CopyDtoH(c.output[i])
-		core.Print("output", i, "\n", core.Reshape(c.output[i], c.IOSize()))
+		//core.Print("output", i, "\n", core.Reshape(c.output[i], c.IOSize()))
 	}
 }
 
@@ -81,12 +82,12 @@ func (c *General) initFFTKern() {
 		}
 	}
 
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			core.Print("kern", i, j, "\n", core.Reshape(c.kern[i][j], c.kernSize))
-			core.Print("fftKern", i, j, "\n", core.Reshape(c.fftKern[i][j], fftedsize))
-		}
-	}
+	//	for i := 0; i < 3; i++ {
+	//		for j := 0; j < 3; j++ {
+	//			core.Print("kern", i, j, "\n", core.Reshape(c.kern[i][j], c.kernSize))
+	//			core.Print("fftKern", i, j, "\n", core.Reshape(c.fftKern[i][j], fftedsize))
+	//		}
+	//	}
 
 }
 

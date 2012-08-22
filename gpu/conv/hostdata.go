@@ -7,17 +7,28 @@ import (
 
 // common data for all convolutions
 type hostData struct {
-	size          [3]int          // 3D size of the input/output data
-	kernSize      [3]int          // Size of kernel and logical FFT size.
-	n             int             // product of size
-	input, output [3][]float32    // input/output arrays, 3 component vectors
-	kern          [3][3][]float32 // Real-space kernel
-	fftKern       [3][3][]float32 // FFT kernel on host
+	size          [3]int           // 3D size of the input/output data
+	kernSize      [3]int           // Size of kernel and logical FFT size.
+	n             int              // product of size
+	input, output [3][]float32     // input/output as contiguous lists, 3 component vectors
+	inArr, outArr [3][][][]float32 // input/output as 3D array.
+	kern          [3][3][]float32  // Real-space kernel
+	fftKern       [3][3][]float32  // FFT kernel on host
 }
 
 // Size of the input and output arrays.
 func (c *hostData) IOSize() [3]int {
 	return c.size
+}
+
+// Input data.
+func (c *hostData) Input() [3][][][]float32 {
+	return c.inArr
+}
+
+// Output data.
+func (c *hostData) Output() [3][][][]float32 {
+	return c.outArr
 }
 
 // Size of the convolution kernel, in real space.
@@ -43,6 +54,8 @@ func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]flo
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
 	core.Debug("convolution i/o size:", c.IOSize(), "kernel size:", c.KernelSize())
+	c.inArr = input_
+	c.outArr = output_
 }
 
 // Page-lock host arrays if applicable.

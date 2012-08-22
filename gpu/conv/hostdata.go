@@ -48,7 +48,6 @@ func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]flo
 		}
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
-	core.Debug("convolution i/o size:", c.size, "kernel size:", c.kernSize)
 	c.inArr = input_
 	c.outArr = output_
 	c.kernArr = kernel

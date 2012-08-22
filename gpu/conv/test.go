@@ -49,14 +49,15 @@ func Test(c Conv) {
 		}
 	}
 
-	//core.Print("input:\n", input)
-
+	// Reference solution
 	bruteOut := core.MakeVectors(size)
 	Brute(input, bruteOut, c.Kernel())
-	ref := core.Contiguous3(bruteOut) // reference solution.
+	ref := core.Contiguous3(bruteOut)
 
+	// solution under test
 	c.Exec()
 
+	// check if error is OK
 	var maxerr float32
 	for c := range in {
 		for i := range in[c] {
@@ -65,7 +66,6 @@ func Test(c Conv) {
 			}
 		}
 	}
-
 	const tolerance = 1e-5
 	if maxerr > tolerance {
 		core.Fprint(os.Stderr, "expected:\n", bruteOut)
@@ -73,6 +73,14 @@ func Test(c Conv) {
 		panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 	}
 	core.Log("convolution test error:", maxerr)
+
+	// cleanly set input/output to zero
+	for i := range in {
+		for j := range in[i] {
+			in[i][j] = 0
+			out[i][j] = 0
+		}
+	}
 }
 
 func rnd() float32 {

@@ -1,10 +1,11 @@
 
-// Micromagnetic kernel multiplication:
+// Micromagnetic kernel multiplication
+// with purely real, symmetric kernel.
 // |Mx|   |Kxx Kxy Kxz|   |Mx|
 // |My| = |Kxy Kyy Kyz| * |My|
 // |Mz|   |Kxz Kyz Kzz|   |Mz|
 extern "C" __global__ void 
-kernmul(float* fftMx,  float* fftMy,  float* fftMz,
+kernmulRSymm(float* fftMx,  float* fftMy,  float* fftMz,
         float* fftKxx, float* fftKyy, float* fftKzz,
         float* fftKyz, float* fftKxz, float* fftKxy, int N){
 

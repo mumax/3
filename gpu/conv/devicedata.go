@@ -12,6 +12,7 @@ type deviceData3 struct {
 	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 }
 
+// Initialize GPU buffers.
 func (c *deviceData3) init(inputSize, kernelSize [3]int) {
 	for i := 0; i < 3; i++ {
 		c.ioBuf[i] = safe.MakeFloat32s(prod(inputSize))

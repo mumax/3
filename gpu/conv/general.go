@@ -1,19 +1,39 @@
 package conv
 
 import (
+	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 )
 
 // General convolution, not optimized for specific cases.
+// Also not concurrent.
 type General struct {
 	hostData    // sizes, host input/output/kernel arrays
-	deviceData3 // device buffers
+	deviceData3 // device buffers // could use just one ioBuf
 	fwPlan      safe.FFT3DR2CPlan
 	bwPlan      safe.FFT3DC2RPlan
 }
 
 func (c *General) Exec() {
+	for i := 0; i < 3; i++ {
+		core.Print("input", i, "\n", core.Reshape(c.input[i], c.IOSize()))
+		c.ioBuf[i].CopyHtoD(c.input[i])
+		core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
+		c.copyPadIOBuf(i)
+		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
+	}
+}
+
+// Copy ioBuf[i] to fftRBuf[i], adding padding :-).
+func (c *General) copyPadIOBuf(i int) {
+	stream0 := cu.Stream(0)
+	offset := [3]int{0, 0, 0}
+	c.fftRBuf[i].Memset(0) // copypad does NOT zero remainder.
+	stream0.Synchronize()
+	copyPad(c.fftRBuf[i], c.ioBuf[i], c.kernSize, c.size, offset, stream0)
+	stream0.Synchronize()
+	c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 }
 
 // Size of the FFT'ed kernel expressed in number of floats.

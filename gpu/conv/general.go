@@ -73,11 +73,12 @@ func (c *General) initFFTKern() {
 
 	fwPlan := c.fwPlan // could use any
 
+	norm := float32(1 / float64(prod(c.kernSize)))
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			c.fftKern[i][j] = make([]float32, fftedlen)
 			c.gpuFFTKern[i][j] = safe.MakeFloat32s(fftedlen)
-			c.gpuFFTKern[i][j].Slice(0, reallen).CopyHtoD(c.kern[i][j])
+			c.gpuFFTKern[i][j].Slice(0, reallen).CopyHtoD(scaled(c.kern[i][j], norm))
 			fwPlan.Exec(c.gpuFFTKern[i][j].Slice(0, reallen), c.gpuFFTKern[i][j].Complex())
 			c.gpuFFTKern[i][j].CopyDtoH(c.fftKern[i][j])
 		}
@@ -89,7 +90,14 @@ func (c *General) initFFTKern() {
 	//			core.Print("fftKern", i, j, "\n", core.Reshape(c.fftKern[i][j], fftedsize))
 	//		}
 	//	}
+}
 
+func scaled(x []float32, s float32) []float32 {
+	out := make([]float32, len(x))
+	for i := range x {
+		out[i] = x[i] * s
+	}
+	return out
 }
 
 // Initializes the FFT plans.
@@ -110,6 +118,8 @@ func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *G
 	c.initFFT()
 	c.initFFTKern()
 	c.deviceData3.init(c.size, c.kernSize)
+
+	Test(c)
 
 	return c
 }

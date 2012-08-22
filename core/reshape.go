@@ -57,3 +57,10 @@ func Contiguous(block [][][]float32) []float32 {
 	N := Prod(SizeOf(block))
 	return block[0][0][:N]
 }
+
+// Reshape the vector block to three contiguous lists.
+// Assumes the components's storage are individually contiguous,
+// like returned by MakeVectors.
+func Contiguous3(v [3][][][]float32)[3][]float32{
+	return [3][]float32{Contiguous(v[0]),Contiguous(v[1]),  Contiguous(v[2]) }
+}

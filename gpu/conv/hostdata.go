@@ -1,7 +1,6 @@
 package conv
 
 import (
-	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
 )
@@ -14,6 +13,22 @@ type hostData struct {
 	input, output [3][]float32    // input/output arrays, 3 component vectors
 	kern          [3][3][]float32 // Real-space kernel
 	fftKern       [3][3][]float32 // FFT kernel on host
+}
+
+// Size of the input and output arrays.
+func (c *hostData) IOSize() [3]int {
+	return c.size
+}
+
+// Size of the convolution kernel, in real space.
+func (c *hostData) KernelSize() [3]int {
+	return c.kernSize
+}
+
+// Logic size of FFT on input/output data.
+// Same as KernelSize().
+func (c *hostData) FFTLogicSize() [3]int {
+	return c.kernSize
 }
 
 // initialize host arrays and check sizes.
@@ -43,6 +58,7 @@ func (c *hostData) initPageLock() {
 	}
 }
 
+// Output size of R2C FFT with given logic size, expressed in floats.
 func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], 2 * (logicSize[2]/2 + 1)}
 }

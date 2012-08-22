@@ -79,8 +79,8 @@ func (c *Symmetric) bwFFTAndDownloadAsync() {
 	offset := [3]int{0, 0, 0}
 	for i := 0; i < 3; i++ {
 		c.bwPlan[i].Exec(c.fftCBuf[i], c.fftRBuf[i]) // uses stream c.fftStr[i]
-		copyPad(c.realBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
-		c.realBuf[i].CopyDtoHAsync(c.output[i], c.fftStr[i])
+		copyPad(c.ioBuf[i], c.fftRBuf[i], c.size, padded, offset, c.fftStr[i])
+		c.ioBuf[i].CopyDtoHAsync(c.output[i], c.fftStr[i])
 	}
 
 	//TODO: slice only the last one in blocks
@@ -103,13 +103,13 @@ func (c *Symmetric) kernMul() {
 	c.cpyStr.Synchronize()
 }
 
-// Copy+zeropad input buffer (realBuf) to FFT buffer (fftRBuf),
+// Copy+zeropad input buffer (ioBuf) to FFT buffer (fftRBuf),
 // then in-place FFT. Asynchronous.
 func (c *Symmetric) fwFFTAsyncComp(i int) {
 	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].MemsetAsync(0, c.fftStr[i]) // copypad does NOT zero remainder.
-	copyPad(c.fftRBuf[i], c.realBuf[i], padded, c.size, offset, c.fftStr[i])
+	copyPad(c.fftRBuf[i], c.ioBuf[i], padded, c.size, offset, c.fftStr[i])
 	c.fwPlan[i].Exec(c.fftRBuf[i], c.fftCBuf[i])
 }
 
@@ -171,7 +171,7 @@ func (c *Symmetric) sendSomeInput() {
 				}
 			}
 
-			c.realBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.fftStr[i])
+			c.ioBuf[i].Slice(sent, upper).CopyHtoDAsync(c.input[i][sent:upper], c.fftStr[i])
 			c.inSent[i] = upper
 			if c.inSent[i] == c.n { // component ready
 				c.fwFFTAsyncComp(i) // start FFT'ing it, uses c.fftStr[i]
@@ -218,11 +218,10 @@ func (c *Symmetric) init() {
 
 	c.initPageLock()
 	c.initFFTKern()
-	c.initBuffers() // alloc after kernel, when memory has been freed.
+	panic("c.deviceData3.init()")
 	c.cpyStr = cu.StreamCreate()
 	c.initialized <- 1
 }
-
 
 func (c *Symmetric) initFFTKern() {
 	padded := c.kernSize

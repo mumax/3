@@ -13,29 +13,12 @@ type General struct {
 	bwPlan      safe.FFT3DC2RPlan
 }
 
-func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *General {
-	c := new(General)
-	c.hostData.init(input_, output_, kernel)
-
-	// need cuda thread lock from here on:
-	c.hostData.initPageLock()
-	c.initFFT()
-	c.initFFTKern()
-
-	return c
+func (c *General) Exec() {
 }
 
-func(c*General)Exec(){
-	c.input
-}
-
-// Initializes the FFT plans.
-func (c *General) initFFT() {
-	padded := c.kernSize
-	//realsize := fftR2COutputSizeFloats(padded)
-	c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
-	c.bwPlan = safe.FFT3DC2R(padded[0], padded[1], padded[2])
-	// no streams set yet
+// Size of the FFT'ed kernel expressed in number of floats.
+func (c *General) FFTKernelSizeFloats() [3]int {
+	return fftR2COutputSizeFloats(c.FFTLogicSize())
 }
 
 // Initializes c.gpuFFTKern and c.fftKern
@@ -64,4 +47,26 @@ func (c *General) initFFTKern() {
 		}
 	}
 
+}
+
+// Initializes the FFT plans.
+func (c *General) initFFT() {
+	padded := c.kernSize
+	//realsize := fftR2COutputSizeFloats(padded)
+	c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
+	c.bwPlan = safe.FFT3DC2R(padded[0], padded[1], padded[2])
+	// no streams set yet
+}
+
+func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *General {
+	c := new(General)
+	c.hostData.init(input_, output_, kernel)
+
+	// need cuda thread lock from here on:
+	c.hostData.initPageLock()
+	c.initFFT()
+	c.initFFTKern()
+	panic("c.deviceData3.init(")
+
+	return c
 }

@@ -97,8 +97,8 @@ func (c *Symmetric) kernMul() {
 
 	core.Debug("kernMul")
 	kernMul(c.fftCBuf,
-		c.gpuKern[0][0], c.gpuKern[1][1], c.gpuKern[2][2],
-		c.gpuKern[1][2], c.gpuKern[0][2], c.gpuKern[0][1],
+		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
+		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
 		c.cpyStr)
 	c.cpyStr.Synchronize()
 }
@@ -259,8 +259,8 @@ func (c *Symmetric) initFFTKern() {
 			scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 
 			// TODO: partially if low on mem.
-			c.gpuKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-			c.gpuKern[i][j].CopyHtoD(c.fftKern[i][j])
+			c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
+			c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
 		}
 	}
 }

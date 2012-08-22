@@ -33,8 +33,8 @@ func (c *General) initFFT() {
 	// no streams set yet
 }
 
+// Initializes c.gpuFFTKern and c.fftKern
 func (c *General) initFFTKern() {
-
 	realsize := c.kernSize
 	reallen := prod(realsize)
 	fftedsize := fftR2COutputSizeFloats(realsize)
@@ -45,10 +45,10 @@ func (c *General) initFFTKern() {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			c.fftKern[i][j] = make([]float32, fftedlen)
-			c.gpuKern[i][j] = safe.MakeFloat32s(fftedlen)
-			c.gpuKern[i][j].Slice(0, reallen).CopyHtoD(c.kern[i][j])
-			fwPlan.Exec(c.gpuKern[i][j].Slice(0, reallen), c.gpuKern[i][j].Complex())
-			c.gpuKern[i][j].CopyDtoH(c.fftKern[i][j])
+			c.gpuFFTKern[i][j] = safe.MakeFloat32s(fftedlen)
+			c.gpuFFTKern[i][j].Slice(0, reallen).CopyHtoD(c.kern[i][j])
+			fwPlan.Exec(c.gpuFFTKern[i][j].Slice(0, reallen), c.gpuFFTKern[i][j].Complex())
+			c.gpuFFTKern[i][j].CopyDtoH(c.fftKern[i][j])
 		}
 	}
 

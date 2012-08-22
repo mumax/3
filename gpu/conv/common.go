@@ -18,10 +18,10 @@ type hostData struct {
 
 // common 3-component device buffers
 type deviceData3 struct {
-	realBuf [3]safe.Float32s    // gpu buffer for real-space, unpadded input/output data
-	fftRBuf [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
-	fftCBuf [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
-	gpuKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	realBuf    [3]safe.Float32s    // gpu buffer for real-space, unpadded input/output data
+	fftRBuf    [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
+	fftCBuf    [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
+	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 }
 
 // initialize host arrays and check sizes.

@@ -1,7 +1,6 @@
 package conv
 
 import (
-	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 )
@@ -16,6 +15,7 @@ type General struct {
 }
 
 func (c *General) Exec() {
+	// Zero padding and forward FFTs.
 	for i := 0; i < 3; i++ {
 		core.Print("input", i, "\n", core.Reshape(c.input[i], c.IOSize()))
 		c.ioBuf[i].CopyHtoD(c.input[i])
@@ -23,12 +23,22 @@ func (c *General) Exec() {
 		c.copyPadIOBuf(i)
 		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+	}
+
+	for i := 0; i < 3; i++ {
+		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
+		c.copyUnpadIOBuf(i)
+		core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
+		c.ioBuf[i].CopyDtoH(c.output[i])
+		core.Print("output", i, "\n", core.Reshape(c.output[i], c.IOSize()))
 	}
 }
 
 // Copy ioBuf[i] to fftRBuf[i], adding padding :-).
 func (c *General) copyPadIOBuf(i int) {
-	stream0 := cu.Stream(0)
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].Memset(0) // copypad does NOT zero remainder.
 	stream0.Synchronize()
@@ -36,8 +46,16 @@ func (c *General) copyPadIOBuf(i int) {
 	stream0.Synchronize()
 }
 
+// Copy ioBuf[i] to fftRBuf[i], adding padding :-).
+func (c *General) copyUnpadIOBuf(i int) {
+	offset := [3]int{0, 0, 0}
+	copyPad(c.ioBuf[i], c.fftRBuf[i], c.size, c.kernSize, offset, stream0)
+	stream0.Synchronize()
+}
+
 // Size of the FFT'ed kernel expressed in number of floats.
-func (c *General) FFTKernelSizeFloats() [3]int {
+// Real and Complex parts are stored.
+func (c *General) fftKernelSizeFloats() [3]int {
 	return fftR2COutputSizeFloats(c.KernelSize())
 	// kernel size is FFT logic size
 }

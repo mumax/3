@@ -15,7 +15,7 @@ type deviceData3 struct {
 func (c *deviceData3) init(inputSize, kernelSize [3]int) {
 	for i := 0; i < 3; i++ {
 		c.ioBuf[i] = safe.MakeFloat32s(prod(inputSize))
-		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(kernelSize))
 		c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(kernelSize)) / 2)
+		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(kernelSize))
 	}
 }

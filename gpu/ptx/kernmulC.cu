@@ -47,25 +47,14 @@ kernmulRSymm(float* Mx,  float* My,  float* Mz,
     float imKzx = Kzx[e+1];
     float imKyx = Kyx[e+1];
 
-	Mx[e  ] = remul(reMx, imMx, reKxx, imKxx) + remul(reMy, imMy, reKxy, imKxy) + remul(reMx, imMx, reKxz, imKxz);
-//	Mx[e+1] =
-//	         
-//	My[e  ] =
-//	My[e+1] =
-//	         
-//	Mz[e  ] =
-//	Mz[e+1] =
+	Mx[e  ] = remul(reMx, imMx, reKxx, imKxx) + remul(reMy, imMy, reKxy, imKxy) + remul(reMz, imMz, reKxz, imKxz);
+	Mx[e+1] = immul(reMx, imMx, reKxx, imKxx) + immul(reMy, imMy, reKxy, imKxy) + immul(reMz, imMz, reKxz, imKxz);
 
+	My[e  ] = remul(reMx, imMx, reKyx, imKyx) + remul(reMy, imMy, reKyy, imKyy) + remul(reMz, imMz, reKyz, imKyz);
+	My[e+1] = immul(reMx, imMx, reKyx, imKyx) + immul(reMy, imMy, reKyy, imKyy) + immul(reMz, imMz, reKyz, imKyz);
 
-
-    //fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
-    //fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;
-
-    //fftMy[e  ] = reMx * Kxy + reMy * Kyy + reMz * Kyz;
-    //fftMy[e+1] = imMx * Kxy + imMy * Kyy + imMz * Kyz;
-
-    //fftMz[e  ] = reMx * Kxz + reMy * Kyz + reMz * Kzz;
-    //fftMz[e+1] = imMx * Kxz + imMy * Kyz + imMz * Kzz;
+	Mz[e  ] = remul(reMx, imMx, reKzx, imKzx) + remul(reMy, imMy, reKzy, imKzy) + remul(reMz, imMz, reKzz, imKzz);
+	Mz[e+1] = immul(reMx, imMx, reKzx, imKzx) + immul(reMy, imMy, reKzy, imKzy) + immul(reMz, imMz, reKzz, imKzz);
   }
 }
 

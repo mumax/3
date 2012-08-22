@@ -96,7 +96,7 @@ func (c *Symmetric) kernMul() {
 	}
 
 	core.Debug("kernMul")
-	kernMul(c.fftCBuf,
+	kernMulRSymm(c.fftCBuf,
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
 		c.cpyStr)

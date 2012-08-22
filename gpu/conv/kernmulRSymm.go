@@ -9,15 +9,15 @@ import (
 	"unsafe"
 )
 
-var kernMulKern cu.Function
+var kernMulRSymmCode cu.Function
 
-func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s, stream cu.Stream) {
+func kernMulRSymm(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s, stream cu.Stream) {
 
 	core.Assert(fftM[0].Len() == K00.Len())
 
-	if kernMulKern == 0 {
-		mod := cu.ModuleLoadData(ptx.KERNMUL) // TODO: target higher SM's as well.
-		kernMulKern = mod.GetFunction("kernmul")
+	if kernMulRSymmCode == 0 {
+		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM) // TODO: target higher SM's as well.
+		kernMulRSymmCode = mod.GetFunction("kernmulRSymm")
 	}
 
 	N := fftM[0].Len()
@@ -46,5 +46,5 @@ func kernMul(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s
 		unsafe.Pointer(&N)}
 
 	shmem := 0
-	cu.LaunchKernel(kernMulKern, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
+	cu.LaunchKernel(kernMulRSymmCode, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 }

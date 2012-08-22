@@ -21,13 +21,8 @@ func (c *hostData) IOSize() [3]int {
 }
 
 // Size of the convolution kernel, in real space.
+// This is also the logic size of the FFTs.
 func (c *hostData) KernelSize() [3]int {
-	return c.kernSize
-}
-
-// Logic size of FFT on input/output data.
-// Same as KernelSize().
-func (c *hostData) FFTLogicSize() [3]int {
 	return c.kernSize
 }
 

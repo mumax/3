@@ -18,7 +18,8 @@ func (c *General) Exec() {
 
 // Size of the FFT'ed kernel expressed in number of floats.
 func (c *General) FFTKernelSizeFloats() [3]int {
-	return fftR2COutputSizeFloats(c.FFTLogicSize())
+	return fftR2COutputSizeFloats(c.KernelSize())
+	// kernel size is FFT logic size
 }
 
 // Initializes c.gpuFFTKern and c.fftKern
@@ -66,7 +67,7 @@ func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *G
 	c.hostData.initPageLock()
 	c.initFFT()
 	c.initFFTKern()
-	panic("c.deviceData3.init(")
+	c.deviceData3.init(c.IOSize(), c.KernelSize())
 
 	return c
 }

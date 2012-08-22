@@ -13,6 +13,7 @@ type General struct {
 	bwPlan      safe.FFT3DC2RPlan
 }
 
+// Execute the convolution.
 func (c *General) Exec() {
 	// Zero padding and forward FFTs.
 	for i := 0; i < 3; i++ {

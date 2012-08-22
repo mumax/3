@@ -4,19 +4,14 @@ import (
 	"nimble-cube/core"
 )
 
-// Brute-force convolution.
-
 // Brute-force O(N²) vector convolution on CPU. 
-// Used to verify GUP FFT convolution.
+// Used to verify GPU FFT convolution.
 // Input better be sparse.
-// Kernel assumed symmtetric. 
-// If kern[i][j] is nil, use kern[j][i]. 
-// If that is nil too, use all 0's.
-func BruteSymmetricConvolution(in [3][][][]float32, kern [3][3][][][]float32) [3][][][]float32 {
+// A nil kernel element is interpreted as all 0s.
+func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 
 	size := core.SizeOf(in[0])
 	ksize := core.SizeOf(kern[0][0])
-	out := core.MakeVectors(size)
 
 	for sc := 0; sc < 3; sc++ {
 		for sx := 0; sx < size[0]; sx++ {
@@ -28,20 +23,18 @@ func BruteSymmetricConvolution(in [3][][][]float32, kern [3][3][][][]float32) [3
 					}
 
 					for dc := 0; dc < 3; dc++ {
-						k := kern[sc][dc]
-						// nil-element means: use symmetric one
-						if k == nil {
-							k = kern[dc][sc]
-						}
+						K := kern[sc][dc]
 						// skip zero kernel
-						if k == nil {
+						if K == nil {
 							continue
 						}
 						for dx := 0; dx < size[0]; dx++ {
+							i := core.Wrap(dx-sx, ksize[0])
 							for dy := 0; dy < size[1]; dy++ {
+								j := core.Wrap(dy-sy, ksize[1])
 								for dz := 0; dz < size[2]; dz++ {
-									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] *
-										k[core.Wrap(dx-sx, ksize[0])][core.Wrap(dy-sy, ksize[1])][core.Wrap(dz-sz, ksize[2])]
+									k := core.Wrap(dz-sz, ksize[2])
+									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * K[i][j][k]
 
 								}
 							}
@@ -51,5 +44,4 @@ func BruteSymmetricConvolution(in [3][][][]float32, kern [3][3][][][]float32) [3
 			}
 		}
 	}
-	return out
 }

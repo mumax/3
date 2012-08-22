@@ -8,6 +8,11 @@ import (
 // Used to verify GPU FFT convolution.
 // Input better be sparse.
 // A nil kernel element is interpreted as all 0s.
+// Kernel indices are destination index, source index.
+//
+// 	(O0)   (K01 K02 K03)   (I0)
+// 	(O1) = (K11 K12 K13) * (I1)
+// 	(O2)   (K21 K22 K23)   (I2)
 func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 
 	size := core.SizeOf(in[0])
@@ -17,16 +22,12 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 		for sx := 0; sx < size[0]; sx++ {
 			for sy := 0; sy < size[1]; sy++ {
 				for sz := 0; sz < size[2]; sz++ {
-					// skip zero source
 					if in[sc][sx][sy][sz] == 0 {
-						continue
+						continue // skip zero source
 					}
-
 					for dc := 0; dc < 3; dc++ {
-						K := kern[sc][dc]
-						// skip zero kernel
-						if K == nil {
-							continue
+						if kern[dc][sc] == nil {
+							continue // skip zero kernel
 						}
 						for dx := 0; dx < size[0]; dx++ {
 							i := core.Wrap(dx-sx, ksize[0])
@@ -34,8 +35,7 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 								j := core.Wrap(dy-sy, ksize[1])
 								for dz := 0; dz < size[2]; dz++ {
 									k := core.Wrap(dz-sz, ksize[2])
-									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * K[i][j][k]
-
+									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * kern[dc][sc][i][j][k]
 								}
 							}
 						}

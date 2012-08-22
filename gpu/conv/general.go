@@ -60,7 +60,7 @@ func (c *General) copyUnpadIOBuf(i int) {
 // Size of the FFT'ed kernel expressed in number of floats.
 // Real and Complex parts are stored.
 func (c *General) fftKernelSizeFloats() [3]int {
-	return fftR2COutputSizeFloats(c.KernelSize())
+	return fftR2COutputSizeFloats(c.kernSize)
 	// kernel size is FFT logic size
 }
 
@@ -109,7 +109,7 @@ func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *G
 	c.hostData.initPageLock()
 	c.initFFT()
 	c.initFFTKern()
-	c.deviceData3.init(c.IOSize(), c.KernelSize())
+	c.deviceData3.init(c.size, c.kernSize)
 
 	return c
 }

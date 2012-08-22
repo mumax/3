@@ -42,6 +42,7 @@ func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]flo
 		}
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
+	core.Debug("convolution i/o size:", c.IOSize(), "kernel size:", c.KernelSize())
 }
 
 // Page-lock host arrays if applicable.

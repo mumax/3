@@ -22,6 +22,7 @@ func (c *General) Exec() {
 		core.Print("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.IOSize()))
 		c.copyPadIOBuf(i)
 		core.Print("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.KernelSize()))
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
 }
 
@@ -33,7 +34,6 @@ func (c *General) copyPadIOBuf(i int) {
 	stream0.Synchronize()
 	copyPad(c.fftRBuf[i], c.ioBuf[i], c.kernSize, c.size, offset, stream0)
 	stream0.Synchronize()
-	c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 }
 
 // Size of the FFT'ed kernel expressed in number of floats.

@@ -9,7 +9,7 @@ func Prod(size [3]int) int {
 // Zero-padding
 func PadSize(size, periodic [3]int) [3]int {
 	for i := range size {
-		if periodic[i] > 0 && size[i] > 1 {
+		if periodic[i] == 0 && size[i] > 1 {
 			size[i] *= 2
 		}
 	}

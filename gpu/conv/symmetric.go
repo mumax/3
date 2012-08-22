@@ -223,13 +223,6 @@ func (c *Symmetric) init() {
 	c.initialized <- 1
 }
 
-func (c *Symmetric) initBuffers() {
-	for i := 0; i < 3; i++ {
-		c.realBuf[i] = safe.MakeFloat32s(prod(c.size))
-		c.fftCBuf[i] = safe.MakeComplex64s(c.fwPlan[i].OutputLen())
-		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, c.fwPlan[i].InputLen())
-	}
-}
 
 func (c *Symmetric) initFFTKern() {
 	padded := c.kernSize

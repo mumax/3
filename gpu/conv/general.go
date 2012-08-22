@@ -25,6 +25,11 @@ func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *G
 	return c
 }
 
+func(c*General)Exec(){
+	c.input
+}
+
+// Initializes the FFT plans.
 func (c *General) initFFT() {
 	padded := c.kernSize
 	//realsize := fftR2COutputSizeFloats(padded)

@@ -7,11 +7,11 @@
 // |My| = |Kyx Kyy Kyz| * |My|
 // |Mz|   |Kzx Kzy Kzz|   |Mz|
 extern "C" __global__ void 
-kernmulRSymm(float* Mx,  float* My,  float* Mz,
-             float* Kxx, float* Kyy, float* Kzz,
-             float* Kyz, float* Kxz, float* Kxy, 
-             float* Kzy, float* Kzx, float* Kyx, 
-             int N){
+kernmulC(float* Mx,  float* My,  float* Mz,
+         float* Kxx, float* Kyy, float* Kzz,
+         float* Kyz, float* Kxz, float* Kxy, 
+         float* Kzy, float* Kzx, float* Kyx, 
+         int N){
 
   int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
   int e = 2 * i;

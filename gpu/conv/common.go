@@ -1,7 +1,10 @@
 package conv
 
+// common code for all convolutions.
+
 import "github.com/barnex/cuda4/cu"
 
+// CUDA root stream.
 const stream0 cu.Stream = 0
 
 // Output size of R2C FFT with given logic size, expressed in floats.

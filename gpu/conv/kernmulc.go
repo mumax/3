@@ -12,12 +12,14 @@ import (
 var kernMulCCode cu.Function
 
 // General kernel multiplication with general complex kernel.
+// (stored in interleaved format).
+// It might be more clear if the kernel were stored as safe.Complex64s.
 func kernMulC(fftM [3]safe.Complex64s, K [3][3]safe.Float32s, stream cu.Stream) {
 
-	core.Assert(fftM[0].Len() == K[0][0].Len())
+	core.Assert(2*fftM[0].Len() == K[0][0].Len())
 
 	if kernMulCCode == 0 {
-		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM) // TODO: target higher SM's as well.
+		mod := cu.ModuleLoadData(ptx.KERNMULC) // TODO: target higher SM's as well.
 		kernMulCCode = mod.GetFunction("kernmulC")
 	}
 

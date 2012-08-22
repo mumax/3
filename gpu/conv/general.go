@@ -26,6 +26,8 @@ func (c *General) Exec() {
 		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 	}
 
+	kernMulC(c.fftCBuf, c.gpuFFTKern, stream0)
+
 	for i := 0; i < 3; i++ {
 		core.Print("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])

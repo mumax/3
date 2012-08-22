@@ -7,7 +7,7 @@ const KERNMULC = `
 	// nvopencc 4.1 built on 2012-04-05
 
 	//-----------------------------------------------------------
-	// Compiling /tmp/tmpxft_000041fb_00000000-9_kernmulC.cpp3.i (/tmp/ccBI#.Gn7eJw)
+	// Compiling /tmp/tmpxft_00005437_00000000-9_kernmulc.cpp3.i (/tmp/ccBI#.Kg3UJr)
 	//-----------------------------------------------------------
 
 	//-----------------------------------------------------------
@@ -20,7 +20,7 @@ const KERNMULC = `
 	//-----------------------------------------------------------
 
 	.file	1	"<command-line>"
-	.file	2	"/tmp/tmpxft_000041fb_00000000-8_kernmulC.cudafe2.gpu"
+	.file	2	"/tmp/tmpxft_00005437_00000000-8_kernmulc.cudafe2.gpu"
 	.file	3	"/usr/lib/gcc/x86_64-linux-gnu/4.6/include/stddef.h"
 	.file	4	"/usr/local/cuda/bin/../include/crt/device_runtime.h"
 	.file	5	"/usr/local/cuda/bin/../include/host_defines.h"
@@ -32,7 +32,7 @@ const KERNMULC = `
 	.file	11	"/usr/local/cuda/bin/../include/vector_types.h"
 	.file	12	"/usr/local/cuda/bin/../include/device_launch_parameters.h"
 	.file	13	"/usr/local/cuda/bin/../include/crt/storage_class.h"
-	.file	14	"kernmulC.cu"
+	.file	14	"kernmulc.cu"
 	.file	15	"/usr/local/cuda/bin/../include/common_functions.h"
 	.file	16	"/usr/local/cuda/bin/../include/math_functions.h"
 	.file	17	"/usr/local/cuda/bin/../include/math_constants.h"
@@ -48,20 +48,20 @@ const KERNMULC = `
 	.file	27	"/usr/local/cuda/bin/../include/math_functions_dbl_ptx1.h"
 
 
-	.entry kernmulRSymm (
-		.param .u64 __cudaparm_kernmulRSymm_Mx,
-		.param .u64 __cudaparm_kernmulRSymm_My,
-		.param .u64 __cudaparm_kernmulRSymm_Mz,
-		.param .u64 __cudaparm_kernmulRSymm_Kxx,
-		.param .u64 __cudaparm_kernmulRSymm_Kyy,
-		.param .u64 __cudaparm_kernmulRSymm_Kzz,
-		.param .u64 __cudaparm_kernmulRSymm_Kyz,
-		.param .u64 __cudaparm_kernmulRSymm_Kxz,
-		.param .u64 __cudaparm_kernmulRSymm_Kxy,
-		.param .u64 __cudaparm_kernmulRSymm_Kzy,
-		.param .u64 __cudaparm_kernmulRSymm_Kzx,
-		.param .u64 __cudaparm_kernmulRSymm_Kyx,
-		.param .s32 __cudaparm_kernmulRSymm_N)
+	.entry kernmulC (
+		.param .u64 __cudaparm_kernmulC_Mx,
+		.param .u64 __cudaparm_kernmulC_My,
+		.param .u64 __cudaparm_kernmulC_Mz,
+		.param .u64 __cudaparm_kernmulC_Kxx,
+		.param .u64 __cudaparm_kernmulC_Kyy,
+		.param .u64 __cudaparm_kernmulC_Kzz,
+		.param .u64 __cudaparm_kernmulC_Kyz,
+		.param .u64 __cudaparm_kernmulC_Kxz,
+		.param .u64 __cudaparm_kernmulC_Kxy,
+		.param .u64 __cudaparm_kernmulC_Kzy,
+		.param .u64 __cudaparm_kernmulC_Kzx,
+		.param .u64 __cudaparm_kernmulC_Kyx,
+		.param .s32 __cudaparm_kernmulC_N)
 	{
 	.reg .u16 %rh<4>;
 	.reg .u32 %r<11>;
@@ -69,7 +69,7 @@ const KERNMULC = `
 	.reg .f32 %f<83>;
 	.reg .pred %p<3>;
 	.loc	14	14	0
-$LDWbegin_kernmulRSymm:
+$LDWbegin_kernmulC:
 	mov.u16 	%rh1, %nctaid.x;
 	mov.u16 	%rh2, %ctaid.y;
 	mul.wide.u16 	%r1, %rh1, %rh2;
@@ -79,40 +79,40 @@ $LDWbegin_kernmulRSymm:
 	mul.lo.u32 	%r5, %r4, %r3;
 	cvt.u32.u16 	%r6, %tid.x;
 	add.u32 	%r7, %r6, %r5;
-	ld.param.s32 	%r8, [__cudaparm_kernmulRSymm_N];
+	ld.param.s32 	%r8, [__cudaparm_kernmulC_N];
 	setp.le.s32 	%p1, %r8, %r7;
 	@%p1 bra 	$Lt_0_1026;
 	.loc	14	20	0
 	mul.lo.s32 	%r9, %r7, 2;
 	cvt.s64.s32 	%rd1, %r9;
 	mul.wide.s32 	%rd2, %r9, 4;
-	ld.param.u64 	%rd3, [__cudaparm_kernmulRSymm_Mx];
+	ld.param.u64 	%rd3, [__cudaparm_kernmulC_Mx];
 	add.u64 	%rd4, %rd3, %rd2;
 	ld.global.f32 	%f1, [%rd4+0];
 	.loc	14	21	0
 	ld.global.f32 	%f2, [%rd4+4];
 	.loc	14	23	0
-	ld.param.u64 	%rd5, [__cudaparm_kernmulRSymm_My];
+	ld.param.u64 	%rd5, [__cudaparm_kernmulC_My];
 	add.u64 	%rd6, %rd5, %rd2;
 	ld.global.f32 	%f3, [%rd6+0];
 	.loc	14	24	0
 	ld.global.f32 	%f4, [%rd6+4];
 	.loc	14	26	0
-	ld.param.u64 	%rd7, [__cudaparm_kernmulRSymm_Mz];
+	ld.param.u64 	%rd7, [__cudaparm_kernmulC_Mz];
 	add.u64 	%rd8, %rd7, %rd2;
 	ld.global.f32 	%f5, [%rd8+0];
 	.loc	14	27	0
 	ld.global.f32 	%f6, [%rd8+4];
 	.loc	14	29	0
-	ld.param.u64 	%rd9, [__cudaparm_kernmulRSymm_Kxx];
+	ld.param.u64 	%rd9, [__cudaparm_kernmulC_Kxx];
 	add.u64 	%rd10, %rd9, %rd2;
 	ld.global.f32 	%f7, [%rd10+0];
 	.loc	14	30	0
-	ld.param.u64 	%rd11, [__cudaparm_kernmulRSymm_Kyy];
+	ld.param.u64 	%rd11, [__cudaparm_kernmulC_Kyy];
 	add.u64 	%rd12, %rd11, %rd2;
 	ld.global.f32 	%f8, [%rd12+0];
 	.loc	14	31	0
-	ld.param.u64 	%rd13, [__cudaparm_kernmulRSymm_Kzz];
+	ld.param.u64 	%rd13, [__cudaparm_kernmulC_Kzz];
 	add.u64 	%rd14, %rd13, %rd2;
 	ld.global.f32 	%f9, [%rd14+0];
 	.loc	14	32	0
@@ -122,15 +122,15 @@ $LDWbegin_kernmulRSymm:
 	.loc	14	34	0
 	ld.global.f32 	%f12, [%rd14+4];
 	.loc	14	36	0
-	ld.param.u64 	%rd15, [__cudaparm_kernmulRSymm_Kyz];
+	ld.param.u64 	%rd15, [__cudaparm_kernmulC_Kyz];
 	add.u64 	%rd16, %rd15, %rd2;
 	ld.global.f32 	%f13, [%rd16+0];
 	.loc	14	37	0
-	ld.param.u64 	%rd17, [__cudaparm_kernmulRSymm_Kxz];
+	ld.param.u64 	%rd17, [__cudaparm_kernmulC_Kxz];
 	add.u64 	%rd18, %rd17, %rd2;
 	ld.global.f32 	%f14, [%rd18+0];
 	.loc	14	38	0
-	ld.param.u64 	%rd19, [__cudaparm_kernmulRSymm_Kxy];
+	ld.param.u64 	%rd19, [__cudaparm_kernmulC_Kxy];
 	add.u64 	%rd20, %rd19, %rd2;
 	ld.global.f32 	%f15, [%rd20+0];
 	.loc	14	39	0
@@ -140,15 +140,15 @@ $LDWbegin_kernmulRSymm:
 	.loc	14	41	0
 	ld.global.f32 	%f18, [%rd20+4];
 	.loc	14	43	0
-	ld.param.u64 	%rd21, [__cudaparm_kernmulRSymm_Kzy];
+	ld.param.u64 	%rd21, [__cudaparm_kernmulC_Kzy];
 	add.u64 	%rd22, %rd21, %rd2;
 	ld.global.f32 	%f19, [%rd22+0];
 	.loc	14	44	0
-	ld.param.u64 	%rd23, [__cudaparm_kernmulRSymm_Kzx];
+	ld.param.u64 	%rd23, [__cudaparm_kernmulC_Kzx];
 	add.u64 	%rd24, %rd23, %rd2;
 	ld.global.f32 	%f20, [%rd24+0];
 	.loc	14	45	0
-	ld.param.u64 	%rd25, [__cudaparm_kernmulRSymm_Kyx];
+	ld.param.u64 	%rd25, [__cudaparm_kernmulC_Kyx];
 	add.u64 	%rd26, %rd25, %rd2;
 	ld.global.f32 	%f21, [%rd26+0];
 	.loc	14	46	0
@@ -229,7 +229,7 @@ $LDWbegin_kernmulRSymm:
 $Lt_0_1026:
 	.loc	14	59	0
 	exit;
-$LDWend_kernmulRSymm:
-	} // kernmulRSymm
+$LDWend_kernmulC:
+	} // kernmulC
 
 `

@@ -58,21 +58,23 @@ func Test(c Conv) {
 	c.Exec()
 
 	// check if error is OK
-	var maxerr float32
-	for c := range in {
-		for i := range in[c] {
-			if fmath.Abs(out[c][i]-ref[c][i]) > maxerr {
-				maxerr = fmath.Abs(out[c][i] - ref[c][i])
+	{
+		var maxerr float32
+		for c := range in {
+			for i := range in[c] {
+				if fmath.Abs(out[c][i]-ref[c][i]) > maxerr {
+					maxerr = fmath.Abs(out[c][i] - ref[c][i])
+				}
 			}
 		}
+		const tolerance = 1e-5
+		if maxerr > tolerance {
+			core.Fprint(os.Stderr, "expected:\n", bruteOut)
+			core.Fprint(os.Stderr, "got:\n", output)
+			panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
+		}
+		core.Log("convolution test error:", maxerr)
 	}
-	const tolerance = 1e-5
-	if maxerr > tolerance {
-		core.Fprint(os.Stderr, "expected:\n", bruteOut)
-		core.Fprint(os.Stderr, "got:\n", output)
-		panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
-	}
-	core.Log("convolution test error:", maxerr)
 
 	// cleanly set input/output to zero
 	for i := range in {
@@ -83,6 +85,7 @@ func Test(c Conv) {
 	}
 }
 
+// random number between -1 and 1.
 func rnd() float32 {
 	return 1 - 2*rand.Float32()
 }

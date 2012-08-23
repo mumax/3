@@ -9,12 +9,8 @@ import (
 // some test sizes
 var (
 	N0s = []int{1}
-	N1s = []int{4}
-	N2s = []int{8}
-
-//	N0s = []int{1}
-//	N1s = []int{1, 2, 3, 8, 32, 48, 63}
-//	N2s = []int{1, 2, 3, 8, 32, 48, 128, 255}
+	N1s = []int{1, 2, 3, 8, 32, 48, 63}
+	N2s = []int{1, 2, 3, 8, 32, 48, 128, 255}
 )
 
 func TestGeneral(test *testing.T) {
@@ -55,53 +51,53 @@ func TestGeneral(test *testing.T) {
 
 }
 
-func TestSymmetric(test *testing.T) {
-	//core.LOG = false
-	for _, N0 := range N0s {
-		for _, N1 := range N1s {
-			for _, N2 := range N2s {
-				size := [3]int{N0, N1, N2}
-				core.Log("size:", size)
-				//cellsize := [3]float64{1e-9, 1e-9, 1e-9}
-				N := core.Prod(size)
-
-				input := core.MakeVectors(size)
-				input[0][N0/2][N1/2][N2/2] = 1
-				input[1][N0/2][N1/2][N2/2] = 2
-				input[2][N0/2][N1/2][N2/2] = 3
-				output := core.MakeVectors(size)
-
-				ksize := core.PadSize(size, [3]int{0, 0, 0})
-				var kern [3][3][][][]float32
-				for i := 0; i < 3; i++ {
-					for j := i; j < 3; j++ {
-						kern[i][j] = core.MakeFloats(ksize)
-					}
-				}
-				kern[0][0][0][0][0] = 1
-				kern[1][1][0][0][0] = 2
-				kern[2][2][0][0][0] = 3
-
-				conv := NewSymmetric(input, output, kern)
-				conv.Push(N)
-				conv.Pull(N)
-
-				//core.Print(output)
-
-				if output[0][N0/2][N1/2][N2/2] != 1 ||
-					output[1][N0/2][N1/2][N2/2] != 4 ||
-					output[2][N0/2][N1/2][N2/2] != 9 {
-					test.Error("size=", size, "got:", output[0][N0/2][N1/2][N2/2], output[1][N0/2][N1/2][N2/2], output[2][N0/2][N1/2][N2/2])
-					core.Log("FAIL size:", size)
-				} else {
-					core.Log(" OK  size:", size)
-				}
-				//conv.Free()
-			}
-		}
-	}
-
-}
+///func TestSymmetric(test *testing.T) {
+///	//core.LOG = false
+///	for _, N0 := range N0s {
+///		for _, N1 := range N1s {
+///			for _, N2 := range N2s {
+///				size := [3]int{N0, N1, N2}
+///				core.Log("size:", size)
+///				//cellsize := [3]float64{1e-9, 1e-9, 1e-9}
+///				N := core.Prod(size)
+///
+///				input := core.MakeVectors(size)
+///				input[0][N0/2][N1/2][N2/2] = 1
+///				input[1][N0/2][N1/2][N2/2] = 2
+///				input[2][N0/2][N1/2][N2/2] = 3
+///				output := core.MakeVectors(size)
+///
+///				ksize := core.PadSize(size, [3]int{0, 0, 0})
+///				var kern [3][3][][][]float32
+///				for i := 0; i < 3; i++ {
+///					for j := i; j < 3; j++ {
+///						kern[i][j] = core.MakeFloats(ksize)
+///					}
+///				}
+///				kern[0][0][0][0][0] = 1
+///				kern[1][1][0][0][0] = 2
+///				kern[2][2][0][0][0] = 3
+///
+///				conv := NewSymmetric(input, output, kern)
+///				conv.Push(N)
+///				conv.Pull(N)
+///
+///				//core.Print(output)
+///
+///				if output[0][N0/2][N1/2][N2/2] != 1 ||
+///					output[1][N0/2][N1/2][N2/2] != 4 ||
+///					output[2][N0/2][N1/2][N2/2] != 9 {
+///					test.Error("size=", size, "got:", output[0][N0/2][N1/2][N2/2], output[1][N0/2][N1/2][N2/2], output[2][N0/2][N1/2][N2/2])
+///					core.Log("FAIL size:", size)
+///				} else {
+///					core.Log(" OK  size:", size)
+///				}
+///				//conv.Free()
+///			}
+///		}
+///	}
+///
+///}
 
 //func BenchmarkConv1_2DSmall(b *testing.B) {
 //	b.StopTimer()

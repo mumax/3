@@ -1,4 +1,4 @@
-all: 6g gccgo doc
+all: 6g doc
 
 6g:
 	go install -v
@@ -8,7 +8,7 @@ all: 6g gccgo doc
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 
 gccgo:
-	go build -v -compiler $(GCCGO)
+	go install -v -compiler $(GCCGO)
 
 test: 6gtest gccgotest
 
@@ -28,6 +28,12 @@ gccgobench:
 
 clean:
 	go clean
+	go-optview -c -w *.go
+	gofmt -w *.go
+
+opt:
+	go-optview -w *.go
+	gofmt -w *.go
 
 doc:
-	godoc github.com/barnex/cuda4/cu > README
+	godoc github.com/barnex/cuda4 > README

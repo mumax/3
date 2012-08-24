@@ -1,4 +1,4 @@
-all: 6g gccgo
+all: 6g gccgo doc
 
 6g:
 	go install -v
@@ -28,3 +28,6 @@ gccgobench:
 
 clean:
 	go clean
+
+doc:
+	godoc github.com/barnex/cuda4/cufft > README

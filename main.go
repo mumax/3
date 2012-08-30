@@ -44,15 +44,14 @@ func main() {
 
 }
 
-func runJob(jobfile, lockfile string) {
+func runJob(jobfile, lockdir string) {
 	log.Println("starting", jobfile)
 
-	lock, err := os.OpenFile(lockfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
+	err := os.Mkdir(lockdir, 0777)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	defer lock.Close()
 
 	j, err2 := os.Open(jobfile)
 	if err2 != nil {
@@ -67,17 +66,45 @@ func runJob(jobfile, lockfile string) {
 		log.Println("error parsing", jobfile, ":", err3)
 		return
 	}
-	spawn(job)
+	spawn(job, lockdir)
 }
 
-func spawn(job Job) {
-	log.Println("exec", job.Command, job.Args)
+func spawn(job Job, lockdir string) {
 	cmd := exec.Command(job.Command, job.Args...)
 	cmd.Dir = job.Wd
-	err := cmd.Run()
-	if err != nil{
-		log.Println(err)
+
+	// all daemon messages go here
+	logout, err2 := os.OpenFile(lockdir+"/daemon.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	if err2 != nil {
+		log.Println(err2)
+		return
 	}
+	defer logout.Close()
+
+	// subprocess output goes here
+	stdout, err3 := os.OpenFile(lockdir+"/stdout", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	if err3 != nil {
+		fmt.Fprintln(logout, err3)
+		return
+	}
+	defer stdout.Close()
+	cmd.Stdout = stdout
+	cmd.Stderr = stdout
+
+	// start
+	fmt.Fprintln(logout, "job:", job)
+	fmt.Fprintln(logout, "exec", job.Command, job.Args)
+	err := cmd.Run()
+	if err != nil {
+		fmt.Fprintln(logout, err)
+	}
+
+	exitstat := "exited sucessfully"
+	if !cmd.ProcessState.Success() {
+		exitstat = "failed"
+	}
+	log.Println(job.Command, exitstat)
+	fmt.Fprintln(logout, job.Command, exitstat)
 }
 
 func findJobFile() (jobfile, lockfile string, ok bool) {
@@ -108,11 +135,11 @@ func alreadyStarted(file string, files []string) bool {
 	prefix := noExt(file)
 	for _, f := range files {
 		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".lock") {
-			log.Println(file, "already started")
+			//log.Println(file, "already started")
 			return true
 		}
 	}
-	log.Println(file, "not yet started")
+	//log.Println(file, "not yet started")
 	return false
 }
 

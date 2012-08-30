@@ -12,11 +12,15 @@ import (
 )
 
 var (
-	flag_dir  = flag.String("dir", ".", "directory to watch")
-	flag_host = flag.String("host", "", "override hostname")
+	flag_dir   = flag.String("dir", ".", "directory to watch")
+	flag_host  = flag.String("host", "", "override hostname")
+	flag_poll  = flag.Duration("poll", 1*time.Second, "directory poll time")
+	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
 )
 
 func main() {
+	flag.Parse()
+
 	if *flag_host == "" {
 		h, err := os.Hostname()
 		check(err)
@@ -25,7 +29,27 @@ func main() {
 
 	log.Println("watching", *flag_host, ":", *flag_dir)
 	rand.Seed(time.Now().UnixNano())
-	fmt.Println(findJobFile())
+
+	for {
+		job, lock, ok := findJobFile()
+		if ok {
+			runJob(job, lock)
+		} else {
+			time.Sleep(*flag_poll)
+		}
+		time.Sleep(*flag_relax)
+	}
+
+}
+
+func runJob(jobfile, lockfile string) {
+	log.Println("starting", jobfile)
+	lock, err := os.OpenFile(lockfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
+	if err != nil {
+		log.Println("could not open", lockfile, ":", err)
+		return
+	}
+	defer lock.Close()
 }
 
 func findJobFile() (jobfile, lockfile string, ok bool) {
@@ -45,7 +69,7 @@ func findJobFile() (jobfile, lockfile string, ok bool) {
 				continue
 			} else {
 				lockfile = noExt(f) + "_" + *flag_host + ".lock"
-				return f, lockfile, ok
+				return f, lockfile, true
 			}
 		}
 	}

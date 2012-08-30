@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -44,12 +45,28 @@ func main() {
 
 func runJob(jobfile, lockfile string) {
 	log.Println("starting", jobfile)
+
 	lock, err := os.OpenFile(lockfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
 	if err != nil {
-		log.Println("could not open", lockfile, ":", err)
+		log.Println(err)
 		return
 	}
 	defer lock.Close()
+
+	j, err2 := os.Open(jobfile)
+	if err2 != nil {
+		log.Println(err2)
+		return
+	}
+	defer j.Close()
+
+	var job Job
+	err3 := json.NewDecoder(j).Decode(&job)
+	if err3 != nil {
+		log.Println("error parsing", jobfile, ":", err3)
+		return
+	}
+	fmt.Println(job)
 }
 
 func findJobFile() (jobfile, lockfile string, ok bool) {

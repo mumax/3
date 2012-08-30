@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"time"
@@ -66,7 +67,17 @@ func runJob(jobfile, lockfile string) {
 		log.Println("error parsing", jobfile, ":", err3)
 		return
 	}
-	fmt.Println(job)
+	spawn(job)
+}
+
+func spawn(job Job) {
+	log.Println("exec", job.Command, job.Args)
+	cmd := exec.Command(job.Command, job.Args...)
+	cmd.Dir = job.Wd
+	err := cmd.Run()
+	if err != nil{
+		log.Println(err)
+	}
 }
 
 func findJobFile() (jobfile, lockfile string, ok bool) {

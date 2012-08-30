@@ -28,7 +28,7 @@ func main() {
 	fmt.Println(findJobFile())
 }
 
-func findJobFile() (jobfile, logfile string, ok bool) {
+func findJobFile() (jobfile, lockfile string, ok bool) {
 	dir, err := os.Open(*flag_dir)
 	check(err)
 	defer dir.Close()
@@ -44,8 +44,8 @@ func findJobFile() (jobfile, logfile string, ok bool) {
 			if alreadyStarted(f, files) {
 				continue
 			} else {
-				logfile = noExt(f) + "_" + *flag_host + ".log"
-				return f, logfile, ok
+				lockfile = noExt(f) + "_" + *flag_host + ".lock"
+				return f, lockfile, ok
 			}
 		}
 	}
@@ -55,7 +55,7 @@ func findJobFile() (jobfile, logfile string, ok bool) {
 func alreadyStarted(file string, files []string) bool {
 	prefix := noExt(file)
 	for _, f := range files {
-		if strings.HasPrefix(f, prefix) && f != file {
+		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".lock") {
 			log.Println(file, "already started")
 			return true
 		}

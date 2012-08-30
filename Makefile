@@ -1,12 +1,8 @@
-all:  gc gofmt #gccgo
+all:
+	make -C daemon
+	make -C submit
 
-gc:
-	go install -v 
-
-gofmt:
-	gofmt -w *.go
-
-GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
-
-gccgo:
-	go install -v -compiler $(GCCGO)
+clean:
+	make clean -C daemon
+	make clean -C submit
+	rm -rf *.out

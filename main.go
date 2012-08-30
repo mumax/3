@@ -74,15 +74,18 @@ func spawn(job Job, lockdir string) {
 	cmd.Dir = job.Wd
 
 	// all daemon messages go here
-	logout, err2 := os.OpenFile(lockdir+"/daemon.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	logout, err2 := os.OpenFile(lockdir+"/daemon.log",
+		os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	if err2 != nil {
 		log.Println(err2)
 		return
 	}
 	defer logout.Close()
+	fmt.Fprintln(logout, "this is the output of the daemon, your job's output is in stdout")
 
 	// subprocess output goes here
-	stdout, err3 := os.OpenFile(lockdir+"/stdout", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	stdout, err3 := os.OpenFile(lockdir+"/stdout",
+		os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	if err3 != nil {
 		fmt.Fprintln(logout, err3)
 		return
@@ -123,7 +126,7 @@ func findJobFile() (jobfile, lockfile string, ok bool) {
 			if alreadyStarted(f, files) {
 				continue
 			} else {
-				lockfile = noExt(f) + "_" + *flag_host + ".lock"
+				lockfile = noExt(f) + "_" + *flag_host + ".out"
 				return f, lockfile, true
 			}
 		}
@@ -134,7 +137,7 @@ func findJobFile() (jobfile, lockfile string, ok bool) {
 func alreadyStarted(file string, files []string) bool {
 	prefix := noExt(file)
 	for _, f := range files {
-		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".lock") {
+		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".out") {
 			//log.Println(file, "already started")
 			return true
 		}

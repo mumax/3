@@ -177,7 +177,10 @@ func spawn(job Job, lockdir string) {
 // Find a job file that's not yet running.
 func findJobFile(que string) (jobfile, lockfile string, ok bool) {
 	dir, err := os.Open(que)
-	check(err)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	defer dir.Close()
 	files, err2 := dir.Readdirnames(-1)
 	check(err2)

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 )
 
 var (
@@ -74,26 +75,62 @@ func setMkjob(f func(string) Job) {
 // Add a job to the que directoy,
 // using the mkjob function.
 func addJob(file, wd, que string) {
-	fmt.Print(file, ": ")
+	fmt.Println("add", file)
 	job := mkjob(file)
 	job.Wd = wd
 
-	out, err := os.OpenFile(que+"/"+jsonfile(file), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer out.Close()
+	// remove previous .json and .out
+	{
+		dir, err := os.Open(que)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer dir.Close()
+		files, err2 := dir.Readdirnames(-1)
+		if err2 != nil {
+			fmt.Println(err2)
+			return
+		}
 
-	err2 := json.NewEncoder(out).Encode(job)
-	if err2 != nil {
-		fmt.Println(err2)
-		return
+		prefix := noExt(file)
+		for _, f := range files {
+			if strings.HasPrefix(f, prefix) {
+				fmt.Println("rm", que+"/"+f)
+				err := os.RemoveAll(que + "/" + f)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
+		}
 	}
 
-	fmt.Println("OK")
+	// add new json
+	{
+		fmt.Println("add", que+"/"+jsonfile(file))
+		out, err := os.OpenFile(que+"/"+jsonfile(file), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer out.Close()
+		err2 := json.NewEncoder(out).Encode(job)
+		if err2 != nil {
+			fmt.Println(err2)
+			return
+		}
+	}
 }
 
+// suited job file name.
+// replace / by _
 func jsonfile(file string) string {
-	return file + ".json"
+	return strings.Replace(file, "/", "_", -1) + ".json"
+}
+
+// remove file extension.
+// TODO: -> lib
+func noExt(file string) string {
+	return file[:len(file)-len(path.Ext(file))]
 }

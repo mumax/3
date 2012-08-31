@@ -3,7 +3,7 @@
  submit takes a flag describing the kind of job file to make
  and a number of input files. E.g.:
  	submit --mumax2 *.py
- This will generate JSON job files in the user's que directy.
+ This will generate corresponding JSON job files in the user's que directy.
  Default is $HOME/que, can be overridden with --que flag.
  The que directory should be accessible by the daemons.
 
@@ -11,6 +11,9 @@
  and may as well be written by hand or a script, 
  should more flexibility be needed.  E.g.:
  	{"Command":"mumax2","Args":["-gpu=%GPU","job.py"],"Wd":"/home/me/myfiles"}
+
+ Jobs can be removed from the queue by simply deleting the job files
+ from the queue directory. See the daemon documentation for more info.
 
  Author: Arne Vansteenkiste
 */

@@ -16,7 +16,7 @@ import (
 
 var (
 	flag_host  = flag.String("host", "", "override hostname")
-	flag_poll  = flag.Duration("poll", 1*time.Second, "directory poll time")
+	flag_poll  = flag.Duration("poll", 60*time.Second, "directory poll time")
 	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
 	flag_gpu   = flag.Int("gpu", -1, "specify gpu number")
 )

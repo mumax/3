@@ -18,7 +18,7 @@ var (
 	flag_host  = flag.String("host", "", "override hostname")
 	flag_poll  = flag.Duration("poll", 1*time.Second, "directory poll time")
 	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
-	flag_gpus  = flag.Int("gpus", 0, "specify number of gpus")
+	flag_gpu   = flag.Int("gpu", -1, "specify gpu number")
 )
 
 func main() {
@@ -38,9 +38,9 @@ func main() {
 		*flag_host = h
 	}
 
-	log.Println("we have", *flag_gpus, "GPUs")
-	if *flag_gpus <= 0 {
-		log.Println("that's not enough")
+	log.Println("using gpu", *flag_gpu)
+	if *flag_gpu < 0 {
+		log.Println("that's just being negative")
 		os.Exit(1)
 	}
 
@@ -123,6 +123,11 @@ func runJob(jobfile, lockdir string) {
 		log.Println("error parsing", jobfile, ":", err3)
 		return
 	}
+
+	for a := range job.Args {
+		job.Args[a] = strings.Replace(job.Args[a], `%GPU`, fmt.Sprint(*flag_gpu), -1)
+	}
+
 	spawn(job, lockdir)
 }
 
@@ -191,7 +196,7 @@ func findJobFile(que string) (jobfile, lockfile string, ok bool) {
 			if alreadyStarted(f, files) {
 				continue
 			} else {
-				lockfile = noExt(f) + "_" + *flag_host + ".out"
+				lockfile = fmt.Sprint(noExt(f), "_", *flag_host, "_", *flag_gpu, ".out")
 				return que + "/" + f, que + "/" + lockfile, true
 			}
 		}
@@ -205,11 +210,9 @@ func alreadyStarted(file string, files []string) bool {
 	prefix := noExt(file)
 	for _, f := range files {
 		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".out") {
-			//log.Println(file, "already started")
 			return true
 		}
 	}
-	//log.Println(file, "not yet started")
 	return false
 }
 

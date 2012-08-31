@@ -1,4 +1,4 @@
-all:  gc gofmt #gccgo
+all:  gc gofmt doc #gccgo
 
 gc:
 	go install -v 
@@ -13,3 +13,5 @@ gccgo:
 
 clean:
 
+doc:
+	godoc github.com/barnex/mumax-daemon/submit > README

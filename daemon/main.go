@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -14,7 +15,6 @@ import (
 )
 
 var (
-	flag_dir   = flag.String("dir", ".", "directory to watch")
 	flag_host  = flag.String("host", "", "override hostname")
 	flag_poll  = flag.Duration("poll", 1*time.Second, "directory poll time")
 	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
@@ -22,6 +22,21 @@ var (
 
 func main() {
 	flag.Parse()
+	rand.Seed(time.Now().UnixNano())
+
+	if flag.NArg() == 0 {
+		log.Println("need args: directories to watch")
+		os.Exit(1)
+	}
+	dirs := flag.Args()
+
+	// init share map randomly
+	share := make(map[string]float64)
+	for _, d := range dirs {
+		share[d] = rand.Float64()
+	}
+
+	//log.Println("inital share", share)
 
 	if *flag_host == "" {
 		h, err := os.Hostname()
@@ -29,13 +44,26 @@ func main() {
 		*flag_host = h
 	}
 
-	log.Println("watching", *flag_host, ":", *flag_dir)
-	rand.Seed(time.Now().UnixNano())
-
 	for {
-		job, lock, ok := findJobFile()
-		if ok {
+		// find que with least share
+		minshare := math.Inf(1)
+		que, job, lock := "", "", ""
+		for q, s := range share {
+			j, l, ok := findJobFile(q)
+			if ok && s < minshare {
+				que = q
+				job = j
+				lock = l
+				minshare = s
+			}
+		}
+
+		if job != "" {
+			start := time.Now()
 			runJob(job, lock)
+			seconds := time.Since(start).Seconds()
+			share[que] += float64(seconds)
+			//log.Println("share", share)
 		} else {
 			time.Sleep(*flag_poll)
 		}
@@ -114,8 +142,8 @@ func spawn(job Job, lockdir string) {
 }
 
 // Find a job file that's not yet running.
-func findJobFile() (jobfile, lockfile string, ok bool) {
-	dir, err := os.Open(*flag_dir)
+func findJobFile(que string) (jobfile, lockfile string, ok bool) {
+	dir, err := os.Open(que)
 	check(err)
 	defer dir.Close()
 	files, err2 := dir.Readdirnames(-1)
@@ -136,7 +164,7 @@ func findJobFile() (jobfile, lockfile string, ok bool) {
 				continue
 			} else {
 				lockfile = noExt(f) + "_" + *flag_host + ".out"
-				return f, lockfile, true
+				return que + "/" + f, que + "/" + lockfile, true
 			}
 		}
 	}

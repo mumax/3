@@ -93,7 +93,7 @@ func addJob(file, wd, que string) {
 			return
 		}
 
-		prefix := noExt(file)
+		prefix := noExt(jsonfile(file))
 		for _, f := range files {
 			if strings.HasPrefix(f, prefix) {
 				fmt.Println("rm", que+"/"+f)

@@ -9,4 +9,4 @@
  
  Author: Arne Vansteenkiste
 */
-package documentation
+package main

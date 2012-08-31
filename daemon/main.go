@@ -44,6 +44,7 @@ func main() {
 
 }
 
+// Run a job file.
 func runJob(jobfile, lockdir string) {
 	log.Println("starting", jobfile)
 
@@ -69,6 +70,7 @@ func runJob(jobfile, lockdir string) {
 	spawn(job, lockdir)
 }
 
+// Spawn job subprocess.
 func spawn(job Job, lockdir string) {
 	cmd := exec.Command(job.Command, job.Args...)
 	cmd.Dir = job.Wd
@@ -110,12 +112,18 @@ func spawn(job Job, lockdir string) {
 	fmt.Fprintln(logout, job.Command, exitstat)
 }
 
+// Find a job file that's not yet running.
 func findJobFile() (jobfile, lockfile string, ok bool) {
 	dir, err := os.Open(*flag_dir)
 	check(err)
 	defer dir.Close()
 	files, err2 := dir.Readdirnames(-1)
 	check(err2)
+
+	// do not crash Intn():
+	if len(files) == 0 {
+		return
+	}
 
 	// start at random position, then go through files linearly
 	start := rand.Intn(len(files))
@@ -134,6 +142,8 @@ func findJobFile() (jobfile, lockfile string, ok bool) {
 	return "", "", false
 }
 
+// checks if a job is already started
+// (.out exits)
 func alreadyStarted(file string, files []string) bool {
 	prefix := noExt(file)
 	for _, f := range files {
@@ -153,6 +163,7 @@ func check(err error) {
 	}
 }
 
+// remove file extension.
 func noExt(file string) string {
 	return file[:len(file)-len(path.Ext(file))]
 }

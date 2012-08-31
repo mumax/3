@@ -16,6 +16,6 @@ func init() {
 func mumax2(file string) Job {
 	var job Job
 	job.Command = "mumax2"
-	job.Args = []string{`-s`, file}
+	job.Args = []string{`-s`, `-f`, file}
 	return job
 }

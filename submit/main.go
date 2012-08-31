@@ -9,25 +9,12 @@ import (
 	"path"
 )
 
-var mkjob func(file string) Job
-
-func setMkjob(f func(string) Job) {
-	if mkjob != nil {
-		fmt.Fprintln(os.Stderr, "more than one target specified")
-		os.Exit(1)
-	}
-	mkjob = f
-}
+var (
+	flag_que = flag.String("que", "", "override default queue directory ($HOME/que)")
+)
 
 func main() {
 	flag.Parse()
-
-	// get queue directory
-	que := os.Getenv("MUMAX_QUE")
-	if que == "" {
-		fmt.Fprintln(os.Stderr, "$MUMAX_QUE not set")
-		os.Exit(1)
-	}
 
 	// get user
 	u, err2 := user.Current()
@@ -35,8 +22,18 @@ func main() {
 		fmt.Fprintln(os.Stderr, err2)
 		os.Exit(1)
 	}
-	usr := u.Username
-	que = path.Clean(que + "/" + usr)
+	que := path.Clean(u.HomeDir + "/que")
+
+	// override que directory by env.
+	override := os.Getenv("MUMAX_QUE")
+	if override != "" {
+		que = override
+	}
+
+	// override que directory by cli flag
+	if *flag_que != "" {
+		que = *flag_que
+	}
 
 	// check if target is set
 	if mkjob == nil {
@@ -60,6 +57,22 @@ func main() {
 	}
 }
 
+// Function used to make jobs.
+// Set by one of the plug-ins.
+// mkjob does not need to set the job's WD.
+var mkjob func(file string) Job
+
+// Sets mkjob, fails if already set.
+func setMkjob(f func(string) Job) {
+	if mkjob != nil {
+		fmt.Fprintln(os.Stderr, "more than one target specified")
+		os.Exit(1)
+	}
+	mkjob = f
+}
+
+// Add a job to the que directoy,
+// using the mkjob function.
 func addJob(file, wd, que string) {
 	fmt.Print(file, ": ")
 	job := mkjob(file)

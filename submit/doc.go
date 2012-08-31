@@ -5,9 +5,12 @@
  	submit --mumax2 *.py
  This will generate JSON job files in the user's que directy.
  Default is $HOME/que, can be overridden with --que flag.
+ The que directory should be accessible by the daemons.
 
- The job files are in simple JSON and may as well be written
- by hand or a script, if more flexibility is needed.
+ The job files are simple JSON encodings of the Job data type
+ and may as well be written by hand or a script, 
+ should more flexibility be needed.  E.g.:
+ 	{"Command":"mumax2","Args":["-gpu=%GPU","job.py"],"Wd":"/home/me/myfiles"}
 
  Author: Arne Vansteenkiste
 */

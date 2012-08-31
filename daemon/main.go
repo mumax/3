@@ -18,6 +18,7 @@ var (
 	flag_host  = flag.String("host", "", "override hostname")
 	flag_poll  = flag.Duration("poll", 1*time.Second, "directory poll time")
 	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
+	flag_gpus  = flag.Int("gpus", 0, "specify number of gpus")
 )
 
 func main() {
@@ -31,19 +32,23 @@ func main() {
 	}
 	dirs := flag.Args()
 
+	if *flag_host == "" {
+		h, err := os.Hostname()
+		check(err)
+		*flag_host = h
+	}
+
+	log.Println("we have", *flag_gpus, "GPUs")
+	if *flag_gpus <= 0 {
+		log.Println("that's not enough")
+		os.Exit(1)
+	}
+
 	// share map stores how many seconds of compute time
 	// was used by each que.
 	share := make(map[string]float64)
 	for _, d := range dirs {
 		share[d] = rand.Float64()
-	}
-
-	//log.Println("inital share", share)
-
-	if *flag_host == "" {
-		h, err := os.Hostname()
-		check(err)
-		*flag_host = h
 	}
 
 	for {
@@ -64,9 +69,8 @@ func main() {
 			start := time.Now()
 			runJob(job, lock)
 			seconds := time.Since(start).Seconds()
-			share[que] += float64(seconds)
 			decay(share)
-			//log.Println("share", share)
+			share[que] += float64(seconds)
 		} else {
 			time.Sleep(*flag_poll)
 		}

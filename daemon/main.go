@@ -99,6 +99,7 @@ func spawn(job Job, lockdir string) {
 	// start
 	fmt.Fprintln(logout, "job:", job)
 	fmt.Fprintln(logout, "exec", job.Command, job.Args)
+	fmt.Println("exec", job.Command, job.Args)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Fprintln(logout, err)

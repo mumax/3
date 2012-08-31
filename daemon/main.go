@@ -23,6 +23,7 @@ var (
 func main() {
 	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
+	lastdecay = time.Now()
 
 	if flag.NArg() == 0 {
 		log.Println("need args: directories to watch")
@@ -30,7 +31,8 @@ func main() {
 	}
 	dirs := flag.Args()
 
-	// init share map randomly
+	// share map stores how many seconds of compute time
+	// was used by each que.
 	share := make(map[string]float64)
 	for _, d := range dirs {
 		share[d] = rand.Float64()
@@ -63,6 +65,7 @@ func main() {
 			runJob(job, lock)
 			seconds := time.Since(start).Seconds()
 			share[que] += float64(seconds)
+			decay(share)
 			//log.Println("share", share)
 		} else {
 			time.Sleep(*flag_poll)
@@ -70,6 +73,27 @@ func main() {
 		time.Sleep(*flag_relax)
 	}
 
+}
+
+var (
+	lastdecay   time.Time       // Last time the shares were decayed.
+	decaytick   = 1 * time.Hour // Update decays every decaytick
+	decayfactor = 0.997         // Multiply shares by this every decaytick, 0.997 gives half-life of about a week.
+)
+
+// update shares to decay by decayfactor/decaytick
+func decay(share map[string]float64) {
+	ok := false
+	for time.Since(lastdecay) > decaytick {
+		for k := range share {
+			share[k] *= decayfactor
+		}
+		lastdecay = lastdecay.Add(decaytick)
+		ok = true
+	}
+	if ok {
+		log.Println("shares have decayed to", share)
+	}
 }
 
 // Run a job file.
@@ -127,7 +151,7 @@ func spawn(job Job, lockdir string) {
 	// start
 	fmt.Fprintln(logout, "job:", job)
 	fmt.Fprintln(logout, "exec", job.Command, job.Args)
-	fmt.Println("exec", job.Command, job.Args)
+	log.Println("exec", job.Command, job.Args)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Fprintln(logout, err)

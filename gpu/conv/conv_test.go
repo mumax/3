@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/mag"
@@ -17,7 +18,7 @@ var (
 func TestGeneral(test *testing.T) {
 	gpu.LockCudaThread()
 
-	//core.LOG = false
+	core.LOG = false
 	for _, N0 := range N0s {
 		for _, N1 := range N1s {
 			for _, N2 := range N2s {
@@ -28,10 +29,14 @@ func TestGeneral(test *testing.T) {
 }
 
 func testGeneralSize(test *testing.T, N0, N1, N2 int) {
-	//	defer func(){
-	//		err := recover()
-	//		if err != nil{test.Fail()}
-	//	}()
+	defer func() {
+		err := recover()
+		if err != nil {
+			test.Error(N0, N1, N2, err)
+		} else {
+			fmt.Println(N0, N1, N2, "OK")
+		}
+	}()
 	size := [3]int{N0, N1, N2}
 	core.Log("size:", size)
 

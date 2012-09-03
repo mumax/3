@@ -17,7 +17,6 @@ type Conv interface {
 }
 
 // Test if the convolution gives the same result as the brute-force implementation.
-// Destroys c's Input() and Output() arrays.
 func Test(c Conv) {
 	core.Log("testing convolution")
 	input := c.Input()

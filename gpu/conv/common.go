@@ -11,3 +11,7 @@ const stream0 cu.Stream = 0
 func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], 2 * (logicSize[2]/2 + 1)}
 }
+
+func prod(size [3]int) int {
+	return size[0] * size[1] * size[2]
+}

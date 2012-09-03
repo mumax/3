@@ -33,14 +33,15 @@ func (c *hostData) Kernel() [3][3][][][]float32 {
 }
 
 // initialize host arrays and check sizes.
-func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) {
-	c.size = core.SizeOf(input_[0])
+func (c *hostData) init(size [3]int, kernel [3][3][][][]float32) {
+
+	c.size = size
 	c.n = core.Prod(c.size)
+	c.inArr = core.MakeVectors(size)
+	c.outArr = core.MakeVectors(size)
+	c.input = core.Contiguous3(c.inArr)
+	c.output = core.Contiguous3(c.outArr)
 	for i := 0; i < 3; i++ {
-		core.CheckEqualSize(core.SizeOf(input_[i]), c.size)
-		core.CheckEqualSize(core.SizeOf(output_[i]), c.size)
-		c.input[i] = core.Contiguous(input_[i])
-		c.output[i] = core.Contiguous(output_[i])
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
 				c.kern[i][j] = core.Contiguous(kernel[i][j])
@@ -48,8 +49,6 @@ func (c *hostData) init(input_, output_ [3][][][]float32, kernel [3][3][][][]flo
 		}
 	}
 	c.kernSize = core.SizeOf(kernel[0][0])
-	c.inArr = input_
-	c.outArr = output_
 	c.kernArr = kernel
 }
 

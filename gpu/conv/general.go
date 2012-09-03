@@ -94,9 +94,9 @@ func (c *General) initFFT() {
 	// no streams set yet
 }
 
-func NewGeneral(input_, output_ [3][][][]float32, kernel [3][3][][][]float32) *General {
+func NewGeneral(size [3]int, kernel [3][3][][][]float32) *General {
 	c := new(General)
-	c.hostData.init(input_, output_, kernel)
+	c.hostData.init(size, kernel)
 
 	// need cuda thread lock from here on:
 	c.hostData.initPageLock()

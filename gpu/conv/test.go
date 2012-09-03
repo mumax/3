@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/barnex/fmath"
 	"math/rand"
+	"nimble-cube/cli"
 	"nimble-cube/core"
-	"os"
 )
 
 // Interface of any convolution.
@@ -18,7 +18,10 @@ type Conv interface {
 
 // Test if the convolution gives the same result as the brute-force implementation.
 func Test(c Conv) {
-	core.Log("testing convolution")
+	if !*cli.Flag_verify {
+		core.Log("skipping convolution self-test")
+		return
+	}
 	input := c.Input()
 	output := c.Output()
 
@@ -68,10 +71,10 @@ func Test(c Conv) {
 		}
 		const tolerance = 1e-5
 		if maxerr > tolerance {
-			core.Fprint(os.Stderr, "expected:\n")
-			core.Fprintf(os.Stderr, "% 6e", bruteOut)
-			core.Fprint(os.Stderr, "got:\n")
-			core.Fprintf(os.Stderr, "% 6e", c.Output())
+			//	core.Fprint(os.Stderr, "expected:\n")
+			//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
+			//	core.Fprint(os.Stderr, "got:\n")
+			//	core.Fprintf(os.Stderr, "% 6e", c.Output())
 			panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 		}
 		core.Log("convolution test error:", maxerr)

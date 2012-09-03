@@ -4,7 +4,7 @@ import(
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
-	"nimble-cube/mag"
+	//"nimble-cube/mag"
 	"strconv"
 	"flag"
 )
@@ -20,8 +20,16 @@ func main(){
 	core.Log("size:", size)
 
 	ksize := core.PadSize(size, [3]int{0, 0, 0})
-	acc := 4
-	kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
+	//kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
+
+				var kern [3][3][][][]float32
+				for i := 0; i < 3; i++ {
+					for j := 0; j < 3; j++ {
+						kern[i][j] = core.MakeFloats(ksize)
+					}
+				}
+				kern[2][0][0][0][0] = 1
+
 	dump.Quick("kx.dump", kern[0][:])
 	dump.Quick("ky.dump", kern[1][:])
 	dump.Quick("kz.dump", kern[2][:])
@@ -29,9 +37,10 @@ func main(){
 	c :=conv.NewGeneral(size, kern)
 	input := c.Input()
 	output := c.Output()
-	input[0][0][0][0] = 0
+	input[0][N0-1][N1-1][N2-1] = 1
 	input[1][0][0][0] = 0
-	input[2][N0-1][N1-1][N2-1] = 1
+	input[2][0][0][0] = 0
+	//input[2][N0-1][N1-1][N2-1] = 1
 
 	conv.Brute(input, output, kern)
 	dump.Quick("brute.dump", output[:])

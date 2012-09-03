@@ -7,6 +7,12 @@ import (
 )
 
 // Produces nicely formatted output for multi-dimensional arrays.
+func Println(array ...interface{}) {
+	Fprint(os.Stdout, array...)
+	fmt.Fprintln(os.Stdout)
+}
+
+// Produces nicely formatted output for multi-dimensional arrays.
 func Print(array ...interface{}) {
 	Fprint(os.Stdout, array...)
 }

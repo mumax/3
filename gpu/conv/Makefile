@@ -1,4 +1,4 @@
-all: 6g vet #gccgo
+all: 6g #gccgo
 
 6g:
 	go install -v

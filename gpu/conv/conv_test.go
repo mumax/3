@@ -11,8 +11,8 @@ import (
 // some test sizes
 var (
 	N0s = []int{1}
-	N1s = []int{2, 3, 8, 32, 48, 64, 63}
-	N2s = []int{2, 3, 8, 32, 48, 64, 128, 255}
+	N1s = []int{2, 3, 4, 8, 16, 32} //48, 64, 63}
+	N2s = []int{2, 3, 4, 8, 16, 32} //48, 64, 128, 255}
 )
 
 func TestGeneral(test *testing.T) {

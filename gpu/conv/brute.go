@@ -18,6 +18,17 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 	size := core.SizeOf(in[0])
 	ksize := core.SizeOf(kern[0][0])
 
+	// Zero output first
+	for c := 0; c < 3; c++ {
+		for x := 0; x < size[0]; x++ {
+			for y := 0; y < size[1]; y++ {
+				for z := 0; z < size[2]; z++ {
+					out[c][x][y][z] = 0
+				}
+			}
+		}
+	}
+
 	for sc := 0; sc < 3; sc++ {
 		for sx := 0; sx < size[0]; sx++ {
 			for sy := 0; sy < size[1]; sy++ {

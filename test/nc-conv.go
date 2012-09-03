@@ -37,4 +37,7 @@ func main(){
 	c :=conv.NewGeneral(input, output, kern)
 	c.Exec()
 	dump.Quick("output.dump", output[:])
+
+	conv.Brute(input, output, kern)
+	dump.Quick("brute.dump", output[:])
 }

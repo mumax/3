@@ -11,8 +11,15 @@ import (
 func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) [3][3][][][]float32 {
 	core.Debug("Calculating demag kernel", "size:", size, "cellsize:", cellsize, "accuracy:", accuracy, "periodic:", periodic)
 
-	core.Assert(size[0] > 0 && size[1] > 0 && size[2] > 0)
+	core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
 	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
+	core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
+	core.Assert(accuracy > 0)
+	// TODO: handle those correctly:
+	core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
+	if size[0] > 1 {
+		core.Assert(size[0]%2 == 0)
+	}
 
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
@@ -110,6 +117,7 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 	array[1][0] = array[0][1]
 	array[2][0] = array[0][2]
 	array[2][1] = array[1][2]
+	//core.Printf("% 6f", array)
 	return array
 }
 

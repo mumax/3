@@ -10,7 +10,7 @@ import (
 // some test sizes
 var (
 	N0s = []int{1}
-	N1s = []int{1, 2, 3, 8, 32, 48, 63}
+	N1s = []int{2, 3, 8, 32, 48, 63}
 	N2s = []int{2, 3, 8, 32, 48, 128, 255}
 )
 
@@ -44,7 +44,6 @@ func testGeneralSize(test *testing.T, N0, N1, N2 int) {
 	ksize := core.PadSize(size, [3]int{0, 0, 0})
 	acc := 2
 	kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
-	core.Printf("% 4g", kern)
 
 	c := NewGeneral(input, output, kern)
 	c.Exec()

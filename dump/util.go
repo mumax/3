@@ -2,9 +2,15 @@ package dump
 
 import (
 	"io"
+	"nimble-cube/core"
 	"os"
 )
 
+// Returns a channel that pipes all frames
+// available through the reader.
+// Each frame is only valid until the next
+// one is taken from the channel;
+// they share the same storage.
 func ReadAll(in Reader) chan *Frame {
 	c := make(chan *Frame)
 	go func() {
@@ -17,6 +23,11 @@ func ReadAll(in Reader) chan *Frame {
 	return c
 }
 
+// Returns a channel that pipes all frames
+// available in the set of files.
+// Each frame is only valid until the next
+// one is taken from the channel;
+// they share the same storage.
 func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 	c := make(chan *Frame)
 	go func() {
@@ -36,4 +47,21 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 		close(c)
 	}()
 	return c
+}
+
+// Quick-and-dirty dump to a file.
+// Useful for debugging.
+func Quick(fname string, data [][][][]float32) {
+	core.Debug("quick dump to", fname)
+	out, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+	core.PanicErr(err)
+	defer out.Close()
+	w := NewWriter(out, CRC_ENABLED)
+	w.Header.Components = len(data)
+	w.Header.MeshSize = core.SizeOf(data[0])
+	w.WriteHeader()
+	for i := range data {
+		w.WriteData(core.Contiguous(data[i]))
+	}
+	w.WriteHash()
 }

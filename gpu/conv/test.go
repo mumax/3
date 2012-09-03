@@ -5,7 +5,7 @@ import (
 	"github.com/barnex/fmath"
 	"math/rand"
 	"nimble-cube/core"
-	//"os"
+	"os"
 )
 
 // Interface of any convolution.
@@ -68,10 +68,10 @@ func Test(c Conv) {
 		}
 		const tolerance = 1e-5
 		if maxerr > tolerance {
-			//	core.Fprint(os.Stderr, "expected:\n")
-			//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
-			//	core.Fprint(os.Stderr, "got:\n")
-			//	core.Fprintf(os.Stderr, "% 6e", c.Output())
+			core.Fprint(os.Stderr, "expected:\n")
+			core.Fprintf(os.Stderr, "% 6e", bruteOut)
+			core.Fprint(os.Stderr, "got:\n")
+			core.Fprintf(os.Stderr, "% 6e", c.Output())
 			panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 		}
 		core.Log("convolution test error:", maxerr)

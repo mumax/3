@@ -19,14 +19,6 @@ func main(){
 	size := [3]int{N0, N1, N2}
 	core.Log("size:", size)
 
-	input := core.MakeVectors(size)
-	input[0][0][0][0] = 1
-	input[1][0][0][0] = 0
-	input[2][0][0][0] = 0
-	dump.Quick("input.dump", input[:])
-
-	output := core.MakeVectors(size)
-
 	ksize := core.PadSize(size, [3]int{0, 0, 0})
 	acc := 4
 	kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
@@ -34,10 +26,19 @@ func main(){
 	dump.Quick("ky.dump", kern[1][:])
 	dump.Quick("kz.dump", kern[2][:])
 
-	c :=conv.NewGeneral(input, output, kern)
-	c.Exec()
-	dump.Quick("output.dump", output[:])
+	c :=conv.NewGeneral(size, kern)
+	input := c.Input()
+	output := c.Output()
+	input[0][0][0][0] = 0
+	input[1][0][0][0] = 0
+	input[2][N0-1][N1-1][N2-1] = 1
 
 	conv.Brute(input, output, kern)
 	dump.Quick("brute.dump", output[:])
+
+	c.Exec()
+
+	dump.Quick("input.dump", input[:])
+	dump.Quick("output.dump", output[:])
+
 }

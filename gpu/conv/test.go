@@ -36,9 +36,9 @@ func Test(c Conv) {
 	// generate sparse input data
 	size := core.SizeOf(input[0])
 	N0, N1, N2 := size[0], size[1], size[2]
-	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
-	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
-	ks := [...]int{0, N2 / 11, N2 / 2, N2 - 1}
+	is := [...]int{N0 - 1} //	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
+	js := [...]int{N1 - 1} //	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
+	ks := [...]int{N2 - 1} //	ks := [...]int{0, N2 / 11, N2 / 2, N2 - 1}
 	for c := range input {
 		for _, i := range is {
 			for _, j := range js {

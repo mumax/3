@@ -106,6 +106,10 @@ func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int
 			}
 		}
 	}
+	// make result symmetric for tools that expect it so.
+	array[1][0] = array[0][1]
+	array[2][0] = array[0][2]
+	array[2][1] = array[1][2]
 	return array
 }
 

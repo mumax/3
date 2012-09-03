@@ -12,6 +12,11 @@ func Print(array ...interface{}) {
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.
+func Printf(format string, array ...interface{}) {
+	Fprintf(os.Stdout, format, array...)
+}
+
+// Produces nicely formatted output for multi-dimensional arrays.
 func Fprint(out io.Writer, array ...interface{}) {
 	Fprintf(out, "%v", array...)
 }
@@ -26,6 +31,10 @@ func Fprintf(out io.Writer, format string, array ...interface{}) {
 			FprintfTensors(out, format, a)
 		case [3][][][]float32:
 			FprintfTensors(out, format, a[:])
+		case [3][3][][][]float32:
+			Fprintf(out, format, a[0][:])
+			Fprintf(out, format, a[1][:])
+			Fprintf(out, format, a[2][:])
 		default:
 			fmt.Fprintf(out, format, a)
 		}

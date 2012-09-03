@@ -1,8 +1,8 @@
 package mag
 
 import (
-	//"nimble-cube/core"
-	"nimble-cube/gpu/conv"
+//"nimble-cube/core"
+//"nimble-cube/gpu/conv"
 )
 
 func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
@@ -20,6 +20,7 @@ func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
 		torque[Y][i] = t_[Y]
 		torque[Z][i] = t_[Z]
 	}
+	panic("TODO: demag")
 }
 
 // Landau-Lifshitz torque.
@@ -29,7 +30,7 @@ type LLGBox struct {
 	H              [3][]float32
 	alpha          []float32
 	Torque         [3][]float32
-	hplan          *conv.Symmetric
+	//hplan          *conv.Symmetric
 	//solver *Euler
 }
 
@@ -40,7 +41,7 @@ func (box *LLGBox) Run() {
 			start := w * box.warpLen
 			stop := (w + 1) * box.warpLen
 
-			box.hplan.Pull(stop)
+			//box.hplan.Pull(stop)
 
 			for i := start; i < stop; i++ {
 

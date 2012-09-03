@@ -69,8 +69,10 @@ func Test(c Conv) {
 		}
 		const tolerance = 1e-5
 		if maxerr > tolerance {
-			core.Fprint(os.Stderr, "expected:\n", bruteOut)
-			core.Fprint(os.Stderr, "got:\n", output)
+			core.Fprint(os.Stderr, "expected:\n")
+			core.Fprintf(os.Stderr, "% 4f", bruteOut)
+			core.Fprint(os.Stderr, "got:\n")
+			core.Fprintf(os.Stderr, "% 4f", c.Output())
 			panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 		}
 		core.Log("convolution test error:", maxerr)

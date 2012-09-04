@@ -26,7 +26,7 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 	dstptr := dst.Pointer()
 	srcptr := src.Pointer()
 
-	block := 1
+	block := 16
 	gridJ := gpu.DivUp(gpu.Min(dstsize[1], srcsize[1]), block)
 	gridK := gpu.DivUp(gpu.Min(dstsize[2], srcsize[2]), block)
 	shmem := 0

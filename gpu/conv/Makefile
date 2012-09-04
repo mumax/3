@@ -15,7 +15,7 @@ gccgo:
 test: 6gtest #gccgotest
 
 6gtest: 
-	go test --pagelock=0
+	go test 
 
 gccgotest: 
 	go test -compiler $(GCCGO)

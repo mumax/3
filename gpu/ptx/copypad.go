@@ -11,7 +11,7 @@ const COPYPAD = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00000508_00000000-9_copypad.cpp3.i"
+	.file	1 "/tmp/tmpxft_00001b15_00000000-9_copypad.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/copypad.cu"
 
 .visible .entry copypad(
@@ -57,14 +57,14 @@ const COPYPAD = `
 	mov.u32 	%r7, %tid.x;
 	mad.lo.s32 	%r8, %r5, %r6, %r7;
 	.loc 2 20 1
-	setp.ge.s32 	%p1, %r4, %r23;
-	setp.ge.s32 	%p2, %r8, %r22;
+	setp.ge.s32 	%p1, %r8, %r23;
+	setp.ge.s32 	%p2, %r4, %r22;
 	or.pred  	%p3, %p1, %p2;
 	@%p3 bra 	BB0_4;
 
 	.loc 2 29 1
-	setp.lt.s32 	%p4, %r4, %r20;
-	setp.lt.s32 	%p5, %r8, %r19;
+	setp.lt.s32 	%p4, %r8, %r20;
+	setp.lt.s32 	%p5, %r4, %r19;
 	and.pred  	%p6, %p5, %p4;
 	.loc 2 41 1
 	setp.gt.s32 	%p7, %r21, 0;
@@ -75,14 +75,14 @@ const COPYPAD = `
 
 BB0_2:
 	.loc 2 41 1
-	add.s32 	%r28, %r3, %r26;
-	mad.lo.s32 	%r29, %r1, %r2, %r28;
-	add.s32 	%r30, %r7, %r25;
-	mad.lo.s32 	%r31, %r5, %r6, %r30;
+	add.s32 	%r28, %r7, %r26;
+	mad.lo.s32 	%r29, %r5, %r6, %r28;
+	add.s32 	%r30, %r3, %r25;
+	mad.lo.s32 	%r31, %r1, %r2, %r30;
 	mad.lo.s32 	%r32, %r24, %r19, %r31;
 	mad.lo.s32 	%r38, %r20, %r32, %r29;
 	mul.lo.s32 	%r10, %r20, %r19;
-	mad.lo.s32 	%r37, %r23, %r8, %r4;
+	mad.lo.s32 	%r37, %r23, %r4, %r8;
 	mul.lo.s32 	%r12, %r23, %r22;
 	mov.u32 	%r39, 0;
 

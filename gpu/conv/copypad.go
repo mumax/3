@@ -18,7 +18,7 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 	// TODO: either remove offset or check offset
 
 	if copyPadKern == 0 {
-		mod := cu.ModuleLoadData(ptx.COPYPAD) // TODO: target higher SM's as well.
+		mod := cu.ModuleLoadData(ptx.COPYPAD)
 		copyPadKern = mod.GetFunction("copypad")
 	}
 
@@ -42,5 +42,6 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 		unsafe.Pointer(&offset[1]),
 		unsafe.Pointer(&offset[2])}
 
-	cu.LaunchKernel(copyPadKern, gridJ, gridK, 1, block, block, 1, shmem, stream, args)
+	// launch config is called x, y, z, but for us this is z, y, x
+	cu.LaunchKernel(copyPadKern, gridK, gridJ, 1, block, block, 1, shmem, stream, args)
 }

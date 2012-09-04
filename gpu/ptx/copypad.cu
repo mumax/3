@@ -14,8 +14,8 @@ copypad(float* dst, int D0, int D1, int D2,
         int o0, int o1, int o2){
 
 	// swap j/k, swap S1/S2, D1/D2
-	int k = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
-	int j = blockIdx.x * blockDim.x + threadIdx.x;
+	int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
+	int k = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if(j>=S1 || k>=S2){
 	//printf("(%dx%dx%d x %dx%dx%d):(%d %d %d:%d %d %d): return1\n",

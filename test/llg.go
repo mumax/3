@@ -30,7 +30,7 @@ func main() {
 	defer table.Flush()
 
 	alpha:=float32(0.02)
-	N := 1000
+	N := 100000
 	dt := 10e-15
 	time := 0.
 	for step := 0; step < N; step++ {

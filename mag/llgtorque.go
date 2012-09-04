@@ -3,10 +3,12 @@ package mag
 import (
 //"nimble-cube/core"
 //"nimble-cube/gpu/conv"
+	"math"
 )
 
 func LLGTorque(torque, m, H [3][]float32, alpha float32) {
-	const gamma = 1.76085970839e11 // rad/Ts
+	//const mu0 = 4 * math.Pi * 1e7
+	//const gamma = 1.76085970839e11 / mu0 // rad/Ts
 	for i := range torque[0] {
 
 		var m_ Vector

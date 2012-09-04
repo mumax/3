@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"math"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
@@ -29,13 +30,18 @@ func main() {
 	Hd_ := core.Contiguous3(Hd)
 
 	// inital mag
-	y1, y2 := 3*N1/8, 5*N1/8
-	z1, z2 := 0*N2/8, 2*N2/8
+	y1, y2 := 0,N1//3*N1/8, 5*N1/8
+	z1, z2 := 0,N2//0*N2/8, 2*N2/8
+	my := m[1]
 	mz := m[2]
+	theta := 0.01
+	c := float32(math.Cos(theta))
+	s := float32(math.Sin(theta))
 	for i := range mz {
 		for j := y1; j < y2; j++ {
 			for k := z1; k < z2; k++ {
-				mz[i][j][k] = 1
+				mz[i][j][k] = c
+				my[i][j][k] = s
 			}
 		}
 	}
@@ -69,7 +75,7 @@ func main() {
 	defer table.Flush()
 
 	N := 1000
-	dt := 1e-15
+	dt := 10e-15
 	time := 0.
 	for step := 0; step < N; step++ {
 		time = dt * float64(step)

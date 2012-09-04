@@ -5,9 +5,10 @@ import (
 	//"nimble-cube/core"
 )
 
-// General convolution, not optimized for specific cases.
+// Basic convolution, not optimized for specific cases.
 // Also not concurrent.
-type General struct {
+// Kernel does not need to have any symmetry.
+type Basic struct {
 	hostData    // sizes, host input/output/kernel arrays
 	deviceData3 // device buffers // could use just one ioBuf
 	fwPlan      safe.FFT3DR2CPlan
@@ -15,7 +16,7 @@ type General struct {
 }
 
 // Execute the convolution.
-func (c *General) Exec() {
+func (c *Basic) Exec() {
 	// Zero padding and forward FFTs.
 	for i := 0; i < 3; i++ {
 		//core.Println("input", i, "\n", core.Reshape(c.input[i], c.size))
@@ -50,7 +51,7 @@ func (c *General) Exec() {
 }
 
 // Copy ioBuf[i] to fftRBuf[i], adding padding :-).
-func (c *General) copyPadIOBuf(i int) {
+func (c *Basic) copyPadIOBuf(i int) {
 	offset := [3]int{0, 0, 0}
 	c.fftRBuf[i].Memset(0) // copypad does NOT zero remainder.
 	stream0.Synchronize()
@@ -59,7 +60,7 @@ func (c *General) copyPadIOBuf(i int) {
 }
 
 // Copy ioBuf[i] to fftRBuf[i], adding padding :-).
-func (c *General) copyUnpadIOBuf(i int) {
+func (c *Basic) copyUnpadIOBuf(i int) {
 	offset := [3]int{0, 0, 0}
 	copyPad(c.ioBuf[i], c.fftRBuf[i], c.size, c.kernSize, offset, stream0)
 	stream0.Synchronize()
@@ -67,13 +68,13 @@ func (c *General) copyUnpadIOBuf(i int) {
 
 // Size of the FFT'ed kernel expressed in number of floats.
 // Real and Complex parts are stored.
-func (c *General) fftKernelSizeFloats() [3]int {
+func (c *Basic) fftKernelSizeFloats() [3]int {
 	return fftR2COutputSizeFloats(c.kernSize)
 	// kernel size is FFT logic size
 }
 
 // Initializes c.gpuFFTKern and c.fftKern
-func (c *General) initFFTKern() {
+func (c *Basic) initFFTKern() {
 	realsize := c.kernSize
 	reallen := prod(realsize)
 	fftedsize := fftR2COutputSizeFloats(realsize)
@@ -102,7 +103,7 @@ func scaled(x []float32, s float32) []float32 {
 }
 
 // Initializes the FFT plans.
-func (c *General) initFFT() {
+func (c *Basic) initFFT() {
 	padded := c.kernSize
 	//realsize := fftR2COutputSizeFloats(padded)
 	c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
@@ -110,8 +111,8 @@ func (c *General) initFFT() {
 	// no streams set yet
 }
 
-func NewGeneral(size [3]int, kernel [3][3][][][]float32) *General {
-	c := new(General)
+func NewBasic(size [3]int, kernel [3][3][][][]float32) *Basic {
+	c := new(Basic)
 	c.hostData.init(size, kernel)
 
 	// need cuda thread lock from here on:

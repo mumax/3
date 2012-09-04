@@ -13,7 +13,7 @@ copypad(float* dst, int D0, int D1, int D2,
         float* src, int S0, int S1, int S2, 
         int o0, int o1, int o2){
 
-	// todo: check if it's contiguous?
+	// swap j/k, swap S1/S2, D1/D2
 	int k = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 

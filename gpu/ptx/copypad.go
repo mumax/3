@@ -11,7 +11,7 @@ const COPYPAD = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00000382_00000000-9_copypad.cpp3.i"
+	.file	1 "/tmp/tmpxft_00000508_00000000-9_copypad.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/copypad.cu"
 
 .visible .entry copypad(

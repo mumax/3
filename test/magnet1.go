@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"os"
-	"math"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
@@ -28,8 +27,17 @@ func main() {
 	Hd_ := core.Contiguous3(Hd)
 
 	// inital mag
-	Θ := 0.01
-	mag.Uniform(m, mag.Vector{0, float32(math.Sin(Θ)), float32(math.Cos(Θ))})
+	y1, y2 := 3*N1/8, 5*N1/8
+	z1, z2 :=  0*N2/8, 2*N2/8
+	mz := m[2]
+	for i:=range mz{
+		for j:=y1; j<y2; j++{
+		for k:=z1; k<z2; k++{
+		mz[i][j][k] = 1
+}
+		}
+	}
+
 	dump.Quick("m", m[:])
 
 	demag.Exec()

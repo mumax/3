@@ -8,15 +8,15 @@ import (
 	"unsafe"
 )
 
-
 type TableReader struct {
-	in  *bufio.Reader
-	Data []float32
-	Tags []string
-	Units []string
+	in        *bufio.Reader
+	Data      []float32
+	Tags      []string
+	Units     []string
+	dataBytes []byte
 }
 
-func NewTableReader(in io.Reader)TableReader{
+func NewTableReader(in io.Reader) TableReader {
 
 	bufin, ok := in.(*bufio.Reader)
 	if !ok {
@@ -26,8 +26,8 @@ func NewTableReader(in io.Reader)TableReader{
 	var t TableReader
 	t.in = bufin
 	magic := t.readString()
-	if magic != TABLE_MAGIC{
-		core.Panic("bad magic number:",magic)
+	if magic != TABLE_MAGIC {
+		core.Panic("bad magic number:", magic)
 	}
 
 	n := t.readInt()
@@ -41,13 +41,22 @@ func NewTableReader(in io.Reader)TableReader{
 	}
 
 	precission := t.readInt()
-	if precission != FLOAT32{
+	if precission != FLOAT32 {
 		core.Panic("only 32 bit is supported")
 	}
+	// t.Data exposed as raw bytes
+	t.dataBytes = (*(*[1<<31 - 1]byte)(unsafe.Pointer(&t.Data[0])))[0 : 4*len(t.Data)]
 
 	return t
 }
 
+func (r *TableReader) ReadLine() error {
+	_, err := io.ReadFull(r.in, r.dataBytes)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (r *TableReader) readInt() int {
 	x := r.readUint64()

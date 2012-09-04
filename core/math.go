@@ -16,3 +16,11 @@ func Add3(dst, a, b [3][]float32) {
 		Add(dst[c], a[c], b[c])
 	}
 }
+
+func Average(x []float32) float64 {
+	sum := 0.
+	for _, v := range x {
+		sum += float64(v)
+	}
+	return sum / float64(len(x))
+}

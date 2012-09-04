@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"os"
 	"math"
 	"nimble-cube/core"
 	"nimble-cube/dump"
@@ -52,15 +52,28 @@ func main() {
 	mag.LLGTorque(torque_, m_, Heff_, alpha)
 	dump.Quick("torque", torque[:])
 
+	out, err := os.OpenFile("m.table", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
+	core.Fatal(err)
+	defer out.Close()
+	table := dump.NewTableWriter(out, []string{"t", "mx", "my", "mz"}, []string{"s", "", "", ""})
+	defer table.Flush()
+
 	N := 1000
 	dt := 1e-15
+	time := 0.
 	for step := 0; step < N; step++ {
+		time = dt * float64(step)
 		demag.Exec()
 		mag.Exchange6(m, Hex, cellsize, Aex)
 		core.Add3(Heff_, Hex_, Hd_)
 		mag.LLGTorque(torque_, m_, Heff_, alpha)
 		mag.EulerStep(m_, torque_, dt)
-		dump.Quick(fmt.Sprintf("m%06d", step), m[:])
+		//dump.Quick(fmt.Sprintf("m%06d", step), m[:])
+		table.Data[0] = float32(time)
+		table.Data[1] = float32(core.Average(m_[0]))
+		table.Data[2] = float32(core.Average(m_[1]))
+		table.Data[3] = float32(core.Average(m_[2]))
+		table.WriteData()
 	}
 }
 

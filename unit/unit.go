@@ -2,7 +2,7 @@ package unit
 
 var (
 	Time   float64 = 1e-15 // seconds
-	B float64 = 1     // Tesla
+	B      float64 = 1     // Tesla
 	Length float64 = 1e-9  // meter
 )
 

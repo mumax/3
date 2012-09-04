@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"os"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"os"
 	"strconv"
 )
 
@@ -19,8 +19,10 @@ func main() {
 
 	// demag
 	acc := 4
-	kernel := mag.BruteKernel(size, cellsize, [3]int{0, 0, 0}, acc)
-	demag := conv.NewSymmetric(size, kernel)
+	NOPBC := [3]int{0, 0, 0}
+	// TODO: kernel should known its size depending on PBC or not!!
+	kernel := mag.BruteKernel(core.PadSize(size, NOPBC), cellsize, NOPBC, acc)
+	demag := conv.NewBasic(size, kernel)
 	m := demag.Input()
 	m_ := core.Contiguous3(m)
 	Hd := demag.Output()
@@ -28,13 +30,13 @@ func main() {
 
 	// inital mag
 	y1, y2 := 3*N1/8, 5*N1/8
-	z1, z2 :=  0*N2/8, 2*N2/8
+	z1, z2 := 0*N2/8, 2*N2/8
 	mz := m[2]
-	for i:=range mz{
-		for j:=y1; j<y2; j++{
-		for k:=z1; k<z2; k++{
-		mz[i][j][k] = 1
-}
+	for i := range mz {
+		for j := y1; j < y2; j++ {
+			for k := z1; k < z2; k++ {
+				mz[i][j][k] = 1
+			}
 		}
 	}
 
@@ -60,7 +62,7 @@ func main() {
 	mag.LLGTorque(torque_, m_, Heff_, alpha)
 	dump.Quick("torque", torque[:])
 
-	out, err := os.OpenFile("m.table", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
+	out, err := os.OpenFile("m.table", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	core.Fatal(err)
 	defer out.Close()
 	table := dump.NewTableWriter(out, []string{"t", "mx", "my", "mz"}, []string{"s", "", "", ""})

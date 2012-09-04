@@ -37,7 +37,7 @@ func main() {
 
 	Hex := core.MakeVectors(size)
 	Hex_ := core.Contiguous3(Hex)
-	Aex := 12e-13
+	Aex := 13e-12
 	mag.Exchange6(m, Hex, cellsize, Aex)
 	dump.Quick("hex", Hex[:])
 
@@ -53,7 +53,7 @@ func main() {
 	dump.Quick("torque", torque[:])
 
 	N := 1000
-	dt := 0.001
+	dt := 1e-15
 	for step := 0; step < N; step++ {
 		demag.Exec()
 		mag.Exchange6(m, Hex, cellsize, Aex)

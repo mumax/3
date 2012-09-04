@@ -1,9 +1,9 @@
 package unit
 
 var (
-	TIME   float64 = 1e-15 // seconds
-	BFIELD float64 = 1     // Tesla
-	LENGTH float64 = 1e-9  // meter
+	Time   float64 = 1e-15 // seconds
+	B float64 = 1     // Tesla
+	Length float64 = 1e-9  // meter
 )
 
 // Time unit in seconds.

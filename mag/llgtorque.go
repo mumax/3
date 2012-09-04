@@ -6,6 +6,7 @@ import (
 )
 
 func LLGTorque(torque, m, H [3][]float32, alpha float32) {
+	const gamma = 1.76085970839e11 // rad/Ts
 	for i := range torque[0] {
 
 		var m_ Vector
@@ -14,7 +15,7 @@ func LLGTorque(torque, m, H [3][]float32, alpha float32) {
 		H_[X], H_[Y], H_[Z] = H[X][i], H[Y][i], H[Z][i]
 
 		mxh := m_.Cross(H_) // not inlined for some reason...
-		t_ := mxh.Sub(m_.Cross(mxh).Scaled(alpha))
+		t_ := (mxh.Sub(m_.Cross(mxh).Scaled(alpha))).Scaled(gamma)
 
 		torque[X][i] = t_[X]
 		torque[Y][i] = t_[Y]

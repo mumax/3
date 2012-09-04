@@ -2,7 +2,7 @@ package conv
 
 import (
 	"github.com/barnex/cuda4/safe"
-	"nimble-cube/core"
+	//"nimble-cube/core"
 )
 
 // General convolution, not optimized for specific cases.
@@ -18,15 +18,15 @@ type General struct {
 func (c *General) Exec() {
 	// Zero padding and forward FFTs.
 	for i := 0; i < 3; i++ {
-		core.Println("input", i, "\n", core.Reshape(c.input[i], c.size))
+		//core.Println("input", i, "\n", core.Reshape(c.input[i], c.size))
 		c.ioBuf[i].CopyHtoD(c.input[i])
-		core.Println("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.size))
+		//core.Println("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.size))
 		stream0.Synchronize()
 		c.copyPadIOBuf(i)
-		core.Println("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.kernSize))
+		//core.Println("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.kernSize))
 		stream0.Synchronize()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-		core.Println("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+		//core.Println("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 		stream0.Synchronize()
 	}
 
@@ -36,16 +36,16 @@ func (c *General) Exec() {
 
 	// Backward FFT and unpadding
 	for i := 0; i < 3; i++ {
-		core.Println("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
+		//core.Println("fftCBuf", i, "\n", core.Reshape(c.fftCBuf[i].Float().Host(), c.fftKernelSizeFloats()))
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
 		stream0.Synchronize()
-		core.Println("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.kernSize))
+		//core.Println("fftRBuf", i, "\n", core.Reshape(c.fftRBuf[i].Host(), c.kernSize))
 		c.copyUnpadIOBuf(i)
 		stream0.Synchronize()
-		core.Println("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.size))
+		//core.Println("ioBuf", i, "\n", core.Reshape(c.ioBuf[i].Host(), c.size))
 		c.ioBuf[i].CopyDtoH(c.output[i])
 		stream0.Synchronize()
-		core.Println("output", i, "\n", core.Reshape(c.output[i], c.size))
+		//core.Println("output", i, "\n", core.Reshape(c.output[i], c.size))
 	}
 }
 

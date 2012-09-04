@@ -37,9 +37,16 @@ func main(){
 	c :=conv.NewGeneral(size, kern)
 	input := c.Input()
 	output := c.Output()
-	input[0][N0-1][N1-1][N2-1] = 1
-	input[1][0][0][0] = 0
-	input[2][0][0][0] = 0
+	
+	for i:=range input[0]{
+	for j:=range input[0][0]{
+	for k:=range input[0][0][0]{
+	input[0][i][j][k] = float32(k)
+	}}}
+
+//	input[0][N0-1][N1-1][N2-1] = 1
+//	input[1][0][0][0] = 0
+//	input[2][0][0][0] = 0
 	//input[2][N0-1][N1-1][N2-1] = 1
 
 	conv.Brute(input, output, kern)

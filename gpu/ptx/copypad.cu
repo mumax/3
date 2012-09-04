@@ -13,13 +13,25 @@ copypad(float* dst, int D0, int D1, int D2,
         float* src, int S0, int S1, int S2, 
         int o0, int o1, int o2){
 
-	int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
-	int k = blockIdx.x * blockDim.x + threadIdx.x;
+	// todo: check if it's contiguous?
+	int k = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
+	int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if(j>=S1 || k>=S2){
+	//printf("(%dx%dx%d x %dx%dx%d):(%d %d %d:%d %d %d): return1\n",
+	//		gridDim.x, gridDim.y, gridDim.z, 
+	//		blockDim.x, blockDim.y, blockDim.z,
+	//		blockIdx.x, blockIdx.y, blockIdx.z,
+	//		threadIdx.x, threadIdx.y, threadIdx.z);
  		return;	// out of src bounds
 	}
+	// TODO: fuse
 	if(j>=D1 || k>=D2){
+	//printf("(%dx%dx%d x %dx%dx%d):(%d %d %d:%d %d %d): return2\n",
+	//		gridDim.x, gridDim.y, gridDim.z, 
+	//		blockDim.x, blockDim.y, blockDim.z,
+	//		blockIdx.x, blockIdx.y, blockIdx.z,
+	//		threadIdx.x, threadIdx.y, threadIdx.z);
  		return;	// out of dst bounds
 	}
 
@@ -28,6 +40,13 @@ copypad(float* dst, int D0, int D1, int D2,
 	
 	for (int i=0; i<S0; i++){
  		int I = i + o0; // index in full src
+
+//	printf("(%dx%dx%d x %dx%dx%d):(%d %d %d:%d %d %d): %d -> %d\n",
+//			gridDim.x, gridDim.y, gridDim.z, 
+//			blockDim.x, blockDim.y, blockDim.z,
+//			blockIdx.x, blockIdx.y, blockIdx.z,
+//			threadIdx.x, threadIdx.y, threadIdx.z,
+//			i*S1*S2 + j*S2 + k, I*D1*D2 + J*D2 + K);
 	
 		dst[I*D1*D2 + J*D2 + K] = src[i*S1*S2 + j*S2 + k];
 	}

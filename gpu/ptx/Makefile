@@ -2,7 +2,13 @@ CUFILES = $(wildcard *.cu)
 PTXFILES = $(CUFILES:.cu=.ptx)
 GOFILES=$(CUFILES:.cu=.go)
 
-NVCC = nvcc
+NVCC = nvcc\
+	-arch=sm_30\
+	--compiler-options -Werror\
+	--compiler-options -Wall\
+	--use_fast_math\
+	-Xptxas\
+	-v\
 
 all: $(GOFILES) install
 

@@ -2,6 +2,7 @@ package dump
 
 import (
 	"io"
+	"path"
 	"nimble-cube/core"
 	"os"
 )
@@ -52,6 +53,9 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 // Quick-and-dirty dump to a file.
 // Useful for debugging.
 func Quick(fname string, data [][][][]float32) {
+	if path.Ext(fname) == ""{
+		fname += ".dump"
+	}
 	core.Debug("quick dump to", fname)
 	out, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	core.PanicErr(err)

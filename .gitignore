@@ -8,5 +8,7 @@
 *.dot
 *.svg
 *.log
-nimble-cube
-*.txt
+*.dump
+*.png
+*.jpg
+*.gplot

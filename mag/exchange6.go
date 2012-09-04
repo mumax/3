@@ -1,11 +1,11 @@
 package mag
 
 // Naive implementation of 6-neighbor exchange field.
-func Exchange6(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64) {
+func Exchange6(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64, aex float64) {
 	var (
-		facI = float32(1 / (cellsize[0] * cellsize[0]))
-		facJ = float32(1 / (cellsize[1] * cellsize[1]))
-		facK = float32(1 / (cellsize[2] * cellsize[2]))
+		facI = float32(aex / (cellsize[0] * cellsize[0]))
+		facJ = float32(aex / (cellsize[1] * cellsize[1]))
+		facK = float32(aex / (cellsize[2] * cellsize[2]))
 	)
 	N0, N1, N2 := len(m[0]), len(m[0][0]), len(m[0][0][0])
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"math"
 	"nimble-cube/core"
 	"nimble-cube/dump"
@@ -24,10 +25,10 @@ func main() {
 	m := demag.Input()
 	m_ := core.Contiguous3(m)
 	Hd := demag.Output()
-	Hd_:= core.Contiguous3(Hd)
+	Hd_ := core.Contiguous3(Hd)
 
 	// inital mag
-	Θ := 5.
+	Θ := 0.01
 	mag.Uniform(m, mag.Vector{0, float32(math.Sin(Θ)), float32(math.Cos(Θ))})
 	dump.Quick("m", m[:])
 
@@ -35,8 +36,9 @@ func main() {
 	dump.Quick("hd", Hd[:])
 
 	Hex := core.MakeVectors(size)
-	Hex_:=core.Contiguous3(Hex)
-	mag.Exchange6(m, Hex, cellsize)	
+	Hex_ := core.Contiguous3(Hex)
+	Aex := 12e-13
+	mag.Exchange6(m, Hex, cellsize, Aex)
 	dump.Quick("hex", Hex[:])
 
 	Heff := core.MakeVectors(size)
@@ -44,20 +46,22 @@ func main() {
 	core.Add3(Heff_, Hex_, Hd_)
 	dump.Quick("heff", Heff[:])
 
-	alpha:=float32(1)
+	alpha := float32(1)
 	torque := core.MakeVectors(size)
 	torque_ := core.Contiguous3(torque)
 	mag.LLGTorque(torque_, m_, Heff_, alpha)
 	dump.Quick("torque", torque[:])
 
-	N:=1000
-	for step := 0; step < N; step++{
+	N := 1000
+	dt := 0.001
+	for step := 0; step < N; step++ {
 		demag.Exec()
-		mag.Exchange6(m, Hex, cellsize)	
+		mag.Exchange6(m, Hex, cellsize, Aex)
 		core.Add3(Heff_, Hex_, Hd_)
 		mag.LLGTorque(torque_, m_, Heff_, alpha)
-	}	
-
+		mag.EulerStep(m_, torque_, dt)
+		dump.Quick(fmt.Sprintf("m%06d", step), m[:])
+	}
 }
 
 func intflag(idx int) int {

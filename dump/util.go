@@ -2,9 +2,9 @@ package dump
 
 import (
 	"io"
-	"path"
 	"nimble-cube/core"
 	"os"
+	"path"
 )
 
 // Returns a channel that pipes all frames
@@ -53,7 +53,7 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 // Quick-and-dirty dump to a file.
 // Useful for debugging.
 func Quick(fname string, data [][][][]float32) {
-	if path.Ext(fname) == ""{
+	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
 	core.Debug("quick dump to", fname)

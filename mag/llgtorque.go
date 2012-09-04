@@ -5,7 +5,7 @@ import (
 //"nimble-cube/gpu/conv"
 )
 
-func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
+func LLGTorque(torque, m, H [3][]float32, alpha float32) {
 	for i := range torque[0] {
 
 		var m_ Vector
@@ -14,13 +14,12 @@ func LLGTorque(m, H [3][]float32, alpha []float32, torque [3][]float32) {
 		H_[X], H_[Y], H_[Z] = H[X][i], H[Y][i], H[Z][i]
 
 		mxh := m_.Cross(H_) // not inlined for some reason...
-		t_ := mxh.Sub(m_.Cross(mxh).Scaled(alpha[i]))
+		t_ := mxh.Sub(m_.Cross(mxh).Scaled(alpha))
 
 		torque[X][i] = t_[X]
 		torque[Y][i] = t_[Y]
 		torque[Z][i] = t_[Z]
 	}
-	panic("TODO: demag")
 }
 
 // Landau-Lifshitz torque.

@@ -11,7 +11,7 @@ import (
 
 var (
 	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
-	flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
+	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 	// TODO: need -gpu=NUM flag
 )
 
@@ -63,7 +63,7 @@ func UnlockCudaThread() {
 // Register host memory for fast transfers,
 // but only when flag -pagelock is true.
 func MemHostRegister(slice []float32) {
-	if *flag_pagelock {
+	if *Flag_pagelock {
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
 	}
 }

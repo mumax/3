@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"flag"
 	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
@@ -11,12 +12,15 @@ import (
 // some test sizes
 var (
 	N0s = []int{1}
-	N1s = []int{2, 3, 4, 8, 16, 32} //48, 64, 63}
-	N2s = []int{2, 3, 4, 8, 16, 32} //48, 64, 128, 255}
+	N1s = []int{2, 3, 4, 8, 16, 32,48, 64, 63}
+	N2s = []int{2, 3, 4, 8, 16, 32, 48, 64, 128, 255}
 )
+
+func init() { flag.Parse() }
 
 func TestGeneral(test *testing.T) {
 	gpu.LockCudaThread()
+	*gpu.Flag_pagelock = false
 
 	core.LOG = false
 	for _, N0 := range N0s {

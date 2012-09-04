@@ -16,6 +16,8 @@ type Conv interface {
 	Exec()                       // Executes the convolution
 }
 
+type Constructor func(size [3]int, kernel [3][3][][][]float32) Conv
+
 // Test if the convolution gives the same result as the brute-force implementation.
 func Test(c Conv) {
 	if !*cli.Flag_verify {

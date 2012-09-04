@@ -111,7 +111,7 @@ func (c *Basic) initFFT() {
 	// no streams set yet
 }
 
-func NewBasic(size [3]int, kernel [3][3][][][]float32) *Basic {
+func NewBasic(size [3]int, kernel [3][3][][][]float32) Conv {
 	c := new(Basic)
 	c.hostData.init(size, kernel)
 

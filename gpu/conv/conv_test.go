@@ -26,13 +26,27 @@ func TestBasic(test *testing.T) {
 	for _, N0 := range N0s {
 		for _, N1 := range N1s {
 			for _, N2 := range N2s {
-				testBasicSize(test, N0, N1, N2)
+				testConvSize(test, NewBasic, N0, N1, N2)
 			}
 		}
 	}
 }
 
-func testBasicSize(test *testing.T, N0, N1, N2 int) {
+func TestSymmetric(test *testing.T) {
+	gpu.LockCudaThread()
+	*gpu.Flag_pagelock = false
+
+	core.LOG = false
+	for _, N0 := range N0s {
+		for _, N1 := range N1s {
+			for _, N2 := range N2s {
+				testConvSize(test, NewSymmetric, N0, N1, N2)
+			}
+		}
+	}
+}
+
+func testConvSize(test *testing.T, f Constructor, N0, N1, N2 int) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -48,7 +62,7 @@ func testBasicSize(test *testing.T, N0, N1, N2 int) {
 	acc := 2
 	kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
 
-	c := NewBasic(size, kern)
+	c := f(size, kern)
 	c.Input()[0][N0/2][0][0] = 1
 	c.Input()[1][0][N1/2][0] = 2
 	c.Input()[2][0][0][N2/2] = 3

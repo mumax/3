@@ -52,31 +52,45 @@ func main() {
 	}
 
 	for {
-		// find que with least share
-		minshare := math.Inf(1)
-		que, job, lock := "", "", ""
-		for q, s := range share {
-			j, l, ok := findJobFile(q)
-			if ok && s < minshare {
-				que = q
-				job = j
-				lock = l
-				minshare = s
-			}
-		}
-
-		if job != "" {
-			start := time.Now()
-			runJob(job, lock)
-			seconds := time.Since(start).Seconds()
-			decay(share)
-			share[que] += float64(seconds)
-		} else {
-			time.Sleep(*flag_poll)
-		}
-		time.Sleep(*flag_relax)
+		mainloop(share)
 	}
 
+}
+
+// Finds a job and executes it.
+// protected against panics.
+func mainloop(share map[string]float64) {
+	defer func() {
+		// do not crash on error
+		err := recover()
+		if err != nil {
+			log.Println(err)
+			time.Sleep(*flag_relax) // don't go bezerk on CPU cycles
+		}
+	}()
+	// find que with least share
+	minshare := math.Inf(1)
+	que, job, lock := "", "", ""
+	for q, s := range share {
+		j, l, ok := findJobFile(q)
+		if ok && s < minshare {
+			que = q
+			job = j
+			lock = l
+			minshare = s
+		}
+	}
+
+	if job != "" {
+		start := time.Now()
+		runJob(job, lock)
+		seconds := time.Since(start).Seconds()
+		decay(share)
+		share[que] += float64(seconds)
+	} else {
+		time.Sleep(*flag_poll)
+	}
+	time.Sleep(*flag_relax)
 }
 
 var (

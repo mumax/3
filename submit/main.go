@@ -48,9 +48,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	wd = strip(wd, u.Username)
 
 	fmt.Println("submitting to", que)
-	fmt.Println("using working directory", wd)
+	fmt.Println("using working directory $HOME/" + wd)
 
 	// submit!
 	for _, f := range flag.Args() {
@@ -133,4 +134,14 @@ func jsonfile(file string) string {
 // TODO: -> lib
 func noExt(file string) string {
 	return file[:len(file)-len(path.Ext(file))]
+}
+
+func strip(wd, usr string) string {
+	usr += "/"
+	i := strings.Index(wd, usr)
+	if i < 0 {
+		fmt.Fprintln(os.Stderr, "working directory (", wd, ") should contain", usr)
+		os.Exit(1)
+	}
+	return wd[i+len(usr):]
 }

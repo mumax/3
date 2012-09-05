@@ -55,7 +55,7 @@ func main() {
 
 	// submit!
 	for _, f := range flag.Args() {
-		addJob(f, wd, que)
+		addJob(f, wd, que, u.Username)
 	}
 }
 
@@ -75,10 +75,11 @@ func setMkjob(f func(string) Job) {
 
 // Add a job to the que directoy,
 // using the mkjob function.
-func addJob(file, wd, que string) {
+func addJob(file, wd, que, usr string) {
 	fmt.Println("add", file)
 	job := mkjob(file)
 	job.Wd = wd
+	job.User = usr
 
 	// remove previous .json and .out
 	{

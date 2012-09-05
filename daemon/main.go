@@ -128,6 +128,10 @@ func runJob(jobfile, lockdir string) {
 		job.Args[a] = strings.Replace(job.Args[a], `%GPU`, fmt.Sprint(*flag_gpu), -1)
 	}
 
+	// re-add $HOME to wd, was stripped by submit
+	// to allow translation.
+	job.Wd = "/home/" + job.User + "/" + job.Wd
+
 	spawn(job, lockdir)
 }
 

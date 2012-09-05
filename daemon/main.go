@@ -180,14 +180,20 @@ func spawn(job Job, lockdir string) {
 	fmt.Fprintln(logout, "exec", job.Command, job.Args)
 	log.Println("exec", job.Command, job.Args)
 	err := cmd.Run()
+	exitstat := "exited sucessfully"
 	if err != nil {
 		fmt.Fprintln(logout, err)
-	}
-
-	exitstat := "exited sucessfully"
-	if !cmd.ProcessState.Success() {
 		exitstat = "failed"
 	}
+
+	if cmd.ProcessState != nil {
+		if !cmd.ProcessState.Success() {
+			exitstat = "failed"
+		}
+	} else {
+		exitstat = "failed"
+	}
+
 	log.Println(job.Command, exitstat)
 	fmt.Fprintln(logout, job.Command, exitstat)
 }

@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"math"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
-	"fmt"
 	"nimble-cube/mag"
 	"strconv"
 )
@@ -62,19 +62,19 @@ func main() {
 		core.Add3(Heff_, Hex_, Hd_)
 		mag.LLGTorque(torque_, m_, Heff_, alpha)
 
-		if step % 500 == 0 {
+		if step%500 == 0 {
 			dump.Quick(fmt.Sprintf("m%06d", step), m[:])
-		//	dump.Quick(fmt.Sprintf("t%06d", step), torque[:])
-		//	dump.Quick(fmt.Sprintf("heff%06d", step), Heff[:])
-		//	dump.Quick(fmt.Sprintf("hex%06d", step), Hex[:])
-		//	dump.Quick(fmt.Sprintf("hd%06d", step), Hd[:])
+			//	dump.Quick(fmt.Sprintf("t%06d", step), torque[:])
+			//	dump.Quick(fmt.Sprintf("heff%06d", step), Heff[:])
+			//	dump.Quick(fmt.Sprintf("hex%06d", step), Hex[:])
+			//	dump.Quick(fmt.Sprintf("hd%06d", step), Hd[:])
 
-		table.Data[0] = float32(time)
-		table.Data[1] = float32(core.Average(m_[0]))
-		table.Data[2] = float32(core.Average(m_[1]))
-		table.Data[3] = float32(core.Average(m_[2]))
-		table.WriteData()
-		table.Flush()
+			table.Data[0] = float32(time)
+			table.Data[1] = float32(core.Average(m_[0]))
+			table.Data[2] = float32(core.Average(m_[1]))
+			table.Data[3] = float32(core.Average(m_[2]))
+			table.WriteData()
+			table.Flush()
 		}
 
 		mag.EulerStep(m_, torque_, dt)

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/mag"
 	"os"
-	"fmt"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	mag.SetAll(m, mag.Uniform(0, 0, 1))
 	mag.SetAll(h, mag.Uniform(1, 0, 0))
 	mag.LLGTorque(torque_, m_, h_, alpha)
-	fmt.Println(m_[0][0], m_[1][0], m_[2][0],  h_[0][0], h_[1][0], h_[2][0],  torque_[0][0], torque_[1][0], torque_[2][0])
+	fmt.Println(m_[0][0], m_[1][0], m_[2][0], h_[0][0], h_[1][0], h_[2][0], torque_[0][0], torque_[1][0], torque_[2][0])
 
 	out, err := os.OpenFile("m.table", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	core.Fatal(err)
@@ -40,12 +40,12 @@ func main() {
 		time = dt * float64(step)
 		mag.LLGTorque(torque_, m_, h_, alpha)
 		mag.EulerStep(m_, torque_, dt)
-		if step % 100 == 0{
-		table.Data[0] = float32(time)
-		table.Data[1] = float32(core.Average(m_[0]))
-		table.Data[2] = float32(core.Average(m_[1]))
-		table.Data[3] = float32(core.Average(m_[2]))
-		table.WriteData()
+		if step%100 == 0 {
+			table.Data[0] = float32(time)
+			table.Data[1] = float32(core.Average(m_[0]))
+			table.Data[2] = float32(core.Average(m_[1]))
+			table.Data[3] = float32(core.Average(m_[2]))
+			table.WriteData()
 		}
 	}
 }

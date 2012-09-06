@@ -1,10 +1,10 @@
 package main
 
 import (
-	"os"
 	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/mag"
+	"os"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	table := dump.NewTableWriter(out, []string{"t", "mx", "my", "mz"}, []string{"s", "", "", ""})
 	defer table.Flush()
 
-	alpha:=float32(0.02)
+	alpha := float32(0.02)
 	N := 100000
 	dt := 10e-15
 	time := 0.
@@ -44,4 +44,3 @@ func main() {
 		table.WriteData()
 	}
 }
-

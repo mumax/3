@@ -1,12 +1,12 @@
 package main
 
 import (
-	"os"
+	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/dump"
-	"nimble-cube/mag"
 	"nimble-cube/gpu/conv"
-	"fmt"
+	"nimble-cube/mag"
+	"os"
 )
 
 func main() {
@@ -24,12 +24,11 @@ func main() {
 	mag.Uniform(m, mag.Vector{1, 0, 0})
 	demag.Exec()
 
-	dump.Quick("h_demag", h[:])	
+	dump.Quick("h_demag", h[:])
 
-	h0, h1, h2 := h[0][0][N1/2][N2/2] , h[1][0][N1/2][N2/2], h[2][0][N1/2][N2/2]
+	h0, h1, h2 := h[0][0][N1/2][N2/2], h[1][0][N1/2][N2/2], h[2][0][N1/2][N2/2]
 	fmt.Println("H_demag(center):", h0, h1, h2)
 	if h1 != 0 || h2 != 0 || h0 > -0.99 || h0 < -1 {
 		os.Exit(1)
 	}
 }
-

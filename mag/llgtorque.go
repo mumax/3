@@ -1,7 +1,6 @@
 package mag
 
-import (
-)
+import ()
 
 func LLGTorque(torque, m, H [3][]float32, alpha float32) {
 	//const mu0 = 4 * math.Pi * 1e7

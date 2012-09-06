@@ -30,8 +30,8 @@ func main() {
 	Hd_ := core.Contiguous3(Hd)
 
 	// inital mag
-	y1, y2 := 0,N1//3*N1/8, 5*N1/8
-	z1, z2 := 0,N2//0*N2/8, 2*N2/8
+	y1, y2 := 0, N1 //3*N1/8, 5*N1/8
+	z1, z2 := 0, N2 //0*N2/8, 2*N2/8
 	my := m[1]
 	mz := m[2]
 	theta := 0.01

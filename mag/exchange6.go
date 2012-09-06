@@ -1,6 +1,5 @@
 package mag
 
-
 // Naive implementation of 6-neighbor exchange field.
 // Aex in Tm² (exchange stiffness divided by Msat0).
 // Hex in Tesla.
@@ -26,42 +25,42 @@ func Exchange6(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64, ae
 					m_neigh = Vector{m[X][i-1][j][k],
 						m[Y][i-1][j][k],
 						m[Z][i-1][j][k]}
-					hex = hex.Add((m0.Sub(m_neigh)).Scaled(facI))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facI))
 				}
 
 				if i < N0-1 {
 					m_neigh = Vector{m[X][i+1][j][k],
 						m[Y][i+1][j][k],
 						m[Z][i+1][j][k]}
-					hex = hex.Add((m0.Sub(m_neigh).Scaled(facI)))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facI))
 				}
 
 				if j > 0 {
 					m_neigh = Vector{m[X][i][j-1][k],
 						m[Y][i][j-1][k],
 						m[Z][i][j-1][k]}
-					hex = hex.Add((m0.Sub(m_neigh)).Scaled(facJ))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facJ))
 				}
 
 				if j < N1-1 {
 					m_neigh = Vector{m[X][i][j+1][k],
 						m[Y][i][j+1][k],
 						m[Z][i][j+1][k]}
-					hex = hex.Add((m0.Sub(m_neigh).Scaled(facJ)))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facJ))
 				}
 
 				if k > 0 {
 					m_neigh = Vector{m[X][i][j][k-1],
 						m[Y][i][j][k-1],
 						m[Z][i][j][k-1]}
-					hex = hex.Add((m0.Sub(m_neigh)).Scaled(facK))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facK))
 				}
 
 				if k < N2-1 {
 					m_neigh = Vector{m[X][i][j][k+1],
 						m[Y][i][j][k+1],
 						m[Z][i][j][k+1]}
-					hex = hex.Add((m0.Sub(m_neigh).Scaled(facK)))
+					hex = hex.Add((m_neigh.Sub(m0)).Scaled(facK))
 				}
 
 				Hex[X][i][j][k] = hex[X]

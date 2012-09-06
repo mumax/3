@@ -21,7 +21,7 @@ func main() {
 
 	m := demag.Input()
 	h := demag.Output()
-	mag.Uniform(m, mag.Vector{1, 0, 0})
+	mag.SetAll(m, mag.Uniform(1, 0, 0))
 	demag.Exec()
 
 	dump.Quick("h_demag", h[:])

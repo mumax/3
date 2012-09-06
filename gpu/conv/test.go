@@ -60,6 +60,8 @@ func Test(c Conv) {
 
 	// solution under test
 	c.Exec()
+	c.Exec()
+	c.Exec() // it may fail the 2nd time, eg. 
 
 	// check if error is OK
 	{

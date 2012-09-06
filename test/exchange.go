@@ -15,8 +15,8 @@ func main() {
 	m := core.MakeVectors(size)
 	h := core.MakeVectors(size)
 
-	mag.SetRegion(m, 0, 0, 0, 1, N1, N2/2, mag.Uniform(0, 1, 0))
-	mag.SetRegion(m, 0, 0, N2/2, 1, N1, N2, mag.Uniform(0, 0, 1))
+	mag.SetRegion(m, 0, 0, 0, 1, N1, N2/2, mag.Uniform(0, 0, 1))
+	mag.SetRegion(m, 0, 0, N2/2, 1, N1, N2, mag.Uniform(0, 1, 0))
 
 	const mu0 = 4 * math.Pi * 1e-7
 	Msat := 1.0053

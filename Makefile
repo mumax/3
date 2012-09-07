@@ -16,15 +16,10 @@ githook:
 
 test: 6gtest gccgotest
 
+PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag nimble-cube/unit
+
 6gtest:
-	go test 
-	go test nimble-cube/core
-	go test nimble-cube/gpu
-	go test nimble-cube/gpu/conv
-	go test nimble-cube/dump
-	go test nimble-cube/mag
-	go test nimble-cube/unit
+	go test $(PKGS) 
 
 gccgotest:
-	go test -compiler $(GCCGO)
-
+	go test -compiler=$(gccgo) $(PKGS)

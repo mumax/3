@@ -18,9 +18,9 @@ func Add3(dst, a, b [3][]float32) {
 }
 
 // dst[i] += cnst.
-func AddConst(dst []float32, cnst float32){
-	for i := range dst{
-		dst [i] += cnst
+func AddConst(dst []float32, cnst float32) {
+	for i := range dst {
+		dst[i] += cnst
 	}
 }
 

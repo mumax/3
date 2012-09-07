@@ -9,7 +9,7 @@
 
 # Run all unit tests
 rm test.log -rf
-if (make test 2>> test.log >> test.log); then
+if (make test); then
 	echo PASS
 	notify-send "Unit tests passed" 2> /dev/null
 	exit 0;

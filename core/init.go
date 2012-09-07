@@ -1,10 +1,11 @@
-package cli
+package core
+
+// Initialization of general command line flags.
 
 import (
 	"flag"
 	"fmt"
 	"log"
-	"nimble-cube/core"
 	"os"
 	"runtime"
 	"runtime/pprof"
@@ -15,8 +16,8 @@ var (
 	Flag_maxprocs  = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	Flag_cpuprof   = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	Flag_memprof   = flag.String("memprof", "", "Write gopprof memory profile to file")
-	Flag_debug     = flag.Bool("debug", core.DEBUG, "Generate debug info")
-	Flag_log       = flag.Bool("log", core.LOG, "Generate log info")
+	Flag_debug     = flag.Bool("debug", DEBUG, "Generate debug info")
+	Flag_log       = flag.Bool("log", LOG, "Generate log info")
 	Flag_verify    = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")
@@ -39,38 +40,38 @@ func init() {
 }
 
 func initLog() {
-	core.LOG = *Flag_log
-	core.DEBUG = *Flag_debug
+	LOG = *Flag_log
+	DEBUG = *Flag_debug
 	log.SetPrefix("#")
 }
 
 func initGOMAXPROCS() {
 	if *Flag_maxprocs == 0 {
 		*Flag_maxprocs = runtime.NumCPU()
-		core.Log("Num CPU:", *Flag_maxprocs)
+		Log("num CPU:", *Flag_maxprocs)
 	}
 	procs := runtime.GOMAXPROCS(*Flag_maxprocs) // sets it
-	core.Log("GOMAXPROCS:", procs)
+	Log("GOMAXPROCS:", procs)
 }
 
 func initCpuProf() {
 	if *Flag_cpuprof != "" {
 		f, err := os.Create(*Flag_cpuprof)
-		core.PanicErr(err)
-		core.Log("Writing CPU profile to", *Flag_cpuprof)
+		PanicErr(err)
+		Log("writing CPU profile to", *Flag_cpuprof)
 		err = pprof.StartCPUProfile(f)
-		core.PanicErr(err)
-		core.AtExit(pprof.StopCPUProfile)
+		PanicErr(err)
+		AtExit(pprof.StopCPUProfile)
 	}
 }
 
 func initMemProf() {
 	if *Flag_memprof != "" {
-		core.AtExit(func() {
+		AtExit(func() {
 			f, err := os.Create(*Flag_memprof)
 			defer f.Close()
-			core.PanicErr(err)
-			core.Log("Writing memory profile to", *Flag_memprof)
+			PanicErr(err)
+			Log("writing memory profile to", *Flag_memprof)
 			pprof.WriteHeapProfile(f)
 		})
 	}

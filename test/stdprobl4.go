@@ -71,7 +71,7 @@ func main() {
 	B1, B2 = 4.3E-3, -24.6E-3
 	core.Log("running")
 	dt = 10e-15
-	N = int(1e-9 / dt)
+	N = int(0.1e-9 / dt)
 	for step = 0; step < N; step++ {
 		time = dt * float64(step)
 		update()
@@ -80,6 +80,7 @@ func main() {
 		}
 		mag.EulerStep(m_, torque_, dt)
 	}
+	core.Cleanup()
 }
 
 func update() {

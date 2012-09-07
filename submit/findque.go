@@ -5,9 +5,10 @@ import (
 	"path"
 )
 
+// Your que directory is where this file resides.
 const MagicFile = ".here_be_your_mumax_que__d3990c0c658a293ac278bb591f15d031"
 
-// find the que directory based on hidden file.
+// find the que directory that contains magic file.
 func findque(wd string) string {
 	if len(wd) == 0 {
 		return ""

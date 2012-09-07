@@ -16,7 +16,7 @@ githook:
 
 test: 6gtest gccgotest
 
-PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag nimble-cube/unit
+PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag 
 
 6gtest:
 	go test $(PKGS) 

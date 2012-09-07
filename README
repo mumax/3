@@ -1,6 +1,6 @@
 PACKAGE
 
-package documentation
+package main
     import "github.com/barnex/mumax-daemon"
 
     mumax-daemon is a tool to run (primarily) mumax simulations on a

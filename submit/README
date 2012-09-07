@@ -24,6 +24,11 @@ package main
 
     Author: Arne Vansteenkiste
 
+CONSTANTS
+
+const MagicFile = ".here_be_your_mumax_que__d3990c0c658a293ac278bb591f15d031"
+
+
 TYPES
 
 type Job struct {

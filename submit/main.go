@@ -10,10 +10,6 @@ import (
 	"strings"
 )
 
-var (
-	flag_que = flag.String("que", "", "override default queue directory ($HOME/que)")
-)
-
 func main() {
 	flag.Parse()
 
@@ -23,22 +19,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, err2)
 		os.Exit(1)
 	}
-	que := path.Clean(u.HomeDir + "/que")
-
-	// override que directory by env.
-	override := os.Getenv("MUMAX_QUE")
-	if override != "" {
-		que = override
-	}
-
-	// override que directory by cli flag
-	if *flag_que != "" {
-		que = *flag_que
-	}
 
 	// check if target is set
 	if mkjob == nil {
-		fmt.Fprintln(os.Stderr, "no target specified")
+		fmt.Fprintln(os.Stderr, "where would you like to submit to today?")
 		os.Exit(1)
 	}
 
@@ -48,10 +32,16 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	wd = strip(wd, u.Username)
+
+	que := findque(wd)
+	if que == "" {
+		fmt.Fprintln(os.Stderr, "you're not in a place to submit files from")
+		os.Exit(1)
+	}
+	wd = strip(wd, path.Dir(que))
 
 	fmt.Println("submitting to", que)
-	fmt.Println("using working directory $HOME/" + wd)
+	fmt.Println("using working directory $HOME/que/" + wd)
 
 	// submit!
 	for _, f := range flag.Args() {

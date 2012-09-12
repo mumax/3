@@ -19,7 +19,33 @@ var (
 
 const (
 	OUTNAME    = "status.html"
-	HTMLHeader = "<!DOCTYPE html>\n<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style type=\"text/css\">\nbody {\n        background-color:rgb(250,250,250)\n}\n\n.failed {\n        background-color:rgb(255,128,128)\n}\n\n.pending {\n        background-color:rgb(255,255,128)\n}\n\n.finished {\n        background-color:rgb(128,128,255);\n        color:rgb(255,255,255)\n}\n\n.running {\n        background-color:rgb(128,255,128)\n}\n</style>\n</head>\n"
+	HTMLHeader = `<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">
+<style type=\"text/css\">
+body {
+        background-color:rgb(250,250,250)
+}
+
+.failed {
+        background-color:rgb(255,128,128)
+}
+
+.pending {
+        background-color:rgb(255,255,128)
+}
+
+.finished {
+        background-color:rgb(128,128,255);
+        color:rgb(255,255,255)
+}
+
+.running {
+        background-color:rgb(128,255,128)
+}
+</style>
+</head>`
 )
 
 type Job struct {
@@ -31,9 +57,11 @@ type Job struct {
 	Gpu       int
 }
 
-var filelist [][]string
-var joblist [][]Job
-var users []string
+var (
+	filelist [][]string
+	joblist  [][]Job
+	users    []string
+)
 
 func GetListOfUsers() {
 	info, _ := ioutil.ReadDir(*home)
@@ -146,8 +174,8 @@ func ProcessJobFromLog(userid int) {
 }
 
 func DumpQue() {
-	fmt.Print("The que is following:\n")
-	fmt.Print("UserName\tJob's name\tNode\tGPU\tStarted\tDuration\tStatus\n")
+	fmt.Println("The que is following:")
+	fmt.Println("UserName\tJob's name\tNode\tGPU\tStarted\tDuration\tStatus")
 	for i := range users {
 		UserName := users[i]
 		for j := range joblist[i] {

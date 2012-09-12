@@ -9,8 +9,11 @@ package main
 	daemon --gpu=1 /home/alice/que /home/bob/que ...
 
     The daemons look in the specified que directories for job files with
-    .json extension. When a job is started, a corresponding .out directory
-    is generated with some info. E.g.:
+    .json extension. Job files are typically created with the "submit"
+    program.
+
+    When a job is started, a corresponding .out directory is generated with
+    some info. E.g.:
 
 	job.json
 	job_hostname_gpu1.out/
@@ -26,6 +29,15 @@ type Job struct {
     Args    []string
     Wd      string
     User    string
+}
+
+type Status struct {
+    Name      string
+    Status    int // -1: failed, 0: finished, 1:running
+    StartTime time.Time
+    Runtime   time.Duration
+    Node      string
+    Gpu       int
 }
 
 

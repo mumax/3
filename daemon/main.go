@@ -146,6 +146,7 @@ func runJob(jobfile, lockdir string) {
 	// to allow translation.
 	job.Wd = "/home/" + job.User + "/" + job.Wd
 
+	saveStartStatus(&job, lockdir)
 	spawn(job, lockdir)
 }
 
@@ -181,18 +182,24 @@ func spawn(job Job, lockdir string) {
 	log.Println("exec", job.Command, job.Args)
 	err := cmd.Run()
 	exitstat := "exited sucessfully"
+	status := 0
 	if err != nil {
 		fmt.Fprintln(logout, err)
 		exitstat = "failed"
+		status = -1
 	}
 
 	if cmd.ProcessState != nil {
 		if !cmd.ProcessState.Success() {
 			exitstat = "failed"
+			status = -1
 		}
 	} else {
 		exitstat = "failed"
+		status = -1
 	}
+
+	saveStopStatus(&job, lockdir, status)
 
 	log.Println(job.Command, exitstat)
 	fmt.Fprintln(logout, job.Command, exitstat)

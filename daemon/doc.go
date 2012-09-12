@@ -5,7 +5,7 @@
  The daemons look in the specified que directories for job files
  with .json extension. Job files are typically created with
  the "submit" program.
-  
+
  When a job is started, a corresponding 
  .out directory is generated with some info. E.g.:
  	job.json

@@ -17,5 +17,6 @@ package main
 SUBDIRECTORIES
 
 	daemon
+	quemon
 	submit
 

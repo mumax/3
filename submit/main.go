@@ -128,7 +128,6 @@ func noExt(file string) string {
 }
 
 func strip(wd, usr string) string {
-	usr += "/"
 	i := strings.Index(wd, usr)
 	if i < 0 {
 		fmt.Fprintln(os.Stderr, "working directory (", wd, ") should contain", usr)

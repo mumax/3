@@ -17,10 +17,10 @@ func findque(wd string) string {
 		return ""
 	}
 	for len(wd) > 1 { // handles "/" and "."
-		wd = path.Dir(wd) // start with parent, should not submit from actual que dir
 		if _, err := os.Stat(wd + "/que/" + MagicFile); err == nil {
 			return wd + "/que"
 		}
+		wd = path.Dir(wd) // start with parent, should not submit from actual que dir
 	}
 	return ""
 }

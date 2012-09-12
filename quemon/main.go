@@ -11,12 +11,16 @@ import (
 	"time"
 )
 
-var home = flag.String("home", "/cluster/home", "Home directory to look at")
-var out = flag.String("output", "", "HTML output directory")
-var DirInfo []os.FileInfo
+var (
+	home    = flag.String("home", "/cluster/home", "Home directory to look at")
+	out     = flag.String("output", "", "HTML output directory")
+	DirInfo []os.FileInfo
+)
 
-const OUTNAME = "status.html"
-const HTMLHeader = "<!DOCTYPE html>\n<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style type=\"text/css\">\nbody {\n        background-color:rgb(250,250,250)\n}\n\n.failed {\n        background-color:rgb(255,128,128)\n}\n\n.pending {\n        background-color:rgb(255,255,128)\n}\n\n.finished {\n        background-color:rgb(128,128,255);\n        color:rgb(255,255,255)\n}\n\n.running {\n        background-color:rgb(128,255,128)\n}\n</style>\n</head>\n"
+const (
+	OUTNAME    = "status.html"
+	HTMLHeader = "<!DOCTYPE html>\n<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style type=\"text/css\">\nbody {\n        background-color:rgb(250,250,250)\n}\n\n.failed {\n        background-color:rgb(255,128,128)\n}\n\n.pending {\n        background-color:rgb(255,255,128)\n}\n\n.finished {\n        background-color:rgb(128,128,255);\n        color:rgb(255,255,255)\n}\n\n.running {\n        background-color:rgb(128,255,128)\n}\n</style>\n</head>\n"
+)
 
 type Job struct {
 	Name      string

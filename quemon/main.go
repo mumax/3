@@ -1,5 +1,8 @@
 package main
 
+// Author: Mykola Dvornik
+// Modified by Arne Vansteenkiste
+
 import (
 	"flag"
 	"fmt"
@@ -48,9 +51,16 @@ body {
 </head>`
 )
 
+// Fields for Job.Status
+const(
+	Failed = -1
+	Finished = 0
+	Running = 1
+)
+
 type Job struct {
 	Name      string
-	Status    int
+	Status    int // -1: failed, 0: finished, 1:running
 	StartTime time.Time
 	Runtime   time.Duration
 	Node      int

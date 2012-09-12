@@ -71,6 +71,7 @@ func addJob(file, wd, que, usr string) {
 	job.Wd = wd
 	job.User = usr
 
+	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:]
 	// remove previous .json and .out
 	{
 		dir, err := os.Open(que)
@@ -85,7 +86,7 @@ func addJob(file, wd, que, usr string) {
 			return
 		}
 
-		prefix := noExt(jsonfile(file))
+		prefix := noExt(jobprefix)
 		for _, f := range files {
 			if strings.HasPrefix(f, prefix) {
 				fmt.Println("rm", que+"/"+f)
@@ -100,8 +101,9 @@ func addJob(file, wd, que, usr string) {
 
 	// add new json
 	{
-		fmt.Println("add", que+"/"+jsonfile(file))
-		out, err := os.OpenFile(que+"/"+jsonfile(file), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+		jsonfile := que + "/" + jobprefix
+		fmt.Println("add", jsonfile)
+		out, err := os.OpenFile(jsonfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return

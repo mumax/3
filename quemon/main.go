@@ -178,7 +178,7 @@ func DumpQue() {
 			job := joblist[i][j]
 			Node := job.Node
 			GPU := fmt.Sprintf("%d", job.Gpu)
-			StartTime := job.StartTime.Format("31-Sep-2006 23:59:59")
+            StartTime := job.StartTime.Format("02 Jan 06 15:04")
 			Duration := job.Runtime.String()
 			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", UserName, job.Name, Node, GPU, StartTime, Duration, STATUSMAP[job.Status])
 		}
@@ -191,7 +191,7 @@ func DumpQueHtml() {
 	var body string
 	body += fmt.Sprint(HTMLHeader)
 	body += fmt.Sprintf("<title>%s</title>\n", "que status page")
-	body += "</header>"
+    body += "</header>"
 	body += fmt.Sprintf("<p>The status of the que as of %s\n\n</p><hr>", time.Now().String())
 
 	for i := range users {
@@ -206,7 +206,7 @@ func DumpQueHtml() {
 			job := joblist[i][j]
 			Node := job.Node
 			GPU := fmt.Sprintf("%d", job.Gpu)
-            StartTime := job.StartTime.Format("2006-01-01 15:00")
+            StartTime := job.StartTime.Format("02 Jan 06 15:04:05")
 			Duration := job.Runtime.String()
             Status := STATUSMAP[job.Status]
 			body += fmt.Sprintf("<tr class='%s'>", strings.ToLower(Status))

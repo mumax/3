@@ -12,21 +12,31 @@ import (
 	"sort"
 	"strings"
 	"time"
+    "encoding/json"
+    "log"
+    "io"
 )
 
 var (
 	home    = flag.String("home", "/cluster/home", "Home directory to look at")
 	out     = flag.String("output", "", "HTML output directory")
 	DirInfo []os.FileInfo
+    STATUSMAP = map[int] string {
+            -1: "FAILED",
+             0: "FINISHED",
+             1: "RUNNING",
+             2: "PENDING",
+    }
 )
 
 const (
 	OUTNAME    = "status.html"
+    STATUSFILENAME = "status.json"
 	HTMLHeader = `<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">
-<style type=\"text/css\">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
 body {
         background-color:rgb(250,250,250)
 }
@@ -63,7 +73,7 @@ type Job struct {
 	Status    int // -1: failed, 0: finished, 1:running
 	StartTime time.Time
 	Runtime   time.Duration
-	Node      int
+	Node      string
 	Gpu       int
 }
 
@@ -86,19 +96,18 @@ func GetListOfUsers() {
 
 func DumpListOfUsers() {
 	for i := range users {
-		fmt.Printf("%s\n", users[i])
+		log.Println(users[i])
 	}
 
 }
 
 func GetDaemonFiles(userid int) {
 	dir := *home + "/" + users[userid] + "/que/"
-	//fmt.Printf("Look into %s ...",dir)
 	_, err := os.Stat(dir)
 	if os.IsNotExist(err) {
-		return
+            log.Println(err)
+		    return
 	}
-	//fmt.Print("Proceeding...\n")
 	DirInfo, _ = ioutil.ReadDir(dir)
 	for i := range DirInfo {
 		isExist, _ := path.Match("*.json", DirInfo[i].Name())
@@ -112,69 +121,46 @@ func GetDaemonFiles(userid int) {
 func ProcessJobFromLog(userid int) {
 	for i := range filelist[userid] {
 		fname := filelist[userid][i]
-		//check if json already has .out dir
+		//check if json already has .status file
 		filemask := fname[:len(fname)-len(path.Ext(fname))] + "*.out"
-
-		status := 1
 		var job Job
-		var filename string
+
+		var fileName string
+
+        quePrefix := *home + "/" + users[userid] + "/que/"
+        
 		file := new(os.File)
 		defer file.Close()
 		var err error
 
 		exist := false
 		for j := range DirInfo {
-			exist, _ = path.Match(filemask, DirInfo[j].Name())
-			if exist {
-				filename = DirInfo[j].Name()
-				break
+            haveDir, _ := path.Match(filemask, DirInfo[j].Name())
+			if haveDir {
+                    dirname := DirInfo[j].Name()
+                    //check if the status file is there
+                    fileName = quePrefix + dirname + "/" + STATUSFILENAME;
+                    _, err = os.Stat(fileName)
+                    if os.IsNotExist(err) {
+                            exist = false
+                    } else {
+                            exist = true
+                    }
+                    break
 			}
 		}
 		if exist {
-			filename = *home + "/" + users[userid] + "/que/" + filename + "/daemon.log"
-			file, err = os.Open(filename)
+			file, err = os.Open(fileName)
 			if err != nil {
 				return
 			}
-			buffer, err1 := ioutil.ReadAll(file)
-			if err1 != nil {
-				return
-			}
-			StrBuffer := (string)(buffer)
+            dec := json.NewDecoder(file)
+            if err = dec.Decode(&job); err == io.EOF {
+                    break
+            } else if err != nil {
+                    log.Print(err)
+            }
 
-			fi, _ := file.Stat()
-			job.StartTime = fi.ModTime()
-			ByStrings := strings.Split(StrBuffer, "\n")
-			for i := range ByStrings {
-				if strings.Contains(ByStrings[i], "exec") {
-					job.Name = ByStrings[i][strings.Index(ByStrings[i], "exec")+len("exec "):]
-					break
-				}
-			}
-			//Get status
-			if strings.Contains(StrBuffer, "fail") {
-				status = -1 // -1 - job failed
-			}
-			if strings.Contains(StrBuffer, "sucessfully") {
-				status = 0
-			}
-			if status == 1 {
-				job.Runtime = time.Now().Sub(job.StartTime)
-			}
-
-			job.Status = status
-			//Guess node
-			indexOfNode := strings.Index(filename, "node")
-			if indexOfNode < 0 {
-				return
-			}
-			nodeName := filename[indexOfNode+len("node"):]
-			nodeName = nodeName[:strings.Index(nodeName, ".")]
-			// nodeName is in XXXX_X format
-			nodeNameFmt := strings.Replace(nodeName, "_", "\t", -1)
-			//nodeNameFmt = strings.TrimLeft(nodeNameFmt, "0")
-			//fmt.Printf("%s\n", nodeNameFmt)
-			fmt.Sscanf(nodeNameFmt+"\n", "%v %v", &job.Node, &job.Gpu)
 		} else {
 			job.Name = fname
 			job.Status = 2
@@ -190,22 +176,11 @@ func DumpQue() {
 		UserName := users[i]
 		for j := range joblist[i] {
 			job := joblist[i][j]
-			Node := fmt.Sprintf("%02d", job.Node)
+			Node := job.Node
 			GPU := fmt.Sprintf("%d", job.Gpu)
-			StartTime := job.StartTime.Format("01-Sep-2006 15:04:05")
+			StartTime := job.StartTime.Format("31-Sep-2006 23:59:59")
 			Duration := job.Runtime.String()
-			var Status string
-			switch job.Status {
-			case -1:
-				Status = "FAILED"
-			case 0:
-				Status = "FINISHED"
-			case 1:
-				Status = "RUNNING"
-			case 2:
-				Status = "PENDING"
-			}
-			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", UserName, job.Name, Node, GPU, StartTime, Duration, Status)
+			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", UserName, job.Name, Node, GPU, StartTime, Duration, STATUSMAP[job.Status])
 		}
 	}
 }
@@ -226,25 +201,14 @@ func DumpQueHtml() {
 		body += "<table>\n"
 
 		body += fmt.Sprintf("<tr><b><td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</b>\n</tr>\n",
-			"          ", "Job's name", "Node", "GPU", "Started on", "Duration", "Status")
+        "          ", "Job's name:", "Node name:", "GPU:", "Started on:", "Duration:", "Status:")
 		for j := range joblist[i] {
 			job := joblist[i][j]
-			Node := fmt.Sprintf("%02d", job.Node)
+			Node := job.Node
 			GPU := fmt.Sprintf("%d", job.Gpu)
-			StartTime := job.StartTime.Format("01-Sep-2006 15:04:05")
+            StartTime := job.StartTime.Format("2006-01-01 15:00")
 			Duration := job.Runtime.String()
-
-			var Status string
-			switch job.Status {
-			case -1:
-				Status = "FAILED"
-			case 0:
-				Status = "FINISHED"
-			case 1:
-				Status = "RUNNING"
-			case 2:
-				Status = "PENDING"
-			}
+            Status := STATUSMAP[job.Status]
 			body += fmt.Sprintf("<tr class='%s'>", strings.ToLower(Status))
 			if job.Status != 2 {
 				body += fmt.Sprintf("<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>\n",
@@ -261,18 +225,14 @@ func DumpQueHtml() {
 	body += fmt.Sprint(htmlFooter)
 	output := ([]byte)(body)
 	filename := *out + "/" + OUTNAME
-	_, errA := os.Stat(filename)
-	if !os.IsNotExist(errA) {
-		os.Remove(filename)
-	}
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.OpenFile(filename, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0666)
 	defer file.Close()
 	if err != nil {
 		return
 	}
 	_, err1 := file.Write(output)
 	if err1 != nil {
-		return
+		log.Fatal(err1)
 	}
 }
 
@@ -284,9 +244,8 @@ func main() {
 	}
 	_, err := os.Stat(*home)
 	if os.IsNotExist(err) {
-		fmt.Printf("%s does not exist\nAborting\n", *home)
-	}
-	//fmt.Printf("Looking into %s directory...\n", *home)
+            log.Fatal(err)
+    }
 	GetListOfUsers()
 	filelist = make([][]string, len(users))
 	joblist = make([][]Job, len(users))
@@ -295,6 +254,5 @@ func main() {
 		GetDaemonFiles(i)
 		ProcessJobFromLog(i)
 	}
-	//DumpQue()
 	DumpQueHtml()
 }

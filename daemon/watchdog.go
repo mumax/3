@@ -40,7 +40,6 @@ func RunWatchdog() {
 				errK := watchcmd.Process.Kill()
 				if errK != nil {
 					log.Println(errK)
-					panic(errK)
 				}
 				watchlock = ""
 				watchcmd = nil

@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+var (
+	flag_rm = flag.Bool("rm", false, "remove existing input file from que")
+)
+
 func main() {
 	flag.Parse()
 
@@ -21,8 +25,15 @@ func main() {
 	}
 
 	// check if target is set
-	if mkjob == nil {
+	if *flag_rm == false && mkjob == nil {
 		fmt.Fprintln(os.Stderr, "where would you like to submit to today?")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	// don't rm and submit at the same time
+	if *flag_rm == true && mkjob != nil {
+		fmt.Fprintln(os.Stderr, "you're asking a lot at the same time.")
 		os.Exit(1)
 	}
 
@@ -35,7 +46,7 @@ func main() {
 
 	que := findque(wd)
 	if que == "" {
-		fmt.Fprintln(os.Stderr, "you're not in a place to submit files from")
+		fmt.Fprintln(os.Stderr, "you're not in a place to submit files from.")
 		os.Exit(1)
 	}
 	wd = strip(wd, path.Dir(que))
@@ -43,9 +54,16 @@ func main() {
 	fmt.Println("submitting to", que)
 	fmt.Println("using working directory $HOME/que/" + wd)
 
-	// submit!
-	for _, f := range flag.Args() {
-		addJob(f, wd, que, u.Username)
+	if *flag_rm {
+		// remove 
+		for _, f := range flag.Args() {
+			rmJob(f, wd, que, u.Username)
+		}
+	} else {
+		// submit!
+		for _, f := range flag.Args() {
+			addJob(f, wd, que, u.Username)
+		}
 	}
 }
 
@@ -71,8 +89,30 @@ func addJob(file, wd, que, usr string) {
 	job.Wd = wd
 	job.User = usr
 
+	rmFiles(file, wd, que)
 	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:]
-	// remove previous .json and .out
+
+	// add new json
+	{
+		jsonfile := que + "/" + jobprefix
+		fmt.Println("add", jsonfile)
+		out, err := os.OpenFile(jsonfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer out.Close()
+		err2 := json.NewEncoder(out).Encode(job)
+		if err2 != nil {
+			fmt.Println(err2)
+			return
+		}
+	}
+}
+
+// remove previous .json and .out files for this input file.
+func rmFiles(file, wd, que string) {
+	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:]
 	{
 		dir, err := os.Open(que)
 		if err != nil {
@@ -98,23 +138,12 @@ func addJob(file, wd, que, usr string) {
 			}
 		}
 	}
+}
 
-	// add new json
-	{
-		jsonfile := que + "/" + jobprefix
-		fmt.Println("add", jsonfile)
-		out, err := os.OpenFile(jsonfile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer out.Close()
-		err2 := json.NewEncoder(out).Encode(job)
-		if err2 != nil {
-			fmt.Println(err2)
-			return
-		}
-	}
+// Remove a job to the que directoy.
+func rmJob(file, wd, que, usr string) {
+	fmt.Println("rm", file)
+	rmFiles(file, wd, que)
 }
 
 // suited job file name.

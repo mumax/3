@@ -19,6 +19,7 @@ var (
 	Flag_debug    = flag.Bool("debug", DEBUG, "Generate debug info")
 	Flag_log      = flag.Bool("log", LOG, "Generate log info")
 	Flag_verify   = flag.Bool("verify", true, "Verify crucial functionality")
+
 //	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 //	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")
 )

@@ -112,7 +112,7 @@ func addJob(file, wd, que, usr string) {
 
 // remove previous .json and .out files for this input file.
 func rmFiles(file, wd, que string) {
-	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:]
+	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:] + "."
 	{
 		dir, err := os.Open(que)
 		if err != nil {
@@ -146,10 +146,14 @@ func rmJob(file, wd, que, usr string) {
 	rmFiles(file, wd, que)
 }
 
+// todo: make absolutely unique using hash or so
 // suited job file name.
 // replace / by _
 func jsonfile(file string) string {
-	return strings.Replace(file, "/", "_", -1) + ".json"
+	file = strings.Replace(file, "/", "_", -1)
+	file = strings.Replace(file, ".", "_", -1)
+	file += ".json"
+	return file
 }
 
 // remove file extension.

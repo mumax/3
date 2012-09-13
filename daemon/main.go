@@ -232,7 +232,7 @@ func findJobFile(que string) (jobfile, lockfile string, ok bool) {
 			if alreadyStarted(f, files) {
 				continue
 			} else {
-				lockfile = fmt.Sprint(noExt(f), "_", *flag_host, "_", *flag_gpu, ".out")
+				lockfile = fmt.Sprint(noExt(f), ".", *flag_host, "_", *flag_gpu, ".out")
 				return que + "/" + f, que + "/" + lockfile, true
 			}
 		}

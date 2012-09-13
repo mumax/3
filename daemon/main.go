@@ -23,6 +23,7 @@ var (
 
 func main() {
 	flag.Parse()
+	go RunWatchdog()
 	rand.Seed(time.Now().UnixNano())
 	lastdecay = time.Now()
 
@@ -180,6 +181,7 @@ func spawn(job Job, lockdir string) {
 	fmt.Fprintln(logout, "job:", job)
 	fmt.Fprintln(logout, "exec", job.Command, job.Args)
 	log.Println("exec", job.Command, job.Args)
+	SetWatchdog(cmd, lockdir)
 	err := cmd.Run()
 	exitstat := "exited sucessfully"
 	status := 0

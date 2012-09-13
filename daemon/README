@@ -22,6 +22,15 @@ package main
 
     Author: Arne Vansteenkiste
 
+FUNCTIONS
+
+func RunWatchdog()
+
+func SetWatchdog(cmd *exec.Cmd, lockdir string)
+    Sets the command and lock dir to be polled by the watchdog. If the lock
+    dir disappears, cmd is killed.
+
+
 TYPES
 
 type Job struct {

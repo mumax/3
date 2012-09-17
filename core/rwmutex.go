@@ -4,14 +4,14 @@ import "sync"
 
 // One reader, one writer.
 type RWMutex struct {
-	N            int // Total number of elements in protected array.
-	a, b         int // half-open interval locked for writing
-	c, d         int // half-open interval locked for reading
-	writingframe int // time stamp of data currently being written in [a, b[
-	lastread     int // time stamp of data last read in [c, d[
+	N            int        // Total number of elements in protected array.
+	a, b         int        // half-open interval locked for writing
+	c, d         int        // half-open interval locked for reading
+	writingframe int        // time stamp of data currently being written in [a, b[
+	lastread     int        // time stamp of data last read in [c, d[
 	state        sync.Mutex // protects the internal state, used in cond.
-	cond         sync.Cond // wait condition: read/write is safe
-	readers []*RMutex
+	cond         sync.Cond  // wait condition: read/write is safe
+	readers      []*RMutex
 }
 
 func NewRWMutex(N int) *RWMutex {
@@ -23,9 +23,15 @@ func NewRWMutex(N int) *RWMutex {
 	return m
 }
 
+func (m *RWMutex) NewReader() *RMutex {
+
+}
+
 // ______________________________________________________ Write
 
 // Lock for writing [start, stop[.
+// Automatically unlocks the previous interval.
+// Lock(0, 0) can be used to explicitly unlock.
 func (m *RWMutex) Lock(start, stop int) {
 
 	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {

@@ -29,6 +29,11 @@ func Panic(msg ...interface{}) {
 	panic(fmt.Sprint(msg...))
 }
 
+// Panics on the message.
+func Panicf(format string, args ...interface{}) {
+	panic(fmt.Sprintf(format, args...))
+}
+
 // Panics if err is not nil
 func PanicErr(err error) {
 	if err != nil {
@@ -47,6 +52,13 @@ func LogErr(err error) {
 func Log(msg ...interface{}) {
 	if LOG {
 		log.Println(msg...)
+	}
+}
+
+// Log message.
+func Logf(format string, args ...interface{}) {
+	if LOG {
+		log.Printf(format, args...)
 	}
 }
 

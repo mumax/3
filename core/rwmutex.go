@@ -2,6 +2,7 @@ package core
 
 import "sync"
 
+// One reader, one writer.
 type RWMutex struct {
 	N            int // Total number of elements in protected array.
 	a, b         int // half-open interval locked for writing
@@ -30,27 +31,19 @@ func (m *RWMutex) Lock(start, stop int) {
 		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}
 
-	// first lock the state
 	m.cond.L.Lock()
 	//Debug("WLock", start, stop)
-	// 
 	if start == 0 {
 		m.writingframe++
 		//Debug("W new frame, writingframe=", m.writingframe)
 	}
-
-	// noting being written while waiting
-	m.a, m.b = start, start
-
-	// wait for safe moment to lock
+	m.a, m.b = start, start // noting is being written while waiting
 	for !m.canWLock(start, stop) {
 		//Debug("Wlock: wait")
 		m.cond.Wait()
 	}
-	// actually lock the interval
-	m.a, m.b = start, stop
+	m.a, m.b = start, stop // update lock the interval
 	m.cond.L.Unlock()
-	// tell others something has changed
 	m.cond.Broadcast()
 }
 
@@ -88,17 +81,13 @@ func (m *RWMutex) RLock(start, stop int) {
 		Panicf("rwmutex: rlock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}
 
-	// first lock the state
 	m.cond.L.Lock()
 	//Debug("RLock", start, stop)
-
 	m.c, m.d = start, start
-	// wait for safe moment to lock
 	for !m.canRLock(start, stop) {
 		//Debug("Rlock: wait")
 		m.cond.Wait()
 	}
-	// actually lock the interval
 	m.c, m.d = start, stop
 	if stop == m.N {
 		m.lastread++
@@ -122,7 +111,6 @@ func (m *RWMutex) canRLock(c, d int) (ok bool) {
 		//reason = "intersects"
 		return
 	}
-
 	// make sure we don't read data that has not yet been written.
 	if c >= b {
 		if m.stampOf(d) != m.lastread+1 { // time stamp should be OK

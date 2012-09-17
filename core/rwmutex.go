@@ -69,6 +69,7 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 		return
 	}
 
+	// make sure we don't overwrite data that has not yet been read.
 	if a >= d {
 		if m.stampOf(a) != m.lastread { // time stamp should be OK
 			//reason = fmt.Sprint("stampOf", a, "==", m.stampOf(a), "!=", m.lastread)
@@ -122,6 +123,7 @@ func (m *RWMutex) canRLock(c, d int) (ok bool) {
 		return
 	}
 
+	// make sure we don't read data that has not yet been written.
 	if c >= b {
 		if m.stampOf(d) != m.lastread+1 { // time stamp should be OK
 			//reason = fmt.Sprint("stampOf", d, "==", m.stampOf(d), "!=", m.lastread, "+ 1")
@@ -164,51 +166,3 @@ func (m *RWMutex) stampOf(index int) int {
 	Panicf("rwmutex: writingframe: invalid index: start=%v, stop=%v, index=%v", m.a, m.b, index)
 	return -2 // silence gc (dummy value)
 }
-
-//// Protects an array for thread-safe
-//// concurrent writing by one writer
-//// and reading by many readers.
-//// The writer locks parts of the array with
-//// 	Lock(start, stop)
-//// 
-//type rnge struct {
-//	start, stop int
-//}
-//
-//type RWMutex struct {
-//	state sync.Mutex
-//	N     int  // total number of elements in protected array
-//	w, r  rnge // writer/reader locked range
-//	//readers []RLock
-//}
-//
-//// Locks for writing between indices 
-//// start (inclusive) and stop (exclusive).
-//func (m *RWMutex) Lock(start, stop int) {
-//	// check bounds
-//	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
-//		panic(fmt.Errorf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N))
-//	}
-//
-//	m.state.Lock()
-//	{
-//		m.w.start = start
-//		m.w.stop = stop
-//	}
-//	m.state.Unlock()
-//}
-//
-//// Registers and returns a new lock for reading.
-//func (m *RWMutex) MakeRLock() *RLock {
-//	return nil
-//}
-//
-//// Lock for reading a RWMutex.
-//type RLock struct {
-//}
-//
-//// Locks for reading between indices 
-//// start (inclusive) and stop (exclusive).
-//func (m *RLock) RLock(start, stop int) {
-//
-//}

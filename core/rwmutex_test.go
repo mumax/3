@@ -13,7 +13,7 @@ func TestRWMutex(t *testing.T) {
 
 	N := 3
 	a := make([]int, N)
-	frames := 1000
+	frames := 1
 	m := NewRWMutex(N)
 	const D = 100 * time.Microsecond
 	const P = 0.95

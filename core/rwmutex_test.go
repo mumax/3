@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -9,7 +10,7 @@ import (
 func TestRWMutex(t *testing.T) {
 	N := 10
 	a := make([]int, N)
-	frames := 3
+	frames := 10
 	m := NewRWMutex(N)
 
 	go func() {
@@ -18,12 +19,13 @@ func TestRWMutex(t *testing.T) {
 			prev := 0
 			for j := 1; j <= N; j++ {
 				m.RLock(prev, j)
+				fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 				if count != a[prev] {
 					t.Error("got", a[prev], "expected", count)
 				}
 				count++
 				prev = j
-				time.Sleep(time.Duration(rand.Int63n(1000)))
+				time.Sleep(time.Duration(rand.Int63n(10000)))
 			}
 		}
 	}()
@@ -33,6 +35,7 @@ func TestRWMutex(t *testing.T) {
 		prev := 0
 		for j := 1; j <= N; j++ {
 			m.Lock(prev, j)
+			fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
 			a[prev] = count
 			count++
 			prev = j

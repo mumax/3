@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+const D = 100 * time.Microsecond
+const P = 0.95
+
 // Write consecutive numbers in the array
 // and test if read receives them in the correct order.
 func TestRWMutex(t *testing.T) {
@@ -15,34 +18,13 @@ func TestRWMutex(t *testing.T) {
 	a := make([]int, N)
 	frames := 1000
 	m := NewRWMutex(N)
-	const D = 100 * time.Microsecond
-	const P = 0.95
 
-	// go write
-	go func() {
-		count := 0
-		for i := 0; i < frames; i++ {
-			prev := 0
-			for j := 1; j <= N; j++ {
-				m.Lock(prev, j)
-				fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
-				a[prev] = count
-				count++
-				prev = j
-				if rand.Float32() > P {
-					time.Sleep(D)
-				}
-			}
-			if rand.Float32() > P {
-				time.Sleep(D)
-			}
-		}
-		m.Lock(0, 0) // unlocks
-	}()
-
+	go write(m, a, N, frames)
 	time.Sleep(time.Millisecond)
+	read(m, a, N, frames, t)
+}
 
-	// read
+func read(m *RWMutex, a []int, N, frames int, t *testing.T) {
 	count := 0
 	for i := 0; i < frames; i++ {
 		prev := 0
@@ -62,4 +44,25 @@ func TestRWMutex(t *testing.T) {
 			time.Sleep(D)
 		}
 	}
+}
+
+func write(m *RWMutex, a []int, N, frames int) {
+	count := 0
+	for i := 0; i < frames; i++ {
+		prev := 0
+		for j := 1; j <= N; j++ {
+			m.Lock(prev, j)
+			fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
+			a[prev] = count
+			count++
+			prev = j
+			if rand.Float32() > P {
+				time.Sleep(D)
+			}
+		}
+		if rand.Float32() > P {
+			time.Sleep(D)
+		}
+	}
+	m.Lock(0, 0) // unlocks
 }

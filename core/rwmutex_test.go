@@ -40,6 +40,8 @@ func TestRWMutex(t *testing.T) {
 		m.Lock(0, 0) // unlocks
 	}()
 
+	time.Sleep(time.Millisecond)
+
 	// read
 	count := 0
 	for i := 0; i < frames; i++ {

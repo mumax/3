@@ -6,11 +6,11 @@ import "sync"
 type RWMutex struct {
 	N            int // Total number of elements in protected array.
 	a, b         int // half-open interval locked for writing
-	writingframe int // time stamp of data before a, increments at each new frame.
 	c, d         int // half-open interval locked for reading
-	lastread     int // time stamp which we want at d for reading.
-	state        sync.Mutex
-	cond         sync.Cond
+	writingframe int // time stamp of data currently being written in [a, b[
+	lastread     int // time stamp of data last read in [c, d[
+	state        sync.Mutex // protects the internal state, used in cond.
+	cond         sync.Cond // wait condition: read/write is safe
 }
 
 func NewRWMutex(N int) *RWMutex {
@@ -51,7 +51,6 @@ func (m *RWMutex) Lock(start, stop int) {
 // Not thread-safe, assumes state mutex is locked.
 func (m *RWMutex) canWLock(a, b int) (ok bool) {
 	c, d := m.c, m.d
-
 	//reason := "?"
 	//defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 
@@ -61,7 +60,6 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 		//reason = "intersects"
 		return
 	}
-
 	// make sure we don't overwrite data that has not yet been read.
 	if a >= d {
 		if m.stampOf(a) != m.lastread { // time stamp should be OK
@@ -93,7 +91,6 @@ func (m *RWMutex) RLock(start, stop int) {
 		m.lastread++
 		//Debug("R new frame, lastread=", m.lastread)
 	}
-
 	m.cond.L.Unlock()
 	m.cond.Broadcast() // TODO: benchmark with broadcast in/out lock.
 }
@@ -102,7 +99,6 @@ func (m *RWMutex) RLock(start, stop int) {
 // Not thread-safe, assumes state mutex is locked.
 func (m *RWMutex) canRLock(c, d int) (ok bool) {
 	a, b := m.a, m.b
-
 	//reason := "?"
 	//defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 

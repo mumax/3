@@ -13,7 +13,7 @@ func TestRWMutex(t *testing.T) {
 
 	N := 3
 	a := make([]int, N)
-	frames := 1
+	frames := 1000
 	m := NewRWMutex(N)
 	const D = 100 * time.Microsecond
 	const P = 0.95
@@ -37,6 +37,7 @@ func TestRWMutex(t *testing.T) {
 				time.Sleep(D)
 			}
 		}
+		m.Lock(0, 0) // unlocks
 	}()
 
 	// read

@@ -11,6 +11,7 @@ type RWMutex struct {
 	lastread     int // time stamp of data last read in [c, d[
 	state        sync.Mutex // protects the internal state, used in cond.
 	cond         sync.Cond // wait condition: read/write is safe
+	readers []*RMutex
 }
 
 func NewRWMutex(N int) *RWMutex {
@@ -74,7 +75,7 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 // ______________________________________________________ Read
 
 // Lock for reading [start, stop[.
-func (m *RWMutex) RLock(start, stop int) {
+func (m *RWMutex) rLock(start, stop int) {
 	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
 		Panicf("rwmutex: rlock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}

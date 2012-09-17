@@ -29,7 +29,7 @@ func read(m *RWMutex, a []int, N, frames int, t *testing.T) {
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j += 1 {
-			m.RLock(prev, j)
+			m.rLock(prev, j)
 			fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 			if count != a[prev] {
 				t.Error("got", a[prev], "expected", count)

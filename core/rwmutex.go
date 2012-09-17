@@ -1,9 +1,6 @@
 package core
 
-import (
-	"fmt"
-	"sync"
-)
+import "sync"
 
 type RWMutex struct {
 	N            int // Total number of elements in protected array.
@@ -35,11 +32,11 @@ func (m *RWMutex) Lock(start, stop int) {
 
 	// first lock the state
 	m.cond.L.Lock()
-	Debug("WLock", start, stop)
+	//Debug("WLock", start, stop)
 	// 
 	if start == 0 {
 		m.writingframe++
-		Debug("W new frame, writingframe=", m.writingframe)
+		//Debug("W new frame, writingframe=", m.writingframe)
 	}
 
 	// noting being written while waiting
@@ -47,7 +44,7 @@ func (m *RWMutex) Lock(start, stop int) {
 
 	// wait for safe moment to lock
 	for !m.canWLock(start, stop) {
-		Debug("Wlock: wait")
+		//Debug("Wlock: wait")
 		m.cond.Wait()
 	}
 	// actually lock the interval
@@ -62,23 +59,23 @@ func (m *RWMutex) Lock(start, stop int) {
 func (m *RWMutex) canWLock(a, b int) (ok bool) {
 	c, d := m.c, m.d
 
-	reason := "?"
-	defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
+	//reason := "?"
+	//defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 
 	// intersection of read & write interval:
 	ok = !intersects(a, b, c, d)
 	if !ok {
-		reason = "intersects"
+		//reason = "intersects"
 		return
 	}
 
 	if a >= d {
 		if m.stampOf(a) != m.lastread { // time stamp should be OK
-			reason = fmt.Sprint("stampOf", a, "==", m.stampOf(a), "!=", m.lastread)
+			//reason = fmt.Sprint("stampOf", a, "==", m.stampOf(a), "!=", m.lastread)
 			return false
 		}
 	}
-	reason = "ok"
+	//reason = "ok"
 	return true
 }
 
@@ -92,19 +89,19 @@ func (m *RWMutex) RLock(start, stop int) {
 
 	// first lock the state
 	m.cond.L.Lock()
-	Debug("RLock", start, stop)
+	//Debug("RLock", start, stop)
 
 	m.c, m.d = start, start
 	// wait for safe moment to lock
 	for !m.canRLock(start, stop) {
-		Debug("Rlock: wait")
+		//Debug("Rlock: wait")
 		m.cond.Wait()
 	}
 	// actually lock the interval
 	m.c, m.d = start, stop
 	if stop == m.N {
 		m.lastread++
-		Debug("R new frame, lastread=", m.lastread)
+		//Debug("R new frame, lastread=", m.lastread)
 	}
 
 	m.cond.L.Unlock()
@@ -116,23 +113,23 @@ func (m *RWMutex) RLock(start, stop int) {
 func (m *RWMutex) canRLock(c, d int) (ok bool) {
 	a, b := m.a, m.b
 
-	reason := "?"
-	defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
+	//reason := "?"
+	//defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 
 	ok = !intersects(a, b, c, d) // intersection should be empty
 	if !ok {
-		reason = "intersects"
+		//reason = "intersects"
 		return
 	}
 
 	if c >= b {
 		if m.stampOf(d) != m.lastread+1 { // time stamp should be OK
-			reason = fmt.Sprint("stampOf", d, "==", m.stampOf(d), "!=", m.lastread, "+ 1")
+			//reason = fmt.Sprint("stampOf", d, "==", m.stampOf(d), "!=", m.lastread, "+ 1")
 			ok = false
 			return
 		}
 	}
-	reason = "ok"
+	//reason = "ok"
 	return true
 }
 

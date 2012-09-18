@@ -18,11 +18,13 @@ func TestRWMutex(t *testing.T) {
 	a := make([]int, N)
 	frames := 1000
 	m := NewRWMutex(N)
-	r := m.NewReader()
+	r1 := m.NewReader()
+	r2 := m.NewReader()
 
 	go write(m, a, N, frames)
 	time.Sleep(time.Millisecond)
-	read(r, a, N, frames, t)
+	go read(r1, a, N, frames, t)
+	read(r2, a, N, frames, t)
 }
 
 func read(m *RMutex, a []int, N, frames int, t *testing.T) {

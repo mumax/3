@@ -77,6 +77,10 @@ func (m *RMutex) RLock(start, stop int) {
 	m.rw.cond.Broadcast() // TODO: benchmark with broadcast in/out lock.
 }
 
+// TryRLock tries to acquire the lock without blocking.
+// If the lock cannot be acquired, TryRLock() 
+// immediately returns false.
+// Otherwise the lock is acquired, returning true.
 func (m *RMutex) TryRLock(start, stop int) (ok bool) {
 	m.rw.check(start, stop)
 	m.rw.cond.L.Lock()
@@ -115,6 +119,10 @@ func (m *RWMutex) WLock(start, stop int) {
 	m.cond.Broadcast()
 }
 
+// TryWLock tries to acquire the lock without blocking.
+// If the lock cannot be acquired, TryWLock() 
+// immediately returns false.
+// Otherwise the lock is acquired, returning true.
 func (m *RWMutex) TryWLock(start, stop int) (ok bool) {
 	m.check(start, stop)
 	m.cond.L.Lock()

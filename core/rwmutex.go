@@ -4,14 +4,12 @@ import "sync"
 
 // One reader, one writer.
 type RWMutex struct {
-	N    int // Total number of elements in protected array.
-	a, b int // half-open interval locked for writing
-	//c, d         int        // half-open interval locked for reading
-	writingframe int // time stamp of data currently being written in [a, b[
-	//lastread     int        // time stamp of data last read in [c, d[
-	state   sync.Mutex // protects the internal state, used in cond.
-	cond    sync.Cond  // wait condition: read/write is safe
-	readers []*RMutex
+	N            int        // Total number of elements in protected array.
+	a, b         int        // half-open interval locked for writing
+	writingframe int        // time stamp of data currently being written in [a, b[
+	state        sync.Mutex // protects the internal state, used in cond.
+	cond         sync.Cond  // wait condition: read/write is safe
+	readers      []*RMutex  // all readers who can access this rwmutex
 }
 
 func NewRWMutex(N int) *RWMutex {
@@ -20,6 +18,14 @@ func NewRWMutex(N int) *RWMutex {
 	m.cond = *(sync.NewCond(&m.state))
 	m.writingframe = -1 // nothing yet written
 	return m
+}
+
+func (m *RWMutex) NewReader() *RMutex {
+	m.cond.L.Lock()
+	defer m.cond.L.Unlock()
+	r := &RMutex{rw: m, c: 0, d: 0, lastread: -1}
+	m.readers = append(m.readers, r)
+	return r
 }
 
 type RMutex struct {
@@ -51,14 +57,6 @@ func (m *RMutex) RLock(start, stop int) {
 	m.rw.cond.L.Unlock()
 	m.rw.cond.Broadcast() // TODO: benchmark with broadcast in/out lock.
 }
-
-func (m *RWMutex) NewReader() *RMutex {
-	r := &RMutex{rw: m, c: 0, d: 0, lastread: -1}
-	m.readers = append(m.readers, r)
-	return r
-}
-
-// ______________________________________________________ Write
 
 // Lock for writing [start, stop[.
 // Automatically unlocks the previous interval.
@@ -141,20 +139,6 @@ func (r *RMutex) canRLock(c, d int) (ok bool) {
 // [a, b[ intersects [c, d[ ?
 func intersects(a, b, c, d int) bool {
 	return max(a, c) < min(b, d)
-}
-
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
-}
-
-func max(x, y int) int {
-	if x > y {
-		return x
-	}
-	return y
 }
 
 // Time stamp when data at index has last been written.

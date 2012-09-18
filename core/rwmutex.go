@@ -215,7 +215,7 @@ func (m *RWMutex) stampOf(index int) int {
 }
 
 func (m *RWMutex) check(start, stop int) {
-	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
+	if start > stop || start > m.N || stop > m.N || start < 0 || stop < 0 {
 		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}
 }

@@ -64,9 +64,7 @@ func (m *RMutex) RLock(start, stop int) {
 	if start > stop || start >= m.rw.N || stop > m.rw.N || start < 0 || stop < 0 {
 		Panicf("rwmutex: rlock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.rw.N)
 	}
-
 	m.rw.cond.L.Lock()
-	//Debug("RLock", start, stop)
 	m.c, m.d = start, start
 	for !m.canRLock(start, stop) {
 		//Debug("Rlock: wait")
@@ -85,11 +83,9 @@ func (m *RMutex) RLock(start, stop int) {
 // Automatically unlocks the previous interval.
 // Lock(0, 0) can be used to explicitly unlock.
 func (m *RWMutex) Lock(start, stop int) {
-
 	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
 		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}
-
 	m.cond.L.Lock()
 	//Debug("WLock", start, stop)
 	if start == 0 {
@@ -112,8 +108,6 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 		c, d := r.c, r.d
 		//reason := "?"
 		//defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
-
-		// intersection of read & write interval:
 		ok = !intersects(a, b, c, d)
 		if !ok {
 			//reason = "intersects"
@@ -137,7 +131,6 @@ func (r *RMutex) canRLock(c, d int) (ok bool) {
 	a, b := m.a, m.b
 	//reason := "?"
 	//defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
-
 	ok = !intersects(a, b, c, d) // intersection should be empty
 	if !ok {
 		//reason = "intersects"

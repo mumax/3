@@ -26,7 +26,6 @@ func TestRWMutex(t *testing.T) {
 	read(r2, a, N, frames, t)
 }
 
-
 func TestRWMutex_try(t *testing.T) {
 	N := 3
 	a := make([]int, N)
@@ -63,14 +62,13 @@ func read(m *RMutex, a []int, N, frames int, t *testing.T) {
 	}
 }
 
-
 func read_try(m *RMutex, a []int, N, frames int, t *testing.T) {
 	count := 0
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j += 1 {
-			for !m.TryRLock(prev, j){
-				//busy wait
+			for !m.TryRLock(prev, j) {
+				time.Sleep(1 * time.Microsecond)
 			}
 			fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 			if count != a[prev] {
@@ -87,7 +85,6 @@ func read_try(m *RMutex, a []int, N, frames int, t *testing.T) {
 		}
 	}
 }
-
 
 func write(m *RWMutex, a []int, N, frames int) {
 	count := 0

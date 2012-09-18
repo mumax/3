@@ -8,6 +8,7 @@ package core
 */
 
 import "sync"
+import "fmt"
 
 // RWMutex protects an array for safe access by
 // one writer and many readers. 
@@ -152,24 +153,24 @@ func (m *RWMutex) TryWLock(start, stop int) (ok bool) {
 
 // Can m safely lock for writing [start, stop[ ?
 func (m *RWMutex) canWLock(a, b int) (ok bool) {
+	reason := "?"
 	for _, r := range m.readers {
 		c, d := r.c, r.d
-		//reason := "?"
-		//defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
+		defer func() { Debug("canWlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 		ok = !intersects(a, b, c, d)
 		if !ok {
-			//reason = "intersects"
+			reason = "intersects"
 			return
 		}
 		// make sure we don't overwrite data that has not yet been read.
 		if a >= d {
 			if m.stampOf(a) != r.lastread { // time stamp should be OK
-				//reason = fmt.Sprint("stampOf", a, "==", m.stampOf(a), "!=", m.lastread)
+				reason = fmt.Sprint("stampOf", a, "==", m.stampOf(a), "!=", r.lastread)
 				return false
 			}
 		}
 	}
-	//reason = "all ok"
+	reason = "all ok"
 	return true
 }
 
@@ -177,22 +178,22 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 func (r *RMutex) canRLock(c, d int) (ok bool) {
 	m := r.rw
 	a, b := m.a, m.b
-	//reason := "?"
-	//defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
+	reason := "?"
+	defer func() { Debug("canRlock: [", a, ",", b, "[, [", c, ",", d, "[", ok, reason) }()
 	ok = !intersects(a, b, c, d) // intersection should be empty
 	if !ok {
-		//reason = "intersects"
+		reason = "intersects"
 		return
 	}
 	// make sure we don't read data that has not yet been written.
 	if c >= b {
 		if m.stampOf(d) != r.lastread+1 { // time stamp should be OK
-			//reason = fmt.Sprint("stampOf", d, "==", m.stampOf(d), "!=", m.lastread, "+ 1")
+			reason = fmt.Sprint("stampOf", d, "==", m.stampOf(d), "!=", r.lastread, "+ 1")
 			ok = false
 			return
 		}
 	}
-	//reason = "ok"
+	reason = "ok"
 	return true
 }
 

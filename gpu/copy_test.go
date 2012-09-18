@@ -10,6 +10,7 @@ func TestCopy(t *testing.T) {
 	LockCudaThread()
 
 	N := 64
+	F := 100
 	a := make([]float32, N)
 	b := safe.MakeFloat32s(N)
 	c := make([]float32, N)
@@ -24,17 +25,25 @@ func TestCopy(t *testing.T) {
 	go up.Run()
 	go down.Run()
 
+	go func(){
+	for f:=0; f<F; f++{
 	mA.WLock(0, N)
 	for i := range a {
 		a[i] = float32(i)
 	}
 	mA.WLock(0, 0)
+	}
+	}()
 
+	
+	for f:=0; f<F; f++{
 	mC.NewReader().RLock(0, N)
 	for i := range c {
 		if c[i] != float32(i) {
 			t.Error("expected:", float32(i), "got:", c[i])
 		}
+	}
+	mC.NewReader().RLock(0, 0)
 	}
 	core.Log(c)
 }

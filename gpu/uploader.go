@@ -36,13 +36,13 @@ func (u *Uploader) Run() {
 		for i := 0; i < len(u.hostdata); i += bsize {
 			j := i + bsize
 			u.rlock.RLock(i, i)
-			u.wlock.WLock(i, i)
+		//	u.wlock.WLock(i, i)
 			u.rlock.RLock(i, j)
 			u.wlock.WLock(i, j)
 			core.Debug("upload", i, j)
 			u.devdata.CopyHtoDAsync(u.hostdata, u.stream)
 			u.stream.Synchronize()
-			u.rlock.RLock(j, j)
+			//u.rlock.RLock(j, j)
 			u.wlock.WLock(j, j)
 		}
 	}
@@ -80,13 +80,13 @@ func (u *Downloader) Run() {
 		for i := 0; i < len(u.hostdata); i += bsize {
 			j := i + bsize
 			u.rlock.RLock(i, i)
-			u.wlock.WLock(i, i)
+			//u.wlock.WLock(i, i)
 			u.wlock.WLock(i, j)
 			u.rlock.RLock(i, j)
 			core.Debug("download", i, j)
 			u.devdata.CopyDtoHAsync(u.hostdata, u.stream)
 			u.stream.Synchronize()
-			u.rlock.RLock(j, j)
+			//u.rlock.RLock(j, j)
 			u.wlock.WLock(j, j)
 		}
 	}

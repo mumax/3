@@ -37,7 +37,7 @@ func NewRWMutex(N int) *RWMutex {
 	m := new(RWMutex)
 	m.N = N
 	m.cond = *(sync.NewCond(&m.state))
-	m.writingframe = -1 // nothing yet written
+	m.writingframe = 0 // frame 0 is next one to be written
 	return m
 }
 
@@ -84,16 +84,16 @@ func (m *RWMutex) WLock(start, stop int) {
 	m.check(start, stop)
 	m.cond.L.Lock()
 	//Debug("WLock", start, stop)
-	if start == 0 {
-		m.writingframe++
-		//Debug("W new frame, writingframe=", m.writingframe)
-	}
 	m.a, m.b = start, start // noting is being written while waiting
 	for !m.canWLock(start, stop) {
 		//Debug("Wlock: wait")
 		m.cond.Wait()
 	}
 	m.a, m.b = start, stop // update lock the interval
+	if stop == m.N {
+		m.writingframe++
+		//Debug("W new frame, writingframe=", m.writingframe)
+	}
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }

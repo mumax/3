@@ -77,43 +77,63 @@ func (m *RMutex) RLock(start, stop int) {
 	m.rw.cond.Broadcast() // TODO: benchmark with broadcast in/out lock.
 }
 
+func (m *RMutex) TryRLock(start, stop int) (ok bool) {
+	m.rw.check(start, stop)
+	m.rw.cond.L.Lock()
+	m.c, m.d = start, start
+	if !m.canRLock(start, stop) {
+		ok = false
+		m.rw.cond.L.Unlock()
+		m.rw.cond.Broadcast()
+		return
+	}
+	m.c, m.d = start, stop
+	if stop == m.rw.N {
+		m.lastread++
+	}
+	ok = true
+	m.rw.cond.L.Unlock()
+	m.rw.cond.Broadcast()
+	return
+}
+
 // Lock for writing [start, stop[.
 // Automatically unlocks the previous interval.
 // Lock(0, 0) can be used to explicitly unlock.
 func (m *RWMutex) WLock(start, stop int) {
 	m.check(start, stop)
 	m.cond.L.Lock()
-	//Debug("WLock", start, stop)
 	m.a, m.b = start, start // noting is being written while waiting
 	for !m.canWLock(start, stop) {
-		//Debug("Wlock: wait")
 		m.cond.Wait()
 	}
 	m.a, m.b = start, stop // update lock the interval
 	if stop == m.N {
 		m.writingframe++
-		//Debug("W new frame, writingframe=", m.writingframe)
 	}
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
 
-//func (m*RWMutex) TryWLock(start, stop int) (ok bool){
-//	m.check(start, stop)
-//
-//	m.cond.L.Lock()
-//	if start == 0 {
-//		m.writingframe++
-//	}
-//	m.a, m.b = start, start // noting is being written while waiting
-//	for !m.canWLock(start, stop) {
-//		//Debug("Wlock: wait")
-//		m.cond.Wait()
-//	}
-//	m.a, m.b = start, stop // update lock the interval
-//	m.cond.L.Unlock()
-//	m.cond.Broadcast()
-//}
+func (m *RWMutex) TryWLock(start, stop int) (ok bool) {
+	m.check(start, stop)
+	m.cond.L.Lock()
+	m.a, m.b = start, start // noting is being written while waiting
+	if !m.canWLock(start, stop) {
+		ok = false
+		m.cond.L.Unlock()
+		m.cond.Broadcast() // previous interval is now unlocked, so broadcast
+		return
+	}
+	m.a, m.b = start, stop // update lock the interval
+	if stop == m.N {
+		m.writingframe++
+	}
+	ok = true
+	m.cond.L.Unlock()
+	m.cond.Broadcast()
+	return
+}
 
 // Can m safely lock for writing [start, stop[ ?
 func (m *RWMutex) canWLock(a, b int) (ok bool) {

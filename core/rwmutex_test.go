@@ -54,7 +54,7 @@ func write(m *RWMutex, a []int, N, frames int) {
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j++ {
-			m.Lock(prev, j)
+			m.WLock(prev, j)
 			fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
 			a[prev] = count
 			count++
@@ -67,5 +67,5 @@ func write(m *RWMutex, a []int, N, frames int) {
 			time.Sleep(D)
 		}
 	}
-	m.Lock(0, 0) // unlocks
+	m.WLock(0, 0) // unlocks
 }

@@ -10,11 +10,11 @@ import "sync"
 // 	rlock := wlock.NewReader()
 // 	
 // 	go func(){
-// 		wlock.Lock(0, 50)
+// 		wlock.WLock(0, 50)
 // 		// write elements 0 to 50
-// 		wlock.Lock(50, 100)
+// 		wlock.WLock(50, 100)
 // 		// write elements 50 to 100
-// 		wlock.Lock(0, 50)
+// 		wlock.WLock(0, 50)
 // 		// ...
 // 	}()
 // 	
@@ -82,7 +82,7 @@ func (m *RMutex) RLock(start, stop int) {
 // Lock for writing [start, stop[.
 // Automatically unlocks the previous interval.
 // Lock(0, 0) can be used to explicitly unlock.
-func (m *RWMutex) Lock(start, stop int) {
+func (m *RWMutex) WLock(start, stop int) {
 	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
 		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
 	}

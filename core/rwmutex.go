@@ -61,9 +61,7 @@ type RMutex struct {
 // Automatically unlocks the previous interval.
 // RLock(0, 0) can be used to explicitly unlock.
 func (m *RMutex) RLock(start, stop int) {
-	if start > stop || start >= m.rw.N || stop > m.rw.N || start < 0 || stop < 0 {
-		Panicf("rwmutex: rlock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.rw.N)
-	}
+	m.rw.check(start, stop)
 	m.rw.cond.L.Lock()
 	m.c, m.d = start, start
 	for !m.canRLock(start, stop) {
@@ -83,9 +81,7 @@ func (m *RMutex) RLock(start, stop int) {
 // Automatically unlocks the previous interval.
 // Lock(0, 0) can be used to explicitly unlock.
 func (m *RWMutex) WLock(start, stop int) {
-	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
-		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
-	}
+	m.check(start, stop)
 	m.cond.L.Lock()
 	//Debug("WLock", start, stop)
 	if start == 0 {
@@ -101,6 +97,23 @@ func (m *RWMutex) WLock(start, stop int) {
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
+
+//func (m*RWMutex) TryWLock(start, stop int) (ok bool){
+//	m.check(start, stop)
+//
+//	m.cond.L.Lock()
+//	if start == 0 {
+//		m.writingframe++
+//	}
+//	m.a, m.b = start, start // noting is being written while waiting
+//	for !m.canWLock(start, stop) {
+//		//Debug("Wlock: wait")
+//		m.cond.Wait()
+//	}
+//	m.a, m.b = start, stop // update lock the interval
+//	m.cond.L.Unlock()
+//	m.cond.Broadcast()
+//}
 
 // Can m safely lock for writing [start, stop[ ?
 func (m *RWMutex) canWLock(a, b int) (ok bool) {
@@ -163,4 +176,10 @@ func (m *RWMutex) stampOf(index int) int {
 	}
 	Panicf("rwmutex: writingframe: invalid index: start=%v, stop=%v, index=%v", m.a, m.b, index)
 	return -2 // silence gc (dummy value)
+}
+
+func (m *RWMutex) check(start, stop int) {
+	if start > stop || start >= m.N || stop > m.N || start < 0 || stop < 0 {
+		Panicf("rwmutex: lock: invalid arguments: start=%v, stop=%v, n=%v", start, stop, m.N)
+	}
 }

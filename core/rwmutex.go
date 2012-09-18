@@ -2,7 +2,27 @@ package core
 
 import "sync"
 
-// One reader, one writer.
+// RWMutex protects an array for safe access by
+// one writer and many readers. 
+// Example:
+// 	array := make([]whatever, 100)
+// 	wlock := NewRWMutex(len(array))
+// 	rlock := wlock.NewReader()
+// 	
+// 	go func(){
+// 		wlock.Lock(0, 50)
+// 		// write elements 0 to 50
+// 		wlock.Lock(50, 100)
+// 		// write elements 50 to 100
+// 		wlock.Lock(0, 50)
+// 		// ...
+// 	}()
+// 	
+// 	rlock.RLock(0, 20)
+// 	// read elemnts 0 to 20
+// 	// ...
+// RWMutex makes sure the readers receive all data
+// exactly once and in the correct order.
 type RWMutex struct {
 	N            int        // Total number of elements in protected array.
 	a, b         int        // half-open interval locked for writing
@@ -12,6 +32,7 @@ type RWMutex struct {
 	readers      []*RMutex  // all readers who can access this rwmutex
 }
 
+// RWMutex to protect an array of length N.
 func NewRWMutex(N int) *RWMutex {
 	m := new(RWMutex)
 	m.N = N
@@ -20,6 +41,7 @@ func NewRWMutex(N int) *RWMutex {
 	return m
 }
 
+// Make a new read lock for this RWMutex.
 func (m *RWMutex) NewReader() *RMutex {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
@@ -28,6 +50,7 @@ func (m *RWMutex) NewReader() *RMutex {
 	return r
 }
 
+// RMutex is a read-only lock, created by an RWMutex.
 type RMutex struct {
 	rw       *RWMutex
 	c, d     int // half-open interval locked for reading
@@ -84,7 +107,6 @@ func (m *RWMutex) Lock(start, stop int) {
 }
 
 // Can m safely lock for writing [start, stop[ ?
-// Not thread-safe, assumes state mutex is locked.
 func (m *RWMutex) canWLock(a, b int) (ok bool) {
 	for _, r := range m.readers {
 		c, d := r.c, r.d
@@ -109,10 +131,7 @@ func (m *RWMutex) canWLock(a, b int) (ok bool) {
 	return true
 }
 
-// ______________________________________________________ Read
-
 // Can m safely lock for reading [start, stop[ ?
-// Not thread-safe, assumes state mutex is locked.
 func (r *RMutex) canRLock(c, d int) (ok bool) {
 	m := r.rw
 	a, b := m.a, m.b
@@ -142,7 +161,6 @@ func intersects(a, b, c, d int) bool {
 }
 
 // Time stamp when data at index has last been written.
-// Not thread-safe, assumes state mutex is locked.
 func (m *RWMutex) stampOf(index int) int {
 	if index < m.a {
 		return m.writingframe

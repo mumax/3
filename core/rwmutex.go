@@ -1,5 +1,12 @@
 package core
 
+/* 
+   To my future colleagues:
+   This code is the very core, the heart and soul of all concurrent GPU-CPU logic.
+   Please, take a deep breath before editing. Raptors will kill you if break it.
+   -Arne.
+*/
+
 import "sync"
 
 // RWMutex protects an array for safe access by

@@ -18,18 +18,19 @@ func TestRWMutex(t *testing.T) {
 	a := make([]int, N)
 	frames := 1000
 	m := NewRWMutex(N)
+	r := m.NewReader()
 
 	go write(m, a, N, frames)
 	time.Sleep(time.Millisecond)
-	read(m, a, N, frames, t)
+	read(r, a, N, frames, t)
 }
 
-func read(m *RWMutex, a []int, N, frames int, t *testing.T) {
+func read(m *RMutex, a []int, N, frames int, t *testing.T) {
 	count := 0
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j += 1 {
-			m.rLock(prev, j)
+			m.RLock(prev, j)
 			fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 			if count != a[prev] {
 				t.Error("got", a[prev], "expected", count)

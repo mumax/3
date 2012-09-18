@@ -8,7 +8,10 @@ import (
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces. Fields are evaluated at the
 // cell center (not averaged).
-func BruteKernel(size [3]int, cellsize [3]float64, periodic [3]int, accuracy int) [3][3][][][]float32 {
+func BruteKernel(mesh *core.Mesh, accuracy int) [3][3][][][]float32 {
+	size := mesh.GridSize()
+	cellsize := mesh.CellSize()
+	periodic := mesh.PBC()
 	core.Debug("Calculating demag kernel", "size:", size, "cellsize:", cellsize, "accuracy:", accuracy, "periodic:", periodic)
 
 	core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)

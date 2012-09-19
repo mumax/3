@@ -45,7 +45,7 @@ type RMutex struct {
 }
 
 // Lock the next delta elements for reading.
-func (m *RMutex) RLock(delta int) {
+func (m *RMutex) ReadNext(delta int) {
 	m.rw.cond.L.Lock()
 
 	delta64 := int64(delta)
@@ -62,7 +62,7 @@ func (m *RMutex) RLock(delta int) {
 }
 
 // Unlock the previous interval locked for reading.
-func (m *RMutex) RUnlock() {
+func (m *RMutex) ReadDone() {
 	m.rw.cond.L.Lock()
 
 	m.absC = m.absD
@@ -72,7 +72,7 @@ func (m *RMutex) RUnlock() {
 }
 
 // Lock the next delta elements for writing.
-func (m *RWMutex) WLock(delta int) {
+func (m *RWMutex) WriteNext(delta int) {
 	m.cond.L.Lock()
 
 	delta64 := int64(delta)
@@ -89,7 +89,7 @@ func (m *RWMutex) WLock(delta int) {
 }
 
 // Unlock the previous interval locked for writing.
-func (m *RWMutex) WUnlock() {
+func (m *RWMutex) WriteDone() {
 	m.cond.L.Lock()
 	if m.absA == m.absB {
 		panic("rwmutex: unlock of unlocked mutex")

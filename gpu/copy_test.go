@@ -25,25 +25,24 @@ func TestCopy(t *testing.T) {
 	go up.Run()
 	go down.Run()
 
-	go func(){
-	for f:=0; f<F; f++{
-	mA.WLock(0, N)
-	for i := range a {
-		a[i] = float32(i)
-	}
-	mA.WLock(0, 0)
-	}
+	go func() {
+		for f := 0; f < F; f++ {
+			mA.WriteNext(N)
+			for i := range a {
+				a[i] = float32(i)
+			}
+			mA.WriteDone()
+		}
 	}()
 
-	
-	for f:=0; f<F; f++{
-	mC.NewReader().RLock(0, N)
-	for i := range c {
-		if c[i] != float32(i) {
-			t.Error("expected:", float32(i), "got:", c[i])
+	for f := 0; f < F; f++ {
+		mC.NewReader().ReadNext(N)
+		for i := range c {
+			if c[i] != float32(i) {
+				t.Error("expected:", float32(i), "got:", c[i])
+			}
 		}
-	}
-	mC.NewReader().RLock(0, 0)
+		mC.NewReader().ReadDone()
 	}
 	core.Log(c)
 }

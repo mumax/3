@@ -66,4 +66,3 @@ func testConvSize(test *testing.T, f Constructor, N0, N1, N2 int) {
 	c.Input()[2][0][0][N2/2] = 3
 	c.Exec()
 }
-

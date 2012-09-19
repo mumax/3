@@ -11,6 +11,8 @@ import "sync"
 
 // RWMutex protects an array for safe access by
 // one writer and many readers. 
+// RWMutex makes sure the readers receive all data
+// exactly once and in the correct order.
 type RWMutex struct {
 	n          int        // Total number of elements in protected array.
 	absA, absB int64      // half-open interval locked for writing
@@ -42,9 +44,7 @@ type RMutex struct {
 	absC, absD int64 // half-open interval locked for reading
 }
 
-// Lock for reading [start, stop[.
-// Automatically unlocks the previous interval.
-// RLock(0, 0) can be used to explicitly unlock.
+// Lock the next delta elements for reading.
 func (m *RMutex) RLock(delta int) {
 	m.rw.cond.L.Lock()
 
@@ -61,6 +61,7 @@ func (m *RMutex) RLock(delta int) {
 	m.rw.cond.Broadcast()
 }
 
+// Unlock the previous interval locked for reading.
 func (m *RMutex) RUnlock() {
 	m.rw.cond.L.Lock()
 
@@ -70,8 +71,8 @@ func (m *RMutex) RUnlock() {
 	m.rw.cond.Broadcast()
 }
 
+// Lock the next delta elements for writing.
 func (m *RWMutex) WLock(delta int) {
-	// TODO: test delta, rnge >= 0 and <= N
 	m.cond.L.Lock()
 
 	delta64 := int64(delta)
@@ -87,6 +88,7 @@ func (m *RWMutex) WLock(delta int) {
 	m.cond.Broadcast()
 }
 
+// Unlock the previous interval locked for writing.
 func (m *RWMutex) WUnlock() {
 	m.cond.L.Lock()
 	if m.absA == m.absB {
@@ -116,47 +118,3 @@ func (r *RMutex) canRLock(c, d int64) (ok bool) {
 	Debug("canRLock", c, d, ok)
 	return ok
 }
-
-//// TryWLock tries to acquire the lock without blocking.
-//// If the lock cannot be acquired, TryWLock() 
-//// immediately returns false.
-//// Otherwise the lock is acquired, returning true.
-//func (m *RWMutex) TryWLock(start, stop int) (ok bool) {
-//	m.check(start, stop)
-//	m.cond.L.Lock()
-//	m.a, m.b = start, start // noting is being written while waiting
-//	if !m.canWLock(start, stop) {
-//		ok = false
-//		m.cond.L.Unlock()
-//		m.cond.Broadcast() // previous interval is now unlocked, so broadcast
-//		return
-//	}
-//	m.a, m.b = start, stop // update lock the interval
-//	if stop == m.N {
-//		m.writingframe++
-//	}
-//	ok = true
-//	m.cond.L.Unlock()
-//	m.cond.Broadcast()
-//	return
-//}
-
-// Example:
-// 	array := make([]whatever, 100)
-// 	wlock := NewRWMutex(len(array))
-// 	rlock := wlock.NewReader()
-// 	
-// 	go func(){
-// 		wlock.WLock(0, 50)
-// 		// write elements 0 to 50
-// 		wlock.WLock(50, 100)
-// 		// write elements 50 to 100
-// 		wlock.WLock(0, 50)
-// 		// ...
-// 	}()
-// 	
-// 	rlock.RLock(0, 20)
-// 	// read elemnts 0 to 20
-// 	// ...
-// RWMutex makes sure the readers receive all data
-// exactly once and in the correct order.

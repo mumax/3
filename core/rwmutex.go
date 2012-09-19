@@ -14,10 +14,10 @@ import "sync"
 // RWMutex makes sure the readers receive all data
 // exactly once and in the correct order.
 type RWMutex struct {
-	n          int        // Total number of elements in protected array.
-	absA, absB int64      // half-open interval locked for writing
-	state      sync.Mutex // protects the internal state, used in cond.
 	cond       sync.Cond  // wait condition: read/write is safe
+	state      sync.Mutex // protects the internal state, used in cond.
+	absA, absB int64      // half-open interval locked for writing
+	n          int        // Total number of elements in protected array.
 	readers    []*RMutex  // all readers who can access this rwmutex
 }
 

@@ -12,10 +12,10 @@ type Symm2 struct {
 	kernSize [3]int // Size of kernel and logical FFT size.
 	n        int    // product of size
 	deviceData3
-	inlock  [3]*core.RMutex
+	inlock  [3]*core.RMutex  // protects ioBuf
+	outlock [3]*core.RWMutex // ALSO protects ioBuf
 	fwPlan  safe.FFT3DR2CPlan
 	bwPlan  safe.FFT3DC2RPlan
-	outlock [3]*core.RWMutex
 	stream  cu.Stream
 	kern    [3][3][]float32     // Real-space kernel
 	kernArr [3][3][][][]float32 // Real-space kernel
@@ -23,6 +23,7 @@ type Symm2 struct {
 }
 
 func (c *Symm2) init() {
+	panic("need 2nd ioBuf")
 	core.Debug("run")
 	padded := c.kernSize
 
@@ -70,12 +71,14 @@ func (c *Symm2) Run() {
 
 		// FW FFT
 		for i := 0; i < 3; i++ {
-			c.fftRBuf[i].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
 			c.inlock[i].ReadNext(c.n)
+
+			c.fftRBuf[i].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
 			copyPad(c.fftRBuf[i], c.ioBuf[i], padded, c.size, offset, c.stream)
-			c.inlock[i].ReadDone()
 			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 			c.stream.Synchronize()
+
+			c.inlock[i].ReadDone()
 		}
 
 		// kern mul
@@ -87,10 +90,12 @@ func (c *Symm2) Run() {
 
 		// BW FFT
 		for i := 0; i < 3; i++ {
+			c.outlock[i].WriteDone()
+
 			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-			c.outlock[i].WriteNext(c.n)
 			copyPad(c.ioBuf[i], c.fftRBuf[i], c.size, padded, offset, c.stream)
 			c.stream.Synchronize()
+
 			c.outlock[i].WriteDone()
 		}
 	}

@@ -16,18 +16,13 @@ type Uploader struct {
 }
 
 func NewUploader(hostdata []float32, hostlock *core.RMutex, devdata safe.Float32s, devlock *core.RWMutex) *Uploader {
-	u := new(Uploader)
-	u.hostdata = hostdata
-	u.rlock = hostlock
-	u.devdata = devdata
-	u.wlock = devlock
-	u.bsize = 16 // TODO !! Always lock max
-	return u
+	return &Uploader{hostdata, hostlock, devdata, devlock, 16}
 }
 
 func (u *Uploader) Run() {
 	core.Debug("uploader: run")
 	LockCudaThread()
+	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()
 	MemHostRegister(u.hostdata)
 	bsize := u.bsize

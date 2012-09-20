@@ -1,7 +1,5 @@
 package core
 
-import ()
-
 // dst[i] = a[i]+b[i].
 func Add(dst, a, b []float32) {
 	Assert(len(dst) == len(a) && len(a) == len(b))

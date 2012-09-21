@@ -15,7 +15,7 @@ func TestSymm2(t *testing.T) {
 	s := mesh.GridSize()
 
 	gpu.LockCudaThread()
-	hin := [3]core.Chan{core.MakeChan(s), core.MakeChan(s), core.MakeChan(s)}
+	hin := core.MakeChan3(s)
 	hinR := [3]core.RChan{hin[0].ReadOnly(), hin[1].ReadOnly(), hin[2].ReadOnly()}
 	din := [3]gpu.Chan{gpu.MakeChan(s), gpu.MakeChan(s), gpu.MakeChan(s)}
 	dinR := [3]gpu.RChan{din[0].ReadOnly(), din[1].ReadOnly(), din[2].ReadOnly()}

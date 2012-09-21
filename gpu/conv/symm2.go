@@ -8,10 +8,10 @@ import (
 )
 
 type Symm2 struct {
-	size     [3]int // 3D size of the input/output data
-	kernSize [3]int // Size of kernel and logical FFT size.
-	n        int    // product of size
-	input    [3]gpu.RChan
+	size     [3]int       // 3D size of the input/output data
+	kernSize [3]int       // Size of kernel and logical FFT size.
+	n        int          // product of size
+	input    [3]gpu.RChan // TODO: fuse into one array
 	output   [3]gpu.Chan
 	//ioBuf      [3]safe.Float32s    // gpu buffer for real-space, unpadded input/output data
 	//inlock     [3]*core.RMutex     // protects ioBuf

@@ -16,7 +16,7 @@ type Uploader struct {
 }
 
 func NewUploader(hostdata []float32, hostlock *core.RMutex, devdata safe.Float32s, devlock *core.RWMutex) *Uploader {
-	return &Uploader{hostdata, hostlock, devdata, devlock, 16}
+	return &Uploader{hostdata, hostlock, devdata, devlock, 16, 0}
 }
 
 func (u *Uploader) Run() {

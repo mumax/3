@@ -56,7 +56,6 @@ func (c *Symm2) init() {
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			core.Log("kern", i, j, c.kern[i][j])
 			input.CopyHtoD(c.kern[i][j])
 			fwPlan.Exec(input, output)
 			fwPlan.Stream().Synchronize() // !!

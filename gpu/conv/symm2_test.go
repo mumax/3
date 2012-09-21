@@ -26,11 +26,18 @@ func TestSymm2(t *testing.T) {
 	acc := 2
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
 
-	go NewSymm2(mesh.GridSize(), kern, dinR, dout).Run()
+	go func() {
+		for i := range hin {
+			hin[i].WriteNext(N)
+			hin[i].WriteDone()
+		}
+	}()
 
 	go gpu.NewUploader(hinR[0], din[0]).Run()
 	go gpu.NewUploader(hinR[1], din[1]).Run()
 	go gpu.NewUploader(hinR[2], din[2]).Run()
+
+	go NewSymm2(mesh.GridSize(), kern, dinR, dout).Run()
 
 	go gpu.NewDownloader(doutR[0], hout[0]).Run()
 	go gpu.NewDownloader(doutR[1], hout[1]).Run()

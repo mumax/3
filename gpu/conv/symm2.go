@@ -8,14 +8,11 @@ import (
 )
 
 type Symm2 struct {
-	size     [3]int       // 3D size of the input/output data
-	kernSize [3]int       // Size of kernel and logical FFT size.
-	n        int          // product of size
-	input    [3]gpu.RChan // TODO: fuse into one array
-	output   [3]gpu.Chan
-	//ioBuf      [3]safe.Float32s    // gpu buffer for real-space, unpadded input/output data
-	//inlock     [3]*core.RMutex     // protects ioBuf
-	//outlock    [3]*core.RWMutex    // ALSO protects ioBuf
+	size       [3]int       // 3D size of the input/output data
+	kernSize   [3]int       // Size of kernel and logical FFT size.
+	n          int          // product of size
+	input      [3]gpu.RChan // TODO: fuse into one array
+	output     [3]gpu.Chan
 	fftRBuf    [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
 	fftCBuf    [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
 	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
@@ -126,4 +123,5 @@ func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, outpu
 	c.output = output
 
 	return c
+	// TODO: self-test
 }

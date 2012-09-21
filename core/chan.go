@@ -3,7 +3,7 @@ package core
 type Chan struct {
 	Array   [][][]float32
 	List    []float32
-	RWMutex // TODO: hide NewReader()?
+	RWMutex // TODO: hide NewReader()?, add WChan (write-only)?
 }
 
 func MakeChan(size [3]int) *Chan {

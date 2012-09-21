@@ -7,16 +7,14 @@ import (
 )
 
 type Uploader struct {
-	hostdata []float32
-	rlock    *core.RMutex
-	devdata  safe.Float32s
-	wlock    *core.RWMutex
-	bsize    int
-	stream   cu.Stream
+	host   core.RChan
+	dev    Chan
+	bsize  int
+	stream cu.Stream
 }
 
-func NewUploader(hostdata []float32, hostlock *core.RMutex, devdata safe.Float32s, devlock *core.RWMutex) *Uploader {
-	return &Uploader{hostdata, hostlock, devdata, devlock, 16, 0}
+func NewUploader(hostdata core.RChan, devdata Chan) *Uploader {
+	return &Uploader{hostdata, devdata, 16, 0} // TODO: block size
 }
 
 func (u *Uploader) Run() {
@@ -24,18 +22,18 @@ func (u *Uploader) Run() {
 	LockCudaThread()
 	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()
-	MemHostRegister(u.hostdata)
+	MemHostRegister(u.host.List)
 	bsize := u.bsize
 
 	for {
-		for i := 0; i < len(u.hostdata); i += bsize {
-			u.rlock.ReadNext(bsize)
-			u.wlock.WriteNext(bsize)
+		for i := 0; i < len(u.host.List); i += bsize {
+			u.host.ReadNext(bsize)
+			u.dev.WriteNext(bsize)
 			core.Debug("upload", i, bsize)
-			u.devdata.CopyHtoDAsync(u.hostdata, u.stream)
+			u.dev.CopyHtoDAsync(u.host.List, u.stream)
 			u.stream.Synchronize()
-			u.rlock.ReadDone()
-			u.wlock.WriteDone()
+			u.host.ReadDone()
+			u.dev.WriteDone()
 		}
 	}
 }

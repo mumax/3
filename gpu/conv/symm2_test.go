@@ -53,7 +53,6 @@ func TestSymm2(t *testing.T) {
 		hout[2].ReadOnly().ReadNext(N)
 	}
 
-	core.Log(hout)
 	outarr := [3][]float32{hout[0].List, hout[1].List, hout[2].List}
 
 	ref := core.MakeVectors(mesh.GridSize())

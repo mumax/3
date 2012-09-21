@@ -28,13 +28,12 @@ type Symm2 struct {
 }
 
 func (c *Symm2) init() {
-	panic("need 2nd ioBuf")
-	core.Debug("run")
+	core.Debug("init")
 	padded := c.kernSize
 
 	// init device buffers
 	for i := 0; i < 3; i++ {
-		c.output[i] = gpu.MakeChan(c.size)
+		//c.output[i] = gpu.MakeChan(c.size)
 		c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
 	}
@@ -57,6 +56,7 @@ func (c *Symm2) init() {
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
+			core.Log("kern", i, j, c.kern[i][j])
 			input.CopyHtoD(c.kern[i][j])
 			fwPlan.Exec(input, output)
 			fwPlan.Stream().Synchronize() // !!
@@ -110,12 +110,21 @@ func (c *Symm2) Run() {
 	}
 }
 
-func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan) *Symm2 {
+func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2 {
 	c := new(Symm2)
 	c.size = size
+	c.kernArr = kernel
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if kernel[i][j] != nil {
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
+			}
+		}
+	}
 	c.n = prod(size)
 	c.kernSize = core.SizeOf(kernel[0][0])
 	c.input = input
+	c.output = output
 
 	return c
 }

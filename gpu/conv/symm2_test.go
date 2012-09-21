@@ -2,25 +2,43 @@ package conv
 
 import (
 	"nimble-cube/core"
+	"nimble-cube/gpu"
 	"nimble-cube/mag"
 	"testing"
 )
 
 func TestSymm2(t *testing.T) {
 	C := 1e-9
+	N0, N1, N2 := 1, 4, 8
 	mesh := core.NewMesh(N0, N1, N2, C, 2*C, 3*C)
 	N := mesh.NCell()
+	s := mesh.GridSize()
 
-	input := core.MakeVectors(mesh.GridSize())
-	output := core.MakeVectors(mesh.GridSize())
-
-	hinlock := [3]*core.RWMutex{core.NewRWMutex(N), core.NewRWMutex(N), core.NewRWMutex(N)}
-	houtlock := [3]*core.RWMutex{core.NewRWMutex(N), core.NewRWMutex(N), core.NewRWMutex(N)}
+	gpu.LockCudaThread()
+	hin := [3]core.Chan{core.MakeChan(s), core.MakeChan(s), core.MakeChan(s)}
+	hinR := [3]core.RChan{hin[0].ReadOnly(), hin[1].ReadOnly(), hin[2].ReadOnly()}
+	din := [3]gpu.Chan{gpu.MakeChan(s), gpu.MakeChan(s), gpu.MakeChan(s)}
+	dinR := [3]gpu.RChan{din[0].ReadOnly(), din[1].ReadOnly(), din[2].ReadOnly()}
+	dout := [3]gpu.Chan{gpu.MakeChan(s), gpu.MakeChan(s), gpu.MakeChan(s)}
+	doutR := [3]gpu.RChan{dout[0].ReadOnly(), dout[1].ReadOnly(), dout[2].ReadOnly()}
+	hout := [3]core.Chan{core.MakeChan(s), core.MakeChan(s), core.MakeChan(s)}
 
 	acc := 2
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
 
-	c := NewSymm2(mesh.GridSize(), mesh.ZeroPadded())
+	go NewSymm2(mesh.GridSize(), kern, dinR, dout).Run()
 
-	up0 := NewUploader(input[0], hinlock[0], c.ioBuf[0], dlock[0])
+	go gpu.NewUploader(hinR[0], din[0]).Run()
+	go gpu.NewUploader(hinR[1], din[1]).Run()
+	go gpu.NewUploader(hinR[2], din[2]).Run()
+
+	go gpu.NewDownloader(doutR[0], hout[0]).Run()
+	go gpu.NewDownloader(doutR[1], hout[1]).Run()
+	go gpu.NewDownloader(doutR[2], hout[2]).Run()
+
+	hout[0].ReadOnly().ReadNext(N)
+	hout[1].ReadOnly().ReadNext(N)
+	hout[2].ReadOnly().ReadNext(N)
+
+	core.Log(hout)
 }

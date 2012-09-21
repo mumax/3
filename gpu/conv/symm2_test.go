@@ -26,6 +26,9 @@ func TestSymm2(t *testing.T) {
 	acc := 2
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
 
+	arr := [3][][][]float32{hin[0].Array, hin[1].Array, hin[2].Array}
+	initConvTestInput(arr)
+
 	go func() {
 		for i := range hin {
 			hin[i].WriteNext(N)
@@ -43,9 +46,17 @@ func TestSymm2(t *testing.T) {
 	go gpu.NewDownloader(doutR[1], hout[1]).Run()
 	go gpu.NewDownloader(doutR[2], hout[2]).Run()
 
-	hout[0].ReadOnly().ReadNext(N)
-	hout[1].ReadOnly().ReadNext(N)
-	hout[2].ReadOnly().ReadNext(N)
+	F := 10
+	for i := 0; i < F; i++ {
+		hout[0].ReadOnly().ReadNext(N)
+		hout[1].ReadOnly().ReadNext(N)
+		hout[2].ReadOnly().ReadNext(N)
+	}
 
 	core.Log(hout)
+	outarr := [3][]float32{hout[0].List, hout[1].List, hout[2].List}
+
+	ref := core.MakeVectors(mesh.GridSize())
+	Brute(arr, ref, kern)
+	checkErr(outarr, core.Contiguous3(ref))
 }

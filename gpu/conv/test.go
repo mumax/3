@@ -49,26 +49,7 @@ func Test(c Conv) {
 	c.Exec()
 	c.Exec() // it may fail the 2nd time, eg. 
 
-	// check if error is OK
-	{
-		var maxerr float32
-		for c := range in {
-			for i := range in[c] {
-				if fmath.Abs(out[c][i]-ref[c][i]) > maxerr {
-					maxerr = fmath.Abs(out[c][i] - ref[c][i])
-				}
-			}
-		}
-		const tolerance = 1e-5
-		if maxerr > tolerance {
-			//	core.Fprint(os.Stderr, "expected:\n")
-			//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
-			//	core.Fprint(os.Stderr, "got:\n")
-			//	core.Fprintf(os.Stderr, "% 6e", c.Output())
-			panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
-		}
-		core.Log("convolution test error:", maxerr)
-	}
+	checkErr(ref, out)
 
 	// cleanly set input/output to zero
 	for i := range in {
@@ -77,6 +58,27 @@ func Test(c Conv) {
 			out[i][j] = 0
 		}
 	}
+}
+
+func checkErr(ref, out [3][]float32) {
+	// check if error is OK
+	var maxerr float32
+	for c := range ref {
+		for i := range ref[c] {
+			if fmath.Abs(out[c][i]-ref[c][i]) > maxerr {
+				maxerr = fmath.Abs(out[c][i] - ref[c][i])
+			}
+		}
+	}
+	const tolerance = 1e-5
+	if maxerr > tolerance {
+		//	core.Fprint(os.Stderr, "expected:\n")
+		//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
+		//	core.Fprint(os.Stderr, "got:\n")
+		//	core.Fprintf(os.Stderr, "% 6e", c.Output())
+		panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
+	}
+	core.Log("convolution test error:", maxerr)
 }
 
 // random number between -1 and 1.

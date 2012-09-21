@@ -16,17 +16,17 @@ func TestSymm2(t *testing.T) {
 
 	gpu.LockCudaThread()
 	hin := core.MakeChan3(s)
-	hinR := [3]core.RChan{hin[0].ReadOnly(), hin[1].ReadOnly(), hin[2].ReadOnly()}
-	din := [3]gpu.Chan{gpu.MakeChan(s), gpu.MakeChan(s), gpu.MakeChan(s)}
-	dinR := [3]gpu.RChan{din[0].ReadOnly(), din[1].ReadOnly(), din[2].ReadOnly()}
-	dout := [3]gpu.Chan{gpu.MakeChan(s), gpu.MakeChan(s), gpu.MakeChan(s)}
-	doutR := [3]gpu.RChan{dout[0].ReadOnly(), dout[1].ReadOnly(), dout[2].ReadOnly()}
-	hout := [3]core.Chan{core.MakeChan(s), core.MakeChan(s), core.MakeChan(s)}
+	hinR := hin.ReadOnly()
+	din := gpu.MakeChan3(s)
+	dinR := din.ReadOnly()
+	dout := gpu.MakeChan3(s)
+	doutR := dout.ReadOnly()
+	hout := core.MakeChan3(s)
 
 	acc := 2
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
 
-	arr := [3][][][]float32{hin[0].Array, hin[1].Array, hin[2].Array}
+	arr := hin.Array()
 	initConvTestInput(arr)
 
 	go func() {

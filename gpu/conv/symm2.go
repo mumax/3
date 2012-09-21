@@ -11,15 +11,20 @@ type Symm2 struct {
 	size     [3]int // 3D size of the input/output data
 	kernSize [3]int // Size of kernel and logical FFT size.
 	n        int    // product of size
-	deviceData3
-	inlock  [3]*core.RMutex  // protects ioBuf
-	outlock [3]*core.RWMutex // ALSO protects ioBuf
-	fwPlan  safe.FFT3DR2CPlan
-	bwPlan  safe.FFT3DC2RPlan
-	stream  cu.Stream
-	kern    [3][3][]float32     // Real-space kernel
-	kernArr [3][3][][][]float32 // Real-space kernel
-	fftKern [3][3][]float32     // FFT kernel on host
+	input    [3]gpu.RChan
+	output   [3]gpu.Chan
+	//ioBuf      [3]safe.Float32s    // gpu buffer for real-space, unpadded input/output data
+	//inlock     [3]*core.RMutex     // protects ioBuf
+	//outlock    [3]*core.RWMutex    // ALSO protects ioBuf
+	fftRBuf    [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
+	fftCBuf    [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
+	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	fwPlan     safe.FFT3DR2CPlan   // Forward FFT (1 component)
+	bwPlan     safe.FFT3DC2RPlan   // Backward FFT (1 component)
+	stream     cu.Stream           // 
+	kern       [3][3][]float32     // Real-space kernel
+	kernArr    [3][3][][][]float32 // Real-space kernel
+	fftKern    [3][3][]float32     // FFT kernel on host
 }
 
 func (c *Symm2) init() {
@@ -28,7 +33,11 @@ func (c *Symm2) init() {
 	padded := c.kernSize
 
 	// init device buffers
-	c.deviceData3.init(c.size, c.kernSize)
+	for i := 0; i < 3; i++ {
+		c.output[i] = gpu.MakeChan(c.size)
+		c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+		c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
+	}
 
 	// init FFT plans
 	c.stream = cu.StreamCreate()
@@ -71,14 +80,14 @@ func (c *Symm2) Run() {
 
 		// FW FFT
 		for i := 0; i < 3; i++ {
-			c.inlock[i].ReadNext(c.n)
+			c.input[i].ReadNext(c.n)
 
 			c.fftRBuf[i].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-			copyPad(c.fftRBuf[i], c.ioBuf[i], padded, c.size, offset, c.stream)
+			copyPad(c.fftRBuf[i], c.input[i].Float32s, padded, c.size, offset, c.stream)
 			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 			c.stream.Synchronize()
 
-			c.inlock[i].ReadDone()
+			c.input[i].ReadDone()
 		}
 
 		// kern mul
@@ -90,22 +99,23 @@ func (c *Symm2) Run() {
 
 		// BW FFT
 		for i := 0; i < 3; i++ {
-			c.outlock[i].WriteDone()
+			c.output[i].WriteNext(c.n)
 
 			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-			copyPad(c.ioBuf[i], c.fftRBuf[i], c.size, padded, offset, c.stream)
+			copyPad(c.output[i].Float32s, c.fftRBuf[i], c.size, padded, offset, c.stream)
 			c.stream.Synchronize()
 
-			c.outlock[i].WriteDone()
+			c.output[i].WriteDone()
 		}
 	}
 }
 
-func NewSymm2(size [3]int, kernel [3][3][][][]float32) *Symm2 {
+func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan) *Symm2 {
 	c := new(Symm2)
 	c.size = size
 	c.n = prod(size)
 	c.kernSize = core.SizeOf(kernel[0][0])
+	c.input = input
 
 	return c
 }

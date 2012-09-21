@@ -1,7 +1,6 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 	"testing"
 )
@@ -9,40 +8,38 @@ import (
 func TestCopy(t *testing.T) {
 	LockCudaThread()
 
-	N := 64
+	size := [3]int{1, 4, 8}
+	N := core.Prod(size)
 	F := 100
-	a := make([]float32, N)
-	b := safe.MakeFloat32s(N)
-	c := make([]float32, N)
+	a := core.MakeChan(size)
+	b := MakeChan(size)
+	c := core.MakeChan(size)
 
-	mA := core.NewRWMutex(N)
-	mB := core.NewRWMutex(N)
-	mC := core.NewRWMutex(N)
-
-	up := NewUploader(a, mA.NewReader(), b, mB)
-	down := NewDownloader(b, mB.NewReader(), c, mC)
+	up := NewUploader(a.ReadOnly(), b)
+	down := NewDownloader(b.ReadOnly(), c)
 
 	go up.Run()
 	go down.Run()
 
 	go func() {
 		for f := 0; f < F; f++ {
-			mA.WriteNext(N)
-			for i := range a {
-				a[i] = float32(i)
+			a.WriteNext(N)
+			for i := range a.List {
+				a.List[i] = float32(i)
 			}
-			mA.WriteDone()
+			a.WriteDone()
 		}
 	}()
 
+	C := c.ReadOnly()
 	for f := 0; f < F; f++ {
-		mC.NewReader().ReadNext(N)
-		for i := range c {
-			if c[i] != float32(i) {
-				t.Error("expected:", float32(i), "got:", c[i])
+		C.ReadNext(N)
+		for i := range C.List {
+			if C.List[i] != float32(i) {
+				t.Error("expected:", float32(i), "got:", C.List[i])
 			}
 		}
-		mC.NewReader().ReadDone()
+		C.ReadDone()
 	}
-	core.Log(c)
+	core.Log(C.List)
 }

@@ -6,16 +6,12 @@ type Chan struct {
 	*RWMutex // TODO: hide NewReader()?, add WChan (write-only)?
 }
 
-func MakeChan(size [3]int) *Chan {
-	c := new(Chan)
-	c.Init(size)
-	return c
-}
-
-func (c *Chan) Init(size [3]int) {
+func MakeChan(size [3]int) Chan {
+	var c Chan
 	c.Array = MakeFloats(size)
 	c.List = Contiguous(c.Array)
-	c.RWMutex.Init(Prod(size))
+	c.RWMutex = NewRWMutex(Prod(size))
+	return c
 }
 
 type RChan struct {

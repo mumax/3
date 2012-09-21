@@ -26,9 +26,13 @@ type RWMutex struct {
 // RWMutex to protect an array of length N.
 func NewRWMutex(N int) *RWMutex {
 	m := new(RWMutex)
+	m.Init(N)
+	return m
+}
+
+func (m *RWMutex) Init(N int) {
 	m.n = N
 	m.cond = *(sync.NewCond(&m.state))
-	return m
 }
 
 // Make a new read lock for this RWMutex.

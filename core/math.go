@@ -30,3 +30,14 @@ func Average(x []float32) float64 {
 	}
 	return sum / float64(len(x))
 }
+
+func AddChan3(out Chan3, a, b RChan3, block int){
+	for{
+		for i:=0; i<N; i+= block{
+		a.ReadNext(block)
+		b.ReadNext(block)
+		...
+		}
+		
+	}
+}

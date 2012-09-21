@@ -1,4 +1,4 @@
-GOFILES = magnet1.go#$(wildcard *.go)
+GOFILES = test4.go#$(wildcard *.go)
 
 all: $(GOFILES)
 

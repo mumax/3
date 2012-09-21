@@ -1,9 +1,31 @@
 package mag
 
+import (
+	"nimble-cube/core"
+)
+
+type Exchange6 struct {
+	m   core.RChan3
+	hex core.Chan3
+	*core.Mesh
+	aex_reduced float64
+}
+
+func (e *Exchange6) Run() {
+	// TODO: properly split in blocks
+	for {
+		e.m.ReadNext(e.NCell())
+		e.hex.WriteNext(e.NCell())
+		exchange6(e.m.Array(), e.hex.Array(), e.CellSize(), e.aex_reduced)
+		e.hex.WriteDone()
+		e.m.ReadDone()
+	}
+}
+
 // Naive implementation of 6-neighbor exchange field.
 // Aex in Tm² (exchange stiffness divided by Msat0).
 // Hex in Tesla.
-func Exchange6(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64, aex_reduced float64) {
+func exchange6(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64, aex_reduced float64) {
 	var (
 		facI = float32(aex_reduced / (cellsize[0] * cellsize[0]))
 		facJ = float32(aex_reduced / (cellsize[1] * cellsize[1]))

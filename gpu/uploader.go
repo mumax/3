@@ -2,10 +2,11 @@ package gpu
 
 import (
 	"github.com/barnex/cuda4/cu"
-	"github.com/barnex/cuda4/safe"
+	//"github.com/barnex/cuda4/safe"
 	"nimble-cube/core"
 )
 
+// Uploads data from host to GPU.
 type Uploader struct {
 	host   core.RChan
 	dev    Chan
@@ -40,41 +41,34 @@ func (u *Uploader) Run() {
 
 // _____________________________________
 
+// Downloads data from GPU to host.
 type Downloader struct {
-	devdata  safe.Float32s
-	rlock    *core.RMutex
-	hostdata []float32
-	wlock    *core.RWMutex
-	bsize    int
-	stream   cu.Stream
+	dev    RChan
+	host   core.Chan
+	bsize  int
+	stream cu.Stream
 }
 
-func NewDownloader(devdata safe.Float32s, devlock *core.RMutex, hostdata []float32, hostlock *core.RWMutex) *Downloader {
-	u := new(Downloader)
-	u.devdata = devdata
-	u.rlock = devlock
-	u.hostdata = hostdata
-	u.wlock = hostlock
-	u.bsize = 16 // TODO !! Always lock max
-	return u
+func NewDownloader(devdata RChan, hostdata core.Chan) *Downloader {
+	return &Downloader{devdata, hostdata, 16, 0} // TODO: block size
 }
 
 func (u *Downloader) Run() {
 	core.Debug("downloader: run")
 	LockCudaThread()
 	u.stream = cu.StreamCreate()
-	MemHostRegister(u.hostdata)
+	MemHostRegister(u.host.List)
 	bsize := u.bsize
 
 	for {
-		for i := 0; i < len(u.hostdata); i += bsize {
-			u.rlock.ReadNext(u.bsize)
-			u.wlock.WriteNext(u.bsize)
+		for i := 0; i < len(u.host.List); i += bsize {
+			u.dev.ReadNext(u.bsize)
+			u.host.WriteNext(u.bsize)
 			core.Debug("download", i, bsize)
-			u.devdata.CopyDtoHAsync(u.hostdata, u.stream)
+			u.dev.CopyDtoHAsync(u.host.List, u.stream)
 			u.stream.Synchronize()
-			u.rlock.ReadDone()
-			u.wlock.WriteDone()
+			u.dev.ReadDone()
+			u.host.WriteDone()
 		}
 	}
 }

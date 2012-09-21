@@ -7,7 +7,7 @@ import (
 
 type Chan struct {
 	safe.Float32s
-	core.RWMutex
+	*core.RWMutex
 }
 
 func MakeChan(size [3]int) *Chan {

@@ -13,15 +13,18 @@ func main() {
 	size := mesh.GridSize()
 
 	m1 := MakeChan3(size)
-	heff := MakeChan3(size)
+	hd := MakeChan3(size)
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
-	go conv.NewSymmetricHtoD(size, kernel, m1.MakeRChan3(), heff).Run()
+	go conv.NewSymmetricHtoD(size, kernel, m1.MakeRChan3(), hd).Run()
 
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size)
 	go mag.NewExchange6(m1.MakeRChan3(), hex, mesh, aex).Run()
+
+	heff := MakeChan3(size)
+	go NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()).Run()
 
 }

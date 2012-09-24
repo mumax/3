@@ -26,3 +26,7 @@ func BlockSize(size [3]int) [3]int {
 	} // else { // slice along I and J 
 	return [3]int{1, (N0 * N1) / nWarp, N2}
 }
+
+func BlockLen(size [3]int) int {
+	return Prod(BlockSize(size))
+}

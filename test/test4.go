@@ -27,4 +27,11 @@ func main() {
 	heff := MakeChan3(size)
 	go NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()).Run()
 
+	const alpha = 0.02
+	torque := MakeChan3(size)
+	go mag.RunLLGTorque(torque, m1.MakeRChan3(), heff.MakeRChan3(), alpha)
+
+//	m2 := MakeChan3(size)
+//	solver := NewEuler(m2, m1, )
+
 }

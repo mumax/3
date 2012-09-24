@@ -1,8 +1,24 @@
 package mag
 
-import ()
+import "nimble-cube/core"
 
-func LLGTorque(torque, m, H [3][]float32, alpha float32) {
+func RunLLGTorque(torque core.Chan3, m, h core.RChan3, alpha float32) {
+	core.Assert(torque.Size() == m.Size())
+	core.Assert(torque.Size() == h.Size())
+	n := core.BlockLen(torque.Size())
+
+	for {
+		T := torque.WriteNext(n)
+		M := m.ReadNext(n)
+		H := h.ReadNext(n)
+		llgTorque(T, M, H, alpha)
+		torque.WriteDone()
+		m.ReadDone()
+		h.ReadDone()
+	}
+}
+
+func llgTorque(torque, m, H [3][]float32, alpha float32) {
 	//const mu0 = 4 * math.Pi * 1e7
 	const gamma = 1.76085970839e11 // rad/Ts
 	for i := range torque[0] {

@@ -17,6 +17,6 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
-	go conv.NewSymmetricHtoD(size, kernel, m1.ReadOnly(), heff).Run()
+	go conv.NewSymmetricHtoD(size, kernel, m1.MakeRChan3(), heff).Run()
 
 }

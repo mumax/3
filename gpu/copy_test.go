@@ -15,31 +15,31 @@ func TestCopy(t *testing.T) {
 	b := MakeChan(size)
 	c := core.MakeChan(size)
 
-	up := NewUploader(a.ReadOnly(), b)
-	down := NewDownloader(b.ReadOnly(), c)
+	up := NewUploader(a.MakeRChan(), b)
+	down := NewDownloader(b.MakeRChan(), c)
 
 	go up.Run()
 	go down.Run()
 
 	go func() {
 		for f := 0; f < F; f++ {
-			a.WriteNext(N)
-			for i := range a.List {
-				a.List[i] = float32(i)
+			list := a.WriteNext(N)
+			for i := range list {
+				list[i] = float32(i)
 			}
 			a.WriteDone()
 		}
 	}()
 
-	C := c.ReadOnly()
+	C := c.MakeRChan()
 	for f := 0; f < F; f++ {
-		C.ReadNext(N)
-		for i := range C.List {
-			if C.List[i] != float32(i) {
-				t.Error("expected:", float32(i), "got:", C.List[i])
+		list := C.ReadNext(N)
+		for i := range list {
+			if list[i] != float32(i) {
+				t.Error("expected:", float32(i), "got:", list[i])
 			}
 		}
 		C.ReadDone()
 	}
-	core.Log(C.List)
+	//core.Log(C.Uns)
 }

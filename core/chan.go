@@ -14,7 +14,7 @@ func makedata(size [3]int) data {
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func(d*data) UnsafeData()[]float32{
+func (d *data) UnsafeData() []float32 {
 	return d.list
 }
 

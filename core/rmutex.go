@@ -46,7 +46,7 @@ func (m *RMutex) ReadDone() {
 // It is not thread-safe because each RMutex is only
 // supposed to be accessed by one reader thread.
 func (m *RMutex) RRange() (start, stop int) {
-	return int(m.absC % int64(m.rw.n)), int(m.absD % int64(m.rw.n))
+	return int(m.absC % int64(m.rw.n)), int((m.absD-1)%int64(m.rw.n)) + 1
 }
 
 // Can m safely lock for reading [start, stop[ ?

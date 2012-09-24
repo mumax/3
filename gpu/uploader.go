@@ -14,7 +14,7 @@ type Uploader struct {
 }
 
 func NewUploader(hostdata core.RChan, devdata Chan) *Uploader {
-	return &Uploader{hostdata, devdata, 16, 0} // TODO: block size
+	return &Uploader{hostdata, devdata, 1, 0} // TODO: block size
 }
 
 func (u *Uploader) Run() {

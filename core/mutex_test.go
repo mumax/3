@@ -17,8 +17,8 @@ func TestRWMutex(t *testing.T) {
 	a := make([]int, N)
 	frames := 100
 	m := NewRWMutex(N)
-	r1 := m.NewReader()
-	r2 := m.NewReader()
+	r1 := m.MakeRMutex()
+	r2 := m.MakeRMutex()
 
 	go write(m, a, N, frames)
 	go read(r2, a, N, frames, t)

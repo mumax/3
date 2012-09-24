@@ -14,7 +14,7 @@ type Downloader struct {
 }
 
 func NewDownloader(devdata RChan, hostdata core.Chan) *Downloader {
-	return &Downloader{devdata, hostdata, 16, 0} // TODO: block size
+	return &Downloader{devdata, hostdata, 1, 0} // TODO: block size
 }
 
 func (u *Downloader) Run() {

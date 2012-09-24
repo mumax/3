@@ -52,7 +52,7 @@ func (m *RWMutex) WriteNext(delta int) {
 // It is not thread-safe because the RWMutex is only
 // supposed to be accessed by one writer thread.
 func (m *RWMutex) WRange() (start, stop int) {
-	return int(m.absA % int64(m.n)), int(m.absB % int64(m.n))
+	return int(m.absA % int64(m.n)), int((m.absB-1)%int64(m.n)) + 1
 }
 
 // Unlock the previous interval locked for writing.

@@ -19,4 +19,9 @@ func main() {
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
 	go conv.NewSymmetricHtoD(size, kernel, m1.MakeRChan3(), heff).Run()
 
+	Msat := 1.0053
+	aex := Mu0 * 13e-12 / Msat
+	hex := MakeChan3(size)
+	go mag.NewExchange6(m1.MakeRChan3(), hex, mesh, aex).Run()
+
 }

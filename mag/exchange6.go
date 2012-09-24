@@ -22,6 +22,10 @@ func (e *Exchange6) Run() {
 	}
 }
 
+func NewExchange6(m core.RChan3, hex core.Chan3, mesh *core.Mesh, aex_reduced float64) *Exchange6 {
+	return &Exchange6{m, hex, mesh, aex_reduced}
+}
+
 // Naive implementation of 6-neighbor exchange field.
 // Aex in Tm² (exchange stiffness divided by Msat0).
 // Hex in Tesla.

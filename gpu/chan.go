@@ -10,7 +10,7 @@ type chandata struct {
 	size [3]int
 }
 
-func (c *chandata) Size() [3]int { return c.size }
+func (c *chandata) Size() [3]int              { return c.size }
 func (c *chandata) UnsafeData() safe.Float32s { return c.list }
 
 type Chan struct {

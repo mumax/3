@@ -14,20 +14,20 @@ type Downloader struct {
 }
 
 func NewDownloader(devdata RChan, hostdata core.Chan) *Downloader {
-	return &Downloader{devdata, hostdata, 1, 0} // TODO: block size
+	core.Assert(hostdata.Size() == devdata.Size())
+	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
+	return &Downloader{devdata, hostdata, blocklen, 0} // TODO: block size
 }
 
 func (u *Downloader) Run() {
-	core.Debug("downloader: run")
+	core.Debug("run gpu.downloader with block size", u.bsize)
 	LockCudaThread()
 	u.stream = cu.StreamCreate()
 	MemHostRegister(u.host.UnsafeData())
-	bsize := u.bsize
 
 	for {
 		in := u.dev.ReadNext(u.bsize)
 		out := u.host.WriteNext(u.bsize)
-		core.Debug("download", bsize)
 		in.CopyDtoHAsync(out, u.stream)
 		u.stream.Synchronize()
 		u.dev.ReadDone()

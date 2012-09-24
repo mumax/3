@@ -15,21 +15,20 @@ type Uploader struct {
 
 func NewUploader(hostdata core.RChan, devdata Chan) *Uploader {
 	core.Assert(hostdata.Size() == devdata.Size())
-	return &Uploader{hostdata, devdata, core.BlockSize(hostdata.Size()), 0}
+	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
+	return &Uploader{hostdata, devdata, blocklen, 0}
 }
 
 func (u *Uploader) Run() {
-	core.Debug("uploader: run")
+	core.Debug("run gpu.uploader with block size", u.bsize)
 	LockCudaThread()
 	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()
 	MemHostRegister(u.host.UnsafeData())
-	bsize := u.bsize
 
 	for {
-		in := u.host.ReadNext(bsize)
-		out := u.dev.WriteNext(bsize)
-		core.Debug("upload", bsize)
+		in := u.host.ReadNext(u.bsize)
+		out := u.dev.WriteNext(u.bsize)
 		out.CopyHtoDAsync(in, u.stream)
 		u.stream.Synchronize()
 		u.host.ReadDone()

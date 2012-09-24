@@ -6,12 +6,12 @@ import (
 )
 
 type RChan struct {
-	list  safe.Float32s
+	chandata
 	mutex *core.RMutex
 }
 
 func (c *Chan) MakeRChan() RChan {
-	return RChan{c.list, c.mutex.MakeRMutex()}
+	return RChan{c.chandata, c.mutex.MakeRMutex()}
 }
 
 // ReadNext locks and returns a slice of length n for 

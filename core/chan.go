@@ -51,30 +51,29 @@ func (c *Chan3) ReadOnly() RChan3 {
 	return RChan3{c[0].ReadOnly(), c[1].ReadOnly(), c[2].ReadOnly()}
 }
 
-func(c*RChan3)ReadNext(delta int){
-	for i:=range c{
+func (c *RChan3) ReadNext(delta int) {
+	for i := range c {
 		c[i].ReadNext(delta)
 	}
 }
 
-func(c*RChan3)ReadDone(){
-	for i:=range c{
+func (c *RChan3) ReadDone() {
+	for i := range c {
 		c[i].ReadDone()
 	}
 }
 
-func(c*Chan3)WriteNext(delta int){
-	for i:=range c{
+func (c *Chan3) WriteNext(delta int) {
+	for i := range c {
 		c[i].WriteNext(delta)
 	}
 }
 
-func(c*Chan3)WriteDone(){
-	for i:=range c{
+func (c *Chan3) WriteDone() {
+	for i := range c {
 		c[i].WriteDone()
 	}
 }
-
 
 func (c *RChan3) List() [3][]float32 {
 	return [3][]float32{c[0].List, c[1].List, c[2].List}
@@ -83,4 +82,3 @@ func (c *RChan3) List() [3][]float32 {
 func (c *RChan3) Array() [3][][][]float32 {
 	return [3][][][]float32{c[0].Array, c[1].Array, c[2].Array}
 }
-

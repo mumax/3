@@ -36,6 +36,7 @@ func (u *Uploader) Run() {
 		in := u.host.ReadNext(u.bsize)
 		for c := 0; c < 3; c++ {
 			out := u.dev[c].WriteNext(u.bsize)
+			//core.Debug("upload", c, u.bsize)
 			out.CopyHtoDAsync(in[c], u.stream)
 			u.stream.Synchronize()
 			u.dev[c].WriteDone()

@@ -36,6 +36,7 @@ func (u *Downloader) Run() {
 		in := u.host.WriteNext(u.bsize)
 		for c := 0; c < 3; c++ {
 			out := u.dev[c].ReadNext(u.bsize)
+			//core.Debug("download", c, u.bsize)
 			out.CopyDtoHAsync(in[c], u.stream)
 			u.stream.Synchronize()
 			u.dev[c].ReadDone()

@@ -22,7 +22,6 @@ func (c *SymmetricHtoD) Run() {
 
 func NewSymmetricHtoD(size [3]int, kernel [3][3][][][]float32, input core.RChan3, output core.Chan3) *SymmetricHtoD {
 	c := new(SymmetricHtoD)
-	panic("todo")
 	for i := 0; i < 3; i++ {
 		c.devin[i] = gpu.MakeChan(size)
 		c.devout[i] = gpu.MakeChan(size)

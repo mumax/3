@@ -18,6 +18,10 @@ func (d *chan3data) UnsafeData() [3][]float32 {
 	return d.list
 }
 
+func (d *chan3data) UnsafeArray() [3][][][]float32 {
+	return d.array
+}
+
 func (d *chan3data) Size() [3]int {
 	return SizeOf(d.array[0])
 }

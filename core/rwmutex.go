@@ -71,10 +71,8 @@ func (m *RWMutex) WriteDone() {
 func (m *RWMutex) canWLock(a, b int64) (ok bool) {
 	for _, r := range m.readers {
 		if a < r.absD || b > (r.absC+int64(m.n)) {
-			Debug("canWLock", a, b, ": false")
 			return false
 		}
 	}
-	Debug("canWLock", a, b, ": true")
 	return true
 }

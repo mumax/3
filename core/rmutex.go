@@ -51,7 +51,5 @@ func (m *RMutex) RRange() (start, stop int) {
 
 // Can m safely lock for reading [start, stop[ ?
 func (r *RMutex) canRLock(c, d int64) (ok bool) {
-	ok = r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
-	Debug("canRLock", c, d, ok)
-	return ok
+	return r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
 }

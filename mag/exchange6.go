@@ -14,9 +14,9 @@ type Exchange6 struct {
 func (e *Exchange6) Run() {
 	// TODO: properly split in blocks
 	for {
-		e.m.ReadNext(e.NCell())
-		e.hex.WriteNext(e.NCell())
-		exchange6(e.m.Array(), e.hex.Array(), e.CellSize(), e.aex_reduced)
+		m := core.Reshape3(e.m.ReadNext(e.NCell()), e.GridSize())
+		hex := core.Reshape3(e.hex.WriteNext(e.NCell()), e.GridSize())
+		exchange6(m, hex, e.CellSize(), e.aex_reduced)
 		e.hex.WriteDone()
 		e.m.ReadDone()
 	}

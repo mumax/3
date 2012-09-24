@@ -23,6 +23,10 @@ func Reshape(array []float32, size [3]int) [][][]float32 {
 	return sliced
 }
 
+func Reshape3(vectors [3][]float32, size [3]int) [3][][][]float32 {
+	return [3][][][]float32{Reshape(vectors[0], size), Reshape(vectors[1], size), Reshape(vectors[2], size)}
+}
+
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
 // Underlying storage is shared.
 func Reshape4D(list []float32, size []int) [][][][]float32 {

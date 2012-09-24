@@ -2,12 +2,12 @@ package core
 
 // Read-only Chan.
 type RChan struct {
-	data
+	chandata
 	mutex *RMutex
 }
 
 func (c *Chan) MakeRChan() RChan {
-	return RChan{c.data, c.mutex.MakeRMutex()}
+	return RChan{c.chandata, c.mutex.MakeRMutex()}
 }
 
 // ReadNext locks and returns a slice of length n for 

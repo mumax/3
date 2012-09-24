@@ -1,12 +1,12 @@
 package core
 
-type data struct {
+type chandata struct {
 	array [][][]float32
 	list  []float32
 }
 
-func makedata(size [3]int) data {
-	var c data
+func makedata(size [3]int) chandata {
+	var c chandata
 	c.array = MakeFloats(size)
 	c.list = Contiguous(c.array)
 	return c
@@ -14,13 +14,17 @@ func makedata(size [3]int) data {
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (d *data) UnsafeData() []float32 {
+func (d *chandata) UnsafeData() []float32 {
 	return d.list
 }
 
+func (d *chandata) Size() [3]int {
+	return SizeOf(d.array)
+}
+
 type Chan struct {
-	data  // array+list
-	mutex *RWMutex
+	chandata // array+list
+	mutex    *RWMutex
 }
 
 func MakeChan(size [3]int) Chan {

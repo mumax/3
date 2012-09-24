@@ -15,19 +15,24 @@ type SymmetricHtoD struct {
 }
 
 func (c *SymmetricHtoD) Run() {
-	panic("todo")
-	//go NewUploader(c.hostin[0], c.devin[0]).Run()
-	//go NewDownloader(c.devout[0].ReadOnly(), c.hostout[0]).Run()
-	//c.convolution.Run()
+	go NewUploader(c.hostin, c.devin).Run()                 // hostin -> devin
+	go NewDownloader(make3RChan(c.devout), c.hostout).Run() // devout -> hostout
+	c.convolution.Run()                                     // devin -> devout
 }
 
 func NewSymmetricHtoD(size [3]int, kernel [3][3][][][]float32, input core.RChan3, output core.Chan3) *SymmetricHtoD {
 	c := new(SymmetricHtoD)
 	panic("todo")
-	//c.devin = gpu.MakeChan3(size)
-	//c.devout = gpu.MakeChan3(size)
-	//c.convolution = NewSymm2(size, kernel, c.devin.ReadOnly(), c.devout)
-	//c.hostin = input
-	//c.hostout = output
+	for i := 0; i < 3; i++ {
+		c.devin[i] = gpu.MakeChan(size)
+		c.devout[i] = gpu.MakeChan(size)
+	}
+	c.convolution = NewSymm2(size, kernel, make3RChan(c.devin), c.devout)
+	c.hostin = input
+	c.hostout = output
 	return c
+}
+
+func make3RChan(c [3]gpu.Chan) [3]gpu.RChan {
+	return [3]gpu.RChan{c[0].MakeRChan(), c[1].MakeRChan(), c[2].MakeRChan()}
 }

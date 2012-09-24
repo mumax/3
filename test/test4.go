@@ -19,6 +19,4 @@ func main() {
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
 	go conv.NewSymmetricHtoD(size, kernel, m1.ReadOnly(), heff).Run()
 
-	
-
 }

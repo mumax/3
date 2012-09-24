@@ -7,7 +7,7 @@ type RMutex struct {
 }
 
 // Make a new read lock for this RWMutex.
-func (m *RWMutex) NewReader() *RMutex {
+func (m *RWMutex) MakeRMutex() *RMutex {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
 	r := &RMutex{rw: m}

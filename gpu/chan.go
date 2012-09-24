@@ -6,40 +6,26 @@ import (
 )
 
 type Chan struct {
-	safe.Float32s
-	*core.RWMutex
+	list  safe.Float32s
+	mutex *core.RWMutex
 }
 
 func MakeChan(size [3]int) Chan {
 	return Chan{safe.MakeFloat32s(core.Prod(size)), core.NewRWMutex(core.Prod(size))}
 }
 
-type RChan struct {
-	safe.Float32s
-	*core.RMutex
+// WriteNext locks and returns a slice of length n for 
+// writing the next n elements to the Chan.
+// When done, WriteDone() should be called to "send" the
+// slice down the Chan. After that, the slice is not valid any more.
+func (c *Chan) WriteNext(n int) safe.Float32s {
+	c.mutex.WriteNext(n)
+	a, b := c.mutex.WRange()
+	return c.list.Slice(a, b)
 }
 
-func (c *Chan) ReadOnly() RChan {
-	return RChan{c.Float32s, c.RWMutex.NewReader()}
-}
-
-type Chan3 [3]Chan
-
-func MakeChan3(size [3]int) Chan3 {
-	return Chan3{MakeChan(size), MakeChan(size), MakeChan(size)}
-}
-
-func (c *Chan3) Vectors() [3]safe.Float32s {
-	return [3]safe.Float32s{c[0].Float32s, c[1].Float32s, c[2].Float32s}
-}
-
-func (c *Chan3) RWMutex() core.RWMutex3 {
-	return core.RWMutex3{c[0].RWMutex, c[1].RWMutex, c[2].RWMutex}
-}
-
-// Read-only Chan3
-type RChan3 [3]RChan
-
-func (c *Chan3) ReadOnly() RChan3 {
-	return RChan3{c[0].ReadOnly(), c[1].ReadOnly(), c[2].ReadOnly()}
+// WriteDone() signals a slice obtained by WriteNext() is fully
+// written and can be sent down the Chan.
+func (c *Chan) WriteDone() {
+	c.mutex.WriteDone()
 }

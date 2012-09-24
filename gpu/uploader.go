@@ -22,18 +22,16 @@ func (u *Uploader) Run() {
 	LockCudaThread()
 	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()
-	MemHostRegister(u.host.List)
+	MemHostRegister(u.host.UnsafeData())
 	bsize := u.bsize
 
 	for {
-		for i := 0; i < len(u.host.List); i += bsize {
-			u.host.ReadNext(bsize)
-			u.dev.WriteNext(bsize)
-			core.Debug("upload", i, bsize)
-			u.dev.CopyHtoDAsync(u.host.List, u.stream)
-			u.stream.Synchronize()
-			u.host.ReadDone()
-			u.dev.WriteDone()
-		}
+		in := u.host.ReadNext(bsize)
+		out := u.dev.WriteNext(bsize)
+		core.Debug("upload", bsize)
+		out.CopyHtoDAsync(in, u.stream)
+		u.stream.Synchronize()
+		u.host.ReadDone()
+		u.dev.WriteDone()
 	}
 }

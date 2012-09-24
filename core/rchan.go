@@ -7,7 +7,7 @@ type RChan struct {
 }
 
 func (c *Chan) MakeRChan() RChan {
-	return RChan{c.data, c.mutex.NewReader()}
+	return RChan{c.data, c.mutex.MakeRMutex()}
 }
 
 // ReadNext locks and returns a slice of length n for 

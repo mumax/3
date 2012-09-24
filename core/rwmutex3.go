@@ -15,7 +15,7 @@ func (m *RWMutex3) WriteDone() {
 }
 
 func (m *RWMutex3) NewReader() RMutex3 {
-	return RMutex3{m[0].NewReader(), m[1].NewReader(), m[2].NewReader()}
+	return RMutex3{m[0].MakeRMutex(), m[1].MakeRMutex(), m[2].MakeRMutex()}
 }
 
 type RMutex3 [3]*RMutex

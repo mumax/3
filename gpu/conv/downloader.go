@@ -6,22 +6,22 @@ import (
 	"nimble-cube/gpu"
 )
 
-// Uploader for vector data specifically tuned for convolution.
+// Downloader for vector data specifically tuned for convolution.
 // Prioritizes upload of all X components, then Y, then Z.
-type Uploader struct {
-	host   core.RChan3
-	dev    [3]gpu.Chan
+type Downloader struct {
+	dev    [3]gpu.RChan
+	host   core.Chan3
 	bsize  int
 	stream cu.Stream
 }
 
-func NewUploader(hostdata core.RChan3, devdata [3]gpu.Chan) *Uploader {
+func NewDownloader(devdata [3]gpu.RChan, hostdata core.Chan3) *Downloader {
 	core.Assert(hostdata.Size() == devdata[0].Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
-	return &Uploader{hostdata, devdata, blocklen, 0}
+	return &Downloader{devdata, hostdata, blocklen, 0}
 }
 
-func (u *Uploader) Run() {
+func (u *Downloader) Run() {
 	core.Debug("run conv.uploader with block size", u.bsize)
 	gpu.LockCudaThread()
 	defer gpu.UnlockCudaThread()
@@ -33,13 +33,13 @@ func (u *Uploader) Run() {
 	for {
 		// -- here be dragons
 		// TODO: properly prioritized implementation
-		in := u.host.ReadNext(u.bsize)
+		in := u.host.WriteNext(u.bsize)
 		for c := 0; c < 3; c++ {
-			out := u.dev[c].WriteNext(u.bsize)
-			out.CopyHtoDAsync(in[c], u.stream)
+			out := u.dev[c].ReadNext(u.bsize)
+			out.CopyDtoHAsync(in[c], u.stream)
 			u.stream.Synchronize()
-			u.dev[c].WriteDone()
+			u.dev[c].ReadDone()
 		}
-		u.host.ReadDone()
+		u.host.WriteDone()
 	}
 }

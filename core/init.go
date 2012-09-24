@@ -12,13 +12,14 @@ import (
 )
 
 var (
-	Flag_version  = flag.Bool("V", false, "print version")
-	Flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
-	Flag_cpuprof  = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
-	Flag_memprof  = flag.String("memprof", "", "Write gopprof memory profile to file")
-	Flag_debug    = flag.Bool("debug", DEBUG, "Generate debug info")
-	Flag_log      = flag.Bool("log", LOG, "Generate log info")
-	Flag_verify   = flag.Bool("verify", true, "Verify crucial functionality")
+	Flag_version     = flag.Bool("V", false, "print version")
+	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
+	Flag_cpuprof     = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
+	Flag_memprof     = flag.String("memprof", "", "Write gopprof memory profile to file")
+	Flag_debug       = flag.Bool("debug", DEBUG, "Generate debug info")
+	Flag_log         = flag.Bool("log", LOG, "Generate log info")
+	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
+	Flag_maxblocklen = flag.Int("maxblock", 1<<30, "Maximum size of concurrent blocks")
 
 //	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 //	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")

@@ -7,7 +7,7 @@ import (
 
 type Chan struct {
 	list  safe.Float32s
-	size[3]int
+	size  [3]int
 	mutex *core.RWMutex
 }
 
@@ -15,7 +15,7 @@ func MakeChan(size [3]int) Chan {
 	return Chan{safe.MakeFloat32s(core.Prod(size)), size, core.NewRWMutex(core.Prod(size))}
 }
 
-func(c*Chan)Size()[3]int{return c.size}
+func (c *Chan) Size() [3]int { return c.size }
 
 // WriteNext locks and returns a slice of length n for 
 // writing the next n elements to the Chan.

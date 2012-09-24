@@ -26,55 +26,9 @@ type RWMutex struct {
 // RWMutex to protect an array of length N.
 func NewRWMutex(N int) *RWMutex {
 	m := new(RWMutex)
-	m.Init(N)
-	return m
-}
-
-func (m *RWMutex) Init(N int) {
 	m.n = N
 	m.cond = *(sync.NewCond(&m.state))
-}
-
-// Make a new read lock for this RWMutex.
-func (m *RWMutex) NewReader() *RMutex {
-	m.cond.L.Lock()
-	defer m.cond.L.Unlock()
-	r := &RMutex{rw: m}
-	m.readers = append(m.readers, r)
-	return r
-}
-
-// RMutex is a read-only lock, created by an RWMutex.
-type RMutex struct {
-	rw         *RWMutex
-	absC, absD int64 // half-open interval locked for reading
-}
-
-// Lock the next delta elements for reading.
-func (m *RMutex) ReadNext(delta int) {
-	m.rw.cond.L.Lock()
-
-	delta64 := int64(delta)
-	if m.absC != m.absD {
-		panic("rmutex: lock of locked mutex")
-	}
-	for !m.canRLock(m.absC, m.absC+delta64) {
-		m.rw.cond.Wait()
-	}
-	m.absD = m.absC + delta64
-
-	m.rw.cond.L.Unlock()
-	m.rw.cond.Broadcast()
-}
-
-// Unlock the previous interval locked for reading.
-func (m *RMutex) ReadDone() {
-	m.rw.cond.L.Lock()
-
-	m.absC = m.absD
-
-	m.rw.cond.L.Unlock()
-	m.rw.cond.Broadcast()
+	return m
 }
 
 // Lock the next delta elements for writing.
@@ -92,6 +46,13 @@ func (m *RWMutex) WriteNext(delta int) {
 
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
+}
+
+// WRange returns the currently write-locked range.
+// It is not thread-safe because the RWMutex is only
+// supposed to be accessed by one writer thread.
+func (m *RWMutex) WRange() (start, stop int) {
+	return int(m.absA % int64(m.n)), int(m.absB % int64(m.n))
 }
 
 // Unlock the previous interval locked for writing.
@@ -116,11 +77,4 @@ func (m *RWMutex) canWLock(a, b int64) (ok bool) {
 	}
 	Debug("canWLock", a, b, ": true")
 	return true
-}
-
-// Can m safely lock for reading [start, stop[ ?
-func (r *RMutex) canRLock(c, d int64) (ok bool) {
-	ok = r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
-	Debug("canRLock", c, d, ok)
-	return ok
 }

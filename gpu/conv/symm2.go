@@ -79,7 +79,7 @@ func (c *Symm2) Run() {
 			c.input[i].ReadNext(c.n)
 
 			c.fftRBuf[i].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-			copyPad(c.fftRBuf[i], c.input[i].Float32s, padded, c.size, offset, c.stream)
+			copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
 			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 			c.stream.Synchronize()
 
@@ -98,7 +98,7 @@ func (c *Symm2) Run() {
 			c.output[i].WriteNext(c.n)
 
 			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-			copyPad(c.output[i].Float32s, c.fftRBuf[i], c.size, padded, offset, c.stream)
+			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
 			c.stream.Synchronize()
 
 			c.output[i].WriteDone()

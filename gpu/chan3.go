@@ -12,6 +12,8 @@ type chan3data struct {
 
 func (c *chan3data) Size() [3]int { return c.size }
 
+func (c*chan3data)UnsafeData()[3]safe.Float32s{return c.list}
+
 type Chan3 struct {
 	chan3data
 	mutex *core.RWMutex

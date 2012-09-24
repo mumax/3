@@ -5,6 +5,15 @@ type chandata struct {
 	list  []float32
 }
 
+---
+put debug code in mutex: saves start/stop of each read/write to global map with some id tag to get timeline
+
+m    wwww
+h           rrrr
+t      www          rrr ...
+---
+
+
 func makedata(size [3]int) chandata {
 	var c chandata
 	c.array = MakeFloats(size)

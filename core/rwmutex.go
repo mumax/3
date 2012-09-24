@@ -15,6 +15,8 @@ import "sync"
 // exactly once and in the correct order.
 // The functionality is like a Go channel, but
 // without copying the data.
+// Note that it is safe for the writer to also read
+// the data (when he holds the write lock).
 type RWMutex struct {
 	cond       sync.Cond  // wait condition: read/write is safe
 	state      sync.Mutex // protects the internal state, used in cond.

@@ -5,6 +5,8 @@ import (
 	"nimble-cube/core"
 )
 
+
+
 func EulerStep(m, torque [3][]float32, dt float64) {
 	h := float32(dt)
 	for i := range m[0] {
@@ -21,48 +23,49 @@ func EulerStep(m, torque [3][]float32, dt float64) {
 }
 
 // Euler solver.
-type EulerBox struct {
-	size               [3]int
-	n                  int
-	M                  [3][]float32
-	Torque             [3][]float32
-	Time               float64
-	Dt                 float64
-	Step               int
-	numSlice, sliceLen int
+type Euler struct {
+	y1 core.Chan3
+	dy core.RChan3
+	dt float32
+	blocklen int
 }
 
-func NewEuler(size [3]int, numSlice int) *EulerBox {
-	e := new(EulerBox)
-	e.size = size
-	e.n = core.Prod(size)
-	e.numSlice = numSlice
-	core.Assert(e.n%numSlice == 0)
-	e.sliceLen = e.n / numSlice
-	return e
+
+func NewEuler(y2 core.Chan3, dy core.RChan3, dt float32) *EulerBox {
+	return &Euler{y2, y1, dy, dt, core.BlockLen(y2.Size())}
 }
 
-func (box *EulerBox) Run(steps int) {
+func (e *Euler) Steps(steps int) {
+	n := core.Prod(e.y2.Size())
+	block := e.blocklen
 
-	//for s := 0; s < steps; s++ {
 
-	//	for w := 0; w < box.nWarp; w++ {
-	//		start := w * box.warpLen
-	//		stop := (w + 1) * box.warpLen
-	//		for i := start; i < stop; i++ {
+---
+	lock torque for reading
+	lock m for writing (implies safe reading as well)
+	overwrite m += torque*dt
+---
 
-	//			var m1 Vector
-	//			m1[X] = box.M[X][i] + float32(box.Dt)*box.Torque[X][i]
-	//			m1[Y] = box.M[Y][i] + float32(box.Dt)*box.Torque[Y][i]
-	//			m1[Z] = box.M[Z][i] + float32(box.Dt)*box.Torque[Z][i]
-	//			m1 = m1.Normalized()
-	//			box.M[X][i] = m1[X]
-	//			box.M[Y][i] = m1[Y]
-	//			box.M[Z][i] = m1[Z]
+	// write y2 once
+	
+	for s := 0; s < steps; s++ {
 
-	//		}
-	//	}
-	//	box.Time += (box.Dt)
-	//	box.Step++
-	//}
+		for I:=0; i<n; i+=block{
+
+				y2 := e.y2.WriteNext(block)
+				y1 := e.y
+	
+			}
+	}
 }
+
+
+
+			//	var m1 Vector
+			//	m1[X] = box.M[X][i] + float32(box.Dt)*box.Torque[X][i]
+			//	m1[Y] = box.M[Y][i] + float32(box.Dt)*box.Torque[Y][i]
+			//	m1[Z] = box.M[Z][i] + float32(box.Dt)*box.Torque[Z][i]
+			//	m1 = m1.Normalized()
+			//	box.M[X][i] = m1[X]
+			//	box.M[Y][i] = m1[Y]
+			//	box.M[Z][i] = m1[Z]

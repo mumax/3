@@ -10,18 +10,17 @@ import (
 )
 
 var (
-	flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
-	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
-	// TODO: need -gpu=NUM flag
+// TODO: need -gpu=NUM flag
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
 
 func init() {
+	flag.Parse()
 	var flag uint
-	switch *flag_sched {
+	switch *core.Flag_sched {
 	default:
-		panic("sched flag: expecting auto,spin,yield or sync: " + *flag_sched)
+		panic("sched flag: expecting auto,spin,yield or sync: " + *core.Flag_sched)
 	case "auto":
 		flag = cu.CTX_SCHED_AUTO
 	case "spin":
@@ -32,8 +31,10 @@ func init() {
 		flag = cu.CTX_BLOCKING_SYNC
 	}
 	cu.Init(0)
-	cudaCtx = cu.CtxCreate(flag, 0)
 	core.Log("CUDA version:", cu.Version())
+	dev := cu.Device(*core.Flag_gpu)
+	cudaCtx = cu.CtxCreate(flag, dev)
+	core.Log(dev.Name(), "with", dev.TotalMem())
 	// TODO: set device, Log device info
 }
 
@@ -63,7 +64,7 @@ func UnlockCudaThread() {
 // Register host memory for fast transfers,
 // but only when flag -pagelock is true.
 func MemHostRegister(slice []float32) {
-	if *Flag_pagelock {
+	if *core.Flag_pagelock {
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
 	}
 }

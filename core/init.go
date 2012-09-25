@@ -20,6 +20,10 @@ var (
 	Flag_log         = flag.Bool("log", LOG, "Generate log info")
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_maxblocklen = flag.Int("maxblock", 1<<30, "Maximum size of concurrent blocks")
+	// CUDA flags
+	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
+	Flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
+	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 
 //	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 //	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")

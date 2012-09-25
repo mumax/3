@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"nimble-cube/core"
+	_ "nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"strconv"
 )

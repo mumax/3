@@ -3,6 +3,7 @@ package core
 // BlockSize finds a suitable way to split an array
 // of given size into equal blocks.
 // It limits block sizes to Flag_maxblocklen.
+// TODO: should actually have more than 1 block!!
 func BlockSize(size [3]int) [3]int {
 	N0, N1, N2 := size[0], size[1], size[2]
 	n := Prod(size)

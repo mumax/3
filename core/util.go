@@ -7,7 +7,7 @@ import "os"
 // Open file for writing, panic or error.
 func OpenFile(fname string) *os.File {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
-	PanicErr(err)
+	Fatal(err)
 	return f
 }
 

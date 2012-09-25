@@ -62,6 +62,12 @@ func Logf(format string, args ...interface{}) {
 	}
 }
 
+func Check(test bool, msg string){
+	if !test{
+		Fatal(fmt.Errorf(msg))
+	}
+}
+
 // Debug message.
 func Debug(msg ...interface{}) {
 	if DEBUG {

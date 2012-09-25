@@ -71,8 +71,13 @@ func (m *RWMutex) WriteDone() {
 	m.cond.Broadcast()
 }
 
-// Can m safely lock for writing [start, stop[ ?
+// Can m safely lock for writing [a, b[ ?
 func (m *RWMutex) canWLock(a, b int64) (ok bool) {
+	// Panic if there are no readers.
+	// This is definitely a mistake, as no readers may be added later.
+	if len(m.readers) == 0 {
+		panic("rwmutex: write without readers")
+	}
 	for _, r := range m.readers {
 		if a < r.absD || b > (r.absC+int64(m.n)) {
 			return false

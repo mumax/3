@@ -10,6 +10,10 @@ type RMutex struct {
 func (m *RWMutex) MakeRMutex() *RMutex {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
+	// Panic if we are already writing to the RWMutex.
+	if m.absB > 0 {
+		panic("rwmutex already in use")
+	}
 	r := &RMutex{rw: m}
 	m.readers = append(m.readers, r)
 	return r

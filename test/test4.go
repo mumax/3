@@ -32,11 +32,12 @@ func main() {
 	torque := MakeChan3(size)
 	go mag.RunLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha)
 
-	const dt = 10e-15
+	const dt = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	solver.Steps(10000)
-	M := m.UnsafeArray()
-	dump.Quick("m", M[:])
+	go dump.Autosave("test4/m.dump", m.MakeRChan3(), 1000)
 
+	solver.Steps(1000)
+	// TODO: drain
+	Cleanup()
 }

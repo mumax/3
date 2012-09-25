@@ -17,6 +17,8 @@ import "sync"
 // without copying the data.
 // Note that it is safe for the writer to also read
 // the data (when he holds the write lock).
+//
+// TODO: add Close() that Goexits all waiting threads.
 type RWMutex struct {
 	cond       sync.Cond  // wait condition: read/write is safe
 	state      sync.Mutex // protects the internal state, used in cond.

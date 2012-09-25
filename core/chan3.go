@@ -26,6 +26,7 @@ func (d *chan3data) Size() [3]int {
 	return SizeOf(d.array[0])
 }
 
+// TODO: [3]Chan
 type Chan3 struct {
 	chan3data // array+list
 	mutex     *RWMutex

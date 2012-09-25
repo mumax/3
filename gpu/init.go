@@ -9,10 +9,6 @@ import (
 	"unsafe"
 )
 
-var (
-// TODO: need -gpu=NUM flag
-)
-
 var cudaCtx cu.Context // gpu context to be used by all threads
 
 func init() {
@@ -35,7 +31,6 @@ func init() {
 	dev := cu.Device(*core.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB")
-	// TODO: set device, Log device info
 }
 
 var lockCount int32

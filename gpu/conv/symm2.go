@@ -66,7 +66,7 @@ func (c *Symm2) init() {
 }
 
 func (c *Symm2) Run() {
-	core.Debug("run")
+	core.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
 	c.init()
 

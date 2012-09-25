@@ -14,7 +14,10 @@ gccgo:
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 
-test: 6gtest gccgotest
+test: 6gtest gccgotest unittest
+
+unittest:
+	make -C test
 
 PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag 
 

@@ -76,9 +76,9 @@ func checkErr(ref, out [3][]float32) {
 		//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
 		//	core.Fprint(os.Stderr, "got:\n")
 		//	core.Fprintf(os.Stderr, "% 6e", c.Output())
-		panic(fmt.Errorf("convolution self-test failed with error %v", maxerr))
+		core.Fatal(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 	}
-	core.Log("convolution test error:", maxerr)
+	core.Log("convolution test error:", maxerr, "OK")
 }
 
 // random number between -1 and 1.

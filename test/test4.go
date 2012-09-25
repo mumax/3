@@ -2,6 +2,7 @@ package main
 
 import (
 	. "nimble-cube/core"
+	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
 )
@@ -12,26 +13,30 @@ func main() {
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	size := mesh.GridSize()
 
-	m1 := MakeChan3(size)
+	m := MakeChan3(size)
 	hd := MakeChan3(size)
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
-	go conv.NewSymmetricHtoD(size, kernel, m1.MakeRChan3(), hd).Run()
+	go conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd).Run()
 
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size)
-	go mag.NewExchange6(m1.MakeRChan3(), hex, mesh, aex).Run()
+	go mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex).Run()
 
 	heff := MakeChan3(size)
 	go NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()).Run()
 
-	const alpha = 0.02
+	const alpha = 1
 	torque := MakeChan3(size)
-	go mag.RunLLGTorque(torque, m1.MakeRChan3(), heff.MakeRChan3(), alpha)
+	go mag.RunLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha)
 
-//	m2 := MakeChan3(size)
-//	solver := NewEuler(m2, m1, )
+	const dt = 10e-15
+	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
+	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
+	solver.Steps(10000)
+	M := m.UnsafeArray()
+	dump.Quick("m", M[:])
 
 }

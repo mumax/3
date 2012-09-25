@@ -26,9 +26,9 @@ func (a *Adder3) Run() {
 		// add
 		for c := 0; c < 3; c++ {
 			for i := 0; i < len(out[0]); i++ {
-				sum := in[i][c][0] + in[i][c][1]
+				sum := in[0][c][i] + in[1][c][i]
 				for j := 2; j < len(a.terms); j++ {
-					sum += in[i][c][j]
+					sum += in[j][c][i]
 				}
 				out[c][i] = sum
 			}

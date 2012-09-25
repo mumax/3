@@ -112,7 +112,7 @@ func addJob(file, wd, que, usr string) {
 
 // remove previous .json and .out files for this input file.
 func rmFiles(file, wd, que string) {
-	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:] + "."
+	jobprefix := jsonfile(path.Clean(wd + "/" + noExt(file)))[1:]
 	{
 		dir, err := os.Open(que)
 		if err != nil {
@@ -126,7 +126,8 @@ func rmFiles(file, wd, que string) {
 			return
 		}
 
-		prefix := noExt(jobprefix)
+		prefix := noExt(jobprefix) + "."
+		println("prefix", prefix)
 		for _, f := range files {
 			if strings.HasPrefix(f, prefix) {
 				fmt.Println("rm", que+"/"+f)

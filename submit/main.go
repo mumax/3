@@ -127,7 +127,6 @@ func rmFiles(file, wd, que string) {
 		}
 
 		prefix := noExt(jobprefix) + "."
-		println("prefix", prefix)
 		for _, f := range files {
 			if strings.HasPrefix(f, prefix) {
 				fmt.Println("rm", que+"/"+f)

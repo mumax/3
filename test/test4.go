@@ -35,7 +35,7 @@ func main() {
 	const dt = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	go dump.Autosave("test4/m.dump", m.MakeRChan3(), 1000)
+	go dump.Autosave("m.dump", m.MakeRChan3(), 1000)
 
 	solver.Steps(1000)
 	// TODO: drain

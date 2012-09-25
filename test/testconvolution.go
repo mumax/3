@@ -1,13 +1,13 @@
 package main
 
 import (
-	"nimble-cube/gpu/conv"
-	"nimble-cube/core"
-	"strconv"
 	"flag"
+	"nimble-cube/core"
+	"nimble-cube/gpu/conv"
+	"strconv"
 )
 
-func main(){
+func main() {
 	core.Check(flag.NArg() == 3, "need 3 command-line arguments: grid size")
 	N0, N1, N2 := intArg(0), intArg(1), intArg(2)
 	conv.TestSymm2(N0, N1, N2)

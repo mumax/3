@@ -20,6 +20,7 @@ var (
 	Flag_log         = flag.Bool("log", LOG, "Generate log info")
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_maxblocklen = flag.Int("maxblock", 1<<30, "Maximum size of concurrent blocks")
+
 //	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 //	Flag_floattest = flag.Bool("floattest", true, "Detect float near-overflow")
 )

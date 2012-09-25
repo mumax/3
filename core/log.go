@@ -62,8 +62,8 @@ func Logf(format string, args ...interface{}) {
 	}
 }
 
-func Check(test bool, msg string){
-	if !test{
+func Check(test bool, msg string) {
+	if !test {
 		Fatal(fmt.Errorf(msg))
 	}
 }

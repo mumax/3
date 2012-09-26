@@ -10,10 +10,16 @@ type Autotable struct {
 	every int
 }
 
+/* TODO:
+	idea to get the time:
+	rwmutex can give you the step (from absA and prod(size), e.g)
+	solver could update small map with step: time
+*/
+
 func NewAutotable(fname string, data core.RChan3, every int) *Autotable {
 	r := new(Autotable)
 	tags := []string{data[0].Tag(), data[1].Tag(), data[2].Tag()}
-	units := []string{"", "", ""} // TODO
+	units := []string{"?", "?", "?"} // TODO
 	r.out = NewTableWriter(core.OpenFile(fname), tags, units)
 	r.data = data
 	r.every = every

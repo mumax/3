@@ -107,6 +107,7 @@ func (c *Symm2) Run() {
 }
 
 func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2 {
+	core.Assert(size[0] == 1) // 2D not yet supported
 	c := new(Symm2)
 	c.size = size
 	c.kernArr = kernel

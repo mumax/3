@@ -1,39 +1,24 @@
 package core
 
-type chan3data struct {
-	array [3][][][]float32
-	list  [3][]float32
-}
-
-func make3data(size [3]int) chan3data {
-	var c chan3data
-	c.array = MakeVectors(size)
-	c.list = Contiguous3(c.array)
-	return c
-}
-
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (d *chan3data) UnsafeData() [3][]float32 {
-	return d.list
+func (c *Chan3) UnsafeData() [3][]float32 {
+	return [3][]float32{c[0].list, c[1].list, c[2].list}
 }
 
-func (d *chan3data) UnsafeArray() [3][][][]float32 {
-	return d.array
+func (c *Chan3) UnsafeArray() [3][][][]float32 {
+	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
 }
 
-func (d *chan3data) Size() [3]int {
-	return SizeOf(d.array[0])
+func (c *Chan3) Size() [3]int {
+	return c[0].Size()
 }
 
-// TODO: [3]Chan
-type Chan3 struct {
-	chan3data // array+list
-	mutex     *RWMutex
-}
+// Chan of 3-vector data.
+type Chan3 [3]Chan
 
 func MakeChan3(size [3]int) Chan3 {
-	return Chan3{make3data(size), NewRWMutex(Prod(size))}
+	return Chan3{MakeChan(size), MakeChan(size), MakeChan(size)}
 }
 
 // WriteNext locks and returns a slice of length n for 
@@ -41,13 +26,19 @@ func MakeChan3(size [3]int) Chan3 {
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
 func (c *Chan3) WriteNext(n int) [3][]float32 {
-	c.mutex.WriteNext(n)
-	a, b := c.mutex.WRange()
-	return [3][]float32{c.list[0][a:b], c.list[1][a:b], c.list[2][a:b]}
+	var next [3][]float32
+	for i := range c {
+		c[i].WriteNext(n)
+		a, b := c[i].mutex.WRange()
+		next[i] = c[i].list[a:b]
+	}
+	return next
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan3.
 func (c *Chan3) WriteDone() {
-	c.mutex.WriteDone()
+	for i := range c {
+		c[i].WriteDone()
+	}
 }

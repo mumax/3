@@ -30,7 +30,7 @@ func (u *Downloader) Run() {
 		out := u.host.WriteNext(u.bsize)
 		in.CopyDtoHAsync(out, u.stream)
 		u.stream.Synchronize()
-		u.dev.ReadDone()
 		u.host.WriteDone()
+		u.dev.ReadDone()
 	}
 }

@@ -46,18 +46,3 @@ func (e *Euler) Steps(steps int) {
 		}
 	}
 }
-
-//func EulerStep(m, torque [3][]float32, dt float64) {
-//	h := float32(dt)
-//	for i := range m[0] {
-//		mx := m[0][i] + h*torque[0][i]
-//		my := m[1][i] + h*torque[1][i]
-//		mz := m[2][i] + h*torque[2][i]
-//		norm := float32(math.Sqrt(float64(mx*mx + my*my + mz*mz)))
-//		if norm != 0 {
-//			m[0][i] = mx / norm
-//			m[1][i] = my / norm
-//			m[2][i] = mz / norm
-//		}
-//	}
-//}

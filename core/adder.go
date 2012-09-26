@@ -18,10 +18,10 @@ func (a *Adder3) Run() {
 	in := make([][3][]float32, len(a.terms))
 	for {
 		// lock
-		out := a.sum.WriteNext(a.blocksize)
 		for i, t := range a.terms {
 			in[i] = t.ReadNext(a.blocksize)
 		}
+		out := a.sum.WriteNext(a.blocksize)
 
 		// add
 		for c := 0; c < 3; c++ {

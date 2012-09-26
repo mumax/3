@@ -15,6 +15,17 @@ import "sync"
 // exactly once and in the correct order.
 // The functionality is like a Go channel, but
 // without copying the data.
+// 
+// When reading and writing channels, the convention is
+// to first obtain the read lock, then the write lock. E.g.:
+// 	input1.ReadNext(n)
+// 	input2.ReadNext(n)
+// 	output.WriteNext(n)
+// 	...
+// 	output.WriteDone()
+// 	input1.ReadDone()
+// 	input2.ReadDone()
+// 
 // Note that it is safe for the writer to also read
 // the data (when he holds the write lock).
 //

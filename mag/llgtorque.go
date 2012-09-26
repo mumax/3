@@ -18,9 +18,9 @@ func (r *LLGTorque) Run() {
 	n := core.BlockLen(r.torque.Size())
 	// TODO: properly block
 	for {
-		T := r.torque.WriteNext(n)
 		M := r.m.ReadNext(n)
 		H := r.h.ReadNext(n)
+		T := r.torque.WriteNext(n)
 		llgTorque(T, M, H, r.alpha)
 		r.torque.WriteDone()
 		r.m.ReadDone()

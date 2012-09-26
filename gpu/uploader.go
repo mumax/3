@@ -31,7 +31,7 @@ func (u *Uploader) Run() {
 		out := u.dev.WriteNext(u.bsize)
 		out.CopyHtoDAsync(in, u.stream)
 		u.stream.Synchronize()
-		u.host.ReadDone()
 		u.dev.WriteDone()
+		u.host.ReadDone()
 	}
 }

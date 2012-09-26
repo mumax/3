@@ -5,7 +5,6 @@ import (
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
-	"os"
 )
 
 func main() {
@@ -43,6 +42,6 @@ func main() {
 	solver.Steps(10)
 	// TODO: drain
 
-	ProfDump(os.Stdout)
+	ProfDumpSVG("test4.prof.svg")
 	Cleanup()
 }

@@ -17,8 +17,8 @@ func (c *Chan3) Size() [3]int {
 // Chan of 3-vector data.
 type Chan3 [3]Chan
 
-func MakeChan3(size [3]int) Chan3 {
-	return Chan3{MakeChan(size), MakeChan(size), MakeChan(size)}
+func MakeChan3(size [3]int, tag string) Chan3 {
+	return Chan3{MakeChan(size, tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
 }
 
 // WriteNext locks and returns a slice of length n for 

@@ -16,7 +16,7 @@ func TestRWMutex(t *testing.T) {
 	N := 3
 	a := make([]int, N)
 	frames := 100
-	m := NewRWMutex(N)
+	m := NewRWMutex(N, "test")
 	r1 := m.MakeRMutex()
 	r2 := m.MakeRMutex()
 

@@ -1,45 +1,24 @@
 package core
 
+type Chan struct {
+	chandata // array+list
+	mutex    *RWMutex
+}
+
 type chandata struct {
 	array [][][]float32
 	list  []float32
 }
 
-/* TODO:
-put debug code in mutex: saves start/stop of each read/write to global map with some id tag to get timeline
-m    wwww
-h           rrrr
-t      www          rrr ...
-*/
+func MakeChan(size [3]int, tag string) Chan {
+	return Chan{makedata(size), NewRWMutex(Prod(size), tag)}
+}
 
 func makedata(size [3]int) chandata {
 	var c chandata
 	c.array = MakeFloats(size)
 	c.list = Contiguous(c.array)
 	return c
-}
-
-// UnsafeData returns the underlying storage without locking.
-// Intended only for page-locking, not for reading or writing.
-func (d *chandata) UnsafeData() []float32 {
-	return d.list
-}
-
-func (d *chandata) UnsafeArray() [][][]float32 {
-	return d.array
-}
-
-func (d *chandata) Size() [3]int {
-	return SizeOf(d.array)
-}
-
-type Chan struct {
-	chandata // array+list
-	mutex    *RWMutex
-}
-
-func MakeChan(size [3]int) Chan {
-	return Chan{makedata(size), NewRWMutex(Prod(size))}
 }
 
 // WriteNext locks and returns a slice of length n for 
@@ -56,4 +35,18 @@ func (c *Chan) WriteNext(n int) []float32 {
 // written and can be sent down the Chan.
 func (c *Chan) WriteDone() {
 	c.mutex.WriteDone()
+}
+
+// UnsafeData returns the underlying storage without locking.
+// Intended only for page-locking, not for reading or writing.
+func (d *chandata) UnsafeData() []float32 {
+	return d.list
+}
+
+func (d *chandata) UnsafeArray() [][][]float32 {
+	return d.array
+}
+
+func (d *chandata) Size() [3]int {
+	return SizeOf(d.array)
 }

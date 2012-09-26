@@ -20,7 +20,7 @@ func init() { flag.Parse() }
 
 func TestBasic(test *testing.T) {
 	gpu.LockCudaThread()
-	*gpu.Flag_pagelock = false
+	*core.Flag_pagelock = false
 
 	core.LOG = false
 	for _, N0 := range N0s {
@@ -34,7 +34,7 @@ func TestBasic(test *testing.T) {
 
 func TestSymmetric(test *testing.T) {
 	gpu.LockCudaThread()
-	*gpu.Flag_pagelock = false
+	*core.Flag_pagelock = false
 
 	core.LOG = false
 	for _, N0 := range N0s {

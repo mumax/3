@@ -18,24 +18,26 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
-	go conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd).Run()
+	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
 
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size)
-	go mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex).Run()
+	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
 
 	heff := MakeChan3(size)
-	go NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()).Run()
+	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
 
 	const alpha = 1
 	torque := MakeChan3(size)
-	go mag.RunLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha)
+	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
 	const dt = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	go dump.Autosave("m.dump", m.MakeRChan3(), 1000)
+	Stack(dump.Autosaver("m.dump", m.MakeRChan3(), 1000))
+
+	RunStack()
 
 	solver.Steps(1000)
 	// TODO: drain

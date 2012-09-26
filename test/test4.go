@@ -3,6 +3,7 @@ package main
 import (
 	. "nimble-cube/core"
 	"nimble-cube/dump"
+	"os"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
 )
@@ -35,13 +36,14 @@ func main() {
 	const dt = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	Stack(dump.NewAutosaver("m.dump", m.MakeRChan3(), 100))
+	//Stack(dump.NewAutosaver("m.dump", m.MakeRChan3(), 100))
+	Stack(dump.NewAutotable("m.table", m.MakeRChan3(), 10))
 
 	RunStack()
 
-	solver.Steps(1000)
+	solver.Steps(10000)
 	// TODO: drain
 
-	//ProfDump(OpenFile("test4.prof.txt"))
+	ProfDump(os.Stdout)
 	Cleanup()
 }

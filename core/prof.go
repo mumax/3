@@ -13,9 +13,11 @@ import (
 
 )
 
+const MaxProfLen = 10000
+
 var (
 	tags      = make(map[string]bool)
-	timeline  = make([]*stamp, 0, 1000)
+	timeline  = make([]*stamp, 0, MaxProfLen)
 	profstate sync.Mutex
 	profstart time.Time
 	keys      []string
@@ -39,20 +41,33 @@ func profRegister(tag string) {
 }
 
 func profWriteNext(tag string, delta int) {
-	profstate.Lock()
-	timeline = append(timeline, &stamp{tag, delta, time.Now()})
-	profstate.Unlock()
+	if *Flag_timing {
+		profstate.Lock()
+		// don't record too much
+		if len(timeline) < MaxProfLen {
+			timeline = append(timeline, &stamp{tag, delta, time.Now()})
+		}
+		profstate.Unlock()
+	}
 }
 
 func profWriteDone(tag string) {
-	profstate.Lock()
-	timeline = append(timeline, &stamp{tag, -1, time.Now()})
-	profstate.Unlock()
+	if *Flag_timing {
+		profstate.Lock()
+		// don't record too much
+		if len(timeline) < MaxProfLen {
+			timeline = append(timeline, &stamp{tag, -1, time.Now()})
+		}
+		profstate.Unlock()
+	}
 }
 
 var res = 10000
 
 func ProfDump(out_ io.Writer) {
+	if !*Flag_timing {
+		Log("dump timing profile: not enabled by -timeprof flag")
+	}
 	profstate.Lock()
 	defer profstate.Unlock()
 	out := tabwriter.NewWriter(out_, 8, 1, 1, ' ', 0)

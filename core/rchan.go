@@ -25,3 +25,7 @@ func (c *RChan) ReadNext(n int) []float32 {
 func (c *RChan) ReadDone() {
 	c.mutex.ReadDone()
 }
+
+func (c *RChan) Tag() string {
+	return c.mutex.rw.tag
+}

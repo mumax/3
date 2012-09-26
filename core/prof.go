@@ -50,23 +50,33 @@ func profWriteDone(tag string) {
 	profstate.Unlock()
 }
 
+var res = 10000
+
 func ProfDump(out_ io.Writer) {
 	profstate.Lock()
 	defer profstate.Unlock()
 	out := tabwriter.NewWriter(out_, 8, 1, 1, ' ', 0)
 	profUpdateKeys()
-	for _, s := range timeline {
-		//	// delimiter
-		//	del := "|"
-		//	if i%4 == 0 {
-		//		del = "- - -"
-		//	}
-
+	for i, s := range timeline {
 		// enable/disable "running" status for this tag
 		tags[s.tag] = (s.delta >= 0)
 
-		// print status of all tags
-		profPrintTags(out, s)
+		if i < len(timeline)-1 {
+			// repeat to get a linear time scale
+			d := int64(timeline[i+1].Time.Sub(s.Time))/int64(res) + 1 // at least once
+			if d > 25 {
+				d = 26
+			} // not too much thouch
+			for j := 0; j < int(d); j++ {
+				profPrintTags(out, s)
+			}
+			if d == 26 {
+				fmt.Fprintln(out, "...")
+				out.Flush()
+			}
+		} else {
+			profPrintTags(out, s)
+		}
 	}
 }
 
@@ -78,9 +88,16 @@ func profUpdateKeys() {
 	sort.Strings(keys)
 }
 
-var del = "|"
+var profl = 0
 
 func profPrintTags(out *tabwriter.Writer, s *stamp) {
+	del := "|"
+	if profl%4 == 0 {
+		del = "- - -"
+		profl = 0
+	}
+	profl++
+
 	fmt.Fprintf(out, "%15v ", s.Time.Sub(profstart))
 	for _, k := range keys {
 		if tags[k] == true {

@@ -39,9 +39,9 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(10)
+	solver.Steps(1000)
 	// TODO: drain
 
-	ProfDumpSVG("test4.prof.svg")
+	//ProfDump(OpenFile("test4.prof.txt"))
 	Cleanup()
 }

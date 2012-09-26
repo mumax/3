@@ -11,9 +11,9 @@ func TestCopy(t *testing.T) {
 	size := [3]int{1, 4, 8}
 	N := core.Prod(size)
 	F := 100
-	a := core.MakeChan(size)
-	b := MakeChan(size)
-	c := core.MakeChan(size)
+	a := core.MakeChan(size, "a")
+	b := MakeChan(size, "b")
+	c := core.MakeChan(size, "c")
 
 	up := NewUploader(a.MakeRChan(), b)
 	down := NewDownloader(b.MakeRChan(), c)

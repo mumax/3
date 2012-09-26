@@ -33,10 +33,16 @@ func (u *Downloader) Run() {
 	for {
 		// -- here be dragons
 		// TODO: properly prioritized implementation
-		in := u.host.WriteNext(u.bsize)
+
+		var in [3][]float32
 		for c := 0; c < 3; c++ {
 			out := u.dev[c].ReadNext(u.bsize)
-			//core.Debug("download", c, u.bsize)
+
+			// a bit of acrobacy to lock read before write
+			if c == 0 {
+				in = u.host.WriteNext(u.bsize)
+			}
+
 			out.CopyDtoHAsync(in[c], u.stream)
 			u.stream.Synchronize()
 			u.dev[c].ReadDone()

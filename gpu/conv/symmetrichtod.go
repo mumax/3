@@ -1,9 +1,9 @@
 package conv
 
 import (
+	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
-	"fmt"
 )
 
 // conv.Symmetric wrapped with uploaders/downloaders

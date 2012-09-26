@@ -3,6 +3,7 @@ package conv
 import (
 	"nimble-cube/core"
 	"nimble-cube/gpu"
+	"fmt"
 )
 
 // conv.Symmetric wrapped with uploaders/downloaders
@@ -15,6 +16,7 @@ type SymmetricHtoD struct {
 }
 
 func (c *SymmetricHtoD) Run() {
+	// TODO: racy! push to stack and have automatically popped off?
 	go NewUploader(c.hostin, c.devin).Run()                 // hostin -> devin
 	go NewDownloader(make3RChan(c.devout), c.hostout).Run() // devout -> hostout
 	c.convolution.Run()                                     // devin -> devout
@@ -23,8 +25,8 @@ func (c *SymmetricHtoD) Run() {
 func NewSymmetricHtoD(size [3]int, kernel [3][3][][][]float32, input core.RChan3, output core.Chan3) *SymmetricHtoD {
 	c := new(SymmetricHtoD)
 	for i := 0; i < 3; i++ {
-		c.devin[i] = gpu.MakeChan(size)
-		c.devout[i] = gpu.MakeChan(size)
+		c.devin[i] = gpu.MakeChan(size, fmt.Sprint("devin", i))
+		c.devout[i] = gpu.MakeChan(size, fmt.Sprint("devout", i))
 	}
 	c.convolution = NewSymm2(size, kernel, make3RChan(c.devin), c.devout)
 	c.hostin = input

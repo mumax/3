@@ -19,8 +19,8 @@ type Chan3 struct {
 	mutex *core.RWMutex
 }
 
-func MakeChan3(size [3]int) Chan3 {
-	return Chan3{chan3data{MakeVectors(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size))}
+func MakeChan3(size [3]int, tag string) Chan3 {
+	return Chan3{chan3data{MakeVectors(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size), tag)}
 }
 
 // WriteNext locks and returns a slice of length n for 

@@ -18,8 +18,8 @@ type Chan struct {
 	mutex *core.RWMutex
 }
 
-func MakeChan(size [3]int) Chan {
-	return Chan{chandata{safe.MakeFloat32s(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size))}
+func MakeChan(size [3]int, tag string) Chan {
+	return Chan{chandata{safe.MakeFloat32s(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size), tag)}
 }
 
 // WriteNext locks and returns a slice of length n for 

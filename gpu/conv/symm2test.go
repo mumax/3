@@ -14,8 +14,8 @@ func TestSymm2(N0, N1, N2 int) {
 	s := mesh.GridSize()
 
 	gpu.LockCudaThread()
-	hin := core.MakeChan3(s)
-	hout := core.MakeChan3(s)
+	hin := core.MakeChan3(s, "hin")
+	hout := core.MakeChan3(s, "hout")
 
 	acc := 2
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)

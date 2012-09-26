@@ -14,8 +14,8 @@ func main() {
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	size := mesh.GridSize()
 
-	m := MakeChan3(size)
-	hd := MakeChan3(size)
+	m := MakeChan3(size, "m")
+	hd := MakeChan3(size, "hd")
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
@@ -23,14 +23,14 @@ func main() {
 
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
-	hex := MakeChan3(size)
+	hex := MakeChan3(size, "hex")
 	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
 
-	heff := MakeChan3(size)
+	heff := MakeChan3(size, "heff")
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
 
 	const alpha = 1
-	torque := MakeChan3(size)
+	torque := MakeChan3(size, "torque")
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
 	const dt = 100e-15
@@ -40,7 +40,7 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(1000)
+	solver.Steps(10)
 	// TODO: drain
 
 	ProfDump(os.Stdout)

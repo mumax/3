@@ -2,25 +2,34 @@ package mag
 
 import "nimble-cube/core"
 
-func RunLLGTorque(torque core.Chan3, m, h core.RChan3, alpha float32) {
+type LLGTorque struct {
+	torque core.Chan3
+	m, h   core.RChan3
+	alpha  float32
+}
+
+func NewLLGTorque(torque core.Chan3, m, h core.RChan3, alpha float32) *LLGTorque {
 	core.Assert(torque.Size() == m.Size())
 	core.Assert(torque.Size() == h.Size())
-	n := core.BlockLen(torque.Size())
+	return &LLGTorque{torque, m, h, alpha}
+}
 
+func (r *LLGTorque) Run() {
+	n := core.BlockLen(r.torque.Size())
+	// TODO: properly block
 	for {
-		T := torque.WriteNext(n)
-		M := m.ReadNext(n)
-		H := h.ReadNext(n)
-		llgTorque(T, M, H, alpha)
-		torque.WriteDone()
-		m.ReadDone()
-		h.ReadDone()
+		T := r.torque.WriteNext(n)
+		M := r.m.ReadNext(n)
+		H := r.h.ReadNext(n)
+		llgTorque(T, M, H, r.alpha)
+		r.torque.WriteDone()
+		r.m.ReadDone()
+		r.h.ReadDone()
 	}
 }
 
 func llgTorque(torque, m, H [3][]float32, alpha float32) {
-	//const mu0 = 4 * math.Pi * 1e7
-	const gamma = 1.76085970839e11 // rad/Ts
+	const gamma = 1.76085970839e11 // rad/Ts // TODO
 	for i := range torque[0] {
 
 		var m_ Vector
@@ -34,47 +43,5 @@ func llgTorque(torque, m, H [3][]float32, alpha float32) {
 		torque[X][i] = t_[X]
 		torque[Y][i] = t_[Y]
 		torque[Z][i] = t_[Z]
-	}
-}
-
-// Landau-Lifshitz torque.
-type LLGBox struct {
-	nWarp, warpLen int
-	M              [3][]float32
-	H              [3][]float32
-	alpha          []float32
-	Torque         [3][]float32
-	//hplan          *conv.Symmetric
-	//solver *Euler
-}
-
-func (box *LLGBox) Run() {
-
-	for {
-		for w := 0; w < box.nWarp; w++ {
-			start := w * box.warpLen
-			stop := (w + 1) * box.warpLen
-
-			//box.hplan.Pull(stop)
-
-			for i := start; i < stop; i++ {
-
-				var m Vector
-				var h Vector
-				m[X], m[Y], m[Z] = box.M[X][i], box.M[Y][i], box.M[Z][i]
-				h[X], h[Y], h[Z] = box.H[X][i], box.H[Y][i], box.H[Z][i]
-
-				alpha := box.alpha[i]
-
-				mxh := m.Cross(h)
-				t := mxh.Sub(m.Cross(mxh).Scaled(alpha))
-
-				box.Torque[X][i] = t[X]
-				box.Torque[Y][i] = t[Y]
-				box.Torque[Z][i] = t[Z]
-			}
-
-			//solver.
-		}
 	}
 }

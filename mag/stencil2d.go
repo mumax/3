@@ -4,14 +4,13 @@ import (
 	"nimble-cube/core"
 )
 
-type Exchange2D struct {
-	m   core.RChan3
-	hex core.Chan3
-	*core.Mesh
-	aex_reduced float64
+type Stencil2D struct {
+	in   core.RChan3
+	out core.Chan3
+	weights
 }
 
-func (e *Exchange2D) Run() {
+func (e *Stencil2D) Run() {
 	N := core.Prod(e.m.Size())
 	bl := core.BlockLen(e.m.Size())
 	nB := div(N , bl)
@@ -41,8 +40,8 @@ func (e *Exchange2D) Run() {
 	}
 }
 
-func NewExchange2D(m core.RChan3, hex core.Chan3, mesh *core.Mesh, aex_reduced float64) *Exchange2D {
-	return &Exchange2D{m, hex, mesh, aex_reduced}
+func NewStencil2D(m core.RChan3, hex core.Chan3, mesh *core.Mesh, aex_reduced float64) *Stencil2D {
+	return &Stencil2D{m, hex, mesh, aex_reduced}
 }
 
 // Naive implementation of 6-neighbor exchange field.

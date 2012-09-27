@@ -42,3 +42,13 @@ func (c *Chan3) WriteDone() {
 		c[i].WriteDone()
 	}
 }
+
+func (c *Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
+	var next [3][]float32
+	for i := range c {
+		c[i].WriteDelta(Δstart, Δstop)
+		a, b := c[i].mutex.WRange()
+		next[i] = c[i].list[a:b]
+	}
+	return next
+}

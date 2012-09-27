@@ -50,7 +50,7 @@ func NewRWMutex(N int, tag string) *RWMutex {
 }
 
 // Move the locked window 
-func (m *RWMutex) WDelta(Δstart, Δstop int) {
+func (m *RWMutex) WriteDelta(Δstart, Δstop int) {
 	m.cond.L.Lock()
 
 	m.delta(Δstart, Δstop)

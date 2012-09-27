@@ -29,6 +29,16 @@ func (c *RChan3) ReadDone() {
 	}
 }
 
+func (c *RChan3) ReadDelta(Δstart, Δstop int) [3][]float32 {
+	var next [3][]float32
+	for i := range c {
+		c[i].mutex.ReadDelta(Δstart, Δstop)
+		a, b := c[i].mutex.RRange()
+		next[i] = c[i].list[a:b]
+	}
+	return next
+}
+
 func (c *RChan3) Size() [3]int {
 	return c[0].Size()
 }

@@ -20,7 +20,7 @@ func (m *RWMutex) MakeRMutex() *RMutex {
 }
 
 // Move the locked window 
-func (m *RMutex) RDelta(Δstart, Δstop int) {
+func (m *RMutex) ReadDelta(Δstart, Δstop int) {
 	m.rw.cond.L.Lock()
 
 	m.delta(Δstart, Δstop)

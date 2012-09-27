@@ -37,6 +37,12 @@ func (c *Chan) WriteDone() {
 	c.mutex.WriteDone()
 }
 
+func (c *Chan) WriteDelta(Δstart, Δstop int) []float32 {
+	c.mutex.WriteDelta(Δstart, Δstop)
+	a, b := c.mutex.WRange()
+	return c.list[a:b]
+}
+
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (d *chandata) UnsafeData() []float32 {

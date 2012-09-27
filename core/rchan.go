@@ -26,6 +26,12 @@ func (c *RChan) ReadDone() {
 	c.mutex.ReadDone()
 }
 
+func (c *RChan) ReadDelta(Δstart, Δstop int) []float32 {
+	c.mutex.ReadDelta(Δstart, Δstop)
+	a, b := c.mutex.RRange()
+	return c.list[a:b]
+}
+
 func (c *RChan) Tag() string {
 	return c.mutex.rw.tag
 }

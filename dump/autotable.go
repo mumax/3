@@ -11,9 +11,9 @@ type Autotable struct {
 }
 
 /* TODO:
-	idea to get the time:
-	rwmutex can give you the step (from absA and prod(size), e.g)
-	solver could update small map with step: time
+idea to get the time:
+rwmutex can give you the step (from absA and prod(size), e.g)
+solver could update small map with step: time
 */
 
 func NewAutotable(fname string, data core.RChan3, every int) *Autotable {

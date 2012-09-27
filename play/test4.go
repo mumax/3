@@ -3,9 +3,9 @@ package main
 import (
 	. "nimble-cube/core"
 	"nimble-cube/dump"
-	"os"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"os"
 )
 
 func main() {
@@ -13,6 +13,8 @@ func main() {
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	size := mesh.GridSize()
+	Log("mesh:", mesh)
+	Log("block:", BlockSize(mesh.GridSize()))
 
 	m := MakeChan3(size, "m")
 	hd := MakeChan3(size, "hd")

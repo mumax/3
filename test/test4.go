@@ -3,9 +3,9 @@ package main
 import (
 	. "nimble-cube/core"
 	"nimble-cube/dump"
-	"os"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"os"
 )
 
 func main() {

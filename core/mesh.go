@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 // Mesh stores info of a finite-difference mesh.
 type Mesh struct {
 	gridSize [3]int
@@ -61,4 +63,11 @@ func padSize(size, periodic [3]int) [3]int {
 		}
 	}
 	return size
+}
+
+func (m *Mesh) String() string {
+	s := m.gridSize
+	N := Prod(s)
+	c := m.cellSize
+	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm]", N, s[0], s[1], s[2], c[0], c[1], c[2])
 }

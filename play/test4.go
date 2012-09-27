@@ -17,7 +17,7 @@ func main() {
 	Log("block:", BlockSize(mesh.GridSize()))
 
 	m := MakeChan3(size, "m")
-	hd := MakeChan3(size, "hd")
+	hd := MakeChan3(size, "Hd")
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
@@ -25,14 +25,14 @@ func main() {
 
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
-	hex := MakeChan3(size, "hex")
+	hex := MakeChan3(size, "Hex")
 	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
 
-	heff := MakeChan3(size, "heff")
+	heff := MakeChan3(size, "Heff")
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
 
 	const alpha = 1
-	torque := MakeChan3(size, "torque")
+	torque := MakeChan3(size, "τ")
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
 	const dt = 100e-15

@@ -25,11 +25,13 @@ func (e *Exchange2D) Run() {
 			m := e.m.ReadNext(bl)
 			M := core.Reshape3(m, bs)[0] // 2D slice
 			// Write after read (sorry kc)
-			if I == 0 { e.hex.WriteNext(N) }
+			if I == 0 {
+				e.hex.WriteNext(N)
+			}
 
-			for i := range M{
-				for j := range M[i]{
-					
+			for i := range M {
+				for j := range M[i] {
+
 				}
 			}
 

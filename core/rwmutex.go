@@ -33,7 +33,7 @@ import "sync"
 type RWMutex struct {
 	cond       sync.Cond  // wait condition: read/write is safe
 	state      sync.Mutex // protects the internal state, used in cond.
-	absA, absB int64      // half-open interval locked for writing
+	absA, absB int64      // half-open interval locked for writing, moves indefinitely upwards.
 	n          int        // Total number of elements in protected array.
 	readers    []*RMutex  // all readers who can access this rwmutex
 	tag        string     // tag for profiling
@@ -49,20 +49,59 @@ func NewRWMutex(N int, tag string) *RWMutex {
 	return m
 }
 
+// Move the locked window 
+func (m *RWMutex) Delta(Δstart, Δstop int) {
+	m.cond.L.Lock()
+
+	m.delta(Δstart, Δstop)
+
+	m.cond.L.Unlock()
+	m.cond.Broadcast()
+}
+
+// unsynchronized Delta
+func (m *RWMutex) delta(Δstart, Δstop int) {
+	Δa, Δb := int64(Δstart), int64(Δstop)
+
+	rnge := int((m.absB + Δb) - (m.absA + Δa))
+	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
+		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
+	}
+
+	for !m.canWLock(m.absA+Δa, m.absB+Δb) {
+		m.cond.Wait()
+	}
+	m.absA += Δa
+	m.absB += Δb
+
+	//profWriteNext(m.tag, Δstart, Δstop) // TODO 
+}
+
 // Lock the next delta elements for writing.
 func (m *RWMutex) WriteNext(delta int) {
 	m.cond.L.Lock()
 
-	delta64 := int64(delta)
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
 	}
-	for !m.canWLock(m.absA, m.absA+delta64) {
-		m.cond.Wait()
-	}
-	m.absB = m.absA + delta64
 
-	profWriteNext(m.tag, delta)
+	m.delta(0, delta)
+
+	m.cond.L.Unlock()
+	m.cond.Broadcast()
+}
+
+// Unlock the previous interval locked for writing.
+func (m *RWMutex) WriteDone() {
+	m.cond.L.Lock()
+
+	if m.absA == m.absB {
+		panic("rwmutex: unlock of unlocked mutex")
+	}
+
+	rnge := int(m.absB - m.absA)
+	m.delta(rnge, 0)
+
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
@@ -72,19 +111,6 @@ func (m *RWMutex) WriteNext(delta int) {
 // supposed to be accessed by one writer thread.
 func (m *RWMutex) WRange() (start, stop int) {
 	return int(m.absA % int64(m.n)), int((m.absB-1)%int64(m.n)) + 1
-}
-
-// Unlock the previous interval locked for writing.
-func (m *RWMutex) WriteDone() {
-	m.cond.L.Lock()
-	if m.absA == m.absB {
-		panic("rwmutex: unlock of unlocked mutex")
-	}
-	m.absA = m.absB
-
-	profWriteDone(m.tag)
-	m.cond.L.Unlock()
-	m.cond.Broadcast()
 }
 
 // Can m safely lock for writing [a, b[ ?

@@ -19,18 +19,40 @@ func (m *RWMutex) MakeRMutex() *RMutex {
 	return r
 }
 
+// Move the locked window 
+func (m *RMutex) RDelta(Δstart, Δstop int) {
+	m.rw.cond.L.Lock()
+
+	m.delta(Δstart, Δstop)
+
+	m.rw.cond.L.Unlock()
+	m.rw.cond.Broadcast()
+}
+
+// unsynchronized Delta
+func (m *RMutex) delta(Δstart, Δstop int) {
+	Δc, Δd := int64(Δstart), int64(Δstop)
+
+	rnge := int((m.absD + Δd) - (m.absC + Δc))
+	if rnge < 0 || rnge > m.rw.n || Δc < 0 || Δd < 0 {
+		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
+	}
+
+	for !m.canRLock(m.absC+Δc, m.absD+Δd) {
+		m.rw.cond.Wait()
+	}
+	m.absC += Δc
+	m.absD += Δd
+}
+
 // Lock the next delta elements for reading.
 func (m *RMutex) ReadNext(delta int) {
 	m.rw.cond.L.Lock()
 
-	delta64 := int64(delta)
 	if m.absC != m.absD {
 		panic("rmutex: lock of locked mutex")
 	}
-	for !m.canRLock(m.absC, m.absC+delta64) {
-		m.rw.cond.Wait()
-	}
-	m.absD = m.absC + delta64
+	m.delta(0, delta)
 
 	m.rw.cond.L.Unlock()
 	m.rw.cond.Broadcast()
@@ -40,7 +62,8 @@ func (m *RMutex) ReadNext(delta int) {
 func (m *RMutex) ReadDone() {
 	m.rw.cond.L.Lock()
 
-	m.absC = m.absD
+	rnge := int(m.absD - m.absC)
+	m.delta(rnge, 0)
 
 	m.rw.cond.L.Unlock()
 	m.rw.cond.Broadcast()

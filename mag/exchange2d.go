@@ -17,17 +17,25 @@ func (e *Exchange2D) Run() {
 	bs := core.BlockSize(e.m.Size())
 
 	for {
+
+		Hex := core.Reshape3(e.hex.UnsafeArray(), e.hex.Size())[0] // 2D
+
+		off := 0
 		for I := 0; I < N; I += bl {
-
 			m := e.m.ReadNext(bl)
-			hex := e.hex.WriteNext(bl)
+			M := core.Reshape3(m, bs)[0] // 2D slice
+			// Write after read (sorry kc)
+			if I == 0 { e.hex.WriteNext(N) }
 
-			M := core.Reshape3(m, bs)
+			for i := range M{
+				for j := range M[i]{
+					
+				}
+			}
 
-			e.hex.WriteDone()
-			e.m.ReadDone()
-
+			off += len(M)
 		}
+		e.hex.WriteDone()
 	}
 }
 

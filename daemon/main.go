@@ -243,7 +243,7 @@ func findJobFile(que string) (jobfile, lockfile string, ok bool) {
 // checks if a job is already started
 // (.out exits)
 func alreadyStarted(file string, files []string) bool {
-	prefix := noExt(file)
+	prefix := noExt(file) + "."
 	for _, f := range files {
 		if strings.HasPrefix(f, prefix) && strings.HasSuffix(f, ".out") {
 			return true

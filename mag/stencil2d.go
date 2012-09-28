@@ -5,43 +5,71 @@ import (
 )
 
 type Stencil2D struct {
-	in   core.RChan3
+	in  core.RChan3
 	out core.Chan3
-	weights
+	//weights
 }
 
-func (e *Stencil2D) Run() {
-	N := core.Prod(e.m.Size())
-	bl := core.BlockLen(e.m.Size())
-	nB := div(N , bl)
-	bs := core.BlockSize(e.m.Size())
-	bs2 := bs // size of two subsequent m blocks
-	bs[1] *= 2 
+func (s *Stencil2D) Run() {
+	size := s.in.Size()
+	N := core.Prod(size)
+	//	bl := core.BlockLen(s.in.Size())
+	//	nB := div(N , bl)
+	//	bs := core.BlockSize(s.in.Size())
+	//	bs2 := bs // size of two subsequent m blocks
+	//	bs[1] *= 2 
 
 	for {
-		m := e.m.ReadNext(2*N)
-		M := core.Reshape3(m, bs2)
-		hex := e.hex.WriteNext(bl)
-		Hex := core.Reshape3(hex, bs)[0] // 2D
+		in := s.in.ReadNext(N)
+		In := core.Reshape3(in, size) // 2D // todo: bs
+		out := s.out.WriteNext(N)
+		Out := core.Reshape3(out, size)
 
-		// top row
-		for c := range Hex{
-		for j:=0; j<len(Hex[c][0]); j++{
-			
-			Hex[c][0][j] = 
-		}
+		for c := range In {
+			for i := 0; i < len(In[c]); i++ {
+				s.span(In[c][0], Out[c][0], i)
+			}
 		}
 
-		for b := 0; b < nB-1; b++ {
-
-	
-			e.m.ReadDelta(N, N)
-		}
+		s.out.WriteDone()
+		s.in.ReadDone()
 	}
 }
 
-func NewStencil2D(m core.RChan3, hex core.Chan3, mesh *core.Mesh, aex_reduced float64) *Stencil2D {
-	return &Stencil2D{m, hex, mesh, aex_reduced}
+// calculate 1 line of the stencil.
+func (s *Stencil2D) span(input, output [][]float32, idx int) {
+	n := len(input)
+	// line above idx, on indx and below idx
+	// clamp out-of-bound lines
+	in0, in1, in2 := input[idx], input[idx], input[idx]
+	if idx > 0 {
+		in0 = input[idx-1]
+	}
+	if idx < n-1 {
+		in0 = input[idx+1]
+	}
+	out := output[idx]
+
+	// leftmost point: clamp
+	{
+		i := 0
+		out[i] = in1[i] + in2[i] + in0[i-0] + in0[i] + in0[i+1]
+	}
+
+	// inner part of line
+	for i := 1; i < n-1; i++ {
+		out[i] = in1[i] + in2[i] + in0[i-1] + in0[i] + in0[i+1]
+	}
+
+	// rightmost point: clamp
+	{
+		i := n - 1
+		out[i] = in1[i] + in2[i] + in0[i-1] + in0[i] + in0[i+0]
+	}
+}
+
+func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
+	return &Stencil2D{in, out}
 }
 
 // Naive implementation of 6-neighbor exchange field.
@@ -57,8 +85,8 @@ func NewStencil2D(m core.RChan3, hex core.Chan3, mesh *core.Mesh, aex_reduced fl
 //
 //}
 
-func div(a, b int) int{
-	if a % b != 0{
+func div(a, b int) int {
+	if a%b != 0 {
 		core.Panic(a, "%", b, "!=", 0)
 	}
 	return a / b

@@ -5,12 +5,20 @@ import (
 )
 
 type Stencil2D struct {
-	in  core.RChan3
-	out core.Chan3
-	//weights
+	in        core.RChan3
+	out       core.Chan3
+	W00       float32 // weight of central (0, 0) pixel
+	W_10, W10 float32 // weight of top (-1,0), bottom (1,0) neighbor
+	W0_1, W01 float32 // weight of left (0, -1), right (0, 1) neighbor
+}
+
+// New 2D 5-point stencil. Weights have to be set afterwards.
+func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
+	return &Stencil2D{in: in, out: out}
 }
 
 func (s *Stencil2D) Run() {
+	core.Debug("running 5-point stencil")
 	size := s.in.Size()
 	N := core.Prod(size)
 	//	bl := core.BlockLen(s.in.Size())
@@ -41,49 +49,36 @@ func (s *Stencil2D) span(input, output [][]float32, idx int) {
 	n := len(input)
 	// line above idx, on indx and below idx
 	// clamp out-of-bound lines
-	in0, in1, in2 := input[idx], input[idx], input[idx]
+	in_1, in0, in1 := input[idx], input[idx], input[idx]
 	if idx > 0 {
-		in0 = input[idx-1]
+		in_1 = input[idx-1]
 	}
 	if idx < n-1 {
-		in0 = input[idx+1]
+		in1 = input[idx+1]
 	}
 	out := output[idx]
 
-	// leftmost point: clamp
-	{
+	w00 := s.W00
+	w_10, w10 := s.W_10, s.W10
+	w0_1, w01 := s.W0_1, s.W01
+
+	{ // leftmost point
 		i := 0
-		out[i] = in1[i] + in2[i] + in0[i-0] + in0[i] + in0[i+1]
-	}
+		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-0] + w00*in0[i] + w01*in0[i+1]
+		//                                        ^^^^^^^^
+	} //                                          clamped
 
 	// inner part of line
 	for i := 1; i < n-1; i++ {
-		out[i] = in1[i] + in2[i] + in0[i-1] + in0[i] + in0[i+1]
+		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-1] + w00*in0[i] + w01*in0[i+1]
 	}
 
-	// rightmost point: clamp
-	{
+	{ // rightmost point
 		i := n - 1
-		out[i] = in1[i] + in2[i] + in0[i-1] + in0[i] + in0[i+0]
-	}
+		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-1] + w00*in0[i] + w01*in0[i+0]
+		//                                                                    ^^^^^^^^
+	} //                                                                      clamped
 }
-
-func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
-	return &Stencil2D{in, out}
-}
-
-// Naive implementation of 6-neighbor exchange field.
-// Aex in Tm² (exchange stiffness divided by Msat0).
-// Hex in Tesla.
-//func exchange2d(m [3][][][]float32, Hex [3][][][]float32, cellsize [3]float64, aex_reduced float64) {
-//	var (
-//		facI = float32(aex_reduced / (cellsize[0] * cellsize[0]))
-//		facJ = float32(aex_reduced / (cellsize[1] * cellsize[1]))
-//		facK = float32(aex_reduced / (cellsize[2] * cellsize[2]))
-//	)
-//	N0, N1, N2 := len(m[0]), len(m[0][0]), len(m[0][0][0])
-//
-//}
 
 func div(a, b int) int {
 	if a%b != 0 {

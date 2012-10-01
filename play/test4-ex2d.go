@@ -26,7 +26,7 @@ func main() {
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size, "Hex")
-	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
+	Stack(mag.NewExchange2D(m.MakeRChan3(), hex, mesh, aex))
 
 	heff := MakeChan3(size, "Heff")
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
@@ -38,12 +38,13 @@ func main() {
 	const dt = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	//Stack(dump.NewAutosaver("m.dump", m.MakeRChan3(), 100))
-	Stack(dump.NewAutotable("m.table", m.MakeRChan3(), 10))
+	Stack(dump.NewAutosaver("ex2dm.dump", m.MakeRChan3(), 100))
+	Stack(dump.NewAutosaver("ex2dhex.dump", hex.MakeRChan3(), 100))
+	Stack(dump.NewAutotable("ex2dm.table", m.MakeRChan3(), 10))
 
 	RunStack()
 
-	solver.Steps(100)
+	solver.Steps(10000)
 	// TODO: drain
 
 	ProfDump(os.Stdout)

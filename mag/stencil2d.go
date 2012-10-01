@@ -29,13 +29,14 @@ func (s *Stencil2D) Run() {
 
 	for {
 		in := s.in.ReadNext(N)
-		In := core.Reshape3(in, size) // 2D // todo: bs
+		In := core.Reshape3(in, size) // todo: bs
 		out := s.out.WriteNext(N)
 		Out := core.Reshape3(out, size)
 
 		for c := range In {
-			for i := 0; i < len(In[c]); i++ {
-				s.span(In[c][0], Out[c][0], i)
+			// i=0 (2D)
+			for j := 0; j < len(In[c][0]); j++ {
+				s.span(In[c][0], Out[c][0], j)
 			}
 		}
 
@@ -46,14 +47,15 @@ func (s *Stencil2D) Run() {
 
 // calculate 1 line of the stencil.
 func (s *Stencil2D) span(input, output [][]float32, idx int) {
-	n := len(input)
+	N1 := len(input)
+	N2 := len(input[0])
 	// line above idx, on indx and below idx
 	// clamp out-of-bound lines
 	in_1, in0, in1 := input[idx], input[idx], input[idx]
 	if idx > 0 {
 		in_1 = input[idx-1]
 	}
-	if idx < n-1 {
+	if idx < N1-1 {
 		in1 = input[idx+1]
 	}
 	out := output[idx]
@@ -63,19 +65,19 @@ func (s *Stencil2D) span(input, output [][]float32, idx int) {
 	w0_1, w01 := s.W0_1, s.W01
 
 	{ // leftmost point
-		i := 0
-		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-0] + w00*in0[i] + w01*in0[i+1]
+		k := 0
+		out[k] = w_10*in_1[k] + w10*in1[k] + w0_1*in0[k-0] + w00*in0[k] + w01*in0[k+1]
 		//                                        ^^^^^^^^
 	} //                                          clamped
 
 	// inner part of line
-	for i := 1; i < n-1; i++ {
-		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-1] + w00*in0[i] + w01*in0[i+1]
+	for k := 1; k < N2-1; k++ {
+		out[k] = w_10*in_1[k] + w10*in1[k] + w0_1*in0[k-1] + w00*in0[k] + w01*in0[k+1]
 	}
 
 	{ // rightmost point
-		i := n - 1
-		out[i] = w_10*in_1[i] + w10*in1[i] + w0_1*in0[i-1] + w00*in0[i] + w01*in0[i+0]
+		k := N2 - 1
+		out[k] = w_10*in_1[k] + w10*in1[k] + w0_1*in0[k-1] + w00*in0[k] + w01*in0[k+0]
 		//                                                                    ^^^^^^^^
 	} //                                                                      clamped
 }

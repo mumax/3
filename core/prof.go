@@ -40,23 +40,15 @@ func profRegister(tag string) {
 	profstart = time.Now()
 }
 
-func profWriteNext(tag string, delta int) {
+func profWriteDelta(tag string, delta int) {
 	if *Flag_timing {
 		profstate.Lock()
 		// don't record too much
 		if len(timeline) < MaxProfLen {
+			if delta == 0 {
+				delta = -1
+			}
 			timeline = append(timeline, &stamp{tag, delta, time.Now()})
-		}
-		profstate.Unlock()
-	}
-}
-
-func profWriteDone(tag string) {
-	if *Flag_timing {
-		profstate.Lock()
-		// don't record too much
-		if len(timeline) < MaxProfLen {
-			timeline = append(timeline, &stamp{tag, -1, time.Now()})
 		}
 		profstate.Unlock()
 	}
@@ -72,6 +64,8 @@ func ProfDump(out_ io.Writer) {
 	defer profstate.Unlock()
 	out := tabwriter.NewWriter(out_, 8, 1, 1, ' ', 0)
 	profUpdateKeys()
+
+	Log("prof: timeline length:", len(timeline))
 	for i, s := range timeline {
 		// enable/disable "running" status for this tag
 		tags[s.tag] = (s.delta >= 0)

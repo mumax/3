@@ -74,7 +74,7 @@ func (m *RWMutex) delta(Δstart, Δstop int) {
 	m.absA += Δa
 	m.absB += Δb
 
-	//profWriteNext(m.tag, Δstart, Δstop) // TODO 
+	profWriteDelta(m.tag, int(m.absB-m.absA))
 }
 
 // Lock the next delta elements for writing.

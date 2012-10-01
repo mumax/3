@@ -16,7 +16,6 @@ func NewLLGTorque(torque core.Chan3, m, h core.RChan3, alpha float32) *LLGTorque
 
 func (r *LLGTorque) Run() {
 	n := core.BlockLen(r.torque.Size())
-	// TODO: properly block
 	for {
 		M := r.m.ReadNext(n)
 		H := r.h.ReadNext(n)

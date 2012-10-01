@@ -22,52 +22,48 @@ func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
 func (s *Stencil2D) Run() {
 	core.Debug("running 4-neighbor 2D stencil")
 	size := s.in.Size()
+	N := core.Prod(size)                   // elements per frame
 	bs := core.BlockSize(size)             // block size
 	bl := core.Prod(bs)                    // elements per block
 	bs2 := [3]int{bs[0], 2 * bs[1], bs[2]} // size of 2 blocks
-	//bs1 := [3]int{bs[0], bs[1] + 1, bs[2]} // size of block + 1 line
-	N := core.Prod(size) // elements per frame
-	N1 := size[1]        // lines per frame
-	//N2 := size[2]                          // lines per frame
-	B1 := bs[1]      // lines per block
-	nB := div(N, bl) // number of blocks
+	N1 := size[1]                          // lines per frame
+	B1 := bs[1]                            // lines per block
+	nB := div(N, bl)                       // number of blocks
+	// TODO: need read array to avoid forgetting proper reshape
 
 	for {
-		in := s.in.ReadNext(bl)
-		In := core.Reshape3(in, bs)
+		in := s.in.ReadNext(2 * bl)
+		In := core.Reshape3(in, bs2)
 
 		out := s.out.WriteNext(bl)
 		Out := core.Reshape3(out, bs)
 
-		// very first line of entire frame
-		s.span3(In, Out, 0, N1)
-
-		for b := 0; b < nB-1; b++ {
-			// block bulk
-			for j := 1; j < B1-1; j++ {
-				s.span3(In, Out, j, N1)
-			}
-			// block last line
-			in = s.in.ReadDelta(0, bl)
-			In := core.Reshape3(in, bs2)
-			s.span3(In, Out, B1-1, N1)
-
-			// next block first line
-			out = s.out.WriteDelta(0, bl)
-			Out = core.Reshape3(out, bs2)
-			s.span3(In, Out, B1, N1)
-			out = s.out.WriteDelta(bl, 0)
-			Out = core.Reshape3(out, bs)
-			in = s.in.ReadDelta(bl, 0)
-			In = core.Reshape3(in, bs)
-		}
-
-		// last block bulk+last line
-		for j := 1; j < B1; j++ {
+		for j := 0; j < B1; j++ {
 			s.span3(In, Out, j, N1)
 		}
-		s.out.WriteDone()
+
+		for b := 1; b < nB-1; b++ {
+
+			in = s.in.ReadDelta(bl, bl)
+			In = core.Reshape3(in, bs2)
+
+			out = s.out.WriteDelta(bl, bl)
+			Out = core.Reshape3(out, bs)
+
+			for j := 0; j < B1; j++ {
+				s.span3(In, Out, j, N1)
+			}
+		}
+
+		out = s.out.WriteDelta(bl, bl)
+		Out = core.Reshape3(out, bs)
+
+		for j := 0; j < B1; j++ {
+			s.span3(In, Out, j, N1)
+		}
+
 		s.in.ReadDone()
+		s.out.WriteDone()
 	}
 }
 

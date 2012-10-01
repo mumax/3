@@ -21,6 +21,7 @@ func (s *Stencil2D) Run() {
 	core.Debug("running 5-point stencil")
 	size := s.in.Size()
 	N := core.Prod(size)
+	N1 := size[1]
 	//	bl := core.BlockLen(s.in.Size())
 	//	nB := div(N , bl)
 	//	bs := core.BlockSize(s.in.Size())
@@ -36,7 +37,7 @@ func (s *Stencil2D) Run() {
 		for c := range In {
 			// i=0 (2D)
 			for j := 0; j < len(In[c][0]); j++ {
-				s.span(In[c][0], Out[c][0], j)
+				s.span(In[c][0], Out[c][0], j, N1)
 			}
 		}
 
@@ -45,9 +46,10 @@ func (s *Stencil2D) Run() {
 	}
 }
 
-// calculate 1 line of the stencil.
-func (s *Stencil2D) span(input, output [][]float32, idx int) {
-	N1 := len(input)
+// calculate line idx of stencil with total Y size N1.
+// input/output may be small blocks of total arrays of size N1 x len(input[0])
+// input is clamped for out-of-bounds elements.
+func (s *Stencil2D) span(input, output [][]float32, idx, N1 int) {
 	N2 := len(input[0])
 	// line above idx, on indx and below idx
 	// clamp out-of-bound lines

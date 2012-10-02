@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	. "nimble-cube/core"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
 	"os"
 	"time"
-	"fmt"
 )
 
 func main() {
@@ -48,14 +48,14 @@ func main() {
 	const N = 20
 	var steps int64
 	solver.Steps(1)
-	for duration < 2*time.Second{
+	for duration < 2*time.Second {
 		solver.Steps(N)
 		steps += N
 		duration = time.Since(start)
 	}
 
 	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/(1e3*steps), "#")
-	
+
 	ProfDump(os.Stdout)
 	Cleanup()
 }

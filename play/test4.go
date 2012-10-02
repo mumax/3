@@ -44,7 +44,7 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(10)
+	solver.Steps(10000)
 	res := m.UnsafeArray()
 	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
 	//expect := [3]float32{-0.0758771, 0.17907965, 0.9809042}

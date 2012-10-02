@@ -1,6 +1,7 @@
 package mag
 
 import (
+	"math"
 	"nimble-cube/core"
 )
 
@@ -23,8 +24,8 @@ func (e *Euler) Steps(steps int) {
 	block := e.blocklen
 	dt := e.dt
 
+	// Send out initial value
 	if !e.init {
-		// Send out initial value
 		e.y.WriteNext(n)
 		e.y.WriteDone()
 		e.init = true
@@ -41,12 +42,14 @@ func (e *Euler) Steps(steps int) {
 				y1[X] = y[X][i] + dt*dy[X][i]
 				y1[Y] = y[Y][i] + dt*dy[Y][i]
 				y1[Z] = y[Z][i] + dt*dy[Z][i]
-				y1 = y1.Normalized()
-				y[X][i] = y1[X]
-				y[Y][i] = y1[Y]
-				y[Z][i] = y1[Z]
+
+				inorm := 1 / float32(math.Sqrt(float64(y1[X]*y1[X]+y1[Y]*y1[Y]+y1[Z]*y1[Z])))
+
+				y[X][i] = inorm * y1[X]
+				y[Y][i] = inorm * y1[Y]
+				y[Z][i] = inorm * y1[Z]
 			}
-			e.y.WriteDone() // TODO: not on last step
+			e.y.WriteDone() // TODO: not on last step?
 			e.dy.ReadDone()
 		}
 	}

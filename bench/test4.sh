@@ -4,7 +4,8 @@ export GOMAXPROCS=4
 bench=test4.txt
 echo "# N0 N1 N2 maxblock µs/step" > $bench
 tail -f $bench &
-for (( N=16; $N<2048; N+=16 )); do
-	./test4 -maxblock $(( $N*$N/4 )) -log=0 1 $N $N >> $bench || exit 2
+delta=64
+for (( N=$delta; $N<2048; N+=$delta )); do
+	./test4 -minblocks 4 -silent 1 $N $N >> $bench || exit 2
 done
-echo "#done" > $bench
+echo "#done" >> $bench

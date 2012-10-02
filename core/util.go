@@ -2,7 +2,11 @@ package core
 
 // Utility functions
 
-import "os"
+import (
+	"flag"
+	"os"
+	"strconv"
+)
 
 // Open file for writing, panic or error.
 func OpenFile(fname string) *os.File {
@@ -32,6 +36,13 @@ func CheckEqualSize(a, b [3]int) {
 	if a != b {
 		Panic("Size mismatch:", a, "!=", b)
 	}
+}
+
+// IntArg returns the idx-th command line as an integer.
+func IntArg(idx int) int {
+	val, err := strconv.Atoi(flag.Arg(idx))
+	Fatal(err)
+	return val
 }
 
 func min(x, y int) int {

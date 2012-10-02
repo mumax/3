@@ -17,6 +17,7 @@ func NewEuler(y core.Chan3, dy core.RChan3, dt float32) *Euler {
 }
 
 func (e *Euler) Steps(steps int) {
+	core.Log("euler solver:", steps, "steps")
 	n := core.Prod(e.y.Size())
 	block := e.blocklen
 	dt := e.dt

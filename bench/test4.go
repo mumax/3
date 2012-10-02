@@ -5,10 +5,12 @@ import (
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
 	"os"
+	"time"
+	"fmt"
 )
 
 func main() {
-	N0, N1, N2 := 1, 32, 128
+	N0, N1, N2 := IntArg(0), IntArg(1), IntArg(2)
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	size := mesh.GridSize()
@@ -18,7 +20,7 @@ func main() {
 	m := MakeChan3(size, "m")
 	hd := MakeChan3(size, "Hd")
 
-	acc := 8
+	acc := 1
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
 	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
 
@@ -40,7 +42,15 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(5000)
+	start := time.Now()
+	duration := time.Since(start)
+	for duration < 10*time.Second{
+		solver.Steps(100)
+		duration = time.Since(start)
+	}
+
+	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/1e6)
+	
 	ProfDump(os.Stdout)
 	Cleanup()
 }

@@ -54,7 +54,7 @@ func main() {
 		duration = time.Since(start)
 	}
 
-	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/(1e3*steps), "#")
+	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/(1e3*steps))
 
 	ProfDump(os.Stdout)
 	Cleanup()

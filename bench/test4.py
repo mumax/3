@@ -1,9 +1,10 @@
 from mumax2 import *
+from time import time
 
 # Standard Problem 4
 
-Nx = 128
-Ny = 32
+Nx = 512
+Ny =512
 Nz = 1
 setgridsize(Nx, Ny, Nz)
 setcellsize(500e-9/Nx, 125e-9/Ny, 3e-9/Nz)
@@ -29,6 +30,10 @@ setv('alpha', 0.02)
 setv('dt', 1e-15)
 setv('t', 0)
 
-steps(5000)
+steps(1)
+t=time()
+N=1000
+steps(N)
+print 1000*((time()-t) / N),"ms/step"
 
 printstats()

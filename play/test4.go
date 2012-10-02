@@ -31,11 +31,11 @@ func main() {
 	heff := MakeChan3(size, "Heff")
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
 
-	const alpha = 1
+	var alpha float32 = 1
 	torque := MakeChan3(size, "τ")
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
-	const dt = 100e-15
+	var dt float32 = 100e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
@@ -44,15 +44,9 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(10)
-	res := m.UnsafeArray()
-	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
-	//expect := [3]float32{-0.0758771, 0.17907965, 0.9809042}
-	Log("result:", got)
-	//	if got != expect {
-	//		Fatal(fmt.Errorf("expected: %v", expect))
-	//	}
-	// TODO: drain
+	solver.Steps(1)
+	solver.Steps(1)
+	solver.Steps(1)
 
 	ProfDump(os.Stdout)
 	Cleanup()

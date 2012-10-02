@@ -6,12 +6,13 @@ type LLGTorque struct {
 	torque core.Chan3
 	m, b   core.RChan3
 	alpha  float32
+	bExt   Vector
 }
 
 func NewLLGTorque(torque core.Chan3, m, B core.RChan3, alpha float32) *LLGTorque {
 	core.Assert(torque.Size() == m.Size())
 	core.Assert(torque.Size() == B.Size())
-	return &LLGTorque{torque, m, B, alpha}
+	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}}
 }
 
 func (r *LLGTorque) Run() {
@@ -20,14 +21,14 @@ func (r *LLGTorque) Run() {
 		M := r.m.ReadNext(n)
 		B := r.b.ReadNext(n)
 		T := r.torque.WriteNext(n)
-		llgTorque(T, M, B, r.alpha)
+		llgTorque(T, M, B, r.alpha, r.bExt)
 		r.torque.WriteDone()
 		r.m.ReadDone()
 		r.b.ReadDone()
 	}
 }
 
-func llgTorque(torque, m, B [3][]float32, alpha float32) {
+func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 	const gamma = 1.76085970839e11 // rad/Ts // TODO
 
 	var mx, my, mz float32
@@ -35,7 +36,9 @@ func llgTorque(torque, m, B [3][]float32, alpha float32) {
 
 	for i := range torque[0] {
 		mx, my, mz = m[X][i], m[Y][i], m[Z][i]
-		Bx, By, Bz = B[X][i], B[Y][i], B[Z][i]
+		Bx = B[X][i] + bExt[X]
+		By = B[Y][i] + bExt[Y]
+		Bz = B[Z][i] + bExt[Z]
 
 		mxBx := my*Bz - mz*By
 		mxBy := -mx*Bz + mz*Bx

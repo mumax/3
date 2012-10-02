@@ -29,18 +29,24 @@ func (r *LLGTorque) Run() {
 
 func llgTorque(torque, m, H [3][]float32, alpha float32) {
 	const gamma = 1.76085970839e11 // rad/Ts // TODO
+
+	var mx, my, mz float32
+	var hx, hy, hz float32
+
 	for i := range torque[0] {
+		mx, my, mz = m[X][i], m[Y][i], m[Z][i]
+		hx, hy, hz = H[X][i], H[Y][i], H[Z][i]
 
-		var m_ Vector
-		var H_ Vector
-		m_[X], m_[Y], m_[Z] = m[X][i], m[Y][i], m[Z][i]
-		H_[X], H_[Y], H_[Z] = H[X][i], H[Y][i], H[Z][i]
+		mxhx := my*hz - mz*hy
+		mxhy := -mx*hz + mz*hx
+		mxhz := mx*hy - my*hx
 
-		mxh := m_.Cross(H_) // not inlined for some reason...
-		t_ := (mxh.Sub(m_.Cross(mxh).Scaled(alpha))).Scaled(gamma)
+		mxmxhx := my*mxhz - mz*mxhy
+		mxmxhy := -mx*mxhz + mz*mxhx
+		mxmxhz := mx*mxhy - my*mxhx
 
-		torque[X][i] = t_[X]
-		torque[Y][i] = t_[Y]
-		torque[Z][i] = t_[Z]
+		torque[X][i] = gamma * (mxhx - alpha*mxmxhx) // todo: gilbert factor
+		torque[Y][i] = gamma * (mxhy - alpha*mxmxhy)
+		torque[Z][i] = gamma * (mxhz - alpha*mxmxhz)
 	}
 }

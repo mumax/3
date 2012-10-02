@@ -26,7 +26,7 @@ func main() {
 	Msat := 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size, "Hex")
-	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
+	Stack(mag.NewExchange2D(m.MakeRChan3(), hex, mesh, aex))
 
 	heff := MakeChan3(size, "Heff")
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))

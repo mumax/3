@@ -22,43 +22,23 @@ func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
 func (s *Stencil2D) Run() {
 	core.Debug("running 4-neighbor 2D stencil")
 	size := s.in.Size()
-	N := core.Prod(size)                   // elements per frame
-	bs := core.BlockSize(size)             // block size
-	bl := core.Prod(bs)                    // elements per block
-	bs2 := [3]int{bs[0], 2 * bs[1], bs[2]} // size of 2 blocks
-	N1 := size[1]                          // lines per frame
-	B1 := bs[1]                            // lines per block
-	nB := div(N, bl)                       // number of blocks
-	// TODO: need read array to avoid forgetting proper reshape
+	N := core.Prod(size) // elements per frame
+	N1 := size[1]        // lines per frame
+	//	bs := core.BlockSize(size)             // block size
+	//	bl := core.Prod(bs)                    // elements per block
+	//	bs2 := [3]int{bs[0], 2 * bs[1], bs[2]} // size of 2 blocks
+	//	B1 := bs[1]                            // lines per block
+	//	nB := div(N, bl)                       // number of blocks
+	// TODO: need ReadArray to avoid forgetting proper reshape
 
 	for {
-		in := s.in.ReadNext(2 * bl)
-		In := core.Reshape3(in, bs2)
+		in := s.in.ReadNext(N)
+		In := core.Reshape3(in, size)
 
-		out := s.out.WriteNext(bl)
-		Out := core.Reshape3(out, bs)
+		out := s.out.WriteNext(N)
+		Out := core.Reshape3(out, size)
 
-		for j := 0; j < B1; j++ {
-			s.span3(In, Out, j, N1)
-		}
-
-		for b := 1; b < nB-1; b++ {
-
-			in = s.in.ReadDelta(bl, bl)
-			In = core.Reshape3(in, bs2)
-
-			out = s.out.WriteDelta(bl, bl)
-			Out = core.Reshape3(out, bs)
-
-			for j := 0; j < B1; j++ {
-				s.span3(In, Out, j, N1)
-			}
-		}
-
-		out = s.out.WriteDelta(bl, bl)
-		Out = core.Reshape3(out, bs)
-
-		for j := 0; j < B1; j++ {
+		for j := 0; j < N1; j++ {
 			s.span3(In, Out, j, N1)
 		}
 

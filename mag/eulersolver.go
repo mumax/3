@@ -10,10 +10,11 @@ type Euler struct {
 	dy       core.RChan3
 	dt       float32
 	blocklen int
+	init     bool
 }
 
 func NewEuler(y core.Chan3, dy core.RChan3, dt float32) *Euler {
-	return &Euler{y, dy, dt, core.BlockLen(y.Size())}
+	return &Euler{y, dy, dt, core.BlockLen(y.Size()), false}
 }
 
 func (e *Euler) Steps(steps int) {
@@ -22,9 +23,12 @@ func (e *Euler) Steps(steps int) {
 	block := e.blocklen
 	dt := e.dt
 
-	// Send out initial value
-	e.y.WriteNext(n)
-	e.y.WriteDone()
+	if !e.init {
+		// Send out initial value
+		e.y.WriteNext(n)
+		e.y.WriteDone()
+		e.init = true
+	}
 
 	for s := 0; s < steps; s++ {
 		for I := 0; I < n; I += block {

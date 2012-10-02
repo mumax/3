@@ -42,14 +42,19 @@ func main() {
 
 	RunStack()
 
+	// run for about 10s and output time/step
 	start := time.Now()
 	duration := time.Since(start)
-	for duration < 10*time.Second{
-		solver.Steps(100)
+	const N = 20
+	var steps int64
+	solver.Steps(1)
+	for duration < 2*time.Second{
+		solver.Steps(N)
+		steps += N
 		duration = time.Since(start)
 	}
 
-	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/1e6)
+	fmt.Println(N0, N1, N2, *Flag_maxblocklen, duration.Nanoseconds()/(1e3*steps), "#")
 	
 	ProfDump(os.Stdout)
 	Cleanup()

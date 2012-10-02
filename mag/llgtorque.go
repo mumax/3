@@ -4,49 +4,49 @@ import "nimble-cube/core"
 
 type LLGTorque struct {
 	torque core.Chan3
-	m, h   core.RChan3
+	m, b   core.RChan3
 	alpha  float32
 }
 
-func NewLLGTorque(torque core.Chan3, m, h core.RChan3, alpha float32) *LLGTorque {
+func NewLLGTorque(torque core.Chan3, m, B core.RChan3, alpha float32) *LLGTorque {
 	core.Assert(torque.Size() == m.Size())
-	core.Assert(torque.Size() == h.Size())
-	return &LLGTorque{torque, m, h, alpha}
+	core.Assert(torque.Size() == B.Size())
+	return &LLGTorque{torque, m, B, alpha}
 }
 
 func (r *LLGTorque) Run() {
 	n := core.BlockLen(r.torque.Size())
 	for {
 		M := r.m.ReadNext(n)
-		H := r.h.ReadNext(n)
+		B := r.b.ReadNext(n)
 		T := r.torque.WriteNext(n)
-		llgTorque(T, M, H, r.alpha)
+		llgTorque(T, M, B, r.alpha)
 		r.torque.WriteDone()
 		r.m.ReadDone()
-		r.h.ReadDone()
+		r.b.ReadDone()
 	}
 }
 
-func llgTorque(torque, m, H [3][]float32, alpha float32) {
+func llgTorque(torque, m, B [3][]float32, alpha float32) {
 	const gamma = 1.76085970839e11 // rad/Ts // TODO
 
 	var mx, my, mz float32
-	var hx, hy, hz float32
+	var Bx, By, Bz float32
 
 	for i := range torque[0] {
 		mx, my, mz = m[X][i], m[Y][i], m[Z][i]
-		hx, hy, hz = H[X][i], H[Y][i], H[Z][i]
+		Bx, By, Bz = B[X][i], B[Y][i], B[Z][i]
 
-		mxhx := my*hz - mz*hy
-		mxhy := -mx*hz + mz*hx
-		mxhz := mx*hy - my*hx
+		mxBx := my*Bz - mz*By
+		mxBy := -mx*Bz + mz*Bx
+		mxBz := mx*By - my*Bx
 
-		mxmxhx := my*mxhz - mz*mxhy
-		mxmxhy := -mx*mxhz + mz*mxhx
-		mxmxhz := mx*mxhy - my*mxhx
+		mxmxBx := my*mxBz - mz*mxBy
+		mxmxBy := -mx*mxBz + mz*mxBx
+		mxmxBz := mx*mxBy - my*mxBx
 
-		torque[X][i] = gamma * (mxhx - alpha*mxmxhx) // todo: gilbert factor
-		torque[Y][i] = gamma * (mxhy - alpha*mxmxhy)
-		torque[Z][i] = gamma * (mxhz - alpha*mxmxhz)
+		torque[X][i] = gamma * (mxBx - alpha*mxmxBx) // todo: gilbert factor
+		torque[Y][i] = gamma * (mxBy - alpha*mxmxBy)
+		torque[Z][i] = gamma * (mxBz - alpha*mxmxBz)
 	}
 }

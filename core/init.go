@@ -12,15 +12,16 @@ import (
 )
 
 var (
-	Flag_version     = flag.Bool("V", false, "print version")
+	Flag_version     = flag.Bool("v", false, "print version")
 	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	Flag_cpuprof     = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	Flag_timing      = flag.Bool("timeprof", false, "Record timing profile")
 	Flag_memprof     = flag.String("memprof", "", "Write gopprof memory profile to file")
-	Flag_debug       = flag.Bool("debug", DEBUG, "Generate debug info")
-	Flag_log         = flag.Bool("log", LOG, "Generate log info")
+	Flag_debug       = flag.Bool("debug", false, "Generate debug info")
+	Flag_silent      = flag.Bool("silent", false, "Don't generate any log info")
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
-	Flag_maxblocklen = flag.Int("maxblock", 1<<30, "Maximum size of concurrent blocks")
+	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")
+	Flag_minblocks   = flag.Int("minblocks", 1, "Minimum number of concurrent blocks")
 	// CUDA flags
 	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
 	Flag_sched    = flag.String("yield", "auto", "CUDA scheduling: auto|spin|yield|sync")
@@ -43,9 +44,10 @@ func init() {
 }
 
 func initLog() {
-	LOG = *Flag_log
+	LOG = !*Flag_silent
 	DEBUG = *Flag_debug
 	log.SetPrefix("#")
+	log.SetFlags(log.Ltime)
 }
 
 func initGOMAXPROCS() {

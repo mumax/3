@@ -31,13 +31,15 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(j>= (N1/2+1) || k>=N2){
+	if(j>= N1 || k>=N2){
  		return;	
 	}
 
+--- TODO: loop over entire array, fetch half Kernel
+
 	int I = j*N2 + k; // linear index
 
-    float Kxx = fftKxx[I];
+    float Kxx = fftKxx[I];  --- branch here?
     float Kyy = fftKyy[I];
     float Kzz = fftKzz[I];
     float Kyz = fftKyz[I];
@@ -58,25 +60,5 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
     fftMz[e  ] =            reMy * Kyz + reMz * Kzz;
     fftMz[e+1] =            imMy * Kyz + imMz * Kzz;
 
-	// Re-use same kernel for bottom half.
-	if (j > 0){
-		float J = N1 - j;
-	 	I = J*N2 + k;
-  		e = 2 * I;
-
-    	reMx = fftMx[e  ];
-    	imMx = fftMx[e+1];
-    	reMy = fftMy[e  ];
-    	imMy = fftMy[e+1];
-    	reMz = fftMz[e  ];
-    	imMz = fftMz[e+1];
-
-    	fftMx[e  ] = reMx * Kxx;
-    	fftMx[e+1] = imMx * Kxx;
-    	fftMy[e  ] =            reMy *  Kyy  + reMz *(-Kyz);
-    	fftMy[e+1] =            imMy *  Kyy  + imMz *(-Kyz);
-    	fftMz[e  ] =            reMy *(-Kyz) + reMz *  Kzz ;
-    	fftMz[e+1] =            imMy *(-Kyz) + imMz *  Kzz ;
-	}
 }
 

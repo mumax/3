@@ -22,7 +22,7 @@ func kernMulRSymm2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, N
 		kernMulRSymm2DCode = mod.GetFunction("kernmulRSymm2D")
 	}
 
-	gridDim, blockDim := gpu.Make2DConf(N1/2+1, N2)
+	gridDim, blockDim := gpu.Make2DConf(N1, N2)
 
 	m0ptr := fftM[0].Pointer()
 	m1ptr := fftM[1].Pointer()

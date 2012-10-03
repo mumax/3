@@ -69,5 +69,6 @@ func (m *Mesh) String() string {
 	s := m.gridSize
 	N := Prod(s)
 	c := m.cellSize
-	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm]", N, s[0], s[1], s[2], c[0], c[1], c[2])
+	pbc := m.pbc
+	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm], PBC: [%v x %v x %v]", N, s[0], s[1], s[2], c[0], c[1], c[2], pbc[0], pbc[1], pbc[2])
 }

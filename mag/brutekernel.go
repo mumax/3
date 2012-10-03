@@ -12,7 +12,7 @@ func BruteKernel(mesh *core.Mesh, accuracy int) [3][3][][][]float32 {
 	size := mesh.GridSize()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
-	core.Debug("Calculating demag kernel", "size:", size, "cellsize:", cellsize, "accuracy:", accuracy, "periodic:", periodic)
+	core.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
 
 	core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
 	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
@@ -116,11 +116,21 @@ func BruteKernel(mesh *core.Mesh, accuracy int) [3][3][][][]float32 {
 			}
 		}
 	}
+	// for 2D these elements are zero:
+	if size[0] == 1 {
+		array[0][1] = nil
+		array[0][2] = nil
+	}
 	// make result symmetric for tools that expect it so.
 	array[1][0] = array[0][1]
 	array[2][0] = array[0][2]
 	array[2][1] = array[1][2]
-	//core.Printf("% 6f", array)
+	//	for i := 0; i < 3; i++ {
+	//		for j := 0; j < 3; j++ {
+	//			core.Log("K", i, j)
+	//			core.Printf("% 6f", array[i][j])
+	//		}
+	//	}
 	return array
 }
 

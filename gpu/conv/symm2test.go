@@ -10,6 +10,7 @@ import (
 func TestSymm2(N0, N1, N2 int) {
 	C := 1e-9
 	mesh := core.NewMesh(N0, N1, N2, C, 2*C, 3*C)
+	core.Log(mesh)
 	N := mesh.NCell()
 	s := mesh.GridSize()
 
@@ -17,7 +18,7 @@ func TestSymm2(N0, N1, N2 int) {
 	hin := core.MakeChan3(s, "hin")
 	hout := core.MakeChan3(s, "hout")
 
-	acc := 2
+	acc := 1
 	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
 
 	arr := hin.UnsafeArray()

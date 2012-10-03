@@ -4,6 +4,7 @@
 // |Mx|   |Kxx Kxy Kxz|   |Mx|
 // |My| = |Kxy Kyy Kyz| * |My|
 // |Mz|   |Kxz Kyz Kzz|   |Mz|
+// Elements may be NULL, interpreted as all zeros.
 extern "C" __global__ void 
 kernmulRSymm(float* fftMx,  float* fftMy,  float* fftMz,
         float* fftKxx, float* fftKyy, float* fftKzz,
@@ -22,13 +23,13 @@ kernmulRSymm(float* fftMx,  float* fftMy,  float* fftMz,
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
-    float Kxx = fftKxx[i];
-    float Kyy = fftKyy[i];
-    float Kzz = fftKzz[i];
+    float Kxx = (fftKxx == NULL? 0.f: fftKxx[i]);
+    float Kyy = (fftKyy == NULL? 0.f: fftKyy[i]);
+    float Kzz = (fftKzz == NULL? 0.f: fftKzz[i]);
 
-    float Kyz = fftKyz[i];
-    float Kxz = fftKxz[i];
-    float Kxy = fftKxy[i];
+    float Kyz = (fftKyz == NULL? 0.f: fftKyz[i]);
+    float Kxz = (fftKxz == NULL? 0.f: fftKxz[i]);
+    float Kxy = (fftKxy == NULL? 0.f: fftKxy[i]);
 
     fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
     fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;

@@ -11,7 +11,7 @@ const KERNMUL2D = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00005275_00000000-9_kernmul2d.cpp3.i"
+	.file	1 "/tmp/tmpxft_00001e2f_00000000-9_kernmul2d.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/kernmul2d.cu"
 
 .visible .entry kernmul2D(

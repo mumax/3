@@ -24,14 +24,14 @@
 // -aaaa
 // -bbbb
 extern "C" __global__ void 
-kernmul2D(float* fftMx,  float* fftMy,  float* fftMz,
+kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
         float* fftKxx, float* fftKyy, float* fftKzz, float* fftKyz, 
 		int N1, int N2){
 
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(j>=N1 || k>=N2){
+	if(j> (N1/2+1) || k>=N2){
  		return;	
 	}
 
@@ -61,7 +61,7 @@ kernmul2D(float* fftMx,  float* fftMy,  float* fftMz,
 
 	// Re-use same kernel for bottom half.
 	if (j > 0 && j < N1/2){
-		j = N1 - j;
+		j = N1/2 - j; //// ??????????
 	 	I = j*N2 + k;
   		e = 2 * I;
 

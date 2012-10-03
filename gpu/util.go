@@ -56,7 +56,7 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	gridSize.Y = NY
 	gridSize.Z = 1
 
-	N := N1*N2
+	N := N1 * N2
 	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }

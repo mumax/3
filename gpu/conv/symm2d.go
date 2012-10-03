@@ -7,7 +7,7 @@ import (
 	"nimble-cube/gpu"
 )
 
-type Symm2D struct {
+type Symm2 struct {
 	size       [3]int              // 3D size of the input/output data
 	kernSize   [3]int              // Size of kernel and logical FFT size.
 	n          int                 // product of size
@@ -24,8 +24,8 @@ type Symm2D struct {
 	fftKern    [3][3][]float32     // FFT kernel on host
 }
 
-func (c *Symm2D) init() {
-	core.Log("initializing 2D 2x symmetric convolution")
+func (c *Symm2) init() {
+	core.Log("initializing 2D symmetric convolution")
 	padded := c.kernSize
 
 	{ // init FFT plans
@@ -69,7 +69,7 @@ func (c *Symm2D) init() {
 	}
 }
 
-func (c *Symm2D) Run() {
+func (c *Symm2) Run() {
 	core.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
 	c.init()
@@ -91,11 +91,10 @@ func (c *Symm2D) Run() {
 		}
 
 		// kern mul
-		N1, N2 := c.kernSize[1], c.kernSize[2]
-		kernMulRSymm2D(c.fftCBuf,
+		kernMulRSymm(c.fftCBuf,
 			c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-			c.gpuFFTKern[1][2],
-			N1, N2, c.stream)
+			c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+			c.stream)
 		c.stream.Synchronize()
 
 		// BW FFT
@@ -111,9 +110,9 @@ func (c *Symm2D) Run() {
 	}
 }
 
-func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2D {
+func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2 {
 	core.Assert(size[0] == 1) // 2D not yet supported
-	c := new(Symm2D)
+	c := new(Symm2)
 	c.size = size
 	c.kernArr = kernel
 	for i := 0; i < 3; i++ {

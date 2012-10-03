@@ -8,20 +8,21 @@ import (
 )
 
 type Symm2 struct {
-	size       [3]int              // 3D size of the input/output data
-	kernSize   [3]int              // Size of kernel and logical FFT size.
-	n          int                 // product of size
-	input      [3]gpu.RChan        // TODO: fuse with input
-	output     [3]gpu.Chan         // TODO: fuse with output
-	fftRBuf    [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
-	fftCBuf    [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
-	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
-	fwPlan     safe.FFT3DR2CPlan   // Forward FFT (1 component)
-	bwPlan     safe.FFT3DC2RPlan   // Backward FFT (1 component)
-	stream     cu.Stream           // 
-	kern       [3][3][]float32     // Real-space kernel
-	kernArr    [3][3][][][]float32 // Real-space kernel
-	fftKern    [3][3][]float32     // FFT kernel on host
+	size        [3]int              // 3D size of the input/output data
+	kernSize    [3]int              // Size of kernel and logical FFT size.
+	fftKernSize [3]int              // Size of real, FFTed kernel
+	n           int                 // product of size
+	input       [3]gpu.RChan        // TODO: fuse with input
+	output      [3]gpu.Chan         // TODO: fuse with output
+	fftRBuf     [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
+	fftCBuf     [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
+	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	fwPlan      safe.FFT3DR2CPlan   // Forward FFT (1 component)
+	bwPlan      safe.FFT3DC2RPlan   // Backward FFT (1 component)
+	stream      cu.Stream           // 
+	kern        [3][3][]float32     // Real-space kernel
+	kernArr     [3][3][][][]float32 // Real-space kernel
+	fftKern     [3][3][]float32     // FFT kernel on host
 }
 
 func (c *Symm2) init() {
@@ -40,6 +41,7 @@ func (c *Symm2) init() {
 		ffted := fftR2COutputSizeFloats(padded)
 		realsize := ffted
 		realsize[2] /= 2
+		c.fftKernSize = realsize
 		fwPlan := c.fwPlan
 		output := safe.MakeComplex64s(fwPlan.OutputLen())
 		input := output.Float().Slice(0, fwPlan.InputLen())
@@ -55,7 +57,8 @@ func (c *Symm2) init() {
 					scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 					c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 					c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-					core.Printf("% 6f", core.Reshape(c.fftKern[i][j], realsize))
+					core.Log("K", i, j)
+					core.Printf("% 9f", core.Reshape(c.fftKern[i][j], c.fftKernSize))
 				}
 			}
 		}
@@ -92,9 +95,11 @@ func (c *Symm2) Run() {
 		}
 
 		// kern mul
-		kernMulRSymm(c.fftCBuf,
+		N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
+		kernMulRSymm2D(c.fftCBuf,
 			c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-			c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+			c.gpuFFTKern[1][2], //c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+			N1, N2,
 			c.stream)
 		c.stream.Synchronize()
 

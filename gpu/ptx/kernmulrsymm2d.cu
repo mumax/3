@@ -31,7 +31,7 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(j> (N1/2+1) || k>=N2){
+	if(j>= (N1/2+1) || k>=N2){
  		return;	
 	}
 
@@ -41,7 +41,6 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
     float Kyy = fftKyy[I];
     float Kzz = fftKzz[I];
     float Kyz = fftKyz[I];
-
 
   	int e = 2 * I;
 
@@ -60,9 +59,9 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
     fftMz[e+1] =            imMy * Kyz + imMz * Kzz;
 
 	// Re-use same kernel for bottom half.
-	if (j > 0 && j < N1/2){
-		j = N1/2 - j; //// ??????????
-	 	I = j*N2 + k;
+	if (j > 0){
+		float J = N1 - j;
+	 	I = J*N2 + k;
   		e = 2 * I;
 
     	reMx = fftMx[e  ];

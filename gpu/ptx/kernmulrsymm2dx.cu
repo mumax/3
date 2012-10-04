@@ -14,7 +14,7 @@
 // aaaaa
 //
 extern "C" __global__ void 
-kernmulRSymm2D(float* fftMx, float* fftKxx, int N1, int N2){
+kernmulRSymm2Dx(float* fftMx, float* fftKxx, int N1, int N2){
 
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;

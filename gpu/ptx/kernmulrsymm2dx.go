@@ -11,14 +11,14 @@ const KERNMULRSYMM2DX = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00005388_00000000-9_kernmulrsymm2dx.cpp3.i"
+	.file	1 "/tmp/tmpxft_00005725_00000000-9_kernmulrsymm2dx.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/kernmulrsymm2dx.cu"
 
-.visible .entry kernmulRSymm2D(
-	.param .u64 kernmulRSymm2D_param_0,
-	.param .u64 kernmulRSymm2D_param_1,
-	.param .u32 kernmulRSymm2D_param_2,
-	.param .u32 kernmulRSymm2D_param_3
+.visible .entry kernmulRSymm2Dx(
+	.param .u64 kernmulRSymm2Dx_param_0,
+	.param .u64 kernmulRSymm2Dx_param_1,
+	.param .u32 kernmulRSymm2Dx_param_2,
+	.param .u32 kernmulRSymm2Dx_param_3
 )
 {
 	.reg .pred 	%p<5>;
@@ -27,10 +27,10 @@ const KERNMULRSYMM2DX = `
 	.reg .s64 	%rd<11>;
 
 
-	ld.param.u64 	%rd3, [kernmulRSymm2D_param_0];
-	ld.param.u64 	%rd4, [kernmulRSymm2D_param_1];
-	ld.param.u32 	%r3, [kernmulRSymm2D_param_2];
-	ld.param.u32 	%r4, [kernmulRSymm2D_param_3];
+	ld.param.u64 	%rd3, [kernmulRSymm2Dx_param_0];
+	ld.param.u64 	%rd4, [kernmulRSymm2Dx_param_1];
+	ld.param.u32 	%r3, [kernmulRSymm2Dx_param_2];
+	ld.param.u32 	%r4, [kernmulRSymm2Dx_param_3];
 	cvta.to.global.u64 	%rd1, %rd3;
 	cvta.to.global.u64 	%rd2, %rd4;
 	.loc 2 19 1

@@ -8,21 +8,22 @@ import (
 )
 
 type Symm2 struct {
-	size        [3]int              // 3D size of the input/output data
-	kernSize    [3]int              // Size of kernel and logical FFT size.
-	fftKernSize [3]int              // Size of real, FFTed kernel
-	n           int                 // product of size
-	input       [3]gpu.RChan        // TODO: fuse with input
-	output      [3]gpu.Chan         // TODO: fuse with output
-	fftRBuf     [3]safe.Float32s    // Real ("input") buffers for FFT, shares underlying storage with fftCBuf
-	fftCBuf     [3]safe.Complex64s  // Complex ("output") for FFT, shares underlying storage with fftRBuf
-	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
-	fwPlan      safe.FFT3DR2CPlan   // Forward FFT (1 component)
-	bwPlan      safe.FFT3DC2RPlan   // Backward FFT (1 component)
-	stream      cu.Stream           // 
-	kern        [3][3][]float32     // Real-space kernel
-	kernArr     [3][3][][][]float32 // Real-space kernel
-	fftKern     [3][3][]float32     // FFT kernel on host
+	size        [3]int             // 3D size of the input/output data
+	kernSize    [3]int             // Size of kernel and logical FFT size.
+	fftKernSize [3]int             // Size of real, FFTed kernel
+	n           int                // product of size
+	input       [3]gpu.RChan       // TODO: fuse with input
+	output      [3]gpu.Chan        // TODO: fuse with output
+	fftRBuf     [2]safe.Float32s   // FFT input buf for FFT, shares storage with fftCBuf. 
+	fftCBuf     [2]safe.Complex64s // FFT output buf, shares storage with fftRBuf
+	//                                element [0] used for X; elements [0],[1] for Y, Z
+	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	fwPlan     safe.FFT3DR2CPlan   // Forward FFT (1 component)
+	bwPlan     safe.FFT3DC2RPlan   // Backward FFT (1 component)
+	stream     cu.Stream           // 
+	kern       [3][3][]float32     // Real-space kernel
+	kernArr    [3][3][][][]float32 // Real-space kernel
+	fftKern    [3][3][]float32     // FFT kernel on host
 }
 
 func (c *Symm2) init() {
@@ -68,7 +69,7 @@ func (c *Symm2) init() {
 	}
 
 	{ // init device buffers
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 2; i++ {
 			c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
 		}
@@ -82,37 +83,51 @@ func (c *Symm2) Run() {
 
 	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
+	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
+
 	for {
 
-		// FW FFT
-		for i := 0; i < 3; i++ {
+		// FFT x
+		c.input[0].ReadNext(c.n)
+		c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
+		copyPad(c.fftRBuf[0], c.input[0].UnsafeData(), padded, c.size, offset, c.stream)
+		c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
+		c.stream.Synchronize()
+		c.input[0].ReadDone()
+
+		// kern mul X	
+		kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
+		c.stream.Synchronize()
+
+		// bw FFT x
+		c.output[0].WriteNext(c.n)
+		c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
+		copyPad(c.output[0].UnsafeData(), c.fftRBuf[0], c.size, padded, offset, c.stream)
+		c.stream.Synchronize()
+		c.output[0].WriteDone()
+
+		// FW FFT yz
+		for i := 1; i < 3; i++ {
 			c.input[i].ReadNext(c.n)
-
-			c.fftRBuf[i].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-			copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
-			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+			c.fftRBuf[i-1].MemsetAsync(0, c.stream)
+			copyPad(c.fftRBuf[i-1], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
+			c.fwPlan.Exec(c.fftRBuf[i-1], c.fftCBuf[i-1])
 			c.stream.Synchronize()
-
 			c.input[i].ReadDone()
 		}
 
-		// kern mul
-		N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
-		kernMulRSymm2D(c.fftCBuf,
-			c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-			c.gpuFFTKern[1][2], //c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-			N1, N2,
-			c.stream)
+		// kern mul yz
+		kernMulRSymm2Dyz(c.fftCBuf[0], c.fftCBuf[1],
+			c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
+			N1, N2, c.stream)
 		c.stream.Synchronize()
 
-		// BW FFT
-		for i := 0; i < 3; i++ {
+		// BW FFT yz
+		for i := 1; i < 3; i++ {
 			c.output[i].WriteNext(c.n)
-
-			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
+			c.bwPlan.Exec(c.fftCBuf[i-1], c.fftRBuf[i-1])
+			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i-1], c.size, padded, offset, c.stream)
 			c.stream.Synchronize()
-
 			c.output[i].WriteDone()
 		}
 	}

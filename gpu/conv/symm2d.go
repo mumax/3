@@ -87,17 +87,22 @@ func (c *Symm2) Run() {
 
 	for {
 
+		// Convolution is separated into 
+		// a 1D convolution for x
+		// and a 2D convolution for yz
+		// Only 2 FFT buffers are then needed at the same time.
+
 		// FFT x
 		c.input[0].ReadNext(c.n)
 		c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
 		copyPad(c.fftRBuf[0], c.input[0].UnsafeData(), padded, c.size, offset, c.stream)
 		c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
-		c.stream.Synchronize()
+		//c.stream.Synchronize()
 		c.input[0].ReadDone()
 
 		// kern mul X	
 		kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
-		c.stream.Synchronize()
+		//c.stream.Synchronize()
 
 		// bw FFT x
 		c.output[0].WriteNext(c.n)

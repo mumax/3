@@ -35,14 +35,26 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
  		return;	
 	}
 
---- TODO: loop over entire array, fetch half Kernel
-
 	int I = j*N2 + k; // linear index
+	int I2 = (N1-j)*N2 + k; // linear index
 
-    float Kxx = fftKxx[I];  --- branch here?
-    float Kyy = fftKyy[I];
-    float Kzz = fftKzz[I];
-    float Kyz = fftKyz[I];
+    float Kxx;
+    float Kyy;
+    float Kzz;
+    float Kyz;
+
+	if (j <= N1/2 + 1){
+		Kxx = fftKxx[I];
+		Kyy = fftKyy[I];
+		Kzz = fftKzz[I];
+		Kyz = fftKyz[I];
+	}else{
+		Kxx = fftKxx[I2];
+		Kyy = fftKyy[I2];
+		Kzz = fftKzz[I2];
+		Kyz = -fftKyz[I2];
+	}
+
 
   	int e = 2 * I;
 

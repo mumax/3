@@ -57,8 +57,8 @@ func (c *Symm2) init() {
 					scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 					c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 					c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-					core.Log("K", i, j)
-					core.Printf("% 9f", core.Reshape(c.fftKern[i][j], c.fftKernSize))
+					//	core.Log("K", i, j)
+					//	core.Printf("% 9f", core.Reshape(c.fftKern[i][j], c.fftKernSize))
 				}
 			}
 		}

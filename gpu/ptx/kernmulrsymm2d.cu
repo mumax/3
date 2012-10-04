@@ -35,15 +35,15 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
  		return;	
 	}
 
-	int I = j*N2 + k; // linear index
-	int I2 = (N1-j)*N2 + k; // linear index
+	int I = j*N2 + k;       // linear index for upper half of kernel
+	int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
 
     float Kxx;
     float Kyy;
     float Kzz;
     float Kyz;
 
-	if (j <= N1/2 + 1){
+	if (j < N1/2 + 1){
 		Kxx = fftKxx[I];
 		Kyy = fftKyy[I];
 		Kzz = fftKzz[I];
@@ -65,6 +65,7 @@ kernmulRSymm2D(float* fftMx,  float* fftMy,  float* fftMz,
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
+	// TODO: split in 1D + 2D
     fftMx[e  ] = reMx * Kxx;
     fftMx[e+1] = imMx * Kxx;
     fftMy[e  ] =            reMy * Kyy + reMz * Kyz;

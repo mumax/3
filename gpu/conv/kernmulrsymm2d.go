@@ -14,8 +14,7 @@ var kernMulRSymm2DCode cu.Function
 // Kernel multiplication with purely real, symmetric kernel.
 func kernMulRSymm2D(fftM [3]safe.Complex64s, K00, K11, K22, K12 safe.Float32s, N1, N2 int, stream cu.Stream) {
 
-	core.Assert(fftM[0].Len() == K00.Len())
-	core.Assert(fftM[0].Len() == N1*N2)
+	core.Assert(K00.Len() == (N1/2+1)*N2)
 
 	if kernMulRSymm2DCode == 0 {
 		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM2D)

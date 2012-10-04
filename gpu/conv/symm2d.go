@@ -137,6 +137,14 @@ func (c *Symm2D) Run() {
 	}
 }
 
+func(c*Symm2D)is2D()bool{
+	return c.size[0] == 1
+}
+
+func(c*Symm2D)is3D()bool{
+	return !c.is2D()
+}
+
 func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2D {
 	core.Assert(size[0] == 1) // 3D not supported
 	c := new(Symm2D)

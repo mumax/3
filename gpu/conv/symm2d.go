@@ -8,21 +8,21 @@ import (
 )
 
 type Symm2D struct {
-	size        [3]int             // 3D size of the input/output data
-	kernSize    [3]int             // Size of kernel and logical FFT size.
-	fftKernSize [3]int             // Size of real, FFTed kernel
-	n           int                // product of size
-	input       [3]gpu.RChan       // TODO: fuse with input
-	output      [3]gpu.Chan        // TODO: fuse with output
-	fftRBuf     [3]safe.Float32s   // FFT input buf for FFT, shares storage with fftCBuf. 
-	fftCBuf     [3]safe.Complex64s // FFT output buf, shares storage with fftRBuf
-	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
-	fwPlan     safe.FFT3DR2CPlan   // Forward FFT (1 component)
-	bwPlan     safe.FFT3DC2RPlan   // Backward FFT (1 component)
-	stream     cu.Stream           // 
-	kern       [3][3][]float32     // Real-space kernel
-	kernArr    [3][3][][][]float32 // Real-space kernel
-	fftKern    [3][3][]float32     // FFT kernel on host
+	size        [3]int              // 3D size of the input/output data
+	kernSize    [3]int              // Size of kernel and logical FFT size.
+	fftKernSize [3]int              // Size of real, FFTed kernel
+	n           int                 // product of size
+	input       [3]gpu.RChan        // TODO: fuse with input
+	output      [3]gpu.Chan         // TODO: fuse with output
+	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf. 
+	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
+	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
+	fwPlan      safe.FFT3DR2CPlan   // Forward FFT (1 component)
+	bwPlan      safe.FFT3DC2RPlan   // Backward FFT (1 component)
+	stream      cu.Stream           // 
+	kern        [3][3][]float32     // Real-space kernel
+	kernArr     [3][3][][][]float32 // Real-space kernel
+	fftKern     [3][3][]float32     // FFT kernel on host
 }
 
 func (c *Symm2D) init() {
@@ -66,8 +66,15 @@ func (c *Symm2D) init() {
 	}
 
 	{ // init device buffers
-		for i := 0; i < 3; i++ {
+		for i := 1; i < 3; i++ {
 			c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+		}
+		if c.is3D() {
+			c.fftCBuf[0] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+		} else {
+			c.fftCBuf[0] = c.fftCBuf[1]
+		}
+		for i := 0; i < 3; i++ {
 			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
 		}
 	}
@@ -135,11 +142,11 @@ func (c *Symm2D) Run() {
 	}
 }
 
-func(c*Symm2D)is2D()bool{
+func (c *Symm2D) is2D() bool {
 	return c.size[0] == 1
 }
 
-func(c*Symm2D)is3D()bool{
+func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 

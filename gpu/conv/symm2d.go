@@ -37,33 +37,7 @@ func (c *Symm2D) init() {
 		c.bwPlan.SetStream(c.stream)
 	}
 
-	{ // init FFT kernel
-		ffted := fftR2COutputSizeFloats(padded)
-		realsize := ffted
-		realsize[2] /= 2
-		c.fftKernSize = realsize
-		halfkern := realsize
-		halfkern[1] = halfkern[1]/2 + 1
-		fwPlan := c.fwPlan
-		output := safe.MakeComplex64s(fwPlan.OutputLen())
-		input := output.Float().Slice(0, fwPlan.InputLen())
-
-		// upper triangular part
-		for i := 0; i < 3; i++ {
-			for j := i; j < 3; j++ {
-				if c.kern[i][j] != nil { // ignore 0's
-					input.CopyHtoD(c.kern[i][j])
-					fwPlan.Exec(input, output)
-					fwPlan.Stream().Synchronize() // !!
-					c.fftKern[i][j] = make([]float32, prod(halfkern))
-					scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-					c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-					c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-				}
-			}
-		}
-		output.Free()
-	}
+	c.initFFTKern2D()
 
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
@@ -77,6 +51,35 @@ func (c *Symm2D) init() {
 		}
 		for i := 0; i < 3; i++ {
 			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
+		}
+	}
+}
+
+func (c *Symm2D) initFFTKern2D() {
+	padded := c.kernSize
+	ffted := fftR2COutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
+	c.fftKernSize = realsize
+	halfkern := realsize
+	halfkern[1] = halfkern[1]/2 + 1
+	fwPlan := c.fwPlan
+	output := safe.MakeComplex64s(fwPlan.OutputLen())
+	defer output.Free()
+	input := output.Float().Slice(0, fwPlan.InputLen())
+
+	// upper triangular part
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			if c.kern[i][j] != nil { // ignore 0's
+				input.CopyHtoD(c.kern[i][j])
+				fwPlan.Exec(input, output)
+				fwPlan.Stream().Synchronize() // !!
+				c.fftKern[i][j] = make([]float32, prod(halfkern))
+				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
+				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+			}
 		}
 	}
 }
@@ -95,7 +98,38 @@ func (c *Symm2D) Exec() {
 	if c.is2D() {
 		c.exec2D()
 	} else {
-		panic("c.exec3D()")
+		c.exec3D()
+	}
+}
+
+func (c *Symm2D) exec3D() {
+	padded := c.kernSize
+	offset := [3]int{0, 0, 0}
+
+	//N0, N1, N2 := cc.fftKernSize[1], c.fftKernSize[2]
+	for i := 0; i < 3; i++ {
+		c.input[i].ReadNext(c.n)
+		c.fftRBuf[i].MemsetAsync(0, c.stream)
+		copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		c.stream.Synchronize()
+		c.input[i].ReadDone()
+	}
+
+	// kern mul
+	kernMulRSymm(c.fftCBuf,
+		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
+		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+		c.stream)
+	c.stream.Synchronize()
+
+	// BW FFT 
+	for i := 0; i < 3; i++ {
+		c.output[i].WriteNext(c.n)
+		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
+		c.stream.Synchronize()
+		c.output[i].WriteDone()
 	}
 }
 
@@ -163,7 +197,6 @@ func (c *Symm2D) is3D() bool {
 }
 
 func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2D {
-	core.Assert(size[0] == 1) // 3D not supported
 	c := new(Symm2D)
 	c.size = size
 	c.kernArr = kernel

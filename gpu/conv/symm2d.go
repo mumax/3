@@ -14,9 +14,8 @@ type Symm2D struct {
 	n           int                // product of size
 	input       [3]gpu.RChan       // TODO: fuse with input
 	output      [3]gpu.Chan        // TODO: fuse with output
-	fftRBuf     [2]safe.Float32s   // FFT input buf for FFT, shares storage with fftCBuf. 
-	fftCBuf     [2]safe.Complex64s // FFT output buf, shares storage with fftRBuf
-	//                                element [0] used for X; elements [0],[1] for Y, Z
+	fftRBuf     [3]safe.Float32s   // FFT input buf for FFT, shares storage with fftCBuf. 
+	fftCBuf     [3]safe.Complex64s // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 	fwPlan     safe.FFT3DR2CPlan   // Forward FFT (1 component)
 	bwPlan     safe.FFT3DC2RPlan   // Backward FFT (1 component)
@@ -67,7 +66,7 @@ func (c *Symm2D) init() {
 	}
 
 	{ // init device buffers
-		for i := 0; i < 2; i++ {
+		for i := 0; i < 3; i++ {
 			c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
 		}
@@ -110,18 +109,17 @@ func (c *Symm2D) Run() {
 		c.output[0].WriteDone()
 
 		// FW FFT yz
-		// use FFT buffers 0 and 1 (not 1, 2) -> fftBuf[i-1]
 		for i := 1; i < 3; i++ {
 			c.input[i].ReadNext(c.n)
-			c.fftRBuf[i-1].MemsetAsync(0, c.stream)
-			copyPad(c.fftRBuf[i-1], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
-			c.fwPlan.Exec(c.fftRBuf[i-1], c.fftCBuf[i-1])
+			c.fftRBuf[i].MemsetAsync(0, c.stream)
+			copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
+			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 			c.stream.Synchronize()
 			c.input[i].ReadDone()
 		}
 
 		// kern mul yz
-		kernMulRSymm2Dyz(c.fftCBuf[0], c.fftCBuf[1],
+		kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
 			c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
 			N1, N2, c.stream)
 		c.stream.Synchronize()
@@ -129,8 +127,8 @@ func (c *Symm2D) Run() {
 		// BW FFT yz
 		for i := 1; i < 3; i++ {
 			c.output[i].WriteNext(c.n)
-			c.bwPlan.Exec(c.fftCBuf[i-1], c.fftRBuf[i-1])
-			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i-1], c.size, padded, offset, c.stream)
+			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
 			c.stream.Synchronize()
 			c.output[i].WriteDone()
 		}

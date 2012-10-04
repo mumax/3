@@ -86,60 +86,71 @@ func (c *Symm2D) Run() {
 	gpu.LockCudaThread()
 	c.init()
 
+	for {
+		c.Exec()
+	}
+}
+
+func (c *Symm2D) Exec() {
+	if c.is2D() {
+		c.exec2D()
+	} else {
+		panic("c.exec3D()")
+	}
+}
+
+func (c *Symm2D) exec2D() {
 	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
+
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
+	// Convolution is separated into 
+	// a 1D convolution for x
+	// and a 2D convolution for yz.
+	// so only 2 FFT buffers are then needed at the same time.
 
-	for {
+	// FFT x
+	c.input[0].ReadNext(c.n)
+	c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
+	copyPad(c.fftRBuf[0], c.input[0].UnsafeData(), padded, c.size, offset, c.stream)
+	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
+	//c.stream.Synchronize()
+	c.input[0].ReadDone()
 
-		// Convolution is separated into 
-		// a 1D convolution for x
-		// and a 2D convolution for yz.
-		// so only 2 FFT buffers are then needed at the same time.
+	// kern mul X	
+	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
+	//c.stream.Synchronize()
 
-		// FFT x
-		c.input[0].ReadNext(c.n)
-		c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-		copyPad(c.fftRBuf[0], c.input[0].UnsafeData(), padded, c.size, offset, c.stream)
-		c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
-		//c.stream.Synchronize()
-		c.input[0].ReadDone()
+	// bw FFT x
+	c.output[0].WriteNext(c.n)
+	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
+	copyPad(c.output[0].UnsafeData(), c.fftRBuf[0], c.size, padded, offset, c.stream)
+	c.stream.Synchronize()
+	c.output[0].WriteDone()
 
-		// kern mul X	
-		kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
-		//c.stream.Synchronize()
-
-		// bw FFT x
-		c.output[0].WriteNext(c.n)
-		c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-		copyPad(c.output[0].UnsafeData(), c.fftRBuf[0], c.size, padded, offset, c.stream)
+	// FW FFT yz
+	for i := 1; i < 3; i++ {
+		c.input[i].ReadNext(c.n)
+		c.fftRBuf[i].MemsetAsync(0, c.stream)
+		copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 		c.stream.Synchronize()
-		c.output[0].WriteDone()
+		c.input[i].ReadDone()
+	}
 
-		// FW FFT yz
-		for i := 1; i < 3; i++ {
-			c.input[i].ReadNext(c.n)
-			c.fftRBuf[i].MemsetAsync(0, c.stream)
-			copyPad(c.fftRBuf[i], c.input[i].UnsafeData(), padded, c.size, offset, c.stream)
-			c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-			c.stream.Synchronize()
-			c.input[i].ReadDone()
-		}
+	// kern mul yz
+	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
+		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
+		N1, N2, c.stream)
+	c.stream.Synchronize()
 
-		// kern mul yz
-		kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
-			c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-			N1, N2, c.stream)
+	// BW FFT yz
+	for i := 1; i < 3; i++ {
+		c.output[i].WriteNext(c.n)
+		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
 		c.stream.Synchronize()
-
-		// BW FFT yz
-		for i := 1; i < 3; i++ {
-			c.output[i].WriteNext(c.n)
-			c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-			copyPad(c.output[i].UnsafeData(), c.fftRBuf[i], c.size, padded, offset, c.stream)
-			c.stream.Synchronize()
-			c.output[i].WriteDone()
-		}
+		c.output[i].WriteDone()
 	}
 }
 

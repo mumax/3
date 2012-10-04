@@ -12,7 +12,7 @@ type SymmetricHtoD struct {
 	hostin        core.RChan3
 	devin, devout [3]gpu.Chan
 	hostout       core.Chan3
-	convolution   *Symm2
+	convolution   *Symm2D
 }
 
 func (c *SymmetricHtoD) Run() {
@@ -28,7 +28,7 @@ func NewSymmetricHtoD(size [3]int, kernel [3][3][][][]float32, input core.RChan3
 		c.devin[i] = gpu.MakeChan(size, fmt.Sprint("devin", i))
 		c.devout[i] = gpu.MakeChan(size, fmt.Sprint("devout", i))
 	}
-	c.convolution = NewSymm2(size, kernel, make3RChan(c.devin), c.devout)
+	c.convolution = NewSymm2D(size, kernel, make3RChan(c.devin), c.devout)
 	c.hostin = input
 	c.hostout = output
 	return c

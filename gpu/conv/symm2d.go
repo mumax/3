@@ -7,7 +7,7 @@ import (
 	"nimble-cube/gpu"
 )
 
-type Symm2 struct {
+type Symm2D struct {
 	size        [3]int             // 3D size of the input/output data
 	kernSize    [3]int             // Size of kernel and logical FFT size.
 	fftKernSize [3]int             // Size of real, FFTed kernel
@@ -26,7 +26,7 @@ type Symm2 struct {
 	fftKern    [3][3][]float32     // FFT kernel on host
 }
 
-func (c *Symm2) init() {
+func (c *Symm2D) init() {
 	core.Log("initializing 2D symmetric convolution")
 	padded := c.kernSize
 
@@ -60,8 +60,6 @@ func (c *Symm2) init() {
 					scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
 					c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 					c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-					//	core.Log("K", i, j)
-					//	core.Printf("% 9f", core.Reshape(c.fftKern[i][j], c.fftKernSize))
 				}
 			}
 		}
@@ -76,7 +74,7 @@ func (c *Symm2) init() {
 	}
 }
 
-func (c *Symm2) Run() {
+func (c *Symm2D) Run() {
 	core.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
 	c.init()
@@ -89,8 +87,8 @@ func (c *Symm2) Run() {
 
 		// Convolution is separated into 
 		// a 1D convolution for x
-		// and a 2D convolution for yz
-		// Only 2 FFT buffers are then needed at the same time.
+		// and a 2D convolution for yz.
+		// so only 2 FFT buffers are then needed at the same time.
 
 		// FFT x
 		c.input[0].ReadNext(c.n)
@@ -112,6 +110,7 @@ func (c *Symm2) Run() {
 		c.output[0].WriteDone()
 
 		// FW FFT yz
+		// use FFT buffers 0 and 1 (not 1, 2) -> fftBuf[i-1]
 		for i := 1; i < 3; i++ {
 			c.input[i].ReadNext(c.n)
 			c.fftRBuf[i-1].MemsetAsync(0, c.stream)
@@ -138,9 +137,9 @@ func (c *Symm2) Run() {
 	}
 }
 
-func NewSymm2(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2 {
-	core.Assert(size[0] == 1) // 2D not yet supported
-	c := new(Symm2)
+func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2D {
+	core.Assert(size[0] == 1) // 3D not supported
+	c := new(Symm2D)
 	c.size = size
 	c.kernArr = kernel
 	for i := 0; i < 3; i++ {

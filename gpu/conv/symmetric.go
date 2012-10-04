@@ -261,6 +261,8 @@ func (c *Symmetric) initFFTKern() {
 // In the meanwhile, check if imaginary parts are nearly zero
 // and scale the kernel to compensate for unnormalized FFTs.
 func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
+	//core.Panicf("len(dstList)=%v, src.Len()=%v", len(dstList), src.Len())
+	core.Assert(2*len(dstList) == src.Len())
 	srcList := src.Host()
 
 	// Normally, the FFT'ed kernel is purely real because of symmetry,

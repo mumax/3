@@ -42,6 +42,8 @@ func (c *Symm2) init() {
 		realsize := ffted
 		realsize[2] /= 2
 		c.fftKernSize = realsize
+		halfkern := realsize
+		halfkern[1] = halfkern[1] // / 2 + 1
 		fwPlan := c.fwPlan
 		output := safe.MakeComplex64s(fwPlan.OutputLen())
 		input := output.Float().Slice(0, fwPlan.InputLen())
@@ -53,7 +55,7 @@ func (c *Symm2) init() {
 					input.CopyHtoD(c.kern[i][j])
 					fwPlan.Exec(input, output)
 					fwPlan.Stream().Synchronize() // !!
-					c.fftKern[i][j] = make([]float32, prod(realsize))
+					c.fftKern[i][j] = make([]float32, prod(halfkern))
 					scaleRealParts(c.fftKern[i][j], output.Float(), 1/float32(fwPlan.InputLen()))
 					c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
 					c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])

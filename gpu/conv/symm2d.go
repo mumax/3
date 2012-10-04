@@ -66,6 +66,7 @@ func (c *Symm2D) init() {
 	}
 
 	{ // init device buffers
+		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
 		for i := 1; i < 3; i++ {
 			c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		}

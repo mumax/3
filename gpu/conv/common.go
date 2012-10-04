@@ -2,7 +2,12 @@ package conv
 
 // common code for all convolutions.
 
-import "github.com/barnex/cuda4/cu"
+import (
+	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda4/safe"
+	"github.com/barnex/fmath"
+	"nimble-cube/core"
+)
 
 // CUDA root stream.
 const stream0 cu.Stream = 0
@@ -42,6 +47,6 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	//core.Debug("FFT Kernel max real part=", maxreal)
 	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
-		panic(fmt.Errorf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal))
+		core.Panicf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal)
 	}
 }

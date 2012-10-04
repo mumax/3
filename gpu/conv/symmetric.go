@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/barnex/cuda4/cu"
 	"github.com/barnex/cuda4/safe"
-	"github.com/barnex/fmath"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
 )

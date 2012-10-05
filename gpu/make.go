@@ -18,6 +18,10 @@ func MakeFloats(N int) safe.Float32s {
 	return s
 }
 
+func MakeComplexs(N int) safe.Complex64s{
+	return MakeFloats(2 * N).Complex()
+}
+
 func HostFloats(N int) safe.Float32s{
 	var s safe.Float32s
 	ptr := cu.MemAllocHost(cu.SIZEOF_FLOAT32 * int64(N))

@@ -5,6 +5,7 @@ import (
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
+	"unsafe"
 )
 
 type Symm2D struct {
@@ -22,7 +23,7 @@ type Symm2D struct {
 	stream      cu.Stream           // 
 	kern        [3][3][]float32     // Real-space kernel
 	kernArr     [3][3][][][]float32 // Real-space kernel
-	fftKern     [3][3][]float32     // FFT kernel on host
+	//fftKern     [3][3][]float32     // FFT kernel on host
 }
 
 func (c *Symm2D) init() {
@@ -37,25 +38,25 @@ func (c *Symm2D) init() {
 		c.bwPlan.SetStream(c.stream)
 	}
 
-	if c.is2D() {
-		c.initFFTKern2D()
-	} else {
-		c.initFFTKern3D()
-	}
-
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
 		for i := 1; i < 3; i++ {
-			c.fftCBuf[i] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[i] = gpu.MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		}
 		if c.is3D() {
-			c.fftCBuf[0] = safe.MakeComplex64s(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[0] = gpu.MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		} else {
 			c.fftCBuf[0] = c.fftCBuf[1]
 		}
 		for i := 0; i < 3; i++ {
 			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
 		}
+	}
+
+	if c.is2D() {
+		c.initFFTKern2D()
+	} else {
+		c.initFFTKern3D()
 	}
 }
 
@@ -73,16 +74,16 @@ func (c *Symm2D) initFFTKern3D() {
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	// upper triangular part
+	fftKern := make([]float32, prod(halfkern))
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			if c.kern[i][j] != nil { // ignore 0's
 				input.CopyHtoD(c.kern[i][j])
 				fwPlan.Exec(input, output)
 				fwPlan.Stream().Synchronize() // !!
-				c.fftKern[i][j] = make([]float32, prod(halfkern))
-				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(fftKern))
+				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
 			}
 		}
 	}
@@ -99,21 +100,21 @@ func (c *Symm2D) initFFTKern2D() {
 	halfkern := realsize
 	halfkern[1] = halfkern[1]/2 + 1
 	fwPlan := c.fwPlan
-	output := safe.MakeComplex64s(fwPlan.OutputLen())
-	defer output.Free()
+	output := gpu.HostFloats(2 * fwPlan.OutputLen()).Complex()
+	defer cu.MemFreeHost(unsafe.Pointer(output.Pointer())) // TODO: is Float32s safe with uintptr?
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	// upper triangular part
+	fftKern := make([]float32, prod(halfkern))
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			if c.kern[i][j] != nil { // ignore 0's
 				input.CopyHtoD(c.kern[i][j])
 				fwPlan.Exec(input, output)
 				fwPlan.Stream().Synchronize() // !!
-				c.fftKern[i][j] = make([]float32, prod(halfkern))
-				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = gpu.MakeFloats(len(c.fftKern[i][j]))
-				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = gpu.MakeFloats(len(fftKern))
+				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
 			}
 		}
 	}

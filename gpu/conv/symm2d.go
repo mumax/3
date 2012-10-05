@@ -112,11 +112,7 @@ func (c *Symm2D) initFFTKern2D() {
 				fwPlan.Stream().Synchronize() // !!
 				c.fftKern[i][j] = make([]float32, prod(halfkern))
 				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = safe.MakeFloat32s(0) //len(c.fftKern[i][j]))
-				//c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-				//gpu.MemHostRegister(c.fftKern[i][i])
-				ptr := cu.MemAllocHost(4 * int64(len(c.fftKern[i][j])))
-				c.gpuFFTKern[i][j].UnsafeSet(ptr, len(c.fftKern[i][j]), len(c.fftKern[i][j]))
+				c.gpuFFTKern[i][j] = gpu.MakeFloats(len(c.fftKern[i][j]))
 				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
 			}
 		}

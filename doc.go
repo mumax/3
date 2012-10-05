@@ -1,5 +1,5 @@
 /*
-	Go bindings for nVIDIA CUDA 4.
+	Go bindings for nVIDIA CUDA 5.
 	This package compiles with both gc and gccgo.	
 */
 package cuda5

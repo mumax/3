@@ -3,7 +3,7 @@ PACKAGE
 package cuda5
     import "github.com/barnex/cuda5"
 
-    Go bindings for nVIDIA CUDA 4. This package compiles with both gc and
+    Go bindings for nVIDIA CUDA 5. This package compiles with both gc and
     gccgo.
 
 SUBDIRECTORIES

@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda4/safe"
+	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
 )
 

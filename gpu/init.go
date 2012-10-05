@@ -2,7 +2,7 @@ package gpu
 
 import (
 	"flag"
-	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda5/cu"
 	"nimble-cube/core"
 	"runtime"
 	"sync/atomic"

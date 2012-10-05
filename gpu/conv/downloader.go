@@ -1,7 +1,7 @@
 package conv
 
 import (
-	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda5/cu"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
 )

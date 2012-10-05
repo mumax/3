@@ -1,10 +1,11 @@
 package conv
 
 import (
-	"github.com/barnex/cuda4/cu"
-	"github.com/barnex/cuda4/safe"
+	"github.com/barnex/cuda5/cu"
+	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
+	"unsafe"
 )
 
 type Symm2D struct {
@@ -37,7 +38,11 @@ func (c *Symm2D) init() {
 		c.bwPlan.SetStream(c.stream)
 	}
 
-	c.initFFTKern2D()
+	if c.is2D() {
+		c.initFFTKern2D()
+	} else {
+		c.initFFTKern3D()
+	}
 
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
@@ -55,6 +60,37 @@ func (c *Symm2D) init() {
 	}
 }
 
+func (c *Symm2D) initFFTKern3D() {
+	padded := c.kernSize
+	ffted := fftR2COutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
+	c.fftKernSize = realsize
+	halfkern := realsize
+	//halfkern[1] = halfkern[1]/2 + 1
+	fwPlan := c.fwPlan
+	output := safe.MakeComplex64s(fwPlan.OutputLen())
+	defer output.Free()
+	input := output.Float().Slice(0, fwPlan.InputLen())
+
+	// upper triangular part
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			if c.kern[i][j] != nil { // ignore 0's
+				input.CopyHtoD(c.kern[i][j])
+				fwPlan.Exec(input, output)
+				fwPlan.Stream().Synchronize() // !!
+				c.fftKern[i][j] = make([]float32, prod(halfkern))
+				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
+				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+			}
+		}
+	}
+}
+
+// Initialize GPU FFT kernel for 2D. 
+// Only the non-redundant parts are stored on the GPU.
 func (c *Symm2D) initFFTKern2D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
@@ -77,8 +113,10 @@ func (c *Symm2D) initFFTKern2D() {
 				fwPlan.Stream().Synchronize() // !!
 				c.fftKern[i][j] = make([]float32, prod(halfkern))
 				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(c.fftKern[i][j]))
-				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+				c.gpuFFTKern[i][j] = safe.MakeFloat32s(0) //len(c.fftKern[i][j]))
+				//c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
+				gpu.MemHostRegister(c.fftKern[i][i])
+				c.gpuFFTKern[i][j].UnsafeSet(unsafe.Pointer(&c.fftKern[i][j]), len(c.fftKern[i][j]), len(c.fftKern[i][j]))
 			}
 		}
 	}

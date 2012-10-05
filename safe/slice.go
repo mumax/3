@@ -13,10 +13,13 @@ import (
 // internal base func for all makeXXX() functions
 func makeslice(len_ int, elemsize int) slice {
 	bytes := int64(len_) * int64(elemsize)
-	ptr := cu.MemAlloc(bytes)
-	cu.MemsetD8(ptr, 0, bytes)
-	cu.CtxSynchronize()
-	return slice{ptr, len_, len_}
+	s := slice{0, len_, len_}
+	if bytes > 0 {
+		s.ptr_ = cu.MemAlloc(bytes)
+		cu.MemsetD8(s.ptr_, 0, bytes)
+		cu.CtxSynchronize()
+	}
+	return s
 }
 
 // internal base type for all slices
@@ -97,4 +100,12 @@ func (dst *slice) copyDtoDAsync(src *slice, elemsize int, stream cu.Stream) {
 		panic(fmt.Errorf("cuda4/safe: len mismatch: src.Len()=%v (device), dst.Len()=%v", src.Len(), dst.Len()))
 	}
 	cu.MemcpyDtoDAsync(dst.Pointer(), src.Pointer(), int64(elemsize)*int64(dst.Len()), stream)
+}
+
+// Manually set the pointer, length and capacity.
+// Side-steps the security mechanisms, use with caution.
+func (s *slice) UnsafeSet(pointer unsafe.Pointer, length, capacity int) {
+	s.ptr_ = cu.DevicePtr(pointer)
+	s.len_ = length
+	s.cap_ = capacity
 }

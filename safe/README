@@ -64,6 +64,10 @@ func (s Complex128s) Slice(start, stop int) Complex128s
     underlying storage with the original slice. Slices obtained in this way
     should not be Free()'d
 
+func (s *Complex128s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
 type Complex64s struct {
     // contains filtered or unexported fields
 }
@@ -115,6 +119,10 @@ func (s Complex64s) Slice(start, stop int) Complex64s
     Return a slice from start (inclusive) to stop (exclusive), sharing the
     underlying storage with the original slice. Slices obtained in this way
     should not be Free()'d
+
+func (s *Complex64s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
 
 type FFT1DC2RPlan struct {
     // contains filtered or unexported fields
@@ -390,6 +398,10 @@ func (s Float32s) Slice(start, stop int) Float32s
     underlying storage with the original slice. Slices obtained in this way
     should not be Free()'d
 
+func (s *Float32s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
 type Float64s struct {
     // contains filtered or unexported fields
 }
@@ -441,5 +453,9 @@ func (s Float64s) Slice(start, stop int) Float64s
     Return a slice from start (inclusive) to stop (exclusive), sharing the
     underlying storage with the original slice. Slices obtained in this way
     should not be Free()'d
+
+func (s *Float64s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
 
 

@@ -5,7 +5,6 @@ import (
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
-	"unsafe"
 )
 
 type Symm2D struct {
@@ -115,8 +114,10 @@ func (c *Symm2D) initFFTKern2D() {
 				scaleRealParts(c.fftKern[i][j], output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = safe.MakeFloat32s(0) //len(c.fftKern[i][j]))
 				//c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
-				gpu.MemHostRegister(c.fftKern[i][i])
-				c.gpuFFTKern[i][j].UnsafeSet(unsafe.Pointer(&c.fftKern[i][j]), len(c.fftKern[i][j]), len(c.fftKern[i][j]))
+				//gpu.MemHostRegister(c.fftKern[i][i])
+				ptr := cu.MemAllocHost(4 * int64(len(c.fftKern[i][j])))
+				c.gpuFFTKern[i][j].UnsafeSet(ptr, len(c.fftKern[i][j]), len(c.fftKern[i][j]))
+				c.gpuFFTKern[i][j].CopyHtoD(c.fftKern[i][j])
 			}
 		}
 	}

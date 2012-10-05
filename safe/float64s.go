@@ -2,7 +2,7 @@ package safe
 
 import (
 	"fmt"
-	"github.com/barnex/cuda4/cu"
+	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
 

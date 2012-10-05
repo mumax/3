@@ -2,7 +2,7 @@ package safe
 
 import (
 	"fmt"
-	"github.com/barnex/cuda4/cufft"
+	"github.com/barnex/cuda5/cufft"
 )
 
 // 1D single-precission complex-to-real FFT plan.

@@ -1,7 +1,7 @@
 PACKAGE
 
-package cuda4
-    import "github.com/barnex/cuda4"
+package cuda5
+    import "github.com/barnex/cuda5"
 
     Go bindings for nVIDIA CUDA 4. This package compiles with both gc and
     gccgo.
@@ -9,7 +9,6 @@ package cuda4
 SUBDIRECTORIES
 
 	cu
-	cuda
 	cufft
 	safe
 

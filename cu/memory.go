@@ -183,6 +183,22 @@ func MemHostUnregister(ptr unsafe.Pointer) {
 	}
 }
 
+func MemAllocHost(bytes int64) unsafe.Pointer {
+	var p unsafe.Pointer
+	err := Result(C.cuMemAllocHost(&p, C.size_t(bytes)))
+	if err != SUCCESS {
+		panic(err)
+	}
+	return p
+}
+
+func MemFreeHost(ptr unsafe.Pointer) {
+	err := Result(C.cuMemFreeHost(ptr))
+	if err != SUCCESS {
+		panic(err)
+	}
+}
+
 type MemHostRegisterFlag int
 
 // Flag for MemHostRegister

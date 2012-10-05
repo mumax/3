@@ -30,4 +30,4 @@ clean:
 	go clean
 
 doc:
-	godoc github.com/barnex/cuda4/cu > README
+	godoc github.com/barnex/cuda5/cu > README

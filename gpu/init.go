@@ -30,7 +30,9 @@ func init() {
 	core.Log("CUDA version:", cu.Version())
 	dev := cu.Device(*core.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
-	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB")
+	M, m := dev.ComputeCapability()
+	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+
 }
 
 var lockCount int32

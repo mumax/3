@@ -40,13 +40,11 @@ func main() {
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
 	Stack(dump.NewAutosaver("test4hex.dump", hex.MakeRChan3(), 100))
-	Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 10))
+	Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 100))
 
 	RunStack()
 
-	solver.Steps(1)
-	solver.Steps(1)
-	solver.Steps(1)
+	solver.Steps(10000)
 
 	ProfDump(os.Stdout)
 	Cleanup()

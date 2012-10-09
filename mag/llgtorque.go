@@ -7,12 +7,13 @@ type LLGTorque struct {
 	m, b   core.RChan3
 	alpha  float32
 	bExt   Vector
+	Func func(t, m, B [3][]float32, a float32, b Vector)
 }
 
 func NewLLGTorque(torque core.Chan3, m, B core.RChan3, alpha float32) *LLGTorque {
 	core.Assert(torque.Size() == m.Size())
 	core.Assert(torque.Size() == B.Size())
-	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}}
+	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}, llgTorque}
 }
 
 func (r *LLGTorque) Run() {
@@ -21,7 +22,7 @@ func (r *LLGTorque) Run() {
 		M := r.m.ReadNext(n)
 		B := r.b.ReadNext(n)
 		T := r.torque.WriteNext(n)
-		llgTorque(T, M, B, r.alpha, r.bExt)
+		r.Func(T, M, B, r.alpha, r.bExt)
 		r.torque.WriteDone()
 		r.m.ReadDone()
 		r.b.ReadDone()

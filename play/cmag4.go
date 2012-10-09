@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-	N0, N1, N2 := 1, 32, 128
+	a:=8
+	N0, N1, N2 := 1, a*32, a*128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	size := mesh.GridSize()
@@ -20,7 +21,7 @@ func main() {
 	m := MakeChan3(size, "m")
 	hd := MakeChan3(size, "Hd")
 
-	acc := 8
+	acc := 1
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
 	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
 
@@ -47,7 +48,7 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(10000)
+	solver.Steps(100)
 
 	ProfDump(os.Stdout)
 	Cleanup()

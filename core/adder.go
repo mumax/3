@@ -23,7 +23,17 @@ func (a *Adder3) Run() {
 		}
 		out := a.sum.WriteNext(a.blocksize)
 
-		// add
+		a.add(in, out)
+
+		// unlock
+		a.sum.WriteDone()
+		for _, t := range a.terms {
+			t.ReadDone()
+		}
+	}
+}
+
+func(a*Adder3)add(in [][3][]float32, out [3][]float32){
 		for c := 0; c < 3; c++ {
 			for i := 0; i < len(out[0]); i++ {
 				sum := in[0][c][i] + in[1][c][i]
@@ -33,11 +43,4 @@ func (a *Adder3) Run() {
 				out[c][i] = sum
 			}
 		}
-
-		// unlock
-		a.sum.WriteDone()
-		for _, t := range a.terms {
-			t.ReadDone()
-		}
-	}
 }

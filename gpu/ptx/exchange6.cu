@@ -2,7 +2,6 @@ __global__ void exchange6(float* h, float* m, int N0, int N1, int N2,
                           int wrap0, int wrap1, int wrap2,
                           float fac0, float fac1, float fac2){
 
-
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int k = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -18,13 +17,13 @@ __global__ void exchange6(float* h, float* m, int N0, int N1, int N2,
 	
     	// neighbors in I direction
 		int idx;
-    	if (i-1 >= 0){                                // neighbor in bounds...
-      		idx = (i-1)*N1*N2 + j*N2 + k;         // ... no worries
-    	} else {                                      // neighbor out of bounds...
-			if(wrap0){                                // ... PBC?
-				idx = (N0-1)*N1*N2 + j*N2 + k;    // yes: wrap around!
+    	if (i-1 >= 0){                         // neighbor in bounds...
+      		idx = (i-1)*N1*N2 + j*N2 + k;      // ... no worries
+    	} else {                               // neighbor out of bounds...
+			if(wrap0){                         // ... PBC?
+				idx = (N0-1)*N1*N2 + j*N2 + k; // yes: wrap around!
 			}else{                                    
-      			idx = I;                              // no: use central m (Neumann BC) 
+      			idx = I;                       // no: use central m (Neumann BC) 
 			}
     	}
 		m1 = m[idx];

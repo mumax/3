@@ -29,24 +29,3 @@ func (c *RChan) ReadNext(n int) safe.Float32s {
 func (c *RChan) ReadDone() {
 	c.mutex.ReadDone()
 }
-
-//type Chan3 [3]Chan
-//
-//func MakeChan3(size [3]int) Chan3 {
-//	return Chan3{MakeChan(size), MakeChan(size), MakeChan(size)}
-//}
-//
-//func (c *Chan3) Vectors() [3]safe.Float32s {
-//	return [3]safe.Float32s{c[0].Float32s, c[1].Float32s, c[2].Float32s}
-//}
-//
-//func (c *Chan3) RWMutex() core.RWMutex3 {
-//	return core.RWMutex3{c[0].RWMutex, c[1].RWMutex, c[2].RWMutex}
-//}
-//
-//// Read-only Chan3
-//type RChan3 [3]RChan
-//
-//func (c *Chan3) ReadOnly() RChan3 {
-//	return RChan3{c[0].ReadOnly(), c[1].ReadOnly(), c[2].ReadOnly()}
-//}

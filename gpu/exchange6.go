@@ -81,4 +81,5 @@ func exchange6(h, m [3]safe.Float32s, mesh *core.Mesh, factors [3]float32, strea
 
 	shmem := 0
 	cu.LaunchKernel(exchange6Code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
+	stream.Synchronize()
 }

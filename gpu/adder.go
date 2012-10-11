@@ -28,9 +28,9 @@ func (a *Adder3) Run() {
 
 var maddCode cu.Function
 
-func madd(dst, src safe.Float32s, scale float32, stream cu.Stream) {
+func madd(dst, src1 safe.Float32s, factor1 float32, src2 safe.Float32s, factor2 float32, stream cu.Stream) {
 
-	core.Assert(dst.Len() == src.Len())
+	core.Assert(dst.Len() == src1.Len() && dst.Len() == src2.Len())
 
 	if maddCode == 0 {
 		mod := cu.ModuleLoadData(ptx.MADD)
@@ -41,12 +41,15 @@ func madd(dst, src safe.Float32s, scale float32, stream cu.Stream) {
 	gridDim, blockDim := Make1DConf(N)
 
 	dstptr := dst.Pointer()
-	srcptr := src.Pointer()
+	src1ptr := src1.Pointer()
+	src2ptr := src2.Pointer()
 
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&dstptr),
-		unsafe.Pointer(&srcptr),
-		unsafe.Pointer(&scale),
+		unsafe.Pointer(&src1ptr),
+		unsafe.Pointer(&factor1),
+		unsafe.Pointer(&src2ptr),
+		unsafe.Pointer(&factor2),
 		unsafe.Pointer(&N)}
 
 	shmem := 0

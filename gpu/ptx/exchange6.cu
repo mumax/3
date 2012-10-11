@@ -1,6 +1,7 @@
-__global__ void exchange6(float* h, float* m, int N0, int N1, int N2, 
+__global__ void exchange6(float* h, float* m, 
+                          float fac0, float fac1, float fac2,
                           int wrap0, int wrap1, int wrap2,
-                          float fac0, float fac1, float fac2){
+                          int N0, int N1, int N2){
 
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int k = blockIdx.y * blockDim.y + threadIdx.y;

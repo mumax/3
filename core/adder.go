@@ -33,14 +33,14 @@ func (a *Adder3) Run() {
 	}
 }
 
-func(a*Adder3)add(in [][3][]float32, out [3][]float32){
-		for c := 0; c < 3; c++ {
-			for i := 0; i < len(out[0]); i++ {
-				sum := in[0][c][i] + in[1][c][i]
-				for j := 2; j < len(a.terms); j++ {
-					sum += in[j][c][i]
-				}
-				out[c][i] = sum
+func (a *Adder3) add(in [][3][]float32, out [3][]float32) {
+	for c := 0; c < 3; c++ {
+		for i := 0; i < len(out[0]); i++ {
+			sum := in[0][c][i] + in[1][c][i]
+			for j := 2; j < len(a.terms); j++ {
+				sum += in[j][c][i]
 			}
+			out[c][i] = sum
 		}
+	}
 }

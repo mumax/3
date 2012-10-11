@@ -18,11 +18,11 @@ func MakeFloats(N int) safe.Float32s {
 	return s
 }
 
-func MakeComplexs(N int) safe.Complex64s{
+func MakeComplexs(N int) safe.Complex64s {
 	return MakeFloats(2 * N).Complex()
 }
 
-func HostFloats(N int) safe.Float32s{
+func HostFloats(N int) safe.Float32s {
 	var s safe.Float32s
 	ptr := cu.MemAllocHost(cu.SIZEOF_FLOAT32 * int64(N))
 	s.UnsafeSet(ptr, N, N)
@@ -37,7 +37,7 @@ func tryMalloc(bytes int64) (ptr unsafe.Pointer) {
 			core.Log("out of GPU memory, allocating", MB, "MB on host")
 			ptr = cu.MemAllocHost(bytes)
 			return
-		} else if err != nil{
+		} else if err != nil {
 			panic(err)
 		}
 	}()

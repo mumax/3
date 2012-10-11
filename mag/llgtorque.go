@@ -7,7 +7,7 @@ type LLGTorque struct {
 	m, b   core.RChan3
 	alpha  float32
 	bExt   Vector
-	Func func(t, m, B [3][]float32, a float32, b Vector)
+	Func   func(t, m, B [3][]float32, a float32, b Vector)
 }
 
 func NewLLGTorque(torque core.Chan3, m, B core.RChan3, alpha float32) *LLGTorque {

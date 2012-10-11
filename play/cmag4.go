@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	a:=8
+	a := 8
 	N0, N1, N2 := 1, a*32, a*128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)

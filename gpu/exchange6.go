@@ -8,6 +8,36 @@ import (
 	"unsafe"
 )
 
+type Exchange6 struct {
+	m   RChan3
+	hex Chan3
+	*core.Mesh
+	aex_reduced float64
+	factors [3]float32
+}
+
+func (e *Exchange6) Run() {
+	N := e.NCell()
+	for {
+		m := e.m.ReadNext(N)
+		hex := e.hex.WriteNext(N)
+		exchange6(m, hex, e.CellSize(), e.aex_reduced)
+		e.hex.WriteDone()
+		e.m.ReadDone()
+	}
+}
+
+func NewExchange6(m RChan3, hex Chan3, mesh *core.Mesh, aex_reduced float64) *Exchange6 {
+	e :=  &Exchange6{m:m, hex:hex, mesh:mesh, aex_reduced: aex_reduced}
+	cellsize := mesh.CellSize()
+	for i:=range e.factors{
+		e.factors[i] = float32(aex_reduced / (cellsize[i] * cellsize[i]))
+	}
+	return e
+}
+
+
+
 var exchange6Code cu.Function
 
 //__global__ void exchange6(float* h, float* m, 

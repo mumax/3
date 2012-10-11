@@ -39,10 +39,7 @@ func (e *Exchange6) Run() {
 
 var exchange6Code cu.Function
 
-//__global__ void exchange6(float* h, float* m, 
-//                          float fac0, float fac1, float fac2,
-//                          int wrap0, int wrap1, int wrap2,
-//                          int N0, int N1, int N2){
+//__global__ void exchange6(float* h, float* m, float fac0, float fac1, float fac2, int wrap0, int wrap1, int wrap2, int N0, int N1, int N2){
 func exchange6(h, m [3]safe.Float32s, mesh *core.Mesh, factors [3]float32, stream cu.Stream) {
 
 	core.Assert(h[0].Len() == m[0].Len() && h[0].Len() == mesh.NCell())

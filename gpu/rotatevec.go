@@ -10,8 +10,8 @@ import (
 
 var rotatevecCode cu.Function
 
-// Rotate unit vectors v in the direction of delta.
-func rotatevec(vec, delta [3]safe.Float32s, stream cu.Stream) {
+// Rotate unit vectors v by factor * delta.
+func rotatevec(vec, delta [3]safe.Float32s, factor float32, stream cu.Stream) {
 	core.Assert(vec[0].Len() == delta[0].Len())
 
 	if rotatevecCode == 0 {
@@ -36,6 +36,7 @@ func rotatevec(vec, delta [3]safe.Float32s, stream cu.Stream) {
 		unsafe.Pointer(&d0ptr),
 		unsafe.Pointer(&d1ptr),
 		unsafe.Pointer(&d2ptr),
+		unsafe.Pointer(&factor),
 		unsafe.Pointer(&N)}
 
 	shmem := 0

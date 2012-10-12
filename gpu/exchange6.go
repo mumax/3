@@ -55,7 +55,7 @@ func exchange6(h, m safe.Float32s, mesh *core.Mesh, factors [3]float32, stream c
 	N0, N1, N2 := size[0], size[1], size[2]
 	wrap := mesh.PBC()
 
-	gridDim, blockDim := Make2DConf(N1, N2)
+	gridDim, blockDim := Make2DConf(N2, N1) // why?
 
 	hptr := h.Pointer()
 	mptr := m.Pointer()

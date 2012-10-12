@@ -1,6 +1,6 @@
-all: githook gofmt 6g #gccgo
+all: githook gofmt 6g gccgo
 
-6g:
+6g: ptx
 	go install -v 
 
 gofmt:
@@ -8,8 +8,11 @@ gofmt:
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 
-gccgo:
+gccgo: ptx
 	go build -v -compiler $(GCCGO) 
+
+ptx:
+	make -C gpu/ptx
 
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit

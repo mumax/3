@@ -36,8 +36,8 @@ func main() {
 	torque := MakeChan3(size, "τ")
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
-	var dt float32 = 100e-15
-	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
+	dt := 100e-15
+	solver := mag.NewEuler(m, torque.MakeRChan3(), dt, mag.Gamma)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
 	Stack(dump.NewAutosaver("test4hex.dump", hex.MakeRChan3(), 100))

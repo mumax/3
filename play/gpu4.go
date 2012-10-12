@@ -34,7 +34,7 @@ func main() {
 	Stack(conv.NewSymm2D(size, kernel, mGPU.MakeRChan3(), b))
 
 	const Msat = 1.0053
-	aex := Mu0 * 13e-12 / Msat
+	aex := mag.Mu0 * 13e-12 / Msat
 	bex := gpu.MakeChan3(size, "Bex")
 	Stack(gpu.NewExchange6(mGPU.MakeRChan3(), bex, mesh, aex))
 
@@ -52,9 +52,8 @@ func main() {
 	torqueH := MakeChan3(size, "τHost")
 	Stack(conv.NewDownloader(torque.MakeRChan3(), torqueH))
 
-	var dt float32 = 50e-15
-	const gamma = 
-	solver := mag.NewEuler(m, torqueH.MakeRChan3(), dt, gamma)
+	dt := 50e-15
+	solver := mag.NewEuler(m, torqueH.MakeRChan3(), dt, mag.Gamma)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
 	Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 100))

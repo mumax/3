@@ -2,6 +2,7 @@ package mag
 
 import "nimble-cube/core"
 
+// LLG Torque / gamma
 type LLGTorque struct {
 	torque core.Chan3
 	m, b   core.RChan3
@@ -30,7 +31,7 @@ func (r *LLGTorque) Run() {
 }
 
 func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
-	const gamma = 1.76085970839e11 // rad/Ts // TODO
+	//const gamma = 1.76085970839e11 // rad/Ts // TODO
 
 	var mx, my, mz float32
 	var Bx, By, Bz float32
@@ -49,8 +50,8 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 		mxmxBy := -mx*mxBz + mz*mxBx
 		mxmxBz := mx*mxBy - my*mxBx
 
-		torque[X][i] = gamma * (mxBx - alpha*mxmxBx) // todo: gilbert factor
-		torque[Y][i] = gamma * (mxBy - alpha*mxmxBy)
-		torque[Z][i] = gamma * (mxBz - alpha*mxmxBz)
+		torque[X][i] = (mxBx - alpha*mxmxBx) // todo: gilbert factor
+		torque[Y][i] = (mxBy - alpha*mxmxBy)
+		torque[Z][i] = (mxBz - alpha*mxmxBz)
 	}
 }

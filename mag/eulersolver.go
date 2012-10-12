@@ -14,8 +14,8 @@ type Euler struct {
 	init     bool
 }
 
-func NewEuler(y core.Chan3, dy core.RChan3, dt float32) *Euler {
-	return &Euler{y, dy, dt, core.BlockLen(y.Size()), false}
+func NewEuler(y core.Chan3, dy core.RChan3, dt, multiplier float64) *Euler {
+	return &Euler{y, dy, float32(dt * multiplier), core.BlockLen(y.Size()), false}
 }
 
 func (e *Euler) Steps(steps int) {

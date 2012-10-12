@@ -2,7 +2,8 @@ __global__ void llgtorque(float* tx, float* ty, float* tz,
                           float* mx, float* my, float* mz, 
                           float* hx, float* hy, float* hz, 
 						  float alpha, int N) {
-	int i = threadindex;
+
+	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
 	if (i < N) {
 
     	float Mx = mx[i];
@@ -29,3 +30,4 @@ __global__ void llgtorque(float* tx, float* ty, float* tz,
     	tz[i] = gilb * (_mxmxHz * alpha);
 	}
 }
+

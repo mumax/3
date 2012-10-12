@@ -28,8 +28,8 @@ type Symm2D struct {
 
 func (c *Symm2D) init() {
 	core.Log("initializing 2D symmetric convolution")
-	gpu.LockCUDAThread()
-	defer gpu.UnlockCUDAThread()
+	gpu.LockCudaThread()
+	defer gpu.UnlockCudaThread()
 
 	padded := c.kernSize
 

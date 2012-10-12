@@ -49,7 +49,6 @@ func main() {
 	dt := 50e-15
 	solver := gpu.NewEuler(mGPU, torque.MakeRChan3(), dt, mag.Gamma)
 
-
 	mHost := MakeChan3(size, "mHost")
 	Stack(conv.NewDownloader(mGPU.MakeRChan3(), mHost))
 	Stack(dump.NewAutosaver("m.dump", mHost.MakeRChan3(), 100))
@@ -63,6 +62,9 @@ func main() {
 
 	in := MakeVectors(size)
 	mag.SetAll(in, mag.Uniform(0, 0.1, 1))
+	for i:=0; i<3; i++{
+		mGPU.UnsafeData()[i].CopyHtoD(Contiguous(in[i]))
+	}
 
 	gpu.LockCudaThread()
 	solver.Steps(20000)

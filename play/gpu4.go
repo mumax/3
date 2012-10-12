@@ -23,10 +23,7 @@ func main() {
 
 	// quantities
 
-	m := MakeChan3(size, "m")
 	mGPU := gpu.MakeChan3(size, "mGPU")
-	Stack(conv.NewUploader(m.MakeRChan3(), mGPU))
-
 	b := gpu.MakeChan3(size, "B")
 
 	acc := 1
@@ -49,18 +46,25 @@ func main() {
 	torque := gpu.MakeChan3(size, "τ")
 	Stack(gpu.NewLLGTorque(torque, mGPU.MakeRChan3(), beffGPU.MakeRChan3(), alpha))
 
-	torqueH := MakeChan3(size, "τHost")
-	Stack(conv.NewDownloader(torque.MakeRChan3(), torqueH))
-
 	dt := 50e-15
-	solver := mag.NewEuler(m, torqueH.MakeRChan3(), dt, mag.Gamma)
-	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
-	Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 100))
+	solver := gpu.NewEuler(mGPU, torque.MakeRChan3(), dt, mag.Gamma)
+
+
+	mHost := MakeChan3(size, "mHost")
+	Stack(conv.NewDownloader(mGPU.MakeRChan3(), mHost))
+	Stack(dump.NewAutosaver("m.dump", mHost.MakeRChan3(), 100))
+
+	//Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
+	//Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 100))
 	//Stack(dump.NewAutosaver("test4bex.dump", bex.MakeRChan3(), 100))
 
 	RunStack()
 
+
+	in := MakeVectors(size)
+	mag.SetAll(in, mag.Uniform(0, 0.1, 1))
+
+	gpu.LockCudaThread()
 	solver.Steps(20000)
 
 	ProfDump(os.Stdout)

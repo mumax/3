@@ -11,20 +11,20 @@ const ROTATEVEC = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000038e2_00000000-9_rotatevec.cpp3.i"
+	.file	1 "/tmp/tmpxft_000039ab_00000000-9_rotatevec.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/rotatevec.cu"
 	.file	3 "/usr/local/cuda-unknown_2931/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/device_functions.h"
 
-.visible .entry llgtorque(
-	.param .u64 llgtorque_param_0,
-	.param .u64 llgtorque_param_1,
-	.param .u64 llgtorque_param_2,
-	.param .u64 llgtorque_param_3,
-	.param .u64 llgtorque_param_4,
-	.param .u64 llgtorque_param_5,
-	.param .f32 llgtorque_param_6,
-	.param .u32 llgtorque_param_7
+.visible .entry rotatevec(
+	.param .u64 rotatevec_param_0,
+	.param .u64 rotatevec_param_1,
+	.param .u64 rotatevec_param_2,
+	.param .u64 rotatevec_param_3,
+	.param .u64 rotatevec_param_4,
+	.param .u64 rotatevec_param_5,
+	.param .f32 rotatevec_param_6,
+	.param .u32 rotatevec_param_7
 )
 {
 	.reg .pred 	%p<3>;
@@ -33,14 +33,14 @@ const ROTATEVEC = `
 	.reg .s64 	%rd<20>;
 
 
-	ld.param.u64 	%rd7, [llgtorque_param_0];
-	ld.param.u64 	%rd8, [llgtorque_param_1];
-	ld.param.u64 	%rd9, [llgtorque_param_2];
-	ld.param.u64 	%rd10, [llgtorque_param_3];
-	ld.param.u64 	%rd11, [llgtorque_param_4];
-	ld.param.u64 	%rd12, [llgtorque_param_5];
-	ld.param.f32 	%f1, [llgtorque_param_6];
-	ld.param.u32 	%r2, [llgtorque_param_7];
+	ld.param.u64 	%rd7, [rotatevec_param_0];
+	ld.param.u64 	%rd8, [rotatevec_param_1];
+	ld.param.u64 	%rd9, [rotatevec_param_2];
+	ld.param.u64 	%rd10, [rotatevec_param_3];
+	ld.param.u64 	%rd11, [rotatevec_param_4];
+	ld.param.u64 	%rd12, [rotatevec_param_5];
+	ld.param.f32 	%f1, [rotatevec_param_6];
+	ld.param.u32 	%r2, [rotatevec_param_7];
 	cvta.to.global.u64 	%rd1, %rd12;
 	cvta.to.global.u64 	%rd2, %rd9;
 	cvta.to.global.u64 	%rd3, %rd11;

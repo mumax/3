@@ -1,5 +1,5 @@
 extern "C" __global__ void
-llgtorque(float* vx, float* vy, float* vz, 
+rotatevec(float* vx, float* vy, float* vz, 
           float* dx, float* dy, float* dz,
           float factor, int N) {
 

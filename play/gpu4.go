@@ -36,8 +36,8 @@ func main() {
 	Stack(gpu.NewExchange6(mGPU.MakeRChan3(), bex, mesh, aex))
 
 	//bexH := MakeChan3(size, "BexH")
-//	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
-//	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
+	//	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
+	//	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
 
 	beffGPU := gpu.MakeChan3(size, "Beff")
 	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), Msat, bex.MakeRChan3(), 1))

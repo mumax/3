@@ -9,21 +9,22 @@ import (
 	"os/exec"
 )
 
+var graphout *graphvizwriter
+
 type graphvizwriter struct {
 	fname string
 	out   io.WriteCloser
 }
 
-func (dot *graphvizwriter) Init(fname string) {
-	if dot.out != nil {
-		return // already inited.
-	}
+func newGraphvizWriter(fname string) *graphvizwriter {
+	dot := new(graphvizwriter)
 	dot.fname = fname
 	var err error
 	dot.out, err = os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	LogErr(err)
 	dot.Println("digraph dot{")
 	dot.Println("rankdir=LR")
+	return dot
 }
 
 func (dot *graphvizwriter) Println(msg ...interface{}) {

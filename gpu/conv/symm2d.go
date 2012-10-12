@@ -28,6 +28,9 @@ type Symm2D struct {
 
 func (c *Symm2D) init() {
 	core.Log("initializing 2D symmetric convolution")
+	gpu.LockCUDAThread()
+	defer gpu.UnlockCUDAThread()
+
 	padded := c.kernSize
 
 	{ // init FFT plans
@@ -123,7 +126,6 @@ func (c *Symm2D) initFFTKern2D() {
 func (c *Symm2D) Run() {
 	core.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
-	c.init()
 
 	for {
 		c.Exec()
@@ -247,6 +249,8 @@ func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, outp
 	c.kernSize = core.SizeOf(kernel[0][0])
 	c.input = input
 	c.output = output
+
+	c.init()
 
 	return c
 	// TODO: self-test

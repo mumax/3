@@ -42,7 +42,7 @@ exchange6(float* h, float* m,
 	    } 
 		m2 = m[idx]; 
 
-    	float H = fac2 * ((m1-m0) + (m2-m0));
+    	float H = fac0 * ((m1-m0) + (m2-m0));
 
 		// neighbors in J direction
 		if (j-1 >= 0){

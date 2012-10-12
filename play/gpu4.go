@@ -43,7 +43,7 @@ func main() {
 	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
 
 	beffGPU := gpu.MakeChan3(size, "BeffGPU")
-	Stack(gpu.NewAdder3(beffGPU, bex.MakeRChan3(), 1, b.MakeRChan3(), Msat))
+	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), 1, bex.MakeRChan3(), 1))
 
 	beff := MakeChan3(size, "Beff")
 	Stack(conv.NewDownloader(beffGPU.MakeRChan3(), beff))

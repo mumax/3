@@ -43,7 +43,7 @@ func main() {
 	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
 
 	beffGPU := gpu.MakeChan3(size, "BeffGPU")
-	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), 1, bex.MakeRChan3(), 1))
+	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), Msat, bex.MakeRChan3(), 1))
 
 	beff := MakeChan3(size, "Beff")
 	Stack(conv.NewDownloader(beffGPU.MakeRChan3(), beff))
@@ -52,7 +52,7 @@ func main() {
 	torque := MakeChan3(size, "τ")
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), beff.MakeRChan3(), alpha))
 
-	var dt float32 = 100e-15
+	var dt float32 = 50e-15
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
@@ -61,7 +61,7 @@ func main() {
 
 	RunStack()
 
-	solver.Steps(1000)
+	solver.Steps(20000)
 
 	ProfDump(os.Stdout)
 	Cleanup()

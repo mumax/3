@@ -11,21 +11,21 @@ const EXCHANGE6 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000072e5_00000000-9_exchange6.cpp3.i"
+	.file	1 "/tmp/tmpxft_00000947_00000000-9_exchange6.cpp3.i"
 	.file	2 "/home/arne/src/nimble-cube/gpu/ptx/exchange6.cu"
 
-.visible .entry _Z9exchange6PfS_fffiiiiii(
-	.param .u64 _Z9exchange6PfS_fffiiiiii_param_0,
-	.param .u64 _Z9exchange6PfS_fffiiiiii_param_1,
-	.param .f32 _Z9exchange6PfS_fffiiiiii_param_2,
-	.param .f32 _Z9exchange6PfS_fffiiiiii_param_3,
-	.param .f32 _Z9exchange6PfS_fffiiiiii_param_4,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_5,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_6,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_7,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_8,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_9,
-	.param .u32 _Z9exchange6PfS_fffiiiiii_param_10
+.visible .entry exchange6(
+	.param .u64 exchange6_param_0,
+	.param .u64 exchange6_param_1,
+	.param .f32 exchange6_param_2,
+	.param .f32 exchange6_param_3,
+	.param .f32 exchange6_param_4,
+	.param .u32 exchange6_param_5,
+	.param .u32 exchange6_param_6,
+	.param .u32 exchange6_param_7,
+	.param .u32 exchange6_param_8,
+	.param .u32 exchange6_param_9,
+	.param .u32 exchange6_param_10
 )
 {
 	.reg .pred 	%p<17>;
@@ -34,16 +34,16 @@ const EXCHANGE6 = `
 	.reg .s64 	%rd<24>;
 
 
-	ld.param.u64 	%rd2, [_Z9exchange6PfS_fffiiiiii_param_0];
-	ld.param.u64 	%rd3, [_Z9exchange6PfS_fffiiiiii_param_1];
-	ld.param.f32 	%f3, [_Z9exchange6PfS_fffiiiiii_param_3];
-	ld.param.f32 	%f4, [_Z9exchange6PfS_fffiiiiii_param_4];
-	ld.param.u32 	%r43, [_Z9exchange6PfS_fffiiiiii_param_5];
-	ld.param.u32 	%r44, [_Z9exchange6PfS_fffiiiiii_param_6];
-	ld.param.u32 	%r45, [_Z9exchange6PfS_fffiiiiii_param_7];
-	ld.param.u32 	%r46, [_Z9exchange6PfS_fffiiiiii_param_8];
-	ld.param.u32 	%r47, [_Z9exchange6PfS_fffiiiiii_param_9];
-	ld.param.u32 	%r48, [_Z9exchange6PfS_fffiiiiii_param_10];
+	ld.param.u64 	%rd2, [exchange6_param_0];
+	ld.param.u64 	%rd3, [exchange6_param_1];
+	ld.param.f32 	%f3, [exchange6_param_3];
+	ld.param.f32 	%f4, [exchange6_param_4];
+	ld.param.u32 	%r43, [exchange6_param_5];
+	ld.param.u32 	%r44, [exchange6_param_6];
+	ld.param.u32 	%r45, [exchange6_param_7];
+	ld.param.u32 	%r46, [exchange6_param_8];
+	ld.param.u32 	%r47, [exchange6_param_9];
+	ld.param.u32 	%r48, [exchange6_param_10];
 	.loc 2 7 1
 	mov.u32 	%r1, %ctaid.x;
 	mov.u32 	%r2, %ntid.x;

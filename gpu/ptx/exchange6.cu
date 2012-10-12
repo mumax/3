@@ -1,4 +1,5 @@
-__global__ void
+// Calculates one component of exchange field.
+extern "C" __global__ void
 exchange6(float* h, float* m, 
           float fac0, float fac1, float fac2,
           int wrap0, int wrap1, int wrap2,

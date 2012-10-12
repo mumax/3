@@ -3,9 +3,9 @@ package main
 import (
 	. "nimble-cube/core"
 	"nimble-cube/dump"
+	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
-	"nimble-cube/gpu"
 	"os"
 )
 
@@ -25,7 +25,7 @@ func main() {
 
 	m := MakeChan3(size, "m")
 	mGPU := gpu.MakeChan3(size, "mGPU")
-	Stack(conv.NewUploader(m.MakeRChan3() , mGPU))
+	Stack(conv.NewUploader(m.MakeRChan3(), mGPU))
 
 	b := gpu.MakeChan3(size, "B")
 
@@ -33,17 +33,20 @@ func main() {
 	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
 	Stack(conv.NewSymm2D(size, kernel, mGPU.MakeRChan3(), b))
 
-	Msat := 1.0053
+	const Msat = 1.0053
 	aex := Mu0 * 13e-12 / Msat
 	bex := gpu.MakeChan3(size, "Bex")
 	Stack(gpu.NewExchange6(mGPU.MakeRChan3(), bex, mesh, aex))
 
+	bexH := MakeChan3(size, "BexH")
+	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
+	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
+
 	beGPU := gpu.MakeChan3(size, "BeGPU")
-	Stack(gpu.NewAdder3(beGPU, bex.MakeRChan3(), b.MakeRChan3()))
+	Stack(gpu.NewAdder3(beGPU, bex.MakeRChan3(), 1, b.MakeRChan3(), Msat))
 
 	be := MakeChan3(size, "Be")
 	Stack(conv.NewDownloader(beGPU.MakeRChan3(), be))
-	
 
 	var alpha float32 = 1
 	torque := MakeChan3(size, "τ")
@@ -53,12 +56,12 @@ func main() {
 	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	Stack(dump.NewAutosaver("test4m.dump", m.MakeRChan3(), 100))
-	//Stack(dump.NewAutosaver("test4bex.dump", bex.MakeRChan3(), 100))
 	Stack(dump.NewAutotable("test4m.table", m.MakeRChan3(), 100))
+	//Stack(dump.NewAutosaver("test4bex.dump", bex.MakeRChan3(), 100))
 
 	RunStack()
 
-	solver.Steps(100)
+	solver.Steps(1000)
 
 	ProfDump(os.Stdout)
 	Cleanup()

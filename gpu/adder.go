@@ -9,21 +9,39 @@ import (
 )
 
 type Adder3 struct {
-	sum       Chan3
-	terms     []RChan3
-	blocksize int
+	sum          Chan3
+	term1, term2 RChan3
+	fac1, fac2   float32
+	stream       cu.Stream
 }
 
-func NewAdder3(sum Chan3, terms ...RChan3) *Adder3 {
-	core.Assert(len(terms) > 1)
-	for _, t := range terms {
-		core.Assert(t.Size() == sum.Size())
-	}
-	return &Adder3{sum, terms, core.BlockLen(sum.Size())}
+func NewAdder3(sum Chan3, term1 RChan3, factor1 float32, term2 RChan3, factor2 float32) *Adder3 {
+	core.Assert(sum.Size() == term1.Size())
+	core.Assert(sum.Size() == term2.Size())
+	return &Adder3{sum, term1, term2, factor1, factor2, cu.StreamCreate()}
 }
 
 func (a *Adder3) Run() {
+	LockCudaThread()
+	for {
+		a.Exec()
+	}
+}
 
+func (a *Adder3) Exec() {
+	N := core.Prod(a.sum.Size())
+
+	a.term1.ReadNext(N)
+	a.term2.ReadNext(N)
+	a.sum.WriteNext(N)
+
+	for i := 0; i < 3; i++ {
+		madd(a.sum.UnsafeData()[i], a.term1.UnsafeData()[i], a.fac1, a.term2.UnsafeData()[i], a.fac2, a.stream)
+	}
+
+	a.sum.WriteDone()
+	a.term1.ReadDone()
+	a.term2.ReadDone()
 }
 
 var maddCode cu.Function

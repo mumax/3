@@ -2,7 +2,7 @@ package main
 
 import (
 	. "nimble-cube/core"
-	"nimble-cube/dump"
+	//"nimble-cube/dump"
 	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
@@ -13,7 +13,7 @@ func main() {
 
 	// mesh
 
-	a := 1
+	a := 8
 	N0, N1, N2 := 1, a*32, a*128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
@@ -35,9 +35,9 @@ func main() {
 	bex := gpu.MakeChan3(size, "Bex")
 	Stack(gpu.NewExchange6(mGPU.MakeRChan3(), bex, mesh, aex))
 
-	bexH := MakeChan3(size, "BexH")
-	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
-	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
+	//bexH := MakeChan3(size, "BexH")
+//	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
+//	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
 
 	beffGPU := gpu.MakeChan3(size, "Beff")
 	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), Msat, bex.MakeRChan3(), 1))
@@ -66,7 +66,7 @@ func main() {
 	}
 
 	gpu.LockCudaThread()
-	solver.Steps(20000)
+	solver.Steps(2000)
 
 	ProfDump(os.Stdout)
 	Cleanup()

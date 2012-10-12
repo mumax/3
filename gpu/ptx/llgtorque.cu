@@ -1,7 +1,8 @@
-__global__ void llgtorque(float* tx, float* ty, float* tz,
-                          float* mx, float* my, float* mz, 
-                          float* hx, float* hy, float* hz, 
-						  float alpha, int N) {
+extern "C" __global__ void
+llgtorque(float* tx, float* ty, float* tz,
+          float* mx, float* my, float* mz, 
+          float* hx, float* hy, float* hz, 
+		  float alpha, int N) {
 
 	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
 	if (i < N) {

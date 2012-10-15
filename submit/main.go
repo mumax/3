@@ -11,17 +11,22 @@ import (
 )
 
 var (
-	flag_rm = flag.Bool("rm", false, "remove existing input file from que")
+	flag_rm   = flag.Bool("rm", false, "remove existing input file from que")
+	flag_user = flag.String("user", "", "override user name")
 )
 
 func main() {
 	flag.Parse()
 
-	// get user
-	u, err2 := user.Current()
-	if err2 != nil {
-		fmt.Fprintln(os.Stderr, err2)
-		os.Exit(1)
+	username := *flag_user
+	if username == "" {
+		// get user
+		u, err2 := user.Current()
+		if err2 != nil {
+			fmt.Fprintln(os.Stderr, err2)
+			os.Exit(1)
+		}
+		username = u.Username
 	}
 
 	// check if target is set
@@ -57,12 +62,12 @@ func main() {
 	if *flag_rm {
 		// remove 
 		for _, f := range flag.Args() {
-			rmJob(f, wd, que, u.Username)
+			rmJob(f, wd, que, username)
 		}
 	} else {
 		// submit!
 		for _, f := range flag.Args() {
-			addJob(f, wd, que, u.Username)
+			addJob(f, wd, que, username)
 		}
 	}
 }

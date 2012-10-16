@@ -1,7 +1,7 @@
 package core
 
 // Read-only Chan3.
-type RChan3 [3]RChan
+type RChan3 [3]RChan1
 
 func (c *Chan3) MakeRChan3() RChan3 {
 	return RChan3{c[0].MakeRChan(), c[1].MakeRChan(), c[2].MakeRChan()}

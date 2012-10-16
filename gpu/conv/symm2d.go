@@ -104,7 +104,7 @@ func (c *Symm2D) initFFTKern2D() {
 	halfkern[1] = halfkern[1]/2 + 1
 	fwPlan := c.fwPlan
 	output := gpu.HostFloats(2 * fwPlan.OutputLen()).Complex()
-	defer cu.MemFreeHost(unsafe.Pointer(output.Pointer())) // TODO: is Float32s safe with uintptr?
+	defer cu.MemFreeHost(unsafe.Pointer(uintptr(output.Pointer()))) // TODO: is Float32s safe with uintptr?
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	// upper triangular part

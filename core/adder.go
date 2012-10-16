@@ -6,7 +6,7 @@ type Adder struct {
 	blocksize int
 }
 
-func NewAdder(sum Chan3, terms ...RChan3) *Adder {
+func NewAdder3(sum Chan3, terms ...RChan3) *Adder {
 	Assert(len(terms) > 1)
 	for _, t := range terms {
 		Assert(t.Size() == sum.Size())

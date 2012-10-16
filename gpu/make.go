@@ -41,6 +41,6 @@ func tryMalloc(bytes int64) (ptr unsafe.Pointer) {
 			panic(err)
 		}
 	}()
-	ptr = unsafe.Pointer(cu.MemAlloc(bytes))
+	ptr = unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
 	return
 }

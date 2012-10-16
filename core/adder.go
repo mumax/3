@@ -1,20 +1,20 @@
 package core
 
-type Adder3 struct {
+type Adder struct {
 	sum       Chan3
 	terms     []RChan3
 	blocksize int
 }
 
-func NewAdder3(sum Chan3, terms ...RChan3) *Adder3 {
+func NewAdder(sum Chan3, terms ...RChan3) *Adder {
 	Assert(len(terms) > 1)
 	for _, t := range terms {
 		Assert(t.Size() == sum.Size())
 	}
-	return &Adder3{sum, terms, BlockLen(sum.Size())}
+	return &Adder{sum, terms, BlockLen(sum.Size())}
 }
 
-func (a *Adder3) Run() {
+func (a *Adder) Run() {
 	in := make([][3][]float32, len(a.terms))
 	for {
 		// lock
@@ -33,7 +33,7 @@ func (a *Adder3) Run() {
 	}
 }
 
-func (a *Adder3) add(in [][3][]float32, out [3][]float32) {
+func (a *Adder) add(in [][3][]float32, out [3][]float32) {
 	for c := 0; c < 3; c++ {
 		for i := 0; i < len(out[0]); i++ {
 			sum := in[0][c][i] + in[1][c][i]

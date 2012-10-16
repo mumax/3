@@ -1,6 +1,6 @@
 package core
 
-type Chan struct {
+type Chan1 struct {
 	chandata // array+list
 	mutex    *RWMutex
 }
@@ -10,13 +10,13 @@ type chandata struct {
 	list  []float32
 }
 
-func MakeChan(size [3]int, tag string) Chan {
-	return Chan{makedata(size), NewRWMutex(Prod(size), tag)}
+func MakeChan(size [3]int, tag string) Chan1 {
+	return Chan1{makedata(size), NewRWMutex(Prod(size), tag)}
 }
 
 // Implements Chans
-func (c *Chan) Chans() []Chan {
-	return []Chan{*c}
+func (c *Chan1) Chan() []Chan1 {
+	return []Chan1{*c}
 }
 
 func makedata(size [3]int) chandata {
@@ -30,7 +30,7 @@ func makedata(size [3]int) chandata {
 // writing the next n elements to the Chan.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan. After that, the slice is not valid any more.
-func (c *Chan) WriteNext(n int) []float32 {
+func (c *Chan1) WriteNext(n int) []float32 {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
 	return c.list[a:b]
@@ -38,11 +38,11 @@ func (c *Chan) WriteNext(n int) []float32 {
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c *Chan) WriteDone() {
+func (c *Chan1) WriteDone() {
 	c.mutex.WriteDone()
 }
 
-func (c *Chan) WriteDelta(Δstart, Δstop int) []float32 {
+func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 	c.mutex.WriteDelta(Δstart, Δstop)
 	a, b := c.mutex.WRange()
 	return c.list[a:b]

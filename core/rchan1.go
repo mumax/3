@@ -6,7 +6,7 @@ type RChan struct {
 	mutex *RMutex
 }
 
-func (c *Chan) MakeRChan() RChan {
+func (c *Chan1) MakeRChan() RChan {
 	return RChan{c.chandata, c.mutex.MakeRMutex()}
 }
 

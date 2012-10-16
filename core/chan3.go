@@ -1,11 +1,10 @@
 package core
 
-
 // Chan of 3-vector data.
-type Chan3 [3]Chan
+type Chan3 [3]Chan1
 
 // Implements Chans
-func (c *Chan3) Chans() []Chan {
+func (c *Chan3) Chan() []Chan1 {
 	return (*c)[:]
 }
 

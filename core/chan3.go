@@ -1,21 +1,13 @@
 package core
 
-// UnsafeData returns the underlying storage without locking.
-// Intended only for page-locking, not for reading or writing.
-func (c *Chan3) UnsafeData() [3][]float32 {
-	return [3][]float32{c[0].list, c[1].list, c[2].list}
-}
-
-func (c *Chan3) UnsafeArray() [3][][][]float32 {
-	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
-}
-
-func (c *Chan3) Size() [3]int {
-	return c[0].Size()
-}
 
 // Chan of 3-vector data.
 type Chan3 [3]Chan
+
+// Implements Chans
+func (c *Chan3) Chans() []Chan {
+	return (*c)[:]
+}
 
 func MakeChan3(size [3]int, tag string) Chan3 {
 	return Chan3{MakeChan(size, tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
@@ -51,4 +43,18 @@ func (c *Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
 		next[i] = c[i].list[a:b]
 	}
 	return next
+}
+
+// UnsafeData returns the underlying storage without locking.
+// Intended only for page-locking, not for reading or writing.
+func (c *Chan3) UnsafeData() [3][]float32 {
+	return [3][]float32{c[0].list, c[1].list, c[2].list}
+}
+
+func (c *Chan3) UnsafeArray() [3][][][]float32 {
+	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
+}
+
+func (c *Chan3) Size() [3]int {
+	return c[0].Size()
 }

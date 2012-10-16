@@ -14,6 +14,11 @@ func MakeChan(size [3]int, tag string) Chan {
 	return Chan{makedata(size), NewRWMutex(Prod(size), tag)}
 }
 
+// Implements Chans
+func (c *Chan) Chans() []Chan {
+	return []Chan{*c}
+}
+
 func makedata(size [3]int) chandata {
 	var c chandata
 	c.array = MakeFloats(size)

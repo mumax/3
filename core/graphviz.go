@@ -11,14 +11,14 @@ import (
 var Graph *Graphviz
 
 func InitGraphviz(fname string) {
-	if Graph != nil{
+	if Graph != nil {
 		Fatal(fmt.Errorf("already saving pipeline graph"))
 	}
 	Log("saving pipeline graph to", fname)
 	Graph = &Graphviz{OpenFile(fname), fname}
 	Graph.Println("digraph dot{")
 	Graph.Println("rankdir=LR")
-	AtExit(func(){Graph.Close()})
+	AtExit(func() { Graph.Close() })
 }
 
 type Graphviz struct {
@@ -27,7 +27,9 @@ type Graphviz struct {
 }
 
 func (g *Graphviz) Println(msg ...interface{}) {
-	if g.out == nil{return}
+	if g.out == nil {
+		return
+	}
 	fmt.Fprintln(g.out, msg...)
 }
 
@@ -42,7 +44,6 @@ func (g *Graphviz) Connect(dst string, src string, label string, thickness int) 
 	}
 	g.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }
-
 
 func (g *Graphviz) Add(box string) {
 	g.Println(box, `[label="`+box+`"shape="rect"];`)

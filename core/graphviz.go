@@ -5,52 +5,50 @@ package core
 import (
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 )
 
-var graphout *graphvizwriter
+var Graph *Graphviz
 
-type graphvizwriter struct {
-	fname string
+func InitGraphviz(fname string) {
+	if Graph != nil{
+		Fatal(fmt.Errorf("already saving pipeline graph"))
+	}
+	Log("saving pipeline graph to", fname)
+	Graph = &Graphviz{OpenFile(fname), fname}
+	Graph.Println("digraph dot{")
+	Graph.Println("rankdir=LR")
+	AtExit(func(){Graph.Close()})
+}
+
+type Graphviz struct {
 	out   io.WriteCloser
+	fname string
 }
 
-func newGraphvizWriter(fname string) *graphvizwriter {
-	dot := new(graphvizwriter)
-	dot.fname = fname
-	var err error
-	dot.out, err = os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	LogErr(err)
-	dot.Println("digraph dot{")
-	dot.Println("rankdir=LR")
-	return dot
+func (g *Graphviz) Println(msg ...interface{}) {
+	if g.out == nil{return}
+	fmt.Fprintln(g.out, msg...)
 }
 
-func (dot *graphvizwriter) Println(msg ...interface{}) {
-	fmt.Fprintln(dot.out, msg...)
+func (g *Graphviz) Close() {
+	g.Println("}")
+	g.out.Close()
+	LogErr(exec.Command("dot", "-O", "-Tpdf", g.fname).Run())
 }
-
-func (dot *graphvizwriter) Connect(dst string, src string, label string, thickness int) {
+func (g *Graphviz) Connect(dst string, src string, label string, thickness int) {
 	if dst == "" || src == "" {
 		Panic("connect", dst, src, label, thickness)
 	}
-	dot.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
+	g.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }
 
-func (dot *graphvizwriter) AddBox(box string) {
-	dot.Println(box, `[label="`+box+`"shape="rect"];`)
-}
 
-func (dot *graphvizwriter) Close() {
-	dot.Println("}")
-	dot.out.Close()
-	err := exec.Command("dot", "-O", "-Tpdf", dot.fname).Run()
-	LogErr(err)
+func (g *Graphviz) Add(box string) {
+	g.Println(box, `[label="`+box+`"shape="rect"];`)
 }
 
 // replaces characters that graphviz cannot handle as labels.
-func escape(in string) (out string) {
+func escape(in string) string {
 	return `"` + in + `"`
-	return
 }

@@ -105,7 +105,7 @@ func (dst *slice) copyDtoDAsync(src *slice, elemsize int, stream cu.Stream) {
 // Manually set the pointer, length and capacity.
 // Side-steps the security mechanisms, use with caution.
 func (s *slice) UnsafeSet(pointer unsafe.Pointer, length, capacity int) {
-	s.ptr_ = cu.DevicePtr(pointer)
+	s.ptr_ = cu.DevicePtr(uintptr(pointer))
 	s.len_ = length
 	s.cap_ = capacity
 }

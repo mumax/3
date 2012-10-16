@@ -1,7 +1,7 @@
 PACKAGE
 
 package safe
-    import "github.com/barnex/cuda4/safe"
+    import "github.com/barnex/cuda5/safe"
 
     Safe and more idiomatic wrappers for the low-level CUDA functions.
 

@@ -120,32 +120,3 @@ func profPrintTags(out *tabwriter.Writer, s *stamp) {
 	fmt.Fprintln(out)
 	out.Flush()
 }
-
-//func ProfDumpSVG(fname string){
-//	profstate.Lock()
-//	defer profstate.Unlock()
-//	out := OpenFile(fname)
-//	defer out.Close()
-//
-//    width := 500
-//    height := 500
-//    canvas := svg.New(out)
-//
-//	profUpdateKeys()
-//	for _, s := range timeline {
-//		// enable/disable "running" status for this tag
-//		tags[s.tag] = (s.delta >= 0)
-//
-//		for _, k := range keys {
-//			if tags[k] == true {
-//				fmt.Fprint(out, "\t", k)
-//			} else {
-//				fmt.Fprint(out, "\t"+del)
-//			}
-//	}
-//	}
-//    canvas.Start(width, height)
-//    canvas.Circle(width/2, height/2, 100)
-//    canvas.Text(width/2, height/2, "Hello, SVG", "text-anchor:middle;font-size:30px;fill:black")
-//    canvas.End()
-//}

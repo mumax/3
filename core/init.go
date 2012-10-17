@@ -34,6 +34,7 @@ var (
 func init() {
 	flag.Parse()
 
+	initOD()
 	initLog()
 	if *Flag_version {
 		fmt.Println(log.Prefix(), "Nimble Cube", runtime.Version(), runtime.Compiler, runtime.GOOS, runtime.GOARCH)
@@ -41,6 +42,12 @@ func init() {
 	initGOMAXPROCS()
 	initCpuProf()
 	initMemProf()
+}
+
+func initOD() {
+	if *Flag_od != "" {
+		SetOD(*Flag_od)
+	}
 }
 
 func initLog() {

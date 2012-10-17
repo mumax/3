@@ -2,6 +2,7 @@ package core
 
 import (
 	"os"
+	"fmt"
 	"path/filepath"
 	"strings"
 )
@@ -12,6 +13,9 @@ var (
 
 // Sets the output directory where auto-saved files will be stored.
 func SetOD(od string) {
+	if OD != ""{
+		Fatal(fmt.Errorf("output directory already set to " + OD))
+	}
 	OD = od
 	if !strings.HasSuffix(OD, "/") {
 		OD += "/"

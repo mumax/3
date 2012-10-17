@@ -22,4 +22,3 @@ else
 	echo
 	exit 2;
 fi;
-rm test.log -rf

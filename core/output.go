@@ -2,6 +2,7 @@ package core
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -16,9 +17,19 @@ func SetOD(od string) {
 		OD += "/"
 	}
 	Log("output directory:", OD)
+
+	// make output dir
 	wd, err := os.Getwd()
 	Fatal(err)
 	stat, err2 := os.Stat(wd)
 	Fatal(err2)
 	LogErr(os.Mkdir(od, stat.Mode()))
+
+	// clean output dir
+	filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
+		if path != OD {
+			Fatal(os.RemoveAll(path))
+		}
+		return nil
+	})
 }

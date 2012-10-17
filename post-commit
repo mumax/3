@@ -8,17 +8,13 @@
 # Add this file to .git/hooks
 
 # Run all unit tests
+echo Running unit tests in background
 rm test.log -rf
-if (make test); then
-	echo PASS
+(if (make test >> test.log 2>> test.log); then
 	notify-send "Unit tests passed" 2> /dev/null
 	exit 0;
 else
-	cat test.log;
 	notify-send "Unit tests failed" 2> /dev/null
-	echo
-	echo Commit aborted due to failed tests.
-	echo 'Fix the code or commit with --no-verify (not on a stable branch!)'
-	echo
+	cat test.log;
 	exit 2;
-fi;
+fi;)&

@@ -12,7 +12,7 @@ type Autosaver struct {
 
 func NewAutosaver(fname string, data core.RChan3, every int) *Autosaver {
 	r := new(Autosaver)
-	r.out = NewWriter(core.OpenFile(fname), CRC_ENABLED)
+	r.out = NewWriter(core.OpenFile(core.OD+fname), CRC_ENABLED)
 	r.out.Components = 3 // TODO !!
 	r.out.MeshSize = data.Size()
 	r.data = data

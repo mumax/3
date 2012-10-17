@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	
+	core.SetOD("heun4")
 
 	// mesh
 

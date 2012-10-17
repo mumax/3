@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	Flag_od          = flag.String("o", "", "set output directory")
 	Flag_version     = flag.Bool("v", false, "print version")
 	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	Flag_cpuprof     = flag.String("cpuprof", "", "Write gopprof CPU profile to file")

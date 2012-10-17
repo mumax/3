@@ -20,7 +20,7 @@ func NewAutotable(fname string, data core.RChan3, every int) *Autotable {
 	r := new(Autotable)
 	tags := []string{data[0].Tag(), data[1].Tag(), data[2].Tag()}
 	units := []string{"?", "?", "?"} // TODO
-	r.out = NewTableWriter(core.OpenFile(fname), tags, units)
+	r.out = NewTableWriter(core.OpenFile(core.OD+fname), tags, units)
 	r.data = data
 	r.every = every
 	return r

@@ -16,6 +16,7 @@ ptx:
 
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
+	ln -sf $(CURDIR)/post-commit .git/hooks/post-commit
 
 test: 6gtest gccgotest unittest
 

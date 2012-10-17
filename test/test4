@@ -1,8 +1,0 @@
-#! /bin/bash
-go run test4.go
-for CPU in 1 2 3; do
-	export GOMAXPROCS=$CPU;
-	for N in 9999999 4096 2048 1024 512 256 128; do
-		go run test4.go -maxblock $N
-	done
-done

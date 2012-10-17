@@ -1,4 +1,0 @@
-#! /bin/bash
-./test4 || exit 2
-./convolution || exit 2
-

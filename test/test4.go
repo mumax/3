@@ -24,7 +24,7 @@ func main() {
 	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
 
 	Msat := 1.0053
-	aex := Mu0 * 13e-12 / Msat
+	aex := mag.Mu0 * 13e-12 / Msat
 	hex := MakeChan3(size, "Hex")
 	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
 
@@ -36,7 +36,7 @@ func main() {
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
 	const dt = 100e-15
-	solver := mag.NewEuler(m, torque.MakeRChan3(), dt)
+	solver := mag.NewEuler(m, torque.MakeRChan3(), mag.Gamma, dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	//	Stack(dump.NewAutosaver("ex2dm.dump", m.MakeRChan3(), 100))
 	//	Stack(dump.NewAutosaver("ex2dhex.dump", hex.MakeRChan3(), 100))
@@ -47,7 +47,7 @@ func main() {
 	solver.Steps(100)
 	res := m.UnsafeArray()
 	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
-	expect := [3]float32{-0.0758771, 0.17907965, 0.9809042}
+	expect := [3]float32{ -0.075877085,0.17907967,0.9809043}
 	Log("result:", got)
 	if got != expect {
 		Fatal(fmt.Errorf("expected: %v", expect))

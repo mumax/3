@@ -30,14 +30,16 @@ type stamp struct {
 }
 
 func profRegister(tag string) {
-	profstate.Lock()
-	defer profstate.Unlock()
-	// make sure tag is not yet in use
-	if _, ok := tags[tag]; ok {
-		Panic("prof: tag", tag, "already in use")
+	if *Flag_timing {
+		profstate.Lock()
+		defer profstate.Unlock()
+		// make sure tag is not yet in use
+		if _, ok := tags[tag]; ok {
+			Panic("prof: tag ", tag, " already in use")
+		}
+		tags[tag] = false
+		profstart = time.Now()
 	}
-	tags[tag] = false
-	profstart = time.Now()
 }
 
 func profWriteDelta(tag string, delta int) {

@@ -44,7 +44,7 @@ func PanicErr(err error) {
 // Logs the error of non-nil.
 func LogErr(err error) {
 	if err != nil {
-		Log("[error]", err)
+		Log(err)
 	}
 }
 

@@ -15,7 +15,7 @@ func GetOD() string {
 }
 
 // Logs a message.
-func Log(msg ...interface{}) {
+func Log(msg ...interface{}){
 	core.Log(msg...)
 }
 

@@ -12,9 +12,9 @@ func main() {
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
-	size := mesh.GridSize()
+	size := mesh.Size()
 	Log("mesh:", mesh)
-	Log("block:", BlockSize(mesh.GridSize()))
+	Log("block:", BlockSize(mesh.Size()))
 
 	m := MakeChan3(size, "m")
 	hd := MakeChan3(size, "Hd")

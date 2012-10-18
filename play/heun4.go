@@ -2,6 +2,7 @@ package main
 
 import (
 	. "nimble-cube/core"
+	"nimble-cube/gpu"
 )
 
 func main() {
@@ -16,7 +17,8 @@ func main() {
 	Log("mesh:", mesh)
 
 	// add quantities
-	mGPU := NewGPUQuant("m", 3, mesh, "")
+	mGPU := gpu.NewQuant("m", 3, mesh, "")
+	Log(mGPU)
 
 	//	b := gpu.MakeChan3(size, "B")
 	//

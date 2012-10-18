@@ -9,7 +9,7 @@ import (
 // of magnetic charges over the faces. Fields are evaluated at the
 // cell center (not averaged).
 func BruteKernel(mesh *core.Mesh, accuracy int) [3][3][][][]float32 {
-	size := mesh.GridSize()
+	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
 	core.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)

@@ -12,7 +12,7 @@ func TestSymm2(N0, N1, N2 int) {
 	mesh := core.NewMesh(N0, N1, N2, C, 2*C, 3*C)
 	core.Log(mesh)
 	N := mesh.NCell()
-	s := mesh.GridSize()
+	s := mesh.Size()
 
 	gpu.LockCudaThread()
 	hin := core.MakeChan3(s, "hin")
@@ -32,7 +32,7 @@ func TestSymm2(N0, N1, N2 int) {
 		}
 	}()
 
-	go NewSymmetricHtoD(mesh.GridSize(), kern, hin.MakeRChan3(), hout).Run()
+	go NewSymmetricHtoD(mesh.Size(), kern, hin.MakeRChan3(), hout).Run()
 
 	houtR := hout.MakeRChan3()
 	for i := 0; i < F; i++ {
@@ -42,7 +42,7 @@ func TestSymm2(N0, N1, N2 int) {
 
 	outarr := hout.UnsafeData()
 
-	ref := core.MakeVectors(mesh.GridSize())
+	ref := core.MakeVectors(mesh.Size())
 	Brute(arr, ref, kern)
 	checkErr(outarr, core.Contiguous3(ref))
 }

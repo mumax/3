@@ -51,7 +51,7 @@ func exchange6(h, m safe.Float32s, mesh *core.Mesh, factors [3]float32, stream c
 		exchange6Code = mod.GetFunction("exchange6")
 	}
 
-	size := mesh.GridSize()
+	size := mesh.Size()
 	N0, N1, N2 := size[0], size[1], size[2]
 	wrap := mesh.PBC()
 

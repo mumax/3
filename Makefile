@@ -6,7 +6,6 @@ PKGS=\
 	nimble-cube/gpu/conv\
 	nimble-cube/dump\
 	nimble-cube/mag\
-	nimble-cube/api\
 
 6g: ptx
 	go install -v $(PKGS)

@@ -20,7 +20,7 @@ func main() {
 	hd := MakeChan3(size, "Hd")
 
 	acc := 8
-	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
+	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
 	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
 
 	Msat := 1.0053

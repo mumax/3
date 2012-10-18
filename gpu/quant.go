@@ -52,7 +52,7 @@ func (q *Quant) NComp() int {
 }
 
 // Unit returns the quantity's physical unit.
-func(q*Quant)Unit()string{
+func (q *Quant) Unit() string {
 	return q.unit
 }
 

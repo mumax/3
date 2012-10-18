@@ -49,7 +49,7 @@ func (m *Mesh) NCell() int {
 // The zero padded size in any direction is twice
 // the original size unless the original size was
 // 1 or unless there are PBCs in that direction.
-func (m *Mesh) ZeroPadded() *Mesh {
+func ZeroPad(m *Mesh) *Mesh {
 	padded := padSize(m.gridSize, m.pbc)
 	return &Mesh{padded, m.cellSize, m.pbc}
 }

@@ -19,7 +19,7 @@ func TestSymm2(N0, N1, N2 int) {
 	hout := core.MakeChan3(s, "hout")
 
 	acc := 1
-	kern := mag.BruteKernel(mesh.ZeroPadded(), acc)
+	kern := mag.BruteKernel(core.ZeroPad(mesh), acc)
 
 	arr := hin.UnsafeArray()
 	initConvTestInput(arr)

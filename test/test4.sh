@@ -6,3 +6,4 @@ for CPU in 1 4; do
 		./test4 -maxblocklen $N || exit 2
 	done
 done
+rm -f ./test4

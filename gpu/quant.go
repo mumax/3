@@ -45,14 +45,21 @@ func NewQuant(tag string, nComp int, m *core.Mesh, unit string, nBlocks ...int) 
 	return q
 }
 
+// NComp returns the number of components
+// (1: scalar, 3: vector, ...)
 func (q *Quant) NComp() int {
 	return len(q.list)
 }
 
+// Unit returns the quantity's physical unit.
+func(q*Quant)Unit()string{
+	return q.unit
+}
+
 func (q *Quant) String() string {
 	unit := q.unit
-	if unit != ""{
+	if unit != "" {
 		unit = " [" + unit + "]"
 	}
-	return fmt.Sprint(q.tag,  unit, ": ", q.NComp(), "x", q.Size(), ", ", q.nBlocks, " blocks")
+	return fmt.Sprint(q.tag, unit, ": ", q.NComp(), "x", q.Size(), ", ", q.nBlocks, " blocks")
 }

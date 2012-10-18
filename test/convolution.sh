@@ -9,3 +9,4 @@ for x in 1 ; do #2 3 4 5 8 16; do
 		done
 	done
 done
+rm -f ./convolution

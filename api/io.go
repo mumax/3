@@ -25,3 +25,7 @@ func Log(msg ...interface{}) {
 func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *core.Mesh {
 	return core.NewMesh(N0, N1, N2, cellx, celly, cellz, pbc...)
 }
+
+func NewGPUQuant() {
+
+}

@@ -23,7 +23,7 @@ test: 6gtest gccgotest unittest
 unittest:
 	make -C test
 
-PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag 
+PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag  nimble-cube/api
 
 6gtest:
 	go test $(PKGS) 

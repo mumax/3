@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "nimble-cube/api"
+	. "nimble-cube/core"
 )
 
 func main() {

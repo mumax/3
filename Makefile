@@ -31,10 +31,10 @@ unittest:
 	make -C test
 
 6gtest:
-	go test $(PKGS) 
+	go test -i $(PKGS) 
 
 gccgotest:
-	go test -compiler=$(gccgo) $(PKGS)
+	go test -i -compiler=$(gccgo) $(PKGS)
 
 .PHONY: clean
 clean:

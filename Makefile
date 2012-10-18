@@ -1,15 +1,22 @@
-all: githook gofmt 6g gccgo
+all: githook 6g gccgo
+
+PKGS=\
+	nimble-cube/core\
+	nimble-cube/gpu\
+	nimble-cube/gpu/conv\
+	nimble-cube/dump\
+	nimble-cube/mag\
+	nimble-cube/api\
 
 6g: ptx
+	go install -v $(PKGS)
 	go install -v 
-
-gofmt:
-	gofmt -w */*.go
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
 
 gccgo: ptx
-	go build -v -compiler $(GCCGO) 
+	go install -v -compiler $(GCCGO) $(PKGS)
+	go install -v -compiler $(GCCGO)
 
 ptx:
 	make -C gpu/ptx
@@ -23,10 +30,12 @@ test: 6gtest gccgotest unittest
 unittest:
 	make -C test
 
-PKGS=nimble-cube/core nimble-cube/gpu nimble-cube/gpu/conv nimble-cube/dump nimble-cube/mag  nimble-cube/api
-
 6gtest:
 	go test $(PKGS) 
 
 gccgotest:
 	go test -compiler=$(gccgo) $(PKGS)
+
+.PHONY: clean
+clean:
+	go clean -i -x $(PKGS)

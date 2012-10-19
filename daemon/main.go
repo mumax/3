@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	flag_host  = flag.String("host", "", "override hostname")
-	flag_poll  = flag.Duration("poll", 60*time.Second, "directory poll time")
-	flag_relax = flag.Duration("relax", 1*time.Second, "relax time after job")
-	flag_gpu   = flag.Int("gpu", -1, "specify gpu number")
+	flag_host     = flag.String("host", "", "override hostname")
+	flag_poll     = flag.Duration("poll", 60*time.Second, "directory poll time")
+	flag_relax    = flag.Duration("relax", 1*time.Second, "relax time after job")
+	flag_halflife = flag.Duration("halflife", 1*24*time.Hour, "share half-life")
+	flag_gpu      = flag.Int("gpu", -1, "specify gpu number")
 )
 
 func main() {
@@ -95,13 +96,17 @@ func mainloop(share map[string]float64) {
 }
 
 var (
-	lastdecay   time.Time       // Last time the shares were decayed.
-	decaytick   = 1 * time.Hour // Update decays every decaytick
-	decayfactor = 0.997         // Multiply shares by this every decaytick, 0.997 gives half-life of about a week.
+	lastdecay time.Time          // Last time the shares were decayed.
+	decaytick = 30 * time.Minute // Update decays every decaytick
 )
 
 // update shares to decay by decayfactor/decaytick
 func decay(share map[string]float64) {
+	tick := float64(decaytick)
+	halflife := float64(*flag_halflife)
+
+	decayfactor := math.Exp(math.Log(.5) * tick / halflife)
+
 	ok := false
 	for time.Since(lastdecay) > decaytick {
 		for k := range share {

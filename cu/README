@@ -302,6 +302,9 @@ func (ptr DevicePtr) GetAddressRange() (bytes int64, base DevicePtr)
     Returns the base address and size of the allocation (by MemAlloc) that
     contains the input pointer ptr.
 
+func (ptr DevicePtr) MemoryType() MemoryType
+    Returns the physical memory type that ptr addresses.
+
 func (p DevicePtr) String() string
 
 type Dim3 struct {
@@ -337,6 +340,20 @@ const (
     MEMHOSTREGISTER_DEVICEMAP MemHostRegisterFlag = C.CU_MEMHOSTREGISTER_DEVICEMAP
 )
     Flag for MemHostRegister
+
+type MemoryType uint
+
+const (
+    MemoryTypeHost    MemoryType = C.CU_MEMORYTYPE_HOST
+    MemoryTypeDevice  MemoryType = C.CU_MEMORYTYPE_DEVICE
+    MemoryTypeArray   MemoryType = C.CU_MEMORYTYPE_ARRAY
+    MemoryTypeUnified MemoryType = C.CU_MEMORYTYPE_UNIFIED
+)
+
+func PointerGetAttributeMemoryType(ptr DevicePtr) (t MemoryType, err Result)
+    Returns the physical memory type that ptr addresses.
+
+func (t MemoryType) String() string
 
 type Module uintptr
     Represents a CUDA CUmodule, a reference to executable device code.

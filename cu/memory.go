@@ -220,3 +220,43 @@ const (
 	SIZEOF_COMPLEX64  = 8
 	SIZEOF_COMPLEX128 = 16
 )
+
+// Physical memory type of device pointer.
+type MemoryType uint
+
+const (
+	MemoryTypeHost    MemoryType = C.CU_MEMORYTYPE_HOST
+	MemoryTypeDevice  MemoryType = C.CU_MEMORYTYPE_DEVICE
+	MemoryTypeArray   MemoryType = C.CU_MEMORYTYPE_ARRAY
+	MemoryTypeUnified MemoryType = C.CU_MEMORYTYPE_UNIFIED
+)
+
+var memorytype = map[MemoryType]string{
+	MemoryTypeHost:    "MemoryTypeHost",
+	MemoryTypeDevice:  "MemoryTypeDevice",
+	MemoryTypeArray:   "MemoryTypeArray",
+	MemoryTypeUnified: "MemoryTypeUnified"}
+
+func (t MemoryType) String() string {
+	if s, ok := memorytype[t]; ok {
+		return s
+	}
+	return "MemoryTypeUnknown"
+}
+
+// Returns the physical memory type that ptr addresses.
+func PointerGetAttributeMemoryType(ptr DevicePtr) (t MemoryType, err Result) {
+	var typ uint64 // foresee enough memory just to be safe
+	err = Result(C.cuPointerGetAttribute(unsafe.Pointer(&typ),
+		C.CU_POINTER_ATTRIBUTE_MEMORY_TYPE, C.CUdeviceptr(uintptr(ptr))))
+	return MemoryType(uint(typ)), err
+}
+
+// Returns the physical memory type that ptr addresses.
+func (ptr DevicePtr) MemoryType() MemoryType {
+	t, err := PointerGetAttributeMemoryType(ptr)
+	if err != SUCCESS {
+		panic(err)
+	}
+	return t
+}

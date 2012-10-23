@@ -193,14 +193,21 @@ func DumpQueHtml() {
 	body += fmt.Sprintf("<title>%s</title>\n", "que status page")
     body += "</header>"
 	body += fmt.Sprintf("<p>The status of the que as of %s\n\n</p><hr>", time.Now().String())
-
+    tempBodyGlobal := ""
+    
+    var vStatusGlobal [4]int
+    
 	for i := range users {
+	    
+	    tempBodyUser := ""
+	    var vStatusUser [4]int
+	    
 		UserName := users[i]
-		body += fmt.Sprint("<b>" + UserName + "</b>\n")
-		body += fmt.Sprint("<hr>\n")
-		body += "<table>\n"
+		tempBodyGlobal += fmt.Sprint("<b>" + UserName + "</b>\n")
+		tempBodyGlobal += fmt.Sprint("<hr>\n")
+		tempBodyUser += "<table>\n"
 
-		body += fmt.Sprintf("<tr><b><td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</b>\n</tr>\n",
+		tempBodyUser += fmt.Sprintf("<tr><b><td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</b>\n</tr>\n",
         "          ", "Job's name:", "Node name:", "GPU:", "Started on:", "Duration:", "Status:")
 		for j := range joblist[i] {
 			job := joblist[i][j]
@@ -209,19 +216,37 @@ func DumpQueHtml() {
             StartTime := job.StartTime.Format("02 Jan 06 15:04:05")
 			Duration := job.Runtime.String()
             Status := STATUSMAP[job.Status]
-			body += fmt.Sprintf("<tr class='%s'>", strings.ToLower(Status))
+            vStatusUser[job.Status + 1] += 1
+			tempBodyUser += fmt.Sprintf("<tr class='%s'>", strings.ToLower(Status))
 			if job.Status != 2 {
-				body += fmt.Sprintf("<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>\n",
+				tempBodyUser += fmt.Sprintf("<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>\n",
 					"          ", job.Name, Node, GPU, StartTime, Duration, Status)
 			} else {
 				const None = "---"
-				body += fmt.Sprintf("<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>\n",
+				tempBodyUser += fmt.Sprintf("<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr>\n",
 					"          ", job.Name, None, None, None, None, Status)
 			}
 		}
-		body += "</table>\n"
+		tempBodyUser += "</table>\n"
+		tempBodyGlobal += "<table cellpadding='10'>\n<tr>"
+		for i := range vStatusUser {
+		    Sts := STATUSMAP[i - 1];
+		    vStatusGlobal[i] += vStatusUser[i]
+		    tempBodyGlobal += fmt.Sprintf("<td class='%s'><b>%d</b></td>", strings.ToLower(Sts), vStatusUser[i])
+		}
+		tempBodyGlobal += "</tr></table>\n"
+		tempBodyGlobal += tempBodyUser + "<hr>\n"
 	}
-	body += "</table>"
+	tempBodyGlobal += "</table>"
+	body += fmt.Sprint("<b>Grand Total</b>\n")
+	body += fmt.Sprint("<hr>\n")
+	body += "<table cellpadding='10'>\n<tr>"
+	for i := range vStatusGlobal {
+	    Sts := STATUSMAP[i - 1];
+	    body += fmt.Sprintf("<td class='%s'><b>%d</b></td>", strings.ToLower(Sts), vStatusGlobal[i])
+	}
+	body += "</tr></table>\n<hr>\n"
+	body += tempBodyGlobal
 	body += fmt.Sprint(htmlFooter)
 	output := ([]byte)(body)
 	filename := *out + "/" + OUTNAME

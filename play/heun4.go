@@ -3,6 +3,7 @@ package main
 import (
 	. "nimble-cube/core"
 	"nimble-cube/gpu"
+	"nimble-cube/gpumag"
 )
 
 func main() {
@@ -19,8 +20,9 @@ func main() {
 	// add quantities
 	m := gpu.MakeChan3("m", "", mesh)
 
-	demag := gpu.NewDemag(m)
-	Log(demag)
+	demag := gpumag.NewDemag("Hd", m.MakeRChan3())
+	Stack(demag)
+	//Log(demag)
 
 	//	b := gpu.MakeChan3(size, "B")
 	//

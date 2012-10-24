@@ -17,14 +17,20 @@ type Exchange6 struct {
 	stream      cu.Stream
 }
 
-func NewExchange6(m RChan3, hex Chan3, mesh *core.Mesh, aex_reduced float64) *Exchange6 {
+func RunExchange6(tag string, m_ Chan3, aex_reduced float64) *Exchange6 {
+	m := m_.MakeRChan3()
+	mesh := m.Mesh()
+	hex := MakeChan3(tag, "T", mesh) //TODO: blocks
 	e := &Exchange6{m: m, hex: hex, Mesh: mesh, aex_reduced: aex_reduced, stream: cu.StreamCreate()}
 	cellsize := mesh.CellSize()
 	for i := range e.factors {
 		e.factors[i] = float32(aex_reduced / (cellsize[i] * cellsize[i]))
 	}
+	core.Stack(e)
 	return e
 }
+
+func (e *Exchange6) Output() Chan3 { return e.hex }
 
 func (e *Exchange6) Run() {
 	LockCudaThread()

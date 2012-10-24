@@ -4,6 +4,7 @@ import (
 	. "nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/gpumag"
+	"nimble-cube/mag"
 )
 
 func main() {
@@ -20,21 +21,18 @@ func main() {
 	// add quantities
 	m := gpu.MakeChan3("m", "", mesh)
 
-	demag := gpumag.NewDemag("Hd", m.MakeRChan3())
+	demag := gpumag.RunDemag("Bd", m.MakeRChan3())
 	Stack(demag)
-	//Log(demag)
+	b := demag.Output()
+	Log(b)
 
-	//	b := gpu.MakeChan3(size, "B")
-	//
-	//	acc := 1
-	//	kernel := mag.BruteKernel(mesh.ZeroPadded(), acc)
-	//	Stack(conv.NewSymm2D(size, kernel, mGPU.MakeRChan3(), b))
-	//
-	//	const Msat = 1.0053
-	//	aex := mag.Mu0 * 13e-12 / Msat
-	//	bex := gpu.MakeChan3(size, "Bex")
-	//	Stack(gpu.NewExchange6(mGPU.MakeRChan3(), bex, mesh, aex))
-	//
+	const Msat = 1.0053
+	aex := mag.Mu0 * 13e-12 / Msat
+	exch := gpu.RunExchange6("Bex", m, aex)
+	bex := exch.Output()
+	Log(bex)
+
+	dump.Autosave()
 	//	//bexH := MakeChan3(size, "BexH")
 	//	//	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
 	//	//	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))

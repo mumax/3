@@ -10,9 +10,9 @@ var (
 	uniquetags = make(map[string]int)
 )
 
-// Unique replaces tag by a globally unique one
+// UniqueTag replaces tag by a globally unique one
 // by appending a number if necessary.
-func Unique(tag string) string {
+func UniqueTag(tag string) string {
 	uniquelock.Lock()
 	defer uniquelock.Unlock()
 

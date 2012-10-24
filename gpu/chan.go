@@ -18,6 +18,7 @@ type Chan struct {
 }
 
 func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan {
+	tag = core.UniqueTag(tag)
 	info := core.NewInfo(tag, unit, m, blocks...)
 	return Chan{chandata{safe.MakeFloat32s(m.NCell()), info}, core.NewRWMutex(m.NCell(), tag)}
 }

@@ -1,11 +1,11 @@
 all: githook 6g gccgo
 
 PKGS=\
-	nimble-cube/core\
-	nimble-cube/gpu\
 	nimble-cube/gpu/conv\
-	nimble-cube/dump\
+	nimble-cube/gpu\
 	nimble-cube/mag\
+	nimble-cube/dump\
+	nimble-cube/core\
 
 6g: ptx
 	go install -v $(PKGS)

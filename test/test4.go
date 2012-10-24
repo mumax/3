@@ -12,27 +12,27 @@ func main() {
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
-	size := mesh.Size()
+	//size := mesh.Size()
 	Log("mesh:", mesh)
 	Log("block:", BlockSize(mesh.Size()))
 
-	m := MakeChan3(size, "m")
-	hd := MakeChan3(size, "Hd")
+	m := MakeChan3("m", "", mesh)
+	hd := MakeChan3("Hd", "", mesh)
 
 	acc := 8
 	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
-	Stack(conv.NewSymmetricHtoD(size, kernel, m.MakeRChan3(), hd))
+	Stack(conv.NewSymmetricHtoD(mesh, kernel, m.MakeRChan3(), hd))
 
 	Msat := 1.0053
 	aex := mag.Mu0 * 13e-12 / Msat
-	hex := MakeChan3(size, "Hex")
+	hex := MakeChan3("Hex", "", mesh)
 	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
 
-	heff := MakeChan3(size, "Heff")
+	heff := MakeChan3("Heff", "", mesh)
 	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
 
 	const alpha = 0.02
-	torque := MakeChan3(size, "τ")
+	torque := MakeChan3("τ", "", mesh)
 	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
 
 	const dt = 100e-15

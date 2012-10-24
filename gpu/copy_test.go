@@ -8,7 +8,7 @@ import (
 func TestCopy(t *testing.T) {
 	LockCudaThread()
 
-	cell:= 1e-9
+	cell := 1e-9
 	mesh := core.NewMesh(2, 4, 8, cell, cell, cell)
 	N := mesh.NCell()
 	F := 100

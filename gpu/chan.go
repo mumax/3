@@ -17,7 +17,7 @@ type Chan struct {
 	mutex *core.RWMutex
 }
 
-func MakeChan(tag, unit string, m*core.Mesh, blocks ...int) Chan {
+func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan {
 	return Chan{chandata{safe.MakeFloat32s(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size), tag)}
 }
 

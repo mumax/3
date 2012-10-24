@@ -8,12 +8,13 @@ import (
 func TestCopy(t *testing.T) {
 	LockCudaThread()
 
-	size := [3]int{1, 4, 8}
-	N := core.Prod(size)
+	cell:= 1e-9
+	mesh := core.NewMesh(2, 4, 8, cell, cell, cell)
+	N := mesh.NCell()
 	F := 100
-	a := core.MakeChan(size, "a")
-	b := MakeChan(size, "b")
-	c := core.MakeChan(size, "c")
+	a := core.MakeChan("a", "", mesh)
+	b := MakeChan("b", "", mesh)
+	c := core.MakeChan("c", "", mesh)
 
 	up := NewUploader(a.MakeRChan(), b)
 	down := NewDownloader(b.MakeRChan(), c)
@@ -41,5 +42,4 @@ func TestCopy(t *testing.T) {
 		}
 		C.ReadDone()
 	}
-	//core.Log(C.Uns)
 }

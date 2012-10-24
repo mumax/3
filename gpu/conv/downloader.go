@@ -9,13 +9,13 @@ import (
 // Downloader for vector data specifically tuned for convolution.
 // Prioritizes upload of all X components, then Y, then Z.
 type Downloader struct {
-	dev    [3]gpu.RChan
+	dev    [3]gpu.RChan1
 	host   core.Chan3
 	bsize  int
 	stream cu.Stream
 }
 
-func NewDownloader(devdata [3]gpu.RChan, hostdata core.Chan3) *Downloader {
+func NewDownloader(devdata [3]gpu.RChan1, hostdata core.Chan3) *Downloader {
 	core.Assert(hostdata.Size() == devdata[0].Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
 	return &Downloader{devdata, hostdata, blocklen, 0}

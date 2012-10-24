@@ -34,6 +34,6 @@ func NewSymmetricHtoD(m *core.Mesh, kernel [3][3][][][]float32, input core.RChan
 	return c
 }
 
-func make3RChan(c [3]gpu.Chan1) [3]gpu.RChan {
-	return [3]gpu.RChan{c[0].MakeRChan(), c[1].MakeRChan(), c[2].MakeRChan()}
+func make3RChan(c [3]gpu.Chan1) [3]gpu.RChan1 {
+	return [3]gpu.RChan1{c[0].MakeRChan(), c[1].MakeRChan(), c[2].MakeRChan()}
 }

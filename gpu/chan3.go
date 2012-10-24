@@ -1,19 +1,20 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda5/safe"
 	"fmt"
+	"github.com/barnex/cuda5/safe"
+	"nimble-cube/core"
 )
 
 // Chan of 3-vector data.
 type Chan3 [3]Chan
 
-func MakeChan3(tag, unit string, m*core.Mesh, blocks ...in) Chan3 {
+func MakeChan3(tag, unit string, m *core.Mesh, blocks ...int) Chan3 {
 	var c Chan3
-	for i:=range c{
-		c[i] = MakeChan(fmt.Sprint(tag, i)
+	for i := range c {
+		c[i] = MakeChan(fmt.Sprint(tag, i), unit, m, blocks...)
 	}
-	return Chan3{MakeChan(tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
+	return c
 }
 
 // UnsafeData returns the underlying storage without locking.

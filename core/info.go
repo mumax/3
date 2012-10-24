@@ -6,11 +6,13 @@ type Info struct {
 	tag, unit string // Human-readable descriptors
 	*Mesh
 	nBlocks, blockLen int
+	blockSize [3]int
 }
 
 func NewInfo(tag, unit string, m *Mesh, nBlocks ...int) *Info {
 	blocks, blen := parseNBlocks(m.Size(), nBlocks...)
-	return &Info{tag, unit, m, blocks, blen}
+	bs := BlockSize(m.Size())
+	return &Info{tag, unit, m, blocks, blen, bs}
 }
 
 func (i *Info) Tag() string   { return i.tag }

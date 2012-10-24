@@ -1,5 +1,9 @@
 package core
 
+import(
+	"fmt"
+)
+
 // Chan of 3-vector data.
 type Chan3 [3]Chan1
 
@@ -8,8 +12,12 @@ func (c *Chan3) Chan() []Chan1 {
 	return (*c)[:]
 }
 
-func MakeChan3(size [3]int, tag string) Chan3 {
-	return Chan3{MakeChan(size, tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
+func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
+	var c Chan3
+	for i := range c {
+		c[i] = MakeChan(fmt.Sprint(tag, i), unit, m, blocks...)
+	}
+	return c
 }
 
 // WriteNext locks and returns a slice of length n for 

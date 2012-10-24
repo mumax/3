@@ -6,12 +6,15 @@ type Chan1 struct {
 }
 
 type chandata struct {
+	*Info
 	array [][][]float32
 	list  []float32
 }
 
-func MakeChan(size [3]int, tag string) Chan1 {
-	return Chan1{makedata(size), NewRWMutex(Prod(size), tag)}
+func MakeChan(tag, unit string, m *Mesh, blocks ...int) Chan1 {
+	tag = UniqueTag(tag)
+	data := makedata(tag, unit, m, blocks...)
+	return Chan1{data, NewRWMutex(data.BlockLen(), tag)}
 }
 
 // Implements Chans
@@ -19,8 +22,11 @@ func (c *Chan1) Chan() []Chan1 {
 	return []Chan1{*c}
 }
 
-func makedata(size [3]int) chandata {
+func makedata(tag, unit string, m*Mesh, blocks...int) chandata {
+	size := m.Size()
 	var c chandata
+	c.Info = NewInfo(tag, unit, m, blocks...)
+
 	c.array = MakeFloats(size)
 	c.list = Contiguous(c.array)
 	return c

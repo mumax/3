@@ -49,7 +49,6 @@ func (c *RChan3) Size() [3]int     { return c[0].Size() }
 func (c *RChan3) Unit() string     { return c[0].Unit() }
 func (c *RChan3) Tag() string      { return c[0].Tag() }
 
-
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (c *RChan3) UnsafeData() [3]safe.Float32s {

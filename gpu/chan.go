@@ -7,10 +7,9 @@ import (
 
 type chandata struct {
 	list safe.Float32s
-	size [3]int
+	*core.Info
 }
 
-func (c *chandata) Size() [3]int              { return c.size }
 func (c *chandata) UnsafeData() safe.Float32s { return c.list }
 
 type Chan struct {
@@ -18,7 +17,7 @@ type Chan struct {
 	mutex *core.RWMutex
 }
 
-func MakeChan(size [3]int, tag string) Chan {
+func MakeChan(tag, unit string, m*core.Mesh, blocks ...int) Chan {
 	return Chan{chandata{safe.MakeFloat32s(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size), tag)}
 }
 

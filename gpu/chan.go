@@ -18,7 +18,8 @@ type Chan struct {
 }
 
 func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan {
-	return Chan{chandata{safe.MakeFloat32s(core.Prod(size)), size}, core.NewRWMutex(core.Prod(size), tag)}
+	info := core.NewInfo(tag, unit, m, blocks...)
+	return Chan{chandata{safe.MakeFloat32s(m.NCell()), info}, core.NewRWMutex(m.NCell(), tag)}
 }
 
 // WriteNext locks and returns a slice of length n for 

@@ -2,13 +2,18 @@ package gpu
 
 import (
 	"github.com/barnex/cuda5/safe"
+	"fmt"
 )
 
 // Chan of 3-vector data.
 type Chan3 [3]Chan
 
-func MakeChan3(size [3]int, tag string) Chan3 {
-	return Chan3{MakeChan(size, tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
+func MakeChan3(tag, unit string, m*core.Mesh, blocks ...in) Chan3 {
+	var c Chan3
+	for i:=range c{
+		c[i] = MakeChan(fmt.Sprint(tag, i)
+	}
+	return Chan3{MakeChan(tag+"0"), MakeChan(size, tag+"1"), MakeChan(size, tag+"2")}
 }
 
 // UnsafeData returns the underlying storage without locking.

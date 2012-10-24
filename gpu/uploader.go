@@ -7,8 +7,8 @@ import (
 
 // Uploads data from host to GPU.
 type Uploader struct {
-	host core.RChan1
-	dev  Chan1
+	host   core.RChan1
+	dev    Chan1
 	bsize  int
 	stream cu.Stream
 }

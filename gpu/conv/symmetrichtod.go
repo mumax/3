@@ -1,7 +1,6 @@
 package conv
 
 import (
-	"fmt"
 	"nimble-cube/core"
 	"nimble-cube/gpu"
 )
@@ -22,11 +21,12 @@ func (c *SymmetricHtoD) Run() {
 	c.convolution.Run()                                     // devin -> devout
 }
 
-func NewSymmetricHtoD(size [3]int, kernel [3][3][][][]float32, input core.RChan3, output core.Chan3) *SymmetricHtoD {
+func NewSymmetricHtoD(m *core.Mesh, kernel [3][3][][][]float32, input core.RChan3, output core.Chan3) *SymmetricHtoD {
+	size := m.Size()
 	c := new(SymmetricHtoD)
 	for i := 0; i < 3; i++ {
-		c.devin[i] = gpu.MakeChan(size, fmt.Sprint("devin", i))
-		c.devout[i] = gpu.MakeChan(size, fmt.Sprint("devout", i))
+		c.devin[i] = gpu.MakeChan("convIn", input.Unit(), m) // TODO: blocks??
+		c.devout[i] = gpu.MakeChan("convOut", input.Unit(), m)
 	}
 	c.convolution = NewSymm2D(size, kernel, make3RChan(c.devin), c.devout)
 	c.hostin = input

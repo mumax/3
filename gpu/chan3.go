@@ -23,9 +23,10 @@ func (c *Chan3) UnsafeData() [3]safe.Float32s {
 	return [3]safe.Float32s{c[0].list, c[1].list, c[2].list}
 }
 
-func (c *Chan3) Size() [3]int {
-	return c[0].Size()
-}
+func (c *Chan3) Mesh() *core.Mesh { return c[0].Mesh }
+func (c *Chan3) Size() [3]int     { return c[0].Size() }
+func (c *Chan3) Unit() string     { return c[0].Unit() }
+func (c *Chan3) Tag() string      { return c[0].Tag() }
 
 // WriteNext locks and returns a slice of length n for 
 // writing the next n elements to the Chan3.

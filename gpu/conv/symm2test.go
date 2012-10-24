@@ -32,7 +32,7 @@ func TestSymm2(N0, N1, N2 int) {
 		}
 	}()
 
-	go NewSymmetricHtoD(mesh.Size(), kern, hin.MakeRChan3(), hout).Run()
+	go NewSymmetricHtoD(mesh, kern, hin.MakeRChan3(), hout).Run()
 
 	houtR := hout.MakeRChan3()
 	for i := 0; i < F; i++ {

@@ -1,17 +1,19 @@
 all: githook 6g gccgo
 
+PREFIX=nimble-cube
+
 PKGS=\
-	nimble-cube/gpu/conv\
-	nimble-cube/gpu\
-	nimble-cube/mag\
-	nimble-cube/dump\
-	nimble-cube/core\
+	$(PREFIX)/gpu/conv\
+	$(PREFIX)/gpu\
+	$(PREFIX)/mag\
+	$(PREFIX)/dump\
+	$(PREFIX)/core\
 
 6g: ptx
 	go install -v $(PKGS)
 	go install -v 
 
-GCCGO=gccgo -gccgoflags '-static-libgcc -O3'
+GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -march=native'
 
 gccgo: ptx
 	go install -v -compiler $(GCCGO) $(PKGS)
@@ -38,3 +40,4 @@ gccgotest:
 .PHONY: clean
 clean:
 	go clean -i -x $(PKGS)
+	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/

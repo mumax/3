@@ -10,12 +10,12 @@ import (
 // Prioritizes upload of all X components, then Y, then Z.
 type Uploader struct {
 	host   core.RChan3
-	dev    [3]gpu.Chan
+	dev    [3]gpu.Chan1
 	bsize  int
 	stream cu.Stream
 }
 
-func NewUploader(hostdata core.RChan3, devdata [3]gpu.Chan) *Uploader {
+func NewUploader(hostdata core.RChan3, devdata [3]gpu.Chan1) *Uploader {
 	core.Assert(hostdata.Size() == devdata[0].Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
 	return &Uploader{hostdata, devdata, blocklen, 0}

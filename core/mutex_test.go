@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -31,7 +30,7 @@ func write(m *RWMutex, a []int, N, frames int) {
 		prev := 0
 		for j := 1; j <= N; j++ {
 			m.WriteNext(1)
-			fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
+			//fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
 			a[prev] = count
 			m.WriteDone()
 			count++
@@ -52,7 +51,7 @@ func read(m *RMutex, a []int, N, frames int, t *testing.T) {
 		prev := 0
 		for j := 1; j <= N; j += 1 {
 			m.ReadNext(1)
-			fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
+			//fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 			if count != a[prev] {
 				t.Error("got", a[prev], "expected", count)
 			}

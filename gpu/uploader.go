@@ -7,13 +7,13 @@ import (
 
 // Uploads data from host to GPU.
 type Uploader struct {
-	host   core.RChan1
-	dev    Chan
+	host core.RChan1
+	dev  Chan1
 	bsize  int
 	stream cu.Stream
 }
 
-func NewUploader(hostdata core.RChan1, devdata Chan) *Uploader {
+func NewUploader(hostdata core.RChan1, devdata Chan1) *Uploader {
 	core.Assert(hostdata.Size() == devdata.Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
 	return &Uploader{hostdata, devdata, blocklen, 0}

@@ -12,23 +12,23 @@ type chandata struct {
 
 func (c *chandata) UnsafeData() safe.Float32s { return c.list }
 
-type Chan struct {
+type Chan1 struct {
 	chandata
 	mutex *core.RWMutex
 }
 
-func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan {
+func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan1 {
 	tag = core.UniqueTag(tag)
 	info := core.NewInfo(tag, unit, m, blocks...)
 	len_ := info.BlockLen()
-	return Chan{chandata{safe.MakeFloat32s(len_), info}, core.NewRWMutex(len_, tag)}
+	return Chan1{chandata{safe.MakeFloat32s(len_), info}, core.NewRWMutex(len_, tag)}
 }
 
 // WriteNext locks and returns a slice of length n for 
 // writing the next n elements to the Chan.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan. After that, the slice is not valid any more.
-func (c *Chan) WriteNext(n int) safe.Float32s {
+func (c *Chan1) WriteNext(n int) safe.Float32s {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
 	return c.list.Slice(a, b)
@@ -36,6 +36,6 @@ func (c *Chan) WriteNext(n int) safe.Float32s {
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c *Chan) WriteDone() {
+func (c *Chan1) WriteDone() {
 	c.mutex.WriteDone()
 }

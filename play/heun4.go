@@ -17,11 +17,10 @@ func main() {
 	Log("mesh:", mesh)
 
 	// add quantities
-	m := gpu.NewQuant("m", 3, mesh, "")
-	Log(m)
+	m := gpu.MakeChan3("m", "", mesh)
 
-	b := gpu.NewDemag(m).Output()
-	Log(b)
+	demag := gpu.NewDemag(m)
+	Log(demag)
 
 	//	b := gpu.MakeChan3(size, "B")
 	//

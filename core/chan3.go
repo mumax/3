@@ -7,11 +7,6 @@ import (
 // Chan of 3-vector data.
 type Chan3 [3]Chan1
 
-// Implements Chans
-func (c *Chan3) Chan() []Chan1 {
-	return (*c)[:]
-}
-
 func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
 	var c Chan3
 	for i := range c {
@@ -59,10 +54,6 @@ func (c *Chan3) Tag() string  { return c[0].Tag() }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (c *Chan3) UnsafeData() [3][]float32 {
-	return [3][]float32{c[0].list, c[1].list, c[2].list}
-}
-
-func (c *Chan3) UnsafeArray() [3][][][]float32 {
-	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
-}
+func (c *Chan3) UnsafeData() [3][]float32 { return [3][]float32{c[0].list, c[1].list, c[2].list} }
+func (c *Chan3) UnsafeArray() [3][][][]float32 { return [3][][][]float32{c[0].array, c[1].array, c[2].array} }
+func(c*Chan3) Comp(idx int)Chan1{ return c[idx] }

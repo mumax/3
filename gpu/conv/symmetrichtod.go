@@ -9,15 +9,15 @@ import (
 // to accept host input/output.
 type SymmetricHtoD struct {
 	hostin        core.RChan3
-	devin, devout [3]gpu.Chan
+	devin, devout [3]gpu.Chan1
 	hostout       core.Chan3
 	convolution   *Symm2D
 }
 
 func (c *SymmetricHtoD) Run() {
 	// TODO: racy! push to stack and have automatically popped off?
-	go NewUploader(c.hostin, c.devin).Run()                 // hostin -> devin
 	go NewDownloader(make3RChan(c.devout), c.hostout).Run() // devout -> hostout
+	go NewUploader(c.hostin, c.devin).Run()                 // hostin -> devin
 	c.convolution.Run()                                     // devin -> devout
 }
 
@@ -34,6 +34,6 @@ func NewSymmetricHtoD(m *core.Mesh, kernel [3][3][][][]float32, input core.RChan
 	return c
 }
 
-func make3RChan(c [3]gpu.Chan) [3]gpu.RChan {
+func make3RChan(c [3]gpu.Chan1) [3]gpu.RChan {
 	return [3]gpu.RChan{c[0].MakeRChan(), c[1].MakeRChan(), c[2].MakeRChan()}
 }

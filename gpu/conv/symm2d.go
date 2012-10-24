@@ -14,7 +14,7 @@ type Symm2D struct {
 	fftKernSize [3]int              // Size of real, FFTed kernel
 	n           int                 // product of size
 	input       [3]gpu.RChan        // TODO: fuse with input
-	output      [3]gpu.Chan         // TODO: fuse with output
+	output      [3]gpu.Chan1        // TODO: fuse with output
 	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf. 
 	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
@@ -234,7 +234,7 @@ func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 
-func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan) *Symm2D {
+func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input [3]gpu.RChan, output [3]gpu.Chan1) *Symm2D {
 	c := new(Symm2D)
 	c.size = size
 	c.kernArr = kernel

@@ -7,7 +7,7 @@ import (
 )
 
 // Chan of 3-vector data.
-type Chan3 [3]Chan
+type Chan3 [3]Chan1
 
 func MakeChan3(tag, unit string, m *core.Mesh, blocks ...int) Chan3 {
 	var c Chan3

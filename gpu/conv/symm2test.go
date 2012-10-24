@@ -12,11 +12,10 @@ func TestSymm2(N0, N1, N2 int) {
 	mesh := core.NewMesh(N0, N1, N2, C, 2*C, 3*C)
 	core.Log(mesh)
 	N := mesh.NCell()
-	s := mesh.Size()
 
 	gpu.LockCudaThread()
-	hin := core.MakeChan3(s, "hin")
-	hout := core.MakeChan3(s, "hout")
+	hin := core.MakeChan3("hin", "", mesh)
+	hout := core.MakeChan3("hout", "", mesh)
 
 	acc := 1
 	kern := mag.BruteKernel(core.ZeroPad(mesh), acc)

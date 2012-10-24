@@ -22,7 +22,7 @@ func (c *Chan1) Chan() []Chan1 {
 	return []Chan1{*c}
 }
 
-func makedata(tag, unit string, m*Mesh, blocks...int) chandata {
+func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 	size := m.Size()
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)

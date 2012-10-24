@@ -6,7 +6,7 @@ type Info struct {
 	tag, unit string // Human-readable descriptors
 	*Mesh
 	nBlocks, blockLen int
-	blockSize [3]int
+	blockSize         [3]int
 }
 
 func NewInfo(tag, unit string, m *Mesh, nBlocks ...int) *Info {

@@ -1,6 +1,6 @@
 package core
 
-import(
+import (
 	"fmt"
 )
 
@@ -52,6 +52,11 @@ func (c *Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
 	return next
 }
 
+func (c *Chan3) Mesh() *Mesh  { return c[0].Mesh }
+func (c *Chan3) Size() [3]int { return c[0].Size() }
+func (c *Chan3) Unit() string { return c[0].Unit() }
+func (c *Chan3) Tag() string  { return c[0].Tag() }
+
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (c *Chan3) UnsafeData() [3][]float32 {
@@ -60,8 +65,4 @@ func (c *Chan3) UnsafeData() [3][]float32 {
 
 func (c *Chan3) UnsafeArray() [3][][][]float32 {
 	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
-}
-
-func (c *Chan3) Size() [3]int {
-	return c[0].Size()
 }

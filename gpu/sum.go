@@ -76,6 +76,8 @@ func (s *Sum) Exec() {
 	}
 }
 
+func(s*Sum)Output()ChanN{ return s.sum }
+
 //var maddCode cu.Function
 //
 //func madd(dst, src1 safe.Float32s, factor1 float32, src2 safe.Float32s, factor2 float32, stream cu.Stream) {

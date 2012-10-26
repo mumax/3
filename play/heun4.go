@@ -38,7 +38,7 @@ func main() {
 	bex := exch.Output()
 	Log(bex)
 
-	beff := gpu.RunSum("Beff", b, Bsat, bex, 1)
+	beff := gpu.RunSum("Beff", b, Bsat, bex, 1).Output().Chan3()
 
 	τ := gpu.RunLLGTorque("τ", m.NewReader(), beff.NewReader(), alpha)
 

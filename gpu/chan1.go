@@ -17,7 +17,7 @@ type Chan1 struct {
 	mutex *core.RWMutex
 }
 
-func MakeChan(tag, unit string, m *core.Mesh, blocks ...int) Chan1 {
+func MakeChan1(tag, unit string, m *core.Mesh, blocks ...int) Chan1 {
 	tag = core.UniqueTag(tag)
 	info := core.NewInfo(tag, unit, m, blocks...)
 	len_ := info.BlockLen()

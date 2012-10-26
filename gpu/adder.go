@@ -1,5 +1,8 @@
 package gpu
 
+
+// TODO: rm
+
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"

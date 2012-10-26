@@ -1,6 +1,5 @@
 package gpumag
 
-
 import (
 	"nimble-cube/core"
 	"nimble-cube/gpu"

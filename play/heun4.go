@@ -43,7 +43,9 @@ func main() {
 
 	τ := gpu.RunLLGTorque("τ", m, beff, alpha).Output()
 
-	//solver := gpu.NewHeun(m, τ, dt, mag.Gamma0)
+	solver := gpu.NewHeun(m, τ, dt, mag.Gamma0)
+	solver.Steps(1000)
+
 	//
 	//	mHost := MakeChan3(size, "mHost")
 	//	Stack(conv.NewDownloader(mGPU.MakeRChan3(), mHost))
@@ -62,7 +64,6 @@ func main() {
 	//	}
 	//
 	//	gpu.LockCudaThread()
-	//	solver.Steps(1000)
 	//
 	//	ProfDump(os.Stdout)
 	//	Cleanup()

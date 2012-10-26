@@ -35,8 +35,8 @@ func (s *Sum) MAdd(term RChanN, weight float32) {
 	}
 
 	if len(s.term) != 0 {
-		core.Assert(term.Size() == s.term[0].Size())
-		core.Assert(term.Unit() == s.term[0].Unit())   // TODO: nice error handling
+		core.CheckEqualSize(term.Size(), s.term[0].Size())
+		core.CheckUnits(term.Unit(), s.term[0].Unit())
 		core.Assert(*term.Mesh() == *s.term[0].Mesh()) // TODO: nice error handling
 	}
 	s.term = append(s.term, term)
@@ -72,7 +72,7 @@ func (s *Sum) Exec() {
 			madd(S, S, 1, C, s.weight[t], s.stream)
 			s.term[t][c].ReadDone()
 		}
-		s.sum.WriteDone()
+		s.sum[c].WriteDone()
 	}
 }
 

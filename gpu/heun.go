@@ -16,13 +16,18 @@ type Heun struct {
 	stream cu.Stream
 }
 
-func NewHeun(y Chan3, dy RChan3, dt, multiplier float64) *Heun {
+func NewHeun(y Chan3, dy_ Chan3, dt, multiplier float64) *Heun {
+	dy := dy_.NewReader()
 	dy0 := MakeVectors(core.Prod(y.Size()))
 	return &Heun{dy0, y, dy, float32(dt * multiplier), false, cu.StreamCreate()}
 }
 
 func (e *Heun) Steps(steps int) {
+	core.RunStack()
 	core.Log("GPU heun solver:", steps, "steps")
+	LockCudaThread()
+	defer UnlockCudaThread()
+
 	n := core.Prod(e.y.Size())
 
 	// Send out initial value

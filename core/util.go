@@ -38,6 +38,12 @@ func CheckEqualSize(a, b [3]int) {
 	}
 }
 
+func CheckUnits(a, b string) {
+	if a != b {
+		Panicf(`Unit mismatch: "%v" != "%v"`, a, b)
+	}
+}
+
 // IntArg returns the idx-th command line as an integer.
 func IntArg(idx int) int {
 	val, err := strconv.Atoi(flag.Arg(idx))

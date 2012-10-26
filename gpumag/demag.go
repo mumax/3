@@ -19,7 +19,7 @@ func RunDemag(tag string, m_ gpu.Chan3, accuracy ...int) *Demag {
 	d := new(Demag)
 	acc := DEFAULT_DEMAG_ACCURACY
 	kernel := mag.BruteKernel(core.ZeroPad(m.Mesh()), acc)
-	d.b = gpu.MakeChan3(tag, m.Unit(), m.Mesh()) // TODO: choose blocks
+	d.b = gpu.MakeChan3(tag, "T", m.Mesh()) // TODO: choose blocks
 	d.convolution = *conv.NewSymm2D(m.Size(), kernel, m, d.b)
 	core.Stack(d)
 	return d

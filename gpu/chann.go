@@ -10,7 +10,7 @@ import (
 type ChanN []Chan1
 
 func MakeChanN(nComp int, tag, unit string, m *core.Mesh, blocks ...int) ChanN {
-	tag =core.UniqueTag(tag)
+	tag = core.UniqueTag(tag)
 	c := make(ChanN, nComp)
 	for i := range c {
 		c[i] = MakeChan1(fmt.Sprint(tag, i), unit, m, blocks...)
@@ -25,14 +25,15 @@ func MakeChanN(nComp int, tag, unit string, m *core.Mesh, blocks ...int) ChanN {
 //}
 
 func (c ChanN) Mesh() *core.Mesh { return c[0].Mesh }
-func (c ChanN) NComp() int     { return len(c) }
-func (c ChanN) Comp(i int) Chan1     { return c[i] }
+func (c ChanN) NComp() int       { return len(c) }
+func (c ChanN) Comp(i int) Chan1 { return c[i] }
 func (c ChanN) Size() [3]int     { return c[0].Size() }
-func(c ChanN)NBlocks()int{ return c[0].NBlocks() }
-func(c ChanN)BlockLen()int{ return c[0].BlockLen() }
+func (c ChanN) NBlocks() int     { return c[0].NBlocks() }
+func (c ChanN) BlockLen() int    { return c[0].BlockLen() }
 func (c ChanN) Unit() string     { return c[0].Unit() }
+
 // TODO
-func (c ChanN) Tag() string      { return c[0].Tag() } 
+func (c ChanN) Tag() string { return c[0].Tag() }
 
 // WriteNext locks and returns a slice of length n for 
 // writing the next n elements to the ChanN.
@@ -55,4 +56,3 @@ func (c ChanN) WriteDone() {
 		c[i].WriteDone()
 	}
 }
-

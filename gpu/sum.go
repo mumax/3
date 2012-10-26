@@ -3,16 +3,17 @@ package gpu
 import (
 	"github.com/barnex/cuda5/cu"
 	//	"github.com/barnex/cuda5/safe"
-	"nimble-cube/core"
 	"fmt"
+	"nimble-cube/core"
+
 //	"nimble-cube/gpu/ptx"
 //	"unsafe"
 )
 
 type Sum struct {
 	sum     ChanN
-	terms   []RChan
-	factors []float32
+	term   []RChan
+	weight []float32
 	stream  cu.Stream
 	running bool
 }
@@ -26,19 +27,19 @@ func RunSum(tag string, term1 RChan, weight1 float32, term2 RChan, weight2 float
 	return sum
 }
 
-func(s*Sum)MAdd(term RChan, weight float32){
+func (s *Sum) MAdd(term RChan, weight float32) {
 	// Fail-fast check. May not always fire but should be OK to catch obvious bugs.
-	if s.running{
+	if s.running {
 		core.Fatal(fmt.Errorf("sum: madd: already running"))
 	}
 
-	if len(s.terms) != 0{
-		core.Assert(term.Size() == s.terms[0].Size())
-		core.Assert(term.Unit() == s.terms[0].Unit()) // TODO: nice error handling
-		core.Assert(*term.Mesh() == *s.terms[0].Mesh()) // TODO: nice error handling
+	if len(s.term) != 0 {
+		core.Assert(term.Size() == s.term[0].Size())
+		core.Assert(term.Unit() == s.term[0].Unit())   // TODO: nice error handling
+		core.Assert(*term.Mesh() == *s.term[0].Mesh()) // TODO: nice error handling
 	}
-	s.terms = append(s.terms, term)
-	s.factors = append(s.factors, weight)
+	s.term = append(s.term, term)
+	s.weight = append(s.weight, weight)
 }
 
 func (s *Sum) Run() {
@@ -50,23 +51,29 @@ func (s *Sum) Run() {
 }
 
 func (s *Sum) Exec() {
-	//N := s.sum.NBlocks()
+	N := s.sum.BlockLen()
 	nComp := s.sum.NComp()
 
-	for i := 0; i < nComp; i++ {
-		//sum := s.sum.Comp(i)
-	//term1.ReadNext(N)
-	//term2.ReadNext(N)
-	//sum.WriteNext(N)
+	// TODO: components could be streamed
+	for c := 0; c < nComp; c++ {
 
-	//	madd(a.sum.UnsafeData()[i], a.term1.UnsafeData()[i], a.fac1, a.term2.UnsafeData()[i], a.fac2, a.stream)
+		A := s.term[0].Comp(c).ReadNext(N)
+		B := s.term[1].Comp(c).ReadNext(N)
+		S := s.sum.Comp(c).WriteNext(N)
+
+		madd(S, A, s.weight[0], B, s.weight[1], s.stream)
+
+		s.term[0].Comp(c).ReadDone()
+		s.term[1].Comp(c).ReadDone()
+
+		for t:=2; t<len(s.term); t++{
+			C := s.term[t].Comp(c).ReadNext(N)
+			madd(S, S, 1, C, s.weight[t], s.stream)
+			s.term[t].Comp(c).ReadDone()
+		}
+		s.sum.WriteDone()
 	}
-
-	//a.sum.WriteDone()
-	//a.term1.ReadDone()
-	//a.term2.ReadDone()
 }
-
 
 //var maddCode cu.Function
 //

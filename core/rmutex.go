@@ -50,7 +50,7 @@ func (m *RMutex) ReadNext(delta int) {
 	m.rw.cond.L.Lock()
 
 	if m.absC != m.absD {
-		panic("rmutex: lock of locked mutex")
+		panic("rmutex: readnext w/o readdone")
 	}
 	m.delta(0, delta)
 

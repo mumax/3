@@ -35,13 +35,13 @@ func main() {
 	b := demag.Output()
 	Log(b)
 
-	exch := gpu.RunExchange6("Bex", m, aex)
-	bex := exch.Output()
-	Log(bex)
+//	exch := gpu.RunExchange6("Bex", m, aex)
+//	bex := exch.Output()
+//	Log(bex)
 
-	beff := gpu.RunSum("Beff", b, Bsat, bex, 1).Output().Chan3()
+	//beff := gpu.RunSum("Beff", b, Bsat, bex, 1).Output().Chan3()
 
-	τ := gpu.RunLLGTorque("τ", m, beff, alpha).Output()
+	τ := gpu.RunLLGTorque("τ", m, b, alpha).Output()
 
 	solver := gpu.NewHeun(m, τ, dt, mag.Gamma0)
 	solver.Steps(1000)

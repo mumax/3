@@ -26,7 +26,6 @@ func MakeChanN(nComp int, tag, unit string, m *core.Mesh, blocks ...int) ChanN {
 
 func (c ChanN) Mesh() *core.Mesh { return c[0].Mesh }
 func (c ChanN) NComp() int       { return len(c) }
-func (c ChanN) Comp(i int) Chan1 { return c[i] }
 func (c ChanN) Size() [3]int     { return c[0].Size() }
 func (c ChanN) NBlocks() int     { return c[0].NBlocks() }
 func (c ChanN) BlockLen() int    { return c[0].BlockLen() }

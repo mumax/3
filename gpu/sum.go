@@ -12,14 +12,14 @@ import (
 
 type Sum struct {
 	sum     ChanN
-	term    []RChan
+	term    []RChanN
 	weight  []float32
 	stream  cu.Stream
 	running bool
 }
 
 func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float32, nBlocks ...int) *Sum {
-	term1, term2 := term1_.NewReader(), term2_.NewReader()
+	term1, term2 := term1_.ChanN().NewReader(), term2_.ChanN().NewReader()
 	output := MakeChanN(term1.NComp(), tag, term1.Unit(), term1.Mesh(), nBlocks...)
 	sum := &Sum{sum: output, stream: cu.StreamCreate()}
 	sum.MAdd(term1, weight1)
@@ -28,7 +28,7 @@ func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float
 	return sum
 }
 
-func (s *Sum) MAdd(term RChan, weight float32) {
+func (s *Sum) MAdd(term RChanN, weight float32) {
 	// Fail-fast check. May not always fire but should be OK to catch obvious bugs.
 	if s.running {
 		core.Fatal(fmt.Errorf("sum: madd: already running"))
@@ -58,19 +58,19 @@ func (s *Sum) Exec() {
 	// TODO: components could be streamed
 	for c := 0; c < nComp; c++ {
 
-		A := s.term[0].Comp(c).ReadNext(N)
-		B := s.term[1].Comp(c).ReadNext(N)
-		S := s.sum.Comp(c).WriteNext(N)
+		A := s.term[0][c].ReadNext(N)
+		B := s.term[1][c].ReadNext(N)
+		S := s.sum[c].WriteNext(N)
 
 		madd(S, A, s.weight[0], B, s.weight[1], s.stream)
 
-		s.term[0].Comp(c).ReadDone()
-		s.term[1].Comp(c).ReadDone()
+		s.term[0][c].ReadDone()
+		s.term[1][c].ReadDone()
 
 		for t := 2; t < len(s.term); t++ {
-			C := s.term[t].Comp(c).ReadNext(N)
+			C := s.term[t][c].ReadNext(N)
 			madd(S, S, 1, C, s.weight[t], s.stream)
-			s.term[t].Comp(c).ReadDone()
+			s.term[t][c].ReadDone()
 		}
 		s.sum.WriteDone()
 	}

@@ -20,9 +20,9 @@ func main() {
 
 	// constants
 
-	const(
-		Bsat = 1.0053
-		aex = mag.Mu0 * 13e-12 / Bsat
+	const (
+		Bsat  = 1.0053
+		aex   = mag.Mu0 * 13e-12 / Bsat
 		alpha = 1
 	)
 

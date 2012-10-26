@@ -18,7 +18,7 @@ func MakeChan3(tag, unit string, m *core.Mesh, blocks ...int) Chan3 {
 	return c
 }
 
-func(c Chan3)ChanN()ChanN{ return ChanN(c[:]) }
+func (c Chan3) ChanN() ChanN { return ChanN(c[:]) }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.

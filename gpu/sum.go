@@ -76,7 +76,7 @@ func (s *Sum) Exec() {
 	}
 }
 
-func(s*Sum)Output()ChanN{ return s.sum }
+func (s *Sum) Output() ChanN { return s.sum }
 
 //var maddCode cu.Function
 //

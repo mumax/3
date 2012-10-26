@@ -1,5 +1,5 @@
 package gpu
 
 type Chan interface {
-	ChanN()ChanN
+	ChanN() ChanN
 }

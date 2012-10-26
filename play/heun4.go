@@ -24,6 +24,7 @@ func main() {
 		Bsat  = 1.0053
 		aex   = mag.Mu0 * 13e-12 / Bsat
 		alpha = 1
+		dt    = 50e-15
 	)
 
 	// add quantities
@@ -40,10 +41,9 @@ func main() {
 
 	beff := gpu.RunSum("Beff", b, Bsat, bex, 1).Output().Chan3()
 
-	τ := gpu.RunLLGTorque("τ", m.NewReader(), beff.NewReader(), alpha)
+	τ := gpu.RunLLGTorque("τ", m, beff, alpha).Output()
 
-	//	dt := 50e-15
-	//	solver := gpu.NewHeun(mGPU, torque.MakeRChan3(), dt, mag.Gamma)
+	//solver := gpu.NewHeun(m, τ, dt, mag.Gamma0)
 	//
 	//	mHost := MakeChan3(size, "mHost")
 	//	Stack(conv.NewDownloader(mGPU.MakeRChan3(), mHost))

@@ -17,7 +17,8 @@ type LLGTorque struct {
 	stream cu.Stream
 }
 
-func RunLLGTorque(tag string, m, B RChan3, alpha float32) *LLGTorque {
+func RunLLGTorque(tag string, m_, B_ Chan3, alpha float32) *LLGTorque {
+	m, B := m_.NewReader(), B_.NewReader()
 	core.Assert(B.Size() == m.Size())
 	torque := MakeChan3(tag, "T", m.Mesh(), 1)
 	tq := &LLGTorque{torque, m, B, alpha, mag.Vector{0, 0, 0}, cu.StreamCreate()}

@@ -31,12 +31,12 @@ func (c ChanN) NBlocks() int     { return c[0].NBlocks() }
 func (c ChanN) BlockLen() int    { return c[0].BlockLen() }
 func (c ChanN) Unit() string     { return c[0].Unit() }
 
-func(c ChanN) Chan3()Chan3{
+func (c ChanN) Chan3() Chan3 {
 	core.Assert(c.NComp() == 3)
 	return Chan3{c[0], c[1], c[2]}
 }
 
-func(c ChanN) Chan1()Chan1{
+func (c ChanN) Chan1() Chan1 {
 	core.Assert(c.NComp() == 1)
 	return c[0]
 }

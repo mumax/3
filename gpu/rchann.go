@@ -48,10 +48,10 @@ func (c RChanN) ReadDelta(Δstart, Δstop int) [3]safe.Float32s {
 	return next
 }
 
-func (c RChanN) Size() [3]int { return c[0].Size() }
-func (c RChanN) NComp() int   { return len(c) }
-func (c RChanN) Unit() string   { return c[0].Unit() }
-func (c RChanN) Mesh() *core.Mesh   { return c[0].Mesh }
+func (c RChanN) Size() [3]int     { return c[0].Size() }
+func (c RChanN) NComp() int       { return len(c) }
+func (c RChanN) Unit() string     { return c[0].Unit() }
+func (c RChanN) Mesh() *core.Mesh { return c[0].Mesh }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.

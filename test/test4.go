@@ -36,7 +36,7 @@ func main() {
 	Stack(mag.NewLLGTorque(torque, m.NewReader(), heff.NewReader(), alpha))
 
 	const dt = 100e-15
-	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma, dt)
+	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	//	Stack(dump.NewAutosaver("ex2dm.dump", m.MakeRChan3(), 100))
 	//	Stack(dump.NewAutosaver("ex2dhex.dump", hex.MakeRChan3(), 100))

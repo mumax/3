@@ -14,7 +14,8 @@ type Demag struct {
 
 const DEFAULT_DEMAG_ACCURACY = 8
 
-func RunDemag(tag string, m gpu.RChan3, accuracy ...int) *Demag {
+func RunDemag(tag string, m_ gpu.Chan3, accuracy ...int) *Demag {
+	m := m_.NewReader()
 	d := new(Demag)
 	acc := DEFAULT_DEMAG_ACCURACY
 	kernel := mag.BruteKernel(core.ZeroPad(m.Mesh()), acc)

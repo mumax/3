@@ -18,7 +18,8 @@ type Sum struct {
 	running bool
 }
 
-func RunSum(tag string, term1 RChan, weight1 float32, term2 RChan, weight2 float32, nBlocks ...int) *Sum {
+func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float32, nBlocks ...int) *Sum {
+	term1, term2 := term1_.NewReader(), term2_.NewReader()
 	output := MakeChanN(term1.NComp(), tag, term1.Unit(), term1.Mesh(), nBlocks...)
 	sum := &Sum{sum: output, stream: cu.StreamCreate()}
 	sum.MAdd(term1, weight1)

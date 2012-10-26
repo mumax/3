@@ -18,23 +18,28 @@ func main() {
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 	Log("mesh:", mesh)
 
+	// constants
+
+	const(
+		Bsat = 1.0053
+		aex = mag.Mu0 * 13e-12 / Bsat
+		alpha = 1
+	)
+
 	// add quantities
 	m := gpu.MakeChan3("m", "", mesh)
 
-	demag := gpumag.RunDemag("Bd", m.NewReader()) // TODO: NewReader(), loose it
+	demag := gpumag.RunDemag("Bd", m) // TODO: Bsat
 	Stack(demag)
 	b := demag.Output()
 	Log(b)
 
-	const Msat = 1.0053
-	aex := mag.Mu0 * 13e-12 / Msat
 	exch := gpu.RunExchange6("Bex", m, aex)
 	bex := exch.Output()
 	Log(bex)
 
-	beff := gpu.RunSum("Beff", b, bex)
+	beff := gpu.RunSum("Beff", b, Bsat, bex, 1)
 
-	var alpha float32 = 1
 	τ := gpu.RunLLGTorque("τ", m.NewReader(), beff.NewReader(), alpha)
 
 	//	dt := 50e-15

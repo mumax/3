@@ -18,7 +18,7 @@ type Exchange6 struct {
 }
 
 func RunExchange6(tag string, m_ Chan3, aex_reduced float64) *Exchange6 {
-	m := m_.MakeRChan3()
+	m := m_.NewReader()
 	mesh := m.Mesh()
 	hex := MakeChan3(tag, "T", mesh) //TODO: blocks
 	e := &Exchange6{m: m, hex: hex, Mesh: mesh, aex_reduced: aex_reduced, stream: cu.StreamCreate()}

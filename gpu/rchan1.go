@@ -10,7 +10,7 @@ type RChan1 struct {
 	mutex *core.RMutex
 }
 
-func (c *Chan1) MakeRChan() RChan1 {
+func (c *Chan1) NewReader() RChan1 {
 	return RChan1{c.chandata, c.mutex.MakeRMutex()}
 }
 

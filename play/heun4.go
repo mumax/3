@@ -21,7 +21,7 @@ func main() {
 	// add quantities
 	m := gpu.MakeChan3("m", "", mesh)
 
-	demag := gpumag.RunDemag("Bd", m.MakeRChan3())
+	demag := gpumag.RunDemag("Bd", m.NewReader()) // TODO: NewReader(), loose it
 	Stack(demag)
 	b := demag.Output()
 	Log(b)
@@ -32,18 +32,11 @@ func main() {
 	bex := exch.Output()
 	Log(bex)
 
-	dump.Autosave()
-	//	//bexH := MakeChan3(size, "BexH")
-	//	//	Stack(conv.NewDownloader(bex.MakeRChan3(), bexH))
-	//	//	Stack(dump.NewAutosaver("BexH", bexH.MakeRChan3(), 100))
-	//
-	//	beffGPU := gpu.MakeChan3(size, "Beff")
-	//	Stack(gpu.NewAdder3(beffGPU, b.MakeRChan3(), Msat, bex.MakeRChan3(), 1))
-	//
-	//	var alpha float32 = 1
-	//	torque := gpu.MakeChan3(size, "τ")
-	//	Stack(gpu.NewLLGTorque(torque, mGPU.MakeRChan3(), beffGPU.MakeRChan3(), alpha))
-	//
+	beff := gpu.RunSum("Beff", b, bex)
+
+	var alpha float32 = 1
+	τ := gpu.RunLLGTorque("τ", m.NewReader(), beff.NewReader(), alpha)
+
 	//	dt := 50e-15
 	//	solver := gpu.NewHeun(mGPU, torque.MakeRChan3(), dt, mag.Gamma)
 	//

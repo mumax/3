@@ -21,22 +21,22 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
-	Stack(conv.NewSymmetricHtoD(mesh, kernel, m.MakeRChan3(), hd))
+	Stack(conv.NewSymmetricHtoD(mesh, kernel, m.NewReader(), hd))
 
 	Msat := 1.0053
 	aex := mag.Mu0 * 13e-12 / Msat
 	hex := MakeChan3("Hex", "", mesh)
-	Stack(mag.NewExchange6(m.MakeRChan3(), hex, mesh, aex))
+	Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
 
 	heff := MakeChan3("Heff", "", mesh)
-	Stack(NewAdder3(heff, hd.MakeRChan3(), hex.MakeRChan3()))
+	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))
 
 	const alpha = 0.02
 	torque := MakeChan3("τ", "", mesh)
-	Stack(mag.NewLLGTorque(torque, m.MakeRChan3(), heff.MakeRChan3(), alpha))
+	Stack(mag.NewLLGTorque(torque, m.NewReader(), heff.NewReader(), alpha))
 
 	const dt = 100e-15
-	solver := mag.NewEuler(m, torque.MakeRChan3(), mag.Gamma, dt)
+	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma, dt)
 	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
 	//	Stack(dump.NewAutosaver("ex2dm.dump", m.MakeRChan3(), 100))
 	//	Stack(dump.NewAutosaver("ex2dhex.dump", hex.MakeRChan3(), 100))

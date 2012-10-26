@@ -16,8 +16,8 @@ func TestCopy(t *testing.T) {
 	b := MakeChan("b", "", mesh)
 	c := core.MakeChan("c", "", mesh)
 
-	up := NewUploader(a.MakeRChan(), b)
-	down := NewDownloader(b.MakeRChan(), c)
+	up := NewUploader(a.NewReader(), b)
+	down := NewDownloader(b.NewReader(), c)
 
 	go up.Run()
 	go down.Run()
@@ -32,7 +32,7 @@ func TestCopy(t *testing.T) {
 		}
 	}()
 
-	C := c.MakeRChan()
+	C := c.NewReader()
 	for f := 0; f < F; f++ {
 		list := C.ReadNext(N)
 		for i := range list {

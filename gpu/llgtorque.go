@@ -17,11 +17,15 @@ type LLGTorque struct {
 	stream cu.Stream
 }
 
-func NewLLGTorque(torque Chan3, m, B RChan3, alpha float32) *LLGTorque {
-	core.Assert(torque.Size() == m.Size())
-	core.Assert(torque.Size() == B.Size())
-	return &LLGTorque{torque, m, B, alpha, mag.Vector{0, 0, 0}, cu.StreamCreate()}
+func RunLLGTorque(tag string, m, B RChan3, alpha float32) *LLGTorque {
+	core.Assert(B.Size() == m.Size())
+	torque := MakeChan3(tag, "T", m.Mesh(), 1)
+	tq := &LLGTorque{torque, m, B, alpha, mag.Vector{0, 0, 0}, cu.StreamCreate()}
+	core.Stack(tq)
+	return tq
 }
+
+func (r *LLGTorque) Output() Chan3 { return r.torque }
 
 func (r *LLGTorque) Run() {
 	LockCudaThread()

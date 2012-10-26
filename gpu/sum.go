@@ -12,8 +12,8 @@ import (
 
 type Sum struct {
 	sum     ChanN
-	term   []RChan
-	weight []float32
+	term    []RChan
+	weight  []float32
 	stream  cu.Stream
 	running bool
 }
@@ -66,7 +66,7 @@ func (s *Sum) Exec() {
 		s.term[0].Comp(c).ReadDone()
 		s.term[1].Comp(c).ReadDone()
 
-		for t:=2; t<len(s.term); t++{
+		for t := 2; t < len(s.term); t++ {
 			C := s.term[t].Comp(c).ReadNext(N)
 			madd(S, S, 1, C, s.weight[t], s.stream)
 			s.term[t].Comp(c).ReadDone()

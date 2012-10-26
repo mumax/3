@@ -5,7 +5,7 @@ import (
 	//"github.com/barnex/cuda5/safe"
 )
 
-type Info interface{
+type Info interface {
 	Mesh() *core.Mesh
 	Size() [3]int
 	Unit() string
@@ -16,5 +16,5 @@ type Info interface{
 type RChan interface {
 	Info
 	NComp() int
-	Comp(int)RChan1
+	Comp(int) RChan1
 }

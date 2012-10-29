@@ -35,9 +35,9 @@ func main() {
 	b := demag.Output()
 	Log(b)
 
-//	exch := gpu.RunExchange6("Bex", m, aex)
-//	bex := exch.Output()
-//	Log(bex)
+	//	exch := gpu.RunExchange6("Bex", m, aex)
+	//	bex := exch.Output()
+	//	Log(bex)
 
 	//beff := gpu.RunSum("Beff", b, Bsat, bex, 1).Output().Chan3()
 

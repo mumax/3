@@ -4,8 +4,8 @@ import (
 	"fmt"
 	. "nimble-cube/core"
 	"nimble-cube/dump"
-	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
+	"nimble-cube/gpu"
 	"nimble-cube/mag"
 	"os"
 )
@@ -17,7 +17,7 @@ func main() {
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 
-	m := gpu.HostChan3("m", "", mesh)
+	m := MakeChan3("m", "", mesh)
 	hd := MakeChan3("Hd", "", mesh)
 
 	acc := 8
@@ -31,6 +31,8 @@ func main() {
 
 	heff := MakeChan3("Heff", "", mesh)
 	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))
+
+	Gheff := gpu.RunUploader(heff).Output()
 
 	const alpha = 1
 	torque := MakeChan3("τ", "", mesh)

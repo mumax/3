@@ -61,6 +61,13 @@ func UnlockCudaThread() {
 // Register host memory for fast transfers,
 // but only when flag -pagelock is true.
 func MemHostRegister(slice []float32) {
+	// do not fail on already registered memory.
+	defer func(){
+		err := recover()
+		if err != nil && err != cu.ERROR_HOST_MEMORY_ALREADY_REGISTERED{
+			panic (err)
+		}
+	}()
 	if *core.Flag_pagelock {
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
 	}

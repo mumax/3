@@ -59,3 +59,14 @@ func (c ChanN) UnsafeArray() [3][][][]float32 {
 	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
 }
 func (c ChanN) Comp(idx int) Chan1 { return c[idx] }
+
+
+func (c ChanN) Chan3() Chan3 {
+	Assert(c.NComp() == 3)
+	return Chan3{c[0], c[1], c[2]}
+}
+
+func (c ChanN) Chan1() Chan1 {
+	Assert(c.NComp() == 1)
+	return c[0]
+}

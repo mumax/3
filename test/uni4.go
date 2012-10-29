@@ -32,11 +32,12 @@ func main() {
 	heff := MakeChan3("Heff", "", mesh)
 	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))
 
-	Gheff := gpu.RunUploader(heff).Output()
+	Gheff := gpu.RunUploader("HeffGPU", heff).Chan3()
+	Hheff := gpu.RunDownloader("HeffHost", Gheff).Chan3()
 
 	const alpha = 1
 	torque := MakeChan3("τ", "", mesh)
-	Stack(mag.NewLLGTorque(torque, m.NewReader(), heff.NewReader(), alpha))
+	Stack(mag.NewLLGTorque(torque, m.NewReader(), Hheff.NewReader(), alpha))
 
 	const dt = 50e-15
 	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)

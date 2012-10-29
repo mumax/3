@@ -34,3 +34,12 @@ func (u *Downloader) Run() {
 		u.dev.ReadDone()
 	}
 }
+
+func RunDownloader(tag string, input Chan) core.ChanN {
+	in := input.ChanN()
+	output := core.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh())
+	for i := range in {
+		core.Stack(NewDownloader(in[i].NewReader(), output[i]))
+	}
+	return output
+}

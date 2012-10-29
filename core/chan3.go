@@ -59,3 +59,5 @@ func (c *Chan3) UnsafeArray() [3][][][]float32 {
 	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
 }
 func (c *Chan3) Comp(idx int) Chan1 { return c[idx] }
+
+func(c Chan3) ChanN()ChanN{return c[:]}

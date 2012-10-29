@@ -13,7 +13,7 @@ PKGS=\
 	go install -v $(PKGS)
 	go install -v 
 
-GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -march=native'
+GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 
 gccgo: ptx
 	go install -v -compiler $(GCCGO) $(PKGS)

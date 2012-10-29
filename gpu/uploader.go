@@ -36,10 +36,10 @@ func (u *Uploader) Run() {
 	}
 }
 
-func RunUploader(tag string, input core.Chan) ChanN{
+func RunUploader(tag string, input core.Chan) ChanN {
 	in := input.ChanN()
 	output := MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh())
-	for i := range in{
+	for i := range in {
 		core.Stack(NewUploader(in[i].NewReader(), output[i]))
 	}
 	return output

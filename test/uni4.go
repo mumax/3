@@ -4,8 +4,8 @@ import (
 	"fmt"
 	. "nimble-cube/core"
 	"nimble-cube/dump"
-	"nimble-cube/gpu/conv"
 	"nimble-cube/gpu"
+	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
 	"os"
 )

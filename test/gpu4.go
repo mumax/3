@@ -34,7 +34,6 @@ func main() {
 	//bex := gpu.MakeChan3("Bex", "T", mesh)
 	bex := gpu.RunExchange6("Bex", mGPU, aex).Output()
 
-
 	beffGPU := gpu.MakeChan3("Beff", "T", mesh)
 	Stack(gpu.NewAdder3(beffGPU, b.NewReader(), Msat, bex.NewReader(), 1))
 
@@ -53,7 +52,6 @@ func main() {
 	bH := MakeChan3("B", "T", mesh)
 	Stack(conv.NewDownloader(b.NewReader(), bH))
 	Stack(dump.NewAutosaver("B.dump", bH.NewReader(), 100))
-
 
 	in := MakeVectors(size)
 	mag.SetAll(in, mag.Uniform(0, 0.1, 1))

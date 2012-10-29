@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	. "nimble-cube/core"
+	"nimble-cube/dump"
+	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
-	"nimble-cube/dump"
-	"fmt"
 	"os"
 )
 
@@ -16,7 +17,7 @@ func main() {
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
 
-	m := MakeChan3("m", "", mesh)
+	m := gpu.HostChan3("m", "", mesh)
 	hd := MakeChan3("Hd", "", mesh)
 
 	acc := 8
@@ -53,7 +54,7 @@ func main() {
 	Log("result:", got)
 	if got != expect {
 		Fatal(fmt.Errorf("expected: %v", expect))
-	}else{
+	} else {
 		Log("OK")
 	}
 

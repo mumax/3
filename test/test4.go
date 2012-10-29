@@ -2,9 +2,9 @@ package main
 
 import (
 	. "nimble-cube/core"
+	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
-	"nimble-cube/dump"
 	"os"
 )
 
@@ -46,13 +46,13 @@ func main() {
 	RunStack()
 
 	solver.Steps(100)
-//	res := m.UnsafeArray()
-//	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
-//	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
-//	Log("result:", got)
-//	if got != expect {
-//		Fatal(fmt.Errorf("expected: %v", expect))
-//	}
+	//	res := m.UnsafeArray()
+	//	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
+	//	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
+	//	Log("result:", got)
+	//	if got != expect {
+	//		Fatal(fmt.Errorf("expected: %v", expect))
+	//	}
 	//solver.Steps(10000)
 
 	ProfDump(os.Stdout)

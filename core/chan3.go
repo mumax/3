@@ -18,7 +18,7 @@ func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
 // slice down the Chan3. After that, the slice is not valid any more.
 func (c Chan3) WriteNext(n int) [3][]float32 {
 	next := ChanN(c).WriteNext(n)
-	return[3][]float32{next[0], next[1], next[2]}
+	return [3][]float32{next[0], next[1], next[2]}
 	//var next [3][]float32
 	//for i := range c {
 	//	c[i].WriteNext(n)
@@ -31,25 +31,28 @@ func (c Chan3) WriteNext(n int) [3][]float32 {
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan3.
 func (c Chan3) WriteDone() {
-	for i := range c {
-		c[i].WriteDone()
-	}
+	ChanN(c).WriteDone()
+	//for i := range c {
+	//	c[i].WriteDone()
+	//}
 }
 
 func (c Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
-	var next [3][]float32
-	for i := range c {
-		c[i].WriteDelta(Δstart, Δstop)
-		a, b := c[i].mutex.WRange()
-		next[i] = c[i].slice.Slice(a, b).list
-	}
-	return next
+	next := ChanN(c).WriteDelta(Δstart, Δstop)
+	return [3][]float32{next[0], next[1], next[2]}
+	//var next [3][]float32
+	//for i := range c {
+	//	c[i].WriteDelta(Δstart, Δstop)
+	//	a, b := c[i].mutex.WRange()
+	//	next[i] = c[i].slice.Slice(a, b).list
+	//}
+	//return next
 }
 
-func (c Chan3) Mesh() *Mesh  { return c[0].Mesh }
-func (c Chan3) Size() [3]int { return c[0].Size() }
-func (c Chan3) Unit() string { return c[0].Unit() }
-func (c Chan3) Tag() string  { return c[0].Tag() }
+func (c Chan3) Mesh() *Mesh  { return ChanN(c).Mesh() }
+func (c Chan3) Size() [3]int { return ChanN(c).Size() }
+func (c Chan3) Unit() string { return ChanN(c).Unit() }
+func (c Chan3) Tag() string  { return ChanN(c).Tag() }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.

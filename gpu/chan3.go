@@ -1,28 +1,29 @@
 package gpu
 
 import (
-	"fmt"
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
+	"nimble-cube/graph"
 )
 
 // Chan of 3-vector data.
 type Chan3 [3]Chan1
 
 func MakeChan3(tag, unit string, m *core.Mesh, blocks ...int) Chan3 {
-	tag = core.UniqueTag(tag)
+	//tag = core.UniqueTag(tag)
+	graph.AddQuant(tag)
 	var c Chan3
 	for i := range c {
-		c[i] = MakeChan1(fmt.Sprint(tag, i), unit, m, blocks...)
+		c[i] = MakeChan1(tag, unit, m, blocks...)
 	}
 	return c
 }
 
 func HostChan3(tag, unit string, m *core.Mesh, blocks ...int) Chan3 {
-	tag = core.UniqueTag(tag)
+	//tag = core.UniqueTag(tag)
 	var c Chan3
 	for i := range c {
-		c[i] = HostChan1(fmt.Sprint(tag, i), unit, m, blocks...)
+		c[i] = HostChan1(tag, unit, m, blocks...)
 	}
 	return c
 }

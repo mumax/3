@@ -1,16 +1,13 @@
 package core
 
-import (
-	"fmt"
-)
-
 // Chan of 3-vector data.
 type Chan3 [3]Chan1
 
 func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
+	//tag = UniqueTag(tag)
 	var c Chan3
 	for i := range c {
-		c[i] = MakeChan(fmt.Sprint(tag, i), unit, m, blocks...)
+		c[i] = MakeChan(tag, unit, m, blocks...)
 	}
 	return c
 }

@@ -17,7 +17,7 @@ func Init(fname string) {
 	}
 	core.Log("saving pipeline graph to", fname)
 	global = &writer{core.OpenFile(fname), fname}
-	global.Println("graph dot{")
+	global.Println("digraph dot{")
 	global.Println("rankdir=LR")
 	core.AtExit(func() { global.Close() })
 }
@@ -45,23 +45,31 @@ func (g *writer) Close() {
 	}
 }
 
-func Connect(dst string, src string, label string, thickness int) {
-	global.Connect(dst, src, label, thickness)
+func Connect(src, dst string) {
+	global.Connect(src, dst)
 }
 
-func (g *writer) Connect(dst string, src string, label string, thickness int) {
-	if dst == "" || src == "" {
-		core.Panic("connect", dst, src, label, thickness)
-	}
-	g.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
+func (g *writer) Connect(src, dst string) {
+	//	if dst == "" || src == "" {
+	//		core.Panic("connect", dst, src, label, thickness)
+	//	}
+	g.Println(src, "->", dst) //, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }
 
-func Add(box string) {
-	global.Add(box)
+func AddQuant(tag string) {
+	global.AddQuant(tag)
 }
 
-func (g *writer) Add(box string) {
-	g.Println(box, `[label="`+box+`"shape="rect"];`)
+func (g *writer) AddQuant(tag string) {
+	g.Println(tag, `[label="`+tag+`"shape="oval"];`)
+}
+
+func AddRoutine(tag string) {
+	global.AddRoutine(tag)
+}
+
+func (g *writer) AddRoutine(tag string) {
+	g.Println(tag, `[label="`+tag+`"shape="rect"];`)
 }
 
 // replaces characters that graphviz cannot handle as labels.

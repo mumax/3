@@ -1,15 +1,12 @@
 package core
 
-import (
-	"fmt"
-)
-
 type ChanN []Chan1
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, blocks ...int) ChanN {
+	//tag = UniqueTag(tag)
 	c := make(ChanN, nComp)
 	for i := range c {
-		c[i] = MakeChan(fmt.Sprint(tag, i), unit, m, blocks...)
+		c[i] = MakeChan(tag, unit, m, blocks...)
 	}
 	return c
 }

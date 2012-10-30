@@ -4,6 +4,7 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
+	"nimble-cube/graph"
 )
 
 type chandata struct {
@@ -19,14 +20,15 @@ type Chan1 struct {
 }
 
 func MakeChan1(tag, unit string, m *core.Mesh, blocks ...int) Chan1 {
-	tag = core.UniqueTag(tag)
+	//tag = core.UniqueTag(tag)
+	graph.AddQuant(tag)
 	info := core.NewInfo(tag, unit, m, blocks...)
 	len_ := info.BlockLen()
 	return Chan1{chandata{safe.MakeFloat32s(len_), info}, core.NewRWMutex(len_, tag)}
 }
 
 func HostChan1(tag, unit string, m *core.Mesh, blocks ...int) Chan1 {
-	tag = core.UniqueTag(tag)
+	//tag = core.UniqueTag(tag)
 	info := core.NewInfo(tag, unit, m, blocks...)
 	len_ := info.BlockLen()
 	return Chan1{chandata{MakeHostFloat32s(len_), info}, core.NewRWMutex(len_, tag)}

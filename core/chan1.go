@@ -1,13 +1,16 @@
 package core
 
+import "nimble-cube/graph"
+
 type Chan1 struct {
 	chandata // array+list
 	mutex    *RWMutex
 }
 
 func MakeChan(tag, unit string, m *Mesh, blocks ...int) Chan1 {
-	tag = UniqueTag(tag)
+	//tag = UniqueTag(tag)
 	data := makedata(tag, unit, m, blocks...)
+	graph.AddQuant(tag)
 	return Chan1{data, NewRWMutex(data.BlockLen(), tag)}
 }
 

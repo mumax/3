@@ -1,19 +1,20 @@
 package gpu
 
 import (
-	"fmt"
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
+	"nimble-cube/graph"
 )
 
 // Chan of arbitrary component data.
 type ChanN []Chan1
 
 func MakeChanN(nComp int, tag, unit string, m *core.Mesh, blocks ...int) ChanN {
-	tag = core.UniqueTag(tag)
+	//tag = core.UniqueTag(tag)
+	graph.AddQuant(tag)
 	c := make(ChanN, nComp)
 	for i := range c {
-		c[i] = MakeChan1(fmt.Sprint(tag, i), unit, m, blocks...)
+		c[i] = MakeChan1(tag, unit, m, blocks...)
 	}
 	return c
 }

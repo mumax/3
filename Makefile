@@ -1,4 +1,4 @@
-all: githook 6g gccgo
+all: githook 6g 
 
 PREFIX=nimble-cube
 
@@ -31,10 +31,10 @@ test: 6gtest gccgotest unittest
 unittest:
 	make -C test
 
-6gtest:
+6gtest: 6g
 	go test -i $(PKGS) 
 
-gccgotest:
+gccgotest: gccgo
 	go test -i -compiler=$(gccgo) $(PKGS)
 
 .PHONY: clean

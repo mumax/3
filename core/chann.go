@@ -15,12 +15,12 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, blocks ...int) ChanN {
 // writing the next n elements to the Chan3.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
-func (c ChanN) WriteNext(n int) [][]float32 {
-	next := make([][]float32, c.NComp())
+func (c ChanN) WriteNext(n int) []Slice {
+	next := make([]Slice, c.NComp())
 	for i := range c {
 		c[i].WriteNext(n)
 		a, b := c[i].mutex.WRange()
-		next[i] = c[i].slice.Slice(a, b).list
+		next[i] = c[i].slice.Slice(a, b)
 	}
 	return next
 }

@@ -9,7 +9,7 @@ func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
 
 func (c Chan3) WriteNext(n int) [3][]float32 {
 	next := ChanN(c).WriteNext(n)
-	return [3][]float32{next[0], next[1], next[2]}
+	return [3][]float32{next[0].Host(), next[1].Host(), next[2].Host()}
 }
 
 func (c Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {

@@ -27,7 +27,7 @@ func (u *Uploader) Run() {
 	MemHostRegister(u.host.UnsafeData())
 
 	for {
-		in := u.host.ReadNext(u.bsize)
+		in := u.host.ReadNext(u.bsize).Host()
 		out := u.dev.WriteNext(u.bsize)
 		out.CopyHtoDAsync(in, u.stream)
 		u.stream.Synchronize()

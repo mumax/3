@@ -14,10 +14,10 @@ func (c *Chan1) NewReader() RChan1 {
 // reading the next n elements from the Chan.
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.
-func (c *RChan1) ReadNext(n int) []float32 {
+func (c *RChan1) ReadNext(n int) Slice {
 	c.mutex.ReadNext(n)
 	a, b := c.mutex.RRange()
-	return c.slice.Slice(a, b).list
+	return c.slice.Slice(a, b)
 }
 
 // ReadDone() signals a slice obtained by WriteNext() is fully

@@ -22,6 +22,7 @@ func Init(fname string) {
 	core.AtExit(func() { global.Close() })
 }
 
+
 type writer struct {
 	out   io.WriteCloser
 	fname string
@@ -39,11 +40,20 @@ func (g *writer) Close() {
 	g.out.Close()
 	core.LogErr(exec.Command("dot", "-O", "-Tpdf", g.fname).Run())
 }
+
+func Connect(dst string, src string, label string, thickness int) {
+	global.Connect(dst, src, label, thickness)
+}
+
 func (g *writer) Connect(dst string, src string, label string, thickness int) {
 	if dst == "" || src == "" {
 		core.Panic("connect", dst, src, label, thickness)
 	}
 	g.Println(src, "->", dst, "[label=", escape(label), `penwidth=`, thickness, `];`)
+}
+
+func Add(box string) {
+	global.Add(box)
 }
 
 func (g *writer) Add(box string) {

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	SetOD("test4")
+	SetOD("test4.out")
 
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	SetOD("gpu4")
+	SetOD("gpu4.out")
 	// mesh
 
 	N0, N1, N2 := 1, 32, 128

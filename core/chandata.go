@@ -5,25 +5,23 @@ import "fmt"
 type chandata struct {
 	*Info
 	slice Slice
-	array [][][]float32
-	list  []float32
 }
 
 func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 	size := m.Size()
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)
-	c.array = MakeFloats(size)
-	c.list = Contiguous(c.array)
+	c.slice.array = MakeFloats(size)
+	c.slice.list = Contiguous(c.slice.array)
 	return c
 }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (d *chandata) UnsafeData() []float32      { return d.list }
-func (d *chandata) UnsafeArray() [][][]float32 { return d.array }
-func (d *chandata) Size() [3]int               { return SizeOf(d.array) }
-func (d *chandata) NComp() int                 { return len(d.list) }
+func (d *chandata) UnsafeData() []float32      { return d.slice.list }
+func (d *chandata) UnsafeArray() [][][]float32 { return d.slice.array }
+func (d *chandata) Size() [3]int               { return SizeOf(d.slice.array) }
+func (d *chandata) NComp() int                 { return len(d.slice.list) }
 
 func (q Chan1) String() string {
 	unit := q.unit

@@ -17,7 +17,7 @@ func (c *Chan1) NewReader() RChan1 {
 func (c *RChan1) ReadNext(n int) []float32 {
 	c.mutex.ReadNext(n)
 	a, b := c.mutex.RRange()
-	return c.list[a:b]
+	return c.slice.Slice(a, b).list
 }
 
 // ReadDone() signals a slice obtained by WriteNext() is fully
@@ -29,7 +29,7 @@ func (c *RChan1) ReadDone() {
 func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {
 	c.mutex.ReadDelta(Δstart, Δstop)
 	a, b := c.mutex.RRange()
-	return c.list[a:b]
+	return c.slice.Slice(a, b).list
 }
 
 func (c *RChan1) Tag() string {

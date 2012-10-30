@@ -19,7 +19,7 @@ func MakeChan(tag, unit string, m *Mesh, blocks ...int) Chan1 {
 func (c *Chan1) WriteNext(n int) []float32 {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
-	return c.list[a:b]
+	return c.slice.list[a:b]
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
@@ -31,13 +31,11 @@ func (c *Chan1) WriteDone() {
 func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 	c.mutex.WriteDelta(Δstart, Δstop)
 	a, b := c.mutex.WRange()
-	return c.list[a:b]
+	return c.slice.list[a:b]
 }
-
-
 
 func (c *Chan1) WriteNextSlice(n int) Slice {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
-	return Slice{c.list[a:b]}
+	return c.slice.Slice(a, b)
 }

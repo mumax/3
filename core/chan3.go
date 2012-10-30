@@ -22,7 +22,7 @@ func (c *Chan3) WriteNext(n int) [3][]float32 {
 	for i := range c {
 		c[i].WriteNext(n)
 		a, b := c[i].mutex.WRange()
-		next[i] = c[i].list[a:b]
+		next[i] = c[i].slice.Slice(a, b).list
 	}
 	return next
 }
@@ -40,7 +40,7 @@ func (c *Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
 	for i := range c {
 		c[i].WriteDelta(Δstart, Δstop)
 		a, b := c[i].mutex.WRange()
-		next[i] = c[i].list[a:b]
+		next[i] = c[i].slice.Slice(a, b).list
 	}
 	return next
 }
@@ -52,9 +52,12 @@ func (c *Chan3) Tag() string  { return c[0].Tag() }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (c *Chan3) UnsafeData() [3][]float32 { return [3][]float32{c[0].list, c[1].list, c[2].list} }
+func (c *Chan3) UnsafeData() [3][]float32 {
+	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}
+}
+
 func (c *Chan3) UnsafeArray() [3][][][]float32 {
-	return [3][][][]float32{c[0].array, c[1].array, c[2].array}
+	return [3][][][]float32{c[0].slice.array, c[1].slice.array, c[2].slice.array}
 }
 func (c *Chan3) Comp(idx int) Chan1 { return c[idx] }
 

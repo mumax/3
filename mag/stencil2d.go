@@ -14,14 +14,14 @@ type Stencil2D struct {
 
 // New 2D 5-point stencil. Weights have to be set afterwards.
 func NewStencil2D(in core.RChan3, out core.Chan3) *Stencil2D {
-	core.Assert(in.Size()[0] == 1)
+	core.Assert(in.Mesh().Size()[0] == 1)
 	core.Assert(in.Mesh().Size() == out.Mesh().Size())
 	return &Stencil2D{in: in, out: out}
 }
 
 func (s *Stencil2D) Run() {
 	core.Debug("running 4-neighbor 2D stencil")
-	size := s.in.Size()
+	size := s.in.Mesh().Size()
 	N := core.Prod(size) // elements per frame
 	N1 := size[1]        // lines per frame
 	//	bs := core.BlockSize(size)             // block size

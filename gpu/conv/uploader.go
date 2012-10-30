@@ -16,8 +16,8 @@ type Uploader struct {
 }
 
 func NewUploader(hostdata core.RChan3, devdata [3]gpu.Chan1) *Uploader {
-	core.Assert(hostdata.Size() == devdata[0].Size())
-	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
+	core.Assert(hostdata.Mesh().Size() == devdata[0].Size())
+	blocklen := core.Prod(core.BlockSize(hostdata.Mesh().Size()))
 	return &Uploader{hostdata, devdata, blocklen, 0}
 }
 

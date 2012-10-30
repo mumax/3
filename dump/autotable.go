@@ -28,7 +28,7 @@ func NewAutotable(fname string, data core.RChan3, every int) *Autotable {
 
 func (r *Autotable) Run() {
 	core.Log("running auto table")
-	N := core.Prod(r.data.Size())
+	N := core.Prod(r.data.Mesh().Size())
 
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO

@@ -13,15 +13,16 @@ type Autosaver struct {
 func NewAutosaver(fname string, data core.RChan3, every int) *Autosaver {
 	r := new(Autosaver)
 	r.out = NewWriter(core.OpenFile(core.OD+fname), CRC_ENABLED)
+	core.Assert(data.NComp() == 3)
 	r.out.Components = 3 // TODO !!
-	r.out.MeshSize = data.Size()
+	r.out.MeshSize = data.Mesh().Size()
 	r.data = data
 	r.every = every
 	return r
 }
 
 func (r *Autosaver) Run() {
-	N := core.Prod(r.data.Size())
+	N := core.Prod(r.data.Mesh().Size())
 
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO

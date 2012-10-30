@@ -17,13 +17,15 @@ func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
 func (c Chan3) WriteNext(n int) [3][]float32 {
-	var next [3][]float32
-	for i := range c {
-		c[i].WriteNext(n)
-		a, b := c[i].mutex.WRange()
-		next[i] = c[i].slice.Slice(a, b).list
-	}
-	return next
+	next := ChanN(c).WriteNext(n)
+	return[3][]float32{next[0], next[1], next[2]}
+	//var next [3][]float32
+	//for i := range c {
+	//	c[i].WriteNext(n)
+	//	a, b := c[i].mutex.WRange()
+	//	next[i] = c[i].slice.Slice(a, b).list
+	//}
+	//return next
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully

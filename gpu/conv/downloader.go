@@ -16,8 +16,8 @@ type Downloader struct {
 }
 
 func NewDownloader(devdata [3]gpu.RChan1, hostdata core.Chan3) *Downloader {
-	core.Assert(hostdata.Size() == devdata[0].Size())
-	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
+	core.Assert(hostdata.Mesh().Size() == devdata[0].Size())
+	blocklen := core.Prod(core.BlockSize(hostdata.Mesh().Size()))
 	return &Downloader{devdata, hostdata, blocklen, 0}
 }
 

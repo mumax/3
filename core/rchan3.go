@@ -17,7 +17,7 @@ func (c RChan3) ReadDelta(Δstart, Δstop int) [3][]float32 {
 	return [3][]float32{next[0], next[1], next[2]}
 }
 
-func (c RChan3) ReadDone() { RChanN(c).ReadDone() }
+func (c RChan3) ReadDone()    { RChanN(c).ReadDone() }
 func (c RChan3) Mesh() *Mesh  { return RChanN(c).Mesh() }
 func (c RChan3) Size() [3]int { return RChanN(c).Size() }
 func (c RChan3) Unit() string { return RChanN(c).Unit() }

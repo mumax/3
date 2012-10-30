@@ -15,12 +15,12 @@ type Euler struct {
 }
 
 func NewEuler(y core.Chan3, dy core.RChan3, dt, multiplier float64) *Euler {
-	return &Euler{y, dy, float32(dt * multiplier), core.BlockLen(y.Size()), false}
+	return &Euler{y, dy, float32(dt * multiplier), core.BlockLen(y.Mesh().Size()), false}
 }
 
 func (e *Euler) Steps(steps int) {
 	core.Log("euler solver:", steps, "steps")
-	n := core.Prod(e.y.Size())
+	n := core.Prod(e.y.Mesh().Size())
 	block := e.blocklen
 
 	// Send out initial value

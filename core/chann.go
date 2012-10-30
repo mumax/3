@@ -45,7 +45,6 @@ func (c ChanN) WriteDelta(Δstart, Δstop int) [3][]float32 {
 }
 
 func (c ChanN) Mesh() *Mesh  { return c[0].Mesh }
-func (c ChanN) Size() [3]int { return c[0].Size() }
 func (c ChanN) Unit() string { return c[0].Unit() }
 func (c ChanN) Tag() string  { return c[0].Tag() }
 func (c ChanN) NComp() int   { return len(c) }

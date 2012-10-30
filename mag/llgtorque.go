@@ -12,13 +12,13 @@ type LLGTorque struct {
 }
 
 func NewLLGTorque(torque core.Chan3, m, B core.RChan3, alpha float32) *LLGTorque {
-	core.Assert(torque.Size() == m.Size())
-	core.Assert(torque.Size() == B.Size())
+	core.Assert(torque.Mesh().Size() == m.Mesh().Size())
+	core.Assert(torque.Mesh().Size() == B.Mesh().Size())
 	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}, llgTorque}
 }
 
 func (r *LLGTorque) Run() {
-	n := core.BlockLen(r.torque.Size())
+	n := core.BlockLen(r.torque.Mesh().Size())
 	for {
 		M := r.m.ReadNext(n)
 		B := r.b.ReadNext(n)

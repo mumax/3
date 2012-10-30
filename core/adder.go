@@ -9,9 +9,9 @@ type Adder struct {
 func NewAdder3(sum Chan3, terms ...RChan3) *Adder {
 	Assert(len(terms) > 1)
 	for _, t := range terms {
-		Assert(t.Size() == sum.Size())
+		Assert(t.Mesh().Size() == sum.Mesh().Size())
 	}
-	return &Adder{sum, terms, BlockLen(sum.Size())}
+	return &Adder{sum, terms, BlockLen(sum.Mesh().Size())}
 }
 
 func (a *Adder) Run() {

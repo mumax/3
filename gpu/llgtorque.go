@@ -5,7 +5,6 @@ import (
 	"github.com/barnex/cuda5/safe"
 	"nimble-cube/core"
 	"nimble-cube/gpu/ptx"
-	"nimble-cube/graph"
 	"nimble-cube/mag"
 	"unsafe"
 )
@@ -24,9 +23,9 @@ func RunLLGTorque(tag string, m_, B_ Chan3, alpha float32) *LLGTorque {
 	torque := MakeChan3(tag, "T", m.Mesh(), 1)
 	tq := &LLGTorque{torque, m, B, alpha, mag.Vector{0, 0, 0}, cu.StreamCreate()}
 	core.Stack(tq)
-	graph.AddRoutine(tag)
-	graph.Connect(m.Tag(), tag)
-	graph.Connect(B.Tag(), tag)
+	core.AddRoutine(tag)
+	core.Connect(m.Tag(), tag)
+	core.Connect(B.Tag(), tag)
 	return tq
 }
 

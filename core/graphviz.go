@@ -1,11 +1,10 @@
-package graph
+package core
 
 // This file implements graphviz output.
 
 import (
 	"fmt"
 	"io"
-	"nimble-cube/core"
 	"os/exec"
 )
 
@@ -13,13 +12,13 @@ var global *writer
 
 func Init(fname string) {
 	if global != nil {
-		core.Fatal(fmt.Errorf("already saving pipeline graph"))
+		Fatal(fmt.Errorf("already saving pipeline graph"))
 	}
-	core.Log("saving pipeline graph to", fname)
-	global = &writer{core.OpenFile(fname), fname}
+	Log("saving pipeline graph to", fname)
+	global = &writer{OpenFile(fname), fname}
 	global.Println("digraph dot{")
 	global.Println("rankdir=LR")
-	core.AtExit(func() { global.Close() })
+	AtExit(func() { global.Close() })
 }
 
 type writer struct {
@@ -40,8 +39,8 @@ func (g *writer) Close() {
 	dot := exec.Command("dot", "-O", "-Tpdf", g.fname)
 	out, err := dot.CombinedOutput()
 	if err != nil {
-		core.Log("dot:", string(out))
-		core.Log("dot:", err)
+		Log("dot:", string(out))
+		Log("dot:", err)
 	}
 }
 
@@ -51,7 +50,7 @@ func Connect(src, dst string) {
 
 func (g *writer) Connect(src, dst string) {
 	//	if dst == "" || src == "" {
-	//		core.Panic("connect", dst, src, label, thickness)
+	//		Panic("connect", dst, src, label, thickness)
 	//	}
 	g.Println(src, "->", dst) //, "[label=", escape(label), `penwidth=`, thickness, `];`)
 }

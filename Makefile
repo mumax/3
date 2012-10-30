@@ -3,7 +3,6 @@ all: githook 6g gccgo
 PREFIX=nimble-cube
 
 PKGS=\
-	$(PREFIX)/graph\
 	$(PREFIX)/gpu/conv\
 	$(PREFIX)/gpu\
 	$(PREFIX)/mag\

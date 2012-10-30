@@ -33,15 +33,15 @@ func (c ChanN) WriteDone() {
 	}
 }
 
-func (c ChanN) WriteDelta(Δstart, Δstop int) [][]float32 {
-	next := make([][]float32, c.NComp())
-	for i := range c {
-		c[i].WriteDelta(Δstart, Δstop)
-		a, b := c[i].mutex.WRange()
-		next[i] = c[i].slice.Slice(a, b).list
-	}
-	return next
-}
+//func (c ChanN) WriteDelta(Δstart, Δstop int) [][]float32 {
+//	next := make([][]float32, c.NComp())
+//	for i := range c {
+//		c[i].WriteDelta(Δstart, Δstop)
+//		a, b := c[i].mutex.WRange()
+//		next[i] = c[i].slice.Slice(a, b).list
+//	}
+//	return next
+//}
 
 func (c ChanN) Mesh() *Mesh  { return c[0].Mesh }
 func (c ChanN) Unit() string { return c[0].Unit() }

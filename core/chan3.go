@@ -12,10 +12,10 @@ func (c Chan3) WriteNext(n int) [3][]float32 {
 	return [3][]float32{next[0].Host(), next[1].Host(), next[2].Host()}
 }
 
-func (c Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
-	next := ChanN(c).WriteDelta(Δstart, Δstop)
-	return [3][]float32{next[0], next[1], next[2]}
-}
+//func (c Chan3) WriteDelta(Δstart, Δstop int) [3][]float32 {
+//	next := ChanN(c).WriteDelta(Δstart, Δstop)
+//	return [3][]float32{next[0], next[1], next[2]}
+//}
 
 func (c Chan3) Mesh() *Mesh  { return ChanN(c).Mesh() }
 func (c Chan3) WriteDone()   { ChanN(c).WriteDone() }

@@ -31,4 +31,3 @@ func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {
 	a, b := c.mutex.RRange()
 	return c.slice.Slice(a, b).list
 }
-

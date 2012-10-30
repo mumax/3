@@ -3,7 +3,7 @@ package core
 // Read-only Chan3.
 type RChan3 [3]RChan1
 
-func (c *Chan3) NewReader() RChan3 {
+func (c Chan3) NewReader() RChan3 {
 	return RChan3{c[0].NewReader(), c[1].NewReader(), c[2].NewReader()}
 }
 

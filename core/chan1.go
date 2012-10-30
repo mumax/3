@@ -1,6 +1,5 @@
 package core
 
-
 type Chan1 struct {
 	chandata // array+list
 	mutex    *RWMutex

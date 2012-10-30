@@ -6,14 +6,13 @@ import (
 	"nimble-cube/dump"
 	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
-	"nimble-cube/graph"
 	"nimble-cube/mag"
 	"os"
 )
 
 func main() {
 	SetOD("uni4.out")
-	graph.Init(OD + "graph.dot")
+	InitGraph(OD + "graph.dot")
 
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9

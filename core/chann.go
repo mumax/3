@@ -8,6 +8,7 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, blocks ...int) ChanN {
 	for i := range c {
 		c[i] = MakeChan(tag, unit, m, blocks...)
 	}
+	AddQuant(tag)
 	return c
 }
 

@@ -10,7 +10,7 @@ import (
 
 var global *writer
 
-func Init(fname string) {
+func InitGraph(fname string) {
 	if global != nil {
 		Fatal(fmt.Errorf("already saving pipeline graph"))
 	}

@@ -9,6 +9,7 @@ func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
 	for i := range c {
 		c[i] = MakeChan(tag, unit, m, blocks...)
 	}
+	AddQuant(tag)
 	return c
 }
 

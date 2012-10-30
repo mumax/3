@@ -32,6 +32,3 @@ func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {
 	return c.slice.Slice(a, b).list
 }
 
-func (c *RChan1) Tag() string {
-	return c.mutex.rw.tag
-}

@@ -33,3 +33,11 @@ func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 	a, b := c.mutex.WRange()
 	return c.list[a:b]
 }
+
+
+
+func (c *Chan1) WriteNextSlice(n int) Slice {
+	c.mutex.WriteNext(n)
+	a, b := c.mutex.WRange()
+	return Slice{c.list[a:b]}
+}

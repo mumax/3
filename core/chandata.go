@@ -4,6 +4,7 @@ import "fmt"
 
 type chandata struct {
 	*Info
+	slice Slice
 	array [][][]float32
 	list  []float32
 }

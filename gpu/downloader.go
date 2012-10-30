@@ -27,7 +27,7 @@ func (u *Downloader) Run() {
 
 	for {
 		in := u.dev.ReadNext(u.bsize)
-		out := u.host.WriteNext(u.bsize)
+		out := u.host.WriteNext(u.bsize).Host()
 		in.CopyDtoHAsync(out, u.stream)
 		u.stream.Synchronize()
 		u.host.WriteDone()

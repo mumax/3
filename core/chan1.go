@@ -16,11 +16,11 @@ func MakeChan(tag, unit string, m *Mesh, blocks ...int) Chan1 {
 // writing the next n elements to the Chan.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan. After that, the slice is not valid any more.
-func (c *Chan1) WriteNext(n int) []float32 {
-	c.mutex.WriteNext(n)
-	a, b := c.mutex.WRange()
-	return c.slice.list[a:b]
-}
+//func (c *Chan1) WriteNext(n int) []float32 {
+//	c.mutex.WriteNext(n)
+//	a, b := c.mutex.WRange()
+//	return c.slice.list[a:b]
+//}
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
@@ -34,7 +34,7 @@ func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 	return c.slice.list[a:b]
 }
 
-func (c *Chan1) WriteNextSlice(n int) Slice {
+func (c *Chan1) WriteNext(n int) Slice {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
 	return c.slice.Slice(a, b)

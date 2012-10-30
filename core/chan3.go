@@ -4,8 +4,7 @@ package core
 type Chan3 ChanN
 
 func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
-	//tag = UniqueTag(tag)
-	var c Chan3
+	c := make(Chan3, 3)
 	for i := range c {
 		c[i] = MakeChan(tag, unit, m, blocks...)
 	}

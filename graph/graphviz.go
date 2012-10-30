@@ -1,4 +1,4 @@
-package core
+package graph
 
 // This file implements graphviz output.
 
@@ -17,11 +17,10 @@ func Init(fname string) {
 	}
 	core.Log("saving pipeline graph to", fname)
 	global = &writer{core.OpenFile(fname), fname}
-	global.Println("digraph dot{")
+	global.Println("graph dot{")
 	global.Println("rankdir=LR")
 	core.AtExit(func() { global.Close() })
 }
-
 
 type writer struct {
 	out   io.WriteCloser
@@ -38,7 +37,12 @@ func (g *writer) Println(msg ...interface{}) {
 func (g *writer) Close() {
 	g.Println("}")
 	g.out.Close()
-	core.LogErr(exec.Command("dot", "-O", "-Tpdf", g.fname).Run())
+	dot := exec.Command("dot", "-O", "-Tpdf", g.fname)
+	out, err := dot.CombinedOutput()
+	if err != nil {
+		core.Log("dot:", string(out))
+		core.Log("dot:", err)
+	}
 }
 
 func Connect(dst string, src string, label string, thickness int) {

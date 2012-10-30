@@ -27,7 +27,7 @@ type writer struct {
 }
 
 func (g *writer) Println(msg ...interface{}) {
-	if g.out == nil {
+	if g == nil {
 		return
 	}
 	fmt.Fprintln(g.out, msg...)

@@ -11,7 +11,18 @@ func (c ChanN) NewReader() RChanN {
 // reading the next n elements from the Chan.
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.
-func (c RChanN) ReadNext(n int) [][]float32 {
+func (c RChanN) ReadNext(n int) []Slice {
+	next := make([]Slice, c.NComp())
+	for i := range c {
+		c[i].mutex.ReadNext(n)
+		a, b := c[i].mutex.RRange()
+		next[i] = c[i].slice.Slice(a, b)
+	}
+	return next
+}
+
+// temporary
+func (c RChanN) ReadNextList(n int) [][]float32 {
 	next := make([][]float32, c.NComp())
 	for i := range c {
 		c[i].mutex.ReadNext(n)
@@ -42,7 +53,7 @@ func (c RChanN) ReadDelta(Δstart, Δstop int) [3][]float32 {
 func (c RChanN) Mesh() *Mesh  { return c[0].Mesh }
 func (c RChanN) Unit() string { return c[0].Unit() }
 func (c RChanN) Tag() string  { return c[0].Tag() }
-func (c RChanN) NComp() int  { return len(c) }
+func (c RChanN) NComp() int   { return len(c) }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.

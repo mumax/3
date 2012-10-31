@@ -22,7 +22,7 @@ func (c Chan3) WriteDone()   { ChanN(c).WriteDone() }
 func (c Chan3) Unit() string { return ChanN(c).Unit() }
 func (c Chan3) Tag() string  { return ChanN(c).Tag() }
 func (c Chan3) ChanN() ChanN { return ChanN(c) }
-func (c Chan3) NComp() int { return len(c) }
+func (c Chan3) NComp() int   { return len(c) }
 
 func (c Chan3) UnsafeData() [3][]float32 {
 	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}

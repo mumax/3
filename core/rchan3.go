@@ -12,10 +12,10 @@ func (c RChan3) ReadNext(n int) [3][]float32 {
 	return [3][]float32{next[0], next[1], next[2]}
 }
 
-func (c RChan3) ReadDelta(Δstart, Δstop int) [3][]float32 {
-	next := RChanN(c).ReadDelta(Δstart, Δstop)
-	return [3][]float32{next[0], next[1], next[2]}
-}
+//func (c RChan3) ReadDelta(Δstart, Δstop int) [3][]float32 {
+//	next := RChanN(c).ReadDelta(Δstart, Δstop)
+//	return [3][]float32{next[0], next[1], next[2]}
+//}
 
 func (c RChan3) ReadDone()    { RChanN(c).ReadDone() }
 func (c RChan3) Mesh() *Mesh  { return RChanN(c).Mesh() }

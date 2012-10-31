@@ -11,6 +11,21 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, blocks ...int) ChanN {
 	return c
 }
 
+func (c ChanN) Mesh() *Mesh  { return c[0].Mesh }
+func (c ChanN) Unit() string { return c[0].Unit() }
+func (c ChanN) Tag() string  { return c[0].Tag() }
+func (c ChanN) NComp() int   { return len(c) }
+
+func (c ChanN) Chan3() Chan3 {
+	Assert(c.NComp() == 3)
+	return Chan3{c[0], c[1], c[2]}
+}
+
+func (c ChanN) Chan1() Chan1 {
+	Assert(c.NComp() == 1)
+	return c[0]
+}
+
 // WriteNext locks and returns a slice of length n for 
 // writing the next n elements to the Chan3.
 // When done, WriteDone() should be called to "send" the
@@ -43,17 +58,3 @@ func (c ChanN) WriteDone() {
 //	return next
 //}
 
-func (c ChanN) Mesh() *Mesh  { return c[0].Mesh }
-func (c ChanN) Unit() string { return c[0].Unit() }
-func (c ChanN) Tag() string  { return c[0].Tag() }
-func (c ChanN) NComp() int   { return len(c) }
-
-func (c ChanN) Chan3() Chan3 {
-	Assert(c.NComp() == 3)
-	return Chan3{c[0], c[1], c[2]}
-}
-
-func (c ChanN) Chan1() Chan1 {
-	Assert(c.NComp() == 1)
-	return c[0]
-}

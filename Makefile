@@ -20,13 +20,13 @@ gccgo: ptx
 	go install -v -compiler $(GCCGO)
 
 ptx:
-	make -C gpu/ptx
+	make -C gpu/ptx -j8
 
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 	ln -sf $(CURDIR)/post-commit .git/hooks/post-commit
 
-test: 6gtest gccgotest unittest
+test: 6gtest  unittest #gccgotest
 
 unittest:
 	make -C test
@@ -41,3 +41,4 @@ gccgotest: gccgo
 clean:
 	go clean -i -x $(PKGS)
 	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/
+	make clean -C gpu/ptx

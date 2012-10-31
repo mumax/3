@@ -26,7 +26,7 @@ githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 	ln -sf $(CURDIR)/post-commit .git/hooks/post-commit
 
-test: 6gtest  unittest #gccgotest
+test: 6gtest  unittest gccgotest
 
 unittest:
 	make -C test

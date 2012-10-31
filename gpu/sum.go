@@ -11,7 +11,7 @@ type Sum struct {
 	term    []RChanN
 	weight  []float32
 	stream  cu.Stream
-	running bool 
+	running bool
 	readlen int // smallest of all blockLen's.
 }
 

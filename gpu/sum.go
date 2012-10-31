@@ -1,8 +1,8 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda5/cu"
 	"fmt"
+	"github.com/barnex/cuda5/cu"
 	"nimble-cube/core"
 )
 
@@ -11,7 +11,8 @@ type Sum struct {
 	term    []RChanN
 	weight  []float32
 	stream  cu.Stream
-	running bool
+	running bool 
+	readlen int // smallest of all blockLen's.
 }
 
 func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float32, nBlocks ...int) *Sum {
@@ -20,6 +21,7 @@ func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float
 	sum := &Sum{sum: output, stream: cu.StreamCreate()}
 	sum.MAdd(term1, weight1)
 	sum.MAdd(term2, weight2)
+	sum.readlen = output.BlockLen() // TODO: core.Min(output.BlockLen(), core.Min(term1.BlockLen(), term2.BlockLen()))
 	core.Stack(sum)
 	return sum
 }
@@ -37,6 +39,8 @@ func (s *Sum) MAdd(term RChanN, weight float32) {
 	}
 	s.term = append(s.term, term)
 	s.weight = append(s.weight, weight)
+	//TODO:
+	//s.readlen = core.Min(s.readlen, term.BlockLen())
 }
 
 func (s *Sum) Run() {

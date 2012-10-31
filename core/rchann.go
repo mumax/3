@@ -51,7 +51,6 @@ func (c RChanN) ReadDone() {
 //	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}
 //}
 
-
 //func (c RChanN) ReadDelta(Δstart, Δstop int) [3][]float32 {
 //	var next [3][]float32
 //	for i := range c {
@@ -61,4 +60,3 @@ func (c RChanN) ReadDone() {
 //	}
 //	return next
 //}
-

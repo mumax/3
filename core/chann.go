@@ -57,4 +57,3 @@ func (c ChanN) WriteDone() {
 //	}
 //	return next
 //}
-

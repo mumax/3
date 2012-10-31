@@ -51,14 +51,14 @@ func IntArg(idx int) int {
 	return val
 }
 
-func min(x, y int) int {
+func Min(x, y int) int {
 	if x < y {
 		return x
 	}
 	return y
 }
 
-func max(x, y int) int {
+func Max(x, y int) int {
 	if x > y {
 		return x
 	}

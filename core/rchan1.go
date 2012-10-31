@@ -26,8 +26,8 @@ func (c *RChan1) ReadDone() {
 	c.mutex.ReadDone()
 }
 
-func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {
-	c.mutex.ReadDelta(Δstart, Δstop)
-	a, b := c.mutex.RRange()
-	return c.slice.Slice(a, b).list
-}
+//func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {
+//	c.mutex.ReadDelta(Δstart, Δstop)
+//	a, b := c.mutex.RRange()
+//	return c.slice.Slice(a, b).list
+//}

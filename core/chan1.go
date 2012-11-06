@@ -28,4 +28,3 @@ func (c *Chan1) WriteNext(n int) Slice {
 //	a, b := c.mutex.WRange()
 //	return c.slice.list[a:b]
 //}
-

@@ -6,7 +6,6 @@ import (
 
 type Slice struct {
 	list []float32
-	//array [][][]float32
 	gpu safe.Float32s
 }
 

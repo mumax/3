@@ -29,6 +29,3 @@ func (c *Chan1) WriteNext(n int) Slice {
 //	return c.slice.list[a:b]
 //}
 
-func(c Chan1)UnsafeArray()[][][]float32{
-	return Reshape(c.chandata.slice.Host(), c.Size())
-}

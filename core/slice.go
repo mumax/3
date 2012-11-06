@@ -5,9 +5,9 @@ import (
 )
 
 type Slice struct {
-	list  []float32
+	list []float32
 	//array [][][]float32
-	gpu   safe.Float32s
+	gpu safe.Float32s
 }
 
 func (s *Slice) Slice(a, b int) Slice {

@@ -11,7 +11,7 @@ import (
 var rotatevecCode cu.Function
 
 // Rotate unit vectors v by factor * delta.
-func rotatevec(vec, delta [3]safe.Float32s, factor float32, stream cu.Stream) {
+func rotatevec(vec, delta [3]core.Slice, factor float32, stream cu.Stream) {
 	core.Assert(vec[0].Len() == delta[0].Len())
 
 	if rotatevecCode == 0 {
@@ -22,12 +22,12 @@ func rotatevec(vec, delta [3]safe.Float32s, factor float32, stream cu.Stream) {
 	N := vec[0].Len()
 	gridDim, blockDim := Make1DConf(N)
 
-	v0ptr := vec[0].Pointer()
-	v1ptr := vec[1].Pointer()
-	v2ptr := vec[2].Pointer()
-	d0ptr := delta[0].Pointer()
-	d1ptr := delta[1].Pointer()
-	d2ptr := delta[2].Pointer()
+	v0ptr := vec[0].Device().Pointer()
+	v1ptr := vec[1].Device().Pointer()
+	v2ptr := vec[2].Device().Pointer()
+	d0ptr := delta[0].Device().Pointer()
+	d1ptr := delta[1].Device().Pointer()
+	d2ptr := delta[2].Device().Pointer()
 
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&v0ptr),

@@ -8,6 +8,7 @@ func (c ChanN) NewReader() RChanN {
 }
 
 func (c RChanN) Mesh() *Mesh  { return c[0].Mesh }
+func (c RChanN) Size() [3]int  { return c[0].Size() }
 func (c RChanN) Unit() string { return c[0].Unit() }
 func (c RChanN) Tag() string  { return c[0].Tag() }
 func (c RChanN) NComp() int   { return len(c) }

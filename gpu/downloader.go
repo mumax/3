@@ -26,7 +26,7 @@ func (u *Downloader) Run() {
 	MemHostRegister(u.host.UnsafeData())
 
 	for {
-		in := u.dev.ReadNext(u.bsize)
+		in := u.dev.ReadNext(u.bsize).Device()
 		out := u.host.WriteNext(u.bsize).Host()
 		in.CopyDtoHAsync(out, u.stream)
 		u.stream.Synchronize()

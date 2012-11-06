@@ -19,6 +19,7 @@ func (c RChan3) ReadNext(n int) [3][]float32 {
 
 func (c RChan3) ReadDone()    { RChanN(c).ReadDone() }
 func (c RChan3) Mesh() *Mesh  { return RChanN(c).Mesh() }
+func (c RChan3) Size() [3]int  { return RChanN(c).Size() }
 func (c RChan3) Unit() string { return RChanN(c).Unit() }
 func (c RChan3) Tag() string  { return RChanN(c).Tag() }
 func (c RChan3) NComp() int   { return len(c) }

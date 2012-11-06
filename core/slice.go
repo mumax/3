@@ -43,7 +43,7 @@ const SizeofFloat32 = 4
 func (s *Slice) Slice(a, b int) Slice {
 	ptr := unsafe.Pointer(uintptr(s.ptr) + SizeofFloat32*uintptr(a))
 	len_ := b - a
-	if a >= s.len_ || b > s.len_ || a > b || a< 0||b< 0 {
+	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
 		Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_)
 	}
 	return Slice{ptr, len_, s.flag}
@@ -70,4 +70,4 @@ func (s Slice) Device() safe.Float32s {
 	return floats
 }
 
-func(s Slice)Len()int{return s.len_}
+func (s Slice) Len() int { return s.len_ }

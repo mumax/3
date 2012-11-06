@@ -12,7 +12,7 @@ type chandata struct {
 func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)
-	N := m.NCell()                      // TODO: block len
+	N := m.NCell() // TODO: block len
 	c.slice = Float32ToSlice(make([]float32, N))
 	return c
 }

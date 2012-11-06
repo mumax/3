@@ -32,7 +32,7 @@ func (c RChanN) ReadNextList(n int) [][]float32 {
 	for i := range c {
 		c[i].mutex.ReadNext(n)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].slice.Slice(a, b).list
+		next[i] = c[i].slice.Slice(a, b).Host()
 	}
 	return next
 }

@@ -25,7 +25,7 @@ func (c Chan3) ChanN() ChanN { return ChanN(c) }
 func (c Chan3) NComp() int   { return len(c) }
 
 func (c Chan3) UnsafeData() [3][]float32 {
-	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}
+	return [3][]float32{c[0].slice.Host(), c[1].slice.Host(), c[2].slice.Host()}
 }
 
 func (c Chan3) UnsafeArray() [3][][][]float32 {

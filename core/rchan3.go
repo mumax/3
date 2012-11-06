@@ -24,5 +24,5 @@ func (c RChan3) Tag() string  { return RChanN(c).Tag() }
 func (c RChan3) NComp() int   { return len(c) }
 
 func (c RChan3) UnsafeData() [3][]float32 {
-	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}
+	return [3][]float32{c[0].slice.Host(), c[1].slice.Host(), c[2].slice.Host()}
 }

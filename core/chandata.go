@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"unsafe"
 )
 
 type chandata struct {
@@ -13,17 +12,16 @@ type chandata struct {
 func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)
-	N := m.NCell()                    // TODO: block len
-	c.slice.list = make([]float32, N) //Contiguous(c.slice.array)
-	c.slice.gpu.UnsafeSet(unsafe.Pointer(&c.slice.list[0]), N, N)
+	N := m.NCell()                      // TODO: block len
+	c.slice = Float32ToSlice(make([]float32, N))
 	return c
 }
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
-func (d *chandata) UnsafeData() []float32 { return d.slice.list }
+func (d *chandata) UnsafeData() []float32 { return d.slice.Host() }
 
-func (d *chandata) NComp() int { return len(d.slice.list) }
+func (d *chandata) NComp() int { return len(d.slice.Host()) }
 
 func (q Chan1) String() string {
 	unit := q.unit

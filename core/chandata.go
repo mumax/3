@@ -11,12 +11,12 @@ type chandata struct {
 }
 
 func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
-	size := m.Size()
+	//size := m.Size()
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)
-	c.slice.array = MakeFloats(size)
-	c.slice.list = Contiguous(c.slice.array)
-	N := len(c.slice.list)
+	//c.slice.array = MakeFloats(size)
+	N := m.NCell() // TODO: block len
+	c.slice.list = make([]float32, N)//Contiguous(c.slice.array)
 	c.slice.gpu.UnsafeSet(unsafe.Pointer(&c.slice.list[0]), N, N)
 	return c
 }
@@ -24,8 +24,8 @@ func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (d *chandata) UnsafeData() []float32      { return d.slice.list }
-func (d *chandata) UnsafeArray() [][][]float32 { return d.slice.array }
-func (d *chandata) Size() [3]int               { return SizeOf(d.slice.array) }
+//func (d *chandata) UnsafeArray() [][][]float32 { return d.slice.array }
+//func (d *chandata) Size() [3]int               { return SizeOf(d.slice.array) }
 func (d *chandata) NComp() int                 { return len(d.slice.list) }
 
 func (q Chan1) String() string {

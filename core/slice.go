@@ -6,12 +6,12 @@ import (
 
 type Slice struct {
 	list  []float32
-	array [][][]float32
+	//array [][][]float32
 	gpu   safe.Float32s
 }
 
 func (s *Slice) Slice(a, b int) Slice {
-	return Slice{s.list[a:b], nil, s.gpu.Slice(a, b)}
+	return Slice{s.list[a:b], s.gpu.Slice(a, b)}
 }
 
 func (s Slice) Host() []float32 {

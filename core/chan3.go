@@ -29,5 +29,5 @@ func (c Chan3) UnsafeData() [3][]float32 {
 }
 
 func (c Chan3) UnsafeArray() [3][][][]float32 {
-	return [3][][][]float32{c[0].slice.array, c[1].slice.array, c[2].slice.array}
+	return [3][][][]float32{c[0].UnsafeArray(), c[1].UnsafeArray(), c[2].UnsafeArray()}
 }

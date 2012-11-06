@@ -28,3 +28,7 @@ func (c *Chan1) WriteNext(n int) Slice {
 //	a, b := c.mutex.WRange()
 //	return c.slice.list[a:b]
 //}
+
+func(c Chan1)UnsafeArray()[][][]float32{
+	return Reshape(c.chandata.slice.Host(), c.Size())
+}

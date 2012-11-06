@@ -21,7 +21,7 @@ func (c *RChan3) ReadNext(n int) [3]safe.Float32s {
 	for i := range c {
 		c[i].mutex.ReadNext(n)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }
@@ -39,7 +39,7 @@ func (c *RChan3) ReadDelta(Δstart, Δstop int) [3]safe.Float32s {
 	for i := range c {
 		c[i].mutex.ReadDelta(Δstart, Δstop)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }
@@ -52,5 +52,5 @@ func (c *RChan3) Tag() string      { return c[0].Tag() }
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (c *RChan3) UnsafeData() [3]safe.Float32s {
-	return [3]safe.Float32s{c[0].list, c[1].list, c[2].list}
+	return [3]safe.Float32s{c[0].gpu, c[1].gpu, c[2].gpu}
 }

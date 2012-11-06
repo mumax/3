@@ -53,7 +53,7 @@ func (c ChanN) WriteNext(n int) [3]safe.Float32s {
 	for i := range c {
 		c[i].WriteNext(n)
 		a, b := c[i].mutex.WRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }

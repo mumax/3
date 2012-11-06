@@ -25,7 +25,7 @@ func (c RChanN) ReadNext(n int) []safe.Float32s {
 	for i := range c {
 		c[i].mutex.ReadNext(n)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }
@@ -43,7 +43,7 @@ func (c RChanN) ReadDelta(Δstart, Δstop int) [3]safe.Float32s {
 	for i := range c {
 		c[i].mutex.ReadDelta(Δstart, Δstop)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }

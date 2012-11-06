@@ -1,8 +1,9 @@
 package core
 
-import(
- "fmt"
-"unsafe")
+import (
+	"fmt"
+	"unsafe"
+)
 
 type chandata struct {
 	*Info

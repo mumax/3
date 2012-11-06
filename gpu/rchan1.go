@@ -21,7 +21,7 @@ func (c *Chan1) NewReader() RChan1 {
 func (c RChan1) ReadNext(n int) safe.Float32s {
 	c.mutex.ReadNext(n)
 	a, b := c.mutex.RRange()
-	return c.list.Slice(a, b)
+	return c.gpu.Slice(a, b)
 }
 
 // ReadDone() signals a slice obtained by WriteNext() is fully

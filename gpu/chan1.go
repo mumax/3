@@ -7,11 +7,11 @@ import (
 )
 
 type chandata struct {
-	list safe.Float32s
+	gpu safe.Float32s
 	*core.Info
 }
 
-func (c *chandata) UnsafeData() safe.Float32s { return c.list }
+func (c *chandata) UnsafeData() safe.Float32s { return c.gpu }
 
 type Chan1 struct {
 	chandata
@@ -49,7 +49,7 @@ func MakeHostFloat32s(len_ int) safe.Float32s {
 func (c Chan1) WriteNext(n int) safe.Float32s {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
-	return c.list.Slice(a, b)
+	return c.gpu.Slice(a, b)
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully

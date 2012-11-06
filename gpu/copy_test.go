@@ -24,9 +24,9 @@ func TestCopy(t *testing.T) {
 
 	go func() {
 		for f := 0; f < F; f++ {
-			list := a.WriteNext(N)
-			for i := range list {
-				list[i] = float32(i)
+			gpu := a.WriteNext(N)
+			for i := range gpu {
+				gpu[i] = float32(i)
 			}
 			a.WriteDone()
 		}
@@ -34,10 +34,10 @@ func TestCopy(t *testing.T) {
 
 	C := c.NewReader()
 	for f := 0; f < F; f++ {
-		list := C.ReadNext(N)
-		for i := range list {
-			if list[i] != float32(i) {
-				t.Error("expected:", float32(i), "got:", list[i])
+		gpu := C.ReadNext(N)
+		for i := range gpu {
+			if gpu[i] != float32(i) {
+				t.Error("expected:", float32(i), "got:", gpu[i])
 			}
 		}
 		C.ReadDone()

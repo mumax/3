@@ -32,7 +32,7 @@ func (c Chan3) ChanN() ChanN { return ChanN(c[:]) }
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.
 func (c *Chan3) UnsafeData() [3]safe.Float32s {
-	return [3]safe.Float32s{c[0].list, c[1].list, c[2].list}
+	return [3]safe.Float32s{c[0].gpu, c[1].gpu, c[2].gpu}
 }
 
 func (c *Chan3) Mesh() *core.Mesh { return c[0].Mesh }
@@ -49,7 +49,7 @@ func (c *Chan3) WriteNext(n int) [3]safe.Float32s {
 	for i := range c {
 		c[i].WriteNext(n)
 		a, b := c[i].mutex.WRange()
-		next[i] = c[i].list.Slice(a, b)
+		next[i] = c[i].gpu.Slice(a, b)
 	}
 	return next
 }

@@ -9,15 +9,15 @@ import (
 )
 
 type Exchange6 struct {
-	m   RChan3
-	hex Chan3
+	m   core.RChan3
+	hex core.Chan3
 	*core.Mesh
 	aex_reduced float64
 	factors     [3]float32
 	stream      cu.Stream
 }
 
-func RunExchange6(tag string, m_ Chan3, aex_reduced float64) *Exchange6 {
+func RunExchange6(tag string, m_ core.Chan3, aex_reduced float64) *Exchange6 {
 	m := m_.NewReader()
 	mesh := m.Mesh()
 	hex := MakeChan3(tag, "T", mesh) //TODO: blocks
@@ -30,7 +30,7 @@ func RunExchange6(tag string, m_ Chan3, aex_reduced float64) *Exchange6 {
 	return e
 }
 
-func (e *Exchange6) Output() Chan3 { return e.hex }
+func (e *Exchange6) Output() core.Chan3 { return e.hex }
 
 func (e *Exchange6) Run() {
 	LockCudaThread()

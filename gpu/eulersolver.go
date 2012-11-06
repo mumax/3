@@ -7,14 +7,14 @@ import (
 
 // Euler solver.
 type Euler struct {
-	y      Chan3
-	dy     RChan3
+	y      core.Chan3
+	dy     core.RChan3
 	dt     float32
 	init   bool
 	stream cu.Stream
 }
 
-func NewEuler(y Chan3, dy RChan3, dt, multiplier float64) *Euler {
+func NewEuler(y core.Chan3, dy core.RChan3, dt, multiplier float64) *Euler {
 	return &Euler{y, dy, float32(dt * multiplier), false, cu.StreamCreate()}
 }
 

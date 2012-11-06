@@ -10,14 +10,14 @@ import (
 )
 
 type LLGTorque struct {
-	torque Chan3
-	m, b   RChan3
+	torque core.Chan3
+	m, b   core.RChan3
 	alpha  float32
 	bExt   mag.Vector
 	stream cu.Stream
 }
 
-func RunLLGTorque(tag string, m_, B_ Chan3, alpha float32) *LLGTorque {
+func RunLLGTorque(tag string, m_, B_ core.Chan3, alpha float32) *LLGTorque {
 	m, B := m_.NewReader(), B_.NewReader()
 	core.Assert(B.Size() == m.Size())
 	torque := MakeChan3(tag, "T", m.Mesh(), 1)
@@ -29,7 +29,7 @@ func RunLLGTorque(tag string, m_, B_ Chan3, alpha float32) *LLGTorque {
 	return tq
 }
 
-func (r *LLGTorque) Output() Chan3 { return r.torque }
+func (r *LLGTorque) Output() core.Chan3 { return r.torque }
 
 func (r *LLGTorque) Run() {
 	LockCudaThread()

@@ -7,13 +7,13 @@ import (
 
 // Downloads data from GPU to host.
 type Downloader struct {
-	dev    RChan1
+	dev    core.RChan1
 	host   core.Chan1
 	bsize  int
 	stream cu.Stream
 }
 
-func NewDownloader(devdata RChan1, hostdata core.Chan1) *Downloader {
+func NewDownloader(devdata core.RChan1, hostdata core.Chan1) *Downloader {
 	core.Assert(hostdata.Size() == devdata.Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
 	return &Downloader{devdata, hostdata, blocklen, 0} // TODO: block size
@@ -35,7 +35,7 @@ func (u *Downloader) Run() {
 	}
 }
 
-func RunDownloader(tag string, input Chan) core.ChanN {
+func RunDownloader(tag string, input core.Chan) core.ChanN {
 	in := input.ChanN()
 	output := core.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh())
 	for i := range in {

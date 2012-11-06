@@ -9,14 +9,14 @@ import (
 // Heun solver.
 type Heun struct {
 	dy0    [3]safe.Float32s
-	y      Chan3
-	dy     RChan3
+	y      core.Chan3
+	dy     core.RChan3
 	dt     float32
 	init   bool
 	stream cu.Stream
 }
 
-func NewHeun(y Chan3, dy_ Chan3, dt, multiplier float64) *Heun {
+func NewHeun(y core.Chan3, dy_ core.Chan3, dt, multiplier float64) *Heun {
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(core.Prod(y.Size()))
 	return &Heun{dy0, y, dy, float32(dt * multiplier), false, cu.StreamCreate()}

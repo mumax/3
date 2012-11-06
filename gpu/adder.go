@@ -11,13 +11,13 @@ import (
 )
 
 type Adder3 struct {
-	sum          Chan3
-	term1, term2 RChan3
+	sum          core.Chan3
+	term1, term2 core.RChan3
 	fac1, fac2   float32
 	stream       cu.Stream
 }
 
-func NewAdder3(sum Chan3, term1 RChan3, factor1 float32, term2 RChan3, factor2 float32) *Adder3 {
+func NewAdder3(sum core.Chan3, term1 core.RChan3, factor1 float32, term2 core.RChan3, factor2 float32) *Adder3 {
 	core.Assert(sum.Size() == term1.Size())
 	core.Assert(sum.Size() == term2.Size())
 	return &Adder3{sum, term1, term2, factor1, factor2, cu.StreamCreate()}

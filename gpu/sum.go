@@ -7,15 +7,15 @@ import (
 )
 
 type Sum struct {
-	sum     ChanN
-	term    []RChanN
+	sum     core.ChanN
+	term    []core.RChanN
 	weight  []float32
 	stream  cu.Stream
 	running bool
 	readlen int // smallest of all blockLen's.
 }
 
-func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float32, nBlocks ...int) *Sum {
+func RunSum(tag string, term1_ core.Chan, weight1 float32, term2_ core.Chan, weight2 float32, nBlocks ...int) *Sum {
 	term1, term2 := term1_.ChanN().NewReader(), term2_.ChanN().NewReader()
 	output := MakeChanN(term1.NComp(), tag, term1.Unit(), term1.Mesh(), nBlocks...)
 	sum := &Sum{sum: output, stream: cu.StreamCreate()}
@@ -26,7 +26,7 @@ func RunSum(tag string, term1_ Chan, weight1 float32, term2_ Chan, weight2 float
 	return sum
 }
 
-func (s *Sum) MAdd(term RChanN, weight float32) {
+func (s *Sum) MAdd(term core.RChanN, weight float32) {
 	// Fail-fast check. May not always fire but should be OK to catch obvious bugs.
 	if s.running {
 		core.Fatal(fmt.Errorf("sum: madd: already running"))
@@ -76,4 +76,4 @@ func (s *Sum) Exec() {
 	}
 }
 
-func (s *Sum) Output() ChanN { return s.sum }
+func (s *Sum) Output() core.ChanN { return s.sum }

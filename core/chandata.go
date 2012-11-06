@@ -1,6 +1,8 @@
 package core
 
-import "fmt"
+import(
+ "fmt"
+"unsafe")
 
 type chandata struct {
 	*Info
@@ -13,6 +15,8 @@ func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
 	c.Info = NewInfo(tag, unit, m, blocks...)
 	c.slice.array = MakeFloats(size)
 	c.slice.list = Contiguous(c.slice.array)
+	N := len(c.slice.list)
+	c.slice.gpu.UnsafeSet(unsafe.Pointer(&c.slice.list[0]), N, N)
 	return c
 }
 

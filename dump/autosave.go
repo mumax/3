@@ -4,35 +4,37 @@ import (
 	"code.google.com/p/nimble-cube/nimble"
 )
 
+// TODO: unexport
 type Autosaver struct {
 	out   *Writer
-	data  nimble.RChan3
+	data  nimble.RChanN
 	every int
 }
 
-func NewAutosaver(fname string, data nimble.RChan3, every int) *Autosaver {
+func RunAutosaver(fname string, data_ nimble.Chan, every int) *Autosaver {
 	r := new(Autosaver)
 	r.out = NewWriter(nimble.OpenFile(nimble.OD+fname), CRC_ENABLED)
-	nimble.Assert(data.NComp() == 3)
-	r.out.Components = 3 // TODO !!
+	data := data_.ChanN().NewReader()
+	r.out.Components = data.NComp()
 	r.out.MeshSize = data.Mesh().Size()
 	r.data = data
 	r.every = every
+	nimble.Stack(r)
 	return r
 }
 
 func (r *Autosaver) Run() {
-	N := nimble.Prod(r.data.Mesh().Size())
+	N := r.data.Mesh().NCell()
 
 	for i := 0; ; i++ {
-		output := r.data.ReadNext(N) // TODO
+		output := r.data.ReadNext(N) // TODO: could read comp by comp...
 		if i%r.every == 0 {
 			i = 0
 			nimble.Debug("dump")
 			r.out.WriteHeader()
-			r.out.WriteData(output[0].Host())
-			r.out.WriteData(output[1].Host())
-			r.out.WriteData(output[2].Host())
+			for c:=0; c < r.data.NComp(); c++{
+			r.out.WriteData(output[c].Host())
+			}
 			r.out.WriteHash()
 		}
 		r.data.ReadDone()

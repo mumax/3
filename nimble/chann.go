@@ -11,12 +11,12 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...
 	return c
 }
 
-func (c ChanN) Mesh() *Mesh  { return c[0].Mesh }
-func (c ChanN) Size() [3]int { return c[0].Size() }
-func (c ChanN) Unit() string { return c[0].Unit() }
-func (c ChanN) Tag() string  { return c[0].Tag() }
-func (c ChanN) NComp() int   { return len(c) }
-func (c ChanN) Comp(i int) Chan1   { return c[i] }
+func (c ChanN) Mesh() *Mesh      { return c[0].Mesh }
+func (c ChanN) Size() [3]int     { return c[0].Size() }
+func (c ChanN) Unit() string     { return c[0].Unit() }
+func (c ChanN) Tag() string      { return c[0].Tag() }
+func (c ChanN) NComp() int       { return len(c) }
+func (c ChanN) Comp(i int) Chan1 { return c[i] }
 
 func (c ChanN) Chan3() Chan3 {
 	Assert(c.NComp() == 3)

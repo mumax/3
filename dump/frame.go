@@ -1,9 +1,9 @@
 package dump
 
 import (
+	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 	"io"
-	"code.google.com/p/nimble-cube/nimble"
 	"os"
 )
 

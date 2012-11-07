@@ -31,7 +31,7 @@ func makedata(tag, unit string, m *Mesh, memtype MemType, blocks ...int) chandat
 
 func gpuSlice(N int) Slice {
 	bytes := int64(N) * SizeofFloat32
-	ptr := unsafe.Pointer(cu.MemAlloc(bytes))
+	ptr := unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
 	return Slice{ptr, N, GPUMemory}
 }
 

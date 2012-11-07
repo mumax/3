@@ -2,9 +2,9 @@ package dump
 
 import (
 	"bufio"
+	"code.google.com/p/nimble-cube/nimble"
 	"io"
 	"math"
-	"code.google.com/p/nimble-cube/nimble"
 	"unsafe"
 )
 

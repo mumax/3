@@ -1,8 +1,8 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda5/cu"
 	"code.google.com/p/nimble-cube/nimble"
+	"github.com/barnex/cuda5/cu"
 )
 
 func Min(a, b int) int {

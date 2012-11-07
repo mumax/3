@@ -1,8 +1,8 @@
 package dump
 
 import (
-	"io"
 	"code.google.com/p/nimble-cube/nimble"
+	"io"
 	"os"
 	"path"
 )

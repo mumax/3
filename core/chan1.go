@@ -5,8 +5,8 @@ type Chan1 struct {
 	mutex    *RWMutex
 }
 
-func MakeChan(tag, unit string, m *Mesh, blocks ...int) Chan1 {
-	data := makedata(tag, unit, m, blocks...)
+func MakeChan(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 {
+	data := makedata(tag, unit, m, memType, blocks...)
 	AddQuant(tag)
 	return Chan1{data, NewRWMutex(data.BlockLen(), tag)}
 }

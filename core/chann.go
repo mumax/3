@@ -2,10 +2,10 @@ package core
 
 type ChanN []Chan1
 
-func MakeChanN(nComp int, tag, unit string, m *Mesh, blocks ...int) ChanN {
+func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...int) ChanN {
 	c := make(ChanN, nComp)
 	for i := range c {
-		c[i] = MakeChan(tag, unit, m, blocks...)
+		c[i] = MakeChan(tag, unit, m, memType, blocks...)
 	}
 	AddQuant(tag)
 	return c

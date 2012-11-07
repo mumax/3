@@ -3,8 +3,8 @@ package core
 // Chan of 3-vector data.
 type Chan3 ChanN
 
-func MakeChan3(tag, unit string, m *Mesh, blocks ...int) Chan3 {
-	return Chan3(MakeChanN(3, tag, unit, m, blocks...))
+func MakeChan3(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan3 {
+	return Chan3(MakeChanN(3, tag, unit, m, memType, blocks...))
 }
 
 func (c Chan3) WriteNext(n int) [3][]float32 {

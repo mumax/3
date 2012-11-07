@@ -9,7 +9,7 @@ type chandata struct {
 	slice Slice
 }
 
-func makedata(tag, unit string, m *Mesh, blocks ...int) chandata {
+func makedata(tag, unit string, m *Mesh, memtype MemType, blocks ...int) chandata {
 	var c chandata
 	c.Info = NewInfo(tag, unit, m, blocks...)
 	N := m.NCell() // TODO: block len

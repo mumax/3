@@ -1,7 +1,7 @@
 package mag
 
 import (
-	//"nimble-cube/core"
+//"nimble-cube/core"
 )
 
 //type Exchange6 struct {

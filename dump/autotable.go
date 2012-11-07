@@ -36,8 +36,9 @@ func (r *Autotable) Run() {
 			i = 0
 			for c := range output {
 				sum := 0.
-				for j := range output[c] {
-					sum += float64(output[c][j])
+				list := output[c].Host()
+				for j := range list {
+					sum += float64(list[j])
 				}
 				sum /= float64(N)
 				r.out.Data[c] = float32(sum)

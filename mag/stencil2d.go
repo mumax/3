@@ -1,7 +1,7 @@
 package mag
 
 import (
-	//"nimble-cube/core"
+//"nimble-cube/core"
 )
 
 //type Stencil2D struct {

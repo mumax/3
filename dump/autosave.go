@@ -30,9 +30,9 @@ func (r *Autosaver) Run() {
 			i = 0
 			core.Debug("dump")
 			r.out.WriteHeader()
-			r.out.WriteData(output[0])
-			r.out.WriteData(output[1])
-			r.out.WriteData(output[2])
+			r.out.WriteData(output[0].Host())
+			r.out.WriteData(output[1].Host())
+			r.out.WriteData(output[2].Host())
 			r.out.WriteHash()
 		}
 		r.data.ReadDone()

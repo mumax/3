@@ -17,6 +17,8 @@ func main() {
 	Log("mesh:", mesh)
 
 	m := MakeChan3("m", "", mesh, UnifiedMemory)
+	// TODO: write m here
+
 	hd := MakeChan3("Hd", "", mesh, UnifiedMemory)
 
 	acc := 8

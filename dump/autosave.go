@@ -32,8 +32,8 @@ func (r *Autosaver) Run() {
 			i = 0
 			nimble.Debug("dump")
 			r.out.WriteHeader()
-			for c:=0; c < r.data.NComp(); c++{
-			r.out.WriteData(output[c].Host())
+			for c := 0; c < r.data.NComp(); c++ {
+				r.out.WriteData(output[c].Host())
 			}
 			r.out.WriteHash()
 		}

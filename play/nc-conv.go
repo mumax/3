@@ -1,9 +1,9 @@
 package main
 
 import (
-	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
+	"nimble-cube/nimble"
 	//"nimble-cube/mag"
 	"flag"
 	"strconv"
@@ -16,15 +16,15 @@ func main() {
 	N2, _ := strconv.Atoi(flag.Arg(2))
 
 	size := [3]int{N0, N1, N2}
-	core.Log("size:", size)
+	nimble.Log("size:", size)
 
-	ksize := core.PadSize(size, [3]int{0, 0, 0})
+	ksize := nimble.PadSize(size, [3]int{0, 0, 0})
 	//kern := mag.BruteKernel(ksize, [3]float64{1, 2, 3}, [3]int{0, 0, 0}, acc)
 
 	var kern [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			kern[i][j] = core.MakeFloats(ksize)
+			kern[i][j] = nimble.MakeFloats(ksize)
 		}
 	}
 	kern[2][0][0][0][0] = 1

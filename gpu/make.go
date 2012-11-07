@@ -3,7 +3,7 @@ package gpu
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"unsafe"
 )
 
@@ -34,7 +34,7 @@ func tryMalloc(bytes int64) (ptr unsafe.Pointer) {
 		err := recover()
 		if err == cu.ERROR_OUT_OF_MEMORY {
 			MB := bytes / (1024 * 1024)
-			core.Log("out of GPU memory, allocating", MB, "MB on host")
+			nimble.Log("out of GPU memory, allocating", MB, "MB on host")
 			ptr = cu.MemAllocHost(bytes)
 			return
 		} else if err != nil {

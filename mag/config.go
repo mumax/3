@@ -3,7 +3,7 @@ package mag
 // Utilities for setting magnetic configurations.
 
 import (
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 )
 
 // Returns a function that returns the vector value for all i,j,k.
@@ -16,7 +16,7 @@ func Uniform(x, y, z float32) func(i, j, k int) Vector {
 
 // Sets value at index i,j,k to f(i,j,k).
 func SetAll(array [3][][][]float32, f func(i, j, k int) Vector) {
-	n := core.SizeOf(array[0])
+	n := nimble.SizeOf(array[0])
 	i2, j2, k2 := n[0], n[1], n[2]
 	SetRegion(array, 0, 0, 0, i2, j2, k2, f)
 }

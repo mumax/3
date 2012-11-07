@@ -2,7 +2,7 @@ package dump
 
 import (
 	"io"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"os"
 	"path"
 )
@@ -56,16 +56,16 @@ func Quick(fname string, data [][][][]float32) {
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
-	core.Debug("quick dump to", fname)
+	nimble.Debug("quick dump to", fname)
 	out, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
-	core.PanicErr(err)
+	nimble.PanicErr(err)
 	defer out.Close()
 	w := NewWriter(out, CRC_ENABLED)
 	w.Header.Components = len(data)
-	w.Header.MeshSize = core.SizeOf(data[0])
+	w.Header.MeshSize = nimble.SizeOf(data[0])
 	w.WriteHeader()
 	for i := range data {
-		w.WriteData(core.Contiguous(data[i]))
+		w.WriteData(nimble.Contiguous(data[i]))
 	}
 	w.WriteHash()
 }

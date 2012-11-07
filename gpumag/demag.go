@@ -1,10 +1,10 @@
 package gpumag
 
 import (
-	"nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"nimble-cube/nimble"
 )
 
 type Demag struct {
@@ -18,10 +18,10 @@ func RunDemag(tag string, m_ gpu.Chan3, accuracy ...int) *Demag {
 	m := m_.NewReader()
 	d := new(Demag)
 	acc := DEFAULT_DEMAG_ACCURACY
-	kernel := mag.BruteKernel(core.ZeroPad(m.Mesh()), acc)
+	kernel := mag.BruteKernel(nimble.ZeroPad(m.Mesh()), acc)
 	d.b = gpu.MakeChan3(tag, "T", m.Mesh()) // TODO: choose blocks
 	d.convolution = *conv.NewSymm2D(m.Size(), kernel, m, d.b)
-	core.Stack(d)
+	nimble.Stack(d)
 	return d
 }
 

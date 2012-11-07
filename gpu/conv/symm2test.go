@@ -1,24 +1,24 @@
 package conv
 
 import (
-	"nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/mag"
+	"nimble-cube/nimble"
 )
 
 // Internal: main function for conv test.
 func TestSymm2(N0, N1, N2 int) {
 	C := 1e-9
-	mesh := core.NewMesh(N0, N1, N2, C, 2*C, 3*C)
-	core.Log(mesh)
+	mesh := nimble.NewMesh(N0, N1, N2, C, 2*C, 3*C)
+	nimble.Log(mesh)
 	N := mesh.NCell()
 
 	gpu.LockCudaThread()
-	hin := core.MakeChan3("hin", "", mesh, core.UnifiedMemory)
-	hout := core.MakeChan3("hout", "", mesh, core.UnifiedMemory)
+	hin := nimble.MakeChan3("hin", "", mesh, nimble.UnifiedMemory)
+	hout := nimble.MakeChan3("hout", "", mesh, nimble.UnifiedMemory)
 
 	acc := 1
-	kern := mag.BruteKernel(core.ZeroPad(mesh), acc)
+	kern := mag.BruteKernel(nimble.ZeroPad(mesh), acc)
 
 	arr := hin.UnsafeArray()
 	initConvTestInput(arr)
@@ -42,7 +42,7 @@ func TestSymm2(N0, N1, N2 int) {
 
 	outarr := hout.UnsafeData()
 
-	ref := core.MakeVectors(mesh.Size())
+	ref := nimble.MakeVectors(mesh.Size())
 	Brute(arr, ref, kern)
-	checkErr(outarr, core.Contiguous3(ref))
+	checkErr(outarr, nimble.Contiguous3(ref))
 }

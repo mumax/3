@@ -3,7 +3,7 @@ package dump
 import (
 	"fmt"
 	"io"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"os"
 )
 
@@ -64,7 +64,7 @@ func (f *Frame) Fprintf(out io.Writer, format string) {
 		return
 	}
 	fmt.Fprintln(out, f.Header.String())
-	core.Fprintf(out, format, f.Tensors())
+	nimble.Fprintf(out, format, f.Tensors())
 	fmt.Fprintf(out, "ISO CRC64:%x\n", f.CRC)
 }
 
@@ -90,5 +90,5 @@ func (f *Frame) Vectors() [3][][][]float32 {
 }
 
 func (f *Frame) Tensors() [][][][]float32 {
-	return core.Reshape4D(f.Data, f.Size())
+	return nimble.Reshape4D(f.Data, f.Size())
 }

@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"nimble-cube/nimble"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 
 	acc := 8
 	noPBC := [3]int{0, 0, 0}
-	kernel := mag.BruteKernel(core.PadSize(size, noPBC), cellsize, noPBC, acc)
+	kernel := mag.BruteKernel(nimble.PadSize(size, noPBC), cellsize, noPBC, acc)
 	demag := conv.NewSymmetric(size, kernel)
 
 	m := demag.Input()

@@ -7,7 +7,7 @@ PKGS=\
 	$(PREFIX)/gpu\
 	$(PREFIX)/mag\
 	$(PREFIX)/dump\
-	$(PREFIX)/core\
+	$(PREFIX)/nimble\
 
 6g: ptx
 	go install -v $(PKGS)

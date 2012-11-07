@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"testing"
 )
 
@@ -9,12 +9,12 @@ func TestCopy(t *testing.T) {
 	LockCudaThread()
 
 	cell := 1e-9
-	mesh := core.NewMesh(2, 4, 8, cell, cell, cell)
+	mesh := nimble.NewMesh(2, 4, 8, cell, cell, cell)
 	N := mesh.NCell()
 	F := 100
-	a := core.MakeChan1("a", "", mesh)
+	a := nimble.MakeChan1("a", "", mesh)
 	b := MakeChan1("b", "", mesh)
-	c := core.MakeChan1("c", "", mesh)
+	c := nimble.MakeChan1("c", "", mesh)
 
 	up := NewUploader(a.NewReader(), b)
 	down := NewDownloader(b.NewReader(), c)

@@ -1,11 +1,11 @@
 package main
 
 import (
-	. "nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	. "nimble-cube/nimble"
 	"os"
 )
 

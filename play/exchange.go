@@ -2,9 +2,9 @@ package main
 
 import (
 	"math"
-	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/mag"
+	"nimble-cube/nimble"
 )
 
 func main() {
@@ -12,8 +12,8 @@ func main() {
 	size := [3]int{N0, N1, N2}
 	cellsize := [3]float64{1e-9, 1e-9, 1e-9}
 
-	m := core.MakeVectors(size)
-	h := core.MakeVectors(size)
+	m := nimble.MakeVectors(size)
+	h := nimble.MakeVectors(size)
 
 	mag.SetRegion(m, 0, 0, 0, 1, N1, N2/2, mag.Uniform(0, 0, 1))
 	mag.SetRegion(m, 0, 0, N2/2, 1, N1, N2, mag.Uniform(0, 1, 0))

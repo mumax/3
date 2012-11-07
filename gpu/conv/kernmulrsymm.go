@@ -3,9 +3,9 @@ package conv
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/gpu/ptx"
+	"nimble-cube/nimble"
 	"unsafe"
 )
 
@@ -14,7 +14,7 @@ var kernMulRSymmCode cu.Function
 // Kernel multiplication with purely real, symmetric kernel.
 func kernMulRSymm(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Float32s, stream cu.Stream) {
 
-	core.Assert(fftM[0].Len() == K00.Len())
+	nimble.Assert(fftM[0].Len() == K00.Len())
 
 	if kernMulRSymmCode == 0 {
 		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM) // TODO: target higher SM's as well.

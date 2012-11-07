@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	. "nimble-cube/core"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	. "nimble-cube/nimble"
 	"os"
 	"time"
 )

@@ -3,7 +3,7 @@ package gpu
 import (
 	"flag"
 	"github.com/barnex/cuda5/cu"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"runtime"
 	"sync/atomic"
 	"unsafe"
@@ -14,9 +14,9 @@ var cudaCtx cu.Context // gpu context to be used by all threads
 func init() {
 	flag.Parse()
 	var flag uint
-	switch *core.Flag_sched {
+	switch *nimble.Flag_sched {
 	default:
-		panic("sched flag: expecting auto,spin,yield or sync: " + *core.Flag_sched)
+		panic("sched flag: expecting auto,spin,yield or sync: " + *nimble.Flag_sched)
 	case "auto":
 		flag = cu.CTX_SCHED_AUTO
 	case "spin":
@@ -27,11 +27,11 @@ func init() {
 		flag = cu.CTX_BLOCKING_SYNC
 	}
 	cu.Init(0)
-	core.Log("CUDA version:", cu.Version())
-	dev := cu.Device(*core.Flag_gpu)
+	nimble.Log("CUDA version:", cu.Version())
+	dev := cu.Device(*nimble.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
-	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+	nimble.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
 
 }
 
@@ -45,7 +45,7 @@ func LockCudaThread() {
 	runtime.LockOSThread()
 	cudaCtx.SetCurrent() // super cheap.
 	c := atomic.AddInt32(&lockCount, 1)
-	core.Debug("Locked thread", c, "to CUDA context")
+	nimble.Debug("Locked thread", c, "to CUDA context")
 }
 
 // Undo LockCudaThread()
@@ -55,7 +55,7 @@ func UnlockCudaThread() {
 	}
 	runtime.UnlockOSThread()
 	c := atomic.AddInt32(&lockCount, -1)
-	core.Debug("Unlocked OS thread,", c, "remain locked")
+	nimble.Debug("Unlocked OS thread,", c, "remain locked")
 }
 
 // Register host memory for fast transfers,
@@ -68,7 +68,7 @@ func MemHostRegister(slice []float32) {
 			panic(err)
 		}
 	}()
-	if *core.Flag_pagelock {
+	if *nimble.Flag_pagelock {
 		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
 	}
 }

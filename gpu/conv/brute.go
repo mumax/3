@@ -1,7 +1,7 @@
 package conv
 
 import (
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 )
 
 // Brute-force O(N²) vector convolution on CPU. 
@@ -15,8 +15,8 @@ import (
 // 	(O2)   (K21 K22 K23)   (I2)
 func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 
-	size := core.SizeOf(in[0])
-	ksize := core.SizeOf(kern[0][0])
+	size := nimble.SizeOf(in[0])
+	ksize := nimble.SizeOf(kern[0][0])
 
 	// Zero output first
 	for c := 0; c < 3; c++ {
@@ -41,11 +41,11 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 							continue // skip zero kernel
 						}
 						for dx := 0; dx < size[0]; dx++ {
-							i := core.Wrap(dx-sx, ksize[0])
+							i := nimble.Wrap(dx-sx, ksize[0])
 							for dy := 0; dy < size[1]; dy++ {
-								j := core.Wrap(dy-sy, ksize[1])
+								j := nimble.Wrap(dy-sy, ksize[1])
 								for dz := 0; dz < size[2]; dz++ {
-									k := core.Wrap(dz-sz, ksize[2])
+									k := nimble.Wrap(dz-sz, ksize[2])
 									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * kern[dc][sc][i][j][k]
 								}
 							}

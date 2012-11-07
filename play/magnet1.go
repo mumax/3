@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"math"
-	"nimble-cube/core"
 	"nimble-cube/dump"
 	"nimble-cube/gpu/conv"
 	"nimble-cube/mag"
+	"nimble-cube/nimble"
 	"os"
 	"strconv"
 )
@@ -22,12 +22,12 @@ func main() {
 	acc := 4
 	NOPBC := [3]int{0, 0, 0}
 	// TODO: kernel should known its size depending on PBC or not!!
-	kernel := mag.BruteKernel(core.PadSize(size, NOPBC), cellsize, NOPBC, acc)
+	kernel := mag.BruteKernel(nimble.PadSize(size, NOPBC), cellsize, NOPBC, acc)
 	demag := conv.NewBasic(size, kernel)
 	m := demag.Input()
-	m_ := core.Contiguous3(m)
+	m_ := nimble.Contiguous3(m)
 	Hd := demag.Output()
-	Hd_ := core.Contiguous3(Hd)
+	Hd_ := nimble.Contiguous3(Hd)
 
 	// inital mag
 	y1, y2 := 0, N1 //3*N1/8, 5*N1/8
@@ -51,25 +51,25 @@ func main() {
 	demag.Exec()
 	dump.Quick("hd", Hd[:])
 
-	Hex := core.MakeVectors(size)
-	Hex_ := core.Contiguous3(Hex)
+	Hex := nimble.MakeVectors(size)
+	Hex_ := nimble.Contiguous3(Hex)
 	Aex := 13e-12
 	mag.Exchange6(m, Hex, cellsize, Aex)
 	dump.Quick("hex", Hex[:])
 
-	Heff := core.MakeVectors(size)
-	Heff_ := core.Contiguous3(Heff)
-	core.Add3(Heff_, Hex_, Hd_)
+	Heff := nimble.MakeVectors(size)
+	Heff_ := nimble.Contiguous3(Heff)
+	nimble.Add3(Heff_, Hex_, Hd_)
 	dump.Quick("heff", Heff[:])
 
 	alpha := float32(1)
-	torque := core.MakeVectors(size)
-	torque_ := core.Contiguous3(torque)
+	torque := nimble.MakeVectors(size)
+	torque_ := nimble.Contiguous3(torque)
 	mag.LLGTorque(torque_, m_, Heff_, alpha)
 	dump.Quick("torque", torque[:])
 
 	out, err := os.OpenFile("m.table", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	core.Fatal(err)
+	nimble.Fatal(err)
 	defer out.Close()
 	table := dump.NewTableWriter(out, []string{"t", "mx", "my", "mz"}, []string{"s", "", "", ""})
 	defer table.Flush()
@@ -81,20 +81,20 @@ func main() {
 		time = dt * float64(step)
 		demag.Exec()
 		mag.Exchange6(m, Hex, cellsize, Aex)
-		core.Add3(Heff_, Hex_, Hd_)
+		nimble.Add3(Heff_, Hex_, Hd_)
 		mag.LLGTorque(torque_, m_, Heff_, alpha)
 		mag.EulerStep(m_, torque_, dt)
 		//dump.Quick(fmt.Sprintf("m%06d", step), m[:])
 		table.Data[0] = float32(time)
-		table.Data[1] = float32(core.Average(m_[0]))
-		table.Data[2] = float32(core.Average(m_[1]))
-		table.Data[3] = float32(core.Average(m_[2]))
+		table.Data[1] = float32(nimble.Average(m_[0]))
+		table.Data[2] = float32(nimble.Average(m_[1]))
+		table.Data[3] = float32(nimble.Average(m_[2]))
 		table.WriteData()
 	}
 }
 
 func intflag(idx int) int {
 	val, err := strconv.Atoi(flag.Arg(idx))
-	core.Fatal(err)
+	nimble.Fatal(err)
 	return val
 }

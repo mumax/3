@@ -1,10 +1,10 @@
 package main
 
 import (
-	. "nimble-cube/core"
 	"nimble-cube/gpu"
 	"nimble-cube/gpumag"
 	"nimble-cube/mag"
+	. "nimble-cube/nimble"
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package conv
 
 import (
-	"nimble-cube/core"
 	"nimble-cube/gpu"
+	"nimble-cube/nimble"
 )
 
 // common data for all convolutions
@@ -36,19 +36,19 @@ func (c *hostData) Kernel() [3][3][][][]float32 {
 func (c *hostData) init(size [3]int, kernel [3][3][][][]float32) {
 
 	c.size = size
-	c.n = core.Prod(c.size)
-	c.inArr = core.MakeVectors(size)
-	c.outArr = core.MakeVectors(size)
-	c.input = core.Contiguous3(c.inArr)
-	c.output = core.Contiguous3(c.outArr)
+	c.n = nimble.Prod(c.size)
+	c.inArr = nimble.MakeVectors(size)
+	c.outArr = nimble.MakeVectors(size)
+	c.input = nimble.Contiguous3(c.inArr)
+	c.output = nimble.Contiguous3(c.outArr)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
-				c.kern[i][j] = core.Contiguous(kernel[i][j])
+				c.kern[i][j] = nimble.Contiguous(kernel[i][j])
 			}
 		}
 	}
-	c.kernSize = core.SizeOf(kernel[0][0])
+	c.kernSize = nimble.SizeOf(kernel[0][0])
 	c.kernArr = kernel
 }
 

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 	"math"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 	"unsafe"
 )
 
@@ -18,7 +18,7 @@ type TableWriter struct {
 
 func NewTableWriter(out io.Writer, tags, units []string) TableWriter {
 	if len(tags) != len(units) {
-		core.Panic("table: len(tags) != len(units)")
+		nimble.Panic("table: len(tags) != len(units)")
 	}
 
 	bufout, ok := out.(*bufio.Writer)
@@ -48,7 +48,7 @@ func (w *TableWriter) WriteData() {
 }
 
 func (w *TableWriter) Flush() {
-	core.PanicErr(w.out.Flush())
+	nimble.PanicErr(w.out.Flush())
 }
 func (w *TableWriter) writeFloat64(x float64) {
 	w.writeUInt64(math.Float64bits(x))
@@ -77,6 +77,6 @@ func (w *TableWriter) writeInt(x int) {
 }
 func (w *TableWriter) check(n int, err error) {
 	if err != nil {
-		core.Panic(err)
+		nimble.Panic(err)
 	}
 }

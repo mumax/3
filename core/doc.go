@@ -1,4 +1,0 @@
-/*
-	Core functionality.
-*/
-package core

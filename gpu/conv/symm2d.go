@@ -3,8 +3,8 @@ package conv
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"nimble-cube/core"
 	"nimble-cube/gpu"
+	"nimble-cube/nimble"
 	"unsafe"
 )
 
@@ -13,8 +13,8 @@ type Symm2D struct {
 	kernSize    [3]int              // Size of kernel and logical FFT size.
 	fftKernSize [3]int              // Size of real, FFTed kernel
 	n           int                 // product of size
-	input       [3]core.RChan1      // TODO: fuse with input
-	output      [3]core.Chan1       // TODO: fuse with output
+	input       [3]nimble.RChan1    // TODO: fuse with input
+	output      [3]nimble.Chan1     // TODO: fuse with output
 	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf. 
 	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
@@ -27,7 +27,7 @@ type Symm2D struct {
 }
 
 func (c *Symm2D) init() {
-	core.Log("initializing 2D symmetric convolution")
+	nimble.Log("initializing 2D symmetric convolution")
 	gpu.LockCudaThread()
 	defer gpu.UnlockCudaThread()
 
@@ -124,7 +124,7 @@ func (c *Symm2D) initFFTKern2D() {
 }
 
 func (c *Symm2D) Run() {
-	core.Log("running symmetric 2D convolution")
+	nimble.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
 
 	for {
@@ -234,22 +234,22 @@ func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 
-func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input_ core.Chan3, output_ core.Chan3) *Symm2D {
+func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input_ nimble.Chan3, output_ nimble.Chan3) *Symm2D {
 	in_ := input_.NewReader()
-	input := [3]core.RChan1{in_[0], in_[1], in_[2]}
-	output := [3]core.Chan1{output_[0], output_[1], output_[2]}
+	input := [3]nimble.RChan1{in_[0], in_[1], in_[2]}
+	output := [3]nimble.Chan1{output_[0], output_[1], output_[2]}
 	c := new(Symm2D)
 	c.size = size
 	c.kernArr = kernel
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
-				c.kern[i][j] = core.Contiguous(kernel[i][j])
+				c.kern[i][j] = nimble.Contiguous(kernel[i][j])
 			}
 		}
 	}
 	c.n = prod(size)
-	c.kernSize = core.SizeOf(kernel[0][0])
+	c.kernSize = nimble.SizeOf(kernel[0][0])
 	c.input = input
 	c.output = output
 

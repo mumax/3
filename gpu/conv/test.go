@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/barnex/fmath"
 	"math/rand"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 )
 
 // Interface of any convolution.
@@ -19,17 +19,17 @@ type Constructor func(size [3]int, kernel [3][3][][][]float32) Conv
 
 // Test if the convolution gives the same result as the brute-force implementation.
 func Test(c Conv) {
-	if !*core.Flag_verify {
-		core.Log("skipping convolution self-test")
+	if !*nimble.Flag_verify {
+		nimble.Log("skipping convolution self-test")
 		return
 	}
 	input := c.Input()
 	output := c.Output()
-	size := core.SizeOf(input[0])
+	size := nimble.SizeOf(input[0])
 
 	// overwrite input/output data, if any.
-	in := core.Contiguous3(input)
-	out := core.Contiguous3(output)
+	in := nimble.Contiguous3(input)
+	out := nimble.Contiguous3(output)
 	for i := range in {
 		for j := range in[i] {
 			in[i][j] = 0
@@ -40,9 +40,9 @@ func Test(c Conv) {
 	initConvTestInput(input)
 
 	// Reference solution
-	bruteOut := core.MakeVectors(size)
+	bruteOut := nimble.MakeVectors(size)
 	Brute(input, bruteOut, c.Kernel())
-	ref := core.Contiguous3(bruteOut)
+	ref := nimble.Contiguous3(bruteOut)
 
 	// solution under test
 	c.Exec()
@@ -76,9 +76,9 @@ func checkErr(ref, out [3][]float32) {
 		//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
 		//	core.Fprint(os.Stderr, "got:\n")
 		//	core.Fprintf(os.Stderr, "% 6e", c.Output())
-		core.Fatal(fmt.Errorf("convolution self-test failed with error %v", maxerr))
+		nimble.Fatal(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 	}
-	core.Log("convolution test error:", maxerr, "OK")
+	nimble.Log("convolution test error:", maxerr, "OK")
 }
 
 // random number between -1 and 1.
@@ -88,7 +88,7 @@ func rnd() float32 {
 
 // generate sparse input data
 func initConvTestInput(input [3][][][]float32) {
-	size := core.SizeOf(input[0])
+	size := nimble.SizeOf(input[0])
 	N0, N1, N2 := size[0], size[1], size[2]
 	is := [...]int{N0 - 1} //	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
 	js := [...]int{N1 - 1} //	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}

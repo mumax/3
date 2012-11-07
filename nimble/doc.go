@@ -1,0 +1,4 @@
+/*
+	Core functionality.
+*/
+package nimble

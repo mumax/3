@@ -2,25 +2,25 @@ package gpu
 
 import (
 	"github.com/barnex/cuda5/cu"
-	"nimble-cube/core"
+	"nimble-cube/nimble"
 )
 
 // Downloads data from GPU to host.
 type Downloader struct {
-	dev    core.RChan1
-	host   core.Chan1
+	dev    nimble.RChan1
+	host   nimble.Chan1
 	bsize  int
 	stream cu.Stream
 }
 
-func NewDownloader(devdata core.RChan1, hostdata core.Chan1) *Downloader {
-	core.Assert(hostdata.Size() == devdata.Size())
-	blocklen := core.Prod(core.BlockSize(hostdata.Size()))
+func NewDownloader(devdata nimble.RChan1, hostdata nimble.Chan1) *Downloader {
+	nimble.Assert(hostdata.Size() == devdata.Size())
+	blocklen := nimble.Prod(nimble.BlockSize(hostdata.Size()))
 	return &Downloader{devdata, hostdata, blocklen, 0} // TODO: block size
 }
 
 func (u *Downloader) Run() {
-	core.Debug("run gpu.downloader with block size", u.bsize)
+	nimble.Debug("run gpu.downloader with block size", u.bsize)
 	LockCudaThread()
 	u.stream = cu.StreamCreate()
 	MemHostRegister(u.host.UnsafeData())
@@ -35,11 +35,11 @@ func (u *Downloader) Run() {
 	}
 }
 
-func RunDownloader(tag string, input core.Chan) core.ChanN {
+func RunDownloader(tag string, input nimble.Chan) nimble.ChanN {
 	in := input.ChanN()
-	output := core.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), core.CPUMemory)
+	output := nimble.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), nimble.CPUMemory)
 	for i := range in {
-		core.Stack(NewDownloader(in[i].NewReader(), output[i]))
+		nimble.Stack(NewDownloader(in[i].NewReader(), output[i]))
 	}
 	return output
 }

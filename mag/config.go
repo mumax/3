@@ -3,7 +3,7 @@ package mag
 // Utilities for setting magnetic configurations.
 
 import (
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Returns a function that returns the vector value for all i,j,k.

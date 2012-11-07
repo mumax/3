@@ -3,14 +3,14 @@
 */
 package main
 
-// dummy imports to make go install fetch all of them.
+// dummy imports to make go get fetch all of them.
 import (
-	_ "nimble-cube/dump"
-	_ "nimble-cube/gpu"
-	_ "nimble-cube/gpu/conv"
-	_ "nimble-cube/gpu/ptx"
-	_ "nimble-cube/mag"
-	_ "nimble-cube/nimble"
+	_ "code.google.com/p/nimble-cube/dump"
+	_ "code.google.com/p/nimble-cube/gpu"
+	_ "code.google.com/p/nimble-cube/gpu/conv"
+	_ "code.google.com/p/nimble-cube/gpu/ptx"
+	_ "code.google.com/p/nimble-cube/mag"
+	_ "code.google.com/p/nimble-cube/nimble"
 )
 
 func main() {

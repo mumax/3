@@ -1,8 +1,8 @@
 package conv
 
 import (
-	"nimble-cube/gpu"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/gpu"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // common data for all convolutions

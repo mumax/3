@@ -1,7 +1,7 @@
 package dump
 
 import (
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 type Autosaver struct {

@@ -2,7 +2,7 @@ package gpu
 
 import (
 	"github.com/barnex/cuda5/cu"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Uploads data from host to GPU.

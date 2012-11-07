@@ -3,10 +3,10 @@ package conv
 // common code for all convolutions.
 
 import (
+	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"github.com/barnex/fmath"
-	"nimble-cube/nimble"
 )
 
 // CUDA root stream.

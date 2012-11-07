@@ -1,10 +1,10 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 	"github.com/barnex/fmath"
 	"math/rand"
-	"nimble-cube/nimble"
 )
 
 // Interface of any convolution.

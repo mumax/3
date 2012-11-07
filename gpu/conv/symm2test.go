@@ -1,9 +1,9 @@
 package conv
 
 import (
-	"nimble-cube/gpu"
-	"nimble-cube/mag"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/gpu"
+	"code.google.com/p/nimble-cube/mag"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Internal: main function for conv test.

@@ -1,6 +1,6 @@
 all: githook 6g 
 
-PREFIX=nimble-cube
+PREFIX=code.google.com/p/nimble-cube
 
 PKGS=\
 	$(PREFIX)/gpu/conv\

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 	"math"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"unsafe"
 )
 

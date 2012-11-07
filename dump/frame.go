@@ -3,7 +3,7 @@ package dump
 import (
 	"fmt"
 	"io"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"os"
 )
 

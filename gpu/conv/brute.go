@@ -1,7 +1,7 @@
 package conv
 
 import (
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Brute-force O(N²) vector convolution on CPU. 

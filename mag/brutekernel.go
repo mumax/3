@@ -2,7 +2,7 @@ package mag
 
 import (
 	"math"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Calculates the magnetostatic kernel by brute-force integration

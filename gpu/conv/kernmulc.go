@@ -1,11 +1,11 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/gpu"
+	"code.google.com/p/nimble-cube/gpu/ptx"
+	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"nimble-cube/gpu"
-	"nimble-cube/gpu/ptx"
-	"nimble-cube/nimble"
 	"unsafe"
 )
 

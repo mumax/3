@@ -2,7 +2,7 @@ package dump
 
 import (
 	"io"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"os"
 	"path"
 )

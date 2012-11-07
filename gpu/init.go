@@ -3,7 +3,7 @@ package gpu
 import (
 	"flag"
 	"github.com/barnex/cuda5/cu"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"runtime"
 	"sync/atomic"
 	"unsafe"

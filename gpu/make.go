@@ -3,7 +3,7 @@ package gpu
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"unsafe"
 )
 

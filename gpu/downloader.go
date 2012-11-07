@@ -38,8 +38,8 @@ func (u *Downloader) Run() {
 func RunDownloader(tag string, input nimble.Chan) nimble.ChanN {
 	in := input.ChanN()
 	output := nimble.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), nimble.CPUMemory)
-	for i := range in {
-		nimble.Stack(NewDownloader(in[i].NewReader(), output[i]))
+	for i := 0; i < in.NComp(); i++ {
+		nimble.Stack(NewDownloader(in.Comp(i).NewReader(), output.Comp(i)))
 	}
 	return output
 }

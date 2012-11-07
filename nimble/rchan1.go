@@ -6,7 +6,7 @@ type RChan1 struct {
 	mutex *rMutex
 }
 
-func (c *Chan1) NewReader() RChan1 {
+func (c Chan1) NewReader() RChan1 {
 	return RChan1{c.chandata, c.mutex.MakeRMutex()}
 }
 
@@ -14,7 +14,7 @@ func (c *Chan1) NewReader() RChan1 {
 // reading the next n elements from the Chan.
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.
-func (c *RChan1) ReadNext(n int) Slice {
+func (c RChan1) ReadNext(n int) Slice {
 	c.mutex.ReadNext(n)
 	a, b := c.mutex.RRange()
 	return c.slice.Slice(a, b)
@@ -22,7 +22,7 @@ func (c *RChan1) ReadNext(n int) Slice {
 
 // ReadDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c *RChan1) ReadDone() {
+func (c RChan1) ReadDone() {
 	c.mutex.ReadDone()
 }
 

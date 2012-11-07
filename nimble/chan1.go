@@ -13,11 +13,11 @@ func MakeChan(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 {
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c *Chan1) WriteDone() {
+func (c Chan1) WriteDone() {
 	c.mutex.WriteDone()
 }
 
-func (c *Chan1) WriteNext(n int) Slice {
+func (c Chan1) WriteNext(n int) Slice {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
 	return c.slice.Slice(a, b)

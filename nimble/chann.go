@@ -1,7 +1,7 @@
 package nimble
 
-type ChanN struct{
- comp []Chan1
+type ChanN struct {
+	comp []Chan1
 }
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...int) ChanN {

@@ -7,9 +7,9 @@ func (c Chan3) NewReader() RChan3 {
 	return RChan3{c[0].NewReader(), c[1].NewReader(), c[2].NewReader()}
 }
 
-func (c RChan3) ReadNext(n int) [3][]float32 {
-	next := RChanN(c).ReadNextList(n)
-	return [3][]float32{next[0], next[1], next[2]}
+func (c RChan3) ReadNext(n int) [3]Slice {
+	next := RChanN(c).ReadNext(n)
+	return [3]Slice{next[0], next[1], next[2]}
 }
 
 //func (c RChan3) ReadDelta(Δstart, Δstop int) [3][]float32 {

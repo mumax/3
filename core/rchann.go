@@ -28,15 +28,15 @@ func (c RChanN) ReadNext(n int) []Slice {
 }
 
 // temporary
-func (c RChanN) ReadNextList(n int) [][]float32 {
-	next := make([][]float32, c.NComp())
-	for i := range c {
-		c[i].mutex.ReadNext(n)
-		a, b := c[i].mutex.RRange()
-		next[i] = c[i].slice.Slice(a, b).Host()
-	}
-	return next
-}
+//func (c RChanN) ReadNextList(n int) [][]float32 {
+//	next := make([][]float32, c.NComp())
+//	for i := range c {
+//		c[i].mutex.ReadNext(n)
+//		a, b := c[i].mutex.RRange()
+//		next[i] = c[i].slice.Slice(a, b).Host()
+//	}
+//	return next
+//}
 
 // ReadDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan3.

@@ -1,5 +1,7 @@
 package conv
 
+//TODO: rm
+
 import (
 	"github.com/barnex/cuda5/cu"
 	"nimble-cube/core"
@@ -10,12 +12,12 @@ import (
 // Prioritizes upload of all X components, then Y, then Z.
 type Uploader struct {
 	host   core.RChan3
-	dev    [3]gpu.Chan1
+	dev    [3]core.Chan1
 	bsize  int
 	stream cu.Stream
 }
 
-func NewUploader(hostdata core.RChan3, devdata [3]gpu.Chan1) *Uploader {
+func NewUploader(hostdata core.RChan3, devdata [3]core.Chan1) *Uploader {
 	core.Assert(hostdata.Mesh().Size() == devdata[0].Size())
 	blocklen := core.Prod(core.BlockSize(hostdata.Mesh().Size()))
 	return &Uploader{hostdata, devdata, blocklen, 0}
@@ -35,7 +37,7 @@ func (u *Uploader) Run() {
 		// TODO: properly prioritized implementation
 		in := u.host.ReadNext(u.bsize)
 		for c := 0; c < 3; c++ {
-			out := u.dev[c].WriteNext(u.bsize)
+			out := u.dev[c].WriteNext(u.bsize).Device()
 			//core.Debug("upload", c, u.bsize)
 			out.CopyHtoDAsync(in[c], u.stream)
 			u.stream.Synchronize()

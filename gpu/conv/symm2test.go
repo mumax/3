@@ -14,8 +14,8 @@ func TestSymm2(N0, N1, N2 int) {
 	N := mesh.NCell()
 
 	gpu.LockCudaThread()
-	hin := core.MakeChan3("hin", "", mesh)
-	hout := core.MakeChan3("hout", "", mesh)
+	hin := core.MakeChan3("hin", "", mesh, core.UnifiedMemory)
+	hout := core.MakeChan3("hout", "", mesh, core.UnifiedMemory)
 
 	acc := 1
 	kern := mag.BruteKernel(core.ZeroPad(mesh), acc)
@@ -31,7 +31,8 @@ func TestSymm2(N0, N1, N2 int) {
 		}
 	}()
 
-	go NewSymmetricHtoD(mesh, kern, hin.NewReader(), hout).Run()
+	//go NewSymmetricHtoD(mesh, kern, hin.NewReader(), hout).Run()
+	go NewSymm2D(mesh.Size(), kern, hin, hout).Run()
 
 	houtR := hout.NewReader()
 	for i := 0; i < F; i++ {

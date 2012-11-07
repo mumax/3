@@ -16,26 +16,27 @@ func makedata(tag, unit string, m *Mesh, memtype MemType, blocks ...int) chandat
 	c.Info = NewInfo(tag, unit, m, blocks...)
 	N := m.NCell() // TODO: block len
 
-	switch memtype{
-		default: Panic("makechan: illegal memtype:", memtype)
-		case CPUMemory: 
-			c.slice = Float32ToSlice(make([]float32, N))
-		case GPUMemory:
-			c.slice = gpuSlice(N)
-		case UnifiedMemory:
-			c.slice = unifiedSlice(N)
+	switch memtype {
+	default:
+		Panic("makechan: illegal memtype:", memtype)
+	case CPUMemory:
+		c.slice = Float32ToSlice(make([]float32, N))
+	case GPUMemory:
+		c.slice = gpuSlice(N)
+	case UnifiedMemory:
+		c.slice = unifiedSlice(N)
 	}
 	return c
 }
 
-func gpuSlice(N int) Slice{
-	bytes := int64(N)*SizeofFloat32
+func gpuSlice(N int) Slice {
+	bytes := int64(N) * SizeofFloat32
 	ptr := unsafe.Pointer(cu.MemAlloc(bytes))
 	return Slice{ptr, N, GPUMemory}
 }
 
-func unifiedSlice(N int) Slice{
-	bytes := int64(N)*SizeofFloat32
+func unifiedSlice(N int) Slice {
+	bytes := int64(N) * SizeofFloat32
 	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
 	return Slice{ptr, N, UnifiedMemory}
 }

@@ -13,8 +13,8 @@ type Slice struct {
 }
 
 const (
-	CPUMemory MemType = 1 << 0
-	GPUMemory MemType = 1 << 1
+	CPUMemory     MemType = 1 << 0
+	GPUMemory     MemType = 1 << 1
 	UnifiedMemory MemType = CPUMemory | GPUMemory
 )
 

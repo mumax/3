@@ -37,7 +37,7 @@ func (u *Downloader) Run() {
 
 func RunDownloader(tag string, input core.Chan) core.ChanN {
 	in := input.ChanN()
-	output := core.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh())
+	output := core.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), core.CPUMemory)
 	for i := range in {
 		core.Stack(NewDownloader(in[i].NewReader(), output[i]))
 	}

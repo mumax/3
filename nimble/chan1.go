@@ -1,7 +1,7 @@
 package nimble
 
 type Chan1 struct {
-	chandata // array+list
+	chandata 
 	mutex    *rwMutex
 }
 

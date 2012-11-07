@@ -2,7 +2,7 @@ package nimble
 
 type Chan1 struct {
 	chandata // array+list
-	mutex    *RWMutex
+	mutex    *rwMutex
 }
 
 func MakeChan(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 {

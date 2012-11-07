@@ -24,7 +24,7 @@ func TestRWMutex(t *testing.T) {
 	read(r1, a, N, frames, t)
 }
 
-func write(m *RWMutex, a []int, N, frames int) {
+func write(m *rwMutex, a []int, N, frames int) {
 	count := 0
 	for i := 0; i < frames; i++ {
 		prev := 0
@@ -45,7 +45,7 @@ func write(m *RWMutex, a []int, N, frames int) {
 	}
 }
 
-func read(m *RMutex, a []int, N, frames int, t *testing.T) {
+func read(m *rMutex, a []int, N, frames int, t *testing.T) {
 	count := 0
 	for i := 0; i < frames; i++ {
 		prev := 0

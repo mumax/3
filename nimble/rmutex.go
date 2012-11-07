@@ -1,26 +1,26 @@
 package nimble
 
 // RMutex is a read-only lock, created by an RWMutex.
-type RMutex struct {
-	rw         *RWMutex
+type rMutex struct {
+	rw         *rwMutex
 	absC, absD int64 // half-open interval locked for reading
 }
 
 // Make a new read lock for this RWMutex.
-func (m *RWMutex) MakeRMutex() *RMutex {
+func (m *rwMutex) MakeRMutex() *rMutex {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
 	// Panic if we are already writing to the RWMutex.
 	if m.absB > 0 {
 		panic("rwmutex already in use")
 	}
-	r := &RMutex{rw: m}
+	r := &rMutex{rw: m}
 	m.readers = append(m.readers, r)
 	return r
 }
 
 // Move the locked window 
-func (m *RMutex) ReadDelta(Δstart, Δstop int) {
+func (m *rMutex) ReadDelta(Δstart, Δstop int) {
 	m.rw.cond.L.Lock()
 
 	m.delta(Δstart, Δstop)
@@ -30,7 +30,7 @@ func (m *RMutex) ReadDelta(Δstart, Δstop int) {
 }
 
 // unsynchronized Delta
-func (m *RMutex) delta(Δstart, Δstop int) {
+func (m *rMutex) delta(Δstart, Δstop int) {
 	Δc, Δd := int64(Δstart), int64(Δstop)
 
 	rnge := int((m.absD + Δd) - (m.absC + Δc))
@@ -46,7 +46,7 @@ func (m *RMutex) delta(Δstart, Δstop int) {
 }
 
 // Lock the next delta elements for reading.
-func (m *RMutex) ReadNext(delta int) {
+func (m *rMutex) ReadNext(delta int) {
 	m.rw.cond.L.Lock()
 
 	if m.absC != m.absD {
@@ -59,7 +59,7 @@ func (m *RMutex) ReadNext(delta int) {
 }
 
 // Unlock the previous interval locked for reading.
-func (m *RMutex) ReadDone() {
+func (m *rMutex) ReadDone() {
 	m.rw.cond.L.Lock()
 
 	rnge := int(m.absD - m.absC)
@@ -72,11 +72,11 @@ func (m *RMutex) ReadDone() {
 // RRange returns the currently read-locked range.
 // It is not thread-safe because each RMutex is only
 // supposed to be accessed by one reader thread.
-func (m *RMutex) RRange() (start, stop int) {
+func (m *rMutex) RRange() (start, stop int) {
 	return int(m.absC % int64(m.rw.n)), int((m.absD-1)%int64(m.rw.n)) + 1
 }
 
 // Can m safely lock for reading [start, stop[ ?
-func (r *RMutex) canRLock(c, d int64) (ok bool) {
+func (r *rMutex) canRLock(c, d int64) (ok bool) {
 	return r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
 }

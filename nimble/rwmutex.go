@@ -30,19 +30,19 @@ import "sync"
 // the data (when he holds the write lock).
 //
 // TODO: add Close() that Goexits all waiting threads.
-type RWMutex struct {
+type rwMutex struct {
 	cond       sync.Cond  // wait condition: read/write is safe
 	state      sync.Mutex // protects the internal state, used in cond.
 	absA, absB int64      // half-open interval locked for writing, moves indefinitely upwards.
 	n          int        // Total number of elements in protected array.
-	readers    []*RMutex  // all readers who can access this rwmutex
+	readers    []*rMutex  // all readers who can access this rwmutex
 	tag        string     // tag for profiling
 }
 
 // RWMutex to protect an array of length N.
-func NewRWMutex(N int, tag string) *RWMutex {
+func NewRWMutex(N int, tag string) *rwMutex {
 	profRegister(tag)
-	m := new(RWMutex)
+	m := new(rwMutex)
 	m.n = N
 	m.cond = *(sync.NewCond(&m.state))
 	m.tag = tag
@@ -50,7 +50,7 @@ func NewRWMutex(N int, tag string) *RWMutex {
 }
 
 // Move the locked window 
-func (m *RWMutex) WriteDelta(Δstart, Δstop int) {
+func (m *rwMutex) WriteDelta(Δstart, Δstop int) {
 	m.cond.L.Lock()
 
 	m.delta(Δstart, Δstop)
@@ -60,7 +60,7 @@ func (m *RWMutex) WriteDelta(Δstart, Δstop int) {
 }
 
 // unsynchronized Delta
-func (m *RWMutex) delta(Δstart, Δstop int) {
+func (m *rwMutex) delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
 
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
@@ -78,7 +78,7 @@ func (m *RWMutex) delta(Δstart, Δstop int) {
 }
 
 // Lock the next delta elements for writing.
-func (m *RWMutex) WriteNext(delta int) {
+func (m *rwMutex) WriteNext(delta int) {
 	m.cond.L.Lock()
 
 	if m.absA != m.absB {
@@ -92,7 +92,7 @@ func (m *RWMutex) WriteNext(delta int) {
 }
 
 // Unlock the previous interval locked for writing.
-func (m *RWMutex) WriteDone() {
+func (m *rwMutex) WriteDone() {
 	m.cond.L.Lock()
 
 	if m.absA == m.absB {
@@ -109,12 +109,12 @@ func (m *RWMutex) WriteDone() {
 // WRange returns the currently write-locked range.
 // It is not thread-safe because the RWMutex is only
 // supposed to be accessed by one writer thread.
-func (m *RWMutex) WRange() (start, stop int) {
+func (m *rwMutex) WRange() (start, stop int) {
 	return int(m.absA % int64(m.n)), int((m.absB-1)%int64(m.n)) + 1
 }
 
 // Can m safely lock for writing [a, b[ ?
-func (m *RWMutex) canWLock(a, b int64) (ok bool) {
+func (m *rwMutex) canWLock(a, b int64) (ok bool) {
 	// Panic if there are no readers.
 	// This is definitely a mistake, as no readers may be added later.
 	if len(m.readers) == 0 {

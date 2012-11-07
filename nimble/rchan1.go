@@ -3,7 +3,7 @@ package nimble
 // Read-only Chan.
 type RChan1 struct {
 	chandata
-	mutex *RMutex
+	mutex *rMutex
 }
 
 func (c *Chan1) NewReader() RChan1 {

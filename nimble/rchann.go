@@ -4,7 +4,7 @@ package nimble
 type RChanN []RChan1
 
 func (c ChanN) NewReader() RChanN {
-	return RChanN{c[0].NewReader(), c[1].NewReader(), c[2].NewReader()}
+	return RChanN{c.comp[0].NewReader(), c.comp[1].NewReader(), c.comp[2].NewReader()}
 }
 
 func (c RChanN) Mesh() *Mesh  { return c[0].Mesh }

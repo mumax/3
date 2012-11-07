@@ -32,7 +32,7 @@ func TestSymm2(N0, N1, N2 int) {
 	}()
 
 	//go NewSymmetricHtoD(mesh, kern, hin.NewReader(), hout).Run()
-	go NewSymm2D(mesh.Size(), kern, hin, hout).Run()
+	go NewSymm2D(mesh, kern, hin, hout).Run()
 
 	houtR := hout.NewReader()
 	for i := 0; i < F; i++ {

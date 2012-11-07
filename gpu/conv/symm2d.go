@@ -234,7 +234,8 @@ func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 
-func NewSymm2D(size [3]int, kernel [3][3][][][]float32, input_ nimble.Chan3, output_ nimble.Chan3) *Symm2D {
+func NewSymm2D(mesh *nimble.Mesh, kernel [3][3][][][]float32, input_ nimble.Chan3, output_ nimble.Chan3) *Symm2D {
+	size := mesh.Size()
 	in_ := input_.NewReader()
 	input := [3]nimble.RChan1{in_[0], in_[1], in_[2]}
 	output := [3]nimble.Chan1{output_[0], output_[1], output_[2]}

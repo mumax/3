@@ -28,7 +28,7 @@ func (u *Uploader) Run() {
 
 	for {
 		in := u.host.ReadNext(u.bsize).Host()
-		out := u.dev.WriteNext(u.bsize)
+		out := u.dev.WriteNext(u.bsize).Device()
 		out.CopyHtoDAsync(in, u.stream)
 		u.stream.Synchronize()
 		u.dev.WriteDone()
@@ -38,7 +38,9 @@ func (u *Uploader) Run() {
 
 func RunUploader(tag string, input core.Chan) core.ChanN {
 	in := input.ChanN()
+
 	output := MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh())
+
 	for i := range in {
 		core.Stack(NewUploader(in[i].NewReader(), output[i]))
 	}

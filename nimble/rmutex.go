@@ -1,5 +1,9 @@
 package nimble
 
+import(
+ "code.google.com/p/nimble-cube/core" )
+
+
 // RMutex is a read-only lock, created by an RWMutex.
 type rMutex struct {
 	rw         *rwMutex
@@ -35,7 +39,7 @@ func (m *rMutex) delta(Δstart, Δstop int) {
 
 	rnge := int((m.absD + Δd) - (m.absC + Δc))
 	if rnge < 0 || rnge > m.rw.n || Δc < 0 || Δd < 0 {
-		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
+		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
 	}
 
 	for !m.canRLock(m.absC+Δc, m.absD+Δd) {

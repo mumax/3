@@ -1,6 +1,10 @@
 package nimble
 
-import "fmt"
+import(
+	 "fmt"
+	"code.google.com/p/nimble-cube/core"
+)
+
 
 // Mesh stores info of a finite-difference mesh.
 type Mesh struct {
@@ -18,7 +22,7 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 		copy(pbc3[:], pbc)
 	} else {
 		if len(pbc) != 0 {
-			Panic("mesh: need 0 or 3 PBC arguments, got:", pbc)
+			core.Panic("mesh: need 0 or 3 PBC arguments, got:", pbc)
 		}
 	}
 	return &Mesh{[3]int{N0, N1, N2}, [3]float64{cellx, celly, cellz}, pbc3}

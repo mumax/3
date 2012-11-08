@@ -9,6 +9,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"code.google.com/p/nimble-cube/core"
 )
 
 var (
@@ -46,13 +47,13 @@ func init() {
 
 func initOD() {
 	if *Flag_od != "" {
-		SetOD(*Flag_od)
+		core.SetOD(*Flag_od)
 	}
 }
 
 func initLog() {
-	LOG = !*Flag_silent
-	DEBUG = *Flag_debug
+	core.LOG = !*Flag_silent
+	core.DEBUG = *Flag_debug
 	log.SetPrefix("#")
 	log.SetFlags(log.Ltime)
 }
@@ -60,30 +61,30 @@ func initLog() {
 func initGOMAXPROCS() {
 	if *Flag_maxprocs == 0 {
 		*Flag_maxprocs = runtime.NumCPU()
-		Log("num CPU:", *Flag_maxprocs)
+		core.Log("num CPU:", *Flag_maxprocs)
 	}
 	procs := runtime.GOMAXPROCS(*Flag_maxprocs) // sets it
-	Log("GOMAXPROCS:", procs)
+	core.Log("GOMAXPROCS:", procs)
 }
 
 func initCpuProf() {
 	if *Flag_cpuprof != "" {
 		f, err := os.Create(*Flag_cpuprof)
-		PanicErr(err)
-		Log("writing CPU profile to", *Flag_cpuprof)
+		core.PanicErr(err)
+		core.Log("writing CPU profile to", *Flag_cpuprof)
 		err = pprof.StartCPUProfile(f)
-		PanicErr(err)
-		AtExit(pprof.StopCPUProfile)
+		core.PanicErr(err)
+		core.AtExit(pprof.StopCPUProfile)
 	}
 }
 
 func initMemProf() {
 	if *Flag_memprof != "" {
-		AtExit(func() {
+		core.AtExit(func() {
 			f, err := os.Create(*Flag_memprof)
 			defer f.Close()
-			PanicErr(err)
-			Log("writing memory profile to", *Flag_memprof)
+			core.PanicErr(err)
+			core.Log("writing memory profile to", *Flag_memprof)
 			pprof.WriteHeapProfile(f)
 		})
 	}

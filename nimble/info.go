@@ -1,6 +1,8 @@
 package nimble
 
-import "fmt"
+import(
+	"code.google.com/p/nimble-cube/core"
+)
 
 type Info struct {
 	tag, unit string // Human-readable descriptors
@@ -24,7 +26,7 @@ func parseNBlocks(size [3]int, nBlocks ...int) (blocks, blocklen int) {
 	blocklen = BlockLen(size)
 	maxBlocks := Prod(size) / blocklen
 	if len(nBlocks) > 1 {
-		Fatal(fmt.Errorf("newquant: nblocks... should be ≤ 1 parameter"))
+		core.Fatalf("newquant: nblocks... should be ≤ 1 parameter")
 	}
 	blocks = maxBlocks // TODO: both maxblocks or 1 are good choices here
 	if len(nBlocks) > 0 {

@@ -9,8 +9,7 @@ import (
 	"sync"
 	"text/tabwriter"
 	"time"
-	//"github.com/ajstarks/svgo"
-
+	"code.google.com/p/nimble-cube/core"
 )
 
 const MaxProfLen = 10000
@@ -35,7 +34,7 @@ func profRegister(tag string) {
 		defer profstate.Unlock()
 		// make sure tag is not yet in use
 		if _, ok := tags[tag]; ok {
-			Panic("prof: tag ", tag, " already in use")
+			core.Panic("prof: tag ", tag, " already in use")
 		}
 		tags[tag] = false
 		profstart = time.Now()
@@ -60,14 +59,14 @@ var res = 10000
 
 func ProfDump(out_ io.Writer) {
 	if !*Flag_timing {
-		Log("dump timing profile: not enabled by -timeprof flag")
+		core.Log("dump timing profile: not enabled by -timeprof flag")
 	}
 	profstate.Lock()
 	defer profstate.Unlock()
 	out := tabwriter.NewWriter(out_, 8, 1, 1, ' ', 0)
 	profUpdateKeys()
 
-	Log("prof: timeline length:", len(timeline))
+	core.Log("prof: timeline length:", len(timeline))
 	for i, s := range timeline {
 		// enable/disable "running" status for this tag
 		tags[s.tag] = (s.delta >= 0)

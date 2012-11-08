@@ -3,6 +3,7 @@ package nimble
 // This file implements graphviz output.
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"fmt"
 	"io"
 	"os/exec"
@@ -12,13 +13,13 @@ var global *writer
 
 func InitGraph(fname string) {
 	if global != nil {
-		Fatal(fmt.Errorf("already saving pipeline graph"))
+		core.Fatalf("already saving pipeline graph")
 	}
-	Log("saving pipeline graph to", fname)
-	global = &writer{OpenFile(fname), fname}
+	core.Log("saving pipeline graph to", fname)
+	global = &writer{core.OpenFile(fname), fname}
 	global.Println("digraph dot{")
 	global.Println("rankdir=LR")
-	AtExit(func() { global.Close() })
+	core.AtExit(func() { global.Close() })
 }
 
 type writer struct {
@@ -39,8 +40,8 @@ func (g *writer) Close() {
 	dot := exec.Command("dot", "-O", "-Tpdf", g.fname)
 	out, err := dot.CombinedOutput()
 	if err != nil {
-		Log("dot:", string(out))
-		Log("dot:", err)
+		core.Log("dot:", string(out))
+		core.Log("dot:", err)
 	}
 }
 

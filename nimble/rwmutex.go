@@ -7,7 +7,10 @@ package nimble
    -Arne.
 */
 
-import "sync"
+import (
+"sync"
+"code.google.com/p/nimble-cube/core"
+)
 
 // RWMutex protects an array for safe access by
 // one writer and many readers. 
@@ -65,7 +68,7 @@ func (m *rwMutex) delta(Δstart, Δstop int) {
 
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
 	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
-		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
+		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
 	}
 
 	for !m.canWLock(m.absA+Δa, m.absB+Δb) {

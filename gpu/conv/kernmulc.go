@@ -1,9 +1,9 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/ptx"
-	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -16,7 +16,7 @@ var kernMulCCode cu.Function
 // It might be more clear if the kernel were stored as safe.Complex64s.
 func kernMulC(fftM [3]safe.Complex64s, K [3][3]safe.Float32s, stream cu.Stream) {
 
-	nimble.Assert(2*fftM[0].Len() == K[0][0].Len())
+	core.Assert(2*fftM[0].Len() == K[0][0].Len())
 
 	if kernMulCCode == 0 {
 		mod := cu.ModuleLoadData(ptx.KERNMULC) // TODO: target higher SM's as well.

@@ -1,9 +1,9 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/ptx"
-	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -16,7 +16,7 @@ var (
 
 func kernMulRSymm2Dyz(fftMy, fftMz safe.Complex64s, K11, K22, K12 safe.Float32s, N1, N2 int, stream cu.Stream) {
 
-	nimble.Assert(K11.Len() == (N1/2+1)*N2)
+	core.Assert(K11.Len() == (N1/2+1)*N2)
 
 	if kernMulRSymm2DyzCode == 0 {
 		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM2DYZ)
@@ -46,7 +46,7 @@ func kernMulRSymm2Dyz(fftMy, fftMz safe.Complex64s, K11, K22, K12 safe.Float32s,
 
 func kernMulRSymm2Dx(fftMx safe.Complex64s, K00 safe.Float32s, N1, N2 int, stream cu.Stream) {
 
-	nimble.Assert(K00.Len() == (N1/2+1)*N2)
+	core.Assert(K00.Len() == (N1/2+1)*N2)
 
 	if kernMulRSymm2DxCode == 0 {
 		mod := cu.ModuleLoadData(ptx.KERNMULRSYMM2DX)

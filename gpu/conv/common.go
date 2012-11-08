@@ -3,7 +3,7 @@ package conv
 // common code for all convolutions.
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"github.com/barnex/fmath"
@@ -25,7 +25,7 @@ func prod(size [3]int) int {
 // In the meanwhile, check if imaginary parts are nearly zero
 // and scale the kernel to compensate for unnormalized FFTs.
 func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
-	nimble.Assert(2*len(dstList) == src.Len())
+	core.Assert(2*len(dstList) == src.Len())
 	srcList := src.Host()
 
 	// Normally, the FFT'ed kernel is purely real because of symmetry,
@@ -45,8 +45,8 @@ func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
 	// just to be sure we did not make a mistake during kernel creation.
 	//core.Debug("FFT Kernel max imaginary part=", maximg)
 	//core.Debug("FFT Kernel max real part=", maxreal)
-	nimble.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
+	core.Debug("FFT Kernel max imaginary/real part=", maximg/maxreal)
 	if maximg/maxreal > 1e-5 { // TODO: is this reasonable?
-		nimble.Panicf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal)
+		core.Panicf("xc: FFT Kernel max imaginary/real part=%v", maximg/maxreal)
 	}
 }

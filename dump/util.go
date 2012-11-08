@@ -2,7 +2,6 @@ package dump
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
 	"io"
 	"os"
 	"path"
@@ -57,9 +56,9 @@ func Quick(fname string, data [][][][]float32) {
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
-	nimble.Debug("quick dump to", fname)
+	core.Debug("quick dump to", fname)
 	out, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
-	nimble.PanicErr(err)
+	core.PanicErr(err)
 	defer out.Close()
 	w := NewWriter(out, CRC_ENABLED)
 	w.Header.Components = len(data)

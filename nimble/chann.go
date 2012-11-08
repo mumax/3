@@ -1,7 +1,8 @@
 package nimble
 
-import(
-	"code.google.com/p/nimble-cube/core")
+import (
+	"code.google.com/p/nimble-cube/core"
+)
 
 type ChanN struct {
 	comp []Chan1

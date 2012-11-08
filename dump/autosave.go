@@ -1,6 +1,7 @@
 package dump
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 )
 
@@ -13,7 +14,7 @@ type Autosaver struct {
 
 func RunAutosaver(fname string, data_ nimble.Chan, every int) *Autosaver {
 	r := new(Autosaver)
-	r.out = NewWriter(nimble.OpenFile(nimble.OD+fname), CRC_ENABLED)
+	r.out = NewWriter(core.OpenFile(core.OD+fname), CRC_ENABLED)
 	data := data_.ChanN().NewReader()
 	r.out.Components = data.NComp()
 	r.out.MeshSize = data.Mesh().Size()
@@ -30,7 +31,7 @@ func (r *Autosaver) Run() {
 		output := r.data.ReadNext(N) // TODO: could read comp by comp...
 		if i%r.every == 0 {
 			i = 0
-			nimble.Debug("dump")
+			core.Debug("dump")
 			r.out.WriteHeader()
 			for c := 0; c < r.data.NComp(); c++ {
 				r.out.WriteData(output[c].Host())

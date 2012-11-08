@@ -28,7 +28,7 @@ type Symm2D struct {
 }
 
 func (c *Symm2D) init() {
-	nimble.Log("initializing 2D symmetric convolution")
+	core.Log("initializing 2D symmetric convolution")
 	gpu.LockCudaThread()
 	defer gpu.UnlockCudaThread()
 
@@ -125,7 +125,7 @@ func (c *Symm2D) initFFTKern2D() {
 }
 
 func (c *Symm2D) Run() {
-	nimble.Log("running symmetric 2D convolution")
+	core.Log("running symmetric 2D convolution")
 	gpu.LockCudaThread()
 
 	for {

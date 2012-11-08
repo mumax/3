@@ -2,7 +2,6 @@ package conv
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
 )
 
 // Brute-force O(N²) vector convolution on CPU. 
@@ -42,11 +41,11 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 							continue // skip zero kernel
 						}
 						for dx := 0; dx < size[0]; dx++ {
-							i := nimble.Wrap(dx-sx, ksize[0])
+							i := Wrap(dx-sx, ksize[0])
 							for dy := 0; dy < size[1]; dy++ {
-								j := nimble.Wrap(dy-sy, ksize[1])
+								j := Wrap(dy-sy, ksize[1])
 								for dz := 0; dz < size[2]; dz++ {
-									k := nimble.Wrap(dz-sz, ksize[2])
+									k := Wrap(dz-sz, ksize[2])
 									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * kern[dc][sc][i][j][k]
 								}
 							}
@@ -56,4 +55,15 @@ func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 			}
 		}
 	}
+}
+
+// Wraps an index to [0, max] by adding/subtracting a multiple of max.
+func Wrap(number, max int) int {
+	for number < 0 {
+		number += max
+	}
+	for number >= max {
+		number -= max
+	}
+	return number
 }

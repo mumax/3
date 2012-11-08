@@ -62,9 +62,9 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped. 
 			xw := Wrap(x, size[X])
 			for y := y1; y <= y2; y++ {
-				yw := nimble.Wrap(y, size[Y])
+				yw := Wrap(y, size[Y])
 				for z := z1; z <= z2; z++ {
-					zw := nimble.Wrap(z, size[Z])
+					zw := Wrap(z, size[Z])
 					R[X] = float64(x) * cellsize[X]
 					R[Y] = float64(y) * cellsize[Y]
 					R[Z] = float64(z) * cellsize[Z]
@@ -140,7 +140,6 @@ const (
 	Y = 1
 	Z = 2
 )
-
 
 // Wraps an index to [0, max] by adding/subtracting a multiple of max.
 func Wrap(number, max int) int {

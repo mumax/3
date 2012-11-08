@@ -1,9 +1,9 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/ptx"
-	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -14,8 +14,8 @@ var copyPadKern cu.Function
 // Copies src into dst (which is larger or smaller), at offset position.
 func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.Stream) {
 	//panic("need to loop for 3D, in kernel")
-	nimble.Assert(dst.Len() == nimble.Prod(dstsize))
-	nimble.Assert(src.Len() == nimble.Prod(srcsize))
+	core.Assert(dst.Len() == core.Prod(dstsize))
+	core.Assert(src.Len() == core.Prod(srcsize))
 	// TODO: either remove offset or check offset
 
 	if copyPadKern == 0 {

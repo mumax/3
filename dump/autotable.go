@@ -1,6 +1,7 @@
 package dump
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 )
 
@@ -20,15 +21,15 @@ func NewAutotable(fname string, data nimble.RChan3, every int) *Autotable {
 	r := new(Autotable)
 	tags := []string{data[0].Tag(), data[1].Tag(), data[2].Tag()}
 	units := []string{"?", "?", "?"} // TODO
-	r.out = NewTableWriter(nimble.OpenFile(nimble.OD+fname), tags, units)
+	r.out = NewTableWriter(core.OpenFile(core.OD+fname), tags, units)
 	r.data = data
 	r.every = every
 	return r
 }
 
 func (r *Autotable) Run() {
-	nimble.Log("running auto table")
-	N := nimble.Prod(r.data.Mesh().Size())
+	core.Log("running auto table")
+	N := core.Prod(r.data.Mesh().Size())
 
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO

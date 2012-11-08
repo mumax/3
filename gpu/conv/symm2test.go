@@ -17,7 +17,7 @@ func TestSymm2(N0, N1, N2 int) {
 
 	C := 1e-9
 	mesh := nimble.NewMesh(N0, N1, N2, C, 2*C, 3*C)
-	nimble.Log(mesh)
+	core.Log(mesh)
 	//N := mesh.NCell()
 
 	acc := 1
@@ -143,9 +143,9 @@ func checkErr(ref, out [3][]float32) {
 		//	core.Fprintf(os.Stderr, "% 6e", bruteOut)
 		//	core.Fprint(os.Stderr, "got:\n")
 		//	core.Fprintf(os.Stderr, "% 6e", c.Output())
-		nimble.Fatal(fmt.Errorf("convolution self-test failed with error %v", maxerr))
+		core.Fatal(fmt.Errorf("convolution self-test failed with error %v", maxerr))
 	}
-	nimble.Log("convolution test error:", maxerr, "OK")
+	core.Log("convolution test error:", maxerr, "OK")
 }
 
 // random number between -1 and 1.

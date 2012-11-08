@@ -11,7 +11,7 @@ const EXCHANGE6 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000026fd_00000000-9_exchange6.cpp3.i"
+	.file	1 "/tmp/tmpxft_00003021_00000000-9_exchange6.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/exchange6.cu"
 
 .visible .entry exchange6(

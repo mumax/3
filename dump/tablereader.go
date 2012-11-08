@@ -2,7 +2,7 @@ package dump
 
 import (
 	"bufio"
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"io"
 	"math"
 	"unsafe"
@@ -27,7 +27,7 @@ func NewTableReader(in io.Reader) TableReader {
 	t.in = bufin
 	magic := t.readString()
 	if magic != TABLE_MAGIC {
-		nimble.Panic("bad magic number:", magic)
+		core.Panic("bad magic number:", magic)
 	}
 
 	n := t.readInt()
@@ -42,7 +42,7 @@ func NewTableReader(in io.Reader) TableReader {
 
 	precission := t.readInt()
 	if precission != FLOAT32 {
-		nimble.Panic("only 32 bit is supported")
+		core.Panic("only 32 bit is supported")
 	}
 	// t.Data exposed as raw bytes
 	t.dataBytes = (*(*[1<<31 - 1]byte)(unsafe.Pointer(&t.Data[0])))[0 : 4*len(t.Data)]
@@ -61,7 +61,7 @@ func (r *TableReader) ReadLine() error {
 func (r *TableReader) readInt() int {
 	x := r.readUint64()
 	if uint64(int(x)) != x {
-		nimble.Panic("value overflows int:", x)
+		core.Panic("value overflows int:", x)
 	}
 	return int(x)
 }
@@ -69,7 +69,7 @@ func (r *TableReader) readInt() int {
 // read until the buffer is full
 func (r *TableReader) read(buf []byte) {
 	_, err := io.ReadFull(r.in, buf[:])
-	nimble.PanicErr(err)
+	core.PanicErr(err)
 }
 
 // read a maximum 8-byte string

@@ -11,47 +11,50 @@ import (
 
 // Internal: main function for conv test.
 func TestSymm2(N0, N1, N2 int) {
+
+	gpu.LockCudaThread()
+
 	C := 1e-9
 	mesh := nimble.NewMesh(N0, N1, N2, C, 2*C, 3*C)
 	nimble.Log(mesh)
-	N := mesh.NCell()
-
-	gpu.LockCudaThread()
-	hin := nimble.MakeChan3("hin", "", mesh, nimble.UnifiedMemory)
-	hout := nimble.MakeChan3("hout", "", mesh, nimble.UnifiedMemory)
+	//N := mesh.NCell()
 
 	acc := 1
 	kern := mag.BruteKernel(nimble.ZeroPad(mesh), acc)
+	chIn := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory)
+	chOut := nimble.MakeChan3("B", "", mesh, nimble.UnifiedMemory)
 
-	// TODO: const chan
-	for i := 0; i < 3; i++ {
-		arr := hin.Comp(i).WriteNext(N).Host()
-		initConvTestInput(nimble.Reshape(arr, hin.Size()))
-		hin.Comp(i).WriteDone()
-	}
-	F := 10
-	go func() {
-		for i := 1; i < F; i++ {
-			hin.WriteNext(N)
-			hin.WriteDone()
-		}
-	}()
+	nimble.Stack(NewSymm2D(mesh, kern, chIn, chOut))
 
-	//go NewSymmetricHtoD(mesh, kern, hin.NewReader(), hout).Run()
-	go NewSymm2D(mesh, kern, hin, hout).Run()
-
-	houtR := hout.NewReader()
-	var outarr [3]nimble.Slice
-	for i := 0; i < F; i++ {
-		outarr = houtR.ReadNext(N)
-		houtR.ReadDone()
-	}
-	outarrh := [3][]float32{outarr[0].Host(), outarr[1].Host(), outarr[2].Host()}
-
-	arr := nimble.MakeVectors(mesh.Size())
-	ref := nimble.MakeVectors(mesh.Size())
-	Brute(arr, ref, kern)
-	checkErr(outarrh, nimble.Contiguous3(ref))
+	//	// TODO: const chan
+	//	
+	//	for i:=0; i<3; i++{
+	//		arr = hin.Comp(i).WriteNext(N).Host()
+	//		initConvTestInput(nimble.Reshape(arr, hin.Size()))
+	//		hin.Comp(i).WriteDone()
+	//	}
+	//	F := 10
+	//	go func() {
+	//		for i := 1; i < F; i++ {
+	//			hin.WriteNext(N)
+	//			hin.WriteDone()
+	//		}
+	//	}()
+	//
+	//	//go NewSymmetricHtoD(mesh, kern, hin.NewReader(), hout).Run()
+	//	nimble.RunStack()
+	//
+	//	var outarr [3]nimble.Slice
+	//	for i := 0; i < F; i++ {
+	//		outarr = houtR.ReadNext(N)
+	//		houtR.ReadDone()
+	//	}
+	//	outarrh:=[3][]float32{outarr[0].Host(), outarr[1].Host(), outarr[2].Host()}
+	//
+	//	in := 
+	//	ref := nimble.MakeVectors(mesh.Size())
+	//	Brute(in, ref, kern)
+	//	checkErr(outarrh, nimble.Contiguous3(ref))
 }
 
 // generate sparse input data

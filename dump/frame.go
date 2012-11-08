@@ -1,6 +1,7 @@
 package dump
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 	"io"
@@ -90,5 +91,5 @@ func (f *Frame) Vectors() [3][][][]float32 {
 }
 
 func (f *Frame) Tensors() [][][][]float32 {
-	return nimble.Reshape4D(f.Data, f.Size())
+	return core.Reshape4D(f.Data, f.Size())
 }

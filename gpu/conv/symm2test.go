@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
@@ -59,7 +60,7 @@ func TestSymm2(N0, N1, N2 int) {
 
 // generate sparse input data
 func initConvTestInput(input [][][]float32) {
-	size := nimble.SizeOf(input)
+	size := core.SizeOf(input)
 	N0, N1, N2 := size[0], size[1], size[2]
 	is := [...]int{N0 - 1} //	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
 	js := [...]int{N1 - 1} //	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}

@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/nimble"
 )
@@ -37,18 +38,18 @@ func (c *hostData) init(size [3]int, kernel [3][3][][][]float32) {
 
 	c.size = size
 	c.n = nimble.Prod(c.size)
-	c.inArr = nimble.MakeVectors(size)
-	c.outArr = nimble.MakeVectors(size)
-	c.input = nimble.Contiguous3(c.inArr)
-	c.output = nimble.Contiguous3(c.outArr)
+	c.inArr = core.MakeVectors(size)
+	c.outArr = core.MakeVectors(size)
+	c.input = core.Contiguous3(c.inArr)
+	c.output = core.Contiguous3(c.outArr)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
-				c.kern[i][j] = nimble.Contiguous(kernel[i][j])
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
 			}
 		}
 	}
-	c.kernSize = nimble.SizeOf(kernel[0][0])
+	c.kernSize = core.SizeOf(kernel[0][0])
 	c.kernArr = kernel
 }
 

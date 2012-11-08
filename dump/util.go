@@ -1,6 +1,7 @@
 package dump
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 	"io"
 	"os"
@@ -62,10 +63,10 @@ func Quick(fname string, data [][][][]float32) {
 	defer out.Close()
 	w := NewWriter(out, CRC_ENABLED)
 	w.Header.Components = len(data)
-	w.Header.MeshSize = nimble.SizeOf(data[0])
+	w.Header.MeshSize = core.SizeOf(data[0])
 	w.WriteHeader()
 	for i := range data {
-		w.WriteData(nimble.Contiguous(data[i]))
+		w.WriteData(core.Contiguous(data[i]))
 	}
 	w.WriteHash()
 }

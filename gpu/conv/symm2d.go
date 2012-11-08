@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
@@ -246,12 +247,12 @@ func NewSymm2D(mesh *nimble.Mesh, kernel [3][3][][][]float32, input_ nimble.Chan
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
-				c.kern[i][j] = nimble.Contiguous(kernel[i][j])
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
 			}
 		}
 	}
 	c.n = prod(size)
-	c.kernSize = nimble.SizeOf(kernel[0][0])
+	c.kernSize = core.SizeOf(kernel[0][0])
 	c.input = input
 	c.output = output
 

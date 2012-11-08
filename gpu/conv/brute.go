@@ -1,6 +1,7 @@
 package conv
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 )
 
@@ -15,8 +16,8 @@ import (
 // 	(O2)   (K21 K22 K23)   (I2)
 func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
 
-	size := nimble.SizeOf(in[0])
-	ksize := nimble.SizeOf(kern[0][0])
+	size := core.SizeOf(in[0])
+	ksize := core.SizeOf(kern[0][0])
 
 	// Zero output first
 	for c := 0; c < 3; c++ {

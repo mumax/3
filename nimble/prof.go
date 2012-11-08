@@ -3,13 +3,13 @@ package nimble
 // Profiler
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"fmt"
 	"io"
 	"sort"
 	"sync"
 	"text/tabwriter"
 	"time"
-	"code.google.com/p/nimble-cube/core"
 )
 
 const MaxProfLen = 10000

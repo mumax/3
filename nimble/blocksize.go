@@ -32,6 +32,6 @@ func BlockLen(size [3]int) int {
 	return Prod(BlockSize(size))
 }
 
-func Prod(size[3]int)int{
+func Prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }

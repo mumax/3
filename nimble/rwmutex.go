@@ -8,8 +8,8 @@ package nimble
 */
 
 import (
-"sync"
-"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/core"
+	"sync"
 )
 
 // RWMutex protects an array for safe access by

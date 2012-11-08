@@ -1,10 +1,9 @@
 package nimble
 
-import(
-	 "fmt"
+import (
 	"code.google.com/p/nimble-cube/core"
+	"fmt"
 )
-
 
 // Mesh stores info of a finite-difference mesh.
 type Mesh struct {

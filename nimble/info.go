@@ -1,6 +1,6 @@
 package nimble
 
-import(
+import (
 	"code.google.com/p/nimble-cube/core"
 )
 

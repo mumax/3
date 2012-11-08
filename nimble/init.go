@@ -3,13 +3,13 @@ package nimble
 // Initialization of general command line flags.
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"code.google.com/p/nimble-cube/core"
 )
 
 var (

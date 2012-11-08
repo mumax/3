@@ -1,8 +1,8 @@
 package nimble
 
-import(
- "code.google.com/p/nimble-cube/core" )
-
+import (
+	"code.google.com/p/nimble-cube/core"
+)
 
 // RMutex is a read-only lock, created by an RWMutex.
 type rMutex struct {

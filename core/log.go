@@ -29,7 +29,6 @@ func Fatalf(format string, args ...interface{}) {
 	Fatal(fmt.Errorf(format, args...))
 }
 
-
 // Panics on the message.
 func Panic(msg ...interface{}) {
 	panic(fmt.Sprint(msg...))

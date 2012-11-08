@@ -24,7 +24,7 @@ func (u *Uploader) Run() {
 	LockCudaThread()
 	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()
-	MemHostRegister(u.host.UnsafeData())
+	//MemHostRegister(u.host.UnsafeData()) //TODO
 
 	for {
 		in := u.host.ReadNext(u.bsize).Host()

@@ -23,7 +23,7 @@ func (u *Downloader) Run() {
 	nimble.Debug("run gpu.downloader with block size", u.bsize)
 	LockCudaThread()
 	u.stream = cu.StreamCreate()
-	MemHostRegister(u.host.UnsafeData())
+	//MemHostRegister(u.host.UnsafeData()) // TODO
 
 	for {
 		in := u.dev.ReadNext(u.bsize).Device()

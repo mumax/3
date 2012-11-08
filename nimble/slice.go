@@ -73,7 +73,6 @@ func UnsafeSlice(ptr unsafe.Pointer, len_ int, flag MemType) Slice {
 	return Slice{ptr, len_, flag}
 }
 
-
 func (s *Slice) Slice(a, b int) Slice {
 	ptr := unsafe.Pointer(uintptr(s.ptr) + SizeofFloat32*uintptr(a))
 	len_ := b - a

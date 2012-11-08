@@ -41,7 +41,7 @@ func RunUploader(tag string, input nimble.Chan) nimble.ChanN {
 
 	output := nimble.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), nimble.GPUMemory)
 
-	for i := 0; i < output.NComp(); i++{
+	for i := 0; i < output.NComp(); i++ {
 		nimble.Stack(NewUploader(in.Comp(i).NewReader(), output.Comp(i)))
 	}
 	return output

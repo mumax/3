@@ -1,8 +1,8 @@
 package nimble
 
 import (
-	"github.com/barnex/cuda5/safe"
 	"github.com/barnex/cuda5/cu"
+	"github.com/barnex/cuda5/safe"
 	"reflect"
 	"unsafe"
 )
@@ -14,7 +14,7 @@ type Slice struct {
 	flag MemType
 }
 
-func MakeSlice(length int, memtype MemType)Slice{
+func MakeSlice(length int, memtype MemType) Slice {
 	switch memtype {
 	default:
 		Panic("makeslice: illegal memtype:", memtype)
@@ -30,8 +30,8 @@ func MakeSlice(length int, memtype MemType)Slice{
 	return s
 }
 
-func cpuSlice(N int)Slice{
-	return Float32ToSlice(make([]float32, N))
+func cpuSlice(N int) Slice {
+	return ToSlice(make([]float32, N))
 }
 
 func gpuSlice(N int) Slice {
@@ -44,6 +44,10 @@ func unifiedSlice(N int) Slice {
 	bytes := int64(N) * SizeofFloat32
 	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
 	return Slice{ptr, N, UnifiedMemory}
+}
+
+func ToSlice(list []float32) Slice {
+	return Slice{unsafe.Pointer(&list[0]), len(list), CPUMemory}
 }
 
 const (
@@ -69,11 +73,6 @@ func UnsafeSlice(ptr unsafe.Pointer, len_ int, flag MemType) Slice {
 	return Slice{ptr, len_, flag}
 }
 
-func Float32ToSlice(list []float32) Slice {
-	return Slice{unsafe.Pointer(&list[0]), len(list), CPUMemory}
-}
-
-const SizeofFloat32 = 4
 
 func (s *Slice) Slice(a, b int) Slice {
 	ptr := unsafe.Pointer(uintptr(s.ptr) + SizeofFloat32*uintptr(a))
@@ -106,3 +105,5 @@ func (s Slice) Device() safe.Float32s {
 }
 
 func (s Slice) Len() int { return s.len_ }
+
+const SizeofFloat32 = 4

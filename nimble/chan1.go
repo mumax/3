@@ -8,7 +8,7 @@ type Chan1 struct {
 
 func makeChan1(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 {
 	AddQuant(tag)
-	info:= NewInfo(tag, unit, m, blocks...)
+	info := NewInfo(tag, unit, m, blocks...)
 	N := info.BlockLen()
 	return Chan1{info, MakeSlice(N, memType), NewRWMutex(N, tag)}
 }
@@ -25,9 +25,7 @@ func (c Chan1) WriteNext(n int) Slice {
 	return c.slice.Slice(a, b)
 }
 
-func(c Chan1)NComp()int{return 1}
-
-
+func (c Chan1) NComp() int { return 1 }
 
 //func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 //	c.mutex.WriteDelta(Δstart, Δstop)

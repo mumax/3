@@ -1,6 +1,7 @@
 package mag
 
 import (
+	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 	"math"
 )
@@ -27,7 +28,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			array[i][j] = nimble.MakeFloats(size)
+			array[i][j] = core.MakeFloats(size)
 		}
 	}
 

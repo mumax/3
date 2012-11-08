@@ -1,4 +1,4 @@
-package nimble
+package core
 
 // Make a 3D block of vectors. Underlying storage is contiguous per component.
 func MakeVectors(size [3]int) [3][][][]float32 {

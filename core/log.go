@@ -1,4 +1,4 @@
-package nimble
+package core
 
 // Logging and error reporting utility functions
 
@@ -16,6 +16,7 @@ var (
 )
 
 // If err != nil, exit cleanly without panic.
+// TODO -> FatalErr
 func Fatal(err error) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

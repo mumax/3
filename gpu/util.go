@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -38,7 +38,7 @@ func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 	gridSize.Y = NY
 	gridSize.Z = 1
 
-	nimble.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
+	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }
 
@@ -57,6 +57,6 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	gridSize.Z = 1
 
 	N := N1 * N2
-	nimble.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
+	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }

@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -14,13 +15,13 @@ type Uploader struct {
 }
 
 func NewUploader(hostdata nimble.RChan1, devdata nimble.Chan1) *Uploader {
-	nimble.Assert(hostdata.Size() == devdata.Size())
+	core.Assert(hostdata.Size() == devdata.Size())
 	blocklen := nimble.Prod(nimble.BlockSize(hostdata.Size()))
 	return &Uploader{hostdata, devdata, blocklen, 0}
 }
 
 func (u *Uploader) Run() {
-	nimble.Debug("run gpu.uploader with block size", u.bsize)
+	core.Debug("run gpu.uploader with block size", u.bsize)
 	LockCudaThread()
 	defer UnlockCudaThread()
 	u.stream = cu.StreamCreate()

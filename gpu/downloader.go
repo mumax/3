@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -14,13 +15,13 @@ type Downloader struct {
 }
 
 func NewDownloader(devdata nimble.RChan1, hostdata nimble.Chan1) *Downloader {
-	nimble.Assert(hostdata.Size() == devdata.Size())
+	core.Assert(hostdata.Size() == devdata.Size())
 	blocklen := nimble.Prod(nimble.BlockSize(hostdata.Size()))
 	return &Downloader{devdata, hostdata, blocklen, 0} // TODO: block size
 }
 
 func (u *Downloader) Run() {
-	nimble.Debug("run gpu.downloader with block size", u.bsize)
+	core.Debug("run gpu.downloader with block size", u.bsize)
 	LockCudaThread()
 	u.stream = cu.StreamCreate()
 	//MemHostRegister(u.host.UnsafeData()) // TODO

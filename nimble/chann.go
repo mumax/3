@@ -1,5 +1,8 @@
 package nimble
 
+import(
+	"code.google.com/p/nimble-cube/core")
+
 type ChanN struct {
 	comp []Chan1
 }
@@ -21,12 +24,12 @@ func (c ChanN) NComp() int       { return len(c.comp) }
 func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
 
 func (c ChanN) Chan3() Chan3 {
-	Assert(c.NComp() == 3)
+	core.Assert(c.NComp() == 3)
 	return Chan3{c.comp}
 }
 
 func (c ChanN) Chan1() Chan1 {
-	Assert(c.NComp() == 1)
+	core.Assert(c.NComp() == 1)
 	return c.comp[0]
 }
 

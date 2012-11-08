@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"flag"
 	"github.com/barnex/cuda5/cu"
 	"runtime"
@@ -27,11 +28,11 @@ func init() {
 		flag = cu.CTX_BLOCKING_SYNC
 	}
 	cu.Init(0)
-	nimble.Log("CUDA version:", cu.Version())
+	core.Log("CUDA version:", cu.Version())
 	dev := cu.Device(*nimble.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
-	nimble.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
 
 }
 
@@ -45,7 +46,7 @@ func LockCudaThread() {
 	runtime.LockOSThread()
 	cudaCtx.SetCurrent() // super cheap.
 	c := atomic.AddInt32(&lockCount, 1)
-	nimble.Debug("Locked thread", c, "to CUDA context")
+	core.Debug("Locked thread", c, "to CUDA context")
 }
 
 // Undo LockCudaThread()
@@ -55,7 +56,7 @@ func UnlockCudaThread() {
 	}
 	runtime.UnlockOSThread()
 	c := atomic.AddInt32(&lockCount, -1)
-	nimble.Debug("Unlocked OS thread,", c, "remain locked")
+	core.Debug("Unlocked OS thread,", c, "remain locked")
 }
 
 // Register host memory for fast transfers,

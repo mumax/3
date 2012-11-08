@@ -13,16 +13,16 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
-	nimble.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
+	core.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
 
-	nimble.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
-	nimble.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-	nimble.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
-	nimble.Assert(accuracy > 0)
+	core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
+	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
+	core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
+	core.Assert(accuracy > 0)
 	// TODO: handle those correctly:
-	nimble.Assert(size[1]%2 == 0 && size[2]%2 == 0)
+	core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
 	if size[0] > 1 {
-		nimble.Assert(size[0]%2 == 0)
+		core.Assert(size[0]%2 == 0)
 	}
 
 	var array [3][3][][][]float32
@@ -60,7 +60,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 
 	for s := 0; s < 3; s++ { // source index Ksdxyz
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped. 
-			xw := nimble.Wrap(x, size[X])
+			xw := Wrap(x, size[X])
 			for y := y1; y <= y2; y++ {
 				yw := nimble.Wrap(y, size[Y])
 				for z := z1; z <= z2; z++ {
@@ -140,3 +140,15 @@ const (
 	Y = 1
 	Z = 2
 )
+
+
+// Wraps an index to [0, max] by adding/subtracting a multiple of max.
+func Wrap(number, max int) int {
+	for number < 0 {
+		number += max
+	}
+	for number >= max {
+		number -= max
+	}
+	return number
+}

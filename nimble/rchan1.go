@@ -2,12 +2,13 @@ package nimble
 
 // Read-only Chan.
 type RChan1 struct {
-	chandata
+	*Info
+	slice Slice // TODO: rename buffer
 	mutex *rMutex
 }
 
 func (c Chan1) NewReader() RChan1 {
-	return RChan1{c.chandata, c.mutex.MakeRMutex()}
+	return RChan1{c.Info, c.slice, c.mutex.MakeRMutex()}
 }
 
 // ReadNext locks and returns a slice of length n for 

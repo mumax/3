@@ -2,8 +2,6 @@ package nimble
 
 import (
 	"fmt"
-	"github.com/barnex/cuda5/cu"
-	"unsafe"
 )
 
 type chandata struct {
@@ -29,17 +27,6 @@ func makedata(tag, unit string, m *Mesh, memtype MemType, blocks ...int) chandat
 	return c
 }
 
-func gpuSlice(N int) Slice {
-	bytes := int64(N) * SizeofFloat32
-	ptr := unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
-	return Slice{ptr, N, GPUMemory}
-}
-
-func unifiedSlice(N int) Slice {
-	bytes := int64(N) * SizeofFloat32
-	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
-	return Slice{ptr, N, UnifiedMemory}
-}
 
 // UnsafeData returns the underlying storage without locking.
 // Intended only for page-locking, not for reading or writing.

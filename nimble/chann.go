@@ -7,7 +7,7 @@ type ChanN struct {
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...int) ChanN {
 	c := make([]Chan1, nComp)
 	for i := range c {
-		c[i] = MakeChan(tag, unit, m, memType, blocks...)
+		c[i] = makeChan1(tag, unit, m, memType, blocks...)
 	}
 	AddQuant(tag)
 	return ChanN{c}

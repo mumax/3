@@ -2,14 +2,48 @@ package nimble
 
 import (
 	"github.com/barnex/cuda5/safe"
+	"github.com/barnex/cuda5/cu"
 	"reflect"
 	"unsafe"
 )
 
+// Slice of float32, accessible by CPU, GPU or both.
 type Slice struct {
 	ptr  unsafe.Pointer
 	len_ int
 	flag MemType
+}
+
+func MakeSlice(length int, memtype MemType)Slice{
+	switch memtype {
+	default:
+		Panic("makeslice: illegal memtype:", memtype)
+	case CPUMemory:
+		return cpuSlice(length)
+	case GPUMemory:
+		return gpuSlice(length)
+	case UnifiedMemory:
+		return unifiedSlice(length)
+	}
+	panic("bug")
+	var s Slice
+	return s
+}
+
+func cpuSlice(N int)Slice{
+	return Float32ToSlice(make([]float32, N))
+}
+
+func gpuSlice(N int) Slice {
+	bytes := int64(N) * SizeofFloat32
+	ptr := unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
+	return Slice{ptr, N, GPUMemory}
+}
+
+func unifiedSlice(N int) Slice {
+	bytes := int64(N) * SizeofFloat32
+	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
+	return Slice{ptr, N, UnifiedMemory}
 }
 
 const (

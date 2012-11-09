@@ -17,12 +17,22 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...
 	return ChanN{c}
 }
 
+func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
+	c := make([]Chan1, nComp)
+	for i := range c {
+		c[i] = makeChan1(tag, unit, m, memType, blocks...)
+	}
+	AddQuant(tag)
+	return ChanN{c}
+}
+
 func (c ChanN) Mesh() *Mesh      { return c.comp[0].Mesh }
 func (c ChanN) Size() [3]int     { return c.comp[0].Size() }
 func (c ChanN) Unit() string     { return c.comp[0].Unit() }
 func (c ChanN) Tag() string      { return c.comp[0].Tag() }
 func (c ChanN) NComp() int       { return len(c.comp) }
 func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
+func (c ChanN) BufLen() int      { return c.comp[0].BufLen() }
 
 func (c ChanN) Chan3() Chan3 {
 	core.Assert(c.NComp() == 3)

@@ -7,9 +7,10 @@ import (
 
 // Mesh stores info of a finite-difference mesh.
 type Mesh struct {
-	gridSize [3]int
-	cellSize [3]float64
-	pbc      [3]int
+	gridSize  [3]int
+	cellSize  [3]float64
+	pbc       [3]int
+	blockSize [3]int
 }
 
 // Retruns a new mesh with N0 x N1 x N2 cells of size cellx x celly x cellz.
@@ -24,7 +25,8 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 			core.Panic("mesh: need 0 or 3 PBC arguments, got:", pbc)
 		}
 	}
-	return &Mesh{[3]int{N0, N1, N2}, [3]float64{cellx, celly, cellz}, pbc3}
+	size := [3]int{N0, N1, N2}
+	return &Mesh{size, [3]float64{cellx, celly, cellz}, pbc3, BlockSize(size)}
 }
 
 // Returns N0, N1, N2, as passed to constructor.
@@ -46,6 +48,12 @@ func (m *Mesh) PBC() [3]int {
 // 	N0 * N1 * N2
 func (m *Mesh) NCell() int {
 	return m.gridSize[0] * m.gridSize[1] * m.gridSize[2]
+}
+
+// Size of blocks in which the data on this mesh is divided.
+// The data will have to buffer at least one block.
+func (m *Mesh) BlockSize() [3]int {
+	return m.blockSize
 }
 
 // Returns the mesh size after zero-padding.
@@ -72,6 +80,9 @@ func (m *Mesh) String() string {
 	s := m.gridSize
 	N := Prod(s)
 	c := m.cellSize
-	pbc := m.pbc
-	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm], PBC: [%v x %v x %v]", N, s[0], s[1], s[2], c[0], c[1], c[2], pbc[0], pbc[1], pbc[2])
+	pbc := ""
+	if m.pbc != [3]int{0, 0, 0} {
+		pbc = fmt.Sprintf("PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
+	}
+	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm], %v blocksize: [%v x %v x %v]", N, s[0], s[1], s[2], c[0], c[1], c[2], pbc, m.blockSize[0], m.blockSize[1], m.blockSize[2])
 }

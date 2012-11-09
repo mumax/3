@@ -6,11 +6,15 @@ type Chan1 struct {
 	mutex *rwMutex
 }
 
-func makeChan1(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 {
+func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
+	N := 
+	return asChan1(MakeSlice(N, memType)
+}
+
+func asChan1(buffer Slice, tag, unit string, m*Mesh, blocks...int)Chan1{
 	AddQuant(tag)
 	info := NewInfo(tag, unit, m, blocks...)
-	N := info.BlockLen()
-	return Chan1{info, MakeSlice(N, memType), newRWMutex(N, tag)}
+	return Chan1{info, buffer, newRWMutex(N, tag)}
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
@@ -26,6 +30,8 @@ func (c Chan1) WriteNext(n int) Slice {
 }
 
 func (c Chan1) NComp() int { return 1 }
+func(c Chan1)BufLen()int{return c.slice.Len()}
+func(c Chan1)NBufferedBlocks()int{ }
 
 //func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 //	c.mutex.WriteDelta(Δstart, Δstop)

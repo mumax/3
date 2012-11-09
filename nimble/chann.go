@@ -8,19 +8,20 @@ type ChanN struct {
 	comp []Chan1
 }
 
-func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, blocks ...int) ChanN {
+func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
 	c := make([]Chan1, nComp)
 	for i := range c {
-		c[i] = makeChan1(tag, unit, m, memType, blocks...)
+		c[i] = makeChan1(tag, unit, m, memType, bufBlocks)
 	}
 	AddQuant(tag)
 	return ChanN{c}
 }
 
 func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
+	nComp := len(buffer)
 	c := make([]Chan1, nComp)
 	for i := range c {
-		c[i] = makeChan1(tag, unit, m, memType, blocks...)
+		c[i] = asChan1(buffer[i], tag, unit, m)
 	}
 	AddQuant(tag)
 	return ChanN{c}

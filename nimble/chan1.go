@@ -1,5 +1,9 @@
 package nimble
 
+import(
+"code.google.com/p/nimble-cube/core"
+)
+
 type Chan1 struct {
 	*Info
 	slice Slice // TODO: rename buffer
@@ -10,7 +14,7 @@ func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 
 	N := -666
 	if bufBlocks < 1 { // means auto
-		N = Div(m.NCell(), m.BlockLen())
+		N = idiv(m.NCell(), m.BlockLen())
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
@@ -39,10 +43,15 @@ func (c Chan1) WriteNext(n int) Slice {
 
 func (c Chan1) NComp() int           { return 1 }
 func (c Chan1) BufLen() int          { return c.slice.Len() }
-func (c Chan1) NBufferedBlocks() int {}
+func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.slice.Len()) }
 
 //func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 //	c.mutex.WriteDelta(Δstart, Δstop)
 //	a, b := c.mutex.WRange()
 //	return c.slice.list[a:b]
 //}
+
+func idiv(a, b int)int{
+	core.Assert(a%b==0)
+	return a/b
+}

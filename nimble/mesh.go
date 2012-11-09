@@ -68,7 +68,7 @@ func (m *Mesh) BlockLen() int {
 // 1 or unless there are PBCs in that direction.
 func ZeroPad(m *Mesh) *Mesh {
 	padded := padSize(m.gridSize, m.pbc)
-	return &Mesh{padded, m.cellSize, m.pbc}
+	return &Mesh{padded, m.cellSize, m.pbc, BlockSize(padded)}
 }
 
 // Returns the size after zero-padding,

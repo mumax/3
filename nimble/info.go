@@ -1,7 +1,6 @@
 package nimble
 
 import (
-	"code.google.com/p/nimble-cube/core"
 )
 
 type Info struct {
@@ -9,16 +8,12 @@ type Info struct {
 	*Mesh
 }
 
-func NewInfo(tag, unit string, m *Mesh, nBlocks ...int) *Info {
-	blocks, blen := parseNBlocks(m.Size(), nBlocks...)
-	bs := BlockSize(m.Size())
-	return &Info{tag, unit, m, blocks, blen, bs}
+func NewInfo(tag, unit string, m *Mesh) *Info {
+	return &Info{tag, unit, m}
 }
 
 func (i *Info) Tag() string   { return i.tag }
 func (i *Info) Unit() string  { return i.unit }
-func (i *Info) NBlocks() int  { return i.nBlocks }
-func (i *Info) BlockLen() int { return i.blockLen }
 
 //func parseNBlocks(size [3]int, nBlocks ...int) (blocks, blocklen int) {
 //	blocklen = BlockLen(size)

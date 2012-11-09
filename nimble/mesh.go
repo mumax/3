@@ -59,7 +59,7 @@ func (m *Mesh) BlockSize() [3]int {
 // Length of blocks in which the data on this mesh is divided.
 // Product of the 3 dimensions returned by BlockSize.
 func (m *Mesh) BlockLen() int {
-	return Prod(m.BlockSize())
+	return prod(m.BlockSize())
 }
 
 // Returns the mesh size after zero-padding.
@@ -84,7 +84,7 @@ func padSize(size, periodic [3]int) [3]int {
 
 func (m *Mesh) String() string {
 	s := m.gridSize
-	N := Prod(s)
+	N := prod(s)
 	c := m.cellSize
 	pbc := ""
 	if m.pbc != [3]int{0, 0, 0} {

@@ -3,10 +3,9 @@ package nimble
 // BlockSize finds a suitable way to split an array
 // of given size into equal blocks.
 // It limits block sizes to Flag_maxblocklen.
-// TODO: should actually have more than 1 block!!
 func BlockSize(size [3]int) [3]int {
 	N0, N1, N2 := size[0], size[1], size[2]
-	n := Prod(size)
+	n := prod(size)
 
 	minNw := *Flag_minblocks // minimum number of blocks
 	maxNw := N0 * N1         // max. Nwarp: do not slice up along K, keep full rows.
@@ -28,10 +27,6 @@ func BlockSize(size [3]int) [3]int {
 	return [3]int{1, (N0 * N1) / nWarp, N2}
 }
 
-func BlockLen(size [3]int) int {
-	return Prod(BlockSize(size))
-}
-
-func Prod(size [3]int) int {
+func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }

@@ -12,6 +12,7 @@ import (
 	"runtime/pprof"
 )
 
+// TODO: pull inside Init?
 var (
 	Flag_od          = flag.String("o", "", "set output directory")
 	Flag_version     = flag.Bool("v", false, "print version")

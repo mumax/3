@@ -62,7 +62,6 @@ func (m *Mesh) BlockLen() int {
 	return prod(m.BlockSize())
 }
 
-
 func (m *Mesh) String() string {
 	s := m.gridSize
 	N := prod(s)

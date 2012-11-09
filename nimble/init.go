@@ -57,7 +57,7 @@ func SetOD(dir string) {
 	core.SetOD(dir)
 }
 
-func Cleanup(){
+func Cleanup() {
 	core.Cleanup()
 }
 

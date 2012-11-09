@@ -168,5 +168,3 @@ func padSize(size, periodic [3]int) [3]int {
 	}
 	return size
 }
-
-

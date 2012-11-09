@@ -5,8 +5,8 @@ import (
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
-	"os"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := NewConstant(testM, "m", "", mesh, 0)
+	m := NewConstant("m", "", mesh, testM)
 
 	acc := 8
 	kernel := mag.BruteKernel(ZeroPad(mesh), acc)

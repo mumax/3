@@ -56,6 +56,12 @@ func (m *Mesh) BlockSize() [3]int {
 	return m.blockSize
 }
 
+// Length of blocks in which the data on this mesh is divided.
+// Product of the 3 dimensions returned by BlockSize.
+func (m *Mesh) BlockLen() int {
+	return Prod(m.BlockSize())
+}
+
 // Returns the mesh size after zero-padding.
 // The zero padded size in any direction is twice
 // the original size unless the original size was

@@ -45,11 +45,11 @@ func (c Chan1) WriteNext(n int) Slice {
 }
 
 // NComp returns the number of components (1: scalar, 3: vector, ...)
-func (c Chan1) NComp() int           { return 1 }
+func (c Chan1) NComp() int { return 1 }
 
 // BufLen returns the largest buffer size n that can be obained
 // with ReadNext/WriteNext.
-func (c Chan1) BufLen() int          { return c.slice.Len() }
+func (c Chan1) BufLen() int { return c.slice.Len() }
 
 func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.slice.Len()) }
 

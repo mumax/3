@@ -62,25 +62,6 @@ func (m *Mesh) BlockLen() int {
 	return prod(m.BlockSize())
 }
 
-// Returns the mesh size after zero-padding.
-// The zero padded size in any direction is twice
-// the original size unless the original size was
-// 1 or unless there are PBCs in that direction.
-func ZeroPad(m *Mesh) *Mesh {
-	padded := padSize(m.gridSize, m.pbc)
-	return &Mesh{padded, m.cellSize, m.pbc, blockSize(padded)}
-}
-
-// Returns the size after zero-padding,
-// taking into account periodic boundary conditions.
-func padSize(size, periodic [3]int) [3]int {
-	for i := range size {
-		if periodic[i] == 0 && size[i] > 1 {
-			size[i] *= 2
-		}
-	}
-	return size
-}
 
 func (m *Mesh) String() string {
 	s := m.gridSize

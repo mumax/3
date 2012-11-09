@@ -57,6 +57,10 @@ func SetOD(dir string) {
 	core.SetOD(dir)
 }
 
+func Cleanup(){
+	core.Cleanup()
+}
+
 func initLog() {
 	core.LOG = !*Flag_silent
 	core.DEBUG = *Flag_debug

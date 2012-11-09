@@ -9,7 +9,13 @@ import (
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces. Fields are evaluated at the
 // cell center (not averaged).
+// Mesh should NOT yet be zero-padded.
 func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
+	pbc := mesh.PBC()
+	sz := padSize(mesh.Size(), pbc)
+	cs := mesh.CellSize()
+	mesh = nimble.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
+
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
@@ -151,3 +157,16 @@ func Wrap(number, max int) int {
 	}
 	return number
 }
+
+// Returns the size after zero-padding,
+// taking into account periodic boundary conditions.
+func padSize(size, periodic [3]int) [3]int {
+	for i := range size {
+		if periodic[i] == 0 && size[i] > 1 {
+			size[i] *= 2
+		}
+	}
+	return size
+}
+
+

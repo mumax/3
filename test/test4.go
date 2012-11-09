@@ -6,11 +6,11 @@ import (
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
-	"os"
 )
 
 func main() {
 	nimble.Init()
+	defer nimble.Cleanup()
 	nimble.SetOD("test4.out")
 
 	N0, N1, N2 := 1, 32, 128
@@ -22,7 +22,7 @@ func main() {
 	m := nimble.NewConstant("m", "", mesh, testM).Output()
 
 	acc := 8
-	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
+	kernel := mag.BruteKernel(mesh, acc)
 	demag := conv.NewSymm2D(mesh, kernel, m)
 	hd := demag.Output()
 
@@ -58,6 +58,4 @@ func main() {
 	//	}
 	//solver.Steps(10000)
 
-	ProfDump(os.Stdout)
-	Cleanup()
 }

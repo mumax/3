@@ -21,7 +21,7 @@ func TestSymm2(N0, N1, N2 int) {
 	//N := mesh.NCell()
 
 	acc := 1
-	kern := mag.BruteKernel(nimble.ZeroPad(mesh), acc)
+	kern := mag.BruteKernel(mesh, acc)
 	chIn := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory, 0)
 	chOut := nimble.MakeChan3("B", "", mesh, nimble.UnifiedMemory, 0)
 

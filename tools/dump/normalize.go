@@ -1,8 +1,8 @@
 package main
 
 import (
-	"math"
 	"code.google.com/p/nimble-cube/dump"
+	"math"
 )
 
 // normalize vector data to unit length

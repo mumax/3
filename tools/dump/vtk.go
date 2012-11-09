@@ -5,10 +5,10 @@ package main
 // Modified by Arne Vansteenkiste, aug. 2012.
 
 import (
-	"fmt"
-	"io"
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
+	"fmt"
+	"io"
 	"os"
 	"unsafe"
 )

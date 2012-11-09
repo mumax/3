@@ -3,11 +3,11 @@ package main
 // Author: Arne Vansteenkiste, Mykola Dvornik
 
 import (
+	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/dump"
 	"flag"
 	"fmt"
 	"io"
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/dump"
 	"os"
 	"path"
 )
@@ -120,7 +120,6 @@ func preprocess(f *dump.Frame) {
 	}
 }
 
-
 // Transforms the index between user and program space, unless it is a scalar:
 //	X  <-> Z
 //	Y  <-> Y
@@ -146,7 +145,6 @@ func SwapIndex(index, dim int) int {
 	}
 	return -1 // silence 6g
 }
-
 
 // Linear indices for matrix components.
 // E.g.: matrix[Y][Z] is stored as list[YZ]

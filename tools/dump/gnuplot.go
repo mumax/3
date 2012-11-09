@@ -5,9 +5,9 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
+	"fmt"
 	"os"
 )
 

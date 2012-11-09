@@ -4,12 +4,12 @@ package main
 // Author: Arne Vansteenkiste
 
 import (
+	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/dump"
 	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/dump"
 	"os"
 	"path"
 	"strconv"

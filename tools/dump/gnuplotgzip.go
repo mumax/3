@@ -5,10 +5,10 @@ package main
 
 import (
 	"bufio"
-	"compress/gzip"
-	"fmt"
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
+	"compress/gzip"
+	"fmt"
 	"os"
 )
 

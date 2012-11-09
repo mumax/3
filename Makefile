@@ -1,4 +1,4 @@
-all: githook 6g 
+all: githook 6g tools
 
 PREFIX=code.google.com/p/nimble-cube
 
@@ -12,6 +12,9 @@ PKGS=\
 6g: ptx
 	go install -v $(PKGS)
 	go install -v 
+
+tools:
+	make -C tools 
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 

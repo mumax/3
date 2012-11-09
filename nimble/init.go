@@ -32,7 +32,7 @@ var (
 //	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 )
 
-func init() {
+func Init() {
 	flag.Parse()
 
 	initOD()

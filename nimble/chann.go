@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/nimble-cube/core"
 )
 
+// ChanN is a Chan that passes N-component data.
 type ChanN struct {
 	comp []Chan1
 }
@@ -13,7 +14,6 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 	for i := range c {
 		c[i] = makeChan1(tag, unit, m, memType, bufBlocks)
 	}
-	AddQuant(tag)
 	return ChanN{c}
 }
 
@@ -23,7 +23,6 @@ func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
 	for i := range c {
 		c[i] = asChan1(buffer[i], tag, unit, m)
 	}
-	AddQuant(tag)
 	return ChanN{c}
 }
 

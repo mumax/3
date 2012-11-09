@@ -1,5 +1,6 @@
 package nimble
 
+// Constant continuously pipes a constant array into a channel.
 type Constant struct {
 	output ChanN
 }

@@ -1,7 +1,7 @@
 package nimble
 
-import(
-"code.google.com/p/nimble-cube/core"
+import (
+	"code.google.com/p/nimble-cube/core"
 )
 
 type Chan1 struct {
@@ -14,7 +14,7 @@ func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 
 	N := -666
 	if bufBlocks < 1 { // means auto
-		N = idiv(m.NCell(), m.BlockLen())
+		N = idiv(m.NCell(), m.BlockLen()) // buffer all, just to be sure
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
@@ -51,7 +51,7 @@ func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.slice.Len()) }
 //	return c.slice.list[a:b]
 //}
 
-func idiv(a, b int)int{
-	core.Assert(a%b==0)
-	return a/b
+func idiv(a, b int) int {
+	core.Assert(a%b == 0)
+	return a / b
 }

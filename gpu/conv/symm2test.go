@@ -22,8 +22,8 @@ func TestSymm2(N0, N1, N2 int) {
 
 	acc := 1
 	kern := mag.BruteKernel(nimble.ZeroPad(mesh), acc)
-	chIn := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory)
-	chOut := nimble.MakeChan3("B", "", mesh, nimble.UnifiedMemory)
+	chIn := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory, 0)
+	chOut := nimble.MakeChan3("B", "", mesh, nimble.UnifiedMemory, 0)
 
 	nimble.Stack(NewSymm2D(mesh, kern, chIn, chOut))
 

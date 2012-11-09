@@ -34,6 +34,7 @@ func (c ChanN) Tag() string      { return c.comp[0].Tag() }
 func (c ChanN) NComp() int       { return len(c.comp) }
 func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
 func (c ChanN) BufLen() int      { return c.comp[0].BufLen() }
+func (c ChanN) NBufferedBlocks() int      { return c.comp[0].NBufferedBlocks()}
 
 func (c ChanN) Chan3() Chan3 {
 	core.Assert(c.NComp() == 3)

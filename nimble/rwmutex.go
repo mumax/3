@@ -43,7 +43,7 @@ type rwMutex struct {
 }
 
 // RWMutex to protect an array of length N.
-func NewRWMutex(N int, tag string) *rwMutex {
+func newRWMutex(N int, tag string) *rwMutex {
 	profRegister(tag)
 	m := new(rwMutex)
 	m.n = N

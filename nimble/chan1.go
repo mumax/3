@@ -10,7 +10,7 @@ func makeChan1(tag, unit string, m *Mesh, memType MemType, blocks ...int) Chan1 
 	AddQuant(tag)
 	info := NewInfo(tag, unit, m, blocks...)
 	N := info.BlockLen()
-	return Chan1{info, MakeSlice(N, memType), NewRWMutex(N, tag)}
+	return Chan1{info, MakeSlice(N, memType), newRWMutex(N, tag)}
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully

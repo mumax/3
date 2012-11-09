@@ -4,26 +4,26 @@ import (
 	//"code.google.com/p/nimble-cube/dump"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
-	. "code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/nimble"
 	"os"
+	"fmt"
 )
 
 func main() {
-	SetOD("test4.out")
+	nimble.Init()
+	nimble.SetOD("test4.out")
 
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
-	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
-	Log("mesh:", mesh)
+	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
+	fmt.Println("mesh:", mesh)
 
-	m := MakeChan3("m", "", mesh, UnifiedMemory)
-	// TODO: write m here
-
-	hd := MakeChan3("Hd", "", mesh, UnifiedMemory)
+	m := NewConstant(testM, "m", "", mesh, 0)
 
 	acc := 8
 	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
-	Stack(conv.NewSymm2D(mesh, kernel, m, hd))
+	demag := conv.NewSymm2D(mesh, kernel, m)
+	hd := demag.Output()
 
 	//	Msat := 1.0053
 	//	aex := mag.Mu0 * 13e-12 / Msat

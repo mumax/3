@@ -53,7 +53,7 @@ func initOD() {
 }
 
 // SetOD sets the default output directory.
-func SetOD(dir string){
+func SetOD(dir string) {
 	core.SetOD(dir)
 }
 

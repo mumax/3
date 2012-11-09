@@ -18,7 +18,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	testM := [3][][][]
+	testM := 
 	m := nimble.NewConstant("m", "", mesh, testM).Output()
 
 	acc := 8

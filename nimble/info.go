@@ -13,4 +13,3 @@ func NewInfo(tag, unit string, m *Mesh) *Info {
 
 func (i *Info) Tag() string  { return i.tag }
 func (i *Info) Unit() string { return i.unit }
-

@@ -27,14 +27,14 @@ func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
 	return ChanN{c}
 }
 
-func (c ChanN) Mesh() *Mesh      { return c.comp[0].Mesh }
-func (c ChanN) Size() [3]int     { return c.comp[0].Size() }
-func (c ChanN) Unit() string     { return c.comp[0].Unit() }
-func (c ChanN) Tag() string      { return c.comp[0].Tag() }
-func (c ChanN) NComp() int       { return len(c.comp) }
-func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
-func (c ChanN) BufLen() int      { return c.comp[0].BufLen() }
-func (c ChanN) NBufferedBlocks() int      { return c.comp[0].NBufferedBlocks()}
+func (c ChanN) Mesh() *Mesh          { return c.comp[0].Mesh }
+func (c ChanN) Size() [3]int         { return c.comp[0].Size() }
+func (c ChanN) Unit() string         { return c.comp[0].Unit() }
+func (c ChanN) Tag() string          { return c.comp[0].Tag() }
+func (c ChanN) NComp() int           { return len(c.comp) }
+func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
+func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
+func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 
 func (c ChanN) Chan3() Chan3 {
 	core.Assert(c.NComp() == 3)

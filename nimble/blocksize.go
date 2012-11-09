@@ -3,7 +3,7 @@ package nimble
 // BlockSize finds a suitable way to split an array
 // of given size into equal blocks.
 // It limits block sizes to Flag_maxblocklen.
-func BlockSize(size [3]int) [3]int {
+func blockSize(size [3]int) [3]int {
 	N0, N1, N2 := size[0], size[1], size[2]
 	n := prod(size)
 

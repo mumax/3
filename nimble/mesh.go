@@ -26,7 +26,7 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 		}
 	}
 	size := [3]int{N0, N1, N2}
-	return &Mesh{size, [3]float64{cellx, celly, cellz}, pbc3, BlockSize(size)}
+	return &Mesh{size, [3]float64{cellx, celly, cellz}, pbc3, blockSize(size)}
 }
 
 // Returns N0, N1, N2, as passed to constructor.
@@ -68,7 +68,7 @@ func (m *Mesh) BlockLen() int {
 // 1 or unless there are PBCs in that direction.
 func ZeroPad(m *Mesh) *Mesh {
 	padded := padSize(m.gridSize, m.pbc)
-	return &Mesh{padded, m.cellSize, m.pbc, BlockSize(padded)}
+	return &Mesh{padded, m.cellSize, m.pbc, blockSize(padded)}
 }
 
 // Returns the size after zero-padding,

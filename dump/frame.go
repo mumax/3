@@ -2,7 +2,6 @@ package dump
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 	"io"
 	"os"
@@ -65,7 +64,7 @@ func (f *Frame) Fprintf(out io.Writer, format string) {
 		return
 	}
 	fmt.Fprintln(out, f.Header.String())
-	nimble.Fprintf(out, format, f.Tensors())
+	core.Fprintf(out, format, f.Tensors())
 	fmt.Fprintf(out, "ISO CRC64:%x\n", f.CRC)
 }
 

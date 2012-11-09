@@ -7,7 +7,9 @@ type Chan1 struct {
 }
 
 func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
-	N := 
+
+	N := m.BlockLen() * bufBlocks
+
 	return asChan1(MakeSlice(N, memType)
 }
 

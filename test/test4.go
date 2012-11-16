@@ -1,10 +1,10 @@
 package main
 
 import (
-	//"code.google.com/p/nimble-cube/dump"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/core"
 	"fmt"
 )
 
@@ -18,13 +18,13 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	//testM := [3][][][]
-	m := nimble.NewConstant("m", "", mesh, testM).Output()
+	m := nimble.NewConstArray(3, "m", "", mesh)
+		
 
-	acc := 8
-	kernel := mag.BruteKernel(mesh, acc)
-	demag := conv.NewSymm2D(mesh, kernel, m)
-	hd := demag.Output()
+//	acc := 8
+//	kernel := mag.BruteKernel(mesh, acc)
+//	demag := conv.NewSymm2D(mesh, kernel, m)
+//	hd := demag.Output()
 
 	//	Msat := 1.0053
 	//	aex := mag.Mu0 * 13e-12 / Msat

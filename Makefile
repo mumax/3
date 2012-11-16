@@ -8,6 +8,7 @@ PKGS=\
 	$(PREFIX)/mag\
 	$(PREFIX)/dump\
 	$(PREFIX)/nimble\
+	$(PREFIX)/core\
 
 6g: ptx
 	go install -v $(PKGS)

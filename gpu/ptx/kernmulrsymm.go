@@ -11,7 +11,7 @@ const KERNMULRSYMM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00003034_00000000-9_kernmulrsymm.cpp3.i"
+	.file	1 "/tmp/tmpxft_0000173c_00000000-9_kernmulrsymm.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm.cu"
 
 .visible .entry kernmulRSymm(

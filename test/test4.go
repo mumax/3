@@ -8,6 +8,14 @@ import (
 	"fmt"
 )
 
+func host(s []nimble.Slice) [][]float32 {
+	h := make([][]float32, len(s))
+	for i := range h {
+		h[i] = s[i].Host()
+	}
+	return h
+}
+
 func main() {
 	nimble.Init()
 	defer nimble.Cleanup()
@@ -23,9 +31,13 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
-	B := nimble.MakeChan3("B", "T", mesh, nimble.GPUMemory, -1)
+	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 1) // -1 does not work?
 	demag := conv.NewSymm2D(mesh, kernel, m, B)
 	nimble.Stack(demag)
+	nimble.RunStack()
+
+	output := host(B.ChanN().NewReader().ReadNext(mesh.NCell()))
+	fmt.Println(output)
 
 	//	Msat := 1.0053
 	//	aex := mag.Mu0 * 13e-12 / Msat

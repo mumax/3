@@ -12,16 +12,13 @@ type Chan1 struct {
 }
 
 func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
-
 	N := -666
 	if bufBlocks < 1 { // means auto
-		N = idiv(m.NCell(), m.BlockLen()) // buffer all, just to be sure
+		N = m.NCell() // buffer all
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
-
 	return asChan1(MakeSlice(N, memType), tag, unit, m)
-
 }
 
 func asChan1(buffer Slice, tag, unit string, m *Mesh) Chan1 {

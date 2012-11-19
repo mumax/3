@@ -32,7 +32,7 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
-	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 1) // -1 does not work?
+	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0) 
 	demag := conv.NewSymm2D(mesh, kernel, m, B)
 	nimble.Stack(demag)
 	nimble.RunStack()
@@ -41,6 +41,8 @@ func main() {
 	if output[0][24*121] != -0.97624576 || output[1][24*121] != 0 || output[2][24*121] != 0 {
 		fmt.Println("failed")
 		os.Exit(-1)
+	}else{
+		fmt.Println("OK")
 	}
 
 	//	Msat := 1.0053

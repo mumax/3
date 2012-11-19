@@ -1,8 +1,8 @@
 package cpu
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
 	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 // LLG Torque / gamma
@@ -58,6 +58,6 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 	}
 }
 
-func Host3(s [3]nimble.Slice)[3][]float32{
-	return [3][]float32{s[0].Host(), s[1].Host(), s[2].Host() }
+func Host3(s [3]nimble.Slice) [3][]float32 {
+	return [3][]float32{s[0].Host(), s[1].Host(), s[2].Host()}
 }

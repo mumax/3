@@ -25,10 +25,16 @@ type Symm2D struct {
 	kern        [3][3][]float32     // Real-space kernel
 	kernArr     [3][3][][][]float32 // Real-space kernel
 	//fftKern     [3][3][]float32     // FFT kernel on host
+	inited bool
 }
 
 func (c *Symm2D) init() {
 	core.Log("initializing 2D symmetric convolution")
+	if c.inited {
+		core.Panic("conv: already initialized")
+	}
+	c.inited = true
+	// TODO: may unlock main thread...
 	gpu.LockCudaThread()
 	defer gpu.UnlockCudaThread()
 

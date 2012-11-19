@@ -1,4 +1,4 @@
-package mag
+package cpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
@@ -6,7 +6,7 @@ import (
 )
 
 type Exchange6 struct {
-	in           nimble.RChan3
+	in          nimble.RChan3
 	out         nimble.Chan3
 	aex_reduced float64
 }

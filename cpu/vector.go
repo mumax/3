@@ -1,4 +1,4 @@
-package mag
+package cpu
 
 import (
 	"math"
@@ -50,3 +50,9 @@ func (a Vector) Normalized() Vector {
 func (a Vector) Scaled(s float32) Vector {
 	return Vector{s * a[X], s * a[Y], s * a[Z]}
 }
+
+const(
+	X=0
+	Y=1
+	Z=2
+)

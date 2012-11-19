@@ -1,4 +1,4 @@
-package mag
+package cpu
 
 import (
 	"fmt"

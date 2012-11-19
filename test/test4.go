@@ -1,10 +1,10 @@
 package main
 
 import (
+	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
-	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 )

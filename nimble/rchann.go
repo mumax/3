@@ -7,11 +7,12 @@ func (c ChanN) NewReader() RChanN {
 	return RChanN{c.comp[0].NewReader(), c.comp[1].NewReader(), c.comp[2].NewReader()}
 }
 
-func (c RChanN) Mesh() *Mesh  { return c[0].Mesh }
-func (c RChanN) Size() [3]int { return c[0].Size() }
-func (c RChanN) Unit() string { return c[0].Unit() }
-func (c RChanN) Tag() string  { return c[0].Tag() }
-func (c RChanN) NComp() int   { return len(c) }
+func (c RChanN) Mesh() *Mesh       { return c[0].Mesh }
+func (c RChanN) Size() [3]int      { return c[0].Size() }
+func (c RChanN) Unit() string      { return c[0].Unit() }
+func (c RChanN) Tag() string       { return c[0].Tag() }
+func (c RChanN) NComp() int        { return len(c) }
+func (c RChanN) Comp(i int) RChan1 { return c[i] }
 
 // ReadNext locks and returns a slice of length n for 
 // reading the next n elements from the Chan.

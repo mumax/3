@@ -11,7 +11,7 @@ type Autosaver struct {
 	every int
 }
 
-func Autosave(data_ Chan, every int) *Autosaver {
+func Autosave(data_ Chan, every int) {
 	fname := data_.ChanN().Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
@@ -21,7 +21,6 @@ func Autosave(data_ Chan, every int) *Autosaver {
 	r.data = data
 	r.every = every
 	Stack(r)
-	return r
 }
 
 func (r *Autosaver) Run() {

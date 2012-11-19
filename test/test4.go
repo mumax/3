@@ -54,6 +54,7 @@ func main() {
 	nimble.Autosave(Bex, every)
 	nimble.Autosave(Beff, every)
 	nimble.Autosave(torque, every)
+	nimble.Autotable(m, every)
 
 	nimble.RunStack()
 
@@ -61,11 +62,11 @@ func main() {
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
 	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
+	solver.Steps(10000)
 	fmt.Println("result:", got)
 	if got != expect {
 		fmt.Println("expected:", expect)
 		os.Exit(2)
 	}
-	solver.Steps(10000)
 
 }

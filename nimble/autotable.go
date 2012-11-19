@@ -5,23 +5,29 @@ import (
 	"code.google.com/p/nimble-cube/dump"
 )
 
-type Autotable struct {
+type Autotabler struct {
 	out   dump.TableWriter
-	data  RChan3
+	data  RChanN
 	every int
 }
 
-func NewAutotable(fname string, data RChan3, every int) *Autotable {
-	r := new(Autotable)
-	tags := []string{data[0].Tag(), data[1].Tag(), data[2].Tag()}
-	units := []string{"?", "?", "?"} // TODO
+func Autotable(data_ Chan, every int) {
+	r := new(Autotabler)
+	data := data_.ChanN().NewReader()
+	tags := make([]string, data.NComp())
+	units := make([]string, data.NComp())
+	for i := range tags {
+		tags[i] = data.Comp(i).Tag()
+		units[i] = data.Comp(i).Unit()
+	}
+	fname := data.Tag() + ".table"
 	r.out = dump.NewTableWriter(core.OpenFile(core.OD+fname), tags, units)
 	r.data = data
 	r.every = every
-	return r
+	Stack(r)
 }
 
-func (r *Autotable) Run() {
+func (r *Autotabler) Run() {
 	core.Log("running auto table")
 	N := core.Prod(r.data.Mesh().Size())
 

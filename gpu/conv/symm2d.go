@@ -16,6 +16,7 @@ type Symm2D struct {
 	n           int                 // product of size
 	input       [3]nimble.RChan1    // TODO: fuse with input
 	output      [3]nimble.Chan1     // TODO: fuse with output
+	outChan     nimble.Chan3        // same as output
 	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf. 
 	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
@@ -241,12 +242,14 @@ func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 
-func NewSymm2D(mesh *nimble.Mesh, kernel [3][3][][][]float32, input_ nimble.Chan3, output__ nimble.Chan3) *Symm2D {
+func (c *Symm2D) Output() nimble.Chan3 {
+	return c.outChan
+}
+
+func NewSymm2D(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.Chan3) *Symm2D {
 	size := mesh.Size()
 	in_ := input_.NewReader()
 	input := [3]nimble.RChan1{in_[0], in_[1], in_[2]}
-	output_ := output__.ChanN()
-	output := [3]nimble.Chan1{output_.Comp(0), output_.Comp(1), output_.Comp(2)}
 	c := new(Symm2D)
 	c.size = size
 	c.kernArr = kernel
@@ -260,7 +263,8 @@ func NewSymm2D(mesh *nimble.Mesh, kernel [3][3][][][]float32, input_ nimble.Chan
 	c.n = prod(size)
 	c.kernSize = core.SizeOf(kernel[0][0])
 	c.input = input
-	c.output = output
+	c.outChan = nimble.MakeChan3(tag, unit, mesh, memType, 0)
+	c.output = [3]nimble.Chan1{c.outChan.Comp(0), c.outChan.Comp(1), c.outChan.Comp(2)}
 
 	c.init()
 	nimble.Stack(c)

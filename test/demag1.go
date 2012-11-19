@@ -32,8 +32,7 @@ func main() {
 
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)
-	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0)
-	conv.NewSymm2D(mesh, kernel, m, B)
+	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 	nimble.RunStack()
 
 	const probe = 24 * 121

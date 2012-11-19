@@ -26,21 +26,11 @@ func main() {
 	kernel := mag.BruteKernel(mesh, acc)
 	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0)
 	demag := conv.NewSymm2D(mesh, kernel, m, B)
-	nimble.Stack(demag)
 	nimble.RunStack()
-
-	const probe = 24 * 121
-	output := host(B.ChanN().NewReader().ReadNext(mesh.NCell()))
-	if output[0][probe] != -0.9709071 || output[1][probe] != 0 || output[2][probe] != 0 {
-		fmt.Println("failed, got:", output[0][probe])
-		os.Exit(2)
-	} else {
-		fmt.Println("OK")
-	}
 
 	//	Msat := 1.0053
 	//	aex := mag.Mu0 * 13e-12 / Msat
-	//	hex := MakeChan3("Hex", "", mesh)
+	//	hex := nimble.MakeChan3("Hex", "", mesh)
 	//	Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
 	//
 	//	heff := MakeChan3("Heff", "", mesh)

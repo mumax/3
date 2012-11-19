@@ -257,6 +257,7 @@ func NewSymm2D(mesh *nimble.Mesh, kernel [3][3][][][]float32, input_ nimble.Chan
 	c.output = output
 
 	c.init()
+	nimble.Stack(c)
 
 	return c
 	// TODO: self-test

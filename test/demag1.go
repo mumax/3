@@ -28,18 +28,18 @@ func main() {
 	fmt.Println("mesh:", mesh)
 
 	m := gpu.NewConst("m", "", mesh, 1, 0, 0).Output().Chan3()
-	fmt.Println("m:", m)
+	//fmt.Println("m:", m)
 
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)
 	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0)
-	nimble.Stack(conv.NewSymm2D(mesh, kernel, m, B))
+	conv.NewSymm2D(mesh, kernel, m, B)
 	nimble.RunStack()
 
 	const probe = 24 * 121
 	output := host(B.ChanN().NewReader().ReadNext(mesh.NCell()))
 	if output[0][probe] != -0.9709071 || output[1][probe] != 0 || output[2][probe] != 0 {
-		fmt.Println("failed, got:", output[0][probe])
+		//fmt.Println("failed, got:", output[0][probe])
 		os.Exit(2)
 	} else {
 		fmt.Println("OK")

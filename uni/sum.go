@@ -26,11 +26,6 @@ func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem 
 }
 
 func (s *Sum) MAdd(term nimble.RChanN, weight float32) {
-	// Fail-fast check. May not always fire but should be OK to catch obvious bugs.
-	//	if s.running {
-	//		panic(fmt.Errorf("sum: madd: already running"))
-	//	}
-
 	if len(s.term) != 0 {
 		core.Assert(term.NComp() == s.sum.NComp())
 		core.CheckEqualSize(term.Size(), s.term[0].Size())
@@ -42,7 +37,6 @@ func (s *Sum) MAdd(term nimble.RChanN, weight float32) {
 }
 
 func (s *Sum) Run() {
-	//s.running = true
 	s.dev.InitThread()
 	for {
 		s.Exec()

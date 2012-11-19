@@ -2,56 +2,10 @@ package cpu
 
 import (
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/uni"
 )
 
-type Sum struct {
-	in  []nimble.RChanN
-	out nimble.ChanN
+
+func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType) *uni.Sum {
+	return uni.NewSum(tag, term1, term2, weight1, weight2, mem, CPUDevice)
 }
-
-func (s *Sum) Output() nimble.ChanN {
-	return s.out
-}
-
-func NewSum(tag string) *Sum {
-
-}
-
-//func NewAdder3(sum Chan3, terms ...RChan3) *Adder {
-//	Assert(len(terms) > 1)
-//	for _, t := range terms {
-//		Assert(t.Mesh().Size() == sum.Mesh().Size())
-//	}
-//	return &Adder{sum, terms, BlockLen(sum.Mesh().Size())}
-//}
-//
-//func (a *Adder) Run() {
-//	in := make([][3][]float32, len(a.terms))
-//	for {
-//		// lock
-//		for i, t := range a.terms {
-//			in[i] = t.ReadNext(a.blocksize)
-//		}
-//		out := a.sum.WriteNext(a.blocksize)
-//
-//		a.add(in, out)
-//
-//		// unlock
-//		a.sum.WriteDone()
-//		for _, t := range a.terms {
-//			t.ReadDone()
-//		}
-//	}
-//}
-//
-//func (a *Adder) add(in [][3][]float32, out [3][]float32) {
-//	for c := 0; c < 3; c++ {
-//		for i := 0; i < len(out[0]); i++ {
-//			sum := in[0][c][i] + in[1][c][i]
-//			for j := 2; j < len(a.terms); j++ {
-//				sum += in[j][c][i]
-//			}
-//			out[c][i] = sum
-//		}
-//	}
-//}

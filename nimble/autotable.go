@@ -17,8 +17,9 @@ func Autotable(data_ Chan, every int) {
 	tags := make([]string, data.NComp())
 	units := make([]string, data.NComp())
 	for i := range tags {
-		tags[i] = data.Comp(i).Tag()
-		units[i] = data.Comp(i).Unit()
+		cmp := data.Comp(i) // gccgo hack: gccgo 4.7.2 wants a pointer here
+		tags[i] = (&cmp).Tag()
+		units[i] = (&cmp).Unit()
 	}
 	fname := data.Tag() + ".table"
 	r.out = dump.NewTableWriter(core.OpenFile(core.OD+fname), tags, units)

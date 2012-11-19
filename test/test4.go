@@ -38,7 +38,7 @@ func main() {
 	torque := nimble.MakeChan3("τ", "", mesh, nimble.UnifiedMemory, 1)
 	nimble.Stack(cpu.NewLLGTorque(torque, m.NewReader(), Beff.NewReader(), alpha))
 
-	const dt = 50e-15
+	const dt = 100e-15
 
 	solver := cpu.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
 
@@ -61,12 +61,13 @@ func main() {
 	solver.Steps(100)
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
-	solver.Steps(10000)
+	expect := [3]float32{-0.03450077, 0.21015842, 0.9770585}
+	//solver.Steps(50000)
 	fmt.Println("result:", got)
 	if got != expect {
 		fmt.Println("expected:", expect)
 		os.Exit(2)
+	} else {
+		fmt.Println("OK")
 	}
-
 }

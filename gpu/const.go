@@ -11,13 +11,13 @@ type Const struct {
 }
 
 // NewConst returns a time- and space- independent constant value.
-func NewConst(tag, unit string, m *nimble.Mesh, value ...float64) *Const {
+func NewConst(tag, unit string, m *nimble.Mesh, memType nimble.MemType, value ...float64) *Const {
 	nComp := len(value)
 	if nComp < 1 {
 		panic(fmt.Errorf("newconst: need at least one value"))
 	}
 	c := new(Const)
-	data := nimble.MakeSlices(nComp, m.BlockLen(), nimble.GPUMemory)
+	data := nimble.MakeSlices(nComp, m.BlockLen(), memType)
 	for i := range data {
 		data[i].Device().Memset(float32(value[i]))
 	}

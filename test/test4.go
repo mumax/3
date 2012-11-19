@@ -19,19 +19,17 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := gpu.NewConst("m", "", mesh, 1, 0, 0).Output().Chan3()
+	m := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, 1, 0, 0).Output().Chan3()
 	fmt.Println("m:", m)
 
-	acc := 2
+	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
-	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0)
-	demag := conv.NewSymm2D(mesh, kernel, m, B)
-	nimble.RunStack()
+	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 
-	//	Msat := 1.0053
-	//	aex := mag.Mu0 * 13e-12 / Msat
-	//	hex := nimble.MakeChan3("Hex", "", mesh)
-	//	Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
+		Msat := 1.0053
+		aex := mag.Mu0 * 13e-12 / Msat
+		hex := nimble.MakeChan3("Hex", "", mesh)
+		Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
 	//
 	//	heff := MakeChan3("Heff", "", mesh)
 	//	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))

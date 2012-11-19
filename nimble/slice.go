@@ -67,12 +67,12 @@ const (
 
 type MemType byte
 
-func (s Slice) GPUAccess() bool {
-	return s.flag&GPUMemory != 0
+func (m MemType) GPUAccess() bool {
+	return m&GPUMemory != 0
 }
 
-func (s Slice) CPUAccess() bool {
-	return s.flag&CPUMemory != 0
+func (m MemType) CPUAccess() bool {
+	return m&CPUMemory != 0
 }
 
 func UnsafeSlice(ptr unsafe.Pointer, len_ int, flag MemType) Slice {

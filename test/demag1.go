@@ -27,7 +27,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := gpu.NewConst("m", "", mesh, 1, 0, 0).Output().Chan3()
+	m := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, 1, 0, 0).Output().Chan3()
 	//fmt.Println("m:", m)
 
 	acc := 2

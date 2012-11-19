@@ -6,7 +6,6 @@ import (
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
-	"os"
 )
 
 func main() {
@@ -19,7 +18,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, 1, 0, 0).Output().Chan3()
+	m := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, []float64{1, 0, 0}).Output().Chan3()
 	fmt.Println("m:", m)
 
 	acc := 8
@@ -28,8 +27,8 @@ func main() {
 
 	Msat := 1.0053
 	aex := mag.Mu0 * 13e-12 / Msat
-	hex := nimble.MakeChan3("Hex", "", mesh)
-	Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
+	exch := mag.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
+	Bex := exch.Output()
 	//
 	//	heff := MakeChan3("Heff", "", mesh)
 	//	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))

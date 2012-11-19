@@ -9,12 +9,20 @@ import (
 	"os"
 )
 
+func host(s []nimble.Slice) [][]float32 {
+	h := make([][]float32, len(s))
+	for i := range h {
+		h[i] = s[i].Host()
+	}
+	return h
+}
+
 func main() {
 	nimble.Init()
 	defer nimble.Cleanup()
-	nimble.SetOD("test4.out")
+	nimble.SetOD("demag1.out")
 
-	N0, N1, N2 := 1, 32, 64
+	N0, N1, N2 := 1, 3*64, 5*64
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
@@ -25,8 +33,7 @@ func main() {
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)
 	B := nimble.MakeChan3("B", "T", mesh, nimble.UnifiedMemory, 0)
-	demag := conv.NewSymm2D(mesh, kernel, m, B)
-	nimble.Stack(demag)
+	nimble.Stack(conv.NewSymm2D(mesh, kernel, m, B))
 	nimble.RunStack()
 
 	const probe = 24 * 121

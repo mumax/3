@@ -2,11 +2,11 @@ package main
 
 import (
 	"code.google.com/p/nimble-cube/cpu"
-	//"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	defer nimble.Cleanup()
 	nimble.SetOD("test4.out")
 
-	N0, N1, N2 := 1, 32, 64
+	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
@@ -45,23 +45,27 @@ func main() {
 	M := cpu.Host(m.ChanN().UnsafeData())
 	for i := range M[2] {
 		M[2][i] = 1
+		M[1][i] = 0.1
 	}
 
-	//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
-	//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
-	//	Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
-	//	Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
+	every := 100
+	nimble.RunAutosaver("B.dump", B, every)
+	nimble.RunAutosaver("m.dump", m, every)
+	nimble.RunAutosaver("Bex.dump", Bex, every)
+	nimble.RunAutosaver("Beff.dump", Beff, every)
+	nimble.RunAutosaver("torque.dump", torque, every)
 
 	nimble.RunStack()
 
 	solver.Steps(100)
-	//	res := m.UnsafeArray()
-	//	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
-	//	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
-	//	Log("result:", got)
-	//	if got != expect {
-	//		Fatal(fmt.Errorf("expected: %v", expect))
-	//	}
-	//solver.Steps(10000)
+	res := cpu.Host(m.ChanN().UnsafeData())
+	got := [3]float32{res[0][0], res[1][0], res[2][0]}
+	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}
+	fmt.Println("result:", got)
+	if got != expect {
+		fmt.Println("expected:", expect)
+		os.Exit(2)
+	}
+	solver.Steps(10000)
 
 }

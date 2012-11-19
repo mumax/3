@@ -17,9 +17,17 @@ func Stack(r Runner) {
 	stack = append(stack, r)
 }
 
+func StackFunc(f func()){
+	Stack(funcRunner(f))
+}
+
 func RunStack() {
 	for _, r := range stack {
 		go r.Run()
 	}
 	stack = nil
 }
+
+type funcRunner func()
+
+func(f funcRunner)Run(){f()}

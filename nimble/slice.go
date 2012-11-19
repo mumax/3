@@ -31,9 +31,9 @@ func MakeSlice(length int, memtype MemType) Slice {
 	return s
 }
 
-func MakeSlices(nComp int, length int, memType MemType)[]Slice{
-	s:=make([]Slice, nComp)
-	for i:=range s{
+func MakeSlices(nComp int, length int, memType MemType) []Slice {
+	s := make([]Slice, nComp)
+	for i := range s {
 		s[i] = MakeSlice(length, memType)
 	}
 	return s

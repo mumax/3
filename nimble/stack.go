@@ -1,5 +1,7 @@
 package nimble
 
+import "fmt"
+
 type Runner interface {
 	Run()
 }
@@ -7,6 +9,11 @@ type Runner interface {
 var stack []Runner
 
 func Stack(r Runner) {
+	for _, s := range stack {
+		if s == r {
+			panic(fmt.Errorf("stack: already stacked %v", r))
+		}
+	}
 	stack = append(stack, r)
 }
 

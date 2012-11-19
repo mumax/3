@@ -26,10 +26,10 @@ func main() {
 	kernel := mag.BruteKernel(mesh, acc)
 	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 
-		Msat := 1.0053
-		aex := mag.Mu0 * 13e-12 / Msat
-		hex := nimble.MakeChan3("Hex", "", mesh)
-		Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
+	Msat := 1.0053
+	aex := mag.Mu0 * 13e-12 / Msat
+	hex := nimble.MakeChan3("Hex", "", mesh)
+	Stack(mag.NewExchange6(m.NewReader(), hex, mesh, aex))
 	//
 	//	heff := MakeChan3("Heff", "", mesh)
 	//	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))

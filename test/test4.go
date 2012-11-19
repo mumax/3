@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
+	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 )
@@ -27,11 +28,12 @@ func main() {
 
 	Msat := 1.0053
 	aex := mag.Mu0 * 13e-12 / Msat
-	exch := mag.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
+	exch := cpu.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
 	Bex := exch.Output()
 
 	//	heff := MakeChan3("Heff", "", mesh)
-	//	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))
+	heff := cpu.NewSum("Beff", B, Bex)
+
 	//
 	//	const alpha = 1
 	//	torque := MakeChan3("τ", "", mesh)

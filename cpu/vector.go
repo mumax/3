@@ -51,8 +51,8 @@ func (a Vector) Scaled(s float32) Vector {
 	return Vector{s * a[X], s * a[Y], s * a[Z]}
 }
 
-const(
-	X=0
-	Y=1
-	Z=2
+const (
+	X = 0
+	Y = 1
+	Z = 2
 )

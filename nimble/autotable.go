@@ -44,9 +44,9 @@ func (r *Autotabler) Run() {
 				sum /= float64(N)
 				r.out.Data[c] = float32(sum)
 			}
+			r.out.Flush()
+			r.out.WriteData()
 		}
 		r.data.ReadDone()
-		r.out.WriteData()
-		r.out.Flush()
 	}
 }

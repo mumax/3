@@ -29,7 +29,7 @@ func main() {
 	aex := mag.Mu0 * 13e-12 / Msat
 	exch := mag.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
 	Bex := exch.Output()
-	//
+	
 	//	heff := MakeChan3("Heff", "", mesh)
 	//	Stack(NewAdder3(heff, hd.NewReader(), hex.NewReader()))
 	//

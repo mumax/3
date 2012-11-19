@@ -6,34 +6,36 @@ import (
 )
 
 type Exchange6 struct {
-	m           nimble.RChan3
-	hex         nimble.Chan3
+	in           nimble.RChan3
+	out         nimble.Chan3
 	aex_reduced float64
 }
 
 func (e *Exchange6) Run() {
-	N := e.m.Mesh().NCell()
-	size := e.m.Mesh().Size()
-	cellsize := e.m.Mesh().CellSize()
+	N := e.in.Mesh().NCell()
+	size := e.in.Mesh().Size()
+	cellsize := e.in.Mesh().CellSize()
 	// TODO: properly split in blocks
 	for {
-		mSlice := e.m.ReadNext(N)
+		mSlice := e.in.ReadNext(N)
 		mList := [3][]float32{mSlice[0].Host(), mSlice[1].Host(), mSlice[2].Host()}
 		m := core.Reshape3(mList, size)
-		hex := core.Reshape3(e.hex.WriteNext(N), size)
+		hex := core.Reshape3(e.out.WriteNext(N), size)
 		exchange6(m, hex, cellsize, e.aex_reduced)
-		e.hex.WriteDone()
-		e.m.ReadDone()
+		e.out.WriteDone()
+		e.in.ReadDone()
 	}
 }
 
 func NewExchange6(tag, unit string, memType nimble.MemType, m nimble.RChan3, aex_reduced float64) *Exchange6 {
-	hex := nimble.MakeChan3(tag, unit, m.Mesh(), memType, 0)
-	return &Exchange6{m, hex, aex_reduced}
+	out := nimble.MakeChan3(tag, unit, m.Mesh(), memType, 0)
+	ex := &Exchange6{m, out, aex_reduced}
+	nimble.Stack(ex)
+	return ex
 }
 
 func (e *Exchange6) Output() nimble.Chan3 {
-	return e.hex
+	return e.out
 }
 
 // Naive implementation of 6-neighbor exchange field.

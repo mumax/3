@@ -1,13 +1,13 @@
 package mag
 
 import (
- "code.google.com/p/nimble-cube/nimble"
- "code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 type Exchange6 struct {
-	m   nimble.RChan3
-	hex nimble.Chan3
+	m           nimble.RChan3
+	hex         nimble.Chan3
 	aex_reduced float64
 }
 
@@ -30,6 +30,10 @@ func (e *Exchange6) Run() {
 func NewExchange6(tag, unit string, memType nimble.MemType, m nimble.RChan3, aex_reduced float64) *Exchange6 {
 	hex := nimble.MakeChan3(tag, unit, m.Mesh(), memType, 0)
 	return &Exchange6{m, hex, aex_reduced}
+}
+
+func (e *Exchange6) Output() nimble.Chan3 {
+	return e.hex
 }
 
 // Naive implementation of 6-neighbor exchange field.

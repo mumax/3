@@ -38,13 +38,13 @@ func main() {
 	torque := nimble.MakeChan3("τ", "", mesh, nimble.UnifiedMemory, 1)
 	nimble.Stack(cpu.NewLLGTorque(torque, m.NewReader(), Beff.NewReader(), alpha))
 
-//	const dt = 50e-15
-//	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
-//	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
-//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
-//	Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
-//	Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
+	//	const dt = 50e-15
+	//	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
+	//	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
+	//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
+	//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
+	//	Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
+	//	Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
 	//
 	//	RunStack()
 	//

@@ -20,7 +20,7 @@ func (e *Exchange6) Run() {
 		mSlice := e.in.ReadNext(N)
 		mList := [3][]float32{mSlice[0].Host(), mSlice[1].Host(), mSlice[2].Host()}
 		m := core.Reshape3(mList, size)
-		hex := core.Reshape3(e.out.WriteNext(N), size)
+		hex := core.Reshape3(Host3(e.out.WriteNext(N)), size)
 		exchange6(m, hex, cellsize, e.aex_reduced)
 		e.out.WriteDone()
 		e.in.ReadDone()

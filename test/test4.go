@@ -26,26 +26,25 @@ func main() {
 	kernel := mag.BruteKernel(mesh, acc)
 	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 
-	Msat := 1.0053
-	aex := mag.Mu0 * 13e-12 / Msat
+	const Bsat = 1.0053
+	const aex = mag.Mu0 * 13e-12 / Bsat
 	exch := cpu.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
 	Bex := exch.Output()
 
 	//	heff := MakeChan3("Heff", "", mesh)
-	heff := cpu.NewSum("Beff", B, Bex)
+	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory)
 
-	//
-	//	const alpha = 1
-	//	torque := MakeChan3("τ", "", mesh)
-	//	Stack(mag.NewLLGTorque(torque, m.NewReader(), heff.NewReader(), alpha))
-	//
-	//	const dt = 50e-15
-	//	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
-	//	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
-	//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
-	//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
-	//	Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
-	//	Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
+		const alpha = 1
+		torque := nimble.MakeChan3("τ", "", mesh, nimble.UnifiedMemory, 1)
+		nimble.Stack(mag.NewLLGTorque(torque, m.NewReader(), heff.NewReader(), alpha))
+
+		const dt = 50e-15
+		solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
+		mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
+		Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
+		Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
+		Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
+		Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
 	//
 	//	RunStack()
 	//

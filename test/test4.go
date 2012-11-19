@@ -49,11 +49,11 @@ func main() {
 	}
 
 	every := 100
-	nimble.RunAutosaver("B.dump", B, every)
-	nimble.RunAutosaver("m.dump", m, every)
-	nimble.RunAutosaver("Bex.dump", Bex, every)
-	nimble.RunAutosaver("Beff.dump", Beff, every)
-	nimble.RunAutosaver("torque.dump", torque, every)
+	nimble.Autosave(B, every)
+	nimble.Autosave(m, every)
+	nimble.Autosave(Bex, every)
+	nimble.Autosave(Beff, every)
+	nimble.Autosave(torque, every)
 
 	nimble.RunStack()
 

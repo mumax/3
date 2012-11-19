@@ -18,7 +18,7 @@ type Sum struct {
 func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
 	t1, t2 := term1.ChanN().NewReader(), term2.ChanN().NewReader()
 	output := nimble.MakeChanN(t1.NComp(), tag, t1.Unit(), t1.Mesh(), mem, 1)
-	sum := &Sum{sum: output}
+	sum := &Sum{sum: output, dev: dev, stream: dev.StreamCreate()}
 	sum.MAdd(t1, weight1)
 	sum.MAdd(t2, weight2)
 	nimble.Stack(sum)
@@ -66,7 +66,9 @@ func (s *Sum) Exec() {
 		}
 		s.sum.Comp(c).WriteDone()
 	}
-	s.stream.Synchronize()
+	if s.stream != 0 {
+		s.stream.Synchronize()
+	}
 }
 
 func (s *Sum) Output() nimble.ChanN { return s.sum }

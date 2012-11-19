@@ -2,7 +2,7 @@ package main
 
 import (
 	"code.google.com/p/nimble-cube/cpu"
-	"code.google.com/p/nimble-cube/gpu"
+	//"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
@@ -19,7 +19,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, []float64{1, 0, 0}).Output().Chan3()
+	m := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory, 0)
 	fmt.Println("m:", m)
 
 	acc := 8
@@ -38,17 +38,24 @@ func main() {
 	torque := nimble.MakeChan3("τ", "", mesh, nimble.UnifiedMemory, 1)
 	nimble.Stack(cpu.NewLLGTorque(torque, m.NewReader(), Beff.NewReader(), alpha))
 
-	//	const dt = 50e-15
-	//	solver := mag.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
-	//	mag.SetAll(m.UnsafeArray(), mag.Uniform(0, 0.1, 1))
+	const dt = 50e-15
+
+	solver := cpu.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
+
+	M := cpu.Host3(m.WriteNext(mesh.NCell()))
+	for i := range M[2] {
+		M[2][i] = 1
+	}
+	m.WriteDone()
+
 	//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
 	//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))
 	//	Stack(dump.NewAutosaver("hex.dump", hex.NewReader(), 1))
 	//	Stack(dump.NewAutotable("m.table", m.NewReader(), 1))
-	//
-	//	RunStack()
-	//
-	//	solver.Steps(100)
+
+	nimble.RunStack()
+
+	solver.Steps(100)
 	//	res := m.UnsafeArray()
 	//	got := [3]float32{res[0][0][0][0], res[1][0][0][0], res[2][0][0][0]}
 	//	expect := [3]float32{-0.075877085, 0.17907967, 0.9809043}

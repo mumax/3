@@ -5,6 +5,8 @@ PREFIX=code.google.com/p/nimble-cube
 PKGS=\
 	$(PREFIX)/gpu/conv\
 	$(PREFIX)/gpu\
+	$(PREFIX)/cpu\
+	$(PREFIX)/uni\
 	$(PREFIX)/mag\
 	$(PREFIX)/dump\
 	$(PREFIX)/nimble\

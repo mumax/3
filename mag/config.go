@@ -2,11 +2,11 @@ package mag
 
 // Utilities for setting magnetic configurations.
 
-//import (
-//	"code.google.com/p/nimble-cube/nimble"
-//)
-//
-//// Returns a function that returns the vector value for all i,j,k.
+import (
+//"code.google.com/p/nimble-cube/nimble"
+)
+
+// Returns a function that returns the vector value for all i,j,k.
 //func Uniform(x, y, z float32) func(i, j, k int) Vector {
 //	v := Vector{x, y, z}
 //	return func(i, j, k int) Vector {

@@ -13,6 +13,10 @@ func (d Device) InitThread() {
 	// intentionally empty
 }
 
+func (d Device) StreamCreate() cu.Stream {
+	return 0
+}
+
 func (d Device) Madd(dst nimble.Slice, src1, src2 nimble.Slice, w1, w2 float32, str cu.Stream) {
 	Madd(dst.Host(), src1.Host(), src2.Host(), w1, w2)
 }

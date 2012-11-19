@@ -35,6 +35,14 @@ func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
 func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
 func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 
+func (c ChanN) UnsafeData() []Slice {
+	s := make([]Slice, c.NComp())
+	for i := range s {
+		s[i] = c.comp[i].slice
+	}
+	return s
+}
+
 func (c ChanN) Chan3() Chan3 {
 	core.Assert(c.NComp() == 3)
 	return Chan3{c.comp}

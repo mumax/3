@@ -61,3 +61,11 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 func Host3(s [3]nimble.Slice) [3][]float32 {
 	return [3][]float32{s[0].Host(), s[1].Host(), s[2].Host()}
 }
+
+func Host(s []nimble.Slice) [][]float32 {
+	h := make([][]float32, len(s))
+	for i := range h {
+		h[i] = s[i].Host()
+	}
+	return h
+}

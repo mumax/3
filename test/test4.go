@@ -42,11 +42,10 @@ func main() {
 
 	solver := cpu.NewEuler(m, torque.NewReader(), mag.Gamma0, dt)
 
-	M := cpu.Host3(m.WriteNext(mesh.NCell()))
+	M := cpu.Host(m.ChanN().UnsafeData())
 	for i := range M[2] {
 		M[2][i] = 1
 	}
-	m.WriteDone()
 
 	//	Stack(dump.NewAutosaver("h.dump", hd.NewReader(), 1))
 	//	Stack(dump.NewAutosaver("m.dump", m.NewReader(), 1))

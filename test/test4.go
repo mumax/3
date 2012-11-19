@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
+	"os"
 )
 
 func host(s []nimble.Slice) [][]float32 {
@@ -37,7 +38,10 @@ func main() {
 	nimble.RunStack()
 
 	output := host(B.ChanN().NewReader().ReadNext(mesh.NCell()))
-	fmt.Println(output)
+	if output[0][24*121] != -0.97624576 || output[1][24*121] != 0 || output[2][24*121] != 0 {
+		fmt.Println("failed")
+		os.Exit(-1)
+	}
 
 	//	Msat := 1.0053
 	//	aex := mag.Mu0 * 13e-12 / Msat

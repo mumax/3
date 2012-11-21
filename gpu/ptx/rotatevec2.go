@@ -11,7 +11,7 @@ const ROTATEVEC2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000017be_00000000-9_rotatevec2.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002267_00000000-9_rotatevec2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/rotatevec2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/device_functions.h"
@@ -76,47 +76,47 @@ const ROTATEVEC2 = `
 	add.s64 	%rd21, %rd8, %rd19;
 	ld.global.f32 	%f3, [%rd21];
 	ld.global.f32 	%f4, [%rd20];
-	fma.rn.ftz.f32 	%f5, %f3, %f1, %f4;
+	fma.rn.f32 	%f5, %f3, %f1, %f4;
 	add.s64 	%rd22, %rd7, %rd19;
 	ld.global.f32 	%f6, [%rd22];
-	fma.rn.ftz.f32 	%f7, %f6, %f2, %f5;
+	fma.rn.f32 	%f7, %f6, %f2, %f5;
 	.loc 2 11 1
 	add.s64 	%rd23, %rd6, %rd19;
 	add.s64 	%rd24, %rd5, %rd19;
 	ld.global.f32 	%f8, [%rd24];
 	ld.global.f32 	%f9, [%rd23];
-	fma.rn.ftz.f32 	%f10, %f8, %f1, %f9;
+	fma.rn.f32 	%f10, %f8, %f1, %f9;
 	add.s64 	%rd25, %rd4, %rd19;
 	ld.global.f32 	%f11, [%rd25];
-	fma.rn.ftz.f32 	%f12, %f11, %f2, %f10;
+	fma.rn.f32 	%f12, %f11, %f2, %f10;
 	.loc 2 12 1
 	add.s64 	%rd26, %rd3, %rd19;
 	add.s64 	%rd27, %rd2, %rd19;
 	ld.global.f32 	%f13, [%rd27];
 	ld.global.f32 	%f14, [%rd26];
-	fma.rn.ftz.f32 	%f15, %f13, %f1, %f14;
+	fma.rn.f32 	%f15, %f13, %f1, %f14;
 	add.s64 	%rd28, %rd1, %rd19;
 	ld.global.f32 	%f16, [%rd28];
-	fma.rn.ftz.f32 	%f17, %f16, %f2, %f15;
+	fma.rn.f32 	%f17, %f16, %f2, %f15;
 	.loc 2 14 1
-	mul.ftz.f32 	%f18, %f12, %f12;
-	fma.rn.ftz.f32 	%f19, %f7, %f7, %f18;
-	fma.rn.ftz.f32 	%f20, %f17, %f17, %f19;
-	.loc 3 996 5
-	sqrt.approx.ftz.f32 	%f21, %f20;
+	mul.f32 	%f18, %f12, %f12;
+	fma.rn.f32 	%f19, %f7, %f7, %f18;
+	fma.rn.f32 	%f20, %f17, %f17, %f19;
+	.loc 3 991 5
+	sqrt.rn.f32 	%f21, %f20;
 	.loc 2 15 1
-	setp.eq.ftz.f32 	%p2, %f21, 0f00000000;
+	setp.eq.f32 	%p2, %f21, 0f00000000;
 	selp.f32 	%f22, 0f3F800000, %f21, %p2;
-	.loc 3 749 5
-	div.approx.ftz.f32 	%f23, %f7, %f22;
+	.loc 4 2399 3
+	div.rn.f32 	%f23, %f7, %f22;
 	.loc 2 17 1
 	st.global.f32 	[%rd20], %f23;
-	.loc 3 749 5
-	div.approx.ftz.f32 	%f24, %f12, %f22;
+	.loc 4 2399 3
+	div.rn.f32 	%f24, %f12, %f22;
 	.loc 2 18 1
 	st.global.f32 	[%rd23], %f24;
-	.loc 3 749 5
-	div.approx.ftz.f32 	%f25, %f17, %f22;
+	.loc 4 2399 3
+	div.rn.f32 	%f25, %f17, %f22;
 	.loc 2 19 1
 	st.global.f32 	[%rd26], %f25;
 

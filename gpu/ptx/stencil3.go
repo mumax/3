@@ -11,7 +11,7 @@ const STENCIL3 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001159_00000000-9_stencil3.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002274_00000000-9_stencil3.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/stencil3.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 
@@ -133,8 +133,8 @@ BB0_2:
 	mul.wide.s32 	%rd7, %r53, 4;
 	add.s64 	%rd8, %rd2, %rd7;
 	ld.global.f32 	%f9, [%rd8];
-	mul.ftz.f32 	%f10, %f9, %f6;
-	fma.rn.ftz.f32 	%f11, %f8, %f1, %f10;
+	mul.f32 	%f10, %f9, %f6;
+	fma.rn.f32 	%f11, %f8, %f1, %f10;
 	.loc 2 37 1
 	add.s32 	%r55, %r21, -1;
 	.loc 3 238 5
@@ -147,31 +147,31 @@ BB0_2:
 	mul.wide.s32 	%rd9, %r59, 4;
 	add.s64 	%rd10, %rd2, %rd9;
 	ld.global.f32 	%f12, [%rd10];
-	fma.rn.ftz.f32 	%f13, %f12, %f7, %f11;
+	fma.rn.f32 	%f13, %f12, %f7, %f11;
 	.loc 2 38 1
 	mul.wide.s32 	%rd11, %r70, 4;
 	add.s64 	%rd12, %rd2, %rd11;
 	ld.global.f32 	%f14, [%rd12];
-	fma.rn.ftz.f32 	%f15, %f14, %f4, %f13;
+	fma.rn.f32 	%f15, %f14, %f4, %f13;
 	.loc 2 39 1
 	mul.wide.s32 	%rd13, %r71, 4;
 	add.s64 	%rd14, %rd2, %rd13;
 	ld.global.f32 	%f16, [%rd14];
-	fma.rn.ftz.f32 	%f17, %f16, %f5, %f15;
+	fma.rn.f32 	%f17, %f16, %f5, %f15;
 	.loc 2 40 1
 	mul.wide.s32 	%rd15, %r68, 4;
 	add.s64 	%rd16, %rd2, %rd15;
 	ld.global.f32 	%f18, [%rd16];
-	fma.rn.ftz.f32 	%f19, %f18, %f3, %f17;
+	fma.rn.f32 	%f19, %f18, %f3, %f17;
 	.loc 2 41 1
 	mul.wide.s32 	%rd17, %r69, 4;
 	add.s64 	%rd18, %rd2, %rd17;
 	ld.global.f32 	%f20, [%rd18];
-	fma.rn.ftz.f32 	%f21, %f20, %f2, %f19;
+	fma.rn.f32 	%f21, %f20, %f2, %f19;
 	.loc 2 43 1
 	add.s64 	%rd19, %rd1, %rd5;
 	ld.global.f32 	%f22, [%rd19];
-	add.ftz.f32 	%f23, %f22, %f21;
+	add.f32 	%f23, %f22, %f21;
 	st.global.f32 	[%rd19], %f23;
 	.loc 2 32 1
 	add.s32 	%r71, %r71, %r11;

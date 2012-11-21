@@ -11,7 +11,7 @@ const KERNMULC = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000172a_00000000-9_kernmulc.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021db_00000000-9_kernmulc.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulc.cu"
 
 .visible .entry kernmulC(
@@ -143,98 +143,98 @@ const KERNMULC = `
 	.loc 2 20 1
 	ld.global.f32 	%f14, [%rd24];
 	.loc 2 50 1
-	mul.ftz.f32 	%f15, %f14, %f13;
+	mul.f32 	%f15, %f14, %f13;
 	.loc 2 32 1
 	ld.global.f32 	%f16, [%rd36];
 	.loc 2 21 1
 	ld.global.f32 	%f17, [%rd26];
 	.loc 2 50 1
-	mul.ftz.f32 	%f18, %f17, %f16;
-	sub.ftz.f32 	%f19, %f15, %f18;
+	mul.f32 	%f18, %f17, %f16;
+	sub.f32 	%f19, %f15, %f18;
 	.loc 2 38 1
 	ld.global.f32 	%f20, [%rd41];
 	.loc 2 23 1
 	ld.global.f32 	%f21, [%rd28];
 	.loc 2 50 1
-	mul.ftz.f32 	%f22, %f21, %f20;
+	mul.f32 	%f22, %f21, %f20;
 	.loc 2 41 1
 	ld.global.f32 	%f23, [%rd44];
 	.loc 2 24 1
 	ld.global.f32 	%f24, [%rd29];
 	.loc 2 50 1
-	mul.ftz.f32 	%f25, %f24, %f23;
-	sub.ftz.f32 	%f26, %f22, %f25;
-	add.ftz.f32 	%f27, %f19, %f26;
+	mul.f32 	%f25, %f24, %f23;
+	sub.f32 	%f26, %f22, %f25;
+	add.f32 	%f27, %f19, %f26;
 	.loc 2 37 1
 	ld.global.f32 	%f28, [%rd40];
 	.loc 2 26 1
 	ld.global.f32 	%f29, [%rd31];
 	.loc 2 50 1
-	mul.ftz.f32 	%f30, %f29, %f28;
+	mul.f32 	%f30, %f29, %f28;
 	.loc 2 40 1
 	ld.global.f32 	%f31, [%rd43];
 	.loc 2 27 1
 	ld.global.f32 	%f32, [%rd32];
 	.loc 2 50 1
-	mul.ftz.f32 	%f33, %f32, %f31;
-	sub.ftz.f32 	%f34, %f30, %f33;
-	add.ftz.f32 	%f35, %f27, %f34;
+	mul.f32 	%f33, %f32, %f31;
+	sub.f32 	%f34, %f30, %f33;
+	add.f32 	%f35, %f27, %f34;
 	st.global.f32 	[%rd24], %f35;
 	.loc 2 51 1
-	mul.ftz.f32 	%f36, %f17, %f13;
-	fma.rn.ftz.f32 	%f37, %f14, %f16, %f36;
-	mul.ftz.f32 	%f38, %f24, %f20;
-	fma.rn.ftz.f32 	%f39, %f21, %f23, %f38;
-	add.ftz.f32 	%f40, %f37, %f39;
-	mul.ftz.f32 	%f41, %f32, %f28;
-	fma.rn.ftz.f32 	%f42, %f29, %f31, %f41;
-	add.ftz.f32 	%f43, %f40, %f42;
+	mul.f32 	%f36, %f17, %f13;
+	fma.rn.f32 	%f37, %f14, %f16, %f36;
+	mul.f32 	%f38, %f24, %f20;
+	fma.rn.f32 	%f39, %f21, %f23, %f38;
+	add.f32 	%f40, %f37, %f39;
+	mul.f32 	%f41, %f32, %f28;
+	fma.rn.f32 	%f42, %f29, %f31, %f41;
+	add.f32 	%f43, %f40, %f42;
 	st.global.f32 	[%rd26], %f43;
 	.loc 2 53 1
-	mul.ftz.f32 	%f44, %f14, %f9;
-	mul.ftz.f32 	%f45, %f17, %f12;
-	sub.ftz.f32 	%f46, %f44, %f45;
-	mul.ftz.f32 	%f47, %f21, %f1;
-	mul.ftz.f32 	%f48, %f24, %f3;
-	sub.ftz.f32 	%f49, %f47, %f48;
-	add.ftz.f32 	%f50, %f46, %f49;
-	mul.ftz.f32 	%f51, %f29, %f5;
-	mul.ftz.f32 	%f52, %f32, %f6;
-	sub.ftz.f32 	%f53, %f51, %f52;
-	add.ftz.f32 	%f54, %f50, %f53;
+	mul.f32 	%f44, %f14, %f9;
+	mul.f32 	%f45, %f17, %f12;
+	sub.f32 	%f46, %f44, %f45;
+	mul.f32 	%f47, %f21, %f1;
+	mul.f32 	%f48, %f24, %f3;
+	sub.f32 	%f49, %f47, %f48;
+	add.f32 	%f50, %f46, %f49;
+	mul.f32 	%f51, %f29, %f5;
+	mul.f32 	%f52, %f32, %f6;
+	sub.f32 	%f53, %f51, %f52;
+	add.f32 	%f54, %f50, %f53;
 	st.global.f32 	[%rd28], %f54;
 	.loc 2 54 1
-	mul.ftz.f32 	%f55, %f17, %f9;
-	fma.rn.ftz.f32 	%f56, %f14, %f12, %f55;
-	mul.ftz.f32 	%f57, %f24, %f1;
-	fma.rn.ftz.f32 	%f58, %f21, %f3, %f57;
-	add.ftz.f32 	%f59, %f56, %f58;
-	mul.ftz.f32 	%f60, %f32, %f5;
-	fma.rn.ftz.f32 	%f61, %f29, %f6, %f60;
-	add.ftz.f32 	%f62, %f59, %f61;
+	mul.f32 	%f55, %f17, %f9;
+	fma.rn.f32 	%f56, %f14, %f12, %f55;
+	mul.f32 	%f57, %f24, %f1;
+	fma.rn.f32 	%f58, %f21, %f3, %f57;
+	add.f32 	%f59, %f56, %f58;
+	mul.f32 	%f60, %f32, %f5;
+	fma.rn.f32 	%f61, %f29, %f6, %f60;
+	add.f32 	%f62, %f59, %f61;
 	st.global.f32 	[%rd29], %f62;
 	.loc 2 56 1
-	mul.ftz.f32 	%f63, %f14, %f8;
-	mul.ftz.f32 	%f64, %f17, %f11;
-	sub.ftz.f32 	%f65, %f63, %f64;
-	mul.ftz.f32 	%f66, %f21, %f7;
-	mul.ftz.f32 	%f67, %f24, %f10;
-	sub.ftz.f32 	%f68, %f66, %f67;
-	add.ftz.f32 	%f69, %f65, %f68;
-	mul.ftz.f32 	%f70, %f29, %f2;
-	mul.ftz.f32 	%f71, %f32, %f4;
-	sub.ftz.f32 	%f72, %f70, %f71;
-	add.ftz.f32 	%f73, %f69, %f72;
+	mul.f32 	%f63, %f14, %f8;
+	mul.f32 	%f64, %f17, %f11;
+	sub.f32 	%f65, %f63, %f64;
+	mul.f32 	%f66, %f21, %f7;
+	mul.f32 	%f67, %f24, %f10;
+	sub.f32 	%f68, %f66, %f67;
+	add.f32 	%f69, %f65, %f68;
+	mul.f32 	%f70, %f29, %f2;
+	mul.f32 	%f71, %f32, %f4;
+	sub.f32 	%f72, %f70, %f71;
+	add.f32 	%f73, %f69, %f72;
 	st.global.f32 	[%rd31], %f73;
 	.loc 2 57 1
-	mul.ftz.f32 	%f74, %f17, %f8;
-	fma.rn.ftz.f32 	%f75, %f14, %f11, %f74;
-	mul.ftz.f32 	%f76, %f24, %f7;
-	fma.rn.ftz.f32 	%f77, %f21, %f10, %f76;
-	add.ftz.f32 	%f78, %f75, %f77;
-	mul.ftz.f32 	%f79, %f32, %f2;
-	fma.rn.ftz.f32 	%f80, %f29, %f4, %f79;
-	add.ftz.f32 	%f81, %f78, %f80;
+	mul.f32 	%f74, %f17, %f8;
+	fma.rn.f32 	%f75, %f14, %f11, %f74;
+	mul.f32 	%f76, %f24, %f7;
+	fma.rn.f32 	%f77, %f21, %f10, %f76;
+	add.f32 	%f78, %f75, %f77;
+	mul.f32 	%f79, %f32, %f2;
+	fma.rn.f32 	%f80, %f29, %f4, %f79;
+	add.f32 	%f81, %f78, %f80;
 	st.global.f32 	[%rd32], %f81;
 
 BB0_2:

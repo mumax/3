@@ -11,7 +11,7 @@ const EXCHANGE6 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001729_00000000-9_exchange6.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021d6_00000000-9_exchange6.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/exchange6.cu"
 
 .visible .entry exchange6(
@@ -144,9 +144,9 @@ BB0_8:
 	add.s64 	%rd12, %rd4, %rd11;
 	ld.global.f32 	%f6, [%rd12];
 	.loc 2 45 1
-	sub.ftz.f32 	%f7, %f6, %f1;
-	sub.ftz.f32 	%f8, %f2, %f1;
-	add.ftz.f32 	%f9, %f8, %f7;
+	sub.f32 	%f7, %f6, %f1;
+	sub.f32 	%f8, %f2, %f1;
+	add.f32 	%f9, %f8, %f7;
 	setp.eq.s32 	%p12, %r44, 0;
 	.loc 2 51 1
 	selp.b32 	%r64, %r80, %r85, %p12;
@@ -166,14 +166,14 @@ BB0_8:
 	.loc 2 57 1
 	ld.global.f32 	%f10, [%rd14];
 	.loc 2 70 1
-	sub.ftz.f32 	%f11, %f10, %f1;
+	sub.f32 	%f11, %f10, %f1;
 	.loc 2 68 1
 	ld.global.f32 	%f12, [%rd16];
 	.loc 2 70 1
-	sub.ftz.f32 	%f13, %f12, %f1;
-	add.ftz.f32 	%f14, %f11, %f13;
-	mul.ftz.f32 	%f15, %f14, %f4;
-	fma.rn.ftz.f32 	%f16, %f9, %f3, %f15;
+	sub.f32 	%f13, %f12, %f1;
+	add.f32 	%f14, %f11, %f13;
+	mul.f32 	%f15, %f14, %f4;
+	fma.rn.f32 	%f16, %f9, %f3, %f15;
 	setp.eq.s32 	%p14, %r45, 0;
 	.loc 2 76 1
 	selp.b32 	%r70, %r80, %r82, %p14;
@@ -196,13 +196,13 @@ BB0_8:
 	.loc 2 82 1
 	ld.global.f32 	%f17, [%rd18];
 	.loc 2 95 1
-	sub.ftz.f32 	%f18, %f17, %f1;
+	sub.f32 	%f18, %f17, %f1;
 	.loc 2 93 1
 	ld.global.f32 	%f19, [%rd20];
 	.loc 2 95 1
-	sub.ftz.f32 	%f20, %f19, %f1;
-	add.ftz.f32 	%f21, %f18, %f20;
-	fma.rn.ftz.f32 	%f22, %f21, %f5, %f16;
+	sub.f32 	%f20, %f19, %f1;
+	add.f32 	%f21, %f18, %f20;
+	fma.rn.f32 	%f22, %f21, %f5, %f16;
 	.loc 2 98 1
 	shl.b64 	%rd22, %rd1, 2;
 	add.s64 	%rd23, %rd21, %rd22;

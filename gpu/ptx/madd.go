@@ -11,7 +11,7 @@ const MADD = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000174c_00000000-9_madd.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021f4_00000000-9_madd.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/madd.cu"
 
 .visible .entry madd(
@@ -56,8 +56,8 @@ const MADD = `
 	ld.global.f32 	%f3, [%rd8];
 	add.s64 	%rd9, %rd2, %rd7;
 	ld.global.f32 	%f4, [%rd9];
-	mul.ftz.f32 	%f5, %f4, %f2;
-	fma.rn.ftz.f32 	%f6, %f3, %f1, %f5;
+	mul.f32 	%f5, %f4, %f2;
+	fma.rn.f32 	%f6, %f3, %f1, %f5;
 	add.s64 	%rd10, %rd1, %rd7;
 	st.global.f32 	[%rd10], %f6;
 

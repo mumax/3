@@ -11,7 +11,7 @@ const KERNMULRSYMM2DX = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000172d_00000000-9_kernmulrsymm2dx.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021dc_00000000-9_kernmulrsymm2dx.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm2dx.cu"
 
 .visible .entry kernmulRSymm2Dx(
@@ -79,10 +79,10 @@ const KERNMULRSYMM2DX = `
 	.loc 2 37 1
 	ld.global.f32 	%f3, [%rd6];
 	.loc 2 42 1
-	mul.ftz.f32 	%f4, %f2, %f3;
+	mul.f32 	%f4, %f2, %f3;
 	st.global.f32 	[%rd8], %f4;
 	.loc 2 43 1
-	mul.ftz.f32 	%f5, %f1, %f3;
+	mul.f32 	%f5, %f1, %f3;
 	st.global.f32 	[%rd10], %f5;
 
 BB0_2:

@@ -11,7 +11,7 @@ const LLGTORQUE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001741_00000000-9_llgtorque.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021f3_00000000-9_llgtorque.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/llgtorque.cu"
 
 .visible .entry llgtorque(
@@ -83,54 +83,54 @@ const LLGTORQUE = `
 	.loc 2 11 1
 	ld.global.f32 	%f3, [%rd21];
 	.loc 2 19 1
-	mul.ftz.f32 	%f4, %f3, %f2;
+	mul.f32 	%f4, %f3, %f2;
 	.loc 2 15 1
 	ld.global.f32 	%f5, [%rd24];
 	.loc 2 12 1
 	ld.global.f32 	%f6, [%rd22];
 	.loc 2 19 1
-	mul.ftz.f32 	%f7, %f5, %f6;
-	sub.ftz.f32 	%f8, %f4, %f7;
+	mul.f32 	%f7, %f5, %f6;
+	sub.f32 	%f8, %f4, %f7;
 	.loc 2 10 1
 	ld.global.f32 	%f9, [%rd20];
 	.loc 2 14 1
 	ld.global.f32 	%f10, [%rd23];
 	.loc 2 20 1
-	mul.ftz.f32 	%f11, %f10, %f6;
-	mul.ftz.f32 	%f12, %f2, %f9;
-	sub.ftz.f32 	%f13, %f11, %f12;
+	mul.f32 	%f11, %f10, %f6;
+	mul.f32 	%f12, %f2, %f9;
+	sub.f32 	%f13, %f11, %f12;
 	.loc 2 21 1
-	mul.ftz.f32 	%f14, %f9, %f5;
-	mul.ftz.f32 	%f15, %f10, %f3;
-	sub.ftz.f32 	%f16, %f14, %f15;
+	mul.f32 	%f14, %f9, %f5;
+	mul.f32 	%f15, %f10, %f3;
+	sub.f32 	%f16, %f14, %f15;
 	.loc 2 24 1
-	mul.ftz.f32 	%f17, %f13, %f6;
-	mul.ftz.f32 	%f18, %f16, %f3;
-	sub.ftz.f32 	%f19, %f17, %f18;
+	mul.f32 	%f17, %f13, %f6;
+	mul.f32 	%f18, %f16, %f3;
+	sub.f32 	%f19, %f17, %f18;
 	.loc 2 25 1
-	mul.ftz.f32 	%f20, %f9, %f16;
-	mul.ftz.f32 	%f21, %f8, %f6;
-	sub.ftz.f32 	%f22, %f20, %f21;
+	mul.f32 	%f20, %f9, %f16;
+	mul.f32 	%f21, %f8, %f6;
+	sub.f32 	%f22, %f20, %f21;
 	.loc 2 26 1
-	mul.ftz.f32 	%f23, %f8, %f3;
-	mul.ftz.f32 	%f24, %f13, %f9;
-	sub.ftz.f32 	%f25, %f23, %f24;
+	mul.f32 	%f23, %f8, %f3;
+	mul.f32 	%f24, %f13, %f9;
+	sub.f32 	%f25, %f23, %f24;
 	.loc 2 28 1
-	fma.rn.ftz.f32 	%f26, %f1, %f1, 0f3F800000;
-	rcp.approx.ftz.f32 	%f27, %f26;
+	fma.rn.f32 	%f26, %f1, %f1, 0f3F800000;
+	rcp.rn.f32 	%f27, %f26;
 	.loc 2 29 1
-	mul.ftz.f32 	%f28, %f19, %f1;
-	mul.ftz.f32 	%f29, %f27, %f28;
+	mul.f32 	%f28, %f19, %f1;
+	mul.f32 	%f29, %f27, %f28;
 	add.s64 	%rd26, %rd3, %rd19;
 	st.global.f32 	[%rd26], %f29;
 	.loc 2 30 1
-	mul.ftz.f32 	%f30, %f22, %f1;
-	mul.ftz.f32 	%f31, %f27, %f30;
+	mul.f32 	%f30, %f22, %f1;
+	mul.f32 	%f31, %f27, %f30;
 	add.s64 	%rd27, %rd2, %rd19;
 	st.global.f32 	[%rd27], %f31;
 	.loc 2 31 1
-	mul.ftz.f32 	%f32, %f25, %f1;
-	mul.ftz.f32 	%f33, %f27, %f32;
+	mul.f32 	%f32, %f25, %f1;
+	mul.f32 	%f33, %f27, %f32;
 	add.s64 	%rd28, %rd1, %rd19;
 	st.global.f32 	[%rd28], %f33;
 

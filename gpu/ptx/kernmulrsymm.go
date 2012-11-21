@@ -11,7 +11,7 @@ const KERNMULRSYMM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000173c_00000000-9_kernmulrsymm.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021e8_00000000-9_kernmulrsymm.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm.cu"
 
 .visible .entry kernmulRSymm(
@@ -154,34 +154,34 @@ BB0_11:
 
 BB0_13:
 	.loc 2 34 1
-	mul.ftz.f32 	%f25, %f3, %f48;
-	fma.rn.ftz.f32 	%f26, %f1, %f8, %f25;
-	fma.rn.ftz.f32 	%f27, %f5, %f49, %f26;
+	mul.f32 	%f25, %f3, %f48;
+	fma.rn.f32 	%f26, %f1, %f8, %f25;
+	fma.rn.f32 	%f27, %f5, %f49, %f26;
 	st.global.f32 	[%rd9], %f27;
 	.loc 2 35 1
-	mul.ftz.f32 	%f28, %f4, %f48;
-	fma.rn.ftz.f32 	%f29, %f2, %f8, %f28;
-	fma.rn.ftz.f32 	%f30, %f6, %f49, %f29;
+	mul.f32 	%f28, %f4, %f48;
+	fma.rn.f32 	%f29, %f2, %f8, %f28;
+	fma.rn.f32 	%f30, %f6, %f49, %f29;
 	st.global.f32 	[%rd10], %f30;
 	.loc 2 37 1
-	mul.ftz.f32 	%f31, %f3, %f52;
-	fma.rn.ftz.f32 	%f32, %f1, %f48, %f31;
-	fma.rn.ftz.f32 	%f33, %f5, %f50, %f32;
+	mul.f32 	%f31, %f3, %f52;
+	fma.rn.f32 	%f32, %f1, %f48, %f31;
+	fma.rn.f32 	%f33, %f5, %f50, %f32;
 	st.global.f32 	[%rd11], %f33;
 	.loc 2 38 1
-	mul.ftz.f32 	%f34, %f4, %f52;
-	fma.rn.ftz.f32 	%f35, %f2, %f48, %f34;
-	fma.rn.ftz.f32 	%f36, %f6, %f50, %f35;
+	mul.f32 	%f34, %f4, %f52;
+	fma.rn.f32 	%f35, %f2, %f48, %f34;
+	fma.rn.f32 	%f36, %f6, %f50, %f35;
 	st.global.f32 	[%rd12], %f36;
 	.loc 2 40 1
-	mul.ftz.f32 	%f37, %f3, %f50;
-	fma.rn.ftz.f32 	%f38, %f1, %f49, %f37;
-	fma.rn.ftz.f32 	%f39, %f5, %f51, %f38;
+	mul.f32 	%f37, %f3, %f50;
+	fma.rn.f32 	%f38, %f1, %f49, %f37;
+	fma.rn.f32 	%f39, %f5, %f51, %f38;
 	st.global.f32 	[%rd13], %f39;
 	.loc 2 41 1
-	mul.ftz.f32 	%f40, %f4, %f50;
-	fma.rn.ftz.f32 	%f41, %f2, %f49, %f40;
-	fma.rn.ftz.f32 	%f42, %f6, %f51, %f41;
+	mul.f32 	%f40, %f4, %f50;
+	fma.rn.f32 	%f41, %f2, %f49, %f40;
+	fma.rn.f32 	%f42, %f6, %f51, %f41;
 	st.global.f32 	[%rd14], %f42;
 
 BB0_14:

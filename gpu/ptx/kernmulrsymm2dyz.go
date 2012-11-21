@@ -11,7 +11,7 @@ const KERNMULRSYMM2DYZ = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001737_00000000-9_kernmulrsymm2dyz.cpp3.i"
+	.file	1 "/tmp/tmpxft_000021e5_00000000-9_kernmulrsymm2dyz.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm2dyz.cu"
 
 .visible .entry kernmulRSymm2Dyz(
@@ -75,7 +75,7 @@ const KERNMULRSYMM2DYZ = `
 	mul.wide.s32 	%rd11, %r4, 4;
 	add.s64 	%rd12, %rd3, %rd11;
 	ld.global.f32 	%f4, [%rd12];
-	neg.ftz.f32 	%f19, %f4;
+	neg.f32 	%f19, %f4;
 	mov.u32 	%r33, %r4;
 	bra.uni 	BB0_4;
 
@@ -117,20 +117,20 @@ BB0_4:
 	.loc 2 57 1
 	ld.global.f32 	%f10, [%rd22];
 	.loc 2 60 1
-	mul.ftz.f32 	%f11, %f10, %f19;
-	fma.rn.ftz.f32 	%f12, %f8, %f9, %f11;
+	mul.f32 	%f11, %f10, %f19;
+	fma.rn.f32 	%f12, %f8, %f9, %f11;
 	st.global.f32 	[%rd19], %f12;
 	.loc 2 61 1
-	mul.ftz.f32 	%f13, %f7, %f19;
-	fma.rn.ftz.f32 	%f14, %f6, %f9, %f13;
+	mul.f32 	%f13, %f7, %f19;
+	fma.rn.f32 	%f14, %f6, %f9, %f13;
 	st.global.f32 	[%rd21], %f14;
 	.loc 2 62 1
-	mul.ftz.f32 	%f15, %f10, %f5;
-	fma.rn.ftz.f32 	%f16, %f8, %f19, %f15;
+	mul.f32 	%f15, %f10, %f5;
+	fma.rn.f32 	%f16, %f8, %f19, %f15;
 	st.global.f32 	[%rd22], %f16;
 	.loc 2 63 1
-	mul.ftz.f32 	%f17, %f7, %f5;
-	fma.rn.ftz.f32 	%f18, %f6, %f19, %f17;
+	mul.f32 	%f17, %f7, %f5;
+	fma.rn.f32 	%f18, %f6, %f19, %f17;
 	st.global.f32 	[%rd23], %f18;
 
 BB0_5:

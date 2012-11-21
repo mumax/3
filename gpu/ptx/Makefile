@@ -6,8 +6,8 @@ NVCC = nvcc\
 	-gencode arch=compute_30,code=sm_30\
 	--compiler-options -Werror\
 	--compiler-options -Wall\
-	--use_fast_math\
 	-Xptxas\
+	-O3\
 	-v\
 
 all: $(GOFILES) install

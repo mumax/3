@@ -115,5 +115,6 @@ func (s Slice) Device() safe.Float32s {
 }
 
 func (s Slice) Len() int { return s.len_ }
+func (s Slice)MemType() MemType { return s.flag }
 
 const SizeofFloat32 = 4

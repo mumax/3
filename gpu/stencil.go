@@ -22,8 +22,8 @@ func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32) *Stencil {
 }
 
 func (s *Stencil) Exec() {
-	//N := s.out.NCell()
-	//CalcStencil(s.out.Uni.Device(), s.in.ReadNext(N).Device(), s.out.Mesh, &s.weight, s.stream)
+	N := s.out.NCell()
+	CalcStencil(s.out.UnsafeData().Device(), s.in.UnsafeData().Device(), s.out.Mesh, &s.weight, s.stream)
 	//s.out.WriteDone()
 	//s.in.ReadDone()
 }

@@ -41,12 +41,12 @@ var note = "You can leave a note here."
 
 func noteHandler(w http.ResponseWriter, r *http.Request) {
 	//title := r.URL.Path[len("/note"):]
-	fmt.Fprintf(w, "<html>"+
-		"<form action=\"/save/\" method=\"POST\">"+
-		"<textarea name=\"body\">%s</textarea><br>"+
-		"<input type=\"submit\" value=\"Save\">"+
-		"</form>"+
-		"</html>",
+	fmt.Fprintf(w, `<html>
+		<form action="/save/" method="POST">
+		<textarea name="body">%s</textarea><br/>
+		<input type="submit" value="Save">
+		</form>
+		</html>`,
 		note)
 }
 

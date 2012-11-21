@@ -44,6 +44,11 @@ unittest:
 
 gccgotest: gccgo
 	go test -i -compiler=$(gccgo) $(PKGS)
+	go test -compiler=$(gccgo) $(PKGS)
+
+.PHONY: bench
+bench: 
+	go test -test.bench $(PKGS)
 
 .PHONY: clean
 clean:

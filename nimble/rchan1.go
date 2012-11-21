@@ -14,6 +14,13 @@ func (c Chan1) NewReader() RChan1 {
 	return RChan1{c.Info, c.slice, c.mutex.MakeRMutex()}
 }
 
+func (c RChan1) UnsafeData() Slice {
+	if c.mutex.rw.isLocked() {
+		panic("unsafearray: mutex is locked")
+	}
+	return c.slice
+}
+
 // ReadNext locks and returns a slice of length n for 
 // reading the next n elements from the Chan.
 // When done, ReadDone() should be called .

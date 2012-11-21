@@ -3,6 +3,10 @@ package nimble
 // TODO: can be completely absorbed in Chan1
 // if we use mutex interface Next(), Done()
 
+import (
+	"code.google.com/p/nimble-cube/core"
+)
+
 // Read-only Chan.
 type RChan1 struct {
 	*Info
@@ -19,6 +23,9 @@ func (c RChan1) UnsafeData() Slice {
 		panic("unsafearray: mutex is locked")
 	}
 	return c.slice
+}
+func (c RChan1) UnsafeArray() [][][]float32 {
+	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
 }
 
 // ReadNext locks and returns a slice of length n for 

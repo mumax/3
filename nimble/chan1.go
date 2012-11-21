@@ -31,6 +31,10 @@ func (c Chan1) UnsafeData() Slice {
 	return c.slice
 }
 
+func (c Chan1) UnsafeArray() [][][]float32 {
+	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
+}
+
 func asChan1(buffer Slice, tag, unit string, m *Mesh) Chan1 {
 	core.AddQuant(tag)
 	info := newInfo(tag, unit, m)

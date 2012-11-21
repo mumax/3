@@ -6,8 +6,8 @@ import (
 )
 
 type Exchange6 struct {
-	in          nimble.RChan3
-	out         nimble.Chan3
+	in          nimble.RChanN
+	out         nimble.ChanN
 	aex_reduced float64
 }
 
@@ -27,14 +27,14 @@ func (e *Exchange6) Run() {
 	}
 }
 
-func NewExchange6(tag, unit string, memType nimble.MemType, m nimble.RChan3, aex_reduced float64) *Exchange6 {
-	out := nimble.MakeChan3(tag, unit, m.Mesh(), memType, 0)
+func NewExchange6(tag, unit string, memType nimble.MemType, m nimble.RChanN, aex_reduced float64) *Exchange6 {
+	out := nimble.MakeChanN(3, tag, unit, m.Mesh(), memType, 0)
 	ex := &Exchange6{m, out, aex_reduced}
 	nimble.Stack(ex)
 	return ex
 }
 
-func (e *Exchange6) Output() nimble.Chan3 {
+func (e *Exchange6) Output() nimble.ChanN {
 	return e.out
 }
 

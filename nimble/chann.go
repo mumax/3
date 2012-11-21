@@ -44,10 +44,10 @@ func (c ChanN) UnsafeData() []Slice {
 	return s
 }
 
-func (c ChanN) Chan3() Chan3 {
-	core.Assert(c.NComp() == 3)
-	return Chan3{c.comp}
-}
+//func (c ChanN) Chan3() Chan3 {
+//	core.Assert(c.NComp() == 3)
+//	return Chan3{c.comp}
+//}
 
 func (c ChanN) Chan1() Chan1 {
 	core.Assert(c.NComp() == 1)

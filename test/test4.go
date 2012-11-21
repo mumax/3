@@ -19,7 +19,7 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
-	m := nimble.MakeChan3("m", "", mesh, nimble.UnifiedMemory, 0)
+	m := nimble.MakeChanN(3, "m", "", mesh, nimble.UnifiedMemory, 0)
 	fmt.Println("m:", m)
 
 	acc := 8
@@ -32,10 +32,10 @@ func main() {
 	Bex := exch.Output()
 
 	//	heff := MakeChan3("Heff", "", mesh)
-	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output().Chan3()
+	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
 	const alpha = 1
-	torque := nimble.MakeChan3("τ", "", mesh, nimble.UnifiedMemory, 1)
+	torque := nimble.MakeChanN(3, "τ", "", mesh, nimble.UnifiedMemory, 1)
 	nimble.Stack(cpu.NewLLGTorque(torque, m.NewReader(), Beff.NewReader(), alpha))
 
 	const dt = 100e-15

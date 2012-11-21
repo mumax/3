@@ -8,20 +8,20 @@ import (
 
 // Euler solver.
 type Euler struct {
-	y    nimble.Chan3
-	dy   nimble.RChan3
+	y    nimble.ChanN
+	dy   nimble.RChanN
 	dt   float32
 	init bool
 }
 
-func NewEuler(y nimble.Chan3, dy nimble.RChan3, dt, multiplier float64) *Euler {
+func NewEuler(y nimble.ChanN, dy nimble.RChanN, dt, multiplier float64) *Euler {
 	return &Euler{y, dy, float32(dt * multiplier), false}
 }
 
 func (e *Euler) Steps(steps int) {
 	core.Log("euler solver:", steps, "steps")
 	n := core.Prod(e.y.Mesh().Size())
-	block := e.y.ChanN().BufLen()
+	block := e.y.BufLen()
 
 	// Send out initial value
 	if !e.init {

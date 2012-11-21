@@ -50,6 +50,8 @@ func (c Chan1) BufLen() int { return c.slice.Len() }
 
 func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.slice.Len()) }
 
+
+
 //func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 //	c.mutex.WriteDelta(Δstart, Δstop)
 //	a, b := c.mutex.WRange()

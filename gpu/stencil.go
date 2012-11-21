@@ -1,16 +1,16 @@
 package gpu
 
-import(
+import (
 	"code.google.com/p/nimble-cube/nimble"
 )
 
-type Stencil struct{
-	in nimble.RChan1
-	out nimble.Chan1
+type Stencil struct {
+	in     nimble.RChan1
+	out    nimble.Chan1
 	weight [7]float32
 }
 
-func(s*Stencil)Exec(){
+func (s *Stencil) Exec() {
 
 }
 
@@ -18,10 +18,6 @@ func(s*Stencil)Exec(){
 //	r := in.ChanN().Chan1().NewReader() // TODO: buffer
 //	w := nimble.MakeChan1(tag, unit, r.Mesh, in.ChanN())
 //}
-
-
-
-
 
 //import (
 //	"github.com/barnex/cuda5/cu"

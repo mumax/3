@@ -7,20 +7,20 @@ import (
 
 // LLG Torque / gamma
 type LLGTorque struct {
-	torque nimble.Chan3
-	m, b   nimble.RChan3
+	torque nimble.ChanN
+	m, b   nimble.RChanN
 	alpha  float32
 	bExt   Vector
 }
 
-func NewLLGTorque(torque nimble.Chan3, m, B nimble.RChan3, alpha float32) *LLGTorque {
+func NewLLGTorque(torque nimble.ChanN, m, B nimble.RChanN, alpha float32) *LLGTorque {
 	core.Assert(torque.Mesh().Size() == m.Mesh().Size())
 	core.Assert(torque.Mesh().Size() == B.Mesh().Size())
 	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}}
 }
 
 func (r *LLGTorque) Run() {
-	n := r.torque.ChanN().BufLen()
+	n := r.torque.BufLen()
 	for {
 		M := Host3(r.m.ReadNext(n))
 		B := Host3(r.b.ReadNext(n))
@@ -58,7 +58,8 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 	}
 }
 
-func Host3(s [3]nimble.Slice) [3][]float32 {
+func Host3(s []nimble.Slice) [3][]float32 {
+	core.Assert(len(s)==3)
 	return [3][]float32{s[0].Host(), s[1].Host(), s[2].Host()}
 }
 

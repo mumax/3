@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/nimble"
+	"github.com/barnex/cuda5/safe"
 )
 
 type Stencil struct {
@@ -10,14 +11,21 @@ type Stencil struct {
 	weight [7]float32
 }
 
-func (s *Stencil) Exec() {
-
-}
-
-func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32)*Stencil{
+func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32) *Stencil {
 	r := in.ChanN().Chan1().NewReader() // TODO: buffer
 	w := nimble.MakeChan1(tag, unit, r.Mesh, in.MemType(), -1)
 	return &Stencil{r, w, weight}
+}
+
+func (s *Stencil) Exec() {
+	N := s.out.NCell()
+	CalcStencil(s.out.WriteNext(N).Device(), s.in.ReadNext(N).Device(), &s.weight)
+	s.out.WriteDone()
+	s.in.ReadDone()
+}
+
+func CalcStencil(out, in safe.Float32s, weight *[7]float32) {
+
 }
 
 //import (

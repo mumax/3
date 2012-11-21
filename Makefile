@@ -40,6 +40,7 @@ unittest:
 
 6gtest: 6g
 	go test -i $(PKGS) 
+	go test $(PKGS) 
 
 gccgotest: gccgo
 	go test -i -compiler=$(gccgo) $(PKGS)

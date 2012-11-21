@@ -23,7 +23,7 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 
 func asChan1(buffer Slice, tag, unit string, m *Mesh) Chan1 {
 	core.AddQuant(tag)
-	info := NewInfo(tag, unit, m)
+	info := newInfo(tag, unit, m)
 	return Chan1{info, buffer, newRWMutex(buffer.Len(), tag)}
 }
 

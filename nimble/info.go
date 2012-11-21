@@ -7,7 +7,7 @@ type Info struct {
 	*Mesh
 }
 
-func NewInfo(tag, unit string, m *Mesh) *Info {
+func newInfo(tag, unit string, m *Mesh) *Info {
 	return &Info{tag, unit, m}
 }
 

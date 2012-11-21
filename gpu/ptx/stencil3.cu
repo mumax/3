@@ -13,6 +13,9 @@ inline __device__ int clamp(int i, int N){
 	return min( max(i, 0) , N-1 );
 }
 
+// 3D array indexing
+#define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
+
 extern "C" __global__ void
 stencil3(float* dst, float* src, 
           float w0, float wl, float wr, float wu, float wd, float wt, float wb,
@@ -27,68 +30,16 @@ stencil3(float* dst, float* src,
 
 	for(int i=0; i<N0; i++){
 
-  		int I = i*N1*N2 + j*N2 + k; // linear array index
-		float H = w0 * src[I];
+		float H = w0 * src[idx(i,j,k)];
 
-    	// neighbors in I direction
-      	int idx = clamp(i-1, N0)*N1*N2 + j*N2 + k;
-		H += wt*src[idx];
+		H += wt*src[idx(clamp(i+1,N0), j, k)];
+		H += wb*src[idx(clamp(i-1,N0), j, k)];
+		H += wu*src[idx(i, clamp(j+1,N1), k)];
+		H += wd*src[idx(i, clamp(j-1,N1), k)];
+		H += wr*src[idx(i, j, clamp(k+1,N2))];
+		H += wl*src[idx(i, j, clamp(k-1,N2))];
 
-      	idx = clamp(i+1, N0)*N1*N2 + j*N2 + k;
-		H += wb*src[idx]; 
-
-		//// neighbors in J direction
-		//if (j-1 >= 0){
-		//	idx = i*N1*N2 + (j-1)*N2 + k;
-		//} else {
-		//	if(wrap1){
-		//		idx = i*N1*N2 + (N1-1)*N2 + k;
-		//	}else{
-		//  		idx = I;
-		//	}
-		//}
-		//m1 = m[idx];
-		//
-		//if (j+1 < N1){
-		//  idx =  i*N1*N2 + (j+1)*N2 + k;
-		//} else {
-		//	if(wrap1){
-		//		idx = i*N1*N2 + (0)*N2 + k;
-		//	}else{
-		//  		idx = I;
-		//	}
-		//} 
-		//m2 = m[idx];
-		//
-		//H += fac1 * ((m1-m0) + (m2-m0));
-
-		//// neighbors in K direction
-		//if (k-1 >= 0){
-		//	idx = i*N1*N2 + j*N2 + (k-1);
-		//} else {
-		//	if(wrap2){
-		//		idx = i*N1*N2 + j*N2 + (N2-1);
-		//	}else{
-		//  		idx = I;
-		//	}
-		//}
-		//m1 = m[idx];
-		//
-		//if (k+1 < N2){
-		//  idx =  i*N1*N2 + j*N2 + (k+1);
-		//} else {
-		//	if(wrap2){
-		//		idx = i*N1*N2 + j*N2 + (0);
-		//	}else{
-		//  		idx = I;
-		//	}
-		//} 
-		//m2 = m[idx];
-		//
-		//H += fac2 * ((m1-m0) + (m2-m0));
-
-		// Write back to global memory
-		dst[I] += H;
+		dst[idx(i,j,k)] += H;
 	}
-} 
+}
 

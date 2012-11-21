@@ -35,6 +35,7 @@ func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
 func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
 func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 func (c ChanN) MemType() MemType     { return c.comp[0].slice.flag }
+func (c ChanN) ChanN() ChanN     { return c } // implements Chan iface
 
 func (c ChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())

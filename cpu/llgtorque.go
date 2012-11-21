@@ -59,7 +59,7 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 }
 
 func Host3(s []nimble.Slice) [3][]float32 {
-	core.Assert(len(s)==3)
+	core.Assert(len(s) == 3)
 	return [3][]float32{s[0].Host(), s[1].Host(), s[2].Host()}
 }
 

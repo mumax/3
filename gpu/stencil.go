@@ -28,6 +28,10 @@ func (s *Stencil) Exec() {
 	//s.in.ReadDone()
 }
 
+func (s *Stencil) Output() nimble.Chan1 {
+	return s.out
+}
+
 func CalcStencil(dst, src safe.Float32s, mesh *nimble.Mesh, weight *[7]float32, stream cu.Stream) {
 	core.Assert(dst.Len() == src.Len() && src.Len() == mesh.NCell())
 

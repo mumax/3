@@ -130,3 +130,16 @@ func (m *rwMutex) canWLock(a, b int64) (ok bool) {
 	}
 	return true
 }
+
+func (m *rwMutex) isLocked() bool {
+	want := m.absA
+	if m.absB != want {
+		return true
+	}
+	for i := range m.readers {
+		if m.readers[i].absC != want || m.readers[i].absD != want {
+			return true
+		}
+	}
+	return false
+}

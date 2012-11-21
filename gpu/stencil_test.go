@@ -14,8 +14,17 @@ func TestStencil(t *testing.T) {
 	)
 
 	mesh := nimble.NewMesh(N0, N1, N2, c, c, c)
-	in := nimble.MakeChan1("in", "", mesh, nimble.UnifiedMemory, 0)
-	w := [7]float32{1}
-	stencil := NewStencil("out", "", in, w)
+	inCh := nimble.MakeChan1("in", "", mesh, nimble.UnifiedMemory, 0)
+	w := [7]float32{2}
+	stencil := NewStencil("out", "", inCh, w)
+
+	in := inCh.UnsafeData().Host()
+	in[0] = 3
 	stencil.Exec()
+	out := stencil.Output().UnsafeData().Host()
+	const want = 6
+	got := out[0]
+	if got != want {
+		t.Fatalf("expected: %v, got: %v", want, got)
+	}
 }

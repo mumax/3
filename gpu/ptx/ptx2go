@@ -3,9 +3,13 @@ ptxfile=$1
 gofile=$2
 varname=$3
 tmpfile=$gofile.tmp
+VARNAME="${varname^^}"
 
 echo "package ptx" > $tmpfile
-echo "const" "${varname^^}" "=" "\`" >> $tmpfile
+echo "//This file is auto-generated. Editing is futile." >>$tmpfile
+echo "" >>$tmpfile
+echo "func init(){ptxcode[\""$varname"\"]=" $VARNAME "}">> $tmpfile
+echo "const" $VARNAME "=" "\`" >> $tmpfile
 cat $tmpfile $ptxfile > $gofile
 rm $tmpfile
 echo "\`" >> $gofile

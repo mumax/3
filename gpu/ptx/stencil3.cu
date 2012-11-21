@@ -1,9 +1,9 @@
 // Accumulating 3rd oder 3D stencil operation.
 // 	dst[i,j,k] += w0*src[i,j,k] 
-// 	            + wl*src[i,j,k-1] + wr*src[i,j,k+1]
-// 	            + wu*src[i,j-1,k] + wd*src[i,j+1,k]
-// 	            + wt*src[i-1,j,k] + wb*src[i-1,j,k]
-// (l,r,u,d,t,b means left, right, up, down, top, bottom)
+// 	            + wr*src[i,j,k+1] + wl*src[i,j,k-1]
+// 	            + wu*src[i,j+1,k] + wd*src[i,j-1,k]
+// 	            + wt*src[i+1,j,k] + wb*src[i-1,j,k]
+// (r,l,u,d,t,b means right, left, up, down, top, bottom)
 // Clamping boundary conditions.
 // This is a "naive" implementation perfect for verifying
 // and benchmarking implementations with shared memory.

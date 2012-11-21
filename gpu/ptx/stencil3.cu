@@ -1,9 +1,11 @@
 // Accumulating 3rd oder 3D stencil operation.
+// 
 // 	dst[i,j,k] += w0*src[i,j,k] 
 // 	            + wr*src[i,j,k+1] + wl*src[i,j,k-1]
 // 	            + wu*src[i,j+1,k] + wd*src[i,j-1,k]
 // 	            + wt*src[i+1,j,k] + wb*src[i-1,j,k]
-// (r,l,u,d,t,b means right, left, up, down, top, bottom)
+// 
+// (r,l,u,d,t,b mean right, left, up, down, top, bottom)
 // Clamping boundary conditions.
 // This is a "naive" implementation perfect for verifying
 // and benchmarking implementations with shared memory.
@@ -32,7 +34,7 @@ stencil3(float* dst, float* src,
 	for(int i=0; i<N0; i++){
 
 		float H = w0 * src[idx(i,j,k)];
-
+		// TODO: terms _can_ be re-ordered to make laplacians more stable.
 		H += wt*src[idx(clamp(i+1,N0), j, k)];
 		H += wb*src[idx(clamp(i-1,N0), j, k)];
 		H += wu*src[idx(i, clamp(j+1,N1), k)];

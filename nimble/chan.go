@@ -6,7 +6,8 @@ package nimble
 // is duplicated to all readers.
 type Chan interface {
 	ChanN() ChanN
+	MemType() MemType
 }
 
-// TODO: get rid of chan1, chan3, always arb. num comp. ?
+// TODO: get rid of chan1, always arb. num comp. ?
 // TODO: RChan: ReadChan

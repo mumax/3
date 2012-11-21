@@ -14,10 +14,11 @@ func (s *Stencil) Exec() {
 
 }
 
-//func NewStencil(in nimble.Chan, weight [7]float32)*Stencil{
-//	r := in.ChanN().Chan1().NewReader() // TODO: buffer
-//	w := nimble.MakeChan1(tag, unit, r.Mesh, in.ChanN())
-//}
+func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32)*Stencil{
+	r := in.ChanN().Chan1().NewReader() // TODO: buffer
+	w := nimble.MakeChan1(tag, unit, r.Mesh, in.MemType(), -1)
+	return &Stencil{r, w, weight}
+}
 
 //import (
 //	"github.com/barnex/cuda5/cu"

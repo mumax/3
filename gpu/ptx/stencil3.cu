@@ -7,6 +7,7 @@
 // Clamping boundary conditions.
 // This is a "naive" implementation perfect for verifying
 // and benchmarking implementations with shared memory.
+// TODO: wrap
 
 // clamps i between 0 and N-1
 inline __device__ int clamp(int i, int N){

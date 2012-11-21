@@ -11,7 +11,7 @@ type Chan1 struct {
 	mutex *rwMutex
 }
 
-func makeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
+func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
 	N := -666
 	if bufBlocks < 1 { // means auto
 		N = m.NCell() // buffer all

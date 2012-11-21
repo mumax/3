@@ -12,7 +12,7 @@ type ChanN struct {
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
 	c := make([]Chan1, nComp)
 	for i := range c {
-		c[i] = makeChan1(tag, unit, m, memType, bufBlocks)
+		c[i] = MakeChan1(tag, unit, m, memType, bufBlocks)
 	}
 	return ChanN{c}
 }

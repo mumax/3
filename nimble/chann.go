@@ -9,6 +9,7 @@ type ChanN struct {
 	comp []Chan1
 }
 
+// TODO: re-use same *Info for all chan1's, tag for components?
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
 	c := make([]Chan1, nComp)
 	for i := range c {
@@ -35,7 +36,7 @@ func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
 func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
 func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 func (c ChanN) MemType() MemType     { return c.comp[0].slice.flag }
-func (c ChanN) ChanN() ChanN     { return c } // implements Chan iface
+func (c ChanN) ChanN() ChanN         { return c } // implements Chan iface
 
 func (c ChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())

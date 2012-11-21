@@ -9,6 +9,8 @@ import (
 )
 
 // Slice of float32, accessible by CPU, GPU or both.
+// TODO: could be replaced by []float32, provided &slice[0]
+// is taken by dedicated unsafe function.
 type Slice struct {
 	ptr  unsafe.Pointer
 	len_ int

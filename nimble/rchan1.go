@@ -1,5 +1,8 @@
 package nimble
 
+// TODO: can be completely absorbed in Chan1
+// if we use mutex interface Next(), Done()
+
 // Read-only Chan.
 type RChan1 struct {
 	*Info

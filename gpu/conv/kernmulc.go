@@ -3,13 +3,10 @@ package conv
 import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu"
-	"code.google.com/p/nimble-cube/gpu/ptx"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
 )
-
-var kernMulCCode cu.Function
 
 // General kernel multiplication with general complex kernel.
 // (stored in interleaved format).
@@ -18,10 +15,7 @@ func kernMulC(fftM [3]safe.Complex64s, K [3][3]safe.Float32s, stream cu.Stream) 
 
 	core.Assert(2*fftM[0].Len() == K[0][0].Len())
 
-	if kernMulCCode == 0 {
-		mod := cu.ModuleLoadData(ptx.KERNMULC) // TODO: target higher SM's as well.
-		kernMulCCode = mod.GetFunction("kernmulC")
-	}
+	kernMulCCode := gpu.PTXLoad("kernmulC")
 
 	N := fftM[0].Len()
 	gridDim, blockDim := gpu.Make1DConf(N)

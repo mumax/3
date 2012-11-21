@@ -2,7 +2,7 @@ package ptx
 
 //This file is auto-generated. Editing is futile.
 
-func init() { ptxcode["kernmulrsymm"] = KERNMULRSYMM }
+func init() { Code["kernmulrsymm"] = KERNMULRSYMM }
 
 const KERNMULRSYMM = `
 //
@@ -15,7 +15,7 @@ const KERNMULRSYMM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002cc9_00000000-9_kernmulrsymm.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002f15_00000000-9_kernmulrsymm.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm.cu"
 
 .visible .entry kernmulRSymm(

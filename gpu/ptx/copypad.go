@@ -2,7 +2,7 @@ package ptx
 
 //This file is auto-generated. Editing is futile.
 
-func init() { ptxcode["copypad"] = COPYPAD }
+func init() { Code["copypad"] = COPYPAD }
 
 const COPYPAD = `
 //
@@ -15,7 +15,7 @@ const COPYPAD = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002cba_00000000-9_copypad.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002f05_00000000-9_copypad.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/copypad.cu"
 
 .visible .entry copypad(

@@ -8,7 +8,7 @@ VARNAME="${varname^^}"
 echo "package ptx" > $tmpfile
 echo "//This file is auto-generated. Editing is futile." >>$tmpfile
 echo "" >>$tmpfile
-echo "func init(){ptxcode[\""$varname"\"]=" $VARNAME "}">> $tmpfile
+echo "func init(){Code[\""$varname"\"]=" $VARNAME "}">> $tmpfile
 echo "const" $VARNAME "=" "\`" >> $tmpfile
 cat $tmpfile $ptxfile > $gofile
 rm $tmpfile

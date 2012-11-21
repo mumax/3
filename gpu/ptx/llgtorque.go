@@ -2,7 +2,7 @@ package ptx
 
 //This file is auto-generated. Editing is futile.
 
-func init() { ptxcode["llgtorque"] = LLGTORQUE }
+func init() { Code["llgtorque"] = LLGTORQUE }
 
 const LLGTORQUE = `
 //
@@ -15,7 +15,7 @@ const LLGTORQUE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002cd3_00000000-9_llgtorque.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002f21_00000000-9_llgtorque.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/llgtorque.cu"
 
 .visible .entry llgtorque(

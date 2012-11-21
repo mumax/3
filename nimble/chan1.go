@@ -21,8 +21,8 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 	return asChan1(MakeSlice(N, memType), tag, unit, m)
 }
 
-func(c Chan1)ChanN()ChanN{ return ChanN{[]Chan1{c}} }
-func(c Chan1)MemType()MemType{ return c.slice.MemType()}
+func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
+func (c Chan1) MemType() MemType { return c.slice.MemType() }
 
 func asChan1(buffer Slice, tag, unit string, m *Mesh) Chan1 {
 	core.AddQuant(tag)

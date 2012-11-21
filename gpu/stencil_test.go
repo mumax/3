@@ -22,6 +22,8 @@ func TestStencil(t *testing.T) {
 	in := inCh.UnsafeArray()
 	in[x][y][z] = 3
 	stencil.Exec()
+	stencil.Exec()
+	stencil.Exec()
 	out := stencil.Output().UnsafeArray()
 	const want = 6
 	got := out[x][y][z+1]

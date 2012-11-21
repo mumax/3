@@ -15,6 +15,7 @@ type Stencil struct {
 	stream cu.Stream
 }
 
+// Stencil adds the stencil result to out
 func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32) *Stencil {
 	r := in.ChanN().Chan1().NewReader() // TODO: buffer
 	w := nimble.MakeChan1(tag, unit, r.Mesh, in.MemType(), -1)
@@ -22,7 +23,10 @@ func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32) *Stencil {
 }
 
 func (s *Stencil) Exec() {
-	CalcStencil(s.out.UnsafeData().Device(), s.in.UnsafeData().Device(), s.out.Mesh, &s.weight, s.stream)
+	dst := s.out.UnsafeData().Device()
+	dst.Memset(0)
+	src := s.in.UnsafeData().Device()
+	CalcStencil(dst, src, s.out.Mesh, &s.weight, s.stream)
 }
 
 func (s *Stencil) Output() nimble.Chan1 {

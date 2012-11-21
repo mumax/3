@@ -1,5 +1,9 @@
 package gpu
 
+//func NewExchange6(tag string, m nimble.ChanN, aex_reduced float64) *Stencil{
+//
+//}
+
 //import (
 //	"github.com/barnex/cuda5/cu"
 //	"github.com/barnex/cuda5/safe"

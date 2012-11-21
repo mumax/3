@@ -47,8 +47,12 @@ gccgotest: gccgo
 	go test -compiler=$(gccgo) $(PKGS)
 
 .PHONY: bench
-bench: 
+bench: 6g
 	go test -test.bench $(PKGS)
+
+.PHONY: gccgobench
+gccgobench: gccgo
+	go test -compiler=$(gccgo) -test.bench $(PKGS)
 
 .PHONY: clean
 clean:

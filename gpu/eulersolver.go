@@ -21,6 +21,7 @@ func NewEuler(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Euler {
 }
 
 func (e *Euler) Steps(steps int) {
+	LockCudaThread()
 	core.Log("GPU euler solver:", steps, "steps")
 	n := e.y.Mesh().NCell()
 

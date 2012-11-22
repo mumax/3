@@ -1,10 +1,10 @@
 package gpu
 
 import (
-	"github.com/barnex/cuda5/cu"
-	"github.com/barnex/cuda5/safe"
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
+	"github.com/barnex/cuda5/cu"
+	"github.com/barnex/cuda5/safe"
 )
 
 // Heun solver.
@@ -19,7 +19,7 @@ type Heun struct {
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	dy := dy_.NewReader()
-	dy0 := MakeVectors(y.BufLen())// TODO: proper len?
+	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
 	return &Heun{dy0, y, dy, float32(dt * multiplier), false, cu.StreamCreate()}
 }
 

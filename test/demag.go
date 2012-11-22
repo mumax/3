@@ -11,7 +11,7 @@ import (
 
 func main() {
 	nimble.Init()
-	nimble.SetOD("test4.out")
+	nimble.SetOD("demag.out")
 
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9

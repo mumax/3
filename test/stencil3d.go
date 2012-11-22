@@ -13,7 +13,7 @@ import (
 func main() {
 	nimble.Init()
 	defer nimble.Cleanup()
-	nimble.SetOD("test4.out")
+	nimble.SetOD("stencil3d.out")
 
 	N0, N1, N2 := 1, 32, 128
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9

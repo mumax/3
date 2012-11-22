@@ -1,5 +1,7 @@
 package gpu
 
+//TODO: rm, use madd+normalize? or just for final dela?
+
 import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/gpu/ptx"

@@ -43,5 +43,3 @@ func (c RChanN) UnsafeData() []Slice {
 	}
 	return s
 }
-
-

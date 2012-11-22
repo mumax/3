@@ -65,7 +65,7 @@ func main() {
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
 	expect := [3]float32{-0.033120323, 0.20761484, 0.9776498}
-	//solver.Steps(10000)
+	solver.Steps(10000)
 	fmt.Println("result:", got)
 	if got != expect {
 		fmt.Println("expected:", expect)

@@ -1,0 +1,83 @@
+/**
+  * @file
+  * This file implements common functions typically required for calculus.
+  *
+  * @author Mykola Dvornik, Arne Vansteenkiste
+  */
+
+#ifndef _COMMON_FUNC_H_
+#define _COMMON_FUNC_H_
+
+#include <cuda.h>
+#include "stdio.h"
+
+// printf() is only supported
+// for devices of compute capability 2.0 and higher
+#if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ < 200)
+#define printf(f, ...) ((void)(f, __VA_ARGS__),0)
+#endif
+
+
+typedef float (*func)(float x, float prefix, float mult);
+
+inline __device__ float3 operator+(float3 a, float3 b) {
+    return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+inline __device__ void operator+=(float3 &a, float3 b) {
+    a.x += b.x; 
+	a.y += b.y; 
+	a.z += b.z;
+}
+
+inline __device__ float3 operator-(float3 a, float3 b) {
+    return make_float3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+inline __device__ float3 operator-(float3 a) {
+    return make_float3(-a.x, -a.y, -a.z);
+}
+
+inline __device__ void operator-=(float3 &a, float3 b) {
+    a.x -= b.x; 
+	a.y -= b.y; 
+	a.z -= b.z;
+}
+
+inline __device__ float3 operator*(float s, float3 a) {
+    return make_float3(s*a.x, s*a.y, s*a.z);
+}
+
+inline __device__ float3 operator*(float3 a, float s) {
+    return make_float3(s*a.x, s*a.y, s*a.z);
+}
+
+
+inline __device__ void operator*=(float3 &a, float s) {
+    a.x *= s; 
+	a.y *= s; 
+	a.z *= s;
+}
+
+// dot product
+inline __device__ float dotf(float3 a, float3 b) { 
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+// cross product in LHR system 
+inline __device__ float3 crossf(float3 a, float3 b) { 
+	return make_float3( - a.y*b.z + a.z*b.y,  - a.z*b.x + a.x*b.z, - a.x*b.y + a.y*b.x); 
+}
+
+// lenght of the 3-components vector
+inline __device__ float len(float3 a) {
+	return sqrtf(dotf(a,a));
+}
+
+// normalize the 3-components vector
+inline __device__ float3 normalize(float3 a){
+    float veclen = (len(a) != 0.0f) ? 1.0f / len(a) : 0.0f;
+	return veclen * a;
+}
+
+#endif

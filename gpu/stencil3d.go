@@ -12,7 +12,8 @@ type Stencil3D struct {
 	stream cu.Stream
 }
 
-// Stencil adds the stencil result to out
+// Stencil adds the stencil result to out.
+// Uses the same MemType as in.
 func NewStencil3D(tag, unit string, in nimble.ChanN) *Stencil3D {
 	r := in.NewReader() // TODO: buffer
 	w := nimble.MakeChanN(3, tag, unit, r.Mesh(), in.MemType(), -1)

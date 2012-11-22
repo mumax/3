@@ -23,12 +23,7 @@ func NewStencil3D(tag, unit string, in nimble.ChanN) *Stencil3D {
 }
 
 func (s *Stencil3D) Exec() {
-	//	dst := s.out.UnsafeData().Device()
-	//	dst.Memset(0)
-	//	for c:=0; c<3; c++{
-	//		src := s.in[c].UnsafeData().Device()
-	//		CalcStencil(dst, src, s.out.Mesh, &(s.weight[c]), s.stream)
-	//	}
+	//out := s.out.UnsafeData()
 }
 
 func (s *Stencil3D) Output() nimble.ChanN {

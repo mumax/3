@@ -28,17 +28,6 @@ func (c RChanN) ReadNext(n int) []Slice {
 	return next
 }
 
-// temporary
-//func (c RChanN) ReadNextList(n int) [][]float32 {
-//	next := make([][]float32, c.NComp())
-//	for i := range c {
-//		c[i].mutex.ReadNext(n)
-//		a, b := c[i].mutex.RRange()
-//		next[i] = c[i].slice.Slice(a, b).Host()
-//	}
-//	return next
-//}
-
 // ReadDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan3.
 func (c RChanN) ReadDone() {
@@ -47,18 +36,12 @@ func (c RChanN) ReadDone() {
 	}
 }
 
-// UnsafeData returns the underlying storage without locking.
-// Intended only for page-locking, not for reading or writing.
-//func (c RChanN) UnsafeData() [3][]float32 {
-//	return [3][]float32{c[0].slice.list, c[1].slice.list, c[2].slice.list}
-//}
+func (c RChanN) UnsafeData() []Slice {
+	s := make([]Slice, c.NComp())
+	for i := range s {
+		s[i] = c[i].slice
+	}
+	return s
+}
 
-//func (c RChanN) ReadDelta(Δstart, Δstop int) [3][]float32 {
-//	var next [3][]float32
-//	for i := range c {
-//		c[i].mutex.ReadDelta(Δstart, Δstop)
-//		a, b := c[i].mutex.RRange()
-//		next[i] = c[i].slice.Slice(a, b).list
-//	}
-//	return next
-//}
+

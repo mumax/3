@@ -22,6 +22,22 @@ func NewStencil3D(tag, unit string, in nimble.ChanN) *Stencil3D {
 func (s *Stencil3D) Exec() {
 	out := s.out.UnsafeData()
 	in := s.in.UnsafeData()
+	s.exec(out, in)
+}
+
+func (s *Stencil3D) Run() {
+	N := s.out.Mesh().NCell()
+	LockCudaThread()
+	for {
+		in := s.in.ReadNext(N)
+		out := s.out.WriteNext(N)
+		s.exec(out, in)
+		s.in.ReadDone()
+		s.out.WriteDone()
+	}
+}
+
+func (s *Stencil3D) exec(out, in []nimble.Slice) {
 	m := s.out.Mesh()
 	for di := range out {
 		dst := out[di].Device()

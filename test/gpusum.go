@@ -35,7 +35,7 @@ func main() {
 	Bex := exch.Output()
 
 	//	heff := MakeChan3("Heff", "", mesh)
-	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
+	Beff := gpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
 	const alpha = 1
 	torque := nimble.MakeChanN(3, "τ", "", mesh, nimble.UnifiedMemory, 1)
@@ -64,7 +64,7 @@ func main() {
 	solver.Steps(100)
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-	expect := [3]float32{-0.033120327, 0.20761484, 0.9776498}
+	expect := [3]float32{-0.033120323, 0.20761484, 0.9776498}
 	//solver.Steps(10000)
 	fmt.Println("result:", got)
 	if got != expect {

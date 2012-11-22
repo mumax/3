@@ -4,6 +4,8 @@ import (
 	"math"
 )
 
+// TODO: mv to nimble or even remove
+
 // 3-component vector.
 type Vector [3]float32
 

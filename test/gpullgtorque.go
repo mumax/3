@@ -40,7 +40,7 @@ func main() {
 	//	heff := MakeChan3("Heff", "", mesh)
 	Beff := gpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
-	tBox := gpu.NewLLGTorque("τ", m, Beff, α)
+	tBox := gpu.NewLLGTorque("torque", m, Beff, α)
 	nimble.Stack(tBox)
 	torque := tBox.Output()
 

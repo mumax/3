@@ -14,7 +14,7 @@ llgtorque(float* tx, float* ty, float* tz,
 
     	float3 mxH = crossf(m, H);
 		float gilb = 1.0f / (1.0f + alpha * alpha);
-		float3 torque = -mxH + gilb * crossf(m, mxH);
+		float3 torque = mxH - gilb * crossf(m, mxH);
 
 		tx[i] = torque.x;
 		ty[i] = torque.y;

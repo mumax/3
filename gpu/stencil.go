@@ -11,21 +11,21 @@ import (
 type Stencil struct {
 	in     nimble.RChan1
 	out    nimble.Chan1
-	weight [7]float32
+	Weight [7]float32
 	stream cu.Stream
 }
 
-func NewStencil(tag, unit string, in nimble.Chan, weight [7]float32) *Stencil {
+func NewStencil(tag, unit string, in nimble.Chan, Weight [7]float32) *Stencil {
 	r := in.ChanN().Chan1().NewReader() // TODO: buffer
 	w := nimble.MakeChan1(tag, unit, r.Mesh, in.MemType(), -1)
-	return &Stencil{r, w, weight, cu.StreamCreate()}
+	return &Stencil{r, w, Weight, cu.StreamCreate()}
 }
 
 func (s *Stencil) Exec() {
 	dst := s.out.UnsafeData().Device()
 	dst.Memset(0)
 	src := s.in.UnsafeData().Device()
-	StencilAdd(dst, src, s.out.Mesh, &s.weight, s.stream)
+	StencilAdd(dst, src, s.out.Mesh, &s.Weight, s.stream)
 }
 
 func (s *Stencil) Output() nimble.Chan1 {

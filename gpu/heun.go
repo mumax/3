@@ -28,6 +28,7 @@ func (e *Heun) SetDt(dt float64) {
 }
 
 func (e *Heun) Steps(steps int) {
+	nimble.RunStack()
 	core.Log("GPU heun solver:", steps, "steps")
 	LockCudaThread()
 	defer UnlockCudaThread()

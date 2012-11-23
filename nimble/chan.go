@@ -7,6 +7,9 @@ package nimble
 type Chan interface {
 	ChanN() ChanN
 	MemType() MemType
+	NComp() int
+	Unit() string
+	Mesh() *Mesh
 }
 
 // TODO: get rid of chan1, always arb. num comp. ?

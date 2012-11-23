@@ -24,14 +24,11 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 	core.Assert(B.Size() == m.Size())
 	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
 	tq := &LLGTorque{torque, m, B, alpha, cpu.Vector{0, 0, 0}, cu.StreamCreate()}
-	//core.Stack(tq)
-	//	core.AddRoutine(tag)
-	//	core.Connect(m.Tag(), tag)
-	//	core.Connect(B.Tag(), tag)
 	return tq
 }
 
 func (r *LLGTorque) Output() nimble.ChanN { return r.torque }
+func (r *LLGTorque) SetAlpha(α float32)   { r.alpha = α }
 
 //
 func (r *LLGTorque) Run() {

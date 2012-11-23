@@ -16,16 +16,17 @@ type Sum struct {
 }
 
 func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
-	t1, t2 := term1.ChanN().NewReader(), term2.ChanN().NewReader()
-	output := nimble.MakeChanN(t1.NComp(), tag, t1.Unit(), t1.Mesh(), mem, 1)
+	//t1, t2 := term1.ChanN().NewReader(), term2.ChanN().NewReader()
+	output := nimble.MakeChanN(term1.NComp(), tag, term1.Unit(), term1.Mesh(), mem, 1)
 	sum := &Sum{sum: output, dev: dev, stream: dev.StreamCreate()}
-	sum.MAdd(t1, weight1)
-	sum.MAdd(t2, weight2)
+	sum.MAdd(term1, weight1)
+	sum.MAdd(term2, weight2)
 	nimble.Stack(sum)
 	return sum
 }
 
-func (s *Sum) MAdd(term nimble.RChanN, weight float32) {
+func (s *Sum) MAdd(term_ nimble.Chan, weight float32) {
+	term := term_.ChanN().NewReader()
 	if len(s.term) != 0 {
 		core.Assert(term.NComp() == s.sum.NComp())
 		core.CheckEqualSize(term.Size(), s.term[0].Size())

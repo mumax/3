@@ -33,7 +33,7 @@ func init() {
 	cudaCtx = cu.CtxCreate(flag, dev)
 	if *nimble.Flag_version {
 		M, m := dev.ComputeCapability()
-		fmt.Println("CUDA", cu.Version(), dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ")\n")
 	}
 
 }

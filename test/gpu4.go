@@ -43,7 +43,8 @@ func main() {
 	nimble.Stack(exch)
 	Bex := exch.Output()
 
-	Beff := gpu.NewSum("Beff", B, Bex, Bsat, 1, mem).Output()
+	BeffBox := gpu.NewSum("Beff", B, Bex, Bsat, 1, mem)
+	Beff := BeffBox.Output()
 
 	tBox := gpu.NewLLGTorque("torque", m, Beff, α)
 	nimble.Stack(tBox)
@@ -53,15 +54,9 @@ func main() {
 	solver := gpu.NewHeun(m, torque, dt, mag.Gamma0)
 	solver.SetDt(200e-15)
 
-	every := 1000
-	nimble.Autosave(B, every)
+	every := 100
 	nimble.Autosave(m, every)
-	nimble.Autosave(Bex, every)
-	nimble.Autosave(Beff, every)
-	nimble.Autosave(torque, every)
 	nimble.Autotable(m, every/10)
-
-	nimble.RunStack()
 
 	solver.Steps(5000)
 
@@ -76,10 +71,16 @@ func main() {
 		fmt.Println("OK")
 	}
 
-	dt = 10e-15
+	dt = 100e-15
 	solver.SetDt(dt)
-	//	tBox.SetAlpha(0.02)
-	//	BeffBox.Madd(hext)
-	//	D:=1e-9
-	//	solver.Steps(D / dt)
+	//tBox.SetAlpha(0.02)
+	const (
+		Bx = -24.6E-3
+		By = 4.3E-3
+		Bz = 0
+	)
+	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
+	BeffBox.MAdd(Bext, 1)
+	D := 1e-9
+	solver.Steps(int(D / dt))
 }

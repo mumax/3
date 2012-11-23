@@ -22,8 +22,13 @@ func NewConst(tag, unit string, m *nimble.Mesh, memType nimble.MemType, value []
 		data[i].Device().Memset(float32(value[i]))
 	}
 	c.output = nimble.AsChan(data, tag, unit, m)
-	nimble.Stack(c)
 	return c
+}
+
+func RunConst(tag, unit string, m *nimble.Mesh, mem nimble.MemType, value []float64) nimble.ChanN {
+	box := NewConst(tag, unit, m, mem, value)
+	nimble.Stack(box)
+	return box.Output()
 }
 
 //func NewConstArray(tag, unit string, m*nimble.Mesh, array []Slice)*Const{

@@ -31,7 +31,7 @@ func main() {
 
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)
-	B := gpu.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
+	B := gpu.NewConvolution("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 	nimble.RunStack()
 
 	const probe = 24 * 121

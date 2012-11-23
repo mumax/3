@@ -24,7 +24,7 @@ func main() {
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
-	B := gpu.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
+	B := gpu.NewConvolution("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 
 	const Bsat = 1.0053
 	const aex = mag.Mu0 * 13e-12 / Bsat

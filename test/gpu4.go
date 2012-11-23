@@ -1,69 +1,64 @@
 package main
 
 import (
-	"nimble-cube/dump"
-	"nimble-cube/gpu"
-	"nimble-cube/gpu/conv"
-	"nimble-cube/mag"
-	. "nimble-cube/nimble"
-	"os"
+	"code.google.com/p/nimble-cube/cpu"
+	"code.google.com/p/nimble-cube/gpu"
+	"code.google.com/p/nimble-cube/gpu/conv"
+	"code.google.com/p/nimble-cube/mag"
+	"code.google.com/p/nimble-cube/nimble"
+	"fmt"
 )
 
+// Standard problem 4 on GPU
 func main() {
-	SetOD("gpu4.out")
-	// mesh
+	nimble.Init()
+	defer nimble.Cleanup()
+	nimble.SetOD("gpu4.out")
 
-	N0, N1, N2 := 1, 32, 128
-	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
-	mesh := NewMesh(N0, N1, N2, cx, cy, cz)
-	size := mesh.Size()
-	Log("mesh:", mesh)
-	Log("block:", BlockSize(mesh.Size()))
+	const (
+		N0, N1, N2 = 1, 32, 128
+		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
+		Bsat       = 1.0053
+		Aex_red    = mag.Mu0 * 13e-12 / Bsat
+		α          = 1
+	)
 
-	// quantities
+	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
+	fmt.Println("mesh:", mesh)
 
-	mGPU := gpu.MakeChan3("m", "", mesh)
-	b := gpu.MakeChan3("B", "T", mesh)
+	m := nimble.MakeChanN(3, "m", "", mesh, nimble.UnifiedMemory, 0)
+	M := cpu.Host(m.ChanN().UnsafeData())
+	for i := range M[2] {
+		M[2][i] = 1
+		M[1][i] = 0.1
+	}
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
-	Stack(conv.NewSymm2D(size, kernel, mGPU.NewReader(), b))
+	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 
-	const Msat = 1.0053
-	aex := mag.Mu0 * 13e-12 / Msat
-	//bex := gpu.MakeChan3("Bex", "T", mesh)
-	bex := gpu.RunExchange6("Bex", mGPU, aex).Output()
+	exch := gpu.NewExchange6("Bex", m, Aex_red)
+	nimble.Stack(exch)
+	Bex := exch.Output()
 
-	beffGPU := gpu.MakeChan3("Beff", "T", mesh)
-	Stack(gpu.NewAdder3(beffGPU, b.NewReader(), Msat, bex.NewReader(), 1))
+	Beff := gpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
-	var alpha float32 = 1
-	//torque := gpu.MakeChan3(size, "τ")
-	torque := gpu.RunLLGTorque("torque", mGPU, beffGPU, alpha).Output()
+	tBox := gpu.NewLLGTorque("torque", m, Beff, α)
+	nimble.Stack(tBox)
+	torque := tBox.Output()
 
 	dt := 100e-15
-	//solver := gpu.NewHeun(mGPU, torque, dt, mag.Gamma0)
-	solver := gpu.NewEuler(mGPU, torque.NewReader(), dt, mag.Gamma0)
+	solver := gpu.NewHeun(m, torque, mag.Gamma0, dt)
 
-	mHost := MakeChan3("mHost", "", mesh)
-	Stack(conv.NewDownloader(mGPU.NewReader(), mHost))
-	Stack(dump.NewAutosaver("m.dump", mHost.NewReader(), 1))
-	Stack(dump.NewAutotable("m.table", mHost.NewReader(), 1))
-	bH := MakeChan3("B", "T", mesh)
-	Stack(conv.NewDownloader(b.NewReader(), bH))
-	Stack(dump.NewAutosaver("B.dump", bH.NewReader(), 100))
+	every := 100
+	nimble.Autosave(B, every)
+	nimble.Autosave(m, every)
+	nimble.Autosave(Bex, every)
+	nimble.Autosave(Beff, every)
+	nimble.Autosave(torque, every)
+	nimble.Autotable(m, every)
 
-	in := MakeVectors(size)
-	mag.SetAll(in, mag.Uniform(0, 0.1, 1))
-	for i := 0; i < 3; i++ {
-		mGPU.UnsafeData()[i].CopyHtoD(Contiguous(in[i]))
-	}
+	nimble.RunStack()
 
-	RunStack()
-
-	gpu.LockCudaThread()
-	solver.Steps(100)
-
-	ProfDump(os.Stdout)
-	Cleanup()
+	solver.Steps(1000)
 }

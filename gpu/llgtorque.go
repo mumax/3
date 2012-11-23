@@ -28,7 +28,6 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 }
 
 func (r *LLGTorque) Output() nimble.ChanN { return r.torque }
-func (r *LLGTorque) SetAlpha(α float32)   { r.alpha = α }
 
 //
 func (r *LLGTorque) Run() {

@@ -22,7 +22,8 @@ func main() {
 		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
 		Bsat       = 1.0053
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
-		α          = 1
+		α          = 0.02
+		dt = 200e-15
 	)
 
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
@@ -50,15 +51,15 @@ func main() {
 	nimble.Stack(tBox)
 	torque := tBox.Output()
 
-	dt := 1e-19
-	solver := gpu.NewHeun(m, torque, dt, mag.Gamma0)
+	solver := gpu.NewHeun(m, torque, 0, mag.Gamma0)
 	solver.SetDt(200e-15)
 
 	every := 100
 	nimble.Autosave(m, every)
 	nimble.Autotable(m, every/10)
 
-	solver.Steps(5000)
+	D := 1e-9
+	solver.Steps(int(D / dt))
 
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
@@ -71,9 +72,6 @@ func main() {
 		fmt.Println("OK")
 	}
 
-	dt = 100e-15
-	solver.SetDt(dt)
-	//tBox.SetAlpha(0.02)
 	const (
 		Bx = -24.6E-3
 		By = 4.3E-3
@@ -81,6 +79,5 @@ func main() {
 	)
 	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
 	BeffBox.MAdd(Bext, 1)
-	D := 1e-9
 	solver.Steps(int(D / dt))
 }

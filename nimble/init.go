@@ -12,7 +12,6 @@ import (
 	"runtime/pprof"
 )
 
-// TODO: pull inside Init?
 var (
 	Flag_od          = flag.String("o", "", "set output directory")
 	Flag_version     = flag.Bool("v", false, "print version")
@@ -21,7 +20,7 @@ var (
 	Flag_timing      = flag.Bool("timeprof", false, "Record timing profile")
 	Flag_memprof     = flag.String("memprof", "", "Write gopprof memory profile to file")
 	Flag_debug       = flag.Bool("debug", false, "Generate debug info")
-	Flag_silent      = flag.Bool("silent", false, "Don't generate any log info")
+	Flag_silent      = flag.Bool("s", false, "Don't generate any log info")
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")
 	Flag_minblocks   = flag.Int("minblocks", 1, "Minimum number of concurrent blocks")
@@ -29,18 +28,16 @@ var (
 	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
 	Flag_sched    = flag.String("sched", "yield", "CUDA scheduling: auto|spin|yield|sync")
 	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
-
-//	Flag_nantest   = flag.Bool("nantest", true, "Detect NaN/Inf early")
 )
 
 func Init() {
 	flag.Parse()
+	if *Flag_version {
+		fmt.Print("Nimble Cube 0.", core.BUILD_COMMIT, " alpha ", core.BUILD_DATE, " ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
+	}
 
 	initOD()
 	initLog()
-	if *Flag_version {
-		fmt.Println(log.Prefix(), "Nimble Cube", runtime.Version(), runtime.Compiler, runtime.GOOS, runtime.GOARCH)
-	}
 	initGOMAXPROCS()
 	initCpuProf()
 	initMemProf()

@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 	"flag"
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"runtime"
 	"sync/atomic"
@@ -28,11 +29,12 @@ func init() {
 		flag = cu.CTX_BLOCKING_SYNC
 	}
 	cu.Init(0)
-	core.Log("CUDA version:", cu.Version())
 	dev := cu.Device(*nimble.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
-	M, m := dev.ComputeCapability()
-	core.Log("GPU:", dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+	if *nimble.Flag_version {
+		M, m := dev.ComputeCapability()
+		fmt.Println("CUDA", cu.Version(), dev.Name(), (dev.TotalMem())/(1024*1024), "MB", "compute", M, m)
+	}
 
 }
 

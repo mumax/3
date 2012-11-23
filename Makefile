@@ -1,4 +1,4 @@
-all: githook 6g tool
+all: githook 6g tool version
 
 PREFIX=code.google.com/p/nimble-cube
 
@@ -11,6 +11,7 @@ PKGS=\
 	$(PREFIX)/dump\
 	$(PREFIX)/nimble\
 	$(PREFIX)/core\
+
 
 6g: ptx
 	go install -v $(PKGS)

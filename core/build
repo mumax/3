@@ -1,0 +1,5 @@
+#! /bin/bash
+commit=$(( $(git log --pretty=oneline | wc -l) + 1 ))
+date=$(date)
+
+echo "package core; const( BUILD_COMMIT = \"$commit\"; BUILD_DATE = \"$date\")"

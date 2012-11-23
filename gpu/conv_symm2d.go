@@ -24,8 +24,7 @@ type Symm2D struct {
 	stream      cu.Stream           // 
 	kern        [3][3][]float32     // Real-space kernel
 	kernArr     [3][3][][][]float32 // Real-space kernel
-	//fftKern     [3][3][]float32     // FFT kernel on host
-	inited bool
+	inited      bool
 }
 
 func (c *Symm2D) init() {
@@ -245,7 +244,7 @@ func (c *Symm2D) Output() nimble.ChanN {
 	return c.outChan
 }
 
-func NewSymm2D(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.ChanN) *Symm2D {
+func NewConvolution(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.ChanN) *Symm2D {
 	size := mesh.Size()
 	in_ := input_.NewReader()
 	input := [3]nimble.RChan1{in_[0], in_[1], in_[2]}

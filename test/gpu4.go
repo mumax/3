@@ -3,7 +3,6 @@ package main
 import (
 	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/gpu"
-	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
@@ -38,7 +37,7 @@ func main() {
 
 	acc := 10
 	kernel := mag.BruteKernel(mesh, acc)
-	B := conv.NewSymm2D("B", "T", mesh, mem, kernel, m).Output()
+	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
 
 	exch := gpu.NewExchange6("Bex", m, Aex_red)
 	nimble.Stack(exch)
@@ -50,8 +49,9 @@ func main() {
 	nimble.Stack(tBox)
 	torque := tBox.Output()
 
-	dt := 200e-15
-	solver := gpu.NewHeun(m, torque, mag.Gamma0, dt)
+	dt := 1e-19
+	solver := gpu.NewHeun(m, torque, dt, mag.Gamma0)
+	solver.SetDt(200e-15)
 
 	every := 1000
 	nimble.Autosave(B, every)
@@ -76,8 +76,8 @@ func main() {
 		fmt.Println("OK")
 	}
 
-	//	dt := 10e-15
-	//	solver.SetDt(dt)
+	dt = 10e-15
+	solver.SetDt(dt)
 	//	tBox.SetAlpha(0.02)
 	//	BeffBox.Madd(hext)
 	//	D:=1e-9

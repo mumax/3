@@ -8,5 +8,6 @@
  	RunXXX() Stacks, returns output(s) ? (to avoid confusion with New)
  	ExecUnsafe()
 	Run()
+ TODO: Automatically report run time.
 */
 package nimble

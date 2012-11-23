@@ -23,7 +23,7 @@ func main() {
 		Bsat       = 1.0053
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
 		α          = 0.02
-		dt = 200e-15
+		dt         = 200e-15
 	)
 
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
@@ -61,16 +61,16 @@ func main() {
 	D := 1e-9
 	solver.Steps(int(D / dt))
 
-//	res := cpu.Host(m.ChanN().UnsafeData())
-//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
-//	fmt.Println("result:", got)
-//	if got != expect {
-//		fmt.Println("expected:", expect)
-//		os.Exit(2)
-//	} else {
-//		fmt.Println("OK")
-//	}
+	//	res := cpu.Host(m.ChanN().UnsafeData())
+	//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
+	//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
+	//	fmt.Println("result:", got)
+	//	if got != expect {
+	//		fmt.Println("expected:", expect)
+	//		os.Exit(2)
+	//	} else {
+	//		fmt.Println("OK")
+	//	}
 
 	const (
 		Bx = -24.6E-3

@@ -2,7 +2,6 @@ package main
 
 import (
 	"code.google.com/p/nimble-cube/gpu"
-	"code.google.com/p/nimble-cube/gpu/conv"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
@@ -32,7 +31,7 @@ func main() {
 
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)
-	B := conv.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
+	B := gpu.NewSymm2D("B", "T", mesh, nimble.UnifiedMemory, kernel, m).Output()
 	nimble.RunStack()
 
 	const probe = 24 * 121

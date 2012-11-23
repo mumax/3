@@ -1,4 +1,4 @@
-package conv
+package gpu
 
 //import (
 //	"github.com/barnex/cuda5/safe"

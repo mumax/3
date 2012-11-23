@@ -1,4 +1,4 @@
-package conv
+package gpu
 
 // common code for all convolutions.
 

@@ -1,4 +1,4 @@
-package conv
+package gpu
 
 //
 //import (
@@ -6,7 +6,6 @@ package conv
 //	"github.com/barnex/cuda5/cu"
 //	"github.com/barnex/cuda5/safe"
 //	"nimble-cube/core"
-//	"nimble-cube/gpu"
 //)
 //
 //type Symmetric struct {

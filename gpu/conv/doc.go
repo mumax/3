@@ -1,4 +1,0 @@
-/*
- GPU convolution
-*/
-package conv

@@ -7,7 +7,6 @@ package main
 import (
 	_ "code.google.com/p/nimble-cube/dump"
 	_ "code.google.com/p/nimble-cube/gpu"
-	_ "code.google.com/p/nimble-cube/gpu/conv"
 	_ "code.google.com/p/nimble-cube/gpu/ptx"
 	_ "code.google.com/p/nimble-cube/mag"
 	_ "code.google.com/p/nimble-cube/nimble"

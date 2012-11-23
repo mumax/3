@@ -1,4 +1,4 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"

@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
@@ -36,8 +35,8 @@ func (c *Symm2D) init() {
 	}
 	c.inited = true
 	// TODO: may unlock main thread...
-	gpu.LockCudaThread()
-	defer gpu.UnlockCudaThread()
+	LockCudaThread()
+	defer UnlockCudaThread()
 
 	padded := c.kernSize
 
@@ -52,10 +51,10 @@ func (c *Symm2D) init() {
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
 		for i := 1; i < 3; i++ {
-			c.fftCBuf[i] = gpu.MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[i] = MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		}
 		if c.is3D() {
-			c.fftCBuf[0] = gpu.MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[0] = MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		} else {
 			c.fftCBuf[0] = c.fftCBuf[1]
 		}
@@ -111,7 +110,7 @@ func (c *Symm2D) initFFTKern2D() {
 	halfkern := realsize
 	halfkern[1] = halfkern[1]/2 + 1
 	fwPlan := c.fwPlan
-	output := gpu.HostFloats(2 * fwPlan.OutputLen()).Complex()
+	output := HostFloats(2 * fwPlan.OutputLen()).Complex()
 	defer cu.MemFreeHost(unsafe.Pointer(uintptr(output.Pointer()))) // TODO: is Float32s safe with uintptr?
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
@@ -124,7 +123,7 @@ func (c *Symm2D) initFFTKern2D() {
 				fwPlan.Exec(input, output)
 				fwPlan.Stream().Synchronize() // !!
 				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = gpu.MakeFloats(len(fftKern))
+				c.gpuFFTKern[i][j] = MakeFloats(len(fftKern))
 				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
 			}
 		}
@@ -133,7 +132,7 @@ func (c *Symm2D) initFFTKern2D() {
 
 func (c *Symm2D) Run() {
 	core.Log("running symmetric 2D convolution")
-	gpu.LockCudaThread()
+	LockCudaThread()
 
 	for {
 		c.Exec()

@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -15,10 +14,10 @@ func kernMulC(fftM [3]safe.Complex64s, K [3][3]safe.Float32s, stream cu.Stream) 
 
 	core.Assert(2*fftM[0].Len() == K[0][0].Len())
 
-	kernMulCCode := gpu.PTXLoad("kernmulC")
+	kernMulCCode := PTXLoad("kernmulC")
 
 	N := fftM[0].Len()
-	gridDim, blockDim := gpu.Make1DConf(N)
+	gridDim, blockDim := Make1DConf(N)
 
 	m0ptr := fftM[0].Pointer()
 	m1ptr := fftM[1].Pointer()

@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 //import (
 //	"code.google.com/p/nimble-cube/core"
-//	"code.google.com/p/nimble-cube/gpu"
 //	"code.google.com/p/nimble-cube/mag"
 //	"code.google.com/p/nimble-cube/nimble"
 //	"fmt"

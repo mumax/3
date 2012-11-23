@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu"
 )
 
 // common data for all convolutions
@@ -56,7 +55,7 @@ func (c *hostData) init(size [3]int, kernel [3][3][][][]float32) {
 // Should be run in CUDA locked thread.
 func (c *hostData) initPageLock() {
 	for i := 0; i < 3; i++ {
-		gpu.MemHostRegister(c.input[i])
-		gpu.MemHostRegister(c.output[i])
+		MemHostRegister(c.input[i])
+		MemHostRegister(c.output[i])
 	}
 }

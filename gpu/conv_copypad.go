@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -15,14 +14,14 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 	core.Assert(src.Len() == core.Prod(srcsize))
 	// TODO: either remove offset or check offset
 
-	copyPadKern := gpu.PTXLoad("copypad")
+	copyPadKern := PTXLoad("copypad")
 
 	dstptr := dst.Pointer()
 	srcptr := src.Pointer()
 
 	block := 16
-	gridJ := gpu.DivUp(gpu.Min(dstsize[1], srcsize[1]), block)
-	gridK := gpu.DivUp(gpu.Min(dstsize[2], srcsize[2]), block)
+	gridJ := DivUp(Min(dstsize[1], srcsize[1]), block)
+	gridK := DivUp(Min(dstsize[2], srcsize[2]), block)
 	shmem := 0
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&dstptr),

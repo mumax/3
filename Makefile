@@ -3,8 +3,8 @@ all: githook 6g tool
 PREFIX=code.google.com/p/nimble-cube
 
 PKGS=\
-	$(PREFIX)/gpu/conv\
 	$(PREFIX)/gpu\
+	$(PREFIX)/gpu/ptx\
 	$(PREFIX)/cpu\
 	$(PREFIX)/uni\
 	$(PREFIX)/mag\

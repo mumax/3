@@ -1,8 +1,7 @@
-package conv
+package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -13,10 +12,10 @@ func kernMulRSymm(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.Flo
 
 	core.Assert(fftM[0].Len() == K00.Len())
 
-	kernMulRSymmCode := gpu.PTXLoad("kernmulRSymm")
+	kernMulRSymmCode := PTXLoad("kernmulRSymm")
 
 	N := fftM[0].Len()
-	gridDim, blockDim := gpu.Make1DConf(N)
+	gridDim, blockDim := Make1DConf(N)
 
 	m0ptr := fftM[0].Pointer()
 	m1ptr := fftM[1].Pointer()

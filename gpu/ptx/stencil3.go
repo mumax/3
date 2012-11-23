@@ -15,7 +15,7 @@ const STENCIL3 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000013f4_00000000-9_stencil3.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002c51_00000000-9_stencil3.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/stencil3.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 

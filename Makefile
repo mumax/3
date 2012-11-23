@@ -1,4 +1,4 @@
-all: githook 6g tool version
+all: githook 6g tool 
 
 PREFIX=code.google.com/p/nimble-cube
 

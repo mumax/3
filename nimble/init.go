@@ -19,7 +19,7 @@ var (
 	Flag_cpuprof     = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
 	Flag_timing      = flag.Bool("timeprof", false, "Record timing profile")
 	Flag_memprof     = flag.String("memprof", "", "Write gopprof memory profile to file")
-	Flag_debug       = flag.Bool("debug", false, "Generate debug info")
+	Flag_debug       = flag.Bool("g", false, "Generate debug info")
 	Flag_silent      = flag.Bool("s", false, "Don't generate any log info")
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")

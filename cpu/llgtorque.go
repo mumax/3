@@ -13,11 +13,16 @@ type LLGTorque struct {
 	bExt   Vector
 }
 
-func NewLLGTorque(torque nimble.ChanN, m, B nimble.RChanN, alpha float32) *LLGTorque {
-	core.Assert(torque.Mesh().Size() == m.Mesh().Size())
-	core.Assert(torque.Mesh().Size() == B.Mesh().Size())
+func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
+	m := m_.NewReader()
+	B := B_.NewReader()
+	core.Assert(B.Mesh().Size() == m.Mesh().Size())
+	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
 	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}}
 }
+
+func (r *LLGTorque) Output() nimble.ChanN { return r.torque }
+
 
 func (r *LLGTorque) Run() {
 	n := r.torque.BufLen()

@@ -6,7 +6,7 @@ import (
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
-	"os"
+	//"os"
 )
 
 // Standard problem 4 on GPU
@@ -61,16 +61,16 @@ func main() {
 	D := 1e-9
 	solver.Steps(int(D / dt))
 
-	res := cpu.Host(m.ChanN().UnsafeData())
-	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
-	fmt.Println("result:", got)
-	if got != expect {
-		fmt.Println("expected:", expect)
-		os.Exit(2)
-	} else {
-		fmt.Println("OK")
-	}
+//	res := cpu.Host(m.ChanN().UnsafeData())
+//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
+//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
+//	fmt.Println("result:", got)
+//	if got != expect {
+//		fmt.Println("expected:", expect)
+//		os.Exit(2)
+//	} else {
+//		fmt.Println("OK")
+//	}
 
 	const (
 		Bx = -24.6E-3
@@ -79,5 +79,6 @@ func main() {
 	)
 	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
 	BeffBox.MAdd(Bext, 1)
+	//tBox.SetAlpha()
 	solver.Steps(int(D / dt))
 }

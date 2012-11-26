@@ -30,7 +30,7 @@ func Autosave(data_ nimble.Chan, every int, dev Device) {
 func (r *Autosaver) Run() {
 	N := r.data.Mesh().NCell()
 
-	if !r.data.MemType().CPUAccess(){
+	if !r.data.MemType().CPUAccess() {
 		core.Assert(r.Dev != nil)
 		r.Dev.InitThread()
 	}

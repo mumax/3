@@ -10,7 +10,7 @@ type Autotabler struct {
 	out   dump.TableWriter
 	data  nimble.RChanN
 	every int
-	Dev Device
+	Dev   Device
 	hostBuf
 }
 
@@ -36,7 +36,7 @@ func (r *Autotabler) Run() {
 	core.Log("running auto table")
 	N := core.Prod(r.data.Mesh().Size())
 
-	if !r.data.MemType().CPUAccess(){
+	if !r.data.MemType().CPUAccess() {
 		core.Assert(r.Dev != nil)
 		r.Dev.InitThread()
 	}

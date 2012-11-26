@@ -3,8 +3,8 @@ package main
 import (
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/mag"
-	"code.google.com/p/nimble-cube/uni"
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/uni"
 	"fmt"
 	//"os"
 )
@@ -22,9 +22,9 @@ func main() {
 		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
 		Bsat       = 1.0053
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
-		α          = 0.02
-		dt         = 200e-15
+		α          = 1
 	)
+	dt         := 200e-15
 
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
@@ -59,6 +59,7 @@ func main() {
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 
 	D := 1e-9
+	dt = 200e-15
 	solver.Steps(int(D / dt))
 
 	//	res := cpu.Host(m.ChanN().UnsafeData())
@@ -77,8 +78,10 @@ func main() {
 		By = 4.3E-3
 		Bz = 0
 	)
+	dt = 50e-15
 	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
 	BeffBox.MAdd(Bext, 1)
-	//tBox.SetAlpha()
+	tBox.SetAlpha(0.02)
+	solver.SetDt(dt)
 	solver.Steps(int(D / dt))
 }

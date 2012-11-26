@@ -24,7 +24,7 @@ func main() {
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
 		α          = 1
 	)
-	dt         := 200e-15
+	dt := 200e-15
 
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)

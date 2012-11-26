@@ -16,5 +16,6 @@ rm test.log -rf
 else
 	notify-send "Unit tests failed" 2> /dev/null
 	cat test.log;
+	rm test.log;
 	exit 2;
 fi;)&

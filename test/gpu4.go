@@ -1,7 +1,6 @@
 package main
 
 import (
-	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
@@ -15,7 +14,7 @@ func main() {
 	defer nimble.Cleanup()
 	nimble.SetOD("gpu4.out")
 
-	mem := nimble.UnifiedMemory
+	mem := nimble.GPUMemory
 
 	const (
 		N0, N1, N2 = 1, 32, 128
@@ -29,12 +28,12 @@ func main() {
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
 	fmt.Println("mesh:", mesh)
 
+	// TODO: MakeChanN -> NewQuant()
 	m := nimble.MakeChanN(3, "m", "", mesh, mem, 0)
-	M := cpu.Host(m.ChanN().UnsafeData())
-	for i := range M[2] {
-		M[2][i] = 1
-		M[1][i] = 0.1
-	}
+	M := gpu.Device3(m.ChanN().UnsafeData())
+	M[0].Memset(0)
+	M[1].Memset(0.1)
+	M[2].Memset(0.99)
 
 	acc := 10
 	kernel := mag.BruteKernel(mesh, acc)

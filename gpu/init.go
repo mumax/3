@@ -35,7 +35,7 @@ func init() {
 	if *nimble.Flag_version {
 		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ")\n")
 	}
-	if M < 2{
+	if M < 2 {
 		core.Fatalf("Need at least compute capability 2.0, have %v.%v", M, m)
 	}
 }

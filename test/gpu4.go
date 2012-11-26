@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/mag"
+	"code.google.com/p/nimble-cube/uni"
 	"code.google.com/p/nimble-cube/nimble"
 	"fmt"
 	//"os"
@@ -54,8 +55,8 @@ func main() {
 	solver.SetDt(200e-15)
 
 	every := 100
-	nimble.Autosave(m, every)
-	nimble.Autotable(m, every/10)
+	uni.Autosave(m, every, gpu.GPUDevice)
+	uni.Autotable(m, every/10, gpu.GPUDevice)
 
 	D := 1e-9
 	solver.Steps(int(D / dt))

@@ -114,6 +114,6 @@ func (s Slice) Device() safe.Float32s {
 	return floats
 }
 
-func (s Slice) Len() int         { return s.len_ }
+func (s Slice) Len() int { return s.len_ }
 
 const SizeofFloat32 = 4

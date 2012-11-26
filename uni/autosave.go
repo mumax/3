@@ -11,9 +11,10 @@ type Autosaver struct {
 	data  nimble.RChanN
 	every int
 	hostBuf
+	Dev Device
 }
 
-func Autosave(data_ nimble.Chan, every int) {
+func Autosave(data_ nimble.Chan, every int, dev Device) {
 	fname := data_.ChanN().Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
@@ -22,11 +23,17 @@ func Autosave(data_ nimble.Chan, every int) {
 	r.out.MeshSize = data.Mesh().Size()
 	r.data = data
 	r.every = every
+	r.Dev = dev
 	nimble.Stack(r)
 }
 
 func (r *Autosaver) Run() {
 	N := r.data.Mesh().NCell()
+
+	if !r.data.MemType().CPUAccess(){
+		core.Assert(r.Dev != nil)
+		r.Dev.InitThread()
+	}
 
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO: could read comp by comp...
@@ -35,7 +42,7 @@ func (r *Autosaver) Run() {
 			core.Debug("dump")
 			r.out.WriteHeader()
 			for c := 0; c < r.data.NComp(); c++ {
-				r.out.WriteData(output[c].Host())
+				r.out.WriteData(r.gethost(output[c]))
 			}
 			r.out.WriteHash()
 		}
@@ -44,16 +51,19 @@ func (r *Autosaver) Run() {
 }
 
 //func (r*Autosaver) gethost(data Slice) []float32{
-	//if data.MemType().CPUAccess()
+//if data.MemType().CPUAccess()
 //}
 
 type hostBuf []float32
 
-func(r*hostBuf)gethost(data nimble.Slice)[]float32{
-	if data.CPUAccess(){
+func (r *hostBuf) gethost(data nimble.Slice) []float32 {
+	if data.CPUAccess() {
 		return data.Host()
 	} // else
-	if *r == nil{ *r = make([]float32, data.Len())}
+	if *r == nil {
+		core.Debug("alloc buffer")
+		*r = make([]float32, data.Len())
+	}
 	data.Device().CopyDtoH(*r)
 	return *r
 }

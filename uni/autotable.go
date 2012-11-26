@@ -10,9 +10,11 @@ type Autotabler struct {
 	out   dump.TableWriter
 	data  nimble.RChanN
 	every int
+	Dev Device
+	hostBuf
 }
 
-func Autotable(data_ nimble.Chan, every int) {
+func Autotable(data_ nimble.Chan, every int, dev Device) {
 	r := new(Autotabler)
 	data := data_.ChanN().NewReader()
 	tags := make([]string, data.NComp())
@@ -26,6 +28,7 @@ func Autotable(data_ nimble.Chan, every int) {
 	r.out = dump.NewTableWriter(core.OpenFile(core.OD+fname), tags, units)
 	r.data = data
 	r.every = every
+	r.Dev = dev
 	nimble.Stack(r)
 }
 
@@ -33,13 +36,18 @@ func (r *Autotabler) Run() {
 	core.Log("running auto table")
 	N := core.Prod(r.data.Mesh().Size())
 
+	if !r.data.MemType().CPUAccess(){
+		core.Assert(r.Dev != nil)
+		r.Dev.InitThread()
+	}
+
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO
 		if i%r.every == 0 {
 			i = 0
 			for c := range output {
 				sum := 0.
-				list := output[c].Host()
+				list := r.gethost(output[c])
 				for j := range list {
 					sum += float64(list[j])
 				}

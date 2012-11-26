@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/nimble-cube/cpu"
+	"code.google.com/p/nimble-cube/uni"
 	"code.google.com/p/nimble-cube/gpu"
 	"code.google.com/p/nimble-cube/mag"
 	"code.google.com/p/nimble-cube/nimble"
@@ -35,8 +36,9 @@ func main() {
 	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
 	const alpha = 1
-	torque := nimble.MakeChanN(3, "τ", "", mesh, nimble.UnifiedMemory, 1)
-	nimble.Stack(cpu.NewLLGTorque(torque, m.NewReader(), Beff.NewReader(), alpha))
+	tbox := cpu.NewLLGTorque("torque", m, Beff, alpha)
+	nimble.Stack(tbox)
+	torque := tbox.Output()
 
 	const dt = 100e-15
 
@@ -49,12 +51,12 @@ func main() {
 	}
 
 	every := 100
-	nimble.Autosave(B, every)
-	nimble.Autosave(m, every)
-	nimble.Autosave(Bex, every)
-	nimble.Autosave(Beff, every)
-	nimble.Autosave(torque, every)
-	nimble.Autotable(m, every)
+	uni.Autosave(B, every, cpu.CPUDevice)
+	uni.Autosave(m, every, cpu.CPUDevice)
+	uni.Autosave(Bex, every, cpu.CPUDevice)
+	uni.Autosave(Beff, every, cpu.CPUDevice)
+	uni.Autosave(torque, every, cpu.CPUDevice)
+	uni.Autotable(m, every, cpu.CPUDevice)
 
 	nimble.RunStack()
 

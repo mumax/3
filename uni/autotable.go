@@ -1,17 +1,18 @@
-package nimble
+package uni
 
 import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 type Autotabler struct {
 	out   dump.TableWriter
-	data  RChanN
+	data  nimble.RChanN
 	every int
 }
 
-func Autotable(data_ Chan, every int) {
+func Autotable(data_ nimble.Chan, every int) {
 	r := new(Autotabler)
 	data := data_.ChanN().NewReader()
 	tags := make([]string, data.NComp())
@@ -25,7 +26,7 @@ func Autotable(data_ Chan, every int) {
 	r.out = dump.NewTableWriter(core.OpenFile(core.OD+fname), tags, units)
 	r.data = data
 	r.every = every
-	Stack(r)
+	nimble.Stack(r)
 }
 
 func (r *Autotabler) Run() {

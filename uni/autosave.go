@@ -1,17 +1,19 @@
-package nimble
+package uni
 
 import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/nimble-cube/nimble"
 )
 
 type Autosaver struct {
 	out   *dump.Writer
-	data  RChanN
+	data  nimble.RChanN
 	every int
+	hostBuf
 }
 
-func Autosave(data_ Chan, every int) {
+func Autosave(data_ nimble.Chan, every int) {
 	fname := data_.ChanN().Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
@@ -20,7 +22,7 @@ func Autosave(data_ Chan, every int) {
 	r.out.MeshSize = data.Mesh().Size()
 	r.data = data
 	r.every = every
-	Stack(r)
+	nimble.Stack(r)
 }
 
 func (r *Autosaver) Run() {
@@ -44,3 +46,14 @@ func (r *Autosaver) Run() {
 //func (r*Autosaver) gethost(data Slice) []float32{
 	//if data.MemType().CPUAccess()
 //}
+
+type hostBuf []float32
+
+func(r*hostBuf)gethost(data nimble.Slice)[]float32{
+	if data.CPUAccess(){
+		return data.Host()
+	} // else
+	if *r == nil{ *r = make([]float32, data.Len())}
+	data.Device().CopyDtoH(*r)
+	return *r
+}

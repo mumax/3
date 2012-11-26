@@ -14,7 +14,7 @@ import (
 type Slice struct {
 	ptr  unsafe.Pointer
 	len_ int
-	flag MemType
+	MemType
 }
 
 func MakeSlice(length int, memtype MemType) Slice {
@@ -90,12 +90,12 @@ func (s *Slice) Slice(a, b int) Slice {
 	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
 		core.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_)
 	}
-	return Slice{ptr, len_, s.flag}
+	return Slice{ptr, len_, s.MemType}
 }
 
 func (s Slice) Host() []float32 {
-	if s.flag&CPUMemory == 0 {
-		core.Panicf("slice not accessible by CPU (memory type %v)", s.flag)
+	if s.MemType&CPUMemory == 0 {
+		core.Panicf("slice not accessible by CPU (memory type %v)", s.MemType)
 	}
 	var list []float32
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
@@ -106,8 +106,8 @@ func (s Slice) Host() []float32 {
 }
 
 func (s Slice) Device() safe.Float32s {
-	if s.flag&GPUMemory == 0 {
-		core.Panicf("slice not accessible by GPU (memory type %v)", s.flag)
+	if s.MemType&GPUMemory == 0 {
+		core.Panicf("slice not accessible by GPU (memory type %v)", s.MemType)
 	}
 	var floats safe.Float32s
 	floats.UnsafeSet(s.ptr, s.len_, s.len_)
@@ -115,6 +115,5 @@ func (s Slice) Device() safe.Float32s {
 }
 
 func (s Slice) Len() int         { return s.len_ }
-func (s Slice) MemType() MemType { return s.flag }
 
 const SizeofFloat32 = 4

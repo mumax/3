@@ -24,7 +24,7 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 }
 
 func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
-func (c Chan1) MemType() MemType { return c.slice.MemType() }
+func (c Chan1) MemType() MemType { return c.slice.MemType }
 
 func (c Chan1) UnsafeData() Slice {
 	if c.mutex.isLocked() {

@@ -40,3 +40,7 @@ func (r *Autosaver) Run() {
 		r.data.ReadDone()
 	}
 }
+
+//func (r*Autosaver) gethost(data Slice) []float32{
+	//if data.MemType().CPUAccess()
+//}

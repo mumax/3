@@ -13,7 +13,7 @@ func reduce_sum(in safe.Float32s, stream cu.Stream) float32 {
 	N := in.Len()
 
 	blockDim := cu.Dim3{512, 1, 1}
-	gridDim := cu.Dim3{1, 1, 1}
+	gridDim := cu.Dim3{1, 1, 1} // TODO
 
 	inptr := in.Pointer()
 	outptr := out.Pointer()

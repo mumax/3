@@ -42,6 +42,6 @@ reducesum(float *src, float *dst, int n) {
 		smem[tid] = sum(smem[tid], smem[tid +  1]); 
 	}
 
-	if (tid == 0) { dst[blockIdx.x] = sdata[0]; }//atomicAdd(dst, sdata[0]); }
+	if (tid == 0) { atomicAdd(dst, sdata[0]); }
 }
 

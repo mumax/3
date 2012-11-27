@@ -15,8 +15,10 @@ const REDUCESUM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002c0d_00000000-9_reducesum.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002f54_00000000-9_reducesum.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducesum.cu"
+	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
+	.file	4 "/usr/local/cuda/bin/../include/sm_20_atomic_functions.h"
 // __cuda_local_var_33843_32_non_const_sdata has been demoted
 
 .visible .entry reducesum(
@@ -26,69 +28,69 @@ const REDUCESUM = `
 )
 {
 	.reg .pred 	%p<8>;
-	.reg .s32 	%r<39>;
-	.reg .f32 	%f<32>;
-	.reg .s64 	%rd<15>;
+	.reg .s32 	%r<38>;
+	.reg .f32 	%f<33>;
+	.reg .s64 	%rd<13>;
 	// demoted variable
 	.shared .align 4 .b8 __cuda_local_var_33843_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd4, [reducesum_param_0];
 	ld.param.u64 	%rd5, [reducesum_param_1];
-	ld.param.u32 	%r10, [reducesum_param_2];
+	ld.param.u32 	%r9, [reducesum_param_2];
 	cvta.to.global.u64 	%rd1, %rd5;
 	cvta.to.global.u64 	%rd2, %rd4;
 	.loc 2 16 1
-	mov.u32 	%r38, %ntid.x;
-	mov.u32 	%r2, %ctaid.x;
+	mov.u32 	%r37, %ntid.x;
+	mov.u32 	%r10, %ctaid.x;
 	.loc 2 15 1
-	mov.u32 	%r3, %tid.x;
+	mov.u32 	%r2, %tid.x;
 	.loc 2 16 1
-	mad.lo.s32 	%r37, %r38, %r2, %r3;
+	mad.lo.s32 	%r36, %r37, %r10, %r2;
 	.loc 2 19 1
 	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r5, %r38, %r11;
+	mul.lo.s32 	%r4, %r37, %r11;
 	.loc 2 20 1
-	setp.ge.s32 	%p1, %r37, %r10;
-	mov.f32 	%f30, 0f00000000;
-	mov.f32 	%f31, %f30;
+	setp.ge.s32 	%p1, %r36, %r9;
+	mov.f32 	%f31, 0f00000000;
+	mov.f32 	%f32, %f31;
 	@%p1 bra 	BB0_2;
 
 BB0_1:
 	.loc 2 21 1
-	mul.wide.s32 	%rd6, %r37, 4;
+	mul.wide.s32 	%rd6, %r36, 4;
 	add.s64 	%rd7, %rd2, %rd6;
 	ld.global.f32 	%f6, [%rd7];
-	add.f32 	%f31, %f31, %f6;
+	add.f32 	%f32, %f32, %f6;
 	.loc 2 22 1
-	add.s32 	%r37, %r37, %r5;
+	add.s32 	%r36, %r36, %r4;
 	.loc 2 20 1
-	setp.lt.s32 	%p2, %r37, %r10;
-	mov.f32 	%f30, %f31;
+	setp.lt.s32 	%p2, %r36, %r9;
+	mov.f32 	%f31, %f32;
 	@%p2 bra 	BB0_1;
 
 BB0_2:
 	.loc 2 24 1
-	mul.wide.s32 	%rd8, %r3, 4;
+	mul.wide.s32 	%rd8, %r2, 4;
 	mov.u64 	%rd9, __cuda_local_var_33843_32_non_const_sdata;
 	add.s64 	%rd3, %rd9, %rd8;
-	st.shared.f32 	[%rd3], %f30;
+	st.shared.f32 	[%rd3], %f31;
 	.loc 2 25 1
 	bar.sync 	0;
 	.loc 2 27 1
-	setp.lt.u32 	%p3, %r38, 66;
+	setp.lt.u32 	%p3, %r37, 66;
 	@%p3 bra 	BB0_6;
 
 BB0_3:
 	.loc 2 27 1
-	mov.u32 	%r8, %r38;
-	shr.u32 	%r38, %r8, 1;
+	mov.u32 	%r7, %r37;
+	shr.u32 	%r37, %r7, 1;
 	.loc 2 28 1
-	setp.ge.u32 	%p4, %r3, %r38;
+	setp.ge.u32 	%p4, %r2, %r37;
 	@%p4 bra 	BB0_5;
 
 	.loc 2 29 1
 	ld.shared.f32 	%f7, [%rd3];
-	add.s32 	%r15, %r38, %r3;
+	add.s32 	%r15, %r37, %r2;
 	mul.wide.u32 	%rd10, %r15, 4;
 	add.s64 	%rd12, %rd9, %rd10;
 	ld.shared.f32 	%f8, [%rd12];
@@ -99,12 +101,12 @@ BB0_5:
 	.loc 2 31 1
 	bar.sync 	0;
 	.loc 2 27 1
-	setp.gt.u32 	%p5, %r8, 131;
+	setp.gt.u32 	%p5, %r7, 131;
 	@%p5 bra 	BB0_3;
 
 BB0_6:
 	.loc 2 35 1
-	setp.gt.s32 	%p6, %r3, 31;
+	setp.gt.s32 	%p6, %r2, 31;
 	@%p6 bra 	BB0_8;
 
 	.loc 2 37 1
@@ -140,14 +142,13 @@ BB0_6:
 
 BB0_8:
 	.loc 2 45 1
-	setp.ne.s32 	%p7, %r3, 0;
+	setp.ne.s32 	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
 	.loc 2 45 1
 	ld.shared.f32 	%f28, [__cuda_local_var_33843_32_non_const_sdata];
-	mul.wide.u32 	%rd13, %r2, 4;
-	add.s64 	%rd14, %rd1, %rd13;
-	st.global.f32 	[%rd14], %f28;
+	.loc 3 1844 5
+	atom.global.add.f32 	%f29, [%rd1], %f28;
 
 BB0_10:
 	.loc 2 46 2

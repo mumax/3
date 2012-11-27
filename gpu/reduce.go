@@ -14,6 +14,10 @@ func reduceMax(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducemax", in, stream)
 }
 
+func reduceMin(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce("reducemin", in, stream)
+}
+
 func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 	out := safe.MakeFloat32s(1)
 	defer out.Free()

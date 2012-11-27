@@ -18,7 +18,7 @@ install: $(GOFILES)
 $(GOFILES): %.go: %.ptx
 	./ptx2go $(@:.go=.ptx) $@ $(@:.go=)
 
-$(PTXFILES): %.ptx: %.cu
+$(PTXFILES): %.ptx: %.cu *.h
 	rm -f $@
 	$(NVCC) -ptx $(@:.ptx=.cu)
 

@@ -16,11 +16,27 @@ func TestReduceSum(t *testing.T) {
 		in[i] = float32(i) / 100
 	}
 	str := cu.StreamCreate()
-	result := reduce_sum(input.Device(), str)
+	result := reduceSum(input.Device(), str)
 	if result != 499950 {
 		t.Error("got:", result)
 	}
 }
+
+func TestReduceMax(t *testing.T) {
+	LockCudaThread()
+	N := 100000
+	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in := input.Host()
+	for i := range in {
+		in[i] = float32(i) / 100
+	}
+	str := cu.StreamCreate()
+	result := reduceMax(input.Device(), str)
+	if result != 999.99 {
+		t.Error("got:", result)
+	}
+}
+
 
 func BenchmarkReduceSum(b *testing.B) {
 	core.LOG = false
@@ -32,6 +48,6 @@ func BenchmarkReduceSum(b *testing.B) {
 	b.SetBytes(N * 4)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		reduce_sum(input.Device(), str)
+		reduceSum(input.Device(), str)
 	}
 }

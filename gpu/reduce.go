@@ -6,7 +6,16 @@ import (
 	"unsafe"
 )
 
-func reduce_sum(in safe.Float32s, stream cu.Stream) float32 {
+
+func reduceSum(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce("reducesum", in, stream)
+}
+
+func reduceMax(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce("reducemax", in, stream)
+}
+
+func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 	out := safe.MakeFloat32s(1)
 	defer out.Free()
 
@@ -23,7 +32,7 @@ func reduce_sum(in safe.Float32s, stream cu.Stream) float32 {
 		unsafe.Pointer(&N)}
 
 	shmem := 0
-	code := PTXLoad("reducesum")
+	code := PTXLoad(op)
 	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 	stream.Synchronize()
 

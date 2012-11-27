@@ -38,7 +38,5 @@
 	}                                                   \
                                                         \
 	if (tid == 0) { atomicOp(dst, sdata[0]); }          \
-
-#endif
-
 // Based on "Optimizing parallel reduction in CUDA" by Mark Harris.
+#endif

@@ -52,7 +52,6 @@ func TestReduceMaxAbs(t *testing.T) {
 	}
 }
 
-
 func TestReduceMin(t *testing.T) {
 	LockCudaThread()
 	N := 10033

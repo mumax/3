@@ -52,7 +52,6 @@ func TestReduceMin(t *testing.T) {
 	}
 }
 
-
 func BenchmarkReduceSum(b *testing.B) {
 	core.LOG = false
 	b.StopTimer()

@@ -15,11 +15,11 @@ const REDUCEMIN = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000042d9_00000000-9_reducemin.cpp3.i"
+	.file	1 "/tmp/tmpxft_0000467c_00000000-9_reducemin.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemin.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
-// __cuda_local_var_33839_32_non_const_sdata has been demoted
+// __cuda_local_var_33846_32_non_const_sdata has been demoted
 
 .visible .entry reducemin(
 	.param .u64 reducemin_param_0,
@@ -32,7 +32,7 @@ const REDUCEMIN = `
 	.reg .f32 	%f<31>;
 	.reg .s64 	%rd<13>;
 	// demoted variable
-	.shared .align 4 .b8 __cuda_local_var_33839_32_non_const_sdata[2048];
+	.shared .align 4 .b8 __cuda_local_var_33846_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd4, [reducemin_param_0];
 	ld.param.u64 	%rd5, [reducemin_param_1];
@@ -69,7 +69,7 @@ BB0_1:
 BB0_2:
 	.loc 2 9 1
 	mul.wide.s32 	%rd8, %r2, 4;
-	mov.u64 	%rd9, __cuda_local_var_33839_32_non_const_sdata;
+	mov.u64 	%rd9, __cuda_local_var_33846_32_non_const_sdata;
 	add.s64 	%rd3, %rd9, %rd8;
 	st.shared.f32 	[%rd3], %f29;
 	bar.sync 	0;
@@ -152,7 +152,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 2 9 1
-	ld.shared.u32 	%r36, [__cuda_local_var_33839_32_non_const_sdata];
+	ld.shared.u32 	%r36, [__cuda_local_var_33846_32_non_const_sdata];
 	.loc 3 1865 5
 	atom.global.min.s32 	%r37, [%rd1], %r36;
 

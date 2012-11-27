@@ -6,7 +6,6 @@ import (
 	"unsafe"
 )
 
-
 func reduceSum(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducesum", in, stream)
 }

@@ -15,7 +15,7 @@ const REDUCEMAX = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00003f32_00000000-9_reducemax.cpp3.i"
+	.file	1 "/tmp/tmpxft_000041d1_00000000-9_reducemax.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemax.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
@@ -48,7 +48,7 @@ const REDUCEMAX = `
 	mul.lo.s32 	%r4, %r39, %r11;
 	.loc 2 9 1
 	setp.ge.s32 	%p1, %r38, %r9;
-	mov.f32 	%f29, 0fFE967699;
+	mov.f32 	%f29, 0fFF7FFFFF;
 	mov.f32 	%f30, %f29;
 	@%p1 bra 	BB0_2;
 

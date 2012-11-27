@@ -8,12 +8,12 @@ import (
 
 func TestReduceSum(t *testing.T) {
 	LockCudaThread()
-	N := 512
+	N := 10
 	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//		in := input.Host()
-//		for i := range in {
-//			in[i] = 0
-//		}
+	in := input.Host()
+	for i := range in {
+		in[i] = 1
+	}
 	str := cu.StreamCreate()
 	result := reduce_sum(input.Device(), str)
 	if result != 0 {

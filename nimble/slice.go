@@ -46,9 +46,8 @@ func cpuSlice(N int) Slice {
 }
 
 func gpuSlice(N int) Slice {
-	bytes := int64(N) * SizeofFloat32
-	ptr := unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
-	return Slice{ptr, N, GPUMemory}
+	s := safe.MakeFloat32s(N)
+	return Slice{unsafe.Pointer(uintptr(s.Pointer())), N, GPUMemory}
 }
 
 func unifiedSlice(N int) Slice {

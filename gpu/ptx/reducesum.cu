@@ -4,6 +4,7 @@ inline __device__ float sum(float a, float b){
 	return a + b;
 }
 
+// smemsize needs to be at least 2*32
 extern "C" __global__ void
 reducesum(float *src, float *dst) {
 

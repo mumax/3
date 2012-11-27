@@ -15,7 +15,7 @@ const REDUCESUM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000016c5_00000000-9_reducesum.cpp3.i"
+	.file	1 "/tmp/tmpxft_000016ff_00000000-9_reducesum.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducesum.cu"
 .extern .shared .align 4 .b8 sdata[];
 
@@ -43,37 +43,37 @@ const REDUCESUM = `
 	.loc 2 13 1
 	add.s32 	%r8, %r7, %r3;
 	cvta.to.global.u64 	%rd5, %rd3;
-	.loc 2 15 1
+	.loc 2 16 1
 	mul.wide.u32 	%rd6, %r8, 4;
 	add.s64 	%rd7, %rd5, %rd6;
 	mul.wide.u32 	%rd8, %r3, 4;
 	mov.u64 	%rd9, sdata;
 	add.s64 	%rd2, %rd9, %rd8;
-	.loc 2 16 1
+	.loc 2 17 1
 	add.s32 	%r9, %r36, %r8;
 	mul.wide.u32 	%rd10, %r9, 4;
 	add.s64 	%rd11, %rd5, %rd10;
 	ld.global.f32 	%f1, [%rd11];
-	.loc 2 15 1
-	ld.global.f32 	%f2, [%rd7];
 	.loc 2 16 1
+	ld.global.f32 	%f2, [%rd7];
+	.loc 2 17 1
 	add.f32 	%f3, %f2, %f1;
 	st.shared.f32 	[%rd2], %f3;
-	.loc 2 18 1
+	.loc 2 19 1
 	bar.sync 	0;
-	.loc 2 20 1
+	.loc 2 21 1
 	setp.lt.u32 	%p1, %r36, 66;
 	@%p1 bra 	BB0_4;
 
 BB0_1:
-	.loc 2 20 1
+	.loc 2 21 1
 	mov.u32 	%r4, %r36;
 	shr.u32 	%r36, %r4, 1;
-	.loc 2 21 1
+	.loc 2 22 1
 	setp.ge.u32 	%p2, %r3, %r36;
 	@%p2 bra 	BB0_3;
 
-	.loc 2 22 1
+	.loc 2 23 1
 	ld.shared.f32 	%f4, [%rd2];
 	add.s32 	%r14, %r36, %r3;
 	mul.wide.u32 	%rd12, %r14, 4;
@@ -83,61 +83,61 @@ BB0_1:
 	st.shared.f32 	[%rd2], %f6;
 
 BB0_3:
-	.loc 2 24 1
+	.loc 2 25 1
 	bar.sync 	0;
-	.loc 2 20 1
+	.loc 2 21 1
 	setp.gt.u32 	%p3, %r4, 131;
 	@%p3 bra 	BB0_1;
 
 BB0_4:
-	.loc 2 27 1
+	.loc 2 28 1
 	setp.gt.u32 	%p4, %r3, 31;
 	@%p4 bra 	BB0_6;
 
-	.loc 2 29 1
+	.loc 2 30 1
 	ld.volatile.shared.f32 	%f7, [%rd2];
 	ld.volatile.shared.f32 	%f8, [%rd2+128];
 	add.f32 	%f9, %f7, %f8;
 	st.volatile.shared.f32 	[%rd2], %f9;
-	.loc 2 30 1
+	.loc 2 31 1
 	ld.volatile.shared.f32 	%f10, [%rd2+64];
 	ld.volatile.shared.f32 	%f11, [%rd2];
 	add.f32 	%f12, %f11, %f10;
 	st.volatile.shared.f32 	[%rd2], %f12;
-	.loc 2 31 1
+	.loc 2 32 1
 	ld.volatile.shared.f32 	%f13, [%rd2+32];
 	ld.volatile.shared.f32 	%f14, [%rd2];
 	add.f32 	%f15, %f14, %f13;
 	st.volatile.shared.f32 	[%rd2], %f15;
-	.loc 2 32 1
+	.loc 2 33 1
 	ld.volatile.shared.f32 	%f16, [%rd2+16];
 	ld.volatile.shared.f32 	%f17, [%rd2];
 	add.f32 	%f18, %f17, %f16;
 	st.volatile.shared.f32 	[%rd2], %f18;
-	.loc 2 33 1
+	.loc 2 34 1
 	ld.volatile.shared.f32 	%f19, [%rd2+8];
 	ld.volatile.shared.f32 	%f20, [%rd2];
 	add.f32 	%f21, %f20, %f19;
 	st.volatile.shared.f32 	[%rd2], %f21;
-	.loc 2 34 1
+	.loc 2 35 1
 	ld.volatile.shared.f32 	%f22, [%rd2+4];
 	ld.volatile.shared.f32 	%f23, [%rd2];
 	add.f32 	%f24, %f23, %f22;
 	st.volatile.shared.f32 	[%rd2], %f24;
 
 BB0_6:
-	.loc 2 38 1
+	.loc 2 39 1
 	setp.ne.s32 	%p5, %r3, 0;
 	@%p5 bra 	BB0_8;
 
-	.loc 2 38 1
+	.loc 2 39 1
 	ld.shared.f32 	%f25, [sdata];
 	mul.wide.u32 	%rd15, %r1, 4;
 	add.s64 	%rd16, %rd1, %rd15;
 	st.global.f32 	[%rd16], %f25;
 
 BB0_8:
-	.loc 2 39 2
+	.loc 2 40 2
 	ret;
 }
 

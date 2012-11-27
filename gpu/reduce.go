@@ -6,8 +6,8 @@ import (
 	"unsafe"
 )
 
-func reduce_sum(in safe.Float32s, stream cu.Stream) {
-	out := cu.MemAlloc(cu.SIZEOF_FLOAT32) // TODO
+func reduce_sum(in safe.Float32s, stream cu.Stream) float32{
+	out := safe.MakeFloat32s(1)
 	defer out.Free()
 
 	N := in.Len()
@@ -17,7 +17,7 @@ func reduce_sum(in safe.Float32s, stream cu.Stream) {
 	gridDim.X = 8 // TODO
 
 	inptr := in.Pointer()
-	outptr := unsafe.Pointer(uintptr(out))
+	outptr := unsafe.Pointer(uintptr(out.Pointer()))
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&inptr),
 		unsafe.Pointer(&outptr),
@@ -26,5 +26,10 @@ func reduce_sum(in safe.Float32s, stream cu.Stream) {
 	shmem := 0
 	code := PTXLoad("reducesum")
 	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
+
+	var result_ [1]float32
+	result := result_[:]
+	out.CopyDtoHAsync(result, stream)
 	stream.Synchronize()
+	return result_[0]	
 }

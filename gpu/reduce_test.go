@@ -37,6 +37,22 @@ func TestReduceMax(t *testing.T) {
 	}
 }
 
+func TestReduceMaxAbs(t *testing.T) {
+	LockCudaThread()
+	N := 100000
+	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in := input.Host()
+	for i := range in {
+		in[i] = -float32(i) / 100
+	}
+	str := cu.StreamCreate()
+	result := reduceMaxAbs(input.Device(), str)
+	if result != 999.99 {
+		t.Error("got:", result)
+	}
+}
+
+
 func TestReduceMin(t *testing.T) {
 	LockCudaThread()
 	N := 10033

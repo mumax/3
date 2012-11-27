@@ -1,8 +1,5 @@
 #include "reduce.h"
-
-inline __device__ void atomicFmax(float* a, float b){
-	atomicMax((int*)(a), *((int*)(&b)));
-}
+#include "atomicf.h"
 
 extern "C" __global__ void
 reducemax(float *src, float *dst, int n) {

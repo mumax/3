@@ -15,7 +15,7 @@ const KERNMULC = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000459e_00000000-9_kernmulc.cpp3.i"
+	.file	1 "/tmp/tmpxft_000048a8_00000000-9_kernmulc.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulc.cu"
 
 .visible .entry kernmulC(

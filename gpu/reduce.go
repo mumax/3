@@ -17,7 +17,7 @@ func reduce_sum(in safe.Float32s, stream cu.Stream) {
 	gridDim.X = 8 // TODO
 
 	inptr := in.Pointer()
-	outptr := unsafe.Pointer(out)
+	outptr := unsafe.Pointer(uintptr(out))
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&inptr),
 		unsafe.Pointer(&outptr),

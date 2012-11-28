@@ -5,6 +5,8 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
+	"fmt"
+	"reflect"
 	"unsafe"
 )
 
@@ -165,4 +167,17 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 	result := result_[:]
 	out.CopyDtoH(result) // async? register one arena block // , stream)
 	return result_[0]
+}
+
+func ptxcallAsync(code string, blockDim, gridDim cu.Dim3, shmem int, stream cu.Stream, args ...interface{}){
+	argptr := make([]unsafe.Pointer, len(args))	
+	for i, arg:=range args{
+		switch v := arg.(type){
+			default: panic(fmt.Errorf("ptxcall: unsupported type: %v", reflect.TypeOf(arg)))
+			case int: argptr[i] = unsafe.Pointer(&v)
+			case uintptr: argptr[i] = unsafe.Pointer(&v)
+		}
+	}
+	kernel := PTXLoad(code)
+	cu.LaunchKernel(kernel, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, argptr)
 }

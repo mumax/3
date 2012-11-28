@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func init(){core.LOG = false}
+func init() { core.LOG = false }
 
 func TestReduceSum(t *testing.T) {
 	LockCudaThread()
@@ -73,7 +73,6 @@ func TestReduceMaxDiff(t *testing.T) {
 		t.Error("got:", result)
 	}
 }
-
 
 func TestReduceMin(t *testing.T) {
 	LockCudaThread()

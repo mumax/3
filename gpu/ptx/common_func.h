@@ -80,4 +80,9 @@ inline __device__ float3 normalize(float3 a){
 	return veclen * a;
 }
 
+// square
+inline __device__ float sqr(float x){
+	return x * x;
+}
+
 #endif

@@ -33,7 +33,7 @@ func reduceMaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
 }
 
 func reduceMaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
-	return math.Sqrt(float64(reduce6("reducemaxvecdiff2",x1, y1, z1, x2, y2, z2 , stream)))
+	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, stream)))
 }
 
 // 1-input reduce with arbitrary PTX code (op)
@@ -127,7 +127,6 @@ func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
 	out.CopyDtoH(result) // async? register one arena block // , stream)
 	return result_[0]
 }
-
 
 // 6-input reduce with arbitrary PTX code (op)
 func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.Stream) float32 {

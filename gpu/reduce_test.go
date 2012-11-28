@@ -7,17 +7,19 @@ import (
 	"testing"
 )
 
+func init(){core.LOG = false}
+
 func TestReduceSum(t *testing.T) {
 	LockCudaThread()
-	N := 10000
+	N := 1000
 	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
 	in := input.Host()
 	for i := range in {
-		in[i] = float32(i) / 100
+		in[i] = float32(i)
 	}
 	str := cu.StreamCreate()
 	result := reduceSum(input.Device(), str)
-	if result != 499950 {
+	if result != 499500 {
 		t.Error("got:", result)
 	}
 }
@@ -51,6 +53,27 @@ func TestReduceMaxAbs(t *testing.T) {
 		t.Error("got:", result)
 	}
 }
+
+func TestReduceMaxDiff(t *testing.T) {
+	LockCudaThread()
+	N := 100001
+	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in := input.Host()
+	for i := range in {
+		in[i] = -float32(i) / 100
+	}
+	input2 := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in2 := input2.Host()
+	for i := range in2 {
+		in2[i] = float32(i) / 100
+	}
+	str := cu.StreamCreate()
+	result := reduceMaxDiff(input.Device(), input2.Device(), str)
+	if result != 2000 {
+		t.Error("got:", result)
+	}
+}
+
 
 func TestReduceMin(t *testing.T) {
 	LockCudaThread()

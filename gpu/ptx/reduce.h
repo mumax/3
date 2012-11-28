@@ -14,8 +14,8 @@
 	float mine = initVal;                               \
 	int stride = gridDim.x * blockDim.x;                \
 	while (i < n) {                                     \
-    	mine = op(mine, load(i));            \
-    	i += stride;                                    \
+		mine = op(mine, load(i));                       \
+		i += stride;                                    \
 	}                                                   \
 	sdata[tid] = mine;                                  \
 	__syncthreads();                                    \

@@ -1,8 +1,6 @@
 #ifndef _REDUCE_H_
 #define _REDUCE_H_
 
-#define load_ident(i) src[i]
-
 // Block size for reduce kernels.
 #define BLOCK 512
 

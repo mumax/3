@@ -4,8 +4,10 @@ inline __device__ float sum(float a, float b){
 	return a + b;
 }
 
+#define load(i) src[i]
+
 extern "C" __global__ void
 reducesum(float *src, float *dst, int n) {
-	reduce(load_ident, sum, atomicAdd, 0)
+	reduce(load, sum, atomicAdd, 0)
 }
 

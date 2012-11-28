@@ -2,11 +2,11 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
+	//"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
-	"fmt"
-	"reflect"
+	//"reflect"
 	"unsafe"
 )
 
@@ -48,6 +48,7 @@ func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 	blockDim := cu.Dim3{512, 1, 1}
 	gridDim := cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
 
+	//ptxcallAsync(op, gridDim, blockDim, 0, stream, in.Pointer(), out.Pointer(), N)
 	inptr := in.Pointer()
 	outptr := out.Pointer()
 	args := []unsafe.Pointer{
@@ -169,15 +170,19 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 	return result_[0]
 }
 
-func ptxcallAsync(code string, blockDim, gridDim cu.Dim3, shmem int, stream cu.Stream, args ...interface{}){
-	argptr := make([]unsafe.Pointer, len(args))	
-	for i, arg:=range args{
-		switch v := arg.(type){
-			default: panic(fmt.Errorf("ptxcall: unsupported type: %v", reflect.TypeOf(arg)))
-			case int: argptr[i] = unsafe.Pointer(&v)
-			case uintptr: argptr[i] = unsafe.Pointer(&v)
-		}
-	}
-	kernel := PTXLoad(code)
-	cu.LaunchKernel(kernel, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, argptr)
-}
+//func ptxcallAsync(code string, gridDim, blockDim cu.Dim3, shmem int, stream cu.Stream, args ...interface{}) {
+//	argptr := make([]unsafe.Pointer, len(args))
+//	for i, arg := range args {
+//		switch v := arg.(type) {
+//		default:
+//			panic(fmt.Errorf("ptxcall: unsupported type: %v", reflect.TypeOf(arg)))
+//		case int:
+//			argptr[i] = unsafe.Pointer(&v)
+//			fmt.Println("arg", i, *((*int)(argptr[i])))
+//		case cu.DevicePtr, uintptr:
+//			argptr[i] = unsafe.Pointer(&v)
+//		}
+//	}
+//	kernel := PTXLoad(code)
+//	cu.LaunchKernel(kernel, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, argptr)
+//}

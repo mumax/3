@@ -15,21 +15,21 @@ const REDUCEMAXVECDIFF2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002811_00000000-9_reducemaxvecdiff2.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002c07_00000000-9_reducemaxvecdiff2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxvecdiff2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
 // __cuda_local_var_35271_32_non_const_sdata has been demoted
 
-.visible .entry reducevecdiff2(
-	.param .u64 reducevecdiff2_param_0,
-	.param .u64 reducevecdiff2_param_1,
-	.param .u64 reducevecdiff2_param_2,
-	.param .u64 reducevecdiff2_param_3,
-	.param .u64 reducevecdiff2_param_4,
-	.param .u64 reducevecdiff2_param_5,
-	.param .u64 reducevecdiff2_param_6,
-	.param .u32 reducevecdiff2_param_7
+.visible .entry reducemaxvecdiff2(
+	.param .u64 reducemaxvecdiff2_param_0,
+	.param .u64 reducemaxvecdiff2_param_1,
+	.param .u64 reducemaxvecdiff2_param_2,
+	.param .u64 reducemaxvecdiff2_param_3,
+	.param .u64 reducemaxvecdiff2_param_4,
+	.param .u64 reducemaxvecdiff2_param_5,
+	.param .u64 reducemaxvecdiff2_param_6,
+	.param .u32 reducemaxvecdiff2_param_7
 )
 {
 	.reg .pred 	%p<8>;
@@ -39,14 +39,14 @@ const REDUCEMAXVECDIFF2 = `
 	// demoted variable
 	.shared .align 4 .b8 __cuda_local_var_35271_32_non_const_sdata[2048];
 
-	ld.param.u64 	%rd9, [reducevecdiff2_param_0];
-	ld.param.u64 	%rd10, [reducevecdiff2_param_1];
-	ld.param.u64 	%rd11, [reducevecdiff2_param_2];
-	ld.param.u64 	%rd12, [reducevecdiff2_param_3];
-	ld.param.u64 	%rd13, [reducevecdiff2_param_4];
-	ld.param.u64 	%rd14, [reducevecdiff2_param_5];
-	ld.param.u64 	%rd15, [reducevecdiff2_param_6];
-	ld.param.u32 	%r9, [reducevecdiff2_param_7];
+	ld.param.u64 	%rd9, [reducemaxvecdiff2_param_0];
+	ld.param.u64 	%rd10, [reducemaxvecdiff2_param_1];
+	ld.param.u64 	%rd11, [reducemaxvecdiff2_param_2];
+	ld.param.u64 	%rd12, [reducemaxvecdiff2_param_3];
+	ld.param.u64 	%rd13, [reducemaxvecdiff2_param_4];
+	ld.param.u64 	%rd14, [reducemaxvecdiff2_param_5];
+	ld.param.u64 	%rd15, [reducemaxvecdiff2_param_6];
+	ld.param.u32 	%r9, [reducemaxvecdiff2_param_7];
 	cvta.to.global.u64 	%rd1, %rd15;
 	cvta.to.global.u64 	%rd2, %rd14;
 	cvta.to.global.u64 	%rd3, %rd11;

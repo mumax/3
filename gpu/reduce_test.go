@@ -104,7 +104,6 @@ func BenchmarkReduceSum(b *testing.B) {
 	}
 }
 
-
 func TestReduceMaxVecNorm(t *testing.T) {
 	LockCudaThread()
 	N := 1234
@@ -114,11 +113,33 @@ func TestReduceMaxVecNorm(t *testing.T) {
 		in[i] = -float32(i) / 1000
 	}
 	str := cu.StreamCreate()
-	x:= input.Device()
-	result := reduceMaxNorm(x, x, x, str)
+	x := input.Device()
+	result := reduceMaxVecNorm(x, x, x, str)
 	want := math.Sqrt(3) * 1233. / 1000.
-	if math.Abs(result - want)>1e-7 {
+	if math.Abs(result-want) > 1e-7 {
 		t.Error("got:", result, "want:", want)
 	}
 }
 
+func TestReduceMaxVecDiff(t *testing.T) {
+	LockCudaThread()
+	N := 1234
+	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in := input.Host()
+	for i := range in {
+		in[i] = -float32(i) / 1000
+	}
+	str := cu.StreamCreate()
+	x := input.Device()
+	input2 := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in2 := input2.Host()
+	for i := range in2 {
+		in2[i] = 0
+	}
+	y := input2.Device()
+	result := reduceMaxVecDiff(x, x, x, y, y, y, str)
+	want := math.Sqrt(3) * 1233. / 1000.
+	if math.Abs(result-want) > 1e-7 {
+		t.Error("got:", result, "want:", want)
+	}
+}

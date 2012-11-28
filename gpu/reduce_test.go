@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
+	"math"
 	"testing"
 )
 
@@ -102,3 +103,22 @@ func BenchmarkReduceSum(b *testing.B) {
 		reduceSum(input.Device(), str)
 	}
 }
+
+
+func TestReduceMaxVecNorm(t *testing.T) {
+	LockCudaThread()
+	N := 1234
+	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
+	in := input.Host()
+	for i := range in {
+		in[i] = -float32(i) / 1000
+	}
+	str := cu.StreamCreate()
+	x:= input.Device()
+	result := reduceMaxNorm(x, x, x, str)
+	want := math.Sqrt(3) * 1233. / 1000.
+	if math.Abs(result - want)>1e-7 {
+		t.Error("got:", result, "want:", want)
+	}
+}
+

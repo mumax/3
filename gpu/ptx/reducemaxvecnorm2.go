@@ -15,18 +15,18 @@ const REDUCEMAXVECNORM2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002819_00000000-9_reducemaxvecnorm2.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002a83_00000000-9_reducemaxvecnorm2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxvecnorm2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
 // __cuda_local_var_35267_32_non_const_sdata has been demoted
 
-.visible .entry reducevecnorm2(
-	.param .u64 reducevecnorm2_param_0,
-	.param .u64 reducevecnorm2_param_1,
-	.param .u64 reducevecnorm2_param_2,
-	.param .u64 reducevecnorm2_param_3,
-	.param .u32 reducevecnorm2_param_4
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .u32 reducemaxvecnorm2_param_4
 )
 {
 	.reg .pred 	%p<8>;
@@ -36,11 +36,11 @@ const REDUCEMAXVECNORM2 = `
 	// demoted variable
 	.shared .align 4 .b8 __cuda_local_var_35267_32_non_const_sdata[2048];
 
-	ld.param.u64 	%rd6, [reducevecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducevecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducevecnorm2_param_2];
-	ld.param.u64 	%rd9, [reducevecnorm2_param_3];
-	ld.param.u32 	%r9, [reducevecnorm2_param_4];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd9, [reducemaxvecnorm2_param_3];
+	ld.param.u32 	%r9, [reducemaxvecnorm2_param_4];
 	cvta.to.global.u64 	%rd1, %rd9;
 	cvta.to.global.u64 	%rd2, %rd8;
 	cvta.to.global.u64 	%rd3, %rd7;

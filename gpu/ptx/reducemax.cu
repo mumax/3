@@ -3,6 +3,6 @@
 
 extern "C" __global__ void
 reducemax(float *src, float *dst, int n) {
-	reduce(ident, fmax, atomicFmax, -3.4028234663852886e38)
+	reduce(load_ident, fmax, atomicFmax, -3.4028234663852886e38)
 }
 

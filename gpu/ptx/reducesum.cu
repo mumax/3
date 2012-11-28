@@ -6,6 +6,6 @@ inline __device__ float sum(float a, float b){
 
 extern "C" __global__ void
 reducesum(float *src, float *dst, int n) {
-	reduce(ident, sum, atomicAdd, 0)
+	reduce(load_ident, sum, atomicAdd, 0)
 }
 

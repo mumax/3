@@ -1,17 +1,14 @@
 #ifndef _REDUCE_H_
 #define _REDUCE_H_
 
-// identity preprocess func.
-inline __device__ float ident(float a){
-	return a;
-}
+#define load_ident(i) src[i]
 
 // Block size for reduce kernels.
 #define BLOCK 512
 
 // This macro expands to a reduce kernel with arbitrary reduce operation.
 // Ugly, perhaps, but arguably nicer than some 1000+ line C++ template.
-#define reduce(preprocess, op, atomicOp, initVal)\
+#define reduce(load, op, atomicOp, initVal)\
  	__shared__ float sdata[BLOCK];                      \
 	int tid = threadIdx.x;                              \
 	int i =  blockIdx.x * blockDim.x + threadIdx.x;     \
@@ -19,7 +16,7 @@ inline __device__ float ident(float a){
 	float mine = initVal;                               \
 	int stride = gridDim.x * blockDim.x;                \
 	while (i < n) {                                     \
-    	mine = op(mine, preprocess(src[i]));            \
+    	mine = op(mine, load(i));            \
     	i += stride;                                    \
 	}                                                   \
 	sdata[tid] = mine;                                  \

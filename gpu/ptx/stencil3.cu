@@ -33,10 +33,11 @@ stencil3(float* dst, float* src,
 
 	for(int i=0; i<N0; i++){
 
-		float H = w0 * src[idx(i,j,k)];
-		H += wt*src[idx(clamp(i+1,N0), j, k)] + wb*src[idx(clamp(i-1,N0), j, k)];
-		H += wu*src[idx(i, clamp(j+1,N1), k)] + wd*src[idx(i, clamp(j-1,N1), k)];
-		H += wr*src[idx(i, j, clamp(k+1,N2))] + wl*src[idx(i, j, clamp(k-1,N2))];
+		float H = 0;
+		if(w0 != 0.f){ H += w0 * src[idx(i,j,k)]; }
+		if(wt != 0.f){ H += wt*src[idx(clamp(i+1,N0), j, k)] + wb*src[idx(clamp(i-1,N0), j, k)]; }
+		if(wu != 0.f){ H += wu*src[idx(i, clamp(j+1,N1), k)] + wd*src[idx(i, clamp(j-1,N1), k)]; }
+		if(wr != 0.f){ H += wr*src[idx(i, j, clamp(k+1,N2))] + wl*src[idx(i, j, clamp(k-1,N2))]; }
 
 		dst[idx(i,j,k)] += H;
 	}

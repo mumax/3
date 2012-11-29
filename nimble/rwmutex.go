@@ -44,7 +44,6 @@ type rwMutex struct {
 
 // RWMutex to protect an array of length N.
 func newRWMutex(N int, tag string) *rwMutex {
-	profRegister(tag)
 	m := new(rwMutex)
 	m.n = N
 	m.cond = *(sync.NewCond(&m.state))
@@ -76,8 +75,7 @@ func (m *rwMutex) delta(Δstart, Δstop int) {
 	}
 	m.absA += Δa
 	m.absB += Δb
-
-	profWriteDelta(m.tag, int(m.absB-m.absA))
+	//profWriteDelta(m.tag, int(m.absB-m.absA))
 }
 
 // Lock the next delta elements for writing.

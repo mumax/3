@@ -19,7 +19,7 @@ func TestReduceSum(t *testing.T) {
 		in[i] = float32(i)
 	}
 	str := cu.StreamCreate()
-	result := reduceSum(input.Device(), str)
+	result := Sum(input.Device(), str)
 	if result != 499500 {
 		t.Error("got:", result)
 	}
@@ -34,7 +34,7 @@ func TestReduceMax(t *testing.T) {
 		in[i] = float32(i) / 100
 	}
 	str := cu.StreamCreate()
-	result := reduceMax(input.Device(), str)
+	result := Max(input.Device(), str)
 	if result != 999.99 {
 		t.Error("got:", result)
 	}
@@ -49,7 +49,7 @@ func TestReduceMaxAbs(t *testing.T) {
 		in[i] = -float32(i) / 100
 	}
 	str := cu.StreamCreate()
-	result := reduceMaxAbs(input.Device(), str)
+	result := MaxAbs(input.Device(), str)
 	if result != 999.99 {
 		t.Error("got:", result)
 	}
@@ -69,7 +69,7 @@ func TestReduceMaxDiff(t *testing.T) {
 		in2[i] = float32(i) / 100
 	}
 	str := cu.StreamCreate()
-	result := reduceMaxDiff(input.Device(), input2.Device(), str)
+	result := MaxDiff(input.Device(), input2.Device(), str)
 	if result != 2000 {
 		t.Error("got:", result)
 	}
@@ -84,7 +84,7 @@ func TestReduceMin(t *testing.T) {
 		in[i] = float32(i) - 100
 	}
 	str := cu.StreamCreate()
-	result := reduceMin(input.Device(), str)
+	result := Min(input.Device(), str)
 	if result != -100 {
 		t.Error("got:", result)
 	}
@@ -100,7 +100,7 @@ func BenchmarkReduceSum(b *testing.B) {
 	b.SetBytes(N * 4)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		reduceSum(input.Device(), str)
+		Sum(input.Device(), str)
 	}
 }
 
@@ -114,7 +114,7 @@ func TestReduceMaxVecNorm(t *testing.T) {
 	}
 	str := cu.StreamCreate()
 	x := input.Device()
-	result := reduceMaxVecNorm(x, x, x, str)
+	result := MaxVecNorm(x, x, x, str)
 	want := math.Sqrt(3) * 1233. / 1000.
 	if math.Abs(result-want) > 1e-7 {
 		t.Error("got:", result, "want:", want)
@@ -137,7 +137,7 @@ func TestReduceMaxVecDiff(t *testing.T) {
 		in2[i] = 0
 	}
 	y := input2.Device()
-	result := reduceMaxVecDiff(x, x, x, y, y, y, str)
+	result := MaxVecDiff(x, x, x, y, y, y, str)
 	want := math.Sqrt(3) * 1233. / 1000.
 	if math.Abs(result-want) > 1e-7 {
 		t.Error("got:", result, "want:", want)

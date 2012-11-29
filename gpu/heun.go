@@ -47,7 +47,9 @@ func (e *Heun) Advance(seconds float64) {
 		e.Step()
 	}
 
-	if core.DEBUG { e.debug.Flush() }
+	if core.DEBUG {
+		e.debug.Flush()
+	}
 }
 
 // Run for a number of steps
@@ -58,7 +60,9 @@ func (e *Heun) Steps(steps int) {
 	for s := 0; s < steps; s++ {
 		e.Step()
 	}
-	if core.DEBUG { e.debug.Flush() }
+	if core.DEBUG {
+		e.debug.Flush()
+	}
 }
 
 // Take one time step

@@ -11,19 +11,20 @@ import (
 
 // Heun solver.
 type Heun struct {
-	dy0           [3]safe.Float32s
-	y             nimble.ChanN
-	dy            nimble.RChanN
-	dt_si, dt_mul float64 // time step = dt_si*dt_mul, which should be nice float32
-	time          float64
-	Mindt, Maxdt  float64
-	Maxerr, Headroom        float64
-	stream        cu.Stream
-	init          bool
-	debug         dump.TableWriter // save t, dt, error here
+	dy0              [3]safe.Float32s
+	y                nimble.ChanN
+	dy               nimble.RChanN
+	dt_si, dt_mul    float64 // time step = dt_si*dt_mul, which should be nice float32
+	time             float64
+	Mindt, Maxdt     float64
+	Maxerr, Headroom float64
+	stream           cu.Stream
+	init             bool
+	debug            dump.TableWriter // save t, dt, error here
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
+	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
 	var w dump.TableWriter
@@ -40,11 +41,27 @@ func (e *Heun) SetDt(dt float64) {
 	e.dt_si = dt
 }
 
+func (e *Heun) Advance(duration float64) {
+	nimble.RunStack()
+	core.Log("GPU heun solver:", duration, "s")
+	LockCudaThread()
+	defer UnlockCudaThread() // better not?
+
+	stop := e.time + duration
+	for e.time < stop {
+		e.Step()
+	}
+
+	if core.DEBUG {
+		e.debug.Flush()
+	}
+}
+
 func (e *Heun) Steps(steps int) {
 	nimble.RunStack()
 	core.Log("GPU heun solver:", steps, "steps")
 	LockCudaThread()
-	defer UnlockCudaThread()
+	defer UnlockCudaThread() // better not?
 
 	for s := 0; s < steps; s++ {
 		e.Step()
@@ -92,12 +109,13 @@ func (e *Heun) Step() {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
 			e.debug.WriteData()
 		}
-		if err < e.Maxerr {
+		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
 			e.time += e.dt_si
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
 			// do not advance solution, nor time
+			// just try again next time with smaller dt
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
 	}

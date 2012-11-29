@@ -4,7 +4,6 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu/ptx"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"
@@ -40,16 +39,10 @@ func rotatevec(vec, delta [3]safe.Float32s, factor float32, stream cu.Stream) {
 	stream.Synchronize()
 }
 
-var rotatevec2Code cu.Function
 
 // Rotate unit vectors v by factor * delta.
 func rotatevec2(vec, delta1 [3]safe.Float32s, factor1 float32, delta2 [3]safe.Float32s, factor2 float32, stream cu.Stream) {
 	core.Assert(vec[0].Len() == delta1[0].Len() && vec[0].Len() == delta2[0].Len())
-
-	if rotatevec2Code == 0 {
-		mod := cu.ModuleLoadData(ptx.ROTATEVEC2)
-		rotatevec2Code = mod.GetFunction("rotatevec2")
-	}
 
 	N := vec[0].Len()
 	gridDim, blockDim := Make1DConf(N)

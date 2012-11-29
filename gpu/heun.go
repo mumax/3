@@ -36,8 +36,13 @@ func (e *Heun) Steps(steps int) {
 	LockCudaThread()
 	defer UnlockCudaThread()
 
-	n := e.y.Mesh().NCell()
+	for s:=0; s<steps; s++{
+		e.Step()
+	}
+}
 
+func(e*Heun) Step(){
+	n := e.y.Mesh().NCell()
 	// Send out initial value
 	if !e.init {
 		e.y.WriteNext(n)
@@ -49,7 +54,6 @@ func (e *Heun) Steps(steps int) {
 
 	dy0 := e.dy0
 
-	for s := 0; s < steps; s++ {
 		dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 
 		// stage 1
@@ -86,10 +90,7 @@ func (e *Heun) Steps(steps int) {
 			core.Log("dt:", e.dt_si)
 		}
 		e.dy.ReadDone()
-		if s != steps-1 {
-			e.y.WriteDone() // do not signal write done to get pipeline in fixed state
-		}
-	}
+		// no write done here.
 }
 
 func (e *Heun) adaptDt(corr float64) {

@@ -15,12 +15,12 @@ type Heun struct {
 	y             nimble.ChanN
 	dy            nimble.RChanN
 	dt_si, dt_mul float64 // time step = dt_si*dt_mul, which should be nice float32
-	init          bool
-	Mindt, Maxdt  float64
-	Maxerr        float64
 	time          float64
+	Mindt, Maxdt  float64
+	Maxerr, Headroom        float64
 	stream        cu.Stream
-	debug         dump.TableWriter
+	init          bool
+	debug         dump.TableWriter // save t, dt, error here
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
@@ -32,7 +32,7 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
 	return &Heun{dy0: dy0, y: y, dy: dy,
-		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-3,
+		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-3, Headroom: 0.75,
 		debug: w, stream: cu.StreamCreate()}
 }
 
@@ -86,7 +86,7 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) // *dt !!!!!
+		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) * float64(dt)
 
 		if core.DEBUG {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
@@ -106,6 +106,7 @@ func (e *Heun) Step() {
 }
 
 func (e *Heun) adaptDt(corr float64) {
+	corr *= e.Headroom
 	if corr > 2 {
 		corr = 2
 	}

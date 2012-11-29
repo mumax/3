@@ -39,7 +39,6 @@ func (r *Autosaver) Run() {
 		output := r.data.ReadNext(N) // TODO: could read comp by comp...
 		if i%r.every == 0 {
 			i = 0
-			core.Debug("dump")
 			r.out.WriteHeader()
 			for c := 0; c < r.data.NComp(); c++ {
 				r.out.WriteData(r.gethost(output[c]))
@@ -49,10 +48,6 @@ func (r *Autosaver) Run() {
 		r.data.ReadDone()
 	}
 }
-
-//func (r*Autosaver) gethost(data Slice) []float32{
-//if data.MemType().CPUAccess()
-//}
 
 type hostBuf []float32
 

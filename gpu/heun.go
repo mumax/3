@@ -2,8 +2,8 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
 	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
@@ -16,17 +16,24 @@ type Heun struct {
 	dy            nimble.RChanN
 	dt_si, dt_mul float64 // time step = dt_si*dt_mul, which should be nice float32
 	init          bool
-	stream        cu.Stream
 	Mindt, Maxdt  float64
 	Maxerr        float64
 	time          float64
-	debug dump.TableWriter
+	stream        cu.Stream
+	debug         dump.TableWriter
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
-	return &Heun{dy0: dy0, y: y, dy: dy, dt_si: dt, dt_mul: multiplier, stream: cu.StreamCreate(), Maxerr: 1e-3}
+	var w dump.TableWriter
+	if core.DEBUG {
+		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.dump"),
+			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
+	}
+	return &Heun{dy0: dy0, y: y, dy: dy,
+		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-3,
+		debug: w, stream: cu.StreamCreate()}
 }
 
 func (e *Heun) SetDt(dt float64) {
@@ -41,6 +48,9 @@ func (e *Heun) Steps(steps int) {
 
 	for s := 0; s < steps; s++ {
 		e.Step()
+	}
+	if core.DEBUG {
+		e.debug.Flush()
 	}
 }
 
@@ -76,9 +86,12 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream)
+		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) // *dt !!!!!
 
-		core.Log("t, dt, err:", e.time, e.dt_si, err)
+		if core.DEBUG {
+			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
+			e.debug.WriteData()
+		}
 		if err < e.Maxerr {
 			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
 			e.time += e.dt_si

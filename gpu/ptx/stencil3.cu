@@ -34,13 +34,9 @@ stencil3(float* dst, float* src,
 	for(int i=0; i<N0; i++){
 
 		float H = w0 * src[idx(i,j,k)];
-		// TODO: terms _can_ be re-ordered to make laplacians more stable.
-		H += wt*src[idx(clamp(i+1,N0), j, k)];
-		H += wb*src[idx(clamp(i-1,N0), j, k)];
-		H += wu*src[idx(i, clamp(j+1,N1), k)];
-		H += wd*src[idx(i, clamp(j-1,N1), k)];
-		H += wr*src[idx(i, j, clamp(k+1,N2))];
-		H += wl*src[idx(i, j, clamp(k-1,N2))];
+		H += wt*src[idx(clamp(i+1,N0), j, k)] + wb*src[idx(clamp(i-1,N0), j, k)];
+		H += wu*src[idx(i, clamp(j+1,N1), k)] + wd*src[idx(i, clamp(j-1,N1), k)];
+		H += wr*src[idx(i, j, clamp(k+1,N2))] + wl*src[idx(i, j, clamp(k-1,N2))];
 
 		dst[idx(i,j,k)] += H;
 	}

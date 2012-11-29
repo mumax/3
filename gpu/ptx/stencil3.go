@@ -15,7 +15,7 @@ const STENCIL3 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002150_00000000-9_stencil3.cpp3.i"
+	.file	1 "/tmp/tmpxft_00000a7f_00000000-9_stencil3.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/stencil3.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 
@@ -39,7 +39,7 @@ const STENCIL3 = `
 {
 	.reg .pred 	%p<7>;
 	.reg .s32 	%r<73>;
-	.reg .f32 	%f<24>;
+	.reg .f32 	%f<26>;
 	.reg .s64 	%rd<20>;
 
 
@@ -79,32 +79,32 @@ const STENCIL3 = `
 	bra.uni 	BB0_1;
 
 BB0_1:
-	.loc 2 38 1
+	.loc 2 37 1
 	add.s32 	%r9, %r28, -1;
-	.loc 2 40 1
+	.loc 2 38 1
 	add.s32 	%r32, %r4, 1;
 	mov.u32 	%r31, 0;
 	.loc 3 238 5
 	max.s32 	%r33, %r32, %r31;
-	.loc 2 40 1
+	.loc 2 38 1
 	add.s32 	%r34, %r29, -1;
 	.loc 3 210 5
 	min.s32 	%r35, %r33, %r34;
-	.loc 2 41 1
+	.loc 2 38 1
 	add.s32 	%r36, %r4, -1;
 	.loc 3 238 5
 	max.s32 	%r37, %r36, %r31;
 	.loc 3 210 5
 	min.s32 	%r38, %r37, %r34;
-	.loc 2 42 1
+	.loc 2 39 1
 	add.s32 	%r39, %r8, 1;
 	.loc 3 238 5
 	max.s32 	%r40, %r39, %r31;
-	.loc 2 42 1
+	.loc 2 39 1
 	add.s32 	%r41, %r30, -1;
 	.loc 3 210 5
 	min.s32 	%r42, %r40, %r41;
-	.loc 2 43 1
+	.loc 2 39 1
 	add.s32 	%r43, %r8, -1;
 	.loc 3 238 5
 	max.s32 	%r44, %r43, %r31;
@@ -125,58 +125,57 @@ BB0_2:
 	mul.wide.s32 	%rd5, %r67, 4;
 	add.s64 	%rd6, %rd2, %rd5;
 	ld.global.f32 	%f8, [%rd6];
-	.loc 2 38 1
+	.loc 2 37 1
 	add.s32 	%r22, %r21, 1;
 	.loc 3 238 5
 	max.s32 	%r50, %r22, %r31;
 	.loc 3 210 5
 	min.s32 	%r51, %r50, %r9;
-	.loc 2 38 1
+	.loc 2 37 1
 	mad.lo.s32 	%r52, %r51, %r29, %r4;
 	mad.lo.s32 	%r53, %r52, %r30, %r8;
 	mul.wide.s32 	%rd7, %r53, 4;
 	add.s64 	%rd8, %rd2, %rd7;
 	ld.global.f32 	%f9, [%rd8];
-	mul.f32 	%f10, %f9, %f6;
-	fma.rn.f32 	%f11, %f8, %f1, %f10;
-	.loc 2 39 1
 	add.s32 	%r55, %r21, -1;
 	.loc 3 238 5
 	max.s32 	%r56, %r55, %r31;
 	.loc 3 210 5
 	min.s32 	%r57, %r56, %r9;
-	.loc 2 39 1
+	.loc 2 37 1
 	mad.lo.s32 	%r58, %r57, %r29, %r4;
 	mad.lo.s32 	%r59, %r58, %r30, %r8;
 	mul.wide.s32 	%rd9, %r59, 4;
 	add.s64 	%rd10, %rd2, %rd9;
-	ld.global.f32 	%f12, [%rd10];
-	fma.rn.f32 	%f13, %f12, %f7, %f11;
-	.loc 2 40 1
+	ld.global.f32 	%f10, [%rd10];
+	mul.f32 	%f11, %f10, %f7;
+	fma.rn.f32 	%f12, %f9, %f6, %f11;
+	fma.rn.f32 	%f13, %f8, %f1, %f12;
+	.loc 2 38 1
 	mul.wide.s32 	%rd11, %r70, 4;
 	add.s64 	%rd12, %rd2, %rd11;
 	ld.global.f32 	%f14, [%rd12];
-	fma.rn.f32 	%f15, %f14, %f4, %f13;
-	.loc 2 41 1
 	mul.wide.s32 	%rd13, %r71, 4;
 	add.s64 	%rd14, %rd2, %rd13;
-	ld.global.f32 	%f16, [%rd14];
-	fma.rn.f32 	%f17, %f16, %f5, %f15;
-	.loc 2 42 1
+	ld.global.f32 	%f15, [%rd14];
+	mul.f32 	%f16, %f15, %f5;
+	fma.rn.f32 	%f17, %f14, %f4, %f16;
+	add.f32 	%f18, %f13, %f17;
+	.loc 2 39 1
 	mul.wide.s32 	%rd15, %r68, 4;
 	add.s64 	%rd16, %rd2, %rd15;
-	ld.global.f32 	%f18, [%rd16];
-	fma.rn.f32 	%f19, %f18, %f3, %f17;
-	.loc 2 43 1
+	ld.global.f32 	%f19, [%rd16];
 	mul.wide.s32 	%rd17, %r69, 4;
 	add.s64 	%rd18, %rd2, %rd17;
 	ld.global.f32 	%f20, [%rd18];
-	fma.rn.f32 	%f21, %f20, %f2, %f19;
-	.loc 2 45 1
+	mul.f32 	%f21, %f20, %f2;
+	fma.rn.f32 	%f22, %f19, %f3, %f21;
+	add.f32 	%f23, %f18, %f22;
+	.loc 2 41 1
 	add.s64 	%rd19, %rd1, %rd5;
-	ld.global.f32 	%f22, [%rd19];
-	add.f32 	%f23, %f22, %f21;
-	st.global.f32 	[%rd19], %f23;
+	ld.global.f32 	%f24, [%rd19];
+	add.f32 	%f25, %f24, %f23;
+	st.global.f32 	[%rd19], %f25;
 	.loc 2 34 1
 	add.s32 	%r71, %r71, %r11;
 	add.s32 	%r70, %r70, %r11;
@@ -188,7 +187,7 @@ BB0_2:
 	@%p6 bra 	BB0_2;
 
 BB0_3:
-	.loc 2 47 2
+	.loc 2 43 2
 	ret;
 }
 

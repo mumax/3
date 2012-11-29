@@ -2,39 +2,48 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	//"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
-	//"reflect"
 	"unsafe"
 )
 
-func reduceSum(in safe.Float32s, stream cu.Stream) float32 {
+// Sum of all elements.
+func Sum(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducesum", in, stream)
 }
 
-func reduceMax(in safe.Float32s, stream cu.Stream) float32 {
+// Maximum of all elements.
+func Max(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducemax", in, stream)
 }
 
-func reduceMin(in safe.Float32s, stream cu.Stream) float32 {
+// Minimum of all elements.
+func Min(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducemin", in, stream)
 }
 
-func reduceMaxAbs(in safe.Float32s, stream cu.Stream) float32 {
+// Maximum of absolute values of all elements.
+func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce("reducemaxabs", in, stream)
 }
 
-func reduceMaxDiff(in1, in2 safe.Float32s, stream cu.Stream) float32 {
-	return reduce2("reducemaxdiff", in1, in2, stream)
+// Maximum difference between the two arrays.
+// 	max_i abs(a[i] - b[i])
+func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
+	return reduce2("reducemaxdiff", a, b, stream)
 }
 
-func reduceMaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
+// Maximum of the norms of all vectors (x[i], y[i], z[i]).
+// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
+func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
 	return math.Sqrt(float64(reduce3("reducemaxvecnorm2", x, y, z, stream)))
 }
 
-func reduceMaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
+// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
+// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
+// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
+func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
 	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, stream)))
 }
 

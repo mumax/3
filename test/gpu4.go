@@ -52,7 +52,7 @@ func main() {
 
 	solver := gpu.NewHeun(m, torque, 1e-15, mag.Gamma0)
 
-	every := 1000
+	every := 100
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 

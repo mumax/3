@@ -9,15 +9,15 @@ import (
 	"math"
 )
 
-// Heun solver.
+// Adaptive heun solver.
 type Heun struct {
 	dy0              [3]safe.Float32s
 	y                nimble.ChanN
 	dy               nimble.RChanN
 	dt_si, dt_mul    float64 // time step = dt_si*dt_mul, which should be nice float32
 	time             float64
-	Mindt, Maxdt     float64
-	Maxerr, Headroom float64
+	Mindt, Maxdt     float64 // minimum and maximum time step
+	Maxerr, Headroom float64 // maximum error per step
 	stream           cu.Stream
 	init             bool
 	debug            dump.TableWriter // save t, dt, error here
@@ -37,40 +37,31 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 		debug: w, stream: cu.StreamCreate()}
 }
 
-func (e *Heun) SetDt(dt float64) {
-	e.dt_si = dt
-}
-
-func (e *Heun) Advance(duration float64) {
+// Run for a duration in seconds
+func (e *Heun) Advance(seconds float64) {
 	nimble.RunStack()
-	core.Log("GPU heun solver:", duration, "s")
+	core.Log("GPU heun solver:", seconds, "s")
 	LockCudaThread()
-	defer UnlockCudaThread() // better not?
-
-	stop := e.time + duration
+	stop := e.time + seconds
 	for e.time < stop {
 		e.Step()
 	}
 
-	if core.DEBUG {
-		e.debug.Flush()
-	}
+	if core.DEBUG { e.debug.Flush() }
 }
 
+// Run for a number of steps
 func (e *Heun) Steps(steps int) {
 	nimble.RunStack()
 	core.Log("GPU heun solver:", steps, "steps")
 	LockCudaThread()
-	defer UnlockCudaThread() // better not?
-
 	for s := 0; s < steps; s++ {
 		e.Step()
 	}
-	if core.DEBUG {
-		e.debug.Flush()
-	}
+	if core.DEBUG { e.debug.Flush() }
 }
 
+// Take one time step
 func (e *Heun) Step() {
 	n := e.y.Mesh().NCell()
 	// Send out initial value
@@ -103,7 +94,7 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) * float64(dt)
+		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) * float64(dt)
 
 		if core.DEBUG {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
@@ -123,6 +114,7 @@ func (e *Heun) Step() {
 	// no writeDone() here.
 }
 
+// adapt time step: dt *= corr, but limited to sensible values.
 func (e *Heun) adaptDt(corr float64) {
 	corr *= e.Headroom
 	if corr > 2 {

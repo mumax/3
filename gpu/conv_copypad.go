@@ -20,8 +20,8 @@ func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.
 	srcptr := src.Pointer()
 
 	block := 16
-	gridJ := DivUp(Min(dstsize[1], srcsize[1]), block)
-	gridK := DivUp(Min(dstsize[2], srcsize[2]), block)
+	gridJ := DivUp(IMin(dstsize[1], srcsize[1]), block)
+	gridK := DivUp(IMin(dstsize[2], srcsize[2]), block)
 	shmem := 0
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&dstptr),

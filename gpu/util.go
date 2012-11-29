@@ -5,7 +5,7 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-func Min(a, b int) int {
+func IMin(a, b int) int {
 	if a < b {
 		return a
 	}

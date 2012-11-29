@@ -64,12 +64,10 @@ func (m *rwMutex) WriteDelta(Δstart, Δstop int) {
 // unsynchronized Delta
 func (m *rwMutex) delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
-
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
 	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
 		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
 	}
-
 	for !m.canWLock(m.absA+Δa, m.absB+Δb) {
 		m.cond.Wait()
 	}
@@ -85,7 +83,6 @@ func (m *rwMutex) WriteNext(delta int) {
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
 	}
-
 	m.delta(0, delta)
 
 	m.cond.L.Unlock()
@@ -99,7 +96,6 @@ func (m *rwMutex) WriteDone() {
 	if m.absA == m.absB {
 		panic("rwmutex: unlock of unlocked mutex")
 	}
-
 	rnge := int(m.absB - m.absA)
 	m.delta(rnge, 0)
 

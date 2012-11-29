@@ -24,9 +24,9 @@ var (
 	Flag_verify      = flag.Bool("verify", true, "Verify crucial functionality")
 	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")
 	Flag_minblocks   = flag.Int("minblocks", 1, "Minimum number of concurrent blocks")
-	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
-	Flag_sched    = flag.String("sched", "yield", "CUDA scheduling: auto|spin|yield|sync")
-	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
+	Flag_gpu         = flag.Int("gpu", 0, "specify GPU")
+	Flag_sched       = flag.String("sched", "yield", "CUDA scheduling: auto|spin|yield|sync")
+	Flag_pagelock    = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
 func Init() {

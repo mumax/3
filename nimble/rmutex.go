@@ -26,9 +26,7 @@ func (m *rwMutex) MakeRMutex() *rMutex {
 // Move the locked window 
 func (m *rMutex) ReadDelta(Δstart, Δstop int) {
 	m.rw.cond.L.Lock()
-
 	m.delta(Δstart, Δstop)
-
 	m.rw.cond.L.Unlock()
 	m.rw.cond.Broadcast()
 }
@@ -36,12 +34,10 @@ func (m *rMutex) ReadDelta(Δstart, Δstop int) {
 // unsynchronized Delta
 func (m *rMutex) delta(Δstart, Δstop int) {
 	Δc, Δd := int64(Δstart), int64(Δstop)
-
 	rnge := int((m.absD + Δd) - (m.absC + Δc))
 	if rnge < 0 || rnge > m.rw.n || Δc < 0 || Δd < 0 {
 		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
 	}
-
 	for !m.canRLock(m.absC+Δc, m.absD+Δd) {
 		m.rw.cond.Wait()
 	}
@@ -76,9 +72,9 @@ func (m *rMutex) ReadDone() {
 // RRange returns the currently read-locked range.
 // It is not thread-safe because each RMutex is only
 // supposed to be accessed by one reader thread.
-func (m *rMutex) RRange() (start, stop int) {
-	return int(m.absC % int64(m.rw.n)), int((m.absD-1)%int64(m.rw.n)) + 1
-}
+//func (m *rMutex) RRange() (start, stop int) {
+//	return int(m.absC % int64(m.rw.n)), int((m.absD-1)%int64(m.rw.n)) + 1
+//}
 
 // Can m safely lock for reading [start, stop[ ?
 func (r *rMutex) canRLock(c, d int64) (ok bool) {

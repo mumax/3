@@ -16,8 +16,8 @@ type Heun struct {
 	dt_si, dt_mul float64 // time step = dt_si*dt_mul, which should be nice float32
 	init          bool
 	stream        cu.Stream
-	mindt, maxdt float64
-	maxerr float64
+	Mindt, Maxdt  float64
+	Maxerr        float64
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
@@ -75,12 +75,12 @@ func (e *Heun) Steps(steps int) {
 			core.Log("error:", err)
 
 			corr := 1.
-			if err < e.maxerr{
+			if err < e.Maxerr {
 				rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
 				//t += dt
-				corr = math.Pow(e.maxerr / err, 1./2.)
-			}else{
-				corr = math.Pow(e.maxerr / err, 1./3.)
+				corr = math.Pow(e.Maxerr/err, 1./2.)
+			} else {
+				corr = math.Pow(e.Maxerr/err, 1./3.)
 			}
 			e.adaptDt(corr)
 			core.Log("dt:", e.dt_si)
@@ -92,14 +92,18 @@ func (e *Heun) Steps(steps int) {
 	}
 }
 
-func(e*Heun)adaptDt(corr float64){
-	if corr > 2{corr = 2}
-	if corr < 1./2.{corr = 1./2.}
-	e.dt_si *= corr
-	if e.mindt != 0 && e.dt_si < e.mindt{
-		e.dt_si = e.mindt
+func (e *Heun) adaptDt(corr float64) {
+	if corr > 2 {
+		corr = 2
 	}
-	if e.maxdt != 0 && e.dt_si > e.maxdt{
-		e.dt_si = e.maxdt
+	if corr < 1./2. {
+		corr = 1. / 2.
+	}
+	e.dt_si *= corr
+	if e.Mindt != 0 && e.dt_si < e.Mindt {
+		e.dt_si = e.Mindt
+	}
+	if e.Maxdt != 0 && e.dt_si > e.Maxdt {
+		e.dt_si = e.Maxdt
 	}
 }

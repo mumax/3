@@ -18,12 +18,13 @@ type Heun struct {
 	stream        cu.Stream
 	Mindt, Maxdt  float64
 	Maxerr        float64
+	time float64
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
-	return &Heun{dy0, y, dy, dt, multiplier, false, cu.StreamCreate(), 0, 0, 1e-3}
+	return &Heun{dy0: dy0, y:y, dy:dy, dt_si:dt, dt_mul:multiplier, stream:cu.StreamCreate(), Maxerr:1e-3}
 }
 
 func (e *Heun) SetDt(dt float64) {
@@ -36,12 +37,12 @@ func (e *Heun) Steps(steps int) {
 	LockCudaThread()
 	defer UnlockCudaThread()
 
-	for s:=0; s<steps; s++{
+	for s := 0; s < steps; s++ {
 		e.Step()
 	}
 }
 
-func(e*Heun) Step(){
+func (e *Heun) Step() {
 	n := e.y.Mesh().NCell()
 	// Send out initial value
 	if !e.init {
@@ -53,44 +54,40 @@ func(e*Heun) Step(){
 	// TODO: send out time, step here
 
 	dy0 := e.dy0
+	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 
-		dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
+	// stage 1
+	dy := Device3(e.dy.ReadNext(n))
+	y := Device3(e.y.WriteNext(n))
+	{
+		rotatevec(y, dy, dt, e.stream)
 
-		// stage 1
-		dy := Device3(e.dy.ReadNext(n))
-		y := Device3(e.y.WriteNext(n))
-		{
-			rotatevec(y, dy, dt, e.stream)
-
-			for i := 0; i < 3; i++ {
-				dy0[i].CopyDtoDAsync(dy[i], e.stream)
-			}
-			e.stream.Synchronize()
+		for i := 0; i < 3; i++ {
+			dy0[i].CopyDtoDAsync(dy[i], e.stream)
 		}
-		e.y.WriteDone()
-		e.dy.ReadDone()
+		e.stream.Synchronize()
+	}
+	e.y.WriteDone()
+	e.dy.ReadDone()
 
-		// stage 2
-		dy = Device3(e.dy.ReadNext(n))
-		y = Device3(e.y.WriteNext(n))
-		{
-			err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream)
-			e.stream.Synchronize()
-			core.Log("error:", err)
+	// stage 2
+	dy = Device3(e.dy.ReadNext(n))
+	y = Device3(e.y.WriteNext(n))
+	{
+		err := reduceMaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream)
 
-			corr := 1.
-			if err < e.Maxerr {
-				rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
-				//t += dt
-				corr = math.Pow(e.Maxerr/err, 1./2.)
-			} else {
-				corr = math.Pow(e.Maxerr/err, 1./3.)
-			}
-			e.adaptDt(corr)
-			core.Log("dt:", e.dt_si)
+		core.Log("t, dt, err:", e.time, e.dt_si, err)
+		if err < e.Maxerr {
+			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
+			e.time += e.dt_si
+			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
+		} else {
+			// do not advance solution
+			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
-		e.dy.ReadDone()
-		// no write done here.
+	}
+	e.dy.ReadDone()
+	// no write done here.
 }
 
 func (e *Heun) adaptDt(corr float64) {

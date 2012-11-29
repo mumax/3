@@ -39,7 +39,6 @@ func rotatevec(vec, delta [3]safe.Float32s, factor float32, stream cu.Stream) {
 	stream.Synchronize()
 }
 
-
 // Rotate unit vectors v by factor * delta.
 func rotatevec2(vec, delta1 [3]safe.Float32s, factor1 float32, delta2 [3]safe.Float32s, factor2 float32, stream cu.Stream) {
 	core.Assert(vec[0].Len() == delta1[0].Len() && vec[0].Len() == delta2[0].Len())

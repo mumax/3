@@ -3,6 +3,7 @@ package gpu
 import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/nimble-cube/dump"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
@@ -18,13 +19,14 @@ type Heun struct {
 	stream        cu.Stream
 	Mindt, Maxdt  float64
 	Maxerr        float64
-	time float64
+	time          float64
+	debug dump.TableWriter
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
-	return &Heun{dy0: dy0, y:y, dy:dy, dt_si:dt, dt_mul:multiplier, stream:cu.StreamCreate(), Maxerr:1e-3}
+	return &Heun{dy0: dy0, y: y, dy: dy, dt_si: dt, dt_mul: multiplier, stream: cu.StreamCreate(), Maxerr: 1e-3}
 }
 
 func (e *Heun) SetDt(dt float64) {
@@ -82,12 +84,12 @@ func (e *Heun) Step() {
 			e.time += e.dt_si
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
-			// do not advance solution
+			// do not advance solution, nor time
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
 	}
 	e.dy.ReadDone()
-	// no write done here.
+	// no writeDone() here.
 }
 
 func (e *Heun) adaptDt(corr float64) {

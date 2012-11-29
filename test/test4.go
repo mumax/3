@@ -32,7 +32,6 @@ func main() {
 	exch := cpu.NewExchange6("Bex", "T", nimble.UnifiedMemory, m.NewReader(), aex)
 	Bex := exch.Output()
 
-	//	heff := MakeChan3("Heff", "", mesh)
 	Beff := cpu.NewSum("Beff", B, Bex, Bsat, 1, nimble.UnifiedMemory).Output()
 
 	const alpha = 1
@@ -64,7 +63,6 @@ func main() {
 	res := cpu.Host(m.ChanN().UnsafeData())
 	got := [3]float32{res[0][0], res[1][0], res[2][0]}
 	expect := [3]float32{-0.03450077, 0.21015842, 0.9770585}
-	//solver.Steps(50000)
 	fmt.Println("result:", got)
 	if got != expect {
 		fmt.Println("expected:", expect)

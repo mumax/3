@@ -43,6 +43,8 @@ func (e *Heun) Steps(steps int) {
 
 	e.y.WriteDone()
 
+	// TODO: send out time, step here
+
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	for s := 0; s < steps; s++ {
 

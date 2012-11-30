@@ -26,6 +26,7 @@ var (
 	flag_min         = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max         = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize   = flag.Bool("normalize", false, `Normalize vector data to unit length`)
+	flag_normpeak    = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 )
 
 const (
@@ -116,7 +117,10 @@ func noExt(file string) string {
 
 func preprocess(f *dump.Frame) {
 	if *flag_normalize {
-		normalize(f)
+		normalize(f, 1)
+	}
+	if *flag_normpeak {
+		normpeak(f)
 	}
 }
 

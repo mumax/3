@@ -44,7 +44,7 @@ func (r *Autotabler) Run() {
 		r.Dev.InitThread()
 	}
 
-	i:=0
+	i := 0
 	for {
 		output := r.data.ReadNext(N) // TODO
 		time := <-r.time
@@ -64,6 +64,8 @@ func (r *Autotabler) Run() {
 			r.out.WriteData()
 		}
 		r.data.ReadDone()
-		if time.Stage{i++}
+		if time.Stage {
+			i++
+		}
 	}
 }

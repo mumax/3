@@ -9,7 +9,7 @@ import (
 type LLGTorque struct {
 	torque nimble.ChanN
 	m, b   nimble.RChanN
-	alpha  float32
+	Alpha  float32
 	bExt   Vector
 }
 
@@ -29,7 +29,7 @@ func (r *LLGTorque) Run() {
 		M := Host3(r.m.ReadNext(n))
 		B := Host3(r.b.ReadNext(n))
 		T := Host3(r.torque.WriteNext(n))
-		llgTorque(T, M, B, r.alpha, r.bExt)
+		llgTorque(T, M, B, r.Alpha, r.bExt)
 		r.torque.WriteDone()
 		r.m.ReadDone()
 		r.b.ReadDone()

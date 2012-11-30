@@ -98,7 +98,7 @@ func (e *Heun) Step() {
 	e.dy.ReadDone()
 
 	// stage 2
-	nimble.Clock.Send(e.time + e.dt_si, false)
+	nimble.Clock.Send(e.time+e.dt_si, false)
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{

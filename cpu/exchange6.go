@@ -27,10 +27,10 @@ func (e *Exchange6) Run() {
 	}
 }
 
-func NewExchange6(tag, unit string, memType nimble.MemType, m nimble.RChanN, aex_reduced float64) *Exchange6 {
+func NewExchange6(tag, unit string, memType nimble.MemType, m_ nimble.ChanN, aex_reduced float64) *Exchange6 {
+	m := m_.NewReader()
 	out := nimble.MakeChanN(3, tag, unit, m.Mesh(), memType, 0)
 	ex := &Exchange6{m, out, aex_reduced}
-	nimble.Stack(ex)
 	return ex
 }
 

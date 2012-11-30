@@ -14,7 +14,7 @@ import (
 type LLGTorque struct {
 	torque nimble.ChanN
 	m, b   nimble.RChanN
-	alpha  float32
+	Alpha  float32
 	bExt   cpu.Vector
 	stream cu.Stream
 }
@@ -29,10 +29,6 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 
 func (r *LLGTorque) Output() nimble.ChanN { return r.torque }
 
-// TODO: thread-safety?
-func (r *LLGTorque) SetAlpha(α float32) { r.alpha = α }
-
-//
 func (r *LLGTorque) Run() {
 	LockCudaThread()
 	for {
@@ -46,7 +42,7 @@ func (r *LLGTorque) Exec() {
 	B := Device3(r.b.ReadNext(n))
 	T := Device3(r.torque.WriteNext(n))
 
-	CalcLLGTorque(T, M, B, r.alpha, r.bExt, r.stream)
+	CalcLLGTorque(T, M, B, r.Alpha, r.bExt, r.stream)
 
 	r.torque.WriteDone()
 	r.m.ReadDone()

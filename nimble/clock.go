@@ -5,8 +5,8 @@ package nimble
 var Clock clock
 
 type Time struct {
-	Time     float64
-	Stage    bool
+	Time  float64
+	Stage bool
 }
 
 type clock struct {

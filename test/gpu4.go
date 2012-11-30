@@ -74,7 +74,7 @@ func main() {
 	)
 	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
 	BeffBox.MAdd(Bext, 1)
-	tBox.SetAlpha(0.02)
+	tBox.Alpha = 0.02
 	solver.Advance(1e-9)
 
 	for i := range avg {

@@ -1,11 +1,8 @@
-/**
-  * @file
-  * This file implements common functions typically required for calculus.
-  *
-  * @author Mykola Dvornik, Arne Vansteenkiste
-  */
 #ifndef _COMMON_FUNC_H_
 #define _COMMON_FUNC_H_
+
+// This file implements common functions typically required for calculus.
+// Author: Mykola Dvornik, Arne Vansteenkiste
 
 #include <cuda.h>
 #include "stdio.h"

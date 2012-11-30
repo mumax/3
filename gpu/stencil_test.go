@@ -15,7 +15,7 @@ func TestStencil(t *testing.T) {
 
 	mesh := nimble.NewMesh(N0, N1, N2, c, c, c)
 	inCh := nimble.MakeChan1("in", "", mesh, nimble.UnifiedMemory, 0)
-	w := [7]float32{1, 2, 3, 4, 5, 6, 7}
+	w := [7]float32{1, 6, 7, 4, 5, 2, 3}
 	stencil := NewStencil("out", "", inCh, w)
 
 	const x, y, z = 1, 121, 333

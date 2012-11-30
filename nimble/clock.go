@@ -2,20 +2,25 @@ package nimble
 
 //TODO: time quantum, output quantum
 
-var Time Clock
+var Clock clock
 
-type Clock struct {
-	timeOut []chan float64
+type Time struct{
+	Time, Dt float64
+	Valid bool
 }
 
-func (c *Clock) Send(t float64) {
+type clock struct {
+	timeOut []chan Time
+}
+
+func (c *clock) Send(t Time) {
 	for i := range c.timeOut {
 		c.timeOut[i] <- t
 	}
 }
 
-func (c *Clock) NewReader() <-chan float64 {
-	ch := make(chan float64, 1)
+func (c *clock) NewReader() <-chan Time {
+	ch := make(chan Time, 1)
 	c.timeOut = append(c.timeOut, ch)
 	return ch
 }

@@ -11,7 +11,7 @@ type Autotabler struct {
 	data  nimble.RChanN
 	every int
 	Dev   Device
-	time  <-chan float64
+	time  <-chan nimble.Time
 	hostBuf
 }
 
@@ -31,7 +31,7 @@ func Autotable(data_ nimble.Chan, every int, dev Device) {
 	r.data = data
 	r.every = every
 	r.Dev = dev
-	r.time = nimble.Time.NewReader()
+	r.time = nimble.Clock.NewReader()
 	nimble.Stack(r)
 }
 
@@ -46,7 +46,7 @@ func (r *Autotabler) Run() {
 
 	for i := 0; ; i++ {
 		output := r.data.ReadNext(N) // TODO
-		time := float32(<-r.time)
+		time := float32((<-r.time).Time)
 		if i%r.every == 0 {
 			i = 0
 			r.out.Data[0] = time

@@ -83,7 +83,7 @@ func (e *Heun) Step() {
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 
 	// stage 1
-	nimble.Time.Send(e.time)
+	nimble.Clock.Send(e.time)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
 	{

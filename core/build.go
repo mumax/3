@@ -1,6 +1,6 @@
 package core
 
 const (
-	BUILD_COMMIT = "1091"
-	BUILD_DATE   = "Fri Nov 30 14:40:02 CET 2012"
+	BUILD_COMMIT = "1093"
+	BUILD_DATE   = "Fri Nov 30 15:27:57 CET 2012"
 )

@@ -79,12 +79,11 @@ func (e *Heun) Step() {
 	}
 	e.y.WriteDone()
 
-	// TODO: send out time, step here
-
 	dy0 := e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 
 	// stage 1
+	nimble.Time.Send(e.time)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
 	{
@@ -99,6 +98,7 @@ func (e *Heun) Step() {
 	e.dy.ReadDone()
 
 	// stage 2
+	nimble.Time.Send(e.time + e.dt_si)
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{

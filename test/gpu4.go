@@ -59,7 +59,7 @@ func main() {
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 
-	solver.Advance(10e-9)
+	solver.Advance(1e-9)
 
 	var avg [3]float32
 	for i := range avg {
@@ -67,17 +67,6 @@ func main() {
 	}
 	fmt.Println("avg:", avg)
 
-	//	//	res := cpu.Host(m.ChanN().UnsafeData())
-	//	//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-	//	//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
-	//	//	fmt.Println("result:", got)
-	//	//	if got != expect {
-	//	//		fmt.Println("expected:", expect)
-	//	//		os.Exit(2)
-	//	//	} else {
-	//	//		fmt.Println("OK")
-	//	//	}
-	//
 	const (
 		Bx = -24.6E-3
 		By = 4.3E-3

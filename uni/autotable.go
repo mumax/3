@@ -44,12 +44,13 @@ func (r *Autotabler) Run() {
 		r.Dev.InitThread()
 	}
 
-	for i := 0; ; i++ {
+	i:=0
+	for {
 		output := r.data.ReadNext(N) // TODO
-		time := float32((<-r.time).Time)
-		if i%r.every == 0 {
+		time := <-r.time
+		if time.Stage && i%r.every == 0 {
 			i = 0
-			r.out.Data[0] = time
+			r.out.Data[0] = float32(time.Time)
 			for c := range output {
 				sum := 0.
 				list := r.gethost(output[c])
@@ -63,5 +64,6 @@ func (r *Autotabler) Run() {
 			r.out.WriteData()
 		}
 		r.data.ReadDone()
+		if time.Stage{i++}
 	}
 }

@@ -15,7 +15,7 @@ const ROTATEVEC = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00002145_00000000-9_rotatevec.cpp3.i"
+	.file	1 "/tmp/tmpxft_00000b6d_00000000-9_rotatevec.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/rotatevec.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/device_functions.h"

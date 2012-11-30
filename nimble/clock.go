@@ -4,18 +4,18 @@ package nimble
 
 var Clock clock
 
-type Time struct{
-	Time, Dt float64
-	Valid bool
+type Time struct {
+	Time     float64
+	Stage    bool
 }
 
 type clock struct {
 	timeOut []chan Time
 }
 
-func (c *clock) Send(t Time) {
+func (c *clock) Send(time float64, stage bool) {
 	for i := range c.timeOut {
-		c.timeOut[i] <- t
+		c.timeOut[i] <- Time{time, stage}
 	}
 }
 

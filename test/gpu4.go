@@ -35,7 +35,7 @@ func main() {
 	M[1].Memset(0.1)
 	M[2].Memset(0.99)
 
-	acc := 10
+	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
 	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
 
@@ -51,31 +51,40 @@ func main() {
 	torque := tBox.Output()
 
 	solver := gpu.NewHeun(m, torque, 1e-15, mag.Gamma0)
+	solver.Maxerr = 1e-4
 
 	every := 100
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 
-	solver.Advance(0.3e-9)
-
-	//	res := cpu.Host(m.ChanN().UnsafeData())
-	//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
-	//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
-	//	fmt.Println("result:", got)
-	//	if got != expect {
-	//		fmt.Println("expected:", expect)
-	//		os.Exit(2)
-	//	} else {
-	//		fmt.Println("OK")
-	//	}
-
-	const (
-		Bx = -24.6E-3
-		By = 4.3E-3
-		Bz = 0
-	)
-	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
-	BeffBox.MAdd(Bext, 1)
-	tBox.SetAlpha(0.02)
 	solver.Advance(1e-9)
+
+	
+	
+	var avg [3]float32
+	for i:=range avg{
+		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
+	}
+	fmt.Println("avg:", avg)
+
+//	//	res := cpu.Host(m.ChanN().UnsafeData())
+//	//	got := [3]float32{res[0][0], res[1][0], res[2][0]}
+//	//	expect := [3]float32{1.090642e-06, 0.6730072, 0.739636}
+//	//	fmt.Println("result:", got)
+//	//	if got != expect {
+//	//		fmt.Println("expected:", expect)
+//	//		os.Exit(2)
+//	//	} else {
+//	//		fmt.Println("OK")
+//	//	}
+//
+//	const (
+//		Bx = -24.6E-3
+//		By = 4.3E-3
+//		Bz = 0
+//	)
+//	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
+//	BeffBox.MAdd(Bext, 1)
+//	tBox.SetAlpha(0.02)
+//	solver.Advance(1e-9)
 }

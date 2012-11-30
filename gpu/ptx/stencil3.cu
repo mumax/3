@@ -21,7 +21,7 @@ inline __device__ int clamp(int i, int N){
 
 extern "C" __global__ void
 stencil3(float* dst, float* src, 
-          float w0, float wl, float wr, float wu, float wd, float wt, float wb,
+          float w0, float wt, float wb, float wu, float wd, float wl, float wr, 
           int wrap0, int wrap1, int wrap2, int N0, int N1, int N2){
 
 	int j = blockIdx.x * blockDim.x + threadIdx.x;

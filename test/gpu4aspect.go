@@ -18,8 +18,8 @@ func main() {
 	mem := nimble.GPUMemory
 
 	const (
-		N0, N1, N2 = 1, 32*2, 128
-		cx, cy, cz = 3e-9, 3.125e-9/2, 3.125e-9
+		N0, N1, N2 = 1, 32 * 2, 128
+		cx, cy, cz = 3e-9, 3.125e-9 / 2, 3.125e-9
 		Bsat       = 1.0053
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
 		α          = 1

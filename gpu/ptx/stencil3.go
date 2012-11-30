@@ -15,7 +15,7 @@ const STENCIL3 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00000c58_00000000-9_stencil3.cpp3.i"
+	.file	1 "/tmp/tmpxft_000009ff_00000000-9_stencil3.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/stencil3.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 
@@ -100,7 +100,7 @@ BB0_2:
 
 BB0_4:
 	.loc 2 38 1
-	setp.eq.f32 	%p7, %f14, 0f00000000;
+	setp.eq.f32 	%p7, %f10, 0f00000000;
 	@%p7 bra 	BB0_6;
 
 	.loc 2 38 1
@@ -129,8 +129,8 @@ BB0_4:
 	mul.wide.s32 	%rd9, %r38, 4;
 	add.s64 	%rd10, %rd2, %rd9;
 	ld.global.f32 	%f19, [%rd10];
-	mul.f32 	%f20, %f19, %f15;
-	fma.rn.f32 	%f21, %f18, %f14, %f20;
+	mul.f32 	%f20, %f19, %f11;
+	fma.rn.f32 	%f21, %f18, %f10, %f20;
 	add.f32 	%f32, %f32, %f21;
 
 BB0_6:
@@ -170,7 +170,7 @@ BB0_6:
 
 BB0_8:
 	.loc 2 40 1
-	setp.eq.f32 	%p9, %f11, 0f00000000;
+	setp.eq.f32 	%p9, %f15, 0f00000000;
 	@%p9 bra 	BB0_10;
 
 	.loc 2 40 1
@@ -197,8 +197,8 @@ BB0_8:
 	mul.wide.s32 	%rd17, %r64, 4;
 	add.s64 	%rd18, %rd2, %rd17;
 	ld.global.f32 	%f27, [%rd18];
-	mul.f32 	%f28, %f27, %f10;
-	fma.rn.f32 	%f29, %f26, %f11, %f28;
+	mul.f32 	%f28, %f27, %f14;
+	fma.rn.f32 	%f29, %f26, %f15, %f28;
 	add.f32 	%f32, %f32, %f29;
 
 BB0_10:

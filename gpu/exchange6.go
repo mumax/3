@@ -6,14 +6,14 @@ import (
 
 func NewExchange6(tag string, m nimble.ChanN, aex_reduced float64) *Stencil3D {
 	Δ := m.Mesh().CellSize()
-	z := float32(aex_reduced / (Δ[0] * Δ[0]))
-	y := float32(aex_reduced / (Δ[1] * Δ[1]))
-	x := float32(aex_reduced / (Δ[2] * Δ[2]))
-	if m.Mesh().Size()[0] == 1{
-		//x = 0
+	var w [3]float32
+	for i := range w {
+		if m.Mesh().Size()[i] != 1{
+			w[i] = float32(aex_reduced / (Δ[i] * Δ[i]))
+		}
 	}
-	Σ := float32(-2 * (x + y + z))
-	nabla := [7]float32{Σ, x, x, y, y, z, z}
+	Σ := float32(-2 * (w[0] + w[1] + w[2]))
+	nabla := [7]float32{Σ, w[0], w[0], w[1], w[1], w[2], w[2]}
 	s := NewStencil3D(tag, "T", m)
 	s.Weight[0][0] = nabla
 	s.Weight[1][1] = nabla

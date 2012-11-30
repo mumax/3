@@ -20,6 +20,7 @@ type Heun struct {
 	Maxerr, Headroom float64 // maximum error per step
 	stream           cu.Stream
 	init             bool
+	steps            int
 	debug            dump.TableWriter // save t, dt, error here
 }
 
@@ -46,6 +47,7 @@ func (e *Heun) Advance(seconds float64) {
 	for e.time < stop {
 		e.Step()
 	}
+	nimble.DashExit()
 
 	if core.DEBUG {
 		e.debug.Flush()
@@ -60,6 +62,8 @@ func (e *Heun) Steps(steps int) {
 	for s := 0; s < steps; s++ {
 		e.Step()
 	}
+	nimble.DashExit()
+
 	if core.DEBUG {
 		e.debug.Flush()
 	}
@@ -107,12 +111,14 @@ func (e *Heun) Step() {
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
 			e.time += e.dt_si
+			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
 			// do not advance solution, nor time
 			// just try again next time with smaller dt
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
+		nimble.Dash(e.steps, e.time, e.dt_si, err)
 	}
 	e.dy.ReadDone()
 	// no writeDone() here.

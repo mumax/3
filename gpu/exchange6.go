@@ -9,7 +9,7 @@ func NewExchange6(tag string, m nimble.ChanN, aex_reduced float64) *Stencil3D {
 	var w [3]float32
 	for i := range w {
 		if m.Mesh().Size()[i] != 1 {
-			w[i] = float32(aex_reduced / (Δ[i] * Δ[i]))
+			w[i] = float32(2 * aex_reduced / (Δ[i] * Δ[i]))
 		}
 	}
 	Σ := float32(-2 * (w[0] + w[1] + w[2]))

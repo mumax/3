@@ -20,9 +20,10 @@ func main() {
 
 	const (
 		N0, N1, N2 = 1, 32, 128
-		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
-		Bsat       = 1.0053  
-		Aex_red    = mag.Mu0 * 13e-12 / Bsat
+		Sx, Sy, Sz = 3e-9, 125e-9, 500e-9
+		cx, cy, cz = Sx/N0, Sy/N1, Sz/N2
+		Bsat       = 800e3 * mag.Mu0
+		Aex_red    = 13e-12 / (Bsat / mag.Mu0)
 		α          = 1
 	)
 
@@ -59,6 +60,9 @@ func main() {
 	every := 100
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
+
+	//solver.Step()
+	//nimble.Dump(m, "m0.dump")
 
 	solver.Advance(2e-9)
 

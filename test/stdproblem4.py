@@ -20,6 +20,11 @@ x = 1/sqrt(3)
 m=[ [[[x]]], [[[x]]], [[[x]]] ]
 setarray('m', m)
 
+save('m', 'dump', [])
+save('H_eff', 'dump',[])
+save('H_ex', 'dump',[])
+save('torque', 'dump',[])
+
 autosave("m", "dump", [], 100e-12)
 autotabulate(["t", "<m>", "m_error", "m_peakerror", "badsteps", "dt", "maxtorque"], "m.txt", 10e-12)
 

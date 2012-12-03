@@ -30,7 +30,7 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
 	var w dump.TableWriter
 	if core.DEBUG {
-		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.dump"),
+		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.table"),
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
 	return &Heun{dy0: dy0, y: y, dy: dy,

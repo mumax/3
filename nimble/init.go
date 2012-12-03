@@ -6,8 +6,8 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"flag"
 	"fmt"
-	"log"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -82,27 +82,30 @@ func initGOMAXPROCS() {
 
 func initCpuProf() {
 	if *Flag_cpuprof {
+		// start CPU profile to file
 		fname := core.OD + "/cpu.pprof"
- 		f, err := os.Create(fname)
+		f, err := os.Create(fname)
 		core.PanicErr(err)
 		core.Log("writing CPU profile to", fname)
 		err = pprof.StartCPUProfile(f)
 		core.PanicErr(err)
-		core.AtExit(func(){
+
+		// at exit: exec go tool pprof to generate SVG output
+		core.AtExit(func() {
 			pprof.StopCPUProfile()
 			me, err := os.Readlink("/proc/self/exe")
 			core.LogErr(err)
-outfile := core.OD + "/cpu.pprof.svg"
+			outfile := core.OD + "/cpu.pprof.svg"
 			core.Log("exec:", "go", "tool", "pprof", "-svg", me, fname, ">", outfile)
 			out, err := exec.Command("go", "tool", "pprof", "-svg", me, fname).Output()
 			if err != nil {
 				core.Log(string(out), err)
-			}else{
+			} else {
 				err := ioutil.WriteFile(outfile, out, 0666)
 				core.LogErr(err)
 			}
-	})
-}
+		})
+	}
 }
 
 func initMemProf() {

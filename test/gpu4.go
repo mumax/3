@@ -7,7 +7,7 @@ import (
 	"code.google.com/p/nimble-cube/uni"
 	"fmt"
 	"math"
-	//"os"
+	"os"
 )
 
 // Standard problem 4 on GPU
@@ -53,9 +53,9 @@ func main() {
 	torque := tBox.Output()
 
 	solver := gpu.NewHeun(m, torque, 10e-15, mag.Gamma0)
-	solver.Maxerr = 1e-4
-	//solver.Maxdt = 10e-15
-	//solver.Mindt = 1e-15
+	solver.Maxerr = 2e-4
+	solver.Maxdt = 1e-12
+	solver.Mindt = 1e-15
 
 	every := 100
 	uni.Autosave(m, every, gpu.GPUDevice)
@@ -70,7 +70,14 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	fmt.Println("avg:", avg)
+	want := [3]float32{0, 0.12305694, 0.96828824 }
+	err := math.Sqrt(float64(sqr(avg[0] - want[0]) +  sqr(avg[1] - want[1]) + sqr(avg[2] - want[2])))
+	fmt.Println("avg:", avg, "err:", err)
+	if err > 1e-5 {
+		fmt.Println("FAILED")
+		os.Exit(2)
+	}
+	fmt.Println("OK")
 
 	const (
 		Bx = -24.6E-3
@@ -85,5 +92,14 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	fmt.Println("avg:", avg)
+	want = [3]float32{ 0.04577134,0.100720644,-0.9862087}
+	err = math.Sqrt(float64(sqr(avg[0] - want[0]) +  sqr(avg[1] - want[1]) + sqr(avg[2] - want[2])))
+	fmt.Println("avg:", avg, "err:", err)
+	if err > 1e-4 {
+		fmt.Println("FAILED")
+		os.Exit(2)
+	}
+	fmt.Println("OK")
 }
+
+func sqr(x float32)float32{return x*x}

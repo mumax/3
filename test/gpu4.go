@@ -21,7 +21,7 @@ func main() {
 	const (
 		N0, N1, N2 = 1, 32, 128
 		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
-		Bsat       = 1.0053
+		Bsat       = 1.0053  
 		Aex_red    = mag.Mu0 * 13e-12 / Bsat
 		α          = 1
 	)
@@ -32,9 +32,9 @@ func main() {
 	// TODO: MakeChanN -> NewQuant()
 	m := nimble.MakeChanN(3, "m", "", mesh, mem, 0)
 	M := gpu.Device3(m.ChanN().UnsafeData())
-	M[0].Memset(0)
-	M[1].Memset(1 / math.Sqrt2)
-	M[2].Memset(1 / math.Sqrt2)
+	M[0].Memset(float32(1 / math.Sqrt(3)))
+	M[1].Memset(float32(1 / math.Sqrt(3)))
+	M[2].Memset(float32(1 / math.Sqrt(3)))
 
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)

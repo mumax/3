@@ -16,8 +16,8 @@ setv('Aex', 1.3e-11)
 setv('alpha', 1)
 setv('dt', 1e-15)
 setv('m_maxerror', 1e-4)
-x = 1/sqrt(2)
-m=[ [[[x]]], [[[x]]], [[[0]]] ]
+x = 1/sqrt(3)
+m=[ [[[x]]], [[[x]]], [[[x]]] ]
 setarray('m', m)
 
 autosave("m", "dump", [], 100e-12)

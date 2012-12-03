@@ -34,7 +34,7 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
 	return &Heun{dy0: dy0, y: y, dy: dy,
-		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-3, Headroom: 0.75,
+		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
 		debug: w, stream: cu.StreamCreate()}
 }
 
@@ -114,8 +114,8 @@ func (e *Heun) Step() {
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
-			// do not advance solution, nor time
-			// just try again next time with smaller dt
+			// undo.
+			rotatevec(y, dy0, -dt, e.stream) // TODO: not very accurate undo
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
 		nimble.Dash(e.steps, e.time, e.dt_si, err)

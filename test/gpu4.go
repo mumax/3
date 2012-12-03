@@ -22,7 +22,7 @@ func main() {
 		N0, N1, N2 = 1, 32, 128
 		cx, cy, cz = 3e-9, 3.125e-9, 3.125e-9
 		Bsat       = 1.0053
-		Aex_red    =  mag.Mu0 * 13e-12 / Bsat
+		Aex_red    = mag.Mu0 * 13e-12 / Bsat
 		α          = 1
 	)
 
@@ -53,13 +53,14 @@ func main() {
 
 	solver := gpu.NewHeun(m, torque, 1e-15, mag.Gamma0)
 	solver.Maxerr = 1e-4
-	solver.Maxdt = 1e-12
+	//solver.Maxdt = 10e-15
+	//solver.Mindt = 1e-15
 
 	every := 100
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 
-	solver.Advance(1e-9)
+	solver.Advance(2e-9)
 
 	var avg [3]float32
 	for i := range avg {

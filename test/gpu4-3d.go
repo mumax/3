@@ -19,7 +19,7 @@ func main() {
 	mem := nimble.GPUMemory
 
 	const (
-		N0, N1, N2 = 1*2, 32, 128
+		N0, N1, N2 = 1 * 2, 32, 128
 		Sx, Sy, Sz = 3e-9, 125e-9, 500e-9
 		cx, cy, cz = Sx / N0, Sy / N1, Sz / N2
 		Bsat       = 800e3 * mag.Mu0

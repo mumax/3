@@ -7,7 +7,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"runtime"
 	"runtime/pprof"
 	"time"
@@ -17,7 +19,7 @@ var (
 	Flag_od          = flag.String("o", "", "set output directory")
 	Flag_version     = flag.Bool("v", true, "print version")
 	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
-	Flag_cpuprof     = flag.String("cpuprof", "", "Write gopprof CPU profile to file")
+	Flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	Flag_timing      = flag.Bool("timeprof", false, "Record timing profile")
 	Flag_memprof     = flag.String("memprof", "", "Write gopprof memory profile to file")
 	Flag_debug       = flag.Bool("g", false, "Generate debug info")
@@ -79,14 +81,28 @@ func initGOMAXPROCS() {
 }
 
 func initCpuProf() {
-	if *Flag_cpuprof != "" {
-		f, err := os.Create(*Flag_cpuprof)
+	if *Flag_cpuprof {
+		fname := core.OD + "/cpu.pprof"
+ 		f, err := os.Create(fname)
 		core.PanicErr(err)
-		core.Log("writing CPU profile to", *Flag_cpuprof)
+		core.Log("writing CPU profile to", fname)
 		err = pprof.StartCPUProfile(f)
 		core.PanicErr(err)
-		core.AtExit(pprof.StopCPUProfile)
-	}
+		core.AtExit(func(){
+			pprof.StopCPUProfile()
+			me, err := os.Readlink("/proc/self/exe")
+			core.LogErr(err)
+outfile := core.OD + "/cpu.pprof.svg"
+			core.Log("exec:", "go", "tool", "pprof", "-svg", me, fname, ">", outfile)
+			out, err := exec.Command("go", "tool", "pprof", "-svg", me, fname).Output()
+			if err != nil {
+				core.Log(string(out), err)
+			}else{
+				err := ioutil.WriteFile(outfile, out, 0666)
+				core.LogErr(err)
+			}
+	})
+}
 }
 
 func initMemProf() {

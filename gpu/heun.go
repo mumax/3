@@ -20,7 +20,7 @@ type Heun struct {
 	Maxerr, Headroom float64 // maximum error per step
 	stream           cu.Stream
 	init             bool
-	steps, undone            int
+	steps, undone    int
 	debug            dump.TableWriter // save t, dt, error here
 }
 

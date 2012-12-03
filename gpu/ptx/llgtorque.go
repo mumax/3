@@ -15,8 +15,9 @@ const LLGTORQUE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000018ab_00000000-9_llgtorque.cpp3.i"
+	.file	1 "/tmp/tmpxft_00001c4c_00000000-9_llgtorque.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/llgtorque.cu"
+	.file	3 "/usr/local/cuda/bin/../include/device_functions.h"
 
 .visible .entry llgtorque(
 	.param .u64 llgtorque_param_0,
@@ -34,7 +35,7 @@ const LLGTORQUE = `
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<18>;
-	.reg .f32 	%f<37>;
+	.reg .f32 	%f<35>;
 	.reg .s64 	%rd<29>;
 
 
@@ -103,35 +104,34 @@ const LLGTORQUE = `
 	sub.f32 	%f16, %f14, %f15;
 	.loc 2 16 1
 	fma.rn.f32 	%f17, %f1, %f1, 0f3F800000;
-	rcp.rn.f32 	%f18, %f17;
+	mov.f32 	%f18, 0fBF800000;
+	.loc 3 2399 3
+	div.rn.f32 	%f19, %f18, %f17;
 	.loc 2 17 1
-	mul.f32 	%f19, %f5, %f13;
-	mul.f32 	%f20, %f16, %f2;
-	sub.f32 	%f21, %f19, %f20;
-	mul.f32 	%f22, %f10, %f16;
-	mul.f32 	%f23, %f8, %f5;
-	sub.f32 	%f24, %f22, %f23;
-	mul.f32 	%f25, %f2, %f8;
-	mul.f32 	%f26, %f13, %f10;
-	sub.f32 	%f27, %f25, %f26;
-	mul.f32 	%f28, %f21, %f1;
-	mul.f32 	%f29, %f24, %f1;
-	mul.f32 	%f30, %f27, %f1;
-	sub.f32 	%f31, %f8, %f28;
-	sub.f32 	%f32, %f13, %f29;
-	sub.f32 	%f33, %f16, %f30;
-	mul.f32 	%f34, %f18, %f31;
-	mul.f32 	%f35, %f18, %f32;
-	mul.f32 	%f36, %f18, %f33;
+	mul.f32 	%f20, %f5, %f13;
+	mul.f32 	%f21, %f16, %f2;
+	sub.f32 	%f22, %f20, %f21;
+	mul.f32 	%f23, %f10, %f16;
+	mul.f32 	%f24, %f8, %f5;
+	sub.f32 	%f25, %f23, %f24;
+	mul.f32 	%f26, %f2, %f8;
+	mul.f32 	%f27, %f13, %f10;
+	sub.f32 	%f28, %f26, %f27;
+	fma.rn.f32 	%f29, %f22, %f1, %f8;
+	fma.rn.f32 	%f30, %f25, %f1, %f13;
+	fma.rn.f32 	%f31, %f28, %f1, %f16;
+	mul.f32 	%f32, %f19, %f29;
+	mul.f32 	%f33, %f19, %f30;
+	mul.f32 	%f34, %f19, %f31;
 	.loc 2 19 1
 	add.s64 	%rd26, %rd3, %rd19;
-	st.global.f32 	[%rd26], %f34;
+	st.global.f32 	[%rd26], %f32;
 	.loc 2 20 1
 	add.s64 	%rd27, %rd2, %rd19;
-	st.global.f32 	[%rd27], %f35;
+	st.global.f32 	[%rd27], %f33;
 	.loc 2 21 1
 	add.s64 	%rd28, %rd1, %rd19;
-	st.global.f32 	[%rd28], %f36;
+	st.global.f32 	[%rd28], %f34;
 
 BB0_2:
 	.loc 2 23 2

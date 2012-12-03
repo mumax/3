@@ -21,7 +21,7 @@ func main() {
 	const (
 		N0, N1, N2 = 1, 32, 128
 		Sx, Sy, Sz = 3e-9, 125e-9, 500e-9
-		cx, cy, cz = Sx/N0, Sy/N1, Sz/N2
+		cx, cy, cz = Sx / N0, Sy / N1, Sz / N2
 		Bsat       = 800e3 * mag.Mu0
 		Aex_red    = 13e-12 / (Bsat / mag.Mu0)
 		α          = 1

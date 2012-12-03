@@ -20,7 +20,7 @@ type Heun struct {
 	Maxerr, Headroom float64 // maximum error per step
 	stream           cu.Stream
 	init             bool
-	steps            int
+	steps, undone            int
 	debug            dump.TableWriter // save t, dt, error here
 }
 
@@ -110,15 +110,18 @@ func (e *Heun) Step() {
 		}
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
+			normalize([3]safe.Float32s{y[0], y[1], y[2]}, e.stream)
+			e.stream.Synchronize()
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
 			// undo.
 			rotatevec(y, dy0, -dt, e.stream) // TODO: not very accurate undo
+			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
-		nimble.Dash(e.steps, e.time, e.dt_si, err)
+		nimble.Dash(e.steps, e.undone, e.time, e.dt_si, err)
 	}
 	e.dy.ReadDone()
 	// no writeDone() here.

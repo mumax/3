@@ -15,10 +15,9 @@ const ROTATEVEC = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00000b6d_00000000-9_rotatevec.cpp3.i"
+	.file	1 "/tmp/tmpxft_000019c4_00000000-9_rotatevec.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/rotatevec.cu"
-	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
-	.file	4 "/usr/local/cuda/bin/../include/device_functions.h"
+	.file	3 "/usr/local/cuda/bin/../include/device_functions.h"
 
 .visible .entry rotatevec(
 	.param .u64 rotatevec_param_0,
@@ -31,9 +30,9 @@ const ROTATEVEC = `
 	.param .u32 rotatevec_param_7
 )
 {
-	.reg .pred 	%p<3>;
+	.reg .pred 	%p<2>;
 	.reg .s32 	%r<18>;
-	.reg .f32 	%f<19>;
+	.reg .f32 	%f<14>;
 	.reg .s64 	%rd<20>;
 
 
@@ -82,30 +81,21 @@ const ROTATEVEC = `
 	ld.global.f32 	%f8, [%rd19];
 	ld.global.f32 	%f9, [%rd18];
 	fma.rn.f32 	%f10, %f8, %f1, %f9;
-	.loc 2 13 1
-	mul.f32 	%f11, %f7, %f7;
-	fma.rn.f32 	%f12, %f4, %f4, %f11;
-	fma.rn.f32 	%f13, %f10, %f10, %f12;
-	.loc 3 991 5
-	sqrt.rn.f32 	%f14, %f13;
-	.loc 2 14 1
-	setp.eq.f32 	%p2, %f14, 0f00000000;
-	selp.f32 	%f15, 0f3F800000, %f14, %p2;
-	.loc 4 2399 3
-	div.rn.f32 	%f16, %f4, %f15;
-	.loc 2 16 1
-	st.global.f32 	[%rd14], %f16;
-	.loc 4 2399 3
-	div.rn.f32 	%f17, %f7, %f15;
+	.loc 3 2399 3
+	div.rn.f32 	%f11, %f4, 0f3F800000;
 	.loc 2 17 1
-	st.global.f32 	[%rd16], %f17;
-	.loc 4 2399 3
-	div.rn.f32 	%f18, %f10, %f15;
+	st.global.f32 	[%rd14], %f11;
+	.loc 3 2399 3
+	div.rn.f32 	%f12, %f7, 0f3F800000;
 	.loc 2 18 1
-	st.global.f32 	[%rd18], %f18;
+	st.global.f32 	[%rd16], %f12;
+	.loc 3 2399 3
+	div.rn.f32 	%f13, %f10, 0f3F800000;
+	.loc 2 19 1
+	st.global.f32 	[%rd18], %f13;
 
 BB0_2:
-	.loc 2 20 2
+	.loc 2 21 2
 	ret;
 }
 

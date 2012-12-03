@@ -11,8 +11,9 @@ rotatevec2(float* vx, float* vy, float* vz,
     	float Vy = vy[i] + factor1 * dy1[i] + factor2 * dy2[i];
     	float Vz = vz[i] + factor1 * dz1[i] + factor2 * dz2[i];
     	
-		float norm = sqrtf(Vx*Vx + Vy*Vy + Vz*Vz);
-		if (norm == 0){ norm = 1; }
+		float norm = 1.0f;
+		//float norm = sqrtf(Vx*Vx + Vy*Vy + Vz*Vz);
+		//if (norm == 0){ norm = 1; }
 
 		vx[i] = Vx / norm;
 		vy[i] = Vy / norm;

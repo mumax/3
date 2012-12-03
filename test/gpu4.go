@@ -51,7 +51,7 @@ func main() {
 	nimble.Stack(tBox)
 	torque := tBox.Output()
 
-	solver := gpu.NewHeun(m, torque, 1e-15, mag.Gamma0)
+	solver := gpu.NewHeun(m, torque, 10e-15, mag.Gamma0)
 	solver.Maxerr = 1e-4
 	//solver.Maxdt = 10e-15
 	//solver.Mindt = 1e-15

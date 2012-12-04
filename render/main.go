@@ -3,8 +3,8 @@
 package main
 
 import (
-	. "code.google.com/p/nimble-cube/render"
 	"code.google.com/p/nimble-cube/core"
+	. "code.google.com/p/nimble-cube/render"
 	"flag"
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
@@ -13,38 +13,38 @@ import (
 )
 
 var (
-	flag_smooth = flag.Bool("smooth", true, "Smooth shading")
-	flag_vsync      = flag.Bool("vsync", true, "Vertical sync")
-	flag_cullface   = flag.Bool("cullface", true, "Cull invisible polygon faces")
-	flag_lighting   = flag.Bool("lighting", true, "Enable lighting")
-	flag_depthtest  = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias  = flag.Bool("antialias", true, "Antialias lines")
-	flag_wireframe  = flag.Bool("wireframe", false, "Render wireframes")
-	flag_fps        = flag.Bool("fps", true, "Measure frames per second")
+	flag_smooth    = flag.Bool("smooth", true, "Smooth shading")
+	flag_vsync     = flag.Bool("vsync", true, "Vertical sync")
+	flag_cullface  = flag.Bool("cullface", true, "Cull invisible polygon faces")
+	flag_lighting  = flag.Bool("lighting", true, "Enable lighting")
+	flag_depthtest = flag.Bool("depthtest", true, "Enable depth test")
+	flag_antialias = flag.Bool("antialias", true, "Antialias lines")
+	flag_wireframe = flag.Bool("wireframe", false, "Render wireframes")
+	flag_fps       = flag.Bool("fps", true, "Measure frames per second")
 )
 
-var Width , Height int
-
+var Width, Height int
 
 func main() {
 	flag.Parse()
 
-	xinit()
-	defer Close()
+	InitWindow()
+	defer glfw.CloseWindow()
+	defer glfw.Terminate()
 
 	InitInputHandlers()
-	glinit()
-	initViewport()
+	InitGL()
+	InitViewport()
 
 	start := time.Now()
 	frames := 0
 
 	Viewpos.Z = 2
 
-	for IsOpen() {
+	for glfw.WindowParam(glfw.Opened) == 1 {// window open
 		UpdateViewpos()
 		DrawTestScene()
-		SwapBuffers()
+		glfw.SwapBuffers()
 		frames++
 	}
 
@@ -54,16 +54,17 @@ func main() {
 	}
 }
 
-func xinit() {
+func InitWindow() {
 	core.Fatal(glfw.Init())
 	Width, Height = 800, 600
 	core.Fatal(glfw.OpenWindow(Width, Height, 0, 0, 0, 0, 0, 0, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
-	VSync(*flag_vsync)
+	vsync := 0
+	if *flag_vsync{vsync = 1}
+		glfw.SetSwapInterval(vsync)
 }
 
-
-func initViewport() {
+func InitViewport() {
 	gl.Viewport(0, 0, gl.Sizei(Width), gl.Sizei(Height))
 	gl.MatrixMode(gl.PROJECTION)
 	gl.LoadIdentity()
@@ -71,11 +72,8 @@ func initViewport() {
 	gl.Frustum(-1, 1, -x, x, 1, 1000.0)
 }
 
-func glinit() {
-	log.Println("Init", "OpenGL")
-	if err := gl.Init(); err != nil {
-		log.Fatalf("gl: %s\n", err)
-	}
+func InitGL() {
+	core.Fatal(gl.Init())
 
 	if *flag_wireframe {
 		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
@@ -102,7 +100,7 @@ func glinit() {
 		gl.Hint(gl.LINE_SMOOTH_HINT, gl.NICEST)
 	}
 
-	if *flag_smooth{
+	if *flag_smooth {
 		gl.ShadeModel(gl.SMOOTH)
 	}
 }

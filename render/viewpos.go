@@ -10,10 +10,7 @@ import (
 var (
 	Viewpos            Vertex
 	ViewPhi, ViewTheta float64
-)
-
-var (
-	mouseGrabbed = false
+	mousePrevX, mousePrevY int
 )
 
 const PI = math.Pi
@@ -63,21 +60,16 @@ func InitInputHandlers() {
 				Viewpos.Z += deltaMove
 			case Alt:
 				Viewpos.Z -= deltaMove
-			case Esc:
-				GrabMouse(false)
-				mouseGrabbed = false // TODO: func
 			default:
 				log.Println("unused key:", key)
 			}
 		}
 	})
 
-	glfw.SetMousePosCallback(func(dx, dy int) {
-		if !mouseGrabbed {
-			return
-		}
-		// reset mouse pos so we receive deltas.
-		glfw.SetMousePos(0, 0)
+	glfw.SetMousePosCallback(func(x, y int) {
+
+		dx, dy := x-mousePrevX, y-mousePrevY
+		mousePrevX, mousePrevY = x, y
 
 		ViewPhi += deltaLook * float64(dx) // TODO: * arccos
 		ViewTheta += deltaLook * float64(dy)
@@ -99,12 +91,6 @@ func InitInputHandlers() {
 
 	glfw.SetMouseButtonCallback(func(button, state int) {
 		log.Println("mousebutton:", button, state)
-		if !mouseGrabbed {
-			GrabMouse(true)
-			glfw.SetMousePos(0, 0)
-			log.Println("grabbed mouse")
-			mouseGrabbed = true
-		}
 	})
 
 	glfw.SetMouseWheelCallback(func(delta int) {

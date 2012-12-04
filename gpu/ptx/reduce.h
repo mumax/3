@@ -6,7 +6,7 @@
 
 // This macro expands to a reduce kernel with arbitrary reduce operation.
 // Ugly, perhaps, but arguably nicer than some 1000+ line C++ template.
-#define reduce(load, op, atomicOp, initVal)             \
+#define reduce(load, op, atomicOp)                      \
  	__shared__ float sdata[BLOCK];                      \
 	int tid = threadIdx.x;                              \
 	int i =  blockIdx.x * blockDim.x + threadIdx.x;     \

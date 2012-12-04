@@ -15,7 +15,7 @@ const REDUCEMAXVECNORM2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00000f94_00000000-9_reducemaxvecnorm2.cpp3.i"
+	.file	1 "/tmp/tmpxft_00002629_00000000-9_reducemaxvecnorm2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxvecnorm2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
@@ -26,12 +26,13 @@ const REDUCEMAXVECNORM2 = `
 	.param .u64 reducemaxvecnorm2_param_1,
 	.param .u64 reducemaxvecnorm2_param_2,
 	.param .u64 reducemaxvecnorm2_param_3,
-	.param .u32 reducemaxvecnorm2_param_4
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
 )
 {
 	.reg .pred 	%p<8>;
 	.reg .s32 	%r<42>;
-	.reg .f32 	%f<36>;
+	.reg .f32 	%f<33>;
 	.reg .s64 	%rd<19>;
 	// demoted variable
 	.shared .align 4 .b8 __cuda_local_var_35270_32_non_const_sdata[2048];
@@ -40,7 +41,8 @@ const REDUCEMAXVECNORM2 = `
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
 	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
 	ld.param.u64 	%rd9, [reducemaxvecnorm2_param_3];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_4];
+	ld.param.f32 	%f32, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
 	cvta.to.global.u64 	%rd1, %rd9;
 	cvta.to.global.u64 	%rd2, %rd8;
 	cvta.to.global.u64 	%rd3, %rd7;
@@ -54,29 +56,26 @@ const REDUCEMAXVECNORM2 = `
 	mul.lo.s32 	%r4, %r41, %r11;
 	.loc 2 10 1
 	setp.ge.s32 	%p1, %r40, %r9;
-	mov.f32 	%f34, 0fFF7FFFFF;
-	mov.f32 	%f35, %f34;
 	@%p1 bra 	BB0_2;
 
 BB0_1:
 	.loc 2 10 1
 	mul.wide.s32 	%rd10, %r40, 4;
 	add.s64 	%rd11, %rd4, %rd10;
-	ld.global.f32 	%f6, [%rd11];
+	ld.global.f32 	%f5, [%rd11];
 	add.s64 	%rd12, %rd3, %rd10;
-	ld.global.f32 	%f7, [%rd12];
-	mul.f32 	%f8, %f7, %f7;
-	fma.rn.f32 	%f9, %f6, %f6, %f8;
+	ld.global.f32 	%f6, [%rd12];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
 	add.s64 	%rd13, %rd2, %rd10;
-	ld.global.f32 	%f10, [%rd13];
-	fma.rn.f32 	%f11, %f10, %f10, %f9;
+	ld.global.f32 	%f9, [%rd13];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
 	.loc 3 435 5
-	max.f32 	%f35, %f35, %f11;
+	max.f32 	%f32, %f32, %f10;
 	.loc 2 10 1
 	add.s32 	%r40, %r40, %r4;
 	.loc 2 10 1
 	setp.lt.s32 	%p2, %r40, %r9;
-	mov.f32 	%f34, %f35;
 	@%p2 bra 	BB0_1;
 
 BB0_2:
@@ -84,7 +83,7 @@ BB0_2:
 	mul.wide.s32 	%rd14, %r2, 4;
 	mov.u64 	%rd15, __cuda_local_var_35270_32_non_const_sdata;
 	add.s64 	%rd5, %rd15, %rd14;
-	st.shared.f32 	[%rd5], %f34;
+	st.shared.f32 	[%rd5], %f32;
 	bar.sync 	0;
 	.loc 2 10 1
 	setp.lt.u32 	%p3, %r41, 66;
@@ -99,15 +98,15 @@ BB0_3:
 	@%p4 bra 	BB0_5;
 
 	.loc 2 10 1
-	ld.shared.f32 	%f12, [%rd5];
+	ld.shared.f32 	%f11, [%rd5];
 	add.s32 	%r17, %r41, %r2;
 	mul.wide.u32 	%rd16, %r17, 4;
 	add.s64 	%rd18, %rd15, %rd16;
-	ld.shared.f32 	%f13, [%rd18];
+	ld.shared.f32 	%f12, [%rd18];
 	.loc 3 435 5
-	max.f32 	%f14, %f12, %f13;
+	max.f32 	%f13, %f11, %f12;
 	.loc 2 10 1
-	st.shared.f32 	[%rd5], %f14;
+	st.shared.f32 	[%rd5], %f13;
 
 BB0_5:
 	.loc 2 10 1
@@ -122,42 +121,42 @@ BB0_6:
 	@%p6 bra 	BB0_8;
 
 	.loc 2 10 1
-	ld.volatile.shared.f32 	%f15, [%rd5];
-	ld.volatile.shared.f32 	%f16, [%rd5+128];
+	ld.volatile.shared.f32 	%f14, [%rd5];
+	ld.volatile.shared.f32 	%f15, [%rd5+128];
 	.loc 3 435 5
-	max.f32 	%f17, %f15, %f16;
+	max.f32 	%f16, %f14, %f15;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f17;
-	ld.volatile.shared.f32 	%f18, [%rd5+64];
-	ld.volatile.shared.f32 	%f19, [%rd5];
+	st.volatile.shared.f32 	[%rd5], %f16;
+	ld.volatile.shared.f32 	%f17, [%rd5+64];
+	ld.volatile.shared.f32 	%f18, [%rd5];
 	.loc 3 435 5
-	max.f32 	%f20, %f19, %f18;
+	max.f32 	%f19, %f18, %f17;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f20;
-	ld.volatile.shared.f32 	%f21, [%rd5+32];
-	ld.volatile.shared.f32 	%f22, [%rd5];
+	st.volatile.shared.f32 	[%rd5], %f19;
+	ld.volatile.shared.f32 	%f20, [%rd5+32];
+	ld.volatile.shared.f32 	%f21, [%rd5];
 	.loc 3 435 5
-	max.f32 	%f23, %f22, %f21;
+	max.f32 	%f22, %f21, %f20;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f23;
-	ld.volatile.shared.f32 	%f24, [%rd5+16];
-	ld.volatile.shared.f32 	%f25, [%rd5];
+	st.volatile.shared.f32 	[%rd5], %f22;
+	ld.volatile.shared.f32 	%f23, [%rd5+16];
+	ld.volatile.shared.f32 	%f24, [%rd5];
 	.loc 3 435 5
-	max.f32 	%f26, %f25, %f24;
+	max.f32 	%f25, %f24, %f23;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f26;
-	ld.volatile.shared.f32 	%f27, [%rd5+8];
-	ld.volatile.shared.f32 	%f28, [%rd5];
+	st.volatile.shared.f32 	[%rd5], %f25;
+	ld.volatile.shared.f32 	%f26, [%rd5+8];
+	ld.volatile.shared.f32 	%f27, [%rd5];
 	.loc 3 435 5
-	max.f32 	%f29, %f28, %f27;
+	max.f32 	%f28, %f27, %f26;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f29;
-	ld.volatile.shared.f32 	%f30, [%rd5+4];
-	ld.volatile.shared.f32 	%f31, [%rd5];
+	st.volatile.shared.f32 	[%rd5], %f28;
+	ld.volatile.shared.f32 	%f29, [%rd5+4];
+	ld.volatile.shared.f32 	%f30, [%rd5];
 	.loc 3 435 5
-	max.f32 	%f32, %f31, %f30;
+	max.f32 	%f31, %f30, %f29;
 	.loc 2 10 1
-	st.volatile.shared.f32 	[%rd5], %f32;
+	st.volatile.shared.f32 	[%rd5], %f31;
 
 BB0_8:
 	.loc 2 10 1

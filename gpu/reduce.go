@@ -10,46 +10,47 @@ import (
 
 // Sum of all elements.
 func Sum(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducesum", in, stream)
+	return reduce("reducesum", in, 0, stream)
 }
 
 // Maximum of all elements.
 func Max(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemax", in, stream)
+	return reduce("reducemax", in, -math.MaxFloat32, stream)
 }
 
 // Minimum of all elements.
 func Min(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemin", in, stream)
+	return reduce("reducemin", in, math.MaxFloat32, stream)
 }
 
 // Maximum of absolute values of all elements.
 func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemaxabs", in, stream)
+	return reduce("reducemaxabs", in, 0, stream)
 }
 
 // Maximum difference between the two arrays.
 // 	max_i abs(a[i] - b[i])
 func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
-	return reduce2("reducemaxdiff", a, b, stream)
+	return reduce2("reducemaxdiff", a, b, 0, stream)
 }
 
 // Maximum of the norms of all vectors (x[i], y[i], z[i]).
 // 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
 func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
-	return math.Sqrt(float64(reduce3("reducemaxvecnorm2", x, y, z, stream)))
+	return math.Sqrt(float64(reduce3("reducemaxvecnorm2", x, y, z, 0, stream)))
 }
 
 // Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
 // 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
 // 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
 func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
-	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, stream)))
+	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, 0, stream)))
 }
 
 // 1-input reduce with arbitrary PTX code (op)
-func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
+func reduce(op string, in safe.Float32s, init float32, stream cu.Stream) float32 {
 	out := reduceBuf()
+	out.Memset(init)
 	defer reduceRecycle(out)
 
 	N := in.Len()
@@ -63,6 +64,7 @@ func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&inptr),
 		unsafe.Pointer(&outptr),
+		unsafe.Pointer(&init),
 		unsafe.Pointer(&N)}
 
 	shmem := 0
@@ -77,8 +79,9 @@ func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 }
 
 // 2-input reduce with arbitrary PTX code (op)
-func reduce2(op string, in1, in2 safe.Float32s, stream cu.Stream) float32 {
+func reduce2(op string, in1, in2 safe.Float32s, init float32, stream cu.Stream) float32 {
 	out := reduceBuf()
+	out.Memset(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -94,6 +97,7 @@ func reduce2(op string, in1, in2 safe.Float32s, stream cu.Stream) float32 {
 		unsafe.Pointer(&in1ptr),
 		unsafe.Pointer(&in2ptr),
 		unsafe.Pointer(&outptr),
+		unsafe.Pointer(&init),
 		unsafe.Pointer(&N)}
 
 	shmem := 0
@@ -108,8 +112,9 @@ func reduce2(op string, in1, in2 safe.Float32s, stream cu.Stream) float32 {
 }
 
 // 3-input reduce with arbitrary PTX code (op)
-func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
+func reduce3(op string, in1, in2, in3 safe.Float32s, init float32, stream cu.Stream) float32 {
 	out := reduceBuf()
+	out.Memset(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -127,6 +132,7 @@ func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
 		unsafe.Pointer(&in2ptr),
 		unsafe.Pointer(&in3ptr),
 		unsafe.Pointer(&outptr),
+		unsafe.Pointer(&init),
 		unsafe.Pointer(&N)}
 
 	shmem := 0
@@ -141,8 +147,9 @@ func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
 }
 
 // 6-input reduce with arbitrary PTX code (op)
-func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.Stream) float32 {
+func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, init float32, stream cu.Stream) float32 {
 	out := reduceBuf()
+	out.Memset(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -166,6 +173,7 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 		unsafe.Pointer(&in5ptr),
 		unsafe.Pointer(&in6ptr),
 		unsafe.Pointer(&outptr),
+		unsafe.Pointer(&init),
 		unsafe.Pointer(&N)}
 
 	shmem := 0
@@ -179,9 +187,7 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 	return result_[0]
 }
 
-var (
-	reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce
-)
+var reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce
 
 // recycle a 1-float CUDA reduction buffer
 func reduceRecycle(buf safe.Float32s) {
@@ -204,4 +210,3 @@ func initReduceBuf() {
 		reduceBuffers <- safe.MakeFloat32s(1)
 	}
 }
-

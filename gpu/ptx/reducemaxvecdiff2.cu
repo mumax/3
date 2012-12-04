@@ -10,7 +10,7 @@
 extern "C" __global__ void
 reducemaxvecdiff2(float *x1, float *y1, float *z1,
                   float *x2, float *y2, float *z2,
-                  float *dst, int n) {
-	reduce(load_vecdiff2, fmax, atomicFmax, -3.4028234663852886e38)
+                  float *dst, float initVal, int n) {
+	reduce(load_vecdiff2, fmax, atomicFmax)
 }
 

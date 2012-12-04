@@ -11,17 +11,17 @@ import (
 
 // Adaptive heun solver.
 type Heun struct {
-	dy0              [3]safe.Float32s
+	dy0              [3]safe.Float32s // buffer dy/dt
 	y                nimble.ChanN
 	dy               nimble.RChanN
-	dt_si, dt_mul    float64 // time step = dt_si*dt_mul, which should be nice float32
-	time             float64
+	dt_si, dt_mul    float64 // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	time             float64 // in seconds
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
-	stream           cu.Stream
 	init             bool
-	steps, undone    int
+	steps, undone    int // number of good steps, undone steps
 	debug            dump.TableWriter // save t, dt, error here
+	stream           [3]cu.Stream
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
@@ -35,7 +35,15 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	}
 	return &Heun{dy0: dy0, y: y, dy: dy,
 		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
-		debug: w, stream: cu.StreamCreate()}
+		debug: w, stream: stream3Create()}
+}
+
+func stream3Create()[3]cu.Stream{
+	return [3]cu.Stream{cu.StreamCreate(),cu.StreamCreate(),  cu.StreamCreate()}
+}
+
+func syncAll(streams []stream){
+	for _,s := range streams{s.Synchronize()}
 }
 
 // Run for a duration in seconds
@@ -87,12 +95,11 @@ func (e *Heun) Step() {
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
 	{
-		rotatevec(y, dy, dt, e.stream)
-
 		for i := 0; i < 3; i++ {
-			dy0[i].CopyDtoDAsync(dy[i], e.stream)
+			Madd2Async(y, y, dy, dt, e.stream[i])
+			dy0[i].CopyDtoDAsync(dy[i], e.stream[i])
 		}
-		e.stream.Synchronize()
+		syncAll(e.stream[:])
 	}
 	e.y.WriteDone()
 	e.dy.ReadDone()
@@ -102,16 +109,19 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream) * float64(dt)
+		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream[0]) * float64(dt)
 
 		if core.DEBUG {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
 			e.debug.WriteData()
 		}
+
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			rotatevec2(y, dy, 0.5*dt, dy0, -0.5*dt, e.stream)
-			normalize([3]safe.Float32s{y[0], y[1], y[2]}, e.stream)
-			e.stream.Synchronize()
+			Madd3Async(y[0], y[0], dy[0], 0.5*dt, dy0[0], -0.5*dt, e.stream[0])
+			Madd3Async(y[1], y[1], dy[1], 0.5*dt, dy0[1], -0.5*dt, e.stream[1])
+			Madd3Async(y[2], y[2], dy[2], 0.5*dt, dy0[2], -0.5*dt, e.stream[2])
+			syncAll(e.stream[:])
+			NormalizeSync(y, e.stream[0])
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))

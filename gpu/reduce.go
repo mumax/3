@@ -49,8 +49,8 @@ func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 
 
 // 1-input reduce with arbitrary PTX code (op)
 func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
-	out := safe.MakeFloat32s(1)
-	defer out.Free()
+	out := reduceBuf()
+	defer reduceRecycle(out)
 
 	N := in.Len()
 
@@ -78,8 +78,8 @@ func reduce(op string, in safe.Float32s, stream cu.Stream) float32 {
 
 // 2-input reduce with arbitrary PTX code (op)
 func reduce2(op string, in1, in2 safe.Float32s, stream cu.Stream) float32 {
-	out := safe.MakeFloat32s(1)
-	defer out.Free()
+	out := reduceBuf()
+	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
 	N := in1.Len()
@@ -109,8 +109,8 @@ func reduce2(op string, in1, in2 safe.Float32s, stream cu.Stream) float32 {
 
 // 3-input reduce with arbitrary PTX code (op)
 func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
-	out := safe.MakeFloat32s(1)
-	defer out.Free()
+	out := reduceBuf()
+	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
 	N := in1.Len()
@@ -142,8 +142,8 @@ func reduce3(op string, in1, in2, in3 safe.Float32s, stream cu.Stream) float32 {
 
 // 6-input reduce with arbitrary PTX code (op)
 func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.Stream) float32 {
-	out := safe.MakeFloat32s(1)
-	defer out.Free()
+	out := reduceBuf()
+	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
 	N := in1.Len()
@@ -179,19 +179,29 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 	return result_[0]
 }
 
-//func ptxcallAsync(code string, gridDim, blockDim cu.Dim3, shmem int, stream cu.Stream, args ...interface{}) {
-//	argptr := make([]unsafe.Pointer, len(args))
-//	for i, arg := range args {
-//		switch v := arg.(type) {
-//		default:
-//			panic(fmt.Errorf("ptxcall: unsupported type: %v", reflect.TypeOf(arg)))
-//		case int:
-//			argptr[i] = unsafe.Pointer(&v)
-//			fmt.Println("arg", i, *((*int)(argptr[i])))
-//		case cu.DevicePtr, uintptr:
-//			argptr[i] = unsafe.Pointer(&v)
-//		}
-//	}
-//	kernel := PTXLoad(code)
-//	cu.LaunchKernel(kernel, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, argptr)
-//}
+func reduceRecycle(buf safe.Float32s) {
+	reduceStream.Synchronize()
+	buf.MemsetAsync(0, reduceStream)
+	reduceBuffers <- buf
+}
+
+func reduceBuf() safe.Float32s {
+	if reduceBuffers == nil {
+		initReduceBuf()
+	}
+	return <-reduceBuffers
+}
+
+func initReduceBuf() {
+	reduceStream = cu.StreamCreate()
+	const N = 128
+	reduceBuffers = make(chan safe.Float32s, N)
+	for i := 0; i < N; i++ {
+		reduceBuffers <- safe.MakeFloat32s(1)
+	}
+}
+
+var (
+	reduceStream  cu.Stream
+	reduceBuffers chan safe.Float32s
+)

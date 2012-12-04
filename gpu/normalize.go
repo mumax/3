@@ -6,7 +6,6 @@ import (
 	"unsafe"
 )
 
-
 func NormalizeSync(vec [3]safe.Float32s, stream cu.Stream) {
 	N := vec[0].Len()
 	gridDim, blockDim := Make1DConf(N)

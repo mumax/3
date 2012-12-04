@@ -19,7 +19,7 @@ type Heun struct {
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
 	init             bool
-	steps, undone    int // number of good steps, undone steps
+	steps, undone    int              // number of good steps, undone steps
 	debug            dump.TableWriter // save t, dt, error here
 	stream           [3]cu.Stream
 }
@@ -38,12 +38,14 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 		debug: w, stream: stream3Create()}
 }
 
-func stream3Create()[3]cu.Stream{
-	return [3]cu.Stream{cu.StreamCreate(),cu.StreamCreate(),  cu.StreamCreate()}
+func stream3Create() [3]cu.Stream {
+	return [3]cu.Stream{cu.StreamCreate(), cu.StreamCreate(), cu.StreamCreate()}
 }
 
-func syncAll(streams []cu.Stream){
-	for _,s := range streams{s.Synchronize()}
+func syncAll(streams []cu.Stream) {
+	for _, s := range streams {
+		s.Synchronize()
+	}
 }
 
 // Run for a duration in seconds

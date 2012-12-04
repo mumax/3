@@ -43,8 +43,6 @@ func Madd2Async(dst, src1, src2 safe.Float32s, factor1, factor2 float32, stream 
 	cu.LaunchKernel(maddCode, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 }
 
-
-
 func Madd3Sync(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3 float32, stream cu.Stream) {
 	Madd3Async(dst, src1, src2, src3, factor1, factor2, factor3, stream)
 	stream.Synchronize()

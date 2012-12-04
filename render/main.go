@@ -39,7 +39,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = 20
+	Viewpos.Z = 10
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
@@ -83,7 +83,7 @@ func InitGL() {
 
 	if *flag_depthtest {
 		gl.Enable(gl.DEPTH_TEST)
-		gl.DepthFunc(gl.LEQUAL)
+		gl.DepthFunc(gl.LESS)
 	}
 
 	if *flag_lighting {

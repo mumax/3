@@ -11,7 +11,7 @@ var (
 	Viewpos                Vertex
 	ViewPhi, ViewTheta     float64
 	mousePrevX, mousePrevY int
-	mouseButton [5]int
+	mouseButton            [5]int
 )
 
 const PI = math.Pi
@@ -20,7 +20,7 @@ const PI = math.Pi
 func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
-	gl.Translatef(gl.Float(-Viewpos.X), gl.Float(-Viewpos.Y), gl.Float(-Viewpos.Z))
+	gl.Translatef(gl.Float(Viewpos.X), gl.Float(Viewpos.Y), gl.Float(-Viewpos.Z))
 	gl.Rotatef(gl.Float(ViewTheta*(180/PI))-90, 1, 0, 0)
 	gl.Rotatef(gl.Float(ViewPhi*(180/PI))+90, 0, 0, 1)
 }
@@ -30,37 +30,23 @@ const (
 	deltaLook = 0.01
 )
 
-// X-axis of the viewer.
-func ViewerX() Vertex {
-	x := float32(math.Cos(ViewPhi))
-	y := float32(-math.Sin(ViewPhi))
-	return Vertex{x, y, 0}
-}
-
-// Y-axis of the viewer
-func ViewerY() Vertex {
-	x := float32(-math.Sin(ViewPhi))
-	y := float32(-math.Cos(ViewPhi))
-	return Vertex{x, y, 0}
-}
-
 // Sets up input handlers
 func InitInputHandlers() {
 	glfw.SetKeyCallback(func(key, state int) {
 		if state == 1 {
 			switch key {
 			case Up:
-				Viewpos.MAdd(deltaMove, ViewerX())
-			case Down:
-				Viewpos.MAdd(-deltaMove, ViewerX())
-			case Left:
-				Viewpos.MAdd(-deltaMove, ViewerY())
-			case Right:
-				Viewpos.MAdd(deltaMove, ViewerY())
-			case Space:
 				Viewpos.Z += deltaMove
-			case Alt:
+			case Down:
 				Viewpos.Z -= deltaMove
+			case Left:
+				Viewpos.Y += deltaMove
+			case Right:
+				Viewpos.Y -= deltaMove
+			case Space:
+				Viewpos.X += deltaMove
+			case Alt:
+				Viewpos.X -= deltaMove
 			default:
 				log.Println("unused key:", key)
 			}
@@ -71,7 +57,9 @@ func InitInputHandlers() {
 
 		dx, dy := x-mousePrevX, y-mousePrevY
 		mousePrevX, mousePrevY = x, y
-		if mouseButton[0] == 0 {return}
+		if mouseButton[0] == 0 {
+			return
+		}
 
 		ViewPhi += deltaLook * float64(dx) // TODO: * arccos
 		ViewTheta += deltaLook * float64(dy)

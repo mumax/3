@@ -15,7 +15,7 @@ const MADD3 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000095d_00000000-9_madd3.cpp3.i"
+	.file	1 "/tmp/tmpxft_00001110_00000000-9_madd3.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/madd3.cu"
 
 .visible .entry madd3(
@@ -65,16 +65,16 @@ const MADD3 = `
 	ld.global.f32 	%f4, [%rd10];
 	add.s64 	%rd11, %rd3, %rd9;
 	ld.global.f32 	%f5, [%rd11];
-	mul.f32 	%f6, %f5, %f2;
-	fma.rn.f32 	%f7, %f4, %f1, %f6;
 	add.s64 	%rd12, %rd2, %rd9;
-	ld.global.f32 	%f8, [%rd12];
-	fma.rn.f32 	%f9, %f8, %f3, %f7;
+	ld.global.f32 	%f6, [%rd12];
+	mul.f32 	%f7, %f6, %f3;
+	fma.rn.f32 	%f8, %f5, %f2, %f7;
+	fma.rn.f32 	%f9, %f4, %f1, %f8;
 	add.s64 	%rd13, %rd1, %rd9;
 	st.global.f32 	[%rd13], %f9;
 
 BB0_2:
-	.loc 2 8 2
+	.loc 2 9 2
 	ret;
 }
 

@@ -61,17 +61,14 @@ func main() {
 	uni.Autosave(m, every, gpu.GPUDevice)
 	uni.Autotable(m, every/10, gpu.GPUDevice)
 
-	//solver.Step()
-	//nimble.Dump(m, "m0.dump")
-
 	solver.Advance(2e-9)
 
 	var avg [3]float32
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want := [3]float32{0, 0.12305694, 0.96828824 }
-	err := math.Sqrt(float64(sqr(avg[0] - want[0]) +  sqr(avg[1] - want[1]) + sqr(avg[2] - want[2])))
+	want := [3]float32{0, 0.12305694, 0.96828824}
+	err := math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-5 {
 		fmt.Println("FAILED")
@@ -92,8 +89,8 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want = [3]float32{ 0.04577134,0.100720644,-0.9862087}
-	err = math.Sqrt(float64(sqr(avg[0] - want[0]) +  sqr(avg[1] - want[1]) + sqr(avg[2] - want[2])))
+	want = [3]float32{0.04577134, 0.100720644, -0.9862087}
+	err = math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-4 {
 		fmt.Println("FAILED")
@@ -102,4 +99,4 @@ func main() {
 	fmt.Println("OK")
 }
 
-func sqr(x float32)float32{return x*x}
+func sqr(x float32) float32 { return x * x }

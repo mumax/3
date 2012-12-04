@@ -179,12 +179,16 @@ func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, stream cu.St
 	return result_[0]
 }
 
+var (
+	reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce
+)
+
+// recycle a 1-float CUDA reduction buffer
 func reduceRecycle(buf safe.Float32s) {
-	reduceStream.Synchronize()
-	buf.MemsetAsync(0, reduceStream)
 	reduceBuffers <- buf
 }
 
+// return a 1-float CUDA reduction buffer from a pool
 func reduceBuf() safe.Float32s {
 	if reduceBuffers == nil {
 		initReduceBuf()
@@ -192,8 +196,8 @@ func reduceBuf() safe.Float32s {
 	return <-reduceBuffers
 }
 
+// initialize pool of 1-float CUDA reduction buffers
 func initReduceBuf() {
-	reduceStream = cu.StreamCreate()
 	const N = 128
 	reduceBuffers = make(chan safe.Float32s, N)
 	for i := 0; i < N; i++ {
@@ -201,7 +205,3 @@ func initReduceBuf() {
 	}
 }
 
-var (
-	reduceStream  cu.Stream
-	reduceBuffers chan safe.Float32s
-)

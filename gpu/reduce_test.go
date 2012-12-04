@@ -77,15 +77,15 @@ func TestReduceMaxDiff(t *testing.T) {
 
 func TestReduceMin(t *testing.T) {
 	LockCudaThread()
-	N := 10033
+	N := 100
 	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
 	in := input.Host()
 	for i := range in {
-		in[i] = float32(i) - 100
+		in[i] = float32(i) + 100
 	}
 	str := cu.StreamCreate()
 	result := Min(input.Device(), str)
-	if result != -100 {
+	if result != 100 {
 		t.Error("got:", result)
 	}
 }

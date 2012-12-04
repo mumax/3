@@ -15,7 +15,7 @@ const NORMALIZE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000025ac_00000000-9_normalize.cpp3.i"
+	.file	1 "/tmp/tmpxft_00004d21_00000000-9_normalize.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/common_func.h"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/normalize.cu"
@@ -62,47 +62,9 @@ BB0_2:
 	.param .u32 normalize_param_3
 )
 {
-	.reg .pred 	%p<2>;
-	.reg .s32 	%r<15>;
-	.reg .f32 	%f<4>;
-	.reg .s64 	%rd<11>;
 
 
-	ld.param.u64 	%rd4, [normalize_param_0];
-	ld.param.u64 	%rd5, [normalize_param_1];
-	ld.param.u64 	%rd6, [normalize_param_2];
-	ld.param.u32 	%r2, [normalize_param_3];
-	cvta.to.global.u64 	%rd1, %rd6;
-	cvta.to.global.u64 	%rd2, %rd5;
-	cvta.to.global.u64 	%rd3, %rd4;
-	.loc 4 6 1
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 4 7 1
-	setp.ge.s32 	%p1, %r1, %r2;
-	@%p1 bra 	BB1_2;
 
-	.loc 4 9 1
-	mul.wide.s32 	%rd7, %r1, 4;
-	add.s64 	%rd8, %rd3, %rd7;
-	add.s64 	%rd9, %rd2, %rd7;
-	ld.global.f32 	%f1, [%rd9];
-	add.s64 	%rd10, %rd1, %rd7;
-	ld.global.f32 	%f2, [%rd10];
-	ld.global.f32 	%f3, [%rd8];
-	.loc 4 11 1
-	st.global.f32 	[%rd8], %f3;
-	.loc 4 12 1
-	st.global.f32 	[%rd9], %f1;
-	.loc 4 13 1
-	st.global.f32 	[%rd10], %f2;
-
-BB1_2:
 	.loc 4 15 2
 	ret;
 }

@@ -6,8 +6,8 @@
 //	         x x
 //
 extern "C" __global__ void 
-copypad(float* dst, int D0, int D1, int D2, 
-        float* src, int S0, int S1, int S2, 
+copypad(float* __restrict__  dst, int D0, int D1, int D2, 
+        float* __restrict__  src, int S0, int S1, int S2, 
         int o0, int o1, int o2){
 
 	int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice

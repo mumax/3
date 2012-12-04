@@ -22,8 +22,8 @@
 // -aaaa
 // -bbbb
 extern "C" __global__ void 
-kernmulRSymm2Dyz(float* fftMy,  float* fftMz,
-                 float* fftKyy, float* fftKzz, float* fftKyz, 
+kernmulRSymm2Dyz(float* __restrict__  fftMy,  float* __restrict__  fftMz,
+                 float* __restrict__  fftKyy, float* __restrict__  fftKzz, float* __restrict__  fftKyz, 
                  int N1, int N2){
 
 	int j = blockIdx.y * blockDim.y + threadIdx.y;

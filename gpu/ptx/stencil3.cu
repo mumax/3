@@ -20,7 +20,7 @@ inline __device__ int clamp(int i, int N){
 #define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
 
 extern "C" __global__ void
-stencil3(float* dst, float* src, 
+stencil3(float* __restrict__ dst, float* __restrict__ src, 
           float w0, float wt, float wb, float wu, float wd, float wl, float wr, 
           int wrap0, int wrap1, int wrap2, int N0, int N1, int N2){
 

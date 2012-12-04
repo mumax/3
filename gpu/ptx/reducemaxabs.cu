@@ -4,7 +4,7 @@
 #define load_fabs(i) fabs(src[i])
 
 extern "C" __global__ void
-reducemaxabs(float *src, float *dst, float initVal, int n) {
+reducemaxabs(float* __restrict__ src, float* __restrict__ dst, float initVal, int n) {
 	reduce(load_fabs, fmax, atomicFmax)
 }
 

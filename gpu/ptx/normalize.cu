@@ -1,7 +1,7 @@
 #include "common_func.h"
 
 extern "C" __global__ void
-normalize(float* vx, float* vy, float* vz, int N) {
+normalize(float* __restrict__ vx, float* __restrict__ vy, float* __restrict__ vz, int N) {
 
 	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
 	if (i < N) {

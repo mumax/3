@@ -6,9 +6,9 @@
 // |Mz|   |Kxz Kyz Kzz|   |Mz|
 // Elements may be NULL, interpreted as all zeros.
 extern "C" __global__ void 
-kernmulRSymm(float* fftMx,  float* fftMy,  float* fftMz,
-        float* fftKxx, float* fftKyy, float* fftKzz,
-        float* fftKyz, float* fftKxz, float* fftKxy, int N){
+kernmulRSymm(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
+             float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKzz,
+             float* __restrict__  fftKyz, float* __restrict__  fftKxz, float* __restrict__  fftKxy, int N){
 
   int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
   int e = 2 * i;

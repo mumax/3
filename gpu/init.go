@@ -34,7 +34,7 @@ func init() {
 	M, m := dev.ComputeCapability()
 	if *nimble.Flag_version {
 		concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
-		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ", concurrent:", concurrent==1, ")\n")
+		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ", concurrent:", concurrent == 1, ")\n")
 	}
 	if M < 2 {
 		core.Fatalf("Need at least compute capability 2.0, have %v.%v", M, m)

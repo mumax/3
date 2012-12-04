@@ -20,7 +20,7 @@ const PI = math.Pi
 func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
-	gl.Translatef(gl.Float(Viewpos.X), gl.Float(Viewpos.Y), gl.Float(-Viewpos.Z))
+	gl.Translatef(gl.Float(Viewpos.X), gl.Float(Viewpos.Y), gl.Float(Viewpos.Z))
 	gl.Rotatef(gl.Float(ViewTheta*(180/PI))-90, 1, 0, 0)
 	gl.Rotatef(gl.Float(ViewPhi*(180/PI))+90, 0, 0, 1)
 }

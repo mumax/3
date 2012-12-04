@@ -18,7 +18,7 @@ var (
 	flag_cullface  = flag.Bool("cullface", true, "Cull invisible polygon faces")
 	flag_lighting  = flag.Bool("lighting", true, "Enable lighting")
 	flag_depthtest = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias = flag.Bool("antialias", true, "Antialias lines")
+	flag_antialias = flag.Bool("antialias", false, "Antialias lines")
 	flag_wireframe = flag.Bool("wireframe", false, "Render wireframes")
 	flag_fps       = flag.Bool("fps", true, "Measure frames per second")
 )
@@ -39,7 +39,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = 10
+	Viewpos.Z = -10
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
@@ -71,7 +71,7 @@ func InitViewport() {
 	gl.MatrixMode(gl.PROJECTION)
 	gl.LoadIdentity()
 	x := gl.Double(float64(Height) / float64(Width))
-	gl.Frustum(-1, 1, -x, x, 1, 1000.0)
+	gl.Frustum(-1, 1, -x, x, 1, 50)
 }
 
 func InitGL() {

@@ -39,9 +39,9 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = 2
+	Viewpos.Z = 20
 
-	for glfw.WindowParam(glfw.Opened) == 1 {// window open
+	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
 		DrawTestScene()
 		glfw.SwapBuffers()
@@ -60,8 +60,10 @@ func InitWindow() {
 	core.Fatal(glfw.OpenWindow(Width, Height, 0, 0, 0, 0, 0, 0, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
 	vsync := 0
-	if *flag_vsync{vsync = 1}
-		glfw.SetSwapInterval(vsync)
+	if *flag_vsync {
+		vsync = 1
+	}
+	glfw.SetSwapInterval(vsync)
 }
 
 func InitViewport() {

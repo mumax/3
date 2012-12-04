@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	Viewpos            Vertex
-	ViewPhi, ViewTheta float64
+	Viewpos                Vertex
+	ViewPhi, ViewTheta     float64
 	mousePrevX, mousePrevY int
+	mouseButton [5]int
 )
 
 const PI = math.Pi
@@ -19,9 +20,9 @@ const PI = math.Pi
 func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
+	gl.Translatef(gl.Float(-Viewpos.X), gl.Float(-Viewpos.Y), gl.Float(-Viewpos.Z))
 	gl.Rotatef(gl.Float(ViewTheta*(180/PI))-90, 1, 0, 0)
 	gl.Rotatef(gl.Float(ViewPhi*(180/PI))+90, 0, 0, 1)
-	gl.Translatef(gl.Float(-Viewpos.X), gl.Float(-Viewpos.Y), gl.Float(-Viewpos.Z))
 }
 
 const (
@@ -70,6 +71,7 @@ func InitInputHandlers() {
 
 		dx, dy := x-mousePrevX, y-mousePrevY
 		mousePrevX, mousePrevY = x, y
+		if mouseButton[0] == 0 {return}
 
 		ViewPhi += deltaLook * float64(dx) // TODO: * arccos
 		ViewTheta += deltaLook * float64(dy)
@@ -91,6 +93,7 @@ func InitInputHandlers() {
 
 	glfw.SetMouseButtonCallback(func(button, state int) {
 		log.Println("mousebutton:", button, state)
+		mouseButton[button] = state
 	})
 
 	glfw.SetMouseWheelCallback(func(delta int) {

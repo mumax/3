@@ -11,6 +11,7 @@ PKGS=\
 	$(PREFIX)/dump\
 	$(PREFIX)/nimble\
 	$(PREFIX)/core\
+	$(PREFIX)/render\
 
 
 6g: ptx

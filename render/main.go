@@ -3,15 +3,17 @@
 package main
 
 import (
-	"flag"
 	. "code.google.com/p/nimble-cube/render"
+	"code.google.com/p/nimble-cube/core"
+	"flag"
 	gl "github.com/chsc/gogl/gl21"
+	"github.com/jteeuwen/glfw"
 	"log"
 	"time"
 )
 
 var (
-	flag_fullscreen = flag.Bool("fullscreen", false, "Fullscreen mode")
+	flag_smooth = flag.Bool("smooth", true, "Smooth shading")
 	flag_vsync      = flag.Bool("vsync", true, "Vertical sync")
 	flag_cullface   = flag.Bool("cullface", true, "Cull invisible polygon faces")
 	flag_lighting   = flag.Bool("lighting", true, "Enable lighting")
@@ -21,22 +23,17 @@ var (
 	flag_fps        = flag.Bool("fps", true, "Measure frames per second")
 )
 
-var (
-	Width  int
-	Height int
-)
+var Width , Height int
+
 
 func main() {
 	flag.Parse()
 
 	xinit()
 	defer Close()
-	//x.GrabMouse(true)
 
 	InitInputHandlers()
-
 	glinit()
-
 	initViewport()
 
 	start := time.Now()
@@ -58,19 +55,13 @@ func main() {
 }
 
 func xinit() {
-	log.Println("Init", Version())
-	Init()
-
-	const wintitle = "render"
-	if *flag_fullscreen {
-		Width, Height = Fullscreen(wintitle)
-	} else {
-		Width, Height = 800, 600
-		Windowed(Width, Height, wintitle)
-	}
-
+	core.Fatal(glfw.Init())
+	Width, Height = 800, 600
+	core.Fatal(glfw.OpenWindow(Width, Height, 0, 0, 0, 0, 0, 0, glfw.Windowed))
+	glfw.SetWindowTitle("renderer")
 	VSync(*flag_vsync)
 }
+
 
 func initViewport() {
 	gl.Viewport(0, 0, gl.Sizei(Width), gl.Sizei(Height))
@@ -111,5 +102,7 @@ func glinit() {
 		gl.Hint(gl.LINE_SMOOTH_HINT, gl.NICEST)
 	}
 
-	gl.ShadeModel(gl.SMOOTH)
+	if *flag_smooth{
+		gl.ShadeModel(gl.SMOOTH)
+	}
 }

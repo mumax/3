@@ -5,7 +5,8 @@ import (
 )
 
 type Cube struct {
-	BoundingBox
+	Center Vertex
+	Radius Vertex
 }
 
 // Issue to OpenGL.

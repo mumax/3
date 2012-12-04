@@ -10,6 +10,8 @@ import (
 )
 
 // Adaptive heun solver.
+// TODO: now only for magnetization (because it normalizes)
+// post-step hook?
 type Heun struct {
 	dy0              [3]safe.Float32s // buffer dy/dt
 	y                nimble.ChanN
@@ -86,6 +88,9 @@ func (e *Heun) Step() {
 
 	// Send out initial value
 	if !e.init {
+		// normalize initial magnetization	
+		M := Device3(e.y.UnsafeData())
+		normalize(M, e.stream)
 		e.y.WriteNext(n)
 		e.init = true
 	}

@@ -45,12 +45,12 @@ func Madd2Async(dst, src1, src2 safe.Float32s, factor1, factor2 float32, stream 
 
 
 
-func Madd3Sync(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3, float32, stream cu.Stream) {
+func Madd3Sync(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3 float32, stream cu.Stream) {
 	Madd3Async(dst, src1, src2, src3, factor1, factor2, factor3, stream)
 	stream.Synchronize()
 }
 
-func Madd3Async(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3, float32, stream cu.Stream) {
+func Madd3Async(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3 float32, stream cu.Stream) {
 
 	core.Assert(dst.Len() == src1.Len() && dst.Len() == src2.Len())
 
@@ -62,6 +62,7 @@ func Madd3Async(dst, src1, src2, src3 safe.Float32s, factor1, factor2, factor3, 
 	dstptr := dst.Pointer()
 	src1ptr := src1.Pointer()
 	src2ptr := src2.Pointer()
+	src3ptr := src3.Pointer()
 
 	args := []unsafe.Pointer{
 		unsafe.Pointer(&dstptr),

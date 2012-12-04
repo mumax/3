@@ -18,5 +18,5 @@ func (d Device) StreamCreate() cu.Stream {
 }
 
 func (d Device) Madd(dst nimble.Slice, src1, src2 nimble.Slice, w1, w2 float32, str cu.Stream) {
-	Madd2(dst.Device(), src1.Device(), src2.Device(), w1, w2, str)
+	Madd2Sync(dst.Device(), src1.Device(), src2.Device(), w1, w2, str)
 }

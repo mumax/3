@@ -42,7 +42,7 @@ func stream3Create()[3]cu.Stream{
 	return [3]cu.Stream{cu.StreamCreate(),cu.StreamCreate(),  cu.StreamCreate()}
 }
 
-func syncAll(streams []stream){
+func syncAll(streams []cu.Stream){
 	for _,s := range streams{s.Synchronize()}
 }
 
@@ -80,6 +80,8 @@ func (e *Heun) Steps(steps int) {
 // Take one time step
 func (e *Heun) Step() {
 	n := e.y.Mesh().NCell()
+	str := e.stream
+
 	// Send out initial value
 	if !e.init {
 		e.y.WriteNext(n)
@@ -96,10 +98,10 @@ func (e *Heun) Step() {
 	y := Device3(e.y.WriteNext(n))
 	{
 		for i := 0; i < 3; i++ {
-			Madd2Async(y, y, dy, dt, e.stream[i])
-			dy0[i].CopyDtoDAsync(dy[i], e.stream[i])
+			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
+			dy0[i].CopyDtoDAsync(dy[i], str[i])
 		}
-		syncAll(e.stream[:])
+		syncAll(str[:])
 	}
 	e.y.WriteDone()
 	e.dy.ReadDone()
@@ -109,7 +111,7 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], e.stream[0]) * float64(dt)
+		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
 
 		if core.DEBUG {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
@@ -117,17 +119,19 @@ func (e *Heun) Step() {
 		}
 
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			Madd3Async(y[0], y[0], dy[0], 0.5*dt, dy0[0], -0.5*dt, e.stream[0])
-			Madd3Async(y[1], y[1], dy[1], 0.5*dt, dy0[1], -0.5*dt, e.stream[1])
-			Madd3Async(y[2], y[2], dy[2], 0.5*dt, dy0[2], -0.5*dt, e.stream[2])
-			syncAll(e.stream[:])
-			NormalizeSync(y, e.stream[0])
+			Madd3Async(y[0], y[0], dy[0], dy0[0], 1, 0.5*dt, -0.5*dt, str[0])
+			Madd3Async(y[1], y[1], dy[1], dy0[1], 1, 0.5*dt, -0.5*dt, str[1])
+			Madd3Async(y[2], y[2], dy[2], dy0[2], 1, 0.5*dt, -0.5*dt, str[2])
+			syncAll(str[:])
+			NormalizeSync(y, str[0])
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 		} else {
 			// undo.
-			rotatevec(y, dy0, -dt, e.stream) // TODO: not very accurate undo
+			Madd2Async(y[0], y[0], dy0[0], 1, -dt, str[0])
+			Madd2Async(y[1], y[1], dy0[1], 1, -dt, str[1])
+			Madd2Async(y[2], y[2], dy0[2], 1, -dt, str[2])
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}

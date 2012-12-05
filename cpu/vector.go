@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-// TODO: mv to nimble or even remove
+// TODO: -> [3]float32, funcs, not methods
 
 // 3-component vector.
 type Vector [3]float32

@@ -4,7 +4,6 @@ package mag
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/cpu"
 )
 
 // puts a magnetic vortex in m
@@ -27,22 +26,22 @@ func SetVortex(m [3][][][]float32, circulation, polarization int) {
 }
 
 // Returns a function that returns the vector value for all i,j,k.
-func Uniform(x, y, z float32) func(i, j, k int) cpu.Vector {
-	v := cpu.Vector{x, y, z}
-	return func(i, j, k int) cpu.Vector {
+func Uniform(x, y, z float32) func(i, j, k int) [3]float32{
+	v := [3]float32{x, y, z}
+	return func(i, j, k int) [3]float32 {
 		return v
 	}
 }
 
 // Sets value at index i,j,k to f(i,j,k).
-func SetAll(array [3][][][]float32, f func(i, j, k int) cpu.Vector) {
+func SetAll(array [3][][][]float32, f func(i, j, k int) [3]float32) {
 	n := core.SizeOf(array[0])
 	i2, j2, k2 := n[0], n[1], n[2]
 	SetRegion(array, 0, 0, 0, i2, j2, k2, f)
 }
 
 // Sets the region between (i1, j1, k1), (i2, j2, k2) to f(i,j,k).
-func SetRegion(array [3][][][]float32, i1, j1, k1, i2, j2, k2 int, f func(i, j, k int) cpu.Vector) {
+func SetRegion(array [3][][][]float32, i1, j1, k1, i2, j2, k2 int, f func(i, j, k int) [3]float32) {
 	for i := i1; i < i2; i++ {
 		for j := j1; j < j2; j++ {
 			for k := k1; k < k2; k++ {

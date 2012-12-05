@@ -15,7 +15,7 @@ const REDUCEMAXABS = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000010d3_00000000-9_reducemaxabs.cpp3.i"
+	.file	1 "/tmp/tmpxft_00003798_00000000-9_reducemaxabs.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxabs.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"

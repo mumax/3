@@ -2,7 +2,6 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/cpu"
 	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
@@ -15,7 +14,7 @@ type LLGTorque struct {
 	torque nimble.ChanN
 	m, b   nimble.RChanN
 	Alpha  float32
-	bExt   cpu.Vector
+	bExt   [3]float32
 	stream cu.Stream
 }
 
@@ -23,7 +22,7 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 	m, B := m_.NewReader(), B_.NewReader()
 	core.Assert(B.Size() == m.Size())
 	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
-	tq := &LLGTorque{torque, m, B, alpha, cpu.Vector{0, 0, 0}, cu.StreamCreate()}
+	tq := &LLGTorque{torque, m, B, alpha, [3]float32{0, 0, 0}, cu.StreamCreate()}
 	return tq
 }
 
@@ -49,8 +48,8 @@ func (r *LLGTorque) Exec() {
 	r.b.ReadDone()
 }
 
-func CalcLLGTorque(torque, m, B [3]safe.Float32s, alpha float32, bExt cpu.Vector, stream cu.Stream) {
-	core.Assert(bExt == cpu.Vector{0, 0, 0})
+func CalcLLGTorque(torque, m, B [3]safe.Float32s, alpha float32, bExt [3]float32, stream cu.Stream) {
+	core.Assert(bExt == [3]float32{0, 0, 0})
 
 	llgtorqueCode := PTXLoad("llgtorque")
 

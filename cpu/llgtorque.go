@@ -10,7 +10,7 @@ type LLGTorque struct {
 	torque nimble.ChanN
 	m, b   nimble.RChanN
 	Alpha  float32
-	bExt   Vector
+	bExt   [3]float32
 }
 
 func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
@@ -18,7 +18,7 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 	B := B_.NewReader()
 	core.Assert(B.Mesh().Size() == m.Mesh().Size())
 	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
-	return &LLGTorque{torque, m, B, alpha, Vector{0, 0, 0}}
+	return &LLGTorque{torque, m, B, alpha, [3]float32{0, 0, 0}}
 }
 
 func (r *LLGTorque) Output() nimble.ChanN { return r.torque }
@@ -36,18 +36,19 @@ func (r *LLGTorque) Run() {
 	}
 }
 
-func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
+func llgTorque(torque, m, B [3][]float32, alpha float32, bExt [3]float32) {
 	//const gamma = 1.76085970839e11 // rad/Ts // TODO
 
 	var mx, my, mz float32
 	var Bx, By, Bz float32
 
 	for i := range torque[0] {
-		mx, my, mz = m[X][i], m[Y][i], m[Z][i]
-		Bx = B[X][i] + bExt[X]
-		By = B[Y][i] + bExt[Y]
-		Bz = B[Z][i] + bExt[Z]
+		mx, my, mz = m[0][i], m[1][i], m[2][i]
+		Bx = B[0][i] + bExt[0]
+		By = B[1][i] + bExt[1]
+		Bz = B[2][i] + bExt[2]
 
+		// TODO: check left-handed system
 		mxBx := my*Bz - mz*By
 		mxBy := -mx*Bz + mz*Bx
 		mxBz := mx*By - my*Bx
@@ -56,9 +57,9 @@ func llgTorque(torque, m, B [3][]float32, alpha float32, bExt Vector) {
 		mxmxBy := -mx*mxBz + mz*mxBx
 		mxmxBz := mx*mxBy - my*mxBx
 
-		torque[X][i] = (mxBx - alpha*mxmxBx) // todo: gilbert factor
-		torque[Y][i] = (mxBy - alpha*mxmxBy)
-		torque[Z][i] = (mxBz - alpha*mxmxBz)
+		torque[0][i] = (mxBx - alpha*mxmxBx) // todo: gilbert factor
+		torque[1][i] = (mxBy - alpha*mxmxBy)
+		torque[2][i] = (mxBz - alpha*mxmxBz)
 	}
 }
 

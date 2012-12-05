@@ -15,7 +15,7 @@ const REDUCEMAXVECDIFF2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000010dc_00000000-9_reducemaxvecdiff2.cpp3.i"
+	.file	1 "/tmp/tmpxft_000037c9_00000000-9_reducemaxvecdiff2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxvecdiff2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"

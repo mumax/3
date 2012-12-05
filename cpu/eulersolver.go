@@ -56,15 +56,15 @@ func (e *Euler) Steps(steps int) {
 
 func eulerStep(y, dy [3][]float32, dt float32) {
 	for i := range y[0] {
-		var y1 Vector
-		y1[X] = y[X][i] + dt*dy[X][i]
-		y1[Y] = y[Y][i] + dt*dy[Y][i]
-		y1[Z] = y[Z][i] + dt*dy[Z][i]
+		var y1 [3]float32
+		y1[0] = y[0][i] + dt*dy[0][i]
+		y1[1] = y[1][i] + dt*dy[1][i]
+		y1[2] = y[2][i] + dt*dy[2][i]
 
-		inorm := 1 / float32(math.Sqrt(float64(y1[X]*y1[X]+y1[Y]*y1[Y]+y1[Z]*y1[Z])))
+		inorm := 1 / float32(math.Sqrt(float64(y1[0]*y1[0]+y1[1]*y1[1]+y1[2]*y1[2])))
 
-		y[X][i] = inorm * y1[X]
-		y[Y][i] = inorm * y1[Y]
-		y[Z][i] = inorm * y1[Z]
+		y[0][i] = inorm * y1[0]
+		y[1][i] = inorm * y1[1]
+		y[2][i] = inorm * y1[2]
 	}
 }

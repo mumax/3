@@ -71,7 +71,7 @@ func Quick(fname string, data [][][][]float32) {
 
 // Quick-and-dirty read from file.
 // Returns first frame if there are many.
-func ReadFile(fname string)  [][][][]float32{
+func ReadFile(fname string) [][][][]float32 {
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}

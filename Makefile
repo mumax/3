@@ -11,12 +11,12 @@ PKGS=\
 	$(PREFIX)/dump\
 	$(PREFIX)/nimble\
 	$(PREFIX)/core\
-	$(PREFIX)/render\
 
 
 6g: ptx
 	go install -v $(PKGS)
 	go install -v 
+	go install $(PREFIX)/render
 
 tool:
 	make -C tools/dump

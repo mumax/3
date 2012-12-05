@@ -18,7 +18,7 @@ var (
 	flag_show        = flag.Bool("show", false, "Human-readible output to stdout")
 	flag_format      = flag.String("f", "%v", "Printf format string")
 	flag_png         = flag.Bool("png", false, "PNG output")
-	flag_jpeg        = flag.Bool("jpeg", false, "JPEG output")
+	flag_jpeg        = flag.Bool("jpg", false, "JPEG output")
 	flag_gnuplot     = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_gnuplotgzip = flag.Bool("gplotgzip", false, "Gzip'ed 'Gnuplot-compatible output")
 	flag_omf         = flag.String("omf", "", `"text" or "binary" OMF output`)

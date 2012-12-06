@@ -7,7 +7,7 @@ import (
 
 // Const represents a value that is constant in time.
 type Const struct {
-	output nimble.ChanN
+	output nimble.ChanN // could embed?
 }
 
 // NewConst returns a time- and space- independent constant value.
@@ -22,18 +22,9 @@ func NewConst(tag, unit string, m *nimble.Mesh, memType nimble.MemType, value []
 		data[i].Device().Memset(float32(value[i]))
 	}
 	c.output = nimble.AsChan(data, tag, unit, m)
+	nimble.Stack(c) // <- !
 	return c
 }
-
-func RunConst(tag, unit string, m *nimble.Mesh, mem nimble.MemType, value []float64) nimble.ChanN {
-	box := NewConst(tag, unit, m, mem, value)
-	nimble.Stack(box)
-	return box.Output()
-}
-
-//func NewConstArray(tag, unit string, m*nimble.Mesh, array []Slice)*Const{
-//
-//}
 
 func (c *Const) Run() {
 	for {
@@ -45,3 +36,14 @@ func (c *Const) Run() {
 func (c *Const) Output() nimble.ChanN {
 	return c.output
 }
+
+//func RunConst(tag, unit string, m *nimble.Mesh, mem nimble.MemType, value []float64) nimble.ChanN {
+//	box := NewConst(tag, unit, m, mem, value)
+//	nimble.Stack(box)
+//	return box.Output()
+//}
+
+//func NewConstArray(tag, unit string, m*nimble.Mesh, array []Slice)*Const{
+//
+//}
+

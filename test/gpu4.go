@@ -81,7 +81,7 @@ func main() {
 		By = 4.3E-3
 		Bz = 0
 	)
-	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
+	Bext := gpu.NewConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx}).Output()
 	BeffBox.MAdd(Bext, 1)
 	tBox.Alpha = 0.02
 	solver.Advance(1e-9)

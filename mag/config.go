@@ -26,7 +26,7 @@ func SetVortex(m [3][][][]float32, circulation, polarization int) {
 }
 
 // Returns a function that returns the vector value for all i,j,k.
-func Uniform(x, y, z float32) func(i, j, k int) [3]float32{
+func Uniform(x, y, z float32) func(i, j, k int) [3]float32 {
 	v := [3]float32{x, y, z}
 	return func(i, j, k int) [3]float32 {
 		return v

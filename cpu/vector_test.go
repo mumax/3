@@ -1,8 +1,8 @@
 package cpu
 
 import (
-	"fmt"
-	"testing"
+//"fmt"
+//"testing"
 )
 
 //func ExampleVectorString() {

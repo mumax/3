@@ -28,7 +28,6 @@ func main() {
 
 	mbox := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, []float64{1, 0, 0})
 	m := mbox.Output()
-	nimble.Stack(mbox)
 
 	acc := 2
 	kernel := mag.BruteKernel(mesh, acc)

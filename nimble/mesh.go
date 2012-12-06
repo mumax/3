@@ -50,6 +50,10 @@ func (m *Mesh) NCell() int {
 	return m.gridSize[0] * m.gridSize[1] * m.gridSize[2]
 }
 
+func(m*Mesh)WorldSize()[3]float64{
+	return [3]float64{float64(m.gridSize[0]) * m.cellSize[0], float64(m.gridSize[1]) * m.cellSize[1], float64(m.gridSize[2]) * m.cellSize[2]}
+}
+
 // Size of blocks in which the data on this mesh is divided.
 // The data will have to buffer at least one block.
 func (m *Mesh) BlockSize() [3]int {

@@ -1,8 +1,6 @@
 package render
 
-import (
-	gl "github.com/chsc/gogl/gl21"
-)
+import gl "github.com/chsc/gogl/gl21"
 
 func DrawTestScene() {
 

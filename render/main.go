@@ -24,18 +24,18 @@ var (
 	flag_multisample = flag.Int("multisample", 4, "Multisample")
 )
 
-var Width, Height int
-
 func main() {
 	flag.Parse()
+
+	data := Load(flag.Arg(0))
 
 	InitWindow()
 	defer glfw.CloseWindow()
 	defer glfw.Terminate()
 
-	InitInputHandlers()
 	InitGL()
 	InitViewport()
+	InitInputHandlers()
 
 	start := time.Now()
 	frames := 0
@@ -44,7 +44,7 @@ func main() {
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
-		DrawTestScene()
+		Render(data)
 		glfw.SwapBuffers()
 		frames++
 	}
@@ -75,14 +75,6 @@ func InitWindow() {
 		vsync = 1
 	}
 	glfw.SetSwapInterval(vsync)
-}
-
-func InitViewport() {
-	gl.Viewport(0, 0, gl.Sizei(Width), gl.Sizei(Height))
-	gl.MatrixMode(gl.PROJECTION)
-	gl.LoadIdentity()
-	x := gl.Double(float64(Height) / float64(Width))
-	gl.Frustum(-1, 1, -x, x, 1, 50)
 }
 
 func InitGL() {

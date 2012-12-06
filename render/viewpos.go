@@ -14,7 +14,17 @@ var (
 	mouseButton            [5]int
 )
 
+var Width, Height int
+
 const PI = math.Pi
+
+func InitViewport() {
+	gl.Viewport(0, 0, gl.Sizei(Width), gl.Sizei(Height))
+	gl.MatrixMode(gl.PROJECTION)
+	gl.LoadIdentity()
+	x := gl.Double(float64(Height) / float64(Width))
+	gl.Frustum(-1, 1, -x, x, 1, 50)
+}
 
 // Set the GL modelview matrix to match view position and orientation.
 func UpdateViewpos() {
@@ -87,6 +97,11 @@ func InitInputHandlers() {
 	glfw.SetMouseWheelCallback(func(delta int) {
 		log.Println("mousewheel:", delta)
 		glfw.SetMouseWheel(0)
+	})
+
+	glfw.SetWindowSizeCallback(func(w, h int) {
+		Width, Height = w, h
+		InitViewport()
 	})
 }
 

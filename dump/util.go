@@ -80,11 +80,11 @@ func ReadFile(fname string) [][][][]float32 {
 }
 
 // add ".dump" if needed, prefix core.OD if needed
-func cleanFilename(fname string)string{
+func cleanFilename(fname string) string {
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
-	if !path.IsAbs(fname){
+	if !path.IsAbs(fname) {
 		fname = core.OD + "/" + fname
 	}
 	return path.Clean(fname)

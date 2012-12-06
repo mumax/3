@@ -10,18 +10,20 @@ import (
 // 	-> <-
 // calculate, very approximately, a B field needed to compensate
 // for the surface charges on the left and right edges.
-// Adding this field to B_effective will mimic an infinitely long wire.
-func CompensateSurfaceCharges(m *nimble.Mesh, Bsat float64) [3][][][]float32 {
+// Adding (this field * Bsat) to B_effective will mimic an infinitely long wire.
+func CompensateSurfaceCharges(m *nimble.Mesh) [3][][][]float32 {
 	H := core.MakeVectors(m.Size())
 	world := m.WorldSize()
 	cell := m.CellSize()
 	source1 := [3]float64{world[0] / 2, world[1] / 2, 0}
 	source2 := [3]float64{world[0] / 2, world[1] / 2, world[2]}
-	q := world[0] * world[1] * Bsat
+	q := world[0] * world[1] * -1
 	for i := range H[0] {
 		for j := range H[0][i] {
 			for k := range H[0][i][j] {
-				dst := [3]float64{float64(i) * cell[0], float64(j) * cell[1], float64(k) * cell[2]}
+				dst := [3]float64{(float64(i)+0.5) * cell[0], 
+				                  (float64(j)+0.5) * cell[1], 
+				                  (float64(k)+0.5) * cell[2]}
 				h1 := Hfield(q, source1, dst)
 				h2 := Hfield(q, source2, dst)
 				for c := 0; c < 3; c++ {

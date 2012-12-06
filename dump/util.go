@@ -53,9 +53,7 @@ func ReadAllFiles(files []string, crcEnabled bool) chan *Frame {
 // Quick-and-dirty dump to a file.
 // Useful for debugging.
 func Quick(fname string, data [][][][]float32) {
-	if path.Ext(fname) == "" {
-		fname += ".dump"
-	}
+	fname = cleanFilename(fname)
 	out, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	core.PanicErr(err)
 	defer out.Close()
@@ -72,13 +70,22 @@ func Quick(fname string, data [][][][]float32) {
 // Quick-and-dirty read from file.
 // Returns first frame if there are many.
 func ReadFile(fname string) [][][][]float32 {
-	if path.Ext(fname) == "" {
-		fname += ".dump"
-	}
+	fname = cleanFilename(fname)
 	out, err := os.OpenFile(fname, os.O_RDONLY, 0666)
 	core.PanicErr(err)
 	defer out.Close()
 	r := NewReader(out, CRC_ENABLED)
 	core.Fatal(r.Read())
 	return r.Tensors()
+}
+
+// add ".dump" if needed, prefix core.OD if needed
+func cleanFilename(fname string)string{
+	if path.Ext(fname) == "" {
+		fname += ".dump"
+	}
+	if !path.IsAbs(fname){
+		fname = core.OD + "/" + fname
+	}
+	return path.Clean(fname)
 }

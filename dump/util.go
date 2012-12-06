@@ -70,7 +70,7 @@ func Quick(fname string, data [][][][]float32) {
 // Quick-and-dirty read from file.
 // Returns first frame if there are many.
 func ReadFile(fname string) [][][][]float32 {
-	fname = cleanFilename(fname)
+	//fname = cleanFilename(fname)
 	out, err := os.OpenFile(fname, os.O_RDONLY, 0666)
 	core.PanicErr(err)
 	defer out.Close()

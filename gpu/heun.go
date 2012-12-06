@@ -98,6 +98,7 @@ func (e *Heun) Step() {
 
 	dy0 := e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
+	core.Assert(dt > 0)
 
 	// stage 1
 	nimble.Clock.Send(e.time, true)
@@ -155,6 +156,7 @@ func (e *Heun) Step() {
 
 // adapt time step: dt *= corr, but limited to sensible values.
 func (e *Heun) adaptDt(corr float64) {
+	core.Assert(corr != 0)
 	corr *= e.Headroom
 	if corr > 2 {
 		corr = 2

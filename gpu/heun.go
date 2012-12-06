@@ -88,7 +88,7 @@ func (e *Heun) Step() {
 
 	// Send out initial value
 	if !e.init {
-		// normalize initial magnetization	
+		// normalize initial magnetization
 		M := Device3(e.y.UnsafeData())
 		NormalizeSync(M, str[0])
 		e.y.WriteNext(n)

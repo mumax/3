@@ -16,12 +16,12 @@ type Symm2D struct {
 	input       [3]nimble.RChan1    // TODO: fuse with input
 	output      [3]nimble.Chan1     // TODO: fuse with output
 	outChan     nimble.ChanN        // same as output
-	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf. 
+	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
 	fwPlan      safe.FFT3DR2CPlan   // Forward FFT (1 component)
 	bwPlan      safe.FFT3DC2RPlan   // Backward FFT (1 component)
-	stream      cu.Stream           // 
+	stream      cu.Stream           //
 	kern        [3][3][]float32     // Real-space kernel
 	kernArr     [3][3][][][]float32 // Real-space kernel
 	inited      bool
@@ -98,7 +98,7 @@ func (c *Symm2D) initFFTKern3D() {
 	}
 }
 
-// Initialize GPU FFT kernel for 2D. 
+// Initialize GPU FFT kernel for 2D.
 // Only the non-redundant parts are stored on the GPU.
 func (c *Symm2D) initFFTKern2D() {
 	padded := c.kernSize
@@ -167,7 +167,7 @@ func (c *Symm2D) exec3D() {
 		c.stream)
 	c.stream.Synchronize()
 
-	// BW FFT 
+	// BW FFT
 	for i := 0; i < 3; i++ {
 		out := c.output[i].WriteNext(c.n).Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
@@ -182,7 +182,7 @@ func (c *Symm2D) exec2D() {
 	offset := [3]int{0, 0, 0}
 
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
-	// Convolution is separated into 
+	// Convolution is separated into
 	// a 1D convolution for x
 	// and a 2D convolution for yz.
 	// so only 2 FFT buffers are then needed at the same time.
@@ -195,7 +195,7 @@ func (c *Symm2D) exec2D() {
 	//c.stream.Synchronize()
 	c.input[0].ReadDone()
 
-	// kern mul X	
+	// kern mul X
 	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
 	//c.stream.Synchronize()
 

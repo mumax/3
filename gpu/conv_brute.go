@@ -4,7 +4,7 @@ import (
 	"code.google.com/p/nimble-cube/core"
 )
 
-// Brute-force O(N²) vector convolution on CPU. 
+// Brute-force O(N²) vector convolution on CPU.
 // Used to verify GPU FFT convolution.
 // Input better be sparse.
 // A nil kernel element is interpreted as all 0s.

@@ -13,14 +13,15 @@ import (
 )
 
 var (
-	flag_smooth    = flag.Bool("smooth", true, "Smooth shading")
-	flag_vsync     = flag.Bool("vsync", true, "Vertical sync")
-	flag_cullface  = flag.Bool("cullface", true, "Cull invisible polygon faces")
-	flag_lighting  = flag.Bool("lighting", true, "Enable lighting")
-	flag_depthtest = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias = flag.Bool("antialias", true, "Antialias lines")
-	flag_wireframe = flag.Bool("wireframe", false, "Render wireframes")
-	flag_fps       = flag.Bool("fps", true, "Measure frames per second")
+	flag_smooth      = flag.Bool("smooth", true, "Smooth shading")
+	flag_vsync       = flag.Bool("vsync", true, "Vertical sync")
+	flag_cullface    = flag.Bool("cullface", true, "Cull invisible polygon faces")
+	flag_lighting    = flag.Bool("lighting", true, "Enable lighting")
+	flag_depthtest   = flag.Bool("depthtest", true, "Enable depth test")
+	flag_antialias   = flag.Bool("antialias", true, "Antialias lines")
+	flag_wireframe   = flag.Bool("wireframe", false, "Render wireframes")
+	flag_fps         = flag.Bool("fps", true, "Measure frames per second")
+	flag_multisample = flag.Int("multisample", 4, "Multisample")
 )
 
 var Width, Height int
@@ -63,6 +64,9 @@ const (
 
 func InitWindow() {
 	core.Fatal(glfw.Init())
+	if *flag_multisample != 0 {
+		glfw.OpenWindowHint(glfw.FsaaSamples, *flag_multisample)
+	}
 	Width, Height = 800, 600
 	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
@@ -107,6 +111,10 @@ func InitGL() {
 		gl.Enable(gl.BLEND)
 		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		gl.Hint(gl.LINE_SMOOTH_HINT, gl.NICEST)
+	}
+
+	if *flag_multisample != 0 {
+		gl.Enable(gl.MULTISAMPLE)
 	}
 
 	if *flag_smooth {

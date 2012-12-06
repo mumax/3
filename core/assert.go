@@ -6,7 +6,7 @@ import (
 )
 
 // If test == false, panic with the file and
-// line number of this function's caller. 
+// line number of this function's caller.
 func Assert(test bool) {
 	if !test {
 		msg := "assertion failed"

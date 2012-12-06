@@ -1,6 +1,6 @@
 package main
 
-// OVF2 suport 
+// OVF2 suport
 // Author: Mykola Dvornik
 // Modified by Arne Vansteenkiste, 2011, 2012.
 

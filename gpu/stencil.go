@@ -36,7 +36,7 @@ func (s *Stencil) Output() nimble.Chan1 {
 func StencilAdd(dst, src safe.Float32s, mesh *nimble.Mesh, weight *[7]float32, stream cu.Stream) {
 	core.Assert(dst.Len() == src.Len() && src.Len() == mesh.NCell())
 
-	// TODO: 
+	// TODO:
 	// if *weight == [7]float32{}{return}
 
 	size := mesh.Size()

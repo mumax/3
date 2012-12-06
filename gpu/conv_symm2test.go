@@ -27,7 +27,7 @@ package gpu
 //	chOut := cnv.Output()//nimble.MakeChan3("B", "", mesh, nimble.UnifiedMemory, 0)
 //
 //	//	// TODO: const chan
-//	//	
+//	//
 //	//	for i:=0; i<3; i++{
 //	//		arr = hin.Comp(i).WriteNext(N).Host()
 //	//		initConvTestInput(nimble.Reshape(arr, hin.Size()))
@@ -51,7 +51,7 @@ package gpu
 //	//	}
 //	//	outarrh:=[3][]float32{outarr[0].Host(), outarr[1].Host(), outarr[2].Host()}
 //	//
-//	//	in := 
+//	//	in :=
 //	//	ref := nimble.MakeVectors(mesh.Size())
 //	//	Brute(in, ref, kern)
 //	//	checkErr(outarrh, nimble.Contiguous3(ref))
@@ -113,7 +113,7 @@ package gpu
 ////	// solution under test
 ////	c.Exec()
 ////	c.Exec()
-////	c.Exec() // it may fail the 2nd time, eg. 
+////	c.Exec() // it may fail the 2nd time, eg.
 ////
 ////	checkErr(ref, out)
 ////

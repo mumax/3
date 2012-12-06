@@ -28,7 +28,7 @@ func (c RChan1) UnsafeArray() [][][]float32 {
 	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
 }
 
-// ReadNext locks and returns a slice of length n for 
+// ReadNext locks and returns a slice of length n for
 // reading the next n elements from the Chan.
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.

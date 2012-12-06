@@ -48,7 +48,7 @@ package gpu
 //	// solution under test
 //	c.Exec()
 //	c.Exec()
-//	c.Exec() // it may fail the 2nd time, eg. 
+//	c.Exec() // it may fail the 2nd time, eg.
 //
 //	checkErr(ref, out)
 //

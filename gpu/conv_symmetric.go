@@ -86,7 +86,7 @@ package gpu
 //	// have the size depend on pull(N) (limited to maxxfer)
 //}
 //
-//// Kernel multiplication. 
+//// Kernel multiplication.
 //// FFT's have to be synced first.
 //func (c *Symmetric) kernMul() {
 //	if c.noKernMul {
@@ -180,7 +180,7 @@ package gpu
 //	}
 //}
 //
-//// Is new  input available? 
+//// Is new  input available?
 //// I.e.: input that is ready but has not yet been sent.
 //func (c *Symmetric) haveInput() bool {
 //	for _, sent := range c.inSent {

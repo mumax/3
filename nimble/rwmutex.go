@@ -1,6 +1,6 @@
 package nimble
 
-/* 
+/*
    To my future colleagues:
    This code is the very core, the heart and soul of all concurrent GPU-CPU logic.
    Please, take a deep breath before editing. Raptors will kill you if break it.
@@ -13,12 +13,12 @@ import (
 )
 
 // RWMutex protects an array for safe access by
-// one writer and many readers. 
+// one writer and many readers.
 // RWMutex makes sure the readers receive all data
 // exactly once and in the correct order.
 // The functionality is like a Go channel, but
 // without copying the data.
-// 
+//
 // When reading and writing channels, the convention is
 // to first obtain the read lock, then the write lock. E.g.:
 // 	input1.ReadNext(n)
@@ -28,7 +28,7 @@ import (
 // 	output.WriteDone()
 // 	input1.ReadDone()
 // 	input2.ReadDone()
-// 
+//
 // Note that it is safe for the writer to also read
 // the data (when he holds the write lock).
 //
@@ -51,7 +51,7 @@ func newRWMutex(N int, tag string) *rwMutex {
 	return m
 }
 
-// Move the locked window 
+// Move the locked window
 func (m *rwMutex) WriteDelta(Δstart, Δstop int) {
 	m.cond.L.Lock()
 

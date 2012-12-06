@@ -23,7 +23,7 @@ func blockSize(size [3]int) [3]int {
 
 	if nWarp <= N0 { // slice along I
 		return [3]int{N0 / nWarp, N1, N2}
-	} // else { // slice along I and J 
+	} // else { // slice along I and J
 	return [3]int{1, (N0 * N1) / nWarp, N2}
 }
 

@@ -2,7 +2,7 @@ package core
 
 // ScaleNearest copies in to out using nearest-neighbor interpolation.
 // len(in) should be == len(out) (the number of vector components).
-// The other dimensions are supposedly different and will be interpolated over. 
+// The other dimensions are supposedly different and will be interpolated over.
 func ScaleNearest(in, out [][][][]float32) {
 	Assert(len(in) == len(out))
 	size1 := SizeOf(in[0])

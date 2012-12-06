@@ -133,7 +133,7 @@ func preprocess(f *dump.Frame) {
 //	ZZ <-> XX
 //	YZ <-> XY
 //	XZ <-> XZ
-//	XY <-> YZ 
+//	XY <-> YZ
 func SwapIndex(index, dim int) int {
 	switch dim {
 	default:

@@ -65,7 +65,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 	pole := [3]float64{0, 0, 0} // position of point charge on the surface
 
 	for s := 0; s < 3; s++ { // source index Ksdxyz
-		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped. 
+		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 			xw := Wrap(x, size[X])
 			for y := y1; y <= y2; y++ {
 				yw := Wrap(y, size[Y])

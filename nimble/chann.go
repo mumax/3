@@ -56,7 +56,7 @@ func (c ChanN) Chan1() Chan1 {
 	return c.comp[0]
 }
 
-// WriteNext locks and returns a slice of length n for 
+// WriteNext locks and returns a slice of length n for
 // writing the next n elements to the Chan3.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.

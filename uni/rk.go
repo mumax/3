@@ -34,7 +34,7 @@ package uni
 //type RK struct {
 //	stages         int
 //	fsal           bool    // First Same as Last?
-//	fsal_initiated bool    // 
+//	fsal_initiated bool    //
 //	errororder     float64 // the order of the less acurate solution used for the error estimate
 //	a              [][]float32
 //	b              []float32
@@ -230,7 +230,7 @@ package uni
 //	return rk
 //}
 //
-//// On a bad time step (error too big), 
+//// On a bad time step (error too big),
 //// do not re-try the step more than this number of times.
 //const MAX_STEP_TRIALS = 10
 //
@@ -255,7 +255,7 @@ package uni
 //
 //	// Try to take a step with the current dt.
 //	// If the step fails (error too big),
-//	// then cut dt and try again (at most MAX_STEP_TRIALS times) 
+//	// then cut dt and try again (at most MAX_STEP_TRIALS times)
 //	for !goodstep && trials < MAX_STEP_TRIALS {
 //		trials++
 //		for i := 0; i < order; i++ {
@@ -296,7 +296,7 @@ package uni
 //			// After having calculated the first torque (k[0]),
 //			// dt has not actually been used yet. This is the
 //			// last chance to estimate whether the time step is too large
-//			// and possibly reduce it. 
+//			// and possibly reduce it.
 //			// This cannot be done with finite temperature!
 //			if rk.input.temp == 0 && i == 0 {
 //				if rk.b2 == nil { // means no step control based on error estimate

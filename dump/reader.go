@@ -119,7 +119,7 @@ func (r *Reader) readUint64() uint64 {
 	return *((*uint64)(unsafe.Pointer(&buf[0])))
 }
 
-// read the data array, 
+// read the data array,
 // enlarging the previous one if needed.
 func (r *Reader) readData() {
 	N := 1

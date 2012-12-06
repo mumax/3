@@ -171,8 +171,7 @@ func (c *Symm2D) exec3D() {
 	for i := 0; i < 3; i++ {
 		out := c.output[i].WriteNext(c.n).Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		c.stream.Synchronize()                                       // TODO: remove, is for debug copy pad only.
-		copyPad(out, c.fftRBuf[i], c.size, padded, offset, c.stream) // <- ! 
+		copyPad(out, c.fftRBuf[i], c.size, padded, offset, c.stream)
 		c.stream.Synchronize()
 		c.output[i].WriteDone()
 	}

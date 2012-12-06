@@ -21,7 +21,7 @@ var (
 	flag_antialias   = flag.Bool("antialias", true, "Antialias lines")
 	flag_wireframe   = flag.Bool("wireframe", false, "Render wireframes")
 	flag_fps         = flag.Bool("fps", true, "Measure frames per second")
-	flag_multisample = flag.Int("multisample", 4, "Multisample")
+	flag_multisample = flag.Int("multisample", 0, "Multisample")
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = -10
+	Viewpos.Z = -4
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()

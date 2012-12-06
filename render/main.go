@@ -18,7 +18,7 @@ var (
 	flag_cullface  = flag.Bool("cullface", true, "Cull invisible polygon faces")
 	flag_lighting  = flag.Bool("lighting", true, "Enable lighting")
 	flag_depthtest = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias = flag.Bool("antialias", false, "Antialias lines")
+	flag_antialias = flag.Bool("antialias", true, "Antialias lines")
 	flag_wireframe = flag.Bool("wireframe", false, "Render wireframes")
 	flag_fps       = flag.Bool("fps", true, "Measure frames per second")
 )
@@ -54,10 +54,17 @@ func main() {
 	}
 }
 
+// number of bits in buffer
+const (
+	r, g, b, a = 0, 0, 0, 0 // 0 means auto
+	depth      = 32         // 0 means none
+	stencil    = 0          // 0 means none
+)
+
 func InitWindow() {
 	core.Fatal(glfw.Init())
 	Width, Height = 800, 600
-	core.Fatal(glfw.OpenWindow(Width, Height, 0, 0, 0, 0, 0, 0, glfw.Windowed))
+	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
 	vsync := 0
 	if *flag_vsync {

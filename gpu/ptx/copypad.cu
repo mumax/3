@@ -19,8 +19,9 @@ copypad(float* __restrict__  dst, int D0, int D1, int D2,
 
 	int J = j + o1;  // index in full src
 	int K = k + o2; 
-	
-	for (int i=0; i<S0; i++){
+	// loop over N layers
+	int N = min(S0, D0);
+	for (int i=0; i<N; i++){
  		int I = i + o0; // index in full src
 		dst[I*D1*D2 + J*D2 + K] = src[i*S1*S2 + j*S2 + k];
 	}

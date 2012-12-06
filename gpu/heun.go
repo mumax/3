@@ -119,6 +119,11 @@ func (e *Heun) Step() {
 	y = Device3(e.y.WriteNext(n))
 	{
 		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
+		if err == 0 {
+			nimble.DashExit()
+			core.Fatalf("heun: cannot adapt dt")
+			// Note: err == 0 occurs when input is NaN (or time step massively too small).
+		}
 
 		if core.DEBUG {
 			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)

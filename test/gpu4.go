@@ -45,8 +45,7 @@ func main() {
 	BeffBox := gpu.NewSum("Beff", B, Bex, Bsat, 1, mem)
 	Beff := BeffBox.Output()
 
-	tBox := gpu.NewLLGTorque("torque", m, Beff, α)
-	nimble.Stack(tBox)
+	tBox:= gpu.NewLLGTorque("torque", m, Beff, α)
 	torque := tBox.Output()
 
 	solver := gpu.NewHeun(m, torque, 10e-15, mag.Gamma0)

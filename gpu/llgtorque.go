@@ -9,7 +9,7 @@ import (
 )
 
 // LLGTorque calculates the REDUCED torque:
-// 	m x B -  α m x (m x B)
+// 	- m x B +  α m x (m x B)
 type LLGTorque struct {
 	torque nimble.ChanN
 	m, b   nimble.RChanN
@@ -23,6 +23,7 @@ func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 	core.Assert(B.Size() == m.Size())
 	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
 	tq := &LLGTorque{torque, m, B, alpha, [3]float32{0, 0, 0}, cu.StreamCreate()}
+	nimble.Stack(tq)
 	return tq
 }
 

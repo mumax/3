@@ -46,4 +46,3 @@ func (c *Const) Output() nimble.ChanN {
 //func NewConstArray(tag, unit string, m*nimble.Mesh, array []Slice)*Const{
 //
 //}
-

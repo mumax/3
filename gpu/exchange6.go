@@ -18,5 +18,6 @@ func NewExchange6(tag string, m nimble.ChanN, aex_reduced float64) *Stencil3D {
 	s.Weight[0][0] = nabla
 	s.Weight[1][1] = nabla
 	s.Weight[2][2] = nabla
+	nimble.Stack(s)
 	return s
 }

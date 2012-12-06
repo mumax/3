@@ -7,7 +7,7 @@ import (
 
 // Const represents a value that is constant in time.
 type Const struct {
-	output nimble.ChanN // could embed?
+	output nimble.ChanN
 }
 
 // NewConst returns a time- and space- independent constant value.

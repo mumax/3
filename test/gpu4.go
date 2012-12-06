@@ -40,10 +40,7 @@ func main() {
 	acc := 8
 	kernel := mag.BruteKernel(mesh, acc)
 	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
-
-	exch := gpu.NewExchange6("Bex", m, Aex_red)
-	nimble.Stack(exch)
-	Bex := exch.Output()
+	Bex := gpu.NewExchange6("Bex", m, Aex_red).Output()
 
 	BeffBox := gpu.NewSum("Beff", B, Bex, Bsat, 1, mem)
 	Beff := BeffBox.Output()

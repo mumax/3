@@ -13,17 +13,21 @@ import (
 // TODO: now only for magnetization (because it normalizes)
 // post-step hook?
 type Heun struct {
-	dy0              [3]safe.Float32s // buffer dy/dt
-	y                nimble.ChanN
-	dy               nimble.RChanN
+	dy0 [3]safe.Float32s // buffer dy/dt
+	y   nimble.ChanN
+	dy  nimble.RChanN
+	timestep
+	init   bool
+	debug  dump.TableWriter // save t, dt, error here
+	stream [3]cu.Stream
+}
+
+type timestep struct {
 	dt_si, dt_mul    float64 // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	time             float64 // in seconds
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
-	init             bool
-	steps, undone    int              // number of good steps, undone steps
-	debug            dump.TableWriter // save t, dt, error here
-	stream           [3]cu.Stream
+	steps, undone    int     // number of good steps, undone steps
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
@@ -36,8 +40,8 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
 	return &Heun{dy0: dy0, y: y, dy: dy,
-		dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
-		debug: w, stream: stream3Create()}
+		timestep: timestep{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75},
+		debug:    w, stream: stream3Create()}
 }
 
 func stream3Create() [3]cu.Stream {
@@ -148,14 +152,14 @@ func (e *Heun) Step() {
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
-		nimble.Dash(e.steps, e.undone, e.time, e.dt_si, err)
+		e.updateDash(err)
 	}
 	e.dy.ReadDone()
 	// no writeDone() here.
 }
 
 // adapt time step: dt *= corr, but limited to sensible values.
-func (e *Heun) adaptDt(corr float64) {
+func (e *timestep) adaptDt(corr float64) {
 	core.Assert(corr != 0)
 	corr *= e.Headroom
 	if corr > 2 {
@@ -171,4 +175,8 @@ func (e *Heun) adaptDt(corr float64) {
 	if e.Maxdt != 0 && e.dt_si > e.Maxdt {
 		e.dt_si = e.Maxdt
 	}
+}
+
+func (e *timestep) updateDash(err float64) {
+	nimble.Dash(e.steps, e.undone, e.time, e.dt_si, err)
 }

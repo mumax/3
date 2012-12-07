@@ -18,7 +18,7 @@ var (
 	flag_cullface    = flag.Bool("cullface", true, "Cull invisible polygon faces")
 	flag_lighting    = flag.Bool("lighting", true, "Enable lighting")
 	flag_depthtest   = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias   = flag.Bool("antialias", true, "Antialias lines")
+	flag_antialias   = flag.Bool("antialias", false, "Antialias lines")
 	flag_wireframe   = flag.Bool("wireframe", false, "Render wireframes")
 	flag_fps         = flag.Bool("fps", true, "Measure frames per second")
 	flag_multisample = flag.Int("multisample", 0, "Multisample")
@@ -27,7 +27,7 @@ var (
 func main() {
 	flag.Parse()
 
-	data := Load(flag.Arg(0))
+	//data := Load(flag.Arg(0))
 
 	InitWindow()
 	defer glfw.CloseWindow()
@@ -44,7 +44,8 @@ func main() {
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
-		Render(data)
+		DrawTestScene()
+		//Render(data)
 		glfw.SwapBuffers()
 		frames++
 	}
@@ -58,7 +59,7 @@ func main() {
 // number of bits in buffer
 const (
 	r, g, b, a = 0, 0, 0, 0 // 0 means auto
-	depth      = 32         // 0 means none
+	depth      = 16         // 0 means none
 	stencil    = 0          // 0 means none
 )
 

@@ -12,16 +12,16 @@ import (
 // Adaptive heun solver.
 // TODO: now only for magnetization (because it normalizes)
 // post-step hook?
-type Heun struct {
+type RK23 struct {
+	dy0 [3]safe.Float32s // buffer dy/dt
+	y   nimble.ChanN
+	dy  nimble.RChanN
 	solverCommon
-	dy0   [3]safe.Float32s // buffer dy/dt
-	y     nimble.ChanN
-	dy    nimble.RChanN
-	init  bool
-	debug dump.TableWriter // save t, dt, error here
+	init   bool
+	stream [3]cu.Stream
 }
 
-func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
+func NewRK23(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *RK23 {
 	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
@@ -30,23 +30,13 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.table"),
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
-	return &Heun{dy0: dy0, y: y, dy: dy,
-		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
-			debug: w, stream: stream3Create()}}
-}
-
-func stream3Create() [3]cu.Stream {
-	return [3]cu.Stream{cu.StreamCreate(), cu.StreamCreate(), cu.StreamCreate()}
-}
-
-func syncAll(streams []cu.Stream) {
-	for _, s := range streams {
-		s.Synchronize()
-	}
+	return &RK23{dy0: dy0, y: y, dy: dy,
+		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75, debug: w},
+		stream:       stream3Create()}
 }
 
 // Run for a duration in seconds
-func (e *Heun) Advance(seconds float64) {
+func (e *RK23) Advance(seconds float64) {
 	nimble.RunStack()
 	core.Log("GPU heun solver:", seconds, "s")
 	LockCudaThread()
@@ -62,7 +52,7 @@ func (e *Heun) Advance(seconds float64) {
 }
 
 // Run for a number of steps
-func (e *Heun) Steps(steps int) {
+func (e *RK23) Steps(steps int) {
 	nimble.RunStack()
 	core.Log("GPU heun solver:", steps, "steps")
 	LockCudaThread()
@@ -77,7 +67,7 @@ func (e *Heun) Steps(steps int) {
 }
 
 // Take one time step
-func (e *Heun) Step() {
+func (e *RK23) Step() {
 	n := e.y.Mesh().NCell()
 	str := e.stream
 
@@ -99,9 +89,14 @@ func (e *Heun) Step() {
 	nimble.Clock.Send(e.time, true)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
-	maddvec(y, dy, dt, str)
+	{
+		for i := 0; i < 3; i++ {
+			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
+			dy0[i].CopyDtoDAsync(dy[i], str[i])
+		}
+		syncAll(str[:])
+	}
 	e.y.WriteDone()
-	cpyvec(dy0, dy, str)
 	e.dy.ReadDone()
 
 	// stage 2
@@ -110,10 +105,10 @@ func (e *Heun) Step() {
 	y = Device3(e.y.WriteNext(n))
 	{
 		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
-		// Note: err == 0 occurs when input is NaN (or time step massively too small).
 		if err == 0 {
 			nimble.DashExit()
 			core.Fatalf("heun: cannot adapt dt")
+			// Note: err == 0 occurs when input is NaN (or time step massively too small).
 		}
 
 		if core.DEBUG {

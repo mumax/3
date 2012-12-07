@@ -110,31 +110,17 @@ func (e *Heun) Step() {
 	y = Device3(e.y.WriteNext(n))
 	{
 		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
-		// Note: err == 0 occurs when input is NaN (or time step massively too small).
-		if err == 0 {
-			nimble.DashExit()
-			core.Fatalf("heun: cannot adapt dt")
-		}
-
-		if core.DEBUG {
-			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
-			e.debug.WriteData()
-		}
+		e.sendDebugOutput(err)
+		e.checkErr(err)
 
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			Madd3Async(y[0], y[0], dy[0], dy0[0], 1, 0.5*dt, -0.5*dt, str[0])
-			Madd3Async(y[1], y[1], dy[1], dy0[1], 1, 0.5*dt, -0.5*dt, str[1])
-			Madd3Async(y[2], y[2], dy[2], dy0[2], 1, 0.5*dt, -0.5*dt, str[2])
-			syncAll(str[:])
+			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
 			NormalizeSync(y, str[0])
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
-		} else {
-			// undo.
-			Madd2Async(y[0], y[0], dy0[0], 1, -dt, str[0])
-			Madd2Async(y[1], y[1], dy0[1], 1, -dt, str[1])
-			Madd2Async(y[2], y[2], dy0[2], 1, -dt, str[2])
+		} else { // undo.
+			maddvec(y, dy0, -dt, str)
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}

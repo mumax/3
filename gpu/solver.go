@@ -29,6 +29,14 @@ func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream) {
 	syncAll(str[:])
 }
 
+// dst += a * s1 + b * s2
+func madd2vec(dst, a, b [3]safe.Float32s, s1, s2 float32, str [3]cu.Stream) {
+	Madd3Async(dst[0], dst[0], a[0],  b[0], 1, s1, s2, str[0])
+	Madd3Async(dst[1], dst[1], a[1],  b[1], 1, s1, s2, str[1])
+	Madd3Async(dst[2], dst[2], a[2],  b[2], 1, s1, s2, str[2])
+	syncAll(str[:])
+}
+
 // dst = src
 func cpyvec(dst, src [3]safe.Float32s, str [3]cu.Stream) {
 	for i := 0; i < 3; i++ {
@@ -56,6 +64,23 @@ func (e *solverCommon) adaptDt(corr float64) {
 	}
 }
 
+// report time, dt, error to terminal dashboard
 func (e *solverCommon) updateDash(err float64) {
 	nimble.Dash(e.steps, e.undone, e.time, e.dt_si, err)
+}
+
+func (e *solverCommon) sendDebugOutput(err float64) {
+	if core.DEBUG {
+		e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
+		e.debug.WriteData()
+	}
+}
+
+
+func (e *solverCommon) checkErr(err float64) {
+		// Note: err == 0 occurs when input is NaN (or time step massively too small).
+		if err == 0 {
+			nimble.DashExit()
+			core.Fatalf("solver: cannot adapt dt")
+		}
 }

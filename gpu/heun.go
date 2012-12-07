@@ -2,7 +2,6 @@ package gpu
 
 import (
 	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/dump"
 	"code.google.com/p/nimble-cube/nimble"
 	"github.com/barnex/cuda5/safe"
 	"math"
@@ -13,24 +12,17 @@ import (
 // post-step hook?
 type Heun struct {
 	solverCommon
-	dy0   [3]safe.Float32s // buffer dy/dt
-	y     nimble.ChanN
-	dy    nimble.RChanN
-	init  bool
+	dy0  [3]safe.Float32s // buffer dy/dt
+	y    nimble.ChanN
+	dy   nimble.RChanN
+	init bool
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
 	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
-	var w dump.TableWriter
-	if core.DEBUG {
-		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.table"),
-			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
-	}
-	return &Heun{dy0: dy0, y: y, dy: dy,
-		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
-			debug: w, stream: stream3Create()}}
+	return &Heun{dy0: dy0, y: y, dy: dy, solverCommon: newSolverCommon(dt, multiplier)}
 }
 
 // Run for a duration in seconds

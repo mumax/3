@@ -101,8 +101,8 @@ func (e *Heun) Step() {
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
 	maddvec(y, dy, dt, str)
-	cpyvec(dy0, dy, str)
 	e.y.WriteDone()
+	cpyvec(dy0, dy, str)
 	e.dy.ReadDone()
 
 	// stage 2
@@ -145,16 +145,16 @@ func (e *Heun) Step() {
 	// no writeDone() here.
 }
 
-func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream){
-		for i := 0; i < 3; i++ {
-			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
-		}
-		syncAll(str[:])
+func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream) {
+	for i := 0; i < 3; i++ {
+		Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
+	}
+	syncAll(str[:])
 }
 
-func cpyvec(dst, src [3]safe.Float32s, str [3]cu.Stream){
-		for i := 0; i < 3; i++ {
-			dst[i].CopyDtoDAsync(src[i], str[i])
-		}
-		syncAll(str[:])
+func cpyvec(dst, src [3]safe.Float32s, str [3]cu.Stream) {
+	for i := 0; i < 3; i++ {
+		dst[i].CopyDtoDAsync(src[i], str[i])
+	}
+	syncAll(str[:])
 }

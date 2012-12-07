@@ -21,6 +21,7 @@ func Autosave(data_ nimble.Chan, every int, dev Device) {
 	data := data_.ChanN().NewReader()
 	r.out.Components = data.NComp()
 	r.out.MeshSize = data.Mesh().Size()
+	r.out.MeshStep = data.Mesh().CellSize()
 	r.data = data
 	r.every = every
 	r.Dev = dev

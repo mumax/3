@@ -99,9 +99,6 @@ func (e *RK23) Step() {
 	//	//e.y.WriteDone() // todo uncomment
 	//	e.dy.ReadDone()
 
-
-
-
 	//	//e.dy.ReadDone()
 	//	// no writeDone() here.
 }

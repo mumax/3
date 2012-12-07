@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/nimble-cube/dump"
 	gl "github.com/chsc/gogl/gl21"
 	"os"
+	"log"
 )
 
 func Load(fname string) *dump.Frame {
@@ -23,25 +24,34 @@ func Render(frame *dump.Frame) {
 	ambdiff := []gl.Float{0.5, 0.5, 0.5, 1}
 	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
 
-	N0, N1, N2 := frame.MeshSize[0], frame.MeshSize[1], frame.MeshSize[2]
+	size := frame.MeshSize
+	log.Println("size:", size)
 	cell := frame.MeshStep
-	scale := 1e299
-	for i := 0; i < 3; i++ {
-		s := 1 / (float64(frame.MeshSize[i]) * cell[i])
-		if s < scale {
-			scale = s
-		}
+	log.Println("cell:", cell)
+	maxworld := 0.
+	var world [3]float64
+	for i:=range world{
+		world[i] = float64(size[i]) * cell[i]
+		if world[i] > maxworld{maxworld = world[i]}
 	}
-	rx := float32(scale * cell[0])
-	ry := float32(scale * cell[1])
-	rz := float32(scale * cell[2])
+	log.Println("world:", world)
+	log.Println("maxworld:", maxworld)
+	var scale [3]float64
+	for i:=range scale{
+		scale[i] = cell[i] / maxworld
+	}
+	log.Println("scale:", scale)
+
+	N0, N1, N2 := float32(size[0]),  float32(size[1]),  float32(size[2]) 
+	rx, ry, rz := 1./N0, 1./N1, 1./N2
+
 	m := frame.Vectors()
 	for i := range m[0] {
-		x := float32(scale * (float64(i-N0/2) + 0.5) * cell[0])
+		x := float32(scale[0] * (float64(i-size[0]/2) + 0.5))
 		for j := range m[0][i] {
-			y := float32(scale * (float64(j-N1/2) + 0.5) * cell[1])
+			y := float32(scale[1] * (float64(j-size[1]/2) + 0.5))
 			for k := range m[0][i][j] {
-				z := float32(scale * (float64(k-N2/2) + 0.5) * cell[2])
+				z := float32(scale[2] * (float64(k-size[2]/2) + 0.5))
 				(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}}).Render()
 				//log.Println(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}})
 			}

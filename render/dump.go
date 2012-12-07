@@ -25,7 +25,7 @@ func Render(frame *dump.Frame) {
 	cell := frame.MeshStep
 	maxworld := 0.
 	for i := range size {
-		world:= float64(size[i]) * cell[i]
+		world := float64(size[i]) * cell[i]
 		if world > maxworld {
 			maxworld = world
 		}
@@ -44,8 +44,7 @@ func Render(frame *dump.Frame) {
 				rnd := gl.Float(rand.Float32()*0.5 + 0.5)
 				ambdiff := []gl.Float{rnd, rnd, rnd, 1}
 				gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
-				(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}}).Render()
-				//log.Println(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}})
+				(&Cube{Vertex{z, y, x}, Vertex{rz, ry, rx}}).Render()
 			}
 		}
 	}

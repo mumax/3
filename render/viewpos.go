@@ -31,8 +31,8 @@ func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
 	gl.Translatef(gl.Float(Viewpos.X), gl.Float(Viewpos.Y), gl.Float(Viewpos.Z))
-	gl.Rotatef(gl.Float(ViewTheta*(180/PI))-90, 1, 0, 0)
-	gl.Rotatef(gl.Float(ViewPhi*(180/PI))+90, 0, 0, 1)
+	gl.Rotatef(gl.Float(ViewTheta*(180/PI)), 1, 0, 0)
+	gl.Rotatef(gl.Float(ViewPhi*(180/PI)), 0, 0, 1)
 }
 
 const (
@@ -71,7 +71,7 @@ func InitInputHandlers() {
 			return
 		}
 
-		ViewPhi += deltaLook * float64(dx) // TODO: * arccos
+		ViewPhi += deltaLook * float64(dx) 
 		ViewTheta += deltaLook * float64(dy)
 
 		// limit viewing angles
@@ -81,12 +81,13 @@ func InitInputHandlers() {
 		if ViewPhi > PI {
 			ViewPhi -= 2 * PI
 		}
-		if ViewTheta > PI/2 {
-			ViewTheta = PI / 2
+		if ViewTheta > PI {
+			ViewTheta = -PI 
 		}
-		if ViewTheta < -PI/2 {
-			ViewTheta = -PI / 2
+		if ViewTheta < -PI {
+			ViewTheta = PI
 		}
+		log.Println("phi, theta:", ViewPhi, ViewTheta)
 	})
 
 	glfw.SetMouseButtonCallback(func(button, state int) {

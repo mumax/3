@@ -35,8 +35,9 @@ func Render(frame *dump.Frame) {
 
 	rand.Seed(0)
 	m := frame.Vectors()
-	i:=0;{
-	//for i := range m[0] {
+	i := 0
+	{
+		//for i := range m[0] {
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
 		for j := range m[0][i] {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
@@ -59,8 +60,8 @@ func ClearScene() {
 	gl.Lightfv(gl.LIGHT0, gl.DIFFUSE, &diffuse[0])
 	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightpos[0])
 	gl.Enable(gl.LIGHT0)
-ambdiff := []gl.Float{0.5, 0.5, 0.5, 1}
-gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
+	ambdiff := []gl.Float{0.5, 0.5, 0.5, 1}
+	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
 
 	gl.ClearColor(1, 1, 1, 1)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)

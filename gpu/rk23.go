@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
 	"code.google.com/p/nimble-cube/nimble"
-	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
 )
@@ -13,12 +12,12 @@ import (
 // TODO: now only for magnetization (because it normalizes)
 // post-step hook?
 type RK23 struct {
-	dy0 [3]safe.Float32s // buffer dy/dt
-	y   nimble.ChanN
-	dy  nimble.RChanN
 	solverCommon
-	init   bool
-	stream [3]cu.Stream
+	y0   [3]safe.Float32s // backup
+	k [4][3]safe.Float32s // derivatives
+	y     nimble.ChanN
+	dy    nimble.RChanN
+	init  bool
 }
 
 func NewRK23(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *RK23 {
@@ -31,8 +30,8 @@ func NewRK23(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *RK23 {
 			[]string{"t", "dt", "err"}, []string{"s", "s", y.Unit()})
 	}
 	return &RK23{dy0: dy0, y: y, dy: dy,
-		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75, debug: w},
-		stream:       stream3Create()}
+		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
+			debug: w, stream: stream3Create()}}
 }
 
 // Run for a duration in seconds
@@ -89,14 +88,9 @@ func (e *RK23) Step() {
 	nimble.Clock.Send(e.time, true)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
-	{
-		for i := 0; i < 3; i++ {
-			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
-			dy0[i].CopyDtoDAsync(dy[i], str[i])
-		}
-		syncAll(str[:])
-	}
+	maddvec(y, dy, dt, str)
 	e.y.WriteDone()
+	cpyvec(dy0, dy, str)
 	e.dy.ReadDone()
 
 	// stage 2
@@ -105,31 +99,17 @@ func (e *RK23) Step() {
 	y = Device3(e.y.WriteNext(n))
 	{
 		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
-		if err == 0 {
-			nimble.DashExit()
-			core.Fatalf("heun: cannot adapt dt")
-			// Note: err == 0 occurs when input is NaN (or time step massively too small).
-		}
-
-		if core.DEBUG {
-			e.debug.Data[0], e.debug.Data[1], e.debug.Data[2] = float32(e.time), float32(e.dt_si), float32(err)
-			e.debug.WriteData()
-		}
+		e.sendDebugOutput(err)
+		e.checkErr(err)
 
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			Madd3Async(y[0], y[0], dy[0], dy0[0], 1, 0.5*dt, -0.5*dt, str[0])
-			Madd3Async(y[1], y[1], dy[1], dy0[1], 1, 0.5*dt, -0.5*dt, str[1])
-			Madd3Async(y[2], y[2], dy[2], dy0[2], 1, 0.5*dt, -0.5*dt, str[2])
-			syncAll(str[:])
+			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
 			NormalizeSync(y, str[0])
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
-		} else {
-			// undo.
-			Madd2Async(y[0], y[0], dy0[0], 1, -dt, str[0])
-			Madd2Async(y[1], y[1], dy0[1], 1, -dt, str[1])
-			Madd2Async(y[2], y[2], dy0[2], 1, -dt, str[2])
+		} else { // undo.
+			maddvec(y, dy0, -dt, str)
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}

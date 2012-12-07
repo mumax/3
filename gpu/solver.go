@@ -31,9 +31,9 @@ func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream) {
 
 // dst += a * s1 + b * s2
 func madd2vec(dst, a, b [3]safe.Float32s, s1, s2 float32, str [3]cu.Stream) {
-	Madd3Async(dst[0], dst[0], a[0],  b[0], 1, s1, s2, str[0])
-	Madd3Async(dst[1], dst[1], a[1],  b[1], 1, s1, s2, str[1])
-	Madd3Async(dst[2], dst[2], a[2],  b[2], 1, s1, s2, str[2])
+	Madd3Async(dst[0], dst[0], a[0], b[0], 1, s1, s2, str[0])
+	Madd3Async(dst[1], dst[1], a[1], b[1], 1, s1, s2, str[1])
+	Madd3Async(dst[2], dst[2], a[2], b[2], 1, s1, s2, str[2])
 	syncAll(str[:])
 }
 
@@ -76,11 +76,21 @@ func (e *solverCommon) sendDebugOutput(err float64) {
 	}
 }
 
-
 func (e *solverCommon) checkErr(err float64) {
-		// Note: err == 0 occurs when input is NaN (or time step massively too small).
-		if err == 0 {
-			nimble.DashExit()
-			core.Fatalf("solver: cannot adapt dt")
-		}
+	// Note: err == 0 occurs when input is NaN (or time step massively too small).
+	if err == 0 {
+		nimble.DashExit()
+		core.Fatalf("solver: cannot adapt dt")
+	}
 }
+
+func stream3Create() [3]cu.Stream {
+	return [3]cu.Stream{cu.StreamCreate(), cu.StreamCreate(), cu.StreamCreate()}
+}
+
+func syncAll(streams []cu.Stream) {
+	for _, s := range streams {
+		s.Synchronize()
+	}
+}
+

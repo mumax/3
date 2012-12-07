@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
 	"code.google.com/p/nimble-cube/nimble"
-	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
 )
@@ -18,7 +17,6 @@ type Heun struct {
 	y     nimble.ChanN
 	dy    nimble.RChanN
 	init  bool
-	debug dump.TableWriter // save t, dt, error here
 }
 
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
@@ -33,16 +31,6 @@ func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	return &Heun{dy0: dy0, y: y, dy: dy,
 		solverCommon: solverCommon{dt_si: dt, dt_mul: multiplier, Maxerr: 1e-4, Headroom: 0.75,
 			debug: w, stream: stream3Create()}}
-}
-
-func stream3Create() [3]cu.Stream {
-	return [3]cu.Stream{cu.StreamCreate(), cu.StreamCreate(), cu.StreamCreate()}
-}
-
-func syncAll(streams []cu.Stream) {
-	for _, s := range streams {
-		s.Synchronize()
-	}
 }
 
 // Run for a duration in seconds

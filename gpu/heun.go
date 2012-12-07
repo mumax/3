@@ -22,14 +22,6 @@ type Heun struct {
 	stream [3]cu.Stream
 }
 
-type timestep struct {
-	dt_si, dt_mul    float64 // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	time             float64 // in seconds
-	Mindt, Maxdt     float64 // minimum and maximum time step
-	Maxerr, Headroom float64 // maximum error per step
-	steps, undone    int     // number of good steps, undone steps
-}
-
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
@@ -108,13 +100,8 @@ func (e *Heun) Step() {
 	nimble.Clock.Send(e.time, true)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
-	{
-		for i := 0; i < 3; i++ {
-			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
-			dy0[i].CopyDtoDAsync(dy[i], str[i])
-		}
-		syncAll(str[:])
-	}
+	maddvec(y, dy, dt, str)
+	cpyvec(dy0, dy, str)
 	e.y.WriteDone()
 	e.dy.ReadDone()
 
@@ -158,25 +145,16 @@ func (e *Heun) Step() {
 	// no writeDone() here.
 }
 
-// adapt time step: dt *= corr, but limited to sensible values.
-func (e *timestep) adaptDt(corr float64) {
-	core.Assert(corr != 0)
-	corr *= e.Headroom
-	if corr > 2 {
-		corr = 2
-	}
-	if corr < 1./2. {
-		corr = 1. / 2.
-	}
-	e.dt_si *= corr
-	if e.Mindt != 0 && e.dt_si < e.Mindt {
-		e.dt_si = e.Mindt
-	}
-	if e.Maxdt != 0 && e.dt_si > e.Maxdt {
-		e.dt_si = e.Maxdt
-	}
+func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream){
+		for i := 0; i < 3; i++ {
+			Madd2Async(y[i], y[i], dy[i], 1, dt, str[i])
+		}
+		syncAll(str[:])
 }
 
-func (e *timestep) updateDash(err float64) {
-	nimble.Dash(e.steps, e.undone, e.time, e.dt_si, err)
+func cpyvec(dst, src [3]safe.Float32s, str [3]cu.Stream){
+		for i := 0; i < 3; i++ {
+			dst[i].CopyDtoDAsync(src[i], str[i])
+		}
+		syncAll(str[:])
 }

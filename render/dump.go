@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
 	gl "github.com/chsc/gogl/gl21"
-	"log"
 	"math/rand"
 	"os"
 )
@@ -22,36 +21,29 @@ func Load(fname string) *dump.Frame {
 func Render(frame *dump.Frame) {
 	ClearScene()
 
-
 	size := frame.MeshSize
-	log.Println("size:", size)
 	cell := frame.MeshStep
-	log.Println("cell:", cell)
 	maxworld := 0.
-	var world [3]float64
-	for i := range world {
-		world[i] = float64(size[i]) * cell[i]
-		if world[i] > maxworld {
-			maxworld = world[i]
+	for i := range size {
+		world:= float64(size[i]) * cell[i]
+		if world > maxworld {
+			maxworld = world
 		}
 	}
-	log.Println("world:", world)
-	log.Println("maxworld:", maxworld)
-	scale := 10/maxworld
-	log.Println("scale:", scale)
-	rx, ry, rz := float32(0.5*scale*cell[0]),   float32(0.5*scale*cell[1]),   float32(0.5*scale*cell[2])
+	scale := 10 / maxworld
+	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
 	rand.Seed(0)
 	m := frame.Vectors()
 	for i := range m[0] {
-		x := float32(scale * cell [0] * (float64(i-size[0]/2) + 0.5))
+		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
 		for j := range m[0][i] {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
 			for k := range m[0][i][j] {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-	rnd := gl.Float(rand.Float32() * 0.5 + 0.5)
-	ambdiff := []gl.Float{rnd, rnd, rnd, 1}
-	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
+				rnd := gl.Float(rand.Float32()*0.5 + 0.5)
+				ambdiff := []gl.Float{rnd, rnd, rnd, 1}
+				gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
 				(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}}).Render()
 				//log.Println(&Cube{Vertex{x, y, z}, Vertex{rx, ry, rz}})
 			}

@@ -49,6 +49,7 @@ func main() {
 		Render(data)
 		glfw.SwapBuffers()
 		frames++
+		glfw.WaitEvents()
 	}
 
 	if *flag_fps {

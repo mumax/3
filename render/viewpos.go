@@ -71,7 +71,7 @@ func InitInputHandlers() {
 			return
 		}
 
-		ViewPhi += deltaLook * float64(dx) 
+		ViewPhi += deltaLook * float64(dx)
 		ViewTheta += deltaLook * float64(dy)
 
 		// limit viewing angles
@@ -82,7 +82,7 @@ func InitInputHandlers() {
 			ViewPhi -= 2 * PI
 		}
 		if ViewTheta > PI {
-			ViewTheta = -PI 
+			ViewTheta = -PI
 		}
 		if ViewTheta < -PI {
 			ViewTheta = PI

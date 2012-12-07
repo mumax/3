@@ -21,16 +21,16 @@ type solverCommon struct {
 	stream           [3]cu.Stream
 }
 
-func newSolverCommon(dt_si, dt_mul float64)solverCommon{
+func newSolverCommon(dt_si, dt_mul float64) solverCommon {
 	var w dump.TableWriter
 	if core.DEBUG {
 		w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.table"),
 			[]string{"t", "dt", "err"}, []string{"s", "s", ""})
 	}
 
-	return solverCommon{dt_si: dt_si, dt_mul: dt_mul, 
-						Maxerr:1e-4, Headroom: 0.75, 
-						debug:w, stream: stream3Create()}
+	return solverCommon{dt_si: dt_si, dt_mul: dt_mul,
+		Maxerr: 1e-4, Headroom: 0.75,
+		debug: w, stream: stream3Create()}
 }
 
 // y += dy * dt

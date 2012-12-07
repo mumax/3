@@ -16,7 +16,7 @@ var (
 	flag_smooth      = flag.Bool("smooth", true, "Smooth shading")
 	flag_vsync       = flag.Bool("vsync", true, "Vertical sync")
 	flag_cullface    = flag.Bool("cullface", true, "Cull invisible polygon faces")
-	flag_lighting    = flag.Bool("lighting", true, "Enable lighting")
+	flag_lighting    = flag.Bool("lighting", false, "Enable lighting")
 	flag_depthtest   = flag.Bool("depthtest", true, "Enable depth test")
 	flag_antialias   = flag.Bool("antialias", false, "Antialias lines")
 	flag_wireframe   = flag.Bool("wireframe", false, "Render wireframes")
@@ -41,7 +41,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = -4
+	Viewpos.Z = -3
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
@@ -60,7 +60,7 @@ func main() {
 
 // number of bits in buffer
 const (
-	r, g, b, a = 0, 0, 0, 0 // 0 means auto
+	r, g, b, a = 8, 8, 8, 8 // 0 means auto
 	depth      = 16         // 0 means none
 	stencil    = 0          // 0 means none
 )

@@ -41,7 +41,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos.Z = -3
+	Viewpos[2] = -3
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
@@ -49,7 +49,7 @@ func main() {
 		Render(data)
 		glfw.SwapBuffers()
 		frames++
-		glfw.WaitEvents()
+		//glfw.WaitEvents()
 	}
 
 	if *flag_fps {

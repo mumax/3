@@ -17,11 +17,11 @@ func DrawTestScene() {
 
 	gl.ClearColor(1, 1, 1, 1)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-	size := Vertex{0.25, 0.25, 0.25}
+	panic("aargh")
+	//size := Vertex{0.25, 0.25, 0.25}
 	for x := float32(0); x < 20; x++ {
 		for y := float32(0); y < 10; y++ {
-			(&Cube{Vertex{x, y, 0}, size}).Render()
+			//(&Cube{Vertex{x, y, 0}, size}).Render()
 		}
 	}
 

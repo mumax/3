@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Viewpos                Vertex
+	Viewpos                [3]float32
 	ViewPhi, ViewTheta     float64
 	mousePrevX, mousePrevY int
 	mouseButton            [5]int
@@ -30,7 +30,7 @@ func InitViewport() {
 func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
-	gl.Translatef(gl.Float(Viewpos.X), gl.Float(Viewpos.Y), gl.Float(Viewpos.Z))
+	gl.Translatef(gl.Float(Viewpos[0]), gl.Float(Viewpos[1]), gl.Float(Viewpos[2]))
 	gl.Rotatef(gl.Float(ViewTheta*(180/PI)), 1, 0, 0)
 	gl.Rotatef(gl.Float(ViewPhi*(180/PI)), 0, 0, 1)
 }
@@ -46,17 +46,17 @@ func InitInputHandlers() {
 		if state == 1 {
 			switch key {
 			case Up:
-				Viewpos.Z += deltaMove
+				Viewpos[2] += deltaMove
 			case Down:
-				Viewpos.Z -= deltaMove
+				Viewpos[2] -= deltaMove
 			case Left:
-				Viewpos.Y += deltaMove
+				Viewpos[1] += deltaMove
 			case Right:
-				Viewpos.Y -= deltaMove
+				Viewpos[1] -= deltaMove
 			case Space:
-				Viewpos.X += deltaMove
+				Viewpos[0] += deltaMove
 			case Alt:
-				Viewpos.X -= deltaMove
+				Viewpos[0] -= deltaMove
 			default:
 				log.Println("unused key:", key)
 			}

@@ -39,6 +39,8 @@ func Render(frame *dump.Frame) {
 	scale := 1 / maxworld
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
+	gl.Color3f(0.5, 0.5, 0.5)
+	Cube(0, 0, 0, 0.5, 0.5, 0.5)
 	rand.Seed(0)
 	//m := frame.Vectors()
 	for i := Min[0]; i < Max[0]; i++ {
@@ -47,13 +49,18 @@ func Render(frame *dump.Frame) {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
 			for k := Min[2]; k < Max[2]; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-				rnd := gl.Float(rand.Float32()*0.5 + 0.5)
-				gl.Color3f(rnd, rnd, rnd)
-				(&Cube{Vertex{z, y, x}, Vertex{rz, ry, rx}}).Render()
+				if false {
+					rnd := gl.Float(rand.Float32()*0.5 + 0.5)
+					gl.Color3f(rnd, rnd, rnd)
+					if i == Min[0] || i == Max[0]-1 ||
+						j == Min[1] || j == Max[1]-1 ||
+						k == Min[2] || k == Max[2]-1 {
+						Cube(z, y, x, rz, ry, rx)
+					}
+				}
 			}
 		}
 	}
-
 }
 
 func ClearScene() {

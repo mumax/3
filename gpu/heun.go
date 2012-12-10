@@ -56,6 +56,27 @@ func (e *Heun) Steps(steps int) {
 	}
 }
 
+// Run until
+func(e*Heun) Relax(maxerr float64){
+	nimble.RunStack()
+	core.Log("relax down to", maxerr, "of equilibrium")
+	LockCudaThread()
+	if maxerr < 1e-7 {
+		core.Fatalf("relax: max error too small")
+	}
+	preverr := e.Maxerr
+	e.Maxerr = 1e-3
+	for {
+		e.Step()
+		if e.delta < e.Maxerr/e.Headroom{
+			e.Maxerr /= 2
+			e.dt_si /= 1.41
+		}
+		if e.Maxerr < maxerr{ break }
+	}
+	e.Maxerr = preverr
+}
+
 // Take one time step
 func (e *Heun) Step() {
 	n := e.y.Mesh().NCell()
@@ -89,22 +110,23 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		err := MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
-		e.sendDebugOutput(err)
-		e.checkErr(err)
+		e.delta = MaxVecNorm(dy[0], dy[1], dy[2], str[0]) * float64(dt)
+		e.err = MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
+		e.checkErr()
 
-		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
+		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
+			e.sendDebugOutput()
 			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
 			NormalizeSync(y, str[0])
 			e.time += e.dt_si
 			e.steps++
-			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
 		} else { // undo.
 			maddvec(y, dy0, -dt, str)
 			e.undone++
-			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
 		}
-		e.updateDash(err)
+		e.updateDash()
 	}
 	e.dy.ReadDone()
 	// no writeDone() here.

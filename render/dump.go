@@ -20,7 +20,7 @@ func Load(fname string) *dump.Frame {
 	return &(r.Frame)
 }
 
-var(
+var (
 	Min, Max [3]int
 )
 
@@ -41,11 +41,11 @@ func Render(frame *dump.Frame) {
 
 	rand.Seed(0)
 	//m := frame.Vectors()
-	for i := Min[0]; i<Max[0]; i++{
+	for i := Min[0]; i < Max[0]; i++ {
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
-		for j := Min[1]; j<Max[1]; j++{
+		for j := Min[1]; j < Max[1]; j++ {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
-			for k := Min[2]; k<Max[2]; k++{
+			for k := Min[2]; k < Max[2]; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
 				rnd := gl.Float(rand.Float32()*0.5 + 0.5)
 				gl.Color3f(rnd, rnd, rnd)

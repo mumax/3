@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	flag_smooth      = flag.Bool("smooth", true, "Smooth shading")
+	flag_smooth      = flag.Bool("smooth", false, "Smooth shading")
 	flag_vsync       = flag.Bool("vsync", true, "Vertical sync")
 	flag_cullface    = flag.Bool("cullface", true, "Cull invisible polygon faces")
 	flag_lighting    = flag.Bool("lighting", false, "Enable lighting")
@@ -41,7 +41,7 @@ func main() {
 	start := time.Now()
 	frames := 0
 
-	Viewpos[2] = -3
+	Viewpos[2] = -20
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()

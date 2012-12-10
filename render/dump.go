@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/nimble-cube/core"
 	"code.google.com/p/nimble-cube/dump"
 	gl "github.com/chsc/gogl/gl21"
-	"math/rand"
 	"os"
 )
 
@@ -40,27 +39,27 @@ func Render(frame *dump.Frame) {
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
 	gl.Color3f(0.5, 0.5, 0.5)
-	Cube(0, 0, 0, 0.5, 0.5, 0.5)
-	rand.Seed(0)
-	//m := frame.Vectors()
+	//Cube(0, 0, 0, 0.5, 0.5, 0.5)
+	M := frame.Vectors()
+	cubes := 0
 	for i := Min[0]; i < Max[0]; i++ {
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
 		for j := Min[1]; j < Max[1]; j++ {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
 			for k := Min[2]; k < Max[2]; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-				if false {
-					rnd := gl.Float(rand.Float32()*0.5 + 0.5)
-					gl.Color3f(rnd, rnd, rnd)
-					if i == Min[0] || i == Max[0]-1 ||
+				mx, my, mz := M[0][i][j][k]	,  M[1][i][j][k]	, M[2][i][j][k]	 
+					if  i == Min[0] || i == Max[0]-1 ||
 						j == Min[1] || j == Max[1]-1 ||
 						k == Min[2] || k == Max[2]-1 {
+						gl.Color3f(gl.Float(0.5*(mx+0.5)), gl.Float(0.5*(my+0.5)), gl.Float(0.5*(mz+0.5)))
 						Cube(z, y, x, rz, ry, rx)
+						cubes++
 					}
-				}
 			}
 		}
 	}
+	core.Println(cubes, "cubes")
 }
 
 func ClearScene() {

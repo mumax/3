@@ -56,8 +56,9 @@ func (e *Heun) Steps(steps int) {
 	}
 }
 
-// Run until
-func(e*Heun) Relax(maxerr float64){
+// Run until we are only maxerr away from equilibrium.
+// Typ. maxerr: 1e-7 (cannot go lower).
+func (e *Heun) Relax(maxerr float64) {
 	nimble.RunStack()
 	core.Log("relax down to", maxerr, "of equilibrium")
 	LockCudaThread()
@@ -65,14 +66,16 @@ func(e*Heun) Relax(maxerr float64){
 		core.Fatalf("relax: max error too small")
 	}
 	preverr := e.Maxerr
-	e.Maxerr = 1e-3
+	e.Maxerr = 1e-2
 	for {
 		e.Step()
-		if e.delta < e.Maxerr/e.Headroom{
+		if e.delta < e.Maxerr/e.Headroom {
 			e.Maxerr /= 2
 			e.dt_si /= 1.41
 		}
-		if e.Maxerr < maxerr{ break }
+		if e.Maxerr < maxerr {
+			break
+		}
 	}
 	e.Maxerr = preverr
 }

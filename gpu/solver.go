@@ -17,7 +17,7 @@ type solverCommon struct {
 	Mindt, Maxdt     float64          // minimum and maximum time step
 	Maxerr, Headroom float64          // maximum error per step
 	steps, undone    int              // number of good steps, undone steps
-	delta, err float64 // max delta, max error of last step
+	delta, err       float64          // max delta, max error of last step
 	debug            dump.TableWriter // save t, dt, error here
 	stream           [3]cu.Stream
 }
@@ -84,7 +84,7 @@ func (e *solverCommon) updateDash() {
 
 func (e *solverCommon) sendDebugOutput() {
 	if core.DEBUG {
-		e.debug.Data[0], e.debug.Data[1], e.debug.Data[2],e.debug.Data[3] = float32(e.time), float32(e.dt_si), float32(e.err), float32(e.delta)
+		e.debug.Data[0], e.debug.Data[1], e.debug.Data[2], e.debug.Data[3] = float32(e.time), float32(e.dt_si), float32(e.err), float32(e.delta)
 		e.debug.WriteData()
 	}
 }

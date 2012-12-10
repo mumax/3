@@ -54,7 +54,7 @@ func writeOmfData(out io.Writer, q *dump.Frame, dataformat string) {
 
 // Writes the OMF header
 func writeOmfHeader(out io.Writer, q *dump.Frame) {
-	gridsize := q.Size()[1:]
+	gridsize := q.MeshSize
 	cellsize := q.MeshStep
 
 	hdr(out, "OOMMF", "rectangular mesh v1.0")
@@ -93,7 +93,7 @@ func writeOmfHeader(out io.Writer, q *dump.Frame) {
 // Writes data in OMF Binary 4 format
 func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 	data := array.Tensors()
-	gridsize := array.Size()[1:]
+	gridsize := array.MeshSize
 
 	var bytes []byte
 
@@ -107,7 +107,7 @@ func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
-	ncomp := array.Size()[0]
+	ncomp := array.NComp()
 	for i := 0; i < gridsize[X]; i++ {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
@@ -126,15 +126,15 @@ func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 func writeOmfText(out io.Writer, tens *dump.Frame) {
 
 	data := tens.Tensors()
-	gridsize := tens.Size()[1:]
+	gridsize := tens.MeshSize
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
 	for i := 0; i < gridsize[X]; i++ {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
-				for c := 0; c < tens.Size()[0]; c++ {
-					_, err := fmt.Fprint(out, data[SwapIndex(c, tens.Size()[0])][i][j][k], " ") // converts to user space.
+				for c := 0; c < tens.NComp(); c++ {
+					_, err := fmt.Fprint(out, data[SwapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
 					core.Fatal(err)
 				}
 				_, err := fmt.Fprint(out, "\n")

@@ -38,6 +38,8 @@ type Header struct {
 	Precission uint64
 }
 
+func (h *Header) NComp() int { return h.Components }
+
 func (h *Header) size() []int {
 	return []int{h.Components, h.MeshSize[0], h.MeshSize[1], h.MeshSize[2]}
 }

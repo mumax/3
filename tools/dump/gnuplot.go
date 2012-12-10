@@ -21,7 +21,7 @@ func dumpGnuplot(f *dump.Frame, file string) {
 	defer out_buffered.Flush()
 
 	data := f.Tensors()
-	gridsize := f.Size()[1:]
+	gridsize := f.MeshSize
 	cellsize := f.MeshStep
 	// If no cell size is set, use generic cell index.
 	if cellsize == [3]float64{0, 0, 0} {

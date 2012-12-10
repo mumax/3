@@ -26,7 +26,7 @@ func dumpVTK(file string, q *dump.Frame, dataformat string) {
 }
 
 func writeVTKHeader(out io.Writer, q *dump.Frame) {
-	gridsize := q.Size()[1:]
+	gridsize := q.MeshSize
 
 	fmt.Fprintln(out, "<?xml version=\"1.0\"?>")
 	fmt.Fprintln(out, "<VTKFile type=\"StructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">")
@@ -37,7 +37,7 @@ func writeVTKHeader(out io.Writer, q *dump.Frame) {
 func writeVTKPoints(out io.Writer, q *dump.Frame, dataformat string) {
 	fmt.Fprintln(out, "\t\t\t<Points>")
 	fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"points\" NumberOfComponents=\"3\" format=\"%s\">\n", dataformat)
-	gridsize := q.Size()[1:]
+	gridsize := q.MeshSize
 	cellsize := q.MeshStep
 	switch dataformat {
 	case "ascii":
@@ -80,7 +80,7 @@ func writeVTKPoints(out io.Writer, q *dump.Frame, dataformat string) {
 }
 
 func writeVTKCellData(out io.Writer, q *dump.Frame, dataformat string) {
-	N := q.Size()[0]
+	N := q.NComp()
 	data := q.Tensors()
 	switch N {
 	case 1:

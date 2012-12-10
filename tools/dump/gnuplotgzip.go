@@ -29,7 +29,7 @@ func dumpGnuplotGZip(f *dump.Frame, file string) {
 	}()
 
 	data := f.Tensors()
-	gridsize := f.Size()[1:]
+	gridsize := f.MeshSize
 	cellsize := f.MeshStep
 	ncomp := len(data)
 

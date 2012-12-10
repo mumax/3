@@ -60,8 +60,8 @@ inline __device__ float len(float3 a) {
 	return sqrtf(dotf(a,a));
 }
 
-// normalize the 3-components vector
-inline __device__ float3 normalize(float3 a){
+// returns a normalized copy of the 3-components vector
+inline __device__ float3 normalized(float3 a){
     float veclen = (len(a) != 0.0f) ? 1.0f / len(a) : 0.0f;
 	return veclen * a;
 }

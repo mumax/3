@@ -7,19 +7,22 @@ import (
 	"unsafe"
 )
 
-func MakeVectors(n int) [3]safe.Float32s {
-	return [3]safe.Float32s{MakeFloats(n), MakeFloats(n), MakeFloats(n)}
+// Try to allocate on GPU, spill to unified host if out of GPU memory.
+func TryMakeVectors(n int) [3]safe.Float32s {
+	return [3]safe.Float32s{TryMakeFloats(n), TryMakeFloats(n), TryMakeFloats(n)}
 }
 
-func MakeFloats(N int) safe.Float32s {
+// Try to allocate on GPU, spill to unified host if out of GPU memory.
+func TryMakeFloats(N int) safe.Float32s {
 	var s safe.Float32s
 	ptr := tryMalloc(cu.SIZEOF_FLOAT32 * int64(N))
 	s.UnsafeSet(ptr, N, N)
 	return s
 }
 
-func MakeComplexs(N int) safe.Complex64s {
-	return MakeFloats(2 * N).Complex()
+// Try to allocate on GPU, spill to unified host if out of GPU memory.
+func TryMakeComplexs(N int) safe.Complex64s {
+	return TryMakeFloats(2 * N).Complex()
 }
 
 func HostFloats(N int) safe.Float32s {

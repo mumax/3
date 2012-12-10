@@ -21,7 +21,7 @@ type Heun struct {
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
-	dy0 := MakeVectors(y.BufLen()) // TODO: proper len?
+	dy0 := TryMakeVectors(y.BufLen()) // TODO: proper len?
 	return &Heun{dy0: dy0, y: y, dy: dy, solverCommon: newSolverCommon(dt, multiplier)}
 }
 

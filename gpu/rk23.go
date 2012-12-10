@@ -25,9 +25,9 @@ func NewRK23(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *RK23 {
 	s.solverCommon = newSolverCommon(dt, multiplier)
 	s.y = y
 	s.dy = dy_.NewReader()
-	s.y0 = MakeVectors(y.BufLen())
+	s.y0 = TryMakeVectors(y.BufLen())
 	for i := range s.k {
-		s.k[i] = MakeVectors(y.BufLen())
+		s.k[i] = TryMakeVectors(y.BufLen())
 	}
 	return s
 }

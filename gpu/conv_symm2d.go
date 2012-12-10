@@ -50,10 +50,10 @@ func (c *Symm2D) init() {
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
 		for i := 1; i < 3; i++ {
-			c.fftCBuf[i] = MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[i] = TryMakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		}
 		if c.is3D() {
-			c.fftCBuf[0] = MakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
+			c.fftCBuf[0] = TryMakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
 		} else {
 			c.fftCBuf[0] = c.fftCBuf[1]
 		}
@@ -78,7 +78,7 @@ func (c *Symm2D) initFFTKern3D() {
 	halfkern := realsize
 	//halfkern[1] = halfkern[1]/2 + 1
 	fwPlan := c.fwPlan
-	output := safe.MakeComplex64s(fwPlan.OutputLen())
+	output := TryMakeComplexs(fwPlan.OutputLen())
 	defer output.Free()
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
@@ -91,7 +91,7 @@ func (c *Symm2D) initFFTKern3D() {
 				fwPlan.Exec(input, output)
 				fwPlan.Stream().Synchronize() // !!
 				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = safe.MakeFloat32s(len(fftKern))
+				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
 				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
 			}
 		}
@@ -122,7 +122,7 @@ func (c *Symm2D) initFFTKern2D() {
 				fwPlan.Exec(input, output)
 				fwPlan.Stream().Synchronize() // !!
 				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = MakeFloats(len(fftKern))
+				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
 				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
 			}
 		}

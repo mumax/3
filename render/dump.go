@@ -15,8 +15,14 @@ func Load(fname string) *dump.Frame {
 
 	r := dump.NewReader(f, dump.CRC_ENABLED)
 	core.Fatal(r.Read())
+	Min = [3]int{0, 0, 0}
+	Max = r.MeshSize
 	return &(r.Frame)
 }
+
+var(
+	Min, Max [3]int
+)
 
 func Render(frame *dump.Frame) {
 	ClearScene()
@@ -34,14 +40,12 @@ func Render(frame *dump.Frame) {
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
 	rand.Seed(0)
-	m := frame.Vectors()
-	i := 0
-	{
-		//for i := range m[0] {
+	//m := frame.Vectors()
+	for i := Min[0]; i<Max[0]; i++{
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
-		for j := range m[0][i] {
+		for j := Min[1]; j<Max[1]; j++{
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
-			for k := range m[0][i][j] {
+			for k := Min[2]; k<Max[2]; k++{
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
 				rnd := gl.Float(rand.Float32()*0.5 + 0.5)
 				gl.Color3f(rnd, rnd, rnd)

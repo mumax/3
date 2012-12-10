@@ -38,7 +38,7 @@ type Header struct {
 	Precission uint64
 }
 
-func (h *Header) Size() []int {
+func (h *Header) size() []int {
 	return []int{h.Components, h.MeshSize[0], h.MeshSize[1], h.MeshSize[2]}
 }
 
@@ -90,5 +90,5 @@ func (f *Frame) Vectors() [3][][][]float32 {
 }
 
 func (f *Frame) Tensors() [][][][]float32 {
-	return core.Reshape4D(f.Data, f.Size())
+	return core.Reshape4D(f.Data, f.size())
 }

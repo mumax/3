@@ -23,7 +23,7 @@ func InitViewport() {
 	gl.MatrixMode(gl.PROJECTION)
 	gl.LoadIdentity()
 	x := gl.Double(float64(Height) / float64(Width))
-	gl.Frustum(-1, 1, -x, x, 2, 50)
+	gl.Frustum(-1, 1, -x, x, 1, 100)
 }
 
 // Set the GL modelview matrix to match view position and orientation.

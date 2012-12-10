@@ -123,7 +123,7 @@ func (r *Reader) readUint64() uint64 {
 // enlarging the previous one if needed.
 func (r *Reader) readData() {
 	N := 1
-	for _, s := range r.Size() {
+	for _, s := range r.size() {
 		N *= s
 	}
 	if cap(r.Data) < N {

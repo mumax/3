@@ -48,18 +48,18 @@ func Render(frame *dump.Frame) {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
 			for k := Min[2]; k < Max[2]; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-				mx, my, mz := M[0][i][j][k]	,  M[1][i][j][k]	, M[2][i][j][k]	 
-					if  i == Min[0] || i == Max[0]-1 ||
-						j == Min[1] || j == Max[1]-1 ||
-						k == Min[2] || k == Max[2]-1 {
-						gl.Color3f(gl.Float(0.5*(mx+0.5)), gl.Float(0.5*(my+0.5)), gl.Float(0.5*(mz+0.5)))
-						Cube(z, y, x, rz, ry, rx)
-						cubes++
-					}
+				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
+				if i == Min[0] || i == Max[0]-1 ||
+					j == Min[1] || j == Max[1]-1 ||
+					k == Min[2] || k == Max[2]-1 {
+					gl.Color3f(gl.Float(0.5*(mx+0.5)), gl.Float(0.5*(my+0.5)), gl.Float(0.5*(mz+0.5)))
+					Cube(z, y, x, rz, ry, rx)
+					cubes++
+				}
 			}
 		}
 	}
-	core.Println(cubes, "cubes")
+	core.Println(cubes, " cubes")
 }
 
 func ClearScene() {

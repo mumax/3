@@ -8,7 +8,7 @@
 // apart form first row,
 // and is only stored (roughly) half:
 //
-// K11, K22:
+// K11, K22, K02:
 // xxxxx
 // aaaaa
 // bbbbb
@@ -39,9 +39,6 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
  		return;	
 	}
 
-	//int I = j*N2 + k;       // linear index for upper half of kernel
-	//int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
-
     float Kxx, Kyy, Kzz, Kxy, Kxz, Kyz;
 
 	for(int i=0; i<N0; i++){
@@ -57,12 +54,12 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 			Kxy = fftKxy[I];
 		}else{
 			int I2 = i*N1*N2 + (N1-j)*N2 + k;
-			Kxx = fftKxx[I2];
-			Kyy = fftKyy[I2];
-			Kzz = fftKzz[I2];
-			Kyz = -fftKyz[I2];
-			Kxz = fftKxz[I2];
-			Kxy = -fftKxy[I2];
+			Kxx =  fftKxx[I2];
+			Kyy =  fftKyy[I2];
+			Kzz =  fftKzz[I2];
+			Kyz = -fftKyz[I2]; // !
+			Kxz =  fftKxz[I2];
+			Kxy = -fftKxy[I2]; // !
 		}
 
   		int e = 2 * I;

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/mx3/dump"
 	"math"
 )
 

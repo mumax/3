@@ -5,8 +5,8 @@ package main
 // Modified by Arne Vansteenkiste, 2011, 2012.
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/dump"
 	"fmt"
 	"io"
 	"os"

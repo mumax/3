@@ -14,11 +14,11 @@ package main
 
 // dummy imports to make go get fetch all of them.
 import (
-	_ "code.google.com/p/nimble-cube/dump"
-	_ "code.google.com/p/nimble-cube/gpu"
-	_ "code.google.com/p/nimble-cube/gpu/ptx"
-	_ "code.google.com/p/nimble-cube/mag"
-	_ "code.google.com/p/nimble-cube/nimble"
+	_ "code.google.com/p/mx3/dump"
+	_ "code.google.com/p/mx3/gpu"
+	_ "code.google.com/p/mx3/gpu/ptx"
+	_ "code.google.com/p/mx3/mag"
+	_ "code.google.com/p/mx3/nimble"
 )
 
 func main() {

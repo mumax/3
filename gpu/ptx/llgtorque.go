@@ -15,8 +15,8 @@ const LLGTORQUE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_0000711c_00000000-9_llgtorque.cpp3.i"
-	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/llgtorque.cu"
+	.file	1 "/tmp/tmpxft_0000170d_00000000-9_llgtorque.cpp3.i"
+	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/llgtorque.cu"
 	.file	3 "/usr/local/cuda/bin/../include/device_functions.h"
 
 .visible .entry llgtorque(

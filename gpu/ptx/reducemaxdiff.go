@@ -15,8 +15,8 @@ const REDUCEMAXDIFF = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000071ca_00000000-9_reducemaxdiff.cpp3.i"
-	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/reducemaxdiff.cu"
+	.file	1 "/tmp/tmpxft_000017ab_00000000-9_reducemaxdiff.cpp3.i"
+	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/reducemaxdiff.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
 // __cuda_local_var_33851_32_non_const_sdata has been demoted

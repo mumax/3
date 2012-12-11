@@ -5,8 +5,8 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/dump"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/dump"
 	"compress/gzip"
 	"fmt"
 	"os"

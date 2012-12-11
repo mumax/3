@@ -15,8 +15,8 @@ const COPYPAD = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00007105_00000000-9_copypad.cpp3.i"
-	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/copypad.cu"
+	.file	1 "/tmp/tmpxft_000016eb_00000000-9_copypad.cpp3.i"
+	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/copypad.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 
 .visible .entry copypad(

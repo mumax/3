@@ -15,8 +15,8 @@ const NORMALIZE = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00007180_00000000-9_normalize.cpp3.i"
-	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/normalize.cu"
+	.file	1 "/tmp/tmpxft_00001789_00000000-9_normalize.cpp3.i"
+	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/normalize.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 
 .visible .entry normalize(

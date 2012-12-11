@@ -25,7 +25,6 @@
 // -bbbb
 
 // 3D array indexing
-#define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
 
 extern "C" __global__ void 
 kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
@@ -47,13 +46,24 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 
 	for(int i=0; i<N0; i++){
 
-		int I = idx(i, j, k);
-		Kxx = fftKxx[I];
-		Kyy = fftKyy[I];
-		Kzz = fftKzz[I];
-		Kyz = fftKyz[I];
-		Kxz = fftKxz[I];
-		Kxy = fftKxy[I];
+		int I = i*N1*N2 + j*N2 + k;
+	
+		if (j < N1/2 + 1){
+			Kxx = fftKxx[I];
+			Kyy = fftKyy[I];
+			Kzz = fftKzz[I];
+			Kyz = fftKyz[I];
+			Kxz = fftKxz[I];
+			Kxy = fftKxy[I];
+		}else{
+			int I2 = i*N1*N2 + (N1-j)*N2 + k;
+			Kxx = fftKxx[I2];
+			Kyy = fftKyy[I2];
+			Kzz = fftKzz[I2];
+			Kyz = -fftKyz[I2];
+			Kxz = -fftKxz[I2];
+			Kxy = -fftKxy[I2];
+		}
 
   		int e = 2 * I;
 		float reMx = fftMx[e  ];

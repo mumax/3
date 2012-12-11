@@ -28,7 +28,7 @@ type Symm2D struct {
 }
 
 func (c *Symm2D) init() {
-	core.Log("initializing 2D symmetric convolution")
+	core.Log("initializing convolution")
 	if c.inited {
 		core.Panic("conv: already initialized")
 	}
@@ -130,7 +130,7 @@ func (c *Symm2D) initFFTKern2D() {
 }
 
 func (c *Symm2D) Run() {
-	core.Log("running symmetric 2D convolution")
+	core.Log("running convolution")
 	LockCudaThread()
 
 	for {
@@ -150,7 +150,7 @@ func (c *Symm2D) exec3D() {
 	padded := c.kernSize
 	offset := [3]int{0, 0, 0}
 
-	//N0, N1, N2 := cc.fftKernSize[1], c.fftKernSize[2]
+	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
 	for i := 0; i < 3; i++ {
 		in := c.input[i].ReadNext(c.n).Device()
 		c.fftRBuf[i].MemsetAsync(0, c.stream)
@@ -161,9 +161,10 @@ func (c *Symm2D) exec3D() {
 	}
 
 	// kern mul
-	kernMulRSymm(c.fftCBuf,
+	kernMulRSymm3D(c.fftCBuf,
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+		N0, N1, N2,
 		c.stream)
 	c.stream.Synchronize()
 

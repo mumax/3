@@ -42,14 +42,12 @@ func main() {
 	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
 
 	exch := gpu.NewExchange6("Bex", m, Aex_red)
-	nimble.Stack(exch)
 	Bex := exch.Output()
 
 	BeffBox := gpu.NewSum("Beff", B, Bex, Bsat, 1, mem)
 	Beff := BeffBox.Output()
 
 	tBox := gpu.NewLLGTorque("torque", m, Beff, α)
-	nimble.Stack(tBox)
 	torque := tBox.Output()
 
 	solver := gpu.NewHeun(m, torque, 10e-15, mag.Gamma0)
@@ -82,7 +80,7 @@ func main() {
 		By = 4.3E-3
 		Bz = 0
 	)
-	Bext := gpu.RunConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx})
+	Bext := gpu.NewConst("Bext", "T", mesh, mem, []float64{Bz, By, Bx}).Output()
 	BeffBox.MAdd(Bext, 1)
 	tBox.Alpha = 0.02
 	solver.Advance(1e-9)

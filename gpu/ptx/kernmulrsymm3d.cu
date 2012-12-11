@@ -28,10 +28,10 @@
 #define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
 
 extern "C" __global__ void 
-kernmulRSymm2Dyz(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
-                 float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKzz, 
-                 float* __restrict__  fftKyz, float* __restrict__  fftKxz, float* __restrict__  fftKxy,
-                 int N0, int N1, int N2){
+kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
+               float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKzz, 
+               float* __restrict__  fftKyz, float* __restrict__  fftKxz, float* __restrict__  fftKxy,
+               int N0, int N1, int N2){
 
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
 	int k = blockIdx.x * blockDim.x + threadIdx.x;

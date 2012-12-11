@@ -15,22 +15,22 @@ const KERNMULRSYMM3D = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000067fa_00000000-9_kernmulrsymm3d.cpp3.i"
+	.file	1 "/tmp/tmpxft_00006aa3_00000000-9_kernmulrsymm3d.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/nimble-cube/gpu/ptx/kernmulrsymm3d.cu"
 
-.visible .entry kernmulRSymm2Dyz(
-	.param .u64 kernmulRSymm2Dyz_param_0,
-	.param .u64 kernmulRSymm2Dyz_param_1,
-	.param .u64 kernmulRSymm2Dyz_param_2,
-	.param .u64 kernmulRSymm2Dyz_param_3,
-	.param .u64 kernmulRSymm2Dyz_param_4,
-	.param .u64 kernmulRSymm2Dyz_param_5,
-	.param .u64 kernmulRSymm2Dyz_param_6,
-	.param .u64 kernmulRSymm2Dyz_param_7,
-	.param .u64 kernmulRSymm2Dyz_param_8,
-	.param .u32 kernmulRSymm2Dyz_param_9,
-	.param .u32 kernmulRSymm2Dyz_param_10,
-	.param .u32 kernmulRSymm2Dyz_param_11
+.visible .entry kernmulRSymm3D(
+	.param .u64 kernmulRSymm3D_param_0,
+	.param .u64 kernmulRSymm3D_param_1,
+	.param .u64 kernmulRSymm3D_param_2,
+	.param .u64 kernmulRSymm3D_param_3,
+	.param .u64 kernmulRSymm3D_param_4,
+	.param .u64 kernmulRSymm3D_param_5,
+	.param .u64 kernmulRSymm3D_param_6,
+	.param .u64 kernmulRSymm3D_param_7,
+	.param .u64 kernmulRSymm3D_param_8,
+	.param .u32 kernmulRSymm3D_param_9,
+	.param .u32 kernmulRSymm3D_param_10,
+	.param .u32 kernmulRSymm3D_param_11
 )
 {
 	.reg .pred 	%p<7>;
@@ -39,18 +39,18 @@ const KERNMULRSYMM3D = `
 	.reg .s64 	%rd<34>;
 
 
-	ld.param.u64 	%rd10, [kernmulRSymm2Dyz_param_0];
-	ld.param.u64 	%rd11, [kernmulRSymm2Dyz_param_1];
-	ld.param.u64 	%rd12, [kernmulRSymm2Dyz_param_2];
-	ld.param.u64 	%rd9, [kernmulRSymm2Dyz_param_3];
-	ld.param.u64 	%rd13, [kernmulRSymm2Dyz_param_4];
-	ld.param.u64 	%rd14, [kernmulRSymm2Dyz_param_5];
-	ld.param.u64 	%rd15, [kernmulRSymm2Dyz_param_6];
-	ld.param.u64 	%rd16, [kernmulRSymm2Dyz_param_7];
-	ld.param.u64 	%rd17, [kernmulRSymm2Dyz_param_8];
-	ld.param.u32 	%r15, [kernmulRSymm2Dyz_param_9];
-	ld.param.u32 	%r16, [kernmulRSymm2Dyz_param_10];
-	ld.param.u32 	%r17, [kernmulRSymm2Dyz_param_11];
+	ld.param.u64 	%rd10, [kernmulRSymm3D_param_0];
+	ld.param.u64 	%rd11, [kernmulRSymm3D_param_1];
+	ld.param.u64 	%rd12, [kernmulRSymm3D_param_2];
+	ld.param.u64 	%rd9, [kernmulRSymm3D_param_3];
+	ld.param.u64 	%rd13, [kernmulRSymm3D_param_4];
+	ld.param.u64 	%rd14, [kernmulRSymm3D_param_5];
+	ld.param.u64 	%rd15, [kernmulRSymm3D_param_6];
+	ld.param.u64 	%rd16, [kernmulRSymm3D_param_7];
+	ld.param.u64 	%rd17, [kernmulRSymm3D_param_8];
+	ld.param.u32 	%r15, [kernmulRSymm3D_param_9];
+	ld.param.u32 	%r16, [kernmulRSymm3D_param_10];
+	ld.param.u32 	%r17, [kernmulRSymm3D_param_11];
 	cvta.to.global.u64 	%rd1, %rd12;
 	cvta.to.global.u64 	%rd2, %rd11;
 	cvta.to.global.u64 	%rd3, %rd10;

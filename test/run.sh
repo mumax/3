@@ -2,6 +2,7 @@
 go run demag1.go || exit 2
 go run demag2.go || exit 2
 go run gpu4.go || exit 2
+go run gpu4-3d.go || exit 2
 #./test4.sh || exit 2
 #./convolution.sh || exit 2
 

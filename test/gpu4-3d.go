@@ -71,7 +71,7 @@ func main() {
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-2 {
 		fmt.Println("FAILED")
-		//os.Exit(2)
+		os.Exit(2)
 	}
 	fmt.Println("OK")
 
@@ -88,7 +88,8 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want = [3]float32{0.04577134, 0.100720644, -0.9862087}
+
+	want = [3]float32{0.04755566, 0.06652627, -0.9863698}
 	err = math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-2 {

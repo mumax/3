@@ -1,7 +1,7 @@
 package nimble
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	"fmt"
 )
 

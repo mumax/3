@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 )
 
 // Brute-force O(N²) vector convolution on CPU.

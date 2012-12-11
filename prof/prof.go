@@ -1,6 +1,7 @@
 package prof
 
 // Profiler
+// TODO: fix or remove
 
 import (
 	"code.google.com/p/nimble-cube/core"

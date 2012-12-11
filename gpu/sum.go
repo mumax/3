@@ -1,9 +1,9 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
-	"code.google.com/p/nimble-cube/uni"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/nimble"
+	"code.google.com/p/mx3/uni"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"

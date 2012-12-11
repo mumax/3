@@ -1,7 +1,7 @@
 package nimble
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 )
 
 // Chan1 is a Chan that passes 1-component float32 data.

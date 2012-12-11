@@ -1,7 +1,7 @@
 package nimble
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"reflect"

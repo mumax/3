@@ -2,7 +2,6 @@ package dump
 
 import (
 	"fmt"
-	//"nimble-cube/core"
 	"hash"
 	"hash/crc64"
 	"io"

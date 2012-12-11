@@ -1,15 +1,14 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/safe"
 	"math"
 )
 
 // Adaptive heun solver.
-// TODO: now only for magnetization (because it normalizes)
-// post-step hook?
+// TODO: now only for magnetization (because it normalizes), post-step hook?
 type Heun struct {
 	solverCommon
 	dy0  [3]safe.Float32s // buffer dy/dt

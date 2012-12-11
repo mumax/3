@@ -1,7 +1,7 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/nimble"
 	"testing"
 )
 

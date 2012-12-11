@@ -1,7 +1,7 @@
 package cpu
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/cu"
 )
 

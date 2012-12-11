@@ -1,9 +1,10 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/nimble"
 )
 
+// 6-neighbor exchange field.
 func NewExchange6(tag string, m nimble.ChanN, aex_reduced float64) *Stencil3D {
 	Δ := m.Mesh().CellSize()
 	var w [3]float32

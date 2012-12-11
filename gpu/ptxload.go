@@ -3,8 +3,8 @@ package gpu
 // This files implements loading and caching of CUDA PTX code.
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/gpu/ptx"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/gpu/ptx"
 	"github.com/barnex/cuda5/cu"
 	"strings"
 	"sync"

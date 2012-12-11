@@ -3,7 +3,7 @@ package gpu
 //TODO: rm, use madd+normalize? or just for final dela?
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"unsafe"

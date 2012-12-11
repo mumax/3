@@ -1,8 +1,8 @@
 package cpu
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/nimble"
 	"math"
 )
 

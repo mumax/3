@@ -1,15 +1,12 @@
 package gpu
 
 import (
-	"code.google.com/p/nimble-cube/core"
-	"code.google.com/p/nimble-cube/nimble"
+	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/safe"
 	//"math"
 )
 
-// Adaptive heun solver.
-// TODO: now only for magnetization (because it normalizes)
-// post-step hook?
 type RK23 struct {
 	solverCommon
 	y    nimble.ChanN
@@ -65,6 +62,7 @@ func (e *RK23) Steps(steps int) {
 
 // Take one time step
 func (e *RK23) Step() {
+	panic("todo")
 	//	n := e.y.Mesh().NCell()
 	//	str := e.stream
 	//

@@ -2,7 +2,7 @@ package dump
 
 import (
 	"bufio"
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	"io"
 	"math"
 	"unsafe"

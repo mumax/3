@@ -3,7 +3,7 @@ package gpu
 // common code for all convolutions.
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"github.com/barnex/fmath"

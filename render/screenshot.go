@@ -1,7 +1,7 @@
 package render
 
 import (
-	"code.google.com/p/nimble-cube/core"
+	"code.google.com/p/mx3/core"
 	gl "github.com/chsc/gogl/gl21"
 	"image"
 	"image/png"

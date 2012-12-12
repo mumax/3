@@ -67,24 +67,21 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	for s := 0; s < 3; s++ { // source index Ksdxyz
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 			xw := Wrap(x, size[X])
+			R[X] = float64(x) * cellsize[X]
 			for y := y1; y <= y2; y++ {
 				yw := Wrap(y, size[Y])
+				R[Y] = float64(y) * cellsize[Y]
 				for z := z1; z <= z2; z++ {
 					zw := Wrap(z, size[Z])
-					R[X] = float64(x) * cellsize[X]
-					R[Y] = float64(y) * cellsize[Y]
 					R[Z] = float64(z) * cellsize[Z]
-					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
 
 					u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
+
 					// choose number of integration points depending on how far we are from source.
+					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
 					nv := int(accuracy*cellsize[v]/(0.5*cellsize[u]+r)) + 1
 					nw := int(accuracy*cellsize[w]/(0.5*cellsize[u]+r)) + 1
 					scale := 1 / float64(nv*nw)
-
-					R2[X], R2[Y], R2[Z] = 0, 0, 0
-					pole[X], pole[Y], pole[Z] = 0, 0, 0
-
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
 					charge := surface * scale
 
@@ -94,13 +91,12 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					B[X], B[Y], B[Z] = 0, 0, 0 // accumulates during surface integral
 					for i := 0; i < nv; i++ {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
+						pole[v] = pv
 						for j := 0; j < nw; j++ {
 							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
-
-							pole[u] = pu1
-							pole[v] = pv
 							pole[w] = pw
 
+							pole[u] = pu1
 							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
 							r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
 							qr := charge / (4 * math.Pi * r * r * r)
@@ -120,7 +116,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 
 					for d := s; d < 3; d++ { // destination index Ksdxyz
 						// TODO: for PBC, need to add here
-						array[s][d][xw][yw][zw] = float32(B[d]) 
+						array[s][d][xw][yw][zw] = float32(B[d])
 					}
 				}
 			}

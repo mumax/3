@@ -29,7 +29,7 @@ func main() {
 	mbox := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, []float64{1, 0, 0})
 	m := mbox.Output()
 
-	acc := 2
+	acc := 10.
 	kernel := mag.BruteKernel(mesh, acc)
 	conv := gpu.NewConvolution("B", "T", mesh, nimble.UnifiedMemory, kernel, m)
 	B := conv.Output()
@@ -38,7 +38,7 @@ func main() {
 	outputc := B.NewReader()
 	nimble.RunStack()
 	output := host(outputc.ReadNext(mesh.NCell()))
-	if output[0][probe] != -0.9709071 || output[1][probe] != 0 || output[2][probe] != 0 {
+	if output[0][probe] != -0.97740304 || output[1][probe] != 0 || output[2][probe] != 0 {
 		fmt.Println("failed, got:", output[0][probe])
 		os.Exit(2)
 	} else {

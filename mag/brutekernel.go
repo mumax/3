@@ -86,12 +86,12 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					pole[X], pole[Y], pole[Z] = 0, 0, 0
 
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
-					charge := surface
+					charge := surface * scale
 
 					pu1 := cellsize[u] / 2. // positive pole
 					pu2 := -pu1             // negative pole
 
-					B[X], B[Y], B[Z] = 0, 0, 0 // accumulates magnetic field
+					B[X], B[Y], B[Z] = 0, 0, 0 // accumulates during surface integral
 					for i := 0; i < nv; i++ {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
 						for j := 0; j < nw; j++ {
@@ -117,12 +117,10 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 							B[Z] += R2[Z] * qr
 						}
 					}
-					B[X] *= scale
-					B[Y] *= scale
-					B[Z] *= scale
 
 					for d := s; d < 3; d++ { // destination index Ksdxyz
-						array[s][d][xw][yw][zw] += float32(B[d]) // Add: may have multiple contributions in case of periodicity
+						// TODO: for PBC, need to add here
+						array[s][d][xw][yw][zw] = float32(B[d]) 
 					}
 				}
 			}

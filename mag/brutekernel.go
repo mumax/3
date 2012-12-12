@@ -81,7 +81,6 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
 					nv := int(accuracy*cellsize[v]/(0.5*cellsize[u]+r)) + 1
 					nw := int(accuracy*cellsize[w]/(0.5*cellsize[u]+r)) + 1
-					//nu := int(accuracy*cellsize[u]/(0.5*(cellsize[v]+cellsize[w])+r)) + 1
 					scale := 1 / float64(nv*nw)
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
 					charge := surface * scale
@@ -102,17 +101,17 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
 							r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
 							qr := charge / (4 * math.Pi * r * r * r)
-							bx:= R2[X] * qr
-							by:= R2[Y] * qr
-							bz:= R2[Z] * qr
+							bx := R2[X] * qr
+							by := R2[Y] * qr
+							bz := R2[Z] * qr
 
 							pole[u] = pu2
 							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
 							r = math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
 							qr = -charge / (4 * math.Pi * r * r * r)
-							B[X] += (bx + R2[X] * qr) // addition ordered for accuracy
-							B[Y] += (by + R2[Y] * qr)
-							B[Z] += (bz + R2[Z] * qr)
+							B[X] += (bx + R2[X]*qr) // addition ordered for accuracy
+							B[Y] += (by + R2[Y]*qr)
+							B[Z] += (bz + R2[Z]*qr)
 						}
 					}
 

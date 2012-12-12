@@ -37,7 +37,7 @@ func main() {
 	M[1].Memset(float32(1 / math.Sqrt(3)))
 	M[2].Memset(float32(1 / math.Sqrt(3)))
 
-	acc := 8
+	acc := 8.
 	kernel := mag.BruteKernel(mesh, acc)
 	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
 	Bex := gpu.NewExchange6("Bex", m, Aex_red).Output()

@@ -1,0 +1,1 @@
+test: do not fail uni tests if cc is too low.

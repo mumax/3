@@ -10,7 +10,7 @@ import (
 // of magnetic charges over the faces. Fields are evaluated at the
 // cell center (not averaged).
 // Mesh should NOT yet be zero-padded.
-func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
+func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	pbc := mesh.PBC()
 	sz := padSize(mesh.Size(), pbc)
 	cs := mesh.CellSize()
@@ -74,9 +74,13 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 					R[X] = float64(x) * cellsize[X]
 					R[Y] = float64(y) * cellsize[Y]
 					R[Z] = float64(z) * cellsize[Z]
+					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
 
-					n := accuracy                  // number of integration points = n^2
 					u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
+					// choose number of integration points depending on how far we are from source.
+					nv := int(accuracy*cellsize[v]/(0.5*cellsize[u]+r)) + 1
+					nw := int(accuracy*cellsize[w]/(0.5*cellsize[u]+r)) + 1
+					scale := 1 / float64(nv*nw)
 
 					R2[X], R2[Y], R2[Z] = 0, 0, 0
 					pole[X], pole[Y], pole[Z] = 0, 0, 0
@@ -88,10 +92,10 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 					pu2 := -pu1             // negative pole
 
 					B[X], B[Y], B[Z] = 0, 0, 0 // accumulates magnetic field
-					for i := 0; i < n; i++ {
-						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*n) + float64(i)*(cellsize[v]/float64(n))
-						for j := 0; j < n; j++ {
-							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*n) + float64(j)*(cellsize[w]/float64(n))
+					for i := 0; i < nv; i++ {
+						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
+						for j := 0; j < nw; j++ {
+							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
 
 							pole[u] = pu1
 							pole[v] = pv
@@ -111,7 +115,6 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 							B[Z] += R2[Z] * -charge / (4 * math.Pi * r * r * r)
 						}
 					}
-					scale := 1 / float64(n*n)
 					B[X] *= scale
 					B[Y] *= scale
 					B[Z] *= scale

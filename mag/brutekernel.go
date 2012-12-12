@@ -63,7 +63,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 
 	R2 := [3]float64{0, 0, 0}
 	pole := [3]float64{0, 0, 0} // position of point charge on the surface
-
+	points := 0
 	for s := 0; s < 3; s++ { // source index Ksdxyz
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 			xw := Wrap(x, size[X])
@@ -81,6 +81,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
 					nv := int(accuracy*cellsize[v]/(0.5*cellsize[u]+r)) + 1
 					nw := int(accuracy*cellsize[w]/(0.5*cellsize[u]+r)) + 1
+					//nu := int(accuracy*cellsize[u]/(0.5*(cellsize[v]+cellsize[w])+r)) + 1
 					scale := 1 / float64(nv*nw)
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
 					charge := surface * scale
@@ -93,6 +94,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
 						pole[v] = pv
 						for j := 0; j < nw; j++ {
+							points++
 							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
 							pole[w] = pw
 
@@ -122,6 +124,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 			}
 		}
 	}
+	core.Log("kernel used", points, "integration points")
 	// for 2D these elements are zero:
 	if size[0] == 1 {
 		array[0][1] = nil

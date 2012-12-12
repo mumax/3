@@ -103,16 +103,18 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 
 							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
 							r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
-							B[X] += R2[X] * charge / (4 * math.Pi * r * r * r)
-							B[Y] += R2[Y] * charge / (4 * math.Pi * r * r * r)
-							B[Z] += R2[Z] * charge / (4 * math.Pi * r * r * r)
+							qr := charge / (4 * math.Pi * r * r * r)
+							B[X] += R2[X] * qr
+							B[Y] += R2[Y] * qr
+							B[Z] += R2[Z] * qr
 
 							pole[u] = pu2
 							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
 							r = math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
-							B[X] += R2[X] * -charge / (4 * math.Pi * r * r * r)
-							B[Y] += R2[Y] * -charge / (4 * math.Pi * r * r * r)
-							B[Z] += R2[Z] * -charge / (4 * math.Pi * r * r * r)
+							qr = -charge / (4 * math.Pi * r * r * r)
+							B[X] += R2[X] * qr
+							B[Y] += R2[Y] * qr
+							B[Z] += R2[Z] * qr
 						}
 					}
 					B[X] *= scale

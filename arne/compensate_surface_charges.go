@@ -48,14 +48,14 @@ func CompensateSurfaceCharges(m *nimble.Mesh) [3][][][]float32 {
 // H field of charge at location source, evaluated in location dest.
 func Hfield(charge float64, source, dest [3]float64) [3]float64 {
 	var R [3]float64
-	for i := range R {
-		R[i] = dest[i] - source[i]
-	}
+	R[0] = dest[0] - source[0]
+	R[1] = dest[1] - source[1]
+	R[2] = dest[2] - source[2]
 	r := math.Sqrt(R[0]*R[0] + R[1]*R[1] + R[2]*R[2])
-	r3pi4 := 4 * math.Pi * r * r * r
+	qr3pi4 := charge / ((4 * math.Pi) * r * r * r)
 	var h [3]float64
-	for i := range h {
-		h[i] = R[i] * charge / r3pi4
-	}
+	h[0] = R[0] * qr3pi4
+	h[1] = R[1] * qr3pi4
+	h[2] = R[2] * qr3pi4
 	return h
 }

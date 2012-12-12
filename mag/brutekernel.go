@@ -65,6 +65,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	pole := [3]float64{0, 0, 0} // position of point charge on the surface
 	points := 0
 	for s := 0; s < 3; s++ { // source index Ksdxyz
+		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 			xw := Wrap(x, size[X])
 			R[X] = float64(x) * cellsize[X]
@@ -75,7 +76,6 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					zw := Wrap(z, size[Z])
 					R[Z] = float64(z) * cellsize[Z]
 
-					u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
 					// choose number of integration points depending on how far we are from source.
 					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])

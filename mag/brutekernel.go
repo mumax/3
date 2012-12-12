@@ -25,7 +25,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
 	core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
 	core.Assert(accuracy > 0)
-	// TODO: handle those correctly:
+	// TODO: in case of PBC, this will not be met:
 	core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
 	if size[0] > 1 {
 		core.Assert(size[0]%2 == 0)
@@ -132,12 +132,6 @@ func BruteKernel(mesh *nimble.Mesh, accuracy int) [3][3][][][]float32 {
 	array[1][0] = array[0][1]
 	array[2][0] = array[0][2]
 	array[2][1] = array[1][2]
-	//	for i := 0; i < 3; i++ {
-	//		for j := 0; j < 3; j++ {
-	//			core.Log("K", i, j)
-	//			core.Printf("% 6f", array[i][j])
-	//		}
-	//	}
 	return array
 }
 

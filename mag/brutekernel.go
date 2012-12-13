@@ -64,6 +64,11 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		z2 *= (periodic[Z] + 1)
 	}
 
+	// smallest cell dimension is typical length scale
+	L := cellsize[X]
+	if cellsize[Y] < L{L = cellsize[Y]}
+	if cellsize[Z] < L{L = cellsize[Z]}
+
 	// Start brute integration
 	var (
 		R, R2  [3]float64 // field and source cell center positions
@@ -74,27 +79,31 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
-			xw := Wrap(x, size[X])
+			xw := wrap(x, size[X])
 			R[X] = float64(x) * cellsize[X]
 
 			for y := y1; y <= y2; y++ {
-				yw := Wrap(y, size[Y])
+				yw := wrap(y, size[Y])
 				R[Y] = float64(y) * cellsize[Y]
 
 				for z := z1; z <= z2; z++ {
-					zw := Wrap(z, size[Z])
+					zw := wrap(z, size[Z])
 					R[Z] = float64(z) * cellsize[Z]
 
 					// choose number of integration points depending on how far we are from source.
-					r := math.Sqrt(R[X]*R[X] + R[Y]*R[Y] + R[Z]*R[Z])
-					nv := int(accuracy*cellsize[v]/(0.5*cellsize[u]+r)) + 1
-					nw := int(accuracy*cellsize[w]/(0.5*cellsize[u]+r)) + 1
+					dx, dy, dz := delta(x) * cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
+					d := math.Sqrt(dx*dx+dy*dy+dz*dz)
+					if d == 0 {d = L}
+					maxSize := d / accuracy // maximum acceptable integration size
+					nv := int(math.Max(cellsize[v] / maxSize, 1) + 0.5)
+					nw := int(math.Max(cellsize[w] / maxSize, 1) + 0.5)
+					core.Assert(nv > 0 && nw > 0)
+
 					scale := 1 / float64(nv*nw)
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
 					charge := surface * scale
-
-					pu1 := cellsize[u] / 2. // positive pole
-					pu2 := -pu1             // negative pole
+					pu1 := cellsize[u] / 2. // positive pole center
+					pu2 := -pu1             // negative pole center
 
 					var B [3]float64 // accumulates during surface integral
 					for i := 0; i < nv; i++ {
@@ -150,8 +159,20 @@ const (
 	Z = 2
 )
 
+// closest distance between cells, given center distance d.
+// if cells touch by just even a corner, the distance is zero.
+func delta(d int) float64{
+	if d < 0{
+		d = -d
+	}
+	if d > 0{
+		d -= 1
+	}
+	return float64(d)
+}
+
 // Wraps an index to [0, max] by adding/subtracting a multiple of max.
-func Wrap(number, max int) int {
+func wrap(number, max int) int {
 	for number < 0 {
 		number += max
 	}

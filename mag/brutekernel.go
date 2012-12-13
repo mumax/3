@@ -117,7 +117,8 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					pu1 := cellsize[u] / 2. // positive pole center
 					pu2 := -pu1             // negative pole center
 
-					var B [3]float64 // accumulates during surface integral
+					// Do surface integral over source cell, accumulate  in B
+					var B [3]float64
 					for i := 0; i < nv; i++ {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
 						pole[v] = pv
@@ -126,12 +127,18 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
 							pole[w] = pw
 
+							// Do volume integral over destination cell
 							for α := 0; α < nx; α++ {
+								rx := R[X] - cellsize[X]/2 + cellsize[X]/float64(2*nx) + (cellsize[X]/float64(nx))*float64(α)
+
 								for β := 0; β < ny; β++ {
+									ry := R[Y] - cellsize[Y]/2 + cellsize[Y]/float64(2*ny) + (cellsize[Y]/float64(ny))*float64(β)
+
 									for γ := 0; γ < nz; γ++ {
+										rz := R[Z] - cellsize[Z]/2 + cellsize[Z]/float64(2*nz) + (cellsize[Z]/float64(nz))*float64(γ)
 
 										pole[u] = pu1
-										R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
+										R2[X], R2[Y], R2[Z] = rx-pole[X], ry-pole[Y], rz-pole[Z]
 										r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
 										qr := charge / (4 * math.Pi * r * r * r)
 										bx := R2[X] * qr
@@ -139,7 +146,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 										bz := R2[Z] * qr
 
 										pole[u] = pu2
-										R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
+										R2[X], R2[Y], R2[Z] = rx-pole[X], ry-pole[Y], rz-pole[Z]
 										r = math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
 										qr = -charge / (4 * math.Pi * r * r * r)
 										B[X] += (bx + R2[X]*qr) // addition ordered for accuracy

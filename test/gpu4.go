@@ -63,7 +63,7 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want := [3]float32{0, 0.12572803,0.96669436}
+	want := [3]float32{0, 0.12572803, 0.96669436}
 	err := math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-3 {
@@ -85,7 +85,7 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want = [3]float32{ 0.04261171,0.13007264, -0.98427916}
+	want = [3]float32{0.04261171, 0.13007264, -0.98427916}
 	err = math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-2 {

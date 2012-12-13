@@ -1,13 +1,13 @@
 package main
 
 import (
+	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/gpu"
 	"code.google.com/p/mx3/mag"
-	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
 	"fmt"
-	"os"
 	"math"
+	"os"
 )
 
 // Precision test for the kernel
@@ -41,11 +41,10 @@ func main() {
 	if math.Abs(probe-want) > 0.01 {
 		fmt.Println("FAIL")
 		os.Exit(2)
-	}else{
+	} else {
 		fmt.Println("OK")
 	}
 }
-
 
 func host(s []nimble.Slice) [][]float32 {
 	h := make([][]float32, len(s))
@@ -54,4 +53,3 @@ func host(s []nimble.Slice) [][]float32 {
 	}
 	return h
 }
-

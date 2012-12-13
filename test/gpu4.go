@@ -37,7 +37,7 @@ func main() {
 	M[1].Memset(float32(1 / math.Sqrt(3)))
 	M[2].Memset(float32(1 / math.Sqrt(3)))
 
-	acc := 4.
+	acc := 6.
 	kernel := mag.BruteKernel(mesh, acc)
 	B := gpu.NewConvolution("B", "T", mesh, mem, kernel, m).Output()
 	Bex := gpu.NewExchange6("Bex", m, Aex_red).Output()
@@ -64,6 +64,7 @@ func main() {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
 	want := [3]float32{0, 0.12572803, 0.96669436}
+
 	err := math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-3 {
@@ -85,7 +86,7 @@ func main() {
 	for i := range avg {
 		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
 	}
-	want = [3]float32{0.04261171, 0.13007264, -0.98427916}
+	want = [3]float32{0.04370473, 0.11871325, -0.98528093}
 	err = math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
 	fmt.Println("avg:", avg, "err:", err)
 	if err > 1e-2 {

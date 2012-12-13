@@ -43,7 +43,7 @@ func main() {
 	out1 := core.Reshape(output[1], mesh.Size())
 	out2 := core.Reshape(output[2], mesh.Size())
 	X, Y, Z := N0/2, N1/2, N2/2
-	if out0[X][Y][Z] != -0.9222504 || out1[X][Y][Z] > 0.001 || out2[X][Y][Z] > 0.001 {
+	if out0[X][Y][Z] < -0.95 || out0[X][Y][Z] > -0.90 || out1[X][Y][Z] > 0.001 || out2[X][Y][Z] > 0.001 {
 		fmt.Println("failed, got:", out0[X][Y][Z], out1[X][Y][Z], out2[X][Y][Z])
 		os.Exit(2)
 	} else {

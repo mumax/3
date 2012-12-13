@@ -66,8 +66,12 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 
 	// smallest cell dimension is typical length scale
 	L := cellsize[X]
-	if cellsize[Y] < L{L = cellsize[Y]}
-	if cellsize[Z] < L{L = cellsize[Z]}
+	if cellsize[Y] < L {
+		L = cellsize[Y]
+	}
+	if cellsize[Z] < L {
+		L = cellsize[Z]
+	}
 
 	// Start brute integration
 	var (
@@ -91,12 +95,14 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					R[Z] = float64(z) * cellsize[Z]
 
 					// choose number of integration points depending on how far we are from source.
-					dx, dy, dz := delta(x) * cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
-					d := math.Sqrt(dx*dx+dy*dy+dz*dz)
-					if d == 0 {d = L}
+					dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
+					d := math.Sqrt(dx*dx + dy*dy + dz*dz)
+					if d == 0 {
+						d = L
+					}
 					maxSize := d / accuracy // maximum acceptable integration size
-					nv := int(math.Max(cellsize[v] / maxSize, 1) + 0.5)
-					nw := int(math.Max(cellsize[w] / maxSize, 1) + 0.5)
+					nv := int(math.Max(cellsize[v]/maxSize, 1) + 0.5)
+					nw := int(math.Max(cellsize[w]/maxSize, 1) + 0.5)
 					core.Assert(nv > 0 && nw > 0)
 
 					scale := 1 / float64(nv*nw)
@@ -161,11 +167,11 @@ const (
 
 // closest distance between cells, given center distance d.
 // if cells touch by just even a corner, the distance is zero.
-func delta(d int) float64{
-	if d < 0{
+func delta(d int) float64 {
+	if d < 0 {
 		d = -d
 	}
-	if d > 0{
+	if d > 0 {
 		d -= 1
 	}
 	return float64(d)

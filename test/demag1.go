@@ -38,7 +38,7 @@ func main() {
 	outputc := B.NewReader()
 	nimble.RunStack()
 	output := host(outputc.ReadNext(mesh.NCell()))
-	if output[0][probe] != -0.97740304 || output[1][probe] != 0 || output[2][probe] != 0 {
+	if output[0][probe] > -0.97 || output[0][probe] < -0.99 || output[1][probe] != 0 || output[2][probe] != 0 {
 		fmt.Println("failed, got:", output[0][probe])
 		os.Exit(2)
 	} else {

@@ -38,7 +38,7 @@ var starttime time.Time
 func Init() {
 	flag.Parse()
 	if *Flag_version {
-		fmt.Print("Nimble Cube 0.", core.BUILD_COMMIT, " alpha ", core.BUILD_DATE, " ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
+		fmt.Print("Mumax Cubed 0.0 alpha ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
 	}
 
 	initOD()

@@ -10,11 +10,11 @@ import (
 	"os"
 )
 
-// Precision test for the kernel
+// Precision test for the kernel: thin film.
 func main() {
 	nimble.Init()
 	defer nimble.Cleanup()
-	nimble.SetOD("kernel.out")
+	nimble.SetOD("kernel-film.out")
 
 	Y, X := core.IntArg(0), core.IntArg(1)
 	y, x := float64(Y), float64(X)

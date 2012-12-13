@@ -20,7 +20,7 @@ func main() {
 	fmt.Println("mesh:", mesh)
 
 	for acc := 1; acc < 10; acc++ {
-		kernel := mag.BruteKernel(mesh, float64(acc))
-		fmt.Println(acc, kernel[0][0][0][0][0], kernel[1][0][0][0][0])
+		mag.BruteKernel(mesh, float64(acc))
+		//fmt.Println(acc, kernel[0][0][0][0][0], kernel[1][0][0][0][0])
 	}
 }

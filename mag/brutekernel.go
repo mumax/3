@@ -111,11 +111,9 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					nz := int(math.Max(cellsize[Z]/maxSize, 1) + 0.5)
 					// Stagger source and destination grids.
 					// Massively improves accuracy. Could play with variations.
-					nv = ((nv + 1) / 2) * 2
-					nw = ((nw + 1) / 2) * 2
-					nx = ((nx+1)/2)*2 - 1
-					ny = ((ny+1)/2)*2 - 1
-					nz = ((nz+1)/2)*2 - 1
+					// See note.
+					nv *= 2
+					nw *= 2
 
 					core.Assert(nv > 0 && nw > 0 && nx > 0 && ny > 0 && nz > 0)
 
@@ -131,7 +129,6 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
 						pole[v] = pv
 						for j := 0; j < nw; j++ {
-							points++
 							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
 							pole[w] = pw
 
@@ -144,6 +141,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 
 									for γ := 0; γ < nz; γ++ {
 										rz := R[Z] - cellsize[Z]/2 + cellsize[Z]/float64(2*nz) + (cellsize[Z]/float64(nz))*float64(γ)
+										points++
 
 										pole[u] = pu1
 										R2[X], R2[Y], R2[Z] = rx-pole[X], ry-pole[Y], rz-pole[Z]
@@ -175,6 +173,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		}
 	}
 	core.Log("kernel used", points, "integration points")
+	//fmt.Println(accuracy, points, array[0][0][0][0][0] +1./3.) // debug
 	// for 2D these elements are zero:
 	if size[0] == 1 {
 		array[0][1] = nil
@@ -229,3 +228,57 @@ func padSize(size, periodic [3]int) [3]int {
 
 // "If brute force doesn't solve your problem,
 // you're not using enough of it."
+
+/*
+	Note: error for cubic self-kernel for different stagger decissions:
+
+       1 ++--+----+-++---+----+--++---+----+-++---+----+--++---+----+-++--++
+         +           +            +           +            +           +   +
+         |                                                                 |
+         +                 A                                               +
+     0.1 ++                           A      A                            ++
+         +                                         A    A   A   A          +
+         +                       C                                 A  A  A +
+    0.01 ++    B               D          E      C                        ++
+ e       +                               B      D     E    C               +
+ r       |                        F                  B    D   BE  C        |
+ r       +                                   F                   D  BE DC B+
+ o 0.001 ++                                                               ++
+ r       +                                           F                     +
+         +                                                 F               +
+  0.0001 ++                                                             F +F
+         +                                                          F      +
+         |                                                      F          |
+         +           +            +           +            +           +   +
+   1e-05 ++--+----+-++---+----+--++---+----+-++---+----+--++---+----+-++--++
+        100         1000        10000       100000       1e+06       1e+07
+                                  evaluation points
+A: no staggering
+
+B: 
+	nv = ((nv + 1) / 2) * 2
+	nw = ((nw + 1) / 2) * 2
+	nx = ((nx+1)/2)*2 - 1
+	ny = ((ny+1)/2)*2 - 1
+	nz = ((nz+1)/2)*2 - 1
+
+C:
+	nv = ((nv + 1) / 2) * 2
+	nw = ((nw + 1) / 2) * 2
+	nx = ((nx+1)/2)*2 + 1
+	ny = ((ny+1)/2)*2 + 1
+	nz = ((nz+1)/2)*2 + 1
+
+D: 
+	nv += 1 
+	nw += 1 
+
+E: 
+	nx += 1
+	ny += 1
+	nz += 1
+
+F: best with accuracy 6
+	nv *= 2
+	nw *= 2
+*/

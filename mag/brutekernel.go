@@ -109,6 +109,14 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					nx := int(math.Max(cellsize[X]/maxSize, 1) + 0.5)
 					ny := int(math.Max(cellsize[Y]/maxSize, 1) + 0.5)
 					nz := int(math.Max(cellsize[Z]/maxSize, 1) + 0.5)
+					// Stagger source and destination grids.
+					// Massively improves accuracy. Could play with variations.
+					nv = ((nv+1)/2)*2+1
+					nw = ((nw+1)/2)*2+1
+					nx = ((nx+1)/2)*2
+					ny = ((ny+1)/2)*2
+					nz = ((nz+1)/2)*2
+
 					core.Assert(nv > 0 && nw > 0 && nx > 0 && ny > 0 && nz > 0)
 
 					scale := 1 / float64(nv*nw*nx*ny*nz)

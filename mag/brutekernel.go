@@ -47,7 +47,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		}
 	}
 
-	// Field (destination) loop boundaries
+	// Field (destination) loop ranges
 	x1, x2 := -(size[X]-1)/2, size[X]/2-1
 	y1, y2 := -(size[Y]-1)/2, size[Y]/2-1
 	z1, z2 := -(size[Z]-1)/2, size[Z]/2-1
@@ -64,7 +64,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		z2 *= (periodic[Z] + 1)
 	}
 
-	// smallest cell dimension is typical length scale
+	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
 	if cellsize[Y] < L {
 		L = cellsize[Y]
@@ -74,6 +74,9 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	}
 
 	// Start brute integration
+	// 9 nested loops, does that stress you out?
+	// Fortunately, the 5 inner ones usually loop over just one element.
+	// It might be nice to get rid of that branching though.
 	var (
 		R, R2  [3]float64 // field and source cell center positions
 		pole   [3]float64 // position of point charge on the surface
@@ -103,9 +106,12 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					maxSize := d / accuracy // maximum acceptable integration size
 					nv := int(math.Max(cellsize[v]/maxSize, 1) + 0.5)
 					nw := int(math.Max(cellsize[w]/maxSize, 1) + 0.5)
-					core.Assert(nv > 0 && nw > 0)
+					nx := int(math.Max(cellsize[X]/maxSize, 1) + 0.5)
+					ny := int(math.Max(cellsize[Y]/maxSize, 1) + 0.5)
+					nz := int(math.Max(cellsize[Z]/maxSize, 1) + 0.5)
+					core.Assert(nv > 0 && nw > 0 && nx > 0 && ny > 0 && nz > 0)
 
-					scale := 1 / float64(nv*nw)
+					scale := 1 / float64(nv*nw*nx*ny*nz)
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
 					charge := surface * scale
 					pu1 := cellsize[u] / 2. // positive pole center
@@ -120,24 +126,31 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 							pw := -(cellsize[w] / 2.) + cellsize[w]/float64(2*nw) + float64(j)*(cellsize[w]/float64(nw))
 							pole[w] = pw
 
-							pole[u] = pu1
-							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
-							r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
-							qr := charge / (4 * math.Pi * r * r * r)
-							bx := R2[X] * qr
-							by := R2[Y] * qr
-							bz := R2[Z] * qr
+							for α := 0; α < nx; α++ {
+								for β := 0; β < ny; β++ {
+									for γ := 0; γ < nz; γ++ {
 
-							pole[u] = pu2
-							R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
-							r = math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
-							qr = -charge / (4 * math.Pi * r * r * r)
-							B[X] += (bx + R2[X]*qr) // addition ordered for accuracy
-							B[Y] += (by + R2[Y]*qr)
-							B[Z] += (bz + R2[Z]*qr)
+										pole[u] = pu1
+										R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
+										r := math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
+										qr := charge / (4 * math.Pi * r * r * r)
+										bx := R2[X] * qr
+										by := R2[Y] * qr
+										bz := R2[Z] * qr
+
+										pole[u] = pu2
+										R2[X], R2[Y], R2[Z] = R[X]-pole[X], R[Y]-pole[Y], R[Z]-pole[Z]
+										r = math.Sqrt(R2[X]*R2[X] + R2[Y]*R2[Y] + R2[Z]*R2[Z])
+										qr = -charge / (4 * math.Pi * r * r * r)
+										B[X] += (bx + R2[X]*qr) // addition ordered for accuracy
+										B[Y] += (by + R2[Y]*qr)
+										B[Z] += (bz + R2[Z]*qr)
+
+									}
+								}
+							}
 						}
 					}
-
 					for d := s; d < 3; d++ { // destination index Ksdxyz
 						// TODO: for PBC, need to add here
 						array[s][d][xw][yw][zw] = float32(B[d])

@@ -11,26 +11,35 @@ import (
 // cell center (not averaged).
 // Mesh should NOT yet be zero-padded.
 func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
-	pbc := mesh.PBC()
-	sz := padSize(mesh.Size(), pbc)
-	cs := mesh.CellSize()
-	mesh = nimble.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
 
+	{ // Kernel mesh is 2x larger than input, instead in case of PBC
+		pbc := mesh.PBC()
+		core.Assert(pbc == [3]int{0, 0, 0}) // PBC not supported yet
+		sz := padSize(mesh.Size(), pbc)
+		cs := mesh.CellSize()
+		mesh = nimble.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
+	}
+
+	// Shorthand
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
 	core.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
 
-	core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
-	core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-	core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
-	core.Assert(accuracy > 0)
-	// TODO: in case of PBC, this will not be met:
-	core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
-	if size[0] > 1 {
-		core.Assert(size[0]%2 == 0)
+	// Sanity check
+	{
+		core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
+		core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
+		core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
+		core.Assert(accuracy > 0)
+		// TODO: in case of PBC, this will not be met:
+		core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
+		if size[0] > 1 {
+			core.Assert(size[0]%2 == 0)
+		}
 	}
 
+	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
@@ -38,22 +47,19 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 		}
 	}
 
-	B := [3]float64{0, 0, 0}
-	R := [3]float64{0, 0, 0}
-
+	// Field (destination) loop boundaries
 	x1 := -(size[X] - 1) / 2
 	x2 := size[X]/2 - 1
 	// support for 2D simulations (thickness 1)
 	if size[X] == 1 && periodic[X] == 0 {
 		x2 = 0
 	}
-
 	y1 := -(size[Y] - 1) / 2
 	y2 := size[Y]/2 - 1
-
 	z1 := -(size[Z] - 1) / 2
 	z2 := size[Z]/2 - 1
 
+	// Repeat for PBC:
 	x1 *= (periodic[X] + 1)
 	x2 *= (periodic[X] + 1)
 	y1 *= (periodic[Y] + 1)
@@ -61,9 +67,12 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	z1 *= (periodic[Z] + 1)
 	z2 *= (periodic[Z] + 1)
 
-	R2 := [3]float64{0, 0, 0}
-	pole := [3]float64{0, 0, 0} // position of point charge on the surface
-	points := 0
+	var (
+		R, R2  [3]float64 // field and source cell center positions
+		pole   [3]float64 // position of point charge on the surface
+		points int        // counts used integration points
+	)
+
 	for s := 0; s < 3; s++ { // source index Ksdxyz
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 		for x := x1; x <= x2; x++ {    // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
@@ -87,7 +96,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					pu1 := cellsize[u] / 2. // positive pole
 					pu2 := -pu1             // negative pole
 
-					B[X], B[Y], B[Z] = 0, 0, 0 // accumulates during surface integral
+					var B [3]float64 // accumulates during surface integral
 					for i := 0; i < nv; i++ {
 						pv := -(cellsize[v] / 2.) + cellsize[v]/float64(2*nv) + float64(i)*(cellsize[v]/float64(nv))
 						pole[v] = pv
@@ -162,3 +171,6 @@ func padSize(size, periodic [3]int) [3]int {
 	}
 	return size
 }
+
+// "If brute force doesn't solve your problem,
+// you're not using enough of it."

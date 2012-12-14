@@ -7,8 +7,7 @@ import (
 )
 
 // Calculates the magnetostatic kernel by brute-force integration
-// of magnetic charges over the faces. Fields are evaluated at the
-// cell center (not averaged).
+// of magnetic charges over the faces and averages over cell volumes.
 // Mesh should NOT yet be zero-padded.
 func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 

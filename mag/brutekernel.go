@@ -230,7 +230,7 @@ func padSize(size, periodic [3]int) [3]int {
 // you're not using enough of it."
 
 /*
-	Note: error for cubic self-kernel for different stagger decissions:
+	Note: error for cubic self-kernel for different stagger decisions:
 
        1 ++--+----+-++---+----+--++---+----+-++---+----+--++---+----+-++--++
          +           +            +           +            +           +   +

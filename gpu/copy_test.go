@@ -18,7 +18,6 @@ func TestCopy(t *testing.T) {
 	down := NewDownloader("c", "", up.Output())
 	c := down.Output()
 
-
 	go func() {
 		for f := 0; f < F; f++ {
 			gpu := a.WriteNext(N).Host()

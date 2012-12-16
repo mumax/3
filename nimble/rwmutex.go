@@ -39,15 +39,13 @@ type rwMutex struct {
 	absA, absB int64      // half-open interval locked for writing, moves indefinitely upwards.
 	n          int        // Total number of elements in protected array.
 	readers    []*rMutex  // all readers who can access this rwmutex
-	tag        string     // tag for profiling
 }
 
 // RWMutex to protect an array of length N.
-func newRWMutex(N int, tag string) *rwMutex {
+func newRWMutex(N int) *rwMutex {
 	m := new(rwMutex)
 	m.n = N
 	m.cond = *(sync.NewCond(&m.state))
-	m.tag = tag
 	return m
 }
 

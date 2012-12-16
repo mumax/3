@@ -22,7 +22,7 @@ func NewUploader(tag, unit string, hostdata_ nimble.Chan1) *Uploader {
 	return u
 }
 
-func(u*Uploader)Output()nimble.Chan1{
+func (u *Uploader) Output() nimble.Chan1 {
 	return u.dev
 }
 

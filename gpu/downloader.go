@@ -15,14 +15,14 @@ type Downloader struct {
 
 func NewDownloader(tag, unit string, devdata_ nimble.Chan1) *Downloader {
 	devdata := devdata_.NewReader()
-	hostdata := nimble.MakeChan1(tag, unit, devdata.Mesh, nimble.CPUMemory , devdata_.NBufferedBlocks())
+	hostdata := nimble.MakeChan1(tag, unit, devdata.Mesh, nimble.CPUMemory, devdata_.NBufferedBlocks())
 	MemHostRegister(hostdata.UnsafeData().Host())
 	u := &Downloader{hostdata, devdata, cu.StreamCreate()}
 	nimble.Stack(u)
 	return u
 }
 
-func(u*Downloader)Output()nimble.Chan1{
+func (u *Downloader) Output() nimble.Chan1 {
 	return u.host
 }
 
@@ -51,8 +51,6 @@ func (u *Downloader) Run() {
 //	}
 //	return output
 //}
-
-
 
 //import (
 //	"code.google.com/p/nimble-cube/core"

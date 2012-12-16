@@ -15,7 +15,7 @@ type RChan1 struct {
 }
 
 func (c Chan1) NewReader() RChan1 {
-	return RChan1{c.Info, c.slice, c.mutex.MakeRMutex()}
+	return RChan1{c.Info, c.buffer, c.mutex.MakeRMutex()}
 }
 
 func (c RChan1) UnsafeData() Slice {

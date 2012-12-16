@@ -35,13 +35,13 @@ func (c ChanN) NComp() int           { return len(c.comp) }
 func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
 func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
 func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
-func (c ChanN) MemType() MemType     { return c.comp[0].slice.MemType }
+func (c ChanN) MemType() MemType     { return c.comp[0].buffer.MemType }
 func (c ChanN) ChanN() ChanN         { return c } // implements Chan iface
 
 func (c ChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())
 	for i := range s {
-		s[i] = c.comp[i].slice
+		s[i] = c.comp[i].buffer
 	}
 	return s
 }
@@ -65,7 +65,7 @@ func (c ChanN) WriteNext(n int) []Slice {
 	for i := range c.comp {
 		c.comp[i].WriteNext(n)
 		a, b := c.comp[i].mutex.WRange()
-		next[i] = c.comp[i].slice.Slice(a, b)
+		next[i] = c.comp[i].buffer.Slice(a, b)
 	}
 	return next
 }

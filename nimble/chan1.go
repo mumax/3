@@ -7,8 +7,8 @@ import (
 // Chan1 is a Chan that passes 1-component float32 data.
 type Chan1 struct {
 	*Info
-	slice Slice // TODO: rename buffer
-	mutex *rwMutex
+	buffer Slice // TODO: rename buffer
+	mutex  *rwMutex
 }
 
 // TODO: Idea: tag, unit are *string, optional and defaulted to unique value
@@ -24,13 +24,13 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 }
 
 func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
-func (c Chan1) MemType() MemType { return c.slice.MemType }
+func (c Chan1) MemType() MemType { return c.buffer.MemType }
 
 func (c Chan1) UnsafeData() Slice {
 	if c.mutex.isLocked() {
 		panic("unsafearray: mutex is locked")
 	}
-	return c.slice
+	return c.buffer
 }
 
 func (c Chan1) UnsafeArray() [][][]float32 {
@@ -54,7 +54,7 @@ func (c Chan1) WriteDone() {
 func (c Chan1) WriteNext(n int) Slice {
 	c.mutex.WriteNext(n)
 	a, b := c.mutex.WRange()
-	return c.slice.Slice(a, b)
+	return c.buffer.Slice(a, b)
 }
 
 // NComp returns the number of components (1: scalar, 3: vector, ...)
@@ -62,9 +62,9 @@ func (c Chan1) NComp() int { return 1 }
 
 // BufLen returns the largest buffer size n that can be obained
 // with ReadNext/WriteNext.
-func (c Chan1) BufLen() int { return c.slice.Len() }
+func (c Chan1) BufLen() int { return c.buffer.Len() }
 
-func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.slice.Len()) }
+func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.buffer.Len()) }
 
 //func (c *Chan1) WriteDelta(Δstart, Δstop int) []float32 {
 //	c.mutex.WriteDelta(Δstart, Δstop)

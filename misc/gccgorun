@@ -1,0 +1,4 @@
+#! /bin/bash
+# Wrapper for "go run" using gccgo compiler with flags for speed.
+echo go run -compiler=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native' $@
+go run -compiler=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native' $@

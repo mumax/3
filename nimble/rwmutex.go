@@ -16,22 +16,8 @@ import (
 // one writer and many readers.
 // RWMutex makes sure the readers receive all data
 // exactly once and in the correct order.
-// The functionality is like a Go channel, but
-// without copying the data.
-//
-// When reading and writing channels, the convention is
-// to first obtain the read lock, then the write lock. E.g.:
-// 	input1.ReadNext(n)
-// 	input2.ReadNext(n)
-// 	output.WriteNext(n)
-// 	...
-// 	output.WriteDone()
-// 	input1.ReadDone()
-// 	input2.ReadDone()
-//
 // Note that it is safe for the writer to also read
 // the data (when he holds the write lock).
-//
 // TODO: add Close() that Goexits all waiting threads.
 type rwMutex struct {
 	cond       sync.Cond  // wait condition: read/write is safe
@@ -50,17 +36,15 @@ func newRWMutex(N int) *rwMutex {
 }
 
 // Move the locked window
-func (m *rwMutex) WriteDelta(Δstart, Δstop int) {
+func (m *rwMutex) delta(Δstart, Δstop int) {
 	m.cond.L.Lock()
-
-	m.delta(Δstart, Δstop)
-
+	m._delta(Δstart, Δstop)
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
 
 // unsynchronized Delta
-func (m *rwMutex) delta(Δstart, Δstop int) {
+func (m *rwMutex) _delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
 	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
@@ -71,40 +55,35 @@ func (m *rwMutex) delta(Δstart, Δstop int) {
 	}
 	m.absA += Δa
 	m.absB += Δb
-	//profWriteDelta(m.tag, int(m.absB-m.absA))
 }
 
-// Lock the next delta elements for writing.
-func (m *rwMutex) WriteNext(delta int) {
+// Lock the next delta elements.
+func (m *rwMutex) next(delta int) {
 	m.cond.L.Lock()
-
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
 	}
-	m.delta(0, delta)
-
+	m._delta(0, delta)
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
 
 // Unlock the previous interval locked for writing.
-func (m *rwMutex) WriteDone() {
+func (m *rwMutex) done() {
 	m.cond.L.Lock()
-
 	if m.absA == m.absB {
 		panic("rwmutex: unlock of unlocked mutex")
 	}
 	rnge := int(m.absB - m.absA)
-	m.delta(rnge, 0)
-
+	m._delta(rnge, 0)
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
 
-// WRange returns the currently write-locked range.
-// It is not thread-safe because the RWMutex is only
+// Returns the currently locked range.
+// It is not thread-safe because the rwmutex is only
 // supposed to be accessed by one writer thread.
-func (m *rwMutex) WRange() (start, stop int) {
+func (m *rwMutex) lockedRange() (start, stop int) {
 	return int(m.absA % int64(m.n)), int((m.absB-1)%int64(m.n)) + 1
 }
 

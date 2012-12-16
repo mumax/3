@@ -22,8 +22,8 @@ func (c RChanN) MemType() MemType  { return c[0].buffer.MemType }
 func (c RChanN) ReadNext(n int) []Slice {
 	next := make([]Slice, c.NComp())
 	for i := range c {
-		c[i].mutex.ReadNext(n)
-		a, b := c[i].mutex.RRange()
+		c[i].next(n)
+		a, b := c[i].lockedRange()
 		next[i] = c[i].buffer.Slice(a, b)
 	}
 	return next

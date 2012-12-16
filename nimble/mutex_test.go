@@ -29,10 +29,10 @@ func write(m *rwMutex, a []int, N, frames int) {
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j++ {
-			m.WriteNext(1)
+			m.next(1) // write
 			//fmt.Printf("W % 3d % 3d: %d\n", prev, j, count)
 			a[prev] = count
-			m.WriteDone()
+			m.done() // write
 			count++
 			prev = j
 			if rand.Float32() > P {
@@ -50,12 +50,12 @@ func read(m *rMutex, a []int, N, frames int, t *testing.T) {
 	for i := 0; i < frames; i++ {
 		prev := 0
 		for j := 1; j <= N; j += 1 {
-			m.ReadNext(1)
+			m.next(1) // read
 			//fmt.Printf("                   R % 3d % 3d: %d\n", prev, j, a[prev])
 			if count != a[prev] {
 				t.Error("got", a[prev], "expected", count)
 			}
-			m.ReadDone()
+			m.done() // read
 			count++
 			prev = j
 			if rand.Float32() > P {

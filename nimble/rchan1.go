@@ -9,17 +9,17 @@ import (
 
 // Read-only Chan.
 type RChan1 struct {
-	*Info
+	Info
 	buffer Slice
-	mutex  *rMutex
+	*rMutex
 }
 
 func (c Chan1) NewReader() RChan1 {
-	return RChan1{c.Info, c.buffer, c.mutex.MakeRMutex()}
+	return RChan1{c.Info, c.buffer, c.mutex.(*rwMutex).MakeRMutex()}
 }
 
 func (c RChan1) UnsafeData() Slice {
-	if c.mutex.rw.isLocked() {
+	if c.rw.isLocked() {
 		panic("unsafearray: mutex is locked")
 	}
 	return c.buffer
@@ -33,15 +33,15 @@ func (c RChan1) UnsafeArray() [][][]float32 {
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.
 func (c RChan1) ReadNext(n int) Slice {
-	c.mutex.ReadNext(n)
-	a, b := c.mutex.RRange()
+	c.next(n)
+	a, b := c.lockedRange()
 	return c.buffer.Slice(a, b)
 }
 
 // ReadDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
 func (c RChan1) ReadDone() {
-	c.mutex.ReadDone()
+	c.done()
 }
 
 //func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {

@@ -7,8 +7,8 @@ type Info struct {
 	*Mesh
 }
 
-func newInfo(tag, unit string, m *Mesh) *Info {
-	return &Info{tag, unit, m}
+func newInfo(tag, unit string, m *Mesh) Info {
+	return Info{tag, unit, m}
 }
 
 func (i *Info) Tag() string  { return i.tag }

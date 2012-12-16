@@ -6,12 +6,9 @@ import (
 
 // WChan1
 
-
 // Chan1 is a Chan that passes 1-component float32 data.
 type Chan1 struct {
-	*Info
-	buffer Slice // TODO: rename buffer
-	mutex  *rwMutex
+	*chan1
 }
 
 // TODO: Idea: tag, unit are *string, optional and defaulted to unique value
@@ -23,7 +20,7 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
-	return asChan1(MakeSlice(N, memType), tag, unit, m)
+	return Chan1{aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))}
 }
 
 func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
@@ -40,23 +37,14 @@ func (c Chan1) UnsafeArray() [][][]float32 {
 	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
 }
 
-func asChan1(buffer Slice, tag, unit string, m *Mesh) Chan1 {
-	core.AddQuant(tag)
-	info := newInfo(tag, unit, m)
-	return Chan1{info, buffer, newRWMutex(buffer.Len())}
-}
-
-// WriteDone() signals a slice obtained by WriteNext() is fully
-// written and can be sent down the Chan.
-func (c Chan1) WriteDone() {
-	c.mutex.WriteDone()
-}
+// WriteDone() signals a slice obtained by WriteNext() is done written.
+func (c Chan1) WriteDone() { c.done() }
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().
 func (c Chan1) WriteNext(n int) Slice {
-	c.mutex.WriteNext(n)
-	a, b := c.mutex.WRange()
+	c.next(n)
+	a, b := c.lockedRange()
 	return c.buffer.Slice(a, b)
 }
 
@@ -74,9 +62,3 @@ func (c Chan1) NBufferedBlocks() int { return idiv(c.NCell(), c.buffer.Len()) }
 //	a, b := c.mutex.WRange()
 //	return c.slice.list[a:b]
 //}
-
-// safe integer division.
-func idiv(a, b int) int {
-	core.Assert(a%b == 0)
-	return a / b
-}

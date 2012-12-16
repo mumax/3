@@ -22,7 +22,7 @@ func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
 	nComp := len(buffer)
 	c := make([]Chan1, nComp)
 	for i := range c {
-		c[i] = asChan1(buffer[i], tag, unit, m)
+		c[i] = Chan1{aschan1(buffer[i], tag, unit, m, newRWMutex(buffer[i].Len()))}
 	}
 	return ChanN{c}
 }
@@ -64,7 +64,7 @@ func (c ChanN) WriteNext(n int) []Slice {
 	next := make([]Slice, c.NComp())
 	for i := range c.comp {
 		c.comp[i].WriteNext(n)
-		a, b := c.comp[i].mutex.WRange()
+		a, b := c.comp[i].lockedRange()
 		next[i] = c.comp[i].buffer.Slice(a, b)
 	}
 	return next

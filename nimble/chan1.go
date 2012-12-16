@@ -4,6 +4,9 @@ import (
 	"code.google.com/p/mx3/core"
 )
 
+// WChan1
+
+
 // Chan1 is a Chan that passes 1-component float32 data.
 type Chan1 struct {
 	*Info

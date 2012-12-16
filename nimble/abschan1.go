@@ -29,21 +29,22 @@ func aschan1(buffer Slice, tag, unit string, mesh *Mesh, lock mutex) *chan1 {
 func (c chan1) MemType() MemType { return c.buffer.MemType }
 
 func (c chan1) UnsafeData() Slice {
-	if c.mutex.isLocked() {
-		panic("unsafearray: mutex is locked")
+	if c.isLocked() {
+		panic("unsafedata: mutex is locked")
 	}
 	return c.buffer
 }
 
 func (c chan1) UnsafeArray() [][][]float32 {
+	if c.isLocked() {
+		panic("unsafearray: mutex is locked")
+	}
 	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c chan1) WriteDone() {
-	c.mutex.done()
-}
+func (c chan1) WriteDone() { c.mutex.done() }
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().

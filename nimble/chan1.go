@@ -1,9 +1,5 @@
 package nimble
 
-import (
-	"code.google.com/p/mx3/core"
-)
-
 // WChan1
 
 // Chan1 is a Chan that passes 1-component float32 data.
@@ -24,18 +20,6 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 }
 
 func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
-func (c Chan1) MemType() MemType { return c.buffer.MemType }
-
-func (c Chan1) UnsafeData() Slice {
-	if c.mutex.isLocked() {
-		panic("unsafearray: mutex is locked")
-	}
-	return c.buffer
-}
-
-func (c Chan1) UnsafeArray() [][][]float32 {
-	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
-}
 
 // WriteDone() signals a slice obtained by WriteNext() is done written.
 func (c Chan1) WriteDone() { c.done() }

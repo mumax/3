@@ -13,7 +13,7 @@ func (c RChanN) Unit() string      { return c[0].Unit() }
 func (c RChanN) Tag() string       { return c[0].Tag() }
 func (c RChanN) NComp() int        { return len(c) }
 func (c RChanN) Comp(i int) RChan1 { return c[i] }
-func (c RChanN) MemType() MemType  { return c[0].slice.MemType }
+func (c RChanN) MemType() MemType  { return c[0].buffer.MemType }
 
 // ReadNext locks and returns a slice of length n for
 // reading the next n elements from the Chan.
@@ -24,7 +24,7 @@ func (c RChanN) ReadNext(n int) []Slice {
 	for i := range c {
 		c[i].mutex.ReadNext(n)
 		a, b := c[i].mutex.RRange()
-		next[i] = c[i].slice.Slice(a, b)
+		next[i] = c[i].buffer.Slice(a, b)
 	}
 	return next
 }
@@ -40,7 +40,7 @@ func (c RChanN) ReadDone() {
 func (c RChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())
 	for i := range s {
-		s[i] = c[i].slice
+		s[i] = c[i].buffer
 	}
 	return s
 }

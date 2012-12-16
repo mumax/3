@@ -10,8 +10,8 @@ import (
 // Read-only Chan.
 type RChan1 struct {
 	*Info
-	slice Slice // TODO: rename buffer
-	mutex *rMutex
+	buffer Slice
+	mutex  *rMutex
 }
 
 func (c Chan1) NewReader() RChan1 {
@@ -22,7 +22,7 @@ func (c RChan1) UnsafeData() Slice {
 	if c.mutex.rw.isLocked() {
 		panic("unsafearray: mutex is locked")
 	}
-	return c.slice
+	return c.buffer
 }
 func (c RChan1) UnsafeArray() [][][]float32 {
 	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
@@ -35,7 +35,7 @@ func (c RChan1) UnsafeArray() [][][]float32 {
 func (c RChan1) ReadNext(n int) Slice {
 	c.mutex.ReadNext(n)
 	a, b := c.mutex.RRange()
-	return c.slice.Slice(a, b)
+	return c.buffer.Slice(a, b)
 }
 
 // ReadDone() signals a slice obtained by WriteNext() is fully

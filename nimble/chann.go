@@ -6,7 +6,7 @@ import (
 
 // ChanN is a Chan that passes N-component data.
 type ChanN struct {
-	comp []Chan1
+	comp    []Chan1
 	bufnext []Slice
 }
 
@@ -62,7 +62,7 @@ func (c ChanN) Chan1() Chan1 {
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
 func (c ChanN) WriteNext(n int) []Slice {
-	next := make([]Slice, c.NComp())
+	next := c.bufnext
 	for i := range c.comp {
 		c.comp[i].WriteNext(n)
 		a, b := c.comp[i].lockedRange()

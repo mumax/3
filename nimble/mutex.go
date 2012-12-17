@@ -1,9 +1,8 @@
 package nimble
 
 type mutex interface {
-	next(delta int)
-	done()
+	lockNext(delta int) // TODO: return locked range
+	unlock()
 	lockedRange() (start, stop int)
 	isLocked() bool
-	//delta(Δstart, Δstop int)
 }

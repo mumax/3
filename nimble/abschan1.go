@@ -44,12 +44,12 @@ func (c chan1) UnsafeArray() [][][]float32 {
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c chan1) WriteDone() { c.mutex.done() }
+func (c chan1) WriteDone() { c.unlock() }
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().
 func (c chan1) WriteNext(n int) Slice {
-	c.mutex.next(n)
+	c.lockNext(n)
 	a, b := c.mutex.lockedRange()
 	return c.buffer.Slice(a, b)
 }

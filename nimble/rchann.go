@@ -22,7 +22,7 @@ func (c RChanN) MemType() MemType  { return c[0].buffer.MemType }
 func (c RChanN) ReadNext(n int) []Slice {
 	next := make([]Slice, c.NComp())
 	for i := range c {
-		c[i].next(n)
+		c[i].lockNext(n)
 		a, b := c[i].lockedRange()
 		next[i] = c[i].buffer.Slice(a, b)
 	}

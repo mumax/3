@@ -22,12 +22,12 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
 
 // WriteDone() signals a slice obtained by WriteNext() is done written.
-func (c Chan1) WriteDone() { c.done() }
+func (c Chan1) WriteDone() { c.unlock() }
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().
 func (c Chan1) WriteNext(n int) Slice {
-	c.next(n)
+	c.lockNext(n)
 	a, b := c.lockedRange()
 	return c.buffer.Slice(a, b)
 }

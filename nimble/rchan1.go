@@ -33,7 +33,7 @@ func (c RChan1) UnsafeArray() [][][]float32 {
 // When done, ReadDone() should be called .
 // After that, the slice is not valid any more.
 func (c RChan1) ReadNext(n int) Slice {
-	c.next(n)
+	c.lockNext(n)
 	a, b := c.lockedRange()
 	return c.buffer.Slice(a, b)
 }
@@ -41,7 +41,7 @@ func (c RChan1) ReadNext(n int) Slice {
 // ReadDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
 func (c RChan1) ReadDone() {
-	c.done()
+	c.unlock()
 }
 
 //func (c *RChan1) ReadDelta(Δstart, Δstop int) []float32 {

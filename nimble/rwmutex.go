@@ -58,7 +58,7 @@ func (m *rwMutex) _delta(Δstart, Δstop int) {
 }
 
 // Lock the next delta elements.
-func (m *rwMutex) next(delta int) {
+func (m *rwMutex) lockNext(delta int) {
 	m.cond.L.Lock()
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
@@ -69,7 +69,7 @@ func (m *rwMutex) next(delta int) {
 }
 
 // Unlock the previous interval locked for writing.
-func (m *rwMutex) done() {
+func (m *rwMutex) unlock() {
 	m.cond.L.Lock()
 	if m.absA == m.absB {
 		panic("rwmutex: unlock of unlocked mutex")

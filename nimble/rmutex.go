@@ -46,7 +46,7 @@ func (m *rMutex) delta(Δstart, Δstop int) {
 }
 
 // Lock the next delta elements for reading.
-func (m *rMutex) next(delta int) {
+func (m *rMutex) lockNext(delta int) {
 	m.rw.cond.L.Lock()
 	if m.absC != m.absD {
 		panic("rmutex: readnext w/o readdone")
@@ -57,7 +57,7 @@ func (m *rMutex) next(delta int) {
 }
 
 // Unlock the previous interval locked for reading.
-func (m *rMutex) done() {
+func (m *rMutex) unlock() {
 	m.rw.cond.L.Lock()
 	rnge := int(m.absD - m.absC)
 	m.delta(rnge, 0)

@@ -29,16 +29,14 @@ func aschan1(buffer Slice, tag, unit string, mesh *Mesh, lock mutex) *chan1 {
 func (c chan1) MemType() MemType { return c.buffer.MemType }
 
 func (c chan1) UnsafeData() Slice {
-	if c.isLocked() {
-		panic("unsafedata: mutex is locked")
-	}
+	// TODO: if solver does not unlock, this is useless
+	//if c.isLocked() {
+		//panic("unsafedata: mutex is locked")
+	//}
 	return c.buffer
 }
 
 func (c chan1) UnsafeArray() [][][]float32 {
-	if c.isLocked() {
-		panic("unsafearray: mutex is locked")
-	}
 	return core.Reshape(c.UnsafeData().Host(), c.Mesh.Size())
 }
 

@@ -44,7 +44,7 @@ func (c chan1) UnsafeArray() [][][]float32 {
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan.
-func (c chan1) WriteDone() { c.unlock() }
+//func (c chan1) done() { c.unlock() }
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().

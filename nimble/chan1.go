@@ -20,7 +20,7 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 }
 
 func (c Chan1) ChanN() ChanN {
-	return ChanN{[]Chan1{c}}
+	return ChanN{[]Chan1{c}, make([]Slice, 1)}
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is done written.

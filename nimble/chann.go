@@ -7,6 +7,7 @@ import (
 // ChanN is a Chan that passes N-component data.
 type ChanN struct {
 	comp []Chan1
+	bufnext []Slice
 }
 
 // TODO: re-use same *Info for all chan1's, tag for components?
@@ -15,7 +16,7 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 	for i := range c {
 		c[i] = MakeChan1(tag, unit, m, memType, bufBlocks)
 	}
-	return ChanN{c}
+	return ChanN{c, make([]Slice, nComp)}
 }
 
 func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
@@ -24,7 +25,7 @@ func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
 	for i := range c {
 		c[i] = Chan1{aschan1(buffer[i], tag, unit, m, newRWMutex(buffer[i].Len()))}
 	}
-	return ChanN{c}
+	return ChanN{c, make([]Slice, nComp)}
 }
 
 func (c ChanN) Mesh() *Mesh          { return c.comp[0].Mesh }

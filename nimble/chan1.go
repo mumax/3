@@ -19,7 +19,7 @@ func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 
 	return Chan1{aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))}
 }
 
-func (c Chan1) ChanN() ChanN     { return ChanN{[]Chan1{c}} }
+func (c Chan1) ChanN() ChanN { return ChanN{[]Chan1{c}} }
 
 // WriteDone() signals a slice obtained by WriteNext() is done written.
 func (c Chan1) WriteDone() { c.unlock() }

@@ -76,3 +76,7 @@ func (m *rMutex) lockedRange() (start, stop int) {
 func (r *rMutex) canRLock(c, d int64) (ok bool) {
 	return r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
 }
+
+func (m *rMutex) isLocked() bool {
+	return m.rw.isLocked()
+}

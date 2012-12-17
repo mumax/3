@@ -1,1 +1,2 @@
 test: do not fail uni tests if cc is too low.
+replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.

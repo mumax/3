@@ -23,6 +23,7 @@ var (
 	flag_gnuplotgzip = flag.Bool("gplotgzip", false, "Gzip'ed 'Gnuplot-compatible output")
 	flag_omf         = flag.String("omf", "", `"text" or "binary" OMF output`)
 	flag_vtk         = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
+	flag_dump         = flag.Bool("dump", false, `output in dump format`)
 	flag_min         = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max         = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize   = flag.Bool("normalize", false, `Normalize vector data to unit length`)
@@ -101,6 +102,11 @@ func process(f *dump.Frame, name string) {
 
 	if *flag_vtk != "" {
 		dumpVTK(noExt(name)+".vtk", f, *flag_vtk)
+		haveOutput = true
+	}
+
+	if *flag_dump  {
+		dumpDump(noExt(name)+".dump", f)
 		haveOutput = true
 	}
 

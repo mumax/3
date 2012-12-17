@@ -31,7 +31,7 @@ func (c chan1) MemType() MemType { return c.buffer.MemType }
 func (c chan1) UnsafeData() Slice {
 	// TODO: if solver does not unlock, this is useless
 	//if c.isLocked() {
-		//panic("unsafedata: mutex is locked")
+	//panic("unsafedata: mutex is locked")
 	//}
 	return c.buffer
 }

@@ -48,7 +48,7 @@ func (c chan1) UnsafeArray() [][][]float32 {
 
 // WriteNext returns a buffer Slice of length n to which data
 // can be written. Should be followed by ReadDone().
-func (c chan1) WriteNext(n int) Slice {
+func (c chan1) next(n int) Slice {
 	c.lockNext(n)
 	a, b := c.mutex.lockedRange()
 	return c.buffer.Slice(a, b)

@@ -42,7 +42,15 @@ func (c ChanN) ChanN() ChanN         { return c } // implements Chan iface
 func (c ChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())
 	for i := range s {
-		s[i] = c.comp[i].buffer
+		s[i] = c.comp[i].UnsafeData()
+	}
+	return s
+}
+
+func (c ChanN) UnsafeArray() [][][][]float32 {
+	s := make([][][][]float32, c.NComp())
+	for i := range s {
+		s[i] = c.comp[i].UnsafeArray()
 	}
 	return s
 }

@@ -1,2 +1,3 @@
 test: do not fail uni tests if cc is too low.
 replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.
+replace Slice by Frame, contains 3D size, ncomp, time stamp

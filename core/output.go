@@ -22,15 +22,14 @@ func SetOD(od string) {
 
 	// make output dir
 	wd, err := os.Getwd()
-	Fatal(err)
+	PanicErr(err) // todo: fatal
 	stat, err2 := os.Stat(wd)
-	Fatal(err2)
+	PanicErr(err2) // todo: fatal
 	LogErr(os.Mkdir(od, stat.Mode()))
 
 	f, err3 := os.Open(od)
 	Fatal(err3)
-	files, err4 := f.Readdir(1)
-	Fatal(err4)
+	files, _ := f.Readdir(1)
 	if len(files) != 0 {
 		Fatalf(od + " not empty")
 	}

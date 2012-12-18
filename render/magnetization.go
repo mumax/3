@@ -25,12 +25,21 @@ func (p *Poly) Render() {
 	}
 }
 
-func XFace(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+// top x face
+func X1Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 	return Poly{[4][3]float32{
 		{z - rz, y - ry, x + rx},
 		{z + rz, y - ry, x + rx},
 		{z + rz, y + ry, x + rx},
 		{z - rz, y + ry, x + rx}}, col}
+}
+
+func X2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+	return Poly{[4][3]float32{
+		{z - rz, y - ry, x - rx},
+		{z - rz, y + ry, x - rx},
+		{z + rz, y + ry, x - rx},
+		{z + rz, y - ry, x - rx}}, col}
 }
 
 func Load(fname string) *dump.Frame {
@@ -61,19 +70,23 @@ func PreRender(frame *dump.Frame) []Poly {
 	scale := 1 / maxworld
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
-	//M := frame.Vectors()
+	M := frame.Vectors()
 	for i := 0; i < N0; i++ {
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
 		for j := 0; j < N1; j++ {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
 			for k := 0; k < N2; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-				//mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
+				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
 
-				col := color.NRGBA{0, 0, 0, 255} //byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
+				col := color.NRGBA{byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
 				// to be replaced, of course, by neighbor test
 				if i == 0 {
-					p := XFace(x, y, z, rx, ry, rz, col)
+					p := X1Face(x, y, z, rx, ry, rz, col)
+					polys = append(polys, p)
+				}
+				if i == N0-1 {
+					p := X2Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
 

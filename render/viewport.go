@@ -36,7 +36,7 @@ func UpdateViewpos() {
 }
 
 const (
-	deltaMove = 0.1
+	deltaMove = 0.5
 	deltaLook = 0.01
 )
 
@@ -87,16 +87,16 @@ func InitInputHandlers() {
 		if ViewTheta < -PI {
 			ViewTheta = PI
 		}
-		log.Println("phi, theta:", ViewPhi, ViewTheta)
+		//log.Println("phi, theta:", ViewPhi, ViewTheta)
 	})
 
 	glfw.SetMouseButtonCallback(func(button, state int) {
-		log.Println("mousebutton:", button, state)
+		//log.Println("mousebutton:", button, state)
 		mouseButton[button] = state
 	})
 
 	glfw.SetMouseWheelCallback(func(delta int) {
-		log.Println("mousewheel:", delta)
+		//log.Println("mousewheel:", delta)
 		glfw.SetMouseWheel(0)
 	})
 

@@ -22,6 +22,8 @@ func main() {
 	defer nimble.Cleanup()
 	nimble.SetOD("demag2.out")
 
+	gpu.LockCudaThread()
+
 	N0, N1, N2 := 4, 32, 1024
 	cx, cy, cz := 3e-9, 3.125e-9, 3.125e-9
 	mesh := nimble.NewMesh(N0, N1, N2, cx, cy, cz)
@@ -30,7 +32,7 @@ func main() {
 	mbox := gpu.NewConst("m", "", mesh, nimble.UnifiedMemory, []float64{1, 0, 0})
 	m := mbox.Output()
 
-	acc := 10.
+	const acc = 4
 	kernel := mag.BruteKernel(mesh, acc)
 	conv := gpu.NewConvolution("B", "T", mesh, nimble.UnifiedMemory, kernel, m)
 	B := conv.Output()

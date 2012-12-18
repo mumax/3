@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/gpu"
 	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/nimble"
-	"code.google.com/p/mx3/uni"
 	"fmt"
 	"math"
 	"os"
@@ -52,9 +51,9 @@ func main() {
 	solver.Maxerr = 2e-4
 	solver.Mindt = 1e-15
 
-	every := 100
-	uni.Autosave(m, every, gpu.GPUDevice)
-	uni.Autotable(m, every/10, gpu.GPUDevice)
+	//every := 100
+	//uni.Autosave(m, every, gpu.GPUDevice)
+	//uni.Autotable(m, every/10, gpu.GPUDevice)
 
 	solver.Advance(2.5e-9)
 	//solver.Relax(1e-7)

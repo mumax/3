@@ -21,7 +21,7 @@ func main() {
 	//testM :=
 	m := nimble.NewConstant("m", "", mesh, testM).Output()
 
-	acc := 10.
+	const acc = 10
 	kernel := mag.BruteKernel(ZeroPad(mesh), acc)
 	demag := conv.NewSymm2D(mesh, kernel, m)
 	hd := demag.Output()

@@ -28,7 +28,7 @@ func SetOD(od string, force bool) {
 		LogErr(os.Mkdir(od, stat.Mode()))
 	}
 
-	// fail on non-empty WD
+	// fail on non-empty OD
 	f, err3 := os.Open(od)
 	Fatal(err3)
 	files, _ := f.Readdir(1)

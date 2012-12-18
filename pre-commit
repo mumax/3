@@ -6,4 +6,9 @@
 # it wants to stop the commit.
 # 
 # Add this file to .git/hooks
-gofmt -w *.go */*.go */*/*.go
+# 
+# Runs gofmt on the code and stops commit if files were affected.
+# 
+gofmt -w -l *.go */*.go */*/*.go | grep \.go || exit 0
+echo formatted your code, please commit again
+exit 1

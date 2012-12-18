@@ -16,7 +16,6 @@ type Sum struct {
 }
 
 func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
-	//t1, t2 := term1.ChanN().NewReader(), term2.ChanN().NewReader()
 	output := nimble.MakeChanN(term1.NComp(), tag, term1.Unit(), term1.ChanN().Mesh(), mem, 1)
 	sum := &Sum{sum: output, dev: dev, stream: dev.StreamCreate()}
 	sum.MAdd(term1, weight1)
@@ -25,6 +24,13 @@ func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem 
 	return sum
 }
 
+// Add term with weight 1.
+func (s *Sum) Add(term_ nimble.Chan) {
+	s.MAdd(term_, 1)
+}
+
+// Add term * weight to the sum.
+// TODO: it might be nice to add to separate components 
 func (s *Sum) MAdd(term_ nimble.Chan, weight float32) {
 	term := term_.ChanN().NewReader()
 	if len(s.term) != 0 {

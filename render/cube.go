@@ -4,6 +4,7 @@ import (
 	gl "github.com/chsc/gogl/gl21"
 )
 
+// Renders a cube with given center and radius.
 func Cube(cx, cy, cz, rx, ry, rz float32) {
 	gl.Begin(gl.QUADS)
 	{

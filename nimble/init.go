@@ -69,8 +69,8 @@ func Cleanup() {
 func initLog() {
 	core.LOG = !*Flag_silent
 	core.DEBUG = *Flag_debug
-	log.SetPrefix("#")
-	log.SetFlags(log.Ltime)
+	log.SetPrefix(" ·")
+	log.SetFlags(0)
 }
 
 func initGOMAXPROCS() {

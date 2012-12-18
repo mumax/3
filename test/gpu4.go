@@ -14,6 +14,7 @@ func main() {
 	nimble.Init()
 	defer nimble.Cleanup()
 	nimble.SetOD("gpu4.out")
+	gpu.LockCudaThread()
 
 	mem := nimble.GPUMemory
 

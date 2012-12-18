@@ -27,9 +27,6 @@ var (
 func main() {
 	flag.Parse()
 
-	data := Load(flag.Arg(0))
-	log.Println("data loaded")
-
 	InitWindow()
 	defer glfw.CloseWindow()
 	defer glfw.Terminate()
@@ -45,11 +42,10 @@ func main() {
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
-		//DrawTestScene()
-		Render(data)
+		DrawTestScene()
 		glfw.SwapBuffers()
 		frames++
-		//glfw.WaitEvents()
+		glfw.WaitEvents()
 	}
 
 	if *flag_fps {

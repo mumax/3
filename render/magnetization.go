@@ -34,7 +34,36 @@ func Load(fname string) *dump.Frame {
 	return &(r.Frame)
 }
 
-//func PreRender(frame*dump.Frame) 
+func PreRender(frame *dump.Frame) []Poly {
+	polys := make([]Poly, 0, 10000)
+
+	size := frame.MeshSize
+	N0, N1, N2 := size[0], size[1], size[2]
+	cell := frame.MeshStep
+	maxworld := 0.
+	for i := range size {
+		world := float64(size[i]) * cell[i]
+		if world > maxworld {
+			maxworld = world
+		}
+	}
+	scale := 1 / maxworld
+	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
+
+	M := frame.Vectors()
+	for i := N0; i < N0; i++ {
+		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
+		for j := N1; j < N1; j++ {
+			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
+			for k := N2; k < N2; k++ {
+				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
+				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
+
+			}
+		}
+	}
+	return polys
+}
 
 //func Render(frame *dump.Frame) {
 //	ClearScene()

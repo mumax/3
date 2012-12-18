@@ -26,22 +26,26 @@ func (p *Poly) Render() {
 }
 
 func XFace(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
-	return Poly{[4][3]float32{{x + rx, y - ry, z - rz},
-		{x + rx, y - ry, z + rz},
-		{x + rx, y + ry, z + rz},
-		{x + rx, y + ry, z - rz}}, col}
+	return Poly{[4][3]float32{
+		{z - rz, y - ry, x + rx},
+		{z + rz, y - ry, x + rx},
+		{z + rz, y + ry, x + rx},
+		{z - rz, y + ry, x + rx}}, col}
 }
 
 func Load(fname string) *dump.Frame {
+	core.Log("loading", fname)
 	f, err := os.Open(fname)
 	core.Fatal(err)
 	defer f.Close()
 	r := dump.NewReader(f, dump.CRC_ENABLED)
 	core.Fatal(r.Read())
+	core.Log("loaded", fname)
 	return &(r.Frame)
 }
 
 func PreRender(frame *dump.Frame) []Poly {
+	core.Log("pre-render")
 	polys := make([]Poly, 0, 10000)
 
 	size := frame.MeshSize
@@ -57,18 +61,18 @@ func PreRender(frame *dump.Frame) []Poly {
 	scale := 1 / maxworld
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
-	M := frame.Vectors()
-	for i := N0; i < N0; i++ {
+	//M := frame.Vectors()
+	for i := 0; i < N0; i++ {
 		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
-		for j := N1; j < N1; j++ {
+		for j := 0; j < N1; j++ {
 			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
-			for k := N2; k < N2; k++ {
+			for k := 0; k < N2; k++ {
 				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
-				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
+				//mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
 
-				col := color.NRGBA{byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
+				col := color.NRGBA{0, 0, 0, 255} //byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
 				// to be replaced, of course, by neighbor test
-				if i == N0 {
+				if i == 0 {
 					p := XFace(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
@@ -76,14 +80,17 @@ func PreRender(frame *dump.Frame) []Poly {
 			}
 		}
 	}
+	core.Log("pre-rendered", len(polys), "polys")
 	return polys
 }
 
 func Render(polys []Poly) {
 	ClearScene()
+	gl.Begin(gl.QUADS)
 	for i := range polys {
 		polys[i].Render()
 	}
+	gl.End()
 }
 
 func ClearScene() {

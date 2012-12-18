@@ -40,9 +40,12 @@ func main() {
 
 	Viewpos[2] = -20
 
+	frame := Load(flag.Arg(0))
+	polys := PreRender(frame)
+
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()
-		DrawTestScene()
+		Render(polys)
 		glfw.SwapBuffers()
 		frames++
 		glfw.WaitEvents()

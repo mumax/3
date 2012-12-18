@@ -15,13 +15,9 @@ func DrawTestScene() {
 	ambdiff := []gl.Float{0.5, 0.5, 0.0, 1}
 	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
 
-	const r = 0.2
+	const r = 0.5
 	gl.ClearColor(1, 1, 1, 1)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	for x := float32(0); x < 20; x++ {
-		for y := float32(0); y < 10; y++ {
-			Cube(x, y, 0, r, r, r)
-		}
-	}
-
+	Color3f(1, 0, 0)
+	Cube(0, 0, 0, r, r, r)
 }

@@ -13,9 +13,12 @@ type Poly struct {
 	color.NRGBA
 }
 
+var colbuf = [4]float32{0, 0, 0, 1}
+
 func (p *Poly) Render() {
 	if p.A != 0 {
-		gl.Color3b(gl.Byte(p.R), gl.Byte(p.G), gl.Byte(p.B))
+		colbuf[0], colbuf[1], colbuf[2] = float32(p.R)/255, float32(p.G)/255, float32(p.B)/255
+		gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, (*gl.Float)(&(colbuf[0])))
 		for _, v := range p.vertex {
 			Vertex3f(v[0], v[1], v[2])
 		}
@@ -31,11 +34,8 @@ func Load(fname string) *dump.Frame {
 	return &(r.Frame)
 }
 
-//
-//var (
-//	Min, Max [3]int
-//)
-//
+//func PreRender(frame*dump.Frame) 
+
 //func Render(frame *dump.Frame) {
 //	ClearScene()
 //
@@ -75,17 +75,14 @@ func Load(fname string) *dump.Frame {
 //	core.Println(cubes, " cubes")
 //}
 //
-//func ClearScene() {
-//	ambient := []gl.Float{0.7, 0.7, 0.7, 1}
-//	diffuse := []gl.Float{1, 1, 1, 1}
-//	lightpos := []gl.Float{0.2, 0.5, 1, 1}
-//	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &ambient[0])
-//	gl.Lightfv(gl.LIGHT0, gl.DIFFUSE, &diffuse[0])
-//	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightpos[0])
-//	gl.Enable(gl.LIGHT0)
-//	ambdiff := []gl.Float{0.5, 0.5, 0.5, 1}
-//	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
-//
-//	gl.ClearColor(1, 1, 1, 1)
-//	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-//}
+func ClearScene() {
+	ambient := []gl.Float{0.7, 0.7, 0.7, 1}
+	diffuse := []gl.Float{1, 1, 1, 1}
+	lightpos := []gl.Float{0.2, 0.5, 1, 1}
+	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &ambient[0])
+	gl.Lightfv(gl.LIGHT0, gl.DIFFUSE, &diffuse[0])
+	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightpos[0])
+	gl.Enable(gl.LIGHT0)
+	gl.ClearColor(1, 1, 1, 1)
+	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+}

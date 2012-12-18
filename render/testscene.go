@@ -1,6 +1,9 @@
 package render
 
-import gl "github.com/chsc/gogl/gl21"
+import (
+	gl "github.com/chsc/gogl/gl21"
+	"image/color"
+)
 
 func DrawTestScene() {
 
@@ -12,12 +15,17 @@ func DrawTestScene() {
 	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightpos[0])
 	gl.Enable(gl.LIGHT0)
 
-	ambdiff := []gl.Float{0.5, 0.5, 0.0, 1}
-	gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, &ambdiff[0])
-
-	const r = 0.5
 	gl.ClearColor(1, 1, 1, 1)
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	Color3f(1, 0, 0)
-	Cube(0, 0, 0, r, r, r)
+
+	const r = 0.5
+	const z = r
+	red := color.NRGBA{R: 255, A: 255}
+	blue := color.NRGBA{B: 255, A: 255}
+
+	gl.Begin(gl.QUADS)
+	(&Poly{[4][3]float32{{-r, -r, z}, {r, -r, z}, {r, r, z}, {-r, r, z}}, red}).Render()
+	(&Poly{[4][3]float32{{-r, -r, -z}, {-r, r, -z}, {r, r, -z}, {r, -r, -z}}, blue}).Render()
+	gl.End()
+
 }

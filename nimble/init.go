@@ -17,6 +17,7 @@ import (
 
 var (
 	Flag_od          = flag.String("o", "", "set output directory")
+	Flag_force       = flag.Bool("f", false, "force start, clean existing output directory")
 	Flag_version     = flag.Bool("v", true, "print version")
 	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	Flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
@@ -51,13 +52,13 @@ func Init() {
 
 func initOD() {
 	if *Flag_od != "" {
-		core.SetOD(*Flag_od)
+		core.SetOD(*Flag_od, *Flag_force)
 	}
 }
 
 // SetOD sets the default output directory.
 func SetOD(dir string) {
-	core.SetOD(dir)
+	core.SetOD(dir, *Flag_force)
 }
 
 func Cleanup() {

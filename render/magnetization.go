@@ -25,8 +25,15 @@ func (p *Poly) Render() {
 	}
 }
 
-// top x face
 func X1Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+	return Poly{[4][3]float32{
+		{z - rz, y - ry, x - rx},
+		{z - rz, y + ry, x - rx},
+		{z + rz, y + ry, x - rx},
+		{z + rz, y - ry, x - rx}}, col}
+}
+
+func X2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 	return Poly{[4][3]float32{
 		{z - rz, y - ry, x + rx},
 		{z + rz, y - ry, x + rx},
@@ -34,12 +41,36 @@ func X1Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 		{z - rz, y + ry, x + rx}}, col}
 }
 
-func X2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+func Y1Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 	return Poly{[4][3]float32{
 		{z - rz, y - ry, x - rx},
+		{z + rz, y - ry, x - rx},
+		{z + rz, y - ry, x + rx},
+		{z - rz, y - ry, x + rx}}, col}
+}
+
+func Y2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+	return Poly{[4][3]float32{
 		{z - rz, y + ry, x - rx},
+		{z - rz, y + ry, x + rx},
+		{z + rz, y + ry, x + rx},
+		{z + rz, y + ry, x - rx}}, col}
+}
+
+func Z1Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+	return Poly{[4][3]float32{
+		{z - rz, y - ry, x - rx},
+		{z - rz, y - ry, x + rx},
+		{z - rz, y + ry, x + rx},
+		{z - rz, y + ry, x - rx}}, col}
+}
+
+func Z2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
+	return Poly{[4][3]float32{
+		{z + rz, y - ry, x - rx},
 		{z + rz, y + ry, x - rx},
-		{z + rz, y - ry, x - rx}}, col}
+		{z + rz, y + ry, x + rx},
+		{z + rz, y - ry, x + rx}}, col}
 }
 
 func Load(fname string) *dump.Frame {
@@ -89,7 +120,22 @@ func PreRender(frame *dump.Frame) []Poly {
 					p := X2Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-
+				if j == 0 {
+					p := Y1Face(x, y, z, rx, ry, rz, col)
+					polys = append(polys, p)
+				}
+				if j == N1-1 {
+					p := Y2Face(x, y, z, rx, ry, rz, col)
+					polys = append(polys, p)
+				}
+				if k == 0 {
+					p := Z1Face(x, y, z, rx, ry, rz, col)
+					polys = append(polys, p)
+				}
+				if k == N2-1 {
+					p := Z2Face(x, y, z, rx, ry, rz, col)
+					polys = append(polys, p)
+				}
 			}
 		}
 	}

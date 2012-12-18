@@ -40,14 +40,3 @@ func (u *Uploader) Run() {
 		u.host.ReadDone()
 	}
 }
-
-//func RunUploader(tag string, input nimble.Chan) nimble.ChanN {
-//	in := input.ChanN()
-//
-//	output := nimble.MakeChanN(in.NComp(), tag, in.Unit(), in.Mesh(), nimble.GPUMemory, in.NBufferedBlocks())
-//
-//	for i := 0; i < output.NComp(); i++ {
-//		nimble.Stack(NewUploader(in.Comp(i).NewReader(), output.Comp(i)))
-//	}
-//	return output
-//}

@@ -21,7 +21,6 @@ func newchan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) *chan1 
 }
 
 func aschan1(buffer Slice, tag, unit string, mesh *Mesh, lock mutex) *chan1 {
-	core.AddQuant(tag)
 	info := newInfo(tag, unit, mesh)
 	return &chan1{info, buffer, lock}
 }

@@ -27,6 +27,14 @@ func SetOD(od string) {
 	Fatal(err2)
 	LogErr(os.Mkdir(od, stat.Mode()))
 
+	f, err3 := os.Open(od)
+	Fatal(err3)
+	files, err4 := f.Readdir(1)
+	Fatal(err4)
+	if len(files) != 0 {
+		Fatalf(od + " not empty")
+	}
+
 	// clean output dir
 	filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
 		if path != OD {

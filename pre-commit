@@ -6,5 +6,4 @@
 # it wants to stop the commit.
 # 
 # Add this file to .git/hooks
-#./core/build > ./core/build.go
 gofmt -w *.go */*.go */*/*.go

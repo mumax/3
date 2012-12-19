@@ -79,8 +79,8 @@ func LimitCrop() {
 		if Crop1[i] < 0 {
 			Crop1[i] = 0
 		}
-		if Crop1[i] > N[i]-2 {
-			Crop1[i] = N[i] - 2
+		if Crop1[i] > N[i]-1 {
+			Crop1[i] = N[i] - 1
 		}
 		if Crop2[i] < 1 {
 			Crop2[i] = 1

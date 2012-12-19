@@ -14,6 +14,7 @@ var (
 	Crop1, Crop2 [3]int
 	Light        [3]int
 	Time         [3]int // only 1st element used.
+	recording    bool   // screenshot at every key?
 	//Ambient, Diffuse int
 	//Frustrum1, Frustrum2 int
 )
@@ -44,6 +45,11 @@ func InitKeyHandlers() {
 		}
 		if key == Ret || key == Enter {
 			Screenshot()
+			return
+		}
+		if key == Q {
+			recording = !recording
+			log.Println("recording:", recording)
 		}
 		defer log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
 		defer PreRender() // TODO: only if neccesary
@@ -186,4 +192,5 @@ const (
 	L      = 76
 	A      = 65
 	D      = 68
+	Q      = 81
 )

@@ -89,7 +89,7 @@ func Render() {
 		polys[i].Render()
 	}
 	gl.End()
-	core.Log("rendered", len(polys), "polys")
+	//core.Log("rendered", len(polys), "polys")
 }
 
 func ClearScene() {

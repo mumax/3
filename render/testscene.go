@@ -24,8 +24,8 @@ func DrawTestScene() {
 	blue := color.NRGBA{B: 255, A: 255}
 
 	gl.Begin(gl.QUADS)
-	(&Poly{[4][3]float32{{-r, -r, z}, {r, -r, z}, {r, r, z}, {-r, r, z}}, red}).Render()
-	(&Poly{[4][3]float32{{-r, -r, -z}, {-r, r, -z}, {r, r, -z}, {r, -r, -z}}, blue}).Render()
+	(&Poly{[3]float32{0, 0, 0}, [4][3]float32{{-r, -r, z}, {r, -r, z}, {r, r, z}, {-r, r, z}}, red}).Render()
+	(&Poly{[3]float32{0, 0, 0}, [4][3]float32{{-r, -r, -z}, {-r, r, -z}, {r, r, -z}, {r, -r, -z}}, blue}).Render()
 	gl.End()
 
 }

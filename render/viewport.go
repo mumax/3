@@ -7,25 +7,25 @@ import (
 	"math"
 )
 
-// Adjustable parameters
+// Parameters adjustable by keys
 var (
 	Viewpos      [3]int
 	Rot          [3]int
 	Crop1, Crop2 [3]int
-	N            [3]int
 	Light        [3]int
 	Time         [3]int // only 1st element used.
 	//Ambient, Diffuse int
 	//Frustrum1, Frustrum2 int
 )
+var N [3]int          // mesh size
+var Width, Height int // window size
 
 var (
 	mousePrevX, mousePrevY int
 	mouseButton            [5]int
 )
 
-var Width, Height int
-
+// variables targeted by mode keys
 var keyTarget = map[int]*[3]int{
 	P:   &Viewpos,
 	C:   &Crop1,
@@ -34,6 +34,7 @@ var keyTarget = map[int]*[3]int{
 	T:   &Time,
 	Esc: nil}
 
+// currently targeted variable
 var activeTarget = &Viewpos
 
 func InitKeyHandlers() {
@@ -73,7 +74,7 @@ func InitKeyHandlers() {
 	})
 }
 
-// Limit crop ranges to sensible
+// Limit crop ranges to sensible values
 func LimitCrop() {
 	for i := range N {
 		if Crop1[i] < 0 {

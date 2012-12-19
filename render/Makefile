@@ -1,3 +1,5 @@
 all:
 	go install -v
-	go build main.go
+	go build interactive.go
+	go build animate.go
+

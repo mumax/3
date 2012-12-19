@@ -13,14 +13,13 @@ const (
 	stencil    = 0          // 0 means none
 )
 
-func Init(w, h int, smooth bool, multisample int) {
-	InitWindow(800, 600, multisample)
+func Init(w, h int, smooth bool, multisample int, vsync bool) {
+	InitWindow(800, 600, multisample, vsync)
 	InitGL(smooth, multisample)
 	InitViewport()
-	InitInputHandlers()
 }
 
-func InitWindow(w, h int, multisample int) {
+func InitWindow(w, h int, multisample int, vsync bool) {
 	core.Fatal(glfw.Init())
 	if multisample != 0 {
 		glfw.OpenWindowHint(glfw.FsaaSamples, multisample)
@@ -28,7 +27,9 @@ func InitWindow(w, h int, multisample int) {
 	Width, Height = w, h
 	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
-	glfw.SetSwapInterval(1)
+	if vsync {
+		glfw.SetSwapInterval(1)
+	}
 }
 
 func InitGL(smooth bool, multisample int) {

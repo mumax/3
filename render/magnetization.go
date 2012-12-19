@@ -7,11 +7,11 @@ import (
 	"github.com/jteeuwen/glfw"
 )
 
-var polys []Poly
+var polys = make([]Poly, 10000)
 
 func PreRender() {
 	core.Log("pre-render")
-	polys = make([]Poly, 0, 10000)
+	polys = polys[:0]
 
 	frame := Frame
 	N = frame.MeshSize

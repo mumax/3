@@ -20,7 +20,8 @@ func main() {
 
 	Load(flag.Args())
 
-	Init(800, 600, *flag_smooth, *flag_multisample)
+	Init(800, 600, *flag_smooth, *flag_multisample, true)
+	InitInputHandlers()
 	defer glfw.CloseWindow()
 	defer glfw.Terminate()
 

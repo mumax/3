@@ -75,11 +75,6 @@ func InitKeyHandlers() {
 				(*activeTarget)[0]--
 			case PgUp:
 				(*activeTarget)[0]++
-			default:
-				activeTarget = keyTarget[key]
-				mode = key
-				log.Println("mode:", mode, "target:", activeTarget)
-				return
 			}
 		}
 
@@ -87,6 +82,14 @@ func InitKeyHandlers() {
 			log.Println("post update", f)
 			f()
 		}
+
+		if _, ok := keyTarget[key]; ok {
+			activeTarget = keyTarget[key]
+			mode = key
+			log.Println("mode:", mode, "target:", activeTarget)
+			return
+		}
+
 		if recording {
 			Wantscrot = true
 		}
@@ -139,9 +142,9 @@ func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
 	gl.Translatef(gl.Float(Viewpos[0]), gl.Float(Viewpos[1]), gl.Float(Viewpos[2]))
-	gl.Rotatef(gl.Float(Rot[0]), 1, 0, 0)
-	gl.Rotatef(gl.Float(Rot[1]), 0, 1, 0)
-	gl.Rotatef(gl.Float(Rot[2]), 0, 0, 1)
+	gl.Rotatef(gl.Float(Rot[0]*6), 1, 0, 0)
+	gl.Rotatef(gl.Float(Rot[1]*6), 0, 1, 0)
+	gl.Rotatef(gl.Float(Rot[2]*6), 0, 0, 1)
 }
 
 const (

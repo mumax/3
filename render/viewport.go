@@ -3,16 +3,17 @@ package render
 import (
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
-	//"log"
+	"log"
 	"math"
 )
 
 // Adjustable parameters
 var (
-	Viewpos            [3]float32
-	ViewPhi, ViewTheta float64
-	Crop1, Crop2       [3]int
-	Light              [3]float32
+	Viewpos      [3]int
+	Rot          [3]int
+	Crop1, Crop2 [3]int
+	Light        [3]int
+	Time         int
 	//Ambient, Diffuse float32
 	//Frustrum1, Frustrum2 int
 )
@@ -47,13 +48,14 @@ func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
 	gl.Translatef(gl.Float(Viewpos[0]), gl.Float(Viewpos[1]), gl.Float(Viewpos[2]))
-	gl.Rotatef(gl.Float(ViewTheta*(180/PI)), 1, 0, 0)
-	gl.Rotatef(gl.Float(ViewPhi*(180/PI)), 0, 0, 1)
+	gl.Rotatef(gl.Float(Rot[0]), 1, 0, 0)
+	gl.Rotatef(gl.Float(Rot[1]), 0, 1, 0)
+	gl.Rotatef(gl.Float(Rot[2]), 0, 0, 1)
 }
 
 const (
 	deltaMove = 0.5
-	deltaLook = 0.01
+	deltaLook = 1
 )
 
 // Sets up input handlers
@@ -68,23 +70,19 @@ func InitInputHandlers() {
 			return
 		}
 
-		ViewPhi += deltaLook * float64(dx)
-		ViewTheta += deltaLook * float64(dy)
+		Rot[0] += int(deltaLook * float64(dx))
+		Rot[1] += int(deltaLook * float64(dy))
 
 		// limit viewing angles
-		if ViewPhi < -PI {
-			ViewPhi += 2 * PI
+		for i := range Rot {
+			if Rot[i] > 360 {
+				Rot[i] = 0
+			}
+			if Rot[i] < 0 {
+				Rot[i] += 360
+			}
 		}
-		if ViewPhi > PI {
-			ViewPhi -= 2 * PI
-		}
-		if ViewTheta > PI {
-			ViewTheta = -PI
-		}
-		if ViewTheta < -PI {
-			ViewTheta = PI
-		}
-		//log.Println("phi, theta:", ViewPhi, ViewTheta)
+		log.Println("rot:", Rot)
 	})
 
 	glfw.SetMouseButtonCallback(func(button, state int) {

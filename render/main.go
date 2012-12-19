@@ -13,14 +13,7 @@ import (
 )
 
 var (
-	flag_smooth      = flag.Bool("smooth", false, "Smooth shading")
-	flag_vsync       = flag.Bool("vsync", true, "Vertical sync")
-	flag_cullface    = flag.Bool("cullface", true, "Cull invisible polygon faces")
-	flag_lighting    = flag.Bool("lighting", true, "Enable lighting")
-	flag_depthtest   = flag.Bool("depthtest", true, "Enable depth test")
-	flag_antialias   = flag.Bool("antialias", false, "Antialias lines")
-	flag_wireframe   = flag.Bool("wireframe", false, "Render wireframes")
-	flag_fps         = flag.Bool("fps", true, "Measure frames per second")
+	flag_smooth      = flag.Bool("smooth", true, "Smooth shading")
 	flag_multisample = flag.Int("multisample", 0, "Multisample")
 )
 
@@ -54,10 +47,8 @@ func main() {
 		glfw.WaitEvents()
 	}
 
-	if *flag_fps {
-		fps := int((float64(frames) / float64(time.Since(start))) * float64(time.Second))
-		log.Println("average FPS:", fps)
-	}
+	fps := int((float64(frames) / float64(time.Since(start))) * float64(time.Second))
+	log.Println("average FPS:", fps)
 }
 
 // number of bits in buffer
@@ -75,40 +66,16 @@ func InitWindow() {
 	Width, Height = 800, 600
 	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
-	vsync := 0
-	if *flag_vsync {
-		vsync = 1
-	}
-	glfw.SetSwapInterval(vsync)
+	glfw.SetSwapInterval(1)
 }
 
 func InitGL() {
 	core.Fatal(gl.Init())
 
-	if *flag_wireframe {
-		gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE)
-	}
+	gl.Enable(gl.LIGHTING)
 
-	if *flag_depthtest {
-		gl.Enable(gl.DEPTH_TEST)
-		gl.DepthFunc(gl.LESS)
-	}
-
-	if *flag_lighting {
-		gl.Enable(gl.LIGHTING)
-	}
-
-	if *flag_cullface {
-		gl.Enable(gl.CULL_FACE)
-		gl.CullFace(gl.BACK)
-	}
-
-	if *flag_antialias {
-		gl.Enable(gl.LINE_SMOOTH)
-		gl.Enable(gl.BLEND)
-		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-		gl.Hint(gl.LINE_SMOOTH_HINT, gl.NICEST)
-	}
+	gl.Enable(gl.CULL_FACE)
+	gl.CullFace(gl.BACK)
 
 	if *flag_multisample != 0 {
 		gl.Enable(gl.MULTISAMPLE)

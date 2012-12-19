@@ -58,6 +58,7 @@ func InitKeyHandlers() {
 		if key == Q {
 			recording = !recording
 			log.Println("recording:", recording)
+			return
 		}
 
 		if activeTarget != nil {
@@ -77,12 +78,17 @@ func InitKeyHandlers() {
 			default:
 				activeTarget = keyTarget[key]
 				mode = key
+				log.Println("mode:", mode, "target:", activeTarget)
 				return
 			}
 		}
 
 		if f, ok := postUpdate[mode]; ok {
+			log.Println("post update", f)
 			f()
+		}
+		if recording {
+			Wantscrot = true
 		}
 
 		log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])

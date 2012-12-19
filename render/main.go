@@ -47,6 +47,10 @@ func main() {
 		Render()
 		glfw.SwapBuffers()
 		frames++
+		if Wantscrot {
+			Screenshot()
+			Wantscrot = false
+		}
 		glfw.WaitEvents()
 	}
 

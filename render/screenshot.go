@@ -10,7 +10,10 @@ import (
 	"os"
 )
 
-var scroti int // count screenshots
+var (
+	scroti    int // count screenshots
+	Wantscrot bool
+)
 
 func Screenshot() {
 	log.Println("screenshot")

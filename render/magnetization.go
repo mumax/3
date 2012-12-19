@@ -80,7 +80,6 @@ func PreRender() {
 			}
 		}
 	}
-	core.Log("pre-rendered", len(polys), "polys")
 }
 
 func Render() {

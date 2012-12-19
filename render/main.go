@@ -27,6 +27,8 @@ var (
 func main() {
 	flag.Parse()
 
+	Load(flag.Args())
+
 	InitWindow()
 	defer glfw.CloseWindow()
 	defer glfw.Terminate()
@@ -39,9 +41,6 @@ func main() {
 	frames := 0
 
 	Viewpos[2] = -20
-
-	Load(flag.Arg(0))
-	PreRender()
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		UpdateViewpos()

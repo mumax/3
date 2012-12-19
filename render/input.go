@@ -41,7 +41,7 @@ var keyTarget = map[int]*[3]int{
 var postUpdate = map[int]func(){
 	C: UpdateCrop,
 	V: UpdateCrop,
-	T: UpdateTime}
+	T: NextFrame}
 
 // currently targeted variable
 var activeTarget = &Viewpos
@@ -116,10 +116,6 @@ func LimitCrop() {
 			Crop1[i] = Crop2[i] - 1
 		}
 	}
-}
-
-func UpdateTime() {
-
 }
 
 const PI = math.Pi

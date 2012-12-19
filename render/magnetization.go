@@ -13,6 +13,11 @@ type Poly struct {
 	color.NRGBA
 }
 
+var (
+	polys []Poly
+	Frame *dump.Frame
+)
+
 var colbuf = [4]float32{0, 0, 0, 1}
 
 func (p *Poly) Render() {
@@ -73,7 +78,7 @@ func Z2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 		{z + rz, y - ry, x + rx}}, col}
 }
 
-func Load(fname string) *dump.Frame {
+func Load(fname string) {
 	core.Log("loading", fname)
 	f, err := os.Open(fname)
 	core.Fatal(err)
@@ -81,19 +86,20 @@ func Load(fname string) *dump.Frame {
 	r := dump.NewReader(f, dump.CRC_ENABLED)
 	core.Fatal(r.Read())
 	core.Log("loaded", fname)
-	return &(r.Frame)
+	Frame = &(r.Frame)
+	Crop2 = Frame.MeshSize
 }
 
-func PreRender(frame *dump.Frame) []Poly {
+func PreRender() {
 	core.Log("pre-render")
-	polys := make([]Poly, 0, 10000)
+	polys = make([]Poly, 0, 10000)
 
-	size := frame.MeshSize
-	N0, N1, N2 := size[0], size[1], size[2]
+	frame := Frame
+	N = frame.MeshSize
 	cell := frame.MeshStep
 	maxworld := 0.
-	for i := range size {
-		world := float64(size[i]) * cell[i]
+	for i := range N {
+		world := float64(N[i]) * cell[i]
 		if world > maxworld {
 			maxworld = world
 		}
@@ -102,37 +108,37 @@ func PreRender(frame *dump.Frame) []Poly {
 	rx, ry, rz := float32(0.5*scale*cell[0]), float32(0.5*scale*cell[1]), float32(0.5*scale*cell[2])
 
 	M := frame.Vectors()
-	for i := 0; i < N0; i++ {
-		x := float32(scale * cell[0] * (float64(i-size[0]/2) + 0.5))
-		for j := 0; j < N1; j++ {
-			y := float32(scale * cell[1] * (float64(j-size[1]/2) + 0.5))
-			for k := 0; k < N2; k++ {
-				z := float32(scale * cell[2] * (float64(k-size[2]/2) + 0.5))
+	for i := Crop1[0]; i < Crop2[0]; i++ {
+		x := float32(scale * cell[0] * (float64(i-N[0]/2) + 0.5))
+		for j := Crop1[1]; j < Crop2[1]; j++ {
+			y := float32(scale * cell[1] * (float64(j-N[1]/2) + 0.5))
+			for k := Crop1[2]; k < Crop2[2]; k++ {
+				z := float32(scale * cell[2] * (float64(k-N[2]/2) + 0.5))
 				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
 
 				col := color.NRGBA{byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
 				// to be replaced, of course, by neighbor test
-				if i == 0 {
+				if i == Crop1[0] {
 					p := X1Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-				if i == N0-1 {
+				if i == Crop2[0]-1 {
 					p := X2Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-				if j == 0 {
+				if j == Crop1[1] {
 					p := Y1Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-				if j == N1-1 {
+				if j == Crop2[1]-1 {
 					p := Y2Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-				if k == 0 {
+				if k == Crop1[2] {
 					p := Z1Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
-				if k == N2-1 {
+				if k == Crop2[2]-1 {
 					p := Z2Face(x, y, z, rx, ry, rz, col)
 					polys = append(polys, p)
 				}
@@ -140,16 +146,16 @@ func PreRender(frame *dump.Frame) []Poly {
 		}
 	}
 	core.Log("pre-rendered", len(polys), "polys")
-	return polys
 }
 
-func Render(polys []Poly) {
+func Render() {
 	ClearScene()
 	gl.Begin(gl.QUADS)
 	for i := range polys {
 		polys[i].Render()
 	}
 	gl.End()
+	core.Log("rendered", len(polys), "polys")
 }
 
 func ClearScene() {

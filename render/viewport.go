@@ -12,6 +12,7 @@ var (
 	Viewpos      [3]int
 	Rot          [3]int
 	Crop1, Crop2 [3]int
+	N            [3]int
 	Light        [3]int
 	Time         [3]int // only 1st element used.
 	//Ambient, Diffuse int
@@ -33,20 +34,26 @@ var keyTarget = map[int]*[3]int{
 	T:   &Time,
 	Esc: nil}
 
-var activeTarget *[3]int
+var activeTarget = &Viewpos
 
 func InitKeyHandlers() {
 	glfw.SetKeyCallback(func(key, state int) {
 		if state == 0 {
 			return
 		}
+		if key == Ret || key == Enter {
+			Screenshot()
+		}
+		defer log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
+		defer PreRender() // TODO: only if neccesary
+		defer LimitCrop()
 		if activeTarget != nil {
 			switch key {
 			case Left:
-				(*activeTarget)[0]--
+				(*activeTarget)[2]--
 				return
 			case Right:
-				(*activeTarget)[0]++
+				(*activeTarget)[2]++
 				return
 			case Down:
 				(*activeTarget)[1]--
@@ -55,15 +62,39 @@ func InitKeyHandlers() {
 				(*activeTarget)[1]++
 				return
 			case PgDown:
-				(*activeTarget)[2]--
+				(*activeTarget)[0]--
 				return
 			case PgUp:
-				(*activeTarget)[2]++
+				(*activeTarget)[0]++
 				return
 			}
 		}
 		activeTarget = keyTarget[key]
 	})
+}
+
+// Limit crop ranges to sensible
+func LimitCrop() {
+	for i := range N {
+		if Crop1[i] < 0 {
+			Crop1[i] = 0
+		}
+		if Crop1[i] > N[i]-2 {
+			Crop1[i] = N[i] - 2
+		}
+		if Crop2[i] < 1 {
+			Crop2[i] = 1
+		}
+		if Crop2[i] > N[i] {
+			Crop2[i] = N[i]
+		}
+		if Crop2[i] <= Crop1[i] {
+			Crop2[i] = Crop1[i] + 1
+		}
+		if Crop1[i] >= Crop2[i] {
+			Crop1[i] = Crop2[i] - 1
+		}
+	}
 }
 
 const PI = math.Pi

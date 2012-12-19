@@ -1,38 +1,13 @@
-package main
+package draw
 
 // HSL image output for vector data.
 // Author: Arne Vansteenkiste
 
 import (
 	"github.com/barnex/fmath"
-	"image"
 	"image/color"
 	"math"
 )
-
-// Draws rank 4 tensor (3D vector field) as image
-// averages data over X (usually thickness of thin film)
-func DrawVectors(arr [3][][][]float32) *image.NRGBA {
-	h, w := len(arr[0][0]), len(arr[0][0][0])
-	d := len(arr[0])
-	norm := float32(d)
-	img := image.NewNRGBA(image.Rect(0, 0, w, h))
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			var x, y, z float32 = 0., 0., 0.
-			for k := 0; k < d; k++ {
-				x += arr[0][k][i][j]
-				y += arr[1][k][i][j]
-				z += arr[2][k][i][j]
-			}
-			x /= norm
-			y /= norm
-			z /= norm
-			img.Set(j, (h-1)-i, HSLMap(z, y, x))
-		}
-	}
-	return img
-}
 
 func HSLMap(x, y, z float32) color.NRGBA {
 	s := fmath.Sqrt(x*x + y*y + z*z)

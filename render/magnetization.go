@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/draw"
 	gl "github.com/chsc/gogl/gl21"
+	"github.com/jteeuwen/glfw"
 )
 
 var polys []Poly
@@ -73,6 +74,7 @@ func Render() {
 		polys[i].Render()
 	}
 	gl.End()
+	glfw.SwapBuffers()
 }
 
 func ClearScene() {

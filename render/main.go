@@ -31,7 +31,6 @@ func main() {
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
 		Render()
-		glfw.SwapBuffers()
 		frames++
 		if Wantscrot {
 			Screenshot()

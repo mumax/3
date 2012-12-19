@@ -77,3 +77,13 @@ func Z2Face(x, y, z, rx, ry, rz float32, col color.NRGBA) Poly {
 			{z + rz, y + ry, x + rx},
 			{z + rz, y - ry, x + rx}}, col}
 }
+
+// Wraps gl.Vertex3f
+func Vertex3f(x, y, z float32) {
+	gl.Vertex3f(gl.Float(x), gl.Float(y), gl.Float(z))
+}
+
+// Wraps gl.Normal3f
+func Normal3f(x, y, z float32) {
+	gl.Normal3f(gl.Float(x), gl.Float(y), gl.Float(z))
+}

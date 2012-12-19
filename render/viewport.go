@@ -3,18 +3,34 @@ package render
 import (
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
-	"log"
+	//"log"
 	"math"
 )
 
+// Adjustable parameters
 var (
-	Viewpos                [3]float32
-	ViewPhi, ViewTheta     float64
+	Viewpos            [3]float32
+	ViewPhi, ViewTheta float64
+	Crop1, Crop2       [3]int
+	Light              [3]float32
+	//Ambient, Diffuse float32
+	//Frustrum1, Frustrum2 int
+)
+
+var (
 	mousePrevX, mousePrevY int
 	mouseButton            [5]int
 )
 
 var Width, Height int
+
+func InitKeyHandlers() {
+	glfw.SetKeyCallback(func(key, state int) {
+		if state == 1 {
+
+		}
+	})
+}
 
 const PI = math.Pi
 
@@ -42,26 +58,7 @@ const (
 
 // Sets up input handlers
 func InitInputHandlers() {
-	glfw.SetKeyCallback(func(key, state int) {
-		if state == 1 {
-			switch key {
-			case Up:
-				Viewpos[2] += deltaMove
-			case Down:
-				Viewpos[2] -= deltaMove
-			case Left:
-				Viewpos[1] += deltaMove
-			case Right:
-				Viewpos[1] -= deltaMove
-			case Space:
-				Viewpos[0] += deltaMove
-			case Alt:
-				Viewpos[0] -= deltaMove
-			default:
-				log.Println("unused key:", key)
-			}
-		}
-	})
+	InitKeyHandlers()
 
 	glfw.SetMousePosCallback(func(x, y int) {
 
@@ -107,11 +104,23 @@ func InitInputHandlers() {
 }
 
 const (
-	Up    = 283
-	Down  = 284
-	Left  = 285
-	Right = 286
-	Space = 32
-	Alt   = 291
-	Esc   = 257
+	Up     = 283
+	Down   = 284
+	Left   = 285
+	Right  = 286
+	PgUp   = 298
+	PgDown = 299
+	Esc    = 257
+	Ret    = 294
+	Enter  = 318
+	P      = 80
+	C      = 67
+	V      = 86
+	R      = 82
+	F      = 70
+	G      = 71
+	T      = 84
+	L      = 76
+	A      = 65
+	D      = 68
 )

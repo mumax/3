@@ -13,6 +13,7 @@ func Screenshot() {
 	log.Println("screenshot")
 	img := image.NewNRGBA(image.Rect(0, 0, Width, Height))
 	gl.ReadPixels(0, 0, gl.Sizei(Width), gl.Sizei(Height), gl.RGBA, gl.UNSIGNED_INT_8_8_8_8, gl.Pointer(&img.Pix[0]))
+	//go func(){
 	// reverse byte order, opengl seems to use little endian.
 	pix := img.Pix
 	for i := 0; i < len(pix); i += 4 {
@@ -22,4 +23,5 @@ func Screenshot() {
 	core.Fatal(err)
 	defer f.Close()
 	core.Fatal(png.Encode(f, img))
+	//}()
 }

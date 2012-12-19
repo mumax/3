@@ -30,7 +30,6 @@ func main() {
 	Viewpos[2] = -20
 
 	for glfw.WindowParam(glfw.Opened) == 1 { // window open
-		UpdateViewpos()
 		Render()
 		glfw.SwapBuffers()
 		frames++

@@ -66,18 +66,18 @@ func PreRender() {
 }
 
 func Render() {
+	UpdateViewpos()
 	ClearScene()
 	gl.Begin(gl.QUADS)
 	for i := range polys {
 		polys[i].Render()
 	}
 	gl.End()
-	//core.Log("rendered", len(polys), "polys")
 }
 
 func ClearScene() {
 	ambient := []gl.Float{0.7, 0.7, 0.7, 1}
-	diffuse := []gl.Float{1, 1, 1, 1}
+	diffuse := []gl.Float{0.9, 0.9, 0.9, 1}
 	lightpos := []gl.Float{0.2, 0.5, 1, 1}
 	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &ambient[0])
 	gl.Lightfv(gl.LIGHT0, gl.DIFFUSE, &diffuse[0])

@@ -22,11 +22,11 @@ func main() {
 
 	Load(flag.Args())
 
-	InitWindow()
+	InitWindow(800, 600)
 	defer glfw.CloseWindow()
 	defer glfw.Terminate()
 
-	InitGL()
+	InitGL(*flag_smooth, *flag_multisample)
 	InitViewport()
 	InitInputHandlers()
 
@@ -58,18 +58,18 @@ const (
 	stencil    = 0          // 0 means none
 )
 
-func InitWindow() {
+func InitWindow(w, h int) {
 	core.Fatal(glfw.Init())
 	if *flag_multisample != 0 {
 		glfw.OpenWindowHint(glfw.FsaaSamples, *flag_multisample)
 	}
-	Width, Height = 800, 600
+	Width, Height = w, h
 	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
 	glfw.SetWindowTitle("renderer")
 	glfw.SetSwapInterval(1)
 }
 
-func InitGL() {
+func InitGL(smooth bool, multisample int) {
 	core.Fatal(gl.Init())
 
 	gl.Enable(gl.LIGHTING)
@@ -77,11 +77,11 @@ func InitGL() {
 	gl.Enable(gl.CULL_FACE)
 	gl.CullFace(gl.BACK)
 
-	if *flag_multisample != 0 {
+	if multisample != 0 {
 		gl.Enable(gl.MULTISAMPLE)
 	}
 
-	if *flag_smooth {
+	if smooth {
 		gl.ShadeModel(gl.SMOOTH)
 	}
 }

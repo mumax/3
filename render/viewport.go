@@ -13,8 +13,8 @@ var (
 	Rot          [3]int
 	Crop1, Crop2 [3]int
 	Light        [3]int
-	Time         int
-	//Ambient, Diffuse float32
+	Time         [3]int // only 1st element used.
+	//Ambient, Diffuse int
 	//Frustrum1, Frustrum2 int
 )
 
@@ -25,11 +25,44 @@ var (
 
 var Width, Height int
 
+var keyTarget = map[int]*[3]int{
+	P:   &Viewpos,
+	C:   &Crop1,
+	V:   &Crop2,
+	R:   &Rot,
+	T:   &Time,
+	Esc: nil}
+
+var activeTarget *[3]int
+
 func InitKeyHandlers() {
 	glfw.SetKeyCallback(func(key, state int) {
-		if state == 1 {
-
+		if state == 0 {
+			return
 		}
+		if activeTarget != nil {
+			switch key {
+			case Left:
+				(*activeTarget)[0]--
+				return
+			case Right:
+				(*activeTarget)[0]++
+				return
+			case Down:
+				(*activeTarget)[1]--
+				return
+			case Up:
+				(*activeTarget)[1]++
+				return
+			case PgDown:
+				(*activeTarget)[2]--
+				return
+			case PgUp:
+				(*activeTarget)[2]++
+				return
+			}
+		}
+		activeTarget = keyTarget[key]
 	})
 }
 
@@ -108,9 +141,9 @@ const (
 	Right  = 286
 	PgUp   = 298
 	PgDown = 299
-	Esc    = 257
 	Ret    = 294
 	Enter  = 318
+	Esc    = 257
 	P      = 80
 	C      = 67
 	V      = 86

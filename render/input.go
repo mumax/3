@@ -26,6 +26,8 @@ var (
 	mouseButton            [5]int
 )
 
+var mode int
+
 // variables targeted by mode keys
 var keyTarget = map[int]*[3]int{
 	P:   &Viewpos,
@@ -34,6 +36,12 @@ var keyTarget = map[int]*[3]int{
 	R:   &Rot,
 	T:   &Time,
 	Esc: nil}
+
+// called after updating the value of targeted by key
+var postUpdate = map[int]func(){
+	C: UpdateCrop,
+	V: UpdateCrop,
+	T: UpdateTime}
 
 // currently targeted variable
 var activeTarget = &Viewpos
@@ -51,33 +59,39 @@ func InitKeyHandlers() {
 			recording = !recording
 			log.Println("recording:", recording)
 		}
-		defer log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
-		defer PreRender() // TODO: only if neccesary
-		defer LimitCrop()
+
 		if activeTarget != nil {
 			switch key {
 			case Left:
 				(*activeTarget)[2]--
-				return
 			case Right:
 				(*activeTarget)[2]++
-				return
 			case Down:
 				(*activeTarget)[1]--
-				return
 			case Up:
 				(*activeTarget)[1]++
-				return
 			case PgDown:
 				(*activeTarget)[0]--
-				return
 			case PgUp:
 				(*activeTarget)[0]++
+			default:
+				activeTarget = keyTarget[key]
+				mode = key
 				return
 			}
 		}
-		activeTarget = keyTarget[key]
+
+		if f, ok := postUpdate[mode]; ok {
+			f()
+		}
+
+		log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
 	})
+}
+
+func UpdateCrop() {
+	LimitCrop()
+	PreRender()
 }
 
 // Limit crop ranges to sensible values
@@ -102,6 +116,10 @@ func LimitCrop() {
 			Crop1[i] = Crop2[i] - 1
 		}
 	}
+}
+
+func UpdateTime() {
+
 }
 
 const PI = math.Pi

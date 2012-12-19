@@ -2,28 +2,11 @@ package render
 
 import (
 	"code.google.com/p/mx3/core"
-	"code.google.com/p/mx3/dump"
 	gl "github.com/chsc/gogl/gl21"
 	"image/color"
-	"os"
 )
 
-var (
-	polys []Poly
-	Frame *dump.Frame
-)
-
-func Load(fname string) {
-	core.Log("loading", fname)
-	f, err := os.Open(fname)
-	core.Fatal(err)
-	defer f.Close()
-	r := dump.NewReader(f, dump.CRC_ENABLED)
-	core.Fatal(r.Read())
-	core.Log("loaded", fname)
-	Frame = &(r.Frame)
-	Crop2 = Frame.MeshSize
-}
+var polys []Poly
 
 func PreRender() {
 	core.Log("pre-render")

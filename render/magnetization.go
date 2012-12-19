@@ -2,8 +2,8 @@ package render
 
 import (
 	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/draw"
 	gl "github.com/chsc/gogl/gl21"
-	"image/color"
 )
 
 var polys []Poly
@@ -34,7 +34,7 @@ func PreRender() {
 				z := float32(scale * cell[2] * (float64(k-N[2]/2) + 0.5))
 				mx, my, mz := M[0][i][j][k], M[1][i][j][k], M[2][i][j][k]
 
-				col := color.NRGBA{byte(0.5 * (mx + 1) * 255), byte(0.5 * (my + 1) * 255), byte(0.5 * (mz + 1) * 255), 255}
+				col := draw.HSLMap(mz, my, mx)
 				// to be replaced, of course, by neighbor test
 				if i == Crop1[0] {
 					p := X1Face(x, y, z, rx, ry, rz, col)

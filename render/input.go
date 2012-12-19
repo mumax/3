@@ -16,7 +16,7 @@ var (
 	Time         [3]int // only 1st element used.
 	recording    bool   // screenshot at every key?
 	//Ambient, Diffuse int
-	//Frustrum1, Frustrum2 int
+	//Frustum1, Frustum2 int
 )
 var N [3]int          // mesh size
 var Width, Height int // window size

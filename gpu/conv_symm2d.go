@@ -33,9 +33,7 @@ func (c *Symm2D) init() {
 		core.Panic("conv: already initialized")
 	}
 	c.inited = true
-	// TODO: may unlock main thread...
-	LockCudaThread()
-	defer UnlockCudaThread()
+	//LockCudaThread()
 
 	padded := c.kernSize
 
@@ -79,7 +77,7 @@ func (c *Symm2D) initFFTKern3D() {
 	//halfkern[1] = halfkern[1]/2 + 1
 	fwPlan := c.fwPlan
 	output := TryMakeComplexs(fwPlan.OutputLen())
-	defer output.Free()
+	defer free(output.Pointer())
 	input := output.Float().Slice(0, fwPlan.InputLen())
 
 	// upper triangular part
@@ -270,4 +268,22 @@ func NewConvolution(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType,
 
 	return c
 	// TODO: self-test
+}
+
+// freeing kernel memory may fail when it was spilled to host.
+func free(a cu.DevicePtr) {
+	// recover should not be needed
+	defer func() {
+		err := recover()
+		if err != nil {
+			core.Log("free: recovered", err)
+			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
+		}
+	}()
+
+	if a.MemoryType() == cu.MemoryTypeDevice {
+		a.Free()
+	} else {
+		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
+	}
 }

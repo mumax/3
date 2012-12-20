@@ -28,6 +28,7 @@ var (
 	flag_max         = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize   = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak    = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
+	flag_od          = flag.String("o", "", "Set output directory")
 )
 
 const (
@@ -36,12 +37,18 @@ const (
 	Z
 )
 
+var od string
+
 func main() {
 	flag.Parse()
 	core.LOG = false
 
 	if flag.NArg() == 0 {
 		read(os.Stdin, "")
+	}
+
+	if *flag_od != "" {
+		od = *flag_od + "/"
 	}
 	for _, arg := range flag.Args() {
 		f, err := os.Open(arg)
@@ -62,7 +69,7 @@ func read(in io.Reader, name string) {
 		tname := name
 		if !(*flag_onefile) {
 			num := fmt.Sprintf("%06d", i)
-			tname = woext + num + ext
+			tname = od + woext + num + ext
 		}
 		process(&r.Frame, tname)
 		err = r.Read()

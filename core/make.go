@@ -10,3 +10,9 @@ func MakeFloats(size [3]int) [][][]float32 {
 	storage := make([]float32, Prod(size))
 	return Reshape(storage, size)
 }
+
+// Make a N-D block of floats. Underlying storage is contiguous.
+func MakeTensors(ncomp int, size [3]int) [][][][]float32 {
+	storage := make([]float32, ncomp*Prod(size))
+	return Reshape4D(storage, []int{ncomp, size[0], size[1], size[2]})
+}

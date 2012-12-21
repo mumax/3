@@ -142,9 +142,9 @@ func UpdateViewpos() {
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
 	gl.Translatef(gl.Float(Viewpos[0]), gl.Float(Viewpos[1]), gl.Float(Viewpos[2]))
-	gl.Rotatef(gl.Float(Rot[0]*6), 1, 0, 0)
-	gl.Rotatef(gl.Float(Rot[1]*6), 0, 1, 0)
-	gl.Rotatef(gl.Float(Rot[2]*6), 0, 0, 1)
+	gl.Rotatef(gl.Float(Rot[0]*2), 1, 0, 0)
+	gl.Rotatef(gl.Float(Rot[1]*2), 0, 1, 0)
+	gl.Rotatef(gl.Float(Rot[2]*2), 0, 0, 1)
 }
 
 const (

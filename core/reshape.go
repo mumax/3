@@ -62,6 +62,11 @@ func Contiguous(block [][][]float32) []float32 {
 	return block[0][0][:N]
 }
 
+func Contiguous4D(block [][][][]float32) []float32 {
+	N := len(block) * len(block[0]) * len(block[0][0]) * len(block[0][0][0])
+	return block[0][0][0][:N]
+}
+
 // Reshape the vector block to three contiguous lists.
 // Assumes the components's storage are individually contiguous,
 // like returned by MakeVectors.

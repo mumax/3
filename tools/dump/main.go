@@ -29,6 +29,7 @@ var (
 	flag_normalize   = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak    = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 	flag_od          = flag.String("o", "", "Set output directory")
+	//flag_scale       = flag.Int("scale", 1, "Scale down input resolution by factor")
 )
 
 const (
@@ -135,6 +136,9 @@ func preprocess(f *dump.Frame) {
 	if *flag_normpeak {
 		normpeak(f)
 	}
+	//if *flag_scale != 1{
+	//	rescale(f, *flag_scale)
+	//}
 }
 
 // Transforms the index between user and program space, unless it is a scalar:

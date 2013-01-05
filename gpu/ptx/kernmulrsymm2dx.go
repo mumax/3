@@ -15,7 +15,7 @@ const KERNMULRSYMM2DX = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_000016ee_00000000-9_kernmulrsymm2dx.cpp3.i"
+	.file	1 "/tmp/tmpxft_00001341_00000000-9_kernmulrsymm2dx.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/kernmulrsymm2dx.cu"
 
 .visible .entry kernmulRSymm2Dx(

@@ -15,7 +15,7 @@ const MADD2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001705_00000000-9_madd2.cpp3.i"
+	.file	1 "/tmp/tmpxft_000013be_00000000-9_madd2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/madd2.cu"
 
 .visible .entry madd2(

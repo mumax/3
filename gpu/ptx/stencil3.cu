@@ -11,13 +11,7 @@
 // and benchmarking implementations with shared memory.
 // TODO: wrap
 
-// clamps i between 0 and N-1
-inline __device__ int clamp(int i, int N){
-	return min( max(i, 0) , N-1 );
-}
-
-// 3D array indexing
-#define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
+#include "common_stencil.h"
 
 extern "C" __global__ void
 stencil3(float* __restrict__ dst, float* __restrict__ src, 

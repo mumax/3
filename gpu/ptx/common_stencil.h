@@ -11,7 +11,5 @@ inline __device__ int clamp(int i, int N){
 // 3D array indexing
 #define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
 
-//inline __device__ float3
-
 #endif
 

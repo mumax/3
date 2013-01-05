@@ -1,7 +1,7 @@
 #ifndef _COMMON_STENCIL_H_
 #define _COMMON_STENCIL_H_
 
-#include "common_func.h"
+#include "float3.h"
 
 // clamps i between 0 and N-1
 inline __device__ int clamp(int i, int N){

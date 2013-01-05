@@ -1,4 +1,4 @@
-#include "common_func.h"
+#include "float3.h"
 
 extern "C" __global__ void
 normalize(float* __restrict__ vx, float* __restrict__ vy, float* __restrict__ vz, int N) {

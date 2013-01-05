@@ -1,6 +1,6 @@
 #include "reduce.h"
 #include "atomicf.h"
-#include "common_func.h"
+#include "float3.h"
 
 #define load_vecnorm2(i) \
 	sqr(x[i]) + sqr(y[i]) +  sqr(z[i])

@@ -1,7 +1,7 @@
 #ifndef _LLGTORQUE_H_
 #define _LLGTORQUE_H_
 
-#include "common_func.h"
+#include "float3.h"
 
 inline __device__ float3 _llgtorque(float3 m, float3 H, float alpha) {
 	float3 mxH = crossf(m, H);

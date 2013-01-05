@@ -1,6 +1,6 @@
 #include "reduce.h"
 #include "atomicf.h"
-#include "common_func.h"
+#include "float3.h"
 
 #define load_vecdiff2(i)  \
 	sqr(x1[i] - x2[i]) + \

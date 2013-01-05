@@ -1,5 +1,5 @@
-#ifndef _COMMON_FUNC_H_
-#define _COMMON_FUNC_H_
+#ifndef _FLOAT3_H_
+#define _FLOAT3_H_
 
 // This file implements common functions on float3 (vector).
 // Author: Mykola Dvornik, Arne Vansteenkiste

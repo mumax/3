@@ -1,5 +1,12 @@
 #include "common_func.h"
 
+inline __device__ float3 _llgtorque(float3 m, float3 H, float alpha) {
+	float3 mxH = crossf(m, H);
+	float gilb = -1.0f / (1.0f + alpha * alpha);
+	return gilb * (mxH + alpha * crossf(m, mxH));
+}
+
+
 extern "C" __global__ void
 llgtorque(float* __restrict__  tx, float* __restrict__  ty, float* __restrict__  tz,
           float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz, 
@@ -12,9 +19,7 @@ llgtorque(float* __restrict__  tx, float* __restrict__  ty, float* __restrict__ 
 		float3 m = {mx[i], my[i], mz[i]};
 		float3 H = {hx[i], hy[i], hz[i]};
 
-    	float3 mxH = crossf(m, H);
-		float gilb = -1.0f / (1.0f + alpha * alpha);
-		float3 torque = gilb * (mxH + alpha * crossf(m, mxH));
+    	float3 torque = _llgtorque(m, H, alpha);
 
 		tx[i] = torque.x;
 		ty[i] = torque.y;

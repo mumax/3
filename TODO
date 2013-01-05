@@ -2,4 +2,4 @@ test: do not fail uni tests if cc is too low.
 replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.
 replace Slice by Frame, contains 3D size, ncomp, time stamp
 
-kernel wrappers: if async, the arguments might not survive an unfortunately timed GC! this is also a problem with mumax2. also they leak to heap...
+kernel wrappers: if async, the arguments might not survive an unfortunately timed GC! this is also a problem with mumax2. also they leak to heap. kernel launches seem not to overlap, so perhaps just use one stream and a global parameter buffer?

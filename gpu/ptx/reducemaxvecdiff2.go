@@ -15,11 +15,11 @@ const REDUCEMAXVECDIFF2 = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001458_00000000-9_reducemaxvecdiff2.cpp3.i"
+	.file	1 "/tmp/tmpxft_000018c9_00000000-9_reducemaxvecdiff2.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/reducemaxvecdiff2.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
-// __cuda_local_var_35274_32_non_const_sdata has been demoted
+// __cuda_local_var_33928_32_non_const_sdata has been demoted
 
 .visible .entry reducemaxvecdiff2(
 	.param .u64 reducemaxvecdiff2_param_0,
@@ -38,7 +38,7 @@ const REDUCEMAXVECDIFF2 = `
 	.reg .f32 	%f<39>;
 	.reg .s64 	%rd<28>;
 	// demoted variable
-	.shared .align 4 .b8 __cuda_local_var_35274_32_non_const_sdata[2048];
+	.shared .align 4 .b8 __cuda_local_var_33928_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd9, [reducemaxvecdiff2_param_0];
 	ld.param.u64 	%rd10, [reducemaxvecdiff2_param_1];
@@ -99,7 +99,7 @@ BB0_1:
 BB0_2:
 	.loc 2 14 1
 	mul.wide.s32 	%rd23, %r2, 4;
-	mov.u64 	%rd24, __cuda_local_var_35274_32_non_const_sdata;
+	mov.u64 	%rd24, __cuda_local_var_33928_32_non_const_sdata;
 	add.s64 	%rd8, %rd24, %rd23;
 	st.shared.f32 	[%rd8], %f38;
 	bar.sync 	0;
@@ -182,7 +182,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 2 14 1
-	ld.shared.u32 	%r41, [__cuda_local_var_35274_32_non_const_sdata];
+	ld.shared.u32 	%r41, [__cuda_local_var_33928_32_non_const_sdata];
 	.loc 3 1881 5
 	atom.global.max.s32 	%r42, [%rd1], %r41;
 

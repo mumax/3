@@ -1,11 +1,8 @@
 #ifndef _COMMON_FUNC_H_
 #define _COMMON_FUNC_H_
 
-// This file implements common functions typically required for calculus.
+// This file implements common functions on float3 (vector).
 // Author: Mykola Dvornik, Arne Vansteenkiste
-
-#include <cuda.h>
-#include "stdio.h"
 
 inline __device__ float3 operator+(float3 a, float3 b) {
     return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);

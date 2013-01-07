@@ -30,5 +30,4 @@ func main() {
 		Screenshot()
 		NextFrame()
 	}
-
 }

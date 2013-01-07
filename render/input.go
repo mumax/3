@@ -100,7 +100,7 @@ func InitKeyHandlers() {
 
 func UpdateCrop() {
 	LimitCrop()
-	PreRender()
+	PreRender(Frame)
 }
 
 // Limit crop ranges to sensible values

@@ -3,17 +3,17 @@ package render
 import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/draw"
+	"code.google.com/p/mx3/dump"
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
 )
 
 var polys = make([]Poly, 10000)
 
-func PreRender() {
+func PreRender(frame *dump.Frame) {
 	core.Log("pre-render")
 	polys = polys[:0]
 
-	frame := Frame
 	N = frame.MeshSize
 	cell := frame.MeshStep
 	maxworld := 0.

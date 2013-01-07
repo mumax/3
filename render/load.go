@@ -17,7 +17,7 @@ func Load(fnames []string) {
 	Frame = <-pipe
 	N = Frame.MeshSize
 	Crop2 = Frame.MeshSize
-	PreRender()
+	PreRender(Frame)
 }
 
 func NextFrame() {
@@ -30,5 +30,5 @@ func NextFrame() {
 	core.Log("frame", framei)
 	Frame = f
 	N = Frame.MeshSize
-	PreRender()
+	PreRender(Frame)
 }

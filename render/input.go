@@ -1,6 +1,7 @@
 package render
 
 import (
+	"code.google.com/p/mx3/core"
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
 	"log"
@@ -94,7 +95,9 @@ func InitKeyHandlers() {
 			Wantscrot = true
 		}
 
-		log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
+		if core.DEBUG {
+			log.Println("P:", Viewpos, "C:", Crop1, "V:", Crop2, "R:", Rot, "T:", Time[0])
+		}
 	})
 }
 

@@ -28,7 +28,7 @@ func Live(in_ nimble.ChanN) {
 		Viewpos[2] = -20
 
 		//var lock sync.Mutex
-		wantframe := true
+		wantframe := true // TODO: atomic
 
 		go func() {
 			gpu.LockCudaThread()

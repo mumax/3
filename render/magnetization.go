@@ -11,7 +11,9 @@ import (
 var polys = make([]Poly, 10000)
 
 func PreRender(frame *dump.Frame) {
-	core.Log("pre-render")
+	if core.DEBUG {
+		core.Debug("pre-render")
+	}
 	polys = polys[:0]
 
 	N = frame.MeshSize

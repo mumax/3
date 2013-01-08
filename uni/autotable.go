@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/dump"
 	"code.google.com/p/mx3/nimble"
+	"github.com/barnex/cuda5/cu"
 )
 
 type Autotabler struct {
@@ -13,6 +14,7 @@ type Autotabler struct {
 	Dev   Device
 	time  <-chan nimble.Time
 	hostBuf
+	stream cu.Stream
 }
 
 func Autotable(data_ nimble.Chan, every int, dev Device) {
@@ -32,6 +34,7 @@ func Autotable(data_ nimble.Chan, every int, dev Device) {
 	r.every = every
 	r.Dev = dev
 	r.time = nimble.Clock.NewReader()
+	r.stream = cu.StreamCreate()
 	nimble.Stack(r)
 }
 
@@ -53,7 +56,7 @@ func (r *Autotabler) Run() {
 			r.out.Data[0] = float32(time.Time)
 			for c := range output {
 				sum := 0.
-				list := r.gethost(output[c])
+				list := r.gethost(output[c], r.stream)
 				for j := range list {
 					sum += float64(list[j])
 				}

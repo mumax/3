@@ -26,7 +26,7 @@ func InitWindow(w, h int, multisample int, vsync bool) {
 	}
 	Width, Height = w, h
 	core.Fatal(glfw.OpenWindow(Width, Height, r, g, b, a, depth, stencil, glfw.Windowed))
-	glfw.SetWindowTitle("renderer")
+	glfw.SetWindowTitle("mumax cubed")
 	if vsync {
 		glfw.SetSwapInterval(1)
 	}

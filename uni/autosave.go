@@ -4,6 +4,8 @@ import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/dump"
 	"code.google.com/p/mx3/nimble"
+	"github.com/barnex/cuda5/cu"
+	"unsafe"
 )
 
 type Autosaver struct {
@@ -11,7 +13,8 @@ type Autosaver struct {
 	data  nimble.RChanN
 	every int
 	hostBuf
-	Dev Device
+	Dev    Device
+	stream cu.Stream
 }
 
 func Autosave(data_ nimble.Chan, every int, dev Device) {
@@ -25,6 +28,7 @@ func Autosave(data_ nimble.Chan, every int, dev Device) {
 	r.data = data
 	r.every = every
 	r.Dev = dev
+	r.stream = cu.StreamCreate()
 	nimble.Stack(r)
 }
 
@@ -36,30 +40,51 @@ func (r *Autosaver) Run() {
 		r.Dev.InitThread()
 	}
 
+	buffer := make([][]float32, r.data.NComp())
+	for c := range buffer {
+		buffer[c] = make([]float32, N)
+		cu.MemHostRegister(unsafe.Pointer(&buffer[c][0]), cu.SIZEOF_FLOAT32*int64(len(buffer[c])), cu.MEMHOSTREGISTER_PORTABLE)
+	}
+
 	for i := 0; ; i++ {
-		output := r.data.ReadNext(N) // TODO: could read comp by comp...
+
 		if i%r.every == 0 {
+
+			// read first
+			for c := range buffer {
+				data := r.data.Comp(c).ReadNext(N)
+				data.Device().CopyDtoHAsync(buffer[c], r.stream)
+				r.stream.Synchronize()
+				r.data.ReadDone()
+			}
+
+			// then output in parallel
 			i = 0
 			r.out.WriteHeader()
-			for c := 0; c < r.data.NComp(); c++ {
-				r.out.WriteData(r.gethost(output[c]))
+			for c := range buffer {
+				r.out.WriteData(buffer[c])
 			}
 			r.out.WriteHash()
+		} else {
+			// skip frame
+			r.data.ReadNext(N)
+			r.data.ReadDone()
 		}
-		r.data.ReadDone()
 	}
 }
 
 type hostBuf []float32
 
-func (r *hostBuf) gethost(data nimble.Slice) []float32 {
+func (r *hostBuf) gethost(data nimble.Slice, s cu.Stream) []float32 {
 	if data.CPUAccess() {
+		panic("uni.autosave cpu: need a copy")
 		return data.Host()
 	} // else
 	if *r == nil {
 		core.Debug("alloc buffer")
 		*r = make([]float32, data.Len())
 	}
-	data.Device().CopyDtoH(*r)
+	data.Device().CopyDtoHAsync(*r, s)
+	s.Synchronize()
 	return *r
 }

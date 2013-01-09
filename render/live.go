@@ -5,7 +5,7 @@ import (
 	"code.google.com/p/mx3/gpu"
 	"code.google.com/p/mx3/nimble"
 	"github.com/jteeuwen/glfw"
-	//"sync"
+	"sync/atomic"
 )
 
 func Live(in_ nimble.ChanN) {
@@ -27,18 +27,27 @@ func Live(in_ nimble.ChanN) {
 		defer glfw.Terminate()
 		Viewpos[2] = -20
 
-		//var lock sync.Mutex
-		wantframe := true // TODO: atomic
+		want := int32(1)
+		wantframe := func() bool {
+			return atomic.LoadInt32(&want) == 1
+		}
+		setwantframe := func(wnt bool) {
+			w := int32(0)
+			if wnt {
+				w = 1
+			}
+			atomic.StoreInt32(&want, w)
+		}
 
 		go func() {
 			gpu.LockCudaThread()
 			for {
 				data := in.ReadNext(ncell)
-				if wantframe {
+				if wantframe() {
 					for i, d := range data {
 						d.Device().CopyDtoH(Frame.Data[i*ncell : (i+1)*ncell])
 					}
-					wantframe = false
+					setwantframe(false)
 				}
 				in.ReadDone()
 			}
@@ -51,9 +60,9 @@ func Live(in_ nimble.ChanN) {
 				Screenshot()
 				Wantscrot = false
 			}
-			if wantframe == false {
+			if wantframe() == false {
 				PreRender(Frame)
-				wantframe = true
+				setwantframe(true)
 			}
 			//lock.Unlock()
 		}

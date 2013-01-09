@@ -87,7 +87,7 @@ func (e *RK23) Step() {
 	//	cpyvec(y0, y, str)
 	//	maddvec(y, dy, 0.5*dt, str)
 	//	e.time += 0.5*e.dt_si
-	//	e.y.WriteDone() 
+	//	e.y.WriteDone()
 	//	e.dy.ReadDone()
 
 	//	// stage2

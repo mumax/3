@@ -30,7 +30,7 @@ func (s *Sum) Add(term_ nimble.Chan) {
 }
 
 // Add term * weight to the sum.
-// TODO: it might be nice to add to separate components 
+// TODO: it might be nice to add to separate components
 func (s *Sum) MAdd(term_ nimble.Chan, weight float32) {
 	term := term_.ChanN().NewReader()
 	if len(s.term) != 0 {

@@ -254,7 +254,7 @@ func padSize(size, periodic [3]int) [3]int {
                                   evaluation points
 A: no staggering
 
-B: 
+B:
 	nv = ((nv + 1) / 2) * 2
 	nw = ((nw + 1) / 2) * 2
 	nx = ((nx+1)/2)*2 - 1
@@ -268,11 +268,11 @@ C:
 	ny = ((ny+1)/2)*2 + 1
 	nz = ((nz+1)/2)*2 + 1
 
-D: 
-	nv += 1 
-	nw += 1 
+D:
+	nv += 1
+	nw += 1
 
-E: 
+E:
 	nx += 1
 	ny += 1
 	nz += 1

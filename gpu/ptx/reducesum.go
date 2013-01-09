@@ -15,7 +15,7 @@ const REDUCESUM = `
 .target sm_30
 .address_size 64
 
-	.file	1 "/tmp/tmpxft_00001ca2_00000000-9_reducesum.cpp3.i"
+	.file	1 "/tmp/tmpxft_00006c69_00000000-9_reducesum.cpp3.i"
 	.file	2 "/home/arne/src/code.google.com/p/mx3/gpu/ptx/reducesum.cu"
 	.file	3 "/usr/local/cuda-5.0/nvvm/ci_include.h"
 	.file	4 "/usr/local/cuda/bin/../include/sm_20_atomic_functions.h"

@@ -27,27 +27,18 @@ func Live(in_ nimble.ChanN) {
 		defer glfw.Terminate()
 		Viewpos[2] = -20
 
-		want := int32(1)
-		wantframe := func() bool {
-			return atomic.LoadInt32(&want) == 1
-		}
-		setwantframe := func(wnt bool) {
-			w := int32(0)
-			if wnt {
-				w = 1
-			}
-			atomic.StoreInt32(&want, w)
-		}
+		wantframe := new(atomicbool)
+		wantframe.set(true)
 
 		go func() {
 			gpu.LockCudaThread()
 			for {
 				data := in.ReadNext(ncell)
-				if wantframe() {
+				if wantframe.get() {
 					for i, d := range data {
 						d.Device().CopyDtoH(Frame.Data[i*ncell : (i+1)*ncell])
 					}
-					setwantframe(false)
+					wantframe.set(false)
 				}
 				in.ReadDone()
 			}
@@ -60,11 +51,25 @@ func Live(in_ nimble.ChanN) {
 				Screenshot()
 				Wantscrot = false
 			}
-			if wantframe() == false {
+			if wantframe.get() == false {
 				PreRender(Frame)
-				setwantframe(true)
+				wantframe.set(true)
 			}
 			//lock.Unlock()
 		}
 	}()
+}
+
+type atomicbool int32
+
+func (a *atomicbool) get() bool {
+	return atomic.LoadInt32((*int32)(a)) == 1
+}
+
+func (a *atomicbool) set(v bool) {
+	w := int32(0)
+	if v {
+		w = 1
+	}
+	atomic.StoreInt32((*int32)(a), w)
 }

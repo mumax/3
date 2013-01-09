@@ -58,22 +58,6 @@ func ToSlice(list []float32) Slice {
 	return Slice{unsafe.Pointer(&list[0]), len(list), CPUMemory}
 }
 
-const (
-	CPUMemory     MemType = 1 << 0
-	GPUMemory     MemType = 1 << 1
-	UnifiedMemory MemType = CPUMemory | GPUMemory
-)
-
-type MemType byte
-
-func (m MemType) GPUAccess() bool {
-	return m&GPUMemory != 0
-}
-
-func (m MemType) CPUAccess() bool {
-	return m&CPUMemory != 0
-}
-
 func UnsafeSlice(ptr unsafe.Pointer, len_ int, flag MemType) Slice {
 	if len_ < 0 {
 		panic("negative slice length")

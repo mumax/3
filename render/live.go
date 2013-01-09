@@ -45,7 +45,6 @@ func Live(in_ nimble.ChanN) {
 		}()
 
 		for glfw.WindowParam(glfw.Opened) == 1 { // window open
-			//lock.Lock()
 			Render()
 			if Wantscrot {
 				Screenshot()
@@ -55,7 +54,6 @@ func Live(in_ nimble.ChanN) {
 				PreRender(Frame)
 				wantframe.set(true)
 			}
-			//lock.Unlock()
 		}
 	}()
 }

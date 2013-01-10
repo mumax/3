@@ -39,7 +39,7 @@ racetest:
 	go test -race $(PKGS)
 	make -C test
 
-test: 6gtest  unittest gccgotest
+test: 6gtest  unittest #gccgotest #re-enable gccgotest when gcc up to date with go 1.1
 
 unittest:
 	make -C test

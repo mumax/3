@@ -8,9 +8,11 @@ NVCC = nvcc\
 	--compiler-options -Wall\
 	-Xptxas\
 	-O3\
-	-v\
 
-all: $(GOFILES) install
+all: $(GOFILES) install cuda2go
+
+cuda2go: cuda2go.go
+	go build cuda2go.go
 
 install: $(GOFILES)
 	go install -v

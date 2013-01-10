@@ -37,6 +37,6 @@ func kernMulRSymm3D(fftM [3]safe.Complex64s, K00, K11, K22, K12, K02, K01 safe.F
 		unsafe.Pointer(&N2)}
 
 	shmem := 0
-	kernMulRSymm2DyzCode := PTXLoad("kernmulRSymm3D")
-	cu.LaunchKernel(kernMulRSymm2DyzCode, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
+	code := PTXLoad("kernmulRSymm3D")
+	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
 }

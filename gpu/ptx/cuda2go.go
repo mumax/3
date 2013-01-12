@@ -128,20 +128,26 @@ import(
 	"sync"
 )
 
+// pointers passed to CGO must be kept alive manually
+// so we keep then here.
 var( 
+	{{.Name}}_lock sync.Mutex
 	{{.Name}}_stream = cu.StreamCreate() // only after init?
-	{{range $i, $n := .ArgN}} {{$.Name}}_arg_{{$n}}
+	{{range $i, $_ := .ArgN}} {{$.Name}}_arg_{{.}} {{index $.ArgT $i}}
 	{{end}} 
-	argp_{{.Name}} [{{len .ArgN}}]unsafe.Pointer
-	lock_{{.Name}} sync.Mutex
+	{{.Name}}_argptr = [...]unsafe.Ponter{ {{range $i, $_ := .ArgN}} {{with $i}},{{end}} unsafe.Pointer(&{{.}}) {{end}}  }
 )
 
 // CUDA kernel wrapper for {{.Name}}.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
-	//lock_{{.Name}}.Lock()
+	{{.Name}}_lock.Lock()
 
+	{{range .ArgN}} {{$.Name}}_arg_{{.}} = {{.}}
+	{{end}}
+
+	args := {{.Name}}_argptr[:]
 	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, stream_{{.Name}}, args)
 	stream_{{.Name}}.Synchronize()
 	lock_{{.Name}}.Unlock()

@@ -97,7 +97,7 @@ func initCpuProf() {
 			pprof.StopCPUProfile()
 			me := procselfexe()
 			outfile := fname + ".svg"
-			cmdpipe(outfile, "go", "tool", "pprof", "-svg", me, fname)
+			core.SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", me, fname)
 		})
 	}
 }
@@ -113,20 +113,8 @@ func initMemProf() {
 			core.LogErr(pprof.WriteHeapProfile(f))
 			me := procselfexe()
 			outfile := fname + ".svg"
-			cmdpipe(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
+			core.SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
 		})
-	}
-}
-
-// exec command and write output to outfile.
-func cmdpipe(outfile string, cmd string, args ...string) {
-	core.Log("exec:", cmd, args, ">", outfile)
-	out, err := exec.Command(cmd, args...).CombinedOutput()
-	if err != nil {
-		core.Log(cmd, ":", string(out), err)
-		return
-	} else {
-		core.LogErr(ioutil.WriteFile(outfile, out, 0666))
 	}
 }
 

@@ -29,6 +29,17 @@ func NoExt(file string) string {
 	return file[:len(file)-len(ext)]
 }
 
+// Exec command and write output to outfile.
+func SaveCmdOutput(outfile string, cmd string, args ...string) {
+	Log("exec:", cmd, args, ">", outfile)
+	out, err := exec.Command(cmd, args...).CombinedOutput()
+	if err != nil {
+		Fatalf("exec %v %v: %v: %v", cmd, args, err, string(out))
+	} else {
+		Fatalf("writing %v: %v", outfile, ioutil.WriteFile(outfile, out, 0666))
+	}
+}
+
 // Product of elements.
 func Prod(size [3]int) int {
 	return size[0] * size[1] * size[2]

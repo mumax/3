@@ -92,8 +92,8 @@ func typemap(ctype string) string {
 // template data
 type Kernel struct {
 	Name string
-	ArgN []string
 	ArgT []string
+	ArgN []string
 }
 
 //func (k *Kernel) Args() string {
@@ -129,7 +129,9 @@ import(
 )
 
 var( 
-	stream_{{.Name}} = cu.StreamCreate()
+	{{.Name}}_stream = cu.StreamCreate() // only after init?
+	{{range $i, $n := .ArgN}} {{$.Name}}_arg_{{$n}}
+	{{end}} 
 	argp_{{.Name}} [{{len .ArgN}}]unsafe.Pointer
 	lock_{{.Name}} sync.Mutex
 )
@@ -137,8 +139,8 @@ var(
 // CUDA kernel wrapper for {{.Name}}.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
-func K_{{.Name}}({{range .ArgT}}{{.}},{{end}} gridDim, blockDim cu.Dim3) {
-	lock_{{.Name}}.Lock()
+func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
+	//lock_{{.Name}}.Lock()
 
 	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, stream_{{.Name}}, args)
 	stream_{{.Name}}.Synchronize()

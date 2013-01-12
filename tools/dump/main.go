@@ -124,11 +124,6 @@ func process(f *dump.Frame, name string) {
 	}
 }
 
-func noExt(file string) string {
-	ext := path.Ext(file)
-	return file[:len(file)-len(ext)]
-}
-
 func preprocess(f *dump.Frame) {
 	if *flag_normalize {
 		normalize(f, 1)

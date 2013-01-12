@@ -5,14 +5,28 @@ package core
 import (
 	"flag"
 	"os"
+	"path"
 	"strconv"
 )
 
-// Open file for writing, panic or error.
+// Open file for writing, error is fatal.
 func OpenFile(fname string) *os.File {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	Fatal(err)
 	return f
+}
+
+// Open file for reading, error is fatal.
+func Open(fname string) *os.File {
+	f, err := os.Open(fname)
+	Fatal(err)
+	return f
+}
+
+// Remove extension from file name.
+func NoExt(file string) string {
+	ext := path.Ext(file)
+	return file[:len(file)-len(ext)]
 }
 
 // Product of elements.

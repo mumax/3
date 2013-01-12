@@ -9,7 +9,6 @@ package main
 import (
 	"code.google.com/p/mx3/core"
 	"flag"
-	"os"
 	"text/scanner"
 	"text/template"
 )
@@ -24,8 +23,7 @@ func main() {
 // generate cuda wrapper for file.
 func cuda2go(fname string) {
 	// open cuda file
-	f, err := os.Open(fname)
-	core.Fatal(err)
+	f := core.Open(fname)
 	defer f.Close()
 
 	// read tokens
@@ -108,9 +106,11 @@ type Kernel struct {
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	//fmt.Println("wrapgen", filename, funcname, args)
 	kernel := &Kernel{funcname, argt, argn}
-	core.Fatal(templ.Execute(os.Stdout, kernel))
+	wrapfname := core.NoExt(filename) + ".go"
+	wrapout := core.OpenFile(wrapfname)
+	defer wrapout.Close()
+	core.Fatal(templ.Execute(wrapout, kernel))
 }
 
 // wrapper code template text

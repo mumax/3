@@ -45,7 +45,7 @@ func cuda2go(fname string) {
 	// find function name and arguments
 	funcname := ""
 	argstart, argstop := -1, -1
-	for i := 3; i < len(token); i++ {
+	for i := 0; i < len(token); i++ {
 		if token[i] == "__global__" {
 			funcname = token[i+2]
 			argstart = i + 4

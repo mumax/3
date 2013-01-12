@@ -5,6 +5,8 @@
 //	a    ->  a x
 //	         x x
 //
+extern int kaka;
+
 extern "C" __global__ void 
 copypad(float* __restrict__  dst, int D0, int D1, int D2, 
         float* __restrict__  src, int S0, int S1, int S2, 

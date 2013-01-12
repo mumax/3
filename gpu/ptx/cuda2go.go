@@ -7,10 +7,12 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"code.google.com/p/mx3/core"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"text/scanner"
 	"text/template"
 )
@@ -102,10 +104,7 @@ type Kernel struct {
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	ptx, err := ioutil.ReadFile(core.NoExt(filename) + ".ptx")
-	if err != nil {
-		core.Fatalf("read %v: %v", filename, err)
-	}
+	ptx := filterptx(core.NoExt(filename) + ".ptx")
 	kernel := &Kernel{funcname, argt, argn, "`" + string(ptx) + "`"}
 	wrapfname := core.NoExt(filename) + ".go"
 	wrapout := core.OpenFile(wrapfname)
@@ -175,4 +174,22 @@ func filter(token string) bool {
 		return true
 	}
 	return false
+}
+
+// Filter comments and ".file" entries from ptx code.
+// They spoil the git history
+func filterptx(fname string) string {
+	f := core.Open(fname)
+	defer f.Close()
+	in := bufio.NewReader(f)
+	var out bytes.Buffer
+	line, err := in.ReadBytes('\n')
+	for err != io.EOF {
+		core.Fatal(err)
+		if !bytes.HasPrefix(line, []byte("//")) && !bytes.HasPrefix(line, []byte("	.file")) {
+			out.Write(line)
+		}
+		line, err = in.ReadBytes('\n')
+	}
+	return out.String()
 }

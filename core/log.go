@@ -16,7 +16,7 @@ var (
 )
 
 // If err != nil, exit cleanly without panic.
-// TODO -> FatalErr
+// TODO -> FatalErr, require explanatory message.
 func Fatal(err interface{}) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "mx3:", err)

@@ -7,10 +7,8 @@
 package main
 
 import (
-	"bytes"
 	"code.google.com/p/mx3/core"
 	"flag"
-	"fmt"
 	"os"
 	"text/scanner"
 	"text/template"
@@ -67,48 +65,51 @@ func cuda2go(fname string) {
 		}
 	}
 
-	// make pointers Go-style
+	// separate arg names/types and make pointers Go-style
+	argn := make([]string, len(args))
+	argt := make([]string, len(args))
 	for i := range args {
 		if args[i][1] == "*" {
 			args[i] = []string{args[i][0] + "*", args[i][2]}
-			args[i][0] = typemap(args[i][0])
 		}
+		argt[i] = typemap(args[i][0])
+		argn[i] = args[i][1]
 	}
-	wrapgen(fname, funcname, args)
+	wrapgen(fname, funcname, argt, argn)
 }
+
+var tm = map[string]string{"float*": "cu.DevicePtr", "float": "float32", "int": "int"}
 
 // translate C type to Go type.
 func typemap(ctype string) string {
-	switch ctype {
-	default:
-		core.Fatalf("cuda2go: unsupported cuda type: %v", ctype)
-	case "float*":
-		return "cu.DevicePtr"
+	if gotype, ok := tm[ctype]; ok {
+		return gotype
 	}
-	panic("bug")
+	core.Fatalf("cuda2go: unsupported cuda type: %v", ctype)
 	return "" // unreachable
 }
 
 // template data
 type Kernel struct {
 	Name string
-	args [][]string
+	ArgN []string
+	ArgT []string
 }
 
-func (k *Kernel) Args() string {
-	var a bytes.Buffer
-	for _, arg := range k.args {
-		fmt.Fprint(&a, arg[1], " ", arg[0], ", ")
-	}
-	return a.String()
-}
+//func (k *Kernel) Args() string {
+//	var a bytes.Buffer
+//	for _, arg := range k.args {
+//		fmt.Fprint(&a, arg[1], " ", arg[0], ", ")
+//	}
+//	return a.String()
+//}
 
-func (k *Kernel) NArg() int { return len(k.args) }
+//func (k *Kernel) NArg() int { return len(k.args) }
 
 // generate wrapper code from template
-func wrapgen(filename, funcname string, args [][]string) {
+func wrapgen(filename, funcname string, argt, argn []string) {
 	//fmt.Println("wrapgen", filename, funcname, args)
-	kernel := &Kernel{funcname, args}
+	kernel := &Kernel{funcname, argt, argn}
 	core.Fatal(templ.Execute(os.Stdout, kernel))
 }
 
@@ -129,15 +130,14 @@ import(
 
 var( 
 	stream_{{.Name}} = cu.StreamCreate()
-	{{range .
-	argp_{{.Name}} [{{.NArg}}]unsafe.Pointer
+	argp_{{.Name}} [{{len .ArgN}}]unsafe.Pointer
 	lock_{{.Name}} sync.Mutex
 )
 
 // CUDA kernel wrapper for {{.Name}}.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
-func K_{{.Name}}({{.Args}} gridDim, blockDim cu.Dim3) {
+func K_{{.Name}}({{range .ArgT}}{{.}},{{end}} gridDim, blockDim cu.Dim3) {
 	lock_{{.Name}}.Lock()
 
 	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, stream_{{.Name}}, args)

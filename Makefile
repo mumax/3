@@ -65,3 +65,7 @@ clean:
 	go clean -i -x $(PKGS)
 	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/
 	make clean -C gpu/ptx
+
+.PHONY: count
+count:
+	wc -l *.go */*.go gpu/ptx/*.cu

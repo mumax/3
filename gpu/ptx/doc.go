@@ -1,9 +1,5 @@
 /*
- PTX assembly of CUDA code.
+ This package stores PTX assembly code for compiled CUDA kernels
+ and provides auto-generated kernel wrappers.
 */
-package ptx
-
-// maps file names (equal to function names) on code
-// TODO: do not use map but generate functions so that
-// the linker can elide unused ptx code.
-var Code = make(map[string]string)
+package documentation

@@ -1,4 +1,4 @@
-package gpu
+package ptx
 
 // This files implements loading and caching of CUDA PTX code.
 
@@ -30,5 +30,3 @@ func PTXLoad(function string) cu.Function {
 	}
 	return ptxfuncs[function]
 }
-
-// TODO: ptxcall with profiler

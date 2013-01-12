@@ -94,16 +94,6 @@ type Kernel struct {
 	ArgN []string
 }
 
-//func (k *Kernel) Args() string {
-//	var a bytes.Buffer
-//	for _, arg := range k.args {
-//		fmt.Fprint(&a, arg[1], " ", arg[0], ", ")
-//	}
-//	return a.String()
-//}
-
-//func (k *Kernel) NArg() int { return len(k.args) }
-
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
 	kernel := &Kernel{funcname, argt, argn}

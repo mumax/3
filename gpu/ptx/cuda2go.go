@@ -9,6 +9,8 @@ package main
 import (
 	"code.google.com/p/mx3/core"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"text/scanner"
 	"text/template"
 )
@@ -22,6 +24,7 @@ func main() {
 
 // generate cuda wrapper for file.
 func cuda2go(fname string) {
+	fmt.Println("cuda2go", fname)
 	// open cuda file
 	f := core.Open(fname)
 	defer f.Close()
@@ -37,6 +40,7 @@ func cuda2go(fname string) {
 		}
 		tok = s.Scan()
 	}
+	fmt.Println("tokens:", token)
 
 	// find function name and arguments
 	funcname := ""
@@ -51,6 +55,7 @@ func cuda2go(fname string) {
 			break
 		}
 	}
+	fmt.Println("arg", "start:", argstart, "stop:", argstop)
 	argl := token[argstart:argstop]
 
 	// isolate individual arguments
@@ -92,11 +97,16 @@ type Kernel struct {
 	Name string
 	ArgT []string
 	ArgN []string
+	PTX  string
 }
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	kernel := &Kernel{funcname, argt, argn}
+	ptx, err := ioutil.ReadFile(core.NoExt(filename) + ".ptx")
+	if err != nil {
+		core.Fatalf("read %v: %v", filename, err)
+	}
+	kernel := &Kernel{funcname, argt, argn, "`" + string(ptx) + "`"}
 	wrapfname := core.NoExt(filename) + ".go"
 	wrapout := core.OpenFile(wrapfname)
 	defer wrapout.Close()
@@ -112,6 +122,7 @@ const templText = `package ptx
 */
 
 import(
+	"code.google.com/p/mx3/core"
 	"unsafe"
 	"github.com/barnex/cuda5/cu"
 	"sync"
@@ -121,26 +132,35 @@ import(
 // so we keep then here.
 var( 
 	{{.Name}}_lock sync.Mutex
-	{{.Name}}_stream = cu.StreamCreate() // only after init?
+	{{.Name}}_code cu.Function
+	{{.Name}}_stream cu.Stream
 	{{range $i, $_ := .ArgN}} {{$.Name}}_arg_{{.}} {{index $.ArgT $i}}
 	{{end}} 
-	{{.Name}}_argptr = [...]unsafe.Ponter{ {{range $i, $_ := .ArgN}} {{with $i}},{{end}} unsafe.Pointer(&{{.}}) {{end}}  }
+	{{.Name}}_argptr = [...]unsafe.Pointer{ {{range $i, $_ := .ArgN}} {{with $i}},{{end}} unsafe.Pointer(&{{$.Name}}_arg_{{.}}) {{end}}  }
 )
 
 // CUDA kernel wrapper for {{.Name}}.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
-func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
+func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
 	{{.Name}}_lock.Lock()
+
+	if {{.Name}}_stream == 0{
+		{{.Name}}_stream = cu.StreamCreate()
+		core.Log("Loading PTX code for {{.Name}}")
+		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
+	}
 
 	{{range .ArgN}} {{$.Name}}_arg_{{.}} = {{.}}
 	{{end}}
 
 	args := {{.Name}}_argptr[:]
-	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, stream_{{.Name}}, args)
-	stream_{{.Name}}.Synchronize()
-	lock_{{.Name}}.Unlock()
+	cu.LaunchKernel({{.Name}}_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, {{.Name}}_stream, args)
+	{{.Name}}_stream.Synchronize()
+	{{.Name}}_lock.Unlock()
 }
+
+const {{.Name}}_ptx = {{.PTX}}
 `
 
 // wrapper code template

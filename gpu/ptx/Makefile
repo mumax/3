@@ -17,8 +17,8 @@ cuda2go: cuda2go.go
 install: $(GOFILES)
 	go install -v
 
-$(GOFILES): %.go: %.ptx
-	./ptx2go $(@:.go=.ptx) $@ $(@:.go=)
+$(GOFILES): %.go: %.ptx cuda2go
+	./cuda2go $(@:.go=.cu) 
 
 $(PTXFILES): %.ptx: %.cu
 	rm -f $@

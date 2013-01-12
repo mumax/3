@@ -1,4 +1,4 @@
-package ptx
+package gpu
 
 // This files implements loading and caching of CUDA PTX code.
 

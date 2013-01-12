@@ -17,9 +17,9 @@ var (
 
 // If err != nil, exit cleanly without panic.
 // TODO -> FatalErr
-func Fatal(err error) {
+func Fatal(err interface{}) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "mx3:", err)
 		Cleanup()
 		os.Exit(1)
 	}

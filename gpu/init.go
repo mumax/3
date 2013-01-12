@@ -28,7 +28,7 @@ func init() {
 	case "sync":
 		flag = cu.CTX_BLOCKING_SYNC
 	}
-	cu.Init(0)
+	tryCuInit()
 	dev := cu.Device(*nimble.Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
@@ -39,6 +39,15 @@ func init() {
 	if M < 2 {
 		core.Log("Compute capability does not allow unified addressing.")
 	}
+}
+
+// cu.Init(), but error is fatal and does not dump stack.
+func tryCuInit() {
+	defer func() {
+		err := recover()
+		core.Fatal(err)
+	}()
+	cu.Init(0)
 }
 
 var lockCount int32

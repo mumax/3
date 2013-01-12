@@ -40,7 +40,7 @@ func cuda2go(fname string) {
 		}
 		tok = s.Scan()
 	}
-	fmt.Println("tokens:", token)
+	//fmt.Println("tokens:", token)
 
 	// find function name and arguments
 	funcname := ""
@@ -55,7 +55,7 @@ func cuda2go(fname string) {
 			break
 		}
 	}
-	fmt.Println("arg", "start:", argstart, "stop:", argstop)
+	//fmt.Println("arg", "start:", argstart, "stop:", argstop)
 	argl := token[argstart:argstop]
 
 	// isolate individual arguments
@@ -136,7 +136,9 @@ var(
 	{{.Name}}_stream cu.Stream
 	{{range $i, $_ := .ArgN}} {{$.Name}}_arg_{{.}} {{index $.ArgT $i}}
 	{{end}} 
-	{{.Name}}_argptr = [...]unsafe.Pointer{ {{range $i, $_ := .ArgN}} {{with $i}},{{end}} unsafe.Pointer(&{{$.Name}}_arg_{{.}}) {{end}}  }
+	{{.Name}}_argptr = [...]unsafe.Pointer{ 
+		{{range $i, $_ := .ArgN}} {{with $i}},
+	{{end}} unsafe.Pointer(&{{$.Name}}_arg_{{.}}) {{end}}  }
 )
 
 // CUDA kernel wrapper for {{.Name}}.

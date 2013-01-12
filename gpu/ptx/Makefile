@@ -19,6 +19,7 @@ install: $(GOFILES)
 
 $(GOFILES): %.go: %.ptx cuda2go
 	./cuda2go $(@:.go=.cu) 
+	gofmt -w $@
 
 $(PTXFILES): %.ptx: %.cu
 	rm -f $@

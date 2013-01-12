@@ -2,10 +2,10 @@ package gpu
 
 import (
 	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/gpu/ptx"
 	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
-	"unsafe"
 )
 
 type Stencil struct {
@@ -36,37 +36,12 @@ func (s *Stencil) Output() nimble.Chan1 {
 func StencilAdd(dst, src safe.Float32s, mesh *nimble.Mesh, weight *[7]float32, stream cu.Stream) {
 	core.Assert(dst.Len() == src.Len() && src.Len() == mesh.NCell())
 
-	// TODO:
-	// if *weight == [7]float32{}{return}
-
 	size := mesh.Size()
 	N0, N1, N2 := size[0], size[1], size[2]
 	wrap := mesh.PBC()
 	core.Assert(wrap == [3]int{0, 0, 0})
-
 	gridDim, blockDim := Make2DConf(N2, N1) // why?
-
-	dptr := dst.Pointer()
-	sptr := src.Pointer()
-	args := []unsafe.Pointer{
-		unsafe.Pointer(&dptr),
-		unsafe.Pointer(&sptr),
-		unsafe.Pointer(&(*weight)[0]),
-		unsafe.Pointer(&(*weight)[1]),
-		unsafe.Pointer(&(*weight)[2]),
-		unsafe.Pointer(&(*weight)[3]),
-		unsafe.Pointer(&(*weight)[4]),
-		unsafe.Pointer(&(*weight)[5]),
-		unsafe.Pointer(&(*weight)[6]),
-		unsafe.Pointer(&wrap[0]),
-		unsafe.Pointer(&wrap[1]),
-		unsafe.Pointer(&wrap[2]),
-		unsafe.Pointer(&N0),
-		unsafe.Pointer(&N1),
-		unsafe.Pointer(&N2)}
-
-	code := PTXLoad("stencil3")
-	shmem := 0
-	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
-	stream.Synchronize()
+	ptx.K_stencil3(dst.Pointer(), src.Pointer(),
+		weight[0], weight[1], weight[2], weight[3], weight[4], weight[5], weight[6],
+		wrap[0], wrap[1], wrap[2], N0, N1, N2, gridDim, blockDim)
 }

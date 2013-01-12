@@ -4,9 +4,7 @@ package gpu
 
 import (
 	"code.google.com/p/mx3/core"
-	"code.google.com/p/mx3/gpu/ptx"
 	"github.com/barnex/cuda5/cu"
-	"strings"
 	"sync"
 )
 
@@ -21,7 +19,7 @@ func PTXLoad(function string) cu.Function {
 
 	if ptxfuncs[function] == 0 {
 		core.Log("loading PTX code for", function)
-		code, ok := ptx.Code[strings.ToLower(function)]
+		code, ok := "nocode", false
 		if !ok {
 			panic("ptxload: code not found: " + function)
 		}

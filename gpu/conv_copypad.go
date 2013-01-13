@@ -9,7 +9,7 @@ import (
 
 // Copies src into dst, which is larger or smaller.
 // The remainder of dst is not filled with zeros.
-func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int, stream cu.Stream) {
+func copyPad(dst, src safe.Float32s, dstsize, srcsize, offset [3]int) {
 	core.Assert(dst.Len() == core.Prod(dstsize))
 	core.Assert(src.Len() == core.Prod(srcsize))
 

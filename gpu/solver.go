@@ -35,7 +35,7 @@ func newSolverCommon(dt_si, dt_mul float64) solverCommon {
 }
 
 // y += dy * dt
-func maddvec(y, dy [3]safe.Float32s, dt float32, str [3]cu.Stream) {
+func maddvec(y, dy [3]safe.Float32s, dt float32) {
 	for i := 0; i < 3; i++ {
 		Madd2(y[i], y[i], dy[i], 1, dt)
 	}

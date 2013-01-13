@@ -22,7 +22,6 @@ func NewEuler(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Euler {
 
 func (e *Euler) Steps(steps int) {
 	nimble.RunStack()
-	//LockCudaThread()
 	core.Log("GPU euler solver:", steps, "steps")
 	n := e.y.Mesh().NCell()
 
@@ -37,7 +36,8 @@ func (e *Euler) Steps(steps int) {
 	for s := 0; s < steps-1; s++ {
 		dy := Device3(e.dy.ReadNext(n))
 		y := Device3(e.y.WriteNext(n))
-		rotatevec(y, dy, e.dt, e.stream)
+		maddvec(y, dy, e.dt)
+		Normalize(y)
 		e.y.WriteDone()
 		e.dy.ReadDone()
 	}
@@ -46,6 +46,7 @@ func (e *Euler) Steps(steps int) {
 	// then the pipeline comes in a consistent state before Steps() returns.
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
-	rotatevec(y, dy, e.dt, e.stream)
+	maddvec(y, dy, e.dt)
+	Normalize(y)
 	e.dy.ReadDone()
 }

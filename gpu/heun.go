@@ -102,7 +102,7 @@ func (e *Heun) Step() {
 	nimble.Clock.Send(e.time, true)
 	dy := Device3(e.dy.ReadNext(n))
 	y := Device3(e.y.WriteNext(n))
-	maddvec(y, dy, dt, str)
+	maddvec(y, dy, dt)
 	e.y.WriteDone()
 	cpyvec(dy0, dy, str)
 	e.dy.ReadDone()
@@ -124,7 +124,7 @@ func (e *Heun) Step() {
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
 		} else { // undo.
 			e.delta = 0
-			maddvec(y, dy0, -dt, str)
+			maddvec(y, dy0, -dt)
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
 		}

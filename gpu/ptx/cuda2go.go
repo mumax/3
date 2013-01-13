@@ -11,7 +11,6 @@ import (
 	"bytes"
 	"code.google.com/p/mx3/core"
 	"flag"
-	"fmt"
 	"io"
 	"text/scanner"
 	"text/template"
@@ -26,7 +25,6 @@ func main() {
 
 // generate cuda wrapper for file.
 func cuda2go(fname string) {
-	fmt.Println("cuda2go", fname)
 	// open cuda file
 	f := core.Open(fname)
 	defer f.Close()

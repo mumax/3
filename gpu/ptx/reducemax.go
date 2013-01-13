@@ -200,3 +200,5 @@ BB0_10:
 
 
 `
+
+func init() { Code["reducemax"] = reducemax_ptx }

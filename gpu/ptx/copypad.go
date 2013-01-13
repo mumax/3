@@ -174,3 +174,5 @@ BB0_4:
 
 
 `
+
+func init() { Code["copypad"] = copypad_ptx }

@@ -184,3 +184,5 @@ BB0_10:
 
 
 `
+
+func init() { Code["reducesum"] = reducesum_ptx }

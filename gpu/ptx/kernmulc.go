@@ -316,3 +316,5 @@ BB0_2:
 
 
 `
+
+func init() { Code["kernmulC"] = kernmulC_ptx }

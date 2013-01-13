@@ -246,3 +246,5 @@ BB0_10:
 
 
 `
+
+func init() { Code["reducemaxvecdiff2"] = reducemaxvecdiff2_ptx }

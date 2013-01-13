@@ -133,3 +133,5 @@ BB0_2:
 
 
 `
+
+func init() { Code["madd3"] = madd3_ptx }

@@ -88,7 +88,7 @@ func (e *Heun) Step() {
 	if !e.init {
 		// normalize initial magnetization
 		M := Device3(e.y.UnsafeData())
-		NormalizeSync(M, str[0])
+		Normalize(M)
 		e.y.WriteNext(n)
 		e.init = true
 	}
@@ -118,7 +118,7 @@ func (e *Heun) Step() {
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			e.delta = MaxVecNorm(dy[0], dy[1], dy[2], str[0]) * float64(dt)
 			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
-			NormalizeSync(y, str[0])
+			Normalize(y)
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))

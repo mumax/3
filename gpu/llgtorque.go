@@ -55,6 +55,7 @@ func CalcLLGTorque(torque, m, B [3]safe.Float32s, alpha float32) {
 		alpha, N, gridDim, blockDim)
 }
 
+// TODO: rm
 func Device3(s []nimble.Slice) [3]safe.Float32s {
 	core.Assert(len(s) == 3)
 	return [3]safe.Float32s{s[0].Device(), s[1].Device(), s[2].Device()}

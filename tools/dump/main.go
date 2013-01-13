@@ -64,7 +64,7 @@ func read(in io.Reader, name string) {
 	err := r.Read()
 	i := 0
 	ext := path.Ext(name)
-	woext := noExt(name)
+	woext := core.NoExt(name)
 	for err != io.EOF {
 		core.Fatal(err)
 		tname := name
@@ -84,37 +84,37 @@ func process(f *dump.Frame, name string) {
 	haveOutput := false
 
 	if *flag_jpeg {
-		dumpImage(f, noExt(name)+".jpg")
+		dumpImage(f, core.NoExt(name)+".jpg")
 		haveOutput = true
 	}
 
 	if *flag_png {
-		dumpImage(f, noExt(name)+".png")
+		dumpImage(f, core.NoExt(name)+".png")
 		haveOutput = true
 	}
 
 	if *flag_gnuplot {
-		dumpGnuplot(f, noExt(name)+".gplot")
+		dumpGnuplot(f, core.NoExt(name)+".gplot")
 		haveOutput = true
 	}
 
 	if *flag_gnuplotgzip {
-		dumpGnuplotGZip(f, noExt(name)+".gplot.gz")
+		dumpGnuplotGZip(f, core.NoExt(name)+".gplot.gz")
 		haveOutput = true
 	}
 
 	if *flag_omf != "" {
-		dumpOmf(noExt(name)+".omf", f, *flag_omf)
+		dumpOmf(core.NoExt(name)+".omf", f, *flag_omf)
 		haveOutput = true
 	}
 
 	if *flag_vtk != "" {
-		dumpVTK(noExt(name)+".vtk", f, *flag_vtk)
+		dumpVTK(core.NoExt(name)+".vtk", f, *flag_vtk)
 		haveOutput = true
 	}
 
 	if *flag_dump {
-		dumpDump(noExt(name)+".dump", f)
+		dumpDump(core.NoExt(name)+".dump", f)
 		haveOutput = true
 	}
 

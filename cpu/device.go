@@ -2,7 +2,6 @@ package cpu
 
 import (
 	"code.google.com/p/mx3/nimble"
-	"github.com/barnex/cuda5/cu"
 )
 
 type Device int
@@ -13,11 +12,7 @@ func (d Device) InitThread() {
 	// intentionally empty
 }
 
-func (d Device) StreamCreate() cu.Stream {
-	return 0
-}
-
-func (d Device) Madd(dst nimble.Slice, src1, src2 nimble.Slice, w1, w2 float32, str cu.Stream) {
+func (d Device) Madd(dst nimble.Slice, src1, src2 nimble.Slice, w1, w2 float32) {
 	Madd(dst.Host(), src1.Host(), src2.Host(), w1, w2)
 }
 

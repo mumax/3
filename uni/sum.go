@@ -3,7 +3,6 @@ package uni
 import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
-	"github.com/barnex/cuda5/cu"
 )
 
 // Universal weighed sum.
@@ -11,13 +10,12 @@ type Sum struct {
 	sum    nimble.ChanN
 	term   []nimble.RChanN
 	weight []float32
-	stream cu.Stream
 	dev    Device
 }
 
 func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
 	output := nimble.MakeChanN(term1.NComp(), tag, term1.Unit(), term1.ChanN().Mesh(), mem, 1)
-	sum := &Sum{sum: output, dev: dev, stream: dev.StreamCreate()}
+	sum := &Sum{sum: output, dev: dev}
 	sum.MAdd(term1, weight1)
 	sum.MAdd(term2, weight2)
 	nimble.Stack(sum)
@@ -61,20 +59,17 @@ func (s *Sum) Exec() {
 		B := s.term[1].Comp(c).ReadNext(N)
 		S := s.sum.Comp(c).WriteNext(N)
 
-		s.dev.Madd(S, A, B, s.weight[0], s.weight[1], s.stream)
+		s.dev.Madd(S, A, B, s.weight[0], s.weight[1])
 
 		s.term[0].Comp(c).ReadDone()
 		s.term[1].Comp(c).ReadDone()
 
 		for t := 2; t < len(s.term); t++ {
 			C := s.term[t].Comp(c).ReadNext(N)
-			s.dev.Madd(S, S, C, 1, s.weight[t], s.stream)
+			s.dev.Madd(S, S, C, 1, s.weight[t])
 			s.term[t].Comp(c).ReadDone()
 		}
 		s.sum.Comp(c).WriteDone()
-	}
-	if s.stream != 0 {
-		s.stream.Synchronize()
 	}
 }
 

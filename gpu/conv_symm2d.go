@@ -146,13 +146,12 @@ func (c *Symm2D) Exec() {
 
 func (c *Symm2D) exec3D() {
 	padded := c.kernSize
-	offset := [3]int{0, 0, 0}
 
 	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
 	for i := 0; i < 3; i++ {
 		in := c.input[i].ReadNext(c.n).Device()
 		c.fftRBuf[i].MemsetAsync(0, c.stream)
-		copyPad(c.fftRBuf[i], in, padded, c.size, offset)
+		copyPad(c.fftRBuf[i], in, padded, c.size)
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 		c.stream.Synchronize()
 		c.input[i].ReadDone()
@@ -170,7 +169,7 @@ func (c *Symm2D) exec3D() {
 	for i := 0; i < 3; i++ {
 		out := c.output[i].WriteNext(c.n).Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		copyPad(out, c.fftRBuf[i], c.size, padded, offset)
+		copyPad(out, c.fftRBuf[i], c.size, padded)
 		c.stream.Synchronize()
 		c.output[i].WriteDone()
 	}
@@ -178,7 +177,6 @@ func (c *Symm2D) exec3D() {
 
 func (c *Symm2D) exec2D() {
 	padded := c.kernSize
-	offset := [3]int{0, 0, 0}
 
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
 	// Convolution is separated into
@@ -189,7 +187,7 @@ func (c *Symm2D) exec2D() {
 	// FFT x
 	in := c.input[0].ReadNext(c.n).Device()
 	c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-	copyPad(c.fftRBuf[0], in, padded, c.size, offset)
+	copyPad(c.fftRBuf[0], in, padded, c.size)
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 	//c.stream.Synchronize()
 	c.input[0].ReadDone()
@@ -201,7 +199,7 @@ func (c *Symm2D) exec2D() {
 	// bw FFT x
 	out := c.output[0].WriteNext(c.n).Device()
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-	copyPad(out, c.fftRBuf[0], c.size, padded, offset)
+	copyPad(out, c.fftRBuf[0], c.size, padded)
 	c.stream.Synchronize()
 	c.output[0].WriteDone()
 
@@ -209,7 +207,7 @@ func (c *Symm2D) exec2D() {
 	for i := 1; i < 3; i++ {
 		in := c.input[i].ReadNext(c.n).Device()
 		c.fftRBuf[i].MemsetAsync(0, c.stream)
-		copyPad(c.fftRBuf[i], in, padded, c.size, offset)
+		copyPad(c.fftRBuf[i], in, padded, c.size)
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 		c.stream.Synchronize()
 		c.input[i].ReadDone()
@@ -225,7 +223,7 @@ func (c *Symm2D) exec2D() {
 	for i := 1; i < 3; i++ {
 		out := c.output[i].WriteNext(c.n).Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		copyPad(out, c.fftRBuf[i], c.size, padded, offset)
+		copyPad(out, c.fftRBuf[i], c.size, padded)
 		c.stream.Synchronize()
 		c.output[i].WriteDone()
 	}

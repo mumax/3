@@ -18,11 +18,9 @@ install: $(GOFILES)
 	go install -v
 
 $(GOFILES): %.go: %.ptx cuda2go
-	./cuda2go $(@:.go=.cu) 
-	gofmt -w $@
+	./cuda2go $(@:.go=.cu) && gofmt -w $@
 
 $(PTXFILES): %.ptx: %.cu
-	rm -f $@
 	$(NVCC) -ptx $(@:.ptx=.cu)
 
 .PHONY: clean

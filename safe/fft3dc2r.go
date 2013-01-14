@@ -30,6 +30,7 @@ func (p FFT3DC2RPlan) Exec(src Complex64s, dst Float32s) {
 		panic(fmt.Errorf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
 	}
 	p.handle.ExecC2R(src.Pointer(), dst.Pointer())
+	p.stream.Synchronize() //!
 }
 
 // 3D size of the input array.

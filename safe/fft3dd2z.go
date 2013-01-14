@@ -18,7 +18,7 @@ func FFT3DD2Z(Nx, Ny, Nz int) FFT3DD2ZPlan {
 	return FFT3DD2ZPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
 }
 
-// Execute the FFT plan.
+// Execute the FFT plan. Synchronized.
 // src and dst are 3D arrays stored 1D arrays.
 func (p FFT3DD2ZPlan) Exec(src Float64s, dst Complex128s) {
 	oksrclen := p.InputLen()
@@ -30,6 +30,7 @@ func (p FFT3DD2ZPlan) Exec(src Float64s, dst Complex128s) {
 		panic(fmt.Errorf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
 	}
 	p.handle.ExecD2Z(src.Pointer(), dst.Pointer())
+	p.stream.Synchronize() //!
 }
 
 // 3D size of the input array.

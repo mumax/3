@@ -136,7 +136,7 @@ func (p FFT1DC2RPlan) Destroy()
     Releases all resources associated with the FFT plan.
 
 func (p FFT1DC2RPlan) Exec(src Complex64s, dst Float32s)
-    Execute the FFT plan.
+    Execute the FFT plan. Synchronized.
 
 func (p FFT1DC2RPlan) InputLen() int
     Required length of the output array.
@@ -168,7 +168,7 @@ func (p FFT1DR2CPlan) Destroy()
     Releases all resources associated with the FFT plan.
 
 func (p FFT1DR2CPlan) Exec(src Float32s, dst Complex64s)
-    Execute the FFT plan.
+    Execute the FFT plan. Synchronized.
 
 func (p FFT1DR2CPlan) InputLen() int
     Required length of the input array.
@@ -238,7 +238,8 @@ func (p FFT3DD2ZPlan) Destroy()
     Releases all resources associated with the FFT plan.
 
 func (p FFT3DD2ZPlan) Exec(src Float64s, dst Complex128s)
-    Execute the FFT plan. src and dst are 3D arrays stored 1D arrays.
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
 
 func (p FFT3DD2ZPlan) InputLen() int
     Required length of the (1D) input array.
@@ -276,7 +277,8 @@ func (p FFT3DR2CPlan) Destroy()
     Releases all resources associated with the FFT plan.
 
 func (p FFT3DR2CPlan) Exec(src Float32s, dst Complex64s)
-    Execute the FFT plan. src and dst are 3D arrays stored 1D arrays.
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
 
 func (p FFT3DR2CPlan) InputLen() int
     Required length of the (1D) input array.
@@ -314,7 +316,8 @@ func (p FFT3DZ2DPlan) Destroy()
     Releases all resources associated with the FFT plan.
 
 func (p FFT3DZ2DPlan) Exec(src Complex128s, dst Float64s)
-    Execute the FFT plan. src and dst are 3D arrays stored 1D arrays.
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
 
 func (p FFT3DZ2DPlan) InputLen() int
     Required length of the (1D) input array.

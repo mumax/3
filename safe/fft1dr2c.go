@@ -19,7 +19,7 @@ func FFT1DR2C(size, batch int) FFT1DR2CPlan {
 	return FFT1DR2CPlan{fftplan{handle, 0}, size1D(size), batch}
 }
 
-// Execute the FFT plan.
+// Execute the FFT plan. Synchronized.
 func (p FFT1DR2CPlan) Exec(src Float32s, dst Complex64s) {
 	oksrclen := p.InputLen()
 	if src.Len() != oksrclen {
@@ -30,6 +30,7 @@ func (p FFT1DR2CPlan) Exec(src Float32s, dst Complex64s) {
 		panic(fmt.Errorf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
 	}
 	p.handle.ExecR2C(src.Pointer(), dst.Pointer())
+	p.stream.Synchronize() //!
 }
 
 // Required length of the input array.

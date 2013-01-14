@@ -161,8 +161,7 @@ func (c *Symm2D) exec3D() {
 	kernMulRSymm3D(c.fftCBuf,
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-		N0, N1, N2,
-		c.stream)
+		N0, N1, N2)
 	c.stream.Synchronize()
 
 	// BW FFT

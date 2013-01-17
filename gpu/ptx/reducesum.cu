@@ -1,8 +1,5 @@
 #include "reduce.h"
-
-inline __device__ float sum(float a, float b){
-	return a + b;
-}
+#include "sum.h"
 
 #define load(i) src[i]
 

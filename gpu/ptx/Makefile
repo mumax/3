@@ -27,4 +27,5 @@ $(PTXFILES): %.ptx: %.cu
 clean:
 	rm -f $(PTXFILES)
 	rm -f $(GOFILES)
+	rm -f cuda2go
 

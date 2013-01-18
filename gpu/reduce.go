@@ -12,7 +12,21 @@ import (
 // Sum of all elements.
 func Sum(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce1(in, 0, ptx.K_reducesum)
-	//return reduce("reducesum", in, 0, stream)
+}
+
+// Maximum of all elements.
+func Max(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce1(in, -math.MaxFloat32, ptx.K_reducemax)
+}
+
+// Minimum of all elements.
+func Min(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce1(in, math.MaxFloat32, ptx.K_reducemin)
+}
+
+// Maximum of absolute values of all elements.
+func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce1(in, 0, ptx.K_reducemaxabs)
 }
 
 func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
@@ -21,22 +35,6 @@ func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init f
 	gr, bl := reduceConf()
 	f(in.Pointer(), out.Pointer(), init, in.Len(), gr, bl)
 	return copyback(out)
-}
-
-// Maximum of all elements.
-func Max(in safe.Float32s, stream cu.Stream) float32 {
-	//return reduce("reducemax", in, -math.MaxFloat32, stream)
-	return reduce1(in, -math.MaxFloat32, ptx.K_reducemax)
-}
-
-// Minimum of all elements.
-func Min(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemin", in, math.MaxFloat32, stream)
-}
-
-// Maximum of absolute values of all elements.
-func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemaxabs", in, 0, stream)
 }
 
 // Maximum difference between the two arrays.
@@ -60,36 +58,6 @@ func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 
 
 func Dot(x1, x2 safe.Float32s) {
 	panic("todo")
-}
-
-// 1-input reduce with arbitrary PTX code (op)
-func reduce(op string, in safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf(init)
-	defer reduceRecycle(out)
-
-	N := in.Len()
-
-	blockDim := cu.Dim3{512, 1, 1}
-	gridDim := cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
-
-	//ptxcallAsync(op, gridDim, blockDim, 0, stream, in.Pointer(), out.Pointer(), N)
-	inptr := in.Pointer()
-	outptr := out.Pointer()
-	args := []unsafe.Pointer{
-		unsafe.Pointer(&inptr),
-		unsafe.Pointer(&outptr),
-		unsafe.Pointer(&init),
-		unsafe.Pointer(&N)}
-
-	shmem := 0
-	code := PTXLoad(op)
-	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
-	stream.Synchronize()
-
-	var result_ [1]float32
-	result := result_[:]
-	out.CopyDtoH(result) // async? register one arena block // , stream)
-	return result_[0]
 }
 
 // 2-input reduce with arbitrary PTX code (op)

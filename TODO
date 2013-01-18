@@ -1,8 +1,4 @@
-reduce: use auto wrappers, rm streams.
-
 dot test
-
-get rid of ptx map.
 
 test: do not fail uni tests if cc is too low.
 

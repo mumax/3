@@ -11,14 +11,14 @@ import (
 
 // Sum of all elements.
 func Sum(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce1(in, ptx.K_reducesum)
+	return reduce1(in, 0, ptx.K_reducesum)
 	//return reduce("reducesum", in, 0, stream)
 }
 
-func reduce1(in safe.Float32s, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
-	out := reduceBuf(0)
+func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
+	out := reduceBuf(init)
 	defer reduceRecycle(out)
-	gr, bl := Make1DConf(in.Len())
+	gr, bl := reduceConf()
 	ptx.K_reducesum(in.Pointer(), out.Pointer(), 0, in.Len(), gr, bl)
 	return copyback(out)
 }
@@ -205,6 +205,7 @@ func reduceRecycle(buf safe.Float32s) {
 }
 
 // return a 1-float CUDA reduction buffer from a pool
+// initialized to initVal
 func reduceBuf(initVal float32) safe.Float32s {
 	if reduceBuffers == nil {
 		initReduceBuf()
@@ -228,4 +229,11 @@ func initReduceBuf() {
 	for i := 0; i < N; i++ {
 		reduceBuffers <- safe.MakeFloat32s(1)
 	}
+}
+
+func reduceConf() (gridDim, blockDim cu.Dim3) {
+	blockDim = cu.Dim3{512, 1, 1}
+	gridDim = cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
+	// could be improved but takes hardly ~1% of execution time
+	return
 }

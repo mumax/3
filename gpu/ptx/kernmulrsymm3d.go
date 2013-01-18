@@ -286,5 +286,3 @@ BB0_6:
 
 
 `
-
-func init() { Code["kernmulRSymm3D"] = kernmulRSymm3D_ptx }

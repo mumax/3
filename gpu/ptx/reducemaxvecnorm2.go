@@ -219,5 +219,3 @@ BB0_10:
 
 
 `
-
-func init() { Code["reducemaxvecnorm2"] = reducemaxvecnorm2_ptx }

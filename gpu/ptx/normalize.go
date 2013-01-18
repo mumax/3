@@ -134,5 +134,3 @@ BB0_4:
 
 
 `
-
-func init() { Code["normalize"] = normalize_ptx }

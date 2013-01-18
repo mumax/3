@@ -297,5 +297,3 @@ BB0_11:
 
 
 `
-
-func init() { Code["stencil3"] = stencil3_ptx }

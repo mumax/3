@@ -160,8 +160,6 @@ func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 }
 
 const {{.Name}}_ptx = {{.PTX}}
-
-func init(){Code["{{.Name}}"] = {{.Name}}_ptx }
 `
 
 // wrapper code template

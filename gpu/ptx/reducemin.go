@@ -200,5 +200,3 @@ BB0_10:
 
 
 `
-
-func init() { Code["reducemin"] = reducemin_ptx }

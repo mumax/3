@@ -200,5 +200,3 @@ BB0_2:
 
 
 `
-
-func init() { Code["llgtorque"] = llgtorque_ptx }

@@ -90,8 +90,9 @@ func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 
 	return math.Sqrt(float64(r))
 }
 
-func Dot(x1, x2 safe.Float32s) {
-	panic("todo")
+// Vector dot product.
+func Dot(x1, x2 safe.Float32s) float32 {
+	return reduce2(x1, x2, 0, ptx.K_reducedot)
 }
 
 var reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce

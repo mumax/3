@@ -211,5 +211,3 @@ BB0_10:
 
 
 `
-
-func init() { Code["reducemaxdiff"] = reducemaxdiff_ptx }

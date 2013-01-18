@@ -192,5 +192,3 @@ BB0_10:
 
 
 `
-
-func init() { Code["reducedot"] = reducedot_ptx }

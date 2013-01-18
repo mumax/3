@@ -194,5 +194,3 @@ BB0_5:
 
 
 `
-
-func init() { Code["kernmulRSymm2Dyz"] = kernmulRSymm2Dyz_ptx }

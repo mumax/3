@@ -202,5 +202,3 @@ BB0_10:
 
 
 `
-
-func init() { Code["reducemaxabs"] = reducemaxabs_ptx }

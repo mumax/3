@@ -29,6 +29,7 @@ func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce1(in, 0, ptx.K_reducemaxabs)
 }
 
+// general reduce wrapper for one input array
 func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
 	out := reduceBuf(init)
 	defer reduceRecycle(out)

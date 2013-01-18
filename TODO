@@ -1,15 +1,16 @@
+reduce: use auto wrappers, rm streams.
+
+dot test
+
+get rid of ptx map.
+
 test: do not fail uni tests if cc is too low.
 
 replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.
 
 replace Slice by Frame, contains 3D size, ncomp, time stamp
 
-kernel wrappers: if async, the arguments might not survive an unfortunately timed GC! this is also a problem with mumax2. also they leak to heap. kernel launches seem not to overlap, so perhaps just use one stream and a global parameter buffer?
-
-auto-generate wrapper funcs for cuda kernels. also get rid of ptx map.
-
 fuse a standard micromag kernel for at least the local terms. uses inline functions. exchange adds to demag. extra pointers to output buffers , if not NULL, leak intermediate output.  To save memory.
 
-
-
+dedicated exchange kernel or optimized stencil.
 

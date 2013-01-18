@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/gpu/ptx"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
@@ -10,7 +11,12 @@ import (
 
 // Sum of all elements.
 func Sum(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducesum", in, 0, stream)
+	out := reduceBuf(0)
+	defer reduceRecycle(out)
+	gr, bl := Make1DConf(in.Len())
+	ptx.K_reducesum(in.Pointer(), out.Pointer(), 0, in.Len(), gr, bl)
+	return copyback(out)
+	//return reduce("reducesum", in, 0, stream)
 }
 
 // Maximum of all elements.
@@ -47,10 +53,13 @@ func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 
 	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, 0, stream)))
 }
 
+func Dot(x1, x2 safe.Float32s) {
+	panic("todo")
+}
+
 // 1-input reduce with arbitrary PTX code (op)
 func reduce(op string, in safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf()
-	out.Memset(init)
+	out := reduceBuf(init)
 	defer reduceRecycle(out)
 
 	N := in.Len()
@@ -80,8 +89,7 @@ func reduce(op string, in safe.Float32s, init float32, stream cu.Stream) float32
 
 // 2-input reduce with arbitrary PTX code (op)
 func reduce2(op string, in1, in2 safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf()
-	out.Memset(init)
+	out := reduceBuf(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -113,8 +121,7 @@ func reduce2(op string, in1, in2 safe.Float32s, init float32, stream cu.Stream) 
 
 // 3-input reduce with arbitrary PTX code (op)
 func reduce3(op string, in1, in2, in3 safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf()
-	out.Memset(init)
+	out := reduceBuf(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -148,8 +155,7 @@ func reduce3(op string, in1, in2, in3 safe.Float32s, init float32, stream cu.Str
 
 // 6-input reduce with arbitrary PTX code (op)
 func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf()
-	out.Memset(init)
+	out := reduceBuf(init)
 	defer reduceRecycle(out)
 
 	core.Assert(in1.Len() == in2.Len())
@@ -195,11 +201,20 @@ func reduceRecycle(buf safe.Float32s) {
 }
 
 // return a 1-float CUDA reduction buffer from a pool
-func reduceBuf() safe.Float32s {
+func reduceBuf(initVal float32) safe.Float32s {
 	if reduceBuffers == nil {
 		initReduceBuf()
 	}
-	return <-reduceBuffers
+	buf := <-reduceBuffers
+	buf.Memset(initVal)
+	return buf
+}
+
+func copyback(buf safe.Float32s) float32 {
+	var result_ [1]float32
+	result := result_[:]
+	buf.CopyDtoH(result) // async? register one arena block // , stream)
+	return result_[0]
 }
 
 // initialize pool of 1-float CUDA reduction buffers

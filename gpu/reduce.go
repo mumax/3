@@ -9,34 +9,34 @@ import (
 )
 
 // Sum of all elements.
-func Sum(in safe.Float32s, stream cu.Stream) float32 {
+func Sum(in safe.Float32s) float32 {
 	return reduce1(in, 0, ptx.K_reducesum)
 }
 
 // Maximum of all elements.
-func Max(in safe.Float32s, stream cu.Stream) float32 {
+func Max(in safe.Float32s) float32 {
 	return reduce1(in, -math.MaxFloat32, ptx.K_reducemax)
 }
 
 // Minimum of all elements.
-func Min(in safe.Float32s, stream cu.Stream) float32 {
+func Min(in safe.Float32s) float32 {
 	return reduce1(in, math.MaxFloat32, ptx.K_reducemin)
 }
 
 // Maximum of absolute values of all elements.
-func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
+func MaxAbs(in safe.Float32s) float32 {
 	return reduce1(in, 0, ptx.K_reducemaxabs)
 }
 
 // Maximum difference between the two arrays.
 // 	max_i abs(a[i] - b[i])
-func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
+func MaxDiff(a, b safe.Float32s) float32 {
 	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
 }
 
 // Maximum of the norms of all vectors (x[i], y[i], z[i]).
 // 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
-func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
+func MaxVecNorm(x, y, z safe.Float32s) float64 {
 	r := reduce3(x, y, z, 0, ptx.K_reducemaxvecnorm2)
 	return math.Sqrt(float64(r))
 }
@@ -44,7 +44,7 @@ func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
 // Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
 // 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
 // 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
-func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
+func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s) float64 {
 	r := reduce6(x1, y1, z1, x2, y2, z2, 0, ptx.K_reducemaxvecdiff2)
 	return math.Sqrt(float64(r))
 }
@@ -116,7 +116,7 @@ func reduceBuf(initVal float32) safe.Float32s {
 func copyback(buf safe.Float32s) float32 {
 	var result_ [1]float32
 	result := result_[:]
-	buf.CopyDtoH(result) // async? register one arena block // , stream)
+	buf.CopyDtoH(result) // async? register one arena block
 	return result_[0]
 }
 

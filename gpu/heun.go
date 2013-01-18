@@ -112,11 +112,11 @@ func (e *Heun) Step() {
 	dy = Device3(e.dy.ReadNext(n))
 	y = Device3(e.y.WriteNext(n))
 	{
-		e.err = MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2], str[0]) * float64(dt)
+		e.err = MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2]) * float64(dt)
 		e.checkErr()
 
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			e.delta = MaxVecNorm(dy[0], dy[1], dy[2], str[0]) * float64(dt)
+			e.delta = MaxVecNorm(dy[0], dy[1], dy[2]) * float64(dt)
 			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
 			Normalize(y)
 			e.time += e.dt_si

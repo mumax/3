@@ -28,6 +28,32 @@ func MaxAbs(in safe.Float32s, stream cu.Stream) float32 {
 	return reduce1(in, 0, ptx.K_reducemaxabs)
 }
 
+// Maximum difference between the two arrays.
+// 	max_i abs(a[i] - b[i])
+func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
+	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
+}
+
+// Maximum of the norms of all vectors (x[i], y[i], z[i]).
+// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
+func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
+	r := reduce3(x, y, z, 0, ptx.K_reducemaxvecnorm2)
+	return math.Sqrt(float64(r))
+}
+
+// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
+// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
+// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
+func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
+	r := reduce6(x1, y1, z1, x2, y2, z2, 0, ptx.K_reducemaxvecdiff2)
+	return math.Sqrt(float64(r))
+}
+
+// Vector dot product.
+func Dot(x1, x2 safe.Float32s) float32 {
+	return reduce2(x1, x2, 0, ptx.K_reducedot)
+}
+
 // general reduce wrapper for one input array
 func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
 	out := reduceBuf(init)
@@ -67,32 +93,6 @@ func reduce6(in1, in2, in3, in4, in5, in6 safe.Float32s, init float32, f func(in
 	gr, bl := reduceConf()
 	f(in1.Pointer(), in2.Pointer(), in3.Pointer(), in4.Pointer(), in5.Pointer(), in6.Pointer(), out.Pointer(), init, N, gr, bl)
 	return copyback(out)
-}
-
-// Maximum difference between the two arrays.
-// 	max_i abs(a[i] - b[i])
-func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
-	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
-}
-
-// Maximum of the norms of all vectors (x[i], y[i], z[i]).
-// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
-func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
-	r := reduce3(x, y, z, 0, ptx.K_reducemaxvecnorm2)
-	return math.Sqrt(float64(r))
-}
-
-// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
-// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
-// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
-func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
-	r := reduce6(x1, y1, z1, x2, y2, z2, 0, ptx.K_reducemaxvecdiff2)
-	return math.Sqrt(float64(r))
-}
-
-// Vector dot product.
-func Dot(x1, x2 safe.Float32s) float32 {
-	return reduce2(x1, x2, 0, ptx.K_reducedot)
 }
 
 var reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce

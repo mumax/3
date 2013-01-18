@@ -11,12 +11,16 @@ import (
 
 // Sum of all elements.
 func Sum(in safe.Float32s, stream cu.Stream) float32 {
+	return reduce1(in, ptx.K_reducesum)
+	//return reduce("reducesum", in, 0, stream)
+}
+
+func reduce1(in safe.Float32s, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
 	out := reduceBuf(0)
 	defer reduceRecycle(out)
 	gr, bl := Make1DConf(in.Len())
 	ptx.K_reducesum(in.Pointer(), out.Pointer(), 0, in.Len(), gr, bl)
 	return copyback(out)
-	//return reduce("reducesum", in, 0, stream)
 }
 
 // Maximum of all elements.

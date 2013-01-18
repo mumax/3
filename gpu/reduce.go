@@ -6,7 +6,6 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"math"
-	"unsafe"
 )
 
 // Sum of all elements.
@@ -59,6 +58,17 @@ func reduce3(in1, in2, in3 safe.Float32s, init float32, f func(in1, in2, in3, ou
 	return copyback(out)
 }
 
+// general reduce wrapper for 6 input arrays
+func reduce6(in1, in2, in3, in4, in5, in6 safe.Float32s, init float32, f func(in1, in2, in3, in4, in5, in6, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
+	N := in1.Len()
+	core.Assert(in2.Len() == N && in3.Len() == N && in4.Len() == N && in5.Len() == N && in6.Len() == N)
+	out := reduceBuf(init)
+	defer reduceRecycle(out)
+	gr, bl := reduceConf()
+	f(in1.Pointer(), in2.Pointer(), in3.Pointer(), in4.Pointer(), in5.Pointer(), in6.Pointer(), out.Pointer(), init, N, gr, bl)
+	return copyback(out)
+}
+
 // Maximum difference between the two arrays.
 // 	max_i abs(a[i] - b[i])
 func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
@@ -76,51 +86,12 @@ func MaxVecNorm(x, y, z safe.Float32s, stream cu.Stream) float64 {
 // 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
 // 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
 func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 {
-	return math.Sqrt(float64(reduce6("reducemaxvecdiff2", x1, y1, z1, x2, y2, z2, 0, stream)))
+	r := reduce6(x1, y1, z1, x2, y2, z2, 0, ptx.K_reducemaxvecdiff2)
+	return math.Sqrt(float64(r))
 }
 
 func Dot(x1, x2 safe.Float32s) {
 	panic("todo")
-}
-
-// 6-input reduce with arbitrary PTX code (op)
-func reduce6(op string, in1, in2, in3, in4, in5, in6 safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf(init)
-	defer reduceRecycle(out)
-
-	core.Assert(in1.Len() == in2.Len())
-	N := in1.Len()
-
-	blockDim := cu.Dim3{512, 1, 1}
-	gridDim := cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
-
-	in1ptr := in1.Pointer()
-	in2ptr := in2.Pointer()
-	in3ptr := in3.Pointer()
-	in4ptr := in4.Pointer()
-	in5ptr := in5.Pointer()
-	in6ptr := in6.Pointer()
-	outptr := out.Pointer()
-	args := []unsafe.Pointer{
-		unsafe.Pointer(&in1ptr),
-		unsafe.Pointer(&in2ptr),
-		unsafe.Pointer(&in3ptr),
-		unsafe.Pointer(&in4ptr),
-		unsafe.Pointer(&in5ptr),
-		unsafe.Pointer(&in6ptr),
-		unsafe.Pointer(&outptr),
-		unsafe.Pointer(&init),
-		unsafe.Pointer(&N)}
-
-	shmem := 0
-	code := PTXLoad(op)
-	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
-	stream.Synchronize()
-
-	var result_ [1]float32
-	result := result_[:]
-	out.CopyDtoH(result) // async? register one arena block // , stream)
-	return result_[0]
 }
 
 var reduceBuffers chan safe.Float32s // pool of 1-float CUDA buffers for reduce
@@ -157,6 +128,7 @@ func initReduceBuf() {
 	}
 }
 
+// launch configuration for reduce kernels
 func reduceConf() (gridDim, blockDim cu.Dim3) {
 	blockDim = cu.Dim3{512, 1, 1}
 	gridDim = cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.

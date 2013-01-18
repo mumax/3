@@ -19,13 +19,14 @@ func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init f
 	out := reduceBuf(init)
 	defer reduceRecycle(out)
 	gr, bl := reduceConf()
-	ptx.K_reducesum(in.Pointer(), out.Pointer(), 0, in.Len(), gr, bl)
+	f(in.Pointer(), out.Pointer(), init, in.Len(), gr, bl)
 	return copyback(out)
 }
 
 // Maximum of all elements.
 func Max(in safe.Float32s, stream cu.Stream) float32 {
-	return reduce("reducemax", in, -math.MaxFloat32, stream)
+	//return reduce("reducemax", in, -math.MaxFloat32, stream)
+	return reduce1(in, -math.MaxFloat32, ptx.K_reducemax)
 }
 
 // Minimum of all elements.

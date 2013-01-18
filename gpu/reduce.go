@@ -38,10 +38,20 @@ func reduce1(in safe.Float32s, init float32, f func(in, out cu.DevicePtr, init f
 	return copyback(out)
 }
 
+// general reduce wrapper for 2 input arrays
+func reduce2(in1, in2 safe.Float32s, init float32, f func(in1, in2, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
+	core.Assert(in1.Len() == in2.Len())
+	out := reduceBuf(init)
+	defer reduceRecycle(out)
+	gr, bl := reduceConf()
+	f(in1.Pointer(), in2.Pointer(), out.Pointer(), init, in1.Len(), gr, bl)
+	return copyback(out)
+}
+
 // Maximum difference between the two arrays.
 // 	max_i abs(a[i] - b[i])
 func MaxDiff(a, b safe.Float32s, stream cu.Stream) float32 {
-	return reduce2("reducemaxdiff", a, b, 0, stream)
+	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
 }
 
 // Maximum of the norms of all vectors (x[i], y[i], z[i]).
@@ -59,38 +69,6 @@ func MaxVecDiff(x1, y1, z1, x2, y2, z2 safe.Float32s, stream cu.Stream) float64 
 
 func Dot(x1, x2 safe.Float32s) {
 	panic("todo")
-}
-
-// 2-input reduce with arbitrary PTX code (op)
-func reduce2(op string, in1, in2 safe.Float32s, init float32, stream cu.Stream) float32 {
-	out := reduceBuf(init)
-	defer reduceRecycle(out)
-
-	core.Assert(in1.Len() == in2.Len())
-	N := in1.Len()
-
-	blockDim := cu.Dim3{512, 1, 1}
-	gridDim := cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
-
-	in1ptr := in1.Pointer()
-	in2ptr := in2.Pointer()
-	outptr := out.Pointer()
-	args := []unsafe.Pointer{
-		unsafe.Pointer(&in1ptr),
-		unsafe.Pointer(&in2ptr),
-		unsafe.Pointer(&outptr),
-		unsafe.Pointer(&init),
-		unsafe.Pointer(&N)}
-
-	shmem := 0
-	code := PTXLoad(op)
-	cu.LaunchKernel(code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, shmem, stream, args)
-	stream.Synchronize()
-
-	var result_ [1]float32
-	result := result_[:]
-	out.CopyDtoH(result) // async? register one arena block // , stream)
-	return result_[0]
 }
 
 // 3-input reduce with arbitrary PTX code (op)

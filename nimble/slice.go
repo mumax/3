@@ -18,6 +18,18 @@ type Slice struct {
 	MemType
 }
 
+func makeSliceN(nComp, length int, mem MemType) Slice {
+	if mem != GPUMemory {
+		panic("todo")
+	}
+	bytes := int64(length) * cu.SIZEOF_FLOAT32
+	var ptrs [MAX_COMP]unsafe.Pointer
+	for c := 0; c < nComp; c++ {
+		ptrs[c] = cu.MemAlloc(bytes)
+	}
+	return Slice{ptrs, length, nComp, mem}
+}
+
 func MakeSlice(length int, memtype MemType) Slice {
 	switch memtype {
 	default:

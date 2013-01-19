@@ -10,17 +10,22 @@ type Chan1 struct {
 // TODO: Idea: tag, unit are *string, optional and defaulted to unique value
 // can be set by user if wanted.
 func MakeChan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) Chan1 {
+	N := bufferSize(m, bufBlocks)
+	return Chan1{aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))}
+}
+
+func bufferSize(m *Mesh, bufBlocks int) int {
 	N := -666
 	if bufBlocks < 1 { // means auto
 		N = m.NCell() // buffer all
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
-	return Chan1{aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))}
 }
 
 func (c Chan1) ChanN() ChanN {
-	return ChanN{[]Chan1{c}, make([]Slice, 1)}
+	//return ChanN{[]Chan1{c}, make([]Slice, 1)}
+	return ChanN{c.buffer, [MAX_COMP]mutex{c.mutex}}
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is done written.

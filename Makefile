@@ -68,4 +68,4 @@ clean:
 
 .PHONY: count
 count:
-	wc -l *.go */*.go gpu/ptx/*.cu
+	wc -l *.go */*.go gpu/ptx/*.cu gpu/ptx/cuda2go.go

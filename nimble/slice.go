@@ -8,10 +8,13 @@ import (
 	"unsafe"
 )
 
+const MAX_COMP = 3
+
 // Slice of float32, accessible by CPU, GPU or both.
 type Slice struct {
-	ptr  unsafe.Pointer
-	len_ int
+	ptr   [MAX_COMP]unsafe.Pointer
+	len_  int // TODO int32?
+	nComp int
 	MemType
 }
 
@@ -45,53 +48,71 @@ func cpuSlice(N int) Slice {
 
 func gpuSlice(N int) Slice {
 	s := safe.MakeFloat32s(N)
-	return Slice{unsafe.Pointer(uintptr(s.Pointer())), N, GPUMemory}
+	ptrs := [MAX_COMP]unsafe.Pointer{unsafe.Pointer(s.Pointer())}
+	return Slice{ptrs, N, 1, GPUMemory}
 }
 
 func unifiedSlice(N int) Slice {
 	bytes := int64(N) * SizeofFloat32
 	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
-	return Slice{ptr, N, UnifiedMemory}
+	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
+	return Slice{ptrs, N, 1, UnifiedMemory}
 }
 
 func ToSlice(list []float32) Slice {
-	return Slice{unsafe.Pointer(&list[0]), len(list), CPUMemory}
+	ptr := unsafe.Pointer(&list[0])
+	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
+	return Slice{ptrs, len(list), 1, CPUMemory}
 }
 
 func UnsafeSlice(ptr unsafe.Pointer, len_ int, flag MemType) Slice {
 	if len_ < 0 {
 		panic("negative slice length")
 	}
-	return Slice{ptr, len_, flag}
+	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
+	return Slice{ptrs, len_, 1, flag}
 }
 
 func (s *Slice) Slice(a, b int) Slice {
-	ptr := unsafe.Pointer(uintptr(s.ptr) + SizeofFloat32*uintptr(a))
+	if s.nComp != 1 {
+		panic("need to implement for components")
+	}
+	ncomp := s.nComp
+
+	ptr := unsafe.Pointer(uintptr(s.ptr[0]) + SizeofFloat32*uintptr(a))
 	len_ := b - a
 	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
 		core.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_)
 	}
-	return Slice{ptr, len_, s.MemType}
+	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
+	return Slice{ptrs, len_, ncomp, s.MemType}
 }
 
 func (s Slice) Host() []float32 {
+	if s.nComp != 1 {
+		panic("need to implement for components")
+	}
+
 	if s.MemType&CPUMemory == 0 {
 		core.Panicf("slice not accessible by CPU (memory type %v)", s.MemType)
 	}
 	var list []float32
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
-	hdr.Data = uintptr(s.ptr)
+	hdr.Data = uintptr(s.ptr[0])
 	hdr.Len = s.len_
 	hdr.Cap = s.len_
 	return list
 }
 
 func (s Slice) Device() safe.Float32s {
+	if s.nComp != 1 {
+		panic("need to implement for components")
+	}
 	if s.MemType&GPUMemory == 0 {
 		core.Panicf("slice not accessible by GPU (memory type %v)", s.MemType)
 	}
 	var floats safe.Float32s
-	floats.UnsafeSet(s.ptr, s.len_, s.len_)
+	floats.UnsafeSet(s.ptr[0], s.len_, s.len_)
 	return floats
 }
 

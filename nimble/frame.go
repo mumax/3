@@ -5,9 +5,6 @@ import (
 	//"github.com/barnex/cuda5/safe"
 )
 
-// maximum number of data components
-const MAX_COMP = 3
-
 type Tensor struct {
 	ptr   [MAX_COMP]unsafe.Pointer
 	len_  int32

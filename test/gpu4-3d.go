@@ -65,7 +65,7 @@ func main() {
 
 	var avg [3]float32
 	for i := range avg {
-		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
+		avg[i] = gpu.Sum(m.UnsafeData()[i].Device()) / float32(mesh.NCell())
 	}
 	want := [3]float32{0, 0.12521397, 0.9669811}
 	err := math.Sqrt(float64(sqr(avg[0]-want[0]) + sqr(avg[1]-want[1]) + sqr(avg[2]-want[2])))
@@ -87,7 +87,7 @@ func main() {
 	solver.Advance(1e-9)
 
 	for i := range avg {
-		avg[i] = gpu.Sum(m.UnsafeData()[i].Device(), 0) / float32(mesh.NCell())
+		avg[i] = gpu.Sum(m.UnsafeData()[i].Device()) / float32(mesh.NCell())
 	}
 
 	want = [3]float32{0.04303933, 0.13000599, -0.9842051}

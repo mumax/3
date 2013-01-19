@@ -5,9 +5,18 @@ import (
 )
 
 // ChanN is a Chan that passes N-component data.
-type ChanN struct {
+type chanN struct {
 	buffer Slice
 	lock   [MAX_COMP]mutex
+}
+
+type ChanN struct {
+	chanN
+}
+
+type RChanN struct {
+	chanN
+	next Slice // to avoid allocation
 }
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
@@ -17,14 +26,11 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return ChanN{buffer, lock}
+	return ChanN{chanN{buffer, lock}}
 }
 
-func (c ChanN) Mesh() *Mesh  { return c.buffer.mesh }
-func (c ChanN) Unit() string { return c.buffer.Unit() }
-func (c ChanN) Tag() string  { return c.buffer.Tag() }
-func (c ChanN) NComp() int   { return (c.buffer.nComp) }
-func (c ChanN) BufLen() int  { return c.buffer.Len() } //?
+func (c ChanN) NComp() int  { return int(c.buffer.nComp) }
+func (c ChanN) BufLen() int { return c.buffer.Len() } //?
 //func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 func (c ChanN) MemType() MemType { return c.buffer.MemType }
 

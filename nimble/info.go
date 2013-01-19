@@ -4,13 +4,14 @@ import ()
 
 type info struct {
 	tag, unit string // Human-readable descriptors
-	m         Mesh
+	mesh      Mesh
 	MemType
 }
 
-func newInfo(tag, unit string, m *Mesh) Info {
-	return Info{tag, unit, m}
+func newInfo(tag, unit string, m *Mesh, mem MemType) info {
+	return Info{tag, unit, m, mem}
 }
 
-func (i *Info) Tag() string  { return i.tag }
-func (i *Info) Unit() string { return i.unit }
+func (i *info) Tag() string  { return i.tag }
+func (i *info) Unit() string { return i.unit }
+func (i *info) Mesh() *Mesh  { return i.mesh }

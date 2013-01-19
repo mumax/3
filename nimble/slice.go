@@ -2,6 +2,7 @@ package nimble
 
 import (
 	"code.google.com/p/mx3/core"
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
 	"reflect"
@@ -18,6 +19,7 @@ type Slice struct {
 	nComp int8
 }
 
+// mv to makeGPUFrame etc.
 func makeSliceN(nComp, length int, mesh *Mesh, mem MemType) Slice {
 	if mem != GPUMemory {
 		panic("todo")
@@ -30,22 +32,44 @@ func makeSliceN(nComp, length int, mesh *Mesh, mem MemType) Slice {
 	return Slice{ptrs, length, nComp, mem, newInfo(mesh), "", ""}
 }
 
-func MakeSliceN(length int, memtype MemType) Slice {
-	return MakeSlices(1, length, memtype)
-	//	switch memtype {
-	//	default:
-	//		core.Panic("makeslice: illegal memtype:", memtype)
-	//	case CPUMemory:
-	//		return cpuSlice(length)
-	//	case GPUMemory:
-	//		return gpuSlice(length)
-	//	case UnifiedMemory:
-	//		return unifiedSlice(length)
-	//	}
-	//	panic("bug")
-	//	var s Slice
-	//	return s
+// Len returns the number of elements.
+func (s Slice) Len() int {
+	return s.len_
 }
+
+// Slice returns a slice sharing memory with the original.
+func (s *Slice) Slice(a, b int) Slice {
+	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
+		panic(fmt.Errorf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_))
+	}
+	var slice Slice
+	for i := range s.ptr {
+		s.ptr[i] = unsafe.Pointer(uintptr(s.ptr[i]) + SizeofFloat32*uintptr(a))
+	}
+	slice.info = s.info
+	slice.len_ = b - a
+	slice.nComp = s.nComp
+	return Slice{ptrs, len_, ncomp, s.MemType}
+}
+
+const SizeofFloat32 = 4
+
+//func MakeSliceN(length int, memtype MemType) Slice {
+//	return MakeSlices(1, length, memtype)
+//	//	switch memtype {
+//	//	default:
+//	//		core.Panic("makeslice: illegal memtype:", memtype)
+//	//	case CPUMemory:
+//	//		return cpuSlice(length)
+//	//	case GPUMemory:
+//	//		return gpuSlice(length)
+//	//	case UnifiedMemory:
+//	//		return unifiedSlice(length)
+//	//	}
+//	//	panic("bug")
+//	//	var s Slice
+//	//	return s
+//}
 
 //func MakeSlices(nComp int, length int, memType MemType) []Slice {
 //	s := make([]Slice, nComp)
@@ -86,21 +110,6 @@ func MakeSliceN(length int, memtype MemType) Slice {
 //	return Slice{ptrs, len_, 1, flag}
 //}
 
-func (s *Slice) Slice(a, b int) Slice {
-	if s.nComp != 1 {
-		panic("need to implement for components")
-	}
-	ncomp := s.nComp
-
-	ptr := unsafe.Pointer(uintptr(s.ptr[0]) + SizeofFloat32*uintptr(a))
-	len_ := b - a
-	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
-		core.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_)
-	}
-	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
-	return Slice{ptrs, len_, ncomp, s.MemType}
-}
-
 //func (s Slice) Host() []float32 {
 //	if s.nComp != 1 {
 //		panic("need to implement for components")
@@ -129,7 +138,3 @@ func (s *Slice) Slice(a, b int) Slice {
 //	return floats
 //}
 //
-
-func (s Slice) Len() int      { return s.len_ }
-func (s *Slice) Unit() string { return s.unit }
-func (s *Slice) Tag() string  { return s.tag }

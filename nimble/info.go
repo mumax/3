@@ -2,9 +2,10 @@ package nimble
 
 import ()
 
-type Info struct {
+type info struct {
 	tag, unit string // Human-readable descriptors
-	*Mesh
+	m         Mesh
+	MemType
 }
 
 func newInfo(tag, unit string, m *Mesh) Info {

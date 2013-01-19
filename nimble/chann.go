@@ -29,15 +29,28 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 	return ChanN{chanN{buffer, lock}}
 }
 
-func (c ChanN) NComp() int  { return int(c.buffer.nComp) }
-func (c ChanN) BufLen() int { return c.buffer.Len() } //?
-//func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
-func (c ChanN) MemType() MemType { return c.buffer.MemType }
+// NComp returns the number of components.
+// 	scalar: 1
+// 	vector: 3
+// 	...
+func (c *chanN) NComp() int {
+	return int(c.buffer.nComp)
+}
 
+// BufLen returns the number of buffered elements.
+// This is the largest number of elements that can be read/written at once.
+func (c *chanN) BufLen() int {
+	return c.buffer.Len()
+} //?
+
+//func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
+//func (c ChanN) MemType() MemType { return c.buffer.MemType }
 //func (c ChanN) ChanN() ChanN     { return c } // implements Chan iface
 //func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
 
-func (c ChanN) UnsafeData() Slice {
+// UnsafeData returns the data buffer without locking.
+// To be used with extreme care.
+func (c *chanN) UnsafeData() Slice {
 	return c.buffer
 }
 
@@ -63,11 +76,15 @@ func (c ChanN) UnsafeData() Slice {
 // writing the next n elements to the Chan3.
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
-func (c ChanN) WriteNext(n int) Slice {
-	c.lock[0].lockNext(n)
-	a, b := c.comp[i].lockedRange()
+func (c *chanN) next(n int) Slice {
+	//	c.lock[0].lockNext(n)
+	//	a, b := c.comp[i].lockedRange()
+	//
+	//	return next
+}
 
-	return next
+func (c ChanN) WriteNext(n int) Slice {
+	return c.chanN.next(n)
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully

@@ -13,8 +13,8 @@ type ChanN struct {
 }
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
-	var c ChanN
-	c.buffer = makeSliceN(nComp, memType, bufferSize(m, bufBlocks))
+	buffer := makeSliceN(nComp, bufferSize(m, bufBlocks), memType)
+	panic("todo")
 	//	c := make([]Chan1, nComp)
 	//	for i := range c {
 	//		c[i] = MakeChan1(tag, unit, m, memType, bufBlocks)
@@ -22,25 +22,27 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 	//	return ChanN{c, make([]Slice, nComp)}
 }
 
-func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
-	nComp := len(buffer)
-	c := make([]Chan1, nComp)
-	for i := range c {
-		c[i] = Chan1{aschan1(buffer[i], tag, unit, m, newRWMutex(buffer[i].Len()))}
-	}
-	return ChanN{c, make([]Slice, nComp)}
-}
+//func AsChan(buffer []Slice, tag, unit string, m *Mesh) ChanN {
+//	nComp := len(buffer)
+//	c := make([]Chan1, nComp)
+//	for i := range c {
+//		c[i] = Chan1{aschan1(buffer[i], tag, unit, m, newRWMutex(buffer[i].Len()))}
+//	}
+//	return ChanN{c, make([]Slice, nComp)}
+//}
 
-func (c ChanN) Mesh() *Mesh          { return c.comp[0].Mesh }
-func (c ChanN) Size() [3]int         { return c.comp[0].Size() }
-func (c ChanN) Unit() string         { return c.comp[0].Unit() }
-func (c ChanN) Tag() string          { return c.comp[0].Tag() }
-func (c ChanN) NComp() int           { return len(c.comp) }
-func (c ChanN) Comp(i int) Chan1     { return c.comp[i] }
-func (c ChanN) BufLen() int          { return c.comp[0].BufLen() }
-func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
-func (c ChanN) MemType() MemType     { return c.comp[0].buffer.MemType }
-func (c ChanN) ChanN() ChanN         { return c } // implements Chan iface
+func (c ChanN) Mesh() *Mesh { return c.buffer.mesh }
+
+//func (c ChanN) Size() [3]int         { return c.comp[0].Size() }
+func (c ChanN) Unit() string { return c.buffer.Unit() }
+func (c ChanN) Tag() string  { return c.buffer.Tag() }
+func (c ChanN) NComp() int   { return (c.buffer.nComp) }
+func (c ChanN) BufLen() int  { return c.buffer.Len() } //?
+//func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
+func (c ChanN) MemType() MemType { return c.buffer.MemType }
+func (c ChanN) ChanN() ChanN     { return c } // implements Chan iface
+
+func (c ChanN) Comp(i int) Chan1 { return c.comp[i] }
 
 func (c ChanN) UnsafeData() []Slice {
 	s := make([]Slice, c.NComp())

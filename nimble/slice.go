@@ -13,9 +13,11 @@ const MAX_COMP = 3
 // Slice of float32, accessible by CPU, GPU or both.
 type Slice struct {
 	ptr   [MAX_COMP]unsafe.Pointer
+	mesh  *Mesh
 	len_  int // TODO int32?
 	nComp int
 	MemType
+	tag, unit string
 }
 
 func makeSliceN(nComp, length int, mem MemType) Slice {
@@ -131,3 +133,6 @@ func (s Slice) Device() safe.Float32s {
 func (s Slice) Len() int { return s.len_ }
 
 const SizeofFloat32 = 4
+
+func (s *Slice) Unit() string { return s.unit }
+func (s *Slice) Tag() string  { return s.tag }

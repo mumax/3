@@ -5,24 +5,19 @@ import (
 )
 
 type chan1 struct {
-	Info
-	buffer Slice
-	mutex
+	n ChanN
+//Info
+//buffer Slice
+//mutex
 }
 
 func newchan1(tag, unit string, m *Mesh, memType MemType, bufBlocks int) *chan1 {
-	N := -666
-	if bufBlocks < 1 { // means auto
-		N = m.NCell() // buffer all
-	} else {
-		N = m.BlockLen() * bufBlocks
-	}
+	N := bufferSize(m, bufBlocks)
 	return aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))
 }
 
 func aschan1(buffer Slice, tag, unit string, mesh *Mesh, lock mutex) *chan1 {
-	info := newInfo(tag, unit, mesh)
-	return &chan1{info, buffer, lock}
+	return &chan1{
 }
 
 func (c chan1) MemType() MemType { return c.buffer.MemType }

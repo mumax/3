@@ -17,8 +17,8 @@ type Autosaver struct {
 	stream cu.Stream
 }
 
-func Autosave(data_ nimble.Chan, every int, dev Device) {
-	fname := data_.ChanN().Tag() + ".dump"
+func Autosave(data nimble.ChanN, every int, dev Device) {
+	fname := data.Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
 	data := data_.ChanN().NewReader()

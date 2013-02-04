@@ -17,11 +17,12 @@ type Autosaver struct {
 	stream cu.Stream
 }
 
-func Autosave(data nimble.ChanN, every int, dev Device) {
+func Autosave(data_ nimble.ChanN, every int, dev Device) {
+	data := data_.NewReader()
 	fname := data.Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
-	data := data_.ChanN().NewReader()
+	data := NewReader()
 	r.out.Components = data.NComp()
 	r.out.MeshSize = data.Mesh().Size()
 	r.out.MeshStep = data.Mesh().CellSize()

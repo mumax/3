@@ -21,7 +21,7 @@ type ChanN struct {
 // TODO: Reader
 type RChanN struct {
 	chanN
-	next Slice // to avoid allocation
+	//next Slice // to avoid allocation
 }
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
@@ -32,6 +32,14 @@ func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks 
 		lock[c] = newRWMutex(N)
 	}
 	return ChanN{chanN{buffer, lock, "", "", m}}
+}
+
+func (c *ChanN) NewReader() RChanN {
+	reader := c.chanN // copy
+	for i := range reader.lock {
+		reader.lock[i] = (reader.lock[i]).(*rwMutex).MakeRMutex()
+	}
+	return RChanN{reader}
 }
 
 // NComp returns the number of components.

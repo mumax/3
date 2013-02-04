@@ -1,6 +1,9 @@
 package nimble
 
-import "testing"
+import (
+	_ "code.google.com/p/mx3/gpu"
+	"testing"
+)
 
 func TestSlice(t *testing.T) {
 	a := make([]float32, 100)
@@ -12,11 +15,6 @@ func TestSlice(t *testing.T) {
 	a = a[10:42]
 	s = s.Slice(10, 42)
 	if len(a) != s.Len() {
-		t.Fail()
-	}
-
-	b := s.Host()
-	if &b[0] != &a[0] {
 		t.Fail()
 	}
 }

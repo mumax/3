@@ -14,15 +14,6 @@ package nimble
 //	return Chan1{aschan1(MakeSlice(N, memType), tag, unit, m, newRWMutex(N))}
 //}
 
-func bufferSize(m *Mesh, bufBlocks int) int {
-	N := -666
-	if bufBlocks < 1 { // means auto
-		N = m.NCell() // buffer all
-	} else {
-		N = m.BlockLen() * bufBlocks
-	}
-}
-
 //func (c Chan1) ChanN() ChanN {
 //	//return ChanN{[]Chan1{c}, make([]Slice, 1)}
 //	return ChanN{c.buffer, [MAX_COMP]mutex{c.mutex}}

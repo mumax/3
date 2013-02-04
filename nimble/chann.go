@@ -104,3 +104,18 @@ func (c ChanN) WriteDone() {
 //	}
 //	return next
 //}
+
+func bufferSize(m *Mesh, bufBlocks int) int {
+	N := -666
+	if bufBlocks < 1 { // means auto
+		N = m.NCell() // buffer all
+	} else {
+		N = m.BlockLen() * bufBlocks
+	}
+}
+
+// safe integer division.
+func idiv(a, b int) int {
+	core.Assert(a%b == 0)
+	return a / b
+}

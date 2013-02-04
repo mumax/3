@@ -62,8 +62,3 @@ import (
 ////	return c.slice.list[a:b]
 ////}
 //
-// safe integer division.
-func idiv(a, b int) int {
-	core.Assert(a%b == 0)
-	return a / b
-}

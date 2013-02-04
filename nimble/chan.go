@@ -22,7 +22,7 @@ type RChanN struct {
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
 	N := bufferSize(m, bufBlocks)
-	buffer := makeSlice(nComp, N, m, memType)
+	buffer := makeSlice(nComp, N, memType)
 	var lock [MAX_COMP]mutex
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)

@@ -4,7 +4,7 @@ import "testing"
 
 func TestSlice(t *testing.T) {
 	a := make([]float32, 100)
-	s := ToSlice(a)
+	s := makeSlice(1, 100, GPUMemory)
 	if len(a) != s.Len() {
 		t.Fail()
 	}

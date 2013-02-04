@@ -8,16 +8,16 @@ import (
 
 const MAX_COMP = 3
 
-// Slice of float32, accessible by CPU, GPU or both.
+// Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
-	ptr [MAX_COMP]unsafe.Pointer
-	*info
+	ptr   [MAX_COMP]unsafe.Pointer
 	len_  int32
 	nComp int8
+	MemType
 }
 
 // mv to makeGPUFrame etc.
-func makeSlice(nComp, length int, mesh *Mesh, mem MemType) Slice {
+func makeSlice(nComp, length int, mem MemType) Slice {
 	if mem != GPUMemory {
 		panic("todo")
 	}
@@ -26,11 +26,11 @@ func makeSlice(nComp, length int, mesh *Mesh, mem MemType) Slice {
 	for c := 0; c < nComp; c++ {
 		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
 	}
-	return Slice{ptrs, newInfo(*mesh, mem, "", ""), int32(length), int8(nComp)}
+	return Slice{ptrs, int32(length), int8(nComp), mem}
 }
 
 // Len returns the number of elements.
-func (s Slice) Len() int {
+func (s *Slice) Len() int {
 	return int(s.len_)
 }
 
@@ -44,7 +44,6 @@ func (s *Slice) Slice(a, b int) Slice {
 	for i := range s.ptr {
 		s.ptr[i] = unsafe.Pointer(uintptr(s.ptr[i]) + SizeofFloat32*uintptr(a))
 	}
-	slice.info = s.info
 	slice.len_ = int32(b - a)
 	slice.nComp = s.nComp
 	return slice

@@ -1,19 +1,20 @@
 package nimble
 
 import (
-//"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/core"
 )
 
-// ChanN is a Chan that passes N-component data.
 type chanN struct {
 	buffer Slice
 	lock   [MAX_COMP]mutex
 }
 
+// ChanN is a Chan that passes N-component data. R/W.
 type ChanN struct {
 	chanN
 }
 
+// Read-only.
 type RChanN struct {
 	chanN
 	next Slice // to avoid allocation
@@ -77,10 +78,17 @@ func (c *chanN) UnsafeData() Slice {
 // When done, WriteDone() should be called to "send" the
 // slice down the Chan3. After that, the slice is not valid any more.
 func (c *chanN) next(n int) Slice {
-	//	c.lock[0].lockNext(n)
-	//	a, b := c.comp[i].lockedRange()
-	//
-	//	return next
+	c.lock[0].lockNext(n)
+	a, b := c.lock[0].lockedRange()
+	for i := 1; i < len(c.lock); i++ {
+		c.lock[i].lockNext(n)
+		α, β := c.lock[i].lockedRange()
+		if α != a || β != b {
+			panic("chan: next: inconsistent state")
+		}
+	}
+	next := c.buffer.Slice(a, b)
+	return next
 }
 
 func (c ChanN) WriteNext(n int) Slice {

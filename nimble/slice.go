@@ -17,7 +17,7 @@ type Slice struct {
 }
 
 // mv to makeGPUFrame etc.
-func makeSliceN(nComp, length int, mesh *Mesh, mem MemType) Slice {
+func makeSlice(nComp, length int, mesh *Mesh, mem MemType) Slice {
 	if mem != GPUMemory {
 		panic("todo")
 	}

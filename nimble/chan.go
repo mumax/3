@@ -7,7 +7,7 @@ import (
 type chanN struct {
 	buffer    Slice
 	lock      [MAX_COMP]mutex
-	tag, unit string
+	tag, unit string // TODO: fuse with mesh into info
 	mesh      *Mesh
 }
 
@@ -21,7 +21,6 @@ type ChanN struct {
 // TODO: Reader
 type RChanN struct {
 	chanN
-	//next Slice // to avoid allocation
 }
 
 func MakeChanN(nComp int, tag, unit string, m *Mesh, memType MemType, bufBlocks int) ChanN {
@@ -50,6 +49,18 @@ func (c *chanN) NComp() int {
 	return int(c.buffer.nComp)
 }
 
+func (c *chanN) comp(i int) chanN {
+	return chanN{c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}, c.tag, c.unit, c.mesh}
+}
+
+func (c *ChanN) Comp(i int) ChanN {
+	return ChanN{c.comp(i)}
+}
+
+func (c *RChanN) Comp(i int) RChanN {
+	return RChanN{c.comp(i)}
+}
+
 // BufLen returns the number of buffered elements.
 // This is the largest number of elements that can be read/written at once.
 func (c *chanN) BufLen() int {
@@ -66,6 +77,10 @@ func (c *chanN) Tag() string {
 
 func (c *chanN) Mesh() *Mesh {
 	return c.mesh
+}
+
+func (c *chanN) MemType() MemType {
+	return c.buffer.MemType
 }
 
 //func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }

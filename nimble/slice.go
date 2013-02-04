@@ -49,6 +49,10 @@ func (s *Slice) Slice(a, b int) Slice {
 	return slice
 }
 
+func (s *Slice) Comp(i int) Slice {
+	return Slice{[MAX_COMP]unsafe.Pointer{s.ptr[i]}, s.len_, 1, s.MemType}
+}
+
 const SizeofFloat32 = 4
 
 //func MakeSliceN(length int, memtype MemType) Slice {

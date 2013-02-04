@@ -22,7 +22,6 @@ func Autosave(data_ nimble.ChanN, every int, dev Device) {
 	fname := data.Tag() + ".dump"
 	r := new(Autosaver)
 	r.out = dump.NewWriter(core.OpenFile(core.OD+fname), dump.CRC_ENABLED)
-	data := NewReader()
 	r.out.Components = data.NComp()
 	r.out.MeshSize = data.Mesh().Size()
 	r.out.MeshStep = data.Mesh().CellSize()

@@ -17,9 +17,9 @@ type Autotabler struct {
 	stream cu.Stream
 }
 
-func Autotable(data_ nimble.Chan, every int, dev Device) {
+func Autotable(data_ nimble.ChanN, every int, dev Device) {
 	r := new(Autotabler)
-	data := data_.ChanN().NewReader()
+	data := data_.NewReader()
 	tags := make([]string, data.NComp()+1)
 	units := make([]string, data.NComp()+1)
 	tags[0], units[0] = "t", "s"
@@ -54,9 +54,9 @@ func (r *Autotabler) Run() {
 		if time.Stage && i%r.every == 0 {
 			i = 0
 			r.out.Data[0] = float32(time.Time)
-			for c := range output {
+			for c := 0; c < output.NComp(); c++ {
 				sum := 0.
-				list := r.gethost(output[c], r.stream)
+				list := r.gethost(output.Comp(c), r.stream)
 				for j := range list {
 					sum += float64(list[j])
 				}

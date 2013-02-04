@@ -50,6 +50,10 @@ func (s *Slice) Slice(a, b int) Slice {
 	return slice
 }
 
+func (s *Slice) NComp() int {
+	return int(s.nComp)
+}
+
 func (s *Slice) Comp(i int) Slice {
 	return Slice{[MAX_COMP]unsafe.Pointer{s.ptr[i]}, s.len_, 1, s.MemType}
 }

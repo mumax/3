@@ -46,7 +46,19 @@ func (c *chanN) NComp() int {
 // This is the largest number of elements that can be read/written at once.
 func (c *chanN) BufLen() int {
 	return c.buffer.Len()
-} //?
+}
+
+func (c *chanN) Unit() string {
+	return c.unit
+}
+
+func (c *chanN) Tag() string {
+	return c.tag
+}
+
+func (c *chanN) Mesh() *Mesh {
+	return c.mesh
+}
 
 //func (c ChanN) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 //func (c ChanN) MemType() MemType { return c.buffer.MemType }

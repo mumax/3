@@ -24,29 +24,30 @@ func makeSliceN(nComp, length int, mesh *Mesh, mem MemType) Slice {
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	var ptrs [MAX_COMP]unsafe.Pointer
 	for c := 0; c < nComp; c++ {
-		ptrs[c] = cu.MemAlloc(bytes)
+		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
 	}
-	return Slice{ptrs, length, nComp, mem, newInfo(mesh), "", ""}
+	return Slice{ptrs, newInfo(*mesh, mem, "", ""), int32(length), int8(nComp)}
 }
 
 // Len returns the number of elements.
 func (s Slice) Len() int {
-	return s.len_
+	return int(s.len_)
 }
 
 // Slice returns a slice sharing memory with the original.
 func (s *Slice) Slice(a, b int) Slice {
-	if a >= s.len_ || b > s.len_ || a > b || a < 0 || b < 0 {
-		panic(fmt.Errorf("slice range out of bounds: [%v:%v] (len=%v)", a, b, s.len_))
+	len_ := int(s.len_)
+	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {
+		panic(fmt.Errorf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_))
 	}
 	var slice Slice
 	for i := range s.ptr {
 		s.ptr[i] = unsafe.Pointer(uintptr(s.ptr[i]) + SizeofFloat32*uintptr(a))
 	}
 	slice.info = s.info
-	slice.len_ = b - a
+	slice.len_ = int32(b - a)
 	slice.nComp = s.nComp
-	return Slice{ptrs, len_, ncomp, s.MemType}
+	return slice
 }
 
 const SizeofFloat32 = 4

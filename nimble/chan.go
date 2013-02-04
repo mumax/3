@@ -133,6 +133,7 @@ func bufferSize(m *Mesh, bufBlocks int) int {
 	} else {
 		N = m.BlockLen() * bufBlocks
 	}
+	return N
 }
 
 // safe integer division.

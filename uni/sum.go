@@ -13,8 +13,8 @@ type Sum struct {
 	dev    Device
 }
 
-func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
-	output := nimble.MakeChanN(term1.NComp(), tag, term1.Unit(), term1.ChanN().Mesh(), mem, 1)
+func NewSum(tag string, term1, term2 nimble.ChanN, weight1, weight2 float32, mem nimble.MemType, dev Device) *Sum {
+	output := nimble.MakeChanN(term1.NComp(), tag, term1.Unit(), term1.Mesh(), mem, 1)
 	sum := &Sum{sum: output, dev: dev}
 	sum.MAdd(term1, weight1)
 	sum.MAdd(term2, weight2)
@@ -23,17 +23,17 @@ func NewSum(tag string, term1, term2 nimble.Chan, weight1, weight2 float32, mem 
 }
 
 // Add term with weight 1.
-func (s *Sum) Add(term_ nimble.Chan) {
+func (s *Sum) Add(term_ nimble.ChanN) {
 	s.MAdd(term_, 1)
 }
 
 // Add term * weight to the sum.
 // TODO: it might be nice to add to separate components
-func (s *Sum) MAdd(term_ nimble.Chan, weight float32) {
-	term := term_.ChanN().NewReader()
+func (s *Sum) MAdd(term_ nimble.ChanN, weight float32) {
+	term := term_.NewReader()
 	if len(s.term) != 0 {
 		core.Assert(term.NComp() == s.sum.NComp())
-		core.CheckEqualSize(term.Size(), s.term[0].Size())
+		core.CheckEqualSize(term.Mesh().Size(), s.term[0].Mesh().Size())
 		core.CheckUnits(term.Unit(), s.term[0].Unit())
 		core.Assert(*term.Mesh() == *s.term[0].Mesh()) // TODO: nice error handling
 	}
@@ -55,21 +55,25 @@ func (s *Sum) Exec() {
 	// TODO: components could be streamed in parallel.
 	for c := 0; c < nComp; c++ {
 
-		A := s.term[0].Comp(c).ReadNext(N)
-		B := s.term[1].Comp(c).ReadNext(N)
-		S := s.sum.Comp(c).WriteNext(N)
+		Ac := s.term[0].Comp(c)
+		Bc := s.term[1].Comp(c)
+		Sc := s.sum.Comp(c)
+		S := Sc.WriteNext(N)
+		A := Ac.ReadNext(N)
+		B := Bc.ReadNext(N)
 
 		s.dev.Madd(S, A, B, s.weight[0], s.weight[1])
 
-		s.term[0].Comp(c).ReadDone()
-		s.term[1].Comp(c).ReadDone()
+		Ac.ReadDone()
+		Bc.ReadDone()
 
 		for t := 2; t < len(s.term); t++ {
-			C := s.term[t].Comp(c).ReadNext(N)
+			Cc := s.term[t].Comp(c)
+			C := Cc.ReadNext(N)
 			s.dev.Madd(S, S, C, 1, s.weight[t])
-			s.term[t].Comp(c).ReadDone()
+			Cc.ReadDone()
 		}
-		s.sum.Comp(c).WriteDone()
+		Sc.WriteDone()
 	}
 }
 

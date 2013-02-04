@@ -91,17 +91,30 @@ func (c *chanN) next(n int) Slice {
 	return next
 }
 
-func (c ChanN) WriteNext(n int) Slice {
+func (c *chanN) done() {
+	for i := range c.lock {
+		c.lock[i].unlock()
+	}
+}
+
+func (c *ChanN) WriteNext(n int) Slice {
 	return c.chanN.next(n)
+}
+
+func (c *ChanN) WriteDone() {
+	c.chanN.done()
+}
+
+func (c *RChanN) ReadNext(n int) Slice {
+	return c.chanN.next(n)
+}
+
+func (c *RChanN) ReadDone() {
+	c.chanN.done()
 }
 
 // WriteDone() signals a slice obtained by WriteNext() is fully
 // written and can be sent down the Chan3.
-func (c ChanN) WriteDone() {
-	for i := range c.comp {
-		c.comp[i].WriteDone()
-	}
-}
 
 //func (c ChanN) WriteDelta(Δstart, Δstop int) [][]float32 {
 //	next := make([][]float32, c.NComp())

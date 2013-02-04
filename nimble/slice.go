@@ -1,11 +1,8 @@
 package nimble
 
 import (
-	"code.google.com/p/mx3/core"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
-	"github.com/barnex/cuda5/safe"
-	"reflect"
 	"unsafe"
 )
 

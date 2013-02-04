@@ -52,7 +52,8 @@ func (r *Autosaver) Run() {
 
 			// read first
 			for c := range buffer {
-				data := r.data.Comp(c).ReadNext(N)
+				comp := r.data.Comp(c)
+				data := comp.ReadNext(N)
 				data.Device().CopyDtoHAsync(buffer[c], r.stream)
 				r.stream.Synchronize()
 				r.data.ReadDone()
@@ -78,7 +79,7 @@ type hostBuf []float32
 func (r *hostBuf) gethost(data nimble.Slice, s cu.Stream) []float32 {
 	if data.CPUAccess() {
 		panic("uni.autosave cpu: need a copy")
-		return data.Host()
+		return nil //data.Host()
 	} // else
 	if *r == nil {
 		core.Debug("alloc buffer")

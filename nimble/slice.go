@@ -3,6 +3,7 @@ package nimble
 import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
+	"github.com/barnex/cuda5/safe"
 	"unsafe"
 )
 
@@ -127,15 +128,14 @@ const SizeofFloat32 = 4
 //	return list
 //}
 
-//func (s Slice) Device() safe.Float32s {
-//	if s.nComp != 1 {
-//		panic("need to implement for components")
-//	}
-//	if s.MemType&GPUMemory == 0 {
-//		core.Panicf("slice not accessible by GPU (memory type %v)", s.MemType)
-//	}
-//	var floats safe.Float32s
-//	floats.UnsafeSet(s.ptr[0], s.len_, s.len_)
-//	return floats
-//}
-//
+func (s Slice) Device() safe.Float32s {
+	if s.nComp != 1 {
+		panic(fmt.Errorf("slice.device: need 1 component, have %v", s.nComp))
+	}
+	if s.MemType&GPUMemory == 0 {
+		panic(fmt.Errorf("slice not accessible by GPU (memory type %v)", s.MemType))
+	}
+	var floats safe.Float32s
+	floats.UnsafeSet(s.ptr[0], s.Len(), s.Len())
+	return floats
+}

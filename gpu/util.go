@@ -2,6 +2,7 @@ package gpu
 
 import (
 	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -105,6 +106,16 @@ func Copy(dst, src Slice) {
 	str := Stream()
 	for c := 0; c < dst.NComp(); c++ {
 		cu.MemcpyAsync(dst.DevPtr(c), src.DevPtr(c), bytes, str)
+	}
+	SyncAndRecycle(str)
+}
+
+// Set the entire slice to this value.
+func Memset(dst nimble.Slice, val ...float32) {
+	core.Assert(len(val) == dst.NComp())
+	str := Stream()
+	for c, v := range val {
+		cu.MemsetD32Async(dst.DevPtr(), math.Float32bits(value), int64(s.Len()), str)
 	}
 	SyncAndRecycle(str)
 }

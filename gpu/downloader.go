@@ -3,14 +3,13 @@ package gpu
 import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
-	"github.com/barnex/cuda5/cu"
+	//"github.com/barnex/cuda5/cu"
 )
 
 // Downloads data from host to GPU.
 type Downloader struct {
-	host   nimble.ChanN
-	dev    nimble.RChanN
-	stream cu.Stream
+	host nimble.ChanN
+	dev  nimble.RChanN
 }
 
 func NewDownloader(tag, unit string, devdata_ nimble.ChanN) *Downloader {
@@ -18,7 +17,7 @@ func NewDownloader(tag, unit string, devdata_ nimble.ChanN) *Downloader {
 	hostdata := nimble.MakeChanN(devdata.NComp(), devdata.Tag(), devdata.Unit(), devdata.Mesh(), nimble.CPUMemory, 0)
 	panic("register")
 	//MemHostRegister(hostdata.UnsafeData().Host())
-	u := &Downloader{hostdata, devdata, cu.StreamCreate()}
+	u := &Downloader{hostdata, devdata}
 	nimble.Stack(u)
 	return u
 }
@@ -39,9 +38,7 @@ func (u *Downloader) Run() {
 			host := u.host.Comp(c)
 			out := host.WriteNext(N)
 			in := dev.ReadNext(N)
-			CopyDtoH(out, in)
-			//in.CopyDtoHAsync(out, u.stream)
-			//u.stream.Synchronize()
+			Copy(out, in)
 			host.WriteDone()
 			dev.ReadDone()
 		}

@@ -9,15 +9,16 @@ import (
 )
 
 type Stencil struct {
-	in     nimble.RChan1
-	out    nimble.Chan1
+	in     nimble.RChanN
+	out    nimble.ChanN
 	Weight [7]float32
 	stream cu.Stream
 }
 
-func NewStencil(tag, unit string, in nimble.Chan, Weight [7]float32) *Stencil {
-	r := in.ChanN().Chan1().NewReader() // TODO: buffer
-	w := nimble.MakeChan1(tag, unit, r.Mesh, in.MemType(), -1)
+func NewStencil(tag, unit string, in nimble.ChanN, Weight [7]float32) *Stencil {
+	core.Assert(in.NComp() == 1)
+	r := in.NewReader() // TODO: buffer
+	w := nimble.MakeChanN(1, tag, unit, r.Mesh, in.MemType(), -1)
 	return &Stencil{r, w, Weight, cu.StreamCreate()}
 }
 
@@ -28,7 +29,7 @@ func (s *Stencil) Exec() {
 	StencilAdd(dst, src, s.out.Mesh, &s.Weight, s.stream)
 }
 
-func (s *Stencil) Output() nimble.Chan1 {
+func (s *Stencil) Output() nimble.ChanN {
 	return s.out
 }
 

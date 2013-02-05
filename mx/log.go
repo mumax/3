@@ -32,9 +32,7 @@ func initLog() {
 // 	open /some/file file does not exist
 func FatalErr(err interface{}, msg ...interface{}) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, append(msg, err)...)
-		Cleanup()
-		os.Exit(1)
+		FatalExit(append(msg, err)...)
 	}
 }
 

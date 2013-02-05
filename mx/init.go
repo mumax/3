@@ -26,14 +26,14 @@ var (
 	Flag_pagelock    = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
-func Init() {
+func init() {
 	flag.Parse()
-	if *Flag_version {
+	if *Flag_version && !*Flag_silent {
 		fmt.Print("Mumax Cubed 0.0 alpha ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
 	}
 
-	initOD()
 	initLog()
+	initOD()
 	initTiming()
 	initGOMAXPROCS()
 	initCpuProf()

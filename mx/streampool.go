@@ -4,7 +4,6 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -32,5 +31,5 @@ func initStreamPool() {
 	for i := 0; i < streamPoolSize; i++ {
 		streamPool <- cu.StreamCreate()
 	}
-	core.Debug("initialized stream pool of size", streamPoolSize)
+	Debug("initialized stream pool of size", streamPoolSize)
 }

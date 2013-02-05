@@ -12,7 +12,7 @@ import (
 
 var (
 	Flag_version     = flag.Bool("v", true, "print version")
-	Flag_debug       = flag.Bool("g", false, "Generate debug info")
+	Flag_debug       = flag.Bool("g", true, "Generate debug info")
 	Flag_silent      = flag.Bool("s", false, "Don't generate any log info")
 	Flag_od          = flag.String("o", "", "set output directory")
 	Flag_force       = flag.Bool("f", false, "force start, clean existing output directory")

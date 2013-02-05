@@ -17,7 +17,7 @@ type LLGTorque struct {
 
 func NewLLGTorque(tag string, m_, B_ nimble.ChanN, alpha float32) *LLGTorque {
 	m, B := m_.NewReader(), B_.NewReader()
-	core.Assert(B.Size() == m.Size())
+	core.Assert(B.Mesh().Size() == m.Mesh().Size())
 	torque := nimble.MakeChanN(3, tag, "T", m.Mesh(), m_.MemType(), 1)
 	tq := &LLGTorque{torque, m, B, alpha}
 	nimble.Stack(tq)
@@ -35,9 +35,9 @@ func (r *LLGTorque) Run() {
 
 func (r *LLGTorque) Exec() {
 	n := r.torque.Mesh().NCell() // TODO: blocksize
-	M := Device3(r.m.ReadNext(n))
-	B := Device3(r.b.ReadNext(n))
-	T := Device3(r.torque.WriteNext(n))
+	M := r.m.ReadNext(n)
+	B := r.b.ReadNext(n)
+	T := r.torque.WriteNext(n)
 
 	CalcLLGTorque(T, M, B, r.Alpha)
 
@@ -46,12 +46,13 @@ func (r *LLGTorque) Exec() {
 	r.b.ReadDone()
 }
 
-func CalcLLGTorque(torque, m, B [3]safe.Float32s, alpha float32) {
-	N := torque[0].Len()
+func CalcLLGTorque(torque, m, B nimble.Slice, alpha float32) {
+	N := torque.Len()
+	// TODO: assert...
 	gridDim, blockDim := Make1DConf(N)
-	ptx.K_llgtorque(torque[0].Pointer(), torque[1].Pointer(), torque[2].Pointer(),
-		m[0].Pointer(), m[1].Pointer(), m[2].Pointer(),
-		B[0].Pointer(), B[1].Pointer(), B[2].Pointer(),
+	ptx.K_llgtorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
+		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
+		B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
 		alpha, N, gridDim, blockDim)
 }
 

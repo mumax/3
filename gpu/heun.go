@@ -3,7 +3,6 @@ package gpu
 import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
-	"github.com/barnex/cuda5/safe"
 	"math"
 )
 
@@ -11,7 +10,7 @@ import (
 // TODO: now only for magnetization (because it normalizes), post-step hook?
 type Heun struct {
 	solverCommon
-	dy0  [3]safe.Float32s // buffer dy/dt
+	dy0  nimble.Slice
 	y    nimble.ChanN
 	dy   nimble.RChanN
 	init bool
@@ -20,7 +19,7 @@ type Heun struct {
 func NewHeun(y nimble.ChanN, dy_ nimble.ChanN, dt, multiplier float64) *Heun {
 	core.Assert(dt > 0 && multiplier > 0)
 	dy := dy_.NewReader()
-	dy0 := TryMakeVectors(y.BufLen()) // TODO: proper len?
+	dy0 := nimble.MakeSlice(3, y.BufLen()) // TODO: proper len?
 	return &Heun{dy0: dy0, y: y, dy: dy, solverCommon: newSolverCommon(dt, multiplier)}
 }
 
@@ -87,7 +86,7 @@ func (e *Heun) Step() {
 	// Send out initial value
 	if !e.init {
 		// normalize initial magnetization
-		M := Device3(e.y.UnsafeData())
+		M := e.y.UnsafeData()
 		Normalize(M)
 		e.y.WriteNext(n)
 		e.init = true
@@ -100,31 +99,31 @@ func (e *Heun) Step() {
 
 	// stage 1
 	nimble.Clock.Send(e.time, true)
-	dy := Device3(e.dy.ReadNext(n))
-	y := Device3(e.y.WriteNext(n))
-	maddvec(y, dy, dt)
+	dy := e.dy.ReadNext(n)
+	y := e.y.WriteNext(n)
+	Madd2(y, y, dy, 1, dt)
 	e.y.WriteDone()
-	cpyvec(dy0, dy, str)
+	Copy(dy0, dy)
 	e.dy.ReadDone()
 
 	// stage 2
 	nimble.Clock.Send(e.time+e.dt_si, false)
-	dy = Device3(e.dy.ReadNext(n))
-	y = Device3(e.y.WriteNext(n))
+	dy = e.dy.ReadNext(n)
+	y = e.y.WriteNext(n)
 	{
-		e.err = MaxVecDiff(dy0[0], dy0[1], dy0[2], dy[0], dy[1], dy[2]) * float64(dt)
+		e.err = MaxVecDiff(dy0.Safe(0), dy0.Safe(1), dy0.Safe(2), dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
 		e.checkErr()
 
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			e.delta = MaxVecNorm(dy[0], dy[1], dy[2]) * float64(dt)
-			madd2vec(y, dy, dy0, 0.5*dt, -0.5*dt, str)
+			e.delta = MaxVecNorm(dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
+			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			Normalize(y)
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
 		} else { // undo.
 			e.delta = 0
-			maddvec(y, dy0, -dt)
+			Madd2(y, y, dy0, 1, -dt)
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
 		}

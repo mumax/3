@@ -36,7 +36,7 @@ func (e *Euler) Steps(steps int) {
 	for s := 0; s < steps-1; s++ {
 		y := e.y.WriteNext(n)
 		dy := e.dy.ReadNext(n)
-		maddvec(y, dy, e.dt)
+		Madd2(y, y, dy, 1, e.dt)
 		Normalize(y)
 		e.y.WriteDone()
 		e.dy.ReadDone()
@@ -46,7 +46,7 @@ func (e *Euler) Steps(steps int) {
 	// then the pipeline comes in a consistent state before Steps() returns.
 	y := e.y.WriteNext(n)
 	dy := e.dy.ReadNext(n)
-	maddvec(y, dy, e.dt)
+	Madd2(y, y, dy, 1, e.dt)
 	Normalize(y)
 	e.dy.ReadDone()
 }

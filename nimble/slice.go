@@ -19,6 +19,10 @@ type Slice struct {
 	MemType
 }
 
+func MakeSlice(nComp, length int) Slice {
+	return makeSlice(nComp, length, GPUMemory)
+}
+
 // mv to makeGPUFrame etc.
 func makeSlice(nComp, length int, mem MemType) Slice {
 	if mem != GPUMemory {
@@ -89,6 +93,13 @@ const SizeofFloat32 = 4
 
 func (s *Slice) DevPtr(component int) cu.DevicePtr {
 	return cu.DevicePtr(s.ptr[:s.nComp][component])
+}
+
+// TODO: rm
+func (s *Slice) Safe(component int) safe.Float32s {
+	var f safe.Float32s
+	f.UnsafeSet(unsafe.Pointer(s.DevPtr(component)), s.Len(), s.Len())
+	return f
 }
 
 func (s *Slice) Host() []float32 {

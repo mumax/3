@@ -1,7 +1,6 @@
-package nimble
+package mx
 
 import (
-	"code.google.com/p/mx3/core"
 	"fmt"
 )
 
@@ -22,7 +21,7 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 		copy(pbc3[:], pbc)
 	} else {
 		if len(pbc) != 0 {
-			core.Panic("mesh: need 0 or 3 PBC arguments, got:", pbc)
+			Panic("mesh: need 0 or 3 PBC arguments, got:", pbc)
 		}
 	}
 	size := [3]int{N0, N1, N2}

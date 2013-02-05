@@ -6,5 +6,5 @@ all: $(OUT)
 .PHONY: $(OUT)
 
 $(OUT): %: %.go
-	go run $@.go
+	go run $@.go -s
 

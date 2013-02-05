@@ -1,4 +1,6 @@
-package gpu
+package mx
+
+// Management of a pool of re-usable CUDA streams.
 
 import (
 	"code.google.com/p/mx3/core"

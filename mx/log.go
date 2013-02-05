@@ -1,4 +1,4 @@
-package core
+package mx
 
 // Logging and error reporting utility functions
 
@@ -15,18 +15,24 @@ var (
 	DEBUG = true
 )
 
-// If err != nil, exit cleanly without panic.
-// TODO -> FatalErr, require explanatory message.
-func Fatal(err interface{}) {
+// If err != nil, print the message and error, run Cleanup and exit.
+// E.g.:
+// 	f, err := os.Open(file)
+// 	FatalErr(err, "open", file)
+// May output:
+// 	open /some/file: file does not exist
+func FatalErr(err interface{}, msg ...interface{}) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "mx3:", err)
+		fmt.Fprintln(os.Stderr, append(msg, err)...)
 		Cleanup()
 		os.Exit(1)
 	}
 }
 
-func Fatalf(format string, args ...interface{}) {
-	Fatal(fmt.Errorf(format, args...))
+func FatalExit(msg ...interface{}) {
+	fmt.Fprintln(os.Stderr, msg...)
+	Cleanup()
+	os.Exit(1)
 }
 
 // Panics on the message.
@@ -67,11 +73,11 @@ func Logf(format string, args ...interface{}) {
 	}
 }
 
-func Check(test bool, msg string) {
-	if !test {
-		Fatal(fmt.Errorf(msg))
-	}
-}
+//func Check(test bool, msg string) {
+//	if !test {
+//		Fatal(fmt.Errorf(msg))
+//	}
+//}
 
 // Debug message.
 func Debug(msg ...interface{}) {

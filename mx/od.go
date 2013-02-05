@@ -49,3 +49,10 @@ func SetOD(od string, force bool) {
 		})
 	}
 }
+
+// called by init()
+func initOD() {
+	if *Flag_od != "" {
+		SetOD(*Flag_od, *Flag_force)
+	}
+}

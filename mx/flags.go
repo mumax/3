@@ -1,6 +1,6 @@
 package mx
 
-// Initialization of general command line flags.
+// File: initialization of general command line flags.
 
 import (
 	"code.google.com/p/mx3/core"
@@ -43,12 +43,6 @@ func Init() {
 	initCpuProf()
 	initMemProf()
 	starttime = time.Now()
-}
-
-func initOD() {
-	if *Flag_od != "" {
-		SetOD(*Flag_od, *Flag_force)
-	}
 }
 
 func Cleanup() {

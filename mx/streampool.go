@@ -1,6 +1,7 @@
 package mx
 
-// Management of a pool of re-usable CUDA streams.
+// File: management of a pool of re-usable CUDA streams.
+// Author: Arne Vansteenkiste
 
 import (
 	"code.google.com/p/mx3/core"

@@ -1,6 +1,7 @@
 package mx
 
-// Logging and error reporting utility functions
+// File: logging and error reporting utility functions
+// Author: Arne Vansteenkiste
 
 import (
 	"fmt"
@@ -84,12 +85,6 @@ func Logf(format string, args ...interface{}) {
 		log.Printf(format, args...)
 	}
 }
-
-//func Check(test bool, msg string) {
-//	if !test {
-//		Fatal(fmt.Errorf(msg))
-//	}
-//}
 
 // Debug message.
 func Debug(msg ...interface{}) {

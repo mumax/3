@@ -32,28 +32,6 @@ func newSolverCommon(dt_si, dt_mul float64) solverCommon {
 		debug: w}
 }
 
-// y += dy * dt
-//func maddvec(y, dy [3]safe.Float32s, dt float32) {
-//	for i := 0; i < 3; i++ {
-//		Madd2(y[i], y[i], dy[i], 1, dt)
-//	}
-//}
-
-// dst += a * s1 + b * s2
-//func madd2vec(dst, a, b [3]safe.Float32s, s1, s2 float32, str [3]cu.Stream) {
-//	for i := range dst {
-//		Madd3(dst[i], dst[i], a[i], b[i], 1, s1, s2)
-//	}
-//}
-
-// dst = src
-//func cpyvec(dst, src [3]safe.Float32s, str [3]cu.Stream) {
-//	for i := 0; i < 3; i++ {
-//		dst[i].CopyDtoDAsync(src[i], str[i])
-//	}
-//	syncAll(str[:])
-//}
-
 // adapt time step: dt *= corr, but limited to sensible values.
 func (e *solverCommon) adaptDt(corr float64) {
 	core.Assert(corr != 0)

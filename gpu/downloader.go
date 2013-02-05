@@ -8,35 +8,42 @@ import (
 
 // Downloads data from host to GPU.
 type Downloader struct {
-	host   nimble.Chan1
-	dev    nimble.RChan1
+	host   nimble.ChanN
+	dev    nimble.RChanN
 	stream cu.Stream
 }
 
-func NewDownloader(tag, unit string, devdata_ nimble.Chan1) *Downloader {
+func NewDownloader(tag, unit string, devdata_ nimble.ChanN) *Downloader {
 	devdata := devdata_.NewReader()
-	hostdata := nimble.MakeChan1(tag, unit, devdata.Mesh, nimble.CPUMemory, devdata_.NBufferedBlocks())
-	MemHostRegister(hostdata.UnsafeData().Host())
+	hostdata := nimble.MakeChanN(devdata.NComp(), devdata.Tag(), devdata.Unit(), devdata.Mesh(), nimble.CPUMemory, 0)
+	panic("register")
+	//MemHostRegister(hostdata.UnsafeData().Host())
 	u := &Downloader{hostdata, devdata, cu.StreamCreate()}
 	nimble.Stack(u)
 	return u
 }
 
-func (u *Downloader) Output() nimble.Chan1 {
+func (u *Downloader) Output() nimble.ChanN {
 	return u.host
 }
 
 func (u *Downloader) Run() {
 	core.Debug("run gpu.downloader")
-	N := u.host.BlockLen()
-	LockCudaThread()
+	N := u.host.BufLen()
+	panic("lock")
+	//LockCudaThread()
 
 	for {
-		in := u.dev.ReadNext(N).Device()
-		out := u.host.WriteNext(N).Host()
-		in.CopyDtoHAsync(out, u.stream)
-		u.stream.Synchronize()
-		u.host.WriteDone()
-		u.dev.ReadDone()
+		for c := 0; c < u.dev.NComp(); c++ {
+			dev := u.dev.Comp(c)
+			host := u.host.Comp(c)
+			out := host.WriteNext(N)
+			in := dev.ReadNext(N)
+			CopyDtoH(out, in)
+			//in.CopyDtoHAsync(out, u.stream)
+			//u.stream.Synchronize()
+			host.WriteDone()
+			dev.ReadDone()
+		}
 	}
 }

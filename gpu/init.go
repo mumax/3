@@ -6,9 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
-	"runtime"
-	"sync/atomic"
-	"unsafe"
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
@@ -39,6 +36,7 @@ func init() {
 	if M < 2 {
 		core.Log("Compute capability does not allow unified addressing.")
 	}
+	initStreamPool()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.
@@ -48,42 +46,4 @@ func tryCuInit() {
 		core.Fatal(err)
 	}()
 	cu.Init(0)
-}
-
-var lockCount int32
-
-// To be called by any fresh goroutine that will do cuda interaction.
-func LockCudaThread() {
-	if cudaCtx == 0 {
-		return // allow to run if there's no GPU.
-	}
-	runtime.LockOSThread()
-	cudaCtx.SetCurrent() // super cheap.
-	c := atomic.AddInt32(&lockCount, 1)
-	core.Debug("Locked thread", c, "to CUDA context")
-}
-
-// Undo LockCudaThread()
-func UnlockCudaThread() {
-	if cudaCtx == 0 {
-		return // allow to run if there's no GPU.
-	}
-	runtime.UnlockOSThread()
-	c := atomic.AddInt32(&lockCount, -1)
-	core.Debug("Unlocked OS thread,", c, "remain locked")
-}
-
-// Register host memory for fast transfers,
-// but only when flag -pagelock is true.
-func MemHostRegister(slice []float32) {
-	// do not fail on already registered memory.
-	defer func() {
-		err := recover()
-		if err != nil && err != cu.ERROR_HOST_MEMORY_ALREADY_REGISTERED {
-			panic(err)
-		}
-	}()
-	if *nimble.Flag_pagelock {
-		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
-	}
 }

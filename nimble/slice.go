@@ -1,9 +1,11 @@
 package nimble
 
 import (
+	"code.google.com/p/mx3/core"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/safe"
+	"reflect"
 	"unsafe"
 )
 
@@ -35,6 +37,10 @@ func (s *Slice) Len() int {
 	return int(s.len_)
 }
 
+func (s *Slice) Bytes() int64 {
+	return int64(s.len_) * cu.SIZEOF_FLOAT32
+}
+
 // Slice returns a slice sharing memory with the original.
 func (s *Slice) Slice(a, b int) Slice {
 	len_ := int(s.len_)
@@ -60,41 +66,6 @@ func (s *Slice) Comp(i int) Slice {
 
 const SizeofFloat32 = 4
 
-//func MakeSliceN(length int, memtype MemType) Slice {
-//	return MakeSlices(1, length, memtype)
-//	//	switch memtype {
-//	//	default:
-//	//		core.Panic("makeslice: illegal memtype:", memtype)
-//	//	case CPUMemory:
-//	//		return cpuSlice(length)
-//	//	case GPUMemory:
-//	//		return gpuSlice(length)
-//	//	case UnifiedMemory:
-//	//		return unifiedSlice(length)
-//	//	}
-//	//	panic("bug")
-//	//	var s Slice
-//	//	return s
-//}
-
-//func MakeSlices(nComp int, length int, memType MemType) []Slice {
-//	s := make([]Slice, nComp)
-//	for i := range s {
-//		s[i] = MakeSlice(length, memType)
-//	}
-//	return s
-//}
-
-//func cpuSlice(N int) Slice {
-//	return ToSlice(make([]float32, N))
-//}
-//
-//func gpuSlice(N int) Slice {
-//	s := safe.MakeFloat32s(N)
-//	ptrs := [MAX_COMP]unsafe.Pointer{unsafe.Pointer(s.Pointer())}
-//	return Slice{ptrs, N, 1, GPUMemory}
-//}
-//
 //func unifiedSlice(N int) Slice {
 //	bytes := int64(N) * SizeofFloat32
 //	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
@@ -116,23 +87,27 @@ const SizeofFloat32 = 4
 //	return Slice{ptrs, len_, 1, flag}
 //}
 
-//func (s Slice) Host() []float32 {
-//	if s.nComp != 1 {
-//		panic("need to implement for components")
-//	}
-//
-//	if s.MemType&CPUMemory == 0 {
-//		core.Panicf("slice not accessible by CPU (memory type %v)", s.MemType)
-//	}
-//	var list []float32
-//	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
-//	hdr.Data = uintptr(s.ptr[0])
-//	hdr.Len = s.len_
-//	hdr.Cap = s.len_
-//	return list
-//}
+func (s *Slice) DevPtr(component int) cu.DevicePtr {
+	return cu.DevicePtr(s.ptr[:s.nComp][component])
+}
 
-func (s Slice) Device() safe.Float32s {
+func (s *Slice) Host() []float32 {
+	if s.nComp != 1 {
+		panic("need to implement for components")
+	}
+
+	if s.MemType&CPUMemory == 0 {
+		core.Panicf("slice not accessible by CPU (memory type %v)", s.MemType)
+	}
+	var list []float32
+	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
+	hdr.Data = uintptr(s.ptr[0])
+	hdr.Len = int(s.len_)
+	hdr.Cap = hdr.Len
+	return list
+}
+
+func (s *Slice) Device() safe.Float32s {
 	if s.nComp != 1 {
 		panic(fmt.Errorf("slice.device: need 1 component, have %v", s.nComp))
 	}

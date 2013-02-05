@@ -13,8 +13,8 @@ type Symm2D struct {
 	kernSize    [3]int              // Size of kernel and logical FFT size.
 	fftKernSize [3]int              // Size of real, FFTed kernel
 	n           int                 // product of size
-	input       [3]nimble.RChan1    // TODO: fuse with input
-	output      [3]nimble.Chan1     // TODO: fuse with output
+	input       nimble.RChanN       // TODO: fuse with input
+	output      nimble.ChanN        // TODO: fuse with output
 	outChan     nimble.ChanN        // same as output
 	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf

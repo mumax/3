@@ -4,6 +4,10 @@ import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
 	"github.com/barnex/cuda5/cu"
+	"math"
+	"runtime"
+	"sync/atomic"
+	"unsafe"
 )
 
 var lockCount int32
@@ -100,7 +104,7 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	return
 }
 
-func Copy(dst, src Slice) {
+func Copy(dst, src nimble.Slice) {
 	core.Assert(dst.Len() == src.Len() && dst.NComp() == src.NComp())
 	bytes := dst.Bytes()
 	str := Stream()
@@ -115,7 +119,7 @@ func Memset(dst nimble.Slice, val ...float32) {
 	core.Assert(len(val) == dst.NComp())
 	str := Stream()
 	for c, v := range val {
-		cu.MemsetD32Async(dst.DevPtr(), math.Float32bits(value), int64(s.Len()), str)
+		cu.MemsetD32Async(dst.DevPtr(c), math.Float32bits(v), int64(dst.Len()), str)
 	}
 	SyncAndRecycle(str)
 }

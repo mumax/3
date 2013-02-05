@@ -81,7 +81,6 @@ func (e *Heun) Relax(maxerr float64) {
 // Take one time step
 func (e *Heun) Step() {
 	n := e.y.Mesh().NCell()
-	str := e.stream
 
 	// Send out initial value
 	if !e.init {

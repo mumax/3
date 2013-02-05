@@ -18,7 +18,6 @@ type solverCommon struct {
 	steps, undone    int              // number of good steps, undone steps
 	delta, err       float64          // max delta, max error of last step
 	debug            dump.TableWriter // save t, dt, error here
-	stream           [3]cu.Stream     // TODO: rm
 }
 
 func newSolverCommon(dt_si, dt_mul float64) solverCommon {
@@ -30,7 +29,7 @@ func newSolverCommon(dt_si, dt_mul float64) solverCommon {
 
 	return solverCommon{dt_si: dt_si, dt_mul: dt_mul,
 		Maxerr: 1e-4, Headroom: 0.75,
-		debug: w, stream: stream3Create()}
+		debug: w}
 }
 
 // y += dy * dt

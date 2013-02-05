@@ -3,7 +3,6 @@ package gpu
 import (
 	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/nimble"
-	"github.com/barnex/cuda5/cu"
 )
 
 // Uploads data from host to GPU.
@@ -15,14 +14,15 @@ type Uploader struct {
 // TODO: rm tag, unit
 func NewUploader(tag, unit string, hostdata_ nimble.ChanN) *Uploader {
 	hostdata := hostdata_.NewReader()
-	MemHostRegister(hostdata_.UnsafeData().Host())
-	devdata := nimble.MakeChanN(hostdata.NComp(), tag, unit, hostdata.Mesh(), nimble.GPUMemory, hostdata_.NBufferedBlocks())
-	u := &Uploader{hostdata, devdata, cu.StreamCreate()}
+	panic("register")
+	//MemHostRegister(hostdata_.UnsafeData().Host())
+	devdata := nimble.MakeChanN(hostdata.NComp(), tag, unit, hostdata.Mesh(), nimble.GPUMemory, 0) // TODO: use same buflen as source
+	u := &Uploader{hostdata, devdata}
 	nimble.Stack(u)
 	return u
 }
 
-func (u *Uploader) Output() nimble.Chan1 {
+func (u *Uploader) Output() nimble.ChanN {
 	return u.dev
 }
 
@@ -52,8 +52,8 @@ func (u *Uploader) Run() {
 			out := dev.WriteNext(N)
 			in := host.ReadNext(N)
 			Copy(out, in)
-			host.WriteDone()
-			dev.ReadDone()
+			host.ReadDone()
+			dev.WriteDone()
 		}
 	}
 

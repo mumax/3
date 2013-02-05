@@ -34,8 +34,8 @@ func (e *Euler) Steps(steps int) {
 	e.y.WriteDone()
 
 	for s := 0; s < steps-1; s++ {
-		dy := Device3(e.dy.ReadNext(n))
-		y := Device3(e.y.WriteNext(n))
+		y := e.y.WriteNext(n)
+		dy := e.dy.ReadNext(n)
 		maddvec(y, dy, e.dt)
 		Normalize(y)
 		e.y.WriteDone()
@@ -44,8 +44,8 @@ func (e *Euler) Steps(steps int) {
 	// gentle hack:
 	// do not split the last frame in blocks ans do not signal writeDone
 	// then the pipeline comes in a consistent state before Steps() returns.
-	dy := Device3(e.dy.ReadNext(n))
-	y := Device3(e.y.WriteNext(n))
+	y := e.y.WriteNext(n)
+	dy := e.dy.ReadNext(n)
 	maddvec(y, dy, e.dt)
 	Normalize(y)
 	e.dy.ReadDone()

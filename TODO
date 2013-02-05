@@ -1,7 +1,5 @@
 dot test
 
-test: do not fail uni tests if cc is too low.
-
 replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.
 
 replace Slice by Frame, contains 3D size, ncomp, time stamp
@@ -10,3 +8,4 @@ fuse a standard micromag kernel for at least the local terms. uses inline functi
 
 dedicated exchange kernel or optimized stencil.
 
+"make version" updates version number by git commits

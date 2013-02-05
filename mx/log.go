@@ -43,9 +43,13 @@ func FatalExit(msg ...interface{}) {
 	os.Exit(1)
 }
 
+func Fatalf(format string, args ...interface{}) {
+	FatalErr(fmt.Errorf(format, args...))
+}
+
 // Panics on the message.
 func Panic(msg ...interface{}) {
-	panic(fmt.Errorf(msg...))
+	panic(fmt.Errorf(fmt.Sprint(msg...)))
 }
 
 // Panics on the message.

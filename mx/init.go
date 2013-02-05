@@ -27,8 +27,6 @@ var (
 	Flag_pagelock    = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
-var starttime time.Time
-
 func Init() {
 	flag.Parse()
 	if *Flag_version {
@@ -37,15 +35,19 @@ func Init() {
 
 	initOD()
 	initLog()
+	initTiming()
 	initGOMAXPROCS()
 	initCpuProf()
 	initMemProf()
-	starttime = time.Now()
 }
 
-func Cleanup() {
-	Log("run time:", time.Since(starttime))
-	core.Cleanup()
+var starttime time.Time
+
+func initTiming() {
+	starttime = time.Now()
+	AtExit(func() {
+		Log("run time:", time.Since(starttime))
+	})
 }
 
 func initGOMAXPROCS() {

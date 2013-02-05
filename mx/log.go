@@ -15,12 +15,20 @@ var (
 	DEBUG = true
 )
 
+// called by init()
+func initLog() {
+	LOG = !*Flag_silent
+	DEBUG = *Flag_debug
+	log.SetPrefix(" ·")
+	log.SetFlags(0)
+}
+
 // If err != nil, print the message and error, run Cleanup and exit.
 // E.g.:
 // 	f, err := os.Open(file)
 // 	FatalErr(err, "open", file)
 // May output:
-// 	open /some/file: file does not exist
+// 	open /some/file file does not exist
 func FatalErr(err interface{}, msg ...interface{}) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, append(msg, err)...)
@@ -37,7 +45,7 @@ func FatalExit(msg ...interface{}) {
 
 // Panics on the message.
 func Panic(msg ...interface{}) {
-	panic(fmt.Sprint(msg...))
+	panic(fmt.Errorf(msg...))
 }
 
 // Panics on the message.

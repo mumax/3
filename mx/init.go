@@ -3,10 +3,8 @@ package mx
 // File: initialization of general command line flags.
 
 import (
-	"code.google.com/p/mx3/core"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
@@ -46,58 +44,51 @@ func Init() {
 }
 
 func Cleanup() {
-	core.Log("run time:", time.Since(starttime))
+	Log("run time:", time.Since(starttime))
 	core.Cleanup()
-}
-
-func initLog() {
-	core.LOG = !*Flag_silent
-	core.DEBUG = *Flag_debug
-	log.SetPrefix(" ·")
-	log.SetFlags(0)
 }
 
 func initGOMAXPROCS() {
 	if *Flag_maxprocs == 0 {
 		*Flag_maxprocs = runtime.NumCPU()
-		core.Log("num CPU:", *Flag_maxprocs)
+		Log("num CPU:", *Flag_maxprocs)
 	}
 	procs := runtime.GOMAXPROCS(*Flag_maxprocs) // sets it
-	core.Log("GOMAXPROCS:", procs)
+	Log("GOMAXPROCS:", procs)
 }
 
 func initCpuProf() {
 	if *Flag_cpuprof {
 		// start CPU profile to file
-		fname := core.OD + "/cpu.pprof"
+		fname := OD + "/cpu.pprof"
 		f, err := os.Create(fname)
-		core.Fatal(err)
-		core.Log("writing CPU profile to", fname)
+		FatalErr(err, "start CPU profile")
 		err = pprof.StartCPUProfile(f)
-		core.Fatal(err)
+		FatalErr(err, "start CPU profile")
+		Log("writing CPU profile to", fname)
 
 		// at exit: exec go tool pprof to generate SVG output
-		core.AtExit(func() {
+		AtExit(func() {
 			pprof.StopCPUProfile()
 			me := procselfexe()
 			outfile := fname + ".svg"
-			core.SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", me, fname)
+			SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", me, fname)
 		})
 	}
 }
 
 func initMemProf() {
 	if *Flag_memprof {
-		core.AtExit(func() {
-			fname := core.OD + "/mem.pprof"
+		AtExit(func() {
+			fname := OD + "/mem.pprof"
 			f, err := os.Create(fname)
 			defer f.Close()
-			core.LogErr(err)
-			core.Log("writing memory profile to", fname)
-			core.LogErr(pprof.WriteHeapProfile(f))
+			FatalErr(err, "start memory profile")
+			Log("writing memory profile to", fname)
+			FatalErr(pprof.WriteHeapProfile(f), "start memory profile")
 			me := procselfexe()
 			outfile := fname + ".svg"
-			core.SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
+			SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
 		})
 	}
 }
@@ -105,6 +96,6 @@ func initMemProf() {
 // path to the executable.
 func procselfexe() string {
 	me, err := os.Readlink("/proc/self/exe")
-	core.PanicErr(err)
+	PanicErr(err)
 	return me
 }

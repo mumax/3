@@ -41,6 +41,13 @@ func SaveCmdOutput(outfile string, cmd string, args ...string) {
 	}
 }
 
+// path to the executable.
+func ProcSelfExe() string {
+	me, err := os.Readlink("/proc/self/exe")
+	PanicErr(err)
+	return me
+}
+
 // Product of elements.
 func Prod(size [3]int) int {
 	return size[0] * size[1] * size[2]

@@ -38,7 +38,7 @@ func (m *Mesh) CellSize() [3]float64 {
 	return m.cellSize
 }
 
-// Returns pbc, as passed to constructor.
+// Returns pbc (periodic boundary conditions), as passed to constructor.
 func (m *Mesh) PBC() [3]int {
 	return m.pbc
 }
@@ -49,6 +49,7 @@ func (m *Mesh) NCell() int {
 	return m.gridSize[0] * m.gridSize[1] * m.gridSize[2]
 }
 
+// WorldSize equals (grid)Size x CellSize.
 func (m *Mesh) WorldSize() [3]float64 {
 	return [3]float64{float64(m.gridSize[0]) * m.cellSize[0], float64(m.gridSize[1]) * m.cellSize[1], float64(m.gridSize[2]) * m.cellSize[2]}
 }
@@ -74,4 +75,36 @@ func (m *Mesh) String() string {
 		pbc = fmt.Sprintf("PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
 	}
 	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm], %v blocksize: [%v x %v x %v]", N, s[0], s[1], s[2], c[0], c[1], c[2], pbc, m.blockSize[0], m.blockSize[1], m.blockSize[2])
+}
+
+// BlockSize finds a suitable way to split an array
+// of given size into equal blocks.
+// It limits block sizes to Flag_maxblocklen.
+func blockSize(size [3]int) [3]int {
+	N0, N1, N2 := size[0], size[1], size[2]
+	n := prod(size)
+
+	minNw := *Flag_minblocks // minimum number of blocks
+	maxNw := N0 * N1         // max. Nwarp: do not slice up along K, keep full rows.
+
+	nWarp := maxNw
+	for w := maxNw; w >= minNw; w-- {
+		if N0%w != 0 && N1%w != 0 { // need to slice along either I or J
+			continue
+		}
+		if n/w > *Flag_maxblocklen { // warpLen must not be larger than specified.
+			break
+		}
+		nWarp = w
+	}
+
+	if nWarp <= N0 { // slice along I
+		return [3]int{N0 / nWarp, N1, N2}
+	} // else { // slice along I and J
+	return [3]int{1, (N0 * N1) / nWarp, N2}
+}
+
+// product of elements.
+func prod(size [3]int) int {
+	return size[0] * size[1] * size[2]
 }

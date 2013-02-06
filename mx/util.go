@@ -7,12 +7,6 @@ import (
 //"path"
 )
 
-// Remove extension from file name.
-//func NoExt(file string) string {
-//	ext := path.Ext(file)
-//	return file[:len(file)-len(ext)]
-//}
-
 // Open file for writing, error is fatal.
 //func OpenFile(fname string) *os.File {
 //	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)

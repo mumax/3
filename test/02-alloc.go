@@ -14,4 +14,6 @@ func main() {
 
 	m := mx.NewQuant(mx.VECTOR, "m", "", mesh)
 	mx.Log(m)
+
+	m.Data().Memset(1, 0, 0)
 }

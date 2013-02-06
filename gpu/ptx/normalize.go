@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -38,7 +37,7 @@ func K_normalize(vx cu.DevicePtr, vy cu.DevicePtr, vz cu.DevicePtr, N int, gridD
 
 	if normalize_stream == 0 {
 		normalize_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for normalize")
+		//core.Log("Loading PTX code for normalize")
 		normalize_code = cu.ModuleLoadData(normalize_ptx).GetFunction("normalize")
 	}
 

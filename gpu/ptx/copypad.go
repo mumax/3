@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -46,7 +45,7 @@ func K_copypad(dst cu.DevicePtr, D0 int, D1 int, D2 int, src cu.DevicePtr, S0 in
 
 	if copypad_stream == 0 {
 		copypad_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for copypad")
+		//core.Log("Loading PTX code for copypad")
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
 	}
 

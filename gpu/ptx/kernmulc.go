@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -56,7 +55,7 @@ func K_kernmulC(Mx cu.DevicePtr, My cu.DevicePtr, Mz cu.DevicePtr, Kxx cu.Device
 
 	if kernmulC_stream == 0 {
 		kernmulC_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for kernmulC")
+		//core.Log("Loading PTX code for kernmulC")
 		kernmulC_code = cu.ModuleLoadData(kernmulC_ptx).GetFunction("kernmulC")
 	}
 

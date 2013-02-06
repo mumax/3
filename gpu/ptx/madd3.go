@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -46,7 +45,7 @@ func K_madd3(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePt
 
 	if madd3_stream == 0 {
 		madd3_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for madd3")
+		//core.Log("Loading PTX code for madd3")
 		madd3_code = cu.ModuleLoadData(madd3_ptx).GetFunction("madd3")
 	}
 

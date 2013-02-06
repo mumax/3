@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -40,7 +39,7 @@ func K_reducedot(x1 cu.DevicePtr, x2 cu.DevicePtr, dst cu.DevicePtr, initVal flo
 
 	if reducedot_stream == 0 {
 		reducedot_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for reducedot")
+		//core.Log("Loading PTX code for reducedot")
 		reducedot_code = cu.ModuleLoadData(reducedot_ptx).GetFunction("reducedot")
 	}
 

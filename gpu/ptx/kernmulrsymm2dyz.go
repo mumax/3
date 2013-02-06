@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -44,7 +43,7 @@ func K_kernmulRSymm2Dyz(fftMy cu.DevicePtr, fftMz cu.DevicePtr, fftKyy cu.Device
 
 	if kernmulRSymm2Dyz_stream == 0 {
 		kernmulRSymm2Dyz_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for kernmulRSymm2Dyz")
+		//core.Log("Loading PTX code for kernmulRSymm2Dyz")
 		kernmulRSymm2Dyz_code = cu.ModuleLoadData(kernmulRSymm2Dyz_ptx).GetFunction("kernmulRSymm2Dyz")
 	}
 

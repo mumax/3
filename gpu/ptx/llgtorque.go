@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -52,7 +51,7 @@ func K_llgtorque(tx cu.DevicePtr, ty cu.DevicePtr, tz cu.DevicePtr, mx cu.Device
 
 	if llgtorque_stream == 0 {
 		llgtorque_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for llgtorque")
+		//core.Log("Loading PTX code for llgtorque")
 		llgtorque_code = cu.ModuleLoadData(llgtorque_ptx).GetFunction("llgtorque")
 	}
 

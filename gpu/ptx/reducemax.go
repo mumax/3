@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -38,7 +37,7 @@ func K_reducemax(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gri
 
 	if reducemax_stream == 0 {
 		reducemax_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for reducemax")
+		//core.Log("Loading PTX code for reducemax")
 		reducemax_code = cu.ModuleLoadData(reducemax_ptx).GetFunction("reducemax")
 	}
 

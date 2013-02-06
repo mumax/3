@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -38,7 +37,7 @@ func K_reducesum(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gri
 
 	if reducesum_stream == 0 {
 		reducesum_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for reducesum")
+		//core.Log("Loading PTX code for reducesum")
 		reducesum_code = cu.ModuleLoadData(reducesum_ptx).GetFunction("reducesum")
 	}
 

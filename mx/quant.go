@@ -15,10 +15,6 @@ type Quant struct {
 	quant
 }
 
-type Reader struct {
-	quant
-}
-
 func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
 	N := m.NCell() //bufferSize(m, bufBlocks)
 	buffer := gpuSlice(nComp, N)
@@ -29,6 +25,24 @@ func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
 	return Quant{quant{buffer, lock, tag, unit, m}}
 }
 
+func (q *quant) NComp() int {
+	return q.buffer.NComp()
+}
+
+func (q *Quant) Data() Slice {
+	// fail-fast test, likely to spot abuse sooner or later.
+	for c := 0; c < q.NComp(); c++ {
+		if q.lock[c].isLocked() {
+			panic("quant data is locked")
+		}
+	}
+	return q.buffer
+}
+
+//type Reader struct {
+//	quant
+//}
+//
 //func (c *Quant) NewReader() Reader {
 //	reader := c.quant // copy
 //	for i := range reader.lock {

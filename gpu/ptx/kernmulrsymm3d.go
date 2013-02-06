@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -54,7 +53,7 @@ func K_kernmulRSymm3D(fftMx cu.DevicePtr, fftMy cu.DevicePtr, fftMz cu.DevicePtr
 
 	if kernmulRSymm3D_stream == 0 {
 		kernmulRSymm3D_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for kernmulRSymm3D")
+		//core.Log("Loading PTX code for kernmulRSymm3D")
 		kernmulRSymm3D_code = cu.ModuleLoadData(kernmulRSymm3D_ptx).GetFunction("kernmulRSymm3D")
 	}
 

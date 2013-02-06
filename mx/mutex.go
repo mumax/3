@@ -14,7 +14,7 @@ type mutex interface {
 	lockNext(delta int)
 	unlock()
 	lockedRange() (start, stop int)
-	//isLocked() bool
+	isLocked() bool
 }
 
 // RWMutex protects an array for safe access by
@@ -106,18 +106,18 @@ func (m *rwMutex) canWLock(a, b int64) (ok bool) {
 	return true
 }
 
-//func (m *rwMutex) isLocked() bool {
-//	want := m.absA
-//	if m.absB != want {
-//		return true
-//	}
-//	for i := range m.readers {
-//		if m.readers[i].absC != want || m.readers[i].absD != want {
-//			return true
-//		}
-//	}
-//	return false
-//}
+func (m *rwMutex) isLocked() bool {
+	want := m.absA
+	if m.absB != want {
+		return true
+	}
+	for i := range m.readers {
+		if m.readers[i].absC != want || m.readers[i].absD != want {
+			return true
+		}
+	}
+	return false
+}
 
 // RMutex is a read-only lock, created by an RWMutex.
 type rMutex struct {
@@ -192,6 +192,6 @@ func (r *rMutex) canRLock(c, d int64) (ok bool) {
 	return r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
 }
 
-//func (m *rMutex) isLocked() bool {
-//	return m.rw.isLocked()
-//}
+func (m *rMutex) isLocked() bool {
+	return m.rw.isLocked()
+}

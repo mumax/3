@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -60,7 +59,7 @@ func K_stencil3(dst cu.DevicePtr, src cu.DevicePtr, w0 float32, wt float32, wb f
 
 	if stencil3_stream == 0 {
 		stencil3_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for stencil3")
+		//core.Log("Loading PTX code for stencil3")
 		stencil3_code = cu.ModuleLoadData(stencil3_ptx).GetFunction("stencil3")
 	}
 

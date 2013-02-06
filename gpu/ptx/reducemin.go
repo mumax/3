@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -38,7 +37,7 @@ func K_reducemin(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gri
 
 	if reducemin_stream == 0 {
 		reducemin_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for reducemin")
+		//core.Log("Loading PTX code for reducemin")
 		reducemin_code = cu.ModuleLoadData(reducemin_ptx).GetFunction("reducemin")
 	}
 

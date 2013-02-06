@@ -9,9 +9,11 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/util"
 	"flag"
+	"fmt"
 	"io"
+	"os"
 	"text/scanner"
 	"text/template"
 )
@@ -26,7 +28,8 @@ func main() {
 // generate cuda wrapper for file.
 func cuda2go(fname string) {
 	// open cuda file
-	f := core.Open(fname)
+	f, err := os.Open(fname)
+	util.PanicErr(err)
 	defer f.Close()
 
 	// read tokens
@@ -88,7 +91,7 @@ func typemap(ctype string) string {
 	if gotype, ok := tm[ctype]; ok {
 		return gotype
 	}
-	core.Fatalf("cuda2go: unsupported cuda type: %v", ctype)
+	panic(fmt.Errorf("unsupported cuda type: %v", ctype))
 	return "" // unreachable
 }
 
@@ -102,12 +105,14 @@ type Kernel struct {
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	ptx := filterptx(core.NoExt(filename) + ".ptx")
+	ptx := filterptx(util.NoExt(filename) + ".ptx")
 	kernel := &Kernel{funcname, argt, argn, "`" + string(ptx) + "`"}
-	wrapfname := core.NoExt(filename) + ".go"
-	wrapout := core.OpenFile(wrapfname)
+	wrapfname := util.NoExt(filename) + ".go"
+	wrapout, err := os.OpenFile(wrapfname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	util.PanicErr(err)
 	defer wrapout.Close()
-	core.Fatal(templ.Execute(wrapout, kernel))
+	util.PanicErr(templ.Execute(wrapout, kernel))
+
 }
 
 // wrapper code template text
@@ -119,7 +124,6 @@ const templText = `package ptx
 */
 
 import(
-	"code.google.com/p/mx3/core"
 	"unsafe"
 	"github.com/barnex/cuda5/cu"
 	"sync"
@@ -146,7 +150,7 @@ func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 
 	if {{.Name}}_stream == 0{
 		{{.Name}}_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for {{.Name}}")
+		//core.Log("Loading PTX code for {{.Name}}")
 		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
 	}
 
@@ -177,13 +181,14 @@ func filter(token string) bool {
 // Filter comments and ".file" entries from ptx code.
 // They spoil the git history
 func filterptx(fname string) string {
-	f := core.Open(fname)
+	f, err := os.Open(fname)
+	util.PanicErr(err)
 	defer f.Close()
 	in := bufio.NewReader(f)
 	var out bytes.Buffer
 	line, err := in.ReadBytes('\n')
 	for err != io.EOF {
-		core.Fatal(err)
+		util.PanicErr(err)
 		if !bytes.HasPrefix(line, []byte("//")) && !bytes.HasPrefix(line, []byte("	.file")) {
 			out.Write(line)
 		}

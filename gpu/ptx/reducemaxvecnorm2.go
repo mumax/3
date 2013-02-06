@@ -6,7 +6,6 @@ package ptx
 */
 
 import (
-	"code.google.com/p/mx3/core"
 	"github.com/barnex/cuda5/cu"
 	"sync"
 	"unsafe"
@@ -42,7 +41,7 @@ func K_reducemaxvecnorm2(x cu.DevicePtr, y cu.DevicePtr, z cu.DevicePtr, dst cu.
 
 	if reducemaxvecnorm2_stream == 0 {
 		reducemaxvecnorm2_stream = cu.StreamCreate()
-		core.Log("Loading PTX code for reducemaxvecnorm2")
+		//core.Log("Loading PTX code for reducemaxvecnorm2")
 		reducemaxvecnorm2_code = cu.ModuleLoadData(reducemaxvecnorm2_ptx).GetFunction("reducemaxvecnorm2")
 	}
 

@@ -48,6 +48,20 @@ func initMemProf() {
 	}
 }
 
+// called by init()
+func initGPUProf() {
+	if *Flag_gpuprof {
+		//export CUDA_PROFILE=1
+		//export CUDA_PROFILE_CSV=1
+		//export CUDA_PROFILE_CONFIG=config.txt
+		//export CUDA_PROFILE_LOG=profile.csv
+		//echo gpustarttimestamp > config.txt
+		//echo instructions >> config.txt
+		//echo streamid >> config.txt
+
+	}
+}
+
 // TODO: cuda profiling: set env variables, perhaps run cli profiler.
 
 // Exec command and write output to outfile.

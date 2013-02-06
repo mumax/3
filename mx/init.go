@@ -18,6 +18,7 @@ var (
 	Flag_force       = flag.Bool("f", false, "force start, clean existing output directory")
 	Flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	Flag_memprof     = flag.Bool("memprof", false, "Recored gopprof memory profile")
+	Flag_gpuprof     = flag.Bool("gpuprof", false, "Recored GPU profile")
 	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")
 	Flag_minblocks   = flag.Int("minblocks", 1, "Minimum number of concurrent blocks")
@@ -28,14 +29,17 @@ var (
 
 func init() {
 	flag.Parse()
+
 	if *Flag_version && !*Flag_silent {
 		fmt.Print("Mumax Cubed 0.0 alpha ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
 	}
 
 	initLog()
 	initOD()
+	initGPU()
 	initTiming()
 	initGOMAXPROCS()
+	initGPUProf()
 	initCpuProf()
 	initMemProf()
 }

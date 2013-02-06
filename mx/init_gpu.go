@@ -1,15 +1,13 @@
 package mx
 
 import (
-	"flag"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
 
-func init() {
-	flag.Parse()
+func initGPU() {
 	var flag uint
 	switch *Flag_sched {
 	default:

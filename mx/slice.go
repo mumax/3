@@ -34,6 +34,7 @@ func gpuSlice(nComp, length int) Slice {
 	return Slice{ptrs, int32(length), int8(nComp), gpuMemory}
 }
 
+// value for Slice.memType
 const (
 	cpuMemory     = 1 << 0
 	gpuMemory     = 1 << 1
@@ -72,6 +73,15 @@ func (s *Slice) Comp(i int) Slice {
 	return Slice{[MAX_COMP]unsafe.Pointer{s.ptr[i]}, s.len_, 1, s.memType}
 }
 
+// DevPtr returns a CUDA device pointer to a component.
+// Slice must have GPUAccess.
+func (s *Slice) DevPtr(component int) cu.DevicePtr {
+	if !s.GPUAccess() {
+		panic("slice not accessible by GPU")
+	}
+	return cu.DevicePtr(s.ptr[:s.nComp][component])
+}
+
 // Slice returns a slice sharing memory with the original.
 func (s *Slice) Slice(a, b int) Slice {
 	len_ := int(s.len_)
@@ -107,10 +117,6 @@ func (s *Slice) Slice(a, b int) Slice {
 //	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
 //	return Slice{ptrs, len_, 1, flag}
 //}
-
-func (s *Slice) DevPtr(component int) cu.DevicePtr {
-	return cu.DevicePtr(s.ptr[:s.nComp][component])
-}
 
 // TODO: rm
 //func (s *Slice) Safe(component int) safe.Float32s {

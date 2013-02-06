@@ -26,12 +26,29 @@ func MakeSlice(nComp, length int) Slice {
 
 // alloc slice on gpu
 func gpuSlice(nComp, length int) Slice {
+	Argument(nComp > 0 && length > 0)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	var ptrs [MAX_COMP]unsafe.Pointer
 	for c := 0; c < nComp; c++ {
 		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
 	}
 	return Slice{ptrs, int32(length), int8(nComp), gpuMemory}
+}
+
+// Frees the underlying storage and zeros the Slice to avoid accidental use.
+func (s *Slice) Free() {
+	if s.memType == gpuMemory {
+		for c := 0; c < s.NComp(); c++ {
+			cu.MemFree(cu.DevicePtr(s.ptr[c]))
+			s.ptr[c] = unsafe.Pointer(uintptr(0))
+		}
+	} else {
+		panic("todo")
+	}
+
+	s.len_ = 0
+	s.nComp = 0
+	s.memType = 0
 }
 
 // value for Slice.memType

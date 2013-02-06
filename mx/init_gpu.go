@@ -8,6 +8,7 @@ import (
 
 var cudaCtx cu.Context // gpu context to be used by all threads
 
+// called by init()
 func initGPU() {
 	var flag uint
 	switch *Flag_sched {

@@ -99,3 +99,9 @@ func Debug(msg ...interface{}) {
 		Log(append([]interface{}{caller}, msg...)...)
 	}
 }
+
+func Argument(test bool) {
+	if !test {
+		Panic("illegal argument")
+	}
+}

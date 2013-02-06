@@ -45,3 +45,5 @@ func initMemProf() {
 		})
 	}
 }
+
+// TODO: cuda profiling: set env variables, perhaps run cli profiler.

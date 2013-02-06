@@ -1,4 +1,4 @@
-SRC = $(wildcard *.go)
+SRC = $(filter-out doc.go, $(wildcard *.go))
 OUT = $(SRC:.go=)
 
 all: $(OUT)

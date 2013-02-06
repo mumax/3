@@ -68,13 +68,12 @@ func (m *Mesh) BlockLen() int {
 
 func (m *Mesh) String() string {
 	s := m.gridSize
-	N := prod(s)
 	c := m.cellSize
 	pbc := ""
 	if m.pbc != [3]int{0, 0, 0} {
-		pbc = fmt.Sprintf("PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
+		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
 	}
-	return fmt.Sprintf("%v cells: [%v x %v x %v ] x [%vm x %vm x %vm], %v blocksize: [%v x %v x %v]", N, s[0], s[1], s[2], c[0], c[1], c[2], pbc, m.blockSize[0], m.blockSize[1], m.blockSize[2])
+	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[0], s[1], s[2], c[0], c[1], c[2], pbc)
 }
 
 // BlockSize finds a suitable way to split an array

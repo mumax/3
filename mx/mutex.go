@@ -7,7 +7,6 @@ package mx
    -Arne.
 */
 import (
-	"code.google.com/p/mx3/core"
 	"sync"
 )
 
@@ -15,7 +14,7 @@ type mutex interface {
 	lockNext(delta int)
 	unlock()
 	lockedRange() (start, stop int)
-	isLocked() bool
+	//isLocked() bool
 }
 
 // RWMutex protects an array for safe access by
@@ -49,11 +48,11 @@ func newRWMutex(N int) *rwMutex {
 //}
 
 // unsynchronized Delta
-func (m *rwMutex) _delta(Δstart, Δstop int) {
+func (m *rwMutex) delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
 	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
-		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
+		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
 	}
 	for !m.canWLock(m.absA+Δa, m.absB+Δb) {
 		m.cond.Wait()
@@ -68,7 +67,7 @@ func (m *rwMutex) lockNext(delta int) {
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
 	}
-	m._delta(0, delta)
+	m.delta(0, delta)
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
@@ -80,7 +79,7 @@ func (m *rwMutex) unlock() {
 		panic("rwmutex: unlock of unlocked mutex")
 	}
 	rnge := int(m.absB - m.absA)
-	m._delta(rnge, 0)
+	m.delta(rnge, 0)
 	m.cond.L.Unlock()
 	m.cond.Broadcast()
 }
@@ -107,18 +106,18 @@ func (m *rwMutex) canWLock(a, b int64) (ok bool) {
 	return true
 }
 
-func (m *rwMutex) isLocked() bool {
-	want := m.absA
-	if m.absB != want {
-		return true
-	}
-	for i := range m.readers {
-		if m.readers[i].absC != want || m.readers[i].absD != want {
-			return true
-		}
-	}
-	return false
-}
+//func (m *rwMutex) isLocked() bool {
+//	want := m.absA
+//	if m.absB != want {
+//		return true
+//	}
+//	for i := range m.readers {
+//		if m.readers[i].absC != want || m.readers[i].absD != want {
+//			return true
+//		}
+//	}
+//	return false
+//}
 
 // RMutex is a read-only lock, created by an RWMutex.
 type rMutex struct {
@@ -152,7 +151,7 @@ func (m *rMutex) delta(Δstart, Δstop int) {
 	Δc, Δd := int64(Δstart), int64(Δstop)
 	rnge := int((m.absD + Δd) - (m.absC + Δc))
 	if rnge < 0 || rnge > m.rw.n || Δc < 0 || Δd < 0 {
-		core.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
+		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
 	}
 	for !m.canRLock(m.absC+Δc, m.absD+Δd) {
 		m.rw.cond.Wait()
@@ -193,6 +192,6 @@ func (r *rMutex) canRLock(c, d int64) (ok bool) {
 	return r.rw.absA >= d && r.rw.absB <= (c+int64(r.rw.n))
 }
 
-func (m *rMutex) isLocked() bool {
-	return m.rw.isLocked()
-}
+//func (m *rMutex) isLocked() bool {
+//	return m.rw.isLocked()
+//}

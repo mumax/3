@@ -1,4 +1,4 @@
-package nimble
+package mx
 
 import (
 	"math/rand"

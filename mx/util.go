@@ -4,9 +4,7 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
-	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 )
 
@@ -28,29 +26,6 @@ func Open(fname string) *os.File {
 func NoExt(file string) string {
 	ext := path.Ext(file)
 	return file[:len(file)-len(ext)]
-}
-
-// Exec command and write output to outfile.
-func SaveCmdOutput(outfile string, cmd string, args ...string) {
-	Log("exec:", cmd, args, ">", outfile)
-	out, err := exec.Command(cmd, args...).CombinedOutput()
-	if err != nil {
-		Fatalf("exec %v %v: %v: %v", cmd, args, err, string(out))
-	} else {
-		Fatalf("writing %v: %v", outfile, ioutil.WriteFile(outfile, out, 0666))
-	}
-}
-
-// path to the executable.
-func ProcSelfExe() string {
-	me, err := os.Readlink("/proc/self/exe")
-	PanicErr(err)
-	return me
-}
-
-// Product of elements.
-func Prod(size [3]int) int {
-	return size[0] * size[1] * size[2]
 }
 
 // Panics if a != b

@@ -4,7 +4,9 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"runtime/pprof"
 )
 
@@ -22,9 +24,9 @@ func initCpuProf() {
 		// at exit: exec go tool pprof to generate SVG output
 		AtExit(func() {
 			pprof.StopCPUProfile()
-			me := ProcSelfExe()
+			me := procSelfExe()
 			outfile := fname + ".svg"
-			SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", me, fname)
+			saveCmdOutput(outfile, "go", "tool", "pprof", "-svg", me, fname)
 		})
 	}
 }
@@ -39,11 +41,29 @@ func initMemProf() {
 			LogErr(err, "memory profile") // during cleanup, should not panic/exit
 			Log("writing memory profile to", fname)
 			LogErr(pprof.WriteHeapProfile(f), "memory profile")
-			me := ProcSelfExe()
+			me := procSelfExe()
 			outfile := fname + ".svg"
-			SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
+			saveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)
 		})
 	}
 }
 
 // TODO: cuda profiling: set env variables, perhaps run cli profiler.
+
+// Exec command and write output to outfile.
+func saveCmdOutput(outfile string, cmd string, args ...string) {
+	Log("exec:", cmd, args, ">", outfile)
+	out, err := exec.Command(cmd, args...).CombinedOutput()
+	if err != nil {
+		Logf("exec %v %v: %v: %v", cmd, args, err, string(out))
+	} else {
+		Logf("writing %v: %v", outfile, ioutil.WriteFile(outfile, out, 0666))
+	}
+}
+
+// path to the executable.
+func procSelfExe() string {
+	me, err := os.Readlink("/proc/self/exe")
+	PanicErr(err)
+	return me
+}

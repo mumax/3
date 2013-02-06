@@ -13,4 +13,6 @@ func main() {
 
 	m := mx.NewQuant(mx.VECTOR, "m", "", mesh)
 	m.Data().Memset(1, 0, 0)
+
+	m.Data().WriteTo("m.mx3o")
 }

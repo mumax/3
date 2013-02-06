@@ -20,8 +20,7 @@ type Reader struct {
 }
 
 func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
-	bufBlocks := 0
-	N := bufferSize(m, bufBlocks)
+	N := m.NCell() //bufferSize(m, bufBlocks)
 	buffer := gpuSlice(nComp, N)
 	var lock [MAX_COMP]mutex
 	for c := 0; c < nComp; c++ {

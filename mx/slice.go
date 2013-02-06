@@ -12,6 +12,12 @@ import (
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
 
+// Number of components
+const (
+	SCALAR = 1
+	VECTOR = 3
+)
+
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
 	ptr     [MAX_COMP]unsafe.Pointer

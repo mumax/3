@@ -50,11 +50,12 @@ func initMemProf() {
 	}
 }
 
+// Configuration for GPU profile output.
 const CUDA_PROFILE_CONFIG = `
-		gpustarttimestamp
-		instructions
-		streamid
-		`
+gpustarttimestamp
+instructions
+streamid
+`
 
 // called by init()
 func initGPUProf() {

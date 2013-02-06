@@ -14,9 +14,9 @@ func initCpuProf() {
 		// start CPU profile to file
 		fname := OD + "/cpu.pprof"
 		f, err := os.Create(fname)
-		FatalErr(err, "start CPU profile")
+		FatalErr(err, "CPU profile")
 		err = pprof.StartCPUProfile(f)
-		FatalErr(err, "start CPU profile")
+		FatalErr(err, "CPU profile")
 		Log("writing CPU profile to", fname)
 
 		// at exit: exec go tool pprof to generate SVG output
@@ -36,9 +36,9 @@ func initMemProf() {
 			fname := OD + "/mem.pprof"
 			f, err := os.Create(fname)
 			defer f.Close()
-			FatalErr(err, "start memory profile")
+			LogErr(err, "memory profile") // during cleanup, should not panic/exit
 			Log("writing memory profile to", fname)
-			FatalErr(pprof.WriteHeapProfile(f), "start memory profile")
+			LogErr(pprof.WriteHeapProfile(f), "memory profile")
 			me := ProcSelfExe()
 			outfile := fname + ".svg"
 			SaveCmdOutput(outfile, "go", "tool", "pprof", "-svg", "--inuse_objects", me, fname)

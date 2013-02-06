@@ -30,16 +30,17 @@ var (
 func init() {
 	flag.Parse()
 
+	initTiming()
+
 	if *Flag_version && !*Flag_silent {
 		fmt.Print("Mumax Cubed 0.0 alpha ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
 	}
 
 	initLog()
 	initOD()
+	initGPUProf() // should be before initGPU
 	initGPU()
-	initTiming()
 	initGOMAXPROCS()
-	initGPUProf()
 	initCpuProf()
 	initMemProf()
 }

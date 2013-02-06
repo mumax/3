@@ -39,7 +39,7 @@ func FatalErr(err interface{}, msg ...interface{}) {
 // Print message to stderr, run Cleanup and exit unsuccessfully.
 func FatalExit(msg ...interface{}) {
 	fmt.Fprintln(os.Stderr, msg...)
-	cleanup()
+	Cleanup()
 	os.Exit(1)
 }
 
@@ -100,6 +100,7 @@ func Debug(msg ...interface{}) {
 	}
 }
 
+// Argument panics with "illegal argument" if test is false.
 func Argument(test bool) {
 	if !test {
 		Panic("illegal argument")

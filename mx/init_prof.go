@@ -50,22 +50,23 @@ func initMemProf() {
 	}
 }
 
-// called by init()
-func initGPUProf() {
-	if *Flag_gpuprof {
-		//os.Setenv("CUDA_PROFILE_CSV","1")
-		os.Setenv("CUDA_PROFILE", "1")
-		out := OD + "gpuprofile.log"
-		Log("writing GPU profile to", out)
-		os.Setenv("CUDA_PROFILE_LOG", out)
-		cfgfile := OD + "cudaprof.cfg"
-		os.Setenv("CUDA_PROFILE_CONFIG", cfgfile)
-		const cfg = `
+const CUDA_PROFILE_CONFIG = `
 		gpustarttimestamp
 		instructions
 		streamid
 		`
-		FatalErr(ioutil.WriteFile(cfgfile, []byte(cfg), 0666), "gpuprof")
+
+// called by init()
+func initGPUProf() {
+	if *Flag_gpuprof {
+		PanicErr(os.Setenv("CUDA_PROFILE", "1"))
+		PanicErr(os.Setenv("CUDA_PROFILE_CSV", "1"))
+		out := OD + "gpuprofile.csv"
+		Log("writing GPU profile to", out)
+		PanicErr(os.Setenv("CUDA_PROFILE_LOG", out))
+		cfgfile := OD + "cudaprof.cfg"
+		PanicErr(os.Setenv("CUDA_PROFILE_CONFIG", cfgfile))
+		FatalErr(ioutil.WriteFile(cfgfile, []byte(CUDA_PROFILE_CONFIG), 0666), "gpuprof")
 		AtExit(cuda.DeviceReset)
 	}
 }

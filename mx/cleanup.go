@@ -11,7 +11,7 @@ func AtExit(cleanup func()) {
 }
 
 // Runs all functions stacked by AtExit().
-func cleanup() {
+func Cleanup() {
 	if len(atexit) != 0 {
 		Log("Cleanup")
 	}

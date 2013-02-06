@@ -10,19 +10,6 @@ import (
 	"unsafe"
 )
 
-var lockCount int32
-
-// To be called by any fresh goroutine that will do cuda interaction.
-func LockCudaThread() {
-	if cudaCtx == 0 {
-		return // allow to run if there's no GPU.
-	}
-	runtime.LockOSThread()
-	cudaCtx.SetCurrent() // super cheap.
-	c := atomic.AddInt32(&lockCount, 1)
-	core.Debug("Locked thread", c, "to CUDA context")
-}
-
 // Undo LockCudaThread()
 func UnlockCudaThread() {
 	if cudaCtx == 0 {

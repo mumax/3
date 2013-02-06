@@ -3,6 +3,7 @@ package mx
 import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
+	"runtime"
 )
 
 var cudaCtx cu.Context // gpu context to be used by all threads
@@ -43,4 +44,12 @@ func tryCuInit() {
 		FatalErr(err, "initialize GPU:")
 	}()
 	cu.Init(0)
+}
+
+// LockCudaThread locks the current goroutine to an OS thread
+// and sets the CUDA context for that thread. To be called by
+// every fresh goroutine that will use CUDA.
+func LockCudaThread() {
+	runtime.LockOSThread()
+	cudaCtx.SetCurrent()
 }

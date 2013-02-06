@@ -48,7 +48,7 @@ func (s *Slice) GPUAccess() bool {
 }
 
 // CPUAccess returns whether the Slice is accessible by the CPU.
-// true means it is either stored in host memory.
+// true means it is stored in host memory.
 func (s *Slice) CPUAccess() bool {
 	return s.memType&cpuMemory != 0
 }
@@ -64,7 +64,7 @@ func (s *Slice) Len() int {
 }
 
 // Bytes returns the number of storage bytes per component.
-func (s *Slice) Bytes() int64 {
+func (s *Slice) bytes() int64 {
 	return int64(s.len_) * cu.SIZEOF_FLOAT32
 }
 

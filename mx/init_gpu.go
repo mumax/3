@@ -27,7 +27,7 @@ func init() {
 	dev := cu.Device(*Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
-	if *Flag_version {
+	if *Flag_version && !*Flag_silent {
 		concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
 		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ", concurrent:", concurrent == 1, ")\n")
 	}

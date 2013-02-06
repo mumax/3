@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	LOG   = true
-	DEBUG = true
+	LOG   = true // Enables logging
+	DEBUG = true // Enables debug output
 )
 
 // called by init()

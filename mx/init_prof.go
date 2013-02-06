@@ -4,6 +4,7 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
+	"github.com/barnex/cuda5/cuda"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -34,6 +35,7 @@ func initCpuProf() {
 // called by init()
 func initMemProf() {
 	if *Flag_memprof {
+		Log("memory profile enabled")
 		AtExit(func() {
 			fname := OD + "/mem.pprof"
 			f, err := os.Create(fname)
@@ -51,18 +53,22 @@ func initMemProf() {
 // called by init()
 func initGPUProf() {
 	if *Flag_gpuprof {
-		//export CUDA_PROFILE=1
-		//export CUDA_PROFILE_CSV=1
-		//export CUDA_PROFILE_CONFIG=config.txt
-		//export CUDA_PROFILE_LOG=profile.csv
-		//echo gpustarttimestamp > config.txt
-		//echo instructions >> config.txt
-		//echo streamid >> config.txt
-
+		//os.Setenv("CUDA_PROFILE_CSV","1")
+		os.Setenv("CUDA_PROFILE", "1")
+		out := OD + "gpuprofile.log"
+		Log("writing GPU profile to", out)
+		os.Setenv("CUDA_PROFILE_LOG", out)
+		cfgfile := OD + "cudaprof.cfg"
+		os.Setenv("CUDA_PROFILE_CONFIG", cfgfile)
+		const cfg = `
+		gpustarttimestamp
+		instructions
+		streamid
+		`
+		FatalErr(ioutil.WriteFile(cfgfile, []byte(cfg), 0666), "gpuprof")
+		AtExit(cuda.DeviceReset)
 	}
 }
-
-// TODO: cuda profiling: set env variables, perhaps run cli profiler.
 
 // Exec command and write output to outfile.
 func saveCmdOutput(outfile string, cmd string, args ...string) {

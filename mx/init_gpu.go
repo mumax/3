@@ -25,14 +25,15 @@ func initGPU() {
 	dev := cu.Device(*Flag_gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
-	if *Flag_version && !*Flag_silent {
-		concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
-		fmt.Print("CUDA ", float32(cu.Version())/1000, " ", dev.Name(), " (", (dev.TotalMem())/(1024*1024), "MB", ", compute", M, ".", m, ", concurrent:", concurrent == 1, ")\n")
-	}
+	concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
+	Log(fmt.Sprint("CUDA ", float32(cu.Version())/1000, " ",
+		dev.Name(), "(", (dev.TotalMem())/(1024*1024), "MB) ",
+		"compute ", M, ".", m,
+		" concurrent: ", concurrent == 1))
 	if M < 2 {
 		Log("Compute capability does not allow unified addressing.")
+		initStreamPool()
 	}
-	initStreamPool()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.

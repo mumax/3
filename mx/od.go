@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-var OD = "." // Output directory
+var OD = "./" // Output directory
 
 // SetOD sets the output directory where auto-saved files will be stored.
 func SetOD(od string, force bool) {
-	if OD != "." {
+	if OD != "./" {
 		FatalExit("output directory already set to", OD)
 	}
 	OD = od

@@ -1,22 +1,20 @@
-all: githook 6g tool 
+all: githook 6g #tool 
 
 PREFIX=code.google.com/p/mx3
 
 PKGS=\
-	$(PREFIX)/gpu\
-	$(PREFIX)/gpu/ptx\
-	$(PREFIX)/cpu\
-	$(PREFIX)/uni\
-	$(PREFIX)/mag\
-	$(PREFIX)/dump\
-	$(PREFIX)/nimble\
-	$(PREFIX)/core\
+	$(PREFIX)/mx\
+#	$(PREFIX)/gpu/ptx\
+#	$(PREFIX)/cpu\
+#	$(PREFIX)/uni\
+#	$(PREFIX)/mag\
+#	$(PREFIX)/dump\
+#	$(PREFIX)/nimble\
+#	$(PREFIX)/core\
 
 
 6g: ptx
 	go install -v $(PKGS)
-	go install -v 
-	go install $(PREFIX)/render
 
 tool:
 	make -C tools/dump

@@ -40,12 +40,8 @@ func gpuSlice(nComp, length int) Slice {
 		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
 	}
 	s := Slice{ptrs, int32(length), int8(nComp), gpuMemory}
-	s.Memset(zeros(nComp)...)
+	s.Memset(make([]float32, nComp)...)
 	return s
-}
-
-func zeros(n int) []float32 {
-	return make([]float32, n)
 }
 
 // Frees the underlying storage and zeros the Slice header to avoid accidental use.

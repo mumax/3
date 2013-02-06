@@ -34,8 +34,8 @@ func initGPU() {
 		" concurrent: ", concurrent == 1))
 	if M < 2 {
 		Log("Compute capability does not allow unified addressing.")
-		initStreamPool()
 	}
+	initStreamPool()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.

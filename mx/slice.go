@@ -6,6 +6,7 @@ package mx
 import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
+	"math"
 	"unsafe"
 )
 
@@ -32,10 +33,17 @@ func gpuSlice(nComp, length int) Slice {
 	for c := 0; c < nComp; c++ {
 		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
 	}
-	return Slice{ptrs, int32(length), int8(nComp), gpuMemory}
+	s := Slice{ptrs, int32(length), int8(nComp), gpuMemory}
+	s.Memset(zeros(nComp)...)
+	return s
 }
 
-// Frees the underlying storage and zeros the Slice to avoid accidental use.
+func zeros(n int) []float32 {
+	return make([]float32, n)
+}
+
+// Frees the underlying storage and zeros the Slice header to avoid accidental use.
+// Slices sharing storage will be invalid after Free.
 func (s *Slice) Free() {
 	if s.memType == gpuMemory {
 		for c := 0; c < s.NComp(); c++ {
@@ -112,6 +120,16 @@ func (s *Slice) Slice(a, b int) Slice {
 	slice.len_ = int32(b - a)
 	slice.nComp = s.nComp
 	return slice
+}
+
+// Set the entire slice to this value.
+func (s *Slice) Memset(val ...float32) {
+	Argument(len(val) == s.NComp())
+	str := Stream()
+	for c, v := range val {
+		cu.MemsetD32Async(s.DevPtr(c), math.Float32bits(v), int64(s.Len()), str)
+	}
+	SyncAndRecycle(str)
 }
 
 //func unifiedSlice(N int) Slice {

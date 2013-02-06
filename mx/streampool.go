@@ -31,5 +31,4 @@ func initStreamPool() {
 	for i := 0; i < streamPoolSize; i++ {
 		streamPool <- cu.StreamCreate()
 	}
-	Debug("initialized stream pool of size", streamPoolSize)
 }

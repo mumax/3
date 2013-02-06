@@ -19,4 +19,17 @@ func TestSlice(t *testing.T) {
 		t.Fail()
 	}
 
+	//b := a.Comp(1)
+
+}
+
+func TestSliceFree(t *testing.T) {
+	LockCudaThread()
+	length := 128 * 1024 * 1024
+	N := 17
+	// not freeing would attempt to allocate 17GB.
+	for i := 0; i < N; i++ {
+		a := MakeSlice(2, length)
+		a.Free()
+	}
 }

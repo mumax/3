@@ -100,13 +100,3 @@ func Copy(dst, src nimble.Slice) {
 	}
 	SyncAndRecycle(str)
 }
-
-// Set the entire slice to this value.
-func Memset(dst nimble.Slice, val ...float32) {
-	core.Assert(len(val) == dst.NComp())
-	str := Stream()
-	for c, v := range val {
-		cu.MemsetD32Async(dst.DevPtr(c), math.Float32bits(v), int64(dst.Len()), str)
-	}
-	SyncAndRecycle(str)
-}

@@ -40,7 +40,6 @@ func init() {
 	initMemProf()
 }
 
-
 func initTiming() {
 	starttime := time.Now()
 	AtExit(func() {

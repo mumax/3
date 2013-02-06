@@ -36,37 +36,40 @@ func FatalErr(err interface{}, msg ...interface{}) {
 	}
 }
 
+// Print message to stderr, run Cleanup and exit unsuccessfully.
 func FatalExit(msg ...interface{}) {
 	fmt.Fprintln(os.Stderr, msg...)
 	Cleanup()
 	os.Exit(1)
 }
 
+// Like FatalExit, but with Printf formatting.
 func Fatalf(format string, args ...interface{}) {
 	FatalErr(fmt.Errorf(format, args...))
 }
 
-// Panics on the message.
+// Panics on the message. Signals a bug.
 func Panic(msg ...interface{}) {
 	panic(fmt.Errorf(fmt.Sprint(msg...)))
 }
 
-// Panics on the message.
+// Panics on the message, with Printf formatting.
+// Signals a bug.
 func Panicf(format string, args ...interface{}) {
 	panic(fmt.Sprintf(format, args...))
 }
 
-// Panics if err is not nil
+// Panics if err is not nil. Signals a bug.
 func PanicErr(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
-// Logs the error of non-nil.
-func LogErr(err error) {
+// Logs the error of non-nil, plus message
+func LogErr(err error, msg ...interface{}) {
 	if err != nil {
-		Log(err)
+		Log(append(msg, err)...)
 	}
 }
 

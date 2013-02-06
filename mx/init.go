@@ -40,10 +40,9 @@ func init() {
 	initMemProf()
 }
 
-var starttime time.Time
 
 func initTiming() {
-	starttime = time.Now()
+	starttime := time.Now()
 	AtExit(func() {
 		Log("run time:", time.Since(starttime))
 	})

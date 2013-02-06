@@ -39,7 +39,7 @@ func FatalErr(err interface{}, msg ...interface{}) {
 // Print message to stderr, run Cleanup and exit unsuccessfully.
 func FatalExit(msg ...interface{}) {
 	fmt.Fprintln(os.Stderr, msg...)
-	Cleanup()
+	cleanup()
 	os.Exit(1)
 }
 

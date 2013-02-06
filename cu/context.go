@@ -94,7 +94,7 @@ func CtxSynchronize() {
 const (
 	// If  the number of contexts > number of CPUs, yield to other OS threads when waiting for the GPU, otherwise CUDA spin on the processor.
 	CTX_SCHED_AUTO = C.CU_CTX_SCHED_AUTO
-	// Spin when waiting for results from the GPU. 
+	// Spin when waiting for results from the GPU.
 	CTX_SCHED_SPIN = C.CU_CTX_SCHED_SPIN
 	// Yield its thread when waiting for results from the GPU.
 	CTX_SCHED_YIELD = C.CU_CTX_SCHED_YIELD
@@ -102,6 +102,6 @@ const (
 	CTX_BLOCKING_SYNC
 	// Support mapped pinned allocations. This flag must be set in order to allocate pinned host memory that is accessible to the GPU.
 	CTX_MAP_HOST = C.CU_CTX_MAP_HOST
-	//Do not reduce local memory after resizing local memory for a kernel. 
+	//Do not reduce local memory after resizing local memory for a kernel.
 	CTX_LMEM_RESIZE_TO_MAX = C.CU_CTX_LMEM_RESIZE_TO_MAX
 )

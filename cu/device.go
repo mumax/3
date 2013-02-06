@@ -179,7 +179,7 @@ const (
 	L2_CACHE_SIZE                    DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE                    // Size of L2 cache in bytes
 	MAX_THREADS_PER_MULTIPROCESSOR   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR   // Maximum resident threads per multiprocessor
 	ASYNC_ENGINE_COUNT               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT               // Number of asynchronous engines
-	UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host 
+	UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host
 	MAXIMUM_TEXTURE1D_LAYERED_WIDTH  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH  // Maximum 1D layered texture width
 	MAXIMUM_TEXTURE1D_LAYERED_LAYERS DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS // Maximum layers in a 1D layered texture
 )

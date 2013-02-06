@@ -23,14 +23,11 @@ func MemAlloc(bytes int64) DevicePtr {
 }
 
 // Frees device memory allocated by MemAlloc().
-// Overwrites the pointer with NULL.
 // It is safe to double-free.
-func MemFree(ptr *DevicePtr) {
-	p := *ptr
+func MemFree(p DevicePtr) {
 	if p == DevicePtr(uintptr(0)) {
 		return // Allready freed
 	}
-	*ptr = DevicePtr(uintptr(0))
 	err := Result(C.cuMemFree(C.CUdeviceptr(p)))
 	if err != SUCCESS {
 		panic(err)
@@ -40,7 +37,7 @@ func MemFree(ptr *DevicePtr) {
 // Frees device memory allocated by MemAlloc().
 // Overwrites the pointer with NULL.
 // It is safe to double-free.
-func (ptr *DevicePtr) Free() {
+func (ptr DevicePtr) Free() {
 	MemFree(ptr)
 }
 

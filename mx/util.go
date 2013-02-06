@@ -4,30 +4,28 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
-	"os"
-	"path"
+//"path"
 )
 
-// Open file for writing, error is fatal.
-func OpenFile(fname string) *os.File {
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
-	FatalErr(err)
-	return f
-}
-
-// Open file for reading, error is fatal.
-func Open(fname string) *os.File {
-	f, err := os.Open(fname)
-	FatalErr(err)
-	return f
-}
-
 // Remove extension from file name.
-func NoExt(file string) string {
-	ext := path.Ext(file)
-	return file[:len(file)-len(ext)]
-}
+//func NoExt(file string) string {
+//	ext := path.Ext(file)
+//	return file[:len(file)-len(ext)]
+//}
 
+// Open file for writing, error is fatal.
+//func OpenFile(fname string) *os.File {
+//	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+//	FatalErr(err)
+//	return f
+//}
+//
+//// Open file for reading, error is fatal.
+//func Open(fname string) *os.File {
+//	f, err := os.Open(fname)
+//	FatalErr(err)
+//	return f
+//}
 // Panics if a != b
 //func CheckEqualSize(a, b [3]int) {
 //	if a != b {

@@ -13,6 +13,7 @@ import (
 
 // pointers passed to CGO must be kept alive manually
 // so we keep then here.
+// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
 var (
 	copypad_lock    sync.Mutex
 	copypad_code    cu.Function

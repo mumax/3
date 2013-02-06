@@ -29,14 +29,14 @@ func (q *quant) NComp() int {
 	return q.buffer.NComp()
 }
 
-func (q *Quant) Data() Slice {
+func (q *Quant) Data() *Slice {
 	// fail-fast test, likely to spot abuse sooner or later.
 	for c := 0; c < q.NComp(); c++ {
 		if q.lock[c].isLocked() {
 			panic("quant data is locked")
 		}
 	}
-	return q.buffer
+	return &q.buffer
 }
 
 //type Reader struct {

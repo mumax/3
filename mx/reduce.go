@@ -1,7 +1,7 @@
 package mx
 
 import (
-	"code.google.com/p/mx3/gpu/ptx"
+	"code.google.com/p/mx3/ptx"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"unsafe"

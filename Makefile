@@ -5,7 +5,7 @@ PREFIX=code.google.com/p/mx3
 PKGS=\
 	$(PREFIX)/util\
 	$(PREFIX)/mx\
-#	$(PREFIX)/gpu/ptx\
+	$(PREFIX)/ptx\
 #	$(PREFIX)/cpu\
 #	$(PREFIX)/uni\
 #	$(PREFIX)/mag\
@@ -13,8 +13,10 @@ PKGS=\
 #	$(PREFIX)/nimble\
 #	$(PREFIX)/core\
 
+$(PREFIX)/ptx:
+	make -C gpu/ptx -j8
 
-6g: ptx
+6g:
 	go install -v $(PKGS)
 
 tool:
@@ -23,12 +25,10 @@ tool:
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 
-gccgo: ptx
+gccgo:
 	go install -v -compiler $(GCCGO) $(PKGS)
 	go install -v -compiler $(GCCGO)
 
-ptx:
-	make -C gpu/ptx -j8
 
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit

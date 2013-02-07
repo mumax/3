@@ -9,16 +9,15 @@ NVCC = nvcc\
 	-Xptxas\
 	-O3\
 
-all: $(GOFILES) install cuda2go
+all: $(GOFILES)
+	go fmt	
+	go install -v
 
 cuda2go: cuda2go.go
 	go build cuda2go.go
 
-install: $(GOFILES)
-	go install -v
-
 $(GOFILES): %.go: %.ptx cuda2go
-	./cuda2go $(@:.go=.cu) && gofmt -w $@
+	./cuda2go $(@:.go=.cu) 
 
 $(PTXFILES): %.ptx: %.cu
 	$(NVCC) -ptx $(@:.ptx=.cu)

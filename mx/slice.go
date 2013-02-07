@@ -4,6 +4,7 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"unsafe"
@@ -150,11 +151,11 @@ func MemAlloc(bytes int64) cu.DevicePtr {
 // Set the entire slice to this value.
 func (s *Slice) Memset(val ...float32) {
 	Argument(len(val) == s.NComp())
-	str := Stream()
+	str := streams.Get()
 	for c, v := range val {
 		cu.MemsetD32Async(s.DevPtr(c), math.Float32bits(v), int64(s.Len()), str)
 	}
-	SyncAndRecycle(str)
+	streams.SyncAndRecycle(str)
 }
 
 ////func unifiedSlice(N int) Slice {

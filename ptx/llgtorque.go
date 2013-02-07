@@ -6,72 +6,65 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	llgtorque_lock      sync.Mutex
-	llgtorque_code      cu.Function
-	llgtorque_stream    cu.Stream
-	llgtorque_arg_tx    cu.DevicePtr
-	llgtorque_arg_ty    cu.DevicePtr
-	llgtorque_arg_tz    cu.DevicePtr
-	llgtorque_arg_mx    cu.DevicePtr
-	llgtorque_arg_my    cu.DevicePtr
-	llgtorque_arg_mz    cu.DevicePtr
-	llgtorque_arg_hx    cu.DevicePtr
-	llgtorque_arg_hy    cu.DevicePtr
-	llgtorque_arg_hz    cu.DevicePtr
-	llgtorque_arg_alpha float32
-	llgtorque_arg_N     int
+var llgtorque_code cu.Function
 
-	llgtorque_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&llgtorque_arg_tx),
-		unsafe.Pointer(&llgtorque_arg_ty),
-		unsafe.Pointer(&llgtorque_arg_tz),
-		unsafe.Pointer(&llgtorque_arg_mx),
-		unsafe.Pointer(&llgtorque_arg_my),
-		unsafe.Pointer(&llgtorque_arg_mz),
-		unsafe.Pointer(&llgtorque_arg_hx),
-		unsafe.Pointer(&llgtorque_arg_hy),
-		unsafe.Pointer(&llgtorque_arg_hz),
-		unsafe.Pointer(&llgtorque_arg_alpha),
-		unsafe.Pointer(&llgtorque_arg_N)}
-)
+type llgtorque_args struct {
+	arg_tx    cu.DevicePtr
+	arg_ty    cu.DevicePtr
+	arg_tz    cu.DevicePtr
+	arg_mx    cu.DevicePtr
+	arg_my    cu.DevicePtr
+	arg_mz    cu.DevicePtr
+	arg_hx    cu.DevicePtr
+	arg_hy    cu.DevicePtr
+	arg_hz    cu.DevicePtr
+	arg_alpha float32
+	arg_N     int
+	argptr    [11]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for llgtorque.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_llgtorque(tx cu.DevicePtr, ty cu.DevicePtr, tz cu.DevicePtr, mx cu.DevicePtr, my cu.DevicePtr, mz cu.DevicePtr, hx cu.DevicePtr, hy cu.DevicePtr, hz cu.DevicePtr, alpha float32, N int, gridDim, blockDim cu.Dim3) {
-	llgtorque_lock.Lock()
-
-	if llgtorque_stream == 0 {
-		llgtorque_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for llgtorque")
+	if llgtorque_code == 0 {
 		llgtorque_code = cu.ModuleLoadData(llgtorque_ptx).GetFunction("llgtorque")
 	}
 
-	llgtorque_arg_tx = tx
-	llgtorque_arg_ty = ty
-	llgtorque_arg_tz = tz
-	llgtorque_arg_mx = mx
-	llgtorque_arg_my = my
-	llgtorque_arg_mz = mz
-	llgtorque_arg_hx = hx
-	llgtorque_arg_hy = hy
-	llgtorque_arg_hz = hz
-	llgtorque_arg_alpha = alpha
-	llgtorque_arg_N = N
+	var a llgtorque_args
 
-	args := llgtorque_argptr[:]
-	cu.LaunchKernel(llgtorque_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, llgtorque_stream, args)
-	llgtorque_stream.Synchronize()
-	llgtorque_lock.Unlock()
+	a.arg_tx = tx
+	a.argptr[0] = unsafe.Pointer(&a.arg_tx)
+	a.arg_ty = ty
+	a.argptr[1] = unsafe.Pointer(&a.arg_ty)
+	a.arg_tz = tz
+	a.argptr[2] = unsafe.Pointer(&a.arg_tz)
+	a.arg_mx = mx
+	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
+	a.arg_my = my
+	a.argptr[4] = unsafe.Pointer(&a.arg_my)
+	a.arg_mz = mz
+	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
+	a.arg_hx = hx
+	a.argptr[6] = unsafe.Pointer(&a.arg_hx)
+	a.arg_hy = hy
+	a.argptr[7] = unsafe.Pointer(&a.arg_hy)
+	a.arg_hz = hz
+	a.argptr[8] = unsafe.Pointer(&a.arg_hz)
+	a.arg_alpha = alpha
+	a.argptr[9] = unsafe.Pointer(&a.arg_alpha)
+	a.arg_N = N
+	a.argptr[10] = unsafe.Pointer(&a.arg_N)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(llgtorque_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const llgtorque_ptx = `

@@ -6,54 +6,47 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	reducedot_lock        sync.Mutex
-	reducedot_code        cu.Function
-	reducedot_stream      cu.Stream
-	reducedot_arg_x1      cu.DevicePtr
-	reducedot_arg_x2      cu.DevicePtr
-	reducedot_arg_dst     cu.DevicePtr
-	reducedot_arg_initVal float32
-	reducedot_arg_n       int
+var reducedot_code cu.Function
 
-	reducedot_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&reducedot_arg_x1),
-		unsafe.Pointer(&reducedot_arg_x2),
-		unsafe.Pointer(&reducedot_arg_dst),
-		unsafe.Pointer(&reducedot_arg_initVal),
-		unsafe.Pointer(&reducedot_arg_n)}
-)
+type reducedot_args struct {
+	arg_x1      cu.DevicePtr
+	arg_x2      cu.DevicePtr
+	arg_dst     cu.DevicePtr
+	arg_initVal float32
+	arg_n       int
+	argptr      [5]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for reducedot.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_reducedot(x1 cu.DevicePtr, x2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
-	reducedot_lock.Lock()
-
-	if reducedot_stream == 0 {
-		reducedot_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for reducedot")
+	if reducedot_code == 0 {
 		reducedot_code = cu.ModuleLoadData(reducedot_ptx).GetFunction("reducedot")
 	}
 
-	reducedot_arg_x1 = x1
-	reducedot_arg_x2 = x2
-	reducedot_arg_dst = dst
-	reducedot_arg_initVal = initVal
-	reducedot_arg_n = n
+	var a reducedot_args
 
-	args := reducedot_argptr[:]
-	cu.LaunchKernel(reducedot_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, reducedot_stream, args)
-	reducedot_stream.Synchronize()
-	reducedot_lock.Unlock()
+	a.arg_x1 = x1
+	a.argptr[0] = unsafe.Pointer(&a.arg_x1)
+	a.arg_x2 = x2
+	a.argptr[1] = unsafe.Pointer(&a.arg_x2)
+	a.arg_dst = dst
+	a.argptr[2] = unsafe.Pointer(&a.arg_dst)
+	a.arg_initVal = initVal
+	a.argptr[3] = unsafe.Pointer(&a.arg_initVal)
+	a.arg_n = n
+	a.argptr[4] = unsafe.Pointer(&a.arg_n)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(reducedot_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const reducedot_ptx = `

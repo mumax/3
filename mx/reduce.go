@@ -2,6 +2,7 @@ package mx
 
 import (
 	"code.google.com/p/mx3/ptx"
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"unsafe"
@@ -111,9 +112,9 @@ func reduceBuf(initVal float32) cu.DevicePtr {
 		initReduceBuf()
 	}
 	buf := <-reduceBuffers
-	str := Stream()
+	str := streams.Get()
 	cu.MemsetD32Async(buf, math.Float32bits(initVal), 1, str)
-	SyncAndRecycle(str)
+	streams.SyncAndRecycle(str)
 	return buf
 }
 

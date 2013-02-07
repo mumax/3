@@ -6,57 +6,50 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	reducemaxvecnorm2_lock        sync.Mutex
-	reducemaxvecnorm2_code        cu.Function
-	reducemaxvecnorm2_stream      cu.Stream
-	reducemaxvecnorm2_arg_x       cu.DevicePtr
-	reducemaxvecnorm2_arg_y       cu.DevicePtr
-	reducemaxvecnorm2_arg_z       cu.DevicePtr
-	reducemaxvecnorm2_arg_dst     cu.DevicePtr
-	reducemaxvecnorm2_arg_initVal float32
-	reducemaxvecnorm2_arg_n       int
+var reducemaxvecnorm2_code cu.Function
 
-	reducemaxvecnorm2_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&reducemaxvecnorm2_arg_x),
-		unsafe.Pointer(&reducemaxvecnorm2_arg_y),
-		unsafe.Pointer(&reducemaxvecnorm2_arg_z),
-		unsafe.Pointer(&reducemaxvecnorm2_arg_dst),
-		unsafe.Pointer(&reducemaxvecnorm2_arg_initVal),
-		unsafe.Pointer(&reducemaxvecnorm2_arg_n)}
-)
+type reducemaxvecnorm2_args struct {
+	arg_x       cu.DevicePtr
+	arg_y       cu.DevicePtr
+	arg_z       cu.DevicePtr
+	arg_dst     cu.DevicePtr
+	arg_initVal float32
+	arg_n       int
+	argptr      [6]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for reducemaxvecnorm2.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_reducemaxvecnorm2(x cu.DevicePtr, y cu.DevicePtr, z cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
-	reducemaxvecnorm2_lock.Lock()
-
-	if reducemaxvecnorm2_stream == 0 {
-		reducemaxvecnorm2_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for reducemaxvecnorm2")
+	if reducemaxvecnorm2_code == 0 {
 		reducemaxvecnorm2_code = cu.ModuleLoadData(reducemaxvecnorm2_ptx).GetFunction("reducemaxvecnorm2")
 	}
 
-	reducemaxvecnorm2_arg_x = x
-	reducemaxvecnorm2_arg_y = y
-	reducemaxvecnorm2_arg_z = z
-	reducemaxvecnorm2_arg_dst = dst
-	reducemaxvecnorm2_arg_initVal = initVal
-	reducemaxvecnorm2_arg_n = n
+	var a reducemaxvecnorm2_args
 
-	args := reducemaxvecnorm2_argptr[:]
-	cu.LaunchKernel(reducemaxvecnorm2_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, reducemaxvecnorm2_stream, args)
-	reducemaxvecnorm2_stream.Synchronize()
-	reducemaxvecnorm2_lock.Unlock()
+	a.arg_x = x
+	a.argptr[0] = unsafe.Pointer(&a.arg_x)
+	a.arg_y = y
+	a.argptr[1] = unsafe.Pointer(&a.arg_y)
+	a.arg_z = z
+	a.argptr[2] = unsafe.Pointer(&a.arg_z)
+	a.arg_dst = dst
+	a.argptr[3] = unsafe.Pointer(&a.arg_dst)
+	a.arg_initVal = initVal
+	a.argptr[4] = unsafe.Pointer(&a.arg_initVal)
+	a.arg_n = n
+	a.argptr[5] = unsafe.Pointer(&a.arg_n)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(reducemaxvecnorm2_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const reducemaxvecnorm2_ptx = `

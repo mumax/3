@@ -6,75 +6,68 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	kernmulRSymm3D_lock       sync.Mutex
-	kernmulRSymm3D_code       cu.Function
-	kernmulRSymm3D_stream     cu.Stream
-	kernmulRSymm3D_arg_fftMx  cu.DevicePtr
-	kernmulRSymm3D_arg_fftMy  cu.DevicePtr
-	kernmulRSymm3D_arg_fftMz  cu.DevicePtr
-	kernmulRSymm3D_arg_fftKxx cu.DevicePtr
-	kernmulRSymm3D_arg_fftKyy cu.DevicePtr
-	kernmulRSymm3D_arg_fftKzz cu.DevicePtr
-	kernmulRSymm3D_arg_fftKyz cu.DevicePtr
-	kernmulRSymm3D_arg_fftKxz cu.DevicePtr
-	kernmulRSymm3D_arg_fftKxy cu.DevicePtr
-	kernmulRSymm3D_arg_N0     int
-	kernmulRSymm3D_arg_N1     int
-	kernmulRSymm3D_arg_N2     int
+var kernmulRSymm3D_code cu.Function
 
-	kernmulRSymm3D_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftMx),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftMy),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftMz),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKxx),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKyy),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKzz),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKyz),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKxz),
-		unsafe.Pointer(&kernmulRSymm3D_arg_fftKxy),
-		unsafe.Pointer(&kernmulRSymm3D_arg_N0),
-		unsafe.Pointer(&kernmulRSymm3D_arg_N1),
-		unsafe.Pointer(&kernmulRSymm3D_arg_N2)}
-)
+type kernmulRSymm3D_args struct {
+	arg_fftMx  cu.DevicePtr
+	arg_fftMy  cu.DevicePtr
+	arg_fftMz  cu.DevicePtr
+	arg_fftKxx cu.DevicePtr
+	arg_fftKyy cu.DevicePtr
+	arg_fftKzz cu.DevicePtr
+	arg_fftKyz cu.DevicePtr
+	arg_fftKxz cu.DevicePtr
+	arg_fftKxy cu.DevicePtr
+	arg_N0     int
+	arg_N1     int
+	arg_N2     int
+	argptr     [12]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for kernmulRSymm3D.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_kernmulRSymm3D(fftMx cu.DevicePtr, fftMy cu.DevicePtr, fftMz cu.DevicePtr, fftKxx cu.DevicePtr, fftKyy cu.DevicePtr, fftKzz cu.DevicePtr, fftKyz cu.DevicePtr, fftKxz cu.DevicePtr, fftKxy cu.DevicePtr, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
-	kernmulRSymm3D_lock.Lock()
-
-	if kernmulRSymm3D_stream == 0 {
-		kernmulRSymm3D_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for kernmulRSymm3D")
+	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = cu.ModuleLoadData(kernmulRSymm3D_ptx).GetFunction("kernmulRSymm3D")
 	}
 
-	kernmulRSymm3D_arg_fftMx = fftMx
-	kernmulRSymm3D_arg_fftMy = fftMy
-	kernmulRSymm3D_arg_fftMz = fftMz
-	kernmulRSymm3D_arg_fftKxx = fftKxx
-	kernmulRSymm3D_arg_fftKyy = fftKyy
-	kernmulRSymm3D_arg_fftKzz = fftKzz
-	kernmulRSymm3D_arg_fftKyz = fftKyz
-	kernmulRSymm3D_arg_fftKxz = fftKxz
-	kernmulRSymm3D_arg_fftKxy = fftKxy
-	kernmulRSymm3D_arg_N0 = N0
-	kernmulRSymm3D_arg_N1 = N1
-	kernmulRSymm3D_arg_N2 = N2
+	var a kernmulRSymm3D_args
 
-	args := kernmulRSymm3D_argptr[:]
-	cu.LaunchKernel(kernmulRSymm3D_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, kernmulRSymm3D_stream, args)
-	kernmulRSymm3D_stream.Synchronize()
-	kernmulRSymm3D_lock.Unlock()
+	a.arg_fftMx = fftMx
+	a.argptr[0] = unsafe.Pointer(&a.arg_fftMx)
+	a.arg_fftMy = fftMy
+	a.argptr[1] = unsafe.Pointer(&a.arg_fftMy)
+	a.arg_fftMz = fftMz
+	a.argptr[2] = unsafe.Pointer(&a.arg_fftMz)
+	a.arg_fftKxx = fftKxx
+	a.argptr[3] = unsafe.Pointer(&a.arg_fftKxx)
+	a.arg_fftKyy = fftKyy
+	a.argptr[4] = unsafe.Pointer(&a.arg_fftKyy)
+	a.arg_fftKzz = fftKzz
+	a.argptr[5] = unsafe.Pointer(&a.arg_fftKzz)
+	a.arg_fftKyz = fftKyz
+	a.argptr[6] = unsafe.Pointer(&a.arg_fftKyz)
+	a.arg_fftKxz = fftKxz
+	a.argptr[7] = unsafe.Pointer(&a.arg_fftKxz)
+	a.arg_fftKxy = fftKxy
+	a.argptr[8] = unsafe.Pointer(&a.arg_fftKxy)
+	a.arg_N0 = N0
+	a.argptr[9] = unsafe.Pointer(&a.arg_N0)
+	a.arg_N1 = N1
+	a.argptr[10] = unsafe.Pointer(&a.arg_N1)
+	a.arg_N2 = N2
+	a.argptr[11] = unsafe.Pointer(&a.arg_N2)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(kernmulRSymm3D_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const kernmulRSymm3D_ptx = `

@@ -6,78 +6,71 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	kernmulC_lock    sync.Mutex
-	kernmulC_code    cu.Function
-	kernmulC_stream  cu.Stream
-	kernmulC_arg_Mx  cu.DevicePtr
-	kernmulC_arg_My  cu.DevicePtr
-	kernmulC_arg_Mz  cu.DevicePtr
-	kernmulC_arg_Kxx cu.DevicePtr
-	kernmulC_arg_Kyy cu.DevicePtr
-	kernmulC_arg_Kzz cu.DevicePtr
-	kernmulC_arg_Kyz cu.DevicePtr
-	kernmulC_arg_Kxz cu.DevicePtr
-	kernmulC_arg_Kxy cu.DevicePtr
-	kernmulC_arg_Kzy cu.DevicePtr
-	kernmulC_arg_Kzx cu.DevicePtr
-	kernmulC_arg_Kyx cu.DevicePtr
-	kernmulC_arg_N   int
+var kernmulC_code cu.Function
 
-	kernmulC_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&kernmulC_arg_Mx),
-		unsafe.Pointer(&kernmulC_arg_My),
-		unsafe.Pointer(&kernmulC_arg_Mz),
-		unsafe.Pointer(&kernmulC_arg_Kxx),
-		unsafe.Pointer(&kernmulC_arg_Kyy),
-		unsafe.Pointer(&kernmulC_arg_Kzz),
-		unsafe.Pointer(&kernmulC_arg_Kyz),
-		unsafe.Pointer(&kernmulC_arg_Kxz),
-		unsafe.Pointer(&kernmulC_arg_Kxy),
-		unsafe.Pointer(&kernmulC_arg_Kzy),
-		unsafe.Pointer(&kernmulC_arg_Kzx),
-		unsafe.Pointer(&kernmulC_arg_Kyx),
-		unsafe.Pointer(&kernmulC_arg_N)}
-)
+type kernmulC_args struct {
+	arg_Mx  cu.DevicePtr
+	arg_My  cu.DevicePtr
+	arg_Mz  cu.DevicePtr
+	arg_Kxx cu.DevicePtr
+	arg_Kyy cu.DevicePtr
+	arg_Kzz cu.DevicePtr
+	arg_Kyz cu.DevicePtr
+	arg_Kxz cu.DevicePtr
+	arg_Kxy cu.DevicePtr
+	arg_Kzy cu.DevicePtr
+	arg_Kzx cu.DevicePtr
+	arg_Kyx cu.DevicePtr
+	arg_N   int
+	argptr  [13]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for kernmulC.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_kernmulC(Mx cu.DevicePtr, My cu.DevicePtr, Mz cu.DevicePtr, Kxx cu.DevicePtr, Kyy cu.DevicePtr, Kzz cu.DevicePtr, Kyz cu.DevicePtr, Kxz cu.DevicePtr, Kxy cu.DevicePtr, Kzy cu.DevicePtr, Kzx cu.DevicePtr, Kyx cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
-	kernmulC_lock.Lock()
-
-	if kernmulC_stream == 0 {
-		kernmulC_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for kernmulC")
+	if kernmulC_code == 0 {
 		kernmulC_code = cu.ModuleLoadData(kernmulC_ptx).GetFunction("kernmulC")
 	}
 
-	kernmulC_arg_Mx = Mx
-	kernmulC_arg_My = My
-	kernmulC_arg_Mz = Mz
-	kernmulC_arg_Kxx = Kxx
-	kernmulC_arg_Kyy = Kyy
-	kernmulC_arg_Kzz = Kzz
-	kernmulC_arg_Kyz = Kyz
-	kernmulC_arg_Kxz = Kxz
-	kernmulC_arg_Kxy = Kxy
-	kernmulC_arg_Kzy = Kzy
-	kernmulC_arg_Kzx = Kzx
-	kernmulC_arg_Kyx = Kyx
-	kernmulC_arg_N = N
+	var a kernmulC_args
 
-	args := kernmulC_argptr[:]
-	cu.LaunchKernel(kernmulC_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, kernmulC_stream, args)
-	kernmulC_stream.Synchronize()
-	kernmulC_lock.Unlock()
+	a.arg_Mx = Mx
+	a.argptr[0] = unsafe.Pointer(&a.arg_Mx)
+	a.arg_My = My
+	a.argptr[1] = unsafe.Pointer(&a.arg_My)
+	a.arg_Mz = Mz
+	a.argptr[2] = unsafe.Pointer(&a.arg_Mz)
+	a.arg_Kxx = Kxx
+	a.argptr[3] = unsafe.Pointer(&a.arg_Kxx)
+	a.arg_Kyy = Kyy
+	a.argptr[4] = unsafe.Pointer(&a.arg_Kyy)
+	a.arg_Kzz = Kzz
+	a.argptr[5] = unsafe.Pointer(&a.arg_Kzz)
+	a.arg_Kyz = Kyz
+	a.argptr[6] = unsafe.Pointer(&a.arg_Kyz)
+	a.arg_Kxz = Kxz
+	a.argptr[7] = unsafe.Pointer(&a.arg_Kxz)
+	a.arg_Kxy = Kxy
+	a.argptr[8] = unsafe.Pointer(&a.arg_Kxy)
+	a.arg_Kzy = Kzy
+	a.argptr[9] = unsafe.Pointer(&a.arg_Kzy)
+	a.arg_Kzx = Kzx
+	a.argptr[10] = unsafe.Pointer(&a.arg_Kzx)
+	a.arg_Kyx = Kyx
+	a.argptr[11] = unsafe.Pointer(&a.arg_Kyx)
+	a.arg_N = N
+	a.argptr[12] = unsafe.Pointer(&a.arg_N)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(kernmulC_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const kernmulC_ptx = `

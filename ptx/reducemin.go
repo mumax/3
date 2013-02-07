@@ -6,51 +6,44 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	reducemin_lock        sync.Mutex
-	reducemin_code        cu.Function
-	reducemin_stream      cu.Stream
-	reducemin_arg_src     cu.DevicePtr
-	reducemin_arg_dst     cu.DevicePtr
-	reducemin_arg_initVal float32
-	reducemin_arg_n       int
+var reducemin_code cu.Function
 
-	reducemin_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&reducemin_arg_src),
-		unsafe.Pointer(&reducemin_arg_dst),
-		unsafe.Pointer(&reducemin_arg_initVal),
-		unsafe.Pointer(&reducemin_arg_n)}
-)
+type reducemin_args struct {
+	arg_src     cu.DevicePtr
+	arg_dst     cu.DevicePtr
+	arg_initVal float32
+	arg_n       int
+	argptr      [4]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for reducemin.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_reducemin(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
-	reducemin_lock.Lock()
-
-	if reducemin_stream == 0 {
-		reducemin_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for reducemin")
+	if reducemin_code == 0 {
 		reducemin_code = cu.ModuleLoadData(reducemin_ptx).GetFunction("reducemin")
 	}
 
-	reducemin_arg_src = src
-	reducemin_arg_dst = dst
-	reducemin_arg_initVal = initVal
-	reducemin_arg_n = n
+	var a reducemin_args
 
-	args := reducemin_argptr[:]
-	cu.LaunchKernel(reducemin_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, reducemin_stream, args)
-	reducemin_stream.Synchronize()
-	reducemin_lock.Unlock()
+	a.arg_src = src
+	a.argptr[0] = unsafe.Pointer(&a.arg_src)
+	a.arg_dst = dst
+	a.argptr[1] = unsafe.Pointer(&a.arg_dst)
+	a.arg_initVal = initVal
+	a.argptr[2] = unsafe.Pointer(&a.arg_initVal)
+	a.arg_n = n
+	a.argptr[3] = unsafe.Pointer(&a.arg_n)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(reducemin_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const reducemin_ptx = `

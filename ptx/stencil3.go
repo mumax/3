@@ -6,84 +6,77 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	stencil3_lock      sync.Mutex
-	stencil3_code      cu.Function
-	stencil3_stream    cu.Stream
-	stencil3_arg_dst   cu.DevicePtr
-	stencil3_arg_src   cu.DevicePtr
-	stencil3_arg_w0    float32
-	stencil3_arg_wt    float32
-	stencil3_arg_wb    float32
-	stencil3_arg_wu    float32
-	stencil3_arg_wd    float32
-	stencil3_arg_wl    float32
-	stencil3_arg_wr    float32
-	stencil3_arg_wrap0 int
-	stencil3_arg_wrap1 int
-	stencil3_arg_wrap2 int
-	stencil3_arg_N0    int
-	stencil3_arg_N1    int
-	stencil3_arg_N2    int
+var stencil3_code cu.Function
 
-	stencil3_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&stencil3_arg_dst),
-		unsafe.Pointer(&stencil3_arg_src),
-		unsafe.Pointer(&stencil3_arg_w0),
-		unsafe.Pointer(&stencil3_arg_wt),
-		unsafe.Pointer(&stencil3_arg_wb),
-		unsafe.Pointer(&stencil3_arg_wu),
-		unsafe.Pointer(&stencil3_arg_wd),
-		unsafe.Pointer(&stencil3_arg_wl),
-		unsafe.Pointer(&stencil3_arg_wr),
-		unsafe.Pointer(&stencil3_arg_wrap0),
-		unsafe.Pointer(&stencil3_arg_wrap1),
-		unsafe.Pointer(&stencil3_arg_wrap2),
-		unsafe.Pointer(&stencil3_arg_N0),
-		unsafe.Pointer(&stencil3_arg_N1),
-		unsafe.Pointer(&stencil3_arg_N2)}
-)
+type stencil3_args struct {
+	arg_dst   cu.DevicePtr
+	arg_src   cu.DevicePtr
+	arg_w0    float32
+	arg_wt    float32
+	arg_wb    float32
+	arg_wu    float32
+	arg_wd    float32
+	arg_wl    float32
+	arg_wr    float32
+	arg_wrap0 int
+	arg_wrap1 int
+	arg_wrap2 int
+	arg_N0    int
+	arg_N1    int
+	arg_N2    int
+	argptr    [15]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for stencil3.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_stencil3(dst cu.DevicePtr, src cu.DevicePtr, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
-	stencil3_lock.Lock()
-
-	if stencil3_stream == 0 {
-		stencil3_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for stencil3")
+	if stencil3_code == 0 {
 		stencil3_code = cu.ModuleLoadData(stencil3_ptx).GetFunction("stencil3")
 	}
 
-	stencil3_arg_dst = dst
-	stencil3_arg_src = src
-	stencil3_arg_w0 = w0
-	stencil3_arg_wt = wt
-	stencil3_arg_wb = wb
-	stencil3_arg_wu = wu
-	stencil3_arg_wd = wd
-	stencil3_arg_wl = wl
-	stencil3_arg_wr = wr
-	stencil3_arg_wrap0 = wrap0
-	stencil3_arg_wrap1 = wrap1
-	stencil3_arg_wrap2 = wrap2
-	stencil3_arg_N0 = N0
-	stencil3_arg_N1 = N1
-	stencil3_arg_N2 = N2
+	var a stencil3_args
 
-	args := stencil3_argptr[:]
-	cu.LaunchKernel(stencil3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, stencil3_stream, args)
-	stencil3_stream.Synchronize()
-	stencil3_lock.Unlock()
+	a.arg_dst = dst
+	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
+	a.arg_src = src
+	a.argptr[1] = unsafe.Pointer(&a.arg_src)
+	a.arg_w0 = w0
+	a.argptr[2] = unsafe.Pointer(&a.arg_w0)
+	a.arg_wt = wt
+	a.argptr[3] = unsafe.Pointer(&a.arg_wt)
+	a.arg_wb = wb
+	a.argptr[4] = unsafe.Pointer(&a.arg_wb)
+	a.arg_wu = wu
+	a.argptr[5] = unsafe.Pointer(&a.arg_wu)
+	a.arg_wd = wd
+	a.argptr[6] = unsafe.Pointer(&a.arg_wd)
+	a.arg_wl = wl
+	a.argptr[7] = unsafe.Pointer(&a.arg_wl)
+	a.arg_wr = wr
+	a.argptr[8] = unsafe.Pointer(&a.arg_wr)
+	a.arg_wrap0 = wrap0
+	a.argptr[9] = unsafe.Pointer(&a.arg_wrap0)
+	a.arg_wrap1 = wrap1
+	a.argptr[10] = unsafe.Pointer(&a.arg_wrap1)
+	a.arg_wrap2 = wrap2
+	a.argptr[11] = unsafe.Pointer(&a.arg_wrap2)
+	a.arg_N0 = N0
+	a.argptr[12] = unsafe.Pointer(&a.arg_N0)
+	a.arg_N1 = N1
+	a.argptr[13] = unsafe.Pointer(&a.arg_N1)
+	a.arg_N2 = N2
+	a.argptr[14] = unsafe.Pointer(&a.arg_N2)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(stencil3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const stencil3_ptx = `

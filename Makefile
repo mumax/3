@@ -3,6 +3,7 @@ all: githook 6g #tool
 PREFIX=code.google.com/p/mx3
 
 PKGS=\
+	$(PREFIX)/streams\
 	$(PREFIX)/util\
 	$(PREFIX)/mx\
 	$(PREFIX)/ptx\

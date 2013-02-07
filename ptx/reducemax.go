@@ -6,51 +6,44 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	reducemax_lock        sync.Mutex
-	reducemax_code        cu.Function
-	reducemax_stream      cu.Stream
-	reducemax_arg_src     cu.DevicePtr
-	reducemax_arg_dst     cu.DevicePtr
-	reducemax_arg_initVal float32
-	reducemax_arg_n       int
+var reducemax_code cu.Function
 
-	reducemax_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&reducemax_arg_src),
-		unsafe.Pointer(&reducemax_arg_dst),
-		unsafe.Pointer(&reducemax_arg_initVal),
-		unsafe.Pointer(&reducemax_arg_n)}
-)
+type reducemax_args struct {
+	arg_src     cu.DevicePtr
+	arg_dst     cu.DevicePtr
+	arg_initVal float32
+	arg_n       int
+	argptr      [4]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for reducemax.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_reducemax(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
-	reducemax_lock.Lock()
-
-	if reducemax_stream == 0 {
-		reducemax_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for reducemax")
+	if reducemax_code == 0 {
 		reducemax_code = cu.ModuleLoadData(reducemax_ptx).GetFunction("reducemax")
 	}
 
-	reducemax_arg_src = src
-	reducemax_arg_dst = dst
-	reducemax_arg_initVal = initVal
-	reducemax_arg_n = n
+	var a reducemax_args
 
-	args := reducemax_argptr[:]
-	cu.LaunchKernel(reducemax_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, reducemax_stream, args)
-	reducemax_stream.Synchronize()
-	reducemax_lock.Unlock()
+	a.arg_src = src
+	a.argptr[0] = unsafe.Pointer(&a.arg_src)
+	a.arg_dst = dst
+	a.argptr[1] = unsafe.Pointer(&a.arg_dst)
+	a.arg_initVal = initVal
+	a.argptr[2] = unsafe.Pointer(&a.arg_initVal)
+	a.arg_n = n
+	a.argptr[3] = unsafe.Pointer(&a.arg_n)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(reducemax_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const reducemax_ptx = `

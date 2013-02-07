@@ -6,63 +6,56 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	copypad_lock    sync.Mutex
-	copypad_code    cu.Function
-	copypad_stream  cu.Stream
-	copypad_arg_dst cu.DevicePtr
-	copypad_arg_D0  int
-	copypad_arg_D1  int
-	copypad_arg_D2  int
-	copypad_arg_src cu.DevicePtr
-	copypad_arg_S0  int
-	copypad_arg_S1  int
-	copypad_arg_S2  int
+var copypad_code cu.Function
 
-	copypad_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&copypad_arg_dst),
-		unsafe.Pointer(&copypad_arg_D0),
-		unsafe.Pointer(&copypad_arg_D1),
-		unsafe.Pointer(&copypad_arg_D2),
-		unsafe.Pointer(&copypad_arg_src),
-		unsafe.Pointer(&copypad_arg_S0),
-		unsafe.Pointer(&copypad_arg_S1),
-		unsafe.Pointer(&copypad_arg_S2)}
-)
+type copypad_args struct {
+	arg_dst cu.DevicePtr
+	arg_D0  int
+	arg_D1  int
+	arg_D2  int
+	arg_src cu.DevicePtr
+	arg_S0  int
+	arg_S1  int
+	arg_S2  int
+	argptr  [8]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for copypad.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_copypad(dst cu.DevicePtr, D0 int, D1 int, D2 int, src cu.DevicePtr, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
-	copypad_lock.Lock()
-
-	if copypad_stream == 0 {
-		copypad_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for copypad")
+	if copypad_code == 0 {
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
 	}
 
-	copypad_arg_dst = dst
-	copypad_arg_D0 = D0
-	copypad_arg_D1 = D1
-	copypad_arg_D2 = D2
-	copypad_arg_src = src
-	copypad_arg_S0 = S0
-	copypad_arg_S1 = S1
-	copypad_arg_S2 = S2
+	var a copypad_args
 
-	args := copypad_argptr[:]
-	cu.LaunchKernel(copypad_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, copypad_stream, args)
-	copypad_stream.Synchronize()
-	copypad_lock.Unlock()
+	a.arg_dst = dst
+	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
+	a.arg_D0 = D0
+	a.argptr[1] = unsafe.Pointer(&a.arg_D0)
+	a.arg_D1 = D1
+	a.argptr[2] = unsafe.Pointer(&a.arg_D1)
+	a.arg_D2 = D2
+	a.argptr[3] = unsafe.Pointer(&a.arg_D2)
+	a.arg_src = src
+	a.argptr[4] = unsafe.Pointer(&a.arg_src)
+	a.arg_S0 = S0
+	a.argptr[5] = unsafe.Pointer(&a.arg_S0)
+	a.arg_S1 = S1
+	a.argptr[6] = unsafe.Pointer(&a.arg_S1)
+	a.arg_S2 = S2
+	a.argptr[7] = unsafe.Pointer(&a.arg_S2)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(copypad_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const copypad_ptx = `

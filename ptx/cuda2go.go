@@ -43,7 +43,6 @@ func cuda2go(fname string) {
 		}
 		tok = s.Scan()
 	}
-	//fmt.Println("tokens:", token)
 
 	// find function name and arguments
 	funcname := ""
@@ -58,7 +57,6 @@ func cuda2go(fname string) {
 			break
 		}
 	}
-	//fmt.Println("arg", "start:", argstart, "stop:", argstop)
 	argl := token[argstart:argstop]
 
 	// isolate individual arguments
@@ -112,7 +110,6 @@ func wrapgen(filename, funcname string, argt, argn []string) {
 	util.PanicErr(err)
 	defer wrapout.Close()
 	util.PanicErr(templ.Execute(wrapout, kernel))
-
 }
 
 // wrapper code template text
@@ -126,46 +123,37 @@ const templText = `package ptx
 import(
 	"unsafe"
 	"github.com/barnex/cuda5/cu"
-	"sync"
+	"code.google.com/p/mx3/streams"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var( 
-	{{.Name}}_lock sync.Mutex
-	{{.Name}}_code cu.Function
-	{{.Name}}_stream cu.Stream
-	{{range $i, $_ := .ArgN}} {{$.Name}}_arg_{{.}} {{index $.ArgT $i}}
-	{{end}} 
-	{{.Name}}_argptr = [...]unsafe.Pointer{ 
-		{{range $i, $_ := .ArgN}} {{with $i}},
-	{{end}} unsafe.Pointer(&{{$.Name}}_arg_{{.}}) {{end}}  }
-)
+var {{.Name}}_code cu.Function
+
+type {{.Name}}_args struct{
+	{{range $i, $_ := .ArgN}} arg_{{.}} {{index $.ArgT $i}}
+	{{end}} argptr [{{len .ArgN}}]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for {{.Name}}.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
-	{{.Name}}_lock.Lock()
-
-	if {{.Name}}_stream == 0{
-		{{.Name}}_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for {{.Name}}")
+	if {{.Name}}_code == 0{
 		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
 	}
 
-	{{range .ArgN}} {{$.Name}}_arg_{{.}} = {{.}}
+	var a {{.Name}}_args
+
+	{{range $i, $t := .ArgN}} a.arg_{{.}} = {{.}}
+	a.argptr[{{$i}}] = unsafe.Pointer(&a.arg_{{.}})
 	{{end}}
 
-	args := {{.Name}}_argptr[:]
-	cu.LaunchKernel({{.Name}}_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, {{.Name}}_stream, args)
-	{{.Name}}_stream.Synchronize()
-	{{.Name}}_lock.Unlock()
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel({{.Name}}_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
-const {{.Name}}_ptx = {{.PTX}}
-`
+const {{.Name}}_ptx = {{.PTX}} `
 
 // wrapper code template
 var templ = template.Must(template.New("wrap").Parse(templText))

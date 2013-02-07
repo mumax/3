@@ -6,63 +6,56 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	madd3_lock     sync.Mutex
-	madd3_code     cu.Function
-	madd3_stream   cu.Stream
-	madd3_arg_dst  cu.DevicePtr
-	madd3_arg_src1 cu.DevicePtr
-	madd3_arg_fac1 float32
-	madd3_arg_src2 cu.DevicePtr
-	madd3_arg_fac2 float32
-	madd3_arg_src3 cu.DevicePtr
-	madd3_arg_fac3 float32
-	madd3_arg_N    int
+var madd3_code cu.Function
 
-	madd3_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&madd3_arg_dst),
-		unsafe.Pointer(&madd3_arg_src1),
-		unsafe.Pointer(&madd3_arg_fac1),
-		unsafe.Pointer(&madd3_arg_src2),
-		unsafe.Pointer(&madd3_arg_fac2),
-		unsafe.Pointer(&madd3_arg_src3),
-		unsafe.Pointer(&madd3_arg_fac3),
-		unsafe.Pointer(&madd3_arg_N)}
-)
+type madd3_args struct {
+	arg_dst  cu.DevicePtr
+	arg_src1 cu.DevicePtr
+	arg_fac1 float32
+	arg_src2 cu.DevicePtr
+	arg_fac2 float32
+	arg_src3 cu.DevicePtr
+	arg_fac3 float32
+	arg_N    int
+	argptr   [8]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for madd3.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_madd3(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePtr, fac2 float32, src3 cu.DevicePtr, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
-	madd3_lock.Lock()
-
-	if madd3_stream == 0 {
-		madd3_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for madd3")
+	if madd3_code == 0 {
 		madd3_code = cu.ModuleLoadData(madd3_ptx).GetFunction("madd3")
 	}
 
-	madd3_arg_dst = dst
-	madd3_arg_src1 = src1
-	madd3_arg_fac1 = fac1
-	madd3_arg_src2 = src2
-	madd3_arg_fac2 = fac2
-	madd3_arg_src3 = src3
-	madd3_arg_fac3 = fac3
-	madd3_arg_N = N
+	var a madd3_args
 
-	args := madd3_argptr[:]
-	cu.LaunchKernel(madd3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, madd3_stream, args)
-	madd3_stream.Synchronize()
-	madd3_lock.Unlock()
+	a.arg_dst = dst
+	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
+	a.arg_src1 = src1
+	a.argptr[1] = unsafe.Pointer(&a.arg_src1)
+	a.arg_fac1 = fac1
+	a.argptr[2] = unsafe.Pointer(&a.arg_fac1)
+	a.arg_src2 = src2
+	a.argptr[3] = unsafe.Pointer(&a.arg_src2)
+	a.arg_fac2 = fac2
+	a.argptr[4] = unsafe.Pointer(&a.arg_fac2)
+	a.arg_src3 = src3
+	a.argptr[5] = unsafe.Pointer(&a.arg_src3)
+	a.arg_fac3 = fac3
+	a.argptr[6] = unsafe.Pointer(&a.arg_fac3)
+	a.arg_N = N
+	a.argptr[7] = unsafe.Pointer(&a.arg_N)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(madd3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const madd3_ptx = `

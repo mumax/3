@@ -6,54 +6,47 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	reducemaxdiff_lock        sync.Mutex
-	reducemaxdiff_code        cu.Function
-	reducemaxdiff_stream      cu.Stream
-	reducemaxdiff_arg_src1    cu.DevicePtr
-	reducemaxdiff_arg_src2    cu.DevicePtr
-	reducemaxdiff_arg_dst     cu.DevicePtr
-	reducemaxdiff_arg_initVal float32
-	reducemaxdiff_arg_n       int
+var reducemaxdiff_code cu.Function
 
-	reducemaxdiff_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&reducemaxdiff_arg_src1),
-		unsafe.Pointer(&reducemaxdiff_arg_src2),
-		unsafe.Pointer(&reducemaxdiff_arg_dst),
-		unsafe.Pointer(&reducemaxdiff_arg_initVal),
-		unsafe.Pointer(&reducemaxdiff_arg_n)}
-)
+type reducemaxdiff_args struct {
+	arg_src1    cu.DevicePtr
+	arg_src2    cu.DevicePtr
+	arg_dst     cu.DevicePtr
+	arg_initVal float32
+	arg_n       int
+	argptr      [5]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for reducemaxdiff.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_reducemaxdiff(src1 cu.DevicePtr, src2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
-	reducemaxdiff_lock.Lock()
-
-	if reducemaxdiff_stream == 0 {
-		reducemaxdiff_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for reducemaxdiff")
+	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = cu.ModuleLoadData(reducemaxdiff_ptx).GetFunction("reducemaxdiff")
 	}
 
-	reducemaxdiff_arg_src1 = src1
-	reducemaxdiff_arg_src2 = src2
-	reducemaxdiff_arg_dst = dst
-	reducemaxdiff_arg_initVal = initVal
-	reducemaxdiff_arg_n = n
+	var a reducemaxdiff_args
 
-	args := reducemaxdiff_argptr[:]
-	cu.LaunchKernel(reducemaxdiff_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, reducemaxdiff_stream, args)
-	reducemaxdiff_stream.Synchronize()
-	reducemaxdiff_lock.Unlock()
+	a.arg_src1 = src1
+	a.argptr[0] = unsafe.Pointer(&a.arg_src1)
+	a.arg_src2 = src2
+	a.argptr[1] = unsafe.Pointer(&a.arg_src2)
+	a.arg_dst = dst
+	a.argptr[2] = unsafe.Pointer(&a.arg_dst)
+	a.arg_initVal = initVal
+	a.argptr[3] = unsafe.Pointer(&a.arg_initVal)
+	a.arg_n = n
+	a.argptr[4] = unsafe.Pointer(&a.arg_n)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(reducemaxdiff_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const reducemaxdiff_ptx = `

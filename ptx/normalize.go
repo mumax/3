@@ -6,51 +6,44 @@ package ptx
 */
 
 import (
+	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
-	"sync"
 	"unsafe"
 )
 
-// pointers passed to CGO must be kept alive manually
-// so we keep then here.
-// TODO: how about one struct inside the func. will leak not so much and be parallelizeable.
-var (
-	normalize_lock   sync.Mutex
-	normalize_code   cu.Function
-	normalize_stream cu.Stream
-	normalize_arg_vx cu.DevicePtr
-	normalize_arg_vy cu.DevicePtr
-	normalize_arg_vz cu.DevicePtr
-	normalize_arg_N  int
+var normalize_code cu.Function
 
-	normalize_argptr = [...]unsafe.Pointer{
-		unsafe.Pointer(&normalize_arg_vx),
-		unsafe.Pointer(&normalize_arg_vy),
-		unsafe.Pointer(&normalize_arg_vz),
-		unsafe.Pointer(&normalize_arg_N)}
-)
+type normalize_args struct {
+	arg_vx cu.DevicePtr
+	arg_vy cu.DevicePtr
+	arg_vz cu.DevicePtr
+	arg_N  int
+	argptr [4]unsafe.Pointer
+}
 
 // CUDA kernel wrapper for normalize.
 // The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
 // The stream is synchronized before this call returns.
 func K_normalize(vx cu.DevicePtr, vy cu.DevicePtr, vz cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
-	normalize_lock.Lock()
-
-	if normalize_stream == 0 {
-		normalize_stream = cu.StreamCreate()
-		//core.Log("Loading PTX code for normalize")
+	if normalize_code == 0 {
 		normalize_code = cu.ModuleLoadData(normalize_ptx).GetFunction("normalize")
 	}
 
-	normalize_arg_vx = vx
-	normalize_arg_vy = vy
-	normalize_arg_vz = vz
-	normalize_arg_N = N
+	var a normalize_args
 
-	args := normalize_argptr[:]
-	cu.LaunchKernel(normalize_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, normalize_stream, args)
-	normalize_stream.Synchronize()
-	normalize_lock.Unlock()
+	a.arg_vx = vx
+	a.argptr[0] = unsafe.Pointer(&a.arg_vx)
+	a.arg_vy = vy
+	a.argptr[1] = unsafe.Pointer(&a.arg_vy)
+	a.arg_vz = vz
+	a.argptr[2] = unsafe.Pointer(&a.arg_vz)
+	a.arg_N = N
+	a.argptr[3] = unsafe.Pointer(&a.arg_N)
+
+	args := a.argptr[:]
+	str := streams.Get()
+	cu.LaunchKernel(normalize_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+	streams.SyncAndRecycle(str)
 }
 
 const normalize_ptx = `

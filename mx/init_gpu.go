@@ -1,6 +1,7 @@
 package mx
 
 import (
+	"code.google.com/p/mx3/streams"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"runtime"
@@ -35,7 +36,7 @@ func initGPU() {
 	if M < 2 {
 		Log("Compute capability does not allow unified addressing.")
 	}
-	initStreamPool()
+	streams.Init()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.

@@ -5,7 +5,7 @@ all: $(MEM)
 .PHONY: $(MEM)
 
 $(MEM):
-	go run $@ -memprof -o $(@:.go=.out)
+	go run $@ -f -memprof -o $(@:.go=.out)
 
 .PHONY: clean
 

@@ -14,7 +14,10 @@ func main() {
 
 	for i := 0; i < 10000; i++ {
 		a := mx.NewSlice(1, 1)
-		//leak(a)
+		//leak(a) // if we don't leak, no allocations should show up in the memory profile.
+		b := a.Comp(0)
+		b.Memset(0)
+		//leak(b)
 		a.Free()
 	}
 }

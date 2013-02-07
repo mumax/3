@@ -14,11 +14,9 @@ package main
 
 // dummy imports to make go get fetch all of them.
 import (
-	_ "code.google.com/p/mx3/dump"
-	_ "code.google.com/p/mx3/gpu"
-	_ "code.google.com/p/mx3/gpu/ptx"
-	_ "code.google.com/p/mx3/mag"
-	_ "code.google.com/p/mx3/nimble"
+	_ "code.google.com/p/mx3/mx"
+	_ "code.google.com/p/mx3/test"
+	_ "code.google.com/p/mx3/test/prof"
 )
 
 func main() {

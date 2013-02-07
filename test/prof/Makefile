@@ -7,3 +7,7 @@ all: $(MEM)
 $(MEM):
 	go run $@ -memprof -o $(@:.go=.out)
 
+.PHONY: clean
+
+clean:
+	rm -rf *.out

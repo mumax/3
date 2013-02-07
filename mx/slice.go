@@ -13,15 +13,16 @@ import (
 
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
-	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local
-	ptrs    []unsafe.Pointer         // points into ptr_
+	ptr_ [MAX_COMP]unsafe.Pointer // keeps data local
+	ptrs []unsafe.Pointer         // points into ptr_
+	*info
 	len_    int32
 	memType int8
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func NewSlice(nComp, length int) *Slice {
-	s := newSlice(nComp, length)
+func NewSlice(nComp int, m *Mesh) *Slice {
+	s := newSlice(nComp, m)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	for c := range s.ptrs {
 		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
@@ -43,7 +44,8 @@ func NewUnifiedSlice(nComp, length int) *Slice {
 	return s
 }
 
-func newSlice(nComp, length int) *Slice {
+func newSlice(nComp int, m *Mesh) *Slice {
+	length := m.NCell()
 	Argument(nComp > 0 && length > 0)
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]

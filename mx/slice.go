@@ -47,15 +47,21 @@ func gpuSlice(nComp, length int) *Slice {
 // Frees the underlying storage and zeros the Slice header to avoid accidental use.
 // Slices sharing storage will be invalid after Free. Double free is OK.
 func (s *Slice) Free() {
-	if s.memType == gpuMemory {
-		for c, ptr := range s.ptrs {
+	// free storage
+	switch s.memType {
+	case 0:
+		return // already freed
+	case gpuMemory:
+		for _, ptr := range s.ptrs {
 			cu.MemFree(cu.DevicePtr(ptr))
-			s.ptrs[c] = unsafe.Pointer(uintptr(0))
 		}
-	} else {
+	default:
 		panic("todo")
 	}
-
+	// zero the struct
+	for c := range s.ptr_ {
+		s.ptr_[c] = unsafe.Pointer(uintptr(0))
+	}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
 	s.memType = 0

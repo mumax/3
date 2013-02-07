@@ -22,7 +22,7 @@ func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return Quant{quant{buffer, lock, tag, unit, m}}
+	return Quant{quant{*buffer, lock, tag, unit, m}}
 }
 
 func (q *quant) NComp() int {

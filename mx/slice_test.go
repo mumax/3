@@ -32,4 +32,7 @@ func TestSliceFree(t *testing.T) {
 		a := MakeSlice(2, length)
 		a.Free()
 	}
+	a := MakeSlice(2, length)
+	a.Free()
+	a.Free() // test double-free
 }

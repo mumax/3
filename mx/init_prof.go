@@ -15,7 +15,7 @@ import (
 func initCpuProf() {
 	if *Flag_cpuprof {
 		// start CPU profile to file
-		fname := OD + "/cpu.pprof"
+		fname := OD + "cpu.pprof"
 		f, err := os.Create(fname)
 		FatalErr(err, "CPU profile")
 		err = pprof.StartCPUProfile(f)
@@ -37,7 +37,7 @@ func initMemProf() {
 	if *Flag_memprof {
 		Log("memory profile enabled")
 		AtExit(func() {
-			fname := OD + "/mem.pprof"
+			fname := OD + "mem.pprof"
 			f, err := os.Create(fname)
 			defer f.Close()
 			LogErr(err, "memory profile") // during cleanup, should not panic/exit
@@ -75,11 +75,12 @@ func initGPUProf() {
 // Exec command and write output to outfile.
 func saveCmdOutput(outfile string, cmd string, args ...string) {
 	Log("exec:", cmd, args, ">", outfile)
-	out, err := exec.Command(cmd, args...).CombinedOutput()
+	out, err := exec.Command(cmd, args...).Output() // TODO: stderr is ignored
 	if err != nil {
 		Logf("exec %v %v: %v: %v", cmd, args, err, string(out))
 	} else {
-		Logf("writing %v: %v", outfile, ioutil.WriteFile(outfile, out, 0666))
+		e := ioutil.WriteFile(outfile, out, 0666)
+		LogErr(e, "writing", outfile)
 	}
 }
 

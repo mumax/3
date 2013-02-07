@@ -20,7 +20,7 @@ var (
 func initLog() {
 	LOG = !*Flag_silent
 	DEBUG = *Flag_debug
-	log.SetPrefix(" ·")
+	log.SetPrefix("")
 	log.SetFlags(0)
 }
 

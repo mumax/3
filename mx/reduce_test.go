@@ -1,13 +1,9 @@
-package gpu
+package mx
 
 import (
-	"code.google.com/p/mx3/core"
-	"code.google.com/p/mx3/nimble"
 	"math"
 	"testing"
 )
-
-func init() { core.LOG = false }
 
 func TestReduceSum(t *testing.T) {
 	LockCudaThread()

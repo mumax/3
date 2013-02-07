@@ -48,3 +48,21 @@ func TestSliceFree(t *testing.T) {
 	a.Free()
 	a.Free() // test double-free
 }
+
+func TestSliceHost(t *testing.T) {
+	LockCudaThread()
+	length := 100
+	a := NewUnifiedSlice(3, length)
+	defer a.Free()
+
+	b := a.Host()
+	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
+		t.Fail()
+	}
+
+	a.Memset(1, 2, 3)
+	b = a.Host()
+	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
+		t.Fail()
+	}
+}

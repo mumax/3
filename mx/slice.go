@@ -7,6 +7,7 @@ import (
 	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"math"
+	"reflect"
 	"unsafe"
 )
 
@@ -176,13 +177,6 @@ func (s *Slice) Memset(val ...float32) {
 	streams.SyncAndRecycle(str)
 }
 
-////func unifiedSlice(N int) Slice {
-////	bytes := int64(N) * SizeofFloat32
-////	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
-////	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
-////	return Slice{ptrs, N, 1, UnifiedMemory}
-////}
-////
 ////func ToSlice(list []float32) Slice {
 ////	ptr := unsafe.Pointer(&list[0])
 ////	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
@@ -203,23 +197,23 @@ func (s *Slice) Memset(val ...float32) {
 ////	f.UnsafeSet(unsafe.Pointer(s.DevPtr(component)), s.Len(), s.Len())
 ////	return f
 ////}
-//
-////func (s *Slice) Host() []float32 {
-////	if s.nComp != 1 {
-////		panic("need to implement for components")
-////	}
-////
-////	if s.MemType&CPUMemory == 0 {
-////		core.Panicf("slice not accessible by CPU (memory type %v)", s.MemType)
-////	}
-////	var list []float32
-////	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
-////	hdr.Data = uintptr(s.ptr[0])
-////	hdr.Len = int(s.len_)
-////	hdr.Cap = hdr.Len
-////	return list
-////}
-////
+
+// Host returns the Slice as a [][]float32.
+// It should have CPUAccess() == true.
+func (s *Slice) Host() [][]float32 {
+	if !s.CPUAccess() {
+		Panic("slice not accessible by CPU")
+	}
+	list := make([][]float32, s.NComp())
+	for c := range list {
+		hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list[c]))
+		hdr.Data = uintptr(s.ptrs[c])
+		hdr.Len = int(s.len_)
+		hdr.Cap = hdr.Len
+	}
+	return list
+}
+
 ////func (s *Slice) Device() safe.Float32s {
 ////	if s.nComp != 1 {
 ////		panic(fmt.Errorf("slice.device: need 1 component, have %v", s.nComp))

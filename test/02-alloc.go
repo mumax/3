@@ -14,5 +14,5 @@ func main() {
 	mesh := mx.NewMesh(N0, N1, N2, c0, c1, c2)
 
 	m := mx.NewQuant(mx.VECTOR, "m", "", mesh)
-	//m.Data().WriteTo("m.mx3o")
+	m.Data().WriteTo("m.mx3o")
 }

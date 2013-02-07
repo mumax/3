@@ -66,3 +66,21 @@ func TestSliceHost(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSliceSlice(t *testing.T) {
+	LockCudaThread()
+	length := 100
+	a := NewUnifiedSlice(3, length)
+	h := a.Host()
+	h[1][21] = 42
+	b := a.Slice(20, 30)
+	if b.Len() != 30-20 {
+		t.Fail()
+	}
+	if b.NComp() != a.NComp() {
+		t.Fail()
+	}
+	if b.Host()[1][1] != 42 {
+		t.Fail()
+	}
+}

@@ -20,16 +20,44 @@ type Slice struct {
 
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp, length int) *Slice {
-	Argument(nComp > 0 && length > 0)
+	s := newSlice(nComp, length)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
-	var ptrs [MAX_COMP]unsafe.Pointer
-	for c := 0; c < nComp; c++ {
-		ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
+	for c := range s.ptrs {
+		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
 	}
-	s := &Slice{ptrs, ptrs[:nComp], int32(length), gpuMemory}
+	s.memType = gpuMemory
 	s.Memset(make([]float32, nComp)...)
 	return s
 }
+
+// Make a GPU Slice with nComp components each of size length.
+func NewUnifiedSlice(nComp, length int) *Slice {
+	s := newSlice(nComp, length)
+	bytes := int64(length) * cu.SIZEOF_FLOAT32
+	for c := range s.ptrs {
+		s.ptrs[c] = cu.MemAllocHost(bytes)
+	}
+	s.memType = unifiedMemory
+	s.Memset(make([]float32, nComp)...)
+	return s
+}
+
+func newSlice(nComp, length int) *Slice {
+	Argument(nComp > 0 && length > 0)
+	s := new(Slice)
+	s.ptrs = s.ptr_[:nComp]
+	s.len_ = int32(length)
+	return s
+}
+
+//func NewUnifiedSlice(nComp, length int)*Slice{
+//	Argument(nComp > 0 && length > 0)
+//	bytes := int64(length) * cu.SIZEOF_FLOAT32
+//}
+////	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
+////	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
+////	return Slice{ptrs, N, 1, UnifiedMemory}
+////}
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
 

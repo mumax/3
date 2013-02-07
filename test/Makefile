@@ -6,5 +6,10 @@ all: $(OUT)
 .PHONY: $(OUT)
 
 $(OUT): %: %.go
-	go run $@.go -s
+	go run $@.go -s -o $@.out
+
+.PHONY: clean
+
+clean:
+	rm -rf *.out
 

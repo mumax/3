@@ -5,8 +5,9 @@ import "testing"
 func TestSlice(t *testing.T) {
 	LockCudaThread()
 	N := 100
-	a := MakeSlice(3, N)
+	a := NewSlice(3, N)
 	defer a.Free()
+	a.Memset(1, 2, 3)
 	Log(a)
 
 	if a.GPUAccess() == false {
@@ -19,7 +20,16 @@ func TestSlice(t *testing.T) {
 		t.Fail()
 	}
 
-	//b := a.Comp(1)
+	b := a.Comp(1)
+	if b.GPUAccess() == false {
+		t.Error("b.GPUAccess", b.GPUAccess())
+	}
+	if b.Len() != N {
+		t.Error("b.Len", b.Len())
+	}
+	if b.NComp() != 1 {
+		t.Error("b.NComp", b.NComp())
+	}
 
 }
 
@@ -29,10 +39,10 @@ func TestSliceFree(t *testing.T) {
 	N := 17
 	// not freeing would attempt to allocate 17GB.
 	for i := 0; i < N; i++ {
-		a := MakeSlice(2, length)
+		a := NewSlice(2, length)
 		a.Free()
 	}
-	a := MakeSlice(2, length)
+	a := NewSlice(2, length)
 	a.Free()
 	a.Free() // test double-free
 }

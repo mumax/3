@@ -27,7 +27,7 @@ type Slice struct {
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func MakeSlice(nComp, length int) *Slice {
+func NewSlice(nComp, length int) *Slice {
 	return gpuSlice(nComp, length)
 }
 
@@ -100,12 +100,17 @@ func (s *Slice) Len() int {
 //func (s *Slice) bytes() int64 {
 //	return int64(s.len_) * cu.SIZEOF_FLOAT32
 //}
-//
-//// Comp returns a single component of the Slice.
-//func (s *Slice) Comp(i int) Slice {
-//	return Slice{[MAX_COMP]unsafe.Pointer{s.ptr[i]}, s.len_, 1, s.memType}
-//}
-//
+
+// Comp returns a single component of the Slice.
+func (s *Slice) Comp(i int) *Slice {
+	sl := new(Slice)
+	sl.ptr_[0] = s.ptrs[i]
+	sl.ptrs = sl.ptr_[:1]
+	sl.len_ = s.len_
+	sl.memType = s.memType
+	return sl
+}
+
 // DevPtr returns a CUDA device pointer to a component.
 // Slice must have GPUAccess.
 func (s *Slice) DevPtr(component int) cu.DevicePtr {

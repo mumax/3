@@ -78,10 +78,10 @@ func saveCmdOutput(outfile string, cmd string, args ...string) {
 	out, err := exec.Command(cmd, args...).Output() // TODO: stderr is ignored
 	if err != nil {
 		Logf("exec %v %v: %v: %v", cmd, args, err, string(out))
-	} else {
-		e := ioutil.WriteFile(outfile, out, 0666)
-		LogErr(e, "writing", outfile)
 	}
+	// on error: write anyway, clobbers output file.
+	e := ioutil.WriteFile(outfile, out, 0666)
+	LogErr(e, "writing", outfile)
 }
 
 // path to the executable.

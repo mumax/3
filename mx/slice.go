@@ -50,15 +50,6 @@ func newSlice(nComp, length int) *Slice {
 	return s
 }
 
-//func NewUnifiedSlice(nComp, length int)*Slice{
-//	Argument(nComp > 0 && length > 0)
-//	bytes := int64(length) * cu.SIZEOF_FLOAT32
-//}
-////	ptr := unsafe.Pointer(cu.MemAllocHost(bytes))
-////	ptrs := [MAX_COMP]unsafe.Pointer{ptr}
-////	return Slice{ptrs, N, 1, UnifiedMemory}
-////}
-
 const MAX_COMP = 3 // Maximum supported number of Slice components
 
 // Number of components
@@ -77,6 +68,10 @@ func (s *Slice) Free() {
 	case gpuMemory:
 		for _, ptr := range s.ptrs {
 			cu.MemFree(cu.DevicePtr(ptr))
+		}
+	case unifiedMemory:
+		for _, ptr := range s.ptrs {
+			cu.MemFreeHost(ptr)
 		}
 	default:
 		panic("todo")

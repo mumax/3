@@ -17,7 +17,7 @@ type Quant struct {
 
 func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
 	N := m.NCell() //bufferSize(m, bufBlocks)
-	buffer := gpuSlice(nComp, N)
+	buffer := NewSlice(nComp, N)
 	var lock [MAX_COMP]mutex
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)

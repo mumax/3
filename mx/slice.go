@@ -20,19 +20,6 @@ type Slice struct {
 
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp, length int) *Slice {
-	return gpuSlice(nComp, length)
-}
-
-const MAX_COMP = 3 // Maximum supported number of Slice components
-
-// Number of components
-const (
-	SCALAR = 1
-	VECTOR = 3
-)
-
-// alloc slice on gpu
-func gpuSlice(nComp, length int) *Slice {
 	Argument(nComp > 0 && length > 0)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	var ptrs [MAX_COMP]unsafe.Pointer
@@ -43,6 +30,14 @@ func gpuSlice(nComp, length int) *Slice {
 	s.Memset(make([]float32, nComp)...)
 	return s
 }
+
+const MAX_COMP = 3 // Maximum supported number of Slice components
+
+// Number of components
+const (
+	SCALAR = 1
+	VECTOR = 3
+)
 
 // Frees the underlying storage and zeros the Slice header to avoid accidental use.
 // Slices sharing storage will be invalid after Free. Double free is OK.

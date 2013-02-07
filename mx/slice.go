@@ -4,24 +4,15 @@ package mx
 // Author: Arne Vansteenkiste
 
 import (
-	//"fmt"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"unsafe"
 )
 
-const MAX_COMP = 3 // Maximum supported number of Slice components
-
-// Number of components
-const (
-	SCALAR = 1
-	VECTOR = 3
-)
-
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
-	ptr_    [MAX_COMP]unsafe.Pointer
-	ptrs    []unsafe.Pointer // points into ptr_
+	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local
+	ptrs    []unsafe.Pointer         // points into ptr_
 	len_    int32
 	memType int8
 }
@@ -31,13 +22,21 @@ func NewSlice(nComp, length int) *Slice {
 	return gpuSlice(nComp, length)
 }
 
+const MAX_COMP = 3 // Maximum supported number of Slice components
+
+// Number of components
+const (
+	SCALAR = 1
+	VECTOR = 3
+)
+
 // alloc slice on gpu
 func gpuSlice(nComp, length int) *Slice {
 	Argument(nComp > 0 && length > 0)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	var ptrs [MAX_COMP]unsafe.Pointer
 	for c := 0; c < nComp; c++ {
-		ptrs[c] = unsafe.Pointer(cu.MemAlloc(bytes))
+		ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
 	}
 	s := &Slice{ptrs, ptrs[:nComp], int32(length), gpuMemory}
 	s.Memset(make([]float32, nComp)...)
@@ -118,6 +117,19 @@ func (s *Slice) DevPtr(component int) cu.DevicePtr {
 		panic("slice not accessible by GPU")
 	}
 	return cu.DevicePtr(s.ptrs[component])
+}
+
+func MemAlloc(bytes int64) cu.DevicePtr {
+	defer func() {
+		err := recover()
+		if err == cu.ERROR_OUT_OF_MEMORY {
+			FatalErr(err)
+		}
+		if err != nil {
+			panic(err)
+		}
+	}()
+	return cu.MemAlloc(bytes)
 }
 
 //// Slice returns a slice sharing memory with the original.

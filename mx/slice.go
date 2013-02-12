@@ -23,6 +23,7 @@ type Slice struct {
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp int, m *Mesh) *Slice {
 	s := newSlice(nComp, m)
+	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	for c := range s.ptrs {
 		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
@@ -33,8 +34,9 @@ func NewSlice(nComp int, m *Mesh) *Slice {
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func NewUnifiedSlice(nComp, length int) *Slice {
-	s := newSlice(nComp, length)
+func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
+	s := newSlice(nComp, m)
+	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	for c := range s.ptrs {
 		s.ptrs[c] = cu.MemAllocHost(bytes)

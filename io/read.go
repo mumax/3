@@ -49,6 +49,11 @@ func (r *reader) readFrame() error {
 	r.DataLabel = r.readString()
 	r.DataUnit = r.readString()
 	r.Precission = r.readUint64()
+
+	for i := 0; i < padding; i++ {
+		_ = r.readUint64()
+	}
+
 	if r.err != nil {
 		return r.err
 	}

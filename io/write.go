@@ -50,7 +50,8 @@ func newWriter(out io.Writer) *writer {
 	return w
 }
 
-const MAGIC = "#dump002"
+const MAGIC = "#mx3o003"
+const padding = 10
 
 // Writes the current header.
 func (w *writer) writeHeader() {
@@ -68,6 +69,10 @@ func (w *writer) writeHeader() {
 	w.writeString(w.DataLabel)
 	w.writeString(w.DataUnit)
 	w.writeUInt64(w.Precission)
+
+	for i := 0; i < padding; i++ {
+		w.writeUInt64(0)
+	}
 }
 
 // Writes the data.

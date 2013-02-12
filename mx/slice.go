@@ -46,6 +46,16 @@ func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
 	return s
 }
 
+func NewCPUSlice(nComp int, m *Mesh) *Slice {
+	s := newSlice(nComp, m)
+	length := m.NCell()
+	for c := range s.ptrs {
+		s.ptrs[c] = unsafe.Pointer(&(make([]float32, length)[0]))
+	}
+	s.memType = cpuMemory
+	return s
+}
+
 func newSlice(nComp int, m *Mesh) *Slice {
 	length := m.NCell()
 	Argument(nComp > 0 && length > 0)

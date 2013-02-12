@@ -2,7 +2,6 @@ package io
 
 import (
 	"code.google.com/p/mx3/mx"
-	"fmt"
 	"hash"
 	"hash/crc64"
 	"io"

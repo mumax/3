@@ -84,7 +84,7 @@ func (r *reader) readInt() int {
 
 // read until the buffer is full
 func (r *reader) read(buf []byte) {
-	n, err := io.ReadFull(r.in, buf[:])
+	_, err := io.ReadFull(r.in, buf[:])
 	if err != nil {
 		r.err = err
 	}
@@ -122,10 +122,12 @@ func (r *reader) readUint64() uint64 {
 func (r *reader) readData() {
 	s := r.MeshSize
 	c := r.MeshStep
+	nComp := r.Components
 	mesh := mx.NewMesh(s[0], s[1], s[2], c[0], c[1], c[2])
+	length := mesh.NCell()
 	slice := mx.NewCPUSlice(r.Components, mesh)
 	for c := 0; c < nComp; c++ {
-		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&r.Data[0])))[0 : 4*len(r.Data)]
+		buf := (*(*[1<<31 - 1]byte)(slice.HostPtr(c)))[0 : 4*length]
+		r.read(buf)
 	}
-	r.read(buf)
 }

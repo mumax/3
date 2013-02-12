@@ -148,6 +148,15 @@ func (s *Slice) DevPtr(component int) cu.DevicePtr {
 	return cu.DevicePtr(s.ptrs[component])
 }
 
+// DevPtr returns a pointer to a component.
+// Slice must have CPUAccess.
+func (s *Slice) HostPtr(component int) unsafe.Pointer {
+	if !s.CPUAccess() {
+		panic("slice not accessible by CPU")
+	}
+	return s.ptrs[component]
+}
+
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.
 func MemAlloc(bytes int64) cu.DevicePtr {
 	defer func() {

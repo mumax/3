@@ -5,6 +5,7 @@ package mx
 
 import (
 	"code.google.com/p/mx3/streams"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"reflect"
@@ -214,6 +215,31 @@ func (s *Slice) Host() [][]float32 {
 		hdr.Cap = hdr.Len
 	}
 	return list
+}
+
+func (f *Slice) Floats() [][][]float32 {
+	x := f.Tensors()
+	if len(x) != 1 {
+		Panicf("expecting 1 component, got %v", f.NComp())
+	}
+	return x[0]
+}
+
+func (f *Slice) Vectors() [3][][][]float32 {
+	x := f.Tensors()
+	if len(x) != 3 {
+		Panicf("expecting 3 components, got %v", f.NComp())
+	}
+	return [3][][][]float32{x[0], x[1], x[2]}
+}
+
+func (f *Slice) Tensors() [][][][]float32 {
+	tensors := make([][][][]float32, f.NComp())
+	host := f.Host()
+	for i := range tensors {
+		tensors[i] = util.Reshape(host[i], f.Mesh().Size())
+	}
+	return tensors
 }
 
 //// Bytes returns the number of storage bytes per component.

@@ -16,6 +16,8 @@ type Mesh struct {
 // Optional periodic boundary conditions (pbc): number of repetitions
 // in X, Y, Z direction. 0,0,0 means no periodicity.
 func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
+	Argument(N0 > 0 && N1 > 0 && N2 > 0)
+	Argument(cellx > 0 && celly > 0 && cellz > 0)
 	var pbc3 [3]int
 	if len(pbc) == 3 {
 		copy(pbc3[:], pbc)
@@ -82,6 +84,7 @@ func (m *Mesh) String() string {
 func blockSize(size [3]int) [3]int {
 	N0, N1, N2 := size[0], size[1], size[2]
 	n := prod(size)
+	Argument(n > 0)
 
 	minNw := *Flag_minblocks // minimum number of blocks
 	maxNw := N0 * N1         // max. Nwarp: do not slice up along K, keep full rows.

@@ -10,6 +10,11 @@ import (
 	"unsafe"
 )
 
+func ReadSlice(in io.Reader) (*mx.Slice, error) {
+	r := newReader(in)
+	return r.readSlice()
+}
+
 // Reads successive data frames in dump format.
 type reader struct {
 	header
@@ -25,16 +30,15 @@ func newReader(in io.Reader) *reader {
 	return r
 }
 
-// Reads one frame and stores it in r.Frame.
-func (r *reader) readFrame() error {
+func (r *reader) readSlice() (slice *mx.Slice, err error) {
 	r.err = nil // clear previous error, if any
 	r.Magic = r.readString()
 	if r.err != nil {
-		return r.err
+		return nil, r.err
 	}
 	if r.Magic != MAGIC {
 		r.err = fmt.Errorf("dump: bad magic number:%v", r.Magic)
-		return r.err
+		return nil, r.err
 	}
 	r.Components = r.readInt()
 	for i := range r.MeshSize {
@@ -55,10 +59,10 @@ func (r *reader) readFrame() error {
 	}
 
 	if r.err != nil {
-		return r.err
+		return
 	}
 
-	r.readData()
+	slice, err = r.readData()
 
 	// Check CRC
 	var mycrc uint64 // checksum by this reader
@@ -76,7 +80,7 @@ func (r *reader) readFrame() error {
 		r.err == nil {
 		r.err = fmt.Errorf("dump CRC error: expected %16x, got %16x", storedcrc, mycrc)
 	}
-	return r.err
+	return
 }
 
 func (r *reader) readInt() int {
@@ -124,7 +128,7 @@ func (r *reader) readUint64() uint64 {
 
 // read the data array,
 // enlarging the previous one if needed.
-func (r *reader) readData() {
+func (r *reader) readData() (*mx.Slice, error) {
 	s := r.MeshSize
 	c := r.MeshStep
 	nComp := r.Components
@@ -135,4 +139,8 @@ func (r *reader) readData() {
 		buf := (*(*[1<<31 - 1]byte)(slice.HostPtr(c)))[0 : 4*length]
 		r.read(buf)
 	}
+	if r.err == nil {
+		return slice, nil
+	}
+	return nil, r.err
 }

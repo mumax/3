@@ -62,6 +62,8 @@ func newSlice(nComp int, m *Mesh) *Slice {
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
 	s.len_ = int32(length)
+	s.info = new(info)
+	s.info.mesh = *m
 	return s
 }
 

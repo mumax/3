@@ -201,7 +201,8 @@ func (s *Slice) Memset(val ...float32) {
 	streams.SyncAndRecycle(str)
 }
 
-// Host returns the Slice as a [][]float32.
+// Host returns the Slice as a [][]float32,
+// indexed by component, cell number.
 // It should have CPUAccess() == true.
 func (s *Slice) Host() [][]float32 {
 	if !s.CPUAccess() {
@@ -217,6 +218,9 @@ func (s *Slice) Host() [][]float32 {
 	return list
 }
 
+// Floats returns the data as 3D array,
+// indexed by cell position. Data should be
+// scalar (1 component) and have CPUAccess() == true.
 func (f *Slice) Floats() [][][]float32 {
 	x := f.Tensors()
 	if len(x) != 1 {
@@ -225,6 +229,9 @@ func (f *Slice) Floats() [][][]float32 {
 	return x[0]
 }
 
+// Vectors returns the data as 4D array,
+// indexed by component, cell position. Data should have
+// 3 components and have CPUAccess() == true.
 func (f *Slice) Vectors() [3][][][]float32 {
 	x := f.Tensors()
 	if len(x) != 3 {
@@ -233,6 +240,9 @@ func (f *Slice) Vectors() [3][][][]float32 {
 	return [3][][][]float32{x[0], x[1], x[2]}
 }
 
+// Tensors returns the data as 4D array,
+// indexed by component, cell position.
+// Requires CPUAccess() == true.
 func (f *Slice) Tensors() [][][][]float32 {
 	tensors := make([][][][]float32, f.NComp())
 	host := f.Host()
@@ -241,8 +251,3 @@ func (f *Slice) Tensors() [][][][]float32 {
 	}
 	return tensors
 }
-
-//// Bytes returns the number of storage bytes per component.
-//func (s *Slice) bytes() int64 {
-//	return int64(s.len_) * cu.SIZEOF_FLOAT32
-//}

@@ -1,13 +1,10 @@
-package mx
+package data
 
 // File: Slice stores N-component GPU or host data.
 // Author: Arne Vansteenkiste
 
 import (
-	"code.google.com/p/mx3/streams"
-	"code.google.com/p/mx3/util"
-	"github.com/barnex/cuda5/cu"
-	"math"
+	"log"
 	"reflect"
 	"unsafe"
 )
@@ -18,33 +15,7 @@ type Slice struct {
 	ptrs []unsafe.Pointer         // points into ptr_
 	*info
 	len_ int32
-	dev  device // has free, memset, ...
-}
-
-// Make a GPU Slice with nComp components each of size length.
-func NewGPUSlice(nComp int, m *Mesh) *Slice {
-	s := newSlice(nComp, m)
-	length := m.NCell()
-	bytes := int64(length) * cu.SIZEOF_FLOAT32
-	for c := range s.ptrs {
-		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
-	}
-	s.memType = GPUMemory
-	s.Memset(make([]float32, nComp)...)
-	return s
-}
-
-// Make a GPU Slice with nComp components each of size length.
-func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
-	s := newSlice(nComp, m)
-	length := m.NCell()
-	bytes := int64(length) * cu.SIZEOF_FLOAT32
-	for c := range s.ptrs {
-		s.ptrs[c] = cu.MemAllocHost(bytes)
-	}
-	s.memType = UnifiedMemory
-	s.Memset(make([]float32, nComp)...)
-	return s
+	dev  Device // has free, memset, ...
 }
 
 // Make a CPU Slice with nComp components of size length.
@@ -54,28 +25,13 @@ func NewCPUSlice(nComp int, m *Mesh) *Slice {
 	for c := range s.ptrs {
 		s.ptrs[c] = unsafe.Pointer(&(make([]float32, length)[0]))
 	}
-	s.memType = CPUMemory
+	s.dev = cpu{}
 	return s
-}
-
-func NewSliceMemtype(nComp int, m *Mesh, memType int) *Slice {
-	switch memType {
-	default:
-		Panicf("illegal memory type: %v", memType)
-	case GPUMemory:
-		return NewGPUSlice(nComp, m)
-	case CPUMemory:
-		return NewCPUSlice(nComp, m)
-	case UnifiedMemory:
-		return NewUnifiedSlice(nComp, m)
-	}
-	panic("unreachable")
-	return nil
 }
 
 func newSlice(nComp int, m *Mesh) *Slice {
 	length := m.NCell()
-	Argument(nComp > 0 && length > 0)
+	argument(nComp > 0 && length > 0)
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
 	s.len_ = int32(length)
@@ -95,22 +51,8 @@ const (
 // Frees the underlying storage and zeros the Slice header to avoid accidental use.
 // Slices sharing storage will be invalid after Free. Double free is OK.
 func (s *Slice) Free() {
-	// free storage
-	switch s.memType {
-	case 0:
-		return // already freed
-	case GPUMemory:
-		for _, ptr := range s.ptrs {
-			cu.MemFree(cu.DevicePtr(ptr))
-		}
-	case UnifiedMemory:
-		for _, ptr := range s.ptrs {
-			cu.MemFreeHost(ptr)
-		}
-	case CPUMemory:
-		// nothing to do
-	default:
-		panic("invalid memory type")
+	for _, ptr := range s.ptrs {
+		s.dev.MemFree(ptr)
 	}
 	// zero the struct
 	for c := range s.ptr_ {
@@ -118,32 +60,18 @@ func (s *Slice) Free() {
 	}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
-	s.memType = 0
-}
-
-// value for Slice.memType
-const (
-	CPUMemory     = 1 << 0
-	GPUMemory     = 1 << 1
-	UnifiedMemory = CPUMemory | GPUMemory
-)
-
-// MemType returns the memory type of the underlying storage:
-// CPUMemory, GPUMemory or UnifiedMemory
-func (s *Slice) MemType() int {
-	return int(s.memType)
 }
 
 // GPUAccess returns whether the Slice is accessible by the GPU.
 // true means it is either stored on GPU or in unified host memory.
 func (s *Slice) GPUAccess() bool {
-	return s.memType&GPUMemory != 0
+	return s.dev.GPUAccess()
 }
 
 // CPUAccess returns whether the Slice is accessible by the CPU.
 // true means it is stored in host memory.
 func (s *Slice) CPUAccess() bool {
-	return s.memType&CPUMemory != 0
+	return s.dev.CPUAccess()
 }
 
 // NComp returns the number of components.
@@ -162,17 +90,17 @@ func (s *Slice) Comp(i int) *Slice {
 	sl.ptr_[0] = s.ptrs[i]
 	sl.ptrs = sl.ptr_[:1]
 	sl.len_ = s.len_
-	sl.memType = s.memType
+	sl.dev = s.dev
 	return sl
 }
 
 // DevPtr returns a CUDA device pointer to a component.
 // Slice must have GPUAccess.
-func (s *Slice) DevPtr(component int) cu.DevicePtr {
+func (s *Slice) DevPtr(component int) uintptr {
 	if !s.GPUAccess() {
 		panic("slice not accessible by GPU")
 	}
-	return cu.DevicePtr(s.ptrs[component])
+	return uintptr(s.ptrs[component])
 }
 
 // DevPtr returns a pointer to a component.
@@ -184,45 +112,31 @@ func (s *Slice) HostPtr(component int) unsafe.Pointer {
 	return s.ptrs[component]
 }
 
-// Wrapper for cu.MemAlloc, fatal exit on out of memory.
-func MemAlloc(bytes int64) cu.DevicePtr {
-	defer func() {
-		err := recover()
-		if err == cu.ERROR_OUT_OF_MEMORY {
-			FatalErr(err)
-		}
-		if err != nil {
-			panic(err)
-		}
-	}()
-	return cu.MemAlloc(bytes)
-}
-
 // Slice returns a slice sharing memory with the original.
 func (s *Slice) Slice(a, b int) *Slice {
 	len_ := int(s.len_)
 	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {
-		Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
+		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
 	}
 
 	slice := new(Slice)
 	slice.ptrs = s.ptr_[:s.NComp()]
 	for i := range s.ptrs {
-		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + cu.SIZEOF_FLOAT32*uintptr(a))
+		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
 	}
 	slice.len_ = int32(b - a)
-	slice.memType = s.memType
+	slice.dev = s.dev
 	return slice
 }
 
+const SIZEOF_FLOAT32 = 4
+
 // Set the entire slice to this value, component by component.
 func (s *Slice) Memset(val ...float32) {
-	Argument(len(val) == s.NComp())
-	str := streams.Get()
+	argument(len(val) == s.NComp())
 	for c, v := range val {
-		cu.MemsetD32Async(s.DevPtr(c), math.Float32bits(v), int64(s.Len()), str)
+		s.dev.Memset(s.ptrs[c], v, s.Len())
 	}
-	streams.SyncAndRecycle(str)
 }
 
 // Host returns the Slice as a [][]float32,
@@ -230,15 +144,21 @@ func (s *Slice) Memset(val ...float32) {
 // It should have CPUAccess() == true.
 func (s *Slice) Host() [][]float32 {
 	if !s.CPUAccess() {
-		Panic("slice not accessible by CPU")
+		log.Panicf("slice not accessible by CPU")
 	}
 	list := make([][]float32, s.NComp())
 	for c := range list {
-		hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list[c]))
-		hdr.Data = uintptr(s.ptrs[c])
-		hdr.Len = int(s.len_)
-		hdr.Cap = hdr.Len
+		list[c] = assembleSlice(s.ptrs[c], int(s.len_))
 	}
+	return list
+}
+
+func assembleSlice(ptr unsafe.Pointer, len_ int) []float32 {
+	var list []float32
+	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&list))
+	hdr.Data = uintptr(ptr)
+	hdr.Len = int(len_)
+	hdr.Cap = hdr.Len
 	return list
 }
 
@@ -248,7 +168,7 @@ func (s *Slice) Host() [][]float32 {
 func (s *Slice) Floats() [][][]float32 {
 	x := s.Tensors()
 	if len(x) != 1 {
-		Panicf("expecting 1 component, got %v", s.NComp())
+		log.Panicf("expecting 1 component, got %v", s.NComp())
 	}
 	return x[0]
 }
@@ -259,7 +179,7 @@ func (s *Slice) Floats() [][][]float32 {
 func (s *Slice) Vectors() [3][][][]float32 {
 	x := s.Tensors()
 	if len(x) != 3 {
-		Panicf("expecting 3 components, got %v", s.NComp())
+		log.Panicf("expecting 3 components, got %v", s.NComp())
 	}
 	return [3][][][]float32{x[0], x[1], x[2]}
 }
@@ -271,7 +191,7 @@ func (s *Slice) Tensors() [][][][]float32 {
 	tensors := make([][][][]float32, s.NComp())
 	host := s.Host()
 	for i := range tensors {
-		tensors[i] = util.Reshape(host[i], s.Mesh().Size())
+		tensors[i] = Reshape(host[i], s.Mesh().Size())
 	}
 	return tensors
 }

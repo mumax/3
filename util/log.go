@@ -31,7 +31,7 @@ func LogErr(err error, msg ...interface{}) {
 	}
 }
 
-// Debug message.
+// Debug message, includes file + line.
 func Debug(msg ...interface{}) {
 	_, file, line, ok := runtime.Caller(1)
 	file = path.Base(file)

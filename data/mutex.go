@@ -1,4 +1,4 @@
-package mx
+package data
 
 /*
    To my future colleagues:
@@ -7,6 +7,7 @@ package mx
    -Arne.
 */
 import (
+	"log"
 	"sync"
 )
 
@@ -52,7 +53,7 @@ func (m *rwMutex) delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
 	rnge := int((m.absB + Δb) - (m.absA + Δa))
 	if rnge < 0 || rnge > m.n || Δa < 0 || Δb < 0 {
-		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
+		log.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.n)
 	}
 	for !m.canWLock(m.absA+Δa, m.absB+Δb) {
 		m.cond.Wait()
@@ -151,7 +152,7 @@ func (m *rMutex) delta(Δstart, Δstop int) {
 	Δc, Δd := int64(Δstart), int64(Δstop)
 	rnge := int((m.absD + Δd) - (m.absC + Δc))
 	if rnge < 0 || rnge > m.rw.n || Δc < 0 || Δd < 0 {
-		Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
+		log.Panicf("rwmutex: delta out of range: Δstart=%v, Δstop=%v, N=%v", Δstart, Δstop, m.rw.n)
 	}
 	for !m.canRLock(m.absC+Δc, m.absD+Δd) {
 		m.rw.cond.Wait()

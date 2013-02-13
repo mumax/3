@@ -29,7 +29,7 @@ func NewGPUSlice(nComp int, m *Mesh) *Slice {
 	for c := range s.ptrs {
 		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
 	}
-	s.memType = gpuMemory
+	s.memType = GPUMemory
 	s.Memset(make([]float32, nComp)...)
 	return s
 }
@@ -42,7 +42,7 @@ func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
 	for c := range s.ptrs {
 		s.ptrs[c] = cu.MemAllocHost(bytes)
 	}
-	s.memType = unifiedMemory
+	s.memType = UnifiedMemory
 	s.Memset(make([]float32, nComp)...)
 	return s
 }
@@ -54,11 +54,11 @@ func NewCPUSlice(nComp int, m *Mesh) *Slice {
 	for c := range s.ptrs {
 		s.ptrs[c] = unsafe.Pointer(&(make([]float32, length)[0]))
 	}
-	s.memType = cpuMemory
+	s.memType = CPUMemory
 	return s
 }
 
-func NewSliceMemtype(nComp int, m *Mesh, memType int) {
+func NewSliceMemtype(nComp int, m *Mesh, memType int) *Slice {
 	switch memType {
 	default:
 		Panicf("illegal memory type: %v", memType)
@@ -99,16 +99,18 @@ func (s *Slice) Free() {
 	switch s.memType {
 	case 0:
 		return // already freed
-	case gpuMemory:
+	case GPUMemory:
 		for _, ptr := range s.ptrs {
 			cu.MemFree(cu.DevicePtr(ptr))
 		}
-	case unifiedMemory:
+	case UnifiedMemory:
 		for _, ptr := range s.ptrs {
 			cu.MemFreeHost(ptr)
 		}
+	case CPUMemory:
+		// nothing to do
 	default:
-		panic("todo")
+		panic("invalid memory type")
 	}
 	// zero the struct
 	for c := range s.ptr_ {
@@ -126,16 +128,22 @@ const (
 	UnifiedMemory = CPUMemory | GPUMemory
 )
 
+// MemType returns the memory type of the underlying storage:
+// CPUMemory, GPUMemory or UnifiedMemory
+func (s *Slice) MemType() int {
+	return int(s.memType)
+}
+
 // GPUAccess returns whether the Slice is accessible by the GPU.
 // true means it is either stored on GPU or in unified host memory.
 func (s *Slice) GPUAccess() bool {
-	return s.memType&gpuMemory != 0
+	return s.memType&GPUMemory != 0
 }
 
 // CPUAccess returns whether the Slice is accessible by the CPU.
 // true means it is stored in host memory.
 func (s *Slice) CPUAccess() bool {
-	return s.memType&cpuMemory != 0
+	return s.memType&CPUMemory != 0
 }
 
 // NComp returns the number of components.

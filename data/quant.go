@@ -1,28 +1,26 @@
-package mx
+package data
 
 // File: Quant stores a physical quantity.
 // Author: Arne Vansteenkiste
 
 // shared by Quant and Reader
 type quant struct {
-	buffer    Slice           // stores the data
-	lock      [MAX_COMP]mutex // protects buffer. mutex can be read or write type
-	tag, unit string          // TODO: fuse with mesh into info
-	mesh      *Mesh
+	buffer Slice           // stores the data
+	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type
 }
 
 type Quant struct {
 	quant
 }
 
-func NewQuant(nComp int, tag, unit string, m *Mesh) Quant {
-	buffer := NewGPUSlice(nComp, m)
-	N := m.NCell() //bufferSize(m, bufBlocks)
+func NewQuant(s *Slice) Quant {
+	N := s.Mesh().NCell() //bufferSize(m, bufBlocks)
 	var lock [MAX_COMP]mutex
+	nComp := s.NComp()
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return Quant{quant{*buffer, lock, tag, unit, m}}
+	return Quant{quant{*s, lock}}
 }
 
 func (q *quant) NComp() int {

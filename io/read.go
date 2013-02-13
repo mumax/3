@@ -7,12 +7,22 @@ import (
 	"hash/crc64"
 	"io"
 	"math"
+	"os"
 	"unsafe"
 )
 
 func ReadSlice(in io.Reader) (*mx.Slice, error) {
 	r := newReader(in)
 	return r.readSlice()
+}
+
+func ReadSliceFile(fname string) (*mx.Slice, error) {
+	f, err := os.Open(fname)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return ReadSlice(f)
 }
 
 // Reads successive data frames in dump format.

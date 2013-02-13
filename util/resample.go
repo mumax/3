@@ -1,10 +1,14 @@
-package core
+package util
 
-// ScaleNearest copies in to out using nearest-neighbor interpolation.
+import "fmt"
+
+// ResampleNearest copies in to out using nearest-neighbor interpolation.
 // len(in) should be == len(out) (the number of vector components).
 // The other dimensions are supposedly different and will be interpolated over.
-func ScaleNearest(in, out [][][][]float32) {
-	Assert(len(in) == len(out))
+func ResampleNearest(out, in [][][][]float32) {
+	if len(in) != len(out) {
+		panic(fmt.Errorf("illegal argument: len(out)=%v, len(in)=%v", len(out), len(in)))
+	}
 	size1 := SizeOf(in[0])
 	size2 := SizeOf(out[0])
 	for c := range out {

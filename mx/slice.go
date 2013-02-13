@@ -22,7 +22,7 @@ type Slice struct {
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func NewSlice(nComp int, m *Mesh) *Slice {
+func NewGPUSlice(nComp int, m *Mesh) *Slice {
 	s := newSlice(nComp, m)
 	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
@@ -47,6 +47,7 @@ func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
 	return s
 }
 
+// Make a CPU Slice with nComp components of size length.
 func NewCPUSlice(nComp int, m *Mesh) *Slice {
 	s := newSlice(nComp, m)
 	length := m.NCell()
@@ -55,6 +56,21 @@ func NewCPUSlice(nComp int, m *Mesh) *Slice {
 	}
 	s.memType = cpuMemory
 	return s
+}
+
+func NewSliceMemtype(nComp int, m *Mesh, memType int) {
+	switch memType {
+	default:
+		Panicf("illegal memory type: %v", memType)
+	case GPUMemory:
+		return NewGPUSlice(nComp, m)
+	case CPUMemory:
+		return NewCPUSlice(nComp, m)
+	case UnifiedMemory:
+		return NewUnifiedSlice(nComp, m)
+	}
+	panic("unreachable")
+	return nil
 }
 
 func newSlice(nComp int, m *Mesh) *Slice {
@@ -105,9 +121,9 @@ func (s *Slice) Free() {
 
 // value for Slice.memType
 const (
-	cpuMemory     = 1 << 0
-	gpuMemory     = 1 << 1
-	unifiedMemory = cpuMemory | gpuMemory
+	CPUMemory     = 1 << 0
+	GPUMemory     = 1 << 1
+	UnifiedMemory = CPUMemory | GPUMemory
 )
 
 // GPUAccess returns whether the Slice is accessible by the GPU.

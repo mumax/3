@@ -50,8 +50,8 @@ func newWriter(out io.Writer) *writer {
 	return w
 }
 
-const MAGIC = "#mx3o003"
-const padding = 10
+const MAGIC = "#dump002"
+const padding = 0
 
 // Writes the current header.
 func (w *writer) writeHeader() {

@@ -5,8 +5,6 @@
 *.8
 *.o
 *.a
-*.dot.*
-*.dot
 *.svg
 *.log
 *.dump

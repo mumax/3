@@ -19,7 +19,7 @@ type Slice struct {
 }
 
 // Make a CPU Slice with nComp components of size length.
-func NewCPUSlice(nComp int, m *Mesh) *Slice {
+func NewSlice(nComp int, m *Mesh) *Slice {
 	s := newSlice(nComp, m)
 	length := m.NCell()
 	for c := range s.ptrs {

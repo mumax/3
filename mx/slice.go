@@ -245,10 +245,10 @@ func (s *Slice) Host() [][]float32 {
 // Floats returns the data as 3D array,
 // indexed by cell position. Data should be
 // scalar (1 component) and have CPUAccess() == true.
-func (f *Slice) Floats() [][][]float32 {
-	x := f.Tensors()
+func (s *Slice) Floats() [][][]float32 {
+	x := s.Tensors()
 	if len(x) != 1 {
-		Panicf("expecting 1 component, got %v", f.NComp())
+		Panicf("expecting 1 component, got %v", s.NComp())
 	}
 	return x[0]
 }
@@ -256,10 +256,10 @@ func (f *Slice) Floats() [][][]float32 {
 // Vectors returns the data as 4D array,
 // indexed by component, cell position. Data should have
 // 3 components and have CPUAccess() == true.
-func (f *Slice) Vectors() [3][][][]float32 {
-	x := f.Tensors()
+func (s *Slice) Vectors() [3][][][]float32 {
+	x := s.Tensors()
 	if len(x) != 3 {
-		Panicf("expecting 3 components, got %v", f.NComp())
+		Panicf("expecting 3 components, got %v", s.NComp())
 	}
 	return [3][][][]float32{x[0], x[1], x[2]}
 }
@@ -267,11 +267,11 @@ func (f *Slice) Vectors() [3][][][]float32 {
 // Tensors returns the data as 4D array,
 // indexed by component, cell position.
 // Requires CPUAccess() == true.
-func (f *Slice) Tensors() [][][][]float32 {
-	tensors := make([][][][]float32, f.NComp())
-	host := f.Host()
+func (s *Slice) Tensors() [][][][]float32 {
+	tensors := make([][][][]float32, s.NComp())
+	host := s.Host()
 	for i := range tensors {
-		tensors[i] = util.Reshape(host[i], f.Mesh().Size())
+		tensors[i] = util.Reshape(host[i], s.Mesh().Size())
 	}
 	return tensors
 }

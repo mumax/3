@@ -1,4 +1,4 @@
-package mx
+package data
 
 import (
 	"math/rand"

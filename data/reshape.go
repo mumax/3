@@ -1,4 +1,4 @@
-package util
+package data
 
 // Array reshaping.
 
@@ -23,61 +23,53 @@ func Reshape(array []float32, size [3]int) [][][]float32 {
 	return sliced
 }
 
-func Reshape3(vectors [3][]float32, size [3]int) [3][][][]float32 {
-	return [3][][][]float32{Reshape(vectors[0], size), Reshape(vectors[1], size), Reshape(vectors[2], size)}
-}
+//func reshape3(vectors [3][]float32, size [3]int) [3][][][]float32 {
+//	return [3][][][]float32{Reshape(vectors[0], size), Reshape(vectors[1], size), Reshape(vectors[2], size)}
+//}
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
 // Underlying storage is shared.
-func Reshape4D(list []float32, size []int) [][][][]float32 {
-	sliced := make([][][][]float32, size[0])
-	for i := range sliced {
-		sliced[i] = make([][][]float32, size[1])
-	}
-	for i := range sliced {
-		for j := range sliced[i] {
-			sliced[i][j] = make([][]float32, size[2])
-		}
-	}
+//func Reshape4D(list []float32, size []int) [][][][]float32 {
+//	sliced := make([][][][]float32, size[0])
+//	for i := range sliced {
+//		sliced[i] = make([][][]float32, size[1])
+//	}
+//	for i := range sliced {
+//		for j := range sliced[i] {
+//			sliced[i][j] = make([][]float32, size[2])
+//		}
+//	}
+//
+//	for i := range sliced {
+//		for j := range sliced[i] {
+//			for k := range sliced[i][j] {
+//				sliced[i][j][k] = list[((i*size[1]+j)*size[2]+k)*size[3]+0 : ((i*size[1]+j)*size[2]+k)*size[3]+size[3]]
+//			}
+//		}
+//	}
+//	return sliced
+//}
 
-	for i := range sliced {
-		for j := range sliced[i] {
-			for k := range sliced[i][j] {
-				sliced[i][j][k] = list[((i*size[1]+j)*size[2]+k)*size[3]+0 : ((i*size[1]+j)*size[2]+k)*size[3]+size[3]]
-			}
-		}
-	}
-	return sliced
-}
-
-func SizeOf(block [][][]float32) [3]int {
+func sizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }
 
 // Reshape the block to one contiguous list.
 // Assumes the block's storage is contiguous,
 // like returned by MakeFloats or Reshape.
-func Contiguous(block [][][]float32) []float32 {
-	N := Prod(SizeOf(block))
-	return block[0][0][:N]
-}
+//func contiguous(block [][][]float32) []float32 {
+//	N := prod(sizeOf(block))
+//	return block[0][0][:N]
+//}
 
-func Contiguous4D(block [][][][]float32) []float32 {
-	N := len(block) * len(block[0]) * len(block[0][0]) * len(block[0][0][0])
-	return block[0][0][0][:N]
-}
+//func Contiguous4D(block [][][][]float32) []float32 {
+//	N := len(block) * len(block[0]) * len(block[0][0]) * len(block[0][0][0])
+//	return block[0][0][0][:N]
+//}
 
 // Reshape the vector block to three contiguous lists.
 // Assumes the components's storage are individually contiguous,
 // like returned by MakeVectors.
-func Contiguous3(v [3][][][]float32) [3][]float32 {
-	return [3][]float32{Contiguous(v[0]), Contiguous(v[1]), Contiguous(v[2])}
-}
-
-func Prod(size [3]int) int {
-	prod := 1
-	for _, s := range size {
-		prod *= s
-	}
-	return prod
-}
+//func Contiguous3(v [3][][][]float32) [3][]float32 {
+//	return [3][]float32{Contiguous(v[0]), Contiguous(v[1]), Contiguous(v[2])}
+//}

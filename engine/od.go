@@ -1,4 +1,4 @@
-package mx
+package engine
 
 // File: management of output directory.
 // Author: Arne Vansteenkiste
@@ -47,12 +47,5 @@ func SetOD(od string, force bool) {
 			}
 			return nil
 		})
-	}
-}
-
-// called by init()
-func initOD() {
-	if *Flag_od != "" {
-		SetOD(*Flag_od, *Flag_force)
 	}
 }

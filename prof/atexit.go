@@ -1,7 +1,9 @@
-package mx
+package prof
 
 // File: manages functions to be called at program exit
 // Author: Arne Vansteenkiste
+
+import "log"
 
 var atexit []func()
 
@@ -13,7 +15,7 @@ func AtExit(cleanup func()) {
 // Runs all functions stacked by AtExit().
 func Cleanup() {
 	if len(atexit) != 0 {
-		Log("Cleanup")
+		log.Println("cleanup")
 	}
 	for _, f := range atexit {
 		f()

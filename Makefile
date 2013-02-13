@@ -3,11 +3,12 @@ all: nvcc githook 6g #tool
 PREFIX=code.google.com/p/mx3
 
 PKGS=\
-	$(PREFIX)/io\
-	$(PREFIX)/mx\
+	$(PREFIX)/engine\
+	$(PREFIX)/cuda\
+	$(PREFIX)/prof\
 	$(PREFIX)/util\
-	$(PREFIX)/ptx\
 	$(PREFIX)/streams\
+	$(PREFIX)/ptx\
 #	$(PREFIX)/cpu\
 #	$(PREFIX)/uni\
 #	$(PREFIX)/mag\
@@ -15,7 +16,7 @@ PKGS=\
 #	$(PREFIX)/nimble\
 #	$(PREFIX)/core\
 
-$(PREFIX)/mx: nvcc
+$(PREFIX)/ptx: nvcc
 
 .PHONY: nvcc
 nvcc:

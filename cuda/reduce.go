@@ -20,7 +20,7 @@ func reduce1(in *Slice, init float32, f func(in, out cu.DevicePtr, init float32,
 
 // Sum of all elements.
 func Sum(in *Slice) float32 {
-	return reduce1(in, 0, ptx.K_reducesum)
+	return reduce1(in, 0, kernel.K_reducesum)
 }
 
 //

@@ -6,6 +6,8 @@
  	mx3-convert -help
  Example: convert all .dump files to PNG:
  	mx3-convert -png *.dump
+ Example: resize data to a 1 x 32 x 32 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
+ 	mx3-convert -resize 1x32x32 -normalize -omf binary file.dump
 */
 package main
 
@@ -121,7 +123,7 @@ func process(f *data.Slice, name string) {
 	}
 
 	if *flag_omf != "" {
-		out := open(name + ".gplot")
+		out := open(name + ".omf")
 		defer out.Close()
 		dumpOmf(out, f, *flag_omf)
 		haveOutput = true
@@ -155,6 +157,9 @@ func preprocess(f *data.Slice) {
 	}
 	if *flag_normpeak {
 		normpeak(f)
+	}
+	if *flag_resize != "" {
+		resize(f, *flag_resize)
 	}
 	//if *flag_scale != 1{
 	//	rescale(f, *flag_scale)

@@ -9,6 +9,7 @@ PKGS=\
 	$(PREFIX)/util\
 	$(PREFIX)/streams\
 	$(PREFIX)/ptx\
+	$(PREFIX)/draw\
 #	$(PREFIX)/cpu\
 #	$(PREFIX)/uni\
 #	$(PREFIX)/mag\

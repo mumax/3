@@ -231,7 +231,7 @@ func (s *Slice) Host() [][]float32 {
 // Floats returns the data as 3D array,
 // indexed by cell position. Data should be
 // scalar (1 component) and have CPUAccess() == true.
-func (f *Slice) Floats() [][][]float32 {
+func (f *Slice) Scalars() [][][]float32 {
 	x := f.Tensors()
 	if len(x) != 1 {
 		log.Panicf("expecting 1 component, got %v", f.NComp())
@@ -242,13 +242,13 @@ func (f *Slice) Floats() [][][]float32 {
 // Vectors returns the data as 4D array,
 // indexed by component, cell position. Data should have
 // 3 components and have CPUAccess() == true.
-//func (f *Slice) Vectors() [3][][][]float32 {
-//	x := f.Tensors()
-//	if len(x) != 3 {
-//		Panicf("expecting 3 components, got %v", f.NComp())
-//	}
-//	return [3][][][]float32{x[0], x[1], x[2]}
-//}
+func (f *Slice) Vectors() [3][][][]float32 {
+	x := f.Tensors()
+	if len(x) != 3 {
+		log.Panicf("expecting 3 components, got %v", f.NComp())
+	}
+	return [3][][][]float32{x[0], x[1], x[2]}
+}
 
 // Tensors returns the data as 4D array,
 // indexed by component, cell position.

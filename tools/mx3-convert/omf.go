@@ -2,18 +2,18 @@ package main
 
 // OVF2 suport
 // Author: Mykola Dvornik
-// Modified by Arne Vansteenkiste, 2011, 2012.
+// Modified by Arne Vansteenkiste, 2011, 2012, 2013.
 
 import (
-	"code.google.com/p/mx3/dump"
+	"code.google.com/p/mx3/data"
 	"fmt"
 	"io"
-	"os"
+	"log"
 	"strings"
 	"unsafe"
 )
 
-func dumpOmf(file string, q *data.Slice, dataformat string) {
+func dumpOmf(out io.Writer, file string, q *data.Slice, dataformat string) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -21,12 +21,8 @@ func dumpOmf(file string, q *data.Slice, dataformat string) {
 	case "text":
 		dataformat = "Text"
 	default:
-		core.Fatal(fmt.Errorf("Illegal OMF data format: %v", dataformat))
+		log.Fatalf("Illegal OMF data format: %v", dataformat)
 	}
-
-	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	core.Fatal(err)
-	defer out.Close()
 
 	writeOmfHeader(out, q)
 	writeOmfData(out, q, dataformat)
@@ -46,15 +42,15 @@ func writeOmfData(out io.Writer, q *data.Slice, dataformat string) {
 	case "binary 4":
 		writeOmfBinary4(out, q)
 	default:
-		core.Fatal(fmt.Errorf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat))
+		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)
 	}
 	hdr(out, "End", "Data "+dataformat)
 }
 
 // Writes the OMF header
 func writeOmfHeader(out io.Writer, q *data.Slice) {
-	gridsize := q.MeshSize
-	cellsize := q.MeshStep
+	gridsize := q.Mesh().Size()
+	cellsize := q.Mesh().CellSize()
 
 	hdr(out, "OOMMF", "rectangular mesh v1.0")
 	hdr(out, "Segment count", "1")
@@ -62,10 +58,10 @@ func writeOmfHeader(out io.Writer, q *data.Slice) {
 
 	hdr(out, "Begin", "Header")
 
-	dsc(out, "Time", q.Time)
-	hdr(out, "Title", q.DataLabel)
+	dsc(out, "Time", 0) //q.Time) // TODO !!
+	hdr(out, "Title", q.Tag())
 	hdr(out, "meshtype", "rectangular")
-	hdr(out, "meshunit", q.MeshUnit)
+	hdr(out, "meshunit", "m")
 	hdr(out, "xbase", cellsize[Z]/2)
 	hdr(out, "ybase", cellsize[Y]/2)
 	hdr(out, "zbase", cellsize[X]/2)
@@ -92,7 +88,7 @@ func writeOmfHeader(out io.Writer, q *data.Slice) {
 // Writes data in OMF Binary 4 format
 func writeOmfBinary4(out io.Writer, array *data.Slice) {
 	data := array.Tensors()
-	gridsize := array.MeshSize
+	gridsize := array.Mesh().Size()
 
 	var bytes []byte
 
@@ -122,10 +118,10 @@ func writeOmfBinary4(out io.Writer, array *data.Slice) {
 }
 
 // Writes data in OMF Text format
-func writeOmfText(out io.Writer, tens *data.Slice) {
+func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 
 	data := tens.Tensors()
-	gridsize := tens.MeshSize
+	gridsize := tens.Mesh().Size()
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
@@ -133,19 +129,18 @@ func writeOmfText(out io.Writer, tens *data.Slice) {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < tens.NComp(); c++ {
-					_, err := fmt.Fprint(out, data[SwapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
-					core.Fatal(err)
+					_, err = fmt.Fprint(out, data[SwapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
 				}
-				_, err := fmt.Fprint(out, "\n")
-				core.Fatal(err)
+				_, err = fmt.Fprint(out, "\n")
 			}
 		}
 	}
+	return
 }
 
-func floats2bytes(floats []float32) []byte {
-	return (*[4]byte)(unsafe.Pointer(&floats[0]))[:]
-}
+//func floats2bytes(floats []float32) []byte {
+//	return (*[4]byte)(unsafe.Pointer(&floats[0]))[:]
+//}
 
 // Writes a header key/value pair to out:
 // # Key: Value

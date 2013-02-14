@@ -4,55 +4,55 @@ package main
 // Author: Arne Vansteenkiste
 
 import (
+	"bufio"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
-	"fmt"
+	"code.google.com/p/mx3/util"
 	"image"
 	"image/jpeg"
 	"image/png"
-	"os"
-	"path"
+	"io"
+	"log"
 	"strconv"
 )
 
-func dumpImage(f *data.Slice, file string) {
-	var img *image.NRGBA
-	{
-		dim := f.NComp()
-		switch dim {
-		default:
-			core.Fatal(fmt.Errorf("unsupported number of components: %v", dim))
-		case 3:
-			img = DrawVectors(f.Vectors())
-		case 1:
-			min, max := extrema(f.Data)
-			if *flag_min != "auto" {
-				m, err := strconv.ParseFloat(*flag_min, 32)
-				core.Fatal(err)
-				min = float32(m)
-			}
-			if *flag_max != "auto" {
-				m, err := strconv.ParseFloat(*flag_max, 32)
-				core.Fatal(err)
-				max = float32(m)
-			}
-			img = DrawFloats(f.Floats(), min, max)
-		}
-	}
+func dumpPNG(out io.Writer, f *data.Slice) error {
+	img := render(f)
+	buf := bufio.NewWriter(out)
+	defer buf.Flush()
+	return png.Encode(buf, img)
+}
 
-	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	core.Fatal(err)
-	defer out.Close()
+func dumpJPEG(out io.Writer, f *data.Slice) error {
+	img := render(f)
+	buf := bufio.NewWriter(out)
+	defer buf.Flush()
+	return jpeg.Encode(buf, img, &jpeg.Options{100})
+}
 
-	ext := path.Ext(file)
-	switch ext {
+func render(f *data.Slice) *image.NRGBA {
+	dim := f.NComp()
+	switch dim {
 	default:
-		core.Fatal(fmt.Errorf("unsupported image type: %v", ext))
-	case ".png":
-		core.Fatal(png.Encode(out, img))
-	case ".jpg":
-		core.Fatal(jpeg.Encode(out, img, nil))
+		log.Fatalf("unsupported number of components: %v", dim)
+	case 3:
+		return DrawVectors(f.Vectors())
+	case 1:
+		min, max := extrema(f.Host()[0])
+		if *flag_min != "auto" {
+			m, err := strconv.ParseFloat(*flag_min, 32)
+			util.FatalErr(err)
+			min = float32(m)
+		}
+		if *flag_max != "auto" {
+			m, err := strconv.ParseFloat(*flag_max, 32)
+			util.FatalErr(err)
+			max = float32(m)
+		}
+		return DrawFloats(f.Scalars(), min, max)
 	}
+	panic("unreachable")
+	return nil
 }
 
 // Draws rank 4 tensor (3D vector field) as image

@@ -14,6 +14,7 @@ import (
 	"code.google.com/p/mx3/util"
 	"flag"
 	"log"
+	"os"
 	"runtime"
 	"sync"
 )
@@ -38,7 +39,7 @@ var (
 	// TODO: crop, component
 )
 
-var que = make(chan task, 2)
+var que chan task
 var wg sync.WaitGroup
 
 type task struct {
@@ -55,7 +56,8 @@ func main() {
 
 	// start many worker goroutines taking tasks from que
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	ncpu := runtime.NumCPU() - 1
+	ncpu := runtime.GOMAXPROCS(-1)
+	que = make(chan task, ncpu)
 	if ncpu == 0 {
 		ncpu = 1
 	}
@@ -86,41 +88,56 @@ func work() {
 	}
 }
 
+func open(fname string) *os.File {
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	util.FatalErr(err)
+	return f
+}
+
 func process(f *data.Slice, name string) {
 	preprocess(f)
 
 	haveOutput := false
 
 	if *flag_jpeg {
-		dumpImage(f, name+".jpg")
+		out := open(name + ".jpg")
+		defer out.Close()
+		dumpJPEG(out, f)
 		haveOutput = true
 	}
 
 	if *flag_png {
-		dumpImage(f, name+".png")
+		out := open(name + ".png")
+		defer out.Close()
+		dumpPNG(out, f)
 		haveOutput = true
 	}
 
 	if *flag_gnuplot {
-		dumpGnuplot(f, name+".gplot")
+		out := open(name + ".gplot")
+		defer out.Close()
+		dumpGnuplot(out, f)
 		haveOutput = true
 	}
 
-	if *flag_omf != "" {
-		dumpOmf(name+".omf", f, *flag_omf)
-		haveOutput = true
-	}
+	//	if *flag_omf != "" {
+	//		dumpOmf(name+".omf", f, *flag_omf)
+	//		haveOutput = true
+	//	}
+	//
+	//	if *flag_vtk != "" {
+	//		dumpVTK(name+".vtk", f, *flag_vtk)
+	//		haveOutput = true
+	//	}
+	//
+	//	if *flag_dump {
+	//		dumpDump(name+".dump", f)
+	//		haveOutput = true
+	//	}
 
-	if *flag_vtk != "" {
-		dumpVTK(name+".vtk", f, *flag_vtk)
-		haveOutput = true
+	if !haveOutput {
+		log.Fatal("need to specifiy at least one output flag")
 	}
-
-	if *flag_dump {
-		dumpDump(name+".dump", f)
-		haveOutput = true
-	}
-
 	//	if !haveOutput || *flag_show {
 	//		f.Fprintf(os.Stdout, *flag_format)
 	//		haveOutput = true
@@ -140,42 +157,45 @@ func preprocess(f *data.Slice) {
 	//}
 }
 
-//// Transforms the index between user and program space, unless it is a scalar:
-////	X  <-> Z
-////	Y  <-> Y
-////	Z  <-> X
-////	XX <-> ZZ
-////	YY <-> YY
-////	ZZ <-> XX
-////	YZ <-> XY
-////	XZ <-> XZ
-////	XY <-> YZ
-//func SwapIndex(index, dim int) int {
-//	switch dim {
-//	default:
-//		panic(fmt.Errorf("dim=%v", dim))
-//	case 1:
-//		return index
-//	case 3:
-//		return [3]int{Z, Y, X}[index]
-//	case 6:
-//		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
-//	case 9:
-//		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
-//	}
-//	return -1 // silence 6g
-//}
-//
-//// Linear indices for matrix components.
-//// E.g.: matrix[Y][Z] is stored as list[YZ]
-//const (
-//	XX = 0
-//	YY = 1
-//	ZZ = 2
-//	YZ = 3
-//	XZ = 4
-//	XY = 5
-//	ZY = 6
-//	ZX = 7
-//	YX = 8
-//)
+// Transforms the index between user and program space, unless it is a scalar:
+//	X  <-> Z
+//	Y  <-> Y
+//	Z  <-> X
+//	XX <-> ZZ
+//	YY <-> YY
+//	ZZ <-> XX
+//	YZ <-> XY
+//	XZ <-> XZ
+//	XY <-> YZ
+func SwapIndex(index, dim int) int {
+	switch dim {
+	default:
+		log.Panicf("dim=%v", dim)
+	case 1:
+		return index
+	case 3:
+		return [3]int{Z, Y, X}[index]
+	case 6:
+		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
+	case 9:
+		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
+	}
+	return -1 // silence 6g
+}
+
+// Linear indices for matrix components.
+// E.g.: matrix[Y][Z] is stored as list[YZ]
+const (
+	X  = 0
+	Y  = 1
+	Z  = 2
+	XX = 0
+	YY = 1
+	ZZ = 2
+	YZ = 3
+	XZ = 4
+	XY = 5
+	ZY = 6
+	ZX = 7
+	YX = 8
+)

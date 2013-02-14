@@ -1,11 +1,9 @@
-dot test
-
-replace chan by Quant (N-component) and Reader (N-component), no chan1 etc.
-
-replace Slice by Frame, contains 3D size, ncomp, time stamp
+slice time stamp
 
 fuse a standard micromag kernel for at least the local terms. uses inline functions. exchange adds to demag. extra pointers to output buffers , if not NULL, leak intermediate output.  To save memory.
 
 dedicated exchange kernel or optimized stencil.
 
 "make version" updates version number by git commits
+
+vtk binary not working

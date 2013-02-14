@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code.google.com/p/mx3/dump"
+	"code.google.com/p/mx3/data"
 	"math"
 )
 

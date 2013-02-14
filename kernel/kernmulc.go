@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -30,9 +29,7 @@ type kernmulC_args struct {
 	argptr  [13]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for kernmulC.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for kernmulC CUDA kernel. Synchronizes before return.
 func K_kernmulC(Mx cu.DevicePtr, My cu.DevicePtr, Mz cu.DevicePtr, Kxx cu.DevicePtr, Kyy cu.DevicePtr, Kzz cu.DevicePtr, Kyz cu.DevicePtr, Kxz cu.DevicePtr, Kxy cu.DevicePtr, Kzy cu.DevicePtr, Kzx cu.DevicePtr, Kyx cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
 	if kernmulC_code == 0 {
 		kernmulC_code = cu.ModuleLoadData(kernmulC_ptx).GetFunction("kernmulC")
@@ -68,9 +65,9 @@ func K_kernmulC(Mx cu.DevicePtr, My cu.DevicePtr, Mz cu.DevicePtr, Kxx cu.Device
 	a.argptr[12] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(kernmulC_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const kernmulC_ptx = `

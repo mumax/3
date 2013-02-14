@@ -69,6 +69,7 @@ func main() {
 
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
+		log.Println(fname)
 		slice, err := data.ReadSliceFile(fname)
 		if err != nil {
 			log.Println(err)
@@ -84,7 +85,6 @@ func main() {
 
 func work() {
 	for task := range que {
-		log.Println(task.fname)
 		process(task.Slice, task.fname)
 		wg.Done()
 	}

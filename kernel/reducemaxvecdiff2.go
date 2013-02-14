@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -26,9 +25,7 @@ type reducemaxvecdiff2_args struct {
 	argptr      [9]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for reducemaxvecdiff2.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for reducemaxvecdiff2 CUDA kernel. Synchronizes before return.
 func K_reducemaxvecdiff2(x1 cu.DevicePtr, y1 cu.DevicePtr, z1 cu.DevicePtr, x2 cu.DevicePtr, y2 cu.DevicePtr, z2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxvecdiff2_code == 0 {
 		reducemaxvecdiff2_code = cu.ModuleLoadData(reducemaxvecdiff2_ptx).GetFunction("reducemaxvecdiff2")
@@ -56,9 +53,9 @@ func K_reducemaxvecdiff2(x1 cu.DevicePtr, y1 cu.DevicePtr, z1 cu.DevicePtr, x2 c
 	a.argptr[8] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(reducemaxvecdiff2_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const reducemaxvecdiff2_ptx = `

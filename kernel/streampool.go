@@ -1,4 +1,4 @@
-package streams
+package kernel
 
 // File: management of a pool of re-usable CUDA streams.
 // Author: Arne Vansteenkiste
@@ -12,7 +12,10 @@ const streamPoolSize = 64     // number of streams in global pool.
 
 // Returns a CUDA stream from a global pool.
 // After use it should be recycled with SyncAndRecycle.
-func Get() cu.Stream {
+func Stream() cu.Stream {
+	if streamPool == nil {
+		initialize()
+	}
 	return <-streamPool
 }
 
@@ -25,8 +28,7 @@ func SyncAndRecycle(str cu.Stream) {
 	streamPool <- str
 }
 
-// called by init()
-func Init() {
+func initialize() {
 	streamPool = make(chan cu.Stream, streamPoolSize)
 	for i := 0; i < streamPoolSize; i++ {
 		streamPool <- cu.StreamCreate()

@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -21,9 +20,7 @@ type kernmulRSymm2Dx_args struct {
 	argptr     [4]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for kernmulRSymm2Dx.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for kernmulRSymm2Dx CUDA kernel. Synchronizes before return.
 func K_kernmulRSymm2Dx(fftMx cu.DevicePtr, fftKxx cu.DevicePtr, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
 	if kernmulRSymm2Dx_code == 0 {
 		kernmulRSymm2Dx_code = cu.ModuleLoadData(kernmulRSymm2Dx_ptx).GetFunction("kernmulRSymm2Dx")
@@ -41,9 +38,9 @@ func K_kernmulRSymm2Dx(fftMx cu.DevicePtr, fftKxx cu.DevicePtr, N1 int, N2 int, 
 	a.argptr[3] = unsafe.Pointer(&a.arg_N2)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(kernmulRSymm2Dx_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const kernmulRSymm2Dx_ptx = `

@@ -123,7 +123,6 @@ const templText = `package kernel
 import(
 	"unsafe"
 	"github.com/barnex/cuda5/cu"
-	"code.google.com/p/mx3/streams"
 )
 
 var {{.Name}}_code cu.Function
@@ -133,9 +132,7 @@ type {{.Name}}_args struct{
 	{{end}} argptr [{{len .ArgN}}]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for {{.Name}}.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for {{.Name}} CUDA kernel. Synchronizes before return.
 func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
@@ -148,9 +145,9 @@ func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 	{{end}}
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel({{.Name}}_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const {{.Name}}_ptx = {{.PTX}} `

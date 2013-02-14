@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -25,9 +24,7 @@ type copypad_args struct {
 	argptr  [8]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for copypad.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for copypad CUDA kernel. Synchronizes before return.
 func K_copypad(dst cu.DevicePtr, D0 int, D1 int, D2 int, src cu.DevicePtr, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
 	if copypad_code == 0 {
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
@@ -53,9 +50,9 @@ func K_copypad(dst cu.DevicePtr, D0 int, D1 int, D2 int, src cu.DevicePtr, S0 in
 	a.argptr[7] = unsafe.Pointer(&a.arg_S2)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(copypad_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const copypad_ptx = `

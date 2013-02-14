@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -28,9 +27,7 @@ type llgtorque_args struct {
 	argptr    [11]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for llgtorque.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for llgtorque CUDA kernel. Synchronizes before return.
 func K_llgtorque(tx cu.DevicePtr, ty cu.DevicePtr, tz cu.DevicePtr, mx cu.DevicePtr, my cu.DevicePtr, mz cu.DevicePtr, hx cu.DevicePtr, hy cu.DevicePtr, hz cu.DevicePtr, alpha float32, N int, gridDim, blockDim cu.Dim3) {
 	if llgtorque_code == 0 {
 		llgtorque_code = cu.ModuleLoadData(llgtorque_ptx).GetFunction("llgtorque")
@@ -62,9 +59,9 @@ func K_llgtorque(tx cu.DevicePtr, ty cu.DevicePtr, tz cu.DevicePtr, mx cu.Device
 	a.argptr[10] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(llgtorque_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const llgtorque_ptx = `

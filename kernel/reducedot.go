@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -22,9 +21,7 @@ type reducedot_args struct {
 	argptr      [5]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for reducedot.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for reducedot CUDA kernel. Synchronizes before return.
 func K_reducedot(x1 cu.DevicePtr, x2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducedot_code == 0 {
 		reducedot_code = cu.ModuleLoadData(reducedot_ptx).GetFunction("reducedot")
@@ -44,9 +41,9 @@ func K_reducedot(x1 cu.DevicePtr, x2 cu.DevicePtr, dst cu.DevicePtr, initVal flo
 	a.argptr[4] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(reducedot_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const reducedot_ptx = `

@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -21,9 +20,7 @@ type reducemaxabs_args struct {
 	argptr      [4]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for reducemaxabs.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for reducemaxabs CUDA kernel. Synchronizes before return.
 func K_reducemaxabs(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxabs_code == 0 {
 		reducemaxabs_code = cu.ModuleLoadData(reducemaxabs_ptx).GetFunction("reducemaxabs")
@@ -41,9 +38,9 @@ func K_reducemaxabs(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, 
 	a.argptr[3] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(reducemaxabs_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const reducemaxabs_ptx = `

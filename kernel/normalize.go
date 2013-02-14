@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -21,9 +20,7 @@ type normalize_args struct {
 	argptr [4]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for normalize.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for normalize CUDA kernel. Synchronizes before return.
 func K_normalize(vx cu.DevicePtr, vy cu.DevicePtr, vz cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
 	if normalize_code == 0 {
 		normalize_code = cu.ModuleLoadData(normalize_ptx).GetFunction("normalize")
@@ -41,9 +38,9 @@ func K_normalize(vx cu.DevicePtr, vy cu.DevicePtr, vz cu.DevicePtr, N int, gridD
 	a.argptr[3] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(normalize_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const normalize_ptx = `

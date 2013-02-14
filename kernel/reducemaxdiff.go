@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -22,9 +21,7 @@ type reducemaxdiff_args struct {
 	argptr      [5]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for reducemaxdiff.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for reducemaxdiff CUDA kernel. Synchronizes before return.
 func K_reducemaxdiff(src1 cu.DevicePtr, src2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = cu.ModuleLoadData(reducemaxdiff_ptx).GetFunction("reducemaxdiff")
@@ -44,9 +41,9 @@ func K_reducemaxdiff(src1 cu.DevicePtr, src2 cu.DevicePtr, dst cu.DevicePtr, ini
 	a.argptr[4] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(reducemaxdiff_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const reducemaxdiff_ptx = `

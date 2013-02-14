@@ -6,7 +6,6 @@ package kernel
 */
 
 import (
-	"code.google.com/p/mx3/streams"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -25,9 +24,7 @@ type madd3_args struct {
 	argptr   [8]unsafe.Pointer
 }
 
-// CUDA kernel wrapper for madd3.
-// The kernel is launched in a separate stream so that it can be parallel with memcpys etc.
-// The stream is synchronized before this call returns.
+// Wrapper for madd3 CUDA kernel. Synchronizes before return.
 func K_madd3(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePtr, fac2 float32, src3 cu.DevicePtr, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
 	if madd3_code == 0 {
 		madd3_code = cu.ModuleLoadData(madd3_ptx).GetFunction("madd3")
@@ -53,9 +50,9 @@ func K_madd3(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePt
 	a.argptr[7] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := streams.Get()
+	str := Stream()
 	cu.LaunchKernel(madd3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
-	streams.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 const madd3_ptx = `

@@ -5,7 +5,6 @@ package main
 // Modified by Arne Vansteenkiste, 2011, 2012.
 
 import (
-	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/dump"
 	"fmt"
 	"io"
@@ -14,7 +13,7 @@ import (
 	"unsafe"
 )
 
-func dumpOmf(file string, q *dump.Frame, dataformat string) {
+func dumpOmf(file string, q *data.Slice, dataformat string) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -38,7 +37,7 @@ const (
 	OMF_CONTROL_NUMBER = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
 )
 
-func writeOmfData(out io.Writer, q *dump.Frame, dataformat string) {
+func writeOmfData(out io.Writer, q *data.Slice, dataformat string) {
 
 	hdr(out, "Begin", "Data "+dataformat)
 	switch strings.ToLower(dataformat) {
@@ -53,7 +52,7 @@ func writeOmfData(out io.Writer, q *dump.Frame, dataformat string) {
 }
 
 // Writes the OMF header
-func writeOmfHeader(out io.Writer, q *dump.Frame) {
+func writeOmfHeader(out io.Writer, q *data.Slice) {
 	gridsize := q.MeshSize
 	cellsize := q.MeshStep
 
@@ -91,7 +90,7 @@ func writeOmfHeader(out io.Writer, q *dump.Frame) {
 }
 
 // Writes data in OMF Binary 4 format
-func writeOmfBinary4(out io.Writer, array *dump.Frame) {
+func writeOmfBinary4(out io.Writer, array *data.Slice) {
 	data := array.Tensors()
 	gridsize := array.MeshSize
 
@@ -123,7 +122,7 @@ func writeOmfBinary4(out io.Writer, array *dump.Frame) {
 }
 
 // Writes data in OMF Text format
-func writeOmfText(out io.Writer, tens *dump.Frame) {
+func writeOmfText(out io.Writer, tens *data.Slice) {
 
 	data := tens.Tensors()
 	gridsize := tens.MeshSize

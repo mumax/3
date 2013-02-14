@@ -6,7 +6,7 @@ import (
 )
 
 // normalize vector data to given length
-func normalize(f *dump.Frame, length float64) {
+func normalize(f *data.Slice, length float64) {
 	a := f.Vectors()
 	for i := range a[0] {
 		for j := range a[0][i] {
@@ -26,7 +26,7 @@ func normalize(f *dump.Frame, length float64) {
 	}
 }
 
-func normpeak(f *dump.Frame) {
+func normpeak(f *data.Slice) {
 	a := f.Vectors()
 	maxnorm := 0.
 	for i := range a[0] {
@@ -45,7 +45,7 @@ func normpeak(f *dump.Frame) {
 	scale(f, float32(1/maxnorm))
 }
 
-func scale(f *dump.Frame, factor float32) {
+func scale(f *data.Slice, factor float32) {
 	a := f.Vectors()
 	for i := range a[0] {
 		for j := range a[0][i] {

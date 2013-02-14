@@ -4,9 +4,8 @@ package main
 // Author: Arne Vansteenkiste
 
 import (
-	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
-	"code.google.com/p/mx3/dump"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -16,7 +15,7 @@ import (
 	"strconv"
 )
 
-func dumpImage(f *dump.Frame, file string) {
+func dumpImage(f *data.Slice, file string) {
 	var img *image.NRGBA
 	{
 		dim := f.NComp()

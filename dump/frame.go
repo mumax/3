@@ -1,7 +1,6 @@
 package dump
 
 import (
-	"code.google.com/p/mx3/core"
 	"fmt"
 	"io"
 	"os"

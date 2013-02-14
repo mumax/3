@@ -1,3 +1,12 @@
+/*
+ This tool converts binary output files to various formats and allows basic manipulations like crop, rescale...
+ Usage:
+ 	mx3-convert [flags] files
+ For a overview of flags, run:
+ 	mx3-convert -help
+ Example: convert all .dump files to PNG:
+ 	mx3-convert -png *.dump
+*/
 package main
 
 import (
@@ -29,10 +38,6 @@ var (
 	// TODO: crop, component
 )
 
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
-
 var que = make(chan task, 2)
 var wg sync.WaitGroup
 
@@ -42,11 +47,23 @@ type task struct {
 }
 
 func main() {
+	log.SetFlags(0)
 	flag.Parse()
 	if flag.NArg() == 0 {
 		log.Fatal("no input files")
 	}
 
+	// start many worker goroutines taking tasks from que
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	ncpu := runtime.NumCPU() - 1
+	if ncpu == 0 {
+		ncpu = 1
+	}
+	for i := 0; i < ncpu; i++ {
+		go work()
+	}
+
+	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		slice, err := data.ReadSliceFile(fname)
 		if err != nil {
@@ -56,62 +73,73 @@ func main() {
 		wg.Add(1)
 		que <- task{slice, util.NoExt(fname)}
 	}
+
+	// wait for work to finish
 	wg.Wait()
 }
 
-//func process(f *dump.Frame, name string) {
-//	preprocess(f)
-//
-//	haveOutput := false
-//
-//	if *flag_jpeg {
-//		dumpImage(f, core.NoExt(name)+".jpg")
-//		haveOutput = true
-//	}
-//
-//	if *flag_png {
-//		dumpImage(f, core.NoExt(name)+".png")
-//		haveOutput = true
-//	}
-//
-//	if *flag_gnuplot {
-//		dumpGnuplot(f, core.NoExt(name)+".gplot")
-//		haveOutput = true
-//	}
-//
-//	if *flag_omf != "" {
-//		dumpOmf(core.NoExt(name)+".omf", f, *flag_omf)
-//		haveOutput = true
-//	}
-//
-//	if *flag_vtk != "" {
-//		dumpVTK(core.NoExt(name)+".vtk", f, *flag_vtk)
-//		haveOutput = true
-//	}
-//
-//	if *flag_dump {
-//		dumpDump(core.NoExt(name)+".dump", f)
-//		haveOutput = true
-//	}
-//
-//	if !haveOutput || *flag_show {
-//		f.Fprintf(os.Stdout, *flag_format)
-//		haveOutput = true
-//	}
-//}
-//
-//func preprocess(f *dump.Frame) {
-//	if *flag_normalize {
-//		normalize(f, 1)
-//	}
-//	if *flag_normpeak {
-//		normpeak(f)
-//	}
-//	//if *flag_scale != 1{
-//	//	rescale(f, *flag_scale)
-//	//}
-//}
-//
+func work() {
+	for task := range que {
+		log.Println(task.fname)
+		process(task.Slice, task.fname)
+		wg.Done()
+	}
+}
+
+func process(f *data.Slice, name string) {
+	preprocess(f)
+
+	haveOutput := false
+
+	if *flag_jpeg {
+		dumpImage(f, name+".jpg")
+		haveOutput = true
+	}
+
+	if *flag_png {
+		dumpImage(f, name+".png")
+		haveOutput = true
+	}
+
+	if *flag_gnuplot {
+		dumpGnuplot(f, name+".gplot")
+		haveOutput = true
+	}
+
+	if *flag_omf != "" {
+		dumpOmf(name+".omf", f, *flag_omf)
+		haveOutput = true
+	}
+
+	if *flag_vtk != "" {
+		dumpVTK(name+".vtk", f, *flag_vtk)
+		haveOutput = true
+	}
+
+	if *flag_dump {
+		dumpDump(name+".dump", f)
+		haveOutput = true
+	}
+
+	//	if !haveOutput || *flag_show {
+	//		f.Fprintf(os.Stdout, *flag_format)
+	//		haveOutput = true
+	//	}
+
+}
+
+func preprocess(f *data.Slice) {
+	if *flag_normalize {
+		normalize(f, 1)
+	}
+	if *flag_normpeak {
+		normpeak(f)
+	}
+	//if *flag_scale != 1{
+	//	rescale(f, *flag_scale)
+	//}
+}
+
 //// Transforms the index between user and program space, unless it is a scalar:
 ////	X  <-> Z
 ////	Y  <-> Y

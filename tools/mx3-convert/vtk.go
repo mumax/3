@@ -5,7 +5,6 @@ package main
 // Modified by Arne Vansteenkiste, aug. 2012.
 
 import (
-	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/dump"
 	"fmt"
 	"io"
@@ -13,7 +12,7 @@ import (
 	"unsafe"
 )
 
-func dumpVTK(file string, q *dump.Frame, dataformat string) {
+func dumpVTK(file string, q *data.Slice, dataformat string) {
 
 	out, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	core.Fatal(err)
@@ -25,7 +24,7 @@ func dumpVTK(file string, q *dump.Frame, dataformat string) {
 	writeVTKFooter(out)
 }
 
-func writeVTKHeader(out io.Writer, q *dump.Frame) {
+func writeVTKHeader(out io.Writer, q *data.Slice) {
 	gridsize := q.MeshSize
 
 	fmt.Fprintln(out, "<?xml version=\"1.0\"?>")
@@ -34,7 +33,7 @@ func writeVTKHeader(out io.Writer, q *dump.Frame) {
 	fmt.Fprintf(out, "\t\t<Piece Extent=\"0 %d 0 %d 0 %d\">\n", gridsize[Z]-1, gridsize[Y]-1, gridsize[X]-1)
 }
 
-func writeVTKPoints(out io.Writer, q *dump.Frame, dataformat string) {
+func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string) {
 	fmt.Fprintln(out, "\t\t\t<Points>")
 	fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"points\" NumberOfComponents=\"3\" format=\"%s\">\n", dataformat)
 	gridsize := q.MeshSize
@@ -79,7 +78,7 @@ func writeVTKPoints(out io.Writer, q *dump.Frame, dataformat string) {
 	fmt.Fprintln(out, "\t\t\t</Points>")
 }
 
-func writeVTKCellData(out io.Writer, q *dump.Frame, dataformat string) {
+func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) {
 	N := q.NComp()
 	data := q.Tensors()
 	switch N {

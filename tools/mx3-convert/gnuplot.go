@@ -5,13 +5,12 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/core"
 	"code.google.com/p/mx3/dump"
 	"fmt"
 	"os"
 )
 
-func dumpGnuplot(f *dump.Frame, file string) {
+func dumpGnuplot(f *data.Slice, file string) {
 
 	out_, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	core.Fatal(err)

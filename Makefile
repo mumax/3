@@ -7,8 +7,7 @@ PKGS=\
 	$(PREFIX)/cuda\
 	$(PREFIX)/prof\
 	$(PREFIX)/util\
-	$(PREFIX)/streams\
-	$(PREFIX)/ptx\
+	$(PREFIX)/kernel\
 	$(PREFIX)/draw\
 #	$(PREFIX)/cpu\
 #	$(PREFIX)/uni\
@@ -17,11 +16,11 @@ PKGS=\
 #	$(PREFIX)/nimble\
 #	$(PREFIX)/core\
 
-$(PREFIX)/ptx: nvcc
+$(PREFIX)/kernel: nvcc
 
 .PHONY: nvcc
 nvcc:
-	make -C ptx -j8
+	make -C kernel -j8
 
 6g:
 	go install -v $(PKGS)
@@ -69,8 +68,8 @@ gccgobench: gccgo
 clean:
 	go clean -i -x $(PKGS)
 	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/
-	make clean -C ptx
+	make clean -C kernel
 
 .PHONY: count
 count:
-	wc -l *.go */*.go gpu/ptx/*.cu gpu/ptx/cuda2go.go
+	wc -l *.go */*.go gpu/kernel/*.cu gpu/kernel/cuda2go.go

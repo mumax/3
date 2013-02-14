@@ -3,35 +3,32 @@ package data
 import "testing"
 
 func TestSlice(t *testing.T) {
-	LockCudaThread()
 	N := 100
 
-	for _, constructor := range []func(int, int) *Slice{NewSlice, NewUnifiedSlice} {
-		a := constructor(3, N)
-		defer a.Free()
-		a.Memset(1, 2, 3)
-		Log(a)
+	a := NewSlice(3, N)
+	defer a.Free()
+	a.Memset(1, 2, 3)
+	Log(a)
 
-		if a.GPUAccess() == false {
-			t.Fail()
-		}
-		if a.Len() != N {
-			t.Fail()
-		}
-		if a.NComp() != 3 {
-			t.Fail()
-		}
+	if a.GPUAccess() == false {
+		t.Fail()
+	}
+	if a.Len() != N {
+		t.Fail()
+	}
+	if a.NComp() != 3 {
+		t.Fail()
+	}
 
-		b := a.Comp(1)
-		if b.GPUAccess() == false {
-			t.Error("b.GPUAccess", b.GPUAccess())
-		}
-		if b.Len() != N {
-			t.Error("b.Len", b.Len())
-		}
-		if b.NComp() != 1 {
-			t.Error("b.NComp", b.NComp())
-		}
+	b := a.Comp(1)
+	if b.GPUAccess() == false {
+		t.Error("b.GPUAccess", b.GPUAccess())
+	}
+	if b.Len() != N {
+		t.Error("b.Len", b.Len())
+	}
+	if b.NComp() != 1 {
+		t.Error("b.NComp", b.NComp())
 	}
 }
 

@@ -18,6 +18,8 @@ type Slice struct {
 	memType int8
 }
 
+// this package must not depend on CUDA. If CUDA is
+// loaded, these functions are set to cu.MemFree, ...
 var (
 	memFree     func(unsafe.Pointer)
 	memFreeHost func(unsafe.Pointer)

@@ -1,8 +1,7 @@
 package main
 
 import (
-	mxio "code.google.com/p/mx3/io"
-	"code.google.com/p/mx3/mx"
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"flag"
 	"log"
@@ -38,7 +37,7 @@ var que = make(chan task, 2)
 var wg sync.WaitGroup
 
 type task struct {
-	*mx.Slice
+	*data.Slice
 	fname string
 }
 
@@ -49,7 +48,7 @@ func main() {
 	}
 
 	for _, fname := range flag.Args() {
-		slice, err := mxio.ReadSliceFile(fname)
+		slice, err := data.ReadSliceFile(fname)
 		if err != nil {
 			log.Println(err)
 			continue

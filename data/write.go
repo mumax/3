@@ -1,7 +1,6 @@
-package io
+package data
 
 import (
-	"code.google.com/p/mx3/mx"
 	"hash"
 	"hash/crc64"
 	"io"
@@ -10,7 +9,7 @@ import (
 )
 
 // TODO: buffer? benchmark
-func DumpSlice(out io.Writer, s *mx.Slice, time float64) error {
+func DumpSlice(out io.Writer, s *Slice, time float64) error {
 	w := newWriter(out)
 	w.header.Components = s.NComp()
 	w.header.MeshSize = s.Mesh().Size()

@@ -1,14 +1,13 @@
-package io
+package data
 
 import (
 	"bytes"
-	"code.google.com/p/mx3/mx"
 	"testing"
 )
 
-func TestDump(t *testing.T) {
-	mesh := mx.NewMesh(4, 5, 6, 1e-9, 2e-9, 3e-9)
-	slice := mx.NewCPUSlice(3, mesh)
+func TestIO(t *testing.T) {
+	mesh := NewMesh(4, 5, 6, 1e-9, 2e-9, 3e-9)
+	slice := NewSlice(3, mesh)
 	data := slice.Host()
 	for c := range data {
 		for i := range data[c] {

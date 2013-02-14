@@ -1,7 +1,6 @@
-package io
+package data
 
 import (
-	"code.google.com/p/mx3/mx"
 	"fmt"
 	"hash"
 	"hash/crc64"
@@ -11,12 +10,12 @@ import (
 	"unsafe"
 )
 
-func ReadSlice(in io.Reader) (*mx.Slice, error) {
+func ReadSlice(in io.Reader) (*Slice, error) {
 	r := newReader(in)
 	return r.readSlice()
 }
 
-func ReadSliceFile(fname string) (*mx.Slice, error) {
+func ReadSliceFile(fname string) (*Slice, error) {
 	f, err := os.Open(fname)
 	if err != nil {
 		return nil, err
@@ -40,7 +39,7 @@ func newReader(in io.Reader) *reader {
 	return r
 }
 
-func (r *reader) readSlice() (slice *mx.Slice, err error) {
+func (r *reader) readSlice() (slice *Slice, err error) {
 	r.err = nil // clear previous error, if any
 	r.Magic = r.readString()
 	if r.err != nil {
@@ -138,15 +137,15 @@ func (r *reader) readUint64() uint64 {
 
 // read the data array,
 // enlarging the previous one if needed.
-func (r *reader) readData() (*mx.Slice, error) {
+func (r *reader) readData() (*Slice, error) {
 	s := r.MeshSize
 	c := r.MeshStep
-	nComp := r.Components
-	mesh := mx.NewMesh(s[0], s[1], s[2], c[0], c[1], c[2])
+	mesh := NewMesh(s[0], s[1], s[2], c[0], c[1], c[2])
 	length := mesh.NCell()
-	slice := mx.NewCPUSlice(r.Components, mesh)
-	for c := 0; c < nComp; c++ {
-		buf := (*(*[1<<31 - 1]byte)(slice.HostPtr(c)))[0 : 4*length]
+	slice := NewSlice(r.Components, mesh)
+	host := slice.Host()
+	for _, data := range host {
+		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[0 : SIZEOF_FLOAT32*length]
 		r.read(buf)
 	}
 	if r.err == nil {

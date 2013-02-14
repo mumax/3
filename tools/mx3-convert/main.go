@@ -120,16 +120,20 @@ func process(f *data.Slice, name string) {
 		haveOutput = true
 	}
 
-	//	if *flag_omf != "" {
-	//		dumpOmf(name+".omf", f, *flag_omf)
-	//		haveOutput = true
-	//	}
-	//
-	//	if *flag_vtk != "" {
-	//		dumpVTK(name+".vtk", f, *flag_vtk)
-	//		haveOutput = true
-	//	}
-	//
+	if *flag_omf != "" {
+		out := open(name + ".gplot")
+		defer out.Close()
+		dumpOmf(out, f, *flag_omf)
+		haveOutput = true
+	}
+
+	if *flag_vtk != "" {
+		out := open(name + ".vtk")
+		defer out.Close()
+		dumpVTK(out, f, *flag_vtk)
+		haveOutput = true
+	}
+
 	//	if *flag_dump {
 	//		dumpDump(name+".dump", f)
 	//		haveOutput = true
@@ -167,7 +171,7 @@ func preprocess(f *data.Slice) {
 //	YZ <-> XY
 //	XZ <-> XZ
 //	XY <-> YZ
-func SwapIndex(index, dim int) int {
+func swapIndex(index, dim int) int {
 	switch dim {
 	default:
 		log.Panicf("dim=%v", dim)

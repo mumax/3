@@ -36,7 +36,7 @@ func render(f *data.Slice) *image.NRGBA {
 	default:
 		log.Fatalf("unsupported number of components: %v", dim)
 	case 3:
-		return DrawVectors(f.Vectors())
+		return drawVectors(f.Vectors())
 	case 1:
 		min, max := extrema(f.Host()[0])
 		if *flag_min != "auto" {
@@ -49,7 +49,7 @@ func render(f *data.Slice) *image.NRGBA {
 			util.FatalErr(err)
 			max = float32(m)
 		}
-		return DrawFloats(f.Scalars(), min, max)
+		return drawFloats(f.Scalars(), min, max)
 	}
 	panic("unreachable")
 	return nil
@@ -57,7 +57,7 @@ func render(f *data.Slice) *image.NRGBA {
 
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
-func DrawVectors(arr [3][][][]float32) *image.NRGBA {
+func drawVectors(arr [3][][][]float32) *image.NRGBA {
 	h, w := len(arr[0][0]), len(arr[0][0][0])
 	d := len(arr[0])
 	norm := float32(d)
@@ -95,7 +95,7 @@ func extrema(data []float32) (min, max float32) {
 
 // Draws rank 3 tensor (3D scalar field) as image
 // averages data over X (usually thickness of thin film)
-func DrawFloats(arr [][][]float32, min, max float32) *image.NRGBA {
+func drawFloats(arr [][][]float32, min, max float32) *image.NRGBA {
 
 	h, w := len(arr[0]), len(arr[0][0])
 	d := len(arr)

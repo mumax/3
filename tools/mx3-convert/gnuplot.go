@@ -33,7 +33,7 @@ func dumpGnuplot(out io.Writer, f *data.Slice) (err error) {
 				z := float64(k) * cellsize[2]
 				_, err = fmt.Fprint(buf, z, " ", y, " ", x, "\t")
 				for c := 0; c < ncomp; c++ {
-					_, err = fmt.Fprint(buf, data[SwapIndex(c, ncomp)][i][j][k], " ") // converts to user space.
+					_, err = fmt.Fprint(buf, data[swapIndex(c, ncomp)][i][j][k], " ") // converts to user space.
 				}
 				_, err = fmt.Fprint(buf, "\n")
 			}

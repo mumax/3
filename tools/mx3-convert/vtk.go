@@ -95,18 +95,18 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						fmt.Fprint(out, data[SwapIndex(0, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(3, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[SwapIndex(5, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(0, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(1, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(2, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(1, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(3, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(4, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(2, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(4, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[swapIndex(5, 9)][i][j][k], " ")
 					} else {
 						for c := 0; c < N; c++ {
-							fmt.Fprint(out, data[SwapIndex(c, N)][i][j][k], " ")
+							fmt.Fprint(out, data[swapIndex(c, N)][i][j][k], " ")
 						}
 					}
 				}
@@ -120,27 +120,27 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(0, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(0, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(1, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(1, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(2, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(2, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(1, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(1, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(3, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(3, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(4, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(4, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(2, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(2, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(4, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(4, 9)][i][j][k]))[:]
 						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(5, 9)][i][j][k]))[:]
+						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(5, 9)][i][j][k]))[:]
 						out.Write(bytes)
 					} else {
 						for c := 0; c < N; c++ {
-							bytes = (*[4]byte)(unsafe.Pointer(&data[SwapIndex(c, N)][i][j][k]))[:]
+							bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(c, N)][i][j][k]))[:]
 							out.Write(bytes)
 						}
 					}

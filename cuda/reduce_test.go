@@ -47,6 +47,22 @@ func TestReduceMax(t *testing.T) {
 	if result != 999 {
 		t.Error("got:", result)
 	}
+	result = Max(in2)
+	if result != 0 {
+		t.Error("got:", result)
+	}
+}
+
+func TestReduceMin(t *testing.T) {
+	result := Min(in1)
+	if result != 0 {
+		t.Error("got:", result)
+	}
+
+	result = Min(in2)
+	if result != -999.99 {
+		t.Error("got:", result)
+	}
 }
 
 func TestReduceMaxAbs(t *testing.T) {
@@ -71,20 +87,6 @@ func TestReduceMaxAbs(t *testing.T) {
 //	}
 //	result := MaxDiff(input.Device(), input2.Device())
 //	if result != 2000 {
-//		t.Error("got:", result)
-//	}
-//}
-//
-//func TestReduceMin(t *testing.T) {
-//	LockCudaThread()
-//	N := 100
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = float32(i) + 100
-//	}
-//	result := Min(input.Device())
-//	if result != 100 {
 //		t.Error("got:", result)
 //	}
 //}

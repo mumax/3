@@ -4,6 +4,7 @@
 // Atomic min.
 inline __device__ void atomicFmin(float* a, float b){
 	atomicMin((int*)(a), *((int*)(&b)));
+not correct
 }
 
 // Atomic max.

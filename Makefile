@@ -5,16 +5,10 @@ PREFIX=code.google.com/p/mx3
 PKGS=\
 	$(PREFIX)/engine\
 	$(PREFIX)/cuda\
-	$(PREFIX)/prof\
 	$(PREFIX)/util\
 	$(PREFIX)/kernel\
 	$(PREFIX)/draw\
-#	$(PREFIX)/cpu\
-#	$(PREFIX)/uni\
-#	$(PREFIX)/mag\
-#	$(PREFIX)/dump\
-#	$(PREFIX)/nimble\
-#	$(PREFIX)/core\
+# 	$(PREFIX)/prof\
 
 $(PREFIX)/kernel: nvcc
 

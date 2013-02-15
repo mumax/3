@@ -3,16 +3,15 @@
 package main
 
 import (
-	"code.google.com/p/mx3/mx"
+	"code.google.com/p/mx3/cuda"
+	"code.google.com/p/mx3/data"
 )
 
 func main() {
-	defer mx.Cleanup()
-
 	N0, N1, N2 := 2, 16, 32
 	c0, c1, c2 := 1e-9, 1e-9, 1e-9
-	mesh := mx.NewMesh(N0, N1, N2, c0, c1, c2)
+	mesh := data.NewMesh(N0, N1, N2, c0, c1, c2)
 
-	m := mx.NewQuant(mx.VECTOR, "m", "", mesh)
-	m.Data().WriteTo("m.mx3o")
+	m := cuda.NewQuant(3, mesh)
+	m.Data()
 }

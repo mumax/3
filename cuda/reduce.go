@@ -136,7 +136,7 @@ func initReduceBuf() {
 
 // launch configuration for reduce kernels
 func reduceConf() (gridDim, blockDim cu.Dim3) {
-	blockDim = cu.Dim3{512, 1, 1}
+	blockDim = cu.Dim3{kernel.REDUCE_BLOCKSIZE, 1, 1}
 	gridDim = cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
 	// could be improved but takes hardly ~1% of execution time
 	return

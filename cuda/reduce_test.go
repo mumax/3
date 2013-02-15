@@ -14,15 +14,23 @@ func initTest() {
 	}
 	LockThread()
 	Init()
-
 	c := 1e-6
-	m := data.NewMesh(1, 1, 1000, c, c, c)
-	in1 = NewUnifiedSlice(1, m)
-	inh1 := in1.Host()[0]
-	for i := range inh1 {
-		inh1[i] = float32(i)
+	{
+		m := data.NewMesh(1, 1, 1000, c, c, c)
+		in1 = NewUnifiedSlice(1, m)
+		inh1 := in1.Host()[0]
+		for i := range inh1 {
+			inh1[i] = float32(i)
+		}
 	}
-
+	{
+		m := data.NewMesh(1, 1, 100000, c, c, c)
+		in2 = NewUnifiedSlice(1, m)
+		inh2 := in2.Host()[0]
+		for i := range inh2 {
+			inh2[i] = -float32(i) / 100
+		}
+	}
 }
 
 func TestReduceSum(t *testing.T) {
@@ -41,20 +49,13 @@ func TestReduceMax(t *testing.T) {
 	}
 }
 
-//func TestReduceMaxAbs(t *testing.T) {
-//	LockCudaThread()
-//	N := 100000
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = -float32(i) / 100
-//	}
-//	result := MaxAbs(input.Device())
-//	if result != 999.99 {
-//		t.Error("got:", result)
-//	}
-//}
-//
+func TestReduceMaxAbs(t *testing.T) {
+	result := MaxAbs(in2)
+	if result != 999.99 {
+		t.Error("got:", result)
+	}
+}
+
 //func TestReduceMaxDiff(t *testing.T) {
 //	LockCudaThread()
 //	N := 100001

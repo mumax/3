@@ -34,11 +34,11 @@ func Min(in *data.Slice) float32 {
 	return reduce1(in, math.MaxFloat32, kernel.K_reducemin)
 }
 
-//// Maximum of absolute values of all elements.
-//func MaxAbs(in safe.Float32s) float32 {
-//	return reduce1(in, 0, ptx.K_reducemaxabs)
-//}
-//
+// Maximum of absolute values of all elements.
+func MaxAbs(in *data.Slice) float32 {
+	return reduce1(in, 0, kernel.K_reducemaxabs)
+}
+
 //// Maximum difference between the two arrays.
 //// 	max_i abs(a[i] - b[i])
 //func MaxDiff(a, b safe.Float32s) float32 {

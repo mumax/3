@@ -5,10 +5,8 @@ package engine
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"runtime"
-	"time"
 )
 
 var (
@@ -23,8 +21,6 @@ var (
 
 func Init() {
 	flag.Parse()
-
-	initTiming()
 
 	log.SetPrefix("")
 	log.SetFlags(0)
@@ -49,6 +45,6 @@ func Init() {
 
 type devnul struct{}
 
-func (d devnul) Write(b []byte) (int64, error) {
+func (d devnul) Write(b []byte) (int, error) {
 	return len(b), nil
 }

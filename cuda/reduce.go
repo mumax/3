@@ -11,10 +11,10 @@ import (
 
 // general reduce wrapper for one input array
 func reduce1(in *data.Slice, init float32, f func(in, out unsafe.Pointer, init float32, N int, grid, block cu.Dim3)) float32 {
+	util.Argument(in.NComp() == 1)
 	out := reduceBuf(init)
 	defer reduceRecycle(out)
 	gr, bl := reduceConf()
-	util.Argument(in.NComp() == 1)
 	f(in.DevPtr(0), unsafe.Pointer(out), init, in.Len(), gr, bl)
 	return copyback(out)
 }
@@ -24,17 +24,16 @@ func Sum(in *data.Slice) float32 {
 	return reduce1(in, 0, kernel.K_reducesum)
 }
 
-//
-//// Maximum of all elements.
-//func Max(in safe.Float32s) float32 {
-//	return reduce1(in, -math.MaxFloat32, ptx.K_reducemax)
-//}
-//
-//// Minimum of all elements.
-//func Min(in safe.Float32s) float32 {
-//	return reduce1(in, math.MaxFloat32, ptx.K_reducemin)
-//}
-//
+// Maximum of all elements.
+func Max(in *data.Slice) float32 {
+	return reduce1(in, -math.MaxFloat32, kernel.K_reducemax)
+}
+
+// Minimum of all elements.
+func Min(in *data.Slice) float32 {
+	return reduce1(in, math.MaxFloat32, kernel.K_reducemin)
+}
+
 //// Maximum of absolute values of all elements.
 //func MaxAbs(in safe.Float32s) float32 {
 //	return reduce1(in, 0, ptx.K_reducemaxabs)

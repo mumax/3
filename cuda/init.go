@@ -18,6 +18,9 @@ var (
 var cudaCtx cu.Context // gpu context to be used by all threads
 
 func Init() {
+	if cudaCtx != 0 {
+		return // already inited
+	}
 	var flag uint
 	switch *Flag_sched {
 	default:

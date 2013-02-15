@@ -48,6 +48,7 @@ func memAlloc(bytes int64) unsafe.Pointer {
 	return unsafe.Pointer(cu.MemAlloc(bytes))
 }
 
+// Memset sets the Slice's components to the specified values.
 func Memset(s *data.Slice, val ...float32) {
 	util.Argument(len(val) == s.NComp())
 	str := kernel.Stream()

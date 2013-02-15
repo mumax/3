@@ -1,38 +1,46 @@
 package cuda
 
-//import (
-//	"math"
-//	"testing"
-//)
-//
-//func TestReduceSum(t *testing.T) {
-//	LockCudaThread()
-//	N := 1000
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = float32(i)
-//	}
-//	result := Sum(input.Device())
-//	if result != 499500 {
-//		t.Error("got:", result)
-//	}
-//}
-//
-//func TestReduceMax(t *testing.T) {
-//	LockCudaThread()
-//	N := 100000
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = float32(i) / 100
-//	}
-//	result := Max(input.Device())
-//	if result != 999.99 {
-//		t.Error("got:", result)
-//	}
-//}
-//
+import (
+	"code.google.com/p/mx3/data"
+	"testing"
+)
+
+// test input data
+var in1, in2, in3 *data.Slice
+
+func initTest() {
+	if in1 != nil {
+		return
+	}
+	LockThread()
+	Init()
+
+	c := 1e-6
+	m := data.NewMesh(1, 1, 1000, c, c, c)
+	in1 = NewUnifiedSlice(1, m)
+	inh1 := in1.Host()[0]
+	for i := range inh1 {
+		inh1[i] = float32(i)
+	}
+
+}
+
+func TestReduceSum(t *testing.T) {
+	initTest()
+	result := Sum(in1)
+	if result != 499500 {
+		t.Error("got:", result)
+	}
+}
+
+func TestReduceMax(t *testing.T) {
+	initTest()
+	result := Max(in1)
+	if result != 999 {
+		t.Error("got:", result)
+	}
+}
+
 //func TestReduceMaxAbs(t *testing.T) {
 //	LockCudaThread()
 //	N := 100000

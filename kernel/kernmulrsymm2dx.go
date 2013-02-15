@@ -13,15 +13,15 @@ import (
 var kernmulRSymm2Dx_code cu.Function
 
 type kernmulRSymm2Dx_args struct {
-	arg_fftMx  cu.DevicePtr
-	arg_fftKxx cu.DevicePtr
+	arg_fftMx  unsafe.Pointer
+	arg_fftKxx unsafe.Pointer
 	arg_N1     int
 	arg_N2     int
 	argptr     [4]unsafe.Pointer
 }
 
 // Wrapper for kernmulRSymm2Dx CUDA kernel. Synchronizes before return.
-func K_kernmulRSymm2Dx(fftMx cu.DevicePtr, fftKxx cu.DevicePtr, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+func K_kernmulRSymm2Dx(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
 	if kernmulRSymm2Dx_code == 0 {
 		kernmulRSymm2Dx_code = cu.ModuleLoadData(kernmulRSymm2Dx_ptx).GetFunction("kernmulRSymm2Dx")
 	}

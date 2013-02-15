@@ -53,12 +53,28 @@ var (
 
 // Make a CPU Slice with nComp components of size length.
 func NewSlice(nComp int, m *Mesh) *Slice {
-	s := newSlice(nComp, m)
 	length := m.NCell()
-	for c := range s.ptrs {
-		s.ptrs[c] = unsafe.Pointer(&(make([]float32, length)[0]))
+	ptrs := make([]unsafe.Pointer, nComp)
+	for i := range ptrs {
+		ptrs[i] = unsafe.Pointer(&(make([]float32, length)[0]))
 	}
-	s.memType = CPUMemory
+	return SliceFromPtrs(m, CPUMemory, ptrs)
+}
+
+// Internal: construct a Slice using bare memory pointers. Used by cuda.
+func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
+	length := m.NCell()
+	nComp := len(ptrs)
+	argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
+	s := new(Slice)
+	s.ptrs = s.ptr_[:nComp]
+	s.len_ = int32(length)
+	s.info = new(info)
+	s.info.mesh = *m
+	for c := range ptrs {
+		s.ptrs[c] = ptrs[c]
+	}
+	s.memType = memType
 	return s
 }
 
@@ -76,17 +92,6 @@ func NewSlice(nComp int, m *Mesh) *Slice {
 //	panic("unreachable")
 //	return nil
 //}
-
-func newSlice(nComp int, m *Mesh) *Slice {
-	length := m.NCell()
-	argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
-	s := new(Slice)
-	s.ptrs = s.ptr_[:nComp]
-	s.len_ = int32(length)
-	s.info = new(info)
-	s.info.mesh = *m
-	return s
-}
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
 

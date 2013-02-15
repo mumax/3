@@ -13,16 +13,16 @@ import (
 var reducemaxdiff_code cu.Function
 
 type reducemaxdiff_args struct {
-	arg_src1    cu.DevicePtr
-	arg_src2    cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_src1    unsafe.Pointer
+	arg_src2    unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [5]unsafe.Pointer
 }
 
 // Wrapper for reducemaxdiff CUDA kernel. Synchronizes before return.
-func K_reducemaxdiff(src1 cu.DevicePtr, src2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = cu.ModuleLoadData(reducemaxdiff_ptx).GetFunction("reducemaxdiff")
 	}

@@ -13,16 +13,16 @@ import (
 var reducedot_code cu.Function
 
 type reducedot_args struct {
-	arg_x1      cu.DevicePtr
-	arg_x2      cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_x1      unsafe.Pointer
+	arg_x2      unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [5]unsafe.Pointer
 }
 
 // Wrapper for reducedot CUDA kernel. Synchronizes before return.
-func K_reducedot(x1 cu.DevicePtr, x2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducedot(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducedot_code == 0 {
 		reducedot_code = cu.ModuleLoadData(reducedot_ptx).GetFunction("reducedot")
 	}

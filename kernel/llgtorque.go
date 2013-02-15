@@ -13,22 +13,22 @@ import (
 var llgtorque_code cu.Function
 
 type llgtorque_args struct {
-	arg_tx    cu.DevicePtr
-	arg_ty    cu.DevicePtr
-	arg_tz    cu.DevicePtr
-	arg_mx    cu.DevicePtr
-	arg_my    cu.DevicePtr
-	arg_mz    cu.DevicePtr
-	arg_hx    cu.DevicePtr
-	arg_hy    cu.DevicePtr
-	arg_hz    cu.DevicePtr
+	arg_tx    unsafe.Pointer
+	arg_ty    unsafe.Pointer
+	arg_tz    unsafe.Pointer
+	arg_mx    unsafe.Pointer
+	arg_my    unsafe.Pointer
+	arg_mz    unsafe.Pointer
+	arg_hx    unsafe.Pointer
+	arg_hy    unsafe.Pointer
+	arg_hz    unsafe.Pointer
 	arg_alpha float32
 	arg_N     int
 	argptr    [11]unsafe.Pointer
 }
 
 // Wrapper for llgtorque CUDA kernel. Synchronizes before return.
-func K_llgtorque(tx cu.DevicePtr, ty cu.DevicePtr, tz cu.DevicePtr, mx cu.DevicePtr, my cu.DevicePtr, mz cu.DevicePtr, hx cu.DevicePtr, hy cu.DevicePtr, hz cu.DevicePtr, alpha float32, N int, gridDim, blockDim cu.Dim3) {
+func K_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, gridDim, blockDim cu.Dim3) {
 	if llgtorque_code == 0 {
 		llgtorque_code = cu.ModuleLoadData(llgtorque_ptx).GetFunction("llgtorque")
 	}

@@ -1,25 +1,26 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/ptx"
-	"code.google.com/p/mx3/streams"
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/kernel"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"math"
 	"unsafe"
 )
 
 // general reduce wrapper for one input array
-func reduce1(in *Slice, init float32, f func(in, out cu.DevicePtr, init float32, N int, grid, block cu.Dim3)) float32 {
+func reduce1(in *data.Slice, init float32, f func(in, out unsafe.Pointer, init float32, N int, grid, block cu.Dim3)) float32 {
 	out := reduceBuf(init)
 	defer reduceRecycle(out)
 	gr, bl := reduceConf()
-	Argument(in.NComp() == 1)
-	f(in.DevPtr(0), out, init, in.Len(), gr, bl)
+	util.Argument(in.NComp() == 1)
+	f(in.DevPtr(0), unsafe.Pointer(out), init, in.Len(), gr, bl)
 	return copyback(out)
 }
 
 // Sum of all elements.
-func Sum(in *Slice) float32 {
+func Sum(in *data.Slice) float32 {
 	return reduce1(in, 0, kernel.K_reducesum)
 }
 
@@ -112,9 +113,9 @@ func reduceBuf(initVal float32) cu.DevicePtr {
 		initReduceBuf()
 	}
 	buf := <-reduceBuffers
-	str := streams.Get()
+	str := kernel.Stream()
 	cu.MemsetD32Async(buf, math.Float32bits(initVal), 1, str)
-	streams.SyncAndRecycle(str)
+	kernel.SyncAndRecycle(str)
 	return buf
 }
 

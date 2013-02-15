@@ -13,15 +13,15 @@ import (
 var normalize_code cu.Function
 
 type normalize_args struct {
-	arg_vx cu.DevicePtr
-	arg_vy cu.DevicePtr
-	arg_vz cu.DevicePtr
+	arg_vx unsafe.Pointer
+	arg_vy unsafe.Pointer
+	arg_vz unsafe.Pointer
 	arg_N  int
 	argptr [4]unsafe.Pointer
 }
 
 // Wrapper for normalize CUDA kernel. Synchronizes before return.
-func K_normalize(vx cu.DevicePtr, vy cu.DevicePtr, vz cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
+func K_normalize(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, N int, gridDim, blockDim cu.Dim3) {
 	if normalize_code == 0 {
 		normalize_code = cu.ModuleLoadData(normalize_ptx).GetFunction("normalize")
 	}

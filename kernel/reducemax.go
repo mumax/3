@@ -13,15 +13,15 @@ import (
 var reducemax_code cu.Function
 
 type reducemax_args struct {
-	arg_src     cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_src     unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [4]unsafe.Pointer
 }
 
 // Wrapper for reducemax CUDA kernel. Synchronizes before return.
-func K_reducemax(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducemax(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemax_code == 0 {
 		reducemax_code = cu.ModuleLoadData(reducemax_ptx).GetFunction("reducemax")
 	}

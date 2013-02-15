@@ -13,15 +13,15 @@ import (
 var reducemin_code cu.Function
 
 type reducemin_args struct {
-	arg_src     cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_src     unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [4]unsafe.Pointer
 }
 
 // Wrapper for reducemin CUDA kernel. Synchronizes before return.
-func K_reducemin(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducemin(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemin_code == 0 {
 		reducemin_code = cu.ModuleLoadData(reducemin_ptx).GetFunction("reducemin")
 	}

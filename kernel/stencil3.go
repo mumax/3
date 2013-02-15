@@ -13,8 +13,8 @@ import (
 var stencil3_code cu.Function
 
 type stencil3_args struct {
-	arg_dst   cu.DevicePtr
-	arg_src   cu.DevicePtr
+	arg_dst   unsafe.Pointer
+	arg_src   unsafe.Pointer
 	arg_w0    float32
 	arg_wt    float32
 	arg_wb    float32
@@ -32,7 +32,7 @@ type stencil3_args struct {
 }
 
 // Wrapper for stencil3 CUDA kernel. Synchronizes before return.
-func K_stencil3(dst cu.DevicePtr, src cu.DevicePtr, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+func K_stencil3(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
 	if stencil3_code == 0 {
 		stencil3_code = cu.ModuleLoadData(stencil3_ptx).GetFunction("stencil3")
 	}

@@ -13,15 +13,15 @@ import (
 var kernmulRSymm3D_code cu.Function
 
 type kernmulRSymm3D_args struct {
-	arg_fftMx  cu.DevicePtr
-	arg_fftMy  cu.DevicePtr
-	arg_fftMz  cu.DevicePtr
-	arg_fftKxx cu.DevicePtr
-	arg_fftKyy cu.DevicePtr
-	arg_fftKzz cu.DevicePtr
-	arg_fftKyz cu.DevicePtr
-	arg_fftKxz cu.DevicePtr
-	arg_fftKxy cu.DevicePtr
+	arg_fftMx  unsafe.Pointer
+	arg_fftMy  unsafe.Pointer
+	arg_fftMz  unsafe.Pointer
+	arg_fftKxx unsafe.Pointer
+	arg_fftKyy unsafe.Pointer
+	arg_fftKzz unsafe.Pointer
+	arg_fftKyz unsafe.Pointer
+	arg_fftKxz unsafe.Pointer
+	arg_fftKxy unsafe.Pointer
 	arg_N0     int
 	arg_N1     int
 	arg_N2     int
@@ -29,7 +29,7 @@ type kernmulRSymm3D_args struct {
 }
 
 // Wrapper for kernmulRSymm3D CUDA kernel. Synchronizes before return.
-func K_kernmulRSymm3D(fftMx cu.DevicePtr, fftMy cu.DevicePtr, fftMz cu.DevicePtr, fftKxx cu.DevicePtr, fftKyy cu.DevicePtr, fftKzz cu.DevicePtr, fftKyz cu.DevicePtr, fftKxz cu.DevicePtr, fftKxy cu.DevicePtr, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+func K_kernmulRSymm3D(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
 	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = cu.ModuleLoadData(kernmulRSymm3D_ptx).GetFunction("kernmulRSymm3D")
 	}

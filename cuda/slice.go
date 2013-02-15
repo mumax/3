@@ -18,7 +18,7 @@ func NewSlice(nComp int, m *data.Mesh) *data.Slice {
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
+func NewUnifiedSlice(nComp int, m *Mesh) *data.Slice {
 	s := newSlice(nComp, m)
 	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32

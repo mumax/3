@@ -13,20 +13,20 @@ import (
 var reducemaxvecdiff2_code cu.Function
 
 type reducemaxvecdiff2_args struct {
-	arg_x1      cu.DevicePtr
-	arg_y1      cu.DevicePtr
-	arg_z1      cu.DevicePtr
-	arg_x2      cu.DevicePtr
-	arg_y2      cu.DevicePtr
-	arg_z2      cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_x1      unsafe.Pointer
+	arg_y1      unsafe.Pointer
+	arg_z1      unsafe.Pointer
+	arg_x2      unsafe.Pointer
+	arg_y2      unsafe.Pointer
+	arg_z2      unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [9]unsafe.Pointer
 }
 
 // Wrapper for reducemaxvecdiff2 CUDA kernel. Synchronizes before return.
-func K_reducemaxvecdiff2(x1 cu.DevicePtr, y1 cu.DevicePtr, z1 cu.DevicePtr, x2 cu.DevicePtr, y2 cu.DevicePtr, z2 cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducemaxvecdiff2(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.Pointer, x2 unsafe.Pointer, y2 unsafe.Pointer, z2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxvecdiff2_code == 0 {
 		reducemaxvecdiff2_code = cu.ModuleLoadData(reducemaxvecdiff2_ptx).GetFunction("reducemaxvecdiff2")
 	}

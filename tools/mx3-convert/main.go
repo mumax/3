@@ -35,7 +35,7 @@ var (
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
-	flag_o         = flag.String("o", "", "Set output file name format. %v is replaced by input file. E.g.: scaled_%v")
+	flag_o         = flag.String("o", "%v", "Set output file base name. %v is replaced by input name, extension automatically added.")
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
 	//flag_force     = flag.Bool("f", false, "Force overwrite of existing files")
 	// TODO: crop, component

@@ -1,4 +1,4 @@
-package data
+package cuda
 
 import "testing"
 

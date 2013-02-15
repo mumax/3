@@ -13,17 +13,17 @@ import (
 var madd2_code cu.Function
 
 type madd2_args struct {
-	arg_dst  cu.DevicePtr
-	arg_src1 cu.DevicePtr
+	arg_dst  unsafe.Pointer
+	arg_src1 unsafe.Pointer
 	arg_fac1 float32
-	arg_src2 cu.DevicePtr
+	arg_src2 unsafe.Pointer
 	arg_fac2 float32
 	arg_N    int
 	argptr   [6]unsafe.Pointer
 }
 
 // Wrapper for madd2 CUDA kernel. Synchronizes before return.
-func K_madd2(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePtr, fac2 float32, N int, gridDim, blockDim cu.Dim3) {
+func K_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, gridDim, blockDim cu.Dim3) {
 	if madd2_code == 0 {
 		madd2_code = cu.ModuleLoadData(madd2_ptx).GetFunction("madd2")
 	}

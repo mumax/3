@@ -13,15 +13,15 @@ import (
 var reducesum_code cu.Function
 
 type reducesum_args struct {
-	arg_src     cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_src     unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [4]unsafe.Pointer
 }
 
 // Wrapper for reducesum CUDA kernel. Synchronizes before return.
-func K_reducesum(src cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducesum_code == 0 {
 		reducesum_code = cu.ModuleLoadData(reducesum_ptx).GetFunction("reducesum")
 	}

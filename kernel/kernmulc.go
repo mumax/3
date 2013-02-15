@@ -13,24 +13,24 @@ import (
 var kernmulC_code cu.Function
 
 type kernmulC_args struct {
-	arg_Mx  cu.DevicePtr
-	arg_My  cu.DevicePtr
-	arg_Mz  cu.DevicePtr
-	arg_Kxx cu.DevicePtr
-	arg_Kyy cu.DevicePtr
-	arg_Kzz cu.DevicePtr
-	arg_Kyz cu.DevicePtr
-	arg_Kxz cu.DevicePtr
-	arg_Kxy cu.DevicePtr
-	arg_Kzy cu.DevicePtr
-	arg_Kzx cu.DevicePtr
-	arg_Kyx cu.DevicePtr
+	arg_Mx  unsafe.Pointer
+	arg_My  unsafe.Pointer
+	arg_Mz  unsafe.Pointer
+	arg_Kxx unsafe.Pointer
+	arg_Kyy unsafe.Pointer
+	arg_Kzz unsafe.Pointer
+	arg_Kyz unsafe.Pointer
+	arg_Kxz unsafe.Pointer
+	arg_Kxy unsafe.Pointer
+	arg_Kzy unsafe.Pointer
+	arg_Kzx unsafe.Pointer
+	arg_Kyx unsafe.Pointer
 	arg_N   int
 	argptr  [13]unsafe.Pointer
 }
 
 // Wrapper for kernmulC CUDA kernel. Synchronizes before return.
-func K_kernmulC(Mx cu.DevicePtr, My cu.DevicePtr, Mz cu.DevicePtr, Kxx cu.DevicePtr, Kyy cu.DevicePtr, Kzz cu.DevicePtr, Kyz cu.DevicePtr, Kxz cu.DevicePtr, Kxy cu.DevicePtr, Kzy cu.DevicePtr, Kzx cu.DevicePtr, Kyx cu.DevicePtr, N int, gridDim, blockDim cu.Dim3) {
+func K_kernmulC(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx unsafe.Pointer, Kyy unsafe.Pointer, Kzz unsafe.Pointer, Kyz unsafe.Pointer, Kxz unsafe.Pointer, Kxy unsafe.Pointer, Kzy unsafe.Pointer, Kzx unsafe.Pointer, Kyx unsafe.Pointer, N int, gridDim, blockDim cu.Dim3) {
 	if kernmulC_code == 0 {
 		kernmulC_code = cu.ModuleLoadData(kernmulC_ptx).GetFunction("kernmulC")
 	}

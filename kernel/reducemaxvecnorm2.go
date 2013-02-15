@@ -13,17 +13,17 @@ import (
 var reducemaxvecnorm2_code cu.Function
 
 type reducemaxvecnorm2_args struct {
-	arg_x       cu.DevicePtr
-	arg_y       cu.DevicePtr
-	arg_z       cu.DevicePtr
-	arg_dst     cu.DevicePtr
+	arg_x       unsafe.Pointer
+	arg_y       unsafe.Pointer
+	arg_z       unsafe.Pointer
+	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [6]unsafe.Pointer
 }
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel. Synchronizes before return.
-func K_reducemaxvecnorm2(x cu.DevicePtr, y cu.DevicePtr, z cu.DevicePtr, dst cu.DevicePtr, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+func K_reducemaxvecnorm2(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
 	if reducemaxvecnorm2_code == 0 {
 		reducemaxvecnorm2_code = cu.ModuleLoadData(reducemaxvecnorm2_ptx).GetFunction("reducemaxvecnorm2")
 	}

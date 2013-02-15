@@ -13,19 +13,19 @@ import (
 var madd3_code cu.Function
 
 type madd3_args struct {
-	arg_dst  cu.DevicePtr
-	arg_src1 cu.DevicePtr
+	arg_dst  unsafe.Pointer
+	arg_src1 unsafe.Pointer
 	arg_fac1 float32
-	arg_src2 cu.DevicePtr
+	arg_src2 unsafe.Pointer
 	arg_fac2 float32
-	arg_src3 cu.DevicePtr
+	arg_src3 unsafe.Pointer
 	arg_fac3 float32
 	arg_N    int
 	argptr   [8]unsafe.Pointer
 }
 
 // Wrapper for madd3 CUDA kernel. Synchronizes before return.
-func K_madd3(dst cu.DevicePtr, src1 cu.DevicePtr, fac1 float32, src2 cu.DevicePtr, fac2 float32, src3 cu.DevicePtr, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
+func K_madd3(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
 	if madd3_code == 0 {
 		madd3_code = cu.ModuleLoadData(madd3_ptx).GetFunction("madd3")
 	}

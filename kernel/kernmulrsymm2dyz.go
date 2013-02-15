@@ -13,18 +13,18 @@ import (
 var kernmulRSymm2Dyz_code cu.Function
 
 type kernmulRSymm2Dyz_args struct {
-	arg_fftMy  cu.DevicePtr
-	arg_fftMz  cu.DevicePtr
-	arg_fftKyy cu.DevicePtr
-	arg_fftKzz cu.DevicePtr
-	arg_fftKyz cu.DevicePtr
+	arg_fftMy  unsafe.Pointer
+	arg_fftMz  unsafe.Pointer
+	arg_fftKyy unsafe.Pointer
+	arg_fftKzz unsafe.Pointer
+	arg_fftKyz unsafe.Pointer
 	arg_N1     int
 	arg_N2     int
 	argptr     [7]unsafe.Pointer
 }
 
 // Wrapper for kernmulRSymm2Dyz CUDA kernel. Synchronizes before return.
-func K_kernmulRSymm2Dyz(fftMy cu.DevicePtr, fftMz cu.DevicePtr, fftKyy cu.DevicePtr, fftKzz cu.DevicePtr, fftKyz cu.DevicePtr, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+func K_kernmulRSymm2Dyz(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
 	if kernmulRSymm2Dyz_code == 0 {
 		kernmulRSymm2Dyz_code = cu.ModuleLoadData(kernmulRSymm2Dyz_ptx).GetFunction("kernmulRSymm2Dyz")
 	}

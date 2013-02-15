@@ -13,11 +13,11 @@ import (
 var copypad_code cu.Function
 
 type copypad_args struct {
-	arg_dst cu.DevicePtr
+	arg_dst unsafe.Pointer
 	arg_D0  int
 	arg_D1  int
 	arg_D2  int
-	arg_src cu.DevicePtr
+	arg_src unsafe.Pointer
 	arg_S0  int
 	arg_S1  int
 	arg_S2  int
@@ -25,7 +25,7 @@ type copypad_args struct {
 }
 
 // Wrapper for copypad CUDA kernel. Synchronizes before return.
-func K_copypad(dst cu.DevicePtr, D0 int, D1 int, D2 int, src cu.DevicePtr, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
+func K_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
 	if copypad_code == 0 {
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
 	}

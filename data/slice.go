@@ -25,6 +25,12 @@ var (
 	memFreeHost func(unsafe.Pointer)
 )
 
+// Internal: enables slices on GPU. Called upon cuda init.
+func EnableGPU(free, freeHost func(unsafe.Pointer)) {
+	memFree = free
+	memFreeHost = freeHost
+}
+
 // Make a GPU Slice with nComp components each of size length.
 //func NewGPUSlice(nComp int, m *Mesh) *Slice {
 //	s := newSlice(nComp, m)

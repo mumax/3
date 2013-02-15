@@ -12,15 +12,16 @@ import (
 
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, memAlloc)
+	return newSlice(nComp, m, memAlloc, data.GPUMemory)
 }
 
 // Make a GPU Slice with nComp components each of size length.
 func NewUnifiedSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, cu.MemAllocHost)
+	return newSlice(nComp, m, cu.MemAllocHost, data.UnifiedMemory)
 }
 
-func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer) *data.Slice {
+func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
+	data.EnableGPU(memFree, cu.MemFreeHost)
 	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	ptrs := make([]unsafe.Pointer, nComp)
@@ -28,8 +29,10 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer) *data.S
 		ptrs[c] = unsafe.Pointer(alloc(bytes))
 		cu.MemsetD32(cu.DevicePtr(ptrs[c]), 0, int64(length))
 	}
-	return data.SliceFromPtrs(m, data.GPUMemory, ptrs)
+	return data.SliceFromPtrs(m, memType, ptrs)
 }
+
+func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(ptr)) }
 
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.
 func memAlloc(bytes int64) unsafe.Pointer {

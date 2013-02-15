@@ -2,14 +2,17 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/kernel"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
+	"math"
 	"unsafe"
 )
 
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, MemAlloc)
+	return newSlice(nComp, m, memAlloc)
 }
 
 // Make a GPU Slice with nComp components each of size length.
@@ -29,7 +32,7 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer) *data.S
 }
 
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.
-func MemAlloc(bytes int64) unsafe.Pointer {
+func memAlloc(bytes int64) unsafe.Pointer {
 	defer func() {
 		err := recover()
 		if err == cu.ERROR_OUT_OF_MEMORY {
@@ -40,4 +43,13 @@ func MemAlloc(bytes int64) unsafe.Pointer {
 		}
 	}()
 	return unsafe.Pointer(cu.MemAlloc(bytes))
+}
+
+func Memset(s *data.Slice, val ...float32) {
+	util.Argument(len(val) == s.NComp())
+	str := kernel.Stream()
+	for c, v := range val {
+		cu.MemsetD32Async(cu.DevicePtr(s.DevPtr(c)), math.Float32bits(v), int64(s.Len()), str)
+	}
+	kernel.SyncAndRecycle(str)
 }

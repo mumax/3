@@ -208,12 +208,6 @@ const SIZEOF_FLOAT32 = 4
 
 // Set the entire slice to this value, component by component.
 //func (s *Slice) Memset(val ...float32) {
-//	Argument(len(val) == s.NComp())
-//	str := streams.Get()
-//	for c, v := range val {
-//		cu.MemsetD32Async(s.DevPtr(c), math.Float32bits(v), int64(s.Len()), str)
-//	}
-//	streams.SyncAndRecycle(str)
 //}
 
 // Host returns the Slice as a [][]float32,

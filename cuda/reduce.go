@@ -131,7 +131,7 @@ func initReduceBuf() {
 	const N = 128
 	reduceBuffers = make(chan cu.DevicePtr, N)
 	for i := 0; i < N; i++ {
-		reduceBuffers <- cu.DevicePtr(MemAlloc(1 * cu.SIZEOF_FLOAT32))
+		reduceBuffers <- cu.DevicePtr(memAlloc(1 * cu.SIZEOF_FLOAT32))
 	}
 }
 

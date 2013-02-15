@@ -1,14 +1,23 @@
 package cuda
 
-import "testing"
+import (
+	"code.google.com/p/mx3/data"
+	"testing"
+)
+
+func init() {
+	Init()
+}
 
 func TestSlice(t *testing.T) {
-	N := 100
+	N0, N1, N2 := 2, 4, 8
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
+	N := N0 * N1 * N2
 
-	a := NewSlice(3, N)
+	a := NewSlice(3, m)
 	defer a.Free()
-	a.Memset(1, 2, 3)
-	Log(a)
+	Memset(a, 1, 2, 3)
 
 	if a.GPUAccess() == false {
 		t.Fail()
@@ -33,23 +42,27 @@ func TestSlice(t *testing.T) {
 }
 
 func TestSliceFree(t *testing.T) {
-	LockCudaThread()
-	length := 128 * 1024 * 1024
+	LockThread()
+	N0, N1, N2 := 128, 1024, 1024
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
 	N := 17
 	// not freeing would attempt to allocate 17GB.
 	for i := 0; i < N; i++ {
-		a := NewSlice(2, length)
+		a := NewSlice(2, m)
 		a.Free()
 	}
-	a := NewSlice(2, length)
+	a := NewSlice(2, m)
 	a.Free()
 	a.Free() // test double-free
 }
 
 func TestSliceHost(t *testing.T) {
-	LockCudaThread()
-	length := 100
-	a := NewUnifiedSlice(3, length)
+	LockThread()
+	N0, N1, N2 := 1, 10, 10
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
+	a := NewUnifiedSlice(3, m)
 	defer a.Free()
 
 	b := a.Host()
@@ -57,7 +70,7 @@ func TestSliceHost(t *testing.T) {
 		t.Fail()
 	}
 
-	a.Memset(1, 2, 3)
+	Memset(a, 1, 2, 3)
 	b = a.Host()
 	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
 		t.Fail()
@@ -65,9 +78,11 @@ func TestSliceHost(t *testing.T) {
 }
 
 func TestSliceSlice(t *testing.T) {
-	LockCudaThread()
-	length := 100
-	a := NewUnifiedSlice(3, length)
+	LockThread()
+	N0, N1, N2 := 1, 10, 10
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
+	a := NewUnifiedSlice(3, m)
 	h := a.Host()
 	h[1][21] = 42
 	b := a.Slice(20, 30)

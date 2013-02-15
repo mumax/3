@@ -5,6 +5,6 @@
 
 extern "C" __global__ void
 reducemaxdiff(float* __restrict__ src1, float* __restrict__  src2, float* __restrict__ dst, float initVal, int n) {
-	reduce(load_diff, fmax, atomicFmax)
+	reduce(load_diff, fmax, atomicFmaxabs)
 }
 

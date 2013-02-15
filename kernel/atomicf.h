@@ -20,5 +20,11 @@
 //	atomicMax(a, b);
 //}
 
-#endif
+// Atomic max, works only for positive values.
+// To be replaced
+inline __device__ void atomicFmaxabs(float* a, float b){
+	b = fabs(b);
+	atomicMax((int*)(a), *((int*)(&b)));
+}
 
+#endif

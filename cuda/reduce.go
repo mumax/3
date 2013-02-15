@@ -25,14 +25,14 @@ func Sum(in *data.Slice) float32 {
 }
 
 // Maximum of all elements.
-func Max(in *data.Slice) float32 {
-	return reduce1(in, -math.MaxFloat32, kernel.K_reducemax)
-}
+//func Max(in *data.Slice) float32 {
+//	return reduce1(in, -math.MaxFloat32, kernel.K_reducemax)
+//}
 
 // Minimum of all elements.
-func Min(in *data.Slice) float32 {
-	return reduce1(in, math.MaxFloat32, kernel.K_reducemin)
-}
+//func Min(in *data.Slice) float32 {
+//	return reduce1(in, math.MaxFloat32, kernel.K_reducemin)
+//}
 
 // Maximum of absolute values of all elements.
 func MaxAbs(in *data.Slice) float32 {

@@ -5,6 +5,6 @@
 
 extern "C" __global__ void
 reducemaxabs(float* __restrict__ src, float* __restrict__ dst, float initVal, int n) {
-	reduce(load_fabs, fmax, atomicFmax)
+	reduce(load_fabs, fmax, atomicFmaxabs)
 }
 

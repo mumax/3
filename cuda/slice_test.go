@@ -89,42 +89,42 @@ func TestSliceFree(t *testing.T) {
 	a.Free() // test double-free
 }
 
-//func TestSliceHost(t *testing.T) {
-//	LockThread()
-//	N0, N1, N2 := 1, 10, 10
-//	c := 1e-6
-//	m := data.NewMesh(N0, N1, N2, c, c, c)
-//	a := NewUnifiedSlice(3, m)
-//	defer a.Free()
-//
-//	b := a.Host()
-//	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
-//		t.Fail()
-//	}
-//
-//	Memset(a, 1, 2, 3)
-//	b = a.Host()
-//	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
-//		t.Fail()
-//	}
-//}
+func TestSliceHost(t *testing.T) {
+	LockThread()
+	N0, N1, N2 := 1, 10, 10
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
+	a := NewUnifiedSlice(3, m)
+	defer a.Free()
 
-//func TestSliceSlice(t *testing.T) {
-//	LockThread()
-//	N0, N1, N2 := 1, 10, 10
-//	c := 1e-6
-//	m := data.NewMesh(N0, N1, N2, c, c, c)
-//	a := NewUnifiedSlice(3, m)
-//	h := a.Host()
-//	h[1][21] = 42
-//	b := a.Slice(20, 30)
-//	if b.Len() != 30-20 {
-//		t.Fail()
-//	}
-//	if b.NComp() != a.NComp() {
-//		t.Fail()
-//	}
-//	if b.Host()[1][1] != 42 {
-//		t.Fail()
-//	}
-//}
+	b := a.Host()
+	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
+		t.Fail()
+	}
+
+	Memset(a, 1, 2, 3)
+	b = a.Host()
+	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
+		t.Fail()
+	}
+}
+
+func TestSliceSlice(t *testing.T) {
+	LockThread()
+	N0, N1, N2 := 1, 10, 10
+	c := 1e-6
+	m := data.NewMesh(N0, N1, N2, c, c, c)
+	a := NewUnifiedSlice(3, m)
+	h := a.Host()
+	h[1][21] = 42
+	b := a.Slice(20, 30)
+	if b.Len() != 30-20 {
+		t.Fail()
+	}
+	if b.NComp() != a.NComp() {
+		t.Fail()
+	}
+	if b.Host()[1][1] != 42 {
+		t.Fail()
+	}
+}

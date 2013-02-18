@@ -21,8 +21,8 @@ type Slice struct {
 // this package must not depend on CUDA. If CUDA is
 // loaded, these functions are set to cu.MemFree, ...
 var (
-	memFree     func(unsafe.Pointer)
-	memFreeHost func(unsafe.Pointer)
+	memFree, memFreeHost           func(unsafe.Pointer)
+	memCpy, memCpyDtoH, memCpyHtoD func(dst, src unsafe.Pointer, bytes int64)
 )
 
 // Internal: enables slices on GPU. Called upon cuda init.
@@ -30,32 +30,6 @@ func EnableGPU(free, freeHost func(unsafe.Pointer)) {
 	memFree = free
 	memFreeHost = freeHost
 }
-
-// Make a GPU Slice with nComp components each of size length.
-//func NewGPUSlice(nComp int, m *Mesh) *Slice {
-//	s := newSlice(nComp, m)
-//	length := m.NCell()
-//	bytes := int64(length) * cu.SIZEOF_FLOAT32
-//	for c := range s.ptrs {
-//		s.ptrs[c] = unsafe.Pointer(MemAlloc(bytes))
-//	}
-//	s.memType = GPUMemory
-//	s.Memset(make([]float32, nComp)...)
-//	return s
-//}
-
-// Make a GPU Slice with nComp components each of size length.
-//func NewUnifiedSlice(nComp int, m *Mesh) *Slice {
-//	s := newSlice(nComp, m)
-//	length := m.NCell()
-//	bytes := int64(length) * cu.SIZEOF_FLOAT32
-//	for c := range s.ptrs {
-//		s.ptrs[c] = cu.MemAllocHost(bytes)
-//	}
-//	s.memType = UnifiedMemory
-//	s.Memset(make([]float32, nComp)...)
-//	return s
-//}
 
 // Make a CPU Slice with nComp components of size length.
 func NewSlice(nComp int, m *Mesh) *Slice {
@@ -83,21 +57,6 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	s.memType = memType
 	return s
 }
-
-//func NewSliceMemtype(nComp int, m *Mesh, memType int) *Slice {
-//	switch memType {
-//	default:
-//		Panicf("illegal memory type: %v", memType)
-//	case GPUMemory:
-//		return NewGPUSlice(nComp, m)
-//	case CPUMemory:
-//		return NewCPUSlice(nComp, m)
-//	case UnifiedMemory:
-//		return NewUnifiedSlice(nComp, m)
-//	}
-//	panic("unreachable")
-//	return nil
-//}
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
 
@@ -231,6 +190,42 @@ func (s *Slice) Host() [][]float32 {
 		hdr.Cap = hdr.Len
 	}
 	return list
+}
+
+// Returns a copy of the Slice, allocated on CPU.
+func (s *Slice) HostCopy() *Slice {
+	cpy := NewSlice(s.NComp(), s.Mesh())
+	Copy(cpy, s)
+	return cpy
+}
+
+func Copy(dst, src *Slice) {
+	argument(dst.NComp() == src.NComp() && dst.Mesh().Size() == src.Mesh().Size())
+	d, s := dst.GPUAccess(), src.GPUAccess()
+	bytes := SIZEOF_FLOAT32 * int64(dst.Len())
+	switch {
+	default:
+		panic("bug")
+	case d && s:
+		for c := 0; c < dst.NComp(); c++ {
+			memCpy(dst.DevPtr(c), src.DevPtr(c), bytes)
+		}
+	case d && !s:
+		dst := dst.Host()
+		for c := range dst {
+			memCpyDtoH(unsafe.Pointer(&dst[0]), src.DevPtr(c), bytes)
+		}
+	case !d && s:
+		src := src.Host()
+		for c := range src {
+			memCpyHtoD(dst.DevPtr(c), unsafe.Pointer(&src[0]), bytes)
+		}
+	case !d && !s:
+		dst, src := dst.Host(), src.Host()
+		for c := range dst {
+			copy(dst[c], src[c])
+		}
+	}
 }
 
 // Floats returns the data as 3D array,

@@ -17,9 +17,9 @@ func main() {
 	m1 := cuda.NewQuant(3, mesh).Data()
 	m1.HostCopy().Host()
 
-	//cuda.NewUnifiedSlice(3, mesh)
-	////m2.Host()
-	////m2.HostCopy().Host()
+	m2 := cuda.NewUnifiedSlice(3, mesh)
+	m2.Host()
+	m2.HostCopy().Host()
 
 	m3 := data.NewSlice(3, mesh)
 	m3.Host()
@@ -27,12 +27,12 @@ func main() {
 	m4 := data.NewSlice(3, mesh)
 	m4.Host()
 
-	//m3.HostCopy().Host()
+	m3.HostCopy().Host()
 
-	//	data.Copy(m3, m2)
-	//	data.Copy(m2, m3)
-	//	data.Copy(m1, m2)
-	//	data.Copy(m2, m1)
+	data.Copy(m3, m2)
+	data.Copy(m2, m3)
+	data.Copy(m1, m2)
+	data.Copy(m2, m1)
 	data.Copy(m3, m1)
 	data.Copy(m1, m3)
 }

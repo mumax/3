@@ -13,14 +13,14 @@ type Quant struct {
 	quant
 }
 
-func QuantFromSlice(s *Slice) Quant {
+func QuantFromSlice(s *Slice) *Quant {
 	N := s.Mesh().NCell() //bufferSize(m, bufBlocks)
 	var lock [MAX_COMP]mutex
 	nComp := s.NComp()
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return Quant{quant{*s, lock}}
+	return &Quant{quant{*s, lock}}
 }
 
 func (q *quant) NComp() int {

@@ -4,6 +4,7 @@ package data
 // Author: Arne Vansteenkiste
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"unsafe"
@@ -26,9 +27,13 @@ var (
 )
 
 // Internal: enables slices on GPU. Called upon cuda init.
-func EnableGPU(free, freeHost func(unsafe.Pointer)) {
+func EnableGPU(free, freeHost func(unsafe.Pointer),
+	cpy, cpyDtoH, cpyHtoD func(dst, src unsafe.Pointer, bytes int64)) {
 	memFree = free
 	memFreeHost = freeHost
+	memCpy = cpy
+	memCpyDtoH = cpyDtoH
+	memCpyHtoD = cpyHtoD
 }
 
 // Make a CPU Slice with nComp components of size length.
@@ -210,21 +215,23 @@ func Copy(dst, src *Slice) {
 		for c := 0; c < dst.NComp(); c++ {
 			memCpy(dst.DevPtr(c), src.DevPtr(c), bytes)
 		}
-	case d && !s:
+	case s && !d:
 		dst := dst.Host()
 		for c := range dst {
 			memCpyDtoH(unsafe.Pointer(&dst[0]), src.DevPtr(c), bytes)
 		}
-	case !d && s:
+	case !s && d:
 		src := src.Host()
 		for c := range src {
 			memCpyHtoD(dst.DevPtr(c), unsafe.Pointer(&src[0]), bytes)
 		}
 	case !d && !s:
-		dst, src := dst.Host(), src.Host()
-		for c := range dst {
-			copy(dst[c], src[c])
-		}
+		//dst, src := dst.Host(), src.Host()
+		fmt.Println(dst.Host())
+		fmt.Println(src.Host())
+		//	for c := range dst {
+		//		copy(dst[c], src[c])
+		//	}
 	}
 }
 

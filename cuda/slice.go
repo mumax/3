@@ -21,7 +21,7 @@ func NewUnifiedSlice(nComp int, m *data.Mesh) *data.Slice {
 }
 
 func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
-	data.EnableGPU(memFree, cu.MemFreeHost)
+	data.EnableGPU(memFree, cu.MemFreeHost, memCpy, memCpyDtoH, memCpyHtoD)
 	length := m.NCell()
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	ptrs := make([]unsafe.Pointer, nComp)
@@ -32,7 +32,16 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType
 	return data.SliceFromPtrs(m, memType, ptrs)
 }
 
-func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(ptr)) }
+// wrappers for data.EnableGPU arguments
+
+func memFree(ptr unsafe.Pointer)                      { cu.MemFree(cu.DevicePtr(ptr)) }
+func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyDtoH(dst, cu.DevicePtr(src), bytes) }
+func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes) }
+func memCpy(dst, src unsafe.Pointer, bytes int64) {
+	str := kernel.Stream()
+	cu.MemcpyAsync(cu.DevicePtr(dst), cu.DevicePtr(src), bytes, str)
+	kernel.SyncAndRecycle(str)
+}
 
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.
 func memAlloc(bytes int64) unsafe.Pointer {

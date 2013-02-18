@@ -59,9 +59,18 @@ func TestCpy(t *testing.T) {
 	d := NewSlice(1, mesh)
 	data.Copy(d, hs)
 
+	d2 := NewSlice(1, mesh)
+	data.Copy(d2, d)
+
 	h2 := data.NewSlice(1, mesh)
-	data.Copy(h2, d)
-	fmt.Println(h2.Host())
+	data.Copy(h2, d2)
+
+	res := h2.Host()[0]
+	for i := range res {
+		if res[i] != h1[i] {
+			t.Fail()
+		}
+	}
 }
 
 func TestSliceFree(t *testing.T) {

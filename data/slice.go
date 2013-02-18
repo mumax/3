@@ -4,7 +4,6 @@ package data
 // Author: Arne Vansteenkiste
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 	"unsafe"
@@ -61,6 +60,15 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	}
 	s.memType = memType
 	return s
+}
+
+func SliceFromList(data [][]float32, mesh *Mesh) *Slice {
+	ptrs := make([]unsafe.Pointer, len(data))
+	for i := range ptrs {
+		argument(len(data[i]) == mesh.NCell())
+		ptrs[i] = unsafe.Pointer(&data[i][0])
+	}
+	return SliceFromPtrs(mesh, CPUMemory, ptrs)
 }
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
@@ -216,22 +224,18 @@ func Copy(dst, src *Slice) {
 			memCpy(dst.DevPtr(c), src.DevPtr(c), bytes)
 		}
 	case s && !d:
-		dst := dst.Host()
-		for c := range dst {
-			memCpyDtoH(unsafe.Pointer(&dst[0]), src.DevPtr(c), bytes)
+		for c := 0; c < dst.NComp(); c++ {
+			memCpyDtoH(dst.ptr_[c], src.DevPtr(c), bytes)
 		}
 	case !s && d:
-		src := src.Host()
-		for c := range src {
-			memCpyHtoD(dst.DevPtr(c), unsafe.Pointer(&src[0]), bytes)
+		for c := 0; c < dst.NComp(); c++ {
+			memCpyHtoD(dst.DevPtr(c), src.ptr_[c], bytes)
 		}
 	case !d && !s:
-		//dst, src := dst.Host(), src.Host()
-		fmt.Println(dst.Host())
-		fmt.Println(src.Host())
-		//	for c := range dst {
-		//		copy(dst[c], src[c])
-		//	}
+		dst, src := dst.Host(), src.Host()
+		for c := range dst {
+			copy(dst[c], src[c])
+		}
 	}
 }
 

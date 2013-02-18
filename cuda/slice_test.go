@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"fmt"
 	"testing"
 )
 
@@ -41,6 +42,28 @@ func TestSlice(t *testing.T) {
 	}
 }
 
+func TestCpy(t *testing.T) {
+	N0, N1, N2 := 2, 4, 32
+	N := N0 * N1 * N2
+	mesh := data.NewMesh(N0, N1, N2, 1, 1, 1)
+
+	h1 := make([]float32, N)
+	for i := range h1 {
+		h1[i] = float32(i)
+	}
+	fmt.Println(h1)
+	fmt.Println(&h1[0])
+	hs := data.SliceFromList([][]float32{h1}, mesh)
+	fmt.Println(&hs.Host()[0][0])
+
+	d := NewSlice(1, mesh)
+	data.Copy(d, hs)
+
+	h2 := data.NewSlice(1, mesh)
+	data.Copy(h2, d)
+	fmt.Println(h2.Host())
+}
+
 func TestSliceFree(t *testing.T) {
 	LockThread()
 	N0, N1, N2 := 128, 1024, 1024
@@ -57,42 +80,42 @@ func TestSliceFree(t *testing.T) {
 	a.Free() // test double-free
 }
 
-func TestSliceHost(t *testing.T) {
-	LockThread()
-	N0, N1, N2 := 1, 10, 10
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
-	a := NewUnifiedSlice(3, m)
-	defer a.Free()
+//func TestSliceHost(t *testing.T) {
+//	LockThread()
+//	N0, N1, N2 := 1, 10, 10
+//	c := 1e-6
+//	m := data.NewMesh(N0, N1, N2, c, c, c)
+//	a := NewUnifiedSlice(3, m)
+//	defer a.Free()
+//
+//	b := a.Host()
+//	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
+//		t.Fail()
+//	}
+//
+//	Memset(a, 1, 2, 3)
+//	b = a.Host()
+//	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
+//		t.Fail()
+//	}
+//}
 
-	b := a.Host()
-	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
-		t.Fail()
-	}
-
-	Memset(a, 1, 2, 3)
-	b = a.Host()
-	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
-		t.Fail()
-	}
-}
-
-func TestSliceSlice(t *testing.T) {
-	LockThread()
-	N0, N1, N2 := 1, 10, 10
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
-	a := NewUnifiedSlice(3, m)
-	h := a.Host()
-	h[1][21] = 42
-	b := a.Slice(20, 30)
-	if b.Len() != 30-20 {
-		t.Fail()
-	}
-	if b.NComp() != a.NComp() {
-		t.Fail()
-	}
-	if b.Host()[1][1] != 42 {
-		t.Fail()
-	}
-}
+//func TestSliceSlice(t *testing.T) {
+//	LockThread()
+//	N0, N1, N2 := 1, 10, 10
+//	c := 1e-6
+//	m := data.NewMesh(N0, N1, N2, c, c, c)
+//	a := NewUnifiedSlice(3, m)
+//	h := a.Host()
+//	h[1][21] = 42
+//	b := a.Slice(20, 30)
+//	if b.Len() != 30-20 {
+//		t.Fail()
+//	}
+//	if b.NComp() != a.NComp() {
+//		t.Fail()
+//	}
+//	if b.Host()[1][1] != 42 {
+//		t.Fail()
+//	}
+//}

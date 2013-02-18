@@ -14,23 +14,28 @@ func initTest() {
 	}
 	LockThread()
 	Init()
-	c := 1e-6
 	{
-		m := data.NewMesh(1, 1, 1000, c, c, c)
-		in1 = NewUnifiedSlice(1, m)
-		inh1 := in1.Host()[0]
+		inh1 := make([]float32, 1000)
 		for i := range inh1 {
 			inh1[i] = float32(i)
 		}
+		in1 = toGPU(inh1)
 	}
 	{
-		m := data.NewMesh(1, 1, 100000, c, c, c)
-		in2 = NewUnifiedSlice(1, m)
-		inh2 := in2.Host()[0]
+		inh2 := make([]float32, 100000)
 		for i := range inh2 {
 			inh2[i] = -float32(i) / 100
 		}
+		in2 = toGPU(inh2)
 	}
+}
+
+func toGPU(list []float32) *data.Slice {
+	mesh := data.NewMesh(1, 1, len(list), 1, 1, 1)
+	h := data.SliceFromList([][]float32{list}, mesh)
+	d := NewSlice(1, mesh)
+	data.Copy(d, h)
+	return d
 }
 
 func TestReduceSum(t *testing.T) {

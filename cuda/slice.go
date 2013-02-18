@@ -36,15 +36,9 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType
 
 func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(ptr)) }
 
-func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
-	log.Println("cu.MemcpyDtoH", dst, cu.DevicePtr(src), bytes)
-	cu.MemcpyDtoH(dst, cu.DevicePtr(src), bytes)
-}
+func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyDtoH(dst, cu.DevicePtr(src), bytes) }
 
-func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
-	log.Println("cu.MemcpyHtoD", cu.DevicePtr(dst), src, bytes)
-	cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes)
-}
+func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes) }
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
 	str := kernel.Stream()

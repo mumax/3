@@ -2,7 +2,6 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
-	"fmt"
 	"testing"
 )
 
@@ -51,10 +50,7 @@ func TestCpy(t *testing.T) {
 	for i := range h1 {
 		h1[i] = float32(i)
 	}
-	fmt.Println(h1)
-	fmt.Println(&h1[0])
 	hs := data.SliceFromList([][]float32{h1}, mesh)
-	fmt.Println(&hs.Host()[0][0])
 
 	d := NewSlice(1, mesh)
 	data.Copy(d, hs)

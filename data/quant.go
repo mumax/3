@@ -13,7 +13,7 @@ type Quant struct {
 	quant
 }
 
-func NewQuant(s *Slice) Quant {
+func QuantFromSlice(s *Slice) Quant {
 	N := s.Mesh().NCell() //bufferSize(m, bufBlocks)
 	var lock [MAX_COMP]mutex
 	nComp := s.NComp()

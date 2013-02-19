@@ -5,7 +5,6 @@ import (
 	"code.google.com/p/mx3/kernel"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
-	"log"
 	"math"
 	"unsafe"
 )
@@ -44,20 +43,6 @@ func memCpy(dst, src unsafe.Pointer, bytes int64) {
 	str := kernel.Stream()
 	cu.MemcpyAsync(cu.DevicePtr(dst), cu.DevicePtr(src), bytes, str)
 	kernel.SyncAndRecycle(str)
-}
-
-// Wrapper for cu.MemAlloc, fatal exit on out of memory.
-func memAlloc(bytes int64) unsafe.Pointer {
-	defer func() {
-		err := recover()
-		if err == cu.ERROR_OUT_OF_MEMORY {
-			log.Fatal(err)
-		}
-		if err != nil {
-			panic(err)
-		}
-	}()
-	return unsafe.Pointer(cu.MemAlloc(bytes))
 }
 
 // Memset sets the Slice's components to the specified values.

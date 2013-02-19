@@ -12,9 +12,10 @@ type FFT3DR2CPlan struct {
 }
 
 // 3D single-precission real-to-complex FFT plan.
-func FFT3DR2C(Nx, Ny, Nz int) FFT3DR2CPlan {
+func NewFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) FFT3DR2CPlan {
 	handle := cufft.Plan3d(Nx, Ny, Nz, cufft.R2C)
 	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
+	handle.SetStream(stream)
 	return FFT3DR2CPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
 }
 

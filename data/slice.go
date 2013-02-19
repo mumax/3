@@ -173,12 +173,13 @@ func (s *Slice) Slice(a, b int) *Slice {
 	}
 
 	slice := new(Slice)
-	slice.ptrs = s.ptr_[:s.NComp()]
+	slice.ptrs = slice.ptr_[:s.NComp()]
 	for i := range s.ptrs {
 		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
 	}
 	slice.len_ = int32(b - a)
 	slice.memType = s.memType
+	slice.info = s.info
 	return slice
 }
 

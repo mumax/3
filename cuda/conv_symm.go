@@ -74,7 +74,8 @@ func (c *Symm2D) initFFTKern3D() {
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			if c.kern[i][j] != nil { // ignore 0's
-				data.Copy(input, c.kern[i][j]) //input.CopyHtoD(c.kern[i][j])
+				log.Println("data.Copy", input, c.kern[i][j]) //input.CopyHtoD(c.kern[i][j])
+				data.Copy(input, c.kern[i][j])                //input.CopyHtoD(c.kern[i][j])
 				fwPlan.Exec(input, output)
 				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)

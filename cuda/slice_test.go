@@ -123,4 +123,7 @@ func TestSliceSlice(t *testing.T) {
 	if b.Host()[1][1] != 42 {
 		t.Fail()
 	}
+	if *a.Mesh() != *b.Mesh() {
+		t.Fail()
+	}
 }

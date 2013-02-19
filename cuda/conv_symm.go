@@ -129,9 +129,6 @@ func (c *Symm2D) Exec() {
 }
 
 func (c *Symm2D) exec3D() {
-	//padded := c.kernSize
-	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
-
 	// FW FFT
 	for i := 0; i < 3; i++ {
 		inc := c.input.Comp(i)
@@ -143,6 +140,7 @@ func (c *Symm2D) exec3D() {
 	}
 
 	// kern mul
+	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
 	kernMulRSymm3D(c.fftCBuf,
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
@@ -159,9 +157,6 @@ func (c *Symm2D) exec3D() {
 }
 
 func (c *Symm2D) exec2D() {
-	//padded := c.kernSize
-
-	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
 	// Convolution is separated into
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
@@ -175,6 +170,7 @@ func (c *Symm2D) exec2D() {
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X
+	N1, N2 := c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
 	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
 	//c.stream.Synchronize()
 
@@ -246,21 +242,3 @@ func NewConvolution(input *data.Quant, kernel [3][3][][][]float32) *Symm2D {
 	return c
 	// TODO: self-test
 }
-
-// freeing kernel memory may fail when it was spilled to host.
-//func free(a cu.DevicePtr) {
-//	// recover should not be needed
-//	defer func() {
-//		err := recover()
-//		if err != nil {
-//			core.Log("free: recovered", err)
-//			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
-//		}
-//	}()
-//
-//	if a.MemoryType() == cu.MemoryTypeDevice {
-//		a.Free()
-//	} else {
-//		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
-//	}
-//}

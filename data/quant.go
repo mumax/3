@@ -37,18 +37,18 @@ func (q *Quant) Data() *Slice {
 	return &q.buffer
 }
 
-//type Reader struct {
-//	quant
-//}
-//
-//func (c *Quant) NewReader() Reader {
-//	reader := c.quant // copy
-//	for i := range reader.lock {
-//		reader.lock[i] = (reader.lock[i]).(*rwMutex).MakeRMutex()
-//	}
-//	return Reader{reader}
-//}
-//
+type Reader struct {
+	quant
+}
+
+func (c *Quant) NewReader() *Reader {
+	reader := (*c).quant // copy
+	for i := range reader.lock {
+		reader.lock[i] = (reader.lock[i]).(*rwMutex).MakeRMutex()
+	}
+	return &Reader{reader}
+}
+
 //// NComp returns the number of components.
 //// 	scalar: 1
 //// 	vector: 3
@@ -102,46 +102,46 @@ func (q *Quant) Data() *Slice {
 //	return c.buffer
 //}
 //
-//// WriteNext locks and returns a slice of length n for
-//// writing the next n elements to the Chan3.
-//// When done, WriteDone() should be called to "send" the
-//// slice down the Chan3. After that, the slice is not valid any more.
-//func (c *quant) next(n int) Slice {
-//	c.lock[0].lockNext(n)
-//	a, b := c.lock[0].lockedRange()
-//	for i := 1; i < len(c.lock); i++ {
-//		c.lock[i].lockNext(n)
-//		α, β := c.lock[i].lockedRange()
-//		if α != a || β != b {
-//			panic("chan: next: inconsistent state")
-//		}
-//	}
-//	next := c.buffer.Slice(a, b)
-//	return next
-//}
-//
-//func (c *quant) done() {
-//	for i := range c.lock {
-//		c.lock[i].unlock()
-//	}
-//}
-//
-//func (c *Quant) WriteNext(n int) Slice {
-//	return c.quant.next(n)
-//}
-//
-//func (c *Quant) WriteDone() {
-//	c.quant.done()
-//}
-//
-//func (c *Reader) ReadNext(n int) Slice {
-//	return c.quant.next(n)
-//}
-//
-//func (c *Reader) ReadDone() {
-//	c.quant.done()
-//}
-//
+// WriteNext locks and returns a slice of length n for
+// writing the next n elements to the Chan3.
+// When done, WriteDone() should be called to "send" the
+// slice down the Chan3. After that, the slice is not valid any more.
+func (c *quant) next(n int) *Slice {
+	c.lock[0].lockNext(n)
+	a, b := c.lock[0].lockedRange()
+	for i := 1; i < len(c.lock); i++ {
+		c.lock[i].lockNext(n)
+		α, β := c.lock[i].lockedRange()
+		if α != a || β != b {
+			panic("chan: next: inconsistent state")
+		}
+	}
+	next := c.buffer.Slice(a, b)
+	return next
+}
+
+func (c *quant) done() {
+	for i := range c.lock {
+		c.lock[i].unlock()
+	}
+}
+
+func (c *Quant) WriteNext(n int) *Slice {
+	return c.quant.next(n)
+}
+
+func (c *Quant) WriteDone() {
+	c.quant.done()
+}
+
+func (c *Reader) ReadNext(n int) *Slice {
+	return c.quant.next(n)
+}
+
+func (c *Reader) ReadDone() {
+	c.quant.done()
+}
+
 //// WriteDone() signals a slice obtained by WriteNext() is fully
 //// written and can be sent down the Chan3.
 //

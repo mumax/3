@@ -134,12 +134,12 @@ func (c *Symm2D) exec3D() {
 
 	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
 	for i := 0; i < 3; i++ {
-		in := c.input[i].ReadNext(c.n)
+		inc := c.input.
+		in := c.Comp(i).ReadNext(c.n)
 		Memset(c.fftRBuf[i], 0)
-		copyPad(c.fftRBuf[i], in, padded, c.size)
+		copyPad(c.fftRBuf[i], in)
+		c.Comp(i).ReadDone()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-		c.stream.Synchronize()
-		inc.ReadDone()
 	}
 
 	// kern mul

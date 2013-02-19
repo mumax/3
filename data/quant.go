@@ -6,7 +6,7 @@ package data
 // shared by Quant and Reader
 type quant struct {
 	buffer Slice           // stores the data
-	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type
+	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
 }
 
 type Quant struct {
@@ -21,10 +21,6 @@ func QuantFromSlice(s *Slice) *Quant {
 		lock[c] = newRWMutex(N)
 	}
 	return &Quant{quant{*s, lock}}
-}
-
-func (q *quant) NComp() int {
-	return q.buffer.NComp()
 }
 
 func (q *Quant) Data() *Slice {
@@ -49,26 +45,26 @@ func (c *Quant) NewReader() *Reader {
 	return &Reader{reader}
 }
 
-//// NComp returns the number of components.
-//// 	scalar: 1
-//// 	vector: 3
-//// 	...
-//func (c *quant) NComp() int {
-//	return int(c.buffer.nComp)
-//}
-//
-//func (c *quant) comp(i int) quant {
-//	return quant{c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}, c.tag, c.unit, c.mesh}
-//}
-//
-//func (c *Quant) Comp(i int) Quant {
-//	return Quant{c.comp(i)}
-//}
-//
-//func (c *Reader) Comp(i int) Reader {
-//	return Reader{c.comp(i)}
-//}
-//
+// NComp returns the number of components.
+// 	scalar: 1
+// 	vector: 3
+// 	...
+func (c *quant) NComp() int {
+	return int(c.buffer.NComp())
+}
+
+func (c *quant) comp(i int) quant {
+	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}}
+}
+
+func (c *Quant) Comp(i int) Quant {
+	return Quant{c.comp(i)}
+}
+
+func (c *Reader) Comp(i int) Reader {
+	return Reader{c.comp(i)}
+}
+
 //// BufLen returns the number of buffered elements.
 //// This is the largest number of elements that can be read/written at once.
 //func (c *quant) BufLen() int {

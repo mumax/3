@@ -118,7 +118,7 @@ func (c *quant) next(n int) *Slice {
 }
 
 func (c *quant) done() {
-	for i := range c.lock {
+	for i := 0; i < c.NComp(); i++ {
 		c.lock[i].unlock()
 	}
 }

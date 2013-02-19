@@ -105,7 +105,8 @@ func (c *quant) Mesh() *Mesh {
 func (c *quant) next(n int) *Slice {
 	c.lock[0].lockNext(n)
 	a, b := c.lock[0].lockedRange()
-	for i := 1; i < len(c.lock); i++ {
+	ncomp := c.NComp()
+	for i := 1; i < ncomp; i++ {
 		c.lock[i].lockNext(n)
 		α, β := c.lock[i].lockedRange()
 		if α != a || β != b {

@@ -1,15 +1,17 @@
 package data
 
 import (
+	"code.google.com/p/mx3/util"
 	"hash"
 	"hash/crc64"
 	"io"
 	"math"
+	"os"
 	"unsafe"
 )
 
 // TODO: buffer? benchmark
-func DumpSlice(out io.Writer, s *Slice, time float64) error {
+func Write(out io.Writer, s *Slice, time float64) error {
 	w := newWriter(out)
 	w.header.Components = s.NComp()
 	w.header.MeshSize = s.Mesh().Size()
@@ -31,6 +33,20 @@ func DumpSlice(out io.Writer, s *Slice, time float64) error {
 	}
 	w.writeHash()
 	return w.err
+}
+
+func WriteFile(fname string, s *Slice, time float64) error {
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return Write(f, s, time)
+}
+
+func MustWriteFile(fname string, s *Slice, time float64) {
+	err := WriteFile(fname, s, time)
+	util.FatalErr(err)
 }
 
 var table = crc64.MakeTable(crc64.ISO)

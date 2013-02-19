@@ -1,296 +1,289 @@
 package cuda
 
-//import (
-//	"code.google.com/p/mx3/data"
-//	"github.com/barnex/cuda5/cu"
-//	"github.com/barnex/cuda5/cufft"
-//	"unsafe"
-//)
-//
-//type Symm2D struct {
-//	size        [3]int              // 3D size of the input/output data
-//	kernSize    [3]int              // Size of kernel and logical FFT size.
-//	fftKernSize [3]int              // Size of real, FFTed kernel
-//	n           int                 // product of size
-//	input       nimble.RChanN       // TODO: fuse with input
-//	output      nimble.ChanN        // TODO: fuse with output
-//	outChan     nimble.ChanN        // same as output
-//	fftRBuf     [3]safe.Float32s    // FFT input buf for FFT, shares storage with fftCBuf.
-//	fftCBuf     [3]safe.Complex64s  // FFT output buf, shares storage with fftRBuf
-//	gpuFFTKern  [3][3]safe.Float32s // FFT kernel on device: TODO: xfer if needed
-//	fwPlan      safe.FFT3DR2CPlan   // Forward FFT (1 component)
-//	bwPlan      safe.FFT3DC2RPlan   // Backward FFT (1 component)
-//	stream      cu.Stream           //
-//	kern        [3][3][]float32     // Real-space kernel
-//	kernArr     [3][3][][][]float32 // Real-space kernel
-//	inited      bool
-//}
-//
-//func (c *Symm2D) init() {
-//	core.Log("initializing convolution")
-//	if c.inited {
-//		core.Panic("conv: already initialized")
-//	}
-//	c.inited = true
-//	//LockCudaThread()
-//
-//	padded := c.kernSize
-//
-//	{ // init FFT plans
-//		c.stream = cu.StreamCreate()
-//		c.fwPlan = safe.FFT3DR2C(padded[0], padded[1], padded[2])
-//		c.fwPlan.SetStream(c.stream)
-//		c.bwPlan = safe.FFT3DC2R(padded[0], padded[1], padded[2])
-//		c.bwPlan.SetStream(c.stream)
-//	}
-//
-//	{ // init device buffers
-//		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
-//		for i := 1; i < 3; i++ {
-//			c.fftCBuf[i] = TryMakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
-//		}
-//		if c.is3D() {
-//			c.fftCBuf[0] = TryMakeComplexs(prod(fftR2COutputSizeFloats(c.kernSize)) / 2)
-//		} else {
-//			c.fftCBuf[0] = c.fftCBuf[1]
-//		}
-//		for i := 0; i < 3; i++ {
-//			c.fftRBuf[i] = c.fftCBuf[i].Float().Slice(0, prod(c.kernSize))
-//		}
-//	}
-//
-//	if c.is2D() {
-//		c.initFFTKern2D()
-//	} else {
-//		c.initFFTKern3D()
-//	}
-//}
-//
-//func (c *Symm2D) initFFTKern3D() {
-//	padded := c.kernSize
-//	ffted := fftR2COutputSizeFloats(padded)
-//	realsize := ffted
-//	realsize[2] /= 2
-//	c.fftKernSize = realsize
-//	halfkern := realsize
-//	//halfkern[1] = halfkern[1]/2 + 1
-//	fwPlan := c.fwPlan
-//	output := TryMakeComplexs(fwPlan.OutputLen())
-//	defer free(output.Pointer())
-//	input := output.Float().Slice(0, fwPlan.InputLen())
-//
-//	// upper triangular part
-//	fftKern := make([]float32, prod(halfkern))
-//	for i := 0; i < 3; i++ {
-//		for j := i; j < 3; j++ {
-//			if c.kern[i][j] != nil { // ignore 0's
-//				input.CopyHtoD(c.kern[i][j])
-//				fwPlan.Exec(input, output)
-//				fwPlan.Stream().Synchronize() // !!
-//				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-//				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
-//				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
-//			}
-//		}
-//	}
-//}
-//
-//// Initialize GPU FFT kernel for 2D.
-//// Only the non-redundant parts are stored on the GPU.
-//func (c *Symm2D) initFFTKern2D() {
-//	padded := c.kernSize
-//	ffted := fftR2COutputSizeFloats(padded)
-//	realsize := ffted
-//	realsize[2] /= 2
-//	c.fftKernSize = realsize
-//	halfkern := realsize
-//	halfkern[1] = halfkern[1]/2 + 1
-//	fwPlan := c.fwPlan
-//	output := HostFloats(2 * fwPlan.OutputLen()).Complex()
-//	defer cu.MemFreeHost(unsafe.Pointer(uintptr(output.Pointer()))) // TODO: is Float32s safe with uintptr?
-//	input := output.Float().Slice(0, fwPlan.InputLen())
-//
-//	// upper triangular part
-//	fftKern := make([]float32, prod(halfkern))
-//	for i := 0; i < 3; i++ {
-//		for j := i; j < 3; j++ {
-//			if c.kern[i][j] != nil { // ignore 0's
-//				input.CopyHtoD(c.kern[i][j])
-//				fwPlan.Exec(input, output)
-//				fwPlan.Stream().Synchronize() // !!
-//				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
-//				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
-//				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
-//			}
-//		}
-//	}
-//}
-//
-//func (c *Symm2D) Run() {
-//	core.Log("running convolution")
-//	LockCudaThread()
-//
-//	for {
-//		c.Exec()
-//	}
-//}
-//
-//func (c *Symm2D) Exec() {
-//	if c.is2D() {
-//		c.exec2D()
-//	} else {
-//		c.exec3D()
-//	}
-//}
-//
-//func (c *Symm2D) exec3D() {
-//	padded := c.kernSize
-//
-//	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
-//	for i := 0; i < 3; i++ {
-//		inc := c.input.Comp(i)
-//		in2 := inc.ReadNext(c.n)
-//		in := in2.Device()
-//		c.fftRBuf[i].MemsetAsync(0, c.stream)
-//		copyPad(c.fftRBuf[i], in, padded, c.size)
-//		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-//		c.stream.Synchronize()
-//		inc.ReadDone()
-//	}
-//
-//	// kern mul
-//	kernMulRSymm3D(c.fftCBuf,
-//		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-//		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-//		N0, N1, N2)
-//	c.stream.Synchronize()
-//
-//	// BW FFT
-//	for i := 0; i < 3; i++ {
-//		outc := c.output.Comp(i)
-//		out2 := outc.WriteNext(c.n)
-//		out := out2.Device()
-//		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-//		copyPad(out, c.fftRBuf[i], c.size, padded)
-//		c.stream.Synchronize()
-//		outc.WriteDone()
-//	}
-//}
-//
-//func (c *Symm2D) exec2D() {
-//	padded := c.kernSize
-//
-//	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
-//	// Convolution is separated into
-//	// a 1D convolution for x
-//	// and a 2D convolution for yz.
-//	// so only 2 FFT buffers are then needed at the same time.
-//
-//	// FFT x
-//	inc := c.input.Comp(0)
-//	in2 := inc.ReadNext(c.n)
-//	in := in2.Device()
-//	c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-//	copyPad(c.fftRBuf[0], in, padded, c.size)
-//	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
-//	//c.stream.Synchronize()
-//	inc.ReadDone()
-//
-//	// kern mul X
-//	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
-//	//c.stream.Synchronize()
-//
-//	// bw FFT x
-//	outc := c.output.Comp(0)
-//	out2 := outc.WriteNext(c.n)
-//	out := out2.Device()
-//	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-//	copyPad(out, c.fftRBuf[0], c.size, padded)
-//	c.stream.Synchronize()
-//	outc.WriteDone()
-//
-//	// FW FFT yz
-//	for i := 1; i < 3; i++ {
-//		inc := c.input.Comp(i)
-//		in2 := inc.ReadNext(c.n)
-//		in := in2.Device()
-//		c.fftRBuf[i].MemsetAsync(0, c.stream)
-//		copyPad(c.fftRBuf[i], in, padded, c.size)
-//		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-//		c.stream.Synchronize()
-//		inc.ReadDone()
-//	}
-//
-//	// kern mul yz
-//	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
-//		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-//		N1, N2)
-//	c.stream.Synchronize()
-//
-//	// BW FFT yz
-//	for i := 1; i < 3; i++ {
-//		outc := c.output.Comp(i)
-//		out2 := outc.WriteNext(c.n)
-//		out := out2.Device()
-//		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-//		copyPad(out, c.fftRBuf[i], c.size, padded)
-//		c.stream.Synchronize()
-//		outc.WriteDone()
-//	}
-//}
-//
-//func (c *Symm2D) is2D() bool {
-//	return c.size[0] == 1
-//}
-//
-//func (c *Symm2D) is3D() bool {
-//	return !c.is2D()
-//}
-//
-//func (c *Symm2D) Output() nimble.ChanN {
-//	return c.outChan
-//}
-//
-//func NewConvolution(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.ChanN) *Symm2D {
-//	size := mesh.Size()
-//	input := input_.NewReader()
-//	c := new(Symm2D)
-//	c.size = size
-//	c.kernArr = kernel
-//	for i := 0; i < 3; i++ {
-//		for j := 0; j < 3; j++ {
-//			if kernel[i][j] != nil {
-//				c.kern[i][j] = core.Contiguous(kernel[i][j])
-//			}
-//		}
-//	}
-//	c.n = prod(size)
-//	c.kernSize = core.SizeOf(kernel[0][0])
-//	c.input = input
-//	c.outChan = nimble.MakeChanN(3, tag, unit, mesh, memType, 0)
-//	c.output = c.outChan // TODO: rm
-//
-//	c.init()
-//	nimble.Stack(c)
-//
-//	return c
-//	// TODO: self-test
-//}
-//
-//// freeing kernel memory may fail when it was spilled to host.
-//func free(a cu.DevicePtr) {
-//	// recover should not be needed
-//	defer func() {
-//		err := recover()
-//		if err != nil {
-//			core.Log("free: recovered", err)
-//			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
-//		}
-//	}()
-//
-//	if a.MemoryType() == cu.MemoryTypeDevice {
-//		a.Free()
-//	} else {
-//		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
-//	}
-//}
+import (
+	"code.google.com/p/mx3/data"
+	"github.com/barnex/cuda5/cu"
+	"log"
+	"unsafe"
+)
+
+type Symm2D struct {
+	size        [3]int              // 3D size of the input/output data
+	kernSize    [3]int              // Size of kernel and logical FFT size.
+	fftKernSize [3]int              // Size of real, FFTed kernel
+	n           int                 // product of size
+	input       *data.Quant         //
+	output      *data.Quant         //
+	fftRBuf     [3]*data.Slice      // FFT input buf for FFT, shares storage with fftCBuf.
+	fftCBuf     [3]*data.Slice      // FFT output buf, shares storage with fftRBuf
+	gpuFFTKern  [3][3]*data.Slice   // FFT kernel on device: TODO: xfer if needed
+	fwPlan      FFT3DR2CPlan        // Forward FFT (1 component)
+	bwPlan      FFT3DC2RPlan        // Backward FFT (1 component)
+	kern        [3][3][]float32     // Real-space kernel
+	kernArr     [3][3][][][]float32 // Real-space kernel
+	inited      bool
+}
+
+func (c *Symm2D) init() {
+	log.Println("initializing convolution")
+	if c.inited {
+		log.Panic("conv: already initialized")
+	}
+	c.inited = true
+
+	{ // init FFT plans
+		padded := c.kernSize
+		stream := cu.StreamCreate()
+		c.fwPlan = NewFFT3DR2C(padded[0], padded[1], padded[2], stream)
+		c.bwPlan = NewFFT3DC2R(padded[0], padded[1], padded[2], stream)
+	}
+
+	{ // init device buffers
+		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
+		for i := 1; i < 3; i++ {
+			c.fftCBuf[i] = TryMakeFloats(fftR2COutputSizeFloats(c.kernSize))
+		}
+		if c.is3D() {
+			c.fftCBuf[0] = TryMakeFloats(fftR2COutputSizeFloats(c.kernSize))
+		} else {
+			c.fftCBuf[0] = c.fftCBuf[1]
+		}
+		for i := 0; i < 3; i++ {
+			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize))
+		}
+	}
+
+	if c.is2D() {
+		c.initFFTKern2D()
+	} else {
+		c.initFFTKern3D()
+	}
+}
+
+func (c *Symm2D) initFFTKern3D() {
+	padded := c.kernSize
+	ffted := fftR2COutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
+	c.fftKernSize = realsize
+	halfkern := realsize
+	fwPlan := c.fwPlan
+	output := TryMakeComplexs(fwPlan.OutputLen())
+	defer free(output.Pointer())
+	input := output.Float().Slice(0, fwPlan.InputLen())
+
+	// upper triangular part
+	fftKern := make([]float32, prod(halfkern))
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			if c.kern[i][j] != nil { // ignore 0's
+				input.CopyHtoD(c.kern[i][j])
+				fwPlan.Exec(input, output)
+				fwPlan.Stream().Synchronize() // !!
+				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
+				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
+			}
+		}
+	}
+}
+
+// Initialize GPU FFT kernel for 2D.
+// Only the non-redundant parts are stored on the GPU.
+func (c *Symm2D) initFFTKern2D() {
+	padded := c.kernSize
+	ffted := fftR2COutputSizeFloats(padded)
+	realsize := ffted
+	realsize[2] /= 2
+	c.fftKernSize = realsize
+	halfkern := realsize
+	halfkern[1] = halfkern[1]/2 + 1
+	fwPlan := c.fwPlan
+	output := HostFloats(2 * fwPlan.OutputLen()).Complex()
+	defer cu.MemFreeHost(unsafe.Pointer(uintptr(output.Pointer()))) // TODO: is Float32s safe with uintptr?
+	input := output.Float().Slice(0, fwPlan.InputLen())
+
+	// upper triangular part
+	fftKern := make([]float32, prod(halfkern))
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			if c.kern[i][j] != nil { // ignore 0's
+				input.CopyHtoD(c.kern[i][j])
+				fwPlan.Exec(input, output)
+				fwPlan.Stream().Synchronize() // !!
+				scaleRealParts(fftKern, output.Float().Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.gpuFFTKern[i][j] = TryMakeFloats(len(fftKern))
+				c.gpuFFTKern[i][j].CopyHtoD(fftKern)
+			}
+		}
+	}
+}
+
+func (c *Symm2D) Run() {
+	core.Log("running convolution")
+	LockCudaThread()
+
+	for {
+		c.Exec()
+	}
+}
+
+func (c *Symm2D) Exec() {
+	if c.is2D() {
+		c.exec2D()
+	} else {
+		c.exec3D()
+	}
+}
+
+func (c *Symm2D) exec3D() {
+	padded := c.kernSize
+
+	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
+	for i := 0; i < 3; i++ {
+		inc := c.input.Comp(i)
+		in2 := inc.ReadNext(c.n)
+		in := in2.Device()
+		c.fftRBuf[i].MemsetAsync(0, c.stream)
+		copyPad(c.fftRBuf[i], in, padded, c.size)
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		c.stream.Synchronize()
+		inc.ReadDone()
+	}
+
+	// kern mul
+	kernMulRSymm3D(c.fftCBuf,
+		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
+		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+		N0, N1, N2)
+	c.stream.Synchronize()
+
+	// BW FFT
+	for i := 0; i < 3; i++ {
+		outc := c.output.Comp(i)
+		out2 := outc.WriteNext(c.n)
+		out := out2.Device()
+		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		copyPad(out, c.fftRBuf[i], c.size, padded)
+		c.stream.Synchronize()
+		outc.WriteDone()
+	}
+}
+
+func (c *Symm2D) exec2D() {
+	padded := c.kernSize
+
+	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
+	// Convolution is separated into
+	// a 1D convolution for x
+	// and a 2D convolution for yz.
+	// so only 2 FFT buffers are then needed at the same time.
+
+	// FFT x
+	inc := c.input.Comp(0)
+	in2 := inc.ReadNext(c.n)
+	in := in2.Device()
+	c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
+	copyPad(c.fftRBuf[0], in, padded, c.size)
+	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
+	//c.stream.Synchronize()
+	inc.ReadDone()
+
+	// kern mul X
+	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
+	//c.stream.Synchronize()
+
+	// bw FFT x
+	outc := c.output.Comp(0)
+	out2 := outc.WriteNext(c.n)
+	out := out2.Device()
+	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
+	copyPad(out, c.fftRBuf[0], c.size, padded)
+	c.stream.Synchronize()
+	outc.WriteDone()
+
+	// FW FFT yz
+	for i := 1; i < 3; i++ {
+		inc := c.input.Comp(i)
+		in2 := inc.ReadNext(c.n)
+		in := in2.Device()
+		c.fftRBuf[i].MemsetAsync(0, c.stream)
+		copyPad(c.fftRBuf[i], in, padded, c.size)
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		c.stream.Synchronize()
+		inc.ReadDone()
+	}
+
+	// kern mul yz
+	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
+		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
+		N1, N2)
+	c.stream.Synchronize()
+
+	// BW FFT yz
+	for i := 1; i < 3; i++ {
+		outc := c.output.Comp(i)
+		out2 := outc.WriteNext(c.n)
+		out := out2.Device()
+		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		copyPad(out, c.fftRBuf[i], c.size, padded)
+		c.stream.Synchronize()
+		outc.WriteDone()
+	}
+}
+
+func (c *Symm2D) is2D() bool {
+	return c.size[0] == 1
+}
+
+func (c *Symm2D) is3D() bool {
+	return !c.is2D()
+}
+
+func (c *Symm2D) Output() nimble.ChanN {
+	return c.outChan
+}
+
+func NewConvolution(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.ChanN) *Symm2D {
+	size := mesh.Size()
+	input := input_.NewReader()
+	c := new(Symm2D)
+	c.size = size
+	c.kernArr = kernel
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if kernel[i][j] != nil {
+				c.kern[i][j] = core.Contiguous(kernel[i][j])
+			}
+		}
+	}
+	c.n = prod(size)
+	c.kernSize = core.SizeOf(kernel[0][0])
+	c.input = input
+	c.outChan = nimble.MakeChanN(3, tag, unit, mesh, memType, 0)
+	c.output = c.outChan // TODO: rm
+
+	c.init()
+	nimble.Stack(c)
+
+	return c
+	// TODO: self-test
+}
+
+// freeing kernel memory may fail when it was spilled to host.
+func free(a cu.DevicePtr) {
+	// recover should not be needed
+	defer func() {
+		err := recover()
+		if err != nil {
+			core.Log("free: recovered", err)
+			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
+		}
+	}()
+
+	if a.MemoryType() == cu.MemoryTypeDevice {
+		a.Free()
+	} else {
+		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
+	}
+}

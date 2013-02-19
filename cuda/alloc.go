@@ -22,18 +22,15 @@ func memAlloc(bytes int64) unsafe.Pointer {
 }
 
 // Try to allocate on GPU, spill to unified host if out of GPU memory.
-func TryMakeFloats(N int) cu.DevicePtr {
-	return cu.DevicePtr(memAlloc(data.SIZEOF_FLOAT32 * int64(N)))
-	//var s safe.Float32s
-	//ptr := tryMalloc(cu.SIZEOF_FLOAT32 * int64(N))
-	//s.UnsafeSet(ptr, N, N)
-	//return s
+func TryMakeFloats(size [3]int) *data.Slice {
+	m := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+	return NewSlice(1, m)
 }
 
-// Try to allocate on GPU, spill to unified host if out of GPU memory.
-func TryMakeComplexs(N int) cu.DevicePtr {
-	return TryMakeFloats(2 * N)
-}
+//// Try to allocate on GPU, spill to unified host if out of GPU memory.
+//func TryMakeComplexs(N0, N1, N2 int) *data.Slice {
+//	return TryMakeFloats(N0, N1, 2 * N2)
+//}
 
 //func HostFloats(N int) safe.Float32s {
 //	var s safe.Float32s

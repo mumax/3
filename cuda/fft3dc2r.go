@@ -1,6 +1,8 @@
 package cuda
 
 import (
+	"code.google.com/p/mx3/data"
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/cufft"
 )
@@ -21,9 +23,17 @@ func NewFFT3DC2R(Nx, Ny, Nz int, stream cu.Stream) FFT3DC2RPlan {
 
 // Execute the FFT plan.
 // src and dst are 3D arrays stored 1D arrays.
-func (p FFT3DC2RPlan) Exec(src, dst cu.DevicePtr) {
-	p.handle.ExecC2R(src, dst)
-	p.stream.Synchronize()
+func (p FFT3DC2RPlan) Exec(src, dst *data.Slice) {
+	oksrclen := p.InputLen()
+	if src.Len() != oksrclen {
+		panic(fmt.Errorf("size mismatch: expecting src len %v, got %v", oksrclen, src.Len()))
+	}
+	okdstlen := p.OutputLen()
+	if dst.Len() != okdstlen {
+		panic(fmt.Errorf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
+	}
+	p.handle.ExecC2R(cu.DevicePtr(src.DevPtr(0)), cu.DevicePtr(dst.DevPtr(0)))
+	p.stream.Synchronize() //!
 }
 
 // 3D size of the input array.

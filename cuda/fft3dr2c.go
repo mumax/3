@@ -1,8 +1,11 @@
 package cuda
 
 import (
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/cufft"
+	"log"
 )
 
 // 3D single-precission real-to-complex FFT plan.
@@ -20,8 +23,18 @@ func NewFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) FFT3DR2CPlan {
 }
 
 // Execute the FFT plan. Synchronized.
-func (p FFT3DR2CPlan) Exec(src, dst cu.DevicePtr) {
-	p.handle.ExecR2C(src, dst)
+// src and dst are 3D arrays stored 1D arrays.
+func (p FFT3DR2CPlan) Exec(src, dst *data.Slice) {
+	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
+	oksrclen := p.InputLen()
+	if src.Len() != oksrclen {
+		log.Panicf("size mismatch: expecting src len %v, got %v", oksrclen, src.Len())
+	}
+	okdstlen := p.OutputLen()
+	if dst.Len() != okdstlen {
+		log.Panicf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len())
+	}
+	p.handle.ExecR2C(cu.DevicePtr(src.DevPtr(0)), cu.DevicePtr(dst.DevPtr(0)))
 	p.stream.Synchronize()
 }
 

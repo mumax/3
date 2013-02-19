@@ -9,6 +9,7 @@ PKGS=\
 	$(PREFIX)/kernel\
 	$(PREFIX)/draw\
 	$(PREFIX)/mag\
+	$(PREFIX)/data\
 # 	$(PREFIX)/prof\
 
 $(PREFIX)/kernel: nvcc
@@ -38,6 +39,7 @@ racetest:
 	go test -race $(PKGS)
 	make -C test
 
+.PHONY: test
 test: 6gtest unittest #gccgotest #re-enable gccgotest when gcc up to date with go 1.1
 
 unittest:

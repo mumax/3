@@ -1,6 +1,7 @@
 package data
 
 import (
+	"code.google.com/p/mx3/util"
 	"fmt"
 	"hash"
 	"hash/crc64"
@@ -10,18 +11,24 @@ import (
 	"unsafe"
 )
 
-func ReadSlice(in io.Reader) (*Slice, error) {
+func Read(in io.Reader) (*Slice, error) {
 	r := newReader(in)
 	return r.readSlice()
 }
 
-func ReadSliceFile(fname string) (*Slice, error) {
+func ReadFile(fname string) (*Slice, error) {
 	f, err := os.Open(fname)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	return ReadSlice(f)
+	return Read(f)
+}
+
+func MustReadFile(fname string) *Slice {
+	s, err := ReadFile(fname)
+	util.FatalErr(err)
+	return s
 }
 
 // Reads successive data frames in dump format.

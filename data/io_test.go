@@ -18,12 +18,12 @@ func TestIO(t *testing.T) {
 
 	buf := bytes.NewBuffer(nil)
 
-	err := DumpSlice(buf, slice, time)
+	err := Write(buf, slice, time)
 	if err != nil {
 		t.Error(err)
 	}
 
-	slice2, err2 := ReadSlice(buf)
+	slice2, err2 := Read(buf)
 	if err != nil {
 		t.Error(err2)
 	}

@@ -79,10 +79,10 @@ func (c *Reader) Comp(i int) Reader {
 //	return c.tag
 //}
 //
-//func (c *quant) Mesh() *Mesh {
-//	return c.mesh
-//}
-//
+func (c *quant) Mesh() *Mesh {
+	return c.buffer.Mesh()
+}
+
 //func (c *quant) MemType() MemType {
 //	return c.buffer.MemType
 //}

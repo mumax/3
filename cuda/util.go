@@ -1,12 +1,8 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
-	"math"
-	"runtime"
-	"sync/atomic"
-	"unsafe"
 )
 
 //// Undo LockCudaThread()
@@ -67,7 +63,7 @@ func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 	gridSize.Y = NY
 	gridSize.Z = 1
 
-	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
+	util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }
 
@@ -86,6 +82,6 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	gridSize.Z = 1
 
 	N := N1 * N2
-	core.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
+	util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }

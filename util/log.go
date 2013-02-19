@@ -42,9 +42,16 @@ func Debug(msg ...interface{}) {
 	log.Println(append([]interface{}{caller}, msg...)...)
 }
 
-// Argument panics with "illegal argument" if test is false.
+// Panics with "illegal argument" if test is false.
 func Argument(test bool) {
 	if !test {
 		log.Panic("illegal argument")
+	}
+}
+
+// Panics with "assertion failed" if test is false.
+func Assert(test bool) {
+	if !test {
+		log.Panic("assertion failed")
 	}
 }

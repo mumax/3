@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/data"
 	"github.com/barnex/cuda5/cu"
 	"log"
-	"unsafe"
 )
 
 type Symm2D struct {
@@ -130,7 +129,7 @@ func (c *Symm2D) Exec() {
 }
 
 func (c *Symm2D) exec3D() {
-	padded := c.kernSize
+	//padded := c.kernSize
 	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
 
 	// FW FFT
@@ -160,7 +159,7 @@ func (c *Symm2D) exec3D() {
 }
 
 func (c *Symm2D) exec2D() {
-	padded := c.kernSize
+	//padded := c.kernSize
 
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
 	// Convolution is separated into
@@ -223,47 +222,45 @@ func (c *Symm2D) Output() *data.Quant {
 	return c.output
 }
 
+// TODO: kernel is *Slice
 func NewConvolution(input *data.Quant, kernel [3][3][][][]float32) *Symm2D {
 	mesh := input.Mesh()
 	size := mesh.Size()
-	input := input_.NewReader()
 	c := new(Symm2D)
 	c.size = size
-	c.kernArr = kernel
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if kernel[i][j] != nil {
-				c.kern[i][j] = core.Contiguous(kernel[i][j])
+				c.kern[i][j] = data.SliceFromList([][]float32{data.Contiguous(kernel[i][j])}, mesh)
 			}
 		}
 	}
 	c.n = prod(size)
-	c.kernSize = core.SizeOf(kernel[0][0])
-	c.input = input
-	c.outChan = nimble.MakeChanN(3, tag, unit, mesh, memType, 0)
-	c.output = c.outChan // TODO: rm
+	c.kernSize = data.SizeOf(kernel[0][0])
+	c.input = input.NewReader()
+	c.output = NewQuant(3, mesh)
 
 	c.init()
-	nimble.Stack(c)
+	//nimble.Stack(c)
 
 	return c
 	// TODO: self-test
 }
 
 // freeing kernel memory may fail when it was spilled to host.
-func free(a cu.DevicePtr) {
-	// recover should not be needed
-	defer func() {
-		err := recover()
-		if err != nil {
-			core.Log("free: recovered", err)
-			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
-		}
-	}()
-
-	if a.MemoryType() == cu.MemoryTypeDevice {
-		a.Free()
-	} else {
-		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
-	}
-}
+//func free(a cu.DevicePtr) {
+//	// recover should not be needed
+//	defer func() {
+//		err := recover()
+//		if err != nil {
+//			core.Log("free: recovered", err)
+//			core.Log("this is a bug, please report to a.vansteenkiste@gmail.com")
+//		}
+//	}()
+//
+//	if a.MemoryType() == cu.MemoryTypeDevice {
+//		a.Free()
+//	} else {
+//		cu.MemFreeHost(unsafe.Pointer(uintptr(a)))
+//	}
+//}

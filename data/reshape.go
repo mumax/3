@@ -50,17 +50,18 @@ func Reshape(array []float32, size [3]int) [][][]float32 {
 //	return sliced
 //}
 
-func sizeOf(block [][][]float32) [3]int {
+// Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
+func SizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }
 
 // Reshape the block to one contiguous list.
 // Assumes the block's storage is contiguous,
-// like returned by MakeFloats or Reshape.
-//func contiguous(block [][][]float32) []float32 {
-//	N := prod(sizeOf(block))
-//	return block[0][0][:N]
-//}
+// like returned by Reshape.
+func Contiguous(block [][][]float32) []float32 {
+	N := prod(SizeOf(block))
+	return block[0][0][:N]
+}
 
 //func Contiguous4D(block [][][][]float32) []float32 {
 //	N := len(block) * len(block[0]) * len(block[0][0]) * len(block[0][0][0])

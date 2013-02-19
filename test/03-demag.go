@@ -32,10 +32,13 @@ func main() {
 			}
 		}
 	}
+
 	mgpu := m.WriteNext(m.Mesh().NCell())
 	data.Copy(mgpu, mhost)
 	m.WriteDone()
 
+	B := conv.Output().NewReader()
 	conv.Exec()
-	//B := conv.Output().Data().HostCopy()
+	B.ReadNext(B.Mesh().NCell()).HostCopy()
+	B.ReadDone()
 }

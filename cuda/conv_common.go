@@ -3,8 +3,8 @@ package cuda
 // common code for all convolutions.
 
 import (
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"github.com/barnex/cuda5/safe"
 	"github.com/barnex/fmath"
 	"log"
 )
@@ -21,9 +21,11 @@ func prod(size [3]int) int {
 // Extract real parts, copy them from src to dst.
 // In the meanwhile, check if imaginary parts are nearly zero
 // and scale the kernel to compensate for unnormalized FFTs.
-func scaleRealParts(dstList []float32, src safe.Float32s, scale float32) {
-	util.Argument(2*len(dstList) == src.Len())
-	srcList := src.Host()
+func scaleRealParts(dst, src *data.Slice, scale float32) {
+	util.Argument(2*dst.Len() == src.Len())
+	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+	srcList := src.HostCopy().Host()[0]
+	dstList := dst.Host()[0]
 
 	// Normally, the FFT'ed kernel is purely real because of symmetry,
 	// so we only store the real parts...

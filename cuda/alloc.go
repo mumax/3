@@ -27,6 +27,13 @@ func TryMakeFloats(size [3]int) *data.Slice {
 	return NewSlice(1, m)
 }
 
+// Returns a copy of in, allocated on GPU.
+func GPUCopy(in *data.Slice) *data.Slice {
+	s := NewSlice(in.NComp(), in.Mesh())
+	data.Copy(s, in)
+	return s
+}
+
 //// Try to allocate on GPU, spill to unified host if out of GPU memory.
 //func TryMakeComplexs(N0, N1, N2 int) *data.Slice {
 //	return TryMakeFloats(N0, N1, 2 * N2)

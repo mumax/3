@@ -39,6 +39,9 @@ func TestSlice(t *testing.T) {
 	if b.NComp() != 1 {
 		t.Error("b.NComp", b.NComp())
 	}
+	if *b.Mesh() != *a.Mesh() {
+		t.Fail()
+	}
 }
 
 func TestCpy(t *testing.T) {

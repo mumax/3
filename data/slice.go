@@ -142,6 +142,7 @@ func (s *Slice) Comp(i int) *Slice {
 	sl := new(Slice)
 	sl.ptr_[0] = s.ptrs[i]
 	sl.ptrs = sl.ptr_[:1]
+	sl.info = s.info
 	sl.len_ = s.len_
 	sl.memType = s.memType
 	return sl

@@ -28,32 +28,32 @@ func (p FFT3DR2CPlan) Exec(src, dst *data.Slice) {
 	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
 	oksrclen := p.InputLen()
 	if src.Len() != oksrclen {
-		log.Panicf("size mismatch: expecting src len %v, got %v", oksrclen, src.Len())
+		log.Panicf("fft size mismatch: expecting src len %v, got %v", oksrclen, src.Len())
 	}
 	okdstlen := p.OutputLen()
 	if dst.Len() != okdstlen {
-		log.Panicf("size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len())
+		log.Panicf("fft size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len())
 	}
 	p.handle.ExecR2C(cu.DevicePtr(src.DevPtr(0)), cu.DevicePtr(dst.DevPtr(0)))
 	p.stream.Synchronize()
 }
 
 // 3D size of the input array.
-func (p FFT3DR2CPlan) InputSize() (Nx, Ny, Nz int) {
+func (p FFT3DR2CPlan) InputSizeFloats() (Nx, Ny, Nz int) {
 	return p.size3D[0], p.size3D[1], p.size3D[2]
 }
 
 // 3D size of the output array.
-func (p FFT3DR2CPlan) OutputSize() (Nx, Ny, Nz int) {
-	return p.size3D[0], p.size3D[1], p.size3D[2]/2 + 1
+func (p FFT3DR2CPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
+	return p.size3D[0], p.size3D[1], p.size3D[2] + 2
 }
 
 // Required length of the (1D) input array.
 func (p FFT3DR2CPlan) InputLen() int {
-	return prod3(p.InputSize())
+	return prod3(p.InputSizeFloats())
 }
 
 // Required length of the (1D) output array.
 func (p FFT3DR2CPlan) OutputLen() int {
-	return prod3(p.OutputSize())
+	return prod3(p.OutputSizeFloats())
 }

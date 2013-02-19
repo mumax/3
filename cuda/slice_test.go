@@ -126,4 +126,7 @@ func TestSliceSlice(t *testing.T) {
 	if *a.Mesh() != *b.Mesh() {
 		t.Fail()
 	}
+	if a.MemType() != b.MemType() {
+		t.Fail()
+	}
 }

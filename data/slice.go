@@ -214,7 +214,7 @@ func (s *Slice) HostCopy() *Slice {
 }
 
 func Copy(dst, src *Slice) {
-	argument(dst.NComp() == src.NComp() && dst.Mesh().Size() == src.Mesh().Size())
+	argument(dst.NComp() == src.NComp() && dst.Len() == src.Len())
 	d, s := dst.GPUAccess(), src.GPUAccess()
 	bytes := SIZEOF_FLOAT32 * int64(dst.Len())
 	switch {

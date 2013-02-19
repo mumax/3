@@ -16,15 +16,26 @@ func main() {
 
 	m := cuda.NewQuant(3, mesh)
 	conv := cuda.NewDemag(m)
-	m_ := m.Data().Vectors()
+
+	mhost := m.Data().HostCopy()
+	m_ := mhost.Vectors()
+	r := float64(N) / 4
 	for i := 0; i < N; i++ {
+		x := c * (float64(i) + 0.5 - float64(N/2))
 		for j := 0; j < N; j++ {
+			y := c * (float64(j) + 0.5 - float64(N/2))
 			for k := 0; k < N; k++ {
-				x := float64(i)
+				z := c * (float64(k) + 0.5 - float64(N/2))
+				if x*x+y*y+z*z < r*r {
+					m_[0][i][j][k] = 1
+				}
 			}
 		}
 	}
+	mgpu := m.WriteNext(m.Mesh().NCell())
+	data.Copy(mgpu, mhost)
+	m.WriteDone()
 
 	conv.Exec()
-	B := conv.Output().Data().HostCopy()
+	//B := conv.Output().Data().HostCopy()
 }

@@ -131,14 +131,15 @@ func (c *Symm2D) Exec() {
 
 func (c *Symm2D) exec3D() {
 	padded := c.kernSize
-
 	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
+
+	// FW FFT
 	for i := 0; i < 3; i++ {
-		inc := c.input.
-		in := c.Comp(i).ReadNext(c.n)
+		inc := c.input.Comp(i)
+		in := inc.ReadNext(c.n)
 		Memset(c.fftRBuf[i], 0)
 		copyPad(c.fftRBuf[i], in)
-		c.Comp(i).ReadDone()
+		inc.ReadDone()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
@@ -147,16 +148,13 @@ func (c *Symm2D) exec3D() {
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
 		N0, N1, N2)
-	c.stream.Synchronize()
 
 	// BW FFT
 	for i := 0; i < 3; i++ {
 		outc := c.output.Comp(i)
-		out2 := outc.WriteNext(c.n)
-		out := out2.Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		copyPad(out, c.fftRBuf[i], c.size, padded)
-		c.stream.Synchronize()
+		out := outc.WriteNext(c.n)
+		copyPad(out, c.fftRBuf[i]) //, c.size, padded)
 		outc.WriteDone()
 	}
 }
@@ -166,59 +164,49 @@ func (c *Symm2D) exec2D() {
 
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
 	// Convolution is separated into
-	// a 1D convolution for x
-	// and a 2D convolution for yz.
-	// so only 2 FFT buffers are then needed at the same time.
+	// a 1D convolution for x and a 2D convolution for yz.
+	// So only 2 FFT buffers are needed at the same time.
 
 	// FFT x
+	Memset(c.fftRBuf[0], 0)
 	inc := c.input.Comp(0)
-	in2 := inc.ReadNext(c.n)
-	in := in2.Device()
-	c.fftRBuf[0].MemsetAsync(0, c.stream) // copypad does NOT zero remainder.
-	copyPad(c.fftRBuf[0], in, padded, c.size)
-	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
-	//c.stream.Synchronize()
+	in := inc.ReadNext(c.n)
+	copyPad(c.fftRBuf[0], in) //, padded, c.size)
 	inc.ReadDone()
+	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X
 	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
 	//c.stream.Synchronize()
 
 	// bw FFT x
-	outc := c.output.Comp(0)
-	out2 := outc.WriteNext(c.n)
-	out := out2.Device()
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-	copyPad(out, c.fftRBuf[0], c.size, padded)
-	c.stream.Synchronize()
+	outc := c.output.Comp(0)
+	out := outc.WriteNext(c.n)
+	copyPad(out, c.fftRBuf[0]) //, c.size, padded)
 	outc.WriteDone()
 
 	// FW FFT yz
 	for i := 1; i < 3; i++ {
+		Memset(c.fftRBuf[i], 0)
 		inc := c.input.Comp(i)
-		in2 := inc.ReadNext(c.n)
-		in := in2.Device()
-		c.fftRBuf[i].MemsetAsync(0, c.stream)
-		copyPad(c.fftRBuf[i], in, padded, c.size)
-		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-		c.stream.Synchronize()
+		in := inc.ReadNext(c.n)
+		copyPad(c.fftRBuf[i], in) //, padded, c.size)
 		inc.ReadDone()
+		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
 	// kern mul yz
 	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
 		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
 		N1, N2)
-	c.stream.Synchronize()
 
 	// BW FFT yz
 	for i := 1; i < 3; i++ {
-		outc := c.output.Comp(i)
-		out2 := outc.WriteNext(c.n)
-		out := out2.Device()
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		copyPad(out, c.fftRBuf[i], c.size, padded)
-		c.stream.Synchronize()
+		outc := c.output.Comp(i)
+		out := outc.WriteNext(c.n)
+		copyPad(out, c.fftRBuf[i]) //, c.size, padded)
 		outc.WriteDone()
 	}
 }
@@ -231,11 +219,12 @@ func (c *Symm2D) is3D() bool {
 	return !c.is2D()
 }
 
-func (c *Symm2D) Output() nimble.ChanN {
-	return c.outChan
+func (c *Symm2D) Output() *data.Quant {
+	return c.output
 }
 
-func NewConvolution(tag, unit string, mesh *nimble.Mesh, memType nimble.MemType, kernel [3][3][][][]float32, input_ nimble.ChanN) *Symm2D {
+func NewConvolution(input *data.Quant, kernel [3][3][][][]float32) *Symm2D {
+	mesh := input.Mesh()
 	size := mesh.Size()
 	input := input_.NewReader()
 	c := new(Symm2D)

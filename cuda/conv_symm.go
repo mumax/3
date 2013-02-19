@@ -219,20 +219,14 @@ func (c *Symm2D) Output() *data.Quant {
 }
 
 // TODO: kernel is *Slice
-func NewConvolution(input *data.Quant, kernel [3][3][][][]float32) *Symm2D {
+func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
 	mesh := input.Mesh()
 	size := mesh.Size()
 	c := new(Symm2D)
 	c.size = size
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if kernel[i][j] != nil {
-				c.kern[i][j] = data.SliceFromList([][]float32{data.Contiguous(kernel[i][j])}, mesh)
-			}
-		}
-	}
+	c.kern = kernel
 	c.n = prod(size)
-	c.kernSize = data.SizeOf(kernel[0][0])
+	c.kernSize = kernel[0][0].Mesh().Size()
 	c.input = input.NewReader()
 	c.output = NewQuant(3, mesh)
 

@@ -8,6 +8,7 @@ PKGS=\
 	$(PREFIX)/util\
 	$(PREFIX)/kernel\
 	$(PREFIX)/draw\
+	$(PREFIX)/mag\
 # 	$(PREFIX)/prof\
 
 $(PREFIX)/kernel: nvcc

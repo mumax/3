@@ -1,40 +1,41 @@
 package mag
 
 import (
-	"code.google.com/p/mx3/core"
-	"code.google.com/p/mx3/nimble"
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
+	"log"
 	"math"
 )
 
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces and averages over cell volumes.
 // Mesh should NOT yet be zero-padded.
-func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
+func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
 		pbc := mesh.PBC()
-		core.Assert(pbc == [3]int{0, 0, 0}) // PBC not supported yet
+		util.Argument(pbc == [3]int{0, 0, 0}) // PBC not supported yet
 		sz := padSize(mesh.Size(), pbc)
 		cs := mesh.CellSize()
-		mesh = nimble.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
+		mesh = data.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
 	}
 
 	// Shorthand
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
-	core.Log("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
+	log.Println("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
 
 	// Sanity check
 	{
-		core.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
-		core.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-		core.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
-		core.Assert(accuracy > 0)
+		util.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
+		util.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
+		util.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
+		util.Assert(accuracy > 0)
 		// TODO: in case of PBC, this will not be met:
-		core.Assert(size[1]%2 == 0 && size[2]%2 == 0)
+		util.Assert(size[1]%2 == 0 && size[2]%2 == 0)
 		if size[0] > 1 {
-			core.Assert(size[0]%2 == 0)
+			util.Assert(size[0]%2 == 0)
 		}
 	}
 
@@ -42,7 +43,8 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			array[i][j] = core.MakeFloats(size)
+			kernel[i][j] = data.NewSlice(1, mesh)
+			array[i][j] = kernel[i][j].Scalars()
 		}
 	}
 
@@ -114,7 +116,7 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 					nv *= 2
 					nw *= 2
 
-					core.Assert(nv > 0 && nw > 0 && nx > 0 && ny > 0 && nz > 0)
+					util.Assert(nv > 0 && nw > 0 && nx > 0 && ny > 0 && nz > 0)
 
 					scale := 1 / float64(nv*nw*nx*ny*nz)
 					surface := cellsize[v] * cellsize[w] // the two directions perpendicular to direction s
@@ -171,18 +173,17 @@ func BruteKernel(mesh *nimble.Mesh, accuracy float64) [3][3][][][]float32 {
 			}
 		}
 	}
-	core.Log("kernel used", points, "integration points")
-	//fmt.Println(accuracy, points, array[0][0][0][0][0] +1./3.) // debug
+	log.Println("kernel used", points, "integration points")
 	// for 2D these elements are zero:
 	if size[0] == 1 {
-		array[0][1] = nil
-		array[0][2] = nil
+		kernel[0][1] = nil
+		kernel[0][2] = nil
 	}
 	// make result symmetric for tools that expect it so.
-	array[1][0] = array[0][1]
-	array[2][0] = array[0][2]
-	array[2][1] = array[1][2]
-	return array
+	kernel[1][0] = kernel[0][1]
+	kernel[2][0] = kernel[0][2]
+	kernel[2][1] = kernel[1][2]
+	return kernel
 }
 
 const (

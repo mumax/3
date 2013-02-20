@@ -18,7 +18,7 @@ func (c *Symm2D) selfTest() {
 	backup = nil
 
 	brute := data.NewSlice(3, c.input.Mesh())
-	Brute(input.Vectors(), brute.Vectors(), c.kern)
+	bruteConv(input.Vectors(), brute.Vectors(), c.kern)
 	data.MustWriteFile("brute.dump", brute, 0) // rm!
 
 	a, b := output.Host(), brute.Host()
@@ -55,7 +55,7 @@ func abs(x float32) float32 {
 // 	(O0)   (K01 K02 K03)   (I0)
 // 	(O1) = (K11 K12 K13) * (I1)
 // 	(O2)   (K21 K22 K23)   (I2)
-func Brute(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
+func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 
 	var kern [3][3][][][]float32
 	for i := range kern {

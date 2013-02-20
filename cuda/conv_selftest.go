@@ -28,7 +28,7 @@ func (c *Symm2D) selfTest() {
 		}
 	}
 	err := math.Sqrt(rms) / float64(3*len(a[0]))
-	log.Println("Demag self-test RMS error:", err)
+	log.Println("Convolution self-test RMS error:", err)
 }
 
 func sqr(x float32) float64 { return float64(x * x) }

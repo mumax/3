@@ -67,15 +67,15 @@ func (c *Symm2D) initFFTKern3D() {
 	c.fftKernSize = realsize
 	halfkern := realsize
 	fwPlan := c.fwPlan
-	output := c.fftCBuf[0] //TryMakeFloats(fftR2COutputSizeFloats(c.kernSize))
-	input := c.fftRBuf[0]  //output.Slice(0, fwPlan.InputLen())
+	output := c.fftCBuf[0]
+	input := c.fftRBuf[0]
 
 	// upper triangular part
 	fftKern := data.NewSlice(1, data.NewMesh(halfkern[0], halfkern[1], halfkern[2], 1, 1, 1))
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
 			if c.kern[i][j] != nil { // ignore 0's
-				data.Copy(input, c.kern[i][j]) //input.CopyHtoD(c.kern[i][j])
+				data.Copy(input, c.kern[i][j])
 				fwPlan.Exec(input, output)
 				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
@@ -115,7 +115,6 @@ func (c *Symm2D) initFFTKern2D() {
 func (c *Symm2D) Run() {
 	log.Println("running convolution")
 	LockThread()
-
 	for {
 		c.Exec()
 	}
@@ -168,7 +167,7 @@ func (c *Symm2D) exec2D() {
 	Memset(c.fftRBuf[0], 0)
 	inc := c.input.Comp(0)
 	in := inc.ReadNext(c.n)
-	copyPad(c.fftRBuf[0], in) //, padded, c.size)
+	copyPad(c.fftRBuf[0], in)
 	inc.ReadDone()
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 
@@ -182,7 +181,7 @@ func (c *Symm2D) exec2D() {
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
 	outc := c.output.Comp(0)
 	out := outc.WriteNext(c.n)
-	copyPad(out, c.fftRBuf[0]) //, c.size, padded)
+	copyPad(out, c.fftRBuf[0])
 	outc.WriteDone()
 
 	// FW FFT yz
@@ -190,7 +189,7 @@ func (c *Symm2D) exec2D() {
 		Memset(c.fftRBuf[i], 0)
 		inc := c.input.Comp(i)
 		in := inc.ReadNext(c.n)
-		copyPad(c.fftRBuf[i], in) //, padded, c.size)
+		copyPad(c.fftRBuf[i], in)
 		inc.ReadDone()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
@@ -207,7 +206,7 @@ func (c *Symm2D) exec2D() {
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
 		outc := c.output.Comp(i)
 		out := outc.WriteNext(c.n)
-		copyPad(out, c.fftRBuf[i]) //, c.size, padded)
+		copyPad(out, c.fftRBuf[i])
 		outc.WriteDone()
 	}
 }
@@ -224,7 +223,6 @@ func (c *Symm2D) Output() *data.Quant {
 	return c.output
 }
 
-// TODO: kernel is *Slice
 func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
 	mesh := input.Mesh()
 	size := mesh.Size()
@@ -237,9 +235,7 @@ func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
 	c.output = NewQuant(3, mesh)
 
 	c.init()
-	//nimble.Stack(c)
-	//c.nokmul = true // !! rm
+	// TODO: self-test
 
 	return c
-	// TODO: self-test
 }

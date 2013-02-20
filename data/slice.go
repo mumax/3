@@ -210,6 +210,9 @@ func (s *Slice) Host() [][]float32 {
 // Returns a copy of the Slice, allocated on CPU.
 func (s *Slice) HostCopy() *Slice {
 	cpy := NewSlice(s.NComp(), s.Mesh())
+	if cpy.Len() != s.Len() {
+		cpy = cpy.Slice(0, s.Len())
+	}
 	Copy(cpy, s)
 	return cpy
 }

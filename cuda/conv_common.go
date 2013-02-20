@@ -24,6 +24,7 @@ func prod(size [3]int) int {
 func scaleRealParts(dst, src *data.Slice, scale float32) {
 	util.Argument(2*dst.Len() == src.Len())
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+
 	srcList := src.HostCopy().Host()[0]
 	dstList := dst.Host()[0]
 

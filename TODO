@@ -1,5 +1,7 @@
 slice time stamp
 
+slice mesh is not OK when using a part of the slice (i.e., a "slice";-). is now misused, especially in convolution. API should be more fool-proof.
+
 fuse a standard micromag kernel for at least the local terms. uses inline functions. exchange adds to demag. extra pointers to output buffers , if not NULL, leak intermediate output.  To save memory.
 
 dedicated exchange kernel or optimized stencil.

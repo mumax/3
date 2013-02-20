@@ -8,10 +8,10 @@ import (
 
 // Copies src into dst, which is larger or smaller.
 // The remainder of dst is not filled with zeros.
-func copyPad(dst, src *data.Slice) {
+func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
-	dstsize := dst.Mesh().Size()
-	srcsize := src.Mesh().Size()
+	util.Assert(dst.Len() == prod(dstsize))
+	util.Assert(src.Len() == prod(srcsize))
 
 	NO := IMin(dstsize[1], srcsize[1])
 	N1 := IMin(dstsize[2], srcsize[2])

@@ -44,7 +44,14 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 	for(int i=0; i<N0; i++){
 
 		int I = i*N1*N2 + j*N2 + k;
-	
+  		int e = 2 * I;
+		float reMx = fftMx[e  ];
+		float imMx = fftMx[e+1];
+		float reMy = fftMy[e  ];
+		float imMy = fftMy[e+1];
+		float reMz = fftMz[e  ];
+		float imMz = fftMz[e+1];
+		
 		if (j < N1/2 + 1){
 			Kxx = fftKxx[I];
 			Kyy = fftKyy[I];
@@ -62,14 +69,6 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 			Kxy = -fftKxy[I2]; // !
 		}
 
-  		int e = 2 * I;
-		float reMx = fftMx[e  ];
-		float imMx = fftMx[e+1];
-		float reMy = fftMy[e  ];
-		float imMy = fftMy[e+1];
-		float reMz = fftMz[e  ];
-		float imMz = fftMz[e+1];
-		
 		fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
 		fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;
 		fftMy[e  ] = reMx * Kxy + reMy * Kyy + reMz * Kyz;

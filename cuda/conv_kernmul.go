@@ -12,9 +12,7 @@ import (
 )
 
 func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
-	//N0, N1, N2 := fftMy.
 	util.Argument(K11.Len() == (N1/2+1)*N2)
-	util.Argument(fftMy.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
 	gridDim, blockDim := Make2DConf(N1, N2)
@@ -26,6 +24,7 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
 
 func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
+	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
 
 	gridDim, blockDim := Make2DConf(N1, N2)
 
@@ -33,9 +32,8 @@ func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
 }
 
 func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int) {
-	util.Argument(K11.Len() == N0*N1*N2)
-
-	//util.Argument(fftM.NComp() == 3)
+	util.Argument(K00.Len() == N0*(N1/2+1)*N2)
+	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 
 	gridDim, blockDim := Make2DConf(N1, N2)
 

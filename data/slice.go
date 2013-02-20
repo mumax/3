@@ -184,9 +184,9 @@ func (s *Slice) Slice(a, b int) *Slice {
 	slice.info = s.info
 	// if the slice does not span the entire mesh, it might be silently abused
 	// for now we make that fail, but we need a better solution.
-	if slice.Len() != s.Len() {
-		slice.info = nil
-	}
+	//	if slice.Len() != s.Len() {
+	//		slice.info = nil
+	//	}
 	return slice
 }
 

@@ -30,7 +30,7 @@ import (
 //	}
 //}
 
-func IMin(a, b int) int {
+func iMin(a, b int) int {
 	if a < b {
 		return a
 	}
@@ -38,26 +38,26 @@ func IMin(a, b int) int {
 }
 
 // Integer division rounded up.
-func DivUp(x, y int) int {
+func divUp(x, y int) int {
 	return ((x - 1) / y) + 1
 }
 
 const (
-	maxBlockSize = 512   // TODO
-	maxGridSize  = 65535 // TODO
+	MaxBlockSize = 512   // TODO
+	MaxGridSize  = 65535 // TODO
 )
 
 // Make a 1D kernel launch configuration suited for N threads.
 func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 
-	blockSize.X = maxBlockSize
+	blockSize.X = MaxBlockSize
 	blockSize.Y = 1
 	blockSize.Z = 1
 
-	N2 := DivUp(N, maxBlockSize) // N2 blocks left
+	N2 := divUp(N, MaxBlockSize) // N2 blocks left
 
-	NX := DivUp(N2, maxGridSize)
-	NY := DivUp(N2, NX)
+	NX := divUp(N2, MaxGridSize)
+	NY := divUp(N2, NX)
 
 	gridSize.X = NX
 	gridSize.Y = NY
@@ -74,8 +74,8 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	blockSize.Y = BLOCK
 	blockSize.Z = 1
 
-	NX := DivUp(N2, BLOCK)
-	NY := DivUp(N1, BLOCK)
+	NX := divUp(N2, BLOCK)
+	NY := divUp(N1, BLOCK)
 
 	gridSize.X = NX
 	gridSize.Y = NY

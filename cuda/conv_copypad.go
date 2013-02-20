@@ -13,9 +13,9 @@ func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int) {
 	util.Assert(dst.Len() == prod(dstsize))
 	util.Assert(src.Len() == prod(srcsize))
 
-	NO := IMin(dstsize[1], srcsize[1])
-	N1 := IMin(dstsize[2], srcsize[2])
-	gridSize, blockSize := Make2DConf(NO, N1)
+	N0 := iMin(dstsize[1], srcsize[1])
+	N1 := iMin(dstsize[2], srcsize[2])
+	gridSize, blockSize := Make2DConf(N0, N1)
 
 	kernel.K_copypad(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
 		src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2],

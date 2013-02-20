@@ -3,6 +3,8 @@ package data
 // File: Quant stores a physical quantity.
 // Author: Arne Vansteenkiste
 
+import "log"
+
 // shared by Quant and Reader
 type quant struct {
 	buffer Slice           // stores the data
@@ -92,11 +94,18 @@ func (c *quant) Mesh() *Mesh {
 ////func (c Quant) Quant() Quant     { return c } // implements Chan iface
 ////func (c Quant) Comp(i int) Chan1 { return c.comp[i] }
 //
-//// UnsafeData returns the data buffer without locking.
-//// To be used with extreme care.
-//func (c *quant) UnsafeData() Slice {
-//	return c.buffer
-//}
+
+// UnsafeData returns the data buffer without locking.
+// To be used with extreme care.
+func (c *quant) UnsafeData() *Slice {
+	for i := 0; i < c.NComp(); i++ {
+		if c.lock[i].isLocked() {
+			log.Panic("quant unsafe data: is locked")
+		}
+	}
+	return &c.buffer
+}
+
 //
 // WriteNext locks and returns a slice of length n for
 // writing the next n elements to the Chan3.

@@ -2,7 +2,36 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"log"
+	"math"
+	"math/rand"
 )
+
+func (c *Symm2D) selfTest() {
+	backup := c.input.UnsafeData().HostCopy()
+	input := data.NewSlice(3, c.input.Mesh())
+	initConvTestInput(input.Vectors())
+	data.Copy(c.input.UnsafeData(), input)
+	c.Exec()
+	output := c.output.UnsafeData().HostCopy()
+	data.Copy(c.input.UnsafeData(), backup) // restore input
+	backup = nil
+
+	brute := data.NewSlice(3, c.input.Mesh())
+	Brute(input.Vectors(), brute.Vectors(), c.kern)
+
+	a, b := output.Host(), brute.Host()
+	rms := 0.0
+	for c := range a {
+		for i := range a[c] {
+			rms += sqr(a[c][i] - b[c][i])
+		}
+	}
+	err := math.Sqrt(rms) / float64(3*len(a[0]))
+	log.Println("Demag self-test RMS error:", err)
+}
+
+func sqr(x float32) float64 { return float64(x * x) }
 
 // Brute-force O(N²) vector convolution on CPU.
 // Used to verify GPU FFT convolution.
@@ -74,4 +103,27 @@ func Wrap(number, max int) int {
 		number -= max
 	}
 	return number
+}
+
+// random number between -1 and 1.
+func rnd() float32 {
+	return 1 - 2*rand.Float32()
+}
+
+// generate sparse input data for testing the convolution.
+func initConvTestInput(input [3][][][]float32) {
+	size := data.SizeOf(input[0])
+	N0, N1, N2 := size[0], size[1], size[2]
+	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
+	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
+	ks := [...]int{0, N2 / 11, N2 / 2, N2 - 1}
+	for c := range input {
+		for _, i := range is {
+			for _, j := range js {
+				for _, k := range ks {
+					input[c][i][j][k] = rnd()
+				}
+			}
+		}
+	}
 }

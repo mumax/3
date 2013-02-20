@@ -235,7 +235,7 @@ func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
 	c.output = NewQuant(3, mesh)
 
 	c.init()
-	// TODO: self-test
+	c.selfTest()
 
 	return c
 }

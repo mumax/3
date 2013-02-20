@@ -82,25 +82,3 @@ package gpu
 //	nimble.Log("convolution test error:", maxerr, "OK")
 //}
 //
-//// random number between -1 and 1.
-//func rnd() float32 {
-//	return 1 - 2*rand.Float32()
-//}
-//
-//// generate sparse input data
-//func initConvTestInput(input [3][][][]float32) {
-//	size := nimble.SizeOf(input[0])
-//	N0, N1, N2 := size[0], size[1], size[2]
-//	is := [...]int{N0 - 1} //	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
-//	js := [...]int{N1 - 1} //	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
-//	ks := [...]int{N2 - 1} //	ks := [...]int{0, N2 / 11, N2 / 2, N2 - 1}
-//	for c := range input {
-//		for _, i := range is {
-//			for _, j := range js {
-//				for _, k := range ks {
-//					input[c][i][j][k] = rnd()
-//				}
-//			}
-//		}
-//	}
-//}

@@ -91,11 +91,11 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 							continue // skip zero kernel
 						}
 						for dx := 0; dx < size[0]; dx++ {
-							i := Wrap(dx-sx, ksize[0])
+							i := wrap(dx-sx, ksize[0])
 							for dy := 0; dy < size[1]; dy++ {
-								j := Wrap(dy-sy, ksize[1])
+								j := wrap(dy-sy, ksize[1])
 								for dz := 0; dz < size[2]; dz++ {
-									k := Wrap(dz-sz, ksize[2])
+									k := wrap(dz-sz, ksize[2])
 									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * kern[dc][sc][i][j][k]
 								}
 							}
@@ -108,7 +108,7 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 }
 
 // Wraps an index to [0, max] by adding/subtracting a multiple of max.
-func Wrap(number, max int) int {
+func wrap(number, max int) int {
 	for number < 0 {
 		number += max
 	}

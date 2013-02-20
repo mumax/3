@@ -6,7 +6,7 @@ import (
 	"math/rand"
 )
 
-func (c *Symm2D) selfTest() {
+func (c *DemagConvolution) selfTest() {
 	backup := c.input.UnsafeData().HostCopy()
 	input := data.NewSlice(3, c.input.Mesh())
 	initConvTestInput(input.Vectors())

@@ -36,12 +36,7 @@ func prod3(x, y, z int) int {
 func (p fftplan) Destroy() { p.handle.Destroy() }
 
 // Associates a CUDA stream with the FFT plan.
-func (p fftplan) SetStream(stream cu.Stream) {
+func (p fftplan) setStream(stream cu.Stream) {
 	p.handle.SetStream(stream)
 	p.stream = stream
 }
-
-// Returns the CUDA stream associated with the FFT plan.
-//func (p fftplan) Stream() cu.Stream {
-//	return p.stream
-//}

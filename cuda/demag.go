@@ -7,7 +7,7 @@ import (
 
 const DEFAULT_KERNEL_ACC = 6
 
-func NewDemag(m *data.Quant) *Symm2D {
+func NewDemag(m *data.Quant) *DemagConvolution {
 	k := mag.BruteKernel(m.Mesh(), DEFAULT_KERNEL_ACC)
 	return NewConvolution(m, k)
 }

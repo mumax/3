@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-type Symm2D struct {
+type DemagConvolution struct {
 	size        [3]int            // 3D size of the input/output data
 	kernSize    [3]int            // Size of kernel and logical FFT size.
 	fftKernSize [3]int            // Size of real, FFTed kernel
@@ -23,7 +23,7 @@ type Symm2D struct {
 	nokmul      bool // Disable kernel multiplication, for debug
 }
 
-func (c *Symm2D) init() {
+func (c *DemagConvolution) init() {
 	log.Println("initializing convolution")
 	if c.inited {
 		log.Panic("conv: already initialized")
@@ -59,7 +59,7 @@ func (c *Symm2D) init() {
 	}
 }
 
-func (c *Symm2D) initFFTKern3D() {
+func (c *DemagConvolution) initFFTKern3D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
 	realsize := ffted
@@ -86,7 +86,7 @@ func (c *Symm2D) initFFTKern3D() {
 
 // Initialize GPU FFT kernel for 2D.
 // Only the non-redundant parts are stored on the GPU.
-func (c *Symm2D) initFFTKern2D() {
+func (c *DemagConvolution) initFFTKern2D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
 	realsize := ffted
@@ -112,7 +112,7 @@ func (c *Symm2D) initFFTKern2D() {
 	}
 }
 
-func (c *Symm2D) Run() {
+func (c *DemagConvolution) Run() {
 	log.Println("running convolution")
 	LockThread()
 	for {
@@ -120,7 +120,7 @@ func (c *Symm2D) Run() {
 	}
 }
 
-func (c *Symm2D) Exec() {
+func (c *DemagConvolution) Exec() {
 	if c.is2D() {
 		c.exec2D()
 	} else {
@@ -128,7 +128,7 @@ func (c *Symm2D) Exec() {
 	}
 }
 
-func (c *Symm2D) exec3D() {
+func (c *DemagConvolution) exec3D() {
 	padded := c.kernSize
 
 	// FW FFT
@@ -160,7 +160,7 @@ func (c *Symm2D) exec3D() {
 	}
 }
 
-func (c *Symm2D) exec2D() {
+func (c *DemagConvolution) exec2D() {
 	// Convolution is separated into
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
@@ -214,22 +214,22 @@ func (c *Symm2D) exec2D() {
 	}
 }
 
-func (c *Symm2D) is2D() bool {
+func (c *DemagConvolution) is2D() bool {
 	return c.size[0] == 1
 }
 
-func (c *Symm2D) is3D() bool {
+func (c *DemagConvolution) is3D() bool {
 	return !c.is2D()
 }
 
-func (c *Symm2D) Output() *data.Quant {
+func (c *DemagConvolution) Output() *data.Quant {
 	return c.output
 }
 
-func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
+func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *DemagConvolution {
 	mesh := input.Mesh()
 	size := mesh.Size()
-	c := new(Symm2D)
+	c := new(DemagConvolution)
 	c.size = size
 	c.kern = kernel
 	c.n = prod(size)

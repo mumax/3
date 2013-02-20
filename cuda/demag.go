@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/mx3/mag"
 )
 
+// Default accuracy setting for demag kernel.
 const DEFAULT_KERNEL_ACC = 6
 
 func NewDemag(m *data.Quant) *DemagConvolution {

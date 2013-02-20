@@ -37,7 +37,8 @@ func (c *DemagConvolution) selfTest() {
 	//}
 }
 
-const CONV_TOLERANCE = 1e-3
+// Maximum tolerable error on demag convolution self-test.
+const CONV_TOLERANCE = 1e-6
 
 func abs(x float32) float32 {
 	if x < 0 {

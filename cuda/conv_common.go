@@ -48,4 +48,5 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 	}
 }
 
+// Maximum tolerable imaginary/real part for demag kernel in Fourier space. Assures kernel has correct symmetry.
 const FFT_IMAG_TOLERANCE = 1e-5

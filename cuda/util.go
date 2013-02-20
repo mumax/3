@@ -42,9 +42,10 @@ func divUp(x, y int) int {
 	return ((x - 1) / y) + 1
 }
 
+// CUDA Launch parameters. TODO: use device properties.
 const (
-	MaxBlockSize = 512   // TODO
-	MaxGridSize  = 65535 // TODO
+	MaxBlockSize = 512
+	MaxGridSize  = 65535
 )
 
 // Make a 1D kernel launch configuration suited for N threads.

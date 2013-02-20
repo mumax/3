@@ -31,8 +31,10 @@ func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
 	kernel.K_kernmulRSymm2Dx(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, gridDim, blockDim)
 }
 
+// Does not yet use Y mirror symmetry!!
+// Even though it is implemented partially in kernel
 func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int) {
-	util.Argument(K00.Len() == N0*(N1/2+1)*N2)
+	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
 	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 
 	gridDim, blockDim := Make2DConf(N1, N2)

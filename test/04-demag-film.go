@@ -11,7 +11,7 @@ import (
 func main() {
 	cuda.Init()
 
-	N0, N1, N2 := 1, 64, 64
+	N0, N1, N2 := 1, 32, 64
 	c := 1.
 	mesh := data.NewMesh(N0, N1, N2, c, c, c)
 

@@ -27,9 +27,15 @@ func (c *Symm2D) selfTest() {
 			rms += sqr(a[c][i] - b[c][i])
 		}
 	}
-	err := math.Sqrt(rms) / float64(3*len(a[0]))
-	log.Println("Convolution self-test RMS error:", err)
+	err := float32(math.Sqrt(rms) / float64(3*len(a[0])))
+	if err > CONV_TOLERANCE {
+		log.Fatal("convolution self-test RMS error:", err)
+	} else {
+		log.Println("convolution self-test RMS error:", err)
+	}
 }
+
+const CONV_TOLERANCE = 1e-3
 
 func sqr(x float32) float64 { return float64(x * x) }
 

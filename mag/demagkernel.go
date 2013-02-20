@@ -24,7 +24,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	periodic := mesh.PBC()
-	log.Println("Calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
+	log.Println("calculating demag kernel:", "accuracy:", accuracy, ", mesh:", mesh)
 
 	// Sanity check
 	{

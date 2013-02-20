@@ -13,11 +13,13 @@ func (c *Symm2D) selfTest() {
 	data.Copy(c.input.UnsafeData(), input)
 	c.Exec()
 	output := c.output.UnsafeData().HostCopy()
-	data.Copy(c.input.UnsafeData(), backup) // restore input
+	data.MustWriteFile("gpu.dump", output, 0) // rm!
+	data.Copy(c.input.UnsafeData(), backup)   // restore input
 	backup = nil
 
 	brute := data.NewSlice(3, c.input.Mesh())
 	Brute(input.Vectors(), brute.Vectors(), c.kern)
+	data.MustWriteFile("brute.dump", brute, 0) // rm!
 
 	a, b := output.Host(), brute.Host()
 	err := float32(0)
@@ -123,6 +125,7 @@ func rnd() float32 {
 
 // generate sparse input data for testing the convolution.
 func initConvTestInput(input [3][][][]float32) {
+	rand.Seed(0) // reproducible tests
 	size := data.SizeOf(input[0])
 	N0, N1, N2 := size[0], size[1], size[2]
 	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}

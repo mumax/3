@@ -20,6 +20,7 @@ type Symm2D struct {
 	bwPlan      FFT3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
 	inited      bool
+	nokmul      bool // Disable kernel multiplication, for debug
 }
 
 func (c *Symm2D) init() {
@@ -140,11 +141,13 @@ func (c *Symm2D) exec3D() {
 	}
 
 	// kern mul
-	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
-	kernMulRSymm3D(c.fftCBuf,
-		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-		N0, N1, N2)
+	if !c.nokmul {
+		N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
+		kernMulRSymm3D(c.fftCBuf,
+			c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
+			c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+			N0, N1, N2)
+	}
 
 	// BW FFT
 	for i := 0; i < 3; i++ {
@@ -171,8 +174,9 @@ func (c *Symm2D) exec2D() {
 
 	// kern mul X
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
-	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
-	//c.stream.Synchronize()
+	if !c.nokmul {
+		kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
+	}
 
 	// bw FFT x
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
@@ -192,9 +196,11 @@ func (c *Symm2D) exec2D() {
 	}
 
 	// kern mul yz
-	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
-		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-		N1, N2)
+	if !c.nokmul {
+		kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
+			c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
+			N1, N2)
+	}
 
 	// BW FFT yz
 	for i := 1; i < 3; i++ {
@@ -232,6 +238,7 @@ func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *Symm2D {
 
 	c.init()
 	//nimble.Stack(c)
+	//c.nokmul = true // !! rm
 
 	return c
 	// TODO: self-test

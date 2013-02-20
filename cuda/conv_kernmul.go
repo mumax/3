@@ -10,7 +10,9 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
+
 	gridDim, blockDim := Make2DConf(N1, N2)
+
 	kernel.K_kernmulRSymm2Dyz(fftMy.DevPtr(0), fftMz.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
 		N1, N2, gridDim, blockDim)
@@ -18,14 +20,19 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
 
 func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
+
 	gridDim, blockDim := Make2DConf(N1, N2)
+
 	kernel.K_kernmulRSymm2Dx(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, gridDim, blockDim)
 }
 
 func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int) {
 	util.Argument(K11.Len() == N0*N1*N2)
+
 	//util.Argument(fftM.NComp() == 3)
+
 	gridDim, blockDim := Make2DConf(N1, N2)
+
 	kernel.K_kernmulRSymm3D(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
 		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),
 		N0, N1, N2, gridDim, blockDim)

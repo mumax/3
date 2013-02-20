@@ -1,5 +1,10 @@
 package cuda
 
+/*
+ Kernel multiplication for purely real kernel, symmetric around Y axis (apart from first row).
+ Launch configs range over all complex elements of fft input.
+*/
+
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/kernel"
@@ -7,6 +12,7 @@ import (
 )
 
 func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
+	//N0, N1, N2 := fftMy.
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)

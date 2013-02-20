@@ -26,18 +26,17 @@ kernmulRSymm2Dx(float* __restrict__  fftMx, float* __restrict__  fftKxx, int N1,
 	int I = j*N2 + k;       // linear index for upper half of kernel
 	int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
 
-    float Kxx;
+  	int e = 2 * I;
 
+    float reMx = fftMx[e  ];
+    float imMx = fftMx[e+1];
+
+    float Kxx;
 	if (j < N1/2 + 1){
 		Kxx = fftKxx[I];
 	}else{
 		Kxx = fftKxx[I2];
 	}
-
-  	int e = 2 * I;
-
-    float reMx = fftMx[e  ];
-    float imMx = fftMx[e+1];
 
     fftMx[e  ] = reMx * Kxx;
     fftMx[e+1] = imMx * Kxx;

@@ -99,6 +99,7 @@ func (s *Slice) Free() {
 	}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
+	s.info = nil
 	s.memType = 0
 }
 
@@ -181,6 +182,11 @@ func (s *Slice) Slice(a, b int) *Slice {
 	slice.len_ = int32(b - a)
 	slice.memType = s.memType
 	slice.info = s.info
+	// if the slice does not span the entire mesh, it might be silently abused
+	// for now we make that fail, but we need a better solution.
+	if slice.Len() != s.Len() {
+		slice.info = nil
+	}
 	return slice
 }
 

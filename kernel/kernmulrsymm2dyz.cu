@@ -36,26 +36,23 @@ kernmulRSymm2Dyz(float* __restrict__  fftMy,  float* __restrict__  fftMz,
 	int I = j*N2 + k;       // linear index for upper half of kernel
 	int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
 
-    float Kyy;
-    float Kzz;
-    float Kyz;
-
-	if (j < N1/2 + 1){
-		Kyy = fftKyy[I];
-		Kzz = fftKzz[I];
-		Kyz = fftKyz[I];
-	}else{
-		Kyy = fftKyy[I2];
-		Kzz = fftKzz[I2];
-		Kyz = -fftKyz[I2];
-	}
-
   	int e = 2 * I;
 
     float reMy = fftMy[e  ];
     float imMy = fftMy[e+1];
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
+
+    float Kyy, Kzz, Kyz;
+	if (j < N1/2 + 1){
+		Kyy = fftKyy[I];
+		Kzz = fftKzz[I];
+		Kyz = fftKyz[I];
+	}else{
+		Kyy =  fftKyy[I2];
+		Kzz =  fftKzz[I2];
+		Kyz = -fftKyz[I2];
+	}
 
     fftMy[e  ] = reMy * Kyy + reMz * Kyz;
     fftMy[e+1] = imMy * Kyy + imMz * Kyz;

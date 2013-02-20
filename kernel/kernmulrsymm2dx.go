@@ -66,8 +66,8 @@ const kernmulRSymm2Dx_ptx = `
 	ld.param.u64 	%rd4, [kernmulRSymm2Dx_param_1];
 	ld.param.u32 	%r3, [kernmulRSymm2Dx_param_2];
 	ld.param.u32 	%r4, [kernmulRSymm2Dx_param_3];
-	cvta.to.global.u64 	%rd1, %rd3;
-	cvta.to.global.u64 	%rd2, %rd4;
+	cvta.to.global.u64 	%rd1, %rd4;
+	cvta.to.global.u64 	%rd2, %rd3;
 	.loc 2 19 1
 	mov.u32 	%r5, %ntid.y;
 	mov.u32 	%r6, %ctaid.y;
@@ -89,39 +89,39 @@ const kernmulRSymm2Dx_ptx = `
 	.loc 2 27 1
 	sub.s32 	%r12, %r3, %r1;
 	mad.lo.s32 	%r13, %r12, %r4, %r2;
+	.loc 2 29 1
+	shl.b32 	%r14, %r11, 1;
 	.loc 2 31 1
-	shr.u32 	%r14, %r3, 31;
-	add.s32 	%r15, %r3, %r14;
-	shr.s32 	%r16, %r15, 1;
-	add.s32 	%r17, %r16, 1;
-	setp.lt.s32 	%p4, %r1, %r17;
-	.loc 2 32 1
-	selp.b32 	%r18, %r11, %r13, %p4;
-	mul.wide.s32 	%rd5, %r18, 4;
+	mul.wide.s32 	%rd5, %r14, 4;
 	add.s64 	%rd6, %rd2, %rd5;
-	.loc 2 37 1
-	shl.b32 	%r19, %r11, 1;
-	.loc 2 39 1
-	mul.wide.s32 	%rd7, %r19, 4;
-	add.s64 	%rd8, %rd1, %rd7;
-	.loc 2 40 1
+	.loc 2 32 1
+	add.s32 	%r15, %r14, 1;
+	mul.wide.s32 	%rd7, %r15, 4;
+	add.s64 	%rd8, %rd2, %rd7;
+	ld.global.f32 	%f1, [%rd8];
+	.loc 2 35 1
+	shr.u32 	%r17, %r3, 31;
+	add.s32 	%r18, %r3, %r17;
+	shr.s32 	%r19, %r18, 1;
 	add.s32 	%r20, %r19, 1;
-	mul.wide.s32 	%rd9, %r20, 4;
+	setp.lt.s32 	%p4, %r1, %r20;
+	.loc 2 36 1
+	selp.b32 	%r21, %r11, %r13, %p4;
+	mul.wide.s32 	%rd9, %r21, 4;
 	add.s64 	%rd10, %rd1, %rd9;
-	ld.global.f32 	%f1, [%rd10];
-	.loc 2 39 1
-	ld.global.f32 	%f2, [%rd8];
-	.loc 2 37 1
+	.loc 2 41 1
+	ld.global.f32 	%f2, [%rd10];
+	.loc 2 31 1
 	ld.global.f32 	%f3, [%rd6];
+	.loc 2 41 1
+	mul.f32 	%f4, %f3, %f2;
+	st.global.f32 	[%rd6], %f4;
 	.loc 2 42 1
-	mul.f32 	%f4, %f2, %f3;
-	st.global.f32 	[%rd8], %f4;
-	.loc 2 43 1
-	mul.f32 	%f5, %f1, %f3;
-	st.global.f32 	[%rd10], %f5;
+	mul.f32 	%f5, %f1, %f2;
+	st.global.f32 	[%rd8], %f5;
 
 BB0_2:
-	.loc 2 44 2
+	.loc 2 43 2
 	ret;
 }
 

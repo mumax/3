@@ -11,8 +11,8 @@ import (
 func main() {
 	cuda.Init()
 
-	N0, N1, N2 := 32, 32, 32
-	c := 1e-3
+	N0, N1, N2 := 1, 32, 32
+	c := 1.
 	mesh := data.NewMesh(N0, N1, N2, c, c, c)
 
 	m := cuda.NewQuant(3, mesh)

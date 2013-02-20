@@ -3,7 +3,6 @@ package cuda
 import (
 	"code.google.com/p/mx3/data"
 	"log"
-	"math"
 	"math/rand"
 )
 
@@ -21,23 +20,29 @@ func (c *Symm2D) selfTest() {
 	Brute(input.Vectors(), brute.Vectors(), c.kern)
 
 	a, b := output.Host(), brute.Host()
-	rms := 0.0
+	err := float32(0)
 	for c := range a {
 		for i := range a[c] {
-			rms += sqr(a[c][i] - b[c][i])
+			if abs(a[c][i]-b[c][i]) > err {
+				err = abs(a[c][i] - b[c][i])
+			}
 		}
 	}
-	err := float32(math.Sqrt(rms) / float64(3*len(a[0])))
 	if err > CONV_TOLERANCE {
-		log.Fatal("convolution self-test RMS error:", err)
+		log.Fatal("convolution self-test error: ", err)
 	} else {
-		log.Println("convolution self-test RMS error:", err)
+		log.Println("convolution self-test error:", err)
 	}
 }
 
 const CONV_TOLERANCE = 1e-3
 
-func sqr(x float32) float64 { return float64(x * x) }
+func abs(x float32) float32 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
 
 // Brute-force O(N²) vector convolution on CPU.
 // Used to verify GPU FFT convolution.

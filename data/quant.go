@@ -9,6 +9,7 @@ import "log"
 type quant struct {
 	buffer Slice           // stores the data
 	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
+	nosync bool            // disables syncing
 }
 
 type Quant struct {
@@ -22,7 +23,7 @@ func QuantFromSlice(s *Slice) *Quant {
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return &Quant{quant{*s, lock}}
+	return &Quant{quant{*s, lock, false}}
 }
 
 func (q *Quant) Data() *Slice {
@@ -56,7 +57,7 @@ func (c *quant) NComp() int {
 }
 
 func (c *quant) comp(i int) quant {
-	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}}
+	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}, c.nosync}
 }
 
 func (c *Quant) Comp(i int) Quant {
@@ -98,6 +99,9 @@ func (c *quant) Mesh() *Mesh {
 // UnsafeData returns the data buffer without locking.
 // To be used with extreme care.
 func (c *quant) UnsafeData() *Slice {
+	if c.nosync {
+		return &c.buffer
+	}
 	for i := 0; i < c.NComp(); i++ {
 		if c.lock[i].isLocked() {
 			log.Panic("quant unsafe data: is locked")
@@ -106,12 +110,11 @@ func (c *quant) UnsafeData() *Slice {
 	return &c.buffer
 }
 
-//
-// WriteNext locks and returns a slice of length n for
-// writing the next n elements to the Chan3.
-// When done, WriteDone() should be called to "send" the
-// slice down the Chan3. After that, the slice is not valid any more.
+// lock the next n elements of buffer.
 func (c *quant) next(n int) *Slice {
+	if c.nosync {
+		return c.buffer.Slice(0, n)
+	}
 	c.lock[0].lockNext(n)
 	a, b := c.lock[0].lockedRange()
 	ncomp := c.NComp()
@@ -122,14 +125,22 @@ func (c *quant) next(n int) *Slice {
 			panic("chan: next: inconsistent state")
 		}
 	}
-	next := c.buffer.Slice(a, b)
-	return next
+	return c.buffer.Slice(a, b)
 }
 
+// unlock the locked buffer range.
 func (c *quant) done() {
+	if c.nosync {
+		return
+	}
 	for i := 0; i < c.NComp(); i++ {
 		c.lock[i].unlock()
 	}
+}
+
+// INTERNAL: enable/disable synchronization.
+func (c *quant) SetSync(sync bool) {
+	c.nosync = !sync
 }
 
 func (c *Quant) WriteNext(n int) *Slice {

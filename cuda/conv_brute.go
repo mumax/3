@@ -1,7 +1,7 @@
-package gpu
+package cuda
 
 import (
-	"code.google.com/p/mx3/core"
+	"code.google.com/p/mx3/data"
 )
 
 // Brute-force O(N²) vector convolution on CPU.
@@ -13,11 +13,19 @@ import (
 // 	(O0)   (K01 K02 K03)   (I0)
 // 	(O1) = (K11 K12 K13) * (I1)
 // 	(O2)   (K21 K22 K23)   (I2)
-func Brute(in, out [3][][][]float32, kern [3][3][][][]float32) {
+func Brute(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 
-	size := core.SizeOf(in[0])
-	ksize := core.SizeOf(kern[0][0])
+	var kern [3][3][][][]float32
+	for i := range kern {
+		for j := range kern[i] {
+			if kernel[i][j] != nil {
+				kern[i][j] = kernel[i][j].Scalars()
+			}
+		}
+	}
 
+	size := data.SizeOf(in[0])
+	ksize := data.SizeOf(kern[0][0])
 	// Zero output first
 	for c := 0; c < 3; c++ {
 		for x := 0; x < size[0]; x++ {

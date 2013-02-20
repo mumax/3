@@ -40,10 +40,10 @@ func (c *Symm2D) init() {
 	{ // init device buffers
 		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
 		for i := 1; i < 3; i++ {
-			c.fftCBuf[i] = TryMakeFloats(fftR2COutputSizeFloats(c.kernSize))
+			c.fftCBuf[i] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
 		}
 		if c.is3D() {
-			c.fftCBuf[0] = TryMakeFloats(fftR2COutputSizeFloats(c.kernSize))
+			c.fftCBuf[0] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
 		} else {
 			c.fftCBuf[0] = c.fftCBuf[1]
 		}

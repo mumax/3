@@ -21,8 +21,8 @@ func memAlloc(bytes int64) unsafe.Pointer {
 	return unsafe.Pointer(cu.MemAlloc(bytes))
 }
 
-// Try to allocate on GPU, spill to unified host if out of GPU memory.
-func TryMakeFloats(size [3]int) *data.Slice {
+// TODO: spill if does not fit GPU?
+func makeFloats(size [3]int) *data.Slice {
 	m := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
 	return NewSlice(1, m)
 }

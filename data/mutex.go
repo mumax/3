@@ -12,7 +12,7 @@ import (
 )
 
 type mutex interface {
-	lockNext(delta int)
+	lockNext()
 	unlock()
 	lockedRange() (start, stop int)
 	isLocked() bool
@@ -62,8 +62,9 @@ func (m *rwMutex) delta(Δstart, Δstop int) {
 	m.absB += Δb
 }
 
-// Lock the next delta elements.
-func (m *rwMutex) lockNext(delta int) {
+// Lock the next frame.
+func (m *rwMutex) lockNext() {
+	delta := m.n
 	m.cond.L.Lock()
 	if m.absA != m.absB {
 		panic("rwmutex: lock of locked mutex")
@@ -162,7 +163,8 @@ func (m *rMutex) delta(Δstart, Δstop int) {
 }
 
 // Lock the next delta elements for reading.
-func (m *rMutex) lockNext(delta int) {
+func (m *rMutex) lockNext() {
+	delta := m.rw.n
 	m.rw.cond.L.Lock()
 	if m.absC != m.absD {
 		panic("rmutex: readnext w/o readdone")

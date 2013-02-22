@@ -111,15 +111,16 @@ func (c *quant) UnsafeData() *Slice {
 }
 
 // lock the next n elements of buffer.
-func (c *quant) next(n int) *Slice {
+func (c *quant) next() *Slice {
+	//n := c.Mesh().NCell()
 	if c.nosync {
-		return c.buffer.Slice(0, n)
+		return &c.buffer
 	}
-	c.lock[0].lockNext(n)
+	c.lock[0].lockNext()
 	a, b := c.lock[0].lockedRange()
 	ncomp := c.NComp()
 	for i := 1; i < ncomp; i++ {
-		c.lock[i].lockNext(n)
+		c.lock[i].lockNext()
 		α, β := c.lock[i].lockedRange()
 		if α != a || β != b {
 			panic("chan: next: inconsistent state")
@@ -143,16 +144,16 @@ func (c *quant) SetSync(sync bool) {
 	c.nosync = !sync
 }
 
-func (c *Quant) WriteNext(n int) *Slice {
-	return c.quant.next(n)
+func (c *Quant) WriteNext() *Slice {
+	return c.quant.next()
 }
 
 func (c *Quant) WriteDone() {
 	c.quant.done()
 }
 
-func (c *Reader) ReadNext(n int) *Slice {
-	return c.quant.next(n)
+func (c *Reader) ReadNext() *Slice {
+	return c.quant.next()
 }
 
 func (c *Reader) ReadDone() {

@@ -9,7 +9,6 @@ import "log"
 type quant struct {
 	buffer Slice           // stores the data
 	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
-	nosync bool            // disables syncing
 }
 
 type Quant struct {
@@ -23,18 +22,18 @@ func QuantFromSlice(s *Slice) *Quant {
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return &Quant{quant{*s, lock, false}}
+	return &Quant{quant{*s, lock}}
 }
 
-func (q *Quant) Data() *Slice {
-	// fail-fast test, likely to spot abuse sooner or later.
-	for c := 0; c < q.NComp(); c++ {
-		if q.lock[c].isLocked() {
-			panic("quant data is locked")
-		}
-	}
-	return &q.buffer
-}
+//func (q *Quant) Data() *Slice {
+//	// fail-fast test, likely to spot abuse sooner or later.
+//	for c := 0; c < q.NComp(); c++ {
+//		if q.lock[c].isLocked() {
+//			panic("quant data is locked")
+//		}
+//	}
+//	return &q.buffer
+//}
 
 type Reader struct {
 	quant
@@ -57,7 +56,7 @@ func (c *quant) NComp() int {
 }
 
 func (c *quant) comp(i int) quant {
-	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}, c.nosync}
+	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}}
 }
 
 func (c *Quant) Comp(i int) Quant {
@@ -96,12 +95,9 @@ func (c *quant) Mesh() *Mesh {
 ////func (c Quant) Comp(i int) Chan1 { return c.comp[i] }
 //
 
-// UnsafeData returns the data buffer without locking.
+// Returns the data buffer without locking.
 // To be used with extreme care.
-func (c *quant) UnsafeData() *Slice {
-	if c.nosync {
-		return &c.buffer
-	}
+func (c *quant) Data() *Slice {
 	for i := 0; i < c.NComp(); i++ {
 		if c.lock[i].isLocked() {
 			log.Panic("quant unsafe data: is locked")
@@ -113,9 +109,6 @@ func (c *quant) UnsafeData() *Slice {
 // lock the next n elements of buffer.
 func (c *quant) next() *Slice {
 	//n := c.Mesh().NCell()
-	if c.nosync {
-		return &c.buffer
-	}
 	c.lock[0].lockNext()
 	a, b := c.lock[0].lockedRange()
 	ncomp := c.NComp()
@@ -131,17 +124,9 @@ func (c *quant) next() *Slice {
 
 // unlock the locked buffer range.
 func (c *quant) done() {
-	if c.nosync {
-		return
-	}
 	for i := 0; i < c.NComp(); i++ {
 		c.lock[i].unlock()
 	}
-}
-
-// INTERNAL: enable/disable synchronization.
-func (c *quant) SetSync(sync bool) {
-	c.nosync = !sync
 }
 
 func (c *Quant) WriteNext() *Slice {

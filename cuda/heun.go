@@ -10,16 +10,14 @@ import (
 // TODO: now only for magnetization (because it normalizes), post-step hook?
 type Heun struct {
 	solverCommon
-	dy0      *data.Slice // internal buffer
-	y, dy    *data.Slice // external
-	updateDy func()      // updates dy
-	init     bool
+	y, dy0   *data.Slice
+	torqueFn func(m *data.Slice) *data.Slice // updates dy
 }
 
 func NewHeun(y, dy *data.Slice, dt, multiplier float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	dy0 := NewSlice(3, dy.Mesh())
-	return &Heun{dy0: dy0, y: y, dy: dy, solverCommon: newSolverCommon(dt, multiplier)}
+	return &Heun{dy0: dy0, y: y, solverCommon: newSolverCommon(dt, multiplier)}
 }
 
 // Run for a duration in seconds
@@ -74,13 +72,13 @@ func (e *Heun) Steps(steps int) {
 // Take one time step
 func (e *Heun) Step() {
 
-	y, dy, dy0 := e.y, e.dy, e.dy0
+	y, dy0 := e.y, e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
 
 	// stage 1
 	//nimble.Clock.Send(e.time, true)
-	e.updateDy()
+	dy := e.torqueFn(y)
 	Madd2(y, y, dy, 1, dt)
 	data.Copy(dy0, dy)
 

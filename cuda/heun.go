@@ -88,11 +88,11 @@ func (e *Heun) Step() {
 	//nimble.Clock.Send(e.time+e.dt_si, false)
 	e.updateDy()
 	{
-		e.err = MaxVecDiff(dy0.Safe(0), dy0.Safe(1), dy0.Safe(2), dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
+		e.err = MaxVecDiff(dy0, dy) * float64(dt)
 		e.checkErr()
 
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			e.delta = MaxVecNorm(dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
+			e.delta = MaxVecNorm(dy) * float64(dt)
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			Normalize(y)
 			e.time += e.dt_si

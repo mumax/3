@@ -11,7 +11,10 @@ import (
 
 // Sum of all elements.
 func Sum(in *data.Slice) float32 {
-	return reduce1(in, 0, kernel.K_reducesum)
+	util.Argument(in.NComp() == 1)
+	out := reduceBuf(0)
+	kernel.K_reducesum(in.DevPtr(0), out, init, in.Len(), gr, bl)
+	return copyback(out)
 }
 
 // Maximum of all elements.
@@ -26,7 +29,10 @@ func Sum(in *data.Slice) float32 {
 
 // Maximum of absolute values of all elements.
 func MaxAbs(in *data.Slice) float32 {
-	return reduce1(in, 0, kernel.K_reducemaxabs)
+	util.Argument(in.NComp() == 1)
+	out := reduceBuf(0)
+	kernel.K_reducemaxabs(in.DevPtr(0), out, init, in.Len(), gr, bl)
+	return copyback(out)
 }
 
 //// Maximum difference between the two arrays.
@@ -34,14 +40,15 @@ func MaxAbs(in *data.Slice) float32 {
 //func MaxDiff(a, b safe.Float32s) float32 {
 //	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
 //}
-//
-//// Maximum of the norms of all vectors (x[i], y[i], z[i]).
-//// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
-//func MaxVecNorm(x, y, z safe.Float32s) float64 {
-//	r := reduce3(x, y, z, 0, ptx.K_reducemaxvecnorm2)
-//	return math.Sqrt(float64(r))
-//}
-//
+
+// Maximum of the norms of all vectors (x[i], y[i], z[i]).
+// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
+func MaxVecNorm(v *data.Slice) float64 {
+	out := reduceBuf(0)
+	kernel.K_reducemaxvecnorm2(in.DevPtr(0), in.DevPtr(1), in.DevPtr(2), out, 0, in.Len(), gr, bl)
+	return math.Sqrt(float64(copyback(out)))
+}
+
 //// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
 //// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
 //// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
@@ -80,37 +87,11 @@ func MaxVecDiff(x, y *data.Slice) float64 {
 //}
 //
 
-// general reduce wrapper for one input array
-func reduce1(in *data.Slice, init float32, f func(in, out unsafe.Pointer, init float32, N int, grid, block cu.Dim3)) float32 {
-	util.Argument(in.NComp() == 1)
-	out := reduceBuf(init)
-	defer reduceRecycle(out)
-	gr, bl := reduceConf()
-	f(in.DevPtr(0), unsafe.Pointer(out), init, in.Len(), gr, bl)
-	return copyback(out)
-}
-
-// general reduce wrapper for 6 input arrays
-func reduce6(in1, in2, in3, in4, in5, in6 *data.Slice, init float32, f func(in1, in2, in3, in4, in5, in6, out unsafe.Poinster, init float32, N int, grid, block cu.Dim3)) float32 {
-	N := in1.Len()
-	Argument(in2.Len() == N && in3.Len() == N && in4.Len() == N && in5.Len() == N && in6.Len() == N)
-	out := reduceBuf(init)
-	defer reduceRecycle(out)
-	gr, bl := reduceConf()
-	f(in1.Pointer(), in2.Pointer(), in3.Pointer(), in4.Pointer(), in5.Pointer(), in6.Pointer(), out.Pointer(), init, N, gr, bl)
-	return copyback(out)
-}
-
-var reduceBuffers chan cu.DevicePtr // pool of 1-float CUDA buffers for reduce
-
-// recycle a 1-float CUDA reduction buffer
-func reduceRecycle(buf cu.DevicePtr) {
-	reduceBuffers <- buf
-}
+var reduceBuffers chan unsafe.Pointer // pool of 1-float CUDA buffers for reduce
 
 // return a 1-float CUDA reduction buffer from a pool
 // initialized to initVal
-func reduceBuf(initVal float32) cu.DevicePtr {
+func reduceBuf(initVal float32) unsafe.Pointer {
 	if reduceBuffers == nil {
 		initReduceBuf()
 	}
@@ -121,10 +102,12 @@ func reduceBuf(initVal float32) cu.DevicePtr {
 	return buf
 }
 
-func copyback(buf cu.DevicePtr) float32 {
+// copy back single float result from GPU and recycle buffer
+func copyback(buf unsafe.Pointer) float32 {
 	var result_ [1]float32
 	result := result_[:]
 	cu.MemcpyDtoH(unsafe.Pointer(&result[0]), buf, 1*cu.SIZEOF_FLOAT32)
+	reduceBuffers <- buf
 	return result_[0]
 }
 
@@ -133,14 +116,13 @@ func initReduceBuf() {
 	const N = 128
 	reduceBuffers = make(chan cu.DevicePtr, N)
 	for i := 0; i < N; i++ {
-		reduceBuffers <- cu.DevicePtr(memAlloc(1 * cu.SIZEOF_FLOAT32))
+		reduceBuffers <- memAlloc(1 * cu.SIZEOF_FLOAT32)
 	}
 }
 
 // launch configuration for reduce kernels
-func reduceConf() (gridDim, blockDim cu.Dim3) {
-	blockDim = cu.Dim3{kernel.REDUCE_BLOCKSIZE, 1, 1}
-	gridDim = cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
+var (
+	bl = cu.Dim3{kernel.REDUCE_BLOCKSIZE, 1, 1}
+	gr = cu.Dim3{8, 1, 1} // 8 is typ. number of multiprocessors.
 	// could be improved but takes hardly ~1% of execution time
-	return
-}
+)

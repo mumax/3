@@ -25,16 +25,6 @@ func QuantFromSlice(s *Slice) *Quant {
 	return &Quant{quant{*s, lock}}
 }
 
-//func (q *Quant) Data() *Slice {
-//	// fail-fast test, likely to spot abuse sooner or later.
-//	for c := 0; c < q.NComp(); c++ {
-//		if q.lock[c].isLocked() {
-//			panic("quant data is locked")
-//		}
-//	}
-//	return &q.buffer
-//}
-
 type Reader struct {
 	quant
 }
@@ -67,12 +57,6 @@ func (c *Reader) Comp(i int) Reader {
 	return Reader{c.comp(i)}
 }
 
-//// BufLen returns the number of buffered elements.
-//// This is the largest number of elements that can be read/written at once.
-//func (c *quant) BufLen() int {
-//	return c.buffer.Len()
-//}
-//
 //func (c *quant) Unit() string {
 //	return c.unit
 //}
@@ -80,7 +64,7 @@ func (c *Reader) Comp(i int) Reader {
 //func (c *quant) Tag() string {
 //	return c.tag
 //}
-//
+
 func (c *quant) Mesh() *Mesh {
 	return c.buffer.Mesh()
 }
@@ -89,11 +73,7 @@ func (c *quant) Mesh() *Mesh {
 //	return c.buffer.MemType
 //}
 //
-////func (c Quant) NBufferedBlocks() int { return c.comp[0].NBufferedBlocks() }
 ////func (c Quant) MemType() MemType { return c.buffer.MemType }
-////func (c Quant) Quant() Quant     { return c } // implements Chan iface
-////func (c Quant) Comp(i int) Chan1 { return c.comp[i] }
-//
 
 // Returns the data buffer without locking.
 // To be used with extreme care.
@@ -144,33 +124,3 @@ func (c *Reader) ReadNext() *Slice {
 func (c *Reader) ReadDone() {
 	c.quant.done()
 }
-
-//// WriteDone() signals a slice obtained by WriteNext() is fully
-//// written and can be sent down the Chan3.
-//
-////func (c Quant) WriteDelta(Δstart, Δstop int) [][]float32 {
-////	next := make([][]float32, c.NComp())
-////	for i := range c {
-////		c[i].WriteDelta(Δstart, Δstop)
-////		a, b := c[i].mutex.WRange()
-////		next[i] = c[i].slice.Slice(a, b).list
-////	}
-////	return next
-////}
-//
-//func bufferSize(m *Mesh, bufBlocks int) int {
-//	N := -666
-//	if bufBlocks < 1 { // means auto
-//		N = m.NCell() // buffer all
-//	} else {
-//		N = m.BlockLen() * bufBlocks
-//	}
-//	return N
-//}
-//
-//// safe integer division.
-//func idiv(a, b int) int {
-//	core.Assert(a%b == 0)
-//	return a / b
-//}
-//

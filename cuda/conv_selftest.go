@@ -11,7 +11,9 @@ func (c *DemagConvolution) selfTest() {
 	input := data.NewSlice(3, c.input.Mesh())
 	initConvTestInput(input.Vectors())
 	data.Copy(c.input.UnsafeData(), input)
-	c.Exec()
+	c.Exec(c.output.WriteNext(), c.input.ReadNext())
+	c.input.ReadDone()
+	c.output.WriteDone()
 	output := c.output.UnsafeData().HostCopy()
 	data.MustWriteFile("gpu.dump", output, 0) // rm!
 	data.Copy(c.input.UnsafeData(), backup)   // restore input

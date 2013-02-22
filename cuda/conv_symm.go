@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
 )
@@ -116,28 +117,30 @@ func (c *DemagConvolution) Run() {
 	log.Println("running convolution")
 	LockThread()
 	for {
-		c.Exec()
+		in, out := c.input.ReadNext(), c.output.WriteNext()
+		c.Exec(out, in)
+		c.input.ReadDone()
+		c.output.WriteDone()
 	}
 }
 
-func (c *DemagConvolution) Exec() {
+func (c *DemagConvolution) Exec(outp *data.Slice, inp ...*data.Slice) {
+	util.Argument(len(inp) == 1)
 	if c.is2D() {
-		c.exec2D()
+		c.exec2D(outp, inp[0])
 	} else {
-		c.exec3D()
+		c.exec3D(outp, inp[0])
 	}
 }
 
-func (c *DemagConvolution) exec3D() {
+func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
 	padded := c.kernSize
 
 	// FW FFT
 	for i := 0; i < 3; i++ {
-		inc := c.input.Comp(i)
-		in := inc.ReadNext()
 		Memset(c.fftRBuf[i], 0)
+		in := inp.Comp(i)
 		copyPad(c.fftRBuf[i], in, padded, c.size)
-		inc.ReadDone()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
@@ -152,15 +155,13 @@ func (c *DemagConvolution) exec3D() {
 
 	// BW FFT
 	for i := 0; i < 3; i++ {
-		outc := c.output.Comp(i)
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		out := outc.WriteNext()
+		out := outp.Comp(i)
 		copyPad(out, c.fftRBuf[i], c.size, padded)
-		outc.WriteDone()
 	}
 }
 
-func (c *DemagConvolution) exec2D() {
+func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	// Convolution is separated into
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
@@ -168,10 +169,8 @@ func (c *DemagConvolution) exec2D() {
 	padded := c.kernSize
 	// FFT x
 	Memset(c.fftRBuf[0], 0)
-	inc := c.input.Comp(0)
-	in := inc.ReadNext()
+	in := inp.Comp(0)
 	copyPad(c.fftRBuf[0], in, padded, c.size)
-	inc.ReadDone()
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X
@@ -182,18 +181,14 @@ func (c *DemagConvolution) exec2D() {
 
 	// bw FFT x
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-	outc := c.output.Comp(0)
-	out := outc.WriteNext()
+	out := outp.Comp(0)
 	copyPad(out, c.fftRBuf[0], c.size, padded)
-	outc.WriteDone()
 
 	// FW FFT yz
 	for i := 1; i < 3; i++ {
 		Memset(c.fftRBuf[i], 0)
-		inc := c.input.Comp(i)
-		in := inc.ReadNext()
+		in := inp.Comp(i)
 		copyPad(c.fftRBuf[i], in, padded, c.size)
-		inc.ReadDone()
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
@@ -207,10 +202,8 @@ func (c *DemagConvolution) exec2D() {
 	// BW FFT yz
 	for i := 1; i < 3; i++ {
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
-		outc := c.output.Comp(i)
-		out := outc.WriteNext()
+		out := outp.Comp(i)
 		copyPad(out, c.fftRBuf[i], c.size, padded)
-		outc.WriteDone()
 	}
 }
 

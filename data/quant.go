@@ -16,7 +16,7 @@ type Quant struct {
 }
 
 func QuantFromSlice(s *Slice) *Quant {
-	N := s.Mesh().NCell() //bufferSize(m, bufBlocks)
+	N := s.Mesh().NCell()
 	var lock [MAX_COMP]mutex
 	nComp := s.NComp()
 	for c := 0; c < nComp; c++ {

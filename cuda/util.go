@@ -5,31 +5,6 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-//// Undo LockCudaThread()
-//func UnlockCudaThread() {
-//	if cudaCtx == 0 {
-//		return // allow to run if there's no GPU.
-//	}
-//	runtime.UnlockOSThread()
-//	c := atomic.AddInt32(&lockCount, -1)
-//	core.Debug("Unlocked OS thread,", c, "remain locked")
-//}
-//
-//// Register host memory for fast transfers,
-//// but only when flag -pagelock is true.
-//func MemHostRegister(slice []float32) {
-//	// do not fail on already registered memory.
-//	defer func() {
-//		err := recover()
-//		if err != nil && err != cu.ERROR_HOST_MEMORY_ALREADY_REGISTERED {
-//			panic(err)
-//		}
-//	}()
-//	if *nimble.Flag_pagelock {
-//		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
-//	}
-//}
-
 func iMin(a, b int) int {
 	if a < b {
 		return a
@@ -86,3 +61,18 @@ func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
 	util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 	return
 }
+
+//// Register host memory for fast transfers,
+//// but only when flag -pagelock is true.
+//func MemHostRegister(slice []float32) {
+//	// do not fail on already registered memory.
+//	defer func() {
+//		err := recover()
+//		if err != nil && err != cu.ERROR_HOST_MEMORY_ALREADY_REGISTERED {
+//			panic(err)
+//		}
+//	}()
+//	if *nimble.Flag_pagelock {
+//		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
+//	}
+//}

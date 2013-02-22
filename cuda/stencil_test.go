@@ -1,4 +1,4 @@
-package gpu
+package cuda
 
 import (
 	"code.google.com/p/mx3/nimble"

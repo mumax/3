@@ -12,8 +12,6 @@ type DemagConvolution struct {
 	kernSize    [3]int            // Size of kernel and logical FFT size.
 	fftKernSize [3]int            // Size of real, FFTed kernel
 	n           int               // product of size
-	input       *data.Reader      //
-	output      *data.Quant       //
 	fftRBuf     [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]*data.Slice // FFT kernel on device: TODO: xfer if needed
@@ -113,17 +111,6 @@ func (c *DemagConvolution) initFFTKern2D() {
 	}
 }
 
-func (c *DemagConvolution) Run() {
-	log.Println("running convolution")
-	LockThread()
-	for {
-		in, out := c.input.ReadNext(), c.output.WriteNext()
-		c.Exec(out, in)
-		c.input.ReadDone()
-		c.output.WriteDone()
-	}
-}
-
 func (c *DemagConvolution) Exec(outp *data.Slice, inp ...*data.Slice) {
 	util.Argument(len(inp) == 1)
 	if c.is2D() {
@@ -215,10 +202,6 @@ func (c *DemagConvolution) is3D() bool {
 	return !c.is2D()
 }
 
-func (c *DemagConvolution) Output() *data.Quant {
-	return c.output
-}
-
 func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *DemagConvolution {
 	mesh := input.Mesh()
 	size := mesh.Size()
@@ -227,16 +210,8 @@ func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *DemagConvoluti
 	c.kern = kernel
 	c.n = prod(size)
 	c.kernSize = kernel[0][0].Mesh().Size()
-	c.input = input.NewReader()
-	c.output = NewQuant(3, mesh)
 
 	c.init()
-	{ //self-test
-		c.input.SetSync(false)
-		c.output.SetSync(false)
-		c.selfTest()
-		c.input.SetSync(true)
-		c.output.SetSync(true)
-	}
+	c.selfTest()
 	return c
 }

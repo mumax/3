@@ -7,36 +7,37 @@ import (
 )
 
 func (c *DemagConvolution) selfTest() {
-	backup := c.input.UnsafeData().HostCopy()
-	input := data.NewSlice(3, c.input.Mesh())
-	initConvTestInput(input.Vectors())
-	data.Copy(c.input.UnsafeData(), input)
-	c.Exec(c.output.WriteNext(), c.input.ReadNext())
-	c.input.ReadDone()
-	c.output.WriteDone()
-	output := c.output.UnsafeData().HostCopy()
-	data.MustWriteFile("gpu.dump", output, 0) // rm!
-	data.Copy(c.input.UnsafeData(), backup)   // restore input
-	backup = nil
-
-	brute := data.NewSlice(3, c.input.Mesh())
-	bruteConv(input.Vectors(), brute.Vectors(), c.kern)
-	data.MustWriteFile("brute.dump", brute, 0) // rm!
-
-	a, b := output.Host(), brute.Host()
-	err := float32(0)
-	for c := range a {
-		for i := range a[c] {
-			if abs(a[c][i]-b[c][i]) > err {
-				err = abs(a[c][i] - b[c][i])
-			}
-		}
-	}
-	//if err > CONV_TOLERANCE {
-	//	log.Fatal("convolution self-test error: ", err)
-	//} else {
-	log.Println("convolution self-test error:", err)
-	//}
+	log.Println("SELF-TEST DISABLED")
+	//	backup := c.input.UnsafeData().HostCopy()
+	//	input := data.NewSlice(3, c.input.Mesh())
+	//	initConvTestInput(input.Vectors())
+	//	data.Copy(c.input.UnsafeData(), input)
+	//	c.Exec(c.output.WriteNext(), c.input.ReadNext())
+	//	c.input.ReadDone()
+	//	c.output.WriteDone()
+	//	output := c.output.UnsafeData().HostCopy()
+	//	data.MustWriteFile("gpu.dump", output, 0) // rm!
+	//	data.Copy(c.input.UnsafeData(), backup)   // restore input
+	//	backup = nil
+	//
+	//	brute := data.NewSlice(3, c.input.Mesh())
+	//	bruteConv(input.Vectors(), brute.Vectors(), c.kern)
+	//	data.MustWriteFile("brute.dump", brute, 0) // rm!
+	//
+	//	a, b := output.Host(), brute.Host()
+	//	err := float32(0)
+	//	for c := range a {
+	//		for i := range a[c] {
+	//			if abs(a[c][i]-b[c][i]) > err {
+	//				err = abs(a[c][i] - b[c][i])
+	//			}
+	//		}
+	//	}
+	//	//if err > CONV_TOLERANCE {
+	//	//	log.Fatal("convolution self-test error: ", err)
+	//	//} else {
+	//	log.Println("convolution self-test error:", err)
+	//	//}
 }
 
 // Maximum tolerable error on demag convolution self-test.

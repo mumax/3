@@ -9,3 +9,5 @@ dedicated exchange kernel or optimized stencil.
 "make version" updates version number by git commits
 
 vtk binary not working
+
+cuda2go: also create wrappers that accept stream param

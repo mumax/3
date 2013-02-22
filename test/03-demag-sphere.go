@@ -5,7 +5,8 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"fmt"
+	"log"
+	"math"
 )
 
 func main() {
@@ -43,5 +44,13 @@ func main() {
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]
-	fmt.Println(bx, by, bz)
+	check(bx, -1./3.)
+	check(by, 0)
+	check(bz, 0)
+}
+
+func check(have, want float32) {
+	if math.Abs(float64(have-want)) > 1e-4 {
+		log.Fatal("error too large: want ", want, " have ", have)
+	}
 }

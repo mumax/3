@@ -5,15 +5,16 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"fmt"
+	"log"
+	"math"
 )
 
 func main() {
 	cuda.Init()
 
-	N0, N1, N2 := 1, 32, 64
+	N0, N1, N2 := 1, 64, 128
 	c := 1.
-	mesh := data.NewMesh(N0, N1, N2, c, c, c)
+	mesh := data.NewMesh(N0, N1, N2, c/2, c*2, c)
 
 	m := cuda.NewQuant(3, mesh)
 	conv := cuda.NewDemag(mesh)
@@ -23,9 +24,16 @@ func main() {
 	conv.Exec(B.Data(), m.Data())
 	out := B.Data().HostCopy()
 
-	data.MustWriteFile("B.dump", out, 0)
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]
-	fmt.Println(bx, by, bz)
+	check(bx, -1)
+	check(by, 0)
+	check(bz, 0)
+}
+
+func check(have, want float32) {
+	if math.Abs(float64(have-want)) > 1e-2 {
+		log.Fatal("error too large: want ", want, " have ", have)
+	}
 }

@@ -35,13 +35,13 @@ func main() {
 		}
 	}
 
-	mgpu := m.WriteNext(m.Mesh().NCell())
+	mgpu := m.WriteNext()
 	data.Copy(mgpu, mhost)
 	m.WriteDone()
 
 	B := conv.Output().NewReader()
 	conv.Exec()
-	out := B.ReadNext(B.Mesh().NCell()).HostCopy()
+	out := B.ReadNext().HostCopy()
 	B.ReadDone()
 	data.MustWriteFile("B.dump", out, 0)
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]

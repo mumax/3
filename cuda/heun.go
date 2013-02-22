@@ -74,37 +74,37 @@ func (e *Heun) Steps(steps int) {
 // Take one time step
 func (e *Heun) Step() {
 
-	//dy0 := e.dy0
+	y, dy, dy0 := e.y, e.dy, e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
 
 	// stage 1
 	//nimble.Clock.Send(e.time, true)
 	e.updateDy()
-	//	Madd2(y, y, dy, 1, dt)
-	//	data.Copy(dy0, dy)
-	//
-	//	// stage 2
-	//	//nimble.Clock.Send(e.time+e.dt_si, false)
-	//	e.updateDy()
-	//	{
-	//		e.err = MaxVecDiff(dy0.Safe(0), dy0.Safe(1), dy0.Safe(2), dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
-	//		e.checkErr()
-	//
-	//		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-	//			e.delta = MaxVecNorm(dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
-	//			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-	//			Normalize(y)
-	//			e.time += e.dt_si
-	//			e.steps++
-	//			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
-	//		} else { // undo.
-	//			e.delta = 0
-	//			Madd2(y, y, dy0, 1, -dt)
-	//			e.undone++
-	//			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
-	//		}
-	//		e.sendDebugOutput()
-	//		e.updateDash()
-	//	}
+	Madd2(y, y, dy, 1, dt)
+	data.Copy(dy0, dy)
+
+	// stage 2
+	//nimble.Clock.Send(e.time+e.dt_si, false)
+	e.updateDy()
+	{
+		e.err = MaxVecDiff(dy0.Safe(0), dy0.Safe(1), dy0.Safe(2), dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
+		e.checkErr()
+
+		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
+			e.delta = MaxVecNorm(dy.Safe(0), dy.Safe(1), dy.Safe(2)) * float64(dt)
+			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
+			Normalize(y)
+			e.time += e.dt_si
+			e.steps++
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
+		} else { // undo.
+			e.delta = 0
+			Madd2(y, y, dy0, 1, -dt)
+			e.undone++
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
+		}
+		e.sendDebugOutput()
+		e.updateDash()
+	}
 }

@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
-	"log"
 )
 
 type DemagConvolution struct {
@@ -18,17 +17,9 @@ type DemagConvolution struct {
 	fwPlan      FFT3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      FFT3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
-	inited      bool
-	nokmul      bool // Disable kernel multiplication, for debug
 }
 
 func (c *DemagConvolution) init() {
-	log.Println("initializing convolution")
-	if c.inited {
-		log.Panic("conv: already initialized")
-	}
-	c.inited = true
-
 	{ // init FFT plans
 		padded := c.kernSize
 		stream := cu.StreamCreate()
@@ -132,13 +123,11 @@ func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
 	}
 
 	// kern mul
-	if !c.nokmul {
-		N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
-		kernMulRSymm3D(c.fftCBuf,
-			c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-			c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-			N0, N1, N2)
-	}
+	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
+	kernMulRSymm3D(c.fftCBuf,
+		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
+		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
+		N0, N1, N2)
 
 	// BW FFT
 	for i := 0; i < 3; i++ {
@@ -153,18 +142,16 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
-	padded := c.kernSize
 	// FFT x
 	Memset(c.fftRBuf[0], 0)
 	in := inp.Comp(0)
+	padded := c.kernSize
 	copyPad(c.fftRBuf[0], in, padded, c.size)
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
-	if !c.nokmul {
-		kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
-	}
+	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
 
 	// bw FFT x
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
@@ -180,11 +167,9 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	}
 
 	// kern mul yz
-	if !c.nokmul {
-		kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
-			c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-			N1, N2)
-	}
+	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
+		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
+		N1, N2)
 
 	// BW FFT yz
 	for i := 1; i < 3; i++ {
@@ -202,15 +187,13 @@ func (c *DemagConvolution) is3D() bool {
 	return !c.is2D()
 }
 
-func NewConvolution(input *data.Quant, kernel [3][3]*data.Slice) *DemagConvolution {
-	mesh := input.Mesh()
+func NewConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution {
 	size := mesh.Size()
 	c := new(DemagConvolution)
 	c.size = size
 	c.kern = kernel
 	c.n = prod(size)
 	c.kernSize = kernel[0][0].Mesh().Size()
-
 	c.init()
 	c.selfTest()
 	return c

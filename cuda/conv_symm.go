@@ -195,6 +195,6 @@ func NewConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.n = prod(size)
 	c.kernSize = kernel[0][0].Mesh().Size()
 	c.init()
-	c.selfTest()
+	testConvolution(c, mesh)
 	return c
 }

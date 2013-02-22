@@ -12,12 +12,11 @@ func main() {
 	cuda.Init()
 
 	N0, N1, N2 := 16, 16, 16
-	//N0, N1, N2 := 8, 16, 32
 	c := 1.
 	mesh := data.NewMesh(N0, N1, N2, c, c, c)
 
 	m := cuda.NewQuant(3, mesh)
-	conv := cuda.NewDemag(m)
+	conv := cuda.NewDemag(mesh)
 
 	mhost := m.Data().HostCopy()
 	m_ := mhost.Vectors()
@@ -35,15 +34,12 @@ func main() {
 		}
 	}
 
-	mgpu := m.WriteNext()
-	data.Copy(mgpu, mhost)
-	m.WriteDone()
+	data.Copy(m.Data(), mhost)
 
-	B := conv.Output().NewReader()
-	conv.Exec()
-	out := B.ReadNext().HostCopy()
-	B.ReadDone()
-	data.MustWriteFile("B.dump", out, 0)
+	B := cuda.NewQuant(3, mesh)
+	conv.Exec(B.Data(), m.Data())
+	out := B.Data().HostCopy()
+
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]

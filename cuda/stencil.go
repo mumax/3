@@ -10,9 +10,9 @@ type Stencil struct {
 	Weight [7]float32
 }
 
-func (s *Stencil) Exec(dst *data.Slice, src ...*data.Slice) {
+func (s *Stencil) Exec(dst *data.Slice, src *data.Slice) {
 	Memset(dst, 0)
-	stencilAdd(dst, src[0], &s.Weight)
+	stencilAdd(dst, src, &s.Weight)
 }
 
 // adds to dst the stencil result.
@@ -20,6 +20,7 @@ func stencilAdd(dst, src *data.Slice, weight *[7]float32) {
 	mesh := dst.Mesh()
 	util.Argument(dst.Len() == src.Len() && src.Len() == mesh.NCell())
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+	util.Argument(dst.DevPtr(0) != src.DevPtr(0)) // no in-place operation
 
 	size := mesh.Size()
 	N0, N1, N2 := size[0], size[1], size[2]

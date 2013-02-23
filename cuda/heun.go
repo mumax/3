@@ -15,9 +15,46 @@ type Heun struct {
 	torqueFn func(m *data.Slice) *data.Slice // updates dy
 }
 
-func NewHeun(y, dy *data.Slice, dt, multiplier float64) *Heun {
+// Take one time step
+func (e *Heun) Step() {
+	y, dy0 := e.y, e.dy0
+	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
+	util.Assert(dt > 0)
+
+	// stage 1
+	//nimble.Clock.Send(e.time, true)
+	dy := e.torqueFn(y)
+	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
+	data.Copy(dy0, dy)
+
+	// stage 2
+	//nimble.Clock.Send(e.time+e.dt_si, false)
+	dy = e.torqueFn(y)
+	{
+		e.err = MaxVecDiff(dy0, dy) * float64(dt)
+		e.checkErr()
+
+		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
+			e.delta = MaxVecNorm(dy) * float64(dt)
+			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
+			Normalize(y)
+			e.time += e.dt_si
+			e.steps++
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
+		} else { // undo.
+			e.delta = 0
+			Madd2(y, y, dy0, 1, -dt)
+			e.undone++
+			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
+		}
+		//e.sendDebugOutput()
+		//e.updateDash()
+	}
+}
+
+func NewHeun(y *data.Slice, dt, multiplier float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
-	dy0 := NewSlice(3, dy.Mesh())
+	dy0 := NewSlice(3, y.Mesh())
 	return &Heun{dy0: dy0, y: y, solverCommon: newSolverCommon(dt, multiplier)}
 }
 
@@ -69,40 +106,3 @@ func (e *Heun) Steps(steps int) {
 //	}
 //	e.Maxerr = preverr
 //}
-
-// Take one time step
-func (e *Heun) Step() {
-	y, dy0 := e.y, e.dy0
-	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
-	util.Assert(dt > 0)
-
-	// stage 1
-	//nimble.Clock.Send(e.time, true)
-	dy := e.torqueFn(y)
-	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
-	data.Copy(dy0, dy)
-
-	// stage 2
-	//nimble.Clock.Send(e.time+e.dt_si, false)
-	dy = e.torqueFn(y)
-	{
-		e.err = MaxVecDiff(dy0, dy) * float64(dt)
-		e.checkErr()
-
-		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
-			e.delta = MaxVecNorm(dy) * float64(dt)
-			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-			Normalize(y)
-			e.time += e.dt_si
-			e.steps++
-			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
-		} else { // undo.
-			e.delta = 0
-			Madd2(y, y, dy0, 1, -dt)
-			e.undone++
-			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
-		}
-		//e.sendDebugOutput()
-		//e.updateDash()
-	}
-}

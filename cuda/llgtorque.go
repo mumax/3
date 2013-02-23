@@ -7,7 +7,7 @@ import (
 
 // Calculates the REDUCED torque.
 // 	- m x B +  α m x (m x B)
-func CalcLLGTorque(torque, m, B *data.Slice, alpha float32) {
+func LLGTorque(torque, m, B *data.Slice, alpha float32) {
 	N := torque.Len()
 	// TODO: assert...
 	gridDim, blockDim := Make1DConf(N)

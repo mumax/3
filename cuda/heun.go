@@ -15,6 +15,12 @@ type Heun struct {
 	torqueFn func(m *data.Slice) *data.Slice // updates dy
 }
 
+func NewHeun(y *data.Slice, torqueFn func(*data.Slice) *data.Slice, dt, multiplier float64) *Heun {
+	util.Argument(dt > 0 && multiplier > 0)
+	dy0 := NewSlice(3, y.Mesh())
+	return &Heun{newSolverCommon(dt, multiplier), y, dy0, torqueFn}
+}
+
 // Take one time step
 func (e *Heun) Step() {
 	y, dy0 := e.y, e.dy0
@@ -38,7 +44,7 @@ func (e *Heun) Step() {
 			e.delta = MaxVecNorm(dy) * float64(dt)
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			Normalize(y)
-			e.time += e.dt_si
+			e.Time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
 		} else { // undo.
@@ -52,17 +58,11 @@ func (e *Heun) Step() {
 	}
 }
 
-func NewHeun(y *data.Slice, dt, multiplier float64) *Heun {
-	util.Argument(dt > 0 && multiplier > 0)
-	dy0 := NewSlice(3, y.Mesh())
-	return &Heun{dy0: dy0, y: y, solverCommon: newSolverCommon(dt, multiplier)}
-}
-
 // Run for a duration in seconds
 func (e *Heun) Advance(seconds float64) {
 	log.Println("heun solver:", seconds, "s")
-	stop := e.time + seconds
-	for e.time < stop {
+	stop := e.Time + seconds
+	for e.Time < stop {
 		e.Step()
 	}
 	//nimble.DashExit()

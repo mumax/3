@@ -7,7 +7,7 @@ type Stencil3D struct {
 }
 
 func (s *Stencil3D) Exec(out *data.Slice, in *data.Slice) {
-	Memset(out, 0)
+	Memset(out, 0, 0, 0)
 	for di := 0; di < 3; di++ {
 		dst := out.Comp(di)
 		for si := 0; si < 3; si++ {

@@ -10,7 +10,7 @@ import (
 // embedded in all solvers
 type solverCommon struct {
 	dt_si, dt_mul    float64 // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	time             float64 // in seconds
+	Time             float64 // in seconds
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
 	steps, undone    int     // number of good steps, undone steps

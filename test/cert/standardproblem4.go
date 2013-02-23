@@ -5,11 +5,14 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/mag"
 )
 
 func main() {
 	cuda.Init()
+	cuda.LockThread()
+	engine.Init()
 
 	const (
 		N0, N1, N2 = 1, 32, 128
@@ -44,4 +47,6 @@ func main() {
 	for solver.Time < 1e-9 {
 		solver.Step()
 	}
+
+	data.MustWriteFile("m.dump", m.HostCopy(), 0)
 }

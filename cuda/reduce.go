@@ -13,7 +13,7 @@ import (
 func Sum(in *data.Slice) float32 {
 	util.Argument(in.NComp() == 1)
 	out := reduceBuf(0)
-	kernel.K_reducesum(in.DevPtr(0), out, init, in.Len(), gr, bl)
+	kernel.K_reducesum(in.DevPtr(0), out, 0, in.Len(), gr, bl)
 	return copyback(out)
 }
 
@@ -31,7 +31,7 @@ func Sum(in *data.Slice) float32 {
 func MaxAbs(in *data.Slice) float32 {
 	util.Argument(in.NComp() == 1)
 	out := reduceBuf(0)
-	kernel.K_reducemaxabs(in.DevPtr(0), out, init, in.Len(), gr, bl)
+	kernel.K_reducemaxabs(in.DevPtr(0), out, 0, in.Len(), gr, bl)
 	return copyback(out)
 }
 
@@ -45,7 +45,7 @@ func MaxAbs(in *data.Slice) float32 {
 // 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
 func MaxVecNorm(v *data.Slice) float64 {
 	out := reduceBuf(0)
-	kernel.K_reducemaxvecnorm2(in.DevPtr(0), in.DevPtr(1), in.DevPtr(2), out, 0, in.Len(), gr, bl)
+	kernel.K_reducemaxvecnorm2(v.DevPtr(0), v.DevPtr(1), v.DevPtr(2), out, 0, v.Len(), gr, bl)
 	return math.Sqrt(float64(copyback(out)))
 }
 
@@ -53,9 +53,12 @@ func MaxVecNorm(v *data.Slice) float64 {
 //// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
 //// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
 func MaxVecDiff(x, y *data.Slice) float64 {
-	util.Argument(x.NComp() == 3 && y.NComp() == 3)
-	r := reduce6(x1, y1, z1, x2, y2, z2, 0, ptx.K_reducemaxvecdiff2)
-	return math.Sqrt(float64(r))
+	util.Argument(x.Len() == y.Len())
+	out := reduceBuf(0)
+	kernel.K_reducemaxvecdiff2(x.DevPtr(0), x.DevPtr(1), x.DevPtr(2),
+		y.DevPtr(0), y.DevPtr(1), y.DevPtr(2),
+		out, 0, x.Len(), gr, bl)
+	return math.Sqrt(float64(copyback(out)))
 }
 
 //
@@ -97,7 +100,7 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 	}
 	buf := <-reduceBuffers
 	str := kernel.Stream()
-	cu.MemsetD32Async(buf, math.Float32bits(initVal), 1, str)
+	cu.MemsetD32Async(cu.DevicePtr(buf), math.Float32bits(initVal), 1, str)
 	kernel.SyncAndRecycle(str)
 	return buf
 }
@@ -106,7 +109,7 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 func copyback(buf unsafe.Pointer) float32 {
 	var result_ [1]float32
 	result := result_[:]
-	cu.MemcpyDtoH(unsafe.Pointer(&result[0]), buf, 1*cu.SIZEOF_FLOAT32)
+	cu.MemcpyDtoH(unsafe.Pointer(&result[0]), cu.DevicePtr(buf), 1*cu.SIZEOF_FLOAT32)
 	reduceBuffers <- buf
 	return result_[0]
 }
@@ -114,7 +117,7 @@ func copyback(buf unsafe.Pointer) float32 {
 // initialize pool of 1-float CUDA reduction buffers
 func initReduceBuf() {
 	const N = 128
-	reduceBuffers = make(chan cu.DevicePtr, N)
+	reduceBuffers = make(chan unsafe.Pointer, N)
 	for i := 0; i < N; i++ {
 		reduceBuffers <- memAlloc(1 * cu.SIZEOF_FLOAT32)
 	}

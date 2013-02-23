@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
+	"math"
 )
 
 // Adaptive heun solver.
@@ -84,7 +85,7 @@ func (e *Heun) Step() {
 
 	// stage 2
 	//nimble.Clock.Send(e.time+e.dt_si, false)
-	e.updateDy()
+	dy = e.torqueFn(y)
 	{
 		e.err = MaxVecDiff(dy0, dy) * float64(dt)
 		e.checkErr()
@@ -92,7 +93,7 @@ func (e *Heun) Step() {
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			e.delta = MaxVecNorm(dy) * float64(dt)
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-			Normalize(y)
+			//Normalize(y)
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
@@ -102,7 +103,7 @@ func (e *Heun) Step() {
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
 		}
-		e.sendDebugOutput()
-		e.updateDash()
+		//e.sendDebugOutput()
+		//e.updateDash()
 	}
 }

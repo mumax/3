@@ -72,7 +72,6 @@ func (e *Heun) Steps(steps int) {
 
 // Take one time step
 func (e *Heun) Step() {
-
 	y, dy0 := e.y, e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
@@ -80,7 +79,7 @@ func (e *Heun) Step() {
 	// stage 1
 	//nimble.Clock.Send(e.time, true)
 	dy := e.torqueFn(y)
-	Madd2(y, y, dy, 1, dt)
+	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 	data.Copy(dy0, dy)
 
 	// stage 2
@@ -93,7 +92,7 @@ func (e *Heun) Step() {
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			e.delta = MaxVecNorm(dy) * float64(dt)
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-			//Normalize(y)
+			Normalize(y)
 			e.time += e.dt_si
 			e.steps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))

@@ -1,4 +1,4 @@
-package nimble
+package util
 
 import (
 	"fmt"

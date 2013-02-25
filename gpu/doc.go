@@ -1,4 +1,0 @@
-/*
- CUDA functionality.
-*/
-package gpu

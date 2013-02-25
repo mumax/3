@@ -46,7 +46,6 @@ func main() {
 
 	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
 	N := float32(mesh.NCell()) * Bsat
-
 	for solver.Time < 2e-9 {
 		if solver.NSteps%10 == 0 {
 			fmt.Println(solver.Time, cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N)

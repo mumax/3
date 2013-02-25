@@ -45,7 +45,7 @@ func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
 
 // TODO: swap N1/N2?
 func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
-	const BLOCK = 16 // TODO
+	const BLOCK = 32 // TODO
 
 	blockSize.X = BLOCK
 	blockSize.Y = BLOCK

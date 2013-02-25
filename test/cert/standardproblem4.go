@@ -7,7 +7,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/mag"
-	"fmt"
+	//"fmt"
 )
 
 var mesh *data.Mesh
@@ -18,7 +18,8 @@ func main() {
 	cuda.LockThread()
 
 	const (
-		N0, N1, N2 = 1, 32, 128
+		a          = 1
+		N0, N1, N2 = 1 * a, 32 * a, 128 * a
 		S0, S1, S2 = 3e-9, 125e-9, 500e-9
 		c0, c1, c2 = S0 / N0, S1 / N1, S2 / N2
 		Bsat       = 800e3 * mag.Mu0
@@ -43,12 +44,15 @@ func main() {
 
 	solver := cuda.NewHeun(M, updateTorque, 1e-15, mag.Gamma0)
 
-	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
-	N := float32(mesh.NCell()) * Bsat
-	for solver.Time < 2e-9 {
-		if solver.NSteps%10 == 0 {
-			fmt.Println(solver.Time, cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N)
-		}
+	//	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
+	//	N := float32(mesh.NCell()) * Bsat
+	//	for solver.Time < 2e-9 {
+	//		if solver.NSteps%10 == 0 {
+	//			fmt.Println(solver.Time, cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N)
+	//		}
+	//		solver.Step()
+	//	}
+	for i := 0; i < 10; i++ {
 		solver.Step()
 	}
 

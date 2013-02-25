@@ -22,7 +22,7 @@ func main() {
 		S0, S1, S2 = 3e-9, 125e-9, 500e-9
 		c0, c1, c2 = S0 / N0, S1 / N1, S2 / N2
 		Bsat       = 800e3 * mag.Mu0
-		Aex_red    = (13e-12 * mag.Mu0)
+		Aex        = 13e-12
 		α          = 1
 	)
 
@@ -32,11 +32,10 @@ func main() {
 	cuda.Memset(M, 0, 1, 1)
 
 	demag := cuda.NewDemag(mesh)
-	exch := cuda.NewExchange6(mesh, Aex_red)
 
 	updateTorque := func(m *data.Slice) *data.Slice {
 		demag.Exec(Hd, m)
-		exch.Exec(Hex, m)
+		cuda.Exchange(Hex, m, Aex)
 		cuda.Madd2(Heff, Hd, Hex, Bsat, 1)
 		cuda.LLGTorque(torque, m, Heff, α)
 		return torque

@@ -11,14 +11,15 @@ import (
 // TODO: now only for magnetization (because it normalizes), post-step hook?
 type Heun struct {
 	solverCommon
-	y, dy0   *data.Slice
-	torqueFn func(m *data.Slice) *data.Slice // updates dy
+	y, dy0      *data.Slice
+	torqueFn    func(m *data.Slice) *data.Slice // updates dy
+	normalizeFn func(m *data.Slice)             // normalizes y
 }
 
-func NewHeun(y *data.Slice, torqueFn func(*data.Slice) *data.Slice, dt, multiplier float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn func(*data.Slice) *data.Slice, normalizeFn func(m *data.Slice), dt, multiplier float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	dy0 := NewSlice(3, y.Mesh())
-	return &Heun{newSolverCommon(dt, multiplier), y, dy0, torqueFn}
+	return &Heun{newSolverCommon(dt, multiplier), y, dy0, torqueFn, normalizeFn}
 }
 
 // Take one time step
@@ -43,7 +44,7 @@ func (e *Heun) Step() {
 		if e.err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			e.delta = MaxVecNorm(dy) * float64(dt)
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-			Normalize(y)
+			e.normalizeFn(y)
 			e.Time += e.dt_si
 			e.NSteps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))

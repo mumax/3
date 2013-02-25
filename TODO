@@ -15,3 +15,5 @@ cuda2go: also create wrappers that accept stream param
 handle non-unit M: exchange, llgtorque
 
 rename Quant to Stream?
+
+use device properties for grid config

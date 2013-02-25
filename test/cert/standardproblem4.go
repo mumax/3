@@ -7,7 +7,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/mag"
-	//"fmt"
+	"fmt"
 )
 
 var mesh *data.Mesh
@@ -42,16 +42,20 @@ func main() {
 		return torque
 	}
 
-	solver := cuda.NewHeun(M, updateTorque, 1e-15, mag.Gamma0)
+	norm := func(m *data.Slice) {
+		cuda.Normalize(m, Bsat)
+	}
 
-	//	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
-	//	N := float32(mesh.NCell()) * Bsat
-	//	for solver.Time < 2e-9 {
-	//		if solver.NSteps%10 == 0 {
-	//			fmt.Println(solver.Time, cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N)
-	//		}
-	//		solver.Step()
-	//	}
+	solver := cuda.NewHeun(M, updateTorque, norm, 1e-15, mag.Gamma0)
+
+	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
+	N := float32(mesh.NCell()) * Bsat
+	for solver.Time < 2e-9 {
+		if solver.NSteps%10 == 0 {
+			fmt.Println(solver.Time, cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N)
+		}
+		solver.Step()
+	}
 	for i := 0; i < 10; i++ {
 		solver.Step()
 	}

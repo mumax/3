@@ -22,7 +22,6 @@ var (
 
 func Init() {
 	flag.Parse()
-	prof.Init()
 
 	log.SetPrefix("")
 	log.SetFlags(0)
@@ -43,6 +42,8 @@ func Init() {
 	}
 	procs := runtime.GOMAXPROCS(*Flag_maxprocs) // sets it
 	log.Println("gomaxprocs:", procs)
+
+	prof.Init(OD)
 }
 
 type devnul struct{}

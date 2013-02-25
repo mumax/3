@@ -45,7 +45,7 @@ func (e *Heun) Step() {
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			Normalize(y)
 			e.Time += e.dt_si
-			e.steps++
+			e.NSteps++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./2.))
 		} else { // undo.
 			e.delta = 0

@@ -13,7 +13,7 @@ type solverCommon struct {
 	Time             float64 // in seconds
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
-	steps, undone    int     // number of good steps, undone steps
+	NSteps, undone   int     // number of good steps, undone steps
 	delta, err       float64 // max delta, max error of last step
 	//debug            dump.TableWriter // save t, dt, error here
 }

@@ -4,6 +4,7 @@ package engine
 // Author: Arne Vansteenkiste
 
 import (
+	"code.google.com/p/mx3/prof"
 	"flag"
 	"log"
 	"runtime"
@@ -21,6 +22,7 @@ var (
 
 func Init() {
 	flag.Parse()
+	prof.Init()
 
 	log.SetPrefix("")
 	log.SetFlags(0)

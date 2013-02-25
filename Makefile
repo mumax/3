@@ -10,7 +10,7 @@ PKGS=\
 	$(PREFIX)/draw\
 	$(PREFIX)/mag\
 	$(PREFIX)/data\
-# 	$(PREFIX)/prof\
+	$(PREFIX)/prof\
 
 $(PREFIX)/kernel: nvcc
 

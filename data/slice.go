@@ -151,7 +151,11 @@ func (s *Slice) Comp(i int) *Slice {
 
 // DevPtr returns a CUDA device pointer to a component.
 // Slice must have GPUAccess.
+// It is safe to call on a nil slice, returns NULL.
 func (s *Slice) DevPtr(component int) unsafe.Pointer {
+	if s == nil {
+		return unsafe.Pointer(uintptr(0))
+	}
 	if !s.GPUAccess() {
 		panic("slice not accessible by GPU")
 	}

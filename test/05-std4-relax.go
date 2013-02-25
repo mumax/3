@@ -38,7 +38,7 @@ func main() {
 	updateTorque := func(m *data.Slice) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
-		cuda.Madd2(Heff, Hd, Hex, Bsat, 1)
+		cuda.Madd2(Heff, Hd, Hex, 1, 1)
 		cuda.LLGTorque(torque, m, Heff, α)
 		return torque
 	}

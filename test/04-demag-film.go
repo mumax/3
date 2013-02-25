@@ -5,6 +5,7 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"fmt"
 	"log"
 	"math"
 )
@@ -30,6 +31,7 @@ func main() {
 	check(bx, -1)
 	check(by, 0)
 	check(bz, 0)
+	fmt.Println("OK")
 }
 
 func check(have, want float32) {

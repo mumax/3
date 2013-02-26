@@ -17,11 +17,10 @@ exchange(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
 	for(int i=0; i<N0; i++){
 
-		int    I = idx(i, j, k);
-		float3 m = {mx[I], my[I], mz[I]};
+		float3 m, m1, m2, H;
+		loadm(m, idx(i, j, k));
 		float Bsat = len(m);
 		if (Bsat == 0) { Bsat = 1; }
-		float3 m1, m2, H;
 		
 		loadm(m1, idx(clamp(i+1,N0), j, k));
 		loadm(m2, idx(clamp(i-1,N0), j, k));

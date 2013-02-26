@@ -35,7 +35,7 @@ func main() {
 
 	demag := cuda.NewDemag(mesh)
 
-	updateTorque := func(m *data.Slice) *data.Slice {
+	updateTorque := func(m *data.Slice, t float64) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
 		cuda.Madd2(Heff, Hd, Hex, 1, 1)
@@ -58,13 +58,13 @@ func main() {
 	avgx, avgy, avgz := cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N
 	fmt.Println(avgx, avgy, avgz)
 	expect(avgx, 0)
-	expect(avgy, 0.12358)
-	expect(avgz, 0.95588)
+	expect(avgy, 0.125)
+	expect(avgz, 0.967)
 	fmt.Println("OK")
 }
 
 func expect(have, want float32) {
-	if abs(have-want) > 1e-3 {
+	if abs(have-want) > 1e-2 {
 		log.Fatalln("have:", have, "want:", want)
 	}
 }

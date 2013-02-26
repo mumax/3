@@ -6,7 +6,7 @@ all: $(OUT)
 .PHONY: $(OUT)
 
 $(OUT): %: %.go
-	go run $@.go -f -s -o $@.out
+	go run $@.go -f -o $@.out
 
 .PHONY: clean
 

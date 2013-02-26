@@ -12,11 +12,11 @@ import (
 type Heun struct {
 	solverCommon
 	y, dy0      *data.Slice
-	torqueFn    func(m *data.Slice) *data.Slice // updates dy
-	normalizeFn func(m *data.Slice)             // normalizes y
+	torqueFn    func(m *data.Slice, time float64) *data.Slice // updates dy
+	normalizeFn func(m *data.Slice)                           // normalizes y
 }
 
-func NewHeun(y *data.Slice, torqueFn func(*data.Slice) *data.Slice, normalizeFn func(m *data.Slice), dt, multiplier float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn func(*data.Slice, float64) *data.Slice, normalizeFn func(m *data.Slice), dt, multiplier float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	dy0 := NewSlice(3, y.Mesh())
 	return &Heun{newSolverCommon(dt, multiplier), y, dy0, torqueFn, normalizeFn}
@@ -29,14 +29,12 @@ func (e *Heun) Step() {
 	util.Assert(dt > 0)
 
 	// stage 1
-	//nimble.Clock.Send(e.time, true)
-	dy := e.torqueFn(y)
+	dy := e.torqueFn(y, e.Time)
 	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 	data.Copy(dy0, dy)
 
 	// stage 2
-	//nimble.Clock.Send(e.time+e.dt_si, false)
-	dy = e.torqueFn(y)
+	dy = e.torqueFn(y, e.Time)
 	{
 		e.err = MaxVecDiff(dy0, dy) * float64(dt)
 		e.checkErr()
@@ -66,10 +64,6 @@ func (e *Heun) Advance(seconds float64) {
 	for e.Time < stop {
 		e.Step()
 	}
-	//nimble.DashExit()
-	//if core.DEBUG {
-	//	e.debug.Flush()
-	//}
 }
 
 // Run for a number of steps
@@ -78,10 +72,6 @@ func (e *Heun) Steps(steps int) {
 	for s := 0; s < steps; s++ {
 		e.Step()
 	}
-	//nimble.DashExit()
-	//if core.DEBUG {
-	//	e.debug.Flush()
-	//}
 }
 
 // Run until we are only maxerr away from equilibrium.

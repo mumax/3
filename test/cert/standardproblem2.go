@@ -48,7 +48,7 @@ func main() {
 
 	var Bx, By, Bz float32 = 0, 0, 0
 
-	updateTorque := func(m *data.Slice) *data.Slice {
+	updateTorque := func(m *data.Slice, t float64) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
 		cuda.Madd2(Heff, Hd, Hex, 1, 1)

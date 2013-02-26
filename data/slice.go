@@ -95,7 +95,7 @@ func (s *Slice) Free() {
 	}
 	// zero the struct
 	for c := range s.ptr_ {
-		s.ptr_[c] = unsafe.Pointer(uintptr(0))
+		s.ptr_[c] = nil //unsafe.Pointer(uintptr(0))
 	}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
@@ -154,7 +154,7 @@ func (s *Slice) Comp(i int) *Slice {
 // It is safe to call on a nil slice, returns NULL.
 func (s *Slice) DevPtr(component int) unsafe.Pointer {
 	if s == nil {
-		return unsafe.Pointer(uintptr(0))
+		return nil //unsafe.Pointer(uintptr(0))
 	}
 	if !s.GPUAccess() {
 		panic("slice not accessible by GPU")

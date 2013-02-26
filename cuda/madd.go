@@ -34,3 +34,15 @@ func Madd3(dst, src1, src2, src3 *data.Slice, factor1, factor2, factor3 float32)
 			N, gridDim, blockDim)
 	}
 }
+
+// Adds a constant to each element of the slice.
+// 	dst[comp][index] += cnst[comp]
+// TODO: stream
+func AddConst(dst *data.Slice, cnst ...float32) {
+	util.Argument(len(cnst) == dst.NComp())
+	N := dst.Len()
+	gr, bl := Make1DConf(N)
+	for c := 0; c < dst.NComp(); c++ {
+		kernel.K_madd2(dst.DevPtr(c), dst.DevPtr(c), 1, nil, cnst[c], N, gr, bl)
+	}
+}

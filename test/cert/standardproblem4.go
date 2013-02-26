@@ -39,6 +39,7 @@ func main() {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
 		cuda.Madd2(Heff, Hd, Hex, 1, 1)
+		cuda.AddConst(Heff, Bx, By, Bz)
 		cuda.LLGTorque(torque, m, Heff, alpha)
 		return torque
 	}

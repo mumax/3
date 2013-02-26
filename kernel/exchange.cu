@@ -32,9 +32,12 @@ exchange(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 		loadm(m2, idx(i, j, clamp(k-1,N2)));
 		H += (wz/Bsat) * ((m1-m) + (m2-m));
 
-		loadm(m1, idx(clamp(i+1,N0), j, k));
-		loadm(m2, idx(clamp(i-1,N0), j, k));
-		H  += (wx/Bsat) * ((m1-m) + (m2-m));
+		// only take vertical derivative for 3D sim
+		if (N0 != 1){
+			loadm(m1, idx(clamp(i+1,N0), j, k));
+			loadm(m2, idx(clamp(i-1,N0), j, k));
+			H  += (wx/Bsat) * ((m1-m) + (m2-m));
+		}
 
 		Hx[I] = H.x;
 		Hy[I] = H.y;

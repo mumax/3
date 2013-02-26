@@ -17,14 +17,15 @@ type DemagConvolution struct {
 	fwPlan      FFT3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      FFT3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
+	stream      cu.Stream         // Stream for FFT plans
 }
 
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
-		stream := cu.StreamCreate()
-		c.fwPlan = NewFFT3DR2C(padded[0], padded[1], padded[2], stream)
-		c.bwPlan = NewFFT3DC2R(padded[0], padded[1], padded[2], stream)
+		c.stream = cu.StreamCreate()
+		c.fwPlan = NewFFT3DR2C(padded[0], padded[1], padded[2], c.stream)
+		c.bwPlan = NewFFT3DC2R(padded[0], padded[1], padded[2], c.stream)
 	}
 
 	{ // init device buffers
@@ -111,15 +112,20 @@ func (c *DemagConvolution) Exec(outp *data.Slice, inp ...*data.Slice) {
 	}
 }
 
+// zero 1-component slice
+func zero1(dst *data.Slice, str cu.Stream) {
+	cu.MemsetD32Async(cu.DevicePtr(dst.DevPtr(0)), 0, int64(dst.Len()), str)
+}
+
 func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
 	padded := c.kernSize
 
 	// FW FFT
 	for i := 0; i < 3; i++ {
-		Memset(c.fftRBuf[i], 0)
+		zero1(c.fftRBuf[i], c.stream)
 		in := inp.Comp(i)
-		copyPad(c.fftRBuf[i], in, padded, c.size)
-		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		copyPad(c.fftRBuf[i], in, padded, c.size, c.stream)
+		c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
 	// kern mul
@@ -127,14 +133,15 @@ func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
 	kernMulRSymm3D(c.fftCBuf,
 		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
 		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-		N0, N1, N2)
+		N0, N1, N2, c.stream)
 
 	// BW FFT
 	for i := 0; i < 3; i++ {
-		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
 		out := outp.Comp(i)
-		copyPad(out, c.fftRBuf[i], c.size, padded)
+		copyPad(out, c.fftRBuf[i], c.size, padded, c.stream)
 	}
+	c.stream.Synchronize()
 }
 
 func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
@@ -146,8 +153,9 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	Memset(c.fftRBuf[0], 0)
 	in := inp.Comp(0)
 	padded := c.kernSize
-	copyPad(c.fftRBuf[0], in, padded, c.size)
+	copyPad(c.fftRBuf[0], in, padded, c.size, c.stream)
 	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
+	c.stream.Synchronize()
 
 	// kern mul X
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
@@ -155,15 +163,18 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 
 	// bw FFT x
 	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
+	c.stream.Synchronize()
 	out := outp.Comp(0)
-	copyPad(out, c.fftRBuf[0], c.size, padded)
+	copyPad(out, c.fftRBuf[0], c.size, padded, c.stream)
+	c.stream.Synchronize()
 
 	// FW FFT yz
 	for i := 1; i < 3; i++ {
 		Memset(c.fftRBuf[i], 0)
 		in := inp.Comp(i)
-		copyPad(c.fftRBuf[i], in, padded, c.size)
+		copyPad(c.fftRBuf[i], in, padded, c.size, c.stream)
 		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
+		c.stream.Synchronize()
 	}
 
 	// kern mul yz
@@ -175,7 +186,9 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	for i := 1; i < 3; i++ {
 		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
 		out := outp.Comp(i)
-		copyPad(out, c.fftRBuf[i], c.size, padded)
+		c.stream.Synchronize()
+		copyPad(out, c.fftRBuf[i], c.size, padded, c.stream)
+		c.stream.Synchronize()
 	}
 }
 

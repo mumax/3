@@ -22,9 +22,9 @@ func NewFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) FFT3DR2CPlan {
 	return FFT3DR2CPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
 }
 
-// Execute the FFT plan. Synchronized.
+// Execute the FFT plan, asynchronous.
 // src and dst are 3D arrays stored 1D arrays.
-func (p FFT3DR2CPlan) Exec(src, dst *data.Slice) {
+func (p FFT3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
 	oksrclen := p.InputLen()
 	if src.Len() != oksrclen {
@@ -35,6 +35,11 @@ func (p FFT3DR2CPlan) Exec(src, dst *data.Slice) {
 		log.Panicf("fft size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len())
 	}
 	p.handle.ExecR2C(cu.DevicePtr(src.DevPtr(0)), cu.DevicePtr(dst.DevPtr(0)))
+}
+
+// Execute the FFT plan, synchronized.
+func (p FFT3DR2CPlan) Exec(src, dst *data.Slice) {
+	p.ExecAsync(src, dst)
 	p.stream.Synchronize()
 }
 

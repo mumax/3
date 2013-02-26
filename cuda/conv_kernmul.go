@@ -9,6 +9,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/kernel"
 	"code.google.com/p/mx3/util"
+	"github.com/barnex/cuda5/cu"
 )
 
 func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
@@ -33,15 +34,15 @@ func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
 
 // Does not yet use Y mirror symmetry!!
 // Even though it is implemented partially in kernel
-func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int) {
+func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int, str cu.Stream) {
 	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
 	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 
-	gridDim, blockDim := Make2DConf(N1, N2)
+	gr, bl := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm3D(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
+	kernel.K_kernmulRSymm3D_async(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
 		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),
-		N0, N1, N2, gridDim, blockDim)
+		N0, N1, N2, gr, bl, str)
 }
 
 // General kernel multiplication with general complex kernel.

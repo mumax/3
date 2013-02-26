@@ -110,7 +110,7 @@ const llgtorque_ptx = `
 	cvta.to.global.u64 	%rd7, %rd15;
 	cvta.to.global.u64 	%rd8, %rd14;
 	cvta.to.global.u64 	%rd9, %rd13;
-	.loc 2 9 1
+	.loc 2 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -118,35 +118,35 @@ const llgtorque_ptx = `
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 10 1
+	.loc 2 12 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	.loc 2 12 1
+	.loc 2 14 1
 	mul.wide.s32 	%rd19, %r1, 4;
 	add.s64 	%rd20, %rd9, %rd19;
 	add.s64 	%rd21, %rd8, %rd19;
 	add.s64 	%rd22, %rd7, %rd19;
-	.loc 2 13 1
+	.loc 2 15 1
 	add.s64 	%rd23, %rd6, %rd19;
 	add.s64 	%rd24, %rd5, %rd19;
 	add.s64 	%rd25, %rd4, %rd19;
-	.loc 2 12 1
+	.loc 2 14 1
 	ld.global.f32 	%f2, [%rd21];
-	.loc 2 13 1
+	.loc 2 15 1
 	ld.global.f32 	%f3, [%rd25];
 	ld.global.f32 	%f4, [%rd24];
-	.loc 2 12 1
+	.loc 2 14 1
 	ld.global.f32 	%f5, [%rd22];
-	.loc 2 15 1
+	.loc 2 17 1
 	mul.f32 	%f6, %f5, %f4;
 	mul.f32 	%f7, %f3, %f2;
 	sub.f32 	%f8, %f6, %f7;
-	.loc 2 13 1
-	ld.global.f32 	%f9, [%rd23];
-	.loc 2 12 1
-	ld.global.f32 	%f10, [%rd20];
 	.loc 2 15 1
+	ld.global.f32 	%f9, [%rd23];
+	.loc 2 14 1
+	ld.global.f32 	%f10, [%rd20];
+	.loc 2 17 1
 	mul.f32 	%f11, %f10, %f3;
 	mul.f32 	%f12, %f9, %f5;
 	sub.f32 	%f13, %f11, %f12;
@@ -157,7 +157,7 @@ const llgtorque_ptx = `
 	mov.f32 	%f18, 0fBF800000;
 	.loc 3 2399 3
 	div.rn.f32 	%f19, %f18, %f17;
-	.loc 2 15 1
+	.loc 2 17 1
 	mul.f32 	%f20, %f2, %f2;
 	fma.rn.f32 	%f21, %f10, %f10, %f20;
 	fma.rn.f32 	%f22, %f5, %f5, %f21;
@@ -165,7 +165,7 @@ const llgtorque_ptx = `
 	sqrt.rn.f32 	%f23, %f22;
 	.loc 3 2399 3
 	div.rn.f32 	%f24, %f1, %f23;
-	.loc 2 15 1
+	.loc 2 17 1
 	mul.f32 	%f25, %f5, %f13;
 	mul.f32 	%f26, %f16, %f2;
 	sub.f32 	%f27, %f25, %f26;
@@ -181,18 +181,18 @@ const llgtorque_ptx = `
 	mul.f32 	%f37, %f19, %f34;
 	mul.f32 	%f38, %f19, %f35;
 	mul.f32 	%f39, %f19, %f36;
-	.loc 2 17 1
+	.loc 2 19 1
 	add.s64 	%rd26, %rd3, %rd19;
 	st.global.f32 	[%rd26], %f37;
-	.loc 2 18 1
+	.loc 2 20 1
 	add.s64 	%rd27, %rd2, %rd19;
 	st.global.f32 	[%rd27], %f38;
-	.loc 2 19 1
+	.loc 2 21 1
 	add.s64 	%rd28, %rd1, %rd19;
 	st.global.f32 	[%rd28], %f39;
 
 BB0_2:
-	.loc 2 21 2
+	.loc 2 23 2
 	ret;
 }
 

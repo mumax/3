@@ -64,7 +64,7 @@ func main() {
 	data.MustWriteFile("m.dump", M.HostCopy(), 0)
 	expect(avgx, 0)
 	expect(avgy, 0.125)
-	expect(avgz, 0.966)
+	expect(avgz, 0.967)
 	fmt.Println("OK")
 }
 

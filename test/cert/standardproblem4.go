@@ -19,14 +19,14 @@ func main() {
 	cuda.LockThread()
 
 	const (
-		a          = 1
-		N0, N1, N2 = 1 * a, 32 * a, 128 * a
+		N0, N1, N2 = 1, 32, 128
+		N          = N0 * N1 * N2
 		S0, S1, S2 = 3e-9, 125e-9, 500e-9
 		c0, c1, c2 = S0 / N0, S1 / N1, S2 / N2
 		Bsat       = 800e3 * mag.Mu0
 		Aex        = 13e-12
-		α          = 1
 	)
+	alpha := float32(1.0)
 
 	mesh = data.NewMesh(N0, N1, N2, c0, c1, c2)
 	M, Hd, Hex, Heff, torque := newVec(), newVec(), newVec(), newVec(), newVec()
@@ -38,8 +38,8 @@ func main() {
 	updateTorque := func(m *data.Slice) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
-		cuda.Madd2(Heff, Hd, Hex, Bsat, 1)
-		cuda.LLGTorque(torque, m, Heff, α)
+		cuda.Madd2(Heff, Hd, Hex, 1, 1)
+		cuda.LLGTorque(torque, m, Heff, alpha)
 		return torque
 	}
 
@@ -54,13 +54,23 @@ func main() {
 		solver.Step()
 	}
 	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
-	N := float32(mesh.NCell()) * Bsat
-	avgx, avgy, avgz := cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N
-	fmt.Println(avgx, avgy, avgz)
-	expect(avgx, 0)
-	expect(avgy, 0.12358)
-	expect(avgz, 0.95588)
-	fmt.Println("OK")
+	//avgx, avgy, avgz := cuda.Sum(mx)/(N*Bsat), cuda.Sum(my)/(N*Bsat), cuda.Sum(mz)/(N*Bsat)
+	////fmt.Println(avgx, avgy, avgz)
+	//expect(avgx, 0)
+	//expect(avgy, 0.12358)
+	//expect(avgz, 0.95588)
+	//fmt.Println("relax OK")
+
+	alpha = 0.02
+
+	solver.Time = 0
+	for solver.Time < 1e-9 {
+		solver.Step()
+		if solver.NSteps%10 == 0 {
+			avgx, avgy, avgz := cuda.Sum(mx)/(N*Bsat), cuda.Sum(my)/(N*Bsat), cuda.Sum(mz)/(N*Bsat)
+			fmt.Println(solver.Time, avgx, avgy, avgz)
+		}
+	}
 }
 
 func expect(have, want float32) {

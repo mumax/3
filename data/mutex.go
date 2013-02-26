@@ -40,14 +40,6 @@ func newRWMutex(N int) *rwMutex {
 	return m
 }
 
-// Move the locked window
-//func (m *rwMutex) delta(Δstart, Δstop int) {
-//	m.cond.L.Lock()
-//	m._delta(Δstart, Δstop)
-//	m.cond.L.Unlock()
-//	m.cond.Broadcast()
-//}
-
 // unsynchronized Delta
 func (m *rwMutex) delta(Δstart, Δstop int) {
 	Δa, Δb := int64(Δstart), int64(Δstop)
@@ -139,14 +131,6 @@ func (m *rwMutex) MakeRMutex() *rMutex {
 	m.readers = append(m.readers, r)
 	return r
 }
-
-// Move the locked window
-//func (m *rMutex) ReadDelta(Δstart, Δstop int) {
-//	m.rw.cond.L.Lock()
-//	m.delta(Δstart, Δstop)
-//	m.rw.cond.L.Unlock()
-//	m.rw.cond.Broadcast()
-//}
 
 // unsynchronized Delta
 func (m *rMutex) delta(Δstart, Δstop int) {

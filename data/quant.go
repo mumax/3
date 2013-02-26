@@ -57,23 +57,9 @@ func (c *Reader) Comp(i int) Reader {
 	return Reader{c.comp(i)}
 }
 
-//func (c *quant) Unit() string {
-//	return c.unit
-//}
-//
-//func (c *quant) Tag() string {
-//	return c.tag
-//}
-
 func (c *quant) Mesh() *Mesh {
 	return c.buffer.Mesh()
 }
-
-//func (c *quant) MemType() MemType {
-//	return c.buffer.MemType
-//}
-//
-////func (c Quant) MemType() MemType { return c.buffer.MemType }
 
 // Returns the data buffer without locking.
 // To be used with extreme care.

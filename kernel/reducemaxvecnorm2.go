@@ -22,8 +22,8 @@ type reducemaxvecnorm2_args struct {
 	argptr      [6]unsafe.Pointer
 }
 
-// Wrapper for reducemaxvecnorm2 CUDA kernel. Synchronizes before return.
-func K_reducemaxvecnorm2(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+// Wrapper for reducemaxvecnorm2 CUDA kernel, asynchronous.
+func K_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if reducemaxvecnorm2_code == 0 {
 		reducemaxvecnorm2_code = cu.ModuleLoadData(reducemaxvecnorm2_ptx).GetFunction("reducemaxvecnorm2")
 	}
@@ -44,8 +44,13 @@ func K_reducemaxvecnorm2(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, d
 	a.argptr[5] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(reducemaxvecnorm2_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for reducemaxvecnorm2 CUDA kernel, synchronized.
+func K_reducemaxvecnorm2(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_reducemaxvecnorm2_async(x, y, z, dst, initVal, n, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

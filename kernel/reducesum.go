@@ -20,8 +20,8 @@ type reducesum_args struct {
 	argptr      [4]unsafe.Pointer
 }
 
-// Wrapper for reducesum CUDA kernel. Synchronizes before return.
-func K_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+// Wrapper for reducesum CUDA kernel, asynchronous.
+func K_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if reducesum_code == 0 {
 		reducesum_code = cu.ModuleLoadData(reducesum_ptx).GetFunction("reducesum")
 	}
@@ -38,8 +38,13 @@ func K_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,
 	a.argptr[3] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(reducesum_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for reducesum CUDA kernel, synchronized.
+func K_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_reducesum_async(src, dst, initVal, n, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

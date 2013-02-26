@@ -21,8 +21,8 @@ type reducemaxdiff_args struct {
 	argptr      [5]unsafe.Pointer
 }
 
-// Wrapper for reducemaxdiff CUDA kernel. Synchronizes before return.
-func K_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+// Wrapper for reducemaxdiff CUDA kernel, asynchronous.
+func K_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = cu.ModuleLoadData(reducemaxdiff_ptx).GetFunction("reducemaxdiff")
 	}
@@ -41,8 +41,13 @@ func K_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointe
 	a.argptr[4] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(reducemaxdiff_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for reducemaxdiff CUDA kernel, synchronized.
+func K_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_reducemaxdiff_async(src1, src2, dst, initVal, n, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

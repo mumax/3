@@ -29,8 +29,8 @@ type kernmulC_args struct {
 	argptr  [13]unsafe.Pointer
 }
 
-// Wrapper for kernmulC CUDA kernel. Synchronizes before return.
-func K_kernmulC(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx unsafe.Pointer, Kyy unsafe.Pointer, Kzz unsafe.Pointer, Kyz unsafe.Pointer, Kxz unsafe.Pointer, Kxy unsafe.Pointer, Kzy unsafe.Pointer, Kzx unsafe.Pointer, Kyx unsafe.Pointer, N int, gridDim, blockDim cu.Dim3) {
+// Wrapper for kernmulC CUDA kernel, asynchronous.
+func K_kernmulC_async(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx unsafe.Pointer, Kyy unsafe.Pointer, Kzz unsafe.Pointer, Kyz unsafe.Pointer, Kxz unsafe.Pointer, Kxy unsafe.Pointer, Kzy unsafe.Pointer, Kzx unsafe.Pointer, Kyx unsafe.Pointer, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if kernmulC_code == 0 {
 		kernmulC_code = cu.ModuleLoadData(kernmulC_ptx).GetFunction("kernmulC")
 	}
@@ -65,8 +65,13 @@ func K_kernmulC(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx uns
 	a.argptr[12] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(kernmulC_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for kernmulC CUDA kernel, synchronized.
+func K_kernmulC(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx unsafe.Pointer, Kyy unsafe.Pointer, Kzz unsafe.Pointer, Kyz unsafe.Pointer, Kxz unsafe.Pointer, Kxy unsafe.Pointer, Kzy unsafe.Pointer, Kzx unsafe.Pointer, Kyx unsafe.Pointer, N int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_kernmulC_async(Mx, My, Mz, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy, Kzy, Kzx, Kyx, N, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

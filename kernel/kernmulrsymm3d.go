@@ -28,8 +28,8 @@ type kernmulRSymm3D_args struct {
 	argptr     [12]unsafe.Pointer
 }
 
-// Wrapper for kernmulRSymm3D CUDA kernel. Synchronizes before return.
-func K_kernmulRSymm3D(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+// Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
+func K_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = cu.ModuleLoadData(kernmulRSymm3D_ptx).GetFunction("kernmulRSymm3D")
 	}
@@ -62,8 +62,13 @@ func K_kernmulRSymm3D(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.P
 	a.argptr[11] = unsafe.Pointer(&a.arg_N2)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(kernmulRSymm3D_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for kernmulRSymm3D CUDA kernel, synchronized.
+func K_kernmulRSymm3D(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_kernmulRSymm3D_async(fftMx, fftMy, fftMz, fftKxx, fftKyy, fftKzz, fftKyz, fftKxz, fftKxy, N0, N1, N2, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

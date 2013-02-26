@@ -20,8 +20,8 @@ type reducemaxabs_args struct {
 	argptr      [4]unsafe.Pointer
 }
 
-// Wrapper for reducemaxabs CUDA kernel. Synchronizes before return.
-func K_reducemaxabs(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+// Wrapper for reducemaxabs CUDA kernel, asynchronous.
+func K_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if reducemaxabs_code == 0 {
 		reducemaxabs_code = cu.ModuleLoadData(reducemaxabs_ptx).GetFunction("reducemaxabs")
 	}
@@ -38,8 +38,13 @@ func K_reducemaxabs(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n i
 	a.argptr[3] = unsafe.Pointer(&a.arg_n)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(reducemaxabs_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for reducemaxabs CUDA kernel, synchronized.
+func K_reducemaxabs(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_reducemaxabs_async(src, dst, initVal, n, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

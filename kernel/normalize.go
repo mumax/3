@@ -22,8 +22,8 @@ type normalize_args struct {
 	argptr   [6]unsafe.Pointer
 }
 
-// Wrapper for normalize CUDA kernel. Synchronizes before return.
-func K_normalize(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, mask unsafe.Pointer, norm float32, N int, gridDim, blockDim cu.Dim3) {
+// Wrapper for normalize CUDA kernel, asynchronous.
+func K_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, mask unsafe.Pointer, norm float32, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if normalize_code == 0 {
 		normalize_code = cu.ModuleLoadData(normalize_ptx).GetFunction("normalize")
 	}
@@ -44,8 +44,13 @@ func K_normalize(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, mask u
 	a.argptr[5] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(normalize_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for normalize CUDA kernel, synchronized.
+func K_normalize(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, mask unsafe.Pointer, norm float32, N int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_normalize_async(vx, vy, vz, mask, norm, N, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

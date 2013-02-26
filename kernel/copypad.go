@@ -24,8 +24,8 @@ type copypad_args struct {
 	argptr  [8]unsafe.Pointer
 }
 
-// Wrapper for copypad CUDA kernel. Synchronizes before return.
-func K_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
+// Wrapper for copypad CUDA kernel, asynchronous.
+func K_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if copypad_code == 0 {
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
 	}
@@ -50,8 +50,13 @@ func K_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S
 	a.argptr[7] = unsafe.Pointer(&a.arg_S2)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(copypad_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for copypad CUDA kernel, synchronized.
+func K_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_copypad_async(dst, D0, D1, D2, src, S0, S1, S2, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

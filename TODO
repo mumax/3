@@ -10,8 +10,6 @@ dedicated exchange kernel or optimized stencil.
 
 vtk binary not working
 
-cuda2go: also create wrappers that accept stream param
-
 handle non-unit M: exchange, llgtorque
 
 rename Quant to Stream?

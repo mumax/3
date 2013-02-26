@@ -132,8 +132,8 @@ type {{.Name}}_args struct{
 	{{end}} argptr [{{len .ArgN}}]unsafe.Pointer
 }
 
-// Wrapper for {{.Name}} CUDA kernel. Synchronizes before return.
-func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
+// Wrapper for {{.Name}} CUDA kernel, asynchronous.
+func K_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
 	}
@@ -145,8 +145,13 @@ func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 	{{end}}
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel({{.Name}}_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for {{.Name}} CUDA kernel, synchronized.
+func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

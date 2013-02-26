@@ -28,8 +28,8 @@ type exchange_args struct {
 	argptr [12]unsafe.Pointer
 }
 
-// Wrapper for exchange CUDA kernel. Synchronizes before return.
-func K_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+// Wrapper for exchange CUDA kernel, asynchronous.
+func K_exchange_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if exchange_code == 0 {
 		exchange_code = cu.ModuleLoadData(exchange_ptx).GetFunction("exchange")
 	}
@@ -62,8 +62,13 @@ func K_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsa
 	a.argptr[11] = unsafe.Pointer(&a.arg_N2)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(exchange_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for exchange CUDA kernel, synchronized.
+func K_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_exchange_async(Hx, Hy, Hz, Mx, My, Mz, wx, wy, wz, N0, N1, N2, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

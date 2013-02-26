@@ -27,8 +27,8 @@ type llgtorque_args struct {
 	argptr    [11]unsafe.Pointer
 }
 
-// Wrapper for llgtorque CUDA kernel. Synchronizes before return.
-func K_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, gridDim, blockDim cu.Dim3) {
+// Wrapper for llgtorque CUDA kernel, asynchronous.
+func K_llgtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if llgtorque_code == 0 {
 		llgtorque_code = cu.ModuleLoadData(llgtorque_ptx).GetFunction("llgtorque")
 	}
@@ -59,8 +59,13 @@ func K_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx uns
 	a.argptr[10] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(llgtorque_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for llgtorque CUDA kernel, synchronized.
+func K_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_llgtorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alpha, N, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

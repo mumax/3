@@ -20,8 +20,8 @@ type kernmulRSymm2Dx_args struct {
 	argptr     [4]unsafe.Pointer
 }
 
-// Wrapper for kernmulRSymm2Dx CUDA kernel. Synchronizes before return.
-func K_kernmulRSymm2Dx(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+// Wrapper for kernmulRSymm2Dx CUDA kernel, asynchronous.
+func K_kernmulRSymm2Dx_async(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int, N2 int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if kernmulRSymm2Dx_code == 0 {
 		kernmulRSymm2Dx_code = cu.ModuleLoadData(kernmulRSymm2Dx_ptx).GetFunction("kernmulRSymm2Dx")
 	}
@@ -38,8 +38,13 @@ func K_kernmulRSymm2Dx(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int, N2 i
 	a.argptr[3] = unsafe.Pointer(&a.arg_N2)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(kernmulRSymm2Dx_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for kernmulRSymm2Dx CUDA kernel, synchronized.
+func K_kernmulRSymm2Dx(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int, N2 int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_kernmulRSymm2Dx_async(fftMx, fftKxx, N1, N2, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

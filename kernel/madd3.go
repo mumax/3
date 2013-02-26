@@ -24,8 +24,8 @@ type madd3_args struct {
 	argptr   [8]unsafe.Pointer
 }
 
-// Wrapper for madd3 CUDA kernel. Synchronizes before return.
-func K_madd3(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
+// Wrapper for madd3 CUDA kernel, asynchronous.
+func K_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if madd3_code == 0 {
 		madd3_code = cu.ModuleLoadData(madd3_ptx).GetFunction("madd3")
 	}
@@ -50,8 +50,13 @@ func K_madd3(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.
 	a.argptr[7] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	str := Stream()
 	cu.LaunchKernel(madd3_code, gridDim.X, gridDim.Y, gridDim.Z, blockDim.X, blockDim.Y, blockDim.Z, 0, str, args)
+}
+
+// Wrapper for madd3 CUDA kernel, synchronized.
+func K_madd3(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, gridDim, blockDim cu.Dim3) {
+	str := Stream()
+	K_madd3_async(dst, src1, fac1, src2, fac2, src3, fac3, N, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 

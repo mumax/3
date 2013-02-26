@@ -33,10 +33,10 @@ func prod3(x, y, z int) int {
 }
 
 // Releases all resources associated with the FFT plan.
-func (p fftplan) Destroy() { p.handle.Destroy() }
+func (p *fftplan) Destroy() { p.handle.Destroy() }
 
 // Associates a CUDA stream with the FFT plan.
-func (p fftplan) setStream(stream cu.Stream) {
+func (p *fftplan) setStream(stream cu.Stream) {
 	p.handle.SetStream(stream)
 	p.stream = stream
 }

@@ -22,7 +22,7 @@ func main() {
 	cuda.LockThread()
 
 	I := util.FloatArg(0)
-	Msat := 800e3 * 2
+	Msat := 800e3 //* 2
 	Bsat := float32(Msat * mag.Mu0)
 	Aex := 13e-12
 	alpha := float32(1.0)
@@ -64,9 +64,9 @@ func main() {
 
 	solver := cuda.NewHeun(M, updateTorque, norm, 1e-15, mag.Gamma0)
 
-	for solver.Time < 1e-9 {
-		solver.Step()
-	}
+	solver.Steps(1000)
+	solver.Relax(1e-6, 1e6)
+	solver.Steps(1000)
 	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
 	avgx, avgy, avgz := cuda.Sum(mx)/(N*Bsat), cuda.Sum(my)/(N*Bsat), cuda.Sum(mz)/(N*Bsat)
 	fmt.Println(I, avgx, avgy, avgz)

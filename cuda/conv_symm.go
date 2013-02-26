@@ -150,46 +150,41 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	// So only 2 FFT buffers are needed at the same time.
 
 	// FFT x
-	Memset(c.fftRBuf[0], 0)
+	zero1(c.fftRBuf[0], c.stream)
 	in := inp.Comp(0)
 	padded := c.kernSize
 	copyPad(c.fftRBuf[0], in, padded, c.size, c.stream)
-	c.fwPlan.Exec(c.fftRBuf[0], c.fftCBuf[0])
-	c.stream.Synchronize()
+	c.fwPlan.ExecAsync(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2] // TODO: rm these
-	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2)
+	kernMulRSymm2Dx(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, c.stream)
 
 	// bw FFT x
-	c.bwPlan.Exec(c.fftCBuf[0], c.fftRBuf[0])
-	c.stream.Synchronize()
+	c.bwPlan.ExecAsync(c.fftCBuf[0], c.fftRBuf[0])
 	out := outp.Comp(0)
 	copyPad(out, c.fftRBuf[0], c.size, padded, c.stream)
-	c.stream.Synchronize()
 
 	// FW FFT yz
 	for i := 1; i < 3; i++ {
-		Memset(c.fftRBuf[i], 0)
+		zero1(c.fftRBuf[i], c.stream)
 		in := inp.Comp(i)
 		copyPad(c.fftRBuf[i], in, padded, c.size, c.stream)
-		c.fwPlan.Exec(c.fftRBuf[i], c.fftCBuf[i])
-		c.stream.Synchronize()
+		c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
 	// kern mul yz
 	kernMulRSymm2Dyz(c.fftCBuf[1], c.fftCBuf[2],
 		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-		N1, N2)
+		N1, N2, c.stream)
 
 	// BW FFT yz
 	for i := 1; i < 3; i++ {
-		c.bwPlan.Exec(c.fftCBuf[i], c.fftRBuf[i])
+		c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
 		out := outp.Comp(i)
-		c.stream.Synchronize()
 		copyPad(out, c.fftRBuf[i], c.size, padded, c.stream)
-		c.stream.Synchronize()
 	}
+	c.stream.Synchronize()
 }
 
 func (c *DemagConvolution) is2D() bool {

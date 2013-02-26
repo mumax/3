@@ -12,24 +12,24 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int) {
+func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str cu.Stream) {
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
-	gridDim, blockDim := Make2DConf(N1, N2)
+	gr, bl := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm2Dyz(fftMy.DevPtr(0), fftMz.DevPtr(0),
+	kernel.K_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
-		N1, N2, gridDim, blockDim)
+		N1, N2, gr, bl, str)
 }
 
-func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int) {
+func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int, str cu.Stream) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
 	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
 
-	gridDim, blockDim := Make2DConf(N1, N2)
+	gr, bl := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm2Dx(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, gridDim, blockDim)
+	kernel.K_kernmulRSymm2Dx_async(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, gr, bl, str)
 }
 
 // Does not yet use Y mirror symmetry!!

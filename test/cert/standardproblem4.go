@@ -35,6 +35,8 @@ func main() {
 
 	demag := cuda.NewDemag(mesh)
 
+	var Bx, By, Bz float32 = 0, 0, 0
+
 	updateTorque := func(m *data.Slice) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
@@ -51,7 +53,7 @@ func main() {
 
 	solver := cuda.NewHeun(M, updateTorque, norm, 1e-15, mag.Gamma0)
 
-	for solver.Time < 2e-9 {
+	for solver.Time < 3e-9 {
 		solver.Step()
 	}
 	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
@@ -63,6 +65,8 @@ func main() {
 	//fmt.Println("relax OK")
 
 	alpha = 0.02
+	By = 4.3E-3
+	Bz = -24.6E-3
 
 	solver.Time = 0
 	for solver.Time < 1e-9 {
@@ -70,6 +74,9 @@ func main() {
 		if solver.NSteps%10 == 0 {
 			avgx, avgy, avgz := cuda.Sum(mx)/(N*Bsat), cuda.Sum(my)/(N*Bsat), cuda.Sum(mz)/(N*Bsat)
 			fmt.Println(solver.Time, avgx, avgy, avgz)
+			//if solver.NSteps % 100 == 0{
+			//	data.MustWriteFile(fmt.Sprintf("m%06d.dump", solver.NSteps), M.HostCopy(), solver.Time)
+			//}
 		}
 	}
 }

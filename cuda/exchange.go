@@ -11,7 +11,7 @@ func Exchange(Hex *data.Slice, M *data.Slice, Aex float64) {
 	mesh := Hex.Mesh()
 	N := mesh.Size()
 	c := mesh.CellSize()
-	Aex *= mag.Mu0
+	Aex *= 2 * mag.Mu0
 	w0 := float32(Aex / (c[0] * c[0]))
 	w1 := float32(Aex / (c[1] * c[1]))
 	w2 := float32(Aex / (c[2] * c[2]))

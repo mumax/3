@@ -37,7 +37,7 @@ func main() {
 
 	demag := cuda.NewDemag(mesh)
 
-	updateTorque := func(m *data.Slice) *data.Slice {
+	updateTorque := func(m *data.Slice, t float64) *data.Slice {
 		demag.Exec(Hd, m)
 		cuda.Exchange(Hex, m, Aex)
 		cuda.Madd2(Heff, Hd, Hex, 1, 1)
@@ -63,8 +63,8 @@ func main() {
 
 	data.MustWriteFile("m.dump", M.HostCopy(), 0)
 	expect(avgx, 0)
-	expect(avgy, 0.12358)
-	expect(avgz, 0.95588)
+	expect(avgy, 0.125)
+	expect(avgz, 0.966)
 	fmt.Println("OK")
 }
 

@@ -5,14 +5,19 @@ import (
 	"code.google.com/p/mx3/kernel"
 )
 
-// Calculates the REDUCED torque.
-// 	- m x B +  α m x (m x B)
+// Landau-Lifshitz torque divided by gamma0:
+// 	- 1/(1+α²) [ M x B +  α (M/|M|) x (M x B) ]
+// 	torque in Tesla/s
+// 	M in Tesla
+// 	B in Tesla
 func LLGTorque(torque, m, B *data.Slice, alpha float32) {
-	N := torque.Len()
 	// TODO: assert...
-	gridDim, blockDim := Make1DConf(N)
+
+	N := torque.Len()
+	gr, bl := Make1DConf(N)
+
 	kernel.K_llgtorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
 		B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
-		alpha, N, gridDim, blockDim)
+		alpha, N, gr, bl)
 }

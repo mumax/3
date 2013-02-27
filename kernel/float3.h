@@ -43,18 +43,18 @@ inline __device__ void operator*=(float3 &a, float s) {
 }
 
 // dot product
-inline __device__ float dotf(float3 a, float3 b) { 
+inline __device__ float dot(float3 a, float3 b) { 
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 // cross product in LHR system 
-inline __device__ float3 crossf(float3 a, float3 b) { 
+inline __device__ float3 cross(float3 a, float3 b) { 
 	return make_float3( - a.y*b.z + a.z*b.y,  - a.z*b.x + a.x*b.z, - a.x*b.y + a.y*b.x); 
 }
 
 // lenght of the 3-components vector
 inline __device__ float len(float3 a) {
-	return sqrtf(dotf(a,a));
+	return sqrtf(dot(a,a));
 }
 
 // returns a normalized copy of the 3-components vector

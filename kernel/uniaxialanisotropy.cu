@@ -12,7 +12,7 @@ uniaxialanisotropy(float* __restrict__  Hx, float* __restrict__  Hy, float* __re
 	
 		float3 m = {mx[i], my[i], mz[i]};
 		float3 u = {ux, uy, uz};
-		float3 H = u * dotf(m, u);
+		float3 H = u * dot(m, u);
 
 		Hx[i] = H.x;
 		Hy[i] = H.y;

@@ -108,7 +108,7 @@ const uniaxialanisotropy_ptx = `
 	cvta.to.global.u64 	%rd4, %rd12;
 	cvta.to.global.u64 	%rd5, %rd11;
 	cvta.to.global.u64 	%rd6, %rd10;
-	.loc 2 15 1
+	.loc 2 12 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -116,37 +116,37 @@ const uniaxialanisotropy_ptx = `
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 16 1
+	.loc 2 13 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	.loc 2 18 1
+	.loc 2 15 1
 	mul.wide.s32 	%rd13, %r1, 4;
 	add.s64 	%rd14, %rd6, %rd13;
 	add.s64 	%rd15, %rd5, %rd13;
 	add.s64 	%rd16, %rd4, %rd13;
 	ld.global.f32 	%f4, [%rd14];
 	ld.global.f32 	%f5, [%rd15];
-	.loc 2 19 1
+	.loc 2 16 1
 	mul.f32 	%f6, %f5, %f5;
 	fma.rn.f32 	%f7, %f4, %f4, %f6;
-	.loc 2 18 1
+	.loc 2 15 1
 	ld.global.f32 	%f8, [%rd16];
-	.loc 2 19 1
+	.loc 2 16 1
 	fma.rn.f32 	%f9, %f8, %f8, %f7;
-	.loc 2 21 1
+	.loc 2 18 1
 	mul.f32 	%f10, %f2, %f2;
 	fma.rn.f32 	%f11, %f1, %f1, %f10;
 	fma.rn.f32 	%f12, %f3, %f3, %f11;
 	.loc 3 991 5
 	sqrt.rn.f32 	%f13, %f12;
-	.loc 2 22 1
+	.loc 2 19 1
 	mul.f32 	%f14, %f9, %f13;
 	cvt.f64.f32 	%fd1, %f14;
 	mov.f64 	%fd2, 0d3EC515370F99F851;
 	.loc 4 2416 3
 	div.rn.f64 	%fd3, %fd2, %fd1;
-	.loc 2 22 1
+	.loc 2 19 1
 	mul.f32 	%f15, %f5, %f2;
 	fma.rn.f32 	%f16, %f4, %f1, %f15;
 	fma.rn.f32 	%f17, %f8, %f3, %f16;
@@ -156,18 +156,18 @@ const uniaxialanisotropy_ptx = `
 	mul.f32 	%f19, %f18, %f1;
 	mul.f32 	%f20, %f18, %f2;
 	mul.f32 	%f21, %f18, %f3;
-	.loc 2 24 1
+	.loc 2 21 1
 	add.s64 	%rd17, %rd3, %rd13;
 	st.global.f32 	[%rd17], %f19;
-	.loc 2 25 1
+	.loc 2 22 1
 	add.s64 	%rd18, %rd2, %rd13;
 	st.global.f32 	[%rd18], %f20;
-	.loc 2 26 1
+	.loc 2 23 1
 	add.s64 	%rd19, %rd1, %rd13;
 	st.global.f32 	[%rd19], %f21;
 
 BB0_2:
-	.loc 2 28 2
+	.loc 2 25 2
 	ret;
 }
 

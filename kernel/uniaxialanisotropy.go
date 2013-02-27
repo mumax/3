@@ -16,18 +16,18 @@ type uniaxialanisotropy_args struct {
 	arg_Hx unsafe.Pointer
 	arg_Hy unsafe.Pointer
 	arg_Hz unsafe.Pointer
-	arg_mx unsafe.Pointer
-	arg_my unsafe.Pointer
-	arg_mz unsafe.Pointer
-	arg_ux float32
-	arg_uy float32
-	arg_uz float32
+	arg_Mx unsafe.Pointer
+	arg_My unsafe.Pointer
+	arg_Mz unsafe.Pointer
+	arg_Ux float32
+	arg_Uy float32
+	arg_Uz float32
 	arg_N  int
 	argptr [10]unsafe.Pointer
 }
 
 // Wrapper for uniaxialanisotropy CUDA kernel, asynchronous.
-func K_uniaxialanisotropy_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, ux float32, uy float32, uz float32, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
+func K_uniaxialanisotropy_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, gridDim, blockDim cu.Dim3, str cu.Stream) {
 	if uniaxialanisotropy_code == 0 {
 		uniaxialanisotropy_code = cu.ModuleLoadData(uniaxialanisotropy_ptx).GetFunction("uniaxialanisotropy")
 	}
@@ -40,18 +40,18 @@ func K_uniaxialanisotropy_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.
 	a.argptr[1] = unsafe.Pointer(&a.arg_Hy)
 	a.arg_Hz = Hz
 	a.argptr[2] = unsafe.Pointer(&a.arg_Hz)
-	a.arg_mx = mx
-	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
-	a.arg_my = my
-	a.argptr[4] = unsafe.Pointer(&a.arg_my)
-	a.arg_mz = mz
-	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
-	a.arg_ux = ux
-	a.argptr[6] = unsafe.Pointer(&a.arg_ux)
-	a.arg_uy = uy
-	a.argptr[7] = unsafe.Pointer(&a.arg_uy)
-	a.arg_uz = uz
-	a.argptr[8] = unsafe.Pointer(&a.arg_uz)
+	a.arg_Mx = Mx
+	a.argptr[3] = unsafe.Pointer(&a.arg_Mx)
+	a.arg_My = My
+	a.argptr[4] = unsafe.Pointer(&a.arg_My)
+	a.arg_Mz = Mz
+	a.argptr[5] = unsafe.Pointer(&a.arg_Mz)
+	a.arg_Ux = Ux
+	a.argptr[6] = unsafe.Pointer(&a.arg_Ux)
+	a.arg_Uy = Uy
+	a.argptr[7] = unsafe.Pointer(&a.arg_Uy)
+	a.arg_Uz = Uz
+	a.argptr[8] = unsafe.Pointer(&a.arg_Uz)
 	a.arg_N = N
 	a.argptr[9] = unsafe.Pointer(&a.arg_N)
 
@@ -60,9 +60,9 @@ func K_uniaxialanisotropy_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.
 }
 
 // Wrapper for uniaxialanisotropy CUDA kernel, synchronized.
-func K_uniaxialanisotropy(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, ux float32, uy float32, uz float32, N int, gridDim, blockDim cu.Dim3) {
+func K_uniaxialanisotropy(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, gridDim, blockDim cu.Dim3) {
 	str := Stream()
-	K_uniaxialanisotropy_async(Hx, Hy, Hz, mx, my, mz, ux, uy, uz, N, gridDim, blockDim, str)
+	K_uniaxialanisotropy_async(Hx, Hy, Hz, Mx, My, Mz, Ux, Uy, Uz, N, gridDim, blockDim, str)
 	SyncAndRecycle(str)
 }
 
@@ -87,8 +87,9 @@ const uniaxialanisotropy_ptx = `
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<15>;
-	.reg .f32 	%f<13>;
+	.reg .f32 	%f<22>;
 	.reg .s64 	%rd<20>;
+	.reg .f64 	%fd<6>;
 
 
 	ld.param.u64 	%rd7, [uniaxialanisotropy_param_0];
@@ -107,7 +108,7 @@ const uniaxialanisotropy_ptx = `
 	cvta.to.global.u64 	%rd4, %rd12;
 	cvta.to.global.u64 	%rd5, %rd11;
 	cvta.to.global.u64 	%rd6, %rd10;
-	.loc 2 10 1
+	.loc 2 15 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -115,39 +116,58 @@ const uniaxialanisotropy_ptx = `
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 11 1
+	.loc 2 16 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	.loc 2 13 1
+	.loc 2 18 1
 	mul.wide.s32 	%rd13, %r1, 4;
 	add.s64 	%rd14, %rd6, %rd13;
 	add.s64 	%rd15, %rd5, %rd13;
 	add.s64 	%rd16, %rd4, %rd13;
 	ld.global.f32 	%f4, [%rd14];
 	ld.global.f32 	%f5, [%rd15];
-	.loc 2 15 1
-	mul.f32 	%f6, %f5, %f2;
-	fma.rn.f32 	%f7, %f4, %f1, %f6;
-	.loc 2 13 1
-	ld.global.f32 	%f8, [%rd16];
-	.loc 2 15 1
-	fma.rn.f32 	%f9, %f8, %f3, %f7;
-	mul.f32 	%f10, %f9, %f1;
-	mul.f32 	%f11, %f9, %f2;
-	mul.f32 	%f12, %f9, %f3;
-	.loc 2 17 1
-	add.s64 	%rd17, %rd3, %rd13;
-	st.global.f32 	[%rd17], %f10;
-	.loc 2 18 1
-	add.s64 	%rd18, %rd2, %rd13;
-	st.global.f32 	[%rd18], %f11;
 	.loc 2 19 1
+	mul.f32 	%f6, %f5, %f5;
+	fma.rn.f32 	%f7, %f4, %f4, %f6;
+	.loc 2 18 1
+	ld.global.f32 	%f8, [%rd16];
+	.loc 2 19 1
+	fma.rn.f32 	%f9, %f8, %f8, %f7;
+	.loc 2 21 1
+	mul.f32 	%f10, %f2, %f2;
+	fma.rn.f32 	%f11, %f1, %f1, %f10;
+	fma.rn.f32 	%f12, %f3, %f3, %f11;
+	.loc 3 991 5
+	sqrt.rn.f32 	%f13, %f12;
+	.loc 2 22 1
+	mul.f32 	%f14, %f9, %f13;
+	cvt.f64.f32 	%fd1, %f14;
+	mov.f64 	%fd2, 0d3EC515370F99F851;
+	.loc 4 2416 3
+	div.rn.f64 	%fd3, %fd2, %fd1;
+	.loc 2 22 1
+	mul.f32 	%f15, %f5, %f2;
+	fma.rn.f32 	%f16, %f4, %f1, %f15;
+	fma.rn.f32 	%f17, %f8, %f3, %f16;
+	cvt.f64.f32 	%fd4, %f17;
+	mul.f64 	%fd5, %fd3, %fd4;
+	cvt.rn.f32.f64 	%f18, %fd5;
+	mul.f32 	%f19, %f18, %f1;
+	mul.f32 	%f20, %f18, %f2;
+	mul.f32 	%f21, %f18, %f3;
+	.loc 2 24 1
+	add.s64 	%rd17, %rd3, %rd13;
+	st.global.f32 	[%rd17], %f19;
+	.loc 2 25 1
+	add.s64 	%rd18, %rd2, %rd13;
+	st.global.f32 	[%rd18], %f20;
+	.loc 2 26 1
 	add.s64 	%rd19, %rd1, %rd13;
-	st.global.f32 	[%rd19], %f12;
+	st.global.f32 	[%rd19], %f21;
 
 BB0_2:
-	.loc 2 21 2
+	.loc 2 28 2
 	ret;
 }
 

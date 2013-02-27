@@ -1,22 +1,29 @@
 #include "float3.h"
 
-// Uniaxial magnetocrystalline anisotropy
+#define PI 3.14159265359
+#define MU0 (4*PI*1e-7)
 
+// Uniaxial magnetocrystalline anisotropy.
+// H: anisotrotpy field in Tesla.
+// M: magnetization in Tesla.
+// U: anisotropy axis, length is Ku in J/m³.
 extern "C" __global__ void
 uniaxialanisotropy(float* __restrict__  Hx, float* __restrict__  Hy, float* __restrict__  Hz,
-                   float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz, 
-                   float ux, float uy, float uz, int N) {
+                   float* __restrict__  Mx, float* __restrict__  My, float* __restrict__  Mz, 
+                   float Ux, float Uy, float Uz, int N) {
 
 	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
 	if (i < N) {
 	
-		float3 m = {mx[i], my[i], mz[i]};
-		float3 u = {ux, uy, uz};
-		float3 H = u * dot(m, u);
+		float3 M   = {Mx[i], My[i], Mz[i]};
+		float  Bs2 = dot(M, M);
+		float3 U   = {Ux, Uy, Uz};
+		float  K   = len(U);
+		float3 Ha  = (2 * MU0 / (Bs2 * K)) * dot(M, U) * U;
 
-		Hx[i] = H.x;
-		Hy[i] = H.y;
-		Hz[i] = H.z;
+		Hx[i] = Ha.x;
+		Hy[i] = Ha.y;
+		Hz[i] = Ha.z;
 	}
 }
 

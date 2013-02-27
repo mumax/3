@@ -3,17 +3,21 @@ package cuda
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/kernel"
+	"code.google.com/p/mx3/mag"
 )
 
-// Dzyaloshinskii-Moriya interaction
+// Dzyaloshinskii-Moriya interaction.
+// m: normalized
+// D: J/m²
+// Hdm: Tesla
 func DMI(Hdm *data.Slice, m *data.Slice, Dx, Dy, Dz float64) {
 	mesh := Hdm.Mesh()
 	N := mesh.Size()
 	c := mesh.CellSize()
 
-	dx := float32(Dx)
-	dy := float32(Dy)
-	dz := float32(Dz)
+	dx := float32(Dx * mag.Mu0)
+	dy := float32(Dy * mag.Mu0)
+	dz := float32(Dz * mag.Mu0)
 	cx := float32(c[0])
 	cy := float32(c[1])
 	cz := float32(c[2])

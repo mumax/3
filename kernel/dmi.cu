@@ -5,13 +5,13 @@
 
 #define ix(i, j, k) idx(clamp(i, N0), clamp(j, N1), clamp(k, N2))
 
-#define diff(out, in, u, v, w, c) out = ((in[ix(i+u, j+v, k+w)] - in[ix(i-u, j-v, k-v)])/c)
+#define diff(out, in, u, v, w, c) out = ((in[ix(i+u, j+v, k+w)] - in[ix(i-u, j-v, k-v)])/(2*c))
 
 extern "C" __global__ void
 dmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-    float cx, float cy, float cz,
     float dx, float dy, float dz,
+    float cx, float cy, float cz,
     int N0, int N1, int N2){
 
 	int j = blockIdx.x * blockDim.x + threadIdx.x;

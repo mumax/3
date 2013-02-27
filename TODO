@@ -15,3 +15,5 @@ handle non-unit M: exchange, llgtorque
 rename Quant to Stream?
 
 use device properties for grid config
+
+cert/ automate tests

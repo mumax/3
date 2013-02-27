@@ -26,25 +26,26 @@ dmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 		int I = idx(i, j, k);
 		Hx[I] = 0;
 		Hy[I] = 0;
-		Hx[I] = 0;
+		Hz[I] = 0;
 
 		if (dx != 0){
 			float dmzdy; diff(dmzdy, mz, 0, 1, 0, cy);
 			float dmydz; diff(dmydz, my, 0, 0, 1, cz);
-			Hx[I] = dx * (dmzdy - dmydz); 
+			Hx[I] = dx * (-dmzdy + dmydz); 
 		}
 
 		if (dy != 0){
 			float dmzdx; diff(dmzdx, mz, 1, 0, 0, cx);
 			float dmxdz; diff(dmxdz, mx, 0, 0, 1, cz);
-			Hy[I] = dx * (-dmzdx + dmxdz); 
+			Hy[I] = dy * (dmzdx - dmxdz); 
 		}
 
 		if (dz != 0){
 			float dmydx; diff(dmydx, my, 1, 0, 0, cx);
 			float dmxdy; diff(dmxdy, mx, 0, 1, 0, cy);
-			Hz[I] = dx * (dmydx - dmxdy); 
+			Hz[I] = dz * (-dmydx + dmxdy); 
 		}
+		// note: left-handed coordinate system.
 	}
 }
 

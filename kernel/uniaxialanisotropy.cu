@@ -4,9 +4,6 @@
 #define MU0 (4*PI*1e-7)
 
 // Uniaxial magnetocrystalline anisotropy.
-// H: anisotrotpy field in Tesla.
-// M: magnetization in Tesla.
-// U: anisotropy axis, length is Ku in J/m³.
 extern "C" __global__ void
 uniaxialanisotropy(float* __restrict__  Hx, float* __restrict__  Hy, float* __restrict__  Hz,
                    float* __restrict__  Mx, float* __restrict__  My, float* __restrict__  Mz, 

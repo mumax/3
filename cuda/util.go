@@ -24,43 +24,50 @@ const (
 )
 
 // Make a 1D kernel launch configuration suited for N threads.
-func Make1DConf(N int) (gridSize, blockSize cu.Dim3) {
+func Make1DConf(N int) *Config {
 
-	blockSize.X = MaxBlockSize
-	blockSize.Y = 1
-	blockSize.Z = 1
+	var gr, bl cu.Dim3
+	bl.X = MaxBlockSize
+	bl.Y = 1
+	bl.Z = 1
 
 	N2 := divUp(N, MaxBlockSize) // N2 blocks left
 
 	NX := divUp(N2, MaxGridSize)
 	NY := divUp(N2, NX)
 
-	gridSize.X = NX
-	gridSize.Y = NY
-	gridSize.Z = 1
+	gr.X = NX
+	gr.Y = NY
+	gr.Z = 1
+	//util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 
-	util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
-	return
+	return &Config{gr, bl}
 }
 
 // TODO: swap N1/N2?
-func Make2DConf(N1, N2 int) (gridSize, blockSize cu.Dim3) {
+func Make2DConf(N1, N2 int) *Config {
 	const BLOCK = 32 // TODO
 
-	blockSize.X = BLOCK
-	blockSize.Y = BLOCK
-	blockSize.Z = 1
+	var gr, bl cu.Dim3
+	bl.X = BLOCK
+	bl.Y = BLOCK
+	bl.Z = 1
 
 	NX := divUp(N2, BLOCK)
 	NY := divUp(N1, BLOCK)
 
-	gridSize.X = NX
-	gridSize.Y = NY
-	gridSize.Z = 1
+	gr.X = NX
+	gr.Y = NY
+	gr.Z = 1
 
-	N := N1 * N2
-	util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
-	return
+	//N := N1 * N2
+	//util.Assert(gr.X*gr.Y*gr.Z*bl.X*bl.Y*bl.Z >= N)
+
+	return &Config{gr, bl}
+}
+
+type Config struct {
+	Grid, Block cu.Dim3
 }
 
 //// Register host memory for fast transfers,

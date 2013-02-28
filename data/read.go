@@ -150,6 +150,8 @@ func (r *reader) readData() (*Slice, error) {
 	mesh := NewMesh(s[0], s[1], s[2], c[0], c[1], c[2])
 	length := mesh.NCell()
 	slice := NewSlice(r.Components, mesh)
+	slice.info.unit = r.DataUnit
+	slice.info.tag = r.DataLabel
 	host := slice.Host()
 	for _, data := range host {
 		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[0 : SIZEOF_FLOAT32*length]

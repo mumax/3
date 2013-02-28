@@ -70,7 +70,7 @@ func main() {
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		log.Println(fname)
-		slice, err := data.ReadSliceFile(fname)
+		slice, err := data.ReadFile(fname)
 		if err != nil {
 			log.Println(err)
 			continue
@@ -130,7 +130,7 @@ func process(f *data.Slice, name string) {
 	}
 
 	if *flag_vtk != "" {
-		out := open(name + ".vtk")
+		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
 		defer out.Close()
 		dumpVTK(out, f, *flag_vtk)
 		haveOutput = true

@@ -21,17 +21,17 @@ func main() {
 	const (
 		N0, N1, N2 = 1, 64, 64
 		N          = N0 * N1 * N2
-		c0, c1, c2 = 3e-9, 2e-9, 2e-9
-		Bsat       = 800e3 * mag.Mu0
+		c0, c1, c2 = 2e-9, 4e-9, 4e-9
+		Bsat       = 1100e3 * mag.Mu0
 		Aex        = 13e-12
-		alpha      = 1
-		K1         = 5000
+		alpha      = 0.2
+		K1         = 0.5e6
 	)
 
 	mesh = data.NewMesh(N0, N1, N2, c0, c1, c2)
 	M, Hd, Hex, Heff, Ha, torque := newVec(), newVec(), newVec(), newVec(), newVec(), newVec()
 
-	cuda.Memset(M, 0, 1, -0.01)
+	cuda.Memset(M, 1, 1, 1)
 
 	demag := cuda.NewDemag(mesh)
 
@@ -61,22 +61,16 @@ func main() {
 		fmt.Println(solver.Time, avgx, avgy, avgz)
 	}
 
-	for solver.Time < 1e-9 {
-		solver.Step()
-		if solver.NSteps%10 == 0 {
-			save()
+	for i, by := range []float32{0, 10, 30, 100, 300} {
+		By = by * 1e-3
+		for solver.Time < float64(i+1)*1e-9 {
+			solver.Step()
+			if solver.NSteps%10 == 0 {
+				save()
+			}
 		}
 	}
 
-	By = 10e-3
-	Bz = 10e-3
-
-	for solver.Time < 2e-9 {
-		solver.Step()
-		if solver.NSteps%10 == 0 {
-			save()
-		}
-	}
 }
 
 func expect(have, want float32) {

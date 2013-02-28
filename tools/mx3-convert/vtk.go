@@ -3,19 +3,23 @@ package main
 // Support for vtk 4.2 file output
 // Author: Rémy Lassalle-Balier
 // Modified by Arne Vansteenkiste, 2012, 2013.
+// Modified by Mykola Dvornik, 2013
 
 import (
 	"code.google.com/p/mx3/data"
 	"fmt"
 	"io"
 	"log"
-	"unsafe"
+	//~ "unsafe"
+	"bytes"
+	"encoding/base64"
+	"encoding/binary"
 )
 
 func dumpVTK(out io.Writer, q *data.Slice, dataformat string) (err error) {
 	err = writeVTKHeader(out, q)
-	err = writeVTKPoints(out, q, dataformat)
 	err = writeVTKCellData(out, q, dataformat)
+	err = writeVTKPoints(out, q, dataformat)
 	err = writeVTKFooter(out)
 	return
 }
@@ -31,7 +35,7 @@ func writeVTKHeader(out io.Writer, q *data.Slice) (err error) {
 
 func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string) (err error) {
 	_, err = fmt.Fprintln(out, "\t\t\t<Points>")
-	fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"points\" NumberOfComponents=\"3\" format=\"%s\">\n", dataformat)
+	fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"%s\">\n\t\t\t\t\t", dataformat)
 	gridsize := q.Mesh().Size()
 	cellsize := q.Mesh().CellSize()
 	switch dataformat {
@@ -47,26 +51,30 @@ func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string) (err error)
 			}
 		}
 	case "binary":
-		var bytes []byte
+		buffer := new(bytes.Buffer)
 		for k := 0; k < gridsize[X]; k++ {
 			for j := 0; j < gridsize[Y]; j++ {
 				for i := 0; i < gridsize[Z]; i++ {
 					x := (float32)(i) * (float32)(cellsize[Z])
 					y := (float32)(j) * (float32)(cellsize[Y])
 					z := (float32)(k) * (float32)(cellsize[X])
-					bytes = (*[4]byte)(unsafe.Pointer(&x))[:]
-					out.Write(bytes)
-					bytes = (*[4]byte)(unsafe.Pointer(&y))[:]
-					out.Write(bytes)
-					bytes = (*[4]byte)(unsafe.Pointer(&z))[:]
-					out.Write(bytes)
+					binary.Write(buffer, binary.LittleEndian, x)
+					binary.Write(buffer, binary.LittleEndian, y)
+					binary.Write(buffer, binary.LittleEndian, z)
 				}
 			}
 		}
+		b64len := uint32(len(buffer.Bytes()))
+		bufLen := new(bytes.Buffer)
+		binary.Write(bufLen, binary.LittleEndian, b64len)
+		base64out := base64.NewEncoder(base64.StdEncoding, out)
+		base64out.Write(bufLen.Bytes())
+		base64out.Write(buffer.Bytes())
+		base64out.Close()
 	default:
 		log.Fatalf("Illegal VTK data format: %v. Options are: ascii, binary", dataformat)
 	}
-	_, err = fmt.Fprintln(out, "</DataArray>")
+	_, err = fmt.Fprintln(out, "\n\t\t\t\t</DataArray>")
 	_, err = fmt.Fprintln(out, "\t\t\t</Points>")
 	return
 }
@@ -77,13 +85,13 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 	switch N {
 	case 1:
 		fmt.Fprintf(out, "\t\t\t<PointData Scalars=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n", q.Tag(), N, dataformat)
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), N, dataformat)
 	case 3:
 		fmt.Fprintf(out, "\t\t\t<PointData Vectors=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n", q.Tag(), N, dataformat)
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), N, dataformat)
 	case 6, 9:
 		fmt.Fprintf(out, "\t\t\t<PointData Tensors=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n", q.Tag(), 9, dataformat) // must be 9!
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), 9, dataformat) // must be 9!
 	default:
 		log.Fatalf("vtk: cannot handle %v components", N)
 	}
@@ -114,43 +122,41 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 		}
 	case "binary":
 		// Inlined for performance, terabytes of data will pass here...
-		var bytes []byte
+		buffer := new(bytes.Buffer)	
 		for i := 0; i < gridsize[X]; i++ {
 			for j := 0; j < gridsize[Y]; j++ {
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(0, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(1, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(2, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(1, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(3, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(4, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(2, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(4, 9)][i][j][k]))[:]
-						out.Write(bytes)
-						bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(5, 9)][i][j][k]))[:]
-						out.Write(bytes)
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(0, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(1, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(2, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(1, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(3, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(4, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(2, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(4, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[swapIndex(5, 9)][i][j][k])
 					} else {
 						for c := 0; c < N; c++ {
-							bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(c, N)][i][j][k]))[:]
-							out.Write(bytes)
+							binary.Write(buffer, binary.LittleEndian, data[swapIndex(c, N)][i][j][k])
 						}
 					}
 				}
 			}
 		}
+		b64len := uint32(len(buffer.Bytes()))
+		bufLen := new(bytes.Buffer)
+		binary.Write(bufLen, binary.LittleEndian, b64len)
+		base64out := base64.NewEncoder(base64.StdEncoding, out)
+		base64out.Write(bufLen.Bytes())
+		base64out.Write(buffer.Bytes())
+		base64out.Close()
 	default:
 		panic(fmt.Errorf("vtk: illegal data format " + dataformat + ". Options are: ascii, binary"))
 	}
-	fmt.Fprintln(out, "</DataArray>")
+
+	fmt.Fprintln(out, "\n\t\t\t\t</DataArray>")
 	fmt.Fprintln(out, "\t\t\t</PointData>")
 	return
 }

@@ -133,7 +133,7 @@ type {{.Name}}_args struct{
 }
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
-func K_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *Config, str cu.Stream) {
+func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *Config, str cu.Stream) {
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
 	}
@@ -149,7 +149,7 @@ func K_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 }
 
 // Wrapper for {{.Name}} CUDA kernel, synchronized.
-func K_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *Config) {
+func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *Config) {
 	str := Stream()
 	K_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} gridDim, blockDim, str)
 	SyncAndRecycle(str)

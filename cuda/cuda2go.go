@@ -105,7 +105,7 @@ type Kernel struct {
 func wrapgen(filename, funcname string, argt, argn []string) {
 	ptx := filterptx(util.NoExt(filename) + ".ptx")
 	kernel := &Kernel{funcname, argt, argn, "`" + string(ptx) + "`"}
-	wrapfname := util.NoExt(filename) + ".go"
+	wrapfname := util.NoExt(filename) + "_wrapper.go"
 	wrapout, err := os.OpenFile(wrapfname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.PanicErr(err)
 	defer wrapout.Close()

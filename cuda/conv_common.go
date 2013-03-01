@@ -5,7 +5,6 @@ package cuda
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"github.com/barnex/fmath"
 	"log"
 )
 
@@ -34,11 +33,11 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 	maxreal := float32(0.)
 	for i := 0; i < src.Len()/2; i++ {
 		dstList[i] = srcList[2*i] * scale
-		if fmath.Abs(srcList[2*i+0]) > maxreal {
-			maxreal = fmath.Abs(srcList[2*i+0])
+		if fabs(srcList[2*i+0]) > maxreal {
+			maxreal = fabs(srcList[2*i+0])
 		}
-		if fmath.Abs(srcList[2*i+1]) > maximg {
-			maximg = fmath.Abs(srcList[2*i+1])
+		if fabs(srcList[2*i+1]) > maximg {
+			maximg = fabs(srcList[2*i+1])
 		}
 	}
 	// ...however, we check that the imaginary parts are nearly zero,
@@ -50,3 +49,10 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 
 // Maximum tolerable imaginary/real part for demag kernel in Fourier space. Assures kernel has correct symmetry.
 const FFT_IMAG_TOLERANCE = 1e-5
+
+func fabs(x float32) float32 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

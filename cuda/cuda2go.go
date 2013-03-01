@@ -151,7 +151,7 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 // Wrapper for {{.Name}} CUDA kernel, synchronized.
 func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *Config) {
 	str := Stream()
-	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} gridDim, blockDim, str)
+	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} cfg, str)
 	SyncAndRecycle(str)
 }
 

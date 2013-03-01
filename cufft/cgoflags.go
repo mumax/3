@@ -16,4 +16,3 @@ package cufft
 //#cgo CFLAGS:-I/usr/local/cuda/include/ -I/opt/cuda/include
 import "C"
 
-import "C"

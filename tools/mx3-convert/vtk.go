@@ -122,7 +122,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 		}
 	case "binary":
 		// Inlined for performance, terabytes of data will pass here...
-		buffer := new(bytes.Buffer)	
+		buffer := new(bytes.Buffer)
 		for i := 0; i < gridsize[X]; i++ {
 			for j := 0; j < gridsize[Y]; j++ {
 				for k := 0; k < gridsize[Z]; k++ {

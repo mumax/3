@@ -1,4 +1,4 @@
-all: nvcc githook 6g #tool 
+all: nvcc githook 6g mx3 #tool 
 
 PREFIX=code.google.com/p/mx3
 
@@ -13,6 +13,9 @@ PKGS=\
 	$(PREFIX)/prof\
 
 $(PREFIX)/kernel: nvcc
+
+mx3:
+	go install -v
 
 .PHONY: nvcc
 nvcc:

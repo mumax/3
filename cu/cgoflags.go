@@ -14,9 +14,6 @@ package cu
 ////arch linux:
 //#cgo LDFLAGS:-L/opt/cuda/lib64 -L/opt/cuda/lib
 //
-////this one is for Mykola and other optimus victims:
-//#cgo LDFLAGS:-L/usr/lib64/nvidia/ -L/usr/lib/nvidia/
-//
 //#cgo LDFLAGS:-lcuda
 //
 //#cgo CFLAGS:-I/usr/local/cuda/include/ -I/opt/cuda/include

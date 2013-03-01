@@ -1,4 +1,4 @@
-package kernel
+package cuda
 
 // File: management of a pool of re-usable CUDA streams.
 // Author: Arne Vansteenkiste

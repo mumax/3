@@ -1,8 +1,6 @@
 package cuda
 
-import (
-	"github.com/barnex/cuda5/cu"
-)
+import "github.com/barnex/cuda5/cu"
 
 func iMin(a, b int) int {
 	if a < b {

@@ -15,20 +15,20 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str c
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
-	gr, bl := Make2DConf(N1, N2)
+	cfg := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
+	k_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
-		N1, N2, gr, bl, str)
+		N1, N2, cfg, str)
 }
 
 func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int, str cu.Stream) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
 	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
 
-	gr, bl := Make2DConf(N1, N2)
+	cfg := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm2Dx_async(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, gr, bl, str)
+	k_kernmulRSymm2Dx_async(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, cfg, str)
 }
 
 // Does not yet use Y mirror symmetry!!
@@ -37,11 +37,11 @@ func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slic
 	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
 	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 
-	gr, bl := Make2DConf(N1, N2)
+	cfg := Make2DConf(N1, N2)
 
-	kernel.K_kernmulRSymm3D_async(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
+	k_kernmulRSymm3D_async(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
 		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),
-		N0, N1, N2, gr, bl, str)
+		N0, N1, N2, cfg, str)
 }
 
 // General kernel multiplication with general complex kernel.

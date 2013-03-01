@@ -9,6 +9,7 @@ package cuda5
 SUBDIRECTORIES
 
 	cu
+	cuda
 	cufft
 	safe
 

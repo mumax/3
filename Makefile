@@ -6,20 +6,19 @@ PKGS=\
 	$(PREFIX)/engine\
 	$(PREFIX)/cuda\
 	$(PREFIX)/util\
-	$(PREFIX)/kernel\
 	$(PREFIX)/draw\
 	$(PREFIX)/mag\
 	$(PREFIX)/data\
 	$(PREFIX)/prof\
 
-$(PREFIX)/kernel: nvcc
+$(PREFIX)/cuda: nvcc
 
 mx3:
 	go install -v
 
 .PHONY: nvcc
 nvcc:
-	make -C kernel -j8
+	make -C cuda -j8
 
 6g:
 	go install -v $(PKGS)
@@ -68,7 +67,7 @@ gccgobench: gccgo
 clean:
 	go clean -i -x $(PKGS)
 	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/
-	make clean -C kernel
+	make clean -C cuda
 
 .PHONY: count
 count:

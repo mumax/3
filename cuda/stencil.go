@@ -2,7 +2,6 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/kernel"
 	"code.google.com/p/mx3/util"
 )
 
@@ -26,9 +25,9 @@ func stencilAdd(dst, src *data.Slice, weight *[7]float32) {
 	N0, N1, N2 := size[0], size[1], size[2]
 	wrap := mesh.PBC()
 	util.Assert(wrap == [3]int{0, 0, 0})
-	gridDim, blockDim := Make2DConf(N2, N1)
+	cfg := Make2DConf(N2, N1)
 
-	kernel.K_stencil3(dst.DevPtr(0), src.DevPtr(0),
+	k_stencil3(dst.DevPtr(0), src.DevPtr(0),
 		weight[0], weight[1], weight[2], weight[3], weight[4], weight[5], weight[6],
-		wrap[0], wrap[1], wrap[2], N0, N1, N2, gridDim, blockDim)
+		wrap[0], wrap[1], wrap[2], N0, N1, N2, cfg)
 }

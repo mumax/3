@@ -2,7 +2,6 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/kernel"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"math"
@@ -40,17 +39,17 @@ func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyDtoH(dst, cu.De
 func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes) }
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
-	str := kernel.Stream()
+	str := Stream()
 	cu.MemcpyAsync(cu.DevicePtr(dst), cu.DevicePtr(src), bytes, str)
-	kernel.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }
 
 // Memset sets the Slice's components to the specified values.
 func Memset(s *data.Slice, val ...float32) {
 	util.Argument(len(val) == s.NComp())
-	str := kernel.Stream()
+	str := Stream()
 	for c, v := range val {
 		cu.MemsetD32Async(cu.DevicePtr(s.DevPtr(c)), math.Float32bits(v), int64(s.Len()), str)
 	}
-	kernel.SyncAndRecycle(str)
+	SyncAndRecycle(str)
 }

@@ -1,4 +1,4 @@
-package kernel
+package cuda
 
 //#include "reduce.h"
 import "C"

@@ -1,7 +1,6 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/kernel"
 	"code.google.com/p/mx3/util"
 	"flag"
 	"github.com/barnex/cuda5/cu"
@@ -46,7 +45,7 @@ func Init() {
 	if M < 2 {
 		log.Println("compute capability does not allow unified addressing")
 	}
-	kernel.Init()
+	initStreampool()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.

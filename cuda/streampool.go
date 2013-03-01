@@ -25,7 +25,7 @@ func SyncAndRecycle(str cu.Stream) {
 	streamPool <- str
 }
 
-func Init() {
+func initStreampool() {
 	streamPool = make(chan cu.Stream, streamPoolSize)
 	for i := 0; i < streamPoolSize; i++ {
 		streamPool <- cu.StreamCreate()

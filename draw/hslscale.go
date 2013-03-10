@@ -4,13 +4,12 @@ package draw
 // Author: Arne Vansteenkiste
 
 import (
-	"github.com/barnex/fmath"
 	"image/color"
 	"math"
 )
 
 func HSLMap(x, y, z float32) color.NRGBA {
-	s := fmath.Sqrt(x*x + y*y + z*z)
+	s := sqrtf(x*x + y*y + z*z)
 	l := 0.5*z + 0.5
 	h := float32(math.Atan2(float64(y), float64(x)))
 	return HSL(h, s, l)
@@ -106,4 +105,8 @@ func abs(number float32) float32 {
 		return -number
 	} // else
 	return number
+}
+
+func sqrtf(x float32) float32 {
+	return float32(math.Sqrt(float64(x)))
 }

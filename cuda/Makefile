@@ -12,17 +12,18 @@ all: $(GOFILES)
 	go fmt	
 	go install -v
 
-$(GOFILES): %.go: $(@:_wrapper.go=.cu)
+$(GOFILES): %.go: $(@:_wrapper.go=.cu) cuda2go
 	$(NVCC) -gencode arch=compute_20,code=sm_20 $(@:_wrapper.go=.cu) -o $(@:_wrapper.go=_20.ptx)
 	$(NVCC) -gencode arch=compute_20,code=sm_21 $(@:_wrapper.go=.cu) -o $(@:_wrapper.go=_21.ptx)
 	$(NVCC) -gencode arch=compute_30,code=sm_30 $(@:_wrapper.go=.cu) -o $(@:_wrapper.go=_30.ptx)
 	$(NVCC) -gencode arch=compute_35,code=sm_35 $(@:_wrapper.go=.cu) -o $(@:_wrapper.go=_35.ptx)
-	touch $@
+	./cuda2go $(@:_wrapper.go=.cu) 
+	
 	
 
-#cuda2go: cuda2go.go
-#	go build cuda2go.go
-#
+cuda2go: cuda2go.go
+	go build cuda2go.go
+
 #$(GOFILES): %.go: %.ptx cuda2go
 #	./cuda2go $(@:.go=.cu) 
 #

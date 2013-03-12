@@ -98,13 +98,13 @@ type Kernel struct {
 	Name string
 	ArgT []string
 	ArgN []string
-	PTX  string
+	PTX  map[int]string
 }
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	ptx := filterptx(util.NoExt(filename) + ".ptx")
-	kernel := &Kernel{funcname, argt, argn, "`" + string(ptx) + "`"}
+	//ptx := filterptx(util.NoExt(filename) + ".ptx")
+	kernel := &Kernel{funcname, argt, argn, make(map[int]string)}
 	wrapfname := util.NoExt(filename) + "_wrapper.go"
 	wrapout, err := os.OpenFile(wrapfname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.PanicErr(err)
@@ -135,7 +135,7 @@ type {{.Name}}_args struct{
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
 func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str cu.Stream) {
 	if {{.Name}}_code == 0{
-		{{.Name}}_code = cu.ModuleLoadData({{.Name}}_ptx).GetFunction("{{.Name}}")
+		{{.Name}}_code = fatbinLoad({{.Name}}_map, "{{.Name}}")
 	}
 
 	var a {{.Name}}_args
@@ -155,7 +155,9 @@ func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 	syncAndRecycle(str)
 }
 
-const {{.Name}}_ptx = {{.PTX}} `
+var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}}, {{$k}}: {{$.Name}}_ptx_{{$k}} {{end}} }
+
+`
 
 // wrapper code template
 var templ = template.Must(template.New("wrap").Parse(templText))

@@ -1,4 +1,4 @@
 /*
  CUDA functionality.
 */
-package documentation
+package cuda

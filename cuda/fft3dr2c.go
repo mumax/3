@@ -9,22 +9,22 @@ import (
 )
 
 // 3D single-precission real-to-complex FFT plan.
-type FFT3DR2CPlan struct {
+type fft3DR2CPlan struct {
 	fftplan
 	size3D
 }
 
 // 3D single-precission real-to-complex FFT plan.
-func NewFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) FFT3DR2CPlan {
+func newFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) fft3DR2CPlan {
 	handle := cufft.Plan3d(Nx, Ny, Nz, cufft.R2C)
 	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
 	handle.SetStream(stream)
-	return FFT3DR2CPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
+	return fft3DR2CPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
 }
 
 // Execute the FFT plan, asynchronous.
 // src and dst are 3D arrays stored 1D arrays.
-func (p *FFT3DR2CPlan) ExecAsync(src, dst *data.Slice) {
+func (p *fft3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
 	oksrclen := p.InputLen()
 	if src.Len() != oksrclen {
@@ -38,27 +38,27 @@ func (p *FFT3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 }
 
 // Execute the FFT plan, synchronized.
-func (p *FFT3DR2CPlan) Exec(src, dst *data.Slice) {
+func (p *fft3DR2CPlan) Exec(src, dst *data.Slice) {
 	p.ExecAsync(src, dst)
 	p.stream.Synchronize()
 }
 
 // 3D size of the input array.
-func (p *FFT3DR2CPlan) InputSizeFloats() (Nx, Ny, Nz int) {
+func (p *fft3DR2CPlan) InputSizeFloats() (Nx, Ny, Nz int) {
 	return p.size3D[0], p.size3D[1], p.size3D[2]
 }
 
 // 3D size of the output array.
-func (p *FFT3DR2CPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
+func (p *fft3DR2CPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
 	return p.size3D[0], p.size3D[1], p.size3D[2] + 2
 }
 
 // Required length of the (1D) input array.
-func (p *FFT3DR2CPlan) InputLen() int {
+func (p *fft3DR2CPlan) InputLen() int {
 	return prod3(p.InputSizeFloats())
 }
 
 // Required length of the (1D) output array.
-func (p *FFT3DR2CPlan) OutputLen() int {
+func (p *fft3DR2CPlan) OutputLen() int {
 	return prod3(p.OutputSizeFloats())
 }

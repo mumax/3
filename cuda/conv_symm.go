@@ -14,8 +14,8 @@ type DemagConvolution struct {
 	fftRBuf     [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]*data.Slice // FFT kernel on device: TODO: xfer if needed
-	fwPlan      FFT3DR2CPlan      // Forward FFT (1 component)
-	bwPlan      FFT3DC2RPlan      // Backward FFT (1 component)
+	fwPlan      fft3DR2CPlan      // Forward FFT (1 component)
+	bwPlan      fft3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
 	stream      cu.Stream         // Stream for FFT plans
 }
@@ -24,8 +24,8 @@ func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
 		c.stream = cu.StreamCreate()
-		c.fwPlan = NewFFT3DR2C(padded[0], padded[1], padded[2], c.stream)
-		c.bwPlan = NewFFT3DC2R(padded[0], padded[1], padded[2], c.stream)
+		c.fwPlan = newFFT3DR2C(padded[0], padded[1], padded[2], c.stream)
+		c.bwPlan = newFFT3DC2R(padded[0], padded[1], padded[2], c.stream)
 	}
 
 	{ // init device buffers

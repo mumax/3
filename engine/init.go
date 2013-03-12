@@ -11,13 +11,11 @@ import (
 )
 
 var (
-	Flag_version     = flag.Bool("v", true, "print version")
-	Flag_silent      = flag.Bool("s", false, "Don't generate any log info")
-	Flag_od          = flag.String("o", "", "set output directory")
-	Flag_force       = flag.Bool("f", false, "force start, clean existing output directory")
-	Flag_maxprocs    = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
-	Flag_maxblocklen = flag.Int("maxblocklen", 1<<30, "Maximum size of concurrent blocks")
-	Flag_minblocks   = flag.Int("minblocks", 1, "Minimum number of concurrent blocks")
+	Flag_version  = flag.Bool("v", true, "print version")
+	Flag_silent   = flag.Bool("s", false, "Don't generate any log info")
+	Flag_od       = flag.String("o", "", "set output directory")
+	Flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
+	Flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 )
 
 func Init() {

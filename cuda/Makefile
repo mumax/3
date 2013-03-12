@@ -25,6 +25,6 @@ $(PTXFILES): %.ptx: %.cu
 .PHONY: clean
 clean:
 	rm -f $(PTXFILES)
-	rm -f $(GOFILES)
+	rm -f *_wrapper.go
 	rm -f cuda2go
 

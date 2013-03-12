@@ -1,4 +1,4 @@
-package data
+package engine
 
 import (
 	"math/rand"

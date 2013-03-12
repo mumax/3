@@ -1,23 +1,26 @@
-package data
+package engine
 
 // File: Quant stores a physical quantity.
 // Author: Arne Vansteenkiste
 
-import "log"
+import (
+	"code.google.com/p/mx3/data"
+	"log"
+)
 
 // shared by Quant and Reader
 type quant struct {
-	buffer Slice           // stores the data
-	lock   [MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
+	buffer data.Slice           // stores the data
+	lock   [data.MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
 }
 
 type Quant struct {
 	quant
 }
 
-func QuantFromSlice(s *Slice) *Quant {
+func QuantFromSlice(s *data.Slice) *Quant {
 	N := s.Mesh().NCell()
-	var lock [MAX_COMP]mutex
+	var lock [data.MAX_COMP]mutex
 	nComp := s.NComp()
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
@@ -46,7 +49,7 @@ func (c *quant) NComp() int {
 }
 
 func (c *quant) comp(i int) quant {
-	return quant{*c.buffer.Comp(i), [MAX_COMP]mutex{c.lock[i]}}
+	return quant{*c.buffer.Comp(i), [data.MAX_COMP]mutex{c.lock[i]}}
 }
 
 func (c *Quant) Comp(i int) Quant {
@@ -57,13 +60,13 @@ func (c *Reader) Comp(i int) Reader {
 	return Reader{c.comp(i)}
 }
 
-func (c *quant) Mesh() *Mesh {
+func (c *quant) Mesh() *data.Mesh {
 	return c.buffer.Mesh()
 }
 
 // Returns the data buffer without locking.
 // To be used with extreme care.
-func (c *quant) Data() *Slice {
+func (c *quant) Data() *data.Slice {
 	for i := 0; i < c.NComp(); i++ {
 		if c.lock[i].isLocked() {
 			log.Panic("quant unsafe data: is locked")
@@ -73,7 +76,7 @@ func (c *quant) Data() *Slice {
 }
 
 // lock the next n elements of buffer.
-func (c *quant) next() *Slice {
+func (c *quant) next() *data.Slice {
 	//n := c.Mesh().NCell()
 	c.lock[0].lockNext()
 	a, b := c.lock[0].lockedRange()
@@ -95,7 +98,7 @@ func (c *quant) done() {
 	}
 }
 
-func (c *Quant) WriteNext() *Slice {
+func (c *Quant) WriteNext() *data.Slice {
 	return c.quant.next()
 }
 
@@ -103,7 +106,7 @@ func (c *Quant) WriteDone() {
 	c.quant.done()
 }
 
-func (c *Reader) ReadNext() *Slice {
+func (c *Reader) ReadNext() *data.Slice {
 	return c.quant.next()
 }
 

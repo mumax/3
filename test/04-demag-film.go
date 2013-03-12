@@ -17,13 +17,13 @@ func main() {
 	c := 1.
 	mesh := data.NewMesh(N0, N1, N2, c/2, c*2, c)
 
-	m := cuda.NewQuant(3, mesh)
+	m := cuda.NewSlice(3, mesh)
 	conv := cuda.NewDemag(mesh)
-	cuda.Memset(m.Data(), 1, 0, 0)
+	cuda.Memset(m, 1, 0, 0)
 
-	B := cuda.NewQuant(3, mesh)
-	conv.Exec(B.Data(), m.Data())
-	out := B.Data().HostCopy()
+	B := cuda.NewSlice(3, mesh)
+	conv.Exec(B, m)
+	out := B.HostCopy()
 
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]

@@ -14,7 +14,7 @@ func main() {
 	c0, c1, c2 := 1e-9, 1e-9, 1e-9
 	mesh := data.NewMesh(N0, N1, N2, c0, c1, c2)
 
-	m1 := cuda.NewQuant(3, mesh).Data()
+	m1 := cuda.NewSlice(3, mesh)
 	m1.HostCopy().Host()
 
 	m2 := cuda.NewUnifiedSlice(3, mesh)

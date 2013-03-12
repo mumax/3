@@ -286,7 +286,7 @@ func (f *Slice) Tensors() [][][][]float32 {
 	tensors := make([][][][]float32, f.NComp())
 	host := f.Host()
 	for i := range tensors {
-		tensors[i] = Reshape(host[i], f.Mesh().Size())
+		tensors[i] = reshape(host[i], f.Mesh().Size())
 	}
 	return tensors
 }

@@ -20,8 +20,8 @@ func resampleNearest(out, in [][][][]float32) {
 	if len(in) != len(out) {
 		log.Panicf("illegal argument: len(out)=%v, len(in)=%v", len(out), len(in))
 	}
-	size1 := SizeOf(in[0])
-	size2 := SizeOf(out[0])
+	size1 := sizeOf(in[0])
+	size2 := sizeOf(out[0])
 	for c := range out {
 		for i := range out[c] {
 			i1 := (i * size1[0]) / size2[0]

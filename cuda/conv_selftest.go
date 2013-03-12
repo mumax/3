@@ -67,8 +67,8 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 		}
 	}
 
-	size := data.SizeOf(in[0])
-	ksize := data.SizeOf(kern[0][0])
+	size := sizeOf(in[0])
+	ksize := sizeOf(kern[0][0])
 	// Zero output first
 	for c := 0; c < 3; c++ {
 		for x := 0; x < size[0]; x++ {
@@ -127,7 +127,7 @@ func rnd() float32 {
 // generate sparse input data for testing the convolution.
 func initConvTestInput(input [3][][][]float32) {
 	rand.Seed(0) // reproducible tests
-	size := data.SizeOf(input[0])
+	size := sizeOf(input[0])
 	N0, N1, N2 := size[0], size[1], size[2]
 	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
 	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
@@ -141,4 +141,9 @@ func initConvTestInput(input [3][][][]float32) {
 			}
 		}
 	}
+}
+
+// Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
+func sizeOf(block [][][]float32) [3]int {
+	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }

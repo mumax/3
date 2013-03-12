@@ -27,7 +27,7 @@ type uniaxialanisotropy_args struct {
 }
 
 // Wrapper for uniaxialanisotropy CUDA kernel, asynchronous.
-func k_uniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, cfg *Config, str cu.Stream) {
+func k_uniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, cfg *config, str cu.Stream) {
 	if uniaxialanisotropy_code == 0 {
 		uniaxialanisotropy_code = cu.ModuleLoadData(uniaxialanisotropy_ptx).GetFunction("uniaxialanisotropy")
 	}
@@ -60,7 +60,7 @@ func k_uniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.
 }
 
 // Wrapper for uniaxialanisotropy CUDA kernel, synchronized.
-func k_uniaxialanisotropy(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, cfg *Config) {
+func k_uniaxialanisotropy(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Ux float32, Uy float32, Uz float32, N int, cfg *config) {
 	str := stream()
 	k_uniaxialanisotropy_async(Bx, By, Bz, Mx, My, Mz, Ux, Uy, Uz, N, cfg, str)
 	syncAndRecycle(str)

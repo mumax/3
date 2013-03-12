@@ -21,7 +21,7 @@ const (
 )
 
 // Make a 1D kernel launch configuration suited for N threads.
-func Make1DConf(N int) *Config {
+func make1DConf(N int) *config {
 
 	var gr, bl cu.Dim3
 	bl.X = MaxBlockSize
@@ -38,11 +38,11 @@ func Make1DConf(N int) *Config {
 	gr.Z = 1
 	//util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 
-	return &Config{gr, bl}
+	return &config{gr, bl}
 }
 
 // TODO: swap N1/N2?
-func Make2DConf(N1, N2 int) *Config {
+func make2DConf(N1, N2 int) *config {
 	const BLOCK = 32 // TODO
 
 	var gr, bl cu.Dim3
@@ -60,10 +60,10 @@ func Make2DConf(N1, N2 int) *Config {
 	//N := N1 * N2
 	//util.Assert(gr.X*gr.Y*gr.Z*bl.X*bl.Y*bl.Z >= N)
 
-	return &Config{gr, bl}
+	return &config{gr, bl}
 }
 
-type Config struct {
+type config struct {
 	Grid, Block cu.Dim3
 }
 

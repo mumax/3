@@ -25,7 +25,7 @@ func stencilAdd(dst, src *data.Slice, weight *[7]float32) {
 	N0, N1, N2 := size[0], size[1], size[2]
 	wrap := mesh.PBC()
 	util.Assert(wrap == [3]int{0, 0, 0})
-	cfg := Make2DConf(N2, N1)
+	cfg := make2DConf(N2, N1)
 
 	k_stencil3(dst.DevPtr(0), src.DevPtr(0),
 		weight[0], weight[1], weight[2], weight[3], weight[4], weight[5], weight[6],

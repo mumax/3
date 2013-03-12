@@ -23,7 +23,7 @@ type madd2_args struct {
 }
 
 // Wrapper for madd2 CUDA kernel, asynchronous.
-func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *Config, str cu.Stream) {
+func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config, str cu.Stream) {
 	if madd2_code == 0 {
 		madd2_code = cu.ModuleLoadData(madd2_ptx).GetFunction("madd2")
 	}
@@ -48,7 +48,7 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 }
 
 // Wrapper for madd2 CUDA kernel, synchronized.
-func k_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *Config) {
+func k_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config) {
 	str := stream()
 	k_madd2_async(dst, src1, fac1, src2, fac2, N, cfg, str)
 	syncAndRecycle(str)

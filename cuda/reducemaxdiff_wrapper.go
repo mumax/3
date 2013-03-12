@@ -22,7 +22,7 @@ type reducemaxdiff_args struct {
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
-func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config, str cu.Stream) {
+func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = cu.ModuleLoadData(reducemaxdiff_ptx).GetFunction("reducemaxdiff")
 	}
@@ -45,7 +45,7 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, synchronized.
-func k_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
+func k_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	str := stream()
 	k_reducemaxdiff_async(src1, src2, dst, initVal, n, cfg, str)
 	syncAndRecycle(str)

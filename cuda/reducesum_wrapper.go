@@ -21,7 +21,7 @@ type reducesum_args struct {
 }
 
 // Wrapper for reducesum CUDA kernel, asynchronous.
-func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config, str cu.Stream) {
+func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if reducesum_code == 0 {
 		reducesum_code = cu.ModuleLoadData(reducesum_ptx).GetFunction("reducesum")
 	}
@@ -42,7 +42,7 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 }
 
 // Wrapper for reducesum CUDA kernel, synchronized.
-func k_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
+func k_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	str := stream()
 	k_reducesum_async(src, dst, initVal, n, cfg, str)
 	syncAndRecycle(str)

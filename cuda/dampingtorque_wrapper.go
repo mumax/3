@@ -27,7 +27,7 @@ type dampingtorque_args struct {
 }
 
 // Wrapper for dampingtorque CUDA kernel, asynchronous.
-func k_dampingtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *Config, str cu.Stream) {
+func k_dampingtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if dampingtorque_code == 0 {
 		dampingtorque_code = cu.ModuleLoadData(dampingtorque_ptx).GetFunction("dampingtorque")
 	}
@@ -60,7 +60,7 @@ func k_dampingtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Point
 }
 
 // Wrapper for dampingtorque CUDA kernel, synchronized.
-func k_dampingtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *Config) {
+func k_dampingtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *config) {
 	str := stream()
 	k_dampingtorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, N, cfg, str)
 	syncAndRecycle(str)

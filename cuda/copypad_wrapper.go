@@ -25,7 +25,7 @@ type copypad_args struct {
 }
 
 // Wrapper for copypad CUDA kernel, asynchronous.
-func k_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *Config, str cu.Stream) {
+func k_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config, str cu.Stream) {
 	if copypad_code == 0 {
 		copypad_code = cu.ModuleLoadData(copypad_ptx).GetFunction("copypad")
 	}
@@ -54,7 +54,7 @@ func k_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Poin
 }
 
 // Wrapper for copypad CUDA kernel, synchronized.
-func k_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *Config) {
+func k_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config) {
 	str := stream()
 	k_copypad_async(dst, D0, D1, D2, src, S0, S1, S2, cfg, str)
 	syncAndRecycle(str)

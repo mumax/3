@@ -32,7 +32,7 @@ type stencil3_args struct {
 }
 
 // Wrapper for stencil3 CUDA kernel, asynchronous.
-func k_stencil3_async(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, cfg *Config, str cu.Stream) {
+func k_stencil3_async(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, cfg *config, str cu.Stream) {
 	if stencil3_code == 0 {
 		stencil3_code = cu.ModuleLoadData(stencil3_ptx).GetFunction("stencil3")
 	}
@@ -75,7 +75,7 @@ func k_stencil3_async(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt flo
 }
 
 // Wrapper for stencil3 CUDA kernel, synchronized.
-func k_stencil3(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, cfg *Config) {
+func k_stencil3(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, cfg *config) {
 	str := stream()
 	k_stencil3_async(dst, src, w0, wt, wb, wu, wd, wl, wr, wrap0, wrap1, wrap2, N0, N1, N2, cfg, str)
 	syncAndRecycle(str)

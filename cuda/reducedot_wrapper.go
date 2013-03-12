@@ -22,7 +22,7 @@ type reducedot_args struct {
 }
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
-func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config, str cu.Stream) {
+func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if reducedot_code == 0 {
 		reducedot_code = cu.ModuleLoadData(reducedot_ptx).GetFunction("reducedot")
 	}
@@ -45,7 +45,7 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 }
 
 // Wrapper for reducedot CUDA kernel, synchronized.
-func k_reducedot(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
+func k_reducedot(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	str := stream()
 	k_reducedot_async(x1, x2, dst, initVal, n, cfg, str)
 	syncAndRecycle(str)

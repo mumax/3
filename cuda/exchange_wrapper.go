@@ -29,7 +29,7 @@ type exchange_args struct {
 }
 
 // Wrapper for exchange CUDA kernel, asynchronous.
-func k_exchange_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *Config, str cu.Stream) {
+func k_exchange_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config, str cu.Stream) {
 	if exchange_code == 0 {
 		exchange_code = cu.ModuleLoadData(exchange_ptx).GetFunction("exchange")
 	}
@@ -66,7 +66,7 @@ func k_exchange_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, M
 }
 
 // Wrapper for exchange CUDA kernel, synchronized.
-func k_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *Config) {
+func k_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config) {
 	str := stream()
 	k_exchange_async(Hx, Hy, Hz, Mx, My, Mz, wx, wy, wz, N0, N1, N2, cfg, str)
 	syncAndRecycle(str)

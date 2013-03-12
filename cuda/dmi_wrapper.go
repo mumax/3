@@ -32,7 +32,7 @@ type dmi_args struct {
 }
 
 // Wrapper for dmi CUDA kernel, asynchronous.
-func k_dmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dx float32, dy float32, dz float32, cx float32, cy float32, cz float32, N0 int, N1 int, N2 int, cfg *Config, str cu.Stream) {
+func k_dmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dx float32, dy float32, dz float32, cx float32, cy float32, cz float32, N0 int, N1 int, N2 int, cfg *config, str cu.Stream) {
 	if dmi_code == 0 {
 		dmi_code = cu.ModuleLoadData(dmi_ptx).GetFunction("dmi")
 	}
@@ -75,7 +75,7 @@ func k_dmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx uns
 }
 
 // Wrapper for dmi CUDA kernel, synchronized.
-func k_dmi(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dx float32, dy float32, dz float32, cx float32, cy float32, cz float32, N0 int, N1 int, N2 int, cfg *Config) {
+func k_dmi(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dx float32, dy float32, dz float32, cx float32, cy float32, cz float32, N0 int, N1 int, N2 int, cfg *config) {
 	str := stream()
 	k_dmi_async(Hx, Hy, Hz, mx, my, mz, dx, dy, dz, cx, cy, cz, N0, N1, N2, cfg, str)
 	syncAndRecycle(str)

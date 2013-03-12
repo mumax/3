@@ -14,7 +14,10 @@ var (
 	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
-var cudaCtx cu.Context // gpu context to be used by all threads
+var (
+	cudaCtx cu.Context // gpu context to be used by all threads
+	cudaCC  int        // compute capablity
+)
 
 func Init() {
 	if cudaCtx != 0 {
@@ -42,9 +45,7 @@ func Init() {
 		dev.Name(), "(", (dev.TotalMem())/(1024*1024), "MB) ",
 		"compute ", M, ".", m,
 		" concurrent: ", concurrent == 1, "\n")
-	if M < 2 {
-		log.Println("compute capability does not allow unified addressing")
-	}
+	cudaCC = 10*M + m
 	initStreampool()
 }
 

@@ -1,7 +1,16 @@
 package cuda
 
 import "github.com/barnex/cuda5/cu"
+import "log"
 
+// load PTX code for function name, find highest SM that matches our card.
 func fatbinLoad(sm map[int]string, fn string) cu.Function {
-	return cu.ModuleLoadData(sm[20]).GetFunction(fn)
+	best := 0
+	for k, _ := range sm {
+		if k <= cudaCC && k > best {
+			best = k
+		}
+	}
+	log.Print("loading ", fn, " v.", best, "\n") // TODO: rm
+	return cu.ModuleLoadData(sm[best]).GetFunction(fn)
 }

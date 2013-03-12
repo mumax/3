@@ -76,9 +76,9 @@ func k_stencil3_async(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt flo
 
 // Wrapper for stencil3 CUDA kernel, synchronized.
 func k_stencil3(dst unsafe.Pointer, src unsafe.Pointer, w0 float32, wt float32, wb float32, wu float32, wd float32, wl float32, wr float32, wrap0 int, wrap1 int, wrap2 int, N0 int, N1 int, N2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_stencil3_async(dst, src, w0, wt, wb, wu, wd, wl, wr, wrap0, wrap1, wrap2, N0, N1, N2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const stencil3_ptx = `

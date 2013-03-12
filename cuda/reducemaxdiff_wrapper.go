@@ -46,9 +46,9 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 
 // Wrapper for reducemaxdiff CUDA kernel, synchronized.
 func k_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_reducemaxdiff_async(src1, src2, dst, initVal, n, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const reducemaxdiff_ptx = `

@@ -61,9 +61,9 @@ func k_dampingtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Point
 
 // Wrapper for dampingtorque CUDA kernel, synchronized.
 func k_dampingtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_dampingtorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, N, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const dampingtorque_ptx = `

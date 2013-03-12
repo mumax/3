@@ -39,17 +39,17 @@ func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyDtoH(dst, cu.De
 func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes) }
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
-	str := Stream()
+	str := stream()
 	cu.MemcpyAsync(cu.DevicePtr(dst), cu.DevicePtr(src), bytes, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 // Memset sets the Slice's components to the specified values.
 func Memset(s *data.Slice, val ...float32) {
 	util.Argument(len(val) == s.NComp())
-	str := Stream()
+	str := stream()
 	for c, v := range val {
 		cu.MemsetD32Async(cu.DevicePtr(s.DevPtr(c)), math.Float32bits(v), int64(s.Len()), str)
 	}
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }

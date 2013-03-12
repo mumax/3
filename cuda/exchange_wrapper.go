@@ -67,9 +67,9 @@ func k_exchange_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, M
 
 // Wrapper for exchange CUDA kernel, synchronized.
 func k_exchange(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_exchange_async(Hx, Hy, Hz, Mx, My, Mz, wx, wy, wz, N0, N1, N2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const exchange_ptx = `

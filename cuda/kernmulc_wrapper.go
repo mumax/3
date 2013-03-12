@@ -70,9 +70,9 @@ func k_kernmulC_async(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, K
 
 // Wrapper for kernmulC CUDA kernel, synchronized.
 func k_kernmulC(Mx unsafe.Pointer, My unsafe.Pointer, Mz unsafe.Pointer, Kxx unsafe.Pointer, Kyy unsafe.Pointer, Kzz unsafe.Pointer, Kyz unsafe.Pointer, Kxz unsafe.Pointer, Kxy unsafe.Pointer, Kzy unsafe.Pointer, Kzx unsafe.Pointer, Kyx unsafe.Pointer, N int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_kernmulC_async(Mx, My, Mz, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy, Kzy, Kzx, Kyx, N, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const kernmulC_ptx = `

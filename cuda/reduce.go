@@ -77,9 +77,9 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 		initReduceBuf()
 	}
 	buf := <-reduceBuffers
-	str := Stream()
+	str := stream()
 	cu.MemsetD32Async(cu.DevicePtr(buf), math.Float32bits(initVal), 1, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 	return buf
 }
 

@@ -43,9 +43,9 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 
 // Wrapper for reducesum CUDA kernel, synchronized.
 func k_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_reducesum_async(src, dst, initVal, n, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const reducesum_ptx = `

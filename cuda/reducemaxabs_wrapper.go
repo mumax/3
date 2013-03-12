@@ -43,9 +43,9 @@ func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float3
 
 // Wrapper for reducemaxabs CUDA kernel, synchronized.
 func k_reducemaxabs(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_reducemaxabs_async(src, dst, initVal, n, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const reducemaxabs_ptx = `

@@ -49,9 +49,9 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 
 // Wrapper for normalize CUDA kernel, synchronized.
 func k_normalize(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, mask unsafe.Pointer, norm float32, N int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_normalize_async(vx, vy, vz, mask, norm, N, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const normalize_ptx = `

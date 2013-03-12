@@ -67,9 +67,9 @@ func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz un
 
 // Wrapper for kernmulRSymm3D CUDA kernel, synchronized.
 func k_kernmulRSymm3D(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, N0 int, N1 int, N2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_kernmulRSymm3D_async(fftMx, fftMy, fftMz, fftKxx, fftKyy, fftKzz, fftKyz, fftKxz, fftKxy, N0, N1, N2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const kernmulRSymm3D_ptx = `

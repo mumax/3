@@ -64,9 +64,9 @@ func k_llgtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, 
 
 // Wrapper for llgtorque CUDA kernel, synchronized.
 func k_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_llgtorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alpha, N, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const llgtorque_ptx = `

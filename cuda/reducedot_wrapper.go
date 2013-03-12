@@ -46,9 +46,9 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 
 // Wrapper for reducedot CUDA kernel, synchronized.
 func k_reducedot(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_reducedot_async(x1, x2, dst, initVal, n, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const reducedot_ptx = `

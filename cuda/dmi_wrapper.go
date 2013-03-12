@@ -76,9 +76,9 @@ func k_dmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx uns
 
 // Wrapper for dmi CUDA kernel, synchronized.
 func k_dmi(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dx float32, dy float32, dz float32, cx float32, cy float32, cz float32, N0 int, N1 int, N2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_dmi_async(Hx, Hy, Hz, mx, my, mz, dx, dy, dz, cx, cy, cz, N0, N1, N2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const dmi_ptx = `

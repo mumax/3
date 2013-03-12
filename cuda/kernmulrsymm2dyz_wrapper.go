@@ -52,9 +52,9 @@ func k_kernmulRSymm2Dyz_async(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy
 
 // Wrapper for kernmulRSymm2Dyz CUDA kernel, synchronized.
 func k_kernmulRSymm2Dyz(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, N1 int, N2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_kernmulRSymm2Dyz_async(fftMy, fftMz, fftKyy, fftKzz, fftKyz, N1, N2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const kernmulRSymm2Dyz_ptx = `

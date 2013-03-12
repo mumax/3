@@ -12,7 +12,7 @@ const streamPoolSize = 64     // number of streams in global pool.
 
 // Returns a CUDA stream from a global pool.
 // After use it should be recycled with SyncAndRecycle.
-func Stream() cu.Stream {
+func stream() cu.Stream {
 	return <-streamPool
 }
 
@@ -20,7 +20,7 @@ func Stream() cu.Stream {
 // the stream is synchronized and returned to the pool.
 // Not recycling streams will cause deadlock quickly as
 // the pool drains.
-func SyncAndRecycle(str cu.Stream) {
+func syncAndRecycle(str cu.Stream) {
 	str.Synchronize()
 	streamPool <- str
 }

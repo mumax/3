@@ -49,9 +49,9 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 
 // Wrapper for madd2 CUDA kernel, synchronized.
 func k_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_madd2_async(dst, src1, fac1, src2, fac2, N, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const madd2_ptx = `

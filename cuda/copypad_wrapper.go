@@ -55,9 +55,9 @@ func k_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Poin
 
 // Wrapper for copypad CUDA kernel, synchronized.
 func k_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_copypad_async(dst, D0, D1, D2, src, S0, S1, S2, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const copypad_ptx = `

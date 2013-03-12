@@ -49,9 +49,9 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel, synchronized.
 func k_reducemaxvecnorm2(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *Config) {
-	str := Stream()
+	str := stream()
 	k_reducemaxvecnorm2_async(x, y, z, dst, initVal, n, cfg, str)
-	SyncAndRecycle(str)
+	syncAndRecycle(str)
 }
 
 const reducemaxvecnorm2_ptx = `

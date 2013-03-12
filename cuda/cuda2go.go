@@ -101,10 +101,17 @@ type Kernel struct {
 	PTX  map[int]string
 }
 
+// supported compute capabilities.
+var cc = []int{20, 30, 35}
+
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
-	//ptx := filterptx(util.NoExt(filename) + ".ptx")
 	kernel := &Kernel{funcname, argt, argn, make(map[int]string)}
+
+	for _, s := range cc {
+		kernel.PTX[s] = filterptx(fmt.Sprint(util.NoExt(filename), "_", s, ".ptx"))
+	}
+
 	wrapfname := util.NoExt(filename) + "_wrapper.go"
 	wrapout, err := os.OpenFile(wrapfname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.PanicErr(err)
@@ -155,8 +162,12 @@ func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} 
 	syncAndRecycle(str)
 }
 
-var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}}, {{$k}}: {{$.Name}}_ptx_{{$k}} {{end}} }
+var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}},
+{{$k}}: {{$.Name}}_ptx_{{$k}} {{end}} }
 
+const(
+{{range $k, $v := .PTX}}  {{$.Name}}_ptx_{{$k}} = {{$v}}
+ {{end}})
 `
 
 // wrapper code template
@@ -179,6 +190,7 @@ func filterptx(fname string) string {
 	defer f.Close()
 	in := bufio.NewReader(f)
 	var out bytes.Buffer
+	out.Write(([]byte)("`"))
 	line, err := in.ReadBytes('\n')
 	for err != io.EOF {
 		util.PanicErr(err)
@@ -187,5 +199,6 @@ func filterptx(fname string) string {
 		}
 		line, err = in.ReadBytes('\n')
 	}
+	out.Write(([]byte)("`"))
 	return out.String()
 }

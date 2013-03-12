@@ -54,4 +54,287 @@ func k_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.
 	syncAndRecycle(str)
 }
 
-var madd2_map = map[int]string{0: ""}
+var madd2_map = map[int]string{0: "",
+	20: madd2_ptx_20,
+	30: madd2_ptx_30,
+	35: madd2_ptx_35}
+
+const (
+	madd2_ptx_20 = `
+.version 3.1
+.target sm_20
+.address_size 64
+
+
+.visible .entry madd2(
+	.param .u64 madd2_param_0,
+	.param .u64 madd2_param_1,
+	.param .f32 madd2_param_2,
+	.param .u64 madd2_param_3,
+	.param .f32 madd2_param_4,
+	.param .u32 madd2_param_5
+)
+{
+	.reg .pred 	%p<4>;
+	.reg .s32 	%r<12>;
+	.reg .f32 	%f<14>;
+	.reg .s64 	%rd<14>;
+
+
+	ld.param.u64 	%rd7, [madd2_param_0];
+	ld.param.u64 	%rd5, [madd2_param_1];
+	ld.param.f32 	%f5, [madd2_param_2];
+	ld.param.u64 	%rd6, [madd2_param_3];
+	ld.param.f32 	%f6, [madd2_param_4];
+	ld.param.u32 	%r2, [madd2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	.loc 2 9 1
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 2 11 1
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	BB0_6;
+
+	.loc 2 12 1
+	setp.eq.s64 	%p2, %rd5, 0;
+	mov.f32 	%f7, 0f3F800000;
+	.loc 2 12 1
+	mov.f32 	%f13, %f7;
+	@%p2 bra 	BB0_3;
+
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.f32 	%f1, [%rd9];
+	mov.f32 	%f13, %f1;
+
+BB0_3:
+	.loc 2 12 1
+	mov.f32 	%f2, %f13;
+	.loc 2 14 1
+	cvt.s64.s32 	%rd4, %r1;
+	.loc 2 13 1
+	setp.eq.s64 	%p3, %rd6, 0;
+	mov.f32 	%f12, %f7;
+	@%p3 bra 	BB0_5;
+
+	shl.b64 	%rd10, %rd4, 2;
+	add.s64 	%rd11, %rd2, %rd10;
+	ld.global.f32 	%f12, [%rd11];
+
+BB0_5:
+	.loc 2 14 1
+	mul.f32 	%f9, %f12, %f6;
+	fma.rn.f32 	%f10, %f2, %f5, %f9;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd1, %rd12;
+	st.global.f32 	[%rd13], %f10;
+
+BB0_6:
+	.loc 2 16 2
+	ret;
+}
+
+
+`
+	madd2_ptx_30 = `
+.version 3.1
+.target sm_30
+.address_size 64
+
+
+.visible .entry madd2(
+	.param .u64 madd2_param_0,
+	.param .u64 madd2_param_1,
+	.param .f32 madd2_param_2,
+	.param .u64 madd2_param_3,
+	.param .f32 madd2_param_4,
+	.param .u32 madd2_param_5
+)
+{
+	.reg .pred 	%p<4>;
+	.reg .s32 	%r<12>;
+	.reg .f32 	%f<14>;
+	.reg .s64 	%rd<14>;
+
+
+	ld.param.u64 	%rd7, [madd2_param_0];
+	ld.param.u64 	%rd5, [madd2_param_1];
+	ld.param.f32 	%f5, [madd2_param_2];
+	ld.param.u64 	%rd6, [madd2_param_3];
+	ld.param.f32 	%f6, [madd2_param_4];
+	ld.param.u32 	%r2, [madd2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	.loc 2 9 1
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 2 11 1
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	BB0_6;
+
+	.loc 2 12 1
+	setp.eq.s64 	%p2, %rd5, 0;
+	mov.f32 	%f7, 0f3F800000;
+	.loc 2 12 1
+	mov.f32 	%f13, %f7;
+	@%p2 bra 	BB0_3;
+
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.f32 	%f1, [%rd9];
+	mov.f32 	%f13, %f1;
+
+BB0_3:
+	.loc 2 12 1
+	mov.f32 	%f2, %f13;
+	.loc 2 14 1
+	cvt.s64.s32 	%rd4, %r1;
+	.loc 2 13 1
+	setp.eq.s64 	%p3, %rd6, 0;
+	mov.f32 	%f12, %f7;
+	@%p3 bra 	BB0_5;
+
+	shl.b64 	%rd10, %rd4, 2;
+	add.s64 	%rd11, %rd2, %rd10;
+	ld.global.f32 	%f12, [%rd11];
+
+BB0_5:
+	.loc 2 14 1
+	mul.f32 	%f9, %f12, %f6;
+	fma.rn.f32 	%f10, %f2, %f5, %f9;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd1, %rd12;
+	st.global.f32 	[%rd13], %f10;
+
+BB0_6:
+	.loc 2 16 2
+	ret;
+}
+
+
+`
+	madd2_ptx_35 = `
+.version 3.1
+.target sm_35
+.address_size 64
+
+
+.weak .func  (.param .b32 func_retval0) cudaMalloc(
+	.param .b64 cudaMalloc_param_0,
+	.param .b64 cudaMalloc_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 66 3
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
+	.param .b64 cudaFuncGetAttributes_param_0,
+	.param .b64 cudaFuncGetAttributes_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 71 3
+	ret;
+}
+
+.visible .entry madd2(
+	.param .u64 madd2_param_0,
+	.param .u64 madd2_param_1,
+	.param .f32 madd2_param_2,
+	.param .u64 madd2_param_3,
+	.param .f32 madd2_param_4,
+	.param .u32 madd2_param_5
+)
+{
+	.reg .pred 	%p<4>;
+	.reg .s32 	%r<10>;
+	.reg .f32 	%f<14>;
+	.reg .s64 	%rd<14>;
+
+
+	ld.param.u64 	%rd7, [madd2_param_0];
+	ld.param.u64 	%rd5, [madd2_param_1];
+	ld.param.f32 	%f5, [madd2_param_2];
+	ld.param.u64 	%rd6, [madd2_param_3];
+	ld.param.f32 	%f6, [madd2_param_4];
+	ld.param.u32 	%r2, [madd2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	.loc 3 9 1
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 3 11 1
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	BB2_6;
+
+	.loc 3 12 1
+	setp.eq.s64 	%p2, %rd5, 0;
+	mov.f32 	%f7, 0f3F800000;
+	.loc 3 12 1
+	mov.f32 	%f13, %f7;
+	@%p2 bra 	BB2_3;
+
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	mov.f32 	%f13, %f1;
+
+BB2_3:
+	.loc 3 12 1
+	mov.f32 	%f2, %f13;
+	.loc 3 14 1
+	cvt.s64.s32 	%rd4, %r1;
+	.loc 3 13 1
+	setp.eq.s64 	%p3, %rd6, 0;
+	mov.f32 	%f12, %f7;
+	@%p3 bra 	BB2_5;
+
+	shl.b64 	%rd10, %rd4, 2;
+	add.s64 	%rd11, %rd2, %rd10;
+	ld.global.nc.f32 	%f12, [%rd11];
+
+BB2_5:
+	.loc 3 14 1
+	mul.f32 	%f9, %f12, %f6;
+	fma.rn.f32 	%f10, %f2, %f5, %f9;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd1, %rd12;
+	st.global.f32 	[%rd13], %f10;
+
+BB2_6:
+	.loc 3 16 2
+	ret;
+}
+
+
+`
+)

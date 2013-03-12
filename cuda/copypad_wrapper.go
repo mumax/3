@@ -60,4 +60,308 @@ func k_copypad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S
 	syncAndRecycle(str)
 }
 
-var copypad_map = map[int]string{0: ""}
+var copypad_map = map[int]string{0: "",
+	20: copypad_ptx_20,
+	30: copypad_ptx_30,
+	35: copypad_ptx_35}
+
+const (
+	copypad_ptx_20 = `
+.version 3.1
+.target sm_20
+.address_size 64
+
+
+.visible .entry copypad(
+	.param .u64 copypad_param_0,
+	.param .u32 copypad_param_1,
+	.param .u32 copypad_param_2,
+	.param .u32 copypad_param_3,
+	.param .u64 copypad_param_4,
+	.param .u32 copypad_param_5,
+	.param .u32 copypad_param_6,
+	.param .u32 copypad_param_7
+)
+{
+	.reg .pred 	%p<10>;
+	.reg .s32 	%r<34>;
+	.reg .f32 	%f<2>;
+	.reg .s64 	%rd<9>;
+
+
+	ld.param.u64 	%rd3, [copypad_param_0];
+	ld.param.u32 	%r18, [copypad_param_1];
+	ld.param.u32 	%r19, [copypad_param_2];
+	ld.param.u32 	%r20, [copypad_param_3];
+	ld.param.u64 	%rd4, [copypad_param_4];
+	ld.param.u32 	%r21, [copypad_param_5];
+	ld.param.u32 	%r22, [copypad_param_6];
+	ld.param.u32 	%r23, [copypad_param_7];
+	cvta.to.global.u64 	%rd1, %rd3;
+	cvta.to.global.u64 	%rd2, %rd4;
+	.loc 2 11 1
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
+	mad.lo.s32 	%r24, %r1, %r2, %r3;
+	.loc 2 12 1
+	mov.u32 	%r4, %ntid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mov.u32 	%r6, %tid.x;
+	mad.lo.s32 	%r25, %r4, %r5, %r6;
+	.loc 2 14 1
+	setp.ge.s32 	%p1, %r25, %r23;
+	setp.ge.s32 	%p2, %r24, %r22;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32 	%p4, %r24, %r19;
+	or.pred  	%p5, %p3, %p4;
+	setp.ge.s32 	%p6, %r25, %r20;
+	or.pred  	%p7, %p5, %p6;
+	@%p7 bra 	BB0_4;
+
+	.loc 3 210 5
+	min.s32 	%r7, %r21, %r18;
+	.loc 2 20 1
+	setp.lt.s32 	%p8, %r7, 1;
+	@%p8 bra 	BB0_4;
+
+	.loc 2 21 1
+	mad.lo.s32 	%r32, %r23, %r24, %r25;
+	mul.lo.s32 	%r9, %r23, %r22;
+	mad.lo.s32 	%r31, %r20, %r24, %r25;
+	mul.lo.s32 	%r11, %r20, %r19;
+	mov.u32 	%r33, 0;
+
+BB0_3:
+	.loc 2 21 1
+	mul.wide.s32 	%rd5, %r32, 4;
+	add.s64 	%rd6, %rd2, %rd5;
+	mul.wide.s32 	%rd7, %r31, 4;
+	add.s64 	%rd8, %rd1, %rd7;
+	ld.global.f32 	%f1, [%rd6];
+	st.global.f32 	[%rd8], %f1;
+	.loc 2 20 1
+	add.s32 	%r32, %r32, %r9;
+	add.s32 	%r31, %r31, %r11;
+	.loc 2 20 52
+	add.s32 	%r33, %r33, 1;
+	.loc 2 20 1
+	setp.lt.s32 	%p9, %r33, %r7;
+	@%p9 bra 	BB0_3;
+
+BB0_4:
+	.loc 2 23 2
+	ret;
+}
+
+
+`
+	copypad_ptx_30 = `
+.version 3.1
+.target sm_30
+.address_size 64
+
+
+.visible .entry copypad(
+	.param .u64 copypad_param_0,
+	.param .u32 copypad_param_1,
+	.param .u32 copypad_param_2,
+	.param .u32 copypad_param_3,
+	.param .u64 copypad_param_4,
+	.param .u32 copypad_param_5,
+	.param .u32 copypad_param_6,
+	.param .u32 copypad_param_7
+)
+{
+	.reg .pred 	%p<10>;
+	.reg .s32 	%r<34>;
+	.reg .f32 	%f<2>;
+	.reg .s64 	%rd<9>;
+
+
+	ld.param.u64 	%rd3, [copypad_param_0];
+	ld.param.u32 	%r18, [copypad_param_1];
+	ld.param.u32 	%r19, [copypad_param_2];
+	ld.param.u32 	%r20, [copypad_param_3];
+	ld.param.u64 	%rd4, [copypad_param_4];
+	ld.param.u32 	%r21, [copypad_param_5];
+	ld.param.u32 	%r22, [copypad_param_6];
+	ld.param.u32 	%r23, [copypad_param_7];
+	cvta.to.global.u64 	%rd1, %rd3;
+	cvta.to.global.u64 	%rd2, %rd4;
+	.loc 2 11 1
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
+	mad.lo.s32 	%r24, %r1, %r2, %r3;
+	.loc 2 12 1
+	mov.u32 	%r4, %ntid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mov.u32 	%r6, %tid.x;
+	mad.lo.s32 	%r25, %r4, %r5, %r6;
+	.loc 2 14 1
+	setp.ge.s32 	%p1, %r25, %r23;
+	setp.ge.s32 	%p2, %r24, %r22;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32 	%p4, %r24, %r19;
+	or.pred  	%p5, %p3, %p4;
+	setp.ge.s32 	%p6, %r25, %r20;
+	or.pred  	%p7, %p5, %p6;
+	@%p7 bra 	BB0_4;
+
+	.loc 3 210 5
+	min.s32 	%r7, %r21, %r18;
+	.loc 2 20 1
+	setp.lt.s32 	%p8, %r7, 1;
+	@%p8 bra 	BB0_4;
+
+	.loc 2 21 1
+	mad.lo.s32 	%r32, %r23, %r24, %r25;
+	mul.lo.s32 	%r9, %r23, %r22;
+	mad.lo.s32 	%r31, %r20, %r24, %r25;
+	mul.lo.s32 	%r11, %r20, %r19;
+	mov.u32 	%r33, 0;
+
+BB0_3:
+	.loc 2 21 1
+	mul.wide.s32 	%rd5, %r32, 4;
+	add.s64 	%rd6, %rd2, %rd5;
+	mul.wide.s32 	%rd7, %r31, 4;
+	add.s64 	%rd8, %rd1, %rd7;
+	ld.global.f32 	%f1, [%rd6];
+	st.global.f32 	[%rd8], %f1;
+	.loc 2 20 1
+	add.s32 	%r32, %r32, %r9;
+	add.s32 	%r31, %r31, %r11;
+	.loc 2 20 52
+	add.s32 	%r33, %r33, 1;
+	.loc 2 20 1
+	setp.lt.s32 	%p9, %r33, %r7;
+	@%p9 bra 	BB0_3;
+
+BB0_4:
+	.loc 2 23 2
+	ret;
+}
+
+
+`
+	copypad_ptx_35 = `
+.version 3.1
+.target sm_35
+.address_size 64
+
+
+.weak .func  (.param .b32 func_retval0) cudaMalloc(
+	.param .b64 cudaMalloc_param_0,
+	.param .b64 cudaMalloc_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 66 3
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
+	.param .b64 cudaFuncGetAttributes_param_0,
+	.param .b64 cudaFuncGetAttributes_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 71 3
+	ret;
+}
+
+.visible .entry copypad(
+	.param .u64 copypad_param_0,
+	.param .u32 copypad_param_1,
+	.param .u32 copypad_param_2,
+	.param .u32 copypad_param_3,
+	.param .u64 copypad_param_4,
+	.param .u32 copypad_param_5,
+	.param .u32 copypad_param_6,
+	.param .u32 copypad_param_7
+)
+{
+	.reg .pred 	%p<10>;
+	.reg .s32 	%r<33>;
+	.reg .f32 	%f<2>;
+	.reg .s64 	%rd<9>;
+
+
+	ld.param.u64 	%rd3, [copypad_param_0];
+	ld.param.u32 	%r18, [copypad_param_1];
+	ld.param.u32 	%r19, [copypad_param_2];
+	ld.param.u32 	%r20, [copypad_param_3];
+	ld.param.u64 	%rd4, [copypad_param_4];
+	ld.param.u32 	%r21, [copypad_param_5];
+	ld.param.u32 	%r22, [copypad_param_6];
+	ld.param.u32 	%r23, [copypad_param_7];
+	cvta.to.global.u64 	%rd1, %rd3;
+	cvta.to.global.u64 	%rd2, %rd4;
+	.loc 3 11 1
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
+	mad.lo.s32 	%r24, %r1, %r2, %r3;
+	.loc 3 12 1
+	mov.u32 	%r4, %ntid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mov.u32 	%r6, %tid.x;
+	mad.lo.s32 	%r25, %r4, %r5, %r6;
+	.loc 3 14 1
+	setp.ge.s32 	%p1, %r25, %r23;
+	setp.ge.s32 	%p2, %r24, %r22;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32 	%p4, %r24, %r19;
+	or.pred  	%p5, %p3, %p4;
+	setp.ge.s32 	%p6, %r25, %r20;
+	or.pred  	%p7, %p5, %p6;
+	@%p7 bra 	BB2_4;
+
+	.loc 4 210 5
+	min.s32 	%r7, %r21, %r18;
+	.loc 3 20 1
+	setp.lt.s32 	%p8, %r7, 1;
+	@%p8 bra 	BB2_4;
+
+	.loc 3 21 1
+	mad.lo.s32 	%r31, %r23, %r24, %r25;
+	mul.lo.s32 	%r9, %r23, %r22;
+	mad.lo.s32 	%r30, %r20, %r24, %r25;
+	mul.lo.s32 	%r11, %r20, %r19;
+	mov.u32 	%r32, 0;
+
+BB2_3:
+	.loc 3 21 1
+	mul.wide.s32 	%rd5, %r31, 4;
+	add.s64 	%rd6, %rd2, %rd5;
+	ld.global.nc.f32 	%f1, [%rd6];
+	mul.wide.s32 	%rd7, %r30, 4;
+	add.s64 	%rd8, %rd1, %rd7;
+	st.global.f32 	[%rd8], %f1;
+	.loc 3 20 1
+	add.s32 	%r31, %r31, %r9;
+	add.s32 	%r30, %r30, %r11;
+	.loc 3 20 52
+	add.s32 	%r32, %r32, 1;
+	.loc 3 20 1
+	setp.lt.s32 	%p9, %r32, %r7;
+	@%p9 bra 	BB2_3;
+
+BB2_4:
+	.loc 3 23 2
+	ret;
+}
+
+
+`
+)

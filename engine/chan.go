@@ -1,6 +1,6 @@
 package engine
 
-// File: Quant stores a physical quantity.
+// File: Chan stores a physical quantity.
 // Author: Arne Vansteenkiste
 
 import (
@@ -8,32 +8,32 @@ import (
 	"log"
 )
 
-// shared by Quant and Reader
-type quant struct {
+// shared by Chan and Reader
+type chan_ struct {
 	buffer data.Slice           // stores the data
 	lock   [data.MAX_COMP]mutex // protects buffer. mutex can be read or write type TODO: make slice, also for Slice
 }
 
-type Quant struct {
-	quant
+type Chan struct {
+	chan_
 }
 
-func QuantFromSlice(s *data.Slice) *Quant {
+func ChanFromSlice(s *data.Slice) *Chan {
 	N := s.Mesh().NCell()
 	var lock [data.MAX_COMP]mutex
 	nComp := s.NComp()
 	for c := 0; c < nComp; c++ {
 		lock[c] = newRWMutex(N)
 	}
-	return &Quant{quant{*s, lock}}
+	return &Chan{chan_{*s, lock}}
 }
 
 type Reader struct {
-	quant
+	chan_
 }
 
-func (c *Quant) NewReader() *Reader {
-	reader := (*c).quant // copy
+func (c *Chan) NewReader() *Reader {
+	reader := (*c).chan_ // copy
 	for i := range reader.lock {
 		reader.lock[i] = (reader.lock[i]).(*rwMutex).MakeRMutex()
 	}
@@ -44,39 +44,39 @@ func (c *Quant) NewReader() *Reader {
 // 	scalar: 1
 // 	vector: 3
 // 	...
-func (c *quant) NComp() int {
+func (c *chan_) NComp() int {
 	return int(c.buffer.NComp())
 }
 
-func (c *quant) comp(i int) quant {
-	return quant{*c.buffer.Comp(i), [data.MAX_COMP]mutex{c.lock[i]}}
+func (c *chan_) comp(i int) chan_ {
+	return chan_{*c.buffer.Comp(i), [data.MAX_COMP]mutex{c.lock[i]}}
 }
 
-func (c *Quant) Comp(i int) Quant {
-	return Quant{c.comp(i)}
+func (c *Chan) Comp(i int) Chan {
+	return Chan{c.comp(i)}
 }
 
 func (c *Reader) Comp(i int) Reader {
 	return Reader{c.comp(i)}
 }
 
-func (c *quant) Mesh() *data.Mesh {
+func (c *chan_) Mesh() *data.Mesh {
 	return c.buffer.Mesh()
 }
 
 // Returns the data buffer without locking.
 // To be used with extreme care.
-func (c *quant) Data() *data.Slice {
+func (c *chan_) Data() *data.Slice {
 	for i := 0; i < c.NComp(); i++ {
 		if c.lock[i].isLocked() {
-			log.Panic("quant unsafe data: is locked")
+			log.Panic("chan unsafe data: is locked")
 		}
 	}
 	return &c.buffer
 }
 
 // lock the next n elements of buffer.
-func (c *quant) next() *data.Slice {
+func (c *chan_) next() *data.Slice {
 	//n := c.Mesh().NCell()
 	c.lock[0].lockNext()
 	a, b := c.lock[0].lockedRange()
@@ -92,24 +92,24 @@ func (c *quant) next() *data.Slice {
 }
 
 // unlock the locked buffer range.
-func (c *quant) done() {
+func (c *chan_) done() {
 	for i := 0; i < c.NComp(); i++ {
 		c.lock[i].unlock()
 	}
 }
 
-func (c *Quant) WriteNext() *data.Slice {
-	return c.quant.next()
+func (c *Chan) WriteNext() *data.Slice {
+	return c.chan_.next()
 }
 
-func (c *Quant) WriteDone() {
-	c.quant.done()
+func (c *Chan) WriteDone() {
+	c.chan_.done()
 }
 
 func (c *Reader) ReadNext() *data.Slice {
-	return c.quant.next()
+	return c.chan_.next()
 }
 
 func (c *Reader) ReadDone() {
-	c.quant.done()
+	c.chan_.done()
 }

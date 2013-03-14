@@ -14,19 +14,11 @@ type solverCommon struct {
 	Mindt, Maxdt     float64 // minimum and maximum time step
 	Maxerr, Headroom float64 // maximum error per step
 	NSteps, undone   int     // number of good steps, undone steps
-	delta, err       float64 // max delta, max error of last step
-	//debug            dump.TableWriter // save t, dt, error here
 }
 
 func newSolverCommon(dt_si, dt_mul float64) solverCommon {
-	//var w dump.TableWriter
-	//if core.DEBUG {
-	//	w = dump.NewTableWriter(core.OpenFile(core.OD+"/debug_heun.table"),
-	//		[]string{"t", "dt", "err", "delta"}, []string{"s", "s", "", ""})
-	//}
 	return solverCommon{dt_si: dt_si, dt_mul: dt_mul,
 		Maxerr: 1e-4, Headroom: 0.75}
-	//debug: w}
 }
 
 // adapt time step: dt *= corr, but limited to sensible values.
@@ -48,22 +40,10 @@ func (e *solverCommon) adaptDt(corr float64) {
 	}
 }
 
-// report time, dt, error to terminal dashboard
-//func (e *solverCommon) updateDash() {
-//	nimble.Dash(e.steps, e.undone, e.time, e.dt_si, e.err)
-//}
-
-//func (e *solverCommon) sendDebugOutput() {
-//	if core.DEBUG {
-//		e.debug.Data[0], e.debug.Data[1], e.debug.Data[2], e.debug.Data[3] = float32(e.time), float32(e.dt_si), float32(e.err), float32(e.delta)
-//		e.debug.WriteData()
-//	}
-//}
-
-func (e *solverCommon) checkErr() {
+func solverCheckErr(err float64) {
 	// Note: err == 0 occurs when input is NaN (or time step massively too small).
-	if e.err == 0 {
-		//nimble.DashExit()
+	if err == 0 {
+		util.DashExit()
 		log.Fatalf("solver: cannot adapt dt")
 	}
 }

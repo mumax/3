@@ -4,6 +4,7 @@ package engine
 // Author: Arne Vansteenkiste
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/prof"
 	"flag"
 	"log"
@@ -42,10 +43,16 @@ func Init() {
 	log.Println("gomaxprocs:", procs)
 
 	prof.Init(OD)
+	cuda.Init()
+	cuda.LockThread()
 }
 
 type devnul struct{}
 
 func (d devnul) Write(b []byte) (int, error) {
 	return len(b), nil
+}
+
+func Close() {
+
 }

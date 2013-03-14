@@ -52,8 +52,7 @@ func (e *Heun) Step() {
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/e.err, 1./3.))
 		}
-		//e.sendDebugOutput()
-		//e.updateDash()
+		util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, e.Time, e.dt_si, e.err)
 	}
 }
 
@@ -64,6 +63,7 @@ func (e *Heun) Advance(seconds float64) {
 	for e.Time < stop {
 		e.Step()
 	}
+	util.DashExit()
 }
 
 // Run for a number of steps
@@ -72,6 +72,7 @@ func (e *Heun) Steps(steps int) {
 	for s := 0; s < steps; s++ {
 		e.Step()
 	}
+	util.DashExit()
 }
 
 // Run until we are only maxerr away from equilibrium.
@@ -100,4 +101,5 @@ func (e *Heun) Relax(maxerr float64, maxSteps int) {
 		log.Fatalf("relax: did not converge within %v time steps.")
 	}
 	e.Maxerr = preverr
+	util.DashExit()
 }

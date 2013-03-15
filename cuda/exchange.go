@@ -6,10 +6,10 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-// TODO: m should be normalized.
-func Exchange(Hex *data.Slice, M *data.Slice, Aex float64) {
+// Add exchange field to Heff. m must be normalized to unit length.
+func AddExchange(Heff *data.Slice, m *data.Slice, Aex float64) {
 	// TODO: size check
-	mesh := Hex.Mesh()
+	mesh := Heff.Mesh()
 	N := mesh.Size()
 	c := mesh.CellSize()
 	Aex *= 2 * mag.Mu0
@@ -20,13 +20,9 @@ func Exchange(Hex *data.Slice, M *data.Slice, Aex float64) {
 
 	str := [3]cu.Stream{stream(), stream(), stream()}
 	for c := 0; c < 3; c++ {
-		k_exchange1comp_async(Hex.DevPtr(c), M.DevPtr(c), w0, w1, w2, N[0], N[1], N[2], cfg, str[c])
+		k_exchange1comp_async(Heff.DevPtr(c), m.DevPtr(c), w0, w1, w2, N[0], N[1], N[2], cfg, str[c])
 	}
 	syncAndRecycle(str[0])
 	syncAndRecycle(str[1])
 	syncAndRecycle(str[2])
-
-	//	k_exchange(Hex.DevPtr(0), Hex.DevPtr(1), Hex.DevPtr(2),
-	//		M.DevPtr(0), M.DevPtr(1), M.DevPtr(2),
-	//		w0, w1, w2, N[0], N[1], N[2], cfg)
 }

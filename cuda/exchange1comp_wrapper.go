@@ -13,27 +13,27 @@ import (
 var addexchange1comp_code cu.Function
 
 type addexchange1comp_args struct {
-	arg_h  unsafe.Pointer
-	arg_m  unsafe.Pointer
-	arg_wx float32
-	arg_wy float32
-	arg_wz float32
-	arg_N0 int
-	arg_N1 int
-	arg_N2 int
-	argptr [8]unsafe.Pointer
+	arg_Beff unsafe.Pointer
+	arg_m    unsafe.Pointer
+	arg_wx   float32
+	arg_wy   float32
+	arg_wz   float32
+	arg_N0   int
+	arg_N1   int
+	arg_N2   int
+	argptr   [8]unsafe.Pointer
 }
 
 // Wrapper for addexchange1comp CUDA kernel, asynchronous.
-func k_addexchange1comp_async(h unsafe.Pointer, m unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config, str cu.Stream) {
+func k_addexchange1comp_async(Beff unsafe.Pointer, m unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config, str cu.Stream) {
 	if addexchange1comp_code == 0 {
 		addexchange1comp_code = fatbinLoad(addexchange1comp_map, "addexchange1comp")
 	}
 
 	var a addexchange1comp_args
 
-	a.arg_h = h
-	a.argptr[0] = unsafe.Pointer(&a.arg_h)
+	a.arg_Beff = Beff
+	a.argptr[0] = unsafe.Pointer(&a.arg_Beff)
 	a.arg_m = m
 	a.argptr[1] = unsafe.Pointer(&a.arg_m)
 	a.arg_wx = wx
@@ -54,9 +54,9 @@ func k_addexchange1comp_async(h unsafe.Pointer, m unsafe.Pointer, wx float32, wy
 }
 
 // Wrapper for addexchange1comp CUDA kernel, synchronized.
-func k_addexchange1comp(h unsafe.Pointer, m unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config) {
+func k_addexchange1comp(Beff unsafe.Pointer, m unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, cfg *config) {
 	str := stream()
-	k_addexchange1comp_async(h, m, wx, wy, wz, N0, N1, N2, cfg, str)
+	k_addexchange1comp_async(Beff, m, wx, wy, wz, N0, N1, N2, cfg, str)
 	syncAndRecycle(str)
 }
 

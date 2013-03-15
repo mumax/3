@@ -22,7 +22,9 @@ func main() {
 	cuda.Memset(m, 1, 0, 0)
 
 	B := cuda.NewSlice(3, mesh)
-	conv.Exec(B, m)
+	Bsat := 1.
+	vol := data.NilSlice(1, mesh)
+	conv.Exec(B, m, vol, Bsat)
 	out := B.HostCopy()
 
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]

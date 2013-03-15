@@ -45,6 +45,11 @@ func NewSlice(nComp int, m *Mesh) *Slice {
 	return SliceFromPtrs(m, CPUMemory, ptrs)
 }
 
+// Return a slice without underlying storage. Used to represent a mask containing all 1's.
+func NilSlice(nComp int, m *Mesh) *Slice {
+	return SliceFromPtrs(m, UnifiedMemory, make([]unsafe.Pointer, nComp))
+}
+
 // Internal: construct a Slice using bare memory pointers. Used by cuda.
 func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	length := m.NCell()

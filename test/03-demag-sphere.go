@@ -39,7 +39,7 @@ func main() {
 	data.Copy(m, mhost)
 
 	B := cuda.NewSlice(3, mesh)
-	conv.Exec(B, m)
+	conv.Exec(B, m, data.NilSlice(1, mesh), 1)
 	out := B.HostCopy()
 
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]

@@ -4,8 +4,8 @@
 // m is normalized (in Tesla).
 
 extern "C" __global__ void
-exchange1comp(float* __restrict__ h, float* __restrict__ m, 
-              float wx, float wy, float wz, int N0, int N1, int N2){
+addexchange1comp(float* __restrict__ h, float* __restrict__ m, 
+                 float wx, float wy, float wz, int N0, int N1, int N2){
 
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int k = blockIdx.y * blockDim.y + threadIdx.y;
@@ -17,11 +17,12 @@ exchange1comp(float* __restrict__ h, float* __restrict__ m,
 	for(int i=0; i<N0; i++){
 
 		int I = idx(i, j, k);
+		float H = h[I];
 		float m0 = m[I];
 
 		float m1 = m[idx(i, j, lclamp(k-1    ))];
 		float m2 = m[idx(i, j, hclamp(k+1, N2))];
-		float H = wz * ((m1-m0) + (m2-m0));
+		H += wz * ((m1-m0) + (m2-m0));
 
 		m1 = m[idx(i, lclamp(j-1   ), k)];
 		m2 = m[idx(i, hclamp(j+1,N1), k)];

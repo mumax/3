@@ -20,7 +20,7 @@ func AddExchange(Heff *data.Slice, m *data.Slice, Aex float64) {
 
 	str := [3]cu.Stream{stream(), stream(), stream()}
 	for c := 0; c < 3; c++ {
-		k_exchange1comp_async(Heff.DevPtr(c), m.DevPtr(c), w0, w1, w2, N[0], N[1], N[2], cfg, str[c])
+		k_addexchange1comp_async(Heff.DevPtr(c), m.DevPtr(c), w0, w1, w2, N[0], N[1], N[2], cfg, str[c])
 	}
 	syncAndRecycle(str[0])
 	syncAndRecycle(str[1])

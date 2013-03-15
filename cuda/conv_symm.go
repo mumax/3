@@ -103,12 +103,11 @@ func (c *DemagConvolution) initFFTKern2D() {
 	}
 }
 
-func (c *DemagConvolution) Exec(outp *data.Slice, inp ...*data.Slice) {
-	util.Argument(len(inp) == 1)
+func (c *DemagConvolution) Exec(outp, inp, vol *data.Slice, Bsat float64) {
 	if c.is2D() {
-		c.exec2D(outp, inp[0])
+		c.exec2D(outp, inp)
 	} else {
-		c.exec3D(outp, inp[0])
+		c.exec3D(outp, inp)
 	}
 }
 
@@ -144,7 +143,7 @@ func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
 	c.stream.Synchronize()
 }
 
-func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
+func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat float64) {
 	// Convolution is separated into
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
@@ -153,7 +152,7 @@ func (c *DemagConvolution) exec2D(outp, inp *data.Slice) {
 	zero1(c.fftRBuf[0], c.stream)
 	in := inp.Comp(0)
 	padded := c.kernSize
-	copyPad(c.fftRBuf[0], in, padded, c.size, c.stream)
+	copyPadMul(c.fftRBuf[0], in, padded, c.size, vol, Bsat, c.stream)
 	c.fwPlan.ExecAsync(c.fftRBuf[0], c.fftCBuf[0])
 
 	// kern mul X

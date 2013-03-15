@@ -31,6 +31,8 @@ func main() {
 				z := c * (float64(k) + 0.5 - float64(N2)/2)
 				if x*x+y*y+z*z < r*r {
 					m_[0][i][j][k] = 1
+					m_[1][i][j][k] = 2
+					m_[2][i][j][k] = 3
 				}
 			}
 		}
@@ -46,13 +48,14 @@ func main() {
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]
 	check(bx, -1./3.)
-	check(by, 0)
-	check(bz, 0)
+	check(by, -2./3.)
+	check(bz, -3./3.)
+
 	fmt.Println("OK")
 }
 
 func check(have, want float32) {
-	if math.Abs(float64(have-want)) > 1e-4 {
+	if math.Abs(float64(have-want)) > 1e-3 {
 		log.Fatal("error too large: want ", want, " have ", have)
 	}
 }

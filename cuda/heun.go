@@ -17,7 +17,7 @@ type Heun struct {
 	Fixdt       bool                                          // fixed time step?
 }
 
-func NewHeun(y *data.Slice, torqueFn func(*data.Slice, float64) *data.Slice, normalizeFn func(m *data.Slice), dt, multiplier float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn func(m *data.Slice, t float64) *data.Slice, normalizeFn func(m *data.Slice), dt, multiplier float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	dy0 := NewSlice(3, y.Mesh())
 	return &Heun{newSolverCommon(dt, multiplier), y, dy0, torqueFn, normalizeFn, false}

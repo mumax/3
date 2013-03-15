@@ -32,5 +32,6 @@ cuda2go: cuda2go.go
 clean:
 	rm -f *.ptx
 	rm -f $(GOFILES)
+	rm -f *_wrapper.go
 	rm -f cuda2go
 

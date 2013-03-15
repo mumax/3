@@ -12,7 +12,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	gpu := NewSlice(3, mesh)
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
-	c.Exec(gpu, gpu, Ones(mesh), 1)
+	c.Exec(gpu, gpu, nil, 1)
 
 	output := gpu.HostCopy()
 	//data.MustWriteFile("gpu.dump", output, 0) // rm!

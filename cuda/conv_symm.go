@@ -2,7 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
+	//"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -105,9 +105,9 @@ func (c *DemagConvolution) initFFTKern2D() {
 
 func (c *DemagConvolution) Exec(outp, inp, vol *data.Slice, Bsat float64) {
 	if c.is2D() {
-		c.exec2D(outp, inp)
+		c.exec2D(outp, inp, vol, Bsat)
 	} else {
-		c.exec3D(outp, inp)
+		c.exec3D(outp, inp, vol, Bsat)
 	}
 }
 
@@ -116,14 +116,14 @@ func zero1(dst *data.Slice, str cu.Stream) {
 	cu.MemsetD32Async(cu.DevicePtr(dst.DevPtr(0)), 0, int64(dst.Len()), str)
 }
 
-func (c *DemagConvolution) exec3D(outp, inp *data.Slice) {
+func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat float64) {
 	padded := c.kernSize
 
 	// FW FFT
 	for i := 0; i < 3; i++ {
 		zero1(c.fftRBuf[i], c.stream)
 		in := inp.Comp(i)
-		copyPad(c.fftRBuf[i], in, padded, c.size, c.stream)
+		copyPadMul(c.fftRBuf[i], in, padded, c.size, vol, Bsat, c.stream)
 		c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 	}
 
@@ -168,7 +168,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat float64) {
 	for i := 1; i < 3; i++ {
 		zero1(c.fftRBuf[i], c.stream)
 		in := inp.Comp(i)
-		copyPad(c.fftRBuf[i], in, padded, c.size, c.stream)
+		copyPadMul(c.fftRBuf[i], in, padded, c.size, vol, Bsat, c.stream)
 		c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 	}
 

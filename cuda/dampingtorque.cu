@@ -1,9 +1,6 @@
-#include "llgtorque.h"
 #include "float3.h"
 
 // Only the damping term of the Landau-Lifshitz torque, with alpha = 1.
-// m assumed normalized but does not really matter for relaxation.
-
 extern "C" __global__ void
 dampingtorque(float* __restrict__  tx, float* __restrict__  ty, float* __restrict__  tz,
               float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz, 

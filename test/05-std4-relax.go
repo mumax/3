@@ -29,32 +29,25 @@ func main() {
 	)
 
 	mesh = data.NewMesh(N0, N1, N2, c0, c1, c2)
-	M, Hd, Hex, Heff, torque := newVec(), newVec(), newVec(), newVec(), newVec()
+	m, Beff, torque := newVec(), newVec(), newVec()
+	vol := data.NilSlice(1, mesh)
 
-	cuda.Memset(M, 0, 1, 1)
+	cuda.Memset(m, 0, 1, 1)
 
 	demag := cuda.NewDemag(mesh)
 
 	updateTorque := func(m *data.Slice, t float64) *data.Slice {
-		demag.Exec(Hd, m)
-		cuda.Exchange(Hex, m, Aex)
-		cuda.Madd2(Heff, Hd, Hex, 1, 1)
-		cuda.LLGTorque(torque, m, Heff, α)
+		demag.Exec(Beff, m, vol, Bsat)
+		cuda.AddExchange(Beff, m, Aex, Bsat)
+		cuda.LLGTorque(torque, m, Beff, α)
 		return torque
 	}
 
-	norm := func(m *data.Slice) {
-		cuda.Normalize(m, nil, Bsat)
-	}
-	norm(M)
+	solver := cuda.NewHeun(m, updateTorque, cuda.Normalize, 1e-15, mag.Gamma0)
 
-	solver := cuda.NewHeun(M, updateTorque, norm, 1e-15, mag.Gamma0)
-
-	for solver.Time < 2e-9 {
-		solver.Step()
-	}
-	mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
-	N := float32(mesh.NCell()) * Bsat
+	solver.Advance(2e-9)
+	mx, my, mz := m.Comp(0), m.Comp(1), m.Comp(2)
+	N := float32(mesh.NCell())
 	avgx, avgy, avgz := cuda.Sum(mx)/N, cuda.Sum(my)/N, cuda.Sum(mz)/N
 	fmt.Println(avgx, avgy, avgz)
 	expect(avgx, 0)

@@ -12,6 +12,7 @@ var (
 	Msat  Scal
 	Alpha Scal
 	Bext  Vec = Vector(0, 0, 0)
+	DMI   Vec = Vector(0, 0, 0)
 )
 
 var (

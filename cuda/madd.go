@@ -43,7 +43,9 @@ func AddConst(dst *data.Slice, cnst ...float32) {
 	cfg := make1DConf(N)
 	str := stream()
 	for c := 0; c < dst.NComp(); c++ {
-		k_madd2_async(dst.DevPtr(c), dst.DevPtr(c), 1, nil, cnst[c], N, cfg, str)
+		if cnst[c] != 0 {
+			k_madd2_async(dst.DevPtr(c), dst.DevPtr(c), 1, nil, cnst[c], N, cfg, str)
+		}
 	}
 	syncAndRecycle(str)
 }

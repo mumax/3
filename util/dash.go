@@ -17,5 +17,5 @@ func Dashf(format string, v ...interface{}) {
 }
 
 func DashExit() {
-	fmt.Println(os.Stderr)
+	fmt.Fprintln(os.Stderr)
 }

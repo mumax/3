@@ -17,7 +17,7 @@ var (
 
 var (
 	mesh   *data.Mesh
-	solver *cuda.Heun
+	Solver *cuda.Heun
 	inited bool
 	m, h   *data.Slice
 	vol    *data.Slice
@@ -33,7 +33,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	m = cuda.NewSlice(3, mesh)
 	h = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
-	solver = cuda.NewHeun(m, torque, cuda.Normalize, 1e-15, Gamma0)
+	Solver = cuda.NewHeun(m, torque, cuda.Normalize, 1e-15, Gamma0)
 	demag = cuda.NewDemag(mesh)
 }
 
@@ -50,7 +50,7 @@ func SetM(mx, my, mz float64) {
 
 func Run(seconds float64) {
 	initialize()
-	solver.Advance(seconds)
+	Solver.Advance(seconds)
 }
 
 func torque(m *data.Slice, t float64) *data.Slice {

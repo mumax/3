@@ -9,6 +9,7 @@ import (
 // Returns the idx'the command line argument
 // after proper parsing and error handling.
 // Requires flag.Parse() to be called first.
+// TODO: when used, interferes with normal flags...
 func IntArg(idx int) int {
 	if idx >= flag.NArg() {
 		log.Fatalf("need command line flag #%v", idx)

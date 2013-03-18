@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -10,11 +11,11 @@ var lastdash = time.Now()
 func Dashf(format string, v ...interface{}) {
 	if time.Since(lastdash) > 100*time.Millisecond {
 		lastdash = time.Now()
-		fmt.Printf(format, v...)
-		fmt.Print("\u000D")
+		fmt.Fprintf(os.Stderr, format, v...)
+		fmt.Fprint(os.Stderr, "\u000D")
 	}
 }
 
 func DashExit() {
-	fmt.Println()
+	fmt.Println(os.Stderr)
 }

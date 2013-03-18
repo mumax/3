@@ -6,16 +6,21 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-// Add exchange field to Beff. m must be normalized to unit length.
+// Add exchange field to Beff.
 func AddExchange(Beff *data.Slice, m *data.Slice, Aex, Bsat float64) {
+	AddAnisoExchange(Beff, m, Aex, Aex, Aex, Bsat)
+}
+
+// Add exchange field to Beff with different exchange constant for X,Y,Z direction.
+// m must be normalized to unit length.
+func AddAnisoExchange(Beff *data.Slice, m *data.Slice, AexX, AexY, AexZ, Bsat float64) {
 	// TODO: size check
 	mesh := Beff.Mesh()
 	N := mesh.Size()
 	c := mesh.CellSize()
-	fac := 2 * Aex * mag.Mu0 / Bsat
-	w0 := float32(fac / (c[0] * c[0]))
-	w1 := float32(fac / (c[1] * c[1]))
-	w2 := float32(fac / (c[2] * c[2]))
+	w0 := float32(2 * AexX * mag.Mu0 / (Bsat * c[0] * c[0]))
+	w1 := float32(2 * AexY * mag.Mu0 / (Bsat * c[1] * c[1]))
+	w2 := float32(2 * AexZ * mag.Mu0 / (Bsat * c[2] * c[2]))
 	cfg := make2DConf(N[2], N[1])
 
 	str := [3]cu.Stream{stream(), stream(), stream()}

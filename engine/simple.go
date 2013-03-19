@@ -23,6 +23,7 @@ var (
 	vol    *data.Slice
 	demag  *cuda.DemagConvolution
 	exch   Quant
+	out    = make(map[*Quant]autosaver)
 )
 
 func torque(m *data.Slice) *data.Slice {

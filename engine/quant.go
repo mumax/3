@@ -9,6 +9,10 @@ type Quant struct {
 	autosave
 }
 
+func NewQuant(adder func(dst *data.Slice)) Quant {
+	return Quant{addTo: adder}
+}
+
 func (q *Quant) AddTo(dst *data.Slice) {
 	// if need output:
 	// add to zeroed buffer, output buffer (async), add buffer to dst

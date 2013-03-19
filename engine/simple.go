@@ -23,7 +23,6 @@ var (
 	vol    *data.Slice
 	demag  *cuda.DemagConvolution
 	exch   Quant
-	out    = make(map[*Quant]autosaver)
 )
 
 func torque(m *data.Slice) *data.Slice {
@@ -48,9 +47,9 @@ func initialize() {
 
 	demag = cuda.NewDemag(mesh)
 
-	exch = Quant{func(dst *data.Slice) {
+	exch = NewQuant(func(dst *data.Slice) {
 		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
-	}}
+	})
 }
 
 func checkInited() {

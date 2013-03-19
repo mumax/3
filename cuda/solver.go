@@ -11,6 +11,7 @@ import (
 type solverCommon struct {
 	dt_si, dt_mul    float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	Time             *float64 // in seconds
+	GoodStep         bool     // indicates torque evaluation is at physically good time step, can be saved.
 	Mindt, Maxdt     float64  // minimum and maximum time step
 	Maxerr, Headroom float64  // maximum error per step
 	NSteps, undone   int      // number of good steps, undone steps

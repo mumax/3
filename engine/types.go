@@ -1,9 +1,5 @@
 package engine
 
-import (
-	"code.google.com/p/mx3/data"
-)
-
 type ScalFn func() float64
 
 type VecFn func() [3]float64

@@ -27,7 +27,9 @@ func (e *Heun) Step(y *data.Slice) {
 	util.Assert(dt > 0)
 
 	// stage 1
-	dy := e.torqueFn(y)    // <- hack here for output, always good step output
+	e.GoodStep = true
+	dy := e.torqueFn(y) // <- hook here for output, always good step output
+	e.GoodStep = false
 	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 	data.Copy(dy0, dy)
 

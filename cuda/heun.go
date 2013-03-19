@@ -54,7 +54,7 @@ func (e *Heun) Step(y *data.Slice) {
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
-		util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, e.Time, e.dt_si, err) // TODO: move
+		util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
 	}
 }
 

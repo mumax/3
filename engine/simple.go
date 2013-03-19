@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	Aex   Scal
-	Msat  Scal
-	Alpha Scal
-	Bext  Vec = Vector(0, 0, 0)
-	DMI   Vec = Vector(0, 0, 0)
+	Aex   ScalFn
+	Msat  ScalFn
+	Alpha ScalFn
+	Bext  VecFn = ConstVector(0, 0, 0)
+	DMI   VecFn = ConstVector(0, 0, 0)
 	Time  float64
 )
 
@@ -38,7 +38,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
 	demag = cuda.NewDemag(mesh)
 	exch = func(h *data.Slice) {
-		cuda.AddExchange(h, m, Aex.Val(), Mu0*Msat)
+		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
 	}
 }
 
@@ -55,18 +55,21 @@ func SetM(mx, my, mz float64) {
 
 func Run(seconds float64) {
 	initialize()
-	Solver.Advance(seconds)
+	stop := Time + seconds
+	for Time < stop {
+		Solver.Step(m)
+	}
 }
 
-func torque(m *data.Slice, t float64) *data.Slice {
-	msat := Msat.Val(t)
+func torque(m *data.Slice) *data.Slice {
+	msat := Msat()
 	demag.Exec(h, m, vol, Mu0*msat)
 
-	cuda.AddExchange(h, m, Aex.Val(t), Mu0*msat)
+	cuda.AddExchange(h, m, Aex(), Mu0*msat)
 
-	bext := Bext.Val(t)
+	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
-	cuda.LLGTorque(h, m, h, float32(Alpha.Val(t)))
+	cuda.LLGTorque(h, m, h, float32(Alpha()))
 	return h
 }
 

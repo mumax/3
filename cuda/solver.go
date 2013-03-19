@@ -18,7 +18,7 @@ type solverCommon struct {
 }
 
 func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {
-	return solverCommon{dt_si: dt_si, dt_mul: dt_mul,
+	return solverCommon{Time: time, dt_si: dt_si, dt_mul: dt_mul,
 		Maxerr: 1e-4, Headroom: 0.75}
 }
 

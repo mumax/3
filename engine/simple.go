@@ -17,13 +17,13 @@ var (
 )
 
 var (
-	mesh   *data.Mesh
-	Solver *cuda.Heun
-	inited bool
-	m, h   *data.Slice
-	vol    *data.Slice
-	demag  *cuda.DemagConvolution
-	exch   adder
+	mesh    *data.Mesh
+	Solver  *cuda.Heun
+	inited  bool
+	m, h    *data.Slice
+	vol     *data.Slice
+	demag   *cuda.DemagConvolution
+	addExch adder
 )
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
@@ -32,14 +32,19 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	}
 	mesh = data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
 	log.Println("set mesh:", mesh)
+
 	m = cuda.NewSlice(3, mesh)
 	h = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
+
 	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
+
 	demag = cuda.NewDemag(mesh)
-	exch = func(h *data.Slice) {
+
+	addExch = addOutput(func(h *data.Slice) {
 		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
-	}
+	})
+
 }
 
 func initialize() {
@@ -65,15 +70,27 @@ func torque(m *data.Slice) *data.Slice {
 	msat := Msat()
 	demag.Exec(h, m, vol, Mu0*msat)
 
-	cuda.AddExchange(h, m, Aex(), Mu0*msat)
+	addExch(h)
 
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
+
 	cuda.LLGTorque(h, m, h, float32(Alpha()))
 	return h
 }
 
 type adder func(dst *data.Slice)
+
+func addOutput(f adder) adder {
+	return func(dst *data.Slice) {
+		// TODO:
+		// if need output:
+		// add to zeroed buffer, output buffer (async), add buffer to dst
+		// pipe buffers to/from output goroutine
+		// else:
+		f(dst)
+	}
+}
 
 const (
 	Mu0    = mag.Mu0

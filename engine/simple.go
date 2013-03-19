@@ -71,14 +71,20 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func SetM(mx, my, mz float64) {
 	checkInited()
 	cuda.Memset(m, float32(mz), float32(my), float32(mx))
+	cuda.Normalize(m)
 }
 
 func Run(seconds float64) {
 	checkInited()
 	stop := Time + seconds
 	for Time < stop {
-		Solver.Step(m)
+		step()
 	}
+}
+
+func step() {
+	Solver.Step(m)
+	cuda.Normalize(m)
 }
 
 const (

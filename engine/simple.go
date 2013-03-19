@@ -17,60 +17,19 @@ var (
 )
 
 var (
-	mesh    *data.Mesh
-	Solver  *cuda.Heun
-	inited  bool
-	m, h    *data.Slice
-	vol     *data.Slice
-	demag   *cuda.DemagConvolution
-	addExch adder
+	mesh   *data.Mesh
+	Solver *cuda.Heun
+	m, h   *data.Slice
+	vol    *data.Slice
+	demag  *cuda.DemagConvolution
+	exch   Quant
 )
-
-func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
-	if mesh != nil {
-		log.Fatal("mesh already set")
-	}
-	mesh = data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
-	log.Println("set mesh:", mesh)
-
-	m = cuda.NewSlice(3, mesh)
-	h = cuda.NewSlice(3, mesh)
-	vol = data.NilSlice(1, mesh)
-
-	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
-
-	demag = cuda.NewDemag(mesh)
-
-	addExch = addOutput(func(h *data.Slice) {
-		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
-	})
-
-}
-
-func initialize() {
-	if mesh == nil {
-		log.Fatal("need to set mesh first")
-	}
-}
-
-func SetM(mx, my, mz float64) {
-	initialize()
-	cuda.Memset(m, float32(mz), float32(my), float32(mx))
-}
-
-func Run(seconds float64) {
-	initialize()
-	stop := Time + seconds
-	for Time < stop {
-		Solver.Step(m)
-	}
-}
 
 func torque(m *data.Slice) *data.Slice {
 	msat := Msat()
 	demag.Exec(h, m, vol, Mu0*msat)
 
-	addExch(h)
+	exch.AddTo(h)
 
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
@@ -79,16 +38,45 @@ func torque(m *data.Slice) *data.Slice {
 	return h
 }
 
-type adder func(dst *data.Slice)
+func initialize() {
+	m = cuda.NewSlice(3, mesh)
+	h = cuda.NewSlice(3, mesh)
+	vol = data.NilSlice(1, mesh)
 
-func addOutput(f adder) adder {
-	return func(dst *data.Slice) {
-		// TODO:
-		// if need output:
-		// add to zeroed buffer, output buffer (async), add buffer to dst
-		// pipe buffers to/from output goroutine
-		// else:
-		f(dst)
+	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
+
+	demag = cuda.NewDemag(mesh)
+
+	exch = Quant{func(dst *data.Slice) {
+		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
+	}}
+}
+
+func checkInited() {
+	if mesh == nil {
+		log.Fatal("need to set mesh first")
+	}
+}
+
+func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
+	if mesh != nil {
+		log.Fatal("mesh already set")
+	}
+	mesh = data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+	log.Println("set mesh:", mesh)
+	initialize()
+}
+
+func SetM(mx, my, mz float64) {
+	checkInited()
+	cuda.Memset(m, float32(mz), float32(my), float32(mx))
+}
+
+func Run(seconds float64) {
+	checkInited()
+	stop := Time + seconds
+	for Time < stop {
+		Solver.Step(m)
 	}
 }
 

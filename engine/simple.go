@@ -13,6 +13,7 @@ var (
 	Alpha Scal
 	Bext  Vec = Vector(0, 0, 0)
 	DMI   Vec = Vector(0, 0, 0)
+	Time  float64
 )
 
 var (
@@ -22,6 +23,7 @@ var (
 	m, h   *data.Slice
 	vol    *data.Slice
 	demag  *cuda.DemagConvolution
+	exch   adder
 )
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
@@ -33,8 +35,11 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	m = cuda.NewSlice(3, mesh)
 	h = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
-	Solver = cuda.NewHeun(m, torque, cuda.Normalize, 1e-15, Gamma0)
+	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
 	demag = cuda.NewDemag(mesh)
+	exch = func(h *data.Slice) {
+		cuda.AddExchange(h, m, Aex.Val(), Mu0*Msat)
+	}
 }
 
 func initialize() {
@@ -56,12 +61,16 @@ func Run(seconds float64) {
 func torque(m *data.Slice, t float64) *data.Slice {
 	msat := Msat.Val(t)
 	demag.Exec(h, m, vol, Mu0*msat)
+
 	cuda.AddExchange(h, m, Aex.Val(t), Mu0*msat)
+
 	bext := Bext.Val(t)
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
 	cuda.LLGTorque(h, m, h, float32(Alpha.Val(t)))
 	return h
 }
+
+type adder func(dst *data.Slice)
 
 const (
 	Mu0    = mag.Mu0

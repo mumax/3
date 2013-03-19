@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/util"
 	"flag"
 	"github.com/barnex/cuda5/cu"
+	"github.com/barnex/cuda5/cuda"
 	"log"
 	"runtime"
 )
@@ -46,6 +47,8 @@ func Init() {
 		"compute ", M, ".", m,
 		" concurrent: ", concurrent == 1, "\n")
 	cudaCC = 10*M + m
+	log.Println("set preference for device L1 cache")
+	cuda.DeviceSetCacheConfig(cuda.FUNC_CACHE_PREFER_L1)
 	initStreampool()
 }
 

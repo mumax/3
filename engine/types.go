@@ -15,14 +15,3 @@ func Const(value float64) ScalFn {
 func ConstVector(x, y, z float64) VecFn {
 	return VecFn(func() [3]float64 { return [3]float64{x, y, z} })
 }
-
-type Quant struct {
-	addTo func(dst *data.Slice) // adds quantity to dst
-}
-
-func (q *Quant) AddTo(dst *data.Slice) {
-	// if need output:
-	// add to zeroed buffer, output buffer (async), add buffer to dst
-	// pipe buffers to/from output goroutine
-	q.addTo(dst)
-}

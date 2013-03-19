@@ -11,7 +11,7 @@ import (
 
 var (
 	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
-	Flag_sched    = flag.String("sched", "yield", "CUDA scheduling: auto|spin|yield|sync")
+	Flag_sched    = flag.String("sched", "auto", "CUDA scheduling: auto|spin|yield|sync")
 	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 

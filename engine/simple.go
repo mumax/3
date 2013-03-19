@@ -47,7 +47,7 @@ func initialize() {
 
 	demag = cuda.NewDemag(mesh)
 
-	exch = NewQuant(func(dst *data.Slice) {
+	exch = NewQuant("B_ex", func(dst *data.Slice) {
 		cuda.AddExchange(h, m, Aex(), Mu0*Msat())
 	})
 }

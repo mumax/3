@@ -9,7 +9,7 @@ import (
 //#include "common_stencil.h"
 import "C"
 
-const STENCIL_BLOCKSIZE = C.STENCIL_BLOCK_X
+const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X
 
 // Add exchange field to Beff.
 func AddExchange(Beff *data.Slice, m *data.Slice, Aex, Bsat float64) {
@@ -26,7 +26,7 @@ func AddAnisoExchange(Beff *data.Slice, m *data.Slice, AexX, AexY, AexZ, Bsat fl
 	w0 := float32(2 * AexX * mag.Mu0 / (Bsat * c[0] * c[0]))
 	w1 := float32(2 * AexY * mag.Mu0 / (Bsat * c[1] * c[1]))
 	w2 := float32(2 * AexZ * mag.Mu0 / (Bsat * c[2] * c[2]))
-	cfg := make2DConf(N[2], N[1], STENCIL_BLOCKSIZE)
+	cfg := make2DConfSize(N[2], N[1], STENCIL_BLOCKSIZE)
 
 	str := [3]cu.Stream{stream(), stream(), stream()}
 	for c := 0; c < 3; c++ {

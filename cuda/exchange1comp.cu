@@ -4,7 +4,6 @@
 // m is normalized.
 
 extern "C" __global__ void
-__launch_bounds__(STENCIL_MAXTHREADS, 1)
 addexchange1comp(float* __restrict__ Beff, float* __restrict__ m, 
                  float wx, float wy, float wz, int N0, int N1, int N2){
 

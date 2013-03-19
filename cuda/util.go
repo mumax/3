@@ -62,9 +62,9 @@ func make2DConfSize(N1, N2, BLOCK int) *config {
 	return &config{gr, bl}
 }
 
-func make2DConf(N1, N2 int) *config{
-  const BLOCK = 32 // TODO
-  return make2DConfSize(N1, N2, BLOCK)
+func make2DConf(N1, N2 int) *config {
+	const BLOCK = 32 // TODO
+	return make2DConfSize(N1, N2, BLOCK)
 }
 
 type config struct {

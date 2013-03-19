@@ -1,8 +1,9 @@
 package data
 
 type info struct {
-	tag, unit string // Human-readable descriptors
-	mesh      Mesh
+	tag, unit string // Human-readable descriptors // TODO: not really used...
+	// TODO: dump reads Slice + info pair?
+	mesh Mesh
 }
 
 // Human-readable tag to identify the data.

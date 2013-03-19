@@ -42,8 +42,7 @@ func make1DConf(N int) *config {
 }
 
 // TODO: swap N1/N2?
-func make2DConf(N1, N2 int) *config {
-	const BLOCK = 32 // TODO
+func make2DConfSize(N1, N2, BLOCK int) *config {
 
 	var gr, bl cu.Dim3
 	bl.X = BLOCK
@@ -61,6 +60,11 @@ func make2DConf(N1, N2 int) *config {
 	//util.Assert(gr.X*gr.Y*gr.Z*bl.X*bl.Y*bl.Z >= N)
 
 	return &config{gr, bl}
+}
+
+func make2DConf(N1, N2 int) *config{
+  const BLOCK = 32 // TODO
+  return make2DConfSize(N1, N2, BLOCK)
 }
 
 type config struct {

@@ -21,7 +21,7 @@ var (
 	mesh          *data.Mesh
 	Solver        *cuda.Heun
 	m, mx, my, mz *data.Slice
-	h             *data.Slice // holds H_effective or torque
+	buffer        *data.Slice // holds H_effective or torque
 	vol           *data.Slice
 	Demag         Quant
 	Exch          Quant
@@ -29,19 +29,19 @@ var (
 )
 
 func torque() *data.Slice {
-	cuda.Memset(h, 0, 0, 0) // Need this in case demag is output, then we really add to.
-	Demag.AddTo(h)          // Does not add but sets, so it should be first.
-	Exch.AddTo(h)
+	cuda.Memset(buffer, 0, 0, 0) // Need this in case demag is output, then we really add to.
+	Demag.AddTo(buffer)          // Does not add but sets, so it should be first.
+	Exch.AddTo(buffer)
 	bext := Bext()
-	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
-	cuda.LLGTorque(h, m, h, float32(Alpha()))
-	return h
+	cuda.AddConst(buffer, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
+	cuda.LLGTorque(buffer, m, buffer, float32(Alpha()))
+	return buffer
 }
 
 func initialize() {
 	m = cuda.NewSlice(3, mesh)
 	mx, my, mz = m.Comp(0), m.Comp(1), m.Comp(2)
-	h = cuda.NewSlice(3, mesh)
+	buffer = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
 	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
 

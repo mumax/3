@@ -9,7 +9,7 @@ import (
 // Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
-	dy0      *data.Slice
+	dy0      *data.Slice        // <- buffer could be released after step?
 	torqueFn func() *data.Slice // updates dy
 }
 

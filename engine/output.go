@@ -36,13 +36,14 @@ func saveAndRecycle(s *data.Slice, fname string, time float64) {
 }
 
 func initOutBuf() {
-	if gpubuf == nil {
-		gpubuf = make(chan *data.Slice, nbuf)
-		hostbuf = make(chan *data.Slice, nbuf)
-		for i := 0; i < nbuf; i++ {
-			gpubuf <- cuda.NewSlice(3, mesh)
-			hostbuf <- cuda.NewUnifiedSlice(3, mesh)
-		}
+	if gpubuf != nil {
+		return
+	}
+	gpubuf = make(chan *data.Slice, nbuf)
+	hostbuf = make(chan *data.Slice, nbuf)
+	for i := 0; i < nbuf; i++ {
+		gpubuf <- cuda.NewSlice(3, mesh)
+		hostbuf <- cuda.NewUnifiedSlice(3, mesh)
 	}
 }
 

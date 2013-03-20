@@ -15,7 +15,7 @@ func AtExit(cleanup func()) {
 // Runs all functions stacked by AtExit().
 func Cleanup() {
 	if len(atexit) != 0 {
-		log.Println("cleanup")
+		log.Println("stopping profiler")
 	}
 	for _, f := range atexit {
 		f()

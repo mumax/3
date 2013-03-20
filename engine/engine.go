@@ -28,13 +28,16 @@ var (
 	Table         autosave
 )
 
-func torque() *data.Slice {
+// Evaluates all quantities, possibly saving them in the meanwhile.
+func Eval() *data.Slice {
+	// save M here
 	cuda.Memset(buffer, 0, 0, 0) // Need this in case demag is output, then we really add to.
 	Demag.AddTo(buffer)          // Does not add but sets, so it should be first.
 	Exch.AddTo(buffer)
 	bext := Bext()
 	cuda.AddConst(buffer, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
 	cuda.LLGTorque(buffer, m, buffer, float32(Alpha()))
+	// save torque here
 	return buffer
 }
 
@@ -43,7 +46,7 @@ func initialize() {
 	mx, my, mz = m.Comp(0), m.Comp(1), m.Comp(2)
 	buffer = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
-	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(m, Eval, 1e-15, Gamma0, &Time)
 
 	demag := cuda.NewDemag(mesh)
 	Demag = NewQuant("B_demag", func(dst *data.Slice) {

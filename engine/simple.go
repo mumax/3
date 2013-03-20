@@ -27,8 +27,8 @@ var (
 )
 
 func torque() *data.Slice {
-	cuda.Memset(h, 0, 0, 0)
-	Demag.AddTo(h)
+	cuda.Memset(h, 0, 0, 0) // Need this in case demag is output, then we really add to.
+	Demag.AddTo(h)          // Does not add but sets, so it should be first.
 	Exch.AddTo(h)
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))

@@ -25,7 +25,7 @@ var (
 	exch   Quant
 )
 
-func torque(m *data.Slice) *data.Slice {
+func torque() *data.Slice {
 	msat := Msat()
 	demag.Exec(h, m, vol, Mu0*msat)
 

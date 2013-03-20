@@ -6,15 +6,14 @@ import (
 	"math"
 )
 
-// Adaptive heun solver.
-// TODO: now only for magnetization (because it normalizes), post-step hook?
+// Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
 	dy0      *data.Slice
-	torqueFn func(m *data.Slice) *data.Slice // updates dy
+	torqueFn func() *data.Slice // updates dy
 }
 
-func NewHeun(y *data.Slice, torqueFn func(m *data.Slice) *data.Slice, dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	dy0 := NewSlice(3, y.Mesh())
 	return &Heun{newSolverCommon(dt, multiplier, time), dy0, torqueFn}
@@ -28,14 +27,14 @@ func (e *Heun) Step(y *data.Slice) {
 
 	// stage 1
 	e.GoodStep = true
-	dy := e.torqueFn(y) // <- hook here for output, always good step output
+	dy := e.torqueFn() // <- hook here for output, always good step output
 	e.GoodStep = false
 	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 	data.Copy(dy0, dy)
 
 	// stage 2
 	*e.Time += e.dt_si
-	dy = e.torqueFn(y)
+	dy = e.torqueFn()
 	{
 		err := 0.0
 		if !e.Fixdt {

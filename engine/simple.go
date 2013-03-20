@@ -22,16 +22,14 @@ var (
 	Solver *cuda.Heun
 	m, h   *data.Slice
 	vol    *data.Slice
-	demag  *cuda.DemagConvolution
+	Demag  Quant
 	Exch   Quant
 )
 
 func torque() *data.Slice {
-	msat := Msat()
-	demag.Exec(h, m, vol, Mu0*msat)
-
+	cuda.Memset(h, 0, 0, 0)
+	Demag.AddTo(h)
 	Exch.AddTo(h)
-
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
 
@@ -46,9 +44,12 @@ func initialize() {
 
 	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
 
-	demag = cuda.NewDemag(mesh)
+	demag := cuda.NewDemag(mesh)
+	Demag = NewQuant("B_demag", func(dst *data.Slice) {
+		demag.Exec(dst, m, vol, Mu0*Msat())
+	})
 
-	Exch = NewQuant("B_ex", func(dst *data.Slice) {
+	Exch = NewQuant("B_exch", func(dst *data.Slice) {
 		cuda.AddExchange(dst, m, Aex(), Mu0*Msat()) // !! ADD TO DST, NOT H !
 	})
 }

@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"fmt"
 )
 
 // TODO: what if we want to save energies etc?
@@ -20,7 +21,7 @@ func (q *Quant) AddTo(dst *data.Slice) {
 		buffer := OutputBuffer(dst.NComp())
 		q.addTo(buffer)
 		cuda.Madd2(dst, dst, buffer, 1, 1)
-		GoSaveAndRecycle(buffer, q.name)
+		GoSaveAndRecycle(buffer, q.fname(), Time)
 		q.autosave.count++ // !
 	} else {
 		q.addTo(dst)
@@ -46,4 +47,8 @@ func (a *autosave) needSave() bool {
 	}
 	t := Time - a.start
 	return t-float64(a.count)*a.period >= a.period
+}
+
+func (a *autosave) fname() string {
+	return fmt.Sprintf("%s%s%06d.dump", OD, a.name, a.count)
 }

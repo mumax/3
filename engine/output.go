@@ -5,9 +5,10 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"log"
 )
 
-const nbuf = 1
+const nbuf = 1 // todo: use a few more if we have enough memory
 
 var (
 	gpubuf  chan *data.Slice
@@ -39,6 +40,16 @@ func initOutBuf() {
 		for i := 0; i < nbuf; i++ {
 			gpubuf <- cuda.NewSlice(3, mesh)
 			hostbuf <- cuda.NewUnifiedSlice(3, mesh)
+		}
+	}
+}
+
+func drainOutput() {
+	if gpubuf != nil {
+		log.Println("flushing output")
+		for i := 0; i < nbuf; i++ {
+			<-gpubuf
+			<-hostbuf
 		}
 	}
 }

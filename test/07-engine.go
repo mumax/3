@@ -6,14 +6,15 @@ import . "code.google.com/p/mx3/engine"
 
 func main() {
 	Init()
+	defer Close()
 
-	SetMesh(128, 32, 1, 500e-9/128, 125e-9/32, 3e-9)
+	SetMesh(1024, 1024, 1, 4e-9, 4e-9, 4e-9)
 
 	SetM(1, 1, 0)
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
 	Alpha = Const(1)
 
-	Exch.Autosave(0.1e-9)
-	Run(2e-9)
+	Exch.Autosave(0.0000001e-9)
+	Steps(10)
 }

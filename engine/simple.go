@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/mag"
+	"code.google.com/p/mx3/util"
 	"log"
 )
 
@@ -79,6 +80,15 @@ func Run(seconds float64) {
 	for Time < stop {
 		step()
 	}
+	util.DashExit()
+}
+
+func Steps(n int) {
+	checkInited()
+	for i := 0; i < n; i++ {
+		step()
+	}
+	util.DashExit()
 }
 
 func step() {

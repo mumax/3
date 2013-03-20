@@ -24,8 +24,7 @@ func OutputBuffer(nComp int) *data.Slice {
 
 // asynchronously copy slice to host to save it.
 // return gpu buffer to pool as soon as copied.
-func GoSaveAndRecycle(s *data.Slice, fname string, time float64) {
-	//log.Println("save", fname)
+func SaveAndRecycle(s *data.Slice, fname string, time float64) {
 	host := <-hostbuf
 	data.Copy(host, s) // async
 	gpubuf <- s

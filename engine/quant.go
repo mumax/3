@@ -21,7 +21,7 @@ func (q *Quant) AddTo(dst *data.Slice) {
 		buffer := OutputBuffer(dst.NComp())
 		q.addTo(buffer)
 		cuda.Madd2(dst, dst, buffer, 1, 1)
-		GoSaveAndRecycle(buffer, q.fname(), Time)
+		go SaveAndRecycle(buffer, q.fname(), Time)
 		q.autosave.count++ // !
 	} else {
 		q.addTo(dst)

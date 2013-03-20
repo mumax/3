@@ -20,7 +20,9 @@ var (
 // then this buffer should be gosaved.
 func OutputBuffer(nComp int) *data.Slice {
 	initOutBuf()
-	return <-gpubuf
+	buf := <-gpubuf
+	cuda.Memset(buf, 0, 0, 0)
+	return buf
 }
 
 // asynchronously copy slice to host to save it.

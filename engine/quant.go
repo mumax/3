@@ -4,12 +4,13 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"fmt"
+	"sync"
 )
 
-// TODO: what if we want to save energies etc?
 type Quant struct {
 	addTo func(dst *data.Slice) // adds quantity to dst
 	autosave
+	sync.RWMutex
 }
 
 func NewQuant(name string, adder func(dst *data.Slice)) Quant {

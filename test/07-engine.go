@@ -8,13 +8,14 @@ func main() {
 	Init()
 	defer Close()
 
-	SetMesh(1024, 1024, 1, 4e-9, 4e-9, 4e-9)
+	SetMesh(256, 64, 1, 500e-9/256, 125e-9/64, 3e-9)
 
 	SetM(1, 1, 0)
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
 	Alpha = Const(1)
 
-	Exch.Autosave(0.0000001e-9)
-	Steps(10)
+	Exch.Autosave(0.1e-9)
+	Table.Autosave(0.01e-9)
+	Run(1e-9)
 }

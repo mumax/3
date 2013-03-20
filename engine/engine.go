@@ -18,12 +18,14 @@ var (
 )
 
 var (
-	mesh   *data.Mesh
-	Solver *cuda.Heun
-	m, h   *data.Slice
-	vol    *data.Slice
-	Demag  Quant
-	Exch   Quant
+	mesh          *data.Mesh
+	Solver        *cuda.Heun
+	m, mx, my, mz *data.Slice
+	h             *data.Slice // holds H_effective or torque
+	vol           *data.Slice
+	Demag         Quant
+	Exch          Quant
+	Table         autosave
 )
 
 func torque() *data.Slice {
@@ -32,16 +34,15 @@ func torque() *data.Slice {
 	Exch.AddTo(h)
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
-
 	cuda.LLGTorque(h, m, h, float32(Alpha()))
 	return h
 }
 
 func initialize() {
 	m = cuda.NewSlice(3, mesh)
+	mx, my, mz = m.Comp(0), m.Comp(1), m.Comp(2)
 	h = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
-
 	Solver = cuda.NewHeun(m, torque, 1e-15, Gamma0, &Time)
 
 	demag := cuda.NewDemag(mesh)
@@ -93,6 +94,7 @@ func Steps(n int) {
 }
 
 func step() {
+	savetable()
 	Solver.Step(m)
 	cuda.Normalize(m)
 }

@@ -18,10 +18,10 @@ func NewQuant(name string, adder func(dst *data.Slice)) Quant {
 
 func (q *Quant) AddTo(dst *data.Slice) {
 	if Solver.GoodStep && q.needSave() {
-		buffer := OutputBuffer(dst.NComp())
+		buffer := outputBuffer(dst.NComp())
 		q.addTo(buffer)
 		cuda.Madd2(dst, dst, buffer, 1, 1)
-		go SaveAndRecycle(buffer, q.fname(), Time)
+		go saveAndRecycle(buffer, q.fname(), Time)
 		q.autosave.count++ // !
 	} else {
 		q.addTo(dst)

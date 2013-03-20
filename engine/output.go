@@ -18,7 +18,7 @@ var (
 // returns a zeroed GPU buffer to "add" a quant to.
 // then it should be added to the sum.
 // then this buffer should be gosaved.
-func OutputBuffer(nComp int) *data.Slice {
+func outputBuffer(nComp int) *data.Slice {
 	initOutBuf()
 	buf := <-gpubuf
 	cuda.Memset(buf, 0, 0, 0)
@@ -27,7 +27,7 @@ func OutputBuffer(nComp int) *data.Slice {
 
 // asynchronously copy slice to host to save it.
 // return gpu buffer to pool as soon as copied.
-func SaveAndRecycle(s *data.Slice, fname string, time float64) {
+func saveAndRecycle(s *data.Slice, fname string, time float64) {
 	host := <-hostbuf
 	data.Copy(host, s) // async
 	gpubuf <- s

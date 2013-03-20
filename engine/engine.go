@@ -23,22 +23,61 @@ var (
 	m, mx, my, mz *data.Slice
 	buffer        *data.Slice // holds H_effective or torque
 	vol           *data.Slice
-	Demag         Quant
-	Exch          Quant
-	Table         autosave
+	demag         addFn
+	exch          addFn
 )
 
+var (
+	M, B_demag, B_exch, B_eff, Torque Handle
+)
+
+type Handle struct{}
+
+func (h *Handle) Need() bool {
+	return false
+}
+
+func (h *Handle) Send(s *data.Slice) {
+
+}
+
 // Evaluates all quantities, possibly saving them in the meanwhile.
-func Eval() *data.Slice {
-	// save M here
-	cuda.Memset(buffer, 0, 0, 0) // Need this in case demag is output, then we really add to.
-	Demag.AddTo(buffer)          // Does not add but sets, so it should be first.
-	Exch.AddTo(buffer)
+func Eval() *data.Slice { // todo: output bool
+	//doOutput := Solver.GoodStep
+
+	output(m, M)
+
+	cuda.Memset(buffer, 0, 0, 0)         // Need this in case demag is output, then we really add to.
+	addAndOutput(buffer, demag, B_demag) // Does not add but sets, so it should be first.
+	addAndOutput(buffer, exch, B_exch)
+
 	bext := Bext()
 	cuda.AddConst(buffer, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
+	output(buffer, B_eff)
+
 	cuda.LLGTorque(buffer, m, buffer, float32(Alpha()))
-	// save torque here
+	output(buffer, Torque)
+
 	return buffer
+}
+
+func output(s *data.Slice, h Handle) {
+
+}
+
+type addFn func(dst *data.Slice) // calculates quantity and add result to dst
+
+func addAndOutput(dst *data.Slice, addTo addFn, h Handle) {
+	if h.Need() {
+		buffer := outputBuffer(dst.NComp())
+		addTo(buffer)
+		cuda.Madd2(dst, dst, buffer, 1, 1)
+		h.Send(buffer)
+		//go saveAndRecycle(buffer, q.fname(), Time)
+		//q.autosave.count++ // !
+	} else {
+		addTo(dst)
+	}
 }
 
 func initialize() {
@@ -48,14 +87,14 @@ func initialize() {
 	vol = data.NilSlice(1, mesh)
 	Solver = cuda.NewHeun(m, Eval, 1e-15, Gamma0, &Time)
 
-	demag := cuda.NewDemag(mesh)
-	Demag = NewQuant("B_demag", func(dst *data.Slice) {
-		demag.Exec(dst, m, vol, Mu0*Msat())
-	})
+	demag_ := cuda.NewDemag(mesh)
+	demag = func(dst *data.Slice) {
+		demag_.Exec(dst, m, vol, Mu0*Msat())
+	}
 
-	Exch = NewQuant("B_exch", func(dst *data.Slice) {
-		cuda.AddExchange(dst, m, Aex(), Mu0*Msat()) // !! ADD TO DST, NOT H !
-	})
+	exch = func(dst *data.Slice) {
+		cuda.AddExchange(dst, m, Aex(), Mu0*Msat())
+	}
 }
 
 func checkInited() {
@@ -97,7 +136,7 @@ func Steps(n int) {
 }
 
 func step() {
-	savetable()
+	//savetable()
 	Solver.Step(m)
 	cuda.Normalize(m)
 }

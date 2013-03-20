@@ -16,7 +16,7 @@ func main() {
 	Aex = Const(13e-12)
 	Alpha = Const(1)
 
-	//Exch.Autosave(0.1e-9)
-	//Table.Autosave(0.01e-9)
+	Exch.Autosave(0.1e-9)
+	Table.Autosave(0.01e-9)
 	Run(10e-9)
 }

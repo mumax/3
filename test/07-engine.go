@@ -14,5 +14,6 @@ func main() {
 	Aex = Const(13e-12)
 	Alpha = Const(1)
 
+	Exch.Autosave(0.1e-9)
 	Run(2e-9)
 }

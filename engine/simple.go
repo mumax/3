@@ -22,14 +22,14 @@ var (
 	m, h   *data.Slice
 	vol    *data.Slice
 	demag  *cuda.DemagConvolution
-	exch   Quant
+	Exch   Quant
 )
 
 func torque() *data.Slice {
 	msat := Msat()
 	demag.Exec(h, m, vol, Mu0*msat)
 
-	exch.AddTo(h)
+	Exch.AddTo(h)
 
 	bext := Bext()
 	cuda.AddConst(h, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
@@ -47,7 +47,7 @@ func initialize() {
 
 	demag = cuda.NewDemag(mesh)
 
-	exch = NewQuant("B_ex", func(dst *data.Slice) {
+	Exch = NewQuant("B_ex", func(dst *data.Slice) {
 		cuda.AddExchange(dst, m, Aex(), Mu0*Msat()) // !! ADD TO DST, NOT H !
 	})
 }

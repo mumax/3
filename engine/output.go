@@ -4,6 +4,7 @@ package engine
 
 import (
 	"code.google.com/p/mx3/data"
+	"log"
 )
 
 // returns a zeroed GPU buffer to "add" a quant to.
@@ -16,5 +17,5 @@ func OutputBuffer(nComp int) *data.Slice {
 // asynchronously copy slice to host to save it.
 // return gpu buffer to pool as soon as copied.
 func GoSaveAndRecycle(s *data.Slice, fname string) {
-
+	log.Println("save", fname)
 }

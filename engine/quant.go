@@ -34,13 +34,16 @@ type autosave struct {
 	name   string
 }
 
+func (a *autosave) Autosave(period float64) {
+	a.period = period
+	a.start = Time
+	a.count = 0
+}
+
 func (a *autosave) needSave() bool {
 	if a.period == 0 {
 		return false
 	}
 	t := Time - a.start
-	if t-float64(a.count)*a.period >= a.period {
-		return true
-	}
-	return false
+	return t-float64(a.count)*a.period >= a.period
 }

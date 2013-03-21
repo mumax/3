@@ -5,10 +5,11 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
-	"sync"
 	"log"
+	"sync"
 )
 
+// User inputs
 var (
 	Aex   ScalFn
 	Msat  ScalFn
@@ -19,20 +20,53 @@ var (
 )
 
 var (
-	mesh          *data.Mesh
-	Solver        *cuda.Heun
-	m, mx, my, mz *data.Slice
-	buffer        *data.Slice // holds H_effective or torque
-	vol           *data.Slice
-	demag         addFn
-	exch          addFn
+	mesh     *data.Mesh
+	Solver   *cuda.Heun
+	m        *S
+	buffer   *S // holds H_effective or torque
+	_outbuf  *S
+	_hostbuf *S
+	vol      *data.Slice
+	demag    addFn
+	exch     addFn
 )
 
 var (
 	M, B_demag, B_exch, B_eff, Torque *Handle
 )
 
-type Handle struct{
+type S struct {
+	_slice *data.Slice
+	_lock  sync.RWMutex
+}
+
+func newS() *S {
+	s := new(S)
+	s._slice = cuda.NewSlice(3, mesh)
+	return s
+}
+
+func (s *S) RLock() *data.Slice {
+	s._lock.RLock()
+	return s._slice
+}
+
+func (s *S) WLock() *data.Slice {
+	s._lock.Lock()
+	return s._slice
+}
+
+func (s *S) WUnlock() { s._lock.Unlock() }
+func (s *S) RUnlock() { s._lock.RUnlock() }
+
+func outBuf() *S {
+	if _outbuf == nil {
+		_outbuf = newS()
+	}
+	return _outbuf
+}
+
+type Handle struct {
 	autosave
 }
 
@@ -41,64 +75,64 @@ func (h *Handle) Need() bool {
 }
 
 func (h *Handle) Send(s *data.Slice) {
-		log.Println("need save:", h.Need())
-		log.Println("\nsave", h.name)
+	log.Println("need save:", h.Need())
+	log.Println("\nsave", h.name)
 
-		saveAndRecycle(s , h.fname(), Time)
+	//saveAndRecycle(s , h.fname(), Time)
 
-		h.saved()
+	h.saved()
 }
 
-func newHandle(name string)*Handle{
+func newHandle(name string) *Handle {
 	var h Handle
 	h.name = name
-	return &h	
+	return &h
 }
 
 // Evaluates all quantities, possibly saving them in the meanwhile.
 func Eval() *data.Slice { // todo: output bool
 	//doOutput := Solver.GoodStep
 
-	output(m, M)
+	M.output(m)
 
-	cuda.Memset(buffer, 0, 0, 0)         // Need this in case demag is output, then we really add to.
-	addAndOutput(buffer, demag, B_demag) // Does not add but sets, so it should be first.
-	addAndOutput(buffer, exch, B_exch)
+	//	buf := buffer.Lock()
+	//	cuda.Memset(buf, 0, 0, 0)         // Need this in case demag is output, then we really add to.
+	//	addAndOutput(buf, demag, B_demag) // Does not add but sets, so it should be first.
+	//
+	//	addAndOutput(buffer, exch, B_exch)
+	//
+	//	bext := Bext()
+	//	cuda.AddConst(buffer.Slice, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
+	//	output(buffer, B_eff)
+	//
+	//
+	//	cuda.LLGTorque(buffer.Slice, m.Lock(), buffer.Slice, float32(Alpha()))
+	//	m.Unlock()
+	//	output(buffer, Torque)
 
-	bext := Bext()
-	cuda.AddConst(buffer, float32(bext[Z]), float32(bext[Y]), float32(bext[X]))
-	output(buffer, B_eff)
-
-	cuda.LLGTorque(buffer, m, buffer, float32(Alpha()))
-	output(buffer, Torque)
-
-	return buffer
+	out := buffer.RLock()
+	buffer.RUnlock()
+	return out
 }
 
-func output(s *data.Slice, h *Handle) {
-	if h.Need(){h.Send(buffer)}
+func (h *Handle) output(s *S) {
+	if h.Need() {
+		s.RLock()
+		s.RUnlock()
+	}
 }
 
 type addFn func(dst *data.Slice) // calculates quantity and add result to dst
 
-var(
- gpubuf *data.Slice
- gpubuflock sync.Mutex
-)
-
-func outputBuffer()*data.Slice{
-	if gpubuf == nil{
-		gpubuf = cuda.NewSlice(3, m.Mesh())
-	}
-	return gpubuf
-}
-
-func addAndOutput(dst *data.Slice, addTo addFn, h *Handle) {
+func addAndOutput(dst *S, addTo addFn, h *Handle) {
 	if h.Need() {
-		gpubuflock.Lock()
-		buffer := gpubuf
+		gb := outBuf().WLock()
 		addTo(buffer)
-		h.Send(buffer, LOCK?)
+		go func() {
+
+		}()
+		outBuf().WUnlock()
+
 		cuda.Madd2(dst, dst, buffer, 1, 1)
 		output(buffer, h)
 	} else {

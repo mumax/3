@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
+	"sync"
 	"log"
 )
 
@@ -28,17 +29,30 @@ var (
 )
 
 var (
-	M, B_demag, B_exch, B_eff, Torque Handle
+	M, B_demag, B_exch, B_eff, Torque *Handle
 )
 
-type Handle struct{}
+type Handle struct{
+	autosave
+}
 
 func (h *Handle) Need() bool {
-	return false
+	return h.needSave()
 }
 
 func (h *Handle) Send(s *data.Slice) {
+		log.Println("need save:", h.Need())
+		log.Println("\nsave", h.name)
 
+		saveAndRecycle(s , h.fname(), Time)
+
+		h.saved()
+}
+
+func newHandle(name string)*Handle{
+	var h Handle
+	h.name = name
+	return &h	
 }
 
 // Evaluates all quantities, possibly saving them in the meanwhile.
@@ -61,20 +75,32 @@ func Eval() *data.Slice { // todo: output bool
 	return buffer
 }
 
-func output(s *data.Slice, h Handle) {
-
+func output(s *data.Slice, h *Handle) {
+	if h.Need(){h.Send(buffer)}
 }
 
 type addFn func(dst *data.Slice) // calculates quantity and add result to dst
 
-func addAndOutput(dst *data.Slice, addTo addFn, h Handle) {
+var(
+ gpubuf *data.Slice
+ gpubuflock sync.Mutex
+)
+
+func outputBuffer()*data.Slice{
+	if gpubuf == nil{
+		gpubuf = cuda.NewSlice(3, m.Mesh())
+	}
+	return gpubuf
+}
+
+func addAndOutput(dst *data.Slice, addTo addFn, h *Handle) {
 	if h.Need() {
-		buffer := outputBuffer(dst.NComp())
+		gpubuflock.Lock()
+		buffer := gpubuf
 		addTo(buffer)
+		h.Send(buffer, LOCK?)
 		cuda.Madd2(dst, dst, buffer, 1, 1)
-		h.Send(buffer)
-		//go saveAndRecycle(buffer, q.fname(), Time)
-		//q.autosave.count++ // !
+		output(buffer, h)
 	} else {
 		addTo(dst)
 	}
@@ -82,6 +108,8 @@ func addAndOutput(dst *data.Slice, addTo addFn, h Handle) {
 
 func initialize() {
 	m = cuda.NewSlice(3, mesh)
+	M = newHandle("m")
+
 	mx, my, mz = m.Comp(0), m.Comp(1), m.Comp(2)
 	buffer = cuda.NewSlice(3, mesh)
 	vol = data.NilSlice(1, mesh)
@@ -91,10 +119,16 @@ func initialize() {
 	demag = func(dst *data.Slice) {
 		demag_.Exec(dst, m, vol, Mu0*Msat())
 	}
+	B_demag = newHandle("B_demag")
 
 	exch = func(dst *data.Slice) {
 		cuda.AddExchange(dst, m, Aex(), Mu0*Msat())
 	}
+	B_exch = newHandle("B_exch")
+
+	B_eff = newHandle("B_eff")
+
+	Torque = newHandle("torque")
 }
 
 func checkInited() {
@@ -138,6 +172,7 @@ func Steps(n int) {
 func step() {
 	//savetable()
 	Solver.Step(m)
+	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
 	cuda.Normalize(m)
 }
 

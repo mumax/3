@@ -21,7 +21,7 @@ func initialize() {
 	M = NewBuffered(3, "m")
 	Torque = NewBuffered(3, "torque")
 
-	Solver = cuda.NewHeun(m, TorqueFn, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(TorqueFn, 1e-15, Gamma0, &Time)
 
 	//buffer = cuda.NewSlice(3, mesh)
 	//vol = data.NilSlice(1, mesh)

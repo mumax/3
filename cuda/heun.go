@@ -13,9 +13,9 @@ type Heun struct {
 	torqueFn func() *data.Slice // updates dy
 }
 
-func NewHeun(y *data.Slice, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
+func NewHeun(m *data.Mesh, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
-	dy0 := NewSlice(3, y.Mesh())
+	dy0 := NewSlice(3, m)
 	return &Heun{newSolverCommon(dt, multiplier, time), dy0, torqueFn}
 }
 

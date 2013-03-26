@@ -1,27 +1,27 @@
 package engine
 
-import(
-	"code.google.com/p/mx3/data"
+import (
 	"code.google.com/p/mx3/cuda"
+	"code.google.com/p/mx3/data"
 	"log"
 )
 
 var (
-	mesh     *data.Mesh
-	solver   *cuda.Heun
-	Time float64
+	mesh   *data.Mesh
+	solver *cuda.Heun
+	Time   float64
 )
 
 var (
 	M, Torque Handle
-	Solver *cuda.Heun
+	Solver    *cuda.Heun
 )
 
 func initialize() {
 	M = NewBuffered(3, "m")
 	Torque = NewBuffered(3, "torque")
 
-	Solver = cuda.NewHeun(TorqueFn, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(mesh, TorqueFn, 1e-15, Gamma0, &Time)
 
 	//buffer = cuda.NewSlice(3, mesh)
 	//vol = data.NilSlice(1, mesh)
@@ -42,7 +42,7 @@ func initialize() {
 	//Torque = newHandle("torque")
 }
 
-func TorqueFn()*data.Slice{
+func TorqueFn() *data.Slice {
 	return nil
 }
 

@@ -1,6 +1,6 @@
 package engine
 
-import(
+import (
 	"fmt"
 )
 
@@ -32,4 +32,3 @@ func (a *autosave) saved() {
 func (a *autosave) fname() string {
 	return fmt.Sprintf("%s%s%06d.dump", OD, a.name, a.count)
 }
-

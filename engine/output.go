@@ -3,8 +3,8 @@ package engine
 // asynchronous output server.
 
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/data"
+	//	"code.google.com/p/mx3/cuda"
+	//	"code.google.com/p/mx3/data"
 	"log"
 )
 

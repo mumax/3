@@ -53,3 +53,8 @@ func Memset(s *data.Slice, val ...float32) {
 	}
 	syncAndRecycle(str)
 }
+
+// Set all elements of all components to zero.
+func Zero(s *data.Slice) {
+	Memset(s, make([]float32, s.NComp())...)
+}

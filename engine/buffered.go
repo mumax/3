@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"fmt"
 	"sync"
 )
 
@@ -26,4 +27,27 @@ func (b *Buffered) Read() *data.Slice {
 
 func (b *Buffered) ReadDone() {
 	b.lock.RUnlock()
+}
+
+func (b *Buffered) Write() *data.Slice {
+	b.lock.Lock()
+	return b.buffer
+}
+
+func (b *Buffered) WriteDone() {
+	b.lock.Unlock()
+}
+
+func (b *Buffered) Memset(val ...float32) {
+	s := b.Write()
+	cuda.Memset(s, val...)
+	b.WriteDone()
+}
+
+// autosaves if needed
+func (b *Buffered) Touch() {
+	if b.needSave() {
+		fmt.Println("save", b.name)
+		b.saved() // count++ hazard
+	}
 }

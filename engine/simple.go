@@ -52,6 +52,11 @@ func initialize() {
 
 func TorqueFn() *data.Slice {
 	M.Touch() // saves if needed
+
+	Torque.Memset(0, 0, 0)
+	B_demag.AddTo(Torque)
+
+	return nil
 }
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

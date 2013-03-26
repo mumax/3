@@ -180,33 +180,4 @@ package engine
 //	initialize()
 //}
 //
-//func SetM(mx, my, mz float64) {
-//	checkInited()
-//	cuda.Memset(m, float32(mz), float32(my), float32(mx))
-//	cuda.Normalize(m)
-//}
-//
-//func Run(seconds float64) {
-//	checkInited()
-//	stop := Time + seconds
-//	for Time < stop {
-//		step()
-//	}
-//	util.DashExit()
-//}
-//
-//func Steps(n int) {
-//	checkInited()
-//	for i := 0; i < n; i++ {
-//		step()
-//	}
-//	util.DashExit()
-//}
-//
-//func step() {
-//	//savetable()
-//	Solver.Step(m)
-//	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
-//	cuda.Normalize(m)
-//}
 //

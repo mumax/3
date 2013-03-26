@@ -13,15 +13,18 @@ var (
 )
 
 var (
-	M Handle
+	M, Torque Handle
+	Solver *cuda.Heun
 )
 
 func initialize() {
 	M = NewBuffered(3, "m")
+	Torque = NewBuffered(3, "torque")
+
+	Solver = cuda.NewHeun(m, TorqueFn, 1e-15, Gamma0, &Time)
 
 	//buffer = cuda.NewSlice(3, mesh)
 	//vol = data.NilSlice(1, mesh)
-	//Solver = cuda.NewHeun(m, Eval, 1e-15, Gamma0, &Time)
 
 	//demag_ := cuda.NewDemag(mesh)
 	//demag = func(dst *data.Slice) {
@@ -37,6 +40,10 @@ func initialize() {
 	//B_eff = newHandle("B_eff")
 
 	//Torque = newHandle("torque")
+}
+
+func TorqueFn()*data.Slice{
+	return nil
 }
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

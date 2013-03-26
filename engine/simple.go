@@ -51,7 +51,7 @@ func initialize() {
 }
 
 func TorqueFn() *data.Slice {
-
+	M.Touch() // saves if needed
 }
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

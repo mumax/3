@@ -9,18 +9,20 @@ import (
 // Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
-	dy0      *data.Slice        // <- buffer could be released after step?
+	y        *data.Synced       // the quantity to be time stepped
+	dy0      *data.Slice        // time derivative of y <- buffer could be released after step?
 	torqueFn func() *data.Slice // updates dy
 }
 
-func NewHeun(m *data.Mesh, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Synced, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
+	m := y.Mesh()
 	dy0 := NewSlice(3, m)
-	return &Heun{newSolverCommon(dt, multiplier, time), dy0, torqueFn}
+	return &Heun{newSolverCommon(dt, multiplier, time), y, dy0, torqueFn}
 }
 
 // Take one time step
-func (e *Heun) Step(y *data.Slice) {
+func (e *Heun) Step() {
 	dy0 := e.dy0
 	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
@@ -29,7 +31,11 @@ func (e *Heun) Step(y *data.Slice) {
 	e.GoodStep = true
 	dy := e.torqueFn() // <- hook here for output, always good step output
 	e.GoodStep = false
-	Madd2(y, y, dy, 1, dt) // y = y + dt * dy
+	{
+		y := e.y.Write()
+		Madd2(y, y, dy, 1, dt) // y = y + dt * dy
+		e.y.WriteDone()
+	}
 	data.Copy(dy0, dy)
 
 	// stage 2
@@ -42,6 +48,7 @@ func (e *Heun) Step(y *data.Slice) {
 			solverCheckErr(err)
 		}
 
+		y := e.y.Write()
 		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
@@ -55,6 +62,7 @@ func (e *Heun) Step(y *data.Slice) {
 			e.undone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
+		e.y.WriteDone()
 	}
 }
 

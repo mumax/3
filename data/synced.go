@@ -18,23 +18,27 @@ func NewSynced(slice *Slice) *Synced {
 }
 
 // Locks for reading and returns the (now locked) data Slice.
-func (b *Synced) Read() *Slice {
-	b.lock.RLock()
-	return &b.buffer
+func (s *Synced) Read() *Slice {
+	s.lock.RLock()
+	return &s.buffer
 }
 
 // Unlocks for reading, to be called after Read.
-func (b *Synced) ReadDone() {
-	b.lock.RUnlock()
+func (s *Synced) ReadDone() {
+	s.lock.RUnlock()
 }
 
 // Locks for writing and returns the (now locked) data Slice.
-func (b *Synced) Write() *Slice {
-	b.lock.Lock()
-	return &b.buffer
+func (s *Synced) Write() *Slice {
+	s.lock.Lock()
+	return &s.buffer
 }
 
 // Unlocks for writing, to be called after Write.
-func (b *Synced) WriteDone() {
-	b.lock.Unlock()
+func (s *Synced) WriteDone() {
+	s.lock.Unlock()
+}
+
+func (s *Synced) Mesh() *Mesh {
+	return s.buffer.Mesh()
 }

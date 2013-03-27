@@ -11,24 +11,24 @@ import (
 	"unsafe"
 )
 
-func Read(in io.Reader) (*Slice, error) {
+func Read(in io.Reader) (data *Slice, time float64, err error) {
 	r := newReader(in)
 	return r.readSlice()
 }
 
-func ReadFile(fname string) (*Slice, error) {
+func ReadFile(fname string) (data *Slice, time float64, err error) {
 	f, err := os.Open(fname)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer f.Close()
 	return Read(f)
 }
 
-func MustReadFile(fname string) *Slice {
-	s, err := ReadFile(fname)
+func MustReadFile(fname string) (data *Slice, time float64) {
+	s, t, err := ReadFile(fname)
 	util.FatalErr(err)
-	return s
+	return s, t
 }
 
 // Reads successive data frames in dump format.
@@ -46,15 +46,15 @@ func newReader(in io.Reader) *reader {
 	return r
 }
 
-func (r *reader) readSlice() (slice *Slice, err error) {
+func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 	r.err = nil // clear previous error, if any
 	r.Magic = r.readString()
 	if r.err != nil {
-		return nil, r.err
+		return nil, 0, r.err
 	}
 	if r.Magic != MAGIC {
 		r.err = fmt.Errorf("dump: bad magic number:%v", r.Magic)
-		return nil, r.err
+		return nil, 0, r.err
 	}
 	r.Components = r.readInt()
 	for i := range r.MeshSize {
@@ -65,6 +65,7 @@ func (r *reader) readSlice() (slice *Slice, err error) {
 	}
 	r.MeshUnit = r.readString()
 	r.Time = r.readFloat64()
+	time = r.Time
 	r.TimeUnit = r.readString()
 	r.DataLabel = r.readString()
 	r.DataUnit = r.readString()

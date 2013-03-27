@@ -9,12 +9,12 @@ import (
 // Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
-	y        *data.Synced       // the quantity to be time stepped
-	dy0      *data.Slice        // time derivative of y <- buffer could be released after step?
-	torqueFn func() *data.Slice // updates dy
+	y        *data.Synced            // the quantity to be time stepped
+	dy0      *data.Slice             // time derivative of y <- buffer could be released after step?
+	torqueFn func(bool) *data.Synced // updates dy
 }
 
-func NewHeun(y *data.Synced, torqueFn func() *data.Slice, dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Synced, torqueFn func(bool) *data.Synced, dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	m := y.Mesh()
 	dy0 := NewSlice(3, m)
@@ -28,20 +28,22 @@ func (e *Heun) Step() {
 	util.Assert(dt > 0)
 
 	// stage 1
-	e.GoodStep = true
-	dy := e.torqueFn() // <- hook here for output, always good step output
-	e.GoodStep = false
 	{
+		Dy := e.torqueFn(true) // <- hook here for output, always good step output
+		dy := Dy.Read()
 		y := e.y.Write()
 		Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 		e.y.WriteDone()
+		data.Copy(dy0, dy)
+		Dy.ReadDone()
 	}
-	data.Copy(dy0, dy)
 
 	// stage 2
-	*e.Time += e.dt_si
-	dy = e.torqueFn()
 	{
+		*e.Time += e.dt_si
+		Dy := e.torqueFn(false)
+		dy := Dy.Read()
+
 		err := 0.0
 		if !e.Fixdt {
 			err = MaxVecDiff(dy0, dy) * float64(dt)
@@ -63,6 +65,7 @@ func (e *Heun) Step() {
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
 		e.y.WriteDone()
+		Dy.ReadDone()
 	}
 }
 

@@ -48,10 +48,10 @@ func initialize() {
 
 	Torque = NewBuffered(3, "torque")
 
-	Solver = cuda.NewHeun(mesh, TorqueFn, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(&M.Synced, TorqueFn, 1e-15, Gamma0, &Time)
 }
 
-func TorqueFn() *data.Slice {
+func TorqueFn(good bool) *data.Synced {
 
 	//Torque.Memset(0, 0, 0)
 	B_demag.AddTo(Torque)
@@ -79,10 +79,9 @@ func Steps(n int) {
 func step() {
 	M.Touch() // saves if needed
 
-	m := M.Write() // will block until save done, pass rwmutex to heun??
-	Solver.Step(m)
-	cuda.Normalize(m)
-	M.WriteDone()
+	Solver.Step()
+	//cuda.Normalize(m)
+	//M.WriteDone()
 
 	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
 }

@@ -38,7 +38,7 @@ var (
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 	flag_o         = flag.String("o", "%v", "Set output file base name. %v is replaced by input name, extension automatically added.")
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
-	flag_tstep     = flag.Float64("tstep", 1.0, "Time step")
+	flag_tstep     = flag.Float64("tstep", 1.0, "timestep")
 	//flag_force     = flag.Bool("f", false, "Force overwrite of existing files")
 	// TODO: crop, component
 )
@@ -48,6 +48,7 @@ var wg sync.WaitGroup
 
 type task struct {
 	*data.Slice
+	time  float64
 	fname string
 }
 
@@ -72,13 +73,13 @@ func main() {
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		log.Println(fname)
-		slice, err := data.ReadFile(fname)
+		slice, time, err := data.ReadFile(fname)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 		wg.Add(1)
-		que <- task{slice, util.NoExt(fname)}
+		que <- task{slice, time, util.NoExt(fname)}
 	}
 
 	// wait for work to finish
@@ -87,7 +88,7 @@ func main() {
 
 func work() {
 	for task := range que {
-		process(task.Slice, task.fname)
+		process(task.Slice, task.time, task.fname)
 		wg.Done()
 	}
 }
@@ -98,7 +99,7 @@ func open(fname string) *os.File {
 	return f
 }
 
-func process(f *data.Slice, name string) {
+func process(f *data.Slice, time float64, name string) {
 	preprocess(f)
 
 	haveOutput := false
@@ -134,7 +135,7 @@ func process(f *data.Slice, name string) {
 	if *flag_ovf != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOvf2(out, f, *flag_ovf, *flag_tstep)
+		dumpOvf2(out, f, *flag_ovf, time, *flag_tstep)
 		haveOutput = true
 	}
 

@@ -21,7 +21,7 @@ import (
 	"unsafe"
 )
 
-func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, tstep float64) {
+func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time, tstep float64) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -32,7 +32,7 @@ func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, tstep float64) {
 		log.Fatalf("Illegal OMF data format: %v", dataformat)
 	}
 
-	writeOvf2Header(out, q, tstep)
+	writeOvf2Header(out, q, time, tstep)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
 	return
@@ -53,7 +53,7 @@ func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
 	hdr(out, "End", "Data "+dataformat)
 }
 
-func writeOvf2Header(out io.Writer, q *data.Slice, tstep float64) {
+func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 	gridsize := q.Mesh().Size()
 	cellsize := q.Mesh().CellSize()
 
@@ -100,7 +100,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, tstep float64) {
 
 	// We don't really have stages
 	fmt.Fprintln(out, "# Desc: Stage simulation time: ", tstep, " s")
-	fmt.Fprintln(out, "# Desc: Total simulation time: ", tstep, " s")
+	fmt.Fprintln(out, "# Desc: Total simulation time: ", time, " s")
 
 	hdr(out, "xbase", cellsize[Z]/2)
 	hdr(out, "ybase", cellsize[Y]/2)

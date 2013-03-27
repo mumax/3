@@ -72,7 +72,7 @@ const (
 	.reg .f32 	%f<30>;
 	.reg .s64 	%rd<13>;
 	// demoted variable
-	.shared .align 4 .b8 __cuda_local_var_33729_32_non_const_sdata[2048];
+	.shared .align 4 .b8 __cuda_local_var_33772_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd4, [reducesum_param_0];
 	ld.param.u64 	%rd5, [reducesum_param_1];
@@ -105,7 +105,7 @@ BB0_1:
 BB0_2:
 	.loc 2 8 1
 	mul.wide.s32 	%rd8, %r2, 4;
-	mov.u64 	%rd9, __cuda_local_var_33729_32_non_const_sdata;
+	mov.u64 	%rd9, __cuda_local_var_33772_32_non_const_sdata;
 	add.s64 	%rd3, %rd9, %rd8;
 	st.shared.f32 	[%rd3], %f29;
 	bar.sync 	0;
@@ -174,7 +174,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 2 8 1
-	ld.shared.f32 	%f27, [__cuda_local_var_33729_32_non_const_sdata];
+	ld.shared.f32 	%f27, [__cuda_local_var_33772_32_non_const_sdata];
 	.loc 3 1844 5
 	atom.global.add.f32 	%f28, [%rd1], %f27;
 
@@ -203,7 +203,7 @@ BB0_10:
 	.reg .f32 	%f<30>;
 	.reg .s64 	%rd<13>;
 	// demoted variable
-	.shared .align 4 .b8 __cuda_local_var_33802_32_non_const_sdata[2048];
+	.shared .align 4 .b8 __cuda_local_var_33845_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd4, [reducesum_param_0];
 	ld.param.u64 	%rd5, [reducesum_param_1];
@@ -236,7 +236,7 @@ BB0_1:
 BB0_2:
 	.loc 2 8 1
 	mul.wide.s32 	%rd8, %r2, 4;
-	mov.u64 	%rd9, __cuda_local_var_33802_32_non_const_sdata;
+	mov.u64 	%rd9, __cuda_local_var_33845_32_non_const_sdata;
 	add.s64 	%rd3, %rd9, %rd8;
 	st.shared.f32 	[%rd3], %f29;
 	bar.sync 	0;
@@ -305,7 +305,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 2 8 1
-	ld.shared.f32 	%f27, [__cuda_local_var_33802_32_non_const_sdata];
+	ld.shared.f32 	%f27, [__cuda_local_var_33845_32_non_const_sdata];
 	.loc 3 1844 5
 	atom.global.add.f32 	%f28, [%rd1], %f27;
 
@@ -362,7 +362,7 @@ BB0_10:
 	.reg .f32 	%f<30>;
 	.reg .s64 	%rd<13>;
 	// demoted variable
-	.shared .align 4 .b8 __cuda_local_var_33951_32_non_const_sdata[2048];
+	.shared .align 4 .b8 __cuda_local_var_33994_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd4, [reducesum_param_0];
 	ld.param.u64 	%rd5, [reducesum_param_1];
@@ -395,7 +395,7 @@ BB2_1:
 BB2_2:
 	.loc 3 8 1
 	mul.wide.s32 	%rd8, %r2, 4;
-	mov.u64 	%rd9, __cuda_local_var_33951_32_non_const_sdata;
+	mov.u64 	%rd9, __cuda_local_var_33994_32_non_const_sdata;
 	add.s64 	%rd3, %rd9, %rd8;
 	st.shared.f32 	[%rd3], %f29;
 	bar.sync 	0;
@@ -464,7 +464,7 @@ BB2_8:
 	@%p7 bra 	BB2_10;
 
 	.loc 3 8 1
-	ld.shared.f32 	%f27, [__cuda_local_var_33951_32_non_const_sdata];
+	ld.shared.f32 	%f27, [__cuda_local_var_33994_32_non_const_sdata];
 	.loc 4 1844 5
 	atom.global.add.f32 	%f28, [%rd1], %f27;
 

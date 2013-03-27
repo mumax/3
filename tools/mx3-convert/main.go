@@ -29,6 +29,7 @@ var (
 	flag_jpeg      = flag.Bool("jpg", false, "JPEG output")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF output`)
+	flag_ovf       = flag.String("ovf", "", `"text" or "binary" OMF output`)
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
@@ -37,6 +38,7 @@ var (
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 	flag_o         = flag.String("o", "%v", "Set output file base name. %v is replaced by input name, extension automatically added.")
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
+	flag_tstep     = flag.Float64("tstep", 1.0, "Time step")
 	//flag_force     = flag.Bool("f", false, "Force overwrite of existing files")
 	// TODO: crop, component
 )
@@ -126,6 +128,13 @@ func process(f *data.Slice, name string) {
 		out := open(name + ".omf")
 		defer out.Close()
 		dumpOmf(out, f, *flag_omf)
+		haveOutput = true
+	}
+
+	if *flag_ovf != "" {
+		out := open(name + ".ovf")
+		defer out.Close()
+		dumpOvf2(out, f, *flag_ovf, *flag_tstep)
 		haveOutput = true
 	}
 

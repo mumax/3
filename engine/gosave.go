@@ -4,58 +4,80 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
-	"time"
 )
 
-var _hostbuf *data.Synced
-
-// returns host buffer for output. TODO: have more than one.
-func hostbuf() *data.Synced {
-	if _hostbuf == nil {
-		log.Println("allocating host output buffer")
-		_hostbuf = data.NewSynced(cuda.NewUnifiedSlice(3, mesh))
-	}
-	return _hostbuf
-}
-
 // Asynchronously save output to file. Calls unlockOutput() to unlock output read lock.
+// This function returns as soon as downloading output to host can start (usually immediately).
+// During the download, further computations can continue. When the download is done, unlockOutput()
+// is called so that the output buffer can be written again. Then the output host copy is
+// queued for saving to disk. 
 func GoSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
-	if outputrequests == nil {
-		outputrequests = make(chan outTask)
-		go RunOutputServer()
+	if dlQue == nil {
+		dlQue = make(chan dlTask)
+		saveQue = make(chan saveTask)
+		hBuf = make(chan *data.Slice, MaxOutputQueLen)
+		go RunDownloader()
+		go RunSaver()
 	}
-	outputrequests <- outTask{fname, output, t, unlockOutput}
+	dlQue <- dlTask{fname, output, t, unlockOutput}
 }
 
 var (
-	outputrequests chan outTask      // pipes output requests from GoSave to RunOutputServer
-	done           = make(chan bool) // marks output server is completely done after closing outputrequests
+	dlQue   chan dlTask       // pipes download requests from GoSave to RunDownloader
+	saveQue chan saveTask     // pipes save requests from RunDownloader to RunSaver
+	hBuf    chan *data.Slice  // pool of page-locked host buffers
+	done    = make(chan bool) // marks output server is completely done after closing dlQue
 )
 
-// output task
-type outTask struct {
+// download task
+type dlTask struct {
 	fname        string
 	output       *data.Slice
 	time         float64
 	unlockOutput func()
 }
 
+type saveTask dlTask
+
+// At most this many outputs can be queued for asynchronous saving to disk.
+const MaxOutputQueLen = 16
+
+var nOutBuf int // number of output buffers actually in use (<= MaxOutputQueLen)
+
+// returns host buffer for output. TODO: have more than one.
+func hostbuf() *data.Slice {
+	select {
+	case b := <-hBuf:
+		return b
+	default:
+		if nOutBuf < MaxOutputQueLen {
+			nOutBuf++
+			//util.DashExit()
+			//log.Println("using", nOutBuf, "host output buffers")
+			return cuda.NewUnifiedSlice(3, mesh)
+		}
+	}
+	panic("unreachable")
+	return nil
+}
+
 // output goroutine to be run concurrently with simulation.
-func RunOutputServer() {
+func RunDownloader() {
 	cuda.LockThread()
 
-	for t := range outputrequests {
-		H := hostbuf()
-		h := H.Write()
-
+	for t := range dlQue {
+		h := hostbuf()
 		data.Copy(h, t.output)
-
 		t.unlockOutput()
+		saveQue <- saveTask{t.fname, h, t.time, func() { hBuf <- h }}
+	}
+	close(saveQue)
+}
 
-		time.Sleep(1 * time.Second)
-		data.MustWriteFile(t.fname, h, t.time)
-
-		H.WriteDone()
+func RunSaver() {
+	for t := range saveQue {
+		data.MustWriteFile(t.fname, t.output, t.time)
+		t.unlockOutput()
 	}
 	done <- true
 }
@@ -64,6 +86,6 @@ func RunOutputServer() {
 // waits until all asynchronous output has been saved.
 func drainOutput() {
 	log.Println("flushing output")
-	close(outputrequests)
+	close(dlQue)
 	<-done
 }

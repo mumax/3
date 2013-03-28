@@ -5,9 +5,6 @@ import (
 )
 
 const (
-	Mu0    = mag.Mu0
-	Gamma0 = mag.Gamma0
-	X      = 0
-	Y      = 1
-	Z      = 2
+	Mu0    = mag.Mu0    // Permeability of vacuum in Tm/A
+	Gamma0 = mag.Gamma0 // Gyromagnetic ratio of electron in rad/Ts
 )

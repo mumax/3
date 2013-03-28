@@ -12,7 +12,7 @@ var (
 	Aex   ScalFn
 	Msat  ScalFn
 	Alpha ScalFn
-	Bext  VecFn = ConstVector(0, 0, 0)
+	B_ext VecFn = ConstVector(0, 0, 0)
 	DMI   VecFn = ConstVector(0, 0, 0)
 )
 
@@ -31,7 +31,9 @@ var (
 func initialize() {
 
 	M = newBuffered(3, "m")
+
 	Torque = newBuffered(3, "torque")
+
 	B_eff = &buffered{Synced: Torque.Synced} // shares storages with torque, but has separate autosave
 	B_eff.name = "B_eff"
 
@@ -57,7 +59,8 @@ func torqueFn(good bool) *data.Synced {
 	M.touch(good) // saves if needed
 
 	// Effective field
-	B_eff.memset(0, 0, 0)
+	bext := B_ext()
+	B_eff.memset(float32(bext[2]), float32(bext[1]), float32(bext[0]))
 	B_demag.addTo(B_eff, good) // properly locks and outputs if needed
 	B_exch.addTo(B_eff, good)
 	B_eff.touch(good)

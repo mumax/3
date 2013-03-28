@@ -91,7 +91,9 @@ func runSaver() {
 // finalizer function called upon program exit.
 // waits until all asynchronous output has been saved.
 func drainOutput() {
-	log.Println("flushing output")
-	close(dlQue)
-	<-done
+	if dlQue != nil {
+		log.Println("flushing output")
+		close(dlQue)
+		<-done
+	}
 }

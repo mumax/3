@@ -55,7 +55,7 @@ func TorqueFn(good bool) *data.Synced {
 	Torque.Memset(0, 0, 0)
 	B_demag.AddTo(Torque)
 
-	return nil
+	return &Torque.Synced
 }
 
 func Run(seconds float64) {

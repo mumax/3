@@ -9,16 +9,17 @@ import (
 
 // embedded in all solvers
 type solverCommon struct {
-	dt_si, dt_mul    float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	Dt_si, dt_mul    float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	Time             *float64 // in seconds
 	Mindt, Maxdt     float64  // minimum and maximum time step
 	Maxerr, Headroom float64  // maximum error per step
-	NSteps, undone   int      // number of good steps, undone steps
+	LastErr          float64  // error of last step
+	NSteps, NUndone  int      // number of good steps, undone steps
 	Fixdt            bool     // fixed time step?
 }
 
 func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {
-	return solverCommon{Time: time, dt_si: dt_si, dt_mul: dt_mul,
+	return solverCommon{Time: time, Dt_si: dt_si, dt_mul: dt_mul,
 		Maxerr: 1e-4, Headroom: 0.75}
 }
 
@@ -35,12 +36,12 @@ func (e *solverCommon) adaptDt(corr float64) {
 	if corr < 1./2. {
 		corr = 1. / 2.
 	}
-	e.dt_si *= corr
-	if e.Mindt != 0 && e.dt_si < e.Mindt {
-		e.dt_si = e.Mindt
+	e.Dt_si *= corr
+	if e.Mindt != 0 && e.Dt_si < e.Mindt {
+		e.Dt_si = e.Mindt
 	}
-	if e.Maxdt != 0 && e.dt_si > e.Maxdt {
-		e.dt_si = e.Maxdt
+	if e.Maxdt != 0 && e.Dt_si > e.Maxdt {
+		e.Dt_si = e.Maxdt
 	}
 }
 

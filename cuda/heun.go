@@ -24,7 +24,7 @@ func NewHeun(y *data.Synced, torqueFn func(bool) *data.Synced, dt, multiplier fl
 // Take one time step
 func (e *Heun) Step() {
 	dy0 := e.dy0
-	dt := float32(e.dt_si * e.dt_mul) // could check here if it is in float32 ranges
+	dt := float32(e.Dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
 
 	// stage 1
@@ -40,7 +40,7 @@ func (e *Heun) Step() {
 
 	// stage 2
 	{
-		*e.Time += e.dt_si
+		*e.Time += e.Dt_si
 		Dy := e.torqueFn(false)
 		dy := Dy.Read()
 
@@ -51,17 +51,18 @@ func (e *Heun) Step() {
 		}
 
 		y := e.y.Write()
-		if err < e.Maxerr || e.dt_si <= e.Mindt { // mindt check to avoid infinite loop
+		if err < e.Maxerr || e.Dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			e.NSteps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
+			e.LastErr = err
 		} else {
 			// undo bad step
 			util.Assert(!e.Fixdt)
-			*e.Time -= e.dt_si
+			*e.Time -= e.Dt_si
 			Madd2(y, y, dy0, 1, -dt)
-			e.undone++
+			e.NUndone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
 		}
 		e.y.WriteDone()

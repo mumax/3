@@ -52,13 +52,23 @@ func initialize() {
 
 func TorqueFn(good bool) *data.Synced {
 
-	Torque.Memset(0, 0, 0)
-	B_demag.AddTo(Torque)
+	Buf := Torque // first use torque buffer for effective field.
 
-	return &Torque.Synced
+	Buf.Memset(0, 0, 0)
+	B_demag.AddTo(Buf)
+	B_exch.AddTo(Buf)
+
+	b := Buf.Write() // B_eff, to be overwritten by torque.
+	m := M.Read()
+	cuda.LLGTorque(b, m, b, float32(Alpha()))
+	M.ReadDone()
+	Buf.WriteDone()
+
+	return &Buf.Synced
 }
 
 func Run(seconds float64) {
+	log.Println("run for", seconds, "s")
 	checkInited()
 	stop := Time + seconds
 	for Time < stop {
@@ -68,6 +78,7 @@ func Run(seconds float64) {
 }
 
 func Steps(n int) {
+	log.Println("run for", n, "steps")
 	checkInited()
 	for i := 0; i < n; i++ {
 		step()
@@ -81,7 +92,8 @@ func step() {
 	Solver.Step()
 	M.Normalize()
 
-	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
+	s := Solver
+	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
 }
 
 func SetM(mx, my, mz float32) {

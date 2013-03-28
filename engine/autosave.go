@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"log"
 )
 
 type autosave struct {
@@ -12,6 +13,7 @@ type autosave struct {
 }
 
 func (a *autosave) Autosave(period float64) {
+	log.Println("auto saving", a.name, "every", period, "s")
 	a.period = period
 	a.start = Time
 	a.count = 0

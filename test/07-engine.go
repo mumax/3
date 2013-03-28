@@ -18,7 +18,7 @@ func main() {
 
 	//	B_exch.Autosave(1e-9)
 	//	B_demag.Autosave(1e-9)
-	M.Autosave(2e-9)
-	Torque.Autosave(2e-9)
-	Run(10e-9)
+	M.Autosave(0.1e-9)
+	Torque.Autosave(0.1e-9)
+	Run(5e-9)
 }

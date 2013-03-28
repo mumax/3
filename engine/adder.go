@@ -7,23 +7,27 @@ import (
 	"log"
 )
 
-type AddFn func(dst *data.Slice)
+// function that adds a quantity to dst
+type addFunc func(dst *data.Slice)
 
-type Adder struct {
-	addFn AddFn // calculates quantity and add result to dst
+// Output Handle for a quantity that is not explicitly stored, but only added to an other quantity (like effective field)
+type adder struct {
+	addFn addFunc // calculates quantity and add result to dst
 	autosave
 }
 
-func NewAdder(name string, f AddFn) *Adder {
-	a := new(Adder)
+func newAdder(name string, f addFunc) *adder {
+	a := new(adder)
 	a.addFn = f
 	a.name = name
 	return a
 }
 
-func (a *Adder) AddTo(Dst *Buffered) {
+// Calls the addFunc to add the quantity to Dst. If output is needed,
+// it is first added to a separate buffer, saved, and then added to Dst.
+func (a *adder) addTo(Dst *Buffered) {
 	if a.needSave() {
-		Buf := AddBuf()
+		Buf := addBuf()
 		buf := Buf.Write()
 		cuda.Zero(buf)
 		a.addFn(buf)
@@ -39,13 +43,14 @@ func (a *Adder) AddTo(Dst *Buffered) {
 	}
 }
 
-var addBuf *Buffered
+var _addBuf *Buffered
 
-func AddBuf() *Buffered {
-	if addBuf == nil {
+// returns a GPU buffer for temporarily adding a quantity to and saving it
+func addBuf() *Buffered {
+	if _addBuf == nil {
 		util.DashExit()
 		log.Println("allocating GPU buffer for output")
-		addBuf = NewBuffered(3, "buffer")
+		_addBuf = NewBuffered(3, "buffer")
 	}
-	return addBuf
+	return _addBuf
 }

@@ -25,7 +25,7 @@ var (
 
 var (
 	M, Torque       *Buffered
-	B_demag, B_exch *Adder
+	B_demag, B_exch *adder
 )
 
 func initialize() {
@@ -35,13 +35,13 @@ func initialize() {
 
 	demag_ := cuda.NewDemag(mesh)
 	vol := data.NilSlice(1, mesh)
-	B_demag = NewAdder("B_demag", func(dst *data.Slice) {
+	B_demag = newAdder("B_demag", func(dst *data.Slice) {
 		m := M.Read()
 		demag_.Exec(dst, m, vol, Mu0*Msat())
 		M.ReadDone()
 	})
 
-	B_exch = NewAdder("B_exch", func(dst *data.Slice) {
+	B_exch = newAdder("B_exch", func(dst *data.Slice) {
 		m := M.Read()
 		cuda.AddExchange(dst, m, Aex(), Mu0*Msat())
 		M.ReadDone()
@@ -59,8 +59,8 @@ func TorqueFn(good bool) *data.Synced {
 	// Effective field
 	Buf := Torque // first use torque buffer for effective field.
 	Buf.Memset(0, 0, 0)
-	B_demag.AddTo(Buf)
-	B_exch.AddTo(Buf)
+	B_demag.addTo(Buf) // properly locks and outputs if needed
+	B_exch.addTo(Buf)
 
 	// Torque
 	b := Buf.Write() // B_eff, to be overwritten by torque.

@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// keeps info needed to decide when a quantity needs to be periodically saved
 type autosave struct {
 	period float64 // How often to save
 	start  float64 // Starting point
@@ -12,6 +13,8 @@ type autosave struct {
 	name   string
 }
 
+// Register a quantity for auto-saving every period (in seconds).
+// Use zero period to disable auto-save.
 func (a *autosave) Autosave(period float64) {
 	log.Println("auto saving", a.name, "every", period, "s")
 	a.period = period

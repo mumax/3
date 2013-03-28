@@ -25,8 +25,8 @@ func newAdder(name string, f addFunc) *adder {
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,
 // it is first added to a separate buffer, saved, and then added to Dst.
-func (a *adder) addTo(Dst *Buffered) {
-	if a.needSave() {
+func (a *adder) addTo(Dst *Buffered, goodstep bool) {
+	if goodstep && a.needSave() {
 		Buf := addBuf()
 		buf := Buf.Write()
 		cuda.Zero(buf)

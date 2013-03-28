@@ -59,8 +59,8 @@ func TorqueFn(good bool) *data.Synced {
 	// Effective field
 	Buf := Torque // first use torque buffer for effective field.
 	Buf.Memset(0, 0, 0)
-	B_demag.addTo(Buf) // properly locks and outputs if needed
-	B_exch.addTo(Buf)
+	B_demag.addTo(Buf, good) // properly locks and outputs if needed
+	B_exch.addTo(Buf, good)
 
 	// Torque
 	b := Buf.Write() // B_eff, to be overwritten by torque.

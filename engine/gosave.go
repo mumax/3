@@ -25,7 +25,10 @@ func GoSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
 	outputrequests <- outTask{fname, output, t, unlockOutput}
 }
 
-var outputrequests chan outTask
+var (
+	outputrequests chan outTask
+	done           = make(chan bool)
+)
 
 type outTask struct {
 	fname        string
@@ -49,16 +52,11 @@ func RunOutputServer() {
 
 		H.WriteDone()
 	}
-	// done<-
+	done <- true
 }
 
 func drainOutput() {
-	log.Println("TODO: flushing output")
-	//	if gpubuf != nil {
-	//		log.Println("flushing output")
-	//		for i := 0; i < nbuf; i++ {
-	//			<-gpubuf
-	//			<-hostbuf
-	//		}
-	//	}
+	log.Println("flushing output")
+	close(outputrequests)
+	<-done
 }

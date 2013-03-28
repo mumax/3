@@ -31,6 +31,7 @@ var (
 func initialize() {
 
 	M = NewBuffered(3, "m")
+	Torque = NewBuffered(3, "torque")
 
 	demag_ := cuda.NewDemag(mesh)
 	vol := data.NilSlice(3, mesh)
@@ -46,14 +47,12 @@ func initialize() {
 		M.ReadDone()
 	})
 
-	Torque = NewBuffered(3, "torque")
-
 	Solver = cuda.NewHeun(&M.Synced, TorqueFn, 1e-15, Gamma0, &Time)
 }
 
 func TorqueFn(good bool) *data.Synced {
 
-	//Torque.Memset(0, 0, 0)
+	Torque.Memset(0, 0, 0)
 	B_demag.AddTo(Torque)
 
 	return nil

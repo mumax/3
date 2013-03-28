@@ -18,10 +18,17 @@ func NewBuffered(nComp int, name string) *Buffered {
 	return b
 }
 
-// autosaves if needed
+// Autosaves if needed.
 func (b *Buffered) Touch() {
 	if b.needSave() {
 		fmt.Println("save", b.name)
 		b.saved() // count++ hazard
 	}
+}
+
+// Memset with synchronization.
+func (b *Buffered) Memset(val ...float32) {
+	s := b.Write()
+	cuda.Memset(s, val...)
+	b.WriteDone()
 }

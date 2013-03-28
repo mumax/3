@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
-	"time"
 )
 
 var _hostbuf *data.Synced
@@ -18,6 +17,7 @@ func hostbuf() *data.Synced {
 	return _hostbuf
 }
 
+// Asynchronously save output to file. Calls unlockOutput() to unlock output read lock.
 func GoSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
 	if outputrequests == nil {
 		outputrequests = make(chan outTask)
@@ -27,10 +27,11 @@ func GoSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
 }
 
 var (
-	outputrequests chan outTask
-	done           = make(chan bool)
+	outputrequests chan outTask      // pipes output requests from GoSave to RunOutputServer
+	done           = make(chan bool) // marks output server is completely done after closing outputrequests
 )
 
+// output task
 type outTask struct {
 	fname        string
 	output       *data.Slice
@@ -38,6 +39,7 @@ type outTask struct {
 	unlockOutput func()
 }
 
+// output goroutine to be run concurrently with simulation.
 func RunOutputServer() {
 	cuda.LockThread()
 
@@ -49,7 +51,6 @@ func RunOutputServer() {
 
 		t.unlockOutput()
 
-		time.Sleep(1 * time.Second) // todo: rm
 		data.MustWriteFile(t.fname, h, t.time)
 
 		H.WriteDone()
@@ -57,6 +58,8 @@ func RunOutputServer() {
 	done <- true
 }
 
+// finalizer function called upon program exit.
+// waits until all asynchronous output has been saved.
 func drainOutput() {
 	log.Println("flushing output")
 	close(outputrequests)

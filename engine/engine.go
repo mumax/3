@@ -103,11 +103,9 @@ func Steps(n int) {
 }
 
 func step() {
-
-	Solver.Step()
-	M.normalize()
-
 	s := Solver
+	s.Step()
+	M.normalize()
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
 }
 

@@ -24,14 +24,16 @@ var (
 )
 
 var (
-	M, Torque       *buffered
-	B_demag, B_exch *adder
+	M, B_eff, Torque *buffered
+	B_demag, B_exch  *adder
 )
 
 func initialize() {
 
 	M = newBuffered(3, "m")
 	Torque = newBuffered(3, "torque")
+	B_eff = &buffered{Synced: Torque.Synced} // shares storages with torque, but has separate autosave
+	B_eff.name = "B_eff"
 
 	demag_ := cuda.NewDemag(mesh)
 	vol := data.NilSlice(1, mesh)
@@ -55,21 +57,20 @@ func torqueFn(good bool) *data.Synced {
 	M.touch(good) // saves if needed
 
 	// Effective field
-	Buf := Torque // first use torque buffer for effective field.
-	Buf.memset(0, 0, 0)
-	B_demag.addTo(Buf, good) // properly locks and outputs if needed
-	B_exch.addTo(Buf, good)
+	B_eff.memset(0, 0, 0)
+	B_demag.addTo(B_eff, good) // properly locks and outputs if needed
+	B_exch.addTo(B_eff, good)
+	B_eff.touch(good)
 
 	// Torque
-	b := Buf.Write() // B_eff, to be overwritten by torque.
+	b := Torque.Write() // B_eff, to be overwritten by torque.
 	m := M.Read()
 	cuda.LLGTorque(b, m, b, float32(Alpha()))
 	M.ReadDone()
-	Buf.WriteDone()
-
+	Torque.WriteDone()
 	Torque.touch(good) // saves if needed
 
-	return &Buf.Synced
+	return &Torque.Synced
 }
 
 func Run(seconds float64) {

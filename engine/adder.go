@@ -10,7 +10,8 @@ import (
 // function that adds a quantity to dst
 type addFunc func(dst *data.Slice)
 
-// Output Handle for a quantity that is not explicitly stored, but only added to an other quantity (like effective field)
+// Output Handle for a quantity that is not explicitly stored,
+// but only added to an other quantity (like effective field)
 type adder struct {
 	addFn addFunc // calculates quantity and add result to dst
 	autosave
@@ -34,7 +35,8 @@ func (a *adder) addTo(Dst *Buffered, goodstep bool) {
 		dst := Dst.Write()
 		cuda.Madd2(dst, dst, buf, 1, 1)
 		Dst.WriteDone()
-		GoSave(a.fname(), dst, Time, func() { Buf.WriteDone() }) // Buf only unlocked here to avoid overwite by next AddTo
+		// Buf only unlocked here to avoid overwite by next addTo
+		GoSave(a.fname(), dst, Time, func() { Buf.WriteDone() })
 		a.saved()
 	} else {
 		dst := Dst.Write()

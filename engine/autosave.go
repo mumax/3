@@ -22,6 +22,8 @@ func (a *autosave) Autosave(period float64) {
 	a.count = 0
 }
 
+// returns true when the time is right to save.
+// after saving, saved() should be called
 func (a *autosave) needSave() bool {
 	if a.period == 0 {
 		return false
@@ -30,10 +32,12 @@ func (a *autosave) needSave() bool {
 	return t-float64(a.count)*a.period >= a.period
 }
 
+// to be called after saving the quantity
 func (a *autosave) saved() {
 	a.count++
 }
 
+// filename to save the quantity under
 func (a *autosave) fname() string {
 	return fmt.Sprintf("%s%s%06d.dump", OD, a.name, a.count)
 }

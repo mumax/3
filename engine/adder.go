@@ -26,13 +26,7 @@ func (a *Adder) AddTo(b *Buffered) {
 		dst := buf.Write()
 		cuda.Zero(dst)
 		a.addFn(dst)
-		buf.WriteDone()
-
-		//out := buf.Read()
-		go func() {
-			log.Println("save", b.fname())
-			buf.ReadDone()
-		}()
+		GoSave(a.fname(), dst, Time, func() { buf.WriteDone() })
 	} else {
 		dst := b.Write()
 		a.addFn(dst)
@@ -44,7 +38,7 @@ var addBuf *Buffered
 
 func AddBuf() *Buffered {
 	if addBuf == nil {
-		log.Println("allocating buffer for output")
+		log.Println("allocating GPU buffer for output")
 		addBuf = NewBuffered(3, "buffer")
 	}
 	return addBuf

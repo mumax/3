@@ -68,6 +68,7 @@ func TorqueFn(good bool) *data.Synced {
 	cuda.LLGTorque(b, m, b, float32(Alpha()))
 	M.ReadDone()
 	Buf.WriteDone()
+
 	if good {
 		Torque.Touch() // saves if needed
 	}

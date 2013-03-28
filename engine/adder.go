@@ -26,7 +26,7 @@ func newAdder(name string, f addFunc) *adder {
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,
 // it is first added to a separate buffer, saved, and then added to Dst.
-func (a *adder) addTo(Dst *Buffered, goodstep bool) {
+func (a *adder) addTo(Dst *buffered, goodstep bool) {
 	if goodstep && a.needSave() {
 		Buf := addBuf()
 		buf := Buf.Write()
@@ -45,14 +45,14 @@ func (a *adder) addTo(Dst *Buffered, goodstep bool) {
 	}
 }
 
-var _addBuf *Buffered
+var _addBuf *buffered
 
 // returns a GPU buffer for temporarily adding a quantity to and saving it
-func addBuf() *Buffered {
+func addBuf() *buffered {
 	if _addBuf == nil {
 		util.DashExit()
 		log.Println("allocating GPU buffer for output")
-		_addBuf = NewBuffered(3, "buffer")
+		_addBuf = newBuffered(3, "buffer")
 	}
 	return _addBuf
 }

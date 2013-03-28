@@ -5,35 +5,36 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-type Buffered struct {
+// Output Handle for a quantity that is stored on the GPU.
+type buffered struct {
 	data.Synced
 	autosave
 }
 
-func NewBuffered(nComp int, name string) *Buffered {
-	b := new(Buffered)
+func newBuffered(nComp int, name string) *buffered {
+	b := new(buffered)
 	b.Synced = *data.NewSynced(cuda.NewSlice(nComp, mesh))
 	b.name = name
 	return b
 }
 
-// Autosaves if needed.
-func (b *Buffered) Touch() {
-	if b.needSave() {
+// notify the handle that it may need to be saved
+func (b *buffered) touch(goodstep bool) {
+	if goodstep && b.needSave() {
 		GoSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
-		b.saved() // count++ hazard?
+		b.saved()
 	}
 }
 
 // Memset with synchronization.
-func (b *Buffered) Memset(val ...float32) {
+func (b *buffered) memset(val ...float32) {
 	s := b.Write()
 	cuda.Memset(s, val...)
 	b.WriteDone()
 }
 
 // Normalize with synchronization.
-func (b *Buffered) Normalize() {
+func (b *buffered) normalize() {
 	s := b.Write()
 	cuda.Normalize(s)
 	b.WriteDone()

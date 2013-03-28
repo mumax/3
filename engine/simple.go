@@ -24,14 +24,14 @@ var (
 )
 
 var (
-	M, Torque       *Buffered
+	M, Torque       *buffered
 	B_demag, B_exch *adder
 )
 
 func initialize() {
 
-	M = NewBuffered(3, "m")
-	Torque = NewBuffered(3, "torque")
+	M = newBuffered(3, "m")
+	Torque = newBuffered(3, "torque")
 
 	demag_ := cuda.NewDemag(mesh)
 	vol := data.NilSlice(1, mesh)
@@ -52,13 +52,11 @@ func initialize() {
 
 func TorqueFn(good bool) *data.Synced {
 
-	if good {
-		M.Touch() // saves if needed
-	}
+	M.touch(good) // saves if needed
 
 	// Effective field
 	Buf := Torque // first use torque buffer for effective field.
-	Buf.Memset(0, 0, 0)
+	Buf.memset(0, 0, 0)
 	B_demag.addTo(Buf, good) // properly locks and outputs if needed
 	B_exch.addTo(Buf, good)
 
@@ -69,9 +67,7 @@ func TorqueFn(good bool) *data.Synced {
 	M.ReadDone()
 	Buf.WriteDone()
 
-	if good {
-		Torque.Touch() // saves if needed
-	}
+	Torque.touch(good) // saves if needed
 
 	return &Buf.Synced
 }
@@ -98,7 +94,7 @@ func Steps(n int) {
 func step() {
 
 	Solver.Step()
-	M.Normalize()
+	M.normalize()
 
 	s := Solver
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
@@ -106,8 +102,8 @@ func step() {
 
 func SetM(mx, my, mz float32) {
 	checkInited()
-	M.Memset(mx, my, mz)
-	M.Normalize()
+	M.memset(mx, my, mz)
+	M.normalize()
 }
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

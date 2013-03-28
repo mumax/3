@@ -24,56 +24,62 @@ var (
 )
 
 var (
-	M, B_eff, Torque *buffered
-	B_demag, B_exch  *adder
+	m, b_eff, torque                 *buffered
+	b_demag, b_exch                  *adder
+	M, B_eff, Torque, B_demag, B_exh Handle
 )
 
 func initialize() {
 
-	M = newBuffered(3, "m")
+	m = newBuffered(3, "m")
+	M = m
 
-	Torque = newBuffered(3, "torque")
+	torque = newBuffered(3, "torque")
+	Torque = torque
 
-	B_eff = &buffered{Synced: Torque.Synced} // shares storages with torque, but has separate autosave
-	B_eff.name = "B_eff"
+	b_eff = &buffered{Synced: torque.Synced} // shares storages with torque, but has separate autosave
+	b_eff.name = "B_eff"
+	B_eff = b_eff
 
 	demag_ := cuda.NewDemag(mesh)
 	vol := data.NilSlice(1, mesh)
-	B_demag = newAdder("B_demag", func(dst *data.Slice) {
-		m := M.Read()
-		demag_.Exec(dst, m, vol, Mu0*Msat())
-		M.ReadDone()
+	b_demag = newAdder("B_demag", func(dst *data.Slice) {
+		m_ := m.Read()
+		demag_.Exec(dst, m_, vol, Mu0*Msat())
+		m.ReadDone()
 	})
+	B_demag = b_demag
 
-	B_exch = newAdder("B_exch", func(dst *data.Slice) {
-		m := M.Read()
-		cuda.AddExchange(dst, m, Aex(), Mu0*Msat())
-		M.ReadDone()
+	b_exch = newAdder("B_exch", func(dst *data.Slice) {
+		m_ := m.Read()
+		cuda.AddExchange(dst, m_, Aex(), Mu0*Msat())
+		m.ReadDone()
 	})
+	B_exh = b_exch
 
-	Solver = cuda.NewHeun(&M.Synced, torqueFn, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(&m.Synced, torqueFn, 1e-15, Gamma0, &Time)
 }
 
 func torqueFn(good bool) *data.Synced {
 
-	M.touch(good) // saves if needed
+	m.touch(good) // saves if needed
 
 	// Effective field
-	B_eff.memset(0, 0, 0)      // !! although demag overwrites, must be zero in case we save...
-	B_demag.addTo(B_eff, good) // !! this one has to be the first addTo
-	B_exch.addTo(B_eff, good)
-	B_eff.touch(good)
-	addB_ext(B_eff)
+	b_eff.memset(0, 0, 0)      // !! although demag overwrites, must be zero in case we save...
+	b_demag.addTo(b_eff, good) // !! this one has to be the first addTo
+	b_exch.addTo(b_eff, good)
+	b_eff.touch(good)
+	addB_ext(b_eff)
 
 	// Torque
-	b := Torque.Write() // B_eff, to be overwritten by torque.
-	m := M.Read()
-	cuda.LLGTorque(b, m, b, float32(Alpha()))
-	M.ReadDone()
-	Torque.WriteDone()
-	Torque.touch(good) // saves if needed
+	b := torque.Write() // B_eff, to be overwritten by torque.
+	m_ := m.Read()
+	cuda.LLGTorque(b, m_, b, float32(Alpha()))
+	m.ReadDone()
+	torque.WriteDone()
+	torque.touch(good) // saves if needed
 
-	return &Torque.Synced
+	return &torque.Synced
 }
 
 func addB_ext(Dst *buffered) {
@@ -105,14 +111,14 @@ func Steps(n int) {
 func step() {
 	s := Solver
 	s.Step()
-	M.normalize()
+	m.normalize()
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
 }
 
 func SetM(mx, my, mz float32) {
 	checkInited()
-	M.memset(mx, my, mz)
-	M.normalize()
+	m.memset(mx, my, mz)
+	m.normalize()
 }
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

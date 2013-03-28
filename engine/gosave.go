@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
+	"time"
 )
 
 var _hostbuf *data.Synced
@@ -48,6 +49,7 @@ func RunOutputServer() {
 
 		t.unlockOutput()
 
+		time.Sleep(1 * time.Second) // todo: rm
 		data.MustWriteFile(t.fname, h, t.time)
 
 		H.WriteDone()

@@ -21,7 +21,7 @@ func newBuffered(nComp int, name string) *buffered {
 // notify the handle that it may need to be saved
 func (b *buffered) touch(goodstep bool) {
 	if goodstep && b.needSave() {
-		GoSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
+		goSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
 		b.saved()
 	}
 }

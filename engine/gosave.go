@@ -11,21 +11,21 @@ import (
 // During the download, further computations can continue. When the download is done, unlockOutput()
 // is called so that the output buffer can be written again. Then the output host copy is
 // queued for saving to disk. 
-func GoSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
+func goSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
 	if dlQue == nil {
 		dlQue = make(chan dlTask)
 		saveQue = make(chan saveTask)
-		hBuf = make(chan *data.Slice, MaxOutputQueLen)
-		go RunDownloader()
-		go RunSaver()
+		hBuf = make(chan *data.Slice, maxOutputQueLen)
+		go runDownloader()
+		go runSaver()
 	}
 	dlQue <- dlTask{fname, output, t, unlockOutput}
 }
 
 var (
-	dlQue   chan dlTask       // pipes download requests from GoSave to RunDownloader
-	saveQue chan saveTask     // pipes save requests from RunDownloader to RunSaver
-	hBuf    chan *data.Slice  // pool of page-locked host buffers
+	dlQue   chan dlTask       // passes download requests from goSave to runDownloader
+	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
+	hBuf    chan *data.Slice  // pool of page-locked host buffers for save queue
 	done    = make(chan bool) // marks output server is completely done after closing dlQue
 )
 
@@ -37,23 +37,24 @@ type dlTask struct {
 	unlockOutput func()
 }
 
+// save task
 type saveTask dlTask
 
 // At most this many outputs can be queued for asynchronous saving to disk.
-const MaxOutputQueLen = 16
+const maxOutputQueLen = 16
 
-var nOutBuf int // number of output buffers actually in use (<= MaxOutputQueLen)
+var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
 
-// returns host buffer for output. TODO: have more than one.
+// returns host buffer for storing output before being flushed to disk.
+// takes one from the pool or allocates a new one when the pool is empty 
+// and less than maxOutputQueLen buffers already are in use.
 func hostbuf() *data.Slice {
 	select {
 	case b := <-hBuf:
 		return b
 	default:
-		if nOutBuf < MaxOutputQueLen {
+		if nOutBuf < maxOutputQueLen {
 			nOutBuf++
-			//util.DashExit()
-			//log.Println("using", nOutBuf, "host output buffers")
 			return cuda.NewUnifiedSlice(3, mesh)
 		}
 	}
@@ -61,8 +62,10 @@ func hostbuf() *data.Slice {
 	return nil
 }
 
-// output goroutine to be run concurrently with simulation.
-func RunDownloader() {
+// continuously takes download tasks and queues corresponding save tasks.
+// the downloader queue is not buffered and we want to use at most one GPU
+// output buffer. Only one PCIe download at a time can proceed anyway.
+func runDownloader() {
 	cuda.LockThread()
 
 	for t := range dlQue {
@@ -74,7 +77,10 @@ func RunDownloader() {
 	close(saveQue)
 }
 
-func RunSaver() {
+// continuously takes save tasks and flushes them to disk.
+// the save queue can accommodate many outputs (stored on host).
+// the rather big queue allows big output bursts to be concurrent.
+func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)
 		t.unlockOutput()

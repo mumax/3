@@ -85,11 +85,11 @@ func step() {
 	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
 }
 
-//func SetM(mx, my, mz float64) {
-//	checkInited()
-//	cuda.Memset(m, float32(mz), float32(my), float32(mx))
-//	cuda.Normalize(m)
-//}
+func SetM(mx, my, mz float32) {
+	checkInited()
+	M.Memset(mx, my, mz)
+	M.Normalize()
+}
 
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	if mesh != nil {

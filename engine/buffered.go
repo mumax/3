@@ -32,3 +32,10 @@ func (b *Buffered) Memset(val ...float32) {
 	cuda.Memset(s, val...)
 	b.WriteDone()
 }
+
+// Normalize with synchronization.
+func (b *Buffered) Normalize() {
+	s := b.Write()
+	cuda.Normalize(s)
+	b.WriteDone()
+}

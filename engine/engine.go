@@ -59,11 +59,11 @@ func torqueFn(good bool) *data.Synced {
 	M.touch(good) // saves if needed
 
 	// Effective field
-	bext := B_ext()
-	B_eff.memset(float32(bext[2]), float32(bext[1]), float32(bext[0]))
-	B_demag.addTo(B_eff, good) // properly locks and outputs if needed
+	B_eff.memset(0, 0, 0)      // !! although demag overwrites, must be zero in case we save...
+	B_demag.addTo(B_eff, good) // !! this one has to be the first addTo
 	B_exch.addTo(B_eff, good)
 	B_eff.touch(good)
+	addB_ext(B_eff)
 
 	// Torque
 	b := Torque.Write() // B_eff, to be overwritten by torque.
@@ -74,6 +74,13 @@ func torqueFn(good bool) *data.Synced {
 	Torque.touch(good) // saves if needed
 
 	return &Torque.Synced
+}
+
+func addB_ext(Dst *buffered) {
+	bext := B_ext()
+	dst := Dst.Write()
+	cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
+	Dst.WriteDone()
 }
 
 func Run(seconds float64) {

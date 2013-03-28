@@ -24,7 +24,7 @@ func main() {
 
 	Run(5e-9)
 
-	B_ext = func() [3]float64 { panic("ok"); return [3]float64{} } //ConstVector(-24.6E-3,  4.3E-3, 0)
+	B_ext = ConstVector(-24.6E-3, 4.3E-3, 0)
 	Alpha = Const(0.02)
 	M.Autosave(0.01e-9)
 	Run(1e-9)

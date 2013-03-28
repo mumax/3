@@ -47,10 +47,10 @@ func initialize() {
 		M.ReadDone()
 	})
 
-	Solver = cuda.NewHeun(&M.Synced, TorqueFn, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(&M.Synced, torqueFn, 1e-15, Gamma0, &Time)
 }
 
-func TorqueFn(good bool) *data.Synced {
+func torqueFn(good bool) *data.Synced {
 
 	M.touch(good) // saves if needed
 

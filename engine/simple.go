@@ -52,17 +52,25 @@ func initialize() {
 
 func TorqueFn(good bool) *data.Synced {
 
-	Buf := Torque // first use torque buffer for effective field.
+	if good {
+		M.Touch() // saves if needed
+	}
 
+	// Effective field
+	Buf := Torque // first use torque buffer for effective field.
 	Buf.Memset(0, 0, 0)
 	B_demag.AddTo(Buf)
 	B_exch.AddTo(Buf)
 
+	// Torque
 	b := Buf.Write() // B_eff, to be overwritten by torque.
 	m := M.Read()
 	cuda.LLGTorque(b, m, b, float32(Alpha()))
 	M.ReadDone()
 	Buf.WriteDone()
+	if good {
+		Torque.Touch() // saves if needed
+	}
 
 	return &Buf.Synced
 }
@@ -71,23 +79,22 @@ func Run(seconds float64) {
 	log.Println("run for", seconds, "s")
 	checkInited()
 	stop := Time + seconds
+	defer util.DashExit()
 	for Time < stop {
 		step()
 	}
-	util.DashExit()
 }
 
 func Steps(n int) {
 	log.Println("run for", n, "steps")
 	checkInited()
+	defer util.DashExit()
 	for i := 0; i < n; i++ {
 		step()
 	}
-	util.DashExit()
 }
 
 func step() {
-	M.Touch() // saves if needed
 
 	Solver.Step()
 	M.Normalize()

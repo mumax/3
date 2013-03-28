@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"fmt"
 )
 
 type Buffered struct {
@@ -21,8 +20,8 @@ func NewBuffered(nComp int, name string) *Buffered {
 // Autosaves if needed.
 func (b *Buffered) Touch() {
 	if b.needSave() {
-		fmt.Println("save", b.name)
-		b.saved() // count++ hazard
+		GoSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
+		b.saved() // count++ hazard?
 	}
 }
 

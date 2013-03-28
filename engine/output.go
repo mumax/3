@@ -3,9 +3,8 @@ package engine
 // asynchronous output server.
 
 import (
-	//	"code.google.com/p/mx3/cuda"
-	//	"code.google.com/p/mx3/data"
-	"log"
+//	"code.google.com/p/mx3/cuda"
+//	"code.google.com/p/mx3/data"
 )
 
 //const nbuf = 1 // todo: use a few more if we have enough memory
@@ -49,13 +48,3 @@ import (
 //	}
 //}
 //
-func drainOutput() {
-	log.Println("TODO: flushing output")
-	//	if gpubuf != nil {
-	//		log.Println("flushing output")
-	//		for i := 0; i < nbuf; i++ {
-	//			<-gpubuf
-	//			<-hostbuf
-	//		}
-	//	}
-}

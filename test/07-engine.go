@@ -17,6 +17,6 @@ func main() {
 	Alpha = Const(1)
 
 	//B_exch.Autosave(0.1e-9)
-	//M.Autosave(0.1e-9)
+	M.Autosave(0.1e-9)
 	Run(10e-9)
 }

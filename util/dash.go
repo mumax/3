@@ -6,16 +6,23 @@ import (
 	"time"
 )
 
-var lastdash = time.Now()
+var (
+	lastdash    = time.Now()
+	dashVisible bool
+)
 
 func Dashf(format string, v ...interface{}) {
 	if time.Since(lastdash) > 100*time.Millisecond {
 		lastdash = time.Now()
 		fmt.Fprintf(os.Stderr, format, v...)
 		fmt.Fprint(os.Stderr, "\u000D")
+		dashVisible = true
 	}
 }
 
 func DashExit() {
-	fmt.Fprintln(os.Stderr)
+	if dashVisible {
+		fmt.Fprintln(os.Stderr)
+		dashVisible = false
+	}
 }

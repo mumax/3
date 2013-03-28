@@ -34,7 +34,7 @@ func initialize() {
 	Torque = NewBuffered(3, "torque")
 
 	demag_ := cuda.NewDemag(mesh)
-	vol := data.NilSlice(3, mesh)
+	vol := data.NilSlice(1, mesh)
 	B_demag = NewAdder("B_demag", func(dst *data.Slice) {
 		m := M.Read()
 		demag_.Exec(dst, m, vol, Mu0*Msat())
@@ -79,8 +79,7 @@ func step() {
 	M.Touch() // saves if needed
 
 	Solver.Step()
-	//cuda.Normalize(m)
-	//M.WriteDone()
+	M.Normalize()
 
 	//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", e.NSteps, e.undone, *e.Time, e.dt_si, err) // TODO: move
 }

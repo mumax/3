@@ -1,10 +1,8 @@
 package engine
 
-import (
-	"code.google.com/p/mx3/mag"
-)
+import "math"
 
 const (
-	Mu0    = mag.Mu0    // Permeability of vacuum in Tm/A
-	Gamma0 = mag.Gamma0 // Gyromagnetic ratio of electron in rad/Ts
+	Gamma0 = 1.7595e11          // Gyromagnetic ratio of electron, in rad/Ts
+	Mu0    = 4 * math.Pi * 1e-7 // Permeability of vacuum in Tm/A
 )

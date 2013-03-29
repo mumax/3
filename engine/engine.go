@@ -29,7 +29,7 @@ var (
 	Solver *cuda.Heun
 )
 
-// hidden
+// hidden quantities
 var (
 	mesh *data.Mesh
 	m    *buffered
@@ -107,6 +107,7 @@ func initialize() {
 	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
+// Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	log.Println("run for", seconds, "s")
 	checkInited()
@@ -117,6 +118,7 @@ func Run(seconds float64) {
 	}
 }
 
+// Run the simulation for a number of steps.
 func Steps(n int) {
 	log.Println("run for", n, "steps")
 	checkInited()
@@ -132,12 +134,15 @@ func step() {
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
 }
 
+// Set the magnetization to uniform state.
 func SetM(mx, my, mz float32) {
 	checkInited()
 	m.memset(mx, my, mz)
 	m.normalize()
 }
 
+// Set the simulation mesh to Nx x Ny x Nz cells of given size.
+// Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	if mesh != nil {
 		log.Fatal("mesh already set")

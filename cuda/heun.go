@@ -12,13 +12,14 @@ type Heun struct {
 	y        *data.Synced            // the quantity to be time stepped
 	dy0      *data.Slice             // time derivative of y <- buffer could be released after step?
 	torqueFn func(bool) *data.Synced // updates dy
+	postStep func(*data.Slice)       // called on y after successful step, typically normalizes magnetization
 }
 
-func NewHeun(y *data.Synced, torqueFn func(bool) *data.Synced, dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Synced, torqueFn func(bool) *data.Synced, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	m := y.Mesh()
 	dy0 := NewSlice(3, m)
-	return &Heun{newSolverCommon(dt, multiplier, time), y, dy0, torqueFn}
+	return &Heun{newSolverCommon(dt, multiplier, time), y, dy0, torqueFn, postStep}
 }
 
 // Take one time step
@@ -54,6 +55,7 @@ func (e *Heun) Step() {
 		if err < e.Maxerr || e.Dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
+			e.postStep(y)
 			e.NSteps++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
 			e.LastErr = err
@@ -69,25 +71,6 @@ func (e *Heun) Step() {
 		Dy.ReadDone()
 	}
 }
-
-// Run for a duration in seconds
-//func (e *Heun) Advance(seconds float64) {
-//	log.Println("heun solver:", seconds, "s")
-//	stop := *e.Time + seconds
-//	for *e.Time < stop {
-//		e.Step()
-//	}
-//	util.DashExit()
-//}
-
-// Run for a number of steps
-//func (e *Heun) Steps(steps int) {
-//	log.Println("heun solver:", steps, "steps")
-//	for s := 0; s < steps; s++ {
-//		e.Step()
-//	}
-//	util.DashExit()
-//}
 
 // Run until we are only maxerr away from equilibrium.
 // Typ. maxerr: 1e-7 (cannot go lower).

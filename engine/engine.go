@@ -16,17 +16,21 @@ var (
 	DMI   VecFn = ConstVector(0, 0, 0)
 )
 
+// Accessible quantities
 var (
-	mesh   *data.Mesh
-	solver *cuda.Heun
-	Time   float64
-	Solver *cuda.Heun
+	M, B_eff, Torque, B_demag, B_exh Handle
+	Time                             float64
+	Solver                           *cuda.Heun
 )
 
+// 
 var (
-	m, b_eff, torque                 *buffered
-	b_demag, b_exch                  *adder
-	M, B_eff, Torque, B_demag, B_exh Handle
+	mesh                      *data.Mesh
+	solver                    *cuda.Heun
+	m, b_eff, torque, b_demag *buffered
+	b_exch                    *adder
+	demag_                    *cuda.DemagConvolution
+	vol                       *data.Slice
 )
 
 func initialize() {
@@ -41,13 +45,11 @@ func initialize() {
 	b_eff.name = "B_eff"
 	B_eff = b_eff
 
-	demag_ := cuda.NewDemag(mesh)
-	vol := data.NilSlice(1, mesh)
-	b_demag = newAdder("B_demag", func(dst *data.Slice) {
-		m_ := m.Read()
-		demag_.Exec(dst, m_, vol, Mu0*Msat())
-		m.ReadDone()
-	})
+	vol = data.NilSlice(1, mesh)
+
+	demag_ = cuda.NewDemag(mesh)
+	b_demag = &buffered{Synced: torque.Synced}
+	b_demag.name = "B_demag"
 	B_demag = b_demag
 
 	b_exch = newAdder("B_exch", func(dst *data.Slice) {
@@ -64,16 +66,24 @@ func torqueFn(good bool) *data.Synced {
 
 	m.touch(good) // saves if needed
 
-	// Effective field
-	b_eff.memset(0, 0, 0)      // !! although demag overwrites, must be zero in case we save...
-	b_demag.addTo(b_eff, good) // !! this one has to be the first addTo
+	// Demag field
+	m_ := m.Read()
+	b_d := b_demag.Write()
+	demag_.Exec(b_d, m_, vol, Mu0*Msat())
+	m.ReadDone()
+	b_demag.WriteDone()
+	b_demag.touch(good)
+
+	// Exchange field
 	b_exch.addTo(b_eff, good)
 	b_eff.touch(good)
+
+	// External field
 	addB_ext(b_eff)
 
 	// Torque
 	b := torque.Write() // B_eff, to be overwritten by torque.
-	m_ := m.Read()
+	m_ = m.Read()
 	cuda.LLGTorque(b, m_, b, float32(Alpha()))
 	m.ReadDone()
 	torque.WriteDone()

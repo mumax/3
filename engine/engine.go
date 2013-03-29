@@ -28,28 +28,29 @@ var (
 	mesh                      *data.Mesh
 	solver                    *cuda.Heun
 	m, b_eff, torque, b_demag *buffered
-	b_exch                    *adder
-	demag_                    *cuda.DemagConvolution
+	b_exch, b_ext             *adder
 	vol                       *data.Slice
 )
 
 func initialize() {
 
-	m = newBuffered(3, "m")
+	// these 2 GPU arrays are re-used to stored various quantities.
+	arr1, arr2 := cuda.NewSynced(3, mesh), cuda.NewSynced(3, mesh)
+
+	m = newBuffered(arr1, "m", nil)
 	M = m
 
-	torque = newBuffered(3, "torque")
-	Torque = torque
-
-	b_eff = &buffered{Synced: torque.Synced} // shares storages with torque, but has separate autosave
-	b_eff.name = "B_eff"
+	b_eff = newBuffered(arr2, "B_eff", nil)
 	B_eff = b_eff
 
 	vol = data.NilSlice(1, mesh)
 
-	demag_ = cuda.NewDemag(mesh)
-	b_demag = &buffered{Synced: torque.Synced}
-	b_demag.name = "B_demag"
+	demag_ := cuda.NewDemag(mesh)
+	b_demag = newBuffered(arr2, "B_demag", func(b *data.Slice) {
+		m_ := m.Read()
+		demag_.Exec(b, m_, vol, Mu0*Msat())
+		m.ReadDone()
+	})
 	B_demag = b_demag
 
 	b_exch = newAdder("B_exch", func(dst *data.Slice) {
@@ -59,44 +60,28 @@ func initialize() {
 	})
 	B_exh = b_exch
 
-	Solver = cuda.NewHeun(&m.Synced, torqueFn, 1e-15, Gamma0, &Time)
-}
+	b_ext = newAdder("B_ext", func(dst *data.Slice) {
+		bext := B_ext()
+		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
+	})
 
-func torqueFn(good bool) *data.Synced {
+	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
+		m_ := m.Read()
+		cuda.LLGTorque(b, m_, b, float32(Alpha()))
+		m.ReadDone()
+	})
+	Torque = torque
 
-	m.touch(good) // saves if needed
+	torqueFn := func(good bool) *data.Synced {
+		m.touch(good) // saves if needed
+		b_demag.update(good)
+		b_exch.addTo(b_eff, good)
+		b_ext.addTo(b_eff, good)
+		torque.update(good)
+		return torque.Synced
+	}
 
-	// Demag field
-	m_ := m.Read()
-	b_d := b_demag.Write()
-	demag_.Exec(b_d, m_, vol, Mu0*Msat())
-	m.ReadDone()
-	b_demag.WriteDone()
-	b_demag.touch(good)
-
-	// Exchange field
-	b_exch.addTo(b_eff, good)
-	b_eff.touch(good)
-
-	// External field
-	addB_ext(b_eff)
-
-	// Torque
-	b := torque.Write() // B_eff, to be overwritten by torque.
-	m_ = m.Read()
-	cuda.LLGTorque(b, m_, b, float32(Alpha()))
-	m.ReadDone()
-	torque.WriteDone()
-	torque.touch(good) // saves if needed
-
-	return &torque.Synced
-}
-
-func addB_ext(Dst *buffered) {
-	bext := B_ext()
-	dst := Dst.Write()
-	cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
-	Dst.WriteDone()
+	Solver = cuda.NewHeun(m.Synced, torqueFn, 1e-15, Gamma0, &Time)
 }
 
 func Run(seconds float64) {

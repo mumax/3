@@ -5,17 +5,29 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
+// function that sets ("updates") quantity stored in dst
+type updFunc func(dst *data.Slice)
+
 // Output Handle for a quantity that is stored on the GPU.
 type buffered struct {
-	data.Synced
+	*data.Synced
+	updFn updFunc
 	autosave
 }
 
-func newBuffered(nComp int, name string) *buffered {
+func newBuffered(synced *data.Synced, name string, f updFunc) *buffered {
 	b := new(buffered)
-	b.Synced = *data.NewSynced(cuda.NewSlice(nComp, mesh))
+	b.Synced = synced
 	b.name = name
+	b.updFn = f
 	return b
+}
+
+func (b *buffered) update(goodstep bool) {
+	dst := b.Write()
+	b.updFn(dst)
+	b.WriteDone()
+	b.touch(goodstep)
 }
 
 // notify the handle that it may need to be saved

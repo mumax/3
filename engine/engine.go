@@ -14,6 +14,7 @@ var (
 	Alpha ScalFn                        // Damping constant
 	B_ext VecFn  = ConstVector(0, 0, 0) // External field in T
 	DMI   VecFn  = ConstVector(0, 0, 0) // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1   VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
 )
 
 // Accessible quantities
@@ -24,6 +25,7 @@ var (
 	B_demag Handle  // demag field (T) output handle
 	B_dmi   Handle  // demag field (T) output handle
 	B_exch  Handle  // exchange field (T) output handle
+	B_uni   Handle  // field due to uniaxial anisotropy output handle
 	Table   Handle  // output handle for tabular data (average magnetization etc.)
 	Time    float64 // time in seconds  // todo: hide? setting breaks autosaves
 	Solver  *cuda.Heun
@@ -80,6 +82,17 @@ func initialize() {
 	})
 	B_dmi = b_dmi
 
+	// uniaxial anisotropy
+	b_uni := newAdder("B_uni", func(dst *data.Slice) {
+		ku1 := Ku1()
+		if ku1 != [3]float64{0, 0, 0} {
+			m_ := m.Read()
+			cuda.AddUniaxialAnisotropy(dst, m_, float32(ku1[2]), float32(ku1[1]), float32(ku1[0]))
+			m.ReadDone()
+		}
+	})
+	B_uni = b_uni
+
 	// external field
 	b_ext := newAdder("B_ext", func(dst *data.Slice) {
 		bext := B_ext()
@@ -105,6 +118,7 @@ func initialize() {
 		b_demag.update(good)
 		b_exch.addTo(b_eff, good)
 		b_dmi.addTo(b_eff, good)
+		b_uni.addTo(b_eff, good)
 		b_ext.addTo(b_eff, good)
 		torque.update(good)
 		return torque.Synced

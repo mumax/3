@@ -10,7 +10,7 @@ import (
 // This function returns as soon as downloading output to host can start (usually immediately).
 // During the download, further computations can continue. When the download is done, unlockOutput()
 // is called so that the output buffer can be written again. Then the output host copy is
-// queued for saving to disk. 
+// queued for saving to disk.
 func goSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
 	if dlQue == nil {
 		dlQue = make(chan dlTask)
@@ -46,7 +46,7 @@ const maxOutputQueLen = 16
 var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
 
 // returns host buffer for storing output before being flushed to disk.
-// takes one from the pool or allocates a new one when the pool is empty 
+// takes one from the pool or allocates a new one when the pool is empty
 // and less than maxOutputQueLen buffers already are in use.
 func hostbuf() *data.Slice {
 	select {
@@ -59,7 +59,6 @@ func hostbuf() *data.Slice {
 		}
 	}
 	panic("unreachable")
-	return nil
 }
 
 // continuously takes download tasks and queues corresponding save tasks.

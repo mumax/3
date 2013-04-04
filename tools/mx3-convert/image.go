@@ -27,7 +27,7 @@ func dumpJPEG(out io.Writer, f *data.Slice) error {
 	img := render(f)
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
-	return jpeg.Encode(buf, img, &jpeg.Options{100})
+	return jpeg.Encode(buf, img, &jpeg.Options{Quality: 100})
 }
 
 func render(f *data.Slice) *image.NRGBA {
@@ -52,7 +52,6 @@ func render(f *data.Slice) *image.NRGBA {
 		return drawFloats(f.Scalars(), min, max)
 	}
 	panic("unreachable")
-	return nil
 }
 
 // Draws rank 4 tensor (3D vector field) as image

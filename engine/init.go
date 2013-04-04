@@ -56,6 +56,8 @@ func (d devnul) Write(b []byte) (int, error) {
 func Close() {
 	log.Println("shutting down")
 	drainOutput()
-	Table.(*dataTable).flush()
+	if Table != nil {
+		Table.(*dataTable).flush()
+	}
 	prof.Cleanup()
 }

@@ -1,22 +1,19 @@
 package cuda
 
-import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/mag"
-)
+import "code.google.com/p/mx3/data"
 
 // Add effective field of Dzyaloshinskii-Moriya interaction to Beff (Tesla).
 // m: normalized
 // D: J/m²
-func AddDMI(Beff *data.Slice, m *data.Slice, Dx, Dy, Dz float64) {
+func AddDMI(Beff *data.Slice, m *data.Slice, Dx, Dy, Dz, Msat float64) {
 	// TODO: size check
 	mesh := Beff.Mesh()
 	N := mesh.Size()
 	c := mesh.CellSize()
 
-	dx := float32(Dx * mag.Mu0)
-	dy := float32(Dy * mag.Mu0)
-	dz := float32(Dz * mag.Mu0)
+	dx := float32(Dx / Msat)
+	dy := float32(Dy / Msat)
+	dz := float32(Dz / Msat)
 	cx := float32(c[0])
 	cy := float32(c[1])
 	cz := float32(c[2])

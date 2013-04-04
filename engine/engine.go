@@ -19,15 +19,15 @@ var (
 
 // Accessible quantities
 var (
-	M       Handle  // reduced magnetization output handle
-	B_eff   Handle  // effective field (T) output handle
-	Torque  Handle  // torque (?) output handle
-	B_demag Handle  // demag field (T) output handle
-	B_dmi   Handle  // demag field (T) output handle
-	B_exch  Handle  // exchange field (T) output handle
-	B_uni   Handle  // field due to uniaxial anisotropy output handle
-	Table   Handle  // output handle for tabular data (average magnetization etc.)
-	Time    float64 // time in seconds  // todo: hide? setting breaks autosaves
+	M       Settable // reduced magnetization output handle
+	B_eff   Handle   // effective field (T) output handle
+	Torque  Buffered // torque (?) output handle
+	B_demag Handle   // demag field (T) output handle
+	B_dmi   Handle   // demag field (T) output handle
+	B_exch  Handle   // exchange field (T) output handle
+	B_uni   Handle   // field due to uniaxial anisotropy output handle
+	Table   Handle   // output handle for tabular data (average magnetization etc.)
+	Time    float64  // time in seconds  // todo: hide? setting breaks autosaves
 	Solver  *cuda.Heun
 )
 
@@ -76,7 +76,7 @@ func initialize() {
 		d := DMI()
 		if d != [3]float64{0, 0, 0} {
 			m_ := m.Read()
-			cuda.AddDMI(dst, m_, d[2], d[1], d[0])
+			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Mu0*Msat())
 			m.ReadDone()
 		}
 	})
@@ -85,10 +85,9 @@ func initialize() {
 	// uniaxial anisotropy
 	b_uni := newAdder("B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
-		ms := Msat() // ku/ms is in Tesla
 		if ku1 != [3]float64{0, 0, 0} {
 			m_ := m.Read()
-			cuda.AddUniaxialAnisotropy(dst, m_, float32(ku1[2]/ms), float32(ku1[1]/ms), float32(ku1[0]/ms))
+			cuda.AddUniaxialAnisotropy(dst, m_, ku1[2], ku1[1], ku1[0], Msat())
 			m.ReadDone()
 		}
 	})
@@ -159,21 +158,6 @@ func SetMUniform(mx, my, mz float32) {
 	checkInited()
 	m.memset(mx, my, mz)
 	m.normalize()
-}
-
-// Get a CPU copy of the magnetization.
-func GetM() *data.Slice {
-	m_ := m.Read()
-	host := m_.HostCopy()
-	m.ReadDone()
-	return host
-}
-
-// Upload a magnetization (from CPU).
-func SetM(hostM *data.Slice) {
-	m_ := m.Write()
-	data.Copy(m_, hostM)
-	m.WriteDone()
 }
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.

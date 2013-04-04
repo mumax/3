@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"path"
 )
 
 // function that sets ("updates") quantity stored in dst
@@ -33,9 +34,34 @@ func (b *buffered) update(goodstep bool) {
 // notify the handle that it may need to be saved
 func (b *buffered) touch(goodstep bool) {
 	if goodstep && b.needSave() {
-		goSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
+		b.Save()
 		b.saved()
 	}
+}
+
+func (b *buffered) Save() {
+	goSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
+	b.autonum++
+}
+
+func (b *buffered) SaveAs(fname string) {
+	if !path.IsAbs(fname) {
+		fname = OD + fname
+	}
+	goSave(fname, b.Read(), Time, func() { b.ReadDone() })
+}
+
+func (m *buffered) Download() *data.Slice {
+	m_ := m.Read()
+	host := m_.HostCopy()
+	m.ReadDone()
+	return host
+}
+
+func (m *buffered) Upload(src *data.Slice) {
+	m_ := m.Write()
+	data.Copy(m_, src)
+	m.WriteDone()
 }
 
 // Memset with synchronization.

@@ -7,10 +7,11 @@ import (
 
 // keeps info needed to decide when a quantity needs to be periodically saved
 type autosave struct {
-	period float64 // How often to save
-	start  float64 // Starting point
-	count  int     // Number of times it has been saved
-	name   string
+	period  float64 // How often to save
+	start   float64 // Starting point
+	count   int     // Number of times it has been autosaved
+	autonum int     // File number for output, may be > count when saved manually
+	name    string
 }
 
 // Register a quantity for auto-saving every period (in seconds).
@@ -35,9 +36,10 @@ func (a *autosave) needSave() bool {
 // to be called after saving the quantity
 func (a *autosave) saved() {
 	a.count++
+	a.autonum++
 }
 
 // filename to save the quantity under
 func (a *autosave) fname() string {
-	return fmt.Sprintf("%s%s%06d.dump", OD, a.name, a.count)
+	return fmt.Sprintf("%s%s%06d.dump", OD, a.name, a.autonum)
 }

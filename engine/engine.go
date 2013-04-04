@@ -18,15 +18,15 @@ var (
 
 // Accessible quantities
 var (
-	M       Handle // reduced magnetization output handle
-	B_eff   Handle // effective field (T) output handle
-	Torque  Handle // torque (?) output handle
-	B_demag Handle // demag field (T) output handle
-	B_dmi   Handle // demag field (T) output handle
-	B_exh   Handle // exchange field (T) output handle
-	//Table Handle // output handle for tabular data (average magnetization etc.)
-	Time   float64 // time in seconds  // todo: hide? setting breaks autosaves
-	Solver *cuda.Heun
+	M       Handle  // reduced magnetization output handle
+	B_eff   Handle  // effective field (T) output handle
+	Torque  Handle  // torque (?) output handle
+	B_demag Handle  // demag field (T) output handle
+	B_dmi   Handle  // demag field (T) output handle
+	B_exch  Handle  // exchange field (T) output handle
+	Table   Handle  // output handle for tabular data (average magnetization etc.)
+	Time    float64 // time in seconds  // todo: hide? setting breaks autosaves
+	Solver  *cuda.Heun
 )
 
 // hidden quantities
@@ -67,9 +67,9 @@ func initialize() {
 		cuda.AddExchange(dst, m_, Aex(), Mu0*Msat())
 		m.ReadDone()
 	})
-	B_exh = b_exch
+	B_exch = b_exch
 
-	// Dzyaloshinskii-Moriya vector in J/m²
+	// Dzyaloshinskii-Moriya field
 	b_dmi := newAdder("B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != [3]float64{0, 0, 0} {
@@ -94,9 +94,14 @@ func initialize() {
 	})
 	Torque = torque
 
+	// data table
+	table := newTable("datatable")
+	Table = table
+
 	// solver
 	torqueFn := func(good bool) *data.Synced {
 		m.touch(good) // saves if needed
+		table.send(m.Synced, good)
 		b_demag.update(good)
 		b_exch.addTo(b_eff, good)
 		b_dmi.addTo(b_eff, good)

@@ -1,6 +1,7 @@
 #include "float3.h"
 
 // Add uniaxial magnetocrystalline anisotropy field to B.
+// U vector is in Tesla.
 extern "C" __global__ void
 adduniaxialanisotropy(float* __restrict__  Bx, float* __restrict__  By, float* __restrict__  Bz,
                       float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz, 

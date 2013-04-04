@@ -84,10 +84,11 @@ func initialize() {
 
 	// uniaxial anisotropy
 	b_uni := newAdder("B_uni", func(dst *data.Slice) {
-		ku1 := Ku1()
+		ku1 := Ku1() // in J/m3
+		ms := Msat() // ku/ms is in Tesla
 		if ku1 != [3]float64{0, 0, 0} {
 			m_ := m.Read()
-			cuda.AddUniaxialAnisotropy(dst, m_, float32(ku1[2]), float32(ku1[1]), float32(ku1[0]))
+			cuda.AddUniaxialAnisotropy(dst, m_, float32(ku1[2]/ms), float32(ku1[1]/ms), float32(ku1[0]/ms))
 			m.ReadDone()
 		}
 	})

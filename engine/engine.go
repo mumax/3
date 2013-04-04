@@ -140,10 +140,25 @@ func step() {
 }
 
 // Set the magnetization to uniform state.
-func SetM(mx, my, mz float32) {
+func SetMUniform(mx, my, mz float32) {
 	checkInited()
 	m.memset(mx, my, mz)
 	m.normalize()
+}
+
+// Get a CPU copy of the magnetization.
+func GetM() *data.Slice {
+	m_ := m.Read()
+	host := m_.HostCopy()
+	m.ReadDone()
+	return host
+}
+
+// Upload a magnetization (from CPU).
+func SetM(hostM *data.Slice) {
+	m_ := m.Write()
+	data.Copy(m_, hostM)
+	m.WriteDone()
 }
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.

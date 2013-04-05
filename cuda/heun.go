@@ -41,7 +41,7 @@ func (e *Heun) Step() {
 
 	// stage 2
 	{
-		*e.Time += e.Dt_si
+		*e.time += e.Dt_si
 		Dy := e.torqueFn(false)
 		dy := Dy.Read()
 
@@ -62,7 +62,7 @@ func (e *Heun) Step() {
 		} else {
 			// undo bad step
 			util.Assert(!e.Fixdt)
-			*e.Time -= e.Dt_si
+			*e.time -= e.Dt_si
 			Madd2(y, y, dy0, 1, -dt)
 			e.NUndone++
 			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))

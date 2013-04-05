@@ -10,7 +10,7 @@ import (
 // embedded in all solvers
 type solverCommon struct {
 	Dt_si, dt_mul    float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	Time             *float64 // in seconds
+	time             *float64 // in seconds
 	Mindt, Maxdt     float64  // minimum and maximum time step
 	Maxerr, Headroom float64  // maximum error per step
 	LastErr          float64  // error of last step
@@ -19,7 +19,7 @@ type solverCommon struct {
 }
 
 func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {
-	return solverCommon{Time: time, Dt_si: dt_si, dt_mul: dt_mul,
+	return solverCommon{time: time, Dt_si: dt_si, dt_mul: dt_mul,
 		Maxerr: 1e-4, Headroom: 0.75} // TODO: use consts
 }
 

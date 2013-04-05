@@ -152,7 +152,7 @@ func Steps(n int) {
 func step() {
 	s := Solver
 	s.Step()
-	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
+	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
 // Set the magnetization to uniform state. // TODO: mv to settable

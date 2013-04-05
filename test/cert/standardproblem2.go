@@ -41,7 +41,7 @@ func main() {
 	Run(2e-9)
 
 	m := M.Average()
-	fmt.Println("remanent magnetization for d/lex=", I, ":", m)
+	fmt.Println("remanent m for d/lex=", I, ":", m)
 	expect(m[X], 0.9627)
 	expect(m[Y], 0.0756)
 	expect(m[Z], 0)

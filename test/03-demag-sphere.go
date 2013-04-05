@@ -47,10 +47,10 @@ func main() {
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]
+	fmt.Println("demag tensor:", bx, by/2, bz/3)
 	check(bx, -1./3.)
 	check(by, -2./3.)
 	check(bz, -3./3.)
-
 	fmt.Println("OK")
 }
 

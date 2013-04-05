@@ -19,7 +19,7 @@ func main() {
 
 	m := cuda.NewSlice(3, mesh)
 	conv := cuda.NewDemag(mesh)
-	cuda.Memset(m, 1, 0, 0)
+	cuda.Memset(m, 1, 1, 1)
 
 	B := cuda.NewSlice(3, mesh)
 	Bsat := 1.
@@ -30,6 +30,7 @@ func main() {
 	bx := out.Vectors()[0][N0/2][N1/2][N2/2]
 	by := out.Vectors()[1][N0/2][N1/2][N2/2]
 	bz := out.Vectors()[2][N0/2][N1/2][N2/2]
+	fmt.Println("demag tensor:", bx, by, bz)
 	check(bx, -1)
 	check(by, 0)
 	check(bz, 0)

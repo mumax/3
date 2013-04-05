@@ -58,7 +58,7 @@ func initialize() {
 	demag_ := cuda.NewDemag(mesh)
 	b_demag := newBuffered(arr2, "B_demag", func(b *data.Slice) {
 		m_ := m.Read()
-		demag_.Exec(b, m_, vol, Mu0*Msat())
+		demag_.Exec(b, m_, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 		m.ReadDone()
 	})
 	B_demag = b_demag
@@ -66,7 +66,7 @@ func initialize() {
 	// exchange field
 	b_exch := newAdder("B_exch", func(dst *data.Slice) {
 		m_ := m.Read()
-		cuda.AddExchange(dst, m_, Aex(), Mu0*Msat())
+		cuda.AddExchange(dst, m_, Aex(), Msat())
 		m.ReadDone()
 	})
 	B_exch = b_exch
@@ -77,7 +77,7 @@ func initialize() {
 		if d != [3]float64{0, 0, 0} {
 			log.Println("add dmi") // rm
 			m_ := m.Read()
-			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Mu0*Msat())
+			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Msat())
 			m.ReadDone()
 		}
 	})

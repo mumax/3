@@ -15,24 +15,24 @@ func main() {
 	Aex = Const(13e-12)
 	Alpha = Const(1.0)
 	lex := math.Sqrt(Aex() / (0.5 * Mu0 * Msat() * Msat()))
-	I := 10.
+	I := 20.
 	d := I * lex
 	Sz, Sy, Sx := 0.1*d, d, 5*d
 
 	Nz, Ny, Nx := 1, 1, 1
-	for Sy/float64(Ny) > 0.75*lex {
+	for Sy/float64(Ny) > lex {
 		Ny *= 2
 	}
-	for Sx/float64(Nx) > 0.75*lex {
+	for Sx/float64(Nx) > lex {
 		Nx *= 2
 	}
 
 	SetMesh(Nx, Ny, Nz, Sx/float64(Nx), Sy/float64(Ny), Sz/float64(Nz))
 
-	SetMUniform(1, 1, 0)
+	SetMUniform(1, 0.1, 0)
 
-	M.Autosave(1e-16)
-	Table.Autosave(0.1e-9)
+	M.Autosave(0.1e-9)
+	Table.Autosave(0.01e-9)
 	Run(5e-9)
 	M.Save()
 

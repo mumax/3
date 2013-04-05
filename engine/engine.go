@@ -75,6 +75,7 @@ func initialize() {
 	b_dmi := newAdder("B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != [3]float64{0, 0, 0} {
+			log.Println("add dmi") // rm
 			m_ := m.Read()
 			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Mu0*Msat())
 			m.ReadDone()
@@ -86,6 +87,7 @@ func initialize() {
 	b_uni := newAdder("B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
+			log.Println("add uni") // rm
 			m_ := m.Read()
 			cuda.AddUniaxialAnisotropy(dst, m_, ku1[2], ku1[1], ku1[0], Msat())
 			m.ReadDone()
@@ -153,7 +155,7 @@ func step() {
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, *s.Time, s.Dt_si, s.LastErr)
 }
 
-// Set the magnetization to uniform state.
+// Set the magnetization to uniform state. // TODO: mv to settable
 func SetMUniform(mx, my, mz float32) {
 	checkInited()
 	m.memset(mx, my, mz)

@@ -69,9 +69,9 @@ func runDownloader() {
 
 	for t := range dlQue {
 		h := hostbuf()
-		data.Copy(h, t.output)
+		data.Copy(h, t.output) // output is already locked
 		t.unlockOutput()
-		saveQue <- saveTask{t.fname, h, t.time, func() { hBuf <- h }}
+		saveQue <- saveTask{t.fname, h, t.time, func() { cuda.Memset(h, 0, 0, 0); hBuf <- h }}
 	}
 	close(saveQue)
 }
@@ -82,7 +82,7 @@ func runDownloader() {
 func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)
-		t.unlockOutput()
+		t.unlockOutput() // typically puts buffer back in pool
 	}
 	done <- true
 }

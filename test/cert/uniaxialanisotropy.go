@@ -2,90 +2,47 @@
 
 package main
 
+// This test lets uniaxial anisotropy compete against the external field.
+
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/engine"
-	"code.google.com/p/mx3/mag"
+	. "code.google.com/p/mx3/engine"
 	"fmt"
 	"log"
+	"math"
 )
 
-var mesh *data.Mesh
-
 func main() {
-	engine.Init()
-	cuda.Init()
-	cuda.LockThread()
+	Init()
+	defer Close()
 
-	const (
-		N0, N1, N2 = 1, 64, 64
-		N          = N0 * N1 * N2
-		c0, c1, c2 = 2e-9, 4e-9, 4e-9
-		Bsat       = 1100e3 * mag.Mu0
-		Aex        = 13e-12
-		alpha      = 0.2
-		K1         = 0.5e6
-	)
+	const Nz, Ny, Nx = 1, 64, 64
+	const cz, cy, cx = 2e-9, 4e-9, 4e-9
 
-	mesh = data.NewMesh(N0, N1, N2, c0, c1, c2)
-	M, Hd, Hex, Heff, Ha, torque := newVec(), newVec(), newVec(), newVec(), newVec(), newVec()
+	Msat = Const(1100e3)
+	Aex = Const(13e-12)
+	Alpha = Const(0.2)
+	Ku1 = ConstVector(0.5e6, 0, 0)
 
-	cuda.Memset(M, 1, 1, 1)
+	SetMesh(Nx, Ny, Nz, cx, cy, cz)
 
-	demag := cuda.NewDemag(mesh)
+	SetMUniform(1, 1, 0)
+	Table.Autosave(10e-12)
 
-	var Bx, By, Bz float32 = 0, 0, 0
-	var Kx, Ky, Kz float32 = 0, 0, K1
-
-	updateTorque := func(m *data.Slice, t float64) *data.Slice {
-		demag.Exec(Hd, m)
-		cuda.Exchange(Hex, m, Aex)
-		cuda.UniaxialAnisotropy(Ha, m, Kx, Ky, Kz)
-		cuda.Madd3(Heff, Hd, Hex, Ha, 1, 1, 1)
-		cuda.AddConst(Heff, Bx, By, Bz)
-		cuda.LLGTorque(torque, m, Heff, alpha)
-		return torque
+	// Apply some fields and verify the relaxed my agains OOMMF values.
+	reference := []float64{0, 0.011, 0.033, 0.110, 0.331}
+	for i, by := range []float64{0, 10, 30, 100, 300} {
+		By := by * 1e-3
+		B_ext = ConstVector(0, By, 0)
+		Run(1e-9)
+		m := M.Average()
+		fmt.Println("By:", By, "T", "my:", m[Y])
+		expect(m[Y], reference[i])
 	}
-
-	norm := func(m *data.Slice) {
-		cuda.Normalize(m, nil, Bsat)
-	}
-	norm(M)
-
-	solver := cuda.NewHeun(M, updateTorque, norm, 1e-15, mag.Gamma0)
-
-	save := func() {
-		mx, my, mz := M.Comp(0), M.Comp(1), M.Comp(2)
-		avgx, avgy, avgz := cuda.Sum(mx)/(N*Bsat), cuda.Sum(my)/(N*Bsat), cuda.Sum(mz)/(N*Bsat)
-		fmt.Println(solver.Time, avgx, avgy, avgz)
-	}
-
-	for i, by := range []float32{0, 10, 30, 100, 300} {
-		By = by * 1e-3
-		for solver.Time < float64(i+1)*1e-9 {
-			solver.Step()
-			if solver.NSteps%10 == 0 {
-				save()
-			}
-		}
-	}
-
+	fmt.Println("OK")
 }
 
-func expect(have, want float32) {
-	if abs(have-want) > 1e-3 {
+func expect(have, want float64) {
+	if math.Abs(have-want) > 1e-3 {
 		log.Fatalln("have:", have, "want:", want)
 	}
-}
-
-func abs(x float32) float32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func newVec() *data.Slice {
-	return cuda.NewSlice(3, mesh)
 }

@@ -69,6 +69,3 @@ clean:
 	rm -rf $(GOPATH)/pkg/gccgo/$(PREFIX)/
 	make clean -C cuda
 
-.PHONY: count
-count:
-	wc -l *.go */*.go kernel/*.cu kernel/cuda2go.go

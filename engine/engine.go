@@ -172,7 +172,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 	mesh = data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
-	log.Println("set mesh:", mesh)
+	log.Println("set mesh:", mesh.UserString())
 	initialize()
 }
 

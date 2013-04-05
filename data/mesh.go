@@ -56,7 +56,8 @@ func (m *Mesh) WorldSize() [3]float64 {
 	return [3]float64{float64(m.gridSize[0]) * m.cellSize[0], float64(m.gridSize[1]) * m.cellSize[1], float64(m.gridSize[2]) * m.cellSize[2]}
 }
 
-func (m *Mesh) String() string {
+// String representation in internal coordinates (ZYX)
+func (m *Mesh) InternString() string {
 	s := m.gridSize
 	c := m.cellSize
 	pbc := ""
@@ -64,6 +65,17 @@ func (m *Mesh) String() string {
 		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
 	}
 	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[0], s[1], s[2], c[0], c[1], c[2], pbc)
+}
+
+// String representation in user coordinates (XYZ)
+func (m *Mesh) UserString() string {
+	s := m.gridSize
+	c := m.cellSize
+	pbc := ""
+	if m.pbc != [3]int{0, 0, 0} {
+		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[2], m.pbc[1], m.pbc[0])
+	}
+	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[2], s[1], s[0], float32(c[2]), float32(c[1]), float32(c[0]), pbc)
 }
 
 // product of elements.

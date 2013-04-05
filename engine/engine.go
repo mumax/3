@@ -75,7 +75,6 @@ func initialize() {
 	b_dmi := newAdder("B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != [3]float64{0, 0, 0} {
-			log.Println("add dmi") // rm
 			m_ := m.Read()
 			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Msat())
 			m.ReadDone()

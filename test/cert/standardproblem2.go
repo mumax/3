@@ -31,6 +31,7 @@ func main() {
 
 	SetMUniform(1, 1, 0)
 
+	M.Autosave(1e-16)
 	Table.Autosave(0.1e-9)
 	Run(5e-9)
 	M.Save()

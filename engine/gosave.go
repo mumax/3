@@ -51,6 +51,7 @@ var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
 func hostbuf() *data.Slice {
 	select {
 	case b := <-hBuf:
+		cuda.Memset(b, 0, 0, 0) // not strictly needed
 		return b
 	default:
 		if nOutBuf < maxOutputQueLen {
@@ -71,7 +72,7 @@ func runDownloader() {
 		h := hostbuf()
 		data.Copy(h, t.output) // output is already locked
 		t.unlockOutput()
-		saveQue <- saveTask{t.fname, h, t.time, func() { cuda.Memset(h, 0, 0, 0); hBuf <- h }}
+		saveQue <- saveTask{t.fname, h, t.time, func() { hBuf <- h }}
 	}
 	close(saveQue)
 }

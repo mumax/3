@@ -26,6 +26,32 @@ const (
 	YX = 8
 )
 
+// Transforms the index between user and program space, unless it is a scalar:
+//	X  <-> Z
+//	Y  <-> Y
+//	Z  <-> X
+//	XX <-> ZZ
+//	YY <-> YY
+//	ZZ <-> XX
+//	YZ <-> XY
+//	XZ <-> XZ
+//	XY <-> YZ
+func swapIndex(index, dim int) int {
+	switch dim {
+	default:
+		log.Panic("swapindex: invalid dim:", dim)
+	case 1:
+		return index
+	case 3:
+		return [3]int{Z, Y, X}[index]
+	case 6:
+		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
+	case 9:
+		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
+	}
+	panic("unreachable")
+}
+
 // Maps the 3x3 indices of a symmetric matrix (K_ij) onto
 // a length 6 array containing the upper triangular part:
 // (Kxx, Kyy, Kzz, Kyz, Kxz, Kxy)
@@ -79,29 +105,3 @@ const (
 //	}
 //	return
 //}
-
-// Transforms the index between user and program space, unless it is a scalar:
-//	X  <-> Z
-//	Y  <-> Y
-//	Z  <-> X
-//	XX <-> ZZ
-//	YY <-> YY
-//	ZZ <-> XX
-//	YZ <-> XY
-//	XZ <-> XZ
-//	XY <-> YZ
-func swapIndex(index, dim int) int {
-	switch dim {
-	default:
-		log.Panic("swapindex: invalid dim:", dim)
-	case 1:
-		return index
-	case 3:
-		return [3]int{Z, Y, X}[index]
-	case 6:
-		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
-	case 9:
-		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
-	}
-	panic("unreachable")
-}

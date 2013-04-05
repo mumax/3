@@ -158,7 +158,7 @@ func step() {
 // Set the magnetization to uniform state. // TODO: mv to settable
 func SetMUniform(mx, my, mz float32) {
 	checkInited()
-	m.memset(mx, my, mz)
+	m.memset(mz, my, mx)
 	m.normalize()
 }
 

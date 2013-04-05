@@ -23,22 +23,22 @@ func main() {
 	Alpha = Const(1.0)
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
-
 	SetMUniform(1, .1, 0)
+
+	Table.Autosave(1e-12)
 	Run(3e-9)
 
 	m := M.Average()
 	fmt.Println("relaxed m:", m[X], m[Y], m[Z])
-	expect(m[Z], 0)
-	expect(m[Y], 0.12358)
-	expect(m[X], 0.95588)
-	fmt.Println("relax OK")
+	//expect(m[Z], 0)
+	//expect(m[Y], 0.12358)
+	//expect(m[X], 0.95588)
+	//fmt.Println("relax OK")
 
 	Alpha = Const(0.02)
 	B_ext = ConstVector(-24.6E-3, 4.3E-3, 0)
 
-	Time = 0
-	Table.Autosave(1e-12)
+	//Time = 0
 	M.Autosave(20e-12)
 	Run(1e-9)
 }

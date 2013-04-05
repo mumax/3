@@ -25,7 +25,7 @@ func main() {
 	Aex = Const(13e-12)
 	SetMUniform(1, .1, 0)
 
-	//Table.Autosave(1e-12)
+	Table.Autosave(1e-12)
 	Run(3e-9)
 
 	m := M.Average()
@@ -38,8 +38,8 @@ func main() {
 	Alpha = Const(0.02)
 	B_ext = ConstVector(-24.6E-3, 4.3E-3, 0)
 
-	//Time = 0
-	//M.Autosave(50e-12)
+	Time = 0
+	M.Autosave(50e-12)
 	Run(1e-9)
 
 	m = M.Average()

@@ -77,3 +77,21 @@ func (b *buffered) normalize() {
 	cuda.Normalize(s)
 	b.WriteDone()
 }
+
+func (b *buffered) Average() []float64 {
+	return average(b.Synced)
+}
+
+// average in userspace XYZ order
+// does not yet take into account volume.
+// pass volume parameter, possibly nil?
+func average(b *data.Synced) []float64 {
+	s := b.Read()
+	nComp := s.NComp()
+	avg := make([]float64, nComp)
+	for i := range avg {
+		I := swapIndex(i, nComp)
+		avg[i] = float64(cuda.Sum(s.Comp(I))) / float64(s.Mesh().NCell())
+	}
+	return avg
+}

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"fmt"
@@ -17,13 +16,8 @@ type dataTable struct {
 func (t *dataTable) send(M *data.Synced, good bool) {
 	if good && t.needSave() {
 		t.init()
-		m := M.Read()
-		ncell := float64(m.Mesh().NCell())
-		mx := float64(cuda.Sum(m.Comp(2))) / ncell
-		my := float64(cuda.Sum(m.Comp(1))) / ncell
-		mz := float64(cuda.Sum(m.Comp(0))) / ncell
-		M.ReadDone()
-		fmt.Fprintln(t, Time, mx, my, mz)
+		m := average(M) // in userspace XYZ order
+		fmt.Fprintln(t, Time, m[0], m[1], m[2])
 		t.saved()
 	}
 }

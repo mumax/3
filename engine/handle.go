@@ -15,6 +15,7 @@ type Buffered interface {
 	Save()                 // single-shot save with auto file name
 	SaveAs(fname string)   // single-shot save with manual file name
 	Download() *data.Slice // CPU-accessible slice
+	Average() []float64
 }
 
 type Settable interface {

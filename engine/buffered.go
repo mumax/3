@@ -87,6 +87,7 @@ func (b *buffered) Average() []float64 {
 // pass volume parameter, possibly nil?
 func average(b *data.Synced) []float64 {
 	s := b.Read()
+	defer b.ReadDone()
 	nComp := s.NComp()
 	avg := make([]float64, nComp)
 	for i := range avg {

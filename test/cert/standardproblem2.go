@@ -42,6 +42,7 @@ func main() {
 
 	m := M.Average()
 	fmt.Println("remanent m for d/lex=", I, ":", m)
+	// check against solution from Donahue:
 	expect(m[X], 0.9627)
 	expect(m[Y], 0.0756)
 	expect(m[Z], 0)

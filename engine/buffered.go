@@ -82,6 +82,12 @@ func (b *buffered) Average() []float64 {
 	return average(b.Synced)
 }
 
+func (b *buffered) MaxNorm() float64 {
+	s := b.Read()
+	defer b.ReadDone()
+	return cuda.MaxVecNorm(s)
+}
+
 // average in userspace XYZ order
 // does not yet take into account volume.
 // pass volume parameter, possibly nil?

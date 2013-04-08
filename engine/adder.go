@@ -36,7 +36,7 @@ func (a *adder) addTo(Dst *buffered, goodstep bool) {
 		cuda.Madd2(dst, dst, buf, 1, 1)
 		Dst.WriteDone()
 		// Buf only unlocked here to avoid overwite by next addTo
-		goSave(a.fname(), dst, Time, func() { Buf.WriteDone() })
+		goSave(a.fname(), buf, Time, func() { Buf.WriteDone() })
 		a.saved()
 	} else {
 		dst := Dst.Write()

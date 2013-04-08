@@ -29,7 +29,7 @@ func Init() {
 	}
 
 	if *Flag_version {
-		log.Print("Mumax Cubed 0.0 alpha ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
+		log.Print("Mumax Cubed 0.1α ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
 	}
 
 	if *Flag_od != "" {

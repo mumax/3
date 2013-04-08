@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <title>mx3</title>
+
+<style media="screen" type="text/css">
+body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
+img  { margin: 10px; }
+h1   { font-size: 28px; font-color: gray; }
+hr   { border-style: none; border-top: 1px solid gray; }
+a    { color: #375EAB; text-decoration: none; }
+table{ border:"10"; }
+div#header{ color:gray; font-size:14px; }
+div#footer{ color:gray; font-size:14px; }
+</style>
+
+</head>
+<body>
+
+<div id="header">
+	<h1> mx3 </h1> 
+	<hr/>
+</div>
+
+<div id="body">
+
+<h2> solver </h2> 
+<table> 
+<tr> <td>     step:</td> <td>{{.NSteps}}  </td><td>  undone steps:</td> <td>{{.NUndone}}</td> </tr>
+<tr> <td>     time:</td> <td>{{.Time}}s   </td><td>     time step:</td> <td>{{.Dt_si}}s </td> </tr>
+<tr> <td> err/step:</td> <td>{{.LastErr}}s</td><td>  max err/step:</td> <td>{{.MaxErr}}s</td> </tr>
+</table>
+
+<hr/>
+
+<h2> magnetization </h2> 
+<img src="/render/m">
+
+</div>
+
+
+<div id="footer">
+	<hr/>
+	
+</div>
+
+
+</body>
+</html>

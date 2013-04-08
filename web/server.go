@@ -15,6 +15,8 @@ func GoServe(port string) {
 
 	http.HandleFunc("/render/", render)
 
+	http.HandleFunc("/", gui)
+
 	log.Print("serving http://localhost", port, "\n")
 	go func() {
 		cuda.LockThread()

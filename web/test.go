@@ -21,14 +21,14 @@ func main() {
 
 	web.GoServe(":8080")
 
-	Run(5e-9)
+	Run(1e-9)
 
 	f := 1.0
 	Alpha = Const(0.02)
 
 	for {
-		B_ext = ConstVector(f*24.6E-3, f*4.3E-3, 0)
-		Run(5e-9)
+		B_ext = ConstVector(f*24.6E-3, -f*4.3E-3, 0)
+		Run(2e-9)
 		f = -f
 	}
 

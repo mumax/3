@@ -179,3 +179,17 @@ func checkInited() {
 		log.Fatal("need to set mesh first")
 	}
 }
+
+// map of names to Handle does not work because Handles change on the fly
+// *Handle does not work because we loose interfaceness.
+func Quant(name string) (h Buffered, ok bool) {
+	switch name {
+	default:
+		return nil, false
+	case "m":
+		return M, true
+	case "torque":
+		return Torque, true
+	}
+	panic("unreachable")
+}

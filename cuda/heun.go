@@ -52,12 +52,12 @@ func (e *Heun) Step() {
 		}
 
 		y := e.y.Write()
-		if err < e.Maxerr || e.Dt_si <= e.Mindt { // mindt check to avoid infinite loop
+		if err < e.MaxErr || e.Dt_si <= e.Mindt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			e.postStep(y)
 			e.NSteps++
-			e.adaptDt(math.Pow(e.Maxerr/err, 1./2.))
+			e.adaptDt(math.Pow(e.MaxErr/err, 1./2.))
 			e.LastErr = err
 		} else {
 			// undo bad step
@@ -65,7 +65,7 @@ func (e *Heun) Step() {
 			*e.time -= e.Dt_si
 			Madd2(y, y, dy0, 1, -dt)
 			e.NUndone++
-			e.adaptDt(math.Pow(e.Maxerr/err, 1./3.))
+			e.adaptDt(math.Pow(e.MaxErr/err, 1./3.))
 		}
 		e.y.WriteDone()
 		Dy.ReadDone()

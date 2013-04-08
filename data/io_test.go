@@ -23,9 +23,13 @@ func TestIO(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice2, err2 := Read(buf)
+	slice2, t2, err2 := Read(buf)
 	if err != nil {
 		t.Error(err2)
+	}
+
+	if t2 != time {
+		t.Fail()
 	}
 
 	if *slice2.Mesh() != *slice.Mesh() {

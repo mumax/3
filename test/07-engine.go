@@ -14,7 +14,7 @@ func main() {
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
 	Alpha = Const(1)
-	SetM(1, 1, 0)
+	SetMUniform(1, 1, 0)
 
 	B_exch.Autosave(1e-9)
 	B_demag.Autosave(1e-9)

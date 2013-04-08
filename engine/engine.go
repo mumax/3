@@ -174,6 +174,10 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	initialize()
 }
 
+func GetMesh() *data.Mesh {
+	return mesh
+}
+
 func checkInited() {
 	if mesh == nil {
 		log.Fatal("need to set mesh first")

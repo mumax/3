@@ -32,17 +32,24 @@ div#footer{ color:gray; font-size:14px; }
 <tr> <td>     time:</td> <td>{{.Time}}s   </td><td>     time step:</td> <td>{{.Dt_si}}s </td> </tr>
 <tr> <td> err/step:</td> <td>{{.LastErr}}s</td><td>  max err/step:</td> <td>{{.MaxErr}}s</td> </tr>
 </table>
-
 <hr/>
 
 <h2> magnetization </h2> 
 <img src="/render/m">
+<hr/>
+
+
+<h2> mesh </h2> 
+<table> 
+<tr> <td> grid size: </td> <td>{{index .Size 0}}     x{{index .Size 1}}     x{{index .Size 2}}      </td></tr>
+<tr> <td> cell size: </td> <td>{{index .CellSize 0}} x{{index .CellSize 1}} x{{index .CellSize 2}}  </td></tr>
+<tr> <td> world size:</td> <td>{{index .WorldSize 0}}x{{index .WorldSize 1}}x{{index .WorldSize 2}} </td></tr>
+</table>
+<hr/>
+
 
 </div>
-
-
 <div id="footer">
-	<hr/>
 	
 </div>
 

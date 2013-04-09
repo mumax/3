@@ -1,13 +1,11 @@
 package cuda
 
-import (
-	"code.google.com/p/mx3/data"
-)
+import "code.google.com/p/mx3/data"
 
 // Landau-Lifshitz torque divided by gamma0:
-// 	- 1/(1+α²) [ M x B +  α (M/|M|) x (M x B) ]
+// 	- 1/(1+α²) [ m x B +  α (m/|m|) x (m x B) ]
 // 	torque in Tesla/s
-// 	M in Tesla
+// 	m normalized
 // 	B in Tesla
 func LLGTorque(torque, m, B *data.Slice, alpha float32) {
 	// TODO: assert...

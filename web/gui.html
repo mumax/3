@@ -12,7 +12,7 @@ h1   { font-size: 28px; font-color: gray; }
 hr   { border-style: none; border-top: 1px solid gray; }
 a    { color: #375EAB; text-decoration: none; }
 table{ border:"10"; }
-div#header{ color:gray; font-size:14px; }
+div#header{ color:gray; font-size:16px; }
 div#footer{ color:gray; font-size:14px; }
 </style>
 
@@ -29,8 +29,8 @@ div#footer{ color:gray; font-size:14px; }
 <h2> solver </h2> 
 <table> 
 <tr> <td>     step:</td> <td>{{.NSteps}}  </td><td>  undone steps:</td> <td>{{.NUndone}}</td> </tr>
-<tr> <td>     time:</td> <td>{{.Time}}s   </td><td>     time step:</td> <td>{{.Dt_si}}s </td> </tr>
-<tr> <td> err/step:</td> <td>{{.LastErr}}s</td><td>  max err/step:</td> <td>{{.MaxErr}}s</td> </tr>
+<tr> <td>     time:</td> <td>{{.Time}} s   </td><td>     time step:</td> <td>{{.Dt_si}} s </td> </tr>
+<tr> <td> err/step:</td> <td>{{.LastErr}} </td><td>  max err/step:</td> <td>{{.MaxErr}}</td> </tr>
 </table>
 <hr/>
 
@@ -41,9 +41,9 @@ div#footer{ color:gray; font-size:14px; }
 
 <h2> mesh </h2> 
 <table> 
-<tr> <td> grid size: </td> <td>{{index .Size 0}}     x{{index .Size 1}}     x{{index .Size 2}}      </td></tr>
-<tr> <td> cell size: </td> <td>{{index .CellSize 0}} x{{index .CellSize 1}} x{{index .CellSize 2}}  </td></tr>
-<tr> <td> world size:</td> <td>{{index .WorldSize 0}}x{{index .WorldSize 1}}x{{index .WorldSize 2}} </td></tr>
+<tr> <td> grid size: </td> <td>{{index .Size 2}}     x{{index .Size 1}}     x{{index .Size 0}}      </td></tr>
+<tr> <td> cell size: </td> <td>{{index .CellSize 2}} m x{{index .CellSize 1}} m x {{index .CellSize 0}} m </td></tr>
+<tr> <td> world size:</td> <td>{{index .WorldSize 2}} m x{{index .WorldSize 1}} m x{{index .WorldSize 0}} m</td></tr>
 </table>
 <hr/>
 

@@ -1,4 +1,4 @@
-#include "common_stencil.h"
+#include "stencil.h"
 
 // Add 1 component of exchange interaction to Beff (Tesla).
 // m is normalized.

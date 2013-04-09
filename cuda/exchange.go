@@ -5,7 +5,7 @@ import (
 	"github.com/barnex/cuda5/cu"
 )
 
-//#include "common_stencil.h"
+//#include "stencil.h"
 import "C"
 
 const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X

@@ -11,16 +11,12 @@ func AddDMI(Beff *data.Slice, m *data.Slice, Dx, Dy, Dz, Msat float64) {
 	N := mesh.Size()
 	c := mesh.CellSize()
 
-	dx := float32(Dx / Msat)
-	dy := float32(Dy / Msat)
-	dz := float32(Dz / Msat)
-	cx := float32(c[0])
-	cy := float32(c[1])
-	cz := float32(c[2])
+	dx := float32(2 * Dx / (Msat * c[0]))
+	dy := float32(2 * Dy / (Msat * c[1]))
+	dz := float32(2 * Dz / (Msat * c[2]))
 
 	cfg := make2DConf(N[2], N[1])
 	k_adddmi(Beff.DevPtr(0), Beff.DevPtr(1), Beff.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
-		dx, dy, dz, cx, cy, cz,
-		N[0], N[1], N[2], cfg)
+		dx, dy, dz, N[0], N[1], N[2], cfg)
 }

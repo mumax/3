@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	flag_comp      = flag.Int("comp", -1, "Select a component of vector data. 0=x, 1=y, ...")
 	flag_gzip      = flag.Bool("gzip", false, "GZIP the output")
 	flag_show      = flag.Bool("show", false, "Human-readible output to stdout")
 	flag_format    = flag.String("f", "%v", "Printf format string")
@@ -167,6 +168,9 @@ func preprocess(f *data.Slice) {
 	}
 	if *flag_normpeak {
 		normpeak(f)
+	}
+	if *flag_comp != -1 {
+		*f = *f.Comp(swapIndex(*flag_comp, f.NComp()))
 	}
 	if *flag_resize != "" {
 		resize(f, *flag_resize)

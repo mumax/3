@@ -1,4 +1,4 @@
-all: nvcc githook 6g mx3 #tool 
+all: nvcc githook 6g mx3 tools
 
 PREFIX=code.google.com/p/mx3
 
@@ -10,6 +10,7 @@ PKGS=\
 	$(PREFIX)/mag\
 	$(PREFIX)/data\
 	$(PREFIX)/prof\
+	$(PREFIX)/web\
 
 $(PREFIX)/cuda: nvcc
 
@@ -23,9 +24,8 @@ nvcc:
 6g:
 	go install -v $(PKGS)
 
-tool:
-	make -C tools/dump
-	make -C tools/table
+tools:
+	go install -v $(PREFIX)/tools/mx3-convert
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 

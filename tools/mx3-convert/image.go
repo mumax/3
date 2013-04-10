@@ -7,13 +7,9 @@ import (
 	"bufio"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
-	"code.google.com/p/mx3/util"
-	"image"
 	"image/jpeg"
 	"image/png"
 	"io"
-	"log"
-	"strconv"
 )
 
 func dumpPNG(out io.Writer, f *data.Slice) error {

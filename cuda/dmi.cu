@@ -22,11 +22,11 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 		int I = idx(i, j, k);
 		float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
 
-			//h.x += Dz * delta(mz, 0, 0, 1); 
-			//h.x += Dy * delta(my, 0, 1, 0); 
+		h.x += Dz * delta(mz, 0, 0, 1); 
+		h.x += Dy * delta(my, 0, 1, 0); 
 
-			h.y += Dy * delta(mx, 0, 1, 0); 
-			h.z -= Dz * delta(mx, 0, 0, 1); 
+		h.y -= Dy * delta(mx, 0, 1, 0); 
+		h.z -= Dz * delta(mx, 0, 0, 1); 
 
 		// write back, result is H + Hdmi
 		Hx[I] = h.x;

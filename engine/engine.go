@@ -13,7 +13,7 @@ var (
 	Msat  ScalFn                        // Saturation magnetization in A/m
 	Alpha ScalFn                        // Damping constant
 	B_ext VecFn  = ConstVector(0, 0, 0) // External field in T
-	DMI   VecFn  = ConstVector(0, 0, 0) // Dzyaloshinskii-Moriya vector in J/m²
+	DMI   ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Ku1   VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
 )
 
@@ -74,9 +74,9 @@ func initialize() {
 	// Dzyaloshinskii-Moriya field
 	b_dmi := newAdder("B_dmi", func(dst *data.Slice) {
 		d := DMI()
-		if d != [3]float64{0, 0, 0} {
+		if d != 0 {
 			m_ := m.Read()
-			cuda.AddDMI(dst, m_, d[2], d[1], d[0], Msat())
+			cuda.AddDMI(dst, m_, d, Msat())
 			m.ReadDone()
 		}
 	})
@@ -195,5 +195,4 @@ func Quant(name string) (h Buffered, ok bool) {
 	case "torque":
 		return Torque, true
 	}
-	panic("unreachable")
 }

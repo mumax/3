@@ -29,12 +29,12 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
 		if (Dy != 0){
 			h.z += Dy * delta(my, 0, 1, 0); 
-			h.y -= Dx * delta(mz, 0, 1, 0); 
+			h.y -= Dy * delta(mz, 0, 1, 0); 
 		}
 
 		if (Dz != 0){
-			h.x += Dx * delta(my, 0, 0, 1); 
-			h.y -= Dx * delta(mx, 0, 0, 1); 
+			h.x += Dz * delta(my, 0, 0, 1); 
+			h.y -= Dz * delta(mx, 0, 0, 1); 
 		}
 
 		// write back, result is H + Hdmi

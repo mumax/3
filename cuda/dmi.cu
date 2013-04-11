@@ -1,7 +1,7 @@
 #include "stencil.h"
 
 // Dzyaloshinskii-Moriya interaction according to
-// Bagdanov and Röβler, PRL 87, 3, 2001. Eq. (6) and (8).
+// Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).
 // m: normalized magnetization
 // H: effective field in Tesla
 extern "C" __global__ void

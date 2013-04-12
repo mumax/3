@@ -23,22 +23,22 @@ addzhanglitorque(float* __restrict__    tx, float* __restrict__    ty, float* __
 
 		float3 hspin = make_float3(0, 0, 0); // (u·∇)m
 		if (ux != 0.){
-			ux *= loadmask(jmapx, I);
+			//ux *= loadmask(jmapx, I);
 			hspin += ux * make_float3(delta(mx, 1,0,0), delta(my, 1,0,0), delta(mz, 1,0,0)); 
 		}
 		if (uy != 0.){
-			uy *= loadmask(jmapy, I);
+			//uy *= loadmask(jmapy, I);
 			hspin += uy * make_float3(delta(mx, 0,1,0), delta(my, 0,1,0), delta(mz, 0,1,0)); 
 		}
 		if (uz != 0.){
-			uz *= loadmask(jmapz, I);
+			//uz *= loadmask(jmapz, I);
 			hspin += uz * make_float3(delta(mx, 0,0,1), delta(my, 0,0,1), delta(mz, 0,0,1)); 
 		}
 
-   		float3 m      = make_float3(mx[I], my[I], mz[I]); 
+		float3 m      = make_float3(mx[I], my[I], mz[I]); 
 		float3 torque = (-1./(1. + alpha*alpha)) * (
-						  (1+xi*alpha) * cross(m, cross(m, hspin)) 
-		                 +(  xi-alpha) * cross(m, hspin)           );
+		                 (1+xi*alpha) * cross(m, cross(m, hspin)) 
+		                +(  xi-alpha) * cross(m, hspin)           );
 	
 		// write back, adding to torque
 		tx[I] += torque.x;

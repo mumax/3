@@ -17,7 +17,7 @@ var (
 	Ku1     VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
 	Xi      ScalFn
 	SpinPol ScalFn
-	J       VecFn = ConstVector(1e12, 0, 0)
+	J       VecFn = ConstVector(0, 0, 0)
 )
 
 // Accessible quantities
@@ -113,14 +113,16 @@ func initialize() {
 
 	// spin-transfer torque
 	stt := newAdder("stt", func(dst *data.Slice) {
-		m_ := m.Read()
 		j := J()
-		p := SpinPol()
-		for i := range j {
-			j[i] *= p
+		if j != [3]float64{0, 0, 0} {
+			m_ := m.Read()
+			p := SpinPol()
+			jx := j[2] * p
+			jy := j[1] * p
+			jz := j[0] * p
+			cuda.AddZhangLiTorque(dst, m_, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
+			m.ReadDone()
 		}
-		cuda.AddZhangLiTorque(dst, m_, j, Msat(), nil, Alpha(), Xi())
-		m.ReadDone()
 	})
 	STT = stt
 

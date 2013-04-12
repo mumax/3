@@ -2,6 +2,9 @@
 
 package main
 
+// Micromagnetic standard problem 4b according to
+// http://www.ctcms.nist.gov/~rdm/mumag.org.html
+
 import (
 	. "code.google.com/p/mx3/engine"
 	"fmt"

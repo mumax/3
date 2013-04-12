@@ -1,4 +1,5 @@
 /*
- test/ directory contains go input scripts for simple (fast) test cases.
+ cert directory contains tests for certification,
+ like standard problems.
 */
-package doc
+package cert

@@ -2,8 +2,9 @@
 
 package main
 
-// Micromagnetic standard proplem no. 5
-// As proposed by M. Najafi et al., JAP 105, 113914 (2009).
+// Micromagnetic standard problem 5
+// as proposed by M. Najafi et al., JAP 105, 113914 (2009).
+// Reference solution by mumax2.
 
 import (
 	. "code.google.com/p/mx3/engine"
@@ -30,9 +31,9 @@ func main() {
 
 	Run(1e-9)
 
-	Table.Autosave(10e-12)
-	M.Autosave(50e-12)
-	STT.Autosave(50e-12)
+	//Table.Autosave(10e-12)
+	//M.Autosave(50e-12)
+	//STT.Autosave(50e-12)
 
 	Alpha = Const(0.1)
 	Xi = Const(0.05)

@@ -3,6 +3,7 @@
 package main
 
 // This test lets uniaxial anisotropy compete against the external field.
+// Reference values obtained with OOMMF.
 
 import (
 	. "code.google.com/p/mx3/engine"

@@ -2,6 +2,9 @@
 
 package main
 
+// Micromagnetic standard problem 4 (a) according to
+// http://www.ctcms.nist.gov/~rdm/mumag.org.html
+
 import (
 	. "code.google.com/p/mx3/engine"
 	"fmt"
@@ -25,7 +28,7 @@ func main() {
 	Aex = Const(13e-12)
 	SetMUniform(1, .1, 0)
 
-	Table.Autosave(1e-12)
+	//Table.Autosave(1e-12)
 	Run(3e-9)
 
 	m := M.Average()
@@ -39,7 +42,7 @@ func main() {
 	B_ext = ConstVector(-24.6E-3, 4.3E-3, 0)
 
 	Time = 0
-	M.Autosave(50e-12)
+	//M.Autosave(50e-12)
 	Run(1e-9)
 
 	m = M.Average()

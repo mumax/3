@@ -16,8 +16,8 @@ var (
 	DMI     ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Ku1     VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
 	Xi      ScalFn
-	SpinPol ScalFn
-	J       VecFn = ConstVector(0, 0, 0)
+	SpinPol ScalFn = Const(1)
+	J       VecFn  = ConstVector(0, 0, 0)
 )
 
 // Accessible quantities
@@ -139,6 +139,7 @@ func initialize() {
 		b_dmi.addTo(b_eff, good)
 		b_uni.addTo(b_eff, good)
 		b_ext.addTo(b_eff, good)
+		b_eff.touch(good)
 		torque.update(good)
 		stt.addTo(torque, good)
 		return torque.Synced

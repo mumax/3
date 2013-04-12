@@ -2,6 +2,8 @@
 
 package main
 
+// Tests the demag tensor of a thin film.
+
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"

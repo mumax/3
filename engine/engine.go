@@ -9,12 +9,15 @@ import (
 
 // User inputs
 var (
-	Aex   ScalFn                        // Exchange stiffness in J/m
-	Msat  ScalFn                        // Saturation magnetization in A/m
-	Alpha ScalFn                        // Damping constant
-	B_ext VecFn  = ConstVector(0, 0, 0) // External field in T
-	DMI   ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1   VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Aex     ScalFn                        // Exchange stiffness in J/m
+	Msat    ScalFn                        // Saturation magnetization in A/m
+	Alpha   ScalFn                        // Damping constant
+	B_ext   VecFn  = ConstVector(0, 0, 0) // External field in T
+	DMI     ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1     VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi      ScalFn
+	SpinPol ScalFn
+	J       VecFn = ConstVector(1e12, 0, 0)
 )
 
 // Accessible quantities
@@ -22,6 +25,7 @@ var (
 	M       Settable // reduced magnetization output handle
 	B_eff   Handle   // effective field (T) output handle
 	Torque  Buffered // torque (?) output handle
+	STT     Handle   // spin-transfer torque output handle
 	B_demag Handle   // demag field (T) output handle
 	B_dmi   Handle   // demag field (T) output handle
 	B_exch  Handle   // exchange field (T) output handle
@@ -107,6 +111,19 @@ func initialize() {
 	})
 	Torque = torque
 
+	// spin-transfer torque
+	stt := newAdder("stt", func(dst *data.Slice) {
+		m_ := m.Read()
+		j := J()
+		p := SpinPol()
+		for i := range j {
+			j[i] *= p
+		}
+		cuda.AddZhangLiTorque(dst, m_, j, Msat(), nil, Alpha(), Xi())
+		m.ReadDone()
+	})
+	STT = stt
+
 	// data table
 	table := newTable("datatable")
 	Table = table
@@ -121,6 +138,7 @@ func initialize() {
 		b_uni.addTo(b_eff, good)
 		b_ext.addTo(b_eff, good)
 		torque.update(good)
+		stt.addTo(torque, good)
 		return torque.Synced
 	}
 	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

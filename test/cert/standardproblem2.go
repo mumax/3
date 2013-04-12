@@ -37,7 +37,7 @@ func main() {
 
 	Solver.Maxdt = 1e-12
 	Run(2e-9)
-	Solver.Maxerr = 1e-5
+	Solver.MaxErr = 1e-5
 	Run(2e-9)
 
 	m := M.Average()

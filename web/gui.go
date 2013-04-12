@@ -20,7 +20,7 @@ func gui(w http.ResponseWriter, r *http.Request) {
 	if guiTempl == nil {
 		guiTempl = loadTemplate("gui.html") // TODO: embed.
 		guis.Heun = engine.Solver
-		guis.Mesh = engine.GetMesh()
+		guis.Mesh = engine.Mesh()
 	}
 	util.FatalErr(guiTempl.Execute(w, guis))
 }

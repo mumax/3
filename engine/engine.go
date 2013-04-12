@@ -174,7 +174,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	initialize()
 }
 
-func GetMesh() *data.Mesh {
+func Mesh() *data.Mesh {
+	checkInited()
 	return mesh
 }
 

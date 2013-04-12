@@ -1,15 +1,20 @@
-package mag
-
-// Utilities for setting magnetic configurations.
+package engine
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 )
 
-// Sets m to a magnetic vortex with given circulation and core polarization (1 or -1).
-func SetVortex(m *data.Slice, circ, pol int) {
-	mh := host(m)
+// Utilities for setting magnetic configurations.
 
+// Make a vortex magnetization with given circulation and core polarization (+1 or -1)
+// Example:
+// 	M.Upload(Vortex(1, 1))
+func Vortex(circ, pol int) *data.Slice {
+	util.Argument(circ == 1 || circ == -1)
+	util.Argument(pol == 1 || pol == -1)
+
+	mh := data.NewSlice(3, Mesh())
 	v := mh.Vectors()
 	cy, cz := len(v[0][0])/2, len(v[0][0][0])/2
 	for i := range v[0] {
@@ -26,18 +31,7 @@ func SetVortex(m *data.Slice, circ, pol int) {
 		v[Y][i][cy][cz] = 0.
 		v[X][i][cy][cz] = float32(pol)
 	}
-
-	if mh != m {
-		data.Copy(m, mh)
-	}
-}
-
-// return m if already on host, new CPU slice otherwise.
-func host(m *data.Slice) *data.Slice {
-	if m.CPUAccess() {
-		return m
-	} //else
-	return data.NewSlice(m.NComp(), m.Mesh())
+	return mh
 }
 
 //// Returns a function that returns the vector value for all i,j,k.

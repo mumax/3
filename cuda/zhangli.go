@@ -4,11 +4,8 @@ import (
 	"code.google.com/p/mx3/data"
 	. "code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
-	"fmt"
 )
 
-// be careful with gamma!
-//P := s.spinPol put in j
 func AddZhangLiTorque(torque, m *data.Slice, j [3]float64, Msat float64, j_MsMap *data.Slice, alpha, xi float64) {
 	// TODO: assert...
 
@@ -22,7 +19,6 @@ func AddZhangLiTorque(torque, m *data.Slice, j [3]float64, Msat float64, j_MsMap
 	ux := float32((j[0] * b) / (Gamma0 * 2 * c[0]))
 	uy := float32((j[1] * b) / (Gamma0 * 2 * c[1]))
 	uz := float32((j[2] * b) / (Gamma0 * 2 * c[2]))
-	fmt.Println("u:", ux, uy, uz)
 
 	k_addzhanglitorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),

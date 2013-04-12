@@ -22,6 +22,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 		int I = idx(i, j, k);
 		float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
 
+		// Out-of-plane field
 		h.x += Dz * delta(mz, 0, 0, 1); 
 		h.x += Dy * delta(my, 0, 1, 0); 
 

@@ -34,11 +34,10 @@ func control(w http.ResponseWriter, r *http.Request) {
 
 	case "pause": // reacts immediately
 		ui.Lock()
+		ui.pleaseStop = true
 		for ui.Running {
-			ui.pleaseStop = true
 			ui.Wait()
 		}
-		ui.pleaseStop = false
 		ui.Unlock()
 
 	case "run":
@@ -89,8 +88,8 @@ func Run(seconds float64) {
 	stop := Time + seconds
 	defer util.DashExit()
 	for {
-		ui.Lock()
 		step()
+		ui.Lock()
 		if Time >= stop || ui.pleaseStop {
 			break
 		} else {
@@ -98,7 +97,9 @@ func Run(seconds float64) {
 		}
 	}
 	ui.Running = false
+	ui.pleaseStop = false
 	ui.Unlock()
+	ui.Signal()
 }
 
 // Run the simulation for a number of steps.

@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"fmt"
 	"html/template"
 	"net/http"
 	"sync"
@@ -19,7 +20,9 @@ func gui(w http.ResponseWriter, r *http.Request) {
 		ui.Mesh = Mesh()
 		ui.Unlock()
 	}
+	//ui.Lock()
 	util.FatalErr(ui.templ.Execute(w, ui))
+	//ui.Unlock()
 }
 
 type guistate struct {
@@ -36,6 +39,7 @@ type guistate struct {
 func (s *guistate) Time() float32 { return float32(Time) }
 func (s *guistate) Lock()         { ui.L.Lock() }
 func (s *guistate) Unlock()       { ui.L.Unlock() }
+func (s *guistate) Debug() string { return fmt.Sprint(ui.pleaseStop) }
 
 const templText = `
 <!DOCTYPE html>
@@ -63,6 +67,7 @@ const templText = `
 <div> <h2> control </h2>
 	{{if .Running}}Running{{else}}Paused{{end}}
 	{{with .Msg}}{{.}}{{end}}<br/>
+	Debug:{{.Debug}}<br/>
 	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
 	<form action=/ctl/run   method="POST">
         <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>

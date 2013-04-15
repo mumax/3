@@ -17,6 +17,7 @@ var (
 	Flag_od       = flag.String("o", "", "set output directory")
 	Flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
 	Flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
+	Flag_port     = flag.String("http", ":8080", "port to serve web gui")
 )
 
 func Init() {

@@ -85,7 +85,6 @@ div#footer{ color:gray; font-size:14px; }
 	
 </div>
 
-
 </body>
 </html>
 `

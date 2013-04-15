@@ -22,6 +22,8 @@ func GoServe(port string) {
 
 	http.HandleFunc("/render/", render)
 
+	http.HandleFunc("/ctl/", control)
+
 	http.HandleFunc("/", gui)
 
 	log.Print("serving GUI on http://localhost", port, "\n")

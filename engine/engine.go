@@ -5,7 +5,6 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
-	"time"
 )
 
 // User inputs
@@ -166,18 +165,6 @@ func Steps(n int) {
 	defer util.DashExit()
 	for i := 0; i < n; i++ {
 		step()
-	}
-}
-
-// Enter interactive mode.
-func Interactive() {
-	log.Println("entering interactive mode")
-	if webPort == "" {
-		GoServe(*Flag_port)
-	}
-	for {
-		time.Sleep(1 * time.Second)
-		// REPL here ...
 	}
 }
 

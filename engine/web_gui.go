@@ -10,7 +10,7 @@ import (
 
 var (
 	guiTempl *template.Template
-	guis     = new(guistate)
+	guis     = &guistate{Steps: 1000, Runtime: 1e-9}
 )
 
 func gui(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +25,10 @@ func gui(w http.ResponseWriter, r *http.Request) {
 type guistate struct {
 	*cuda.Heun
 	*data.Mesh
+	Paused  bool
+	Msg     string
+	Steps   int
+	Runtime float64
 }
 
 func (s *guistate) Time() float32 { return float32(Time) }
@@ -33,30 +37,35 @@ const templText = `
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-  <title>mx3</title>
-
-<style media="screen" type="text/css">
-body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
-img  { margin: 10px; }
-h1   { font-size: 28px; font-color: gray; }
-hr   { border-style: none; border-top: 1px solid gray; }
-a    { color: #375EAB; text-decoration: none; }
-table{ border:"10"; }
-div#header{ color:gray; font-size:16px; }
-div#footer{ color:gray; font-size:14px; }
-</style>
-
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>mx3</title>
+	<style media="screen" type="text/css">
+		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
+		img  { margin: 10px; }
+		h1   { font-size: 28px; font-color: gray; }
+		hr   { border-style: none; border-top: 1px solid gray; }
+		a    { color: #375EAB; text-decoration: none; }
+		table{ border:"10"; }
+		div#header{ color:gray; font-size:16px; }
+		div#footer{ color:gray; font-size:14px; }
+	</style>
 </head>
+
 <body>
 
-<div id="header">
-	<h1> mx3 </h1> 
-	<hr/>
-</div>
+<div id="header"> <h1> mx3 </h1> <hr/> </div>
 
-<div id="body">
+<div> <h2> control </h2>
+	<b>{{.Msg}}</b><br/>
+	<form action=/ctl/exit  method="POST"> <input type="submit" value="Kill"/> </form>
+	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
+	<form action=/ctl/run   method="POST">
+        <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
+	</form>
+	<form action=/ctl/steps method="POST">
+        <input name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
+	</form>
+<hr/></div>
 
 <h2> solver </h2> 
 <table> 

@@ -33,7 +33,7 @@ var (
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
 	val := r.FormValue("value")
-	guis.Msg = "" // clear last message
+	ui.Msg = "" // clear last message
 
 	switch cmd {
 	default:
@@ -57,18 +57,18 @@ func control(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, cmd+":"+err.Error(), 400)
 			return
 		}
-		guis.Runtime = v
+		ui.Runtime = v
 		requests <- req{cmd: cmd, nval: v}
-		guis.Msg = <-response
+		ui.Msg = <-response
 	case "steps":
 		v, err := strconv.Atoi(val)
 		if err != nil {
 			http.Error(w, cmd+":"+err.Error(), 400)
 			return
 		}
-		guis.Steps = int(v)
+		ui.Steps = int(v)
 		requests <- req{cmd: cmd, nval: float64(v)}
-		guis.Msg = <-response
+		ui.Msg = <-response
 	case "exit":
 		os.Exit(0)
 	}
@@ -93,13 +93,13 @@ func Interactive() {
 			log.Println(msg)
 			response <- msg
 			Run(r.nval)
-			guis.Msg = "Paused"
+			ui.Msg = "Paused"
 		case "steps":
 			msg := fmt.Sprintln("interactive run for", int(r.nval), "steps")
 			log.Println(msg)
 			response <- msg
 			Steps(int(r.nval))
-			guis.Msg = "Paused"
+			ui.Msg = "Paused"
 		}
 	}
 }
@@ -135,8 +135,6 @@ func Run(seconds float64) {
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	guis.Paused = false
-	defer func() { guis.Paused = true }()
 	log.Println("run for", n, "steps")
 	checkInited()
 	defer util.DashExit()

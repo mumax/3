@@ -6,32 +6,37 @@ import (
 	"code.google.com/p/mx3/util"
 	"html/template"
 	"net/http"
+	"sync"
 )
 
-var (
-	guiTempl *template.Template
-	guis     = &guistate{Steps: 1000, Runtime: 1e-9, Paused: true}
-)
+var ui *guistate = &guistate{Steps: 1000, Runtime: 1e-9, Cond: sync.NewCond(new(sync.Mutex))}
 
 func gui(w http.ResponseWriter, r *http.Request) {
-	if guiTempl == nil {
-		guiTempl = template.Must(template.New("gui").Parse(templText))
-		guis.Heun = Solver
-		guis.Mesh = Mesh()
+	if ui.templ == nil {
+		ui.Lock()
+		ui.templ = template.Must(template.New("gui").Parse(templText))
+		ui.Heun = Solver
+		ui.Mesh = Mesh()
+		ui.Unlock()
 	}
-	util.FatalErr(guiTempl.Execute(w, guis))
+	ui.Lock()
+	defer ui.Unlock()
+	util.FatalErr(ui.templ.Execute(w, ui))
 }
 
 type guistate struct {
 	*cuda.Heun
 	*data.Mesh
-	Paused  bool
 	Msg     string
 	Steps   int
 	Runtime float64
+	templ   *template.Template
+	*sync.Cond
 }
 
 func (s *guistate) Time() float32 { return float32(Time) }
+func (s *guistate) Lock()         { ui.L.Lock() }
+func (s *guistate) Unlock()       { ui.L.Unlock() }
 
 //<meta http-equiv="refresh" content="1">
 const templText = `
@@ -57,7 +62,6 @@ const templText = `
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
 <div> <h2> control </h2>
-	{{if .Paused}} <b>Paused</b> {{else}} <b>Running</b> {{end}}<br/>
 	{{with .Msg}}{{.}}<br/>{{end}}
 	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
 	<form action=/ctl/run   method="POST">

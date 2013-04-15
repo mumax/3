@@ -9,13 +9,11 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"sync"
 )
 
 var (
-	requests = make(chan req)      // requests for long-running commands are sent here
-	response = make(chan string)   // responses to requests channel are sent here
-	breakrun = make(chan struct{}) // dropping a value breaks run loops
+	requests = make(chan req)    // requests for long-running commands are sent here
+	response = make(chan string) // responses to requests channel are sent here
 )
 
 type req struct {
@@ -23,12 +21,6 @@ type req struct {
 	value string
 	nval  float64
 }
-
-var (
-	runcond    = sync.NewCond(new(sync.Mutex))
-	pleaseStop bool
-	running    bool
-)
 
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
@@ -41,15 +33,13 @@ func control(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case "pause": // reacts immediately
-		runcond.L.Lock()
-		for running {
-			pleaseStop = true
-			runcond.Wait()
+		ui.Lock()
+		for ui.Running {
+			ui.pleaseStop = true
+			ui.Wait()
 		}
-		pleaseStop = false
-		runcond.L.Unlock()
-
-	case "break":
+		ui.pleaseStop = false
+		ui.Unlock()
 
 	case "run":
 		v, err := strconv.ParseFloat(val, 64)
@@ -60,15 +50,7 @@ func control(w http.ResponseWriter, r *http.Request) {
 		ui.Runtime = v
 		requests <- req{cmd: cmd, nval: v}
 		ui.Msg = <-response
-	case "steps":
-		v, err := strconv.Atoi(val)
-		if err != nil {
-			http.Error(w, cmd+":"+err.Error(), 400)
-			return
-		}
-		ui.Steps = int(v)
-		requests <- req{cmd: cmd, nval: float64(v)}
-		ui.Msg = <-response
+
 	case "exit":
 		os.Exit(0)
 	}
@@ -115,16 +97,10 @@ func Run(seconds float64) {
 	for {
 		step()
 
-		runcond.L.Lock()
-		if pleaseStop || Time >= stop {
+		if Time >= stop {
 			break
-		} else {
-			runcond.L.Unlock()
 		}
 	}
-	running = false
-	runcond.Signal()
-	runcond.L.Unlock()
 }
 
 //func isRunning() bool{
@@ -135,18 +111,18 @@ func Run(seconds float64) {
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	log.Println("run for", n, "steps")
-	checkInited()
-	defer util.DashExit()
-
-	ok := true
-	for i := 0; i < n && ok; i++ {
-		step()
-		select {
-		default: // keep going
-		case <-breakrun:
-			ok = false
-			response <- "stopped stepping"
-		}
-	}
+	//	log.Println("run for", n, "steps")
+	//	checkInited()
+	//	defer util.DashExit()
+	//
+	//	ok := true
+	//	for i := 0; i < n && ok; i++ {
+	//		step()
+	//		select {
+	//		default: // keep going
+	//		case <-breakrun:
+	//			ok = false
+	//			response <- "stopped stepping"
+	//		}
+	//	}
 }

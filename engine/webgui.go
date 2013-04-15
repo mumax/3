@@ -27,10 +27,11 @@ func gui(w http.ResponseWriter, r *http.Request) {
 type guistate struct {
 	*cuda.Heun
 	*data.Mesh
-	Msg     string
-	Steps   int
-	Runtime float64
-	templ   *template.Template
+	Msg                 string
+	Steps               int
+	Runtime             float64
+	templ               *template.Template
+	Running, pleaseStop bool
 	*sync.Cond
 }
 

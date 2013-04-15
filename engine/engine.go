@@ -147,46 +147,6 @@ func initialize() {
 	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
-// Run the simulation for a number of seconds.
-func Run(seconds float64) {
-	guis.Paused = false
-	defer func() { guis.Paused = true }()
-	log.Println("run for", seconds, "s")
-	checkInited()
-	stop := Time + seconds
-	defer util.DashExit()
-	ok := true
-	for Time < stop && ok {
-		step()
-		select {
-		default: // keep going
-		case <-breakrun:
-			ok = false
-			response <- "stopped running"
-		}
-	}
-}
-
-// Run the simulation for a number of steps.
-func Steps(n int) {
-	guis.Paused = false
-	defer func() { guis.Paused = true }()
-	log.Println("run for", n, "steps")
-	checkInited()
-	defer util.DashExit()
-
-	ok := true
-	for i := 0; i < n && ok; i++ {
-		step()
-		select {
-		default: // keep going
-		case <-breakrun:
-			ok = false
-			response <- "stopped stepping"
-		}
-	}
-}
-
 func step() {
 	s := Solver
 	s.Step()

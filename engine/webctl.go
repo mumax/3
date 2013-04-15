@@ -87,6 +87,11 @@ func Run(seconds float64) {
 
 	stop := Time + seconds
 	defer util.DashExit()
+
+	ui.Lock()
+	ui.Running = true
+	ui.Unlock()
+
 	for {
 		step()
 		ui.Lock()

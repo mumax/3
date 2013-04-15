@@ -20,9 +20,9 @@ func gui(w http.ResponseWriter, r *http.Request) {
 		ui.Mesh = Mesh()
 		ui.Unlock()
 	}
-	//ui.Lock()
+	ui.Lock()
 	util.FatalErr(ui.templ.Execute(w, ui))
-	//ui.Unlock()
+	ui.Unlock()
 }
 
 type guistate struct {
@@ -65,7 +65,7 @@ const templText = `
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
 <div> <h2> control </h2>
-	{{if .Running}}Running{{else}}Paused{{end}}
+	{{if .Running}}Running{{else}}Paused{{end}}<br/>
 	{{with .Msg}}{{.}}{{end}}<br/>
 	Debug:{{.Debug}}<br/>
 	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>

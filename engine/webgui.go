@@ -19,8 +19,6 @@ func gui(w http.ResponseWriter, r *http.Request) {
 		ui.Mesh = Mesh()
 		ui.Unlock()
 	}
-	ui.Lock()
-	defer ui.Unlock()
 	util.FatalErr(ui.templ.Execute(w, ui))
 }
 
@@ -39,12 +37,12 @@ func (s *guistate) Time() float32 { return float32(Time) }
 func (s *guistate) Lock()         { ui.L.Lock() }
 func (s *guistate) Unlock()       { ui.L.Unlock() }
 
-//<meta http-equiv="refresh" content="1">
 const templText = `
 <!DOCTYPE html>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	{{if .Running}}<meta http-equiv="refresh" content="1">{{end}}
 	<title>mx3</title>
 	<style media="screen" type="text/css">
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
@@ -63,7 +61,8 @@ const templText = `
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
 <div> <h2> control </h2>
-	{{with .Msg}}{{.}}<br/>{{end}}
+	{{if .Running}}Running{{else}}Paused{{end}}
+	{{with .Msg}}{{.}}{{end}}<br/>
 	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
 	<form action=/ctl/run   method="POST">
         <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>

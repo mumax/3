@@ -65,6 +65,7 @@ func Interactive() {
 	}
 	for {
 		r := <-requests
+		log.Println("request:", r)
 		switch r.cmd {
 		default:
 			msg := "interactive: unhandled command: " + r.cmd
@@ -72,16 +73,9 @@ func Interactive() {
 			response <- msg
 		case "run":
 			msg := fmt.Sprintln("interactive run for", r.nval, "s")
-			log.Println(msg)
 			response <- msg
+			log.Println(msg)
 			Run(r.nval)
-			ui.Msg = "Paused"
-		case "steps":
-			msg := fmt.Sprintln("interactive run for", int(r.nval), "steps")
-			log.Println(msg)
-			response <- msg
-			Steps(int(r.nval))
-			ui.Msg = "Paused"
 		}
 	}
 }
@@ -95,19 +89,17 @@ func Run(seconds float64) {
 	stop := Time + seconds
 	defer util.DashExit()
 	for {
+		ui.Lock()
 		step()
-
-		if Time >= stop {
+		if Time >= stop || ui.pleaseStop {
 			break
+		} else {
+			ui.Unlock()
 		}
 	}
+	ui.Running = false
+	ui.Unlock()
 }
-
-//func isRunning() bool{
-//	runlock.Lock()
-//	defer runlock.Unlock()
-//	return running
-//}
 
 // Run the simulation for a number of steps.
 func Steps(n int) {

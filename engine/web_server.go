@@ -1,4 +1,4 @@
-package web
+package engine
 
 import (
 	"code.google.com/p/mx3/cuda"

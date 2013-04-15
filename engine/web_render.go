@@ -1,9 +1,8 @@
-package web
+package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/draw"
-	"code.google.com/p/mx3/engine"
 	"image/jpeg"
 	"net/http"
 	"strings"
@@ -12,7 +11,7 @@ import (
 // render image of quantity
 func render(w http.ResponseWriter, r *http.Request) {
 	url := strings.ToLower(r.URL.Path[len("/render/"):])
-	h, ok := engine.Quant(url)
+	h, ok := Quant(url)
 	if !ok {
 		http.Error(w, "render: unknown quantity: "+url, http.StatusNotFound)
 		return

@@ -1,3 +1,35 @@
+package engine
+
+import (
+	"code.google.com/p/mx3/cuda"
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
+	"html/template"
+	"net/http"
+)
+
+var (
+	guiTempl *template.Template
+	guis     = new(guistate)
+)
+
+func gui(w http.ResponseWriter, r *http.Request) {
+	if guiTempl == nil {
+		guiTempl = template.Must(template.New("gui").Parse(templText))
+		guis.Heun = Solver
+		guis.Mesh = Mesh()
+	}
+	util.FatalErr(guiTempl.Execute(w, guis))
+}
+
+type guistate struct {
+	*cuda.Heun
+	*data.Mesh
+}
+
+func (s *guistate) Time() float32 { return float32(Time) }
+
+const templText = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,3 +88,4 @@ div#footer{ color:gray; font-size:14px; }
 
 </body>
 </html>
+`

@@ -10,7 +10,6 @@ PKGS=\
 	$(PREFIX)/mag\
 	$(PREFIX)/data\
 	$(PREFIX)/prof\
-	$(PREFIX)/web\
 
 $(PREFIX)/cuda: nvcc
 

@@ -150,6 +150,7 @@ func initialize() {
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	guis.Paused = false
+	defer func() { guis.Paused = true }()
 	log.Println("run for", seconds, "s")
 	checkInited()
 	stop := Time + seconds
@@ -161,7 +162,6 @@ func Run(seconds float64) {
 		default: // keep going
 		case <-breakrun:
 			ok = false
-			guis.Paused = true
 			response <- "stopped running"
 		}
 	}
@@ -170,6 +170,7 @@ func Run(seconds float64) {
 // Run the simulation for a number of steps.
 func Steps(n int) {
 	guis.Paused = false
+	defer func() { guis.Paused = true }()
 	log.Println("run for", n, "steps")
 	checkInited()
 	defer util.DashExit()
@@ -181,7 +182,6 @@ func Steps(n int) {
 		default: // keep going
 		case <-breakrun:
 			ok = false
-			guis.Paused = true
 			response <- "stopped stepping"
 		}
 	}

@@ -10,7 +10,7 @@ import (
 
 var (
 	guiTempl *template.Template
-	guis     = &guistate{Steps: 1000, Runtime: 1e-9}
+	guis     = &guistate{Steps: 1000, Runtime: 1e-9, Paused: true}
 )
 
 func gui(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +38,7 @@ const templText = `
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	{{if not .Paused}}<meta http-equiv="refresh" content="1"> {{end}}
 	<title>mx3</title>
 	<style media="screen" type="text/css">
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
@@ -56,7 +57,8 @@ const templText = `
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
 <div> <h2> control </h2>
-	<b>{{.Msg}}</b><br/>
+	{{if .Paused}} <b>Paused</b> {{else}} <b>Running</b> {{end}}<br/>
+	{{with .Msg}}{{.}}<br/>{{end}}
 	<form action=/ctl/exit  method="POST"> <input type="submit" value="Kill"/> </form>
 	<form action=/ctl/break method="POST"> <input type="submit" value="Break"/> </form>
 	<form action=/ctl/run   method="POST">

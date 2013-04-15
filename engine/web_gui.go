@@ -58,7 +58,7 @@ const templText = `
 <div> <h2> control </h2>
 	<b>{{.Msg}}</b><br/>
 	<form action=/ctl/exit  method="POST"> <input type="submit" value="Kill"/> </form>
-	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
+	<form action=/ctl/break method="POST"> <input type="submit" value="Break"/> </form>
 	<form action=/ctl/run   method="POST">
         <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>

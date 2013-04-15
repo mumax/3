@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	requests = make(chan req)
+	requests = make(chan req) // requests for long-running commands are sent here
 	response = make(chan string)
+	breakrun = make(chan bool) // breaks run loops
 )
 
 type req struct {
@@ -30,8 +31,8 @@ func control(w http.ResponseWriter, r *http.Request) {
 		return
 	case "exit":
 		os.Exit(0)
-	case "pause":
-		requests <- req{cmd: cmd} // , ..
+	case "break":
+		breakrun <- true
 		guis.Msg = <-response
 	case "run":
 		v, err := strconv.ParseFloat(val, 64)

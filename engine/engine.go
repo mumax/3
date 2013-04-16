@@ -38,7 +38,7 @@ var (
 
 // hidden quantities
 var (
-	mesh      *data.Mesh
+	mesh      data.Mesh
 	m, torque *buffered
 	demag_    *cuda.DemagConvolution
 	vol       *data.Slice
@@ -47,10 +47,10 @@ var (
 func initialize() {
 
 	// these 2 GPU arrays are re-used to stored various quantities.
-	arr1, arr2 := cuda.NewSynced(3, mesh), cuda.NewSynced(3, mesh)
+	arr1, arr2 := cuda.NewSynced(3, &mesh), cuda.NewSynced(3, &mesh)
 
 	// cell volumes currently unused
-	vol = data.NilSlice(1, mesh)
+	vol = data.NilSlice(1, &mesh)
 
 	// magnetization
 	m = newBuffered(arr1, "m", nil)
@@ -61,7 +61,7 @@ func initialize() {
 	B_eff = b_eff
 
 	// demag field
-	demag_ = cuda.NewDemag(mesh)
+	demag_ = cuda.NewDemag(&mesh)
 	b_demag := newBuffered(arr2, "B_demag", func(b *data.Slice) {
 		m_ := m.Read()
 		demag_.Exec(b, m_, vol, Mu0*Msat()) //TODO: consistent msat or bsat
@@ -166,25 +166,29 @@ func SetMUniform(mx, my, mz float32) {
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	//if mesh != nil{
-	log.Println("resetting gpu")
-	cuda5.DeviceReset()
-	Init()
 	//}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
-	mesh = data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+	mesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
 	log.Println("set mesh:", mesh.UserString())
 	initialize()
 }
 
+func free() {
+	log.Println("resetting gpu")
+	cuda5.DeviceReset()
+	Init()
+	dlQue = nil
+}
+
 func Mesh() *data.Mesh {
 	checkInited()
-	return mesh
+	return &mesh
 }
 
 func checkInited() {
-	if mesh == nil {
+	if mesh.Size() == [3]int{0, 0, 0} {
 		log.Fatal("need to set mesh first")
 	}
 }

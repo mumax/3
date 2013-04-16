@@ -52,7 +52,7 @@ func addBuf() *buffered {
 	if _addBuf == nil {
 		util.DashExit()
 		log.Println("allocating GPU buffer for output")
-		_addBuf = newBuffered(cuda.NewSynced(3, mesh), "buffer", nil)
+		_addBuf = newBuffered(cuda.NewSynced(3, &mesh), "buffer", nil)
 	}
 	return _addBuf
 }

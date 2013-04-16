@@ -9,37 +9,41 @@ import (
 	"sync"
 )
 
-var ui *guistate = &guistate{Steps: 1000, Runtime: 1e-9, Cond: sync.NewCond(new(sync.Mutex))}
+var (
+	ui      = &guistate{Steps: 1000, Runtime: 1e-9, Cond: sync.NewCond(new(sync.Mutex))}
+	uitempl = template.Must(template.New("gui").Parse(templText))
+)
 
 func gui(w http.ResponseWriter, r *http.Request) {
-	if ui.templ == nil {
-		ui.Lock()
-		ui.templ = template.Must(template.New("gui").Parse(templText))
-		ui.Heun = Solver
-		ui.Mesh = Mesh()
-		ui.Unlock()
-	}
 	ui.Lock()
-	util.FatalErr(ui.templ.Execute(w, ui))
-	ui.Unlock()
+	defer ui.Unlock()
+	util.FatalErr(uitempl.Execute(w, ui))
 }
 
 type guistate struct {
-	*cuda.Heun
-	*data.Mesh
 	Msg                 string
 	Steps               int
 	Runtime             float64
-	templ               *template.Template
 	Running, pleaseStop bool
 	*sync.Cond
 }
 
-func (s *guistate) Time() float32 { return float32(Time) }
-func (s *guistate) Lock()         { ui.L.Lock() }
-func (s *guistate) Unlock()       { ui.L.Unlock() }
-func (s *guistate) ImWidth() int  { return ui.Mesh.Size()[2] }
-func (s *guistate) ImHeight() int { return ui.Mesh.Size()[1] }
+func (s *guistate) Time() float32    { return float32(Time) }
+func (s *guistate) Lock()            { ui.L.Lock() }
+func (s *guistate) Unlock()          { ui.L.Unlock() }
+func (s *guistate) ImWidth() int     { return ui.Mesh().Size()[2] }
+func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
+func (s *guistate) Mesh() *data.Mesh { return &mesh }
+func (s *guistate) Solver() *cuda.Heun {
+	if Solver == nil {
+		return &zeroSolver
+	} else {
+		return Solver
+	}
+}
+
+// surrogate solver if no real one is set, provides zero values for time step etc to template.
+var zeroSolver cuda.Heun
 
 const templText = `
 <!DOCTYPE html>
@@ -94,12 +98,12 @@ const templText = `
 
 
 <table>
-<tr><td> step:        </td><td> {{.NSteps}} </td></tr> 
-<tr><td> undone steps:</td><td> {{.NUndone}}</td></tr>  
+<tr><td> step:        </td><td> {{.Solver.NSteps}} </td></tr> 
+<tr><td> undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  
 <tr><td> time:        </td><td> {{.Time}}   </td></tr>  
-<tr><td> time step:   </td><td> {{.Dt_si}}  </td></tr>  
-<tr><td> max err/step:</td><td> {{.MaxErr}} </td></tr>  
-<tr><td> err/step:    </td><td> {{.LastErr}}</td></tr>  
+<tr><td> time step:   </td><td> {{.Solver.Dt_si}}  </td></tr>  
+<tr><td> max err/step:</td><td> {{.Solver.MaxErr}} </td></tr>  
+<tr><td> err/step:    </td><td> {{.Solver.LastErr}}</td></tr>  
 </table>
 
 </td></tr></table> 
@@ -128,23 +132,23 @@ const templText = `
 <form action=/setmesh/ method="POST"><table> 
 	<tr>
 		<td> grid size: </td>
-		<td> <input id=text size=8 name="gridsizex" value="{{index .Size 2}}"> </td> <td> x </td>
-		<td> <input id=text size=8 name="gridsizey" value="{{index .Size 1}}"> </td> <td> x </td>
-		<td> <input id=text size=8 name="gridsizez" value="{{index .Size 0}}"> </td> <td>   </td>
+		<td> <input id=text size=8 name="gridsizex" value="{{index .Mesh.Size 2}}"> </td> <td> x </td>
+		<td> <input id=text size=8 name="gridsizey" value="{{index .Mesh.Size 1}}"> </td> <td> x </td>
+		<td> <input id=text size=8 name="gridsizez" value="{{index .Mesh.Size 0}}"> </td> <td>   </td>
 	</tr>
 
 	<tr>
 		<td> cell size: </td>
-		<td> <input id=text size=8 name="cellsizex" value="{{index .CellSize 2}}"> </td> <td> x  </td>
-		<td> <input id=text size=8 name="cellsizey" value="{{index .CellSize 1}}"> </td> <td> x  </td>
-		<td> <input id=text size=8 name="cellsizez" value="{{index .CellSize 0}}"> </td> <td> m3 </td>
+		<td> <input id=text size=8 name="cellsizex" value="{{index .Mesh.CellSize 2}}"> </td> <td> x  </td>
+		<td> <input id=text size=8 name="cellsizey" value="{{index .Mesh.CellSize 1}}"> </td> <td> x  </td>
+		<td> <input id=text size=8 name="cellsizez" value="{{index .Mesh.CellSize 0}}"> </td> <td> m3 </td>
 	</tr>
 
 	<tr>
 		<td> world size: &nbsp;&nbsp; </td>
-		<td> {{index .WorldSize 2}} </td> <td> x  </td>
-		<td> {{index .WorldSize 1}} </td> <td> x  </td>
-		<td> {{index .WorldSize 0}} </td> <td> m3 </td>
+		<td> {{index .Mesh.WorldSize 2}} </td> <td> x  </td>
+		<td> {{index .Mesh.WorldSize 1}} </td> <td> x  </td>
+		<td> {{index .Mesh.WorldSize 0}} </td> <td> m3 </td>
 	</tr>
 </table>
 	<input type="submit" value=" SAVE "/> <b> Changing the mesh requires some re-initialization time</b>

@@ -38,6 +38,8 @@ type guistate struct {
 func (s *guistate) Time() float32 { return float32(Time) }
 func (s *guistate) Lock()         { ui.L.Lock() }
 func (s *guistate) Unlock()       { ui.L.Unlock() }
+func (s *guistate) ImWidth() int  { return ui.Mesh.Size()[2] }
+func (s *guistate) ImHeight() int { return ui.Mesh.Size()[1] }
 
 const templText = `
 <!DOCTYPE html>
@@ -78,12 +80,12 @@ const templText = `
 	<form action=/ctl/run method="POST">
         <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
-	<form  action=/ctl/steps method="POST">
+	<form  action=/ctl/steps/ method="POST">
         <input name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 	{{end}}
 	<br/>
-	<form action=/ctl/exit  method="POST"> <font color=red><b>Danger Zone:</b></font> <input type="submit" value="Kill"/> </form>
+	<form action=/ctl/kill  method="POST"> <font color=red><b>Danger Zone:</b></font> <input type="submit" value="Kill"/> </form>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;
@@ -103,21 +105,27 @@ const templText = `
 
 <hr/> </div>
 
-<h2> magnetization </h2> 
-<img src="/render/m">
-<hr/>
+<div> <h2> magnetization </h2> 
+<img width={{.ImWidth}} height={{.ImHeight}} src="/render/m">
+<hr/></div>
 
+<div> <h2> parameters </h2> 
+	<form action="/set/" method="POST">
+        Msat <input name="msat" value="800e6"/> A/m  <br/>
+        Aex  <input name="aex"  value="13e-12"/> J/m <br/>
 
-<h2> mesh </h2> 
+		Apply: <input type="submit" value="OK"/>
+	</form>
+<hr/></div>
+
+<div><h2> mesh </h2> 
 <table> 
 <tr> <td> grid size: </td> <td>{{index .Size 2}}     x{{index .Size 1}}     x{{index .Size 0}}      </td></tr>
 <tr> <td> cell size: </td> <td>{{index .CellSize 2}} m x{{index .CellSize 1}} m x {{index .CellSize 0}} m </td></tr>
 <tr> <td> world size:</td> <td>{{index .WorldSize 2}} m x{{index .WorldSize 1}} m x{{index .WorldSize 0}} m</td></tr>
 </table>
-<hr/>
+<hr/></div>
 
-
-</div>
 <div id="footer">
 	
 </div>

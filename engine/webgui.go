@@ -110,11 +110,15 @@ const templText = `
 <hr/></div>
 
 <div> <h2> parameters </h2> 
-	<form action="/set/" method="POST">
-        Msat <input name="msat" value="800e6"/> A/m  <br/>
-        Aex  <input name="aex"  value="13e-12"/> J/m <br/>
-
-		Apply: <input type="submit" value="OK"/>
+	<form action=/set/ method="POST">
+	<table>
+	{{range $k, $v := .Params}}
+		<tr><td> {{$k}}: </td><td> 
+		{{range $v.Comp}} 
+        	<input size=10 name="{{$k}}{{.}}" value="xxx"> 
+		{{end}} {{$v.Unit}} </td></tr>
+	{{end}}
+	</table>
 	</form>
 <hr/></div>
 

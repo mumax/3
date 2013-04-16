@@ -20,6 +20,35 @@ var (
 	J       VecFn  = ConstVector(0, 0, 0)
 )
 
+var meta_inf = map[string]meta{
+	"aex":     {"J/m", "Exchange stiffness", &Aex},
+	"msat":    {"A/m", "Saturation magnetization", &Msat},
+	"alpha":   {"", "Damping constant", &Alpha},
+	"b_ext":   {"T", "External field", &B_ext},
+	"dmi":     {"J/m2", "Dzyaloshinskii-Moriya strength", &DMI},
+	"ku1":     {"J/m3", "Uniaxial anisotropy vector", &Ku1},
+	"xi":      {"", "Spin-transfer torque", &Xi}, // TODO: replace by beta
+	"spinpol": {"", "Spin polarization", &SpinPol},
+	"j":       {"A/m2", "Electrical current density", &J},
+}
+
+type meta struct {
+	Unit, Descr string
+	Handle      interface{}
+}
+
+func (m meta) Comp() []int {
+	switch m.Handle.(type) {
+	default:
+		panic("meta-inf: unknown pointer type")
+	case *ScalFn:
+		return []int{0}
+	case *VecFn:
+		return []int{0, 1, 2}
+	}
+}
+func (ui *guistate) Params() map[string]meta { return meta_inf }
+
 // Accessible quantities
 var (
 	M       Settable // reduced magnetization output handle

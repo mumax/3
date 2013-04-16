@@ -51,7 +51,7 @@ func control(w http.ResponseWriter, r *http.Request) {
 		requests <- req{cmd: cmd, argn: v}
 		ui.Msg = <-response
 
-	case "exit":
+	case "kill":
 		os.Exit(0)
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
@@ -64,8 +64,8 @@ func Interactive() {
 		GoServe(*Flag_port)
 	}
 	for {
+		log.Println("awaiting web input")
 		r := <-requests
-		log.Println("request:", r)
 		switch r.cmd {
 		default:
 			msg := "interactive: unhandled command: " + r.cmd

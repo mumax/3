@@ -107,11 +107,11 @@ const templText = `
 <hr/> </div>
 
 <div> <h2> magnetization </h2> 
-<img width={{.ImWidth}} height={{.ImHeight}} src="/render/m">
+<a href="/render/m"> <img width={{.ImWidth}} height={{.ImHeight}} src="/render/m"  alt="m"> </a>
 <hr/></div>
 
 <div> <h2> parameters </h2> 
-	<form action=/param/ method="POST">
+	<form action=/setparam/ method="POST">
 	<table>
 	{{range $k, $v := .Params}}
 		<tr><td> {{$k}}: </td><td> 
@@ -125,10 +125,12 @@ const templText = `
 <hr/></div>
 
 <div><h2> mesh </h2> 
+
+<form action=/setmesh/ method="POST">
 <table> 
-<tr> <td> grid size: </td> <td>{{index .Size 2}}     x{{index .Size 1}}     x{{index .Size 0}}      </td></tr>
-<tr> <td> cell size: </td> <td>{{index .CellSize 2}} m x{{index .CellSize 1}} m x {{index .CellSize 0}} m </td></tr>
-<tr> <td> world size:</td> <td>{{index .WorldSize 2}} m x{{index .WorldSize 1}} m x{{index .WorldSize 0}} m</td></tr>
+<tr> <td> grid size: </td><td>{{index .Size 2}}        x{{index .Size 1}}        x{{index .Size 0}}      </td></tr>
+<tr> <td> cell size: </td><td>{{index .CellSize 2}}  m x{{index .CellSize 1}} m  x {{index .CellSize 0}} m </td></tr>
+<tr> <td> world size:</td><td>{{index .WorldSize 2}} m x{{index .WorldSize 1}} m x{{index .WorldSize 0}} m</td></tr>
 </table>
 <hr/></div>
 

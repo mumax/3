@@ -10,7 +10,8 @@ import (
 	"strconv"
 )
 
-func set(w http.ResponseWriter, r *http.Request) {
+// handle to set numerical parameters
+func setparam(w http.ResponseWriter, r *http.Request) {
 
 	ui.Lock()
 	defer ui.Unlock()

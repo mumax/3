@@ -111,7 +111,7 @@ const templText = `
 <hr/></div>
 
 <div> <h2> parameters </h2> 
-	<form action=/set/ method="POST">
+	<form action=/param/ method="POST">
 	<table>
 	{{range $k, $v := .Params}}
 		<tr><td> {{$k}}: </td><td> 

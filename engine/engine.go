@@ -47,6 +47,25 @@ func (m meta) Comp() []int {
 		return []int{0, 1, 2}
 	}
 }
+
+func (m meta) Get(name string, comp int) float64 {
+	switch h := m.Handle.(type) {
+	default:
+		panic("meta-inf: unknown pointer type")
+	case *ScalFn:
+		util.Argument(comp == 0)
+		if *h == nil {
+			return 0
+		}
+		return (*h)()
+	case *VecFn:
+		if *h == nil {
+			return 0
+		}
+		return (*h)()[comp]
+	}
+}
+
 func (ui *guistate) Params() map[string]meta { return meta_inf }
 
 // Accessible quantities

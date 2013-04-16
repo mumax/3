@@ -78,10 +78,10 @@ const templText = `
 
 	{{if not .Running}}
 	<form action=/ctl/run method="POST">
-        <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
+        <input size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
 	<form  action=/ctl/steps/ method="POST">
-        <input name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
+        <input size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 	{{end}}
 	<br/>
@@ -115,7 +115,7 @@ const templText = `
 	{{range $k, $v := .Params}}
 		<tr><td> {{$k}}: </td><td> 
 		{{range $v.Comp}} 
-        	<input size=10 name="{{$k}}{{.}}" value="xxx"> 
+        	<input size=8 name="{{$k}}{{.}}" value="{{$v.Get $k .}}"> 
 		{{end}} {{$v.Unit}} </td></tr>
 	{{end}}
 	</table>

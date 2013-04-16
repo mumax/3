@@ -16,15 +16,16 @@ var (
 	response = make(chan string) // responses to requests channel are sent here
 )
 
+// request for long-running command
 type req struct {
-	cmd   string
-	value string
-	nval  float64
+	cmd  string  // command, e.g., "run"
+	arg  string  // argument, if any, e.g. "1e-9" (s)
+	argn float64 // argument as number, if applicable.
 }
 
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
-	val := r.FormValue("value")
+	arg := r.FormValue("value")
 	ui.Msg = "" // clear last message
 
 	switch cmd {
@@ -41,13 +42,13 @@ func control(w http.ResponseWriter, r *http.Request) {
 		ui.Unlock()
 
 	case "run":
-		v, err := strconv.ParseFloat(val, 64)
+		v, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
 			http.Error(w, cmd+":"+err.Error(), 400)
 			return
 		}
 		ui.Runtime = v
-		requests <- req{cmd: cmd, nval: v}
+		requests <- req{cmd: cmd, argn: v}
 		ui.Msg = <-response
 
 	case "exit":
@@ -71,10 +72,10 @@ func Interactive() {
 			log.Println(msg)
 			response <- msg
 		case "run":
-			msg := fmt.Sprintln("interactive run for", r.nval, "s")
+			msg := fmt.Sprintln("interactive run for", r.argn, "s")
 			response <- msg
 			log.Println(msg)
-			Run(r.nval)
+			Run(r.argn)
 		}
 	}
 }

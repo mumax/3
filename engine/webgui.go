@@ -55,7 +55,7 @@ const templText = `
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
 		table{ border:"20"; }
-		input#text{ border:solid; border-color:grey; border-width:1px; }
+		input#text{ border:solid; border-color:grey; border-width:1px; padding-left:4px;}
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
 	</style>

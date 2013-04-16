@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	cuda5 "github.com/barnex/cuda5/cuda"
 	"log"
 )
 
@@ -37,9 +38,10 @@ var (
 
 // hidden quantities
 var (
-	mesh *data.Mesh
-	m    *buffered
-	vol  *data.Slice
+	mesh      *data.Mesh
+	m, torque *buffered
+	demag_    *cuda.DemagConvolution
+	vol       *data.Slice
 )
 
 func initialize() {
@@ -59,7 +61,7 @@ func initialize() {
 	B_eff = b_eff
 
 	// demag field
-	demag_ := cuda.NewDemag(mesh)
+	demag_ = cuda.NewDemag(mesh)
 	b_demag := newBuffered(arr2, "B_demag", func(b *data.Slice) {
 		m_ := m.Read()
 		demag_.Exec(b, m_, vol, Mu0*Msat()) //TODO: consistent msat or bsat
@@ -104,7 +106,7 @@ func initialize() {
 	})
 
 	// llg torque
-	torque := newBuffered(arr2, "torque", func(b *data.Slice) {
+	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
 		m_ := m.Read()
 		cuda.LLGTorque(b, m_, b, float32(Alpha()))
 		m.ReadDone()
@@ -163,9 +165,11 @@ func SetMUniform(mx, my, mz float32) {
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
-	if mesh != nil {
-		log.Fatal("mesh already set")
-	}
+	//if mesh != nil{
+	log.Println("resetting gpu")
+	cuda5.DeviceReset()
+	Init()
+	//}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}

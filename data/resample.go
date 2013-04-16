@@ -2,12 +2,12 @@ package data
 
 import "log"
 
-func Resample(in *Slice, N0, N1, N2 int) *Slice {
+func Resample(in *Slice, N [3]int) *Slice {
 	m1 := in.Mesh()
 	w := m1.WorldSize()
-	n0, n1, n2 := float64(N0), float64(N1), float64(N2)
+	n0, n1, n2 := float64(N[0]), float64(N[1]), float64(N[2])
 	pbc := m1.PBC()
-	m2 := NewMesh(N0, N1, N2, w[0]/n0, w[1]/n1, w[2]/n2, pbc[:]...)
+	m2 := NewMesh(N[0], N[1], N[2], w[0]/n0, w[1]/n1, w[2]/n2, pbc[:]...)
 	out := NewSlice(in.NComp(), m2)
 	resampleNearest(out.Tensors(), in.Tensors())
 	return out

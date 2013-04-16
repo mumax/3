@@ -56,6 +56,7 @@ const templText = `
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 10px; }
 		h1   { font-size: 28px; font-color: gray; }
+		h2   { font-size: 20px; }
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
 		table{ border:"20"; }
@@ -69,7 +70,7 @@ const templText = `
 
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
-<div> <h2> control loop </h2>
+<div> <h2> solver </h2>
 
 <table><tr><td>  
 

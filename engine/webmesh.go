@@ -3,6 +3,7 @@ package engine
 // Handlers for mesh setting through web interface
 
 import (
+	"code.google.com/p/mx3/data"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,7 +27,14 @@ func setmesh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var mh *data.Slice
+	if mesh.Size() != [3]int{} {
+		mh = m.Read().HostCopy()
+	}
 	SetMesh(N[0], N[1], N[2], c[0], c[1], c[2])
+	if mh != nil {
+		M.Upload(mh)
+	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
 

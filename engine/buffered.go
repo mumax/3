@@ -59,6 +59,9 @@ func (m *buffered) Download() *data.Slice {
 }
 
 func (m *buffered) Upload(src *data.Slice) {
+	if src.Mesh().Size() != m.Mesh().Size() {
+		src = data.Resample(src, m.Mesh().Size())
+	}
 	m_ := m.Write()
 	data.Copy(m_, src)
 	m.WriteDone()

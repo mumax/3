@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"fmt"
 	"html/template"
 	"net/http"
 	"sync"
@@ -39,7 +38,6 @@ type guistate struct {
 func (s *guistate) Time() float32 { return float32(Time) }
 func (s *guistate) Lock()         { ui.L.Lock() }
 func (s *guistate) Unlock()       { ui.L.Unlock() }
-func (s *guistate) Debug() string { return fmt.Sprint(ui.pleaseStop) }
 
 const templText = `
 <!DOCTYPE html>
@@ -65,17 +63,25 @@ const templText = `
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
 <div> <h2> control </h2>
-	{{if .Running}}Running{{else}}Paused{{end}}<br/>
-	{{with .Msg}}{{.}}{{end}}<br/>
-	Debug:{{.Debug}}<br/>
-	<form action=/ctl/pause method="POST"> <input type="submit" value="Pause"/> </form>
-	<form action=/ctl/run   method="POST">
+	<!-- Pause -->
+	<form id=text action=/ctl/pause method="POST"> 
+		Status: {{if .Running}}
+			<b> Running </b> <input type="submit" value="Pause"/>
+		 {{else}}
+ 			<b> Paused</b> 
+		{{end}}
+	</form>
+
+	{{if not .Running}}
+	<form action=/ctl/run method="POST">
         <input name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
-	<form action=/ctl/steps method="POST">
+	<form  action=/ctl/steps method="POST">
         <input name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
-	<b>Danger Zone:</b><form action=/ctl/exit  method="POST"> <input type="submit" value="Kill"/> </form>
+	{{end}}
+
+	<form action=/ctl/exit  method="POST"> <b>Danger Zone:</b> <input type="submit" value="Kill"/> </form>
 <hr/></div>
 
 <h2> solver </h2> 

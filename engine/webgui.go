@@ -116,7 +116,7 @@ const templText = `
 	{{range $k, $v := .Params}}
 		<tr><td> {{$k}}: </td><td> 
 		{{range $v.Comp}} 
-        	<input id=text size=8 name="{{$k}}{{.}}" value="{{$v.Get $k .}}"> 
+        	<input id=text size=8 name="{{$k}}{{.}}" value="{{$v.GetComp .}}"> 
 		{{end}} {{$v.Unit}} <font color=grey>&nbsp;({{$v.Descr}})</font> </td></tr>
 	{{end}}
 	</table>

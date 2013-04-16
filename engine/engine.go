@@ -48,21 +48,40 @@ func (m meta) Comp() []int {
 	}
 }
 
-func (m meta) Get(name string, comp int) float64 {
+func (m meta) NComp() int { return len(m.Comp()) }
+
+func (m meta) GetComp(comp int) float64 {
+	return m.Get()[comp]
+}
+
+func (m meta) Get() []float64 {
 	switch h := m.Handle.(type) {
 	default:
 		panic("meta-inf: unknown pointer type")
 	case *ScalFn:
-		util.Argument(comp == 0)
 		if *h == nil {
-			return 0
+			return []float64{0}
 		}
-		return (*h)()
+		return []float64{(*h)()}
 	case *VecFn:
 		if *h == nil {
-			return 0
+			return []float64{0, 0, 0}
 		}
-		return (*h)()[comp]
+		v := (*h)()
+		return v[:]
+	}
+}
+
+func (m meta) Set(v []float64) {
+	switch h := m.Handle.(type) {
+	default:
+		panic("meta-inf: unknown pointer type")
+	case *ScalFn:
+		util.Argument(len(v) == 1)
+		*h = Const(v[0])
+	case *VecFn:
+		util.Argument(len(v) == 3)
+		*h = ConstVector(v[0], v[1], v[2])
 	}
 }
 

@@ -52,7 +52,7 @@ const templText = `
 		h1   { font-size: 28px; font-color: gray; }
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
-		table{ border:"10"; }
+		table{ border:"20"; }
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
 	</style>
@@ -62,8 +62,10 @@ const templText = `
 
 <div id="header"> <h1> mx3 </h1> <hr/> </div>
 
-<div> <h2> control </h2>
-	<!-- Pause -->
+<div> <h2> control loop </h2>
+
+<table><tr><td>  
+
 	<form id=text action=/ctl/pause method="POST"> 
 		Status: {{if .Running}}
 			<b> Running </b> <input type="submit" value="Pause"/>
@@ -80,17 +82,26 @@ const templText = `
         <input name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 	{{end}}
+	<br/>
+	<form action=/ctl/exit  method="POST"> <font color=red><b>Danger Zone:</b></font> <input type="submit" value="Kill"/> </form>
 
-	<form action=/ctl/exit  method="POST"> <b>Danger Zone:</b> <input type="submit" value="Kill"/> </form>
-<hr/></div>
+</td><td>  
+ &nbsp; &nbsp; &nbsp;
+</td><td>  
 
-<h2> solver </h2> 
-<table> 
-<tr> <td>     step:</td> <td>{{.NSteps}}  </td><td>  undone steps:</td> <td>{{.NUndone}}</td> </tr>
-<tr> <td>     time:</td> <td>{{.Time}} s   </td><td>     time step:</td> <td>{{.Dt_si}} s </td> </tr>
-<tr> <td> err/step:</td> <td>{{.LastErr}} </td><td>  max err/step:</td> <td>{{.MaxErr}}</td> </tr>
+
+<table>
+<tr><td> step:        </td><td> {{.NSteps}} </td></tr> 
+<tr><td> undone steps:</td><td> {{.NUndone}}</td></tr>  
+<tr><td> time:        </td><td> {{.Time}}   </td></tr>  
+<tr><td> time step:   </td><td> {{.Dt_si}}  </td></tr>  
+<tr><td> max err/step:</td><td> {{.MaxErr}} </td></tr>  
+<tr><td> err/step:    </td><td> {{.LastErr}}</td></tr>  
 </table>
-<hr/>
+
+</td></tr></table> 
+
+<hr/> </div>
 
 <h2> magnetization </h2> 
 <img src="/render/m">

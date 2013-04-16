@@ -55,6 +55,7 @@ const templText = `
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
 		table{ border:"20"; }
+		input#text{ border:solid; border-color:grey; border-width:1px; }
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
 	</style>
@@ -78,10 +79,10 @@ const templText = `
 
 	{{if not .Running}}
 	<form action=/ctl/run method="POST">
-        <input size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
+        <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
 	<form  action=/ctl/steps/ method="POST">
-        <input size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
+        <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 	{{end}}
 	<br/>
@@ -115,10 +116,11 @@ const templText = `
 	{{range $k, $v := .Params}}
 		<tr><td> {{$k}}: </td><td> 
 		{{range $v.Comp}} 
-        	<input size=8 name="{{$k}}{{.}}" value="{{$v.Get $k .}}"> 
-		{{end}} {{$v.Unit}} </td></tr>
+        	<input id=text size=8 name="{{$k}}{{.}}" value="{{$v.Get $k .}}"> 
+		{{end}} {{$v.Unit}} <font color=grey>&nbsp;({{$v.Descr}})</font> </td></tr>
 	{{end}}
 	</table>
+	<b> <input type="submit" value=" SAVE "/> </b> 
 	</form>
 <hr/></div>
 

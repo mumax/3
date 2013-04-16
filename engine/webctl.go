@@ -34,14 +34,10 @@ func control(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case "pause": // reacts immediately
-		ui.Lock()
-		ui.pleaseStop = true
-		for ui.Running {
-			ui.Wait()
-		}
-		ui.Unlock()
+		pause()
 
 	case "run":
+		// todo: should not allow run while running
 		v, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
 			http.Error(w, cmd+":"+err.Error(), 400)
@@ -55,6 +51,15 @@ func control(w http.ResponseWriter, r *http.Request) {
 		os.Exit(0)
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func pause() {
+	ui.Lock()
+	ui.pleaseStop = true
+	for ui.Running {
+		ui.Wait()
+	}
+	ui.Unlock()
 }
 
 // Enter interactive mode.

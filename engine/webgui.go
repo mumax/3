@@ -49,7 +49,7 @@ const templText = `
 	{{if .Running}}<meta http-equiv="refresh" content="1">{{end}}
 	<title>mx3</title>
 	<style media="screen" type="text/css">
-		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 16px; }
+		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 10px; }
 		h1   { font-size: 28px; font-color: gray; }
 		hr   { border-style: none; border-top: 1px solid gray; }
@@ -120,22 +120,42 @@ const templText = `
 		{{end}} {{$v.Unit}} <font color=grey>&nbsp;({{$v.Descr}})</font> </td></tr>
 	{{end}}
 	</table>
-	<b> <input type="submit" value=" SAVE "/> </b> 
+	<input type="submit" value=" SAVE "/>
 	</form>
 <hr/></div>
 
 <div><h2> mesh </h2> 
+<form action=/setmesh/ method="POST"><table> 
+	<tr>
+		<td> grid size: </td>
+		<td> <input id=text size=8 name="gridsizex" value="{{index .Size 2}}"> </td> <td> x </td>
+		<td> <input id=text size=8 name="gridsizey" value="{{index .Size 1}}"> </td> <td> x </td>
+		<td> <input id=text size=8 name="gridsizez" value="{{index .Size 0}}"> </td> <td>   </td>
+	</tr>
 
-<form action=/setmesh/ method="POST">
-<table> 
-<tr> <td> grid size: </td><td>{{index .Size 2}}        x{{index .Size 1}}        x{{index .Size 0}}      </td></tr>
-<tr> <td> cell size: </td><td>{{index .CellSize 2}}  m x{{index .CellSize 1}} m  x {{index .CellSize 0}} m </td></tr>
-<tr> <td> world size:</td><td>{{index .WorldSize 2}} m x{{index .WorldSize 1}} m x{{index .WorldSize 0}} m</td></tr>
+	<tr>
+		<td> cell size: </td>
+		<td> <input id=text size=8 name="cellsizex" value="{{index .CellSize 2}}"> </td> <td> x  </td>
+		<td> <input id=text size=8 name="cellsizey" value="{{index .CellSize 1}}"> </td> <td> x  </td>
+		<td> <input id=text size=8 name="cellsizez" value="{{index .CellSize 0}}"> </td> <td> m3 </td>
+	</tr>
+
+	<tr>
+		<td> world size: &nbsp;&nbsp; </td>
+		<td> {{index .WorldSize 2}} </td> <td> x  </td>
+		<td> {{index .WorldSize 1}} </td> <td> x  </td>
+		<td> {{index .WorldSize 0}} </td> <td> m3 </td>
+	</tr>
 </table>
+	<input type="submit" value=" SAVE "/> <b> Changing the mesh requires some re-initialization time</b>
+</form>
+
 <hr/></div>
 
 <div id="footer">
-	
+<center>
+mx3 web interface
+</center>
 </div>
 
 </body>

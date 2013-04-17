@@ -10,13 +10,13 @@ import (
 
 // User inputs
 var (
-	Aex     ScalFn                        // Exchange stiffness in J/m
-	Msat    ScalFn                        // Saturation magnetization in A/m
-	Alpha   ScalFn                        // Damping constant
+	Aex     ScalFn = Const(0)             // Exchange stiffness in J/m
+	Msat    ScalFn = Const(0)             // Saturation magnetization in A/m
+	Alpha   ScalFn = Const(0)             // Damping constant
 	B_ext   VecFn  = ConstVector(0, 0, 0) // External field in T
 	DMI     ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Ku1     VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi      ScalFn
+	Xi      ScalFn = Const(0)
 	SpinPol ScalFn = Const(1)
 	J       VecFn  = ConstVector(0, 0, 0)
 )

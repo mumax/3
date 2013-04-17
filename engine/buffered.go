@@ -39,11 +39,13 @@ func (b *buffered) touch(goodstep bool) {
 	}
 }
 
+// Save once, with automatically assigned file name.
 func (b *buffered) Save() {
 	goSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
 	b.autonum++
 }
 
+// Save once, with given file name.
 func (b *buffered) SaveAs(fname string) {
 	if !path.IsAbs(fname) {
 		fname = OD + fname
@@ -51,6 +53,9 @@ func (b *buffered) SaveAs(fname string) {
 	goSave(fname, b.Read(), Time, func() { b.ReadDone() })
 }
 
+// Get a host copy.
+// TODO: assume it can be called from another thread,
+// transfer asynchronously.
 func (m *buffered) Download() *data.Slice {
 	m_ := m.Read()
 	host := m_.HostCopy()
@@ -58,6 +63,7 @@ func (m *buffered) Download() *data.Slice {
 	return host
 }
 
+// Replace the data by src. Auto rescales if needed.
 func (m *buffered) Upload(src *data.Slice) {
 	if src.Mesh().Size() != m.Mesh().Size() {
 		src = data.Resample(src, m.Mesh().Size())
@@ -81,10 +87,12 @@ func (b *buffered) normalize() {
 	b.WriteDone()
 }
 
+// Returns the average over all cells.
 func (b *buffered) Average() []float64 {
 	return average(b.Synced)
 }
 
+// Returns the maximum norm of a vector field.
 func (b *buffered) MaxNorm() float64 {
 	s := b.Read()
 	defer b.ReadDone()

@@ -34,6 +34,8 @@ func (s *guistate) Unlock()          { ui.L.Unlock() }
 func (s *guistate) ImWidth() int     { return ui.Mesh().Size()[2] }
 func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
 func (s *guistate) Mesh() *data.Mesh { return &mesh }
+func (s *guistate) Uname() string    { return Uname }
+func (s *guistate) Version() string  { return VERSION }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {
 		return &zeroSolver
@@ -68,7 +70,7 @@ const templText = `
 
 <body>
 
-<div id="header"> <h1> mx3 </h1> <hr/> </div>
+<div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
 <div> <h2> solver </h2>
 
@@ -159,7 +161,7 @@ const templText = `
 
 <div id="footer">
 <center>
-mx3 web interface
+{{.Uname}}
 </center>
 </div>
 

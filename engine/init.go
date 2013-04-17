@@ -20,6 +20,10 @@ var (
 	Flag_port     = flag.String("http", ":35367", "port to serve web gui")
 )
 
+const VERSION = "mx3.0.2 α "
+
+var Uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
+
 func Init() {
 	flag.Parse()
 
@@ -30,7 +34,7 @@ func Init() {
 	}
 
 	if *Flag_version {
-		log.Print("Mumax Cubed 0.1α ", runtime.GOOS, "_", runtime.GOARCH, " ", runtime.Version(), "(", runtime.Compiler, ")", "\n")
+		log.Print(Uname, "\n")
 	}
 
 	if *Flag_od != "" {

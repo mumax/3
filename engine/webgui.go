@@ -121,7 +121,7 @@ const templText = `
 		{{end}} {{$v.Unit}} <font color=grey>&nbsp;({{$v.Descr}})</font> </td></tr>
 	{{end}}
 	</table>
-	<input type="submit" value=" SAVE "/>
+	<input type="submit" value="Submit"/>
 	</form>
 <hr/></div>
 
@@ -148,7 +148,7 @@ const templText = `
 		<td> {{index .Mesh.WorldSize 0}} </td> <td> m3 </td>
 	</tr>
 </table>
-	<input type="submit" value=" SAVE "/> <b> Changing the mesh requires some re-initialization time</b>
+	<input type="submit" value=" Submit"/> <b> Changing the mesh requires some re-initialization time</b>
 </form>
 
 <hr/></div>

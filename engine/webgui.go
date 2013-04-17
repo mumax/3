@@ -93,7 +93,6 @@ const templText = `
 	</form>
 	{{end}}
 	<br/>
-	<form action=/ctl/kill  method="POST"> <font color=red><b>Danger Zone:</b></font> <input type="submit" value="Kill"/> </form>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;
@@ -154,6 +153,10 @@ const templText = `
 	<input type="submit" value=" SAVE "/> <b> Changing the mesh requires some re-initialization time</b>
 </form>
 
+<hr/></div>
+
+<font color=red> <div> <h2> Danger Zone </h2></font>
+	<form action=/ctl/kill  method="POST"> <b> Kill process:</b> <input type="submit" value="Kill"/> </form>
 <hr/></div>
 
 <div id="footer">

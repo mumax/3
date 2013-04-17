@@ -40,6 +40,7 @@ func setmesh(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// for all keys, fetch and parse integer values from the http form.
 func formInts(r *http.Request, key ...string) ([]int, error) {
 	vals := make([]int, len(key))
 	for i, k := range key {
@@ -52,6 +53,7 @@ func formInts(r *http.Request, key ...string) ([]int, error) {
 	return vals, nil
 }
 
+// for all keys, fetch and parse float values from the http form.
 func formFloats(r *http.Request, key ...string) ([]float64, error) {
 	vals := make([]float64, len(key))
 	for i, k := range key {

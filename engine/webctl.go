@@ -115,6 +115,7 @@ func Run(seconds float64) {
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
+	panic("TODO")
 	//	log.Println("run for", n, "steps")
 	//	checkInited()
 	//	defer util.DashExit()

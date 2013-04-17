@@ -77,10 +77,8 @@ const templText = `
 <table><tr><td>  
 
 	<form id=text action=/ctl/pause method="POST"> 
-		Status: {{if .Running}}
+		{{if .Running}} 
 			<b> Running </b> <input type="submit" value="Pause"/>
-		 {{else}}
- 			<b> Paused</b> 
 		{{end}}
 	</form>
 

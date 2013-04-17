@@ -12,7 +12,7 @@ func main() {
 	Init()
 	defer Close()
 
-	SetMesh(32, 32, 1, 1e-9, 1e-9, 1e-9)
+	SetMesh(32, 32, 1, 5e-9, 5e-9, 5e-9)
 
 	Msat = Const(1000e3)
 	Aex = Const(10e-12)

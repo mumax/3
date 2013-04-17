@@ -101,12 +101,9 @@ const templText = `
 
 
 <table>
-<tr><td> step:        </td><td> {{.Solver.NSteps}} </td></tr> 
-<tr><td> undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  
-<tr><td> time:        </td><td> {{.Time}}         s</td></tr>  
-<tr><td> time step:   </td><td> {{.Solver.Dt_si}} s</td></tr>  
-<tr><td> max err/step:</td><td> {{.Solver.MaxErr}} </td></tr>  
-<tr><td> err/step:    </td><td> {{.Solver.LastErr}}</td></tr>  
+<tr><td> step:        </td><td> {{.Solver.NSteps}} </td><td> &nbsp; &nbsp; undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  
+<tr><td> time:        </td><td> {{.Time}}         s</td><td> &nbsp; &nbsp; time step:   </td><td> {{.Solver.Dt_si}} s</td></tr>  
+<tr><td> max err/step:</td><td> {{.Solver.MaxErr}} </td><td> &nbsp; &nbsp; err/step:    </td><td> {{.Solver.LastErr}}</td></tr>  
 </table>
 
 </td></tr></table> 

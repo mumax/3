@@ -24,8 +24,8 @@ type guistate struct {
 	Msg                 string
 	Steps               int
 	Runtime             float64
-	Running, pleaseStop bool
-	*sync.Cond
+	Running, pleaseStop bool // todo: mv out of struct
+	*sync.Cond               // todo: mv out of struct
 }
 
 func (s *guistate) Time() float32    { return float32(Time) }
@@ -69,6 +69,20 @@ const templText = `
 
 <body>
 
+<script>
+	function httpGet(url){
+    	var xmlHttp = new XMLHttpRequest();
+    	xmlHttp.open("GET", url, false);
+    	xmlHttp.send(null);
+    	return xmlHttp.responseText;
+    }
+	var running = false
+	function updateRunning(){
+		running = (httpGet("/running/") === "true")
+	}
+	setInterval(updateRunning, 200)
+</script>
+
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
 <div> <h2> solver </h2>
@@ -98,16 +112,11 @@ const templText = `
 	<p id="dash"> </p>
 
 </td></tr></table>
-
+<p id="running">running?</p>
 <script>
-	function httpGet(url){
-    	var xmlHttp = new XMLHttpRequest();
-    	xmlHttp.open("GET", url, false);
-    	xmlHttp.send(null);
-    	return xmlHttp.responseText;
-    }
 	function updateDash(){
 		document.getElementById("dash").innerHTML = httpGet("/dash/")
+		document.getElementById("running").innerHTML = running
 	}
 	updateDash();
 	setInterval(updateDash, 200);

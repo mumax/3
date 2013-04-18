@@ -53,6 +53,11 @@ func control(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+func isrunning(w http.ResponseWriter, r *http.Request) {
+	log.Println("running:", ui.Running)
+	fmt.Fprint(w, ui.Running)
+}
+
 func pause() {
 	ui.Lock()
 	ui.pleaseStop = true

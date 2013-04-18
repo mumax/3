@@ -27,6 +27,7 @@ func GoServe(port string) {
 	http.HandleFunc("/ctl/", control)
 	http.HandleFunc("/setparam/", setparam)
 	http.HandleFunc("/setmesh/", setmesh)
+	http.HandleFunc("/running/", isrunning)
 
 	http.HandleFunc("/", gui)
 

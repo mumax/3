@@ -85,6 +85,9 @@ const templText = `
 
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
+
+
+
 <div> <h2> solver </h2>
 
 <table><tr><td>  
@@ -112,7 +115,9 @@ const templText = `
 	<p id="dash"> </p>
 
 </td></tr></table>
+
 <p id="running">running?</p>
+
 <script>
 	function updateDash(){
 		document.getElementById("dash").innerHTML = httpGet("/dash/")
@@ -122,9 +127,10 @@ const templText = `
 	setInterval(updateDash, 200);
 </script>
 
-
-
 <hr/> </div>
+
+
+
 
 <div> <h2> magnetization </h2> 
 <img id="magnetization" src="/render/m"/>
@@ -144,6 +150,9 @@ const templText = `
 
 <hr/></div>
 
+
+
+
 <div> <h2> parameters </h2> 
 	<form action=/setparam/ method="POST">
 	<table>
@@ -157,6 +166,9 @@ const templText = `
 	<input type="submit" value="Submit"/>
 	</form>
 <hr/></div>
+
+
+
 
 <div><h2> mesh </h2> 
 <form action=/setmesh/ method="POST"><table> 
@@ -185,6 +197,9 @@ const templText = `
 </form>
 
 <hr/></div>
+
+
+
 
 <font color=red> <div> <h2> Danger Zone </h2></font>
 	<form action=/ctl/kill  method="POST"> <b> Kill process:</b> <input type="submit" value="Kill"/> </form>

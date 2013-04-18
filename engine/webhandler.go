@@ -22,6 +22,7 @@ func GoServe(port string) {
 	http.HandleFunc("/cmd/uname", Command("uname", "-a"))
 
 	http.HandleFunc("/render/", render)
+	http.HandleFunc("/disp/", disp)
 
 	http.HandleFunc("/ctl/", control)
 	http.HandleFunc("/setparam/", setparam)

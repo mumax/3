@@ -52,7 +52,6 @@ const templText = `
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	{{if .Running}}<meta http-equiv="refresh" content="1">{{end}}
 	<title>mx3</title>
 	<style media="screen" type="text/css">
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
@@ -108,7 +107,7 @@ const templText = `
 <hr/> </div>
 
 <div> <h2> magnetization </h2> 
-<a href="/render/m"> <img width={{.ImWidth}} height={{.ImHeight}} src="/render/m"  alt="m"> </a>
+<object type="text/html" data="/disp/" >You need a HTML5-compliant browser</object>
 <hr/></div>
 
 <div> <h2> parameters </h2> 

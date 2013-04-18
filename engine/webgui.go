@@ -95,14 +95,25 @@ const templText = `
  &nbsp; &nbsp; &nbsp;
 </td><td>  
 
+	<p id="dash"> </p>
 
-<table>
-<tr><td> step:        </td><td> {{.Solver.NSteps}} </td><td> &nbsp; &nbsp; undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  
-<tr><td> time:        </td><td> {{.Time}}         s</td><td> &nbsp; &nbsp; time step:   </td><td> {{.Solver.Dt_si}} s</td></tr>  
-<tr><td> max err/step:</td><td> {{.Solver.MaxErr}} </td><td> &nbsp; &nbsp; err/step:    </td><td> {{.Solver.LastErr}}</td></tr>  
-</table>
+</td></tr></table>
 
-</td></tr></table> 
+<script>
+	function httpGet(url){
+    	var xmlHttp = new XMLHttpRequest();
+    	xmlHttp.open("GET", url, false);
+    	xmlHttp.send(null);
+    	return xmlHttp.responseText;
+    }
+	function updateDash(){
+		document.getElementById("dash").innerHTML = httpGet("/dash/")
+	}
+	updateDash();
+	setInterval(updateDash, 200);
+</script>
+
+
 
 <hr/> </div>
 

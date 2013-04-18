@@ -82,7 +82,7 @@ const templText = `
 	<form action=/ctl/run method="POST">
         <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
-	<form  action=/ctl/steps/ method="POST">
+	<form  action=/ctl/steps method="POST">
         <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 

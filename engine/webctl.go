@@ -45,6 +45,17 @@ func control(w http.ResponseWriter, r *http.Request) {
 		}
 		ui.Runtime = v
 		requests <- req{cmd: cmd, argn: v}
+		ui.Msg = <-response // TODO: msg is not used
+
+	case "steps":
+		// todo: should not allow run while running
+		v, err := strconv.Atoi(arg)
+		if err != nil {
+			http.Error(w, cmd+":"+err.Error(), 400)
+			return
+		}
+		ui.Steps = v
+		requests <- req{cmd: cmd, argn: float64(v)}
 		ui.Msg = <-response
 
 	case "kill":
@@ -78,7 +89,7 @@ func Interactive() {
 		r := <-requests
 		switch r.cmd {
 		default:
-			msg := "interactive: unhandled command: " + r.cmd
+			msg := "interactive: unhandled command: " + r.cmd // TODO: handle better
 			log.Println(msg)
 			response <- msg
 		case "run":
@@ -86,17 +97,32 @@ func Interactive() {
 			response <- msg
 			log.Println(msg)
 			Run(r.argn)
+		case "steps":
+			msg := fmt.Sprintln("interactive run for", r.argn, "steps")
+			response <- msg
+			log.Println(msg)
+			Steps(int(r.argn))
 		}
 	}
 }
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
-
 	log.Println("run for", seconds, "s")
-	checkInited() // todo: check in handler
-
 	stop := Time + seconds
+	RunCond(func() bool { return Time < stop })
+}
+
+// Run the simulation for a number of steps.
+func Steps(n int) {
+	log.Println("run for", n, "steps")
+	stop := Solver.NSteps + n
+	RunCond(func() bool { return Solver.NSteps < stop })
+}
+
+// Runs as long as condition returns true.
+func RunCond(condition func() bool) {
+	checkInited() // todo: check in handler
 	defer util.DashExit()
 
 	ui.Lock()
@@ -106,7 +132,7 @@ func Run(seconds float64) {
 	for {
 		step()
 		ui.Lock()
-		if Time >= stop || ui.pleaseStop {
+		if !condition() || ui.pleaseStop {
 			break
 		} else {
 			ui.Unlock()
@@ -116,23 +142,4 @@ func Run(seconds float64) {
 	ui.pleaseStop = false
 	ui.Unlock()
 	ui.Signal()
-}
-
-// Run the simulation for a number of steps.
-func Steps(n int) {
-	panic("TODO")
-	//	log.Println("run for", n, "steps")
-	//	checkInited()
-	//	defer util.DashExit()
-	//
-	//	ok := true
-	//	for i := 0; i < n && ok; i++ {
-	//		step()
-	//		select {
-	//		default: // keep going
-	//		case <-breakrun:
-	//			ok = false
-	//			response <- "stopped stepping"
-	//		}
-	//	}
 }

@@ -24,7 +24,7 @@ type guistate struct {
 	Msg                 string
 	Steps               int
 	Runtime             float64
-	Running, pleaseStop bool // todo: mv out of struct
+	running, pleaseStop bool // todo: mv out of struct
 	*sync.Cond               // todo: mv out of struct
 }
 
@@ -79,31 +79,28 @@ const templText = `
 
 <table><tr><td>  
 
-	<form id=text action=/ctl/pause method="POST"> 
-		{{if .Running}} 
-			<b> Running </b> <input type="submit" value="Pause"/>
-		{{end}}
-	</form>
-
-	{{if not .Running}}
 	<form action=/ctl/run method="POST">
         <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
 	</form>
 	<form  action=/ctl/steps/ method="POST">
         <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
-	{{end}}
+
+	<form id=text action=/ctl/pause method="POST"> 
+		<input type="submit" value="Pause"/>
+	</form>
+
 	<br/>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;
 </td><td>  
 
-	<p id="dash"> </p>
+	<span id="running"><font color=red><b>Paused</b></font></span> 
+	<span id="dash"> </span>
 
 </td></tr></table>
 
-<p id="running">running?</p>
 
 <script>
 	function httpGet(url){
@@ -113,13 +110,13 @@ const templText = `
     	return xmlHttp.responseText;
     }
 	var running = false
-	document.getElementById("running").innerHTML = running 
 	function updateRunning(){
-		r = (httpGet("/running/") === "true")
-		if(r!==running) { 
-			document.getElementById("running").innerHTML = running 
+		running = (httpGet("/running/") === "true")
+		if(running){
+			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>"
+		}else{
+			document.getElementById("running").innerHTML = "<font color=red><b>Paused</b></font>"
 		}
-		running = r
 	}
 	setInterval(updateRunning, 200)
 </script>

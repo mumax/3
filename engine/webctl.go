@@ -54,14 +54,14 @@ func control(w http.ResponseWriter, r *http.Request) {
 }
 
 func isrunning(w http.ResponseWriter, r *http.Request) {
-	log.Println("running:", ui.Running)
-	fmt.Fprint(w, ui.Running)
+	//log.Print("alive")
+	fmt.Fprint(w, ui.running)
 }
 
 func pause() {
 	ui.Lock()
 	ui.pleaseStop = true
-	for ui.Running {
+	for ui.running {
 		ui.Wait()
 	}
 	ui.Unlock()
@@ -100,7 +100,7 @@ func Run(seconds float64) {
 	defer util.DashExit()
 
 	ui.Lock()
-	ui.Running = true
+	ui.running = true
 	ui.Unlock()
 
 	for {
@@ -112,7 +112,7 @@ func Run(seconds float64) {
 			ui.Unlock()
 		}
 	}
-	ui.Running = false
+	ui.running = false
 	ui.pleaseStop = false
 	ui.Unlock()
 	ui.Signal()

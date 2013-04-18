@@ -118,7 +118,21 @@ const templText = `
 <hr/> </div>
 
 <div> <h2> magnetization </h2> 
-<object type="text/html" data="/disp/" >You need a HTML5-compliant browser</object>
+<img id="magnetization" src="/render/m"/>
+
+<script>
+	var img = new Image();
+	img.src = "/render/m";
+	function updateImg(){
+		if(img.complete){
+			document.getElementById("magnetization").src = img.src;
+			img = new Image();
+			img.src = "/render/m?" + new Date();
+		}
+	}
+	setInterval(updateImg, 500);
+</script>
+
 <hr/></div>
 
 <div> <h2> parameters </h2> 

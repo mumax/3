@@ -6,7 +6,7 @@ all: $(OUT)
 .PHONY: $(OUT)
 
 $(OUT): %: %.go
-	go run $@.go -f -s -o -http="" $@.out
+	go run $@.go -http="" -f -s -o $@.out
 
 .PHONY: clean
 

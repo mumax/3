@@ -50,6 +50,9 @@ func Init() {
 	prof.Init(OD)
 	cuda.Init()
 	cuda.LockThread()
+	if *Flag_port != "" {
+		GoServe(*Flag_port)
+	}
 }
 
 type devnul struct{}

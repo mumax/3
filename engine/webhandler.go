@@ -32,7 +32,7 @@ func GoServe(port string) {
 	log.Print("serving GUI on http://localhost", port, "\n")
 	go func() {
 		cuda.LockThread()
-		util.FatalErr(http.ListenAndServe(port, nil))
+		util.LogErr(http.ListenAndServe(port, nil))
 	}()
 	runtime.Gosched()
 }

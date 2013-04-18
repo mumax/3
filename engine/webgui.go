@@ -69,19 +69,6 @@ const templText = `
 
 <body>
 
-<script>
-	function httpGet(url){
-    	var xmlHttp = new XMLHttpRequest();
-    	xmlHttp.open("GET", url, false);
-    	xmlHttp.send(null);
-    	return xmlHttp.responseText;
-    }
-	var running = false
-	function updateRunning(){
-		running = (httpGet("/running/") === "true")
-	}
-	setInterval(updateRunning, 200)
-</script>
 
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
@@ -119,12 +106,35 @@ const templText = `
 <p id="running">running?</p>
 
 <script>
+	function httpGet(url){
+    	var xmlHttp = new XMLHttpRequest();
+    	xmlHttp.open("GET", url, false);
+    	xmlHttp.send(null);
+    	return xmlHttp.responseText;
+    }
+	var running = false
+	document.getElementById("running").innerHTML = running 
+	function updateRunning(){
+		r = (httpGet("/running/") === "true")
+		if(r!==running) { 
+			document.getElementById("running").innerHTML = running 
+		}
+		running = r
+	}
+	setInterval(updateRunning, 200)
+</script>
+
+<script>
 	function updateDash(){
 		document.getElementById("dash").innerHTML = httpGet("/dash/")
-		document.getElementById("running").innerHTML = running
+	}
+	function updateDashIfRunning(){
+		if(running){
+			updateDash();
+		}
 	}
 	updateDash();
-	setInterval(updateDash, 200);
+	setInterval(updateDashIfRunning, 200);
 </script>
 
 <hr/> </div>
@@ -139,7 +149,7 @@ const templText = `
 	var img = new Image();
 	img.src = "/render/m";
 	function updateImg(){
-		if(img.complete){
+		if(running && img.complete){
 			document.getElementById("magnetization").src = img.src;
 			img = new Image();
 			img.src = "/render/m?" + new Date();

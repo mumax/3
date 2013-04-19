@@ -227,8 +227,10 @@ func setMFile(fname string) error {
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
-	//if mesh != nil{
-	//}
+	var zeromesh data.Mesh
+	if mesh != zeromesh {
+		free()
+	}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
@@ -239,7 +241,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 
 func free() {
 	log.Println("resetting gpu")
-	cuda5.DeviceReset()
+	cuda5.DeviceReset() // does not seem to clear allocations
 	Init()
 	dlQue = nil
 }

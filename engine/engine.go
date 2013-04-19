@@ -155,7 +155,7 @@ func step() {
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
-// injects arbitrary code into the engine run loops.
+// injects arbitrary code into the engine run loops. Used by web interface.
 var inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
 
 // Run the simulation for a number of seconds.
@@ -182,8 +182,8 @@ func RunCond(condition func() bool) {
 		select {
 		default:
 			step()
-		case r := <-inject:
-			r()
+		case f := <-inject:
+			f()
 		}
 	}
 	pause = true
@@ -199,7 +199,8 @@ func RunInteractive() {
 
 	for {
 		log.Println("awaiting interaction")
-		(<-inject)()
+		f := <-inject
+		f()
 	}
 }
 

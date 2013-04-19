@@ -142,6 +142,10 @@ const templText = `
 <div> <h2> magnetization </h2> 
 <img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
+<form  action=/setm/ method="POST">
+	<b>Upload magnetization file:</b> <input type=file name="value" value="{{.Steps}}"> <input type="submit" value="Submit"/>
+</form>
+
 <script>
 	var img = new Image();
 	img.src = "/render/m";

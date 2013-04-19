@@ -13,26 +13,25 @@ import (
 // handle to set numerical parameters
 func setparam(w http.ResponseWriter, r *http.Request) {
 
-	ui.Lock()
-	defer ui.Unlock()
-
-	for name, inf := range params {
-		vals := make([]float64, inf.NComp())
-		for c := range inf.Comp() {
-			str := r.FormValue(fmt.Sprint(name, c))
-			v, err := strconv.ParseFloat(str, 64)
-			if err != nil {
-				http.Error(w, "set "+name+": "+err.Error(), 400)
-				return
+	injectAndWait(func() {
+		for name, inf := range params {
+			vals := make([]float64, inf.NComp())
+			for c := range inf.Comp() {
+				str := r.FormValue(fmt.Sprint(name, c))
+				v, err := strconv.ParseFloat(str, 64)
+				if err != nil {
+					http.Error(w, "set "+name+": "+err.Error(), 400)
+					return
+				}
+				vals[c] = v
 			}
-			vals[c] = v
+			have := inf.Get()
+			if !eq(have, vals) {
+				log.Println("set", name, vals)
+				inf.Set(vals)
+			}
 		}
-		have := inf.Get()
-		if !eq(have, vals) {
-			log.Println("set", name, vals)
-			inf.Set(vals)
-		}
-	}
+	})
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }

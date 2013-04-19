@@ -15,6 +15,7 @@ $(PREFIX)/cuda: nvcc
 
 mx3:
 	go install -v
+	go build -o mx3 main.go
 
 .PHONY: nvcc
 nvcc:

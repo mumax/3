@@ -11,8 +11,6 @@ var dashtempl = template.Must(template.New("dash").Parse(dashText))
 
 func dash(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET dash")
-	ui.Lock()
-	defer ui.Unlock()
 	util.FatalErr(dashtempl.Execute(w, ui))
 }
 

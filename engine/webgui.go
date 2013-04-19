@@ -7,17 +7,14 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"sync"
 )
 
 var (
-	ui      = &guistate{Steps: 1000, Runtime: 1e-9, Cond: sync.NewCond(new(sync.Mutex))}
+	ui      = &guistate{Steps: 1000, Runtime: 1e-9}
 	uitempl = template.Must(template.New("gui").Parse(templText))
 )
 
 func gui(w http.ResponseWriter, r *http.Request) {
-	ui.Lock()
-	defer ui.Unlock()
 	util.FatalErr(uitempl.Execute(w, ui))
 }
 
@@ -26,12 +23,9 @@ type guistate struct {
 	Steps               int
 	Runtime             float64
 	running, pleaseStop bool // todo: mv out of struct
-	*sync.Cond               // todo: mv out of struct
 }
 
 func (s *guistate) Time() float32    { return float32(Time) }
-func (s *guistate) Lock()            { ui.L.Lock() }
-func (s *guistate) Unlock()          { ui.L.Unlock() }
 func (s *guistate) ImWidth() int     { return ui.Mesh().Size()[2] }
 func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
 func (s *guistate) Mesh() *data.Mesh { return &mesh }

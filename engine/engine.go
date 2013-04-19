@@ -155,6 +155,54 @@ func step() {
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
+// injects arbitrary code into the engine run loops.
+var inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
+
+// Run the simulation for a number of seconds.
+func Run(seconds float64) {
+	log.Println("run for", seconds, "s")
+	stop := Time + seconds
+	RunCond(func() bool { return Time < stop })
+}
+
+// Run the simulation for a number of steps.
+func Steps(n int) {
+	log.Println("run for", n, "steps")
+	stop := Solver.NSteps + n
+	RunCond(func() bool { return Solver.NSteps < stop })
+}
+
+// Runs as long as condition returns true.
+func RunCond(condition func() bool) {
+	checkInited() // todo: check in handler
+	defer util.DashExit()
+
+	pause = false
+	for condition() && !pause {
+		select {
+		default:
+			step()
+		case r := <-inject:
+			r()
+		}
+	}
+	pause = true
+}
+
+// Enter interactive mode. Never returns.
+func RunInteractive() {
+	pause = true
+	log.Println("entering interactive mode")
+	if webPort == "" {
+		GoServe(*Flag_port)
+	}
+
+	for {
+		log.Println("awaiting interaction")
+		(<-inject)()
+	}
+}
+
 // Set the magnetization to uniform state. // TODO: mv to settable
 func SetMUniform(mx, my, mz float32) {
 	checkInited()

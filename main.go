@@ -20,7 +20,7 @@ func main() {
 	SetMUniform(1, 1, 0)
 
 	go openbrowser("http://localhost" + *Flag_port)
-	Interactive()
+	RunInteractive()
 }
 
 // Try to open url in a browser. Instruct to do so if it fails.

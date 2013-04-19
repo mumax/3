@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/mx3/util"
 	"html/template"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -36,6 +37,7 @@ func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
 func (s *guistate) Mesh() *data.Mesh { return &mesh }
 func (s *guistate) Uname() string    { return Uname }
 func (s *guistate) Version() string  { return VERSION }
+func (s *guistate) Pwd() string      { pwd, _ := os.Getwd(); return pwd }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {
 		return &zeroSolver
@@ -143,7 +145,7 @@ const templText = `
 <img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
 <form  action=/setm/ method="POST">
-	<b>Upload magnetization file:</b> <input type=file name="value" value="{{.Steps}}"> <input type="submit" value="Submit"/>
+	<b>From file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/>
 </form>
 
 <script>

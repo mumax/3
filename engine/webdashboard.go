@@ -3,15 +3,13 @@ package engine
 import (
 	"code.google.com/p/mx3/util"
 	"html/template"
-	"log"
 	"net/http"
 )
 
 var dashtempl = template.Must(template.New("dash").Parse(dashText))
 
 func dash(w http.ResponseWriter, r *http.Request) {
-	log.Println("GET dash")
-	util.FatalErr(dashtempl.Execute(w, ui))
+	injectAndWait(func() { util.FatalErr(dashtempl.Execute(w, ui)) })
 }
 
 const dashText = `

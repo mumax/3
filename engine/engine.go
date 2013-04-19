@@ -162,6 +162,20 @@ func SetMUniform(mx, my, mz float32) {
 	m.normalize()
 }
 
+// Set magnetization from file.
+func SetMFile(fname string) {
+	util.FatalErr(setMFile(fname))
+}
+
+func setMFile(fname string) error {
+	m, _, err := data.ReadFile(fname)
+	if err != nil {
+		return err
+	}
+	M.Upload(m)
+	return nil
+}
+
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {

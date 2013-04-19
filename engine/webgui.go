@@ -4,6 +4,8 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"fmt"
+	"github.com/barnex/cuda5/cu"
 	"html/template"
 	"net/http"
 	"os"
@@ -15,7 +17,7 @@ var (
 )
 
 func gui(w http.ResponseWriter, r *http.Request) {
-	util.FatalErr(uitempl.Execute(w, ui))
+	injectAndWait(func() { util.FatalErr(uitempl.Execute(w, ui)) })
 }
 
 type guistate struct {
@@ -32,6 +34,11 @@ func (s *guistate) Mesh() *data.Mesh { return &mesh }
 func (s *guistate) Uname() string    { return Uname }
 func (s *guistate) Version() string  { return VERSION }
 func (s *guistate) Pwd() string      { pwd, _ := os.Getwd(); return pwd }
+
+const Mi = 1024 * 2014
+
+func (s *guistate) MemInfo() string   { f, t := cu.MemGetInfo(); return fmt.Sprint(f/Mi, "/", t/Mi) }
+func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {
 		return &zeroSolver
@@ -139,7 +146,7 @@ const templText = `
 <img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
 <form  action=/setm/ method="POST">
-	<b>From file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/>
+	<b>Initialize from file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> (optional)
 </form>
 
 <script>
@@ -208,8 +215,14 @@ const templText = `
 
 
 
-<font color=red> <div> <h2> Danger Zone </h2></font>
-	<form action=/ctl/kill  method="POST"> <b> Kill process:</b> <input type="submit" value="Kill"/> </form>
+<div> <h2> process </h2>
+	<form action=/ctl/kill  method="POST"> 
+		<table>
+		<tr><td> <font color=red><b> Kill process:</b></font> </td><td> <input type="submit" value="Kill"/> </td></tr>
+		<tr><td> <b>GPU</b> </td><td> {{.Device.Name}} </td></tr>
+		<tr><td> <b>Memory</b> </td><td> {{.MemInfo}} MB </td></tr>
+		</table>
+	</form>
 <hr/></div>
 
 <div id="footer">

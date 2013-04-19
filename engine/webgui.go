@@ -140,7 +140,7 @@ const templText = `
 
 
 <div> <h2> magnetization </h2> 
-<img id="magnetization" src="/render/m" width={{.ImWidth}}, height={{.ImHeight}}/>
+<img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
 <script>
 	var img = new Image();

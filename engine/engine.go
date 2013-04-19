@@ -42,6 +42,7 @@ var (
 	m, torque *buffered
 	demag_    *cuda.DemagConvolution
 	vol       *data.Slice
+	postStep  []func(m *data.Synced) // called on m after every step
 )
 
 func initialize() {
@@ -149,9 +150,18 @@ func initialize() {
 	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
+func PostStep(f func(m *data.Synced)) {
+	postStep = append(postStep, f)
+}
+
 func step() {
+	Solver.Step()
+
+	for _, f := range postStep {
+		f(m.Synced)
+	}
+
 	s := Solver
-	s.Step()
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 

@@ -168,6 +168,13 @@ func step() {
 // injects arbitrary code into the engine run loops.
 var inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
 
+// inject code into engine and wait for it to complete.
+func injectAndWait(task func()) {
+	ready := make(chan int)
+	inject <- func() { task(); ready <- 1 }
+	<-ready
+}
+
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	log.Println("run for", seconds, "s")

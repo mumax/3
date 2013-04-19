@@ -18,7 +18,6 @@ func pauseFn() { pause = true }
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
 	arg := r.FormValue("value")
-	ui.Msg = "" // clear last message
 
 	switch cmd {
 	default:

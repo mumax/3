@@ -21,7 +21,6 @@ func gui(w http.ResponseWriter, r *http.Request) {
 }
 
 type guistate struct {
-	Msg                 string
 	Steps               int
 	Runtime             float64
 	running, pleaseStop bool // todo: mv out of struct

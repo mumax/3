@@ -42,6 +42,7 @@ var (
 	m, torque *buffered
 	demag_    *cuda.DemagConvolution
 	vol       *data.Slice
+	postStep  []func(m *data.Synced) // called on m after every step
 )
 
 func initialize() {
@@ -149,14 +150,30 @@ func initialize() {
 	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
+func PostStep(f func(m *data.Synced)) {
+	postStep = append(postStep, f)
+}
+
 func step() {
+	Solver.Step()
+
+	for _, f := range postStep {
+		f(m.Synced)
+	}
+
 	s := Solver
-	s.Step()
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
 // injects arbitrary code into the engine run loops. Used by web interface.
 var inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
+
+// inject code into engine and wait for it to complete.
+func injectAndWait(task func()) {
+	ready := make(chan int)
+	inject <- func() { task(); ready <- 1 }
+	<-ready
+}
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
@@ -269,4 +286,5 @@ func Quant(name string) (h Buffered, ok bool) {
 	case "torque":
 		return Torque, true
 	}
+	return nil, false // rm for go 1.1
 }

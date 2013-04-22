@@ -10,21 +10,20 @@ import (
 type Heun struct {
 	solverCommon
 	y        *data.Synced            // the quantity to be time stepped
-	dy0      *data.Slice             // time derivative of y <- buffer could be released after step?
 	torqueFn func(bool) *data.Synced // updates dy
 	postStep func(*data.Slice)       // called on y after successful step, typically normalizes magnetization
 }
 
 func NewHeun(y *data.Synced, torqueFn func(bool) *data.Synced, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
-	m := y.Mesh()
-	dy0 := NewSlice(3, m)
-	return &Heun{newSolverCommon(dt, multiplier, time), y, dy0, torqueFn, postStep}
+	return &Heun{newSolverCommon(dt, multiplier, time), y, torqueFn, postStep}
 }
 
 // Take one time step
 func (e *Heun) Step() {
-	dy0 := e.dy0
+	dy0 := GetBuffer(3, e.y.Mesh())
+	defer RecycleBuffer(dy0)
+
 	dt := float32(e.Dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
 

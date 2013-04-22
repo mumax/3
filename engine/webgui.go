@@ -21,7 +21,6 @@ func gui(w http.ResponseWriter, r *http.Request) {
 }
 
 type guistate struct {
-	Msg                 string
 	Steps               int
 	Runtime             float64
 	running, pleaseStop bool // todo: mv out of struct
@@ -45,6 +44,7 @@ func (s *guistate) Solver() *cuda.Heun {
 	} else {
 		return Solver
 	}
+	return nil //rm for go 1.1
 }
 
 // surrogate solver if no real one is set, provides zero values for time step etc to template.
@@ -140,13 +140,22 @@ const templText = `
 <hr/> </div>
 
 
+<script>
+function hide(id) {
+    document.getElementById(id).style.display = 'none';
+}
+function show(id) {
+    document.getElementById(id).style.display = 'block';
+}
+</script>
 
 
-<div> <h2> magnetization </h2> 
+<h2> magnetization </h2> <a href="#" onclick="hide('div_magnetization'); return false;">Hide</a>
+<div id=div_magnetization> 
 <img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
 <form  action=/setm/ method="POST">
-	<b>Initialize from file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> (optional)
+	<b>Re-initialize from .dump file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> 
 </form>
 
 <script>
@@ -162,7 +171,7 @@ const templText = `
 	setInterval(updateImg, 500);
 </script>
 
-<hr/></div>
+</div><hr/>
 
 
 

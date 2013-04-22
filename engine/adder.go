@@ -45,7 +45,7 @@ func (a *adder) addTo(Dst *buffered, goodstep bool) {
 	}
 }
 
-var _addBuf *buffered
+var _addBuf *buffered // TODO: use cuda.GetBuffer?
 
 // returns a GPU buffer for temporarily adding a quantity to and saving it
 func addBuf() *buffered {

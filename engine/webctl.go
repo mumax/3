@@ -18,7 +18,6 @@ func pauseFn() { pause = true }
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
 	arg := r.FormValue("value")
-	ui.Msg = "" // clear last message
 
 	switch cmd {
 	default:
@@ -52,12 +51,6 @@ func control(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-func injectAndWait(task func()) {
-	ready := make(chan int)
-	inject <- func() { task(); ready <- 1 }
-	<-ready
 }
 
 func isrunning(w http.ResponseWriter, r *http.Request) {

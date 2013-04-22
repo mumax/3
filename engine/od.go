@@ -16,8 +16,10 @@ var OD = "./" // Output directory
 // SetOD sets the output directory where auto-saved files will be stored.
 func SetOD(od string, force bool) {
 	if OD != "./" {
-		log.Fatal("output directory already set to", OD)
+		log.Println("setod: output directory already set to", OD)
+		return
 	}
+
 	OD = od
 	if !strings.HasSuffix(OD, "/") {
 		OD += "/"

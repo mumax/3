@@ -140,9 +140,18 @@ const templText = `
 <hr/> </div>
 
 
+<script>
+function hide(id) {
+    document.getElementById(id).style.display = 'none';
+}
+function show(id) {
+    document.getElementById(id).style.display = 'block';
+}
+</script>
 
 
-<div> <h2> magnetization </h2> 
+<h2> magnetization </h2> <a href="#" onclick="hide('div_magnetization'); return false;">Hide</a>
+<div id=div_magnetization> 
 <img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
 
 <form  action=/setm/ method="POST">
@@ -162,7 +171,7 @@ const templText = `
 	setInterval(updateImg, 500);
 </script>
 
-<hr/></div>
+</div><hr/>
 
 
 

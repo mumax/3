@@ -13,7 +13,7 @@ func Shift(dst, src *data.Slice, shift [3]int) {
 	util.Assert(dst.Len() == src.Len())
 
 	N := dst.Mesh().Size()
-	cfg := make2DConf(N[2], N[1])
+	cfg := make2DConf(N[1], N[2])
 
 	k_shift(dst.DevPtr(0), src.DevPtr(0), N[0], N[1], N[2], shift[0], shift[1], shift[2], cfg)
 }

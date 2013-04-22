@@ -285,4 +285,5 @@ func Quant(name string) (h Buffered, ok bool) {
 	case "torque":
 		return Torque, true
 	}
+	return nil, false // rm for go 1.1
 }

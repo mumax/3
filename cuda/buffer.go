@@ -13,9 +13,14 @@ var (
 	buf_pool map[int][]unsafe.Pointer
 )
 
+// Returns a GPU slice for temporary use. To be returned to the pool with RecycleBuffer.
 func GetBuffer(nComp int, m *data.Mesh) *data.Slice {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()
+
+	if buf_pool == nil {
+		buf_pool = make(map[int][]unsafe.Pointer)
+	}
 
 	N := m.NCell()
 	pool := buf_pool[N]
@@ -34,6 +39,7 @@ func GetBuffer(nComp int, m *data.Mesh) *data.Slice {
 	return data.SliceFromPtrs(m, data.GPUMemory, ptrs)
 }
 
+// Returns a buffer obtained from GetBuffer to the pool.
 func RecycleBuffer(s *data.Slice) {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()

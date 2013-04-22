@@ -56,7 +56,7 @@ const templText = `
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>mx3</title>
-	<style media="screen" type="text/css">
+	<style media="all" type="text/css">
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 10px; }
 		h1   { font-size: 28px; font-color: gray; }
@@ -74,7 +74,6 @@ const templText = `
 
 
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
-
 
 
 

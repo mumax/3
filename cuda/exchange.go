@@ -11,9 +11,13 @@ import "C"
 const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X
 
 // Add exchange field to Beff.
-func AddExchange(Beff, m *data.Slice, Aex, Msat float64) {
+func AddExchange(Beff, m, mask *data.Slice, Aex, Msat float64) {
 	// TODO: size check
-	AddAnisoExchange(Beff, m, Aex, Aex, Aex, Msat)
+	if mask == nil {
+		AddAnisoExchange(Beff, m, Aex, Aex, Aex, Msat)
+	} else {
+		AddMaskExchange(Beff, m, mask, Aex, Msat)
+	}
 }
 
 // Add exchange field to Beff with different exchange constant for X,Y,Z direction.

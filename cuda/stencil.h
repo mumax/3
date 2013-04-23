@@ -14,13 +14,10 @@
 #define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
 
 // clamp index to bounds (0:N0, 0:N1, 0:N2)
-#define ix(i, j, k) idx(clamp(i, N0), clamp(j, N1), clamp(k, N2))
+#define idxclamp(i, j, k) idx(clamp(i, N0), clamp(j, N1), clamp(k, N2))
 
 // spatial derivative along (u, v, w) direction without dividing by cell size
-#define delta(in, u, v, w) (in[ix(i+u, j+v, k+w)] - in[ix(i-u, j-v, k-w)])
-
-// spatial derivative along (u, v, w) direction with given cell size
-#define diff(in, u, v, w, c) ((delta(in, u, v, w))/(2*c))
+#define delta(in, u, v, w) (in[idxclamp(i+u, j+v, k+w)] - in[idxclamp(i-u, j-v, k-w)])
 
 // Maximum threads per block for stencil op
 #define STENCIL_BLOCKSIZE_X 16

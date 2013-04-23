@@ -16,7 +16,7 @@ shift(float* __restrict__  dst, float* __restrict__  src,
 
 	// loop over N layers
 	for (int i=0; i<N0; i++){
-		dst[idx(i, j, k)] = src[ix(i-sh0, j-sh1, k-sh2)];
+		dst[idx(i, j, k)] = src[idxclamp(i-sh0, j-sh1, k-sh2)];
 	}
 } 
 

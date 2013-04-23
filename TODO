@@ -1,3 +1,5 @@
+Get rid of data.Synced, instead wait for download server to finish all.
+
 slice time stamp
 
 slice mesh is not OK when using a part of the slice (i.e., a "slice";-). is now misused, especially in convolution. API should be more fool-proof.
@@ -13,3 +15,5 @@ web: show/hide/auto refresh
 web: graphs
 web: don't fall over the edge while browser is open
 web: (clean) exit button
+
+ExMask: proper XYZ, left/right/top/bottom API

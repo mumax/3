@@ -62,3 +62,19 @@ func Memset(s *data.Slice, val ...float32) {
 func Zero(s *data.Slice) {
 	Memset(s, make([]float32, s.NComp())...)
 }
+
+func index(i, j, k int, size [3]int) int {
+	util.Argument(i >= 0 && j >= 0 && k >= 0 &&
+		i < size[0] && j < size[1] && k < size[2])
+	return ((i)*size[1]*size[2] + (j)*size[2] + (k))
+}
+
+func SetCell(s *data.Slice, comp int, i, j, k int, value float32) {
+	SetElem(s, comp, index(i, j, k, s.Mesh().Size()), value)
+}
+
+func SetElem(s *data.Slice, comp int, index int, value float32) {
+	f := value
+	dst := unsafe.Pointer(uintptr(s.DevPtr(comp)) + uintptr(index)*cu.SIZEOF_FLOAT32)
+	memCpyHtoD(dst, unsafe.Pointer(&f), cu.SIZEOF_FLOAT32)
+}

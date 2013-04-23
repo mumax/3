@@ -10,16 +10,16 @@ import (
 
 // User inputs
 var (
-	Aex     ScalFn      = Const(0)             // Exchange stiffness in J/m
-	ExMask  *data.Slice = nil                  // Mask for exchange. See cuda/exchange.go:AddMaskExchange(). Set(L/R, i,j,k) API would be nice
-	Msat    ScalFn      = Const(0)             // Saturation magnetization in A/m
-	Alpha   ScalFn      = Const(0)             // Damping constant
-	B_ext   VecFn       = ConstVector(0, 0, 0) // External field in T
-	DMI     ScalFn      = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1     VecFn       = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi      ScalFn      = Const(0)
-	SpinPol ScalFn      = Const(1)
-	J       VecFn       = ConstVector(0, 0, 0)
+	Aex     ScalFn        = Const(0)             // Exchange stiffness in J/m
+	ExMask  StaggeredMask                        // Mask for exchange.
+	Msat    ScalFn        = Const(0)             // Saturation magnetization in A/m
+	Alpha   ScalFn        = Const(0)             // Damping constant
+	B_ext   VecFn         = ConstVector(0, 0, 0) // External field in T
+	DMI     ScalFn        = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1     VecFn         = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi      ScalFn        = Const(0)
+	SpinPol ScalFn        = Const(1)
+	J       VecFn         = ConstVector(0, 0, 0)
 )
 
 // Accessible quantities
@@ -74,7 +74,7 @@ func initialize() {
 	// exchange field
 	b_exch := newAdder("B_exch", func(dst *data.Slice) {
 		m_ := m.Read()
-		cuda.AddExchange(dst, m_, ExMask, Aex(), Msat())
+		cuda.AddExchange(dst, m_, ExMask.mask, Aex(), Msat())
 		m.ReadDone()
 	})
 	B_exch = b_exch

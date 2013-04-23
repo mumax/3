@@ -3,15 +3,7 @@
 
 // Add 1 component of exchange interaction to Beff (Tesla).
 // m is normalized.
-// mask defines a pre-factor for (Aex / Msat) to allow space-dependent exchange.
-// the mask is staggered over half a cell with respect to the magnetization grid,
-// and otherwise has the same size.
-// mask{X,Y,Z} defines the coupling between neighbors in the {X,Y,Z} direction, respectively.
-// maskX[i, j, k] defines the coupling between m[i, j, k-1] and m[i, j k]
-// maskY[i, j, k] defines the coupling between m[i, j-1, k] and m[i, j k]
-// maskZ[i, j, k] defines the coupling between m[i-1, j, k] and m[i, j k]
-// Each time, the zeroth element defines the coupling at the leftmost boundary and is thus unused,
-// but would be used in case if periodic boundary conditions.
+// See exchange.go for more details.
 extern "C" __global__ void
 addexchangemask(float* __restrict__ Beff, float* __restrict__ m, 
                 float* __restrict__ maskX, float* __restrict__ maskY, float* __restrict__ maskZ,

@@ -24,13 +24,14 @@ func (m *StaggeredMask) SetLeftOf(direction int, ix, iy, iz int, value float64) 
 
 func (m *StaggeredMask) SetRightOf(direction int, ix, iy, iz int, value float64) {
 	m.init()
-	i := [3]int{iz, ix, iy}
+	direction = swapIndex(direction, 3)
+	i := [3]int{iz, iy, ix}
 	i[direction]++
 	size := m.mask.Mesh().Size()
 	if i[direction] == size[direction] {
 		i[direction] = 0 // wrap around boundary
 	}
-	cuda.SetCell(m.mask, swapIndex(direction, 3), iz, iy, ix, float32(value))
+	cuda.SetCell(m.mask, direction, i[0], i[1], i[2], float32(value))
 }
 
 func (m *StaggeredMask) init() {

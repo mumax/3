@@ -24,8 +24,8 @@ addexchangemask(float* __restrict__ Beff, float* __restrict__ m,
 
 		float m1 = m[idx(i, j, lclamp(k-1    ))];
 		float m2 = m[idx(i, j, hclamp(k+1, N2))];
-		float a1 = loadmask(maskX, idx     (i, j, k  ));
-		float a2 = loadmask(maskX, idxclamp(i, j, k+1));
+		float a1 = loadmask(maskZ, idx     (i, j, k  ));
+		float a2 = loadmask(maskZ, idxclamp(i, j, k+1));
 		B += wz * (a1*(m1-m0) + a2*(m2-m0));
 
 		m1 = m[idx(i, lclamp(j-1   ), k)];
@@ -38,8 +38,8 @@ addexchangemask(float* __restrict__ Beff, float* __restrict__ m,
 		if (N0 != 1){
 			m1 = m[idx(hclamp(i+1,N0), j, k)];
 			m2 = m[idx(lclamp(i-1   ), j, k)];
-			a1 = loadmask(maskZ, idx     (i  , j, k));
-			a2 = loadmask(maskZ, idxclamp(i+1, j, k));
+			a1 = loadmask(maskX, idx     (i  , j, k));
+			a2 = loadmask(maskX, idxclamp(i+1, j, k));
 			B  += wx * (a1*(m1-m0) + a2*(m2-m0));
 		}
 

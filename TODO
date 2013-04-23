@@ -4,16 +4,12 @@ slice mesh is not OK when using a part of the slice (i.e., a "slice";-). is now 
 
 fuse a standard micromag kernel for at least the local terms. uses inline functions. exchange adds to demag. extra pointers to output buffers , if not NULL, leak intermediate output.  To save memory.
 
-dedicated exchange kernel or optimized stencil.
-
-"make version" updates version number by git commits
-
-vtk binary not working
-
 handle non-unit M: exchange, llgtorque
-
-rename Quant to Stream?
 
 use device properties for grid config
 
-cert/ automate tests
+web: update parameters 
+web: show/hide/auto refresh
+web: graphs
+web: don't fall over the edge while browser is open
+web: (clean) exit button

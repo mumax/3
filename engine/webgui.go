@@ -113,7 +113,11 @@ const templText = `
     }
 	var running = false
 	function updateRunning(){
-		running = (httpGet("/running/") === "true")
+		try{
+			running = (httpGet("/running/") === "true")
+		}catch(err){
+			running = false	
+		}
 		if(running){
 			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>"
 		}else{
@@ -125,7 +129,9 @@ const templText = `
 
 <script>
 	function updateDash(){
-		document.getElementById("dash").innerHTML = httpGet("/dash/")
+		try{
+			document.getElementById("dash").innerHTML = httpGet("/dash/")
+		}catch(err){}
 	}
 	function updateDashIfRunning(){
 		if(running){

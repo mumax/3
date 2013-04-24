@@ -3,6 +3,7 @@
 package main
 
 // Test energy calculation.
+// TODO: not ready
 
 import (
 	. "code.google.com/p/mx3/engine"

@@ -21,7 +21,7 @@ func mDotAdder(a *adder) float64 {
 }
 
 func mDotSlice(field *data.Slice) float64 {
-	util.Assert(vol == nil) // would need to include in dot
+	util.Assert(vol.DevPtr(0) == nil) // would need to include in dot
 	c := mesh.CellSize()
 	cellVolume := c[0] * c[1] * c[2]
 	return (Msat() * cellVolume * float64(cuda.Dot(field, m.Slice)))

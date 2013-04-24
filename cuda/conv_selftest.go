@@ -107,15 +107,9 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 	}
 }
 
-// Wraps an index to [0, max] by adding/subtracting a multiple of max.
+// Wraps an index to [0, max] (python-like modulus)
 func wrap(number, max int) int {
-	for number < 0 {
-		number += max
-	}
-	for number >= max {
-		number -= max
-	}
-	return number
+	return ((number % max) + max) % max
 }
 
 // random number between -1 and 1.

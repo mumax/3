@@ -2,10 +2,11 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
-	//"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 )
 
+// Stores the necessary state to perform FFT-accelerated convolution
+// with magnetostatic kernel (or other kernel of same symmetry).
 type DemagConvolution struct {
 	size        [3]int            // 3D size of the input/output data
 	kernSize    [3]int            // Size of kernel and logical FFT size.
@@ -13,7 +14,7 @@ type DemagConvolution struct {
 	n           int               // product of size
 	fftRBuf     [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
-	gpuFFTKern  [3][3]*data.Slice // FFT kernel on device: TODO: xfer if needed
+	gpuFFTKern  [3][3]*data.Slice // FFT kernel on device
 	fwPlan      fft3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      fft3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
@@ -103,11 +104,16 @@ func (c *DemagConvolution) initFFTKern2D() {
 	}
 }
 
-func (c *DemagConvolution) Exec(outp, inp, vol *data.Slice, Bsat float64) {
+// Calculate the demag field of m * vol * Bsat, store result in B.
+// 	m:    magnetization normalized to unit length
+// 	vol:  unitless mask used to scale m's length, may be nil
+// 	Bsat: saturation magnetization in Tesla
+// 	B:    resulting demag field, in Tesla
+func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat float64) {
 	if c.is2D() {
-		c.exec2D(outp, inp, vol, Bsat)
+		c.exec2D(B, m, vol, Bsat)
 	} else {
-		c.exec3D(outp, inp, vol, Bsat)
+		c.exec3D(B, m, vol, Bsat)
 	}
 }
 
@@ -194,6 +200,7 @@ func (c *DemagConvolution) is3D() bool {
 	return !c.is2D()
 }
 
+// Initializes a demag convolution for the given mesh geometry and magnetostatic kernel.
 func NewConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution {
 	size := mesh.Size()
 	c := new(DemagConvolution)

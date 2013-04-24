@@ -43,13 +43,13 @@ var (
 	m, torque *buffered
 	demag_    *cuda.DemagConvolution
 	vol       *data.Slice
-	postStep  []func(m *data.Synced) // called on m after every step
+	postStep  []func(m *data.Slice) // called on m after every step
 )
 
 func initialize() {
 
 	// these 2 GPU arrays are re-used to stored various quantities.
-	arr1, arr2 := cuda.NewSynced(3, &mesh), cuda.NewSynced(3, &mesh)
+	arr1, arr2 := cuda.NewSlice(3, &mesh), cuda.NewSlice(3, &mesh)
 
 	// cell volumes currently unused
 	vol = data.NilSlice(1, &mesh)
@@ -65,17 +65,13 @@ func initialize() {
 	// demag field
 	demag_ = cuda.NewDemag(&mesh)
 	b_demag := newBuffered(arr2, "B_demag", func(b *data.Slice) {
-		m_ := m.Read()
-		demag_.Exec(b, m_, vol, Mu0*Msat()) //TODO: consistent msat or bsat
-		m.ReadDone()
+		demag_.Exec(b, m.Slice, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 	B_demag = b_demag
 
 	// exchange field
 	b_exch := newAdder("B_exch", func(dst *data.Slice) {
-		m_ := m.Read()
-		cuda.AddExchange(dst, m_, ExMask.mask, Aex(), Msat())
-		m.ReadDone()
+		cuda.AddExchange(dst, m.Slice, ExMask.mask, Aex(), Msat())
 	})
 	B_exch = b_exch
 
@@ -83,9 +79,7 @@ func initialize() {
 	b_dmi := newAdder("B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
-			m_ := m.Read()
-			cuda.AddDMI(dst, m_, d, Msat())
-			m.ReadDone()
+			cuda.AddDMI(dst, m.Slice, d, Msat())
 		}
 	})
 	B_dmi = b_dmi
@@ -94,9 +88,7 @@ func initialize() {
 	b_uni := newAdder("B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
-			m_ := m.Read()
-			cuda.AddUniaxialAnisotropy(dst, m_, ku1[2], ku1[1], ku1[0], Msat())
-			m.ReadDone()
+			cuda.AddUniaxialAnisotropy(dst, m.Slice, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
 	B_uni = b_uni
@@ -109,9 +101,7 @@ func initialize() {
 
 	// llg torque
 	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
-		m_ := m.Read()
-		cuda.LLGTorque(b, m_, b, float32(Alpha()))
-		m.ReadDone()
+		cuda.LLGTorque(b, m.Slice, b, float32(Alpha()))
 	})
 	Torque = torque
 
@@ -119,13 +109,11 @@ func initialize() {
 	stt := newAdder("stt", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
-			m_ := m.Read()
 			p := SpinPol()
 			jx := j[2] * p
 			jy := j[1] * p
 			jz := j[0] * p
-			cuda.AddZhangLiTorque(dst, m_, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
-			m.ReadDone()
+			cuda.AddZhangLiTorque(dst, m.Slice, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
 	STT = stt
@@ -135,9 +123,9 @@ func initialize() {
 	Table = table
 
 	// solver
-	torqueFn := func(good bool) *data.Synced {
+	torqueFn := func(good bool) *data.Slice {
 		m.touch(good) // saves if needed
-		table.send(m.Synced, good)
+		table.send(m.Slice, good)
 		b_demag.update(good)
 		b_exch.addTo(b_eff, good)
 		b_dmi.addTo(b_eff, good)
@@ -146,12 +134,12 @@ func initialize() {
 		b_eff.touch(good)
 		torque.update(good)
 		stt.addTo(torque, good)
-		return torque.Synced
+		return torque.Slice
 	}
-	Solver = cuda.NewHeun(m.Synced, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(m.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
-func PostStep(f func(m *data.Synced)) {
+func PostStep(f func(m *data.Slice)) {
 	postStep = append(postStep, f)
 }
 
@@ -159,7 +147,7 @@ func step() {
 	Solver.Step()
 
 	for _, f := range postStep {
-		f(m.Synced)
+		f(m.Slice)
 	}
 
 	s := Solver

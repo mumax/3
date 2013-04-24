@@ -29,15 +29,12 @@ func (a *adder) addTo(Dst *buffered, goodstep bool) {
 		buf := cuda.GetBuffer(3, Dst.Mesh()) // TODO: not 3
 		cuda.Zero(buf)
 		a.addFn(buf)
-		dst := Dst.Write()
+		dst := Dst.Slice
 		cuda.Madd2(dst, dst, buf, 1, 1)
-		Dst.WriteDone()
 		goSaveAndRecycle(a.fname(), buf, Time)
 		a.saved()
 	} else {
-		dst := Dst.Write()
-		a.addFn(dst)
-		Dst.WriteDone()
+		a.addFn(Dst.Slice)
 	}
 }
 

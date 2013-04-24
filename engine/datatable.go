@@ -13,7 +13,7 @@ type dataTable struct {
 	autosave
 }
 
-func (t *dataTable) send(M *data.Synced, good bool) {
+func (t *dataTable) send(M *data.Slice, good bool) {
 	if good && t.needSave() {
 		t.init()
 		m := average(M) // in userspace XYZ order

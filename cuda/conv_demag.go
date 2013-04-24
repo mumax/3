@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/mag"
 	"github.com/barnex/cuda5/cu"
 )
 
@@ -201,7 +202,7 @@ func (c *DemagConvolution) is3D() bool {
 }
 
 // Initializes a demag convolution for the given mesh geometry and magnetostatic kernel.
-func NewConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution {
+func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution {
 	size := mesh.Size()
 	c := new(DemagConvolution)
 	c.size = size
@@ -211,4 +212,13 @@ func NewConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.init()
 	testConvolution(c, mesh)
 	return c
+}
+
+// Default accuracy setting for demag kernel.
+const DEFAULT_KERNEL_ACC = 6
+
+// Initializes a convolution to evaluate the demag field for the given mesh geometry.
+func NewDemag(mesh *data.Mesh) *DemagConvolution {
+	k := mag.BruteKernel(mesh, DEFAULT_KERNEL_ACC)
+	return newConvolution(mesh, k)
 }

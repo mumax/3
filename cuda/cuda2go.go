@@ -82,8 +82,6 @@ func cuda2go(fname string) {
 	wrapgen(fname, funcname, argt, argn)
 }
 
-var tm = map[string]string{"float*": "unsafe.Pointer", "float": "float32", "int": "int"}
-
 // translate C type to Go type.
 func typemap(ctype string) string {
 	if gotype, ok := tm[ctype]; ok {
@@ -92,6 +90,8 @@ func typemap(ctype string) string {
 	panic(fmt.Errorf("unsupported cuda type: %v", ctype))
 	return "" // unreachable
 }
+
+var tm = map[string]string{"float*": "unsafe.Pointer", "float": "float32", "int": "int"}
 
 // template data
 type Kernel struct {

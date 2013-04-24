@@ -102,6 +102,12 @@ func (s *Slice) Free() {
 	for c := range s.ptr_ {
 		s.ptr_[c] = nil //unsafe.Pointer(uintptr(0))
 	}
+	s.Disable()
+}
+
+// INTERNAL. Overwrite struct fields with zeros to avoid
+// accidental use after Free.
+func (s *Slice) Disable() {
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
 	s.info = nil

@@ -1,14 +1,17 @@
 package cuda
 
-import "code.google.com/p/mx3/data"
+import (
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
+)
 
 // Add effective field of Dzyaloshinskii-Moriya interaction to Beff (Tesla).
 // According to Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).
 // m: normalized
 // D: J/m²
 func AddDMI(Beff *data.Slice, m *data.Slice, D, Msat float64) {
-	// TODO: size check
 	mesh := Beff.Mesh()
+	util.Argument(m.Mesh().Size() == mesh.Size())
 	N := mesh.Size()
 	c := mesh.CellSize()
 

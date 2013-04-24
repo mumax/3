@@ -39,11 +39,12 @@ var (
 
 // hidden quantities
 var (
-	mesh      data.Mesh
-	m, torque *buffered
-	demag_    *cuda.DemagConvolution
-	vol       *data.Slice
-	postStep  []func(m *data.Slice) // called on m after every step
+	mesh                             data.Mesh
+	m, torque, b_eff, b_demag        *buffered // torque, b_eff, b_demag share storage!
+	b_exch, b_ext, b_dmi, b_uni, stt *adder
+	demag_                           *cuda.DemagConvolution
+	vol                              *data.Slice
+	postStep                         []func(m *data.Slice) // called on m after every step
 )
 
 func initialize() {
@@ -59,24 +60,24 @@ func initialize() {
 	M = m
 
 	// effective field
-	b_eff := newBuffered(arr2, "B_eff", nil)
+	b_eff = newBuffered(arr2, "B_eff", nil)
 	B_eff = b_eff
 
 	// demag field
 	demag_ = cuda.NewDemag(&mesh)
-	b_demag := newBuffered(arr2, "B_demag", func(b *data.Slice) {
+	b_demag = newBuffered(arr2, "B_demag", func(b *data.Slice) {
 		demag_.Exec(b, m.Slice, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 	B_demag = b_demag
 
 	// exchange field
-	b_exch := newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
+	b_exch = newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
 		cuda.AddExchange(dst, m.Slice, ExMask.mask, Aex(), Msat())
 	})
 	B_exch = b_exch
 
 	// Dzyaloshinskii-Moriya field
-	b_dmi := newAdder(3, &mesh, "B_dmi", func(dst *data.Slice) {
+	b_dmi = newAdder(3, &mesh, "B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
 			cuda.AddDMI(dst, m.Slice, d, Msat())
@@ -85,7 +86,7 @@ func initialize() {
 	B_dmi = b_dmi
 
 	// uniaxial anisotropy
-	b_uni := newAdder(3, &mesh, "B_uni", func(dst *data.Slice) {
+	b_uni = newAdder(3, &mesh, "B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
 			cuda.AddUniaxialAnisotropy(dst, m.Slice, ku1[2], ku1[1], ku1[0], Msat())
@@ -94,7 +95,7 @@ func initialize() {
 	B_uni = b_uni
 
 	// external field
-	b_ext := newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
+	b_ext = newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
 	})
@@ -106,7 +107,7 @@ func initialize() {
 	Torque = torque
 
 	// spin-transfer torque
-	stt := newAdder(3, &mesh, "stt", func(dst *data.Slice) {
+	stt = newAdder(3, &mesh, "stt", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()

@@ -46,6 +46,30 @@ func TestReduceSum(t *testing.T) {
 	}
 }
 
+func TestReduceDot(t *testing.T) {
+	initTest()
+
+	// test for 1 comp
+	a := toGPU([]float32{1, 2, 3, 4, 5})
+	b := toGPU([]float32{5, 4, 3, -1, 2})
+	result := Dot(a, b)
+	if result != 5+8+9-4+10 {
+		t.Error("got:", result)
+	}
+
+	// test for 3 comp
+	const N = 32
+	mesh := data.NewMesh(1, 1, N, 1, 1, 1)
+	c := NewSlice(3, mesh)
+	d := NewSlice(3, mesh)
+	Memset(c, 1, 2, 3)
+	Memset(d, 4, 5, 6)
+	result = Dot(c, d)
+	if result != N*(4+10+18) {
+		t.Error("got:", result)
+	}
+}
+
 //func TestReduceMax(t *testing.T) {
 //	initTest()
 //	result := Max(in1)

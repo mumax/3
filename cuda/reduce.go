@@ -16,15 +16,16 @@ func Sum(in *data.Slice) float32 {
 	return copyback(out)
 }
 
-// Maximum of all elements.
-//func Max(in *data.Slice) float32 {
-//	return reduce1(in, -math.MaxFloat32, k_reducemax)
-//}
-
-// Minimum of all elements.
-//func Min(in *data.Slice) float32 {
-//	return reduce1(in, math.MaxFloat32, k_reducemin)
-//}
+// Dot product.
+func Dot(a, b *data.Slice) float32 {
+	nComp := a.NComp()
+	util.Argument(nComp == b.NComp())
+	out := reduceBuf(0)
+	for c := 0; c < nComp; c++ {
+		k_reducedot(a.DevPtr(c), b.DevPtr(c), out, 0, a.Len(), reducecfg) // all components add to out
+	}
+	return copyback(out)
+}
 
 // Maximum of absolute values of all elements.
 func MaxAbs(in *data.Slice) float32 {
@@ -33,12 +34,6 @@ func MaxAbs(in *data.Slice) float32 {
 	k_reducemaxabs(in.DevPtr(0), out, 0, in.Len(), reducecfg)
 	return copyback(out)
 }
-
-//// Maximum difference between the two arrays.
-//// 	max_i abs(a[i] - b[i])
-//func MaxDiff(a, b safe.Float32s) float32 {
-//	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
-//}
 
 // Maximum of the norms of all vectors (x[i], y[i], z[i]).
 // 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
@@ -60,13 +55,21 @@ func MaxVecDiff(x, y *data.Slice) float64 {
 	return math.Sqrt(float64(copyback(out)))
 }
 
-//
-//// Vector dot product.
-//func Dot(x1, x2 safe.Float32s) float32 {
-//	return reduce2(x1, x2, 0, ptx.K_reducedot)
+//// Maximum difference between the two arrays.
+//// 	max_i abs(a[i] - b[i])
+//func MaxDiff(a, b safe.Float32s) float32 {
+//	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
 //}
-//
-//
+
+// Maximum of all elements.
+//func Max(in *data.Slice) float32 {
+//	return reduce1(in, -math.MaxFloat32, k_reducemax)
+//}
+
+// Minimum of all elements.
+//func Min(in *data.Slice) float32 {
+//	return reduce1(in, math.MaxFloat32, k_reducemin)
+//}
 
 var reduceBuffers chan unsafe.Pointer // pool of 1-float CUDA buffers for reduce
 

@@ -127,13 +127,13 @@ func initialize() {
 		m.touch(good) // saves if needed
 		table.send(m.Slice, good)
 		b_demag.update(good)
-		b_exch.addTo(b_eff, good)
-		b_dmi.addTo(b_eff, good)
-		b_uni.addTo(b_eff, good)
-		b_ext.addTo(b_eff, good)
+		b_exch.addTo(b_eff.Slice, good)
+		b_dmi.addTo(b_eff.Slice, good)
+		b_uni.addTo(b_eff.Slice, good)
+		b_ext.addTo(b_eff.Slice, good)
 		b_eff.touch(good)
 		torque.update(good)
-		stt.addTo(torque, good)
+		stt.addTo(torque.Slice, good)
 		return torque.Slice
 	}
 	Solver = cuda.NewHeun(m.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

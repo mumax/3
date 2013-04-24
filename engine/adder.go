@@ -24,22 +24,23 @@ func newAdder(name string, f addFunc) *adder {
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,
 // it is first added to a separate buffer, saved, and then added to Dst.
-func (a *adder) addTo(Dst *buffered, goodstep bool) {
+func (a *adder) addTo(dst *data.Slice, goodstep bool) {
 	if goodstep && a.needSave() {
-		buf := cuda.GetBuffer(3, Dst.Mesh()) // TODO: not 3
+		buf := cuda.GetBuffer(dst.NComp(), dst.Mesh()) // TODO: not 3
 		cuda.Zero(buf)
 		a.addFn(buf)
-		dst := Dst.Slice
 		cuda.Madd2(dst, dst, buf, 1, 1)
 		goSaveAndRecycle(a.fname(), buf, Time)
 		a.saved()
 	} else {
-		a.addFn(Dst.Slice)
+		a.addFn(dst)
 	}
 }
 
 //func(a*adder)get_mustRecycle()*data.Slice{
-//
+//		buf := cuda.GetBuffer(3, Dst.Mesh()) // TODO: not 3
+//		cuda.Zero(buf)
+//		a.addFn(buf)
 //}
 
 //var _addBuf *buffered // TODO: use cuda.GetBuffer?

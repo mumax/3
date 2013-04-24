@@ -12,3 +12,6 @@ web: graphs
 web: don't fall over the edge while browser is open
 web: (clean) exit button
 
+use cuda.OnFree throughout
+cuda.HostBuffer()
+cuda.Recycle: check if you own it, disable contents to avoid use-after-recylce.

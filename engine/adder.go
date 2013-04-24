@@ -11,12 +11,16 @@ type addFunc func(dst *data.Slice)
 // Output Handle for a quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field)
 type adder struct {
+	nComp int
+	mesh  *data.Mesh
 	addFn addFunc // calculates quantity and add result to dst
 	autosave
 }
 
-func newAdder(name string, f addFunc) *adder {
+func newAdder(nComp int, m *data.Mesh, name string, f addFunc) *adder {
 	a := new(adder)
+	a.nComp = nComp
+	a.mesh = m
 	a.addFn = f
 	a.name = name
 	return a
@@ -37,11 +41,14 @@ func (a *adder) addTo(dst *data.Slice, goodstep bool) {
 	}
 }
 
-//func(a*adder)get_mustRecycle()*data.Slice{
-//		buf := cuda.GetBuffer(3, Dst.Mesh()) // TODO: not 3
-//		cuda.Zero(buf)
-//		a.addFn(buf)
-//}
+// Evaluates addFn and returns the result in a buffer.
+// The returned buffer must be recycled with cuda.RecycleBuffer
+func (a *adder) get_mustRecycle() *data.Slice {
+	buf := cuda.GetBuffer(a.nComp, a.mesh)
+	cuda.Zero(buf)
+	a.addFn(buf)
+	return buf
+}
 
 //var _addBuf *buffered // TODO: use cuda.GetBuffer?
 //

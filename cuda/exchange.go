@@ -11,6 +11,11 @@ import "C"
 const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X
 
 // Add exchange field to Beff.
+// 	m:    normalized magnetization
+// 	mask: see AddMaskExchange
+// 	Aex:  exchange stiffness in J/m
+// 	Msat: saturation magnetization in A/m
+// 	Beff: effective field in Tesla
 func AddExchange(Beff, m, mask *data.Slice, Aex, Msat float64) {
 	// TODO: size check
 	if mask == nil {
@@ -21,9 +26,7 @@ func AddExchange(Beff, m, mask *data.Slice, Aex, Msat float64) {
 }
 
 // Add exchange field to Beff with different exchange constant for X,Y,Z direction.
-// m must be normalized to unit length.
 func AddAnisoExchange(Beff, m *data.Slice, AexX, AexY, AexZ, Msat float64) {
-
 	mesh := Beff.Mesh()
 	N := mesh.Size()
 	w := exchangeWeights(AexX, AexY, AexZ, Msat, mesh.CellSize())
@@ -48,7 +51,6 @@ func AddAnisoExchange(Beff, m *data.Slice, AexX, AexY, AexZ, Msat float64) {
 // Each time, the 0th element defines the coupling at the leftmost boundary and is thus unused,
 // but would be used in case if periodic boundary conditions.
 func AddMaskExchange(Beff, m, mask *data.Slice, Aex, Msat float64) {
-
 	mesh := Beff.Mesh()
 	N := mesh.Size()
 	w := exchangeWeights(Aex, Aex, Aex, Msat, mesh.CellSize())

@@ -3,8 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
-	"log"
 )
 
 // function that adds a quantity to dst
@@ -28,15 +26,14 @@ func newAdder(name string, f addFunc) *adder {
 // it is first added to a separate buffer, saved, and then added to Dst.
 func (a *adder) addTo(Dst *buffered, goodstep bool) {
 	if goodstep && a.needSave() {
-		Buf := addBuf()
-		buf := Buf.Write()
+		buf := cuda.GetBuffer(Dst.Synced.buffer.NComp(), Dst.Synced.buffer.Mesh())
 		cuda.Zero(buf)
 		a.addFn(buf)
 		dst := Dst.Write()
 		cuda.Madd2(dst, dst, buf, 1, 1)
 		Dst.WriteDone()
 		// Buf only unlocked here to avoid overwite by next addTo
-		goSave(a.fname(), buf, Time, func() { Buf.WriteDone() })
+		goSave(a.fname(), buf, Time, func() { cuda.RecycleBuffer(buf) })
 		a.saved()
 	} else {
 		dst := Dst.Write()
@@ -45,14 +42,18 @@ func (a *adder) addTo(Dst *buffered, goodstep bool) {
 	}
 }
 
-var _addBuf *buffered // TODO: use cuda.GetBuffer?
+//func(a*adder)get_mustRecycle()*data.Slice{
+//
+//}
 
-// returns a GPU buffer for temporarily adding a quantity to and saving it
-func addBuf() *buffered {
-	if _addBuf == nil {
-		util.DashExit()
-		log.Println("allocating GPU buffer for output")
-		_addBuf = newBuffered(cuda.NewSynced(3, &mesh), "buffer", nil)
-	}
-	return _addBuf
-}
+//var _addBuf *buffered // TODO: use cuda.GetBuffer?
+//
+//// returns a GPU buffer for temporarily adding a quantity to and saving it
+//func addBuf() *buffered {
+//	if _addBuf == nil {
+//		util.DashExit()
+//		log.Println("allocating GPU buffer for output")
+//		_addBuf = newBuffered(cuda.NewSynced(3, &mesh), "buffer", nil)
+//	}
+//	return _addBuf
+//}

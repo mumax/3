@@ -41,7 +41,7 @@ func (b *buffered) touch(goodstep bool) {
 
 // Save once, with automatically assigned file name.
 func (b *buffered) Save() {
-	goSave(b.fname(), b.Read(), Time, func() { b.ReadDone() })
+	goSaveCopy(b.fname(), b.Read(), Time)
 	b.autonum++
 }
 
@@ -50,7 +50,7 @@ func (b *buffered) SaveAs(fname string) {
 	if !path.IsAbs(fname) {
 		fname = OD + fname
 	}
-	goSave(fname, b.Read(), Time, func() { b.ReadDone() })
+	goSaveCopy(fname, b.Read(), Time)
 }
 
 // Get a host copy.

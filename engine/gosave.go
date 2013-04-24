@@ -6,20 +6,21 @@ import (
 	"log"
 )
 
-// Asynchronously save output to file. Calls unlockOutput() to unlock output read lock.
-// This function returns as soon as downloading output to host can start (usually immediately).
-// During the download, further computations can continue. When the download is done, unlockOutput()
-// is called so that the output buffer can be written again. Then the output host copy is
-// queued for saving to disk.
-func goSave(fname string, output *data.Slice, t float64, unlockOutput func()) {
-	if dlQue == nil {
-		dlQue = make(chan dlTask)
-		saveQue = make(chan saveTask)
-		hBuf = make(chan *data.Slice, maxOutputQueLen)
-		go runDownloader()
-		go runSaver()
-	}
-	dlQue <- dlTask{fname, output, t, unlockOutput}
+// Save buffer (obtained by cuda.GetBuffer()) to file.
+// buffer is automatically recycled. Underlying implementation
+// is concurrent. buffer should not be used after this call.
+func goSaveAndRecycle(fname string, buffer *data.Slice, t float64) {
+	initQue()
+	dlQue <- dlTask{fname, buffer, t}
+}
+
+// Save a copy of output to file. Underlying implementation
+// is concurrent. Function returns as soon as output can be
+// safely modified.
+func goSaveCopy(fname string, output *data.Slice, t float64) {
+	cpy := cuda.GetBuffer(output.NComp(), output.Mesh())
+	data.Copy(cpy, output)
+	goSaveAndRecycle(fname, cpy, t)
 }
 
 var (
@@ -29,12 +30,21 @@ var (
 	done    = make(chan bool) // marks output server is completely done after closing dlQue
 )
 
+func initQue() {
+	if dlQue == nil {
+		dlQue = make(chan dlTask)
+		saveQue = make(chan saveTask)
+		hBuf = make(chan *data.Slice, maxOutputQueLen)
+		go runDownloader()
+		go runSaver()
+	}
+}
+
 // download task
 type dlTask struct {
-	fname        string
-	output       *data.Slice
-	time         float64
-	unlockOutput func()
+	fname  string
+	output *data.Slice // needs to be recylced
+	time   float64
 }
 
 // save task
@@ -48,6 +58,7 @@ var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
 // returns host buffer for storing output before being flushed to disk.
 // takes one from the pool or allocates a new one when the pool is empty
 // and less than maxOutputQueLen buffers already are in use.
+// TODO: use same cuda.GetBuffer implementation!
 func hostbuf() *data.Slice {
 	select {
 	case b := <-hBuf:
@@ -71,8 +82,8 @@ func runDownloader() {
 	for t := range dlQue {
 		h := hostbuf()
 		data.Copy(h, t.output) // output is already locked
-		t.unlockOutput()
-		saveQue <- saveTask{t.fname, h, t.time, func() { hBuf <- h }}
+		cuda.RecycleBuffer(t.output)
+		saveQue <- saveTask{t.fname, h, t.time}
 	}
 	close(saveQue)
 }
@@ -83,7 +94,7 @@ func runDownloader() {
 func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)
-		t.unlockOutput() // typically puts buffer back in pool
+		hBuf <- t.output
 	}
 	done <- true
 }

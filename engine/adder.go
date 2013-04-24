@@ -26,14 +26,13 @@ func newAdder(name string, f addFunc) *adder {
 // it is first added to a separate buffer, saved, and then added to Dst.
 func (a *adder) addTo(Dst *buffered, goodstep bool) {
 	if goodstep && a.needSave() {
-		buf := cuda.GetBuffer(Dst.Synced.buffer.NComp(), Dst.Synced.buffer.Mesh())
+		buf := cuda.GetBuffer(3, Dst.Mesh()) // TODO: not 3
 		cuda.Zero(buf)
 		a.addFn(buf)
 		dst := Dst.Write()
 		cuda.Madd2(dst, dst, buf, 1, 1)
 		Dst.WriteDone()
-		// Buf only unlocked here to avoid overwite by next addTo
-		goSave(a.fname(), buf, Time, func() { cuda.RecycleBuffer(buf) })
+		goSaveAndRecycle(a.fname(), buf, Time)
 		a.saved()
 	} else {
 		dst := Dst.Write()

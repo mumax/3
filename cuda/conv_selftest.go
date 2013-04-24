@@ -6,6 +6,7 @@ import (
 	"math/rand"
 )
 
+// compares FFT-accelerated convolution against brute-force on sparse data.
 func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	inhost := data.NewSlice(3, mesh)
 	initConvTestInput(inhost.Vectors())
@@ -15,11 +16,9 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	c.Exec(gpu, gpu, data.NilSlice(1, mesh), 1)
 
 	output := gpu.HostCopy()
-	//data.MustWriteFile("gpu.dump", output, 0) // rm!
 
 	brute := data.NewSlice(3, mesh)
 	bruteConv(inhost.Vectors(), brute.Vectors(), c.kern)
-	//data.MustWriteFile("brute.dump", brute, 0) // rm!
 
 	a, b := output.Host(), brute.Host()
 	err := float32(0)

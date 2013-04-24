@@ -29,6 +29,12 @@ func (b *buffered) update(goodstep bool) {
 	b.touch(goodstep)
 }
 
+func (b *buffered) get() *data.Slice {
+	cuda.Zero(b.Slice)
+	b.updFn(b.Slice)
+	return b.Slice
+}
+
 // notify the handle that it may need to be saved
 func (b *buffered) touch(goodstep bool) {
 	if goodstep && b.needSave() {

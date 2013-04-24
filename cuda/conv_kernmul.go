@@ -43,17 +43,3 @@ func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slic
 		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),
 		N0, N1, N2, cfg, str)
 }
-
-// General kernel multiplication with general complex kernel.
-// (stored in interleaved format).
-// It might be more clear if the kernel were stored as safe.Complex64s.
-//func kernMulC(fftM [3]safe.Complex64s, K [3][3]safe.Float32s) {
-//	util.Argument(2*fftM[0].Len() == K[0][0].Len())
-//	N := fftM[0].Len()
-//	gridDim, blockDim := Make1DConf(N)
-//	ptx.K_kernmulC(fftM[0].Pointer(), fftM[1].Pointer(), fftM[2].Pointer(),
-//		K[0][0].Pointer(), K[1][1].Pointer(), K[2][2].Pointer(),
-//		K[1][2].Pointer(), K[0][2].Pointer(), K[0][1].Pointer(),
-//		K[2][1].Pointer(), K[2][0].Pointer(), K[1][0].Pointer(),
-//		N, gridDim, blockDim)
-//}

@@ -10,8 +10,7 @@ import (
 // The remainder of dst is not filled with zeros.
 func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
-	util.Assert(dst.Len() == prod(dstsize))
-	util.Assert(src.Len() == prod(srcsize))
+	util.Argument(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 
 	N0 := iMin(dstsize[1], srcsize[1])
 	N1 := iMin(dstsize[2], srcsize[2])
@@ -24,9 +23,7 @@ func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 // Copies src into dst, which is larger or smaller, and multiplies by vol*Bsat.
 // The remainder of dst is not filled with zeros.
 func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, vol *data.Slice, Bsat float64, str cu.Stream) {
-	util.Argument(dst.NComp() == 1)
-	util.Argument(src.NComp() == 1)
-	util.Argument(vol.NComp() == 1)
+	util.Argument(dst.NComp() == 1 && src.NComp() == 1 && vol.NComp() == 1)
 	util.Assert(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 	util.Assert(vol.Mesh().Size() == srcsize)
 

@@ -254,10 +254,10 @@ func free() {
 	dlQue = nil
 }
 
-func Mesh() *data.Mesh {
-	checkInited()
-	return &mesh
-}
+//func Mesh() *data.Mesh {
+//	checkInited()
+//	return &mesh
+//}
 
 func checkInited() {
 	if mesh.Size() == [3]int{0, 0, 0} {

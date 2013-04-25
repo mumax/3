@@ -1,21 +1,21 @@
 package engine
 
+// Utilities for setting magnetic configurations.
+
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 )
 
-// Utilities for setting magnetic configurations.
-
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1)
 // Example:
-// 	M.Upload(Vortex(1, 1))
-func Vortex(circ, pol int) *data.Slice {
+// 	M.Set(Vortex(1, 1)) // counterclockwise, core up
+func Vortex(circ, pol int) [3][][][]float32 {
 	util.Argument(circ == 1 || circ == -1)
 	util.Argument(pol == 1 || pol == -1)
 
-	mh := data.NewSlice(3, Mesh())
-	v := mh.Vectors()
+	m := data.NewSlice(3, &mesh)
+	v := m.Vectors()
 	cy, cz := len(v[0][0])/2, len(v[0][0][0])/2
 	for i := range v[0] {
 		for j := range v[0][i] {
@@ -31,8 +31,25 @@ func Vortex(circ, pol int) *data.Slice {
 		v[Y][i][cy][cz] = 0.
 		v[X][i][cy][cz] = float32(pol)
 	}
-	return mh
+	return v
 }
+
+//func TwoDomain() [3][][][]float32{
+//	m := data.NewSlice(3, mesh)
+//	Nx := mesh.Size()[]
+//	v := m.Vectors()
+//	for j := 0; j < Ny; j++ {
+//		for k := 0; k < Nx/2; k++ {
+//			m[0][0][j][k] = 1
+//		}
+//		for k := Nx / 2; k < Nx; k++ {
+//			m[0][0][j][k] = -1
+//		}
+//		m[0][0][j][Nx/2] = 0
+//		m[1][0][j][Nx/2] = 1
+//		m[2][0][j][Nx/2] = 1
+//	}
+//}
 
 //// Returns a function that returns the vector value for all i,j,k.
 //func Uniform(x, y, z float32) func(i, j, k int) [3]float32 {

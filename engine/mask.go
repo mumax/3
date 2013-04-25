@@ -46,8 +46,8 @@ func (m *StaggeredMask) SetSide2(direction int, ix, iy, iz int, value float64) {
 
 func (m *StaggeredMask) init() {
 	if m.mask == nil {
-		m.mask = cuda.NewSlice(3, Mesh()) // could alloc only needed components...
-		cuda.Memset(m.mask, 1, 1, 1)      // default value: all ones.
+		m.mask = cuda.NewSlice(3, &mesh) // could alloc only needed components...
+		cuda.Memset(m.mask, 1, 1, 1)     // default value: all ones.
 		OnFree(func() { m.mask.Free(); m.mask = nil })
 	}
 }

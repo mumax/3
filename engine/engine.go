@@ -24,23 +24,23 @@ var (
 
 // Accessible quantities
 var (
-	M       Settable // reduced magnetization output handle
-	B_eff   Handle   // effective field (T) output handle
-	Torque  Buffered // torque (?) output handle
-	STT     Handle   // spin-transfer torque output handle
-	B_demag Handle   // demag field (T) output handle
-	B_dmi   Handle   // demag field (T) output handle
-	B_exch  Handle   // exchange field (T) output handle
-	B_uni   Handle   // field due to uniaxial anisotropy output handle
-	Table   Handle   // output handle for tabular data (average magnetization etc.)
-	Time    float64  // time in seconds  // todo: hide? setting breaks autosaves
+	M       Magnetization //
+	B_eff   Handle        // effective field (T) output handle
+	Torque  Buffered      // torque (?) output handle
+	STT     Handle        // spin-transfer torque output handle
+	B_demag Handle        // demag field (T) output handle
+	B_dmi   Handle        // demag field (T) output handle
+	B_exch  Handle        // exchange field (T) output handle
+	B_uni   Handle        // field due to uniaxial anisotropy output handle
+	Table   Handle        // output handle for tabular data (average magnetization etc.)
+	Time    float64       // time in seconds  // todo: hide? setting breaks autosaves
 	Solver  *cuda.Heun
 )
 
 // hidden quantities
 var (
 	mesh                             data.Mesh
-	m, torque, b_eff, b_demag        *buffered // torque, b_eff, b_demag share storage!
+	torque, b_eff, b_demag           *buffered // torque, b_eff, b_demag share storage!
 	b_exch, b_ext, b_dmi, b_uni, stt *adder
 	demag_                           *cuda.DemagConvolution
 	vol                              *data.Slice
@@ -56,8 +56,7 @@ func initialize() {
 	vol = data.NilSlice(1, &mesh)
 
 	// magnetization
-	m = newBuffered(arr1, "m", nil)
-	M = m
+	M = Magnetization{newBuffered(arr1, "m", nil)}
 
 	// effective field
 	b_eff = newBuffered(arr2, "B_eff", nil)
@@ -66,13 +65,13 @@ func initialize() {
 	// demag field
 	demag_ = cuda.NewDemag(&mesh)
 	b_demag = newBuffered(arr2, "B_demag", func(b *data.Slice) {
-		demag_.Exec(b, m.Slice, vol, Mu0*Msat()) //TODO: consistent msat or bsat
+		demag_.Exec(b, M.Slice, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 	B_demag = b_demag
 
 	// exchange field
 	b_exch = newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
-		cuda.AddExchange(dst, m.Slice, ExMask.mask, Aex(), Msat())
+		cuda.AddExchange(dst, M.Slice, ExMask.mask, Aex(), Msat())
 	})
 	B_exch = b_exch
 
@@ -80,7 +79,7 @@ func initialize() {
 	b_dmi = newAdder(3, &mesh, "B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
-			cuda.AddDMI(dst, m.Slice, d, Msat())
+			cuda.AddDMI(dst, M.Slice, d, Msat())
 		}
 	})
 	B_dmi = b_dmi
@@ -89,7 +88,7 @@ func initialize() {
 	b_uni = newAdder(3, &mesh, "B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
-			cuda.AddUniaxialAnisotropy(dst, m.Slice, ku1[2], ku1[1], ku1[0], Msat())
+			cuda.AddUniaxialAnisotropy(dst, M.Slice, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
 	B_uni = b_uni
@@ -102,7 +101,7 @@ func initialize() {
 
 	// llg torque
 	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
-		cuda.LLGTorque(b, m.Slice, b, float32(Alpha()))
+		cuda.LLGTorque(b, M.Slice, b, float32(Alpha()))
 	})
 	Torque = torque
 
@@ -114,7 +113,7 @@ func initialize() {
 			jx := j[2] * p
 			jy := j[1] * p
 			jz := j[0] * p
-			cuda.AddZhangLiTorque(dst, m.Slice, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
+			cuda.AddZhangLiTorque(dst, M.Slice, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
 	STT = stt
@@ -125,8 +124,8 @@ func initialize() {
 
 	// solver
 	torqueFn := func(good bool) *data.Slice {
-		m.touch(good) // saves if needed
-		table.send(m.Slice, good)
+		M.touch(good) // saves if needed
+		table.send(M.Slice, good)
 		b_demag.update(good)
 		b_exch.addTo(b_eff.Slice, good)
 		b_dmi.addTo(b_eff.Slice, good)
@@ -137,7 +136,7 @@ func initialize() {
 		stt.addTo(torque.Slice, good)
 		return torque.Slice
 	}
-	Solver = cuda.NewHeun(m.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
 func PostStep(f func(m *data.Slice)) {
@@ -148,7 +147,7 @@ func step() {
 	Solver.Step()
 
 	for _, f := range postStep {
-		f(m.Slice)
+		f(M.Slice)
 	}
 
 	s := Solver
@@ -212,25 +211,11 @@ func RunInteractive() {
 }
 
 // Set the magnetization to uniform state. // TODO: mv to settable
-func SetMUniform(mx, my, mz float32) {
-	checkInited()
-	m.memset(mz, my, mx)
-	m.normalize()
-}
-
-// Set magnetization from file.
-func SetMFile(fname string) {
-	util.FatalErr(setMFile(fname))
-}
-
-func setMFile(fname string) error {
-	m, _, err := data.ReadFile(fname)
-	if err != nil {
-		return err
-	}
-	M.Set(m)
-	return nil
-}
+//func SetMUniform(mx, my, mz float32) {
+//	checkInited()
+//	M.memset(mz, my, mx)
+//	M.normalize()
+//}
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.

@@ -24,5 +24,5 @@ func mDotSlice(field *data.Slice) float64 {
 	util.Assert(vol.DevPtr(0) == nil) // would need to include in dot
 	c := mesh.CellSize()
 	cellVolume := c[0] * c[1] * c[2]
-	return (Msat() * cellVolume * float64(cuda.Dot(field, m.Slice)))
+	return (Msat() * cellVolume * float64(cuda.Dot(field, M.Slice)))
 }

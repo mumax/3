@@ -18,8 +18,3 @@ type Buffered interface {
 	Average() []float64
 	MaxNorm() float64
 }
-
-type Settable interface {
-	Buffered
-	Set(*data.Slice)
-}

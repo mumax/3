@@ -214,6 +214,7 @@ const SIZEOF_FLOAT32 = 4
 // Host returns the Slice as a [][]float32,
 // indexed by component, cell number.
 // It should have CPUAccess() == true.
+// TODO: rename
 func (s *Slice) Host() [][]float32 {
 	if !s.CPUAccess() {
 		log.Panic("slice not accessible by CPU")

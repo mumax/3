@@ -15,15 +15,15 @@ const (
 // Linear indices for matrix components.
 // E.g.: matrix[Y][Z] is stored as list[YZ]
 const (
-	XX = 0
-	YY = 1
-	ZZ = 2
-	YZ = 3
-	XZ = 4
-	XY = 5
-	ZY = 6
-	ZX = 7
-	YX = 8
+	xx = 0
+	yy = 1
+	zz = 2
+	yz = 3
+	xz = 4
+	xy = 5
+	zy = 6
+	zx = 7
+	yx = 8
 )
 
 // Transforms the index between user and program space, unless it is a scalar:
@@ -45,9 +45,9 @@ func swapIndex(index, dim int) int {
 	case 3:
 		return [3]int{Z, Y, X}[index]
 	case 6:
-		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
+		return [6]int{zz, yy, xx, xy, xz, yz}[index]
 	case 9:
-		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
+		return [9]int{zz, yy, xx, yx, zx, zy, xy, xz, yz}[index]
 	}
 	panic("unreachable")
 }

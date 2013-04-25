@@ -11,15 +11,15 @@ import (
 // User inputs
 var (
 	Aex     ScalFn        = Const(0)             // Exchange stiffness in J/m
-	ExMask  StaggeredMask                        // Mask for exchange.
+	ExMask  StaggeredMask                        // Mask that scales Aex/Msat between cells.
 	Msat    ScalFn        = Const(0)             // Saturation magnetization in A/m
 	Alpha   ScalFn        = Const(0)             // Damping constant
 	B_ext   VecFn         = ConstVector(0, 0, 0) // External field in T
 	DMI     ScalFn        = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Ku1     VecFn         = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi      ScalFn        = Const(0)
-	SpinPol ScalFn        = Const(1)
-	J       VecFn         = ConstVector(0, 0, 0)
+	Xi      ScalFn        = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol ScalFn        = Const(1)             // Spin polarization of electrical current
+	J       VecFn         = ConstVector(0, 0, 0) // Electrical current density
 )
 
 // Accessible quantities
@@ -201,7 +201,7 @@ func RunInteractive() {
 	pause = true
 	log.Println("entering interactive mode")
 	if webPort == "" {
-		goServe(*Flag_port)
+		goServe(*flag_port)
 	}
 
 	for {

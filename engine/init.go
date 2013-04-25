@@ -12,17 +12,17 @@ import (
 )
 
 var (
-	Flag_version  = flag.Bool("v", true, "print version")
-	Flag_silent   = flag.Bool("s", false, "Don't generate any log info")
-	Flag_od       = flag.String("o", "", "set output directory")
-	Flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
-	Flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
-	Flag_port     = flag.String("http", ":35367", "port to serve web gui")
+	flag_version  = flag.Bool("v", true, "print version")
+	flag_silent   = flag.Bool("s", false, "Don't generate any log info")
+	flag_od       = flag.String("o", "", "set output directory")
+	flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
+	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
+	flag_port     = flag.String("http", ":35367", "port to serve web gui")
 )
 
 const VERSION = "mx3.0.4 α "
 
-var Uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
+var uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 // Initializes the simulation engine. Typical use:
 // 	func main(){
@@ -34,29 +34,29 @@ func Init() {
 
 	log.SetPrefix("")
 	log.SetFlags(0)
-	if *Flag_silent {
+	if *flag_silent {
 		log.SetOutput(devnul{})
 	}
 
-	if *Flag_version {
-		log.Print(Uname, "\n")
+	if *flag_version {
+		log.Print(uname, "\n")
 	}
 
-	if *Flag_od != "" {
-		SetOD(*Flag_od, *Flag_force)
+	if *flag_od != "" {
+		SetOD(*flag_od, *flag_force)
 	}
 
-	if *Flag_maxprocs == 0 {
-		*Flag_maxprocs = runtime.NumCPU()
+	if *flag_maxprocs == 0 {
+		*flag_maxprocs = runtime.NumCPU()
 	}
-	procs := runtime.GOMAXPROCS(*Flag_maxprocs) // sets it
+	procs := runtime.GOMAXPROCS(*flag_maxprocs) // sets it
 	log.Println("gomaxprocs:", procs)
 
 	prof.Init(OD)
 	cuda.Init()
 	cuda.LockThread()
-	if *Flag_port != "" {
-		goServe(*Flag_port)
+	if *flag_port != "" {
+		goServe(*flag_port)
 	}
 }
 

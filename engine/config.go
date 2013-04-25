@@ -1,6 +1,8 @@
 package engine
 
 // Utilities for setting magnetic configurations.
+// TODO: use [3][][][]float32, hide data.Slice API.
+// Requires careful ZYX translation.
 
 import (
 	"code.google.com/p/mx3/data"
@@ -10,7 +12,7 @@ import (
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1)
 // Example:
 // 	M.Set(Vortex(1, 1)) // counterclockwise, core up
-func Vortex(circ, pol int) [3][][][]float32 {
+func Vortex(circ, pol int) *data.Slice {
 	util.Argument(circ == 1 || circ == -1)
 	util.Argument(pol == 1 || pol == -1)
 
@@ -31,7 +33,7 @@ func Vortex(circ, pol int) [3][][][]float32 {
 		v[Y][i][cy][cz] = 0.
 		v[X][i][cy][cz] = float32(pol)
 	}
-	return v
+	return m
 }
 
 //func TwoDomain() [3][][][]float32{

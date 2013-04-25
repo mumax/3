@@ -1,19 +1,20 @@
-package arne
+package engine
 
 import (
-	"code.google.com/p/mx3/core"
-	"code.google.com/p/mx3/nimble"
+	"code.google.com/p/mx3/data"
+	"log"
 	"math"
 )
 
 // For a nanowire magnetized like this:
 // 	-> <-
-// calculate, very approximately, a B field needed to compensate
+// calculate, approximately, a B field needed to compensate
 // for the surface charges on the left and right edges.
 // Adding (this field * Bsat) to B_effective will mimic an infinitely long wire.
-func CompensateSurfaceCharges(m *nimble.Mesh) [3][][][]float32 {
-	core.Log("calculating field to compensate nanowire surface charge")
-	H := core.MakeVectors(m.Size())
+func compensateLRSurfaceCharges(m *data.Mesh) [3][][][]float32 {
+	log.Println("calculating field to compensate nanowire surface charge")
+	h := data.NewSlice(3, m)
+	H := h.Vectors()
 	world := m.WorldSize()
 	cell := m.CellSize()
 	size := m.Size()
@@ -32,8 +33,8 @@ func CompensateSurfaceCharges(m *nimble.Mesh) [3][][][]float32 {
 						dst := [3]float64{(float64(i) + 0.5) * cell[0],
 							(float64(j) + 0.5) * cell[1],
 							(float64(k) + 0.5) * cell[2]}
-						h1 := Hfield(q, source1, dst)
-						h2 := Hfield(q, source2, dst)
+						h1 := hfield(q, source1, dst)
+						h2 := hfield(q, source2, dst)
 						for c := 0; c < 3; c++ {
 							H[c][i][j][k] += float32(h1[c] + h2[c])
 						}
@@ -46,7 +47,7 @@ func CompensateSurfaceCharges(m *nimble.Mesh) [3][][][]float32 {
 }
 
 // H field of charge at location source, evaluated in location dest.
-func Hfield(charge float64, source, dest [3]float64) [3]float64 {
+func hfield(charge float64, source, dest [3]float64) [3]float64 {
 	var R [3]float64
 	R[0] = dest[0] - source[0]
 	R[1] = dest[1] - source[1]

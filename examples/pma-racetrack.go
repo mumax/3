@@ -21,27 +21,26 @@ func main() {
 	// Material parameters
 	Msat = Const(600e3)
 	Aex = Const(10e-12)
-	Alpha = Const(1)
+	Alpha = Const(0.02)
 	Ku1 = ConstVector(0, 0, 0.59E6)
+	Xi = Const(0.2)
+	SpinPol = Const(0.5)
 
 	// Initial magnetization
 	M.Set(TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1)) // up-down domains with wall between Bloch and Néél type
+	Alpha = Const(1)                             // high damping for fast relax
 	Run(0.1e-9)                                  // relax
+	Alpha = Const(0.02)                          // restore normal damping
 
 	// Set post-step function that centers simulation window on domain wall.
 	PostStep(centerPMAWall)
-
-	// New parameters
-	Alpha = Const(0.02)
-	Xi = Const(0.2)
-	SpinPol = Const(0.5)
-	J = ConstVector(1e13, 0, 0)
 
 	// Schedule output
 	M.Autosave(100e-12)
 	Table.Autosave(10e-12)
 
-	// Run for 1ns
+	// Run for 1ns with current through the sample
+	J = ConstVector(1e13, 0, 0)
 	Run(1e-9)
 }
 

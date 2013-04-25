@@ -49,15 +49,3 @@ func (a *adder) get_mustRecycle() *data.Slice {
 	a.addFn(buf)
 	return buf
 }
-
-//var _addBuf *buffered // TODO: use cuda.GetBuffer?
-//
-//// returns a GPU buffer for temporarily adding a quantity to and saving it
-//func addBuf() *buffered {
-//	if _addBuf == nil {
-//		util.DashExit()
-//		log.Println("allocating GPU buffer for output")
-//		_addBuf = newBuffered(cuda.NewSynced(3, &mesh), "buffer", nil)
-//	}
-//	return _addBuf
-//}

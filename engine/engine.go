@@ -24,16 +24,16 @@ var (
 
 // Accessible quantities
 var (
-	M       Magnetization //
-	B_eff   Handle        // effective field (T) output handle
-	Torque  Buffered      // torque (?) output handle
-	STT     Handle        // spin-transfer torque output handle
-	B_demag Handle        // demag field (T) output handle
-	B_dmi   Handle        // demag field (T) output handle
-	B_exch  Handle        // exchange field (T) output handle
-	B_uni   Handle        // field due to uniaxial anisotropy output handle
-	Table   Handle        // output handle for tabular data (average magnetization etc.)
-	Time    float64       // time in seconds  // todo: hide? setting breaks autosaves
+	M       Magnetization  // reduced magnetization (unit length)
+	B_eff   Handle         // effective field (T) output handle
+	Torque  buffered_iface // torque (?) output handle
+	STT     Handle         // spin-transfer torque output handle
+	B_demag Handle         // demag field (T) output handle
+	B_dmi   Handle         // demag field (T) output handle
+	B_exch  Handle         // exchange field (T) output handle
+	B_uni   Handle         // field due to uniaxial anisotropy output handle
+	Table   Handle         // output handle for tabular data (average magnetization etc.)
+	Time    float64        // time in seconds  // todo: hide? setting breaks autosaves
 	Solver  *cuda.Heun
 )
 
@@ -139,17 +139,17 @@ func initialize() {
 	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
+// Register function f to be called after every time step.
+// Typically used, e.g., to manipulate the magnetization.
 func PostStep(f func()) {
 	postStep = append(postStep, f)
 }
 
 func step() {
 	Solver.Step()
-
 	for _, f := range postStep {
 		f()
 	}
-
 	s := Solver
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
@@ -210,13 +210,6 @@ func RunInteractive() {
 	}
 }
 
-// Set the magnetization to uniform state. // TODO: mv to settable
-//func SetMUniform(mx, my, mz float32) {
-//	checkInited()
-//	M.memset(mz, my, mx)
-//	M.normalize()
-//}
-
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
@@ -232,17 +225,13 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	initialize()
 }
 
+// TODO: not perfectly OK yet.
 func free() {
 	log.Println("resetting gpu")
 	cuda5.DeviceReset() // does not seem to clear allocations
 	Init()
 	dlQue = nil
 }
-
-//func Mesh() *data.Mesh {
-//	checkInited()
-//	return &mesh
-//}
 
 func checkInited() {
 	if mesh.Size() == [3]int{0, 0, 0} {
@@ -252,7 +241,7 @@ func checkInited() {
 
 // map of names to Handle does not work because Handles change on the fly
 // *Handle does not work because we loose interfaceness.
-func Quant(name string) (h Buffered, ok bool) {
+func Quant(name string) (h buffered_iface, ok bool) {
 	switch name {
 	default:
 		return nil, false

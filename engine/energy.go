@@ -6,10 +6,15 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+// Returns the current exchange energy in Joules.
+// Note: the energy is defined up to an arbitrary constant,
+// ground state energy is not necessarily zero or comparable
+// to other simulation programs.
 func ExchangeEnergy() float64 {
 	return -0.5 * mDotAdder(b_exch)
 }
 
+// Returns the current demag energy in Joules.
 func DemagEnergy() float64 {
 	return -0.5 * mDotSlice(b_demag.get())
 }

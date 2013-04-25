@@ -10,7 +10,8 @@ type Handle interface {
 }
 
 // Output handle that also support manual single-shot saving.
-type Buffered interface {
+// TODO: replace by smallest struct/iface that captures Get()
+type buffered_iface interface {
 	Handle                 // auto-save
 	Save()                 // single-shot save with auto file name
 	SaveAs(fname string)   // single-shot save with manual file name

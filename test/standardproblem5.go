@@ -27,7 +27,7 @@ func main() {
 	Alpha = Const(3)
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
-	M.Upload(Vortex(1, 1))
+	M.Set(Vortex(1, 1))
 
 	Run(1e-9)
 

@@ -29,21 +29,7 @@ func main() {
 	Alpha = Const(3)
 	Ku1 = ConstVector(0, 0, 1.27E6)
 
-	// initialize close to Bloch wall
-	mh := M.Download()
-	m := mh.Vectors()
-	for j := 0; j < Ny; j++ {
-		for k := 0; k < Nx/2; k++ {
-			m[0][0][j][k] = 1
-		}
-		for k := Nx / 2; k < Nx; k++ {
-			m[0][0][j][k] = -1
-		}
-		m[0][0][j][Nx/2] = 0
-		m[1][0][j][Nx/2] = 1
-		m[2][0][j][Nx/2] = 0.001
-	}
-	M.Upload(mh)
+	M.Set(TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1)) // up-down domains with wall between Bloch and Néél type
 	M.SaveAs("m_init.dump")
 
 	DMI = Const(0.1e-3) // J/m2.

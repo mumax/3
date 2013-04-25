@@ -45,6 +45,7 @@ racetest:
 test: 6gtest unittest #gccgotest #re-enable gccgotest when gcc up to date with go 1.1
 
 unittest:
+	(cd examples && ./build.bash)
 	(cd test && ./run.bash)
 
 6gtest: 6g

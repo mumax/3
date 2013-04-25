@@ -44,7 +44,7 @@ var (
 	b_exch, b_ext, b_dmi, b_uni, stt *adder
 	demag_                           *cuda.DemagConvolution
 	vol                              *data.Slice
-	postStep                         []func(m *data.Slice) // called on m after every step
+	postStep                         []func() // called on after every time step
 )
 
 func initialize() {
@@ -139,7 +139,7 @@ func initialize() {
 	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
-func PostStep(f func(m *data.Slice)) {
+func PostStep(f func()) {
 	postStep = append(postStep, f)
 }
 
@@ -147,7 +147,7 @@ func step() {
 	Solver.Step()
 
 	for _, f := range postStep {
-		f(M.Slice)
+		f()
 	}
 
 	s := Solver

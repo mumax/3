@@ -86,6 +86,31 @@ func Uniform(mx, my, mz float64) *data.Slice {
 	return m
 }
 
+// Only sets the region between cells [x1, y1, z1] and [x2, y2, z2] (excl.) to the given configuration.
+// E.g.: to set m to something resembling a vortex wall:
+// 	// Nx, Ny, Nz= number of cells
+// 	M.SetRegion(0,    0, 0,   Nx/2, Ny, Nz,  Uniform( 1, 0, 0)) // left half
+// 	M.SetRegion(Nx/2, 0, 0,   Nx,   Ny, Nz,  Uniform(-1, 0, 0)) // right half
+// 	M.SetRegion(Nx/2-Ny/2, 0, 0,   Nx/2+Ny/2,   Ny, Nz,  Vortex(1, 1)) // center
+func (M *Magnetization) SetRegion(x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
+
+	m := M.Download()
+	v := m.Vectors()
+	src := config.Vectors()
+
+	for c := range v {
+		for i := z1; i < z2; i++ {
+			for j := y1; j < y2; j++ {
+				for k := x1; k < x2; k++ {
+					v[c][i][j][k] = src[c][i][j][k]
+				}
+			}
+		}
+	}
+
+	M.Set(m)
+}
+
 func vec(mx, my, mz float64) [3]float32 {
 	return [3]float32{float32(mz), float32(my), float32(mx)}
 }
@@ -108,18 +133,4 @@ func vec(mx, my, mz float64) [3]float32 {
 //		}
 //	}
 //	return transp
-//}
-
-//// Sets the region between (i1, j1, k1), (i2, j2, k2) to f(i,j,k).
-//func SetRegion(array [3][][][]float32, i1, j1, k1, i2, j2, k2 int, f func(i, j, k int) [3]float32) {
-//	for i := i1; i < i2; i++ {
-//		for j := j1; j < j2; j++ {
-//			for k := k1; k < k2; k++ {
-//				v := f(i, j, k)
-//				for c := range array {
-//					array[c][i][j][k] = v[c]
-//				}
-//			}
-//		}
-//	}
 //}

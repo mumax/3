@@ -8,6 +8,10 @@ import (
 	"os/exec"
 )
 
+import (
+	_ "code.google.com/p/mx3/examples"
+)
+
 func main() {
 	Init()
 	defer Close()

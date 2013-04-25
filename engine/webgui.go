@@ -34,9 +34,9 @@ func (s *guistate) Uname() string    { return uname }
 func (s *guistate) Version() string  { return VERSION }
 func (s *guistate) Pwd() string      { pwd, _ := os.Getwd(); return pwd }
 
-const Mi = 1024 * 2014
+const mib = 1024 * 2014
 
-func (s *guistate) MemInfo() string   { f, t := cu.MemGetInfo(); return fmt.Sprint(f/Mi, "/", t/Mi) }
+func (s *guistate) MemInfo() string   { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
 func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {

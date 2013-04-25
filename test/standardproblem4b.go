@@ -26,7 +26,7 @@ func main() {
 	Alpha = Const(1.0)
 	Msat = Const(800e3)
 	Aex = Const(13e-12)
-	SetMUniform(1, .1, 0)
+	M.Set(Uniform(1, .1, 0))
 
 	Table.Autosave(1e-12)
 	Run(3e-9)

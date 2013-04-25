@@ -36,7 +36,7 @@ func main() {
 
 	SetMesh(Nx, Ny, Nz, Sx/float64(Nx), Sy/float64(Ny), Sz/float64(Nz))
 
-	SetMUniform(1, 0.1, 0)
+	M.Set(Uniform(1, 0.1, 0))
 
 	Solver.Maxdt = 1e-12
 	Run(2e-9)

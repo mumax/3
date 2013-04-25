@@ -25,9 +25,9 @@ func main() {
 
 	Alpha = Const(1.0)
 	Msat = Const(800e3)
-	Aex = Const(13e-12 * 2) // * 2 here...
+	Aex = Const(13e-12 * 2) // Aex * 2 here...
 	M.Set(Uniform(1, .1, 0))
-	ExMask.SetAll(X, 0.5)
+	ExMask.SetAll(X, 0.5) // ... and Aex/2 again here
 	ExMask.SetAll(Y, 0.5)
 	ExMask.SetAll(Z, 0.5)
 

@@ -26,7 +26,7 @@ func main() {
 
 	SetMesh(Nx, Ny, Nz, cx, cy, cz)
 
-	SetMUniform(1, 1, 0)
+	M.Set(Uniform(1, 1, 0))
 	Table.Autosave(10e-12)
 
 	// Apply some fields and verify the relaxed my agains OOMMF values.

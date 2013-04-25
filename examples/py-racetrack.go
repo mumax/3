@@ -23,8 +23,8 @@ func main() {
 	// Material parameters
 	Msat = Const(860e3)
 	Aex = Const(13e-12)
-	Alpha = Const(0.02)
-	Xi = Const(0.2)
+	Alpha = Const(0.01)
+	Xi = Const(0.1)
 	SpinPol = Const(0.5)
 
 	// Initial magnetization
@@ -32,10 +32,10 @@ func main() {
 	M.SetRegion(Nx/2, 0, 0, Nx, Ny, Nz, Uniform(-1, 0, 0))        // right half
 	M.SetRegion(Nx/2-Ny/2, 0, 0, Nx/2+Ny/2, Ny, Nz, Vortex(1, 1)) // center
 
-	// TODO: rm charges
-	Alpha = Const(3) // high damping for fast relax
-	Run(5e-9)        // relax
-	RunInteractive()
+	RemoveLRSurfaceCharge(1, -1)
+
+	Alpha = Const(3)    // high damping for fast relax
+	Run(5e-9)           // relax
 	Alpha = Const(0.02) // restore normal damping
 
 	// Set post-step function that centers simulation window on domain wall.
@@ -45,12 +45,12 @@ func main() {
 	M.Autosave(100e-12)
 	Table.Autosave(10e-12)
 
-	// Run for 1ns with current through the sample
-	J = ConstVector(1e13, 0, 0)
-	Run(1e-9)
+	// Run the simulation with current through the sample
+	J = ConstVector(8e12, 0, 0)
+	Run(10e-9)
 }
 
-// Shift the magnetization to the left or right in order to keep mz close zero.
+// Shift the magnetization to the left or right in order to keep mx close zero.
 // Thus moving an up-down domain wall to the center of the simulation box.
 func centerInplaneWall() {
 	mx := M.Average()[X]

@@ -45,7 +45,18 @@ var (
 	demag_                           *cuda.DemagConvolution
 	vol                              *data.Slice
 	postStep                         []func() // called on after every time step
+	extFields                        []extField
 )
+
+func AddExtField(mask *data.Slice, multiplier ScalFn) {
+	m := cuda.GPUCopy(mask)
+	extFields = append(extFields, extField{m, multiplier})
+}
+
+type extField struct {
+	mask *data.Slice
+	mul  ScalFn
+}
 
 func initialize() {
 
@@ -97,6 +108,9 @@ func initialize() {
 	b_ext = newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
+		for _, f := range extFields {
+			cuda.Madd2(dst, dst, f.mask, 1, float32(f.mul()))
+		}
 	})
 
 	// llg torque

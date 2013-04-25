@@ -2,16 +2,28 @@ package engine
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"log"
 	"math"
 )
 
-// For a nanowire magnetized like this:
-// 	-> <-
-// calculate, approximately, a B field needed to compensate
+// Returns the saturation magnetization in Tesla.
+// Cannot be set. Set Msat and Bsat() will automatically be updated.
+func Bsat() float64 {
+	return Mu0 * Msat()
+}
+
+// For a nanowire magnetized in-plane, with mx = mxLeft on the left end and
+// mx = mxRight on the right end (both -1 or +1), add a B field needed to compensate
 // for the surface charges on the left and right edges.
-// Adding (this field * Bsat) to B_effective will mimic an infinitely long wire.
-func compensateLRSurfaceCharges(m *data.Mesh) [3][][][]float32 {
+// This will mimic an infinitely long wire.
+func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
+	util.Argument(mxLeft == 1 || mxLeft == -1)
+	util.Argument(mxRight == 1 || mxRight == -1)
+	AddExtField(compensateLRSurfaceCharges(&mesh, mxLeft, mxRight), Bsat)
+}
+
+func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {
 	log.Println("calculating field to compensate nanowire surface charge")
 	h := data.NewSlice(3, m)
 	H := h.Vectors()
@@ -19,6 +31,8 @@ func compensateLRSurfaceCharges(m *data.Mesh) [3][][][]float32 {
 	cell := m.CellSize()
 	size := m.Size()
 	q := cell[0] * cell[1]
+	q1 := q * mxLeft
+	q2 := q * (-mxRight)
 
 	for I := 0; I < size[0]; I++ {
 		for J := 0; J < size[1]; J++ {
@@ -33,8 +47,8 @@ func compensateLRSurfaceCharges(m *data.Mesh) [3][][][]float32 {
 						dst := [3]float64{(float64(i) + 0.5) * cell[0],
 							(float64(j) + 0.5) * cell[1],
 							(float64(k) + 0.5) * cell[2]}
-						h1 := hfield(q, source1, dst)
-						h2 := hfield(q, source2, dst)
+						h1 := hfield(q1, source1, dst)
+						h2 := hfield(q2, source2, dst)
 						for c := 0; c < 3; c++ {
 							H[c][i][j][k] += float32(h1[c] + h2[c])
 						}
@@ -43,7 +57,7 @@ func compensateLRSurfaceCharges(m *data.Mesh) [3][][][]float32 {
 			}
 		}
 	}
-	return H
+	return h
 }
 
 // H field of charge at location source, evaluated in location dest.

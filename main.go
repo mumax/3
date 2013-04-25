@@ -8,8 +8,10 @@ import (
 	"os/exec"
 )
 
+// dummy imports to fetch those files
 import (
 	_ "code.google.com/p/mx3/examples"
+	_ "code.google.com/p/mx3/test"
 )
 
 func main() {
@@ -21,9 +23,9 @@ func main() {
 	Msat = Const(1000e3)
 	Aex = Const(10e-12)
 	Alpha = Const(1)
-	SetMUniform(1, 1, 0)
+	M.Set(Uniform(1, 1, 0))
 
-	go openbrowser("http://localhost" + *Flag_port)
+	//go openbrowser("http://localhost" + *Flag_port)
 	RunInteractive()
 }
 

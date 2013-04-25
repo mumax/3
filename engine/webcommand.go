@@ -6,7 +6,7 @@ import (
 )
 
 // handler that executes the command and returns the output
-func Command(cmd string, args ...string) http.HandlerFunc {
+func command(cmd string, args ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := exec.Command(cmd, args...).CombinedOutput()
 		w.Write(out)

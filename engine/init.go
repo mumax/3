@@ -61,6 +61,11 @@ func (d devnul) Write(b []byte) (int, error) {
 	return len(b), nil
 }
 
+// Cleanly exits the simulation, assuring all output is flushed. Typical use:
+// 	func main(){
+// 		Init()
+// 		defer Close()
+// 		...
 func Close() {
 	log.Println("shutting down")
 	drainOutput()

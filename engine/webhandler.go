@@ -18,8 +18,8 @@ func GoServe(port string) {
 	}
 	webPort = port
 
-	http.HandleFunc("/cmd/top", Command("top", "-b", "-n", "1"))
-	http.HandleFunc("/cmd/uname", Command("uname", "-a"))
+	http.HandleFunc("/cmd/top", command("top", "-b", "-n", "1"))
+	http.HandleFunc("/cmd/uname", command("uname", "-a"))
 
 	http.HandleFunc("/render/", render)
 	http.HandleFunc("/dash/", dash)

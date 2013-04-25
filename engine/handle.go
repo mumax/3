@@ -21,5 +21,5 @@ type Buffered interface {
 
 type Settable interface {
 	Buffered
-	Upload(*data.Slice)
+	Set(*data.Slice)
 }

@@ -228,7 +228,7 @@ func setMFile(fname string) error {
 	if err != nil {
 		return err
 	}
-	M.Upload(m)
+	M.Set(m)
 	return nil
 }
 

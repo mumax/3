@@ -65,7 +65,7 @@ func (m *buffered) Download() *data.Slice {
 }
 
 // Replace the data by src. Auto rescales if needed.
-func (m *buffered) Upload(src *data.Slice) {
+func (m *buffered) Set(src *data.Slice) {
 	if src.Mesh().Size() != m.Mesh().Size() {
 		src = data.Resample(src, m.Mesh().Size())
 	}

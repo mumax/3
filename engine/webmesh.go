@@ -33,7 +33,7 @@ func setmesh(w http.ResponseWriter, r *http.Request) {
 		}
 		SetMesh(N[0], N[1], N[2], c[0], c[1], c[2])
 		if mh != nil {
-			M.Upload(mh)
+			M.Set(mh)
 		}
 	})
 

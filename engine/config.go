@@ -36,21 +36,60 @@ func Vortex(circ, pol int) *data.Slice {
 	return m
 }
 
-//func TwoDomain() [3][][][]float32{
-//	m := data.NewSlice(3, mesh)
-//	Nx := mesh.Size()[]
-//	v := m.Vectors()
-//	for j := 0; j < Ny; j++ {
-//		for k := 0; k < Nx/2; k++ {
-//			m[0][0][j][k] = 1
+// Make a 2-domain configuration with domain wall.
+// (mx1, my1, mz1) and (mx2, my2, mz2) are the magnetizations in the left and right domain, respectively.
+// (mxwall, mywall, mzwall) is the magnetization in the wall.
+// E.g.:
+// 	M.Set(TwoDomain(1,0,0,  0,1,0,  -1,0,0)) // head-to-head domains with transverse (Néel) wall
+// 	M.Set(TwoDomain(1,0,0,  0,0,1,  -1,0,0)) // head-to-head domains with perpendicular (Bloch) wall
+// 	M.Set(TwoDomain(0,0,1,  1,0,0,   0,0,-1))// up-down domains with Bloch wall
+func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) *data.Slice {
+	m1 := [3]float32{float32(mz1), float32(my1), float32(mx1)}
+	m2 := [3]float32{float32(mz2), float32(my2), float32(mx2)}
+	mw := [3]float32{float32(mzwall), float32(mywall), float32(mxwall)}
+	m := data.NewSlice(3, &mesh)
+	Nz := mesh.Size()[0]
+	Ny := mesh.Size()[1]
+	Nx := mesh.Size()[2]
+	util.Argument(Nx >= 4)
+	v := m.Vectors()
+	for c := range mw {
+		for i := 0; i < Nz; i++ {
+			for j := 0; j < Ny; j++ {
+				for k := 0; k < Nx/2; k++ {
+					v[c][i][j][k] = m1[c]
+				}
+				for k := Nx / 2; k < Nx; k++ {
+					v[c][i][j][k] = m2[c]
+				}
+				v[c][i][j][Nx/2-2] += mw[c]
+				v[c][i][j][Nx/2-1] = mw[c]
+				v[c][i][j][Nx/2] = mw[c]
+				v[c][i][j][Nx/2+1] += mw[c]
+			}
+		}
+	}
+	return m
+}
+
+// convert mumax's internal ZYX convention to userspace XYZ.
+//func convertXYZ(arr [][][][]float32) *host.Array {
+//	s := arr.Size3D
+//	n := arr.NComp()
+//	a := arr.Array
+//	transp := host.NewArray(n, []int{s[Z], s[Y], s[X]})
+//	t := transp.Array
+//	for c := 0; c < n; c++ {
+//		c2 := swapIndex(c, n)
+//		for i := 0; i < s[X]; i++ {
+//			for j := 0; j < s[Y]; j++ {
+//				for k := 0; k < s[Z]; k++ {
+//					t[c2][k][j][i] = a[c][i][j][k]
+//				}
+//			}
 //		}
-//		for k := Nx / 2; k < Nx; k++ {
-//			m[0][0][j][k] = -1
-//		}
-//		m[0][0][j][Nx/2] = 0
-//		m[1][0][j][Nx/2] = 1
-//		m[2][0][j][Nx/2] = 1
 //	}
+//	return transp
 //}
 
 //// Returns a function that returns the vector value for all i,j,k.

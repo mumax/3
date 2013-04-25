@@ -23,23 +23,23 @@ func main() {
 	// Material parameters
 	Msat = Const(860e3)
 	Aex = Const(13e-12)
-	Alpha = Const(0.01)
 	Xi = Const(0.1)
-	SpinPol = Const(0.5)
+	SpinPol = Const(0.56)
 
-	// Initial magnetization
-	M.SetRegion(0, 0, 0, Nx/2, Ny, Nz, Uniform(1, 0, 0))          // left half
-	M.SetRegion(Nx/2, 0, 0, Nx, Ny, Nz, Uniform(-1, 0, 0))        // right half
-	M.SetRegion(Nx/2-Ny/2, 0, 0, Nx/2+Ny/2, Ny, Nz, Vortex(1, 1)) // center
+	// Initial magnetization close to vortex wall
+	M.SetRegion(0, 0, 0, Nx/2, Ny, Nz, Uniform(1, 0, 0))          // left half:  ->
+	M.SetRegion(Nx/2, 0, 0, Nx, Ny, Nz, Uniform(-1, 0, 0))        // right half: <-
+	M.SetRegion(Nx/2-Ny/2, 0, 0, Nx/2+Ny/2, Ny, Nz, Vortex(1, 1)) // center: vortex
 
+	// Remove surface charges from left (mx=1) and right (mx=-1) sides
+	// to mimic infinitely long wire.
 	RemoveLRSurfaceCharge(1, -1)
+	// Set post-step function that centers simulation window on domain wall.
+	PostStep(centerInplaneWall)
 
 	Alpha = Const(3)    // high damping for fast relax
 	Run(5e-9)           // relax
 	Alpha = Const(0.02) // restore normal damping
-
-	// Set post-step function that centers simulation window on domain wall.
-	PostStep(centerInplaneWall)
 
 	// Schedule output
 	M.Autosave(100e-12)

@@ -48,6 +48,10 @@ var (
 	extFields                        []extField
 )
 
+// Add an additional space-dependent field to B_ext.
+// The field is mask * multiplier, where mask typically contains space-dependent scaling values of the order of 1.
+// multiplier can be time dependent.
+// TODO: extend API (set one component, construct masks or read from file)
 func AddExtField(mask *data.Slice, multiplier ScalFn) {
 	m := cuda.GPUCopy(mask)
 	extFields = append(extFields, extField{m, multiplier})

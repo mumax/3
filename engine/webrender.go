@@ -13,7 +13,7 @@ import (
 func render(w http.ResponseWriter, r *http.Request) {
 	url := strings.ToLower(r.URL.Path[len("/render/"):])
 	log.Println("render", url)
-	h, ok := Quant(url)
+	h, ok := quant(url)
 	if !ok {
 		err := "render: unknown quantity: " + url
 		log.Println(err)

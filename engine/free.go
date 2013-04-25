@@ -1,15 +1,15 @@
 package engine
 
-var onFree []func()
+var onfree []func()
 
 // TODO: mv to cuda/
-func OnFree(f func()) {
-	onFree = append(onFree, f)
+func onFree(f func()) {
+	onfree = append(onfree, f)
 }
 
 func runOnFree() {
-	for _, f := range onFree {
+	for _, f := range onfree {
 		f()
 	}
-	onFree = nil
+	onfree = nil
 }

@@ -24,6 +24,11 @@ const VERSION = "mx3.0.4 α "
 
 var Uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
+// Initializes the simulation engine. Typical use:
+// 	func main(){
+// 		Init()
+// 		defer Close()
+// 		...
 func Init() {
 	flag.Parse()
 
@@ -51,7 +56,7 @@ func Init() {
 	cuda.Init()
 	cuda.LockThread()
 	if *Flag_port != "" {
-		GoServe(*Flag_port)
+		goServe(*Flag_port)
 	}
 }
 

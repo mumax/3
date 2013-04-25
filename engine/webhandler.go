@@ -11,7 +11,7 @@ import (
 var webPort string
 
 // Start web gui on given port, does not block.
-func GoServe(port string) {
+func goServe(port string) {
 
 	if webPort != "" {
 		return // already serving

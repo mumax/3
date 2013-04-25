@@ -195,12 +195,13 @@ func RunCond(condition func() bool) {
 	pause = true
 }
 
-// Enter interactive mode. Never returns.
+// Enter interactive mode. Simulation is now exclusively controlled
+// by web GUI (default: http://localhost:35367)
 func RunInteractive() {
 	pause = true
 	log.Println("entering interactive mode")
 	if webPort == "" {
-		GoServe(*Flag_port)
+		goServe(*Flag_port)
 	}
 
 	for {
@@ -241,7 +242,7 @@ func checkInited() {
 
 // map of names to Handle does not work because Handles change on the fly
 // *Handle does not work because we loose interfaceness.
-func Quant(name string) (h buffered_iface, ok bool) {
+func quant(name string) (h buffered_iface, ok bool) {
 	switch name {
 	default:
 		return nil, false

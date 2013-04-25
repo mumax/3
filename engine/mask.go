@@ -48,6 +48,6 @@ func (m *StaggeredMask) init() {
 	if m.mask == nil {
 		m.mask = cuda.NewSlice(3, &mesh) // could alloc only needed components...
 		cuda.Memset(m.mask, 1, 1, 1)     // default value: all ones.
-		OnFree(func() { m.mask.Free(); m.mask = nil })
+		onFree(func() { m.mask.Free(); m.mask = nil })
 	}
 }

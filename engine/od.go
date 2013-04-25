@@ -14,6 +14,7 @@ import (
 var OD = "./" // Output directory
 
 // SetOD sets the output directory where auto-saved files will be stored.
+// The -o flag can also be used for this purpose.
 func SetOD(od string, force bool) {
 	if OD != "./" {
 		log.Println("setod: output directory already set to", OD)

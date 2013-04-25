@@ -3,14 +3,14 @@ package engine
 // Utilities for setting magnetic configurations.
 // TODO: use [3][][][]float32, hide data.Slice API.
 // Requires careful ZYX translation.
+// TODO: already normalize them.
 
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 )
 
-// Make a vortex magnetization with given circulation and core polarization (+1 or -1)
-// Example:
+// Make a vortex magnetization with given circulation and core polarization (+1 or -1). E.g.:
 // 	M.Set(Vortex(1, 1)) // counterclockwise, core up
 func Vortex(circ, pol int) *data.Slice {
 	util.Argument(circ == 1 || circ == -1)
@@ -72,6 +72,8 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) *da
 	return m
 }
 
+// Returns a uniform magnetization state. E.g.:
+// 	M.Set(Uniform(1, 0, 0)) // saturated along X
 func Uniform(mx, my, mz float64) *data.Slice {
 	m := data.NewSlice(3, &mesh)
 	v := vec(mx, my, mz)

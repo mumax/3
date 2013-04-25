@@ -12,7 +12,6 @@ import (
 // render image of quantity
 func render(w http.ResponseWriter, r *http.Request) {
 	url := strings.ToLower(r.URL.Path[len("/render/"):])
-	log.Println("render", url)
 	h, ok := quant(url)
 	if !ok {
 		err := "render: unknown quantity: " + url

@@ -9,7 +9,10 @@ package main
  long wire.
 */
 
-import . "code.google.com/p/mx3/engine"
+import (
+	. "code.google.com/p/mx3/engine"
+	"math/rand"
+)
 
 func main() {
 	Init()
@@ -46,7 +49,7 @@ func main() {
 	Table.Autosave(10e-12)
 
 	// Run the simulation with current through the sample
-	J = ConstVector(8e12, 0, 0)
+	J = ConstVector(-8e12, 0, 0)
 	Run(10e-9)
 }
 
@@ -56,9 +59,19 @@ func centerInplaneWall() {
 	mx := M.Average()[X]
 	if mx > 0.01 {
 		M.Shift(-1, 0, 0) // 1 cell to the left
+		makeDefects()
 		return
 	}
 	if mx < -0.01 {
 		M.Shift(1, 0, 0) // 1 cell to the right
+	}
+}
+
+// randomly remove a cell at the right edge of the wire to induce "holes".
+func makeDefects() {
+	if rand.Intn(5) == 0 {
+		mx, my, mz := 0., 0., 0.
+		ix, iy, iz := 254, rand.Intn(32), 0
+		M.SetCell(ix, iy, iz, mx, my, mz)
 	}
 }

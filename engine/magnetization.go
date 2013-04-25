@@ -23,7 +23,16 @@ func (b *buffered) setFile(fname string) error {
 	return nil
 }
 
-// Shift the array over (shx, shy, shz cells), clamping boundary values.
+//
+func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
+	nComp := b.NComp()
+	util.Argument(len(v) == nComp)
+	for c := 0; c < nComp; c++ {
+		cuda.SetCell(b.Slice, swapIndex(c, nComp), iz, iy, ix, float32(v[c]))
+	}
+}
+
+// Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
 func (b *buffered) Shift(shx, shy, shz int) {

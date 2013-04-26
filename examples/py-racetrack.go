@@ -71,7 +71,7 @@ func centerInplaneWall() {
 func makeDefects() {
 	if rand.Intn(5) == 0 {
 		mx, my, mz := 0., 0., 0.
-		ix, iy, iz := 254, rand.Intn(32), 0
+		ix, iy, iz := 254, rand.Intn(64), 0
 		M.SetCell(ix, iy, iz, mx, my, mz)
 	}
 }

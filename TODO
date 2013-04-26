@@ -6,7 +6,6 @@ use cuda.OnFree throughout: setmesh memleak
 improvements:
 -------------
 
-cuda: fatal error if cc < 2
 web: don't fall over the edge while browser is open + timeout
 web: update parameter text boxes and image size
 web: use next free port if already in use

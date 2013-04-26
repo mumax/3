@@ -9,10 +9,9 @@ import (
 	"strconv"
 )
 
-// TODO: nil if not serving web.
+var pause = false
 
-var pause = false // TODO: should only start paused
-
+// inject to pause simulation.
 func pauseFn() { pause = true }
 
 func control(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +23,7 @@ func control(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unhandled control: "+cmd, http.StatusNotFound)
 		return
 
-	case "pause": // reacts immediately
+	case "pause":
 		inject <- pauseFn
 
 	case "run":
@@ -44,6 +43,7 @@ func control(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ui.Steps = v
+		inject <- pauseFn
 		inject <- func() { Steps(v) }
 
 	case "kill":

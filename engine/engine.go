@@ -86,7 +86,7 @@ func initialize() {
 
 	// exchange field
 	b_exch = newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
-		cuda.AddExchange(dst, M.Slice, ExMask.mask, Aex(), Msat())
+		cuda.AddExchange(dst, M.Slice, ExMask.Slice, Aex(), Msat())
 	})
 	B_exch = b_exch
 

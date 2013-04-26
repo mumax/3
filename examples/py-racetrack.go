@@ -53,25 +53,21 @@ func main() {
 	Run(10e-9)
 }
 
-// Shift the magnetization to the left or right in order to keep mx close zero.
-// Thus moving an up-down domain wall to the center of the simulation box.
+// Shift the magnetization to the left in order to keep mx close zero.
+// So the simulation window remains centered on the right-moving domain wall.
 func centerInplaneWall() {
 	mx := M.Average()[X]
 	if mx > 0.01 {
 		M.Shift(-1, 0, 0) // 1 cell to the left
-		makeDefects()
-		return
-	}
-	if mx < -0.01 {
-		M.Shift(1, 0, 0) // 1 cell to the right
+		makeDefects(254)  // new defects near right border
 	}
 }
 
 // randomly remove a cell at the right edge of the wire to induce "holes".
-func makeDefects() {
+func makeDefects(x int) {
 	if rand.Intn(5) == 0 {
 		mx, my, mz := 0., 0., 0.
-		ix, iy, iz := 254, rand.Intn(64), 0
+		ix, iy, iz := x, rand.Intn(64), 0
 		M.SetCell(ix, iy, iz, mx, my, mz)
 	}
 }

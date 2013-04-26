@@ -32,7 +32,7 @@ func goServe(port string) {
 
 	http.HandleFunc("/", gui)
 
-	log.Print("serving GUI on http://localhost", port, "\n")
+	log.Print(" =====\n serving GUI on http://localhost", port, "\n =====\n")
 	go func() {
 		cuda.LockThread()
 		util.FatalErr(http.ListenAndServe(port, nil)) // should not be fatal, but then we should not open browser.

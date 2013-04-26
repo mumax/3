@@ -25,5 +25,7 @@ Otherwise, add these to your environment:
  	export CGO_CFLAGS='-I<path-to>/cuda/include'
 
 where you replace <path-to> by the relevant path.
+
+To get started, see package engine and examples.
 */
 package main

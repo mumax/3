@@ -45,8 +45,10 @@ func Init() {
 		dev.Name(), "(", (dev.TotalMem())/(1024*1024), "MB) ",
 		"compute ", M, ".", m,
 		" concurrent: ", concurrent == 1, "\n")
+	if M < 2 {
+		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")
+	}
 	cudaCC = 10*M + m
-	//cuda.DeviceSetCacheConfig(cuda.FUNC_CACHE_PREFER_L1)
 	initStreampool()
 }
 

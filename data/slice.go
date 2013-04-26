@@ -183,6 +183,7 @@ func (s *Slice) DevPtr(component int) unsafe.Pointer {
 //}
 
 // Slice returns a slice sharing memory with the original.
+// Beware that it may contain less elements than would be expected from Mesh().NCell().
 func (s *Slice) Slice(a, b int) *Slice {
 	len_ := int(s.len_)
 	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {

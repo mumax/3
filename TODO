@@ -1,8 +1,6 @@
 bugs:
 -----
 
-slice mesh is not OK when using a part of the slice (i.e., a "slice";-). is now misused, especially in convolution. API should be more fool-proof.
-
 use cuda.OnFree throughout: setmesh memleak
 
 improvements:

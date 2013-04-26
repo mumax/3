@@ -9,6 +9,7 @@ import (
 	"flag"
 	"log"
 	"runtime"
+	"time"
 )
 
 var (
@@ -72,10 +73,29 @@ func (d devnul) Write(b []byte) (int, error) {
 // 		defer Close()
 // 		...
 func Close() {
+	keepBrowserAlive()
+
 	log.Println("shutting down")
 	drainOutput()
 	if Table != nil {
 		Table.(*dataTable).flush()
 	}
 	prof.Cleanup()
+}
+
+// keep session open this long after browser inactivity
+const webtimeout = 10 * time.Second
+
+func keepBrowserAlive() {
+	if time.Since(lastKeepalive) < webtimeout {
+		log.Println("keeping session open to browser")
+		go func() {
+			for {
+				if time.Since(lastKeepalive) > webtimeout {
+					inject <- func() {} // wakeup!
+				}
+			}
+		}()
+		RunInteractive()
+	}
 }

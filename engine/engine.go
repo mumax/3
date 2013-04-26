@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/mx3/util"
 	cuda5 "github.com/barnex/cuda5/cuda"
 	"log"
+	"time"
 )
 
 // User inputs
@@ -217,6 +218,7 @@ func RunCond(condition func() bool) {
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
 func RunInteractive() {
+	lastKeepalive = time.Now()
 	pause = true
 	log.Println("entering interactive mode")
 	if webPort == "" {
@@ -224,6 +226,10 @@ func RunInteractive() {
 	}
 
 	for {
+		if time.Since(lastKeepalive) > webtimeout {
+			log.Println("interactive session idle: exiting")
+			break
+		}
 		log.Println("awaiting interaction")
 		f := <-inject
 		f()

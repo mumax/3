@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 var pause = false
@@ -53,6 +54,10 @@ func control(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+// when we last saw browser activity
+var lastKeepalive time.Time
+
 func isrunning(w http.ResponseWriter, r *http.Request) {
+	lastKeepalive = time.Now()
 	fmt.Fprint(w, !pause)
 }

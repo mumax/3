@@ -12,6 +12,7 @@ web: graphs
 web: don't fall over the edge while browser is open
 web: (clean) exit button
 web: rename pause -> break
+web: undone steps -> total evals
 
 use cuda.OnFree throughout
 cuda.HostBuffer()

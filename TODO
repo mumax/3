@@ -1,21 +1,38 @@
-slice time stamp
+bugs:
+-----
 
 slice mesh is not OK when using a part of the slice (i.e., a "slice";-). is now misused, especially in convolution. API should be more fool-proof.
 
-fuse a standard micromag kernel for at least the local terms. uses inline functions. exchange adds to demag. extra pointers to output buffers , if not NULL, leak intermediate output.  To save memory.
+use cuda.OnFree throughout: setmesh memleak
 
-use device properties for grid config
+improvements:
+-------------
 
-web: update parameters 
-web: show/hide/auto refresh
-web: graphs
-web: don't fall over the edge while browser is open
-web: (clean) exit button
-web: rename pause -> break
-web: undone steps -> total evals
-
-use cuda.OnFree throughout
+cuda: fatal error if cc < 2
+web: don't fall over the edge while browser is open + timeout
+web: update parameter text boxes and image size
+web: use next free port if already in use
+render: black pixels in png
+cuda: use device properties for grid config
+cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
 cuda.Recycle: check if you own it, disable contents to avoid use-after-recylce.
+LD_LIBARY_PATH ignored by build
 
-shift: memeset, don't clamp
+
+new features:
+-------------
+
+slice time stamp
+
+
+web: rename pause -> break
+web: undone steps -> total evals
+web: (clean) exit button
+web: show/hide/auto refresh
+web: render more than just magnetization
+web: graphs
+web: -web flag opens browser
+
+
+

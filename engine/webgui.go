@@ -36,7 +36,9 @@ func (s *guistate) Pwd() string      { pwd, _ := os.Getwd(); return pwd }
 
 const mib = 1024 * 2014
 
-func (s *guistate) MemInfo() string   { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
+// TODO: strangely this reports wrong numbers (x2 too low).
+func (s *guistate) MemInfo() string { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
+
 func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {
@@ -234,7 +236,6 @@ function show(id) {
 		<table>
 		<tr><td> <font color=red><b> Kill process:</b></font> </td><td> <input type="submit" value="Kill"/> </td></tr>
 		<tr><td> <b>GPU</b> </td><td> {{.Device.Name}} </td></tr>
-		<tr><td> <b>Memory</b> </td><td> {{.MemInfo}} MB </td></tr>
 		</table>
 	</form>
 <hr/></div>

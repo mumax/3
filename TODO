@@ -2,6 +2,7 @@ bugs:
 -----
 
 use cuda.OnFree throughout: setmesh memleak
+mx3 main program hangs
 
 improvements:
 -------------

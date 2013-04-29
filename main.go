@@ -25,7 +25,6 @@ func main() {
 	Alpha = Const(1)
 	M.Set(Uniform(1, 1, 0))
 
-	//go openbrowser("http://localhost" + *Flag_port)
 	RunInteractive()
 }
 

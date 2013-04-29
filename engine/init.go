@@ -21,7 +21,7 @@ var (
 	flag_port     = flag.String("http", ":35367", "port to serve web gui")
 )
 
-const VERSION = "mx3.0.4 α "
+const VERSION = "mx3.0.5 α "
 
 var uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 

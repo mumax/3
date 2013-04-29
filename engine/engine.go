@@ -28,6 +28,7 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 // Accessible quantities
 var (
 	M       Magnetization  // reduced magnetization (unit length)
+	AvgM    *scalar        // average magnetization
 	B_eff   Handle         // effective field (T) output handle
 	Torque  buffered_iface // torque (?) output handle
 	STT     Handle         // spin-transfer torque output handle
@@ -76,6 +77,9 @@ func initialize() {
 
 	// magnetization
 	M = Magnetization{newBuffered(arr1, "m", nil)}
+	AvgM = newScalar("m", func() []float64 {
+		return M.Average()
+	})
 
 	// effective field
 	b_eff = newBuffered(arr2, "B_eff", nil)

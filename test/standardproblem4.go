@@ -31,7 +31,7 @@ func main() {
 	//Table.Autosave(1e-12)
 	Run(3e-9)
 
-	m := M.Average()
+	m := AvgM.Get()
 	fmt.Println("relaxed m:", m[X], m[Y], m[Z])
 	expect(m[Z], 0)
 	expect(m[Y], 0.12528)
@@ -45,7 +45,7 @@ func main() {
 	//M.Autosave(50e-12)
 	Run(1e-9)
 
-	m = M.Average()
+	m = AvgM.Get()
 	fmt.Println("final m:", m[X], m[Y], m[Z])
 	expect(m[Z], 0.0432)
 	expect(m[Y], 0.1268)

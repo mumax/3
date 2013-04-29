@@ -4,6 +4,7 @@ bugs:
 use cuda.OnFree throughout: setmesh memleak
 mx3 main program hangs
 saving staggeredmask fails if not initialized first
+shifting staggeredmask fails if not initialized first
 
 improvements:
 -------------

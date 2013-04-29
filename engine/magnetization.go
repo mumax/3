@@ -33,7 +33,7 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 }
 
 var (
-	Shift = newScalar(3, "shift", func() []float64 {
+	Shift = newScalar(3, "shift", "m", func() []float64 {
 		c := CellSize()
 		return []float64{float64(shift[X]) * c[X], float64(shift[Y]) * c[Y], float64(shift[Z]) * c[Z]}
 	})

@@ -51,19 +51,21 @@ func newTable(name string) *DataTable {
 	return t
 }
 
-// make sure tabout is open.
+// open writer and write header
 func (t *DataTable) init() {
 	if !t.inited() {
 		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
+
+		// write header
 		fmt.Fprint(t, "# t(s)")
 		for _, o := range t.outputs {
 			if o.nComp == 1 {
-				fmt.Fprint(t, " ", o.name)
+				fmt.Fprint(t, "\t", o.name, " (", o.unit, ")")
 			} else {
 				for c := 0; c < o.nComp; c++ {
-					fmt.Fprint(t, " ", o.name+string('x'+c))
+					fmt.Fprint(t, "\t", o.name+string('x'+c), " (", o.unit, ")")
 				}
 			}
 		}

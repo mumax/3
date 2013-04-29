@@ -77,7 +77,7 @@ func initialize() {
 
 	// magnetization
 	M = Magnetization{newBuffered(arr1, "m", nil)}
-	AvgM = newScalar(3, "m", func() []float64 {
+	AvgM = newScalar(3, "m", "", func() []float64 {
 		return M.Average()
 	})
 

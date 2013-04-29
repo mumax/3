@@ -1,19 +1,20 @@
 package engine
 
 type scalar struct {
-	nComp     int
-	name      string
-	value     []float64
-	timestamp int
-	armed     bool
-	updateFn  func() []float64 // need on-the-fly and from-zero
-	UpdCount  int
+	nComp      int
+	name, unit string
+	value      []float64
+	timestamp  int
+	armed      bool
+	updateFn   func() []float64 // need on-the-fly and from-zero
+	UpdCount   int
 }
 
-func newScalar(nComp int, name string, updateFn func() []float64) *scalar {
+func newScalar(nComp int, name, unit string, updateFn func() []float64) *scalar {
 	s := new(scalar)
 	s.nComp = nComp
 	s.name = name
+	s.unit = unit
 	s.updateFn = updateFn
 	return s
 }

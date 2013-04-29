@@ -2,22 +2,45 @@ package engine
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"fmt"
+	"log"
 	"os"
 )
 
 type dataTable struct {
 	*bufio.Writer
 	autosave
+	outputs []*scalar
 }
 
-func (t *dataTable) send(M *data.Slice, good bool) {
+func (t *dataTable) Add(output *scalar) {
+	if t.inited() {
+		log.Fatalln("data table add", output.name, ": need to add quantity before table is output the first time")
+	}
+	t.outputs = append(t.outputs, output)
+}
+
+func (t *dataTable) arm(good bool) {
 	if good && t.needSave() {
 		t.init()
-		m := average(M) // in userspace XYZ order
-		fmt.Fprintln(t, Time, m[0], m[1], m[2])
+		for _, o := range t.outputs {
+			o.arm()
+		}
+	}
+}
+
+func (t *dataTable) touch(good bool) {
+	if good && t.needSave() {
+		fmt.Fprint(t, Time)
+		for _, o := range t.outputs {
+			vec := o.Get()
+			for _, v := range vec {
+				fmt.Fprint(t, "\t", v)
+			}
+		}
+		fmt.Fprintln(t)
+		t.Flush()
 		t.saved()
 	}
 }
@@ -30,13 +53,27 @@ func newTable(name string) *dataTable {
 
 // make sure tabout is open.
 func (t *dataTable) init() {
-	if t.Writer == nil {
+	if !t.inited() {
 		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
-		fmt.Fprintln(t, "# t(s) mx my mz")
+		fmt.Fprint(t, "# t(s)")
+		for _, o := range t.outputs {
+			if o.nComp == 1 {
+				fmt.Fprint(t, " ", o.name)
+			} else {
+				for c := 0; c < o.nComp; c++ {
+					fmt.Fprint(t, " ", o.name+string('x'+c))
+				}
+			}
+		}
+		fmt.Fprintln(t)
 		t.Flush()
 	}
+}
+
+func (t *dataTable) inited() bool {
+	return t.Writer != nil
 }
 
 func (t *dataTable) flush() {

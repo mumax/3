@@ -1,20 +1,19 @@
 package engine
 
-import (
-	"fmt"
-)
-
 type scalar struct {
+	nComp     int
+	name      string
 	value     []float64
 	timestamp int
 	armed     bool
-	autosave
-	updateFn func() []float64
+	updateFn  func() []float64
+	UpdCount  int
 	// todo: deps: interface{arm}
 }
 
-func newScalar(name string, updateFn func() []float64) *scalar {
+func newScalar(nComp int, name string, updateFn func() []float64) *scalar {
 	s := new(scalar)
+	s.nComp = nComp
 	s.name = name
 	s.updateFn = updateFn
 	return s
@@ -22,8 +21,8 @@ func newScalar(name string, updateFn func() []float64) *scalar {
 
 func (s *scalar) Get() []float64 {
 	if s.timestamp != itime {
-		fmt.Println("update", s.name) // debug. RM
 		s.value = s.updateFn()
+		s.UpdCount++
 		s.timestamp = itime
 	}
 	return s.value

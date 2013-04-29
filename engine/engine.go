@@ -77,9 +77,14 @@ func initialize() {
 
 	// magnetization
 	M = Magnetization{newBuffered(arr1, "m", nil)}
-	AvgM = newScalar("m", func() []float64 {
+	AvgM = newScalar(3, "m", func() []float64 {
 		return M.Average()
 	})
+
+	// data table
+	table := newTable("datatable")
+	Table = table
+	table.Add(AvgM)
 
 	// effective field
 	b_eff = newBuffered(arr2, "B_eff", nil)
@@ -144,14 +149,11 @@ func initialize() {
 	})
 	STT = stt
 
-	// data table
-	table := newTable("datatable")
-	Table = table
-
 	// solver
 	torqueFn := func(good bool) *data.Slice {
 		itime++
-		M.touch(good) // saves if needed
+		table.arm(good) // if table output needed, quantities marked for update
+		M.touch(good)   // saves m if needed
 		b_demag.update(good)
 		ExMask.touch(good)
 		b_exch.addTo(b_eff.Slice, good)
@@ -161,6 +163,7 @@ func initialize() {
 		b_eff.touch(good)
 		torque.update(good)
 		stt.addTo(torque.Slice, good)
+		table.touch(good) // all needed quantities are now up-to-date, save them
 		return torque.Slice
 	}
 	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

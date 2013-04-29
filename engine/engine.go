@@ -200,6 +200,16 @@ func CellSize() [3]float64 {
 	return [3]float64{c[Z], c[Y], c[X]} // swaps XYZ
 }
 
+func WorldSize() [3]float64 {
+	w := mesh.WorldSize()
+	return [3]float64{w[Z], w[Y], w[X]} // swaps XYZ
+}
+
+func GridSize() [3]int {
+	n := mesh.Size()
+	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
+}
+
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	log.Println("run for", seconds, "s")

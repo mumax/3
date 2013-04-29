@@ -32,7 +32,10 @@ func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
 func (s *guistate) Mesh() *data.Mesh { return &mesh }
 func (s *guistate) Uname() string    { return uname }
 func (s *guistate) Version() string  { return VERSION }
-func (s *guistate) Pwd() string      { pwd, _ := os.Getwd(); return pwd }
+func (s *guistate) WorldNm() [3]float64 {
+	return [3]float64{WorldSize()[X] * 1e9, WorldSize()[Y] * 1e9, WorldSize()[Z] * 1e9}
+}
+func (s *guistate) Pwd() string { pwd, _ := os.Getwd(); return pwd }
 
 const mib = 1024 * 2014
 
@@ -91,7 +94,7 @@ const templText = `
 	</form>
 
 	<form id=text action=/ctl/pause method="POST"> 
-		<input type="submit" value="Pause"/>
+		<input type="submit" value="Break"/>
 	</form>
 
 	<br/>
@@ -100,7 +103,7 @@ const templText = `
  &nbsp; &nbsp; &nbsp;
 </td><td>  
 
-	<span id="running"><font color=red><b>Paused</b></font></span> 
+	<span id="running"><font color=red><b>Not running</b></font></span> 
 	<span id="dash"> </span>
 
 </td></tr></table>
@@ -123,7 +126,7 @@ const templText = `
 		if(running){
 			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>"
 		}else{
-			document.getElementById("running").innerHTML = "<font color=red><b>Paused</b></font>"
+			document.getElementById("running").innerHTML = "<font color=red><b>Not running</b></font>"
 		}
 	}
 	setInterval(updateRunning, 200)
@@ -218,9 +221,9 @@ function show(id) {
 
 	<tr>
 		<td> world size: &nbsp;&nbsp; </td>
-		<td> {{index .Mesh.WorldSize 2}} </td> <td> x  </td>
-		<td> {{index .Mesh.WorldSize 1}} </td> <td> x  </td>
-		<td> {{index .Mesh.WorldSize 0}} </td> <td> m3 </td>
+		<td> {{index .WorldNm 0 | printf "%2f" }} </td> <td> x  </td>
+		<td> {{index .WorldNm 1 | printf "%2f" }} </td> <td> x  </td>
+		<td> {{index .WorldNm 2 | printf "%2f" }} </td> <td> nm3 </td>
 	</tr>
 </table>
 	<input type="submit" value=" Submit"/> <b> Changing the mesh requires some re-initialization time</b>

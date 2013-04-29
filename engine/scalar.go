@@ -6,9 +6,8 @@ type scalar struct {
 	value     []float64
 	timestamp int
 	armed     bool
-	updateFn  func() []float64
+	updateFn  func() []float64 // need on-the-fly and from-zero
 	UpdCount  int
-	// todo: deps: interface{arm}
 }
 
 func newScalar(nComp int, name string, updateFn func() []float64) *scalar {

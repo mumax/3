@@ -36,7 +36,7 @@ var (
 	B_dmi   Handle         // demag field (T) output handle
 	B_exch  Handle         // exchange field (T) output handle
 	B_uni   Handle         // field due to uniaxial anisotropy output handle
-	Table   Handle         // output handle for tabular data (average magnetization etc.)
+	Table   *DataTable     // output handle for tabular data (average magnetization etc.)
 	Time    float64        // time in seconds  // todo: hide? setting breaks autosaves
 	Solver  *cuda.Heun
 )
@@ -82,9 +82,8 @@ func initialize() {
 	})
 
 	// data table
-	table := newTable("datatable")
-	Table = table
-	table.Add(AvgM)
+	Table = newTable("datatable")
+	Table.Add(AvgM)
 
 	// effective field
 	b_eff = newBuffered(arr2, "B_eff", nil)
@@ -152,7 +151,7 @@ func initialize() {
 	// solver
 	torqueFn := func(good bool) *data.Slice {
 		itime++
-		table.arm(good) // if table output needed, quantities marked for update
+		Table.arm(good) // if table output needed, quantities marked for update
 		M.touch(good)   // saves m if needed
 		b_demag.update(good)
 		ExMask.touch(good)
@@ -163,7 +162,7 @@ func initialize() {
 		b_eff.touch(good)
 		torque.update(good)
 		stt.addTo(torque.Slice, good)
-		table.touch(good) // all needed quantities are now up-to-date, save them
+		Table.touch(good) // all needed quantities are now up-to-date, save them
 		return torque.Slice
 	}
 	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
@@ -192,6 +191,13 @@ func injectAndWait(task func()) {
 	ready := make(chan int)
 	inject <- func() { task(); ready <- 1 }
 	<-ready
+}
+
+// Returns the mesh cell size in meters. E.g.:
+// 	cellsize_x := CellSize()[X]
+func CellSize() [3]float64 {
+	c := mesh.CellSize()
+	return [3]float64{c[Z], c[Y], c[X]} // swaps XYZ
 }
 
 // Run the simulation for a number of seconds.

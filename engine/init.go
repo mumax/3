@@ -78,7 +78,7 @@ func Close() {
 	log.Println("shutting down")
 	drainOutput()
 	if Table != nil {
-		Table.(*dataTable).flush()
+		Table.flush()
 	}
 	prof.Cleanup()
 }

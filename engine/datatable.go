@@ -8,20 +8,20 @@ import (
 	"os"
 )
 
-type dataTable struct {
+type DataTable struct {
 	*bufio.Writer
 	autosave
 	outputs []*scalar
 }
 
-func (t *dataTable) Add(output *scalar) {
+func (t *DataTable) Add(output *scalar) {
 	if t.inited() {
 		log.Fatalln("data table add", output.name, ": need to add quantity before table is output the first time")
 	}
 	t.outputs = append(t.outputs, output)
 }
 
-func (t *dataTable) arm(good bool) {
+func (t *DataTable) arm(good bool) {
 	if good && t.needSave() {
 		t.init()
 		for _, o := range t.outputs {
@@ -30,7 +30,7 @@ func (t *dataTable) arm(good bool) {
 	}
 }
 
-func (t *dataTable) touch(good bool) {
+func (t *DataTable) touch(good bool) {
 	if good && t.needSave() {
 		fmt.Fprint(t, Time)
 		for _, o := range t.outputs {
@@ -45,14 +45,14 @@ func (t *dataTable) touch(good bool) {
 	}
 }
 
-func newTable(name string) *dataTable {
-	t := new(dataTable)
+func newTable(name string) *DataTable {
+	t := new(DataTable)
 	t.name = name
 	return t
 }
 
 // make sure tabout is open.
-func (t *dataTable) init() {
+func (t *DataTable) init() {
 	if !t.inited() {
 		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
@@ -72,11 +72,11 @@ func (t *dataTable) init() {
 	}
 }
 
-func (t *dataTable) inited() bool {
+func (t *DataTable) inited() bool {
 	return t.Writer != nil
 }
 
-func (t *dataTable) flush() {
+func (t *DataTable) flush() {
 	if t.Writer != nil {
 		t.Flush()
 	}

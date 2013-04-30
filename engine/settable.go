@@ -6,15 +6,15 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
-type Magnetization struct {
+type Settable struct {
 	*buffered //  TODO: buffered <-> settable?
 }
 
-func (b *buffered) SetFile(fname string) {
+func (b *Settable) SetFile(fname string) {
 	util.FatalErr(b.setFile(fname))
 }
 
-func (b *buffered) setFile(fname string) error {
+func (b *Settable) setFile(fname string) error {
 	m, _, err := data.ReadFile(fname)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func (b *buffered) setFile(fname string) error {
 }
 
 //
-func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
+func (b *Settable) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
@@ -43,7 +43,7 @@ var (
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
-func (b *buffered) Shift(shx, shy, shz int) {
+func (b *Settable) Shift(shx, shy, shz int) {
 	m := b.buffer
 	m2 := cuda.GetBuffer(1, m.Mesh())
 	defer cuda.RecycleBuffer(m2)

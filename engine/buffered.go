@@ -29,7 +29,7 @@ func (b *buffered) update(goodstep bool) {
 	b.touch(goodstep)
 }
 
-func (b *buffered) get() *data.Slice {
+func (b *buffered) getGPU() *data.Slice {
 	cuda.Zero(b.buffer)
 	b.updFn(b.buffer)
 	return b.buffer

@@ -27,7 +27,7 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 
 // Accessible quantities
 var (
-	M      Magnetization  // reduced magnetization (unit length)
+	M      Settable       // reduced magnetization (unit length)
 	AvgM   *scalar        // average magnetization
 	Torque buffered_iface // torque (?) output handle
 
@@ -78,7 +78,7 @@ func initialize() {
 	vol = data.NilSlice(1, &mesh)
 
 	// magnetization
-	M = Magnetization{newBuffered(arr1, "m", nil)}
+	M = Settable{newBuffered(arr1, "m", nil)}
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return M.Average()
 	})

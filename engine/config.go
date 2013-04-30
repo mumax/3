@@ -92,7 +92,7 @@ func Uniform(mx, my, mz float64) *data.Slice {
 // 	M.SetRegion(0,    0, 0,   Nx/2, Ny, Nz,  Uniform( 1, 0, 0)) // left half
 // 	M.SetRegion(Nx/2, 0, 0,   Nx,   Ny, Nz,  Uniform(-1, 0, 0)) // right half
 // 	M.SetRegion(Nx/2-Ny/2, 0, 0,   Nx/2+Ny/2,   Ny, Nz,  Vortex(1, 1)) // center
-func (M *Magnetization) SetRegion(x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
+func (M *Settable) SetRegion(x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
 
 	m := M.Download()
 	v := m.Vectors()

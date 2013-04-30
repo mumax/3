@@ -16,7 +16,7 @@ func ExchangeEnergy() float64 {
 
 // Returns the current demag energy in Joules.
 func DemagEnergy() float64 {
-	return -0.5 * mDotSlice(b_demag.get())
+	return -0.5 * mDotSlice(b_demag.getGPU())
 }
 
 func mDotAdder(a *adder) float64 {

@@ -6,33 +6,14 @@ import (
 	"path"
 )
 
-// function that sets ("updates") quantity stored in dst
-type updFunc func(dst *data.Slice)
-
 // Output Handle for a quantity that is stored on the GPU.
 type buffered struct {
 	buffer *data.Slice
-	updFn  updFunc
 	autosave
 }
 
-func newBuffered(slice *data.Slice, name string, f updFunc) *buffered {
-	b := new(buffered)
-	b.buffer = slice
-	b.name = name
-	b.updFn = f
-	return b
-}
-
-func (b *buffered) update(goodstep bool) {
-	b.updFn(b.buffer)
-	b.touch(goodstep)
-}
-
-func (b *buffered) getGPU() *data.Slice {
-	cuda.Zero(b.buffer)
-	b.updFn(b.buffer)
-	return b.buffer
+func newBuffered(slice *data.Slice, name string) *buffered {
+	return &buffered{slice, autosave{name: name}}
 }
 
 // notify the handle that it may need to be saved
@@ -66,31 +47,15 @@ func (m *buffered) Download() *data.Slice {
 	return m.buffer.HostCopy()
 }
 
-// Replace the data by src. Auto rescales if needed.
-func (m *buffered) Set(src *data.Slice) {
-	if src.Mesh().Size() != m.buffer.Mesh().Size() {
-		src = data.Resample(src, m.buffer.Mesh().Size())
-	}
-	data.Copy(m.buffer, src)
-}
-
-// TODO: rm
-//func (b *buffered) memset(val ...float32) {
-//	cuda.Memset(b.slice, val...)
-//}
-
-// TODO: rm
-//func (b *buffered) normalize() {
-//	cuda.Normalize(b.slice)
-//}
-
 // Returns the average over all cells.
+// TODO: does not belong here
 func (b *buffered) Average() []float64 {
 	return average(b.buffer)
 }
 
 // Returns the maximum norm of a vector field.
 // TODO: only for vectors
+// TODO: does not belong here
 func (b *buffered) MaxNorm() float64 {
 	return cuda.MaxVecNorm(b.buffer)
 }
@@ -106,4 +71,12 @@ func average(b *data.Slice) []float64 {
 		avg[i] = float64(cuda.Sum(b.Comp(I))) / float64(b.Mesh().NCell())
 	}
 	return avg
+}
+
+// Replace the data by src. Auto rescales if needed.
+func (m *buffered) Set(src *data.Slice) {
+	if src.Mesh().Size() != m.buffer.Mesh().Size() {
+		src = data.Resample(src, m.buffer.Mesh().Size())
+	}
+	data.Copy(m.buffer, src)
 }

@@ -5,25 +5,17 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-// function that adds a quantity to dst
-type addFunc func(dst *data.Slice)
-
 // Output Handle for a quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field)
 type adder struct {
 	nComp int
 	mesh  *data.Mesh
-	addFn addFunc // calculates quantity and add result to dst
+	addFn func(dst *data.Slice) // calculates quantity and add result to dst
 	autosave
 }
 
-func newAdder(nComp int, m *data.Mesh, name string, f addFunc) *adder {
-	a := new(adder)
-	a.nComp = nComp
-	a.mesh = m
-	a.addFn = f
-	a.name = name
-	return a
+func newAdder(nComp int, m *data.Mesh, name string, addFunc func(dst *data.Slice)) *adder {
+	return &adder{nComp, m, addFunc, autosave{name: name}}
 }
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,

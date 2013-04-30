@@ -27,20 +27,18 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 
 // Accessible quantities
 var (
-	M      *buffered // reduced magnetization (unit length)
-	AvgM   *scalar   // average magnetization
-	Torque *setter   // torque (?) output handle
-
-	B_eff   *setter // effective field (T) output handle
-	B_demag *setter // demag field (T) output handle
-	B_dmi   *adder  // demag field (T) output handle
-	B_exch  *adder  // exchange field (T) output handle
-	B_uni   *adder  // field due to uniaxial anisotropy output handle
-	STT     *adder  // spin-transfer torque output handle
-
-	Table  *DataTable // output handle for tabular data (average magnetization etc.)
-	Time   float64    // time in seconds  // todo: hide? setting breaks autosaves
-	Solver *cuda.Heun
+	M       *buffered  // reduced magnetization (unit length)
+	AvgM    *scalar    // average magnetization
+	Torque  *setter    // torque (?) output handle
+	B_eff   *setter    // effective field (T) output handle
+	B_demag *setter    // demag field (T) output handle
+	B_dmi   *adder     // demag field (T) output handle
+	B_exch  *adder     // exchange field (T) output handle
+	B_uni   *adder     // field due to uniaxial anisotropy output handle
+	STT     *adder     // spin-transfer torque output handle
+	Table   *DataTable // output handle for tabular data (average magnetization etc.)
+	Time    float64    // time in seconds  // todo: hide? setting breaks autosaves
+	Solver  *cuda.Heun
 )
 
 // hidden quantities
@@ -88,7 +86,7 @@ func initialize() {
 
 	// demag field
 	demag_ := cuda.NewDemag(&mesh)
-	B_demag = newSetter(3, &mesh, "B_demag", func(b *data.Slice) {
+	B_demag = newSetter(3, &mesh, "B_demag", func(b *data.Slice, good bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 
@@ -114,7 +112,7 @@ func initialize() {
 	})
 
 	// external field
-	B_ext = newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
+	b_ext := newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
 		for _, f := range extFields {
@@ -123,20 +121,20 @@ func initialize() {
 	})
 
 	// effective field
-	B_eff = newSetter(3, &mesh, "B_eff", func(dst *data.Slice) {
-		B_demag.set(dst)
-		B_exch.addTo(dst)
-		B_dmi.addTo(dst)
-		B_uni.addTo(dst)
-		B_ext.addTo(dst)
+	B_eff = newSetter(3, &mesh, "B_eff", func(dst *data.Slice, good bool) {
+		B_demag.set(dst, good)
+		B_exch.addTo(dst, good)
+		B_dmi.addTo(dst, good)
+		B_uni.addTo(dst, good)
+		b_ext.addTo(dst, good)
 	})
-	quants["B_eff"] = b_eff
+	//quants["B_eff"] = B_eff
 
 	// llg torque
-	Torque = newSetter(3, &mesh, "torque", func(b *data.Slice) {
+	Torque = newSetter(3, &mesh, "torque", func(b *data.Slice, good bool) {
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
-	quants["torque"] = torque
+	//quants["torque"] = Torque
 
 	// spin-transfer torque
 	STT = newAdder(3, &mesh, "stt", func(dst *data.Slice) {
@@ -153,13 +151,13 @@ func initialize() {
 	// solver
 	torqueFn := func(good bool) *data.Slice {
 		itime++
-		Table.arm() // if table output needed, quantities marked for update
-		M.touch()   // saves m if needed
-		ExMask.touch()
-		B_eff.set(torquebuffer)
-		Torque.set(torquebuffer)
-		stt.addTo(torquebuffer)
-		Table.touch() // all needed quantities are now up-to-date, save them
+		Table.arm(good) // if table output needed, quantities marked for update
+		M.touch(good)   // saves m if needed
+		ExMask.touch(good)
+		B_eff.set(torquebuffer, good)
+		Torque.set(torquebuffer, good)
+		STT.addTo(torquebuffer, good)
+		Table.touch(good) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
 	Solver = cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

@@ -9,7 +9,6 @@ import (
 	"flag"
 	"log"
 	"runtime"
-	"time"
 )
 
 var (
@@ -82,23 +81,3 @@ func Close() {
 	}
 	prof.Cleanup()
 }
-
-// keep session open this long after browser inactivity
-const webtimeout = 60 * time.Second
-
-func keepBrowserAlive() {
-	if time.Since(lastKeepalive) < webtimeout {
-		log.Println("keeping session open to browser")
-		go func() {
-			for {
-				if time.Since(lastKeepalive) > webtimeout {
-					inject <- nop // wake up
-				}
-				time.Sleep(1 * time.Second)
-			}
-		}()
-		RunInteractive()
-	}
-}
-
-func nop() {}

@@ -15,7 +15,7 @@ type StaggeredMask struct {
 // 	SetAll(X, 1) // sets all faces in YZ plane to value 1.
 func (m *StaggeredMask) SetAll(direction int, value float64) {
 	m.init()
-	cuda.Memset(m.Slice.Comp(swapIndex(direction, 3)), float32(value))
+	cuda.Memset(m.buffer.Comp(swapIndex(direction, 3)), float32(value))
 }
 
 // Sets the value at the "lower/left" face of cell(ix, iy, iz). E.g.:
@@ -24,7 +24,7 @@ func (m *StaggeredMask) SetAll(direction int, value float64) {
 // 	SetSide1(Z, i, j, k, value) // sets value below (along Z) of cell i,j,k.
 func (m *StaggeredMask) SetSide1(direction int, ix, iy, iz int, value float64) {
 	m.init()
-	cuda.SetCell(m.Slice, swapIndex(direction, 3), iz, iy, ix, float32(value))
+	cuda.SetCell(m.buffer, swapIndex(direction, 3), iz, iy, ix, float32(value))
 }
 
 // Sets the value at the "upper/right" face of cell(ix, iy, iz). E.g.:
@@ -36,17 +36,17 @@ func (m *StaggeredMask) SetSide2(direction int, ix, iy, iz int, value float64) {
 	direction = swapIndex(direction, 3)
 	i := [3]int{iz, iy, ix}
 	i[direction]++
-	size := m.Mesh().Size()
+	size := m.buffer.Mesh().Size()
 	if i[direction] == size[direction] {
 		i[direction] = 0 // wrap around boundary
 	}
-	cuda.SetCell(m.Slice, direction, i[0], i[1], i[2], float32(value))
+	cuda.SetCell(m.buffer, direction, i[0], i[1], i[2], float32(value))
 }
 
 func (m *StaggeredMask) init() {
-	if m.Slice == nil {
-		m.Slice = cuda.NewSlice(3, &mesh) // could alloc only needed components...
-		cuda.Memset(m.Slice, 1, 1, 1)     // default value: all ones.
-		onFree(func() { m.Slice.Free(); m.Slice = nil })
+	if m.buffer == nil {
+		m.buffer = cuda.NewSlice(3, &mesh) // could alloc only needed components...
+		cuda.Memset(m.buffer, 1, 1, 1)     // default value: all ones.
+		onFree(func() { m.buffer.Free(); m.buffer = nil })
 	}
 }

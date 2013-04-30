@@ -11,28 +11,28 @@ type updFunc func(dst *data.Slice)
 
 // Output Handle for a quantity that is stored on the GPU.
 type buffered struct {
-	*data.Slice
-	updFn updFunc
+	buffer *data.Slice
+	updFn  updFunc
 	autosave
 }
 
 func newBuffered(slice *data.Slice, name string, f updFunc) *buffered {
 	b := new(buffered)
-	b.Slice = slice
+	b.buffer = slice
 	b.name = name
 	b.updFn = f
 	return b
 }
 
 func (b *buffered) update(goodstep bool) {
-	b.updFn(b.Slice)
+	b.updFn(b.buffer)
 	b.touch(goodstep)
 }
 
 func (b *buffered) get() *data.Slice {
-	cuda.Zero(b.Slice)
-	b.updFn(b.Slice)
-	return b.Slice
+	cuda.Zero(b.buffer)
+	b.updFn(b.buffer)
+	return b.buffer
 }
 
 // notify the handle that it may need to be saved
@@ -43,9 +43,11 @@ func (b *buffered) touch(goodstep bool) {
 	}
 }
 
+func (b *buffered) NComp() int { return b.buffer.NComp() }
+
 // Save once, with automatically assigned file name.
 func (b *buffered) Save() {
-	goSaveCopy(b.fname(), b.Slice, Time)
+	goSaveCopy(b.fname(), b.buffer, Time)
 	b.autonum++
 }
 
@@ -54,42 +56,43 @@ func (b *buffered) SaveAs(fname string) {
 	if !path.IsAbs(fname) {
 		fname = OD + fname
 	}
-	goSaveCopy(fname, b.Slice, Time)
+	goSaveCopy(fname, b.buffer, Time)
 }
 
 // Get a host copy.
 // TODO: assume it can be called from another thread,
 // transfer asynchronously.
 func (m *buffered) Download() *data.Slice {
-	return m.Slice.HostCopy()
+	return m.buffer.HostCopy()
 }
 
 // Replace the data by src. Auto rescales if needed.
 func (m *buffered) Set(src *data.Slice) {
-	if src.Mesh().Size() != m.Mesh().Size() {
-		src = data.Resample(src, m.Mesh().Size())
+	if src.Mesh().Size() != m.buffer.Mesh().Size() {
+		src = data.Resample(src, m.buffer.Mesh().Size())
 	}
-	data.Copy(m.Slice, src)
+	data.Copy(m.buffer, src)
 }
 
 // TODO: rm
-func (b *buffered) memset(val ...float32) {
-	cuda.Memset(b.Slice, val...)
-}
+//func (b *buffered) memset(val ...float32) {
+//	cuda.Memset(b.slice, val...)
+//}
 
 // TODO: rm
-func (b *buffered) normalize() {
-	cuda.Normalize(b.Slice)
-}
+//func (b *buffered) normalize() {
+//	cuda.Normalize(b.slice)
+//}
 
 // Returns the average over all cells.
 func (b *buffered) Average() []float64 {
-	return average(b.Slice)
+	return average(b.buffer)
 }
 
 // Returns the maximum norm of a vector field.
+// TODO: only for vectors
 func (b *buffered) MaxNorm() float64 {
-	return cuda.MaxVecNorm(b.Slice)
+	return cuda.MaxVecNorm(b.buffer)
 }
 
 // average in userspace XYZ order

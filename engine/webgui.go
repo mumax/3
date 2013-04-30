@@ -16,6 +16,7 @@ var (
 	uitempl = template.Must(template.New("gui").Parse(templText))
 )
 
+// http handler that serves main gui
 func gui(w http.ResponseWriter, r *http.Request) {
 	injectAndWait(func() { util.FatalErr(uitempl.Execute(w, ui)) })
 }
@@ -26,23 +27,25 @@ type guistate struct {
 	running, pleaseStop bool // todo: mv out of struct
 }
 
-func (s *guistate) Time() float32    { return float32(Time) }
-func (s *guistate) ImWidth() int     { return ui.Mesh().Size()[2] }
-func (s *guistate) ImHeight() int    { return ui.Mesh().Size()[1] }
-func (s *guistate) Mesh() *data.Mesh { return &mesh }
-func (s *guistate) Uname() string    { return uname }
-func (s *guistate) Version() string  { return VERSION }
+func (s *guistate) Time() float32     { return float32(Time) }
+func (s *guistate) ImWidth() int      { return ui.Mesh().Size()[2] }
+func (s *guistate) ImHeight() int     { return ui.Mesh().Size()[1] }
+func (s *guistate) Mesh() *data.Mesh  { return &mesh }
+func (s *guistate) Uname() string     { return uname }
+func (s *guistate) Version() string   { return VERSION }
+func (s *guistate) Pwd() string       { pwd, _ := os.Getwd(); return pwd }
+func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
+
+// world size in nm.
 func (s *guistate) WorldNm() [3]float64 {
 	return [3]float64{WorldSize()[X] * 1e9, WorldSize()[Y] * 1e9, WorldSize()[Z] * 1e9}
 }
-func (s *guistate) Pwd() string { pwd, _ := os.Getwd(); return pwd }
 
 const mib = 1024 * 2014
 
 // TODO: strangely this reports wrong numbers (x2 too low).
 func (s *guistate) MemInfo() string { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
 
-func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {
 		return &zeroSolver

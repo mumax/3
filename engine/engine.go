@@ -27,18 +27,20 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 
 // Accessible quantities
 var (
-	M       Magnetization  // reduced magnetization (unit length)
-	AvgM    *scalar        // average magnetization
-	B_eff   Handle         // effective field (T) output handle
-	Torque  buffered_iface // torque (?) output handle
-	STT     Handle         // spin-transfer torque output handle
-	B_demag Handle         // demag field (T) output handle
-	B_dmi   Handle         // demag field (T) output handle
-	B_exch  Handle         // exchange field (T) output handle
-	B_uni   Handle         // field due to uniaxial anisotropy output handle
-	Table   *DataTable     // output handle for tabular data (average magnetization etc.)
-	Time    float64        // time in seconds  // todo: hide? setting breaks autosaves
-	Solver  *cuda.Heun
+	M      Magnetization  // reduced magnetization (unit length)
+	AvgM   *scalar        // average magnetization
+	Torque buffered_iface // torque (?) output handle
+
+	B_eff   Handle // effective field (T) output handle
+	STT     Handle // spin-transfer torque output handle
+	B_demag Handle // demag field (T) output handle
+	B_dmi   Handle // demag field (T) output handle
+	B_exch  Handle // exchange field (T) output handle
+	B_uni   Handle // field due to uniaxial anisotropy output handle
+
+	Table  *DataTable // output handle for tabular data (average magnetization etc.)
+	Time   float64    // time in seconds  // todo: hide? setting breaks autosaves
+	Solver *cuda.Heun
 )
 
 // hidden quantities
@@ -56,7 +58,7 @@ var (
 // Add an additional space-dependent field to B_ext.
 // The field is mask * multiplier, where mask typically contains space-dependent scaling values of the order of 1.
 // multiplier can be time dependent.
-// TODO: extend API (set one component, construct masks or read from file)
+// TODO: extend API (set one component, construct masks or read from file). Also for current.
 func AddExtField(mask *data.Slice, multiplier ScalFn) {
 	m := cuda.GPUCopy(mask)
 	extFields = append(extFields, extField{m, multiplier})
@@ -92,13 +94,13 @@ func initialize() {
 	// demag field
 	demag_ = cuda.NewDemag(&mesh)
 	b_demag = newBuffered(arr2, "B_demag", func(b *data.Slice) {
-		demag_.Exec(b, M.Slice, vol, Mu0*Msat()) //TODO: consistent msat or bsat
+		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 	B_demag = b_demag
 
 	// exchange field
 	b_exch = newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
-		cuda.AddExchange(dst, M.Slice, ExMask.Slice, Aex(), Msat())
+		cuda.AddExchange(dst, M.buffer, ExMask.buffer, Aex(), Msat())
 	})
 	B_exch = b_exch
 
@@ -106,7 +108,7 @@ func initialize() {
 	b_dmi = newAdder(3, &mesh, "B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
-			cuda.AddDMI(dst, M.Slice, d, Msat())
+			cuda.AddDMI(dst, M.buffer, d, Msat())
 		}
 	})
 	B_dmi = b_dmi
@@ -115,7 +117,7 @@ func initialize() {
 	b_uni = newAdder(3, &mesh, "B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
-			cuda.AddUniaxialAnisotropy(dst, M.Slice, ku1[2], ku1[1], ku1[0], Msat())
+			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
 	B_uni = b_uni
@@ -131,7 +133,7 @@ func initialize() {
 
 	// llg torque
 	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
-		cuda.LLGTorque(b, M.Slice, b, float32(Alpha()))
+		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
 	Torque = torque
 
@@ -143,7 +145,7 @@ func initialize() {
 			jx := j[2] * p
 			jy := j[1] * p
 			jz := j[0] * p
-			cuda.AddZhangLiTorque(dst, M.Slice, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
+			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
 	STT = stt
@@ -155,17 +157,17 @@ func initialize() {
 		M.touch(good)   // saves m if needed
 		b_demag.update(good)
 		ExMask.touch(good)
-		b_exch.addTo(b_eff.Slice, good)
-		b_dmi.addTo(b_eff.Slice, good)
-		b_uni.addTo(b_eff.Slice, good)
-		b_ext.addTo(b_eff.Slice, good)
+		b_exch.addTo(b_eff.buffer, good)
+		b_dmi.addTo(b_eff.buffer, good)
+		b_uni.addTo(b_eff.buffer, good)
+		b_ext.addTo(b_eff.buffer, good)
 		b_eff.touch(good)
 		torque.update(good)
-		stt.addTo(torque.Slice, good)
+		stt.addTo(torque.buffer, good)
 		Table.touch(good) // all needed quantities are now up-to-date, save them
-		return torque.Slice
+		return torque.buffer
 	}
-	Solver = cuda.NewHeun(M.Slice, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+	Solver = cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
 // Register function f to be called after every time step.

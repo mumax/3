@@ -28,7 +28,7 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
-		cuda.SetCell(b.Slice, swapIndex(c, nComp), iz, iy, ix, float32(v[c]))
+		cuda.SetCell(b.buffer, swapIndex(c, nComp), iz, iy, ix, float32(v[c]))
 	}
 }
 
@@ -44,7 +44,7 @@ var (
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
 func (b *buffered) Shift(shx, shy, shz int) {
-	m := b.Slice
+	m := b.buffer
 	m2 := cuda.GetBuffer(1, m.Mesh())
 	defer cuda.RecycleBuffer(m2)
 	shift[X] += shx

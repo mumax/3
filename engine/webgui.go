@@ -160,26 +160,48 @@ function show(id) {
 </script>
 
 
-<h2> magnetization </h2> <a href="#" onclick="hide('div_magnetization'); return false;">Hide</a>
-<div id=div_magnetization> 
-<img id="magnetization" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="m"/>
+<h2> display </h2>
+<div id=div_display> 
+
+<script>
+
+	var renderQuant = "m"; // TODO: don't forget on reload.
+	var img = new Image();
+	img.src = "/render/m";
+
+	function updateImg(){
+		img.src = "/render/" + renderQuant + "?" + new Date(); // date = cache breaker
+		document.getElementById("display").src = img.src;
+	}
+
+	function updateImgAsync(){
+		if(running && img.complete){
+			updateImg();
+		}
+	}
+
+	setInterval(updateImgAsync, 500);
+
+	function renderSelect() {
+		var list=document.getElementById("renderList");
+		renderQuant=list.options[list.selectedIndex].text;
+		updateImg();
+	}
+</script>
+
+<form>
+Display: <select id="renderList" onchange="renderSelect()">
+  		<option>m</option>
+  		<option>torque</option>  
+	</select>
+</form>
+
+<img id="display" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="display"/>
 
 <form  action=/setm/ method="POST">
 	<b>Re-initialize from .dump file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> 
 </form>
 
-<script>
-	var img = new Image();
-	img.src = "/render/m";
-	function updateImg(){
-		if(running && img.complete){
-			document.getElementById("magnetization").src = img.src;
-			img = new Image();
-			img.src = "/render/m?" + new Date();
-		}
-	}
-	setInterval(updateImg, 500);
-</script>
 
 </div><hr/>
 

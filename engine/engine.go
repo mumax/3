@@ -290,17 +290,3 @@ func checkInited() {
 		log.Fatal("need to set mesh first")
 	}
 }
-
-// map of names to Handle does not work because Handles change on the fly
-// *Handle does not work because we loose interfaceness.
-func quant(name string) (h buffered_iface, ok bool) {
-	switch name {
-	default:
-		return nil, false
-	case "m":
-		return M, true
-	case "torque":
-		return Torque, true
-	}
-	return nil, false // rm for go 1.1
-}

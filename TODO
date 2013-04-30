@@ -36,4 +36,12 @@ web: graphs
 web: -web flag opens browser
 
 
+windows:
+--------
+go msi installer from golang.org
+
+git from git-scm.com
+* Run Git from the windows command prompt
+* Checkout as-is
+
 

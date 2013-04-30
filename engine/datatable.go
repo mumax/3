@@ -21,6 +21,10 @@ func (t *DataTable) Add(output *scalar) {
 	t.outputs = append(t.outputs, output)
 }
 
+func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
+	t.Add(newScalar(nComp, name, unit, f))
+}
+
 func (t *DataTable) arm(good bool) {
 	if good && t.needSave() {
 		t.init()

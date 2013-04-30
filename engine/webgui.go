@@ -221,9 +221,9 @@ function show(id) {
 
 	<tr>
 		<td> world size: &nbsp;&nbsp; </td>
-		<td> {{index .WorldNm 0 | printf "%2f" }} </td> <td> x  </td>
-		<td> {{index .WorldNm 1 | printf "%2f" }} </td> <td> x  </td>
-		<td> {{index .WorldNm 2 | printf "%2f" }} </td> <td> nm3 </td>
+		<td> {{index .WorldNm 0 | printf "%.2f" }} </td> <td> x  </td>
+		<td> {{index .WorldNm 1 | printf "%.2f" }} </td> <td> x  </td>
+		<td> {{index .WorldNm 2 | printf "%.2f" }} </td> <td> nm3 </td>
 	</tr>
 </table>
 	<input type="submit" value=" Submit"/> <b> Changing the mesh requires some re-initialization time</b>

@@ -6,12 +6,11 @@ import (
 	"image/jpeg"
 	"log"
 	"net/http"
-	"strings"
 )
 
 // render image of quantity
 func render(w http.ResponseWriter, r *http.Request) {
-	url := strings.ToLower(r.URL.Path[len("/render/"):])
+	url := r.URL.Path[len("/render/"):]
 	h, ok := quant(url)
 	if !ok {
 		err := "render: unknown quantity: " + url
@@ -26,22 +25,15 @@ func render(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// map of names to Handle does not work because Handles change on the fly
-// *Handle does not work because we loose interfaceness.
-func quant(name string) (h buffered_iface, ok bool) {
-	switch name {
-	default:
-		return nil, false
-	case "m":
-		return M, true
-	case "torque":
-		return Torque, true
-	}
-	return nil, false // rm for go 1.1
+type getter interface {
+	Download() *data.Slice
 }
 
-// Output handle that also support manual single-shot saving.
-// TODO: replace by smallest struct/iface that captures Get()
-type buffered_iface interface {
-	Download() *data.Slice // CPU-accessible slice
+var quants = map[string]getter{}
+
+// map of names to Handle does not work because Handles change on the fly
+// *Handle does not work because we loose interfaceness.
+func quant(name string) (h getter, ok bool) {
+	h, ok = quants[name]
+	return
 }

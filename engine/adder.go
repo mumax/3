@@ -49,3 +49,9 @@ func (a *adder) get_mustRecycle() *data.Slice {
 	a.addFn(buf)
 	return buf
 }
+
+func (a *adder) Download() *data.Slice {
+	b := a.get_mustRecycle()
+	defer cuda.RecycleBuffer(b)
+	return b.HostCopy()
+}

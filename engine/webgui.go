@@ -27,14 +27,15 @@ type guistate struct {
 	running, pleaseStop bool // todo: mv out of struct
 }
 
-func (s *guistate) Time() float32     { return float32(Time) }
-func (s *guistate) ImWidth() int      { return ui.Mesh().Size()[2] }
-func (s *guistate) ImHeight() int     { return ui.Mesh().Size()[1] }
-func (s *guistate) Mesh() *data.Mesh  { return &mesh }
-func (s *guistate) Uname() string     { return uname }
-func (s *guistate) Version() string   { return VERSION }
-func (s *guistate) Pwd() string       { pwd, _ := os.Getwd(); return pwd }
-func (s *guistate) Device() cu.Device { return cu.CtxGetDevice() }
+func (s *guistate) Time() float32             { return float32(Time) }
+func (s *guistate) ImWidth() int              { return ui.Mesh().Size()[2] }
+func (s *guistate) ImHeight() int             { return ui.Mesh().Size()[1] }
+func (s *guistate) Mesh() *data.Mesh          { return &mesh }
+func (s *guistate) Uname() string             { return uname }
+func (s *guistate) Version() string           { return VERSION }
+func (s *guistate) Pwd() string               { pwd, _ := os.Getwd(); return pwd }
+func (s *guistate) Device() cu.Device         { return cu.CtxGetDevice() }
+func (s *guistate) Quants() map[string]getter { return quants }
 
 // world size in nm.
 func (s *guistate) WorldNm() [3]float64 {
@@ -194,8 +195,9 @@ function show(id) {
 
 <form>
 Display: <select id="renderList" onchange="renderSelect()">
-  		<option>m</option>
-  		<option>torque</option>  
+		{{range $k, $v := .Quants}}
+  			<option>{{$k}}</option>
+		{{end}}
 	</select>
 </form>
 

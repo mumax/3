@@ -27,9 +27,9 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 
 // Accessible quantities
 var (
-	M      Settable       // reduced magnetization (unit length)
-	AvgM   *scalar        // average magnetization
-	Torque buffered_iface // torque (?) output handle
+	M      Settable // reduced magnetization (unit length)
+	AvgM   *scalar  // average magnetization
+	Torque getter   // torque (?) output handle
 
 	B_eff   Handle // effective field (T) output handle
 	STT     Handle // spin-transfer torque output handle
@@ -79,6 +79,7 @@ func initialize() {
 
 	// magnetization
 	M = Settable{newBuffered(arr1, "m", nil)}
+	quants["m"] = M
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return M.Average()
 	})
@@ -86,10 +87,6 @@ func initialize() {
 	// data table
 	Table = newTable("datatable")
 	Table.Add(AvgM)
-
-	// effective field
-	b_eff = newBuffered(arr2, "B_eff", nil)
-	B_eff = b_eff
 
 	// demag field
 	demag_ = cuda.NewDemag(&mesh)
@@ -131,11 +128,19 @@ func initialize() {
 		}
 	})
 
+	// effective field
+	b_eff = newAdder("B_eff", func(dst *data.Slice) {
+		b_demag.addTo(dst)
+	})
+	B_eff = b_eff
+	quants["B_eff"] = b_eff
+
 	// llg torque
 	torque = newBuffered(arr2, "torque", func(b *data.Slice) {
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
 	Torque = torque
+	quants["torque"] = torque
 
 	// spin-transfer torque
 	stt = newAdder(3, &mesh, "stt", func(dst *data.Slice) {

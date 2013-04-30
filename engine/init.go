@@ -84,7 +84,7 @@ func Close() {
 }
 
 // keep session open this long after browser inactivity
-const webtimeout = 10 * time.Second
+const webtimeout = 60 * time.Second
 
 func keepBrowserAlive() {
 	if time.Since(lastKeepalive) < webtimeout {

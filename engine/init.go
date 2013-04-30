@@ -92,8 +92,9 @@ func keepBrowserAlive() {
 		go func() {
 			for {
 				if time.Since(lastKeepalive) > webtimeout {
-					inject <- func() {} // wakeup!
+					inject <- func() {} // wake up
 				}
+				time.Sleep(1 * time.Second)
 			}
 		}()
 		RunInteractive()

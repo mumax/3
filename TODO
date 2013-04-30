@@ -44,4 +44,7 @@ git from git-scm.com
 * Run Git from the windows command prompt
 * Checkout as-is
 
+mingw-w64 from mingw.org > sourceforge
+* PATH=%PATH%C:\MinGW/bin
+
 

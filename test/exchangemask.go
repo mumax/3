@@ -27,9 +27,9 @@ func main() {
 	Msat = Const(800e3)
 	Aex = Const(13e-12 * 2) // Aex * 2 here...
 	M.Set(Uniform(1, .1, 0))
-	ExMask.SetAll(X, 0.5) // ... and Aex/2 again here
-	ExMask.SetAll(Y, 0.5)
-	ExMask.SetAll(Z, 0.5)
+	ExchangeMask.SetAll(X, 0.5) // ... and Aex/2 again here
+	ExchangeMask.SetAll(Y, 0.5)
+	ExchangeMask.SetAll(Z, 0.5)
 
 	Run(3e-9)
 

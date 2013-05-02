@@ -2,6 +2,7 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
+	"code.google.com/p/mx3/data"
 )
 
 // Stores values defined on the faces in-between cells.
@@ -9,6 +10,11 @@ import (
 // Automatically initialized to all ones.
 type StaggeredMask struct {
 	buffered
+}
+
+func newStaggeredMask(m *data.Mesh, name, unit string) StaggeredMask {
+	slice := data.NilSlice(3, m)
+	return StaggeredMask{*newBuffered(slice, name, unit)}
 }
 
 // Set the value of all cell faces with their normal along direction. E.g.:
@@ -44,7 +50,7 @@ func (m *StaggeredMask) SetSide2(direction int, ix, iy, iz int, value float64) {
 }
 
 func (m *StaggeredMask) init() {
-	if m.buffer == nil {
+	if m.buffer.DevPtr(0) == nil {
 		m.buffer = cuda.NewSlice(3, m.mesh) // could alloc only needed components...
 		cuda.Memset(m.buffer, 1, 1, 1)      // default value: all ones.
 		onFree(func() { m.buffer.Free(); m.buffer = nil })

@@ -26,7 +26,7 @@ func (a *adder) addTo(dst *data.Slice, goodstep bool) {
 		cuda.Zero(buf)
 		a.addFn(buf)
 		cuda.Madd2(dst, dst, buf, 1, 1)
-		goSaveAndRecycle(a.fname(), buf, Time)
+		goSaveAndRecycle(a.autoFname(), buf, Time)
 		a.saved()
 	} else {
 		a.addFn(dst)

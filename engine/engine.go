@@ -23,8 +23,6 @@ var (
 	J       VecFn         = ConstVector(0, 0, 0) // Electrical current density
 )
 
-func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name: "exmask"}}} }
-
 // Accessible quantities
 var (
 	M       *buffered  // reduced magnetization (unit length)
@@ -94,6 +92,7 @@ func initialize() {
 	B_exch = newAdder(3, &global_mesh, "B_exch", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExMask.buffer, Aex(), Msat())
 	})
+	ExMask = newStaggeredMask(&global_mesh, "exchmask", "")
 
 	// Dzyaloshinskii-Moriya field
 	B_dmi = newAdder(3, &global_mesh, "B_dmi", func(dst *data.Slice) {

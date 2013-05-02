@@ -20,7 +20,7 @@ func newSetter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *dat
 func (b *setter) set(dst *data.Slice, goodstep bool) {
 	b.setFn(dst, goodstep)
 	if goodstep && b.needSave() {
-		goSaveCopy(b.fname(), dst, Time)
+		goSaveCopy(b.autoFname(), dst, Time)
 		b.saved()
 	}
 }

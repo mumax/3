@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"path"
 )
 
 //// Returns the maximum norm of a vector field.
@@ -32,4 +33,16 @@ func average(s getIface) []float64 {
 		avg[i] = float64(cuda.Sum(b.Comp(I))) / float64(b.Mesh().NCell())
 	}
 	return avg
+}
+
+// Save once, with given file name.
+func saveAs(s getIface, fname string) {
+	if !path.IsAbs(fname) {
+		fname = OD + fname
+	}
+	buffer, recylce := s.getGPU()
+	if recylce {
+		defer cuda.RecycleBuffer(buffer)
+	}
+	goSaveCopy(fname, buffer, Time)
 }

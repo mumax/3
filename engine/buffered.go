@@ -24,8 +24,7 @@ func newBuffered(slice *data.Slice, name, unit string) *buffered {
 // notify that it may need to be saved.
 func (b *buffered) notifySave(goodstep bool) {
 	if goodstep && b.needSave() {
-		panic("todo: buffered.save")
-		//b.Save()
+		b.Save()
 		b.saved()
 	}
 }
@@ -87,21 +86,6 @@ func (s *buffered) getShift() []float64 {
 	return []float64{-c[2] * float64(s.shiftc[0]), -c[1] * float64(s.shiftc[1]), -c[0] * float64(s.shiftc[2])}
 }
 
-// TODO: for all quants
-//// Save once, with automatically assigned file name.
-//func (b *buffered) Save() {
-//	goSaveCopy(b.fname(), b.buffer, Time)
-//	b.autonum++
-//}
-//
-//// Save once, with given file name.
-//func (b *buffered) SaveAs(fname string) {
-//	if !path.IsAbs(fname) {
-//		fname = OD + fname
-//	}
-//	goSaveCopy(fname, b.buffer, Time)
-//}
-
 // Get a host copy.
 // TODO: assume it can be called from another thread,
 // transfer asynchronously + sync
@@ -111,6 +95,10 @@ func (m *buffered) Download() *data.Slice {
 
 func (m *buffered) Average() []float64 {
 	return average(m)
+}
+
+func (m *buffered) Save() {
+	saveAs(m, m.autoFname())
 }
 
 func (m *buffered) getGPU() (s *data.Slice, mustRecycle bool) {

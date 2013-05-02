@@ -84,35 +84,6 @@ const templText = `
 
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
-
-
-<div> <h2> solver </h2>
-
-<table><tr><td>  
-
-	<form action=/ctl/run method="POST">
-        <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
-	</form>
-	<form  action=/ctl/steps method="POST">
-        <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
-	</form>
-
-	<form id=text action=/ctl/pause method="POST"> 
-		<input type="submit" value="Break"/>
-	</form>
-
-	<br/>
-
-</td><td>  
- &nbsp; &nbsp; &nbsp;
-</td><td>  
-
-	<span id="running"><font color=red><b>Not running</b></font></span> 
-	<span id="dash"> </span>
-
-</td></tr></table>
-
-
 <script>
 	function httpGet(url){
     	var xmlHttp = new XMLHttpRequest();
@@ -132,9 +103,38 @@ const templText = `
 		}else{
 			document.getElementById("running").innerHTML = "<font color=red><b>Not running</b></font>"
 		}
+		document.getElementById("breakbutton").disabled = !running
 	}
 	setInterval(updateRunning, 200)
 </script>
+
+<div> <h2> solver </h2>
+
+<table><tr><td>  
+
+	<form action=/ctl/run method="POST">
+        <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
+	</form>
+	<form  action=/ctl/steps method="POST">
+        <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
+	</form>
+
+	<form id=text action=/ctl/pause method="POST"> 
+		<input id="breakbutton" type="submit" value="Break"/>
+	</form>
+
+	<br/>
+
+</td><td>  
+ &nbsp; &nbsp; &nbsp;
+</td><td>  
+
+	<span id="running"><font color=red><b>Not running</b></font></span> 
+	<span id="dash"> </span>
+
+</td></tr></table>
+
+
 
 <script>
 	function updateDash(){

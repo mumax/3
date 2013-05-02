@@ -84,12 +84,15 @@ const templText = `
 <div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
 
 <script>
-	function httpGet(url){
+	function http(method, url){
     	var xmlHttp = new XMLHttpRequest();
-    	xmlHttp.open("GET", url, false);
+    	xmlHttp.open(method, url, false);
     	xmlHttp.send(null);
     	return xmlHttp.responseText;
     }
+	function httpGet(url){
+		return http("GET", url)
+	}
 	var running = false
 	function updateRunning(){
 		try{
@@ -118,9 +121,7 @@ const templText = `
         <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 
-	<form id=text action=/ctl/pause method="POST"> 
-		<input id="breakbutton" type="submit" value="Break"/>
-	</form>
+	<button id="breakbutton" onclick="http(&quot;POST&quot;, &quot;/ctl/pause&quot;);">Break</button>
 
 	<br/>
 
@@ -169,6 +170,8 @@ function show(id) {
 <script>
 	var renderQuant = "m"; // TODO: don't forget on reload.
 	var renderComp = ""; 
+	var renderMin = "auto";
+	var renderMax = "auto";
 	var img = new Image();
 	img.src = "/render/" + renderQuant;
 
@@ -210,6 +213,8 @@ Display: <select id="renderList" onchange="renderSelect()">
   		<option>y</option>
   		<option>z</option>
 	</select>
+    min:<input id=text size=8 name="renderMin" value="auto"> 
+    max:<input id=text size=8 name="renderMax" value="auto"> 
 </form>
 <script>
 	document.getElementById("renderList").value = renderQuant;

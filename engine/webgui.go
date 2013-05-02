@@ -173,7 +173,11 @@ function show(id) {
 	img.src = "/render/" + renderQuant;
 
 	function updateImg(){
-		img.src = "/render/" + renderQuant + "?" + new Date(); // date = cache breaker
+		var renderQuantComp = renderQuant;
+		if(renderComp != ""){
+			renderQuantComp += "/" + renderComp;
+		}	
+		img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
 		document.getElementById("display").src = img.src;
 	}
 

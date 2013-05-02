@@ -219,11 +219,6 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 <img id="display" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="display"/>
 
-<form  action=/setm/ method="POST">
-	<b>Re-initialize from .dump file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> 
-</form>
-
-
 </div><hr/>
 
 
@@ -273,13 +268,16 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 
 
-<div> <h2> process </h2>
-	<form action=/ctl/kill  method="POST"> 
-		<table>
-		<tr><td> <font color=red><b> Kill process:</b></font> </td><td> <input type="submit" value="Kill"/> </td></tr>
-		<tr><td> <b>GPU</b> </td><td> {{.Device.Name}} </td></tr>
-		</table>
+<div> <h2> <font color=red> Danger zone </font> </h2>
+
+	<form  action=/setm/ method="POST">
+		<b>Upload m from file:</b> <input id="text" size=60 name="value" value="{{.Pwd}}"> <input type="submit" value="Submit"/> 
 	</form>
+
+	<form action=/ctl/kill method="POST"> 
+		<b> Kill process:</b> <input type="submit" value="Kill"/> 
+	</form>
+
 <hr/></div>
 
 <div id="footer">

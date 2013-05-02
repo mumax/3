@@ -5,17 +5,15 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-// Output Handle for a quantity that is not explicitly stored,
+// quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field)
 type adder struct {
-	nComp int
-	mesh  *data.Mesh
-	addFn func(dst *data.Slice) // calculates quantity and add result to dst
 	autosave
+	addFn func(dst *data.Slice) // calculates quantity and add result to dst
 }
 
-func newAdder(nComp int, m *data.Mesh, name string, addFunc func(dst *data.Slice)) *adder {
-	return &adder{nComp, m, addFunc, autosave{name: name}}
+func newAdder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Slice)) *adder {
+	return &adder{newAutosave(nComp, name, unit, m), addFunc}
 }
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,
@@ -33,17 +31,10 @@ func (a *adder) addTo(dst *data.Slice, goodstep bool) {
 	}
 }
 
-// Evaluates addFn and returns the result in a buffer.
-// The returned buffer must be recycled with cuda.RecycleBuffer
-func (a *adder) get_mustRecycle() *data.Slice {
-	buf := cuda.GetBuffer(a.nComp, a.mesh)
-	cuda.Zero(buf)
-	a.addFn(buf)
-	return buf
-}
-
 func (a *adder) Download() *data.Slice {
-	b := a.get_mustRecycle()
+	b := cuda.GetBuffer(a.nComp, a.mesh)
 	defer cuda.RecycleBuffer(b)
+	cuda.Zero(b)
+	a.addFn(b)
 	return b.HostCopy()
 }

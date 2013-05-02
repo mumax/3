@@ -266,8 +266,6 @@ Display: <select id="renderList" onchange="renderSelect()">
 <hr/></div>
 
 
-
-
 <div> <h2> <font color=red> Danger zone </font> </h2>
 
 	<form  action=/setm/ method="POST">

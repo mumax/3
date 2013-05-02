@@ -200,6 +200,10 @@ Display: <select id="renderList" onchange="renderSelect()">
 	</select>
 </form>
 
+<script>
+	document.getElementById("renderList").value = renderQuant
+</script>
+
 <img id="display" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="display"/>
 
 <form  action=/setm/ method="POST">

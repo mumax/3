@@ -29,7 +29,7 @@ func init() { ExMask = StaggeredMask{buffered: buffered{autosave: autosave{name:
 var (
 	M       *buffered  // reduced magnetization (unit length)
 	AvgM    *scalar    // average magnetization
-	Torque  *setter    // torque (?) output handle
+	Torque  *setter    // torque/gamma0, in Tesla
 	B_eff   *setter    // effective field (T) output handle
 	B_demag *setter    // demag field (T) output handle
 	B_dmi   *adder     // demag field (T) output handle
@@ -43,7 +43,7 @@ var (
 
 // hidden quantities
 var (
-	mesh         data.Mesh
+	global_mesh  data.Mesh
 	torquebuffer *data.Slice
 	vol          *data.Slice
 	postStep     []func() // called on after every time step
@@ -68,13 +68,13 @@ type extField struct {
 func initialize() {
 
 	// these 2 GPU arrays are re-used to stored various quantities.
-	torquebuffer = cuda.NewSlice(3, &mesh)
+	torquebuffer = cuda.NewSlice(3, &global_mesh)
 
 	// cell volumes currently unused
-	vol = data.NilSlice(1, &mesh)
+	vol = data.NilSlice(1, &global_mesh)
 
 	// magnetization
-	M = newBuffered(cuda.NewSlice(3, &mesh), "m")
+	M = newBuffered(cuda.NewSlice(3, &global_mesh), "m", "")
 	quants["m"] = M
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return M.Average()
@@ -85,18 +85,18 @@ func initialize() {
 	Table.Add(AvgM)
 
 	// demag field
-	demag_ := cuda.NewDemag(&mesh)
-	B_demag = newSetter(3, &mesh, "B_demag", func(b *data.Slice, good bool) {
+	demag_ := cuda.NewDemag(&global_mesh)
+	B_demag = newSetter(3, &global_mesh, "B_demag", "T", func(b *data.Slice, good bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 
 	// exchange field
-	B_exch = newAdder(3, &mesh, "B_exch", func(dst *data.Slice) {
+	B_exch = newAdder(3, &global_mesh, "B_exch", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExMask.buffer, Aex(), Msat())
 	})
 
 	// Dzyaloshinskii-Moriya field
-	B_dmi = newAdder(3, &mesh, "B_dmi", func(dst *data.Slice) {
+	B_dmi = newAdder(3, &global_mesh, "B_dmi", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
@@ -104,7 +104,7 @@ func initialize() {
 	})
 
 	// uniaxial anisotropy
-	B_uni = newAdder(3, &mesh, "B_uni", func(dst *data.Slice) {
+	B_uni = newAdder(3, &global_mesh, "B_uni", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1[2], ku1[1], ku1[0], Msat())
@@ -112,7 +112,7 @@ func initialize() {
 	})
 
 	// external field
-	b_ext := newAdder(3, &mesh, "B_ext", func(dst *data.Slice) {
+	b_ext := newAdder(3, &global_mesh, "B_ext", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
 		for _, f := range extFields {
@@ -121,7 +121,7 @@ func initialize() {
 	})
 
 	// effective field
-	B_eff = newSetter(3, &mesh, "B_eff", func(dst *data.Slice, good bool) {
+	B_eff = newSetter(3, &global_mesh, "B_eff", "T", func(dst *data.Slice, good bool) {
 		B_demag.set(dst, good)
 		B_exch.addTo(dst, good)
 		B_dmi.addTo(dst, good)
@@ -131,13 +131,13 @@ func initialize() {
 	//quants["B_eff"] = B_eff
 
 	// llg torque
-	Torque = newSetter(3, &mesh, "torque", func(b *data.Slice, good bool) {
+	Torque = newSetter(3, &global_mesh, "torque", "", func(b *data.Slice, good bool) {
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
 	//quants["torque"] = Torque
 
 	// spin-transfer torque
-	STT = newAdder(3, &mesh, "stt", func(dst *data.Slice) {
+	STT = newAdder(3, &global_mesh, "stt", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()
@@ -191,17 +191,17 @@ func injectAndWait(task func()) {
 // Returns the mesh cell size in meters. E.g.:
 // 	cellsize_x := CellSize()[X]
 func CellSize() [3]float64 {
-	c := mesh.CellSize()
+	c := global_mesh.CellSize()
 	return [3]float64{c[Z], c[Y], c[X]} // swaps XYZ
 }
 
 func WorldSize() [3]float64 {
-	w := mesh.WorldSize()
+	w := global_mesh.WorldSize()
 	return [3]float64{w[Z], w[Y], w[X]} // swaps XYZ
 }
 
 func GridSize() [3]int {
-	n := mesh.Size()
+	n := global_mesh.Size()
 	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
 }
 
@@ -261,14 +261,14 @@ func RunInteractive() {
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	var zeromesh data.Mesh
-	if mesh != zeromesh {
+	if global_mesh != zeromesh {
 		free()
 	}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
-	mesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
-	log.Println("set mesh:", mesh.UserString())
+	global_mesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+	log.Println("set mesh:", global_mesh.UserString())
 	initialize()
 }
 
@@ -281,7 +281,7 @@ func free() {
 }
 
 func checkInited() {
-	if mesh.Size() == [3]int{0, 0, 0} {
+	if global_mesh.Size() == [3]int{0, 0, 0} {
 		log.Fatal("need to set mesh first")
 	}
 }

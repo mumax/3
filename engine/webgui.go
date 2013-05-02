@@ -30,7 +30,7 @@ type guistate struct {
 func (s *guistate) Time() float32             { return float32(Time) }
 func (s *guistate) ImWidth() int              { return ui.Mesh().Size()[2] }
 func (s *guistate) ImHeight() int             { return ui.Mesh().Size()[1] }
-func (s *guistate) Mesh() *data.Mesh          { return &mesh }
+func (s *guistate) Mesh() *data.Mesh          { return &global_mesh }
 func (s *guistate) Uname() string             { return uname }
 func (s *guistate) Version() string           { return VERSION }
 func (s *guistate) Pwd() string               { pwd, _ := os.Getwd(); return pwd }

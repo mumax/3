@@ -67,7 +67,7 @@ func hostbuf() *data.Slice {
 	default:
 		if nOutBuf < maxOutputQueLen {
 			nOutBuf++
-			return cuda.NewUnifiedSlice(3, &mesh)
+			return cuda.NewUnifiedSlice(3, &global_mesh)
 		}
 	}
 	panic("unreachable")

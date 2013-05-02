@@ -3,17 +3,22 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"path"
 )
 
 // Output Handle for a quantity that is stored on the GPU.
 type buffered struct {
-	buffer *data.Slice
 	autosave
+	buffer *data.Slice
+	shiftc [3]int  // shift count (total shifted cells in each direction)
+	shift  *scalar // returns total shift in meters.
 }
 
-func newBuffered(slice *data.Slice, name string) *buffered {
-	return &buffered{slice, autosave{name: name}}
+func newBuffered(slice *data.Slice, name, unit string) *buffered {
+	b := &buffered{newAutosave(name, unit, slice.Mesh()), slice, [3]int{}, nil}
+	b.shift = newScalar(3, name+"_shift", "m", b.getShift)
+	return b
 }
 
 // notify the handle that it may need to be saved
@@ -79,4 +84,48 @@ func (m *buffered) Set(src *data.Slice) {
 		src = data.Resample(src, m.buffer.Mesh().Size())
 	}
 	data.Copy(m.buffer, src)
+}
+
+func (b *buffered) SetFile(fname string) {
+	util.FatalErr(b.setFile(fname))
+}
+
+func (b *buffered) setFile(fname string) error {
+	m, _, err := data.ReadFile(fname)
+	if err != nil {
+		return err
+	}
+	b.Set(m)
+	return nil
+}
+
+//
+func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
+	nComp := b.NComp()
+	util.Argument(len(v) == nComp)
+	for c := 0; c < nComp; c++ {
+		cuda.SetCell(b.buffer, swapIndex(c, nComp), iz, iy, ix, float32(v[c]))
+	}
+}
+
+// returns shift in m
+func (s *buffered) getShift() []float64 {
+	c := s.mesh.CellSize()
+	return []float64{c[2] * float64(s.shiftc[0]), c[1] * float64(s.shiftc[1]), c[0] * float64(s.shiftc[2])}
+}
+
+// Shift the data over (shx, shy, shz cells), clamping boundary values.
+// Typically used in a PostStep function to center the magnetization on
+// the simulation window.
+func (b *buffered) Shift(shx, shy, shz int) {
+	m := b.buffer
+	m2 := cuda.GetBuffer(1, m.Mesh())
+	defer cuda.RecycleBuffer(m2)
+	b.shiftc[X] += shx
+	b.shiftc[Y] += shy
+	b.shiftc[Z] += shz
+	for c := 0; c < m.NComp(); c++ {
+		cuda.Shift(m2, m.Comp(c), [3]int{shz, shy, shx}) // ZYX !
+		data.Copy(m.Comp(c), m2)
+	}
 }

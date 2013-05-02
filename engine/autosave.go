@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/data"
 	"fmt"
 	"log"
 )
@@ -12,6 +13,12 @@ type autosave struct {
 	count   int     // Number of times it has been autosaved
 	autonum int     // File number for output, may be > count when saved manually
 	name    string
+	unit    string
+	mesh    *data.Mesh
+}
+
+func newAutosave(name, unit string, m *data.Mesh) autosave {
+	return autosave{name: name, unit: unit, mesh: m}
 }
 
 // Register a quantity for auto-saving every period (in seconds).

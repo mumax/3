@@ -4,7 +4,7 @@ import "code.google.com/p/mx3/data"
 
 // Landau-Lifshitz torque divided by gamma0:
 // 	- 1/(1+α²) [ m x B +  α (m/|m|) x (m x B) ]
-// 	torque in Tesla/s
+// 	torque in Tesla
 // 	m normalized
 // 	B in Tesla
 func LLGTorque(torque, m, B *data.Slice, alpha float32) {

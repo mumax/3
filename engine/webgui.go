@@ -68,7 +68,7 @@ const templText = `
 		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 10px; }
 		h1   { font-size: 28px; font-color: gray; }
-		h2   { font-size: 20px; }
+		h2   { font-size: 20px; font-color: gray; }
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
 		table{ border:"20"; }

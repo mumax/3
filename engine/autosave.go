@@ -19,7 +19,7 @@ type autosave struct {
 }
 
 func newAutosave(nComp int, name, unit string, m *data.Mesh) autosave {
-	return autosave{name: name, unit: unit, mesh: m}
+	return autosave{nComp: nComp, name: name, unit: unit, mesh: m}
 }
 
 // Register a quantity for auto-saving every period (in seconds).

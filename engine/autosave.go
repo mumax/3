@@ -12,12 +12,13 @@ type autosave struct {
 	start   float64 // Starting point
 	count   int     // Number of times it has been autosaved
 	autonum int     // File number for output, may be > count when saved manually
+	nComp   int     // number of components (scalar, vector, ...)
 	name    string
 	unit    string
 	mesh    *data.Mesh
 }
 
-func newAutosave(name, unit string, m *data.Mesh) autosave {
+func newAutosave(nComp int, name, unit string, m *data.Mesh) autosave {
 	return autosave{name: name, unit: unit, mesh: m}
 }
 
@@ -29,6 +30,8 @@ func (a *autosave) Autosave(period float64) {
 	a.start = Time
 	a.count = 0
 }
+
+func (b *autosave) NComp() int { return b.nComp }
 
 // returns true when the time is right to save.
 // after saving, saved() should be called

@@ -77,7 +77,7 @@ func initialize() {
 	M = newBuffered(cuda.NewSlice(3, &global_mesh), "m", "")
 	quants["m"] = M
 	AvgM = newScalar(3, "m", "", func() []float64 {
-		return M.Average()
+		return average(M)
 	})
 
 	// data table
@@ -151,9 +151,9 @@ func initialize() {
 	// solver
 	torqueFn := func(good bool) *data.Slice {
 		itime++
-		Table.arm(good) // if table output needed, quantities marked for update
-		M.touch(good)   // saves m if needed
-		ExMask.touch(good)
+		Table.arm(good)    // if table output needed, quantities marked for update
+		M.notifySave(good) // saves m if needed
+		ExMask.notifySave(good)
 		B_eff.set(torquebuffer, good)
 		Torque.set(torquebuffer, good)
 		STT.addTo(torquebuffer, good)

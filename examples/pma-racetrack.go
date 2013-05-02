@@ -36,7 +36,7 @@ func main() {
 
 	// Set post-step function that centers simulation window on domain wall.
 	PostStep(centerPMAWall)
-	Table.Add(Shift) // save the shift (=domain wall position) to data table.
+	//Table.Add(M, Shift) // save the shift (=domain wall position) to data table.
 
 	// Schedule output
 	M.Autosave(100e-12)

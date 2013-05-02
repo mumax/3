@@ -4,10 +4,10 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"path"
 )
 
-// Output Handle for a quantity that is stored on the GPU.
+// A buffered quantity is stored in GPU memory at all times.
+// E.g.: magnetization.
 type buffered struct {
 	autosave
 	buffer *data.Slice
@@ -16,66 +16,18 @@ type buffered struct {
 }
 
 func newBuffered(slice *data.Slice, name, unit string) *buffered {
-	b := &buffered{newAutosave(name, unit, slice.Mesh()), slice, [3]int{}, nil}
+	b := &buffered{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}, nil}
 	b.shift = newScalar(3, name+"_shift", "m", b.getShift)
 	return b
 }
 
-// notify the handle that it may need to be saved
-func (b *buffered) touch(goodstep bool) {
+// notify that it may need to be saved.
+func (b *buffered) notifySave(goodstep bool) {
 	if goodstep && b.needSave() {
-		b.Save()
+		panic("todo: buffered.save")
+		//b.Save()
 		b.saved()
 	}
-}
-
-func (b *buffered) NComp() int { return b.buffer.NComp() }
-
-// Save once, with automatically assigned file name.
-func (b *buffered) Save() {
-	goSaveCopy(b.fname(), b.buffer, Time)
-	b.autonum++
-}
-
-// Save once, with given file name.
-func (b *buffered) SaveAs(fname string) {
-	if !path.IsAbs(fname) {
-		fname = OD + fname
-	}
-	goSaveCopy(fname, b.buffer, Time)
-}
-
-// Get a host copy.
-// TODO: assume it can be called from another thread,
-// transfer asynchronously.
-func (m *buffered) Download() *data.Slice {
-	return m.buffer.HostCopy()
-}
-
-// Returns the average over all cells.
-// TODO: does not belong here
-func (b *buffered) Average() []float64 {
-	return average(b.buffer)
-}
-
-// Returns the maximum norm of a vector field.
-// TODO: only for vectors
-// TODO: does not belong here
-func (b *buffered) MaxNorm() float64 {
-	return cuda.MaxVecNorm(b.buffer)
-}
-
-// average in userspace XYZ order
-// does not yet take into account volume.
-// pass volume parameter, possibly nil?
-func average(b *data.Slice) []float64 {
-	nComp := b.NComp()
-	avg := make([]float64, nComp)
-	for i := range avg {
-		I := swapIndex(i, nComp)
-		avg[i] = float64(cuda.Sum(b.Comp(I))) / float64(b.Mesh().NCell())
-	}
-	return avg
 }
 
 // Replace the data by src. Auto rescales if needed.
@@ -108,12 +60,6 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	}
 }
 
-// returns shift in m
-func (s *buffered) getShift() []float64 {
-	c := s.mesh.CellSize()
-	return []float64{c[2] * float64(s.shiftc[0]), c[1] * float64(s.shiftc[1]), c[0] * float64(s.shiftc[2])}
-}
-
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
@@ -128,4 +74,45 @@ func (b *buffered) Shift(shx, shy, shz int) {
 		cuda.Shift(m2, m.Comp(c), [3]int{shz, shy, shx}) // ZYX !
 		data.Copy(m.Comp(c), m2)
 	}
+}
+
+// total shift in meters
+func (s *buffered) ShiftDistance() *scalar {
+	return s.shift
+}
+
+// returns shift of simulation window in m
+func (s *buffered) getShift() []float64 {
+	c := s.mesh.CellSize()
+	return []float64{-c[2] * float64(s.shiftc[0]), -c[1] * float64(s.shiftc[1]), -c[0] * float64(s.shiftc[2])}
+}
+
+// TODO: for all quants
+//// Save once, with automatically assigned file name.
+//func (b *buffered) Save() {
+//	goSaveCopy(b.fname(), b.buffer, Time)
+//	b.autonum++
+//}
+//
+//// Save once, with given file name.
+//func (b *buffered) SaveAs(fname string) {
+//	if !path.IsAbs(fname) {
+//		fname = OD + fname
+//	}
+//	goSaveCopy(fname, b.buffer, Time)
+//}
+
+// Get a host copy.
+// TODO: assume it can be called from another thread,
+// transfer asynchronously + sync
+func (m *buffered) Download() *data.Slice {
+	return m.buffer.HostCopy()
+}
+
+func (m *buffered) Average() []float64 {
+	return average(m)
+}
+
+func (m *buffered) getGPU() (s *data.Slice, mustRecycle bool) {
+	return m.buffer, false
 }

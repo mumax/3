@@ -30,7 +30,7 @@ func main() {
 	Ku1 = ConstVector(0, 0, 1.27E6)
 
 	M.Set(TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1)) // up-down domains with wall between Bloch and Néél type
-	M.SaveAs("m_init.dump")
+	//M.SaveAs("m_init.dump")
 
 	DMI = Const(0.1e-3) // J/m2.
 

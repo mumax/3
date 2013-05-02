@@ -12,7 +12,6 @@ func dash(w http.ResponseWriter, r *http.Request) {
 	injectAndWait(func() { util.FatalErr(dashtempl.Execute(w, ui)) })
 }
 
-//util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 const dashText = `
 <table> 
 <tr><td> step:        </td><td> {{.Solver.NSteps}} </td><td> &nbsp; &nbsp; undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  

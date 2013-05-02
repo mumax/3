@@ -6,14 +6,6 @@ import (
 	"path"
 )
 
-//// Returns the maximum norm of a vector field.
-//// TODO: only for vectors
-//// TODO: does not belong here
-//func (b *buffered) MaxNorm() float64 {
-//	return cuda.MaxVecNorm(b.buffer)
-//}
-//
-
 type getIface interface {
 	getGPU() (s *data.Slice, mustRecylce bool)
 }

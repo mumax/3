@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-// render image of quantity
+// Render image of quantity.
+// Accepts url: /render/name and /render/name/component
 func render(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path[len("/render/"):]
 	words := strings.Split(url, "/")

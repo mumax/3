@@ -25,13 +25,6 @@ func (b *setter) set(dst *data.Slice, goodstep bool) {
 	}
 }
 
-// TODO: rm: use set + recylce
-//func (b *setter) get_mustRecyle() *data.Slice {
-//	buffer := cuda.GetBuffer(b.nComp, b.mesh)
-//	b.setFn(buffer, false)
-//	return buffer
-//}
-
 func (b *setter) Download() *data.Slice {
 	buffer := cuda.GetBuffer(b.nComp, b.mesh)
 	defer cuda.RecycleBuffer(buffer)

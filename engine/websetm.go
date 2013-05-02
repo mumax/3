@@ -1,12 +1,11 @@
 package engine
 
-// Handlers for web control "ctl/"
-
 import (
 	"log"
 	"net/http"
 )
 
+// Handler that sets magnetization from file
 func setm(w http.ResponseWriter, r *http.Request) {
 	arg := r.FormValue("value")
 	log.Println("setm", arg)

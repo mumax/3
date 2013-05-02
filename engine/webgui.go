@@ -27,15 +27,15 @@ type guistate struct {
 	running, pleaseStop bool // todo: mv out of struct
 }
 
-func (s *guistate) Time() float32             { return float32(Time) }
-func (s *guistate) ImWidth() int              { return ui.Mesh().Size()[2] }
-func (s *guistate) ImHeight() int             { return ui.Mesh().Size()[1] }
-func (s *guistate) Mesh() *data.Mesh          { return &global_mesh }
-func (s *guistate) Uname() string             { return uname }
-func (s *guistate) Version() string           { return VERSION }
-func (s *guistate) Pwd() string               { pwd, _ := os.Getwd(); return pwd }
-func (s *guistate) Device() cu.Device         { return cu.CtxGetDevice() }
-func (s *guistate) Quants() map[string]getter { return quants }
+func (s *guistate) Time() float32                 { return float32(Time) }
+func (s *guistate) ImWidth() int                  { return ui.Mesh().Size()[2] }
+func (s *guistate) ImHeight() int                 { return ui.Mesh().Size()[1] }
+func (s *guistate) Mesh() *data.Mesh              { return &global_mesh }
+func (s *guistate) Uname() string                 { return uname }
+func (s *guistate) Version() string               { return VERSION }
+func (s *guistate) Pwd() string                   { pwd, _ := os.Getwd(); return pwd }
+func (s *guistate) Device() cu.Device             { return cu.CtxGetDevice() }
+func (s *guistate) Quants() map[string]downloader { return quants }
 
 // world size in nm.
 func (s *guistate) WorldNm() [3]float64 {
@@ -167,10 +167,10 @@ function show(id) {
 <div id=div_display> 
 
 <script>
-
 	var renderQuant = "m"; // TODO: don't forget on reload.
+	var renderComp = ""; 
 	var img = new Image();
-	img.src = "/render/m";
+	img.src = "/render/" + renderQuant;
 
 	function updateImg(){
 		img.src = "/render/" + renderQuant + "?" + new Date(); // date = cache breaker
@@ -188,6 +188,8 @@ function show(id) {
 	function renderSelect() {
 		var list=document.getElementById("renderList");
 		renderQuant=list.options[list.selectedIndex].text;
+		list=document.getElementById("renderComp");
+		renderComp=list.options[list.selectedIndex].text;
 		updateImg();
 	}
 </script>
@@ -198,11 +200,18 @@ Display: <select id="renderList" onchange="renderSelect()">
   			<option>{{$k}}</option>
 		{{end}}
 	</select>
+	<select id="renderComp" onchange="renderSelect()">
+  		<option></option>
+  		<option>x</option>
+  		<option>y</option>
+  		<option>z</option>
+	</select>
 </form>
-
 <script>
-	document.getElementById("renderList").value = renderQuant
+	document.getElementById("renderList").value = renderQuant;
 </script>
+
+
 
 <img id="display" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="display"/>
 
@@ -212,8 +221,6 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 
 </div><hr/>
-
-
 
 
 <div> <h2> parameters </h2> 
@@ -229,8 +236,6 @@ Display: <select id="renderList" onchange="renderSelect()">
 	<input type="submit" value="Submit"/>
 	</form>
 <hr/></div>
-
-
 
 
 <div><h2> mesh </h2> 

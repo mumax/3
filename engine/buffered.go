@@ -30,11 +30,11 @@ func (b *buffered) notifySave(goodstep bool) {
 }
 
 // Replace the data by src. Auto rescales if needed.
-func (m *buffered) Set(src *data.Slice) {
-	if src.Mesh().Size() != m.buffer.Mesh().Size() {
-		src = data.Resample(src, m.buffer.Mesh().Size())
+func (b *buffered) Set(src *data.Slice) {
+	if src.Mesh().Size() != b.buffer.Mesh().Size() {
+		src = data.Resample(src, b.buffer.Mesh().Size())
 	}
-	data.Copy(m.buffer, src)
+	data.Copy(b.buffer, src)
 }
 
 func (b *buffered) SetFile(fname string) {
@@ -63,44 +63,44 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
 func (b *buffered) Shift(shx, shy, shz int) {
-	m := b.buffer
-	m2 := cuda.GetBuffer(1, m.Mesh())
+	m2 := cuda.GetBuffer(1, b.buffer.Mesh())
 	defer cuda.RecycleBuffer(m2)
 	b.shiftc[X] += shx
 	b.shiftc[Y] += shy
 	b.shiftc[Z] += shz
-	for c := 0; c < m.NComp(); c++ {
-		cuda.Shift(m2, m.Comp(c), [3]int{shz, shy, shx}) // ZYX !
-		data.Copy(m.Comp(c), m2)
+	for c := 0; c < b.NComp(); c++ {
+		comp := b.buffer.Comp(c)
+		cuda.Shift(m2, comp, [3]int{shz, shy, shx}) // ZYX !
+		data.Copy(comp, m2)
 	}
 }
 
 // total shift in meters
-func (s *buffered) ShiftDistance() *scalar {
-	return s.shift
+func (b *buffered) ShiftDistance() *scalar {
+	return b.shift
 }
 
 // returns shift of simulation window in m
-func (s *buffered) getShift() []float64 {
-	c := s.mesh.CellSize()
-	return []float64{-c[2] * float64(s.shiftc[0]), -c[1] * float64(s.shiftc[1]), -c[0] * float64(s.shiftc[2])}
+func (b *buffered) getShift() []float64 {
+	c := b.mesh.CellSize()
+	return []float64{-c[2] * float64(b.shiftc[0]), -c[1] * float64(b.shiftc[1]), -c[0] * float64(b.shiftc[2])}
 }
 
 // Get a host copy.
 // TODO: assume it can be called from another thread,
 // transfer asynchronously + sync
-func (m *buffered) Download() *data.Slice {
-	return m.buffer.HostCopy()
+func (b *buffered) Download() *data.Slice {
+	return b.buffer.HostCopy()
 }
 
-func (m *buffered) Average() []float64 {
-	return average(m)
+func (b *buffered) Average() []float64 {
+	return average(b)
 }
 
-func (m *buffered) Save() {
-	saveAs(m, m.autoFname())
+func (b *buffered) Save() {
+	saveAs(b, b.autoFname())
 }
 
-func (m *buffered) getGPU() (s *data.Slice, mustRecycle bool) {
-	return m.buffer, false
+func (b *buffered) getGPU() (s *data.Slice, mustRecycle bool) {
+	return b.buffer, false
 }

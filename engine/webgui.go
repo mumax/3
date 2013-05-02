@@ -53,7 +53,6 @@ func (s *guistate) Solver() *cuda.Heun {
 	} else {
 		return Solver
 	}
-	return nil //rm for go 1.1
 }
 
 // surrogate solver if no real one is set, provides zero values for time step etc to template.

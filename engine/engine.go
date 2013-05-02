@@ -11,32 +11,32 @@ import (
 
 // User inputs
 var (
-	Aex     ScalFn        = Const(0)             // Exchange stiffness in J/m
-	ExMask  StaggeredMask                        // Mask that scales Aex/Msat between cells.
-	Msat    ScalFn        = Const(0)             // Saturation magnetization in A/m
-	Alpha   ScalFn        = Const(0)             // Damping constant
-	B_ext   VecFn         = ConstVector(0, 0, 0) // External field in T
-	DMI     ScalFn        = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1     VecFn         = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi      ScalFn        = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol ScalFn        = Const(1)             // Spin polarization of electrical current
-	J       VecFn         = ConstVector(0, 0, 0) // Electrical current density
+	Aex          ScalFn         = Const(0)             // Exchange stiffness in J/m
+	ExchangeMask *StaggeredMask                        // Mask that scales Aex/Msat between cells.
+	Msat         ScalFn         = Const(0)             // Saturation magnetization in A/m
+	Alpha        ScalFn         = Const(0)             // Damping constant
+	B_ext        VecFn          = ConstVector(0, 0, 0) // External field in T
+	DMI          ScalFn         = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1          VecFn          = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi           ScalFn         = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol      ScalFn         = Const(1)             // Spin polarization of electrical current
+	J            VecFn          = ConstVector(0, 0, 0) // Electrical current density
 )
 
 // Accessible quantities
 var (
-	M       *buffered  // reduced magnetization (unit length)
-	AvgM    *scalar    // average magnetization
-	Torque  *setter    // torque/gamma0, in Tesla
-	B_eff   *setter    // effective field (T) output handle
-	B_demag *setter    // demag field (T) output handle
-	B_dmi   *adder     // demag field (T) output handle
-	B_exch  *adder     // exchange field (T) output handle
-	B_uni   *adder     // field due to uniaxial anisotropy output handle
-	STT     *adder     // spin-transfer torque output handle
-	Table   *DataTable // output handle for tabular data (average magnetization etc.)
-	Time    float64    // time in seconds  // todo: hide? setting breaks autosaves
-	Solver  *cuda.Heun
+	M                 *buffered  // reduced magnetization (unit length)
+	AvgM              *scalar    // average magnetization
+	B_eff             *setter    // effective field (T) output handle
+	B_demag           *setter    // demag field (T) output handle
+	B_dmi             *adder     // demag field (T) output handle
+	B_exch            *adder     // exchange field (T) output handle
+	B_uni             *adder     // field due to uniaxial anisotropy output handle
+	STTorque          *adder     // spin-transfer torque output handle
+	LLGTorque, Torque *setter    // torque/gamma0, in Tesla
+	Table             *DataTable // output handle for tabular data (average magnetization etc.)
+	Time              float64    // time in seconds  // todo: hide? setting breaks autosaves
+	Solver            *cuda.Heun
 )
 
 // hidden quantities
@@ -87,12 +87,16 @@ func initialize() {
 	B_demag = newSetter(3, &global_mesh, "B_demag", "T", func(b *data.Slice, good bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
+	quants["B_demag"] = B_demag
 
 	// exchange field
 	B_exch = newAdder(3, &global_mesh, "B_exch", func(dst *data.Slice) {
-		cuda.AddExchange(dst, M.buffer, ExMask.buffer, Aex(), Msat())
+		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
-	ExMask = newStaggeredMask(&global_mesh, "exchmask", "")
+	quants["B_exch"] = B_exch
+
+	ExchangeMask = newStaggeredMask(&global_mesh, "exchmask", "")
+	quants["exchangemask"] = ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
 	B_dmi = newAdder(3, &global_mesh, "B_dmi", func(dst *data.Slice) {
@@ -101,6 +105,7 @@ func initialize() {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
 		}
 	})
+	quants["B_dmi"] = B_dmi
 
 	// uniaxial anisotropy
 	B_uni = newAdder(3, &global_mesh, "B_uni", func(dst *data.Slice) {
@@ -109,6 +114,7 @@ func initialize() {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
+	quants["B_uni"] = B_uni
 
 	// external field
 	b_ext := newAdder(3, &global_mesh, "B_ext", func(dst *data.Slice) {
@@ -118,6 +124,7 @@ func initialize() {
 			cuda.Madd2(dst, dst, f.mask, 1, float32(f.mul()))
 		}
 	})
+	//quants["B_ext"] = B_ext
 
 	// effective field
 	B_eff = newSetter(3, &global_mesh, "B_eff", "T", func(dst *data.Slice, good bool) {
@@ -127,16 +134,17 @@ func initialize() {
 		B_uni.addTo(dst, good)
 		b_ext.addTo(dst, good)
 	})
-	//quants["B_eff"] = B_eff
+	quants["B_eff"] = B_eff
 
 	// llg torque
-	Torque = newSetter(3, &global_mesh, "torque", "", func(b *data.Slice, good bool) {
+	LLGTorque = newSetter(3, &global_mesh, "llgtorque", "T", func(b *data.Slice, good bool) {
+		B_eff.set(b, good)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
-	//quants["torque"] = Torque
+	quants["llgtorque"] = LLGTorque
 
 	// spin-transfer torque
-	STT = newAdder(3, &global_mesh, "stt", func(dst *data.Slice) {
+	STTorque = newAdder(3, &global_mesh, "sttorque", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()
@@ -146,16 +154,23 @@ func initialize() {
 			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
+	quants["sttorque"] = STTorque
+
+	Torque = newSetter(3, &global_mesh, "torque", "T", func(b *data.Slice, good bool) {
+		LLGTorque.set(b, good)
+		STTorque.addTo(b, good)
+	})
+	quants["torque"] = Torque
 
 	// solver
 	torqueFn := func(good bool) *data.Slice {
 		itime++
 		Table.arm(good)    // if table output needed, quantities marked for update
 		M.notifySave(good) // saves m if needed
-		ExMask.notifySave(good)
-		B_eff.set(torquebuffer, good)
+		ExchangeMask.notifySave(good)
+
 		Torque.set(torquebuffer, good)
-		STT.addTo(torquebuffer, good)
+
 		Table.touch(good) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}

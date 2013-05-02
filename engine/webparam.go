@@ -71,7 +71,6 @@ func (m param) Comp() []int {
 	case *VecFn:
 		return []int{0, 1, 2}
 	}
-	return nil //rm for go1.1
 }
 
 func (m param) NComp() int { return len(m.Comp()) }
@@ -96,7 +95,6 @@ func (m param) Get() []float64 {
 		v := (*h)()
 		return v[:]
 	}
-	return nil //rm for go 1.1
 }
 
 func (m param) Set(v []float64) {

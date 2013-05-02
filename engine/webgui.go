@@ -199,6 +199,15 @@ function show(id) {
 		renderComp=list.options[list.selectedIndex].text;
 		updateImg();
 	}
+
+	function setRenderMin(m){
+		renderMin = m;
+		updateImg();
+	}
+	function setRenderMax(m){
+		renderMax = m;
+		updateImg();
+	}
 </script>
 
 <form>
@@ -213,8 +222,8 @@ Display: <select id="renderList" onchange="renderSelect()">
   		<option>y</option>
   		<option>z</option>
 	</select>
-    min:<input id=text size=8 name="renderMin" value="auto"> 
-    max:<input id=text size=8 name="renderMax" value="auto"> 
+    min:<input id=text size=8 name="renderMin" value="auto" onchange="setRenderMin(this.value);"> 
+    max:<input id=text size=8 name="renderMax" value="auto" onchange="setRenderMax(this.value);"> 
 </form>
 <script>
 	document.getElementById("renderList").value = renderQuant;

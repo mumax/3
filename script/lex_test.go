@@ -10,10 +10,8 @@ func TestLexer(t *testing.T) {
 	parse(src)
 }
 
-const testText = `
-	alpha=1
-	save(m, "/home/arne/m.dump", 1e-12);
+const testText = `alpha=1
+	save(m, "/home/arne/m.dump", 1e-12)
 	run(1e-9)
-	b=sin(2,pi)
-	// bye bye
+	b=sin(2,pi) // bye bye;
 `

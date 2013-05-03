@@ -10,25 +10,35 @@ import (
 func parse(src io.Reader) {
 
 	// parse list of tokens
-	tokens, err := lex(src)
+	root, err := lex(src)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	root.Print()
+	fmt.Println()
 
-	// rm
-	for _, t := range tokens {
-		fmt.Println(t)
+	root = splitlines(root)
+	root.Print()
+	fmt.Println()
+}
+
+func splitlines(n *node) *node {
+	spl := &node{}
+
+	group := &node{}
+	for _, c := range n.children {
+		if c.tok.Type() == EOL {
+			spl.addChild(group)
+			group = &node{}
+		} else {
+			group.addChild(c)
+		}
 	}
 
-	root := &node{typ: ROOTnode}
-	for _, t := range tokens {
-		root.addChild(&node{typ: TOKENnode, tok: t})
+	if len(group.children) != 0 {
+		spl.addChild(group)
 	}
 
-	root = split(root, EOL, STATEMENTnode)
-	for _, s := range root.children {
-		fmt.Println(s)
-	}
-
+	return spl
 }

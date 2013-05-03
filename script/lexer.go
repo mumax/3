@@ -11,7 +11,7 @@ type lexer struct {
 	err error
 }
 
-func lex(src io.Reader) ([]*token, error) {
+func lex(src io.Reader) (root *node, err error) {
 	l := newLexer(src)
 	var tokens []*token
 	for token := l.next(); token.typ != EOF; token = l.next() {
@@ -27,7 +27,12 @@ func lex(src io.Reader) ([]*token, error) {
 		tokens = append(tokens, token)
 	}
 	tokens = append(tokens, &token{EOL, ";", l.Position}) // add final endline
-	return tokens, nil
+
+	root = &node{}
+	for _, tok := range tokens {
+		root.addChild(&node{tok: tok})
+	}
+	return root, nil
 }
 
 func newLexer(src io.Reader) *lexer {

@@ -18,27 +18,28 @@ func parse(src io.Reader) {
 	root.Print()
 	fmt.Println()
 
-	root = splitlines(root)
+	root = splitLines(root)
 	root.Print()
 	fmt.Println()
 }
 
-func splitlines(n *node) *node {
-	spl := &node{typ: ROOTnode}
+func splitLines(n *node) *node {
+	split := &node{typ: ROOTnode}
 
-	group := &node{typ: STATEMENTnode}
+	line := &node{typ: STATEMENTnode}
 	for _, c := range n.children {
 		if c.tok.Type() == EOL {
-			spl.addChild(group)
-			group = &node{typ: STATEMENTnode}
+			split.addChild(line)
+			line = &node{typ: STATEMENTnode}
 		} else {
-			group.addChild(c)
+			line.addChild(c)
 		}
 	}
 
-	if len(group.children) != 0 {
-		spl.addChild(group)
+	// add trailing line (not terminated by ;)
+	if len(line.children) != 0 {
+		split.addChild(line)
 	}
 
-	return spl
+	return split
 }

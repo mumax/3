@@ -28,9 +28,9 @@ func lex(src io.Reader) (root *node, err error) {
 	}
 	tokens = append(tokens, &token{EOL, ";", l.Position}) // add final endline
 
-	root = &node{}
+	root = &node{typ: ROOTnode}
 	for _, tok := range tokens {
-		root.addChild(&node{tok: tok})
+		root.addChild(&node{typ: TOKENnode, tok: tok})
 	}
 	return root, nil
 }

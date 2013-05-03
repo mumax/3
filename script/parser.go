@@ -24,13 +24,13 @@ func parse(src io.Reader) {
 }
 
 func splitlines(n *node) *node {
-	spl := &node{}
+	spl := &node{typ: ROOTnode}
 
-	group := &node{}
+	group := &node{typ: STATEMENTnode}
 	for _, c := range n.children {
 		if c.tok.Type() == EOL {
 			spl.addChild(group)
-			group = &node{}
+			group = &node{typ: STATEMENTnode}
 		} else {
 			group.addChild(c)
 		}

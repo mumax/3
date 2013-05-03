@@ -6,6 +6,7 @@ import (
 
 type node struct {
 	tok        *token
+	typ        nodeType
 	prev, next *node
 	parent     *node
 	children   []*node
@@ -88,22 +89,22 @@ func (n *node) token() string {
 //	return pars
 //}
 //
-//type nodeType int
-//
-//const (
-//	ERRnode nodeType = iota
-//	ROOTnode
-//	BLOBnode
-//	TOKENnode
-//	STATEMENTnode
-//)
-//
-//// rm
+type nodeType int
+
+const (
+	ERRnode nodeType = iota
+	ROOTnode
+	BLOBnode
+	TOKENnode
+	STATEMENTnode
+)
+
+// rm
 func (n *node) String() string {
 	if n == nil {
 		return "nil"
 	} else {
-		return n.token()
+		return n.typ.String() + "_" + n.token()
 	}
 }
 
@@ -113,7 +114,7 @@ func (n *node) Print() {
 	for i := 0; i < ident; i++ {
 		fmt.Print("  ")
 	}
-	fmt.Println("node", n.token(), "\t\t[p:", n.prev, " n:", n.next, "]")
+	fmt.Println(n.String(), "\t\t[p:", n.prev, " n:", n.next, "]")
 	ident++
 	for _, c := range n.children {
 		c.Print()
@@ -121,15 +122,14 @@ func (n *node) Print() {
 	ident--
 }
 
-//
-//// rm
-//var nodeStr = map[nodeType]string{ERRnode: "err", ROOTnode: "root", TOKENnode: "tok", STATEMENTnode: "stmt", BLOBnode: "blob"}
-//
-//// rm
-//func (n nodeType) String() string {
-//	if str, ok := nodeStr[n]; ok{
-//		return str
-//	}else{
-//		return fmt.Sprint("type", int(n))
-//	}
-//}
+// rm
+var nodeStr = map[nodeType]string{ERRnode: "err", ROOTnode: "root", TOKENnode: "tok", STATEMENTnode: "stmt", BLOBnode: "blob"}
+
+// rm
+func (n nodeType) String() string {
+	if str, ok := nodeStr[n]; ok {
+		return str
+	} else {
+		return fmt.Sprint("type", int(n))
+	}
+}

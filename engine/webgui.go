@@ -170,8 +170,6 @@ function show(id) {
 <script>
 	var renderQuant = "m"; // TODO: don't forget on reload.
 	var renderComp = ""; 
-	var renderMin = "auto";
-	var renderMax = "auto";
 	var img = new Image();
 	img.src = "/render/" + renderQuant;
 
@@ -200,14 +198,6 @@ function show(id) {
 		updateImg();
 	}
 
-	function setRenderMin(m){
-		renderMin = m;
-		updateImg();
-	}
-	function setRenderMax(m){
-		renderMax = m;
-		updateImg();
-	}
 </script>
 
 <form>
@@ -222,8 +212,6 @@ Display: <select id="renderList" onchange="renderSelect()">
   		<option>y</option>
   		<option>z</option>
 	</select>
-    min:<input id=text size=8 name="renderMin" value="auto" onchange="setRenderMin(this.value);"> 
-    max:<input id=text size=8 name="renderMax" value="auto" onchange="setRenderMax(this.value);"> 
 </form>
 <script>
 	document.getElementById("renderList").value = renderQuant;
@@ -294,7 +282,9 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 <div id="footer">
 <center>
-{{.Uname}}
+{{.Uname}}<br/>
+Copyright 2012-2013 <a href="mailto:a.vansteenkiste@gmail.com">Arne Vansteenkiste</a>, <a href="http://dynamat.ugent.be">Dynamat group</a>, Ghent University, Belgium.<br/>
+You are free to modify and distribute this software under the terms of the <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3 license</a>.
 </center>
 </div>
 

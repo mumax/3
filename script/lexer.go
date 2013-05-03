@@ -3,10 +3,7 @@ package script
 import (
 	"fmt"
 	"io"
-	"strconv"
-	"strings"
 	"text/scanner"
-	"unicode"
 )
 
 type lexer struct {
@@ -14,18 +11,19 @@ type lexer struct {
 	err error
 }
 
-func lex(src io.Reader) ([]*node, error) {
+func lex(src io.Reader) ([]*token, error) {
 	l := newLexer(src)
-	var tokens []*node
-	for node := l.next(); node.typ != EOF; node = l.next() {
+	var tokens []*token
+	for token := l.next(); token.typ != EOF; token = l.next() {
 		if l.err != nil {
 			return nil, l.err
 		}
-		if node.typ == ERR {
-			return nil, fmt.Errorf("%v: illegal token: %v", node.Position, node.val)
+		if token.typ == ERR {
+			return nil, fmt.Errorf("%v: illegal token: %v", token.Position, token.val)
 		}
-		tokens = append(tokens, node)
+		tokens = append(tokens, token)
 	}
+	tokens = append(tokens, &token{EOF, "\n", l.Position})
 	return tokens, nil
 }
 
@@ -39,70 +37,12 @@ func newLexer(src io.Reader) *lexer {
 	return l
 }
 
-func (l *lexer) next() *node {
+func (l *lexer) next() *token {
 	tok := l.Scan()
 	if tok == scanner.EOF {
-		return &node{EOF, "", l.Position}
+		return &token{EOF, "", l.Position}
 	} else {
 		v := l.TokenText()
-		return &node{typeof(v), v, l.Position}
+		return &token{typeof(v), v, l.Position}
 	}
-}
-
-type node struct {
-	typ itemType
-	val string
-	scanner.Position
-}
-
-func (i node) isEOF() bool {
-	return i.typ == EOF || i.typ == EOL
-}
-
-func (i node) String() string {
-	return i.Position.String() + ":\t" + i.val + "\t" + i.typ.String()
-}
-
-type itemType int
-
-const (
-	ERR itemType = iota
-	EOF
-	EOL
-	ASSIGN
-	NUM
-	STRING
-	LPAREN
-	RPAREN
-	COMMA
-	IDENT
-)
-
-var typString = map[itemType]string{ERR: "ERR", EOF: "EOF", EOL: "EOL", ASSIGN: "=", NUM: "NUM", STRING: "STRING", LPAREN: "(", RPAREN: ")", IDENT: "IDENT", COMMA: ","}
-
-func (i itemType) String() string {
-	if str, ok := typString[i]; ok {
-		return str
-	} else {
-		return fmt.Sprint("type", int(i))
-	}
-
-}
-
-var typeMap = map[string]itemType{"\n": EOL, ";": EOL, "=": ASSIGN, "(": LPAREN, ")": RPAREN, ",": COMMA}
-
-func typeof(token string) itemType {
-	if t, ok := typeMap[token]; ok {
-		return t
-	}
-	if strings.HasPrefix(token, `"`) {
-		return STRING
-	}
-	if _, err := strconv.ParseFloat(token, 64); err == nil {
-		return NUM
-	}
-	if unicode.IsLetter(rune(token[0])) {
-		return IDENT
-	}
-	return ERR
 }

@@ -21,9 +21,12 @@ func lex(src io.Reader) ([]*token, error) {
 		if token.typ == ERR {
 			return nil, fmt.Errorf("%v: illegal token: %v", token.Position, token.val)
 		}
+		if token.typ == EOL {
+			token.val = ";"
+		}
 		tokens = append(tokens, token)
 	}
-	tokens = append(tokens, &token{EOF, "\n", l.Position})
+	tokens = append(tokens, &token{EOL, ";", l.Position}) // add final endline
 	return tokens, nil
 }
 

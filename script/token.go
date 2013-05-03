@@ -9,7 +9,7 @@ import (
 )
 
 type token struct {
-	typ itemType
+	typ tokenType
 	val string
 	scanner.Position
 }
@@ -18,14 +18,22 @@ func (i token) isEOF() bool {
 	return i.typ == EOF || i.typ == EOL
 }
 
+func (t *token) Type() tokenType {
+	if t == nil {
+		return ERR
+	} else {
+		return t.typ
+	}
+}
+
 func (i token) String() string {
 	return i.Position.String() + ":\t" + i.val + "\t" + i.typ.String()
 }
 
-type itemType int
+type tokenType int
 
 const (
-	ERR itemType = iota
+	ERR tokenType = iota
 	EOF
 	EOL
 	ASSIGN
@@ -37,9 +45,9 @@ const (
 	IDENT
 )
 
-var typString = map[itemType]string{ERR: "ERR", EOF: "EOF", EOL: "EOL", ASSIGN: "=", NUM: "NUM", STRING: "STRING", LPAREN: "(", RPAREN: ")", IDENT: "IDENT", COMMA: ","}
+var typString = map[tokenType]string{ERR: "ERR", EOF: "EOF", EOL: "EOL", ASSIGN: "=", NUM: "NUM", STRING: "STRING", LPAREN: "(", RPAREN: ")", IDENT: "IDENT", COMMA: ","}
 
-func (i itemType) String() string {
+func (i tokenType) String() string {
 	if str, ok := typString[i]; ok {
 		return str
 	} else {
@@ -48,9 +56,9 @@ func (i itemType) String() string {
 
 }
 
-var typeMap = map[string]itemType{"\n": EOL, ";": EOL, "=": ASSIGN, "(": LPAREN, ")": RPAREN, ",": COMMA}
+var typeMap = map[string]tokenType{"\n": EOL, ";": EOL, "=": ASSIGN, "(": LPAREN, ")": RPAREN, ",": COMMA}
 
-func typeof(token string) itemType {
+func typeof(token string) tokenType {
 	if t, ok := typeMap[token]; ok {
 		return t
 	}

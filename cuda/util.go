@@ -36,7 +36,6 @@ func make1DConf(N int) *config {
 	gr.X = NX
 	gr.Y = NY
 	gr.Z = 1
-	//util.Assert(gridSize.X*gridSize.Y*gridSize.Z*blockSize.X*blockSize.Y*blockSize.Z >= N)
 
 	return &config{gr, bl}
 }
@@ -56,9 +55,6 @@ func make2DConfSize(N1, N2, BLOCK int) *config {
 	gr.Y = NY
 	gr.Z = 1
 
-	//N := N1 * N2
-	//util.Assert(gr.X*gr.Y*gr.Z*bl.X*bl.Y*bl.Z >= N)
-
 	return &config{gr, bl}
 }
 
@@ -70,18 +66,3 @@ func make2DConf(N1, N2 int) *config {
 type config struct {
 	Grid, Block cu.Dim3
 }
-
-//// Register host memory for fast transfers,
-//// but only when flag -pagelock is true.
-//func MemHostRegister(slice []float32) {
-//	// do not fail on already registered memory.
-//	defer func() {
-//		err := recover()
-//		if err != nil && err != cu.ERROR_HOST_MEMORY_ALREADY_REGISTERED {
-//			panic(err)
-//		}
-//	}()
-//	if *nimble.Flag_pagelock {
-//		cu.MemHostRegister(unsafe.Pointer(&slice[0]), cu.SIZEOF_FLOAT32*int64(len(slice)), cu.MEMHOSTREGISTER_PORTABLE)
-//	}
-//}

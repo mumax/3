@@ -55,22 +55,6 @@ func MaxVecDiff(x, y *data.Slice) float64 {
 	return math.Sqrt(float64(copyback(out)))
 }
 
-//// Maximum difference between the two arrays.
-//// 	max_i abs(a[i] - b[i])
-//func MaxDiff(a, b safe.Float32s) float32 {
-//	return reduce2(a, b, 0, ptx.K_reducemaxdiff)
-//}
-
-// Maximum of all elements.
-//func Max(in *data.Slice) float32 {
-//	return reduce1(in, -math.MaxFloat32, k_reducemax)
-//}
-
-// Minimum of all elements.
-//func Min(in *data.Slice) float32 {
-//	return reduce1(in, math.MaxFloat32, k_reducemin)
-//}
-
 var reduceBuffers chan unsafe.Pointer // pool of 1-float CUDA buffers for reduce
 
 // return a 1-float CUDA reduction buffer from a pool

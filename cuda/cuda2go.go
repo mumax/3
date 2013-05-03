@@ -183,7 +183,7 @@ func filter(token string) bool {
 }
 
 // Filter comments and ".file" entries from ptx code.
-// They spoil the git history
+// They spoil the git history.
 func filterptx(fname string) string {
 	f, err := os.Open(fname)
 	util.PanicErr(err)

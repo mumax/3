@@ -17,7 +17,8 @@ func TestLexer(t *testing.T) {
 
 const testText = `
 	alpha=1
-	m.set("/home/arne/m.dump")
-	run(1e-9+i)
-	b=sin(2*pi*f*t)
+	m.save("/home/arne/m.dump", 1e-12);
+	run(1e-9)
+	b=sin(2*pi)
+	// bye bye
 `

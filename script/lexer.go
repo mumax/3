@@ -1,8 +1,12 @@
 package script
 
 import (
+	"fmt"
 	"io"
+	"strconv"
+	"strings"
 	"text/scanner"
+	"unicode"
 )
 
 type lexer struct {
@@ -40,14 +44,42 @@ type itemType int
 const (
 	ERR itemType = iota
 	EOF
+	EOL
+	ASSIGN
+	NUM
+	STRING
+	LPAREN
+	RPAREN
+	COMMA
+	DOT
+	IDENT
 )
 
-var typString = map[itemType]string{ERR: "ERR", EOF: "EOF"}
+var typString = map[itemType]string{ERR: "ERR", EOF: "EOF", EOL: "EOL", ASSIGN: "=", NUM: "NUM", STRING: "STRING", LPAREN: "(", RPAREN: ")", IDENT: "IDENT", COMMA: ",", DOT: "."}
 
 func (i itemType) String() string {
-	return typString[i]
+	if str, ok := typString[i]; ok {
+		return str
+	} else {
+		return fmt.Sprint("type", int(i))
+	}
+
 }
 
-func typeof(tok string) itemType {
+var typeMap = map[string]itemType{"\n": EOL, ";": EOL, "=": ASSIGN, "(": LPAREN, ")": RPAREN, ",": COMMA, ".": DOT}
+
+func typeof(token string) itemType {
+	if t, ok := typeMap[token]; ok {
+		return t
+	}
+	if strings.HasPrefix(token, `"`) {
+		return STRING
+	}
+	if _, err := strconv.ParseFloat(token, 64); err == nil {
+		return NUM
+	}
+	if unicode.IsLetter(rune(token[0])) {
+		return IDENT
+	}
 	return ERR
 }

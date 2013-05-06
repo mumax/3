@@ -228,6 +228,10 @@ func GridSize() [3]int {
 	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
 }
 
+func Nx() int { return GridSize()[X] }
+func Ny() int { return GridSize()[Y] }
+func Nz() int { return GridSize()[Z] }
+
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	log.Println("run for", seconds, "s")

@@ -20,6 +20,7 @@ LD_LIBARY_PATH ignored by build
 hide buffered.Mesh(), .Comp() etc. (ZYX axes)
 define shift with same sign as domain wall movement
 log.FatalErr: print line number of caller?
+mask shift, set etc can LAUNCH_FAIL if mask is nil. should nicely check
 
 
 new features:

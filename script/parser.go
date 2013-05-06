@@ -21,6 +21,10 @@ func parse(src io.Reader) {
 	root = splitLines(root)
 	root.Print()
 	fmt.Println()
+
+	root.do_parens()
+	root.Print()
+	fmt.Println()
 }
 
 func splitLines(n *node) *node {
@@ -42,4 +46,46 @@ func splitLines(n *node) *node {
 	}
 
 	return split
+}
+
+func (n *node) do_parens() {
+
+	for _, c := range n.children {
+		c.do_parens()
+	}
+
+	for i := 0; i < n.NChild(); i++ {
+
+		if n.children[i].tok.Type() == RPAREN {
+
+			var j int
+			for j = i; j >= 0; j-- {
+				if n.children[j].tok.Type() == LPAREN {
+					break
+				}
+			}
+			if j < 0 {
+				panic("unmatched )")
+			}
+
+			par := &node{typ: PARENSnode, parent: n}
+			for k := j + 1; k < i; k++ {
+				par.addChild(n.children[k])
+			}
+
+			var newkids []*node
+			newkids = append(newkids, n.children[:j]...)
+			newkids = append(newkids, par)
+			newkids = append(newkids, n.children[i+1:]...)
+			n.children = newkids
+			for _, cc := range n.children {
+				cc.parent = n
+			}
+			i = j
+		}
+	}
+}
+
+func (n *node) do_commas() {
+
 }

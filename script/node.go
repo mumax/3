@@ -5,20 +5,13 @@ import (
 )
 
 type node struct {
-	tok        *token
-	typ        nodeType
-	prev, next *node
-	parent     *node
-	children   []*node
+	tok      *token
+	typ      nodeType
+	parent   *node
+	children []*node
 }
 
 func (n *node) addChild(c *node) {
-	c.next = nil
-	if n.NChild() > 0 {
-		prev := n.children[n.NChild()-1]
-		c.prev = prev
-		prev.next = c
-	}
 	n.children = append(n.children, c)
 	c.parent = n
 }
@@ -97,6 +90,7 @@ const (
 	BLOBnode
 	TOKENnode
 	STATEMENTnode
+	PARENSnode
 )
 
 // rm
@@ -114,7 +108,7 @@ func (n *node) Print() {
 	for i := 0; i < ident; i++ {
 		fmt.Print("  ")
 	}
-	fmt.Println(n.String(), "\t\t[p:", n.prev, " n:", n.next, "]")
+	fmt.Println(n.String())
 	ident++
 	for _, c := range n.children {
 		c.Print()
@@ -123,7 +117,7 @@ func (n *node) Print() {
 }
 
 // rm
-var nodeStr = map[nodeType]string{ERRnode: "err", ROOTnode: "root", TOKENnode: "tok", STATEMENTnode: "stmt", BLOBnode: "blob"}
+var nodeStr = map[nodeType]string{ERRnode: "err", ROOTnode: "root", TOKENnode: "tok", STATEMENTnode: "stmt", BLOBnode: "blob", PARENSnode: "()"}
 
 // rm
 func (n nodeType) String() string {

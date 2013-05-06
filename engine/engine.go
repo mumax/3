@@ -11,16 +11,17 @@ import (
 
 // User inputs
 var (
-	Aex          ScalFn         = Const(0)             // Exchange stiffness in J/m
-	ExchangeMask *StaggeredMask                        // Mask that scales Aex/Msat between cells.
-	Msat         ScalFn         = Const(0)             // Saturation magnetization in A/m
-	Alpha        ScalFn         = Const(0)             // Damping constant
-	B_ext        VecFn          = ConstVector(0, 0, 0) // External field in T
-	DMI          ScalFn         = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          VecFn          = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi           ScalFn         = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol      ScalFn         = Const(1)             // Spin polarization of electrical current
-	J            VecFn          = ConstVector(0, 0, 0) // Electrical current density
+	Aex          ScalFn         = Const(0) // Exchange stiffness in J/m
+	ExchangeMask *StaggeredMask            // Mask that scales Aex/Msat between cells.
+	KuMask       *Mask
+	Msat         ScalFn = Const(0)             // Saturation magnetization in A/m
+	Alpha        ScalFn = Const(0)             // Damping constant
+	B_ext        VecFn  = ConstVector(0, 0, 0) // External field in T
+	DMI          ScalFn = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1          VecFn  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi           ScalFn = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol      ScalFn = Const(1)             // Spin polarization of electrical current
+	J            VecFn  = ConstVector(0, 0, 0) // Electrical current density
 )
 
 // Accessible quantities
@@ -41,13 +42,18 @@ var (
 
 // hidden quantities
 var (
-	global_mesh  data.Mesh
+	globalmesh   data.Mesh
 	torquebuffer *data.Slice
 	vol          *data.Slice
 	postStep     []func() // called on after every time step
 	extFields    []extField
 	itime        int //unique integer time stamp
 )
+
+func global_mesh() *data.Mesh {
+	checkInited()
+	return &globalmesh
+}
 
 // Add an additional space-dependent field to B_ext.
 // The field is mask * multiplier, where mask typically contains space-dependent scaling values of the order of 1.
@@ -66,13 +72,13 @@ type extField struct {
 func initialize() {
 
 	// these 2 GPU arrays are re-used to stored various quantities.
-	torquebuffer = cuda.NewSlice(3, &global_mesh)
+	torquebuffer = cuda.NewSlice(3, global_mesh())
 
 	// cell volumes currently unused
-	vol = data.NilSlice(1, &global_mesh)
+	vol = data.NilSlice(1, global_mesh())
 
 	// magnetization
-	M = newBuffered(cuda.NewSlice(3, &global_mesh), "m", "")
+	M = newBuffered(cuda.NewSlice(3, global_mesh()), "m", "")
 	quants["m"] = M
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return average(M)
@@ -83,23 +89,23 @@ func initialize() {
 	Table.Add(AvgM)
 
 	// demag field
-	demag_ := cuda.NewDemag(&global_mesh)
-	B_demag = newSetter(3, &global_mesh, "B_demag", "T", func(b *data.Slice, good bool) {
+	demag_ := cuda.NewDemag(global_mesh())
+	B_demag = newSetter(3, global_mesh(), "B_demag", "T", func(b *data.Slice, good bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
 	})
 	quants["B_demag"] = B_demag
 
 	// exchange field
-	B_exch = newAdder(3, &global_mesh, "B_exch", "T", func(dst *data.Slice) {
+	B_exch = newAdder(3, global_mesh(), "B_exch", "T", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
 	quants["B_exch"] = B_exch
 
-	ExchangeMask = newStaggeredMask(&global_mesh, "exchmask", "")
+	ExchangeMask = newStaggeredMask(global_mesh(), "exchangemask", "")
 	quants["exchangemask"] = ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
-	B_dmi = newAdder(3, &global_mesh, "B_dmi", "T", func(dst *data.Slice) {
+	B_dmi = newAdder(3, global_mesh(), "B_dmi", "T", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
@@ -108,16 +114,19 @@ func initialize() {
 	quants["B_dmi"] = B_dmi
 
 	// uniaxial anisotropy
-	B_uni = newAdder(3, &global_mesh, "B_uni", "T", func(dst *data.Slice) {
+	B_uni = newAdder(3, global_mesh(), "B_uni", "T", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
-			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1[2], ku1[1], ku1[0], Msat())
+			cuda.AddUniaxialAnisotropy(dst, M.buffer, KuMask.buffer, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
 	quants["B_uni"] = B_uni
 
+	KuMask = newMask(3, global_mesh(), "kumask", "")
+	quants["KuMask"] = KuMask
+
 	// external field
-	b_ext := newAdder(3, &global_mesh, "B_ext", "T", func(dst *data.Slice) {
+	b_ext := newAdder(3, global_mesh(), "B_ext", "T", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
 		for _, f := range extFields {
@@ -127,7 +136,7 @@ func initialize() {
 	//quants["B_ext"] = B_ext
 
 	// effective field
-	B_eff = newSetter(3, &global_mesh, "B_eff", "T", func(dst *data.Slice, good bool) {
+	B_eff = newSetter(3, global_mesh(), "B_eff", "T", func(dst *data.Slice, good bool) {
 		B_demag.set(dst, good)
 		B_exch.addTo(dst, good)
 		B_dmi.addTo(dst, good)
@@ -137,14 +146,14 @@ func initialize() {
 	quants["B_eff"] = B_eff
 
 	// llg torque
-	LLGTorque = newSetter(3, &global_mesh, "llgtorque", "T", func(b *data.Slice, good bool) {
+	LLGTorque = newSetter(3, global_mesh(), "llgtorque", "T", func(b *data.Slice, good bool) {
 		B_eff.set(b, good)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
 	quants["llgtorque"] = LLGTorque
 
 	// spin-transfer torque
-	STTorque = newAdder(3, &global_mesh, "sttorque", "T", func(dst *data.Slice) {
+	STTorque = newAdder(3, global_mesh(), "sttorque", "T", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()
@@ -156,7 +165,7 @@ func initialize() {
 	})
 	quants["sttorque"] = STTorque
 
-	Torque = newSetter(3, &global_mesh, "torque", "T", func(b *data.Slice, good bool) {
+	Torque = newSetter(3, global_mesh(), "torque", "T", func(b *data.Slice, good bool) {
 		LLGTorque.set(b, good)
 		STTorque.addTo(b, good)
 	})
@@ -205,17 +214,17 @@ func injectAndWait(task func()) {
 // Returns the mesh cell size in meters. E.g.:
 // 	cellsize_x := CellSize()[X]
 func CellSize() [3]float64 {
-	c := global_mesh.CellSize()
+	c := global_mesh().CellSize()
 	return [3]float64{c[Z], c[Y], c[X]} // swaps XYZ
 }
 
 func WorldSize() [3]float64 {
-	w := global_mesh.WorldSize()
+	w := global_mesh().WorldSize()
 	return [3]float64{w[Z], w[Y], w[X]} // swaps XYZ
 }
 
 func GridSize() [3]int {
-	n := global_mesh.Size()
+	n := global_mesh().Size()
 	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
 }
 
@@ -275,14 +284,14 @@ func RunInteractive() {
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	var zeromesh data.Mesh
-	if global_mesh != zeromesh {
+	if globalmesh != zeromesh {
 		free()
 	}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
-	global_mesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
-	log.Println("set mesh:", global_mesh.UserString())
+	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+	log.Println("set mesh:", global_mesh().UserString())
 	initialize()
 }
 
@@ -294,8 +303,9 @@ func free() {
 	dlQue = nil
 }
 
+// TODO: rename checkEningeInited or so
 func checkInited() {
-	if global_mesh.Size() == [3]int{0, 0, 0} {
+	if globalmesh.Size() == [3]int{0, 0, 0} {
 		log.Fatal("need to set mesh first")
 	}
 }

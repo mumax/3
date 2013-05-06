@@ -28,7 +28,7 @@ func setmesh(w http.ResponseWriter, r *http.Request) {
 
 	injectAndWait(func() {
 		var mh *data.Slice
-		if global_mesh.Size() != [3]int{} {
+		if globalmesh.Size() != [3]int{} { // if set. TODO: nicer api
 			mh = M.buffer.HostCopy()
 		}
 		SetMesh(N[0], N[1], N[2], c[0], c[1], c[2])

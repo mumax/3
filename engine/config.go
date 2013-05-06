@@ -16,7 +16,7 @@ func Vortex(circ, pol int) *data.Slice {
 	util.Argument(circ == 1 || circ == -1)
 	util.Argument(pol == 1 || pol == -1)
 
-	m := data.NewSlice(3, &global_mesh)
+	m := data.NewSlice(3, global_mesh())
 	v := m.Vectors()
 	cy, cz := len(v[0][0])/2, len(v[0][0][0])/2
 	for i := range v[0] {
@@ -47,10 +47,10 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) *da
 	m1 := vec(mx1, my1, mz1)
 	m2 := vec(mx2, my2, mz2)
 	mw := vec(mxwall, mywall, mzwall)
-	m := data.NewSlice(3, &global_mesh)
-	Nz := global_mesh.Size()[0]
-	Ny := global_mesh.Size()[1]
-	Nx := global_mesh.Size()[2]
+	m := data.NewSlice(3, global_mesh())
+	Nz := global_mesh().Size()[0]
+	Ny := global_mesh().Size()[1]
+	Nx := global_mesh().Size()[2]
 	util.Argument(Nx >= 4)
 	v := m.Vectors()
 	for c := range mw {
@@ -75,7 +75,7 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) *da
 // Returns a uniform magnetization state. E.g.:
 // 	M.Set(Uniform(1, 0, 0)) // saturated along X
 func Uniform(mx, my, mz float64) *data.Slice {
-	m := data.NewSlice(3, &global_mesh)
+	m := data.NewSlice(3, global_mesh())
 	v := vec(mx, my, mz)
 	list := m.Host()
 	for c := 0; c < m.NComp(); c++ {

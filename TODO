@@ -19,6 +19,7 @@ cuda.Recycle: check if you own it, disable contents to avoid use-after-recylce.
 LD_LIBARY_PATH ignored by build
 hide buffered.Mesh(), .Comp() etc. (ZYX axes)
 define shift with same sign as domain wall movement
+log.FatalErr: print line number of caller?
 
 
 new features:

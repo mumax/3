@@ -19,9 +19,9 @@ func main() {
 	defer Close()
 
 	// Geometry
-	Nx, Ny, Nz := 256, 64, 1
+	nx, ny, nz := 256, 64, 1
 	cellx, celly, cellz := 3e-9, 3e-9, 30e-9
-	SetMesh(Nx, Ny, Nz, cellx, celly, cellz)
+	SetMesh(nx, ny, nz, cellx, celly, cellz)
 
 	// Material parameters
 	Msat = Const(860e3)
@@ -30,9 +30,9 @@ func main() {
 	SpinPol = Const(0.56)
 
 	// Initial magnetization close to vortex wall
-	M.SetRegion(0, 0, 0, Nx/2, Ny, Nz, Uniform(1, 0, 0))          // left half:  ->
-	M.SetRegion(Nx/2, 0, 0, Nx, Ny, Nz, Uniform(-1, 0, 0))        // right half: <-
-	M.SetRegion(Nx/2-Ny/2, 0, 0, Nx/2+Ny/2, Ny, Nz, Vortex(1, 1)) // center: vortex
+	M.SetRegion(0, 0, 0, nx/2, ny, nz, Uniform(1, 0, 0))          // left half:  ->
+	M.SetRegion(nx/2, 0, 0, nx, ny, nz, Uniform(-1, 0, 0))        // right half: <-
+	M.SetRegion(nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(1, 1)) // center: vortex
 
 	// Remove surface charges from left (mx=1) and right (mx=-1) sides
 	// to mimic infinitely long wire.

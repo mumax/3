@@ -16,9 +16,9 @@ func main() {
 	defer Close()
 
 	// Geometry
-	Nx, Ny, Nz := 128, 256, 1
+	nx, ny, nz := 128, 256, 1
 	cellx, celly, cellz := 2e-9, 2e-9, 1e-9
-	SetMesh(Nx, Ny, Nz, cellx, celly, cellz)
+	SetMesh(nx, ny, nz, cellx, celly, cellz)
 
 	// Material parameters
 	Msat = Const(600e3)

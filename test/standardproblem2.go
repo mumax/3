@@ -26,15 +26,15 @@ func main() {
 	d := I * lex
 	Sz, Sy, Sx := 0.1*d, d, 5*d
 
-	Nz, Ny, Nx := 1, 1, 1
-	for Sy/float64(Ny) > 0.75*lex {
-		Ny *= 2
+	nz, ny, nx := 1, 1, 1
+	for Sy/float64(ny) > 0.75*lex {
+		ny *= 2
 	}
-	for Sx/float64(Nx) > 0.75*lex {
-		Nx *= 2
+	for Sx/float64(nx) > 0.75*lex {
+		nx *= 2
 	}
 
-	SetMesh(Nx, Ny, Nz, Sx/float64(Nx), Sy/float64(Ny), Sz/float64(Nz))
+	SetMesh(nx, ny, nz, Sx/float64(nx), Sy/float64(ny), Sz/float64(nz))
 
 	M.Set(Uniform(1, 0.1, 0))
 

@@ -4,14 +4,25 @@ import (
 	"fmt"
 )
 
-func nop() interface{} { return "nop" }
-
-func makeVariable(name string)fn{
-	return func()interface{}{return name}
+type node interface{
+	eval()interface{}
 }
 
-func call(function string, args []fn) interface{} {
-	str := fmt.Sprint(function, "(")
+
+type nop struct{}
+func(n*nop)eval()interface{}{return nil}
+
+type variable struct{ name string }
+func (n*variable)eval()interface{}{return n.name}
+
+
+type call struct{
+	funcname string
+	args []node 
+}
+
+func(n*call) eval() interface{} {
+	str := fmt.Sprint(n.funcname, "(")
 	for _, f := range args {
 		str += fmt.Sprint(f(), " ")
 	}

@@ -28,7 +28,7 @@ func newLexer(src io.Reader) *lexer {
 	return l
 }
 
-func (l *lexer) unexpected() fn {
+func (l *lexer) unexpected() node {
 	err := ""
 	if l.typ == ERR {
 		err = fmt.Sprint(l.scan.Pos(), ":syntax error:", l.str)

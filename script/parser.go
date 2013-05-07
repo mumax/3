@@ -5,21 +5,7 @@ import (
 	"strconv"
 )
 
-// TODO rm
-func enter(msg ...interface{}) {
-	fmt.Println(">>", fmt.Sprint(msg...))
-}
-func exit(msg...interface{}){
-	fmt.Println("<<", fmt.Sprint(msg...))
-}
-
-// node of the parse tree
-type fn func() interface{}
-
-func parseLine(l *lexer) fn {
-	enter("line")
-	defer exit("line")
-
+func parseLine(l *lexer) node {
 	l.advance()
 	switch l.typ {
 	case EOF:
@@ -27,45 +13,40 @@ func parseLine(l *lexer) fn {
 	case EOL:
 		return nop // empty line
 	default:
-		fn := parseExpr(l)
+		node := parseExpr(l)
 		l.advance()
 		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
-			return fn
-		}else{
-		return l.unexpected()
+			return node
+		} else {
+			return l.unexpected()
 		}
 	}
 }
 
-func parseIdent(l *lexer) fn {
-	enter("ident")
-	defer exit("ident")
+func parseIdent(l *lexer) node {
 	switch l.peekTyp {
 	case LPAREN:
 		return parseCall(l)
 	case ASSIGN:
 		return parseAssign(l)
 	default:
-		return makeVariable(l.str) 
+		return &variable(l.str)
 	}
 }
 
-func parseExpr(l*lexer)fn{
-	enter("expr")
-	defer exit("expr")
-
-	switch l.typ{
-		case IDENT: return parseIdent(l)
-		case NUM: return parseNum(l)
-		default: return l.unexpected()
+func parseExpr(l *lexer) node {
+	switch l.typ {
+	case IDENT:
+		return parseIdent(l)
+	case NUM:
+		return parseNum(l)
+	default:
+		return l.unexpected()
 		// TODO: handle parens, commas
 	}
 }
 
-
-func parseCall(l *lexer) fn {
-	enter("call")
-	defer exit("call")
+func parseCall(l *lexer) node {
 	funcname := l.str
 	l.advance()
 	assert(l.typ == LPAREN)
@@ -73,11 +54,10 @@ func parseCall(l *lexer) fn {
 	if err != nil {
 		return err
 	} else {
-		return func() interface{} { return call(funcname, args) }
-	}
+		return &call{funcname, args} }
 }
 
-func parseAssign(l *lexer) fn {
+func parseAssign(l *lexer) node {
 	enter("assign")
 	defer exit("assign")
 
@@ -86,10 +66,10 @@ func parseAssign(l *lexer) fn {
 	assert(l.typ == ASSIGN)
 	l.advance()
 	right := parseExpr(l)
-	return func()interface{}{ fmt.Println(left, "=", right); return nil}
+	return func() interface{} { fmt.Println(left, "=", right); return nil }
 }
 
-func parseNum(l *lexer) fn {
+func parseNum(l *lexer) node {
 	enter("num")
 	defer exit("num")
 	val, err := strconv.ParseFloat(l.str, 64)
@@ -99,7 +79,7 @@ func parseNum(l *lexer) fn {
 	return func() interface{} { return val }
 }
 
-func parseArgs(l *lexer) (args []fn, err fn) {
+func parseArgs(l *lexer) (args []node, err node) {
 	enter("args")
 	defer exit("args")
 	l.advance()
@@ -124,6 +104,8 @@ func parseArgs(l *lexer) (args []fn, err fn) {
 	}
 }
 
-func assert(test bool){
-	if !test{panic("assertion failed")}
+func assert(test bool) {
+	if !test {
+		panic("assertion failed")
+	}
 }

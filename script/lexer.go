@@ -28,14 +28,12 @@ func newLexer(src io.Reader) *lexer {
 	return l
 }
 
-func (l *lexer) unexpected() node {
-	err := ""
+func (l *lexer) unexpected() error {
 	if l.typ == ERR {
-		err = fmt.Sprint(l.scan.Pos(), ":syntax error:", l.str)
+		return fmt.Errorf("%v: syntax error: %v", l.scan.Pos(), l.str)
 	} else {
-		err = fmt.Sprint(l.scan.Pos(), ":unexpected:", l.typ, ":", l.str)
+		return fmt.Errorf("%v: unexpected %v: %v", l.scan.Pos(), l.typ, l.str)
 	}
-	return func() interface{} { return err }
 }
 
 func (l *lexer) advance() {

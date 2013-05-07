@@ -1,7 +1,6 @@
 package script
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -11,14 +10,14 @@ func parseLine(l *lexer) node {
 	case EOF:
 		return nil // marks end of input
 	case EOL:
-		return nop // empty line
+		return &nop{} // empty line
 	default:
 		node := parseExpr(l)
 		l.advance()
 		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
 			return node
 		} else {
-			return l.unexpected()
+			panic(l.unexpected())
 		}
 	}
 }
@@ -30,7 +29,7 @@ func parseIdent(l *lexer) node {
 	case ASSIGN:
 		return parseAssign(l)
 	default:
-		return &variable(l.str)
+		return &variable{l.str}
 	}
 }
 
@@ -41,7 +40,7 @@ func parseExpr(l *lexer) node {
 	case NUM:
 		return parseNum(l)
 	default:
-		return l.unexpected()
+		panic(l.unexpected())
 		// TODO: handle parens, commas
 	}
 }
@@ -54,19 +53,17 @@ func parseCall(l *lexer) node {
 	if err != nil {
 		return err
 	} else {
-		return &call{funcname, args} }
+		return &call{funcname, args}
+	}
 }
 
 func parseAssign(l *lexer) node {
-	enter("assign")
-	defer exit("assign")
-
 	left := l.str
 	l.advance()
 	assert(l.typ == ASSIGN)
 	l.advance()
 	right := parseExpr(l)
-	return func() interface{} { fmt.Println(left, "=", right); return nil }
+	return &assign{left, right}
 }
 
 func parseNum(l *lexer) node {

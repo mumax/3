@@ -6,51 +6,37 @@ import (
 	"text/scanner"
 )
 
-type lexer struct {
-	scanner.Scanner
-	err error
+// TODO rm
+func log(msg ...interface{}) {
+	fmt.Println("--", fmt.Sprint(msg...))
 }
 
-func lex(src io.Reader) (root *node, err error) {
-	l := newLexer(src)
-	var tokens []*token
-	for token := l.next(); token.typ != EOF; token = l.next() {
-		if l.err != nil {
-			return nil, l.err
-		}
-		if token.typ == ERR {
-			return nil, fmt.Errorf("%v: illegal token: %v", token.Position, token.val)
-		}
-		if token.typ == EOL {
-			token.val = ";"
-		}
-		tokens = append(tokens, token)
-	}
-	tokens = append(tokens, &token{EOL, ";", l.Position}) // add final endline
-
-	root = &node{typ: ROOTnode}
-	for _, tok := range tokens {
-		root.addChild(&node{typ: TOKENnode, tok: tok})
-	}
-	return root, nil
+type lexer struct {
+	scan scanner.Scanner
+	err  error
+	str  string
+	typ  tokenType
 }
 
 func newLexer(src io.Reader) *lexer {
 	l := new(lexer)
-	l.Init(src)
-	l.Whitespace = 1<<'\t' | 1<<' '
-	l.Scanner.Error = func(s *scanner.Scanner, msg string) {
-		l.err = fmt.Errorf("%v: syntax error: %v", l.Scanner.Position, msg)
+	l.scan.Init(src)
+	l.scan.Whitespace = 1<<'\t' | 1<<' '
+	l.scan.Error = func(s *scanner.Scanner, msg string) {
+		l.err = fmt.Errorf("%v: syntax error: %v", l.scan.Position, msg)
 	}
 	return l
 }
 
-func (l *lexer) next() *token {
-	tok := l.Scan()
-	if tok == scanner.EOF {
-		return &token{EOF, "", l.Position}
-	} else {
-		v := l.TokenText()
-		return &token{typeof(v), v, l.Position}
-	}
+func (l *lexer) unexpected() fn {
+	err := fmt.Sprint(l.scan.Pos(), ":unexpected:", l.typ, ":", l.str)
+	log("err=", err)
+	return func() interface{} { return err }
+}
+
+func (l *lexer) advance() {
+	l.scan.Scan()
+	l.str = l.scan.TokenText()
+	l.typ = typeof(l.str)
+	log("advance:", l.typ, ":", l.str)
 }

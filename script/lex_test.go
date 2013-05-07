@@ -2,17 +2,21 @@ package script
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
 func TestLexer(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
-	parse(src)
+	l := newLexer(src)
+	for f := parseLine(l); f != nil; f = parseLine(l) {
+		fmt.Println("call:", f())
+	}
 }
 
-const testText = `alpha=1
-	save(avg(m), "m.dump", 1e-12)
-	run(1e-9)
-	b=sin(2,(3,4)) // bye bye;
-	c=(1,2,3)
+const testText = `
+	a()
+	a(1) 
+	a(1, 2) 
+	a(b(), c(d()))
 `

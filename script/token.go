@@ -4,31 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"text/scanner"
 	"unicode"
 )
-
-type token struct {
-	typ tokenType
-	val string
-	scanner.Position
-}
-
-func (i token) isEOF() bool {
-	return i.typ == EOF || i.typ == EOL
-}
-
-func (t *token) Type() tokenType {
-	if t == nil {
-		return ERR
-	} else {
-		return t.typ
-	}
-}
-
-func (i token) String() string {
-	return i.Position.String() + ":\t" + i.val + "\t" + i.typ.String()
-}
 
 type tokenType int
 
@@ -59,6 +36,9 @@ func (i tokenType) String() string {
 var typeMap = map[string]tokenType{"\n": EOL, ";": EOL, "=": ASSIGN, "(": LPAREN, ")": RPAREN, ",": COMMA}
 
 func typeof(token string) tokenType {
+	if token == "" {
+		return EOF
+	}
 	if t, ok := typeMap[token]; ok {
 		return t
 	}

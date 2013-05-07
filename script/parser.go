@@ -1,91 +1,87 @@
 package script
 
 import (
-	"io"
-	//"code.google.com/p/mx3/util"
-	"fmt"
-	"os"
+	"strconv"
 )
 
-func parse(src io.Reader) {
+// node of the parse tree
+type fn func() interface{}
 
-	// parse list of tokens
-	root, err := lex(src)
+func parseLine(l *lexer) fn {
+	log("inside line")
+	l.advance()
+	if l.typ == EOF {
+		return nil // marks end of input
+	}
+	if l.typ == EOL {
+		return nop
+	}
+	if l.typ == IDENT {
+		fn := afterIdent(l)
+		l.advance()
+		if l.typ == EOL || l.typ == EOF {
+			return fn
+		}
+	}
+	return l.unexpected()
+}
+
+func afterIdent(l *lexer) fn {
+	log("after ident")
+	ident := l.str
+	l.advance()
+	switch l.typ {
+	default:
+		return l.unexpected()
+	case LPAREN:
+		return insideCall(l, ident)
+	case ASSIGN:
+		return insideAssign(l, ident)
+	}
+}
+
+func insideCall(l *lexer, ident string) fn {
+	log("inside call")
+	args, err := insideArgs(l)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
+	} else {
+		return func() interface{} { return eval(ident, args) }
 	}
-	root.Print()
-	fmt.Println()
-
-	root = splitLines(root)
-	root.Print()
-	fmt.Println()
-
-	root.do_parens()
-	root.Print()
-	fmt.Println()
 }
 
-func splitLines(n *node) *node {
-	split := &node{typ: ROOTnode}
+func insideAssign(l *lexer, ident string) fn {
+	log("inside assign")
+	return nil
+}
 
-	line := &node{typ: STATEMENTnode}
-	for _, c := range n.children {
-		if c.tok.Type() == EOL {
-			split.addChild(line)
-			line = &node{typ: STATEMENTnode}
-		} else {
-			line.addChild(c)
+func afterNum(l *lexer) fn {
+	val, err := strconv.ParseFloat(l.str, 64)
+	if err != nil {
+		panic(err)
+	}
+	return func() interface{} { return val }
+}
+
+func insideArgs(l *lexer) (args []fn, err fn) {
+	l.advance()
+	for {
+		switch l.typ {
+		case RPAREN:
+			return args, nil
+		case NUM:
+			args = append(args, afterNum(l))
+		case IDENT:
+			args = append(args, afterIdent(l))
+		default:
+			return nil, l.unexpected()
+		}
+		l.advance()
+		if l.typ == COMMA {
+			l.advance()
+			if l.typ == RPAREN {
+				return nil, l.unexpected()
+			}
 		}
 	}
-
-	// add trailing line (not terminated by ;)
-	if len(line.children) != 0 {
-		split.addChild(line)
-	}
-
-	return split
-}
-
-func (n *node) do_parens() {
-
-	for _, c := range n.children {
-		c.do_parens()
-	}
-
-	for i := 0; i < n.NChild(); i++ {
-
-		if n.children[i].tok.Type() == RPAREN {
-
-			var j int
-			for j = i; j >= 0; j-- {
-				if n.children[j].tok.Type() == LPAREN {
-					break
-				}
-			}
-			if j < 0 {
-				panic("unmatched )")
-			}
-
-			par := &node{typ: PARENSnode, parent: n}
-			for k := j + 1; k < i; k++ {
-				par.addChild(n.children[k])
-			}
-
-			var newkids []*node
-			newkids = append(newkids, n.children[:j]...)
-			newkids = append(newkids, par)
-			newkids = append(newkids, n.children[i+1:]...)
-			n.children = newkids
-			for _, cc := range n.children {
-				cc.parent = n
-			}
-			i = j
-		}
-	}
-}
-
-func (n *node) do_commas() {
-
 }

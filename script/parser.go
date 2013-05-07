@@ -26,15 +26,14 @@ func parseLine(l *lexer) fn {
 		return nil // marks end of input
 	case EOL:
 		return nop // empty line
-	case IDENT:
-		fn := parseIdent(l)
+	default:
+		fn := parseExpr(l)
 		l.advance()
 		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
 			return fn
-		}
-		fallthrough
-	default:
+		}else{
 		return l.unexpected()
+		}
 	}
 }
 
@@ -48,6 +47,18 @@ func parseIdent(l *lexer) fn {
 		return parseAssign(l)
 	default:
 		return makeVariable(l.str) 
+	}
+}
+
+func parseExpr(l*lexer)fn{
+	enter("expr")
+	defer exit("expr")
+
+	switch l.typ{
+		case IDENT: return parseIdent(l)
+		case NUM: return parseNum(l)
+		default: return l.unexpected()
+		// TODO: handle parens, commas
 	}
 }
 
@@ -69,7 +80,13 @@ func parseCall(l *lexer) fn {
 func parseAssign(l *lexer) fn {
 	enter("assign")
 	defer exit("assign")
-	return nil
+
+	left := l.str
+	l.advance()
+	assert(l.typ == ASSIGN)
+	l.advance()
+	right := parseExpr(l)
+	return func()interface{}{ fmt.Println(left, "=", right); return nil}
 }
 
 func parseNum(l *lexer) fn {

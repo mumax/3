@@ -16,9 +16,15 @@ func TestParser(t *testing.T) {
 }
 
 const testText = `
-	a()
-	a(1) 
-	a(1, 2) 
-	a(b(), c(d()))
+	a
+	1
+	a() 
+	a(1)
 	a(b)
+	a(1, 2) 
+	a(1, b(c()), d)
+	x y
+	9 x
+	x 9
+	()
 `

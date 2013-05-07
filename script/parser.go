@@ -16,20 +16,21 @@ type fn func() interface{}
 func parseLine(l *lexer) fn {
 	log("inside line")
 	l.advance()
-	if l.typ == EOF {
+	switch l.typ {
+	case EOF:
 		return nil // marks end of input
-	}
-	if l.typ == EOL {
-		return nop
-	}
-	if l.typ == IDENT {
+	case EOL:
+		return nop // empty line
+	case IDENT:
 		fn := afterIdent(l)
 		l.advance()
-		if l.typ == EOL || l.typ == EOF {
-			return fn
+		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
+			return fn 
 		}
+		fallthrough
+	default:
+		return l.unexpected()
 	}
-	return l.unexpected()
 }
 
 func afterIdent(l *lexer) fn {

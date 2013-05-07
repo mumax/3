@@ -7,9 +7,11 @@ import (
 )
 
 type lexer struct {
-	scan scanner.Scanner
-	str  string
-	typ  tokenType
+	scan    scanner.Scanner
+	str     string    // last read token
+	typ     tokenType // last read token type
+	peekStr string    // peek-ahead value for str
+	peekTyp tokenType // peek-ahead value for typ
 }
 
 func newLexer(src io.Reader) *lexer {
@@ -17,9 +19,12 @@ func newLexer(src io.Reader) *lexer {
 	l.scan.Init(src)
 	l.scan.Whitespace = 1<<'\t' | 1<<' '
 	l.scan.Error = func(s *scanner.Scanner, msg string) {
-		l.str = fmt.Sprintf("%v: syntax error: %v", l.scan.Position, msg)
-		l.typ = ERR
+		l.peekStr = fmt.Sprintf("%v: syntax error: %v", l.scan.Position, msg)
+		l.peekTyp = ERR
 	}
+	l.scan.Scan() // peek
+	l.peekStr = l.scan.TokenText()
+	l.peekTyp = typeof(l.peekStr)
 	return l
 }
 
@@ -34,8 +39,10 @@ func (l *lexer) unexpected() fn {
 }
 
 func (l *lexer) advance() {
-	l.scan.Scan()
-	l.str = l.scan.TokenText()
-	l.typ = typeof(l.str)
+	l.str = l.peekStr
+	l.typ = l.peekTyp
 	log("advance:", l.typ, ":", l.str)
+	l.scan.Scan()
+	l.peekStr = l.scan.TokenText()
+	l.peekTyp = typeof(l.peekStr)
 }

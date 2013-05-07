@@ -21,6 +21,4 @@ const testText = `
 	a(1, 2) 
 	a(b(), c(d()))
 	a(b)
-	@
-	"
 `

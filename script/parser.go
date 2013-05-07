@@ -6,15 +6,20 @@ import (
 )
 
 // TODO rm
-func log(msg ...interface{}) {
-	fmt.Println("--", fmt.Sprint(msg...))
+func enter(msg ...interface{}) {
+	fmt.Println(">>", fmt.Sprint(msg...))
+}
+func exit(msg...interface{}){
+	fmt.Println("<<", fmt.Sprint(msg...))
 }
 
 // node of the parse tree
 type fn func() interface{}
 
 func parseLine(l *lexer) fn {
-	log("inside line")
+	enter("line")
+	defer exit("line")
+
 	l.advance()
 	switch l.typ {
 	case EOF:
@@ -22,10 +27,10 @@ func parseLine(l *lexer) fn {
 	case EOL:
 		return nop // empty line
 	case IDENT:
-		fn := afterIdent(l)
+		fn := parseIdent(l)
 		l.advance()
 		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
-			return fn 
+			return fn
 		}
 		fallthrough
 	default:
@@ -33,37 +38,43 @@ func parseLine(l *lexer) fn {
 	}
 }
 
-func afterIdent(l *lexer) fn {
-	log("after ident")
-	ident := l.str
-	l.advance()
-	switch l.typ {
-	default:
-		return l.unexpected()
+func parseIdent(l *lexer) fn {
+	enter("ident")
+	defer exit("ident")
+	switch l.peekTyp {
 	case LPAREN:
-		return insideCall(l, ident)
+		return parseCall(l)
 	case ASSIGN:
-		return insideAssign(l, ident)
+		return parseAssign(l)
+	default:
+		return makeVariable(l.str) 
 	}
 }
 
-func insideCall(l *lexer, ident string) fn {
-	log("inside call")
-	args, err := insideArgs(l)
+
+func parseCall(l *lexer) fn {
+	enter("call")
+	defer exit("call")
+	funcname := l.str
+	l.advance()
+	assert(l.typ == LPAREN)
+	args, err := parseArgs(l)
 	if err != nil {
 		return err
 	} else {
-		return func() interface{} { return eval(ident, args) }
+		return func() interface{} { return call(funcname, args) }
 	}
 }
 
-func insideAssign(l *lexer, ident string) fn {
-	log("inside assign")
+func parseAssign(l *lexer) fn {
+	enter("assign")
+	defer exit("assign")
 	return nil
 }
 
-func afterNum(l *lexer) fn {
-	log("inside num")
+func parseNum(l *lexer) fn {
+	enter("num")
+	defer exit("num")
 	val, err := strconv.ParseFloat(l.str, 64)
 	if err != nil {
 		panic(err)
@@ -71,17 +82,18 @@ func afterNum(l *lexer) fn {
 	return func() interface{} { return val }
 }
 
-func insideArgs(l *lexer) (args []fn, err fn) {
-	log("inside args")
+func parseArgs(l *lexer) (args []fn, err fn) {
+	enter("args")
+	defer exit("args")
 	l.advance()
 	for {
 		switch l.typ {
 		case RPAREN:
 			return args, nil
 		case NUM:
-			args = append(args, afterNum(l))
+			args = append(args, parseNum(l))
 		case IDENT:
-			args = append(args, afterIdent(l))
+			args = append(args, parseIdent(l))
 		default:
 			return nil, l.unexpected()
 		}
@@ -93,4 +105,8 @@ func insideArgs(l *lexer) (args []fn, err fn) {
 			}
 		}
 	}
+}
+
+func assert(test bool){
+	if !test{panic("assertion failed")}
 }

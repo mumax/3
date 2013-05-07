@@ -41,7 +41,7 @@ func (l *lexer) unexpected() fn {
 func (l *lexer) advance() {
 	l.str = l.peekStr
 	l.typ = l.peekTyp
-	log("advance:", l.typ, ":", l.str)
+	fmt.Println("--advance:", l.typ, ":", l.str)
 	l.scan.Scan()
 	l.peekStr = l.scan.TokenText()
 	l.peekTyp = typeof(l.peekStr)

@@ -6,8 +6,12 @@ import (
 
 func nop() interface{} { return "nop" }
 
-func eval(ident string, args []fn) interface{} {
-	str := fmt.Sprint(ident, "(")
+func makeVariable(name string)fn{
+	return func()interface{}{return name}
+}
+
+func call(function string, args []fn) interface{} {
+	str := fmt.Sprint(function, "(")
 	for _, f := range args {
 		str += fmt.Sprint(f(), " ")
 	}

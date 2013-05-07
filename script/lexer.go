@@ -6,14 +6,8 @@ import (
 	"text/scanner"
 )
 
-// TODO rm
-func log(msg ...interface{}) {
-	fmt.Println("--", fmt.Sprint(msg...))
-}
-
 type lexer struct {
 	scan scanner.Scanner
-	err  error
 	str  string
 	typ  tokenType
 }
@@ -23,14 +17,19 @@ func newLexer(src io.Reader) *lexer {
 	l.scan.Init(src)
 	l.scan.Whitespace = 1<<'\t' | 1<<' '
 	l.scan.Error = func(s *scanner.Scanner, msg string) {
-		l.err = fmt.Errorf("%v: syntax error: %v", l.scan.Position, msg)
+		l.str = fmt.Sprintf("%v: syntax error: %v", l.scan.Position, msg)
+		l.typ = ERR
 	}
 	return l
 }
 
 func (l *lexer) unexpected() fn {
-	err := fmt.Sprint(l.scan.Pos(), ":unexpected:", l.typ, ":", l.str)
-	log("err=", err)
+	err := ""
+	if l.typ == ERR {
+		err = fmt.Sprint(l.scan.Pos(), ":syntax error:", l.str)
+	} else {
+		err = fmt.Sprint(l.scan.Pos(), ":unexpected:", l.typ, ":", l.str)
+	}
 	return func() interface{} { return err }
 }
 

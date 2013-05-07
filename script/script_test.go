@@ -6,11 +6,12 @@ import (
 	"testing"
 )
 
-func TestLexer(t *testing.T) {
+func TestParser(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
 	l := newLexer(src)
 	for f := parseLine(l); f != nil; f = parseLine(l) {
-		fmt.Println("call:", f())
+		fmt.Println(f())
+		fmt.Println("\n=====")
 	}
 }
 
@@ -19,4 +20,7 @@ const testText = `
 	a(1) 
 	a(1, 2) 
 	a(b(), c(d()))
+	a(b)
+	@
+	"
 `

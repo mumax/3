@@ -1,8 +1,14 @@
 package script
 
 import (
+	"fmt"
 	"strconv"
 )
+
+// TODO rm
+func log(msg ...interface{}) {
+	fmt.Println("--", fmt.Sprint(msg...))
+}
 
 // node of the parse tree
 type fn func() interface{}
@@ -56,6 +62,7 @@ func insideAssign(l *lexer, ident string) fn {
 }
 
 func afterNum(l *lexer) fn {
+	log("inside num")
 	val, err := strconv.ParseFloat(l.str, 64)
 	if err != nil {
 		panic(err)
@@ -64,6 +71,7 @@ func afterNum(l *lexer) fn {
 }
 
 func insideArgs(l *lexer) (args []fn, err fn) {
+	log("inside args")
 	l.advance()
 	for {
 		switch l.typ {

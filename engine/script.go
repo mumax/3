@@ -5,10 +5,20 @@ import (
 	"io"
 )
 
+func (s *ScalFn) Eval() interface{} {
+	return (*s)()
+}
+
+func (s *ScalFn) Assign(e script.Expr) {
+	(*s) = func() float64 { return e.Eval().(float64) }
+}
+
 func RunScript(src io.Reader) {
 
 	p := script.NewParser(src)
 	p.AddFloat("t", &Time)
+	p.AddVar("Aex", &Aex)
+
 	p.Exec()
 
 }

@@ -18,20 +18,20 @@ func NewParser(src io.Reader) Parser {
 }
 
 func (p *Parser) Exec() error {
-	expr, err := p.parseLine()
+	Expr, err := p.parseLine()
 	for err != io.EOF {
 		if err == nil {
-			fmt.Println("eval", expr, ":", expr.eval())
+			fmt.Println("eval", Expr, ":", Expr.Eval())
 		} else {
 			fmt.Println("err:", err)
 			return err
 		}
-		expr, err = p.parseLine()
+		Expr, err = p.parseLine()
 	}
 	return nil
 }
 
-func (p *Parser) parseLine() (ex expr, err error) {
+func (p *Parser) parseLine() (ex Expr, err error) {
 	defer func() {
 		panc := recover()
 		if panc != nil {
@@ -51,17 +51,17 @@ func (p *Parser) parseLine() (ex expr, err error) {
 	case EOL:
 		return &nop{}, nil // empty line
 	default:
-		expr := p.parseExpr()
+		Expr := p.parseExpr()
 		p.advance()
 		if p.typ == EOL || p.typ == EOF { // statement has to be terminated
-			return expr, nil
+			return Expr, nil
 		} else {
 			panic(p.unexpected())
 		}
 	}
 }
 
-func (p *Parser) parseIdent() expr {
+func (p *Parser) parseIdent() Expr {
 	switch p.peekTyp {
 	case LPAREN:
 		return p.parseCall()
@@ -72,7 +72,7 @@ func (p *Parser) parseIdent() expr {
 	}
 }
 
-func (p *Parser) parseExpr() expr {
+func (p *Parser) parseExpr() Expr {
 	switch p.typ {
 	case IDENT:
 		return p.parseIdent()
@@ -84,7 +84,7 @@ func (p *Parser) parseExpr() expr {
 	}
 }
 
-func (p *Parser) parseCall() expr {
+func (p *Parser) parseCall() Expr {
 	funcname := p.str
 	p.advance()
 	assert(p.typ == LPAREN)
@@ -92,7 +92,7 @@ func (p *Parser) parseCall() expr {
 	return &call{funcname, args}
 }
 
-func (p *Parser) parseAssign() expr {
+func (p *Parser) parseAssign() Expr {
 	left := p.str
 	p.advance()
 	assert(p.typ == ASSIGN)
@@ -101,7 +101,7 @@ func (p *Parser) parseAssign() expr {
 	return p.newAssign(left, right)
 }
 
-func (p *Parser) parseNum() expr {
+func (p *Parser) parseNum() Expr {
 	val, err := strconv.ParseFloat(p.str, 64)
 	if err != nil {
 		panic(err)
@@ -109,8 +109,8 @@ func (p *Parser) parseNum() expr {
 	return num(val)
 }
 
-func (p *Parser) parseArgs() []expr {
-	var args []expr
+func (p *Parser) parseArgs() []Expr {
+	var args []Expr
 	p.advance()
 	for {
 		switch p.typ {

@@ -4,14 +4,9 @@ import (
 	"fmt"
 )
 
-type expr interface {
-	eval() interface{}
-	String() string
-}
-
 type nop struct{}
 
-func (e *nop) eval() interface{} {
+func (e *nop) Eval() interface{} {
 	return nil
 }
 
@@ -21,10 +16,10 @@ func (e *nop) String() string {
 
 type call struct {
 	funcname string
-	args     []expr
+	args     []Expr
 }
 
-func (e *call) eval() interface{} {
+func (e *call) Eval() interface{} {
 	return nil
 }
 
@@ -39,10 +34,10 @@ func (e *call) String() string {
 
 type num float64
 
-func (n num) eval() interface{} {
+func (n num) Eval() interface{} {
 	return float64(n)
 }
 
 func (n num) String() string {
-	return fmt.Sprint(n.eval())
+	return fmt.Sprint(n.Eval())
 }

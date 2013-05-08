@@ -4,17 +4,17 @@ import (
 	"fmt"
 )
 
-func (p *Parser) newAssign(name string, rhs expr) assignment {
+func (p *Parser) newAssign(name string, rhs Expr) assignment {
 	return assignment{p.getvar(name), rhs}
 }
 
 type assignment struct {
-	left  variable
-	right expr
+	left  Variable
+	right Expr
 }
 
-func (e assignment) eval() interface{} {
-	e.left.assign(e.right) // no eval here
+func (e assignment) Eval() interface{} {
+	e.left.Assign(e.right) // no eval here
 	return nil
 }
 

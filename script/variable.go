@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-type variable interface {
-	expr
-	assign(expr)
+type Variable interface {
+	Expr
+	Assign(Expr)
 }
 
 type float struct {
@@ -17,10 +17,10 @@ func (f float) String() string {
 	return fmt.Sprintf("float@%p", f.addr)
 }
 
-func (f float) eval() interface{} {
+func (f float) Eval() interface{} {
 	return *(f.addr)
 }
 
-func (f float) assign(rhs expr) {
-	*(f.addr) = rhs.eval().(float64)
+func (f float) Assign(rhs Expr) {
+	*(f.addr) = rhs.Eval().(float64)
 }

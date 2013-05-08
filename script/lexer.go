@@ -36,10 +36,6 @@ func (l *lexer) unexpected() error {
 	}
 }
 
-func (l *lexer) undefined() error {
-	return fmt.Errorf("%v: undefined: %v", l.scan.Pos(), l.str)
-}
-
 func (l *lexer) advance() {
 	l.str = l.peekStr
 	l.typ = l.peekTyp

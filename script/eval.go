@@ -19,18 +19,6 @@ func (e *nop) String() string {
 	return ";"
 }
 
-type variable struct {
-	name string
-}
-
-func (e *variable) eval() interface{} {
-	return e.name
-}
-
-func (e *variable) String() string {
-	return e.name
-}
-
 type call struct {
 	funcname string
 	args     []expr
@@ -47,20 +35,6 @@ func (e *call) String() string {
 	}
 	str += ")"
 	return str
-}
-
-type assign struct {
-	left  string
-	right expr
-}
-
-func (e *assign) eval() interface{} {
-	fmt.Println(e.left, "=", e.right)
-	return nil
-}
-
-func (e *assign) String() string {
-	return fmt.Sprint(e.left, "=", e.right)
 }
 
 type num float64

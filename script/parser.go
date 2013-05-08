@@ -8,10 +8,13 @@ import (
 
 type parser struct {
 	*lexer
+	world
 }
 
 func newParser(src io.Reader) parser {
-	return parser{newLexer(src)}
+	p := parser{lexer: newLexer(src)}
+	p.world.init()
+	return p
 }
 
 func (p *parser) ParseLine() (ex expr, err error) {
@@ -51,7 +54,7 @@ func (p *parser) parseIdent() expr {
 	case ASSIGN:
 		return p.parseAssign()
 	default:
-		return &variable{p.str}
+		return p.getvar(p.str)
 	}
 }
 
@@ -81,7 +84,7 @@ func (p *parser) parseAssign() expr {
 	assert(p.typ == ASSIGN)
 	p.advance()
 	right := p.parseExpr()
-	return &assign{left, right}
+	return p.newAssign(left, right)
 }
 
 func (p *parser) parseNum() expr {

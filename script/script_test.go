@@ -7,9 +7,14 @@ import (
 	"testing"
 )
 
+var (
+	a float64
+)
+
 func TestParser(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
 	p := newParser(src)
+	p.addFloat("a", &a)
 	expr, err := p.ParseLine()
 	for err != io.EOF {
 		if err == nil {
@@ -23,7 +28,8 @@ func TestParser(t *testing.T) {
 
 const testText = `
 	a
-	1
+	a=1
+	a
 	a() 
 	a(1)
 	a(b)

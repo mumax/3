@@ -79,6 +79,8 @@ func (p *Parser) parseExpr() Expr {
 		return p.parseNum()
 	case LPAREN:
 		return List(p.parseArgs())
+	case STRING:
+		return String(p.str[1 : len(p.str)-1]) // remove quotes
 	default:
 		panic(p.unexpected())
 	}
@@ -116,10 +118,8 @@ func (p *Parser) parseArgs() []Expr {
 		switch p.typ {
 		case RPAREN:
 			return args
-		case NUM:
-			args = append(args, p.parseNum())
-		case IDENT:
-			args = append(args, p.parseIdent())
+		case NUM, IDENT, STRING:
+			args = append(args, p.parseExpr())
 		default:
 			panic(p.unexpected())
 		}

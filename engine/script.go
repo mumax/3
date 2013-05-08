@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
 	"io"
-	"log"
 )
 
 func (f *ScalFn) Eval() interface{} {
@@ -19,10 +18,11 @@ func (f *VecFn) Eval() interface{} {
 	return (*f)()
 }
 
-func (f *ScalFn) Assign(e script.Expr) {
+func (f *VecFn) Assign(e script.Expr) {
 	(*f) = func() [3]float64 {
-		log.Println()
-		return [3]float64{}
+		v := e.Eval().([]interface{})
+		util.Argument(len(v) == 3)
+		return [3]float64{v[0].(float64), v[1].(float64), v[2].(float64)}
 	}
 }
 

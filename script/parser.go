@@ -1,10 +1,8 @@
 package script
 
 import (
-	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 )
 
@@ -17,29 +15,6 @@ func NewParser() *Parser {
 	p := new(Parser)
 	p.world.init()
 	return p
-}
-
-// First compiles the entire source, then executes it.
-// So compile errors are spotted before executing the previous code.
-func (p *Parser) Exec(src io.Reader) (err error) {
-	defer func() {
-		panc := recover()
-		if panc != nil {
-			err = fmt.Errorf("%v", panc)
-		}
-	}()
-
-	var code []Expr
-	code, err = p.parse(src)
-	if err != nil {
-		return
-	}
-
-	for _, e := range code {
-		ret := e.Eval()
-		log.Println("eval", e, ":", ret)
-	}
-	return nil
 }
 
 func (p *Parser) parse(src io.Reader) (code []Expr, err error) {
@@ -62,10 +37,6 @@ func (p *Parser) parse(src io.Reader) (code []Expr, err error) {
 		expr, err = p.parseLine()
 	}
 	return code, nil
-}
-
-func (p *Parser) ExecString(code string) error {
-	return p.Exec(bytes.NewBufferString(code))
 }
 
 func (p *Parser) parseLine() (ex Expr, err error) {
@@ -104,9 +75,10 @@ func (p *Parser) parseExpr() Expr {
 		return p.parseIdent()
 	case NUM:
 		return p.parseNum()
+	case LPAREN:
+		return List(p.parseArgs())
 	default:
 		panic(p.unexpected())
-		// TODO: handle parens, commas
 	}
 }
 

@@ -1,9 +1,9 @@
 #! /bin/bash
 
-#scripts=*.txt
-#for f in $scripts; do
-#	../mx3 $f || exit 1;
-#done;
+scripts=*.txt
+for f in $scripts; do
+	../mx3 $f || exit 1;
+done;
 
 files=*.go
 files=$(echo $files | sed s/doc.go//g)

@@ -28,7 +28,7 @@ func main() {
 	Aex = Const(13e-12)
 	M.Set(Uniform(1, .1, 0))
 
-	Table.Autosave(1e-12)
+	Table.Autosave(10e-12)
 	Run(3e-9)
 
 	m := AvgM.Get()
@@ -41,7 +41,6 @@ func main() {
 	Alpha = Const(0.02)
 	B_ext = ConstVector(-24.6E-3, 4.3E-3, 0)
 
-	//M.Autosave(50e-12)
 	Run(1e-9)
 
 	m = AvgM.Get()
@@ -50,9 +49,6 @@ func main() {
 	expect(m[Y], 0.1268)
 	expect(m[X], -0.9845)
 	fmt.Println("OK")
-
-	fmt.Println(Solver.NSteps, "steps")
-	fmt.Println(AvgM.UpdCount, "m upd")
 }
 
 func expect(have, want float64) {

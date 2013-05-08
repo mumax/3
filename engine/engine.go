@@ -278,7 +278,7 @@ func RunInteractive() {
 			log.Println("interactive session idle: exiting")
 			break
 		}
-		log.Println("awaiting interaction")
+		log.Println("awaiting browser interaction")
 		f := <-inject
 		f()
 	}

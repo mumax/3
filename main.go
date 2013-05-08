@@ -1,9 +1,8 @@
 package main
 
-// main program starts a web gui.
-
 import (
 	. "code.google.com/p/mx3/engine"
+	"flag"
 	"log"
 	"os/exec"
 )
@@ -18,13 +17,26 @@ func main() {
 	Init()
 	defer Close()
 
-	SetMesh(32, 32, 1, 5e-9, 5e-9, 5e-9)
+	// flags parsed by engine.Init()
+	if flag.NArg() > 0 {
+		for _, f := range flag.Args() {
+			log.Println("run file", f)
+			RunFile(f)
+		}
+	} else {
+		log.Println("no input files: starting interactive session")
+		interactive()
+	}
 
+}
+
+//
+func interactive() {
+	SetMesh(32, 32, 1, 5e-9, 5e-9, 5e-9)
 	Msat = Const(1000e3)
 	Aex = Const(10e-12)
 	Alpha = Const(1)
 	M.Set(Uniform(1, 1, 0))
-
 	RunInteractive()
 }
 

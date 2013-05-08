@@ -13,6 +13,7 @@ PKGS=\
 
 $(PREFIX)/cuda: nvcc
 
+.PHONY: mx3
 mx3:
 	go install -v
 	go build -o mx3 main.go

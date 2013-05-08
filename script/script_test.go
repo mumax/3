@@ -10,10 +10,11 @@ var (
 )
 
 func TestParser(t *testing.T) {
-	src := bytes.NewBuffer([]byte(testText))
-	p := NewParser(src)
+	src1 := bytes.NewBuffer([]byte(testText))
+	p := NewParser()
 	p.AddFloat("a", &a)
-	p.Exec()
+	p.Exec(src1)
+	p.ExecString("a=2")
 }
 
 const testText = `

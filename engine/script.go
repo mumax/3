@@ -19,6 +19,7 @@ func RunScript(src io.Reader) {
 	p.AddFloat("t", &Time)
 	p.AddVar("aex", &Aex)
 	p.AddVar("msat", &Msat)
+	p.AddVar("alpha", &Alpha)
 	util.FatalErr(p.Exec())
 
 }

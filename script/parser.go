@@ -1,6 +1,7 @@
 package script
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -8,25 +9,27 @@ import (
 )
 
 type Parser struct {
-	*lexer
+	lexer
 	world
 }
 
-func NewParser(src io.Reader) Parser {
-	p := Parser{lexer: newLexer(src)}
+func NewParser() *Parser {
+	p := new(Parser)
 	p.world.init()
 	return p
 }
 
 // First compiles the entire source, then executes it.
-// Compile errors are spotted before
-func (p *Parser) Exec() (err error) {
+// So compile errors are spotted before executing the previous code.
+func (p *Parser) Exec(src io.Reader) (err error) {
 	defer func() {
 		panc := recover()
 		if panc != nil {
 			err = fmt.Errorf("%v", panc)
 		}
 	}()
+
+	p.lexer.init(src)
 
 	var code []Expr
 	expr, err := p.parseLine()
@@ -43,6 +46,10 @@ func (p *Parser) Exec() (err error) {
 		log.Println("eval", e, ":", ret)
 	}
 	return nil
+}
+
+func (p *Parser) ExecString(code string) error {
+	return p.Exec(bytes.NewBufferString(code))
 }
 
 func (p *Parser) parseLine() (ex Expr, err error) {

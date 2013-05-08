@@ -14,8 +14,12 @@ type lexer struct {
 	peekTyp tokenType // peek-ahead value for typ
 }
 
-func newLexer(src io.Reader) *lexer {
+func newLexer() *lexer {
 	l := new(lexer)
+	return l
+}
+
+func (l *lexer) init(src io.Reader) {
 	l.scan.Init(src)
 	l.scan.Whitespace = 1<<'\t' | 1<<' '
 	l.scan.Error = func(s *scanner.Scanner, msg string) {
@@ -25,7 +29,6 @@ func newLexer(src io.Reader) *lexer {
 	l.scan.Scan() // peek
 	l.peekStr = l.scan.TokenText()
 	l.peekTyp = typeof(l.peekStr)
-	return l
 }
 
 func (l *lexer) unexpected() error {

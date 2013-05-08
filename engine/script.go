@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+var parser *script.Parser
+
 // Runs a script file.
 func RunFile(fname string) {
 	f, err := os.Open(fname)
@@ -19,18 +21,21 @@ func RunFile(fname string) {
 
 // Runs script form input.
 func RunScript(src io.Reader) {
-	p := script.NewParser()
+	if parser == nil {
+		initParser()
+	}
+	util.FatalErr(parser.Exec(src))
+}
 
-	p.AddFunc("print", myprint)
-	p.AddFunc("setmesh", setmeshfloat)
-
-	p.AddFloat("t", &Time)
-	p.AddVar("aex", &Aex)
-	p.AddVar("msat", &Msat)
-	p.AddVar("alpha", &Alpha)
-	p.AddVar("b_ext", &B_ext)
-
-	util.FatalErr(p.Exec(src))
+func initParser() {
+	parser = script.NewParser()
+	parser.AddFunc("print", myprint)
+	parser.AddFunc("setmesh", setmeshfloat)
+	parser.AddFloat("t", &Time)
+	parser.AddVar("aex", &Aex)
+	parser.AddVar("msat", &Msat)
+	parser.AddVar("alpha", &Alpha)
+	parser.AddVar("b_ext", &B_ext)
 }
 
 // needed only to make it callable from scripts

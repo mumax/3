@@ -14,10 +14,11 @@ func RunFile(fname string) {
 	f, err := os.Open(fname)
 	util.FatalErr(err)
 	defer f.Close()
-	runScript(f)
+	RunScript(f)
 }
 
-func runScript(src io.Reader) {
+// Runs script form input.
+func RunScript(src io.Reader) {
 	p := script.NewParser()
 
 	p.AddFunc("print", myprint)

@@ -16,9 +16,9 @@ func main() {
 	defer Close()
 
 	const script = `
-		msat = 800e3
 		t = 1e-9
-		Aex = 13e-12
+		msat = 800e3
+		aex = 13e-12
 		alpha = 1
 	`
 	src := bytes.NewBuffer([]byte(script))

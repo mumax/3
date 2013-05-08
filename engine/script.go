@@ -2,6 +2,7 @@ package engine
 
 import (
 	"code.google.com/p/mx3/script"
+	"code.google.com/p/mx3/util"
 	"io"
 )
 
@@ -14,11 +15,10 @@ func (s *ScalFn) Assign(e script.Expr) {
 }
 
 func RunScript(src io.Reader) {
-
 	p := script.NewParser(src)
 	p.AddFloat("t", &Time)
-	p.AddVar("Aex", &Aex)
-
-	p.Exec()
+	p.AddVar("aex", &Aex)
+	p.AddVar("msat", &Msat)
+	util.FatalErr(p.Exec())
 
 }

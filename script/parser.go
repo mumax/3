@@ -3,6 +3,7 @@ package script
 import (
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 )
 
@@ -17,32 +18,34 @@ func NewParser(src io.Reader) Parser {
 	return p
 }
 
-func (p *Parser) Exec() error {
-	Expr, err := p.parseLine()
+// First compiles the entire source, then executes it.
+// Compile errors are spotted before
+func (p *Parser) Exec() (err error) {
+	defer func() {
+		panc := recover()
+		if panc != nil {
+			err = fmt.Errorf("%v", panc)
+		}
+	}()
+
+	var code []Expr
+	expr, err := p.parseLine()
 	for err != io.EOF {
-		if err == nil {
-			fmt.Println("eval", Expr, ":", Expr.Eval())
-		} else {
-			fmt.Println("err:", err)
+		if err != nil {
 			return err
 		}
-		Expr, err = p.parseLine()
+		code = append(code, expr)
+		expr, err = p.parseLine()
+	}
+
+	for _, e := range code {
+		ret := e.Eval()
+		log.Println("eval", e, ":", ret)
 	}
 	return nil
 }
 
 func (p *Parser) parseLine() (ex Expr, err error) {
-	defer func() {
-		panc := recover()
-		if panc != nil {
-			ex = nil
-			err = fmt.Errorf("%v", panc)
-			// skip rest of line
-			for p.typ != EOF && p.typ != EOL {
-				p.advance()
-			}
-		}
-	}()
 
 	p.advance()
 	switch p.typ {

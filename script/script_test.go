@@ -2,6 +2,7 @@ package script
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -13,8 +14,13 @@ func TestParser(t *testing.T) {
 	src1 := bytes.NewBuffer([]byte(testText))
 	p := NewParser()
 	p.AddFloat("a", &a)
+	p.AddFunc("print", myprint)
 	p.Exec(src1)
-	p.ExecString("a=2")
+	p.ExecString("a=2; print(a, 2)")
+}
+
+func myprint(msg ...interface{}) {
+	fmt.Println(msg...)
 }
 
 const testText = `

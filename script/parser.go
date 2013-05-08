@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+// TODO: parse tree could keep line number references for runtime error reporting
+
 type Parser struct {
 	lexer
 	world
@@ -87,7 +89,7 @@ func (p *Parser) parseCall() Expr {
 	p.advance()
 	assert(p.typ == LPAREN)
 	args := p.parseArgs()
-	return &call{funcname, args}
+	return p.newCall(funcname, args)
 }
 
 func (p *Parser) parseAssign() Expr {

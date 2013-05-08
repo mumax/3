@@ -21,6 +21,8 @@ func main() {
 		aex = 13e-12
 		b_ext = (alpha, 2e-3, 3e-3)
 		alpha = t
+		print(alpha)
+		setmesh(8, 4, 1, 1e-9, 1e-9, 1e-9)
 	`
 	src := bytes.NewBuffer([]byte(script))
 	RunScript(src)

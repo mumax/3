@@ -26,7 +26,14 @@ func (e *call) Eval() interface{} {
 	for i := range args {
 		args[i] = reflect.ValueOf(argv[i])
 	}
-	return e.funcval.Call(args)
+	ret := e.funcval.Call(args)
+	if len(ret) == 0 {
+		return nil
+	}
+	if len(ret) == 1 {
+		return ret[0].Interface()
+	}
+	return ret // multiple return values still returned as []reflect.Value
 }
 
 func (e *call) String() string {

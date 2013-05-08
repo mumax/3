@@ -8,6 +8,23 @@ import (
 	"log"
 )
 
+func RunScript(src io.Reader) {
+	p := script.NewParser()
+
+	p.AddFunc("print", myprint)
+	p.AddFunc("setmesh", setmeshfloat)
+
+	p.AddFloat("t", &Time)
+	p.AddVar("aex", &Aex)
+	p.AddVar("msat", &Msat)
+	p.AddVar("alpha", &Alpha)
+	p.AddVar("b_ext", &B_ext)
+
+	util.FatalErr(p.Exec(src))
+}
+
+// wrappers to make them callable from script
+
 func (f *ScalFn) Eval() interface{} {
 	return (*f)()
 }
@@ -42,20 +59,4 @@ func cint(f float64) int {
 		panic(fmt.Errorf("need integer, have: %v", f))
 	}
 	return i
-}
-
-func RunScript(src io.Reader) {
-	p := script.NewParser()
-
-	p.AddFunc("print", myprint)
-	p.AddFunc("setmesh", setmeshfloat)
-
-	p.AddFloat("t", &Time)
-	p.AddVar("aex", &Aex)
-	p.AddVar("msat", &Msat)
-	p.AddVar("alpha", &Alpha)
-	p.AddVar("b_ext", &B_ext)
-
-	util.FatalErr(p.Exec(src))
-
 }

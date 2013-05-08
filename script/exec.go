@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 )
 
 // First compiles the entire source, then executes it.
@@ -24,8 +23,7 @@ func (p *Parser) Exec(src io.Reader) (err error) {
 	}
 
 	for _, e := range code {
-		ret := e.Eval()
-		log.Println("eval", e, ":", ret)
+		e.Eval()
 	}
 	return nil
 }

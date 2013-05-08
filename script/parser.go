@@ -124,6 +124,9 @@ func (p *Parser) parseArgs() []Expr {
 			panic(p.unexpected())
 		}
 		p.advance()
+		if p.typ != COMMA && p.typ != RPAREN {
+			panic(fmt.Errorf(`%v: expected "," or ")"`, p.Position))
+		}
 		if p.typ == COMMA {
 			p.advance()
 			if p.typ == RPAREN {

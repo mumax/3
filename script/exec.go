@@ -23,6 +23,7 @@ func (p *Parser) Exec(src io.Reader) (err error) {
 	}
 
 	for _, e := range code {
+		//log.Println("exec:", e)
 		e.Eval()
 	}
 	return nil

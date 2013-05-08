@@ -30,9 +30,15 @@ func RunScript(src io.Reader) {
 func init() {
 	parser.AddFunc("print", myprint)
 
-	parser.AddFunc("setmesh", setmeshfloat)
-	parser.AddFunc("uniform", Uniform)
+	parser.AddFunc("setgridsize", setGridSize)
+	parser.AddFunc("setcellsize", setCellSize)
+
 	parser.AddFunc("run", Run)
+	parser.AddFunc("autosave", doAutosave)
+	parser.AddFunc("savetable", doSaveTable)
+
+	parser.AddFunc("average", average)
+	parser.AddFunc("uniform", Uniform)
 
 	parser.AddFloat("t", &Time)
 
@@ -63,10 +69,16 @@ func (f *VecFn) Eval() interface{} {
 // needed only to make it callable from scripts
 func (f *VecFn) Assign(e script.Expr) {
 	(*f) = func() [3]float64 {
-		v := e.Eval().([]interface{})
-		util.Argument(len(v) == 3)
-		return [3]float64{v[0].(float64), v[1].(float64), v[2].(float64)}
+		return eval3float64(e)
 	}
+}
+
+// evaluate e and cast return value to [3]float64 (vector)
+func eval3float64(e script.Expr) [3]float64 {
+	v := e.Eval().([]interface{})
+	util.Argument(len(v) == 3)
+	return [3]float64{v[0].(float64), v[1].(float64), v[2].(float64)}
+
 }
 
 // needed only to make it callable from scripts
@@ -83,8 +95,18 @@ func myprint(msg ...interface{}) {
 	log.Println(msg...)
 }
 
-func setmeshfloat(nx, ny, nz, cx, cy, cz float64) {
-	SetMesh(cint(nx), cint(ny), cint(nz), cx, cy, cz)
+//func setmeshfloat(nx, ny, nz, cx, cy, cz float64) {
+//	SetMesh(cint(nx), cint(ny), cint(nz), cx, cy, cz)
+//}
+
+func doAutosave(what interface {
+	Autosave(float64)
+}, period float64) {
+	what.Autosave(period)
+}
+
+func doSaveTable(period float64) {
+	Table.Autosave(period)
 }
 
 // safe conversion from float to integer.

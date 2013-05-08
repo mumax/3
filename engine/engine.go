@@ -299,6 +299,27 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	initialize()
 }
 
+// for lazy setmesh: set gridsize and cellsize in separate calls
+var (
+	gridsize []int
+	cellsize []float64
+)
+
+func setGridSize(nx, ny, nz float64) {
+	Nx, Ny, Nz := cint(nx), cint(ny), cint(nz)
+	gridsize = []int{Nx, Ny, Nz}
+	if cellsize != nil {
+		SetMesh(Nx, Ny, Nz, cellsize[0], cellsize[1], cellsize[2])
+	}
+}
+
+func setCellSize(cx, cy, cz float64) {
+	cellsize = []float64{cx, cy, cz}
+	if gridsize != nil {
+		SetMesh(gridsize[0], gridsize[1], gridsize[2], cx, cy, cz)
+	}
+}
+
 // TODO: not perfectly OK yet.
 func free() {
 	log.Println("resetting gpu")

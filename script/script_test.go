@@ -13,16 +13,16 @@ var (
 
 func TestParser(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
-	p := newParser(src)
+	p := NewParser(src)
 	p.addFloat("a", &a)
-	expr, err := p.ParseLine()
+	expr, err := p.parseLine()
 	for err != io.EOF {
 		if err == nil {
 			fmt.Println("eval", expr, ":", expr.eval())
 		} else {
 			fmt.Println("err:", err)
 		}
-		expr, err = p.ParseLine()
+		expr, err = p.parseLine()
 	}
 }
 

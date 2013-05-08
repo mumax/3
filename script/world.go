@@ -15,7 +15,7 @@ func (w *world) addvar(name string, v variable) {
 	w.variables[name] = v
 }
 
-func (p *parser) getvar(name string) variable {
+func (p *Parser) getvar(name string) variable {
 	if v, ok := p.variables[name]; ok {
 		return v
 	} else {
@@ -23,6 +23,6 @@ func (p *parser) getvar(name string) variable {
 	}
 }
 
-func (w *world) addFloat(name string, addr *float64) {
+func (w *world) AddFloat(name string, addr *float64) {
 	w.addvar(name, float{addr})
 }

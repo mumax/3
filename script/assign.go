@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (p *parser) newAssign(name string, rhs expr) assignment {
+func (p *Parser) newAssign(name string, rhs expr) assignment {
 	return assignment{p.getvar(name), rhs}
 }
 

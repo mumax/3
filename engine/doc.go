@@ -32,12 +32,5 @@
  	go run myinput.go -o outputdir
  The optional -o flag sets the output directory. For a list of all flags, see:
  	go run myinput.go -help
-
-
- Web gui
-
- While the simulation is running, you can visualize and manipulate it from your browser. Default is:
- 	http://localhost:35367
- The -http flag can select an other port.
 */
 package engine

@@ -16,6 +16,42 @@ For running the pre-compiled mx3 binary, you need install the CUDA toolkit. Ubun
 Or the toolkit can be downloaded from nvidia's website.
 
 
+
+Getting started
+
+Running an input script:
+ 	mx3 myscript.txt
+
+Example script:
+ 	setgridsize(128,      32,      1)
+ 	setcellsize(3.125e-9, 3.125e-9, 3e-9)
+
+ 	alpha = 0.02
+ 	msat  = 800e3
+ 	aex   = 13e-12
+ 	m     = uniform(1, .1, 0)
+ 	b_ext = (-24.6E-3, 4.3E-3, 0)
+
+ 	savetable(10e-12)
+ 	autosave(m, 50e-12)
+
+ 	run(1e-9)
+
+ 	print("final m:", average(m))
+
+See package "examples" for more examples.
+
+Also, more advanced input scripts can be written in Go. See package "engine".
+
+
+
+Web interface
+
+While the simulation is running, you can visualize and manipulate it from your browser. Default is:
+ 	http://localhost:35367
+The -http flag can select an other port.
+
+
 Recompiling
 
 The pre-compiled binaries should suit most people. Nevertheless, if you want to compile yourself you need Git and Go (with properly set $GOPATH). Ubuntu users can run:
@@ -34,8 +70,5 @@ Otherwise, add these to your environment:
 where you replace <path-to> by the relevant path.
 
 
-Getting started
-
-To get started, see package engine and examples.
 */
 package main

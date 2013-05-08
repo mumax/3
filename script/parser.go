@@ -17,6 +17,20 @@ func newParser(src io.Reader) parser {
 	return p
 }
 
+func (p *parser) Exec() error {
+	expr, err := p.ParseLine()
+	for err != io.EOF {
+		if err == nil {
+			fmt.Println("eval", expr, ":", expr.eval())
+		} else {
+			fmt.Println("err:", err)
+			return err
+		}
+		expr, err = p.ParseLine()
+	}
+	return nil
+}
+
 func (p *parser) ParseLine() (ex expr, err error) {
 	defer func() {
 		panc := recover()

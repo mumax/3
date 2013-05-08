@@ -44,7 +44,14 @@ func (l *lexer) advance() {
 	l.str = l.peekStr
 	l.typ = l.peekTyp
 	l.Position = l.scn.Pos() // peeked position
+
 	l.scn.Scan()
 	l.peekStr = l.scn.TokenText()
 	l.peekTyp = typeof(l.peekStr)
+
+	// hack for negative numbers, text/scanner does not resolve them.
+	if l.str == "-" && l.peekTyp == NUM {
+		l.advance()
+		l.str = "-" + l.str
+	}
 }

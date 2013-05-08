@@ -7,6 +7,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/prof"
 	"flag"
+	"io/ioutil"
 	"log"
 	"runtime"
 )
@@ -35,7 +36,7 @@ func Init() {
 	log.SetPrefix("")
 	log.SetFlags(0)
 	if *flag_silent {
-		log.SetOutput(devnul{})
+		log.SetOutput(ioutil.Discard)
 	}
 
 	if *flag_version {
@@ -58,12 +59,6 @@ func Init() {
 	if *flag_port != "" {
 		goServe(*flag_port)
 	}
-}
-
-type devnul struct{}
-
-func (d devnul) Write(b []byte) (int, error) {
-	return len(b), nil
 }
 
 // Cleanly exits the simulation, assuring all output is flushed. Typical use:

@@ -35,7 +35,7 @@ func (p *Parser) getvar(name string) Variable {
 	if v, ok := p.variables[name]; ok {
 		return v
 	} else {
-		panic(fmt.Errorf("line %v: undefined: %v", p.scan.Pos().Line, name))
+		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
 	}
 }
 
@@ -52,7 +52,7 @@ func (p *Parser) getfunc(name string) reflect.Value {
 	if v, ok := p.functions[name]; ok {
 		return v
 	} else {
-		panic(fmt.Errorf("line %v: undefined: %v", p.scan.Pos().Line, name))
+		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
 	}
 }
 

@@ -15,7 +15,7 @@ func (p *Parser) newCall(name string, args []Expr) *call {
 	funcval := p.getfunc(name)
 	functyp := funcval.Type()
 	if !functyp.IsVariadic() && functyp.NumIn() != len(args) {
-		panic(fmt.Errorf("line %v: %v needs %v arguments, have %v", p.scan.Pos().Line, name, functyp.NumIn(), len(args)))
+		panic(fmt.Errorf("line %v: %v needs %v arguments, have %v", p.Line, name, functyp.NumIn(), len(args)))
 	}
 	return &call{name, funcval, args}
 }

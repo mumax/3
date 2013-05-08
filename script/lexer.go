@@ -7,9 +7,10 @@ import (
 )
 
 type lexer struct {
-	scan    scanner.Scanner
-	str     string    // last read token
-	typ     tokenType // last read token type
+	scn scanner.Scanner
+	str string    // last read token
+	typ tokenType // last read token type
+	scanner.Position
 	peekStr string    // peek-ahead value for str
 	peekTyp tokenType // peek-ahead value for typ
 }
@@ -20,30 +21,30 @@ func newLexer() *lexer {
 }
 
 func (l *lexer) init(src io.Reader) {
-	l.scan.Init(src)
-	l.scan.Whitespace = 1<<'\t' | 1<<' '
-	l.scan.Error = func(s *scanner.Scanner, msg string) {
-		l.peekStr = fmt.Sprintf("%v: syntax error: %v", l.scan.Position, msg)
+	l.scn.Init(src)
+	l.scn.Whitespace = 1<<'\t' | 1<<' '
+	l.scn.Error = func(s *scanner.Scanner, msg string) {
+		l.peekStr = fmt.Sprintf("%v: syntax error: %v", l.Position, msg)
 		l.peekTyp = ERR
 	}
-	l.scan.Scan() // peek
-	l.peekStr = l.scan.TokenText()
+	l.scn.Scan() // peek
+	l.peekStr = l.scn.TokenText()
 	l.peekTyp = typeof(l.peekStr)
 }
 
 func (l *lexer) unexpected() error {
 	if l.typ == ERR {
-		return fmt.Errorf("%v: syntax error: %v", l.scan.Pos(), l.str)
+		return fmt.Errorf("%v: syntax error: %v", l.Position, l.str)
 	} else {
-		return fmt.Errorf("%v: unexpected %v: %v", l.scan.Pos(), l.typ, l.str)
+		return fmt.Errorf("%v: unexpected %v: %v", l.Position, l.typ, l.str)
 	}
 }
 
 func (l *lexer) advance() {
 	l.str = l.peekStr
 	l.typ = l.peekTyp
-	//fmt.Println("--advance:", l.typ, ":", l.str)
-	l.scan.Scan()
-	l.peekStr = l.scan.TokenText()
+	l.Position = l.scn.Pos() // peeked position
+	l.scn.Scan()
+	l.peekStr = l.scn.TokenText()
 	l.peekTyp = typeof(l.peekStr)
 }

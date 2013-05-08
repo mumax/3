@@ -26,7 +26,7 @@ var (
 
 // Accessible quantities
 var (
-	M                 *buffered  // reduced magnetization (unit length)
+	M                 buffered   // reduced magnetization (unit length)
 	AvgM              *scalar    // average magnetization
 	B_eff             *setter    // effective field (T) output handle
 	B_demag           *setter    // demag field (T) output handle
@@ -78,10 +78,10 @@ func initialize() {
 	vol = data.NilSlice(1, global_mesh())
 
 	// magnetization
-	M = newBuffered(cuda.NewSlice(3, global_mesh()), "m", "")
-	quants["m"] = M
+	M = *newBuffered(cuda.NewSlice(3, global_mesh()), "m", "")
+	quants["m"] = &M
 	AvgM = newScalar(3, "m", "", func() []float64 {
-		return average(M)
+		return average(&M)
 	})
 
 	// data table

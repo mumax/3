@@ -10,12 +10,12 @@ import (
 // First compiles the entire source, then executes it.
 // So compile errors are spotted before executing the previous code.
 func (p *Parser) Exec(src io.Reader) (err error) {
-	defer func() {
-		panc := recover()
-		if panc != nil {
-			err = fmt.Errorf("%v", panc)
-		}
-	}()
+	//	defer func() {
+	//		panc := recover()
+	//		if panc != nil {
+	//			err = fmt.Errorf("%v", panc)
+	//		}
+	//	}()
 
 	var code []Expr
 	code, err = p.parse(src)

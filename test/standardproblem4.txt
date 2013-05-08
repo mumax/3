@@ -10,16 +10,16 @@ msat  = 800e3
 aex   = 13e-12
 m     = uniform(1, .1, 0)
 
-savetable(1e-12)
+//savetable(1e-12)
 run(3e-9)
 
-print(average(m))
+//print(average(m))
 
 alpha = 0.02
-b_ext = (-24.6E-3, 4.3E-3, 0)
+b_ext = (24.6E-3, 4.3E-3, 0)
 
-autosave(m, 50e-12)
+//autosave(m, 50e-12)
 run(1e-9)
 
-print(average(m))
+//print(average(m))
 

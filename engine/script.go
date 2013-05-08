@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
 	"fmt"
@@ -9,7 +10,9 @@ import (
 	"os"
 )
 
-var parser *script.Parser
+//TODO use go/scanner to handle negative numbers etc.
+
+var parser = script.NewParser()
 
 // Runs a script file.
 func RunFile(fname string) {
@@ -21,21 +24,25 @@ func RunFile(fname string) {
 
 // Runs script form input.
 func RunScript(src io.Reader) {
-	if parser == nil {
-		initParser()
-	}
 	util.FatalErr(parser.Exec(src))
 }
 
-func initParser() {
-	parser = script.NewParser()
+func init() {
 	parser.AddFunc("print", myprint)
+
 	parser.AddFunc("setmesh", setmeshfloat)
+	parser.AddFunc("uniform", Uniform)
+	parser.AddFunc("run", Run)
+
 	parser.AddFloat("t", &Time)
+
 	parser.AddVar("aex", &Aex)
 	parser.AddVar("msat", &Msat)
 	parser.AddVar("alpha", &Alpha)
 	parser.AddVar("b_ext", &B_ext)
+	parser.AddVar("m", &M)
+
+	log.Println("parser initialized")
 }
 
 // needed only to make it callable from scripts
@@ -60,6 +67,16 @@ func (f *VecFn) Assign(e script.Expr) {
 		util.Argument(len(v) == 3)
 		return [3]float64{v[0].(float64), v[1].(float64), v[2].(float64)}
 	}
+}
+
+// needed only to make it callable from scripts
+func (b *buffered) Assign(e script.Expr) {
+	b.Set(e.Eval().(*data.Slice))
+}
+
+// needed only to make it callable from scripts
+func (b *buffered) Eval() interface{} {
+	return b
 }
 
 func myprint(msg ...interface{}) {

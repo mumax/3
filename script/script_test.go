@@ -13,7 +13,7 @@ func TestParser(t *testing.T) {
 	expr, err := parseLine(l)
 	for err != io.EOF {
 		if err == nil {
-			fmt.Println("eval:", expr.eval())
+			fmt.Println("eval", expr, ":", expr.eval())
 		} else {
 			fmt.Println("err:", err)
 		}

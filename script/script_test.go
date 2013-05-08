@@ -9,15 +9,15 @@ import (
 
 func TestParser(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
-	l := newLexer(src)
-	expr, err := parseLine(l)
+	p := newParser(src)
+	expr, err := p.ParseLine()
 	for err != io.EOF {
 		if err == nil {
 			fmt.Println("eval", expr, ":", expr.eval())
 		} else {
 			fmt.Println("err:", err)
 		}
-		expr, err = parseLine(l)
+		expr, err = p.ParseLine()
 	}
 }
 

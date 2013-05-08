@@ -6,103 +6,111 @@ import (
 	"strconv"
 )
 
-func parseLine(l *lexer) (ex expr, err error) {
+type parser struct {
+	*lexer
+}
+
+func newParser(src io.Reader) parser {
+	return parser{newLexer(src)}
+}
+
+func (p *parser) ParseLine() (ex expr, err error) {
 	defer func() {
 		panc := recover()
 		if panc != nil {
 			ex = nil
 			err = fmt.Errorf("%v", panc)
 			// skip rest of line
-			for l.typ != EOF && l.typ != EOL {
-				l.advance()
+			for p.typ != EOF && p.typ != EOL {
+				p.advance()
 			}
 		}
 	}()
 
-	l.advance()
-	switch l.typ {
+	p.advance()
+	switch p.typ {
 	case EOF:
 		return nil, io.EOF // marks end of input
 	case EOL:
 		return &nop{}, nil // empty line
 	default:
-		expr := parseExpr(l)
-		l.advance()
-		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
+		expr := p.parseExpr()
+		p.advance()
+		if p.typ == EOL || p.typ == EOF { // statement has to be terminated
 			return expr, nil
 		} else {
-			panic(l.unexpected())
+			panic(p.unexpected())
 		}
 	}
 }
 
-func parseIdent(l *lexer) expr {
-	switch l.peekTyp {
+func (p *parser) parseIdent() expr {
+	switch p.peekTyp {
 	case LPAREN:
-		return parseCall(l)
+		return p.parseCall()
 	case ASSIGN:
-		return parseAssign(l)
+		return p.parseAssign()
 	default:
-		return &variable{l.str}
+		return &variable{p.str}
 	}
 }
 
-func parseExpr(l *lexer) expr {
-	switch l.typ {
+func (p *parser) parseExpr() expr {
+	switch p.typ {
 	case IDENT:
-		return parseIdent(l)
+		return p.parseIdent()
 	case NUM:
-		return parseNum(l)
+		return p.parseNum()
 	default:
-		panic(l.unexpected())
+		panic(p.unexpected())
 		// TODO: handle parens, commas
 	}
 }
 
-func parseCall(l *lexer) expr {
-	funcname := l.str
-	l.advance()
-	assert(l.typ == LPAREN)
-	args := parseArgs(l)
+func (p *parser) parseCall() expr {
+	funcname := p.str
+	p.advance()
+	assert(p.typ == LPAREN)
+	args := p.parseArgs()
 	return &call{funcname, args}
 }
 
-func parseAssign(l *lexer) expr {
-	left := l.str
-	l.advance()
-	assert(l.typ == ASSIGN)
-	l.advance()
-	right := parseExpr(l)
+func (p *parser) parseAssign() expr {
+	left := p.str
+	p.advance()
+	assert(p.typ == ASSIGN)
+	p.advance()
+	right := p.parseExpr()
 	return &assign{left, right}
 }
 
-func parseNum(l *lexer) expr {
-	val, err := strconv.ParseFloat(l.str, 64)
+func (p *parser) parseNum() expr {
+	val, err := strconv.ParseFloat(p.str, 64)
 	if err != nil {
 		panic(err)
 	}
 	return num(val)
 }
 
-func parseArgs(l *lexer) []expr {
+func (p *parser) parseArgs() []expr {
 	var args []expr
-	l.advance()
+	p.advance()
 	for {
-		switch l.typ {
+		switch p.typ {
 		case RPAREN:
 			return args
 		case NUM:
-			args = append(args, parseNum(l))
+			args = append(args, p.parseNum())
 		case IDENT:
-			args = append(args, parseIdent(l))
+			args = append(args, p.parseIdent())
 		default:
-			panic(l.unexpected())
+			panic(p.unexpected())
 		}
-		l.advance()
-		if l.typ == COMMA {
-			l.advance()
-			if l.typ == RPAREN {
-				panic(l.unexpected())
+		p.advance()
+		if p.typ == COMMA {
+			p.advance()
+			if p.typ == RPAREN {
+				panic(p.unexpected())
 			}
 		}
 	}

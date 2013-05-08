@@ -3,15 +3,21 @@ package script
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"testing"
 )
 
 func TestParser(t *testing.T) {
 	src := bytes.NewBuffer([]byte(testText))
 	l := newLexer(src)
-	for f := parseLine(l); f != nil; f = parseLine(l) {
-		fmt.Println(f())
-		fmt.Println("\n=====")
+	expr, err := parseLine(l)
+	for err != io.EOF {
+		if err == nil {
+			fmt.Println("eval:", expr.eval())
+		} else {
+			fmt.Println("err:", err)
+		}
+		expr, err = parseLine(l)
 	}
 }
 

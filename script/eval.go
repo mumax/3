@@ -4,30 +4,54 @@ import (
 	"fmt"
 )
 
-type node interface {
+type expr interface {
 	eval() interface{}
 }
 
 type nop struct{}
 
-func (n *nop) eval() interface{} {
+func (e *nop) eval() interface{} {
 	return nil
 }
 
-type variable struct{ name string }
+type variable struct {
+	name string
+}
 
-func (n *variable) eval() interface{} { return n.name }
+func (e *variable) eval() interface{} {
+	return e.name
+}
 
 type call struct {
 	funcname string
-	args     []node
+	args     []expr
 }
 
-func (n *call) eval() interface{} {
-	str := fmt.Sprint(n.funcname, "(")
-	for _, f := range n.args {
-		str += fmt.Sprint(f.eval(), " ")
+func (e *call) eval() interface{} {
+	str := fmt.Sprint(e.funcname, "(")
+	for _, a := range e.args {
+		str += fmt.Sprint(a.eval(), " ")
 	}
 	str += ")"
 	return str
+}
+
+//func (e*call)exec(){
+//	fmt.Println(e.eval()) // don't use result
+//}
+
+type assign struct {
+	left  string
+	right expr
+}
+
+func (e *assign) eval() interface{} {
+	fmt.Println(e.left, "=", e.right)
+	return nil
+}
+
+type num float64
+
+func (n num) eval() interface{} {
+	return float64(n)
 }

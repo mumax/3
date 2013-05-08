@@ -1,28 +1,42 @@
 package script
 
 import (
+	"fmt"
+	"io"
 	"strconv"
 )
 
-func parseLine(l *lexer) node {
+func parseLine(l *lexer) (ex expr, err error) {
+	defer func() {
+		panc := recover()
+		if panc != nil {
+			ex = nil
+			err = fmt.Errorf("%v", panc)
+			// skip rest of line
+			for l.typ != EOF && l.typ != EOL {
+				l.advance()
+			}
+		}
+	}()
+
 	l.advance()
 	switch l.typ {
 	case EOF:
-		return nil // marks end of input
+		return nil, io.EOF // marks end of input
 	case EOL:
-		return &nop{} // empty line
+		return &nop{}, nil // empty line
 	default:
-		node := parseExpr(l)
+		expr := parseExpr(l)
 		l.advance()
 		if l.typ == EOL || l.typ == EOF { // statement has to be terminated
-			return node
+			return expr, nil
 		} else {
 			panic(l.unexpected())
 		}
 	}
 }
 
-func parseIdent(l *lexer) node {
+func parseIdent(l *lexer) expr {
 	switch l.peekTyp {
 	case LPAREN:
 		return parseCall(l)
@@ -33,7 +47,7 @@ func parseIdent(l *lexer) node {
 	}
 }
 
-func parseExpr(l *lexer) node {
+func parseExpr(l *lexer) expr {
 	switch l.typ {
 	case IDENT:
 		return parseIdent(l)
@@ -45,19 +59,15 @@ func parseExpr(l *lexer) node {
 	}
 }
 
-func parseCall(l *lexer) node {
+func parseCall(l *lexer) expr {
 	funcname := l.str
 	l.advance()
 	assert(l.typ == LPAREN)
-	args, err := parseArgs(l)
-	if err != nil {
-		return err
-	} else {
-		return &call{funcname, args}
-	}
+	args := parseArgs(l)
+	return &call{funcname, args}
 }
 
-func parseAssign(l *lexer) node {
+func parseAssign(l *lexer) expr {
 	left := l.str
 	l.advance()
 	assert(l.typ == ASSIGN)
@@ -66,36 +76,33 @@ func parseAssign(l *lexer) node {
 	return &assign{left, right}
 }
 
-func parseNum(l *lexer) node {
-	enter("num")
-	defer exit("num")
+func parseNum(l *lexer) expr {
 	val, err := strconv.ParseFloat(l.str, 64)
 	if err != nil {
 		panic(err)
 	}
-	return func() interface{} { return val }
+	return num(val)
 }
 
-func parseArgs(l *lexer) (args []node, err node) {
-	enter("args")
-	defer exit("args")
+func parseArgs(l *lexer) []expr {
+	var args []expr
 	l.advance()
 	for {
 		switch l.typ {
 		case RPAREN:
-			return args, nil
+			return args
 		case NUM:
 			args = append(args, parseNum(l))
 		case IDENT:
 			args = append(args, parseIdent(l))
 		default:
-			return nil, l.unexpected()
+			panic(l.unexpected())
 		}
 		l.advance()
 		if l.typ == COMMA {
 			l.advance()
 			if l.typ == RPAREN {
-				return nil, l.unexpected()
+				panic(l.unexpected())
 			}
 		}
 	}

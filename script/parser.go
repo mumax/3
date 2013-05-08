@@ -29,16 +29,10 @@ func (p *Parser) Exec(src io.Reader) (err error) {
 		}
 	}()
 
-	p.lexer.init(src)
-
 	var code []Expr
-	expr, err := p.parseLine()
-	for err != io.EOF {
-		if err != nil {
-			return err
-		}
-		code = append(code, expr)
-		expr, err = p.parseLine()
+	code, err = p.parse(src)
+	if err != nil {
+		return
 	}
 
 	for _, e := range code {
@@ -46,6 +40,28 @@ func (p *Parser) Exec(src io.Reader) (err error) {
 		log.Println("eval", e, ":", ret)
 	}
 	return nil
+}
+
+func (p *Parser) parse(src io.Reader) (code []Expr, err error) {
+	defer func() {
+		panc := recover()
+		if panc != nil {
+			code = nil
+			err = fmt.Errorf("%v", panc)
+		}
+	}()
+
+	p.lexer.init(src)
+
+	expr, err := p.parseLine()
+	for err != io.EOF {
+		if err != nil {
+			return nil, err
+		}
+		code = append(code, expr)
+		expr, err = p.parseLine()
+	}
+	return code, nil
 }
 
 func (p *Parser) ExecString(code string) error {

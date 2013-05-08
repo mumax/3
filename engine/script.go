@@ -4,22 +4,35 @@ import (
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
 	"io"
+	"log"
 )
 
-func (s *ScalFn) Eval() interface{} {
-	return (*s)()
+func (f *ScalFn) Eval() interface{} {
+	return (*f)()
 }
 
-func (s *ScalFn) Assign(e script.Expr) {
-	(*s) = func() float64 { return e.Eval().(float64) }
+func (f *ScalFn) Assign(e script.Expr) {
+	(*f) = func() float64 { return e.Eval().(float64) }
+}
+
+func (f *VecFn) Eval() interface{} {
+	return (*f)()
+}
+
+func (f *ScalFn) Assign(e script.Expr) {
+	(*f) = func() [3]float64 {
+		log.Println()
+		return [3]float64{}
+	}
 }
 
 func RunScript(src io.Reader) {
-	p := script.NewParser(src)
+	p := script.NewParser()
 	p.AddFloat("t", &Time)
 	p.AddVar("aex", &Aex)
 	p.AddVar("msat", &Msat)
 	p.AddVar("alpha", &Alpha)
-	util.FatalErr(p.Exec())
+	p.AddVar("b_ext", &B_ext)
+	util.FatalErr(p.Exec(src))
 
 }

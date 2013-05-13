@@ -2,7 +2,6 @@ bugs:
 -----
 
 use cuda.OnFree throughout: setmesh memleak
-mx3 main program hangs
 saving staggeredmask fails if not initialized first
 shifting staggeredmask fails if not initialized first
 
@@ -18,9 +17,9 @@ cuda.HostBuffer()
 cuda.Recycle: check if you own it, disable contents to avoid use-after-recylce.
 LD_LIBARY_PATH ignored by build
 hide buffered.Mesh(), .Comp() etc. (ZYX axes)
-define shift with same sign as domain wall movement
 log.FatalErr: print line number of caller?
 mask shift, set etc can LAUNCH_FAIL if mask is nil. should nicely check
+move add-hoc functionality (center walls etc) to "extra" package
 
 
 new features:
@@ -28,12 +27,9 @@ new features:
 
 slice time stamp
 
-
-web: rename pause -> break
 web: undone steps -> total evals
 web: (clean) exit button
 web: show/hide/auto refresh
-web: render more than just magnetization
 web: graphs
 web: -web flag opens browser
 

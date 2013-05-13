@@ -23,6 +23,10 @@ func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 	AddExtField(compensateLRSurfaceCharges(global_mesh(), mxLeft, mxRight), Bsat)
 }
 
+func init() {
+	parser.AddFunc("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
+}
+
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {
 	log.Println("calculating field to compensate nanowire surface charge")
 	h := data.NewSlice(3, m)

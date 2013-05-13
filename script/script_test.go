@@ -39,6 +39,6 @@ func BenchmarkParser(b *testing.B) {
 	p.AddFloat("a", &a)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		p.parse(src)
+		p.Parse(src)
 	}
 }

@@ -15,8 +15,8 @@ import (
 var (
 	flag_version  = flag.Bool("v", true, "print version")
 	flag_silent   = flag.Bool("s", false, "Don't generate any log info")
-	flag_od       = flag.String("o", "", "set output directory")
-	flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
+	Flag_od       = flag.String("o", "", "set output directory")
+	Flag_force    = flag.Bool("f", false, "force start, clean existing output directory")
 	flag_maxprocs = flag.Int("threads", 0, "maximum number of CPU threads, 0=auto")
 	flag_port     = flag.String("http", ":35367", "port to serve web gui")
 )
@@ -43,8 +43,8 @@ func Init() {
 		log.Print(uname, "\n")
 	}
 
-	if *flag_od != "" {
-		SetOD(*flag_od, *flag_force)
+	if *Flag_od != "" {
+		SetOD(*Flag_od, *Flag_force)
 	}
 
 	if *flag_maxprocs == 0 {

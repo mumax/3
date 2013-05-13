@@ -2,6 +2,7 @@ package main
 
 import (
 	. "code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/util"
 	"flag"
 	"log"
 	"os/exec"
@@ -19,6 +20,9 @@ func main() {
 
 	// flags parsed by engine.Init()
 	if flag.NArg() > 0 {
+		if *Flag_od == "" { // -o not set
+			SetOD(util.NoExt(flag.Arg(0))+".out", *Flag_force)
+		}
 		for _, f := range flag.Args() {
 			log.Println("run file", f)
 			RunFile(f)

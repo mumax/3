@@ -2,7 +2,7 @@
 
 scripts=*.txt
 for f in $scripts; do
-	../mx3 $f || exit 1;
+	../mx3 -f $f|| exit 1;
 done;
 
 files=*.go

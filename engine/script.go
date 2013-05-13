@@ -12,7 +12,10 @@ import (
 
 //TODO use go/scanner to handle negative numbers etc.
 
-var parser = script.NewParser()
+var (
+	parser       = script.NewParser()
+	parserInited bool
+)
 
 // Runs a script file.
 func RunFile(fname string) {
@@ -24,10 +27,13 @@ func RunFile(fname string) {
 
 // Runs script form input.
 func RunScript(src io.Reader) {
+	if !parserInited {
+		initParser()
+	}
 	util.FatalErr(parser.Exec(src))
 }
 
-func init() {
+func initParser() {
 	parser.AddFunc("print", myprint)
 
 	parser.AddFunc("setgridsize", setGridSize)
@@ -48,6 +54,7 @@ func init() {
 	parser.AddVar("b_ext", &B_ext)
 	parser.AddVar("m", &M)
 
+	parserInited = true
 	log.Println("parser initialized")
 }
 

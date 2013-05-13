@@ -22,22 +22,27 @@ mx3:
 nvcc:
 	make -C cuda -j8
 
+.PHONY: 6g
 6g:
 	go install -v $(PKGS)
 
+.PHONY: tools
 tools:
 	go install -v $(PREFIX)/tools/mx3-convert
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 
+.PHONY: gccgo
 gccgo:
 	go install -v -compiler $(GCCGO) $(PKGS)
 	go install -v -compiler $(GCCGO)
 
+.PHONY: githook
 githook:
 	ln -sf $(CURDIR)/pre-commit .git/hooks/pre-commit
 	ln -sf $(CURDIR)/post-commit .git/hooks/post-commit
 
+.PHONY: racetest
 racetest:
 	go test -race $(PKGS)
 	make -C test
@@ -45,10 +50,12 @@ racetest:
 .PHONY: test
 test: 6gtest unittest #gccgotest #re-enable gccgotest when gcc up to date with go 1.1
 
+.PHONY: unittest
 unittest:
 	(cd examples && ./build.bash)
 	(cd test && ./run.bash)
 
+.PHONY: 6gtest
 6gtest: 6g
 	go test -i $(PKGS) 
 	go test $(PKGS) 

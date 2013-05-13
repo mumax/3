@@ -7,35 +7,29 @@ import (
 )
 
 type world struct {
-	identifiers map[string]struct{} // set of defined identifiers
-	variables   map[string]Variable
-	functions   map[string]reflect.Value
+	identifiers map[string]interface{} // set of defined identifiers
 }
 
 func (w *world) init() {
-	w.identifiers = make(map[string]struct{})
-	w.variables = make(map[string]Variable)
-	w.functions = make(map[string]reflect.Value)
+	w.identifiers = make(map[string]interface{})
 }
 
-// checks that name has not yet been declared,
-// then adds it to the known identifiers so it can not be declared a second time.
-func (w *world) declare(name string) {
-	if _, ok := w.identifiers[name]; ok {
-		panic("identifier " + name + " already defined")
+// add identifier but check that it's not declared yet.
+func (w *world) declare(key string, value interface{}) {
+	lname := strings.ToLower(key)
+	if _, ok := w.identifiers[lname]; ok {
+		panic("identifier " + key + " already defined")
 	}
-	w.identifiers[name] = struct{}{}
+	w.identifiers[lname] = value
 }
 
 func (w *world) AddVar(name string, v Variable) {
-	name = strings.ToLower(name)
-	w.declare(name)
-	w.variables[name] = v
+	w.declare(name, v)
 }
 
-func (p *Parser) getvar(name string) Variable {
+func (p *Parser) get(name string) interface{} {
 	lname := strings.ToLower(name)
-	if v, ok := p.variables[lname]; ok {
+	if v, ok := p.identifiers[lname]; ok {
 		return v
 	} else {
 		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
@@ -43,22 +37,11 @@ func (p *Parser) getvar(name string) Variable {
 }
 
 func (w *world) AddFunc(name string, f interface{}) {
-	lname := strings.ToLower(name)
-	w.declare(name)
 	v := reflect.ValueOf(f)
 	if v.Kind() != reflect.Func {
 		panic(fmt.Errorf("addfunc: expect func, got: %v", reflect.TypeOf(f)))
 	}
-	w.functions[lname] = v
-}
-
-func (p *Parser) getfunc(name string) reflect.Value {
-	lname := strings.ToLower(name)
-	if v, ok := p.functions[lname]; ok {
-		return v
-	} else {
-		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
-	}
+	w.declare(name, v) // TODO: wrap in Func type?
 }
 
 // TODO: add const, like pi, mu0, ...

@@ -5,7 +5,10 @@ import (
 )
 
 func (p *Parser) newAssign(name string, rhs Expr) assignment {
-	return assignment{p.getvar(name), rhs}
+	if v, ok := p.get(name).(Variable); ok {
+		return assignment{v, rhs}
+	}
+	panic(fmt.Errorf("line %v: cannot assign to %v", p.Position, name))
 }
 
 type assignment struct {

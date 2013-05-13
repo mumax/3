@@ -12,7 +12,10 @@ type call struct {
 }
 
 func (p *Parser) newCall(name string, args []Expr) *call {
-	funcval := p.getfunc(name)
+	funcval, ok := p.get(name).(reflect.Value)
+	if !ok {
+		panic(fmt.Errorf("line %v: cannot call %v", p.Position, name))
+	}
 	functyp := funcval.Type()
 	if !functyp.IsVariadic() && functyp.NumIn() != len(args) {
 		panic(fmt.Errorf("line %v: %v needs %v arguments, have %v", p.Line, name, functyp.NumIn(), len(args)))

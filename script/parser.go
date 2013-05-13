@@ -67,7 +67,7 @@ func (p *Parser) parseIdent() Expr {
 	case ASSIGN:
 		return p.parseAssign()
 	default:
-		return p.getvar(p.str)
+		return p.parseExpr()
 	}
 }
 

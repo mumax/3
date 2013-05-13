@@ -1,12 +1,12 @@
 #! /bin/bash
 
-source ./build.bash
+source ./build.bash || exit 1
 
-go test -i $PKGS
-go test $PKGS 
+go test -i $PKGS || exit 1
+go test $PKGS  || exit 1
 
-(cd examples && ./build.bash)
-(cd test && ./run.bash)
+(cd examples && ./build.bash) || exit 1
+(cd test && ./run.bash) || exit 1
 
 #go test -i -compiler=$gccgo $PKGS
 #go test -compiler=$gccgo $PKGS

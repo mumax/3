@@ -1,5 +1,7 @@
 #! /bin/bash
 
+go build -v ..
+
 files=*.go
 files=$(echo $files | sed s/doc.go//g)
 

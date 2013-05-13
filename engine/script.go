@@ -52,6 +52,12 @@ func initParser() {
 	parser.AddVar("msat", &Msat)
 	parser.AddVar("alpha", &Alpha)
 	parser.AddVar("b_ext", &B_ext)
+	parser.AddVar("dmi", &DMI)
+	parser.AddVar("ku1", &Ku1)
+	parser.AddVar("xi", &Xi)
+	parser.AddVar("spinpol", &SpinPol)
+	parser.AddVar("j", &J)
+
 	parser.AddVar("m", &M)
 
 	parserInited = true

@@ -17,7 +17,7 @@ func (p *Parser) Exec(src io.Reader) (err error) {
 	//	}()
 
 	var code []Expr
-	code, err = p.parse(src)
+	code, err = p.Parse(src)
 	if err != nil {
 		return
 	}

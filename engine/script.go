@@ -27,6 +27,14 @@ func RunScript(src io.Reader) {
 	util.FatalErr(parser.Exec(src))
 }
 
+func Vet(fname string) {
+	f, err := os.Open(fname)
+	util.FatalErr(err)
+	defer f.Close()
+	_, err = parser.Parse(f)
+	util.FatalErr(err)
+}
+
 func init() {
 	parser.AddFunc("print", myprint)
 

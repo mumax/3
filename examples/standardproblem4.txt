@@ -1,0 +1,35 @@
+/*
+	Micromagnetic standard problem 4 (a) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+
+	setgridsize(128,      32,      1)
+	setcellsize(3.125e-9, 3.125e-9, 3e-9)
+
+
+// material
+
+	alpha = 1
+	msat  = 800e3
+	aex   = 13e-12
+	m     = uniform(1, .1, 0)
+
+
+// relax
+
+	run(3e-9) 
+	print("relaxed m:", average(m))
+
+
+// run
+
+	alpha = 0.02
+	b_ext = (-24.6E-3, 4.3E-3, 0)
+
+	savetable(10e-12)
+	autosave(m, 50e-12)
+	run(1e-9)
+	print("final m:", average(m))
+

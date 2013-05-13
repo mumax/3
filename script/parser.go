@@ -20,7 +20,7 @@ func NewParser() *Parser {
 	return p
 }
 
-func (p *Parser) parse(src io.Reader) (code []Expr, err error) {
+func (p *Parser) Parse(src io.Reader) (code []Expr, err error) {
 	defer func() {
 		panc := recover()
 		if panc != nil {

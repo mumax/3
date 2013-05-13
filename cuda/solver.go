@@ -9,13 +9,13 @@ import (
 
 // embedded in all solvers
 type solverCommon struct {
-	Dt_si, dt_mul    float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	time             *float64 // in seconds
-	Mindt, Maxdt     float64  // minimum and maximum time step
-	MaxErr, Headroom float64  // maximum error per step
-	LastErr          float64  // error of last step
-	NSteps, NUndone  int      // number of good steps, undone steps
-	Fixdt            bool     // fixed time step?
+	Dt_si, dt_mul          float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	time                   *float64 // in seconds
+	Mindt, Maxdt           float64  // minimum and maximum time step
+	MaxErr, Headroom       float64  // maximum error per step
+	LastErr                float64  // error of last step
+	NSteps, NUndone, NEval int      // number of good steps, undone steps
+	Fixdt                  bool     // fixed time step?
 }
 
 func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {

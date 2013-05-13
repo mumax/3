@@ -30,6 +30,7 @@ func (e *Heun) Step() {
 	// stage 1
 	{
 		dy := e.torqueFn(true) // <- hook here for output, always good step output
+		e.NEval++
 		y := e.y
 		Madd2(y, y, dy, 1, dt) // y = y + dt * dy
 		data.Copy(dy0, dy)
@@ -39,6 +40,7 @@ func (e *Heun) Step() {
 	{
 		*e.time += e.Dt_si
 		dy := e.torqueFn(false)
+		e.NEval++
 
 		err := 0.0
 		if !e.Fixdt {

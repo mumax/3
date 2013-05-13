@@ -14,7 +14,7 @@ func dash(w http.ResponseWriter, r *http.Request) {
 
 const dashText = `
 <table> 
-<tr><td> step:        </td><td> {{.Solver.NSteps}} </td><td> &nbsp; &nbsp; undone steps:</td><td> {{.Solver.NUndone}}</td></tr>  
+<tr><td> step:        </td><td> {{.Solver.NSteps}} </td><td> &nbsp; &nbsp; evaluations:</td><td> {{.Solver.NEval}}</td></tr>  
 <tr><td> time:        </td><td> {{printf "%12e" .Time}}         s</td><td> &nbsp; &nbsp; time step:   </td><td> {{printf "%12e" .Solver.Dt_si}} s</td></tr>  
 <tr><td> max err/step:</td><td> {{printf "%e" .Solver.MaxErr}} </td><td> &nbsp; &nbsp; err/step:    </td><td> {{printf "%12e" .Solver.LastErr}}</td></tr>  
 </table>

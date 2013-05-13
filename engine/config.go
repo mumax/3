@@ -10,6 +10,12 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+func init() {
+	parser.AddFunc("uniform", Uniform)
+	parser.AddFunc("vortex", Vortex)
+	parser.AddFunc("twodomain", TwoDomain)
+}
+
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1). E.g.:
 // 	M.Set(Vortex(1, 1)) // counterclockwise, core up
 func Vortex(circ, pol int) *data.Slice {

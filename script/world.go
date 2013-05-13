@@ -3,6 +3,7 @@ package script
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type world struct {
@@ -27,12 +28,14 @@ func (w *world) declare(name string) {
 }
 
 func (w *world) AddVar(name string, v Variable) {
+	name = strings.ToLower(name)
 	w.declare(name)
 	w.variables[name] = v
 }
 
 func (p *Parser) getvar(name string) Variable {
-	if v, ok := p.variables[name]; ok {
+	lname := strings.ToLower(name)
+	if v, ok := p.variables[lname]; ok {
 		return v
 	} else {
 		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
@@ -40,16 +43,18 @@ func (p *Parser) getvar(name string) Variable {
 }
 
 func (w *world) AddFunc(name string, f interface{}) {
+	lname := strings.ToLower(name)
 	w.declare(name)
 	v := reflect.ValueOf(f)
 	if v.Kind() != reflect.Func {
 		panic(fmt.Errorf("addfunc: expect func, got: %v", reflect.TypeOf(f)))
 	}
-	w.functions[name] = v
+	w.functions[lname] = v
 }
 
 func (p *Parser) getfunc(name string) reflect.Value {
-	if v, ok := p.functions[name]; ok {
+	lname := strings.ToLower(name)
+	if v, ok := p.functions[lname]; ok {
 		return v
 	} else {
 		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
@@ -60,5 +65,6 @@ func (p *Parser) getfunc(name string) reflect.Value {
 
 // TODO: rm
 func (w *world) AddFloat(name string, addr *float64) {
-	w.AddVar(name, float{addr})
+	lname := strings.ToLower(name)
+	w.AddVar(lname, float{addr})
 }

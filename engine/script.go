@@ -12,10 +12,7 @@ import (
 
 //TODO use go/scanner to handle negative numbers etc.
 
-var (
-	parser       = script.NewParser()
-	parserInited bool
-)
+var parser = script.NewParser()
 
 // Runs a script file.
 func RunFile(fname string) {
@@ -27,13 +24,10 @@ func RunFile(fname string) {
 
 // Runs script form input.
 func RunScript(src io.Reader) {
-	if !parserInited {
-		initParser()
-	}
 	util.FatalErr(parser.Exec(src))
 }
 
-func initParser() {
+func init() {
 	parser.AddFunc("print", myprint)
 
 	parser.AddFunc("setgridsize", setGridSize)
@@ -44,7 +38,6 @@ func initParser() {
 	parser.AddFunc("savetable", doSaveTable)
 
 	parser.AddFunc("average", average)
-	parser.AddFunc("uniform", Uniform)
 
 	parser.AddFloat("t", &Time)
 
@@ -60,8 +53,7 @@ func initParser() {
 
 	parser.AddVar("m", &M)
 
-	parserInited = true
-	log.Println("parser initialized")
+	//log.Println("parser initialized")
 }
 
 // needed only to make it callable from scripts

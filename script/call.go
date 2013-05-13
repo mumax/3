@@ -6,21 +6,20 @@ import (
 )
 
 type call struct {
-	funcname string
-	funcval  reflect.Value
-	args     []Expr
+	function
+	args []Expr
 }
 
 func (p *Parser) newCall(name string, args []Expr) *call {
-	funcval, ok := p.get(name).(reflect.Value)
+	f, ok := p.get(name).(*function)
 	if !ok {
-		panic(fmt.Errorf("line %v: cannot call %v", p.Position, name))
+		panic(fmt.Errorf("line %v: cannot call %v (type %v)", p.Position, name, reflect.TypeOf(p.get(name))))
 	}
-	functyp := funcval.Type()
+	functyp := f.funcval.Type()
 	if !functyp.IsVariadic() && functyp.NumIn() != len(args) {
 		panic(fmt.Errorf("line %v: %v needs %v arguments, have %v", p.Line, name, functyp.NumIn(), len(args)))
 	}
-	return &call{name, funcval, args}
+	return &call{function{name, f.funcval}, args}
 }
 
 func (e *call) Eval() interface{} {
@@ -29,7 +28,7 @@ func (e *call) Eval() interface{} {
 	for i := range args {
 		args[i] = reflect.ValueOf(argv[i])
 	}
-	ret := e.funcval.Call(args)
+	ret := e.function.funcval.Call(args)
 	if len(ret) == 0 {
 		return nil
 	}

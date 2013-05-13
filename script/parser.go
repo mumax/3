@@ -3,6 +3,7 @@ package script
 import (
 	"fmt"
 	"io"
+	"reflect"
 	"strconv"
 )
 
@@ -36,6 +37,7 @@ func (p *Parser) parse(src io.Reader) (code []Expr, err error) {
 			return nil, err
 		}
 		code = append(code, expr)
+		//fmt.Println(expr)
 		expr, err = p.parseLine()
 	}
 	return code, nil
@@ -67,7 +69,11 @@ func (p *Parser) parseIdent() Expr {
 	case ASSIGN:
 		return p.parseAssign()
 	default:
-		return p.parseExpr()
+		if e, ok := p.get(p.str).(Expr); ok {
+			return e
+		} else {
+			panic(fmt.Errorf("line %v: not an expression: %v (type %v)", p.Position, p.str, reflect.TypeOf(p.get(p.str))))
+		}
 	}
 }
 

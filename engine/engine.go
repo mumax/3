@@ -192,6 +192,10 @@ func PostStep(f func()) {
 	postStep = append(postStep, f)
 }
 
+func init() {
+	parser.AddFunc("PostStep", PostStep)
+}
+
 func step() {
 	Solver.Step()
 	for _, f := range postStep {

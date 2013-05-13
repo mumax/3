@@ -41,7 +41,7 @@ func (w *world) AddFunc(name string, f interface{}) {
 	if v.Kind() != reflect.Func {
 		panic(fmt.Errorf("addfunc: expect func, got: %v", reflect.TypeOf(f)))
 	}
-	w.declare(name, v) // TODO: wrap in Func type?
+	w.declare(name, &function{name, v}) // TODO: wrap in Func type?
 }
 
 // TODO: add const, like pi, mu0, ...

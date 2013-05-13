@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 )
 
 type Mask struct {
@@ -18,7 +19,7 @@ func newMask(nComp int, m *data.Mesh, name, unit string) *Mask {
 // 	SetAll(X, 1) // sets all faces in YZ plane to value 1.
 func (m *Mask) SetAll(component int, value float64) {
 	m.init()
-	cuda.Memset(m.buffer.Comp(swapIndex(component, 3)), float32(value))
+	cuda.Memset(m.buffer.Comp(util.SwapIndex(component, 3)), float32(value))
 }
 
 // TODO: alloc one component at a time

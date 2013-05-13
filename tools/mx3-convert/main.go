@@ -152,13 +152,11 @@ func process(f *data.Slice, time float64, name string) {
 	//		haveOutput = true
 	//	}
 
-	if !haveOutput {
-		log.Fatal("need to specifiy at least one output flag")
+	if !haveOutput || *flag_show {
+		// TODO: header
+		util.Fprintf(os.Stdout, *flag_format, f.Tensors())
+		haveOutput = true
 	}
-	//	if !haveOutput || *flag_show {
-	//		f.Fprintf(os.Stdout, *flag_format)
-	//		haveOutput = true
-	//	}
 
 }
 
@@ -170,55 +168,9 @@ func preprocess(f *data.Slice) {
 		normpeak(f)
 	}
 	if *flag_comp != -1 {
-		*f = *f.Comp(swapIndex(*flag_comp, f.NComp()))
+		*f = *f.Comp(util.SwapIndex(*flag_comp, f.NComp()))
 	}
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
 	}
-	//if *flag_scale != 1{
-	//	rescale(f, *flag_scale)
-	//}
 }
-
-// Transforms the index between user and program space, unless it is a scalar:
-//	X  <-> Z
-//	Y  <-> Y
-//	Z  <-> X
-//	XX <-> ZZ
-//	YY <-> YY
-//	ZZ <-> XX
-//	YZ <-> XY
-//	XZ <-> XZ
-//	XY <-> YZ
-func swapIndex(index, dim int) int {
-	switch dim {
-	default:
-		log.Panicf("dim=%v", dim)
-	case 1:
-		return index
-	case 3:
-		return [3]int{Z, Y, X}[index]
-	case 6:
-		return [6]int{ZZ, YY, XX, XY, XZ, YZ}[index]
-	case 9:
-		return [9]int{ZZ, YY, XX, YX, ZX, ZY, XY, XZ, YZ}[index]
-	}
-	return -1 // silence 6g
-}
-
-// Linear indices for matrix components.
-// E.g.: matrix[Y][Z] is stored as list[YZ]
-const (
-	X  = 0
-	Y  = 1
-	Z  = 2
-	XX = 0
-	YY = 1
-	ZZ = 2
-	YZ = 3
-	XZ = 4
-	XY = 5
-	ZY = 6
-	ZX = 7
-	YX = 8
-)

@@ -7,13 +7,13 @@
 
 // OVF2 suport added by Mykola Dvornik for mumax1,
 // modified for mumax2 by Arne Vansteenkiste, 2011.
+// modified for mx3 by Arne Vansteenkiste, 2013.
 
 package main
 
-// Author: Arne Vansteenkiste
-
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"fmt"
 	"io"
 	"log"
@@ -139,7 +139,7 @@ func writeOvf2Binary4(out io.Writer, array *data.Slice) {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < ncomp; c++ {
-					bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(c, ncomp)][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[util.SwapIndex(c, ncomp)][i][j][k]))[:]
 					out.Write(bytes)
 				}
 			}

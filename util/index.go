@@ -1,4 +1,4 @@
-package engine
+package util
 
 // Functions for manipulating vector and tensor indices in program and user space
 // Author: Arne Vansteenkiste
@@ -36,7 +36,7 @@ const (
 //	YZ <-> XY
 //	XZ <-> XZ
 //	XY <-> YZ
-func swapIndex(index, dim int) int {
+func SwapIndex(index, dim int) int {
 	switch dim {
 	default:
 		log.Panic("swapindex: invalid dim:", dim)

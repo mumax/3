@@ -55,7 +55,7 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
-		cuda.SetCell(b.buffer, swapIndex(c, nComp), iz, iy, ix, float32(v[c]))
+		cuda.SetCell(b.buffer, util.SwapIndex(c, nComp), iz, iy, ix, float32(v[c]))
 	}
 }
 
@@ -104,3 +104,9 @@ func (b *buffered) Save() {
 func (b *buffered) getGPU() (s *data.Slice, mustRecycle bool) {
 	return b.buffer, false
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

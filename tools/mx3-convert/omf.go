@@ -6,6 +6,7 @@ package main
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"fmt"
 	"io"
 	"log"
@@ -111,7 +112,7 @@ func writeOmfBinary4(out io.Writer, array *data.Slice) (err error) {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < ncomp; c++ {
 					// dirty conversion from float32 to [4]byte
-					bytes = (*[4]byte)(unsafe.Pointer(&data[swapIndex(c, ncomp)][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[util.SwapIndex(c, ncomp)][i][j][k]))[:]
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
 					out.Write(bytes)
 				}
@@ -133,7 +134,7 @@ func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < tens.NComp(); c++ {
-					_, err = fmt.Fprint(out, data[swapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
+					_, err = fmt.Fprint(out, data[util.SwapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
 				}
 				_, err = fmt.Fprint(out, "\n")
 			}
@@ -157,3 +158,9 @@ func hdr(out io.Writer, key string, value ...interface{}) (err error) {
 func dsc(out io.Writer, k, v interface{}) {
 	hdr(out, "Desc", k, ": ", v)
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

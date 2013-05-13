@@ -6,14 +6,14 @@ package main
 // Modified by Mykola Dvornik, 2013
 
 import (
+	"bytes"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"log"
-	//~ "unsafe"
-	"bytes"
-	"encoding/base64"
-	"encoding/binary"
 )
 
 func dumpVTK(out io.Writer, q *data.Slice, dataformat string) (err error) {
@@ -103,18 +103,18 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						fmt.Fprint(out, data[swapIndex(0, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(3, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[swapIndex(5, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(0, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(1, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(2, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(1, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(3, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(4, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(2, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(4, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[util.SwapIndex(5, 9)][i][j][k], " ")
 					} else {
 						for c := 0; c < N; c++ {
-							fmt.Fprint(out, data[swapIndex(c, N)][i][j][k], " ")
+							fmt.Fprint(out, data[util.SwapIndex(c, N)][i][j][k], " ")
 						}
 					}
 				}
@@ -128,18 +128,18 @@ func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err erro
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(0, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(1, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(2, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(1, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(3, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(4, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(2, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(4, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[swapIndex(5, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(0, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(1, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(2, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(1, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(3, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(4, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(2, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(4, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(5, 9)][i][j][k])
 					} else {
 						for c := 0; c < N; c++ {
-							binary.Write(buffer, binary.LittleEndian, data[swapIndex(c, N)][i][j][k])
+							binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(c, N)][i][j][k])
 						}
 					}
 				}

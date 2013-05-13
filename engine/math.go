@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"path"
 )
 
@@ -21,7 +22,7 @@ func average(s getIface) []float64 {
 	nComp := b.NComp()
 	avg := make([]float64, nComp)
 	for i := range avg {
-		I := swapIndex(i, nComp)
+		I := util.SwapIndex(i, nComp)
 		avg[i] = float64(cuda.Sum(b.Comp(I))) / float64(b.Mesh().NCell())
 	}
 	return avg

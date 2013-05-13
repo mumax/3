@@ -10,7 +10,7 @@ import (
 
 func resize(f *data.Slice, arg string) {
 	s := parseSize(arg)
-	resized := data.Resample(f, s[2], s[1], s[0])
+	resized := data.Resample(f, s)
 	*f = *resized
 }
 

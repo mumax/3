@@ -59,23 +59,37 @@ const templText = `
 
 	function rpc(command){
 		httpPost("/script/" + command);
+		alert("rpc " + command);
 	}
 
 	function rpcBox(label, command, args){
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
+		var boxes = [];
 		for (var i=0; i < args.length; i++){
 			var textbox = document.createElement("input");
 			textbox.type = "text";
 			textbox.value = args[i];
+			textbox.id = "text";
+			textbox.size = 10;
 			par.appendChild(textbox);
+			boxes.push(textbox);
 		}
 
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = label;
-		button.onclick = function(){rpc(command + "()")};
+		button.onclick = function(){
+			var args = "(";
+			for (var i=0; i < boxes.length; i++){
+				args += boxes[i].value;
+				if (i != boxes.length - 1) { args += ","; }
+			}
+			args += ")";
+			rpc(command + args);
+		};
 		par.appendChild(button);
+		par.innerHTML += "<br/>";
 	}
 
 	// add a button that executes an rpc command
@@ -95,8 +109,8 @@ const templText = `
 
 <table><tr><td>  
 
-	<script> rpcBox("Run", "run", 1e-9);     </script>
-	<script> rpcBox("Steps", "steps", 1000); </script>
+	<script> rpcBox("Run", "run", [1e-9]);     </script>
+	<script> rpcBox("Steps", "steps", [1000]); </script>
 	<script> rpcButton("Break", "pause");    </script>
 
 	<br/>

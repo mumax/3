@@ -20,7 +20,8 @@
 // relax
 
 	run(3e-9) 
-	print("relaxed m:", average(m))
+	print("relaxed m")
+	print(average(m))
 
 
 // run
@@ -31,5 +32,6 @@
 	savetable(10e-12)
 	autosave(m, 50e-12)
 	run(1e-9)
-	print("final m:", average(m))
+	print("final m:")
+	print(average(m))
 

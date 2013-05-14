@@ -30,9 +30,7 @@ func main() {
 	SpinPol = Const(0.56)
 
 	// Initial magnetization close to vortex wall
-	M.SetRegion(0, 0, 0, nx/2, ny, nz, Uniform(1, 0, 0))          // left half:  ->
-	M.SetRegion(nx/2, 0, 0, nx, ny, nz, Uniform(-1, 0, 0))        // right half: <-
-	M.SetRegion(nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(1, 1)) // center: vortex
+	M.Set(VortexWall(1, -1, 1, 1))
 
 	// Remove surface charges from left (mx=1) and right (mx=-1) sides
 	// to mimic infinitely long wire.
@@ -50,7 +48,7 @@ func main() {
 
 	// Run the simulation with current through the sample
 	J = ConstVector(-8e12, 0, 0)
-	Run(10e-9)
+	Run(1e-9)
 }
 
 // Shift the magnetization to the left in order to keep mx close zero.

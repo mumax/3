@@ -43,10 +43,10 @@ func (e *call) Eval() interface{} {
 
 func convertArg(v interface{}, typ reflect.Type) reflect.Value {
 	switch typ.Kind() {
-	//	case reflect.Int:
-	//		return reflect.ValueOf(cint(v.(float64)))
-	//	case reflect.Float32:
-	//		return reflect.ValueOf(float32(v.(float64)))
+	case reflect.Int:
+		return reflect.ValueOf(cint(v.(float64)))
+	case reflect.Float32:
+		return reflect.ValueOf(float32(v.(float64)))
 	default:
 		return reflect.ValueOf(v) // do not convert
 	}

@@ -32,5 +32,5 @@
 
 // Run the simulation with current through the sample
 	J = (-8e12, 0, 0)
-	Run(10e-9)
+	Run(1e-9)
 

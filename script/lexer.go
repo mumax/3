@@ -20,7 +20,7 @@ func newLexer() *lexer {
 	return l
 }
 
-func (l *lexer) init(src io.Reader) {
+func (l *lexer) Init(src io.Reader) {
 	l.scn.Init(src)
 	l.scn.Whitespace = 1<<'\t' | 1<<' '
 	l.scn.Error = func(s *scanner.Scanner, msg string) {

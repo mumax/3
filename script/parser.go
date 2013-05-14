@@ -1,6 +1,7 @@
 package script
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"reflect"
@@ -29,7 +30,7 @@ func (p *Parser) Parse(src io.Reader) (code []Expr, err error) {
 		}
 	}()
 
-	p.lexer.init(src)
+	p.lexer.Init(src)
 
 	expr, err := p.parseLine()
 	for err != io.EOF {
@@ -41,6 +42,11 @@ func (p *Parser) Parse(src io.Reader) (code []Expr, err error) {
 		expr, err = p.parseLine()
 	}
 	return code, nil
+}
+
+func (p *Parser) ParseLine(line string) (Expr, error) {
+	p.Init(bytes.NewBuffer([]byte(line)))
+	return p.parseLine()
 }
 
 func (p *Parser) parseLine() (ex Expr, err error) {

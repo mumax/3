@@ -9,11 +9,17 @@ import (
 
 var webPort string
 
+// start web gui server
+func ServeHTTP() {
+	goServe(*flag_port)
+}
+
 // Start web gui on given port, does not block.
 func goServe(port string) {
 
-	if webPort != "" {
-		return // already serving
+	// already serving or don't want to serve
+	if webPort != "" || port == "" {
+		return
 	}
 	webPort = port
 

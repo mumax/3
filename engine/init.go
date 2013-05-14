@@ -56,9 +56,6 @@ func Init() {
 	prof.Init(OD)
 	cuda.Init()
 	cuda.LockThread()
-	if *flag_port != "" {
-		goServe(*flag_port)
-	}
 }
 
 // Cleanly exits the simulation, assuring all output is flushed. Typical use:

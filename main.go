@@ -19,19 +19,18 @@ func main() {
 	defer Close()
 
 	// flags parsed by engine.Init()
-	if flag.NArg() > 0 {
+	switch flag.NArg() {
+	case 1:
 		if *Flag_od == "" { // -o not set
 			SetOD(util.NoExt(flag.Arg(0))+".out", *Flag_force)
 		}
-		for _, f := range flag.Args() {
-			log.Println("run file", f)
-			RunFile(f)
-		}
-	} else {
+		RunFile(flag.Arg(0))
+	case 0:
 		log.Println("no input files: starting interactive session")
 		interactive()
+	default:
+		log.Fatal("need at most one input file")
 	}
-
 }
 
 //

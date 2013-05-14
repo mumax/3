@@ -103,11 +103,9 @@ const templText = `
 
 <table><tr><td>  
 
-	<script> rpcBox("Run", "pause();run", [1e-9]);     </script>
-	<script> rpcBox("Steps", "pause();steps", [1000]); </script>
+	<script> rpcBox("Run", "run", [1e-9]);     </script>
+	<script> rpcBox("Steps", "steps", [1000]); </script>
 	<script> rpcButton("Break", "pause");    </script>
-
-	<br/>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;

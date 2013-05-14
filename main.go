@@ -16,7 +16,6 @@ import (
 
 func main() {
 	Init()
-	defer Close()
 
 	// flags parsed by engine.Init()
 	switch flag.NArg() {
@@ -31,6 +30,8 @@ func main() {
 	default:
 		log.Fatal("need at most one input file")
 	}
+
+	Close()
 }
 
 //

@@ -55,6 +55,8 @@
 		httpPost("/script/" + command);
 	}
 
+	// adds a button and as many text boxes as args (default arguments).
+	// on click the rpc command is called with the text boxes input as arguments.
 	function rpcBox(label, command, args){
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
@@ -107,7 +109,7 @@
 
 	<script> rpcBox("Run", "run", [1e-9]);     </script>
 	<script> rpcBox("Steps", "steps", [1000]); </script>
-	<script> rpcButton("Break", "pause");    </script>
+	<script> rpcButton("Break", "pause");      </script>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;
@@ -152,7 +154,7 @@ function show(id) {
 <div id=div_display> 
 
 <script>
-	var renderQuant = "m"; // TODO: don't forget on reload.
+	var renderQuant = "m"; 
 	var renderComp = ""; 
 	var img = new Image();
 	img.src = "/render/" + renderQuant;

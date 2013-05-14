@@ -30,24 +30,41 @@
     	return xmlHttp.responseText;
     }
 	function httpGet(url){
-		return http("GET", url)
+		return http("GET", url);
 	}
-	var running = false
+	function httpPost(url){
+		return http("POST", url);
+	}
+
+	var running = false;
 	function updateRunning(){
 		try{
-			running = (httpGet("/running/") === "true")
+			running = (httpGet("/running/") === "true");
 		}catch(err){
-			running = false	
+			running = false	;
 		}
 		if(running){
-			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>"
+			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>";
 		}else{
-			document.getElementById("running").innerHTML = "<font color=red><b>Not running</b></font>"
+			document.getElementById("running").innerHTML = "<font color=red><b>Not running</b></font>";
 		}
-		document.getElementById("breakbutton").disabled = !running
 	}
-	setInterval(updateRunning, 200)
+	setInterval(updateRunning, 200);
+
+	function rpc(command){
+		httpPost("/script/" + command);
+	}
+
+	function callButton(label, command){
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = label;
+		button.onclick = function(){rpc(command)};
+		var par = document.scripts[document.scripts.length - 1].parentNode;
+		par.appendChild(button);
+	}
 </script>
+
 
 <div> <h2> solver </h2>
 
@@ -60,7 +77,7 @@
         <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
 	</form>
 
-	<button id="breakbutton" onclick="http(&quot;POST&quot;, &quot;/ctl/pause&quot;);">Break</button>
+	<script> callButton("Break", "pause()"); </script>
 
 	<br/>
 
@@ -78,7 +95,7 @@
 <script>
 	function updateDash(){
 		try{
-			document.getElementById("dash").innerHTML = httpGet("/dash/")
+			document.getElementById("dash").innerHTML = httpGet("/dash/");
 		}catch(err){}
 	}
 	function updateDashIfRunning(){

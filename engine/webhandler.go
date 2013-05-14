@@ -30,6 +30,7 @@ func goServe(port string) {
 	http.HandleFunc("/setm/", setm)
 
 	http.HandleFunc("/", gui)
+	http.HandleFunc("/script/", scriptHandler)
 
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {

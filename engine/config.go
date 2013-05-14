@@ -14,6 +14,7 @@ func init() {
 	parser.AddFunc("uniform", Uniform)
 	parser.AddFunc("vortex", Vortex)
 	parser.AddFunc("twodomain", TwoDomain)
+	parser.AddFunc("vortexwall", VortexWall)
 }
 
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1). E.g.:
@@ -39,6 +40,15 @@ func Vortex(circ, pol int) *data.Slice {
 		v[Y][i][cy][cz] = 0.
 		v[X][i][cy][cz] = float32(pol)
 	}
+	return m
+}
+
+func VortexWall(mleft, mright float64, circ, pol int) *data.Slice {
+	m := data.NewSlice(3, global_mesh())
+	nx, ny, nz := Nx(), Ny(), Nz()
+	SetRegion(m, 0, 0, 0, nx/2, ny, nz, Uniform(1, 0, 0))          // left half:  ->
+	SetRegion(m, nx/2, 0, 0, nx, ny, nz, Uniform(-1, 0, 0))        // right half: <-
+	SetRegion(m, nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(1, 1)) // center: vortex
 	return m
 }
 
@@ -93,14 +103,8 @@ func Uniform(mx, my, mz float64) *data.Slice {
 }
 
 // Only sets the region between cells [x1, y1, z1] and [x2, y2, z2] (excl.) to the given configuration.
-// E.g.: to set m to something resembling a vortex wall:
-// 	// Nx, Ny, Nz= number of cells
-// 	M.SetRegion(0,    0, 0,   Nx/2, Ny, Nz,  Uniform( 1, 0, 0)) // left half
-// 	M.SetRegion(Nx/2, 0, 0,   Nx,   Ny, Nz,  Uniform(-1, 0, 0)) // right half
-// 	M.SetRegion(Nx/2-Ny/2, 0, 0,   Nx/2+Ny/2,   Ny, Nz,  Vortex(1, 1)) // center
-func (M *buffered) SetRegion(x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
-	m := M.Download()
-	v := m.Vectors()
+func SetRegion(dst *data.Slice, x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
+	v := dst.Vectors()
 	src := config.Vectors()
 
 	for c := range v {
@@ -112,8 +116,6 @@ func (M *buffered) SetRegion(x1, y1, z1, x2, y2, z2 int, config *data.Slice) {
 			}
 		}
 	}
-
-	M.Set(m)
 }
 
 func vec(mx, my, mz float64) [3]float32 {

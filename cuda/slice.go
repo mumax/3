@@ -74,3 +74,14 @@ func SetElem(s *data.Slice, comp int, index int, value float32) {
 	dst := unsafe.Pointer(uintptr(s.DevPtr(comp)) + uintptr(index)*cu.SIZEOF_FLOAT32)
 	memCpyHtoD(dst, unsafe.Pointer(&f), cu.SIZEOF_FLOAT32)
 }
+
+func GetElem(s *data.Slice, comp int, index int) float32 {
+	var f float32
+	src := unsafe.Pointer(uintptr(s.DevPtr(comp)) + uintptr(index)*cu.SIZEOF_FLOAT32)
+	memCpyDtoH(unsafe.Pointer(&f), src, cu.SIZEOF_FLOAT32)
+	return f
+}
+
+func GetCell(s *data.Slice, comp, i, j, k int) float32 {
+	return GetElem(s, comp, index(i, j, k, s.Mesh().Size()))
+}

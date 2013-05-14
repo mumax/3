@@ -11,7 +11,7 @@ done;
 files=*.go
 files=$(echo $files | sed s/doc.go//g)
 
-./build.bash || exit 1
+./make.bash || exit 1
 
 for f in $files; do
 	a=$(echo $f | sed s/.go//g)

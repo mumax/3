@@ -46,9 +46,9 @@ func Vortex(circ, pol int) *data.Slice {
 func VortexWall(mleft, mright float64, circ, pol int) *data.Slice {
 	m := data.NewSlice(3, global_mesh())
 	nx, ny, nz := Nx(), Ny(), Nz()
-	SetRegion(m, 0, 0, 0, nx/2, ny, nz, Uniform(1, 0, 0))          // left half:  ->
-	SetRegion(m, nx/2, 0, 0, nx, ny, nz, Uniform(-1, 0, 0))        // right half: <-
-	SetRegion(m, nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(1, 1)) // center: vortex
+	SetRegion(m, 0, 0, 0, nx/2, ny, nz, Uniform(mleft, 0, 0))           // left half
+	SetRegion(m, nx/2, 0, 0, nx, ny, nz, Uniform(mright, 0, 0))         // right half
+	SetRegion(m, nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(circ, pol)) // center
 	return m
 }
 

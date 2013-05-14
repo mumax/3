@@ -1,6 +1,6 @@
 #! /bin/bash
 
-source ./build.bash || exit 1
+source ./make.bash || exit 1
 
 go test -i $PKGS || exit 1
 go test $PKGS  || exit 1

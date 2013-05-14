@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-var pause = false
-
-// inject to pause simulation.
-func pauseFn() { pause = true }
-
 func control(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/ctl/"):]
 	arg := r.FormValue("value")

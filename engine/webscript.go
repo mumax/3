@@ -18,6 +18,11 @@ func scriptHandler(w http.ResponseWriter, r *http.Request) {
 	inject <- func() { code.Eval() } // TODO: catch
 }
 
+var pause = false
+
+// inject to pause simulation.
+func pauseFn() { pause = true }
+
 func init() {
 	parser.AddFunc("pause", pauseFn)
 }

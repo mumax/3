@@ -55,14 +55,33 @@
 		httpPost("/script/" + command);
 	}
 
-	function callButton(label, command){
+	function rpcBox(label, command, args){
+		var par = document.scripts[document.scripts.length - 1].parentNode;
+
+		for (var i=0; i < args.length; i++){
+			var textbox = document.createElement("input");
+			textbox.type = "text";
+			textbox.value = args[i];
+			par.appendChild(textbox);
+		}
+
 		var button = document.createElement("input");
 		button.type = "button";
 		button.value = label;
-		button.onclick = function(){rpc(command)};
+		button.onclick = function(){rpc(command + "()")};
+		par.appendChild(button);
+	}
+
+	// add a button that executes an rpc command
+	function rpcButton(label, command){
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = label;
+		button.onclick = function(){rpc(command + "()")};
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 		par.appendChild(button);
 	}
+
 </script>
 
 
@@ -70,14 +89,9 @@
 
 <table><tr><td>  
 
-	<form action=/ctl/run method="POST">
-        <input id=text size=8 name="value" value="{{.Runtime}}"> s <input type="submit" value="Run"/>
-	</form>
-	<form  action=/ctl/steps method="POST">
-        <input id=text size=8 name="value" value="{{.Steps}}"> <input type="submit" value="Steps"/>
-	</form>
-
-	<script> callButton("Break", "pause()"); </script>
+	<script> rpcBox("Run", "run", 1e-9);     </script>
+	<script> rpcBox("Steps", "steps", 1000); </script>
+	<script> rpcButton("Break", "pause");    </script>
 
 	<br/>
 

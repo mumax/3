@@ -309,8 +309,7 @@ var (
 	cellsize []float64
 )
 
-func setGridSize(nx, ny, nz float64) {
-	Nx, Ny, Nz := cint(nx), cint(ny), cint(nz)
+func setGridSize(Nx, Ny, Nz int) {
 	gridsize = []int{Nx, Ny, Nz}
 	if cellsize != nil {
 		SetMesh(Nx, Ny, Nz, cellsize[0], cellsize[1], cellsize[2])

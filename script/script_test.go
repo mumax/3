@@ -16,7 +16,7 @@ func TestParser(t *testing.T) {
 	p.AddFloat("a", &a)
 	p.AddFunc("print", myprint)
 	p.Exec(src1)
-	p.ExecString("a=2; print(a, 2)")
+	p.ExecString("a=2; print(a)")
 }
 
 func myprint(msg ...interface{}) {

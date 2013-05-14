@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -108,10 +107,6 @@ func myprint(msg ...interface{}) {
 	log.Println(msg...)
 }
 
-//func setmeshfloat(nx, ny, nz, cx, cy, cz float64) {
-//	SetMesh(cint(nx), cint(ny), cint(nz), cx, cy, cz)
-//}
-
 func doAutosave(what interface {
 	Autosave(float64)
 }, period float64) {
@@ -120,13 +115,4 @@ func doAutosave(what interface {
 
 func doSaveTable(period float64) {
 	Table.Autosave(period)
-}
-
-// safe conversion from float to integer.
-func cint(f float64) int {
-	i := int(f)
-	if float64(i) != f {
-		panic(fmt.Errorf("need integer, have: %v", f))
-	}
-	return i
 }

@@ -45,6 +45,7 @@ func init() {
 	parser.AddFunc("setcellsize", setCellSize)
 
 	parser.AddFunc("run", Run)
+	parser.AddFunc("steps", Steps)
 	parser.AddFunc("autosave", doAutosave)
 	parser.AddFunc("savetable", doSaveTable)
 

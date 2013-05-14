@@ -64,21 +64,7 @@ const templText = `
 	function rpcBox(label, command, args){
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
-		var boxes = [];
-		for (var i=0; i < args.length; i++){
-			var textbox = document.createElement("input");
-			textbox.type = "text";
-			textbox.value = args[i];
-			textbox.id = "text";
-			textbox.size = 10;
-			par.appendChild(textbox);
-			boxes.push(textbox);
-		}
-
-		var button = document.createElement("input");
-		button.type = "button";
-		button.value = label;
-		button.onclick = function(){
+		var submit = function(){
 			var args = "(";
 			for (var i=0; i < boxes.length; i++){
 				args += boxes[i].value;
@@ -87,6 +73,28 @@ const templText = `
 			args += ")";
 			rpc(command + args);
 		};
+
+		var boxes = [];
+		for (var i=0; i < args.length; i++){
+			var textbox = document.createElement("input");
+			textbox.type = "text";
+			textbox.value = args[i];
+			textbox.id = "text";
+			textbox.size = 10;
+			textbox.onkeydown=function(){
+				if (event.keyCode == 13) {
+					submit();
+				}
+			};
+			par.appendChild(textbox);
+			boxes.push(textbox);
+		}
+
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = label;
+		button.onclick = submit;
+
 		par.appendChild(button);
 		par.appendChild(document.createElement("br"));
 	}

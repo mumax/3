@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-//TODO use go/scanner to handle negative numbers etc.
-
 var parser = script.NewParser()
 
 // Runs a script file.
@@ -30,6 +28,7 @@ func RunFile(fname string) {
 	}
 }
 
+// Compile file but do not run it. Used to check for errors.
 func Vet(fname string) {
 	f, err := os.Open(fname)
 	util.FatalErr(err)
@@ -62,10 +61,7 @@ func init() {
 	parser.AddVar("xi", &Xi)
 	parser.AddVar("spinpol", &SpinPol)
 	parser.AddVar("j", &J)
-
 	parser.AddVar("m", &M)
-
-	//log.Println("parser initialized")
 }
 
 // needed only to make it callable from scripts

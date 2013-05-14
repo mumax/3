@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+// TODO replace by rpc call
 func setmesh(w http.ResponseWriter, r *http.Request) {
 
 	inject <- pauseFn

@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// TODO: rpc
+
 // Handler that sets magnetization from file
 func setm(w http.ResponseWriter, r *http.Request) {
 	arg := r.FormValue("value")

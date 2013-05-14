@@ -29,7 +29,6 @@ func goServe(port string) {
 	http.HandleFunc("/render/", render)
 	http.HandleFunc("/dash/", dash)
 
-	http.HandleFunc("/ctl/", control)
 	http.HandleFunc("/setparam/", setparam)
 	http.HandleFunc("/setmesh/", setmesh)
 	http.HandleFunc("/running/", isrunning)

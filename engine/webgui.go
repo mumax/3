@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"html/template"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 )
 
 var (
-	ui      = &guistate{Steps: 1000, Runtime: 1e-9}
+	ui      = &guistate{}
 	uitempl = template.Must(template.New("gui").Parse(templText))
 )
 
@@ -21,11 +20,7 @@ func gui(w http.ResponseWriter, r *http.Request) {
 	injectAndWait(func() { util.FatalErr(uitempl.Execute(w, ui)) })
 }
 
-type guistate struct {
-	Steps               int
-	Runtime             float64
-	running, pleaseStop bool // todo: mv out of struct
-}
+type guistate struct{}
 
 func (s *guistate) Time() float32                 { return float32(Time) }
 func (s *guistate) ImWidth() int                  { return ui.Mesh().Size()[2] }
@@ -45,7 +40,7 @@ func (s *guistate) WorldNm() [3]float64 {
 const mib = 1024 * 2014
 
 // TODO: strangely this reports wrong numbers (x2 too low).
-func (s *guistate) MemInfo() string { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
+// func (s *guistate) MemInfo() string { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
 
 func (s *guistate) Solver() *cuda.Heun {
 	if Solver == nil {

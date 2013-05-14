@@ -10,6 +10,8 @@ import (
 	"strconv"
 )
 
+// TODO: replace by rpc call
+
 // handle to set numerical parameters
 func setparam(w http.ResponseWriter, r *http.Request) {
 

@@ -20,7 +20,7 @@ func newAdder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data
 // it is first added to a separate buffer, saved, and then added to Dst.
 func (a *adder) addTo(dst *data.Slice, goodstep bool) {
 	if goodstep && a.needSave() {
-		buf := cuda.GetBuffer(dst.NComp(), dst.Mesh()) // TODO: not 3
+		buf := cuda.GetBuffer(dst.NComp(), dst.Mesh())
 		cuda.Zero(buf)
 		a.addFn(buf)
 		cuda.Madd2(dst, dst, buf, 1, 1)

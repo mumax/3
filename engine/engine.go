@@ -90,8 +90,8 @@ func initialize() {
 
 	// demag field
 	demag_ := cuda.NewDemag(global_mesh())
-	B_demag = newSetter(3, global_mesh(), "B_demag", "T", func(b *data.Slice, good bool) {
-		demag_.Exec(b, M.buffer, vol, Mu0*Msat()) //TODO: consistent msat or bsat
+	B_demag = newSetter(3, global_mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
+		demag_.Exec(b, M.buffer, vol, Mu0*Msat())
 	})
 	quants["B_demag"] = B_demag
 
@@ -136,18 +136,18 @@ func initialize() {
 	//quants["B_ext"] = B_ext
 
 	// effective field
-	B_eff = newSetter(3, global_mesh(), "B_eff", "T", func(dst *data.Slice, good bool) {
-		B_demag.set(dst, good)
-		B_exch.addTo(dst, good)
-		B_dmi.addTo(dst, good)
-		B_uni.addTo(dst, good)
-		b_ext.addTo(dst, good)
+	B_eff = newSetter(3, global_mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
+		B_demag.set(dst, cansave)
+		B_exch.addTo(dst, cansave)
+		B_dmi.addTo(dst, cansave)
+		B_uni.addTo(dst, cansave)
+		b_ext.addTo(dst, cansave)
 	})
 	quants["B_eff"] = B_eff
 
 	// llg torque
-	LLGTorque = newSetter(3, global_mesh(), "llgtorque", "T", func(b *data.Slice, good bool) {
-		B_eff.set(b, good)
+	LLGTorque = newSetter(3, global_mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
+		B_eff.set(b, cansave)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
 	quants["llgtorque"] = LLGTorque
@@ -165,22 +165,22 @@ func initialize() {
 	})
 	quants["sttorque"] = STTorque
 
-	Torque = newSetter(3, global_mesh(), "torque", "T", func(b *data.Slice, good bool) {
-		LLGTorque.set(b, good)
-		STTorque.addTo(b, good)
+	Torque = newSetter(3, global_mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
+		LLGTorque.set(b, cansave)
+		STTorque.addTo(b, cansave)
 	})
 	quants["torque"] = Torque
 
 	// solver
-	torqueFn := func(good bool) *data.Slice {
+	torqueFn := func(cansave bool) *data.Slice {
 		itime++
-		Table.arm(good)    // if table output needed, quantities marked for update
-		M.notifySave(good) // saves m if needed
-		ExchangeMask.notifySave(good)
+		Table.arm(cansave)    // if table output needed, quantities marked for update
+		M.notifySave(cansave) // saves m if needed
+		ExchangeMask.notifySave(cansave)
 
-		Torque.set(torquebuffer, good)
+		Torque.set(torquebuffer, cansave)
 
-		Table.touch(good) // all needed quantities are now up-to-date, save them
+		Table.touch(cansave) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
 	Solver = cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

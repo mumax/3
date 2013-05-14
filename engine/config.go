@@ -121,23 +121,3 @@ func SetRegion(dst *data.Slice, x1, y1, z1, x2, y2, z2 int, config *data.Slice) 
 func vec(mx, my, mz float64) [3]float32 {
 	return [3]float32{float32(mz), float32(my), float32(mx)}
 }
-
-// convert mumax's internal ZYX convention to userspace XYZ.
-//func convertXYZ(arr [][][][]float32) *host.Array {
-//	s := arr.Size3D
-//	n := arr.NComp()
-//	a := arr.Array
-//	transp := host.NewArray(n, []int{s[Z], s[Y], s[X]})
-//	t := transp.Array
-//	for c := 0; c < n; c++ {
-//		c2 := swapIndex(c, n)
-//		for i := 0; i < s[X]; i++ {
-//			for j := 0; j < s[Y]; j++ {
-//				for k := 0; k < s[Z]; k++ {
-//					t[c2][k][j][i] = a[c][i][j][k]
-//				}
-//			}
-//		}
-//	}
-//	return transp
-//}

@@ -9,12 +9,12 @@ func CenterPMAWall() {
 	tolerance := 4 / float64(Nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
-		sign := signum(M.GetCell(Z, 0, Ny()/2, Nz()/2))
+		sign := wall_left_magnetization(M.GetCell(Z, 0, Ny()/2, Nz()/2))
 		M.Shift(sign, 0, 0)
 		return
 	}
 	if mz > tolerance {
-		sign := signum(M.GetCell(Z, 0, Ny()/2, Nz()/2))
+		sign := wall_left_magnetization(M.GetCell(Z, 0, Ny()/2, Nz()/2))
 		M.Shift(-sign, 0, 0)
 	}
 }
@@ -26,12 +26,12 @@ func CenterInplaneWall() {
 	tolerance := 4 / float64(Nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
-		sign := signum(M.GetCell(X, 0, Ny()/2, Nz()/2))
+		sign := wall_left_magnetization(M.GetCell(X, 0, Ny()/2, Nz()/2))
 		M.Shift(sign, 0, 0)
 		return
 	}
 	if mz > tolerance {
-		sign := signum(M.GetCell(X, 0, Ny()/2, Nz()/2))
+		sign := wall_left_magnetization(M.GetCell(X, 0, Ny()/2, Nz()/2))
 		M.Shift(-sign, 0, 0)
 	}
 }
@@ -41,7 +41,7 @@ func init() {
 	parser.AddFunc("centerInplaneWall", CenterInplaneWall)
 }
 
-func signum(x float64) int {
+func wall_left_magnetization(x float64) int {
 	if x > 0.6 {
 		return 1
 	}

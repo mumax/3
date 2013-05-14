@@ -25,11 +25,7 @@ const VERSION = "mx3.0.6 α "
 
 var uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
-// Initializes the simulation engine. Typical use:
-// 	func main(){
-// 		Init()
-// 		defer Close()
-// 		...
+// Initializes the simulation engine.
 func Init() {
 	flag.Parse()
 
@@ -58,11 +54,7 @@ func Init() {
 	cuda.LockThread()
 }
 
-// Cleanly exits the simulation, assuring all output is flushed. Typical use:
-// 	func main(){
-// 		Init()
-// 		defer Close()
-// 		...
+// Cleanly exits the simulation, assuring all output is flushed.
 func Close() {
 	keepBrowserAlive()
 

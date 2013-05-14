@@ -11,6 +11,7 @@
 	setgridsize(128, 256, 1)
 	setcellsize(2e-9, 2e-9, 1e-9)
 
+
 // Material parameters
 
 	msat    = 600e3
@@ -20,6 +21,7 @@
 	xi      = 0.2
 	spinpol = 0.5
 
+
 // Initial magnetization
 
 	m     = twoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
@@ -27,14 +29,17 @@
 	run(0.1e-9)                                   // relax
 	alpha = 0.02                                  // restore normal damping
 
+
 // Set post-step function that centers simulation window on domain wall.
 
 	postStep(centerPMAwall)
+
 
 // Schedule output
 
 	autosave(m, 100e-12)
 	savetable(10e-12)
+
 
 // Run for 1ns with current through the sample
 

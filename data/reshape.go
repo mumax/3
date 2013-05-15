@@ -22,16 +22,3 @@ func reshape(array []float32, size [3]int) [][][]float32 {
 	}
 	return sliced
 }
-
-// Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
-func sizeOf(block [][][]float32) [3]int {
-	return [3]int{len(block), len(block[0]), len(block[0][0])}
-}
-
-// Reshape the block to one contiguous list.
-// Assumes the block's storage is contiguous,
-// like returned by Reshape.
-func contiguous(block [][][]float32) []float32 {
-	N := prod(sizeOf(block))
-	return block[0][0][:N]
-}

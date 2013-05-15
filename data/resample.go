@@ -2,6 +2,8 @@ package data
 
 import "log"
 
+// Resample returns a slice of new size N,
+// using nearest neighbor interpolation over the input slice.
 func Resample(in *Slice, N [3]int) *Slice {
 	m1 := in.Mesh()
 	w := m1.WorldSize()
@@ -13,9 +15,6 @@ func Resample(in *Slice, N [3]int) *Slice {
 	return out
 }
 
-// ResampleNearest copies in to out using nearest-neighbor interpolation.
-// len(in) should be == len(out) (the number of vector components).
-// The other dimensions are supposedly different and will be interpolated over.
 func resampleNearest(out, in [][][][]float32) {
 	if len(in) != len(out) {
 		log.Panicf("illegal argument: len(out)=%v, len(in)=%v", len(out), len(in))
@@ -34,4 +33,9 @@ func resampleNearest(out, in [][][][]float32) {
 			}
 		}
 	}
+}
+
+// Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
+func sizeOf(block [][][]float32) [3]int {
+	return [3]int{len(block), len(block[0]), len(block[0][0])}
 }

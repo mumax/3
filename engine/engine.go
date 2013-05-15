@@ -211,16 +211,6 @@ func step() {
 	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
-// injects arbitrary code into the engine run loops. Used by web interface.
-var inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
-
-// inject code into engine and wait for it to complete.
-func injectAndWait(task func()) {
-	ready := make(chan int)
-	inject <- func() { task(); ready <- 1 }
-	<-ready
-}
-
 // Returns the mesh cell size in meters. E.g.:
 // 	cellsize_x := CellSize()[X]
 func CellSize() [3]float64 {
@@ -241,43 +231,6 @@ func GridSize() [3]int {
 func Nx() int { return GridSize()[X] }
 func Ny() int { return GridSize()[Y] }
 func Nz() int { return GridSize()[Z] }
-
-// Run the simulation for a number of seconds.
-func Run(seconds float64) {
-	log.Println("run for", seconds, "s")
-	stop := Time + seconds
-	RunCond(func() bool { return Time < stop })
-}
-
-// Run the simulation for a number of steps.
-func Steps(n int) {
-	log.Println("run for", n, "steps")
-	stop := Solver.NSteps + n
-	RunCond(func() bool { return Solver.NSteps < stop })
-}
-
-var pause = false
-
-func Pause() {
-	pause = true
-}
-
-// Runs as long as condition returns true.
-func RunCond(condition func() bool) {
-	checkInited() // todo: check in handler
-	defer util.DashExit()
-
-	pause = false
-	for condition() && !pause {
-		select {
-		default:
-			step()
-		case f := <-inject:
-			f()
-		}
-	}
-	pause = true
-}
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.

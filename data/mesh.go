@@ -1,6 +1,7 @@
 package data
 
 import (
+	"code.google.com/p/mx3/util"
 	"fmt"
 	"log"
 )
@@ -16,8 +17,8 @@ type Mesh struct {
 // Optional periodic boundary conditions (pbc): number of repetitions
 // in X, Y, Z direction. 0,0,0 means no periodicity.
 func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
-	argument(N0 > 0 && N1 > 0 && N2 > 0)
-	argument(cellx > 0 && celly > 0 && cellz > 0)
+	util.Argument(N0 > 0 && N1 > 0 && N2 > 0)
+	util.Argument(cellx > 0 && celly > 0 && cellz > 0)
 	var pbc3 [3]int
 	if len(pbc) == 3 {
 		copy(pbc3[:], pbc)

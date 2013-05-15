@@ -4,6 +4,7 @@ package data
 // Author: Arne Vansteenkiste
 
 import (
+	"code.google.com/p/mx3/util"
 	"log"
 	"reflect"
 	"unsafe"
@@ -57,7 +58,7 @@ func NilSlice(nComp int, m *Mesh) *Slice {
 func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	length := m.NCell()
 	nComp := len(ptrs)
-	argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
+	util.Argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
 	s.len_ = int32(length)
@@ -72,7 +73,7 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 func SliceFromList(data [][]float32, mesh *Mesh) *Slice {
 	ptrs := make([]unsafe.Pointer, len(data))
 	for i := range ptrs {
-		argument(len(data[i]) == mesh.NCell())
+		util.Argument(len(data[i]) == mesh.NCell())
 		ptrs[i] = unsafe.Pointer(&data[i][0])
 	}
 	return SliceFromPtrs(mesh, CPUMemory, ptrs)
@@ -175,7 +176,7 @@ func (s *Slice) Comp(i int) *Slice {
 // It is safe to call on a nil slice, returns NULL.
 func (s *Slice) DevPtr(component int) unsafe.Pointer {
 	if s == nil {
-		return nil //unsafe.Pointer(uintptr(0))
+		return nil
 	}
 	if !s.GPUAccess() {
 		panic("slice not accessible by GPU")

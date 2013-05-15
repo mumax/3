@@ -39,9 +39,3 @@ func render(w http.ResponseWriter, r *http.Request) {
 }
 
 var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
-
-type downloader interface {
-	Download() *data.Slice
-}
-
-var quants = make(map[string]downloader)

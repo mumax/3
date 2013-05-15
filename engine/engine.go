@@ -6,7 +6,6 @@ import (
 	"code.google.com/p/mx3/util"
 	cuda5 "github.com/barnex/cuda5/cuda"
 	"log"
-	"time"
 )
 
 // User inputs
@@ -69,6 +68,13 @@ type extField struct {
 	mul  ScalFn
 }
 
+type Downloader interface {
+	Download() *data.Slice
+}
+
+// maps quantity names to downloadable data. E.g. for rendering
+var Quants = make(map[string]Downloader)
+
 func initialize() {
 
 	// these 2 GPU arrays are re-used to stored various quantities.
@@ -79,7 +85,7 @@ func initialize() {
 
 	// magnetization
 	M = *newBuffered(cuda.NewSlice(3, global_mesh()), "m", "")
-	quants["m"] = &M
+	Quants["m"] = &M
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return average(&M)
 	})
@@ -93,16 +99,16 @@ func initialize() {
 	B_demag = newSetter(3, global_mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat())
 	})
-	quants["B_demag"] = B_demag
+	Quants["B_demag"] = B_demag
 
 	// exchange field
 	B_exch = newAdder(3, global_mesh(), "B_exch", "T", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
-	quants["B_exch"] = B_exch
+	Quants["B_exch"] = B_exch
 
 	ExchangeMask = newStaggeredMask(global_mesh(), "exchangemask", "")
-	quants["exchangemask"] = ExchangeMask
+	Quants["exchangemask"] = ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
 	B_dmi = newAdder(3, global_mesh(), "B_dmi", "T", func(dst *data.Slice) {
@@ -111,7 +117,7 @@ func initialize() {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
 		}
 	})
-	quants["B_dmi"] = B_dmi
+	Quants["B_dmi"] = B_dmi
 
 	// uniaxial anisotropy
 	B_uni = newAdder(3, global_mesh(), "B_uni", "T", func(dst *data.Slice) {
@@ -120,10 +126,10 @@ func initialize() {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, KuMask.buffer, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
-	quants["B_uni"] = B_uni
+	Quants["B_uni"] = B_uni
 
 	KuMask = newMask(3, global_mesh(), "kumask", "")
-	quants["KuMask"] = KuMask
+	Quants["KuMask"] = KuMask
 
 	// external field
 	b_ext := newAdder(3, global_mesh(), "B_ext", "T", func(dst *data.Slice) {
@@ -133,7 +139,7 @@ func initialize() {
 			cuda.Madd2(dst, dst, f.mask, 1, float32(f.mul()))
 		}
 	})
-	//quants["B_ext"] = B_ext
+	//Quants["B_ext"] = B_ext
 
 	// effective field
 	B_eff = newSetter(3, global_mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
@@ -143,14 +149,14 @@ func initialize() {
 		B_uni.addTo(dst, cansave)
 		b_ext.addTo(dst, cansave)
 	})
-	quants["B_eff"] = B_eff
+	Quants["B_eff"] = B_eff
 
 	// llg torque
 	LLGTorque = newSetter(3, global_mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
-	quants["llgtorque"] = LLGTorque
+	Quants["llgtorque"] = LLGTorque
 
 	// spin-transfer torque
 	STTorque = newAdder(3, global_mesh(), "sttorque", "T", func(dst *data.Slice) {
@@ -163,13 +169,13 @@ func initialize() {
 			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
-	quants["sttorque"] = STTorque
+	Quants["sttorque"] = STTorque
 
 	Torque = newSetter(3, global_mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLGTorque.set(b, cansave)
 		STTorque.addTo(b, cansave)
 	})
-	quants["torque"] = Torque
+	Quants["torque"] = Torque
 
 	// solver
 	torqueFn := func(cansave bool) *data.Slice {
@@ -250,6 +256,12 @@ func Steps(n int) {
 	RunCond(func() bool { return Solver.NSteps < stop })
 }
 
+var pause = false
+
+func Pause() {
+	pause = true
+}
+
 // Runs as long as condition returns true.
 func RunCond(condition func() bool) {
 	checkInited() // todo: check in handler
@@ -265,27 +277,6 @@ func RunCond(condition func() bool) {
 		}
 	}
 	pause = true
-}
-
-// Enter interactive mode. Simulation is now exclusively controlled
-// by web GUI (default: http://localhost:35367)
-func RunInteractive() {
-	lastKeepalive = time.Now()
-	pause = true
-	log.Println("entering interactive mode")
-	if webPort == "" {
-		goServe(*flag_port)
-	}
-
-	for {
-		if time.Since(lastKeepalive) > webtimeout {
-			log.Println("interactive session idle: exiting")
-			break
-		}
-		log.Println("awaiting browser interaction")
-		f := <-inject
-		f()
-	}
 }
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.

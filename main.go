@@ -31,7 +31,56 @@ func main() {
 		log.Fatal("need at most one input file")
 	}
 
+	keepBrowserAlive()
 	Close()
+}
+
+// Enter interactive mode. Simulation is now exclusively controlled
+// by web GUI (default: http://localhost:35367)
+func RunInteractive() {
+	lastKeepalive = time.Now()
+	pause = true
+	log.Println("entering interactive mode")
+	if webPort == "" {
+		goServe(*flag_port)
+	}
+
+	for {
+		if time.Since(lastKeepalive) > webtimeout {
+			log.Println("interactive session idle: exiting")
+			break
+		}
+		log.Println("awaiting browser interaction")
+		f := <-inject
+		f()
+	}
+}
+
+// Runs a script file.
+func RunFile(fname string) {
+	// first we compile the entire file into an executable tree
+	f, err := os.Open(fname)
+	util.FatalErr(err)
+	defer f.Close()
+	code, err2 := parser.Parse(f)
+	util.FatalErr(err2)
+
+	// now the parser is not used anymore so it can handle web requests
+	web.goServe(*flag_port)
+
+	// start executing the tree, possibly injecting commands from web gui
+	for _, cmd := range code {
+		cmd.Eval()
+	}
+}
+
+// Compile file but do not run it. Used to check for errors.
+func Vet(fname string) {
+	f, err := os.Open(fname)
+	util.FatalErr(err)
+	defer f.Close()
+	_, err = parser.Parse(f)
+	util.FatalErr(err)
 }
 
 //

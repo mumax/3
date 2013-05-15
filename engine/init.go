@@ -56,7 +56,6 @@ func Init() {
 
 // Cleanly exits the simulation, assuring all output is flushed.
 func Close() {
-	keepBrowserAlive()
 
 	log.Println("shutting down")
 	drainOutput()

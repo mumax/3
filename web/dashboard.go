@@ -1,16 +1,18 @@
-package engine
+package web
 
 import (
+	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/util"
 	"html/template"
 	"net/http"
 )
 
-var dashtempl = template.Must(template.New("dash").Parse(dashText))
-
-func dash(w http.ResponseWriter, r *http.Request) {
-	injectAndWait(func() { util.FatalErr(dashtempl.Execute(w, ui)) })
+// handles "/dash", that shows solver state
+func dashHandler(w http.ResponseWriter, r *http.Request) {
+	engine.InjectAndWait(func() { util.FatalErr(dashtempl.Execute(w, ui)) })
 }
+
+var dashtempl = template.Must(template.New("dash").Parse(dashText))
 
 const dashText = `
 <table> 

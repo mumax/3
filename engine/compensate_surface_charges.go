@@ -20,7 +20,7 @@ func Bsat() float64 {
 func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	AddExtField(compensateLRSurfaceCharges(global_mesh(), mxLeft, mxRight), Bsat)
+	AddExtField(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), Bsat)
 }
 
 func init() {

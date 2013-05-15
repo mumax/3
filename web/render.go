@@ -1,8 +1,9 @@
-package engine
+package web
 
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
+	"code.google.com/p/mx3/engine"
 	"image/jpeg"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ func render(w http.ResponseWriter, r *http.Request) {
 	if len(words) > 1 {
 		comp = words[1]
 	}
-	h, ok := quants[quant]
+	h, ok := engine.Quants[quant]
 	if !ok {
 		err := "render: unknown quantity: " + url
 		log.Println(err)
@@ -28,7 +29,7 @@ func render(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var d *data.Slice
 		// TODO: could download only needed component
-		injectAndWait(func() { d = h.Download() })
+		engine.InjectAndWait(func() { d = h.Download() })
 		if comp != "" && d.NComp() > 1 {
 			c := compstr[comp]
 			d = d.Comp(c)

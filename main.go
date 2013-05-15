@@ -93,6 +93,23 @@ func interactive() {
 	RunInteractive()
 }
 
+func keepBrowserAlive() {
+	if time.Since(web.LastKeepalive) < web.Timeout {
+		log.Println("keeping session open to browser")
+		go func() {
+			for {
+				if time.Since(web.LastKeepalive) > web.Timeout {
+					engine.Inject <- nop // wake up
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		RunInteractive()
+	}
+}
+
+func nop() {}
+
 // Try to open url in a browser. Instruct to do so if it fails.
 func openbrowser(url string) {
 	for _, cmd := range browsers {

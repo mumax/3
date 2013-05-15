@@ -1,4 +1,4 @@
-package engine
+package web
 
 // THIS FILE IS AUTO GENERATED FROM webgui.js
 // EDITING IS FUTILE

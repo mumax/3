@@ -1,26 +1,13 @@
-package engine
+package web
 
 // Handlers for web script input "script/"
 
 import (
-	"fmt"
-	"log"
+	"code.google.com/p/mx3/engine"
 	"net/http"
 )
 
 func scriptHandler(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/script/"):]
-	log.Println("web script:", cmd)
-	code, err := parser.ParseLine(cmd)
-	if err != nil {
-		fmt.Fprintln(w, err)
-	}
-	inject <- func() { code.Eval() } // TODO: catch
-}
-
-// inject to pause simulation.
-func pauseFn() { pause = true }
-
-func init() {
-	parser.AddFunc("pause", pauseFn)
+	engine.Inject <- func() { engine.Exec(cmd) } // TODO: catch
 }

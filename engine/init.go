@@ -23,7 +23,7 @@ var (
 
 const VERSION = "mx3.0.7 α "
 
-var uname = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
+var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 // Initializes the simulation engine.
 func Init() {
@@ -36,7 +36,7 @@ func Init() {
 	}
 
 	if *flag_version {
-		log.Print(uname, "\n")
+		log.Print(UNAME, "\n")
 	}
 
 	if *Flag_od != "" {

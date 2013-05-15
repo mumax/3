@@ -4,8 +4,21 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
+	"io"
 	"log"
 )
+
+func Compile(src io.Reader) ([]script.Expr, error) {
+	return parser.Parse(src)
+}
+
+func Exec(cmd string) (interface{}, error) {
+	expr, err := parser.ParseLine(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return expr.Eval(), nil
+}
 
 var parser = script.NewParser()
 

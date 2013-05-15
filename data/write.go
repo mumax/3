@@ -10,19 +10,30 @@ import (
 	"unsafe"
 )
 
-// TODO: buffer? benchmark
+// Write the slice to out in binary format. Add time stamp.
 func Write(out io.Writer, s *Slice, time float64) error {
 	w := newWriter(out)
-	w.header.Components = s.NComp()
-	w.header.MeshSize = s.Mesh().Size()
-	w.header.MeshStep = s.Mesh().CellSize()
-	w.header.MeshUnit = "m"
-	w.header.Time = time
-	w.header.TimeUnit = "s"
-	w.header.DataLabel = s.Tag()
-	w.header.DataUnit = s.Unit()
-	w.header.Precission = 4
-	w.writeHeader()
+
+	// Writes the header.
+	w.writeString(MAGIC)
+	w.writeUInt64(uint64(s.NComp()))
+	for _, s := range s.Mesh().Size() {
+		w.writeUInt64(uint64(s))
+	}
+	for _, s := range s.Mesh().CellSize() {
+		w.writeFloat64(s)
+	}
+	w.writeString("m") // mesh unit
+	w.writeFloat64(time)
+	w.writeString("s") // time unit
+	w.writeString(s.Tag())
+	w.writeString(s.Unit())
+	w.writeUInt64(4) // precission
+	for i := 0; i < padding; i++ {
+		w.writeUInt64(0)
+	}
+
+	// return header write error before writing data
 	if w.err != nil {
 		return w.err
 	}
@@ -35,6 +46,7 @@ func Write(out io.Writer, s *Slice, time float64) error {
 	return w.err
 }
 
+// Write the slice to file in binary format. Add time stamp.
 func WriteFile(fname string, s *Slice, time float64) error {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
@@ -44,6 +56,7 @@ func WriteFile(fname string, s *Slice, time float64) error {
 	return Write(f, s, time)
 }
 
+// Write the slice to file in binary format, panic on error.
 func MustWriteFile(fname string, s *Slice, time float64) {
 	err := WriteFile(fname, s, time)
 	util.FatalErr(err)
@@ -52,7 +65,6 @@ func MustWriteFile(fname string, s *Slice, time float64) {
 var table = crc64.MakeTable(crc64.ISO)
 
 type writer struct {
-	header
 	out io.Writer
 	crc hash.Hash64
 	err error
@@ -65,30 +77,8 @@ func newWriter(out io.Writer) *writer {
 	return w
 }
 
-const MAGIC = "#dump002"
-const padding = 0
-
-// Writes the current header.
-func (w *writer) writeHeader() {
-	w.writeString(MAGIC)
-	w.writeUInt64(uint64(w.Components))
-	for _, s := range w.MeshSize {
-		w.writeUInt64(uint64(s))
-	}
-	for _, s := range w.MeshStep {
-		w.writeFloat64(s)
-	}
-	w.writeString(w.MeshUnit)
-	w.writeFloat64(w.Time)
-	w.writeString(w.TimeUnit)
-	w.writeString(w.DataLabel)
-	w.writeString(w.DataUnit)
-	w.writeUInt64(w.Precission)
-
-	for i := 0; i < padding; i++ {
-		w.writeUInt64(0)
-	}
-}
+const MAGIC = "#dump002" // identifies dump format
+const padding = 0        // padding words before data section
 
 // Writes the data.
 func (w *writer) writeData(list []float32) {

@@ -181,15 +181,6 @@ func (s *Slice) DevPtr(component int) unsafe.Pointer {
 	return s.ptrs[component]
 }
 
-//// HostPtr returns a pointer to a component.
-//// Slice must have CPUAccess.
-//func (s *Slice) HostPtr(component int) unsafe.Pointer {
-//	if !s.CPUAccess() {
-//		panic("slice not accessible by CPU")
-//	}
-//	return s.ptrs[component]
-//}
-
 // Slice returns a slice sharing memory with the original.
 // Beware that it may contain less elements than would be expected from Mesh().NCell().
 func (s *Slice) Slice(a, b int) *Slice {

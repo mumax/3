@@ -33,7 +33,6 @@ func MustReadFile(fname string) (data *Slice, time float64) {
 
 // Reads successive data frames in dump format.
 type reader struct {
-	header
 	in  io.Reader
 	crc hash.Hash64
 	err error
@@ -48,28 +47,34 @@ func newReader(in io.Reader) *reader {
 
 func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 	r.err = nil // clear previous error, if any
-	r.Magic = r.readString()
+	magic := r.readString()
 	if r.err != nil {
 		return nil, 0, r.err
 	}
-	if r.Magic != MAGIC {
-		r.err = fmt.Errorf("dump: bad magic number:%v", r.Magic)
+	if magic != MAGIC {
+		r.err = fmt.Errorf("dump: bad magic number:%v", magic)
 		return nil, 0, r.err
 	}
-	r.Components = r.readInt()
-	for i := range r.MeshSize {
-		r.MeshSize[i] = r.readInt()
+	nComp := r.readInt()
+	size := [3]int{}
+	for i := range size {
+		size[i] = r.readInt()
 	}
-	for i := range r.MeshStep {
-		r.MeshStep[i] = r.readFloat64()
+	cell := [3]float64{}
+	for i := range cell {
+		cell[i] = r.readFloat64()
 	}
-	r.MeshUnit = r.readString()
-	r.Time = r.readFloat64()
-	time = r.Time
-	r.TimeUnit = r.readString()
-	r.DataLabel = r.readString()
-	r.DataUnit = r.readString()
-	r.Precission = r.readUint64()
+	_ = r.readString() // mesh unit
+	time = r.readFloat64()
+	_ = r.readString() // time unit
+
+	mesh := NewMesh(size[0], size[1], size[2], cell[0], cell[1], cell[2])
+	s := NewSlice(nComp, mesh)
+
+	s.tag = r.readString()
+	s.unit = r.readString()
+	precission := r.readUint64()
+	util.Assert(precission == 4)
 
 	for i := 0; i < padding; i++ {
 		_ = r.readUint64()
@@ -79,7 +84,12 @@ func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 		return
 	}
 
-	slice, err = r.readData()
+	host := s.Host()
+	length := mesh.NCell()
+	for _, data := range host {
+		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[0 : SIZEOF_FLOAT32*length]
+		r.read(buf)
+	}
 
 	// Check CRC
 	var mycrc uint64 // checksum by this reader
@@ -87,17 +97,18 @@ func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 		mycrc = r.crc.Sum64()
 	}
 	storedcrc := r.readUint64() // checksum from data stream. 0 means not set
-
+	if r.err != nil {
+		return nil, 0, r.err
+	}
 	if r.crc != nil {
 		r.crc.Reset() // reset for next frame
 	}
-
-	if r.crc != nil && storedcrc != 0 &&
-		mycrc != storedcrc &&
-		r.err == nil {
+	if r.crc != nil && storedcrc != 0 && mycrc != storedcrc {
 		r.err = fmt.Errorf("dump CRC error: expected %16x, got %16x", storedcrc, mycrc)
+		return nil, 0, r.err
 	}
-	return
+
+	return s, time, nil
 }
 
 func (r *reader) readInt() int {
@@ -141,25 +152,4 @@ func (r *reader) readUint64() uint64 {
 	var buf [8]byte
 	r.read(buf[:])
 	return *((*uint64)(unsafe.Pointer(&buf[0])))
-}
-
-// read the data array,
-// enlarging the previous one if needed.
-func (r *reader) readData() (*Slice, error) {
-	s := r.MeshSize
-	c := r.MeshStep
-	mesh := NewMesh(s[0], s[1], s[2], c[0], c[1], c[2])
-	length := mesh.NCell()
-	slice := NewSlice(r.Components, mesh)
-	slice.unit = r.DataUnit
-	slice.tag = r.DataLabel
-	host := slice.Host()
-	for _, data := range host {
-		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[0 : SIZEOF_FLOAT32*length]
-		r.read(buf)
-	}
-	if r.err == nil {
-		return slice, nil
-	}
-	return nil, r.err
 }

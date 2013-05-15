@@ -23,8 +23,6 @@ func gui(w http.ResponseWriter, r *http.Request) {
 type guistate struct{}
 
 func (s *guistate) Time() float32                 { return float32(Time) }
-func (s *guistate) ImWidth() int                  { return ui.Mesh().Size()[2] }
-func (s *guistate) ImHeight() int                 { return ui.Mesh().Size()[1] }
 func (s *guistate) Mesh() *data.Mesh              { return &globalmesh }
 func (s *guistate) Uname() string                 { return uname }
 func (s *guistate) Version() string               { return VERSION }

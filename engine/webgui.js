@@ -205,7 +205,7 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 
 
-<img id="display" src="/render/m" width={{.ImWidth}} height={{.ImHeight}} alt="display"/>
+<img id="display" src="/render/m" alt="display"/>
 
 </div><hr/>
 

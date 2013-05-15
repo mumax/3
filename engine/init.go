@@ -29,8 +29,6 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 func Init() {
 	flag.Parse()
 
-	log.SetPrefix("")
-	log.SetFlags(0)
 	if *flag_silent {
 		log.SetOutput(ioutil.Discard)
 	}

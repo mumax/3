@@ -18,10 +18,14 @@ import (
 )
 
 func main() {
-	// todo: move flags here
-	engine.Init()
+
+	log.SetPrefix("")
+	log.SetFlags(0)
 
 	if flag.NArg() == 1 {
+		// TODO: move flags here
+		// TODO: move cuda init here
+		engine.Init()
 		if *engine.Flag_od == "" { // -o not set
 			engine.SetOD(util.NoExt(flag.Arg(0))+".out", *engine.Flag_force)
 		}

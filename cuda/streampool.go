@@ -3,9 +3,7 @@ package cuda
 // File: management of a pool of re-usable CUDA streams.
 // Author: Arne Vansteenkiste
 
-import (
-	"github.com/barnex/cuda5/cu"
-)
+import "github.com/barnex/cuda5/cu"
 
 var streamPool chan cu.Stream // global pool of streams.
 const streamPoolSize = 64     // number of streams in global pool.

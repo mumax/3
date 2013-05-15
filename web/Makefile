@@ -1,3 +1,2 @@
 all:
-	go install -v
-	go vet
+	./make.bash

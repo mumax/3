@@ -1,8 +1,9 @@
 package main
 
 import (
-	. "code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/util"
+	"code.google.com/p/mx3/web"
 	"flag"
 	"log"
 	"os/exec"
@@ -15,7 +16,7 @@ import (
 )
 
 func main() {
-	Init()
+	enine.Init()
 
 	// flags parsed by engine.Init()
 	switch flag.NArg() {
@@ -31,15 +32,15 @@ func main() {
 		log.Fatal("need at most one input file")
 	}
 
-	keepBrowserAlive()
-	Close()
+	keepBrowserAlive() // if open, that is
+	engine.Close()
 }
 
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
 func RunInteractive() {
-	lastKeepalive = time.Now()
-	pause = true
+	web.LastKeepalive = time.Now()
+	engine.Pause()
 	log.Println("entering interactive mode")
 	if webPort == "" {
 		goServe(*flag_port)

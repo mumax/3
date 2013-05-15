@@ -127,7 +127,6 @@ const templText = `
 </td></tr></table>
 
 
-
 <script>
 	function updateDash(){
 		try{

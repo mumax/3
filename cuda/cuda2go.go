@@ -1,9 +1,8 @@
 // +build ignore
 
-/*
- This program generates Go wrappers for cuda sources.
- The cuda file should contain exactly one __global__ void.
-*/
+// This program generates Go wrappers for cuda sources.
+// The cuda file should contain exactly one __global__ void.
+
 package main
 
 import (
@@ -88,7 +87,6 @@ func typemap(ctype string) string {
 		return gotype
 	}
 	panic(fmt.Errorf("unsupported cuda type: %v", ctype))
-	return "" // unreachable
 }
 
 var tm = map[string]string{"float*": "unsafe.Pointer", "float": "float32", "int": "int"}

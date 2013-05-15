@@ -43,8 +43,7 @@ func Init() {
 	concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
 	log.Print("CUDA ", float32(cu.Version())/1000, " ",
 		dev.Name(), "(", (dev.TotalMem())/(1024*1024), "MB) ",
-		"compute ", M, ".", m,
-		" concurrent: ", concurrent == 1, "\n")
+		"compute ", M, ".", m, " concurrent: ", concurrent == 1, "\n")
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")
 	}

@@ -1,9 +1,7 @@
 package cuda
 
-/*
- Kernel multiplication for purely real kernel, symmetric around Y axis (apart from first row).
- Launch configs range over all complex elements of fft input.
-*/
+// Kernel multiplication for purely real kernel, symmetric around Y axis (apart from first row).
+// Launch configs range over all complex elements of fft input. This could be optimized: range only over kernel.
 
 import (
 	"code.google.com/p/mx3/data"

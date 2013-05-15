@@ -11,7 +11,7 @@ import (
 // 3D single-precission real-to-complex FFT plan.
 type fft3DR2CPlan struct {
 	fftplan
-	size3D
+	size [3]int
 }
 
 // 3D single-precission real-to-complex FFT plan.
@@ -19,7 +19,7 @@ func newFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) fft3DR2CPlan {
 	handle := cufft.Plan3d(Nx, Ny, Nz, cufft.R2C)
 	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
 	handle.SetStream(stream)
-	return fft3DR2CPlan{fftplan{handle, 0}, size3D{Nx, Ny, Nz}}
+	return fft3DR2CPlan{fftplan{handle, 0}, [3]int{Nx, Ny, Nz}}
 }
 
 // Execute the FFT plan, asynchronous.
@@ -45,12 +45,12 @@ func (p *fft3DR2CPlan) Exec(src, dst *data.Slice) {
 
 // 3D size of the input array.
 func (p *fft3DR2CPlan) InputSizeFloats() (Nx, Ny, Nz int) {
-	return p.size3D[0], p.size3D[1], p.size3D[2]
+	return p.size[0], p.size[1], p.size[2]
 }
 
 // 3D size of the output array.
 func (p *fft3DR2CPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
-	return p.size3D[0], p.size3D[1], p.size3D[2] + 2
+	return p.size[0], p.size[1], p.size[2] + 2
 }
 
 // Required length of the (1D) input array.

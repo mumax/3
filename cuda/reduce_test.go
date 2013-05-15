@@ -70,30 +70,6 @@ func TestReduceDot(t *testing.T) {
 	}
 }
 
-//func TestReduceMax(t *testing.T) {
-//	initTest()
-//	result := Max(in1)
-//	if result != 999 {
-//		t.Error("got:", result)
-//	}
-//	result = Max(in2)
-//	if result != 0 {
-//		t.Error("got:", result)
-//	}
-//}
-//
-//func TestReduceMin(t *testing.T) {
-//	result := Min(in1)
-//	if result != 0 {
-//		t.Error("got:", result)
-//	}
-//
-//	result = Min(in2)
-//	if result != -999.99 {
-//		t.Error("got:", result)
-//	}
-//}
-
 func TestReduceMaxAbs(t *testing.T) {
 	result := MaxAbs(in1)
 	if result != 999 {

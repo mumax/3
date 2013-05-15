@@ -14,20 +14,6 @@ type fftplan struct {
 	stream cu.Stream
 }
 
-// For the sake of embedding.
-type size1D int
-
-// Returns the logical size of the FFT:
-// the number of elements (real or complex) it transforms.
-func (s size1D) Size() int { return int(s) }
-
-// For the sake of embedding.
-type size3D [3]int
-
-// Returns the logical size of the FFT:
-// the number of elements (real or complex) it transforms.
-func (s size3D) Size() (Nx, Ny, Nz int) { return s[0], s[1], s[2] }
-
 func prod3(x, y, z int) int {
 	return x * y * z
 }

@@ -66,32 +66,3 @@ func (e *Heun) Step() {
 		}
 	}
 }
-
-// Run until we are only maxerr away from equilibrium.
-// Typ. maxerr: 1e-7 (cannot go lower).
-// Run for at most maxSteps to avoid infinite loop if we fail to relax.
-//func (e *Heun) Relax(maxerr float64, maxSteps int) {
-//	log.Println("relax down to", maxerr, "of equilibrium")
-//	if maxerr < 1e-7 {
-//		log.Fatal("relax: max error too small")
-//	}
-//	preverr := e.Maxerr
-//	e.Maxerr = 1e-2
-//
-//	var i int
-//	for i = 0; i < maxSteps; i++ {
-//		e.Step()
-//		if e.delta < e.Maxerr/e.Headroom {
-//			e.Maxerr /= 2
-//			e.dt_si /= 1.41
-//		}
-//		if e.Maxerr < maxerr {
-//			break
-//		}
-//	}
-//	if i == maxSteps {
-//		log.Fatalf("relax: did not converge within %v time steps.")
-//	}
-//	e.Maxerr = preverr
-//	util.DashExit()
-//}

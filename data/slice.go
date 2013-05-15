@@ -11,6 +11,7 @@ import (
 )
 
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
+// TODO: unified memory is not used anymore, can be removed. Then we can split cuda.Slice and data.Slice?
 type Slice struct {
 	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local
 	ptrs      []unsafe.Pointer         // points into ptr_

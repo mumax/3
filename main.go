@@ -6,7 +6,9 @@ import (
 	"code.google.com/p/mx3/web"
 	"flag"
 	"log"
+	"os"
 	"os/exec"
+	"time"
 )
 
 // dummy imports to fetch those files
@@ -16,20 +18,16 @@ import (
 )
 
 func main() {
-	enine.Init()
+	// todo: move flags here
+	engine.Init()
 
-	// flags parsed by engine.Init()
-	switch flag.NArg() {
-	case 1:
-		if *Flag_od == "" { // -o not set
-			SetOD(util.NoExt(flag.Arg(0))+".out", *Flag_force)
+	if flag.NArg() == 1 {
+		if *engine.Flag_od == "" { // -o not set
+			engine.SetOD(util.NoExt(flag.Arg(0))+".out", *engine.Flag_force)
 		}
-		RunFile(flag.Arg(0))
-	case 0:
-		log.Println("no input files: starting interactive session")
-		interactive()
-	default:
-		log.Fatal("need at most one input file")
+		RunFileAndServe(flag.Arg(0))
+	} else {
+		log.Fatal("need one input file")
 	}
 
 	keepBrowserAlive() // if open, that is
@@ -42,56 +40,34 @@ func RunInteractive() {
 	web.LastKeepalive = time.Now()
 	engine.Pause()
 	log.Println("entering interactive mode")
-	if webPort == "" {
-		goServe(*flag_port)
-	}
 
 	for {
-		if time.Since(lastKeepalive) > webtimeout {
+		if time.Since(web.LastKeepalive) > web.Timeout {
 			log.Println("interactive session idle: exiting")
 			break
 		}
 		log.Println("awaiting browser interaction")
-		f := <-inject
+		f := <-engine.Inject
 		f()
 	}
 }
 
 // Runs a script file.
-func RunFile(fname string) {
+func RunFileAndServe(fname string) {
 	// first we compile the entire file into an executable tree
 	f, err := os.Open(fname)
 	util.FatalErr(err)
 	defer f.Close()
-	code, err2 := parser.Parse(f)
+	code, err2 := engine.Compile(f)
 	util.FatalErr(err2)
 
 	// now the parser is not used anymore so it can handle web requests
-	web.goServe(*flag_port)
+	web.GoServe("")
 
 	// start executing the tree, possibly injecting commands from web gui
 	for _, cmd := range code {
 		cmd.Eval()
 	}
-}
-
-// Compile file but do not run it. Used to check for errors.
-func Vet(fname string) {
-	f, err := os.Open(fname)
-	util.FatalErr(err)
-	defer f.Close()
-	_, err = parser.Parse(f)
-	util.FatalErr(err)
-}
-
-//
-func interactive() {
-	SetMesh(32, 32, 1, 5e-9, 5e-9, 5e-9)
-	Msat = Const(1000e3)
-	Aex = Const(10e-12)
-	Alpha = Const(1)
-	M.Set(Uniform(1, 1, 0))
-	RunInteractive()
 }
 
 func keepBrowserAlive() {

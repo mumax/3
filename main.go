@@ -1,13 +1,16 @@
 package main
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/util"
 	"code.google.com/p/mx3/web"
 	"flag"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"time"
 )
 
@@ -17,25 +20,63 @@ import (
 	_ "code.google.com/p/mx3/test"
 )
 
+var (
+	flag_silent = flag.Bool("s", false, "Don't generate any log info")
+	flag_od     = flag.String("o", "", "Override output directory")
+	flag_force  = flag.Bool("f", false, "Force start, clean existing output directory")
+	flag_port   = flag.String("http", ":35367", "Port to serve web gui")
+)
+
 func main() {
+
+	flag.Parse()
 
 	log.SetPrefix("")
 	log.SetFlags(0)
 
-	if flag.NArg() == 1 {
-		// TODO: move flags here
-		// TODO: move cuda init here
-		engine.Init()
-		if *engine.Flag_od == "" { // -o not set
-			engine.SetOD(util.NoExt(flag.Arg(0))+".out", *engine.Flag_force)
-		}
-		RunFileAndServe(flag.Arg(0))
-	} else {
+	if flag.NArg() != 1 {
 		log.Fatal("need one input file")
 	}
 
+	if *flag_silent {
+		log.SetOutput(ioutil.Discard)
+	}
+
+	// TODO: tee output to log file, replace all panics by log.Panic
+
+	if *flag_od == "" { // -o not set
+		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)
+	}
+
+	log.Print(engine.UNAME, "\n")
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	//TODO: init profiling // prof.Init(engine.OD)
+	cuda.Init()
+	cuda.LockThread()
+
+	RunFileAndServe(flag.Arg(0))
+
 	keepBrowserAlive() // if open, that is
 	engine.Close()
+}
+
+// Runs a script file.
+func RunFileAndServe(fname string) {
+	// first we compile the entire file into an executable tree
+	f, err := os.Open(fname)
+	util.FatalErr(err)
+	defer f.Close()
+	code, err2 := engine.Compile(f)
+	util.FatalErr(err2)
+
+	// now the parser is not used anymore so it can handle web requests
+	web.GoServe(*flag_port)
+
+	// start executing the tree, possibly injecting commands from web gui
+	for _, cmd := range code {
+		cmd.Eval()
+	}
 }
 
 // Enter interactive mode. Simulation is now exclusively controlled
@@ -53,24 +94,6 @@ func RunInteractive() {
 		log.Println("awaiting browser interaction")
 		f := <-engine.Inject
 		f()
-	}
-}
-
-// Runs a script file.
-func RunFileAndServe(fname string) {
-	// first we compile the entire file into an executable tree
-	f, err := os.Open(fname)
-	util.FatalErr(err)
-	defer f.Close()
-	code, err2 := engine.Compile(f)
-	util.FatalErr(err2)
-
-	// now the parser is not used anymore so it can handle web requests
-	web.GoServe("")
-
-	// start executing the tree, possibly injecting commands from web gui
-	for _, cmd := range code {
-		cmd.Eval()
 	}
 }
 

@@ -10,7 +10,6 @@ improvements:
 
 web: update parameter text boxes and image size
 web: use next free port if already in use
-render: black pixels in png
 cuda: use device properties for grid config
 cuda: shift: memeset, don't clamp
 cuda.HostBuffer()

@@ -1,4 +1,4 @@
 /*
- 2D rendering of magnetization snapshots.
+ 2D rendering of slices.
 */
 package documentation

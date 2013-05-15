@@ -1,12 +1,10 @@
 package draw
 
-// Grayscale image output.
 // Author: Arne Vansteenkiste
 
-import (
-	"image/color"
-)
+import "image/color"
 
+// Gray colorscale: min=black, max=white.
 func GreyMap(min, max, value float32) color.NRGBA {
 	col := (value - min) / (max - min)
 	if col > 1. {

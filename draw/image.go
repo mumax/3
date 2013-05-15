@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.
 func Image(f *data.Slice, fmin, fmax string) *image.NRGBA {
 	dim := f.NComp()
 	switch dim {

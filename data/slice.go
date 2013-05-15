@@ -11,11 +11,12 @@ import (
 
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
-	ptr_ [MAX_COMP]unsafe.Pointer // keeps data local
-	ptrs []unsafe.Pointer         // points into ptr_
-	*info
-	len_    int32
-	memType int8
+	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local
+	ptrs      []unsafe.Pointer         // points into ptr_
+	tag, unit string                   // Human-readable descriptors
+	mesh      *Mesh
+	len_      int32
+	memType   int8
 }
 
 // this package must not depend on CUDA. If CUDA is
@@ -58,8 +59,7 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
 	s.len_ = int32(length)
-	s.info = new(info)
-	s.info.mesh = *m
+	s.mesh = m
 	for c := range ptrs {
 		s.ptrs[c] = ptrs[c]
 	}
@@ -98,19 +98,16 @@ func (s *Slice) Free() {
 	default:
 		panic("invalid memory type")
 	}
-	// zero the struct
-	for c := range s.ptr_ {
-		s.ptr_[c] = nil //unsafe.Pointer(uintptr(0))
-	}
 	s.Disable()
 }
 
 // INTERNAL. Overwrite struct fields with zeros to avoid
 // accidental use after Free.
 func (s *Slice) Disable() {
+	s.ptr_ = [MAX_COMP]unsafe.Pointer{}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
-	s.info = nil
+	s.mesh = nil
 	s.memType = 0
 }
 
@@ -149,12 +146,23 @@ func (s *Slice) Len() int {
 	return int(s.len_)
 }
 
+// Human-readable tag to identify the data.
+func (s *Slice) Tag() string { return s.tag }
+
+// Physical unit of the data.
+func (s *Slice) Unit() string { return s.unit }
+
+// Mesh on which the data is defined.
+func (s *Slice) Mesh() *Mesh { return s.mesh }
+
 // Comp returns a single component of the Slice.
 func (s *Slice) Comp(i int) *Slice {
 	sl := new(Slice)
 	sl.ptr_[0] = s.ptrs[i]
 	sl.ptrs = sl.ptr_[:1]
-	sl.info = s.info
+	sl.mesh = s.mesh
+	sl.unit = s.unit
+	sl.tag = s.tag
 	sl.len_ = s.len_
 	sl.memType = s.memType
 	return sl
@@ -190,32 +198,19 @@ func (s *Slice) Slice(a, b int) *Slice {
 		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
 	}
 
-	slice := new(Slice)
+	slice := &Slice{memType: s.memType, mesh: s.mesh, tag: s.tag, unit: s.unit}
 	slice.ptrs = slice.ptr_[:s.NComp()]
 	for i := range s.ptrs {
 		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
 	}
 	slice.len_ = int32(b - a)
-	slice.memType = s.memType
-	slice.info = s.info
-	// if the slice does not span the entire mesh, it might be silently abused
-	// for now we make that fail, but we need a better solution.
-	//	if slice.Len() != s.Len() {
-	//		slice.info = nil
-	//	}
 	return slice
 }
 
 const SIZEOF_FLOAT32 = 4
 
-// Set the entire slice to this value, component by component.
-//func (s *Slice) Memset(val ...float32) {
-//}
-
-// Host returns the Slice as a [][]float32,
-// indexed by component, cell number.
+// Host returns the Slice as a [][]float32 indexed by component, cell number.
 // It should have CPUAccess() == true.
-// TODO: rename
 func (s *Slice) Host() [][]float32 {
 	if !s.CPUAccess() {
 		log.Panic("slice not accessible by CPU")

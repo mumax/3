@@ -21,6 +21,8 @@ type Slice struct {
 
 // this package must not depend on CUDA. If CUDA is
 // loaded, these functions are set to cu.MemFree, ...
+// NOTE: cpyDtoH and cpuHtoD are only needed to support 32-bit builds,
+// otherwise, it could be removed in favor of memCpy only.
 var (
 	memFree, memFreeHost           func(unsafe.Pointer)
 	memCpy, memCpyDtoH, memCpyHtoD func(dst, src unsafe.Pointer, bytes int64)

@@ -126,16 +126,8 @@
 </script>
 
 
-<a id=hide onclick="toggle('div_file');"> file <br/></a> 
-<div id=div_file>
-	<script> rpcCall("SetOD", ["\".\""]);     </script> (output directory) <br/>
-	<script> rpcCall("RunFile", ["\".\""]);   </script> 
-</div>
-
-
 <a id=hide onclick="toggle('div_box');"> simulation box <br/></a> 
 <div id=div_box>
-	<script> rpcCall("SetGPU", [0]);                      </script>  <br/>
 	<script> rpcCall("SetGridSize", [128, 32, 1]);        </script> (cells) <br/>
 	<script> rpcCall("SetCellSize", [3e-9, 3e-9, 5e-9]);  </script> (m) <br/>
 </div>

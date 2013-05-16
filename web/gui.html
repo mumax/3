@@ -61,7 +61,7 @@
 
 	// adds a button and as many text boxes as args (default arguments).
 	// on click the rpc command is called with the text boxes input as arguments.
-	function rpcBox(label, command, args){
+	function rpcCmd(command, args, infix){
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
 		var submit = function(){
@@ -71,12 +71,12 @@
 				if (i != boxes.length - 1) { args += ","; }
 			}
 			args += ")";
-			rpc(command + args);
+			rpc(command + infix + args);
 		};
 
 		var button = document.createElement("input");
 		button.type = "button";
-		button.value = label;
+		button.value = command + infix;
 		button.onclick = submit;
 		par.appendChild(button);
 
@@ -95,30 +95,63 @@
 		}
 	}
 
+	function rpcCall(command, args){
+		rpcCmd(command, args, "")
+	}
+
+	function rpcSet(command, args){
+		rpcCmd(command, args, "=")
+	}
+
 	// add a button that executes an rpc command
-	function rpcButton(label, command){
-		rpcBox(label, command, []);
+	function rpcButton(command){
+		rpcCall(command, []);
+	}
+
+</script>
+
+<script>
+	function toggle(id){
+		var elem = document.getElementById("div_file");
+		if (elem.style.display === 'block'){
+			elem.sytle.display = 'none';	
+		}else{
+			elem.sytle.display = 'block';	
+		}
 	}
 </script>
 
 
+<div id="div_file"> <a onclick="toggle();"> file </a>
+	<script> rpcCall("SetOD", ["\".\""]);     </script> (output directory) <br/>
+	<script> rpcCall("RunFile", ["\".\""]);   </script> 
+<hr/></div>
+
+
+<div> <h2> simulation box </h2>
+	<script> rpcCall("SetGPU", [0]);                      </script>  <br/>
+	<script> rpcCall("SetGridSize", [128, 32, 1]);        </script> (cells) <br/>
+	<script> rpcCall("SetCellSize", [3e-9, 3e-9, 5e-9]);  </script> (m) <br/>
+<hr/></div>
+
+
+<div> <h2> magnet </h2>
+	<script> rpcSet("m", ["uniform(1, 1, 0)"]);   </script>  <br/>
+	<script> rpcSet("geom", ["rect()"]);          </script>  <br/>
+<hr/></div>
+
+
 <div> <h2> solver </h2>
-
 <table><tr><td>  
-
-	<script> rpcBox("Run", "run", [1e-9]);     </script> s <br/>
-	<script> rpcBox("Steps", "steps", [1000]); </script> <br/>
-	<script> rpcButton("Break", "pause");      </script>
-
+	<script> rpcCall("Run", [1e-9]);   </script> s <br/>
+	<script> rpcCall("Steps", [1000]); </script> <br/>
+	<script> rpcButton("Pause");      </script>
 </td><td>  
  &nbsp; &nbsp; &nbsp;
 </td><td>  
-
 	<span id="running"><font color=red><b>Not running</b></font></span> 
 	<span id="dash"> </span>
-
 </td></tr></table>
-
 
 <script>
 	function updateDash(){
@@ -138,10 +171,7 @@
 <hr/> </div>
 
 
-
-<h2> display </h2>
-<div id=div_display> 
-
+<h2> display </h2> <div> 
 <script>
 	var renderQuant = "m"; 
 	var renderComp = ""; 
@@ -174,7 +204,6 @@
 		renderComp=list.options[list.selectedIndex].text;
 		updateImg();
 	}
-
 </script>
 
 Display: <select id="renderList" onchange="renderSelect()">
@@ -193,8 +222,13 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 <img id="display" src="/render/m" alt="display"/>
 
-</div><hr/>
+<hr/></div>
 
+<div> <h2> output </h2>
+
+
+
+<hr/></div>
 
 <div id="footer">
 <br/>

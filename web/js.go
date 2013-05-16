@@ -11,17 +11,16 @@ const templText = `
 	<title>mx3</title>
 	<style media="all" type="text/css">
 		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
-		img  { margin: 15px; }
 		h1   { font-size: 22px; font-weight: normal; color: black}
-		h2   {   }
+		img  { margin: 15px; }
+		table{ border:"10"; }
 		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
 		a    { color: #375EAB; text-decoration: none; }
 		a#hide{ color: black; font-size:17px; text-decoration: none; cursor: pointer; font-weight: normal; }
-		table { border:"10"; }
 		input#text{ border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px;}
+		div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
-		div{ margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 		.err { color: red; font-weight: bold; } 
 	</style>
 </head>
@@ -29,7 +28,9 @@ const templText = `
 
 <body>
 
-<h1> {{.Version}} </h1> <hr/>
+<h1> {{.Version}} </h1> 
+<span id=err_0 class=err></span>
+<hr/>
 
 <script>
 	function http(method, url){
@@ -51,8 +52,10 @@ const templText = `
 	function updateRunning(){
 		try{
 			running = (httpGet("/running/") === "true");
+			document.getElementById("err_0").innerHTML = "";
 		}catch(err){
 			running = false	;
+			document.getElementById("err_0").innerHTML = "Disconnected from simulation";
 		}
 		if(running){
 			document.getElementById("running").innerHTML = "<b>Running</b>";
@@ -176,7 +179,7 @@ const templText = `
 	<span id="running"><b>Paused</b></span> 
 	<span id="dash"> </span>
 </td></tr></table>
-<span id=err_2 class=err>kakadee</span>
+<span id=err_2 class=err></span>
 
 <script>
 	function updateDash(){
@@ -203,7 +206,6 @@ const templText = `
 	var renderComp = ""; 
 	var img = new Image();
 	img.src = "/render/" + renderQuant;
-	img.onload = function() { document.getElementById("display").src = img.src; }
 
 	function updateImg(){
 		var renderQuantComp = renderQuant;
@@ -211,6 +213,7 @@ const templText = `
 			renderQuantComp += "/" + renderComp;
 		}	
 		img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
+		document.getElementById("display").src = img.src;
 	}
 
 	function updateImgAsync(){

@@ -22,6 +22,7 @@ const templText = `
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
 		div{ margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+		.err { color: red; font-weight: bold; } 
 	</style>
 </head>
 
@@ -54,9 +55,9 @@ const templText = `
 			running = false	;
 		}
 		if(running){
-			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>";
+			document.getElementById("running").innerHTML = "<b>Running</b>";
 		}else{
-			document.getElementById("running").innerHTML = "<font color=red><b>Paused</b></font>";
+			document.getElementById("running").innerHTML = "<b>Paused</b>";
 		}
 	}
 	setInterval(updateRunning, 200);
@@ -79,10 +80,11 @@ const templText = `
 				if (i != boxes.length - 1) { arg += ","; }
 			}
 			arg += ")";
+			var errArea = document.getElementById(err);
+			errArea.innerHTML = "";
 			try{
 				rpc(command + infix + arg);
 			}catch(e){
-				var errArea = document.getElementById(err);
 				errArea.innerHTML = e;
 			}
 		};
@@ -115,17 +117,17 @@ const templText = `
 		}
 	}
 
-	function rpcCall(command, args){
-		rpcCmd(command, args, "")
+	function rpcCall(command, args, err){
+		rpcCmd(command, args, "", err)
 	}
 
-	function rpcSet(command, args){
-		rpcCmd(command, args, "=")
+	function rpcSet(command, args, err){
+		rpcCmd(command, args, "=", err)
 	}
 
 	// add a button that executes an rpc command
-	function rpcButton(command){
-		rpcCall(command, []);
+	function rpcButton(command, err){
+		rpcCall(command, [], err);
 	}
  
 </script>
@@ -152,7 +154,7 @@ const templText = `
 	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"], "err_1");           </script>  </tr>
 	<tr><script> rpcSet("geom", ["rect()"], "err_1");                  </script>  </tr>
 </table>
-<span id=err_1></span>
+<span id=err_1 class=err></span>
 </div>
 
 
@@ -162,18 +164,19 @@ const templText = `
 
 
 <table>
-	<tr><script> rpcCall("Relax", [1e-5]); </script> <td>maxtorque</td> </tr>
-	<tr><script> rpcCall("Run", [1e-9]);   </script> <td>seconds</td> </tr>
-	<tr><script> rpcCall("Steps", [1000]); </script>            </tr>
-	<tr><script> rpcButton("Pause");       </script>            </tr>
+	<tr><script> rpcCall("Relax", [1e-5], "err_2"); </script> <td>maxtorque</td> </tr>
+	<tr><script> rpcCall("Run", [1e-9], "err_2");   </script> <td>seconds</td> </tr>
+	<tr><script> rpcCall("Steps", [1000], "err_2"); </script>            </tr>
+	<tr><script> rpcButton("Pause", "err_2");       </script>            </tr>
 </table>
 
 </td><td>  
  &nbsp; &nbsp; &nbsp;
 </td><td>  
-	<span id="running"><font color=red><b>Not running</b></font></span> 
+	<span id="running"><b>Paused</b></span> 
 	<span id="dash"> </span>
 </td></tr></table>
+<span id=err_2 class=err>kakadee</span>
 
 <script>
 	function updateDash(){

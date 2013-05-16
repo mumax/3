@@ -73,18 +73,25 @@ const templText = `
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
 		var submit = function(){
-			var args = "(";
+			var arg = "(";
 			for (var i=0; i < boxes.length; i++){
-				args += boxes[i].value;
-				if (i != boxes.length - 1) { args += ","; }
+				arg += boxes[i].value;
+				if (i != boxes.length - 1) { arg += ","; }
 			}
-			args += ")";
-			rpc(command + infix + args);
+			arg += ")";
+			rpc(command + infix + arg);
 		};
 
-		var button = document.createElement("input");
-		button.type = "button";
-		button.value = command + infix;
+		var button;
+		if (args.length == 0){
+			button = document.createElement("input");
+			button.type = 'button';
+			button.value = command;
+		} else {
+			button = document.createElement("td");
+			button.innerHTML = command;
+			button.style.cursor = 'pointer';
+		}
 		button.onclick = submit;
 		par.appendChild(button);
 
@@ -115,7 +122,7 @@ const templText = `
 	function rpcButton(command){
 		rpcCall(command, []);
 	}
-
+ 
 </script>
 
 
@@ -132,34 +139,29 @@ const templText = `
 </script>
 
 
-<a id=hide onclick="toggle('div_file');"> file <br/></a> 
-<div id=div_file>
-	<script> rpcCall("SetOD", ["\".\""]);     </script> (output directory) <br/>
-	<script> rpcCall("RunFile", ["\".\""]);   </script> 
+<a id=hide onclick="toggle('div_1');"> Initialize <br/></a> 
+<div id=div_1>
+<table>
+	<tr><script> rpcCall("setGridSize", [128, 32, 1]);        </script> <td>(cells)</td> </tr>
+	<tr><script> rpcCall("setCellSize", [3e-9, 3e-9, 5e-9]);  </script> <td>(m)    </td> </tr>
+	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"]);           </script>  </tr>
+	<tr><script> rpcSet("geom", ["rect()"]);                  </script>  </tr>
+</table>
 </div>
 
 
-<a id=hide onclick="toggle('div_box');"> simulation box <br/></a> 
-<div id=div_box>
-	<script> rpcCall("SetGPU", [0]);                      </script>  <br/>
-	<script> rpcCall("SetGridSize", [128, 32, 1]);        </script> (cells) <br/>
-	<script> rpcCall("SetCellSize", [3e-9, 3e-9, 5e-9]);  </script> (m) <br/>
-</div>
-
-
-<a id=hide onclick="toggle('div_magnet');"> magnet <br/></a> 
-<div id=div_magnet>
-	<script> rpcSet("m", ["uniform(1, 1, 0)"]);   </script>  <br/>
-	<script> rpcSet("geom", ["rect()"]);          </script>  <br/>
-</div>
-
-
-<a id=hide onclick="toggle('div_solver');"> solver <br/></a> 
+<a id=hide onclick="toggle('div_solver');"> Run <br/></a> 
 <div id=div_solver>
 <table><tr><td>  
-	<script> rpcCall("Run", [1e-9]);   </script> s <br/>
-	<script> rpcCall("Steps", [1000]); </script> <br/>
-	<script> rpcButton("Pause");      </script>
+
+
+<table>
+	<tr><script> rpcCall("Relax", [1e-5]);   </script> <td>maxtorque</td> </tr>
+	<tr><script> rpcCall("Run", [1e-9]);   </script> <td>seconds</td> </tr>
+	<tr><script> rpcCall("Steps", [1000]); </script>            </tr>
+	<tr><script> rpcButton("Pause");       </script>            </tr>
+</table>
+
 </td><td>  
  &nbsp; &nbsp; &nbsp;
 </td><td>  
@@ -185,7 +187,7 @@ const templText = `
 </div>
 
 
-<a id=hide onclick="toggle('div_disp');"> display <br/></a> 
+<a id=hide onclick="toggle('div_disp');"> Output <br/></a> 
 <div id=div_disp>
 <script>
 	var renderQuant = "m"; 

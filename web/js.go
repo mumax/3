@@ -10,7 +10,7 @@ const templText = `
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>mx3</title>
 	<style media="all" type="text/css">
-		body { margin: 40px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
+		body { margin: 20px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 15px; }
 		h1   { font-size: 28px; color: gray; }
 		h2   { font-size: 20px; color: gray; }
@@ -41,7 +41,9 @@ const templText = `
 	function httpPost(url){
 		return http("POST", url);
 	}
+</script>
 
+<script>
 	var running = false;
 	function updateRunning(){
 		try{
@@ -52,11 +54,13 @@ const templText = `
 		if(running){
 			document.getElementById("running").innerHTML = "<font color=green><b>Running</b></font>";
 		}else{
-			document.getElementById("running").innerHTML = "<font color=red><b>Not running</b></font>";
+			document.getElementById("running").innerHTML = "<font color=red><b>Paused</b></font>";
 		}
 	}
 	setInterval(updateRunning, 200);
+</script>
 
+<script>
 	function rpc(command){
 		httpPost("/script/" + command);
 	}
@@ -76,6 +80,12 @@ const templText = `
 			rpc(command + args);
 		};
 
+		var button = document.createElement("input");
+		button.type = "button";
+		button.value = label;
+		button.onclick = submit;
+		par.appendChild(button);
+
 		var boxes = [];
 		for (var i=0; i < args.length; i++){
 			var textbox = document.createElement("input");
@@ -84,28 +94,17 @@ const templText = `
 			textbox.id = "text";
 			textbox.size = 10;
 			textbox.onkeydown=function(){
-				if (event.keyCode == 13) {
-					submit();
-				}
+				if (event.keyCode == 13) { submit(); } // retrun key
 			};
 			par.appendChild(textbox);
 			boxes.push(textbox);
 		}
-
-		var button = document.createElement("input");
-		button.type = "button";
-		button.value = label;
-		button.onclick = submit;
-
-		par.appendChild(button);
-		par.appendChild(document.createElement("br"));
 	}
 
 	// add a button that executes an rpc command
 	function rpcButton(label, command){
-		rpcBox(label, command, [])
+		rpcBox(label, command, []);
 	}
-
 </script>
 
 
@@ -113,8 +112,8 @@ const templText = `
 
 <table><tr><td>  
 
-	<script> rpcBox("Run", "run", [1e-9]);     </script>
-	<script> rpcBox("Steps", "steps", [1000]); </script>
+	<script> rpcBox("Run", "run", [1e-9]);     </script> s <br/>
+	<script> rpcBox("Steps", "steps", [1000]); </script> <br/>
 	<script> rpcButton("Break", "pause");      </script>
 
 </td><td>  
@@ -160,8 +159,10 @@ const templText = `
 		if(renderComp != ""){
 			renderQuantComp += "/" + renderComp;
 		}	
-		img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
-		document.getElementById("display").src = img.src;
+		try{
+			img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
+			document.getElementById("display").src = img.src;
+		}catch(e){}
 	}
 
 	function updateImgAsync(){

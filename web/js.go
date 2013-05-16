@@ -69,7 +69,7 @@ const templText = `
 
 	// adds a button and as many text boxes as args (default arguments).
 	// on click the rpc command is called with the text boxes input as arguments.
-	function rpcCmd(command, args, infix){
+	function rpcCmd(command, args, infix, err){
 		var par = document.scripts[document.scripts.length - 1].parentNode;
 
 		var submit = function(){
@@ -79,7 +79,12 @@ const templText = `
 				if (i != boxes.length - 1) { arg += ","; }
 			}
 			arg += ")";
-			rpc(command + infix + arg);
+			try{
+				rpc(command + infix + arg);
+			}catch(e){
+				var errArea = document.getElementById(err);
+				errArea.innerHTML = e;
+			}
 		};
 
 		var button;
@@ -142,11 +147,12 @@ const templText = `
 <a id=hide onclick="toggle('div_1');"> Initialize <br/></a> 
 <div id=div_1>
 <table>
-	<tr><script> rpcCall("setGridSize", [128, 32, 1]);        </script> <td>(cells)</td> </tr>
-	<tr><script> rpcCall("setCellSize", [3e-9, 3e-9, 5e-9]);  </script> <td>(m)    </td> </tr>
-	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"]);           </script>  </tr>
-	<tr><script> rpcSet("geom", ["rect()"]);                  </script>  </tr>
+	<tr><script> rpcCall("setGridSize", [128, 32, 1], "err_1");        </script> <td>(cells)</td> </tr>
+	<tr><script> rpcCall("setCellSize", [3e-9, 3e-9, 5e-9], "err_1");  </script> <td>(m)    </td> </tr>
+	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"], "err_1");           </script>  </tr>
+	<tr><script> rpcSet("geom", ["rect()"], "err_1");                  </script>  </tr>
 </table>
+<span id=err_1></span>
 </div>
 
 
@@ -156,7 +162,7 @@ const templText = `
 
 
 <table>
-	<tr><script> rpcCall("Relax", [1e-5]);   </script> <td>maxtorque</td> </tr>
+	<tr><script> rpcCall("Relax", [1e-5]); </script> <td>maxtorque</td> </tr>
 	<tr><script> rpcCall("Run", [1e-9]);   </script> <td>seconds</td> </tr>
 	<tr><script> rpcCall("Steps", [1000]); </script>            </tr>
 	<tr><script> rpcButton("Pause");       </script>            </tr>
@@ -194,6 +200,7 @@ const templText = `
 	var renderComp = ""; 
 	var img = new Image();
 	img.src = "/render/" + renderQuant;
+	img.onload = function() { document.getElementById("display").src = img.src; }
 
 	function updateImg(){
 		var renderQuantComp = renderQuant;
@@ -201,7 +208,6 @@ const templText = `
 			renderQuantComp += "/" + renderComp;
 		}	
 		img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
-		document.getElementById("display").src = img.src;
 	}
 
 	function updateImgAsync(){

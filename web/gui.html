@@ -4,23 +4,25 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>mx3</title>
 	<style media="all" type="text/css">
-		body { margin: 20px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
+		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
 		img  { margin: 15px; }
-		h1   { font-size: 28px; color: gray; }
-		h2   { font-size: 20px; color: #375EAB; cursor: pointer; }
-		hr   { border-style: none; border-top: 1px solid gray; }
+		h1   { font-size: 22px; font-weight: normal; color: black}
+		h2   {   }
+		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
 		a    { color: #375EAB; text-decoration: none; }
-		table{ border:"10"; }
-		input#text{ border:solid; border-color:grey; border-width:1px; padding-left:4px;}
+		a#hide{ color: black; font-size:17px; text-decoration: none; cursor: pointer; font-weight: normal; }
+		table { border:"10"; }
+		input#text{ border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px;}
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
+		div{ margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 	</style>
 </head>
 
 
 <body>
 
-<div id="header"> <h1> {{.Version}} </h1> <hr/> </div>
+<h1> {{.Version}} </h1> <hr/>
 
 <script>
 	function http(method, url){
@@ -124,29 +126,29 @@
 </script>
 
 
-<a onclick="toggle('div_file');"> <h2>file</h2> </a> 
+<a id=hide onclick="toggle('div_file');"> file <br/></a> 
 <div id=div_file>
 	<script> rpcCall("SetOD", ["\".\""]);     </script> (output directory) <br/>
 	<script> rpcCall("RunFile", ["\".\""]);   </script> 
-<hr/></div>
+</div>
 
 
-<a onclick="toggle('div_box');"> <h2>simulation box</h2> </a> 
+<a id=hide onclick="toggle('div_box');"> simulation box <br/></a> 
 <div id=div_box>
 	<script> rpcCall("SetGPU", [0]);                      </script>  <br/>
 	<script> rpcCall("SetGridSize", [128, 32, 1]);        </script> (cells) <br/>
 	<script> rpcCall("SetCellSize", [3e-9, 3e-9, 5e-9]);  </script> (m) <br/>
-<hr/></div>
+</div>
 
 
-<a onclick="toggle('div_magnet');"> <h2>magnet</h2> </a> 
+<a id=hide onclick="toggle('div_magnet');"> magnet <br/></a> 
 <div id=div_magnet>
 	<script> rpcSet("m", ["uniform(1, 1, 0)"]);   </script>  <br/>
 	<script> rpcSet("geom", ["rect()"]);          </script>  <br/>
-<hr/></div>
+</div>
 
 
-<a onclick="toggle('div_solver');"> <h2>solver</h2> </a> 
+<a id=hide onclick="toggle('div_solver');"> solver <br/></a> 
 <div id=div_solver>
 <table><tr><td>  
 	<script> rpcCall("Run", [1e-9]);   </script> s <br/>
@@ -174,10 +176,10 @@
 	setInterval(updateDashIfRunning, 200);
 </script>
 
-<hr/> </div>
+</div>
 
 
-<a onclick="toggle('div_disp');"> <h2>display</h2> </a> 
+<a id=hide onclick="toggle('div_disp');"> display <br/></a> 
 <div id=div_disp>
 <script>
 	var renderQuant = "m"; 
@@ -227,16 +229,17 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 <img id="display" src="/render/m" alt="display"/>
 
-<hr/></div>
+</div>
 
-<a onclick="toggle('div_out');"> <h2>output</h2> </a> 
+<a id=hide onclick="toggle('div_out');"> output <br/></a> 
 <div id=div_out>
 
 
-<hr/></div>
+</div>
 
 
 <div id="footer">
+<hr/>
 <br/>
 <center>
 {{.Uname}}<br/>

@@ -13,7 +13,7 @@ const templText = `
 		body { margin: 20px; font-family: Helvetica, Arial, sans-serif; font-size: 15px; }
 		img  { margin: 15px; }
 		h1   { font-size: 28px; color: gray; }
-		h2   { font-size: 20px; color: gray; }
+		h2   { font-size: 20px; color: #375EAB; cursor: pointer; }
 		hr   { border-style: none; border-top: 1px solid gray; }
 		a    { color: #375EAB; text-decoration: none; }
 		table{ border:"10"; }
@@ -116,38 +116,44 @@ const templText = `
 
 </script>
 
+
+
 <script>
-	function toggle(id){
-		var elem = document.getElementById("div_file");
-		if (elem.style.display === 'block'){
-			elem.sytle.display = 'none';	
-		}else{
-			elem.sytle.display = 'block';	
+	function toggle(id) {
+       var el = document.getElementById(id);
+       if(el.style.display != 'none'){
+          el.style.display = 'none';
 		}
-	}
+       else
+          el.style.display = 'block';
+    }
 </script>
 
 
-<div id="div_file"> <a onclick="toggle();"> file </a>
+<a onclick="toggle('div_file');"> <h2>file</h2> </a> 
+<div id=div_file>
 	<script> rpcCall("SetOD", ["\".\""]);     </script> (output directory) <br/>
 	<script> rpcCall("RunFile", ["\".\""]);   </script> 
 <hr/></div>
 
 
-<div> <h2> simulation box </h2>
+<a onclick="toggle('div_box');"> <h2>simulation box</h2> </a> 
+<div id=div_box>
 	<script> rpcCall("SetGPU", [0]);                      </script>  <br/>
 	<script> rpcCall("SetGridSize", [128, 32, 1]);        </script> (cells) <br/>
 	<script> rpcCall("SetCellSize", [3e-9, 3e-9, 5e-9]);  </script> (m) <br/>
 <hr/></div>
 
 
-<div> <h2> magnet </h2>
+<a onclick="toggle('div_magnet');"> <h2>magnet</h2> </a> 
+<div id=div_magnet>
 	<script> rpcSet("m", ["uniform(1, 1, 0)"]);   </script>  <br/>
 	<script> rpcSet("geom", ["rect()"]);          </script>  <br/>
 <hr/></div>
 
 
-<div> <h2> solver </h2>
+<a onclick="toggle('div_solver');"> <h2>solver</h2> </a> 
+<div id=div_solver>
 <table><tr><td>  
 	<script> rpcCall("Run", [1e-9]);   </script> s <br/>
 	<script> rpcCall("Steps", [1000]); </script> <br/>
@@ -177,7 +183,8 @@ const templText = `
 <hr/> </div>
 
 
-<h2> display </h2> <div> 
+<a onclick="toggle('div_disp');"> <h2>display</h2> </a> 
+<div id=div_disp>
 <script>
 	var renderQuant = "m"; 
 	var renderComp = ""; 
@@ -189,10 +196,8 @@ const templText = `
 		if(renderComp != ""){
 			renderQuantComp += "/" + renderComp;
 		}	
-		try{
-			img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
-			document.getElementById("display").src = img.src;
-		}catch(e){}
+		img.src = "/render/" + renderQuantComp + "?" + new Date(); // date = cache breaker
+		document.getElementById("display").src = img.src;
 	}
 
 	function updateImgAsync(){
@@ -230,11 +235,12 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 <hr/></div>
 
-<div> <h2> output </h2>
-
+<a onclick="toggle('div_out');"> <h2>output</h2> </a> 
+<div id=div_out>
 
 
 <hr/></div>
+
 
 <div id="footer">
 <br/>

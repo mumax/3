@@ -63,7 +63,7 @@ const templText = `
 			document.getElementById("running").innerHTML = "<b>Paused</b>";
 		}
 	}
-	setInterval(updateRunning, 200);
+	setInterval(updateRunning, 500);
 </script>
 
 <script>
@@ -221,7 +221,7 @@ const templText = `
 	}
 
 	function updateImgAsync(){
-		if(running && img.complete){
+		if(running && img.complete && document.getElementById("div_disp").style.display != 'none'){
 			updateImg();
 		}
 	}
@@ -255,8 +255,8 @@ Display: <select id="renderList" onchange="renderSelect()">
 
 </div>
 
-<a id=hide onclick="toggle('div_out');"> output <br/></a> 
-<div id=div_out>
+<a id=hide onclick="toggle('div_graph');"> Graph <br/></a> 
+<div id=div_graph>
 
 
 </div>

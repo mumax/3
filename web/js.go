@@ -67,8 +67,16 @@ const templText = `
 </script>
 
 <script>
-	function rpc(command){
-		httpPost("/script/" + command);
+	function rpc(command, err){
+		try{
+			var bytes = httpPost("/script/" + command);
+			var response = JSON.parse(bytes);	
+			if (response.Err != null){
+				document.getElementById(err).innerHTML = response.Err;
+			}
+		}catch(e){
+			document.getElementById(err).innerHTML = e;
+		}
 	}
 
 	// adds a button and as many text boxes as args (default arguments).
@@ -85,11 +93,7 @@ const templText = `
 			arg += ")";
 			var errArea = document.getElementById(err);
 			errArea.innerHTML = "";
-			try{
-				rpc(command + infix + arg);
-			}catch(e){
-				errArea.innerHTML = e;
-			}
+			rpc(command + infix + arg, err);
 		};
 
 		var button;

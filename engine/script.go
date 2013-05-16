@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"code.google.com/p/mx3/util"
@@ -10,6 +11,10 @@ import (
 
 func Compile(src io.Reader) ([]script.Expr, error) {
 	return parser.Parse(src)
+}
+
+func CompileString(str string) ([]script.Expr, error) {
+	return Compile(bytes.NewBufferString(str))
 }
 
 func Exec(cmd string) (interface{}, error) {

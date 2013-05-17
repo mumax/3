@@ -50,7 +50,6 @@ func (p *Parser) ParseLine(line string) (Expr, error) {
 }
 
 func (p *Parser) parseLine() (ex Expr, err error) {
-
 	p.advance()
 	switch p.typ {
 	case EOF:

@@ -4,16 +4,16 @@ import (
 	"fmt"
 )
 
+type assignment struct {
+	left  Variable
+	right Expr
+}
+
 func (p *Parser) newAssign(name string, rhs Expr) assignment {
 	if v, ok := p.get(name).(Variable); ok {
 		return assignment{v, rhs}
 	}
 	panic(fmt.Errorf("line %v: cannot assign to %v", p.Position, name))
-}
-
-type assignment struct {
-	left  Variable
-	right Expr
 }
 
 func (e assignment) Eval() interface{} {

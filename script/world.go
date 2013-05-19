@@ -27,7 +27,8 @@ func (w *World) Var(name string, addr interface{}) {
 }
 
 func (w *World) Func(name string, f interface{}) {
-	w.declare(name, newFuncLit(f))
+	// TODO: specialize for float64 funcs etc
+	w.declare(name, newReflectFunc(f))
 }
 
 func (w *World) init() {

@@ -16,7 +16,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 	if !ok {
 		panic(err("can not call", typ(n.Fun)))
 	}
-	f, ok2 := w.resolve(id.Name).(*funcLit)
+	f, ok2 := w.resolve(id.Name).(*reflectFunc)
 	if !ok2 {
 		panic(err("can not call", id.Name))
 	}
@@ -32,7 +32,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 }
 
 type reflectCall struct {
-	f    *funcLit
+	f    *reflectFunc
 	args []expr
 }
 

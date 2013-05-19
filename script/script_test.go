@@ -16,16 +16,12 @@ func TestEval(t *testing.T) {
 	if w.EvalFloat64("x") != 1.0 {
 		t.Fail()
 	}
-
 	x = 2.0
 	if w.EvalFloat64("x") != 2.0 {
 		t.Fail()
 	}
 
-	y := 3.0
-	w.Var("y", &y)
-	if w.EvalFloat64("y") != y {
+	if w.EvalFloat64("1+2*3/4-5-6") != 1.+2.*3./4.-5.-6 {
 		t.Fail()
 	}
-
 }

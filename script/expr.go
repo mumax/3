@@ -2,11 +2,13 @@ package script
 
 import (
 	"go/ast"
+	"reflect"
 )
 
+// an expression can be evaluated
 type expr interface {
-	Eval() []interface{}
-	NumOut() int
+	Eval() interface{}
+	Type() reflect.Type
 }
 
 func (w *World) compileExpr(e ast.Expr) expr {
@@ -17,5 +19,7 @@ func (w *World) compileExpr(e ast.Expr) expr {
 		return w.resolve(concrete.Name)
 	case *ast.BasicLit:
 		return w.compileBasicLit(concrete)
+	case *ast.BinaryExpr:
+		return w.compileBinaryExpr(concrete)
 	}
 }

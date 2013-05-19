@@ -50,3 +50,25 @@ func BenchmarkEval1_native(bench *testing.B) {
 		panic("make sure result is used")
 	}
 }
+
+func BenchmarkEval2(b *testing.B) {
+	b.StopTimer()
+	w := NewWorld()
+	w.LoadMath()
+	code := w.MustCompileExpr("sin(cos(tan(log(sqrt(1)))))")
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		code.Eval()
+	}
+}
+
+func BenchmarkEval2_native(bench *testing.B) {
+	var a float64
+	b := 1.
+	for i := 0; i < bench.N; i++ {
+		a += math.Sin(math.Cos(math.Tan(math.Log(math.Sqrt(b)))))
+	}
+	if a == 1.23456 {
+		panic("make sure result is used")
+	}
+}

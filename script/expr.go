@@ -22,5 +22,7 @@ func (w *World) compileExpr(e ast.Expr) expr {
 		return w.compileBasicLit(concrete)
 	case *ast.BinaryExpr:
 		return w.compileBinaryExpr(concrete)
+	case *ast.CallExpr:
+		return w.compileCallExpr(concrete)
 	}
 }

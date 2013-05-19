@@ -23,3 +23,9 @@ func err(msg ...interface{}) *compileErr {
 func typ(i interface{}) string {
 	return reflect.TypeOf(reflect.ValueOf(i).Interface()).String()
 }
+
+func assert(test bool) {
+	if !test {
+		panic("assertion failed")
+	}
+}

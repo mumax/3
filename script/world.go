@@ -26,6 +26,10 @@ func (w *World) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
 }
 
+func (w *World) Func(name string, f interface{}) {
+	w.declare(name, newFuncLit(f))
+}
+
 func (w *World) init() {
 	if w.identifiers == nil {
 		w.identifiers = make(map[string]expr)

@@ -5,7 +5,7 @@ import (
 )
 
 type World struct {
-	identifiers map[string]interface{} // set of defined identifiers
+	identifiers map[string]expr // set of defined identifiers
 }
 
 func NewWorld() *World {
@@ -23,12 +23,12 @@ func (w *World) Var(name string, addr interface{}) {
 
 func (w *World) init() {
 	if w.identifiers == nil {
-		w.identifiers = make(map[string]interface{})
+		w.identifiers = make(map[string]expr)
 	}
 }
 
 // add identifier but check that it's not declared yet.
-func (w *World) declare(key string, value interface{}) {
+func (w *World) declare(key string, value expr) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.identifiers[lname]; ok {
@@ -37,7 +37,7 @@ func (w *World) declare(key string, value interface{}) {
 	w.identifiers[lname] = value
 }
 
-func (w *World) resolve(name string) interface{} {
+func (w *World) resolve(name string) expr {
 	w.init()
 	lname := strings.ToLower(name)
 	if v, ok := w.identifiers[lname]; ok {

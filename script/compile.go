@@ -12,6 +12,7 @@ func (w *World) MustCompileExpr(expr string) expr {
 	if e != nil {
 		panic(err(fmt.Sprint(e)))
 	}
+	ast.Print(nil, tree)
 	return w.compileExpr(tree)
 }
 

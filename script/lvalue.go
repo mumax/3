@@ -6,6 +6,7 @@ import (
 
 // left-hand value in (single) assign statement
 type lvalue interface {
+	expr
 	Set(interface{})
 }
 
@@ -22,4 +23,12 @@ func newReflectLvalue(lhs interface{}) lvalue {
 // implements lvalue
 func (l *reflectLvalue) Set(rvalue interface{}) {
 	l.addr.Set(reflect.ValueOf(rvalue))
+}
+
+func (l *reflectLvalue) Eval() []interface{} {
+	return []interface{}{l.addr.Interface()}
+}
+
+func (l *reflectLvalue) NumOut() int {
+	return 1
 }

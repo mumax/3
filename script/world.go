@@ -2,52 +2,76 @@ package script
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
 	"reflect"
-	"strings"
 )
 
-type world struct {
-	identifiers map[string]interface{} // set of defined identifiers
+type World struct {
 }
 
-func (w *world) init() {
-	w.identifiers = make(map[string]interface{})
+func NewWorld() *World {
+	return &World{}
 }
 
-// add identifier but check that it's not declared yet.
-func (w *world) declare(key string, value interface{}) {
-	lname := strings.ToLower(key)
-	if _, ok := w.identifiers[lname]; ok {
-		panic("identifier " + key + " already defined")
+func (w *World) Compile(src string) (c *code, e error) {
+	fmt.Println("compile:", src)
+
+	expr := `func(){` + src + `}` // turn into expression
+	tree, err := parser.ParseExpr(expr)
+	if err != nil {
+		return nil, err
 	}
-	w.identifiers[lname] = value
-}
 
-func (w *world) AddVar(name string, v Variable) {
-	w.declare(name, v)
-}
+	stmts := tree.(*ast.FuncLit).Body.List
+	ast.Print(nil, stmts)
 
-func (p *Parser) get(name string) interface{} {
-	lname := strings.ToLower(name)
-	if v, ok := p.identifiers[lname]; ok {
-		return v
-	} else {
-		panic(fmt.Errorf("line %v: undefined: %v", p.Line, name))
+	defer func() {
+		err := recover()
+		if er, ok := err.(*compileErr); ok {
+			c = nil
+			e = er
+		} else {
+			panic(err)
+		}
+	}()
+
+	for _, s := range stmts {
+		c.append(w.compileStmt(s))
 	}
+
+	return c, nil
 }
 
-func (w *world) AddFunc(name string, f interface{}) {
-	v := reflect.ValueOf(f)
-	if v.Kind() != reflect.Func {
-		panic(fmt.Errorf("addfunc: expect func, got: %v", reflect.TypeOf(f)))
+func notAllowed(n ast.Node) error {
+	return newCompileErr("not allowed: ", reflect.TypeOf(n))
+}
+
+type compileErr string
+
+func (c *compileErr) Error() string {
+	return string(*c)
+}
+
+func newCompileErr(msg ...interface{}) *compileErr {
+	e := compileErr(fmt.Sprint(msg...))
+	return &e
+}
+
+type code struct {
+	list []*stmt
+}
+
+func (c *code) append(s *stmt) {
+	c.list = append(c.list, s)
+}
+
+type stmt struct {
+}
+
+func (w *World) compileStmt(st ast.Stmt) *stmt {
+	switch st.(type) {
+	default:
+		panic(notAllowed(st))
 	}
-	w.declare(name, &function{name, v}) // TODO: wrap in Func type?
-}
-
-// TODO: add const, like pi, mu0, ...
-
-// TODO: rm
-func (w *world) AddFloat(name string, addr *float64) {
-	lname := strings.ToLower(name)
-	w.AddVar(lname, float{addr})
 }

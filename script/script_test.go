@@ -1,44 +1,21 @@
 package script
 
 import (
-	"bytes"
-	"fmt"
+	"log"
 	"testing"
 )
 
-var (
-	a float64
-)
+var tests = []string{"alpha=1"}
 
-func TestParser(t *testing.T) {
-	src1 := bytes.NewBuffer([]byte(testText))
-	p := NewParser()
-	p.AddFloat("a", &a)
-	p.AddFunc("print", myprint)
-	p.Exec(src1)
-	p.ExecString("a=2; print(a)")
-}
-
-func myprint(msg ...interface{}) {
-	fmt.Println(msg...)
-}
-
-const testText = `
-	a
-	a=12e-13
-	a
-	a(a()) 
-	a(1)
-`
-
-func BenchmarkParser(b *testing.B) {
-	b.StopTimer()
-	b.SetBytes(int64(len(testText)))
-	src := bytes.NewBuffer([]byte(testText))
-	p := NewParser()
-	p.AddFloat("a", &a)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		p.Parse(src)
+func TestEval(t *testing.T) {
+	log.SetFlags(0)
+	w := NewWorld()
+	for _, str := range tests {
+		c, err := w.Compile(str)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println(c)
+		}
 	}
 }

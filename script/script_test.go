@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var tests = []string{"alpha=1"}
+var tests = []string{"alpha=1 // cool"}
 
 func TestEval(t *testing.T) {
 	log.SetFlags(0)

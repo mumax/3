@@ -4,6 +4,12 @@ type blockStmt struct {
 	list []stmt
 }
 
-func (c *blockStmt) append(s stmt) {
-	c.list = append(c.list, s)
+func (b *blockStmt) append(s stmt) {
+	b.list = append(b.list, s)
+}
+
+func (b *blockStmt) Exec() {
+	for _, s := range b.list {
+		s.Exec()
+	}
 }

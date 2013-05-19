@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-func (w *World) Compile(src string) (c *blockStmt, e error) {
+func (w *World) Compile(src string) (code stmt, e error) {
 	fmt.Println("compile:", src)
 
 	// parse
@@ -31,11 +31,13 @@ func (w *World) Compile(src string) (c *blockStmt, e error) {
 	stmts := tree.(*ast.FuncLit).Body.List // strip func again
 	ast.Print(nil, stmts)
 
+	block := new(blockStmt)
 	for _, s := range stmts {
-		c.append(w.compileStmt(s))
+		block.append(w.compileStmt(s))
 	}
+	code = block
 
-	return c, nil
+	return code, nil
 }
 
 func typ(i interface{}) string {

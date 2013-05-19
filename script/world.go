@@ -14,6 +14,13 @@ func NewWorld() *World {
 	return w
 }
 
+// adds a native variable to the world. E.g.:
+// 	var x float64
+// 	world.Var("x", &x)
+func (w *World) Var(name string, addr interface{}) {
+	w.declare(name, newReflectLvalue(addr))
+}
+
 func (w *World) init() {
 	if w.identifiers == nil {
 		w.identifiers = make(map[string]interface{})

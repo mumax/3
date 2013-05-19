@@ -5,6 +5,7 @@ import (
 )
 
 type stmt interface {
+	Exec()
 }
 
 func (w *World) compileStmt(st ast.Stmt) stmt {

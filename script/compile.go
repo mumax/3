@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
+	"reflect"
 )
 
 func (w *World) Compile(src string) (c *blockStmt, e error) {
@@ -17,15 +18,15 @@ func (w *World) Compile(src string) (c *blockStmt, e error) {
 	}
 
 	// compile errors are thrown, caught here and returned
-	defer func() {
-		err := recover()
-		if er, ok := err.(*compileErr); ok {
-			c = nil
-			e = er
-		} else {
-			panic(err)
-		}
-	}()
+	//	defer func() {
+	//		err := recover()
+	//		if er, ok := err.(*compileErr); ok {
+	//			c = nil
+	//			e = er
+	//		} else {
+	//			panic(err)
+	//		}
+	//	}()
 
 	stmts := tree.(*ast.FuncLit).Body.List // strip func again
 	ast.Print(nil, stmts)
@@ -37,20 +38,6 @@ func (w *World) Compile(src string) (c *blockStmt, e error) {
 	return c, nil
 }
 
-func (w *World) compileStmt(st ast.Stmt) *stmt {
-	switch st.(type) {
-	default:
-		panic(notAllowed(st))
-	}
-}
-
-type blockStmt struct {
-	list []*stmt
-}
-
-func (c *blockStmt) append(s *stmt) {
-	c.list = append(c.list, s)
-}
-
-type stmt struct {
+func typ(i interface{}) string {
+	return reflect.TypeOf(reflect.ValueOf(i).Interface()).String()
 }

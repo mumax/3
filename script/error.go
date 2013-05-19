@@ -2,13 +2,7 @@ package script
 
 import (
 	"fmt"
-	"go/ast"
-	"reflect"
 )
-
-func notAllowed(n ast.Node) error {
-	return newCompileErr("not allowed: ", reflect.TypeOf(n))
-}
 
 type compileErr string
 

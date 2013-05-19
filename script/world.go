@@ -25,7 +25,7 @@ func (w *World) declare(key string, value interface{}) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.identifiers[lname]; ok {
-		panic(newCompileErr("identifier " + key + " already defined"))
+		panic(err("identifier " + key + " already defined"))
 	}
 	w.identifiers[lname] = value
 }
@@ -36,6 +36,6 @@ func (w *World) resolve(name string) interface{} {
 	if v, ok := w.identifiers[lname]; ok {
 		return v
 	} else {
-		panic(newCompileErr("undefined:", name))
+		panic(err("undefined:", name))
 	}
 }

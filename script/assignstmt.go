@@ -4,13 +4,8 @@ import (
 	"go/ast"
 )
 
-type assignStmt struct {
-	lhs lvalue
-	rhs expr
-}
-
-// compile assign statement
-func (w *World) compileAssignStmt(a *ast.AssignStmt) *assignStmt {
+// compiles a (single) assign statement lhs = rhs
+func (w *World) compileAssignStmt(a *ast.AssignStmt) stmt {
 	if len(a.Lhs) != 1 || len(a.Rhs) != 1 {
 		panic(err("multiple assignment not allowed"))
 	}
@@ -27,6 +22,11 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) *assignStmt {
 			panic(err("cannot assign to", concrete.Name))
 		}
 	}
+}
+
+type assignStmt struct {
+	lhs lvalue
+	rhs expr
 }
 
 func (a *assignStmt) Exec() {

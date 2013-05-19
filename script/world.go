@@ -4,19 +4,24 @@ import (
 	"strings"
 )
 
+// World stores an interpreted program's state
+// like declared variables and functions.
 type World struct {
 	identifiers map[string]expr // set of defined identifiers
+	Debug       bool            // print debug info?
 }
 
 func NewWorld() *World {
 	w := new(World)
+	w.Debug = true
 	w.init()
 	return w
 }
 
 // adds a native variable to the world. E.g.:
-// 	var x float64
+// 	var x = 3.14
 // 	world.Var("x", &x)
+// 	world.MustEval("x") // returns 3.14
 func (w *World) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
 }

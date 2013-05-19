@@ -6,30 +6,7 @@ import (
 	"reflect"
 )
 
-type binaryExpr struct {
-	x, y expr
-}
-
-func (b *binaryExpr) Type() reflect.Type {
-	return b.x.Type() // assumes it has been typechecked
-}
-
-type add struct{ binaryExpr }
-
-func (b *add) Eval() interface{} { return b.x.Eval().(float64) + b.y.Eval().(float64) }
-
-type sub struct{ binaryExpr }
-
-func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(float64) }
-
-type mul struct{ binaryExpr }
-
-func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
-
-type quo struct{ binaryExpr }
-
-func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
-
+// compiles a binary expression x 'op' y
 func (w *World) compileBinaryExpr(n *ast.BinaryExpr) expr {
 	x := w.compileExpr(n.X)
 	y := w.compileExpr(n.Y)
@@ -47,3 +24,20 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) expr {
 		return &quo{binaryExpr{x, y}}
 	}
 }
+
+// abstract superclass for all binary expressions
+type binaryExpr struct{ x, y expr }
+
+func (b *binaryExpr) Type() reflect.Type {
+	return b.x.Type() // assumes it has been type checked, type x = type y = return type
+}
+
+type add struct{ binaryExpr }
+type sub struct{ binaryExpr }
+type mul struct{ binaryExpr }
+type quo struct{ binaryExpr }
+
+func (b *add) Eval() interface{} { return b.x.Eval().(float64) + b.y.Eval().(float64) }
+func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(float64) }
+func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
+func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }

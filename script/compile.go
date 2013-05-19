@@ -6,18 +6,22 @@ import (
 	"go/parser"
 )
 
+// CompileExpr with panic on error.
 func (w *World) MustCompileExpr(expr string) expr {
-	// parse
 	tree, e := parser.ParseExpr(expr)
 	if e != nil {
 		panic(err(fmt.Sprint(e)))
 	}
-	ast.Print(nil, tree)
+	if w.Debug {
+		ast.Print(nil, tree)
+	}
 	return w.compileExpr(tree)
 }
 
+// Compiles an expression, which can then be evaluated. E.g.:
+// 	expr, err := world.CompileExpr("1+1")
+// 	expr.Eval()   // returns 2
 func (w *World) CompileExpr(src string) (code expr, e error) {
-	//compile errors are thrown, caught here and returned
 	defer func() {
 		err := recover()
 		if er, ok := err.(*compileErr); ok {
@@ -27,33 +31,11 @@ func (w *World) CompileExpr(src string) (code expr, e error) {
 			panic(err)
 		}
 	}()
-	code = w.MustCompileExpr(src)
-	return
-}
-
-// compiles a number of statements. E.g.:
-// 	x=1
-// 	y=2
-func (w *World) Compile(src string) (code stmt, e error) {
-	//compile errors are thrown, caught here and returned
-	defer func() {
-		err := recover()
-		if er, ok := err.(*compileErr); ok {
-			code = nil
-			e = er
-		} else {
-			panic(err)
-		}
-	}()
-	code = w.MustCompile(src)
-	return
+	return w.MustCompileExpr(src), nil
 }
 
 // Compile, with panic on error
-func (w *World) MustCompile(src string) (code stmt) {
-	fmt.Println("compile:", src)
-
-	// parse
+func (w *World) MustCompile(src string) stmt {
 	expr := "func(){" + src + "\n}" // wrap in func to turn into expression
 	tree, e := parser.ParseExpr(expr)
 	if e != nil {
@@ -61,13 +43,30 @@ func (w *World) MustCompile(src string) (code stmt) {
 	}
 
 	stmts := tree.(*ast.FuncLit).Body.List // strip func again
-	ast.Print(nil, stmts)
+	if w.Debug {
+		ast.Print(nil, stmts)
+	}
 
 	block := new(blockStmt)
 	for _, s := range stmts {
 		block.append(w.compileStmt(s))
 	}
-	code = block
+	return block
+}
 
-	return code
+// compiles source consisting of a number of statements. E.g.:
+// 	src = "a = 1; b = sin(x)"
+// 	code, err := world.Compile(src)
+// 	code.Exec()
+func (w *World) Compile(src string) (code stmt, e error) {
+	defer func() {
+		err := recover()
+		if er, ok := err.(*compileErr); ok {
+			code = nil
+			e = er
+		} else {
+			panic(err)
+		}
+	}()
+	return w.MustCompile(src), nil
 }

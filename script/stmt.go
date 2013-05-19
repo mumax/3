@@ -4,10 +4,12 @@ import (
 	"go/ast"
 )
 
+// a statement can be executed
 type stmt interface {
 	Exec()
 }
 
+// compiles a statement
 func (w *World) compileStmt(st ast.Stmt) stmt {
 	switch concrete := st.(type) {
 	default:

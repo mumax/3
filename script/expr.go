@@ -11,6 +11,7 @@ type expr interface {
 	Type() reflect.Type
 }
 
+// compiles an expression
 func (w *World) compileExpr(e ast.Expr) expr {
 	switch concrete := e.(type) {
 	default:

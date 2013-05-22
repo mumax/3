@@ -8,7 +8,6 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"runtime"
 	"time"
@@ -64,19 +63,16 @@ func main() {
 // Runs a script file.
 func RunFileAndServe(fname string) {
 	// first we compile the entire file into an executable tree
-	f, err := os.Open(fname)
+	bytes, err := ioutil.ReadFile(fname)
 	util.FatalErr(err)
-	defer f.Close()
-	code, err2 := engine.Compile(f)
+	code, err2 := engine.Compile(string(bytes))
 	util.FatalErr(err2)
 
 	// now the parser is not used anymore so it can handle web requests
 	web.GoServe(*flag_port)
 
 	// start executing the tree, possibly injecting commands from web gui
-	for _, cmd := range code {
-		cmd.Eval()
-	}
+	code.Exec()
 }
 
 // Enter interactive mode. Simulation is now exclusively controlled

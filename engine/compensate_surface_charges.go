@@ -24,7 +24,7 @@ func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 }
 
 func init() {
-	parser.AddFunc("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
+	world.Func("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {

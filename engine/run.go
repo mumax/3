@@ -24,7 +24,7 @@ var pause = false
 func Pause()       { pause = true }
 func Paused() bool { return pause }
 func init() {
-	parser.AddFunc("pause", Pause)
+	world.Func("pause", Pause)
 }
 
 // Runs as long as condition returns true.

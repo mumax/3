@@ -37,8 +37,8 @@ func CenterInplaneWall() {
 }
 
 func init() {
-	parser.AddFunc("centerPMAWall", CenterPMAWall)
-	parser.AddFunc("centerInplaneWall", CenterInplaneWall)
+	world.Func("centerPMAWall", CenterPMAWall)
+	world.Func("centerInplaneWall", CenterInplaneWall)
 }
 
 func wall_left_magnetization(x float64) int {

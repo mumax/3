@@ -19,7 +19,7 @@ type Resp struct {
 func scriptHandler(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Path[len("/script/"):]
 
-	var resp Resp
+	var resp Resp // TODO
 
 	defer func() {
 		bytes, err2 := json.Marshal(resp)
@@ -28,7 +28,7 @@ func scriptHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(bytes)
 	}()
 
-	code, err := engine.CompileString(cmd)
+	code, err := engine.Compile(cmd)
 	if err != nil {
 		resp.Err = err.Error()
 		util.LogErr(err)
@@ -41,9 +41,7 @@ func scriptHandler(w http.ResponseWriter, r *http.Request) {
 				resp.Err = fmt.Sprint(err)
 			}
 		}()
-		for _, e := range code {
-			log.Println("eval:", e)
-			resp.Val = e.Eval()
-		}
+		log.Println("exec:", code)
+		code.Exec()
 	}
 }

@@ -199,7 +199,7 @@ func PostStep(f func()) {
 }
 
 func init() {
-	parser.AddFunc("PostStep", PostStep)
+	world.Func("PostStep", PostStep)
 }
 
 func step() {

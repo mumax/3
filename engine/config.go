@@ -11,10 +11,10 @@ import (
 )
 
 func init() {
-	parser.AddFunc("uniform", Uniform)
-	parser.AddFunc("vortex", Vortex)
-	parser.AddFunc("twodomain", TwoDomain)
-	parser.AddFunc("vortexwall", VortexWall)
+	world.Func("uniform", Uniform)
+	world.Func("vortex", Vortex)
+	world.Func("twodomain", TwoDomain)
+	world.Func("vortexwall", VortexWall)
 }
 
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1). E.g.:

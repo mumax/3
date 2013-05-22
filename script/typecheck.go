@@ -6,7 +6,7 @@ func typeconv(in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
 	switch {
 	default:
-		panic(err("type mismatch:", inT, outT))
+		panic(err("type mismatch: can not use type ", inT, " as ", outT))
 	case inT == outT:
 		return in
 	case outT == float64_t && inT == int_t:

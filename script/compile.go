@@ -22,15 +22,15 @@ func (w *World) MustCompileExpr(Expr string) Expr {
 // 	expr, err := world.CompileExpr("1+1")
 // 	expr.Eval()   // returns 2
 func (w *World) CompileExpr(src string) (code Expr, e error) {
-	//defer func() {
-	//	err := recover()
-	//	if er, ok := err.(*compileErr); ok {
-	//		code = nil
-	//		e = er
-	//	} else {
-	//		panic(err)
-	//	}
-	//}()
+	defer func() {
+		err := recover()
+		if er, ok := err.(*compileErr); ok {
+			code = nil
+			e = er
+		} else {
+			panic(err)
+		}
+	}()
 	return w.MustCompileExpr(src), nil
 }
 
@@ -59,14 +59,14 @@ func (w *World) MustCompile(src string) Expr {
 // 	code, err := world.Compile(src)
 // 	code.Exec()
 func (w *World) Compile(src string) (code Expr, e error) {
-	//	defer func() {
-	//		err := recover()
-	//		if er, ok := err.(*compileErr); ok {
-	//			code = nil
-	//			e = er
-	//		} else {
-	//			panic(err)
-	//		}
-	//	}()
+	defer func() {
+		err := recover()
+		if er, ok := err.(*compileErr); ok {
+			code = nil
+			e = er
+		} else {
+			panic(err)
+		}
+	}()
 	return w.MustCompile(src), nil
 }

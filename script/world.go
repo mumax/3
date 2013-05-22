@@ -13,7 +13,7 @@ type World struct {
 
 func NewWorld() *World {
 	w := new(World)
-	w.Debug = true
+	w.Debug = false
 	w.init()
 	return w
 }

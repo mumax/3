@@ -6,7 +6,7 @@ import (
 
 // left-hand value in (single) assign statement
 type lvalue interface {
-	expr             // evalutes
+	Expr             // evalutes
 	Set(interface{}) // assigns a new value
 }
 

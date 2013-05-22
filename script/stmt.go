@@ -5,12 +5,12 @@ import (
 )
 
 // a statement can be executed
-type stmt interface {
+type Stmt interface {
 	Exec()
 }
 
 // compiles a statement
-func (w *World) compileStmt(st ast.Stmt) stmt {
+func (w *World) compileStmt(st ast.Stmt) Stmt {
 	switch concrete := st.(type) {
 	default:
 		panic(err("not allowed:", st))

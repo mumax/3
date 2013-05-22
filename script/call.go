@@ -6,8 +6,8 @@ import (
 )
 
 type call interface {
-	expr
-	stmt
+	Expr
+	Stmt
 }
 
 // TODO: might become func.curry, so it can be optimized
@@ -23,7 +23,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 	if len(n.Args) != f.NumIn() {
 		panic(err(id.Name, "needs", f.NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
 	}
-	args := make([]expr, len(n.Args))
+	args := make([]Expr, len(n.Args))
 	for i := range args {
 		args[i] = w.compileExpr(n.Args[i])
 		typecheck(args[i].Type(), f.In(i))
@@ -33,7 +33,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 
 type reflectCall struct {
 	f    *reflectFunc
-	args []expr
+	args []Expr
 }
 
 func (c *reflectCall) Eval() interface{} {

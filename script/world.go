@@ -7,7 +7,7 @@ import (
 // World stores an interpreted program's state
 // like declared variables and functions.
 type World struct {
-	identifiers map[string]expr // set of defined identifiers
+	identifiers map[string]Expr // set of defined identifiers
 	Debug       bool            // print debug info?
 }
 
@@ -33,12 +33,12 @@ func (w *World) Func(name string, f interface{}) {
 
 func (w *World) init() {
 	if w.identifiers == nil {
-		w.identifiers = make(map[string]expr)
+		w.identifiers = make(map[string]Expr)
 	}
 }
 
 // add identifier but check that it's not declared yet.
-func (w *World) declare(key string, value expr) {
+func (w *World) declare(key string, value Expr) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.identifiers[lname]; ok {
@@ -47,7 +47,7 @@ func (w *World) declare(key string, value expr) {
 	w.identifiers[lname] = value
 }
 
-func (w *World) resolve(name string) expr {
+func (w *World) resolve(name string) Expr {
 	w.init()
 	lname := strings.ToLower(name)
 	if v, ok := w.identifiers[lname]; ok {

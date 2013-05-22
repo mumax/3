@@ -7,7 +7,7 @@ import (
 )
 
 // compiles a binary expression x 'op' y
-func (w *World) compileBinaryExpr(n *ast.BinaryExpr) expr {
+func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 	x := w.compileExpr(n.X)
 	y := w.compileExpr(n.Y)
 	typecheck(x.Type(), y.Type())
@@ -26,7 +26,7 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) expr {
 }
 
 // abstract superclass for all binary expressions
-type binaryExpr struct{ x, y expr }
+type binaryExpr struct{ x, y Expr }
 
 func (b *binaryExpr) Type() reflect.Type {
 	return b.x.Type() // assumes it has been type checked, type x = type y = return type

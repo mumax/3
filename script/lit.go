@@ -8,7 +8,7 @@ import (
 )
 
 // compiles a basic literal, like numbers and strings
-func (w *World) compileBasicLit(n *ast.BasicLit) expr {
+func (w *World) compileBasicLit(n *ast.BasicLit) Expr {
 	switch n.Kind {
 	default:
 		panic(err("not allowed:", n.Value, "(", typ(n), ")"))

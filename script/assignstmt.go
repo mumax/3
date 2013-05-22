@@ -5,7 +5,7 @@ import (
 )
 
 // compiles a (single) assign statement lhs = rhs
-func (w *World) compileAssignStmt(a *ast.AssignStmt) stmt {
+func (w *World) compileAssignStmt(a *ast.AssignStmt) Stmt {
 	if len(a.Lhs) != 1 || len(a.Rhs) != 1 {
 		panic(err("multiple assignment not allowed"))
 	}
@@ -26,7 +26,7 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) stmt {
 
 type assignStmt struct {
 	lhs lvalue
-	rhs expr
+	rhs Expr
 }
 
 func (a *assignStmt) Exec() {

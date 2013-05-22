@@ -1,9 +1,9 @@
 package script
 
 // block statement is a list of statements.
-type blockStmt []stmt
+type blockStmt []Stmt
 
-func (b *blockStmt) append(s stmt) {
+func (b *blockStmt) append(s Stmt) {
 	(*b) = append(*b, s)
 }
 

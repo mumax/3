@@ -7,8 +7,8 @@ import (
 )
 
 // CompileExpr with panic on error.
-func (w *World) MustCompileExpr(expr string) expr {
-	tree, e := parser.ParseExpr(expr)
+func (w *World) MustCompileExpr(Expr string) Expr {
+	tree, e := parser.ParseExpr(Expr)
 	if e != nil {
 		panic(err(fmt.Sprint(e)))
 	}
@@ -21,7 +21,7 @@ func (w *World) MustCompileExpr(expr string) expr {
 // Compiles an expression, which can then be evaluated. E.g.:
 // 	expr, err := world.CompileExpr("1+1")
 // 	expr.Eval()   // returns 2
-func (w *World) CompileExpr(src string) (code expr, e error) {
+func (w *World) CompileExpr(src string) (code Expr, e error) {
 	defer func() {
 		err := recover()
 		if er, ok := err.(*compileErr); ok {
@@ -35,9 +35,9 @@ func (w *World) CompileExpr(src string) (code expr, e error) {
 }
 
 // Compile, with panic on error
-func (w *World) MustCompile(src string) stmt {
-	expr := "func(){" + src + "\n}" // wrap in func to turn into expression
-	tree, e := parser.ParseExpr(expr)
+func (w *World) MustCompile(src string) Stmt {
+	Expr := "func(){" + src + "\n}" // wrap in func to turn into expression
+	tree, e := parser.ParseExpr(Expr)
 	if e != nil {
 		panic(err(fmt.Sprint(e)))
 	}
@@ -58,7 +58,7 @@ func (w *World) MustCompile(src string) stmt {
 // 	src = "a = 1; b = sin(x)"
 // 	code, err := world.Compile(src)
 // 	code.Exec()
-func (w *World) Compile(src string) (code stmt, e error) {
+func (w *World) Compile(src string) (code Stmt, e error) {
 	defer func() {
 		err := recover()
 		if er, ok := err.(*compileErr); ok {

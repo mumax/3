@@ -6,13 +6,13 @@ import (
 )
 
 // an expression can be evaluated
-type expr interface {
+type Expr interface {
 	Eval() interface{}
 	Type() reflect.Type
 }
 
 // compiles an expression
-func (w *World) compileExpr(e ast.Expr) expr {
+func (w *World) compileExpr(e ast.Expr) Expr {
 	switch concrete := e.(type) {
 	default:
 		panic(err("not allowed:", typ(e)))

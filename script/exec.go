@@ -1,21 +1,5 @@
 package script
 
-// Exec compiles and executes the source statements.
-func (w *World) Exec(src string) error {
-	code, err := w.Compile(src)
-	if err != nil {
-		return err
-	}
-	code.Exec()
-	return nil
-}
-
-// Exec with panic on error.
-func (w *World) MustExec(src string) {
-	code := w.MustCompile(src)
-	code.Exec()
-}
-
 // Eval with panic on error.
 func (w *World) MustEval(src string) interface{} {
 	Expr := w.MustCompileExpr(src)

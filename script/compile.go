@@ -22,20 +22,20 @@ func (w *World) MustCompileExpr(Expr string) Expr {
 // 	expr, err := world.CompileExpr("1+1")
 // 	expr.Eval()   // returns 2
 func (w *World) CompileExpr(src string) (code Expr, e error) {
-	defer func() {
-		err := recover()
-		if er, ok := err.(*compileErr); ok {
-			code = nil
-			e = er
-		} else {
-			panic(err)
-		}
-	}()
+	//defer func() {
+	//	err := recover()
+	//	if er, ok := err.(*compileErr); ok {
+	//		code = nil
+	//		e = er
+	//	} else {
+	//		panic(err)
+	//	}
+	//}()
 	return w.MustCompileExpr(src), nil
 }
 
 // Compile, with panic on error
-func (w *World) MustCompile(src string) Stmt {
+func (w *World) MustCompile(src string) Expr {
 	Expr := "func(){" + src + "\n}" // wrap in func to turn into expression
 	tree, e := parser.ParseExpr(Expr)
 	if e != nil {
@@ -58,15 +58,15 @@ func (w *World) MustCompile(src string) Stmt {
 // 	src = "a = 1; b = sin(x)"
 // 	code, err := world.Compile(src)
 // 	code.Exec()
-func (w *World) Compile(src string) (code Stmt, e error) {
-	defer func() {
-		err := recover()
-		if er, ok := err.(*compileErr); ok {
-			code = nil
-			e = er
-		} else {
-			panic(err)
-		}
-	}()
+func (w *World) Compile(src string) (code Expr, e error) {
+	//	defer func() {
+	//		err := recover()
+	//		if er, ok := err.(*compileErr); ok {
+	//			code = nil
+	//			e = er
+	//		} else {
+	//			panic(err)
+	//		}
+	//	}()
 	return w.MustCompile(src), nil
 }

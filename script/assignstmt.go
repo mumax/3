@@ -1,11 +1,9 @@
 package script
 
-import (
-	"go/ast"
-)
+import "go/ast"
 
 // compiles a (single) assign statement lhs = rhs
-func (w *World) compileAssignStmt(a *ast.AssignStmt) Stmt {
+func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 	if len(a.Lhs) != 1 || len(a.Rhs) != 1 {
 		panic(err("multiple assignment not allowed"))
 	}
@@ -17,7 +15,7 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Stmt {
 	case *ast.Ident:
 		if l, ok := w.resolve(concrete.Name).(lvalue); ok {
 			typecheck(l.Type(), r.Type())
-			return &assignStmt{l, r}
+			return &assignStmt{lhs: l, rhs: r}
 		} else {
 			panic(err("cannot assign to", concrete.Name))
 		}
@@ -27,8 +25,10 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Stmt {
 type assignStmt struct {
 	lhs lvalue
 	rhs Expr
+	void
 }
 
-func (a *assignStmt) Exec() {
+func (a *assignStmt) Eval() interface{} {
 	a.lhs.Set(a.rhs.Eval())
+	return nil
 }

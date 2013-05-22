@@ -29,7 +29,7 @@ func init() {
 	world.Var("m", &M)
 }
 
-func Compile(src string) (script.Stmt, error) {
+func Compile(src string) (script.Expr, error) {
 	return world.Compile(src)
 }
 

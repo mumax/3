@@ -7,7 +7,6 @@ import (
 
 type call interface {
 	Expr
-	Stmt
 }
 
 // TODO: might become func.curry, so it can be optimized

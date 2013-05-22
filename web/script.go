@@ -42,6 +42,6 @@ func scriptHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 		log.Println("exec:", code)
-		code.Exec()
+		code.Eval()
 	}
 }

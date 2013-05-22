@@ -72,7 +72,7 @@ func RunFileAndServe(fname string) {
 	web.GoServe(*flag_port)
 
 	// start executing the tree, possibly injecting commands from web gui
-	code.Exec()
+	code.Eval()
 }
 
 // Enter interactive mode. Simulation is now exclusively controlled

@@ -1,14 +1,21 @@
 package script
 
-// block statement is a list of statements.
-type blockStmt []Stmt
+import "reflect"
 
-func (b *blockStmt) append(s Stmt) {
+// block statement is a list of statements.
+type blockStmt []Expr
+
+func (b *blockStmt) append(s Expr) {
 	(*b) = append(*b, s)
 }
 
-func (b *blockStmt) Exec() {
+func (b *blockStmt) Eval() interface{} {
 	for _, s := range *b {
-		s.Exec()
+		s.Eval()
 	}
+	return nil
+}
+
+func (b *blockStmt) Type() reflect.Type {
+	return nil
 }

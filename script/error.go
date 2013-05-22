@@ -2,21 +2,28 @@ package script
 
 import (
 	"fmt"
+	"go/token"
 	"reflect"
 )
 
 // compileErr, and only compileErr will be caught by Compile and returned as an error.
-type compileErr string
+type compileErr struct {
+	pos token.Pos
+	msg string
+}
 
 // implements error
 func (c *compileErr) Error() string {
-	return string(*c)
+	return c.msg
 }
 
 // constructs a compileErr
 func err(msg ...interface{}) *compileErr {
-	e := compileErr(fmt.Sprint(msg...))
-	return &e
+	return &compileErr{0, fmt.Sprint(msg...)}
+}
+
+func errp(pos token.Pos, msg ...interface{}) *compileErr {
+	return &compileErr{pos, fmt.Sprint(msg)}
 }
 
 // type string for value i

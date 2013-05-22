@@ -1,6 +1,7 @@
 package script
 
 import (
+	"go/token"
 	"strings"
 )
 
@@ -47,12 +48,12 @@ func (w *World) declare(key string, value Expr) {
 	w.identifiers[lname] = value
 }
 
-func (w *World) resolve(name string) Expr {
+func (w *World) resolve(pos token.Pos, name string) Expr {
 	w.init()
 	lname := strings.ToLower(name)
 	if v, ok := w.identifiers[lname]; ok {
 		return v
 	} else {
-		panic(err(0, "undefined:", name)) // TODO: add pos
+		panic(err(pos, "undefined:", name)) // TODO: add pos
 	}
 }

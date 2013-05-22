@@ -17,7 +17,7 @@ func (w *World) compileExpr(e ast.Expr) Expr {
 	default:
 		panic(err(e.Pos(), "not allowed:", typ(e)))
 	case *ast.Ident:
-		return w.resolve(concrete.Name)
+		return w.resolve(e.Pos(), concrete.Name)
 	case *ast.BasicLit:
 		return w.compileBasicLit(concrete)
 	case *ast.BinaryExpr:

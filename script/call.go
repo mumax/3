@@ -15,7 +15,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 	if !ok {
 		panic(err(n.Pos(), "can not call", typ(n.Fun)))
 	}
-	f, ok2 := w.resolve(id.Name).(*reflectFunc)
+	f, ok2 := w.resolve(n.Pos(), id.Name).(*reflectFunc)
 	if !ok2 {
 		panic(err(n.Pos(), "can not call", id.Name))
 	}

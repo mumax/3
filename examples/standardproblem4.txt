@@ -5,7 +5,7 @@
 
 // geometry
 
-	setgridsize(128,      32,      1)
+	setgridsize(128, 32, 1)
 	setcellsize(3.125e-9, 3.125e-9, 3e-9)
 
 

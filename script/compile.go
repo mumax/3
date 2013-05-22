@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
-	"go/token"
-	"strings"
 )
 
 // CompileExpr with panic on error.
@@ -66,7 +64,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 	exprSrc := "func(){" + src + "\n}" // wrap in func to turn into expression
 	tree, err := parser.ParseExpr(exprSrc)
 	if err != nil {
-		return nil, fmt.Errorf("script syntax error: line %v", err)
+		return nil, fmt.Errorf("script line %v: ", err)
 	}
 
 	// compile
@@ -74,7 +72,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 		err := recover()
 		if compErr, ok := err.(*compileErr); ok {
 			code = nil
-			e = fmt.Errorf("%v: %v", pos2line(compErr.pos, exprSrc), compErr.msg)
+			e = fmt.Errorf("script %v: %v", pos2line(compErr.pos, exprSrc), compErr.msg)
 		} else {
 			panic(err)
 		}
@@ -90,18 +88,4 @@ func (w *World) Compile(src string) (code Expr, e error) {
 		block.append(w.compileStmt(s))
 	}
 	return block, nil
-}
-
-func pos2line(pos token.Pos, src string) string {
-	lines := strings.Split(src, "\n")
-	line := 0
-	for i, b := range src {
-		if token.Pos(i) == pos {
-			return fmt.Sprint("line", line, lines[line])
-		}
-		if b == '\n' {
-			line++
-		}
-	}
-	return fmt.Sprint("position", pos) // we should not reach this
 }

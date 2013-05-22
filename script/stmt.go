@@ -9,7 +9,7 @@ import (
 func (w *World) compileStmt(st ast.Stmt) Expr {
 	switch concrete := st.(type) {
 	default:
-		panic(err("not allowed:", typ(st)))
+		panic(err(st.Pos(), "not allowed:", typ(st)))
 	case *ast.AssignStmt:
 		return w.compileAssignStmt(concrete)
 	case *ast.ExprStmt:

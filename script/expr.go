@@ -15,7 +15,7 @@ type Expr interface {
 func (w *World) compileExpr(e ast.Expr) Expr {
 	switch concrete := e.(type) {
 	default:
-		panic(err("not allowed:", typ(e)))
+		panic(err(e.Pos(), "not allowed:", typ(e)))
 	case *ast.Ident:
 		return w.resolve(concrete.Name)
 	case *ast.BasicLit:

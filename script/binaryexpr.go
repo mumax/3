@@ -12,7 +12,7 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 	y := typeconv(w.compileExpr(n.Y), float64_t)
 	switch n.Op {
 	default:
-		panic(err("not allowed:", n.Op))
+		panic(err(n.Pos(), "not allowed:", n.Op))
 	case token.ADD:
 		return &add{binaryExpr{x, y}}
 	case token.SUB:

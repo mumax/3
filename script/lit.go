@@ -11,7 +11,7 @@ import (
 func (w *World) compileBasicLit(n *ast.BasicLit) Expr {
 	switch n.Kind {
 	default:
-		panic(err("not allowed:", n.Value, "(", typ(n), ")"))
+		panic(err(n.Pos(), "not allowed:", n.Value, "(", typ(n), ")"))
 	case token.FLOAT:
 		return floatLit(parseFloat(n.Value))
 	case token.INT:

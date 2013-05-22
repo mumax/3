@@ -13,14 +13,14 @@ type call interface {
 func (w *World) compileCallExpr(n *ast.CallExpr) call {
 	id, ok := (n.Fun).(*ast.Ident)
 	if !ok {
-		panic(err("can not call", typ(n.Fun)))
+		panic(err(n.Pos(), "can not call", typ(n.Fun)))
 	}
 	f, ok2 := w.resolve(id.Name).(*reflectFunc)
 	if !ok2 {
-		panic(err("can not call", id.Name))
+		panic(err(n.Pos(), "can not call", id.Name))
 	}
 	if len(n.Args) != f.NumIn() {
-		panic(err(id.Name, "needs", f.NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
+		panic(err(n.Pos(), id.Name, "needs", f.NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
 	}
 	args := make([]Expr, len(n.Args))
 	for i := range args {

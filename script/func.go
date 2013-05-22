@@ -11,10 +11,10 @@ type reflectFunc struct {
 func newReflectFunc(fn interface{}) *reflectFunc {
 	val := reflect.ValueOf(fn)
 	if val.Type().Kind() != reflect.Func {
-		panic(err("not a function:", fn))
+		panic(err(0, "not a function:", fn)) // TODO: is this compile err or not?
 	}
 	if val.Type().NumOut() > 1 {
-		panic(err("multiple return values not allowed:", fn))
+		panic(err(0, "multiple return values not allowed:", fn))
 	}
 	return &reflectFunc{val}
 }

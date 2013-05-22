@@ -42,7 +42,7 @@ func (w *World) declare(key string, value Expr) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.identifiers[lname]; ok {
-		panic(err("identifier " + key + " already defined"))
+		panic("identifier " + key + " already defined")
 	}
 	w.identifiers[lname] = value
 }
@@ -53,6 +53,6 @@ func (w *World) resolve(name string) Expr {
 	if v, ok := w.identifiers[lname]; ok {
 		return v
 	} else {
-		panic(err("undefined:", name))
+		panic(err(0, "undefined:", name)) // TODO: add pos
 	}
 }

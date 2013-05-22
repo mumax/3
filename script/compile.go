@@ -54,7 +54,7 @@ func (w *World) MustCompileExpr(src string) Expr {
 func (w *World) Compile(src string) (code Expr, e error) {
 
 	// parse
-	exprSrc := "func(){" + src + "\n}" // wrap in func to turn into expression
+	exprSrc := "func(){\n" + src + "\n}" // wrap in func to turn into expression
 	tree, err := parser.ParseExpr(exprSrc)
 	if err != nil {
 		return nil, fmt.Errorf("script line %v: ", err)

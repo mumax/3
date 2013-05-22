@@ -44,7 +44,7 @@ func pos2line(pos token.Pos, src string) string {
 	line := 0
 	for i, b := range src {
 		if token.Pos(i) == pos {
-			return fmt.Sprint("line ", line+1, ": ", strings.Trim(lines[line], " \t")) // lines count from 1
+			return fmt.Sprint("line ", line, ": ", strings.Trim(lines[line], " \t")) // func{ prefix makes lines count from 1
 		}
 		if b == '\n' {
 			line++

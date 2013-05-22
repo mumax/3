@@ -7,8 +7,8 @@ import (
 
 // an expression can be evaluated
 type Expr interface {
-	Eval() interface{}
-	Type() reflect.Type
+	Eval() interface{}  // evaluate and return result (nil for void)
+	Type() reflect.Type // return type, nil for void
 }
 
 // compiles an expression

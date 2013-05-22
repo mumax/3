@@ -27,6 +27,15 @@ func (w *World) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
 }
 
+// adds a special variable to the world. Upon assignment,
+// v's Set() will be called.
+func (w *World) LValue(name string, v LValue) {
+	w.declare(name, v)
+}
+
+// adds a native function to the world. E.g.:
+// 	world.Func("sin", math.Sin)
+// 	world.MustEval("sin(0)") // returns 0
 func (w *World) Func(name string, f interface{}) {
 	// TODO: specialize for float64 funcs etc
 	w.declare(name, newReflectFunc(f))

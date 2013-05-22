@@ -1,8 +1,10 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"log"
+	"reflect"
 )
 
 var world = script.NewWorld()
@@ -17,61 +19,76 @@ func init() {
 	world.Func("savetable", doSaveTable)
 	world.Func("average", average)
 	world.Var("t", &Time)
-	world.Var("aex", &Aex)
-	world.Var("msat", &Msat)
-	world.Var("alpha", &Alpha)
+	world.LValue("aex", &Aex)
+	world.LValue("msat", &Msat)
+	world.LValue("alpha", &Alpha)
 	world.Var("b_ext", &B_ext)
 	world.Var("dmi", &DMI)
 	world.Var("ku1", &Ku1)
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
-	world.Var("m", &M)
+	world.LValue("m", (*bufL)(&M))
 }
 
 func Compile(src string) (script.Expr, error) {
 	return world.Compile(src)
 }
 
-//// needed only to make it callable from scripts
-//func (f *ScalFn) Eval() interface{} {
-//	return (*f)()
-//}
-//
-//// needed only to make it callable from scripts
-//func (f *ScalFn) Assign(e script.Expr) {
-//	(*f) = func() float64 { return e.Eval().(float64) }
-//}
-//
-//// needed only to make it callable from scripts
-//func (f *VecFn) Eval() interface{} {
-//	return (*f)()
-//}
-//
-//// needed only to make it callable from scripts
-//func (f *VecFn) Assign(e script.Expr) {
-//	(*f) = func() [3]float64 {
-//		return eval3float64(e)
-//	}
-//}
-//
-//// evaluate e and cast return value to [3]float64 (vector)
+// needed only to make it callable from scripts
+func (f *ScalFn) Eval() interface{} {
+	return (*f)()
+}
+
+// needed only to make it callable from scripts
+func (f *ScalFn) Set(v interface{}) {
+	(*f) = func() float64 { return v.(float64) }
+}
+
+func (f *ScalFn) Type() reflect.Type {
+	return reflect.TypeOf(float64(0))
+}
+
+// needed only to make it callable from scripts
+func (f *VecFn) Eval() interface{} {
+	return (*f)()
+}
+
+// needed only to make it callable from scripts
+func (f *VecFn) Set(v interface{}) {
+	(*f) = func() [3]float64 {
+		return v.([3]float64)
+	}
+}
+
+func (f *VecFn) Type() reflect.Type {
+	return reflect.TypeOf([3]float64{})
+}
+
+// evaluate e and cast return value to [3]float64 (vector)
 //func eval3float64(e script.Expr) [3]float64 {
 //	v := e.Eval().([]interface{})
 //	util.Argument(len(v) == 3)
 //	return [3]float64{v[0].(float64), v[1].(float64), v[2].(float64)}
 //
 //}
-//
-//// needed only to make it callable from scripts
-//func (b *buffered) Assign(e script.Expr) {
-//	b.Set(e.Eval().(*data.Slice))
-//}
-//
-//// needed only to make it callable from scripts
-//func (b *buffered) Eval() interface{} {
-//	return b
-//}
+
+type bufL buffered
+
+// needed only to make it callable from scripts
+func (b *bufL) Set(v interface{}) {
+	b.Set(v.(*data.Slice))
+}
+
+// needed only to make it callable from scripts
+func (b *bufL) Eval() interface{} {
+	return b
+}
+
+func (b *bufL) Type() reflect.Type {
+	var slice *data.Slice
+	return reflect.TypeOf(slice)
+}
 
 func myprint(msg ...interface{}) {
 	log.Println(msg...)

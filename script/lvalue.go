@@ -5,14 +5,14 @@ import (
 )
 
 // left-hand value in (single) assign statement
-type lvalue interface {
+type LValue interface {
 	Expr             // evalutes
 	Set(interface{}) // assigns a new value
 }
 
 // general lvalue implementation using reflect.
 // lhs must be settable, e.g. address of something
-func newReflectLvalue(lhs interface{}) lvalue {
+func newReflectLvalue(lhs interface{}) LValue {
 	return &reflectLvalue{reflect.ValueOf(lhs).Elem()}
 }
 

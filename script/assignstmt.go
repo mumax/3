@@ -13,7 +13,7 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 	default:
 		panic(err(a.Pos(), "cannot assign to", typ(lhs)))
 	case *ast.Ident:
-		if l, ok := w.resolve(a.Pos(), concrete.Name).(lvalue); ok {
+		if l, ok := w.resolve(a.Pos(), concrete.Name).(LValue); ok {
 			return &assignStmt{lhs: l, rhs: typeconv(a.Pos(), r, l.Type())}
 		} else {
 			panic(err(a.Pos(), "cannot assign to", concrete.Name))
@@ -22,7 +22,7 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 }
 
 type assignStmt struct {
-	lhs lvalue
+	lhs LValue
 	rhs Expr
 	void
 }

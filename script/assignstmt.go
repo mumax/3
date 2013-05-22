@@ -14,7 +14,7 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 		panic(err(a.Pos(), "cannot assign to", typ(lhs)))
 	case *ast.Ident:
 		if l, ok := w.resolve(concrete.Name).(lvalue); ok {
-			return &assignStmt{lhs: l, rhs: typeconv(r, l.Type())}
+			return &assignStmt{lhs: l, rhs: typeconv(a.Pos(), r, l.Type())}
 		} else {
 			panic(err(a.Pos(), "cannot assign to", concrete.Name))
 		}

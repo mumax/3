@@ -1,12 +1,15 @@
 package script
 
-import "reflect"
+import (
+	"go/token"
+	"reflect"
+)
 
-func typeconv(in Expr, outT reflect.Type) Expr {
+func typeconv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
 	switch {
 	default:
-		panic(err(0, "type mismatch: can not use type ", inT, " as ", outT)) // TODO: add pos!
+		panic(err(pos, "type mismatch: can not use type", inT, "as", outT)) // TODO: add pos!
 	case inT == outT:
 		return in
 	case outT == float64_t && inT == int_t:

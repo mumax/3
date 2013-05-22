@@ -24,7 +24,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 	}
 	args := make([]Expr, len(n.Args))
 	for i := range args {
-		args[i] = typeconv(w.compileExpr(n.Args[i]), f.In(i))
+		args[i] = typeconv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.In(i))
 	}
 	return &reflectCall{f, args} // TODO: args
 }

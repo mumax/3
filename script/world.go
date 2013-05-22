@@ -16,6 +16,7 @@ func NewWorld() *World {
 	w := new(World)
 	w.Debug = false
 	w.init()
+	w.LoadMath()
 	return w
 }
 

@@ -20,6 +20,7 @@ func typeconv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 var (
 	float64_t = reflect.TypeOf(float64(0))
 	int_t     = reflect.TypeOf(int(0))
+	string_t  = reflect.TypeOf("")
 )
 
 type intToFloat64 struct {

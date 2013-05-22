@@ -86,8 +86,7 @@ func (b *bufL) Eval() interface{} {
 }
 
 func (b *bufL) Type() reflect.Type {
-	var slice *data.Slice
-	return reflect.TypeOf(slice)
+	return reflect.TypeOf((*buffered)(b))
 }
 
 func myprint(msg ...interface{}) {

@@ -16,6 +16,8 @@ func (w *World) compileBasicLit(n *ast.BasicLit) Expr {
 		return floatLit(parseFloat(n.Value))
 	case token.INT:
 		return intLit(parseInt(n.Value))
+	case token.STRING:
+		return stringLit(n.Value)
 	}
 }
 
@@ -28,6 +30,11 @@ type intLit int
 
 func (l intLit) Eval() interface{}  { return int(l) }
 func (l intLit) Type() reflect.Type { return int_t }
+
+type stringLit string
+
+func (l stringLit) Eval() interface{}  { return string(l) }
+func (l stringLit) Type() reflect.Type { return string_t }
 
 func parseFloat(str string) float64 {
 	v, err := strconv.ParseFloat(str, 64)

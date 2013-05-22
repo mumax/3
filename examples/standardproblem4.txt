@@ -10,8 +10,7 @@
 
 
 // material
-
-	alpha = 1
+	alpha = sin(1e9*t)
 	msat  = 800e3
 	aex   = 13e-12
 	m     = uniform(1, .1, 0)
@@ -20,8 +19,7 @@
 // relax
 
 	run(3e-9) 
-	print("relaxed m")
-	print(average(m))
+	print("relaxed m", average(m))
 
 
 // run

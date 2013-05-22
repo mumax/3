@@ -8,9 +8,8 @@ import (
 
 // compiles a binary expression x 'op' y
 func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
-	x := w.compileExpr(n.X)
-	y := w.compileExpr(n.Y)
-	typecheck(x.Type(), y.Type())
+	x := typeconv(w.compileExpr(n.X), float64_t)
+	y := typeconv(w.compileExpr(n.Y), float64_t)
 	switch n.Op {
 	default:
 		panic(err("not allowed:", n.Op))

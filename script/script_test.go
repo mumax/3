@@ -1,6 +1,7 @@
 package script
 
 import (
+	"log"
 	"math"
 	"testing"
 )
@@ -29,6 +30,17 @@ func TestEval(t *testing.T) {
 	if w.MustEval("sqrt(3*3)").(float64) != 3 {
 		t.Fail()
 	}
+}
+
+func TestTypes(t *testing.T) {
+	w := NewWorld()
+
+	x := 3.14
+	w.Var("x", &x)
+	w.MustEval("x=7")
+
+	w.Func("printInt", func(x int) { log.Println(x) })
+	w.MustEval("printInt(7)")
 }
 
 func BenchmarkEval1(b *testing.B) {

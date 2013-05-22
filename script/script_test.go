@@ -37,10 +37,10 @@ func TestTypes(t *testing.T) {
 
 	x := 3.14
 	w.Var("x", &x)
-	w.MustEval("x=7")
+	w.MustExec("x=7")
 
 	w.Func("printInt", func(x int) { log.Println(x) })
-	w.MustEval("printInt(7)")
+	w.MustExec("printInt(7)")
 }
 
 func BenchmarkEval1(b *testing.B) {

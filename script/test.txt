@@ -1,3 +1,1 @@
-a
-// test input file
-	print(1+1)
+a := 1

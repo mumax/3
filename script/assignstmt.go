@@ -1,6 +1,9 @@
 package script
 
-import "go/ast"
+import (
+	"go/ast"
+	"go/token"
+)
 
 // compiles a (single) assign statement lhs = rhs
 func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
@@ -9,14 +12,20 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 	}
 	lhs, rhs := a.Lhs[0], a.Rhs[0]
 	r := w.compileExpr(rhs)
-	switch concrete := lhs.(type) {
+
+	switch a.Tok {
 	default:
-		panic(err(a.Pos(), "cannot assign to", typ(lhs)))
-	case *ast.Ident:
-		if l, ok := w.resolve(a.Pos(), concrete.Name).(LValue); ok {
-			return &assignStmt{lhs: l, rhs: typeconv(a.Pos(), r, l.Type())}
-		} else {
-			panic(err(a.Pos(), "cannot assign to", concrete.Name))
+		panic(err(a.Pos(), a.Tok, "not allowed"))
+	case token.ASSIGN:
+		switch concrete := lhs.(type) {
+		default:
+			panic(err(a.Pos(), "cannot assign to", typ(lhs)))
+		case *ast.Ident:
+			if l, ok := w.resolve(a.Pos(), concrete.Name).(LValue); ok {
+				return &assignStmt{lhs: l, rhs: typeconv(a.Pos(), r, l.Type())}
+			} else {
+				panic(err(a.Pos(), "cannot assign to", concrete.Name))
+			}
 		}
 	}
 }

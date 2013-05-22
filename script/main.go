@@ -13,9 +13,12 @@ import (
 	"os"
 )
 
+var debug = flag.Bool("g", false, "print debug output")
+
 func main() {
 	flag.Parse()
 	w := NewWorld()
+	w.Debug = *debug
 	if flag.NArg() > 0 {
 		for _, arg := range flag.Args() {
 			src, err := ioutil.ReadFile(arg)

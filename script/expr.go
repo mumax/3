@@ -29,6 +29,8 @@ func (w *World) compileExpr(e ast.Expr) Expr {
 		return w.compileCallExpr(concrete)
 	case *ast.ParenExpr:
 		return w.compileExpr(concrete.X)
+	case *ast.IndexExpr:
+		return w.compileIndexExpr(concrete)
 	}
 }
 

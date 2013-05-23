@@ -1,0 +1,27 @@
+/*
+	Test for the DMI interaction, inspired by Thiaville et al. EPL 100 2012.
+	In this simulation, the DMI interaction converts a Bloch wall to a Néel wall.
+*/
+
+	SetGridSize(128, 128, 1)
+	SetCellSize(250e-9/128, 250e-9/128, 0.6e-9)
+
+	Msat = 1100e3
+	Aex = 16e-12
+	Alpha = 3
+	Ku1 = Vector(0, 0, 1.27E6)
+	DMI = 0.1e-3 // J/m2.
+
+	m = TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
+
+	MaxErr = 1e-4
+	Maxdt = 5e-13
+	SaveTable(10e-12)
+	Autosave(m, 1000e-12)
+	Run(5e-9)
+
+	Print("m (D=0.1e-3 J/m2):", Average(m))
+	expect("mx", Average(m)[X], 0.059, 0.01)
+	expect("mx", Average(m)[Y], 0.035, 0.01)
+	Print("OK")
+

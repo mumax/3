@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -11,10 +12,10 @@ type reflectFunc struct {
 func newReflectFunc(fn interface{}) *reflectFunc {
 	val := reflect.ValueOf(fn)
 	if val.Type().Kind() != reflect.Func {
-		panic(err(0, "not a function:", fn)) // TODO: is this compile err or not?
+		panic(fmt.Errorf("not a function: %v", val.Type()))
 	}
 	if val.Type().NumOut() > 1 {
-		panic(err(0, "multiple return values not allowed:", fn))
+		panic(fmt.Errorf("multiple return values not allowed: %v", val.Type()))
 	}
 	return &reflectFunc{val}
 }

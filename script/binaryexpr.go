@@ -27,9 +27,7 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 // abstract superclass for all binary expressions
 type binaryExpr struct{ x, y Expr }
 
-func (b *binaryExpr) Type() reflect.Type {
-	return b.x.Type() // assumes it has been type checked, type x = type y = return type
-}
+func (b *binaryExpr) Type() reflect.Type { return float64_t }
 
 type add struct{ binaryExpr }
 type sub struct{ binaryExpr }

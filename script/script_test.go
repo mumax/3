@@ -26,7 +26,6 @@ func TestEval(t *testing.T) {
 	}
 
 	// Test func
-	w.Func("sqrt", math.Sqrt)
 	if w.MustEval("sqrt(3*3)").(float64) != 3 {
 		t.Fail()
 	}
@@ -66,7 +65,7 @@ func BenchmarkEval1_native(bench *testing.B) {
 func BenchmarkEval2(b *testing.B) {
 	b.StopTimer()
 	w := NewWorld()
-	w.LoadMath()
+	//w.LoadMath()
 	code := w.MustCompileExpr("sin(cos(tan(log(sqrt(1)))))")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {

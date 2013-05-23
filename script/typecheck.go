@@ -32,3 +32,14 @@ func (c *intToFloat64) Eval() interface{} {
 }
 
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
+
+// returns input type for expression. Usually this is the same as the return type,
+// unless the expression has a method InputType()reflect.Type.
+func inputType(e Expr) reflect.Type {
+	if in, ok := e.(interface {
+		InputType() reflect.Type
+	}); ok {
+		return in.InputType()
+	}
+	return e.Type()
+}

@@ -17,7 +17,7 @@ func (w *World) compileBasicLit(n *ast.BasicLit) Expr {
 	case token.INT:
 		return intLit(parseInt(n.Value))
 	case token.STRING:
-		return stringLit(n.Value)
+		return stringLit(n.Value[1 : len(n.Value)-1]) // remove quotes
 	}
 }
 

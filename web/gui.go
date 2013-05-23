@@ -43,11 +43,7 @@ const mib = 1024 * 2014
 // func (s *guistate) MemInfo() string { f, t := cu.MemGetInfo(); return fmt.Sprint(f/mib, "/", t/mib) }
 
 func (s *guistate) Solver() *cuda.Heun {
-	if engine.Solver == nil {
-		return &zeroSolver
-	} else {
-		return engine.Solver
-	}
+	return &engine.Solver
 }
 
 // surrogate solver if no real one is set, provides zero values for time step etc to template.

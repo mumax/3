@@ -15,7 +15,7 @@ var (
 	KuMask       *Mask                                    // Mask to scales Ku1/Msat cellwise.
 	Msat         func() float64    = Const(0)             // Saturation magnetization in A/m
 	Alpha        func() float64    = Const(0)             // Damping constant
-	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // External field in T
+	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Ku1          func() [3]float64 = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
 	Xi           func() float64    = Const(0)             // Non-adiabaticity of spin-transfer-torque
@@ -36,7 +36,7 @@ var (
 	LLGTorque, Torque *setter    // torque/gamma0, in Tesla
 	Table             *DataTable // output handle for tabular data (average magnetization etc.)
 	Time              float64    // time in seconds  // todo: hide? setting breaks autosaves
-	Solver            *cuda.Heun
+	Solver            cuda.Heun
 )
 
 // hidden quantities
@@ -189,7 +189,7 @@ func initialize() {
 		Table.touch(cansave) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
-	Solver = cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
 // Register function f to be called after every time step.

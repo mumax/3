@@ -5,6 +5,8 @@ package engine
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
+	"log"
+	"math"
 	"reflect"
 )
 
@@ -13,12 +15,17 @@ var world = script.NewWorld()
 func init() {
 	world.Func("setgridsize", setGridSize)
 	world.Func("setcellsize", setCellSize)
+
 	world.Func("vector", Vector)
+
 	world.Func("run", Run)
 	world.Func("steps", Steps)
+
 	world.Func("autosave", doAutosave)
 	world.Func("savetable", doSaveTable)
+
 	world.Func("average", average)
+
 	world.Var("t", &Time)
 	world.Var("aex", &Aex)
 	world.Var("msat", &Msat)
@@ -29,7 +36,23 @@ func init() {
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
+
+	world.Var("dt", &Solver.Dt_si)
+	world.Var("mindt", &Solver.Mindt)
+	world.Var("maxdt", &Solver.Maxdt)
+	world.Var("maxerr", &Solver.MaxErr)
+	world.Var("headroom", &Solver.Headroom)
+	world.Var("fixdt", &Solver.Fixdt)
+
 	world.LValue("m", &M)
+
+	world.Func("expect", expect)
+}
+
+func expect(msg string, have, want, maxError float64) {
+	if math.Abs(have-want) > maxError {
+		log.Fatal(msg, ":", "have:", have, "want:", want)
+	}
 }
 
 func Compile(src string) (script.Expr, error) {

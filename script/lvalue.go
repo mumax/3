@@ -11,7 +11,9 @@ type LValue interface {
 }
 
 // general lvalue implementation using reflect.
-// lhs must be settable, e.g. address of something
+// lhs must be settable, e.g. address of something:
+// 	var x float64
+// 	newReflectLValue(&x)
 func newReflectLvalue(lhs interface{}) LValue {
 	return &reflectLvalue{reflect.ValueOf(lhs).Elem()}
 }

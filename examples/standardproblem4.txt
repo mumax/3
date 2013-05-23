@@ -5,8 +5,7 @@
 
 // geometry
 	setgridsize(128, 32, 1)
-	setcellsize(3.125e-9, 3.125e-9, 3e-9)
-
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
 
 // material
 	alpha = 3
@@ -14,19 +13,19 @@
 	aex   = 13e-12
 	m     = uniform(1, .1, 0)
 
+// output
+	savetable(10e-12)
+	autosave(m, 50e-12)
 
 // relax
-	run(3e-9) 
-	print("relaxed m", average(m))
-
+	run(10e-9) 
+	print("relaxed m:", average(m))
 
 // run
 	alpha = 0.02
 	b_ext = vector(-24.6E-3, 4.3E-3, 0)
-
-	savetable(10e-12)
-	autosave(m, 50e-12)
 	run(1e-9)
+
 	print("final m:")
 	print(average(m))
 

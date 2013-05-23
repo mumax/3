@@ -37,6 +37,6 @@ type assignStmt struct {
 }
 
 func (a *assignStmt) Eval() interface{} {
-	a.lhs.Set(a.rhs.Eval())
+	a.lhs.SetValue(a.rhs.Eval())
 	return nil
 }

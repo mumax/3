@@ -26,7 +26,7 @@ func init() {
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
-	world.LValue("m", (*bufL)(&M))
+	world.LValue("m", &M)
 }
 
 func Compile(src string) (script.Expr, error) {
@@ -39,7 +39,7 @@ func (f *ScalFn) Eval() interface{} {
 }
 
 // needed only to make it callable from scripts
-func (f *ScalFn) Set(v interface{}) {
+func (f *ScalFn) SetValue(v interface{}) {
 	(*f) = func() float64 { return v.(float64) }
 }
 
@@ -53,7 +53,7 @@ func (f *VecFn) Eval() interface{} {
 }
 
 // needed only to make it callable from scripts
-func (f *VecFn) Set(v interface{}) {
+func (f *VecFn) SetValue(v interface{}) {
 	(*f) = func() [3]float64 {
 		return v.([3]float64)
 	}
@@ -71,21 +71,11 @@ func (f *VecFn) Type() reflect.Type {
 //
 //}
 
-type bufL buffered
-
 // needed only to make it callable from scripts
-func (b *bufL) Set(v interface{}) {
-	b.Set(v.(*data.Slice))
-}
-
-// needed only to make it callable from scripts
-func (b *bufL) Eval() interface{} {
-	return b
-}
-
-func (b *bufL) Type() reflect.Type {
-	return reflect.TypeOf((*buffered)(b))
-}
+func (b *buffered) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *buffered) Eval() interface{}       { return b }
+func (b *buffered) Type() reflect.Type      { return reflect.TypeOf((*buffered)(b)) }
+func (b *buffered) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 func doAutosave(what interface {
 	Autosave(float64)

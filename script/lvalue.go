@@ -6,8 +6,8 @@ import (
 
 // left-hand value in (single) assign statement
 type LValue interface {
-	Expr             // evalutes
-	Set(interface{}) // assigns a new value
+	Expr                  // evalutes
+	SetValue(interface{}) // assigns a new value
 }
 
 // general lvalue implementation using reflect.
@@ -20,7 +20,7 @@ type reflectLvalue struct {
 	elem reflect.Value
 }
 
-func (l *reflectLvalue) Set(rvalue interface{}) {
+func (l *reflectLvalue) SetValue(rvalue interface{}) {
 	l.elem.Set(reflect.ValueOf(rvalue))
 }
 

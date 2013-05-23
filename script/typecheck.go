@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func typeconv(pos token.Pos, in Expr, outT reflect.Type) Expr {
+func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
 	switch {
 	default:

@@ -31,7 +31,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) call {
 		if variadic {
 			args[i] = w.compileExpr(n.Args[i]) // no type check or conversion
 		} else {
-			args[i] = typeconv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.In(i))
+			args[i] = typeConv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.In(i))
 		}
 	}
 	return &reflectCall{f, args}

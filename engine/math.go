@@ -7,15 +7,15 @@ import (
 	"path"
 )
 
-type getIface interface {
-	getGPU() (s *data.Slice, mustRecylce bool)
+type GetSlice interface {
+	GetSlice() (s *data.Slice, mustRecylce bool)
 }
 
 // average in userspace XYZ order
 // does not yet take into account volume.
 // pass volume parameter, possibly nil?
-func average(s getIface) []float64 {
-	b, recycle := s.getGPU()
+func average(s GetSlice) []float64 {
+	b, recycle := s.GetSlice()
 	if recycle {
 		defer cuda.RecycleBuffer(b)
 	}
@@ -29,11 +29,11 @@ func average(s getIface) []float64 {
 }
 
 // Save once, with given file name.
-func saveAs(s getIface, fname string) {
+func saveAs(s GetSlice, fname string) {
 	if !path.IsAbs(fname) {
 		fname = OD + fname
 	}
-	buffer, recylce := s.getGPU()
+	buffer, recylce := s.GetSlice()
 	if recylce {
 		defer cuda.RecycleBuffer(buffer)
 	}

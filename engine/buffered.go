@@ -97,6 +97,9 @@ func (b *buffered) Download() *data.Slice {
 	return b.buffer.HostCopy()
 }
 
+func (b *buffered) GetSlice() (s *data.Slice, recycle bool) {
+	return b.buffer, false
+}
 func (b *buffered) Average() []float64 {
 	return average(b)
 }

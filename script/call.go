@@ -5,11 +5,7 @@ import (
 	"reflect"
 )
 
-type call interface {
-	Expr
-}
-
-func (w *World) compileCallExpr(n *ast.CallExpr) call {
+func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	// only call idents for now
 	id, ok := (n.Fun).(*ast.Ident)
 	if !ok {

@@ -6,8 +6,10 @@ import (
 	"code.google.com/p/mx3/util"
 	"code.google.com/p/mx3/web"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
@@ -21,6 +23,7 @@ import (
 
 var (
 	flag_silent = flag.Bool("s", false, "Don't generate any log info")
+	flag_vet    = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od     = flag.String("o", "", "Override output directory")
 	flag_force  = flag.Bool("f", false, "Force start, clean existing output directory")
 	flag_port   = flag.String("http", ":35367", "Port to serve web gui")
@@ -33,6 +36,11 @@ func main() {
 	log.SetPrefix("")
 	log.SetFlags(0)
 
+	if *flag_vet {
+		vet()
+		return
+	}
+
 	if flag.NArg() != 1 {
 		log.Fatal("need one input file")
 	}
@@ -43,11 +51,11 @@ func main() {
 
 	// TODO: tee output to log file, replace all panics by log.Panic
 
+	log.Print(engine.UNAME, "\n")
+
 	if *flag_od == "" { // -o not set
 		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)
 	}
-
-	log.Print(engine.UNAME, "\n")
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	//TODO: init profiling // prof.Init(engine.OD)
@@ -73,6 +81,23 @@ func RunFileAndServe(fname string) {
 
 	// start executing the tree, possibly injecting commands from web gui
 	code.Eval()
+}
+
+// check all input files for errors, don't run.
+func vet() {
+	status := 0
+	for _, f := range flag.Args() {
+		src, ioerr := ioutil.ReadFile(f)
+		util.FatalErr(ioerr)
+		_, err := engine.Compile(string(src))
+		if err != nil {
+			fmt.Println(f, ":", err)
+			status = 1
+		} else {
+			fmt.Println(f, ":", "OK")
+		}
+	}
+	os.Exit(status)
 }
 
 // Enter interactive mode. Simulation is now exclusively controlled

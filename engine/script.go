@@ -3,14 +3,12 @@ package engine
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
-	"log"
 	"reflect"
 )
 
 var world = script.NewWorld()
 
 func init() {
-	world.Func("print", myprint)
 	world.Func("setgridsize", setGridSize)
 	world.Func("setcellsize", setCellSize)
 	world.Func("run", Run)
@@ -87,10 +85,6 @@ func (b *bufL) Eval() interface{} {
 
 func (b *bufL) Type() reflect.Type {
 	return reflect.TypeOf((*buffered)(b))
-}
-
-func myprint(msg ...interface{}) {
-	log.Println(msg...)
 }
 
 func doAutosave(what interface {

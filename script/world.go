@@ -1,8 +1,8 @@
 package script
 
 import (
-	"fmt"
 	"go/token"
+	"log"
 	"strings"
 )
 
@@ -23,7 +23,7 @@ func NewWorld() *World {
 }
 
 func myprint(msg ...interface{}) {
-	fmt.Println(msg...)
+	log.Println(msg...)
 }
 
 // adds a native variable to the world. E.g.:

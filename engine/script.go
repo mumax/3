@@ -1,5 +1,7 @@
 package engine
 
+// support for interpreted input scripts
+
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
@@ -11,6 +13,7 @@ var world = script.NewWorld()
 func init() {
 	world.Func("setgridsize", setGridSize)
 	world.Func("setcellsize", setCellSize)
+	world.Func("vector", Vector)
 	world.Func("run", Run)
 	world.Func("steps", Steps)
 	world.Func("autosave", doAutosave)
@@ -61,4 +64,8 @@ func doAutosave(what interface {
 
 func doSaveTable(period float64) {
 	Table.Autosave(period)
+}
+
+func Vector(x, y, z float64) [3]float64 {
+	return [3]float64{x, y, z}
 }

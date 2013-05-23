@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+// converts in to an expression of type OutT.
+// pos is used for error message on impossible conversion.
 func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
 	switch {
@@ -14,6 +16,8 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 		return in
 	case outT == float64_t && inT == int_t:
 		return &intToFloat64{in}
+	case inT.AssignableTo(outT):
+		return in
 	}
 }
 

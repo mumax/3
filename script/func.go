@@ -20,6 +20,24 @@ func newReflectFunc(fn interface{}) *reflectFunc {
 	return &reflectFunc{val}
 }
 
+// type of the function itself (when not called)
+func (f *reflectFunc) Type() reflect.Type    { return f.fn.Type() }
+func (f *reflectFunc) NumIn() int            { return f.fn.Type().NumIn() }
+func (f *reflectFunc) In(i int) reflect.Type { return f.fn.Type().In(i) }
+func (f *reflectFunc) Eval() interface{}     { return f.fn.Interface() }
+
+// return type of call
+func (f *reflectFunc) ReturnType() reflect.Type {
+	switch f.fn.Type().NumOut() {
+	case 0:
+		return nil // "void"
+	case 1:
+		return f.fn.Type().Out(0)
+	default:
+		panic("bug: multiple return values not allowed")
+	}
+}
+
 func (f *reflectFunc) call(args []interface{}) interface{} {
 	ret := f.fn.Call(argv(args))
 	assert(len(ret) <= 1)
@@ -37,27 +55,4 @@ func argv(iface []interface{}) []reflect.Value {
 		v[i] = reflect.ValueOf(iface[i])
 	}
 	return v
-}
-
-func (f *reflectFunc) Type() reflect.Type {
-	switch f.fn.Type().NumOut() {
-	case 0:
-		return nil // "void"
-	case 1:
-		return f.fn.Type().Out(0)
-	default:
-		panic("bug: multiple return values not allowed")
-	}
-}
-
-func (f *reflectFunc) NumIn() int {
-	return f.fn.Type().NumIn()
-}
-
-func (f *reflectFunc) In(i int) reflect.Type {
-	return f.fn.Type().In(i)
-}
-
-func (f *reflectFunc) Eval() interface{} {
-	return f.fn.Interface()
 }

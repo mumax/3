@@ -52,12 +52,4 @@ func (c *reflectCall) Eval() interface{} {
 	}
 }
 
-// TODO: if arg expr is of type EvalValue()reflect.Value, don't convert to interface{} and back to reflect.Value
-
-func (c *reflectCall) Exec() {
-	c.Eval()
-}
-
-func (c *reflectCall) Type() reflect.Type {
-	return c.f.Type()
-}
+func (c *reflectCall) Type() reflect.Type { return c.f.ReturnType() }

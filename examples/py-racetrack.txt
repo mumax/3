@@ -5,9 +5,11 @@
 	long wire.
 */
 
+// Geometry
 	setgridsize(256, 64, 1)
 	setcellsize(3e-9, 3e-9, 30e-9)
 
+// Material
 	Msat    = 860e3
 	Aex     = 13e-12
 	Xi      = 0.1
@@ -22,6 +24,7 @@
 // Set post-step function that centers simulation window on domain wall.
 	PostStep(centerInplaneWall)
 
+// Relax
 	Alpha = 3    // high damping for fast relax
 	Run(1e-9)    // relax
 	Alpha = 0.02 // restore normal damping
@@ -31,6 +34,5 @@
 	savetable(10e-12)
 
 // Run the simulation with current through the sample
-	J = (-8e12, 0, 0)
+	J = vector(-8e12, 0, 0)
 	Run(1e-9)
-

@@ -11,13 +11,18 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
 	switch {
 	default:
-		panic(err(pos, "type mismatch: can not use type", inT, "as", outT)) // TODO: add pos!
-	// strict go conversions
+		panic(err(pos, "type mismatch: can not use type", inT, "as", outT))
+	// treat 'void' (type nil) separately:
+	case inT == nil && outT != nil:
+		panic(err(pos, "void used as value"))
+	case inT != nil && outT == nil:
+		panic("script internal bug: void input type")
+	// strict go conversions:
 	case inT == outT:
 		return in
 	case inT.AssignableTo(outT):
 		return in
-	// extra conversions for ease-of-use
+	// extra conversions for ease-of-use:
 	case outT == float64_t && inT == int_t: // int -> float64
 		return &intToFloat64{in}
 	case inT == float64_t && outT == func_float64_t: // float64 -> func()float64

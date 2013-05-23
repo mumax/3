@@ -20,9 +20,9 @@ func init() {
 	world.Func("savetable", doSaveTable)
 	world.Func("average", average)
 	world.Var("t", &Time)
-	world.LValue("aex", &Aex)
-	world.LValue("msat", &Msat)
-	world.LValue("alpha", &Alpha)
+	world.Var("aex", &Aex)
+	world.Var("msat", &Msat)
+	world.Var("alpha", &Alpha)
 	world.Var("b_ext", &B_ext)
 	world.Var("dmi", &DMI)
 	world.Var("ku1", &Ku1)
@@ -34,20 +34,6 @@ func init() {
 
 func Compile(src string) (script.Expr, error) {
 	return world.Compile(src)
-}
-
-// needed only to make it callable from scripts
-func (f *ScalFn) Eval() interface{}      { return (*f)() }
-func (f *ScalFn) SetValue(v interface{}) { (*f) = func() float64 { return v.(float64) } }
-func (f *ScalFn) Type() reflect.Type     { return reflect.TypeOf(float64(0)) }
-
-// needed only to make it callable from scripts
-func (f *VecFn) Eval() interface{}  { return (*f)() }
-func (f *VecFn) Type() reflect.Type { return reflect.TypeOf([3]float64{}) }
-func (f *VecFn) SetValue(v interface{}) {
-	(*f) = func() [3]float64 {
-		return v.([3]float64)
-	}
 }
 
 // needed only to make it callable from scripts

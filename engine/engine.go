@@ -10,17 +10,17 @@ import (
 
 // User inputs
 var (
-	Aex          ScalFn         = Const(0)             // Exchange stiffness in J/m
-	ExchangeMask *StaggeredMask                        // Mask that scales Aex/Msat between cells.
-	KuMask       *Mask                                 // Mask to scales Ku1/Msat cellwise.
-	Msat         ScalFn         = Const(0)             // Saturation magnetization in A/m
-	Alpha        ScalFn         = Const(0)             // Damping constant
-	B_ext        VecFn          = ConstVector(0, 0, 0) // External field in T
-	DMI          ScalFn         = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          VecFn          = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi           ScalFn         = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol      ScalFn         = Const(1)             // Spin polarization of electrical current
-	J            VecFn          = ConstVector(0, 0, 0) // Electrical current density
+	Aex          func() float64    = Const(0)             // Exchange stiffness in J/m
+	ExchangeMask *StaggeredMask                           // Mask that scales Aex/Msat between cells.
+	KuMask       *Mask                                    // Mask to scales Ku1/Msat cellwise.
+	Msat         func() float64    = Const(0)             // Saturation magnetization in A/m
+	Alpha        func() float64    = Const(0)             // Damping constant
+	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // External field in T
+	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1          func() [3]float64 = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi           func() float64    = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol      func() float64    = Const(1)             // Spin polarization of electrical current
+	J            func() [3]float64 = ConstVector(0, 0, 0) // Electrical current density
 )
 
 // Accessible quantities
@@ -58,14 +58,14 @@ func Mesh() *data.Mesh {
 // The field is mask * multiplier, where mask typically contains space-dependent scaling values of the order of 1.
 // multiplier can be time dependent.
 // TODO: extend API (set one component, construct masks or read from file). Also for current.
-func AddExtField(mask *data.Slice, multiplier ScalFn) {
+func AddExtField(mask *data.Slice, multiplier func() float64) {
 	m := cuda.GPUCopy(mask)
 	extFields = append(extFields, extField{m, multiplier})
 }
 
 type extField struct {
 	mask *data.Slice
-	mul  ScalFn
+	mul  func() float64
 }
 
 type Downloader interface {

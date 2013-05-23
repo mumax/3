@@ -21,7 +21,7 @@
 	Run(5e-9)
 
 	Print("m (D=0.1e-3 J/m2):", Average(m))
-	expect("mx", Average(m)[X], 0.059, 0.01)
-	expect("mx", Average(m)[Y], 0.035, 0.01)
+	expect("mx", Average(m)[0], 0.059, 0.01)
+	expect("mx", Average(m)[1], 0.035, 0.01)
 	Print("OK")
 

@@ -16,7 +16,7 @@ type World struct {
 func NewWorld() *World {
 	w := new(World)
 	w.init()
-	w.Debug = true
+	w.Debug = false
 	w.LoadMath()
 	w.Func("print", myprint)
 	return w

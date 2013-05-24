@@ -45,6 +45,7 @@ func init() {
 	world.Var("fixdt", &Solver.Fixdt)
 
 	world.LValue("m", &M)
+	world.LValue("ExchangeMask", ExchangeMask)
 
 	world.Func("expect", expect)
 }
@@ -62,8 +63,14 @@ func Compile(src string) (script.Expr, error) {
 // needed only to make it callable from scripts
 func (b *buffered) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *buffered) Eval() interface{}       { return b }
-func (b *buffered) Type() reflect.Type      { return reflect.TypeOf((*buffered)(b)) }
+func (b *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }
 func (b *buffered) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+
+// needed only to make it callable from scripts
+func (b *StaggeredMask) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *StaggeredMask) Eval() interface{}       { return b }
+func (b *StaggeredMask) Type() reflect.Type      { return reflect.TypeOf(new(StaggeredMask)) }
+func (b *StaggeredMask) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 func doAutosave(what interface {
 	Autosave(float64)

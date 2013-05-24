@@ -9,7 +9,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	// only call idents for now
 	id, ok := (n.Fun).(*ast.Ident)
 	if !ok {
-		panic(err(n.Pos(), "can not call", typ(n.Fun)))
+		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
 	}
 	// only call reflectFunc for now
 	f, ok2 := w.resolve(n.Pos(), id.Name).(*reflectFunc)

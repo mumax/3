@@ -51,7 +51,6 @@ func abs(x float32) float32 {
 // Input better be sparse.
 // A nil kernel element is interpreted as all 0s.
 // Kernel indices are destination index, source index.
-//
 // 	(O0)   (K01 K02 K03)   (I0)
 // 	(O1) = (K11 K12 K13) * (I1)
 // 	(O2)   (K21 K22 K23)   (I2)
@@ -112,14 +111,9 @@ func wrap(number, max int) int {
 	return ((number % max) + max) % max
 }
 
-// random number between -1 and 1.
-func rnd() float32 {
-	return 1 - 2*rand.Float32()
-}
-
 // generate sparse input data for testing the convolution.
 func initConvTestInput(input [3][][][]float32) {
-	rand.Seed(0) // reproducible tests
+	rng := rand.New(rand.NewSource(0)) // reproducible tests
 	size := sizeOf(input[0])
 	N0, N1, N2 := size[0], size[1], size[2]
 	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
@@ -129,7 +123,7 @@ func initConvTestInput(input [3][][][]float32) {
 		for _, i := range is {
 			for _, j := range js {
 				for _, k := range ks {
-					input[c][i][j][k] = rnd()
+					input[c][i][j][k] = 1 - 2*rng.Float32()
 				}
 			}
 		}

@@ -47,6 +47,8 @@ func init() {
 	world.Var("FixDt", &Solver.Fixdt)
 
 	world.LValue("m", &M)
+	fftmAddr := &FFTM
+	world.Var("FFTm", &fftmAddr)
 	world.LValue("ExchangeMask", ExchangeMask)
 
 	world.Func("expect", expect)

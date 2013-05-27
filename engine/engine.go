@@ -188,6 +188,7 @@ func initialize() {
 		itime++
 		Table.arm(cansave)    // if table output needed, quantities marked for update
 		M.notifySave(cansave) // saves m if needed
+		FFTM.notifySave(cansave)
 		ExchangeMask.notifySave(cansave)
 
 		Torque.set(torquebuffer, cansave)

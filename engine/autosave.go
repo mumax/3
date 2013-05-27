@@ -48,7 +48,7 @@ func (a *autosave) saved() {
 
 // Returns filename to save the quantity and increments the auto number.
 func (a *autosave) autoFname() string {
-	fname := fmt.Sprintf("%s%06d.dump", a.name, a.autonum)
+	fname := fmt.Sprintf("%s/%s%06d.dump", OD, a.name, a.autonum)
 	a.autonum++
 	return fname
 }

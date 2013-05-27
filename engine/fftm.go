@@ -30,6 +30,18 @@ func (q *fftm) Download() *data.Slice {
 	return s
 }
 
+// notify that it may need to be saved.
+func (b *fftm) notifySave(goodstep bool) {
+	if goodstep && b.needSave() {
+		b.Save()
+		b.saved()
+	}
+}
+
+func (b *fftm) Save() {
+	data.MustWriteFile(b.autoFname(), b.Download(), Time)
+}
+
 type fftmPower struct{}
 
 // Power of FFTM, used for display in web interface.

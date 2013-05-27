@@ -32,12 +32,15 @@ func (q *fftm) Download() *data.Slice {
 
 type fftmPower struct{}
 
-// Power of FFTM, used for display in web interface
+// Power of FFTM, used for display in web interface.
+// Frequencies in y shifted to center at 0/m.
 func (q *fftmPower) Download() *data.Slice {
 	fftm := FFTM.Download()
 	n := fftm.Mesh().Size()
 	c := fftm.Mesh().CellSize()
 	m1 := data.NewMesh(n[0], n[1], n[2]/2, c[0], c[1], c[2])
+	n1 := n[1]
+	n12 := n1 / 2
 	m1.Unit = fftm.Mesh().Unit
 	power := data.NewSlice(3, m1)
 	f := fftm.Vectors()
@@ -45,9 +48,9 @@ func (q *fftmPower) Download() *data.Slice {
 	for i := range p[0] {
 		for j := range p[0][i] {
 			for k := range p[0][i][j] {
-				p[0][i][j][k] = sqrt(sqr(f[0][i][j][2*k]) + sqr(f[0][i][j][2*k+1]))
-				p[1][i][j][k] = sqrt(sqr(f[1][i][j][2*k]) + sqr(f[1][i][j][2*k+1]))
-				p[2][i][j][k] = sqrt(sqr(f[2][i][j][2*k]) + sqr(f[2][i][j][2*k+1]))
+				p[0][i][j][k] = sqrt(sqr(f[0][i][(j+n12)%n1][2*k]) + sqr(f[0][i][(j+n12)%n1][2*k+1]))
+				p[1][i][j][k] = sqrt(sqr(f[1][i][(j+n12)%n1][2*k]) + sqr(f[1][i][(j+n12)%n1][2*k+1]))
+				p[2][i][j][k] = sqrt(sqr(f[2][i][(j+n12)%n1][2*k]) + sqr(f[2][i][(j+n12)%n1][2*k+1]))
 			}
 		}
 	}

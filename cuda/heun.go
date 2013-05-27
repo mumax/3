@@ -45,7 +45,6 @@ func (e *Heun) Step() {
 		err := 0.0
 		if !e.Fixdt {
 			err = MaxVecDiff(dy0, dy) * float64(dt)
-			solverCheckErr(err)
 		}
 
 		y := e.y

@@ -43,12 +43,7 @@ func (e *solverCommon) adaptDt(corr float64) {
 	if e.Maxdt != 0 && e.Dt_si > e.Maxdt {
 		e.Dt_si = e.Maxdt
 	}
-}
-
-func solverCheckErr(err float64) {
-	// Note: err == 0 occurs when input is NaN (or time step massively too small).
-	if err == 0 {
-		util.DashExit()
-		log.Fatalf("solver: cannot adapt dt")
+	if e.Dt_si == 0 {
+		log.Fatal("time step too small")
 	}
 }

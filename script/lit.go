@@ -36,6 +36,11 @@ type stringLit string
 func (l stringLit) Eval() interface{}  { return string(l) }
 func (l stringLit) Type() reflect.Type { return string_t }
 
+type boolLit bool
+
+func (l boolLit) Eval() interface{}  { return bool(l) }
+func (l boolLit) Type() reflect.Type { return bool_t }
+
 func parseFloat(str string) float64 {
 	v, err := strconv.ParseFloat(str, 64)
 	if err != nil {

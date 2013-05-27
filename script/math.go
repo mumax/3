@@ -53,5 +53,10 @@ func (w *World) LoadMath() {
 	w.Func("IsInf", math.IsInf)
 	w.Func("IsNaN", math.IsNaN)
 
-	//w.Func("Inf(sign int) float64
+	w.declare("true", boolLit(true))
+	w.declare("false", boolLit(false))
+
+	w.declare("Pi", floatLit(math.Pi))
+
+	w.declare("Inf", floatLit(math.Inf(1)))
 }

@@ -53,6 +53,7 @@ var (
 	string_t       = reflect.TypeOf("")
 	vector_t       = reflect.TypeOf([3]float64{})
 	func_vector_t  = reflect.TypeOf(func() [3]float64 { panic(0) })
+	bool_t         = reflect.TypeOf(false)
 )
 
 // converts int to float64

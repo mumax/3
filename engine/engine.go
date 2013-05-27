@@ -50,7 +50,7 @@ var (
 )
 
 func Mesh() *data.Mesh {
-	checkInited()
+	checkMesh()
 	return &globalmesh
 }
 
@@ -275,8 +275,7 @@ func free() {
 	dlQue = nil
 }
 
-// TODO: rename checkEningeInited or so
-func checkInited() {
+func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
 		log.Fatal("need to set mesh first")
 	}

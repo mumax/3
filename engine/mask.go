@@ -24,7 +24,7 @@ func (m *Mask) SetAll(component int, value float64) {
 
 // TODO: alloc one component at a time
 func (m *Mask) init() {
-	checkInited() //engine
+	checkMesh() //engine
 	if m.isNil() {
 		m.buffer = cuda.NewSlice(3, m.mesh) // could alloc only needed components...
 		cuda.Memset(m.buffer, 1, 1, 1)      // default value: all ones.

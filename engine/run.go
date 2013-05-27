@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+var pause = false // set pause at any time to stop running after the current step
+
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	log.Println("run for", seconds, "s")
@@ -19,17 +21,23 @@ func Steps(n int) {
 	RunCond(func() bool { return Solver.NSteps < stop })
 }
 
-var pause = false
+// Pause the simulation, only useful for web gui.
+func Pause() {
+	pause = true
+}
 
-func Pause()       { pause = true }
-func Paused() bool { return pause }
+// Check if simulation is paused. Used by web gui.
+func Paused() bool {
+	return pause
+}
+
 func init() {
 	world.Func("pause", Pause)
 }
 
 // Runs as long as condition returns true.
 func RunCond(condition func() bool) {
-	checkInited() // todo: check in handler
+	checkMesh() // todo: check in handler
 	defer util.DashExit()
 
 	pause = false

@@ -10,32 +10,33 @@ import (
 
 // User inputs
 var (
-	Aex          func() float64    = Const(0)             // Exchange stiffness in J/m
-	ExchangeMask *StaggeredMask                           // Mask that scales Aex/Msat between cells.
-	KuMask       *Mask                                    // Mask to scales Ku1/Msat cellwise.
-	Msat         func() float64    = Const(0)             // Saturation magnetization in A/m
-	Alpha        func() float64    = Const(0)             // Damping constant
-	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          func() [3]float64 = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi           func() float64    = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol      func() float64    = Const(1)             // Spin polarization of electrical current
-	J            func() [3]float64 = ConstVector(0, 0, 0) // Electrical current density
+	Aex          func() float64      = Const(0)             // Exchange stiffness in J/m
+	ExchangeMask *staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
+	KuMask       *maskQuant                                 // Mask to scales Ku1/Msat cellwise.
+	Msat         func() float64      = Const(0)             // Saturation magnetization in A/m
+	Alpha        func() float64      = Const(0)             // Damping constant
+	B_ext        func() [3]float64   = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
+	DMI          func() float64      = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1          func() [3]float64   = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi           func() float64      = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol      func() float64      = Const(1)             // Spin polarization of electrical current
+	J            func() [3]float64   = ConstVector(0, 0, 0) // Electrical current density
 )
 
 // Accessible quantities
 var (
-	M                 buffered   // reduced magnetization (unit length)
-	AvgM              *scalar    // average magnetization
-	B_eff             *setter    // effective field (T) output handle
-	B_demag           *setter    // demag field (T) output handle
-	B_dmi             *adder     // demag field (T) output handle
-	B_exch            *adder     // exchange field (T) output handle
-	B_uni             *adder     // field due to uniaxial anisotropy output handle
-	STTorque          *adder     // spin-transfer torque output handle
-	LLGTorque, Torque *setter    // torque/gamma0, in Tesla
-	Table             *DataTable // output handle for tabular data (average magnetization etc.)
-	Time              float64    // time in seconds  // todo: hide? setting breaks autosaves
+	M                 bufferedQuant // reduced magnetization (unit length)
+	FFTM              fftm          // FFT of M
+	AvgM              *scalar       // average magnetization
+	B_eff             *setterQuant  // effective field (T) output handle
+	B_demag           *setterQuant  // demag field (T) output handle
+	B_dmi             *adderQuant   // demag field (T) output handle
+	B_exch            *adderQuant   // exchange field (T) output handle
+	B_uni             *adderQuant   // field due to uniaxial anisotropy output handle
+	STTorque          *adderQuant   // spin-transfer torque output handle
+	LLGTorque, Torque *setterQuant  // torque/gamma0, in Tesla
+	Table             *DataTable    // output handle for tabular data (average magnetization etc.)
+	Time              float64       // time in seconds  // todo: hide? setting breaks autosaves
 	Solver            cuda.Heun
 )
 
@@ -47,6 +48,7 @@ var (
 	postStep     []func() // called on after every time step
 	extFields    []extField
 	itime        int //unique integer time stamp
+	demag_       *cuda.DemagConvolution
 )
 
 func Mesh() *data.Mesh {
@@ -68,12 +70,8 @@ type extField struct {
 	mul  func() float64
 }
 
-type Downloader interface {
-	Download() *data.Slice
-}
-
 // maps quantity names to downloadable data. E.g. for rendering
-var Quants = make(map[string]Downloader)
+var Quants = make(map[string]Quant)
 
 func initialize() {
 
@@ -90,12 +88,15 @@ func initialize() {
 		return average(&M)
 	})
 
+	FFTM.init()
+	Quants["fftm"] = &FFTM
+
 	// data table
 	Table = newTable("datatable")
 	Table.Add(AvgM)
 
 	// demag field
-	demag_ := cuda.NewDemag(Mesh())
+	demag_ = cuda.NewDemag(Mesh())
 	B_demag = newSetter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		demag_.Exec(b, M.buffer, vol, Mu0*Msat())
 	})

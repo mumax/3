@@ -23,13 +23,13 @@ func gui(w http.ResponseWriter, r *http.Request) {
 
 type guistate struct{}
 
-func (s *guistate) Time() float32                        { return float32(engine.Time) }
-func (s *guistate) Mesh() *data.Mesh                     { return engine.Mesh() }
-func (s *guistate) Uname() string                        { return engine.UNAME }
-func (s *guistate) Version() string                      { return engine.VERSION }
-func (s *guistate) Pwd() string                          { pwd, _ := os.Getwd(); return pwd }
-func (s *guistate) Device() cu.Device                    { return cu.CtxGetDevice() }
-func (s *guistate) Quants() map[string]engine.Downloader { return engine.Quants }
+func (s *guistate) Time() float32                   { return float32(engine.Time) }
+func (s *guistate) Mesh() *data.Mesh                { return engine.Mesh() }
+func (s *guistate) Uname() string                   { return engine.UNAME }
+func (s *guistate) Version() string                 { return engine.VERSION }
+func (s *guistate) Pwd() string                     { pwd, _ := os.Getwd(); return pwd }
+func (s *guistate) Device() cu.Device               { return cu.CtxGetDevice() }
+func (s *guistate) Quants() map[string]engine.Quant { return engine.Quants }
 
 // world size in nm.
 func (s *guistate) WorldNm() [3]float64 {

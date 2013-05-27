@@ -11,6 +11,7 @@ type Mesh struct {
 	gridSize [3]int
 	cellSize [3]float64
 	pbc      [3]int
+	Unit     string // unit of cellSize, default: "m"
 }
 
 // Retruns a new mesh with N0 x N1 x N2 cells of size cellx x celly x cellz.
@@ -28,7 +29,7 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 		}
 	}
 	size := [3]int{N0, N1, N2}
-	return &Mesh{size, [3]float64{cellx, celly, cellz}, pbc3}
+	return &Mesh{size, [3]float64{cellx, celly, cellz}, pbc3, "m"}
 }
 
 // Returns N0, N1, N2, as passed to constructor.

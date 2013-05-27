@@ -8,21 +8,21 @@ import (
 
 // A buffered quantity is stored in GPU memory at all times.
 // E.g.: magnetization.
-type buffered struct {
+type bufferedQuant struct {
 	autosave
 	buffer *data.Slice
 	shiftc [3]int  // shift count (total shifted cells in each direction)
 	shift  *scalar // returns total shift in meters.
 }
 
-func newBuffered(slice *data.Slice, name, unit string) *buffered {
-	b := &buffered{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}, nil}
+func newBuffered(slice *data.Slice, name, unit string) *bufferedQuant {
+	b := &bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}, nil}
 	b.shift = newScalar(3, name+"_shift", "m", b.getShift)
 	return b
 }
 
 // notify that it may need to be saved.
-func (b *buffered) notifySave(goodstep bool) {
+func (b *bufferedQuant) notifySave(goodstep bool) {
 	if goodstep && b.needSave() {
 		b.Save()
 		b.saved()
@@ -30,18 +30,18 @@ func (b *buffered) notifySave(goodstep bool) {
 }
 
 // Replace the data by src. Auto rescales if needed.
-func (b *buffered) Set(src *data.Slice) {
+func (b *bufferedQuant) Set(src *data.Slice) {
 	if src.Mesh().Size() != b.buffer.Mesh().Size() {
 		src = data.Resample(src, b.buffer.Mesh().Size())
 	}
 	data.Copy(b.buffer, src)
 }
 
-func (b *buffered) SetFile(fname string) {
+func (b *bufferedQuant) SetFile(fname string) {
 	util.FatalErr(b.setFile(fname))
 }
 
-func (b *buffered) setFile(fname string) error {
+func (b *bufferedQuant) setFile(fname string) error {
 	m, _, err := data.ReadFile(fname)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (b *buffered) setFile(fname string) error {
 }
 
 //
-func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
+func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
@@ -59,14 +59,14 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	}
 }
 
-func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
+func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
 }
 
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
-func (b *buffered) Shift(shx, shy, shz int) {
+func (b *bufferedQuant) Shift(shx, shy, shz int) {
 	m2 := cuda.GetBuffer(1, b.buffer.Mesh())
 	defer cuda.RecycleBuffer(m2)
 	b.shiftc[X] += shx
@@ -80,12 +80,12 @@ func (b *buffered) Shift(shx, shy, shz int) {
 }
 
 // total shift in meters
-func (b *buffered) ShiftDistance() *scalar {
+func (b *bufferedQuant) ShiftDistance() *scalar {
 	return b.shift
 }
 
 // returns shift of simulation window in m
-func (b *buffered) getShift() []float64 {
+func (b *bufferedQuant) getShift() []float64 {
 	c := b.mesh.CellSize()
 	return []float64{-c[2] * float64(b.shiftc[0]), -c[1] * float64(b.shiftc[1]), -c[0] * float64(b.shiftc[2])}
 }
@@ -93,22 +93,22 @@ func (b *buffered) getShift() []float64 {
 // Get a host copy.
 // TODO: assume it can be called from another thread,
 // transfer asynchronously + sync
-func (b *buffered) Download() *data.Slice {
+func (b *bufferedQuant) Download() *data.Slice {
 	return b.buffer.HostCopy()
 }
 
-func (b *buffered) GetSlice() (s *data.Slice, recycle bool) {
+func (b *bufferedQuant) GetSlice() (s *data.Slice, recycle bool) {
 	return b.buffer, false
 }
-func (b *buffered) Average() []float64 {
+func (b *bufferedQuant) Average() []float64 {
 	return average(b)
 }
 
-func (b *buffered) Save() {
+func (b *bufferedQuant) Save() {
 	saveAs(b, b.autoFname())
 }
 
-func (b *buffered) getGPU() (s *data.Slice, mustRecycle bool) {
+func (b *bufferedQuant) getGPU() (s *data.Slice, mustRecycle bool) {
 	return b.buffer, false
 }
 

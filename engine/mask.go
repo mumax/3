@@ -6,24 +6,24 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
-type Mask struct {
-	buffered
+type maskQuant struct {
+	bufferedQuant
 }
 
-func newMask(nComp int, m *data.Mesh, name, unit string) *Mask {
+func newMask(nComp int, m *data.Mesh, name, unit string) *maskQuant {
 	slice := data.NilSlice(nComp, m)
-	return &Mask{*newBuffered(slice, name, unit)}
+	return &maskQuant{*newBuffered(slice, name, unit)}
 }
 
 // Set the value of all cell faces with their normal along direction. E.g.:
 // 	SetAll(X, 1) // sets all faces in YZ plane to value 1.
-func (m *Mask) SetAll(component int, value float64) {
+func (m *maskQuant) SetAll(component int, value float64) {
 	m.init()
 	cuda.Memset(m.buffer.Comp(util.SwapIndex(component, 3)), float32(value))
 }
 
 // TODO: alloc one component at a time
-func (m *Mask) init() {
+func (m *maskQuant) init() {
 	checkMesh() //engine
 	if m.isNil() {
 		m.buffer = cuda.NewSlice(3, m.mesh) // could alloc only needed components...
@@ -32,11 +32,11 @@ func (m *Mask) init() {
 	}
 }
 
-func (m *Mask) isNil() bool {
+func (m *maskQuant) isNil() bool {
 	return m.buffer.DevPtr(0) == nil
 }
 
-func (m *Mask) Download() *data.Slice {
+func (m *maskQuant) Download() *data.Slice {
 	if m.isNil() {
 		s := data.NewSlice(m.NComp(), m.mesh)
 		return s // TODO: memset 1s?

@@ -23,7 +23,7 @@ func Write(out io.Writer, s *Slice, time float64) error {
 	for _, s := range s.Mesh().CellSize() {
 		w.writeFloat64(s)
 	}
-	w.writeString("m") // mesh unit
+	w.writeString(s.Mesh().Unit)
 	w.writeFloat64(time)
 	w.writeString("s") // time unit
 	w.writeString(s.Tag())

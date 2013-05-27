@@ -61,16 +61,16 @@ func Compile(src string) (script.Expr, error) {
 }
 
 // needed only to make it callable from scripts
-func (b *buffered) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
-func (b *buffered) Eval() interface{}       { return b }
-func (b *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }
-func (b *buffered) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *bufferedQuant) Eval() interface{}       { return b }
+func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
+func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
-func (b *StaggeredMask) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
-func (b *StaggeredMask) Eval() interface{}       { return b }
-func (b *StaggeredMask) Type() reflect.Type      { return reflect.TypeOf(new(StaggeredMask)) }
-func (b *StaggeredMask) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+func (b *staggeredMaskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *staggeredMaskQuant) Eval() interface{}       { return b }
+func (b *staggeredMaskQuant) Type() reflect.Type      { return reflect.TypeOf(new(staggeredMaskQuant)) }
+func (b *staggeredMaskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 func doAutosave(what interface {
 	Autosave(float64)

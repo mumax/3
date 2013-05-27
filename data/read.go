@@ -64,11 +64,12 @@ func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 	for i := range cell {
 		cell[i] = r.readFloat64()
 	}
-	_ = r.readString() // mesh unit
+	mesh := NewMesh(size[0], size[1], size[2], cell[0], cell[1], cell[2])
+
+	mesh.Unit = r.readString()
 	time = r.readFloat64()
 	_ = r.readString() // time unit
 
-	mesh := NewMesh(size[0], size[1], size[2], cell[0], cell[1], cell[2])
 	s := NewSlice(nComp, mesh)
 
 	s.tag = r.readString()

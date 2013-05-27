@@ -19,6 +19,7 @@ type DemagConvolution struct {
 	fwPlan      fft3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      fft3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host)
+	FFTMesh     data.Mesh         // mesh of FFT m
 	stream      cu.Stream         // Stream for FFT plans
 }
 
@@ -209,6 +210,7 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.n = prod(size)
 	c.kernSize = kernel[0][0].Mesh().Size()
 	c.init()
+	c.initMesh()
 	testConvolution(c, mesh)
 	c.freeKern()
 	return c
@@ -221,6 +223,13 @@ func (c *DemagConvolution) freeKern() {
 			c.kern[i][j] = nil
 		}
 	}
+}
+
+func (c *DemagConvolution) initMesh() {
+	n := fftR2COutputSizeFloats(c.kernSize)
+	cell := c.kern[0][0].Mesh().CellSize()
+	c.FFTMesh = *data.NewMesh(n[0], n[1], n[2], 1/cell[0], 1/cell[1], 1/cell[2])
+	c.FFTMesh.Unit = "/m"
 }
 
 // Default accuracy setting for demag kernel.

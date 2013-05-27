@@ -211,7 +211,17 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.kernSize = kernel[0][0].Mesh().Size()
 	c.init()
 	testConvolution(c, mesh)
+	c.freeKern()
 	return c
+}
+
+// release the real-space kernel so the host memory can be reclaimed by GC.
+func (c *DemagConvolution) freeKern() {
+	for i := range c.kern {
+		for j := range c.kern[i] {
+			c.kern[i][j] = nil
+		}
+	}
 }
 
 // Default accuracy setting for demag kernel.

@@ -275,8 +275,20 @@ func free() {
 	dlQue = nil
 }
 
+// check if mesh is set
 func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
 		log.Fatal("need to set mesh first")
+	}
+}
+
+// check if m is set
+func checkM() {
+	checkMesh()
+	if M.buffer.DevPtr(0) == nil {
+		log.Fatal("need to initialize magnetization first")
+	}
+	if cuda.MaxVecNorm(M.buffer) == 0 {
+		log.Fatal("need to initialize magnetization first")
 	}
 }

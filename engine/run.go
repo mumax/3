@@ -37,7 +37,7 @@ func init() {
 
 // Runs as long as condition returns true.
 func RunCond(condition func() bool) {
-	checkMesh() // todo: check in handler
+	checkM()
 	defer util.DashExit()
 
 	pause = false

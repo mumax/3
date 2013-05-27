@@ -108,3 +108,12 @@ func drainOutput() {
 		<-done
 	}
 }
+
+// Save once, with given file name.
+func saveAs(s GetSlice, fname string) {
+	buffer, recylce := s.GetSlice()
+	if recylce {
+		defer cuda.RecycleBuffer(buffer)
+	}
+	goSaveCopy(fname, buffer, Time)
+}

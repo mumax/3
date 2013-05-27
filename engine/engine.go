@@ -84,7 +84,7 @@ func initialize() {
 	vol = data.NilSlice(1, Mesh())
 
 	// magnetization
-	M = *newBuffered(cuda.NewSlice(3, Mesh()), "m", "")
+	M.init()
 	Quants["m"] = &M
 	AvgM = newScalar(3, "m", "", func() []float64 {
 		return average(&M)

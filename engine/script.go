@@ -37,12 +37,14 @@ func init() {
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
 
-	world.Var("dt", &Solver.Dt_si)
-	world.Var("mindt", &Solver.Mindt)
-	world.Var("maxdt", &Solver.Maxdt)
-	world.Var("maxerr", &Solver.MaxErr)
-	world.Var("headroom", &Solver.Headroom)
-	world.Var("fixdt", &Solver.Fixdt)
+	world.Var("EnableDemag", &EnableDemag)
+
+	world.Var("Dt", &Solver.Dt_si)
+	world.Var("MinDt", &Solver.Mindt)
+	world.Var("MaxDt", &Solver.Maxdt)
+	world.Var("MaxErr", &Solver.MaxErr)
+	world.Var("Headroom", &Solver.Headroom)
+	world.Var("FixDt", &Solver.Fixdt)
 
 	world.LValue("m", &M)
 	world.LValue("ExchangeMask", ExchangeMask)

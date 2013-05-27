@@ -21,6 +21,7 @@ var (
 	Xi           func() float64      = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64      = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64   = ConstVector(0, 0, 0) // Electrical current density
+	EnableDemag  bool                = true                 // enable/disable demag field
 )
 
 // Accessible quantities
@@ -98,7 +99,11 @@ func initialize() {
 	// demag field
 	demag_ = cuda.NewDemag(Mesh())
 	B_demag = newSetter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
-		demag_.Exec(b, M.buffer, vol, Mu0*Msat())
+		if EnableDemag {
+			demag_.Exec(b, M.buffer, vol, Mu0*Msat())
+		} else {
+			cuda.Zero(b)
+		}
 	})
 	Quants["B_demag"] = B_demag
 

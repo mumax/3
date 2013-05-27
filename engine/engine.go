@@ -89,7 +89,7 @@ func initialize() {
 	})
 
 	FFTM.init()
-	Quants["fftm"] = &FFTM
+	Quants["mFFT"] = &FFTM
 
 	// data table
 	Table = newTable("datatable")

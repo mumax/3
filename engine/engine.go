@@ -89,7 +89,7 @@ func initialize() {
 	})
 
 	FFTM.init()
-	Quants["mFFT"] = &FFTM
+	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
 
 	// data table
 	Table = newTable("datatable")

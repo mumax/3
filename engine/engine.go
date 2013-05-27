@@ -26,7 +26,7 @@ var (
 
 // Accessible quantities
 var (
-	M                 bufferedQuant // reduced magnetization (unit length)
+	M                 magnetization // reduced magnetization (unit length)
 	FFTM              fftm          // FFT of M
 	AvgM              *scalar       // average magnetization
 	B_eff             *setterQuant  // effective field (T) output handle
@@ -39,6 +39,7 @@ var (
 	Table             *DataTable    // output handle for tabular data (average magnetization etc.)
 	Time              float64       // time in seconds  // todo: hide? setting breaks autosaves
 	Solver            cuda.Heun
+	Geom              func(x, y, z float64) bool = func(x, y, z float64) bool { return true } // geometric stencil
 )
 
 // hidden quantities

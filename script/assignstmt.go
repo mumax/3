@@ -3,7 +3,6 @@ package script
 import (
 	"go/ast"
 	"go/token"
-	"log"
 	"reflect"
 )
 
@@ -49,7 +48,6 @@ func (w *World) compileDefine(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
 	}
 	addr := reflect.New(r.Type())
 	w.declare(ident.Name, &reflectLvalue{reflectROnly{addr.Elem()}})
-	log.Println("declare", ident.Name)
 	return w.compileAssign(a, lhs, r)
 }
 

@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"go/token"
 	"reflect"
 )
@@ -12,24 +13,42 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	switch {
 	default:
 		panic(err(pos, "type mismatch: can not use type", inT, "as", outT))
+
 	// treat 'void' (type nil) separately:
 	case inT == nil && outT != nil:
 		panic(err(pos, "void used as value"))
 	case inT != nil && outT == nil:
 		panic("script internal bug: void input type")
+
 	// strict go conversions:
 	case inT == outT:
 		return in
 	case inT.AssignableTo(outT):
 		return in
+
 	// extra conversions for ease-of-use:
-	case outT == float64_t && inT == int_t: // int -> float64
+	// int -> float64
+	case outT == float64_t && inT == int_t:
 		return &intToFloat64{in}
-	case inT == float64_t && outT == func_float64_t: // float64 -> func()float64
+
+		// float64 -> int
+	case outT == int_t && inT == float64_t:
+		return &float64ToInt{in}
+
+	// float64 -> func()float64
+	case inT == float64_t && outT == func_float64_t:
 		return &float64ToFunc{in}
-	case inT == int_t && outT == func_float64_t: // int -> func()float64
+
+		// float64 -> func()float64
+	case inT == func_float64_t && outT == float64_t:
+		return &funcToFloat64{in}
+
+	// int -> func()float64
+	case inT == int_t && outT == func_float64_t:
 		return &float64ToFunc{&intToFloat64{in}}
-	case inT == vector_t && outT == func_vector_t: // [3]float64 -> func()[3]float64
+
+	// [3]float64 -> func()[3]float64
+	case inT == vector_t && outT == func_vector_t:
 		return &vectorToFunc{in}
 	}
 }
@@ -62,11 +81,30 @@ type intToFloat64 struct{ in Expr }
 func (c *intToFloat64) Eval() interface{}  { return float64(c.in.Eval().(int)) }
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
 
+// converts float64 to int
+type float64ToInt struct{ in Expr }
+
+func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
+func (c *float64ToInt) Type() reflect.Type { return int_t }
+func safe_int(x float64) int {
+	i := int(x)
+	if float64(i) != x {
+		panic(fmt.Errorf("can not use %v as int", x))
+	}
+	return i
+}
+
 // converts float64 to func()float64
 type float64ToFunc struct{ in Expr }
 
 func (c *float64ToFunc) Eval() interface{}  { return func() float64 { return c.in.Eval().(float64) } }
 func (c *float64ToFunc) Type() reflect.Type { return func_float64_t }
+
+// converts float64 to func()float64
+type funcToFloat64 struct{ in Expr }
+
+func (c *funcToFloat64) Eval() interface{}  { return (c.in.Eval().(func() float64))() }
+func (c *funcToFloat64) Type() reflect.Type { return float64_t }
 
 type vectorToFunc struct{ in Expr }
 

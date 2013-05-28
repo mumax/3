@@ -6,6 +6,7 @@ package main
 // http://www.ctcms.nist.gov/~rdm/mumag.org.html
 
 import (
+	"code.google.com/p/mx3/cuda"
 	. "code.google.com/p/mx3/engine"
 	"fmt"
 	"log"
@@ -13,6 +14,7 @@ import (
 )
 
 func main() {
+	cuda.Init()
 	Init()
 	defer Close()
 

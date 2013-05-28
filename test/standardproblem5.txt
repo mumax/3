@@ -1,0 +1,27 @@
+/*
+	Micromagnetic standard problem 5
+	as proposed by M. Najafi et al., JAP 105, 113914 (2009).
+	Reference solution by mumax2.
+*/
+
+	setgridsize(32, 32, 4)
+	setcellsize(100e-9/32, 100e-9/32, 10e-9/4)
+
+	Msat  = 800e3
+	Aex   = 13e-12
+	m     = vortex(1, 1)
+	alpha = 3
+ 
+	run(1e-9) // relax
+
+	alpha   = 0.1
+	xi      = 0.05
+	SpinPol = 1
+	J       = vector(1e12, 0, 0)
+
+	run(1e-9) // run
+
+	m_ := average(m)
+	expect("mx", m_[0], -0.239191, 1e-6)
+	expect("my", m_[1], -0.099219, 1e-6)
+	expect("mz", m_[2],  0.022813, 1e-6)

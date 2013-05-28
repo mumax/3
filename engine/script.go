@@ -49,7 +49,7 @@ func init() {
 	world.Const("mu0", Mu0)
 
 	world.LValue("m", &M)
-	//world.ROnly("B_demag", &B_demag)
+	world.ROnly("B_demag", &B_demag)
 
 	fftmAddr := &FFTM
 	world.Var("FFTm", &fftmAddr)
@@ -59,9 +59,13 @@ func init() {
 	world.Func("expect", expect)
 }
 
+// Test if have lies within want +/- maxError,
+// and print suited message.
 func expect(msg string, have, want, maxError float64) {
 	if math.Abs(have-want) > maxError {
-		log.Fatal(msg, ":", "have:", have, "want:", want)
+		log.Fatal(msg, ":", " have:", have, " want:", want, "±", maxError)
+	} else {
+		log.Println(msg, ":", have, "OK")
 	}
 }
 

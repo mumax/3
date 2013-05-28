@@ -26,6 +26,12 @@ func (b *setterQuant) set(dst *data.Slice, goodstep bool) {
 	}
 }
 
+func (b *setterQuant) GetSlice() (*data.Slice, bool) {
+	buffer := cuda.GetBuffer(b.nComp, b.mesh)
+	b.set(buffer, false)
+	return buffer, true // must recycle
+}
+
 func (b *setterQuant) Download() *data.Slice {
 	buffer := cuda.GetBuffer(b.nComp, b.mesh)
 	defer cuda.RecycleBuffer(buffer)

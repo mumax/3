@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"go/token"
 	"log"
 	"strings"
@@ -32,6 +33,17 @@ func myprint(msg ...interface{}) {
 // 	world.MustEval("x") // returns 3.14
 func (w *World) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
+}
+
+func (w *World) Const(name string, val interface{}) {
+	switch v := val.(type) {
+	default:
+		panic(fmt.Errorf("const of type %v not handled", typ(v))) // todo: const using reflection
+	case float64:
+		w.declare(name, floatLit(v))
+	case int:
+		w.declare(name, intLit(v))
+	}
 }
 
 // adds a special variable to the world. Upon assignment,

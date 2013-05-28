@@ -46,9 +46,14 @@ func init() {
 	world.Var("Headroom", &Solver.Headroom)
 	world.Var("FixDt", &Solver.Fixdt)
 
+	world.Const("mu0", Mu0)
+
 	world.LValue("m", &M)
+	//world.ROnly("B_demag", &B_demag)
+
 	fftmAddr := &FFTM
 	world.Var("FFTm", &fftmAddr)
+
 	world.LValue("ExchangeMask", ExchangeMask)
 
 	world.Func("expect", expect)

@@ -1,5 +1,5 @@
 /*
-	Micromagnetic standard problem 4 (a) according to
+	Micromagnetic standard problem 4 (b) according to
 	http://www.ctcms.nist.gov/~rdm/mumag.org.html
 */
 
@@ -26,10 +26,10 @@
 
 // reversal
 	alpha = 0.02
-	B_ext = vector(-24.6E-3, 4.3E-3, 0)
+	B_ext = vector(-35.5E-3, -6.3E-3, 0)
 	run(1e-9)
 	m_ = average(m)
-	expect("mx", m_[0],-0.9845, 1e-3)
-	expect("my", m_[1], 0.1268, 1e-3)
-	expect("mz", m_[2], 0.0432, 1e-3)
+	expect("mx", m_[0], -0.9687, 1e-3)
+	expect("my", m_[1], -0.1186, 1e-3)
+	expect("mz", m_[2], -0.0056, 1e-3)
 

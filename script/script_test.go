@@ -19,6 +19,10 @@ func TestEval(t *testing.T) {
 	if w.MustEval("x") != 2.0 {
 		t.Fail()
 	}
+	w.MustExec("x=3")
+	if w.MustEval("x") != 3.0 {
+		t.Fail()
+	}
 
 	// Test Ops
 	if w.MustEval("1+2*3/4-5-6") != 1.+2.*3./4.-5.-6 {

@@ -35,6 +35,16 @@ func (w *World) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
 }
 
+// adds a native variable to the world. It cannot be changed from script.
+// 	var x = 3.14
+// 	world.ROnly("x", &x)
+// 	world.MustEval("x")   // returns 3.14
+// 	world.MustExec("x=2") // fails: cannot assign to x
+func (w *World) ROnly(name string, addr interface{}) {
+	w.declare(name, newReflectROnly(addr))
+}
+
+// adds a constant. Cannot be changed in any way.
 func (w *World) Const(name string, val interface{}) {
 	switch v := val.(type) {
 	default:

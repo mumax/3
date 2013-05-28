@@ -1,0 +1,32 @@
+/*
+	Micromagnetic standard problem 4 (a) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+	setgridsize(128, 32, 1)
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+// material
+	Msat  = 800e3
+	Aex   = 13e-12
+	m     = uniform(1, .1, 0)
+
+// output
+	savetable(10e-12)
+	autosave(m, 50e-12)
+
+// relax
+	alpha = 3
+	run(10e-9) 
+	expect("mx", average(m)[0], 0.96696, 1e-3)
+	expect("my", average(m)[1], 0.12528, 1e-3)
+	expect("mz", average(m)[2], 0,       1e-3)
+
+	alpha = 0.02
+	B_ext = vector(-24.6E-3, 4.3E-3, 0)
+	run(1e-9)
+	expect("mx", average(m)[0],-0.9845, 1e-3)
+	expect("my", average(m)[1], 0.1268, 1e-3)
+	expect("mz", average(m)[2], 0.0432, 1e-3)
+

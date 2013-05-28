@@ -11,6 +11,7 @@ import (
 type World struct {
 	identifiers map[string]Expr // set of defined identifiers
 	Debug       bool            // print debug info?
+	parent      *World          // parent scope, if any
 }
 
 func NewWorld() *World {

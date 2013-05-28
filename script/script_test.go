@@ -3,6 +3,7 @@ package script
 import (
 	"log"
 	"math"
+	"reflect"
 	"testing"
 )
 
@@ -85,5 +86,22 @@ func BenchmarkEval2_native(bench *testing.B) {
 	}
 	if a == 1.23456 {
 		panic("make sure result is used")
+	}
+}
+
+type T struct {
+	in  string
+	out interface{}
+}
+
+func TestMany(test *testing.T) {
+	tests := []T{{"1+1", 2.}}
+
+	w := NewWorld()
+	for _, t := range tests {
+		out := w.MustEval(t.in)
+		if !reflect.DeepEqual(out, t.out) {
+			test.Error(t.in, "returned", out, "expected:", t.out)
+		}
 	}
 }

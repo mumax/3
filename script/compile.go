@@ -10,13 +10,11 @@ import (
 // 	expr, err := world.CompileExpr("1+1")
 // 	expr.Eval()   // returns 2
 func (w *World) CompileExpr(src string) (code Expr, e error) {
-
 	// parse
 	tree, err := parser.ParseExpr(src)
 	if err != nil {
 		return nil, fmt.Errorf(`parse "%s": %v`, src, err)
 	}
-
 	if w.Debug {
 		ast.Print(nil, tree)
 	}
@@ -34,7 +32,6 @@ func (w *World) CompileExpr(src string) (code Expr, e error) {
 			panic(err)
 		}
 	}()
-
 	return w.compileExpr(tree), nil
 }
 
@@ -52,7 +49,6 @@ func (w *World) MustCompileExpr(src string) Expr {
 // 	code, err := world.Compile(src)
 // 	code.Eval()
 func (w *World) Compile(src string) (code Expr, e error) {
-
 	// parse
 	exprSrc := "func(){\n" + src + "\n}" // wrap in func to turn into expression
 	tree, err := parser.ParseExpr(exprSrc)

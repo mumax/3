@@ -1,9 +1,21 @@
 package script
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
-// Loads math functions into the world.
-func (w *World) LoadMath() {
+// Loads standard functions into the world.
+func (w *World) LoadStdlib() {
+
+	// literals
+	w.declare("true", boolLit(true))
+	w.declare("false", boolLit(false))
+
+	// io
+	w.Func("print", myprint)
+
+	// math
 	w.Func("Abs", math.Abs)
 	w.Func("Acos", math.Acos)
 	w.Func("Acosh", math.Acosh)
@@ -37,7 +49,6 @@ func (w *World) LoadMath() {
 	w.Func("Trunc", math.Trunc)
 	w.Func("Y0", math.Y0)
 	w.Func("Y1", math.Y1)
-
 	w.Func("Ilogb", math.Ilogb)
 	w.Func("Pow10", math.Pow10)
 	w.Func("Atan2", math.Atan2)
@@ -52,11 +63,10 @@ func (w *World) LoadMath() {
 	w.Func("Ldexp", math.Ldexp)
 	w.Func("IsInf", math.IsInf)
 	w.Func("IsNaN", math.IsNaN)
-
-	w.declare("true", boolLit(true))
-	w.declare("false", boolLit(false))
-
 	w.declare("Pi", floatLit(math.Pi))
-
 	w.declare("Inf", floatLit(math.Inf(1)))
+}
+
+func myprint(msg ...interface{}) {
+	log.Println(msg...)
 }

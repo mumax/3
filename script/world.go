@@ -3,7 +3,6 @@ package script
 import (
 	"fmt"
 	"go/token"
-	"log"
 	"strings"
 )
 
@@ -18,13 +17,14 @@ func NewWorld() *World {
 	w := new(World)
 	w.init()
 	w.Debug = false
-	w.LoadMath()
-	w.Func("print", myprint)
+	w.LoadStdlib()
 	return w
 }
 
-func myprint(msg ...interface{}) {
-	log.Println(msg...)
+func (w *World) init() {
+	if w.identifiers == nil {
+		w.identifiers = make(map[string]Expr)
+	}
 }
 
 // adds a native variable to the world. E.g.:
@@ -68,12 +68,6 @@ func (w *World) LValue(name string, v LValue) {
 func (w *World) Func(name string, f interface{}) {
 	// TODO: specialize for float64 funcs etc
 	w.declare(name, newReflectFunc(f))
-}
-
-func (w *World) init() {
-	if w.identifiers == nil {
-		w.identifiers = make(map[string]Expr)
-	}
 }
 
 // add identifier but check that it's not declared yet.

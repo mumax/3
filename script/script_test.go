@@ -28,6 +28,10 @@ func TestEval(t *testing.T) {
 	if w.MustEval("x") != 3.0 {
 		t.Fail()
 	}
+	w.MustExec("y:=8")
+	if w.MustEval("y") != 8 {
+		t.Error("got", w.MustEval("y"))
+	}
 
 	// Test Ops
 	if w.MustEval("1+2*3/4-5-6") != 1.+2.*3./4.-5.-6 {

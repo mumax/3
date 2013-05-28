@@ -20,19 +20,21 @@ func (w *World) CompileExpr(src string) (code Expr, e error) {
 	}
 
 	// catch compile errors
-	defer func() {
-		err := recover()
-		if err == nil {
-			return
-		}
-		if er, ok := err.(*compileErr); ok {
-			code = nil
-			e = fmt.Errorf(`parse "%s": %v`, src, er)
-		} else {
-			panic(err)
-		}
-	}()
-	return w.compileExpr(tree), nil
+	if !Debug {
+		defer func() {
+			err := recover()
+			if err == nil {
+				return
+			}
+			if er, ok := err.(*compileErr); ok {
+				code = nil
+				e = fmt.Errorf(`parse "%s": %v`, src, er)
+			} else {
+				panic(err)
+			}
+		}()
+	}
+	return w.compile(tree), nil
 }
 
 // CompileExpr with panic on error.
@@ -57,18 +59,20 @@ func (w *World) Compile(src string) (code Expr, e error) {
 	}
 
 	// catch compile errors and decode line number
-	defer func() {
-		err := recover()
-		if err == nil {
-			return
-		}
-		if compErr, ok := err.(*compileErr); ok {
-			code = nil
-			e = fmt.Errorf("script %v: %v", pos2line(compErr.pos, exprSrc), compErr.msg)
-		} else {
-			panic(err)
-		}
-	}()
+	if !Debug {
+		defer func() {
+			err := recover()
+			if err == nil {
+				return
+			}
+			if compErr, ok := err.(*compileErr); ok {
+				code = nil
+				e = fmt.Errorf("script %v: %v", pos2line(compErr.pos, exprSrc), compErr.msg)
+			} else {
+				panic(err)
+			}
+		}()
+	}
 
 	// compile
 	stmts := tree.(*ast.FuncLit).Body.List // strip func again
@@ -77,7 +81,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 	}
 	block := new(blockStmt)
 	for _, s := range stmts {
-		block.append(w.compileStmt(s))
+		block.append(w.compile(s))
 	}
 	return block, nil
 }

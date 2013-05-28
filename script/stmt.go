@@ -5,6 +5,18 @@ import (
 	"reflect"
 )
 
+// compiles expression or statement
+func (w *World) compile(n ast.Node) Expr {
+	switch concrete := n.(type) {
+	case ast.Stmt:
+		return w.compileStmt(concrete)
+	case ast.Expr:
+		return w.compileExpr(concrete)
+	default:
+		panic(err(n.Pos(), "not allowed"))
+	}
+}
+
 // compiles a statement
 func (w *World) compileStmt(st ast.Stmt) Expr {
 	switch concrete := st.(type) {

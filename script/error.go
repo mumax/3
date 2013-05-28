@@ -20,7 +20,9 @@ func (c *compileErr) Error() string {
 
 // constructs a compileErr
 func err(pos token.Pos, msg ...interface{}) *compileErr {
-	return &compileErr{pos, fmt.Sprintln(msg...)}
+	str := fmt.Sprintln(msg...) // use Sprinln to insert spaces
+	str = str[:len(str)-1]      // strip final \n
+	return &compileErr{pos, str}
 }
 
 // type string for value i

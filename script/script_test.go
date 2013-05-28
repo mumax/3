@@ -105,3 +105,20 @@ func TestMany(test *testing.T) {
 		}
 	}
 }
+
+// Test a few cases that should not compile
+func TestFail(test *testing.T) {
+	w := NewWorld()
+	w.Const("c", 3e8)
+	a := 1.
+	w.Var("a", &a)
+	tests := []string{"c=1", "undefined", "1++", "a=true"}
+	for _, t := range tests {
+		_, err := w.Compile(t)
+		if err == nil {
+			test.Error(t, "should not compile")
+		} else {
+			log.Println(t, ":", err, ":OK")
+		}
+	}
+}

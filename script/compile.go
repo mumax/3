@@ -15,7 +15,7 @@ func (w *World) CompileExpr(src string) (code Expr, e error) {
 	if err != nil {
 		return nil, fmt.Errorf(`parse "%s": %v`, src, err)
 	}
-	if w.Debug {
+	if Debug {
 		ast.Print(nil, tree)
 	}
 
@@ -72,7 +72,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 
 	// compile
 	stmts := tree.(*ast.FuncLit).Body.List // strip func again
-	if w.Debug {
+	if Debug {
 		ast.Print(nil, stmts)
 	}
 	block := new(blockStmt)

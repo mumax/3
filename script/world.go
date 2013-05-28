@@ -9,20 +9,25 @@ import (
 // World stores an interpreted program's state
 // like declared variables and functions.
 type World struct {
+	*scope
+	toplevel *scope
+}
+
+// scope stores identifiers
+type scope struct {
 	identifiers map[string]Expr // set of defined identifiers
-	Debug       bool            // print debug info?
-	parent      *World          // parent scope, if any
+	parent      *scope          // parent scope, if any
 }
 
 func NewWorld() *World {
 	w := new(World)
-	w.init()
-	w.Debug = false
-	w.LoadStdlib()
+	w.scope = new(scope)
+	w.toplevel = w.scope
+	w.LoadStdlib() // loads into toplevel
 	return w
 }
 
-func (w *World) init() {
+func (w *scope) init() {
 	if w.identifiers == nil {
 		w.identifiers = make(map[string]Expr)
 	}
@@ -32,7 +37,7 @@ func (w *World) init() {
 // 	var x = 3.14
 // 	world.Var("x", &x)
 // 	world.MustEval("x") // returns 3.14
-func (w *World) Var(name string, addr interface{}) {
+func (w *scope) Var(name string, addr interface{}) {
 	w.declare(name, newReflectLvalue(addr))
 }
 
@@ -41,12 +46,12 @@ func (w *World) Var(name string, addr interface{}) {
 // 	world.ROnly("x", &x)
 // 	world.MustEval("x")   // returns 3.14
 // 	world.MustExec("x=2") // fails: cannot assign to x
-func (w *World) ROnly(name string, addr interface{}) {
+func (w *scope) ROnly(name string, addr interface{}) {
 	w.declare(name, newReflectROnly(addr))
 }
 
 // adds a constant. Cannot be changed in any way.
-func (w *World) Const(name string, val interface{}) {
+func (w *scope) Const(name string, val interface{}) {
 	switch v := val.(type) {
 	default:
 		panic(fmt.Errorf("const of type %v not handled", typ(v))) // todo: const using reflection
@@ -59,20 +64,20 @@ func (w *World) Const(name string, val interface{}) {
 
 // adds a special variable to the world. Upon assignment,
 // v's Set() will be called.
-func (w *World) LValue(name string, v LValue) {
+func (w *scope) LValue(name string, v LValue) {
 	w.declare(name, v)
 }
 
 // adds a native function to the world. E.g.:
 // 	world.Func("sin", math.Sin)
 // 	world.MustEval("sin(0)") // returns 0
-func (w *World) Func(name string, f interface{}) {
+func (w *scope) Func(name string, f interface{}) {
 	// TODO: specialize for float64 funcs etc
 	w.declare(name, newReflectFunc(f))
 }
 
 // add identifier but check that it's not declared yet.
-func (w *World) declare(key string, value Expr) {
+func (w *scope) declare(key string, value Expr) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.identifiers[lname]; ok {
@@ -81,12 +86,29 @@ func (w *World) declare(key string, value Expr) {
 	w.identifiers[lname] = value
 }
 
-func (w *World) resolve(pos token.Pos, name string) Expr {
+// resolve identifier in this scope or its parents
+func (w *scope) resolve(pos token.Pos, name string) Expr {
 	w.init()
 	lname := strings.ToLower(name)
 	if v, ok := w.identifiers[lname]; ok {
 		return v
 	} else {
-		panic(err(pos, "undefined:", name)) // TODO: add pos
+		if w.parent != nil {
+			return w.parent.resolve(pos, name)
+		}
+		panic(err(pos, "undefined:", name))
+	}
+}
+
+func (w *World) enterScope() {
+	par := w.scope
+	w.scope = new(scope)
+	w.scope.parent = par
+}
+
+func (w *World) exitScope() {
+	w.scope = w.scope.parent
+	if w.scope == nil { // went above toplevel
+		panic("bug")
 	}
 }

@@ -7,6 +7,10 @@ import (
 	"testing"
 )
 
+func init() {
+	log.SetFlags(0)
+}
+
 func TestEval(t *testing.T) {
 	w := NewWorld()
 

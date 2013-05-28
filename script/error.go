@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var Debug bool // print debug info?
+
 // compileErr, and only compileErr will be caught by Compile and returned as an error.
 type compileErr struct {
 	pos token.Pos

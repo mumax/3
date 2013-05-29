@@ -1,0 +1,21 @@
+/*
+	Test Exchange Mask set to uniform,
+	using standard problem 4.
+*/
+
+	SetGridSize(128, 32, 1)
+	SetCellSize(500e-9/128, 125e-9/32, 3e-9)
+
+	Msat  = 800e3
+	Aex   = 13e-12 * 2                    // Aex *2 here...
+	alpha = 1.0
+	m     = uniform(1, .1, 0)
+
+	exchangemask = Uniform(0.5, 0.5, 0.5) // ... and back /2 here
+
+	Run(3e-9)
+
+	m_ := average(m)
+	expect("mx", m_[0], 0.96696, 1e-4)
+	expect("my", m_[1], 0.12528, 1e-4)
+	expect("mz", m_[2], 0,       1e-4)

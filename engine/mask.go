@@ -22,6 +22,11 @@ func (m *maskQuant) SetAll(component int, value float64) {
 	cuda.Memset(m.buffer.Comp(util.SwapIndex(component, 3)), float32(value))
 }
 
+func (m *maskQuant) Set(src *data.Slice) {
+	m.init()
+	m.bufferedQuant.Set(src)
+}
+
 // TODO: alloc one component at a time
 func (m *maskQuant) init() {
 	checkMesh() //engine

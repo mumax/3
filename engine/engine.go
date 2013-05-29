@@ -10,18 +10,18 @@ import (
 
 // User inputs
 var (
-	Aex          func() float64      = Const(0)             // Exchange stiffness in J/m
-	ExchangeMask *staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
-	KuMask       *maskQuant                                 // Mask to scales Ku1/Msat cellwise.
-	Msat         func() float64      = Const(0)             // Saturation magnetization in A/m
-	Alpha        func() float64      = Const(0)             // Damping constant
-	B_ext        func() [3]float64   = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	DMI          func() float64      = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          func() [3]float64   = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
-	Xi           func() float64      = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol      func() float64      = Const(1)             // Spin polarization of electrical current
-	J            func() [3]float64   = ConstVector(0, 0, 0) // Electrical current density
-	EnableDemag  bool                = true                 // enable/disable demag field
+	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
+	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
+	KuMask       maskQuant                                 // Mask to scales Ku1/Msat cellwise.
+	Msat         func() float64     = Const(0)             // Saturation magnetization in A/m
+	Alpha        func() float64     = Const(0)             // Damping constant
+	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
+	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1          func() [3]float64  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
+	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
+	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
+	EnableDemag  bool               = true                 // enable/disable demag field
 )
 
 // Accessible quantities
@@ -114,8 +114,8 @@ func initialize() {
 	})
 	Quants["B_exch"] = B_exch
 
-	ExchangeMask = newStaggeredMask(Mesh(), "exchangemask", "")
-	Quants["exchangemask"] = ExchangeMask
+	ExchangeMask = *newStaggeredMask(Mesh(), "exchangemask", "")
+	Quants["exchangemask"] = &ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
 	B_dmi = newAdder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
@@ -135,8 +135,8 @@ func initialize() {
 	})
 	Quants["B_uni"] = B_uni
 
-	KuMask = newMask(3, Mesh(), "kumask", "")
-	Quants["KuMask"] = KuMask
+	KuMask = *newMask(3, Mesh(), "kumask", "")
+	Quants["KuMask"] = &KuMask
 
 	// external field
 	b_ext := newAdder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {

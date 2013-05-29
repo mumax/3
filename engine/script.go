@@ -54,7 +54,7 @@ func init() {
 	fftmAddr := &FFTM
 	world.Var("FFTm", &fftmAddr)
 
-	world.LValue("ExchangeMask", ExchangeMask)
+	world.LValue("ExchangeMask", &ExchangeMask)
 
 	world.Func("expect", expect)
 }

@@ -55,6 +55,7 @@ func init() {
 	world.Var("FFTm", &fftmAddr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
+	world.LValue("AnisotropyMask", &KuMask)
 
 	world.Func("expect", expect)
 }
@@ -63,7 +64,7 @@ func init() {
 // and print suited message.
 func expect(msg string, have, want, maxError float64) {
 	if math.Abs(have-want) > maxError {
-		log.Fatal(msg, ":", " have:", have, " want:", want, "±", maxError)
+		log.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
 		log.Println(msg, ":", have, "OK")
 	}
@@ -78,6 +79,12 @@ func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+
+// needed only to make it callable from scripts
+func (b *maskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *maskQuant) Eval() interface{}       { return b }
+func (b *maskQuant) Type() reflect.Type      { return reflect.TypeOf(new(maskQuant)) }
+func (b *maskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
 func (b *staggeredMaskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }

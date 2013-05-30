@@ -114,5 +114,37 @@ See file examples/standardproblem4.txt
 		print("final m:")
 		print(average(m))
 
+
+
+Vortex
+
+See file examples/vortex.txt
+	// Switch magnetic vortex with rotating field.
+
+	// geometry
+		setgridsize(256, 256, 1)
+		setcellsize(1000e-9/256, 1000e-9/256, 30e-9)
+
+	// material
+		msat  = 800e3
+		aex   = 13e-12
+		m     = vortex(1, 1)  // circulation, polarization
+
+	// relax
+		alpha = 3
+		run(1e-9)
+		alpha = 0.01
+
+	// output
+		savetable(10e-12)
+		autosave(m, 50e-12)
+
+	// run
+		f := 330e6 // excitation frequency
+		A := 1e-3  // excitation amplitude
+		b_ext = vector(A*cos(2*pi*f*t), A*sin(2*pi*f*t), 0)
+		run(10e-9)
+
+
 */
 package examples

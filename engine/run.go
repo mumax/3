@@ -52,6 +52,25 @@ func RunCond(condition func() bool) {
 	pause = true
 }
 
+// Register function f to be called after every time step.
+// Typically used, e.g., to manipulate the magnetization.
+func PostStep(f func()) {
+	postStep = append(postStep, f)
+}
+
+func init() {
+	world.Func("PostStep", PostStep)
+}
+
+func step() {
+	Solver.Step()
+	for _, f := range postStep {
+		f()
+	}
+	s := Solver
+	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
+}
+
 // injects arbitrary code into the engine run loops. Used by web interface.
 var Inject = make(chan func()) // inject function calls into the cuda main loop. Executed in between time steps.
 

@@ -3,15 +3,12 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 	"log"
 )
 
 // User inputs
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
-	KuMask       maskQuant                                 // Mask to scales Ku1/Msat cellwise.
 	Msat         func() float64     = Const(0)             // Saturation magnetization in A/m
 	Alpha        func() float64     = Const(0)             // Damping constant
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
@@ -20,6 +17,8 @@ var (
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
+	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
+	KuMask       maskQuant                                 // Mask to scales Ku1/Msat cellwise.
 	EnableDemag  bool               = true                 // enable/disable demag field
 )
 
@@ -195,25 +194,6 @@ func initialize() {
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
-}
-
-// Register function f to be called after every time step.
-// Typically used, e.g., to manipulate the magnetization.
-func PostStep(f func()) {
-	postStep = append(postStep, f)
-}
-
-func init() {
-	world.Func("PostStep", PostStep)
-}
-
-func step() {
-	Solver.Step()
-	for _, f := range postStep {
-		f()
-	}
-	s := Solver
-	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
 // Returns the mesh cell size in meters. E.g.:

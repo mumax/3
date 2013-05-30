@@ -1,9 +1,6 @@
 package engine
 
 // Utilities for setting magnetic configurations.
-// TODO: use [3][][][]float32, hide data.Slice API.
-// Requires careful ZYX translation.
-// TODO: already normalize them.
 
 import (
 	"code.google.com/p/mx3/data"

@@ -31,10 +31,22 @@ func (b *bufferedQuant) notifySave(goodstep bool) {
 
 // Replace the data by src. Auto rescales if needed.
 func (b *bufferedQuant) Set(src *data.Slice) {
+	b.init()
 	if src.Mesh().Size() != b.buffer.Mesh().Size() {
 		src = data.Resample(src, b.buffer.Mesh().Size())
 	}
 	data.Copy(b.buffer, src)
+}
+
+func (m *bufferedQuant) init() {
+	if m.isNil() {
+		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
+		cuda.Memset(m.buffer, 1, 1, 1)              // default value: all ones.
+	}
+}
+
+func (m *bufferedQuant) isNil() bool {
+	return m.buffer.DevPtr(0) == nil
 }
 
 // TODO: read(file)

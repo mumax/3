@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	cuda5 "github.com/barnex/cuda5/cuda"
 	"log"
 )
 
@@ -133,7 +132,7 @@ func initialize() {
 	})
 	Quants["B_uni"] = &B_uni
 
-	KuMask = *newMask(3, Mesh(), "kumask", "")
+	KuMask = mask(3, Mesh(), "kumask", "")
 	Quants["KuMask"] = &KuMask
 
 	// external field
@@ -241,10 +240,6 @@ func Nz() int { return GridSize()[Z] }
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
-	var zeromesh data.Mesh
-	if globalmesh != zeromesh {
-		free()
-	}
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
@@ -271,14 +266,6 @@ func setCellSize(cx, cy, cz float64) {
 	if gridsize != nil {
 		SetMesh(gridsize[0], gridsize[1], gridsize[2], cx, cy, cz)
 	}
-}
-
-// TODO: not perfectly OK yet.
-func free() {
-	log.Println("resetting gpu")
-	cuda5.DeviceReset() // does not seem to clear allocations
-	Init()
-	dlQue = nil
 }
 
 // check if mesh is set

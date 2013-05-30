@@ -17,6 +17,8 @@ type Getter interface {
 type Saver interface {
 	Getter
 	autoFname() string // file name for autosave
+	needSave() bool
+	saved()
 }
 
 // Download a quantity to host,
@@ -45,4 +47,12 @@ func Save(q Saver) {
 
 func SaveAs(q Getter, fname string) {
 	data.MustWriteFile(fname, Download(q), Time) // async would be nice
+}
+
+// notify that it may need to be saved.
+func notifySave(q Saver, goodstep bool) {
+	if goodstep && q.needSave() {
+		Save(q)
+		q.saved()
+	}
 }

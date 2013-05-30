@@ -16,7 +16,7 @@ func (f *fftm) init() {
 	f.name = "fftm"
 }
 
-func (q *fftm) Download() *data.Slice {
+func (q *fftm) Get() (quant *data.Slice, recycle bool) {
 	mesh := &demag_.FFTMesh
 	n := mesh.Size()
 	s := data.NewSlice(3, mesh)
@@ -27,27 +27,15 @@ func (q *fftm) Download() *data.Slice {
 		cuda.Mul(fft, fft, scale) // normalize fft
 		data.Copy(dst, fft)
 	}
-	return s
-}
-
-// notify that it may need to be saved.
-func (b *fftm) notifySave(goodstep bool) {
-	if goodstep && b.needSave() {
-		b.Save()
-		b.saved()
-	}
-}
-
-func (b *fftm) Save() {
-	data.MustWriteFile(b.autoFname(), b.Download(), Time)
+	return s, false
 }
 
 type fftmPower struct{}
 
 // Power of FFTM, used for display in web interface.
 // Frequencies in y shifted to center at 0/m.
-func (q *fftmPower) Download() *data.Slice {
-	fftm := FFTM.Download()
+func (q *fftmPower) Get() (*data.Slice, bool) {
+	fftm, _ := FFTM.Get()
 	n := fftm.Mesh().Size()
 	c := fftm.Mesh().CellSize()
 	m1 := data.NewMesh(n[0], n[1], n[2]/2, c[0], c[1], c[2])
@@ -66,7 +54,7 @@ func (q *fftmPower) Download() *data.Slice {
 			}
 		}
 	}
-	return power
+	return power, false
 }
 
 func sqr(x float32) float32  { return x * x }

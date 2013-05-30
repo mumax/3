@@ -18,14 +18,6 @@ func buffered(slice *data.Slice, name, unit string) bufferedQuant {
 	return bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice}
 }
 
-// notify that it may need to be saved.
-func (b *bufferedQuant) notifySave(cansave bool) {
-	if cansave && b.needSave() {
-		Save(b)
-		b.saved()
-	}
-}
-
 // get buffer (on GPU, no need to recycle)
 func (b *bufferedQuant) Get() (q *data.Slice, recycle bool) {
 	b.init()

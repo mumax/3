@@ -183,10 +183,10 @@ func initialize() {
 	// solver
 	torqueFn := func(cansave bool) *data.Slice {
 		itime++
-		Table.arm(cansave)    // if table output needed, quantities marked for update
-		M.notifySave(cansave) // saves m if needed
-		FFTM.notifySave(cansave)
-		ExchangeMask.notifySave(cansave)
+		Table.arm(cansave)      // if table output needed, quantities marked for update
+		notifySave(&M, cansave) // saves m if needed
+		notifySave(&FFTM, cansave)
+		notifySave(&ExchangeMask, cansave)
 
 		Torque.set(torquebuffer, cansave)
 

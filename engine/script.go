@@ -49,7 +49,9 @@ func init() {
 	world.Const("mu0", Mu0)
 
 	world.LValue("m", &M)
-	world.ROnly("B_demag", &B_demag)
+
+	B_demag_addr := &B_demag
+	world.ROnly("B_demag", &B_demag_addr)
 
 	fftmAddr := &FFTM
 	world.Var("FFTm", &fftmAddr)
@@ -79,6 +81,11 @@ func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+
+// needed only to make it callable from scripts
+//func (b *setterQuant) Eval() interface{}       { return b. }
+//func (b *setterQuant) Type() reflect.Type      { return reflect.TypeOf(new(setterQuant)) }
+//func (b *setterQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
 func (b *maskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }

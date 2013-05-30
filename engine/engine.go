@@ -28,15 +28,14 @@ var (
 var (
 	M                 magnetization // reduced magnetization (unit length)
 	FFTM              fftm          // FFT of M
-	AvgM              *scalar       // average magnetization
-	B_eff             *setterQuant  // effective field (T) output handle
-	B_demag           *setterQuant  // demag field (T) output handle
-	B_dmi             *adderQuant   // demag field (T) output handle
-	B_exch            *adderQuant   // exchange field (T) output handle
-	B_uni             *adderQuant   // field due to uniaxial anisotropy output handle
-	STTorque          *adderQuant   // spin-transfer torque output handle
-	LLGTorque, Torque *setterQuant  // torque/gamma0, in Tesla
-	Table             *DataTable    // output handle for tabular data (average magnetization etc.)
+	B_eff             setterQuant   // effective field (T) output handle
+	B_demag           setterQuant   // demag field (T) output handle
+	B_dmi             adderQuant    // demag field (T) output handle
+	B_exch            adderQuant    // exchange field (T) output handle
+	B_uni             adderQuant    // field due to uniaxial anisotropy output handle
+	STTorque          adderQuant    // spin-transfer torque output handle
+	LLGTorque, Torque setterQuant   // torque/gamma0, in Tesla
+	Table             DataTable     // output handle for tabular data (average magnetization etc.)
 	Time              float64       // time in seconds  // todo: hide? setting breaks autosaves
 	Solver            cuda.Heun
 	Geom              func(x, y, z float64) bool = func(x, y, z float64) bool { return true } // geometric stencil
@@ -94,46 +93,45 @@ func initialize() {
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
 
 	// data table
-	Table = newTable("datatable")
-	Table.Add(AvgM)
+	Table = *newTable("datatable")
 
 	// demag field
 	demag_ = cuda.NewDemag(Mesh())
-	B_demag = newSetter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
+	B_demag = *newSetter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		if EnableDemag {
 			demag_.Exec(b, M.buffer, vol, Mu0*Msat())
 		} else {
 			cuda.Zero(b)
 		}
 	})
-	Quants["B_demag"] = B_demag
+	Quants["B_demag"] = &B_demag
 
 	// exchange field
-	B_exch = newAdder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
+	B_exch = *newAdder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
-	Quants["B_exch"] = B_exch
+	Quants["B_exch"] = &B_exch
 
 	ExchangeMask = *newStaggeredMask(Mesh(), "exchangemask", "")
 	Quants["exchangemask"] = &ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
-	B_dmi = newAdder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
+	B_dmi = *newAdder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
 		}
 	})
-	Quants["B_dmi"] = B_dmi
+	Quants["B_dmi"] = &B_dmi
 
 	// uniaxial anisotropy
-	B_uni = newAdder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
+	B_uni = *newAdder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, KuMask.buffer, ku1[2], ku1[1], ku1[0], Msat())
 		}
 	})
-	Quants["B_uni"] = B_uni
+	Quants["B_uni"] = &B_uni
 
 	KuMask = *newMask(3, Mesh(), "kumask", "")
 	Quants["KuMask"] = &KuMask
@@ -149,24 +147,24 @@ func initialize() {
 	//Quants["B_ext"] = B_ext
 
 	// effective field
-	B_eff = newSetter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
+	B_eff = *newSetter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
 		B_dmi.addTo(dst, cansave)
 		B_uni.addTo(dst, cansave)
 		b_ext.addTo(dst, cansave)
 	})
-	Quants["B_eff"] = B_eff
+	Quants["B_eff"] = &B_eff
 
 	// llg torque
-	LLGTorque = newSetter(3, Mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
+	LLGTorque = *newSetter(3, Mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
-	Quants["llgtorque"] = LLGTorque
+	Quants["llgtorque"] = &LLGTorque
 
 	// spin-transfer torque
-	STTorque = newAdder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
+	STTorque = *newAdder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()
@@ -176,13 +174,13 @@ func initialize() {
 			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
 		}
 	})
-	Quants["sttorque"] = STTorque
+	Quants["sttorque"] = &STTorque
 
-	Torque = newSetter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
+	Torque = *newSetter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLGTorque.set(b, cansave)
 		STTorque.addTo(b, cansave)
 	})
-	Quants["torque"] = Torque
+	Quants["torque"] = &Torque
 
 	// solver
 	torqueFn := func(cansave bool) *data.Slice {

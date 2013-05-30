@@ -25,8 +25,6 @@ func Close() {
 
 	log.Println("shutting down")
 	drainOutput()
-	if Table != nil {
-		Table.flush()
-	}
+	Table.flush()
 	prof.Cleanup()
 }

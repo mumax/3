@@ -86,9 +86,9 @@ func initialize() {
 	// magnetization
 	M.init()
 	Quants["m"] = &M
-	AvgM = newScalar(3, "m", "", func() []float64 {
-		return average(&M)
-	})
+	//AvgM = newScalar(3, "m", "", func() []float64 {
+	//	return average(&M)
+	//})
 
 	FFTM.init()
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude

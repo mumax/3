@@ -32,7 +32,7 @@ func SetOD(od string, force bool) {
 		util.FatalErr(err, "create output directory:")
 		stat, err2 := os.Stat(wd)
 		util.FatalErr(err2, "create output directory:")
-		util.LogErr(os.Mkdir(od, stat.Mode())) // already exists is OK
+		_ = os.Mkdir(od, stat.Mode()) // already exists is OK
 	}
 
 	// fail on non-empty OD

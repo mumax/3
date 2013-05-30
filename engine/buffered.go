@@ -11,14 +11,14 @@ import (
 type bufferedQuant struct {
 	autosave
 	buffer *data.Slice
-	shiftc [3]int  // shift count (total shifted cells in each direction)
-	shift  *scalar // returns total shift in meters.
+	shiftc [3]int // shift count (total shifted cells in each direction)
+	//shift  *scalar // returns total shift in meters.
 }
 
-func newBuffered(slice *data.Slice, name, unit string) *bufferedQuant {
-	b := &bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}, nil}
-	b.shift = newScalar(3, name+"_shift", "m", b.getShift)
-	return b
+func buffered(slice *data.Slice, name, unit string) bufferedQuant {
+	return bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}}
+	//b.shift = newScalar(3, name+"_shift", "m", b.getShift)
+	//return b
 }
 
 // notify that it may need to be saved.
@@ -37,18 +37,19 @@ func (b *bufferedQuant) Set(src *data.Slice) {
 	data.Copy(b.buffer, src)
 }
 
-func (b *bufferedQuant) SetFile(fname string) {
-	util.FatalErr(b.setFile(fname))
-}
+// TODO: read(file)
+//func (b *bufferedQuant) SetFile(fname string) {
+//	util.FatalErr(b.setFile(fname))
+//}
 
-func (b *bufferedQuant) setFile(fname string) error {
-	m, _, err := data.ReadFile(fname)
-	if err != nil {
-		return err
-	}
-	b.Set(m)
-	return nil
-}
+//func (b *bufferedQuant) setFile(fname string) error {
+//	m, _, err := data.ReadFile(fname)
+//	if err != nil {
+//		return err
+//	}
+//	b.Set(m)
+//	return nil
+//}
 
 //
 func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
@@ -80,9 +81,9 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 }
 
 // total shift in meters
-func (b *bufferedQuant) ShiftDistance() *scalar {
-	return b.shift
-}
+//func (b *bufferedQuant) ShiftDistance() *scalar {
+//	return b.shift
+//}
 
 // returns shift of simulation window in m
 func (b *bufferedQuant) getShift() []float64 {

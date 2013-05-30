@@ -12,7 +12,7 @@ type maskQuant struct {
 
 func newMask(nComp int, m *data.Mesh, name, unit string) *maskQuant {
 	slice := data.NilSlice(nComp, m)
-	return &maskQuant{*newBuffered(slice, name, unit)}
+	return &maskQuant{buffered(slice, name, unit)}
 }
 
 // Set the value of all cell faces with their normal along direction. E.g.:

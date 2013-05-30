@@ -12,7 +12,7 @@ type magnetization struct {
 }
 
 func (q *magnetization) init() {
-	q.bufferedQuant = *newBuffered(cuda.NewSlice(3, Mesh()), "m", "")
+	q.bufferedQuant = buffered(cuda.NewSlice(3, Mesh()), "m", "")
 }
 
 func (b *magnetization) Set(src *data.Slice) {

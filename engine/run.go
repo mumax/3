@@ -33,6 +33,7 @@ func Paused() bool {
 
 func init() {
 	world.Func("pause", Pause)
+	world.Func("PostStep", PostStep)
 }
 
 // Runs as long as condition returns true.
@@ -56,10 +57,6 @@ func RunCond(condition func() bool) {
 // Typically used, e.g., to manipulate the magnetization.
 func PostStep(f func()) {
 	postStep = append(postStep, f)
-}
-
-func init() {
-	world.Func("PostStep", PostStep)
 }
 
 func step() {

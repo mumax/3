@@ -21,7 +21,6 @@ func init() {
 	world.Func("run", Run)
 	world.Func("steps", Steps)
 
-	world.Func("autosave", doAutosave)
 	world.Func("savetable", doSaveTable)
 
 	world.Func("average", Average)
@@ -93,16 +92,6 @@ func (b *staggeredMaskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *staggeredMaskQuant) Eval() interface{}       { return b }
 func (b *staggeredMaskQuant) Type() reflect.Type      { return reflect.TypeOf(new(staggeredMaskQuant)) }
 func (b *staggeredMaskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
-
-type Autosave interface {
-	Autosave(period float64)
-}
-
-func doAutosave(what Autosave, period float64) {
-	what.Autosave(period)
-}
-
-//func doSave(what ...
 
 func doSaveTable(period float64) {
 	Table.Autosave(period)

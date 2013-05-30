@@ -59,6 +59,20 @@ func SaveAs(q Getter, fname string) {
 	}
 }
 
+type Autosaver interface {
+	Autosave(period float64)
+}
+
+func Autosave(what Autosaver, period float64) {
+	what.Autosave(period)
+}
+
+func init() {
+	world.Func("save", Save)
+	world.Func("saveas", SaveAs)
+	world.Func("autosave", Autosave)
+}
+
 // notify that it may need to be saved.
 func notifySave(q Saver, goodstep bool) {
 	if goodstep && q.needSave() {

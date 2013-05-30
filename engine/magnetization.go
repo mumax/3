@@ -15,6 +15,7 @@ func (q *magnetization) init() {
 	q.bufferedQuant = buffered(cuda.NewSlice(3, Mesh()), "m", "")
 }
 
+// overrides normal set to allow stencil ops
 func (b *magnetization) Set(src *data.Slice) {
 	if src.Mesh().Size() != b.buffer.Mesh().Size() {
 		src = data.Resample(src, b.buffer.Mesh().Size())

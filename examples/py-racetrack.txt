@@ -1,9 +1,7 @@
-/*
-	In this example we drive a vortex wall in Permalloy by spin-transfer torque.
-	We set up a post-step function that makes the simulation box "follow" the domain
-	wall. By removing surface charges at the left and right ends, we mimic an infintely
-	long wire.
-*/
+// In this example we drive a vortex wall in Permalloy by spin-transfer torque.
+// We set up a post-step function that makes the simulation box "follow" the domain
+// wall. By removing surface charges at the left and right ends, we mimic an infintely
+// long wire.
 
 // Geometry
 	setgridsize(256, 64, 1)

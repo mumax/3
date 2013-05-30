@@ -1,9 +1,7 @@
-/*
-	In this example we drive a domain wall in PMA material by spin-transfer torque.
-	We set up a post-step function that makes the simulation box "follow" the domain
-	wall. Like this, only a small number of cells is needed to simulate an infinitely
-	long magnetic wire.
-*/
+// In this example we drive a domain wall in PMA material by spin-transfer torque.
+// We set up a post-step function that makes the simulation box "follow" the domain
+// wall. Like this, only a small number of cells is needed to simulate an infinitely
+// long magnetic wire.
 
 
 // Geometry

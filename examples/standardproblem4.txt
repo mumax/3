@@ -1,7 +1,5 @@
-/*
-	Micromagnetic standard problem 4 (a) according to
-	http://www.ctcms.nist.gov/~rdm/mumag.org.html
-*/
+// Micromagnetic standard problem 4 (a) according to
+// http://www.ctcms.nist.gov/~rdm/mumag.org.html
 
 // geometry
 	setgridsize(128, 32, 1)

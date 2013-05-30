@@ -46,7 +46,17 @@ func Save(q Saver) {
 }
 
 func SaveAs(q Getter, fname string) {
-	data.MustWriteFile(fname, Download(q), Time) // async would be nice
+	if s, ok := q.(GPU_Getter); ok {
+		buffer, recylce := s.GetGPU()
+		if recylce {
+			defer cuda.RecycleBuffer(buffer)
+		}
+		goSaveCopy(fname, buffer, Time)
+	} else {
+		h, recycle := q.Get()
+		util.Assert(recycle == false)
+		data.MustWriteFile(fname, h, Time) // not async, but only for stuff already on CPU. could be improved
+	}
 }
 
 // notify that it may need to be saved.

@@ -14,7 +14,6 @@
 
 // output
 	savetable(10e-12)
-	autosave(m, 50e-12)
 
 // relax
 	alpha = 3
@@ -25,6 +24,7 @@
 	expect("mz", m_[2], 0,       1e-3)
 
 // reversal
+	autosave(m, 20e-12)
 	alpha = 0.02
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)

@@ -108,12 +108,3 @@ func drainOutput() {
 		<-done
 	}
 }
-
-// Save once, with given file name.
-func saveAs(s GPU_Getter, fname string) {
-	buffer, recylce := s.GetGPU()
-	if recylce {
-		defer cuda.RecycleBuffer(buffer)
-	}
-	goSaveCopy(fname, buffer, Time)
-}

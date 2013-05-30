@@ -107,7 +107,7 @@ func initialize() {
 	Quants["B_demag"] = &B_demag
 
 	// exchange field
-	B_exch = *newAdder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
+	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
 	Quants["B_exch"] = &B_exch
@@ -116,7 +116,7 @@ func initialize() {
 	Quants["exchangemask"] = &ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
-	B_dmi = *newAdder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
+	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
 		d := DMI()
 		if d != 0 {
 			cuda.AddDMI(dst, M.buffer, d, Msat())
@@ -125,7 +125,7 @@ func initialize() {
 	Quants["B_dmi"] = &B_dmi
 
 	// uniaxial anisotropy
-	B_uni = *newAdder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
+	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		ku1 := Ku1() // in J/m3
 		if ku1 != [3]float64{0, 0, 0} {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, KuMask.buffer, ku1[2], ku1[1], ku1[0], Msat())
@@ -137,7 +137,7 @@ func initialize() {
 	Quants["KuMask"] = &KuMask
 
 	// external field
-	b_ext := newAdder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {
+	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {
 		bext := B_ext()
 		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
 		for _, f := range extFields {
@@ -164,7 +164,7 @@ func initialize() {
 	Quants["llgtorque"] = &LLGTorque
 
 	// spin-transfer torque
-	STTorque = *newAdder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
+	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
 		j := J()
 		if j != [3]float64{0, 0, 0} {
 			p := SpinPol()

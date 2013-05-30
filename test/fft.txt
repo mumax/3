@@ -1,0 +1,10 @@
+/*
+	Test output of FFT(m)
+*/
+
+	setgridsize(100, 50, 2)
+	setcellsize(1e-9, 2e-9, 3e-9)
+
+	m = vortex(1, 1)
+
+	//save(mFFT)

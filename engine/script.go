@@ -83,11 +83,6 @@ func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(buf
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
-//func (b *setterQuant) Eval() interface{}       { return b. }
-//func (b *setterQuant) Type() reflect.Type      { return reflect.TypeOf(new(setterQuant)) }
-//func (b *setterQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
-
-// needed only to make it callable from scripts
 func (b *maskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *maskQuant) Eval() interface{}       { return b }
 func (b *maskQuant) Type() reflect.Type      { return reflect.TypeOf(new(maskQuant)) }
@@ -99,11 +94,15 @@ func (b *staggeredMaskQuant) Eval() interface{}       { return b }
 func (b *staggeredMaskQuant) Type() reflect.Type      { return reflect.TypeOf(new(staggeredMaskQuant)) }
 func (b *staggeredMaskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
-func doAutosave(what interface {
-	Autosave(float64)
-}, period float64) {
+type Autosave interface {
+	Autosave(period float64)
+}
+
+func doAutosave(what Autosave, period float64) {
 	what.Autosave(period)
 }
+
+//func doSave(what ...
 
 func doSaveTable(period float64) {
 	Table.Autosave(period)

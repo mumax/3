@@ -12,8 +12,8 @@ type adderQuant struct {
 	addFn func(dst *data.Slice) // calculates quantity and add result to dst
 }
 
-func newAdder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Slice)) *adderQuant {
-	return &adderQuant{newAutosave(nComp, name, unit, m), addFunc}
+func adder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Slice)) adderQuant {
+	return adderQuant{newAutosave(nComp, name, unit, m), addFunc}
 }
 
 // Calls the addFunc to add the quantity to Dst. If output is needed,

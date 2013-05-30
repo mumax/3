@@ -96,7 +96,7 @@ func initialize() {
 
 	// demag field
 	demag_ = cuda.NewDemag(Mesh())
-	B_demag = *newSetter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
+	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		if EnableDemag {
 			demag_.Exec(b, M.buffer, vol, Mu0*Msat())
 		} else {
@@ -111,7 +111,7 @@ func initialize() {
 	})
 	Quants["B_exch"] = &B_exch
 
-	ExchangeMask = *newStaggeredMask(Mesh(), "exchangemask", "")
+	ExchangeMask = staggeredMask(Mesh(), "exchangemask", "")
 	Quants["exchangemask"] = &ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
@@ -146,7 +146,7 @@ func initialize() {
 	//Quants["B_ext"] = B_ext
 
 	// effective field
-	B_eff = *newSetter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
+	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
 		B_dmi.addTo(dst, cansave)
@@ -156,7 +156,7 @@ func initialize() {
 	Quants["B_eff"] = &B_eff
 
 	// llg torque
-	LLGTorque = *newSetter(3, Mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
+	LLGTorque = setter(3, Mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
 	})
@@ -175,7 +175,7 @@ func initialize() {
 	})
 	Quants["sttorque"] = &STTorque
 
-	Torque = *newSetter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
+	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLGTorque.set(b, cansave)
 		STTorque.addTo(b, cansave)
 	})

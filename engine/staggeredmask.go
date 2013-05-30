@@ -13,8 +13,8 @@ type staggeredMaskQuant struct {
 	maskQuant
 }
 
-func newStaggeredMask(m *data.Mesh, name, unit string) *staggeredMaskQuant {
-	return &staggeredMaskQuant{mask(3, m, name, unit)}
+func staggeredMask(m *data.Mesh, name, unit string) staggeredMaskQuant {
+	return staggeredMaskQuant{mask(3, m, name, unit)}
 }
 
 // Sets the value at the "lower/left" face of cell(ix, iy, iz). E.g.:

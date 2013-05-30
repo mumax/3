@@ -13,8 +13,8 @@ type setterQuant struct {
 	setFn func(dst *data.Slice, good bool) // calculates quantity and stores in dst
 }
 
-func newSetter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice, good bool)) *setterQuant {
-	return &setterQuant{nComp, m, autosave{name: name}, setFunc}
+func setter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice, good bool)) setterQuant {
+	return setterQuant{nComp, m, autosave{name: name}, setFunc}
 }
 
 // calculate quantity, save in dst, notify output may be needed

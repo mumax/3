@@ -6,14 +6,14 @@ GPU hardware and driver
 
 You need a CUDA-capable NVIDIA GPU with compute capability 2.0 or higher. An nvidia-provided driver has to be used. Ubuntu users can run:
  	sudo apt-get install nvidia-current
-Or the driver can be downloaded from nvidia's website.
+Or the driver can be downloaded from nvidia's website (see below).
 
 
 CUDA toolkit
 
 For running the pre-compiled mx3 binary, you need install the CUDA toolkit. Ubuntu users can run:
  	sudo apt-get install nvidia-cuda-toolkit
-Or the toolkit can be downloaded from nvidia's website.
+Or the toolkit can be downloaded from nvidia's website https://developer.nvidia.com/cuda-downloads (toolkit download also includes driver).
 
 
 
@@ -22,30 +22,14 @@ Getting started
 Running an input script:
  	mx3 myscript.txt
 
-Example script (standard problem 4):
- 	setgridsize(128, 32, 1)
- 	setcellsize(500e-9/128, 125e-9/32, 3e-9)
-
- 	alpha = 0.02
- 	msat  = 800e3
- 	aex   = 13e-12
- 	m     = uniform(1, .1, 0)
- 	b_ext = vector(-24.6E-3, 4.3E-3, 0)
-
- 	savetable(10e-12)
- 	autosave(m, 50e-12)
-
- 	run(1e-9)
-
- 	print("final m:", average(m))
-
-See package "examples" for more examples.
-
+Example scripts can be found in the examples/ subdirectory, or on http://godoc.org/code.google.com/p/mx3/examples.
 Also, more advanced input scripts can be written in Go. See package "engine".
 
 Scripts can be checked for errors without running them with:
  	mx3 -vet script1.txt script2.txt ...
 
+To find out all mx3 command line flags, run:
+ 	mx3 -help
 
 
 Web interface
@@ -53,6 +37,11 @@ Web interface
 While the simulation is running, you can visualize and manipulate it from your browser. Default is:
  	http://localhost:35367
 The -http flag can select an other port.
+
+
+Output
+
+All output is saved in a '.out' directory with the same base name as your input file (can be overridden by -o flag). Vector data is stored in an efficient binary 'dump' format that can be converted with the mx3-convert tool. See tools/mx3-convert or http://godoc.org/code.google.com/p/mx3/tools/mx3-convert.
 
 
 Recompiling

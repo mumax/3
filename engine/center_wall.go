@@ -5,7 +5,7 @@ import "fmt"
 // This post-step function centers the simulation window on a domain wall between up-down (or down-up) domains (like in perpendicular media). E.g.:
 // 	PostStep(CenterPMAWall)
 func CenterPMAWall() {
-	mz := M.Average()[Z]           // TODO: optimize
+	mz := Average(&M)[Z]           // TODO: optimize
 	tolerance := 4 / float64(Nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
@@ -22,7 +22,7 @@ func CenterPMAWall() {
 // This post-step function centers the simulation window on a domain wall between left-right (or right-left) domains (like in soft thin films). E.g.:
 // 	PostStep(CenterInplaneWall)
 func CenterInplaneWall() {
-	mz := M.Average()[X]           // TODO: optimize
+	mz := Average(&M)[X]           // TODO: optimize
 	tolerance := 4 / float64(Nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
@@ -50,3 +50,9 @@ func wall_left_magnetization(x float64) int {
 	}
 	panic(fmt.Errorf("center wall: unclear in which direction to shift: magnetization at border=%v", x))
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

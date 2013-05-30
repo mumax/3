@@ -24,7 +24,7 @@ func init() {
 	world.Func("autosave", doAutosave)
 	world.Func("savetable", doSaveTable)
 
-	world.Func("average", average)
+	world.Func("average", Average)
 
 	world.Var("t", &Time)
 	world.Var("aex", &Aex)

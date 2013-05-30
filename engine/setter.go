@@ -13,6 +13,7 @@ type setterQuant struct {
 	setFn func(dst *data.Slice, good bool) // calculates quantity and stores in dst
 }
 
+// constructor
 func setter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice, good bool)) setterQuant {
 	return setterQuant{nComp, m, autosave{name: name}, setFunc}
 }
@@ -26,15 +27,14 @@ func (b *setterQuant) set(dst *data.Slice, goodstep bool) {
 	}
 }
 
-func (b *setterQuant) GetSlice() (*data.Slice, bool) {
+// get the quantity, recycle will be true (q needs to be recycled)
+func (b *setterQuant) GetGPU() (q *data.Slice, recycle bool) {
 	buffer := cuda.GetBuffer(b.nComp, b.mesh)
 	b.set(buffer, false)
 	return buffer, true // must recycle
 }
 
-func (b *setterQuant) Download() *data.Slice {
-	buffer := cuda.GetBuffer(b.nComp, b.mesh)
-	defer cuda.RecycleBuffer(buffer)
-	b.set(buffer, false)
-	return buffer.HostCopy()
+// get the quantity, recycle will be true, q will be on GPU
+func (b *setterQuant) Get() (*data.Slice, bool) {
+	return b.GetGPU()
 }

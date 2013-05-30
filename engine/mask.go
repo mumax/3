@@ -21,16 +21,3 @@ func (m *maskQuant) SetAll(component int, value float64) {
 	m.init()
 	cuda.Memset(m.buffer.Comp(util.SwapIndex(component, 3)), float32(value))
 }
-
-//func (m *maskQuant) Set(src *data.Slice) {
-//	m.bufferedQuant.Set(src)
-//}
-
-func (m *maskQuant) Download() *data.Slice {
-	if m.isNil() {
-		s := data.NewSlice(m.NComp(), m.mesh)
-		return s // TODO: memset 1s?
-	} else {
-		return m.buffer.HostCopy()
-	}
-}

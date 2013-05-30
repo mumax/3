@@ -13,6 +13,7 @@ type bufferedQuant struct {
 	buffer *data.Slice
 }
 
+// constructor
 func buffered(slice *data.Slice, name, unit string) bufferedQuant {
 	return bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice}
 }
@@ -25,7 +26,15 @@ func (b *bufferedQuant) notifySave(cansave bool) {
 	}
 }
 
+// get buffer (on GPU, no need to recycle)
 func (b *bufferedQuant) Get() (q *data.Slice, recycle bool) {
+	b.init()
+	return b.buffer, false
+}
+
+// get buffer (on GPU, no need to recycle)
+func (b *bufferedQuant) GetGPU() (q *data.Slice, recycle bool) {
+	b.init()
 	return b.buffer, false
 }
 
@@ -38,17 +47,7 @@ func (b *bufferedQuant) Set(src *data.Slice) {
 	data.Copy(b.buffer, src)
 }
 
-func (m *bufferedQuant) init() {
-	if m.isNil() {
-		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
-		cuda.Memset(m.buffer, 1, 1, 1)              // default value for mask.
-	}
-}
-
-func (m *bufferedQuant) isNil() bool {
-	return m.buffer.DevPtr(0) == nil
-}
-
+// Set the value of one cell.
 func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 	b.init()
 	nComp := b.NComp()
@@ -58,6 +57,7 @@ func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 	}
 }
 
+// Get the value of one cell
 func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 	b.init()
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
@@ -67,6 +67,7 @@ func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
 func (b *bufferedQuant) Shift(shx, shy, shz int) {
+	b.init()
 	m2 := cuda.GetBuffer(1, b.buffer.Mesh())
 	defer cuda.RecycleBuffer(m2)
 	for c := 0; c < b.NComp(); c++ {
@@ -76,26 +77,11 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 	}
 }
 
-// Get a host copy.
-// TODO: assume it can be called from another thread,
-// transfer asynchronously + sync
-func (b *bufferedQuant) Download() *data.Slice {
-	return b.buffer.HostCopy()
+// Allocate buffer data (on GPU) if not yet done so.
+// Used by masks, who are not allocated before needed.
+func (m *bufferedQuant) init() {
+	if m.buffer.DevPtr(0) == nil {
+		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
+		cuda.Memset(m.buffer, 1, 1, 1)              // default value for mask.
+	}
 }
-
-func (b *bufferedQuant) GetSlice() (s *data.Slice, recycle bool) {
-	return b.buffer, false
-}
-func (b *bufferedQuant) Average() []float64 {
-	return average(b)
-}
-
-func (b *bufferedQuant) getGPU() (s *data.Slice, mustRecycle bool) {
-	return b.buffer, false
-}
-
-const (
-	X = 0
-	Y = 1
-	Z = 2
-)

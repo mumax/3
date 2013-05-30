@@ -71,7 +71,7 @@ type extField struct {
 }
 
 // maps quantity names to downloadable data. E.g. for rendering
-var Quants = make(map[string]Quant)
+var Quants = make(map[string]interface{}) // TODO !!!
 
 func initialize() {
 

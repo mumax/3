@@ -11,22 +11,22 @@ import (
 type bufferedQuant struct {
 	autosave
 	buffer *data.Slice
-	shiftc [3]int // shift count (total shifted cells in each direction)
-	//shift  *scalar // returns total shift in meters.
 }
 
 func buffered(slice *data.Slice, name, unit string) bufferedQuant {
-	return bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice, [3]int{}}
-	//b.shift = newScalar(3, name+"_shift", "m", b.getShift)
-	//return b
+	return bufferedQuant{newAutosave(slice.NComp(), name, unit, slice.Mesh()), slice}
 }
 
 // notify that it may need to be saved.
-func (b *bufferedQuant) notifySave(goodstep bool) {
-	if goodstep && b.needSave() {
-		b.Save()
+func (b *bufferedQuant) notifySave(cansave bool) {
+	if cansave && b.needSave() {
+		Save(b)
 		b.saved()
 	}
+}
+
+func (b *bufferedQuant) Get() (q *data.Slice, recycle bool) {
+	return b.buffer, false
 }
 
 // Replace the data by src. Auto rescales if needed.
@@ -41,7 +41,7 @@ func (b *bufferedQuant) Set(src *data.Slice) {
 func (m *bufferedQuant) init() {
 	if m.isNil() {
 		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
-		cuda.Memset(m.buffer, 1, 1, 1)              // default value: all ones.
+		cuda.Memset(m.buffer, 1, 1, 1)              // default value for mask.
 	}
 }
 
@@ -49,22 +49,8 @@ func (m *bufferedQuant) isNil() bool {
 	return m.buffer.DevPtr(0) == nil
 }
 
-// TODO: read(file)
-//func (b *bufferedQuant) SetFile(fname string) {
-//	util.FatalErr(b.setFile(fname))
-//}
-
-//func (b *bufferedQuant) setFile(fname string) error {
-//	m, _, err := data.ReadFile(fname)
-//	if err != nil {
-//		return err
-//	}
-//	b.Set(m)
-//	return nil
-//}
-
-//
 func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
+	b.init()
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
@@ -73,6 +59,7 @@ func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 }
 
 func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
+	b.init()
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
 }
 
@@ -82,25 +69,11 @@ func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 func (b *bufferedQuant) Shift(shx, shy, shz int) {
 	m2 := cuda.GetBuffer(1, b.buffer.Mesh())
 	defer cuda.RecycleBuffer(m2)
-	b.shiftc[X] += shx
-	b.shiftc[Y] += shy
-	b.shiftc[Z] += shz
 	for c := 0; c < b.NComp(); c++ {
 		comp := b.buffer.Comp(c)
 		cuda.Shift(m2, comp, [3]int{shz, shy, shx}) // ZYX !
 		data.Copy(comp, m2)
 	}
-}
-
-// total shift in meters
-//func (b *bufferedQuant) ShiftDistance() *scalar {
-//	return b.shift
-//}
-
-// returns shift of simulation window in m
-func (b *bufferedQuant) getShift() []float64 {
-	c := b.mesh.CellSize()
-	return []float64{-c[2] * float64(b.shiftc[0]), -c[1] * float64(b.shiftc[1]), -c[0] * float64(b.shiftc[2])}
 }
 
 // Get a host copy.
@@ -115,10 +88,6 @@ func (b *bufferedQuant) GetSlice() (s *data.Slice, recycle bool) {
 }
 func (b *bufferedQuant) Average() []float64 {
 	return average(b)
-}
-
-func (b *bufferedQuant) Save() {
-	saveAs(b, b.autoFname())
 }
 
 func (b *bufferedQuant) getGPU() (s *data.Slice, mustRecycle bool) {

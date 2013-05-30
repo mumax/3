@@ -100,13 +100,13 @@ func (w *scope) resolve(pos token.Pos, name string) Expr {
 	}
 }
 
-func (w *World) enterScope() {
+func (w *World) EnterScope() {
 	par := w.scope
 	w.scope = new(scope)
 	w.scope.parent = par
 }
 
-func (w *World) exitScope() {
+func (w *World) ExitScope() {
 	w.scope = w.scope.parent
 	if w.scope == nil { // went above toplevel
 		panic("bug")

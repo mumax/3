@@ -53,7 +53,7 @@ func init() {
 	world.ROnly("B_demag", &B_demag_addr)
 
 	fftmAddr := &FFTM
-	world.Var("FFTm", &fftmAddr)
+	world.ROnly("mFFT", &fftmAddr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 	world.LValue("AnisotropyMask", &KuMask)
@@ -72,6 +72,8 @@ func expect(msg string, have, want, maxError float64) {
 }
 
 func Compile(src string) (script.Expr, error) {
+	world.EnterScope() // file-level scope
+	defer world.ExitScope()
 	return world.Compile(src)
 }
 

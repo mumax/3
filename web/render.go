@@ -1,20 +1,19 @@
 package web
 
 import (
-	//"code.google.com/p/mx3/data"
-	//"code.google.com/p/mx3/draw"
-	//"code.google.com/p/mx3/engine"
-	//"image/jpeg"
-	//"log"
+	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/draw"
+	"code.google.com/p/mx3/engine"
+	"image/jpeg"
+	"log"
 	"net/http"
-	//"strings"
+	"strings"
 )
 
 // Render image of quantity.
 // Accepts url: /render/name and /render/name/component
 func render(w http.ResponseWriter, r *http.Request) {
-	panic("uncomment")
-	/*url := r.URL.Path[len("/render/"):]
+	url := r.URL.Path[len("/render/"):]
 	words := strings.Split(url, "/")
 	quant := words[0]
 	comp := ""
@@ -38,7 +37,6 @@ func render(w http.ResponseWriter, r *http.Request) {
 		img := draw.Image(d, "auto", "auto")
 		jpeg.Encode(w, img, &jpeg.Options{Quality: 100})
 	}
-	*/
 }
 
 var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space

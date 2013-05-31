@@ -40,3 +40,7 @@ func (a *adderQuant) GetGPU() (q *data.Slice, recycle bool) {
 	a.addFn(buf)
 	return buf, true
 }
+
+func (a *adderQuant) Get() (q *data.Slice, recycle bool) {
+	return a.GetGPU()
+}

@@ -29,7 +29,7 @@ func render(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var d *data.Slice
 		// TODO: could download only needed component
-		engine.InjectAndWait(func() { d = h.Download() })
+		engine.InjectAndWait(func() { d = engine.Download(h) })
 		if comp != "" && d.NComp() > 1 {
 			c := compstr[comp]
 			d = d.Comp(c)

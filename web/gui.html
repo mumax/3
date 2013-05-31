@@ -150,8 +150,8 @@
 <a id=hide onclick="toggle('div_1');"> Initialize <br/></a> 
 <div id=div_1>
 <table>
-	<tr><script> rpcCall("setGridSize", [128, 32, 1], "err_1");        </script> <td>(cells)</td> </tr>
-	<tr><script> rpcCall("setCellSize", [3e-9, 3e-9, 5e-9], "err_1");  </script> <td>(m)    </td> </tr>
+	<tr><script> rpcCall("setGridSize", [{{index .Mesh.Size 2}}, {{index .Mesh.Size 1}}, {{index .Mesh.Size 0}}], "err_1");        </script> <td>(cells)</td> </tr>
+	<tr><script> rpcCall("setCellSize", [{{index .Mesh.CellSize 2}}, {{index .Mesh.CellSize 1}}, {{index .Mesh.CellSize 0}}], "err_1");  </script> <td>(m)    </td> </tr>
 	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"], "err_1");           </script>  </tr>
 	<tr><script> rpcSet("geom", ["rect()"], "err_1");                  </script>  </tr>
 </table>

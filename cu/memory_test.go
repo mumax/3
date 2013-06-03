@@ -14,12 +14,7 @@ func TestMalloc(t *testing.T) {
 	}
 	for i := 0; i < 1024; i++ {
 		pointer := MemAlloc(16 * 1024 * 1024)
-		MemFree(&pointer)
-	}
-	for i := 0; i < 1024; i++ {
-		pointer := MemAlloc(16 * 1024 * 1024)
-		MemFree(&pointer)
-		pointer.Free()
+		MemFree(pointer)
 	}
 }
 

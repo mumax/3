@@ -78,16 +78,21 @@ func Compile(src string) (script.Expr, error) {
 }
 
 // needed only to make it callable from scripts
+func (b *magnetization) SetValue(v interface{}) { b.Set(v.(*data.Slice)) }
+
+// needed only to make it callable from scripts
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
-func (b *maskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
-func (b *maskQuant) Eval() interface{}       { return b }
-func (b *maskQuant) Type() reflect.Type      { return reflect.TypeOf(new(maskQuant)) }
-func (b *maskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
+func (b *maskQuant) SetValue(v interface{}) { b.Set(v.(*data.Slice)) }
+
+//func (b *maskQuant) Eval() interface{}       { return b }
+func (b *maskQuant) Type() reflect.Type { return reflect.TypeOf(new(maskQuant)) }
+
+//func (b *maskQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 // needed only to make it callable from scripts
 func (b *staggeredMaskQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }

@@ -72,7 +72,7 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 // Allocate buffer data (on GPU) if not yet done so.
 // Used by masks, who are not allocated before needed.
 func (m *bufferedQuant) alloc() {
-	if m.buffer.DevPtr(0) == nil {
+	if m.buffer.IsNil() {
 		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
 		cuda.Memset(m.buffer, ones(m.NComp())...)   // default value for mask.
 	}

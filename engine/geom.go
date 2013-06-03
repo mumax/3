@@ -6,20 +6,23 @@ import (
 
 type geom struct {
 	maskQuant
+	host *data.Slice // host copy of maskQuant
 }
 
-func (q *geom) init() {
-	q.maskQuant = mask(1, Mesh(), "geom", "")
+func (g *geom) init() {
+	g.maskQuant = mask(1, Mesh(), "geom", "")
 }
 
-func (q *geom) SetFunc(f func(x, y, z float64) bool) {
-	q.alloc()
+func (g *geom) SetFunc(f func(x, y, z float64) bool) {
+	g.alloc()
+	if g.host == nil {
+		g.host = hostBuf(1, g.Mesh())
+	}
 
-	h := hostBuf(1, q.Mesh())
-	l := h.Scalars()
+	l := g.host.Scalars()
 
-	n := q.Mesh().Size()
-	c := q.Mesh().CellSize()
+	n := g.Mesh().Size()
+	c := g.Mesh().CellSize()
 	dx := (float64(n[2]/2) - 0.5) * c[2]
 	dy := (float64(n[1]/2) - 0.5) * c[1]
 	dz := (float64(n[0]/2) - 0.5) * c[0]
@@ -40,8 +43,8 @@ func (q *geom) SetFunc(f func(x, y, z float64) bool) {
 		}
 	}
 
-	data.Copy(q.buffer, h)
-	//magnetization.stencil(h) ...
+	data.Copy(g.buffer, g.host)
+	M.stencil(g.host)
 }
 
 func HalfSpace() func(x, y, z float64) bool {

@@ -77,17 +77,13 @@ func initialize() {
 	// these 2 GPU arrays are re-used to stored various quantities.
 	torquebuffer = cuda.NewSlice(3, Mesh())
 
-	// cell volumes currently unused
-	//vol.init()
-	//vol.SetFunc(Ellipsoid(50e-9, 200e-9, 999)) // DEBUG
-	//Quants["geom"] = &vol
-
 	// magnetization
 	M.init()
 	Quants["m"] = &M
-	//AvgM = newScalar(3, "m", "", func() []float64 {
-	//	return average(&M)
-	//})
+
+	// cell volumes
+	vol.init()
+	Quants["geom"] = &vol
 
 	FFTM.init()
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude

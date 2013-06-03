@@ -293,3 +293,11 @@ func (f *Slice) Tensors() [][][][]float32 {
 	}
 	return tensors
 }
+
+// IsNil returns true if either s is nil or s.pointer[0] == nil
+func (s *Slice) IsNil() bool {
+	if s == nil {
+		return true
+	}
+	return s.ptr_[0] == nil
+}

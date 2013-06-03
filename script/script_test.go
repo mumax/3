@@ -55,6 +55,15 @@ func TestTypes(t *testing.T) {
 	w.MustExec("printInt(7)")
 }
 
+func TestScope(t *testing.T) {
+	w := NewWorld()
+	w.MustEval("sin(0)")
+	w.EnterScope()
+	w.MustEval("sin(0)")
+	w.ExitScope()
+	w.MustEval("sin(0)")
+}
+
 func BenchmarkEval1(b *testing.B) {
 	b.StopTimer()
 	w := NewWorld()
@@ -78,8 +87,7 @@ func BenchmarkEval1_native(bench *testing.B) {
 func BenchmarkEval2(b *testing.B) {
 	b.StopTimer()
 	w := NewWorld()
-	//w.LoadMath()
-	code := w.MustCompileExpr("sin(cos(tan(log(sqrt(1)))))")
+	code := w.MustCompileExpr("sin(cos(tan(log(sqrt(exp(1))))))")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		code.Eval()
@@ -90,7 +98,7 @@ func BenchmarkEval2_native(bench *testing.B) {
 	var a float64
 	b := 1.
 	for i := 0; i < bench.N; i++ {
-		a += math.Sin(math.Cos(math.Tan(math.Log(math.Sqrt(b)))))
+		a += math.Sin(math.Cos(math.Tan(math.Log(math.Sqrt(math.Exp(b))))))
 	}
 	if a == 1.23456 {
 		panic("make sure result is used")

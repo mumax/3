@@ -1,9 +1,6 @@
 bugs:
 -----
 
-use cuda.OnFree throughout: setmesh memleak
-saving staggeredmask fails if not initialized first
-shifting staggeredmask fails if not initialized first
 
 improvements:
 -------------

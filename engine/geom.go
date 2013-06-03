@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
+// geometry mask for the magnetization
 type geom struct {
 	maskQuant
 	host *data.Slice // host copy of maskQuant
@@ -13,6 +14,7 @@ func (g *geom) init() {
 	g.maskQuant = mask(1, Mesh(), "geom", "")
 }
 
+// set the mask to 1 where f is true, 0 elsewhere
 func (g *geom) SetFunc(f func(x, y, z float64) bool) {
 	g.alloc()
 	if g.host == nil {
@@ -57,6 +59,10 @@ func Ellipsoid(rx, ry, rz float64) func(x, y, z float64) bool {
 	return func(x, y, z float64) bool {
 		return sqr64(x/rx)+sqr64(y/ry)+sqr64(z/rz) <= 1
 	}
+}
+
+func init() {
+	world.Func("Ellipsoid", Ellipsoid)
 }
 
 func sqr64(x float64) float64 { return x * x }

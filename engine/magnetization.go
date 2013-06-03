@@ -25,6 +25,7 @@ func (b *magnetization) Set(src *data.Slice) {
 	data.Copy(b.buffer, src)
 }
 
+// remove magnetization where stencil is zero.
 func (m *magnetization) stencil(s *data.Slice) {
 	if s.IsNil() {
 		return
@@ -35,6 +36,7 @@ func (m *magnetization) stencil(s *data.Slice) {
 	data.Copy(m.buffer, h)
 }
 
+// remove dst where stencil is zero (host).
 func stencil(dst, stencil *data.Slice) {
 	if stencil.IsNil() {
 		return

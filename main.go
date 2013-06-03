@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/prof"
 	"code.google.com/p/mx3/util"
 	"code.google.com/p/mx3/web"
 	"flag"
@@ -22,11 +23,14 @@ import (
 )
 
 var (
-	flag_silent = flag.Bool("s", false, "Don't generate any log info")
-	flag_vet    = flag.Bool("vet", false, "Check input files for errors, but don't run them")
-	flag_od     = flag.String("o", "", "Override output directory")
-	flag_force  = flag.Bool("f", false, "Force start, clean existing output directory")
-	flag_port   = flag.String("http", ":35367", "Port to serve web gui")
+	flag_silent  = flag.Bool("s", false, "Don't generate any log info")
+	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")
+	flag_od      = flag.String("o", "", "Override output directory")
+	flag_force   = flag.Bool("f", false, "Force start, clean existing output directory")
+	flag_port    = flag.String("http", ":35367", "Port to serve web gui")
+	flag_cpuprof = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
+	flag_memprof = flag.Bool("memprof", false, "Recored gopprof memory profile")
+	flag_gpuprof = flag.Bool("gpuprof", false, "Recored GPU profile")
 )
 
 func main() {
@@ -61,6 +65,9 @@ func main() {
 	//TODO: init profiling // prof.Init(engine.OD)
 	cuda.Init()
 	cuda.LockThread()
+
+	initProf()
+	defer prof.Cleanup()
 
 	RunFileAndServe(flag.Arg(0))
 
@@ -149,3 +156,15 @@ func openbrowser(url string) {
 
 // list of browsers to try.
 var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "firefox", "ie", "iexplore"}
+
+func initProf() {
+	if *flag_cpuprof {
+		prof.InitCPU(engine.OD)
+	}
+	if *flag_gpuprof {
+		prof.InitGPU(engine.OD)
+	}
+	if *flag_memprof {
+		prof.InitMem(engine.OD)
+	}
+}

@@ -4,7 +4,6 @@ package engine
 // Author: Arne Vansteenkiste
 
 import (
-	"code.google.com/p/mx3/prof"
 	"log"
 	"runtime"
 )
@@ -18,5 +17,4 @@ func Close() {
 	log.Println("shutting down")
 	drainOutput()
 	Table.flush()
-	prof.Cleanup()
 }

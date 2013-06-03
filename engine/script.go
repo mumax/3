@@ -48,6 +48,7 @@ func init() {
 	world.Const("mu0", Mu0)
 
 	world.LValue("m", &M)
+	world.LValue("geom", &vol)
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)
@@ -78,7 +79,14 @@ func Compile(src string) (script.Expr, error) {
 }
 
 // needed only to make it callable from scripts
-func (b *magnetization) SetValue(v interface{}) { b.Set(v.(*data.Slice)) }
+func (m *magnetization) SetValue(v interface{}) { m.Set(v.(*data.Slice)) }
+
+// needed only to make it callable from scripts
+func (g *geom) SetValue(v interface{}) { g.SetFunc(v.(func(x, y, z float64) bool)) }
+func (b *geom) Type() reflect.Type     { return reflect.TypeOf(new(geom)) }
+func (b *geom) InputType() reflect.Type {
+	return reflect.TypeOf(func(x, y, z float64) bool { panic("") })
+}
 
 // needed only to make it callable from scripts
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }

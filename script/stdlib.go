@@ -16,6 +16,7 @@ func (w *World) LoadStdlib() {
 	w.Func("print", myprint)
 
 	// math
+	w.Func("Square", square)
 	w.Func("Abs", math.Abs)
 	w.Func("Acos", math.Acos)
 	w.Func("Acosh", math.Acosh)
@@ -69,4 +70,8 @@ func (w *World) LoadStdlib() {
 
 func myprint(msg ...interface{}) {
 	log.Println(msg...)
+}
+
+func square(x float64) float64 {
+	return x * x
 }

@@ -36,14 +36,14 @@ var (
 	Table             DataTable     // output handle for tabular data (average magnetization etc.)
 	Time              float64       // time in seconds  // todo: hide? setting breaks autosaves
 	Solver            cuda.Heun
-	Geom              func(x, y, z float64) bool = func(x, y, z float64) bool { return true } // geometric stencil
 )
 
 // hidden quantities
 var (
 	globalmesh   data.Mesh
 	torquebuffer *data.Slice
-	vol          geom
+	vol          geomMask
+	geom         Shape    // source for vol
 	postStep     []func() // called on after every time step
 	extFields    []extField
 	itime        int //unique integer time stamp

@@ -82,9 +82,9 @@ func Compile(src string) (script.Expr, error) {
 func (m *magnetization) SetValue(v interface{}) { m.Set(v.(*data.Slice)) }
 
 // needed only to make it callable from scripts
-func (g *geom) SetValue(v interface{}) { g.SetFunc(v.(func(x, y, z float64) bool)) }
-func (b *geom) Type() reflect.Type     { return reflect.TypeOf(new(geom)) }
-func (b *geom) InputType() reflect.Type {
+func (g *geomMask) SetValue(v interface{}) { g.Rasterize(v.(Shape)) }
+func (b *geomMask) Type() reflect.Type     { return reflect.TypeOf(new(geomMask)) }
+func (b *geomMask) InputType() reflect.Type {
 	return reflect.TypeOf(func(x, y, z float64) bool { panic("") })
 }
 

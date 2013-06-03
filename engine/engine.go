@@ -43,7 +43,7 @@ var (
 var (
 	globalmesh   data.Mesh
 	torquebuffer *data.Slice
-	vol          *data.Slice
+	vol          geom
 	postStep     []func() // called on after every time step
 	extFields    []extField
 	itime        int //unique integer time stamp
@@ -78,7 +78,9 @@ func initialize() {
 	torquebuffer = cuda.NewSlice(3, Mesh())
 
 	// cell volumes currently unused
-	vol = data.NilSlice(1, Mesh())
+	//vol.init()
+	//vol.SetFunc(Ellipsoid(50e-9, 200e-9, 999)) // DEBUG
+	//Quants["geom"] = &vol
 
 	// magnetization
 	M.init()
@@ -97,7 +99,7 @@ func initialize() {
 	demag_ = cuda.NewDemag(Mesh())
 	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		if EnableDemag {
-			demag_.Exec(b, M.buffer, vol, Mu0*Msat())
+			demag_.Exec(b, M.buffer, vol.buffer, Mu0*Msat())
 		} else {
 			cuda.Zero(b)
 		}

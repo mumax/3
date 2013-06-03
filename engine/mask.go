@@ -18,6 +18,6 @@ func mask(nComp int, m *data.Mesh, name, unit string) maskQuant {
 // Set the value of all cell faces with their normal along direction. E.g.:
 // 	SetAll(X, 1) // sets all faces in YZ plane to value 1.
 func (m *maskQuant) SetAll(component int, value float64) {
-	m.init()
+	m.alloc()
 	cuda.Memset(m.buffer.Comp(util.SwapIndex(component, 3)), float32(value))
 }

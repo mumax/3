@@ -20,19 +20,19 @@ func buffered(slice *data.Slice, name, unit string) bufferedQuant {
 
 // get buffer (on GPU, no need to recycle)
 func (b *bufferedQuant) Get() (q *data.Slice, recycle bool) {
-	b.init()
+	b.alloc()
 	return b.buffer, false
 }
 
 // get buffer (on GPU, no need to recycle)
 func (b *bufferedQuant) GetGPU() (q *data.Slice, recycle bool) {
-	b.init()
+	b.alloc()
 	return b.buffer, false
 }
 
 // Replace the data by src. Auto rescales if needed.
 func (b *bufferedQuant) Set(src *data.Slice) {
-	b.init()
+	b.alloc()
 	if src.Mesh().Size() != b.buffer.Mesh().Size() {
 		src = data.Resample(src, b.buffer.Mesh().Size())
 	}
@@ -41,7 +41,7 @@ func (b *bufferedQuant) Set(src *data.Slice) {
 
 // Set the value of one cell.
 func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
-	b.init()
+	b.alloc()
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
@@ -51,7 +51,7 @@ func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 
 // Get the value of one cell
 func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
-	b.init()
+	b.alloc()
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
 }
 
@@ -59,7 +59,7 @@ func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
 func (b *bufferedQuant) Shift(shx, shy, shz int) {
-	b.init()
+	b.alloc()
 	m2 := cuda.GetBuffer(1, b.buffer.Mesh())
 	defer cuda.RecycleBuffer(m2)
 	for c := 0; c < b.NComp(); c++ {
@@ -71,9 +71,17 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 
 // Allocate buffer data (on GPU) if not yet done so.
 // Used by masks, who are not allocated before needed.
-func (m *bufferedQuant) init() {
+func (m *bufferedQuant) alloc() {
 	if m.buffer.DevPtr(0) == nil {
 		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
-		cuda.Memset(m.buffer, 1, 1, 1)              // default value for mask.
+		cuda.Memset(m.buffer, ones(m.NComp())...)   // default value for mask.
 	}
+}
+
+func ones(howmany int) []float32 {
+	ones := make([]float32, howmany)
+	for i := range ones {
+		ones[i] = 1
+	}
+	return ones
 }

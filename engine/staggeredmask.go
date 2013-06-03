@@ -22,7 +22,7 @@ func staggeredMask(m *data.Mesh, name, unit string) staggeredMaskQuant {
 // 	SetSide1(Y, i, j, k, value) // sets value below (along Y) of cell i,j,k.
 // 	SetSide1(Z, i, j, k, value) // sets value below (along Z) of cell i,j,k.
 func (m *staggeredMaskQuant) SetSide1(direction int, ix, iy, iz int, value float64) {
-	m.init()
+	m.alloc()
 	cuda.SetCell(m.buffer, util.SwapIndex(direction, 3), iz, iy, ix, float32(value))
 }
 
@@ -31,7 +31,7 @@ func (m *staggeredMaskQuant) SetSide1(direction int, ix, iy, iz int, value float
 // 	SetSide2(Y, i, j, k, value) // sets value above (along Y) of cell i,j,k.
 // 	SetSide2(Z, i, j, k, value) // sets value above (along Z) of cell i,j,k.
 func (m *staggeredMaskQuant) SetSide2(direction int, ix, iy, iz int, value float64) {
-	m.init()
+	m.alloc()
 	direction = util.SwapIndex(direction, 3)
 	i := [3]int{iz, iy, ix}
 	i[direction]++

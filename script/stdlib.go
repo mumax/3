@@ -29,7 +29,7 @@ func (w *World) LoadStdlib() {
 	w.Func("Cosh", math.Cosh)
 	w.Func("Erf", math.Erf)
 	w.Func("Erfc", math.Erfc)
-	w.Func("Exp	", math.Exp)
+	w.Func("Exp", math.Exp)
 	w.Func("Exp2", math.Exp2)
 	w.Func("Expm1", math.Expm1)
 	w.Func("Floor", math.Floor)

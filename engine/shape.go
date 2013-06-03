@@ -5,6 +5,11 @@ import "math"
 func init() {
 	world.Func("Ellipsoid", Ellipsoid)
 	world.Func("Cylinder", Cylinder)
+	world.Func("Rect", Rect)
+	world.Func("Transl", Transl)
+	world.Func("Union", Union)
+	world.Func("Intersect", Intersect)
+	world.Func("Inverse", Inverse)
 }
 
 // geometrical shape for setting sample geometry
@@ -49,6 +54,27 @@ func Transl(s Shape, dx, dy, dz float64) Shape {
 }
 
 // CSG:
+
+// Union of shapes a and b.
+func Union(a, b Shape) Shape {
+	return func(x, y, z float64) bool {
+		return a(x, y, z) || b(x, y, z)
+	}
+}
+
+// Intersection of shapes a and b.
+func Intersect(a, b Shape) Shape {
+	return func(x, y, z float64) bool {
+		return a(x, y, z) && b(x, y, z)
+	}
+}
+
+// Inverse (outside) of shape.
+func Inverse(s Shape) Shape {
+	return func(x, y, z float64) bool {
+		return !s(x, y, z)
+	}
+}
 
 // utils
 

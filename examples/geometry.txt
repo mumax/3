@@ -1,24 +1,32 @@
 /*
 	Geometry example: program a complex shape:
-	a rotated square with two round holes.
+	a square with two round holes, like cheese.
+	Also, the cheese rotates in time.
 */
 
 setgridsize(256, 256, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 
 d      := 200e-9
-square := rect(d, d)            // square with side d
-square  = rotz(square, pi/8)    // rotate it over 22.5°
+square := rect(d, d)                 // square with side d
 
 h     := 50e-9
 hole  := cylinder(h, h)              // circle with diameter h
 hole1 := transl(hole, 100e-9, 0, 0)  // translated circle #1
 hole2 := transl(hole, 0, -50e-9, 0)  // translated cricle #2
 holes := union(hole1, hole2)         // both circles combined
+cheese := sub(square, holes)         // subtract the circles form the square (makes holes).
+geom = cheese 
 
-geom = sub(square, holes)   // subtract the circles form the square (makes holes).
+msat = 600e3
+aex = 12e-13
+alpha = 3
 
-m = uniform(1, 0, 0)
+// rotate the cheese.
+for i:=0; i<=180; i++{
+	angle := i*pi/180
+	geom = rotz(cheese, angle)
+	m = uniform(cos(angle), sin(angle), 0)
+	run(0.1e-9)
+}
 
-save(m)
-save(geom)

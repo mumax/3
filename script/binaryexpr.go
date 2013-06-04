@@ -22,7 +22,13 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 	case token.QUO:
 		return &quo{binaryExpr{x, y}}
 	case token.LSS:
-		return &less{x, y}
+		return &lss{comp{x, y}}
+	case token.GTR:
+		return &gtr{comp{x, y}}
+	case token.LEQ:
+		return &leq{comp{x, y}}
+	case token.GEQ:
+		return &geq{comp{x, y}}
 	}
 }
 
@@ -41,7 +47,16 @@ func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(flo
 func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
 func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
 
-type less binaryExpr
+type comp binaryExpr
 
-func (b *less) Type() reflect.Type { return bool_t }
-func (b *less) Eval() interface{}  { return b.x.Eval().(float64) < b.y.Eval().(float64) }
+func (b *comp) Type() reflect.Type { return bool_t }
+
+type lss struct{ comp }
+type gtr struct{ comp }
+type leq struct{ comp }
+type geq struct{ comp }
+
+func (b *lss) Eval() interface{} { return b.x.Eval().(float64) < b.y.Eval().(float64) }
+func (b *gtr) Eval() interface{} { return b.x.Eval().(float64) > b.y.Eval().(float64) }
+func (b *leq) Eval() interface{} { return b.x.Eval().(float64) <= b.y.Eval().(float64) }
+func (b *geq) Eval() interface{} { return b.x.Eval().(float64) >= b.y.Eval().(float64) }

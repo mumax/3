@@ -38,10 +38,6 @@ func TestEval(t *testing.T) {
 		t.Fail()
 	}
 
-	if w.MustEval("1<2") != true && w.MustEval("2<1") != false {
-		t.Fail()
-	}
-
 	// Test func
 	if w.MustEval("sqrt(3*3)").(float64) != 3 {
 		t.Fail()
@@ -130,7 +126,19 @@ type T struct {
 }
 
 func TestMany(test *testing.T) {
-	tests := []T{{"1+1", 2.}}
+	tests := []T{{"1+1", 2.},
+		{"1<1", false},
+		{"1<2", true},
+		{"2<1", false},
+		{"1>1", false},
+		{"2>1", true},
+		{"1>2", false},
+		{"1<=1", true},
+		{"1<=2", true},
+		{"2<=1", false},
+		{"1>=1", true},
+		{"2>=1", true},
+		{"1>=2", false}}
 
 	w := NewWorld()
 	for _, t := range tests {

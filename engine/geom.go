@@ -16,7 +16,6 @@ func (g *geomMask) init() {
 
 // set the mask to 1 where f is true, 0 elsewhere
 func (g *geomMask) Rasterize(f Shape) {
-	g.alloc()
 	if g.host == nil {
 		g.host = hostBuf(1, g.Mesh())
 	}
@@ -45,6 +44,9 @@ func (g *geomMask) Rasterize(f Shape) {
 		}
 	}
 
-	data.Copy(g.buffer, g.host)
+	//	if needed{
+	//	g.alloc()
+	//	data.Copy(g.buffer, g.host)
+	//	}
 	M.stencil(g.host)
 }

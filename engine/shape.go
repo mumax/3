@@ -5,11 +5,14 @@ import "math"
 func init() {
 	world.Func("Ellipsoid", Ellipsoid)
 	world.Func("Cylinder", Cylinder)
+	world.Func("Cuboid", Cuboid)
 	world.Func("Rect", Rect)
 	world.Func("Transl", Transl)
+	world.Func("RotZ", RotZ)
 	world.Func("Union", Union)
 	world.Func("Intersect", Intersect)
 	world.Func("Inverse", Inverse)
+	world.Func("Sub", Sub)
 }
 
 // geometrical shape for setting sample geometry
@@ -24,16 +27,24 @@ func Ellipsoid(diamx, diamy, diamz float64) Shape {
 	}
 }
 
-// Elliptic cylinder along z, with given diameters along x and y.
+// Elliptic cylinder along z (or 2D disk), with given diameters along x and y.
 func Cylinder(diamx, diamy float64) Shape {
 	return Ellipsoid(diamx, diamy, inf)
 }
 
-// Rectangular slab with given sides.
-func Rect(sidex, sidey, sidez float64) Shape {
+// 3D Rectangular slab with given sides.
+func Cuboid(sidex, sidey, sidez float64) Shape {
 	return func(x, y, z float64) bool {
 		rx, ry, rz := sidex/2, sidey/2, sidez/2
 		return x < rx && x > -rx && y < ry && y > -ry && z < rz && z > -rz
+	}
+}
+
+// 2D Rectangle with given sides.
+func Rect(sidex, sidey float64) Shape {
+	return func(x, y, z float64) bool {
+		rx, ry := sidex/2, sidey/2
+		return x < rx && x > -rx && y < ry && y > -ry
 	}
 }
 
@@ -53,19 +64,34 @@ func Transl(s Shape, dx, dy, dz float64) Shape {
 	}
 }
 
+// Rotates the shape around the Z-axis, over θ radians.
+func RotZ(s Shape, θ float64) Shape {
+	return func(x, y, z float64) bool {
+		x_ := x*math.Cos(θ) - y*math.Sin(θ)
+		y_ := x*math.Sin(θ) + y*math.Cos(θ)
+		return s(x_, y_, z)
+	}
+}
+
 // CSG:
 
 // Union of shapes a and b.
 func Union(a, b Shape) Shape {
 	return func(x, y, z float64) bool {
-		return a(x, y, z) || b(x, y, z)
+		if a(x, y, z) {
+			return true // lazy evaluation
+		}
+		return b(x, y, z)
 	}
 }
 
 // Intersection of shapes a and b.
 func Intersect(a, b Shape) Shape {
 	return func(x, y, z float64) bool {
-		return a(x, y, z) && b(x, y, z)
+		if !a(x, y, z) {
+			return false // lazy evaluation
+		}
+		return b(x, y, z)
 	}
 }
 
@@ -73,6 +99,17 @@ func Intersect(a, b Shape) Shape {
 func Inverse(s Shape) Shape {
 	return func(x, y, z float64) bool {
 		return !s(x, y, z)
+	}
+}
+
+// Removes b from a.
+// Equivalent to "a and not b": intersect(a, inverse(b)).
+func Sub(a, b Shape) Shape {
+	return func(x, y, z float64) bool {
+		if !a(x, y, z) {
+			return false // lazy evaluation
+		}
+		return !b(x, y, z)
 	}
 }
 

@@ -1,0 +1,24 @@
+/*
+	Geometry example: program a complex shape:
+	a rotated square with two round holes.
+*/
+
+setgridsize(256, 256, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+d      := 200e-9
+square := rect(d, d)            // square with side d
+square  = rotz(square, pi/8)    // rotate it over 22.5°
+
+h     := 50e-9
+hole  := cylinder(h, h)              // circle with diameter h
+hole1 := transl(hole, 100e-9, 0, 0)  // translated circle #1
+hole2 := transl(hole, 0, -50e-9, 0)  // translated cricle #2
+holes := union(hole1, hole2)         // both circles combined
+
+geom = sub(square, holes)   // subtract the circles form the square (makes holes).
+
+m = uniform(1, 0, 0)
+
+save(m)
+//save(geom)

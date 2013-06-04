@@ -60,12 +60,22 @@ func TestLoop(t *testing.T) {
 	sum := 0.0
 	w.Var("sum", &sum)
 	src := `
-		for i:=0; i<100; i=i+1{
+		for i:=0; i<100; i++{
 			sum = sum + i
 		}
 	`
 	w.MustExec(src)
 	if sum != 4950 {
+		t.Error("got", sum)
+	}
+
+	src = `
+		for i:=100; i>=0; i--{
+			sum = sum + i
+		}
+	`
+	w.MustExec(src)
+	if sum != 10000 {
 		t.Error("got", sum)
 	}
 }
@@ -155,7 +165,7 @@ func TestFail(test *testing.T) {
 	w.Const("c", 3e8)
 	a := 1.
 	w.Var("a", &a)
-	tests := []string{"c=1", "undefined", "1++", "a=true"}
+	tests := []string{"c=1", "undefined", "1++", "a=true", "x:=a++"}
 	for _, t := range tests {
 		_, err := w.Compile(t)
 		if err == nil {

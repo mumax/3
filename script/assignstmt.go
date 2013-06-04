@@ -27,16 +27,8 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 
 // compile a = b
 func (w *World) compileAssign(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
-	switch concrete := lhs.(type) {
-	default:
-		panic(err(a.Pos(), "cannot assign to", typ(lhs)))
-	case *ast.Ident:
-		if l, ok := w.resolve(a.Pos(), concrete.Name).(LValue); ok {
-			return &assignStmt{lhs: l, rhs: typeConv(a.Pos(), r, inputType(l))}
-		} else {
-			panic(err(a.Pos(), "cannot assign to", concrete.Name))
-		}
-	}
+	l := w.compileLvalue(lhs)
+	return &assignStmt{lhs: l, rhs: typeConv(a.Pos(), r, inputType(l))}
 }
 
 // compile a := b

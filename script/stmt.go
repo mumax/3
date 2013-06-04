@@ -28,6 +28,8 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 		return w.compileExpr(concrete.X)
 	case *ast.ForStmt:
 		return w.compileForStmt(concrete)
+	case *ast.IncDecStmt:
+		return w.compileIncDecStmt(concrete)
 	case *ast.BlockStmt:
 		w.EnterScope()
 		defer w.ExitScope()

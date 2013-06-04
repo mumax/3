@@ -4,7 +4,7 @@ import (
 	"go/ast"
 )
 
-// block statement is a list of statements.
+// for statement
 type forStmt struct {
 	init, cond, post, body Expr
 	void

@@ -1,8 +1,28 @@
 package script
 
 import (
+	"go/ast"
 	"reflect"
 )
+
+// left-hand value in (single) assign statement
+type LValue interface {
+	Expr                  // evalutes
+	SetValue(interface{}) // assigns a new value
+}
+
+func (w *World) compileLvalue(lhs ast.Node) LValue {
+	switch concrete := lhs.(type) {
+	default:
+		panic(err(lhs.Pos(), "cannot assign to", typ(lhs)))
+	case *ast.Ident:
+		if l, ok := w.resolve(lhs.Pos(), concrete.Name).(LValue); ok {
+			return l
+		} else {
+			panic(err(lhs.Pos(), "cannot assign to", concrete.Name))
+		}
+	}
+}
 
 // read-only value (from script, but mutable from outside)
 type reflectROnly struct {
@@ -19,12 +39,6 @@ func (l *reflectROnly) Eval() interface{} {
 
 func (l *reflectROnly) Type() reflect.Type {
 	return l.elem.Type()
-}
-
-// left-hand value in (single) assign statement
-type LValue interface {
-	Expr                  // evalutes
-	SetValue(interface{}) // assigns a new value
 }
 
 // general lvalue implementation using reflect.

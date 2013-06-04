@@ -24,17 +24,17 @@ func goSaveCopy(fname string, output *data.Slice, t float64) {
 }
 
 var (
-	dlQue   chan dlTask       // passes download requests from goSave to runDownloader
-	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
-	hBuf    chan *data.Slice  // pool of page-locked host buffers for save queue
-	done    = make(chan bool) // marks output server is completely done after closing dlQue
+	dlQue   chan dlTask   // passes download requests from goSave to runDownloader
+	saveQue chan saveTask // passes save requests from runDownloader to runSaver
+	//hBuf    chan *data.Slice  // pool of page-locked host buffers for save queue
+	done = make(chan bool) // marks output server is completely done after closing dlQue
 )
 
 func initQue() {
 	if dlQue == nil {
 		dlQue = make(chan dlTask)
 		saveQue = make(chan saveTask)
-		hBuf = make(chan *data.Slice, maxOutputQueLen)
+		//hBuf = make(chan *data.Slice, maxOutputQueLen)
 		go runDownloader()
 		go runSaver()
 	}
@@ -92,7 +92,7 @@ func runDownloader() {
 func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)
-		hBuf <- t.output
+		//hBuf <- t.output
 	}
 	done <- true
 }

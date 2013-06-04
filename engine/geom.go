@@ -50,3 +50,7 @@ func (g *geomMask) Rasterize(f Shape) {
 	//	}
 	M.stencil(g.host)
 }
+
+func (g *geomMask) Get() (*data.Slice, bool) {
+	return g.host, false
+}

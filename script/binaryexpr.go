@@ -21,6 +21,8 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 		return &mul{binaryExpr{x, y}}
 	case token.QUO:
 		return &quo{binaryExpr{x, y}}
+	case token.LSS:
+		return &less{x, y}
 	}
 }
 
@@ -38,3 +40,8 @@ func (b *add) Eval() interface{} { return b.x.Eval().(float64) + b.y.Eval().(flo
 func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(float64) }
 func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
 func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
+
+type less binaryExpr
+
+func (b *less) Type() reflect.Type { return bool_t }
+func (b *less) Eval() interface{}  { return b.x.Eval().(float64) < b.y.Eval().(float64) }

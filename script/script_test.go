@@ -38,6 +38,10 @@ func TestEval(t *testing.T) {
 		t.Fail()
 	}
 
+	if w.MustEval("1<2") != true && w.MustEval("2<1") != false {
+		t.Fail()
+	}
+
 	// Test func
 	if w.MustEval("sqrt(3*3)").(float64) != 3 {
 		t.Fail()
@@ -53,6 +57,21 @@ func TestTypes(t *testing.T) {
 
 	w.Func("printInt", func(x int) { log.Println(x) })
 	w.MustExec("printInt(7)")
+}
+
+func TestLoop(t *testing.T) {
+	w := NewWorld()
+	sum := 0.0
+	w.Var("sum", &sum)
+	src := `
+		for i:=0; i<100; i=i+1{
+			sum = sum + i
+		}
+	`
+	w.MustExec(src)
+	if sum != 4950 {
+		t.Error("got", sum)
+	}
 }
 
 func TestScope(t *testing.T) {

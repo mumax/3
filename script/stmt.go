@@ -26,6 +26,12 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 		return w.compileAssignStmt(concrete)
 	case *ast.ExprStmt:
 		return w.compileExpr(concrete.X)
+	case *ast.ForStmt:
+		return w.compileForStmt(concrete)
+	case *ast.BlockStmt:
+		w.EnterScope()
+		defer w.ExitScope()
+		return w.compileBlockStmt_noScope(concrete)
 	}
 }
 

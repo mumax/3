@@ -59,19 +59,18 @@ var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
 // takes one from the pool or allocates a new one when the pool is empty
 // and less than maxOutputQueLen buffers already are in use.
 // TODO: use same cuda.GetBuffer implementation!
-func hostbuf() *data.Slice {
-	select {
-	case b := <-hBuf:
-		cuda.Memset(b, 0, 0, 0) // not strictly needed
-		return b
-	default:
-		if nOutBuf < maxOutputQueLen {
-			nOutBuf++
-			return cuda.NewUnifiedSlice(3, Mesh())
-		}
-	}
-	panic("unreachable")
-}
+//func hostbuf() *data.Slice {
+//	select {
+//	case b := <-hBuf:
+//		cuda.Memset(b, 0, 0, 0) // not strictly needed
+//		return b
+//	default:
+//		if nOutBuf < maxOutputQueLen {
+//			nOutBuf++
+//			return cuda.NewUnifiedSlice(3, Mesh())
+//		}
+//	}
+//}
 
 // continuously takes download tasks and queues corresponding save tasks.
 // the downloader queue is not buffered and we want to use at most one GPU
@@ -80,9 +79,8 @@ func runDownloader() {
 	cuda.LockThread()
 
 	for t := range dlQue {
-		h := hostbuf()
-		data.Copy(h, t.output) // output is already locked
-		cuda.RecycleBuffer(t.output)
+		h := t.output.HostCopy()     // TODO: use hostBuf pool, page-locked, async copy
+		cuda.RecycleBuffer(t.output) // output comes from pool
 		saveQue <- saveTask{t.fname, h, t.time}
 	}
 	close(saveQue)

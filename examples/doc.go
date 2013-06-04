@@ -28,7 +28,7 @@ See file examples/geometry.txt
 	m = uniform(1, 0, 0)
 
 	save(m)
-	//save(geom)
+	save(geom)
 
 
 Pma-racetrack

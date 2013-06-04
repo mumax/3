@@ -21,4 +21,4 @@ geom = sub(square, holes)   // subtract the circles form the square (makes holes
 m = uniform(1, 0, 0)
 
 save(m)
-//save(geom)
+save(geom)

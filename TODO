@@ -1,6 +1,8 @@
 bugs:
 -----
 
+web interface keepalive timeout not working anymore
+
 
 improvements:
 -------------

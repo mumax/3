@@ -95,6 +95,7 @@ func initialize() {
 	demag_ = cuda.NewDemag(Mesh())
 	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		if EnableDemag {
+			sanitycheck()
 			demag_.Exec(b, M.buffer, nil, Mu0*Msat()) // vol = nil
 		} else {
 			cuda.Zero(b)
@@ -104,6 +105,7 @@ func initialize() {
 
 	// exchange field
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
+		sanitycheck()
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
 	})
 	Quants["B_exch"] = &B_exch
@@ -192,6 +194,12 @@ func initialize() {
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+}
+
+func sanitycheck() {
+	if Msat() == 0 {
+		log.Fatal("Msat should be nonzero")
+	}
 }
 
 // Returns the mesh cell size in meters. E.g.:

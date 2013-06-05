@@ -55,6 +55,11 @@ func HalfSpace() Shape {
 	}
 }
 
+// The entire space.
+func universe(x, y, z float64) bool {
+	return true
+}
+
 // Transforms:
 
 // Transl returns a translated copy of the shape.

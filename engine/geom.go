@@ -6,7 +6,6 @@ import (
 
 // geometry mask for the magnetization
 type geomMask struct {
-	//gpu maskQuant
 	host *data.Slice // host copy of maskQuant
 }
 
@@ -44,10 +43,6 @@ func (g *geomMask) Rasterize(f Shape) {
 		}
 	}
 
-	//	if needed{
-	//	g.alloc()
-	//	data.Copy(g.buffer, g.host)
-	//	}
 	M.stencil(g.host)
 }
 

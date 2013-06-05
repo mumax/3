@@ -11,7 +11,7 @@ type geomMask struct {
 
 func (g *geomMask) init() {
 	g.host = hostBuf(1, M.Mesh())
-	g.Rasterize(func(x, y, z float64) bool { return true }) // todo: replace by universe
+	g.Rasterize(universe)
 }
 
 func (g *geomMask) Mesh() *data.Mesh { return g.host.Mesh() }

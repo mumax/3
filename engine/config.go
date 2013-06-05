@@ -3,62 +3,36 @@ package engine
 // Utilities for setting magnetic configurations.
 
 import (
-	"code.google.com/p/mx3/data"
 	"math"
 )
 
-//func init() {
-//	world.Func("uniform", Uniform)
-//	world.Func("vortex", Vortex)
-//	world.Func("twodomain", TwoDomain)
-//	world.Func("vortexwall", VortexWall)
-//}
+func init() {
+	world.Func("uniform", Uniform)
+	world.Func("vortex", Vortex)
+	//	world.Func("twodomain", TwoDomain)
+	//	world.Func("vortexwall", VortexWall)
+}
 
+// magnetic configuration
 type Config func(x, y, z float64) [3]float64
 
-func setConfig(dst *data.Slice, cfg Config, region Shape) {
-
-	if region == nil {
-		region = universe
-	}
-
-	host := hostBuf(3, dst.Mesh())
-	h := host.Vectors()
-	n := dst.Mesh().Size()
-	c := dst.Mesh().CellSize()
-	dx := (float64(n[2]/2) - 0.5) * c[2]
-	dy := (float64(n[1]/2) - 0.5) * c[1]
-	dz := (float64(n[0]/2) - 0.5) * c[0]
-
-	for i := 0; i < n[0]; i++ {
-		z := float64(i)*c[0] - dz
-		for j := 0; j < n[1]; j++ {
-			y := float64(j)*c[1] - dy
-			for k := 0; k < n[2]; k++ {
-				x := float64(k)*c[2] - dx
-
-				inside := region(x, y, z)
-				if inside {
-					m := cfg(x, y, z)
-					h[0][i][j][k] = float32(m[2])
-					h[1][i][j][k] = float32(m[1])
-					h[2][i][j][k] = float32(m[0])
-				}
-
-			}
-		}
+// Returns a uniform magnetization state. E.g.:
+// 	M.Set(Uniform(1, 0, 0)) // saturated along X
+func Uniform(mx, my, mz float64) Config {
+	return func(x, y, z float64) [3]float64 {
+		return [3]float64{mx, my, mz}
 	}
 }
 
-// Make a vortex magnetization with given circulation and core polarization (+1 or -1). E.g.:
-// 	M.Set(Vortex(1, 1)) // counterclockwise, core up
+// Make a vortex magnetization with given circulation and core polarization (+1 or -1).
 func Vortex(circ, pol int) Config {
-	lex2 := Aex() / (0.5 * Mu0 * Msat() * Msat()) // exchange length²
+	diam2 := 2 * (Aex() / (0.5 * Mu0 * Msat() * Msat())) // inverse core diam squared (roughly)
 	return func(x, y, z float64) [3]float64 {
-		mx := -y * float64(circ)
-		my := x * float64(circ)
 		r2 := x*x + y*y
-		mz := float64(pol) * math.Exp(-r2/lex2)
+		r := math.Sqrt(r2)
+		mx := -y * float64(circ) / r
+		my := x * float64(circ) / r
+		mz := 1.5 * float64(pol) * math.Exp(-r2/diam2)
 		return [3]float64{mx, my, mz}
 	}
 }
@@ -108,19 +82,6 @@ func Vortex(circ, pol int) Config {
 //	return m
 //}
 //
-//// Returns a uniform magnetization state. E.g.:
-//// 	M.Set(Uniform(1, 0, 0)) // saturated along X
-//func Uniform(mx, my, mz float64) *data.Slice {
-//	m := data.NewSlice(3, Mesh())
-//	v := vec(mx, my, mz)
-//	list := m.Host()
-//	for c := 0; c < m.NComp(); c++ {
-//		for i := range list[c] {
-//			list[c][i] = v[c]
-//		}
-//	}
-//	return m
-//}
 //
 //// Only sets the region between cells [x1, y1, z1] and [x2, y2, z2] (excl.) to the given configuration.
 //func SetRegion(dst *data.Slice, x1, y1, z1, x2, y2, z2 int, config *data.Slice) {

@@ -1,17 +1,19 @@
 // Switch magnetic vortex with rotating field.
 
 // geometry
-	r := 200e-9                 // disk radius
-	d := 40e-9                  // disk thickness
+	d := 400e-9                 // disk diameter
+	h := 40e-9                  // disk thickness
 	N := 128                    // number of cells
 	setgridsize(N, N, 1)
-	setcellsize(2*r/N, 2*r/N, d)
-	geom = ellipsoid(r, r, inf) // cylinder
+	setcellsize(d/N, d/N, h)
+	geom = cylinder(d, d)
 
 // material
 	msat  = 800e3
 	aex   = 13e-12
 	m     = vortex(1, 1)  // circulation, polarization
+
+	save(m) // to see initial state
 
 // relax
 	alpha = 3

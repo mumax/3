@@ -4,6 +4,8 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"path"
+	"strings"
 )
 
 type GPU_Getter interface {
@@ -46,6 +48,12 @@ func Save(q Saver) {
 }
 
 func SaveAs(q Getter, fname string) {
+	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
+		fname = path.Clean(OD + "/" + fname)
+	}
+	if path.Ext(fname) == "" {
+		fname += ".dump"
+	}
 	if s, ok := q.(GPU_Getter); ok {
 		buffer, recylce := s.GetGPU()
 		if recylce {
@@ -67,10 +75,16 @@ func Autosave(what Autosaver, period float64) {
 	what.Autosave(period)
 }
 
+//func ReadFile(fname string)*data.Slice{
+//	s, _ := data.MustReadFile(fname)
+//	return s
+//}
+
 func init() {
 	world.Func("save", Save)
 	world.Func("saveas", SaveAs)
 	world.Func("autosave", Autosave)
+	//world.Func("readfile", ReadFile)
 }
 
 // notify that it may need to be saved.

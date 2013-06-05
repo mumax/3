@@ -95,7 +95,7 @@ func initialize() {
 	demag_ = cuda.NewDemag(Mesh())
 	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
 		if EnableDemag {
-			demag_.Exec(b, M.buffer, vol.buffer, Mu0*Msat())
+			demag_.Exec(b, M.buffer, nil, Mu0*Msat()) // vol = nil
 		} else {
 			cuda.Zero(b)
 		}

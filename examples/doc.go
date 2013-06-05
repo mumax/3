@@ -29,6 +29,7 @@ See file examples/geometry.txt
 	aex = 12e-13
 	alpha = 3
 
+	// rotate the cheese.
 	for i:=0; i<=180; i++{
 		angle := i*pi/180
 		geom = rotz(cheese, angle)

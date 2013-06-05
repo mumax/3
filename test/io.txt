@@ -1,0 +1,21 @@
+/*
+	Test I/O.
+*/
+
+setgridsize(50, 25, 2)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+m = uniform(1, 0, 0)
+
+geom = cylinder(50e-9, 50e-9)
+msat = 800e-3
+aex = 12e-13
+Ku1 = vector(500e3, 0, 0)
+dmi = 1e-5
+
+saveas(m, "m")
+saveas(B_demag, "B_demag")
+saveas(B_exch, "B_exch")
+saveas(B_uni, "B_uni")
+saveas(B_dmi, "B_dmi")
+saveas(geom, "geom")

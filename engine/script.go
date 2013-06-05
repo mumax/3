@@ -52,9 +52,14 @@ func init() {
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)
-
-	fftmAddr := &FFTM
-	world.ROnly("mFFT", &fftmAddr)
+	B_exch_addr := &B_exch
+	world.ROnly("B_exch", &B_exch_addr)
+	B_uni_addr := &B_uni
+	world.ROnly("B_uni", &B_uni_addr)
+	B_dmi_addr := &B_dmi
+	world.ROnly("B_dmi", &B_dmi_addr)
+	fftm_addr := &FFTM
+	world.ROnly("mFFT", &fftm_addr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 	world.LValue("AnisotropyMask", &KuMask)
@@ -82,11 +87,10 @@ func Compile(src string) (script.Expr, error) {
 func (m *magnetization) SetValue(v interface{}) { m.Set(v.(*data.Slice)) }
 
 // needed only to make it callable from scripts
-func (g *geomMask) SetValue(v interface{}) { g.Rasterize(v.(Shape)) }
-func (b *geomMask) Type() reflect.Type     { return reflect.TypeOf(new(geomMask)) }
-func (b *geomMask) InputType() reflect.Type {
-	return reflect.TypeOf(func(x, y, z float64) bool { panic("") })
-}
+func (g *geomMask) InputType() reflect.Type { return reflect.TypeOf(Shape(nil)) }
+func (g *geomMask) SetValue(v interface{})  { g.Rasterize(v.(Shape)) }
+func (g *geomMask) Type() reflect.Type      { return reflect.TypeOf(new(geomMask)) }
+func (g *geomMask) Eval() interface{}       { return g }
 
 // needed only to make it callable from scripts
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }

@@ -6,19 +6,18 @@ import (
 
 // geometry mask for the magnetization
 type geomMask struct {
-	maskQuant
+	//gpu maskQuant
 	host *data.Slice // host copy of maskQuant
 }
 
 func (g *geomMask) init() {
-	g.maskQuant = mask(1, Mesh(), "geom", "")
+	g.host = hostBuf(1, M.Mesh())
 }
+
+func (g *geomMask) Mesh() *data.Mesh { return g.host.Mesh() }
 
 // set the mask to 1 where f is true, 0 elsewhere
 func (g *geomMask) Rasterize(f Shape) {
-	if g.host == nil {
-		g.host = hostBuf(1, g.Mesh())
-	}
 
 	l := g.host.Scalars()
 

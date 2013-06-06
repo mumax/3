@@ -20,6 +20,7 @@ var (
 	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
 	KuMask       maskQuant                                 // Mask to scales Ku1/Msat cellwise.
 	EnableDemag  bool               = true                 // enable/disable demag field
+	geom         Shape              = nil                  // nil means universe
 )
 
 // Accessible quantities
@@ -43,7 +44,6 @@ var (
 	globalmesh   data.Mesh
 	torquebuffer *data.Slice
 	regions      Regions
-	geom         Shape    // source for vol
 	postStep     []func() // called on after every time step
 	extFields    []extField
 	itime        int //unique integer time stamp
@@ -81,9 +81,9 @@ func initialize() {
 	M.init()
 	Quants["m"] = &M
 
-	// cell volumes
-	vol.init()
-	Quants["geom"] = &vol
+	// regions
+	regions.init()
+	Quants["regions"] = &regions
 
 	FFTM.init()
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude

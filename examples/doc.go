@@ -23,7 +23,7 @@ See file examples/geometry.txt
 	hole2 := transl(hole, 0, -50e-9, 0)  // translated cricle #2
 	holes := union(hole1, hole2)         // both circles combined
 	cheese := sub(square, holes)         // subtract the circles form the square (makes holes).
-	geom = cheese
+	setgeom(cheese)
 
 	msat = 600e3
 	aex = 12e-13
@@ -32,7 +32,7 @@ See file examples/geometry.txt
 	// rotate the cheese.
 	for i:=0; i<=180; i++{
 		angle := i*pi/180
-		geom = rotz(cheese, angle)
+		setgeom(rotz(cheese, angle))
 		m = uniform(cos(angle), sin(angle), 0)
 		run(0.1e-9)
 	}
@@ -164,7 +164,7 @@ See file examples/vortex.txt
 		N := 128                    // number of cells
 		setgridsize(N, N, 1)
 		setcellsize(d/N, d/N, h)
-		geom = cylinder(d, d)
+		setgeom(cylinder(d, d))
 
 	// material
 		msat  = 800e3

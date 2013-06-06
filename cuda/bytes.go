@@ -26,6 +26,8 @@ func (dst *Bytes) Upload(src []byte) {
 	cu.MemcpyHtoD(cu.DevicePtr(dst.Ptr), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
+func (b *Bytes) Mesh() *data.Mesh { return b.mesh }
+
 //func (SetCell(s *data.Slice, comp int, i, j, k int, value float32) {
 //	SetElem(s, comp, index(i, j, k, s.Mesh().Size()), value)
 //}

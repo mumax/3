@@ -6,7 +6,7 @@
 	N := 128                    // number of cells
 	setgridsize(N, N, 1)
 	setcellsize(d/N, d/N, h)
-	geom = cylinder(d, d)
+	setgeom(cylinder(d, d))
 
 // material
 	msat  = 800e3

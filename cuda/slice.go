@@ -10,7 +10,7 @@ import (
 
 // Make a GPU Slice with nComp components each of size length.
 func NewSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, memAlloc, data.GPUMemory)
+	return newSlice(nComp, m, MemAlloc, data.GPUMemory)
 }
 
 // Make a GPU Slice with nComp components each of size length.

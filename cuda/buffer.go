@@ -43,7 +43,7 @@ func GetBuffer(nComp int, m *data.Mesh) *data.Slice {
 			log.Panic("too many buffers in use, possible memory leak")
 		}
 		buf_count++
-		ptrs[i] = memAlloc(int64(cu.SIZEOF_FLOAT32 * N))
+		ptrs[i] = MemAlloc(int64(cu.SIZEOF_FLOAT32 * N))
 		buf_check[ptrs[i]] = struct{}{} // mark this pointer as mine
 	}
 	return data.SliceFromPtrs(m, data.GPUMemory, ptrs)

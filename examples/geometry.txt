@@ -16,7 +16,7 @@ hole1 := transl(hole, 100e-9, 0, 0)  // translated circle #1
 hole2 := transl(hole, 0, -50e-9, 0)  // translated cricle #2
 holes := union(hole1, hole2)         // both circles combined
 cheese := sub(square, holes)         // subtract the circles form the square (makes holes).
-geom = cheese 
+setgeom(cheese)
 
 msat = 600e3
 aex = 12e-13
@@ -25,7 +25,7 @@ alpha = 3
 // rotate the cheese.
 for i:=0; i<=180; i++{
 	angle := i*pi/180
-	geom = rotz(cheese, angle)
+	setgeom(rotz(cheese, angle))
 	m = uniform(cos(angle), sin(angle), 0)
 	run(0.1e-9)
 }

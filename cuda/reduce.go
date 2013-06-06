@@ -84,7 +84,7 @@ func initReduceBuf() {
 	const N = 128
 	reduceBuffers = make(chan unsafe.Pointer, N)
 	for i := 0; i < N; i++ {
-		reduceBuffers <- memAlloc(1 * cu.SIZEOF_FLOAT32)
+		reduceBuffers <- MemAlloc(1 * cu.SIZEOF_FLOAT32)
 	}
 }
 

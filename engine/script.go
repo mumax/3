@@ -48,7 +48,7 @@ func init() {
 	world.Const("mu0", Mu0)
 
 	world.LValue("m", &M)
-	world.LValue("geom", &vol)
+	world.Func("SetGeom", SetGeometry)
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)
@@ -60,6 +60,8 @@ func init() {
 	world.ROnly("B_dmi", &B_dmi_addr)
 	fftm_addr := &FFTM
 	world.ROnly("mFFT", &fftm_addr)
+	regions_addr := &regions
+	world.ROnly("regions", &regions_addr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 	world.LValue("AnisotropyMask", &KuMask)
@@ -82,12 +84,6 @@ func Compile(src string) (script.Expr, error) {
 	defer world.ExitScope()
 	return world.Compile(src)
 }
-
-// needed only to make it callable from scripts
-func (g *geomMask) InputType() reflect.Type { return reflect.TypeOf(Shape(nil)) }
-func (g *geomMask) SetValue(v interface{})  { g.Rasterize(v.(Shape)) }
-func (g *geomMask) Type() reflect.Type      { return reflect.TypeOf(new(geomMask)) }
-func (g *geomMask) Eval() interface{}       { return g }
 
 func (m *magnetization) SetValue(v interface{})  { m.setRegion(v.(Config), nil) }
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }

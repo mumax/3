@@ -8,7 +8,7 @@ import (
 )
 
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.
-func memAlloc(bytes int64) unsafe.Pointer {
+func MemAlloc(bytes int64) unsafe.Pointer {
 	defer func() {
 		err := recover()
 		if err == cu.ERROR_OUT_OF_MEMORY {

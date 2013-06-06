@@ -49,6 +49,7 @@ func init() {
 
 	world.LValue("m", &M)
 	world.Func("SetGeom", SetGeometry)
+	world.Func("DefRegion", DefRegion)
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)

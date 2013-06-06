@@ -13,6 +13,7 @@ type Regions struct {
 	arr        [][][]byte
 	cache      *data.Slice
 	cacheValid bool
+	autosave
 }
 
 func (r *Regions) init() {
@@ -20,6 +21,9 @@ func (r *Regions) init() {
 	r.cpu = make([]byte, r.gpu.Len)
 	r.arr = resizeBytes(r.cpu, r.gpu.Mesh().Size())
 	r.rasterGeom()
+	r.autosave.nComp = 1
+	r.autosave.name = "regions"
+	r.autosave.mesh = r.gpu.Mesh()
 }
 
 func (r *Regions) upload() {
@@ -27,12 +31,10 @@ func (r *Regions) upload() {
 	r.cacheValid = false // upload indicates arr has changed, so cache probably invalid
 }
 
-func (r *Regions) rasterGeom() {
-	s := geom
-	if s == nil {
-		s = universe
+func DefRegion(id int, s Shape) {
+	if id < 0 || id > 255 {
+		log.Fatalf("region id should be 0-255, have: %v", id)
 	}
-
 	n := Mesh().Size()
 	c := Mesh().CellSize()
 	dx := (float64(n[2]/2) - 0.5) * c[2]
@@ -45,19 +47,22 @@ func (r *Regions) rasterGeom() {
 			y := float64(j)*c[1] - dy
 			for k := 0; k < n[2]; k++ {
 				x := float64(k)*c[2] - dx
-				inside := s(x, y, z)
-				if inside {
-					if regions.arr[i][j][k] == 0 {
-						regions.arr[i][j][k] = 1 // default region
-					} // else: keep previous region
-				} else {
-					regions.arr[i][j][k] = 0 // outside
+				if s(x, y, z) { // inside
+					regions.arr[i][j][k] = byte(id)
 				}
 			}
 		}
 	}
 	regions.upload()
-	M.stencilGeom()
+	M.stencilGeom() // TODO: revise if really needed
+}
+
+// Rasterises the global geom shape
+func (r *Regions) rasterGeom() {
+	s := geom
+	if s == nil {
+		s = universe
+	}
 }
 
 func (r *Regions) Mesh() *data.Mesh { return r.gpu.Mesh() }

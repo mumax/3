@@ -10,7 +10,7 @@ func init() {
 	world.Func("uniform", Uniform)
 	world.Func("vortex", Vortex)
 	world.Func("twodomain", TwoDomain)
-	//world.Func("vortexwall", VortexWall)
+	world.Func("vortexwall", VortexWall)
 }
 
 // magnetic configuration
@@ -38,14 +38,19 @@ func Vortex(circ, pol int) Config {
 	}
 }
 
-//func VortexWall(mleft, mright float64, circ, pol int) *data.Slice {
-//	m := data.NewSlice(3, Mesh())
-//	nx, ny, nz := Nx(), Ny(), Nz()
-//	SetRegion(m, 0, 0, 0, nx/2, ny, nz, Uniform(mleft, 0, 0))           // left half
-//	SetRegion(m, nx/2, 0, 0, nx, ny, nz, Uniform(mright, 0, 0))         // right half
-//	SetRegion(m, nx/2-ny/2, 0, 0, nx/2+ny/2, ny, nz, Vortex(circ, pol)) // center
-//	return m
-//}
+func VortexWall(mleft, mright float64, circ, pol int) Config {
+	h := Mesh().WorldSize()[1]
+	v := Vortex(circ, pol)
+	return func(x, y, z float64) [3]float64 {
+		if x < -h/2 {
+			return [3]float64{mleft, 0, 0}
+		}
+		if x > h/2 {
+			return [3]float64{mright, 0, 0}
+		}
+		return v(x, y, z)
+	}
+}
 
 // Make a 2-domain configuration with domain wall.
 // (mx1, my1, mz1) and (mx2, my2, mz2) are the magnetizations in the left and right domain, respectively.

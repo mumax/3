@@ -24,18 +24,18 @@ var (
 
 // Accessible quantities
 var (
-	M                 magnetization // reduced magnetization (unit length)
-	FFTM              fftm          // FFT of M
-	B_eff             setterQuant   // effective field (T) output handle
-	B_demag           setterQuant   // demag field (T) output handle
-	B_dmi             adderQuant    // demag field (T) output handle
-	B_exch            adderQuant    // exchange field (T) output handle
-	B_uni             adderQuant    // field due to uniaxial anisotropy output handle
-	STTorque          adderQuant    // spin-transfer torque output handle
-	LLGTorque, Torque setterQuant   // torque/gamma0, in Tesla
-	Table             DataTable     // output handle for tabular data (average magnetization etc.)
-	Time              float64       // time in seconds  // todo: hide? setting breaks autosaves
-	Solver            cuda.Heun
+	M                magnetization // reduced magnetization (unit length)
+	FFTM             fftm          // FFT of M
+	B_eff            setterQuant   // effective field (T) output handle
+	B_demag          setterQuant   // demag field (T) output handle
+	B_dmi            adderQuant    // demag field (T) output handle
+	B_exch           adderQuant    // exchange field (T) output handle
+	B_uni            adderQuant    // field due to uniaxial anisotropy output handle
+	STTorque         adderQuant    // spin-transfer torque output handle
+	LLTorque, Torque setterQuant   // torque/gamma0, in Tesla
+	Table            DataTable     // output handle for tabular data (average magnetization etc.)
+	Time             float64       // time in seconds  // todo: hide? setting breaks autosaves
+	Solver           cuda.Heun
 )
 
 // hidden quantities
@@ -154,12 +154,12 @@ func initialize() {
 	})
 	Quants["B_eff"] = &B_eff
 
-	// llg torque
-	LLGTorque = setter(3, Mesh(), "llgtorque", "T", func(b *data.Slice, cansave bool) {
+	// Landau-Lifshitz torque
+	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
-		cuda.LLGTorque(b, M.buffer, b, float32(Alpha()))
+		cuda.LLTorque(b, M.buffer, b, float32(Alpha()))
 	})
-	Quants["llgtorque"] = &LLGTorque
+	Quants["lltorque"] = &LLTorque
 
 	// spin-transfer torque
 	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
@@ -175,7 +175,7 @@ func initialize() {
 	Quants["sttorque"] = &STTorque
 
 	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
-		LLGTorque.set(b, cansave)
+		LLTorque.set(b, cansave)
 		STTorque.addTo(b, cansave)
 	})
 	Quants["torque"] = &Torque

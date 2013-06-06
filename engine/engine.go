@@ -42,7 +42,7 @@ var (
 var (
 	globalmesh   data.Mesh
 	torquebuffer *data.Slice
-	vol          geomMask
+	regions      Regions
 	geom         Shape    // source for vol
 	postStep     []func() // called on after every time step
 	extFields    []extField

@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
@@ -18,6 +19,11 @@ func NewBytes(m *data.Mesh) *Bytes {
 	ptr := cu.MemAlloc(Len)
 	cu.MemsetD8(cu.DevicePtr(ptr), 0, Len)
 	return &Bytes{unsafe.Pointer(ptr), m, int32(Len)}
+}
+
+func (dst *Bytes) Upload(src []byte) {
+	util.Argument(int(dst.Len) == len(src))
+	cu.MemcpyHtoD(cu.DevicePtr(dst.Ptr), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
 //func (SetCell(s *data.Slice, comp int, i, j, k int, value float32) {

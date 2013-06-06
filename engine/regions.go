@@ -24,6 +24,7 @@ func (r *Regions) init() {
 	r.autosave.nComp = 1
 	r.autosave.name = "regions"
 	r.autosave.mesh = r.gpu.Mesh()
+	r.rasterGeom()
 }
 
 func (r *Regions) upload() {
@@ -63,6 +64,32 @@ func (r *Regions) rasterGeom() {
 	if s == nil {
 		s = universe
 	}
+
+	n := Mesh().Size()
+	c := Mesh().CellSize()
+	dx := (float64(n[2]/2) - 0.5) * c[2]
+	dy := (float64(n[1]/2) - 0.5) * c[1]
+	dz := (float64(n[0]/2) - 0.5) * c[0]
+
+	for i := 0; i < n[0]; i++ {
+		z := float64(i)*c[0] - dz
+		for j := 0; j < n[1]; j++ {
+			y := float64(j)*c[1] - dy
+			for k := 0; k < n[2]; k++ {
+				x := float64(k)*c[2] - dx
+				if s(x, y, z) { // inside
+					if regions.arr[i][j][k] == 0 {
+						regions.arr[i][j][k] = 1
+					}
+				} else {
+					regions.arr[i][j][k] = 0
+				}
+			}
+		}
+	}
+	regions.upload()
+	M.stencilGeom() // TODO: revise if really needed
+
 }
 
 func (r *Regions) Mesh() *data.Mesh { return r.gpu.Mesh() }

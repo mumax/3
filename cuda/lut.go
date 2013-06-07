@@ -13,7 +13,7 @@ type LUT struct {
 	cpu [LUTSIZE]float32 //
 }
 
-func (l *LUT) init() {
+func (l *LUT) Init() {
 	l.gpu = MemAlloc(LUTSIZE * cu.SIZEOF_FLOAT32)
 	cu.MemsetD32(cu.DevicePtr(l.gpu), 0, LUTSIZE)
 }
@@ -36,10 +36,10 @@ func (l *LUT) upload() {
 
 type LUTs []LUT
 
-func newLUTs(nComp int) LUTs {
+func NewLUTs(nComp int) LUTs {
 	l := make(LUTs, nComp)
 	for c := range l {
-		l[c].init()
+		l[c].Init()
 	}
 	return l
 }

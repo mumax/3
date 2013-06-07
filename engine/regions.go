@@ -8,28 +8,41 @@ import (
 )
 
 type Regions struct {
-	gpu        *cuda.Bytes
-	cpu        []byte
-	arr        [][][]byte
-	cache      *data.Slice
-	cacheValid bool
+	arr        [][][]byte  // regions map: cell i,j,k -> byte index
+	cpu        []byte      // arr data, stored contiguously
+	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
+	gpuCacheOK bool        // gpuCache in sync with cpu
+	qCache     *data.Slice // float32 copy of arr (for output), possibly out-of-sync
+	qCacheOK   bool        // qCache in sync with arr?
 	autosave
 }
 
 func (r *Regions) init() {
-	r.gpu = cuda.NewBytes(Mesh())
-	r.cpu = make([]byte, r.gpu.Len)
-	r.arr = resizeBytes(r.cpu, r.gpu.Mesh().Size())
-	r.rasterGeom()
+	mesh := Mesh() // global sim mesh
+
 	r.autosave.nComp = 1
 	r.autosave.name = "regions"
-	r.autosave.mesh = r.gpu.Mesh()
+	r.autosave.mesh = mesh
+
+	r.cpu = make([]byte, mesh.NCell())
+	r.arr = resizeBytes(r.cpu, mesh.Size())
+
+	r.gpuCache = cuda.NewBytes(mesh)
+
 	r.rasterGeom()
 }
 
+func (r *Regions) Gpu() *cuda.Bytes {
+	if r.gpuCacheOK {
+		return r.gpuCache
+	}
+	r.upload()
+	return r.gpuCache
+}
+
 func (r *Regions) upload() {
-	r.gpu.Upload(r.cpu)
-	r.cacheValid = false // upload indicates arr has changed, so cache probably invalid
+	r.gpuCache.Upload(r.cpu)
+	r.gpuCacheOK = true
 }
 
 func DefRegion(id int, s Shape) {
@@ -54,8 +67,9 @@ func DefRegion(id int, s Shape) {
 			}
 		}
 	}
-	regions.upload()
 	M.stencilGeom() // TODO: revise if really needed
+	regions.gpuCacheOK = false
+	regions.qCacheOK = false
 }
 
 // Rasterises the global geom shape
@@ -87,26 +101,24 @@ func (r *Regions) rasterGeom() {
 			}
 		}
 	}
-	regions.upload()
 	M.stencilGeom() // TODO: revise if really needed
-
+	regions.gpuCacheOK = false
+	regions.qCacheOK = false
 }
 
-func (r *Regions) Mesh() *data.Mesh { return r.gpu.Mesh() }
-
 func (r *Regions) Get() (*data.Slice, bool) {
-	if !r.cacheValid {
-		if r.cache == nil {
-			r.cache = data.NewSlice(1, r.Mesh())
+	if !r.qCacheOK {
+		if r.qCache == nil {
+			r.qCache = data.NewSlice(1, r.Mesh())
 		}
-		l := r.cache.Host()[0]
+		l := r.qCache.Host()[0]
 		for i := range l {
 			l[i] = float32(r.cpu[i])
 		}
 		log.Println("caching regions output")
-		r.cacheValid = true
+		r.qCacheOK = true
 	}
-	return r.cache, false
+	return r.qCache, false
 }
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.

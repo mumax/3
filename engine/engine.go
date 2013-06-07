@@ -8,12 +8,12 @@ import (
 
 // User inputs
 var (
-	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	Msat         func() float64     = Const(0)             // Saturation magnetization in A/m
-	Alpha        func() float64     = Const(0)             // Damping constant
-	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          func() [3]float64  = ConstVector(0, 0, 0) // Uniaxial anisotropy vector in J/m³
+	Aex          func() float64    = Const(0)             // Exchange stiffness in J/m
+	Msat         func() float64    = Const(0)             // Saturation magnetization in A/m
+	Alpha        func() float64    = Const(0)             // Damping constant
+	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
+	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
+	Ku1, ku1_red cuda.LUTs
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
@@ -124,10 +124,8 @@ func initialize() {
 
 	// uniaxial anisotropy
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
-		ku1 := Ku1() // in J/m3
-		if ku1 != [3]float64{0, 0, 0} {
-			cuda.AddUniaxialAnisotropy(dst, M.buffer, KuMask.buffer, ku1[2], ku1[1], ku1[0], Msat())
-		}
+		//TODO: conditionally
+		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red, regions.Gpu())
 	})
 	Quants["B_uni"] = &B_uni
 

@@ -32,6 +32,9 @@ func param(nComp int, name, unit string) Param {
 
 func (p *Param) SetRegion(region int, v ...float32) {
 	util.Argument(len(v) == p.NComp())
+	if region == 0 {
+		log.Fatal("cannot set parameters in region 0 (vacuum)")
+	}
 	for c := range v {
 		p.cpu[c][region] = v[c]
 	}
@@ -57,10 +60,12 @@ func (p *Param) Gpu() cuda.LUTPtrs {
 	return p.gpu
 }
 
+// XYZ swap here
 func (p *Param) upload() {
 	log.Println("upload LUT", p.name, p.cpu)
-	for c := range p.gpu {
-		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.cpu[c][0]), cu.SIZEOF_FLOAT32*int64(len(p.cpu[c])))
+	for c2 := range p.gpu {
+		c := util.SwapIndex(c2, p.NComp())
+		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.cpu[c2][0]), cu.SIZEOF_FLOAT32*int64(len(p.cpu[c2])))
 	}
 	p.ok = true
 }

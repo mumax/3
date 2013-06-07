@@ -1,6 +1,5 @@
 /*
-	This test lets uniaxial anisotropy compete against the external field.
-	Reference values obtained with OOMMF.
+	Test uniaxial anisotropy with mask
 */
 
 	setgridsize(64, 64, 1)
@@ -9,8 +8,8 @@
 	Msat  = 1100e3
 	Aex   = 13e-12
 	alpha = 0.2
-	Ku1   = vector(0.5e6, 0, 0)
-	M     = uniform(1, 1, 0)
+	M       = uniform(1, 1, 0)
+	regionsetvector(1, Ku1, vector(0.5e6, 0, 0))
 
 	savetable(10e-12)
 

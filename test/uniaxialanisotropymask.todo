@@ -8,9 +8,8 @@
 	Msat  = 1100e3
 	Aex   = 13e-12
 	alpha = 0.2
-	Ku1   = vector(0.5e6 * 2, 0, 0)     // Ku *2 here ...
-	anisotropyMask = uniform(0.5, 0, 0) // ... and /2 here
 	M       = uniform(1, 1, 0)
+	regionsetvector(1, Ku1, vector(0.5, 0, 0))
 
 	savetable(10e-12)
 

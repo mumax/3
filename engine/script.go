@@ -31,7 +31,6 @@ func init() {
 	world.Var("alpha", &Alpha)
 	world.Var("b_ext", &B_ext)
 	world.Var("dmi", &DMI)
-	world.Var("ku1", &Ku1)
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
@@ -63,6 +62,8 @@ func init() {
 	world.ROnly("mFFT", &fftm_addr)
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)
+	Ku1_addr := &Ku1
+	world.ROnly("Ku1", &Ku1_addr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 	world.LValue("AnisotropyMask", &KuMask)

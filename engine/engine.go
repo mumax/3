@@ -13,7 +13,8 @@ var (
 	Alpha        func() float64    = Const(0)             // Damping constant
 	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1, ku1_red cuda.LUTs
+	Ku1          Param
+	ku1_red      Param
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
@@ -122,12 +123,17 @@ func initialize() {
 	})
 	Quants["B_dmi"] = &B_dmi
 
+	Ku1 = param(3, "Ku1", "J/m3")
+	ku1_red = param(3, "ku1_red", "T")
+	Ku1.post_update = func(region int) {
+		ku1_red.SetRegion(region, scale(Ku1.GetRegion(region), float32(1/Msat()))...)
+	}
 	// uniaxial anisotropy
-	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
-		//TODO: conditionally
-		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red, regions.Gpu())
-	})
-	Quants["B_uni"] = &B_uni
+	//	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
+	//		//TODO: conditionally
+	//		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red, regions.Gpu())
+	//	})
+	//	Quants["B_uni"] = &B_uni
 
 	KuMask = mask(3, Mesh(), "kumask", "")
 	Quants["KuMask"] = &KuMask

@@ -52,18 +52,23 @@ func init() {
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)
+
 	B_exch_addr := &B_exch
 	world.ROnly("B_exch", &B_exch_addr)
+
 	B_uni_addr := &B_uni
 	world.ROnly("B_uni", &B_uni_addr)
+
 	B_dmi_addr := &B_dmi
 	world.ROnly("B_dmi", &B_dmi_addr)
+
 	fftm_addr := &FFTM
 	world.ROnly("mFFT", &fftm_addr)
+
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)
-	Ku1_addr := &Ku1
-	world.ROnly("Ku1", &Ku1_addr)
+
+	world.LValue("Ku1", &Ku1)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 

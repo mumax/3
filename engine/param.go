@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
+	"reflect"
 	"unsafe"
 )
 
@@ -16,10 +17,12 @@ type Param struct {
 	lut         [][LUTSIZE]float32 // look-up table source
 	gpu         cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
 	ok          bool               // gpu cache up-to date with lut source
+	zero        bool               // are all values zero (then we may skip corresponding kernel)
 	post_update func(region int)   // called after region value changed, e.g., to update dependent params
 	autosave                       // allow it to be saved
 }
 
+// constructor
 func param(nComp int, name, unit string) Param {
 	var p Param
 	p.autosave = newAutosave(nComp, name, unit, Mesh())
@@ -63,6 +66,11 @@ func (p *Param) Gpu() cuda.LUTPtrs {
 	p.upload()
 	return p.gpu
 }
+
+func (p *Param) SetValue(v interface{})  { RegionSetVector(1, p, v.([3]float64)) } // todo: non-vecs
+func (p *Param) Eval() interface{}       { return p }
+func (p *Param) Type() reflect.Type      { return reflect.TypeOf(new(Param)) }
+func (p *Param) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
 
 // XYZ swap here
 func (p *Param) upload() {

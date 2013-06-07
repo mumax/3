@@ -10,9 +10,9 @@ import (
 	"unsafe"
 )
 
-var llgtorque_code cu.Function
+var lltorque_code cu.Function
 
-type llgtorque_args struct {
+type lltorque_args struct {
 	arg_tx    unsafe.Pointer
 	arg_ty    unsafe.Pointer
 	arg_tz    unsafe.Pointer
@@ -27,13 +27,13 @@ type llgtorque_args struct {
 	argptr    [11]unsafe.Pointer
 }
 
-// Wrapper for llgtorque CUDA kernel, asynchronous.
-func k_llgtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, cfg *config, str cu.Stream) {
-	if llgtorque_code == 0 {
-		llgtorque_code = fatbinLoad(llgtorque_map, "llgtorque")
+// Wrapper for lltorque CUDA kernel, asynchronous.
+func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, cfg *config, str cu.Stream) {
+	if lltorque_code == 0 {
+		lltorque_code = fatbinLoad(lltorque_map, "lltorque")
 	}
 
-	var a llgtorque_args
+	var a lltorque_args
 
 	a.arg_tx = tx
 	a.argptr[0] = unsafe.Pointer(&a.arg_tx)
@@ -59,40 +59,40 @@ func k_llgtorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, 
 	a.argptr[10] = unsafe.Pointer(&a.arg_N)
 
 	args := a.argptr[:]
-	cu.LaunchKernel(llgtorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 
-// Wrapper for llgtorque CUDA kernel, synchronized.
-func k_llgtorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, cfg *config) {
+// Wrapper for lltorque CUDA kernel, synchronized.
+func k_lltorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alpha float32, N int, cfg *config) {
 	str := stream()
-	k_llgtorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alpha, N, cfg, str)
+	k_lltorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alpha, N, cfg, str)
 	syncAndRecycle(str)
 }
 
-var llgtorque_map = map[int]string{0: "",
-	20: llgtorque_ptx_20,
-	30: llgtorque_ptx_30,
-	35: llgtorque_ptx_35}
+var lltorque_map = map[int]string{0: "",
+	20: lltorque_ptx_20,
+	30: lltorque_ptx_30,
+	35: lltorque_ptx_35}
 
 const (
-	llgtorque_ptx_20 = `
+	lltorque_ptx_20 = `
 .version 3.1
 .target sm_20
 .address_size 64
 
 
-.visible .entry llgtorque(
-	.param .u64 llgtorque_param_0,
-	.param .u64 llgtorque_param_1,
-	.param .u64 llgtorque_param_2,
-	.param .u64 llgtorque_param_3,
-	.param .u64 llgtorque_param_4,
-	.param .u64 llgtorque_param_5,
-	.param .u64 llgtorque_param_6,
-	.param .u64 llgtorque_param_7,
-	.param .u64 llgtorque_param_8,
-	.param .f32 llgtorque_param_9,
-	.param .u32 llgtorque_param_10
+.visible .entry lltorque(
+	.param .u64 lltorque_param_0,
+	.param .u64 lltorque_param_1,
+	.param .u64 lltorque_param_2,
+	.param .u64 lltorque_param_3,
+	.param .u64 lltorque_param_4,
+	.param .u64 lltorque_param_5,
+	.param .u64 lltorque_param_6,
+	.param .u64 lltorque_param_7,
+	.param .u64 lltorque_param_8,
+	.param .f32 lltorque_param_9,
+	.param .u32 lltorque_param_10
 )
 {
 	.reg .pred 	%p<2>;
@@ -101,17 +101,17 @@ const (
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd10, [llgtorque_param_0];
-	ld.param.u64 	%rd11, [llgtorque_param_1];
-	ld.param.u64 	%rd12, [llgtorque_param_2];
-	ld.param.u64 	%rd13, [llgtorque_param_3];
-	ld.param.u64 	%rd14, [llgtorque_param_4];
-	ld.param.u64 	%rd15, [llgtorque_param_5];
-	ld.param.u64 	%rd16, [llgtorque_param_6];
-	ld.param.u64 	%rd17, [llgtorque_param_7];
-	ld.param.u64 	%rd18, [llgtorque_param_8];
-	ld.param.f32 	%f1, [llgtorque_param_9];
-	ld.param.u32 	%r2, [llgtorque_param_10];
+	ld.param.u64 	%rd10, [lltorque_param_0];
+	ld.param.u64 	%rd11, [lltorque_param_1];
+	ld.param.u64 	%rd12, [lltorque_param_2];
+	ld.param.u64 	%rd13, [lltorque_param_3];
+	ld.param.u64 	%rd14, [lltorque_param_4];
+	ld.param.u64 	%rd15, [lltorque_param_5];
+	ld.param.u64 	%rd16, [lltorque_param_6];
+	ld.param.u64 	%rd17, [lltorque_param_7];
+	ld.param.u64 	%rd18, [lltorque_param_8];
+	ld.param.f32 	%f1, [lltorque_param_9];
+	ld.param.u32 	%r2, [lltorque_param_10];
 	cvta.to.global.u64 	%rd1, %rd12;
 	cvta.to.global.u64 	%rd2, %rd11;
 	cvta.to.global.u64 	%rd3, %rd10;
@@ -202,24 +202,24 @@ BB0_2:
 
 
 `
-	llgtorque_ptx_30 = `
+	lltorque_ptx_30 = `
 .version 3.1
 .target sm_30
 .address_size 64
 
 
-.visible .entry llgtorque(
-	.param .u64 llgtorque_param_0,
-	.param .u64 llgtorque_param_1,
-	.param .u64 llgtorque_param_2,
-	.param .u64 llgtorque_param_3,
-	.param .u64 llgtorque_param_4,
-	.param .u64 llgtorque_param_5,
-	.param .u64 llgtorque_param_6,
-	.param .u64 llgtorque_param_7,
-	.param .u64 llgtorque_param_8,
-	.param .f32 llgtorque_param_9,
-	.param .u32 llgtorque_param_10
+.visible .entry lltorque(
+	.param .u64 lltorque_param_0,
+	.param .u64 lltorque_param_1,
+	.param .u64 lltorque_param_2,
+	.param .u64 lltorque_param_3,
+	.param .u64 lltorque_param_4,
+	.param .u64 lltorque_param_5,
+	.param .u64 lltorque_param_6,
+	.param .u64 lltorque_param_7,
+	.param .u64 lltorque_param_8,
+	.param .f32 lltorque_param_9,
+	.param .u32 lltorque_param_10
 )
 {
 	.reg .pred 	%p<2>;
@@ -228,17 +228,17 @@ BB0_2:
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd10, [llgtorque_param_0];
-	ld.param.u64 	%rd11, [llgtorque_param_1];
-	ld.param.u64 	%rd12, [llgtorque_param_2];
-	ld.param.u64 	%rd13, [llgtorque_param_3];
-	ld.param.u64 	%rd14, [llgtorque_param_4];
-	ld.param.u64 	%rd15, [llgtorque_param_5];
-	ld.param.u64 	%rd16, [llgtorque_param_6];
-	ld.param.u64 	%rd17, [llgtorque_param_7];
-	ld.param.u64 	%rd18, [llgtorque_param_8];
-	ld.param.f32 	%f1, [llgtorque_param_9];
-	ld.param.u32 	%r2, [llgtorque_param_10];
+	ld.param.u64 	%rd10, [lltorque_param_0];
+	ld.param.u64 	%rd11, [lltorque_param_1];
+	ld.param.u64 	%rd12, [lltorque_param_2];
+	ld.param.u64 	%rd13, [lltorque_param_3];
+	ld.param.u64 	%rd14, [lltorque_param_4];
+	ld.param.u64 	%rd15, [lltorque_param_5];
+	ld.param.u64 	%rd16, [lltorque_param_6];
+	ld.param.u64 	%rd17, [lltorque_param_7];
+	ld.param.u64 	%rd18, [lltorque_param_8];
+	ld.param.f32 	%f1, [lltorque_param_9];
+	ld.param.u32 	%r2, [lltorque_param_10];
 	cvta.to.global.u64 	%rd1, %rd12;
 	cvta.to.global.u64 	%rd2, %rd11;
 	cvta.to.global.u64 	%rd3, %rd10;
@@ -329,7 +329,7 @@ BB0_2:
 
 
 `
-	llgtorque_ptx_35 = `
+	lltorque_ptx_35 = `
 .version 3.1
 .target sm_35
 .address_size 64
@@ -363,18 +363,18 @@ BB0_2:
 	ret;
 }
 
-.visible .entry llgtorque(
-	.param .u64 llgtorque_param_0,
-	.param .u64 llgtorque_param_1,
-	.param .u64 llgtorque_param_2,
-	.param .u64 llgtorque_param_3,
-	.param .u64 llgtorque_param_4,
-	.param .u64 llgtorque_param_5,
-	.param .u64 llgtorque_param_6,
-	.param .u64 llgtorque_param_7,
-	.param .u64 llgtorque_param_8,
-	.param .f32 llgtorque_param_9,
-	.param .u32 llgtorque_param_10
+.visible .entry lltorque(
+	.param .u64 lltorque_param_0,
+	.param .u64 lltorque_param_1,
+	.param .u64 lltorque_param_2,
+	.param .u64 lltorque_param_3,
+	.param .u64 lltorque_param_4,
+	.param .u64 lltorque_param_5,
+	.param .u64 lltorque_param_6,
+	.param .u64 lltorque_param_7,
+	.param .u64 lltorque_param_8,
+	.param .f32 lltorque_param_9,
+	.param .u32 lltorque_param_10
 )
 {
 	.reg .pred 	%p<2>;
@@ -383,17 +383,17 @@ BB0_2:
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd10, [llgtorque_param_0];
-	ld.param.u64 	%rd11, [llgtorque_param_1];
-	ld.param.u64 	%rd12, [llgtorque_param_2];
-	ld.param.u64 	%rd13, [llgtorque_param_3];
-	ld.param.u64 	%rd14, [llgtorque_param_4];
-	ld.param.u64 	%rd15, [llgtorque_param_5];
-	ld.param.u64 	%rd16, [llgtorque_param_6];
-	ld.param.u64 	%rd17, [llgtorque_param_7];
-	ld.param.u64 	%rd18, [llgtorque_param_8];
-	ld.param.f32 	%f1, [llgtorque_param_9];
-	ld.param.u32 	%r2, [llgtorque_param_10];
+	ld.param.u64 	%rd10, [lltorque_param_0];
+	ld.param.u64 	%rd11, [lltorque_param_1];
+	ld.param.u64 	%rd12, [lltorque_param_2];
+	ld.param.u64 	%rd13, [lltorque_param_3];
+	ld.param.u64 	%rd14, [lltorque_param_4];
+	ld.param.u64 	%rd15, [lltorque_param_5];
+	ld.param.u64 	%rd16, [lltorque_param_6];
+	ld.param.u64 	%rd17, [lltorque_param_7];
+	ld.param.u64 	%rd18, [lltorque_param_8];
+	ld.param.f32 	%f1, [lltorque_param_9];
+	ld.param.u32 	%r2, [lltorque_param_10];
 	cvta.to.global.u64 	%rd1, %rd12;
 	cvta.to.global.u64 	%rd2, %rd11;
 	cvta.to.global.u64 	%rd3, %rd10;

@@ -19,7 +19,6 @@ var (
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
 	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
-	KuMask       maskQuant                                 // Mask to scales Ku1/Msat cellwise.
 	EnableDemag  bool               = true                 // enable/disable demag field
 	geom         Shape              = nil                  // nil means universe
 )
@@ -128,15 +127,12 @@ func initialize() {
 	Ku1.post_update = func(region int) {
 		ku1_red.SetRegion(region, scale(Ku1.GetRegion(region), float32(1/Msat()))...)
 	}
-	// uniaxial anisotropy
-	//	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
-	//		//TODO: conditionally
-	//		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red, regions.Gpu())
-	//	})
-	//	Quants["B_uni"] = &B_uni
-
-	KuMask = mask(3, Mesh(), "kumask", "")
-	Quants["KuMask"] = &KuMask
+	//uniaxial anisotropy
+	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
+		//TODO: conditionally
+		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), regions.Gpu())
+	})
+	Quants["B_uni"] = &B_uni
 
 	// external field
 	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {

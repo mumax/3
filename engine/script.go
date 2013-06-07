@@ -66,7 +66,6 @@ func init() {
 	world.ROnly("Ku1", &Ku1_addr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
-	world.LValue("AnisotropyMask", &KuMask)
 
 	world.Func("expect", expect)
 }

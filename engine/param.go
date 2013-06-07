@@ -58,7 +58,7 @@ func (p *Param) Gpu() cuda.LUTPtrs {
 }
 
 func (p *Param) upload() {
-	log.Println("upload LUT", p.name)
+	log.Println("upload LUT", p.name, p.cpu)
 	for c := range p.gpu {
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.cpu[c][0]), cu.SIZEOF_FLOAT32*int64(len(p.cpu[c])))
 	}

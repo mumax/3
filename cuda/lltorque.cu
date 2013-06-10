@@ -7,19 +7,19 @@ lltorque(float* __restrict__  tx, float* __restrict__  ty, float* __restrict__  
          float* __restrict__  hx, float* __restrict__  hy, float* __restrict__  hz,
          float alpha, int N) {
 
-	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
-	if (i < N) {
+    int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
+    if (i < N) {
 
-		float3 m = {mx[i], my[i], mz[i]};
-		float3 H = {hx[i], hy[i], hz[i]};
+        float3 m = {mx[i], my[i], mz[i]};
+        float3 H = {hx[i], hy[i], hz[i]};
 
-		float3 mxH = cross(m, H);
-		float gilb = -1.0f / (1.0f + alpha * alpha);
-		float3 torque = gilb * (mxH + alpha * cross(m, mxH));
+        float3 mxH = cross(m, H);
+        float gilb = -1.0f / (1.0f + alpha * alpha);
+        float3 torque = gilb * (mxH + alpha * cross(m, mxH));
 
-		tx[i] = torque.x;
-		ty[i] = torque.y;
-		tz[i] = torque.z;
-	}
+        tx[i] = torque.x;
+        ty[i] = torque.y;
+        tz[i] = torque.z;
+    }
 }
 

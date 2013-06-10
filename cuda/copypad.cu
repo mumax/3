@@ -4,21 +4,21 @@
 //	a    ->  a x
 //	         x x
 //
-extern "C" __global__ void 
-copypad(float* __restrict__  dst, int D0, int D1, int D2, 
-        float* __restrict__  src, int S0, int S1, int S2){
+extern "C" __global__ void
+copypad(float* __restrict__  dst, int D0, int D1, int D2,
+        float* __restrict__  src, int S0, int S1, int S2) {
 
-	int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
-	int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(j>=S1 || k>=S2 || j>=D1 || k>=D2){
- 		return;	// out of  bounds
-	}
+    if(j>=S1 || k>=S2 || j>=D1 || k>=D2) {
+        return;	// out of  bounds
+    }
 
-	// loop over N layers
-	int N = min(S0, D0);
-	for (int i=0; i<N; i++){
-		dst[i*D1*D2 + j*D2 + k] = src[i*S1*S2 + j*S2 + k];
-	}
-} 
+    // loop over N layers
+    int N = min(S0, D0);
+    for (int i=0; i<N; i++) {
+        dst[i*D1*D2 + j*D2 + k] = src[i*S1*S2 + j*S2 + k];
+    }
+}
 

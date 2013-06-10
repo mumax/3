@@ -9,6 +9,7 @@ NVCC = nvcc\
 	-ptx
 
 all: $(GOFILES)
+	astyle *.cu || echo ""
 	go fmt	
 	go install -v
 

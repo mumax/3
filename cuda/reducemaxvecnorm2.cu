@@ -7,6 +7,6 @@
 
 extern "C" __global__ void
 reducemaxvecnorm2(float* __restrict__ x, float* __restrict__ y, float* __restrict__ z, float* __restrict__ dst, float initVal, int n) {
-	reduce(load_vecnorm2, fmax, atomicFmaxabs)
+    reduce(load_vecnorm2, fmax, atomicFmaxabs)
 }
 

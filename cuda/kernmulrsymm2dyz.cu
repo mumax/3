@@ -21,22 +21,22 @@
 // ...
 // -aaaa
 // -bbbb
-extern "C" __global__ void 
+extern "C" __global__ void
 kernmulRSymm2Dyz(float* __restrict__  fftMy,  float* __restrict__  fftMz,
-                 float* __restrict__  fftKyy, float* __restrict__  fftKzz, float* __restrict__  fftKyz, 
-                 int N1, int N2){
+                 float* __restrict__  fftKyy, float* __restrict__  fftKzz, float* __restrict__  fftKyz,
+                 int N1, int N2) {
 
-	int j = blockIdx.y * blockDim.y + threadIdx.y;
-	int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if(j>= N1 || k>=N2){
- 		return;	
-	}
+    if(j>= N1 || k>=N2) {
+        return;
+    }
 
-	int I = j*N2 + k;       // linear index for upper half of kernel
-	int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
+    int I = j*N2 + k;       // linear index for upper half of kernel
+    int I2 = (N1-j)*N2 + k; // linear index for re-use of lower half
 
-  	int e = 2 * I;
+    int e = 2 * I;
 
     float reMy = fftMy[e  ];
     float imMy = fftMy[e+1];
@@ -44,15 +44,15 @@ kernmulRSymm2Dyz(float* __restrict__  fftMy,  float* __restrict__  fftMz,
     float imMz = fftMz[e+1];
 
     float Kyy, Kzz, Kyz;
-	if (j < N1/2 + 1){
-		Kyy = fftKyy[I];
-		Kzz = fftKzz[I];
-		Kyz = fftKyz[I];
-	}else{
-		Kyy =  fftKyy[I2];
-		Kzz =  fftKzz[I2];
-		Kyz = -fftKyz[I2];
-	}
+    if (j < N1/2 + 1) {
+        Kyy = fftKyy[I];
+        Kzz = fftKzz[I];
+        Kyz = fftKyz[I];
+    } else {
+        Kyy =  fftKyy[I2];
+        Kzz =  fftKzz[I2];
+        Kyz = -fftKyz[I2];
+    }
 
     fftMy[e  ] = reMy * Kyy + reMz * Kyz;
     fftMy[e+1] = imMy * Kyy + imMz * Kyz;

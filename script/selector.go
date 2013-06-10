@@ -11,6 +11,7 @@ type selector struct {
 	method int
 }
 
+// compiles a selector statement like x.sel
 func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 	x := w.compileExpr(n.X)
 	t := x.Type()
@@ -31,5 +32,5 @@ func (e *selector) Eval() interface{} {
 }
 
 func (e *selector) Type() reflect.Type {
-	return e.x.Type().Method(e.method).Type
+	return reflect.New(e.x.Type()).Elem().Method(e.method).Type()
 }

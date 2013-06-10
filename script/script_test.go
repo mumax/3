@@ -80,6 +80,23 @@ func TestLoop(t *testing.T) {
 	}
 }
 
+type test struct {
+	a, b, c int
+}
+
+func (t *test) A() int { return 41 }
+func (t *test) B() int { return 42 }
+func (t *test) C() int { return 43 }
+
+func TestMethod(t *testing.T) {
+	w := NewWorld()
+	var s *test
+	w.Var("s", &s)
+	if w.MustEval("s.B()") != 42 {
+		t.Fail()
+	}
+}
+
 func TestScope(t *testing.T) {
 	w := NewWorld()
 	w.MustEval("sin(0)")
@@ -136,7 +153,14 @@ type T struct {
 }
 
 func TestMany(test *testing.T) {
-	tests := []T{{"1+1", 2.},
+	tests := []T{
+		{"1+1", 2.},
+		{"7-5", 2.},
+		{"2*3", 6.},
+		{"10/5", 2.},
+		{"1+10/5", 3.},
+		{"10/5+1", 3.},
+		{"(1+14)/5", 3.},
 		{"1<1", false},
 		{"1<2", true},
 		{"2<1", false},

@@ -11,7 +11,7 @@ type call struct {
 }
 
 func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
-
+	// compile function or method to be called
 	var f Expr
 	var fname string
 	switch concrete := n.Fun.(type) {
@@ -24,11 +24,11 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 		f = w.compileSelectorStmt(concrete)
 		fname = concrete.Sel.Name
 	}
-
 	if f.Type().Kind() != reflect.Func {
 		panic(err(n.Pos(), "can not call", n))
 	}
 
+	// compile and check args
 	args := make([]Expr, len(n.Args))
 	variadic := f.Type().IsVariadic()
 	for i := range args {
@@ -38,7 +38,6 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 			args[i] = typeConv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.Type().In(i))
 		}
 	}
-
 	if !variadic && len(n.Args) != f.Type().NumIn() {
 		panic(err(n.Pos(), fname, "needs", f.Type().NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
 	}

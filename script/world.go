@@ -73,7 +73,7 @@ func (w *scope) LValue(name string, v LValue) {
 // 	world.MustEval("sin(0)") // returns 0
 func (w *scope) Func(name string, f interface{}) {
 	// TODO: specialize for float64 funcs etc
-	w.declare(name, newReflectFunc(f))
+	w.declare(name, newFunction(f))
 }
 
 // add identifier but check that it's not declared yet.

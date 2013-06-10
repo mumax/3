@@ -11,23 +11,35 @@ type call struct {
 }
 
 func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
-	// only call idents for now
-	id, ok := (n.Fun).(*ast.Ident)
-	if !ok {
-		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
+
+	// compile function/method
+	var f *function
+	var receiver Expr
+	var fname string
+	{
+		switch concrete := n.Fun.(type) {
+		default:
+			panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
+		case *ast.Ident: // function call
+			if fn, ok := w.resolve(n.Pos(), concrete.Name).(*function); ok {
+				f = fn
+				fname = concrete.Name
+			} else {
+				panic(err(n.Pos(), "can not call", concrete.Name))
+			}
+		case *ast.SelectorExpr: // method call
+			receiver = w.compileExpr(concrete.X)
+			if val, ok := receiver.Type().MethodByName(concrete.Sel.Name); ok {
+				f = &function{val.Func}
+				fname = concrete.Sel.Name
+			} else {
+				panic(err(n.Pos(), typ(receiver.Type()), "does not have method", concrete.Sel.Name))
+			}
+		}
 	}
-	// only call reflectFunc for now
-	f, ok2 := w.resolve(n.Pos(), id.Name).(*function)
-	if !ok2 {
-		panic(err(n.Pos(), "can not call", id.Name))
-	}
-	// check args count. no strict check for varargs
-	variadic := f.Type().IsVariadic()
-	if !variadic && len(n.Args) != f.NumIn() {
-		panic(err(n.Pos(), id.Name, "needs", f.NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
-	}
-	// convert args
+
 	args := make([]Expr, len(n.Args))
+	variadic := f.Type().IsVariadic()
 	for i := range args {
 		if variadic {
 			args[i] = w.compileExpr(n.Args[i]) // no type check or conversion
@@ -35,6 +47,16 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 			args[i] = typeConv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.In(i))
 		}
 	}
+
+	// insert receiver in case of method call
+	if receiver != nil {
+		args = append([]Expr{receiver}, args...)
+	}
+
+	if !variadic && len(n.Args) != f.NumIn() {
+		panic(err(n.Pos(), fname, "needs", f.NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
+	}
+
 	return &call{*f, args}
 }
 

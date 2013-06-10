@@ -5,6 +5,11 @@ import (
 	"reflect"
 )
 
+type call struct {
+	f    function
+	args []Expr
+}
+
 func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	// only call idents for now
 	id, ok := (n.Fun).(*ast.Ident)
@@ -33,16 +38,10 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	return &call{*f, args}
 }
 
-type call struct {
-	f    function
-	args []Expr
-}
-
 func (c *call) Eval() interface{} {
 	argv := make([]reflect.Value, len(c.args))
-
 	for i := range c.args {
-		argv[i] = evalue(c.args[i])
+		argv[i] = reflect.ValueOf(c.args[i].Eval())
 	}
 
 	ret := c.f.Call(argv)
@@ -54,9 +53,6 @@ func (c *call) Eval() interface{} {
 	}
 }
 
-func (c *call) Type() reflect.Type { return c.f.ReturnType() }
-
-// eval and return as value
-func evalue(e Expr) reflect.Value {
-	return reflect.ValueOf(e.Eval()) // later we can typeswitch on EvalValue() and avoid unbox+box
+func (c *call) Type() reflect.Type {
+	return c.f.ReturnType()
 }

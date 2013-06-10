@@ -11,9 +11,9 @@ import (
 
 const LUTSIZE = 256
 
-// Param stores a space-dependent material parameter
+// param stores a space-dependent material parameter
 // by keeping a look-up table mapping region index to float value.
-type Param struct {
+type param struct {
 	lut         [][LUTSIZE]float32 // look-up table source
 	gpu         cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
 	ok          bool               // gpu cache up-to date with lut source
@@ -23,8 +23,8 @@ type Param struct {
 }
 
 // constructor
-func param(nComp int, name, unit string) Param {
-	var p Param
+func newParam(nComp int, name, unit string) param {
+	var p param
 	p.autosave = newAutosave(nComp, name, unit, Mesh())
 	p.gpu = make(cuda.LUTPtrs, nComp)
 	for i := range p.gpu {
@@ -35,13 +35,13 @@ func param(nComp int, name, unit string) Param {
 	return p
 }
 
-func (p *Param) SetRegion(region int, v ...float32) {
+func (p *param) setRegion(region int, v ...float64) {
 	util.Argument(len(v) == p.NComp())
 	if region == 0 {
 		log.Fatal("cannot set parameters in region 0 (vacuum)")
 	}
 	for c := range v {
-		p.lut[c][region] = v[c]
+		p.lut[c][region] = float32(v[c])
 	}
 	p.ok = false
 	if p.post_update != nil {
@@ -49,17 +49,17 @@ func (p *Param) SetRegion(region int, v ...float32) {
 	}
 }
 
-func (p *Param) GetRegion(region int) []float32 {
-	v := make([]float32, p.NComp())
+func (p *param) GetRegion(region int) []float64 {
+	v := make([]float64, p.NComp())
 	for c := range v {
-		v[c] = p.lut[c][region]
+		v[c] = float64(p.lut[c][region])
 	}
 	return v
 }
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
-func (p *Param) Gpu() cuda.LUTPtrs {
+func (p *param) Gpu() cuda.LUTPtrs {
 	if p.ok {
 		return p.gpu
 	}
@@ -67,13 +67,8 @@ func (p *Param) Gpu() cuda.LUTPtrs {
 	return p.gpu
 }
 
-func (p *Param) SetValue(v interface{})  { RegionSetVector(1, p, v.([3]float64)) } // todo: non-vecs
-func (p *Param) Eval() interface{}       { return p }
-func (p *Param) Type() reflect.Type      { return reflect.TypeOf(new(Param)) }
-func (p *Param) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
-
 // XYZ swap here
-func (p *Param) upload() {
+func (p *param) upload() {
 	log.Println("upload LUT", p.name, p.lut)
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())
@@ -83,18 +78,28 @@ func (p *Param) upload() {
 }
 
 // scale vector by a, overwrite source and return it for convenience
-func scale(v []float32, a float32) []float32 {
+func scale(v []float64, a float64) []float64 {
 	for i := range v {
 		v[i] *= a
 	}
 	return v
 }
 
-// rudimentary api
-func RegionSetVector(region int, p *Param, v [3]float64) {
-	p.SetRegion(region, []float32{float32(v[0]), float32(v[1]), float32(v[2])}...)
-}
+type ScalarParam struct{ param }
 
-func init() {
-	world.Func("RegionSetVector", RegionSetVector)
+func (s *ScalarParam) SetRegion(region int, value float64) { s.param.setRegion(region, value) }
+func (p *ScalarParam) SetValue(v interface{})              { p.SetRegion(1, v.(float64)) }
+func (p *ScalarParam) Eval() interface{}                   { return p }
+func (p *ScalarParam) Type() reflect.Type                  { return reflect.TypeOf(new(ScalarParam)) }
+func (p *ScalarParam) InputType() reflect.Type             { return reflect.TypeOf(float64(0)) }
+
+type VectorParam struct{ param }
+
+func vectorParam(name, unit string) VectorParam {
+	return VectorParam{newParam(3, name, unit)}
 }
+func (s *VectorParam) SetRegion(region int, value [3]float64) { s.setRegion(region, value[:]...) }
+func (p *VectorParam) SetValue(v interface{})                 { vec := v.([3]float64); p.setRegion(1, vec[:]...) }
+func (p *VectorParam) Eval() interface{}                      { return p }
+func (p *VectorParam) Type() reflect.Type                     { return reflect.TypeOf(new(VectorParam)) }
+func (p *VectorParam) InputType() reflect.Type                { return reflect.TypeOf([3]float64{}) }

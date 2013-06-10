@@ -13,8 +13,8 @@ var (
 	Alpha        func() float64    = Const(0)             // Damping constant
 	B_ext        func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64    = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          Param
-	ku1_red      Param
+	Ku1          VectorParam
+	ku1_red      VectorParam
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
@@ -122,10 +122,10 @@ func initialize() {
 	})
 	Quants["B_dmi"] = &B_dmi
 
-	Ku1 = param(3, "Ku1", "J/m3")
-	ku1_red = param(3, "ku1_red", "T")
+	Ku1 = vectorParam("Ku1", "J/m3")
+	ku1_red = vectorParam("ku1_red", "T")
 	Ku1.post_update = func(region int) {
-		ku1_red.SetRegion(region, scale(Ku1.GetRegion(region), float32(1/Msat()))...)
+		ku1_red.setRegion(region, scale(Ku1.GetRegion(region), 1/Msat())...)
 	}
 	//uniaxial anisotropy
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {

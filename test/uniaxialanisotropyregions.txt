@@ -10,8 +10,8 @@
 	alpha = 0.2
 	M       = uniform(1, 1, 0)
 
-	defregion(1, ...)
-	Ku1.setregion(1, vector(...))
+	defregion(1, rect(999, 999))
+	Ku1.setregion(1, vector(0.5e6, 0, 0))
 
 	savetable(10e-12)
 

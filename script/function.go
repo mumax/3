@@ -25,15 +25,3 @@ func (f *function) Type() reflect.Type    { return f.Value.Type() }
 func (f *function) NumIn() int            { return f.Type().NumIn() }
 func (f *function) In(i int) reflect.Type { return f.Type().In(i) }
 func (f *function) Eval() interface{}     { return f.Value.Interface() }
-
-// return type of call
-func (f *function) ReturnType() reflect.Type {
-	switch f.Type().NumOut() {
-	case 0:
-		return nil // "void"
-	case 1:
-		return f.Type().Out(0)
-	default:
-		panic("bug: multiple return values not allowed")
-	}
-}

@@ -9,17 +9,15 @@ import (
 	"unsafe"
 )
 
-const LUTSIZE = 256
-
 // param stores a space-dependent material parameter
 // by keeping a look-up table mapping region index to float value.
 type param struct {
-	lut         [][LUTSIZE]float32 // look-up table source
-	gpu         cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
-	ok          bool               // gpu cache up-to date with lut source
-	zero        bool               // are all values zero (then we may skip corresponding kernel)
-	post_update func(region int)   // called after region value changed, e.g., to update dependent params
-	autosave                       // allow it to be saved
+	lut         [][MAXREG]float32 // look-up table source
+	gpu         cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
+	ok          bool              // gpu cache up-to date with lut source
+	zero        bool              // are all values zero (then we may skip corresponding kernel)
+	post_update func(region int)  // called after region value changed, e.g., to update dependent params
+	autosave                      // allow it to be saved
 }
 
 // constructor
@@ -28,9 +26,9 @@ func newParam(nComp int, name, unit string) param {
 	p.autosave = newAutosave(nComp, name, unit, Mesh())
 	p.gpu = make(cuda.LUTPtrs, nComp)
 	for i := range p.gpu {
-		p.gpu[i] = cuda.MemAlloc(LUTSIZE * cu.SIZEOF_FLOAT32)
+		p.gpu[i] = cuda.MemAlloc(MAXREG * cu.SIZEOF_FLOAT32)
 	}
-	p.lut = make([][LUTSIZE]float32, nComp)
+	p.lut = make([][MAXREG]float32, nComp)
 	p.ok = false
 	return p
 }
@@ -39,6 +37,9 @@ func (p *param) setRegion(region int, v ...float64) {
 	util.Argument(len(v) == p.NComp())
 	if region == 0 {
 		log.Fatal("cannot set parameters in region 0 (vacuum)")
+	}
+	if !regions.defined[region] {
+		log.Fatal("region ", region, " has not yet been defined by DefRegion()")
 	}
 	for c := range v {
 		p.lut[c][region] = float32(v[c])
@@ -72,7 +73,7 @@ func (p *param) upload() {
 	log.Println("upload LUT", p.name, p.lut)
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())
-		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.lut[c2][0]), cu.SIZEOF_FLOAT32*LUTSIZE)
+		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.lut[c2][0]), cu.SIZEOF_FLOAT32*MAXREG)
 	}
 	p.ok = true
 }

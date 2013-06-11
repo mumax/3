@@ -7,13 +7,16 @@ import (
 	"log"
 )
 
+const MAXREG = 256 // maximum number of regions
+
 type Regions struct {
-	arr        [][][]byte  // regions map: cell i,j,k -> byte index
-	cpu        []byte      // arr data, stored contiguously
-	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
-	gpuCacheOK bool        // gpuCache in sync with cpu
-	qCache     *data.Slice // float32 copy of arr (for output), possibly out-of-sync
-	qCacheOK   bool        // qCache in sync with arr?
+	arr        [][][]byte   // regions map: cell i,j,k -> byte index
+	cpu        []byte       // arr data, stored contiguously
+	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
+	gpuCacheOK bool         // gpuCache in sync with cpu
+	qCache     *data.Slice  // float32 copy of arr (for output), possibly out-of-sync
+	qCacheOK   bool         // qCache in sync with arr?
+	defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
 	autosave
 }
 
@@ -32,11 +35,12 @@ func (r *Regions) init() {
 	r.rasterGeom()
 }
 
-//
+// Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
-	if id < 0 || id > 255 {
+	if id < 0 || id > MAXREG {
 		log.Fatalf("region id should be 0-255, have: %v", id)
 	}
+	regions.defined[id] = true
 	n := Mesh().Size()
 	c := Mesh().CellSize()
 	dx := (float64(n[2]/2) - 0.5) * c[2]

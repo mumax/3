@@ -12,6 +12,7 @@
 
 	defregion(1, rect(999, 999))
 	Ku1.setregion(1, vector(0.5e6, 0, 0))
+	Ku1.setregion(2, vector(0.5e6, 0, 0))
 
 	savetable(10e-12)
 
@@ -38,4 +39,5 @@
 	expect("my", average(m)[1], 0.331, 1e-3)
 
 
-	defregion(2, rect(999, 999))
+	//defregion(2, rect(999, 999))
+	Ku1.setregion(2, vector(0.5e6, 0, 0))

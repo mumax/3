@@ -69,6 +69,7 @@ func init() {
 	world.ROnly("regions", &regions_addr)
 
 	world.LValue("Ku1", &Ku1)
+	world.LValue("AnisU", &AnisU)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 

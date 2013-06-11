@@ -50,7 +50,7 @@ func (p *param) setRegion(region int, v ...float64) {
 	}
 }
 
-func (p *param) GetRegion(region int) []float64 {
+func (p *param) getRegion(region int) []float64 {
 	v := make([]float64, p.NComp())
 	for c := range v {
 		v[c] = float64(p.lut[c][region])
@@ -88,18 +88,25 @@ func scale(v []float64, a float64) []float64 {
 
 type ScalarParam struct{ param }
 
-func (s *ScalarParam) SetRegion(region int, value float64) { s.param.setRegion(region, value) }
-func (p *ScalarParam) SetValue(v interface{})              { p.SetRegion(1, v.(float64)) }
+func scalarParam(name, unit string) ScalarParam {
+	return ScalarParam{newParam(1, name, unit)}
+}
+
+func (p *ScalarParam) SetRegion(region int, value float64) { p.setRegion(region, value) }
+func (p *ScalarParam) SetValue(v interface{})              { p.setRegion(1, v.(float64)) }
 func (p *ScalarParam) Eval() interface{}                   { return p }
 func (p *ScalarParam) Type() reflect.Type                  { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type             { return reflect.TypeOf(float64(0)) }
+func (p *ScalarParam) GetRegion(region int) float64        { return float64(p.lut[0][region]) }
+func (p *ScalarParam) Gpu() cuda.LUTPtr                    { return cuda.LUTPtr(p.param.Gpu()[0]) }
 
 type VectorParam struct{ param }
 
 func vectorParam(name, unit string) VectorParam {
 	return VectorParam{newParam(3, name, unit)}
 }
-func (s *VectorParam) SetRegion(region int, value [3]float64) { s.setRegion(region, value[:]...) }
+
+func (p *VectorParam) SetRegion(region int, value [3]float64) { p.setRegion(region, value[:]...) }
 func (p *VectorParam) SetValue(v interface{})                 { vec := v.([3]float64); p.setRegion(1, vec[:]...) }
 func (p *VectorParam) Eval() interface{}                      { return p }
 func (p *VectorParam) Type() reflect.Type                     { return reflect.TypeOf(new(VectorParam)) }

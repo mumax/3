@@ -7,14 +7,7 @@ func init() {
 	world.Func("Cylinder", Cylinder)
 	world.Func("Cuboid", Cuboid)
 	world.Func("Rect", Rect)
-	world.Func("Transl", Transl)
 	world.Func("HalfSpace", HalfSpace)
-
-	world.Func("RotZ", RotZ)
-	world.Func("Union", Union)
-	world.Func("Intersect", Intersect)
-	world.Func("Inverse", Inverse)
-	world.Func("Sub", Sub)
 }
 
 // geometrical shape for setting sample geometry
@@ -65,14 +58,14 @@ func universe(x, y, z float64) bool {
 // Transforms:
 
 // Transl returns a translated copy of the shape.
-func Transl(s Shape, dx, dy, dz float64) Shape {
+func (s Shape) Transl(dx, dy, dz float64) Shape {
 	return func(x, y, z float64) bool {
 		return s(x-dx, y-dy, z-dz)
 	}
 }
 
 // Rotates the shape around the Z-axis, over θ radians.
-func RotZ(s Shape, θ float64) Shape {
+func (s Shape) RotZ(θ float64) Shape {
 	return func(x, y, z float64) bool {
 		x_ := x*math.Cos(θ) - y*math.Sin(θ)
 		y_ := x*math.Sin(θ) + y*math.Cos(θ)
@@ -83,7 +76,7 @@ func RotZ(s Shape, θ float64) Shape {
 // CSG:
 
 // Union of shapes a and b.
-func Union(a, b Shape) Shape {
+func (a Shape) Add(b Shape) Shape {
 	return func(x, y, z float64) bool {
 		if a(x, y, z) {
 			return true // lazy evaluation
@@ -93,7 +86,7 @@ func Union(a, b Shape) Shape {
 }
 
 // Intersection of shapes a and b.
-func Intersect(a, b Shape) Shape {
+func (a Shape) Intersect(b Shape) Shape {
 	return func(x, y, z float64) bool {
 		if !a(x, y, z) {
 			return false // lazy evaluation
@@ -103,7 +96,7 @@ func Intersect(a, b Shape) Shape {
 }
 
 // Inverse (outside) of shape.
-func Inverse(s Shape) Shape {
+func (s Shape) Inverse() Shape {
 	return func(x, y, z float64) bool {
 		return !s(x, y, z)
 	}
@@ -111,7 +104,7 @@ func Inverse(s Shape) Shape {
 
 // Removes b from a.
 // Equivalent to "a and not b": intersect(a, inverse(b)).
-func Sub(a, b Shape) Shape {
+func (a Shape) Sub(b Shape) Shape {
 	return func(x, y, z float64) bool {
 		if !a(x, y, z) {
 			return false // lazy evaluation

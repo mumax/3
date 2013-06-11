@@ -19,10 +19,9 @@ See file examples/geometry.txt
 
 	h     := 50e-9
 	hole  := cylinder(h, h)              // circle with diameter h
-	hole1 := transl(hole, 100e-9, 0, 0)  // translated circle #1
-	hole2 := transl(hole, 0, -50e-9, 0)  // translated cricle #2
-	holes := union(hole1, hole2)         // both circles combined
-	cheese := sub(square, holes)         // subtract the circles form the square (makes holes).
+	hole1 := hole.transl(100e-9, 0, 0)  // translated circle #1
+	hole2 := hole.transl(0, -50e-9, 0)  // translated cricle #2
+	cheese:= square.sub(hole1).sub(hole2)   // subtract the circles form the square (makes holes).
 	setgeom(cheese)
 
 	msat = 600e3
@@ -32,7 +31,7 @@ See file examples/geometry.txt
 	// rotate the cheese.
 	for i:=0; i<=180; i++{
 		angle := i*pi/180
-		setgeom(rotz(cheese, angle))
+		setgeom(cheese.rotz(angle))
 		m = uniform(cos(angle), sin(angle), 0)
 		run(0.1e-9)
 	}

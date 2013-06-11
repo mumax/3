@@ -2,6 +2,7 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
@@ -9,8 +10,10 @@ import (
 	"unsafe"
 )
 
-// param stores a space-dependent material parameter
+// param stores a space-dependent material parameter,
 // by keeping a look-up table mapping region index to float value.
+// implementation allows arbitrary number of components,
+// narrowed down to 1 or 3 in ScalarParam and VectorParam
 type param struct {
 	lut         [][MAXREG]float32 // look-up table source
 	gpu         cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
@@ -70,15 +73,18 @@ func (p *param) getRegion(region int) []float64 {
 }
 
 // Get returns the space-dependent parameter as a slice of floats, so it can be output.
-//func (p *param) Get() (*data.Slice, bool) {
-//		s := data.NewSlice(p.NComp(), p.Mesh())
-//		l := s.Host()
-//		for c:= range l{
-//		for i := range l[c] {
-//			l[c][i] = float32(p.cpu[c][i])
-//		}
-//	return s
-//}
+func (p *param) Get() (*data.Slice, bool) {
+	s := data.NewSlice(p.NComp(), p.Mesh())
+	l := s.Host()
+
+	for i, r := range regions.cpu {
+		v := p.getRegion(int(r))
+		for c := range l {
+			l[c][i] = float32(v[c])
+		}
+	}
+	return s, false
+}
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.

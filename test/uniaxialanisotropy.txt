@@ -20,10 +20,9 @@
 	defregion(3, rect(100e-9, 20e-9))
 	
 	// Test output
-//	save(Ku1)
-//	save(AnisU)
-//	print(average(Ku1))
-//	print(average(AnisU))
+	save(Ku1)
+	save(AnisU)
+	save(B_uni)
 	
  	// Easy, in-plane
 	AnisU = vector(1, 0, 0)

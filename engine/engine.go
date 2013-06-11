@@ -135,8 +135,8 @@ func initialize() {
 		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
 	})
 	Quants["B_uni"] = &B_uni
-	//Quants["Ku1"] = &Ku1
-	//Quants["anisU"] = &AnisU
+	Quants["Ku1"] = &Ku1
+	Quants["anisU"] = &AnisU
 
 	// external field
 	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {

@@ -38,13 +38,12 @@ var (
 
 // hidden quantities
 var (
-	globalmesh   data.Mesh
-	torquebuffer *data.Slice
-	regions      Regions
-	postStep     []func() // called on after every time step
-	extFields    []extField
-	itime        int //unique integer time stamp
-	demag_       *cuda.DemagConvolution
+	globalmesh data.Mesh
+	regions    Regions
+	postStep   []func() // called on after every time step
+	extFields  []extField
+	itime      int //unique integer time stamp
+	demag_     *cuda.DemagConvolution
 )
 
 func Mesh() *data.Mesh {
@@ -70,9 +69,6 @@ type extField struct {
 var Quants = make(map[string]Getter)
 
 func initialize() {
-
-	// these 2 GPU arrays are re-used to stored various quantities.
-	torquebuffer = cuda.NewSlice(3, Mesh())
 
 	// magnetization
 	M.init()
@@ -168,6 +164,8 @@ func initialize() {
 	Quants["torque"] = &Torque
 
 	// solver
+	torquebuffer := cuda.NewSlice(3, Mesh())
+
 	torqueFn := func(cansave bool) *data.Slice {
 		itime++
 		Table.arm(cansave)      // if table output needed, quantities marked for update

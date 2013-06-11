@@ -32,7 +32,7 @@ func (r *Regions) init() {
 
 	r.gpuCache = cuda.NewBytes(mesh)
 
-	r.rasterGeom()
+	DefRegion(1, universe)
 }
 
 // Define a region with id (0-255) to be inside the Shape.

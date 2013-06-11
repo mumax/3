@@ -9,7 +9,7 @@
 	Aex   = 13e-12
 	alpha = 0.2
 	M     = uniform(1, 1, 0)
-	Ku1   = vector(0.5e6, 0, 0)
+	Ku1   = vector(-0.5e6, 0, 0)
 
 	savetable(10e-12)
 

@@ -8,6 +8,8 @@ func init() {
 	world.Func("Cuboid", Cuboid)
 	world.Func("Rect", Rect)
 	world.Func("Transl", Transl)
+	world.Func("HalfSpace", HalfSpace)
+
 	world.Func("RotZ", RotZ)
 	world.Func("Union", Union)
 	world.Func("Intersect", Intersect)

@@ -14,8 +14,6 @@ type Regions struct {
 	cpu        []byte       // arr data, stored contiguously
 	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool         // gpuCache in sync with cpu
-	qCache     *data.Slice  // float32 copy of arr (for output), possibly out-of-sync
-	qCacheOK   bool         // qCache in sync with arr?
 	defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
 	autosave
 }
@@ -61,7 +59,6 @@ func DefRegion(id int, s Shape) {
 	}
 	M.stencilGeom() // TODO: revise if really needed
 	regions.gpuCacheOK = false
-	regions.qCacheOK = false
 }
 
 // Get the region data on GPU, first uploading it if needed.
@@ -105,23 +102,16 @@ func (r *Regions) rasterGeom() {
 	}
 	M.stencilGeom() // TODO: revise if really needed
 	regions.gpuCacheOK = false
-	regions.qCacheOK = false
 }
 
 // Get returns the regions as a slice of floats, so it can be output.
 func (r *Regions) Get() (*data.Slice, bool) {
-	if !r.qCacheOK {
-		if r.qCache == nil {
-			r.qCache = data.NewSlice(1, r.Mesh())
-		}
-		l := r.qCache.Host()[0]
+		s := data.NewSlice(1, r.Mesh())
+		l := s.Host()[0]
 		for i := range l {
 			l[i] = float32(r.cpu[i])
 		}
-		log.Println("caching regions output")
-		r.qCacheOK = true
-	}
-	return r.qCache, false
+	return s, false
 }
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.

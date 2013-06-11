@@ -17,17 +17,14 @@ var (
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
 	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
-	EnableDemag  bool               = true                 // enable/disable demag field
 	geom         Shape              = nil                  // nil means universe
 )
 
 // Accessible quantities
 var (
 	M                magnetization // reduced magnetization (unit length)
-	FFTM             fftm          // FFT of M
 	B_eff            setterQuant   // effective field (T) output handle
-	B_demag          setterQuant   // demag field (T) output handle
-	B_dmi            adderQuant    // demag field (T) output handle
+	B_dmi            adderQuant    // DMI field (T) output handle
 	B_exch           adderQuant    // exchange field (T) output handle
 	STTorque         adderQuant    // spin-transfer torque output handle
 	LLTorque, Torque setterQuant   // torque/gamma0, in Tesla
@@ -43,7 +40,6 @@ var (
 	postStep   []func() // called on after every time step
 	extFields  []extField
 	itime      int //unique integer time stamp
-	demag_     *cuda.DemagConvolution
 )
 
 func Mesh() *data.Mesh {
@@ -72,29 +68,18 @@ func initialize() {
 
 	// magnetization
 	M.init()
+	FFTM.init()
 	Quants["m"] = &M
+	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
 
 	// regions
 	regions.init()
 	Quants["regions"] = &regions
 
-	FFTM.init()
-	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
-
 	// data table
 	Table = *newTable("datatable")
 
-	// demag field
-	demag_ = cuda.NewDemag(Mesh())
-	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
-		if EnableDemag {
-			sanitycheck()
-			demag_.Exec(b, M.buffer, nil, Mu0*Msat()) // vol = nil
-		} else {
-			cuda.Zero(b)
-		}
-	})
-	Quants["B_demag"] = &B_demag
+	initDemag()
 
 	// exchange field
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {

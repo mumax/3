@@ -35,8 +35,6 @@ func init() {
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
 
-	world.Var("EnableDemag", &EnableDemag)
-
 	world.Var("Dt", &Solver.Dt_si)
 	world.Var("MinDt", &Solver.Mindt)
 	world.Var("MaxDt", &Solver.Maxdt)
@@ -50,9 +48,6 @@ func init() {
 	world.Func("SetGeom", SetGeometry)
 	world.Func("DefRegion", DefRegion)
 
-	B_demag_addr := &B_demag
-	world.ROnly("B_demag", &B_demag_addr)
-
 	B_exch_addr := &B_exch
 	world.ROnly("B_exch", &B_exch_addr)
 
@@ -61,9 +56,6 @@ func init() {
 
 	B_dmi_addr := &B_dmi
 	world.ROnly("B_dmi", &B_dmi_addr)
-
-	fftm_addr := &FFTM
-	world.ROnly("mFFT", &fftm_addr)
 
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)

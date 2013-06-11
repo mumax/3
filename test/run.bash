@@ -6,5 +6,6 @@ for f in $scripts; do
 done;
 for f in $scripts; do
 	../mx3 -f $f|| exit 1;
+	echo ""
 done;
 

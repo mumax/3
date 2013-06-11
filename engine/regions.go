@@ -59,6 +59,7 @@ func DefRegion(id int, s Shape) {
 	}
 	M.stencilGeom() // TODO: revise if really needed
 	regions.gpuCacheOK = false
+	regions.defined[id] = true
 }
 
 // Get the region data on GPU, first uploading it if needed.

@@ -14,6 +14,11 @@
 	savetable(10e-12)
 	//setgeom(cylinder(64*4e-9, 64*4e-9)) // todo: average takes into account geometry filling
 	
+	// define some regions to make sure anisotropy is applied everywhere
+	// (when using Ku1 = ... syntax)
+	defregion(2, cylinder(100e-9, 100e-9))
+	defregion(3, rect(100e-9, 20e-9))
+	
 	// Test output
 //	save(Ku1)
 //	save(AnisU)

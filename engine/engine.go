@@ -128,7 +128,7 @@ func initialize() {
 	Ku1 = scalarParam("Ku1", "J/m3")
 	ku1_red = scalarParam("ku1_red", "T")
 	Ku1.post_update = func(region int) {
-		ku1_red.SetRegion(region, Ku1.GetRegion(region)/Msat())
+		ku1_red.setRegion(region, Ku1.GetRegion(region)/Msat())
 	}
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		//TODO: conditionally

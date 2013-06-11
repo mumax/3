@@ -13,9 +13,6 @@ var (
 	Alpha        func() float64     = Const(0)             // Damping constant
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
-	Ku1          ScalarParam                               // Uniaxial anisotropy strength (J/m³)
-	ku1_red      ScalarParam                               // Ku1 / Msat (T), auto updated from Ku1 (TODO: form msat)
-	AnisU        VectorParam                               // Uniaxial anisotropy axis
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
@@ -32,7 +29,6 @@ var (
 	B_demag          setterQuant   // demag field (T) output handle
 	B_dmi            adderQuant    // demag field (T) output handle
 	B_exch           adderQuant    // exchange field (T) output handle
-	B_uni            adderQuant    // field due to uniaxial anisotropy output handle
 	STTorque         adderQuant    // spin-transfer torque output handle
 	LLTorque, Torque setterQuant   // torque/gamma0, in Tesla
 	Table            DataTable     // output handle for tabular data (average magnetization etc.)
@@ -123,20 +119,7 @@ func initialize() {
 	})
 	Quants["B_dmi"] = &B_dmi
 
-	//uniaxial anisotropy
-	AnisU = vectorParam("anisU", "")
-	Ku1 = scalarParam("Ku1", "J/m3")
-	ku1_red = scalarParam("ku1_red", "T")
-	Ku1.post_update = func(region int) {
-		ku1_red.setRegion(region, Ku1.GetRegion(region)/Msat())
-	}
-	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
-		//TODO: conditionally
-		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
-	})
-	Quants["B_uni"] = &B_uni
-	Quants["Ku1"] = &Ku1
-	Quants["anisU"] = &AnisU
+	initAnisotropy()
 
 	// external field
 	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {

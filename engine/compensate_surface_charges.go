@@ -9,8 +9,8 @@ import (
 
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and Bsat() will automatically be updated.
-func Bsat() float64 {
-	return Mu0 * Msat()
+func bSat() float64 {
+	return Mu0 * Msat.GetUniform()
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and
@@ -20,7 +20,7 @@ func Bsat() float64 {
 func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	AddExtField(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), Bsat)
+	AddExtField(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), bSat)
 }
 
 func init() {

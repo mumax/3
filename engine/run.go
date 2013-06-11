@@ -38,6 +38,7 @@ func init() {
 
 // Runs as long as condition returns true.
 func RunCond(condition func() bool) {
+	// TODO: sanityCheck
 	checkM()
 	defer util.DashExit()
 

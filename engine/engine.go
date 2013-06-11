@@ -9,7 +9,6 @@ import (
 // User inputs
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	Msat         func() float64     = Const(0)             // Saturation magnetization in A/m
 	Alpha        func() float64     = Const(0)             // Damping constant
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
@@ -83,8 +82,9 @@ func initialize() {
 
 	// exchange field
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
-		sanitycheck()
-		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat())
+		//sanitycheck()
+		log.Println()
+		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat.GetUniform())
 	})
 	Quants["B_exch"] = &B_exch
 
@@ -92,13 +92,13 @@ func initialize() {
 	Quants["exchangemask"] = &ExchangeMask
 
 	// Dzyaloshinskii-Moriya field
-	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
-		d := DMI()
-		if d != 0 {
-			cuda.AddDMI(dst, M.buffer, d, Msat())
-		}
-	})
-	Quants["B_dmi"] = &B_dmi
+	//	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
+	//		d := DMI()
+	//		if d != 0 {
+	//			cuda.AddDMI(dst, M.buffer, d, Msat())
+	//		}
+	//	})
+	//	Quants["B_dmi"] = &B_dmi
 
 	initAnisotropy()
 
@@ -130,17 +130,17 @@ func initialize() {
 	Quants["lltorque"] = &LLTorque
 
 	// spin-transfer torque
-	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
-		j := J()
-		if j != [3]float64{0, 0, 0} {
-			p := SpinPol()
-			jx := j[2] * p
-			jy := j[1] * p
-			jz := j[0] * p
-			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
-		}
-	})
-	Quants["sttorque"] = &STTorque
+	//	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
+	//		j := J()
+	//		if j != [3]float64{0, 0, 0} {
+	//			p := SpinPol()
+	//			jx := j[2] * p
+	//			jy := j[1] * p
+	//			jz := j[0] * p
+	//			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
+	//		}
+	//	})
+	//	Quants["sttorque"] = &STTorque
 
 	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLTorque.set(b, cansave)
@@ -166,11 +166,11 @@ func initialize() {
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
-func sanitycheck() {
-	if Msat() == 0 {
-		log.Fatal("Msat should be nonzero")
-	}
-}
+//func sanitycheck() {
+//	if Msat() == 0 {
+//		log.Fatal("Msat should be nonzero")
+//	}
+//}
 
 // Returns the mesh cell size in meters. E.g.:
 // 	cellsize_x := CellSize()[X]

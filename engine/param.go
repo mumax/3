@@ -15,12 +15,12 @@ import (
 // implementation allows arbitrary number of components,
 // narrowed down to 1 or 3 in ScalarParam and VectorParam
 type param struct {
-	lut         [][MAXREG]float32 // look-up table source
-	gpu         cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
-	ok          bool              // gpu cache up-to date with lut source
-	zero        bool              // are all values zero (then we may skip corresponding kernel)
-	post_update func(region int)  // called after region value changed, e.g., to update dependent params
-	autosave                      // allow it to be saved
+	lut [][MAXREG]float32 // look-up table source
+	gpu cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
+	ok  bool              // gpu cache up-to date with lut source
+	//zero        bool              // are all values zero (then we may skip corresponding kernel)
+	post_update func(region int) // called after region value changed, e.g., to update dependent params
+	autosave                     // allow it to be saved
 }
 
 // constructor
@@ -48,10 +48,24 @@ func (p *param) setRegion(region int, v ...float64) {
 }
 
 // set in all regions except 0
-func (p *param) setEverywhere(v ...float64) {
+func (p *param) setUniform(v ...float64) {
 	for r := 1; r < MAXREG; r++ {
 		p.setRegion(r, v...)
 	}
+}
+
+func (p *param) getUniform() []float64 {
+	v := make([]float64, p.NComp())
+	for c := range v {
+		x := p.lut[c][1]
+		for r := 2; r < MAXREG; r++ {
+			if p.lut[c][r] != x {
+				log.Fatalf("%v is not uniform, need to specify a region (%v.GetRegion(x))", p.name, p.name)
+			}
+		}
+		v[c] = float64(x)
+	}
+	return v
 }
 
 // check if region is OK for use.
@@ -106,14 +120,6 @@ func (p *param) upload() {
 	p.ok = true
 }
 
-// scale vector by a, overwrite source and return it for convenience
-//func scale(v []float64, a float64) []float64 {
-//	for i := range v {
-//		v[i] *= a
-//	}
-//	return v
-//}
-
 type ScalarParam struct{ param }
 
 func scalarParam(name, unit string) ScalarParam {
@@ -125,12 +131,13 @@ func (p *ScalarParam) SetRegion(region int, value float64) {
 	p.setRegion(region, value)
 }
 func (p *ScalarParam) SetValue(v interface{}) {
-	p.setEverywhere(v.(float64))
+	p.setUniform(v.(float64))
 }
 func (p *ScalarParam) Eval() interface{}            { return p }
 func (p *ScalarParam) Type() reflect.Type           { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type      { return reflect.TypeOf(float64(0)) }
 func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.lut[0][region]) }
+func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
 func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
 
 type VectorParam struct{ param }
@@ -145,7 +152,7 @@ func (p *VectorParam) SetRegion(region int, value [3]float64) {
 }
 func (p *VectorParam) SetValue(v interface{}) {
 	vec := v.([3]float64)
-	p.setEverywhere(vec[:]...)
+	p.setUniform(vec[:]...)
 }
 func (p *VectorParam) Eval() interface{}       { return p }
 func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }

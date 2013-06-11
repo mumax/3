@@ -27,7 +27,7 @@ func Uniform(mx, my, mz float64) Config {
 // Make a vortex magnetization with given circulation and core polarization (+1 or -1).
 // The core is smoothed over a few exchange lengths and should easily relax to its ground state.
 func Vortex(circ, pol int) Config {
-	diam2 := 2 * (Aex() / (0.5 * Mu0 * Msat() * Msat())) // inverse core diam squared (roughly)
+	diam2 := 2 * sqr64(Mesh().CellSize()[2])
 	return func(x, y, z float64) [3]float64 {
 		r2 := x*x + y*y
 		r := math.Sqrt(r2)

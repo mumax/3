@@ -32,19 +32,7 @@ func (r *Regions) init() {
 	r.rasterGeom()
 }
 
-func (r *Regions) Gpu() *cuda.Bytes {
-	if r.gpuCacheOK {
-		return r.gpuCache
-	}
-	r.upload()
-	return r.gpuCache
-}
-
-func (r *Regions) upload() {
-	r.gpuCache.Upload(r.cpu)
-	r.gpuCacheOK = true
-}
-
+//
 func DefRegion(id int, s Shape) {
 	if id < 0 || id > 255 {
 		log.Fatalf("region id should be 0-255, have: %v", id)
@@ -70,6 +58,16 @@ func DefRegion(id int, s Shape) {
 	M.stencilGeom() // TODO: revise if really needed
 	regions.gpuCacheOK = false
 	regions.qCacheOK = false
+}
+
+// Get the region data on GPU, first uploading it if needed.
+func (r *Regions) Gpu() *cuda.Bytes {
+	if r.gpuCacheOK {
+		return r.gpuCache
+	}
+	r.gpuCache.Upload(r.cpu)
+	r.gpuCacheOK = true
+	return r.gpuCache
 }
 
 // Rasterises the global geom shape
@@ -106,6 +104,7 @@ func (r *Regions) rasterGeom() {
 	regions.qCacheOK = false
 }
 
+// Get returns the regions as a slice of floats, so it can be output.
 func (r *Regions) Get() (*data.Slice, bool) {
 	if !r.qCacheOK {
 		if r.qCache == nil {

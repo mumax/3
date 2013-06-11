@@ -37,3 +37,5 @@
 	run(1e-9)
 	expect("my", average(m)[1], 0.331, 1e-3)
 
+
+	defregion(2, rect(999, 999))

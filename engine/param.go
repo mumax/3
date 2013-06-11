@@ -58,6 +58,17 @@ func (p *param) getRegion(region int) []float64 {
 	return v
 }
 
+// Get returns the space-dependent parameter as a slice of floats, so it can be output.
+//func (p *param) Get() (*data.Slice, bool) {
+//		s := data.NewSlice(p.NComp(), p.Mesh())
+//		l := s.Host()
+//		for c:= range l{
+//		for i := range l[c] {
+//			l[c][i] = float32(p.cpu[c][i])
+//		}
+//	return s
+//}
+
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
 func (p *param) Gpu() cuda.LUTPtrs {

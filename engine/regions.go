@@ -106,11 +106,11 @@ func (r *Regions) rasterGeom() {
 
 // Get returns the regions as a slice of floats, so it can be output.
 func (r *Regions) Get() (*data.Slice, bool) {
-		s := data.NewSlice(1, r.Mesh())
-		l := s.Host()[0]
-		for i := range l {
-			l[i] = float32(r.cpu[i])
-		}
+	s := data.NewSlice(1, r.Mesh())
+	l := s.Host()[0]
+	for i := range l {
+		l[i] = float32(r.cpu[i])
+	}
 	return s, false
 }
 

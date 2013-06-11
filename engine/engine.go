@@ -123,18 +123,20 @@ func initialize() {
 	})
 	Quants["B_dmi"] = &B_dmi
 
+	//uniaxial anisotropy
 	AnisU = vectorParam("anisU", "")
 	Ku1 = scalarParam("Ku1", "J/m3")
 	ku1_red = scalarParam("ku1_red", "T")
 	Ku1.post_update = func(region int) {
 		ku1_red.SetRegion(region, Ku1.GetRegion(region)/Msat())
 	}
-	//uniaxial anisotropy
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		//TODO: conditionally
 		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
 	})
 	Quants["B_uni"] = &B_uni
+	//Quants["Ku1"] = &Ku1
+	//Quants["anisU"] = &AnisU
 
 	// external field
 	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {

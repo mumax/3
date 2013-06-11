@@ -14,6 +14,12 @@
 	savetable(10e-12)
 	//setgeom(cylinder(64*4e-9, 64*4e-9)) // todo: average takes into account geometry filling
 	
+	// Test output
+//	save(Ku1)
+//	save(AnisU)
+//	print(average(Ku1))
+//	print(average(AnisU))
+	
  	// Easy, in-plane
 	AnisU = vector(1, 0, 0)
 	Ku1   = 0.5e6

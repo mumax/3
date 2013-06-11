@@ -56,7 +56,8 @@ See file examples/pma-racetrack.txt
 		msat    = 600e3
 		aex     = 10e-12
 		alpha   = 0.02
-		ku1     = vector(0, 0, 0.59e6)
+		anisU   = vector(0, 0, 1)
+		Ku1     = 0.59e6
 		xi      = 0.2
 		spinpol = 0.5
 

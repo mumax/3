@@ -72,7 +72,13 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	return r.gpuCache
 }
 
+func SetGeometry(s Shape) {
+	geom = s
+	regions.rasterGeom()
+}
+
 // Rasterises the global geom shape
+// TODO: deduplicate from DefRegion
 func (r *Regions) rasterGeom() {
 	s := geom
 	if s == nil {

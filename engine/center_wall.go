@@ -2,7 +2,8 @@ package engine
 
 import "fmt"
 
-// This post-step function centers the simulation window on a domain wall between up-down (or down-up) domains (like in perpendicular media). E.g.:
+// This post-step function centers the simulation window on a domain wall
+// between up-down (or down-up) domains (like in perpendicular media). E.g.:
 // 	PostStep(CenterPMAWall)
 func CenterPMAWall() {
 	mz := Average(&M)[Z]           // TODO: optimize
@@ -19,7 +20,8 @@ func CenterPMAWall() {
 	}
 }
 
-// This post-step function centers the simulation window on a domain wall between left-right (or right-left) domains (like in soft thin films). E.g.:
+// This post-step function centers the simulation window on a domain wall
+// between left-right (or right-left) domains (like in soft thin films). E.g.:
 // 	PostStep(CenterInplaneWall)
 func CenterInplaneWall() {
 	mz := Average(&M)[X]           // TODO: optimize

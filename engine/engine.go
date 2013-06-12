@@ -4,12 +4,16 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
+	"runtime"
 )
+
+const VERSION = "mx3.0.8 α "
+
+var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 // User inputs
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	Alpha        ScalarParam                               // Damping constant
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
@@ -21,15 +25,14 @@ var (
 
 // Accessible quantities
 var (
-	M                magnetization // reduced magnetization (unit length)
-	B_eff            setterQuant   // effective field (T) output handle
-	B_dmi            adderQuant    // DMI field (T) output handle
-	B_exch           adderQuant    // exchange field (T) output handle
-	STTorque         adderQuant    // spin-transfer torque output handle
-	LLTorque, Torque setterQuant   // torque/gamma0, in Tesla
-	Table            DataTable     // output handle for tabular data (average magnetization etc.)
-	Time             float64       // time in seconds  // todo: hide? setting breaks autosaves
-	Solver           cuda.Heun
+	M        magnetization // reduced magnetization (unit length)
+	B_eff    setterQuant   // effective field (T) output handle
+	B_dmi    adderQuant    // DMI field (T) output handle
+	B_exch   adderQuant    // exchange field (T) output handle
+	STTorque adderQuant    // spin-transfer torque output handle
+	Table    DataTable     // output handle for tabular data (average magnetization etc.)
+	Time     float64       // time in seconds  // todo: hide? setting breaks autosaves
+	Solver   cuda.Heun
 )
 
 // hidden quantities
@@ -122,13 +125,7 @@ func initialize() {
 	})
 	Quants["B_eff"] = &B_eff
 
-	// Landau-Lifshitz torque
-	Alpha = scalarParam("alpha", "")
-	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
-		B_eff.set(b, cansave)
-		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
-	})
-	Quants["lltorque"] = &LLTorque
+	initTorque()
 
 	// spin-transfer torque
 	//	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
@@ -142,12 +139,6 @@ func initialize() {
 	//		}
 	//	})
 	//	Quants["sttorque"] = &STTorque
-
-	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
-		LLTorque.set(b, cansave)
-		//STTorque.addTo(b, cansave) TODO
-	})
-	Quants["torque"] = &Torque
 
 	// solver
 	torquebuffer := cuda.NewSlice(3, Mesh())
@@ -241,4 +232,11 @@ func checkM() {
 	if cuda.MaxVecNorm(M.buffer) == 0 {
 		log.Fatal("need to initialize magnetization first")
 	}
+}
+
+// Cleanly exits the simulation, assuring all output is flushed.
+func Close() {
+	log.Println("shutting down")
+	drainOutput()
+	Table.flush()
 }

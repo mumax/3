@@ -34,3 +34,5 @@
  	go run myinput.go -help
 */
 package engine
+
+// TODO: check example

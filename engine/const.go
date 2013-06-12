@@ -1,5 +1,7 @@
 package engine
 
+// TODO: rm
+
 // Returns a constant scalar function. E.g.:
 // 	Alpha = Const(1) // time-independent
 func Const(value float64) func() float64 {

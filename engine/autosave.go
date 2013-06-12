@@ -13,9 +13,8 @@ type autosave struct {
 	count      int     // Number of times it has been autosaved
 	autonum    int     // File number for output, may be > count when saved manually
 	name, unit string
-	// TODO: move these elsewhere:
-	nComp int // number of components (scalar, vector, ...)
-	mesh  *data.Mesh
+	nComp      int // number of components (scalar, vector, ...)
+	mesh       *data.Mesh
 }
 
 func newAutosave(nComp int, name, unit string, m *data.Mesh) autosave {

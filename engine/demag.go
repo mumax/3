@@ -6,13 +6,14 @@ import (
 )
 
 var (
-	Msat        ScalarParam                   // Saturation magnetization in A/m
-	bsat        ScalarParam                   // automatically derived from Msat
-	B_demag     setterQuant                   // demag field in Tesla
-	FFTM        fftm                          // FFT of m
-	EnableDemag bool                   = true // enable/disable demag field
-	demag_      *cuda.DemagConvolution        // does the heavy lifting and provides FFTM
+	Msat        ScalarParam        // Saturation magnetization in A/m
+	bsat        ScalarParam        // automatically derived from Msat
+	B_demag     setterQuant        // demag field in Tesla
+	FFTM        fftm               // FFT of m
+	EnableDemag bool        = true // enable/disable demag field
 )
+
+var demag_ *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 
 func init() {
 	world.Var("EnableDemag", &EnableDemag)

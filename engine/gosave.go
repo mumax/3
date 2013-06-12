@@ -24,10 +24,9 @@ func goSaveCopy(fname string, output *data.Slice, t float64) {
 }
 
 var (
-	dlQue   chan dlTask   // passes download requests from goSave to runDownloader
-	saveQue chan saveTask // passes save requests from runDownloader to runSaver
-	//hBuf    chan *data.Slice  // pool of page-locked host buffers for save queue
-	done = make(chan bool) // marks output server is completely done after closing dlQue
+	dlQue   chan dlTask       // passes download requests from goSave to runDownloader
+	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
+	done    = make(chan bool) // marks output server is completely done after closing dlQue
 )
 
 func initQue() {
@@ -54,23 +53,6 @@ type saveTask dlTask
 const maxOutputQueLen = 16
 
 var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
-
-// returns host buffer for storing output before being flushed to disk.
-// takes one from the pool or allocates a new one when the pool is empty
-// and less than maxOutputQueLen buffers already are in use.
-// TODO: use same cuda.GetBuffer implementation!
-//func hostbuf() *data.Slice {
-//	select {
-//	case b := <-hBuf:
-//		cuda.Memset(b, 0, 0, 0) // not strictly needed
-//		return b
-//	default:
-//		if nOutBuf < maxOutputQueLen {
-//			nOutBuf++
-//			return cuda.NewUnifiedSlice(3, Mesh())
-//		}
-//	}
-//}
 
 // continuously takes download tasks and queues corresponding save tasks.
 // the downloader queue is not buffered and we want to use at most one GPU

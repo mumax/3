@@ -14,14 +14,13 @@ func init() {
 }
 
 var (
-	Alpha            ScalarParam // Damping constant
-	LLTorque, Torque setterQuant // torque/gamma0, in Tesla
+	Alpha            = scalarParam("alpha", "") // Damping constant
+	LLTorque, Torque setterQuant                // torque/gamma0, in Tesla
 )
 
 func initTorque() {
 
 	// Landau-Lifshitz torque
-	Alpha = scalarParam("alpha", "")
 	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())

@@ -25,7 +25,6 @@ func init() {
 	world.Var("t", &Time)
 	world.Var("aex", &Aex)
 	world.Var("b_ext", &B_ext)
-	world.Var("dmi", &DMI)
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
@@ -39,17 +38,10 @@ func init() {
 	B_exch_addr := &B_exch
 	world.ROnly("B_exch", &B_exch_addr)
 
-	B_uni_addr := &B_uni
-	world.ROnly("B_uni", &B_uni_addr)
-
-	B_dmi_addr := &B_dmi
-	world.ROnly("B_dmi", &B_dmi_addr)
 
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)
 
-	world.LValue("Ku1", &Ku1)
-	world.LValue("AnisU", &AnisU)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 

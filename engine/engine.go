@@ -15,7 +15,6 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
 	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
 	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
@@ -27,7 +26,6 @@ var (
 var (
 	M        magnetization // reduced magnetization (unit length)
 	B_eff    setterQuant   // effective field (T) output handle
-	B_dmi    adderQuant    // DMI field (T) output handle
 	B_exch   adderQuant    // exchange field (T) output handle
 	STTorque adderQuant    // spin-transfer torque output handle
 	Table    DataTable     // output handle for tabular data (average magnetization etc.)
@@ -90,14 +88,7 @@ func initialize() {
 	ExchangeMask = staggeredMask(Mesh(), "exchangemask", "")
 	Quants["exchangemask"] = &ExchangeMask
 
-	// Dzyaloshinskii-Moriya field
-	//	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
-	//		d := DMI()
-	//		if d != 0 {
-	//			cuda.AddDMI(dst, M.buffer, d, Msat())
-	//		}
-	//	})
-	//	Quants["B_dmi"] = &B_dmi
+	initDMI()
 
 	initAnisotropy()
 
@@ -115,7 +106,7 @@ func initialize() {
 	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
-		//B_dmi.addTo(dst, cansave) TODO
+		B_dmi.addTo(dst, cansave)
 		B_uni.addTo(dst, cansave)
 		b_ext.addTo(dst, cansave)
 	})

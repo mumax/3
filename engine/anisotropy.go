@@ -5,6 +5,13 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
+func init(){
+	B_uni_addr := &B_uni
+	world.ROnly("B_uni", &B_uni_addr)
+	world.LValue("Ku1", &Ku1)
+	world.LValue("AnisU", &AnisU)
+}
+
 var (
 	Ku1     ScalarParam // Uniaxial anisotropy strength (J/m³)
 	ku1_red ScalarParam // Ku1 / Msat (T), auto updated from Ku1 (TODO: form msat)

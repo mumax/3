@@ -1,7 +1,6 @@
-#include "mask.h"
 
 // Copies src (3D array, size S0 x S1 x S2) to larger dst (3D array, size D0 x D1 x D2),
-// also multiplies by vol*bsat (same size as src).
+// also multiplies by ...
 // The remainder of dst is NOT zero-padded.
 // E.g.:
 //	a    ->  a x
@@ -10,7 +9,7 @@
 extern "C" __global__ void
 copypadmul(float* __restrict__ dst, int D0, int D1, int D2,
            float* __restrict__ src, int S0, int S1, int S2,
-           float* __restrict__ volmask, float Bsat) {
+           float* __restrict__ BsatLUT, int8_t* __restrict__ regions) {
 
     int j = blockIdx.y * blockDim.y + threadIdx.y; // index in src slice
     int k = blockIdx.x * blockDim.x + threadIdx.x;
@@ -19,12 +18,12 @@ copypadmul(float* __restrict__ dst, int D0, int D1, int D2,
         return;	// out of  bounds
     }
 
-    // loop over N layers
+    // loop over N layers: TODO: 3D block
     int N = min(S0, D0);
     for (int i=0; i<N; i++) {
-        int sI = i*S1*S2 + j*S2 + k;
-        float vol = loadmask(volmask, sI);
-        dst[i*D1*D2 + j*D2 + k] = Bsat * vol * src[sI];
+        int sI = i*S1*S2 + j*S2 + k; // source index
+        float Bsat = BsatLUT[regions[sI]];
+        dst[i*D1*D2 + j*D2 + k] = Bsat * src[sI];
     }
 }
 

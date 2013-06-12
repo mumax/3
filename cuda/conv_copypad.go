@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
+	"unsafe"
 )
 
 // Copies src into dst, which is larger or smaller.
@@ -22,7 +23,7 @@ func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 
 // Copies src into dst, which is larger or smaller, and multiplies by vol*Bsat.
 // The remainder of dst is not filled with zeros.
-func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, vol *data.Slice, Bsat float64, str cu.Stream) {
+func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, vol *data.Slice, Bsat LUTPtr, regions *Bytes, str cu.Stream) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 	if vol != nil {
@@ -35,5 +36,5 @@ func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, vol *data.Slice, 
 
 	k_copypadmul_async(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
 		src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2],
-		vol.DevPtr(0), float32(Bsat), cfg, str)
+		unsafe.Pointer(Bsat), regions.Ptr, cfg, str)
 }

@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"unsafe"
 )
 
 // Landau-Lifshitz torque divided by gamma0:
@@ -9,7 +10,7 @@ import (
 // 	torque in Tesla
 // 	m normalized
 // 	B in Tesla
-func LLTorque(torque, m, B *data.Slice, alpha float32) {
+func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
 	// TODO: assert...
 
 	N := torque.Len()
@@ -18,7 +19,7 @@ func LLTorque(torque, m, B *data.Slice, alpha float32) {
 	k_lltorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
 		B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
-		alpha, N, cfg)
+		unsafe.Pointer(alpha), regions.Ptr, N, cfg)
 }
 
 // Only the damping term of LLGTorque, with alpha 1. Useful for relaxation.

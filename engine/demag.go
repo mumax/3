@@ -15,7 +15,6 @@ var (
 )
 
 func init() {
-	world.LValue("Msat", &Msat)
 	world.Var("EnableDemag", &EnableDemag)
 
 	fftm_addr := &FFTM
@@ -23,6 +22,8 @@ func init() {
 
 	B_demag_addr := &B_demag
 	world.ROnly("B_demag", &B_demag_addr)
+
+	world.LValue("Msat", &Msat)
 }
 
 func initDemag() {

@@ -139,6 +139,7 @@ func (p *ScalarParam) InputType() reflect.Type      { return reflect.TypeOf(floa
 func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.lut[0][region]) }
 func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
 func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
+func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
 
 type VectorParam struct{ param }
 

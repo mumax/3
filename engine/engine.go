@@ -123,6 +123,7 @@ func initialize() {
 	Quants["B_eff"] = &B_eff
 
 	// Landau-Lifshitz torque
+	Alpha = scalarParam("alpha", "")
 	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())

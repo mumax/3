@@ -27,7 +27,7 @@ func init() {
 
 	world.Var("t", &Time)
 	world.Var("aex", &Aex)
-	world.Var("alpha", &Alpha)
+	world.LValue("alpha", &Alpha)
 	world.Var("b_ext", &B_ext)
 	world.Var("dmi", &DMI)
 	world.Var("xi", &Xi)

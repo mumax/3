@@ -116,7 +116,7 @@ func initialize() {
 	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
-		B_dmi.addTo(dst, cansave)
+		//B_dmi.addTo(dst, cansave) TODO
 		B_uni.addTo(dst, cansave)
 		b_ext.addTo(dst, cansave)
 	})
@@ -145,7 +145,7 @@ func initialize() {
 
 	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLTorque.set(b, cansave)
-		STTorque.addTo(b, cansave)
+		//STTorque.addTo(b, cansave) TODO
 	})
 	Quants["torque"] = &Torque
 

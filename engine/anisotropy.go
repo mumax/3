@@ -5,7 +5,7 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-func init(){
+func init() {
 	B_uni_addr := &B_uni
 	world.ROnly("B_uni", &B_uni_addr)
 	world.LValue("Ku1", &Ku1)

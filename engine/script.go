@@ -38,10 +38,8 @@ func init() {
 	B_exch_addr := &B_exch
 	world.ROnly("B_exch", &B_exch_addr)
 
-
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)
-
 
 	world.LValue("ExchangeMask", &ExchangeMask)
 

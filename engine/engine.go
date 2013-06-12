@@ -206,7 +206,7 @@ func setCellSize(cx, cy, cz float64) {
 // check if mesh is set
 func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
-		log.Fatal("need to set mesh first")
+		panic("need to set mesh first") //todo: fatal
 	}
 }
 

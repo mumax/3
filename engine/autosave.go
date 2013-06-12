@@ -54,5 +54,12 @@ func (a *autosave) autoFname() string {
 }
 
 // NComp returns the number of components.
-func (b *autosave) NComp() int       { return b.nComp }
-func (b *autosave) Mesh() *data.Mesh { return b.mesh }
+func (b *autosave) NComp() int { return b.nComp }
+
+func (b *autosave) Mesh() *data.Mesh {
+	if b.mesh == nil {
+		return Mesh()
+	} else {
+		return b.mesh
+	}
+}

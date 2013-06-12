@@ -26,18 +26,15 @@ type param struct {
 // constructor
 func newParam(nComp int, name, unit string) param {
 	var p param
-	p.autosave = newAutosave(nComp, name, unit, Mesh())
+	p.autosave = newAutosave(nComp, name, unit, nil)
 	p.gpu = make(cuda.LUTPtrs, nComp)
-	for i := range p.gpu {
-		p.gpu[i] = cuda.MemAlloc(MAXREG * cu.SIZEOF_FLOAT32)
-	}
 	p.lut = make([][MAXREG]float32, nComp)
 	p.ok = false
 	return p
 }
 
 func (p *param) setRegion(region int, v ...float64) {
-	util.Argument(len(v) == p.NComp())
+	util.Argument(len(v) == p.NComp()) // note: also likely panics if param not initialized (nComp = 0)
 	for c := range v {
 		p.lut[c][region] = float32(v[c])
 	}
@@ -112,6 +109,11 @@ func (p *param) Gpu() cuda.LUTPtrs {
 
 // XYZ swap here
 func (p *param) upload() {
+	if p.gpu[0] == nil { // alloc only when needed, allows param use in init()
+		for i := range p.gpu {
+			p.gpu[i] = cuda.MemAlloc(MAXREG * cu.SIZEOF_FLOAT32)
+		}
+	}
 	log.Println("upload LUT", p.name, p.lut)
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())

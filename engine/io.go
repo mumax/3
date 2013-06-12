@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+func init() {
+	world.Func("save", Save)
+	world.Func("saveas", SaveAs)
+	world.Func("autosave", Autosave)
+}
+
 type GPU_Getter interface {
 	GetGPU() (q *data.Slice, recycle bool) // get quantity data (GPU), indicate need to recycle
 }
@@ -75,18 +81,6 @@ func Autosave(what Autosaver, period float64) {
 	what.Autosave(period)
 }
 
-//func ReadFile(fname string)*data.Slice{
-//	s, _ := data.MustReadFile(fname)
-//	return s
-//}
-
-func init() {
-	world.Func("save", Save)
-	world.Func("saveas", SaveAs)
-	world.Func("autosave", Autosave)
-	//world.Func("readfile", ReadFile)
-}
-
 // notify that it may need to be saved.
 func notifySave(q Saver, goodstep bool) {
 	if goodstep && q.needSave() {
@@ -94,3 +88,9 @@ func notifySave(q Saver, goodstep bool) {
 		q.saved()
 	}
 }
+
+//func ReadFile(fname string)*data.Slice{
+//	s, _ := data.MustReadFile(fname)
+//	return s
+//}
+//world.Func("readfile", ReadFile)

@@ -18,9 +18,6 @@ func init() {
 
 	world.Func("vector", Vector)
 
-	world.Func("run", Run)
-	world.Func("steps", Steps)
-
 	world.Func("savetable", doSaveTable)
 
 	world.Func("average", Average)
@@ -32,13 +29,6 @@ func init() {
 	world.Var("xi", &Xi)
 	world.Var("spinpol", &SpinPol)
 	world.Var("j", &J)
-
-	world.Var("Dt", &Solver.Dt_si)
-	world.Var("MinDt", &Solver.Mindt)
-	world.Var("MaxDt", &Solver.Maxdt)
-	world.Var("MaxErr", &Solver.MaxErr)
-	world.Var("Headroom", &Solver.Headroom)
-	world.Var("FixDt", &Solver.Fixdt)
 
 	world.Const("mu0", Mu0)
 

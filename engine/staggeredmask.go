@@ -6,6 +6,8 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+// TODO: rm, use regions
+
 // Stores values defined on the faces in-between cells.
 // E.g.: the exchange interaction between cells.
 // Automatically initialized to all ones.

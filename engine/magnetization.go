@@ -25,6 +25,7 @@ func (b *magnetization) Set(src *data.Slice) {
 	data.Copy(b.buffer, src)
 }
 
+// TODO: use region index
 func (m *magnetization) setRegion(conf Config, region Shape) {
 	if region == nil {
 		region = universe

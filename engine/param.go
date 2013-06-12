@@ -47,6 +47,14 @@ func (p *param) setRegion(region int, v ...float64) {
 	}
 }
 
+func (p *param) getRegion(region int) []float64 {
+	v := make([]float64, p.NComp())
+	for c := range v {
+		v[c] = float64(p.lut[c][region])
+	}
+	return v
+}
+
 // set in all regions except 0
 func (p *param) setUniform(v ...float64) {
 	for r := 1; r < MAXREG; r++ {
@@ -76,14 +84,6 @@ func checkRegion(region int) {
 	if !regions.defined[region] {
 		log.Panic("region ", region, " has not yet been defined by DefRegion()")
 	}
-}
-
-func (p *param) getRegion(region int) []float64 {
-	v := make([]float64, p.NComp())
-	for c := range v {
-		v[c] = float64(p.lut[c][region])
-	}
-	return v
 }
 
 // Get returns the space-dependent parameter as a slice of floats, so it can be output.

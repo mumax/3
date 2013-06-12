@@ -6,6 +6,8 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+// TODO: remove?
+
 type maskQuant struct {
 	bufferedQuant
 }

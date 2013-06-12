@@ -31,15 +31,12 @@ var (
 	B_exch   adderQuant    // exchange field (T) output handle
 	STTorque adderQuant    // spin-transfer torque output handle
 	Table    DataTable     // output handle for tabular data (average magnetization etc.)
-	Time     float64       // time in seconds  // todo: hide? setting breaks autosaves
-	Solver   cuda.Heun
 )
 
 // hidden quantities
 var (
 	globalmesh data.Mesh
 	regions    Regions
-	postStep   []func() // called on after every time step
 	extFields  []extField
 	itime      int //unique integer time stamp
 )

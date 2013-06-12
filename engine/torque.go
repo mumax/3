@@ -5,6 +5,14 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
+func init() {
+	world.LValue("alpha", &Alpha)
+	torque_ := &Torque
+	world.ROnly("torque", &torque_)
+	lltorque_ := &LLTorque
+	world.ROnly("LLtorque", &lltorque_)
+}
+
 var (
 	Alpha            ScalarParam // Damping constant
 	LLTorque, Torque setterQuant // torque/gamma0, in Tesla
@@ -26,8 +34,4 @@ func initTorque() {
 		//STTorque.addTo(b, cansave) TODO
 	})
 	Quants["torque"] = &Torque
-}
-
-func init() {
-	world.LValue("alpha", &Alpha)
 }

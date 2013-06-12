@@ -1,5 +1,7 @@
 package engine
 
+// TODO: rm, merge into param
+
 type scalar struct {
 	nComp      int
 	name, unit string

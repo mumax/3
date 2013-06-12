@@ -11,7 +11,6 @@ import (
 type Bytes struct {
 	Ptr unsafe.Pointer
 	Len int
-	//mesh *data.Mesh
 }
 
 func NewBytes(m *data.Mesh) *Bytes {
@@ -26,4 +25,8 @@ func (dst *Bytes) Upload(src []byte) {
 	cu.MemcpyHtoD(cu.DevicePtr(dst.Ptr), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
-//func (b *Bytes) Mesh() *data.Mesh { return b.mesh }
+func (dst *Bytes) Free() {
+	cu.MemFree(cu.DevicePtr(dst.Ptr))
+	dst.Ptr = nil
+	dst.Len = 0
+}

@@ -13,10 +13,7 @@ for f in *.cu; do
 	done
 done
 
-astyle *.cu
 go build cuda2go.go
-./cuda2go *.cu
-
 go fmt
 go install -v
-
+astyle *.cu

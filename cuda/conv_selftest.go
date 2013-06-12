@@ -8,12 +8,21 @@ import (
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
 func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
+	log.Print("verifying convolution ")
 	inhost := data.NewSlice(3, mesh)
 	initConvTestInput(inhost.Vectors())
 	gpu := NewSlice(3, mesh)
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
-	c.Exec(gpu, gpu, data.NilSlice(1, mesh), 1)
+
+	regions := NewBytes(mesh)
+	defer regions.Free()
+	Bsat := makeFloats([3]int{1, 1, 256})
+	defer Bsat.Free()
+	Memset(Bsat, 1)
+	BsatLUT := LUTPtr(Bsat.DevPtr(0))
+
+	c.Exec(gpu, gpu, BsatLUT, regions)
 
 	output := gpu.HostCopy()
 
@@ -32,7 +41,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	if err > CONV_TOLERANCE {
 		log.Fatal("convolution self-test error: ", err)
 	} else {
-		log.Println("convolution self-test error:", err)
+		log.Println("self-test error:", err)
 	}
 }
 

@@ -111,11 +111,11 @@ func (c *DemagConvolution) initFFTKern2D() {
 // 	vol:  unitless mask used to scale m's length, may be nil
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
-func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat float64) {
+func (c *DemagConvolution) Exec(B, m *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	if c.is2D() {
-		c.exec2D(B, m, vol, Bsat)
+		c.exec2D(B, m, Bsat, regions)
 	} else {
-		c.exec3D(B, m, vol, Bsat)
+		c.exec3D(B, m, Bsat, regions)
 	}
 }
 
@@ -125,10 +125,10 @@ func zero1(dst *data.Slice, str cu.Stream) {
 }
 
 // forward FFT component i
-func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat float64) {
+func (c *DemagConvolution) fwFFT(i int, inp *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	zero1(c.fftRBuf[i], c.stream)
 	in := inp.Comp(i)
-	copyPadMul(c.fftRBuf[i], in, c.kernSize, c.size, vol, Bsat, c.stream)
+	copyPadMul(c.fftRBuf[i], in, c.kernSize, c.size, Bsat, regions, c.stream)
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 }
 
@@ -139,16 +139,16 @@ func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
 	copyPad(out, c.fftRBuf[i], c.size, c.kernSize, c.stream)
 }
 
-// forward FFT of reduced magnetization (norm = 1), one component.
+// forward FFT of magnetization one component.
 // returned slice is valid until next FFT or convolution
-func (c *DemagConvolution) FFT(m *data.Slice, comp int) *data.Slice {
-	c.fwFFT(comp, m, nil, 1)
+func (c *DemagConvolution) FFT(m *data.Slice, comp int, Bsat LUTPtr, regions *Bytes) *data.Slice {
+	c.fwFFT(comp, m, Bsat, regions)
 	return c.fftCBuf[comp]
 }
 
-func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat float64) {
+func (c *DemagConvolution) exec3D(outp, inp *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	for i := 0; i < 3; i++ { // FW FFT
-		c.fwFFT(i, inp, vol, Bsat)
+		c.fwFFT(i, inp, Bsat, regions)
 	}
 
 	// kern mul
@@ -164,12 +164,12 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat float64) {
 	c.stream.Synchronize()
 }
 
-func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat float64) {
+func (c *DemagConvolution) exec2D(outp, inp *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	// Convolution is separated into
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
-	c.fwFFT(0, inp, vol, Bsat) // FFT x
+	c.fwFFT(0, inp, Bsat, regions) // FFT x
 
 	// kern mul X
 	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
@@ -178,7 +178,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat float64) {
 	c.bwFFT(0, outp) // bw FFT x
 
 	for i := 1; i < 3; i++ { // FW FFT yz
-		c.fwFFT(i, inp, vol, Bsat)
+		c.fwFFT(i, inp, Bsat, regions)
 	}
 
 	// kern mul yz

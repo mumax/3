@@ -13,11 +13,11 @@ func init() {
 	world.Func("vortexwall", VortexWall)
 }
 
-// magnetic configuration
+// Magnetic configuration returns m vector for position (x,y,z)
 type Config func(x, y, z float64) [3]float64
 
 // Returns a uniform magnetization state. E.g.:
-// 	M.Set(Uniform(1, 0, 0)) // saturated along X
+// 	M = Uniform(1, 0, 0)) // saturated along X
 func Uniform(mx, my, mz float64) Config {
 	return func(x, y, z float64) [3]float64 {
 		return [3]float64{mx, my, mz}
@@ -38,6 +38,7 @@ func Vortex(circ, pol int) Config {
 	}
 }
 
+// Make a vortex wall configuration.
 func VortexWall(mleft, mright float64, circ, pol int) Config {
 	h := Mesh().WorldSize()[1]
 	v := Vortex(circ, pol)
@@ -74,5 +75,13 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 		m[1] = (1-gauss)*m[1] + gauss*mywall
 		m[2] = (1-gauss)*m[2] + gauss*mzwall
 		return m
+	}
+}
+
+// Transl returns a translated copy of configuration c. E.g.:
+// 	M = Vortex(1, 1).Transl(100e-9, 0, 0)  // vortex with center at x=100nm
+func (c Config) Transl(dx, dy, dz float64) Config {
+	return func(x, y, z float64) [3]float64 {
+		return c(x-dx, y-dy, z-dz)
 	}
 }

@@ -9,7 +9,7 @@ import (
 // User inputs
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	Alpha        func() float64     = Const(0)             // Damping constant
+	Alpha        ScalarParam                               // Damping constant
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
 	DMI          func() float64     = Const(0)             // Dzyaloshinskii-Moriya vector in J/m²
 	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
@@ -125,7 +125,7 @@ func initialize() {
 	// Landau-Lifshitz torque
 	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
-		cuda.LLTorque(b, M.buffer, b, float32(Alpha()))
+		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
 	})
 	Quants["lltorque"] = &LLTorque
 

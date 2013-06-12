@@ -83,7 +83,6 @@ func initialize() {
 	// exchange field
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
 		//sanitycheck()
-		log.Println()
 		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat.GetUniform())
 	})
 	Quants["B_exch"] = &B_exch

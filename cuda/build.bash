@@ -14,6 +14,7 @@ for f in *.cu; do
 done
 
 go build cuda2go.go
+./cuda2go *.cu
 go fmt
 go install -v
 astyle *.cu

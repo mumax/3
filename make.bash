@@ -6,8 +6,8 @@ ln -sf $(pwd)/post-commit .git/hooks/post-commit
 PKGS=$(echo code.google.com/p/mx3/{,tools/mx3-convert,data,draw,prof,engine,mag,script,util,cuda})
 echo compiling $PKGS
 
+(cd cuda && ./build.bash) || exit 1
 (cd web && ./make.bash) || exit 1
-(cd cuda && make -j8) || exit 1
 go install -v $PKGS || exit 1
 go build -v -o mx3 main.go || exit 1
 (cd examples && ../mx3 -vet *.txt) || exit 1

@@ -24,6 +24,9 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 			break
 		}
 	}
+	if N < 0 {
+		panic(err(n.Pos(), t, "has no method", n.Sel.Name))
+	}
 	return &selector{x, N}
 }
 

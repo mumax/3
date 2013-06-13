@@ -1,2 +1,2 @@
 all:
-	./build.bash
+	./make.bash

@@ -6,22 +6,31 @@ import (
 )
 
 func init() {
-	world.Var("dmi", &DMI)
+	world.LValue("dmi", &DMI)
 	B_dmi_addr := &B_dmi
 	world.ROnly("B_dmi", &B_dmi_addr)
+	DMI = scalarParam("dmi", "J/m2", func(r int) {
+		dmi_red.setRegion(r, safediv(DMI.GetRegion(r), Msat.GetRegion(r)))
+	})
 }
 
 var (
-	DMI   func() float64 = Const(0) // Dzyaloshinskii-Moriya vector in J/m²
-	B_dmi adderQuant                // DMI field in T
+	DMI     ScalarParam // Dzyaloshinskii-Moriya vector in J/m²
+	dmi_red = scalarParam("dmi_red", "Tm", nil)
+	B_dmi   adderQuant // DMI field in T
 )
 
 func initDMI() {
 	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
-		d := DMI()
-		if d != 0 {
-			cuda.AddDMI(dst, M.buffer, d, Msat.GetUniform())
-		}
+		// TODO: conditionally
+		cuda.AddDMI(dst, M.buffer, dmi_red.Gpu(), regions.Gpu())
 	})
 	Quants["B_dmi"] = &B_dmi
+}
+
+func safediv(a, b float64) float64 {
+	if b == 0 {
+		return a
+	}
+	return a / b
 }

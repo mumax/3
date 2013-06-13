@@ -26,6 +26,10 @@
 <span id=err_0 class=err></span>
 <hr/>
 
+<h2> Note </h2> 
+This web interface is under active development not yet finished. Currently it should be treated as a rudimentary viewer only. Full control of the simulation and parameters, as well as plotting graphs, is underway.
+<hr/>
+
 <script>
 	function http(method, url){
     	var xmlHttp = new XMLHttpRequest();
@@ -147,18 +151,6 @@
 </script>
 
 
-<a id=hide onclick="toggle('div_1');"> Initialize <br/></a> 
-<div id=div_1>
-<table>
-	<tr><script> rpcCall("setGridSize", [{{index .Mesh.Size 2}}, {{index .Mesh.Size 1}}, {{index .Mesh.Size 0}}], "err_1");        </script> <td>(cells)</td> </tr>
-	<tr><script> rpcCall("setCellSize", [{{index .Mesh.CellSize 2}}, {{index .Mesh.CellSize 1}}, {{index .Mesh.CellSize 0}}], "err_1");  </script> <td>(m)    </td> </tr>
-	<tr><script> rpcSet("m", ["uniform(1, 1, 0)"], "err_1");           </script>  </tr>
-	<tr><script> rpcSet("geom", ["rect()"], "err_1");                  </script>  </tr>
-</table>
-<span id=err_1 class=err></span>
-</div>
-
-
 <a id=hide onclick="toggle('div_solver');"> Run <br/></a> 
 <div id=div_solver>
 <table><tr><td>  
@@ -252,6 +244,7 @@ Display: <select id="renderList" onchange="renderSelect()">
 <a id=hide onclick="toggle('div_graph');"> Graph <br/></a> 
 <div id=div_graph>
 
+Live graphs will be implemented soon.
 
 </div>
 

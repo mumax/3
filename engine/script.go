@@ -22,13 +22,8 @@ func init() {
 
 	world.Func("average", Average)
 
-	world.Var("t", &Time)
 	world.Var("aex", &Aex)
 	world.Var("b_ext", &B_ext)
-	world.Var("xi", &Xi)
-	world.Var("spinpol", &SpinPol)
-	world.Var("j", &J)
-
 	world.Const("mu0", Mu0)
 
 	world.LValue("m", &M)
@@ -42,7 +37,6 @@ func init() {
 	world.ROnly("regions", &regions_addr)
 
 	world.LValue("ExchangeMask", &ExchangeMask)
-
 	world.Func("expect", expect)
 }
 

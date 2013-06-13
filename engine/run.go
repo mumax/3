@@ -12,6 +12,7 @@ func init() {
 	world.Func("Pause", Pause)
 	world.Func("PostStep", PostStep)
 	world.Func("RunWhile", RunWhile)
+	world.Var("t", &Time)
 	world.Var("Dt", &Solver.Dt_si)
 	world.Var("MinDt", &Solver.Mindt)
 	world.Var("MaxDt", &Solver.Maxdt)

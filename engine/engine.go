@@ -15,20 +15,16 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 var (
 	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
 	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	Xi           func() float64     = Const(0)             // Non-adiabaticity of spin-transfer-torque
-	SpinPol      func() float64     = Const(1)             // Spin polarization of electrical current
-	J            func() [3]float64  = ConstVector(0, 0, 0) // Electrical current density
 	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
 	geom         Shape              = nil                  // nil means universe
 )
 
 // Accessible quantities
 var (
-	M        magnetization // reduced magnetization (unit length)
-	B_eff    setterQuant   // effective field (T) output handle
-	B_exch   adderQuant    // exchange field (T) output handle
-	STTorque adderQuant    // spin-transfer torque output handle
-	Table    DataTable     // output handle for tabular data (average magnetization etc.)
+	M      magnetization // reduced magnetization (unit length)
+	B_eff  setterQuant   // effective field (T) output handle
+	B_exch adderQuant    // exchange field (T) output handle
+	Table  DataTable     // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
@@ -113,19 +109,6 @@ func initialize() {
 	Quants["B_eff"] = &B_eff
 
 	initTorque()
-
-	// spin-transfer torque
-	//	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
-	//		j := J()
-	//		if j != [3]float64{0, 0, 0} {
-	//			p := SpinPol()
-	//			jx := j[2] * p
-	//			jy := j[1] * p
-	//			jz := j[0] * p
-	//			cuda.AddZhangLiTorque(dst, M.buffer, [3]float64{jx, jy, jz}, Msat(), nil, Alpha(), Xi())
-	//		}
-	//	})
-	//	Quants["sttorque"] = &STTorque
 
 	// solver
 	torquebuffer := cuda.NewSlice(3, Mesh())

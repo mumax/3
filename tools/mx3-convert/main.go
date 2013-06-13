@@ -1,5 +1,6 @@
 /*
- This tool converts binary output files to various formats and allows basic manipulations like crop, rescale...
+ mx3-convert converts mx3 output files and .omf files to various formats and images.
+ It also provides basic manipulations like data rescale etc.
  Usage:
  	mx3-convert [flags] files
  For a overview of flags, run:
@@ -17,13 +18,13 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path"
 	"runtime"
 	"sync"
 )
 
 var (
 	flag_comp      = flag.Int("comp", -1, "Select a component of vector data. 0=x, 1=y, ...")
-	flag_gzip      = flag.Bool("gzip", false, "GZIP the output")
 	flag_show      = flag.Bool("show", false, "Human-readible output to stdout")
 	flag_format    = flag.String("f", "%v", "Printf format string")
 	flag_png       = flag.Bool("png", false, "PNG output")
@@ -37,11 +38,7 @@ var (
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
-	flag_o         = flag.String("o", "%v", "Set output file base name. %v is replaced by input name, extension automatically added.")
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
-	flag_tstep     = flag.Float64("tstep", 1.0, "timestep")
-	//flag_force     = flag.Bool("f", false, "Force overwrite of existing files")
-	// TODO: crop, component
 )
 
 var que chan task
@@ -74,7 +71,15 @@ func main() {
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		log.Println(fname)
-		slice, time, err := data.ReadFile(fname)
+		var slice *data.Slice
+		var time float64
+		var err error
+
+		if path.Ext(fname) == ".omf" {
+			slice, time, err = ReadOMF(fname)
+		} else {
+			slice, time, err = data.ReadFile(fname)
+		}
 		if err != nil {
 			log.Println(err)
 			continue
@@ -136,7 +141,7 @@ func process(f *data.Slice, time float64, name string) {
 	if *flag_ovf != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOvf2(out, f, *flag_ovf, time, *flag_tstep)
+		dumpOvf2(out, f, *flag_ovf, time)
 		haveOutput = true
 	}
 

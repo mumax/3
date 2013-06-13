@@ -21,7 +21,7 @@ import (
 	"unsafe"
 )
 
-func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time, tstep float64) {
+func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time float64) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -32,6 +32,7 @@ func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time, tstep float
 		log.Fatalf("Illegal OMF data format: %v", dataformat)
 	}
 
+	tstep := 0.0 // TODO
 	writeOvf2Header(out, q, time, tstep)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
@@ -39,11 +40,9 @@ func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time, tstep float
 }
 
 func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
-
 	hdr(out, "Begin", "Data "+dataformat)
 	switch strings.ToLower(dataformat) {
 	case "text":
-		//q.Buffer().WriteAscii(out)
 		writeOmfText(out, q)
 	case "binary 4":
 		writeOvf2Binary4(out, q)
@@ -65,7 +64,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 	hdr(out, "Begin", "Header")
 	fmt.Fprintln(out, "#")
 
-	hdr(out, "Title", q.Tag()) // TODO
+	hdr(out, "Title", q.Tag())
 	hdr(out, "meshtype", "rectangular")
 	hdr(out, "meshunit", "m")
 

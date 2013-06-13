@@ -20,47 +20,20 @@ func init() {
 
 // Accessible quantities
 var (
-	B_ext  func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	M      magnetization                            // reduced magnetization (unit length)
-	B_eff  setterQuant                              // effective field (T) output handle
-	Torque setterQuant                              // total torque/γ0, in T
-	Table  DataTable                                // output handle for tabular data (average magnetization etc.)
+	M      magnetization // reduced magnetization (unit length)
+	B_eff  setterQuant   // effective field (T) output handle
+	Torque setterQuant   // total torque/γ0, in T
+	Table  DataTable     // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
 var (
 	globalmesh data.Mesh
-	regions    Regions
-	extFields  []extField
-	itime      int         //unique integer time stamp // TODO: revise
-	geom       Shape = nil // nil means universe
+	itime      int                       //unique integer time stamp // TODO: revise
+	Quants     = make(map[string]Getter) // maps quantity names to downloadable data. E.g. for rendering
 )
 
-func Mesh() *data.Mesh {
-	checkMesh()
-	return &globalmesh
-}
-
-// Add an additional space-dependent field to B_ext.
-// The field is mask * multiplier, where mask typically contains space-dependent scaling values of the order of 1.
-// multiplier can be time dependent.
-// TODO: extend API (set one component, construct masks or read from file). Also for current.
-func AddExtField(mask *data.Slice, multiplier func() float64) {
-	m := cuda.GPUCopy(mask)
-	extFields = append(extFields, extField{m, multiplier})
-}
-
-type extField struct {
-	mask *data.Slice
-	mul  func() float64
-}
-
-// maps quantity names to downloadable data. E.g. for rendering
-var Quants = make(map[string]Getter)
-
 func initialize() {
-
-	// magnetization
 	M.init()
 	FFTM.init()
 	Quants["m"] = &M
@@ -75,16 +48,7 @@ func initialize() {
 	initExchange()
 	initDMI()
 	initAnisotropy()
-
-	// external field
-	b_ext := adder(3, Mesh(), "B_ext", "T", func(dst *data.Slice) {
-		bext := B_ext()
-		cuda.AddConst(dst, float32(bext[2]), float32(bext[1]), float32(bext[0]))
-		for _, f := range extFields {
-			cuda.Madd2(dst, dst, f.mask, 1, float32(f.mul()))
-		}
-	})
-	//Quants["B_ext"] = B_ext
+	initBExt()
 
 	// effective field
 	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
@@ -96,6 +60,7 @@ func initialize() {
 	})
 	Quants["B_eff"] = &B_eff
 
+	// torque terms
 	initLLTorque()
 	initSTTorque()
 	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
@@ -104,9 +69,7 @@ func initialize() {
 	})
 	Quants["torque"] = &Torque
 
-	// solver
 	torquebuffer := cuda.NewSlice(3, Mesh())
-
 	torqueFn := func(cansave bool) *data.Slice {
 		itime++
 		Table.arm(cansave)      // if table output needed, quantities marked for update
@@ -128,6 +91,11 @@ func initialize() {
 //	}
 //}
 
+func Mesh() *data.Mesh {
+	checkMesh()
+	return &globalmesh
+}
+
 // Returns the mesh cell size in meters. E.g.:
 // 	cellsize_x := CellSize()[X]
 func CellSize() [3]float64 {
@@ -145,6 +113,7 @@ func GridSize() [3]int {
 	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
 }
 
+// TODO: rm, or make script constants
 func Nx() int { return GridSize()[X] }
 func Ny() int { return GridSize()[Y] }
 func Nz() int { return GridSize()[Z] }

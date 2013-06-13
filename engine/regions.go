@@ -14,6 +14,11 @@ func init() {
 	world.ROnly("regions", &regions_addr)
 }
 
+var (
+	regions Regions       // global regions map
+	geom    Shape   = nil // nil means universe
+)
+
 const MAXREG = 256 // maximum number of regions
 
 type Regions struct {
@@ -31,10 +36,8 @@ func (r *Regions) init() {
 	r.autosave.nComp = 1
 	r.autosave.name = "regions"
 	r.autosave.mesh = mesh
-
 	r.cpu = make([]byte, mesh.NCell())
 	r.arr = resizeBytes(r.cpu, mesh.Size())
-
 	r.gpuCache = cuda.NewBytes(mesh)
 
 	DefRegion(1, universe)

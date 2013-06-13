@@ -8,13 +8,13 @@ import (
 
 // keeps info needed to decide when a quantity needs to be periodically saved
 type autosave struct {
-	period     float64 // How often to save
-	start      float64 // Starting point
-	count      int     // Number of times it has been autosaved
-	autonum    int     // File number for output, may be > count when saved manually
-	name, unit string
-	nComp      int // number of components (scalar, vector, ...)
-	mesh       *data.Mesh
+	period     float64    // How often to save
+	start      float64    // Starting point
+	count      int        // Number of times it has been autosaved
+	autonum    int        // File number for output, may be > count when saved manually
+	name, unit string     // metadata for dump file
+	nComp      int        // number of components (scalar, vector, ...)
+	mesh       *data.Mesh // nil means use global mesh
 }
 
 func newAutosave(nComp int, name, unit string, m *data.Mesh) autosave {
@@ -58,7 +58,7 @@ func (b *autosave) NComp() int { return b.nComp }
 
 func (b *autosave) Mesh() *data.Mesh {
 	if b.mesh == nil {
-		return Mesh()
+		return Mesh() // global mesh
 	} else {
 		return b.mesh
 	}

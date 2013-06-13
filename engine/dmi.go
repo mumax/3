@@ -31,7 +31,7 @@ func initDMI() {
 
 func safediv(a, b float64) float64 {
 	if b == 0 {
-		return a
+		return 0
 	}
 	return a / b
 }

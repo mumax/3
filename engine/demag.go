@@ -16,12 +16,11 @@ var (
 var demag_ *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 
 func init() {
-	Msat = scalarParam("Msat", "A/m", func(region int) {
-		b := Msat.GetRegion(region) * Mu0
-		if b == 0 { // nearly everywhere we divide by bsat, so 0 is problematic
-			b = 1 // replacing 0 by 1 simplifies kernels but assumes the result is unused for empty cells.
-		}
-		bsat.setRegion(region, b)
+	Msat = scalarParam("Msat", "A/m", func(r int) {
+		msat := Msat.GetRegion(r)
+		bsat.setRegion(r, msat*Mu0)
+		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
+		dmi_red.setRegion(r, safediv(DMI.GetRegion(r), msat))
 	})
 
 	world.Var("EnableDemag", &EnableDemag)

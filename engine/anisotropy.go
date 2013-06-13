@@ -21,7 +21,7 @@ var (
 
 func initAnisotropy() {
 	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
-		ku1_red.setRegion(region, Ku1.GetRegion(region)/Msat.GetRegion(region))
+		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
 	})
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		if !ku1_red.zero {

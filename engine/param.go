@@ -24,13 +24,8 @@ type param struct {
 }
 
 // constructor
-func newParam(nComp int, name, unit string) param {
-	var p param
-	p.autosave = newAutosave(nComp, name, unit, nil)
-	p.gpu = make(cuda.LUTPtrs, nComp)
-	p.lut = make([][MAXREG]float32, nComp)
-	p.ok = false
-	return p
+func newParam(nComp int, name, unit string, post_update func(int)) param {
+	return param{make([][MAXREG]float32, nComp), make(cuda.LUTPtrs, nComp), false, post_update, newAutosave(nComp, name, unit, nil)}
 }
 
 func (p *param) setRegion(region int, v ...float64) {
@@ -124,10 +119,9 @@ func (p *param) upload() {
 
 type ScalarParam struct{ param }
 
-func scalarParam(name, unit string) ScalarParam {
-	return ScalarParam{newParam(1, name, unit)}
+func scalarParam(name, unit string, post func(int)) ScalarParam {
+	return ScalarParam{newParam(1, name, unit, post)}
 }
-
 func (p *ScalarParam) SetRegion(region int, value float64) {
 	checkRegion(region)
 	p.setRegion(region, value)
@@ -145,8 +139,8 @@ func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
 
 type VectorParam struct{ param }
 
-func vectorParam(name, unit string) VectorParam {
-	return VectorParam{newParam(3, name, unit)}
+func vectorParam(name, unit string, post func(int)) VectorParam {
+	return VectorParam{newParam(3, name, unit, post)}
 }
 
 func (p *VectorParam) SetRegion(region int, value [3]float64) {

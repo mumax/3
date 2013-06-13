@@ -24,11 +24,12 @@ func init() {
 // Test if have lies within want +/- maxError,
 // and print suited message.
 func expect(msg string, have, want, maxError float64) {
-	if math.Abs(have-want) > maxError {
+	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
 		log.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
 		log.Println(msg, ":", have, "OK")
 	}
+	// note: also check "want" for NaN in case "have" and "want" are switched.
 }
 
 func Compile(src string) (script.Expr, error) {

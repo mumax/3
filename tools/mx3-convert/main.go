@@ -1,14 +1,22 @@
 /*
- mx3-convert converts mx3 output files and .omf files to various formats and images.
- It also provides basic manipulations like data rescale etc.
- Usage:
- 	mx3-convert [flags] files
- For a overview of flags, run:
- 	mx3-convert -help
- Example: convert all .dump files to PNG:
- 	mx3-convert -png *.dump
- Example: resize data to a 1 x 32 x 32 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
- 	mx3-convert -resize 1x32x32 -normalize -omf binary file.dump
+mx3-convert converts mx3 output files and .omf files to various formats and images.
+It also provides basic manipulations like data rescale etc.
+
+
+Usage
+
+Command-line flags must always preceed the input files:
+	mx3-convert [flags] files
+For a overview of flags, run:
+	mx3-convert -help
+Example: convert all .dump files to PNG:
+	mx3-convert -png *.dump
+Example: resize data to a 1 x 32 x 32 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
+	mx3-convert -resize 1x32x32 -normalize -omf binary file.dump
+Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
+	mx3-convert -comp 0 -vtk binary -jpg *.omf
+
+Output file names are automatically assigned.
 */
 package main
 
@@ -152,10 +160,10 @@ func process(f *data.Slice, time float64, name string) {
 		haveOutput = true
 	}
 
-	//	if *flag_dump {
-	//		dumpDump(name+".dump", f)
-	//		haveOutput = true
-	//	}
+	if *flag_dump {
+		data.MustWriteFile(name+".dump", f, time)
+		haveOutput = true
+	}
 
 	if !haveOutput || *flag_show {
 		// TODO: header

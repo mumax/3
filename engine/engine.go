@@ -11,17 +11,20 @@ const VERSION = "mx3.0.8 α "
 
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
-// User inputs
-var (
-	B_ext func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	geom  Shape             = nil                  // nil means universe
-)
+func init() {
+	world.Func("setgridsize", setGridSize)
+	world.Func("setcellsize", setCellSize)
+	torque_ := &Torque
+	world.ROnly("torque", &torque_)
+}
 
 // Accessible quantities
 var (
-	M     magnetization // reduced magnetization (unit length)
-	B_eff setterQuant   // effective field (T) output handle
-	Table DataTable     // output handle for tabular data (average magnetization etc.)
+	B_ext  func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
+	M      magnetization                            // reduced magnetization (unit length)
+	B_eff  setterQuant                              // effective field (T) output handle
+	Torque setterQuant                              // total torque/γ0, in T
+	Table  DataTable                                // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
@@ -29,7 +32,8 @@ var (
 	globalmesh data.Mesh
 	regions    Regions
 	extFields  []extField
-	itime      int //unique integer time stamp
+	itime      int         //unique integer time stamp // TODO: revise
+	geom       Shape = nil // nil means universe
 )
 
 func Mesh() *data.Mesh {
@@ -68,11 +72,8 @@ func initialize() {
 	Table = *newTable("datatable")
 
 	initDemag()
-
 	initExchange()
-
 	initDMI()
-
 	initAnisotropy()
 
 	// external field
@@ -95,7 +96,13 @@ func initialize() {
 	})
 	Quants["B_eff"] = &B_eff
 
-	initTorque()
+	initLLTorque()
+	initSTTorque()
+	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
+		LLTorque.set(b, cansave)
+		STTorque.addTo(b, cansave)
+	})
+	Quants["torque"] = &Torque
 
 	// solver
 	torquebuffer := cuda.NewSlice(3, Mesh())

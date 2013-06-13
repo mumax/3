@@ -13,25 +13,12 @@ import (
 var world = script.NewWorld()
 
 func init() {
-	world.Func("setgridsize", setGridSize)
-	world.Func("setcellsize", setCellSize)
-
 	world.Func("vector", Vector)
-
 	world.Func("savetable", doSaveTable)
-
 	world.Func("average", Average)
-
 	world.Var("b_ext", &B_ext)
 	world.Const("mu0", Mu0)
-
 	world.LValue("m", &M)
-	world.Func("SetGeom", SetGeometry)
-	world.Func("DefRegion", DefRegion)
-
-	regions_addr := &regions
-	world.ROnly("regions", &regions_addr)
-
 	world.Func("expect", expect)
 }
 

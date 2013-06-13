@@ -7,6 +7,13 @@ import (
 	"log"
 )
 
+func init() {
+	world.Func("SetGeom", SetGeometry)
+	world.Func("DefRegion", DefRegion)
+	regions_addr := &regions
+	world.ROnly("regions", &regions_addr)
+}
+
 const MAXREG = 256 // maximum number of regions
 
 type Regions struct {

@@ -14,8 +14,8 @@ func init() {
 }
 
 var (
-	Alpha            = scalarParam("alpha", "") // Damping constant
-	LLTorque, Torque setterQuant                // torque/gamma0, in Tesla
+	Alpha            = scalarParam("alpha", "", nil) // Damping constant
+	LLTorque, Torque setterQuant                     // torque/gamma0, in Tesla
 )
 
 func initTorque() {

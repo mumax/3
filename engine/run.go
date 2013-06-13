@@ -55,7 +55,7 @@ func Paused() bool {
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
-	// TODO: sanityCheck
+	//sanityCheck()
 	checkM()
 	defer util.DashExit()
 

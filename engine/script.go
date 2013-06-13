@@ -22,7 +22,6 @@ func init() {
 
 	world.Func("average", Average)
 
-	world.Var("aex", &Aex)
 	world.Var("b_ext", &B_ext)
 	world.Const("mu0", Mu0)
 
@@ -30,13 +29,9 @@ func init() {
 	world.Func("SetGeom", SetGeometry)
 	world.Func("DefRegion", DefRegion)
 
-	B_exch_addr := &B_exch
-	world.ROnly("B_exch", &B_exch_addr)
-
 	regions_addr := &regions
 	world.ROnly("regions", &regions_addr)
 
-	world.LValue("ExchangeMask", &ExchangeMask)
 	world.Func("expect", expect)
 }
 

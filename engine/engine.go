@@ -13,18 +13,15 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 
 // User inputs
 var (
-	Aex          func() float64     = Const(0)             // Exchange stiffness in J/m
-	B_ext        func() [3]float64  = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
-	ExchangeMask staggeredMaskQuant                        // Mask that scales Aex/Msat between cells.
-	geom         Shape              = nil                  // nil means universe
+	B_ext func() [3]float64 = ConstVector(0, 0, 0) // Externally applied field in T, homogeneous.
+	geom  Shape             = nil                  // nil means universe
 )
 
 // Accessible quantities
 var (
-	M      magnetization // reduced magnetization (unit length)
-	B_eff  setterQuant   // effective field (T) output handle
-	B_exch adderQuant    // exchange field (T) output handle
-	Table  DataTable     // output handle for tabular data (average magnetization etc.)
+	M     magnetization // reduced magnetization (unit length)
+	B_eff setterQuant   // effective field (T) output handle
+	Table DataTable     // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
@@ -65,24 +62,14 @@ func initialize() {
 	Quants["m"] = &M
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
 
-	// regions
 	regions.init()
 	Quants["regions"] = &regions
 
-	// data table
 	Table = *newTable("datatable")
 
 	initDemag()
 
-	// exchange field
-	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
-		//sanitycheck()
-		cuda.AddExchange(dst, M.buffer, ExchangeMask.buffer, Aex(), Msat.GetUniform())
-	})
-	Quants["B_exch"] = &B_exch
-
-	ExchangeMask = staggeredMask(Mesh(), "exchangemask", "")
-	Quants["exchangemask"] = &ExchangeMask
+	initExchange()
 
 	initDMI()
 

@@ -24,8 +24,9 @@ func initAnisotropy() {
 		ku1_red.setRegion(region, Ku1.GetRegion(region)/Msat.GetRegion(region))
 	})
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
-		//TODO: conditionally
-		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
+		if !ku1_red.zero {
+			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
+		}
 	})
 	Quants["B_uni"] = &B_uni
 	Quants["Ku1"] = &Ku1

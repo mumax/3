@@ -22,8 +22,9 @@ var (
 
 func initDMI() {
 	B_dmi = adder(3, Mesh(), "B_dmi", "T", func(dst *data.Slice) {
-		// TODO: conditionally
-		cuda.AddDMI(dst, M.buffer, dmi_red.Gpu(), regions.Gpu())
+		if !dmi_red.zero {
+			cuda.AddDMI(dst, M.buffer, dmi_red.Gpu(), regions.Gpu())
+		}
 	})
 	Quants["B_dmi"] = &B_dmi
 }

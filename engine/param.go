@@ -15,24 +15,44 @@ import (
 // implementation allows arbitrary number of components,
 // narrowed down to 1 or 3 in ScalarParam and VectorParam
 type param struct {
-	lut [][MAXREG]float32 // look-up table source
-	gpu cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
-	ok  bool              // gpu cache up-to date with lut source
-	//zero        bool              // are all values zero (then we may skip corresponding kernel)
-	post_update func(region int) // called after region value changed, e.g., to update dependent params
-	autosave                     // allow it to be saved
+	lut         [][MAXREG]float32 // look-up table source
+	gpu         cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
+	ok          bool              // gpu cache up-to date with lut source
+	zero        bool              // are all values zero (then we may skip corresponding kernel)
+	post_update func(region int)  // called after region value changed, e.g., to update dependent params
+	autosave                      // allow it to be saved
 }
 
 // constructor
 func newParam(nComp int, name, unit string, post_update func(int)) param {
-	return param{make([][MAXREG]float32, nComp), make(cuda.LUTPtrs, nComp), false, post_update, newAutosave(nComp, name, unit, nil)}
+	return param{make([][MAXREG]float32, nComp), make(cuda.LUTPtrs, nComp), false, true, post_update, newAutosave(nComp, name, unit, nil)}
 }
 
 func (p *param) setRegion(region int, v ...float64) {
 	util.Argument(len(v) == p.NComp()) // note: also likely panics if param not initialized (nComp = 0)
+
+	v0 := true
 	for c := range v {
 		p.lut[c][region] = float32(v[c])
+		if v[c] != 0 {
+			v0 = false
+		}
 	}
+	p.zero = false
+
+	if v0 {
+		p.zero = true
+		for c := range p.lut {
+			for i := range p.lut[c] {
+				if p.lut[c][i] != 0 {
+					p.zero = false
+					c = len(p.lut) // break outer loop as well
+					break
+				}
+			}
+		}
+	}
+
 	p.ok = false
 	if p.post_update != nil {
 		p.post_update(region)

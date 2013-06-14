@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="refresh" content="1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>mx3</title>
+	<style media="all" type="text/css">
+		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
+		h1   { font-size: 22px; font-weight: normal; color: black}
+		h2   { font-size: 20px; font-weight: normal; color: black}
+		img  { margin: 15px; }
+		table{ border:"10"; }
+		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
+		a    { color: #375EAB; text-decoration: none; }
+		div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+	</style>
+</head>
+
+<body>
+
+<h1>mx3 By Example</h1>
+<hr/>
+
+{{.Example `
+
+SetGridSize(128, 32, 1)
+SetCellSize(3e-9, 3e-9, 3e-9)
+m = Uniform(1, 0, 0)
+save(m)
+
+`}}
+
+
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,7 +13,11 @@ import (
 	"text/template"
 )
 
+var flag_vet = flag.Bool("vet", false, "only vet source files, don't run them")
+
 func main() {
+	flag.Parse()
+
 	// read template
 	b, err := ioutil.ReadFile("template.html")
 	check(err)
@@ -41,7 +46,11 @@ func (s *State) Example(in string) string {
 
 	// exec input file
 	check(ioutil.WriteFile(s.infile(), []byte(in), 0666))
-	cmd("mx3", "-f", "-s", s.infile())
+	arg := "-s"
+	if *flag_vet {
+		arg = "-vet"
+	}
+	cmd("mx3", "-f", arg, s.infile())
 
 	return `<pre>` + in + `</pre>`
 }

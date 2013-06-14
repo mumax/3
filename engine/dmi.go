@@ -15,7 +15,7 @@ func init() {
 }
 
 var (
-	DMI     ScalarParam // Dzyaloshinskii-Moriya vector in J/m²
+	DMI     ScalarParam // Dzyaloshinskii-Moriya strength in J/m²
 	dmi_red = scalarParam("dmi_red", "Tm", nil)
 	B_dmi   adderQuant // DMI field in T
 )

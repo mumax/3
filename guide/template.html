@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="refresh" content="1">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>mx3</title>
 	<style media="all" type="text/css">
-		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
-		h1   { font-size: 22px; font-weight: normal; color: black}
-		h2   { font-size: 16px; font-weight: normal; color: black}
-		h3   { font-size: 14px; font-weight: normal; color: black}
+		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #222222}
+		h1   { font-size: 22px; font-weight: normal; color: #000088}
+		h2   { font-size: 18px; font-weight: normal; color: #000088}
+		h3   { font-size: 15px; font-weight: normal; color: #000088}
 		table{ border:"10"; }
 		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
 		a    { color: #375EAB; text-decoration: none; }
@@ -39,7 +38,7 @@ SetCellsize(500e-9/128, 125e-9/32, 3e-9)
 alpha = 1
 Msat  = 800e3
 Aex   = 13e-12
-m     = uniform(1, .1, 0)
+m     = uniform(1, .1, 0) // initial m
 
 run(3e-9)  // relax
 save(m)    // relaxed state
@@ -51,31 +50,102 @@ run(1e-9)
 
 `}}
 
+This example should be pretty straight-forward to follow. Output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.
+
 {{.Output }}
+
+<hr/><h2>Material parameters</h2>
+
+Overview of the available material parameters:
+
+{{.Example `
+setgridsize(16, 16, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+Msat  = 1000e3    // Saturation magnetization in A/m
+Aex   = 13e-12    // Exchange stiffness in J/m
+alpha = 0.02      // Gilbert damping constant
+
+anisU = vector(1, 0, 0) // Uniaxial anisotropy axis
+Ku1   = 500e3           // Uniaxial anisotropy in J/m3
+
+xi      = 0.04    // Spin-transfer torque degree of non-adiabaticity
+spinPol = 0.56    // Spin polarization
+
+DMI = 1e-3        // Dzyaloshinskii-Moriya interaction in J/m2
+`}}
+
+Obviously this input file does not create any output.
+
+<hr/><h2>Interlude on Syntax</h2>
+
+<p>
+Before we continue we might have a look at the mx3 input syntax. It is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
+
+<h3>Defining variables</h3>
+{{.Example `
+i := 7    // defines a new variable i, type automatically detected to be int
+print(i)  // now we can use i
+i = 5     // assign new value, don't use ':=' (attempt to re-declare)
+
+str := "hello" // defines str, type automatically is string
+//str = 1      // would fail, cannot assign int to string
+`}}
+
+<h3>Arithmetic</h3>
+Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
+
+{{.Example `
+x := pi*(3+4)/5
+x = pow(x, 3)
+x++
+y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
+`}}
+
+<h3>Control structures</h3>
+Loops are possible as well:
+{{.Example `
+
+for i:=0; i<10; i++{
+	print(i)
+}
+
+`}}
+
+<hr/><h2>Geometry</h2>
+mx3 has powerful API to programatically define geometries.
+{{.Example `
+
+setgridsize(256, 256, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+d      := 200e-9
+square := rect(d, d)                 // square with side d
+
+h     := 50e-9
+hole  := cylinder(h, h)              // circle with diameter h
+hole1 := hole.transl(100e-9, 0, 0)  // translated circle #1
+hole2 := hole.transl(0, -50e-9, 0)  // translated cricle #2
+cheese:= square.sub(hole1).sub(hole2)   // subtract the circles form the square (makes holes).
+setgeom(cheese)
+
+msat = 600e3
+aex = 12e-13
+alpha = 3
+
+// rotate the cheese.
+for i:=0; i<=90; i=i+30{
+	angle := i*pi/180
+	setgeom(cheese.rotz(angle))
+	m = uniform(cos(angle), sin(angle), 0)
+	save(m)
+}
+
+`}}
+
+{{.Output}}
+
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

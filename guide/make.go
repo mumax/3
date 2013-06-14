@@ -31,6 +31,7 @@ type State struct {
 }
 
 func (s *State) Example(in string) string {
+	s.count++
 
 	// extract example source
 	in = strings.Replace(in, "@", "\n", -1) // undo raw string hack
@@ -40,8 +41,21 @@ func (s *State) Example(in string) string {
 	check(ioutil.WriteFile(s.infile(), []byte(in), 0666))
 	cmd("mx3", "-f", s.infile())
 
-	s.count++
 	return `<pre>` + in + `</pre>`
+}
+
+func (s *State) Img(fname string) string {
+	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
+	pngfile := s.outfile() + "/" + fname + ".png"
+	return fmt.Sprintf(`
+<table>
+	<tr><td>
+		<img src="%v"/>
+	</td></tr>
+	<tr><td>
+		%v
+	</td></tr>
+</table>`, pngfile, fname)
 }
 
 func (s *State) infile() string {

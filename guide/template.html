@@ -8,7 +8,6 @@
 		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
 		h1   { font-size: 22px; font-weight: normal; color: black}
 		h2   { font-size: 20px; font-weight: normal; color: black}
-		img  { margin: 15px; }
 		table{ border:"10"; }
 		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
 		a    { color: #375EAB; text-decoration: none; }
@@ -21,6 +20,9 @@
 <h1>mx3 By Example</h1>
 <hr/>
 
+
+<h2>Getting started</h2>
+
 {{.Example `
 
 SetGridSize(128, 32, 1)
@@ -30,7 +32,9 @@ save(m)
 
 `}}
 
+<h3>Output</h3>
 
+{{.Img "m000000" }}
 
 </body>
 </html>

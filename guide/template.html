@@ -7,34 +7,75 @@
 	<style media="all" type="text/css">
 		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
 		h1   { font-size: 22px; font-weight: normal; color: black}
-		h2   { font-size: 20px; font-weight: normal; color: black}
+		h2   { font-size: 16px; font-weight: normal; color: black}
+		h3   { font-size: 14px; font-weight: normal; color: black}
 		table{ border:"10"; }
 		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
 		a    { color: #375EAB; text-decoration: none; }
 		div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+		pre  { margin-left: 50px; margin-top: 10px; margin-bottom: 20px; color: #000044 }
 	</style>
 </head>
 
 <body>
 
-<h1>mx3 By Example</h1>
+<h1>mx3 Examples</h1>
 <hr/>
 
+mx3 input files are run with the command
+<pre>mx3 myfile.txt</pre>
+Output is automatically stored in the "myfile.out" directory. Additionally, a web interface provides live output. Default is localhost:35367.<br/>
+For more details refer to the <a href="http://godoc.org/code.google.com/p/mx3">godoc documentation</a>.
 
-<h2>Getting started</h2>
+<hr/><h2>A first example</h2>
+
+Let's start with the classic mumag standard problem 4, as defined <a href="http://www.ctcms.nist.gov/~rdm/mumag.org.html">here</a>.
 
 {{.Example `
 
-SetGridSize(128, 32, 1)
-SetCellSize(3e-9, 3e-9, 3e-9)
-m = Uniform(1, 0, 0)
-save(m)
+SetGridsize(128, 32, 1)
+SetCellsize(500e-9/128, 125e-9/32, 3e-9)
+
+alpha = 1
+Msat  = 800e3
+Aex   = 13e-12
+m     = uniform(1, .1, 0)
+
+run(3e-9)  // relax
+save(m)    // relaxed state
+
+Autosave(m, 200e-12)
+alpha = 0.02
+B_ext = vector(-24.6E-3, 4.3E-3, 0)
+run(1e-9)
 
 `}}
 
-<h3>Output</h3>
-
-{{.Img "m000000" }}
+{{.Output }}
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

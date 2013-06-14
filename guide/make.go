@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -39,7 +41,7 @@ func (s *State) Example(in string) string {
 
 	// exec input file
 	check(ioutil.WriteFile(s.infile(), []byte(in), 0666))
-	cmd("mx3", "-f", s.infile())
+	cmd("mx3", "-f", "-s", s.infile())
 
 	return `<pre>` + in + `</pre>`
 }
@@ -48,14 +50,26 @@ func (s *State) Img(fname string) string {
 	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
-<table>
-	<tr><td>
-		<img src="%v"/>
-	</td></tr>
-	<tr><td>
-		%v
-	</td></tr>
-</table>`, pngfile, fname)
+<figure>
+	<img src="%v"/>
+	<figcaption> %v </figcaption>
+</figure>`, pngfile, fname)
+}
+
+func (s *State) Output() string {
+	out := "<h3>output</h3>"
+
+	dir, err := os.Open(s.outfile())
+	check(err)
+	files, err2 := dir.Readdirnames(-1)
+	check(err2)
+	sort.Strings(files)
+	for _, f := range files {
+		if path.Ext(f) == ".dump" {
+			out += s.Img(f[:len(f)-len(".dump")])
+		}
+	}
+	return out
 }
 
 func (s *State) infile() string {

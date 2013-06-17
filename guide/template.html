@@ -148,7 +148,8 @@ expect("mz", m_[2], 0, 1e-3)
 This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
 
 <hr/><h2>Geometry</h2>
-mx3 has powerful API to programatically define geometries.
+mx3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). In the example below we subtract two disks from a square, then rotate the result. See the full <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">API</a>.
+
 {{.Example `
 
 setgridsize(256, 256, 1)
@@ -159,9 +160,9 @@ square := rect(d, d)                 // square with side d
 
 h     := 50e-9
 hole  := cylinder(h, h)              // circle with diameter h
-hole1 := hole.transl(100e-9, 0, 0)  // translated circle #1
-hole2 := hole.transl(0, -50e-9, 0)  // translated cricle #2
-cheese:= square.sub(hole1).sub(hole2)   // subtract the circles form the square (makes holes).
+hole1 := hole.transl(100e-9, 0, 0)   // translated circle #1
+hole2 := hole.transl(0, -50e-9, 0)   // translated cricle #2
+cheese:= square.sub(hole1).sub(hole2)// subtract the circles form the square (makes holes).
 setgeom(cheese)
 
 msat = 600e3

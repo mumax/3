@@ -15,9 +15,9 @@ func init() {
 }
 
 var (
-	DMI     ScalarParam // Dzyaloshinskii-Moriya strength in J/m²
-	dmi_red = scalarParam("dmi_red", "Tm", nil)
-	B_dmi   adderQuant // DMI field in T
+	DMI     ScalarParam                         // Dzyaloshinskii-Moriya strength in J/m²
+	dmi_red = scalarParam("dmi_red", "Tm", nil) // DMI/Msat
+	B_dmi   adderQuant                          // DMI field in T
 )
 
 func initDMI() {

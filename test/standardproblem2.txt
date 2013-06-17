@@ -6,7 +6,7 @@
 
 	Msat  = 1000e3                               // Msat and Aex should not matter
 	Aex   = 10e-12
-	alpha = 3                                    // fast relax
+ 	alpha = 3                                    // fast relax
 
 	lex := sqrt(Aex / (0.5 * mu0 * pow(Msat.GetUniform(),2))) // define exchange length
 

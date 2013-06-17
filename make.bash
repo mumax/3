@@ -1,5 +1,6 @@
 #! /bin/bash
 
+rm -f mx3
 ln -sf $(pwd)/pre-commit .git/hooks/pre-commit
 ln -sf $(pwd)/post-commit .git/hooks/post-commit
 

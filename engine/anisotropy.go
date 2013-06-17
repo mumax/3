@@ -6,6 +6,9 @@ import (
 )
 
 func init() {
+	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
+		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
+	})
 	B_uni_addr := &B_uni
 	world.ROnly("B_uni", &B_uni_addr)
 	world.LValue("Ku1", &Ku1)
@@ -20,9 +23,6 @@ var (
 )
 
 func initAnisotropy() {
-	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
-		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
-	})
 	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
 		if !ku1_red.zero {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())

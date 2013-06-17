@@ -1,0 +1,18 @@
+mx3 GPU-accelerated micromagnetic simulator
+-------------------------------------------
+
+* main binary: mx3, can be moved to anywhere you like.
+
+* mx3-convert can be found in tools/mx3-convert.
+
+* examples in guide/guide.html.
+
+* recompiling, if you want to: 
+	go install
+(only requires Go1.1, no nvcc)
+
+to recompile also the cuda code:
+./make.bash
+(also requires nvcc)
+
+

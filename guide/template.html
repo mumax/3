@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>mx3</title>
 	<style media="all" type="text/css">
-		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #222222}
+		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; }
 		h1   { font-size: 22px; font-weight: normal; color: #000088}
 		h2   { font-size: 18px; font-weight: normal; color: #000088}
 		h3   { font-size: 15px; font-weight: normal; color: #000088}
@@ -157,35 +157,35 @@ setgridsize(100, 100, 50)
 setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
 setgeom(rect(800e-9, 500e-9))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "rect")
 
 setgeom(rect(800e-9, 500e-9).rotz(30*pi/180))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "rect_rotz")
 
 setgeom(cylinder(800e-9, 600e-9))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "cylinder")
 
 setgeom(cylinder(800e-9, 600e-9).inverse())
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "cylinder_inverse")
 
 setgeom(cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "cylinder_transl")
 
 setgeom(ellipsoid(800e-9, 600e-9, 500e-9))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "ellipsoid")
 
 setgeom(halfspace())
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "halfspace")
 
 setgeom(rect(800e-9, 500e-9).sub(halfspace().rotz(30*pi/180)))
-m=uniform(1,0,0)
+m=uniform(1,1,0)
 saveas(m, "rect_sub_haflspace_rotz")
 
 `}}
@@ -199,8 +199,8 @@ In this example we define a geometry that looks like a slice of cheese and have 
 
 {{.Example `
 
-setgridsize(256, 256, 1)
-setcellsize(1e-9, 1e-9, 1e-9)
+setgridsize(128, 128, 1)
+setcellsize(2e-9, 2e-9, 2e-9)
 
 d      := 200e-9
 square := rect(d, d)                 // square with side d
@@ -221,6 +221,7 @@ for i:=0; i<=90; i=i+30{
 	angle := i*pi/180
 	setgeom(cheese.rotz(angle))
 	m = uniform(cos(angle), sin(angle), 0)
+	run(1e-9)
 	save(m)
 }
 
@@ -231,13 +232,24 @@ for i:=0; i<=90; i=i+30{
 
 <hr/><h2>Regions: space-dependent parameters</h2>
 
+<p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Region 0 conventionally everything outside your magnet (the vacuum), so setting material parameters starts at 1.</p>
+
+<p>Regions are defined with <code>defregion(number, shape)</code>, where <code>shape</code> is a <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">Shape</a> as explained in the geometry example.</p>
+
+<p>When you're not using regions, like in the above examples, you'll probably set parameters with a simple assign:
+<pre>Aex = 12e-13</pre>
+Behind the screens, this sets Aex in <i>all</i> regions.
+</p>
+
+<p>It's always a good idea to output the <code>regions</code> quantity, as well as all your material parameters, to check </p>
+
 {{.Example `
 N := 128
 setgridsize(N, N, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 d := 1e-9 * N  
 
-defregion(0, cylinder(d, d).inverse())
+defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
 defregion(1, cylinder(d, d))
 defregion(2, cylinder(d/2, d/2))
 defregion(3, cylinder(d/2, d/2).transl(d/3, 0, 0))
@@ -260,10 +272,31 @@ save(m)
 
 
 <hr/><h2>Initial magnetization</h2>
+Some initial magnetization functions are provided, as well as transformations on them. See the <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+
 {{.Example `
+setgridsize(200, 100, 1)
+setcellsize(5e-9, 5e-9, 5e-9)
+
+m = uniform(1, 1, 0)  // no need to normalize length
+saveas(m, "uniform")
+
+m = vortex(1, -1)     // circulation, polarization
+saveas(m, "vortex")
+
+m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
+saveas(m, "twodomain")
+
+m = vortexwall(1, -1, 1, 1) 
+saveas(m, "vortexwall")
+
+m = vortex(1,-1).transl(100e-9, 50e-9, 0)
+saveas(m, "vortex_transl")
 
 `}}
+{{.Output}}
 
+These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
 </body>
 </html>
 

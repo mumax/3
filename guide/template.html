@@ -148,7 +148,54 @@ expect("mz", m_[2], 0, 1e-3)
 This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
 
 <hr/><h2>Geometry</h2>
-mx3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). In the example below we subtract two disks from a square, then rotate the result. See the full <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">API</a>.
+
+mx3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). See the full <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">API</a>.
+
+
+{{.Example `
+setgridsize(100, 100, 50)
+setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
+
+setgeom(rect(800e-9, 500e-9))
+m=uniform(1,0,0)
+saveas(m, "rect")
+
+setgeom(rect(800e-9, 500e-9).rotz(30*pi/180))
+m=uniform(1,0,0)
+saveas(m, "rect_rotz")
+
+setgeom(cylinder(800e-9, 600e-9))
+m=uniform(1,0,0)
+saveas(m, "cylinder")
+
+setgeom(cylinder(800e-9, 600e-9).inverse())
+m=uniform(1,0,0)
+saveas(m, "cylinder_inverse")
+
+setgeom(cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0))
+m=uniform(1,0,0)
+saveas(m, "cylinder_transl")
+
+setgeom(ellipsoid(800e-9, 600e-9, 500e-9))
+m=uniform(1,0,0)
+saveas(m, "ellipsoid")
+
+setgeom(halfspace())
+m=uniform(1,0,0)
+saveas(m, "halfspace")
+
+setgeom(rect(800e-9, 500e-9).sub(halfspace().rotz(30*pi/180)))
+m=uniform(1,0,0)
+saveas(m, "rect_sub_haflspace_rotz")
+
+`}}
+
+{{.Output}}
+
+Note: these are 3D geometries seen from above. The magnetization is averaged along the thickness. Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
+<hr/><h2>Interlude: rotating cheese</h2>
+
+In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
 
 {{.Example `
 
@@ -210,6 +257,12 @@ save(m)
 `}}
 
 {{.Output}}
+
+
+<hr/><h2>Initial magnetization</h2>
+{{.Example `
+
+`}}
 
 </body>
 </html>

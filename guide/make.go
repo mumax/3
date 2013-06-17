@@ -59,7 +59,7 @@ func (s *State) Img(fname string) string {
 	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
-<figure>
+<figure align=left>
 	<img src="%v"/>
 	<figcaption> %v </figcaption>
 </figure>`, pngfile, fname)

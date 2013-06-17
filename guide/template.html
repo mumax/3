@@ -9,7 +9,7 @@
 		h2   { font-size: 18px; font-weight: normal; color: #000088}
 		h3   { font-size: 15px; font-weight: normal; color: #000088}
 		table{ border:"10"; }
-		hr   { border-style: none; border-top: 1px solid #CCCCCC; }
+		hr   { border-style: none; border-top: 1px solid #CCCCCC; margin-top: 20px; margin-bottom: 20px }
 		a    { color: #375EAB; text-decoration: none; }
 		div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 		pre  { margin-left: 50px; margin-top: 10px; margin-bottom: 20px; color: #000044 }
@@ -59,9 +59,6 @@ This example should be pretty straight-forward to follow. Output is stored in th
 Overview of the available material parameters:
 
 {{.Example `
-setgridsize(16, 16, 1)
-setcellsize(1e-9, 1e-9, 1e-9)
-
 Msat  = 1000e3    // Saturation magnetization in A/m
 Aex   = 13e-12    // Exchange stiffness in J/m
 alpha = 0.02      // Gilbert damping constant
@@ -75,7 +72,7 @@ spinPol = 0.56    // Spin polarization
 DMI = 1e-3        // Dzyaloshinskii-Moriya interaction in J/m2
 `}}
 
-Obviously this input file does not create any output.
+This input file does not create any output.
 
 <hr/><h2>Interlude on Syntax</h2>
 
@@ -111,6 +108,44 @@ for i:=0; i<10; i++{
 }
 
 `}}
+
+<hr/><h2>Standard problem 2</h2>
+
+Using the scripting language explained above, relatively complex input files can be easily defined. E.g. <a href="http://www.ctcms.nist.gov/~rdm/std2/spec2.html">micromagnetic standard problem #2</a> specifies the simulation size in exchange lengths. The script below calculates the exchange length and chooses cells not larger than 0.75 exchange lengths so that the number of cells is a power of two (for best performance).
+
+
+{{.Example  `
+Msat  = 1000e3
+Aex   = 10e-12
+alpha = 3
+
+// define exchange length
+lex := sqrt(Aex / (0.5 * mu0 * pow(Msat.GetUniform(),2)))
+
+d     := 30 * lex                        // we test for d/lex = 30
+Sizex := 5*d                             // magnet size x
+Sizey := 1*d
+Sizez := 0.1*d
+
+nx := pow(2, ilogb(Sizex / (0.75*lex)))  // power-of-two number of cells
+ny := pow(2, ilogb(Sizey / (0.75*lex)))  // not larger than 0.75 exchange lengths
+
+SetGridSize(nx, ny, 1)
+SetCellSize(Sizex/nx, Sizey/ny, Sizez)
+
+m = Uniform(1, 0.1, 0)                   // initial mag
+Run(5e-9)                                // relax
+
+save(m)                                  // remanent magnetization
+m_ := average(m)                         
+expect("mx", m_[0], 0.9627, 1e-3)        // test m against known value
+expect("my", m_[1], 0.0756, 1e-3)
+expect("mz", m_[2], 0, 1e-3)
+`}}
+
+{{.Output}}
+
+This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
 
 <hr/><h2>Geometry</h2>
 mx3 has powerful API to programatically define geometries.

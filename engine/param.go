@@ -80,7 +80,7 @@ func (p *param) getUniform() []float64 {
 		x := p.lut[c][1]
 		for r := 2; r < MAXREG; r++ {
 			if p.lut[c][r] != x {
-				log.Fatalf("%v is not uniform, need to specify a region (%v.GetRegion(x))", p.name, p.name)
+				log.Panicf("%v is not uniform, need to specify a region (%v.GetRegion(x))", p.name, p.name)
 			}
 		}
 		v[c] = float64(x)

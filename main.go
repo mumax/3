@@ -30,7 +30,6 @@ var (
 	flag_port    = flag.String("http", ":35367", "Port to serve web gui")
 	flag_cpuprof = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	flag_memprof = flag.Bool("memprof", false, "Recored gopprof memory profile")
-	flag_gpuprof = flag.Bool("gpuprof", false, "Recored GPU profile")
 )
 
 func main() {
@@ -160,9 +159,6 @@ var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "f
 func initProf() {
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)
-	}
-	if *flag_gpuprof {
-		prof.InitGPU(engine.OD)
 	}
 	if *flag_memprof {
 		prof.InitMem(engine.OD)

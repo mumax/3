@@ -42,25 +42,6 @@ func InitMem(OD string) {
 	})
 }
 
-// Configuration for GPU profile output.
-const CUDA_PROFILE_CONFIG = `
-gpustarttimestamp
-instructions
-streamid
-`
-
-// called by init()
-func InitGPU(OD string) {
-	util.PanicErr(os.Setenv("CUDA_PROFILE", "1"))
-	util.PanicErr(os.Setenv("CUDA_PROFILE_CSV", "1"))
-	out := OD + "gpuprofile.csv"
-	log.Println("writing GPU profile to", out)
-	util.PanicErr(os.Setenv("CUDA_PROFILE_LOG", out))
-	cfgfile := OD + "cudaprof.cfg"
-	util.PanicErr(os.Setenv("CUDA_PROFILE_CONFIG", cfgfile))
-	util.FatalErr(ioutil.WriteFile(cfgfile, []byte(CUDA_PROFILE_CONFIG), 0666), "gpuprof")
-}
-
 // Exec command and write output to outfile.
 func saveCmdOutput(outfile string, cmd string, args ...string) {
 	log.Println("exec:", cmd, args, ">", outfile)

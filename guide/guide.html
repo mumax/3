@@ -335,7 +335,7 @@ save(m)</pre>
 
 
 <hr/><h2>Initial magnetization</h2>
-Some initial magnetization functions are provided, as well as transformations on them. See the <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
 
 <pre>setgridsize(200, 100, 1)
 setcellsize(5e-9, 5e-9, 5e-9)
@@ -349,8 +349,14 @@ saveas(m, "vortex")
 m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
 saveas(m, "twodomain")
 
+m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
+saveas(m, "twodomain_rot")
+
 m = vortexwall(1, -1, 1, 1) 
 saveas(m, "vortexwall")
+
+m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
+saveas(m, "vortexwall_scale")
 
 m = vortex(1,-1).transl(100e-9, 50e-9, 0)
 saveas(m, "vortex_transl")</pre>
@@ -358,6 +364,10 @@ saveas(m, "vortex_transl")</pre>
 <figure align=left>
 	<img src="example10.out/twodomain.png"/>
 	<figcaption> twodomain </figcaption>
+</figure>
+<figure align=left>
+	<img src="example10.out/twodomain_rot.png"/>
+	<figcaption> twodomain_rot </figcaption>
 </figure>
 <figure align=left>
 	<img src="example10.out/uniform.png"/>
@@ -374,6 +384,10 @@ saveas(m, "vortex_transl")</pre>
 <figure align=left>
 	<img src="example10.out/vortexwall.png"/>
 	<figcaption> vortexwall </figcaption>
+</figure>
+<figure align=left>
+	<img src="example10.out/vortexwall_scale.png"/>
+	<figcaption> vortexwall_scale </figcaption>
 </figure>
 
 These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.

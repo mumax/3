@@ -272,7 +272,7 @@ save(m)
 
 
 <hr/><h2>Initial magnetization</h2>
-Some initial magnetization functions are provided, as well as transformations on them. See the <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
 
 {{.Example `
 setgridsize(200, 100, 1)
@@ -287,8 +287,14 @@ saveas(m, "vortex")
 m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
 saveas(m, "twodomain")
 
+m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
+saveas(m, "twodomain_rot")
+
 m = vortexwall(1, -1, 1, 1) 
 saveas(m, "vortexwall")
+
+m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
+saveas(m, "vortexwall_scale")
 
 m = vortex(1,-1).transl(100e-9, 50e-9, 0)
 saveas(m, "vortex_transl")

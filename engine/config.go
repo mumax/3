@@ -85,3 +85,24 @@ func (c Config) Transl(dx, dy, dz float64) Config {
 		return c(x-dx, y-dy, z-dz)
 	}
 }
+
+// Scale returns a scaled copy of configuration c.
+func (c Config) Scale(sx, sy, sz float64) Config {
+	return func(x, y, z float64) [3]float64 {
+		return c(x/sx, y/sy, z/sz)
+	}
+}
+
+// Rotates the configuration around the Z-axis, over θ radians.
+func (c Config) RotZ(θ float64) Config {
+	cos := math.Cos(θ)
+	sin := math.Sin(θ)
+	return func(x, y, z float64) [3]float64 {
+		x_ := x*cos + y*sin
+		y_ := -x*sin + y*cos
+		m := c(x_, y_, z)
+		mx_ := m[0]*cos - m[1]*sin
+		my_ := m[0]*sin + m[1]*cos
+		return [3]float64{mx_, my_, m[2]}
+	}
+}

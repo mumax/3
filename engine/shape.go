@@ -64,11 +64,20 @@ func (s Shape) Transl(dx, dy, dz float64) Shape {
 	}
 }
 
+// Scale returns a scaled copy of the shape.
+func (s Shape) Scale(sx, sy, sz float64) Shape {
+	return func(x, y, z float64) bool {
+		return s(x/sx, y/sy, z/sz)
+	}
+}
+
 // Rotates the shape around the Z-axis, over θ radians.
 func (s Shape) RotZ(θ float64) Shape {
+	cos := math.Cos(θ)
+	sin := math.Sin(θ)
 	return func(x, y, z float64) bool {
-		x_ := x*math.Cos(θ) - y*math.Sin(θ)
-		y_ := x*math.Sin(θ) + y*math.Cos(θ)
+		x_ := x*cos + y*sin
+		y_ := -x*sin + y*cos
 		return s(x_, y_, z)
 	}
 }

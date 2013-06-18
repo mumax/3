@@ -13,7 +13,7 @@ const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X
 // Add exchange field to Beff.
 // 	m: normalized magnetization
 // 	B: effective field in Tesla
-// 	Aex_red: Aex / (Msat * 1e18 m2)
+// 	Aex_red: 2*Aex / (Msat * 1e18 m2)
 func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes) {
 	mesh := B.Mesh()
 	c := mesh.CellSize()

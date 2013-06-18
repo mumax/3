@@ -62,13 +62,13 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
             i_  = idx(lclamp(i-1), j, k);
             m_  = make_float3(mx[i_], my[i_], mz[i_]);
             a__ = aLUT2d[symidx(r0, regions[i_])];
-            B += wy * a__ *(m_ - m0);
+            B += wx * a__ *(m_ - m0);
 
             // top neighbor
             i_  = idx(hclamp(i+1, N0), j, k);
             m_  = make_float3(mx[i_], my[i_], mz[i_]);
             a__ = aLUT2d[symidx(r0, regions[i_])];
-            B += wy * a__ *(m_ - m0);
+            B += wx * a__ *(m_ - m0);
         }
 
         Bx[I] = B.x;

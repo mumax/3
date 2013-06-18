@@ -10,13 +10,15 @@
 // material
 	Msat = 800e3
 	Aex = 13e-12
-	m     = uniform(1, .1, 0)
+	m  = uniform(1, .1, 0)
 
 // output
 	savetable(10e-12)
 
 // relax
 	alpha = 3
+	save(B_exch)
+	save(m)
 	run(10e-9) 
 	m_ := average(m)
 	expect("mx", m_[0], 0.96696, 1e-3)

@@ -156,6 +156,7 @@ func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.lut[0][re
 func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
 func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
 func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
+func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
 
 type VectorParam struct{ param }
 

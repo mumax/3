@@ -33,6 +33,13 @@ func initExchange() {
 	Quants["exchangemask"] = &ExchangeMask
 }
 
+// Defines the exchange coupling between different regions by specifying the
+// exchange length of the interaction between them.
+// 	lex := sqrt(2*Aex / Msat)
+// In case of different materials it is not always clear what the exchange
+// between them should be, especially if they have different Msat. By specifying
+// the exchange length, it is up to the user to decide which Msat to use.
+// When using regions, there is by default no exchange coupling between different regions.
 func SetLExchange(region1, region2 int, exchangelength float64) {
 	l2 := (exchangelength * exchangelength) * 1e18
 	lex2.SetInterRegion(region1, region2, l2)

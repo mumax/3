@@ -1,0 +1,42 @@
+/*
+	Micromagnetic standard problem 4 (a) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+	setgridsize(128, 32, 1)
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+// material
+	Msat = 800e3
+	Aex = 13e-12
+	m  = uniform(1, .1, 0)
+
+// output
+	savetable(10e-12)
+
+	defregion(1, halfspace().rotz(pi/2))
+	defregion(2, halfspace().rotz(pi/2).inverse())
+	lex := sqrt(2*Aex.GetFloat() / Msat.GetFloat())
+	setlexchange(1, 2, lex)
+
+// relax
+	alpha = 3
+	save(B_exch)
+	save(m)
+	run(10e-9) 
+	m_ := average(m)
+	expect("mx", m_[0], 0.96696, 1e-3)
+	expect("my", m_[1], 0.12528, 1e-3)
+	expect("mz", m_[2], 0,       1e-3)
+
+// reversal
+	autosave(m, 20e-12)
+	alpha = 0.02
+	B_ext = vector(-24.6E-3, 4.3E-3, 0)
+	run(1e-9)
+	m_ = average(m)
+	expect("mx", m_[0],-0.9845, 1e-3)
+	expect("my", m_[1], 0.1268, 1e-3)
+	expect("mz", m_[2], 0.0432, 1e-3)
+

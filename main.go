@@ -16,12 +16,6 @@ import (
 	"time"
 )
 
-// dummy imports to fetch those files
-import (
-	_ "code.google.com/p/mx3/examples"
-	_ "code.google.com/p/mx3/test"
-)
-
 var (
 	flag_silent  = flag.Bool("s", false, "Don't generate any log info")
 	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")

@@ -5,7 +5,7 @@ mx3 GPU-accelerated micromagnetic simulator
 
 * mx3-convert can be found in tools/mx3-convert.
 
-* examples in guide/guide.html.
+* examples in examples/examples.html.
 
 * recompiling, if you want to: 
 	go install

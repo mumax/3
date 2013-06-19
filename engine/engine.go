@@ -24,7 +24,7 @@ var (
 	M      magnetization // reduced magnetization (unit length)
 	B_eff  setterQuant   // effective field (T) output handle
 	Torque setterQuant   // total torque/γ0, in T
-	Table  DataTable     // output handle for tabular data (average magnetization etc.)
+	//Table  DataTable     // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
@@ -43,7 +43,7 @@ func initialize() {
 	regions.init()
 	Quants["regions"] = &regions
 
-	Table = *newTable("datatable")
+	//Table = *newTable("datatable")
 
 	initDemag()
 	initExchange()
@@ -73,13 +73,13 @@ func initialize() {
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {
 		itime++
-		Table.arm(cansave)      // if table output needed, quantities marked for update
+		//Table.arm(cansave)      // if table output needed, quantities marked for update
 		notifySave(&M, cansave) // saves m if needed
 		notifySave(&FFTM, cansave)
 
 		Torque.set(torquebuffer, cansave)
 
-		Table.touch(cansave) // all needed quantities are now up-to-date, save them
+		//Table.touch(cansave) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
@@ -154,5 +154,5 @@ func checkM() {
 func Close() {
 	log.Println("shutting down")
 	drainOutput()
-	Table.flush()
+	//Table.flush()
 }

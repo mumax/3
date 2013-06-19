@@ -12,9 +12,6 @@
 	Aex = 13e-12
 	m  = uniform(1, .1, 0)
 
-// output
-	savetable(10e-12)
-
 // relax
 	alpha = 3
 	save(B_exch)

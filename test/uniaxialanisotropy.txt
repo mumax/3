@@ -10,7 +10,6 @@
 	Aex   = 13e-12
 	alpha = 1
 	M     = uniform(1, 1, 0)
-	savetable(10e-12)
 	//setgeom(cylinder(64*4e-9, 64*4e-9)) // todo: average takes into account geometry filling
 	
 	// define some regions to make sure anisotropy is applied everywhere

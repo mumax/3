@@ -16,7 +16,6 @@
 	m = TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
 	save(m) // initial magnetization
 
-	SaveTable(10e-12)
 	Autosave(m, 1000e-12)
 
 	MaxErr = 1e-4

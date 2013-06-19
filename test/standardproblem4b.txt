@@ -12,10 +12,6 @@
 	Aex   = 13e-12
 	m     = uniform(1, .1, 0)
 
-// output
-	savetable(10e-12)
-	autosave(m, 50e-12)
-
 // relax
 	alpha = 3
 	run(10e-9) 

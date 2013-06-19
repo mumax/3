@@ -14,10 +14,10 @@ var world = script.NewWorld()
 
 func init() {
 	world.Func("vector", Vector)
-	world.Func("savetable", doSaveTable)
 	world.Func("average", Average)
 	world.Const("mu0", Mu0)
 	world.Func("expect", expect)
+	//world.Func("savetable", doSaveTable)
 }
 
 // Test if have lies within want +/- maxError,
@@ -42,9 +42,9 @@ func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
-func doSaveTable(period float64) {
-	Table.Autosave(period)
-}
+//func doSaveTable(period float64) {
+//Table.Autosave(period)
+//}
 
 func Vector(x, y, z float64) [3]float64 {
 	return [3]float64{x, y, z}

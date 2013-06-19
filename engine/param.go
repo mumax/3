@@ -130,7 +130,7 @@ func (p *param) upload() {
 			p.gpu[i] = cuda.MemAlloc(MAXREG * cu.SIZEOF_FLOAT32)
 		}
 	}
-	log.Println("upload LUT", p.name, p.lut)
+	//log.Println("upload LUT", p.name, p.lut)
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.lut[c2][0]), cu.SIZEOF_FLOAT32*MAXREG)

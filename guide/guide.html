@@ -26,7 +26,7 @@ mx3 input files are run with the command
 Output is automatically stored in the "myfile.out" directory. Additionally, a web interface provides live output. Default is localhost:35367.<br/>
 For more details refer to the <a href="http://godoc.org/code.google.com/p/mx3">godoc documentation</a>.
 
-<hr/><h2>A first example</h2>
+<hr/><h2>Getting started with Standard Problem #4</h2>
 
 Let's start with the classic mumag standard problem 4, as defined <a href="http://www.ctcms.nist.gov/~rdm/mumag.org.html">here</a>.
 
@@ -48,29 +48,9 @@ run(1e-9)</pre>
 
 This example should be pretty straight-forward to follow. Output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.
 
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example1.out/m000000.png"/>
-	<figcaption> m000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example1.out/m000001.png"/>
-	<figcaption> m000001 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example1.out/m000003.png"/>
-	<figcaption> m000003 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example1.out/m000005.png"/>
-	<figcaption> m000005 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example1.out/m000007.png"/>
-	<figcaption> m000007 </figcaption>
-</figure><br style="clear:both"/> 
+<h3>output</h3> <br style="clear:both"/> 
 
-<hr/><h2>Material parameters</h2>
+<hr/><h2>Material Parameters</h2>
 
 Overview of the available material parameters:
 
@@ -115,7 +95,7 @@ Loops are possible as well:
 	print(i)
 }</pre>
 
-<hr/><h2>Standard problem 2</h2>
+<hr/><h2>Standard Problem #2</h2>
 
 Using the scripting language explained above, relatively complex input files can be easily defined. E.g. <a href="http://www.ctcms.nist.gov/~rdm/std2/spec2.html">micromagnetic standard problem #2</a> specifies the simulation size in exchange lengths. The script below calculates the exchange length and chooses cells not larger than 0.75 exchange lengths so that the number of cells is a power of two (for best performance).
 
@@ -275,7 +255,7 @@ saveas(m, "logicXor")</pre>
 Note: these are 3D geometries seen from above. The displayed magnetization is averaged along the thickness (notable in ellipse and layers example). Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
 
 
-<hr/><h2>Initial magnetization</h2>
+<hr/><h2>Initial Magnetization</h2>
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
 
 <pre>setgridsize(200, 100, 1)
@@ -338,7 +318,7 @@ These initial states are approximate, after setting them it is a good idea to re
 
 
 
-<hr/><h2>Interlude: rotating cheese</h2>
+<hr/><h2>Interlude: Rotating Cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
 
@@ -387,7 +367,7 @@ for i:=0; i<=90; i=i+30{
 </figure><br style="clear:both"/> 
 
 
-<hr/><h2>Regions: space-dependent parameters</h2>
+<hr/><h2>Regions: Space-dependent Parameters</h2>
 
 <p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Region 0 conventionally everything outside your magnet (the vacuum), so setting material parameters starts at 1.</p>
 
@@ -457,7 +437,7 @@ save(m)</pre>
 </figure><br style="clear:both"/> 
 
 
-<hr/><h2>Exchange spring</h2>
+<hr/><h2>Exchange Spring</h2>
 
 The example above showed how to set material parameters in different regions. However, we can also specify the exchange interaction <i>between</i> different regions (instead of just inside one region). Physically it is not always clear how strong the exchange between different materials should be. Therefore, when using regions, the exchange between different regions defaults to zero. We specify the exchange between regions in terms of the <i>exchange length</i> sqrt(2*Aex/Msat), as this quantity is unambiguous in case of different Msat.
 
@@ -465,30 +445,100 @@ The example above showed how to set material parameters in different regions. Ho
 Exchange spring consisting of bottom Fe layer and top Ni layer.
 Interlayer exchange estimated from geometrical average of Fe and Ni exchange lengths.
 */
-	Nx := 16
-	Ny := 16
-	Nz := 8
-	setgridsize(Nx, Ny, Nz)
-	setcellsize(4e-9, 4e-9, 3e-9)
+Nx := 16
+Ny := 16
+Nz := 8
+setgridsize(Nx, Ny, Nz)
+setcellsize(4e-9, 4e-9, 3e-9)
 
-	// Fe
-	defregion(1, layers(0, Nz/2))
-	Msat.setRegion (1, 1700e3)
-	Aex.setRegion  (1, 21e-12)
-	alpha.setRegion(1, 0.1)
+// Fe
+defregion(1, layers(0, Nz/2))
+Msat.setRegion (1, 1700e3)
+Aex.setRegion  (1, 21e-12)
+alpha.setRegion(1, 0.1)
 
-	// Ni
-	defregion(2, layers(Nz/2, Nz))
-	Msat.setRegion (2, 490e3)
-	Aex.setRegion  (2, 9e-12)
-	alpha.setRegion(2, 0.05)
+// Ni
+defregion(2, layers(Nz/2, Nz))
+Msat.setRegion (2, 490e3)
+Aex.setRegion  (2, 9e-12)
+alpha.setRegion(2, 0.05)
 
-	// define intermaterial exchange
-	lex2Fe := 21e-12/1700e3
-	lex2Ni :=  9e-12/ 490e3
-	lex := sqrt(1/(1/lex2Fe + 1/lex2Ni))
-	setlexchange(1, 2, lex)</pre>
+// define intermaterial exchange
+lex2Fe := 21e-12/1700e3
+lex2Ni :=  9e-12/ 490e3
+lex := sqrt(1/(1/lex2Fe + 1/lex2Ni))
+setlexchange(1, 2, lex)</pre>
 
+
+<hr/><h2>PMA Racetrack</h2>
+<pre>// In this example we drive a domain wall in PMA material by spin-transfer torque.
+// We set up a post-step function that makes the simulation box "follow" the domain
+// wall. Like this, only a small number of cells is needed to simulate an infinitely
+// long magnetic wire.
+
+setgridsize(128, 256, 1)
+setcellsize(2e-9, 2e-9, 1e-9)
+
+msat    = 600e3
+aex     = 10e-12
+anisU   = vector(0, 0, 1)
+Ku1     = 0.59e6
+xi      = 0.2
+spinpol = 0.5
+alpha   = 3                                   // high damping for fast relax
+
+m     = twoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
+run(0.1e-9)                                   // relax
+alpha = 0.02                                  // normal damping
+
+// Set post-step function that centers simulation window on domain wall.
+postStep(centerPMAwall)
+
+// Schedule output
+autosave(m, 100e-12)
+
+// Run for 1ns with current through the sample
+j = vector(2e13, 0, 0)
+run(1e-9)</pre>
+
+Since we center on the domain wall it seems not to be moving, but it is.
+<h3>output</h3> 
+<figure style="float:left">
+	<img src="example12.out/m000000.png"/>
+	<figcaption> m000000 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000002.png"/>
+	<figcaption> m000002 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000004.png"/>
+	<figcaption> m000004 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000006.png"/>
+	<figcaption> m000006 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000008.png"/>
+	<figcaption> m000008 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000010.png"/>
+	<figcaption> m000010 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000012.png"/>
+	<figcaption> m000012 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000014.png"/>
+	<figcaption> m000014 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example12.out/m000016.png"/>
+	<figcaption> m000016 </figcaption>
+</figure><br style="clear:both"/> 
 
 </body>
 </html>

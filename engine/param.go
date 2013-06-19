@@ -100,13 +100,14 @@ func checkRegion(region int) {
 
 // Get returns the space-dependent parameter as a slice of floats, so it can be output.
 func (p *param) Get() (*data.Slice, bool) {
-	s := data.NewSlice(p.NComp(), p.Mesh())
+	ncomp := p.NComp()
+	s := data.NewSlice(ncomp, p.Mesh())
 	l := s.Host()
 
 	for i, r := range regions.cpu {
 		v := p.getRegion(int(r))
 		for c := range l {
-			l[c][i] = float32(v[c])
+			l[c][i] = float32(v[util.SwapIndex(c, ncomp)])
 		}
 	}
 	return s, false

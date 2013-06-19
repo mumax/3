@@ -337,22 +337,32 @@ Behind the screens, this sets Aex in <i>all</i> regions.
 
 <pre>N := 128
 setgridsize(N, N, 1)
-setcellsize(1e-9, 1e-9, 1e-9)
-d := 1e-9 * N  
+setcellsize(5e-9, 5e-9, 5e-9)
+d := 5e-9 * N  
 
 defregion(1, xrange(0, inf))
 defregion(2, xrange(-inf, 0))
 defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
 save(regions)
 
-Ku1.setregion(1, 500)
-Ku1.setregion(2, 1000)
-save(Ku1)
+Ku1.setregion(1, .1e6)
+anisU.setRegion(1, vector(1, 0, 0))
 
-Msat = 800e-3 // sets it everywhere
+Ku1.setregion(2, .1e6)
+anisU.setRegion(2, vector(0, 1, 0))
+
+save(Ku1)
+save(anisU)
+
+Msat = 800e3 // sets it everywhere
 save(Msat)
 
-m = uniform(1, 0, 0)
+Aex = 12e-13
+alpha = 1
+
+setlexchange(1,2, 5e-9)
+m = uniform(1, 1, 0)
+run(.1e-9)
 save(m)</pre>
 
 <h3>output</h3> 
@@ -363,6 +373,10 @@ save(m)</pre>
 <figure style="float:left">
 	<img src="example9.out/Msat000000.png"/>
 	<figcaption> Msat000000 </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example9.out/anisU000000.png"/>
+	<figcaption> anisU000000 </figcaption>
 </figure>
 <figure style="float:left">
 	<img src="example9.out/m000000.png"/>

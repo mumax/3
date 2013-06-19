@@ -337,8 +337,8 @@ Behind the screens, this sets Aex in <i>all</i> regions.
 
 <pre>N := 128
 setgridsize(N, N, 1)
-setcellsize(5e-9, 5e-9, 5e-9)
-d := 5e-9 * N  
+setcellsize(4e-9, 4e-9, 4e-9)
+d := 4e-9 * N  
 
 defregion(1, xrange(0, inf))
 defregion(2, xrange(-inf, 0))
@@ -360,7 +360,10 @@ save(Msat)
 Aex = 12e-13
 alpha = 1
 
-setlexchange(1,2, 5e-9)
+// define inter-material exchange
+lex := sqrt(2*12e-13/800e3)
+setlexchange(1, 2, lex)
+
 m = uniform(1, 1, 0)
 run(.1e-9)
 save(m)</pre>

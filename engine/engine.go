@@ -14,6 +14,7 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 func init() {
 	world.Func("setgridsize", setGridSize)
 	world.Func("setcellsize", setCellSize)
+	world.LValue("m", &M)
 	torque_ := &Torque
 	world.ROnly("torque", &torque_)
 }

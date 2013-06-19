@@ -73,7 +73,7 @@ func ZRange(a, b float64) Shape {
 // Cell layers #a (inclusive) up to #b (exclusive).
 func Layers(a, b int) Shape {
 	Nz := Mesh().Size()[0]
-	if a < 0 || a >= Nz || b < 0 || b >= Nz {
+	if a < 0 || a > Nz || b < 0 || b > Nz {
 		log.Fatal("layers ", a, ":", b, " out of bounds (0 - ", Nz, ")")
 	}
 	c := Mesh().CellSize()[0]

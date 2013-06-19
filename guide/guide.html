@@ -273,6 +273,71 @@ saveas(m, "logicXor")</pre>
 </figure><br style="clear:both"/> 
 
 Note: these are 3D geometries seen from above. The displayed magnetization is averaged along the thickness (notable in ellipse and layers example). Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
+
+
+<hr/><h2>Initial magnetization</h2>
+Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+
+<pre>setgridsize(200, 100, 1)
+setcellsize(5e-9, 5e-9, 5e-9)
+
+m = uniform(1, 1, 0)  // no need to normalize length
+saveas(m, "uniform")
+
+m = vortex(1, -1)     // circulation, polarization
+saveas(m, "vortex")
+
+m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
+saveas(m, "twodomain")
+
+m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
+saveas(m, "twodomain_rot")
+
+m = vortexwall(1, -1, 1, 1) 
+saveas(m, "vortexwall")
+
+m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
+saveas(m, "vortexwall_scale")
+
+m = vortex(1,-1).transl(100e-9, 50e-9, 0)
+saveas(m, "vortex_transl")
+
+// Read m form .dump file, assuming it exists:
+// m.loadfile("myfile.dump")</pre>
+<h3>output</h3> 
+<figure style="float:left">
+	<img src="example8.out/twodomain.png"/>
+	<figcaption> twodomain </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/twodomain_rot.png"/>
+	<figcaption> twodomain_rot </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/uniform.png"/>
+	<figcaption> uniform </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/vortex.png"/>
+	<figcaption> vortex </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/vortex_transl.png"/>
+	<figcaption> vortex_transl </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/vortexwall.png"/>
+	<figcaption> vortexwall </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example8.out/vortexwall_scale.png"/>
+	<figcaption> vortexwall_scale </figcaption>
+</figure><br style="clear:both"/> 
+
+These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
+
+
+
 <hr/><h2>Interlude: rotating cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
@@ -305,19 +370,19 @@ for i:=0; i<=90; i=i+30{
 
 <h3>output</h3> 
 <figure style="float:left">
-	<img src="example8.out/m000000.png"/>
+	<img src="example9.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example8.out/m000001.png"/>
+	<img src="example9.out/m000001.png"/>
 	<figcaption> m000001 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example8.out/m000002.png"/>
+	<img src="example9.out/m000002.png"/>
 	<figcaption> m000002 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example8.out/m000003.png"/>
+	<img src="example9.out/m000003.png"/>
 	<figcaption> m000003 </figcaption>
 </figure><br style="clear:both"/> 
 
@@ -340,6 +405,7 @@ setgridsize(N, N, 1)
 setcellsize(4e-9, 4e-9, 4e-9)
 d := 4e-9 * N  
 
+// disk with different anisotropy in left and right half
 defregion(1, xrange(0, inf))
 defregion(2, xrange(-inf, 0))
 defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
@@ -370,84 +436,60 @@ save(m)</pre>
 
 <h3>output</h3> 
 <figure style="float:left">
-	<img src="example9.out/Ku1000000.png"/>
+	<img src="example10.out/Ku1000000.png"/>
 	<figcaption> Ku1000000 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example9.out/Msat000000.png"/>
+	<img src="example10.out/Msat000000.png"/>
 	<figcaption> Msat000000 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example9.out/anisU000000.png"/>
+	<img src="example10.out/anisU000000.png"/>
 	<figcaption> anisU000000 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example9.out/m000000.png"/>
+	<img src="example10.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
 </figure>
 <figure style="float:left">
-	<img src="example9.out/regions000000.png"/>
+	<img src="example10.out/regions000000.png"/>
 	<figcaption> regions000000 </figcaption>
 </figure><br style="clear:both"/> 
 
 
-<hr/><h2>Initial magnetization</h2>
-Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+<hr/><h2>Exchange spring</h2>
 
-<pre>setgridsize(200, 100, 1)
-setcellsize(5e-9, 5e-9, 5e-9)
+The example above showed how to set material parameters in different regions. However, we can also specify the exchange interaction <i>between</i> different regions (instead of just inside one region). Physically it is not always clear how strong the exchange between different materials should be. Therefore, when using regions, the exchange between different regions defaults to zero. We specify the exchange between regions in terms of the <i>exchange length</i> sqrt(2*Aex/Msat), as this quantity is unambiguous in case of different Msat.
 
-m = uniform(1, 1, 0)  // no need to normalize length
-saveas(m, "uniform")
+<pre>/*
+Exchange spring consisting of bottom Fe layer and top Ni layer.
+Interlayer exchange estimated from geometrical average of Fe and Ni exchange lengths.
+*/
+	Nx := 16
+	Ny := 16
+	Nz := 8
+	setgridsize(Nx, Ny, Nz)
+	setcellsize(4e-9, 4e-9, 3e-9)
 
-m = vortex(1, -1)     // circulation, polarization
-saveas(m, "vortex")
+	// Fe
+	defregion(1, layers(0, Nz/2))
+	Msat.setRegion (1, 1700e3)
+	Aex.setRegion  (1, 21e-12)
+	alpha.setRegion(1, 0.1)
 
-m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
-saveas(m, "twodomain")
+	// Ni
+	defregion(2, layers(Nz/2, Nz))
+	Msat.setRegion (2, 490e3)
+	Aex.setRegion  (2, 9e-12)
+	alpha.setRegion(2, 0.05)
 
-m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
-saveas(m, "twodomain_rot")
+	// define intermaterial exchange
+	lex2Fe := 21e-12/1700e3
+	lex2Ni :=  9e-12/ 490e3
+	lex := sqrt(1/(1/lex2Fe + 1/lex2Ni))
+	setlexchange(1, 2, lex)</pre>
 
-m = vortexwall(1, -1, 1, 1) 
-saveas(m, "vortexwall")
 
-m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
-saveas(m, "vortexwall_scale")
-
-m = vortex(1,-1).transl(100e-9, 50e-9, 0)
-saveas(m, "vortex_transl")</pre>
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example10.out/twodomain.png"/>
-	<figcaption> twodomain </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/twodomain_rot.png"/>
-	<figcaption> twodomain_rot </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/uniform.png"/>
-	<figcaption> uniform </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/vortex.png"/>
-	<figcaption> vortex </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/vortex_transl.png"/>
-	<figcaption> vortex_transl </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/vortexwall.png"/>
-	<figcaption> vortexwall </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/vortexwall_scale.png"/>
-	<figcaption> vortexwall_scale </figcaption>
-</figure><br style="clear:both"/> 
-
-These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
 </body>
 </html>
 

@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"math"
+	"reflect"
 )
 
 // special bufferedQuant to store magnetization.
@@ -11,6 +12,10 @@ import (
 type magnetization struct {
 	bufferedQuant
 }
+
+func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
+func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
+func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(magnetization)) }
 
 func (q *magnetization) init() {
 	q.bufferedQuant = buffered(cuda.NewSlice(3, Mesh()), "m", "")
@@ -25,8 +30,14 @@ func (b *magnetization) Set(src *data.Slice) {
 	data.Copy(b.buffer, src)
 }
 
-// TODO: use region index
-func (m *magnetization) setRegion(conf Config, region Shape) {
+// Read a magnetization state from .dump file.
+func (b *magnetization) LoadFile(fname string) {
+	s, _ := data.MustReadFile(fname)
+	b.Set(s)
+}
+
+// Sets the magnetization inside the shape
+func (m *magnetization) SetInShape(region Shape, conf Config) {
 	if region == nil {
 		region = universe
 	}

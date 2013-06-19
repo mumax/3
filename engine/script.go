@@ -17,7 +17,6 @@ func init() {
 	world.Func("savetable", doSaveTable)
 	world.Func("average", Average)
 	world.Const("mu0", Mu0)
-	world.LValue("m", &M)
 	world.Func("expect", expect)
 }
 
@@ -37,9 +36,6 @@ func Compile(src string) (script.Expr, error) {
 	defer world.ExitScope()
 	return world.Compile(src)
 }
-
-func (m *magnetization) SetValue(v interface{})  { m.setRegion(v.(Config), nil) }
-func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }

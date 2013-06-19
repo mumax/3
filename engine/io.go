@@ -88,9 +88,3 @@ func notifySave(q Saver, goodstep bool) {
 		q.saved()
 	}
 }
-
-//func ReadFile(fname string)*data.Slice{
-//	s, _ := data.MustReadFile(fname)
-//	return s
-//}
-//world.Func("readfile", ReadFile)

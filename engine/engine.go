@@ -76,7 +76,6 @@ func initialize() {
 		Table.arm(cansave)      // if table output needed, quantities marked for update
 		notifySave(&M, cansave) // saves m if needed
 		notifySave(&FFTM, cansave)
-		notifySave(&ExchangeMask, cansave)
 
 		Torque.set(torquebuffer, cansave)
 
@@ -97,27 +96,10 @@ func Mesh() *data.Mesh {
 	return &globalmesh
 }
 
-// Returns the mesh cell size in meters. E.g.:
-// 	cellsize_x := CellSize()[X]
-func CellSize() [3]float64 {
-	c := Mesh().CellSize()
-	return [3]float64{c[Z], c[Y], c[X]} // swaps XYZ
-}
-
 func WorldSize() [3]float64 {
 	w := Mesh().WorldSize()
-	return [3]float64{w[Z], w[Y], w[X]} // swaps XYZ
+	return [3]float64{w[2], w[1], w[0]} // swaps XYZ
 }
-
-func GridSize() [3]int {
-	n := Mesh().Size()
-	return [3]int{n[Z], n[Y], n[X]} // swaps XYZ
-}
-
-// TODO: rm, or make script constants
-func Nx() int { return GridSize()[X] }
-func Ny() int { return GridSize()[Y] }
-func Nz() int { return GridSize()[Z] }
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.

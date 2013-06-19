@@ -9,7 +9,6 @@ func init() {
 	world.LValue("Aex", &Aex)
 	B_exch_addr := &B_exch
 	world.ROnly("B_exch", &B_exch_addr)
-	world.LValue("ExchangeMask", &ExchangeMask)
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
@@ -17,10 +16,9 @@ func init() {
 }
 
 var (
-	Aex          ScalarParam        // inter-cell exchange stiffness in J/m
-	lex2         symmparam          // inter-cell exchange length squared * 1e18
-	ExchangeMask staggeredMaskQuant // Mask that scales Aex/Msat between cells.
-	B_exch       adderQuant         // exchange field (T) output handle
+	Aex    ScalarParam // inter-cell exchange stiffness in J/m
+	lex2   symmparam   // inter-cell exchange length squared * 1e18
+	B_exch adderQuant  // exchange field (T) output handle
 )
 
 func initExchange() {
@@ -29,8 +27,6 @@ func initExchange() {
 	})
 	Quants["B_exch"] = &B_exch
 
-	ExchangeMask = staggeredMask(Mesh(), "exchangemask", "")
-	Quants["exchangemask"] = &ExchangeMask
 }
 
 // Defines the exchange coupling between different regions by specifying the

@@ -25,7 +25,7 @@ func main() {
 	templ := template.Must(template.New("guide").Parse(string(b)))
 
 	// output file
-	f, err2 := os.OpenFile("guide.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	f, err2 := os.OpenFile("examples.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	check(err2)
 
 	// execute!

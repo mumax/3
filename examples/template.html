@@ -30,7 +30,9 @@ For more details refer to the <a href="http://godoc.org/code.google.com/p/mx3">g
 
 Let's start with the classic mumag standard problem 4, as defined <a href="http://www.ctcms.nist.gov/~rdm/mumag.org.html">here</a>.
 
-<pre>SetGridsize(128, 32, 1)
+{{.Example `
+
+SetGridsize(128, 32, 1)
 SetCellsize(500e-9/128, 125e-9/32, 3e-9)
 
 alpha = 1
@@ -44,17 +46,20 @@ save(m)    // relaxed state
 Autosave(m, 200e-12)
 alpha = 0.02
 B_ext = vector(-24.6E-3, 4.3E-3, 0)
-run(1e-9)</pre>
+run(1e-9)
+
+`}}
 
 This example should be pretty straight-forward to follow. Output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.
 
-<h3>output</h3> <br style="clear:both"/> 
+{{.Output }}
 
 <hr/><h2>Material Parameters</h2>
 
 Overview of the available material parameters:
 
-<pre>Msat  = 1000e3    // Saturation magnetization in A/m
+{{.Example `
+Msat  = 1000e3    // Saturation magnetization in A/m
 Aex   = 13e-12    // Exchange stiffness in J/m
 alpha = 0.02      // Gilbert damping constant
 
@@ -64,7 +69,8 @@ Ku1   = 500e3           // Uniaxial anisotropy in J/m3
 xi      = 0.04    // Spin-transfer torque degree of non-adiabaticity
 spinPol = 0.56    // Spin polarization
 
-DMI = 1e-3        // Dzyaloshinskii-Moriya interaction in J/m2</pre>
+DMI = 1e-3        // Dzyaloshinskii-Moriya interaction in J/m2
+`}}
 
 This input file does not create any output.
 
@@ -74,33 +80,42 @@ This input file does not create any output.
 Before we continue we might have a look at the mx3 input syntax. It is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
 
 <h3>Defining variables</h3>
-<pre>i := 7    // defines a new variable i, type automatically detected to be int
+{{.Example `
+i := 7    // defines a new variable i, type automatically detected to be int
 print(i)  // now we can use i
 i = 5     // assign new value, don't use ':=' (attempt to re-declare)
 
 str := "hello" // defines str, type automatically is string
-//str = 1      // would fail, cannot assign int to string</pre>
+//str = 1      // would fail, cannot assign int to string
+`}}
 
 <h3>Arithmetic</h3>
 Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
 
-<pre>x := pi*(3+4)/5
+{{.Example `
+x := pi*(3+4)/5
 x = pow(x, 3)
 x++
-y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))</pre>
+y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
+`}}
 
 <h3>Control structures</h3>
 Loops are possible as well:
-<pre>for i:=0; i<10; i++{
+{{.Example `
+
+for i:=0; i<10; i++{
 	print(i)
-}</pre>
+}
+
+`}}
 
 <hr/><h2>Standard Problem #2</h2>
 
 Using the scripting language explained above, relatively complex input files can be easily defined. E.g. <a href="http://www.ctcms.nist.gov/~rdm/std2/spec2.html">micromagnetic standard problem #2</a> specifies the simulation size in exchange lengths. The script below calculates the exchange length and chooses cells not larger than 0.75 exchange lengths so that the number of cells is a power of two (for best performance).
 
 
-<pre>Msat  = 1000e3
+{{.Example  `
+Msat  = 1000e3
 Aex   = 10e-12
 alpha = 3
 
@@ -125,13 +140,10 @@ save(m)                                  // remanent magnetization
 m_ := average(m)                         
 expect("mx", m_[0], 0.9627, 1e-3)        // test m against known value
 expect("my", m_[1], 0.0756, 1e-3)
-expect("mz", m_[2], 0, 1e-3)</pre>
+expect("mz", m_[2], 0, 1e-3)
+`}}
 
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example6.out/m000000.png"/>
-	<figcaption> m000000 </figcaption>
-</figure><br style="clear:both"/> 
+{{.Output}}
 
 This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
 
@@ -140,7 +152,8 @@ This example saves the remanent magnetization state, and verifies the average ma
 mx3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). See the full <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">API</a>.
 
 
-<pre>setgridsize(100, 100, 50)
+{{.Example `
+setgridsize(100, 100, 50)
 setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
 setgeom( rect(800e-9, 500e-9) )
@@ -196,61 +209,11 @@ saveas(m, "logicAnd")
 
 setgeom( a.xor(b) )
 m=uniform(1,1,0)
-saveas(m, "logicXor")</pre>
+saveas(m, "logicXor")
 
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example7.out/cuboid.png"/>
-	<figcaption> cuboid </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/cuboid_rotZ.png"/>
-	<figcaption> cuboid_rotZ </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/cylinder.png"/>
-	<figcaption> cylinder </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/cylinder_inverse.png"/>
-	<figcaption> cylinder_inverse </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/cylinder_transl.png"/>
-	<figcaption> cylinder_transl </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/ellipsoid.png"/>
-	<figcaption> ellipsoid </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/layers.png"/>
-	<figcaption> layers </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/logicAdd.png"/>
-	<figcaption> logicAdd </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/logicAnd.png"/>
-	<figcaption> logicAnd </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/logicSub.png"/>
-	<figcaption> logicSub </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/logicXor.png"/>
-	<figcaption> logicXor </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/rect.png"/>
-	<figcaption> rect </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example7.out/xrange.png"/>
-	<figcaption> xrange </figcaption>
-</figure><br style="clear:both"/> 
+`}}
+
+{{.Output}}
 
 Note: these are 3D geometries seen from above. The displayed magnetization is averaged along the thickness (notable in ellipse and layers example). Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
 
@@ -258,7 +221,8 @@ Note: these are 3D geometries seen from above. The displayed magnetization is av
 <hr/><h2>Initial Magnetization</h2>
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
 
-<pre>setgridsize(200, 100, 1)
+{{.Example `
+setgridsize(200, 100, 1)
 setcellsize(5e-9, 5e-9, 5e-9)
 
 m = uniform(1, 1, 0)  // no need to normalize length
@@ -283,36 +247,10 @@ m = vortex(1,-1).transl(100e-9, 50e-9, 0)
 saveas(m, "vortex_transl")
 
 // Read m form .dump file, assuming it exists:
-// m.loadfile("myfile.dump")</pre>
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example8.out/twodomain.png"/>
-	<figcaption> twodomain </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/twodomain_rot.png"/>
-	<figcaption> twodomain_rot </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/uniform.png"/>
-	<figcaption> uniform </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/vortex.png"/>
-	<figcaption> vortex </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/vortex_transl.png"/>
-	<figcaption> vortex_transl </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/vortexwall.png"/>
-	<figcaption> vortexwall </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example8.out/vortexwall_scale.png"/>
-	<figcaption> vortexwall_scale </figcaption>
-</figure><br style="clear:both"/> 
+// m.loadfile("myfile.dump")
+
+`}}
+{{.Output}}
 
 These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
 
@@ -322,7 +260,9 @@ These initial states are approximate, after setting them it is a good idea to re
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
 
-<pre>setgridsize(128, 128, 1)
+{{.Example `
+
+setgridsize(128, 128, 1)
 setcellsize(2e-9, 2e-9, 2e-9)
 
 d      := 200e-9
@@ -346,25 +286,11 @@ for i:=0; i<=90; i=i+30{
 	m = uniform(cos(angle), sin(angle), 0)
 	run(1e-9)
 	save(m)
-}</pre>
+}
 
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example9.out/m000000.png"/>
-	<figcaption> m000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example9.out/m000001.png"/>
-	<figcaption> m000001 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example9.out/m000002.png"/>
-	<figcaption> m000002 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example9.out/m000003.png"/>
-	<figcaption> m000003 </figcaption>
-</figure><br style="clear:both"/> 
+`}}
+
+{{.Output}}
 
 
 <hr/><h2>Regions: Space-dependent Parameters</h2>
@@ -378,9 +304,10 @@ for i:=0; i<=90; i=i+30{
 Behind the screens, this sets Aex in <i>all</i> regions.
 </p>
 
-<p>It's always a good idea to output the <code>regions</code> quantity, as well as all your material parameters, to check </p>
+<p>It's always a good idea to output the <code>regions</code> quantity, as well as all your material parameters. </p>
 
-<pre>N := 128
+{{.Example `
+N := 128
 setgridsize(N, N, 1)
 setcellsize(4e-9, 4e-9, 4e-9)
 d := 4e-9 * N  
@@ -412,36 +339,18 @@ setlexchange(1, 2, lex)
 
 m = uniform(1, 1, 0)
 run(.1e-9)
-save(m)</pre>
+save(m)
+`}}
 
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example10.out/Ku1000000.png"/>
-	<figcaption> Ku1000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/Msat000000.png"/>
-	<figcaption> Msat000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/anisU000000.png"/>
-	<figcaption> anisU000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/m000000.png"/>
-	<figcaption> m000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example10.out/regions000000.png"/>
-	<figcaption> regions000000 </figcaption>
-</figure><br style="clear:both"/> 
+{{.Output}}
 
 
 <hr/><h2>Exchange Spring</h2>
 
 The example above showed how to set material parameters in different regions. However, we can also specify the exchange interaction <i>between</i> different regions (instead of just inside one region). Physically it is not always clear how strong the exchange between different materials should be. Therefore, when using regions, the exchange between different regions defaults to zero. We specify the exchange between regions in terms of the <i>exchange length</i> sqrt(2*Aex/Msat), as this quantity is unambiguous in case of different Msat.
 
-<pre>/*
+{{.Example `
+/*
 Exchange spring consisting of bottom Fe layer and top Ni layer.
 Interlayer exchange estimated from geometrical average of Fe and Ni exchange lengths.
 */
@@ -467,16 +376,19 @@ alpha.setRegion(2, 0.05)
 lex2Fe := 21e-12/1700e3
 lex2Ni :=  9e-12/ 490e3
 lex := sqrt(1/(1/lex2Fe + 1/lex2Ni))
-setlexchange(1, 2, lex)</pre>
+setlexchange(1, 2, lex)
+
+`}}
 
 
 <hr/><h2>PMA Racetrack</h2>
-<pre>// In this example we drive a domain wall in PMA material by spin-transfer torque.
+{{.Example `
+// In this example we drive a domain wall in PMA material by spin-transfer torque.
 // We set up a post-step function that makes the simulation box "follow" the domain
 // wall. Like this, only a small number of cells is needed to simulate an infinitely
 // long magnetic wire.
 
-setgridsize(128, 256, 1)
+setgridsize(128, 128, 1)
 setcellsize(2e-9, 2e-9, 1e-9)
 
 msat    = 600e3
@@ -498,47 +410,54 @@ postStep(centerPMAwall)
 autosave(m, 100e-12)
 
 // Run for 1ns with current through the sample
-j = vector(2e13, 0, 0)
-run(1e-9)</pre>
+j = vector(3e13, 0, 0)
+run(.5e-9)
+`}}
 
-Since we center on the domain wall it seems not to be moving, but it is.
-<h3>output</h3> 
-<figure style="float:left">
-	<img src="example12.out/m000000.png"/>
-	<figcaption> m000000 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000002.png"/>
-	<figcaption> m000002 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000004.png"/>
-	<figcaption> m000004 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000006.png"/>
-	<figcaption> m000006 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000008.png"/>
-	<figcaption> m000008 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000010.png"/>
-	<figcaption> m000010 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000012.png"/>
-	<figcaption> m000012 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000014.png"/>
-	<figcaption> m000014 </figcaption>
-</figure>
-<figure style="float:left">
-	<img src="example12.out/m000016.png"/>
-	<figcaption> m000016 </figcaption>
-</figure><br style="clear:both"/> 
+{{.Output}}
+
+Since we center on the domain wall we can not see that it is actually moving, but the domain wall breakdown is visible.
+
+
+<hr/><h2>Py Racetrack</h2>
+
+{{.Example `
+// In this example we drive a vortex wall in Permalloy by spin-transfer torque.
+// We set up a post-step function that makes the simulation box "follow" the domain
+// wall. By removing surface charges at the left and right ends, we mimic an infintely
+// long wire.
+
+setgridsize(256, 64, 1)
+setcellsize(3e-9, 3e-9, 30e-9)
+
+Msat    = 860e3
+Aex     = 13e-12
+Xi      = 0.1
+SpinPol = 0.56
+m       = vortexwall(1, -1, 1, 1)
+
+// Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire.
+RemoveLRSurfaceCharge(1, -1)
+
+// Set post-step function that centers simulation window on domain wall.
+PostStep(centerInplaneWall)
+
+// Relax
+Alpha = 3    // high damping for fast relax
+Run(1e-9)    // relax
+Alpha = 0.02 // restore normal damping
+
+// Schedule output
+Autosave(m, 100e-12)
+
+// Run the simulation with current through the sample
+J = vector(-8e12, 0, 0)
+Run(1e-9)
+`}}
+
+{{.Output}}
+
+Since we center on the domain wall we can not really see the motion, despite the vortex wall moving pretty fast. Note the absence of closure domains at the edges due to the surface charges being removed there.
 
 </body>
 </html>

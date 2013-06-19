@@ -40,7 +40,16 @@ func initExchange() {
 // between them should be, especially if they have different Msat. By specifying
 // the exchange length, it is up to the user to decide which Msat to use.
 // When using regions, there is by default no exchange coupling between different regions.
-func SetLExchange(region1, region2 int, exchangelength float64) {
-	l2 := (exchangelength * exchangelength) * 1e18
+// A negative length may be specified to obtain antiferromagnetic coupling.
+func SetLExchange(region1, region2 int, exlen float64) {
+	l2 := signum(exlen) * (exlen * exlen) * 1e18
 	lex2.SetInterRegion(region1, region2, l2)
+}
+
+func signum(x float64) float64 {
+	if x < 0 {
+		return -1
+	} else {
+		return 1
+	}
 }

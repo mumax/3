@@ -59,14 +59,14 @@ func (s *State) Img(fname string) string {
 	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
-<figure align=left>
+<figure style="float:left">
 	<img src="%v"/>
 	<figcaption> %v </figcaption>
 </figure>`, pngfile, fname)
 }
 
 func (s *State) Output() string {
-	out := "<h3>output</h3>"
+	out := `<h3>output</h3> `
 
 	dir, err := os.Open(s.outfile())
 	check(err)
@@ -78,7 +78,7 @@ func (s *State) Output() string {
 			out += s.Img(f[:len(f)-len(".dump")])
 		}
 	}
-	return out
+	return out + `<br style="clear:both"/> `
 }
 
 func (s *State) infile() string {

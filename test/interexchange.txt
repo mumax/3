@@ -15,8 +15,8 @@
 // output
 	savetable(10e-12)
 
-	defregion(1, halfspace().rotz(pi/2))
-	defregion(2, halfspace().rotz(pi/2).inverse())
+	defregion(1, Yrange(0, inf))
+	defregion(2, Yrange(-inf, 0))
 	lex := sqrt(2*Aex.GetFloat() / Msat.GetFloat())
 	setlexchange(1, 2, lex)
 

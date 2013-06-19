@@ -48,27 +48,27 @@ run(1e-9)</pre>
 
 This example should be pretty straight-forward to follow. Output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.
 
-<h3>output</h3>
-<figure align=left>
+<h3>output</h3> 
+<figure style="float:left">
 	<img src="example1.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example1.out/m000001.png"/>
 	<figcaption> m000001 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example1.out/m000003.png"/>
 	<figcaption> m000003 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example1.out/m000005.png"/>
 	<figcaption> m000005 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example1.out/m000007.png"/>
 	<figcaption> m000007 </figcaption>
-</figure>
+</figure><br style="clear:both"/> 
 
 <hr/><h2>Material parameters</h2>
 
@@ -125,7 +125,7 @@ Aex   = 10e-12
 alpha = 3
 
 // define exchange length
-lex := sqrt(Aex / (0.5 * mu0 * pow(Msat.GetUniform(),2)))
+lex := sqrt(Aex.GetFloat() / (0.5 * mu0 * pow(Msat.GetFloat(),2)))
 
 d     := 30 * lex                        // we test for d/lex = 30
 Sizex := 5*d                             // magnet size x
@@ -147,11 +147,11 @@ expect("mx", m_[0], 0.9627, 1e-3)        // test m against known value
 expect("my", m_[1], 0.0756, 1e-3)
 expect("mz", m_[2], 0, 1e-3)</pre>
 
-<h3>output</h3>
-<figure align=left>
+<h3>output</h3> 
+<figure style="float:left">
 	<img src="example6.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
-</figure>
+</figure><br style="clear:both"/> 
 
 This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
 
@@ -163,73 +163,116 @@ mx3 has powerful API to programatically define geometries. A number of primitive
 <pre>setgridsize(100, 100, 50)
 setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
-setgeom(rect(800e-9, 500e-9))
+setgeom( rect(800e-9, 500e-9) )
 m=uniform(1,1,0)
 saveas(m, "rect")
 
-setgeom(rect(800e-9, 500e-9).rotz(30*pi/180))
-m=uniform(1,1,0)
-saveas(m, "rect_rotz")
-
-setgeom(cylinder(800e-9, 600e-9))
+setgeom( cylinder(800e-9, 600e-9) )
 m=uniform(1,1,0)
 saveas(m, "cylinder")
 
-setgeom(cylinder(800e-9, 600e-9).inverse())
+setgeom( cylinder(800e-9, 600e-9).inverse() )
 m=uniform(1,1,0)
 saveas(m, "cylinder_inverse")
 
-setgeom(cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0))
+setgeom( cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0) )
 m=uniform(1,1,0)
 saveas(m, "cylinder_transl")
 
-setgeom(ellipsoid(800e-9, 600e-9, 500e-9))
+setgeom( ellipsoid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
 saveas(m, "ellipsoid")
 
-setgeom(halfspace())
+setgeom( cuboid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
-saveas(m, "halfspace")
+saveas(m, "cuboid")
 
-setgeom(rect(800e-9, 500e-9).sub(halfspace().rotz(30*pi/180)))
+setgeom( cuboid(800e-9, 600e-9, 500e-9).rotz(-10*pi/180) )
 m=uniform(1,1,0)
-saveas(m, "rect_sub_haflspace_rotz")</pre>
+saveas(m, "cuboid_rotZ")
 
-<h3>output</h3>
-<figure align=left>
+setgeom( layers(0, 25) )
+m=uniform(1,1,0)
+saveas(m, "layers")
+
+setgeom( xrange(0, inf) )
+m=uniform(1,1,0)
+saveas(m, "xrange")
+
+a := cylinder(600e-9, 600e-9).transl(-150e-9, 50e-9, 0 )
+b := rect(600e-9, 600e-9).transl(150e-9, -50e-9, 0)
+
+setgeom( a.add(b) )
+m=uniform(1,1,0)
+saveas(m, "logicAdd")
+
+setgeom( a.sub(b) )
+m=uniform(1,1,0)
+saveas(m, "logicSub")
+
+setgeom( a.intersect(b) )
+m=uniform(1,1,0)
+saveas(m, "logicAnd")
+
+setgeom( a.xor(b) )
+m=uniform(1,1,0)
+saveas(m, "logicXor")</pre>
+
+<h3>output</h3> 
+<figure style="float:left">
+	<img src="example7.out/cuboid.png"/>
+	<figcaption> cuboid </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example7.out/cuboid_rotZ.png"/>
+	<figcaption> cuboid_rotZ </figcaption>
+</figure>
+<figure style="float:left">
 	<img src="example7.out/cylinder.png"/>
 	<figcaption> cylinder </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example7.out/cylinder_inverse.png"/>
 	<figcaption> cylinder_inverse </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example7.out/cylinder_transl.png"/>
 	<figcaption> cylinder_transl </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example7.out/ellipsoid.png"/>
 	<figcaption> ellipsoid </figcaption>
 </figure>
-<figure align=left>
-	<img src="example7.out/halfspace.png"/>
-	<figcaption> halfspace </figcaption>
+<figure style="float:left">
+	<img src="example7.out/layers.png"/>
+	<figcaption> layers </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
+	<img src="example7.out/logicAdd.png"/>
+	<figcaption> logicAdd </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example7.out/logicAnd.png"/>
+	<figcaption> logicAnd </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example7.out/logicSub.png"/>
+	<figcaption> logicSub </figcaption>
+</figure>
+<figure style="float:left">
+	<img src="example7.out/logicXor.png"/>
+	<figcaption> logicXor </figcaption>
+</figure>
+<figure style="float:left">
 	<img src="example7.out/rect.png"/>
 	<figcaption> rect </figcaption>
 </figure>
-<figure align=left>
-	<img src="example7.out/rect_rotz.png"/>
-	<figcaption> rect_rotz </figcaption>
-</figure>
-<figure align=left>
-	<img src="example7.out/rect_sub_haflspace_rotz.png"/>
-	<figcaption> rect_sub_haflspace_rotz </figcaption>
-</figure>
+<figure style="float:left">
+	<img src="example7.out/xrange.png"/>
+	<figcaption> xrange </figcaption>
+</figure><br style="clear:both"/> 
 
-Note: these are 3D geometries seen from above. The magnetization is averaged along the thickness. Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
+Note: these are 3D geometries seen from above. The displayed magnetization is averaged along the thickness (notable in ellipse and layers example). Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
 <hr/><h2>Interlude: rotating cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
@@ -260,23 +303,23 @@ for i:=0; i<=90; i=i+30{
 	save(m)
 }</pre>
 
-<h3>output</h3>
-<figure align=left>
+<h3>output</h3> 
+<figure style="float:left">
 	<img src="example8.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example8.out/m000001.png"/>
 	<figcaption> m000001 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example8.out/m000002.png"/>
 	<figcaption> m000002 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example8.out/m000003.png"/>
 	<figcaption> m000003 </figcaption>
-</figure>
+</figure><br style="clear:both"/> 
 
 
 <hr/><h2>Regions: space-dependent parameters</h2>
@@ -297,41 +340,38 @@ setgridsize(N, N, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 d := 1e-9 * N  
 
+defregion(1, xrange(0, inf))
+defregion(2, xrange(-inf, 0))
 defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
-defregion(1, cylinder(d, d))
-defregion(2, cylinder(d/2, d/2))
-defregion(3, cylinder(d/2, d/2).transl(d/3, 0, 0))
 save(regions)
 
 Ku1.setregion(1, 500)
-Ku1.setregion(2, 0)
-Ku1.setregion(3, -500)
+Ku1.setregion(2, 1000)
 save(Ku1)
 
 Msat = 800e-3 // sets it everywhere
-Msat.setregion(2, 500e3)
 save(Msat)
 
 m = uniform(1, 0, 0)
 save(m)</pre>
 
-<h3>output</h3>
-<figure align=left>
+<h3>output</h3> 
+<figure style="float:left">
 	<img src="example9.out/Ku1000000.png"/>
 	<figcaption> Ku1000000 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example9.out/Msat000000.png"/>
 	<figcaption> Msat000000 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example9.out/m000000.png"/>
 	<figcaption> m000000 </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example9.out/regions000000.png"/>
 	<figcaption> regions000000 </figcaption>
-</figure>
+</figure><br style="clear:both"/> 
 
 
 <hr/><h2>Initial magnetization</h2>
@@ -360,35 +400,35 @@ saveas(m, "vortexwall_scale")
 
 m = vortex(1,-1).transl(100e-9, 50e-9, 0)
 saveas(m, "vortex_transl")</pre>
-<h3>output</h3>
-<figure align=left>
+<h3>output</h3> 
+<figure style="float:left">
 	<img src="example10.out/twodomain.png"/>
 	<figcaption> twodomain </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/twodomain_rot.png"/>
 	<figcaption> twodomain_rot </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/uniform.png"/>
 	<figcaption> uniform </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/vortex.png"/>
 	<figcaption> vortex </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/vortex_transl.png"/>
 	<figcaption> vortex_transl </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/vortexwall.png"/>
 	<figcaption> vortexwall </figcaption>
 </figure>
-<figure align=left>
+<figure style="float:left">
 	<img src="example10.out/vortexwall_scale.png"/>
 	<figcaption> vortexwall_scale </figcaption>
-</figure>
+</figure><br style="clear:both"/> 
 
 These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
 </body>

@@ -120,7 +120,7 @@ Aex   = 10e-12
 alpha = 3
 
 // define exchange length
-lex := sqrt(Aex / (0.5 * mu0 * pow(Msat.GetUniform(),2)))
+lex := sqrt(Aex.GetFloat() / (0.5 * mu0 * pow(Msat.GetFloat(),2)))
 
 d     := 30 * lex                        // we test for d/lex = 30
 Sizex := 5*d                             // magnet size x
@@ -156,43 +156,66 @@ mx3 has powerful API to programatically define geometries. A number of primitive
 setgridsize(100, 100, 50)
 setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
-setgeom(rect(800e-9, 500e-9))
+setgeom( rect(800e-9, 500e-9) )
 m=uniform(1,1,0)
 saveas(m, "rect")
 
-setgeom(rect(800e-9, 500e-9).rotz(30*pi/180))
-m=uniform(1,1,0)
-saveas(m, "rect_rotz")
-
-setgeom(cylinder(800e-9, 600e-9))
+setgeom( cylinder(800e-9, 600e-9) )
 m=uniform(1,1,0)
 saveas(m, "cylinder")
 
-setgeom(cylinder(800e-9, 600e-9).inverse())
+setgeom( cylinder(800e-9, 600e-9).inverse() )
 m=uniform(1,1,0)
 saveas(m, "cylinder_inverse")
 
-setgeom(cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0))
+setgeom( cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0) )
 m=uniform(1,1,0)
 saveas(m, "cylinder_transl")
 
-setgeom(ellipsoid(800e-9, 600e-9, 500e-9))
+setgeom( ellipsoid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
 saveas(m, "ellipsoid")
 
-setgeom(halfspace())
+setgeom( cuboid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
-saveas(m, "halfspace")
+saveas(m, "cuboid")
 
-setgeom(rect(800e-9, 500e-9).sub(halfspace().rotz(30*pi/180)))
+setgeom( cuboid(800e-9, 600e-9, 500e-9).rotz(-10*pi/180) )
 m=uniform(1,1,0)
-saveas(m, "rect_sub_haflspace_rotz")
+saveas(m, "cuboid_rotZ")
+
+setgeom( layers(0, 25) )
+m=uniform(1,1,0)
+saveas(m, "layers")
+
+setgeom( xrange(0, inf) )
+m=uniform(1,1,0)
+saveas(m, "xrange")
+
+a := cylinder(600e-9, 600e-9).transl(-150e-9, 50e-9, 0 )
+b := rect(600e-9, 600e-9).transl(150e-9, -50e-9, 0)
+
+setgeom( a.add(b) )
+m=uniform(1,1,0)
+saveas(m, "logicAdd")
+
+setgeom( a.sub(b) )
+m=uniform(1,1,0)
+saveas(m, "logicSub")
+
+setgeom( a.intersect(b) )
+m=uniform(1,1,0)
+saveas(m, "logicAnd")
+
+setgeom( a.xor(b) )
+m=uniform(1,1,0)
+saveas(m, "logicXor")
 
 `}}
 
 {{.Output}}
 
-Note: these are 3D geometries seen from above. The magnetization is averaged along the thickness. Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
+Note: these are 3D geometries seen from above. The displayed magnetization is averaged along the thickness (notable in ellipse and layers example). Also, when setting a geometry, the magnetization outside the geometry is removed (set to zero). So each time we set a new geometry we have re-initialized m.
 <hr/><h2>Interlude: rotating cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
@@ -249,19 +272,16 @@ setgridsize(N, N, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 d := 1e-9 * N  
 
+defregion(1, xrange(0, inf))
+defregion(2, xrange(-inf, 0))
 defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
-defregion(1, cylinder(d, d))
-defregion(2, cylinder(d/2, d/2))
-defregion(3, cylinder(d/2, d/2).transl(d/3, 0, 0))
 save(regions)
 
 Ku1.setregion(1, 500)
-Ku1.setregion(2, 0)
-Ku1.setregion(3, -500)
+Ku1.setregion(2, 1000)
 save(Ku1)
 
 Msat = 800e-3 // sets it everywhere
-Msat.setregion(2, 500e3)
 save(Msat)
 
 m = uniform(1, 0, 0)

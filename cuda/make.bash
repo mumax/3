@@ -10,7 +10,7 @@ for f in *.cu; do
 	for cc in 20 30 35; do
 		if [[ $f -nt $g'_'$cc.ptx ]]; then
 			echo $NVCC -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx
-			$NVCC -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx || exit 1
+			$NVCC -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx # error can be ignored
 		fi
 	done
 	if [[ $f -nt $g'_wrapper.go' ]]; then

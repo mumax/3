@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
+	"strconv"
 	"text/scanner"
 	"text/template"
 )
@@ -99,18 +101,35 @@ type Kernel struct {
 	PTX  map[int]string
 }
 
-// supported compute capabilities.
-var cc = []int{20, 30, 35}
+var ls []string
 
 // generate wrapper code from template
 func wrapgen(filename, funcname string, argt, argn []string) {
 	kernel := &Kernel{funcname, argt, argn, make(map[int]string)}
 
-	for _, s := range cc {
-		kernel.PTX[s] = filterptx(fmt.Sprint(util.NoExt(filename), "_", s, ".ptx"))
+	// find corresponding .PTX files
+	if ls == nil {
+		dir, errd := os.Open(".")
+		defer dir.Close()
+		util.PanicErr(errd)
+		var errls error
+		ls, errls = dir.Readdirnames(-1)
+		util.PanicErr(errls)
 	}
 
-	wrapfname := util.NoExt(filename) + "_wrapper.go"
+	basename := util.NoExt(filename)
+	for _, f := range ls {
+		match, e := regexp.MatchString(basename+"_*[0-9]..ptx", f)
+		util.PanicErr(e)
+		if match {
+			cc, ei := strconv.Atoi(f[len(f)-len("00.ptx") : len(f)-len(".ptx")])
+			util.PanicErr(ei)
+			fmt.Println(basename, cc)
+			kernel.PTX[cc] = filterptx(f)
+		}
+	}
+
+	wrapfname := basename + "_wrapper.go"
 	wrapout, err := os.OpenFile(wrapfname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.PanicErr(err)
 	defer wrapout.Close()

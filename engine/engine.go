@@ -20,14 +20,16 @@ func init() {
 	world.ROnly("torque", &torque_)
 	B_eff_ := &B_eff
 	world.ROnly("B_eff", &B_eff_)
+	table_ := &Table
+	world.ROnly("table", &table_)
 }
 
 // Accessible quantities
 var (
-	M      magnetization // reduced magnetization (unit length)
-	B_eff  setterQuant   // effective field (T) output handle
-	Torque setterQuant   // total torque/γ0, in T
-	//Table  DataTable     // output handle for tabular data (average magnetization etc.)
+	M      magnetization            // reduced magnetization (unit length)
+	B_eff  setterQuant              // effective field (T) output handle
+	Torque setterQuant              // total torque/γ0, in T
+	Table  = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 )
 
 // hidden quantities
@@ -46,7 +48,7 @@ func initialize() {
 	regions.init()
 	Quants["regions"] = &regions
 
-	//Table = *newTable("datatable")
+	Table.Add(&M)
 
 	initDemag()
 	initExchange()
@@ -82,7 +84,7 @@ func initialize() {
 
 		Torque.set(torquebuffer, cansave)
 
-		//Table.touch(cansave) // all needed quantities are now up-to-date, save them
+		Table.touch(cansave) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
@@ -157,5 +159,5 @@ func checkM() {
 func Close() {
 	log.Println("shutting down")
 	drainOutput()
-	//Table.flush()
+	Table.flush()
 }

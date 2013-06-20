@@ -69,6 +69,10 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 	}
 }
 
+func (b *bufferedQuant) GetVec() []float64 {
+	return Average(b)
+}
+
 // Allocate buffer data (on GPU) if not yet done so.
 // Used by masks, who are not allocated before needed.
 func (m *bufferedQuant) alloc() {

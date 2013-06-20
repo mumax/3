@@ -81,7 +81,10 @@ DMI = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
 
 m = vortex(1, 1)      // Initial magnetization
 
-/* Output quantities */
+/* Tabular output */
+table.autosave(10e-12)// default columns: t, m
+
+/* Space-dependent output */
 
 save(m)        // reduced magnetization
 save(mFFT)     // FFT of m

@@ -54,25 +54,52 @@ This example should be pretty straight-forward to follow. Output is stored in th
 
 {{.Output }}
 
-<hr/><h2>Material Parameters</h2>
+<hr/><h2>Input and Output Parameters</h2>
 
-Overview of the available material parameters:
+In this example we set all possible input parameters, to showcase them. Setting a parameter automatically "enables" the corresponding physics (e.g. setting j enables spin-transfer torque). Demag can be explicitly turned on/off with <code>enableDemag=false</code> (it is enabled by default).
 
-{{.Example `
-Msat  = 1000e3    // Saturation magnetization in A/m
-Aex   = 13e-12    // Exchange stiffness in J/m
-alpha = 0.02      // Gilbert damping constant
+{{.Example  `
 
-anisU = vector(1, 0, 0) // Uniaxial anisotropy axis
-Ku1   = 500e3           // Uniaxial anisotropy in J/m3
+setgridsize(100, 100, 1)
+setcellsize(4e-9, 4e-9, 8e-9)
 
-xi      = 0.04    // Spin-transfer torque degree of non-adiabaticity
-spinPol = 0.56    // Spin polarization
+/* Input parameters */
 
-DMI = 1e-3        // Dzyaloshinskii-Moriya interaction in J/m2
-`}}
+Msat  = 1000e3        // Saturation magnetization in A/m
+Aex   = 13e-12        // Exchange stiffness in J/m
+alpha = 0.02          // Gilbert damping constant
+B_ext = vector(0.1,0,0) // Applied field in T
 
-This input file does not create any output.
+anisU = vector(1,0,0) // Uniaxial anisotropy axis
+Ku1   = 500e3         // Uniaxial anisotropy in J/m3
+
+xi      = 0.04        // Spin-transfer torque degree of non-adiabaticity
+spinPol = 0.56        // Spin polarization
+j = vector(1e14,0,0)  // Electrical current density in A/m2
+
+DMI = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
+
+m = vortex(1, 1)      // Initial magnetization
+
+/* Output quantities */
+
+save(m)        // reduced magnetization
+save(mFFT)     // FFT of m
+
+save(B_eff)    // effective field in T
+save(B_demag)  // demagnetizing field in T
+save(B_exch)   // exchange field in T
+save(B_uni)    // uniaxial anisotropy field in T
+save(B_dmi)    // Dzyaloshinskii-Moriya field in T
+
+save(torque)   // total torque/γ0
+save(LLTorque) // Landau-Lifshitz torque/γ0
+save(STTorque) // Spin-transfer torque/γ0
+
+// The input parameters (Msat, Aex, ...) can be saved as well,
+// but that's only useful when they are defined space-dependent.
+
+`}}{{.Output}}
 
 <hr/><h2>Interlude on Syntax</h2>
 

@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-const VERSION = "mx3.0.8 α "
+const VERSION = "mx3.0.9 α "
 
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
@@ -17,6 +17,8 @@ func init() {
 	world.LValue("m", &M)
 	torque_ := &Torque
 	world.ROnly("torque", &torque_)
+	B_eff_ := &B_eff
+	world.ROnly("B_eff", &B_eff_)
 }
 
 // Accessible quantities

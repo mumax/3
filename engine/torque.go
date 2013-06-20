@@ -9,6 +9,8 @@ func init() {
 	world.LValue("alpha", &Alpha)
 	lltorque_ := &LLTorque
 	world.ROnly("LLtorque", &lltorque_)
+	sttorque_ := &STTorque
+	world.ROnly("STTorque", &sttorque_)
 	world.Var("spinpol", &SpinPol)
 	world.LValue("xi", &Xi)
 	world.Var("j", &J)

@@ -7,12 +7,12 @@ import (
 
 func init() {
 	world.LValue("Aex", &Aex)
-	B_exch_addr := &B_exch
-	world.ROnly("B_exch", &B_exch_addr)
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
 	world.Func("setLexchange", SetLExchange)
+	B_exch_ := &B_exch
+	world.ROnly("B_exch", &B_exch_)
 }
 
 var (

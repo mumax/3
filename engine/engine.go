@@ -1,3 +1,4 @@
+// Package engine implements a high-level API. Most of the API is available through the script syntax as well.
 package engine
 
 import (

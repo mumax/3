@@ -9,7 +9,6 @@ rm -f test.log
 rm -f cuda/*.ptx
 rm -f examples/*.out/*.dump
 rm -rf test/*.out
-rm -f *.tar.gz
 
 rm -rf $name*
 mkdir ../$name
@@ -21,6 +20,7 @@ rm -f $name/package.bash
 rm -f $name/examples/template.html
 rm -f $name/examples/make.go
 rm -f $name/examples/*.txt
+rm -f $name/*.tar.gz
 
 tar cv $name | gzip > $name.tar.gz
 rm -rf $name

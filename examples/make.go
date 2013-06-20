@@ -1,3 +1,12 @@
+/*
+Tool to quickly plot mx3 data tables using gnuplot.
+
+Usage
+
+Run
+	mx3-plot datatable.txt
+and SVG graphs will appear in that directory.
+*/
 package main
 
 import (
@@ -78,7 +87,30 @@ func (s *State) Output() string {
 			out += s.Img(f[:len(f)-len(".dump")])
 		}
 	}
-	return out + `<br style="clear:both"/> `
+	out += `<br style="clear:both"/> `
+
+	for _, f := range files {
+		if path.Ext(f) == ".txt" {
+			cmd("mx3-plot", s.outfile()+"/"+f)
+		}
+	}
+
+	dir, err = os.Open(s.outfile())
+	check(err)
+	files, err2 = dir.Readdirnames(-1)
+	check(err2)
+	sort.Strings(files)
+	for _, f := range files {
+		if path.Ext(f) == ".svg" {
+			src := s.outfile() + "/" + f
+			out += fmt.Sprintf(`
+<figure>
+	<img src="%v"/>
+	<figcaption> %v </figcaption>
+</figure>`, src, f)
+		}
+	}
+	return out
 }
 
 func (s *State) infile() string {
@@ -110,6 +142,6 @@ func replaceInRaw(bytes []byte, old, new byte) {
 
 func check(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 }

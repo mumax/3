@@ -43,14 +43,15 @@ m     = uniform(1, .1, 0) // initial m
 run(3e-9)  // relax
 save(m)    // relaxed state
 
-Autosave(m, 200e-12)
+autosave(m, 200e-12)
+table.autosave(10e-12)
 alpha = 0.02
 B_ext = vector(-24.6E-3, 4.3E-3, 0)
 run(1e-9)
 
 `}}
 
-This example should be pretty straight-forward to follow. Output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.
+This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG. The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-plot>mx3-plot</a>.
 
 {{.Output }}
 

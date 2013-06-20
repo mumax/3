@@ -72,7 +72,7 @@ func (t *DataTable) init() {
 		t.Writer = bufio.NewWriter(f)
 
 		// write header
-		fmt.Fprint(t, "# t(s)")
+		fmt.Fprint(t, "# t (s)")
 		for _, o := range t.outputs {
 			if o.NComp() == 1 {
 				fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")

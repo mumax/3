@@ -15,6 +15,8 @@ Example: resize data to a 1 x 32 x 32 mesh, normalize vectors to unit length and
 	mx3-convert -resize 1x32x32 -normalize -omf binary file.dump
 Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
 	mx3-convert -comp 0 -vtk binary -jpg *.omf
+Example: convet .omf files to .dump, so they can be used as input for mx3 simulations:
+	mx3-convert -dump *.omf
 
 Output file names are automatically assigned.
 */

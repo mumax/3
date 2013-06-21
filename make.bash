@@ -7,8 +7,8 @@ ln -sf $(pwd)/post-commit .git/hooks/post-commit
 (cd cuda && ./make.bash) || exit 1
 (cd web && ./make.bash)  || exit 1
 go install -v            || exit 1
-go install -v code.google.com/p/mx3/tools/mx3-convert || exit 1
-go install -v code.google.com/p/mx3/tools/mx3-plot || exit 1
+(cd tools/mx3-convert && go build) || exit 1
+(cd tools/mx3-plot && go build) || exit 1
 (cd test && mx3 -vet *.txt) || exit 1
 (cd examples && mx3 -vet *.txt) || exit 1
 

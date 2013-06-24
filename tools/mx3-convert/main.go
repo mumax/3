@@ -11,8 +11,8 @@ For a overview of flags, run:
 	mx3-convert -help
 Example: convert all .dump files to PNG:
 	mx3-convert -png *.dump
-Example: resize data to a 1 x 32 x 32 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
-	mx3-convert -resize 1x32x32 -normalize -omf binary file.dump
+Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
+	mx3-convert -resize 32x32x1 -normalize -omf binary file.dump
 Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
 	mx3-convert -comp 0 -vtk binary -jpg *.omf
 Example: convet .omf files to .dump, so they can be used as input for mx3 simulations:

@@ -1,14 +1,16 @@
 package script
 
 import (
+	"fmt"
 	"go/ast"
 	"reflect"
 	"strings"
+	"unicode"
 )
 
 type selector struct {
 	x      Expr
-	method int
+	method string
 }
 
 // compiles a selector statement like x.sel
@@ -17,23 +19,29 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 	t := x.Type()
 
 	sel := strings.ToLower(n.Sel.Name)
-	N := -1
+	N := ""
 	for i := 0; i < t.NumMethod(); i++ {
-		if strings.ToLower(t.Method(i).Name) == sel {
-			N = i
+		name := t.Method(i).Name
+		if strings.ToLower(name) == sel && unicode.IsUpper(rune(name[0])) {
+			N = t.Method(i).Name
 			break
 		}
 	}
-	if N < 0 {
+	if N == "" {
 		panic(err(n.Pos(), t, "has no method", n.Sel.Name))
 	}
 	return &selector{x, N}
 }
 
 func (e *selector) Eval() interface{} {
-	return reflect.ValueOf(e.x.Eval()).Method(e.method).Interface()
+	obj := reflect.ValueOf(e.x.Eval())
+	meth := obj.MethodByName(e.method)
+	if meth.Kind() == 0 {
+		panic(fmt.Sprint(e.x, " has no method ", e.method))
+	}
+	return meth.Interface()
 }
 
 func (e *selector) Type() reflect.Type {
-	return reflect.New(e.x.Type()).Elem().Method(e.method).Type()
+	return reflect.New(e.x.Type()).Elem().MethodByName(e.method).Type()
 }

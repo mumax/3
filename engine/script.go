@@ -37,9 +37,10 @@ func Compile(src string) (script.Expr, error) {
 	return world.Compile(src)
 }
 
-func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
-func (b *bufferedQuant) Eval() interface{}       { return b }
-func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
+func (b *bufferedQuant) SetValue(v interface{}) { b.Set(v.(*data.Slice)) }
+func (b *bufferedQuant) Eval() interface{}      { return b }
+
+//func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 //func doSaveTable(period float64) {

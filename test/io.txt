@@ -15,6 +15,7 @@ anisU = vector(1, 0, 0)
 Ku1   = 500e3
 dmi   = 1e-5
 
+m.loadfile("testdata/m000000.dump")
 saveas(m, "m")
 saveas(B_demag, "B_demag")
 saveas(B_exch, "B_exch")

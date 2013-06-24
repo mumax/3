@@ -32,30 +32,30 @@ func k_copypadmul_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.P
 		copypadmul_code = fatbinLoad(copypadmul_map, "copypadmul")
 	}
 
-	var a copypadmul_args
+	var _a_ copypadmul_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_D0 = D0
-	a.argptr[1] = unsafe.Pointer(&a.arg_D0)
-	a.arg_D1 = D1
-	a.argptr[2] = unsafe.Pointer(&a.arg_D1)
-	a.arg_D2 = D2
-	a.argptr[3] = unsafe.Pointer(&a.arg_D2)
-	a.arg_src = src
-	a.argptr[4] = unsafe.Pointer(&a.arg_src)
-	a.arg_S0 = S0
-	a.argptr[5] = unsafe.Pointer(&a.arg_S0)
-	a.arg_S1 = S1
-	a.argptr[6] = unsafe.Pointer(&a.arg_S1)
-	a.arg_S2 = S2
-	a.argptr[7] = unsafe.Pointer(&a.arg_S2)
-	a.arg_BsatLUT = BsatLUT
-	a.argptr[8] = unsafe.Pointer(&a.arg_BsatLUT)
-	a.arg_regions = regions
-	a.argptr[9] = unsafe.Pointer(&a.arg_regions)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_D0 = D0
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_D0)
+	_a_.arg_D1 = D1
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_D1)
+	_a_.arg_D2 = D2
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_D2)
+	_a_.arg_src = src
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
+	_a_.arg_S0 = S0
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_S0)
+	_a_.arg_S1 = S1
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_S1)
+	_a_.arg_S2 = S2
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_S2)
+	_a_.arg_BsatLUT = BsatLUT
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_BsatLUT)
+	_a_.arg_regions = regions
+	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_regions)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(copypadmul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

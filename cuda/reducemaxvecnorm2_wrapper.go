@@ -28,22 +28,22 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 		reducemaxvecnorm2_code = fatbinLoad(reducemaxvecnorm2_map, "reducemaxvecnorm2")
 	}
 
-	var a reducemaxvecnorm2_args
+	var _a_ reducemaxvecnorm2_args
 
-	a.arg_x = x
-	a.argptr[0] = unsafe.Pointer(&a.arg_x)
-	a.arg_y = y
-	a.argptr[1] = unsafe.Pointer(&a.arg_y)
-	a.arg_z = z
-	a.argptr[2] = unsafe.Pointer(&a.arg_z)
-	a.arg_dst = dst
-	a.argptr[3] = unsafe.Pointer(&a.arg_dst)
-	a.arg_initVal = initVal
-	a.argptr[4] = unsafe.Pointer(&a.arg_initVal)
-	a.arg_n = n
-	a.argptr[5] = unsafe.Pointer(&a.arg_n)
+	_a_.arg_x = x
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_x)
+	_a_.arg_y = y
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_y)
+	_a_.arg_z = z
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_z)
+	_a_.arg_dst = dst
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_initVal = initVal
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_initVal)
+	_a_.arg_n = n
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_n)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

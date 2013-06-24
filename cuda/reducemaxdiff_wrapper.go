@@ -27,20 +27,20 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 		reducemaxdiff_code = fatbinLoad(reducemaxdiff_map, "reducemaxdiff")
 	}
 
-	var a reducemaxdiff_args
+	var _a_ reducemaxdiff_args
 
-	a.arg_src1 = src1
-	a.argptr[0] = unsafe.Pointer(&a.arg_src1)
-	a.arg_src2 = src2
-	a.argptr[1] = unsafe.Pointer(&a.arg_src2)
-	a.arg_dst = dst
-	a.argptr[2] = unsafe.Pointer(&a.arg_dst)
-	a.arg_initVal = initVal
-	a.argptr[3] = unsafe.Pointer(&a.arg_initVal)
-	a.arg_n = n
-	a.argptr[4] = unsafe.Pointer(&a.arg_n)
+	_a_.arg_src1 = src1
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_src1)
+	_a_.arg_src2 = src2
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src2)
+	_a_.arg_dst = dst
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_initVal = initVal
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_initVal)
+	_a_.arg_n = n
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

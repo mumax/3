@@ -14,37 +14,37 @@ var mul_code cu.Function
 
 type mul_args struct {
 	arg_dst unsafe.Pointer
-	arg_src unsafe.Pointer
-	arg_fac float32
+	arg_a   unsafe.Pointer
+	arg_b   unsafe.Pointer
 	arg_N   int
 	argptr  [4]unsafe.Pointer
 }
 
 // Wrapper for mul CUDA kernel, asynchronous.
-func k_mul_async(dst unsafe.Pointer, src unsafe.Pointer, fac float32, N int, cfg *config, str cu.Stream) {
+func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if mul_code == 0 {
 		mul_code = fatbinLoad(mul_map, "mul")
 	}
 
-	var a mul_args
+	var _a_ mul_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_src = src
-	a.argptr[1] = unsafe.Pointer(&a.arg_src)
-	a.arg_fac = fac
-	a.argptr[2] = unsafe.Pointer(&a.arg_fac)
-	a.arg_N = N
-	a.argptr[3] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_a = a
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_a)
+	_a_.arg_b = b
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_b)
+	_a_.arg_N = N
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 
 // Wrapper for mul CUDA kernel, synchronized.
-func k_mul(dst unsafe.Pointer, src unsafe.Pointer, fac float32, N int, cfg *config) {
+func k_mul(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config) {
 	str := stream()
-	k_mul_async(dst, src, fac, N, cfg, str)
+	k_mul_async(dst, a, b, N, cfg, str)
 	syncAndRecycle(str)
 }
 
@@ -169,22 +169,23 @@ BB0_4:
 .visible .entry mul(
 	.param .u64 mul_param_0,
 	.param .u64 mul_param_1,
-	.param .f32 mul_param_2,
+	.param .u64 mul_param_2,
 	.param .u32 mul_param_3
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<11>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<4>;
-	.reg .s64 	%rd<8>;
+	.reg .s64 	%rd<11>;
 
 
-	ld.param.u64 	%rd3, [mul_param_0];
-	ld.param.u64 	%rd4, [mul_param_1];
-	ld.param.f32 	%f1, [mul_param_2];
+	ld.param.u64 	%rd4, [mul_param_0];
+	ld.param.u64 	%rd5, [mul_param_1];
+	ld.param.u64 	%rd6, [mul_param_2];
 	ld.param.u32 	%r2, [mul_param_3];
-	cvta.to.global.u64 	%rd1, %rd3;
-	cvta.to.global.u64 	%rd2, %rd4;
+	cvta.to.global.u64 	%rd1, %rd4;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
 	.loc 2 5 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -198,12 +199,14 @@ BB0_4:
 	@%p1 bra 	BB0_2;
 
 	.loc 2 8 1
-	mul.wide.s32 	%rd5, %r1, 4;
-	add.s64 	%rd6, %rd2, %rd5;
-	ld.global.f32 	%f2, [%rd6];
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd3, %rd7;
+	add.s64 	%rd9, %rd2, %rd7;
+	ld.global.f32 	%f1, [%rd9];
+	ld.global.f32 	%f2, [%rd8];
 	mul.f32 	%f3, %f2, %f1;
-	add.s64 	%rd7, %rd1, %rd5;
-	st.global.f32 	[%rd7], %f3;
+	add.s64 	%rd10, %rd1, %rd7;
+	st.global.f32 	[%rd10], %f3;
 
 BB0_2:
 	.loc 2 10 2
@@ -249,22 +252,23 @@ BB0_2:
 .visible .entry mul(
 	.param .u64 mul_param_0,
 	.param .u64 mul_param_1,
-	.param .f32 mul_param_2,
+	.param .u64 mul_param_2,
 	.param .u32 mul_param_3
 )
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<10>;
 	.reg .f32 	%f<4>;
-	.reg .s64 	%rd<8>;
+	.reg .s64 	%rd<11>;
 
 
-	ld.param.u64 	%rd3, [mul_param_0];
-	ld.param.u64 	%rd4, [mul_param_1];
-	ld.param.f32 	%f1, [mul_param_2];
+	ld.param.u64 	%rd4, [mul_param_0];
+	ld.param.u64 	%rd5, [mul_param_1];
+	ld.param.u64 	%rd6, [mul_param_2];
 	ld.param.u32 	%r2, [mul_param_3];
-	cvta.to.global.u64 	%rd1, %rd3;
-	cvta.to.global.u64 	%rd2, %rd4;
+	cvta.to.global.u64 	%rd1, %rd4;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
 	.loc 3 5 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -278,12 +282,14 @@ BB0_2:
 	@%p1 bra 	BB2_2;
 
 	.loc 3 8 1
-	mul.wide.s32 	%rd5, %r1, 4;
-	add.s64 	%rd6, %rd2, %rd5;
-	ld.global.nc.f32 	%f2, [%rd6];
-	mul.f32 	%f3, %f2, %f1;
-	add.s64 	%rd7, %rd1, %rd5;
-	st.global.f32 	[%rd7], %f3;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd3, %rd7;
+	ld.global.nc.f32 	%f1, [%rd8];
+	add.s64 	%rd9, %rd2, %rd7;
+	ld.global.nc.f32 	%f2, [%rd9];
+	mul.f32 	%f3, %f1, %f2;
+	add.s64 	%rd10, %rd1, %rd7;
+	st.global.f32 	[%rd10], %f3;
 
 BB2_2:
 	.loc 3 10 2

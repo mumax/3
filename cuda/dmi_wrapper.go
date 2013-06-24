@@ -36,38 +36,38 @@ func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx 
 		adddmi_code = fatbinLoad(adddmi_map, "adddmi")
 	}
 
-	var a adddmi_args
+	var _a_ adddmi_args
 
-	a.arg_Hx = Hx
-	a.argptr[0] = unsafe.Pointer(&a.arg_Hx)
-	a.arg_Hy = Hy
-	a.argptr[1] = unsafe.Pointer(&a.arg_Hy)
-	a.arg_Hz = Hz
-	a.argptr[2] = unsafe.Pointer(&a.arg_Hz)
-	a.arg_mx = mx
-	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
-	a.arg_my = my
-	a.argptr[4] = unsafe.Pointer(&a.arg_my)
-	a.arg_mz = mz
-	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
-	a.arg_cx = cx
-	a.argptr[6] = unsafe.Pointer(&a.arg_cx)
-	a.arg_cy = cy
-	a.argptr[7] = unsafe.Pointer(&a.arg_cy)
-	a.arg_cz = cz
-	a.argptr[8] = unsafe.Pointer(&a.arg_cz)
-	a.arg_DLUT = DLUT
-	a.argptr[9] = unsafe.Pointer(&a.arg_DLUT)
-	a.arg_regions = regions
-	a.argptr[10] = unsafe.Pointer(&a.arg_regions)
-	a.arg_N0 = N0
-	a.argptr[11] = unsafe.Pointer(&a.arg_N0)
-	a.arg_N1 = N1
-	a.argptr[12] = unsafe.Pointer(&a.arg_N1)
-	a.arg_N2 = N2
-	a.argptr[13] = unsafe.Pointer(&a.arg_N2)
+	_a_.arg_Hx = Hx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_Hx)
+	_a_.arg_Hy = Hy
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Hy)
+	_a_.arg_Hz = Hz
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Hz)
+	_a_.arg_mx = mx
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
+	_a_.arg_my = my
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
+	_a_.arg_mz = mz
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
+	_a_.arg_cx = cx
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_cx)
+	_a_.arg_cy = cy
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_cy)
+	_a_.arg_cz = cz
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_cz)
+	_a_.arg_DLUT = DLUT
+	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_DLUT)
+	_a_.arg_regions = regions
+	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.arg_N0 = N0
+	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N0)
+	_a_.arg_N1 = N1
+	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_N1)
+	_a_.arg_N2 = N2
+	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_N2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(adddmi_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

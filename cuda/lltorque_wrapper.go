@@ -34,34 +34,34 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 		lltorque_code = fatbinLoad(lltorque_map, "lltorque")
 	}
 
-	var a lltorque_args
+	var _a_ lltorque_args
 
-	a.arg_tx = tx
-	a.argptr[0] = unsafe.Pointer(&a.arg_tx)
-	a.arg_ty = ty
-	a.argptr[1] = unsafe.Pointer(&a.arg_ty)
-	a.arg_tz = tz
-	a.argptr[2] = unsafe.Pointer(&a.arg_tz)
-	a.arg_mx = mx
-	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
-	a.arg_my = my
-	a.argptr[4] = unsafe.Pointer(&a.arg_my)
-	a.arg_mz = mz
-	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
-	a.arg_hx = hx
-	a.argptr[6] = unsafe.Pointer(&a.arg_hx)
-	a.arg_hy = hy
-	a.argptr[7] = unsafe.Pointer(&a.arg_hy)
-	a.arg_hz = hz
-	a.argptr[8] = unsafe.Pointer(&a.arg_hz)
-	a.arg_alphaLUT = alphaLUT
-	a.argptr[9] = unsafe.Pointer(&a.arg_alphaLUT)
-	a.arg_regions = regions
-	a.argptr[10] = unsafe.Pointer(&a.arg_regions)
-	a.arg_N = N
-	a.argptr[11] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_tx = tx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_tx)
+	_a_.arg_ty = ty
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_ty)
+	_a_.arg_tz = tz
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_tz)
+	_a_.arg_mx = mx
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
+	_a_.arg_my = my
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
+	_a_.arg_mz = mz
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
+	_a_.arg_hx = hx
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_hx)
+	_a_.arg_hy = hy
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_hy)
+	_a_.arg_hz = hz
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_hz)
+	_a_.arg_alphaLUT = alphaLUT
+	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_alphaLUT)
+	_a_.arg_regions = regions
+	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.arg_N = N
+	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

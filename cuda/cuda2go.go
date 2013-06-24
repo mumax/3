@@ -162,13 +162,13 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 		{{.Name}}_code = fatbinLoad({{.Name}}_map, "{{.Name}}")
 	}
 
-	var a {{.Name}}_args
+	var _a_ {{.Name}}_args
 
-	{{range $i, $t := .ArgN}} a.arg_{{.}} = {{.}}
-	a.argptr[{{$i}}] = unsafe.Pointer(&a.arg_{{.}})
+	{{range $i, $t := .ArgN}} _a_.arg_{{.}} = {{.}}
+	_a_.argptr[{{$i}}] = unsafe.Pointer(&_a_.arg_{{.}})
 	{{end}}
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

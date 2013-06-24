@@ -26,18 +26,18 @@ func k_kernmulRSymm2Dx_async(fftMx unsafe.Pointer, fftKxx unsafe.Pointer, N1 int
 		kernmulRSymm2Dx_code = fatbinLoad(kernmulRSymm2Dx_map, "kernmulRSymm2Dx")
 	}
 
-	var a kernmulRSymm2Dx_args
+	var _a_ kernmulRSymm2Dx_args
 
-	a.arg_fftMx = fftMx
-	a.argptr[0] = unsafe.Pointer(&a.arg_fftMx)
-	a.arg_fftKxx = fftKxx
-	a.argptr[1] = unsafe.Pointer(&a.arg_fftKxx)
-	a.arg_N1 = N1
-	a.argptr[2] = unsafe.Pointer(&a.arg_N1)
-	a.arg_N2 = N2
-	a.argptr[3] = unsafe.Pointer(&a.arg_N2)
+	_a_.arg_fftMx = fftMx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftMx)
+	_a_.arg_fftKxx = fftKxx
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftKxx)
+	_a_.arg_N1 = N1
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_N1)
+	_a_.arg_N2 = N2
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dx_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

@@ -30,26 +30,26 @@ func k_copypad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Poin
 		copypad_code = fatbinLoad(copypad_map, "copypad")
 	}
 
-	var a copypad_args
+	var _a_ copypad_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_D0 = D0
-	a.argptr[1] = unsafe.Pointer(&a.arg_D0)
-	a.arg_D1 = D1
-	a.argptr[2] = unsafe.Pointer(&a.arg_D1)
-	a.arg_D2 = D2
-	a.argptr[3] = unsafe.Pointer(&a.arg_D2)
-	a.arg_src = src
-	a.argptr[4] = unsafe.Pointer(&a.arg_src)
-	a.arg_S0 = S0
-	a.argptr[5] = unsafe.Pointer(&a.arg_S0)
-	a.arg_S1 = S1
-	a.argptr[6] = unsafe.Pointer(&a.arg_S1)
-	a.arg_S2 = S2
-	a.argptr[7] = unsafe.Pointer(&a.arg_S2)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_D0 = D0
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_D0)
+	_a_.arg_D1 = D1
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_D1)
+	_a_.arg_D2 = D2
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_D2)
+	_a_.arg_src = src
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
+	_a_.arg_S0 = S0
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_S0)
+	_a_.arg_S1 = S1
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_S1)
+	_a_.arg_S2 = S2
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_S2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(copypad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

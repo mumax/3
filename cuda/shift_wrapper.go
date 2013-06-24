@@ -30,26 +30,26 @@ func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 in
 		shift_code = fatbinLoad(shift_map, "shift")
 	}
 
-	var a shift_args
+	var _a_ shift_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_src = src
-	a.argptr[1] = unsafe.Pointer(&a.arg_src)
-	a.arg_N0 = N0
-	a.argptr[2] = unsafe.Pointer(&a.arg_N0)
-	a.arg_N1 = N1
-	a.argptr[3] = unsafe.Pointer(&a.arg_N1)
-	a.arg_N2 = N2
-	a.argptr[4] = unsafe.Pointer(&a.arg_N2)
-	a.arg_sh0 = sh0
-	a.argptr[5] = unsafe.Pointer(&a.arg_sh0)
-	a.arg_sh1 = sh1
-	a.argptr[6] = unsafe.Pointer(&a.arg_sh1)
-	a.arg_sh2 = sh2
-	a.argptr[7] = unsafe.Pointer(&a.arg_sh2)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_src = src
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src)
+	_a_.arg_N0 = N0
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_N0)
+	_a_.arg_N1 = N1
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N1)
+	_a_.arg_N2 = N2
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N2)
+	_a_.arg_sh0 = sh0
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_sh0)
+	_a_.arg_sh1 = sh1
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_sh1)
+	_a_.arg_sh2 = sh2
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_sh2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

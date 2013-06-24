@@ -4,6 +4,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"log"
 	"runtime"
 )
@@ -45,6 +46,15 @@ func initialize() {
 	FFTM.init()
 	Quants["m"] = &M
 	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
+
+	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice, g bool) {
+		msat, r := Msat.GetGPU()
+		util.Assert(r == true)
+		defer cuda.RecycleBuffer(msat)
+		for c := 0; c < 3; c++ {
+			cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)
+		}
+	})
 
 	regions.init()
 	Quants["regions"] = &regions

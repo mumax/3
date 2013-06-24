@@ -29,24 +29,24 @@ func k_kernmulRSymm2Dyz_async(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy
 		kernmulRSymm2Dyz_code = fatbinLoad(kernmulRSymm2Dyz_map, "kernmulRSymm2Dyz")
 	}
 
-	var a kernmulRSymm2Dyz_args
+	var _a_ kernmulRSymm2Dyz_args
 
-	a.arg_fftMy = fftMy
-	a.argptr[0] = unsafe.Pointer(&a.arg_fftMy)
-	a.arg_fftMz = fftMz
-	a.argptr[1] = unsafe.Pointer(&a.arg_fftMz)
-	a.arg_fftKyy = fftKyy
-	a.argptr[2] = unsafe.Pointer(&a.arg_fftKyy)
-	a.arg_fftKzz = fftKzz
-	a.argptr[3] = unsafe.Pointer(&a.arg_fftKzz)
-	a.arg_fftKyz = fftKyz
-	a.argptr[4] = unsafe.Pointer(&a.arg_fftKyz)
-	a.arg_N1 = N1
-	a.argptr[5] = unsafe.Pointer(&a.arg_N1)
-	a.arg_N2 = N2
-	a.argptr[6] = unsafe.Pointer(&a.arg_N2)
+	_a_.arg_fftMy = fftMy
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftMy)
+	_a_.arg_fftMz = fftMz
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftMz)
+	_a_.arg_fftKyy = fftKyy
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fftKyy)
+	_a_.arg_fftKzz = fftKzz
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_fftKzz)
+	_a_.arg_fftKyz = fftKyz
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fftKyz)
+	_a_.arg_N1 = N1
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N1)
+	_a_.arg_N2 = N2
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_N2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dyz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

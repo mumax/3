@@ -34,34 +34,34 @@ func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsa
 		adduniaxialanisotropy_code = fatbinLoad(adduniaxialanisotropy_map, "adduniaxialanisotropy")
 	}
 
-	var a adduniaxialanisotropy_args
+	var _a_ adduniaxialanisotropy_args
 
-	a.arg_Bx = Bx
-	a.argptr[0] = unsafe.Pointer(&a.arg_Bx)
-	a.arg_By = By
-	a.argptr[1] = unsafe.Pointer(&a.arg_By)
-	a.arg_Bz = Bz
-	a.argptr[2] = unsafe.Pointer(&a.arg_Bz)
-	a.arg_mx = mx
-	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
-	a.arg_my = my
-	a.argptr[4] = unsafe.Pointer(&a.arg_my)
-	a.arg_mz = mz
-	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
-	a.arg_K1LUT = K1LUT
-	a.argptr[6] = unsafe.Pointer(&a.arg_K1LUT)
-	a.arg_uxLUT = uxLUT
-	a.argptr[7] = unsafe.Pointer(&a.arg_uxLUT)
-	a.arg_uyLUT = uyLUT
-	a.argptr[8] = unsafe.Pointer(&a.arg_uyLUT)
-	a.arg_uzLUT = uzLUT
-	a.argptr[9] = unsafe.Pointer(&a.arg_uzLUT)
-	a.arg_regions = regions
-	a.argptr[10] = unsafe.Pointer(&a.arg_regions)
-	a.arg_N = N
-	a.argptr[11] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_Bx = Bx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_Bx)
+	_a_.arg_By = By
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_By)
+	_a_.arg_Bz = Bz
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Bz)
+	_a_.arg_mx = mx
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
+	_a_.arg_my = my
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
+	_a_.arg_mz = mz
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
+	_a_.arg_K1LUT = K1LUT
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_K1LUT)
+	_a_.arg_uxLUT = uxLUT
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_uxLUT)
+	_a_.arg_uyLUT = uyLUT
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_uyLUT)
+	_a_.arg_uzLUT = uzLUT
+	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_uzLUT)
+	_a_.arg_regions = regions
+	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.arg_N = N
+	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(adduniaxialanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

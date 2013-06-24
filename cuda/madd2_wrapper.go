@@ -28,22 +28,22 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 		madd2_code = fatbinLoad(madd2_map, "madd2")
 	}
 
-	var a madd2_args
+	var _a_ madd2_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_src1 = src1
-	a.argptr[1] = unsafe.Pointer(&a.arg_src1)
-	a.arg_fac1 = fac1
-	a.argptr[2] = unsafe.Pointer(&a.arg_fac1)
-	a.arg_src2 = src2
-	a.argptr[3] = unsafe.Pointer(&a.arg_src2)
-	a.arg_fac2 = fac2
-	a.argptr[4] = unsafe.Pointer(&a.arg_fac2)
-	a.arg_N = N
-	a.argptr[5] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_src1 = src1
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src1)
+	_a_.arg_fac1 = fac1
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fac1)
+	_a_.arg_src2 = src2
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_src2)
+	_a_.arg_fac2 = fac2
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fac2)
+	_a_.arg_N = N
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(madd2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

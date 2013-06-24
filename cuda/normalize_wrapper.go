@@ -26,18 +26,18 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 		normalize_code = fatbinLoad(normalize_map, "normalize")
 	}
 
-	var a normalize_args
+	var _a_ normalize_args
 
-	a.arg_vx = vx
-	a.argptr[0] = unsafe.Pointer(&a.arg_vx)
-	a.arg_vy = vy
-	a.argptr[1] = unsafe.Pointer(&a.arg_vy)
-	a.arg_vz = vz
-	a.argptr[2] = unsafe.Pointer(&a.arg_vz)
-	a.arg_N = N
-	a.argptr[3] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_vx = vx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_vx)
+	_a_.arg_vy = vy
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_vy)
+	_a_.arg_vz = vz
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_vz)
+	_a_.arg_N = N
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(normalize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

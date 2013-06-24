@@ -27,20 +27,20 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 		reducedot_code = fatbinLoad(reducedot_map, "reducedot")
 	}
 
-	var a reducedot_args
+	var _a_ reducedot_args
 
-	a.arg_x1 = x1
-	a.argptr[0] = unsafe.Pointer(&a.arg_x1)
-	a.arg_x2 = x2
-	a.argptr[1] = unsafe.Pointer(&a.arg_x2)
-	a.arg_dst = dst
-	a.argptr[2] = unsafe.Pointer(&a.arg_dst)
-	a.arg_initVal = initVal
-	a.argptr[3] = unsafe.Pointer(&a.arg_initVal)
-	a.arg_n = n
-	a.argptr[4] = unsafe.Pointer(&a.arg_n)
+	_a_.arg_x1 = x1
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_x1)
+	_a_.arg_x2 = x2
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_x2)
+	_a_.arg_dst = dst
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_initVal = initVal
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_initVal)
+	_a_.arg_n = n
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

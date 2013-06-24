@@ -26,18 +26,18 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 		regiondecode_code = fatbinLoad(regiondecode_map, "regiondecode")
 	}
 
-	var a regiondecode_args
+	var _a_ regiondecode_args
 
-	a.arg_dst = dst
-	a.argptr[0] = unsafe.Pointer(&a.arg_dst)
-	a.arg_LUT = LUT
-	a.argptr[1] = unsafe.Pointer(&a.arg_LUT)
-	a.arg_regions = regions
-	a.argptr[2] = unsafe.Pointer(&a.arg_regions)
-	a.arg_N = N
-	a.argptr[3] = unsafe.Pointer(&a.arg_N)
+	_a_.arg_dst = dst
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
+	_a_.arg_LUT = LUT
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_LUT)
+	_a_.arg_regions = regions
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.arg_N = N
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

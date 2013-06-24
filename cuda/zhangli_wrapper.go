@@ -38,42 +38,42 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 		addzhanglitorque_code = fatbinLoad(addzhanglitorque_map, "addzhanglitorque")
 	}
 
-	var a addzhanglitorque_args
+	var _a_ addzhanglitorque_args
 
-	a.arg_tx = tx
-	a.argptr[0] = unsafe.Pointer(&a.arg_tx)
-	a.arg_ty = ty
-	a.argptr[1] = unsafe.Pointer(&a.arg_ty)
-	a.arg_tz = tz
-	a.argptr[2] = unsafe.Pointer(&a.arg_tz)
-	a.arg_mx = mx
-	a.argptr[3] = unsafe.Pointer(&a.arg_mx)
-	a.arg_my = my
-	a.argptr[4] = unsafe.Pointer(&a.arg_my)
-	a.arg_mz = mz
-	a.argptr[5] = unsafe.Pointer(&a.arg_mz)
-	a.arg_ux = ux
-	a.argptr[6] = unsafe.Pointer(&a.arg_ux)
-	a.arg_uy = uy
-	a.argptr[7] = unsafe.Pointer(&a.arg_uy)
-	a.arg_uz = uz
-	a.argptr[8] = unsafe.Pointer(&a.arg_uz)
-	a.arg_bsatLUT = bsatLUT
-	a.argptr[9] = unsafe.Pointer(&a.arg_bsatLUT)
-	a.arg_alphaLUT = alphaLUT
-	a.argptr[10] = unsafe.Pointer(&a.arg_alphaLUT)
-	a.arg_xiLUT = xiLUT
-	a.argptr[11] = unsafe.Pointer(&a.arg_xiLUT)
-	a.arg_regions = regions
-	a.argptr[12] = unsafe.Pointer(&a.arg_regions)
-	a.arg_N0 = N0
-	a.argptr[13] = unsafe.Pointer(&a.arg_N0)
-	a.arg_N1 = N1
-	a.argptr[14] = unsafe.Pointer(&a.arg_N1)
-	a.arg_N2 = N2
-	a.argptr[15] = unsafe.Pointer(&a.arg_N2)
+	_a_.arg_tx = tx
+	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_tx)
+	_a_.arg_ty = ty
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_ty)
+	_a_.arg_tz = tz
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_tz)
+	_a_.arg_mx = mx
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
+	_a_.arg_my = my
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
+	_a_.arg_mz = mz
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
+	_a_.arg_ux = ux
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_ux)
+	_a_.arg_uy = uy
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_uy)
+	_a_.arg_uz = uz
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_uz)
+	_a_.arg_bsatLUT = bsatLUT
+	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_bsatLUT)
+	_a_.arg_alphaLUT = alphaLUT
+	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_alphaLUT)
+	_a_.arg_xiLUT = xiLUT
+	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_xiLUT)
+	_a_.arg_regions = regions
+	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.arg_N0 = N0
+	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_N0)
+	_a_.arg_N1 = N1
+	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_N1)
+	_a_.arg_N2 = N2
+	_a_.argptr[15] = unsafe.Pointer(&_a_.arg_N2)
 
-	args := a.argptr[:]
+	args := _a_.argptr[:]
 	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 

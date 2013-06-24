@@ -9,12 +9,12 @@ import (
 // ground state energy is not necessarily zero or comparable
 // to other simulation programs.
 func ExchangeEnergy() float64 {
-	return -0.5 * dot(&M_full, &B_exch)
+	return -0.5 * Volume() * dot(&M_full, &B_exch) / Mu0
 }
 
 // Returns the current demag energy in Joules.
 func DemagEnergy() float64 {
-	return -0.5 * dot(&M_full, &B_demag)
+	return -0.5 * Volume() * dot(&M_full, &B_demag) / Mu0
 }
 
 func dot(a, b GPU_Getter) float64 {
@@ -27,4 +27,9 @@ func dot(a, b GPU_Getter) float64 {
 		defer cuda.RecycleBuffer(B)
 	}
 	return float64(cuda.Dot(A, B))
+}
+
+func Volume() float64 {
+	c := Mesh().CellSize()
+	return c[0] * c[1] * c[2]
 }

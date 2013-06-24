@@ -6,7 +6,6 @@ import (
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
-	"reflect"
 	"unsafe"
 )
 
@@ -98,19 +97,17 @@ func checkRegion(region int) {
 	}
 }
 
-// Get returns the space-dependent parameter as a slice of floats, so it can be output.
-func (p *param) Get() (*data.Slice, bool) {
-	ncomp := p.NComp()
-	s := data.NewSlice(ncomp, p.Mesh())
-	l := s.Host()
-
-	for i, r := range regions.cpu {
-		v := p.getRegion(int(r))
-		for c := range l {
-			l[c][i] = float32(v[util.SwapIndex(c, ncomp)])
-		}
+func (p *param) GetGPU() (*data.Slice, bool) {
+	p.upload()
+	b := cuda.GetBuffer(p.NComp(), p.Mesh())
+	for c := 0; c < p.NComp(); c++ {
+		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(p.gpu[c]), regions.Gpu())
 	}
-	return s, false
+	return b, true
+}
+
+func (p *param) Get() (*data.Slice, bool) {
+	return p.GetGPU()
 }
 
 // Get a GPU mirror of the look-up table.
@@ -130,49 +127,9 @@ func (p *param) upload() {
 			p.gpu[i] = cuda.MemAlloc(MAXREG * cu.SIZEOF_FLOAT32)
 		}
 	}
-	//log.Println("upload LUT", p.name, p.lut)
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.lut[c2][0]), cu.SIZEOF_FLOAT32*MAXREG)
 	}
 	p.ok = true
 }
-
-type ScalarParam struct{ param }
-
-func scalarParam(name, unit string, post func(int)) ScalarParam {
-	return ScalarParam{newParam(1, name, unit, post)}
-}
-func (p *ScalarParam) SetRegion(region int, value float64) {
-	checkRegion(region)
-	p.setRegion(region, value)
-}
-func (p *ScalarParam) SetValue(v interface{}) {
-	p.setUniform(v.(float64))
-}
-func (p *ScalarParam) Eval() interface{}            { return p }
-func (p *ScalarParam) Type() reflect.Type           { return reflect.TypeOf(new(ScalarParam)) }
-func (p *ScalarParam) InputType() reflect.Type      { return reflect.TypeOf(float64(0)) }
-func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.lut[0][region]) }
-func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
-func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
-func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
-func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
-
-type VectorParam struct{ param }
-
-func vectorParam(name, unit string, post func(int)) VectorParam {
-	return VectorParam{newParam(3, name, unit, post)}
-}
-
-func (p *VectorParam) SetRegion(region int, value [3]float64) {
-	checkRegion(region)
-	p.setRegion(region, value[:]...)
-}
-func (p *VectorParam) SetValue(v interface{}) {
-	vec := v.([3]float64)
-	p.setUniform(vec[:]...)
-}
-func (p *VectorParam) Eval() interface{}       { return p }
-func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
-func (p *VectorParam) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }

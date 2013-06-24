@@ -68,6 +68,8 @@ func SaveAs(q Getter, fname string) {
 		goSaveCopy(fname, buffer, Time)
 	} else {
 		h, recycle := q.Get()
+		// if this assertion fails, it means q's Get() returns a GPU slice,
+		// yet, it does not implement GPU_Getter. So, add GetGPU() to that type!
 		util.Assert(recycle == false)
 		data.MustWriteFile(fname, h, Time) // not async, but only for stuff already on CPU. could be improved
 	}

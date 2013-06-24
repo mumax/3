@@ -27,6 +27,7 @@ func init() {
 // Accessible quantities
 var (
 	M      magnetization            // reduced magnetization (unit length)
+	M_full setterQuant              // non-reduced magnetization in T
 	B_eff  setterQuant              // effective field (T) output handle
 	Torque setterQuant              // total torque/γ0, in T
 	Table  = *newTable("datatable") // output handle for tabular data (average magnetization etc.)

@@ -24,7 +24,7 @@ func (q *fftm) Get() (quant *data.Slice, recycle bool) {
 	for i := 0; i < 3; i++ {
 		dst := s.Comp(i)
 		fft := demag_.FFT(M.buffer, i, bsat.Gpu(), regions.Gpu())
-		cuda.Mul(fft, fft, scale) // normalize fft
+		cuda.Saxpb(fft, fft, scale, 0) // normalize fft
 		data.Copy(dst, fft)
 	}
 	return s, false

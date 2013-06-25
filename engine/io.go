@@ -14,6 +14,7 @@ func init() {
 	world.Func("autosave", Autosave)
 }
 
+// TODO: only use getter, check if slice is on GPU?
 type GPU_Getter interface {
 	GetGPU() (q *data.Slice, recycle bool) // get quantity data (GPU), indicate need to recycle
 }
@@ -27,6 +28,10 @@ type Saver interface {
 	autoFname() string // file name for autosave
 	needSave() bool
 	saved()
+}
+
+type Autosaver interface {
+	Autosave(period float64)
 }
 
 // Download a quantity to host,
@@ -73,10 +78,6 @@ func SaveAs(q Getter, fname string) {
 		util.Assert(recycle == false)
 		data.MustWriteFile(fname, h, Time) // not async, but only for stuff already on CPU. could be improved
 	}
-}
-
-type Autosaver interface {
-	Autosave(period float64)
 }
 
 func Autosave(what Autosaver, period float64) {

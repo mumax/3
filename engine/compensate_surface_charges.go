@@ -18,7 +18,11 @@ func init() {
 func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	AddExtField(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), bSat)
+	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), func() float64 { return bSat() })
+}
+
+func constVec(x, y, z float64) func() [3]float64 {
+	return func() [3]float64 { return [3]float64{x, y, z} }
 }
 
 // Returns the saturation magnetization in Tesla.

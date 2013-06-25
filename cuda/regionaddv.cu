@@ -10,9 +10,9 @@ regionaddv(float* __restrict__ dstx, float* __restrict__ dsty, float* __restrict
     if (i < N) {
 
         int8_t r = regions[i];
-        dstx[i] = LUTx[r];
-        dsty[i] = LUTy[r];
-        dstz[i] = LUTz[r];
+        dstx[i] += LUTx[r];
+        dsty[i] += LUTy[r];
+        dstz[i] += LUTz[r];
     }
 }
 

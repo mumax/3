@@ -84,8 +84,8 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<16>;
-	.reg .f32 	%f<4>;
+	.reg .s32 	%r<19>;
+	.reg .f32 	%f<10>;
 	.reg .s64 	%rd<26>;
 
 
@@ -125,18 +125,24 @@ const (
 	add.s64 	%rd19, %rd6, %rd18;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd5, %rd20;
-	ld.global.f32 	%f1, [%rd19];
-	st.global.f32 	[%rd21], %f1;
+	ld.global.f32 	%f1, [%rd21];
+	ld.global.f32 	%f2, [%rd19];
+	add.f32 	%f3, %f1, %f2;
+	st.global.f32 	[%rd21], %f3;
 	.loc 2 14 1
 	add.s64 	%rd22, %rd4, %rd18;
 	add.s64 	%rd23, %rd3, %rd20;
-	ld.global.f32 	%f2, [%rd22];
-	st.global.f32 	[%rd23], %f2;
+	ld.global.f32 	%f4, [%rd23];
+	ld.global.f32 	%f5, [%rd22];
+	add.f32 	%f6, %f4, %f5;
+	st.global.f32 	[%rd23], %f6;
 	.loc 2 15 1
 	add.s64 	%rd24, %rd2, %rd18;
 	add.s64 	%rd25, %rd1, %rd20;
-	ld.global.f32 	%f3, [%rd24];
-	st.global.f32 	[%rd25], %f3;
+	ld.global.f32 	%f7, [%rd25];
+	ld.global.f32 	%f8, [%rd24];
+	add.f32 	%f9, %f7, %f8;
+	st.global.f32 	[%rd25], %f9;
 
 BB0_2:
 	.loc 2 17 2
@@ -163,8 +169,8 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<16>;
-	.reg .f32 	%f<4>;
+	.reg .s32 	%r<19>;
+	.reg .f32 	%f<10>;
 	.reg .s64 	%rd<26>;
 
 
@@ -204,18 +210,24 @@ BB0_2:
 	add.s64 	%rd19, %rd6, %rd18;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd5, %rd20;
-	ld.global.f32 	%f1, [%rd19];
-	st.global.f32 	[%rd21], %f1;
+	ld.global.f32 	%f1, [%rd21];
+	ld.global.f32 	%f2, [%rd19];
+	add.f32 	%f3, %f1, %f2;
+	st.global.f32 	[%rd21], %f3;
 	.loc 2 14 1
 	add.s64 	%rd22, %rd4, %rd18;
 	add.s64 	%rd23, %rd3, %rd20;
-	ld.global.f32 	%f2, [%rd22];
-	st.global.f32 	[%rd23], %f2;
+	ld.global.f32 	%f4, [%rd23];
+	ld.global.f32 	%f5, [%rd22];
+	add.f32 	%f6, %f4, %f5;
+	st.global.f32 	[%rd23], %f6;
 	.loc 2 15 1
 	add.s64 	%rd24, %rd2, %rd18;
 	add.s64 	%rd25, %rd1, %rd20;
-	ld.global.f32 	%f3, [%rd24];
-	st.global.f32 	[%rd25], %f3;
+	ld.global.f32 	%f7, [%rd25];
+	ld.global.f32 	%f8, [%rd24];
+	add.f32 	%f9, %f7, %f8;
+	st.global.f32 	[%rd25], %f9;
 
 BB0_2:
 	.loc 2 17 2
@@ -271,7 +283,7 @@ BB0_2:
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<13>;
-	.reg .f32 	%f<4>;
+	.reg .f32 	%f<10>;
 	.reg .s64 	%rd<26>;
 
 
@@ -312,17 +324,23 @@ BB0_2:
 	ld.global.nc.f32 	%f1, [%rd19];
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd5, %rd20;
-	st.global.f32 	[%rd21], %f1;
+	ld.global.nc.f32 	%f2, [%rd21];
+	add.f32 	%f3, %f2, %f1;
+	st.global.f32 	[%rd21], %f3;
 	.loc 3 14 1
 	add.s64 	%rd22, %rd4, %rd18;
-	ld.global.nc.f32 	%f2, [%rd22];
+	ld.global.nc.f32 	%f4, [%rd22];
 	add.s64 	%rd23, %rd3, %rd20;
-	st.global.f32 	[%rd23], %f2;
+	ld.global.nc.f32 	%f5, [%rd23];
+	add.f32 	%f6, %f5, %f4;
+	st.global.f32 	[%rd23], %f6;
 	.loc 3 15 1
 	add.s64 	%rd24, %rd2, %rd18;
-	ld.global.nc.f32 	%f3, [%rd24];
+	ld.global.nc.f32 	%f7, [%rd24];
 	add.s64 	%rd25, %rd1, %rd20;
-	st.global.f32 	[%rd25], %f3;
+	ld.global.nc.f32 	%f8, [%rd25];
+	add.f32 	%f9, %f8, %f7;
+	st.global.f32 	[%rd25], %f9;
 
 BB2_2:
 	.loc 3 17 2

@@ -73,7 +73,7 @@ func initialize() {
 		B_exch.addTo(dst, cansave)
 		B_dmi.addTo(dst, cansave)
 		B_uni.addTo(dst, cansave)
-		b_ext.addTo(dst, cansave)
+		B_ext.addTo(dst) // TODO: cansave
 	})
 	Quants["B_eff"] = &B_eff
 
@@ -89,9 +89,13 @@ func initialize() {
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {
 		itime++
-		//Table.arm(cansave)      // if table output needed, quantities marked for update
-		notifySave(&M, cansave) // saves m if needed
-		notifySave(&FFTM, cansave)
+
+		if cansave {
+			//Table.arm(cansave)      // if table output needed, quantities marked for update
+			notifySave(&M, cansave) // saves m if needed
+			notifySave(&FFTM, cansave)
+			// TODO: use list
+		}
 
 		Torque.set(torquebuffer, cansave)
 

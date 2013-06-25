@@ -23,6 +23,11 @@ func initBExt() {
 			cuda.Madd2(dst, dst, f.mask, 1, float32(f.mul()))
 		}
 	})
+	registerEnergy(ZeemanEnergy)
+}
+
+func ZeemanEnergy() float64 {
+	return -1 * Volume() * dot(&M_full, &b_ext) / Mu0
 }
 
 // Add an additional space-dependent field to B_ext.

@@ -208,7 +208,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<12>;
+	.reg .s32 	%r<11>;
 	.reg .f32 	%f<2>;
 	.reg .s64 	%rd<14>;
 
@@ -238,9 +238,9 @@ BB0_2:
 	ld.global.s8 	%rd9, [%rd8];
 	shl.b64 	%rd10, %rd9, 2;
 	add.s64 	%rd11, %rd2, %rd10;
+	ld.global.nc.f32 	%f1, [%rd11];
 	mul.wide.s32 	%rd12, %r1, 4;
 	add.s64 	%rd13, %rd1, %rd12;
-	ld.global.f32 	%f1, [%rd11];
 	st.global.f32 	[%rd13], %f1;
 
 BB2_2:

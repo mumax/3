@@ -5,7 +5,7 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
-// multiply: dst[i] = src[i] * factor + cnst
+// dst[i] = src[i] * factor + cnst
 func Saxpb(dst, src *data.Slice, factor, cnst float32) {
 	N := dst.Len()
 	nComp := dst.NComp()

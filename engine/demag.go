@@ -6,14 +6,18 @@ import (
 )
 
 var (
-	Msat        ScalarParam                            // Saturation magnetization in A/m
-	bsat        = scalarParam("Bsat", "T", nil)        // automatically derived from Msat, never zero
-	B_demag     setterQuant                            // demag field in Tesla
-	FFTM        fftm                                   // FFT of m
-	EnableDemag bool                            = true // enable/disable demag field
+	Msat        ScalarParam                     // Saturation magnetization in A/m
+	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
+	B_demag     setterQuant                     // demag field in Tesla
+	FFTM        fftm                            // FFT of m
+	EnableDemag = true                          // enable/disable demag field
+	demag_      *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
 )
 
-var demag_ *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+// Returns the current demag energy in Joules.
+func DemagEnergy() float64 {
+	return -0.5 * Volume() * dot(&M_full, &B_demag) / Mu0
+}
 
 func init() {
 	Msat = scalarParam("Msat", "A/m", func(r int) {
@@ -42,4 +46,5 @@ func initDemag() {
 		}
 	})
 	Quants["B_demag"] = &B_demag
+	registerEnergy(DemagEnergy)
 }

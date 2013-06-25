@@ -13,6 +13,7 @@ func init() {
 	world.Func("setLexchange", SetLExchange)
 	B_exch_ := &B_exch
 	world.ROnly("B_exch", &B_exch_)
+	world.Func("sign", sign)
 }
 
 var (
@@ -26,7 +27,16 @@ func initExchange() {
 		cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 	})
 	Quants["B_exch"] = &B_exch
+	registerEnergy(ExchangeEnergy)
+}
 
+// Returns the current exchange energy in Joules.
+// Note: the energy is defined up to an arbitrary constant,
+// ground state energy is not necessarily zero or comparable
+// to other simulation programs.
+func ExchangeEnergy() float64 {
+	return -0.5 * Volume() * dot(&M_full, &B_exch) / Mu0
+	// note: M_full is in Tesla, hence /Mu0
 }
 
 // Defines the exchange coupling between different regions by specifying the
@@ -38,14 +48,17 @@ func initExchange() {
 // When using regions, there is by default no exchange coupling between different regions.
 // A negative length may be specified to obtain antiferromagnetic coupling.
 func SetLExchange(region1, region2 int, exlen float64) {
-	l2 := signum(exlen) * (exlen * exlen) * 1e18
+	l2 := sign(exlen) * (exlen * exlen) * 1e18
 	lex2.SetInterRegion(region1, region2, l2)
 }
 
-func signum(x float64) float64 {
-	if x < 0 {
-		return -1
-	} else {
+func sign(x float64) float64 {
+	switch {
+	case x > 0:
 		return 1
+	case x < 0:
+		return -1
+	default:
+		return 0
 	}
 }

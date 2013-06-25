@@ -2,19 +2,30 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
+	"log"
+	"path"
+	"reflect"
+	"runtime"
 )
 
-// Returns the current exchange energy in Joules.
-// Note: the energy is defined up to an arbitrary constant,
-// ground state energy is not necessarily zero or comparable
-// to other simulation programs.
-func ExchangeEnergy() float64 {
-	return -0.5 * Volume() * dot(&M_full, &B_exch) / Mu0
+// terms of total energy, all terms should be registered here.
+var energyTerms []func() float64
+
+// add energy term to global energy
+func registerEnergy(term func() float64) {
+	name := path.Ext(runtime.FuncForPC(reflect.ValueOf(term).Pointer()).Name())
+	name = name[1:len(name)]
+	log.Println("total energy includes", name)
+	energyTerms = append(energyTerms, term)
 }
 
-// Returns the current demag energy in Joules.
-func DemagEnergy() float64 {
-	return -0.5 * Volume() * dot(&M_full, &B_demag) / Mu0
+// Returns the total energy in J.
+func TotalEnergy() float64 {
+	E := 0.
+	for _, f := range energyTerms {
+		E += f()
+	}
+	return E
 }
 
 func dot(a, b GPU_Getter) float64 {

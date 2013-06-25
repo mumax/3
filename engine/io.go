@@ -91,3 +91,11 @@ func notifySave(q Saver, goodstep bool) {
 		q.saved()
 	}
 }
+
+func assureGPU(s *data.Slice) *data.Slice {
+	if s.GPUAccess() {
+		return s
+	} else {
+		return cuda.GPUCopy(s)
+	}
+}

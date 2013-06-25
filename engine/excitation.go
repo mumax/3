@@ -23,22 +23,14 @@ type mulmask struct {
 func (e *excitation) init(m *data.Mesh, name, unit string) {
 	e.v = vectorParam(name+"_param", unit, nil)
 	e.autosave = newAutosave(3, name, unit, m)
-	//e.adderQuant = adder(3, m, name, unit, func(dst *data.Slice) {
-	//	if !e.VectorParam.zero {
-	//		cuda.RegionAddV(dst, e.VectorParam.Gpu(), regions.Gpu())
-	//		for _, t := range e.extraTerms {
-	//			cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
-	//		}
-	//	}
-	//})
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
 	if !e.v.zero {
 		cuda.RegionAddV(dst, e.v.Gpu(), regions.Gpu())
-		for _, t := range e.extraTerms {
-			cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
-		}
+	}
+	for _, t := range e.extraTerms {
+		cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
 	}
 }
 
@@ -55,7 +47,7 @@ func (e *excitation) Get() (q *data.Slice, recycle bool) {
 
 // Add an extra maks*multiplier term to the excitation.
 func (e *excitation) Add(mask *data.Slice, mul func() float64) {
-	e.extraTerms = append(e.extraTerms, mulmask{mul, mask})
+	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
 }
 
 func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }

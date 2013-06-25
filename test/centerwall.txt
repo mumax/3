@@ -1,0 +1,25 @@
+// tests centerinplanewall and compensatesurfacecharges
+
+setgridsize(128, 32, 1)
+setcellsize(5e-9, 5e-9, 30e-9)
+
+Msat    = 860e3
+Aex     = 13e-12
+m       = vortexwall(1, -1, 1, 1)
+
+RemoveLRSurfaceCharge(1, -1)
+PostStep(centerInplaneWall)
+
+// break Y symmetry to get fat closure domains if compensate does not work
+B_ext = vector(0, 0.01, 0)
+Alpha = 3 
+Run(1e-9)
+
+expect("my", average(m)[1], 0.0633, 1e-3) // sensitive to closure domains
+
+
+// Make wall move
+B_ext = vector(0.03, 0, 0)
+Run(5e-9)
+expect("mx", average(m)[0], 0, 0.1) // sensitive to not moving window
+

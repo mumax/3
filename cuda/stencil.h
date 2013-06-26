@@ -19,9 +19,5 @@
 // spatial derivative along (u, v, w) direction without dividing by cell size
 #define delta(in, u, v, w) (in[idxclamp(i+u, j+v, k+w)] - in[idxclamp(i-u, j-v, k-w)])
 
-// Maximum threads per block for stencil op
-#define STENCIL_BLOCKSIZE_X 16
-#define STENCIL_MAXTHREADS (STENCIL_BLOCKSIZE_X * STENCIL_BLOCKSIZE_X)
-
 #endif
 

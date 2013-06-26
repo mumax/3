@@ -5,11 +5,6 @@ import (
 	"unsafe"
 )
 
-//#include "stencil.h"
-import "C"
-
-const STENCIL_BLOCKSIZE = C.STENCIL_BLOCKSIZE_X
-
 // Add exchange field to Beff.
 // 	m: normalized magnetization
 // 	B: effective field in Tesla

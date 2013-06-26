@@ -11,7 +11,7 @@ func AddZhangLiTorque(torque, m *data.Slice, j [3]float64, bsat, alpha, xi LUTPt
 
 	c := torque.Mesh().CellSize()
 	N := torque.Mesh().Size()
-	cfg := make2DConfSize(N[2], N[1], STENCIL_BLOCKSIZE)
+	cfg := make3DConf(N)
 
 	ux := float32(j[0] / (mag.Gamma0 * 2 * c[0]))
 	uy := float32(j[1] / (mag.Gamma0 * 2 * c[1]))

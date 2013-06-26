@@ -3,11 +3,9 @@ package engine
 // support for interpreted input scripts
 
 import (
-	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/script"
 	"log"
 	"math"
-	"reflect"
 )
 
 var world = script.NewWorld()
@@ -35,12 +33,6 @@ func Compile(src string) (script.Expr, error) {
 	defer world.ExitScope()
 	return world.Compile(src)
 }
-
-func (b *bufferedQuant) SetValue(v interface{}) { b.Set(v.(*data.Slice)) }
-func (b *bufferedQuant) Eval() interface{}      { return b }
-
-//func (b *bufferedQuant) Type() reflect.Type      { return reflect.TypeOf(new(bufferedQuant)) }
-func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }
 
 func Vector(x, y, z float64) [3]float64 {
 	return [3]float64{x, y, z}

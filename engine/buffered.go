@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"reflect"
 )
 
 // A buffered quantity is stored in GPU memory at all times.
@@ -78,14 +79,9 @@ func (b *bufferedQuant) GetVec() []float64 {
 func (m *bufferedQuant) alloc() {
 	if m.buffer.IsNil() {
 		m.buffer = cuda.NewSlice(m.NComp(), m.mesh) // could alloc only needed components...
-		cuda.Memset(m.buffer, ones(m.NComp())...)   // default value for mask.
 	}
 }
 
-func ones(howmany int) []float32 {
-	ones := make([]float32, howmany)
-	for i := range ones {
-		ones[i] = 1
-	}
-	return ones
-}
+func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
+func (b *bufferedQuant) Eval() interface{}       { return b }
+func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }

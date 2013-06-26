@@ -9,30 +9,32 @@ var (
 	AnisU   = vectorParam("anisU", "", nil)    // Uniaxial anisotropy axis
 	ku1_red = scalarParam("ku1_red", "T", nil) // Ku1 / Msat (T), auto updated from Ku1 (TODO: form msat)
 	Ku1     ScalarParam                        // Uniaxial anisotropy strength (J/m³)
-	B_uni   adderQuant                         // field due to uniaxial anisotropy output handle
+	B_anis  adderQuant                         // field due to uniaxial anisotropy output handle
+	E_anis  = newGetScalar("E_anis", "J", GetAnisotropyEnergy)
 )
 
 func init() {
 	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
 		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
 	})
-	world.ROnly("B_uni", &B_uni)
-	world.LValue("Ku1", &Ku1)
 	world.LValue("AnisU", &AnisU)
+	world.LValue("Ku1", &Ku1)
+	world.ROnly("B_anis", &B_anis)
+	world.ROnly("E_anis", &E_anis)
 }
 
 func initAnisotropy() {
-	B_uni = adder(3, Mesh(), "B_uni", "T", func(dst *data.Slice) {
+	B_anis = adder(3, Mesh(), "B_anis", "T", func(dst *data.Slice) {
 		if !ku1_red.zero {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
 		}
 	})
-	registerEnergy(AnisotropyEnergy)
-	Quants["B_uni"] = &B_uni
+	registerEnergy(GetAnisotropyEnergy)
+	Quants["B_anis"] = &B_anis
 	Quants["Ku1"] = &Ku1
 	Quants["anisU"] = &AnisU
 }
 
-func AnisotropyEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_uni) / Mu0
+func GetAnisotropyEnergy() float64 {
+	return -0.5 * cellVolume() * dot(&M_full, &B_anis) / Mu0
 }

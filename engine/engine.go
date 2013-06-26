@@ -69,7 +69,7 @@ func initialize() {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
 		B_dmi.addTo(dst, cansave)
-		B_uni.addTo(dst, cansave)
+		B_anis.addTo(dst, cansave)
 		B_ext.addTo(dst) // TODO: cansave
 	})
 	Quants["B_eff"] = &B_eff

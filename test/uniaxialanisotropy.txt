@@ -20,7 +20,7 @@
 	// Test output
 	save(Ku1)
 	save(AnisU)
-	save(B_uni)
+	save(B_anis)
 	
  	// Easy, in-plane
 	AnisU = vector(1, 0, 0)

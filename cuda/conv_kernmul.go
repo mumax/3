@@ -35,7 +35,7 @@ func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slic
 	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
 	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 
-	cfg := make2DConf(N1, N2)
+	cfg := make3DConf([3]int{N0, N1, N2})
 
 	k_kernmulRSymm3D_async(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
 		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),

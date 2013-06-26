@@ -14,6 +14,7 @@ table.add(energy)
 table.add(e_zeeman)
 table.add(e_demag)
 table.add(e_exch)
+table.add(e_ani)
 
 table.add(maxtorque)
 

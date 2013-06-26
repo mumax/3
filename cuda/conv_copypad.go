@@ -27,8 +27,8 @@ func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr, regi
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 
-	N0 := iMin(dstsize[1], srcsize[1])
-	N1 := iMin(dstsize[2], srcsize[2])
+	N0 := srcsize[1]
+	N1 := srcsize[2]
 	cfg := make2DConf(N0, N1)
 
 	k_copypadmul_async(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],

@@ -20,20 +20,20 @@ func (w *World) CompileExpr(src string) (code Expr, e error) {
 	}
 
 	// catch compile errors
-	//	if !Debug {
-	//		defer func() {
-	//			err := recover()
-	//			if err == nil {
-	//				return
-	//			}
-	//			if er, ok := err.(*compileErr); ok {
-	//				code = nil
-	//				e = fmt.Errorf(`parse "%s": %v`, src, er)
-	//			} else {
-	//				panic(err)
-	//			}
-	//		}()
-	//	}
+	if !Debug {
+		defer func() {
+			err := recover()
+			if err == nil {
+				return
+			}
+			if er, ok := err.(*compileErr); ok {
+				code = nil
+				e = fmt.Errorf(`parse "%s": %v`, src, er)
+			} else {
+				panic(err)
+			}
+		}()
+	}
 	return w.compile(tree), nil
 }
 

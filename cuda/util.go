@@ -63,7 +63,7 @@ func make3DConfSize(N [3]int, BLOCK2D int) *config {
 }
 
 func make3DConf(N [3]int) *config {
-	const BLOCK = 16 // TODO
+	const BLOCK = 32 // TODO
 	return make3DConfSize(N, BLOCK)
 }
 

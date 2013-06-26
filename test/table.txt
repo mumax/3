@@ -1,20 +1,27 @@
-setgridsize(64, 32, 2)
+// Make sure all table quantities are recognized
 
+setgridsize(64, 32, 2)
 c := 4e-9
 setcellsize(c, c, c)
 
 msat  = 800e3
 aex   = 13e-12
-alpha = .1
+alpha = 1
 m = vortex(1, 1)
-
 b_ext = vector(.01, 0, 0)
+
 table.add(energy)
 table.add(e_zeeman)
 table.add(e_demag)
 table.add(e_exch)
-table.add(maxtorque)
-table.autosave(5e-12)
 
-run(1e-9)
+table.add(maxtorque)
+
+table.add(b_ext)
+table.add(msat)
+table.add(aex)
+table.add(alpha)
+
+table.autosave(.0001e-12)
+steps(10)
 

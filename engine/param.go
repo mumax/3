@@ -87,6 +87,8 @@ func (p *param) getUniform() []float64 {
 	return v
 }
 
+func (p *param) GetVec() []float64 { return p.getUniform() }
+
 // check if region is OK for use.
 func checkRegion(region int) {
 	if region == 0 {

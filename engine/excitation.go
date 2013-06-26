@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"log"
 	"reflect"
 )
 
@@ -48,6 +49,13 @@ func (e *excitation) Get() (q *data.Slice, recycle bool) {
 // Add an extra maks*multiplier term to the excitation.
 func (e *excitation) Add(mask *data.Slice, mul func() float64) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
+}
+
+func (e *excitation) GetVec() []float64 {
+	if len(e.extraTerms) != 0 {
+		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
+	}
+	return e.v.GetVec()
 }
 
 func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }

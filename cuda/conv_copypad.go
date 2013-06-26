@@ -13,9 +13,7 @@ func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Argument(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 
-	N0 := dstsize[1]
-	N1 := dstsize[2]
-	cfg := make2DConf(N0, N1)
+	cfg := make3DConf(dstsize[0], dstsize[1], dstsize[2])
 
 	k_copyunpad_async(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
 		src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2], cfg, str)

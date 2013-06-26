@@ -35,6 +35,7 @@ func make1DConf(N int) *config {
 
 // Make a 2D kernel launch configuration suited for N1 x N2 threads.
 // TODO: swap N1/N2?
+// TODO: rm!
 func make2DConfSize(N1, N2, BLOCK int) *config {
 	bl := cu.Dim3{BLOCK, BLOCK, 1}
 
@@ -48,6 +49,22 @@ func make2DConfSize(N1, N2, BLOCK int) *config {
 func make2DConf(N1, N2 int) *config {
 	const BLOCK = 32 // TODO
 	return make2DConfSize(N1, N2, BLOCK)
+}
+
+func make3DConfSize(N0, N1, N2, BLOCK2D int) *config {
+	bl := cu.Dim3{BLOCK2D, BLOCK2D, 1}
+
+	NX := N0
+	NY := divUp(N1, BLOCK2D)
+	NZ := divUp(N2, BLOCK2D)
+	gr := cu.Dim3{NZ, NY, NX}
+
+	return &config{gr, bl}
+}
+
+func make3DConf(N0, N1, N2 int) *config {
+	const BLOCK = 16 // TODO
+	return make3DConfSize(N0, N1, N2, BLOCK)
 }
 
 // cuda launch configuration

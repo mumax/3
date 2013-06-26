@@ -13,7 +13,7 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str c
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
-	cfg := make2DConf(N1, N2)
+	cfg := make3DConf([3]int{1, N1, N2})
 
 	k_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
@@ -24,7 +24,7 @@ func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int, str cu.Stream) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
 	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
 
-	cfg := make2DConf(N1, N2)
+	cfg := make3DConf([3]int{1, N1, N2})
 
 	k_kernmulRSymm2Dx_async(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, cfg, str)
 }

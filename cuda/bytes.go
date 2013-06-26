@@ -7,12 +7,13 @@ import (
 	"unsafe"
 )
 
-// 3D byte slice, used for region lookup
+// 3D byte slice, used for region lookup.
 type Bytes struct {
 	Ptr unsafe.Pointer
 	Len int
 }
 
+// Construct new 3D byte slice for given mesh.
 func NewBytes(m *data.Mesh) *Bytes {
 	Len := int64(m.NCell())
 	ptr := cu.MemAlloc(Len)
@@ -20,13 +21,15 @@ func NewBytes(m *data.Mesh) *Bytes {
 	return &Bytes{unsafe.Pointer(ptr), int(Len)}
 }
 
+// Upload src (host) to dst (gpu)
 func (dst *Bytes) Upload(src []byte) {
 	util.Argument(int(dst.Len) == len(src))
 	cu.MemcpyHtoD(cu.DevicePtr(dst.Ptr), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
-func (dst *Bytes) Free() {
-	cu.MemFree(cu.DevicePtr(dst.Ptr))
-	dst.Ptr = nil
-	dst.Len = 0
+// Frees the GPU memory and disables the slice.
+func (b *Bytes) Free() {
+	cu.MemFree(cu.DevicePtr(b.Ptr))
+	b.Ptr = nil
+	b.Len = 0
 }

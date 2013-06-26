@@ -21,6 +21,7 @@ func MemAlloc(bytes int64) unsafe.Pointer {
 	return unsafe.Pointer(cu.MemAlloc(bytes))
 }
 
+// make slice of given size, but with dummy mesh.
 func makeFloats(size [3]int) *data.Slice {
 	m := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
 	return NewSlice(1, m)

@@ -13,6 +13,7 @@ func fftR2COutputSizeFloats(logicSize [3]int) [3]int {
 	return [3]int{logicSize[0], logicSize[1], 2 * (logicSize[2]/2 + 1)}
 }
 
+// product of elements
 func prod(size [3]int) int {
 	return size[0] * size[1] * size[2]
 }
@@ -50,6 +51,7 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 // Maximum tolerable imaginary/real part for demag kernel in Fourier space. Assures kernel has correct symmetry.
 const FFT_IMAG_TOLERANCE = 1e-5
 
+// float32 absolute value
 func fabs(x float32) float32 {
 	if x < 0 {
 		return -x

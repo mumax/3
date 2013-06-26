@@ -7,8 +7,7 @@ import (
 
 func init() {
 	world.LValue("dmi", &DMI)
-	B_dmi_addr := &B_dmi
-	world.ROnly("B_dmi", &B_dmi_addr)
+	world.ROnly("B_dmi", &B_dmi)
 	DMI = scalarParam("dmi", "J/m2", func(r int) {
 		dmi_red.setRegion(r, safediv(DMI.GetRegion(r), Msat.GetRegion(r)))
 	})

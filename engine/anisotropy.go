@@ -16,8 +16,7 @@ func init() {
 	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
 		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
 	})
-	B_uni_addr := &B_uni
-	world.ROnly("B_uni", &B_uni_addr)
+	world.ROnly("B_uni", &B_uni)
 	world.LValue("Ku1", &Ku1)
 	world.LValue("AnisU", &AnisU)
 }

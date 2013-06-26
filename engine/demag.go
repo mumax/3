@@ -30,13 +30,10 @@ func init() {
 	})
 
 	world.Var("EnableDemag", &EnableDemag)
-	fftm_ := &FFTM
-	world.ROnly("mFFT", &fftm_)
-	B_demag_ := &B_demag
-	world.ROnly("B_demag", &B_demag_)
+	world.ROnly("mFFT", &FFTM)
+	world.ROnly("B_demag", &B_demag)
 	world.LValue("Msat", &Msat)
-	e_ := &E_demag
-	world.ROnly("E_demag", &e_)
+	world.ROnly("E_demag", &E_demag)
 }
 
 func initDemag() {

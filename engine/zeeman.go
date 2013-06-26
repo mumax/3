@@ -7,8 +7,7 @@ var (
 
 func init() {
 	world.LValue("B_ext", &B_ext)
-	e_ := &E_Zeeman
-	world.ROnly("E_Zeeman", &e_)
+	world.ROnly("E_Zeeman", &E_Zeeman)
 }
 
 func initBExt() {

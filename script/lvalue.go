@@ -30,7 +30,7 @@ type reflectROnly struct {
 }
 
 func newReflectROnly(addr interface{}) *reflectROnly {
-	elem := reflect.ValueOf(addr).Elem()
+	elem := reflect.ValueOf(addr)
 	if elem.Kind() == 0 {
 		panic("variable/constant needs to be passed as pointer to addressable value")
 	}
@@ -50,7 +50,11 @@ func (l *reflectROnly) Type() reflect.Type {
 // 	var x float64
 // 	newReflectLValue(&x)
 func newReflectLvalue(addr interface{}) LValue {
-	return &reflectLvalue{*newReflectROnly(addr)}
+	elem := reflect.ValueOf(addr).Elem()
+	if elem.Kind() == 0 {
+		panic("variable/constant needs to be passed as pointer to addressable value")
+	}
+	return &reflectLvalue{reflectROnly{elem}}
 }
 
 type reflectLvalue struct {

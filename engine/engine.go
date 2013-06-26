@@ -17,12 +17,9 @@ func init() {
 	world.Func("setgridsize", setGridSize)
 	world.Func("setcellsize", setCellSize)
 	world.LValue("m", &M)
-	torque_ := &Torque
-	world.ROnly("torque", &torque_)
-	B_eff_ := &B_eff
-	world.ROnly("B_eff", &B_eff_)
-	table_ := &Table
-	world.ROnly("table", &table_)
+	world.ROnly("torque", &Torque)
+	world.ROnly("B_eff", &B_eff)
+	world.ROnly("table", &Table)
 }
 
 // Accessible quantities

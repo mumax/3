@@ -15,16 +15,14 @@ var (
 )
 
 func init() {
-	world.LValue("Aex", &Aex)
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
+	world.LValue("Aex", &Aex)
 	world.Func("setLexchange", SetLExchange)
-	B_exch_ := &B_exch
-	world.ROnly("B_exch", &B_exch_)
+	world.ROnly("B_exch", &B_exch)
+	world.ROnly("E_exch", &E_exch)
 	world.Func("sign", sign)
-	e_ := &E_exch
-	world.ROnly("E_exch", &e_)
 }
 
 func initExchange() {

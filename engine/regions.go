@@ -10,8 +10,7 @@ import (
 func init() {
 	world.Func("SetGeom", SetGeometry)
 	world.Func("DefRegion", DefRegion)
-	regions_addr := &regions
-	world.ROnly("regions", &regions_addr)
+	world.ROnly("regions", &regions)
 }
 
 var (

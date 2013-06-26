@@ -7,11 +7,9 @@ import (
 
 func init() {
 	world.LValue("alpha", &Alpha)
-	lltorque_ := &LLTorque
-	world.ROnly("LLtorque", &lltorque_)
-	sttorque_ := &STTorque
-	world.ROnly("STTorque", &sttorque_)
-	world.Var("spinpol", &SpinPol)
+	world.ROnly("LLtorque", &LLTorque)
+	world.ROnly("STTorque", &STTorque)
+	world.Var("spinpol", &SpinPol) // todo: suck-up in Jpol
 	world.LValue("xi", &Xi)
 	world.Var("j", &J)
 }
@@ -26,7 +24,6 @@ var (
 )
 
 func initLLTorque() {
-
 	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
 		B_eff.set(b, cansave)
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
@@ -46,5 +43,4 @@ func initSTTorque() {
 		}
 	})
 	Quants["sttorque"] = &STTorque
-
 }

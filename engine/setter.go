@@ -7,15 +7,13 @@ import (
 
 // quantity that is not stored, but can output to (set) a buffer
 type setterQuant struct {
-	nComp int
-	mesh  *data.Mesh
 	autosave
 	setFn func(dst *data.Slice, good bool) // calculates quantity and stores in dst
 }
 
 // constructor
 func setter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice, good bool)) setterQuant {
-	return setterQuant{nComp, m, autosave{name: name}, setFunc}
+	return setterQuant{newAutosave(nComp, name, unit, m), setFunc}
 }
 
 // calculate quantity, save in dst, notify output may be needed

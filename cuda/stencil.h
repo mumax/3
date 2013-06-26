@@ -11,7 +11,7 @@
 #define hclamp(i, N) min((i), (N)-1)
 
 // 3D array indexing
-#define idx(i,j,k) ((i)*N1*N2 + (j)*N2 + (k))
+#define idx(i,j,k) (N2*((i)*N1 + (j)) + (k))
 
 // clamp index to bounds (0:N0, 0:N1, 0:N2)
 #define idxclamp(i, j, k) idx(clamp(i, N0), clamp(j, N1), clamp(k, N2))

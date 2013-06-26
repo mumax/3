@@ -2,25 +2,17 @@ package cuda
 
 import "github.com/barnex/cuda5/cu"
 
-// integer minimum
-func iMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// Integer division rounded up.
-func divUp(x, y int) int {
-	return ((x - 1) / y) + 1
-}
-
 // CUDA Launch parameters. TODO: optimize
 const (
 	MaxBlockSize = 512
 	BLOCK        = 32 // 2D tile size
 	MaxGridSize  = 65535
 )
+
+// cuda launch configuration
+type config struct {
+	Grid, Block cu.Dim3
+}
 
 // Make a 1D kernel launch configuration suited for N threads.
 func make1DConf(N int) *config {
@@ -50,7 +42,15 @@ func make3DConf(N [3]int) *config {
 	return make3DConfSize(N, BLOCK)
 }
 
-// cuda launch configuration
-type config struct {
-	Grid, Block cu.Dim3
+// integer minimum
+func iMin(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// Integer division rounded up.
+func divUp(x, y int) int {
+	return ((x - 1) / y) + 1
 }

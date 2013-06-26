@@ -44,18 +44,22 @@ func (t *DataTable) Add(output getVec) {
 
 func (t *DataTable) touch(good bool) {
 	if good && t.needSave() {
-		t.init()
-		fmt.Fprint(t, Time)
-		for _, o := range t.outputs {
-			vec := o.GetVec()
-			for _, v := range vec {
-				fmt.Fprint(t, "\t", v)
-			}
-		}
-		fmt.Fprintln(t)
-		t.Flush()
+		t.Save()
 		t.saved()
 	}
+}
+
+func (t *DataTable) Save() {
+	t.init()
+	fmt.Fprint(t, Time)
+	for _, o := range t.outputs {
+		vec := o.GetVec()
+		for _, v := range vec {
+			fmt.Fprint(t, "\t", v)
+		}
+	}
+	fmt.Fprintln(t)
+	t.Flush()
 }
 
 func newTable(name string) *DataTable {

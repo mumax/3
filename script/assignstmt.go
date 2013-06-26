@@ -21,6 +21,10 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 		return w.compileAssign(a, lhs, r)
 	case token.DEFINE: // :=
 		return w.compileDefine(a, lhs, r)
+	case token.ADD_ASSIGN: // +=
+		return w.compileAddAssign(a, lhs, r)
+	case token.SUB_ASSIGN: // -=
+		return w.compileSubAssign(a, lhs, r)
 	}
 
 }
@@ -52,4 +56,20 @@ type assignStmt struct {
 func (a *assignStmt) Eval() interface{} {
 	a.lhs.SetValue(a.rhs.Eval())
 	return nil
+}
+
+func (w *World) compileAddAssign(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
+	l := w.compileLvalue(lhs)
+	x := typeConv(a.Pos(), l, float64_t)
+	y := typeConv(a.Pos(), r, float64_t)
+	sum := &add{binaryExpr{x, y}}
+	return &assignStmt{lhs: l, rhs: typeConv(a.Pos(), sum, inputType(l))}
+}
+
+func (w *World) compileSubAssign(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
+	l := w.compileLvalue(lhs)
+	x := typeConv(a.Pos(), l, float64_t)
+	y := typeConv(a.Pos(), r, float64_t)
+	sub := &sub{binaryExpr{x, y}}
+	return &assignStmt{lhs: l, rhs: typeConv(a.Pos(), sub, inputType(l))}
 }

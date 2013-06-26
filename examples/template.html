@@ -85,8 +85,13 @@ DMI = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
 
 m = vortex(1, 1)      // Initial magnetization
 
-/* Tabular output */
-table.autosave(10e-12)// default columns: t, m
+/* Tabular output 
+   Default columns: t, m. More can be added */
+table.add(Energy)
+table.add(E_Zeeman)
+table.add(E_exch)
+table.add(E_demag)
+table.autosave(10e-12)
 
 /* Space-dependent output */
 
@@ -104,7 +109,7 @@ save(LLTorque) // Landau-Lifshitz torque/γ0
 save(STTorque) // Spin-transfer torque/γ0
 
 // The input parameters (Msat, Aex, ...) can be saved as well,
-// but that's only useful when they are defined space-dependent.
+// but that's only useful when they are defined space- or time-dependent.
 
 `}}{{.Output}}
 

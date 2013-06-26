@@ -96,3 +96,23 @@ func (t *DataTable) flush() {
 		t.Flush()
 	}
 }
+
+// simple implementation of getVec
+type getfunc struct {
+	info
+	get func() []float64
+}
+
+func newGetfunc(nComp int, name, unit string, get func() []float64) getfunc {
+	return getfunc{info{nComp, name, unit}, get}
+}
+
+func newGetScalar(name, unit string, get func() float64) getfunc {
+	return newGetfunc(1, name, unit, func() []float64 {
+		return []float64{get()}
+	})
+}
+
+func (g *getfunc) GetVec() []float64 {
+	return g.get()
+}

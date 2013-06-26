@@ -8,7 +8,11 @@ aex   = 13e-12
 alpha = .1
 m = vortex(1, 1)
 
+b_ext = vector(.01, 0, 0)
 table.add(energy)
+table.add(e_zeeman)
+table.add(e_demag)
+table.add(e_exch)
 table.autosave(5e-12)
 
 run(1e-9)

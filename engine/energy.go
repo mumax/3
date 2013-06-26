@@ -10,13 +10,11 @@ import (
 
 var (
 	energyTerms []func() float64 // registers total energy terms
-	TotalEnergy = newGetfunc(1, "Energy", "J", func() []float64 {
-		return []float64{GetTotalEnergy()}
-	})
+	E_total     = newGetScalar("Energy", "J", GetTotalEnergy)
 )
 
 func init() {
-	e_ := &TotalEnergy
+	e_ := &E_total
 	world.ROnly("Energy", &e_)
 }
 
@@ -54,17 +52,4 @@ func dot(a, b GPU_Getter) float64 {
 func cellVolume() float64 {
 	c := Mesh().CellSize()
 	return c[0] * c[1] * c[2]
-}
-
-type getfunc struct {
-	info
-	get func() []float64
-}
-
-func newGetfunc(nComp int, name, unit string, get func() []float64) getfunc {
-	return getfunc{info{nComp, name, unit}, get}
-}
-
-func (g *getfunc) GetVec() []float64 {
-	return g.get()
 }

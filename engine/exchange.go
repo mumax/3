@@ -5,6 +5,15 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
+// TODO: have newBlaBla() add the quantity to world when it starts with uppercase
+
+var (
+	Aex    ScalarParam // inter-cell exchange stiffness in J/m
+	lex2   symmparam   // inter-cell exchange length squared * 1e18
+	B_exch adderQuant  // exchange field (T) output handle
+	E_exch = newGetScalar("E_exch", "J", GetExchangeEnergy)
+)
+
 func init() {
 	world.LValue("Aex", &Aex)
 	Aex = scalarParam("Aex", "J/m", func(r int) {
@@ -14,27 +23,23 @@ func init() {
 	B_exch_ := &B_exch
 	world.ROnly("B_exch", &B_exch_)
 	world.Func("sign", sign)
+	e_ := &E_exch
+	world.ROnly("E_exch", &e_)
 }
-
-var (
-	Aex    ScalarParam // inter-cell exchange stiffness in J/m
-	lex2   symmparam   // inter-cell exchange length squared * 1e18
-	B_exch adderQuant  // exchange field (T) output handle
-)
 
 func initExchange() {
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
 		cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 	})
 	Quants["B_exch"] = &B_exch
-	registerEnergy(ExchangeEnergy)
+	registerEnergy(GetExchangeEnergy)
 }
 
 // Returns the current exchange energy in Joules.
 // Note: the energy is defined up to an arbitrary constant,
 // ground state energy is not necessarily zero or comparable
 // to other simulation programs.
-func ExchangeEnergy() float64 {
+func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch) / Mu0
 	// note: M_full is in Tesla, hence /Mu0
 }

@@ -12,10 +12,11 @@ var (
 	FFTM        fftm                            // FFT of m
 	EnableDemag = true                          // enable/disable demag field
 	demag_      *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
+	E_demag     = newGetScalar("E_demag", "J", GetDemagEnergy)
 )
 
 // Returns the current demag energy in Joules.
-func DemagEnergy() float64 {
+func GetDemagEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_demag) / Mu0
 }
 
@@ -34,6 +35,8 @@ func init() {
 	B_demag_ := &B_demag
 	world.ROnly("B_demag", &B_demag_)
 	world.LValue("Msat", &Msat)
+	e_ := &E_demag
+	world.ROnly("E_demag", &e_)
 }
 
 func initDemag() {
@@ -46,5 +49,5 @@ func initDemag() {
 		}
 	})
 	Quants["B_demag"] = &B_demag
-	registerEnergy(DemagEnergy)
+	registerEnergy(GetDemagEnergy)
 }

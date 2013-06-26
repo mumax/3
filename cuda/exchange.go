@@ -21,7 +21,7 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes) {
 	w1 := float32(1e-18 / (c[1] * c[1]))
 	w2 := float32(1e-18 / (c[2] * c[2]))
 	N := mesh.Size()
-	cfg := make2DConfSize(N[1], N[2], STENCIL_BLOCKSIZE)
+	cfg := make3DConf(N)
 	k_addexchange(B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
 		unsafe.Pointer(Aex_red), regions.Ptr,

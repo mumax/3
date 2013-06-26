@@ -13,8 +13,8 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
             float* aLUT2d, int8_t* regions,
             float wx, float wy, float wz, int N0, int N1, int N2) {
 
-    int j = blockIdx.x * blockDim.x + threadIdx.x;
-    int k = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (j >= N1 || k >= N2) {
         return;

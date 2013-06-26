@@ -129,14 +129,14 @@ const (
 	ld.param.u32 	%r57, [addexchange_param_12];
 	ld.param.u32 	%r58, [addexchange_param_13];
 	.loc 2 16 1
-	mov.u32 	%r1, %ntid.x;
-	mov.u32 	%r2, %ctaid.x;
-	mov.u32 	%r3, %tid.x;
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
 	mad.lo.s32 	%r4, %r1, %r2, %r3;
 	.loc 2 17 1
-	mov.u32 	%r5, %ntid.y;
-	mov.u32 	%r6, %ctaid.y;
-	mov.u32 	%r7, %tid.y;
+	mov.u32 	%r5, %ntid.x;
+	mov.u32 	%r6, %ctaid.x;
+	mov.u32 	%r7, %tid.x;
 	mad.lo.s32 	%r8, %r5, %r6, %r7;
 	.loc 2 19 1
 	setp.lt.s32 	%p1, %r8, %r58;
@@ -614,14 +614,14 @@ BB0_23:
 	ld.param.u32 	%r58, [addexchange_param_12];
 	ld.param.u32 	%r59, [addexchange_param_13];
 	.loc 2 16 1
-	mov.u32 	%r1, %ntid.x;
-	mov.u32 	%r2, %ctaid.x;
-	mov.u32 	%r3, %tid.x;
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
 	mad.lo.s32 	%r4, %r1, %r2, %r3;
 	.loc 2 17 1
-	mov.u32 	%r5, %ntid.y;
-	mov.u32 	%r6, %ctaid.y;
-	mov.u32 	%r7, %tid.y;
+	mov.u32 	%r5, %ntid.x;
+	mov.u32 	%r6, %ctaid.x;
+	mov.u32 	%r7, %tid.x;
 	mad.lo.s32 	%r8, %r5, %r6, %r7;
 	.loc 2 19 1
 	setp.lt.s32 	%p1, %r8, %r59;
@@ -1128,14 +1128,14 @@ BB0_23:
 	ld.param.u32 	%r58, [addexchange_param_12];
 	ld.param.u32 	%r59, [addexchange_param_13];
 	.loc 3 16 1
-	mov.u32 	%r1, %ntid.x;
-	mov.u32 	%r2, %ctaid.x;
-	mov.u32 	%r3, %tid.x;
+	mov.u32 	%r1, %ntid.y;
+	mov.u32 	%r2, %ctaid.y;
+	mov.u32 	%r3, %tid.y;
 	mad.lo.s32 	%r4, %r1, %r2, %r3;
 	.loc 3 17 1
-	mov.u32 	%r5, %ntid.y;
-	mov.u32 	%r6, %ctaid.y;
-	mov.u32 	%r7, %tid.y;
+	mov.u32 	%r5, %ntid.x;
+	mov.u32 	%r6, %ctaid.x;
+	mov.u32 	%r7, %tid.x;
 	mad.lo.s32 	%r8, %r5, %r6, %r7;
 	.loc 3 19 1
 	setp.lt.s32 	%p1, %r8, %r59;

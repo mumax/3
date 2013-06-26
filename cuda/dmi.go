@@ -17,7 +17,7 @@ func AddDMI(Beff *data.Slice, m *data.Slice, D_red LUTPtr, regions *Bytes) {
 
 	N := mesh.Size()
 	c := mesh.CellSize()
-	cfg := make2DConf(N[2], N[1])
+	cfg := make3DConf(N)
 
 	k_adddmi(Beff.DevPtr(0), Beff.DevPtr(1), Beff.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),

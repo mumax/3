@@ -11,28 +11,28 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float cx, float cy, float cz,
        float* __restrict__ DLUT, int8_t* __restrict__ regions, int N0, int N1, int N2) {
 
-    int j = blockIdx.x * blockDim.x + threadIdx.x;
-    int k = blockIdx.y * blockDim.y + threadIdx.y;
+    int i = blockIdx.z * blockDim.z + threadIdx.z;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (j >= N1 || k >= N2) {
+    if (i >= N0 || j >= N1 || k >= N2) {
         return;
     }
 
-    for(int i=0; i<N0; i++) {
-        int I = idx(i, j, k);
-        float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
-        float D = DLUT[regions[I]];
+    int I = idx(i, j, k);
+    float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
+    float D = DLUT[regions[I]];
 
-        h.x += D * delta(mz, 0, 0, 1) / cz;
-        h.x += D * delta(my, 0, 1, 0) / cy;
-        h.y -= D * delta(mx, 0, 1, 0) / cy;
-        h.z -= D * delta(mx, 0, 0, 1) / cz;
-        // note: actually 2*D * delta / (2*c)
+    // TODO: proper boundary conditions
+    h.x += D * delta(mz, 0, 0, 1) / cz;
+    h.x += D * delta(my, 0, 1, 0) / cy;
+    h.y -= D * delta(mx, 0, 1, 0) / cy;
+    h.z -= D * delta(mx, 0, 0, 1) / cz;
+    // note: actually 2*D * delta / (2*c)
 
-        // write back, result is H + Hdmi
-        Hx[I] = h.x;
-        Hy[I] = h.y;
-        Hz[I] = h.z;
-    }
+    // write back, result is H + Hdmi
+    Hx[I] = h.x;
+    Hy[I] = h.y;
+    Hz[I] = h.z;
 }
 

@@ -8,17 +8,16 @@ import (
 
 // keeps info needed to decide when a quantity needs to be periodically saved
 type autosave struct {
-	period     float64    // How often to save
-	start      float64    // Starting point
-	count      int        // Number of times it has been autosaved
-	autonum    int        // File number for output, may be > count when saved manually
-	name, unit string     // metadata for dump file
-	nComp      int        // number of components (scalar, vector, ...)
-	mesh       *data.Mesh // nil means use global mesh
+	period  float64    // How often to save
+	start   float64    // Starting point
+	count   int        // Number of times it has been autosaved
+	autonum int        // File number for output, may be > count when saved manually
+	mesh    *data.Mesh // nil means use global mesh
+	info
 }
 
 func newAutosave(nComp int, name, unit string, m *data.Mesh) autosave {
-	return autosave{nComp: nComp, name: name, unit: unit, mesh: m}
+	return autosave{info: info{nComp, name, unit}, mesh: m}
 }
 
 // Register a quantity for auto-saving every period (in seconds).
@@ -53,11 +52,6 @@ func (a *autosave) autoFname() string {
 	return fname
 }
 
-// NComp returns the number of components.
-func (b *autosave) NComp() int   { return b.nComp }
-func (b *autosave) Name() string { return b.name }
-func (b *autosave) Unit() string { return b.unit }
-
 func (b *autosave) Mesh() *data.Mesh {
 	if b.mesh == nil {
 		return Mesh() // global mesh
@@ -65,3 +59,13 @@ func (b *autosave) Mesh() *data.Mesh {
 		return b.mesh
 	}
 }
+
+type info struct {
+	nComp      int    // number of components (scalar, vector, ...)
+	name, unit string // metadata for dump file
+}
+
+// NComp returns the number of components.
+func (b *info) NComp() int   { return b.nComp }
+func (b *info) Name() string { return b.name }
+func (b *info) Unit() string { return b.unit }

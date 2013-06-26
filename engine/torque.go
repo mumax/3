@@ -12,15 +12,17 @@ func init() {
 	world.Var("spinpol", &SpinPol) // todo: suck-up in Jpol
 	world.LValue("xi", &Xi)
 	world.Var("j", &J)
+	world.ROnly("MaxTorque", &MaxTorque)
 }
 
 var (
-	Alpha    = scalarParam("alpha", "", nil)                              // Damping constant
-	LLTorque setterQuant                                                  // Landau-Lifshitz torque/γ0, in T
-	STTorque adderQuant                                                   // Spin-transfer torque/γ0, in T
-	Xi                                       = scalarParam("xi", "", nil) // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
-	SpinPol  func() float64                  = Const(1)                   // Spin polarization of electrical current
-	J        func() [3]float64               = ConstVector(0, 0, 0)       // Electrical current density
+	Alpha     = scalarParam("alpha", "", nil)                              // Damping constant
+	LLTorque  setterQuant                                                  // Landau-Lifshitz torque/γ0, in T
+	STTorque  adderQuant                                                   // Spin-transfer torque/γ0, in T
+	Xi                                        = scalarParam("xi", "", nil) // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
+	SpinPol   func() float64                  = Const(1)                   // Spin polarization of electrical current
+	J         func() [3]float64               = ConstVector(0, 0, 0)       // Electrical current density
+	MaxTorque                                 = newGetScalar("maxTorque", "T", GetMaxTorque)
 )
 
 func initLLTorque() {
@@ -43,4 +45,13 @@ func initSTTorque() {
 		}
 	})
 	Quants["sttorque"] = &STTorque
+}
+
+// TODO: could implement maxnorm(torque) (getfunc)
+func GetMaxTorque() float64 {
+	torque, recycle := Torque.GetGPU()
+	if recycle {
+		defer cuda.RecycleBuffer(torque)
+	}
+	return cuda.MaxVecNorm(torque)
 }

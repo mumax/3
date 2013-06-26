@@ -13,6 +13,7 @@ table.add(energy)
 table.add(e_zeeman)
 table.add(e_demag)
 table.add(e_exch)
+table.add(maxtorque)
 table.autosave(5e-12)
 
 run(1e-9)

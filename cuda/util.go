@@ -15,9 +15,10 @@ func divUp(x, y int) int {
 	return ((x - 1) / y) + 1
 }
 
-// CUDA Launch parameters. TODO: use device properties.
+// CUDA Launch parameters. TODO: optimize
 const (
 	MaxBlockSize = 512
+	BLOCK        = 32 // 2D tile size
 	MaxGridSize  = 65535
 )
 
@@ -33,24 +34,7 @@ func make1DConf(N int) *config {
 	return &config{gr, bl}
 }
 
-// Make a 2D kernel launch configuration suited for N1 x N2 threads.
-// TODO: swap N1/N2?
-// TODO: rm!
-func make2DConfSize(N1, N2, BLOCK int) *config {
-	bl := cu.Dim3{BLOCK, BLOCK, 1}
-
-	NX := divUp(N2, BLOCK)
-	NY := divUp(N1, BLOCK)
-	gr := cu.Dim3{NX, NY, 1}
-
-	return &config{gr, bl}
-}
-
-func make2DConf(N1, N2 int) *config {
-	const BLOCK = 32 // TODO
-	return make2DConfSize(N1, N2, BLOCK)
-}
-
+// Make a 3D kernel launch configuration suited for N threads.
 func make3DConfSize(N [3]int, BLOCK2D int) *config {
 	bl := cu.Dim3{BLOCK2D, BLOCK2D, 1}
 
@@ -63,7 +47,6 @@ func make3DConfSize(N [3]int, BLOCK2D int) *config {
 }
 
 func make3DConf(N [3]int) *config {
-	const BLOCK = 32 // TODO
 	return make3DConfSize(N, BLOCK)
 }
 

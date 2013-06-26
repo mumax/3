@@ -136,7 +136,7 @@ func (c *DemagConvolution) fwFFT(i int, inp *data.Slice, Bsat LUTPtr, regions *B
 func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
 	c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
 	out := outp.Comp(i)
-	copyPad(out, c.fftRBuf[i], c.size, c.kernSize, c.stream)
+	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize, c.stream)
 }
 
 // forward FFT of magnetization one component.

@@ -7,21 +7,21 @@ import (
 	"unsafe"
 )
 
-// Copies src into dst, which is larger or smaller.
-// The remainder of dst is not filled with zeros.
-func copyPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
+// Copies src (larger) into dst (smaller).
+// Uses to extract demag field after convolution on padded m.
+func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Argument(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 
-	N0 := iMin(dstsize[1], srcsize[1])
-	N1 := iMin(dstsize[2], srcsize[2])
+	N0 := dstsize[1]
+	N1 := dstsize[2]
 	cfg := make2DConf(N0, N1)
 
-	k_copypad_async(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
+	k_copyunpad_async(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
 		src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2], cfg, str)
 }
 
-// Copies src into dst, which is larger or smaller, and multiplies by vol*Bsat.
+// Copies src into dst, which is larger, and multiplies by vol*Bsat.
 // The remainder of dst is not filled with zeros.
 func copyPadMul(dst, src *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr, regions *Bytes, str cu.Stream) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)

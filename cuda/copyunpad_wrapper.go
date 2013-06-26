@@ -114,14 +114,16 @@ const (
 	mov.u32 	%r17, %tid.x;
 	mad.lo.s32 	%r3, %r15, %r16, %r17;
 	.loc 2 11 1
-	setp.ge.s32 	%p1, %r3, %r5;
-	setp.ge.s32 	%p2, %r2, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r1, %r8;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB0_2;
+	setp.lt.s32 	%p1, %r1, %r8;
+	setp.lt.s32 	%p2, %r2, %r4;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r5;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-	.loc 2 15 1
+BB0_1:
+	.loc 2 12 1
 	mad.lo.s32 	%r18, %r1, %r6, %r2;
 	mad.lo.s32 	%r19, %r18, %r7, %r3;
 	mul.wide.s32 	%rd5, %r19, 4;
@@ -134,7 +136,7 @@ const (
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
-	.loc 2 16 2
+	.loc 2 14 2
 	ret;
 }
 
@@ -188,14 +190,16 @@ BB0_2:
 	mov.u32 	%r17, %tid.x;
 	mad.lo.s32 	%r3, %r15, %r16, %r17;
 	.loc 2 11 1
-	setp.ge.s32 	%p1, %r3, %r5;
-	setp.ge.s32 	%p2, %r2, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r1, %r8;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB0_2;
+	setp.lt.s32 	%p1, %r1, %r8;
+	setp.lt.s32 	%p2, %r2, %r4;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r5;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-	.loc 2 15 1
+BB0_1:
+	.loc 2 12 1
 	mad.lo.s32 	%r18, %r1, %r6, %r2;
 	mad.lo.s32 	%r19, %r18, %r7, %r3;
 	mul.wide.s32 	%rd5, %r19, 4;
@@ -208,7 +212,7 @@ BB0_2:
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
-	.loc 2 16 2
+	.loc 2 14 2
 	ret;
 }
 
@@ -290,14 +294,16 @@ BB0_2:
 	mov.u32 	%r17, %tid.x;
 	mad.lo.s32 	%r3, %r15, %r16, %r17;
 	.loc 3 11 1
-	setp.ge.s32 	%p1, %r3, %r5;
-	setp.ge.s32 	%p2, %r2, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r1, %r8;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB2_2;
+	setp.lt.s32 	%p1, %r1, %r8;
+	setp.lt.s32 	%p2, %r2, %r4;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r5;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB2_2;
+	bra.uni 	BB2_1;
 
-	.loc 3 15 1
+BB2_1:
+	.loc 3 12 1
 	mad.lo.s32 	%r18, %r1, %r6, %r2;
 	mad.lo.s32 	%r19, %r18, %r7, %r3;
 	mul.wide.s32 	%rd5, %r19, 4;
@@ -310,7 +316,7 @@ BB0_2:
 	st.global.f32 	[%rd8], %f1;
 
 BB2_2:
-	.loc 3 16 2
+	.loc 3 14 2
 	ret;
 }
 

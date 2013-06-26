@@ -8,10 +8,8 @@ copyunpad(float* __restrict__  dst, int D0, int D1, int D2,
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     int k = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(j>=D1 || k>=D2 || i >= D0) {
-        return;	// out of  bounds
+    if (i<D0 && j<D1 && k<D2) {
+        dst[D2*(i*D1 + j) + k] = src[S2*(i*S1 + j) + k];
     }
-
-    dst[D2*(i*D1 + j) + k] = src[S2*(i*S1 + j) + k];
 }
 

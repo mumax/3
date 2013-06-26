@@ -9,14 +9,15 @@ import (
 )
 
 var (
-	energyTerms []func() float64 // terms of total energy, all terms should be registered here.
-	TotalEnergy = newGetfunc(1, "E", "J", func() []float64 {
+	energyTerms []func() float64 // registers total energy terms
+	TotalEnergy = newGetfunc(1, "Energy", "J", func() []float64 {
 		return []float64{GetTotalEnergy()}
 	})
 )
 
 func init() {
-	world.ROnly("energy", &TotalEnergy)
+	e_ := &TotalEnergy
+	world.ROnly("Energy", &e_)
 }
 
 // add energy term to global energy
@@ -36,6 +37,7 @@ func GetTotalEnergy() float64 {
 	return E
 }
 
+// vector dot product
 func dot(a, b GPU_Getter) float64 {
 	A, recyA := a.GetGPU()
 	if recyA {
@@ -48,7 +50,8 @@ func dot(a, b GPU_Getter) float64 {
 	return float64(cuda.Dot(A, B))
 }
 
-func Volume() float64 {
+// volume of one cell in m3
+func cellVolume() float64 {
 	c := Mesh().CellSize()
 	return c[0] * c[1] * c[2]
 }

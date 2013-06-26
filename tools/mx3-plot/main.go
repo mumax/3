@@ -65,6 +65,7 @@ func makePlot(fname string, q *Q) {
 	cmd += fmt.Sprintf(`set xlabel "t(ns)";`)
 
 	cmd += fmt.Sprintf(`set ylabel "%v %v";`, q.vecname(), q.unit)
+	cmd += fmt.Sprint(`set format y "%g";`)
 	cmd += fmt.Sprint(`plot "`, fname, `" u ($1*1e9):`, q.cols[0], ` w li title "`, q.name[0], `"`)
 	for i := 1; i < len(q.cols); i++ {
 		cmd += fmt.Sprint(`, "`, fname, `" u ($1*1e9):`, q.cols[i], ` w li title "`, q.name[i], `"`)

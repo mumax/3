@@ -1,0 +1,15 @@
+setgridsize(64, 32, 2)
+
+c := 4e-9
+setcellsize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = .1
+m = vortex(1, 1)
+
+table.add(energy)
+table.autosave(5e-12)
+
+run(1e-9)
+

@@ -27,6 +27,8 @@ var (
 )
 
 func main() {
+	start := time.Now()
+	defer func() { log.Println("walltime:", time.Since(start)) }()
 
 	flag.Parse()
 
@@ -46,8 +48,6 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	// TODO: tee output to log file, replace all panics by log.Panic
-
 	log.Print(engine.UNAME, "\n")
 
 	if *flag_od == "" { // -o not set
@@ -55,7 +55,6 @@ func main() {
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	//TODO: init profiling // prof.Init(engine.OD)
 	cuda.Init()
 	cuda.LockThread()
 

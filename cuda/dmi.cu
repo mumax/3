@@ -24,10 +24,10 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     float D = DLUT[regions[I]];
 
     // TODO: proper boundary conditions
-    h.x += D * delta(mz, 0, 0, 1) / cz;
-    h.x += D * delta(my, 0, 1, 0) / cy;
-    h.y -= D * delta(mx, 0, 1, 0) / cy;
-    h.z -= D * delta(mx, 0, 0, 1) / cz;
+    h.x += D * deltaz(mz) / cz;
+    h.x += D * deltay(my) / cy;
+    h.y -= D * deltay(mx) / cy;
+    h.z -= D * deltaz(mx) / cz;
     // note: actually 2*D * delta / (2*c)
 
     // write back, result is H + Hdmi
@@ -35,4 +35,3 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     Hy[I] = h.y;
     Hz[I] = h.z;
 }
-

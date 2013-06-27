@@ -34,13 +34,13 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
 
     float3 hspin = make_float3(0, 0, 0); // (u·∇)m
     if (Jx != 0.) {
-        hspin += (b/cx)*Jx * make_float3(delta(mx, 1,0,0), delta(my, 1,0,0), delta(mz, 1,0,0));
+        hspin += (b/cx)*Jx * make_float3(deltax(mx), deltax(my), deltax(mz));
     }
     if (Jy != 0.) {
-        hspin += (b/cy)*Jy * make_float3(delta(mx, 0,1,0), delta(my, 0,1,0), delta(mz, 0,1,0));
+        hspin += (b/cy)*Jy * make_float3(deltay(mx), deltay(my), deltay(mz));
     }
     if (Jz != 0.) {
-        hspin += (b/cz)*Jz * make_float3(delta(mx, 0,0,1), delta(my, 0,0,1), delta(mz, 0,0,1));
+        hspin += (b/cz)*Jz * make_float3(deltaz(mx), deltaz(my), deltaz(mz));
     }
 
     float3 m      = make_float3(mx[I], my[I], mz[I]);

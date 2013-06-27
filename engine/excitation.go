@@ -55,6 +55,10 @@ func (e *excitation) Add(mask *data.Slice, mul func() float64) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
 }
 
+func (e *excitation) SetRegion(region int, value [3]float64) {
+	e.v.SetRegion(region, value)
+}
+
 func (e *excitation) GetVec() []float64 {
 	if len(e.extraTerms) != 0 {
 		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")

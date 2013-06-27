@@ -7,16 +7,16 @@ web interface keepalive timeout not working anymore
 improvements:
 -------------
 
+regions: setgeom() should define region 0 and set all parameters zero there
+regions: should not be neccesary to define region 0
+regions: should automatically set aex between regions, at very least if they have equal params
+
 web: update parameter text boxes and image size
 web: use next free port if already in use
-cuda: use device properties for grid config
 cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
-cuda.Recycle: check if you own it, disable contents to avoid use-after-recylce.
-LD_LIBARY_PATH ignored by build
 hide buffered.Mesh(), .Comp() etc. (ZYX axes)
 log.FatalErr: print line number of caller?
-mask shift, set etc can LAUNCH_FAIL if mask is nil. should nicely check
 move add-hoc functionality (center walls etc) to "extra" package
 
 

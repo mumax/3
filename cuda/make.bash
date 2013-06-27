@@ -4,7 +4,6 @@ go build cuda2go.go || exit 1
 
 NVCC='nvcc --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx'
 
-# ! when changing supported compute capabilities, cuda2go.go should be modified (cc list)
 for f in *.cu; do
 	g=$(basename -s .cu $f)
 	for cc in 20 30 35; do

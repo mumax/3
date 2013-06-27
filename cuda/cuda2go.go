@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -127,6 +128,10 @@ func wrapgen(filename, funcname string, argt, argn []string) {
 			fmt.Println(basename, cc)
 			kernel.PTX[cc] = filterptx(f)
 		}
+	}
+
+	if len(kernel.PTX) == 0 {
+		log.Fatal("no PTX files for ", filename)
 	}
 
 	wrapfname := basename + "_wrapper.go"

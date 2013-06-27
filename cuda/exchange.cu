@@ -1,5 +1,4 @@
 #include "stencil.h"
-#include "mask.h"
 #include "float3.h"
 
 // indexing in symmetric matrix

@@ -35,6 +35,10 @@ func (e *excitation) addTo(dst *data.Slice) {
 	}
 }
 
+func (e *excitation) IsZero() bool {
+	return e.v.zero && len(e.extraTerms) == 0
+}
+
 func (e *excitation) GetGPU() (*data.Slice, bool) {
 	buf := cuda.GetBuffer(e.v.NComp(), e.v.Mesh())
 	cuda.Zero(buf)

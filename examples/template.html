@@ -77,9 +77,9 @@ B_ext = vector(0.1,0,0) // Applied field in T
 anisU = vector(1,0,0) // Uniaxial anisotropy axis
 Ku1   = 500e3         // Uniaxial anisotropy in J/m3
 
-xi      = 0.04        // Spin-transfer torque degree of non-adiabaticity
-spinPol = 0.56        // Spin polarization
-j = vector(1e14,0,0)  // Electrical current density in A/m2
+xi   = 0.04                   // Spin-transfer torque degree of non-adiabaticity
+pol := 0.56                   // Spin polarization
+jpol = vector(pol*1e14, 0, 0) // polarized current density in A/m2
 
 DMI = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
 
@@ -470,7 +470,6 @@ aex     = 10e-12
 anisU   = vector(0, 0, 1)
 Ku1     = 0.59e6
 xi      = 0.2
-spinpol = 0.5
 alpha   = 3                                   // high damping for fast relax
 
 m     = twoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
@@ -484,7 +483,7 @@ postStep(centerPMAwall)
 autosave(m, 100e-12)
 
 // Run for 1ns with current through the sample
-j = vector(3e13, 0, 0)
+jpol = vector(1.5e13, 0, 0)
 run(.5e-9)
 `}}
 
@@ -507,7 +506,6 @@ setcellsize(3e-9, 3e-9, 30e-9)
 Msat    = 860e3
 Aex     = 13e-12
 Xi      = 0.1
-SpinPol = 0.56
 m       = vortexwall(1, -1, 1, 1)
 
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire.
@@ -525,7 +523,8 @@ Alpha = 0.02 // restore normal damping
 Autosave(m, 100e-12)
 
 // Run the simulation with current through the sample
-J = vector(-8e12, 0, 0)
+SpinPol:= 0.56
+JPol    = vector(-8e12 * SpinPol, 0, 0)
 Run(1e-9)
 `}}
 

@@ -14,10 +14,9 @@
  
 	run(1e-9) // relax
 
-	alpha   = 0.1
-	xi      = 0.05
-	SpinPol = 1
-	J       = vector(1e12, 0, 0)
+	alpha = 0.1
+	xi    = 0.05
+	JPol  = vector(1e12, 0, 0)
 
 	run(1e-9) // run
 

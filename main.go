@@ -17,13 +17,16 @@ import (
 )
 
 var (
-	flag_silent  = flag.Bool("s", false, "Don't generate any log info")
-	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")
-	flag_od      = flag.String("o", "", "Override output directory")
-	flag_force   = flag.Bool("f", false, "Force start, clean existing output directory")
-	flag_port    = flag.String("http", ":35367", "Port to serve web gui")
-	flag_cpuprof = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
-	flag_memprof = flag.Bool("memprof", false, "Recored gopprof memory profile")
+	flag_silent   = flag.Bool("s", false, "Don't generate any log info")
+	flag_vet      = flag.Bool("vet", false, "Check input files for errors, but don't run them")
+	flag_od       = flag.String("o", "", "Override output directory")
+	flag_force    = flag.Bool("f", false, "Force start, clean existing output directory")
+	flag_port     = flag.String("http", ":35367", "Port to serve web gui")
+	flag_cpuprof  = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
+	flag_memprof  = flag.Bool("memprof", false, "Recored gopprof memory profile")
+	flag_blocklen = flag.Int("bl", 512, "CUDA 1D thread block length")
+	flag_blockX   = flag.Int("bx", 32, "CUDA 2D thread block size X")
+	flag_blockY   = flag.Int("by", 32, "CUDA 2D thread block size Y")
 )
 
 func main() {
@@ -55,6 +58,9 @@ func main() {
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	cuda.BlockSize = *flag_blocklen
+	cuda.TileX = *flag_blockX
+	cuda.TileY = *flag_blockY
 	cuda.Init()
 	cuda.LockThread()
 

@@ -22,6 +22,7 @@ func (w *World) compileLvalue(lhs ast.Node) LValue {
 			panic(err(lhs.Pos(), "cannot assign to", concrete.Name))
 		}
 	}
+	panic(0) // silence gccgo
 }
 
 // read-only value (from script, but mutable from outside)

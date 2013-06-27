@@ -25,22 +25,26 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType
 	ptrs := make([]unsafe.Pointer, nComp)
 	for c := range ptrs {
 		ptrs[c] = unsafe.Pointer(alloc(bytes))
-		cu.MemsetD32(cu.DevicePtr(ptrs[c]), 0, int64(length))
+		cu.MemsetD32(cu.DevicePtr(uintptr(ptrs[c])), 0, int64(length))
 	}
 	return data.SliceFromPtrs(m, memType, ptrs)
 }
 
 // wrappers for data.EnableGPU arguments
 
-func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(ptr)) }
+func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(uintptr(ptr))) }
 
-func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyDtoH(dst, cu.DevicePtr(src), bytes) }
+func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
+	cu.MemcpyDtoH(dst, cu.DevicePtr(uintptr(src)), bytes)
+}
 
-func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) { cu.MemcpyHtoD(cu.DevicePtr(dst), src, bytes) }
+func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
+	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst)), src, bytes)
+}
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
 	str := stream()
-	cu.MemcpyAsync(cu.DevicePtr(dst), cu.DevicePtr(src), bytes, str)
+	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, str)
 	syncAndRecycle(str)
 }
 
@@ -49,7 +53,7 @@ func Memset(s *data.Slice, val ...float32) {
 	util.Argument(len(val) == s.NComp())
 	str := stream()
 	for c, v := range val {
-		cu.MemsetD32Async(cu.DevicePtr(s.DevPtr(c)), math.Float32bits(v), int64(s.Len()), str)
+		cu.MemsetD32Async(cu.DevicePtr(uintptr(s.DevPtr(c))), math.Float32bits(v), int64(s.Len()), str)
 	}
 	syncAndRecycle(str)
 }

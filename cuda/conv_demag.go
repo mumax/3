@@ -121,7 +121,7 @@ func (c *DemagConvolution) Exec(B, m *data.Slice, Bsat LUTPtr, regions *Bytes) {
 
 // zero 1-component slice
 func zero1(dst *data.Slice, str cu.Stream) {
-	cu.MemsetD32Async(cu.DevicePtr(dst.DevPtr(0)), 0, int64(dst.Len()), str)
+	cu.MemsetD32Async(cu.DevicePtr(uintptr(dst.DevPtr(0))), 0, int64(dst.Len()), str)
 }
 
 // forward FFT component i

@@ -18,18 +18,18 @@ func NewBytes(m *data.Mesh) *Bytes {
 	Len := int64(m.NCell())
 	ptr := cu.MemAlloc(Len)
 	cu.MemsetD8(cu.DevicePtr(ptr), 0, Len)
-	return &Bytes{unsafe.Pointer(ptr), int(Len)}
+	return &Bytes{unsafe.Pointer(uintptr(ptr)), int(Len)}
 }
 
 // Upload src (host) to dst (gpu)
 func (dst *Bytes) Upload(src []byte) {
 	util.Argument(int(dst.Len) == len(src))
-	cu.MemcpyHtoD(cu.DevicePtr(dst.Ptr), unsafe.Pointer(&src[0]), int64(dst.Len))
+	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
 // Frees the GPU memory and disables the slice.
 func (b *Bytes) Free() {
-	cu.MemFree(cu.DevicePtr(b.Ptr))
+	cu.MemFree(cu.DevicePtr(uintptr(b.Ptr)))
 	b.Ptr = nil
 	b.Len = 0
 }

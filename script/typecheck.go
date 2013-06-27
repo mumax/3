@@ -51,6 +51,7 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case inT == vector_t && outT == func_vector_t:
 		return &vectorToFunc{in}
 	}
+	panic(0) // silence gccgo
 }
 
 // returns input type for expression. Usually this is the same as the return type,

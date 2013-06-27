@@ -28,7 +28,7 @@ func newParam(nComp int, name, unit string, post_update func(int)) param {
 }
 
 func (p *param) setRegion(region int, v ...float64) {
-	util.Argument(len(v) == p.NComp()) // note: also likely panics if param not initialized (nComp = 0)
+	util.Argument(len(v) == p.NComp()) // note: also panics if param not initialized (nComp = 0)
 
 	v0 := true
 	for c := range v {

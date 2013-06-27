@@ -31,4 +31,5 @@ func (w *World) compileExpr(e ast.Expr) Expr {
 	case *ast.IndexExpr:
 		return w.compileIndexExpr(concrete)
 	}
+	panic(0) // silence gccgo
 }

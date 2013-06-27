@@ -34,7 +34,7 @@ func (p *fft3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 	if dst.Len() != okdstlen {
 		log.Panicf("fft size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len())
 	}
-	p.handle.ExecR2C(cu.DevicePtr(src.DevPtr(0)), cu.DevicePtr(dst.DevPtr(0)))
+	p.handle.ExecR2C(cu.DevicePtr(uintptr(src.DevPtr(0))), cu.DevicePtr(uintptr(dst.DevPtr(0))))
 }
 
 // Execute the FFT plan, synchronized.

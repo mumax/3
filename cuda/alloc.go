@@ -18,7 +18,7 @@ func MemAlloc(bytes int64) unsafe.Pointer {
 			panic(err)
 		}
 	}()
-	return unsafe.Pointer(cu.MemAlloc(bytes))
+	return unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
 }
 
 // make slice of given size, but with dummy mesh.

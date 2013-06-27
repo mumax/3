@@ -15,6 +15,7 @@ func (w *World) compile(n ast.Node) Expr {
 	default:
 		panic(err(n.Pos(), "not allowed"))
 	}
+	panic(0) // silence gccgo
 }
 
 // compiles a statement
@@ -35,6 +36,7 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 		defer w.ExitScope()
 		return w.compileBlockStmt_noScope(concrete)
 	}
+	panic(0) // silence gccgo
 }
 
 // embed to get Type() that returns nil

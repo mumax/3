@@ -27,7 +27,13 @@ func init() {
 
 func initExchange() {
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
-		cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
+		if dmi_red.zero {
+			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
+		} else {
+			D := dmi_red.GetUniform()
+			A := Aex.GetUniform() / Msat.GetUniform()
+			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
+		}
 	})
 	Quants["B_exch"] = &B_exch
 	registerEnergy(GetExchangeEnergy)

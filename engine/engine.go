@@ -60,7 +60,6 @@ func initialize() {
 
 	initDemag()
 	initExchange()
-	initDMI()
 	initAnisotropy()
 	initBExt()
 
@@ -68,7 +67,6 @@ func initialize() {
 	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
 		B_exch.addTo(dst, cansave)
-		B_dmi.addTo(dst, cansave)
 		B_anis.addTo(dst, cansave)
 		B_ext.addTo(dst) // TODO: cansave
 	})

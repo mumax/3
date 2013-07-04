@@ -8,17 +8,18 @@ package cufft
 ////default location if not properly symlinked:
 //#cgo LDFLAGS:-L/usr/local/cuda-5.0/lib64 -L/usr/local/cuda-5.0/lib
 //
-////ubuntu repos:
-//#cgo LDFLAGS:-L/usr/lib/x86_64-linux-gnu
+////ubuntu provided driver:
+//#cgo LDFLAGS:-L/usr/lib -L/usr/lib/nvidia-current/ -L/usr/lib/nvidia-experimental -L/usr/lib/nvidia-304 -L/usr/lib/nvidia-310 -L/usr/lib/nvidia-313 -L/usr/lib/nvidia-319
 //
-////arch repos:
+////arch linux:
 //#cgo LDFLAGS:-L/opt/cuda/lib64 -L/opt/cuda/lib
 //
-//#cgo LDFLAGS:-lcudart -lcufft
+//#cgo LDFLAGS:-lcufft
 //
-//#cgo CFLAGS:-I/usr/local/cuda/include/ 
-//#cgo CFLAGS:-I/usr/local/cuda-5.0/include/ 
-//#cgo CFLAGS:-I/usr/include
-//#cgo CFLAGS:-I/opt/cuda/include
+//#cgo CFLAGS:-I/usr/local/cuda/include/ -I/opt/cuda/include
+//
+////WINDOWS:
+//
+//#cgo LDFLAGS:-LC:/cuda/v5.0/lib/x64
+//#cgo CFLAGS:-IC:/cuda/v5.0/include
 import "C"
-

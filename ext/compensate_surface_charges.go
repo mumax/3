@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	World.Func("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
+	World.Func("ext_rmSurfaceCharge", RemoveLRSurfaceCharge)
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and

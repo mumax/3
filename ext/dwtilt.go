@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	World.ROnly("DWTilt", &DWTiltPMA)
+	World.ROnly("ext_DWTilt", &DWTiltPMA)
 }
 
 // PMA domain wall tilt assuming straight wall.
@@ -14,7 +14,7 @@ var DWTiltPMA = NewGetScalar("dwtilt", "rad", dwTiltPMA)
 
 func dwTiltPMA() float64 {
 	m := Download(&M)
-	mz := m.Scalars()[0]
+	mz := m.Vectors()[0][0]
 
 	nx := Mesh().Size()[2]
 	ny := Mesh().Size()[1]

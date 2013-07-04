@@ -476,7 +476,7 @@ run(0.1e-9)                                   // relax
 alpha = 0.02                                  // normal damping
 
 // Set post-step function that centers simulation window on domain wall.
-postStep(centerPMAwall)
+postStep(ext_centerPMAwall)
 
 // Schedule output
 autosave(m, 100e-12)
@@ -508,10 +508,10 @@ Xi      = 0.1
 m       = vortexwall(1, -1, 1, 1)
 
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire.
-RemoveLRSurfaceCharge(1, -1)
+ext_rmSurfaceCharge(1, -1)
 
 // Set post-step function that centers simulation window on domain wall.
-PostStep(centerInplaneWall)
+PostStep(ext_centerInplaneWall)
 
 // Relax
 Alpha = 3    // high damping for fast relax

@@ -7,8 +7,8 @@ Msat    = 860e3
 Aex     = 13e-12
 m       = vortexwall(1, -1, 1, 1)
 
-RemoveLRSurfaceCharge(1, -1)
-PostStep(centerInplaneWall)
+ext_rmSurfaceCharge(1, -1)
+PostStep(ext_centerInplaneWall)
 
 // break Y symmetry to get fat closure domains if compensate does not work
 B_ext = vector(0, 0.01, 0)

@@ -32,8 +32,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         int I2 = idx(i, j, lclamp(k-1));      // left index, clamped
 
         // DMI
-        float mz1 = (k+1<N2)? mz[I1] : (m.z - (cz * D_2A * m.x));
-        float mz2 = (k-1>=0)? mz[I2] : (m.z + (cz * D_2A * m.x));
+        float mz1 = (k+1<N2)? mz[I1] : (m.z - (cz * D_2A * m.x)); // right neighbor
+        float mz2 = (k-1>=0)? mz[I2] : (m.z + (cz * D_2A * m.x)); // left neighbor
         h.x += D*(mz1-mz2)/cz;
         // note: actually 2*D * delta / (2*c)
 
@@ -42,8 +42,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         h.z -= D*(mx1-mx2)/cz;
 
         // Exchange
-        float3 m1 = make_float3(mx1, my[I1], mz1);
-        float3 m2 = make_float3(mx2, my[I2], mz2);
+        float3 m1 = make_float3(mx1, my[I1], mz1); // right neighbor
+        float3 m2 = make_float3(mx2, my[I2], mz2); // left neighbor
         h +=  (2*A/(cz*cz)) * ((m1 - m) + (m2 - m));
     }
 
@@ -73,3 +73,40 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     Hz[I] = h.z;
 }
 
+// Note on boundary conditions.
+//
+// We need the derivative and laplacian of m in point A, but e.g. C lies out of the boundaries.
+// We use the boundary condition in B (derivative of the magnetization) to extrapolate m to point C:
+// 	m_C = m_A + (dm/dx)|_B * cellsize
+//
+// When point C is inside the boundary, we just use its actual value.
+//
+// Then we can take the central derivative in A:
+// 	(dm/dx)|_A = (m_C - m_D) / (2*cellsize)
+// And the laplacian:
+// 	nabla(m)|_A = (m_C + m_D - 2*m_A) / (cellsize^2)
+//
+// All these operations should be second order as they involve only central derivatives.
+//
+// 	  ------------------------------------------------------------------ *
+// 	 |                                                   |             C |
+// 	 |                                                   |          **   |
+//   |                                                   |        ***    |
+//   |                                                   |     ***       |
+//   |                                                   |   ***         |
+//   |                                                   | ***           |
+//   |                                                   B               |
+//   |                                               *** |               |
+// m |                                            ***    |               |
+//   |                                         ****      |               |
+//   |                                     ****          |               |
+//   |                                  ****             |               |
+//   |                              ** A                 |               |
+//   |                         *****                     |               |
+//   |                   ******                          |               |
+//   |          *********                                |               |
+// 	 |D ********                                         |               |
+// 	 |                                                   |               |
+// 	  -------------------------------------------------------------------
+// 	-1              -0.5               0               0.5               1
+//                                 x

@@ -11,7 +11,7 @@
 	alpha = 3
 	AnisU = vector(0, 0, 1)
 	Ku1   = 1.27E6
-	DMI   = 0.1e-3               // J/m2.
+	Dex   = 0.1e-3               // J/m2.
 
 	m = TwoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
 	save(m) // initial magnetization

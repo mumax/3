@@ -84,20 +84,20 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 // Then we can take the central derivative in A:
 // 	(dm/dx)|_A = (m_C - m_D) / (2*cellsize)
 // And the laplacian:
-// 	nabla(m)|_A = (m_C + m_D - 2*m_A) / (cellsize^2)
+// 	lapl(m)|_A = (m_C + m_D - 2*m_A) / (cellsize^2)
 //
 // All these operations should be second order as they involve only central derivatives.
 //
-// 	  ------------------------------------------------------------------ *
-// 	 |                                                   |             C |
-// 	 |                                                   |          **   |
+//    ------------------------------------------------------------------ *
+//   |                                                   |             C |
+//   |                                                   |          **   |
 //   |                                                   |        ***    |
 //   |                                                   |     ***       |
 //   |                                                   |   ***         |
 //   |                                                   | ***           |
 //   |                                                   B               |
 //   |                                               *** |               |
-// m |                                            ***    |               |
+//   |                                            ***    |               |
 //   |                                         ****      |               |
 //   |                                     ****          |               |
 //   |                                  ****             |               |
@@ -105,8 +105,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 //   |                         *****                     |               |
 //   |                   ******                          |               |
 //   |          *********                                |               |
-// 	 |D ********                                         |               |
-// 	 |                                                   |               |
-// 	  -------------------------------------------------------------------
-// 	-1              -0.5               0               0.5               1
+//   |D ********                                         |               |
+//   |                                                   |               |
+//   +----------------+----------------+-----------------+---------------+
+//  -1              -0.5               0               0.5               1
 //                                 x

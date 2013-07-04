@@ -25,7 +25,6 @@ func init() {
 		msat := Msat.GetRegion(r)
 		bsat.setRegion(r, msat*Mu0)
 		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
-		dmi_red.setRegion(r, safediv(DMI.GetRegion(r), msat))
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
 
@@ -47,4 +46,11 @@ func initDemag() {
 	})
 	Quants["B_demag"] = &B_demag
 	registerEnergy(GetDemagEnergy)
+}
+
+func safediv(a, b float64) float64 {
+	if b == 0 {
+		return 0
+	}
+	return a / b
 }

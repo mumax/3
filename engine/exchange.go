@@ -12,6 +12,7 @@ var (
 	lex2   symmparam   // inter-cell exchange length squared * 1e18
 	B_exch adderQuant  // exchange field (T) output handle
 	E_exch = NewGetScalar("E_exch", "J", GetExchangeEnergy)
+	Dex    ScalarParam // Dzyaloshinskii-Moriya strength in J/m²
 )
 
 func init() {
@@ -23,15 +24,21 @@ func init() {
 	World.ROnly("B_exch", &B_exch)
 	World.ROnly("E_exch", &E_exch)
 	World.Func("sign", sign)
+
+	World.LValue("Dex", &Dex)
+	Dex = scalarParam("dmi", "J/m2", nil) //func(r int) {
 }
 
 func initExchange() {
 	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
-		if dmi_red.zero {
+		if Dex.zero {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 		} else {
-			D := dmi_red.GetUniform()
-			A := Aex.GetUniform() / Msat.GetUniform()
+			// DMI only implemented for uniform parameters
+			// interaction not clear with space-dependent parameters
+			msat := Msat.GetUniform()
+			D := Dex.GetUniform()/ msat
+			A := Aex.GetUniform() / msat
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})

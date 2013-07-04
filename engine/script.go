@@ -8,13 +8,13 @@ import (
 	"math"
 )
 
-var world = script.NewWorld()
+var World = script.NewWorld()
 
 func init() {
-	world.Func("vector", Vector)
-	world.Func("average", Average)
-	world.Const("mu0", Mu0)
-	world.Func("expect", expect)
+	World.Func("vector", Vector)
+	World.Func("average", Average)
+	World.Const("mu0", Mu0)
+	World.Func("expect", expect)
 }
 
 // Test if have lies within want +/- maxError,
@@ -29,9 +29,9 @@ func expect(msg string, have, want, maxError float64) {
 }
 
 func Compile(src string) (script.Expr, error) {
-	world.EnterScope() // file-level scope
-	defer world.ExitScope()
-	return world.Compile(src)
+	World.EnterScope() // file-level scope
+	defer World.ExitScope()
+	return World.Compile(src)
 }
 
 func Vector(x, y, z float64) [3]float64 {

@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
+	_ "code.google.com/p/mx3/ext"
 	"code.google.com/p/mx3/prof"
 	"code.google.com/p/mx3/util"
 	"code.google.com/p/mx3/web"

@@ -8,9 +8,9 @@ import (
 )
 
 func init() {
-	world.Func("SetGeom", SetGeometry)
-	world.Func("DefRegion", DefRegion)
-	world.ROnly("regions", &regions)
+	World.Func("SetGeom", SetGeometry)
+	World.Func("DefRegion", DefRegion)
+	World.ROnly("regions", &regions)
 }
 
 var (

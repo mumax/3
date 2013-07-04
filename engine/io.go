@@ -9,9 +9,9 @@ import (
 )
 
 func init() {
-	world.Func("save", Save)
-	world.Func("saveas", SaveAs)
-	world.Func("autosave", Autosave)
+	World.Func("save", Save)
+	World.Func("saveas", SaveAs)
+	World.Func("autosave", Autosave)
 }
 
 // TODO: only use getter, check if slice is on GPU?

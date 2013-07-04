@@ -12,7 +12,7 @@ var (
 	FFTM        fftm                            // FFT of m
 	EnableDemag = true                          // enable/disable demag field
 	demag_      *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
-	E_demag     = newGetScalar("E_demag", "J", GetDemagEnergy)
+	E_demag     = NewGetScalar("E_demag", "J", GetDemagEnergy)
 )
 
 // Returns the current demag energy in Joules.
@@ -29,11 +29,11 @@ func init() {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
 
-	world.Var("EnableDemag", &EnableDemag)
-	world.ROnly("mFFT", &FFTM)
-	world.ROnly("B_demag", &B_demag)
-	world.LValue("Msat", &Msat)
-	world.ROnly("E_demag", &E_demag)
+	World.Var("EnableDemag", &EnableDemag)
+	World.ROnly("mFFT", &FFTM)
+	World.ROnly("B_demag", &B_demag)
+	World.LValue("Msat", &Msat)
+	World.ROnly("E_demag", &E_demag)
 }
 
 func initDemag() {

@@ -1,6 +1,9 @@
-package engine
+package ext
 
-import "fmt"
+import (
+	. "code.google.com/p/mx3/engine"
+	"fmt"
+)
 
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:
@@ -39,8 +42,8 @@ func CenterInplaneWall() {
 }
 
 func init() {
-	world.Func("centerPMAWall", CenterPMAWall)
-	world.Func("centerInplaneWall", CenterInplaneWall)
+	World.Func("centerPMAWall", CenterPMAWall)
+	World.Func("centerInplaneWall", CenterInplaneWall)
 }
 
 func wall_left_magnetization(x float64) int {

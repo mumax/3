@@ -14,12 +14,12 @@ const VERSION = "mx3.0.9 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 func init() {
-	world.Func("setgridsize", setGridSize)
-	world.Func("setcellsize", setCellSize)
-	world.LValue("m", &M)
-	world.ROnly("torque", &Torque)
-	world.ROnly("B_eff", &B_eff)
-	world.ROnly("table", &Table)
+	World.Func("setgridsize", setGridSize)
+	World.Func("setcellsize", setCellSize)
+	World.LValue("m", &M)
+	World.ROnly("torque", &Torque)
+	World.ROnly("B_eff", &B_eff)
+	World.ROnly("table", &Table)
 }
 
 // Accessible quantities

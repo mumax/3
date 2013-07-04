@@ -10,17 +10,17 @@ var (
 	ku1_red = scalarParam("ku1_red", "T", nil) // Ku1 / Msat (T), auto updated from Ku1 (TODO: form msat)
 	Ku1     ScalarParam                        // Uniaxial anisotropy strength (J/m³)
 	B_anis  adderQuant                         // field due to uniaxial anisotropy output handle
-	E_anis  = newGetScalar("E_anis", "J", GetAnisotropyEnergy)
+	E_anis  = NewGetScalar("E_anis", "J", GetAnisotropyEnergy)
 )
 
 func init() {
 	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
 		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
 	})
-	world.LValue("AnisU", &AnisU)
-	world.LValue("Ku1", &Ku1)
-	world.ROnly("B_anis", &B_anis)
-	world.ROnly("E_anis", &E_anis)
+	World.LValue("AnisU", &AnisU)
+	World.LValue("Ku1", &Ku1)
+	World.ROnly("B_anis", &B_anis)
+	World.ROnly("E_anis", &E_anis)
 }
 
 func initAnisotropy() {

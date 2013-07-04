@@ -2,7 +2,7 @@
 	Test I/O.
 */
 
-setgridsize(50, 25, 2)
+setgridsize(50, 25, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 
 m = uniform(1, 0, 0)

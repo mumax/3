@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	world.Func("uniform", Uniform)
-	world.Func("vortex", Vortex)
-	world.Func("twodomain", TwoDomain)
-	world.Func("vortexwall", VortexWall)
+	World.Func("uniform", Uniform)
+	World.Func("vortex", Vortex)
+	World.Func("twodomain", TwoDomain)
+	World.Func("vortexwall", VortexWall)
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)

@@ -6,14 +6,14 @@ import (
 )
 
 func init() {
-	world.Func("Ellipsoid", Ellipsoid)
-	world.Func("Cylinder", Cylinder)
-	world.Func("Cuboid", Cuboid)
-	world.Func("Rect", Rect)
-	world.Func("XRange", XRange)
-	world.Func("YRange", YRange)
-	world.Func("ZRange", ZRange)
-	world.Func("Layers", Layers)
+	World.Func("Ellipsoid", Ellipsoid)
+	World.Func("Cylinder", Cylinder)
+	World.Func("Cuboid", Cuboid)
+	World.Func("Rect", Rect)
+	World.Func("XRange", XRange)
+	World.Func("YRange", YRange)
+	World.Func("ZRange", ZRange)
+	World.Func("Layers", Layers)
 }
 
 // geometrical shape for setting sample geometry

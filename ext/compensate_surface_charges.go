@@ -1,14 +1,15 @@
-package engine
+package ext
 
 import (
 	"code.google.com/p/mx3/data"
+	. "code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/util"
 	"log"
 	"math"
 )
 
 func init() {
-	world.Func("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
+	World.Func("removeLRSurfaceCharge", RemoveLRSurfaceCharge)
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and

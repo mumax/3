@@ -11,18 +11,18 @@ var (
 	Aex    ScalarParam // inter-cell exchange stiffness in J/m
 	lex2   symmparam   // inter-cell exchange length squared * 1e18
 	B_exch adderQuant  // exchange field (T) output handle
-	E_exch = newGetScalar("E_exch", "J", GetExchangeEnergy)
+	E_exch = NewGetScalar("E_exch", "J", GetExchangeEnergy)
 )
 
 func init() {
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
-	world.LValue("Aex", &Aex)
-	world.Func("setLexchange", SetLExchange)
-	world.ROnly("B_exch", &B_exch)
-	world.ROnly("E_exch", &E_exch)
-	world.Func("sign", sign)
+	World.LValue("Aex", &Aex)
+	World.Func("setLexchange", SetLExchange)
+	World.ROnly("B_exch", &B_exch)
+	World.ROnly("E_exch", &E_exch)
+	World.Func("sign", sign)
 }
 
 func initExchange() {

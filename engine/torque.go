@@ -6,12 +6,12 @@ import (
 )
 
 func init() {
-	world.LValue("alpha", &Alpha)
-	world.ROnly("LLtorque", &LLTorque)
-	world.ROnly("STTorque", &STTorque)
-	world.LValue("xi", &Xi)
-	world.LValue("jpol", &JPol)
-	world.ROnly("MaxTorque", &MaxTorque)
+	World.LValue("alpha", &Alpha)
+	World.ROnly("LLtorque", &LLTorque)
+	World.ROnly("STTorque", &STTorque)
+	World.LValue("xi", &Xi)
+	World.LValue("jpol", &JPol)
+	World.ROnly("MaxTorque", &MaxTorque)
 }
 
 var (
@@ -20,7 +20,7 @@ var (
 	STTorque  adderQuant                      // Spin-transfer torque/γ0, in T
 	Xi        = scalarParam("xi", "", nil)    // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
 	JPol      excitation                      // Polarized electrical current density
-	MaxTorque = newGetScalar("maxTorque", "T", GetMaxTorque)
+	MaxTorque = NewGetScalar("maxTorque", "T", GetMaxTorque)
 )
 
 func initLLTorque() {

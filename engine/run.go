@@ -7,18 +7,18 @@ import (
 )
 
 func init() {
-	world.Func("Run", Run)
-	world.Func("Steps", Steps)
-	world.Func("Pause", Pause)
-	world.Func("PostStep", PostStep)
-	world.Func("RunWhile", RunWhile)
-	world.Var("t", &Time)
-	world.Var("Dt", &Solver.Dt_si)
-	world.Var("MinDt", &Solver.Mindt)
-	world.Var("MaxDt", &Solver.Maxdt)
-	world.Var("MaxErr", &Solver.MaxErr)
-	world.Var("Headroom", &Solver.Headroom)
-	world.Var("FixDt", &Solver.Fixdt)
+	World.Func("Run", Run)
+	World.Func("Steps", Steps)
+	World.Func("Pause", Pause)
+	World.Func("PostStep", PostStep)
+	World.Func("RunWhile", RunWhile)
+	World.Var("t", &Time)
+	World.Var("Dt", &Solver.Dt_si)
+	World.Var("MinDt", &Solver.Mindt)
+	World.Var("MaxDt", &Solver.Maxdt)
+	World.Var("MaxErr", &Solver.MaxErr)
+	World.Var("Headroom", &Solver.Headroom)
+	World.Var("FixDt", &Solver.Fixdt)
 }
 
 var (

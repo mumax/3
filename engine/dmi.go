@@ -3,7 +3,7 @@ package engine
 import ()
 
 func init() {
-	world.LValue("dmi", &DMI)
+	World.LValue("dmi", &DMI)
 	DMI = scalarParam("dmi", "J/m2", func(r int) {
 		dmi_red.setRegion(r, safediv(DMI.GetRegion(r), Msat.GetRegion(r)))
 	})

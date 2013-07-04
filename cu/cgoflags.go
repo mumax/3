@@ -17,4 +17,9 @@ package cu
 //#cgo LDFLAGS:-lcuda
 //
 //#cgo CFLAGS:-I/usr/local/cuda/include/ -I/opt/cuda/include
+//
+////WINDOWS:
+//
+//#cgo LDFLAGS:-LC:/cuda/v5.0/lib/x64 
+//#cgo CFLAGS:-IC:/cuda/v5.0/include 
 import "C"

@@ -7,9 +7,16 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	testdata := &struct{}{}
+	testdata := &testt{}
 	v := NewView(testdata, testtempl)
 	v.Render(os.Stdout)
+}
+
+type testt struct {
+}
+
+func (t *testt) SayHello() string {
+	return "<Hello world wide web!>"
 }
 
 const testtempl = `
@@ -18,6 +25,9 @@ const testtempl = `
 {{.JS}}
 </head>
 <body>
+
+	{{.Static "SayHello"}}
+
 </body>
 </html>
 `

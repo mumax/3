@@ -1,12 +1,12 @@
 package main
-const js = `<script>
+const js = `<script type="text/javascript">
 
 // update rate
 var tick = 1000;
 
 // show error in document
 function showErr(err){
-	document.getElementById("Errorbox").innerHTML = err;
+	document.getElementById("ErrorBox").innerHTML = err;
 }
 
 // refreshes the contents of all dynamic elements,

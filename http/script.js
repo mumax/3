@@ -4,7 +4,7 @@ var tick = 1000;
 
 // show error in document
 function showErr(err){
-	document.getElementById("Errorbox").innerHTML = err;
+	document.getElementById("ErrorBox").innerHTML = err;
 }
 
 // refreshes the contents of all dynamic elements,

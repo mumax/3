@@ -62,7 +62,7 @@ func (v *View) rpc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (v *View) Button(action string) string {
-	if v.data.MethodByName(action).Kind() == 0{
+	if v.data.MethodByName(action).Kind() == 0 {
 		log.Panic("no such method:", action)
 	}
 	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, action, action)
@@ -97,9 +97,9 @@ func (v *View) JS() string {
 	return js
 }
 
-// {{.Err}} should be embedded in the template where errors are to be shown.
-func (v *View) Err() string {
-	return `<span id=Errorbox ></span>`
+// {{.ErrorBox}} should be embedded in the template where errors are to be shown.
+func (v *View) ErrorBox() string {
+	return `<span id=ErrorBox class=ErrorBox></span>`
 }
 
 func (v *View) RenderHTML(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +110,7 @@ func (v *View) RenderHTML(w http.ResponseWriter, r *http.Request) {
 type kv struct{ ID, HTML string }
 
 func (v *View) refresh(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("*")
+	//fmt.Print("*")
 	js := []kv{}
 	for i, o := range v.objects {
 		id := fmt.Sprint(i + 1)

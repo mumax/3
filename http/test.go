@@ -1,38 +1,36 @@
 package main
 
 import (
-	"log"
 	"time"
 )
 
 func main() {
-	log.SetFlags(0)
-	testdata := &testt{}
+	testdata := &test{}
 	v := NewView(testdata, testtempl)
 	v.ListenAndServe(":7070")
 }
 
-type testt struct{ hits int }
+type test struct{ hits int }
 
-func (t *testt) SayHello() string { return "Hello world wide web!" }
-func (t *testt) HitMe()           { t.hits++ }
-func (t *testt) HitCount() int    { return t.hits }
-func (t *testt) Time() time.Time    { return time.Now() }
+func (t *test) SayHello() string { return "Hello world wide web!" }
+func (t *test) HitMe()           { t.hits++ }
+func (t *test) HitCount() int    { return t.hits }
+func (t *test) Time() time.Time  { return time.Now() }
 
 const testtempl = `
 <html>
 
 <head>
-	<style media="all" type="text/css">
-		body { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
+	<style type="text/css">
+		body   { margin: 20px; font-family: Ubuntu, Arial, sans-serif; }
+		.ErrorBox { color: red; font-weight: bold; } 
 	</style>
-
-{{.JS}}
+	{{.JS}}
 </head>
 
 <body onload=refresh()>
 
-	<p><b>{{.Err}}</b></p>
+	<p> {{.ErrorBox}} </p>
 
 	{{.Static "SayHello"}} <br/><br/>
 

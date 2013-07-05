@@ -42,6 +42,8 @@ const testtempl = `
 	{{.Button "HitMe"}}
 	You hit me {{.Label "HitCount"}} fucking times! <br/><br/>
 
+	{{.AutoRefreshBox}}
+
 </body>
 </html>
 `

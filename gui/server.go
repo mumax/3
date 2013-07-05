@@ -73,6 +73,10 @@ func (v *Server) Button(method string) string {
 	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, method, method)
 }
 
+func (v *Server) AutoRefreshBox() string {
+	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+}
+
 func (m *method_) String() string {
 	args := []reflect.Value{}
 	r := m.Call(args)

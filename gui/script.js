@@ -22,7 +22,6 @@ function refresh(){
 		try{
 			var req = new XMLHttpRequest();
 			req.open("POST", "/refresh/", false);
-			req.timeout = tick;
 			req.send(null);
 			response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
@@ -40,7 +39,6 @@ function rpc(method){
 	try{
 		var req = new XMLHttpRequest();
 		req.open("POST", "/rpc/", false);
-		req.timeout = tick;
 		var map = {"Method": method};
 		req.send(JSON.stringify(map));
 	}catch(e){

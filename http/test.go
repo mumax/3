@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"time"
 )
 
@@ -10,7 +9,7 @@ func main() {
 	log.SetFlags(0)
 	testdata := &testt{}
 	v := NewView(testdata, testtempl)
-	v.Render(os.Stdout)
+	v.ListenAndServe(":7070")
 }
 
 type testt struct {

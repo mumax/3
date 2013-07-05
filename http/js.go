@@ -8,24 +8,18 @@ function http(method, url){
 	return xmlHttp.responseText;
 }
 
-function httpGet(url){
-	return http("GET", url);
-}
-
-function httpPost(url){
-	return http("POST", url);
-}
-
-function rpc(command, err){
+function softRefresh(){
 	try{
-		var bytes = httpPost("/script/" + command);
+		var bytes = http("POST", "/refresh/");
 		var response = JSON.parse(bytes);	
 		if (response.Err != null){
-			document.getElementById(err).innerHTML = response.Err;
+			alert(response.Err);
 		}
 	}catch(e){
-		document.getElementById(err).innerHTML = e;
+		alert(e);
 	}
+	// ...
 }
 
+setInterval(softRefresh, 1000);
 </script>`

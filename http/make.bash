@@ -4,4 +4,4 @@ echo "const js = \`<script>" >> js.go
 cat script.js >> js.go
 echo "</script>\`" >> js.go
 
-go install -v
+go build -v

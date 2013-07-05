@@ -25,12 +25,17 @@ func (t *testt) Time() time.Time {
 
 const testtempl = `
 <html>
+
 <head>
 {{.JS}}
 </head>
+
 <body>
 
+	<p><b>{{.Err}}</b></p>
+
 	{{.Static "SayHello"}}
+
 	{{.Dynamic "Time"}}
 
 </body>

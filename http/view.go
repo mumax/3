@@ -1,21 +1,20 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
 	"log"
 	"net/http"
 	"reflect"
 	"text/template"
-	"encoding/json"
-	"bytes"
 )
 
 type View struct {
-	data   reflect.Value
-	templ  *template.Template
-	haveJS bool // have called JS()?
-	objects []obj
+	data      reflect.Value
+	templ     *template.Template
+	haveJS    bool // have called JS()?
+	objects   []obj
 	htmlCache []byte // static html content, rendered only once
 }
 
@@ -45,8 +44,8 @@ func (v *View) Static(field string) string {
 	return htmlEsc(v.call(field))
 }
 
-type obj interface{
-	Eval()interface{}
+type obj interface {
+	Eval() interface{}
 }
 
 func (v *View) Dynamic(field string) string {
@@ -54,56 +53,57 @@ func (v *View) Dynamic(field string) string {
 	return fmt.Sprintf(`<p id=%v>%v</p>`, id, "")
 }
 
-
-func(m*method_)Eval()interface{}{
-		args := []reflect.Value{}
-		r := m.Call(args)
-		argument(len(r) == 1, "need one return value")
-		return r[0].Interface()
+func (m *method_) Eval() interface{} {
+	args := []reflect.Value{}
+	r := m.Call(args)
+	argument(len(r) == 1, "need one return value")
+	return r[0].Interface()
 }
 
 type method_ struct{ reflect.Value }
-func method(v reflect.Value, field string)obj{
+
+func method(v reflect.Value, field string) obj {
 	m := v.MethodByName(field)
 	if m.Kind() != 0 {
 		return &method_{m}
-	}else{
-	panic(fmt.Sprint("type ", v.Type(), " has no such field or method ", field))
+	} else {
+		panic(fmt.Sprint("type ", v.Type(), " has no such field or method ", field))
 	}
 }
 
-func(v*View)addObj(o obj)(id int){
+func (v *View) addObj(o obj) (id int) {
 	v.objects = append(v.objects, o)
 	return len(v.objects)
 }
 
-
+// {{.JS}} should be embedded in the template <head>
 func (v *View) JS() string {
 	v.haveJS = true
 	return js
+}
+
+// {{.Err}} should be embedded in the template where errors are to be shown.
+func (v *View) Err() string {
+	return `<span id=Errorbox ></span>`
 }
 
 func (v *View) RenderHTML(w http.ResponseWriter, r *http.Request) {
 	w.Write(v.htmlCache)
 }
 
-
 // key-value pair
-type kv struct{ID, HTML string}
+type kv struct{ ID, HTML string }
 
 func (v *View) Refresh(w http.ResponseWriter, r *http.Request) {
-	log.Println("Refresh")
-
+	fmt.Print("*")
 	js := []kv{}
-	for i,o := range v.objects{
-		id := fmt.Sprint(i)
+	for i, o := range v.objects {
+		id := fmt.Sprint(i + 1)
 		innerHTML := htmlEsc(o.Eval())
 		js = append(js, kv{id, innerHTML})
 	}
-	check(json.NewEncoder(os.Stdout).Encode(js))
 	check(json.NewEncoder(w).Encode(js))
 }
-
 
 func (v *View) call(field string) interface{} {
 	m := v.data.MethodByName(field)

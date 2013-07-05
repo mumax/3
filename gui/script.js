@@ -1,5 +1,5 @@
 
-// update rate
+// auto-refresh rate
 var tick = 500;
 var autorefresh = true;
 
@@ -8,6 +8,7 @@ function showErr(err){
 	document.getElementById("ErrorBox").innerHTML = err;
 }
 
+// called on change of auto-refresh button
 function setautorefresh(){
 	autorefresh =  document.getElementById("AutoRefresh").checked;
 }
@@ -34,6 +35,7 @@ function refresh(){
 	}
 }
 
+// remote procedure call, called on button clicks etc.
 function rpc(method){
 	try{
 		var req = new XMLHttpRequest();

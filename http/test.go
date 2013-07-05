@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 )
 
 func main() {
@@ -12,16 +11,11 @@ func main() {
 	v.ListenAndServe(":7070")
 }
 
-type testt struct {
-}
+type testt struct{ hits int }
 
-func (t *testt) SayHello() string {
-	return "<Hello world wide web!>"
-}
-
-func (t *testt) Time() time.Time {
-	return time.Now()
-}
+func (t *testt) SayHello() string { return "<Hello world wide web!>" }
+func (t *testt) HitMe()           { t.hits++ }
+func (t *testt) HitCount() int    { return t.hits }
 
 const testtempl = `
 <html>
@@ -35,8 +29,9 @@ const testtempl = `
 	<p><b>{{.Err}}</b></p>
 
 	{{.Static "SayHello"}}
+	{{.Label "HitCount"}}
+	{{.Button "HitMe"}}
 
-	{{.Dynamic "Time"}}
 
 </body>
 </html>

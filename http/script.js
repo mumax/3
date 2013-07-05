@@ -7,15 +7,17 @@ function showErr(err){
 	document.getElementById("Errorbox").innerHTML = err;
 }
 
-function softRefresh(){
+// refreshes the contents of all dynamic elements,
+// leaves the rest of the page alone.
+function refresh(){
 	showErr("");
 	var response;
 	try{
-		var xmlHttp = new XMLHttpRequest();
-		xmlHttp.open("POST", "/refresh/", false);
-		xmlHttp.timeout = tick;
-		xmlHttp.send(null);
-		response = JSON.parse(xmlHttp.responseText);	
+		var req = new XMLHttpRequest();
+		req.open("POST", "/refresh/", false);
+		req.timeout = tick;
+		req.send(null);
+		response = JSON.parse(req.responseText);	
 		for(var i=0; i<response.length; i++){
 			var r = response[i];
 			document.getElementById(r.ID).innerHTML = r.HTML;
@@ -25,4 +27,17 @@ function softRefresh(){
 	}
 }
 
-setInterval(softRefresh, tick);
+function rpc(){
+	try{
+		var req = new XMLHttpRequest();
+		req.open("POST", "/rpc/", false);
+		req.timeout = tick;
+		var map = {};
+		map["XXXX"] = "YYYYYYYYYYYYY";
+		req.send(JSON.stringify(map));
+	}catch(e){
+		showErr(e);
+	}
+}
+
+setInterval(refresh, tick);

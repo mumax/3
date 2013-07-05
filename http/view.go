@@ -34,7 +34,8 @@ func NewView(data interface{}, templ string) *View {
 
 func (v *View) ListenAndServe(port string) {
 	http.HandleFunc("/", v.RenderHTML)
-	http.HandleFunc("/refresh/", v.Refresh)
+	http.HandleFunc("/refresh/", v.refresh)
+	http.HandleFunc("/rpc/", v.rpc)
 	check(http.ListenAndServe(":7070", nil))
 }
 
@@ -48,9 +49,19 @@ type obj interface {
 	Eval() interface{}
 }
 
-func (v *View) Dynamic(field string) string {
+func (v *View) Label(field string) string {
 	id := v.addObj(method(v.data, field))
 	return fmt.Sprintf(`<p id=%v>%v</p>`, id, "")
+}
+
+func (v *View) rpc(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]string)
+	check(json.NewDecoder(r.Body).Decode(&m))
+	fmt.Println(m)
+}
+
+func (v *View) Button(action string) string {
+	return fmt.Sprintf(`<button onclick=rpc();>%v</button>`, action)
 }
 
 func (m *method_) Eval() interface{} {
@@ -94,7 +105,7 @@ func (v *View) RenderHTML(w http.ResponseWriter, r *http.Request) {
 // key-value pair
 type kv struct{ ID, HTML string }
 
-func (v *View) Refresh(w http.ResponseWriter, r *http.Request) {
+func (v *View) refresh(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("*")
 	js := []kv{}
 	for i, o := range v.objects {

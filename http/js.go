@@ -1,5 +1,4 @@
 package main
-
 const js = `<script>
 
 function http(method, url){

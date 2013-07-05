@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -19,6 +20,10 @@ func (t *testt) SayHello() string {
 	return "<Hello world wide web!>"
 }
 
+func (t *testt) Time() time.Time {
+	return time.Now()
+}
+
 const testtempl = `
 <html>
 <head>
@@ -27,6 +32,7 @@ const testtempl = `
 <body>
 
 	{{.Static "SayHello"}}
+	{{.Dynamic "Time"}}
 
 </body>
 </html>

@@ -13,6 +13,7 @@ type View struct {
 	data   reflect.Value
 	templ  *template.Template
 	haveJS bool // have called JS()?
+	id     int
 }
 
 func NewView(data interface{}, templ string) *View {
@@ -32,9 +33,9 @@ func (v *View) Static(field string) string {
 	return htmlEsc(v.call(field))
 }
 
-//func(v*View)Dynamic(field string)string{
-//
-//}
+func (v *View) Dynamic(field string) string {
+	return fmt.Sprintf(`<p id=%v>%v</p>`, v.ID(), "")
+}
 
 func (v *View) call(field string) interface{} {
 	m := v.data.MethodByName(field)
@@ -56,8 +57,14 @@ func (v *View) JS() string {
 	return js
 }
 
+func (v *View) ID() string {
+	v.id++
+	return fmt.Sprint("C",v.id)
+}
+
 func (v *View) Render(out io.Writer) {
 	check(v.templ.Execute(out, v))
+	v.id = 0 // reset for next Render
 }
 
 func check(err error) {

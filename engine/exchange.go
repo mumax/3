@@ -37,7 +37,7 @@ func initExchange() {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
 			msat := Msat.GetUniform()
-			D := Dex.GetUniform()/ msat
+			D := Dex.GetUniform() / msat
 			A := Aex.GetUniform() / msat
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}

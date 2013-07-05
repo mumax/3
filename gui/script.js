@@ -1,6 +1,6 @@
 
 // update rate
-var tick = 1000;
+var tick = 500;
 
 // show error in document
 function showErr(err){

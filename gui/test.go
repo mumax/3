@@ -1,12 +1,15 @@
+//+build ignore
+
 package main
 
 import (
+	. "."
 	"time"
 )
 
 func main() {
 	testdata := &test{}
-	v := NewView(testdata, testtempl)
+	v := NewServer(testdata, testtempl)
 	v.ListenAndServe(":7070")
 }
 

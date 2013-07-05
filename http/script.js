@@ -27,17 +27,17 @@ function refresh(){
 	}
 }
 
-function rpc(){
+function rpc(method){
 	try{
 		var req = new XMLHttpRequest();
 		req.open("POST", "/rpc/", false);
 		req.timeout = tick;
-		var map = {};
-		map["XXXX"] = "YYYYYYYYYYYYY";
+		var map = {"Method": method};
 		req.send(JSON.stringify(map));
 	}catch(e){
 		showErr(e);
 	}
+	refresh();
 }
 
 setInterval(refresh, tick);

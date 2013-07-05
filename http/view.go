@@ -51,17 +51,21 @@ type obj interface {
 
 func (v *View) Label(field string) string {
 	id := v.addObj(method(v.data, field))
-	return fmt.Sprintf(`<p id=%v>%v</p>`, id, "")
+	return fmt.Sprintf(`<span id=%v>%v</span>`, id, "")
 }
 
 func (v *View) rpc(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]string)
 	check(json.NewDecoder(r.Body).Decode(&m))
-	fmt.Println(m)
+	methodName := m["Method"]
+	v.data.MethodByName(methodName).Call([]reflect.Value{})
 }
 
 func (v *View) Button(action string) string {
-	return fmt.Sprintf(`<button onclick=rpc();>%v</button>`, action)
+	if v.data.MethodByName(action).Kind() == 0{
+		log.Panic("no such method:", action)
+	}
+	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, action, action)
 }
 
 func (m *method_) Eval() interface{} {

@@ -1,6 +1,6 @@
 
 // auto-refresh rate
-var tick = 500;
+var tick = 50;
 var autorefresh = true;
 
 // show error in document
@@ -21,13 +21,18 @@ function refresh(){
 		var response;
 		try{
 			var req = new XMLHttpRequest();
-			req.open("POST", "/refresh/", false);
+			req.open("POST", "/refresh/", true);
+			req.timeout = tick;
+			req.onreadystatechange = function(){
+				if (req.readyState == 4) { // DONE
+					response = JSON.parse(req.responseText);	
+					for(var i=0; i<response.length; i++){
+						var r = response[i];
+						document.getElementById(r.ID).innerHTML = r.HTML;
+					}
+				}
+			};
 			req.send(null);
-			response = JSON.parse(req.responseText);	
-			for(var i=0; i<response.length; i++){
-				var r = response[i];
-				document.getElementById(r.ID).innerHTML = r.HTML;
-			}
 		}catch(e){
 			showErr(e);
 		}

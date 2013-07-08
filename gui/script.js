@@ -1,6 +1,6 @@
 
 // auto-refresh rate
-var tick = 50;
+var tick = 250;
 var autorefresh = true;
 
 // show error in document
@@ -13,28 +13,34 @@ function setautorefresh(){
 	autorefresh =  document.getElementById("AutoRefresh").checked;
 }
 
+// onreadystatechange function for update request
+function refreshDOM(req){
+	if (req.readyState == 4) { // DONE
+		if (req.status == 200) {	
+			showErr("");
+			var response = JSON.parse(req.responseText);	
+			for(var i=0; i<response.length; i++){
+				var r = response[i];
+				document.getElementById(r.ID).innerHTML = r.HTML;
+			}
+		} else {
+			showErr("Disconnected");	
+		}
+	}
+}
+
 // refreshes the contents of all dynamic elements,
 // leaves the rest of the page alone.
 function refresh(){
 	if (autorefresh){
-		showErr("");
-		var response;
 		try{
 			var req = new XMLHttpRequest();
 			req.open("POST", "/refresh/", true);
 			req.timeout = tick;
-			req.onreadystatechange = function(){
-				if (req.readyState == 4) { // DONE
-					response = JSON.parse(req.responseText);	
-					for(var i=0; i<response.length; i++){
-						var r = response[i];
-						document.getElementById(r.ID).innerHTML = r.HTML;
-					}
-				}
-			};
+			req.onreadystatechange = function(){ refreshDOM(req) };
 			req.send(null);
 		}catch(e){
-			showErr(e);
+			showErr(e); // TODO: same message as refresh
 		}
 	}
 }
@@ -47,7 +53,7 @@ function rpc(method){
 		var map = {"Method": method};
 		req.send(JSON.stringify(map));
 	}catch(e){
-		showErr(e);
+		showErr(e); // TODO
 	}
 	refresh();
 }

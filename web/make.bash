@@ -1,11 +1,11 @@
 #! /bin/bash
-echo package web > js.go
-echo // THIS FILE IS AUTO GENERATED FROM webgui.js >> js.go
-echo // EDITING IS FUTILE >> js.go
-echo  >> js.go
-echo const templText = \` >> js.go
-cat gui.html >> js.go
-echo \` >> js.go
-gofmt -w js.go
+echo package web > html.go
+echo // THIS FILE IS AUTO GENERATED FROM webgui.html >> html.go
+echo // EDITING IS FUTILE >> html.go
+echo  >> html.go
+echo const templText = \` >> html.go
+cat gui.html >> html.go
+echo \` >> html.go
+gofmt -w html.go
 go install -v
 go vet

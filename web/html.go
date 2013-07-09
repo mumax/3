@@ -1,3 +1,9 @@
+package web
+
+// THIS FILE IS AUTO GENERATED FROM webgui.html
+// EDITING IS FUTILE
+
+const templText = `
 <!DOCTYPE html>
 <html>
 
@@ -71,3 +77,4 @@
 
 </body>
 </html>
+`

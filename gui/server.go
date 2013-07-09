@@ -32,12 +32,12 @@ func (v *Server) preRender() {
 	v.htmlCache = cache.Bytes()
 }
 
-func (v *Server) ListenAndServe(port string) {
+func (v *Server) ListenAndServe(port string) error {
 	v.preRender()
 	http.HandleFunc("/", v.renderHTML)
 	http.HandleFunc("/refresh/", v.refresh)
 	http.HandleFunc("/rpc/", v.rpc)
-	check(http.ListenAndServe(":7070", nil))
+	return http.ListenAndServe(":7070", nil)
 }
 
 // {{.JS}} should always be embedded in the template <head>.
@@ -71,6 +71,10 @@ func (v *Server) Button(modelName string) string {
 	_ = v.caller(modelName) // check existence
 	id := id(modelName)
 	return fmt.Sprintf(`<button id=%v onclick="call('%v')">%v</button>`, id, modelName, modelName)
+}
+
+func (s *Server) Function(modelName string) string {
+
 }
 
 // {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
@@ -154,7 +158,6 @@ type domUpd struct {
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]string)
 	check(json.NewDecoder(r.Body).Decode(&m))
-	log.Println("RPC", m)
 	modelName := m["ID"]
 	method := m["Method"]
 	switch method {

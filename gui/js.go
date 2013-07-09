@@ -52,16 +52,20 @@ function refresh(){
 }
 
 // remote procedure call, called on button clicks etc.
-function rpc(method, args){
+function rpc(model, method, args){
 	try{
 		var req = new XMLHttpRequest();
 		req.open("POST", "/rpc/", false);
-		var map = {"Method": method, "Args": args};
+		var map = {"ID": model, "Method": method, "Args": args};
 		req.send(JSON.stringify(map));
 	}catch(e){
 		showErr(e); // TODO
 	}
 	refresh();
+}
+
+function call(model){
+	rpc(model, "call");
 }
 
 setInterval(refresh, tick);

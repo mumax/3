@@ -4,6 +4,7 @@ package main
 
 import (
 	. "."
+	"fmt"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func main() {
 type test struct{ hits int }
 
 func (t *test) SayHello() string { return "Hello world wide web!" }
-func (t *test) HitMe()           { t.hits++ }
+func (t *test) HitMe()           { t.hits++; fmt.Println("got hit") }
 func (t *test) HitCount() int    { return t.hits }
 func (t *test) Time() time.Time  { return time.Now() }
 
@@ -44,6 +45,7 @@ const testtempl = `
 	<hr/>
 
 	It's now <b> {{.Label "time"}} </b><br/><br/>
+	{{.Button "hit me"}}
 
 	<hr/>
 	

@@ -44,27 +44,18 @@ func (s *Server) Add(name string, model interface{}) {
 	panic(fmt.Sprint("server.add: can not handle model of type ", t))
 }
 
-type getter struct {
-	get func() interface{}
-}
+type getter struct{ get func() interface{} }
+type setter struct{ set func(interface{}) }
+type caller struct{ f func() }
 
-type setter struct {
-	set func(interface{})
-}
+func (g *getter) Get() interface{}  { return g.get() }
+func (s *setter) Set(v interface{}) { s.set(v) }
+func (c *caller) Call()             { c.f() }
 
 type model struct {
 	setter
 	getter
 }
-
-func (g *getter) Get() interface{}  { return g.get() }
-func (s *setter) Set(v interface{}) { s.set(v) }
-
-type caller struct {
-	f func()
-}
-
-func (c *caller) Call() { c.f() }
 
 func (s *Server) addMod(name string, mod interface{}) {
 	if _, ok := s.model[name]; ok {

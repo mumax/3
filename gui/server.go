@@ -68,9 +68,9 @@ func (v *Server) Label(modelName string) string {
 
 // {{.Button "modelName"}}
 func (v *Server) Button(modelName string) string {
-	_ = v.setter(modelName) // check existence
+	_ = v.caller(modelName) // check existence
 	id := id(modelName)
-	return fmt.Sprintf(`<button id=%v onclick="rpc(&quot;%v&quot;);">%v</button>`, id, modelName, modelName)
+	return fmt.Sprintf(`<button id=%v onclick="call(&quot;%v&quot;);">%v</button>`, id, modelName, modelName)
 }
 
 func id(name string) string {
@@ -92,6 +92,15 @@ func (v *Server) setter(name string) Setter {
 		return s
 	} else {
 		panic("model " + name + " has no set() functionality")
+	}
+}
+
+func (v *Server) caller(name string) Caller {
+	m := v.getModel(name)
+	if s, ok := m.(Caller); ok {
+		return s
+	} else {
+		panic("model " + name + " has no call() functionality")
 	}
 }
 
@@ -141,12 +150,17 @@ type domUpd struct {
 
 // HTTP handler for RPC calls by button clicks etc
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
-	//m := make(map[string]string)
-	//check(json.NewDecoder(r.Body).Decode(&m))
+	m := make(map[string]string)
+	check(json.NewDecoder(r.Body).Decode(&m))
 	//log.Println("RPC", m)
-
-	//methodName := m["Method"]
-	//v.data.MethodByName(methodName).Call([]reflect.Value{})
+	modelName := m["ID"]
+	method := m["Method"]
+	switch method {
+	default:
+		panic("rpc: unhandled method: " + method)
+	case "call":
+		v.caller(modelName).Call()
+	}
 }
 
 //func (v *Server) call(field string) string {

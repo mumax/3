@@ -2,37 +2,38 @@ package gui
 
 import (
 	"bytes"
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
+	//"reflect"
 	"text/template"
 )
 
 type Server struct {
-	data      reflect.Value
 	templ     *template.Template
 	haveJS    bool // have called JS()?
-	elements  []fmt.Stringer
+	model     map[string]*mod
 	htmlCache []byte // static html content, rendered only once
 }
 
-func NewServer(data interface{}, templ string) *Server {
+func NewServer(templ string) *Server {
 	t := template.Must(template.New("").Parse(templ))
-	v := &Server{data: reflect.ValueOf(data), templ: t}
+	return &Server{templ: t, model: make(map[string]*mod)}
+}
 
-	// pre-render static html content
+// pre-render static html content
+func (v *Server) preRender() {
 	cache := bytes.NewBuffer(nil)
 	check(v.templ.Execute(cache, v))
 	if !v.haveJS {
 		log.Panic("template should call {{.JS}}")
 	}
 	v.htmlCache = cache.Bytes()
-	return v
 }
 
 func (v *Server) ListenAndServe(port string) {
+	v.preRender()
 	http.HandleFunc("/", v.renderHTML)
 	http.HandleFunc("/refresh/", v.refresh)
 	http.HandleFunc("/rpc/", v.rpc)
@@ -52,59 +53,56 @@ func (v *Server) ErrorBox() string {
 	return `<span id=ErrorBox class=ErrorBox></span>`
 }
 
-// {{.Static "method"}} renders the value returned by the data's specified method,
-// without auto-refresh.
-func (v *Server) Static(method string) string {
-	return htmlEsc(v.call(method))
-}
+//// {{.Static "modelName"}}
+//// without auto-refresh.
+//func (v *Server) Static(method string) string {
+//	return htmlEsc(v.call(method))
+//}
 
-// {{.Label "method"}} renders the value returned by the data's specified method,
+// {{.Label "modelName"}}
 // with auto-refresh.
-func (v *Server) Label(meth string) string {
-	id := v.addElem(method(v.data, meth))
-	return fmt.Sprintf(`<span id=%v>%v</span>`, id, "")
+func (v *Server) Label(modelName string) string {
+	m := v.getter(modelName)
+	return fmt.Sprintf(`<span id=%v>%v</span>`, id(modelName), m.Get())
 }
 
-// {{.Button "method"}} renders a button that invokes the specified method on click.
-func (v *Server) Button(method string) string {
-	if v.data.MethodByName(method).Kind() == 0 {
-		log.Panic("no such method:", method)
+func id(name string) string {
+	return "guielem_" + name
+}
+
+func (v *Server) getter(name string) Getter {
+	m := v.getModel(name)
+	if m.get == nil {
+		panic("model " + name + " has no get() functionality")
 	}
-	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, method, method)
+	return m
 }
 
-// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
-func (v *Server) AutoRefreshBox() string {
-	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
-}
-
-func (v *Server) TextBox(meth string) string {
-	id := v.addElem(method(v.data, meth))
-	return fmt.Sprintf(`<input id=%v class=TextBox onchange="rpc(&quot;%v&quot;, document.getElementById(&quot;%v&quot;).text);"></input>`, id, id, meth)
-}
-
-func (m *method_) String() string {
-	args := []reflect.Value{}
-	r := m.Call(args)
-	argument(len(r) == 1, "need one return value")
-	return fmt.Sprint(r[0].Interface())
-}
-
-type method_ struct{ reflect.Value }
-
-func method(v reflect.Value, field string) fmt.Stringer {
-	m := v.MethodByName(field)
-	if m.Kind() != 0 {
-		return &method_{m}
+func (v *Server) getModel(name string) *mod {
+	if m, ok := v.model[name]; ok {
+		return m
 	} else {
-		panic(fmt.Sprint("type ", v.Type(), " has no such field or method ", field))
+		panic("undefined model: " + name)
 	}
 }
 
-func (v *Server) addElem(o fmt.Stringer) (id int) {
-	v.elements = append(v.elements, o)
-	return len(v.elements)
-}
+//// {{.Button "modelName"}}
+//func (v *Server) Button(method string) string {
+//	if v.data.MethodByName(method).Kind() == 0 {
+//		log.Panic("no such method:", method)
+//	}
+//	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, method, method)
+//}
+//
+//// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
+//func (v *Server) AutoRefreshBox() string {
+//	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+//}
+//
+//func (v *Server) TextBox(meth string) string {
+//	id := v.addElem(method(v.data, meth))
+//	return fmt.Sprintf(`<input id=%v class=TextBox onchange="rpc(&quot;%v&quot;, document.getElementById(&quot;%v&quot;).text);"></input>`, id, id, meth)
+//}
 
 // HTTP handler for the main page
 func (v *Server) renderHTML(w http.ResponseWriter, r *http.Request) {
@@ -113,14 +111,14 @@ func (v *Server) renderHTML(w http.ResponseWriter, r *http.Request) {
 
 // HTTP handler for refreshing the dynamic elements
 func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
-	//fmt.Print("*")
-	js := []domUpd{}
-	for i, o := range v.elements {
-		id := fmt.Sprint(i + 1)
-		innerHTML := htmlEsc(o.String())
-		js = append(js, domUpd{id, "innerHTML", innerHTML})
-	}
-	check(json.NewEncoder(w).Encode(js))
+	//	//fmt.Print("*")
+	//	js := []domUpd{}
+	//	for i, o := range v.model {
+	//		id := fmt.Sprint(i + 1)
+	//		innerHTML := htmlEsc(o.get())
+	//		js = append(js, domUpd{id, "innerHTML", innerHTML})
+	//	}
+	//	check(json.NewEncoder(w).Encode(js))
 }
 
 // DOM update action
@@ -132,25 +130,26 @@ type domUpd struct {
 
 // HTTP handler for RPC calls by button clicks etc
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]string)
-	check(json.NewDecoder(r.Body).Decode(&m))
-	log.Println("RPC", m)
-	methodName := m["Method"]
-	v.data.MethodByName(methodName).Call([]reflect.Value{})
+	//m := make(map[string]string)
+	//check(json.NewDecoder(r.Body).Decode(&m))
+	//log.Println("RPC", m)
+
+	//methodName := m["Method"]
+	//v.data.MethodByName(methodName).Call([]reflect.Value{})
 }
 
-func (v *Server) call(field string) string {
-	m := v.data.MethodByName(field)
-	if m.Kind() != 0 {
-		r := m.Call([]reflect.Value{})
-		argument(len(r) == 1, "need one return value")
-		return fmt.Sprint(r[0].Interface())
-	}
-	panic(fmt.Sprint("type ", v.data.Type(), " has no such field or method ", field))
-}
+//func (v *Server) call(field string) string {
+//	//m := v.data.MethodByName(field)
+//	//if m.Kind() != 0 {
+//	//	r := m.Call([]reflect.Value{})
+//	//	argument(len(r) == 1, "need one return value")
+//	//	return fmt.Sprint(r[0].Interface())
+//	//}
+//	//panic(fmt.Sprint("type ", v.data.Type(), " has no such field or method ", field))
+//}
 
-func htmlEsc(v string) string {
-	return template.HTMLEscapeString(v)
+func htmlEsc(v interface{}) string {
+	return template.HTMLEscapeString(fmt.Sprint(v))
 }
 
 func check(err error) {

@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	testdata := &test{}
-	v := NewServer(testdata, testtempl)
+	v := NewServer(testtempl)
+	v.Add("time", time.Now)
 	v.ListenAndServe(":7070")
 }
 
@@ -39,18 +39,9 @@ const testtempl = `
 	<p> {{.ErrorBox}} </p>
 	<hr/>
 
-	{{.Static "SayHello"}} <br/><br/>
-
-	It's now <b> {{.Label "Time"}} </b><br/><br/>
-
-	{{.Button "HitMe"}}
-	You hit me {{.Label "HitCount"}} fucking times! <br/><br/>
-
-	{{.TextBox "TextMe"}}
+	It's now <b> {{.Label "time"}} </b><br/><br/>
 
 	<hr/>
-
-	{{.AutoRefreshBox}}
 
 </body>
 </html>

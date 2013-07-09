@@ -2,7 +2,7 @@ package gui
 
 import (
 	"bytes"
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -111,14 +111,15 @@ func (v *Server) renderHTML(w http.ResponseWriter, r *http.Request) {
 
 // HTTP handler for refreshing the dynamic elements
 func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
-	//	//fmt.Print("*")
-	//	js := []domUpd{}
-	//	for i, o := range v.model {
-	//		id := fmt.Sprint(i + 1)
-	//		innerHTML := htmlEsc(o.get())
-	//		js = append(js, domUpd{id, "innerHTML", innerHTML})
-	//	}
-	//	check(json.NewEncoder(w).Encode(js))
+	//fmt.Print("*")
+	js := []domUpd{}
+	for n, m := range v.model {
+		if m.get != nil {
+			innerHTML := htmlEsc(m.get())
+			js = append(js, domUpd{id(n), "innerHTML", innerHTML})
+		}
+	}
+	check(json.NewEncoder(w).Encode(js))
 }
 
 // DOM update action

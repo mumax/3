@@ -27,7 +27,7 @@ function refreshDOM(req){
 			var response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
-				document.getElementById(r.ID).innerHTML = r.HTML;
+				document.getElementById(r.ID)[r.Var] = r.HTML;
 			}
 		} else {
 			showErr("Disconnected");	

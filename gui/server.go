@@ -108,17 +108,21 @@ func (v *Server) renderHTML(w http.ResponseWriter, r *http.Request) {
 // HTTP handler for refreshing the dynamic elements
 func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
-	js := []kv{}
+	js := []domUpd{}
 	for i, o := range v.elements {
 		id := fmt.Sprint(i + 1)
 		innerHTML := htmlEsc(o.String())
-		js = append(js, kv{id, innerHTML})
+		js = append(js, domUpd{id, "innerHTML", innerHTML})
 	}
 	check(json.NewEncoder(w).Encode(js))
 }
 
-// key-value pair
-type kv struct{ ID, HTML string }
+// DOM update action
+type domUpd struct {
+	ID   string // element ID to update
+	Var  string // element member, e.g. innerHTML
+	HTML string // element value to set
+}
 
 // HTTP handler for RPC calls by button clicks etc
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {

@@ -8,20 +8,20 @@ function showErr(err){
 	document.getElementById("ErrorBox").innerHTML = err;
 }
 
+// show debug message in document
+function msg(err){
+	document.getElementById("MsgBox").innerHTML = err;
+}
+
+
 // called on change of auto-refresh button
 function setautorefresh(){
 	autorefresh =  document.getElementById("AutoRefresh").checked;
 }
 
 var hasFocus = "";
-
-function focus(id){
-	hasFocus = id;
-}
-
-function unfocus(id){
-	hasFocus = "";
-}
+function notifyfocus(id){hasFocus = id;}
+function notifyblur (id){hasFocus = "";}
 
 // onreadystatechange function for update request
 function refreshDOM(req){

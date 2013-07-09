@@ -23,7 +23,7 @@ func main() {
 
 type alpha struct{ x string }
 
-func (a *alpha) Get() interface{}  { fmt.Println("get alpha"); return a.x }
+func (a *alpha) Get() interface{}  { return a.x }
 func (a *alpha) Set(v interface{}) { a.x = v.(string) + "*"; fmt.Println("set alpha") }
 
 type test struct{ hits int }

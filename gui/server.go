@@ -50,7 +50,7 @@ func (v *Server) JS() string {
 // {{.ErrorBox}} should be embedded in the template where errors are to be shown.
 // CSS rules for class ErrorBox may be set, e.g., to render errors in red.
 func (v *Server) ErrorBox() string {
-	return `<span id=ErrorBox class=ErrorBox></span>`
+	return `<span id=ErrorBox class=ErrorBox></span> <span id=MsgBox class=ErrorBox></span>`
 }
 
 //// {{.Static "modelName"}}
@@ -70,19 +70,20 @@ func (v *Server) Label(modelName string) string {
 func (v *Server) Button(modelName string) string {
 	_ = v.caller(modelName) // check existence
 	id := id(modelName)
-	return fmt.Sprintf(`<button id=%v onclick="call(&quot;%v&quot;);">%v</button>`, id, modelName, modelName)
+	return fmt.Sprintf(`<button id=%v onclick="call('%v')">%v</button>`, id, modelName, modelName)
 }
 
 // {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
 func (v *Server) AutoRefreshBox() string {
-	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh()">auto refresh</input>`)
 }
 
 //{{.TextBox}}
 func (v *Server) TextBox(modelName string) string {
 	_ = v.getModel(modelName) // check existence
 	id := id(modelName)
-	return fmt.Sprintf(`<input id=%v class=TextBox onchange="settext(&quot;%v&quot;);"></input>`, id, modelName)
+	i := "guielem_" + modelName
+	return fmt.Sprintf(`<input type=text id=%v class=TextBox onchange="settext('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, modelName, i, i)
 }
 
 func id(name string) string {
@@ -138,8 +139,6 @@ func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
 			id := "guielem_" + n // no quotes!
 			innerHTML := htmlEsc(g.Get())
 			js = append(js, domUpd{id, innerHTML})
-		} else {
-			fmt.Println("ignore ", n)
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))

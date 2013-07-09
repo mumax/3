@@ -73,8 +73,14 @@ func (v *Server) Button(method string) string {
 	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, method, method)
 }
 
+// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
 func (v *Server) AutoRefreshBox() string {
 	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+}
+
+func (v *Server) TextBox(meth string) string {
+	id := v.addElem(method(v.data, meth))
+	return fmt.Sprintf(`<input id=%v class=TextBox onchange="rpc(&quot;%v&quot;, document.getElementById(&quot;%v&quot;).text);"></input>`, id, id, meth)
 }
 
 func (m *method_) String() string {
@@ -128,6 +134,7 @@ type domUpd struct {
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]string)
 	check(json.NewDecoder(r.Body).Decode(&m))
+	log.Println("RPC", m)
 	methodName := m["Method"]
 	v.data.MethodByName(methodName).Call([]reflect.Value{})
 }

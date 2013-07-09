@@ -3,7 +3,7 @@
 var tick = 1000;
 var autorefresh = true;
 
-// show error in document
+// show error in document (non-intrusive alert())
 function showErr(err){
 	document.getElementById("ErrorBox").innerHTML = err;
 }
@@ -13,17 +13,19 @@ function msg(err){
 	document.getElementById("MsgBox").innerHTML = err;
 }
 
-
 // called on change of auto-refresh button
 function setautorefresh(){
 	autorefresh =  document.getElementById("AutoRefresh").checked;
 }
 
+// Id of element that has focus. We don't auto-refresh a focused textbox
+// as this would overwrite the users input.
 var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
 function notifyblur (id){hasFocus = "";}
 
-// onreadystatechange function for update request
+// onreadystatechange function for update http request.
+// refreshes the DOM with new values received from server.
 function refreshDOM(req){
 	if (req.readyState == 4) { // DONE
 		if (req.status == 200) {	
@@ -35,7 +37,7 @@ function refreshDOM(req){
 				// switch element type
 				if (elem.value != null && hasFocus != r.ID){ // textbox etc
 					elem.value = r.HTML;
-				}else{
+				}else{                                       // other elements
 					elem.innerHTML = r.HTML;
 				}
 			}
@@ -45,8 +47,8 @@ function refreshDOM(req){
 	}
 }
 
-// refreshes the contents of all dynamic elements,
-// leaves the rest of the page alone.
+// refreshes the contents of all dynamic elements.
+// periodically called via setInterval()
 function refresh(){
 	if (autorefresh){
 		try{
@@ -60,6 +62,8 @@ function refresh(){
 		}
 	}
 }
+
+setInterval(refresh, tick);
 
 // remote procedure call, called on button clicks etc.
 function rpc(model, method, arg){
@@ -83,4 +87,3 @@ function settext(model){
 }
 
 
-setInterval(refresh, tick);

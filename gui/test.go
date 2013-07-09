@@ -9,7 +9,11 @@ import (
 
 func main() {
 	v := NewServer(testtempl)
+	t := new(test)
+
 	v.Add("time", time.Now)
+	v.Add("hit me", t.HitMe)
+
 	v.ListenAndServe(":7070")
 }
 
@@ -42,6 +46,8 @@ const testtempl = `
 	It's now <b> {{.Label "time"}} </b><br/><br/>
 
 	<hr/>
+	
+	{{.AutoRefreshBox}}
 
 </body>
 </html>

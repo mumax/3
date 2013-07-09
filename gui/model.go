@@ -14,49 +14,63 @@ type Getter interface {
 }
 
 type Model interface {
-	Getter
 	Setter
+	Getter
+}
+
+type Caller interface {
+	Call()
 }
 
 func (s *Server) Add(name string, model interface{}) {
-	t := reflect.TypeOf(model)
-	switch m := t.(type) {
-	case Model:
-		s.addMod(name, m.Get, m.Set)
-		return
-	case Setter:
-		s.addMod(name, nil, m.Set)
-		return
-	case Getter:
-		s.addMod(name, m.Get, nil)
-		return
+	switch model.(type) {
+	case Getter, Setter, Caller:
+		s.addMod(name, model)
 	}
 
+	t := reflect.TypeOf(model)
 	v := reflect.ValueOf(model)
 	switch t.Kind() {
 	case reflect.Func:
-		if t.NumOut() == 1 && t.NumIn() == 0 {
-			s.addMod(name, func() interface{} { return v.Call([]reflect.Value{})[0].Interface() }, nil)
+		if t.NumOut() == 1 && t.NumIn() == 0 { // getter
+			s.addMod(name, &getter{func() interface{} { return v.Call([]reflect.Value{})[0].Interface() }})
+			return
+		}
+		if t.NumOut() == 0 && t.NumIn() == 0 { // niladic call
+			s.addMod(name, &caller{func() { v.Call([]reflect.Value{}) }})
 			return
 		}
 	}
 	panic(fmt.Sprint("server.add: can not handle model of type ", t))
 }
 
-type mod struct {
-	name string
-	get  func() interface{}
-	set  func(interface{})
+type getter struct {
+	get func() interface{}
 }
 
-func (m *mod) Get() interface{}  { return m.get() }
-func (m *mod) Set(v interface{}) { m.set(v) }
+type setter struct {
+	set func(interface{})
+}
 
-func (s *Server) addMod(name string, get func() interface{}, set func(interface{})) {
+type model struct {
+	setter
+	getter
+}
+
+func (g *getter) Get() interface{}  { return g.get() }
+func (s *setter) Set(v interface{}) { s.set(v) }
+
+type caller struct {
+	f func()
+}
+
+func (c *caller) Call() { c.f() }
+
+func (s *Server) addMod(name string, mod interface{}) {
 	if _, ok := s.model[name]; ok {
 		panic("model name " + name + " already in use")
 	}
-	s.model[name] = &mod{name, get, set}
+	s.model[name] = mod
 }
 
 //

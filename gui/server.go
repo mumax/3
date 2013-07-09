@@ -13,13 +13,13 @@ import (
 type Server struct {
 	templ     *template.Template
 	haveJS    bool // have called JS()?
-	model     map[string]*mod
+	model     map[string]interface{}
 	htmlCache []byte // static html content, rendered only once
 }
 
 func NewServer(templ string) *Server {
 	t := template.Must(template.New("").Parse(templ))
-	return &Server{templ: t, model: make(map[string]*mod)}
+	return &Server{templ: t, model: make(map[string]interface{})}
 }
 
 // pre-render static html content
@@ -66,19 +66,36 @@ func (v *Server) Label(modelName string) string {
 	return fmt.Sprintf(`<span id=%v>%v</span>`, id(modelName), m.Get())
 }
 
+// {{.Button "modelName"}}
+func (v *Server) Button(modelName string) string {
+	_ = v.setter(modelName) // check existence
+	id := id(modelName)
+	return fmt.Sprintf(`<button id=%v onclick="rpc(&quot;%v&quot;);">%v</button>`, id, modelName, modelName)
+}
+
 func id(name string) string {
-	return "guielem_" + name
+	return `"guielem_` + name + `"`
 }
 
 func (v *Server) getter(name string) Getter {
 	m := v.getModel(name)
-	if m.get == nil {
+	if g, ok := m.(Getter); ok {
+		return g
+	} else {
 		panic("model " + name + " has no get() functionality")
 	}
-	return m
 }
 
-func (v *Server) getModel(name string) *mod {
+func (v *Server) setter(name string) Setter {
+	m := v.getModel(name)
+	if s, ok := m.(Setter); ok {
+		return s
+	} else {
+		panic("model " + name + " has no set() functionality")
+	}
+}
+
+func (v *Server) getModel(name string) interface{} {
 	if m, ok := v.model[name]; ok {
 		return m
 	} else {
@@ -86,19 +103,11 @@ func (v *Server) getModel(name string) *mod {
 	}
 }
 
-//// {{.Button "modelName"}}
-//func (v *Server) Button(method string) string {
-//	if v.data.MethodByName(method).Kind() == 0 {
-//		log.Panic("no such method:", method)
-//	}
-//	return fmt.Sprintf(`<button onclick="rpc(&quot;%v&quot;);">%v</button>`, method, method)
-//}
-//
-//// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
-//func (v *Server) AutoRefreshBox() string {
-//	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
-//}
-//
+// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
+func (v *Server) AutoRefreshBox() string {
+	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+}
+
 //func (v *Server) TextBox(meth string) string {
 //	id := v.addElem(method(v.data, meth))
 //	return fmt.Sprintf(`<input id=%v class=TextBox onchange="rpc(&quot;%v&quot;, document.getElementById(&quot;%v&quot;).text);"></input>`, id, id, meth)
@@ -114,9 +123,10 @@ func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
 	js := []domUpd{}
 	for n, m := range v.model {
-		if m.get != nil {
-			innerHTML := htmlEsc(m.get())
-			js = append(js, domUpd{id(n), "innerHTML", innerHTML})
+		if g, ok := m.(Getter); ok {
+			id := "guielem_" + n // no quotes!
+			innerHTML := htmlEsc(g.Get())
+			js = append(js, domUpd{id, "innerHTML", innerHTML})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))

@@ -73,6 +73,18 @@ func (v *Server) Button(modelName string) string {
 	return fmt.Sprintf(`<button id=%v onclick="call(&quot;%v&quot;);">%v</button>`, id, modelName, modelName)
 }
 
+// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
+func (v *Server) AutoRefreshBox() string {
+	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
+}
+
+//{{.TextBox}}
+func (v *Server) TextBox(modelName string) string {
+	_ = v.getModel(modelName) // check existence
+	id := id(modelName)
+	return fmt.Sprintf(`<input id=%v class=TextBox onchange="settext(&quot;%v&quot;);"></input>`, id, modelName)
+}
+
 func id(name string) string {
 	return `"guielem_` + name + `"`
 }
@@ -112,16 +124,6 @@ func (v *Server) getModel(name string) interface{} {
 	}
 }
 
-// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
-func (v *Server) AutoRefreshBox() string {
-	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh();">auto refresh</input>`)
-}
-
-//func (v *Server) TextBox(meth string) string {
-//	id := v.addElem(method(v.data, meth))
-//	return fmt.Sprintf(`<input id=%v class=TextBox onchange="rpc(&quot;%v&quot;, document.getElementById(&quot;%v&quot;).text);"></input>`, id, id, meth)
-//}
-
 // HTTP handler for the main page
 func (v *Server) renderHTML(w http.ResponseWriter, r *http.Request) {
 	w.Write(v.htmlCache)
@@ -135,7 +137,9 @@ func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
 		if g, ok := m.(Getter); ok {
 			id := "guielem_" + n // no quotes!
 			innerHTML := htmlEsc(g.Get())
-			js = append(js, domUpd{id, "innerHTML", innerHTML})
+			js = append(js, domUpd{id, innerHTML})
+		} else {
+			fmt.Println("ignore ", n)
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))
@@ -144,7 +148,6 @@ func (v *Server) refresh(w http.ResponseWriter, r *http.Request) {
 // DOM update action
 type domUpd struct {
 	ID   string // element ID to update
-	Var  string // element member, e.g. innerHTML
 	HTML string // element value to set
 }
 
@@ -152,7 +155,7 @@ type domUpd struct {
 func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]string)
 	check(json.NewDecoder(r.Body).Decode(&m))
-	//log.Println("RPC", m)
+	log.Println("RPC", m)
 	modelName := m["ID"]
 	method := m["Method"]
 	switch method {
@@ -160,6 +163,8 @@ func (v *Server) rpc(w http.ResponseWriter, r *http.Request) {
 		panic("rpc: unhandled method: " + method)
 	case "call":
 		v.caller(modelName).Call()
+	case "set":
+		v.setter(modelName).Set(m["Arg"])
 	}
 }
 

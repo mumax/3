@@ -13,6 +13,16 @@ function setautorefresh(){
 	autorefresh =  document.getElementById("AutoRefresh").checked;
 }
 
+var hasFocus = "";
+
+function focus(id){
+	hasFocus = id;
+}
+
+function unfocus(id){
+	hasFocus = "";
+}
+
 // onreadystatechange function for update request
 function refreshDOM(req){
 	if (req.readyState == 4) { // DONE
@@ -21,7 +31,13 @@ function refreshDOM(req){
 			var response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
-				document.getElementById(r.ID)[r.Var] = r.HTML;
+				var elem = document.getElementById(r.ID);
+				// switch element type
+				if (elem.value != null && hasFocus != r.ID){ // textbox etc
+					elem.value = r.HTML;
+				}else{
+					elem.innerHTML = r.HTML;
+				}
 			}
 		} else {
 			showErr("Disconnected");	
@@ -46,11 +62,11 @@ function refresh(){
 }
 
 // remote procedure call, called on button clicks etc.
-function rpc(model, method, args){
+function rpc(model, method, arg){
 	try{
 		var req = new XMLHttpRequest();
 		req.open("POST", "/rpc/", false);
-		var map = {"ID": model, "Method": method, "Args": args};
+		var map = {"ID": model, "Method": method, "Arg": arg};
 		req.send(JSON.stringify(map));
 	}catch(e){
 		showErr(e); // TODO
@@ -61,5 +77,10 @@ function rpc(model, method, args){
 function call(model){
 	rpc(model, "call");
 }
+
+function settext(model){
+	rpc(model, "set", document.getElementById("guielem_"+model).value);
+}
+
 
 setInterval(refresh, tick);

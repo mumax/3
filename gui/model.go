@@ -23,9 +23,10 @@ type Caller interface {
 }
 
 func (s *Server) Add(name string, model interface{}) {
-	switch model.(type) {
-	case Getter, Setter, Caller:
-		s.addMod(name, model)
+	if m, ok := model.(Model); ok {
+		fmt.Println("add " + name + ": full model")
+		s.addMod(name, m)
+		return
 	}
 
 	t := reflect.TypeOf(model)

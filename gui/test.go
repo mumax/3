@@ -15,8 +15,16 @@ func main() {
 	v.Add("time", time.Now)
 	v.Add("hit me", t.HitMe)
 
+	a := &alpha{"it works"}
+	v.Add("alpha", a)
+
 	v.ListenAndServe(":7070")
 }
+
+type alpha struct{ x string }
+
+func (a *alpha) Get() interface{}  { fmt.Println("get alpha"); return a.x }
+func (a *alpha) Set(v interface{}) { a.x = v.(string) + "*"; fmt.Println("set alpha") }
 
 type test struct{ hits int }
 
@@ -46,6 +54,8 @@ const testtempl = `
 
 	It's now <b> {{.Label "time"}} </b><br/><br/>
 	{{.Button "hit me"}}
+
+	{{.TextBox "alpha"}}
 
 	<hr/>
 	

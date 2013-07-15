@@ -61,7 +61,7 @@ func (s *State) Example(in string) string {
 	}
 	cmd("mx3", "-f", arg, s.infile())
 
-	return `<pre>` + in + `</pre>`
+	return `<pre>` + template.HTMLEscapeString(in) + `</pre>`
 }
 
 func (s *State) Img(fname string) string {

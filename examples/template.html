@@ -12,7 +12,7 @@
 		hr   { border-style: none; border-top: 1px solid #CCCCCC; margin-top: 20px; margin-bottom: 20px }
 		a    { color: #375EAB; text-decoration: none; }
 		div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
-		pre  { margin-left: 50px; margin-top: 10px; margin-bottom: 20px; color: #000044 }
+		pre  { margin-left: 50px; margin-top: 10px; margin-bottom: 20px; color: #000044; font-size: 12px; }
 	</style>
 </head>
 
@@ -109,6 +109,11 @@ save(STTorque) // Spin-transfer torque/γ0
 
 // The input parameters (Msat, Aex, ...) can be saved as well,
 // but that's only useful when they are defined space- or time-dependent.
+
+// Append output to existing file. When running a large batch
+// you can append the end result of every simulation to a single file.
+// E.g: add Aex and <mx> of every simulation to result.txt:
+fprintln("result.txt", Aex, average(m)[0])
 
 `}}{{.Output}}
 

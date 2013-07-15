@@ -4,6 +4,8 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"fmt"
+	"os"
 	"path"
 	"strings"
 )
@@ -12,6 +14,7 @@ func init() {
 	World.Func("save", Save)
 	World.Func("saveas", SaveAs)
 	World.Func("autosave", Autosave)
+	World.Func("fprintln", Fprintln)
 }
 
 // TODO: only use getter, check if slice is on GPU?
@@ -98,4 +101,13 @@ func assureGPU(s *data.Slice) *data.Slice {
 	} else {
 		return cuda.GPUCopy(s)
 	}
+}
+
+// Append msg to file. Used to write aggregated output of many simulations in one file.
+func Fprintln(filename string, msg ...interface{}) {
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+	util.FatalErr(err)
+	defer f.Close()
+	_, err = fmt.Fprintln(f, msg...)
+	util.FatalErr(err)
 }

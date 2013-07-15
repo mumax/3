@@ -73,8 +73,8 @@ func (v *Server) Button(modelName string) string {
 	return fmt.Sprintf(`<button id=%v onclick="call('%v')">%v</button>`, id, modelName, modelName)
 }
 
-func (s *Server) Function(modelName string) string {
-
+func (s *Server) Function(modelName, funcName string) string {
+	return "TODO"
 }
 
 // {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.

@@ -21,3 +21,5 @@ saveas(B_demag, "B_demag")
 saveas(B_exch, "B_exch")
 saveas(B_anis, "B_anis")
 saveas(regions, "regions")
+
+fprintln("testfile", "m", average(m))

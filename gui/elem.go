@@ -9,10 +9,11 @@ type Elem struct {
 	value string
 	dirty bool
 	sync.Mutex
+	domAttr string
 }
 
-func newElem(id, value string) *Elem {
-	return &Elem{id: id, value: value, dirty: true}
+func newElem(id, attr, value string) *Elem {
+	return &Elem{id: id, value: value, dirty: true, domAttr: attr}
 }
 
 func (e *Elem) Id() string {

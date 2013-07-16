@@ -79,12 +79,19 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "not found: "+r.URL.Path, http.StatusNotFound)
 	case "":
-		w.Write(d.htmlCache)
+		d.serveContent(w, r)
 	case "refresh/":
 		d.serveRefresh(w, r)
 	case "rpc":
 		d.serveRPC(w, r)
 	}
+}
+
+func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
+	for _, e := range d.elem {
+		e.dirty = true
+	}
+	w.Write(d.htmlCache)
 }
 
 // HTTP handler for RPC calls by button clicks etc
@@ -111,7 +118,7 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	for _, e := range v.elem {
 		if value, dirty := e.Value(); dirty {
 			vEsc := htmlEsc(value)
-			js = append(js, domUpd{e.Id(), vEsc})
+			js = append(js, domUpd{e.Id(), e.domAttr, vEsc})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))
@@ -120,6 +127,7 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 // DOM update action
 type domUpd struct {
 	ID   string // element ID to update
+	ATTR string // element attribute (innerHTML, value, ...)
 	HTML string // element value to set
 }
 

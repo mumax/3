@@ -40,13 +40,7 @@ function refreshDOM(req){
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
 				var elem = document.getElementById(r.ID);
-				// switch element type
-				if (elem.value != null && hasFocus != r.ID){ // textbox etc
-					elem.value = r.HTML;
-				}else{                                       // other elements
-					elem.innerHTML = r.HTML;
-					elem.value = r.HTML; // hack
-				}
+				elem[r.ATTR] = r.HTML; 
 			}
 		} else {
 			showErr("Disconnected");	

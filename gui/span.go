@@ -5,7 +5,7 @@ import (
 )
 
 func (d *Doc) Span(id, value string) string {
-	e := newElem(id, value)
+	e := newElem(id, "innerHTML", value)
 	d.add(e)
-	return fmt.Sprintf(`<span id=%v>%v</span>`, e.Id(), htmlEsc(value))
+	return fmt.Sprintf(`<span id=%v>%v</span>`, e.Id(), "")
 }

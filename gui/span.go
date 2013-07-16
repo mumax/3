@@ -8,8 +8,10 @@ type Span struct {
 	elem
 }
 
-func newSpan(id, value string) *Span {
-	return &Span{elem{id, value, true}}
+func (d *Doc) Span(id, value string) string {
+	e := &Span{elem{id, value, true, &d.Mutex}}
+	d.add(e)
+	return e.Render()
 }
 
 func (e *Span) Render() string {

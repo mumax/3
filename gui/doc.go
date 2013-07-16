@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"text/template"
 )
 
@@ -15,6 +16,7 @@ type Doc struct {
 	elem      map[string]Elem
 	htmlCache []byte // static html content, rendered only once
 	prefix    string
+	sync.Mutex
 }
 
 func NewDoc(urlPattern, htmlTemplate string) *Doc {
@@ -55,12 +57,6 @@ func (v *Doc) AutoRefreshBox() string {
 //	i := "guielem_" + modelName
 //	return fmt.Sprintf(`<input type=text id=%v class=TextBox onchange="settext('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, modelName, i, i)
 //}
-
-func (d *Doc) Span(id, value string) string {
-	e := newSpan(id, value)
-	d.add(e)
-	return e.Render()
-}
 
 func (d *Doc) Elem(id string) Elem {
 	if e, ok := d.elem[id]; ok {

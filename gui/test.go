@@ -4,34 +4,16 @@ package main
 
 import (
 	. "."
-	"fmt"
-	"time"
+	"net/http"
 )
 
 func main() {
-	v := NewServer(testtempl)
-	t := new(test)
-
-	v.Add("time", time.Now)
-	v.Add("hit me", t.HitMe)
-
-	a := &alpha{"it works"}
-	v.Add("alpha", a)
-
-	v.ListenAndServe(":7070")
+	_ = NewDoc("/", testtempl)
+	err := http.ListenAndServe(":7070", nil)
+	if err != nil {
+		panic(err)
+	}
 }
-
-type alpha struct{ x string }
-
-func (a *alpha) Get() interface{}  { return a.x }
-func (a *alpha) Set(v interface{}) { a.x = v.(string) + "*"; fmt.Println("set alpha") }
-
-type test struct{ hits int }
-
-func (t *test) SayHello() string { return "Hello world wide web!" }
-func (t *test) HitMe()           { t.hits++; fmt.Println("got hit") }
-func (t *test) HitCount() int    { return t.hits }
-func (t *test) Time() time.Time  { return time.Now() }
 
 const testtempl = `
 <html>
@@ -46,20 +28,16 @@ const testtempl = `
 	{{.JS}}
 </head>
 
-<body onload=refresh()>
+<body>
 
 	<h1> GUI test </h1>
 	<p> {{.ErrorBox}} </p>
 	<hr/>
 
-	It's now <b> {{.Label "time"}} </b><br/><br/>
-	{{.Button "hit me"}}
-
-	{{.TextBox "alpha"}}
+	{{.Span "e_time" "time flies"}}
 
 	<hr/>
 	
-	{{.AutoRefreshBox}}
 
 </body>
 </html>

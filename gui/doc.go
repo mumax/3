@@ -62,6 +62,14 @@ func (d *Doc) Span(id, value string) string {
 	return e.Render()
 }
 
+func (d *Doc) Elem(id string) Elem {
+	if e, ok := d.elem[id]; ok {
+		return e
+	} else {
+		panic("elem id " + id + " undefined")
+	}
+}
+
 func (d *Doc) add(e Elem) {
 	id := e.Id()
 	if _, ok := d.elem[id]; ok {
@@ -108,8 +116,8 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	js := []domUpd{}
 	for _, e := range v.elem {
 		if e.Dirty() {
-			value := htmlEsc(g.Value())
-			js = append(js, domUpd{id, value})
+			value := template.HTMLEscapeString(e.Value())
+			js = append(js, domUpd{e.Id(), value})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))
@@ -123,6 +131,6 @@ type domUpd struct {
 
 func check(e error) {
 	if e != nil {
-		log.Panic(err)
+		log.Panic(e)
 	}
 }

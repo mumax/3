@@ -5,14 +5,22 @@ package main
 import (
 	. "."
 	"net/http"
+	"time"
 )
 
 func main() {
-	_ = NewDoc("/", testtempl)
-	err := http.ListenAndServe(":7070", nil)
-	if err != nil {
-		panic(err)
+	doc := NewDoc("/", testtempl)
+	go func() {
+		err := http.ListenAndServe(":7070", nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
+	for {
+		time.Sleep(1 * time.Second)
+		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
 	}
+
 }
 
 const testtempl = `

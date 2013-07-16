@@ -9,7 +9,7 @@ type Span struct {
 }
 
 func newSpan(id, value string) *Span {
-	return &Span{elem{id, value}}
+	return &Span{elem{id, value, true}}
 }
 
 func (e *Span) Render() string {

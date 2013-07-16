@@ -43,8 +43,8 @@ const testtempl = `
 	<hr/>
 
 	{{.Span "e_time" "time flies"}} <br/>
+	{{.Button "e_hitme" "Hit me!"}} <br/>
 	
-	{{.Button "e_hitme" "hit me"}}
 
 	<hr/>
 	

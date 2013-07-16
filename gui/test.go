@@ -17,7 +17,7 @@ func main() {
 		}
 	}()
 	for {
-		time.Sleep(1 * time.Microsecond)
+		time.Sleep(1 * time.Second)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
 	}
 
@@ -42,7 +42,9 @@ const testtempl = `
 	<p> {{.ErrorBox}} </p>
 	<hr/>
 
-	{{.Span "e_time" "time flies"}}
+	{{.Span "e_time" "time flies"}} <br/>
+	
+	{{.Button "e_hitme" "hit me"}}
 
 	<hr/>
 	

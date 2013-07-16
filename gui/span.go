@@ -9,7 +9,7 @@ type Span struct {
 }
 
 func (d *Doc) Span(id, value string) string {
-	e := &Span{elem{id, value, true, &d.Mutex}}
+	e := &Span{makeElem(id, value)}
 	d.add(e)
 	return e.Render()
 }

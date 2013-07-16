@@ -15,7 +15,11 @@ type elem struct {
 	id    string
 	value string
 	dirty bool
-	*sync.Mutex
+	sync.Mutex
+}
+
+func makeElem(id, value string) elem {
+	return elem{id: id, value: value, dirty: true}
 }
 
 func (e *elem) Id() string {
@@ -23,10 +27,12 @@ func (e *elem) Id() string {
 }
 
 func (e *elem) Value() string {
+	e.dirty = false
 	return e.value
 }
 
 func (e *elem) SetValue(v string) {
+	e.dirty = true
 	e.value = v
 }
 

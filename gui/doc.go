@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 	"text/template"
 )
 
@@ -16,7 +15,6 @@ type Doc struct {
 	elem      map[string]Elem
 	htmlCache []byte // static html content, rendered only once
 	prefix    string
-	sync.Mutex
 }
 
 func NewDoc(urlPattern, htmlTemplate string) *Doc {

@@ -110,7 +110,7 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	js := []domUpd{}
 	for _, e := range v.elem {
 		if value, dirty := e.Value(); dirty {
-			vEsc := template.HTMLEscapeString(value)
+			vEsc := htmlEsc(value)
 			js = append(js, domUpd{e.Id(), vEsc})
 		}
 	}
@@ -127,4 +127,8 @@ func check(e error) {
 	if e != nil {
 		log.Panic(e)
 	}
+}
+
+func htmlEsc(s string) string {
+	return template.HTMLEscapeString(s)
 }

@@ -39,6 +39,7 @@ function refreshDOM(req){
 					elem.value = r.HTML;
 				}else{                                       // other elements
 					elem.innerHTML = r.HTML;
+					elem.value = r.HTML; // hack
 				}
 			}
 		} else {

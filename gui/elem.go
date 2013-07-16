@@ -4,28 +4,22 @@ import (
 	"sync"
 )
 
-type Elem interface {
-	Id() string
-	Value() (string, bool)
-	SetValue(string)
-}
-
-type elem struct {
+type Elem struct {
 	id    string
 	value string
 	dirty bool
 	sync.Mutex
 }
 
-func makeElem(id, value string) elem {
-	return elem{id: id, value: value, dirty: true}
+func newElem(id, value string) *Elem {
+	return &Elem{id: id, value: value, dirty: true}
 }
 
-func (e *elem) Id() string {
+func (e *Elem) Id() string {
 	return e.id
 }
 
-func (e *elem) Value() (value string, dirty bool) {
+func (e *Elem) Value() (value string, dirty bool) {
 	e.Lock()
 	value = e.value
 	dirty = e.dirty
@@ -34,7 +28,7 @@ func (e *elem) Value() (value string, dirty bool) {
 	return
 }
 
-func (e *elem) SetValue(v string) {
+func (e *Elem) SetValue(v string) {
 	e.Lock()
 	e.dirty = true
 	e.value = v

@@ -12,14 +12,14 @@ import (
 type Doc struct {
 	templ     *template.Template
 	haveJS    bool // have called JS()?
-	elem      map[string]Elem
+	elem      map[string]*Elem
 	htmlCache []byte // static html content, rendered only once
 	prefix    string
 }
 
 func NewDoc(urlPattern, htmlTemplate string) *Doc {
 	t := template.Must(template.New(urlPattern).Parse(htmlTemplate))
-	d := &Doc{templ: t, elem: make(map[string]Elem), prefix: urlPattern}
+	d := &Doc{templ: t, elem: make(map[string]*Elem), prefix: urlPattern}
 	cache := bytes.NewBuffer(nil)
 	check(d.templ.Execute(cache, d))
 	if !d.haveJS {
@@ -56,7 +56,7 @@ func (v *Doc) AutoRefreshBox() string {
 //	return fmt.Sprintf(`<input type=text id=%v class=TextBox onchange="settext('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, modelName, i, i)
 //}
 
-func (d *Doc) Elem(id string) Elem {
+func (d *Doc) Elem(id string) *Elem {
 	if e, ok := d.elem[id]; ok {
 		return e
 	} else {
@@ -64,7 +64,7 @@ func (d *Doc) Elem(id string) Elem {
 	}
 }
 
-func (d *Doc) add(e Elem) {
+func (d *Doc) add(e *Elem) {
 	id := e.Id()
 	if _, ok := d.elem[id]; ok {
 		log.Panic("element id " + id + " already defined")

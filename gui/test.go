@@ -17,7 +17,7 @@ func main() {
 		}
 	}()
 	for {
-		time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Microsecond)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
 	}
 

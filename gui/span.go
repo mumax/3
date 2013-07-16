@@ -15,5 +15,5 @@ func (d *Doc) Span(id, value string) string {
 }
 
 func (e *Span) Render() string {
-	return fmt.Sprintf(`<span id=%v>%v</span>`, e.Id(), e.Value())
+	return fmt.Sprintf(`<span id=%v>%v</span>`, e.Id(), "")
 }

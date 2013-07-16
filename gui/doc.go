@@ -74,7 +74,7 @@ func (d *Doc) add(e Elem) {
 
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path[len(d.prefix):]
-	log.Println("handle", url)
+	//log.Println("handle", url)
 	switch url {
 	default:
 		http.Error(w, "not found: "+r.URL.Path, http.StatusNotFound)
@@ -109,9 +109,9 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
 	js := []domUpd{}
 	for _, e := range v.elem {
-		if e.Dirty() {
-			value := template.HTMLEscapeString(e.Value())
-			js = append(js, domUpd{e.Id(), value})
+		if value, dirty := e.Value(); dirty {
+			vEsc := template.HTMLEscapeString(value)
+			js = append(js, domUpd{e.Id(), vEsc})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))

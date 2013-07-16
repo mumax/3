@@ -6,9 +6,8 @@ import (
 
 type Elem interface {
 	Id() string
-	Value() string
+	Value() (string, bool)
 	SetValue(string)
-	Dirty() bool
 }
 
 type elem struct {
@@ -26,16 +25,18 @@ func (e *elem) Id() string {
 	return e.id
 }
 
-func (e *elem) Value() string {
+func (e *elem) Value() (value string, dirty bool) {
+	e.Lock()
+	value = e.value
+	dirty = e.dirty
 	e.dirty = false
-	return e.value
+	e.Unlock()
+	return
 }
 
 func (e *elem) SetValue(v string) {
+	e.Lock()
 	e.dirty = true
 	e.value = v
-}
-
-func (e *elem) Dirty() bool {
-	return e.dirty
+	e.Unlock()
 }

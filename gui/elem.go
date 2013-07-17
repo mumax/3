@@ -4,6 +4,7 @@ import (
 	"sync"
 )
 
+// Elem represents a GUI element (button, textbox, ...)
 type Elem struct {
 	id    string
 	value string
@@ -20,6 +21,8 @@ func (e *Elem) Id() string {
 	return e.id
 }
 
+// Value returns the GUI element's value.
+// E.g., a textbox's text.
 func (e *Elem) Value() (value string, dirty bool) {
 	e.Lock()
 	value = e.value

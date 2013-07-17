@@ -9,19 +9,23 @@ import (
 	"text/template"
 )
 
+// gui.Doc serves a GUI as a html document.
 type Doc struct {
-	templ     *template.Template
-	haveJS    bool // have called JS()?
-	elem      map[string]*Elem
-	htmlCache []byte // static html content, rendered only once
-	prefix    string
+	haveJS    bool             // have called JS()?
+	elem      map[string]*Elem // document elements by ID
+	htmlCache []byte           // static html content, rendered only once
+	prefix    string           // URL prefix (not yet working)
 }
 
+// NewDoc makes a new GUI document, to be served under urlPattern.
+// htmlTemplate defines the GUI elements and layout.
+// A http handler still needs to be registered manually.
+// Example...
 func NewDoc(urlPattern, htmlTemplate string) *Doc {
 	t := template.Must(template.New(urlPattern).Parse(htmlTemplate))
-	d := &Doc{templ: t, elem: make(map[string]*Elem), prefix: urlPattern}
+	d := &Doc{elem: make(map[string]*Elem), prefix: urlPattern}
 	cache := bytes.NewBuffer(nil)
-	check(d.templ.Execute(cache, d))
+	check(t.Execute(cache, d))
 	if !d.haveJS {
 		log.Panic("template should call {{.JS}}")
 	}
@@ -56,6 +60,7 @@ func (v *Doc) AutoRefreshBox() string {
 //	return fmt.Sprintf(`<input type=text id=%v class=TextBox onchange="settext('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, modelName, i, i)
 //}
 
+// Elem returns an element by Id.
 func (d *Doc) Elem(id string) *Elem {
 	if e, ok := d.elem[id]; ok {
 		return e
@@ -72,6 +77,7 @@ func (d *Doc) add(e *Elem) {
 	d.elem[id] = e
 }
 
+// ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path[len(d.prefix):]
 	//log.Println("handle", url)
@@ -87,6 +93,7 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// serves the html content.
 func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
 	for _, e := range d.elem {
 		e.dirty = true

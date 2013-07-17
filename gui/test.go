@@ -29,6 +29,16 @@ func main() {
 		doc.Elem("e_greet").SetValue(fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
 	})
 
+	doc.Elem("e_check").OnChange(func() {
+		name := doc.Elem("e_namebox").Value().(string)
+		cookie := doc.Elem("e_cookies")
+		if doc.Elem("e_check").Value() == true {
+			cookie.SetValue(name + " likes cookies")
+		} else {
+			cookie.SetValue(name + " doesn't like cookies")
+		}
+	})
+
 	for {
 		time.Sleep(1 * time.Second)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
@@ -61,9 +71,9 @@ const testtempl = `
 	What's your name: {{.TextBox "e_namebox" ""}} &nbsp;
 	{{.Span "e_greet" ""}} <br/><br/>
 
-	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/>
+	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/><br/>
 
-	{{.CheckBox "e_check" "Like cookies?" false}} 
+	{{.CheckBox "e_check" "Like cookies?" false}} &nbsp;
 	{{.Span "e_cookies" ""}}
 
 	<hr/>

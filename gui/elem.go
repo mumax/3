@@ -14,7 +14,7 @@ type Elem struct {
 	onclick, onchange func() // event handler
 }
 
-func newElem(id, attr, value string) *Elem {
+func newElem(id, attr string, value interface{}) *Elem {
 	return &Elem{id: id, value: value, dirty: true, domAttr: attr}
 }
 

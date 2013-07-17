@@ -4,8 +4,9 @@ import (
 	"fmt"
 )
 
-// {{.CheckBox id value}} adds a checkbox to the document.
-// value is "true" or "false"
+// {{.CheckBox id text value}} adds a checkbox to the document.
+// text is displayed next to the textbox.
+// value is true (checked) or false (unchecked)
 func (d *Doc) CheckBox(id, text string, value bool) string {
 	e := newElem(id, "checked", value)
 	d.add(e)

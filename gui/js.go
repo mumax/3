@@ -87,5 +87,8 @@ function notifycheckbox(id){
 	notify(id, "change", document.getElementById(id).checked);
 }
 
+function notifyrange(id){
+	notify(id, "change", document.getElementById(id).value);
+}
 
 </script>`

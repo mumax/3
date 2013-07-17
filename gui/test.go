@@ -39,6 +39,12 @@ func main() {
 		}
 	})
 
+	doc.Elem("e_range").OnChange(func() {
+		doc.Elem("e_age").SetValue(fmt.Sprint(
+			doc.Elem("e_namebox").Value(), " is ",
+			doc.Elem("e_range").Value(), " years old."))
+	})
+
 	for {
 		time.Sleep(1 * time.Second)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
@@ -74,7 +80,11 @@ const testtempl = `
 	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/><br/>
 
 	{{.CheckBox "e_check" "Like cookies?" false}} &nbsp;
-	{{.Span "e_cookies" ""}}
+	{{.Span "e_cookies" ""}} <br/><br/>
+
+
+	Your age: {{.Range "e_range" 0 100 18}}
+	{{.Span "e_age" ""}} <br/><br/>
 
 	<hr/>
 

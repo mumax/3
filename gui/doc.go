@@ -109,6 +109,8 @@ func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 			e.onclick()
 		}
 	case "change":
+		arg := m["Arg"]
+		e.SetValue(arg)
 		if e.onchange != nil {
 			e.onchange()
 		}
@@ -120,7 +122,7 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
 	js := []domUpd{}
 	for _, e := range v.elem {
-		if value, dirty := e.Value(); dirty {
+		if value, dirty := e.valueDirty(); dirty {
 			vEsc := htmlEsc(value)
 			js = append(js, domUpd{e.Id(), e.domAttr, vEsc})
 		}

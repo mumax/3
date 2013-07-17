@@ -25,7 +25,15 @@ func (e *Elem) Id() string {
 
 // Value returns the GUI element's value.
 // E.g., a textbox's text.
-func (e *Elem) Value() (value string, dirty bool) {
+func (e *Elem) Value() string {
+	e.Lock()
+	defer e.Unlock()
+	return e.value
+}
+
+// returns the value ad whether it is dirty (needs refresh),
+// then sets dirty to false.
+func (e *Elem) valueDirty() (value string, dirty bool) {
 	e.Lock()
 	value = e.value
 	dirty = e.dirty
@@ -43,4 +51,8 @@ func (e *Elem) SetValue(v interface{}) {
 
 func (e *Elem) OnClick(f func()) {
 	e.onclick = f
+}
+
+func (e *Elem) OnChange(f func()) {
+	e.onchange = f
 }

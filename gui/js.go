@@ -79,8 +79,12 @@ function notify(id, method, arg){
 	refresh();
 }
 
-function notifytext(id){
+function notifytextbox(id){
 	notify(id, "change", document.getElementById(id).value);
+}
+
+function notifycheckbox(id){
+	notify(id, "check", document.getElementById(id).checked);
 }
 
 

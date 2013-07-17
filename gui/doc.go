@@ -95,11 +95,11 @@ func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
 
 // HTTP handler for event notifications by button clicks etc
 func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]string) // todo: decode into struct
+	var m event
 	check(json.NewDecoder(r.Body).Decode(&m))
 	log.Println("event", m)
-	e := d.Elem(m["ID"])
-	method := m["Method"]
+	e := d.Elem(m.ID)
+	method := m.Method
 
 	switch method {
 	default:
@@ -109,12 +109,17 @@ func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 			e.onclick()
 		}
 	case "change":
-		arg := m["Arg"]
+		arg := m.Arg
 		e.SetValue(arg)
 		if e.onchange != nil {
 			e.onchange()
 		}
 	}
+}
+
+type event struct {
+	ID, Method string
+	Arg        interface{}
 }
 
 // HTTP handler for refreshing the dynamic elements
@@ -123,8 +128,8 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	js := []domUpd{}
 	for _, e := range v.elem {
 		if value, dirty := e.valueDirty(); dirty {
-			vEsc := htmlEsc(value)
-			js = append(js, domUpd{e.Id(), e.domAttr, vEsc})
+			//vEsc := htmlEsc(value)
+			js = append(js, domUpd{e.Id(), e.domAttr, value})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))
@@ -132,9 +137,9 @@ func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 
 // DOM update action
 type domUpd struct {
-	ID   string // element ID to update
-	ATTR string // element attribute (innerHTML, value, ...)
-	HTML string // element value to set
+	ID   string      // element ID to update
+	ATTR string      // element attribute (innerHTML, value, ...)
+	HTML interface{} // element value to set // TODO: rename value
 }
 
 func check(e error) {

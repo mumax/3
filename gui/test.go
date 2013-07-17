@@ -4,6 +4,7 @@ package main
 
 import (
 	. "."
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -25,7 +26,7 @@ func main() {
 	})
 
 	doc.Elem("e_namebox").OnChange(func() {
-		doc.Elem("e_greet").SetValue("Hello " + doc.Elem("e_namebox").Value() + "!")
+		doc.Elem("e_greet").SetValue(fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
 	})
 
 	for {
@@ -61,6 +62,9 @@ const testtempl = `
 	{{.Span "e_greet" ""}} <br/><br/>
 
 	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/>
+
+	{{.CheckBox "e_check" "Like cookies?" false}} 
+	{{.Span "e_cookies" ""}}
 
 	<hr/>
 

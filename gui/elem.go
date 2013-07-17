@@ -1,14 +1,13 @@
 package gui
 
 import (
-	"fmt"
 	"sync"
 )
 
 // Elem represents a GUI element (button, textbox, ...)
 type Elem struct {
 	id      string
-	value   string
+	value   interface{}
 	domAttr string // element attribute to assign value to (e.g., "innerHTML")
 	dirty   bool   // value needs to be sent on next refresh?
 	sync.Mutex
@@ -25,7 +24,7 @@ func (e *Elem) Id() string {
 
 // Value returns the GUI element's value.
 // E.g., a textbox's text.
-func (e *Elem) Value() string {
+func (e *Elem) Value() interface{} {
 	e.Lock()
 	defer e.Unlock()
 	return e.value
@@ -33,7 +32,7 @@ func (e *Elem) Value() string {
 
 // returns the value ad whether it is dirty (needs refresh),
 // then sets dirty to false.
-func (e *Elem) valueDirty() (value string, dirty bool) {
+func (e *Elem) valueDirty() (value interface{}, dirty bool) {
 	e.Lock()
 	value = e.value
 	dirty = e.dirty
@@ -45,7 +44,7 @@ func (e *Elem) valueDirty() (value string, dirty bool) {
 func (e *Elem) SetValue(v interface{}) {
 	e.Lock()
 	e.dirty = true
-	e.value = fmt.Sprint(v)
+	e.value = v
 	e.Unlock()
 }
 

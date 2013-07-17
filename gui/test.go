@@ -24,6 +24,10 @@ func main() {
 		doc.Elem("e_hitcount").SetValue(hitcount)
 	})
 
+	doc.Elem("e_name").OnChange(func() {
+		doc.Elem("e_greet").SetValue("Hello " + doc.Elem("e_name").Value())
+	})
+
 	for {
 		time.Sleep(1 * time.Second)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
@@ -50,13 +54,15 @@ const testtempl = `
 	<p> {{.ErrorBox}} </p>
 	<hr/>
 
-	{{.Span "e_time" "time flies"}} <br/>
-	{{.Span "e_dummy" "I'm a <dummy/>"}} <br/>
+	{{.Span "e_time" ""}} <br/><br/>
+
+
+	What's your name: {{.TextBox "e_namebox" ""}} <br/>
+	{{.Span "e_greet" ""}} <br/><br/>
+
 	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/>
-	
 
 	<hr/>
-	
 
 </body>
 </html>

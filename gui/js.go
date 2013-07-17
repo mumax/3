@@ -79,8 +79,8 @@ function notify(id, method, arg){
 	refresh();
 }
 
-function settext(model){
-	notify(model, "set", document.getElementById("guielem_"+model).value);
+function notifytext(id){
+	notify(id, "change", document.getElementById(id).value);
 }
 
 

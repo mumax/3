@@ -12,7 +12,7 @@ type Elem struct {
 	domAttr string // element attribute to assign value to (e.g., "innerHTML")
 	dirty   bool   // value needs to be sent on next refresh?
 	sync.Mutex
-	onclick func() // event handler for clicks
+	onclick, onchange func() // event handler
 }
 
 func newElem(id, attr, value string) *Elem {

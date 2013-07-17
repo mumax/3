@@ -52,14 +52,6 @@ func (v *Doc) AutoRefreshBox() string {
 	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh()">auto refresh</input>`)
 }
 
-//{{.TextBox}}
-//func (v *Doc) TextBox(modelName string) string {
-//	_ = v.getModel(modelName) // check existence
-//	id := id(modelName)
-//	i := "guielem_" + modelName
-//	return fmt.Sprintf(`<input type=text id=%v class=TextBox onchange="settext('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, modelName, i, i)
-//}
-
 // Elem returns an element by Id.
 func (d *Doc) Elem(id string) *Elem {
 	if e, ok := d.elem[id]; ok {
@@ -113,7 +105,13 @@ func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 	default:
 		log.Println("unhandled event method: " + method)
 	case "click":
-		e.onclick()
+		if e.onclick != nil {
+			e.onclick()
+		}
+	case "change":
+		if e.onchange != nil {
+			e.onchange()
+		}
 	}
 }
 

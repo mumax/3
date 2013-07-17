@@ -6,7 +6,7 @@ adduniaxialanisotropy(float* __restrict__  Bx, float* __restrict__  By, float* _
                       float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz,
                       float* __restrict__ K1LUT,
                       float* __restrict__ uxLUT, float* __restrict__ uyLUT, float* __restrict__ uzLUT,
-                      int8_t* regions, int N) {
+                      int8_t* __restrict__ regions, int N) {
 
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
     if (i < N) {

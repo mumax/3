@@ -102,20 +102,19 @@ func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
 }
 
 // HTTP handler for event notifications by button clicks etc
-func (v *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]string)
+func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]string) // todo: decode into struct
 	check(json.NewDecoder(r.Body).Decode(&m))
 	log.Println("event", m)
-	//	modelName := m["ID"]
-	//	method := m["Method"]
-	//	switch method {
-	//	default:
-	//		panic("rpc: unhandled method: " + method)
-	//	case "call":
-	//		v.caller(modelName).Call()
-	//	case "set":
-	//		v.setter(modelName).Set(m["Arg"])
-	//	}
+	e := d.Elem(m["ID"])
+	method := m["Method"]
+
+	switch method {
+	default:
+		log.Println("unhandled event method: " + method)
+	case "click":
+		e.onclick()
+	}
 }
 
 // HTTP handler for refreshing the dynamic elements

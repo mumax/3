@@ -18,7 +18,11 @@ func main() {
 		}
 	}()
 
-	//doc.Elem("e_hitme").OnClick()
+	hitcount := 0
+	doc.Elem("e_hitme").OnClick(func() {
+		hitcount++
+		doc.Elem("e_hitcount").SetValue(hitcount)
+	})
 
 	for {
 		time.Sleep(1 * time.Second)
@@ -48,7 +52,7 @@ const testtempl = `
 
 	{{.Span "e_time" "time flies"}} <br/>
 	{{.Span "e_dummy" "I'm a <dummy/>"}} <br/>
-	{{.Button "e_hitme" "Hit me!"}} <br/>
+	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/>
 	
 
 	<hr/>

@@ -1,16 +1,18 @@
 package gui
 
 import (
+	"fmt"
 	"sync"
 )
 
 // Elem represents a GUI element (button, textbox, ...)
 type Elem struct {
-	id    string
-	value string
-	dirty bool
+	id      string
+	value   string
+	domAttr string // element attribute to assign value to (e.g., "innerHTML")
+	dirty   bool   // value needs to be sent on next refresh?
 	sync.Mutex
-	domAttr string
+	onclick func() // event handler for clicks
 }
 
 func newElem(id, attr, value string) *Elem {
@@ -32,9 +34,13 @@ func (e *Elem) Value() (value string, dirty bool) {
 	return
 }
 
-func (e *Elem) SetValue(v string) {
+func (e *Elem) SetValue(v interface{}) {
 	e.Lock()
 	e.dirty = true
-	e.value = v
+	e.value = fmt.Sprint(v)
 	e.Unlock()
+}
+
+func (e *Elem) OnClick(f func()) {
+	e.onclick = f
 }

@@ -10,12 +10,16 @@ import (
 
 func main() {
 	doc := NewDoc("/", testtempl)
+
 	go func() {
 		err := http.ListenAndServe(":7070", nil)
 		if err != nil {
 			panic(err)
 		}
 	}()
+
+	//doc.Elem("e_hitme").OnClick()
+
 	for {
 		time.Sleep(1 * time.Second)
 		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))

@@ -88,8 +88,8 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		d.serveContent(w, r)
 	case "refresh/":
 		d.serveRefresh(w, r)
-	case "rpc":
-		d.serveRPC(w, r)
+	case "event/":
+		d.serveEvent(w, r)
 	}
 }
 
@@ -101,11 +101,11 @@ func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
 	w.Write(d.htmlCache)
 }
 
-// HTTP handler for RPC calls by button clicks etc
-func (v *Doc) serveRPC(w http.ResponseWriter, r *http.Request) {
+// HTTP handler for event notifications by button clicks etc
+func (v *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]string)
 	check(json.NewDecoder(r.Body).Decode(&m))
-	log.Println("RPC", m)
+	log.Println("event", m)
 	//	modelName := m["ID"]
 	//	method := m["Method"]
 	//	switch method {

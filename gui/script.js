@@ -60,12 +60,12 @@ function refresh(){
 
 setInterval(refresh, tick);
 
-// remote procedure call, called on button clicks etc.
-function rpc(model, method, arg){
+// sends event notification to server, called on button clicks etc.
+function notify(id, method, arg){
 	try{
 		var req = new XMLHttpRequest();
-		req.open("POST", "/rpc/", false);
-		var map = {"ID": model, "Method": method, "Arg": arg};
+		req.open("POST", "/event/", false);
+		var map = {"ID": id, "Method": method, "Arg": arg};
 		req.send(JSON.stringify(map));
 	}catch(e){
 		showErr(e); // TODO
@@ -73,12 +73,8 @@ function rpc(model, method, arg){
 	refresh();
 }
 
-function call(model){
-	rpc(model, "call");
-}
-
 function settext(model){
-	rpc(model, "set", document.getElementById("guielem_"+model).value);
+	notify(model, "set", document.getElementById("guielem_"+model).value);
 }
 
 

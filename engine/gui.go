@@ -26,6 +26,7 @@ func GoServe(port string) {
 	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(bool) } })
 	GUI.OnChange("mindt", func() { Inject <- func() { Solver.MinDt = GUI.Value("mindt").(float64) } })
 	GUI.OnChange("maxdt", func() { Inject <- func() { Solver.MaxDt = GUI.Value("maxdt").(float64) } })
+	GUI.OnChange("maxerr", func() { Inject <- func() { Solver.MaxErr = GUI.Value("maxerr").(float64) } })
 
 	go func() {
 		for {

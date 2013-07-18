@@ -15,11 +15,11 @@ const templText = `
 
 	<style media="all" type="text/css">
 
-		body  { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
-		h1    { font-size: 22px; font-weight: normal; color: black}
-		h2    { font-size: 18px; font-weight: normal; color: black}
-		img   { margin: 15px; }
-		table { border:10px; border-collapse: collapse; margin:10px}
+		body  { margin-left: 5%; margin-right:5%; font-family: sans-serif; font-size: 14px; }
+		h1    { font-size: 22px; color: gray}
+		h2    { font-size: 18px; color: gray}
+		img   { margin: 10px; }
+		table { border-collapse: collapse;}
 		tr:nth-child(even) { background-color: white; }
 		tr:nth-child(odd)  { background-color: #EEEEFF; }
 		td    { padding: 1px 5px;}
@@ -60,9 +60,9 @@ const templText = `
 	<h2> geometry </h2><div>
 
 		<table>
-			<tr> <td><b>gridsize: </b></td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
-			<tr> <td><b>cellsize: </b></td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
-			<tr> <td><b>worldsize:</b></td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
 		</table>
 	</div><hr/>
 
@@ -73,19 +73,21 @@ const templText = `
 			<tr style="background-color:white"> <td>
 	
 		<table>
-			<tr> <td>{{.Button "break"}} </td> <td> <b>status:</b> {{.Span "solverstatus" "initializing"}} </td></tr>
+			<tr> <td>{{.Button "break"}} </td> <td> status: {{.Span "solverstatus" "initializing"}} </td></tr>
 			<tr> <td> {{.Button "run"}}  </td> <td> {{.NumBox "runtime" 1e-9}}s</td></tr> 
 			<tr> <td> {{.Button "steps"}}</td> <td> {{.IntBox "runsteps" 1000}}</td></tr>
-			<tr> <td> {{.Button "relax"}}</td> <td> <b>(coming soon) </b>      </td></tr>
+			<tr> <td> {{.Button "relax"}}</td> <td> (coming soon)       </td></tr>
 		</table>
 
 		</td><td>
+			&nbsp; &nbsp; &nbsp; &nbsp;
+		</td><td>
 
 		<table>
-			<tr> <td><b>step:    </b></td><td>{{.Span   "step"}}      </td><td><b>time:  </b></td> <td>{{.Span "time"}} s       </td></tr>
-			<tr> <td><b>dt:      </b></td><td>{{.NumBox "dt" 1e-15}}s </td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
-			<tr> <td><b>mindt:   </b></td><td>{{.NumBox "mindt" 0}}s  </td><td><b>maxdt: </b></td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
-			<tr> <td><b>err/step:</b></td><td>{{.Span   "lasterr"}}   </td><td><b>maxerr:</b></td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
+			<tr> <td>step:    </td><td>{{.Span   "step"}}      </td><td>time:  </td> <td>{{.Span "time"}} s       </td></tr>
+			<tr> <td>dt:      </td><td>{{.NumBox "dt" 1e-15}}s </td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
+			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s  </td><td>maxdt: </td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
+			<tr> <td>err/step:</td><td>{{.Span   "lasterr"}}   </td><td>maxerr:</td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
 		</table>
 
 			</td></tr>
@@ -95,10 +97,10 @@ const templText = `
 
 	<h2> process </h2><div>
 		<table>
-			<tr> <td><b>host:     </b></td> <td>{{.Span "hostname"}} </td> <td> </td>                           </tr>
-			<tr> <td><b>pid:      </b></td> <td>{{.Span "pid"}}      </td> <td> {{.Button "kill" "Kill"}} </td> </tr>
-			<tr> <td><b>gpu:      </b></td> <td>{{.Span "gpu"}}      </td> <td>  </td>                          </tr>
-			<tr> <td><b>walltime: </b></td> <td>{{.Span "walltime"}} </td> <td>  </td>                          </tr>
+			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td> <td> </td>                           </tr>
+			<tr> <td>pid:      </td> <td>{{.Span "pid"}}      </td> <td> {{.Button "kill" "Kill"}} </td> </tr>
+			<tr> <td>gpu:      </td> <td>{{.Span "gpu"}}      </td> <td>  </td>                          </tr>
+			<tr> <td>walltime: </td> <td>{{.Span "walltime"}} </td> <td>  </td>                          </tr>
 		</table>
 	</div><hr/>
 

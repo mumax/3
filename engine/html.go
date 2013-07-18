@@ -21,7 +21,7 @@ const templText = `
 		img   { margin: 15px; }
 		table { border:10px; border-collapse: collapse; margin:10px}
 		tr:nth-child(even) { background-color: white; }
-		tr:nth-child(odd)  { background-color: #F0F0FF; }
+		tr:nth-child(odd)  { background-color: #EEEEFF; }
 		td    { padding: 1px 5px;}
 		hr    { border-style: none; border-top: 1px solid #CCCCCC; }
 		a     { color: #375EAB; text-decoration: none; }
@@ -68,6 +68,10 @@ const templText = `
 
 
 	<h2> solver </h2><div>
+
+		<table>
+			<tr style="background-color:white"> <td>
+	
 		<table>
 			<tr> <td>{{.Button "break"}} </td> <td> <b>status:</b> {{.Span "solverstatus" "initializing"}} </td></tr>
 			<tr> <td> {{.Button "run"}}  </td> <td> {{.NumBox "runtime" 1e-9}}s</td></tr> 
@@ -75,11 +79,16 @@ const templText = `
 			<tr> <td> {{.Button "relax"}}</td> <td> <b>(coming soon) </b>      </td></tr>
 		</table>
 
+		</td><td>
+
 		<table>
 			<tr> <td><b>step:    </b></td><td>{{.Span   "step"}}      </td><td><b>time:  </b></td> <td>{{.Span "time"}} s       </td></tr>
 			<tr> <td><b>dt:      </b></td><td>{{.NumBox "dt" 1e-15}}s </td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
 			<tr> <td><b>mindt:   </b></td><td>{{.NumBox "mindt" 0}}s  </td><td><b>maxdt: </b></td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
 			<tr> <td><b>err/step:</b></td><td>{{.Span   "lasterr"}}   </td><td><b>maxerr:</b></td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
+		</table>
+
+			</td></tr>
 		</table>
 	</div><hr/>
 

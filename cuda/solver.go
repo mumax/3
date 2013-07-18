@@ -11,7 +11,7 @@ import (
 type solverCommon struct {
 	Dt_si, dt_mul          float64  // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	time                   *float64 // in seconds
-	Mindt, Maxdt           float64  // minimum and maximum time step
+	MinDt, MaxDt           float64  // minimum and maximum time step
 	MaxErr, Headroom       float64  // maximum error per step
 	LastErr                float64  // error of last step
 	NSteps, NUndone, NEval int      // number of good steps, undone steps
@@ -37,11 +37,11 @@ func (e *solverCommon) adaptDt(corr float64) {
 		corr = 1. / 2.
 	}
 	e.Dt_si *= corr
-	if e.Mindt != 0 && e.Dt_si < e.Mindt {
-		e.Dt_si = e.Mindt
+	if e.MinDt != 0 && e.Dt_si < e.MinDt {
+		e.Dt_si = e.MinDt
 	}
-	if e.Maxdt != 0 && e.Dt_si > e.Maxdt {
-		e.Dt_si = e.Maxdt
+	if e.MaxDt != 0 && e.Dt_si > e.MaxDt {
+		e.Dt_si = e.MaxDt
 	}
 	if e.Dt_si == 0 {
 		log.Fatal("time step too small")

@@ -48,7 +48,7 @@ func (e *Heun) Step() {
 		}
 
 		y := e.y
-		if err < e.MaxErr || e.Dt_si <= e.Mindt { // mindt check to avoid infinite loop
+		if err < e.MaxErr || e.Dt_si <= e.MinDt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 			e.postStep(y)

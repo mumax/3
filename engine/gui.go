@@ -24,6 +24,8 @@ func GoServe(port string) {
 	GUI.OnClick("run", func() { Inject <- func() { Run(GUI.Value("runtime").(float64)) } })
 	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
 	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(bool) } })
+	GUI.OnChange("mindt", func() { Inject <- func() { Solver.MinDt = GUI.Value("mindt").(float64) } })
+	GUI.OnChange("maxdt", func() { Inject <- func() { Solver.MaxDt = GUI.Value("maxdt").(float64) } })
 
 	go func() {
 		for {

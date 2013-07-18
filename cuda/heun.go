@@ -43,7 +43,7 @@ func (e *Heun) Step() {
 		e.NEval++
 
 		err := 0.0
-		if !e.Fixdt {
+		if !e.FixDt {
 			err = MaxVecDiff(dy0, dy) * float64(dt)
 		}
 
@@ -57,7 +57,7 @@ func (e *Heun) Step() {
 			e.LastErr = err
 		} else {
 			// undo bad step
-			util.Assert(!e.Fixdt)
+			util.Assert(!e.FixDt)
 			*e.time -= e.Dt_si
 			Madd2(y, y, dy0, 1, -dt)
 			e.NUndone++

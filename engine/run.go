@@ -18,7 +18,7 @@ func init() {
 	World.Var("MaxDt", &Solver.Maxdt)
 	World.Var("MaxErr", &Solver.MaxErr)
 	World.Var("Headroom", &Solver.Headroom)
-	World.Var("FixDt", &Solver.Fixdt)
+	World.Var("FixDt", &Solver.FixDt)
 }
 
 var (

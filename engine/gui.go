@@ -22,6 +22,7 @@ func GoServe(port string) {
 	GUI.OnClick("break", Pause)
 	GUI.OnClick("run", func() { Inject <- func() { Run(GUI.Value("runtime").(float64)) } })
 	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
+	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(bool) } })
 
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {

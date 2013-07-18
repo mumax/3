@@ -20,6 +20,8 @@ func GoServe(port string) {
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 
 	GUI.OnClick("break", Pause)
+	GUI.OnClick("run", func() { Inject <- func() { Run(GUI.Value("runtime").(float64)) } })
+	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
 
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {

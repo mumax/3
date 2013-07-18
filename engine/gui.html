@@ -63,10 +63,10 @@
 
 	<h2> solver </h2><div>
 		<table>
-			<tr> <td> <b>status:</b> {{.Span "solverstatus" "initializing"}} </td><td>{{.Button "break"}}        </td></tr>
-			<tr> <td> {{.Button "run"}}               </td><td>{{.NumBox "runtime" 1e-9}} </td></tr> 
-			<tr> <td> {{.Button "steps"}}             </td><td>{{.NumBox "runsteps" 1000}}</td></tr>
-			<tr> <td> {{.Button "relax"}}             </td><td>                           </td></tr>
+			<tr> <td>{{.Button "break"}} </td> <td> <b>status:</b> {{.Span "solverstatus" "initializing"}} </td></tr>
+			<tr> <td> {{.Button "run"}}  </td> <td> {{.NumBox "runtime" 1e-9}}s</td></tr> 
+			<tr> <td> {{.Button "steps"}}</td> <td> {{.IntBox "runsteps" 1000}}</td></tr>
+			<tr> <td> {{.Button "relax"}}</td> <td> <b>(coming soon) </b>      </td></tr>
 		</table>
 
 		<table>

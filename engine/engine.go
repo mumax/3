@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
+	"os"
 	"runtime"
 )
 
@@ -20,6 +21,9 @@ func init() {
 	World.ROnly("torque", &Torque)
 	World.ROnly("B_eff", &B_eff)
 	World.ROnly("table", &Table)
+
+	hostname, _ := os.Hostname()
+	GUI.SetValue("hostname", hostname)
 }
 
 // Accessible quantities

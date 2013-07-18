@@ -25,7 +25,7 @@ const templText = `
 		a     { color: #375EAB; text-decoration: none; }
 		a#hide{ color: black; font-size:17px; text-decoration: none; cursor: pointer; font-weight: normal; }
 
-		div       { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+		div       { margin-left: 20px; margin-top: 5px; margin-bottom: 20px; }
 		div#header{ color:gray; font-size:16px; }
 		div#footer{ color:gray; font-size:14px; }
 
@@ -54,15 +54,16 @@ const templText = `
 		<h1> mx 3 GUI </h1> 
 	<div id=header>
 		<p> {{.ErrorBox}} </p>
+		<p> {{.Span "log"}} </p>
 	</div><hr/>
 
 	
 	<h2> geometry </h2><div>
 
 		<table>
-			<tr> <td>gridsize: </td> <td>{{.Span "nx" "0"}} </td> <td> &times; {{.Span "ny" "0"}}</td> <td> &times; {{.Span "nz" "0"}}                </td> </tr>
-			<tr> <td>cellsize: </td> <td>{{.Span "cx" "0"}} </td> <td> &times; {{.Span "cy" "0"}}</td> <td> &times; {{.Span "cz" "0"}} nm<sup>3</sup> </td> </tr>
-			<tr> <td>worldsize:</td> <td>{{.Span "wx" "0"}} </td> <td> &times; {{.Span "wy" "0"}}</td> <td> &times; {{.Span "wz" "0"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
 		</table>
 	</div><hr/>
 
@@ -71,6 +72,14 @@ const templText = `
 	</div><hr/>
 
 
+	<h2> process </h2><div>
+		<table>
+			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td> <td> </td>                           </tr>
+			<tr> <td>pid:      </td> <td>{{.Span "pid"}}      </td> <td> {{.Button "kill" "Kill"}} </td> </tr>
+			<tr> <td>gpu:      </td> <td>{{.Span "gpu"}}      </td> <td>  </td>                          </tr>
+			<tr> <td>walltime: </td> <td>{{.Span "walltime"}} </td> <td>  </td>                          </tr>
+		</table>
+	</div><hr/>
 
 	<div id="footer">
 		<br/>

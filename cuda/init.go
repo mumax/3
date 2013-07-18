@@ -15,8 +15,11 @@ var (
 )
 
 var (
-	cudaCtx cu.Context // gpu context to be used by all threads
-	cudaCC  int        // compute capablity
+	cudaCtx  cu.Context // gpu context to be used by all threads
+	cudaCC   int        // compute capablity
+	Version  float32
+	DevName  string
+	TotalMem int64
 )
 
 func Init() {
@@ -41,8 +44,13 @@ func Init() {
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
 	concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
-	log.Print("CUDA ", float32(cu.Version())/1000, " ",
-		dev.Name(), "(", (dev.TotalMem())/(1024*1024), "MB) ",
+
+	Version = float32(cu.Version()) / 1000
+	DevName = dev.Name()
+	TotalMem = dev.TotalMem()
+
+	log.Print("CUDA ", Version, " ",
+		DevName, "(", (TotalMem)/(1024*1024), "MB) ",
 		"compute ", M, ".", m, " concurrent: ", concurrent == 1, "\n")
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")

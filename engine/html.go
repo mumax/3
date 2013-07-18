@@ -60,35 +60,36 @@ const templText = `
 	<h2> geometry </h2><div>
 
 		<table>
-			<tr> <td>gridsize: </td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
-			<tr> <td>cellsize: </td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
-			<tr> <td>worldsize:</td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td><b>gridsize: </b></td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
+			<tr> <td><b>cellsize: </b></td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td><b>worldsize:</b></td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
 		</table>
 	</div><hr/>
 
 
 	<h2> solver </h2><div>
 		<table>
-			<tr> <td> <b>status: {{.Span "solverstatus" "init"}} </b></td><td>{{.Button "break"}}        </td></tr>
+			<tr> <td> <b>status:</b> {{.Span "solverstatus" "initializing"}} </td><td>{{.Button "break"}}        </td></tr>
 			<tr> <td> {{.Button "run"}}               </td><td>{{.NumBox "runtime" 1e-9}} </td></tr> 
 			<tr> <td> {{.Button "steps"}}             </td><td>{{.NumBox "runsteps" 1000}}</td></tr>
 			<tr> <td> {{.Button "relax"}}             </td><td>                           </td></tr>
 		</table>
 
 		<table>
-			<tr> <td>step:    </td><td>{{.Span "step"}}        </td><td>time:</td> <td> {{.Span "time"}} ns  </td> <td></td> <td></td> </tr>
-			<tr> <td>dt:      </td><td>{{.NumBox "dt" 1e-15}} s</td><td>mindt: </td> <td>{{.NumBox "mindt" 1e-15}} s</td> <td> maxdt: {{.NumBox "maxdt" 1e-11}}s </td>  <td> {{.CheckBox "fixdt" "fixdt" false}} </td></tr>
-			<tr> <td>err/step:</td><td>{{.Span "err"}}         </td><td>maxerr: </td> <td>{{.NumBox "maxerr" 1e-5}}</td> <td></td> <td></td></tr>
+			<tr> <td><b>step:    </b></td><td>{{.Span "step"}}          </td><td><b>time:  </b></td> <td>{{.Span "time"}} s       </td></tr>
+			<tr> <td><b>dt:      </b></td><td>{{.NumBox "dt" 1e-15}}   s</td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
+			<tr> <td><b>mindt:   </b></td><td>{{.NumBox "mindt" 0}}s    </td><td><b>maxdt: </b></td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
+			<tr> <td><b>err/step:</b></td><td>{{.Span "err"}}           </td><td><b>maxerr:</b></td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
 		</table>
 	</div><hr/>
 
 
 	<h2> process </h2><div>
 		<table>
-			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td> <td> </td>                           </tr>
-			<tr> <td>pid:      </td> <td>{{.Span "pid"}}      </td> <td> {{.Button "kill" "Kill"}} </td> </tr>
-			<tr> <td>gpu:      </td> <td>{{.Span "gpu"}}      </td> <td>  </td>                          </tr>
-			<tr> <td>walltime: </td> <td>{{.Span "walltime"}} </td> <td>  </td>                          </tr>
+			<tr> <td><b>host:     </b></td> <td>{{.Span "hostname"}} </td> <td> </td>                           </tr>
+			<tr> <td><b>pid:      </b></td> <td>{{.Span "pid"}}      </td> <td> {{.Button "kill" "Kill"}} </td> </tr>
+			<tr> <td><b>gpu:      </b></td> <td>{{.Span "gpu"}}      </td> <td>  </td>                          </tr>
+			<tr> <td><b>walltime: </b></td> <td>{{.Span "walltime"}} </td> <td>  </td>                          </tr>
 		</table>
 	</div><hr/>
 

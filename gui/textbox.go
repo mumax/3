@@ -19,7 +19,7 @@ func (d *Doc) NumBox(id string, value float64) string {
 	e := newElem(id, "value", value)
 	e.setValue = setNumBox // setvalue override
 	d.add(e)
-	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" size=12 onchange="notifytextbox('%v')"/>`, id, value, id) // todo: onblur...
+	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" size=10 onchange="notifytextbox('%v')"/>`, id, value, id) // todo: onblur...
 }
 
 func setNumBox(e *Elem, v interface{}) {

@@ -19,9 +19,10 @@ const templText = `
 		h1    { font-size: 22px; font-weight: normal; color: black}
 		h2    { font-size: 18px; font-weight: normal; color: black}
 		img   { margin: 15px; }
-		table { border:10px; }
-		table,th, td { border: 1px solid black; }
-		td    { padding: 0px 10px;}
+		table { border:10px; border-collapse: collapse; }
+		tr:nth-child(even) { background-color: white; }
+		tr:nth-child(odd)  { background-color: #EEEEFF; }
+		td    { padding: 1px 5px;}
 		hr    { border-style: none; border-top: 1px solid #CCCCCC; }
 		a     { color: #375EAB; text-decoration: none; }
 
@@ -70,9 +71,9 @@ const templText = `
 
 	<h2> solver </h2><div>
 		<table>
-			<tr> <td>step:</td> <td>{{.Span "step"}} </td> <td>time:</td> <td> {{.Span "time"}} ns  </td> </tr>
-			<tr> <td>dt:  </td> <td>{{.NumBox "dt" 1e-15}} s</td> <td>min: </td> <td>{{.NumBox "mindt" 1e-15}}s</td> <td> max: {{.NumBox "maxdt" 1e-11}}s </td>  <td> {{.CheckBox "fixdt" "fix" false}} </td></tr>
-			<tr> <td>err/step: </td> <td>{{.Span "err"}}  </td> <td>max: </td> <td>{{.NumBox "maxerr" 1e-5}}</td> </tr>
+			<tr> <td>step:</td> <td>{{.Span "step"}} </td> <td>time:</td> <td> {{.Span "time"}} ns  </td> <td></td> <td></td> </tr>
+			<tr> <td>dt:  </td> <td>{{.NumBox "dt" 1e-15}} s</td> <td>mindt: </td> <td>{{.NumBox "mindt" 1e-15}} s</td> <td> maxdt: {{.NumBox "maxdt" 1e-11}}s </td>  <td> {{.CheckBox "fixdt" "fixdt" false}} </td></tr>
+			<tr> <td>err/step: </td> <td>{{.Span "err"}}  </td> <td>maxerr: </td> <td>{{.NumBox "maxerr" 1e-5}}</td> <td></td> <td></td></tr>
 		</table>
 	</div><hr/>
 

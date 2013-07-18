@@ -6,9 +6,13 @@ import (
 
 // {{.Button id value}} adds a button to the document.
 // value is text on the button.
-func (d *Doc) Button(id, value string) string {
-	e := newElem(id, "value", value)
+func (d *Doc) Button(id string, value ...string) string {
+	val := cat(value)
+	if val == "" {
+		val = id
+	}
+	e := newElem(id, "value", val)
 	d.add(e)
 	return fmt.Sprintf(`<button id=%v class=Button onclick="notify('%v', 'click')">%v</button>`,
-		e.id, e.id, htmlEsc(value)) // set button value does not work
+		e.id, e.id, htmlEsc(val)) // set button value does not work
 }

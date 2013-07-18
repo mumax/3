@@ -19,16 +19,15 @@ const templText = `
 		h1    { font-size: 22px; font-weight: normal; color: black}
 		h2    { font-size: 18px; font-weight: normal; color: black}
 		img   { margin: 15px; }
-		table { border:10px; border-collapse: collapse; }
+		table { border:10px; border-collapse: collapse; margin:10px}
 		tr:nth-child(even) { background-color: white; }
-		tr:nth-child(odd)  { background-color: #EEEEFF; }
+		tr:nth-child(odd)  { background-color: #F0F0FF; }
 		td    { padding: 1px 5px;}
 		hr    { border-style: none; border-top: 1px solid #CCCCCC; }
 		a     { color: #375EAB; text-decoration: none; }
 
 		div       { margin-left: 20px; margin-top: 5px; margin-bottom: 20px; }
-		div#header{ color:gray; font-size:16px; }
-		div#footer{ color:gray; font-size:14px; }
+		div#footer{ color:gray; font-size:14px; border:none}
 
 		.ErrorBox { color: red; font-weight: bold; } 
 		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px;}
@@ -53,10 +52,9 @@ const templText = `
 <body>
 
 	<h1> mx 3 GUI </h1> 
-	<div id=header>
 		<p> {{.ErrorBox}} </p>
 		<p> {{.Span "log"}} </p>
-	</div><hr/>
+	<hr/>
 
 	
 	<h2> geometry </h2><div>
@@ -71,9 +69,16 @@ const templText = `
 
 	<h2> solver </h2><div>
 		<table>
-			<tr> <td>step:</td> <td>{{.Span "step"}} </td> <td>time:</td> <td> {{.Span "time"}} ns  </td> <td></td> <td></td> </tr>
-			<tr> <td>dt:  </td> <td>{{.NumBox "dt" 1e-15}} s</td> <td>mindt: </td> <td>{{.NumBox "mindt" 1e-15}} s</td> <td> maxdt: {{.NumBox "maxdt" 1e-11}}s </td>  <td> {{.CheckBox "fixdt" "fixdt" false}} </td></tr>
-			<tr> <td>err/step: </td> <td>{{.Span "err"}}  </td> <td>maxerr: </td> <td>{{.NumBox "maxerr" 1e-5}}</td> <td></td> <td></td></tr>
+			<tr> <td> <b>status: {{.Span "solverstatus" "init"}} </b></td><td>{{.Button "break"}}        </td></tr>
+			<tr> <td> {{.Button "run"}}               </td><td>{{.NumBox "runtime" 1e-9}} </td></tr> 
+			<tr> <td> {{.Button "steps"}}             </td><td>{{.NumBox "runsteps" 1000}}</td></tr>
+			<tr> <td> {{.Button "relax"}}             </td><td>                           </td></tr>
+		</table>
+
+		<table>
+			<tr> <td>step:    </td><td>{{.Span "step"}}        </td><td>time:</td> <td> {{.Span "time"}} ns  </td> <td></td> <td></td> </tr>
+			<tr> <td>dt:      </td><td>{{.NumBox "dt" 1e-15}} s</td><td>mindt: </td> <td>{{.NumBox "mindt" 1e-15}} s</td> <td> maxdt: {{.NumBox "maxdt" 1e-11}}s </td>  <td> {{.CheckBox "fixdt" "fixdt" false}} </td></tr>
+			<tr> <td>err/step:</td><td>{{.Span "err"}}         </td><td>maxerr: </td> <td>{{.NumBox "maxerr" 1e-5}}</td> <td></td> <td></td></tr>
 		</table>
 	</div><hr/>
 

@@ -61,6 +61,16 @@ func (d *Doc) Elem(id string) *Elem {
 	}
 }
 
+// Shorthand for d.Elem(id).Value()
+func (d *Doc) Value(id string) interface{} {
+	return d.Elem(id).Value()
+}
+
+// Shorthand for d.Elem(id).SetValue(value)
+func (d *Doc) SetValue(id string, value interface{}) {
+	d.Elem(id).SetValue(value)
+}
+
 func (d *Doc) add(e *Elem) {
 	id := e.Id()
 	if _, ok := d.elem[id]; ok {

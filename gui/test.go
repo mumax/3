@@ -12,27 +12,21 @@ import (
 func main() {
 	doc := NewDoc("/", testtempl)
 
-	go func() {
-		err := http.ListenAndServe(":7070", nil)
-		if err != nil {
-			panic(err)
-		}
-	}()
-
 	hitcount := 0
 	doc.Elem("e_hitme").OnClick(func() {
 		hitcount++
-		doc.Elem("e_hitcount").SetValue(hitcount)
+		doc.SetValue("e_hitcount", hitcount)
 	})
 
 	doc.Elem("e_namebox").OnChange(func() {
-		doc.Elem("e_greet").SetValue(fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
+		doc.SetValue("e_greet",
+			fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
 	})
 
 	doc.Elem("e_check").OnChange(func() {
-		name := doc.Elem("e_namebox").Value().(string)
+		name := doc.Value("e_namebox").(string)
 		cookie := doc.Elem("e_cookies")
-		if doc.Elem("e_check").Value() == true {
+		if doc.Value("e_check") == true {
 			cookie.SetValue(name + " likes cookies")
 		} else {
 			cookie.SetValue(name + " doesn't like cookies")
@@ -40,14 +34,21 @@ func main() {
 	})
 
 	doc.Elem("e_range").OnChange(func() {
-		doc.Elem("e_age").SetValue(fmt.Sprint(
-			doc.Elem("e_namebox").Value(), " is ",
-			doc.Elem("e_range").Value(), " years old."))
+		doc.SetValue("e_age", fmt.Sprint(
+			doc.Value("e_namebox"), " is ",
+			doc.Value("e_range"), " years old."))
 	})
 
-	for {
-		time.Sleep(1 * time.Second)
-		doc.Elem("e_time").SetValue(time.Now().Format("15:04:05"))
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			doc.SetValue("e_time", time.Now().Format("15:04:05"))
+		}
+	}()
+
+	err := http.ListenAndServe(":7070", nil)
+	if err != nil {
+		panic(err)
 	}
 
 }

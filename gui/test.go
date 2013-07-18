@@ -72,11 +72,11 @@ const testtempl = `
 	<p> {{.ErrorBox}} </p>
 	<hr/>
 
-	{{.Span "e_time" ""}} <br/><br/>
+	{{.Span "e_time" "time flies..."}} <br/><br/>
 
 
 	What's your name: {{.TextBox "e_namebox" ""}} &nbsp;
-	{{.Span "e_greet" ""}} <br/><br/>
+	{{.Span "e_greet"}} <br/><br/>
 
 	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/><br/>
 

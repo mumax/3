@@ -70,10 +70,10 @@
 		</table>
 
 		<table>
-			<tr> <td><b>step:    </b></td><td>{{.Span "step"}}          </td><td><b>time:  </b></td> <td>{{.Span "time"}} s       </td></tr>
-			<tr> <td><b>dt:      </b></td><td>{{.NumBox "dt" 1e-15}}   s</td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
-			<tr> <td><b>mindt:   </b></td><td>{{.NumBox "mindt" 0}}s    </td><td><b>maxdt: </b></td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
-			<tr> <td><b>err/step:</b></td><td>{{.Span "err"}}           </td><td><b>maxerr:</b></td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
+			<tr> <td><b>step:    </b></td><td>{{.Span   "step"}}      </td><td><b>time:  </b></td> <td>{{.Span "time"}} s       </td></tr>
+			<tr> <td><b>dt:      </b></td><td>{{.NumBox "dt" 1e-15}}s </td><td>   {{.CheckBox "fixdt" "fixdt" false}}           </td></tr>
+			<tr> <td><b>mindt:   </b></td><td>{{.NumBox "mindt" 0}}s  </td><td><b>maxdt: </b></td><td>{{.NumBox "maxdt" 0}}s    </td></tr>
+			<tr> <td><b>err/step:</b></td><td>{{.Span   "lasterr"}}   </td><td><b>maxerr:</b></td><td>{{.NumBox "maxerr" 1e-5}} </td></tr>
 		</table>
 	</div><hr/>
 

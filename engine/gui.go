@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"time"
 )
 
 var GUI = gui.NewDoc("/", templText)
@@ -24,9 +25,23 @@ func GoServe(port string) {
 	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
 	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(bool) } })
 
+	go func() {
+		for {
+			Inject <- updateDash
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
+
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {
 		util.LogErr(http.ListenAndServe(port, nil))
 	}()
 	runtime.Gosched()
+}
+
+func updateDash() {
+	GUI.SetValue("time", float32(Time))
+	GUI.SetValue("dt", float32(Solver.Dt_si))
+	GUI.SetValue("step", float32(Solver.NSteps))
+	GUI.SetValue("lasterr", float32(Solver.LastErr))
 }

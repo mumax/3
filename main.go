@@ -6,7 +6,6 @@ import (
 	_ "code.google.com/p/mx3/ext"
 	"code.google.com/p/mx3/prof"
 	"code.google.com/p/mx3/util"
-	"code.google.com/p/mx3/web"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -83,7 +82,7 @@ func RunFileAndServe(fname string) {
 	util.FatalErr(err2)
 
 	// now the parser is not used anymore so it can handle web requests
-	web.GoServe(*flag_port)
+	engine.GoServe(*flag_port)
 
 	// start executing the tree, possibly injecting commands from web gui
 	code.Eval()
@@ -109,34 +108,34 @@ func vet() {
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
 func RunInteractive() {
-	web.LastKeepalive = time.Now()
+	//web.LastKeepalive = time.Now()
 	engine.Pause()
 	log.Println("entering interactive mode")
-
-	for {
-		if time.Since(web.LastKeepalive) > web.Timeout {
-			log.Println("interactive session idle: exiting")
-			break
-		}
-		log.Println("awaiting browser interaction")
-		f := <-engine.Inject
-		f()
-	}
+	panic("todo")
+	//	for {
+	//		if time.Since(web.LastKeepalive) > web.Timeout {
+	//			log.Println("interactive session idle: exiting")
+	//			break
+	//		}
+	//		log.Println("awaiting browser interaction")
+	//		f := <-engine.Inject
+	//		f()
+	//	}
 }
 
 func keepBrowserAlive() {
-	if time.Since(web.LastKeepalive) < web.Timeout {
-		log.Println("keeping session open to browser")
-		go func() {
-			for {
-				if time.Since(web.LastKeepalive) > web.Timeout {
-					engine.Inject <- nop // wake up
-				}
-				time.Sleep(1 * time.Second)
-			}
-		}()
-		RunInteractive()
-	}
+	//	if time.Since(web.LastKeepalive) < web.Timeout {
+	//		log.Println("keeping session open to browser")
+	//		go func() {
+	//			for {
+	//				if time.Since(web.LastKeepalive) > web.Timeout {
+	//					engine.Inject <- nop // wake up
+	//				}
+	//				time.Sleep(1 * time.Second)
+	//			}
+	//		}()
+	//		RunInteractive()
+	//	}
 }
 
 func nop() {}

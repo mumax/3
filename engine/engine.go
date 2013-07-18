@@ -123,7 +123,12 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+
 	log.Println("set mesh:", Mesh().UserString())
+	GUI.SetValue("nx", Nx)
+	GUI.SetValue("ny", Ny)
+	GUI.SetValue("nz", Nz)
+
 	initialize()
 }
 

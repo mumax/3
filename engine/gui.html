@@ -1,9 +1,3 @@
-package web
-
-// THIS FILE IS AUTO GENERATED FROM webgui.html
-// EDITING IS FUTILE
-
-const templText = `
 <!DOCTYPE html>
 <html>
 
@@ -51,28 +45,29 @@ const templText = `
 
 <body>
 
-	<div id=header>
 		<h1> mx 3 GUI </h1> 
+	<div id=header>
 		<p> {{.ErrorBox}} </p>
-		<hr/>
-	</div>
+	</div><hr/>
 
 	
-	<div id=body>
-	<h2> geometry </h2>
+	<h2> geometry </h2><div>
 
 		<table>
-			<tr> <td>gridsize:</td> <td>{{.Span "nx"}}</td> x <td>{{.Span "ny"}}</td> x <td>{{.Span "nz"}}</td> </tr>
-			<tr> <td>cellsize:</td> <td>{{.Span "cx"}}</td> x <td>{{.Span "cy"}}</td> x <td>{{.Span "cz"}}</td> </tr>
-			<tr> <td>worldsize:</td> <td>{{.Span "wx"}}</td> x <td>{{.Span "wy"}}</td> x <td>{{.Span "wz"}}</td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.Span "nx" "0"}} </td> <td>x {{.Span "ny" "0"}}</td> <td>x {{.Span "nz" "0"}}</td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.Span "cx" "0"}} </td> <td>x {{.Span "cy" "0"}}</td> <td>x {{.Span "cz" "0"}}</td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span "wx" "0"}} </td> <td>x {{.Span "wy" "0"}}</td> <td>x {{.Span "wz" "0"}}</td> </tr>
 		</table>
+	</div><hr/>
 
-	<h2> control </h2>
 
-	</div>
+	<h2> control </h2><div>
+	</div><hr/>
+
+
 
 	<div id="footer">
-		<hr/> <br/>
+		<br/>
 		<center>
 			mumax 3<br/>
 			Copyright 2012-2013 <a href="mailto:a.vansteenkiste@gmail.com">Arne Vansteenkiste</a>,
@@ -84,4 +79,3 @@ const templText = `
 
 </body>
 </html>
-`

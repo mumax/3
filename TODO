@@ -7,6 +7,9 @@ web interface keepalive timeout not working anymore
 improvements:
 -------------
 
+remove -f flag, move existing files to name.trash
+fprintln: put file in OD if not absolute
+OD() api
 regions: setgeom() should define region 0 and set all parameters zero there
 regions: should not be neccesary to define region 0
 regions: should automatically set aex between regions, at very least if they have equal params

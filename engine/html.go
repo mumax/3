@@ -1,3 +1,9 @@
+package engine
+
+// THIS FILE IS AUTO GENERATED FROM gui.html
+// EDITING IS FUTILE
+
+const templText = `
 <!DOCTYPE html>
 <html>
 
@@ -11,6 +17,7 @@
 
 		body  { margin: 20px; font-family: Ubuntu, Arial, sans-serif; font-size: 14px; color: #444444}
 		h1    { font-size: 22px; font-weight: normal; color: black}
+		h2    { font-size: 18px; font-weight: normal; color: black}
 		img   { margin: 15px; }
 		table { border:"10"; }
 		hr    { border-style: none; border-top: 1px solid #CCCCCC; }
@@ -44,22 +51,29 @@
 
 <body>
 
+		<h1> mx 3 GUI </h1> 
 	<div id=header>
-		<h1> mumax 3 </h1> 
 		<p> {{.ErrorBox}} </p>
-		<hr/>
-	</div>
+	</div><hr/>
 
-
-	<h2> control </h2>
+	
+	<h2> geometry </h2><div>
 
 		<table>
-			<tr>  <td>{{.Function "Run" "1e-9"}}</td> <td>s</td>  </tr>
+			<tr> <td>gridsize: </td> <td>{{.Span "nx" "0"}} </td> <td>x {{.Span "ny" "0"}}</td> <td>x {{.Span "nz" "0"}}</td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.Span "cx" "0"}} </td> <td>x {{.Span "cy" "0"}}</td> <td>x {{.Span "cz" "0"}}</td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span "wx" "0"}} </td> <td>x {{.Span "wy" "0"}}</td> <td>x {{.Span "wz" "0"}}</td> </tr>
 		</table>
+	</div><hr/>
+
+
+	<h2> control </h2><div>
+	</div><hr/>
+
 
 
 	<div id="footer">
-		<hr/> <br/>
+		<br/>
 		<center>
 			mumax 3<br/>
 			Copyright 2012-2013 <a href="mailto:a.vansteenkiste@gmail.com">Arne Vansteenkiste</a>,
@@ -71,3 +85,4 @@
 
 </body>
 </html>
+`

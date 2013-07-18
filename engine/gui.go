@@ -1,7 +1,6 @@
-package web
+package engine
 
 import (
-	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/gui"
 	"code.google.com/p/mx3/util"
 	"log"
@@ -9,18 +8,13 @@ import (
 	"runtime"
 )
 
-var doc *gui.Doc
+var GUI *gui.Doc
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
 
-	doc = gui.NewDoc("/", templText)
-	http.HandleFunc("/render/", render)
-
-	size := engine.Mesh().Size()
-	doc.SetValue("nx", size[2])
-	doc.SetValue("ny", size[1])
-	doc.SetValue("nz", size[0])
+	GUI = gui.NewDoc("/", templText)
+	//http.HandleFunc("/render/", render)
 
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {

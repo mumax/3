@@ -6,7 +6,7 @@ package gui
 const js = `<script type="text/javascript">
 
 // auto-refresh rate
-var tick = 200;
+var tick = 250;
 var autorefresh = true;
 
 // show error in document (non-intrusive alert())
@@ -40,7 +40,7 @@ function refreshDOM(req){
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
 				var elem = document.getElementById(r.ID);
-				elem[r.ATTR] = r.HTML; 
+				if (r.ID != hasFocus) { elem[r.ATTR] = r.HTML; }
 			}
 		} else {
 			showErr("Disconnected");	

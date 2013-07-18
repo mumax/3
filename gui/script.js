@@ -34,7 +34,7 @@ function refreshDOM(req){
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
 				var elem = document.getElementById(r.ID);
-				elem[r.ATTR] = r.HTML; 
+				if (r.ID != hasFocus) { elem[r.ATTR] = r.HTML; }
 			}
 		} else {
 			showErr("Disconnected");	

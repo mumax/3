@@ -19,7 +19,6 @@ func GoServe(port string) {
 	//http.HandleFunc("/render/", render)
 
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
-
 	GUI.OnClick("break", Pause)
 	GUI.OnClick("run", func() { Inject <- func() { Run(GUI.Value("runtime").(float64)) } })
 	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
@@ -28,6 +27,7 @@ func GoServe(port string) {
 	GUI.OnChange("maxdt", func() { Inject <- func() { Solver.MaxDt = GUI.Value("maxdt").(float64) } })
 	GUI.OnChange("maxerr", func() { Inject <- func() { Solver.MaxErr = GUI.Value("maxerr").(float64) } })
 
+	// periodically update time, steps, etc
 	go func() {
 		for {
 			Inject <- updateDash

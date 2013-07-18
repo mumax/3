@@ -11,7 +11,8 @@ type Elem struct {
 	domAttr string // element attribute to assign value to (e.g., "innerHTML")
 	dirty   bool   // value needs to be sent on next refresh?
 	sync.Mutex
-	onclick, onchange func() // event handler
+	onclick, onchange func()                   // event handler
+	setValue          func(*Elem, interface{}) // SetValue override
 }
 
 func newElem(id, attr string, value interface{}) *Elem {
@@ -44,7 +45,11 @@ func (e *Elem) valueDirty() (value interface{}, dirty bool) {
 func (e *Elem) SetValue(v interface{}) {
 	e.Lock()
 	e.dirty = true
-	e.value = v
+	if e.setValue == nil {
+		e.value = v
+	} else {
+		e.setValue(e, v)
+	}
 	e.Unlock()
 }
 

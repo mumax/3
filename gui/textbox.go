@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"strconv"
 )
 
 // {{.Textbox id value}} adds a textbox to the document.
@@ -12,4 +13,25 @@ func (d *Doc) TextBox(id string, value ...string) string {
 	e := newElem(id, "value", val)
 	d.add(e)
 	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" onchange="notifytextbox('%v')"/>`, id, val, id) // todo: onblur...
+}
+
+func (d *Doc) NumBox(id string, value float64) string {
+	e := newElem(id, "value", value)
+	e.setValue = setNumBox // setvalue override
+	d.add(e)
+	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" size=12 onchange="notifytextbox('%v')"/>`, id, value, id) // todo: onblur...
+}
+
+func setNumBox(e *Elem, v interface{}) {
+	switch concrete := v.(type) {
+	default:
+		setNumBox(e, fmt.Sprint(v))
+	case float64:
+		e.value = concrete
+	case string:
+		n, err := strconv.ParseFloat(concrete, 64)
+		if err == nil {
+			e.value = n
+		} // else: keep old value
+	}
 }

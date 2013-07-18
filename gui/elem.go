@@ -52,11 +52,3 @@ func (e *Elem) SetValue(v interface{}) {
 	}
 	e.Unlock()
 }
-
-func (e *Elem) OnClick(f func()) {
-	e.onclick = f
-}
-
-func (e *Elem) OnChange(f func()) {
-	e.onchange = f
-}

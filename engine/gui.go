@@ -19,6 +19,8 @@ func GoServe(port string) {
 
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 
+	GUI.OnClick("break", Pause)
+
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	go func() {
 		util.LogErr(http.ListenAndServe(port, nil))

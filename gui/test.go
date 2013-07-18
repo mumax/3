@@ -13,17 +13,17 @@ func main() {
 	doc := NewDoc("/", testtempl)
 
 	hitcount := 0
-	doc.Elem("e_hitme").OnClick(func() {
+	doc.OnClick("e_hitme", func() {
 		hitcount++
 		doc.SetValue("e_hitcount", hitcount)
 	})
 
-	doc.Elem("e_namebox").OnChange(func() {
+	doc.OnChange("e_namebox", func() {
 		doc.SetValue("e_greet",
 			fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
 	})
 
-	doc.Elem("e_check").OnChange(func() {
+	doc.OnChange("e_check", func() {
 		name := doc.Value("e_namebox").(string)
 		cookie := doc.Elem("e_cookies")
 		if doc.Value("e_check") == true {
@@ -33,7 +33,7 @@ func main() {
 		}
 	})
 
-	doc.Elem("e_range").OnChange(func() {
+	doc.OnChange("e_range", func() {
 		doc.SetValue("e_age", fmt.Sprint(
 			doc.Value("e_namebox"), " is ",
 			doc.Value("e_range"), " years old."))

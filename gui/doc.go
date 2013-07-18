@@ -61,6 +61,14 @@ func (d *Doc) Elem(id string) *Elem {
 	}
 }
 
+func (d *Doc) OnClick(id string, handler func()) {
+	d.Elem(id).onclick = handler
+}
+
+func (d *Doc) OnChange(id string, handler func()) {
+	d.Elem(id).onchange = handler
+}
+
 // Shorthand for d.Elem(id).Value()
 func (d *Doc) Value(id string) interface{} {
 	return d.Elem(id).Value()

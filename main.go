@@ -111,31 +111,30 @@ func RunInteractive() {
 	//web.LastKeepalive = time.Now()
 	engine.Pause()
 	log.Println("entering interactive mode")
-	panic("todo")
-	//	for {
-	//		if time.Since(web.LastKeepalive) > web.Timeout {
-	//			log.Println("interactive session idle: exiting")
-	//			break
-	//		}
-	//		log.Println("awaiting browser interaction")
-	//		f := <-engine.Inject
-	//		f()
-	//	}
+	for {
+		if time.Since(engine.GUI.KeepAlive) > timeout {
+			log.Println("interactive session idle: exiting")
+			break
+		}
+		log.Println("awaiting browser interaction")
+		f := <-engine.Inject
+		f()
+	}
 }
 
+const timeout = 5 * time.Second
+
 func keepBrowserAlive() {
-	//	if time.Since(web.LastKeepalive) < web.Timeout {
-	//		log.Println("keeping session open to browser")
-	//		go func() {
-	//			for {
-	//				if time.Since(web.LastKeepalive) > web.Timeout {
-	//					engine.Inject <- nop // wake up
-	//				}
-	//				time.Sleep(1 * time.Second)
-	//			}
-	//		}()
-	//		RunInteractive()
-	//	}
+	if time.Since(engine.GUI.KeepAlive) < timeout {
+		log.Println("keeping session open to browser")
+		go func() {
+			for {
+				engine.Inject <- nop // wake up RunInteractive so it may exit
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		RunInteractive()
+	}
 }
 
 func nop() {}

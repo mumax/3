@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+	"time"
 )
 
 // gui.Doc serves a GUI as a html document.
@@ -15,6 +16,7 @@ type Doc struct {
 	elem      map[string]*Elem // document elements by ID
 	htmlCache []byte           // static html content, rendered only once
 	prefix    string           // URL prefix (not yet working)
+	KeepAlive time.Time        // last time we heard from the browser
 }
 
 // NewDoc makes a new GUI document, to be served under urlPattern.
@@ -89,6 +91,7 @@ func (d *Doc) add(e *Elem) {
 
 // ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	d.KeepAlive = time.Now()
 	url := r.URL.Path[len(d.prefix):]
 	//log.Println("handle", url)
 	switch url {

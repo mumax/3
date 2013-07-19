@@ -71,7 +71,7 @@ const templText = `
 			<tr style="background-color:white"> <td>
 	
 		<table>
-			<tr> <td>{{.Button "break"}} </td> <td> status: {{.Span "solverstatus" "initializing"}} </td></tr>
+			<tr> <td> {{.Button "break"}}</td> <td> status: {{.Span "solverstatus" "initializing"}} </td></tr>
 			<tr> <td> {{.Button "run"}}  </td> <td> {{.NumBox "runtime" 1e-9}}s</td></tr> 
 			<tr> <td> {{.Button "steps"}}</td> <td> {{.IntBox "runsteps" 1000}}</td></tr>
 		</table>
@@ -92,7 +92,9 @@ const templText = `
 	</div><hr/>
 
 
-	<h2> render </h2><div>
+	<h2> display </h2><div>
+
+		{{.Img "render" "/render/m"}}
 
 	</div><hr/>
 

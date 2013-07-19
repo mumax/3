@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"text/template"
 	"time"
 )
@@ -17,6 +18,8 @@ type Doc struct {
 	htmlCache []byte           // static html content, rendered only once
 	prefix    string           // URL prefix (not yet working)
 	KeepAlive time.Time        // last time we heard from the browser
+	callStack []jsCall
+	sync.Mutex
 }
 
 // NewDoc makes a new GUI document, to be served under urlPattern.
@@ -145,13 +148,17 @@ type event struct {
 // HTTP handler for refreshing the dynamic elements
 func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
-	js := []jsCall{}
+	v.Lock()
+	defer v.Unlock()
+
 	for id, e := range v.elem {
 		if value, dirty := e.valueDirty(); dirty {
-			js = append(js, jsCall{"setAttr", []interface{}{id, e.domAttr, value}})
+			v.callStack = append(v.callStack, jsCall{"setAttr", []interface{}{id, e.domAttr, value}})
 		}
 	}
-	check(json.NewEncoder(w).Encode(js))
+	check(json.NewEncoder(w).Encode(v.callStack))
+
+	v.callStack = v.callStack[:0]
 }
 
 // javascript call

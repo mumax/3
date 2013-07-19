@@ -1,6 +1,6 @@
 #! /bin/bash
 
-name=mx3.0.9_linux
+name=mx3.0.10
 
 go build -o mx3 || exit 1
 #(cd examples && go run make.go) || exit 1

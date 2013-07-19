@@ -24,10 +24,7 @@ var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
 function notifyblur (id){hasFocus = "";}
 
-function setAttr(args){
-	var id = args[0];
-	var attr = args[1];
-	var value = args[2];
+function setAttr(id, attr, value){
 	document.getElementById(id)[attr] = value;
 }
 
@@ -40,7 +37,7 @@ function refreshDOM(req){
 			var response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
-				window[r.F](r.Args);
+				window[r.F].apply(this, r.Args);
 			}
 		} else {
 			showErr("Disconnected");	

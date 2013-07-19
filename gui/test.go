@@ -39,6 +39,8 @@ func main() {
 			doc.Value("e_range"), " years old."))
 	})
 
+	doc.OnClick("alert", func() { doc.Call("alert", "How alert of you!") })
+
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
@@ -87,7 +89,9 @@ const testtempl = `
 	Your age: {{.Range "e_range" 0 100 18}}
 	{{.Span "e_age" ""}} <br/><br/>
 
-	Favorite OS: {{.Select "e_os"}}
+	Favorite OS: {{.Select "e_os"}} <br/><br/>
+
+	{{.Button "alert"}}
 
 	<hr/>
 

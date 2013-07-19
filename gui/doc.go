@@ -84,6 +84,12 @@ func (d *Doc) SetValue(id string, value interface{}) {
 	d.Elem(id).SetValue(value)
 }
 
+func (d *Doc) Call(function string, arg ...interface{}) {
+	d.Lock()
+	d.callStack = append(d.callStack, jsCall{function, arg})
+	d.Unlock()
+}
+
 func (d *Doc) add(id string, e *Elem) {
 	if _, ok := d.elem[id]; ok {
 		log.Panic("element id " + id + " already defined")

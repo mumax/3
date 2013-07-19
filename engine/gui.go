@@ -22,7 +22,7 @@ func GoServe(port string) {
 	GUI.OnClick("break", Pause)
 	GUI.OnClick("run", func() { Inject <- func() { Run(GUI.Value("runtime").(float64)) } })
 	GUI.OnClick("steps", func() { Inject <- func() { Steps(GUI.Value("runsteps").(int)) } })
-	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(bool) } })
+	GUI.OnChange("fixdt", func() { Inject <- func() { Solver.FixDt = GUI.Value("fixdt").(float64) } })
 	GUI.OnChange("mindt", func() { Inject <- func() { Solver.MinDt = GUI.Value("mindt").(float64) } })
 	GUI.OnChange("maxdt", func() { Inject <- func() { Solver.MaxDt = GUI.Value("maxdt").(float64) } })
 	GUI.OnChange("maxerr", func() { Inject <- func() { Solver.MaxErr = GUI.Value("maxerr").(float64) } })
@@ -43,8 +43,8 @@ func GoServe(port string) {
 }
 
 func updateDash() {
-	GUI.SetValue("time", float32(Time))
-	GUI.SetValue("dt", float32(Solver.Dt_si))
-	GUI.SetValue("step", float32(Solver.NSteps))
-	GUI.SetValue("lasterr", float32(Solver.LastErr))
+	GUI.SetValue("time", fmt.Sprintf("%6e", Time))
+	GUI.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
+	GUI.SetValue("step", Solver.NSteps)
+	GUI.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
 }

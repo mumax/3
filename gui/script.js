@@ -1,6 +1,6 @@
 
 // auto-refresh rate
-var tick = 250;
+var tick = 200;
 var autorefresh = true;
 
 // show error in document (non-intrusive alert())

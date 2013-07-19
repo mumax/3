@@ -15,7 +15,7 @@ type solverCommon struct {
 	MaxErr, Headroom       float64  // maximum error per step
 	LastErr                float64  // error of last step
 	NSteps, NUndone, NEval int      // number of good steps, undone steps
-	FixDt                  bool     // fixed time step?
+	FixDt                  float64  // fixed time step?
 }
 
 func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {
@@ -25,7 +25,8 @@ func newSolverCommon(dt_si, dt_mul float64, time *float64) solverCommon {
 
 // adapt time step: dt *= corr, but limited to sensible values.
 func (e *solverCommon) adaptDt(corr float64) {
-	if e.FixDt {
+	if e.FixDt != 0 {
+		e.Dt_si = e.FixDt
 		return
 	}
 	util.Assert(corr != 0)

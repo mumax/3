@@ -11,21 +11,21 @@ import (
 func (d *Doc) TextBox(id string, value ...string) string {
 	val := cat(value)
 	e := newElem(id, "value", val)
-	d.add(e)
+	d.add(id, e)
 	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" onchange="notifytextbox('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, val, id, id, id)
 }
 
 func (d *Doc) NumBox(id string, value float64) string {
 	e := newElem(id, "value", value)
 	e.setValue = setNumBox // setvalue override
-	d.add(e)
+	d.add(id, e)
 	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" size=10 onchange="notifytextbox('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, value, id, id, id)
 }
 
 func (d *Doc) IntBox(id string, value int) string {
 	e := newElem(id, "value", value)
 	e.setValue = setIntBox // setvalue override
-	d.add(e)
+	d.add(id, e)
 	return fmt.Sprintf(`<input type=textbox class=TextBox id=%v value="%v" size=10 onchange="notifytextbox('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"/>`, id, value, id, id, id)
 }
 

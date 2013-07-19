@@ -9,6 +9,6 @@ import (
 // value is true (checked) or false (unchecked)
 func (d *Doc) CheckBox(id, text string, value bool) string {
 	e := newElem(id, "checked", value)
-	d.add(e)
+	d.add(id, e)
 	return fmt.Sprintf(`<input type=checkbox id=%v class=CheckBox onchange="notifycheckbox('%v')">%v</input>`, id, id, text)
 }

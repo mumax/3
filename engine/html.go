@@ -16,21 +16,19 @@ const templText = `
 	<style media="all" type="text/css">
 
 		body  { margin-left: 5%; margin-right:5%; font-family: sans-serif; font-size: 14px; }
-		h1    { font-size: 22px; color: gray}
-		h2    { font-size: 18px; color: gray}
+		h1    { font-size: 22px; color: gray; }
+		h2    { font-size: 18px; color: gray; }
 		img   { margin: 10px; }
-		table { border-collapse: collapse;}
+		table { border-collapse: collapse; }
 		tr:nth-child(even) { background-color: white; }
 		tr:nth-child(odd)  { background-color: #F7F7FF; }
-		td    { padding: 1px 5px;}
-		hr    { border-style: none; border-top: 1px solid #CCCCCC; }
-		a     { color: #375EAB; text-decoration: none; }
-
+		td        { padding: 1px 5px; }
+		hr        { border-style: none; border-top: 1px solid #CCCCCC; }
+		a         { color: #375EAB; text-decoration: none; }
 		div       { margin-left: 20px; margin-top: 5px; margin-bottom: 20px; }
-		div#footer{ color:gray; font-size:14px; border:none}
-
+		div#footer{ color:gray; font-size:14px; border:none; }
 		.ErrorBox { color: red; font-weight: bold; } 
-		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px;}
+		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; }
 	</style>
 
 	<script>
@@ -92,6 +90,12 @@ const templText = `
 			</td></tr>
 		</table>
 	</div><hr/>
+
+
+	<h2> render </h2><div>
+
+	</div><hr/>
+
 
 
 	<h2> process </h2><div>

@@ -12,7 +12,7 @@ func (d *Doc) Button(id string, value ...string) string {
 		val = id
 	}
 	e := newElem(id, "value", val)
-	d.add(e)
+	d.add(id, e)
 	return fmt.Sprintf(`<button id=%v class=Button onclick="notify('%v', 'click')">%v</button>`,
-		e.id, e.id, htmlEsc(val)) // set button value does not work
+		id, id, htmlEsc(val)) // set button value does not work
 }

@@ -6,7 +6,6 @@ import (
 
 // Elem represents a GUI element (button, textbox, ...)
 type Elem struct {
-	id      string
 	value   interface{}
 	domAttr string // element attribute to assign value to (e.g., "innerHTML")
 	dirty   bool   // value needs to be sent on next refresh?
@@ -16,11 +15,7 @@ type Elem struct {
 }
 
 func newElem(id, attr string, value interface{}) *Elem {
-	return &Elem{id: id, value: value, dirty: true, domAttr: attr}
-}
-
-func (e *Elem) Id() string {
-	return e.id
+	return &Elem{value: value, dirty: true, domAttr: attr}
 }
 
 // Value returns the GUI element's value.

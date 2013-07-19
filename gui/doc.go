@@ -81,8 +81,7 @@ func (d *Doc) SetValue(id string, value interface{}) {
 	d.Elem(id).SetValue(value)
 }
 
-func (d *Doc) add(e *Elem) {
-	id := e.Id()
+func (d *Doc) add(id string, e *Elem) {
 	if _, ok := d.elem[id]; ok {
 		log.Panic("element id " + id + " already defined")
 	}
@@ -147,10 +146,10 @@ type event struct {
 func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
 	js := []domUpd{}
-	for _, e := range v.elem {
+	for id, e := range v.elem {
 		if value, dirty := e.valueDirty(); dirty {
 			//vEsc := htmlEsc(value)
-			js = append(js, domUpd{e.Id(), e.domAttr, value})
+			js = append(js, domUpd{id, e.domAttr, value})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))

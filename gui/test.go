@@ -87,6 +87,8 @@ const testtempl = `
 	Your age: {{.Range "e_range" 0 100 18}}
 	{{.Span "e_age" ""}} <br/><br/>
 
+	Favorite OS: {{.Select "e_os"}}
+
 	<hr/>
 
 </body>

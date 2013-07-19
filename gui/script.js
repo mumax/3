@@ -24,6 +24,13 @@ var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
 function notifyblur (id){hasFocus = "";}
 
+function setAttr(args){
+	var id = args[0];
+	var attr = args[1];
+	var value = args[2];
+	document.getElementById(id)[attr] = value;
+}
+
 // onreadystatechange function for update http request.
 // refreshes the DOM with new values received from server.
 function refreshDOM(req){
@@ -33,8 +40,7 @@ function refreshDOM(req){
 			var response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
-				var elem = document.getElementById(r.ID);
-				if (r.ID != hasFocus) { elem[r.ATTR] = r.HTML; }
+				window[r.F](r.Args);
 			}
 		} else {
 			showErr("Disconnected");	
@@ -85,3 +91,6 @@ function notifyrange(id){
 	notify(id, "change", document.getElementById(id).value);
 }
 
+function notifyselect(id){
+	notify(id, "change", document.getElementById(id).value);
+}

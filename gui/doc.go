@@ -145,21 +145,19 @@ type event struct {
 // HTTP handler for refreshing the dynamic elements
 func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	//fmt.Print("*")
-	js := []domUpd{}
+	js := []jsCall{}
 	for id, e := range v.elem {
 		if value, dirty := e.valueDirty(); dirty {
-			//vEsc := htmlEsc(value)
-			js = append(js, domUpd{id, e.domAttr, value})
+			js = append(js, jsCall{"setAttr", []interface{}{id, e.domAttr, value}})
 		}
 	}
 	check(json.NewEncoder(w).Encode(js))
 }
 
-// DOM update action
-type domUpd struct {
-	ID   string      // element ID to update
-	ATTR string      // element attribute (innerHTML, value, ...)
-	HTML interface{} // element value to set // TODO: rename value
+// javascript call
+type jsCall struct {
+	F    string        // function to call
+	Args []interface{} // function arguments
 }
 
 func check(e error) {

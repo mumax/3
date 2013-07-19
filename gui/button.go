@@ -1,8 +1,6 @@
 package gui
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // {{.Button id value}} adds a button to the document.
 // value is text on the button.

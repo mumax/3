@@ -30,8 +30,16 @@ var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
 function notifyblur (id){hasFocus = "";}
 
+// called by server to manipulate the DOM
 function setAttr(id, attr, value){
 	document.getElementById(id)[attr] = value;
+}
+
+function addOption(id, option){
+	var opt = document.createElement('option');
+    opt.value = 0;
+    opt.innerHTML = option;
+    document.getElementById(id).appendChild(opt);
 }
 
 // onreadystatechange function for update http request.
@@ -95,6 +103,10 @@ function notifyrange(id){
 }
 
 function notifyselect(id){
-	notify(id, "change", document.getElementById(id).value);
+	var e = document.getElementById(id);
+	var value = e.options[e.selectedIndex].text;
+	notify(id, "change", value);
 }
+
+
 </script>`

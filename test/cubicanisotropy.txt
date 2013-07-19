@@ -1,6 +1,11 @@
 /*
 	Test cubic anisotropy.
-	todo: verify against OOMMF values.
+	We let the anisotropy compete with an external field
+	and verify the relaxed my against OOMMF values.
+	
+	There seems to be a ~10% difference with OOMMF,
+	probably due to different understandings of what is an ellipse exactly.
+	
 */
 
 	setgridsize(64, 64, 1)
@@ -8,12 +13,15 @@
 
 	Aex   = 13e-12
 	alpha = 1
-	M     = uniform(1, 1, 0)
+	setgeom(cylinder(64*4e-9, 64*4e-9)) // todo: average takes into account geometry filling
+	M     = uniform(1, 0, 0)
+	fill := average(m)[0]
 	
 	// define some regions to make sure anisotropy is applied everywhere
 	// (when using Ku1 = ... syntax)
 	defregion(2, cylinder(100e-9, 100e-9))
 	defregion(3, rect(100e-9, 20e-9))
+	setgeom(cylinder(64*4e-9, 64*4e-9))
 	
 	// Test output
 	save(Kc1)
@@ -21,14 +29,36 @@
 	save(AnisC2)
 	save(B_anis)
 	
+ 	// Easy, in-plane
 	AnisC1 = vector(1, 0, 0)
 	AnisC2 = vector(0, 1, 0)
-	Kc1   = 0.5e6
+	Kc1   = 0.2e6
 
 	Msat  = 1100e3
 
-	B_ext = vector(0, 0.00, 0)
+  
+	table.autosave(1e-11)
+	B_ext = vector(0.00, 0.00, 0)
 	run(1e-9)
-	print("my", average(m)[1])
+	expect("my", average(m)[1]/fill, 0.000, 1e-3)
 
+	B_ext = vector(0.01, 0.01, 0)
+	run(1e-9)
+	expect("my", average(m)[1]/fill, 0.0270009412, 1e-3)
+
+	B_ext = vector(0.03, 0.03, 0)
+	run(1e-9)
+	expect("my", average(m)[1]/fill, 0.0775918376, 1e-3)
+
+	B_ext = vector(0.10, 0.10, 0)
+	run(1e-9)
+	expect("my", average(m)[1]/fill, 0.2367503415, 2e-2)
+
+	B_ext = vector(0.30, 0.30, 0)
+	run(1e-9)
+	expect("my", average(m)[1]/fill, 0.407313229, 1e-1)
+
+	AnisC1 = vector(100, 0, 0)                // Test unnormalized U vector
+	run(1e-9)
+	expect("my", average(m)[1]/fill, 0.407313229, 1e-1) // should not make a difference (normalized internally)
 

@@ -5,20 +5,19 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-// TODO: have newBlaBla() add the quantity to world when it starts with uppercase
-
 var (
 	Aex    ScalarParam // inter-cell exchange stiffness in J/m
-	lex2   symmparam   // inter-cell exchange length squared * 1e18
 	B_exch adderQuant  // exchange field (T) output handle
-	E_exch = NewGetScalar("E_exch", "J", GetExchangeEnergy)
+	E_exch GetFunc     // exchange energy (J)
 	Dex    ScalarParam // Dzyaloshinskii-Moriya strength in J/m²
+	lex2   symmparam   // inter-cell exchange length squared * 1e18
 )
 
 func init() {
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
+	E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy)
 	World.LValue("Aex", &Aex)
 	World.Func("setLexchange", SetLExchange)
 	World.ROnly("B_exch", &B_exch)
@@ -43,14 +42,14 @@ func initExchange() {
 		}
 	})
 	Quants["B_exch"] = &B_exch
-	registerEnergy(GetExchangeEnergy)
+	registerEnergy(getExchangeEnergy)
 }
 
 // Returns the current exchange energy in Joules.
 // Note: the energy is defined up to an arbitrary constant,
 // ground state energy is not necessarily zero or comparable
 // to other simulation programs.
-func GetExchangeEnergy() float64 {
+func getExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch) / Mu0
 	// note: M_full is in Tesla, hence /Mu0
 }

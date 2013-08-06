@@ -16,10 +16,10 @@ anisU = vector(1, 0, 0)
 Ku1   = 500e3
 
 m.loadfile("testdata/m000000.dump")
-saveas(m, "m")
-saveas(B_demag, "B_demag")
-saveas(B_exch, "B_exch")
-saveas(B_anis, "B_anis")
-saveas(regions, "regions")
+m.saveas("m")
+B_demag.saveas("B_demag")
+B_exch.saveas("B_exch")
+B_anis.saveas("B_anis")
+regions.saveas("regions")
 
 fprintln("testfile", "m", average(m))

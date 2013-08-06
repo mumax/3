@@ -36,3 +36,11 @@ func (b *setterQuant) GetGPU() (q *data.Slice, recycle bool) {
 func (b *setterQuant) Get() (*data.Slice, bool) {
 	return b.GetGPU()
 }
+
+func (p *setterQuant) Save() {
+	save(p)
+}
+
+func (p *setterQuant) SaveAs(fname string) {
+	saveAs(p, fname)
+}

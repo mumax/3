@@ -10,7 +10,6 @@ alpha = 3
 m     = vortex(1, 1)
 
 run(2e-9) 
-save(m) 
 expect("mz", average(m)[2], 0.02785073, 1e-6)
 
 

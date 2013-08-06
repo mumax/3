@@ -14,9 +14,9 @@
 	Dex   = 0.1e-3               // J/m2.
 
 	m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
-	save(m) // initial magnetization
+	m.save() // initial magnetization
 
-	Autosave(m, 1000e-12)
+	m.autosave(1000e-12)
 
 	MaxErr = 1e-4
 	Maxdt = 5e-13

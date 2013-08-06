@@ -7,4 +7,4 @@
 
 	m = vortex(1, 1)
 
-	save(mFFT)
+	mFFT.save()

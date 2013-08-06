@@ -135,3 +135,11 @@ func (p *param) upload() {
 	}
 	p.ok = true
 }
+
+func (p *adderQuant) Save() {
+	save(p)
+}
+
+func (p *adderQuant) SaveAs(fname string) {
+	saveAs(p, fname)
+}

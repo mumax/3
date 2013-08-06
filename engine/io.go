@@ -11,9 +11,6 @@ import (
 )
 
 func init() {
-	World.Func("save", Save)
-	World.Func("saveas", SaveAs)
-	World.Func("autosave", Autosave)
 	World.Func("fprintln", Fprintln)
 }
 
@@ -57,11 +54,11 @@ func hostBuf(nComp int, m *data.Mesh) *data.Slice {
 	return data.NewSlice(nComp, m) // TODO use pool of page-locked buffers
 }
 
-func Save(q Saver) {
-	SaveAs(q, q.autoFname())
+func save(q Saver) {
+	saveAs(q, q.autoFname())
 }
 
-func SaveAs(q Getter, fname string) {
+func saveAs(q Getter, fname string) {
 	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
 		fname = path.Clean(OD + "/" + fname)
 	}
@@ -83,14 +80,10 @@ func SaveAs(q Getter, fname string) {
 	}
 }
 
-func Autosave(what Autosaver, period float64) {
-	what.Autosave(period)
-}
-
 // notify that it may need to be saved.
 func notifySave(q Saver, goodstep bool) {
 	if goodstep && q.needSave() {
-		Save(q)
+		save(q)
 		q.saved()
 	}
 }

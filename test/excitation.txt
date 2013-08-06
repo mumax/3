@@ -12,5 +12,5 @@ defregion(2, dot)
 b_ext.setregion(2, vector(0, 0, 1))
 setlexchange(1, 2, 5e-9)
 
-autosave(m, 10e-9)
+m.autosave(10e-9)
 run(1e-9)

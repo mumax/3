@@ -1,2 +1,0 @@
-setgridsize(512, 256, 1)
-setcellsize(4e-9, 4e-9, 4e-9)

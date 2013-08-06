@@ -24,10 +24,10 @@
 	setgeom(cylinder(64*4e-9, 64*4e-9))
 	
 	// Test output
-	save(Kc1)
-	save(AnisC1)
-	save(AnisC2)
-	save(B_anis)
+	Kc1.save()
+	AnisC1.save()
+	AnisC2.save()
+	B_anis.save()
 	
  	// Easy, in-plane
 	AnisC1 = vector(1, 0, 0)

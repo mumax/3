@@ -11,16 +11,16 @@ defregion(0, cylinder(d, d).inverse())
 defregion(1, cylinder(d, d))
 defregion(2, cylinder(d/2, d/2))
 defregion(3, cylinder(d/2, d/2).transl(d/3, 0, 0))
-save(regions)
+regions.save()
 
 Ku1.setregion(1, 500)
 Ku1.setregion(2, 0)
 Ku1.setregion(3, -500)
-save(Ku1)
+Ku1.save()
 
 Msat = 800e-3 // sets it everywhere
 Msat.setregion(2, 500e3)
-save(Msat)
+Msat.save()
 
 m = uniform(1, 0, 0)
-save(m)
+m.save()

@@ -44,3 +44,11 @@ func (a *adderQuant) GetGPU() (q *data.Slice, recycle bool) {
 func (a *adderQuant) Get() (q *data.Slice, recycle bool) {
 	return a.GetGPU()
 }
+
+func (p *param) Save() {
+	save(p)
+}
+
+func (p *param) SaveAs(fname string) {
+	saveAs(p, fname)
+}

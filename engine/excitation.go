@@ -70,3 +70,11 @@ func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
+
+func (p *excitation) Save() {
+	save(p)
+}
+
+func (p *excitation) SaveAs(fname string) {
+	saveAs(p, fname)
+}

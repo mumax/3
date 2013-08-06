@@ -19,8 +19,8 @@
 
 // relax
 	alpha = 3
-	save(B_exch)
-	save(m)
+	B_exch.save()
+	m.save()
 	run(10e-9) 
 	m_ := average(m)
 	expect("mx", m_[0], 0.96696, 1e-3)
@@ -28,7 +28,7 @@
 	expect("mz", m_[2], 0,       1e-3)
 
 // reversal
-	autosave(m, 20e-12)
+	m.autosave(20e-12)
 	alpha = 0.02
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)

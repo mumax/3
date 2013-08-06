@@ -35,15 +35,15 @@ Let's start with the classic mumag standard problem 4, as defined <a href="http:
 SetGridsize(128, 32, 1)
 SetCellsize(500e-9/128, 125e-9/32, 3e-9)
 
-alpha = 1
+alpha = 1.0
 Msat  = 800e3
 Aex   = 13e-12
-m     = uniform(1, .1, 0) // initial m
+m     = uniform(1, .1, 0)
 
 run(3e-9)  // relax
-save(m)    // relaxed state
+m.save()   // relaxed state
 
-autosave(m, 200e-12)
+m.autosave(200e-12)
 table.autosave(10e-12)
 alpha = 0.02
 B_ext = vector(-24.6E-3, 4.3E-3, 0)
@@ -95,17 +95,17 @@ table.autosave(10e-12)
 
 /* Space-dependent output */
 
-save(m)        // reduced magnetization
-save(mFFT)     // FFT of m
+m.save()        // reduced magnetization
+mFFT.save()     // FFT of m
 
-save(B_eff)    // effective field in T
-save(B_demag)  // demagnetizing field in T
-save(B_exch)   // exchange field in T
-save(B_anis)   // uniaxial anisotropy field in T
+B_eff.save()    // effective field in T
+B_demag.save()  // demagnetizing field in T
+B_exch.save()   // exchange field in T
+B_anis.save()   // uniaxial anisotropy field in T
 
-save(torque)   // total torque/γ0
-save(LLTorque) // Landau-Lifshitz torque/γ0
-save(STTorque) // Spin-transfer torque/γ0
+torque.save()   // total torque/γ0
+LLTorque.save() // Landau-Lifshitz torque/γ0
+STTorque.save() // Spin-transfer torque/γ0
 
 // The input parameters (Msat, Aex, ...) can be saved as well,
 // but that's only useful when they are defined space- or time-dependent.
@@ -179,7 +179,7 @@ SetCellSize(Sizex/nx, Sizey/ny, Sizez)
 m = Uniform(1, 0.1, 0)                   // initial mag
 Run(5e-9)                                // relax
 
-save(m)                                  // remanent magnetization
+m.save()                                  // remanent magnetization
 m_ := average(m)                         
 expect("mx", m_[0], 0.9627, 1e-3)        // test m against known value
 expect("my", m_[1], 0.0756, 1e-3)
@@ -201,58 +201,58 @@ setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
 setgeom( rect(800e-9, 500e-9) )
 m=uniform(1,1,0)
-saveas(m, "rect")
+m.saveas("rect")
 
 setgeom( cylinder(800e-9, 600e-9) )
 m=uniform(1,1,0)
-saveas(m, "cylinder")
+m.saveas("cylinder")
 
 setgeom( cylinder(800e-9, 600e-9).inverse() )
 m=uniform(1,1,0)
-saveas(m, "cylinder_inverse")
+m.saveas("cylinder_inverse")
 
 setgeom( cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0) )
 m=uniform(1,1,0)
-saveas(m, "cylinder_transl")
+m.saveas("cylinder_transl")
 
 setgeom( ellipsoid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
-saveas(m, "ellipsoid")
+m.saveas("ellipsoid")
 
 setgeom( cuboid(800e-9, 600e-9, 500e-9) )
 m=uniform(1,1,0)
-saveas(m, "cuboid")
+m.saveas("cuboid")
 
 setgeom( cuboid(800e-9, 600e-9, 500e-9).rotz(-10*pi/180) )
 m=uniform(1,1,0)
-saveas(m, "cuboid_rotZ")
+m.saveas("cuboid_rotZ")
 
 setgeom( layers(0, 25) )
 m=uniform(1,1,0)
-saveas(m, "layers")
+m.saveas("layers")
 
 setgeom( xrange(0, inf) )
 m=uniform(1,1,0)
-saveas(m, "xrange")
+m.saveas("xrange")
 
 a := cylinder(600e-9, 600e-9).transl(-150e-9, 50e-9, 0 )
 b := rect(600e-9, 600e-9).transl(150e-9, -50e-9, 0)
 
 setgeom( a.add(b) )
 m=uniform(1,1,0)
-saveas(m, "logicAdd")
+m.saveas("logicAdd")
 
 setgeom( a.sub(b) )
 m=uniform(1,1,0)
-saveas(m, "logicSub")
+m.saveas("logicSub")
 
 setgeom( a.intersect(b) )
 m=uniform(1,1,0)
-saveas(m, "logicAnd")
+m.saveas("logicAnd")
 
 setgeom( a.xor(b) )
 m=uniform(1,1,0)
-saveas(m, "logicXor")
+m.saveas("logicXor")
 
 `}}
 
@@ -269,25 +269,25 @@ setgridsize(200, 100, 1)
 setcellsize(5e-9, 5e-9, 5e-9)
 
 m = uniform(1, 1, 0)  // no need to normalize length
-saveas(m, "uniform")
+m.saveas("uniform")
 
 m = vortex(1, -1)     // circulation, polarization
-saveas(m, "vortex")
+m.saveas("vortex")
 
 m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
-saveas(m, "twodomain")
+m.saveas("twodomain")
 
 m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
-saveas(m, "twodomain_rot")
+m.saveas("twodomain_rot")
 
 m = vortexwall(1, -1, 1, 1) 
-saveas(m, "vortexwall")
+m.saveas("vortexwall")
 
 m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
-saveas(m, "vortexwall_scale")
+m.saveas("vortexwall_scale")
 
 m = vortex(1,-1).transl(100e-9, 50e-9, 0)
-saveas(m, "vortex_transl")
+m.saveas("vortex_transl")
 
 // Read m form .dump file, assuming it exists:
 // m.loadfile("myfile.dump")
@@ -320,7 +320,7 @@ table.add(B_ext)
 
 th := 0.0001 // field direction
 
-saveas(m, "m_initial")
+m.saveas("m_initial")
 
 // Scan the hysteresis loop:
 for B:=0.; B<100e-3; B+=10e-3{
@@ -329,7 +329,7 @@ for B:=0.; B<100e-3; B+=10e-3{
 	table.save()
 }
 
-saveas(m, "m_saturated")
+m.saveas("m_saturated")
 
 `}}{{.Output}}
 
@@ -363,7 +363,7 @@ for i:=0; i<=90; i=i+30{
 	setgeom(cheese.rotz(angle))
 	m = uniform(cos(angle), sin(angle), 0)
 	run(1e-9)
-	save(m)
+	m.save()
 }
 
 `}}
@@ -394,7 +394,7 @@ d := 4e-9 * N
 defregion(1, xrange(0, inf))
 defregion(2, xrange(-inf, 0))
 defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
-save(regions)
+regions.save()
 
 Ku1.setregion(1, .1e6)
 anisU.setRegion(1, vector(1, 0, 0))
@@ -402,11 +402,11 @@ anisU.setRegion(1, vector(1, 0, 0))
 Ku1.setregion(2, .1e6)
 anisU.setRegion(2, vector(0, 1, 0))
 
-save(Ku1)
-save(anisU)
+Ku1.save()
+anisU.save()
 
 Msat = 800e3 // sets it everywhere
-save(Msat)
+Msat.save()
 
 Aex = 12e-13
 alpha = 1
@@ -417,7 +417,7 @@ setlexchange(1, 2, lex)
 
 m = uniform(1, 1, 0)
 run(.1e-9)
-save(m)
+m.save()
 `}}
 
 {{.Output}}
@@ -484,7 +484,7 @@ alpha = 0.02                                  // normal damping
 postStep(ext_centerPMAwall)
 
 // Schedule output
-autosave(m, 100e-12)
+m.autosave(100e-12)
 
 // Run for 1ns with current through the sample
 jpol = vector(1.5e13, 0, 0)
@@ -524,7 +524,7 @@ Run(1e-9)    // relax
 Alpha = 0.02 // restore normal damping
 
 // Schedule output
-Autosave(m, 100e-12)
+m.autosave(100e-12)
 
 // Run the simulation with current through the sample
 SpinPol:= 0.56

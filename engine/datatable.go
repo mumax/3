@@ -102,21 +102,21 @@ func (t *DataTable) flush() {
 }
 
 // simple implementation of getVec
-type getfunc struct {
+type GetFunc struct {
 	info
 	get func() []float64
 }
 
-func newGetfunc(nComp int, name, unit string, get func() []float64) getfunc {
-	return getfunc{info{nComp, name, unit}, get}
+func newGetfunc(nComp int, name, unit string, get func() []float64) GetFunc {
+	return GetFunc{info{nComp, name, unit}, get}
 }
 
-func NewGetScalar(name, unit string, get func() float64) getfunc {
+func NewGetScalar(name, unit string, get func() float64) GetFunc {
 	return newGetfunc(1, name, unit, func() []float64 {
 		return []float64{get()}
 	})
 }
 
-func (g *getfunc) GetVec() []float64 {
+func (g *GetFunc) GetVec() []float64 {
 	return g.get()
 }

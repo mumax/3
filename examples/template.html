@@ -110,11 +110,6 @@ STTorque.save() // Spin-transfer torque/γ0
 // The input parameters (Msat, Aex, ...) can be saved as well,
 // but that's only useful when they are defined space- or time-dependent.
 
-// Append output to existing file. When running a large batch
-// you can append the end result of every simulation to a single file.
-// E.g: add Aex and <mx> of every simulation to result.txt:
-fprintln("result.txt", Aex, average(m)[0])
-
 `}}{{.Output}}
 
 <hr/><h2>Interlude on Syntax</h2>

@@ -6,26 +6,29 @@ import (
 )
 
 var (
-	AnisU   = vectorParam("anisU", "", nil)    // Uniaxial anisotropy axis
+	AnisU  VectorParam // Uniaxial anisotropy axis
+	Ku1    ScalarParam // Uniaxial anisotropy strength (J/m³)
+	Kc1    ScalarParam // Cubic anisotropy strength (J/m³)
+	AnisC1 VectorParam // Cubic anisotropy axis 1
+	AnisC2 VectorParam // Cubic anisotropy axis 2
+	B_anis adderQuant  // field due to uniaxial anisotropy (T)
+	E_anis GetFunc     // Total anisotropy energy (J)
+
 	ku1_red = scalarParam("ku1_red", "T", nil) // Ku1 / Msat (T), auto updated from Ku1 (TODO: form msat)
-	Ku1     ScalarParam                        // Uniaxial anisotropy strength (J/m³)
-
 	kc1_red = scalarParam("kc1_red", "T", nil) // Kc1 / Msat (T), auto updated from Kc1 (TODO: form msat)
-	Kc1     ScalarParam                        // Cubic anisotropy strength (J/m³)
-	AnisC1  = vectorParam("anisC1", "", nil)   // Cubic anisotropy axis 1
-	AnisC2  = vectorParam("anisC2", "", nil)   // Cubic anisotropy axis 2
-
-	B_anis adderQuant                                         // field due to uniaxial anisotropy
-	E_anis = NewGetScalar("E_anis", "J", GetAnisotropyEnergy) // TODO: verify
 )
 
 func init() {
+	AnisU = vectorParam("anisU", "", nil)
+	AnisC1 = vectorParam("anisC1", "", nil)
+	AnisC2 = vectorParam("anisC2", "", nil)
 	Ku1 = scalarParam("Ku1", "J/m3", func(region int) {
 		ku1_red.setRegion(region, safediv(Ku1.GetRegion(region), Msat.GetRegion(region)))
 	})
 	Kc1 = scalarParam("Kc1", "J/m3", func(region int) {
 		kc1_red.setRegion(region, safediv(Kc1.GetRegion(region), Msat.GetRegion(region)))
 	})
+	E_anis = NewGetScalar("E_anis", "J", getAnisotropyEnergy) // TODO: verify
 	World.LValue("AnisU", &AnisU)
 	World.LValue("AnisC1", &AnisC1)
 	World.LValue("AnisC2", &AnisC2)
@@ -44,7 +47,7 @@ func initAnisotropy() {
 			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.Gpu(), AnisC1.Gpu(), AnisC2.Gpu(), regions.Gpu())
 		}
 	})
-	registerEnergy(GetAnisotropyEnergy)
+	registerEnergy(getAnisotropyEnergy)
 	Quants["B_anis"] = &B_anis
 	Quants["Ku1"] = &Ku1
 	Quants["Kc1"] = &Kc1
@@ -53,6 +56,6 @@ func initAnisotropy() {
 	Quants["anisC2"] = &AnisC2
 }
 
-func GetAnisotropyEnergy() float64 {
+func getAnisotropyEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_anis) / Mu0
 }

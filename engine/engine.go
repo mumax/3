@@ -15,6 +15,7 @@ const VERSION = "mx3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 func init() {
+	Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 	World.Func("setgridsize", setGridSize)
 	World.Func("setcellsize", setCellSize)
 	World.LValue("m", &M)
@@ -26,20 +27,19 @@ func init() {
 	GUI.SetValue("hostname", hostname)
 }
 
-// Accessible quantities
 var (
-	M      magnetization            // reduced magnetization (unit length)
-	M_full setterQuant              // non-reduced magnetization in T
-	B_eff  setterQuant              // effective field (T) output handle
-	Torque setterQuant              // total torque/γ0, in T
-	Table  = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+	M      magnetization // reduced magnetization (unit length)
+	M_full SetterQuant   // non-reduced magnetization in T
+	B_eff  SetterQuant   // effective field (T) output handle
+	Torque SetterQuant   // total torque/γ0, in T
 )
 
-// hidden quantities
+var Table DataTable
+
 var (
 	globalmesh data.Mesh
-	itime      int                       //unique integer time stamp // TODO: revise
-	Quants     = make(map[string]Getter) // maps quantity names to downloadable data. E.g. for rendering
+	itime      int                       // unique integer time stamp // TODO: revise
+	Quants     = make(map[string]Getter) // INTERNAL maps quantity names to downloadable data. E.g. for rendering
 )
 
 func initialize() {

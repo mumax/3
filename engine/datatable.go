@@ -111,6 +111,7 @@ func newGetfunc(nComp int, name, unit string, get func() []float64) GetFunc {
 	return GetFunc{info{nComp, name, unit}, get}
 }
 
+// INTERNAL
 func NewGetScalar(name, unit string, get func() float64) GetFunc {
 	return newGetfunc(1, name, unit, func() []float64 {
 		return []float64{get()}

@@ -6,19 +6,15 @@ import (
 )
 
 var (
-	Msat        ScalarParam                     // Saturation magnetization in A/m
-	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
-	B_demag     setterQuant                     // demag field in Tesla
-	FFTM        fftm                            // FFT of m
-	EnableDemag = true                          // enable/disable demag field
-	demag_      *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
-	E_demag     = NewGetScalar("E_demag", "J", GetDemagEnergy)
-)
+	Msat        ScalarParam // Saturation magnetization in A/m
+	B_demag     SetterQuant // demag field in Tesla
+	FFTM        fftm        // FFT of m
+	E_demag     GetFunc     // Magnetostatic energy (J)
+	EnableDemag = true      // enable/disable demag field
 
-// Returns the current demag energy in Joules.
-func GetDemagEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_demag) / Mu0
-}
+	bsat   = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
+	demag_ *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
+)
 
 func init() {
 	Msat = scalarParam("Msat", "A/m", func(r int) {
@@ -28,6 +24,8 @@ func init() {
 		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
+
+	E_demag = NewGetScalar("E_demag", "J", getDemagEnergy)
 
 	World.Var("EnableDemag", &EnableDemag)
 	World.ROnly("mFFT", &FFTM)
@@ -46,7 +44,12 @@ func initDemag() {
 		}
 	})
 	Quants["B_demag"] = &B_demag
-	registerEnergy(GetDemagEnergy)
+	registerEnergy(getDemagEnergy)
+}
+
+// Returns the current demag energy in Joules.
+func getDemagEnergy() float64 {
+	return -0.5 * cellVolume() * dot(&M_full, &B_demag) / Mu0
 }
 
 func safediv(a, b float64) float64 {

@@ -16,7 +16,7 @@ func init() {
 
 var (
 	Alpha     = scalarParam("alpha", "", nil) // Damping constant
-	LLTorque  setterQuant                     // Landau-Lifshitz torque/γ0, in T
+	LLTorque  SetterQuant                     // Landau-Lifshitz torque/γ0, in T
 	STTorque  adderQuant                      // Spin-transfer torque/γ0, in T
 	Xi        = scalarParam("xi", "", nil)    // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
 	JPol      excitation                      // Polarized electrical current density

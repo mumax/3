@@ -68,6 +68,10 @@ func (e *entry) Methods() []string {
 	return m
 }
 
+func (e *entry) Examples() []int {
+	return api_examples[strings.ToLower(e.Name)]
+}
+
 func (e *entries) Len() int {
 	return len(*e)
 }
@@ -104,6 +108,7 @@ const templ = `
 
 {{with .Doc}} <p> {{.}} </p> {{end}}
 
+{{with .Examples}} <p> <b>examples:</b> {{range .}} {{.}} {{end}} </p> {{end}}
 {{with .Methods}} <p> <span style="color:grey"> <b>methods:</b> {{range .}} {{.}} {{end}} </span> </p> {{end}}
 
 <br/><hr/>

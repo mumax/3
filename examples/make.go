@@ -44,8 +44,6 @@ func main() {
 	state := &State{}
 	check(templ.Execute(f, state))
 
-	fmt.Println(api_examples)
-
 	renderAPI()
 }
 

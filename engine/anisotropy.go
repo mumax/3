@@ -29,13 +29,13 @@ func init() {
 		kc1_red.setRegion(region, safediv(Kc1.GetRegion(region), Msat.GetRegion(region)))
 	})
 	E_anis = NewGetScalar("E_anis", "J", getAnisotropyEnergy) // TODO: verify
-	World.LValue("AnisU", &AnisU)
-	World.LValue("AnisC1", &AnisC1)
-	World.LValue("AnisC2", &AnisC2)
-	World.LValue("Ku1", &Ku1)
-	World.LValue("Kc1", &Kc1)
-	World.ROnly("B_anis", &B_anis)
-	World.ROnly("E_anis", &E_anis)
+	World.LValue("AnisU", &AnisU, "Uniaxial anisotropy direction")
+	World.LValue("AnisC1", &AnisC1, "Cubic anisotropy direction #1")
+	World.LValue("AnisC2", &AnisC2, "Cubic anisotorpy directon #2")
+	World.LValue("Ku1", &Ku1, "Uniaxial anisotropy constant (J/m³)")
+	World.LValue("Kc1", &Kc1, "Cubic anisotropy constant (J/m³)")
+	World.ROnly("B_anis", &B_anis, "Anisotropy field (T)")
+	World.ROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
 }
 
 func initAnisotropy() {

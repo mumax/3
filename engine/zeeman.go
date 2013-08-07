@@ -6,8 +6,8 @@ var (
 )
 
 func init() {
-	World.LValue("B_ext", &B_ext)
-	World.ROnly("E_Zeeman", &E_Zeeman)
+	World.LValue("B_ext", &B_ext, "External field (T)")
+	World.ROnly("E_Zeeman", &E_Zeeman, "Zeeman energy (J)")
 }
 
 func initBExt() {

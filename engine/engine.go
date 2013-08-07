@@ -19,7 +19,6 @@ func init() {
 	World.Func("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	World.Func("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 	World.LValue("m", &M, `Reduced magnetization (unit length)`)
-	World.ROnly("torque", &Torque, `Torque/gamma0 (T)`)
 	World.ROnly("B_eff", &B_eff, `Effective field (T)`)
 	World.ROnly("table", &Table, `Provides methods for tabular output`)
 

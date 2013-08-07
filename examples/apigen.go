@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+	"unicode"
 )
 
 func main() {
@@ -40,11 +41,29 @@ type entry struct {
 
 type entries []entry
 
-func (e *entries) Len() int { return len(*e) }
+func (e *entry) Methods() []string {
+	nm := e.Type.NumMethod()
+	m := make([]string, 0, nm)
+	for i := 0; i < nm; i++ {
+		n := e.Type.Method(i).Name
+		if unicode.IsUpper(rune(n[0])) {
+			m = append(m, n)
+		}
+	}
+	return m
+}
+
+func (e *entries) Len() int {
+	return len(*e)
+}
+
 func (e *entries) Less(i, j int) bool {
 	return strings.ToLower((*e)[i].Name) < strings.ToLower((*e)[j].Name)
 }
-func (e *entries) Swap(i, j int) { (*e)[i], (*e)[j] = (*e)[j], (*e)[i] }
+
+func (e *entries) Swap(i, j int) {
+	(*e)[i], (*e)[j] = (*e)[j], (*e)[i]
+}
 
 type api struct {
 	Entries entries
@@ -72,11 +91,13 @@ const templ = `
 
 {{range .Entries}}
 
-<h3>{{.Name}}</h3> 
-{{with .Doc}} {{.}} <br/> {{end}}
-<span style="color:gray; font-size:0.9em"> type: {{.Type}} <br/> </span>
+<span style="color:#000088; font-size:1.3em">{{.Name}}</span> &nbsp; &nbsp; <span style="color:gray; font-size:0.9em"> {{.Type}}  </span> <br/>
 
-<hr/>
+{{with .Doc}} <p> {{.}} </p> {{end}}
+
+{{with .Methods}} <p> <b>methods:</b> {{range .}} {{.}} {{end}} </p> {{end}}
+
+<br/><hr/>
 
 {{end}}
 

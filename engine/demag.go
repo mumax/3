@@ -27,11 +27,11 @@ func init() {
 
 	E_demag = NewGetScalar("E_demag", "J", getDemagEnergy)
 
-	World.Var("EnableDemag", &EnableDemag)
-	World.ROnly("mFFT", &FFTM)
-	World.ROnly("B_demag", &B_demag)
-	World.LValue("Msat", &Msat)
-	World.ROnly("E_demag", &E_demag)
+	World.Var("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
+	World.ROnly("mFFT", &FFTM, "Fourier-transformed magnetization")
+	World.ROnly("B_demag", &B_demag, "Magnetostatic field (T)")
+	World.LValue("Msat", &Msat, "Saturation magnetization (A/m)")
+	World.ROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
 }
 
 func initDemag() {

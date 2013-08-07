@@ -6,14 +6,14 @@ import (
 )
 
 func init() {
-	World.Func("Ellipsoid", Ellipsoid)
-	World.Func("Cylinder", Cylinder)
-	World.Func("Cuboid", Cuboid)
-	World.Func("Rect", Rect)
-	World.Func("XRange", XRange)
-	World.Func("YRange", YRange)
-	World.Func("ZRange", ZRange)
-	World.Func("Layers", Layers)
+	World.Func("Ellipsoid", Ellipsoid, "Ellipsoid with axes in meter")
+	World.Func("Cylinder", Cylinder, "Ellipitic cylinder with axes in meter")
+	World.Func("Cuboid", Cuboid, "Cuboid with sides in meter")
+	World.Func("Rect", Rect, "Infinitely high rectangle with size in meter")
+	World.Func("XRange", XRange, "Part of space between x1 and x2, in meter")
+	World.Func("YRange", YRange, "Part of space between y1 and y2, in meter")
+	World.Func("ZRange", ZRange, "Part of space between z1 and z2, in meter")
+	World.Func("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
 }
 
 // geometrical shape for setting sample geometry

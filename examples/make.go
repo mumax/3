@@ -74,6 +74,12 @@ func (s *State) Img(fname string) string {
 </figure>`, pngfile, fname)
 }
 
+func (s *State) Include(fname string) string {
+	b, err := ioutil.ReadFile(fname)
+	check(err)
+	return string(b)
+}
+
 func (s *State) Output() string {
 	out := `<h3>output</h3> `
 

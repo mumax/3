@@ -3,7 +3,7 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
-	"fmt"
+	"strings"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -19,14 +19,11 @@ func main() {
 	ident := engine.World.Identifiers
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
-	for k, v := range ident {
-		e = append(e, entry{k, v.Type(), doc[k]})
+	for k, v := range doc {
+		t := ident[strings.ToLower(k)].Type()
+		e = append(e, entry{k, t, v})
 	}
-
 	sort.Sort(&e)
-	for _, x := range e {
-		fmt.Println(x)
-	}
 
 	t := template.Must(template.New("api").Parse(templ))
 	f, err2 := os.OpenFile("api.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
@@ -44,7 +41,7 @@ type entry struct {
 type entries []entry
 
 func (e *entries) Len() int           { return len(*e) }
-func (e *entries) Less(i, j int) bool { return (*e)[i].Name < (*e)[j].Name }
+func (e *entries) Less(i, j int) bool { return strings.ToLower((*e)[i].Name) < strings.ToLower((*e)[j].Name) }
 func (e *entries) Swap(i, j int)      { (*e)[i], (*e)[j] = (*e)[j], (*e)[i] }
 
 type api struct {

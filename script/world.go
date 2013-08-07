@@ -109,9 +109,10 @@ func (w *scope) document(ident string, doc ...string) {
 		switch len(doc) {
 		default:
 			panic("too many doc strings for " + ident)
+		case 0:
+			w.Doc[ident] = ""
 		case 1:
 			w.Doc[ident] = doc[0]
-		case 0: // add nothing
 		}
 	}
 }

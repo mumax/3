@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	World.Func("uniform", Uniform)
-	World.Func("vortex", Vortex)
-	World.Func("twodomain", TwoDomain)
-	World.Func("vortexwall", VortexWall)
+	World.Func("uniform", Uniform, "Uniform magnetization in given direction")
+	World.Func("vortex", Vortex, "Vortex magnetization with given core circulation and polarization")
+	World.Func("twodomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
+	World.Func("vortexwall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)

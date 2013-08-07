@@ -7,18 +7,18 @@ import (
 )
 
 func init() {
-	World.Func("Run", Run)
-	World.Func("Steps", Steps)
-	World.Func("Pause", Pause)
-	World.Func("PostStep", PostStep)
+	World.Func("Run", Run, "Run the simulation for a time in seconds")
+	World.Func("Steps", Steps, "Run the simulation for a number of time steps")
+	World.Func("Pause", Pause, "Pause the simulation, waits for web GUI input.")
+	World.Func("PostStep", PostStep, "Set up a function to be executed after every time step")
 	World.Func("RunWhile", RunWhile)
-	World.ROnly("t", &Time)
-	World.ROnly("Dt", &Solver.Dt_si)
-	World.Var("MinDt", &Solver.MinDt)
-	World.Var("MaxDt", &Solver.MaxDt)
-	World.Var("MaxErr", &Solver.MaxErr)
-	World.Var("Headroom", &Solver.Headroom)
-	World.Var("FixDt", &Solver.FixDt)
+	World.ROnly("t", &Time, "Total simulated time (s)")
+	World.ROnly("Dt", &Solver.Dt_si, "Last solver time step (s)")
+	World.Var("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
+	World.Var("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
+	World.Var("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
+	World.Var("Headroom", &Solver.Headroom, "Solver headroom")
+	World.Var("FixDt", &Solver.FixDt, "Enable/disable fixed time step (default: false)")
 }
 
 var (

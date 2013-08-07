@@ -11,10 +11,10 @@ import (
 var World = script.NewWorld()
 
 func init() {
-	World.Func("vector", Vector)
+	World.Func("vector", Vector, "Constructs a vector with given components")
 	World.Func("average", Average)
-	World.Const("mu0", Mu0)
-	World.Func("expect", expect)
+	World.Const("mu0", Mu0, "Permittivity of vaccum (Tm/A)")
+	World.Func("expect", expect, "Used internally for automated tests: checks if a value is close enough to the expected value")
 }
 
 // Test if have lies within want +/- maxError,

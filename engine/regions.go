@@ -8,9 +8,9 @@ import (
 )
 
 func init() {
-	World.Func("SetGeom", SetGeometry)
-	World.Func("DefRegion", DefRegion)
-	World.ROnly("regions", &regions)
+	World.Func("SetGeom", SetGeometry, "Sets the geometry to a given shape")
+	World.Func("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
+	World.ROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
 var (

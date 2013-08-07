@@ -406,10 +406,6 @@ Msat.save()
 Aex = 12e-13
 alpha = 1
 
-// define inter-material exchange
-lex := sqrt(2*12e-13/800e3)
-setlexchange(1, 2, lex)
-
 m = uniform(1, 1, 0)
 run(.1e-9)
 m.save()
@@ -445,11 +441,11 @@ Msat.setRegion (2, 490e3)
 Aex.setRegion  (2, 9e-12)
 alpha.setRegion(2, 0.05)
 
-// define intermaterial exchange
+// define an intermaterial exchange
 lex2Fe := 21e-12/1700e3
 lex2Ni :=  9e-12/ 490e3
-lex := sqrt(1/(1/lex2Fe + 1/lex2Ni))
-setlexchange(1, 2, lex)
+lex := sqrt(2/(1/lex2Fe + 1/lex2Ni))
+setlexchange(1, 2, lex)  // set exchange length between Ni and Fe
 
 `}}
 

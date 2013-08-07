@@ -18,7 +18,7 @@ var (
 	geom    Shape   = nil // nil means universe
 )
 
-const MAXREG = 256 // maximum number of regions
+const MAXREG = 256 // maximum number of regions. (!) duplicated in CUDA
 
 type Regions struct {
 	arr        [][][]byte   // regions map: cell i,j,k -> byte index

@@ -2,8 +2,8 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
-	"github.com/barnex/cuda5/cu"
 	"fmt"
+	"github.com/barnex/cuda5/cu"
 	"unsafe"
 )
 
@@ -13,8 +13,21 @@ type symmparam struct {
 	ok  bool                               // gpu cache up-to date with lut source
 }
 
-func (p *symmparam) SetInterRegion(r1, r2 int, v float64) {
-	p.lut[symmidx(r1, r2)] = float32(v)
+func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
+	v := float32(val)
+	p.lut[symmidx(r1, r2)] = v
+
+	if r1 == r2 {
+		r := r1
+		for i := 0; i < MAXREG; i++ {
+			if p.lut[symmidx(i, i)] == v {
+				p.lut[symmidx(r, i)] = v
+			} else {
+				p.lut[symmidx(r, i)] = 0
+			}
+		}
+	}
+
 	p.ok = false
 }
 
@@ -54,15 +67,15 @@ func (p *symmparam) upload() {
 	if p.gpu == nil { // alloc only when needed, allows param use in init()
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	fmt.Println("upload SymmLUT\n", p)
+	//fmt.Println("upload SymmLUT\n", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.ok = true
 }
 
-func(p*symmparam)String()string{
+func (p *symmparam) String() string {
 	str := ""
-	for j := 0;  j < MAXREG; j++{
-		for i:=0; i <= j; i++{
+	for j := 0; j < MAXREG; j++ {
+		for i := 0; i <= j; i++ {
 			str += fmt.Sprint(p.getInter(j, i), "\t")
 		}
 		str += "\n"

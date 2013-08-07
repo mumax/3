@@ -500,6 +500,9 @@ Alpha = 0.02 // restore normal damping
 
 // Schedule output
 m.autosave(100e-12)
+table.add(ext_dwpos)   // domain wall position
+table.add(ext_dwspeed) // domain wall speed
+table.autosave(10e-12)
 
 // Run the simulation with current through the sample
 SpinPol:= 0.56

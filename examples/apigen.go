@@ -2,6 +2,7 @@ package main
 
 import (
 	"code.google.com/p/mx3/cuda"
+	_ "code.google.com/p/mx3/ext"
 	"code.google.com/p/mx3/engine"
 	"io/ioutil"
 	"os"
@@ -108,7 +109,7 @@ const templ = `
 
 {{with .Doc}} <p> {{.}} </p> {{end}}
 
-{{with .Examples}} <p> <b>examples:</b> {{range .}} <a href="examples.html#example{{.}}">{{.}}</a> {{end}} </p> {{end}}
+{{with .Examples}} <p> <b>examples:</b> {{range .}} <a href="examples.html#example{{.}}">[{{.}}]</a> {{end}} </p> {{end}}
 {{with .Methods}} <p> <span style="color:grey"> <b>methods:</b> {{range .}} {{.}} {{end}} </span> </p> {{end}}
 
 <br/><hr/>

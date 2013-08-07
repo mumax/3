@@ -6,10 +6,10 @@ import (
 )
 
 func init() {
-	World.Func("ext_centerPMAWall", CenterPMAWall)
-	World.Func("ext_centerInplaneWall", CenterInplaneWall)
-	World.ROnly("ext_dwspeed", &DWSpeed)
-	World.ROnly("ext_dwpos", &DWPos)
+	World.Func("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
+	World.Func("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
+	World.ROnly("ext_dwspeed", &DWSpeed, "Speed of the simulation window while following a domain wall")
+	World.ROnly("ext_dwpos", &DWPos, "Position of the simulation window while following a domain wall")
 }
 
 // This post-step function centers the simulation window on a domain wall

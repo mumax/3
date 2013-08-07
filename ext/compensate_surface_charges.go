@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	World.Func("ext_rmSurfaceCharge", RemoveLRSurfaceCharge)
+	World.Func("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: mx on left and right side, resp.")
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and

@@ -12,7 +12,12 @@ import (
 	"unicode"
 )
 
-func main() {
+var (
+	api_entries entries
+	api_ident   = make(map[string]entry)
+)
+
+func buildAPI() {
 
 	cuda.Init()
 	cuda.LockThread()
@@ -20,17 +25,23 @@ func main() {
 	ident := engine.World.Identifiers
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
-	for k, v := range doc {
-		t := ident[strings.ToLower(k)].Type()
-		e = append(e, entry{k, t, v})
+	for K, v := range doc {
+		k := strings.ToLower(K)
+		t := ident[k].Type()
+		entr := entry{K, t, v}
+		e = append(e, entr)
+		api_ident[k] = entr
 	}
 	sort.Sort(&e)
+	api_entries = e
+}
 
+func renderAPI() {
+	e := api_entries
 	t := template.Must(template.New("api").Parse(templ))
 	f, err2 := os.OpenFile("api.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	check(err2)
 	check(t.Execute(f, &api{e}))
-
 }
 
 type entry struct {
@@ -73,12 +84,6 @@ func (e *api) Include(fname string) string {
 	b, err := ioutil.ReadFile(fname)
 	check(err)
 	return string(b)
-}
-
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
 
 const templ = `

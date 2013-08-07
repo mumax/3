@@ -27,6 +27,8 @@ var flag_vet = flag.Bool("vet", false, "only vet source files, don't run them")
 func main() {
 	flag.Parse()
 
+	buildAPI()
+
 	// read template
 	b, err := ioutil.ReadFile("template.html")
 	check(err)
@@ -40,6 +42,8 @@ func main() {
 	// execute!
 	state := &State{}
 	check(templ.Execute(f, state))
+
+	renderAPI()
 }
 
 type State struct {

@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"github.com/barnex/cuda5/cu"
+	"fmt"
 	"unsafe"
 )
 
@@ -24,9 +25,10 @@ func (p *symmparam) SetUniform(v float64) {
 	p.ok = false
 }
 
-// index in symmetric matrix where only one half is stored
+// Index in symmetric matrix where only one half is stored.
+// (!) Code duplicated in exchange.cu
 func symmidx(i, j int) int {
-	if i <= j {
+	if j <= i {
 		return i*(i+1)/2 + j
 	} else {
 		return j*(j+1)/2 + i
@@ -52,7 +54,18 @@ func (p *symmparam) upload() {
 	if p.gpu == nil { // alloc only when needed, allows param use in init()
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	//log.Println("upload SymmLUT", p.lut[:20], "...")
+	fmt.Println("upload SymmLUT\n", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.ok = true
+}
+
+func(p*symmparam)String()string{
+	str := ""
+	for j := 0;  j < MAXREG; j++{
+		for i:=0; i <= j; i++{
+			str += fmt.Sprint(p.getInter(j, i), "\t")
+		}
+		str += "\n"
+	}
+	return str
 }

@@ -2,7 +2,7 @@
 #include "float3.h"
 
 // indexing in symmetric matrix
-#define symidx(i, j) ( (i<=j)? ( (((i)*((i)+1)) /2 )+j )  :  ( (((j)*((j)+1)) /2 )+i ) )
+#define symidx(i, j) ( (j<=i)? ( (((i)*((i)+1)) /2 )+(j) )  :  ( (((j)*((j)+1)) /2 )+(i) ) )
 
 // m is normalized.
 // See exchange.go for more details.

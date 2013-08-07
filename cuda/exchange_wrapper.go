@@ -204,8 +204,8 @@ const (
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc2;
+	cvt.s16.s8 	%temp1, %rc2;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p6, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r4, %rc2;
@@ -267,8 +267,8 @@ BB0_4:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc3;
+	cvt.s16.s8 	%temp1, %rc3;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p7, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r8, %rc1;
@@ -327,8 +327,8 @@ BB0_7:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc4;
+	cvt.s16.s8 	%temp1, %rc4;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p8, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r14, %rc4;
@@ -387,8 +387,8 @@ BB0_10:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc5;
+	cvt.s16.s8 	%temp1, %rc5;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p9, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r19, %rc5;
@@ -450,8 +450,8 @@ BB0_13:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc6;
+	cvt.s16.s8 	%temp1, %rc6;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p11, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r24, %rc6;
@@ -510,8 +510,8 @@ BB0_17:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc7;
+	cvt.s16.s8 	%temp1, %rc7;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p12, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r29, %rc7;
@@ -692,8 +692,8 @@ BB0_22:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc2;
+	cvt.s16.s8 	%temp1, %rc2;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p6, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r6, %rc2;
@@ -755,8 +755,8 @@ BB0_4:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc3;
+	cvt.s16.s8 	%temp1, %rc3;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p7, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r10, %rc1;
@@ -815,8 +815,8 @@ BB0_7:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc4;
+	cvt.s16.s8 	%temp1, %rc4;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p8, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r16, %rc4;
@@ -875,8 +875,8 @@ BB0_10:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc5;
+	cvt.s16.s8 	%temp1, %rc5;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p9, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r21, %rc5;
@@ -938,8 +938,8 @@ BB0_13:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc6;
+	cvt.s16.s8 	%temp1, %rc6;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p11, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r26, %rc6;
@@ -998,8 +998,8 @@ BB0_17:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc7;
+	cvt.s16.s8 	%temp1, %rc7;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p12, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r31, %rc7;
@@ -1206,8 +1206,8 @@ BB0_22:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc2;
+	cvt.s16.s8 	%temp1, %rc2;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p6, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r6, %rc2;
@@ -1269,8 +1269,8 @@ BB2_4:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc3;
+	cvt.s16.s8 	%temp1, %rc3;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p7, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r10, %rc1;
@@ -1329,8 +1329,8 @@ BB2_7:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc4;
+	cvt.s16.s8 	%temp1, %rc4;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p8, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r16, %rc4;
@@ -1389,8 +1389,8 @@ BB2_10:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc5;
+	cvt.s16.s8 	%temp1, %rc5;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p9, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r21, %rc5;
@@ -1452,8 +1452,8 @@ BB2_13:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc6;
+	cvt.s16.s8 	%temp1, %rc6;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p11, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r26, %rc6;
@@ -1512,8 +1512,8 @@ BB2_17:
 	{
 	.reg .s16 	%temp1;
 	.reg .s16 	%temp2;
-	cvt.s16.s8 	%temp1, %rc1;
-	cvt.s16.s8 	%temp2, %rc7;
+	cvt.s16.s8 	%temp1, %rc7;
+	cvt.s16.s8 	%temp2, %rc1;
 	setp.gt.s16 	%p12, %temp1, %temp2;
 	}
 	cvt.s32.s8 	%r31, %rc7;

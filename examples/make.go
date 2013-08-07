@@ -83,9 +83,7 @@ func recordExamples(input string, num int) {
 }
 
 func (s *State) Img(fname string) string {
-	if !*flag_vet {
-		cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
-	}
+	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
 <figure style="float:left">

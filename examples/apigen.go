@@ -2,8 +2,8 @@ package main
 
 import (
 	"code.google.com/p/mx3/cuda"
-	_ "code.google.com/p/mx3/ext"
 	"code.google.com/p/mx3/engine"
+	_ "code.google.com/p/mx3/ext"
 	"io/ioutil"
 	"os"
 	"reflect"

@@ -68,7 +68,7 @@ func (s *State) Example(in string) string {
 
 	recordExamples(in, s.count)
 
-	return `<pre>` + template.HTMLEscapeString(in) + `</pre>`
+	return `<a id=example` + fmt.Sprint(s.count) + `></a><pre>` + template.HTMLEscapeString(in) + `</pre>`
 }
 
 var api_examples = make(map[string][]int)

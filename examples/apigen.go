@@ -95,7 +95,7 @@ const templ = `
 
 {{with .Doc}} <p> {{.}} </p> {{end}}
 
-{{with .Methods}} <p> <b>methods:</b> {{range .}} {{.}} {{end}} </p> {{end}}
+{{with .Methods}} <p> <span style="color:grey"> <b>methods:</b> {{range .}} {{.}} {{end}} </span> </p> {{end}}
 
 <br/><hr/>
 

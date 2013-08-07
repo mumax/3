@@ -17,6 +17,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -43,6 +44,8 @@ func main() {
 	state := &State{}
 	check(templ.Execute(f, state))
 
+	fmt.Println(api_examples)
+
 	renderAPI()
 }
 
@@ -65,11 +68,26 @@ func (s *State) Example(in string) string {
 	}
 	cmd("mx3", "-f", arg, s.infile())
 
+	recordExamples(in, s.count)
+
 	return `<pre>` + template.HTMLEscapeString(in) + `</pre>`
 }
 
+var api_examples = make(map[string][]int)
+
+func recordExamples(input string, num int) {
+	in := strings.ToLower(input)
+	for k, _ := range api_ident {
+		if ok, _ := regexp.MatchString(k, in); ok {
+			api_examples[k] = append(api_examples[k], num)
+		}
+	}
+}
+
 func (s *State) Img(fname string) string {
-	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
+	if !*flag_vet {
+		cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
+	}
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
 <figure style="float:left">

@@ -18,7 +18,6 @@ var (
 )
 
 func buildAPI() {
-
 	cuda.Init()
 	cuda.LockThread()
 
@@ -53,10 +52,15 @@ type entry struct {
 type entries []entry
 
 func (e *entry) Methods() []string {
-	nm := e.Type.NumMethod()
+	t := e.Type
+	// if it's a function, we list the methods on the output type
+	if t.Kind() == reflect.Func && t.NumOut() == 1 {
+		t = t.Out(0)
+	}
+	nm := t.NumMethod()
 	m := make([]string, 0, nm)
 	for i := 0; i < nm; i++ {
-		n := e.Type.Method(i).Name
+		n := t.Method(i).Name
 		if unicode.IsUpper(rune(n[0])) {
 			m = append(m, n)
 		}

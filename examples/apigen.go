@@ -3,11 +3,11 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
-	"strings"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"sort"
+	"strings"
 	"text/template"
 )
 
@@ -40,9 +40,11 @@ type entry struct {
 
 type entries []entry
 
-func (e *entries) Len() int           { return len(*e) }
-func (e *entries) Less(i, j int) bool { return strings.ToLower((*e)[i].Name) < strings.ToLower((*e)[j].Name) }
-func (e *entries) Swap(i, j int)      { (*e)[i], (*e)[j] = (*e)[j], (*e)[i] }
+func (e *entries) Len() int { return len(*e) }
+func (e *entries) Less(i, j int) bool {
+	return strings.ToLower((*e)[i].Name) < strings.ToLower((*e)[j].Name)
+}
+func (e *entries) Swap(i, j int) { (*e)[i], (*e)[j] = (*e)[j], (*e)[i] }
 
 type api struct {
 	Entries entries

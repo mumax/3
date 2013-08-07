@@ -18,13 +18,13 @@ func init() {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
 	E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy)
-	World.LValue("Aex", &Aex)
-	World.Func("setLexchange", SetLExchange)
-	World.ROnly("B_exch", &B_exch)
-	World.ROnly("E_exch", &E_exch)
+	World.LValue("Aex", &Aex, "Exchange stiffness (J/m)")
+	World.Func("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
+	World.ROnly("B_exch", &B_exch, "Exchange field (T)")
+	World.ROnly("E_exch", &E_exch, "Exchange energy (J)")
 	World.Func("sign", sign)
 
-	World.LValue("Dex", &Dex)
+	World.LValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
 	Dex = scalarParam("dmi", "J/m2", nil) //func(r int) {
 }
 

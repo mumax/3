@@ -22,7 +22,7 @@ func corePos() []float64 {
 	for y := 1; y < len(mz)-1; y++ { // Avoid the boundaries so the neighbor interpolation can't go out of bounds.
 		for x := 1; x < len(mz[y])-1; x++ {
 			m := abs(mz[y][x])
-			if m > abs(max) {
+			if m > max {
 				maxX, maxY = x, y
 				max = m
 			}
@@ -30,8 +30,8 @@ func corePos() []float64 {
 	}
 
 	pos := make([]float64, 3)
-	pos[0] = float64(maxX) + interpolate_maxpos(max, -1., abs(mz[maxY][maxX-1]), 1., abs(mz[maxY][maxX+1])) - float64(len(mz[1]))/2.
-	pos[1] = float64(maxY) + interpolate_maxpos(max, -1., abs(mz[maxY-1][maxX]), 1., abs(mz[maxY+1][maxX])) - float64(len(mz[0]))/2.
+	pos[0] = float64(maxX) + interpolate_maxpos(max, -1., abs(mz[maxY][maxX-1]), 1., abs(mz[maxY][maxX+1])) - float64(len(mz[1]))/2 + 0.5
+	pos[1] = float64(maxY) + interpolate_maxpos(max, -1., abs(mz[maxY-1][maxX]), 1., abs(mz[maxY+1][maxX])) - float64(len(mz[0]))/2 + 0.5
 
 	pos[0] *= engine.Mesh().CellSize()[2]
 	pos[1] *= engine.Mesh().CellSize()[1]

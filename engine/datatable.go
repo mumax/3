@@ -118,6 +118,11 @@ func NewGetScalar(name, unit string, get func() float64) GetFunc {
 	})
 }
 
+// INTERNAL
+func NewGetVector(name, unit string, get func() []float64) GetFunc {
+	return newGetfunc(3, name, unit, get)
+}
+
 func (g *GetFunc) GetVec() []float64 {
 	return g.get()
 }

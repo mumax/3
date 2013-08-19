@@ -49,7 +49,7 @@ func initDemag() {
 
 // Returns the current demag energy in Joules.
 func getDemagEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_demag) / Mu0
+	return -0.5 * cellVolume() * dot(&M_full, &B_demag)
 }
 
 func safediv(a, b float64) float64 {

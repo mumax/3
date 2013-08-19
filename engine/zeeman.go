@@ -16,5 +16,5 @@ func initBExt() {
 }
 
 func getZeemanEnergy() float64 {
-	return -1 * cellVolume() * dot(&M_full, &B_ext) / Mu0
+	return -1 * cellVolume() * dot(&M_full, &B_ext)
 }

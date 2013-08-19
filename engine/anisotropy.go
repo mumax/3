@@ -57,5 +57,5 @@ func initAnisotropy() {
 }
 
 func getAnisotropyEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_anis) / Mu0
+	return -0.5 * cellVolume() * dot(&M_full, &B_anis)
 }

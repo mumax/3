@@ -50,8 +50,7 @@ func initExchange() {
 // ground state energy is not necessarily zero or comparable
 // to other simulation programs.
 func getExchangeEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_exch) / Mu0
-	// note: M_full is in Tesla, hence /Mu0
+	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
 }
 
 // Defines the exchange coupling between different regions by specifying the

@@ -12,6 +12,7 @@ expect("coreY", pos[1], 30e-9, 0.1e-9)
 
 m  = vortex(1, 1)
 alpha = 3
+table.add(ext_corepos)
 steps(100)
 
 pos = ext_corepos.getvec()

@@ -40,7 +40,6 @@ func main() {
 			doc.Value("e_range"), " years old."))
 	})
 
-	doc.AddOption("e_os", "Windows", "MacOSX", "Linux", "BSD", "Minix", "Plan9", "other")
 	doc.OnChange("e_os", func() { doc.SetValue("e_os_opinion", doc.Value("e_os").(string)+", really?") })
 
 	doc.OnClick("alert", func() { doc.Call("alert", "How alert of you!") })
@@ -93,7 +92,17 @@ const testtempl = `
 	Your age: {{.Range "e_range" 0 100 18}}
 	{{.Span "e_age" ""}} <br/><br/>
 
-	Favorite OS: {{.Select "e_os"}} <br/>
+	Favorite OS: {{.BeginSelect "e_os"}} 
+		{{.Option "Windows"}} 
+		{{.Option "MacOSX" }}
+		{{.Option "Linux"  }}
+		{{.Option "BSD"    }}
+		{{.Option "Minix"  }}
+		{{.Option "Plan9"  }}
+		{{.Option "other"  }}
+	{{.EndSelect}}
+
+<br/>
 	{{.Span "e_os_opinion" " "}}
 	<br/> <br/>
 

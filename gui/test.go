@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-	doc := NewDoc("/", testtempl)
+	data := []string{"one", "two", "three"}
+	doc := NewDoc("/", testtempl, data)
 
 	hitcount := 0
 	doc.OnClick("e_hitme", func() {
@@ -96,7 +97,12 @@ const testtempl = `
 	{{.Span "e_os_opinion" " "}}
 	<br/> <br/>
 
-	{{.Button "alert"}}
+	{{.Button "alert"}} <br/>
+
+	{{range .Data}}
+		{{$.Button . }} 
+	{{end}}
+		
 
 	<hr/>
 

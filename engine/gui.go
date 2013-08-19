@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var GUI = gui.NewDoc("/", templText)
+var GUI = gui.NewDoc("/", templText, nil)
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {

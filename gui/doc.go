@@ -20,15 +20,16 @@ type Doc struct {
 	KeepAlive time.Time        // last time we heard from the browser
 	callStack []jsCall
 	sync.Mutex
+	data interface{} // any additional data to be passed to template
 }
 
 // NewDoc makes a new GUI document, to be served under urlPattern.
 // htmlTemplate defines the GUI elements and layout.
 // A http handler still needs to be registered manually.
 // Example...
-func NewDoc(urlPattern, htmlTemplate string) *Doc {
+func NewDoc(urlPattern, htmlTemplate string, data interface{}) *Doc {
 	t := template.Must(template.New(urlPattern).Parse(htmlTemplate))
-	d := &Doc{elem: make(map[string]*Elem), prefix: urlPattern}
+	d := &Doc{elem: make(map[string]*Elem), prefix: urlPattern, data: data}
 	cache := bytes.NewBuffer(nil)
 	check(t.Execute(cache, d))
 	if !d.haveJS {
@@ -64,6 +65,10 @@ func (d *Doc) Elem(id string) *Elem {
 	} else {
 		panic("elem id " + id + " undefined")
 	}
+}
+
+func (d *Doc) Data() interface{} {
+	return d.data
 }
 
 func (d *Doc) OnClick(id string, handler func()) {

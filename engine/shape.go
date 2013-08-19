@@ -14,6 +14,7 @@ func init() {
 	World.Func("YRange", YRange, "Part of space between y1 and y2, in meter")
 	World.Func("ZRange", ZRange, "Part of space between z1 and z2, in meter")
 	World.Func("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
+	World.Func("Cell", Cell, "Single cell with given integer index (i, j, k)")
 }
 
 // geometrical shape for setting sample geometry
@@ -81,6 +82,26 @@ func Layers(a, b int) Shape {
 	z1 := ((float64(a) - n/2 - 0.5) * c)
 	z2 := ((float64(b-1) - n/2 + 0.5) * c)
 	return ZRange(z1, z2)
+}
+
+// Single cell with given index
+func Cell(k, j, i int) Shape {
+	c := Mesh().CellSize()
+	n := Mesh().Size()
+	dx := (float64(n[2]/2) - 0.5) * c[2]
+	dy := (float64(n[1]/2) - 0.5) * c[1]
+	dz := (float64(n[0]/2) - 0.5) * c[0]
+	x1 := float64(k)*c[2] - dx - c[2]/2
+	y1 := float64(j)*c[1] - dy - c[1]/2
+	z1 := float64(i)*c[0] - dz - c[0]/2
+	x2 := float64(k)*c[2] - dx + c[2]/2
+	y2 := float64(j)*c[1] - dy + c[1]/2
+	z2 := float64(i)*c[0] - dz + c[0]/2
+	return func(x, y, z float64) bool {
+		return x > x1 && x < x2 &&
+			y > y1 && y < y2 &&
+			z > z1 && z < z2
+	}
 }
 
 // The entire space.

@@ -1,4 +1,0 @@
-all:
-	go build
-
-	

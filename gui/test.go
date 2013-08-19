@@ -11,7 +11,7 @@ import (
 
 func main() {
 	data := []string{"one", "two", "three"}
-	doc := NewDoc("/", testtempl, data)
+	doc := NewDoc(testtempl, data)
 
 	hitcount := 0
 	doc.OnClick("e_hitme", func() {
@@ -51,6 +51,8 @@ func main() {
 		}
 	}()
 
+	http.Handle("/gui", doc)
+	http.Handle("/gui2", doc)
 	err := http.ListenAndServe(":7070", nil)
 	if err != nil {
 		panic(err)

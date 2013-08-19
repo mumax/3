@@ -16,7 +16,6 @@ type Doc struct {
 	haveJS    bool             // have called JS()?
 	elem      map[string]*Elem // document elements by ID
 	htmlCache []byte           // static html content, rendered only once
-	prefix    string           // URL prefix (not yet working)
 	KeepAlive time.Time        // last time we heard from the browser
 	callStack []jsCall
 	sync.Mutex
@@ -26,17 +25,15 @@ type Doc struct {
 // NewDoc makes a new GUI document, to be served under urlPattern.
 // htmlTemplate defines the GUI elements and layout.
 // A http handler still needs to be registered manually.
-// Example...
-func NewDoc(urlPattern, htmlTemplate string, data interface{}) *Doc {
-	t := template.Must(template.New(urlPattern).Parse(htmlTemplate))
-	d := &Doc{elem: make(map[string]*Elem), prefix: urlPattern, data: data}
+func NewDoc(htmlTemplate string, data interface{}) *Doc {
+	t := template.Must(template.New("").Parse(htmlTemplate))
+	d := &Doc{elem: make(map[string]*Elem), data: data}
 	cache := bytes.NewBuffer(nil)
 	check(t.Execute(cache, d))
 	if !d.haveJS {
 		log.Panic("template should call {{.JS}}")
 	}
 	d.htmlCache = cache.Bytes()
-	http.Handle(urlPattern, d)
 	return d
 }
 
@@ -105,16 +102,14 @@ func (d *Doc) add(id string, e *Elem) {
 // ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d.KeepAlive = time.Now()
-	url := r.URL.Path[len(d.prefix):]
-	//log.Println("handle", url)
-	switch url {
+	switch r.Method {
 	default:
-		http.Error(w, "not found: "+r.URL.Path, http.StatusNotFound)
-	case "":
+		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
+	case "GET":
 		d.serveContent(w, r)
-	case "refresh/":
+	case "POST":
 		d.serveRefresh(w, r)
-	case "event/":
+	case "PUT":
 		d.serveEvent(w, r)
 	}
 }

@@ -52,7 +52,7 @@ function refresh(){
 	if (autorefresh){
 		try{
 			var req = new XMLHttpRequest();
-			req.open("POST", "/refresh/", true);
+			req.open("POST", document.URL, true); 
 			req.timeout = tick;
 			req.onreadystatechange = function(){ refreshDOM(req) };
 			req.send(null);
@@ -68,7 +68,7 @@ setInterval(refresh, tick);
 function notify(id, method, arg){
 	try{
 		var req = new XMLHttpRequest();
-		req.open("POST", "/event/", false);
+		req.open("PUT", document.URL, false);
 		var map = {"ID": id, "Method": method, "Arg": arg};
 		req.send(JSON.stringify(map));
 	}catch(e){

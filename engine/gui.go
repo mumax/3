@@ -11,11 +11,12 @@ import (
 	"time"
 )
 
-var GUI = gui.NewDoc("/", templText, nil)
+var GUI = gui.NewDoc(templText, nil)
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
 
+	http.Handle("/", GUI)
 	http.HandleFunc("/render/", serveRender)
 
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))

@@ -6,7 +6,6 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
-	"os"
 	"runtime"
 )
 
@@ -22,8 +21,6 @@ func init() {
 	World.ROnly("B_eff", &B_eff, `Effective field (T)`)
 	World.ROnly("table", &Table, `Provides methods for tabular output`)
 
-	hostname, _ := os.Hostname()
-	GUI.SetValue("hostname", hostname)
 }
 
 var (
@@ -128,6 +125,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
 
 	log.Println("set mesh:", Mesh().UserString())
+
 	GUI.SetValue("nx", Nx)
 	GUI.SetValue("ny", Ny)
 	GUI.SetValue("nz", Nz)
@@ -137,6 +135,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	GUI.SetValue("wx", float64(Nx)*cellSizeX*1e9)
 	GUI.SetValue("wy", float64(Ny)*cellSizeY*1e9)
 	GUI.SetValue("wz", float64(Nz)*cellSizeZ*1e9)
+
 	initialize()
 }
 

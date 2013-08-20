@@ -7,19 +7,24 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 	"time"
 )
 
-var GUI = gui.NewDoc(templText, nil)
+var GUI *gui.Doc
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
+
+	GUI = gui.NewDoc(templText, nil)
 
 	http.Handle("/", GUI)
 	http.HandleFunc("/render/", serveRender)
 
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
+	hostname, _ := os.Hostname()
+	GUI.SetValue("hostname", hostname)
 	GUI.OnClick("break", Pause)
 	GUI.OnClick("run", inj(func() { Run(GUI.Value("runtime").(float64)) }))
 	GUI.OnClick("steps", inj(func() { Steps(GUI.Value("runsteps").(int)) }))

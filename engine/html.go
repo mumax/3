@@ -94,6 +94,8 @@ const templText = `
 
 	<h2> display </h2><div>
 
+		{{range $k,$v := .Data.Quants}} {{$k}} {{end}}
+		<br/>
 		{{.Img "render" "/render/m"}}
 
 	</div><hr/>

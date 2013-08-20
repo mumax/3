@@ -43,7 +43,6 @@ func initDemag() {
 			cuda.Zero(b)
 		}
 	})
-	Quants["B_demag"] = &B_demag
 	registerEnergy(getDemagEnergy)
 }
 

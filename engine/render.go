@@ -19,7 +19,7 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	if len(words) > 1 {
 		comp = words[1]
 	}
-	h, ok := Quants[quant]
+	h, ok := quants[quant]
 	if !ok {
 		err := "render: unknown quantity: " + url
 		log.Println(err)

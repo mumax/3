@@ -34,15 +34,12 @@ var Table DataTable
 
 var (
 	globalmesh data.Mesh
-	itime      int                       // unique integer time stamp // TODO: revise
-	Quants     = make(map[string]Getter) // INTERNAL maps quantity names to downloadable data. E.g. for rendering
+	itime      int // unique integer time stamp // TODO: revise
 )
 
 func initialize() {
 	M.init()
 	FFTM.init()
-	Quants["m"] = &M
-	Quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
 
 	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice, g bool) {
 		msat, r := Msat.GetGPU()
@@ -54,7 +51,6 @@ func initialize() {
 	})
 
 	regions.init()
-	Quants["regions"] = &regions
 
 	Table.Add(&M)
 
@@ -70,7 +66,6 @@ func initialize() {
 		B_anis.addTo(dst, cansave)
 		B_ext.addTo(dst) // TODO: cansave
 	})
-	Quants["B_eff"] = &B_eff
 
 	// torque terms
 	initLLTorque()
@@ -79,7 +74,6 @@ func initialize() {
 		LLTorque.set(b, cansave)
 		STTorque.addTo(b, cansave)
 	})
-	Quants["torque"] = &Torque
 
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {

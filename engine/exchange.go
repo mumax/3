@@ -41,7 +41,6 @@ func initExchange() {
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})
-	Quants["B_exch"] = &B_exch
 	registerEnergy(getExchangeEnergy)
 }
 

@@ -48,12 +48,6 @@ func initAnisotropy() {
 		}
 	})
 	registerEnergy(getAnisotropyEnergy)
-	Quants["B_anis"] = &B_anis
-	Quants["Ku1"] = &Ku1
-	Quants["Kc1"] = &Kc1
-	Quants["anisU"] = &AnisU
-	Quants["anisC1"] = &AnisC1
-	Quants["anisC2"] = &AnisC2
 }
 
 func getAnisotropyEnergy() float64 {

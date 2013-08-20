@@ -12,12 +12,35 @@ import (
 	"time"
 )
 
-var GUI *gui.Doc
+var (
+	GUI    *gui.Doc
+	quants = make(map[string]Getter) // INTERNAL maps quantity names to downloadable data. E.g. for rendering
+)
+
+func init() {
+	quants["m"] = &M
+	quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
+	quants["B_anis"] = &B_anis
+	quants["Ku1"] = &Ku1
+	quants["Kc1"] = &Kc1
+	quants["anisU"] = &AnisU
+	quants["anisC1"] = &AnisC1
+	quants["anisC2"] = &AnisC2
+	quants["regions"] = &regions
+	quants["B_demag"] = &B_demag
+	quants["B_eff"] = &B_eff
+	quants["torque"] = &Torque
+	quants["B_exch"] = &B_exch
+	quants["lltorque"] = &LLTorque
+	quants["jpol"] = &JPol
+	quants["sttorque"] = &STTorque
+}
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
 
-	GUI = gui.NewDoc(templText, nil)
+	data := &struct{ Quants *map[string]Getter }{&quants}
+	GUI = gui.NewDoc(templText, data)
 
 	http.Handle("/", GUI)
 	http.HandleFunc("/render/", serveRender)

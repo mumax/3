@@ -30,8 +30,6 @@ func initLLTorque() {
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
 	})
 	JPol.init(Mesh(), "JPol", "A/m2")
-	Quants["lltorque"] = &LLTorque
-	Quants["jpol"] = &JPol
 }
 
 func initSTTorque() {
@@ -44,7 +42,6 @@ func initSTTorque() {
 			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.Gpu(), Alpha.Gpu(), Xi.Gpu(), regions.Gpu())
 		}
 	})
-	Quants["sttorque"] = &STTorque
 }
 
 // TODO: could implement maxnorm(torque) (getfunc)

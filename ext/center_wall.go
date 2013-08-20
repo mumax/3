@@ -63,7 +63,7 @@ func wall_left_magnetization(x float64) int {
 }
 
 var (
-	totalShift float64
+	totalShift float64 // accumulated window shift (X) in meter
 	DWPos      = NewGetScalar("dwpos", "m", getShiftPos)
 )
 

@@ -35,6 +35,8 @@ func corePos() []float64 {
 
 	pos[0] *= engine.Mesh().CellSize()[2]
 	pos[1] *= engine.Mesh().CellSize()[1]
+
+	pos[0] += totalShift // add simulation window shift
 	return pos
 }
 

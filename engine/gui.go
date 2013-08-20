@@ -69,12 +69,20 @@ func GoServe(port string) {
 	runtime.Gosched()
 }
 
+var start = time.Now()
+
 func updateDash() {
 	GUI.SetValue("time", fmt.Sprintf("%6e", Time))
 	GUI.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 	GUI.SetValue("step", Solver.NSteps)
 	GUI.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
 	GUI.SetValue("render", "/render/"+renderQ)
+	GUI.SetValue("walltime", fmt.Sprint(roundt(time.Since(start))))
+}
+
+// round duration to 1s accuracy
+func roundt(t time.Duration) time.Duration {
+	return t - t%1e9
 }
 
 func inj(f func()) func() {

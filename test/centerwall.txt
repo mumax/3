@@ -20,6 +20,6 @@ expect("my", average(m)[1], 0.0633, 1e-3) // sensitive to closure domains
 
 // Make wall move
 B_ext = vector(0.03, 0, 0)
-Run(5e-9)
+Run(2e-9)
 expect("mx", average(m)[0], 0, 0.1) // sensitive to not moving window
 

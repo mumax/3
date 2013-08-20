@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var renderQ string = "m" // TODO: select
+
 // Render image of quantity.
 // Accepts url: /render/name and /render/name/component
 func serveRender(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +20,9 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	comp := ""
 	if len(words) > 1 {
 		comp = words[1]
+	}
+	if quant == "" {
+		quant = renderQ
 	}
 	h, ok := quants[quant]
 	if !ok {

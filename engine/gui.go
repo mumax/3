@@ -14,27 +14,24 @@ import (
 
 var (
 	GUI    *gui.Doc
-	quants = make(map[string]Getter) // INTERNAL maps quantity names to downloadable data. E.g. for rendering
+	quants = map[string]Getter{
+		"m":        &M,
+		"mFFT":     &fftmPower{},
+		"B_anis":   &B_anis,
+		"Ku1":      &Ku1,
+		"Kc1":      &Kc1,
+		"anisU":    &AnisU,
+		"anisC1":   &AnisC1,
+		"anisC2":   &AnisC2,
+		"regions":  &regions,
+		"B_demag":  &B_demag,
+		"B_eff":    &B_eff,
+		"torque":   &Torque,
+		"B_exch":   &B_exch,
+		"lltorque": &LLTorque,
+		"jpol":     &JPol,
+		"sttorque": &STTorque}
 )
-
-func init() {
-	quants["m"] = &M
-	quants["mFFT"] = &fftmPower{} // for the web interface we display FFT amplitude
-	quants["B_anis"] = &B_anis
-	quants["Ku1"] = &Ku1
-	quants["Kc1"] = &Kc1
-	quants["anisU"] = &AnisU
-	quants["anisC1"] = &AnisC1
-	quants["anisC2"] = &AnisC2
-	quants["regions"] = &regions
-	quants["B_demag"] = &B_demag
-	quants["B_eff"] = &B_eff
-	quants["torque"] = &Torque
-	quants["B_exch"] = &B_exch
-	quants["lltorque"] = &LLTorque
-	quants["jpol"] = &JPol
-	quants["sttorque"] = &STTorque
-}
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
@@ -55,6 +52,7 @@ func GoServe(port string) {
 	GUI.OnChange("mindt", inj(func() { Solver.MinDt = GUI.Value("mindt").(float64) }))
 	GUI.OnChange("maxdt", inj(func() { Solver.MaxDt = GUI.Value("maxdt").(float64) }))
 	GUI.OnChange("maxerr", inj(func() { Solver.MaxErr = GUI.Value("maxerr").(float64) }))
+	GUI.OnChange("sel_render", func() { renderQ = GUI.Value("sel_render").(string); updateDash() })
 
 	// periodically update time, steps, etc
 	go func() {
@@ -76,7 +74,7 @@ func updateDash() {
 	GUI.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 	GUI.SetValue("step", Solver.NSteps)
 	GUI.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-	GUI.SetValue("render", "/render/m")
+	GUI.SetValue("render", "/render/"+renderQ)
 }
 
 func inj(f func()) func() {

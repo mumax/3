@@ -88,9 +88,11 @@
 
 	<h2> display </h2><div>
 
-		{{range $k,$v := .Data.Quants}} {{$k}} {{end}}
+		{{.BeginSelect "sel_render"}}
+			{{range $k,$v := .Data.Quants}} {{$.Option $k}} {{end}}
+		{{.EndSelect}}
 		<br/>
-		{{.Img "render" "/render/m"}}
+		{{.Img "render" "/render"}}
 
 	</div><hr/>
 

@@ -76,7 +76,8 @@ func updateDash() {
 	GUI.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 	GUI.SetValue("step", Solver.NSteps)
 	GUI.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-	GUI.SetValue("render", "/render/"+renderQ)
+	cachebreaker := "?" + fmt.Sprint(time.Now().Nanosecond())
+	GUI.SetValue("render", "/render/"+renderQ+cachebreaker)
 	GUI.SetValue("walltime", fmt.Sprint(roundt(time.Since(start))))
 }
 

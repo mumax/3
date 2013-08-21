@@ -13,7 +13,7 @@
 
 	Aex   = 13e-12
 	alpha = 1
-	setgeom(cylinder(64*4e-9, 64*4e-9)) // todo: average takes into account geometry filling
+	setgeom(cylinder(64*4e-9, 64*4e-9))
 	M     = uniform(1, 0, 0)
 	fill := average(m)[0]
 	

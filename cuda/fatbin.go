@@ -16,5 +16,6 @@ func fatbinLoad(sm map[int]string, fn string) cu.Function {
 	if best == 0 {
 		log.Fatalln("Unsupported GPU compute capability:", cudaCC)
 	}
+	log.Println("load PTX", best, fn)
 	return cu.ModuleLoadData(sm[best]).GetFunction(fn)
 }

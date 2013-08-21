@@ -8,7 +8,7 @@
  The que directory should be accessible by the daemons.
 
  The job files are simple JSON encodings of the Job data type
- and may as well be written by hand or a script, 
+ and may as well be written by hand or a script,
  should more flexibility be needed.  E.g.:
  	{"Command":"mumax2","Args":["-gpu=%GPU","job.py"],"Wd":"/home/me/myfiles"}
 

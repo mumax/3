@@ -15,7 +15,7 @@ func init() {
 
 func mumax2(file string) Job {
 	var job Job
-	job.Command = "/home/mumax/mumax2/bin/mumax2" // hack for our cluster
+	job.Command = "mumax2"
 	job.Args = []string{`-f`, `-gpu=%GPU`, file}
 	return job
 }

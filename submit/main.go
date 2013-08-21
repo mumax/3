@@ -60,7 +60,7 @@ func main() {
 	fmt.Println("using working directory $HOME/que/" + wd)
 
 	if *flag_rm {
-		// remove 
+		// remove
 		for _, f := range flag.Args() {
 			rmJob(f, wd, que, username)
 		}

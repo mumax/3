@@ -1,7 +1,4 @@
-PACKAGE
-
-package main
-    import "github.com/barnex/mumax-daemon/submit"
+COMMAND DOCUMENTATION
 
     submit can be used to submit jobs to a mumax-daemon que. submit takes a
     flag describing the kind of job file to make and a number of input
@@ -23,20 +20,5 @@ package main
     the queue directory. See the daemon documentation for more info.
 
     Author: Arne Vansteenkiste
-
-CONSTANTS
-
-const MagicFile = ".here_be_your_mumax_que__d3990c0c658a293ac278bb591f15d031"
-    Your que directory is where this file resides.
-
-
-TYPES
-
-type Job struct {
-    Command string
-    Args    []string
-    Wd      string
-    User    string
-}
 
 

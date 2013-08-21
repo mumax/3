@@ -120,7 +120,7 @@ func wrapgen(filename, funcname string, argt, argn []string) {
 
 	basename := util.NoExt(filename)
 	for _, f := range ls {
-		match, e := regexp.MatchString(basename+"_*[0-9]..ptx", f)
+		match, e := regexp.MatchString("^"+basename+"_*[0-9]..ptx", f)
 		util.PanicErr(e)
 		if match {
 			cc, ei := strconv.Atoi(f[len(f)-len("00.ptx") : len(f)-len(".ptx")])

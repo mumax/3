@@ -60,88 +60,50 @@ const (
 .address_size 64
 
 
-.visible .entry copypadmul(
-	.param .u64 copypadmul_param_0,
-	.param .u32 copypadmul_param_1,
-	.param .u32 copypadmul_param_2,
-	.param .u32 copypadmul_param_3,
-	.param .u64 copypadmul_param_4,
-	.param .u32 copypadmul_param_5,
-	.param .u32 copypadmul_param_6,
-	.param .u32 copypadmul_param_7,
-	.param .u64 copypadmul_param_8,
-	.param .u64 copypadmul_param_9
+.visible .entry mul(
+	.param .u64 mul_param_0,
+	.param .u64 mul_param_1,
+	.param .u64 mul_param_2,
+	.param .u32 mul_param_3
 )
 {
-	.reg .pred 	%p<6>;
-	.reg .s32 	%r<26>;
+	.reg .pred 	%p<2>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<4>;
-	.reg .s64 	%rd<18>;
+	.reg .s64 	%rd<11>;
 
 
-	ld.param.u64 	%rd5, [copypadmul_param_0];
-	ld.param.u32 	%r4, [copypadmul_param_2];
-	ld.param.u32 	%r5, [copypadmul_param_3];
-	ld.param.u64 	%rd6, [copypadmul_param_4];
-	ld.param.u32 	%r8, [copypadmul_param_5];
-	ld.param.u32 	%r6, [copypadmul_param_6];
-	ld.param.u32 	%r7, [copypadmul_param_7];
-	ld.param.u64 	%rd7, [copypadmul_param_8];
-	ld.param.u64 	%rd8, [copypadmul_param_9];
-	cvta.to.global.u64 	%rd1, %rd5;
+	ld.param.u64 	%rd4, [mul_param_0];
+	ld.param.u64 	%rd5, [mul_param_1];
+	ld.param.u64 	%rd6, [mul_param_2];
+	ld.param.u32 	%r2, [mul_param_3];
+	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd6;
-	cvta.to.global.u64 	%rd3, %rd7;
-	cvta.to.global.u64 	%rd4, %rd8;
-	.loc 2 9 1
-	mov.u32 	%r9, %ntid.z;
-	mov.u32 	%r10, %ctaid.z;
-	mov.u32 	%r11, %tid.z;
-	mad.lo.s32 	%r1, %r9, %r10, %r11;
-	.loc 2 10 1
-	mov.u32 	%r12, %ntid.y;
-	mov.u32 	%r13, %ctaid.y;
-	mov.u32 	%r14, %tid.y;
-	mad.lo.s32 	%r2, %r12, %r13, %r14;
-	.loc 2 11 1
-	mov.u32 	%r15, %ntid.x;
-	mov.u32 	%r16, %ctaid.x;
-	mov.u32 	%r17, %tid.x;
-	mad.lo.s32 	%r3, %r15, %r16, %r17;
-	.loc 2 13 1
-	setp.lt.s32 	%p1, %r1, %r8;
-	setp.lt.s32 	%p2, %r2, %r6;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32 	%p4, %r3, %r7;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_2;
-	bra.uni 	BB0_1;
+	cvta.to.global.u64 	%rd3, %rd5;
+	.loc 2 5 1
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 2 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
 
-BB0_1:
-	.loc 2 14 1
-	mad.lo.s32 	%r18, %r1, %r6, %r2;
-	mad.lo.s32 	%r19, %r18, %r7, %r3;
-	.loc 2 15 1
-	cvt.s64.s32 	%rd9, %r19;
-	add.s64 	%rd10, %rd4, %rd9;
-	ld.global.s8 	%rd11, [%rd10];
-	shl.b64 	%rd12, %rd11, 2;
-	add.s64 	%rd13, %rd3, %rd12;
-	.loc 2 16 1
-	mul.wide.s32 	%rd14, %r19, 4;
-	add.s64 	%rd15, %rd2, %rd14;
-	ld.global.f32 	%f1, [%rd15];
-	.loc 2 15 1
-	ld.global.f32 	%f2, [%rd13];
-	.loc 2 16 1
+	.loc 2 8 1
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd3, %rd7;
+	add.s64 	%rd9, %rd2, %rd7;
+	ld.global.f32 	%f1, [%rd9];
+	ld.global.f32 	%f2, [%rd8];
 	mul.f32 	%f3, %f2, %f1;
-	mad.lo.s32 	%r23, %r1, %r4, %r2;
-	mad.lo.s32 	%r24, %r23, %r5, %r3;
-	mul.wide.s32 	%rd16, %r24, 4;
-	add.s64 	%rd17, %rd1, %rd16;
-	st.global.f32 	[%rd17], %f3;
+	add.s64 	%rd10, %rd1, %rd7;
+	st.global.f32 	[%rd10], %f3;
 
 BB0_2:
-	.loc 2 18 2
+	.loc 2 10 2
 	ret;
 }
 

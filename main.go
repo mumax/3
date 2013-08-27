@@ -47,15 +47,15 @@ func main() {
 		return
 	}
 
-	if flag.NArg() != 1 {
-		log.Fatal("need one input file")
-	}
-
 	if *flag_silent {
 		log.SetOutput(ioutil.Discard)
 	}
 
 	log.Print(engine.UNAME, "\n")
+
+	if flag.NArg() != 1 {
+		log.Fatal("need one input file")
+	}
 
 	if *flag_od == "" { // -o not set
 		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)

@@ -29,6 +29,10 @@ var (
 	flag_blockY   = flag.Int("by", 32, "CUDA 2D thread block size Y")
 )
 
+func init() {
+	flag.BoolVar(&util.DashEnable, "p", false, "show progress in terminal")
+}
+
 func main() {
 	start := time.Now()
 	defer func() { log.Println("walltime:", time.Since(start)) }()
@@ -66,6 +70,14 @@ func main() {
 
 	initProf()
 	defer prof.Cleanup()
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			engine.Crashlog()
+			log.Panic(err)
+		}
+	}()
 
 	RunFileAndServe(flag.Arg(0))
 

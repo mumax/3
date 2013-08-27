@@ -40,8 +40,9 @@ var (
 	flag_png       = flag.Bool("png", false, "PNG output")
 	flag_jpeg      = flag.Bool("jpg", false, "JPEG output")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
-	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF output`)
-	flag_ovf       = flag.String("ovf", "", `"text" or "binary" OMF output`)
+	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF (OVF1) output`)
+	flag_ovf1      = flag.String("ovf1", "", `"text" or "binary" OVF1 output`)
+	flag_ovf2      = flag.String("ovf2", "", `"text" or "binary" OVF2 output`)
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
@@ -148,10 +149,17 @@ func process(f *data.Slice, time float64, name string) {
 		haveOutput = true
 	}
 
-	if *flag_ovf != "" {
+	if *flag_ovf1 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOvf2(out, f, *flag_ovf, time)
+		dumpOmf(out, f, *flag_ovf1)
+		haveOutput = true
+	}
+
+	if *flag_ovf2 != "" {
+		out := open(name + ".ovf")
+		defer out.Close()
+		dumpOvf2(out, f, *flag_ovf2, time)
 		haveOutput = true
 	}
 

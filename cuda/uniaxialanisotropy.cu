@@ -18,7 +18,7 @@ adduniaxialanisotropy(float* __restrict__  Bx, float* __restrict__  By, float* _
         float3 u   = normalized(make_float3(ux, uy, uz));
         float  K1  = K1LUT[reg];
         float3 m   = {mx[i], my[i], mz[i]};
-        float3 Ba  = 2 * K1 * dot(m, u) * u;
+        float3 Ba  = 2.0f * K1 * dot(m, u) * u;
 
         Bx[i] += Ba.x;
         By[i] += Ba.y;

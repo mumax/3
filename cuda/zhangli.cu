@@ -27,25 +27,25 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
     float alpha = alphaLUT[r];
     float xi    = xiLUT[r];
     float bsat  = bsatLUT[r];
-    float b = PREFACTOR / (bsat * (1 + xi*xi));
+    float b = PREFACTOR / (bsat * (1.0f + xi*xi));
     float Jx = jx[I];
     float Jy = jy[I];
     float Jz = jz[I];
 
-    float3 hspin = make_float3(0, 0, 0); // (u·∇)m
-    if (Jx != 0.) {
+    float3 hspin = make_float3(0.0f, 0.0f, 0.0f); // (u·∇)m
+    if (Jx != 0.0f) {
         hspin += (b/cx)*Jx * make_float3(deltax(mx), deltax(my), deltax(mz));
     }
-    if (Jy != 0.) {
+    if (Jy != 0.0f) {
         hspin += (b/cy)*Jy * make_float3(deltay(mx), deltay(my), deltay(mz));
     }
-    if (Jz != 0.) {
+    if (Jz != 0.0f) {
         hspin += (b/cz)*Jz * make_float3(deltaz(mx), deltaz(my), deltaz(mz));
     }
 
     float3 m      = make_float3(mx[I], my[I], mz[I]);
-    float3 torque = (-1./(1. + alpha*alpha)) * (
-                        (1+xi*alpha) * cross(m, cross(m, hspin))
+    float3 torque = (-1.0f/(1.0f + alpha*alpha)) * (
+                        (1.0f+xi*alpha) * cross(m, cross(m, hspin))
                         +(  xi-alpha) * cross(m, hspin)           );
 
     // write back, adding to torque

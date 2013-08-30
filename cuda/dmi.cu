@@ -24,7 +24,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     int I = idx(i, j, k);                        // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
     float3 m = make_float3(mx[I], my[I], mz[I]); // central m
-    float D_2A = (D/(2.*A));
+    float D_2A = (D/(2.0f*A));
 
     // z derivatives (along length)
     {
@@ -44,7 +44,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         // Exchange
         float3 m1 = make_float3(mx1, my[I1], mz1); // right neighbor
         float3 m2 = make_float3(mx2, my[I2], mz2); // left neighbor
-        h +=  (2*A/(cz*cz)) * ((m1 - m) + (m2 - m));
+        h +=  (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m));
     }
 
     // y derivatives (along height)
@@ -64,7 +64,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         // Exchange
         float3 m1 = make_float3(mx1, my1, mz[I1]);
         float3 m2 = make_float3(mx2, my2, mz[I2]);
-        h +=  (2*A/(cy*cy)) * ((m1 - m) + (m2 - m));
+        h +=  (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
     }
 
     // write back, result is H + Hdmi + Hex

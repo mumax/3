@@ -1,16 +1,16 @@
-setgridsize(200, 100, 4)
-setcellsize(4e-9, 4e-9, 4e-9)
-
-msat = 800e3
-aex = 13e-12
-alpha = 0.01
-m = uniform(1, 0, 0)
-
-dot := cylinder(100e-9, 100e-9)
-defregion(2, dot)
-
-b_ext.setregion(2, vector(0, 0, 1))
-setlexchange(1, 2, 5e-9)
-
-m.autosave(10e-9)
-run(1e-9)
+//setgridsize(200, 100, 4)
+//setcellsize(4e-9, 4e-9, 4e-9)
+//
+//msat = 800e3
+//aex = 13e-12
+//alpha = 0.01
+//m = uniform(1, 0, 0)
+//
+//dot := cylinder(100e-9, 100e-9)
+//defregion(2, dot)
+//
+//b_ext.setregion(2, vector(0, 0, 1))
+//setlexchange(1, 2, 5e-9)
+//
+//m.autosave(10e-9)
+//run(1e-9)

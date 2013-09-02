@@ -90,4 +90,4 @@ func initReduceBuf() {
 // launch configuration for reduce kernels
 // 8 is typ. number of multiprocessors.
 // could be improved but takes hardly ~1% of execution time
-var reducecfg = &config{Grid: cu.Dim3{8, 1, 1}, Block: cu.Dim3{REDUCE_BLOCKSIZE, 1, 1}}
+var reducecfg = &config{Grid: cu.Dim3{X: 8, Y: 1, Z: 1}, Block: cu.Dim3{X: REDUCE_BLOCKSIZE, Y: 1, Z: 1}}

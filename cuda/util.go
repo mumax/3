@@ -16,24 +16,24 @@ type config struct {
 
 // Make a 1D kernel launch configuration suited for N threads.
 func make1DConf(N int) *config {
-	bl := cu.Dim3{BlockSize, 1, 1}
+	bl := cu.Dim3{X: BlockSize, Y: 1, Z: 1}
 
 	N2 := divUp(N, BlockSize) // N2 blocks left
 	NX := divUp(N2, MaxGridSize)
 	NY := divUp(N2, NX)
-	gr := cu.Dim3{NX, NY, 1}
+	gr := cu.Dim3{X: NX, Y: NY, Z: 1}
 
 	return &config{gr, bl}
 }
 
 // Make a 3D kernel launch configuration suited for N threads.
 func make3DConf(N [3]int) *config {
-	bl := cu.Dim3{TileX, TileY, 1}
+	bl := cu.Dim3{X: TileX, Y: TileY, Z: 1}
 
-	NX := N[0]
+	NZ := N[0]
 	NY := divUp(N[1], TileY)
-	NZ := divUp(N[2], TileX)
-	gr := cu.Dim3{NZ, NY, NX}
+	NX := divUp(N[2], TileX)
+	gr := cu.Dim3{X: NX, Y: NY, Z: NZ}
 
 	return &config{gr, bl}
 }

@@ -7,36 +7,34 @@ import (
 
 // compiles expression or statement
 func (w *World) compile(n ast.Node) Expr {
-	switch concrete := n.(type) {
+	switch n := n.(type) {
 	case ast.Stmt:
-		return w.compileStmt(concrete)
+		return w.compileStmt(n)
 	case ast.Expr:
-		return w.compileExpr(concrete)
+		return w.compileExpr(n)
 	default:
 		panic(err(n.Pos(), "not allowed"))
 	}
-	panic(0) // silence gccgo
 }
 
 // compiles a statement
 func (w *World) compileStmt(st ast.Stmt) Expr {
-	switch concrete := st.(type) {
+	switch st := st.(type) {
 	default:
 		panic(err(st.Pos(), "not allowed:", typ(st)))
 	case *ast.AssignStmt:
-		return w.compileAssignStmt(concrete)
+		return w.compileAssignStmt(st)
 	case *ast.ExprStmt:
-		return w.compileExpr(concrete.X)
+		return w.compileExpr(st.X)
 	case *ast.ForStmt:
-		return w.compileForStmt(concrete)
+		return w.compileForStmt(st)
 	case *ast.IncDecStmt:
-		return w.compileIncDecStmt(concrete)
+		return w.compileIncDecStmt(st)
 	case *ast.BlockStmt:
 		w.EnterScope()
 		defer w.ExitScope()
-		return w.compileBlockStmt_noScope(concrete)
+		return w.compileBlockStmt_noScope(st)
 	}
-	panic(0) // silence gccgo
 }
 
 // embed to get Type() that returns nil

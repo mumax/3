@@ -13,23 +13,22 @@ type Expr interface {
 
 // compiles an expression
 func (w *World) compileExpr(e ast.Expr) Expr {
-	switch concrete := e.(type) {
+	switch e := e.(type) {
 	default:
 		panic(err(e.Pos(), "not allowed:", typ(e)))
 	case *ast.Ident:
-		return w.resolve(e.Pos(), concrete.Name)
+		return w.resolve(e.Pos(), e.Name)
 	case *ast.BasicLit:
-		return w.compileBasicLit(concrete)
+		return w.compileBasicLit(e)
 	case *ast.BinaryExpr:
-		return w.compileBinaryExpr(concrete)
+		return w.compileBinaryExpr(e)
 	case *ast.UnaryExpr:
-		return w.compileUnaryExpr(concrete)
+		return w.compileUnaryExpr(e)
 	case *ast.CallExpr:
-		return w.compileCallExpr(concrete)
+		return w.compileCallExpr(e)
 	case *ast.ParenExpr:
-		return w.compileExpr(concrete.X)
+		return w.compileExpr(e.X)
 	case *ast.IndexExpr:
-		return w.compileIndexExpr(concrete)
+		return w.compileIndexExpr(e)
 	}
-	panic(0) // silence gccgo
 }

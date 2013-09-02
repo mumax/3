@@ -12,17 +12,16 @@ type LValue interface {
 }
 
 func (w *World) compileLvalue(lhs ast.Node) LValue {
-	switch concrete := lhs.(type) {
+	switch lhs := lhs.(type) {
 	default:
 		panic(err(lhs.Pos(), "cannot assign to", typ(lhs)))
 	case *ast.Ident:
-		if l, ok := w.resolve(lhs.Pos(), concrete.Name).(LValue); ok {
+		if l, ok := w.resolve(lhs.Pos(), lhs.Name).(LValue); ok {
 			return l
 		} else {
-			panic(err(lhs.Pos(), "cannot assign to", concrete.Name))
+			panic(err(lhs.Pos(), "cannot assign to", lhs.Name))
 		}
 	}
-	panic(0) // silence gccgo
 }
 
 // read-only value (from script, but mutable from outside)

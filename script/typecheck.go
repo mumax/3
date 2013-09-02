@@ -31,7 +31,7 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case outT == float64_t && inT == int_t:
 		return &intToFloat64{in}
 
-		// float64 -> int
+	// float64 -> int
 	case outT == int_t && inT == float64_t:
 		return &float64ToInt{in}
 
@@ -39,7 +39,7 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case inT == float64_t && outT == func_float64_t:
 		return &float64ToFunc{in}
 
-		// float64 -> func()float64
+	// float64 -> func()float64
 	case inT == func_float64_t && outT == float64_t:
 		return &funcToFloat64{in}
 
@@ -51,7 +51,6 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case inT == vector_t && outT == func_vector_t:
 		return &vectorToFunc{in}
 	}
-	panic(0) // silence gccgo
 }
 
 // returns input type for expression. Usually this is the same as the return type,

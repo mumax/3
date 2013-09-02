@@ -9,8 +9,8 @@ var (
 	Msat        ScalarParam // Saturation magnetization in A/m
 	B_demag     SetterQuant // demag field in Tesla
 	FFTM        fftm        // FFT of m
-	E_demag     GetFunc     // Magnetostatic energy (J)
-	EnableDemag = true      // enable/disable demag field
+	E_demag     = NewGetScalar("E_demag", "J", getDemagEnergy)
+	EnableDemag = true // enable/disable demag field
 
 	bsat   = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
 	demag_ *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
@@ -24,8 +24,6 @@ func init() {
 		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
-
-	E_demag = NewGetScalar("E_demag", "J", getDemagEnergy)
 
 	World.Var("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	World.ROnly("mFFT", &FFTM, "Fourier-transformed magnetization")

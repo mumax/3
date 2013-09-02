@@ -6,18 +6,17 @@ import (
 )
 
 var (
-	Aex    ScalarParam // inter-cell exchange stiffness in J/m
-	B_exch adderQuant  // exchange field (T) output handle
-	E_exch GetFunc     // exchange energy (J)
-	Dex    ScalarParam // Dzyaloshinskii-Moriya strength in J/m²
-	lex2   symmparam   // inter-cell exchange length squared * 1e18
+	Aex    ScalarParam                                      // inter-cell exchange stiffness in J/m
+	B_exch adderQuant                                       // exchange field (T) output handle
+	E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy) // Exchange (normal+DM) energy in J
+	Dex    = scalarParam("dmi", "J/m2", nil)                //func(r int) { // Dzyaloshinskii-Moriya strength in J/m²
+	lex2   symmparam                                        // inter-cell exchange length squared * 1e18
 )
 
 func init() {
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
-	E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy)
 	World.LValue("Aex", &Aex, "Exchange stiffness (J/m)")
 	World.Func("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 	World.ROnly("B_exch", &B_exch, "Exchange field (T)")
@@ -25,7 +24,6 @@ func init() {
 	World.Func("sign", sign)
 
 	World.LValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
-	Dex = scalarParam("dmi", "J/m2", nil) //func(r int) {
 }
 
 func initExchange() {

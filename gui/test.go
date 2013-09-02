@@ -77,7 +77,7 @@ const testtempl = `
 
 	<h1> GUI test </h1>
 	<p> {{.ErrorBox}} </p>
-	<p> <button onclick="refresh();">Refresh</button> </p>
+	<p> <button onclick="refresh();"> &#x21bb; </button> </p>
 	<hr/>
 
 	{{.Span "e_time" "time flies..."}} <br/><br/>
@@ -117,7 +117,8 @@ const testtempl = `
 	{{$.Button . . }}
 	{{end}}
 
-	<p> Enter a number: {{.NumBox "e_num" 0}} </p>
+	<p> NumBox: {{.NumBox "e_num" 0}} </p>
+	<p> IntBox: {{.IntBox "e_int" 0}} </p>
 
 	<hr/>
 

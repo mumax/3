@@ -59,7 +59,6 @@ func RunWhile(condition func() bool) {
 	checkM()
 	defer util.DashExit()
 
-	GUI.SetValue("solverstatus", "running")
 	pause = false
 	for condition() && !pause {
 		select {
@@ -70,7 +69,6 @@ func RunWhile(condition func() bool) {
 		}
 	}
 	pause = true
-	GUI.SetValue("solverstatus", "paused")
 }
 
 func step() {

@@ -13,11 +13,12 @@ type Doc struct {
 	htmlCache []byte      // static html content, rendered only once
 	haveJS    bool        // have called JS()?
 	data      interface{} // any additional data to be passed to template
-	KeepAlive time.Time   // last time we heard from the browser
+	keepAlive time.Time   // last time we heard from the browser
+	onRefresh func()
 }
 
 func NewDoc(htmlTemplate string, data interface{}) *Doc {
-	d := &Doc{elems: make(map[string]*elem), data: data}
+	d := &Doc{elems: make(map[string]*elem), data: data, onRefresh: func() {}}
 	d.execTemplate(htmlTemplate)
 	if !d.haveJS {
 		log.Panic("template should call {{.JS}}")
@@ -27,6 +28,10 @@ func NewDoc(htmlTemplate string, data interface{}) *Doc {
 
 func (d *Doc) OnEvent(id string, f func()) {
 	d.elem(id).onevent = f
+}
+
+func (d *Doc) OnRefresh(f func()) {
+	d.onRefresh = f
 }
 
 func (d *Doc) SetValue(id string, v interface{}) {

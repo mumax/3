@@ -71,13 +71,13 @@ func main() {
 	initProf()
 	defer prof.Cleanup()
 
-	defer func() {
-		err := recover()
-		if err != nil {
-			engine.Crashlog()
-			log.Panic(err)
-		}
-	}()
+	//	defer func() {
+	//		err := recover()
+	//		if err != nil {
+	//			engine.Crashlog()
+	//			log.Panic(err)
+	//		}
+	//	}()
 
 	RunFileAndServe(flag.Arg(0))
 
@@ -94,7 +94,7 @@ func RunFileAndServe(fname string) {
 	util.FatalErr(err2)
 
 	// now the parser is not used anymore so it can handle web requests
-	engine.GoServe(*flag_port)
+	go engine.Serve(*flag_port)
 
 	// start executing the tree, possibly injecting commands from web gui
 	code.Eval()
@@ -124,7 +124,7 @@ func RunInteractive() {
 	engine.Pause()
 	log.Println("entering interactive mode")
 	for {
-		if time.Since(engine.GUI.KeepAlive) > timeout {
+		if time.Since(engine.KeepAlive()) > timeout {
 			log.Println("interactive session idle: exiting")
 			break
 		}
@@ -137,7 +137,7 @@ func RunInteractive() {
 const timeout = 2 * time.Second
 
 func keepBrowserAlive() {
-	if time.Since(engine.GUI.KeepAlive) < timeout {
+	if time.Since(engine.KeepAlive()) < timeout {
 		log.Println("keeping session open to browser")
 		go func() {
 			for {

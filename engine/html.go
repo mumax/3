@@ -106,9 +106,11 @@ const templText = `
 
 	<h2> parameters </h2><div>
 
+	<table>
 	{{range $k,$v := .Data.Params}}
-
+		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.NumBox . 0}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
 	{{end}}
+	</table>
 
 	</div><hr/>
 

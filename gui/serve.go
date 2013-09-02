@@ -8,7 +8,7 @@ import (
 
 // ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d.KeepAlive = time.Now()
+	d.keepAlive = time.Now()
 	switch r.Method {
 	default:
 		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
@@ -19,6 +19,10 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "PUT":
 		d.serveEvent(w, r)
 	}
+}
+
+func (d *Doc) KeepAlive() time.Time {
+	return d.keepAlive
 }
 
 // serves the html content.
@@ -44,6 +48,7 @@ type event struct {
 
 // HTTP handler for refreshing the dynamic elements
 func (d *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
+	d.onRefresh()
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, el := range d.elems {
 		calls = append(calls, el.update(id))

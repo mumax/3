@@ -28,6 +28,8 @@ var (
 	M_full SetterQuant   // non-reduced magnetization in T
 	B_eff  SetterQuant   // effective field (T) output handle
 	Torque SetterQuant   // total torque/γ0, in T
+
+	inited = make(chan int, 1)
 )
 
 var Table DataTable
@@ -92,6 +94,8 @@ func initialize() {
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
+
+	inited <- 1
 }
 
 //func sanitycheck() {
@@ -119,16 +123,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
 
 	log.Println("set mesh:", Mesh().UserString())
-
-	GUI.SetValue("nx", Nx)
-	GUI.SetValue("ny", Ny)
-	GUI.SetValue("nz", Nz)
-	GUI.SetValue("cx", cellSizeX*1e9) // in nm
-	GUI.SetValue("cy", cellSizeY*1e9)
-	GUI.SetValue("cz", cellSizeZ*1e9)
-	GUI.SetValue("wx", float64(Nx)*cellSizeX*1e9)
-	GUI.SetValue("wy", float64(Ny)*cellSizeY*1e9)
-	GUI.SetValue("wz", float64(Nz)*cellSizeZ*1e9)
 
 	initialize()
 }

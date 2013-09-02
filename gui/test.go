@@ -14,35 +14,34 @@ func main() {
 	doc := NewDoc(testtempl, data)
 
 	hitcount := 0
-	doc.OnClick("e_hitme", func() {
+	doc.OnEvent("e_hitme", func() {
 		hitcount++
 		doc.SetValue("e_hitcount", hitcount)
 	})
+	doc.SetValue("e_hitme", "Hit me!")
 
-	doc.OnChange("e_namebox", func() {
+	doc.SetValue("e_greet", "anyone there?")
+	doc.OnEvent("e_namebox", func() {
 		doc.SetValue("e_greet",
-			fmt.Sprint("Hello ", doc.Elem("e_namebox").Value(), "!"))
+			fmt.Sprint("Hello ", doc.Value("e_namebox"), "!"))
 	})
 
-	doc.OnChange("e_check", func() {
+	doc.OnEvent("e_check", func() {
 		name := doc.Value("e_namebox").(string)
-		cookie := doc.Elem("e_cookies")
 		if doc.Value("e_check") == true {
-			cookie.SetValue(name + " likes cookies")
+			doc.SetValue("e_cookies", name+" likes cookies")
 		} else {
-			cookie.SetValue(name + " doesn't like cookies")
+			doc.SetValue("e_cookies", name+" doesn't like cookies")
 		}
 	})
 
-	doc.OnChange("e_range", func() {
+	doc.OnEvent("e_range", func() {
 		doc.SetValue("e_age", fmt.Sprint(
 			doc.Value("e_namebox"), " is ",
 			doc.Value("e_range"), " years old."))
 	})
 
-	doc.OnChange("e_os", func() { doc.SetValue("e_os_opinion", doc.Value("e_os").(string)+", really?") })
-
-	doc.OnClick("alert", func() { doc.Call("alert", "How alert of you!") })
+	doc.OnEvent("e_os", func() { doc.SetValue("e_os_opinion", doc.Value("e_os").(string)+", really?") })
 
 	go func() {
 		for {
@@ -53,6 +52,7 @@ func main() {
 
 	http.Handle("/gui", doc)
 	http.Handle("/gui2", doc)
+	println("listening :7070")
 	err := http.ListenAndServe(":7070", nil)
 	if err != nil {
 		panic(err)
@@ -83,9 +83,11 @@ const testtempl = `
 
 
 	What's your name: {{.TextBox "e_namebox" ""}} &nbsp;
-	{{.Span "e_greet"}} <br/><br/>
+	{{.Span "e_greet" ""}} <br/><br/>
+
 
 	You hit me {{.Span "e_hitcount" "0"}} times. {{.Button "e_hitme" "Hit me baby one more time!"}} <br/><br/>
+
 
 	{{.CheckBox "e_check" "Like cookies?" false}} &nbsp;
 	{{.Span "e_cookies" ""}} <br/><br/>
@@ -94,8 +96,9 @@ const testtempl = `
 	Your age: {{.Range "e_range" 0 100 18}}
 	{{.Span "e_age" ""}} <br/><br/>
 
-	Favorite OS: {{.BeginSelect "e_os"}} 
-		{{.Option "Windows"}} 
+
+	Favorite OS: {{.BeginSelect "e_os"}}
+		{{.Option "Windows"}}
 		{{.Option "MacOSX" }}
 		{{.Option "Linux"  }}
 		{{.Option "BSD"    }}
@@ -108,12 +111,11 @@ const testtempl = `
 	{{.Span "e_os_opinion" " "}}
 	<br/> <br/>
 
-	{{.Button "alert"}} <br/>
 
 	{{range .Data}}
-		{{$.Button . }} 
+	{{$.Button . . }}
 	{{end}}
-		
+
 
 	<hr/>
 

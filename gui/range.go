@@ -1,9 +1,16 @@
 package gui
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func (d *Doc) Range(id string, min, max, value int) string {
-	e := newElem(id, "checked", value)
-	d.add(id, e)
+func (t *Templ) Range(id string, min, max, value int) string {
+	d := (*Doc)(t)
+	el := d.addElem(id)
+	el.data = &intData{interfaceData{nil}}
+	el.setValue(value)
+	el.update = func(id string) jsCall {
+		return jsCall{F: "setAttr", Args: []interface{}{id, "value", el.value().(int)}}
+	}
 	return fmt.Sprintf(`<input type=range id=%v min=%v max=%v value=%v onchange="notifyrange('%v')"/>`, id, min, max, value, id)
 }

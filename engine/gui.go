@@ -48,14 +48,14 @@ func GoServe(port string) {
 	GUI.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 	hostname, _ := os.Hostname()
 	GUI.SetValue("hostname", hostname)
-	GUI.OnClick("break", Pause)
-	GUI.OnClick("run", inj(func() { Run(GUI.Value("runtime").(float64)) }))
-	GUI.OnClick("steps", inj(func() { Steps(GUI.Value("runsteps").(int)) }))
-	GUI.OnChange("fixdt", inj(func() { Solver.FixDt = GUI.Value("fixdt").(float64) }))
-	GUI.OnChange("mindt", inj(func() { Solver.MinDt = GUI.Value("mindt").(float64) }))
-	GUI.OnChange("maxdt", inj(func() { Solver.MaxDt = GUI.Value("maxdt").(float64) }))
-	GUI.OnChange("maxerr", inj(func() { Solver.MaxErr = GUI.Value("maxerr").(float64) }))
-	GUI.OnChange("sel_render", func() { renderQ = GUI.Value("sel_render").(string); updateDash() })
+	GUI.OnEvent("break", Pause)
+	GUI.OnEvent("run", inj(func() { Run(GUI.Value("runtime").(float64)) }))
+	GUI.OnEvent("steps", inj(func() { Steps(GUI.Value("runsteps").(int)) }))
+	GUI.OnEvent("fixdt", inj(func() { Solver.FixDt = GUI.Value("fixdt").(float64) }))
+	GUI.OnEvent("mindt", inj(func() { Solver.MinDt = GUI.Value("mindt").(float64) }))
+	GUI.OnEvent("maxdt", inj(func() { Solver.MaxDt = GUI.Value("maxdt").(float64) }))
+	GUI.OnEvent("maxerr", inj(func() { Solver.MaxErr = GUI.Value("maxerr").(float64) }))
+	GUI.OnEvent("sel_render", func() { renderQ = GUI.Value("sel_render").(string); updateDash() })
 
 	// periodically update time, steps, etc
 	go func() {

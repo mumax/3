@@ -58,13 +58,13 @@ func (p *param) setRegion(region int, v ...float64) {
 	}
 }
 
-func (p *param) getRegion(region int) []float64 {
-	v := make([]float64, p.NComp())
-	for c := range v {
-		v[c] = float64(p.lut[c][region])
-	}
-	return v
-}
+//func (p *param) getRegion(region int) []float64 {
+//	v := make([]float64, p.NComp())
+//	for c := range v {
+//		v[c] = float64(p.lut[c][region])
+//	}
+//	return v
+//}
 
 // set in all regions except 0
 func (p *param) setUniform(v ...float64) {

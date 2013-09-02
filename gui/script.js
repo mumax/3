@@ -1,6 +1,6 @@
 
 // auto-refresh rate
-var tick = 200;
+var tick = 2000;
 var autorefresh = true;
 
 // show error in document (non-intrusive alert())
@@ -13,9 +13,19 @@ function msg(err){
 	document.getElementById("MsgBox").innerHTML = err;
 }
 
+// wraps document.getElementById, shows error if not found
+function elementById(id){
+	var elem = document.getElementById(id);
+	if (elem == null){
+		showErr("undefined: " + id);
+		return null;
+	}
+	return elem;
+}
+
 // called on change of auto-refresh button
 function setautorefresh(){
-	autorefresh =  document.getElementById("AutoRefresh").checked;
+	autorefresh =  elementById("AutoRefresh").checked;
 }
 
 // Id of element that has focus. We don't auto-refresh a focused textbox
@@ -26,8 +36,31 @@ function notifyblur (id){hasFocus = "";}
 
 // called by server to manipulate the DOM
 function setAttr(id, attr, value){
-	document.getElementById(id)[attr] = value;
+	var elem = elementById(id);
+	if (elem == null){
+		return;
+	}
+	if (elem[attr] == null){
+		showErr("settAttr: undefined: " + id + "[" + attr + "]");
+		return;
+	}
+	elem[attr] = value;
 }
+
+// set textbox value unless focused
+function setTextbox(id, value){
+	if (hasFocus != id){
+		elementById(id).value = value;
+	}
+}
+
+// set select value unless focused
+function setSelect(id, value){
+	if (hasFocus != id){
+		elementById(id).value = value;
+	}
+}
+
 
 // onreadystatechange function for update http request.
 // refreshes the DOM with new values received from server.
@@ -38,7 +71,12 @@ function refreshDOM(req){
 			var response = JSON.parse(req.responseText);	
 			for(var i=0; i<response.length; i++){
 				var r = response[i];
-				window[r.F].apply(this, r.Args);
+				var func = window[r.F];
+				if (func == null) {
+					showErr("undefined: " + r.F);
+				}else{ 
+					func.apply(this, r.Args);
+				}
 			}
 		} else {
 			showErr("Disconnected");	
@@ -65,11 +103,11 @@ function refresh(){
 setInterval(refresh, tick);
 
 // sends event notification to server, called on button clicks etc.
-function notify(id, method, arg){
+function notify(id, arg){
 	try{
 		var req = new XMLHttpRequest();
 		req.open("PUT", document.URL, false);
-		var map = {"ID": id, "Method": method, "Arg": arg};
+		var map = {"ID": id, "Arg": arg};
 		req.send(JSON.stringify(map));
 	}catch(e){
 		showErr(e); // TODO
@@ -77,22 +115,26 @@ function notify(id, method, arg){
 	refresh();
 }
 
+function notifyButton(id){
+	notify(id, elementById(id).innerHTML);
+}
+
 function notifytextbox(id){
-	notify(id, "change", document.getElementById(id).value);
+	notify(id, elementById(id).value);
 }
 
 function notifycheckbox(id){
-	notify(id, "change", document.getElementById(id).checked);
+	notify(id, elementById(id).checked);
 }
 
 function notifyrange(id){
-	notify(id, "change", document.getElementById(id).value);
+	notify(id, elementById(id).value);
 }
 
 function notifyselect(id){
-	var e = document.getElementById(id);
+	var e = elementById(id);
 	var value = e.options[e.selectedIndex].text;
-	notify(id, "change", value);
+	notify(id, value);
 }
 
 

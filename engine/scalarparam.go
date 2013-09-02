@@ -31,3 +31,7 @@ func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
 func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
 func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
 func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
+
+func (p *ScalarParam) SetFunc(f func() float64) {
+
+}

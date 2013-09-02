@@ -1,17 +1,22 @@
 package gui
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func (d *Doc) BeginSelect(id string) string {
-	e := newElem(id, "select", 0) // select is dummy attr
-	d.add(id, e)
-	return fmt.Sprintf(`<select id=%v onchange="notifyselect('%v')"> `, id, id)
+func (t *Templ) BeginSelect(id string) string {
+	d := (*Doc)(t)
+	el := d.addElem(id)
+	el.update = func(id string) jsCall {
+		return jsCall{F: "setSelect", Args: []interface{}{id, el.value()}}
+	}
+	return fmt.Sprintf(`<select id=%v onchange="notifyselect('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"> `, id, id, id, id)
 }
 
-func (d *Doc) EndSelect() string {
+func (t *Templ) EndSelect() string {
 	return `</select>`
 }
 
-func (d *Doc) Option(value string) string {
+func (t *Templ) Option(value string) string {
 	return fmt.Sprintf(`<option value=%v> %v </option>`, value, value)
 }

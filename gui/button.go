@@ -1,16 +1,18 @@
 package gui
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // {{.Button id value}} adds a button to the document.
 // value is text on the button.
-func (d *Doc) Button(id string, value ...string) string {
-	val := cat(value)
-	if val == "" {
-		val = id
+func (t *Templ) Button(id string, value string) string {
+	d := (*Doc)(t)
+	el := d.addElem(id)
+	el.setValue(value)
+	el.update = func(id string) jsCall {
+		return jsCall{F: "setAttr", Args: []interface{}{id, "innerHTML", el.value()}}
 	}
-	e := newElem(id, "value", val)
-	d.add(id, e)
-	return fmt.Sprintf(`<button id=%v class=Button onclick="notify('%v', 'click')">%v</button>`,
-		id, id, htmlEsc(val)) // set button value does not work
+	return fmt.Sprintf(`<button id=%v class=Button onclick="notifyButton('%v')">%v</button>`,
+		id, id, value) // set button value does not work
 }

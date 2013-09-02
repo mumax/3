@@ -2,10 +2,7 @@ package gui
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
 	"sync"
 	"text/template"
 	"time"
@@ -13,172 +10,63 @@ import (
 
 // gui.Doc serves a GUI as a html document.
 type Doc struct {
-	haveJS    bool             // have called JS()?
-	elem      map[string]*Elem // document elements by ID
-	htmlCache []byte           // static html content, rendered only once
-	KeepAlive time.Time        // last time we heard from the browser
-	callStack []jsCall
-	sync.Mutex
-	data interface{} // any additional data to be passed to template
+	elems     map[string]*elem
+	htmlCache []byte // static html content, rendered only once
+	lock      sync.Mutex
+	haveJS    bool        // have called JS()?
+	data      interface{} // any additional data to be passed to template
+	KeepAlive time.Time   // last time we heard from the browser
 }
 
-// NewDoc makes a new GUI document, to be served under urlPattern.
-// htmlTemplate defines the GUI elements and layout.
-// A http handler still needs to be registered manually.
 func NewDoc(htmlTemplate string, data interface{}) *Doc {
-	t := template.Must(template.New("").Parse(htmlTemplate))
-	d := &Doc{elem: make(map[string]*Elem), data: data}
-	cache := bytes.NewBuffer(nil)
-	check(t.Execute(cache, d))
+	d := &Doc{elems: make(map[string]*elem), data: data}
+	d.execTemplate(htmlTemplate)
 	if !d.haveJS {
 		log.Panic("template should call {{.JS}}")
 	}
-	d.htmlCache = cache.Bytes()
 	return d
 }
 
-// {{.JS}} should always be embedded in the template <head>.
-// Expands to needed JavaScript code.
-func (d *Doc) JS() string {
-	d.haveJS = true
-	return js
+func (d *Doc) OnEvent(id string, f func()) {
+	d.elem(id).onevent = f
 }
 
-// {{.ErrorBox}} should be embedded in the template where errors are to be shown.
-// CSS rules for class ErrorBox may be set, e.g., to render errors in red.
-func (d *Doc) ErrorBox() string {
-	return `<span id=ErrorBox class=ErrorBox></span> <span id=MsgBox class=ErrorBox></span>`
+func (d *Doc) SetValue(id string, v interface{}) {
+	d.elem(id).setValue(v)
 }
 
-// {{.AutoRefreshBox }} renders a check box to toggle auto-refresh.
-func (v *Doc) AutoRefreshBox() string {
-	return fmt.Sprintf(`<input type="checkbox" id="AutoRefresh" checked=true onchange="setautorefresh()">auto refresh</input>`)
+func (d *Doc) Value(id string) interface{} {
+	return d.elem(id).value()
 }
 
-// Elem returns an element by Id.
-func (d *Doc) Elem(id string) *Elem {
-	if e, ok := d.elem[id]; ok {
+func (d *Doc) addElem(id string) *elem {
+	if _, ok := d.elems[id]; ok {
+		panic("doc.addElem: already defined: " + id)
+	} else {
+		el := &elem{data: &interfaceData{nil}}
+		d.elems[id] = el
+		return el
+	}
+}
+
+func (d *Doc) elem(id string) *elem {
+	if e, ok := d.elems[id]; ok {
 		return e
 	} else {
-		panic("elem id " + id + " undefined")
+		panic("no element with id: " + id)
 	}
 }
 
-func (d *Doc) Data() interface{} {
-	return d.data
-}
-
-func (d *Doc) OnClick(id string, handler func()) {
-	d.Elem(id).onclick = handler
-}
-
-func (d *Doc) OnChange(id string, handler func()) {
-	d.Elem(id).onchange = handler
-}
-
-// Shorthand for d.Elem(id).Value()
-func (d *Doc) Value(id string) interface{} {
-	return d.Elem(id).Value()
-}
-
-// Shorthand for d.Elem(id).SetValue(value)
-func (d *Doc) SetValue(id string, value interface{}) {
-	d.Elem(id).SetValue(value)
-}
-
-func (d *Doc) Call(function string, arg ...interface{}) {
-	d.Lock()
-	d.callStack = append(d.callStack, jsCall{function, arg})
-	d.Unlock()
-}
-
-func (d *Doc) add(id string, e *Elem) {
-	if _, ok := d.elem[id]; ok {
-		log.Panic("element id " + id + " already defined")
-	}
-	d.elem[id] = e
-}
-
-// ServeHTTP implements http.Handler.
-func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d.KeepAlive = time.Now()
-	switch r.Method {
-	default:
-		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
-	case "GET":
-		d.serveContent(w, r)
-	case "POST":
-		d.serveRefresh(w, r)
-	case "PUT":
-		d.serveEvent(w, r)
-	}
-}
-
-// serves the html content.
-func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
-	for _, e := range d.elem {
-		e.dirty = true
-	}
-	w.Write(d.htmlCache)
-}
-
-// HTTP handler for event notifications by button clicks etc
-func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
-	var m event
-	check(json.NewDecoder(r.Body).Decode(&m))
-	log.Println("event", m)
-	e := d.Elem(m.ID)
-	method := m.Method
-
-	switch method {
-	default:
-		log.Println("unhandled event method: " + method)
-	case "click":
-		if e.onclick != nil {
-			e.onclick()
-		}
-	case "change":
-		arg := m.Arg
-		e.SetValue(arg)
-		if e.onchange != nil {
-			e.onchange()
-		}
-	}
-}
-
-type event struct {
-	ID, Method string
-	Arg        interface{}
-}
-
-// HTTP handler for refreshing the dynamic elements
-func (v *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
-	//fmt.Print("*")
-	v.Lock()
-	defer v.Unlock()
-
-	for id, e := range v.elem {
-		if value, dirty := e.valueDirty(); dirty {
-			v.callStack = append(v.callStack, jsCall{"setAttr", []interface{}{id, e.domAttr, value}})
-		}
-	}
-	check(json.NewEncoder(w).Encode(v.callStack))
-
-	v.callStack = v.callStack[:0]
-}
-
-// javascript call
-type jsCall struct {
-	F    string        // function to call
-	Args []interface{} // function arguments
+// parse and execute template, store result in d.htmlCache.
+func (d *Doc) execTemplate(htmlTemplate string) {
+	t := template.Must(template.New("").Parse(htmlTemplate))
+	cache := bytes.NewBuffer(nil)
+	check(t.Execute(cache, (*Templ)(d)))
+	d.htmlCache = cache.Bytes()
 }
 
 func check(e error) {
 	if e != nil {
 		log.Panic(e)
 	}
-}
-
-func htmlEsc(s string) string {
-	return template.HTMLEscapeString(s)
 }

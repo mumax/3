@@ -1,7 +1,7 @@
 
 // auto-refresh rate
-var tick = 2000;
-var autorefresh = true;
+var tick = 3000;
+var autorefresh = false;
 
 // show error in document (non-intrusive alert())
 function showErr(err){
@@ -87,7 +87,6 @@ function refreshDOM(req){
 // refreshes the contents of all dynamic elements.
 // periodically called via setInterval()
 function refresh(){
-	if (autorefresh){
 		try{
 			var req = new XMLHttpRequest();
 			req.open("POST", document.URL, true); 
@@ -97,10 +96,15 @@ function refresh(){
 		}catch(e){
 			showErr(e); // TODO: same message as refresh
 		}
+}
+
+function doAutorefresh(){
+	if (autorefresh){
+		refresh();
 	}
 }
 
-setInterval(refresh, tick);
+setInterval(doAutorefresh, tick);
 
 // sends event notification to server, called on button clicks etc.
 function notify(id, arg){
@@ -137,4 +141,4 @@ function notifyselect(id){
 	notify(id, value);
 }
 
-
+window.onload = refresh;

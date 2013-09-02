@@ -34,12 +34,18 @@ var (
 		"lltorque": &LLTorque,
 		"jpol":     &JPol,
 		"sttorque": &STTorque}
+	params = map[string]*param{}
 )
+
+type guidata struct {
+	Quants map[string]Getter
+	Params map[string]*param
+}
 
 // Start web gui on given port, does not block.
 func GoServe(port string) {
 
-	data := &struct{ Quants *map[string]Getter }{&quants}
+	data := &guidata{Quants: quants, Params: params}
 	GUI = gui.NewDoc(templText, data)
 
 	http.Handle("/", GUI)

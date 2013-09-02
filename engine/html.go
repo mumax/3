@@ -104,6 +104,16 @@ const templText = `
 
 
 
+	<h2> parameters </h2><div>
+
+	{{range $k,$v := .Data.Params}}
+
+	{{end}}
+
+	</div><hr/>
+
+
+
 	<h2> process </h2><div>
 		<table>
 			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td>  </tr>

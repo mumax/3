@@ -71,13 +71,14 @@ func main() {
 	initProf()
 	defer prof.Cleanup()
 
-	//	defer func() {
-	//		err := recover()
-	//		if err != nil {
-	//			engine.Crashlog()
-	//			log.Panic(err)
-	//		}
-	//	}()
+	// on crash: save magnetization for post-mortem inspection
+	defer func() {
+		err := recover()
+		if err != nil {
+			engine.M.SaveAs("m_crash.dump")
+			log.Panic(err)
+		}
+	}()
 
 	RunFileAndServe(flag.Arg(0))
 
@@ -120,17 +121,13 @@ func vet() {
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
 func RunInteractive() {
-	//web.LastKeepalive = time.Now()
 	engine.Pause()
 	log.Println("entering interactive mode")
-	for {
-		if time.Since(engine.KeepAlive()) > timeout {
-			log.Println("interactive session idle: exiting")
-			break
-		}
+	for time.Since(engine.KeepAlive()) < timeout {
 		f := <-engine.Inject
 		f()
 	}
+	log.Println("interactive session idle: exiting")
 }
 
 // exit finished simulation this long after browser was closed

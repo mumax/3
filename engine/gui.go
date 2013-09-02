@@ -14,29 +14,23 @@ import (
 
 var (
 	quants = map[string]Getter{
-		"m":    &M,
-		"mFFT": &fftmPower{},
-
-		"regions": &regions,
-
-		"Msat":  &Msat,
-		"Aex":   &Aex,
-		"alpha": &Alpha,
-
-		"jpol": &JPol,
-
-		"Ku1":    &Ku1,
-		"Kc1":    &Kc1,
-		"anisU":  &AnisU,
-		"anisC1": &AnisC1,
-		"anisC2": &AnisC2,
-
-		"B_eff":   &B_eff,
-		"B_ext":   &B_ext,
-		"B_exch":  &B_exch,
-		"B_anis":  &B_anis,
-		"B_demag": &B_demag,
-
+		"m":        &M,
+		"mFFT":     &fftmPower{},
+		"regions":  &regions,
+		"Msat":     &Msat,
+		"Aex":      &Aex,
+		"alpha":    &Alpha,
+		"jpol":     &JPol,
+		"Ku1":      &Ku1,
+		"Kc1":      &Kc1,
+		"anisU":    &AnisU,
+		"anisC1":   &AnisC1,
+		"anisC2":   &AnisC2,
+		"B_eff":    &B_eff,
+		"B_ext":    &B_ext,
+		"B_exch":   &B_exch,
+		"B_anis":   &B_anis,
+		"B_demag":  &B_demag,
 		"torque":   &Torque,
 		"lltorque": &LLTorque,
 		"sttorque": &STTorque}
@@ -103,6 +97,7 @@ func Serve(port string) {
 	gui.SetValue("wx", float64(size[2])*cellSize[2]*1e9)
 	gui.SetValue("wy", float64(size[1])*cellSize[1]*1e9)
 	gui.SetValue("wz", float64(size[0])*cellSize[0]*1e9)
+	gui.SetValue("sel_render", renderQ)
 
 	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 	hostname, _ := os.Hostname()

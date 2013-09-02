@@ -7,9 +7,21 @@ import (
 // {{.Textbox id value}} adds a textbox to the document.
 // value is the initial text in the box.
 func (t *Templ) TextBox(id string, value string) string {
+	return t.textbox(id, nil, value)
+}
+
+// {{.Numbox id value}} adds a textbox for numbers to the document.
+// value is the initial text in the box.
+func (t *Templ) NumBox(id string, value float64) string {
+	return t.textbox(id, &floatData{interfaceData{0}}, value)
+}
+
+func (t *Templ) textbox(id string, dm data, value interface{}) string {
 	d := (*Doc)(t)
 	el := d.addElem(id)
-	el.setValue(value)
+	if dm != nil {
+		el.data = dm
+	}
 	el.update = func(id string) jsCall {
 		return jsCall{F: "setTextbox", Args: []interface{}{id, el.value()}}
 	}

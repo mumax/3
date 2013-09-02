@@ -51,16 +51,16 @@ const templText = `
 
 	<h1> mx 3 GUI </h1> 
 		<p> {{.ErrorBox}} </p>
-		<p> {{.Span "log" ""}} </p>
+		<p> {{.Span "log"}} </p>
 	<hr/>
 
 	
 	<h2> geometry </h2><div>
 
 		<table>
-			<tr> <td>gridsize: </td> <td>{{.Span "nx" ""}} </td> <td> &times; {{.Span "ny" ""}}</td> <td> &times; {{.Span "nz" ""}}                </td> </tr>
-			<tr> <td>cellsize: </td> <td>{{.Span "cx" ""}} </td> <td> &times; {{.Span "cy" ""}}</td> <td> &times; {{.Span "cz" ""}} nm<sup>3</sup> </td> </tr>
-			<tr> <td>worldsize:</td> <td>{{.Span "wx" ""}} </td> <td> &times; {{.Span "wy" ""}}</td> <td> &times; {{.Span "wz" ""}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.Span "nx"}} </td> <td> &times; {{.Span "ny"}}</td> <td> &times; {{.Span "nz"}}                </td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.Span "cx"}} </td> <td> &times; {{.Span "cy"}}</td> <td> &times; {{.Span "cz"}} nm<sup>3</sup> </td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span "wx"}} </td> <td> &times; {{.Span "wy"}}</td> <td> &times; {{.Span "wz"}} nm<sup>3</sup> </td> </tr>
 		</table>
 	</div><hr/>
 
@@ -81,10 +81,10 @@ const templText = `
 		</td><td>
 
 		<table>
-			<tr> <td>step:    </td><td>{{.Span   "step" ""}}    </td><td>time:  </td><td>{{.Span "time" ""}}s          </td></tr>
-			<tr> <td>dt:      </td><td>{{.Span   "dt" ""}}s     </td><td>fixdt: </td><td>{{.NumBox "fixdt" 0}}         </td></tr>
-			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s   </td><td>maxdt: </td><td>{{.NumBox "maxdt" 0}}s        </td></tr>
-			<tr> <td>err/step:</td><td>{{.Span   "lasterr" ""}} </td><td>maxerr:</td><td>{{.NumBox "maxerr" 1e-5}}/step</td></tr>
+			<tr> <td>step:    </td><td>{{.Span   "step"}}     </td><td>time:  </td><td>{{.Span "time"}}s             </td></tr>
+			<tr> <td>dt:      </td><td>{{.Span   "dt"}}s      </td><td>fixdt: </td><td>{{.NumBox "fixdt" 0}}         </td></tr>
+			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s </td><td>maxdt: </td><td>{{.NumBox "maxdt" 0}}s        </td></tr>
+			<tr> <td>err/step:</td><td>{{.Span   "lasterr"}}  </td><td>maxerr:</td><td>{{.NumBox "maxerr" 1e-5}}/step</td></tr>
 		</table>
 
 			</td></tr>
@@ -106,9 +106,9 @@ const templText = `
 
 	<h2> process </h2><div>
 		<table>
-			<tr> <td>host:     </td> <td>{{.Span "hostname" ""}} </td>  </tr>
-			<tr> <td>gpu:      </td> <td>{{.Span "gpu" ""}}      </td>  </tr>
-			<tr> <td>walltime: </td> <td>{{.Span "walltime" ""}} </td>  </tr>
+			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td>  </tr>
+			<tr> <td>gpu:      </td> <td>{{.Span "gpu"}}      </td>  </tr>
+			<tr> <td>walltime: </td> <td>{{.Span "walltime"}} </td>  </tr>
 		</table>
 	</div><hr/>
 

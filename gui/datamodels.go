@@ -36,6 +36,24 @@ func (d *intData) setValue(v interface{}) {
 	}
 }
 
+type floatData struct {
+	interfaceData
+}
+
+func (d *floatData) setValue(v interface{}) {
+	switch v := v.(type) {
+	case float64:
+		d.v = v
+	default:
+		i, err := strconv.ParseFloat(fmt.Sprint(v), 64)
+		if err == nil {
+			d.v = i
+		} else {
+			log.Println(err)
+		}
+	}
+}
+
 type boolData struct {
 	interfaceData
 }

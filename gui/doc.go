@@ -3,7 +3,6 @@ package gui
 import (
 	"bytes"
 	"log"
-	"sync"
 	"text/template"
 	"time"
 )
@@ -11,8 +10,7 @@ import (
 // gui.Doc serves a GUI as a html document.
 type Doc struct {
 	elems     map[string]*elem
-	htmlCache []byte // static html content, rendered only once
-	lock      sync.Mutex
+	htmlCache []byte      // static html content, rendered only once
 	haveJS    bool        // have called JS()?
 	data      interface{} // any additional data to be passed to template
 	KeepAlive time.Time   // last time we heard from the browser

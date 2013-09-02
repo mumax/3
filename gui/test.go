@@ -116,6 +116,7 @@ const testtempl = `
 	{{$.Button . . }}
 	{{end}}
 
+	<p> Enter a number: {{.NumBox "e_num" 0}} </p>
 
 	<hr/>
 

@@ -49,8 +49,6 @@ type event struct {
 // HTTP handler for refreshing the dynamic elements
 func (d *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("*")
-	//v.Lock()
-	//defer v.Unlock()
 
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, el := range d.elems {

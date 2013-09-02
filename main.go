@@ -153,11 +153,11 @@ func openbrowser(url string) {
 	for _, cmd := range browsers {
 		err := exec.Command(cmd, url).Start()
 		if err == nil {
-			log.Println("\n ====\n openend web interface in", cmd, "\n ====\n")
+			log.Println("\n ====\n openend web interface in", cmd, "\n ====")
 			return
 		}
 	}
-	log.Println("\n ===== \n Please open ", url, " in a browser \n ==== \n")
+	log.Println("\n ===== \n Please open ", url, " in a browser \n ====")
 }
 
 // list of browsers to try.

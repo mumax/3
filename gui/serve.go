@@ -2,8 +2,6 @@ package gui
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -32,11 +30,9 @@ func (d *Doc) serveContent(w http.ResponseWriter, r *http.Request) {
 func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 	var ev event
 	check(json.NewDecoder(r.Body).Decode(&ev))
-	log.Println("event", ev)
 	el := d.elem(ev.ID)
 	el.setValue(ev.Arg)
 	if el.onevent != nil {
-		fmt.Println("onevent", ev.ID)
 		el.onevent()
 	}
 }
@@ -48,14 +44,10 @@ type event struct {
 
 // HTTP handler for refreshing the dynamic elements
 func (d *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("*")
-
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, el := range d.elems {
 		calls = append(calls, el.update(id))
 	}
-	fmt.Println(calls)
-
 	check(json.NewEncoder(w).Encode(calls))
 }
 

@@ -6,8 +6,8 @@ package gui
 const js = `<script type="text/javascript">
 
 // auto-refresh rate
-var tick = 3000;
-var autorefresh = false;
+var tick = 300;
+var autorefresh = true;
 
 // show error in document (non-intrusive alert())
 function showErr(err){

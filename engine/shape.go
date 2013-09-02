@@ -31,7 +31,7 @@ func Ellipsoid(diamx, diamy, diamz float64) Shape {
 
 // Elliptic cylinder along z (or 2D disk), with given diameters along x and y.
 func Cylinder(diamx, diamy float64) Shape {
-	return Ellipsoid(diamx, diamy, inf)
+	return Ellipsoid(diamx, diamy, math.Inf(1))
 }
 
 // 3D Rectangular slab with given sides.
@@ -158,8 +158,6 @@ func (s Shape) RotX(θ float64) Shape {
 	}
 }
 
-// CSG:
-
 // Union of shapes a and b (logical OR).
 func (a Shape) Add(b Shape) Shape {
 	return func(x, y, z float64) bool {
@@ -196,8 +194,4 @@ func (a Shape) Xor(b Shape) Shape {
 	}
 }
 
-// utils
-
 func sqr64(x float64) float64 { return x * x }
-
-var inf = math.Inf(1)

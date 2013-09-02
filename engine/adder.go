@@ -41,14 +41,6 @@ func (a *adderQuant) GetGPU() (q *data.Slice, recycle bool) {
 	return buf, true
 }
 
-func (a *adderQuant) Get() (q *data.Slice, recycle bool) {
-	return a.GetGPU()
-}
-
-func (p *param) Save() {
-	save(p)
-}
-
-func (p *param) SaveAs(fname string) {
-	saveAs(p, fname)
-}
+func (a *adderQuant) Get() (q *data.Slice, recycle bool) { return a.GetGPU() }
+func (p *adderQuant) Save()                              { save(p) }
+func (p *adderQuant) SaveAs(fname string)                { saveAs(p, fname) }

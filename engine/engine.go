@@ -25,18 +25,15 @@ func init() {
 
 var (
 	M      magnetization // reduced magnetization (unit length)
-	M_full SetterQuant   // non-reduced magnetization in T
-	B_eff  SetterQuant   // effective field (T) output handle
-	Torque SetterQuant   // total torque/γ0, in T
-
-	inited = make(chan int, 1)
+	M_full setterQuant   // non-reduced magnetization in T
+	B_eff  setterQuant   // effective field (T) output handle
+	Torque setterQuant   // total torque/γ0, in T
+	Table  DataTable
 )
-
-var Table DataTable
 
 var (
 	globalmesh data.Mesh
-	itime      int // unique integer time stamp // TODO: revise
+	inited     = make(chan int, 1) // fires when engine ready to serve GUI
 )
 
 func initialize() {
@@ -79,8 +76,6 @@ func initialize() {
 
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {
-		itime++
-
 		if cansave {
 			//Table.arm(cansave)      // if table output needed, quantities marked for update
 			notifySave(&M, cansave) // saves m if needed

@@ -25,7 +25,7 @@ func expect(msg string, have, want, maxError float64) {
 	} else {
 		log.Println(msg, ":", have, "OK")
 	}
-	// note: also check "want" for NaN in case "have" and "want" are switched.
+	// note: we also check "want" for NaN in case "have" and "want" are switched.
 }
 
 func Compile(src string) (script.Expr, error) {

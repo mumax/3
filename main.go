@@ -34,8 +34,7 @@ func init() {
 }
 
 func main() {
-	start := time.Now()
-	defer func() { log.Println("walltime:", time.Since(start)) }()
+	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
 
 	flag.Parse()
 

@@ -114,19 +114,13 @@ func Serve(port string) {
 	// periodically update time, steps, etc
 	gui.OnRefresh(func() {
 		Inject <- func() {
-			defer func() {
-				err := recover()
-				if err != nil {
-					log.Println(err)
-				}
-			}()
 			gui.SetValue("time", fmt.Sprintf("%6e", Time))
 			gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 			gui.SetValue("step", Solver.NSteps)
 			gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
 			cachebreaker := "?" + fmt.Sprint(time.Now().Nanosecond())
 			gui.SetValue("render", "/render/"+renderQ+cachebreaker)
-			gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(start))))
+			gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
 			p := "running"
 			if pause {
 				p = "paused"
@@ -147,7 +141,7 @@ func Serve(port string) {
 	runtime.Gosched()
 }
 
-var start = time.Now()
+var StartTime = time.Now()
 
 // round duration to 1s accuracy
 func roundt(t time.Duration) time.Duration {

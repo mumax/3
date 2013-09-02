@@ -56,14 +56,6 @@ func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
 }
 
-func (b *bufferedQuant) Save() {
-	save(b)
-}
-
-func (b *bufferedQuant) SaveAs(fname string) {
-	saveAs(b, fname)
-}
-
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
 // the simulation window.
@@ -90,6 +82,8 @@ func (m *bufferedQuant) alloc() {
 	}
 }
 
+func (b *bufferedQuant) Save()                   { save(b) }
+func (b *bufferedQuant) SaveAs(fname string)     { saveAs(b, fname) }
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }

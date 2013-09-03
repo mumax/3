@@ -26,15 +26,13 @@ type Regions struct {
 	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool         // gpuCache in sync with cpu
 	defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
-	autosave
+	info
 }
 
 func (r *Regions) init() {
 	mesh := Mesh() // global sim mesh
 
-	r.autosave.nComp = 1
-	r.autosave.name = "regions"
-	r.autosave.mesh = mesh
+	r.info = info{1, "regions", "", mesh}
 	r.cpu = make([]byte, mesh.NCell())
 	r.arr = resizeBytes(r.cpu, mesh.Size())
 	r.gpuCache = cuda.NewBytes(mesh)
@@ -157,10 +155,5 @@ func resizeBytes(array []byte, size [3]int) [][][]byte {
 	return sliced
 }
 
-func (p *Regions) Save() {
-	save(p)
-}
-
-func (p *Regions) SaveAs(fname string) {
-	saveAs(p, fname)
-}
+//func (p *Regions) Save() { save(p) }
+//func (p *Regions) SaveAs(fname string) { saveAs(p, fname) }

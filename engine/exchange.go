@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	Aex    ScalarParam                                      // inter-cell exchange stiffness in J/m
-	B_exch adderQuant                                       // exchange field (T) output handle
-	E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy) // Exchange (normal+DM) energy in J
-	Dex    = scalarParam("dmi", "J/m2", nil)                //func(r int) { // Dzyaloshinskii-Moriya strength in J/m²
-	lex2   symmparam                                        // inter-cell exchange length squared * 1e18
+	Aex    ScalarParam // inter-cell exchange stiffness in J/m
+	B_exch adderQuant  // exchange field (T) output handle
+	//E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy) // Exchange (normal+DM) energy in J
+	Dex  = scalarParam("dmi", "J/m2", nil) //func(r int) { // Dzyaloshinskii-Moriya strength in J/m²
+	lex2 symmparam                         // inter-cell exchange length squared * 1e18
 )
 
 func init() {
@@ -20,7 +20,7 @@ func init() {
 	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
 	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 	DeclROnly("B_exch", &B_exch, "Exchange field (T)")
-	DeclROnly("E_exch", &E_exch, "Exchange energy (J)")
+	//DeclROnly("E_exch", &E_exch, "Exchange energy (J)")
 	DeclFunc("sign", sign, "Signum function")
 
 	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")

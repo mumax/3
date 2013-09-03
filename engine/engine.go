@@ -13,12 +13,12 @@ const VERSION = "mx3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 func init() {
-	Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
 	DeclROnly("B_eff", &B_eff, `Effective field (T)`)
-	DeclROnly("table", &Table, `Provides methods for tabular output`)
+	//DeclROnly("table", &Table, `Provides methods for tabular output`)
 
 }
 
@@ -27,7 +27,7 @@ var (
 	M_full setterQuant   // non-reduced magnetization in T
 	B_eff  setterQuant   // effective field (T) output handle
 	Torque setterQuant   // total torque/γ0, in T
-	Table  DataTable
+	//Table  DataTable
 )
 
 var (
@@ -50,7 +50,7 @@ func initialize() {
 
 	regions.init()
 
-	Table.Add(&M)
+	//Table.Add(&M)
 
 	initDemag()
 	initExchange()
@@ -60,9 +60,9 @@ func initialize() {
 	// effective field
 	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
 		B_demag.set(dst, cansave)
-		B_exch.addTo(dst, cansave)
-		B_anis.addTo(dst, cansave)
-		B_ext.addTo(dst) // TODO: cansave
+		B_exch.addTo(dst)
+		B_anis.addTo(dst)
+		B_ext.addTo(dst)
 	})
 
 	// torque terms
@@ -70,19 +70,19 @@ func initialize() {
 	initSTTorque()
 	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
 		LLTorque.set(b, cansave)
-		STTorque.addTo(b, cansave)
+		STTorque.addTo(b)
 	})
 
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {
-		if cansave {
-			notifySave(&M, cansave) // saves m if needed
-			notifySave(&FFTM, cansave)
-		}
+		//if cansave {
+		//	notifySave(&M) // saves m if needed
+		//	notifySave(&FFTM)
+		//}
 
 		Torque.set(torquebuffer, cansave)
 
-		Table.touch(cansave) // all needed quantities are now up-to-date, save them
+		//Table.touch(cansave) // all needed quantities are now up-to-date, save them
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
@@ -159,5 +159,6 @@ func checkM() {
 func Close() {
 	log.Println("shutting down")
 	drainOutput()
-	Table.flush()
+	log.Println("TODO: FLUSH TABLE")
+	//Table.flush()
 }

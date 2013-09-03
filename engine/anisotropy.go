@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	Ku1     ScalarParam // Uniaxial anisotropy strength (J/m³)
-	Kc1     ScalarParam // Cubic anisotropy strength (J/m³)
-	B_anis  adderQuant  // field due to uniaxial anisotropy (T)
-	E_anis  = NewGetScalar("E_anis", "J", getAnisotropyEnergy)
+	Ku1    ScalarParam // Uniaxial anisotropy strength (J/m³)
+	Kc1    ScalarParam // Cubic anisotropy strength (J/m³)
+	B_anis adderQuant  // field due to uniaxial anisotropy (T)
+	//E_anis  = NewGetScalar("E_anis", "J", getAnisotropyEnergy)
 	AnisU   = vectorParam("anisU", "", nil)
 	AnisC1  = vectorParam("anisC1", "", nil)
 	AnisC2  = vectorParam("anisC2", "", nil)
@@ -30,7 +30,7 @@ func init() {
 	DeclLValue("Ku1", &Ku1, "Uniaxial anisotropy constant (J/m³)")
 	DeclLValue("Kc1", &Kc1, "Cubic anisotropy constant (J/m³)")
 	DeclROnly("B_anis", &B_anis, "Anisotropy field (T)")
-	DeclROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
+	//DeclROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
 }
 
 func initAnisotropy() {

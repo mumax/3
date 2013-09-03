@@ -13,7 +13,7 @@ import (
 type excitation struct {
 	v          VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
-	autosave
+	info
 }
 
 type mulmask struct {
@@ -23,7 +23,7 @@ type mulmask struct {
 
 func (e *excitation) init(m *data.Mesh, name, unit string) {
 	e.v = vectorParam(name+"_param", unit, nil)
-	e.autosave = newAutosave(3, name, unit, m)
+	e.info = info{3, name, unit, m}
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
@@ -46,9 +46,9 @@ func (e *excitation) GetGPU() (*data.Slice, bool) {
 	return buf, true
 }
 
-func (e *excitation) Get() (q *data.Slice, recycle bool) {
-	return e.GetGPU()
-}
+//func (e *excitation) Get() (q *data.Slice, recycle bool) {
+//	return e.GetGPU()
+//}
 
 // Add an extra maks*multiplier term to the excitation.
 func (e *excitation) Add(mask *data.Slice, mul func() float64) {
@@ -70,5 +70,6 @@ func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
-func (p *excitation) Save()                   { save(p) }
-func (p *excitation) SaveAs(fname string)     { saveAs(p, fname) }
+
+//func (p *excitation) Save()                   { save(p) }
+//func (p *excitation) SaveAs(fname string)     { saveAs(p, fname) }

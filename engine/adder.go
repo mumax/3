@@ -3,33 +3,18 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 )
 
 // quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field contributions)
 type adderQuant struct {
-	autosave
-	addFn func(dst *data.Slice) // calculates quantity and add result to dst
+	addTo func(dst *data.Slice) // calculates quantity and add result to dst
+	info
 }
 
 // constructor
 func adder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Slice)) adderQuant {
-	return adderQuant{newAutosave(nComp, name, unit, m), addFunc}
-}
-
-// Calls the addFunc to add the quantity to Dst. If output is needed,
-// it is first added to a separate buffer, saved, and then added to Dst.
-func (a *adderQuant) addTo(dst *data.Slice, cansave bool) {
-	if cansave && a.needSave() {
-		buf, recycle := a.GetGPU()
-		util.Assert(recycle == true)
-		cuda.Madd2(dst, dst, buf, 1, 1)
-		goSaveAndRecycle(a.autoFname(), buf, Time)
-		a.saved()
-	} else {
-		a.addFn(dst)
-	}
+	return adderQuant{addFunc, info{nComp, name, unit, m}}
 }
 
 // Calcuates and returns the quantity. recycle is true:
@@ -37,10 +22,11 @@ func (a *adderQuant) addTo(dst *data.Slice, cansave bool) {
 func (a *adderQuant) GetGPU() (q *data.Slice, recycle bool) {
 	buf := cuda.GetBuffer(a.NComp(), a.Mesh())
 	cuda.Zero(buf)
-	a.addFn(buf)
+	a.addTo(buf)
 	return buf, true
 }
 
 func (a *adderQuant) Get() (q *data.Slice, recycle bool) { return a.GetGPU() }
-func (p *adderQuant) Save()                              { save(p) }
-func (p *adderQuant) SaveAs(fname string)                { saveAs(p, fname) }
+
+//func (p *adderQuant) Save()                              { save(p) }
+//func (p *adderQuant) SaveAs(fname string)                { saveAs(p, fname) }

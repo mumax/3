@@ -75,6 +75,7 @@ func step() {
 	for _, f := range postStep {
 		f()
 	}
+	DoOutput()
 }
 
 // Register function f to be called after every time step.

@@ -7,6 +7,12 @@ var (
 	autonum = make(map[AutoSaver]int)       // auto number for out file
 )
 
+func init() {
+	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
+	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
+	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
+}
+
 // Anything that can be autosaved
 type AutoSaver interface {
 	Getter

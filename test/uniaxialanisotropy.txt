@@ -18,9 +18,9 @@
 	defregion(3, rect(100e-9, 20e-9))
 	
 	// Test output
-	Ku1.save()
-	AnisU.save()
-	B_anis.save()
+	save(Ku1)
+	save(AnisU)
+	save(B_anis)
 	
  	// Easy, in-plane
 	AnisU = vector(1, 0, 0)

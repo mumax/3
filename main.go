@@ -3,7 +3,7 @@ package main
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/engine"
-	_ "code.google.com/p/mx3/ext"
+	//_ "code.google.com/p/mx3/ext"
 	"code.google.com/p/mx3/prof"
 	"code.google.com/p/mx3/util"
 	"flag"
@@ -70,7 +70,7 @@ func main() {
 	defer func() {
 		err := recover()
 		if err != nil {
-			engine.M.SaveAs("m_crash.dump")
+			engine.SaveAs(&engine.M, "m_crash.dump")
 			log.Panic(err)
 		}
 	}()

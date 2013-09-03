@@ -3,25 +3,22 @@
 	In this simulation, the DMI interaction converts a Bloch wall to a Néel wall.
 */
 
-	SetGridSize(128, 128, 1)
-	SetCellSize(250e-9/128, 250e-9/128, 0.6e-9)
+SetGridSize(128, 128, 1)
+SetCellSize(250e-9/128, 250e-9/128, 0.6e-9)
 
-	Msat  = 1100e3
-	Aex   = 16e-12
-	alpha = 3
-	AnisU = vector(0, 0, 1)
-	Ku1   = 1.27E6
-	Dex   = 0.1e-3               // J/m2.
+Msat  = 1100e3
+Aex   = 16e-12
+alpha = 3
+AnisU = vector(0, 0, 1)
+Ku1   = 1.27E6
+Dex   = 0.1e-3               // J/m2.
 
-	m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
-	m.save() // initial magnetization
+m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
 
-	m.autosave(1000e-12)
+MaxErr = 1e-4
+Maxdt = 5e-13
+Run(5e-9)
 
-	MaxErr = 1e-4
-	Maxdt = 5e-13
-	Run(5e-9)
-
-	expect("mx", Average(m)[0], 0.059, 0.01)
-	expect("mx", Average(m)[1], 0.035, 0.01)
+expect("mx", Average(m)[0], 0.059, 0.01)
+expect("mx", Average(m)[1], 0.035, 0.01)
 

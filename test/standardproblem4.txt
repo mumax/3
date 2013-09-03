@@ -21,13 +21,9 @@
 	expect("mz", m_[2], 0,       1e-3)
 
 // reversal
-	table.autosave(20e-12)
 	alpha = 0.02
 
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
-	B_ext.save()
-	B_eff.save()
-	m.save()
 	run(1e-9)
 	m_ = average(m)
 	expect("mx", m_[0],-0.9845, 1e-3)

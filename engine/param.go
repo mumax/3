@@ -103,17 +103,13 @@ func checkRegion(region int) {
 	}
 }
 
-func (p *param) GetGPU() (*data.Slice, bool) {
+func (p *param) Get() (*data.Slice, bool) {
 	p.upload()
 	b := cuda.GetBuffer(p.NComp(), p.Mesh())
 	for c := 0; c < p.NComp(); c++ {
 		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(p.gpu[c]), regions.Gpu())
 	}
 	return b, true
-}
-
-func (p *param) Get() (*data.Slice, bool) {
-	return p.GetGPU()
 }
 
 // Get a GPU mirror of the look-up table.
@@ -139,6 +135,3 @@ func (p *param) upload() {
 	}
 	p.ok = true
 }
-
-//func (p *param) Save()               { save(p) }
-//func (p *param) SaveAs(fname string) { saveAs(p, fname) }

@@ -40,7 +40,7 @@ func initialize() {
 	FFTM.init()
 
 	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice) {
-		msat, r := Msat.GetGPU()
+		msat, r := Msat.Get()
 		util.Assert(r == true)
 		defer cuda.RecycleBuffer(msat)
 		for c := 0; c < 3; c++ {

@@ -39,20 +39,24 @@ func (e *excitation) IsZero() bool {
 	return e.v.zero && len(e.extraTerms) == 0
 }
 
-func (e *excitation) GetGPU() (*data.Slice, bool) {
+func (e *excitation) Get() (*data.Slice, bool) {
 	buf := cuda.GetBuffer(e.v.NComp(), e.v.Mesh())
 	cuda.Zero(buf)
 	e.addTo(buf)
 	return buf, true
 }
 
-//func (e *excitation) Get() (q *data.Slice, recycle bool) {
-//	return e.GetGPU()
-//}
-
 // Add an extra maks*multiplier term to the excitation.
 func (e *excitation) Add(mask *data.Slice, mul func() float64) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
+}
+
+func assureGPU(s *data.Slice) *data.Slice {
+	if s.GPUAccess() {
+		return s
+	} else {
+		return cuda.GPUCopy(s)
+	}
 }
 
 func (e *excitation) SetRegion(region int, value [3]float64) {
@@ -70,6 +74,3 @@ func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
-
-//func (p *excitation) Save()                   { save(p) }
-//func (p *excitation) SaveAs(fname string)     { saveAs(p, fname) }

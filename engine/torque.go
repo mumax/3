@@ -35,7 +35,7 @@ func initLLTorque() {
 func initSTTorque() {
 	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
 		if !JPol.IsZero() {
-			jspin, rec := JPol.GetGPU()
+			jspin, rec := JPol.Get()
 			if rec {
 				defer cuda.RecycleBuffer(jspin)
 			}
@@ -46,7 +46,7 @@ func initSTTorque() {
 
 // TODO: could implement maxnorm(torque) (getfunc)
 func GetMaxTorque() float64 {
-	torque, recycle := Torque.GetGPU()
+	torque, recycle := Torque.Get()
 	if recycle {
 		defer cuda.RecycleBuffer(torque)
 	}

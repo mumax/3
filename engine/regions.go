@@ -154,6 +154,3 @@ func resizeBytes(array []byte, size [3]int) [][][]byte {
 	}
 	return sliced
 }
-
-//func (p *Regions) Save() { save(p) }
-//func (p *Regions) SaveAs(fname string) { saveAs(p, fname) }

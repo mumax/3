@@ -43,9 +43,7 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 		region = universe
 	}
 
-	host := hostBuf(3, m.Mesh())
-	data.Copy(host, m.buffer)
-
+	host := m.buffer.HostCopy()
 	h := host.Vectors()
 	n := m.Mesh().Size()
 	c := m.Mesh().CellSize()
@@ -87,8 +85,7 @@ func (m *magnetization) stencilGeom() {
 	if geom == nil {
 		return
 	}
-	h := hostBuf(m.NComp(), m.Mesh())
-	data.Copy(h, m.buffer)
+	h := m.buffer.HostCopy()
 	stencil(h, regions.cpu)
 	data.Copy(m.buffer, h)
 }

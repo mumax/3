@@ -57,8 +57,5 @@ func (q *fftmPower) Get() (*data.Slice, bool) {
 	return power, false
 }
 
-//func (p *fftm) Save()               { save(p) }
-//func (p *fftm) SaveAs(fname string) { saveAs(p, fname) }
-
 func sqr(x float32) float32  { return x * x }
 func sqrt(x float32) float32 { return float32(math.Sqrt(float64(x))) }

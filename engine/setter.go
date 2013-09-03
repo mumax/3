@@ -17,16 +17,8 @@ func setter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.S
 }
 
 // get the quantity, recycle will be true (q needs to be recycled)
-func (b *setterQuant) GetGPU() (q *data.Slice, recycle bool) {
+func (b *setterQuant) Get() (q *data.Slice, recycle bool) {
 	buffer := cuda.GetBuffer(b.nComp, b.mesh)
 	b.set(buffer)
 	return buffer, true // must recycle
 }
-
-// get the quantity, recycle will be true, q will be on GPU
-func (b *setterQuant) Get() (*data.Slice, bool) {
-	return b.GetGPU()
-}
-
-//func (p *setterQuant) Save()               { save(p) }
-//func (p *setterQuant) SaveAs(fname string) { saveAs(p, fname) }

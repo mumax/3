@@ -8,8 +8,8 @@ import (
 // average in userspace XYZ order
 // does not yet take into account volume.
 // pass volume parameter, possibly nil?
-func Average(s GPU_Getter) []float64 {
-	b, recycle := s.GetGPU()
+func Average(s Getter) []float64 {
+	b, recycle := s.Get()
 	if recycle {
 		defer cuda.RecycleBuffer(b)
 	}

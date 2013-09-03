@@ -13,9 +13,13 @@ var (
 
 const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
 
+// Asynchronously save slice to file. Slice should be on CPU and
+// not be written after this call.
 func AsyncSave(fname string, s *data.Slice, time float64) {
 	initQue()
-	saveQue <- saveTask{fname, s, time}
+	S := *s
+	s.Disable() // avoid use after save
+	saveQue <- saveTask{fname, &S, time}
 }
 
 func initQue() {
@@ -28,7 +32,7 @@ func initQue() {
 // output task
 type saveTask struct {
 	fname  string
-	output *data.Slice // needs to be recylced
+	output *data.Slice
 	time   float64
 }
 
@@ -38,7 +42,6 @@ type saveTask struct {
 func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)
-		//hBuf <- t.output
 	}
 	done <- true
 }

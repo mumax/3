@@ -19,14 +19,9 @@ func adder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Sl
 
 // Calcuates and returns the quantity. recycle is true:
 // slice needs to be recycled.
-func (a *adderQuant) GetGPU() (q *data.Slice, recycle bool) {
+func (a *adderQuant) Get() (q *data.Slice, recycle bool) {
 	buf := cuda.GetBuffer(a.NComp(), a.Mesh())
 	cuda.Zero(buf)
 	a.addTo(buf)
 	return buf, true
 }
-
-func (a *adderQuant) Get() (q *data.Slice, recycle bool) { return a.GetGPU() }
-
-//func (p *adderQuant) Save()                              { save(p) }
-//func (p *adderQuant) SaveAs(fname string)                { saveAs(p, fname) }

@@ -34,4 +34,5 @@ func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
 
 func (p *ScalarParam) SetFunc(f func() float64) {
 	// TODO: time - dependent
+	panic("todo")
 }

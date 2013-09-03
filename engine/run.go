@@ -2,7 +2,6 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/util"
 	"log"
 )
 
@@ -56,7 +55,6 @@ func Paused() bool {
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
 	checkM() // TODO: move to failed solver step
-	defer util.DashExit()
 
 	pause = false
 	for condition() && !pause {

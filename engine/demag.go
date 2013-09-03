@@ -33,7 +33,7 @@ func init() {
 
 func initDemag() {
 	demag_ = cuda.NewDemag(Mesh())
-	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice, cansave bool) {
+	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice) {
 		if EnableDemag {
 			demag_.Exec(b, M.buffer, bsat.Gpu(), regions.Gpu())
 		} else {

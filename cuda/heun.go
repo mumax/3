@@ -9,12 +9,12 @@ import (
 // Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
-	y        *data.Slice            // the quantity to be time stepped
-	torqueFn func(bool) *data.Slice // updates dy
-	postStep func(*data.Slice)      // called on y after successful step, typically normalizes magnetization
+	y        *data.Slice        // the quantity to be time stepped
+	torqueFn func() *data.Slice // updates dy
+	postStep func(*data.Slice)  // called on y after successful step, typically normalizes magnetization
 }
 
-func NewHeun(y *data.Slice, torqueFn func(bool) *data.Slice, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn func() *data.Slice, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	return &Heun{newSolverCommon(dt, multiplier, time), y, torqueFn, postStep}
 }
@@ -29,7 +29,7 @@ func (e *Heun) Step() {
 
 	// stage 1
 	{
-		dy := e.torqueFn(true) // <- hook here for output, always good step output
+		dy := e.torqueFn()
 		e.NEval++
 		y := e.y
 		Madd2(y, y, dy, 1, dt) // y = y + dt * dy
@@ -39,7 +39,7 @@ func (e *Heun) Step() {
 	// stage 2
 	{
 		*e.time += e.Dt_si
-		dy := e.torqueFn(false)
+		dy := e.torqueFn()
 		e.NEval++
 
 		err := 0.0

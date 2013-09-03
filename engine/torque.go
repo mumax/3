@@ -25,8 +25,8 @@ var (
 )
 
 func initLLTorque() {
-	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice, cansave bool) {
-		B_eff.set(b, cansave)
+	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice) {
+		B_eff.set(b)
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
 	})
 	JPol.init(Mesh(), "JPol", "A/m2")

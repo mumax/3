@@ -39,7 +39,7 @@ func initialize() {
 	M.init()
 	FFTM.init()
 
-	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice, g bool) {
+	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice) {
 		msat, r := Msat.GetGPU()
 		util.Assert(r == true)
 		defer cuda.RecycleBuffer(msat)
@@ -58,8 +58,8 @@ func initialize() {
 	initBExt()
 
 	// effective field
-	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice, cansave bool) {
-		B_demag.set(dst, cansave)
+	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice) {
+		B_demag.set(dst)
 		B_exch.addTo(dst)
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
@@ -68,21 +68,14 @@ func initialize() {
 	// torque terms
 	initLLTorque()
 	initSTTorque()
-	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice, cansave bool) {
-		LLTorque.set(b, cansave)
+	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice) {
+		LLTorque.set(b)
 		STTorque.addTo(b)
 	})
 
 	torquebuffer := cuda.NewSlice(3, Mesh())
-	torqueFn := func(cansave bool) *data.Slice {
-		//if cansave {
-		//	notifySave(&M) // saves m if needed
-		//	notifySave(&FFTM)
-		//}
-
-		Torque.set(torquebuffer, cansave)
-
-		//Table.touch(cansave) // all needed quantities are now up-to-date, save them
+	torqueFn := func() *data.Slice {
+		Torque.set(torquebuffer)
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)

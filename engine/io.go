@@ -4,8 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"fmt"
-	"os"
 	"path"
 	"strings"
 )
@@ -57,19 +55,11 @@ func SaveAs(q Getter, fname string) {
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
-	if s, ok := q.(GPU_Getter); ok {
-		buffer, recylce := s.GetGPU()
-		if recylce {
-			defer cuda.RecycleBuffer(buffer)
-		}
-		goSaveCopy(fname, buffer, Time)
-	} else {
-		h, recycle := q.Get()
-		// if this assertion fails, it means q's Get() returns a GPU slice,
-		// yet, it does not implement GPU_Getter. So, add GetGPU() to that type!
-		util.Assert(recycle == false)
-		data.MustWriteFile(fname, h, Time) // not async, but only for stuff already on CPU. could be improved
+	buffer, recylce := q.Get()
+	if recylce {
+		defer cuda.RecycleBuffer(buffer)
 	}
+	AsyncSave(fname, assureCPU(buffer), Time)
 }
 
 func assureGPU(s *data.Slice) *data.Slice {
@@ -80,11 +70,10 @@ func assureGPU(s *data.Slice) *data.Slice {
 	}
 }
 
-// Append msg to file. Used to write aggregated output of many simulations in one file.
-func Fprintln(filename string, msg ...interface{}) {
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
-	util.FatalErr(err)
-	defer f.Close()
-	_, err = fmt.Fprintln(f, msg...)
-	util.FatalErr(err)
+func assureCPU(s *data.Slice) *data.Slice {
+	if s.CPUAccess() {
+		return s
+	} else {
+		return s.HostCopy()
+	}
 }

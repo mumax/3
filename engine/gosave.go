@@ -1,71 +1,35 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
 )
 
-// Save buffer (obtained by cuda.GetBuffer()) to file.
-// buffer is automatically recycled. Underlying implementation
-// is concurrent. buffer should not be used after this call.
-func goSaveAndRecycle(fname string, buffer *data.Slice, t float64) {
-	initQue()
-	dlQue <- dlTask{fname, buffer, t}
-}
-
-// Save a copy of output to file. Underlying implementation
-// is concurrent. Function returns as soon as output can be
-// safely modified.
-func goSaveCopy(fname string, output *data.Slice, t float64) {
-	cpy := cuda.GetBuffer(output.NComp(), output.Mesh())
-	data.Copy(cpy, output)
-	goSaveAndRecycle(fname, cpy, t)
-}
-
 var (
-	dlQue   chan dlTask       // passes download requests from goSave to runDownloader
 	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
 	done    = make(chan bool) // marks output server is completely done after closing dlQue
+	nOutBuf int               // number of output buffers actually in use (<= maxOutputQueLen)
 )
 
+const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
+
+func AsyncSave(fname string, s *data.Slice, time float64) {
+	initQue()
+	saveQue <- saveTask{fname, s, time}
+}
+
 func initQue() {
-	if dlQue == nil {
-		dlQue = make(chan dlTask)
+	if saveQue == nil {
 		saveQue = make(chan saveTask)
-		//hBuf = make(chan *data.Slice, maxOutputQueLen)
-		go runDownloader()
 		go runSaver()
 	}
 }
 
-// download task
-type dlTask struct {
+// output task
+type saveTask struct {
 	fname  string
 	output *data.Slice // needs to be recylced
 	time   float64
-}
-
-// save task
-type saveTask dlTask
-
-// At most this many outputs can be queued for asynchronous saving to disk.
-const maxOutputQueLen = 16
-
-var nOutBuf int // number of output buffers actually in use (<= maxOutputQueLen)
-
-// continuously takes download tasks and queues corresponding save tasks.
-// the downloader queue is not buffered and we want to use at most one GPU
-// output buffer. Only one PCIe download at a time can proceed anyway.
-func runDownloader() {
-	cuda.LockThread()
-
-	for t := range dlQue {
-		h := t.output.HostCopy()     // TODO: use hostBuf pool, page-locked, async copy
-		cuda.RecycleBuffer(t.output) // output comes from pool
-		saveQue <- saveTask{t.fname, h, t.time}
-	}
-	close(saveQue)
 }
 
 // continuously takes save tasks and flushes them to disk.
@@ -82,9 +46,9 @@ func runSaver() {
 // finalizer function called upon program exit.
 // waits until all asynchronous output has been saved.
 func drainOutput() {
-	if dlQue != nil {
+	if saveQue != nil {
 		log.Println("flushing output")
-		close(dlQue)
+		close(saveQue)
 		<-done
 	}
 }

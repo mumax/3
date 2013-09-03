@@ -4,8 +4,11 @@ package engine
 
 import (
 	"code.google.com/p/mx3/script"
+	"code.google.com/p/mx3/util"
+	"fmt"
 	"log"
 	"math"
+	"os"
 )
 
 var world = script.NewWorld()
@@ -65,4 +68,13 @@ func expect(msg string, have, want, maxError float64) {
 		log.Println(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
+}
+
+// Append msg to file. Used to write aggregated output of many simulations in one file.
+func Fprintln(filename string, msg ...interface{}) {
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+	util.FatalErr(err)
+	defer f.Close()
+	_, err = fmt.Fprintln(f, msg...)
+	util.FatalErr(err)
 }

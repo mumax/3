@@ -15,7 +15,7 @@ func init() {
 
 func mx3(file string) Job {
 	var job Job
-	job.Command = "/home/mumax/go/bin/mx3" // hack for our cluster
+	job.Command = "mx3"
 	job.Args = []string{`-f`, `-gpu=%GPU`, file}
 	return job
 }

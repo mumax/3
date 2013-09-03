@@ -16,13 +16,14 @@ var (
 	quants    = make(map[string]Getter)
 	params    = make(map[string]Param)
 	KeepAlive = func() time.Time { return time.Time{} } // overwritten by gui server
+	renderQ   = "m"                                     // quantity to display
 )
 
 type Param interface {
-	Name() string
 	NComp() int
 	Unit() string
 	GetVec() []float64
+	setRegion(int, ...float64)
 }
 
 type guidata struct {

@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-var renderQ string = "m" // TODO: select
-
 // Render image of quantity.
 // Accepts url: /render/name and /render/name/component
 func serveRender(w http.ResponseWriter, r *http.Request) {

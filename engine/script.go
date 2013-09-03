@@ -14,7 +14,7 @@ func init() {
 	DeclFunc("vector", Vector, "Constructs a vector with given components")
 	DeclFunc("average", Average, "Average of space-dependent quantity")
 	DeclConst("mu0", Mu0, "Permittivity of vaccum (Tm/A)")
-	DeclFunc("expect", expect, "Used internally for automated tests: checks if a value is close enough to the expected value")
+	DeclFunc("expect", expect, "Used for automated tests: checks if a value is close enough to the expected value")
 	DeclFunc("fprintln", Fprintln, "Print to file")
 }
 

@@ -81,10 +81,10 @@ const templText = `
 		</td><td>
 
 		<table>
-			<tr> <td>step:    </td><td>{{.Span   "step"}}     </td><td>time:  </td><td>{{.Span "time"}}s             </td></tr>
-			<tr> <td>dt:      </td><td>{{.Span   "dt"}}s      </td><td>fixdt: </td><td>{{.NumBox "fixdt" 0}}         </td></tr>
-			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s </td><td>maxdt: </td><td>{{.NumBox "maxdt" 0}}s        </td></tr>
-			<tr> <td>err/step:</td><td>{{.Span   "lasterr"}}  </td><td>maxerr:</td><td>{{.NumBox "maxerr" 1e-5}}/step</td></tr>
+			<tr> <td>step:    </td><td>{{.Span   "step"}}     </td><td>time:  </td><td>{{.Span "time"}}s          </td></tr>
+			<tr> <td>dt:      </td><td>{{.Span   "dt"}}s      </td><td>fixdt: </td><td>{{.NumBox "fixdt"  0}}s    </td></tr>
+			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s </td><td>maxdt: </td><td>{{.NumBox "maxdt"  0}}s    </td></tr>
+			<tr> <td>err/step:</td><td>{{.Span   "lasterr"}}  </td><td>maxerr:</td><td>{{.NumBox "maxerr" 0}}/step</td></tr>
 		</table>
 
 			</td></tr>
@@ -98,15 +98,25 @@ const templText = `
 			{{range $k,$v := .Data.Quants}} {{$.Option $k}} {{end}}
 		{{.EndSelect}}
 		<br/>
-		{{.Img "render" "/render"}}
+		{{.Img "render" "/render/m"}}
 
 	</div><hr/>
-
 
 
 	<h2> parameters </h2><div>
 
 	<table>
+
+	<tr> <td> <b>Region </b> </td>
+	<td>{{.BeginSelect "sel_region"}}
+		<option value=-1> all        </option>
+		<option value= 0> 0 (vacuum) </option>
+		<option value= 1> 1 (default)</option>
+		{{range .Data.MakeRange 2 256}}
+		<option value= {{.}}> {{.}}</option>
+		{{end}}
+	{{.EndSelect}}</td></tr>
+
 	{{range $k,$v := .Data.Params}}
 		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.NumBox . 0}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
 	{{end}}

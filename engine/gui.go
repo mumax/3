@@ -41,6 +41,14 @@ func (d *guidata) CompBoxIds(param string) []string {
 	return e
 }
 
+func (d *guidata) MakeRange(min, max int) []int {
+	l := make([]int, max-min)
+	for i := range l {
+		l[i] = min + i
+	}
+	return l
+}
+
 // Start web gui on given port, blocks.
 func Serve(port string) {
 	log.Println("gui waiting for engine init")
@@ -81,6 +89,8 @@ func Serve(port string) {
 	gui.SetValue("sel_render", renderQ)
 
 	// parameters
+	gui.SetValue("sel_region", -1) // all regions
+
 	for n, p := range params {
 		n := n // closure caveats...
 		p := p

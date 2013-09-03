@@ -55,8 +55,7 @@ func Paused() bool {
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
-	//sanityCheck()
-	checkM()
+	checkM() // TODO: move to failed solver step
 	defer util.DashExit()
 
 	pause = false
@@ -76,8 +75,6 @@ func step() {
 	for _, f := range postStep {
 		f()
 	}
-	s := Solver
-	util.Dashf("step: % 8d (%6d) t: % 12es Δt: % 12es ε:% 12e", s.NSteps, s.NUndone, Time, s.Dt_si, s.LastErr)
 }
 
 // Register function f to be called after every time step.

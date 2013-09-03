@@ -1,4 +1,3 @@
-// Package engine implements a high-level API. Most of the API is available through the script syntax as well.
 package engine
 
 import (
@@ -77,10 +76,8 @@ func initialize() {
 	torquebuffer := cuda.NewSlice(3, Mesh())
 	torqueFn := func(cansave bool) *data.Slice {
 		if cansave {
-			//Table.arm(cansave)      // if table output needed, quantities marked for update
 			notifySave(&M, cansave) // saves m if needed
 			notifySave(&FFTM, cansave)
-			// TODO: use list
 		}
 
 		Torque.set(torquebuffer, cansave)
@@ -116,9 +113,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
-
 	log.Println("set mesh:", Mesh().UserString())
-
 	initialize()
 }
 
@@ -145,7 +140,7 @@ func setCellSize(cx, cy, cz float64) {
 // check if mesh is set
 func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
-		panic("need to set mesh first") //todo: fatal
+		log.Fatal("need to set mesh first")
 	}
 }
 

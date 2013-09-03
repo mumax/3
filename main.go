@@ -29,10 +29,6 @@ var (
 	flag_blockY   = flag.Int("by", 32, "CUDA 2D thread block size Y")
 )
 
-func init() {
-	flag.BoolVar(&util.DashEnable, "p", false, "show progress in terminal")
-}
-
 func main() {
 	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
 

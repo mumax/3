@@ -18,8 +18,16 @@ func (d *interfaceData) value() interface{} {
 	return d.v
 }
 
-type intData struct {
-	interfaceData
+type boolData struct{ v bool }
+type intData struct{ v int }
+type floatData struct{ v float64 }
+
+func (d *boolData) value() interface{}  { return d.v }
+func (d *intData) value() interface{}   { return d.v }
+func (d *floatData) value() interface{} { return d.v }
+
+func (d *boolData) setValue(v interface{}) {
+	d.v = v.(bool)
 }
 
 func (d *intData) setValue(v interface{}) {
@@ -36,10 +44,6 @@ func (d *intData) setValue(v interface{}) {
 	}
 }
 
-type floatData struct {
-	interfaceData
-}
-
 func (d *floatData) setValue(v interface{}) {
 	switch v := v.(type) {
 	case float64:
@@ -52,12 +56,4 @@ func (d *floatData) setValue(v interface{}) {
 			log.Println(err)
 		}
 	}
-}
-
-type boolData struct {
-	interfaceData
-}
-
-func (d *boolData) setValue(v interface{}) {
-	d.v = v.(bool)
 }

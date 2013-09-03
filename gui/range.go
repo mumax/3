@@ -7,7 +7,7 @@ import (
 func (t *Templ) Range(id string, min, max, value int) string {
 	d := (*Doc)(t)
 	el := d.addElem(id)
-	el.data = &intData{interfaceData{nil}}
+	el.data = &intData{value}
 	el.setValue(value)
 	el.update = func(id string) jsCall {
 		return jsCall{F: "setAttr", Args: []interface{}{id, "value", el.value().(int)}}

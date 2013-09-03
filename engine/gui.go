@@ -50,7 +50,6 @@ func Serve(port string) {
 	data := &guidata{Quants: quants, Params: params}
 	gui := gui.NewDoc(templText, data)
 	KeepAlive = gui.KeepAlive
-
 	http.Handle("/", gui)
 	http.HandleFunc("/render/", serveRender)
 
@@ -65,11 +64,12 @@ func Serve(port string) {
 	gui.SetValue("wx", float64(size[2])*cellSize[2]*1e9)
 	gui.SetValue("wy", float64(size[1])*cellSize[1]*1e9)
 	gui.SetValue("wz", float64(size[0])*cellSize[0]*1e9)
-	gui.SetValue("sel_render", renderQ)
 
+	gui.SetValue("sel_render", renderQ)
 	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 	hostname, _ := os.Hostname()
 	gui.SetValue("hostname", hostname)
+
 	gui.OnEvent("break", Pause)
 	gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
 	gui.OnEvent("steps", inj(func() { Steps(gui.Value("runsteps").(int)) }))

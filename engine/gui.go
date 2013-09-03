@@ -23,7 +23,7 @@ type Param interface {
 	NComp() int
 	Unit() string
 	GetVec() []float64
-	setRegion(int, ...float64)
+	setUniform(...float64)
 }
 
 type guidata struct {
@@ -81,6 +81,24 @@ func Serve(port string) {
 	gui.SetValue("sel_render", renderQ)
 
 	// parameters
+	for n, p := range params {
+		n := n // closure caveats...
+		p := p
+
+		compIds := ((*guidata)(nil)).CompBoxIds(n)
+		handler := func() {
+			v := make([]float64, len(compIds))
+			for comp, id := range compIds {
+				v[comp] = gui.Value(id).(float64)
+			}
+			Inject <- func() { p.setUniform(v...) }
+		}
+
+		for _, id := range compIds {
+			gui.OnEvent(id, handler)
+		}
+
+	}
 
 	// process
 	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))

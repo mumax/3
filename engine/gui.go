@@ -50,9 +50,11 @@ func Serve(port string) {
 	data := &guidata{Quants: quants, Params: params}
 	gui := gui.NewDoc(templText, data)
 	KeepAlive = gui.KeepAlive
+
 	http.Handle("/", gui)
 	http.HandleFunc("/render/", serveRender)
 
+	// geometry
 	size := Mesh().Size()
 	gui.SetValue("nx", size[2])
 	gui.SetValue("ny", size[1])
@@ -65,11 +67,7 @@ func Serve(port string) {
 	gui.SetValue("wy", float64(size[1])*cellSize[1]*1e9)
 	gui.SetValue("wz", float64(size[0])*cellSize[0]*1e9)
 
-	gui.SetValue("sel_render", renderQ)
-	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
-	hostname, _ := os.Hostname()
-	gui.SetValue("hostname", hostname)
-
+	// solver
 	gui.OnEvent("break", Pause)
 	gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
 	gui.OnEvent("steps", inj(func() { Steps(gui.Value("runsteps").(int)) }))
@@ -79,28 +77,45 @@ func Serve(port string) {
 	gui.OnEvent("maxerr", inj(func() { Solver.MaxErr = gui.Value("maxerr").(float64) }))
 	gui.OnEvent("sel_render", func() { renderQ = gui.Value("sel_render").(string) })
 
+	// display
+	gui.SetValue("sel_render", renderQ)
+
+	// parameters
+
+	// process
+	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
+	hostname, _ := os.Hostname()
+	gui.SetValue("hostname", hostname)
+
 	// periodically update time, steps, etc
 	gui.OnRefresh(func() {
 		Inject <- func() {
+			// solver
 			gui.SetValue("time", fmt.Sprintf("%6e", Time))
 			gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 			gui.SetValue("step", Solver.NSteps)
 			gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
+			if pause {
+				gui.SetValue("solverstatus", "paused")
+			} else {
+				gui.SetValue("solverstatus", "running")
+			}
+
+			// display
+			// todo: use time step as cachebreaker
 			cachebreaker := "?" + fmt.Sprint(time.Now().Nanosecond())
 			gui.SetValue("render", "/render/"+renderQ+cachebreaker)
-			gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
-			p := "running"
-			if pause {
-				p = "paused"
-			}
-			gui.SetValue("solverstatus", p)
 
+			// parameters
 			for n, p := range params {
 				v := p.GetVec()
 				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
 					gui.SetValue(id, v[comp])
 				}
 			}
+
+			// process
+			gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
 		}
 	})
 

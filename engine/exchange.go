@@ -17,13 +17,13 @@ func init() {
 	Aex = scalarParam("Aex", "J/m", func(r int) {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
-	World.LValue("Aex", &Aex, "Exchange stiffness (J/m)")
-	World.Func("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
-	World.ROnly("B_exch", &B_exch, "Exchange field (T)")
-	World.ROnly("E_exch", &E_exch, "Exchange energy (J)")
-	World.Func("sign", sign)
+	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
+	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
+	DeclROnly("B_exch", &B_exch, "Exchange field (T)")
+	DeclROnly("E_exch", &E_exch, "Exchange energy (J)")
+	DeclFunc("sign", sign, "Signum function")
 
-	World.LValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
+	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
 }
 
 func initExchange() {

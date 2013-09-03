@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	engine.World.ROnly("ext_CorePos", &CorePos, "Vortex core position")
+	engine.DeclROnly("ext_CorePos", &CorePos, "Vortex core position")
 }
 
 var CorePos = engine.NewGetVector("corepos", "m", corePos)

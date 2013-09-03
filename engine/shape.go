@@ -6,15 +6,15 @@ import (
 )
 
 func init() {
-	World.Func("Ellipsoid", Ellipsoid, "Ellipsoid with axes in meter")
-	World.Func("Cylinder", Cylinder, "Ellipitic cylinder with axes in meter")
-	World.Func("Cuboid", Cuboid, "Cuboid with sides in meter")
-	World.Func("Rect", Rect, "Infinitely high rectangle with size in meter")
-	World.Func("XRange", XRange, "Part of space between x1 and x2, in meter")
-	World.Func("YRange", YRange, "Part of space between y1 and y2, in meter")
-	World.Func("ZRange", ZRange, "Part of space between z1 and z2, in meter")
-	World.Func("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
-	World.Func("Cell", Cell, "Single cell with given integer index (i, j, k)")
+	DeclFunc("Ellipsoid", Ellipsoid, "Ellipsoid with axes in meter")
+	DeclFunc("Cylinder", Cylinder, "Ellipitic cylinder with axes in meter")
+	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
+	DeclFunc("Rect", Rect, "Infinitely high rectangle with size in meter")
+	DeclFunc("XRange", XRange, "Part of space between x1 and x2, in meter")
+	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
+	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
+	DeclFunc("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
+	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 }
 
 // geometrical shape for setting sample geometry

@@ -24,13 +24,13 @@ func init() {
 	Kc1 = scalarParam("Kc1", "J/m3", func(region int) {
 		kc1_red.setRegion(region, safediv(Kc1.GetRegion(region), Msat.GetRegion(region)))
 	})
-	World.LValue("AnisU", &AnisU, "Uniaxial anisotropy direction")
-	World.LValue("AnisC1", &AnisC1, "Cubic anisotropy direction #1")
-	World.LValue("AnisC2", &AnisC2, "Cubic anisotorpy directon #2")
-	World.LValue("Ku1", &Ku1, "Uniaxial anisotropy constant (J/m³)")
-	World.LValue("Kc1", &Kc1, "Cubic anisotropy constant (J/m³)")
-	World.ROnly("B_anis", &B_anis, "Anisotropy field (T)")
-	World.ROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
+	DeclLValue("AnisU", &AnisU, "Uniaxial anisotropy direction")
+	DeclLValue("AnisC1", &AnisC1, "Cubic anisotropy direction #1")
+	DeclLValue("AnisC2", &AnisC2, "Cubic anisotorpy directon #2")
+	DeclLValue("Ku1", &Ku1, "Uniaxial anisotropy constant (J/m³)")
+	DeclLValue("Kc1", &Kc1, "Cubic anisotropy constant (J/m³)")
+	DeclROnly("B_anis", &B_anis, "Anisotropy field (T)")
+	DeclROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
 }
 
 func initAnisotropy() {

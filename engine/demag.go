@@ -24,11 +24,11 @@ func init() {
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
 
-	World.Var("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
-	World.ROnly("mFFT", &FFTM, "Fourier-transformed magnetization")
-	World.ROnly("B_demag", &B_demag, "Magnetostatic field (T)")
-	World.LValue("Msat", &Msat, "Saturation magnetization (A/m)")
-	World.ROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
+	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
+	DeclROnly("mFFT", &FFTM, "Fourier-transformed magnetization")
+	DeclROnly("B_demag", &B_demag, "Magnetostatic field (T)")
+	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
+	DeclROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
 }
 
 func initDemag() {

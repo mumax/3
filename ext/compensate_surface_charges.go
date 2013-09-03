@@ -2,14 +2,14 @@ package ext
 
 import (
 	"code.google.com/p/mx3/data"
-	. "code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/util"
 	"log"
 	"math"
 )
 
 func init() {
-	World.Func("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: mx on left and right side, resp.")
+	engine.DeclFunc("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: mx on left and right side, resp.")
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and
@@ -19,7 +19,7 @@ func init() {
 func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight), func() float64 { return bSat() })
+	engine.B_ext.Add(compensateLRSurfaceCharges(engine.Mesh(), mxLeft, mxRight), func() float64 { return bSat() })
 }
 
 func constVec(x, y, z float64) func() [3]float64 {
@@ -29,7 +29,7 @@ func constVec(x, y, z float64) func() [3]float64 {
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
 func bSat() float64 {
-	return Mu0 * Msat.GetUniform()
+	return engine.Mu0 * engine.Msat.GetUniform()
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {

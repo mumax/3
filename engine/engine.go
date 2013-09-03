@@ -15,11 +15,11 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 
 func init() {
 	Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
-	World.Func("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
-	World.Func("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
-	World.LValue("m", &M, `Reduced magnetization (unit length)`)
-	World.ROnly("B_eff", &B_eff, `Effective field (T)`)
-	World.ROnly("table", &Table, `Provides methods for tabular output`)
+	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
+	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
+	DeclROnly("B_eff", &B_eff, `Effective field (T)`)
+	DeclROnly("table", &Table, `Provides methods for tabular output`)
 
 }
 

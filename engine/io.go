@@ -10,10 +10,6 @@ import (
 	"strings"
 )
 
-func init() {
-	World.Func("fprintln", Fprintln)
-}
-
 // TODO: only use getter, check if slice is on GPU?
 type GPU_Getter interface {
 	GetGPU() (q *data.Slice, recycle bool) // get quantity data (GPU), indicate need to recycle

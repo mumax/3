@@ -13,43 +13,10 @@ import (
 )
 
 var (
-	quants = map[string]Getter{
-		"m":        &M,
-		"mFFT":     &fftmPower{},
-		"regions":  &regions,
-		"Msat":     &Msat,
-		"Aex":      &Aex,
-		"alpha":    &Alpha,
-		"jpol":     &JPol,
-		"Ku1":      &Ku1,
-		"Kc1":      &Kc1,
-		"anisU":    &AnisU,
-		"anisC1":   &AnisC1,
-		"anisC2":   &AnisC2,
-		"B_eff":    &B_eff,
-		"B_ext":    &B_ext,
-		"B_exch":   &B_exch,
-		"B_anis":   &B_anis,
-		"B_demag":  &B_demag,
-		"torque":   &Torque,
-		"lltorque": &LLTorque,
-		"sttorque": &STTorque}
-
-	params = map[string]Param{
-		"Ku1":    &Ku1,
-		"Kc1":    &Kc1,
-		"anisU":  &AnisU,
-		"anisC1": &AnisC1,
-		"anisC2": &AnisC2,
-		"Msat":   &Msat,
-		"Aex":    &Aex,
-		"alpha":  &Alpha,
-		"jpol":   &JPol,
-		"B_ext":  &B_ext}
+	quants    = make(map[string]Getter)
+	params    = make(map[string]Param)
+	KeepAlive = func() time.Time { return time.Time{} } // overwritten by gui server
 )
-
-// overwritten once gui server is in place
-var KeepAlive = func() time.Time { return time.Time{} }
 
 type Param interface {
 	Name() string

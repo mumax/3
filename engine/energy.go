@@ -14,7 +14,7 @@ var (
 )
 
 func init() {
-	World.ROnly("E_total", &E_total, "Total energy (J)")
+	DeclROnly("E_total", &E_total, "Total energy (J)")
 }
 
 // add energy term to global energy

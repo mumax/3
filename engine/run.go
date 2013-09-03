@@ -7,18 +7,18 @@ import (
 )
 
 func init() {
-	World.Func("Run", Run, "Run the simulation for a time in seconds")
-	World.Func("Steps", Steps, "Run the simulation for a number of time steps")
-	World.Func("Pause", Pause, "Pause the simulation, waits for web GUI input.")
-	World.Func("PostStep", PostStep, "Set up a function to be executed after every time step")
-	World.Func("RunWhile", RunWhile)
-	World.ROnly("t", &Time, "Total simulated time (s)")
-	World.ROnly("Dt", &Solver.Dt_si, "Last solver time step (s)")
-	World.Var("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
-	World.Var("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
-	World.Var("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
-	World.Var("Headroom", &Solver.Headroom, "Solver headroom")
-	World.Var("FixDt", &Solver.FixDt, "Enable/disable fixed time step (default: false)")
+	DeclFunc("Run", Run, "Run the simulation for a time in seconds")
+	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
+	DeclFunc("Pause", Pause, "Pause the simulation, waits for web GUI input.")
+	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
+	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
+	DeclROnly("t", &Time, "Total simulated time (s)")
+	DeclROnly("Dt", &Solver.Dt_si, "Last solver time step (s)")
+	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
+	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
+	DeclVar("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
+	DeclVar("Headroom", &Solver.Headroom, "Solver headroom")
+	DeclVar("FixDt", &Solver.FixDt, "Enable/disable fixed time step (default: false)")
 }
 
 var (

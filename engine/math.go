@@ -21,3 +21,8 @@ func Average(s GPU_Getter) []float64 {
 	}
 	return avg
 }
+
+// Constructs a vector
+func Vector(x, y, z float64) [3]float64 {
+	return [3]float64{x, y, z}
+}

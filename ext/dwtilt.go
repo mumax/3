@@ -1,23 +1,23 @@
 package ext
 
 import (
-	. "code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/engine"
 	"math"
 )
 
 func init() {
-	World.ROnly("ext_DWTilt", &DWTiltPMA)
+	engine.DeclROnly("ext_DWTilt", &DWTiltPMA, "PMA domain wall tilt (rad)")
 }
 
 // PMA domain wall tilt assuming straight wall.
-var DWTiltPMA = NewGetScalar("dwtilt", "rad", dwTiltPMA)
+var DWTiltPMA = engine.NewGetScalar("dwtilt", "rad", dwTiltPMA)
 
 func dwTiltPMA() float64 {
-	m := Download(&M)
+	m := engine.Download(&engine.M)
 	mz := m.Vectors()[0][0]
 
-	nx := Mesh().Size()[2]
-	ny := Mesh().Size()[1]
+	nx := engine.Mesh().Size()[2]
+	ny := engine.Mesh().Size()[1]
 	// find domain wall at these y positions:
 	y1 := 4
 	y2 := ny - 5

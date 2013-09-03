@@ -1,22 +1,23 @@
 package ext
 
 import (
-	. "code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/engine"
 	"fmt"
 )
 
 func init() {
-	World.Func("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
-	World.Func("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
-	World.ROnly("ext_dwspeed", &DWSpeed, "Speed of the simulation window while following a domain wall")
-	World.ROnly("ext_dwpos", &DWPos, "Position of the simulation window while following a domain wall")
+	engine.DeclFunc("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
+	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
+	engine.DeclROnly("ext_dwspeed", &DWSpeed, "Speed of the simulation window while following a domain wall")
+	engine.DeclROnly("ext_dwpos", &DWPos, "Position of the simulation window while following a domain wall")
 }
 
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:
 // 	PostStep(CenterPMAWall)
 func CenterPMAWall() {
-	mz := Average(&M)[2]           // TODO: optimize
+	M := &engine.M
+	mz := engine.Average(M)[2]     // TODO: optimize
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
@@ -36,7 +37,8 @@ func CenterPMAWall() {
 // between left-right (or right-left) domains (like in soft thin films). E.g.:
 // 	PostStep(CenterInplaneWall)
 func CenterInplaneWall() {
-	mz := Average(&M)[0]           // TODO: optimize
+	M := &engine.M
+	mz := engine.Average(M)[0]     // TODO: optimize
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
@@ -64,11 +66,11 @@ func wall_left_magnetization(x float64) int {
 
 var (
 	totalShift float64 // accumulated window shift (X) in meter
-	DWPos      = NewGetScalar("dwpos", "m", getShiftPos)
+	DWPos      = engine.NewGetScalar("dwpos", "m", getShiftPos)
 )
 
 func updateShift(dir, sign int) {
-	totalShift -= float64(sign) * Mesh().CellSize()[dir] // window left means wall right: minus sign
+	totalShift -= float64(sign) * engine.Mesh().CellSize()[dir] // window left means wall right: minus sign
 }
 
 func getShiftPos() float64 {
@@ -80,18 +82,18 @@ var (
 	lastShift float64 // shift the last time we queried speed
 	lastT     float64 // time the last time we queried speed
 	lastV     float64 // speed the last time we queried speed
-	DWSpeed   = NewGetScalar("dwspeed", "m/s", getShiftSpeed)
+	DWSpeed   = engine.NewGetScalar("dwspeed", "m/s", getShiftSpeed)
 )
 
 func getShiftSpeed() float64 {
 	if lastShift != totalShift {
-		lastV = (totalShift - lastShift) / (Time - lastT)
+		lastV = (totalShift - lastShift) / (engine.Time - lastT)
 		lastShift = totalShift
-		lastT = Time
+		lastT = engine.Time
 	}
 	return lastV
 }
 
-func nx() int { return Mesh().Size()[2] }
-func ny() int { return Mesh().Size()[1] }
-func nz() int { return Mesh().Size()[0] }
+func nx() int { return engine.Mesh().Size()[2] }
+func ny() int { return engine.Mesh().Size()[1] }
+func nz() int { return engine.Mesh().Size()[0] }

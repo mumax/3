@@ -6,13 +6,13 @@ import (
 )
 
 func init() {
-	World.LValue("alpha", &Alpha, "Landau-Lifshitz damping constant")
-	World.ROnly("LLtorque", &LLTorque, "Landau-Lifshitz torque/γ0 (T)")
-	World.ROnly("STTorque", &STTorque, "Spin-transfer torque/γ0 (T)")
-	World.ROnly("torque", &Torque, `Total torque/γ0 (T)`)
-	World.LValue("xi", &Xi, "Non-adiabaticity of spin-transfer-torque")
-	World.LValue("jpol", &JPol, "Polarized electrical current density (A/m²)")
-	World.ROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
+	DeclLValue("alpha", &Alpha, "Landau-Lifshitz damping constant")
+	DeclROnly("LLtorque", &LLTorque, "Landau-Lifshitz torque/γ0 (T)")
+	DeclROnly("STTorque", &STTorque, "Spin-transfer torque/γ0 (T)")
+	DeclROnly("torque", &Torque, `Total torque/γ0 (T)`)
+	DeclLValue("xi", &Xi, "Non-adiabaticity of spin-transfer-torque")
+	DeclLValue("jpol", &JPol, "Polarized electrical current density (A/m²)")
+	DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
 }
 
 var (

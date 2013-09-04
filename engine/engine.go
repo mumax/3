@@ -35,7 +35,7 @@ func init() {
 
 func init() {
 
-	M_full.init(3, &globalmesh, "m_full", "T", func(dst *data.Slice) {
+	M_full.init(3, &globalmesh, "m_full", "T", "Unnormalized magnetization", func(dst *data.Slice) {
 		msat, r := Msat.Get()
 		if r {
 			defer cuda.RecycleBuffer(msat)

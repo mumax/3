@@ -25,15 +25,12 @@ func init() {
 	})
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
+
 	DeclROnly("mFFT", &FFTM, "Fourier-transformed magnetization")
-	DeclROnly("B_demag", &B_demag, "Magnetostatic field (T)")
 	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
 	//DeclROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
-}
 
-func initDemag() {
-	demag_ = cuda.NewDemag(Mesh())
-	B_demag = setter(3, Mesh(), "B_demag", "T", func(b *data.Slice) {
+	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field (T)", func(b *data.Slice) {
 		if EnableDemag {
 			demag_.Exec(b, M.buffer, bsat.Gpu(), regions.Gpu())
 		} else {
@@ -41,6 +38,10 @@ func initDemag() {
 		}
 	})
 	registerEnergy(getDemagEnergy)
+}
+
+func initDemag() {
+	demag_ = cuda.NewDemag(Mesh())
 }
 
 // Returns the current demag energy in Joules.

@@ -16,7 +16,6 @@ const maxOutputQueLen = 16 // number of outputs that can be queued for asynchron
 // Asynchronously save slice to file. Slice should be on CPU and
 // not be written after this call.
 func AsyncSave(fname string, s *data.Slice, time float64) {
-	panic("AsyncSave " + fname)
 	initQue()
 	S := *s
 	s.Disable() // avoid use after save

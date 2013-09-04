@@ -11,9 +11,9 @@ type setterQuant struct {
 	info
 }
 
-func (q *setterQuant) init(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice)) {
+func (q *setterQuant) init(nComp int, m *data.Mesh, name, unit, doc string, setFunc func(dst *data.Slice)) {
 	*q = setterQuant{setFunc, info{nComp, name, unit, m}}
-	DeclROnly(name, q, "") // TODO: doc
+	DeclROnly(name, q, doc)
 }
 
 // constructor TODO: rm

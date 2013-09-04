@@ -19,7 +19,8 @@ type param struct {
 	ok          bool              // gpu cache up-to date with lut source
 	zero        bool              // are all values zero (then we may skip corresponding kernel)
 	post_update func(region int)  // called after region value changed, e.g., to update dependent params
-	info                          // allow it to be saved
+	nComp       int
+	name, unit  string
 }
 
 // constructor
@@ -28,7 +29,7 @@ func newParam(nComp int, name, unit string, post_update func(int)) param {
 		gpu: make(cuda.LUTPtrs, nComp),
 		ok:  false, zero: true,
 		post_update: post_update,
-		info:        info{nComp, name, unit, nil}}
+		nComp:       nComp, name: name, unit: unit}
 }
 
 func (p *param) setRegion(region int, v ...float64) {
@@ -135,3 +136,8 @@ func (p *param) upload() {
 	}
 	p.ok = true
 }
+
+func (p *param) Mesh() *data.Mesh { return &globalmesh }
+func (p *param) NComp() int       { return p.nComp }
+func (p *param) Name() string     { return p.name }
+func (p *param) Unit() string     { return p.unit }

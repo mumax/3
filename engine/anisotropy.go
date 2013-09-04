@@ -13,7 +13,7 @@ var (
 	AnisC2  = vectorParam("anisC2", "", nil)
 	ku1_red = scalarParam("ku1_red", "T", nil) // Ku1 / Msat (T), auto updated from Ku1
 	kc1_red = scalarParam("kc1_red", "T", nil) // Kc1 / Msat (T), auto updated from Kc1
-	B_anis  adderQuant                         // field due to uniaxial anisotropy (T)
+	B_anis  adder                              // field due to uniaxial anisotropy (T)
 	//E_anis  = NewGetScalar("E_anis", "J", getAnisotropyEnergy)
 )
 

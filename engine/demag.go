@@ -7,7 +7,7 @@ import (
 
 var (
 	Msat    ScalarParam // Saturation magnetization in A/m
-	B_demag setterQuant // demag field in Tesla
+	B_demag setter      // demag field in Tesla
 	//E_demag     = NewGetScalar("E_demag", "J", getDemagEnergy)
 	EnableDemag = true                          // enable/disable demag field
 	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero

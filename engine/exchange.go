@@ -7,7 +7,7 @@ import (
 
 var (
 	Aex    ScalarParam                       // inter-cell exchange stiffness in J/m
-	B_exch adderQuant                        // exchange field (T) output handle
+	B_exch adder                             // exchange field (T) output handle
 	Dex    = scalarParam("dmi", "J/m2", nil) //func(r int) { // Dzyaloshinskii-Moriya strength in J/m²
 	lex2   symmparam                         // inter-cell exchange length squared * 1e18
 	//E_exch = NewGetScalar("E_exch", "J", getExchangeEnergy) // Exchange (normal+DM) energy in J

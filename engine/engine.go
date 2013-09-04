@@ -13,9 +13,9 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 
 var (
 	M      magnetization // reduced magnetization (unit length)
-	M_full setterQuant   // non-reduced magnetization in T
-	B_eff  setterQuant   // effective field (T) output handle
-	Torque setterQuant   // total torque/γ0, in T
+	M_full setter        // non-reduced magnetization in T
+	B_eff  setter        // effective field (T) output handle
+	Torque setter        // total torque/γ0, in T
 	//Table  DataTable
 )
 

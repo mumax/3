@@ -48,9 +48,9 @@ func Pause() {
 }
 
 // Check if simulation is paused. Used by web gui.
-func Paused() bool {
-	return pause
-}
+//func Paused() bool {
+//	return pause
+//}
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
@@ -61,6 +61,7 @@ func RunWhile(condition func() bool) {
 		select {
 		default:
 			step()
+		// accept tasks form Inject channel
 		case f := <-Inject:
 			f()
 		}

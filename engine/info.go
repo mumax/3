@@ -9,14 +9,7 @@ type info struct {
 	mesh       *data.Mesh // nil means use global mesh
 }
 
-func (i *info) Mesh() *data.Mesh {
-	if i.mesh == nil {
-		return &globalmesh
-	} else {
-		return i.mesh
-	}
-}
-
-func (i *info) NComp() int   { return i.nComp }
-func (i *info) Name() string { return i.name }
-func (i *info) Unit() string { return i.unit }
+func (i *info) Mesh() *data.Mesh { return i.mesh }
+func (i *info) NComp() int       { return i.nComp }
+func (i *info) Name() string     { return i.name }
+func (i *info) Unit() string     { return i.unit }

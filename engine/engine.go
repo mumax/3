@@ -38,11 +38,12 @@ func init() {
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
 	})
+
 }
 
 func initialize() {
 	M.init()
-	regions.init()
+	regions.alloc()
 
 	//Table.Add(&M)
 

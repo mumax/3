@@ -7,16 +7,16 @@ import (
 	"log"
 )
 
+var (
+	regions       = Regions{doc: doc{1, "regions", ""}} // global regions map
+	geom    Shape = nil                                 // nil means universe
+)
+
 func init() {
 	DeclFunc("SetGeom", SetGeometry, "Sets the geometry to a given shape")
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
-
-var (
-	regions Regions       // global regions map
-	geom    Shape   = nil // nil means universe
-)
 
 const MAXREG = 256 // maximum number of regions. (!) duplicated in CUDA
 
@@ -26,17 +26,14 @@ type Regions struct {
 	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool         // gpuCache in sync with cpu
 	defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
-	info
+	doc
 }
 
-func (r *Regions) init() {
-	mesh := Mesh() // global sim mesh
-
-	r.info = info{1, "regions", "", mesh}
+func (r *Regions) alloc() {
+	mesh := r.Mesh()
 	r.cpu = make([]byte, mesh.NCell())
 	r.arr = resizeBytes(r.cpu, mesh.Size())
 	r.gpuCache = cuda.NewBytes(mesh)
-
 	DefRegion(1, universe)
 }
 
@@ -154,3 +151,5 @@ func resizeBytes(array []byte, size [3]int) [][][]byte {
 	}
 	return sliced
 }
+
+func (r *Regions) Mesh() *data.Mesh { return &globalmesh }

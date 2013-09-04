@@ -16,7 +16,7 @@ type bufferedQuant struct {
 
 // constructor
 func buffered(slice *data.Slice, name, unit string) bufferedQuant {
-	return bufferedQuant{info{slice.NComp(), name, unit, slice.Mesh()}, slice}
+	return bufferedQuant{mkInfo(slice.NComp(), name, unit, slice.Mesh()), slice}
 }
 
 // get buffer (on GPU, no need to recycle)

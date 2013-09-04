@@ -39,7 +39,7 @@ func assureCPU(s *data.Slice) *data.Slice {
 func Download(q Getter) *data.Slice {
 	buf, recycle := q.Get()
 	if recycle {
-		cuda.RecycleBuffer(buf)
+		defer cuda.RecycleBuffer(buf)
 	}
 	if buf.CPUAccess() {
 		return buf

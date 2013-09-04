@@ -11,7 +11,7 @@ type info struct {
 
 func (i *info) Mesh() *data.Mesh {
 	if i.mesh == nil {
-		return Mesh() // global mesh
+		return &globalmesh
 	} else {
 		return i.mesh
 	}

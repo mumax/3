@@ -67,13 +67,13 @@ func main() {
 	defer prof.Cleanup()
 
 	// on crash: save magnetization for post-mortem inspection
-	defer func() {
-		err := recover()
-		if err != nil {
-			engine.SaveAs(&engine.M, "m_crash.dump")
-			log.Panic(err)
-		}
-	}()
+	//defer func() {
+	//	err := recover()
+	//	if err != nil {
+	//		engine.SaveAs(&engine.M, "m_crash.dump")
+	//		log.Panic(err)
+	//	}
+	//}()
 
 	RunFileAndServe(flag.Arg(0))
 

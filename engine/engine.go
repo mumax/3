@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 	"log"
 	"runtime"
 )
@@ -11,16 +10,6 @@ import (
 const VERSION = "mx3.0.11 α "
 
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
-
-func init() {
-	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
-	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
-	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
-	DeclROnly("B_eff", &B_eff, `Effective field (T)`)
-	//DeclROnly("table", &Table, `Provides methods for tabular output`)
-
-}
 
 var (
 	M      magnetization // reduced magnetization (unit length)
@@ -35,18 +24,32 @@ var (
 	inited     = make(chan int, 1) // fires when engine ready to serve GUI
 )
 
-func initialize() {
-	M.init()
-	FFTM.init()
+func init() {
+	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
+	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
+	DeclROnly("B_eff", &B_eff, `Effective field (T)`)
+	//DeclROnly("table", &Table, `Provides methods for tabular output`)
+	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+}
 
-	M_full = setter(3, Mesh(), "m_full", "T", func(dst *data.Slice) {
+func init() {
+
+	M_full.init(3, &globalmesh, "m_full", "T", func(dst *data.Slice) {
 		msat, r := Msat.Get()
-		util.Assert(r == true)
-		defer cuda.RecycleBuffer(msat)
+		if r {
+			defer cuda.RecycleBuffer(msat)
+		}
 		for c := 0; c < 3; c++ {
 			cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)
 		}
 	})
+
+}
+
+func initialize() {
+	M.init()
+	FFTM.init()
 
 	regions.init()
 

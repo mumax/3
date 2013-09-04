@@ -1,0 +1,27 @@
+# source this file to bash to build for different cuda versions
+
+name=mumax3.0.12
+
+
+for c in 4.0 5.0 5.5; do
+	sudo rm -f /usr/local/cuda
+	echo ln -s /usr/local/cuda-$c /usr/local/cuda
+	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
+
+	out=$name'_linux_cuda'$c
+
+	echo rm -f $out
+	rm -f $out
+
+	echo go build -o $out
+	go build -v -o $out
+	
+	echo
+done
+
+
+sudo rm -f /usr/local/cuda
+echo ln -s /usr/local/cuda-5.0 /usr/local/cuda
+sudo ln -s /usr/local/cuda-5.0 /usr/local/cuda
+
+ldd $name*

@@ -13,7 +13,6 @@ var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Versio
 
 var (
 	M      magnetization // reduced magnetization (unit length)
-	M_full setter        // non-reduced magnetization in T
 	B_eff  setter        // effective field (T) output handle
 	Torque setter        // total torque/γ0, in T
 	//Table  DataTable
@@ -31,48 +30,32 @@ func init() {
 
 	//DeclROnly("table", &Table, `Provides methods for tabular output`)
 	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
-}
-
-func init() {
-
-	M_full.init(3, &globalmesh, "m_full", "T", "Unnormalized magnetization", func(dst *data.Slice) {
-		msat, r := Msat.Get()
-		if r {
-			defer cuda.RecycleBuffer(msat)
-		}
-		for c := 0; c < 3; c++ {
-			cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)
-		}
-	})
-
-}
-
-func initialize() {
-	M.init()
-
-	regions.init()
-
-	//Table.Add(&M)
-
-	initDemag()
-	initBExt()
 
 	// effective field
-	B_eff.init(3, Mesh(), "B_eff", "T", "Effective field", func(dst *data.Slice) {
+	B_eff.init(3, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {
 		B_demag.set(dst)
 		B_exch.addTo(dst)
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
 	})
+}
 
-	torquebuffer := cuda.NewSlice(3, Mesh())
+func initialize() {
+	M.init()
+	regions.init()
+
+	//Table.Add(&M)
+
+	initBExt()
+
+	torquebuffer := cuda.NewSlice(3, Mesh()) // TODO: cuda.Buffer()
 	torqueFn := func() *data.Slice {
 		Torque.set(torquebuffer)
 		return torquebuffer
 	}
 	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
 
-	inited <- 1
+	inited <- 1 // TODO: rm when everything is in init()
 }
 
 //func sanitycheck() {

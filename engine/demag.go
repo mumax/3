@@ -7,11 +7,12 @@ import (
 
 var (
 	Msat    ScalarParam // Saturation magnetization in A/m
+	M_full  setter      // non-reduced magnetization in A/m
 	B_demag setter      // demag field in Tesla
 	//E_demag     = NewGetScalar("E_demag", "J", getDemagEnergy)
 	EnableDemag = true                          // enable/disable demag field
 	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
-	demag_      *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
+	demagconv_  *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
 )
 
 func init() {
@@ -22,24 +23,37 @@ func init() {
 		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 	})
+	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
+
+	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
+		msat, r := Msat.Get()
+		if r {
+			defer cuda.RecycleBuffer(msat)
+		}
+		for c := 0; c < 3; c++ {
+			cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)
+		}
+	})
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
-	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
-	//DeclROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
-
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field (T)", func(b *data.Slice) {
 		if EnableDemag {
-			demag_.Exec(b, M.buffer, bsat.Gpu(), regions.Gpu())
+			demagConv().Exec(b, M.buffer, bsat.Gpu(), regions.Gpu())
 		} else {
 			cuda.Zero(b)
 		}
 	})
+
 	registerEnergy(getDemagEnergy)
+	//DeclROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
 }
 
-func initDemag() {
-	demag_ = cuda.NewDemag(Mesh())
+func demagConv() *cuda.DemagConvolution {
+	if demagconv_ == nil {
+		demagconv_ = cuda.NewDemag(Mesh())
+	}
+	return demagconv_
 }
 
 // Returns the current demag energy in Joules.

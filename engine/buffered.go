@@ -42,9 +42,9 @@ func (b *bufferedQuant) SetCell(ix, iy, iz int, v ...float64) {
 }
 
 // Get the value of one cell
-func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
-	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
-}
+//func (b *bufferedQuant) GetCell(comp, ix, iy, iz int) float64 {
+//	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
+//}
 
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
 // Typically used in a PostStep function to center the magnetization on
@@ -59,10 +59,7 @@ func (b *bufferedQuant) Shift(shx, shy, shz int) {
 	}
 }
 
-func (b *bufferedQuant) GetVec() []float64 {
-	return Average(b)
-}
-
+func (b *bufferedQuant) GetVec() []float64       { return Average(b) }
 func (b *bufferedQuant) SetValue(v interface{})  { b.Set(v.(*data.Slice)) }
 func (b *bufferedQuant) Eval() interface{}       { return b }
 func (b *bufferedQuant) InputType() reflect.Type { return reflect.TypeOf(new(data.Slice)) }

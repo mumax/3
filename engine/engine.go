@@ -28,7 +28,7 @@ func init() {
 	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
-	DeclROnly("B_eff", &B_eff, `Effective field (T)`)
+
 	//DeclROnly("table", &Table, `Provides methods for tabular output`)
 	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 }
@@ -56,24 +56,14 @@ func initialize() {
 	//Table.Add(&M)
 
 	initDemag()
-	initExchange()
-	initAnisotropy()
 	initBExt()
 
 	// effective field
-	B_eff = setter(3, Mesh(), "B_eff", "T", func(dst *data.Slice) {
+	B_eff.init(3, Mesh(), "B_eff", "T", "Effective field", func(dst *data.Slice) {
 		B_demag.set(dst)
 		B_exch.addTo(dst)
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
-	})
-
-	// torque terms
-	initLLTorque()
-	initSTTorque()
-	Torque = setter(3, Mesh(), "torque", "T", func(b *data.Slice) {
-		LLTorque.set(b)
-		STTorque.addTo(b)
 	})
 
 	torquebuffer := cuda.NewSlice(3, Mesh())
@@ -136,7 +126,7 @@ func setCellSize(cx, cy, cz float64) {
 // check if mesh is set
 func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
-		log.Fatal("need to set mesh first")
+		log.Panic("need to set mesh first")
 	}
 }
 

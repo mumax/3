@@ -19,15 +19,13 @@ func init() {
 	})
 	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
 	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
-	DeclROnly("B_exch", &B_exch, "Exchange field (T)")
+
 	//DeclROnly("E_exch", &E_exch, "Exchange energy (J)")
 	DeclFunc("sign", sign, "Signum function")
 
 	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
-}
 
-func initExchange() {
-	B_exch = adder(3, Mesh(), "B_exch", "T", func(dst *data.Slice) {
+	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
 		if Dex.zero {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 		} else {

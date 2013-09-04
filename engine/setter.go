@@ -11,14 +11,10 @@ type setterQuant struct {
 	info
 }
 
+// initialize setter and declare as quantity (for script and gui)
 func (q *setterQuant) init(nComp int, m *data.Mesh, name, unit, doc string, setFunc func(dst *data.Slice)) {
 	*q = setterQuant{setFunc, info{nComp, name, unit, m}}
 	DeclROnly(name, q, doc)
-}
-
-// constructor TODO: rm
-func setter(nComp int, m *data.Mesh, name, unit string, setFunc func(dst *data.Slice)) setterQuant {
-	return setterQuant{setFunc, info{nComp, name, unit, m}}
 }
 
 // get the quantity, recycle will be true (q needs to be recycled)

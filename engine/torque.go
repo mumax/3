@@ -5,16 +5,6 @@ import (
 	"code.google.com/p/mx3/data"
 )
 
-func init() {
-	DeclLValue("alpha", &Alpha, "Landau-Lifshitz damping constant")
-	DeclROnly("LLtorque", &LLTorque, "Landau-Lifshitz torque/γ0 (T)")
-	DeclROnly("STTorque", &STTorque, "Spin-transfer torque/γ0 (T)")
-	DeclROnly("torque", &Torque, `Total torque/γ0 (T)`)
-	DeclLValue("xi", &Xi, "Non-adiabaticity of spin-transfer-torque")
-	DeclLValue("jpol", &JPol, "Polarized electrical current density (A/m²)")
-	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
-}
-
 var (
 	Alpha    = scalarParam("alpha", "", nil) // Damping constant
 	LLTorque setterQuant                     // Landau-Lifshitz torque/γ0, in T
@@ -24,16 +14,18 @@ var (
 	//MaxTorque = NewGetScalar("maxTorque", "T", GetMaxTorque)
 )
 
-func initLLTorque() {
-	LLTorque = setter(3, Mesh(), "lltorque", "T", func(b *data.Slice) {
+func init() {
+	DeclLValue("alpha", &Alpha, "Landau-Lifshitz damping constant")
+	DeclLValue("xi", &Xi, "Non-adiabaticity of spin-transfer-torque")
+	DeclLValue("jpol", &JPol, "Polarized electrical current density (A/m²)")
+	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
+
+	LLTorque.init(3, &globalmesh, "lltorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
 		B_eff.set(b)
 		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
 	})
-	JPol.init(Mesh(), "JPol", "A/m2")
-}
 
-func initSTTorque() {
-	STTorque = adder(3, Mesh(), "sttorque", "T", func(dst *data.Slice) {
+	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !JPol.IsZero() {
 			jspin, rec := JPol.Get()
 			if rec {
@@ -42,6 +34,13 @@ func initSTTorque() {
 			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.Gpu(), Alpha.Gpu(), Xi.Gpu(), regions.Gpu())
 		}
 	})
+
+	Torque.init(3, &globalmesh, "torque", "T", "Total torque/γ0", func(b *data.Slice) {
+		LLTorque.set(b)
+		STTorque.addTo(b)
+	})
+
+	JPol.init(&globalmesh, "JPol", "A/m2")
 }
 
 // TODO: could implement maxnorm(torque) (getfunc)

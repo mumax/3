@@ -29,12 +29,9 @@ func init() {
 	DeclLValue("AnisU", &AnisU, "Uniaxial anisotropy direction")
 	DeclLValue("AnisC1", &AnisC1, "Cubic anisotropy direction #1")
 	DeclLValue("AnisC2", &AnisC2, "Cubic anisotorpy directon #2")
-	DeclROnly("B_anis", &B_anis, "Anisotropy field (T)")
 	//DeclROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
-}
 
-func initAnisotropy() {
-	B_anis = adder(3, Mesh(), "B_anis", "T", func(dst *data.Slice) {
+	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
 		if !ku1_red.zero {
 			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu(), AnisU.Gpu(), regions.Gpu())
 		}
@@ -42,7 +39,9 @@ func initAnisotropy() {
 			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.Gpu(), AnisC1.Gpu(), AnisC2.Gpu(), regions.Gpu())
 		}
 	})
+
 	registerEnergy(getAnisotropyEnergy)
+
 }
 
 func getAnisotropyEnergy() float64 {

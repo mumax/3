@@ -7,14 +7,15 @@ import (
 
 // quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field contributions)
+// TODO -> adder
 type adderQuant struct {
 	addTo func(dst *data.Slice) // calculates quantity and add result to dst
 	info
 }
 
-// constructor
-func adder(nComp int, m *data.Mesh, name, unit string, addFunc func(dst *data.Slice)) adderQuant {
-	return adderQuant{addFunc, info{nComp, name, unit, m}}
+func (q *adderQuant) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc func(dst *data.Slice)) {
+	*q = adderQuant{addFunc, info{nComp, name, unit, m}}
+	DeclROnly(name, q, doc)
 }
 
 // Calcuates and returns the quantity.

@@ -12,9 +12,9 @@ const VERSION = "mx3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 var (
-	M      magnetization // reduced magnetization (unit length)
-	B_eff  setter        // effective field (T) output handle
-	Torque setter        // total torque/γ0, in T
+	M      buffered // reduced magnetization (unit length)
+	B_eff  setter   // effective field (T) output handle
+	Torque setter   // total torque/γ0, in T
 	//Table  DataTable
 )
 
@@ -26,7 +26,8 @@ var (
 func init() {
 	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
+
+	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
 
 	//DeclROnly("table", &Table, `Provides methods for tabular output`)
 	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
@@ -42,7 +43,8 @@ func init() {
 }
 
 func initialize() {
-	M.init()
+	log.Println("engine.initialize")
+	M.alloc()
 	regions.alloc()
 
 	//Table.Add(&M)

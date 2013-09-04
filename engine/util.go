@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"fmt"
 	"log"
@@ -8,9 +9,15 @@ import (
 	"os"
 )
 
+func init() {
+	DeclFunc("expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
+	DeclFunc("fprintln", Fprintln, "Print to file")
+	DeclFunc("ReadFile", ReadFile, "Read .dump file and return contents as array.")
+}
+
 // Test if have lies within want +/- maxError,
 // and print suited message.
-func expect(msg string, have, want, maxError float64) {
+func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
 		log.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
@@ -26,4 +33,10 @@ func Fprintln(filename string, msg ...interface{}) {
 	defer f.Close()
 	_, err = fmt.Fprintln(f, msg...)
 	util.FatalErr(err)
+}
+
+// Read a magnetization state from .dump file.
+func ReadFile(fname string) *data.Slice {
+	s, _ := data.MustReadFile(fname)
+	return s
 }

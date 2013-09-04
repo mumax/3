@@ -19,6 +19,7 @@ var (
 	renderQ   = "m"                                     // quantity to display
 )
 
+// displayable in GUI Parameters section
 type Param interface {
 	NComp() int
 	Unit() string
@@ -26,6 +27,7 @@ type Param interface {
 	setUniform(...float64)
 }
 
+// data for html template
 type guidata struct {
 	Quants map[string]Getter
 	Params map[string]Param
@@ -41,6 +43,7 @@ func (d *guidata) CompBoxIds(param string) []string {
 	return e
 }
 
+// util for generating region numbers in GUI Parameters section.
 func (d *guidata) MakeRange(min, max int) []int {
 	l := make([]int, max-min)
 	for i := range l {
@@ -53,7 +56,6 @@ func (d *guidata) MakeRange(min, max int) []int {
 func Serve(port string) {
 	log.Println("gui waiting for engine init")
 	<-inited
-	log.Println("engine inited, gui starting")
 
 	data := &guidata{Quants: quants, Params: params}
 	gui := gui.NewDoc(templText, data)
@@ -159,6 +161,7 @@ func roundt(t time.Duration) time.Duration {
 	return t - t%1e9
 }
 
+// returns a function that injects f into run loop
 func inj(f func()) func() {
 	return func() { Inject <- f }
 }

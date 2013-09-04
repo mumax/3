@@ -8,7 +8,6 @@ import (
 var (
 	Msat    ScalarParam // Saturation magnetization in A/m
 	B_demag setterQuant // demag field in Tesla
-	FFTM    fftm        // FFT of m
 	//E_demag     = NewGetScalar("E_demag", "J", getDemagEnergy)
 	EnableDemag = true                          // enable/disable demag field
 	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
@@ -26,7 +25,6 @@ func init() {
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
-	DeclROnly("mFFT", &FFTM, "Fourier-transformed magnetization")
 	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
 	//DeclROnly("E_demag", &E_demag, "Magnetostatic energy (J)")
 

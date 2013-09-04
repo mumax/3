@@ -6,18 +6,24 @@ import (
 	"math"
 )
 
-// FFT of m
-type fftm struct {
-	info
+// TODO: composition: fft(anyquant)
+
+var FFTM fftm // FFT of m
+
+func init() {
+	DeclROnly(FFTM.Name(), &FFTM, "FFT of m")
 }
 
-func (f *fftm) init() {
-	f.nComp = 3
-	f.name = "fftm"
-}
+// FFT of m
+type fftm struct{}
+
+func (f *fftm) NComp() int       { return 3 }
+func (f *fftm) Name() string     { return "mFFT" }
+func (f *fftm) Unit() string     { return "" }
+func (f *fftm) Mesh() *data.Mesh { return &demag_.FFTMesh }
 
 func (q *fftm) Get() (quant *data.Slice, recycle bool) {
-	mesh := &demag_.FFTMesh
+	mesh := q.Mesh()
 	n := mesh.Size()
 	s := data.NewSlice(3, mesh)
 	scale := float32(1 / math.Sqrt(float64(n[0]*n[1]*n[2])))

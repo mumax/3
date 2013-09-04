@@ -49,7 +49,6 @@ func init() {
 
 func initialize() {
 	M.init()
-	FFTM.init()
 
 	regions.init()
 

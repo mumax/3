@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
 	"image/jpeg"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 )
+
+var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
 
 // Render image of quantity.
 // Accepts url: /render/name and /render/name/component
@@ -31,7 +34,7 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var d *data.Slice
 		// TODO: could download only needed component
-		InjectAndWait(func() { d = Download(h) })
+		InjectAndWait(func() { d = download(h) })
 		if comp != "" && d.NComp() > 1 {
 			c := compstr[comp]
 			d = d.Comp(c)
@@ -41,4 +44,16 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
+// Download a quantity to host,
+// or just return its data when already on host.
+func download(q Getter) *data.Slice {
+	buf, recycle := q.Get()
+	if recycle {
+		defer cuda.RecycleBuffer(buf)
+	}
+	if buf.CPUAccess() {
+		return buf
+	} else {
+		return buf.HostCopy()
+	}
+}

@@ -1,17 +1,31 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"log"
+	"path"
+	"strings"
 )
 
-var (
-	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
-	done    = make(chan bool) // marks output server is completely done after closing dlQue
-	nOutBuf int               // number of output buffers actually in use (<= maxOutputQueLen)
-)
+type Getter interface {
+	Get() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
+}
 
-const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
+// Save under given file name (transparant async I/O).
+func SaveAs(q Getter, fname string) {
+	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
+		fname = path.Clean(OD + "/" + fname)
+	}
+	if path.Ext(fname) == "" {
+		fname += ".dump"
+	}
+	buffer, recylce := q.Get()
+	if recylce {
+		defer cuda.RecycleBuffer(buffer)
+	}
+	AsyncSave(fname, assureCPU(buffer), Time)
+}
 
 // Asynchronously save slice to file. Slice should be on CPU and
 // not be written after this call.
@@ -21,6 +35,23 @@ func AsyncSave(fname string, s *data.Slice, time float64) {
 	s.Disable() // avoid use after save
 	saveQue <- saveTask{fname, &S, time}
 }
+
+// Copy to CPU, if needed
+func assureCPU(s *data.Slice) *data.Slice {
+	if s.CPUAccess() {
+		return s
+	} else {
+		return s.HostCopy()
+	}
+}
+
+var (
+	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
+	done    = make(chan bool) // marks output server is completely done after closing dlQue
+	nOutBuf int               // number of output buffers actually in use (<= maxOutputQueLen)
+)
+
+const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
 
 func initQue() {
 	if saveQue == nil {
@@ -38,7 +69,7 @@ type saveTask struct {
 
 // continuously takes save tasks and flushes them to disk.
 // the save queue can accommodate many outputs (stored on host).
-// the rather big queue allows big output bursts to be concurrent.
+// the rather big queue allows big output bursts to be concurrent with GPU.
 func runSaver() {
 	for t := range saveQue {
 		data.MustWriteFile(t.fname, t.output, t.time)

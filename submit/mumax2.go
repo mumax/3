@@ -16,6 +16,6 @@ func init() {
 func mumax2(file string) Job {
 	var job Job
 	job.Command = "mumax2"
-	job.Args = []string{`-f`, `-gpu=%GPU`, file}
+	job.Args = []string{`-f`, `-gpu=%GPU`, `-sched=yield`, file}
 	return job
 }

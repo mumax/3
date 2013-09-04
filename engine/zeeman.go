@@ -8,10 +8,7 @@ var (
 func init() {
 	DeclLValue("B_ext", &B_ext, "External field (T)")
 	//DeclROnly("E_Zeeman", &E_Zeeman, "Zeeman energy (J)")
-}
-
-func initBExt() {
-	B_ext.init(Mesh(), "B_ext", "T")
+	B_ext.init(&globalmesh, "B_ext", "T")
 	registerEnergy(getZeemanEnergy)
 }
 

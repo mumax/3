@@ -21,6 +21,7 @@ type mulmask struct {
 	mask *data.Slice
 }
 
+// todo: always use global mesh
 func (e *excitation) init(m *data.Mesh, name, unit string) {
 	e.v = vectorParam(name+"_param", unit, nil)
 	e.info = info{3, name, unit, m}

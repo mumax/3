@@ -46,8 +46,6 @@ func initialize() {
 
 	//Table.Add(&M)
 
-	initBExt()
-
 	torquebuffer := cuda.NewSlice(3, Mesh()) // TODO: cuda.Buffer()
 	torqueFn := func() *data.Slice {
 		Torque.set(torquebuffer)

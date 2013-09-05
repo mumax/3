@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/mag"
 	"log"
 	"runtime"
 )
@@ -64,7 +65,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
-	Solver = *cuda.NewHeun(M.buffer, Torque.set, cuda.Normalize, 1e-15, Gamma0, &Time)
+	Solver = *cuda.NewHeun(M.buffer, Torque.set, cuda.Normalize, 1e-15, mag.Gamma0, &Time)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

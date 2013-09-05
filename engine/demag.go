@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/mag"
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 func init() {
 	Msat = scalarParam("Msat", "A/m", func(r int) {
 		msat := Msat.GetRegion(r)
-		bsat.setRegion(r, msat*Mu0)
+		bsat.setRegion(r, msat*mag.Mu0)
 		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
 		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
 		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))

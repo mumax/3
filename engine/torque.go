@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	Alpha    = scalarParam("alpha", "", nil) // Damping constant
-	LLTorque setter                          // Landau-Lifshitz torque/γ0, in T
-	STTorque adder                           // Spin-transfer torque/γ0, in T
-	Xi       = scalarParam("xi", "", nil)    // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
-	JPol     excitation                      // Polarized electrical current density
-	//MaxTorque = NewGetScalar("maxTorque", "T", GetMaxTorque)
+	Alpha     = scalarParam("alpha", "", nil) // Damping constant
+	LLTorque  setter                          // Landau-Lifshitz torque/γ0, in T
+	STTorque  adder                           // Spin-transfer torque/γ0, in T
+	Xi        = scalarParam("xi", "", nil)    // Non-adiabaticity of spin-transfer-torque // TODO: use beta?
+	JPol      excitation                      // Polarized electrical current density
+	MaxTorque = NewGetScalar("maxTorque", "T", "", GetMaxTorque)
 )
 
 func init() {

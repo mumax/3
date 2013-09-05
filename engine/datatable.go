@@ -49,19 +49,20 @@ func (t *DataTable) Add(output getVec) {
 //	}
 //}
 //
-//func (t *DataTable) Save() {
-//	t.init()
-//	fmt.Fprint(t, Time)
-//	for _, o := range t.outputs {
-//		vec := o.GetVec()
-//		for _, v := range vec {
-//			fmt.Fprint(t, "\t", v)
-//		}
-//	}
-//	fmt.Fprintln(t)
-//	t.Flush()
-//}
-//
+func (t *DataTable) Save() {
+	log.Println("TODO: table.save")
+	//	t.init()
+	//	fmt.Fprint(t, Time)
+	//	for _, o := range t.outputs {
+	//		vec := o.GetVec()
+	//		for _, v := range vec {
+	//			fmt.Fprint(t, "\t", v)
+	//		}
+	//	}
+	//	fmt.Fprintln(t)
+	//	t.Flush()
+}
+
 func newTable(name string) *DataTable {
 	t := new(DataTable)
 	t.name = name
@@ -102,28 +103,3 @@ func (t *DataTable) inited() bool {
 //	}
 //}
 //
-//// simple implementation of getVec
-//type GetFunc struct {
-//	info
-//	get func() []float64
-//}
-//
-//func newGetfunc(nComp int, name, unit string, get func() []float64) GetFunc {
-//	return GetFunc{info{nComp, name, unit}, get}
-//}
-//
-//// INTERNAL
-//func NewGetScalar(name, unit string, get func() float64) GetFunc {
-//	return newGetfunc(1, name, unit, func() []float64 {
-//		return []float64{get()}
-//	})
-//}
-//
-//// INTERNAL
-//func NewGetVector(name, unit string, get func() []float64) GetFunc {
-//	return newGetfunc(3, name, unit, get)
-//}
-//
-//func (g *GetFunc) GetVec() []float64 {
-//	return g.get()
-//}

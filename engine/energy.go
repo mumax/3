@@ -10,12 +10,8 @@ import (
 
 var (
 	energyTerms []func() float64 // registers total energy terms
-	//E_total     = NewGetScalar("Energy", "J", GetTotalEnergy)
+	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
 )
-
-func init() {
-	//DeclROnly("E_total", &E_total, "Total energy (J)")
-}
 
 // add energy term to global energy
 func registerEnergy(term func() float64) {

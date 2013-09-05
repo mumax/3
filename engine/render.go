@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/draw"
 	"image/jpeg"
@@ -34,26 +33,12 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var d *data.Slice
 		// TODO: could download only needed component
-		InjectAndWait(func() { d = download(h) })
+		InjectAndWait(func() { d = Download(h) })
 		if comp != "" && d.NComp() > 1 {
 			c := compstr[comp]
 			d = d.Comp(c)
 		}
 		img := draw.Image(d, "auto", "auto")
 		jpeg.Encode(w, img, &jpeg.Options{Quality: 100})
-	}
-}
-
-// Download a quantity to host,
-// or just return its data when already on host.
-func download(q Getter) *data.Slice {
-	buf, recycle := q.Get()
-	if recycle {
-		defer cuda.RecycleBuffer(buf)
-	}
-	if buf.CPUAccess() {
-		return buf
-	} else {
-		return buf.HostCopy()
 	}
 }

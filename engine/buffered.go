@@ -39,6 +39,10 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	}
 }
 
+func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
+	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
+}
+
 // overrides normal set to allow stencil ops
 func (b *buffered) Set(src *data.Slice) {
 	if src.Mesh().Size() != b.buffer.Mesh().Size() {
@@ -46,6 +50,10 @@ func (b *buffered) Set(src *data.Slice) {
 	}
 	//stencil(src, vol.host) // TODO: stencil !!
 	data.Copy(b.buffer, src)
+}
+
+func (b *buffered) LoadFile(fname string) {
+	b.Set(LoadFile(fname))
 }
 
 // Shift the data over (shx, shy, shz cells), clamping boundary values.

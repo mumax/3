@@ -37,7 +37,6 @@
 	Msat  = 1100e3
 
   
-	table.autosave(1e-11)
 	B_ext = vector(0.00, 0.00, 0)
 	run(1e-9)
 	expect("my", average(m)[1]/fill, 0.000, 1e-3)

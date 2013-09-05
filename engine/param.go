@@ -120,11 +120,25 @@ func (p *param) setUniform(v ...float64) {
 	}
 }
 
+func (p *param) GetRegion(region int) []float64 {
+	cpu := p.Cpu()
+	v := make([]float64, p.nComp)
+	for i := range v {
+		v[i] = float64(cpu[i][region])
+	}
+	return v
+}
+
+func (p *param) GetVec() []float64 {
+	return p.GetRegion(1)
+}
+
 func (p *param) getUniform() []float64 {
+	cpu := p.Cpu()
 	v := make([]float64, p.NComp())
 	for c := range v {
-		x := p.cpu[c][1]
-		for r := 2; r < NREGION; r++ {
+		x := cpu[c][1]
+		for r := 2; r < regions.maxreg; r++ {
 			if p.cpu[c][r] != x {
 				log.Panicf("%v is not uniform", p.name)
 			}

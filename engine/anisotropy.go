@@ -14,7 +14,7 @@ var (
 	ku1_red = scalarParam("ku1_red", "T", nil) // Ku1 / Msat (T), auto updated from Ku1
 	kc1_red = scalarParam("kc1_red", "T", nil) // Kc1 / Msat (T), auto updated from Kc1
 	B_anis  adder                              // field due to uniaxial anisotropy (T)
-	//E_anis  = NewGetScalar("E_anis", "J", getAnisotropyEnergy)
+	E_anis  = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
 )
 
 func init() {
@@ -29,7 +29,6 @@ func init() {
 	DeclLValue("AnisU", &AnisU, "Uniaxial anisotropy direction")
 	DeclLValue("AnisC1", &AnisC1, "Cubic anisotropy direction #1")
 	DeclLValue("AnisC2", &AnisC2, "Cubic anisotorpy directon #2")
-	//DeclROnly("E_anis", &E_anis, "Anisotorpy energy (J)")
 
 	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
 		if !ku1_red.zero() {

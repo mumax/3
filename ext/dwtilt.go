@@ -5,12 +5,8 @@ import (
 	"math"
 )
 
-func init() {
-	engine.DeclROnly("ext_DWTilt", &DWTiltPMA, "PMA domain wall tilt (rad)")
-}
-
 // PMA domain wall tilt assuming straight wall.
-var DWTiltPMA = engine.NewGetScalar("dwtilt", "rad", dwTiltPMA)
+var DWTiltPMA = engine.NewGetScalar("dwtilt", "rad", "PMA domain wall tilt (rad)", dwTiltPMA)
 
 func dwTiltPMA() float64 {
 	m := engine.Download(&engine.M)

@@ -3,6 +3,7 @@ package ext
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/engine"
+	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
 	"log"
 	"math"
@@ -29,7 +30,7 @@ func constVec(x, y, z float64) func() [3]float64 {
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
 func bSat() float64 {
-	return engine.Mu0 * engine.Msat.GetUniform()
+	return mag.Mu0 * engine.Msat.GetUniform()
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {

@@ -8,8 +8,6 @@ import (
 func init() {
 	engine.DeclFunc("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
 	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
-	engine.DeclROnly("ext_dwspeed", &DWSpeed, "Speed of the simulation window while following a domain wall")
-	engine.DeclROnly("ext_dwpos", &DWPos, "Position of the simulation window while following a domain wall")
 }
 
 // This post-step function centers the simulation window on a domain wall
@@ -66,7 +64,7 @@ func wall_left_magnetization(x float64) int {
 
 var (
 	totalShift float64 // accumulated window shift (X) in meter
-	DWPos      = engine.NewGetScalar("dwpos", "m", getShiftPos)
+	DWPos      = engine.NewGetScalar("dwpos", "m", "Position of the simulation window while following a domain wall", getShiftPos)
 )
 
 func updateShift(dir, sign int) {
@@ -82,7 +80,7 @@ var (
 	lastShift float64 // shift the last time we queried speed
 	lastT     float64 // time the last time we queried speed
 	lastV     float64 // speed the last time we queried speed
-	DWSpeed   = engine.NewGetScalar("dwspeed", "m/s", getShiftSpeed)
+	DWSpeed   = engine.NewGetScalar("dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
 func getShiftSpeed() float64 {

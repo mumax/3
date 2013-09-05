@@ -5,11 +5,7 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
-func init() {
-	engine.DeclROnly("ext_CorePos", &CorePos, "Vortex core position")
-}
-
-var CorePos = engine.NewGetVector("corepos", "m", corePos)
+var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
 
 func corePos() []float64 {
 

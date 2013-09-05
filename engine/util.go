@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"fmt"
@@ -12,7 +13,8 @@ import (
 func init() {
 	DeclFunc("expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
 	DeclFunc("fprintln", Fprintln, "Print to file")
-	DeclFunc("ReadFile", ReadFile, "Read .dump file and return contents as array.")
+	DeclFunc("sign", sign, "Signum function")
+	//DeclFunc("LoadFile", LoadFile, "Read .dump file and return contents as array.")
 }
 
 // Test if have lies within want +/- maxError,
@@ -36,7 +38,21 @@ func Fprintln(filename string, msg ...interface{}) {
 }
 
 // Read a magnetization state from .dump file.
-func ReadFile(fname string) *data.Slice {
+func LoadFile(fname string) *data.Slice {
 	s, _ := data.MustReadFile(fname)
 	return s
+}
+
+// Download a quantity to host,
+// or just return its data when already on host.
+func Download(q Getter) *data.Slice {
+	buf, recycle := q.Get()
+	if recycle {
+		defer cuda.RecycleBuffer(buf)
+	}
+	if buf.CPUAccess() {
+		return buf
+	} else {
+		return buf.HostCopy()
+	}
 }

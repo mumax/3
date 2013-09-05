@@ -9,18 +9,19 @@ import (
 // Adaptive heun solver for vectors.
 type Heun struct {
 	solverCommon
-	y        *data.Slice        // the quantity to be time stepped
-	torqueFn func() *data.Slice // updates dy
-	postStep func(*data.Slice)  // called on y after successful step, typically normalizes magnetization
+	y        *data.Slice       // the quantity to be time stepped
+	torqueFn func(*data.Slice) // updates dy
+	postStep func(*data.Slice) // called on y after successful step, typically normalizes magnetization
 }
 
-func NewHeun(y *data.Slice, torqueFn func() *data.Slice, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
+func NewHeun(y *data.Slice, torqueFn, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
 	util.Argument(dt > 0 && multiplier > 0)
 	return &Heun{newSolverCommon(dt, multiplier, time), y, torqueFn, postStep}
 }
 
 // Take one time step
 func (e *Heun) Step() {
+	y := e.y
 	dy0 := GetBuffer(3, e.y.Mesh())
 	defer RecycleBuffer(dy0)
 
@@ -29,17 +30,17 @@ func (e *Heun) Step() {
 
 	// stage 1
 	{
-		dy := e.torqueFn()
+		e.torqueFn(dy0)
 		e.NEval++
-		y := e.y
-		Madd2(y, y, dy, 1, dt) // y = y + dt * dy
-		data.Copy(dy0, dy)
+		Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 	}
 
 	// stage 2
 	{
+		dy := GetBuffer(3, e.y.Mesh())
+		defer RecycleBuffer(dy)
 		*e.time += e.Dt_si
-		dy := e.torqueFn()
+		e.torqueFn(dy)
 		e.NEval++
 
 		err := 0.0
@@ -47,7 +48,6 @@ func (e *Heun) Step() {
 			err = MaxVecDiff(dy0, dy) * float64(dt)
 		}
 
-		y := e.y
 		if err < e.MaxErr || e.Dt_si <= e.MinDt { // mindt check to avoid infinite loop
 			// step OK
 			Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)

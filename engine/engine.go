@@ -12,15 +12,11 @@ const VERSION = "mx3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 var (
-	M      buffered // reduced magnetization (unit length)
-	B_eff  setter   // effective field (T) output handle
-	Torque setter   // total torque/γ0, in T
+	globalmesh data.Mesh // mesh for m and everything that has the same size
+	M          buffered  // reduced magnetization (unit length)
+	B_eff      setter    // effective field (T) output handle
+	Torque     setter    // total torque/γ0, in T
 	//Table  DataTable
-)
-
-var (
-	globalmesh data.Mesh
-	inited     = make(chan int, 1) // fires when engine ready to serve GUI
 )
 
 func init() {
@@ -28,9 +24,6 @@ func init() {
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
-
-	//DeclROnly("table", &Table, `Provides methods for tabular output`)
-	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 
 	// effective field
 	B_eff.init(3, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {
@@ -40,30 +33,11 @@ func init() {
 		B_ext.addTo(dst)
 	})
 
+	// torque inited in torque.go
+
+	//DeclROnly("table", &Table, `Provides methods for tabular output`)
+	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 }
-
-func initialize() {
-	log.Println("engine.initialize")
-	M.alloc()
-	regions.alloc()
-
-	//Table.Add(&M)
-
-	torquebuffer := cuda.NewSlice(3, Mesh()) // TODO: cuda.Buffer()
-	torqueFn := func() *data.Slice {
-		Torque.set(torquebuffer)
-		return torquebuffer
-	}
-	Solver = *cuda.NewHeun(M.buffer, torqueFn, cuda.Normalize, 1e-15, Gamma0, &Time)
-
-	inited <- 1 // TODO: rm when everything is in init()
-}
-
-//func sanitycheck() {
-//	if Msat() == 0 {
-//		log.Fatal("Msat should be nonzero")
-//	}
-//}
 
 func Mesh() *data.Mesh {
 	checkMesh()
@@ -83,7 +57,14 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	}
 	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
 	log.Println("set mesh:", Mesh().UserString())
-	initialize()
+	alloc()
+}
+
+// allocate m and regions buffer (after mesh is set)
+func alloc() {
+	M.alloc()
+	regions.alloc()
+	Solver = *cuda.NewHeun(M.buffer, Torque.set, cuda.Normalize, 1e-15, Gamma0, &Time)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls
@@ -131,3 +112,9 @@ func Close() {
 	log.Println("TODO: FLUSH TABLE")
 	//Table.flush()
 }
+
+//func sanitycheck() {
+//	if Msat() == 0 {
+//		log.Fatal("Msat should be nonzero")
+//	}
+//}

@@ -54,9 +54,6 @@ func (d *guidata) MakeRange(min, max int) []int {
 
 // Start web gui on given port, blocks.
 func Serve(port string) {
-	log.Println("gui waiting for engine init")
-	<-inited
-
 	data := &guidata{Quants: quants, Params: params}
 	gui := gui.NewDoc(templText, data)
 	KeepAlive = gui.KeepAlive

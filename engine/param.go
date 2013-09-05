@@ -14,22 +14,21 @@ import (
 // implementation allows arbitrary number of components,
 // narrowed down to 1 or 3 in ScalarParam and VectorParam
 type param struct {
-	lut         [][MAXREG]float32 // look-up table source
+	cpu         [][MAXREG]float32 // look-up table source
 	gpu         cuda.LUTPtrs      // gpu copy of lut, lazily transferred when needed
-	ok          bool              // gpu cache up-to date with lut source
+	gpu_ok      bool              // gpu cache up-to date with lut source
 	zero        bool              // are all values zero (then we may skip corresponding kernel)
 	post_update func(region int)  // called after region value changed, e.g., to update dependent params
-	nComp       int
-	name, unit  string
+	doc
 }
 
 // constructor
 func newParam(nComp int, name, unit string, post_update func(int)) param {
-	return param{lut: make([][MAXREG]float32, nComp),
-		gpu: make(cuda.LUTPtrs, nComp),
-		ok:  false, zero: true,
+	return param{cpu: make([][MAXREG]float32, nComp),
+		gpu:    make(cuda.LUTPtrs, nComp),
+		gpu_ok: false, zero: true,
 		post_update: post_update,
-		nComp:       nComp, name: name, unit: unit}
+		doc:         doc{nComp: nComp, name: name, unit: unit}}
 }
 
 func (p *param) setRegion(region int, v ...float64) {
@@ -37,7 +36,7 @@ func (p *param) setRegion(region int, v ...float64) {
 
 	v0 := true
 	for c := range v {
-		p.lut[c][region] = float32(v[c])
+		p.cpu[c][region] = float32(v[c])
 		if v[c] != 0 {
 			v0 = false
 		}
@@ -46,18 +45,18 @@ func (p *param) setRegion(region int, v ...float64) {
 
 	if v0 {
 		p.zero = true
-		for c := range p.lut {
-			for i := range p.lut[c] {
-				if p.lut[c][i] != 0 {
+		for c := range p.cpu {
+			for i := range p.cpu[c] {
+				if p.cpu[c][i] != 0 {
 					p.zero = false
-					c = len(p.lut) // break outer loop as well
+					c = len(p.cpu) // break outer loop as well
 					break
 				}
 			}
 		}
 	}
 
-	p.ok = false
+	p.gpu_ok = false
 	if p.post_update != nil {
 		p.post_update(region)
 	}
@@ -81,9 +80,9 @@ func (p *param) setUniform(v ...float64) {
 func (p *param) getUniform() []float64 {
 	v := make([]float64, p.NComp())
 	for c := range v {
-		x := p.lut[c][1]
+		x := p.cpu[c][1]
 		for r := 2; r < MAXREG; r++ {
-			if p.lut[c][r] != x {
+			if p.cpu[c][r] != x {
 				log.Panicf("%v is not uniform, need to specify a region (%v.GetRegion(x))", p.name, p.name)
 			}
 		}
@@ -116,7 +115,7 @@ func (p *param) Get() (*data.Slice, bool) {
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
 func (p *param) Gpu() cuda.LUTPtrs {
-	if p.ok {
+	if p.gpu_ok {
 		return p.gpu
 	}
 	p.upload()
@@ -132,12 +131,9 @@ func (p *param) upload() {
 	}
 	for c2 := range p.gpu {
 		c := util.SwapIndex(c2, p.NComp())
-		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.lut[c2][0]), cu.SIZEOF_FLOAT32*MAXREG)
+		cu.MemcpyHtoD(cu.DevicePtr(p.gpu[c]), unsafe.Pointer(&p.cpu[c2][0]), cu.SIZEOF_FLOAT32*MAXREG)
 	}
-	p.ok = true
+	p.gpu_ok = true
 }
 
 func (p *param) Mesh() *data.Mesh { return &globalmesh }
-func (p *param) NComp() int       { return p.nComp }
-func (p *param) Name() string     { return p.name }
-func (p *param) Unit() string     { return p.unit }

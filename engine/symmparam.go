@@ -8,9 +8,9 @@ import (
 )
 
 type symmparam struct {
-	lut [MAXREG * (MAXREG + 1) / 2]float32 // look-up table source
-	gpu cuda.SymmLUT                       // gpu copy of lut, lazily transferred when needed
-	ok  bool                               // gpu cache up-to date with lut source
+	lut [NREGION * (NREGION + 1) / 2]float32 // look-up table source
+	gpu cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
+	ok  bool                                 // gpu cache up-to date with lut source
 }
 
 func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
@@ -19,7 +19,7 @@ func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
 
 	if r1 == r2 {
 		r := r1
-		for i := 0; i < MAXREG; i++ {
+		for i := 0; i < NREGION; i++ { // could use regions.maxreg?
 			if p.lut[symmidx(i, i)] == v {
 				p.lut[symmidx(r, i)] = v
 			} else {
@@ -74,7 +74,7 @@ func (p *symmparam) upload() {
 
 func (p *symmparam) String() string {
 	str := ""
-	for j := 0; j < MAXREG; j++ {
+	for j := 0; j < regions.maxreg; j++ {
 		for i := 0; i <= j; i++ {
 			str += fmt.Sprint(p.getInter(j, i), "\t")
 		}

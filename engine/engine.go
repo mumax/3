@@ -13,11 +13,11 @@ const VERSION = "mx3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 var (
-	globalmesh data.Mesh // mesh for m and everything that has the same size
-	M          buffered  // reduced magnetization (unit length)
-	B_eff      setter    // effective field (T) output handle
-	Torque     setter    // total torque/γ0, in T
-	//Table  DataTable
+	globalmesh data.Mesh                // mesh for m and everything that has the same size
+	M          buffered                 // reduced magnetization (unit length)
+	B_eff      setter                   // effective field (T) output handle
+	Torque     setter                   // total torque/γ0, in T
+	Table      = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 )
 
 func init() {
@@ -36,8 +36,7 @@ func init() {
 
 	// torque inited in torque.go
 
-	//DeclROnly("table", &Table, `Provides methods for tabular output`)
-	//Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+	DeclROnly("table", &Table, `Provides methods for tabular output`)
 }
 
 func Mesh() *data.Mesh {

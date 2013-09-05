@@ -11,7 +11,7 @@ func vectorParam(name, unit string, post func(int)) VectorParam {
 }
 
 func (p *VectorParam) SetRegion(region int, value [3]float64) {
-	checkRegion(region)
+	//checkRegion(region)
 	p.setRegion(region, value[:]...)
 }
 

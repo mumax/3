@@ -26,7 +26,7 @@ func init() {
 	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
-		if Dex.zero {
+		if Dex.zero() {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 		} else {
 			// DMI only implemented for uniform parameters

@@ -15,7 +15,7 @@ func scalarParam(name, unit string, post func(int)) ScalarParam {
 }
 
 func (p *ScalarParam) SetRegion(region int, value float64) {
-	checkRegion(region)
+	//checkRegion(region)
 	p.setRegion(region, value)
 }
 

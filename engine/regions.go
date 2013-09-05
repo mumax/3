@@ -12,20 +12,21 @@ var (
 	geom    Shape = nil                                 // nil means universe
 )
 
+const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
+
 func init() {
 	DeclFunc("SetGeom", SetGeometry, "Sets the geometry to a given shape")
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
-const MAXREG = 256 // maximum number of regions. (!) duplicated in CUDA
-
 type Regions struct {
-	arr        [][][]byte   // regions map: cell i,j,k -> byte index
-	cpu        []byte       // arr data, stored contiguously
-	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
-	gpuCacheOK bool         // gpuCache in sync with cpu
-	defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
+	arr        [][][]byte  // regions map: cell i,j,k -> byte index
+	cpu        []byte      // arr data, stored contiguously
+	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
+	gpuCacheOK bool        // gpuCache in sync with cpu
+	maxreg     int         // highest used region
+	//defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
 	doc
 }
 
@@ -39,8 +40,15 @@ func (r *Regions) alloc() {
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
-	checkRegionIdx(id)
-	regions.defined[id] = true
+	if id < 0 || id > NREGION {
+		log.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
+	}
+	if id > regions.maxreg {
+		regions.maxreg = id
+	}
+	//regions.defined[id] = true
+	regions.gpuCacheOK = false
+
 	n := Mesh().Size()
 	c := Mesh().CellSize()
 	dx := (float64(n[2]/2) - 0.5) * c[2]
@@ -60,8 +68,6 @@ func DefRegion(id int, s Shape) {
 		}
 	}
 	M.stencilGeom() // TODO: revise if really needed
-	regions.gpuCacheOK = false
-	regions.defined[id] = true
 }
 
 func checkRegionIdx(id int) {

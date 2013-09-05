@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"log"
 	"reflect"
 )
 
@@ -28,7 +27,7 @@ func (e *excitation) init(m *data.Mesh, name, unit string) {
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
-	if !e.v.zero {
+	if !e.v.zero() {
 		cuda.RegionAddV(dst, e.v.Gpu(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
@@ -37,7 +36,7 @@ func (e *excitation) addTo(dst *data.Slice) {
 }
 
 func (e *excitation) IsZero() bool {
-	return e.v.zero && len(e.extraTerms) == 0
+	return e.v.zero() && len(e.extraTerms) == 0
 }
 
 func (e *excitation) Get() (*data.Slice, bool) {
@@ -64,12 +63,12 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 	e.v.SetRegion(region, value)
 }
 
-func (e *excitation) GetVec() []float64 {
-	if len(e.extraTerms) != 0 {
-		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
-	}
-	return e.v.GetVec()
-}
+//func (e *excitation) GetVec() []float64 {
+//	if len(e.extraTerms) != 0 {
+//		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
+//	}
+//	return e.v.GetVec()
+//}
 
 func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }

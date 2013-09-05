@@ -10,8 +10,8 @@ type ScalarParam struct {
 	param
 }
 
-func scalarParam(name, unit string, post func(int)) ScalarParam {
-	return ScalarParam{newParam(1, name, unit, post)}
+func scalarParam(name, unit string, deps ...*param) ScalarParam {
+	return ScalarParam{newParam(1, name, unit, deps...)}
 }
 
 func (p *ScalarParam) SetRegion(region int, value float64) {

@@ -15,21 +15,23 @@ import (
 // implementation allows arbitrary number of components,
 // narrowed down to 1 or 3 in ScalarParam and VectorParam
 type param struct {
-	gpu_ok    bool         // gpu cache up-to date with lut source
-	gpu       cuda.LUTPtrs // gpu copy of lut, lazily transferred when needed
-	cpu_stamp float64
+	gpu_ok    bool               // gpu cache up-to date with lut source
+	gpu       cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
+	cpu_stamp float64            // timestamp for cpu data
 	cpu       [][NREGION]float32 // look-up table source
-	upd       [NREGION]func()
-	deps      []*param
+	upd       [NREGION]func()    // per-region time-dependent functions
+	updateAll func()             // master updater, may be nil
+	deps      []*param           // dependencies
 	doc
 }
 
 // constructor: TODO: init + decl
-func newParam(nComp int, name, unit string, post_update func(int)) param {
+func newParam(nComp int, name, unit string, deps ...*param) param {
 	return param{
 		gpu:       make(cuda.LUTPtrs, nComp),
 		cpu_stamp: math.Inf(-1),
 		cpu:       make([][NREGION]float32, nComp),
+		deps:      deps,
 		doc:       doc{nComp: nComp, name: name, unit: unit}}
 }
 
@@ -84,9 +86,14 @@ func (p *param) cpu_upToDate() bool {
 func (p *param) updateCPU() {
 	p.cpu_stamp = Time
 	p.gpu_ok = false
-	for r := 0; r < regions.maxreg; r++ {
-		if p.upd[r] != nil {
-			p.upd[r]()
+
+	if p.updateAll != nil {
+		p.updateAll()
+	} else {
+		for r := 0; r < regions.maxreg; r++ {
+			if p.upd[r] != nil {
+				p.upd[r]()
+			}
 		}
 	}
 }

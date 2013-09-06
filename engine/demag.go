@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/mag"
 )
 
 var (
@@ -11,20 +10,13 @@ var (
 	M_full      setter      // non-reduced magnetization in A/m
 	B_demag     setter      // demag field in Tesla
 	E_demag     = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
-	EnableDemag = true                          // enable/disable demag field
-	bsat        = scalarParam("Bsat", "T", nil) // automatically derived from Msat, never zero
-	demagconv_  *cuda.DemagConvolution          // does the heavy lifting and provides FFTM
+	EnableDemag = true // enable/disable demag field
+	bsat        derivedParam
+	demagconv_  *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 )
 
 func init() {
-	Msat = scalarParam("Msat", "A/m", func(r int) {
-		msat := Msat.GetRegion(r)
-		bsat.setRegion(r, msat*mag.Mu0)
-		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
-		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
-		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
-	})
-	DeclLValue("Msat", &Msat, "Saturation magnetization (A/m)")
+	Msat.init("Msat", "A/m", "Saturation magnetization")
 
 	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
 		msat, r := Msat.Get()
@@ -38,9 +30,13 @@ func init() {
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
+	bsat.init(1, "Bsat", "T", func(p *param) {
+		panic("todo")
+	})
+
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field (T)", func(b *data.Slice) {
 		if EnableDemag {
-			demagConv().Exec(b, M.buffer, bsat.Gpu(), regions.Gpu())
+			demagConv().Exec(b, M.buffer, bsat.Gpu1(), regions.Gpu())
 		} else {
 			cuda.Zero(b)
 		}

@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	Aex    ScalarParam                       // inter-cell exchange stiffness in J/m
-	B_exch adder                             // exchange field (T) output handle
-	Dex    = scalarParam("dmi", "J/m2", nil) //func(r int) { // Dzyaloshinskii-Moriya strength in J/m²
-	lex2   symmparam                         // inter-cell exchange length squared * 1e18
+	Aex    ScalarParam // inter-cell exchange stiffness in J/m
+	Dex    ScalarParam // TODO: only uniform??
+	B_exch adder       // exchange field (T) output handle
+	lex2   symmparam   // inter-cell exchange length squared * 1e18
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 )
 
@@ -34,7 +34,18 @@ func init() {
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})
+
+	//
+	//  		UPDATE lex:
+	//
+	//		msat := Msat.GetRegion(r)
+	//		bsat.setRegion(r, msat*mag.Mu0)
+	//		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
+	//		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
+	//		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
+
 	registerEnergy(getExchangeEnergy)
+
 }
 
 // Returns the current exchange energy in Joules.

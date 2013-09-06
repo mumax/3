@@ -1,13 +1,21 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/cuda"
 	"reflect"
 )
 
-type VectorParam struct{ param }
+type VectorParam struct {
+	inputParam
+}
 
-func vectorParam(name, unit string, post func(int)) VectorParam {
-	return VectorParam{newParam(3, name, unit, post)}
+func (p *VectorParam) init(name, unit, desc string) {
+	p.param.init_param(3, name, unit, desc)
+	DeclLValue(name, p, desc)
+}
+
+func (p *VectorParam) Gpu() cuda.LUTPtrs {
+	return p.gpu()
 }
 
 func (p *VectorParam) SetRegion(region int, value [3]float64) {

@@ -7,15 +7,15 @@ import (
 
 // specialized param with 1 component
 type ScalarParam struct {
-	param
+	inputParam
 }
 
-func scalarParam(name, unit string, deps ...*param) ScalarParam {
-	return ScalarParam{newParam(1, name, unit, deps...)}
+func (p *ScalarParam) init(name, unit, desc string) {
+	p.param.init_param(1, name, unit, desc)
+	DeclLValue(name, p, desc)
 }
 
 func (p *ScalarParam) SetRegion(region int, value float64) {
-	//checkRegion(region)
 	p.setRegion(region, value)
 }
 
@@ -33,6 +33,5 @@ func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
 func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
 
 func (p *ScalarParam) SetFunc(f func() float64) {
-	// TODO: time - dependent
 	panic("todo")
 }

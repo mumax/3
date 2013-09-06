@@ -2,16 +2,9 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/util"
-	"flag"
 	"github.com/barnex/cuda5/cu"
 	"log"
 	"runtime"
-)
-
-var (
-	Flag_gpu      = flag.Int("gpu", 0, "specify GPU")
-	Flag_sched    = flag.String("sched", "auto", "CUDA scheduling: auto|spin|yield|sync")
-	Flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
 var (
@@ -22,14 +15,14 @@ var (
 	TotalMem int64
 )
 
-func Init() {
+func Init(gpu int, sched string) {
 	if cudaCtx != 0 {
 		return // already inited
 	}
 	var flag uint
-	switch *Flag_sched {
+	switch sched {
 	default:
-		panic("sched flag: expecting auto,spin,yield or sync: " + *Flag_sched)
+		panic("sched flag: expecting auto,spin,yield or sync: " + sched)
 	case "auto":
 		flag = cu.CTX_SCHED_AUTO
 	case "spin":
@@ -40,7 +33,7 @@ func Init() {
 		flag = cu.CTX_BLOCKING_SYNC
 	}
 	tryCuInit()
-	dev := cu.Device(*Flag_gpu)
+	dev := cu.Device(gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
 	concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)

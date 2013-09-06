@@ -27,6 +27,9 @@ var (
 	flag_blocklen = flag.Int("bl", 512, "CUDA 1D thread block length")
 	flag_blockX   = flag.Int("bx", 32, "CUDA 2D thread block size X")
 	flag_blockY   = flag.Int("by", 32, "CUDA 2D thread block size Y")
+	flag_gpu      = flag.Int("gpu", 0, "specify GPU")
+	flag_sched    = flag.String("sched", "yield", "CUDA scheduling: auto|spin|yield|sync")
+	//flag_pagelock = flag.Bool("pagelock", true, "enable CUDA memeory page-locking")
 )
 
 func main() {
@@ -60,7 +63,7 @@ func main() {
 	cuda.BlockSize = *flag_blocklen
 	cuda.TileX = *flag_blockX
 	cuda.TileY = *flag_blockY
-	cuda.Init()
+	cuda.Init(*flag_gpu, *flag_sched)
 	cuda.LockThread()
 
 	initProf()

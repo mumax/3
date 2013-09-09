@@ -15,7 +15,7 @@ func init() {
 
 func bin(file string) Job {
 	var job Job
-	job.Command = "./" + file
-	job.Args = []string{`-f`, `-gpu=%GPU`, `-sched=yield`}
+	job.Command = "exec"
+	job.Args = []string{file, `-f`, `-gpu=%GPU`, `-sched=yield`}
 	return job
 }

@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 )
 
 var (
@@ -19,11 +20,17 @@ func init() {
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
+
 	ku1_red.init_(1, "ku1_red", "T", func() {
-		panic("TODO: ku1")
+		if Ku1.timestamp() != Time || Msat.timestamp() != Time {
+			paramDiv(&ku1_red, Ku1.Cpu(), Msat.Cpu())
+		}
 	})
+
 	kc1_red.init_(1, "kc1_red", "T", func() {
-		panic("TODO: kc1")
+		if Kc1.timestamp() != Time || Msat.timestamp() != Time {
+			paramDiv(&ku1_red, Kc1.Cpu(), Msat.Cpu())
+		}
 	})
 
 	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
@@ -36,9 +43,24 @@ func init() {
 	})
 
 	registerEnergy(getAnisotropyEnergy)
-
 }
 
 func getAnisotropyEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_anis)
+}
+
+// dst = a/b, unless b == 0
+func paramDiv(dst *param, a, b [][NREGION]float32) {
+	util.Assert(dst.NComp() == 1 && len(a) == 1 && len(b) == 1)
+
+	dst.gpu_ok = false
+	for i := 0; i < regions.maxreg; i++ {
+		a := a[0][i]
+		b := b[0][i]
+		if b == 0 {
+			dst.cpu_buf[0][i] = 0
+		} else {
+			dst.cpu_buf[0][i] = a / b
+		}
+	}
 }

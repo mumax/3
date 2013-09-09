@@ -7,7 +7,6 @@ import (
 
 // quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field contributions)
-// TODO -> adder
 type adder struct {
 	addTo func(dst *data.Slice) // calculates quantity and add result to dst
 	info

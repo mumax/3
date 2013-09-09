@@ -6,23 +6,20 @@ import (
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
 	"log"
-	"math"
 	"unsafe"
 )
 
 // param stores a space-dependent material parameter,
 // by keeping a look-up table mapping region index to float value.
 type param struct {
-	gpu_ok    bool               // gpu cache up-to date with lut source
-	gpu_buf   cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
-	cpu_stamp float64            // timestamp for cpu data
-	cpu_buf   [][NREGION]float32 // look-up table source
-	update    func()             // updates cpu_buf, if needed
+	gpu_ok  bool               // gpu cache up-to date with lut source
+	gpu_buf cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
+	cpu_buf [][NREGION]float32 // look-up table source
+	update  func()             // updates cpu_buf, if needed
 	doc
 }
 
 func (p *param) init_(nComp int, name, unit string, upd func()) {
-	p.cpu_stamp = math.Inf(-1)
 	p.cpu_buf = make([][NREGION]float32, nComp)
 	p.update = upd
 	p.doc = doc{nComp: nComp, name: name, unit: unit}

@@ -5,15 +5,18 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
+	"math"
 )
 
 type inputParam struct {
 	param
-	upd_reg [NREGION]func() []float64
+	cpu_stamp float64 // timestamp for cpu data
+	upd_reg   [NREGION]func() []float64
 }
 
 func (p *inputParam) init(nComp int, name, unit string) {
 	p.param.init_(nComp, name, unit, p.update)
+	p.cpu_stamp = math.Inf(-1)
 }
 
 func (p *inputParam) update() {
@@ -31,6 +34,11 @@ func (p *inputParam) update() {
 			}
 		}
 	}
+}
+
+func (p *inputParam) timestamp() float64 {
+	p.update()
+	return p.cpu_stamp
 }
 
 func (p *inputParam) setRegion(region int, v ...float64) {

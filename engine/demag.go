@@ -56,10 +56,3 @@ func demagConv() *cuda.DemagConvolution {
 func getDemagEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_demag)
 }
-
-func safediv(a, b float64) float64 {
-	if b == 0 {
-		return 0
-	}
-	return a / b
-}

@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+// Anisotropy variables
 var (
 	Ku1, Kc1              ScalarParam
 	AnisU, AnisC1, AnisC2 VectorParam

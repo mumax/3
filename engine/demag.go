@@ -6,13 +6,12 @@ import (
 )
 
 var (
-	Msat        ScalarParam // Saturation magnetization in A/m
-	M_full      setter      // non-reduced magnetization in A/m
-	B_demag     setter      // demag field in Tesla
-	E_demag     = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
-	EnableDemag = true // enable/disable demag field
-	bsat        param
-	demagconv_  *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	Msat            ScalarParam
+	M_full, B_demag setter
+	bsat            param
+	E_demag         = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
+	EnableDemag     = true                 // enable/disable demag field
+	demagconv_      *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 )
 
 func init() {
@@ -45,6 +44,7 @@ func init() {
 	registerEnergy(getDemagEnergy)
 }
 
+// returns demag convolution, making sure it's initialized
 func demagConv() *cuda.DemagConvolution {
 	if demagconv_ == nil {
 		demagconv_ = cuda.NewDemag(Mesh())

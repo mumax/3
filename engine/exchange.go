@@ -15,10 +15,7 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness")
 
-	//	, func(r int) {
-	//		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
-	//	})
-	//	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
+	//lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 
 	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 
@@ -36,15 +33,6 @@ func init() {
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})
-
-	//
-	//  		UPDATE lex:
-	//
-	//		msat := Msat.GetRegion(r)
-	//		bsat.setRegion(r, msat*mag.Mu0)
-	//		ku1_red.setRegion(r, safediv(Ku1.GetRegion(r), msat))
-	//		kc1_red.setRegion(r, safediv(Kc1.GetRegion(r), msat))
-	//		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
 
 	registerEnergy(getExchangeEnergy)
 

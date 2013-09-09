@@ -44,9 +44,7 @@ func (r *Regions) init() {
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
-	if id < 0 || id > MAXREG {
-		log.Fatalf("region id should be 0-255, have: %v", id)
-	}
+	checkRegionIdx(id)
 	regions.defined[id] = true
 	n := Mesh().Size()
 	c := Mesh().CellSize()
@@ -69,6 +67,19 @@ func DefRegion(id int, s Shape) {
 	M.stencilGeom() // TODO: revise if really needed
 	regions.gpuCacheOK = false
 	regions.defined[id] = true
+}
+
+func checkRegionIdx(id int) {
+	if id < 0 || id > MAXREG {
+		log.Fatalf("region id should be 0-255, have: %v", id)
+	}
+}
+
+// Set the region of one cell
+func (r *Regions) SetCell(ix, iy, iz int, region int) {
+	checkRegionIdx(region)
+	r.arr[iz][iy][ix] = byte(region)
+	r.gpuCacheOK = false
 }
 
 // Get the region data on GPU, first uploading it if needed.

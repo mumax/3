@@ -11,9 +11,8 @@ import (
 // can be defined region-wise plus extra mask*multiplier terms.
 // This way, arbitrarily complex excitations can be constructed.
 type excitation struct {
-	v          VectorParam // Region-based excitation
+	perRegion  VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
-	info
 }
 
 type mulmask struct {
@@ -22,14 +21,13 @@ type mulmask struct {
 }
 
 // todo: always use global mesh
-func (e *excitation) init(m *data.Mesh, name, unit string) {
-	e.v = vectorParam(name+"_param", unit, nil)
-	e.info = mkInfo(3, name, unit, m)
+func (e *excitation) init(name, unit, desc string) {
+	e.perRegion.param.init_(3, name, unit)
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
-	if !e.v.zero() {
-		cuda.RegionAddV(dst, e.v.Gpu(), regions.Gpu())
+	if !e.perRegion.zero() {
+		cuda.RegionAddV(dst, e.perRegion.Gpu(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
 		cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
@@ -37,11 +35,12 @@ func (e *excitation) addTo(dst *data.Slice) {
 }
 
 func (e *excitation) IsZero() bool {
-	return e.v.zero() && len(e.extraTerms) == 0
+	return e.perRegion.zero() && len(e.extraTerms) == 0
 }
 
 func (e *excitation) Get() (*data.Slice, bool) {
-	buf := cuda.GetBuffer(e.v.NComp(), e.v.Mesh())
+	// TODO: unite with adder
+	buf := cuda.GetBuffer(e.NComp(), e.Mesh())
 	cuda.Zero(buf)
 	e.addTo(buf)
 	return buf, true
@@ -61,17 +60,20 @@ func assureGPU(s *data.Slice) *data.Slice {
 }
 
 func (e *excitation) SetRegion(region int, value [3]float64) {
-	e.v.SetRegion(region, value)
+	e.perRegion.SetRegion(region, value)
 }
 
 func (e *excitation) GetVec() []float64 {
 	if len(e.extraTerms) != 0 {
 		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
 	}
-	return e.v.GetVec()
+	return e.perRegion.GetVec()
 }
 
-func (e *excitation) SetValue(v interface{})  { e.v.SetValue(v) }
+func (e *excitation) Name() string            { return e.perRegion.Name() }
+func (e *excitation) NComp() int              { return e.perRegion.NComp() }
+func (e *excitation) Mesh() *data.Mesh        { return e.perRegion.Mesh() }
+func (e *excitation) SetValue(v interface{})  { e.perRegion.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }

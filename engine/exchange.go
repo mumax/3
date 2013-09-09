@@ -6,18 +6,20 @@ import (
 )
 
 var (
-	Aex    ScalarParam // inter-cell exchange stiffness in J/m
-	Dex    ScalarParam // TODO: only uniform??
-	B_exch adder       // exchange field (T) output handle
-	lex2   symmparam   // inter-cell exchange length squared * 1e18
-	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
+	Aex, Dex ScalarParam
+	B_exch   adder     // exchange field (T) output handle
+	lex2     symmparam // inter-cell exchange length squared * 1e18
+	E_exch   = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 )
 
 func init() {
-	Aex = scalarParam("Aex", "J/m", func(r int) {
-		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
-	})
-	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
+	Aex.init("Aex", "J/m", "Exchange stiffness")
+
+	//	, func(r int) {
+	//		lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
+	//	})
+	//	DeclLValue("Aex", &Aex, "Exchange stiffness (J/m)")
+
 	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 
 	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")

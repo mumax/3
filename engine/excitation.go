@@ -22,12 +22,12 @@ type mulmask struct {
 
 // todo: always use global mesh
 func (e *excitation) init(name, unit, desc string) {
-	e.perRegion.param.init_(3, name, unit)
+	e.perRegion.init(name, unit, "XXXX") // TODO: don't declare
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
 	if !e.perRegion.zero() {
-		cuda.RegionAddV(dst, e.perRegion.Gpu(), regions.Gpu())
+		cuda.RegionAddV(dst, e.perRegion.Gpu3(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
 		cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
@@ -60,7 +60,7 @@ func assureGPU(s *data.Slice) *data.Slice {
 }
 
 func (e *excitation) SetRegion(region int, value [3]float64) {
-	e.perRegion.SetRegion(region, value)
+	e.perRegion.setRegion(region, value[:]...)
 }
 
 func (e *excitation) GetVec() []float64 {

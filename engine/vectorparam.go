@@ -10,7 +10,7 @@ type VectorParam struct {
 }
 
 func (p *VectorParam) init(name, unit, desc string) {
-	p.param.init_param(3, name, unit, desc)
+	p.inputParam.init(3, name, unit)
 	DeclLValue(name, p, desc)
 }
 

@@ -6,8 +6,7 @@ var (
 )
 
 func init() {
-	DeclLValue("B_ext", &B_ext, "External field (T)")
-	B_ext.init(&globalmesh, "B_ext", "T")
+	B_ext.init("B_ext", "T", "Externally applied field")
 	registerEnergy(getZeemanEnergy)
 }
 

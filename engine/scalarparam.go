@@ -11,7 +11,7 @@ type ScalarParam struct {
 }
 
 func (p *ScalarParam) init(name, unit, desc string) {
-	p.param.init_param(1, name, unit, desc)
+	p.inputParam.init(1, name, unit)
 	DeclLValue(name, p, desc)
 }
 
@@ -26,9 +26,9 @@ func (p *ScalarParam) SetValue(v interface{}) {
 func (p *ScalarParam) Eval() interface{}            { return p }
 func (p *ScalarParam) Type() reflect.Type           { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type      { return reflect.TypeOf(float64(0)) }
-func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.cpu[0][region]) }
+func (p *ScalarParam) GetRegion(region int) float64 { return float64(p.getRegion(region)[0]) }
 func (p *ScalarParam) GetUniform() float64          { return p.getUniform()[0] }
-func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.param.Gpu()[0]) }
+func (p *ScalarParam) Gpu() cuda.LUTPtr             { return cuda.LUTPtr(p.Gpu1()) }
 func (p *ScalarParam) Set(v float64)                { p.setUniform(v) }
 func (p *ScalarParam) GetFloat() float64            { return p.GetUniform() }
 

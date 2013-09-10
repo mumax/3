@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
+	"log"
 	"math"
 	"unsafe"
 )
@@ -13,6 +14,7 @@ type symmparam struct {
 	gpu     cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	ok      bool                                 // gpu cache up-to date with lut source
 	modtime float64
+	// TODO: setmodtime: also clears OK flag, mainly in param
 }
 
 func (p *symmparam) init() {
@@ -41,8 +43,9 @@ func (p *symmparam) update() {
 				p.lut[symmidx(i, j)] = 2 / (1/lexi + 1/lexj)
 			}
 		}
+		p.modtime = Time
+		p.ok = false
 	}
-	p.modtime = Time
 }
 
 func safediv(a, b float32) float32 {
@@ -59,7 +62,7 @@ func (p *symmparam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	fmt.Println("upload SymmLUT")
+	log.Println(" ******* upload Aex", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.ok = true
 }
@@ -105,7 +108,7 @@ func (p *symmparam) getInter(r1, r2 int) float64 {
 
 func (p *symmparam) String() string {
 	str := ""
-	for j := 0; j < NREGION; j++ {
+	for j := 0; j < regions.maxreg; j++ {
 		for i := 0; i <= j; i++ {
 			str += fmt.Sprint(p.getInter(j, i), "\t")
 		}

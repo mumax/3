@@ -43,8 +43,8 @@ func DefRegion(id int, s Shape) {
 	if id < 0 || id > NREGION {
 		log.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
 	}
-	if id > regions.maxreg {
-		regions.maxreg = id
+	if id+1 > regions.maxreg {
+		regions.maxreg = id + 1 // we loop < maxreg, so +1
 	}
 	//regions.defined[id] = true
 	regions.gpuCacheOK = false

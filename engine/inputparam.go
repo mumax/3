@@ -5,28 +5,25 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
-	"math"
 )
 
 type inputParam struct {
 	param
-	cpu_stamp float64 // timestamp for cpu data
-	upd_reg   [NREGION]func() []float64
+	upd_reg [NREGION]func() []float64
 }
 
 func (p *inputParam) init(nComp int, name, unit string) {
 	p.param.init_(nComp, name, unit, p.update)
-	p.cpu_stamp = math.Inf(-1)
 }
 
 func (p *inputParam) update() {
-	if p.cpu_stamp != Time {
+	if p.modtime < Time {
 		log.Println("update", p.Name())
-		p.cpu_stamp = Time
+		p.modtime = Time
 
 		for r := 0; r < regions.maxreg; r++ {
 			if p.upd_reg[r] != nil {
-				p.gpu_ok = false
+				p.gpu_ok = false // !
 				v := p.upd_reg[r]()
 				for c := range p.cpu_buf {
 					p.cpu_buf[c][r] = float32(v[c])
@@ -36,22 +33,21 @@ func (p *inputParam) update() {
 	}
 }
 
-func (p *inputParam) timestamp() float64 {
-	p.update()
-	return p.cpu_stamp
-}
-
 func (p *inputParam) setRegion(region int, v ...float64) {
 	util.Argument(len(v) == p.NComp()) // note: also panics if param not initialized (nComp = 0)
 
-	p.gpu_ok = false
+	p.update() // ! make sure everything has same time stamp
 	p.upd_reg[region] = nil
+
 	for c := range v {
 		p.cpu_buf[c][region] = float32(v[c])
 	}
+	p.gpu_ok = false
 }
 
 // set in all regions except 0
+// TODO: should region zero really have unset params?
+// TODO: check if we always start from 1
 func (p *inputParam) setUniform(v ...float64) {
 	for r := 1; r < NREGION; r++ {
 		p.setRegion(r, v...)
@@ -59,7 +55,7 @@ func (p *inputParam) setUniform(v ...float64) {
 }
 
 func (p *inputParam) getRegion(region int) []float64 {
-	cpu := p.Cpu()
+	cpu, _ := p.Cpu()
 	v := make([]float64, p.nComp)
 	for i := range v {
 		v[i] = float64(cpu[i][region])
@@ -72,7 +68,7 @@ func (p *inputParam) GetVec() []float64 {
 }
 
 func (p *param) getUniform() []float64 {
-	cpu := p.Cpu()
+	cpu, _ := p.Cpu()
 	v := make([]float64, p.NComp())
 	for c := range v {
 		x := cpu[c][1]

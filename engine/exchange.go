@@ -14,12 +14,10 @@ var (
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness")
-
+	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
 	lex2.init()
 
-	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
-
-	DeclLValue("Dex", &Dex, "Dzyaloshinskii-Moriya strength (J/m²)")
+	//DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
 		if Dex.zero() {
@@ -35,7 +33,6 @@ func init() {
 	})
 
 	registerEnergy(getExchangeEnergy)
-
 }
 
 // Returns the current exchange energy in Joules.

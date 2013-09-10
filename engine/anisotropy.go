@@ -23,14 +23,22 @@ func init() {
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 
 	ku1_red.init_(1, "ku1_red", "T", func() {
-		if Ku1.timestamp() != Time || Msat.timestamp() != Time {
-			paramDiv(&ku1_red, Ku1.Cpu(), Msat.Cpu())
+		tk_red := ku1_red.modtime
+		K1, tK1 := Ku1.Cpu()
+		Ms, tMs := Msat.Cpu()
+		if tk_red < tK1 || tk_red < tMs {
+			paramDiv(&ku1_red, K1, Ms)
+			ku1_red.modtime = Time
 		}
 	})
 
 	kc1_red.init_(1, "kc1_red", "T", func() {
-		if Kc1.timestamp() != Time || Msat.timestamp() != Time {
-			paramDiv(&ku1_red, Kc1.Cpu(), Msat.Cpu())
+		tk_red := kc1_red.modtime
+		K1, tK1 := Kc1.Cpu()
+		Ms, tMs := Msat.Cpu()
+		if tk_red < tK1 || tk_red < tMs {
+			paramDiv(&kc1_red, K1, Ms)
+			kc1_red.modtime = Time
 		}
 	})
 

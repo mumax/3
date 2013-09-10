@@ -9,14 +9,14 @@ import (
 )
 
 type symmparam struct {
-	lut       [NREGION * (NREGION + 1) / 2]float32 // look-up table source
-	gpu       cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
-	ok        bool                                 // gpu cache up-to date with lut source
-	cpu_stamp float64
+	lut     [NREGION * (NREGION + 1) / 2]float32 // look-up table source
+	gpu     cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
+	ok      bool                                 // gpu cache up-to date with lut source
+	modtime float64
 }
 
 func (p *symmparam) init() {
-	p.cpu_stamp = math.Inf(-1)
+	p.modtime = math.Inf(-1)
 }
 
 // Get a GPU mirror of the look-up table.
@@ -30,10 +30,10 @@ func (p *symmparam) Gpu() cuda.SymmLUT {
 }
 
 func (p *symmparam) update() {
-	if p.cpu_stamp != Time { // TODO: if maxreg changes, we need to update as well...
-		msat := Msat.Cpu()[0]
-		aex := Aex.Cpu()[0]
+	msat, tMsat := Msat.Cpu1()
+	aex, tAex := Aex.Cpu1()
 
+	if p.modtime < tMsat || p.modtime < tAex {
 		for i := 0; i < regions.maxreg; i++ {
 			lexi := 1e18 * safediv(aex[i], msat[i])
 			for j := 0; j <= i; j++ {
@@ -42,7 +42,7 @@ func (p *symmparam) update() {
 			}
 		}
 	}
-	p.cpu_stamp = Time
+	p.modtime = Time
 }
 
 func safediv(a, b float32) float32 {

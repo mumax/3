@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/mag"
 )
 
 var (
@@ -30,7 +31,16 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
 	bsat.init_(1, "Bsat", "T", func() {
-		panic("todo")
+		println("bsat update?")
+		if Msat.timestamp() != Time {
+			println("bsat update!")
+			mSat := Msat.Cpu()[0]
+			bSat := bsat.cpu_buf[0]
+			for i, m := range mSat {
+				bSat[i] = mag.Mu0 * m
+			}
+			bsat.gpu_ok = false
+		}
 	})
 
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field (T)", func(b *data.Slice) {

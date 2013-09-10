@@ -20,6 +20,7 @@ type param struct {
 }
 
 func (p *param) init_(nComp int, name, unit string, upd func()) {
+	util.Assert(nComp > 0)
 	p.cpu_buf = make([][NREGION]float32, nComp)
 	p.update = upd
 	p.doc = doc{nComp: nComp, name: name, unit: unit}
@@ -35,10 +36,13 @@ func (p *param) gpu() cuda.LUTPtrs {
 	if !p.gpu_ok {
 		p.upload()
 	}
+	log.Println(p.name, ".gpu:", p.gpu_buf)
 	return p.gpu_buf
 }
 
-func (p *param) Gpu1() cuda.LUTPtr  { return cuda.LUTPtr(p.gpu()[0]) }
+func (p *param) Gpu1() cuda.LUTPtr {
+	return cuda.LUTPtr(p.gpu()[0])
+}
 func (p *param) Gpu3() cuda.LUTPtrs { return p.gpu() }
 
 // upload cpu table to gpu
@@ -56,6 +60,7 @@ func (p *param) upload() {
 // allocte if when needed
 func (p *param) assureAlloc() {
 	if p.gpu == nil {
+		log.Println("alloc", p.name)
 		util.Assert(p.NComp() > 0)
 		p.gpu_buf = make(cuda.LUTPtrs, p.NComp())
 		for i := range p.gpu_buf {

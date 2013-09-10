@@ -30,15 +30,15 @@ func (p *symmparam) Gpu() cuda.SymmLUT {
 }
 
 func (p *symmparam) update() {
-	msat, tMsat := Msat.Cpu1()
-	aex, tAex := Aex.Cpu1()
+	msat, tMsat := Msat.Cpu()
+	aex, tAex := Aex.Cpu()
 
 	if p.modtime < tMsat || p.modtime < tAex {
 		for i := 0; i < regions.maxreg; i++ {
-			lexi := 1e18 * safediv(aex[i], msat[i])
+			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
 			for j := 0; j <= i; j++ {
-				lexj := 1e18 * safediv(aex[j], msat[j])
-				p.lut[symmidx(i, j)] = 0.5 / (1/lexi + 1/lexj)
+				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
+				p.lut[symmidx(i, j)] = 2 / (1/lexi + 1/lexj)
 			}
 		}
 	}

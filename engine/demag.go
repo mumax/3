@@ -31,11 +31,11 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
 	bsat.init_(1, "Bsat", "T", func() {
-		Ms, tMs := Msat.Cpu1()
+		Ms, tMs := Msat.Cpu()
 		if bsat.modtime < tMs {
-			Bs := bsat.cpu_buf[0]
-			for i, ms := range Ms {
-				Bs[i] = mag.Mu0 * ms
+			println("update Bsat")
+			for i, ms := range Ms[0] {
+				bsat.cpu_buf[0][i] = mag.Mu0 * ms
 			}
 			bsat.modtime = Time
 		}

@@ -18,12 +18,11 @@ func (p *inputParam) init(nComp int, name, unit string) {
 
 func (p *inputParam) update() {
 	if p.modtime < Time {
-		log.Println("update", p.Name())
-		p.modtime = Time
-
 		for r := 0; r < regions.maxreg; r++ {
 			if p.upd_reg[r] != nil {
+				p.modtime = Time // !
 				p.gpu_ok = false // !
+				log.Println("update", p.name, "reg=", r)
 				v := p.upd_reg[r]()
 				for c := range p.cpu_buf {
 					p.cpu_buf[c][r] = float32(v[c])
@@ -36,12 +35,13 @@ func (p *inputParam) update() {
 func (p *inputParam) setRegion(region int, v ...float64) {
 	util.Argument(len(v) == p.NComp()) // note: also panics if param not initialized (nComp = 0)
 
-	p.update() // ! make sure everything has same time stamp
 	p.upd_reg[region] = nil
+	p.update() // ! make sure everything has same time stamp
 
 	for c := range v {
 		p.cpu_buf[c][region] = float32(v[c])
 	}
+	p.modtime = Time
 	p.gpu_ok = false
 }
 

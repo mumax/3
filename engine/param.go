@@ -15,7 +15,7 @@ import (
 type param struct {
 	gpu_ok  bool               // gpu cache up-to date with lut source
 	gpu_buf cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
-	cpu_buf [][NREGION]float32 // look-up table source
+	cpu_buf [][NREGION]float32 // look-up table source // TODO []*[NREGION]float32
 	update  func()             // updates cpu_buf, if needed
 	modtime float64            // timestamp for cpu data
 	doc
@@ -33,25 +33,17 @@ func (p *param) Cpu() (data [][NREGION]float32, modtime float64) {
 	p.update()
 	return p.cpu_buf, p.modtime
 }
-func (p *param) Cpu1() (data [NREGION]float32, modtime float64) {
-	util.Assert(p.nComp == 1)
-	comps, t := p.Cpu()
-	return comps[0], t
-}
 
 // Get a GPU mirror of the look-up table, copies to GPU if needed.
 func (p *param) gpu() cuda.LUTPtrs {
 	if !p.gpu_ok {
 		p.upload()
 	}
-	log.Println("gpu:", p.name, ".gpu:", p.gpu_buf)
 	return p.gpu_buf
 }
 
 func (p *param) Gpu1() cuda.LUTPtr {
-	log.Println("Gpu1:")
 	ptr := cuda.LUTPtr(p.gpu()[0])
-	log.Println("Gpu1:", ptr)
 	return ptr
 }
 
@@ -61,13 +53,12 @@ func (p *param) Gpu3() cuda.LUTPtrs { return p.gpu() }
 func (p *param) upload() {
 	p.assureAlloc()
 	_, _ = p.Cpu() // assures cpu is up-to-date, but don't leak pointer to heap
-	log.Println("upload", p.Name())
 	for c2 := range p.gpu_buf {
 		c := util.SwapIndex(c2, p.NComp()) // XYZ swap here
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
 	}
 	p.gpu_ok = true
-	log.Println("upload", p.name, "gpu_buf=", p.gpu_buf)
+	log.Println("upload", p)
 }
 
 // allocte if when needed

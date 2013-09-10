@@ -62,7 +62,7 @@ func (p *symmparam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	log.Println(" ******* upload Aex", p)
+	log.Println("upload Aex")
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.ok = true
 }

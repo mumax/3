@@ -58,7 +58,7 @@ func (p *param) upload() {
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
 	}
 	p.gpu_ok = true
-	log.Println("upload", p)
+	log.Println("upload", p.name)
 }
 
 // allocte if when needed

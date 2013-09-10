@@ -2,10 +2,10 @@ package engine
 
 import (
 	"code.google.com/p/mx3/cuda"
-	"log"
-	"path"
-	"reflect"
-	"runtime"
+	//"path"
+	//"log"
+	//"reflect"
+	//"runtime"
 )
 
 var (
@@ -15,9 +15,9 @@ var (
 
 // add energy term to global energy
 func registerEnergy(term func() float64) {
-	name := path.Ext(runtime.FuncForPC(reflect.ValueOf(term).Pointer()).Name())
-	name = name[1:len(name)]
-	log.Println("total energy includes", name)
+	//name := path.Ext(runtime.FuncForPC(reflect.ValueOf(term).Pointer()).Name())
+	//name = name[1:len(name)]
+	//log.Println("total energy includes", name)
 	energyTerms = append(energyTerms, term)
 }
 

@@ -71,7 +71,7 @@ func DefRegion(id int, s Shape) {
 }
 
 func checkRegionIdx(id int) {
-	if id < 0 || id > MAXREG {
+	if id < 0 || id > NREGION {
 		log.Fatalf("region id should be 0-255, have: %v", id)
 	}
 }

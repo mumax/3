@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	World.Func("ext_MakeDefects", makeDefects, "Make randomly distributed defects (region, size, probabilty)")
+	DeclFunc("ext_MakeDefects", makeDefects, "Make randomly distributed defects (region, size, probabilty)")
 }
 
 func makeDefects(region, size int, prob float64) {

@@ -15,7 +15,7 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness")
 
-	//lex2.SetInterRegion(r, r, safediv(2e18*Aex.GetRegion(r), Msat.GetRegion(r)))
+	lex2.init()
 
 	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 

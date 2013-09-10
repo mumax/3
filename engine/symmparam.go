@@ -4,13 +4,64 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
+	"math"
 	"unsafe"
 )
 
 type symmparam struct {
-	lut [NREGION * (NREGION + 1) / 2]float32 // look-up table source
-	gpu cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
-	ok  bool                                 // gpu cache up-to date with lut source
+	lut       [NREGION * (NREGION + 1) / 2]float32 // look-up table source
+	gpu       cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
+	ok        bool                                 // gpu cache up-to date with lut source
+	cpu_stamp float64
+}
+
+func (p *symmparam) init() {
+	p.cpu_stamp = math.Inf(-1)
+}
+
+// Get a GPU mirror of the look-up table.
+// Copies to GPU first only if needed.
+func (p *symmparam) Gpu() cuda.SymmLUT {
+	p.update()
+	if !p.ok {
+		p.upload()
+	}
+	return p.gpu
+}
+
+func (p *symmparam) update() {
+	if p.cpu_stamp != Time { // TODO: if maxreg changes, we need to update as well...
+		msat := Msat.Cpu()[0]
+		aex := Aex.Cpu()[0]
+
+		for i := 0; i < regions.maxreg; i++ {
+			lexi := 1e18 * safediv(aex[i], msat[i])
+			for j := 0; j <= i; j++ {
+				lexj := 1e18 * safediv(aex[j], msat[j])
+				p.lut[symmidx(i, j)] = 0.5 / (1/lexi + 1/lexj)
+			}
+		}
+	}
+	p.cpu_stamp = Time
+}
+
+func safediv(a, b float32) float32 {
+	if b == 0 {
+		return 0
+	} else {
+		return a / b
+	}
+}
+
+// XYZ swap here
+func (p *symmparam) upload() {
+	// alloc if  needed
+	if p.gpu == nil {
+		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
+	}
+	fmt.Println("upload SymmLUT")
+	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
+	p.ok = true
 }
 
 func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
@@ -19,7 +70,7 @@ func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
 
 	if r1 == r2 {
 		r := r1
-		for i := 0; i < NREGION; i++ { // could use regions.maxreg?
+		for i := 0; i < NREGION; i++ {
 			if p.lut[symmidx(i, i)] == v {
 				p.lut[symmidx(r, i)] = v
 			} else {
@@ -52,29 +103,9 @@ func (p *symmparam) getInter(r1, r2 int) float64 {
 	return float64(p.lut[symmidx(r1, r2)])
 }
 
-// Get a GPU mirror of the look-up table.
-// Copies to GPU first only if needed.
-func (p *symmparam) Gpu() cuda.SymmLUT {
-	if p.ok {
-		return p.gpu
-	}
-	p.upload()
-	return p.gpu
-}
-
-// XYZ swap here
-func (p *symmparam) upload() {
-	if p.gpu == nil { // alloc only when needed, allows param use in init()
-		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
-	}
-	//fmt.Println("upload SymmLUT\n", p)
-	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
-	p.ok = true
-}
-
 func (p *symmparam) String() string {
 	str := ""
-	for j := 0; j < regions.maxreg; j++ {
+	for j := 0; j < NREGION; j++ {
 		for i := 0; i <= j; i++ {
 			str += fmt.Sprint(p.getInter(j, i), "\t")
 		}

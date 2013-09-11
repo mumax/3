@@ -1,6 +1,6 @@
 
-setgridsize(128, 128, 2)
-setcellsize(1e-9, 1e-9, 1e-9)
+setgridsize(128, 64, 2)
+setcellsize(1e-9, 2e-9, 1e-9)
 
 Msat = 800e3
 Aex = 13e-12

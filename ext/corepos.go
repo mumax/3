@@ -9,7 +9,7 @@ var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", co
 func corePos() []float64 {
 
 	m, _ := engine.M.Get()
-	mz3d := m.Comp(0).HostCopy().Scalars()
+	m_z := m.Comp(0).HostCopy().Scalars()
 
 	s := m.Mesh().Size()
 	Nx, Ny, Nz := s[2], s[1], s[0] // (xyz swap)
@@ -18,11 +18,10 @@ func corePos() []float64 {
 	var maxX, maxY, maxZ int
 
 	for z := 0; z < Nz; z++ {
-		mz := mz3d[z]
 		// Avoid the boundaries so the neighbor interpolation can't go out of bounds.
 		for y := 1; y < Ny-1; y++ {
 			for x := 1; x < Nx-1; x++ {
-				m := abs(mz[y][x])
+				m := abs(m_z[z][y][x])
 				if m > max {
 					maxX, maxY, maxZ = x, y, z
 					max = m
@@ -33,9 +32,14 @@ func corePos() []float64 {
 
 	pos := make([]float64, 3)
 
-	mz := mz3d[maxZ]
-	pos[0] = float64(maxX) + interpolate_maxpos(max, -1., abs(mz[maxY][maxX-1]), 1., abs(mz[maxY][maxX+1])) - float64(len(mz[1]))/2 + 0.5
-	pos[1] = float64(maxY) + interpolate_maxpos(max, -1., abs(mz[maxY-1][maxX]), 1., abs(mz[maxY+1][maxX])) - float64(len(mz[0]))/2 + 0.5
+	// sub-cell interpolation in X and Y, but not Z
+	mz := m_z[maxZ]
+	pos[0] = float64(maxX) + interpolate_maxpos(
+		max, -1, abs(mz[maxY][maxX-1]), 1, abs(mz[maxY][maxX+1])) -
+		float64(Nx)/2 + 0.5
+	pos[1] = float64(maxY) + interpolate_maxpos(
+		max, -1, abs(mz[maxY-1][maxX]), 1, abs(mz[maxY+1][maxX])) -
+		float64(Ny)/2 + 0.5
 	pos[2] = float64(maxZ) - float64(Nz)/2 + 0.5
 
 	pos[0] *= engine.Mesh().CellSize()[2] // (xyz swap)

@@ -31,9 +31,8 @@ func SaveAs(q Getter, fname string) {
 // not be written after this call.
 func AsyncSave(fname string, s *data.Slice, time float64) {
 	initQue()
-	S := *s
-	s.Disable() // avoid use after save
-	saveQue <- saveTask{fname, &S, time}
+	//s.Disable() // avoid use after save
+	saveQue <- saveTask{fname, s, time}
 }
 
 // Copy to CPU, if needed
@@ -41,7 +40,10 @@ func assureCPU(s *data.Slice) *data.Slice {
 	if s.CPUAccess() {
 		return s
 	} else {
-		return s.HostCopy()
+		log.Println("** hostcopy of:", s)
+		c := s.HostCopy()
+		log.Println("** hostcopy is:", c)
+		return c
 	}
 }
 
@@ -72,6 +74,7 @@ type saveTask struct {
 // the rather big queue allows big output bursts to be concurrent with GPU.
 func runSaver() {
 	for t := range saveQue {
+		log.Println("** MustWriteFile:", t.output)
 		data.MustWriteFile(t.fname, t.output, t.time)
 	}
 	done <- true

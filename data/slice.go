@@ -13,7 +13,7 @@ import (
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 // TODO: unified memory is not used anymore, can be removed. Then we can split cuda.Slice and data.Slice?
 type Slice struct {
-	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local
+	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
 	ptrs      []unsafe.Pointer         // points into ptr_
 	tag, unit string                   // Human-readable descriptors
 	mesh      *Mesh
@@ -68,6 +68,7 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 		s.ptrs[c] = ptrs[c]
 	}
 	s.memType = memType
+	util.Assert(s.ptrs[0] != nil) // TODO: rm
 	return s
 }
 
@@ -228,6 +229,7 @@ func (s *Slice) HostCopy() *Slice {
 		cpy = cpy.Slice(0, s.Len())
 	}
 	Copy(cpy, s)
+	util.Assert(s.ptrs[0] != nil) // todo rm
 	return cpy
 }
 

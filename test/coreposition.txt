@@ -1,5 +1,5 @@
 
-setgridsize(128, 128, 1)
+setgridsize(128, 128, 2)
 setcellsize(1e-9, 1e-9, 1e-9)
 
 Msat = 800e3

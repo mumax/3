@@ -1,8 +1,6 @@
 package ext
 
-import (
-	"code.google.com/p/mx3/engine"
-)
+import "code.google.com/p/mx3/engine"
 
 var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
 
@@ -10,7 +8,6 @@ func corePos() []float64 {
 
 	m, _ := engine.M.Get()
 	m_z := m.Comp(0).HostCopy().Scalars()
-
 	s := m.Mesh().Size()
 	Nx, Ny, Nz := s[2], s[1], s[0] // (xyz swap)
 
@@ -31,9 +28,9 @@ func corePos() []float64 {
 	}
 
 	pos := make([]float64, 3)
+	mz := m_z[maxZ]
 
 	// sub-cell interpolation in X and Y, but not Z
-	mz := m_z[maxZ]
 	pos[0] = float64(maxX) + interpolate_maxpos(
 		max, -1, abs(mz[maxY][maxX-1]), 1, abs(mz[maxY][maxX+1])) -
 		float64(Nx)/2 + 0.5
@@ -42,9 +39,10 @@ func corePos() []float64 {
 		float64(Ny)/2 + 0.5
 	pos[2] = float64(maxZ) - float64(Nz)/2 + 0.5
 
-	pos[0] *= engine.Mesh().CellSize()[2] // (xyz swap)
-	pos[1] *= engine.Mesh().CellSize()[1]
-	pos[2] *= engine.Mesh().CellSize()[0]
+	c := m.Mesh().CellSize()
+	pos[0] *= c[2] // (xyz swap)
+	pos[1] *= c[1]
+	pos[2] *= c[0]
 
 	pos[0] += totalShift // add simulation window shift
 	return pos

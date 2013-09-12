@@ -10,8 +10,8 @@ import (
 // can be defined region-wise plus extra mask*multiplier terms.
 // This way, arbitrarily complex excitations can be constructed.
 type excitation struct {
-	perRegion  VectorParam // Region-based excitation
-	extraTerms []mulmask   // add extra mask*multiplier terms
+	perRegion  inputParam // Region-based excitation
+	extraTerms []mulmask  // add extra mask*multiplier terms
 }
 
 type mulmask struct {
@@ -21,7 +21,8 @@ type mulmask struct {
 
 // todo: always use global mesh
 func (e *excitation) init(name, unit, desc string) {
-	e.perRegion.init(name, unit, "XXXX") // TODO: don't declare
+	e.perRegion.init(3, name, unit, nil)
+	world.LValue(name, e, desc)
 }
 
 func (e *excitation) addTo(dst *data.Slice) {

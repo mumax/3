@@ -14,6 +14,10 @@ func (p *derivedParam) init(nComp int, updater func(*derivedParam)) {
 	p.updater = updater
 }
 
+func (p *derivedParam) invalidate() {
+	p.uptodate = false
+}
+
 func (p *derivedParam) Cpu() [][NREGION]float32 {
 	if !p.uptodate {
 		p.updater(p)

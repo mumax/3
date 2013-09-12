@@ -60,3 +60,10 @@ func (p *gpuTable) assureAlloc() {
 		}
 	}
 }
+
+type cpuTable struct {
+	cpu_buf [][NREGION]float32 // look-up table source
+}
+
+func (b *cpuTable) NComp() int     { return len(b.cpu_buf) }
+func (b *cpuTable) init(ncomp int) { b.cpu_buf = make([][NREGION]float32, ncomp) }

@@ -13,9 +13,8 @@ var (
 )
 
 func init() {
-	Aex.init("Aex", "J/m", "Exchange stiffness", nil) // TODO: lex2!
+	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
-	lex2.init()
 
 	//DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 

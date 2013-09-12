@@ -10,7 +10,7 @@ type ScalarParam struct {
 	inputParam
 }
 
-func (p *ScalarParam) init(name, unit, desc string, children []*derivedParam) {
+func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 	p.inputParam.init(1, name, unit, children)
 	DeclLValue(name, p, desc)
 }

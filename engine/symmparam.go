@@ -5,45 +5,44 @@ import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"log"
-	"math"
 	"unsafe"
 )
 
 type symmparam struct {
-	lut     [NREGION * (NREGION + 1) / 2]float32 // look-up table source
-	gpu     cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
-	ok      bool                                 // gpu cache up-to date with lut source
-	modtime float64
-	// TODO: setmodtime: also clears OK flag, mainly in param
+	lut            [NREGION * (NREGION + 1) / 2]float32 // look-up table source
+	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
+	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
+
 }
 
-func (p *symmparam) init() {
-	p.modtime = math.Inf(-1)
-}
+func (p *symmparam) invalidate() { p.cpu_ok = false }
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
 func (p *symmparam) Gpu() cuda.SymmLUT {
 	p.update()
-	if !p.ok {
+	if !p.gpu_ok {
 		p.upload()
 	}
 	return p.gpu
 }
 
 func (p *symmparam) update() {
-	msat := Msat.Cpu()
-	aex := Aex.Cpu()
+	if !p.cpu_ok {
+		msat := Msat.Cpu()
+		aex := Aex.Cpu()
 
-	// todo: conditional
-	for i := 0; i < regions.maxreg; i++ {
-		lexi := 2e18 * safediv(aex[0][i], msat[0][i])
-		for j := 0; j <= i; j++ {
-			lexj := 2e18 * safediv(aex[0][j], msat[0][j])
-			p.lut[symmidx(i, j)] = 2 / (1/lexi + 1/lexj)
+		// todo: conditional
+		for i := 0; i < regions.maxreg; i++ {
+			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
+			for j := 0; j <= i; j++ {
+				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
+				p.lut[symmidx(i, j)] = 2 / (1/lexi + 1/lexj)
+			}
 		}
+		p.gpu_ok = false
+		p.cpu_ok = true
 	}
-	p.ok = false
 }
 
 func safediv(a, b float32) float32 {
@@ -62,7 +61,7 @@ func (p *symmparam) upload() {
 	}
 	log.Println("upload Aex")
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
-	p.ok = true
+	p.gpu_ok = true
 }
 
 func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
@@ -80,15 +79,15 @@ func (p *symmparam) SetInterRegion(r1, r2 int, val float64) {
 		}
 	}
 
-	p.ok = false
+	p.gpu_ok = false
 }
 
-func (p *symmparam) SetUniform(v float64) {
-	for i := range p.lut {
-		p.lut[i] = float32(v)
-	}
-	p.ok = false
-}
+//func (p *symmparam) SetUniform(v float64) {
+//	for i := range p.lut {
+//		p.lut[i] = float32(v)
+//	}
+//	p.ok = false
+//}
 
 // Index in symmetric matrix where only one half is stored.
 // (!) Code duplicated in exchange.cu

@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	Msat.init("Msat", "A/m", "Saturation magnetization", []*derivedParam{&bsat})
+	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&bsat, &lex2})
 
 	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
 		msat, r := Msat.Get()

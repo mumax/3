@@ -16,8 +16,8 @@ var (
 )
 
 func init() {
-	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant", []*derivedParam{&ku1_red})
-	Kc1.init("Kc1", "J/m3", "Cubic anisotropy constant", []*derivedParam{&kc1_red})
+	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant", []derived{&ku1_red})
+	Kc1.init("Kc1", "J/m3", "Cubic anisotropy constant", []derived{&kc1_red})
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")

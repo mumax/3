@@ -6,23 +6,20 @@ import (
 	"log"
 )
 
-type cpuTable struct {
-	cpu_buf [][NREGION]float32 // look-up table source
-}
-
-func (b *cpuTable) NComp() int     { return len(b.cpu_buf) }
-func (b *cpuTable) init(ncomp int) { b.cpu_buf = make([][NREGION]float32, ncomp) }
-
 type inputParam struct {
 	gpuTable
 	cpuTable
 	upd_reg   [NREGION]func() []float64
 	timestamp float64 // don't double-evaluate f(t)
-	children  []*derivedParam
+	children  []derived
 	descr
 }
 
-func (p *inputParam) init(nComp int, name, unit string, children []*derivedParam) {
+type derived interface {
+	invalidate()
+}
+
+func (p *inputParam) init(nComp int, name, unit string, children []derived) {
 	p.cpuTable.init(nComp)
 	p.gpuTable.init(nComp)
 	p.descr = descr{name, unit}
@@ -73,7 +70,7 @@ func (p *inputParam) bufset(region int, v []float64) {
 	}
 	p.gpu_ok = false
 	for _, c := range p.children {
-		c.uptodate = false
+		c.invalidate()
 	}
 }
 

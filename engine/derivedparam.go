@@ -1,9 +1,6 @@
 package engine
 
-import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/util"
-)
+import ()
 
 type derivedParam struct {
 	gpuTable
@@ -15,20 +12,6 @@ type derivedParam struct {
 func (p *derivedParam) init(nComp int, updater func(*derivedParam)) {
 	p.cpu_buf = make([][NREGION]float32, nComp)
 	p.updater = updater
-}
-
-func (p *derivedParam) gpu() cuda.LUTPtrs {
-	if !p.gpu_ok {
-		p.upload(p.Cpu())
-	}
-	return p.gpu_buf
-}
-
-func (p *derivedParam) NComp() int { return len(p.cpu_buf) }
-
-func (p *derivedParam) gpu1() cuda.LUTPtr {
-	util.Assert(p.NComp() == 1)
-	return cuda.LUTPtr(p.gpu()[0])
 }
 
 func (p *derivedParam) Cpu() [][NREGION]float32 {

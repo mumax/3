@@ -129,7 +129,7 @@ func stencil(dst *data.Slice, stencil []byte) {
 	}
 }
 
-func (b *buffered) GetVec() []float64       { return Average(b) }
+//func (b *buffered) GetVec() []float64       { return Average(b) }
 func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }

@@ -1,17 +1,13 @@
 package engine
 
-import ()
-
 type derivedParam struct {
-	gpuTable
-	cpuTable
+	lut
 	updater  func(*derivedParam)
 	uptodate bool
 }
 
 func (p *derivedParam) init(nComp int, updater func(*derivedParam)) {
-	p.cpuTable.init(nComp)
-	p.gpuTable.init(nComp, p)
+	p.lut.init(nComp, p)
 	p.updater = updater
 }
 
@@ -20,11 +16,16 @@ func (p *derivedParam) invalidate() {
 }
 
 func (p *derivedParam) Cpu() [][NREGION]float32 {
+	p.update()
+	return p.cpu_buf
+}
+
+func (p *derivedParam) update() {
 	if !p.uptodate {
 		p.updater(p)
 		p.gpu_ok = false
+		p.uptodate = true
 	}
-	return p.cpu_buf
 }
 
 func isZero(v [][NREGION]float32) bool {

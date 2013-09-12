@@ -62,7 +62,7 @@ func Serve(port string) {
 	http.HandleFunc("/render/", serveRender)
 
 	// geometry
-	size := Mesh().Size()
+	size := Mesh().Size() // deadly race condition here!!!!!!
 	gui.SetValue("nx", size[2])
 	gui.SetValue("ny", size[1])
 	gui.SetValue("nz", size[0])

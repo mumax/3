@@ -8,10 +8,10 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1, Kc1              ScalarParam
-	AnisU, AnisC1, AnisC2 VectorParam
-	ku1_red, kc1_red      derivedParam
-	B_anis                adder // field due to uniaxial anisotropy (T)
+	Ku1, Kc1              ScalarParam  // uniaxial and cubic anis constants
+	AnisU, AnisC1, AnisC2 VectorParam  // unixial and cubic anis axes
+	ku1_red, kc1_red      derivedParam // K1 / Msat
+	B_anis                adder        // field due to uniaxial anisotropy (T)
 	E_anis                = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
 )
 
@@ -50,7 +50,7 @@ func getAnisotropyEnergy() float64 {
 func paramDiv(dst, a, b [][NREGION]float32) {
 	util.Assert(len(dst) == 1 && len(a) == 1 && len(b) == 1)
 
-	for i := 0; i < regions.maxreg; i++ {
+	for i := 0; i < NREGION; i++ { // todo: regions.maxreg
 		a := a[0][i]
 		b := b[0][i]
 		if b == 0 {

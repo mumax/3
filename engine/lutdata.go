@@ -9,36 +9,37 @@ import (
 	"unsafe"
 )
 
-// TODO: fuse cputable
-
-type gpuTable struct {
-	gpu_buf cuda.LUTPtrs // gpu copy of lut, lazily transferred when needed
-	gpu_ok  bool         // gpu cache up-to date with lut source
-	source  interface {
-		Cpu() [][NREGION]float32
-	}
+type lut struct {
+	gpu_buf cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
+	gpu_ok  bool               // gpu cache up-to date with lut source
+	cpu_buf [][NREGION]float32 // look-up table source
+	source  updater
 }
 
-func (p *gpuTable) init(nComp int, source interface {
-	Cpu() [][NREGION]float32
-}) {
+type updater interface {
+	update()
+}
+
+func (p *lut) init(nComp int, source updater) {
 	p.gpu_buf = make(cuda.LUTPtrs, nComp)
+	p.cpu_buf = make([][NREGION]float32, nComp)
 	p.source = source
 }
 
-func (p *gpuTable) LUT() cuda.LUTPtrs {
+func (p *lut) LUT() cuda.LUTPtrs {
+	p.source.update()
 	if !p.gpu_ok {
-		p.upload(p.source.Cpu())
+		p.upload()
 	}
 	return p.gpu_buf
 }
 
-func (p *gpuTable) LUT1() cuda.LUTPtr {
+func (p *lut) LUT1() cuda.LUTPtr {
 	util.Assert(len(p.gpu_buf) == 1)
 	return cuda.LUTPtr(p.LUT()[0])
 }
 
-func (p *gpuTable) Get() (*data.Slice, bool) {
+func (p *lut) Get() (*data.Slice, bool) {
 	gpu := p.LUT()
 	nComp := len(p.gpu_buf)
 	b := cuda.GetBuffer(nComp, &globalmesh)
@@ -48,7 +49,8 @@ func (p *gpuTable) Get() (*data.Slice, bool) {
 	return b, true
 }
 
-func (p *gpuTable) upload(cpu [][NREGION]float32) {
+func (p *lut) upload() {
+	cpu := p.cpu_buf
 	util.Assert(len(cpu) == len(p.gpu_buf))
 	ncomp := len(cpu)
 	p.assureAlloc()
@@ -60,7 +62,7 @@ func (p *gpuTable) upload(cpu [][NREGION]float32) {
 	log.Println("upload", cpu)
 }
 
-func (p *gpuTable) assureAlloc() {
+func (p *lut) assureAlloc() {
 	if p.gpu_buf[0] == nil {
 		for i := range p.gpu_buf {
 			p.gpu_buf[i] = cuda.MemAlloc(NREGION * cu.SIZEOF_FLOAT32)
@@ -68,9 +70,4 @@ func (p *gpuTable) assureAlloc() {
 	}
 }
 
-type cpuTable struct {
-	cpu_buf [][NREGION]float32 // look-up table source
-}
-
-func (b *cpuTable) NComp() int     { return len(b.cpu_buf) }
-func (b *cpuTable) init(ncomp int) { b.cpu_buf = make([][NREGION]float32, ncomp) }
+func (b *lut) NComp() int { return len(b.cpu_buf) }

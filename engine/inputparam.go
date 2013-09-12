@@ -7,8 +7,7 @@ import (
 )
 
 type inputParam struct {
-	gpuTable
-	cpuTable
+	lut
 	upd_reg   [NREGION]func() []float64
 	timestamp float64 // don't double-evaluate f(t)
 	children  []derived
@@ -20,25 +19,31 @@ type derived interface {
 }
 
 func (p *inputParam) init(nComp int, name, unit string, children []derived) {
-	p.cpuTable.init(nComp)
-	p.gpuTable.init(nComp, p)
+	p.lut.init(nComp, p)
 	p.descr = descr{name, unit}
 	p.children = children
 }
 
-func (p *inputParam) Cpu() [][NREGION]float32 {
+func (p *inputParam) update() {
 	if p.timestamp != Time {
-
+		changed := false
 		// update functions of time
 		for r := 0; r < regions.maxreg; r++ {
 			updFunc := p.upd_reg[r]
 			if updFunc != nil {
 				p.bufset(r, updFunc())
+				changed = true
 			}
 		}
 		p.timestamp = Time
-
+		if changed {
+			p.invalidate()
+		}
 	}
+}
+
+func (p *inputParam) Cpu() [][NREGION]float32 {
+	p.update()
 	return p.cpu_buf
 }
 
@@ -52,6 +57,9 @@ func (p *inputParam) bufset(region int, v []float64) {
 	for c := range p.cpu_buf {
 		p.cpu_buf[c][region] = float32(v[c])
 	}
+}
+
+func (p *inputParam) invalidate() {
 	p.gpu_ok = false
 	for _, c := range p.children {
 		c.invalidate()

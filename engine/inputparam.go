@@ -42,22 +42,6 @@ func (p *inputParam) Cpu() [][NREGION]float32 {
 	return p.cpu_buf
 }
 
-//func(p*inputParam)gpu() cuda.LUTPtrs{
-//	if !p.gpu_ok{
-//		p.upload(p.Cpu())
-//	}
-//	return p.gpu_buf
-//}
-
-//type paramIface interface{
-//	gpu()cuda.LUTPtrs
-//	NComp()int
-//	Mesh()*data.Mesh
-//}
-//
-//func paramDecode(p paramIface){
-//}
-
 func (p *inputParam) setRegion(region int, v []float64) {
 	util.Argument(len(v) == len(p.cpu_buf))
 	p.upd_reg[region] = nil

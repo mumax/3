@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
+	"log"
 	"unsafe"
 )
 
@@ -56,6 +57,7 @@ func (p *gpuTable) upload(cpu [][NREGION]float32) {
 		cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&cpu[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
 	}
 	p.gpu_ok = true
+	log.Println("upload", cpu)
 }
 
 func (p *gpuTable) assureAlloc() {

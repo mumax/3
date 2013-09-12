@@ -19,7 +19,6 @@ type mulmask struct {
 	mask *data.Slice
 }
 
-// todo: always use global mesh
 func (e *excitation) init(name, unit, desc string) {
 	e.perRegion.init(3, name, unit, nil)
 	world.LValue(name, e, desc)
@@ -39,7 +38,6 @@ func (e *excitation) IsZero() bool {
 }
 
 func (e *excitation) Get() (*data.Slice, bool) {
-	// TODO: unite with adder
 	buf := cuda.GetBuffer(e.NComp(), e.Mesh())
 	cuda.Zero(buf)
 	e.addTo(buf)
@@ -59,9 +57,9 @@ func assureGPU(s *data.Slice) *data.Slice {
 	}
 }
 
-func (e *excitation) SetRegion(region int, value [3]float64) {
-	e.perRegion.setRegion(region, value[:])
-}
+//func (e *excitation) SetRegion(region int, value [3]float64) {
+//	e.perRegion.setRegion(region, value[:])
+//}
 
 //func (e *excitation) GetVec() []float64 {
 //	if len(e.extraTerms) != 0 {
@@ -70,10 +68,14 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 //	return e.perRegion.GetVec()
 //}
 
+func (e *excitation) SetValue(v interface{}) {
+	vec := v.([3]float64)
+	e.perRegion.setUniform(vec[:])
+}
+
 func (e *excitation) Name() string            { return e.perRegion.Name() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }
-func (e *excitation) SetValue(v interface{})  { e.perRegion.SetValue(v) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }

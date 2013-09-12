@@ -30,6 +30,7 @@ func (p *inputParam) Cpu() [][NREGION]float64 {
 			for c := range p.cpu_buf {
 				p.cpu_buf[c][r] = float32(v[c])
 			}
+			// !! p.gpu_ok = false // !!
 		}
 
 		p.timestamp = Time

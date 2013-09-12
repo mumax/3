@@ -20,8 +20,6 @@ func init() {
 // geometrical shape for setting sample geometry
 type Shape func(x, y, z float64) bool
 
-// Primitives:
-
 // Ellipsoid with given diameters
 func Ellipsoid(diamx, diamy, diamz float64) Shape {
 	return func(x, y, z float64) bool {
@@ -108,8 +106,6 @@ func Cell(k, j, i int) Shape {
 func universe(x, y, z float64) bool {
 	return true
 }
-
-// Transforms:
 
 // Transl returns a translated copy of the shape.
 func (s Shape) Transl(dx, dy, dz float64) Shape {

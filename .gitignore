@@ -16,3 +16,4 @@
 mx3
 *.tar.gz
 mumax3.*linux*cuda*
+*.*~

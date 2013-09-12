@@ -34,7 +34,6 @@ var (
 
 func main() {
 	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
-
 	flag.Parse()
 
 	log.SetPrefix("")

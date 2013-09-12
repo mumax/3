@@ -10,44 +10,32 @@ import (
 var (
 	Ku1, Kc1              ScalarParam
 	AnisU, AnisC1, AnisC2 VectorParam
-	ku1_red, kc1_red      param
+	ku1_red, kc1_red      derivedParam
 	B_anis                adder // field due to uniaxial anisotropy (T)
 	E_anis                = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
 )
 
 func init() {
-	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant")
-	Kc1.init("Kc1", "J/m3", "Cubic anisotropy constant")
+	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant", []*derivedParam{&ku1_red})
+	Kc1.init("Kc1", "J/m3", "Cubic anisotropy constant", []*derivedParam{&kc1_red})
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 
-	ku1_red.init_(1, "ku1_red", "T", func() {
-		tk_red := ku1_red.modtime
-		K1, tK1 := Ku1.Cpu()
-		Ms, tMs := Msat.Cpu()
-		if tk_red < tK1 || tk_red < tMs {
-			paramDiv(&ku1_red, K1, Ms)
-			ku1_red.modtime = Time
-		}
+	ku1_red.init(1, func(p *derivedParam) {
+		paramDiv(p.cpu_buf, Ku1.Cpu(), Msat.Cpu())
 	})
 
-	kc1_red.init_(1, "kc1_red", "T", func() {
-		tk_red := kc1_red.modtime
-		K1, tK1 := Kc1.Cpu()
-		Ms, tMs := Msat.Cpu()
-		if tk_red < tK1 || tk_red < tMs {
-			paramDiv(&kc1_red, K1, Ms)
-			kc1_red.modtime = Time
-		}
+	kc1_red.init(1, func(p *derivedParam) {
+		paramDiv(p.cpu_buf, Kc1.Cpu(), Msat.Cpu())
 	})
 
 	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
-		if !ku1_red.zero() {
-			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.Gpu1(), AnisU.Gpu(), regions.Gpu())
+		if !isZero(ku1_red.Cpu()) {
+			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpu1(), AnisU.LUT(), regions.Gpu())
 		}
-		if !kc1_red.zero() {
-			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.Gpu1(), AnisC1.Gpu(), AnisC2.Gpu(), regions.Gpu())
+		if !isZero(kc1_red.Cpu()) {
+			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.LUT1(), AnisC1.LUT(), AnisC2.LUT(), regions.Gpu())
 		}
 	})
 
@@ -59,17 +47,16 @@ func getAnisotropyEnergy() float64 {
 }
 
 // dst = a/b, unless b == 0
-func paramDiv(dst *param, a, b [][NREGION]float32) {
-	util.Assert(dst.NComp() == 1 && len(a) == 1 && len(b) == 1)
+func paramDiv(dst, a, b [][NREGION]float32) {
+	util.Assert(len(dst) == 1 && len(a) == 1 && len(b) == 1)
 
-	dst.gpu_ok = false
 	for i := 0; i < regions.maxreg; i++ {
 		a := a[0][i]
 		b := b[0][i]
 		if b == 0 {
-			dst.cpu_buf[0][i] = 0
+			dst[0][i] = 0
 		} else {
-			dst.cpu_buf[0][i] = a / b
+			dst[0][i] = a / b
 		}
 	}
 }

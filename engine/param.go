@@ -1,13 +1,12 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
-	"github.com/barnex/cuda5/cu"
-	"log"
-	"math"
-	"unsafe"
+//"code.google.com/p/mx3/data"
+//"code.google.com/p/mx3/util"
+//"github.com/barnex/cuda5/cu"
+//"log"
+//"math"
+//"unsafe"
 )
 
 //// param stores a space-dependent material parameter,

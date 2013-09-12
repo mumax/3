@@ -14,15 +14,15 @@ var (
 )
 
 func init() {
-	Alpha.init("alpha", "", "Landau-Lifshitz damping constant")
-	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque")
+	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", nil)
+	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
 	JPol.init("JPol", "A/m2", "Polarized electrical current density")
 
 	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
 
 	LLTorque.init(3, &globalmesh, "lltorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
 		B_eff.set(b)
-		cuda.LLTorque(b, M.buffer, b, Alpha.Gpu(), regions.Gpu())
+		cuda.LLTorque(b, M.buffer, b, Alpha.LUT1(), regions.Gpu())
 	})
 
 	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
@@ -31,7 +31,7 @@ func init() {
 			if rec {
 				defer cuda.RecycleBuffer(jspin)
 			}
-			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.Gpu1(), Alpha.Gpu(), Xi.Gpu(), regions.Gpu())
+			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.LUT1(), Alpha.LUT1(), Xi.LUT1(), regions.Gpu())
 		}
 	})
 

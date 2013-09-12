@@ -10,7 +10,8 @@ type derivedParam struct {
 }
 
 func (p *derivedParam) init(nComp int, updater func(*derivedParam)) {
-	p.cpu_buf = make([][NREGION]float32, nComp)
+	p.cpuTable.init(nComp)
+	p.gpuTable.init(nComp)
 	p.updater = updater
 }
 

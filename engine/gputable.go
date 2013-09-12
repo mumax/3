@@ -8,6 +8,8 @@ import (
 	"unsafe"
 )
 
+// TODO: fuse cputable
+
 type gpuTable struct {
 	gpu_buf cuda.LUTPtrs // gpu copy of lut, lazily transferred when needed
 	gpu_ok  bool         // gpu cache up-to date with lut source

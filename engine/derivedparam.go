@@ -11,7 +11,7 @@ type derivedParam struct {
 
 func (p *derivedParam) init(nComp int, updater func(*derivedParam)) {
 	p.cpuTable.init(nComp)
-	p.gpuTable.init(nComp)
+	p.gpuTable.init(nComp, p)
 	p.updater = updater
 }
 

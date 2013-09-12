@@ -18,8 +18,11 @@ type gpuTable struct {
 	}
 }
 
-func (p *gpuTable) init(nComp int) {
+func (p *gpuTable) init(nComp int, source interface {
+	Cpu() [][NREGION]float32
+}) {
 	p.gpu_buf = make(cuda.LUTPtrs, nComp)
+	p.source = source
 }
 
 func (p *gpuTable) LUT() cuda.LUTPtrs {

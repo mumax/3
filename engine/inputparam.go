@@ -21,7 +21,7 @@ type derived interface {
 
 func (p *inputParam) init(nComp int, name, unit string, children []derived) {
 	p.cpuTable.init(nComp)
-	p.gpuTable.init(nComp)
+	p.gpuTable.init(nComp, p)
 	p.descr = descr{name, unit}
 	p.children = children
 }

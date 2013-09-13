@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"log"
 	"reflect"
 )
 
@@ -25,7 +26,7 @@ func (e *excitation) init(name, unit, desc string) {
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
-	if isZero(e.perRegion.Cpu()) {
+	if !isZero(e.perRegion.Cpu()) {
 		cuda.RegionAddV(dst, e.perRegion.LUT(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
@@ -69,6 +70,7 @@ func assureGPU(s *data.Slice) *data.Slice {
 //}
 
 func (e *excitation) SetValue(v interface{}) {
+	log.Println("excitation.SetValue", v)
 	vec := v.([3]float64)
 	e.perRegion.setUniform(vec[:])
 }

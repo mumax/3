@@ -27,10 +27,10 @@ func (p *inputParam) update() {
 	if p.timestamp != Time {
 		changed := false
 		// update functions of time
-		for r := 0; r < regions.maxreg; r++ {
+		for r := 0; r < NREGION; r++ { // TODO: 1..maxreg
 			updFunc := p.upd_reg[r]
 			if updFunc != nil {
-				p.bufset(r, updFunc())
+				p.bufset_(r, updFunc())
 				changed = true
 			}
 		}
@@ -47,18 +47,34 @@ func (p *inputParam) Cpu() [][NREGION]float32 {
 }
 
 func (p *inputParam) setRegion(region int, v []float64) {
-	util.Argument(len(v) == len(p.cpu_buf))
-	p.upd_reg[region] = nil
-	p.bufset(region, v)
+	p.setRegions(region, region, v)
 }
 
-func (p *inputParam) bufset(region int, v []float64) {
+// set in all regions except 0
+// TODO: should region zero really have unset params?
+// TODO: check if we always start from 1
+func (p *inputParam) setUniform(v []float64) {
+	p.setRegions(1, NREGION, v)
+}
+
+func (p *inputParam) setRegions(r1, r2 int, v []float64) {
+	log.Println("inputParam.setRegions", r1, r2, v)
+	util.Argument(len(v) == len(p.cpu_buf))
+	for r := 1; r < NREGION; r++ {
+		p.upd_reg[r] = nil
+		p.bufset_(r, v)
+	}
+	p.invalidate()
+}
+
+func (p *inputParam) bufset_(region int, v []float64) {
 	for c := range p.cpu_buf {
 		p.cpu_buf[c][region] = float32(v[c])
 	}
 }
 
 func (p *inputParam) invalidate() {
+	log.Println(p.name, ".invalidate()")
 	p.gpu_ok = false
 	for _, c := range p.children {
 		c.invalidate()
@@ -71,15 +87,6 @@ type descr struct {
 
 func (d *descr) Name() string { return d.name }
 func (d *descr) Unit() string { return d.unit }
-
-// set in all regions except 0
-// TODO: should region zero really have unset params?
-// TODO: check if we always start from 1
-func (p *inputParam) setUniform(v []float64) {
-	for r := 1; r < NREGION; r++ {
-		p.setRegion(r, v)
-	}
-}
 
 func (p *inputParam) getRegion(region int) []float64 {
 	cpu := p.Cpu()

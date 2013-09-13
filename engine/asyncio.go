@@ -10,6 +10,7 @@ import (
 
 type Getter interface {
 	Get() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
+	Name() string
 }
 
 // Save under given file name (transparant async I/O).

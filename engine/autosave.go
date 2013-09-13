@@ -3,25 +3,24 @@ package engine
 import "fmt"
 
 var (
-	output  = make(map[AutoSaver]*autosave) // when to save quantities
-	autonum = make(map[AutoSaver]int)       // auto number for out file
+	output  = make(map[Saver]*autosave) // when to save quantities
+	autonum = make(map[interface{}]int) // auto number for out file
 )
 
 func init() {
-	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
-	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
+	//DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
+	//DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
 	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
 }
 
-// Anything that can be autosaved
-type AutoSaver interface {
-	Getter
-	Name() string
+// Anything that can be saved with auto name
+type Saver interface {
+	Save()
 }
 
 // Register quant to be auto-saved every period.
 // period == 0 stops autosaving.
-func AutoSave(quant AutoSaver, period float64) {
+func AutoSave(quant Saver, period float64) {
 	if period == 0 {
 		delete(output, quant)
 	} else {
@@ -33,14 +32,14 @@ func AutoSave(quant AutoSaver, period float64) {
 func DoOutput() {
 	for q, a := range output {
 		if a.needSave() {
-			Save(q)
+			q.Save()
 			a.count++
 		}
 	}
 }
 
 // Save once, with auto file name
-func Save(q AutoSaver) {
+func save(q Getter) {
 	fname := fmt.Sprintf("%s%06d.dump", q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++

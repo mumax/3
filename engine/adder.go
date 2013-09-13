@@ -25,3 +25,5 @@ func (a *adder) Get() (q *data.Slice, recycle bool) {
 	a.addTo(buf)
 	return buf, true
 }
+
+func (a *adder) Save() { save(a) }

@@ -13,7 +13,7 @@ func initTest() {
 		return
 	}
 	LockThread()
-	Init()
+	Init(0, "auto")
 	{
 		inh1 := make([]float32, 1000)
 		for i := range inh1 {

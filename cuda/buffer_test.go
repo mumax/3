@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	Init()
+	Init(0, "auto")
 }
 
 func TestBuffer(t *testing.T) {

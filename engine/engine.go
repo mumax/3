@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-const VERSION = "mx3.0.11 α "
+const VERSION = "mumax3.0.12 α "
 
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 

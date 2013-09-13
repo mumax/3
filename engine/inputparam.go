@@ -84,7 +84,7 @@ func (d *descr) Name() string { return d.name }
 func (d *descr) Unit() string { return d.unit }
 
 func (p *inputParam) getRegion(region int) []float64 {
-	cpu := p.Cpu()
+	cpu := p.CpuLUT()
 	v := make([]float64, p.NComp())
 	for i := range v {
 		v[i] = float64(cpu[i][region])
@@ -98,7 +98,7 @@ func (p *inputParam) getRegion(region int) []float64 {
 //
 func (p *inputParam) getUniform() []float64 {
 	v1 := p.getRegion(1)
-	cpu := p.Cpu()
+	cpu := p.CpuLUT()
 	for r := 2; r < regions.maxreg; r++ {
 		for c := range v1 {
 			if cpu[c][r] != float32(v1[c]) {

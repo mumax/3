@@ -29,8 +29,8 @@ func (p *symmparam) Gpu() cuda.SymmLUT {
 
 func (p *symmparam) update() {
 	if !p.cpu_ok {
-		msat := Msat.Cpu()
-		aex := Aex.Cpu()
+		msat := Msat.CpuLUT()
+		aex := Aex.CpuLUT()
 
 		// todo: conditional
 		for i := 0; i < regions.maxreg; i++ {

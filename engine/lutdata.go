@@ -9,15 +9,16 @@ import (
 	"unsafe"
 )
 
+// look-up table for region based parameters
 type lut struct {
-	gpu_buf cuda.LUTPtrs       // gpu copy of lut, lazily transferred when needed
-	gpu_ok  bool               // gpu cache up-to date with lut source
-	cpu_buf [][NREGION]float32 // look-up table source
-	source  updater
+	gpu_buf cuda.LUTPtrs       // gpu copy of cpu buffer, only transferred when needed
+	gpu_ok  bool               // gpu cache up-to date with cpu source?
+	cpu_buf [][NREGION]float32 // table data on cpu
+	source  updater            // updates cpu data
 }
 
 type updater interface {
-	update()
+	update() // updates cpu lookup table
 }
 
 func (p *lut) init(nComp int, source updater) {
@@ -26,36 +27,48 @@ func (p *lut) init(nComp int, source updater) {
 	p.source = source
 }
 
-func (p *lut) Cpu() [][NREGION]float32 {
+// get an up-to-date version of the lookup-table on CPU
+func (p *lut) CpuLUT() [][NREGION]float32 {
 	p.source.update()
 	return p.cpu_buf
 }
 
+// get an up-to-date version of the lookup-table on GPU
 func (p *lut) LUT() cuda.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
-		p.upload()
+		// upload to GPU
+		log.Println("upload", p.cpu_buf)
+		p.assureAlloc()
+		ncomp := p.NComp()
+		for c2 := range p.gpu_buf {
+			c := util.SwapIndex(c2, ncomp) // XYZ swap here
+			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
+		}
+		p.gpu_ok = true
 	}
 	return p.gpu_buf
 }
 
+// utility for LUT of single-component data
 func (p *lut) LUT1() cuda.LUTPtr {
 	util.Assert(len(p.gpu_buf) == 1)
 	return cuda.LUTPtr(p.LUT()[0])
 }
 
+// uncompress the table to a full array with parameter values per cell.
 func (p *lut) Get() (*data.Slice, bool) {
 	gpu := p.LUT()
-	nComp := len(p.gpu_buf)
-	b := cuda.GetBuffer(nComp, &globalmesh)
-	for c := 0; c < nComp; c++ {
+	b := cuda.GetBuffer(p.NComp(), &globalmesh)
+	for c := 0; c < p.NComp(); c++ {
 		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
 	}
 	return b, true
 }
 
+// all data is 0?
 func (p *lut) isZero() bool {
-	v := p.Cpu()
+	v := p.CpuLUT()
 	for c := range v {
 		for i := range v[c] { // TODO: regions.maxreg
 			if v[c][i] != 0 {
@@ -64,19 +77,6 @@ func (p *lut) isZero() bool {
 		}
 	}
 	return true
-}
-
-func (p *lut) upload() {
-	cpu := p.cpu_buf
-	util.Assert(len(cpu) == len(p.gpu_buf))
-	ncomp := len(cpu)
-	p.assureAlloc()
-	for c2 := range p.gpu_buf {
-		c := util.SwapIndex(c2, ncomp) // XYZ swap here
-		cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&cpu[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
-	}
-	p.gpu_ok = true
-	log.Println("upload", cpu)
 }
 
 func (p *lut) assureAlloc() {

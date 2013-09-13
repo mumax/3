@@ -22,7 +22,9 @@ var (
 func init() {
 	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclROnly("table", &Table, `Provides methods for tabular output`)
 
+	// magnetization
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
 
 	// effective field
@@ -34,8 +36,6 @@ func init() {
 	})
 
 	// torque inited in torque.go
-
-	DeclROnly("table", &Table, `Provides methods for tabular output`)
 }
 
 func Mesh() *data.Mesh {

@@ -23,11 +23,11 @@ func init() {
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 
 	ku1_red.init(1, func(p *derivedParam) {
-		paramDiv(p.cpu_buf, Ku1.Cpu(), Msat.Cpu())
+		paramDiv(p.cpu_buf, Ku1.CpuLUT(), Msat.CpuLUT())
 	})
 
 	kc1_red.init(1, func(p *derivedParam) {
-		paramDiv(p.cpu_buf, Kc1.Cpu(), Msat.Cpu())
+		paramDiv(p.cpu_buf, Kc1.CpuLUT(), Msat.CpuLUT())
 	})
 
 	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {

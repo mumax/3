@@ -31,7 +31,7 @@ func init() {
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
-	bsat.init(1, func(p *derivedParam) {
+	bsat.init(1, []updater{&Msat}, func(p *derivedParam) {
 		Ms := Msat.CpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms

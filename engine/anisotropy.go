@@ -22,11 +22,11 @@ func init() {
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 
-	ku1_red.init(1, func(p *derivedParam) {
+	ku1_red.init(1, []updater{&Ku1, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Ku1.CpuLUT(), Msat.CpuLUT())
 	})
 
-	kc1_red.init(1, func(p *derivedParam) {
+	kc1_red.init(1, []updater{&Kc1, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc1.CpuLUT(), Msat.CpuLUT())
 	})
 

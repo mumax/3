@@ -19,7 +19,7 @@ func init() {
 	//DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
-		if isZero(Dex.Cpu()) {
+		if Dex.isZero() {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 		} else {
 			// DMI only implemented for uniform parameters

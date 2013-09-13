@@ -26,6 +26,11 @@ func (p *lut) init(nComp int, source updater) {
 	p.source = source
 }
 
+func (p *lut) Cpu() [][NREGION]float32 {
+	p.source.update()
+	return p.cpu_buf
+}
+
 func (p *lut) LUT() cuda.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
@@ -47,6 +52,18 @@ func (p *lut) Get() (*data.Slice, bool) {
 		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
 	}
 	return b, true
+}
+
+func (p *lut) isZero() bool {
+	v := p.Cpu()
+	for c := range v {
+		for i := range v[c] { // TODO: regions.maxreg
+			if v[c][i] != 0 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (p *lut) upload() {

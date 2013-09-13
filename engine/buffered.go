@@ -39,6 +39,7 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	}
 }
 
+// Get the value of one cell.
 func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
 	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
 }

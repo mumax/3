@@ -26,7 +26,7 @@ func init() {
 	})
 
 	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
-		if !JPol.IsZero() {
+		if !JPol.isZero() {
 			jspin, rec := JPol.Get()
 			if rec {
 				defer cuda.RecycleBuffer(jspin)

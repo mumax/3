@@ -9,7 +9,6 @@ import (
 
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
-// This way, arbitrarily complex excitations can be constructed.
 type excitation struct {
 	perRegion  inputParam // Region-based excitation
 	extraTerms []mulmask  // add extra mask*multiplier terms
@@ -26,7 +25,7 @@ func (e *excitation) init(name, unit, desc string) {
 }
 
 func (e *excitation) addTo(dst *data.Slice) {
-	if !isZero(e.perRegion.Cpu()) {
+	if !e.perRegion.isZero() {
 		cuda.RegionAddV(dst, e.perRegion.LUT(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
@@ -34,8 +33,8 @@ func (e *excitation) addTo(dst *data.Slice) {
 	}
 }
 
-func (e *excitation) IsZero() bool {
-	return isZero(e.perRegion.Cpu()) && len(e.extraTerms) == 0
+func (e *excitation) isZero() bool {
+	return e.perRegion.isZero() && len(e.extraTerms) == 0
 }
 
 func (e *excitation) Get() (*data.Slice, bool) {
@@ -58,9 +57,9 @@ func assureGPU(s *data.Slice) *data.Slice {
 	}
 }
 
-//func (e *excitation) SetRegion(region int, value [3]float64) {
-//	e.perRegion.setRegion(region, value[:])
-//}
+func (e *excitation) SetRegion(region int, value [3]float64) {
+	e.perRegion.setRegion(region, value[:])
+}
 
 //func (e *excitation) GetVec() []float64 {
 //	if len(e.extraTerms) != 0 {

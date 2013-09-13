@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/mx3/mag"
 )
 
+// demag variables
 var (
 	Msat            ScalarParam
 	bsat            derivedParam

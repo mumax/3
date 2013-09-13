@@ -31,7 +31,6 @@ func SaveAs(q Getter, fname string) {
 // not be written after this call.
 func AsyncSave(fname string, s *data.Slice, time float64) {
 	initQue()
-	//s.Disable() // avoid use after save
 	saveQue <- saveTask{fname, s, time}
 }
 

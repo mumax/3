@@ -41,11 +41,6 @@ func (p *inputParam) update() {
 	}
 }
 
-func (p *inputParam) Cpu() [][NREGION]float32 {
-	p.update()
-	return p.cpu_buf
-}
-
 func (p *inputParam) setRegion(region int, v []float64) {
 	p.setRegions(region, region, v)
 }

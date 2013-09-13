@@ -56,16 +56,6 @@ func (p *lut) LUT1() cuda.LUTPtr {
 	return cuda.LUTPtr(p.LUT()[0])
 }
 
-// uncompress the table to a full array with parameter values per cell.
-func (p *lut) Get() (*data.Slice, bool) {
-	gpu := p.LUT()
-	b := cuda.GetBuffer(p.NComp(), &globalmesh)
-	for c := 0; c < p.NComp(); c++ {
-		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
-	}
-	return b, true
-}
-
 // all data is 0?
 func (p *lut) isZero() bool {
 	v := p.CpuLUT()
@@ -88,3 +78,13 @@ func (p *lut) assureAlloc() {
 }
 
 func (b *lut) NComp() int { return len(b.cpu_buf) }
+
+// uncompress the table to a full array with parameter values per cell.
+func (p *lut) Get() (*data.Slice, bool) {
+	gpu := p.LUT()
+	b := cuda.GetBuffer(p.NComp(), &globalmesh)
+	for c := 0; c < p.NComp(); c++ {
+		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
+	}
+	return b, true
+}

@@ -24,9 +24,9 @@ func init() {
 		} else {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
-			msat := Msat.GetUniform()
-			D := Dex.GetUniform() / msat
-			A := Aex.GetUniform() / msat
+			msat := Msat.getUniform()[0]
+			D := Dex.getUniform()[0] / msat
+			A := Aex.getUniform()[0] / msat
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})

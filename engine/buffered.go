@@ -16,7 +16,7 @@ type buffered struct {
 
 // init metadata but does not allocate yet
 func (b *buffered) init(nComp int, name, unit, doc_ string, mesh *data.Mesh) {
-	b.info = mkInfo(nComp, name, unit, mesh)
+	b.info = Info(nComp, name, unit, mesh)
 	DeclLValue(name, b, doc_)
 }
 

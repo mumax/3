@@ -17,11 +17,6 @@ func init() {
 // FFT of m
 type fftm struct{}
 
-func (f *fftm) NComp() int       { return 3 }
-func (f *fftm) Name() string     { return "mFFT" }
-func (f *fftm) Unit() string     { return "" }
-func (f *fftm) Mesh() *data.Mesh { return &demagConv().FFTMesh }
-
 func (q *fftm) Get() (quant *data.Slice, recycle bool) {
 	mesh := q.Mesh()
 	n := mesh.Size()
@@ -62,6 +57,11 @@ func (q *fftmPower) Get() (*data.Slice, bool) {
 	}
 	return power, false
 }
+
+func (f *fftm) NComp() int       { return 3 }
+func (f *fftm) Name() string     { return "mFFT" }
+func (f *fftm) Unit() string     { return "" }
+func (f *fftm) Mesh() *data.Mesh { return &demagConv().FFTMesh }
 
 func sqr(x float32) float32  { return x * x }
 func sqrt(x float32) float32 { return float32(math.Sqrt(float64(x))) }

@@ -5,11 +5,12 @@ import (
 	"log"
 )
 
+// input parameter, settable by user
 type inputParam struct {
 	lut
-	upd_reg   [NREGION]func() []float64
-	timestamp float64 // don't double-evaluate f(t)
-	children  []derived
+	upd_reg   [NREGION]func() []float64 // time-dependent values
+	timestamp float64                   // used not to double-evaluate f(t)
+	children  []derived                 // derived parameters
 	descr
 }
 
@@ -41,6 +42,7 @@ func (p *inputParam) update() {
 	}
 }
 
+// set in one region
 func (p *inputParam) setRegion(region int, v []float64) {
 	p.setRegions(region, region, v)
 }
@@ -52,6 +54,7 @@ func (p *inputParam) setUniform(v []float64) {
 	p.setRegions(1, NREGION, v)
 }
 
+// set in regions r1..r2(excl)
 func (p *inputParam) setRegions(r1, r2 int, v []float64) {
 	log.Println("inputParam.setRegions", r1, r2, v)
 	util.Argument(len(v) == len(p.cpu_buf))
@@ -68,6 +71,7 @@ func (p *inputParam) bufset_(region int, v []float64) {
 	}
 }
 
+// mark my GPU copy and my children as invalid (need update)
 func (p *inputParam) invalidate() {
 	log.Println(p.name, ".invalidate()")
 	p.gpu_ok = false
@@ -75,13 +79,6 @@ func (p *inputParam) invalidate() {
 		c.invalidate()
 	}
 }
-
-type descr struct {
-	name, unit string
-}
-
-func (d *descr) Name() string { return d.name }
-func (d *descr) Unit() string { return d.unit }
 
 func (p *inputParam) getRegion(region int) []float64 {
 	cpu := p.CpuLUT()

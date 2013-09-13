@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	regions       = Regions{doc: doc{1, "regions", ""}} // global regions map
+	regions       = Regions{doc: Doc(1, "regions", "")} // global regions map
 	geom    Shape = nil                                 // nil means universe
 )
 

@@ -14,7 +14,7 @@
 
 	defregion(1, Yrange(0, inf))
 	defregion(2, Yrange(-inf, 0))
-	lex := sqrt(2*Aex.GetFloat() / Msat.GetFloat())
+	lex := sqrt(2*Aex.GetUniform() / Msat.GetUniform())
 	setlexchange(1, 2, lex)
 
 // relax
@@ -28,7 +28,6 @@
 	expect("mz", m_[2], 0,       1e-3)
 
 // reversal
-	autosave(m, 20e-12)
 	alpha = 0.02
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)

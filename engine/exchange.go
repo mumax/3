@@ -18,8 +18,7 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
-
-	//DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
+	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
 		if Dex.isZero() {

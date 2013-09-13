@@ -62,6 +62,7 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 }
 
 func (e *excitation) GetVec() []float64 {
+	// TODO: average? maybe for all?
 	if len(e.extraTerms) != 0 {
 		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
 	}
@@ -69,7 +70,6 @@ func (e *excitation) GetVec() []float64 {
 }
 
 func (e *excitation) SetValue(v interface{}) {
-	log.Println("excitation.SetValue", v)
 	vec := v.([3]float64)
 	e.perRegion.setUniform(vec[:])
 }

@@ -40,10 +40,7 @@ func assureCPU(s *data.Slice) *data.Slice {
 	if s.CPUAccess() {
 		return s
 	} else {
-		log.Println("** hostcopy of:", s)
-		c := s.HostCopy()
-		log.Println("** hostcopy is:", c)
-		return c
+		return s.HostCopy()
 	}
 }
 
@@ -74,7 +71,6 @@ type saveTask struct {
 // the rather big queue allows big output bursts to be concurrent with GPU.
 func runSaver() {
 	for t := range saveQue {
-		log.Println("** MustWriteFile:", t.output)
 		data.MustWriteFile(t.fname, t.output, t.time)
 	}
 	done <- true

@@ -56,7 +56,6 @@ func (p *inputParam) setUniform(v []float64) {
 
 // set in regions r1..r2(excl)
 func (p *inputParam) setRegions(r1, r2 int, v []float64) {
-	log.Println("inputParam.setRegions", r1, r2, v)
 	util.Argument(len(v) == len(p.cpu_buf))
 	for r := 1; r < NREGION; r++ {
 		p.upd_reg[r] = nil
@@ -73,7 +72,6 @@ func (p *inputParam) bufset_(region int, v []float64) {
 
 // mark my GPU copy and my children as invalid (need update)
 func (p *inputParam) invalidate() {
-	log.Println(p.name, ".invalidate()")
 	p.gpu_ok = false
 	for _, c := range p.children {
 		c.invalidate()

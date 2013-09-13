@@ -61,12 +61,12 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 	e.perRegion.setRegion(region, value[:])
 }
 
-//func (e *excitation) GetVec() []float64 {
-//	if len(e.extraTerms) != 0 {
-//		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
-//	}
-//	return e.perRegion.GetVec()
-//}
+func (e *excitation) GetVec() []float64 {
+	if len(e.extraTerms) != 0 {
+		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
+	}
+	return e.perRegion.getRegion(1)
+}
 
 func (e *excitation) SetValue(v interface{}) {
 	log.Println("excitation.SetValue", v)
@@ -75,6 +75,7 @@ func (e *excitation) SetValue(v interface{}) {
 }
 
 func (e *excitation) Name() string            { return e.perRegion.Name() }
+func (e *excitation) Unit() string            { return e.perRegion.Unit() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }
 func (e *excitation) Eval() interface{}       { return e }

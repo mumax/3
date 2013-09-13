@@ -29,38 +29,25 @@ func (t *DataTable) Add(output getVec) {
 	t.outputs = append(t.outputs, output)
 }
 
-////func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
-////	t.Add(newScalar(nComp, name, unit, f))
-////}
-//
-////func (t *DataTable) arm(good bool) {
-////	if good && t.needSave() {
-////		t.init()
-////		for _, o := range t.outputs {
-////			o.arm()
-////		}
-////	}
-////}
-//
-//func (t *DataTable) touch(good bool) {
-//	if good && t.needSave() {
-//		t.Save()
-//		t.saved()
-//	}
+//func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
+//	t.Add(newScalar(nComp, name, unit, f))
 //}
-//
+
 func (t *DataTable) Save() {
-	log.Println("TODO: table.save")
-	//	t.init()
-	//	fmt.Fprint(t, Time)
-	//	for _, o := range t.outputs {
-	//		vec := o.GetVec()
-	//		for _, v := range vec {
-	//			fmt.Fprint(t, "\t", v)
-	//		}
-	//	}
-	//	fmt.Fprintln(t)
-	//	t.Flush()
+	t.init()
+	fmt.Fprint(t, Time)
+	for _, o := range t.outputs {
+		vec := o.GetVec()
+		for _, v := range vec {
+			fmt.Fprint(t, "\t", v)
+		}
+	}
+	fmt.Fprintln(t)
+	t.Flush()
+}
+
+func (t *DataTable) AutoSave(period float64) {
+	AutoSave(t, period)
 }
 
 func newTable(name string) *DataTable {
@@ -69,8 +56,7 @@ func newTable(name string) *DataTable {
 	return t
 }
 
-//
-//// open writer and write header
+// open writer and write header
 func (t *DataTable) init() {
 	if !t.inited() {
 		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
@@ -97,9 +83,8 @@ func (t *DataTable) inited() bool {
 	return t.Writer != nil
 }
 
-//func (t *DataTable) flush() {
-//	if t.Writer != nil {
-//		t.Flush()
-//	}
-//}
-//
+func (t *DataTable) flush() {
+	if t.Writer != nil {
+		t.Flush()
+	}
+}

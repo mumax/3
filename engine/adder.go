@@ -26,4 +26,4 @@ func (a *adder) Get() (q *data.Slice, recycle bool) {
 	return buf, true
 }
 
-func (a *adder) Save() { save(a) }
+func (a *adder) Save() { Save(a) }

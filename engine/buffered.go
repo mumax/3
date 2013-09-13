@@ -135,6 +135,7 @@ func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }
 func (m *buffered) Eval() interface{}       { return m }
+func (m *buffered) Save()                   { Save(m) }
 
 func normalize(v [3]float64) [3]float64 {
 	s := 1 / math.Sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])

@@ -89,10 +89,10 @@ func (p *inputParam) getRegion(region int) []float64 {
 	return v
 }
 
-//func (p *inputParam) GetVec() []float64 {
-//	return p.getRegion(1) // TODO: revise
-//}
-//
+func (p *inputParam) GetVec() []float64 {
+	return p.getRegion(1) // TODO: revise
+}
+
 func (p *inputParam) getUniform() []float64 {
 	v1 := p.getRegion(1)
 	cpu := p.CpuLUT()

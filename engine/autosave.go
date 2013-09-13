@@ -8,8 +8,8 @@ var (
 )
 
 func init() {
-	//DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
-	//DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
+	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
+	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
 	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
 }
 
@@ -39,7 +39,7 @@ func DoOutput() {
 }
 
 // Save once, with auto file name
-func save(q Getter) {
+func Save(q Getter) {
 	fname := fmt.Sprintf("%s%06d.dump", q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++

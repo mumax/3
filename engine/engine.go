@@ -108,8 +108,7 @@ func checkM() {
 func Close() {
 	log.Println("shutting down")
 	drainOutput()
-	log.Println("TODO: FLUSH TABLE")
-	//Table.flush()
+	Table.flush()
 }
 
 //func sanitycheck() {

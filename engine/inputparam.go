@@ -105,3 +105,6 @@ func (p *inputParam) getUniform() []float64 {
 	}
 	return v1
 }
+
+func (p *inputParam) Save()           { Save(p) }
+func (p *inputParam) SaveAs(f string) { SaveAs(p, f) }

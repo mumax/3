@@ -8,6 +8,8 @@ import (
 func init() {
 	engine.DeclFunc("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
 	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
+	engine.DeclROnly("ext_dwpos", DWPos, "Position of window following domain wall")
+	engine.DeclROnly("ext_dwspeed", DWSpeed, "Speed of window following domain wall")
 }
 
 // This post-step function centers the simulation window on a domain wall

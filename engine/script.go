@@ -7,7 +7,7 @@ import (
 	"code.google.com/p/mx3/script"
 )
 
-var world = script.NewWorld()
+var World = script.NewWorld()
 
 func init() {
 	DeclFunc("vector", Vector, "Constructs a vector with given components")
@@ -16,25 +16,25 @@ func init() {
 }
 
 func DeclFunc(name string, f interface{}, doc string) {
-	world.Func(name, f, doc)
+	World.Func(name, f, doc)
 }
 
 func DeclConst(name string, value float64, doc string) {
-	world.Const(name, value, doc)
+	World.Const(name, value, doc)
 }
 
 func DeclVar(name string, value interface{}, doc string) {
-	world.Var(name, value, doc)
+	World.Var(name, value, doc)
 	guiAdd(name, value)
 }
 
 func DeclLValue(name string, value script.LValue, doc string) {
-	world.LValue(name, value, doc)
+	World.LValue(name, value, doc)
 	guiAdd(name, value)
 }
 
 func DeclROnly(name string, value interface{}, doc string) {
-	world.ROnly(name, value, doc)
+	World.ROnly(name, value, doc)
 	guiAdd(name, value)
 }
 
@@ -48,7 +48,7 @@ func guiAdd(name string, value interface{}) {
 }
 
 func Compile(src string) (script.Expr, error) {
-	world.EnterScope() // file-level scope
-	defer world.ExitScope()
-	return world.Compile(src)
+	World.EnterScope() // file-level scope
+	defer World.ExitScope()
+	return World.Compile(src)
 }

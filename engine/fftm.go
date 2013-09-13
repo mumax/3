@@ -62,6 +62,7 @@ func (f *fftm) NComp() int       { return 3 }
 func (f *fftm) Name() string     { return "mFFT" }
 func (f *fftm) Unit() string     { return "" }
 func (f *fftm) Mesh() *data.Mesh { return &demagConv().FFTMesh }
+func (f *fftm) Save()            { Save(f) }
 
 func sqr(x float32) float32  { return x * x }
 func sqrt(x float32) float32 { return float32(math.Sqrt(float64(x))) }

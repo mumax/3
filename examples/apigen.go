@@ -19,7 +19,7 @@ var (
 )
 
 func buildAPI() {
-	cuda.Init()
+	cuda.Init(0, "yield") // gpu 0
 	cuda.LockThread()
 
 	ident := engine.World.Identifiers

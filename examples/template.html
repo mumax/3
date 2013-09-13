@@ -142,7 +142,7 @@ Aex   = 10e-12
 alpha = 3
 
 // define exchange length
-lex := sqrt(Aex.GetFloat() / (0.5 * mu0 * pow(Msat.GetFloat(),2)))
+lex := sqrt(Aex.GetRegion(1) / (0.5 * mu0 * pow(Msat.GetRegion(1),2)))
 
 d     := 30 * lex                        // we test for d/lex = 30
 Sizex := 5*d                             // magnet size x
@@ -469,7 +469,7 @@ alpha = 0.02                                  // normal damping
 postStep(ext_centerPMAwall)
 
 // Schedule output
-m.autosave(100e-12)
+autosave(m, 100e-12)
 
 // Run for 1ns with current through the sample
 jpol = vector(1.5e13, 0, 0)
@@ -509,7 +509,7 @@ Run(1e-9)    // relax
 Alpha = 0.02 // restore normal damping
 
 // Schedule output
-m.autosave(100e-12)
+autosave(m, 100e-12)
 table.add(ext_dwpos)   // domain wall position
 table.add(ext_dwspeed) // domain wall speed
 table.autosave(10e-12)

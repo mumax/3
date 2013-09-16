@@ -51,6 +51,7 @@ var (
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
 	flag_csv       = flag.Bool("csv", false, `output in CSV format`)
+	flag_json      = flag.Bool("json", false, `output in JSON format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
@@ -183,6 +184,13 @@ func process(f *data.Slice, time float64, name string) {
 		out := open(name + ".csv")
 		defer out.Close()
 		dumpCSV(out, f)
+		haveOutput = true
+	}
+
+	if *flag_json {
+		out := open(name + ".json")
+		defer out.Close()
+		dumpJSON(out, f)
 		haveOutput = true
 	}
 

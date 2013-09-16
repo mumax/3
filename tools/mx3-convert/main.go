@@ -50,6 +50,7 @@ var (
 	flag_ovf2      = flag.String("ovf2", "", `"text" or "binary" OVF2 output`)
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
+	flag_csv       = flag.Bool("csv", false, `output in CSV format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
@@ -175,6 +176,13 @@ func process(f *data.Slice, time float64, name string) {
 		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
 		defer out.Close()
 		dumpVTK(out, f, *flag_vtk)
+		haveOutput = true
+	}
+
+	if *flag_csv {
+		out := open(name + ".csv")
+		defer out.Close()
+		dumpCSV(out, f)
 		haveOutput = true
 	}
 

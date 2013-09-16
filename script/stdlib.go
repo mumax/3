@@ -16,7 +16,6 @@ func (w *World) LoadStdlib() {
 	w.Func("print", myprint)
 
 	// math
-	w.Func("square", square)
 	w.Func("abs", math.Abs)
 	w.Func("acos", math.Acos)
 	w.Func("acosh", math.Acosh)

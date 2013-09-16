@@ -44,7 +44,7 @@ func (p *inputParam) update() {
 
 // set in one region
 func (p *inputParam) setRegion(region int, v []float64) {
-	p.setRegions(region, region, v)
+	p.setRegions(region, region+1, v)
 }
 
 // set in all regions except 0
@@ -56,7 +56,6 @@ func (p *inputParam) setUniform(v []float64) {
 
 // set in regions r1..r2(excl)
 func (p *inputParam) setRegions(r1, r2 int, v []float64) {
-	log.Println(p.Name(), ".setRegions", r1, r2, v)
 	util.Argument(len(v) == len(p.cpu_buf))
 	for r := r1; r < r2; r++ {
 		p.upd_reg[r] = nil
@@ -75,7 +74,6 @@ func (p *inputParam) bufset_(region int, v []float64) {
 func (p *inputParam) invalidate() {
 	p.gpu_ok = false
 	for _, c := range p.children {
-		log.Println("invalidate", c)
 		c.invalidate()
 	}
 }

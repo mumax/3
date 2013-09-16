@@ -48,7 +48,7 @@ func guiAdd(name string, value interface{}) {
 }
 
 func Compile(src string) (script.Expr, error) {
-	World.EnterScope() // file-level scope
-	defer World.ExitScope()
+	//World.EnterScope() // file-level scope
+	//defer World.ExitScope()
 	return World.Compile(src)
 }

@@ -105,8 +105,9 @@ const templText = `
 
 	<h2> parameters </h2><div>
 
-	<table>
+	<p class=ErrorBox>{{.Span "paramErr" ""}}</p>
 
+	<table>
 	<tr> <td> <b>Region </b> </td>
 	<td>{{.BeginSelect "sel_region"}}
 		<option value=-1> all        </option>
@@ -118,7 +119,7 @@ const templText = `
 	{{.EndSelect}}</td></tr>
 
 	{{range $k,$v := .Data.Params}}
-		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.NumBox . 0}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
+		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.TextBox . "0"}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
 	{{end}}
 	</table>
 

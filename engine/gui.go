@@ -24,7 +24,7 @@ type Param interface {
 	NComp() int
 	Unit() string
 	GetVec() []float64
-	setUniform(...float64)
+	setUniform([]float64)
 }
 
 // data for html template
@@ -96,11 +96,17 @@ func Serve(port string) {
 
 		compIds := ((*guidata)(nil)).CompBoxIds(n)
 		handler := func() {
-			v := make([]float64, len(compIds))
-			for comp, id := range compIds {
-				v[comp] = gui.Value(id).(float64)
+			cmd := n + " = "
+			if p.NComp() == 3 {
+				cmd += "vector("
+				cmd += fmt.Sprint(gui.Value(compIds[0])) + ", "
+				cmd += fmt.Sprint(gui.Value(compIds[1])) + ", "
+				cmd += fmt.Sprint(gui.Value(compIds[0])) + ")"
+			} else {
+				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}
-			Inject <- func() { p.setUniform(v...) }
+			cmd += ";"
+			Inject <- func() { Eval(cmd, gui) }
 		}
 
 		for _, id := range compIds {
@@ -161,4 +167,21 @@ func roundt(t time.Duration) time.Duration {
 // returns a function that injects f into run loop
 func inj(f func()) func() {
 	return func() { Inject <- f }
+}
+
+func Eval(code string, gui *gui.Doc) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			gui.SetValue("ErrorBox", fmt.Sprint(err))
+			log.Println(err)
+		}
+	}()
+	tree, err := Compile(code)
+	if err == nil {
+		tree.Eval()
+	} else {
+		gui.SetValue("paramErr", fmt.Sprint(err))
+		log.Println(err)
+	}
 }

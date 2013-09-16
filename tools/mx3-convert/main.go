@@ -15,8 +15,12 @@ Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and
 	mx3-convert -resize 32x32x1 -normalize -omf binary file.dump
 Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
 	mx3-convert -comp 0 -vtk binary -jpg *.omf
-Example: convet .omf files to .dump, so they can be used as input for mx3 simulations:
+Example: convert .omf files to .dump, so they can be used as input for mx3 simulations:
 	mx3-convert -dump *.omf
+Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
+	mx3-convert -xrange 50:100 -yrange :100 file.dump
+Example: select the bottom layer
+	mx3-convert -zrange :1 file.dump
 
 Output file names are automatically assigned.
 */
@@ -51,9 +55,9 @@ var (
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
-	flag_cropx     = flag.String("xrange", "", "Crop semi-open range. E.g.: 10:20")
-	flag_cropy     = flag.String("yrange", "", "Crop semi-open range. E.g.: 10:20")
-	flag_cropz     = flag.String("zrange", "", "Crop semi-open range. E.g.: 10:20")
+	flag_cropx     = flag.String("xrange", "", "Crop x range min:max (both optional, max=exclusive)")
+	flag_cropy     = flag.String("yrange", "", "Crop y range min:max (both optional, max=exclusive)")
+	flag_cropz     = flag.String("zrange", "", "Crop z range min:max (both optional, max=exclusive)")
 )
 
 var que chan task

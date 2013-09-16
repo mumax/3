@@ -30,6 +30,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"sync"
 )
 
@@ -50,6 +51,9 @@ var (
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
 	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
+	flag_cropx     = flag.String("xrange", "", "Crop semi-open range. E.g.: 10:20")
+	flag_cropy     = flag.String("yrange", "", "Crop semi-open range. E.g.: 10:20")
+	flag_cropz     = flag.String("zrange", "", "Crop semi-open range. E.g.: 10:20")
 )
 
 var que chan task
@@ -193,7 +197,49 @@ func preprocess(f *data.Slice) {
 	if *flag_comp != -1 {
 		*f = *f.Comp(util.SwapIndex(*flag_comp, f.NComp()))
 	}
+	crop(f)
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
 	}
+}
+
+func crop(f *data.Slice) {
+	N := f.Mesh().Size()
+	x1, x2 := 0, N[2]
+	y1, y2 := 0, N[1]
+	z1, z2 := 0, N[0]
+	todo := false
+
+	if *flag_cropz != "" {
+		z1, z2 = parseRange(*flag_cropz, N[0])
+		todo = true
+	}
+	if *flag_cropy != "" {
+		y1, y2 = parseRange(*flag_cropy, N[1])
+		todo = true
+	}
+	if *flag_cropx != "" {
+		x1, x2 = parseRange(*flag_cropx, N[2])
+		todo = true
+	}
+
+	if todo {
+		log.Println("crop", z1, z2, y1, y2, x1, x2)
+		*f = *data.Crop(f, z1, z2, y1, y2, x1, x2)
+	}
+}
+
+func parseRange(r string, max int) (int, int) {
+	a, b := 0, max
+	spl := strings.Split(r, ":")
+	if len(spl) != 2 {
+		log.Fatal("range needs min:max syntax, have:", r)
+	}
+	if spl[0] != "" {
+		a = atoi(spl[0])
+	}
+	if spl[1] != "" {
+		b = atoi(spl[1])
+	}
+	return a, b
 }

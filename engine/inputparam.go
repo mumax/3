@@ -57,7 +57,7 @@ func (p *inputParam) setUniform(v []float64) {
 // set in regions r1..r2(excl)
 func (p *inputParam) setRegions(r1, r2 int, v []float64) {
 	util.Argument(len(v) == len(p.cpu_buf))
-	for r := 1; r < NREGION; r++ {
+	for r := r1; r < r2; r++ {
 		p.upd_reg[r] = nil
 		p.bufset_(r, v)
 	}

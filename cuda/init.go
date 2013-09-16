@@ -36,7 +36,6 @@ func Init(gpu int, sched string) {
 	dev := cu.Device(gpu)
 	cudaCtx = cu.CtxCreate(flag, dev)
 	M, m := dev.ComputeCapability()
-	concurrent := dev.Attribute(cu.CONCURRENT_KERNELS)
 
 	Version = float32(cu.Version()) / 1000
 	DevName = dev.Name()
@@ -44,7 +43,7 @@ func Init(gpu int, sched string) {
 
 	log.Print("CUDA ", Version, " ",
 		DevName, "(", (TotalMem)/(1024*1024), "MB) ",
-		"compute ", M, ".", m, " concurrent: ", concurrent == 1, "\n")
+		"cc", M, ".", m, "\n")
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")
 	}

@@ -88,7 +88,7 @@ func RunFileAndServe(fname string) {
 	// first we compile the entire file into an executable tree
 	bytes, err := ioutil.ReadFile(fname)
 	util.FatalErr(err)
-	code, err2 := engine.Compile(string(bytes))
+	code, err2 := engine.World.Compile(string(bytes))
 	util.FatalErr(err2)
 
 	// now the parser is not used anymore so it can handle web requests
@@ -104,7 +104,9 @@ func vet() {
 	for _, f := range flag.Args() {
 		src, ioerr := ioutil.ReadFile(f)
 		util.FatalErr(ioerr)
-		_, err := engine.Compile(string(src))
+		engine.World.EnterScope() // avoid name collisions between separate files
+		_, err := engine.World.Compile(string(src))
+		engine.World.ExitScope()
 		if err != nil {
 			fmt.Println(f, ":", err)
 			status = 1

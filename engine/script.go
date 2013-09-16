@@ -46,9 +46,3 @@ func guiAdd(name string, value interface{}) {
 		quants[name] = v
 	}
 }
-
-func Compile(src string) (script.Expr, error) {
-	//World.EnterScope() // file-level scope
-	//defer World.ExitScope()
-	return World.Compile(src)
-}

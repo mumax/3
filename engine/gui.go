@@ -177,7 +177,7 @@ func Eval(code string, gui *gui.Doc) {
 			log.Println(err)
 		}
 	}()
-	tree, err := Compile(code)
+	tree, err := World.Compile(code)
 	if err == nil {
 		tree.Eval()
 	} else {

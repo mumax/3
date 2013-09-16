@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"log"
 	"unsafe"
@@ -163,13 +164,13 @@ func symmidx(i, j int) int {
 //	return float64(p.lut[symmidx(r1, r2)])
 //}
 //
-//func (p *exchParam) String() string {
-//	str := ""
-//	for j := 0; j < regions.maxreg; j++ {
-//		for i := 0; i <= j; i++ {
-//			str += fmt.Sprint(p.getInter(j, i), "\t")
-//		}
-//		str += "\n"
-//	}
-//	return str
-//}
+func (p *exchParam) String() string {
+	str := ""
+	for j := 0; j < regions.maxreg; j++ {
+		for i := 0; i <= j; i++ {
+			str += fmt.Sprint(p.lut[symmidx(i, j)], "\t")
+		}
+		str += "\n"
+	}
+	return str
+}

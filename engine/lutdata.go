@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
+	"log"
 	"unsafe"
 )
 
@@ -37,6 +38,7 @@ func (p *lut) LUT() cuda.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
 		// upload to GPU
+		log.Println("upload", p.cpu_buf)
 		p.assureAlloc()
 		ncomp := p.NComp()
 		for c2 := range p.gpu_buf {

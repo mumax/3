@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
+	"fmt"
 )
 
 func init() {
@@ -26,7 +27,8 @@ func (r *reduced) GetVec() []float64 {
 }
 
 func MakeAvgRegion(s Getter, region int) *reduced {
-	return newReduced(s.NComp(), s.Name(), s.Unit(), func() []float64 {
+	name := fmt.Sprint("avg_", s.Name(), "_reg", region)
+	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
 		src, r := s.Get()
 		if r {
 			defer cuda.RecycleBuffer(src)
@@ -39,7 +41,8 @@ func MakeAvgRegion(s Getter, region int) *reduced {
 }
 
 func MakeAvg(s Getter) *reduced {
-	return newReduced(s.NComp(), s.Name(), s.Unit(), func() []float64 {
+	name := fmt.Sprint("avg_", s.Name())
+	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
 		full := Average(s)
 		for i := range full {
 			full[i] /= spaceFill

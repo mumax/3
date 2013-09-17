@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"log"
+	"math"
 	"unsafe"
 )
 
@@ -19,7 +20,8 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
-	DeclFunc("setLexchange", SetLExchange, "Sets inter-material exchange length between two regions.")
+	DeclFunc("OverrideLex", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
+	lex2.init()
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
 		if Dex.isZero() {
@@ -53,9 +55,10 @@ func getExchangeEnergy() float64 {
 // the exchange length, it is up to the user to decide which Msat to use.
 // When using regions, there is by default no exchange coupling between different regions.
 // A negative length may be specified to obtain antiferromagnetic coupling.
-func SetLExchange(region1, region2 int, exlen float64) {
+func OverrideExchangeLength(region1, region2 int, exlen float64) {
 	l2 := sign(exlen) * (exlen * exlen) * 1e18
-	lex2.SetInterRegion(region1, region2, l2)
+	lex2.override[symmidx(region1, region2)] = float32(l2)
+	lex2.gpu_ok = false
 }
 
 func sign(x float64) float64 {
@@ -70,13 +73,21 @@ func sign(x float64) float64 {
 }
 
 type exchParam struct {
-	lut            [NREGION * (NREGION + 1) / 2]float32 // look-up table source
+	lut, override  [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 
 }
 
 func (p *exchParam) invalidate() { p.cpu_ok = false }
+
+const no_override = math.MaxFloat32
+
+func (p *exchParam) init() {
+	for i := range p.override {
+		p.override[i] = no_override // dummy value means no override
+	}
+}
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
@@ -97,8 +108,13 @@ func (p *exchParam) update() {
 		for i := 0; i < regions.maxreg; i++ {
 			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
 			for j := 0; j <= i; j++ {
-				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
-				p.lut[symmidx(i, j)] = 2 / (1/lexi + 1/lexj)
+				I := symmidx(i, j)
+				if p.override[I] == no_override {
+					lexj := 2e18 * safediv(aex[0][j], msat[0][j])
+					p.lut[I] = 2 / (1/lexi + 1/lexj)
+				} else {
+					p.lut[I] = p.override[I]
+				}
 			}
 		}
 		p.gpu_ok = false
@@ -120,13 +136,14 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	log.Println("upload lex2:", p)
+	log.Println("upload lex2:\n", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
 
 func (p *exchParam) SetInterRegion(r1, r2 int, val float64) {
 	v := float32(val)
+	log.Println("lex2.setinterregion", r1, r2, val)
 	p.lut[symmidx(r1, r2)] = v
 
 	if r1 == r2 {

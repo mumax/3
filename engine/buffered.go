@@ -89,13 +89,7 @@ func (m *buffered) SetInShape(region Shape, conf Config) {
 			y := float64(j)*c[1] - dy
 			for k := 0; k < n[2]; k++ {
 				x := float64(k)*c[2] - dx
-
-				sten := regions.arr[i][j][k]
-				if sten == 0 {
-					h[0][i][j][k] = 0
-					h[1][i][j][k] = 0
-					h[2][i][j][k] = 0
-				} else if region(x, y, z) { // inside
+				if region(x, y, z) { // inside
 					m := conf(x, y, z)
 					h[0][i][j][k] = float32(m[2])
 					h[1][i][j][k] = float32(m[1])

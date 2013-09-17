@@ -64,7 +64,7 @@ func alloc() {
 	M.alloc()
 	regions.alloc()
 	Solver = *cuda.NewHeun(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, &Time)
-	Table.AddFunc(3, "<m>", "", func() []float64 { return Average(&M) })
+	Table.Add(MakeAvg(&M))
 	vol = data.NilSlice(1, Mesh())
 }
 

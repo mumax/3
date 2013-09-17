@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
 	"log"
 )
@@ -105,5 +106,6 @@ func (p *inputParam) getUniform() []float64 {
 	return v1
 }
 
-func (p *inputParam) Save()           { Save(p) }
-func (p *inputParam) SaveAs(f string) { SaveAs(p, f) }
+func (p *inputParam) Save()            { Save(p) }
+func (p *inputParam) SaveAs(f string)  { SaveAs(p, f) }
+func (p *inputParam) Mesh() *data.Mesh { return Mesh() }

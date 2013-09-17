@@ -22,7 +22,8 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	Memset(Bsat, 1)
 	BsatLUT := LUTPtr(Bsat.DevPtr(0))
 
-	c.Exec(gpu, gpu, BsatLUT, regions)
+	vol := data.NilSlice(1, mesh)
+	c.Exec(gpu, gpu, vol, BsatLUT, regions)
 
 	output := gpu.HostCopy()
 

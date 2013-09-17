@@ -98,7 +98,7 @@ const (
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_4;
 
-	.loc 2 8 1
+	.loc 2 7 1
 	cvt.s64.s32 	%rd4, %r1;
 	add.s64 	%rd8, %rd3, %rd4;
 	ld.global.u8 	%rc2, [%rd8];
@@ -110,7 +110,7 @@ const (
 	setp.ne.s16 	%p2, %temp1, %temp2;
 	}
 	mov.f32 	%f4, 0f00000000;
-	.loc 2 8 1
+	.loc 2 7 1
 	@%p2 bra 	BB0_3;
 
 	shl.b64 	%rd9, %rd4, 2;
@@ -123,7 +123,7 @@ BB0_3:
 	st.global.f32 	[%rd12], %f4;
 
 BB0_4:
-	.loc 2 11 2
+	.loc 2 9 2
 	ret;
 }
 
@@ -170,7 +170,7 @@ BB0_4:
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_4;
 
-	.loc 2 8 1
+	.loc 2 7 1
 	cvt.s64.s32 	%rd4, %r1;
 	add.s64 	%rd8, %rd3, %rd4;
 	ld.global.u8 	%rc2, [%rd8];
@@ -182,7 +182,7 @@ BB0_4:
 	setp.ne.s16 	%p2, %temp1, %temp2;
 	}
 	mov.f32 	%f4, 0f00000000;
-	.loc 2 8 1
+	.loc 2 7 1
 	@%p2 bra 	BB0_3;
 
 	shl.b64 	%rd9, %rd4, 2;
@@ -195,7 +195,7 @@ BB0_3:
 	st.global.f32 	[%rd12], %f4;
 
 BB0_4:
-	.loc 2 11 2
+	.loc 2 9 2
 	ret;
 }
 
@@ -270,7 +270,7 @@ BB0_4:
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB2_4;
 
-	.loc 3 8 1
+	.loc 3 7 1
 	cvt.s64.s32 	%rd4, %r1;
 	add.s64 	%rd8, %rd3, %rd4;
 	ld.global.u8 	%rc2, [%rd8];
@@ -282,7 +282,7 @@ BB0_4:
 	setp.ne.s16 	%p2, %temp1, %temp2;
 	}
 	mov.f32 	%f4, 0f00000000;
-	.loc 3 8 1
+	.loc 3 7 1
 	@%p2 bra 	BB2_3;
 
 	shl.b64 	%rd9, %rd4, 2;
@@ -295,7 +295,7 @@ BB2_3:
 	st.global.f32 	[%rd12], %f4;
 
 BB2_4:
-	.loc 3 11 2
+	.loc 3 9 2
 	ret;
 }
 

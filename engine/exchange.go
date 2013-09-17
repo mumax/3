@@ -120,7 +120,7 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	log.Println("upload Aex")
+	log.Println("upload lex2:", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
@@ -163,7 +163,6 @@ func symmidx(i, j int) int {
 //func (p *exchParam) getInter(r1, r2 int) float64 {
 //	return float64(p.lut[symmidx(r1, r2)])
 //}
-//
 func (p *exchParam) String() string {
 	str := ""
 	for j := 0; j < regions.maxreg; j++ {

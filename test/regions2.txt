@@ -17,7 +17,7 @@ defregion(2, cuboid(3*d,3*d,h).transl(0.5*d,0.5*d,0.5*h))
 Msat.setregion(2, 0.0)
 
 les := sqrt(2*13e-12/860e3)
-setlexchange(1,2, les)
+overrideLex(1,2, les)
 
 alpha = 0.8
 
@@ -29,4 +29,4 @@ run(1e-9)
 m_ := average(m)
 expect("mx", m_[0],  1.043081283569336e-07, 1e-6)
 expect("my", m_[1], -3.903551260009408e-09, 1e-6)
-expect("mz", m_[2], -0.0035411138087511063, 1e-6)
+expect("mz", m_[2], -0.0037489673122763634, 1e-6)

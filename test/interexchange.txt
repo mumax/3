@@ -15,7 +15,7 @@
 	defregion(1, Yrange(0, inf))
 	defregion(2, Yrange(-inf, 0))
 	lex := sqrt(2*Aex.GetUniform() / Msat.GetUniform())
-	setlexchange(1, 2, lex)
+	overridelex(1, 2, lex)
 
 // relax
 	alpha = 3

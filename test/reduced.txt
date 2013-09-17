@@ -1,0 +1,27 @@
+// test derived output quantities
+
+Nx := 64
+Ny := 64
+Nz := 2
+c := 4e-9
+
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(c,  c,  c )
+
+DefRegion(0, xrange(-inf, 0))
+DefRegion(1, xrange(0,  inf))
+
+m = Vortex(1, 1)
+
+m0 := MakeAvgRegion(m, 0)
+m1 := MakeAvgRegion(m, 1)
+
+
+table.add(m0)
+table.add(m1)
+table.save()
+
+expect("m0x", m0.getVec()[0],  0       , 1e-6)
+expect("m0y", m0.getVec()[1], -0.323819, 1e-6)
+expect("m1x", m1.getVec()[0],  0       , 1e-6)
+expect("m1y", m1.getVec()[1],  0.323819, 1e-6)

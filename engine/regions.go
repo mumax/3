@@ -7,15 +7,11 @@ import (
 	"log"
 )
 
-var (
-	regions       = Regions{doc: Doc(1, "regions", "")} // global regions map
-	geom    Shape = nil                                 // nil means universe
-)
+var regions = Regions{doc: Doc(1, "regions", "")} // global regions map
 
 const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
 
 func init() {
-	DeclFunc("SetGeom", SetGeometry, "Sets the geometry to a given shape")
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
@@ -35,7 +31,7 @@ func (r *Regions) alloc() {
 	r.cpu = make([]byte, mesh.NCell())
 	r.arr = resizeBytes(r.cpu, mesh.Size())
 	r.gpuCache = cuda.NewBytes(mesh)
-	DefRegion(1, universe)
+	DefRegion(0, universe)
 }
 
 // Define a region with id (0-255) to be inside the Shape.
@@ -67,7 +63,6 @@ func DefRegion(id int, s Shape) {
 			}
 		}
 	}
-	M.stencilGeom() // TODO: revise if really needed
 }
 
 func checkRegionIdx(id int) {
@@ -91,45 +86,6 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	r.gpuCache.Upload(r.cpu)
 	r.gpuCacheOK = true
 	return r.gpuCache
-}
-
-func SetGeometry(s Shape) {
-	geom = s
-	regions.rasterGeom()
-}
-
-// Rasterises the global geom shape
-// TODO: deduplicate from DefRegion
-func (r *Regions) rasterGeom() {
-	s := geom
-	if s == nil {
-		s = universe
-	}
-
-	n := Mesh().Size()
-	c := Mesh().CellSize()
-	dx := (float64(n[2]/2) - 0.5) * c[2]
-	dy := (float64(n[1]/2) - 0.5) * c[1]
-	dz := (float64(n[0]/2) - 0.5) * c[0]
-
-	for i := 0; i < n[0]; i++ {
-		z := float64(i)*c[0] - dz
-		for j := 0; j < n[1]; j++ {
-			y := float64(j)*c[1] - dy
-			for k := 0; k < n[2]; k++ {
-				x := float64(k)*c[2] - dx
-				if s(x, y, z) { // inside
-					if regions.arr[i][j][k] == 0 {
-						regions.arr[i][j][k] = 1
-					}
-				} else {
-					regions.arr[i][j][k] = 0
-				}
-			}
-		}
-	}
-	M.stencilGeom() // TODO: revise if really needed
-	regions.gpuCacheOK = false
 }
 
 // Get returns the regions as a slice of floats, so it can be output.

@@ -2,13 +2,13 @@ package cuda
 
 import (
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 )
 
-// Normalize the vector field to length mask * norm.
-// nil mask interpreted as 1s.
-// 0-length vectors are unaffected.
-func Normalize(vec *data.Slice) {
+// Normalize vec to unit length, unless length or vol are zero.
+func Normalize(vec, vol *data.Slice) {
+	util.Argument(vol == nil || vol.NComp() == 1)
 	N := vec.Len()
 	cfg := make1DConf(N)
-	k_normalize(vec.DevPtr(0), vec.DevPtr(1), vec.DevPtr(2), N, cfg)
+	k_normalize(vec.DevPtr(0), vec.DevPtr(1), vec.DevPtr(2), vol.DevPtr(0), N, cfg)
 }

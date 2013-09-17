@@ -64,9 +64,13 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
-	Solver = *cuda.NewHeun(M.buffer, Torque.set, cuda.Normalize, 1e-15, mag.Gamma0, &Time)
+	Solver = *cuda.NewHeun(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, &Time)
 	Table.AddFunc(3, "<m>", "", func() []float64 { return Average(&M) })
 	vol = data.NilSlice(1, Mesh())
+}
+
+func normalize(m *data.Slice) {
+	cuda.Normalize(m, nil)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

@@ -443,7 +443,7 @@ alpha.setRegion(2, 0.05)
 lex2Fe := 21e-12/1700e3
 lex2Ni :=  9e-12/ 490e3
 lex := sqrt(2/(1/lex2Fe + 1/lex2Ni))
-setlexchange(1, 2, lex)  // set exchange length between Ni and Fe
+overrideLex(1, 2, lex)  // set exchange length between Ni and Fe
 
 `}}
 

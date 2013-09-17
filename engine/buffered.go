@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"math"
 	"reflect"
 )
 
@@ -71,6 +70,7 @@ func (b *buffered) Shift(shx, shy, shz int) {
 }
 
 // Sets the magnetization inside the shape
+// TODO: a bit slowish
 func (m *buffered) SetInShape(region Shape, conf Config) {
 	if region == nil {
 		region = universe
@@ -96,7 +96,7 @@ func (m *buffered) SetInShape(region Shape, conf Config) {
 					h[1][i][j][k] = 0
 					h[2][i][j][k] = 0
 				} else if region(x, y, z) { // inside
-					m := normalize(conf(x, y, z))
+					m := conf(x, y, z)
 					h[0][i][j][k] = float32(m[2])
 					h[1][i][j][k] = float32(m[1])
 					h[2][i][j][k] = float32(m[0])
@@ -105,6 +105,7 @@ func (m *buffered) SetInShape(region Shape, conf Config) {
 		}
 	}
 	data.Copy(m.buffer, host)
+	cuda.Normalize(M.buffer, vol) // removes m outside vol
 }
 
 // set m to config in region
@@ -126,7 +127,7 @@ func (m *buffered) SetRegion(region int, conf Config) {
 				x := float64(k)*c[2] - dx
 
 				if regions.arr[i][j][k] == r {
-					m := normalize(conf(x, y, z))
+					m := conf(x, y, z)
 					h[0][i][j][k] = float32(m[2])
 					h[1][i][j][k] = float32(m[1])
 					h[2][i][j][k] = float32(m[0])
@@ -135,17 +136,18 @@ func (m *buffered) SetRegion(region int, conf Config) {
 		}
 	}
 	data.Copy(m.buffer, host)
+	cuda.Normalize(m.buffer, vol)
 }
 
 // remove magnetization where stencil is zero.
-func (m *buffered) stencilGeom() {
-	if geom == nil {
-		return
-	}
-	h := m.buffer.HostCopy()
-	stencil(h, regions.cpu)
-	data.Copy(m.buffer, h)
-}
+//func (m *buffered) stencilGeom() {
+//	if geom == nil {
+//		return
+//	}
+//	h := m.buffer.HostCopy()
+//	stencil(h, regions.cpu)
+//	data.Copy(m.buffer, h)
+//}
 
 // remove dst where stencil is zero (host).
 func stencil(dst *data.Slice, stencil []byte) {
@@ -160,14 +162,9 @@ func stencil(dst *data.Slice, stencil []byte) {
 }
 
 //func (b *buffered) GetVec() []float64       { return Average(b) }
-func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
+func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) } // TODO: SetInShape a bit slowish
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }
 func (m *buffered) Eval() interface{}       { return m }
 func (m *buffered) Save()                   { Save(m) }
 func (m *buffered) SaveAs(f string)         { SaveAs(m, f) }
-
-func normalize(v [3]float64) [3]float64 {
-	s := 1 / math.Sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
-	return [3]float64{s * v[0], s * v[1], s * v[2]}
-}

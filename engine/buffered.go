@@ -75,7 +75,6 @@ func (m *buffered) SetInShape(region Shape, conf Config) {
 	if region == nil {
 		region = universe
 	}
-
 	host := m.buffer.HostCopy()
 	h := host.Vectors()
 	n := m.Mesh().Size()
@@ -97,6 +96,36 @@ func (m *buffered) SetInShape(region Shape, conf Config) {
 					h[1][i][j][k] = 0
 					h[2][i][j][k] = 0
 				} else if region(x, y, z) { // inside
+					m := normalize(conf(x, y, z))
+					h[0][i][j][k] = float32(m[2])
+					h[1][i][j][k] = float32(m[1])
+					h[2][i][j][k] = float32(m[0])
+				}
+			}
+		}
+	}
+	data.Copy(m.buffer, host)
+}
+
+// set m to config in region
+func (m *buffered) SetRegion(region int, conf Config) {
+	host := m.buffer.HostCopy()
+	h := host.Vectors()
+	n := m.Mesh().Size()
+	c := m.Mesh().CellSize()
+	dx := (float64(n[2]/2) - 0.5) * c[2]
+	dy := (float64(n[1]/2) - 0.5) * c[1]
+	dz := (float64(n[0]/2) - 0.5) * c[0]
+	r := byte(region)
+
+	for i := 0; i < n[0]; i++ {
+		z := float64(i)*c[0] - dz
+		for j := 0; j < n[1]; j++ {
+			y := float64(j)*c[1] - dy
+			for k := 0; k < n[2]; k++ {
+				x := float64(k)*c[2] - dx
+
+				if regions.arr[i][j][k] == r {
 					m := normalize(conf(x, y, z))
 					h[0][i][j][k] = float32(m[2])
 					h[1][i][j][k] = float32(m[1])

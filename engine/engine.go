@@ -13,9 +13,8 @@ const VERSION = "mumax3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 var (
-	globalmesh    data.Mesh   // mesh for m and everything that has the same size
-	vol           *data.Slice // cell fillings (0..1)
-	M             buffered    // reduced magnetization (unit length)
+	globalmesh    data.Mesh // mesh for m and everything that has the same size
+	M             buffered  // reduced magnetization (unit length)
 	B_eff, Torque setter
 	Table         = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 )

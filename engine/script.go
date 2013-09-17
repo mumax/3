@@ -1,19 +1,9 @@
 package engine
 
 // support for interpreted input scripts
-
-import (
-	"code.google.com/p/mx3/mag"
-	"code.google.com/p/mx3/script"
-)
+import "code.google.com/p/mx3/script"
 
 var World = script.NewWorld()
-
-func init() {
-	DeclFunc("vector", Vector, "Constructs a vector with given components")
-	DeclFunc("average", Average, "Average of space-dependent quantity")
-	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
-}
 
 func DeclFunc(name string, f interface{}, doc string) {
 	World.Func(name, f, doc)

@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
 	"fmt"
 	"log"
@@ -14,7 +15,14 @@ func init() {
 	DeclFunc("expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
 	DeclFunc("fprintln", Fprintln, "Print to file")
 	DeclFunc("sign", sign, "Signum function")
+	DeclFunc("vector", Vector, "Constructs a vector with given components")
+	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	//DeclFunc("LoadFile", LoadFile, "Read .dump file and return contents as array.")
+}
+
+// Constructs a vector
+func Vector(x, y, z float64) [3]float64 {
+	return [3]float64{x, y, z}
 }
 
 // Test if have lies within want +/- maxError,

@@ -5,6 +5,10 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+func init() {
+	DeclFunc("average", Average, "Average of space-dependent quantity")
+}
+
 // average in userspace XYZ order
 // does not yet take into account volume.
 // pass volume parameter, possibly nil?
@@ -20,9 +24,4 @@ func Average(s Getter) []float64 {
 		avg[i] = float64(cuda.Sum(b.Comp(I))) / float64(b.Mesh().NCell())
 	}
 	return avg
-}
-
-// Constructs a vector
-func Vector(x, y, z float64) [3]float64 {
-	return [3]float64{x, y, z}
 }

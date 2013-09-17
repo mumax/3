@@ -3,6 +3,12 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"log"
+)
+
+var (
+	vol       *data.Slice // cell fillings (0..1)
+	spaceFill = 1.0       // filled fraction of space
 )
 
 func init() {
@@ -21,6 +27,8 @@ func SetGeom(s Shape) {
 	dy := (float64(n[1]/2) - 0.5) * c[1]
 	dz := (float64(n[0]/2) - 0.5) * c[0]
 
+	fill := 0.0
+
 	for i := 0; i < n[0]; i++ {
 		z := float64(i)*c[0] - dz
 		for j := 0; j < n[1]; j++ {
@@ -29,11 +37,17 @@ func SetGeom(s Shape) {
 				x := float64(k)*c[2] - dx
 				if s(x, y, z) { // inside
 					v[i][j][k] = 1
+					fill += 1.0
 				} else {
 					v[i][j][k] = 0
 				}
 			}
 		}
+	}
+
+	spaceFill = fill / float64(Mesh().NCell())
+	if spaceFill == 0 {
+		log.Fatal("SetGeom: geometry completely empty")
 	}
 
 	data.Copy(vol, V)

@@ -286,6 +286,8 @@ m.saveas("setInShape_setCell")
 
 These initial states are approximate, after setting them it is a good idea to relax the magnetization to the actual ground state.
 
+The magnetization can also be set in separate regions, see below.
+
 
 
 <hr/><h2>Hysteresis</h2>
@@ -400,9 +402,11 @@ Msat.save()
 Aex = 12e-13
 alpha = 1
 
-m = uniform(1, 1, 0)
+m.setRegion(1, uniform(1, 1, 0))
+m.setRegion(2, uniform(-1, 1, 0))
+saveas(m, "m_inital")
 run(.1e-9)
-m.save()
+saveas(m, "m_final")
 `}}
 
 {{.Output}}

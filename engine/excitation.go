@@ -69,6 +69,12 @@ func (e *excitation) GetVec() []float64 {
 	return e.perRegion.getRegion(1)
 }
 
+// needed for gui
+func (e *excitation) setUniform(v []float64) {
+	e.perRegion.setUniform(v)
+}
+
+// needed for script
 func (e *excitation) SetValue(v interface{}) {
 	vec := v.([3]float64)
 	e.perRegion.setUniform(vec[:])

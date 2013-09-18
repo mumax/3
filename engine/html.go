@@ -105,6 +105,7 @@ const templText = `
 
 	<h2> gnuplot </h2><div>
 
+		Plot of "datatable.txt", provided table is being autosaved and gnuplot installed.<br>
 		<b>plot "datatable.txt" using {{.IntBox "usingX" 1}} : {{.IntBox "usingY" 2}} with lines </b><br/>
 		<p class=ErrorBox>{{.Span "plotErr"}}</p>
 		{{.Img "plot" "/plot/"}}
@@ -119,11 +120,8 @@ const templText = `
 	<table>
 	<tr> <td> <b>Region </b> </td>
 	<td>{{.BeginSelect "sel_region"}}
-		<option value=-1> all        </option>
-		<option value= 0> 0 (vacuum) </option>
-		<option value= 1> 1 (default)</option>
-		{{range .Data.MakeRange 2 256}}
-		<option value= {{.}}> {{.}}</option>
+		{{range .Data.MakeRange 0 256}}
+			<option value= {{.}}> {{.}}</option>
 		{{end}}
 	{{.EndSelect}}</td></tr>
 
@@ -133,7 +131,6 @@ const templText = `
 	</table>
 
 	</div><hr/>
-
 
 
 	<h2> process </h2><div>

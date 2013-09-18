@@ -8,7 +8,6 @@ import (
 func init() {
 	DeclFunc("Run", Run, "Run the simulation for a time in seconds")
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
-	DeclFunc("Pause", Pause, "Pause the simulation, waits for web GUI input.")
 	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclROnly("t", &Time, "Total simulated time (s)")
@@ -41,16 +40,6 @@ func Steps(n int) {
 	stop := Solver.NSteps + n
 	RunWhile(func() bool { return Solver.NSteps < stop })
 }
-
-// Pause the simulation, only useful for web gui.
-func Pause() {
-	pause = true
-}
-
-// Check if simulation is paused. Used by web gui.
-//func Paused() bool {
-//	return pause
-//}
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {

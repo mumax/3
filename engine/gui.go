@@ -75,7 +75,7 @@ func Serve(port string) {
 	gui.SetValue("wz", float64(size[0])*cellSize[0]*1e9)
 
 	// solver
-	gui.OnEvent("break", Pause)
+	gui.OnEvent("break", inj(func() { pause = true }))
 	gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
 	gui.OnEvent("steps", inj(func() { Steps(gui.Value("runsteps").(int)) }))
 	gui.OnEvent("fixdt", inj(func() { Solver.FixDt = gui.Value("fixdt").(float64) }))

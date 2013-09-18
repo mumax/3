@@ -120,7 +120,7 @@ func vet() {
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
 func RunInteractive() {
-	engine.Pause()
+	//engine.Pause()
 	log.Println("entering interactive mode")
 	for time.Since(engine.KeepAlive()) < timeout {
 		f := <-engine.Inject

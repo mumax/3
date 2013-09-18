@@ -1,7 +1,6 @@
 package engine
 
-// File: management of output directory.
-// Author: Arne Vansteenkiste
+// Management of output directory.
 
 import (
 	"code.google.com/p/mx3/util"

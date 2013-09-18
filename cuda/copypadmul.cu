@@ -13,7 +13,7 @@ copypadmul(float* __restrict__ dst, int D0, int D1, int D2,
     if (i<S0 && j<S1 && k<S2) {
         int sI = S2*(i*S1 + j) + k; // source index
         float Bsat = BsatLUT[regions[sI]];
-        float v = (vol == NULL? 1: vol[sI]);
+        float v = (vol == NULL? 1.0f: vol[sI]);
         dst[D2*(i*D1 + j) + k] = Bsat * v * src[sI];
     }
 }

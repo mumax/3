@@ -7,7 +7,7 @@ normalize(float* __restrict__ vx, float* __restrict__ vy, float* __restrict__ vz
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
     if (i < N) {
 
-        float v = (vol == NULL? 1: vol[i]);
+        float v = (vol == NULL? 1.0f: vol[i]);
         float3 V = {v*vx[i], v*vy[i], v*vz[i]};
         V = normalized(V);
         vx[i] = V.x;

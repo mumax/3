@@ -11,7 +11,7 @@ const templText = `
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-	<title>mx3 GUI</title>
+	<title>mumax3</title>
 
 	<style media="all" type="text/css">
 
@@ -49,7 +49,7 @@ const templText = `
 
 <body>
 
-	<h1> mx 3 GUI </h1> 
+	<h1> mumax<sup>3</sup> web interface </h1> 
 		<p> {{.ErrorBox}} </p>
 		<p> {{.Span "log"}} </p>
 	<hr/>
@@ -105,7 +105,7 @@ const templText = `
 
 	<h2> gnuplot </h2><div>
 
-		<b>plot "datatable.txt" using {{.Range "usingX" 0 10 1}} : {{.Range "usingY" 0 10 2}} with lines </b><br/>
+		<b>plot "datatable.txt" using {{.IntBox "usingX" 1}} : {{.IntBox "usingY" 2}} with lines </b><br/>
 		<p class=ErrorBox>{{.Span "plotErr"}}</p>
 		{{.Img "plot" "/plot/"}}
 

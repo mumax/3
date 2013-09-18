@@ -53,10 +53,13 @@ func (d *guidata) MakeRange(min, max int) []int {
 	return l
 }
 
+var gui_ *gui.Doc // use with caution, may not be inited yet.
+
 // Start web gui on given port, blocks.
 func Serve(port string) {
 	data := &guidata{Quants: quants, Params: params}
-	gui := gui.NewDoc(templText, data)
+	gui_ = gui.NewDoc(templText, data)
+	gui := gui_
 	KeepAlive = gui.KeepAlive
 
 	http.Handle("/", gui)

@@ -24,7 +24,7 @@
 	alpha = 0.02
 
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
-	table.autosave(10e-12)
+	table.autosave(5e-12)
 	run(1e-9)
 	m_ = average(m)
 	expect("mx", m_[0],-0.9845, 1e-3)

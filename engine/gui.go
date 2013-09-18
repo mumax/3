@@ -99,6 +99,7 @@ func Serve(port string) {
 	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
 
 	// parameters
+	gui.SetValue("sel_region", 0)
 	gui.OnEvent("sel_region", func() { guiRegion = atoi(gui.Value("sel_region")) })
 
 	for n, p := range params {

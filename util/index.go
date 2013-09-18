@@ -1,7 +1,6 @@
 package util
 
 // Functions for manipulating vector and tensor indices in program and user space
-// Author: Arne Vansteenkiste
 
 import "log"
 

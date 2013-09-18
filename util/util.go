@@ -1,8 +1,6 @@
 package util
 
-import (
-	"path"
-)
+import "path"
 
 // Remove extension from file name.
 func NoExt(file string) string {

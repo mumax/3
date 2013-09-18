@@ -136,7 +136,7 @@ func Serve(port string) {
 			gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 			gui.SetValue("step", Solver.NSteps)
 			gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			gui.SetValue("maxerr", fmt.Sprintf("%5e", Solver.MaxErr))
+			gui.SetValue("maxerr", Solver.MaxErr)
 			if pause {
 				gui.SetValue("solverstatus", "paused")
 			} else {

@@ -12,7 +12,7 @@ import (
 	"unsafe"
 )
 
-func ReadOMF(fname string) (s *data.Slice, t float64, err error) {
+func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
 	in_, err := os.Open(fname)
 	util.FatalErr(err)
 	in := BlockingReader{bufio.NewReader(in_)}
@@ -39,7 +39,7 @@ func ReadOMF(fname string) (s *data.Slice, t float64, err error) {
 			readDataBinary4(in, data_)
 		}
 	}
-	return data_, info.TotalTime, nil
+	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
 }
 
 // omf.Info represents the header part of an omf file.

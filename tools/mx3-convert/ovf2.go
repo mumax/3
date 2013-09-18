@@ -21,7 +21,7 @@ import (
 	"unsafe"
 )
 
-func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time float64) {
+func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -33,7 +33,7 @@ func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, time float64) {
 	}
 
 	tstep := 0.0 // TODO
-	writeOvf2Header(out, q, time, tstep)
+	writeOvf2Header(out, q, meta, tstep)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
 	return
@@ -52,7 +52,7 @@ func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
 	hdr(out, "End", "Data "+dataformat)
 }
 
-func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
+func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta, tstep float64) {
 	gridsize := q.Mesh().Size()
 	cellsize := q.Mesh().CellSize()
 
@@ -64,7 +64,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 	hdr(out, "Begin", "Header")
 	fmt.Fprintln(out, "#")
 
-	hdr(out, "Title", q.Tag())
+	hdr(out, "Title", meta.Name)
 	hdr(out, "meshtype", "rectangular")
 	hdr(out, "meshunit", "m")
 
@@ -76,7 +76,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 	hdr(out, "ymax", cellsize[Y]*float64(gridsize[Y]))
 	hdr(out, "zmax", cellsize[X]*float64(gridsize[X]))
 
-	name := q.Tag()
+	name := meta.Name
 	var labels []interface{}
 	if q.NComp() == 1 {
 		labels = []interface{}{name}
@@ -87,7 +87,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 	}
 	hdr(out, "valuedim", q.NComp())
 	hdr(out, "valuelabels", labels...) // TODO
-	unit := q.Unit()
+	unit := meta.Unit
 	if unit == "" {
 		unit = "1"
 	}
@@ -99,7 +99,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, time, tstep float64) {
 
 	// We don't really have stages
 	fmt.Fprintln(out, "# Desc: Stage simulation time: ", tstep, " s")
-	fmt.Fprintln(out, "# Desc: Total simulation time: ", time, " s")
+	fmt.Fprintln(out, "# Desc: Total simulation time: ", meta.Time, " s")
 
 	hdr(out, "xbase", cellsize[Z]/2)
 	hdr(out, "ybase", cellsize[Y]/2)

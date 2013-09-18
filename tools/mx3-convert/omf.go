@@ -14,7 +14,7 @@ import (
 	"unsafe"
 )
 
-func dumpOmf(out io.Writer, q *data.Slice, dataformat string) (err error) {
+func dumpOmf(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) (err error) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -25,7 +25,7 @@ func dumpOmf(out io.Writer, q *data.Slice, dataformat string) (err error) {
 		log.Fatalf("Illegal OMF data format: %v", dataformat)
 	}
 
-	err = writeOmfHeader(out, q)
+	err = writeOmfHeader(out, q, meta)
 	err = writeOmfData(out, q, dataformat)
 	err = hdr(out, "End", "Segment")
 	return
@@ -51,7 +51,7 @@ func writeOmfData(out io.Writer, q *data.Slice, dataformat string) (err error) {
 }
 
 // Writes the OMF header
-func writeOmfHeader(out io.Writer, q *data.Slice) (err error) {
+func writeOmfHeader(out io.Writer, q *data.Slice, meta data.Meta) (err error) {
 	gridsize := q.Mesh().Size()
 	cellsize := q.Mesh().CellSize()
 
@@ -61,8 +61,8 @@ func writeOmfHeader(out io.Writer, q *data.Slice) (err error) {
 
 	hdr(out, "Begin", "Header")
 
-	dsc(out, "Time", 0) //q.Time) // TODO !!
-	hdr(out, "Title", q.Tag())
+	dsc(out, "Time", meta.Time)
+	hdr(out, "Title", meta.Name)
 	hdr(out, "meshtype", "rectangular")
 	hdr(out, "meshunit", "m")
 	hdr(out, "xbase", cellsize[Z]/2)

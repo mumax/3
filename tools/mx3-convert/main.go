@@ -67,7 +67,7 @@ var wg sync.WaitGroup
 
 type task struct {
 	*data.Slice
-	time  float64
+	info  data.Meta
 	fname string
 }
 
@@ -93,20 +93,20 @@ func main() {
 	for _, fname := range flag.Args() {
 		log.Println(fname)
 		var slice *data.Slice
-		var time float64
+		var info data.Meta
 		var err error
 
 		if path.Ext(fname) == ".omf" {
-			slice, time, err = ReadOMF(fname)
+			slice, info, err = ReadOMF(fname)
 		} else {
-			slice, time, err = data.ReadFile(fname)
+			slice, info, err = data.ReadFile(fname)
 		}
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 		wg.Add(1)
-		que <- task{slice, time, util.NoExt(fname)}
+		que <- task{slice, info, util.NoExt(fname)}
 	}
 
 	// wait for work to finish
@@ -115,7 +115,7 @@ func main() {
 
 func work() {
 	for task := range que {
-		process(task.Slice, task.time, task.fname)
+		process(task.Slice, task.info, task.fname)
 		wg.Done()
 	}
 }
@@ -126,7 +126,7 @@ func open(fname string) *os.File {
 	return f
 }
 
-func process(f *data.Slice, time float64, name string) {
+func process(f *data.Slice, info data.Meta, name string) {
 	preprocess(f)
 
 	haveOutput := false
@@ -155,28 +155,28 @@ func process(f *data.Slice, time float64, name string) {
 	if *flag_omf != "" {
 		out := open(name + ".omf")
 		defer out.Close()
-		dumpOmf(out, f, *flag_omf)
+		dumpOmf(out, f, info, *flag_omf)
 		haveOutput = true
 	}
 
 	if *flag_ovf1 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOmf(out, f, *flag_ovf1)
+		dumpOmf(out, f, info, *flag_ovf1)
 		haveOutput = true
 	}
 
 	if *flag_ovf2 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOvf2(out, f, *flag_ovf2, time)
+		dumpOvf2(out, f, *flag_ovf2, info)
 		haveOutput = true
 	}
 
 	if *flag_vtk != "" {
 		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
 		defer out.Close()
-		dumpVTK(out, f, *flag_vtk)
+		dumpVTK(out, f, info, *flag_vtk)
 		haveOutput = true
 	}
 
@@ -195,7 +195,7 @@ func process(f *data.Slice, time float64, name string) {
 	}
 
 	if *flag_dump {
-		data.MustWriteFile(name+".dump", f, time)
+		data.MustWriteFile(name+".dump", f, info)
 		haveOutput = true
 	}
 

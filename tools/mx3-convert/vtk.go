@@ -16,9 +16,9 @@ import (
 	"log"
 )
 
-func dumpVTK(out io.Writer, q *data.Slice, dataformat string) (err error) {
+func dumpVTK(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) (err error) {
 	err = writeVTKHeader(out, q)
-	err = writeVTKCellData(out, q, dataformat)
+	err = writeVTKCellData(out, q, meta, dataformat)
 	err = writeVTKPoints(out, q, dataformat)
 	err = writeVTKFooter(out)
 	return
@@ -79,19 +79,19 @@ func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string) (err error)
 	return
 }
 
-func writeVTKCellData(out io.Writer, q *data.Slice, dataformat string) (err error) {
+func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) (err error) {
 	N := q.NComp()
 	data := q.Tensors()
 	switch N {
 	case 1:
-		fmt.Fprintf(out, "\t\t\t<PointData Scalars=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), N, dataformat)
+		fmt.Fprintf(out, "\t\t\t<PointData Scalars=\"%s\">\n", meta.Name)
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", meta.Name, N, dataformat)
 	case 3:
-		fmt.Fprintf(out, "\t\t\t<PointData Vectors=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), N, dataformat)
+		fmt.Fprintf(out, "\t\t\t<PointData Vectors=\"%s\">\n", meta.Name)
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", meta.Name, N, dataformat)
 	case 6, 9:
-		fmt.Fprintf(out, "\t\t\t<PointData Tensors=\"%s\">\n", q.Tag())
-		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", q.Tag(), 9, dataformat) // must be 9!
+		fmt.Fprintf(out, "\t\t\t<PointData Tensors=\"%s\">\n", meta.Name)
+		fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"%s\">\n\t\t\t\t\t", meta.Name, 9, dataformat) // must be 9!
 	default:
 		log.Fatalf("vtk: cannot handle %v components", N)
 	}

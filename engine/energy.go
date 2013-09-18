@@ -25,11 +25,11 @@ func GetTotalEnergy() float64 {
 func dot(a, b Getter) float64 {
 	A, recyA := a.Get()
 	if recyA {
-		defer cuda.RecycleBuffer(A)
+		defer cuda.Recycle(A)
 	}
 	B, recyB := b.Get()
 	if recyB {
-		defer cuda.RecycleBuffer(B)
+		defer cuda.Recycle(B)
 	}
 	return float64(cuda.Dot(A, B))
 }

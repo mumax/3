@@ -26,7 +26,7 @@ func SaveAs(q Getter, fname string) {
 	}
 	buffer, recylce := q.Get()
 	if recylce {
-		defer cuda.RecycleBuffer(buffer)
+		defer cuda.Recycle(buffer)
 	}
 	AsyncSave(fname, assureCPU(buffer), Time)
 }

@@ -20,7 +20,7 @@ func (q *adder) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc fu
 // Calcuates and returns the quantity.
 // recycle is true: slice needs to be recycled.
 func (a *adder) Get() (q *data.Slice, recycle bool) {
-	buf := cuda.GetBuffer(a.NComp(), a.Mesh())
+	buf := cuda.Buffer(a.NComp(), a.Mesh())
 	cuda.Zero(buf)
 	a.addTo(buf)
 	return buf, true

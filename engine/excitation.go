@@ -38,7 +38,7 @@ func (e *excitation) isZero() bool {
 }
 
 func (e *excitation) Get() (*data.Slice, bool) {
-	buf := cuda.GetBuffer(e.NComp(), e.Mesh())
+	buf := cuda.Buffer(e.NComp(), e.Mesh())
 	cuda.Zero(buf)
 	e.addTo(buf)
 	return buf, true

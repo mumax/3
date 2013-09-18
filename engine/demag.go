@@ -22,7 +22,7 @@ func init() {
 	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
 		msat, r := Msat.Get()
 		if r {
-			defer cuda.RecycleBuffer(msat)
+			defer cuda.Recycle(msat)
 		}
 		for c := 0; c < 3; c++ {
 			cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)

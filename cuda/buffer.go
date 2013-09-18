@@ -17,8 +17,8 @@ var (
 
 const buf_max = 100 // maximum number of buffers to allocate
 
-// Returns a GPU slice for temporary use. To be returned to the pool with RecycleBuffer.
-func GetBuffer(nComp int, m *data.Mesh) *data.Slice {
+// Returns a GPU slice for temporary use. To be returned to the pool with Recycle
+func Buffer(nComp int, m *data.Mesh) *data.Slice {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()
 
@@ -50,7 +50,7 @@ func GetBuffer(nComp int, m *data.Mesh) *data.Slice {
 }
 
 // Returns a buffer obtained from GetBuffer to the pool.
-func RecycleBuffer(s *data.Slice) {
+func Recycle(s *data.Slice) {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()
 

@@ -56,7 +56,7 @@ func LoadFile(fname string) *data.Slice {
 func Download(q Getter) *data.Slice {
 	buf, recycle := q.Get()
 	if recycle {
-		defer cuda.RecycleBuffer(buf)
+		defer cuda.Recycle(buf)
 	}
 	if buf.CPUAccess() {
 		return buf

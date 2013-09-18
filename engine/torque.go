@@ -29,7 +29,7 @@ func init() {
 		if !JPol.isZero() {
 			jspin, rec := JPol.Get()
 			if rec {
-				defer cuda.RecycleBuffer(jspin)
+				defer cuda.Recycle(jspin)
 			}
 			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.LUT1(), Alpha.LUT1(), Xi.LUT1(), regions.Gpu())
 		}
@@ -46,7 +46,7 @@ func init() {
 func GetMaxTorque() float64 {
 	torque, recycle := Torque.Get()
 	if recycle {
-		defer cuda.RecycleBuffer(torque)
+		defer cuda.Recycle(torque)
 	}
 	return cuda.MaxVecNorm(torque)
 }

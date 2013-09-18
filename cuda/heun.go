@@ -22,8 +22,8 @@ func NewHeun(y *data.Slice, torqueFn, postStep func(*data.Slice), dt, multiplier
 // Take one time step
 func (e *Heun) Step() {
 	y := e.y
-	dy0 := GetBuffer(3, e.y.Mesh())
-	defer RecycleBuffer(dy0)
+	dy0 := Buffer(3, e.y.Mesh())
+	defer Recycle(dy0)
 
 	dt := float32(e.Dt_si * e.dt_mul) // could check here if it is in float32 ranges
 	util.Assert(dt > 0)
@@ -37,8 +37,8 @@ func (e *Heun) Step() {
 
 	// stage 2
 	{
-		dy := GetBuffer(3, e.y.Mesh())
-		defer RecycleBuffer(dy)
+		dy := Buffer(3, e.y.Mesh())
+		defer Recycle(dy)
 		*e.time += e.Dt_si
 		e.torqueFn(dy)
 		e.NEval++

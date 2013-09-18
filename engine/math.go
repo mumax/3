@@ -31,10 +31,10 @@ func MakeAvgRegion(s Getter, region int) *reduced {
 	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
 		src, r := s.Get()
 		if r {
-			defer cuda.RecycleBuffer(src)
+			defer cuda.Recycle(src)
 		}
-		out := cuda.GetBuffer(s.NComp(), s.Mesh())
-		defer cuda.RecycleBuffer(out)
+		out := cuda.Buffer(s.NComp(), s.Mesh())
+		defer cuda.Recycle(out)
 		cuda.RegionSelect(out, src, regions.Gpu(), byte(region))
 		return avg(out)
 	})
@@ -57,7 +57,7 @@ func MakeAvg(s Getter) *reduced {
 func Average(s Getter) []float64 {
 	b, recycle := s.Get()
 	if recycle {
-		defer cuda.RecycleBuffer(b)
+		defer cuda.Recycle(b)
 	}
 	return avg(b)
 }

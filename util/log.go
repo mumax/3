@@ -48,6 +48,13 @@ func Argument(test bool) {
 	}
 }
 
+// Panics with msg if test is false
+func AssertMsg(test bool, msg interface{}) {
+	if !test {
+		log.Panic(msg)
+	}
+}
+
 // Panics with "assertion failed" if test is false.
 func Assert(test bool) {
 	if !test {

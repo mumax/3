@@ -25,8 +25,8 @@ var (
 type Param interface {
 	NComp() int
 	Unit() string
-	GetVec() []float64
-	setUniform([]float64)
+	getRegion(int) []float64
+	setRegion(int, []float64)
 }
 
 // data for html template
@@ -148,7 +148,7 @@ func Serve(port string) {
 
 			// parameters
 			for n, p := range params {
-				v := p.GetVec()
+				v := p.getRegion(guiRegion)
 				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
 					gui.SetValue(id, v[comp])
 				}

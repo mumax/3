@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
-	"log"
 	"reflect"
 )
 
@@ -62,11 +61,10 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 }
 
 func (e *excitation) GetVec() []float64 {
-	// TODO: average? maybe for all?
 	if len(e.extraTerms) != 0 {
-		log.Fatal(e.Name(), " is space-dependent, cannot be used as value")
+		panic(e.Name() + " is space-dependent, cannot be used as value")
 	}
-	return e.perRegion.getRegion(1)
+	return e.perRegion.getRegion(0)
 }
 
 // needed for gui

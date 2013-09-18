@@ -3,7 +3,6 @@ package engine
 import (
 	"code.google.com/p/mx3/data"
 	"code.google.com/p/mx3/util"
-	"log"
 )
 
 // input parameter, settable by user
@@ -89,21 +88,21 @@ func (p *inputParam) getRegion(region int) []float64 {
 	return v
 }
 
-func (p *inputParam) GetVec() []float64 {
-	return p.getRegion(1) // TODO: revise
-}
+//func (p *inputParam) GetVec() []float64 {
+//	return p.getRegion(0) // TODO: revise
+//}
 
-func (p *inputParam) getUniform() []float64 {
-	v1 := p.getRegion(1)
+func (p *inputParam) IsUniform() bool {
 	cpu := p.CpuLUT()
-	for r := 2; r < regions.maxreg; r++ {
+	v1 := p.getRegion(0)
+	for r := 1; r < regions.maxreg; r++ {
 		for c := range v1 {
 			if cpu[c][r] != float32(v1[c]) {
-				log.Panicf("%v is not uniform", p.name)
+				return false
 			}
 		}
 	}
-	return v1
+	return true
 }
 
 func (p *inputParam) Save()            { Save(p) }

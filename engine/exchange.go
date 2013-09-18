@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/util"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"log"
@@ -29,9 +30,13 @@ func init() {
 		} else {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
-			msat := Msat.getUniform()[0]
-			D := Dex.getUniform()[0] / msat
-			A := Aex.getUniform()[0] / msat
+			util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
+				"DMI: Msat, Aex, Dex must be uniform")
+			util.AssertMsg(spaceFill == 1,
+				"DMI: empty cells not yet supported")
+			msat := Msat.GetRegion(0)
+			D := Dex.GetRegion(0) / msat
+			A := Aex.GetRegion(0) / msat
 			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
 		}
 	})

@@ -13,16 +13,11 @@ func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 }
 
 func (p *ScalarParam) SetRegion(region int, value float64) {
-	// todo: accept func here
 	p.setRegion(region, []float64{value})
 }
 
 func (p *ScalarParam) GetRegion(region int) float64 {
 	return float64(p.getRegion(region)[0])
-}
-
-func (p *ScalarParam) GetUniform() float64 {
-	return float64(p.getUniform()[0])
 }
 
 func (p *ScalarParam) SetValue(v interface{})  { p.setUniform([]float64{v.(float64)}) }

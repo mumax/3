@@ -8,7 +8,7 @@
 	Aex   = 10e-12
  	alpha = 3                                    // fast relax
 
-	lex := sqrt(Aex.GetUniform() / (0.5 * mu0 * pow(Msat.GetUniform(),2))) // define exchange length
+	lex := sqrt(Aex.GetRegion(0) / (0.5 * mu0 * pow(Msat.GetRegion(0),2))) // define exchange length
 
 	d     := 30 * lex                            // we test for d/lex = 30
 	Sizex := 5*d                                 // magnet size x

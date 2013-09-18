@@ -30,7 +30,8 @@ func constVec(x, y, z float64) func() [3]float64 {
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
 func bSat() float64 {
-	return mag.Mu0 * engine.Msat.GetUniform()
+	util.AssertMsg(engine.Msat.IsUniform(), "Remove surface charge: Msat must be uniform")
+	return mag.Mu0 * engine.Msat.GetRegion(0)
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {

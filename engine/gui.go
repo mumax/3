@@ -18,7 +18,7 @@ var (
 	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
 	renderQ        = "m"                                     // quantity to display
 	usingX, usingY = 1, 2                                    // columns to plot
-	guiRegion      = -1                                      // currently addressed region
+	guiRegion      = 0                                       // currently addressed region
 )
 
 // displayable in GUI Parameters section

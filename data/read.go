@@ -11,21 +11,21 @@ import (
 	"unsafe"
 )
 
-func Read(in io.Reader) (data *Slice, time float64, err error) {
+func Read(in io.Reader) (data *Slice, info Meta, err error) {
 	r := newReader(in)
 	return r.readSlice()
 }
 
-func ReadFile(fname string) (data *Slice, time float64, err error) {
+func ReadFile(fname string) (data *Slice, info Meta, err error) {
 	f, err := os.Open(fname)
 	if err != nil {
-		return nil, 0, err
+		return nil, Meta{}, err
 	}
 	defer f.Close()
 	return Read(f)
 }
 
-func MustReadFile(fname string) (data *Slice, time float64) {
+func MustReadFile(fname string) (data *Slice, info Meta) {
 	s, t, err := ReadFile(fname)
 	util.FatalErr(err)
 	return s, t
@@ -45,15 +45,15 @@ func newReader(in io.Reader) *reader {
 	return r
 }
 
-func (r *reader) readSlice() (slice *Slice, time float64, err error) {
+func (r *reader) readSlice() (slice *Slice, info Meta, err error) {
 	r.err = nil // clear previous error, if any
 	magic := r.readString()
 	if r.err != nil {
-		return nil, 0, r.err
+		return nil, Meta{}, r.err
 	}
 	if magic != MAGIC {
 		r.err = fmt.Errorf("dump: bad magic number:%v", magic)
-		return nil, 0, r.err
+		return nil, Meta{}, r.err
 	}
 	nComp := r.readInt()
 	size := [3]int{}
@@ -67,15 +67,15 @@ func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 	mesh := NewMesh(size[0], size[1], size[2], cell[0], cell[1], cell[2])
 
 	mesh.Unit = r.readString()
-	time = r.readFloat64()
+	info.Time = r.readFloat64()
 	_ = r.readString() // time unit
 
 	s := NewSlice(nComp, mesh)
 
-	s.tag = r.readString()
-	s.unit = r.readString()
+	info.Name = r.readString()
+	info.Unit = r.readString()
 	precission := r.readUint64()
-	util.Assert(precission == 4)
+	util.AssertMsg(precission == 4, "only single precission supported")
 
 	for i := 0; i < padding; i++ {
 		_ = r.readUint64()
@@ -99,17 +99,17 @@ func (r *reader) readSlice() (slice *Slice, time float64, err error) {
 	}
 	storedcrc := r.readUint64() // checksum from data stream. 0 means not set
 	if r.err != nil {
-		return nil, 0, r.err
+		return nil, Meta{}, r.err
 	}
 	if r.crc != nil {
 		r.crc.Reset() // reset for next frame
 	}
 	if r.crc != nil && storedcrc != 0 && mycrc != storedcrc {
 		r.err = fmt.Errorf("dump CRC error: expected %16x, got %16x", storedcrc, mycrc)
-		return nil, 0, r.err
+		return nil, Meta{}, r.err
 	}
 
-	return s, time, nil
+	return s, info, nil
 }
 
 func (r *reader) readInt() int {

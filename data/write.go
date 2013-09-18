@@ -11,7 +11,7 @@ import (
 )
 
 // Write the slice to out in binary format. Add time stamp.
-func Write(out io.Writer, s *Slice, time float64) error {
+func Write(out io.Writer, s *Slice, info Meta) error {
 	w := newWriter(out)
 
 	// Writes the header.
@@ -24,10 +24,10 @@ func Write(out io.Writer, s *Slice, time float64) error {
 		w.writeFloat64(s)
 	}
 	w.writeString(s.Mesh().Unit)
-	w.writeFloat64(time)
+	w.writeFloat64(info.Time)
 	w.writeString("s") // time unit
-	w.writeString(s.Tag())
-	w.writeString(s.Unit())
+	w.writeString(info.Name)
+	w.writeString(info.Unit)
 	w.writeUInt64(4) // precission
 	for i := 0; i < padding; i++ {
 		w.writeUInt64(0)
@@ -47,18 +47,18 @@ func Write(out io.Writer, s *Slice, time float64) error {
 }
 
 // Write the slice to file in binary format. Add time stamp.
-func WriteFile(fname string, s *Slice, time float64) error {
+func WriteFile(fname string, s *Slice, info Meta) error {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	return Write(f, s, time)
+	return Write(f, s, info)
 }
 
 // Write the slice to file in binary format, panic on error.
-func MustWriteFile(fname string, s *Slice, time float64) {
-	err := WriteFile(fname, s, time)
+func MustWriteFile(fname string, s *Slice, info Meta) {
+	err := WriteFile(fname, s, info)
 	util.FatalErr(err)
 }
 

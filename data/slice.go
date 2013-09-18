@@ -1,7 +1,6 @@
 package data
 
-// File: Slice stores N-component GPU or host data.
-// Author: Arne Vansteenkiste
+// Slice stores N-component GPU or host data.
 
 import (
 	"code.google.com/p/mx3/util"
@@ -13,12 +12,16 @@ import (
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 // TODO: unified memory is not used anymore, can be removed. Then we can split cuda.Slice and data.Slice?
 type Slice struct {
-	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
-	ptrs      []unsafe.Pointer         // points into ptr_
-	tag, unit string                   // TODO: remove, duplicated in engine. mv engine/Info here, pass separately
-	mesh      *Mesh
-	len_      int32
-	memType   int8
+	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
+	ptrs    []unsafe.Pointer         // points into ptr_
+	mesh    *Mesh
+	len_    int32
+	memType int8
+}
+
+type Meta struct {
+	Name, Unit string
+	Time       float64
 }
 
 // this package must not depend on CUDA. If CUDA is
@@ -150,12 +153,6 @@ func (s *Slice) Len() int {
 	return int(s.len_)
 }
 
-// Human-readable tag to identify the data.
-func (s *Slice) Tag() string { return s.tag }
-
-// Physical unit of the data.
-func (s *Slice) Unit() string { return s.unit }
-
 // Mesh on which the data is defined.
 func (s *Slice) Mesh() *Mesh { return s.mesh }
 
@@ -165,8 +162,6 @@ func (s *Slice) Comp(i int) *Slice {
 	sl.ptr_[0] = s.ptrs[i]
 	sl.ptrs = sl.ptr_[:1]
 	sl.mesh = s.mesh
-	sl.unit = s.unit
-	sl.tag = s.tag
 	sl.len_ = s.len_
 	sl.memType = s.memType
 	return sl
@@ -193,7 +188,7 @@ func (s *Slice) Slice(a, b int) *Slice {
 		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
 	}
 
-	slice := &Slice{memType: s.memType, mesh: s.mesh, tag: s.tag, unit: s.unit}
+	slice := &Slice{memType: s.memType, mesh: s.mesh}
 	slice.ptrs = slice.ptr_[:s.NComp()]
 	for i := range s.ptrs {
 		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))

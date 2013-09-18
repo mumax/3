@@ -97,9 +97,11 @@
 	</div><hr/>
 
 
-	<h2> graph </h2><div>
+	<h2> gnuplot </h2><div>
 
-		{{.Img "plot" "/plot/1/2"}}
+		<b>plot "datatable.txt" using {{.Range "usingX" 0 10 1}} : {{.Range "usingY" 0 10 2}} with lines </b><br/>
+		<p class=ErrorBox>{{.Span "plotErr"}}</p>
+		{{.Img "plot" "/plot/"}}
 
 	</div><hr/>
 

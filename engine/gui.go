@@ -13,10 +13,11 @@ import (
 )
 
 var (
-	quants    = make(map[string]Getter)
-	params    = make(map[string]Param)
-	KeepAlive = func() time.Time { return time.Time{} } // overwritten by gui server
-	renderQ   = "m"                                     // quantity to display
+	quants         = make(map[string]Getter)
+	params         = make(map[string]Param)
+	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
+	renderQ        = "m"                                     // quantity to display
+	usingX, usingY = 1, 2                                    // columns to plot
 )
 
 // displayable in GUI Parameters section
@@ -87,6 +88,10 @@ func Serve(port string) {
 
 	// display
 	gui.SetValue("sel_render", renderQ)
+
+	// gnuplot
+	gui.OnEvent("usingX", func() { usingX = gui.Value("usingX").(int) })
+	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
 
 	// parameters
 	gui.SetValue("sel_region", -1) // all regions

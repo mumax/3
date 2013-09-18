@@ -10,11 +10,13 @@ import (
 func servePlot(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path[len("/plot/"):]
 
+	var a, b interface{}
 	u := strings.Split(url, "/") // u a:b
-	if len(u) != 2 {
-		http.Error(w, "need a/b", http.StatusNotFound)
+	if len(u) == 2 {
+		a, b = u[0], u[1]
+	} else {
+		a, b = usingX, usingY
 	}
-	a, b := u[0], u[1]
 
 	cmd := "gnuplot"
 	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set format y "%%g"; set term png; plot "%v/datatable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}

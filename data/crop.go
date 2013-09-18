@@ -1,5 +1,6 @@
 package data
 
+// Cut-out a piece between given bounds (incl, excl)
 func Crop(in *Slice, x1, x2, y1, y2, z1, z2 int) *Slice {
 	Nx := x2 - x1
 	Ny := y2 - y1

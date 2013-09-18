@@ -11,8 +11,6 @@ import (
 // 	m normalized
 // 	B in Tesla
 func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
-	// TODO: assert...
-
 	N := torque.Len()
 	cfg := make1DConf(N)
 

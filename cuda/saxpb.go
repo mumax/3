@@ -5,7 +5,8 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
-// dst[i] = src[i] * factor + cnst
+// dst[i] = src[i] * factor + cnst.
+// TODO: remove? Used only by FFTM
 func Saxpb(dst, src *data.Slice, factor, cnst float32) {
 	N := dst.Len()
 	nComp := dst.NComp()

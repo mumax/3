@@ -2,7 +2,7 @@ package cuda
 
 import "github.com/barnex/cuda5/cu"
 
-// CUDA Launch parameters. TODO: optimize
+// CUDA Launch parameters. TODO: optimize?
 var (
 	BlockSize    = 512
 	TileX, TileY = 32, 32

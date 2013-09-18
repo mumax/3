@@ -8,6 +8,12 @@ import (
 	"unsafe"
 )
 
+//#include "reduce.h"
+import "C"
+
+// Block size for reduce kernels.
+const REDUCE_BLOCKSIZE = C.REDUCE_BLOCKSIZE
+
 // Sum of all elements.
 func Sum(in *data.Slice) float32 {
 	util.Argument(in.NComp() == 1)
@@ -43,9 +49,9 @@ func MaxVecNorm(v *data.Slice) float64 {
 	return math.Sqrt(float64(copyback(out)))
 }
 
-//// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
-//// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
-//// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
+// Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
+// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
+// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
 func MaxVecDiff(x, y *data.Slice) float64 {
 	util.Argument(x.Len() == y.Len())
 	out := reduceBuf(0)

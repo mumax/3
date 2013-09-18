@@ -244,7 +244,6 @@ func crop(f *data.Slice) {
 	}
 
 	if todo {
-		log.Println("crop", z1, z2, y1, y2, x1, x2)
 		*f = *data.Crop(f, z1, z2, y1, y2, x1, x2)
 	}
 }

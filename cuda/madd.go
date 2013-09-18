@@ -5,6 +5,19 @@ import (
 	"code.google.com/p/mx3/util"
 )
 
+// multiply: dst[i] = a[i] * b[i]
+func Mul(dst, a, b *data.Slice) {
+	N := dst.Len()
+	nComp := dst.NComp()
+	util.Assert(a.Len() == N && a.NComp() == nComp && b.Len() == N && b.NComp() == nComp)
+	cfg := make1DConf(N)
+	str := stream()
+	for c := 0; c < nComp; c++ {
+		k_mul_async(dst.DevPtr(c), a.DevPtr(c), b.DevPtr(c), N, cfg, str)
+	}
+	syncAndRecycle(str)
+}
+
 // multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2
 func Madd2(dst, src1, src2 *data.Slice, factor1, factor2 float32) {
 	N := dst.Len()
@@ -34,18 +47,3 @@ func Madd3(dst, src1, src2, src3 *data.Slice, factor1, factor2, factor3 float32)
 	}
 	syncAndRecycle(str)
 }
-
-//// Adds a constant to each element of the slice.
-//// 	dst[comp][index] += cnst[comp]
-//func AddConst(dst *data.Slice, cnst ...float32) {
-//	util.Argument(len(cnst) == dst.NComp())
-//	N := dst.Len()
-//	cfg := make1DConf(N)
-//	str := stream()
-//	for c := 0; c < dst.NComp(); c++ {
-//		if cnst[c] != 0 {
-//			k_madd2_async(dst.DevPtr(c), dst.DevPtr(c), 1, nil, cnst[c], N, cfg, str)
-//		}
-//	}
-//	syncAndRecycle(str)
-//}

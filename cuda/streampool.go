@@ -1,7 +1,6 @@
 package cuda
 
-// File: management of a pool of re-usable CUDA streams.
-// Author: Arne Vansteenkiste
+// Management of a pool of re-usable CUDA streams.
 
 import "github.com/barnex/cuda5/cu"
 

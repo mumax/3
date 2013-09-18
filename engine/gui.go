@@ -110,7 +110,7 @@ func Serve(port string) {
 				cmd += "vector("
 				cmd += fmt.Sprint(gui.Value(compIds[0])) + ", "
 				cmd += fmt.Sprint(gui.Value(compIds[1])) + ", "
-				cmd += fmt.Sprint(gui.Value(compIds[0])) + ")"
+				cmd += fmt.Sprint(gui.Value(compIds[2])) + ")"
 			} else {
 				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}

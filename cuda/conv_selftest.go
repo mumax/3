@@ -34,8 +34,8 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	err := float32(0)
 	for c := range a {
 		for i := range a[c] {
-			if abs(a[c][i]-b[c][i]) > err {
-				err = abs(a[c][i] - b[c][i])
+			if fabs(a[c][i]-b[c][i]) > err {
+				err = fabs(a[c][i] - b[c][i])
 			}
 		}
 	}
@@ -48,13 +48,6 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 
 // Maximum tolerable error on demag convolution self-test.
 const CONV_TOLERANCE = 1e-6
-
-func abs(x float32) float32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
 
 // Brute-force O(N²) vector convolution on CPU.
 // Used to verify GPU FFT convolution.

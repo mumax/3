@@ -152,7 +152,7 @@ func Serve(port string) {
 			for n, p := range params {
 				v := p.getRegion(guiRegion)
 				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
-					gui.SetValue(id, v[comp])
+					gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
 				}
 			}
 

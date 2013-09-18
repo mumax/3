@@ -18,6 +18,7 @@ var (
 	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
 	renderQ        = "m"                                     // quantity to display
 	usingX, usingY = 1, 2                                    // columns to plot
+	guiRegion      = -1                                      // currently addressed region
 )
 
 // displayable in GUI Parameters section
@@ -98,6 +99,7 @@ func Serve(port string) {
 
 	// parameters
 	gui.SetValue("sel_region", -1) // all regions
+	gui.OnEvent("sel_region", func() { guiRegion = gui.Value("sel_region").(int) })
 
 	for n, p := range params {
 		n := n // closure caveats...
@@ -107,21 +109,17 @@ func Serve(port string) {
 		handler := func() {
 			cmd := n + " = "
 			if p.NComp() == 3 {
-				cmd += "vector("
-				cmd += fmt.Sprint(gui.Value(compIds[0])) + ", "
-				cmd += fmt.Sprint(gui.Value(compIds[1])) + ", "
-				cmd += fmt.Sprint(gui.Value(compIds[2])) + ")"
+				cmd += fmt.Sprintf("vector(%v, %v, %v)",
+					gui.Value(compIds[0]), gui.Value(compIds[1]), gui.Value(compIds[2]))
 			} else {
 				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}
 			cmd += ";"
 			Inject <- func() { Eval(cmd, gui) }
 		}
-
 		for _, id := range compIds {
 			gui.OnEvent(id, handler)
 		}
-
 	}
 
 	// process

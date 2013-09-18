@@ -28,14 +28,15 @@ func SaveAs(q Getter, fname string) {
 	if recylce {
 		defer cuda.Recycle(buffer)
 	}
-	AsyncSave(fname, assureCPU(buffer), Time)
+	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit()}
+	AsyncSave(fname, assureCPU(buffer), info)
 }
 
 // Asynchronously save slice to file. Slice should be on CPU and
 // not be written after this call.
-func AsyncSave(fname string, s *data.Slice, time float64) {
+func AsyncSave(fname string, s *data.Slice, info data.Meta) {
 	initQue()
-	saveQue <- saveTask{fname, s, time}
+	saveQue <- saveTask{fname, s, info}
 }
 
 // Copy to CPU, if needed
@@ -66,7 +67,7 @@ func initQue() {
 type saveTask struct {
 	fname  string
 	output *data.Slice
-	time   float64
+	info   data.Meta
 }
 
 // continuously takes save tasks and flushes them to disk.
@@ -74,7 +75,7 @@ type saveTask struct {
 // the rather big queue allows big output bursts to be concurrent with GPU.
 func runSaver() {
 	for t := range saveQue {
-		data.MustWriteFile(t.fname, t.output, t.time)
+		data.MustWriteFile(t.fname, t.output, t.info)
 	}
 	done <- true
 }

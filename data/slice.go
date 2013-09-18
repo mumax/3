@@ -68,7 +68,6 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 		s.ptrs[c] = ptrs[c]
 	}
 	s.memType = memType
-	//util.Assert(s.ptrs[0] != nil) // TODO: rm
 	return s
 }
 

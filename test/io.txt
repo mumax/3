@@ -11,7 +11,6 @@ setgeom(cylinder(50e-9, 50e-9))
 
 msat  = 800e-3
 Aex   = 12e-13
-Dex   = 1e-5
 anisU = vector(1, 0, 0)
 Ku1   = 500e3
 

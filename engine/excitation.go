@@ -60,15 +60,14 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 	e.perRegion.setRegion(region, value[:])
 }
 
-func (e *excitation) GetVec() []float64 {
-	if len(e.extraTerms) != 0 {
-		panic(e.Name() + " is space-dependent, cannot be used as value")
-	}
-	return e.perRegion.getRegion(0)
-}
+//func (e *excitation) GetVec() []float64 {
+//	if len(e.extraTerms) != 0 {
+//		panic(e.Name() + " is space-dependent, cannot be used as value")
+//	}
+//	return e.perRegion.getRegion(0)
+//}
 
-// needed for gui
-func (e *excitation) setUniform(v []float64) {
+func (e *excitation) setRegion(r int, v []float64) {
 	e.perRegion.setUniform(v)
 }
 

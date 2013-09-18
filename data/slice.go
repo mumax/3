@@ -15,7 +15,7 @@ import (
 type Slice struct {
 	ptr_      [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
 	ptrs      []unsafe.Pointer         // points into ptr_
-	tag, unit string                   // Human-readable descriptors
+	tag, unit string                   // TODO: remove, duplicated in engine. mv engine/Info here, pass separately
 	mesh      *Mesh
 	len_      int32
 	memType   int8

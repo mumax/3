@@ -133,28 +133,6 @@ func (m *buffered) SetRegion(region int, conf Config) {
 	cuda.Normalize(m.buffer, vol)
 }
 
-// remove magnetization where stencil is zero.
-//func (m *buffered) stencilGeom() {
-//	if geom == nil {
-//		return
-//	}
-//	h := m.buffer.HostCopy()
-//	stencil(h, regions.cpu)
-//	data.Copy(m.buffer, h)
-//}
-
-// remove dst where stencil is zero (host).
-func stencil(dst *data.Slice, stencil []byte) {
-	d := dst.Host()
-	for i, s := range stencil {
-		if s == 0 {
-			d[0][i] = 0
-			d[1][i] = 0
-			d[2][i] = 0
-		}
-	}
-}
-
 //func (b *buffered) GetVec() []float64       { return Average(b) }
 func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) } // TODO: SetInShape a bit slowish
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }

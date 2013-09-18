@@ -1,6 +1,6 @@
 package engine
 
-// parameter derived from others (not directly settable)
+// parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
 type derivedParam struct {
 	lut
 	updater  func(*derivedParam)
@@ -20,7 +20,7 @@ func (p *derivedParam) invalidate() {
 
 func (p *derivedParam) update() {
 	for _, par := range p.parents {
-		par.update() // may invalidate me they-re time dependent
+		par.update() // may invalidate me
 	}
 	if !p.uptodate {
 		p.updater(p)

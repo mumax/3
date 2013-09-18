@@ -16,7 +16,7 @@ type DataTable struct {
 
 // can be saved in table
 type getVec interface {
-	GetVec() []float64
+	GetVec() []float64 // TODO: output float32s only
 	Name() string
 	Unit() string
 	NComp() int

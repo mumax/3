@@ -1,7 +1,5 @@
 package draw
 
-// Author: Arne Vansteenkiste
-
 import "image/color"
 
 // Gray colorscale: min=black, max=white.

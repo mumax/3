@@ -2,9 +2,7 @@ package engine
 
 // Utilities for setting magnetic configurations.
 
-import (
-	"math"
-)
+import "math"
 
 func init() {
 	DeclFunc("uniform", Uniform, "Uniform magnetization in given direction")

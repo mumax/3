@@ -120,6 +120,7 @@ const templText = `
 	<table>
 	<tr> <td> <b>Region </b> </td>
 	<td>{{.BeginSelect "sel_region"}}
+		<option value=-1> [all]       </option>
 		{{range .Data.MakeRange 0 256}}
 			<option value= {{.}}> {{.}}</option>
 		{{end}}

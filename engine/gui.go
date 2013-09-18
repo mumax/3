@@ -60,6 +60,7 @@ func Serve(port string) {
 
 	http.Handle("/", gui)
 	http.HandleFunc("/render/", serveRender)
+	http.HandleFunc("/plot/", servePlot)
 
 	// geometry
 	size := Mesh().Size() // deadly race condition here!!!!!!

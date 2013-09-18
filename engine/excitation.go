@@ -56,8 +56,19 @@ func assureGPU(s *data.Slice) *data.Slice {
 	}
 }
 
+// user script: has to be 3-vector
 func (e *excitation) SetRegion(region int, value [3]float64) {
 	e.perRegion.setRegion(region, value[:])
+}
+
+// for gui (nComp agnostic)
+func (e *excitation) setRegion(region int, value []float64) {
+	e.perRegion.setRegion(region, value)
+}
+
+// does not use extramask!
+func (e *excitation) getRegion(region int) []float64 {
+	return e.perRegion.getRegion(region)
 }
 
 //func (e *excitation) GetVec() []float64 {
@@ -66,10 +77,6 @@ func (e *excitation) SetRegion(region int, value [3]float64) {
 //	}
 //	return e.perRegion.getRegion(0)
 //}
-
-func (e *excitation) setRegion(r int, v []float64) {
-	e.perRegion.setUniform(v)
-}
 
 // needed for script
 func (e *excitation) SetValue(v interface{}) {

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -98,8 +99,7 @@ func Serve(port string) {
 	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
 
 	// parameters
-	gui.SetValue("sel_region", -1) // all regions
-	gui.OnEvent("sel_region", func() { guiRegion = gui.Value("sel_region").(int) })
+	gui.OnEvent("sel_region", func() { guiRegion = atoi(gui.Value("sel_region")) })
 
 	for n, p := range params {
 		n := n // closure caveats...
@@ -107,14 +107,14 @@ func Serve(port string) {
 
 		compIds := ((*guidata)(nil)).CompBoxIds(n)
 		handler := func() {
-			cmd := n + " = "
+			cmd := fmt.Sprintf("%v.setRegion(%v,", n, guiRegion)
 			if p.NComp() == 3 {
 				cmd += fmt.Sprintf("vector(%v, %v, %v)",
 					gui.Value(compIds[0]), gui.Value(compIds[1]), gui.Value(compIds[2]))
 			} else {
 				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}
-			cmd += ";"
+			cmd += ");"
 			Inject <- func() { Eval(cmd, gui) }
 		}
 		for _, id := range compIds {
@@ -191,4 +191,10 @@ func Eval(code string, gui *gui.Doc) {
 		gui.SetValue("paramErr", fmt.Sprint(err))
 		log.Println(err)
 	}
+}
+
+func atoi(x interface{}) int {
+	i, err := strconv.Atoi(fmt.Sprint(x))
+	util.LogErr(err)
+	return i
 }

@@ -20,7 +20,7 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
-	DeclFunc("OverrideLex", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
+	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
@@ -53,7 +53,6 @@ func getExchangeEnergy() float64 {
 // In case of different materials it is not always clear what the exchange
 // between them should be, especially if they have different Msat. By specifying
 // the exchange length, it is up to the user to decide which Msat to use.
-// When using regions, there is by default no exchange coupling between different regions.
 // A negative length may be specified to obtain antiferromagnetic coupling.
 func OverrideExchangeLength(region1, region2 int, exlen float64) {
 	l2 := sign(exlen) * (exlen * exlen) * 1e18

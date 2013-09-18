@@ -1,10 +1,8 @@
 package prof
 
-// File: manages functions to be called at program exit
-// Author: Arne Vansteenkiste
-
 import "log"
 
+// Functions to be called at program exit
 var atexit []func()
 
 // Add a function to be executed at program exit.

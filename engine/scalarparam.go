@@ -1,9 +1,6 @@
 package engine
 
-import (
-	//"code.google.com/p/mx3/cuda"
-	"reflect"
-)
+import "reflect"
 
 // specialized param with 1 component
 type ScalarParam struct {

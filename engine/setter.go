@@ -24,5 +24,5 @@ func (b *setter) Get() (q *data.Slice, recycle bool) {
 	return buffer, true // must recycle
 }
 
-func (s *setter) Save()           { Save(s) }
+func (s *setter) Save()           { Save(s) } // TODO: rm
 func (s *setter) SaveAs(f string) { SaveAs(s, f) }

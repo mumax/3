@@ -92,6 +92,26 @@ const templText = `
 	</div><hr/>
 
 
+	<h2> parameters </h2><div>
+
+	<p class=ErrorBox>{{.Span "paramErr" ""}}</p>
+
+	<table>
+	<tr> <td> <b>Region </b> </td>
+	<td>{{.BeginSelect "sel_region"}}
+		{{range .Data.MakeRange 0 256}}
+			<option value= {{.}}> {{.}}</option>
+		{{end}}
+	{{.EndSelect}}</td></tr>
+
+	{{range $k,$v := .Data.Params}}
+		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.TextBox . "0"}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
+	{{end}}
+	</table>
+
+	</div><hr/>
+
+
 	<h2> display </h2><div>
 
 		{{.BeginSelect "sel_render"}}
@@ -109,26 +129,6 @@ const templText = `
 		<b>plot "datatable.txt" using {{.IntBox "usingX" 1}} : {{.IntBox "usingY" 2}} with lines </b><br/>
 		<p class=ErrorBox>{{.Span "plotErr"}}</p>
 		{{.Img "plot" "/plot/"}}
-
-	</div><hr/>
-
-
-	<h2> parameters </h2><div>
-
-	<p class=ErrorBox>{{.Span "paramErr" ""}}</p>
-
-	<table>
-	<tr> <td> <b>Region </b> </td>
-	<td>{{.BeginSelect "sel_region"}}
-		{{range .Data.MakeRange 0 256}}
-			<option value= {{.}}> {{.}}</option>
-		{{end}}
-	{{.EndSelect}}</td></tr>
-
-	{{range $k,$v := .Data.Params}}
-		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.TextBox . "0"}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>
-	{{end}}
-	</table>
 
 	</div><hr/>
 

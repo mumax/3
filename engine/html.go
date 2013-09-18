@@ -103,6 +103,13 @@ const templText = `
 	</div><hr/>
 
 
+	<h2> graph </h2><div>
+
+		{{.Img "plot" "/plot/1/2"}}
+
+	</div><hr/>
+
+
 	<h2> parameters </h2><div>
 
 	<p class=ErrorBox>{{.Span "paramErr" ""}}</p>

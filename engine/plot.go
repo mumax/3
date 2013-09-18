@@ -17,7 +17,7 @@ func servePlot(w http.ResponseWriter, r *http.Request) {
 	a, b := u[0], u[1]
 
 	cmd := "gnuplot"
-	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set format y "%%g"; set term svg; plot "%v/datatable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}
+	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set format y "%%g"; set term png; plot "%v/datatable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
 		http.Error(w, err.Error()+"\n"+string(out), http.StatusInternalServerError)

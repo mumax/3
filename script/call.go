@@ -31,6 +31,9 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	// compile and check args
 	args := make([]Expr, len(n.Args))
 	variadic := f.Type().IsVariadic()
+	if !variadic && len(n.Args) != f.Type().NumIn() {
+		panic(err(n.Pos(), fname, "needs", f.Type().NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
+	}
 	for i := range args {
 		if variadic {
 			args[i] = w.compileExpr(n.Args[i]) // no type check or conversion
@@ -38,10 +41,6 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 			args[i] = typeConv(n.Args[i].Pos(), w.compileExpr(n.Args[i]), f.Type().In(i))
 		}
 	}
-	if !variadic && len(n.Args) != f.Type().NumIn() {
-		panic(err(n.Pos(), fname, "needs", f.Type().NumIn(), "arguments, got", len(n.Args))) // TODO: varargs
-	}
-
 	return &call{f, args}
 }
 

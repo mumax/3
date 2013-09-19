@@ -47,9 +47,8 @@ func (p *inputParam) setRegion(region int, v []float64) {
 	p.setRegions(region, region+1, v)
 }
 
-// set in all regions except 0
-// TODO: should region zero really have unset params?
-// TODO: check if we always start from 1
+// set in all regions
+// TODO: check if we always start from 0
 func (p *inputParam) setUniform(v []float64) {
 	p.setRegions(0, NREGION, v)
 }

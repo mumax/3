@@ -6,10 +6,12 @@ import (
 )
 
 func init() {
-	DeclFunc("Ellipsoid", Ellipsoid, "Ellipsoid with axes in meter")
-	DeclFunc("Cylinder", Cylinder, "Ellipitic cylinder with axes in meter")
+	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
+	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
+	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
+	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
-	DeclFunc("Rect", Rect, "Infinitely high rectangle with size in meter")
+	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
 	DeclFunc("XRange", XRange, "Part of space between x1 and x2, in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
@@ -27,9 +29,20 @@ func Ellipsoid(diamx, diamy, diamz float64) Shape {
 	}
 }
 
-// Elliptic cylinder along z (or 2D disk), with given diameters along x and y.
-func Cylinder(diamx, diamy float64) Shape {
+func Ellipse(diamx, diamy float64) Shape {
 	return Ellipsoid(diamx, diamy, math.Inf(1))
+}
+
+func Circle(diam float64) Shape {
+	return Cylinder(diam, math.Inf(1))
+}
+
+// cylinder along z.
+func Cylinder(diam, height float64) Shape {
+	return func(x, y, z float64) bool {
+		return z <= height/2 && z >= -height/2 &&
+			sqr64(x/diam)+sqr64(y/diam) <= 0.25
+	}
 }
 
 // 3D Rectangular slab with given sides.

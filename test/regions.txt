@@ -7,10 +7,10 @@ setgridsize(N, N, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
 d := 1e-9 * N  
 
-defregion(0, cylinder(d, d).inverse())
-defregion(1, cylinder(d, d))
-defregion(2, cylinder(d/2, d/2))
-defregion(3, cylinder(d/2, d/2).transl(d/3, 0, 0))
+defregion(0, circle(d).inverse())
+defregion(1, circle(d))
+defregion(2, circle(d/2))
+defregion(3, circle(d/2).transl(d/3, 0, 0))
 save(regions)
 
 Ku1.setregion(1, 500)

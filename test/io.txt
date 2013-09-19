@@ -7,7 +7,7 @@ setcellsize(1e-9, 1e-9, 1e-9)
 
 m = uniform(1, 0, 0)
 
-setgeom(cylinder(50e-9, 50e-9))
+setgeom(circle(50e-9))
 
 msat  = 800e-3
 Aex   = 12e-13

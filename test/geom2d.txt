@@ -10,7 +10,7 @@ d := 1e-9 * N
 m = uniform(1, 0, 0)
 expect("m", average(m)[0], 1, 1e-7)
 
-setgeom(cylinder(d, d))
+setgeom(circle(d))
 expect("m", average(m)[0], pi/4, 1e-2) // cylinder cut away part of m
 
 m = uniform(-1, 0, 0)

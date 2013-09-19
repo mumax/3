@@ -6,7 +6,7 @@ vol := l * w * d * (pi/4)
 
 setcellsize(c, c, d)
 setgridsize(128, 64, 1)
-setgeom(cylinder(l, w))
+setgeom(ellipse(l, w))
 
 Msat  = 860E3
 Aex   = 13E-12

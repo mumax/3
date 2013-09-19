@@ -7,7 +7,7 @@
 
 	defregion(1, xrange(0, inf))
 	defregion(2, xrange(-inf, 0))
-	defregion(3, cylinder(10e-9, 20e-9))
+	defregion(3, ellipse(10e-9, 20e-9))
 
 	B := 2/mu0
 	msat.setregion(1, B)

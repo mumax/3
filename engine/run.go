@@ -10,7 +10,7 @@ func init() {
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
 	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
-	DeclROnly("t", &Time, "Total simulated time (s)")
+	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclROnly("Dt", &Solver.Dt_si, "Last solver time step (s)")
 	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")

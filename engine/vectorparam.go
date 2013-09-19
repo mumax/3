@@ -18,7 +18,7 @@ func (p *VectorParam) SetRegion(region int, value [3]float64) {
 
 func (p *VectorParam) GetRegion(region int) [3]float64 {
 	v := p.getRegion(region)
-	return Vector(v[0], v[1], v[2])
+	return [3]float64{v[0], v[1], v[2]}
 }
 
 func (p *VectorParam) Eval() interface{}       { return p }

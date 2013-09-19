@@ -148,7 +148,7 @@ func Serve(port string) {
 			gui.SetValue("render", "/render/"+renderQ+cachebreaker)
 
 			// plot
-			gui.SetValue("render", "/plot/"+cachebreaker)
+			gui.SetValue("plot", "/plot/"+cachebreaker)
 
 			// parameters
 			for n, p := range params {

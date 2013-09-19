@@ -7,6 +7,7 @@ import (
 )
 
 // converts in to an expression of type OutT.
+// also serves as type check (not convertible == type error)
 // pos is used for error message on impossible conversion.
 func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	inT := in.Type()
@@ -35,11 +36,11 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case outT == int_t && inT == float64_t:
 		return &float64ToInt{in}
 
-	case inT == float64_t && outT.AssignableTo(funcIf_t):
-		return &funcIf{in}
+	case inT == float64_t && outT.AssignableTo(ScalarFunction_t):
+		return &scalFn{in}
 
-	case inT == int_t && outT.AssignableTo(funcIf_t):
-		return &funcIf{&intToFloat64{in}}
+	case inT == int_t && outT.AssignableTo(ScalarFunction_t):
+		return &scalFn{&intToFloat64{in}}
 
 		// float64 -> func()float64
 		//case inT == float64_t && outT == func_float64_t:
@@ -72,30 +73,20 @@ func inputType(e Expr) reflect.Type {
 
 // common type definitions
 var (
-	float64_t      = reflect.TypeOf(float64(0))
-	func_float64_t = reflect.TypeOf(func() float64 { return 0 })
-	int_t          = reflect.TypeOf(int(0))
-	string_t       = reflect.TypeOf("")
-	vector_t       = reflect.TypeOf([3]float64{})
-	func_vector_t  = reflect.TypeOf(func() [3]float64 { panic(0) })
-	bool_t         = reflect.TypeOf(false)
-	funcIf_t       = reflect.TypeOf(dummy_f).In(0)
-	func3If_t      = reflect.TypeOf(dummy_f3).In(0)
+	float64_t        = reflect.TypeOf(float64(0))
+	func_float64_t   = reflect.TypeOf(func() float64 { return 0 })
+	int_t            = reflect.TypeOf(int(0))
+	string_t         = reflect.TypeOf("")
+	vector_t         = reflect.TypeOf([3]float64{})
+	func_vector_t    = reflect.TypeOf(func() [3]float64 { panic(0) })
+	bool_t           = reflect.TypeOf(false)
+	ScalarFunction_t = reflect.TypeOf(dummy_f).In(0)
+	VectorFunction_t = reflect.TypeOf(dummy_f3).In(0)
 )
 
-type FuncIf interface {
-	Float() float64
-	Const() bool
-}
-
-type Func3If interface {
-	Float3() [3]float64
-	Const() bool
-}
-
 // maneuvers to get interface type of Func (simpler way?)
-func dummy_f(FuncIf)   {}
-func dummy_f3(Func3If) {}
+func dummy_f(ScalarFunction)  {}
+func dummy_f3(VectorFunction) {}
 
 // converts int to float64
 type intToFloat64 struct{ in Expr }
@@ -118,13 +109,6 @@ func safe_int(x float64) int {
 	}
 	return i
 }
-
-type funcIf struct{ in Expr }
-
-func (c *funcIf) Eval() interface{}  { return c }
-func (c *funcIf) Type() reflect.Type { return funcIf_t }
-func (c *funcIf) Float() float64     { return c.in.Eval().(float64) } // implements FuncIf
-func (c *funcIf) Const() bool        { return Const(c.in) }           // implements FuncIf
 
 // converts float64 to func()float64
 //type float64ToFunc struct{ in Expr }

@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"code.google.com/p/mx3/script"
 	"log"
 	"reflect"
 )
@@ -25,7 +26,7 @@ func (p *ScalarParam) GetRegion(region int) float64 {
 
 func (p *ScalarParam) SetValue(v interface{}) {
 	log.Println(p.Name(), ".SetValue", v)
-	f := v.(FuncIf)
+	f := v.(script.ScalarFunction)
 	if f.Const() {
 		p.setUniform([]float64{f.Float()})
 	} else {
@@ -35,16 +36,6 @@ func (p *ScalarParam) SetValue(v interface{}) {
 	}
 }
 
-type FuncIf interface {
-	Float() float64
-	Const() bool
-}
-
 func (p *ScalarParam) Eval() interface{}       { return p }
 func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
-func (p *ScalarParam) InputType() reflect.Type { return funcIf_t }
-
-// maneuvers to get interface type of Func (simpler way?)
-var funcIf_t = reflect.TypeOf(dummy_f).In(0)
-
-func dummy_f(FuncIf) {}
+func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }

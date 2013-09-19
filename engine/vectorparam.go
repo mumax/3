@@ -1,6 +1,9 @@
 package engine
 
-import "reflect"
+import (
+	"code.google.com/p/mx3/script"
+	"reflect"
+)
 
 type VectorParam struct {
 	inputParam
@@ -21,18 +24,11 @@ func (p *VectorParam) GetRegion(region int) [3]float64 {
 	return [3]float64{v[0], v[1], v[2]}
 }
 
-func (p *VectorParam) Eval() interface{}       { return p }
-func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
-func (p *VectorParam) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
 func (p *VectorParam) SetValue(v interface{}) {
 	vec := v.([3]float64)
 	p.setUniform(vec[:])
 }
 
-type Func3If interface {
-	Float3() [3]float64
-	Const() bool
-}
-
-// maneuvers to get interface type of Func3 (simpler way?)
-func dummy_f3(Func3If) {}
+func (p *VectorParam) Eval() interface{}       { return p }
+func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
+func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t }

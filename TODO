@@ -12,6 +12,8 @@ remove excitation_PerRegion exports
 improvements:
 -------------
 
+rm log("uploading ...,  add upload/update counters and show in gui
+
 remove -f flag, move existing files to name.trash
 fprintln: put file in OD if not absolute
 

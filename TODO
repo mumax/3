@@ -1,36 +1,27 @@
 bugs:
 -----
 
-web interface keepalive timeout not working anymore
-
+N/A
 
 improvements:
 -------------
 
 remove -f flag, move existing files to name.trash
 fprintln: put file in OD if not absolute
-OD() api
-regions: setgeom() should define region 0 and set all parameters zero there
-regions: should not be neccesary to define region 0
-regions: should automatically set aex between regions, at very least if they have equal params
 
-web: update parameter text boxes and image size
 web: use next free port if already in use
 cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
 hide buffered.Mesh(), .Comp() etc. (ZYX axes)
+non-fatal error handling for GUI
 log.FatalErr: print line number of caller?
-move add-hoc functionality (center walls etc) to "extra" package
 
 
 new features:
 -------------
 
-slice time stamp
-
 web: (clean) exit button
 web: show/hide/auto refresh
-web: graphs
 web: -web flag opens browser
 
 

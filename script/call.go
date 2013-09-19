@@ -14,15 +14,15 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	// compile function or method to be called
 	var f Expr
 	var fname string
-	switch concrete := n.Fun.(type) {
+	switch Fun := n.Fun.(type) {
 	default:
 		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
 	case *ast.Ident: // function call
-		f = w.compileExpr(concrete)
-		fname = concrete.Name
+		f = w.compileExpr(Fun)
+		fname = Fun.Name
 	case *ast.SelectorExpr: // method call
-		f = w.compileSelectorStmt(concrete)
-		fname = concrete.Sel.Name
+		f = w.compileSelectorStmt(Fun)
+		fname = Fun.Sel.Name
 	}
 	if f.Type().Kind() != reflect.Func {
 		panic(err(n.Pos(), "can not call", n))

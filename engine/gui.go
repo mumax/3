@@ -144,9 +144,11 @@ func Serve(port string) {
 			}
 
 			// display
-			// todo: use time step as cachebreaker
-			cachebreaker := "?" + fmt.Sprint(time.Now().Nanosecond())
+			cachebreaker := "?" + fmt.Sprint(Solver.NSteps)
 			gui.SetValue("render", "/render/"+renderQ+cachebreaker)
+
+			// plot
+			gui.SetValue("render", "/plot/"+cachebreaker)
 
 			// parameters
 			for n, p := range params {

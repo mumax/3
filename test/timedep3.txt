@@ -1,0 +1,24 @@
+c:=4e-9
+setgridsize(32, 32, 1)
+setcellsize(c, c, c)
+
+Msat=860e3
+Aex=13e-12
+alpha=0.2
+m=uniform(1, 1, 0)
+setgeom(circle(32*4e-9))
+
+f := 1e9
+A := 0.01
+B_ext = vector(A*sin(2*pi*f*t), A*cos(2*pi*f*t), 0)
+
+table.add(B_ext)
+table.autosave(1e-12)
+
+run(0.2e-9)
+
+m_ := average(m)
+
+expect("mx", m_[0], 0.537903, 1e-6)
+expect("my", m_[1], 0.570360, 1e-6)
+expect("mz", m_[2], 0.016862, 1e-6)

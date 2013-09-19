@@ -1,7 +1,13 @@
 bugs:
 -----
 
-N/A
+x = blabla(t) sets only in region 0
+
+API:
+----
+
+getVec : something with Table (for script output)
+remove excitation_PerRegion exports
 
 improvements:
 -------------

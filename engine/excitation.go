@@ -3,6 +3,7 @@ package engine
 import (
 	"code.google.com/p/mx3/cuda"
 	"code.google.com/p/mx3/data"
+	"code.google.com/p/mx3/script"
 	"reflect"
 )
 
@@ -75,12 +76,12 @@ func (e *excitation) getRegion(region int) []float64 {
 	return e.perRegion.getRegion(region)
 }
 
-//func (e *excitation) GetVec() []float64 {
-//	if len(e.extraTerms) != 0 {
-//		panic(e.Name() + " is space-dependent, cannot be used as value")
-//	}
-//	return e.perRegion.getRegion(0)
-//}
+func (e *excitation) GetVec() []float64 {
+	if len(e.extraTerms) != 0 {
+		panic(e.Name() + " is space-dependent, cannot be used as value")
+	}
+	return e.perRegion.getRegion(0) // TODO: all regions!
+}
 
 // needed for script
 
@@ -94,4 +95,4 @@ func (e *excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
-func (e *excitation) InputType() reflect.Type { return reflect.TypeOf([3]float64{}) }
+func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }

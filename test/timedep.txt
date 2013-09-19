@@ -4,8 +4,8 @@ setcellsize(c, c, c)
 
 Msat=860e3
 Aex=13e-12
-alpha=1
-m=uniform(1, 0, 0)
+alpha=0.2
+m=uniform(1, 1, 0)
 anisU = vector(0, 1, 0)
 
 f := 1e9
@@ -14,4 +14,10 @@ Ku1 = 1e5 * sin(2 * pi * f * t)
 table.add(Ku1)
 table.autosave(1e-12)
 
-run(10e-9)
+run(0.5e-9)
+
+m_ := average(m)
+expect("mx", m_[0], -6.4e-6,     1e-6)
+expect("my", m_[1],  0.99093753, 1e-6)
+expect("mz", m_[2],  7.8e-6,     1e-6)
+print(m_)

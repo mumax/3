@@ -1,0 +1,17 @@
+c:=4e-9
+setgridsize(32, 32, 1)
+setcellsize(c, c, c)
+
+Msat=860e3
+Aex=13e-12
+alpha=1
+m=uniform(1, 0, 0)
+anisU = vector(0, 1, 0)
+
+f := 1e9
+Ku1 = 1e5 * sin(2 * pi * f * t)
+
+table.add(Ku1)
+table.autosave(1e-12)
+
+run(10e-9)

@@ -71,6 +71,11 @@ func (p *inputParam) bufset_(region int, v []float64) {
 	}
 }
 
+func (p *inputParam) setFunc(region int, f func() []float64) {
+	p.upd_reg[region] = f
+	p.invalidate()
+}
+
 // mark my GPU copy and my children as invalid (need update)
 func (p *inputParam) invalidate() {
 	p.gpu_ok = false

@@ -29,7 +29,9 @@ func (p *ScalarParam) SetValue(v interface{}) {
 	if f.Const() {
 		p.setUniform([]float64{f.Float()})
 	} else {
-		panic("timedep!!")
+		p.setFunc(0, func() []float64 {
+			return []float64{f.Float()}
+		})
 	}
 }
 

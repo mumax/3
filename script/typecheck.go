@@ -80,6 +80,7 @@ var (
 	func_vector_t  = reflect.TypeOf(func() [3]float64 { panic(0) })
 	bool_t         = reflect.TypeOf(false)
 	funcIf_t       = reflect.TypeOf(dummy_f).In(0)
+	func3If_t      = reflect.TypeOf(dummy_f3).In(0)
 )
 
 type FuncIf interface {
@@ -87,8 +88,14 @@ type FuncIf interface {
 	Const() bool
 }
 
+type Func3If interface {
+	Float3() [3]float64
+	Const() bool
+}
+
 // maneuvers to get interface type of Func (simpler way?)
-func dummy_f(FuncIf) {}
+func dummy_f(FuncIf)   {}
+func dummy_f3(Func3If) {}
 
 // converts int to float64
 type intToFloat64 struct{ in Expr }

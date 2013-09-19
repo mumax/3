@@ -28,3 +28,11 @@ func (p *VectorParam) SetValue(v interface{}) {
 	vec := v.([3]float64)
 	p.setUniform(vec[:])
 }
+
+type Func3If interface {
+	Float3() [3]float64
+	Const() bool
+}
+
+// maneuvers to get interface type of Func3 (simpler way?)
+func dummy_f3(Func3If) {}

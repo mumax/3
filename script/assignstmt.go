@@ -43,7 +43,7 @@ func (w *World) compileDefine(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
 		panic(err(a.Pos(), "non-name on left side of :="))
 	}
 	addr := reflect.New(r.Type())
-	w.declare(ident.Name, &reflectLvalue{reflectROnly{addr.Elem()}})
+	w.declare(ident.Name, &reflectLvalue{addr.Elem()})
 	return w.compileAssign(a, lhs, r)
 }
 

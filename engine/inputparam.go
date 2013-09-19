@@ -88,9 +88,9 @@ func (p *inputParam) getRegion(region int) []float64 {
 	return v
 }
 
-//func (p *inputParam) GetVec() []float64 {
-//	return p.getRegion(0) // TODO: revise
-//}
+func (p *inputParam) GetVec() []float64 {
+	return p.getRegion(0) // TODO: revise !!!
+}
 
 func (p *inputParam) IsUniform() bool {
 	cpu := p.CpuLUT()

@@ -40,9 +40,9 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 		}
 	}
 	if err > CONV_TOLERANCE {
-		log.Fatal("convolution self-test error: ", err)
+		log.Fatal("convolution self-test tolerance: ", err, "FAIL")
 	} else {
-		log.Println("self-test error:", err)
+		log.Println("convolution self-test tolreance:", err, "OK")
 	}
 }
 

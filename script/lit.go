@@ -25,21 +25,25 @@ type floatLit float64
 
 func (l floatLit) Eval() interface{}  { return float64(l) }
 func (l floatLit) Type() reflect.Type { return float64_t }
+func (l floatLit) Const() bool        { return true }
 
 type intLit int
 
 func (l intLit) Eval() interface{}  { return int(l) }
 func (l intLit) Type() reflect.Type { return int_t }
+func (l intLit) Const() bool        { return true }
 
 type stringLit string
 
 func (l stringLit) Eval() interface{}  { return string(l) }
 func (l stringLit) Type() reflect.Type { return string_t }
+func (l stringLit) Const() bool        { return true }
 
 type boolLit bool
 
 func (l boolLit) Eval() interface{}  { return bool(l) }
 func (l boolLit) Type() reflect.Type { return bool_t }
+func (l boolLit) Const() bool        { return true }
 
 func parseFloat(str string) float64 {
 	v, err := strconv.ParseFloat(str, 64)

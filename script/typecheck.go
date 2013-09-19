@@ -84,6 +84,7 @@ var (
 
 type FuncIf interface {
 	Float() float64
+	Const() bool
 }
 
 // maneuvers to get interface type of Func (simpler way?)
@@ -94,12 +95,15 @@ type intToFloat64 struct{ in Expr }
 
 func (c *intToFloat64) Eval() interface{}  { return float64(c.in.Eval().(int)) }
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
+func (c *intToFloat64) Const() bool        { return Const(c.in) }
 
 // converts float64 to int
 type float64ToInt struct{ in Expr }
 
 func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
 func (c *float64ToInt) Type() reflect.Type { return int_t }
+func (c *float64ToInt) Const() bool        { return Const(c.in) }
+
 func safe_int(x float64) int {
 	i := int(x)
 	if float64(i) != x {
@@ -113,6 +117,7 @@ type funcIf struct{ in Expr }
 func (c *funcIf) Eval() interface{}  { return c }
 func (c *funcIf) Type() reflect.Type { return funcIf_t }
 func (c *funcIf) Float() float64     { return c.in.Eval().(float64) } // implements FuncIf
+func (c *funcIf) Const() bool        { return Const(c.in) }           // implements FuncIf
 
 // converts float64 to func()float64
 //type float64ToFunc struct{ in Expr }

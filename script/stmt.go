@@ -40,6 +40,5 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 // embed to get Type() that returns nil
 type void struct{}
 
-func (v *void) Type() reflect.Type {
-	return nil
-}
+func (v *void) Type() reflect.Type { return nil }
+func (v *void) Const() bool        { return false }

@@ -35,21 +35,27 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case outT == int_t && inT == float64_t:
 		return &float64ToInt{in}
 
-	// float64 -> func()float64
-	case inT == float64_t && outT == func_float64_t:
-		return &float64ToFunc{in}
+	case inT == float64_t && outT.AssignableTo(funcIf_t):
+		return &funcIf{in}
 
-	// float64 -> func()float64
-	case inT == func_float64_t && outT == float64_t:
-		return &funcToFloat64{in}
+	case inT == int_t && outT.AssignableTo(funcIf_t):
+		return &funcIf{&intToFloat64{in}}
 
-	// int -> func()float64
-	case inT == int_t && outT == func_float64_t:
-		return &float64ToFunc{&intToFloat64{in}}
+		// float64 -> func()float64
+		//case inT == float64_t && outT == func_float64_t:
+		//	return &float64ToFunc{in}
 
-	// [3]float64 -> func()[3]float64
-	case inT == vector_t && outT == func_vector_t:
-		return &vectorToFunc{in}
+		//// float64 -> func()float64
+		//case inT == func_float64_t && outT == float64_t:
+		//	return &funcToFloat64{in}
+
+		// int -> func()float64
+		//case inT == int_t && outT == func_float64_t:
+		//	return &float64ToFunc{&intToFloat64{in}}
+
+		// [3]float64 -> func()[3]float64
+		//case inT == vector_t && outT == func_vector_t:
+		//	return &vectorToFunc{in}
 	}
 }
 
@@ -73,7 +79,15 @@ var (
 	vector_t       = reflect.TypeOf([3]float64{})
 	func_vector_t  = reflect.TypeOf(func() [3]float64 { panic(0) })
 	bool_t         = reflect.TypeOf(false)
+	funcIf_t       = reflect.TypeOf(dummy_f).In(0)
 )
+
+type FuncIf interface {
+	Float() float64
+}
+
+// maneuvers to get interface type of Func (simpler way?)
+func dummy_f(FuncIf) {}
 
 // converts int to float64
 type intToFloat64 struct{ in Expr }
@@ -94,21 +108,27 @@ func safe_int(x float64) int {
 	return i
 }
 
+type funcIf struct{ in Expr }
+
+func (c *funcIf) Eval() interface{}  { return c }
+func (c *funcIf) Type() reflect.Type { return funcIf_t }
+func (c *funcIf) Float() float64     { return c.in.Eval().(float64) } // implements FuncIf
+
 // converts float64 to func()float64
-type float64ToFunc struct{ in Expr }
-
-func (c *float64ToFunc) Eval() interface{}  { return func() float64 { return c.in.Eval().(float64) } }
-func (c *float64ToFunc) Type() reflect.Type { return func_float64_t }
-
-// converts float64 to func()float64
-type funcToFloat64 struct{ in Expr }
-
-func (c *funcToFloat64) Eval() interface{}  { return (c.in.Eval().(func() float64))() }
-func (c *funcToFloat64) Type() reflect.Type { return float64_t }
-
-type vectorToFunc struct{ in Expr }
-
-func (c *vectorToFunc) Eval() interface{} {
-	return func() [3]float64 { return c.in.Eval().([3]float64) }
-}
-func (c *vectorToFunc) Type() reflect.Type { return func_vector_t }
+//type float64ToFunc struct{ in Expr }
+//
+//func (c *float64ToFunc) Eval() interface{}  { return func() float64 { return c.in.Eval().(float64) } }
+//func (c *float64ToFunc) Type() reflect.Type { return func_float64_t }
+//
+//// converts float64 to func()float64
+//type funcToFloat64 struct{ in Expr }
+//
+//func (c *funcToFloat64) Eval() interface{}  { return (c.in.Eval().(func() float64))() }
+//func (c *funcToFloat64) Type() reflect.Type { return float64_t }
+//
+//type vectorToFunc struct{ in Expr }
+//
+//func (c *vectorToFunc) Eval() interface{} {
+//	return func() [3]float64 { return c.in.Eval().([3]float64) }
+//}
+//func (c *vectorToFunc) Type() reflect.Type { return func_vector_t }

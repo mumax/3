@@ -22,7 +22,7 @@ func (q *fftm) Get() (quant *data.Slice, recycle bool) {
 	scale := float32(1 / math.Sqrt(float64(M.Mesh().NCell()))) // logical number of cells
 
 	for i := 0; i < 3; i++ {
-		fft := demagConv().FFT(M.buffer, vol, i, bsat.LUT1(), regions.Gpu()) // fft buffer re-used in conv
+		fft := demagConv().FFT(M.buffer, vol, i, Bsat.LUT1(), regions.Gpu()) // fft buffer re-used in conv
 		comp := dst.Comp(i)
 		data.Copy(comp, fft)
 		arr := comp.Host()[0]

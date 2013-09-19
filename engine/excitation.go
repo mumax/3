@@ -28,7 +28,11 @@ func (e *excitation) addTo(dst *data.Slice) {
 		cuda.RegionAddV(dst, e.perRegion.LUT(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
-		cuda.Madd2(dst, dst, t.mask, 1, float32(t.mul()))
+		var mul float32 = 1
+		if t.mul != nil {
+			mul = float32(t.mul())
+		}
+		cuda.Madd2(dst, dst, t.mask, 1, mul)
 	}
 }
 

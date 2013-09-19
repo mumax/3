@@ -31,7 +31,7 @@ func init() {
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
-			cuda.AddZhangLiTorque(dst, M.buffer, jspin, bsat.LUT1(), Alpha.LUT1(), Xi.LUT1(), regions.Gpu())
+			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.LUT1(), Alpha.LUT1(), Xi.LUT1(), regions.Gpu())
 		}
 	})
 

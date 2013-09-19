@@ -5,22 +5,25 @@ import (
 	"code.google.com/p/mx3/engine"
 	"code.google.com/p/mx3/mag"
 	"code.google.com/p/mx3/util"
+	"fmt"
 	"log"
 	"math"
 )
 
 func init() {
-	engine.DeclFunc("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: mx on left and right side, resp.")
+	engine.DeclFunc("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: region, mx on left and right side, resp.")
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and
 // mx = mxRight on the right end (both -1 or +1), add a B field needed to compensate
 // for the surface charges on the left and right edges.
 // This will mimic an infinitely long wire.
-func RemoveLRSurfaceCharge(mxLeft, mxRight float64) {
+func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	engine.B_ext.Add(compensateLRSurfaceCharges(engine.Mesh(), mxLeft, mxRight), func() float64 { return bSat() })
+	bsat := engine.Bsat.GetRegion(region)[0]
+	util.AssertMsg(bsat != 0, "RemoveSurfaceCharges: Msat is zero in region "+fmt.Sprint(region))
+	engine.B_ext.Add(compensateLRSurfaceCharges(engine.Mesh(), mxLeft, mxRight, bsat), nil)
 }
 
 func constVec(x, y, z float64) func() [3]float64 {
@@ -34,7 +37,7 @@ func bSat() float64 {
 	return mag.Mu0 * engine.Msat.GetRegion(0)
 }
 
-func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64) *data.Slice {
+func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
 	log.Println("calculating field to compensate nanowire surface charge")
 	h := data.NewSlice(3, m)
 	H := h.Vectors()

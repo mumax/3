@@ -2,6 +2,7 @@ package engine
 
 import (
 	"code.google.com/p/mx3/script"
+	"log"
 	"reflect"
 )
 
@@ -25,10 +26,22 @@ func (p *VectorParam) GetRegion(region int) [3]float64 {
 }
 
 func (p *VectorParam) SetValue(v interface{}) {
-	vec := v.([3]float64)
-	p.setUniform(vec[:])
+	log.Println(p.Name(), ".SetValue", v)
+	f := v.(script.VectorFunction)
+	if f.Const() {
+		p.setUniform(slice(f.Float3()))
+	} else {
+		p.setFunc(0, func() []float64 { // TODO: ALL REGIONS !!
+			return slice(f.Float3())
+		})
+	}
 }
 
 func (p *VectorParam) Eval() interface{}       { return p }
 func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
 func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t }
+
+// shortcut for slicing unaddressable_vector()[:]
+func slice(v [3]float64) []float64 {
+	return v[:]
+}

@@ -36,11 +36,13 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 	case outT == int_t && inT == float64_t:
 		return &float64ToInt{in}
 
+	// magical expression -> function conversions
 	case inT == float64_t && outT.AssignableTo(ScalarFunction_t):
 		return &scalFn{in}
-
 	case inT == int_t && outT.AssignableTo(ScalarFunction_t):
 		return &scalFn{&intToFloat64{in}}
+	case inT == vector_t && outT.AssignableTo(VectorFunction_t):
+		return &vecFn{in}
 
 		// float64 -> func()float64
 		//case inT == float64_t && outT == func_float64_t:

@@ -9,8 +9,8 @@ import (
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
 type excitation struct {
-	perRegion  inputParam // Region-based excitation
-	extraTerms []mulmask  // add extra mask*multiplier terms
+	perRegion  VectorParam // Region-based excitation
+	extraTerms []mulmask   // add extra mask*multiplier terms
 }
 
 type mulmask struct {
@@ -19,7 +19,7 @@ type mulmask struct {
 }
 
 func (e *excitation) init(name, unit, desc string) {
-	e.perRegion.init(3, name, unit, nil)
+	e.perRegion.init(name+"_perRegion", unit, "(internal)")
 	DeclLValue(name, e, desc)
 }
 
@@ -83,9 +83,9 @@ func (e *excitation) getRegion(region int) []float64 {
 //}
 
 // needed for script
+
 func (e *excitation) SetValue(v interface{}) {
-	vec := v.([3]float64)
-	e.perRegion.setUniform(vec[:])
+	e.perRegion.SetValue(v) // allows function of time
 }
 
 func (e *excitation) Name() string            { return e.perRegion.Name() }

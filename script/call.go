@@ -18,8 +18,13 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	default:
 		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
 	case *ast.Ident: // function call
-		f = w.compileExpr(Fun)
 		fname = Fun.Name
+		switch fname {
+		case "vector":
+			return w.compileVector(n)
+		default:
+			f = w.compileExpr(Fun)
+		}
 	case *ast.SelectorExpr: // method call
 		f = w.compileSelectorStmt(Fun)
 		fname = Fun.Sel.Name

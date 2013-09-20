@@ -10,6 +10,10 @@ func DeclFunc(name string, f interface{}, doc string) {
 	World.Func(name, f, doc)
 }
 
+func DeclPure(name string, f interface{}, doc string) {
+	World.PureFunc(name, f, doc)
+}
+
 func DeclConst(name string, value float64, doc string) {
 	World.Const(name, value, doc)
 }

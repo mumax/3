@@ -74,8 +74,12 @@ func (w *scope) LValue(name string, v LValue, doc ...string) {
 // 	world.Func("sin", math.Sin)
 // 	world.MustEval("sin(0)") // returns 0
 func (w *scope) Func(name string, f interface{}, doc ...string) {
-	// TODO: specialize for float64 funcs etc
 	w.declare(name, newFunction(f), doc...)
+}
+
+
+func (w *scope) PureFunc(name string, f interface{}, doc ...string) {
+	w.declare(name, newPureFunc(f), doc...)
 }
 
 // add identifier but check that it's not declared yet.

@@ -19,12 +19,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
 	case *ast.Ident: // function call
 		fname = Fun.Name
-		switch fname {
-		case "vector":
-			return w.compileVector(n)
-		default:
-			f = w.compileExpr(Fun)
-		}
+		f = w.compileExpr(Fun)
 	case *ast.SelectorExpr: // method call
 		f = w.compileSelectorStmt(Fun)
 		fname = Fun.Sel.Name
@@ -80,5 +75,16 @@ func (c *call) Type() reflect.Type {
 		return c.f.Type().Out(0)
 	default:
 		panic("bug: multiple return values not allowed")
+	}
+}
+
+func(c*call)Const()bool{
+	if _, ok := c.f.(interface{Pure()}); ok{
+		for _, a:=range c.args{
+			if !Const(a) {return false}
+		}
+		return true
+	}else{
+		return false
 	}
 }

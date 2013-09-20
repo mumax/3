@@ -76,11 +76,8 @@ func (e *excitation) getRegion(region int) []float64 {
 	return e.perRegion.getRegion(region)
 }
 
-func (e *excitation) GetVec() []float64 {
-	if len(e.extraTerms) != 0 {
-		panic(e.Name() + " is space-dependent, cannot be used as value")
-	}
-	return e.perRegion.getRegion(0) // TODO: all regions!
+func (e *excitation) TableData() []float64 {
+	return e.perRegion.getRegion(0)
 }
 
 // needed for script

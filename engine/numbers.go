@@ -24,6 +24,6 @@ func NewGetVector(name, unit, doc string, get func() []float64) *GetFunc {
 	return newGetfunc(3, name, unit, doc, get)
 }
 
-func (g *GetFunc) GetVec() []float64 {
+func (g *GetFunc) TableData() []float64 {
 	return g.get()
 }

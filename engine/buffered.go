@@ -133,10 +133,7 @@ func (m *buffered) SetRegion(region int, conf Config) {
 	cuda.Normalize(m.buffer, vol)
 }
 
-//func (b *buffered) GetVec() []float64       { return Average(b) }
 func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) } // TODO: SetInShape a bit slowish
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }
 func (m *buffered) Eval() interface{}       { return m }
-func (m *buffered) Save()                   { Save(m) }
-func (m *buffered) SaveAs(f string)         { SaveAs(m, f) }

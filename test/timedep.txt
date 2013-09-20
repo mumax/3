@@ -11,8 +11,8 @@ anisU = vector(0, 1, 0)
 f := 1e9
 Ku1 = 1e5 * sin(2 * pi * f * t)
 
-table.add(Ku1)
-table.autosave(1e-12)
+tableadd(Ku1)
+tableautosave(1e-12)
 
 run(0.5e-9)
 

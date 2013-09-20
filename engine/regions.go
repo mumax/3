@@ -115,5 +115,3 @@ func resizeBytes(array []byte, size [3]int) [][][]byte {
 }
 
 func (r *Regions) Mesh() *data.Mesh { return &globalmesh }
-func (r *Regions) Save()            { Save(r) }
-func (r *Regions) SaveAs(f string)  { SaveAs(r, f) }

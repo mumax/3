@@ -13,16 +13,14 @@ const VERSION = "mumax3.0.11 α "
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
 var (
-	globalmesh    data.Mesh // mesh for m and everything that has the same size
-	M             buffered  // reduced magnetization (unit length)
+	globalmesh    data.Mesh     // mesh for m and everything that has the same size
+	M             magnetization // reduced magnetization (unit length)
 	B_eff, Torque setter
-	Table         = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
 )
 
 func init() {
 	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclROnly("table", &Table, `Provides methods for tabular output`)
 
 	// magnetization
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
@@ -64,7 +62,7 @@ func alloc() {
 	M.alloc()
 	regions.alloc()
 	Solver = *cuda.NewHeun(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, &Time)
-	Table.Add(MakeAvg(&M))
+	Table.Add(&M)
 	vol = data.NilSlice(1, Mesh())
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	vol       *data.Slice // cell fillings (0..1)
+	vol       *data.Slice // cell fillings (0..1) TODO: allow output
 	spaceFill = 1.0       // filled fraction of space
 )
 

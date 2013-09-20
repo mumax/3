@@ -17,9 +17,9 @@ m0 := MakeAvgRegion(m, 0)
 m1 := MakeAvgRegion(m, 1)
 
 
-table.add(m0)
-table.add(m1)
-table.save()
+tableadd(m0)
+tableadd(m1)
+tablesave()
 
 expect("m0x", m0.getVec()[0],  0       , 1e-6)
 expect("m0y", m0.getVec()[1], -0.323819, 1e-6)

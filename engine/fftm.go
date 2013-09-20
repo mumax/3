@@ -37,4 +37,3 @@ func (f *fftm) NComp() int       { return 3 }
 func (f *fftm) Name() string     { return "mFFT" }
 func (f *fftm) Unit() string     { return "" }
 func (f *fftm) Mesh() *data.Mesh { return &demagConv().FFTMesh }
-func (f *fftm) Save()            { Save(f) } // TODO: rm

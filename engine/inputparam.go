@@ -95,10 +95,6 @@ func (p *inputParam) getRegion(region int) []float64 {
 	return v
 }
 
-func (p *inputParam) GetVec() []float64 {
-	return p.getRegion(0) // TODO: revise !!!
-}
-
 func (p *inputParam) IsUniform() bool {
 	cpu := p.CpuLUT()
 	v1 := p.getRegion(0)
@@ -112,6 +108,25 @@ func (p *inputParam) IsUniform() bool {
 	return true
 }
 
-func (p *inputParam) Save()            { Save(p) }
-func (p *inputParam) SaveAs(f string)  { SaveAs(p, f) }
 func (p *inputParam) Mesh() *data.Mesh { return Mesh() }
+
+// Table output
+
+// Parameter TableData is region 0
+func (p *inputParam) TableData() []float64 {
+	return p.getRegion(0)
+}
+
+func (p *inputParam) Region(r int) TableData {
+	return &selectRegion{p, r}
+}
+
+// TableData for specific region
+type selectRegion struct {
+	*inputParam
+	region int
+}
+
+func (p *selectRegion) TableData() []float64 {
+	return p.getRegion(p.region)
+}

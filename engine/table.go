@@ -8,52 +8,62 @@ import (
 	"os"
 )
 
+var Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+
+func init() {
+	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
+	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
+	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table ever period (s).")
+}
+
 type DataTable struct {
 	*bufio.Writer
 	doc
-	outputs []getVec
-}
-
-// can be saved in table
-type getVec interface {
-	GetVec() []float64 // TODO: output float32s only
-	Name() string
-	Unit() string
-	NComp() int
-}
-
-func (t *DataTable) Add(output getVec) {
-	if t.inited() {
-		log.Fatalln("data table add", output.Name(), ": need to add quantity before table is output the first time")
-	}
-	t.outputs = append(t.outputs, output)
-}
-
-func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
-	t.Add(newGetfunc(nComp, name, unit, "", f))
-}
-
-func (t *DataTable) Save() {
-	t.init()
-	fmt.Fprint(t, Time)
-	for _, o := range t.outputs {
-		vec := o.GetVec()
-		for _, v := range vec {
-			fmt.Fprint(t, "\t", v)
-		}
-	}
-	fmt.Fprintln(t)
-	t.Flush()
-}
-
-func (t *DataTable) AutoSave(period float64) {
-	AutoSave(t, period)
+	outputs []TableData
+	autosave
 }
 
 func newTable(name string) *DataTable {
 	t := new(DataTable)
 	t.name = name
 	return t
+}
+
+func TableAdd(col TableData) {
+	Table.Add(col)
+}
+
+func TableSave() {
+	Table.Save()
+}
+
+func TableAutoSave(period float64) {
+	Table.autosave = autosave{period, Time, 0}
+}
+
+func (t *DataTable) Add(output TableData) {
+	if t.inited() {
+		log.Fatalln("data table add", output.Name(), ": need to add quantity before table is output the first time")
+	}
+	t.outputs = append(t.outputs, output)
+}
+
+//func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
+//	t.Add(newGetfunc(nComp, name, unit, "", f))
+//}
+
+func (t *DataTable) Save() {
+	t.init()
+	fmt.Fprint(t, Time)
+	for _, o := range t.outputs {
+		vec := o.TableData()
+		for _, v := range vec {
+			fmt.Fprint(t, "\t", v)
+		}
+	}
+	fmt.Fprintln(t)
+	t.Flush()
+	t.count++
 }
 
 // open writer and write header
@@ -87,4 +97,12 @@ func (t *DataTable) flush() {
 	if t.Writer != nil {
 		t.Flush()
 	}
+}
+
+// can be saved in table
+type TableData interface {
+	TableData() []float64 // TODO: output float32s only
+	Name() string
+	Unit() string
+	NComp() int
 }

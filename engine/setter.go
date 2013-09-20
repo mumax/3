@@ -23,6 +23,3 @@ func (b *setter) Get() (q *data.Slice, recycle bool) {
 	b.set(buffer)
 	return buffer, true // must recycle
 }
-
-func (s *setter) Save()           { Save(s) } // TODO: rm
-func (s *setter) SaveAs(f string) { SaveAs(s, f) }

@@ -68,19 +68,6 @@ func Serve(port string) {
 	http.HandleFunc("/render/", serveRender)
 	http.HandleFunc("/plot/", servePlot)
 
-	// geometry
-	size := Mesh().Size() // deadly race condition here!!!!!!
-	gui.SetValue("nx", size[2])
-	gui.SetValue("ny", size[1])
-	gui.SetValue("nz", size[0])
-	cellSize := Mesh().CellSize()
-	gui.SetValue("cx", cellSize[2]*1e9) // in nm
-	gui.SetValue("cy", cellSize[1]*1e9)
-	gui.SetValue("cz", cellSize[0]*1e9)
-	gui.SetValue("wx", float64(size[2])*cellSize[2]*1e9)
-	gui.SetValue("wy", float64(size[1])*cellSize[1]*1e9)
-	gui.SetValue("wz", float64(size[0])*cellSize[0]*1e9)
-
 	// solver
 	gui.OnEvent("break", inj(func() { pause = true }))
 	gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
@@ -129,39 +116,53 @@ func Serve(port string) {
 	gui.SetValue("hostname", hostname)
 
 	// periodically update time, steps, etc
-	gui.OnRefresh(func() {
-		Inject <- func() {
-			// solver
-			gui.SetValue("time", fmt.Sprintf("%6e", Time))
-			gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
-			gui.SetValue("step", Solver.NSteps)
-			gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			gui.SetValue("maxerr", Solver.MaxErr)
-			if pause {
-				gui.SetValue("solverstatus", "paused")
-			} else {
-				gui.SetValue("solverstatus", "running")
-			}
+	onrefresh := func() {
 
-			// display
-			cachebreaker := "?" + fmt.Sprint(Solver.NSteps)
-			gui.SetValue("render", "/render/"+renderQ+cachebreaker)
+		// geometry
+		size := globalmesh.Size()
+		gui.SetValue("nx", size[2])
+		gui.SetValue("ny", size[1])
+		gui.SetValue("nz", size[0])
+		cellSize := globalmesh.CellSize()
+		gui.SetValue("cx", float32(cellSize[2]*1e9)) // in nm
+		gui.SetValue("cy", float32(cellSize[1]*1e9))
+		gui.SetValue("cz", float32(cellSize[0]*1e9))
+		gui.SetValue("wx", float32(float64(size[2])*cellSize[2]*1e9))
+		gui.SetValue("wy", float32(float64(size[1])*cellSize[1]*1e9))
+		gui.SetValue("wz", float32(float64(size[0])*cellSize[0]*1e9))
 
-			// plot
-			gui.SetValue("plot", "/plot/"+cachebreaker)
-
-			// parameters
-			for n, p := range params {
-				v := p.getRegion(guiRegion)
-				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
-					gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
-				}
-			}
-
-			// process
-			gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
+		// solver
+		gui.SetValue("time", fmt.Sprintf("%6e", Time))
+		gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
+		gui.SetValue("step", Solver.NSteps)
+		gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
+		gui.SetValue("maxerr", Solver.MaxErr)
+		if pause {
+			gui.SetValue("solverstatus", "paused")
+		} else {
+			gui.SetValue("solverstatus", "running")
 		}
-	})
+
+		// display
+		cachebreaker := "?" + fmt.Sprint(Solver.NSteps)
+		gui.SetValue("render", "/render/"+renderQ+cachebreaker)
+
+		// plot
+		gui.SetValue("plot", "/plot/"+cachebreaker)
+
+		// parameters
+		for n, p := range params {
+			v := p.getRegion(guiRegion)
+			for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
+				gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+			}
+		}
+
+		// process
+		gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
+	}
+
+	gui.OnRefresh(func() { Inject <- onrefresh })
 
 	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	util.LogErr(http.ListenAndServe(port, nil))

@@ -14,7 +14,7 @@ type lut struct {
 	gpu_ok  bool               // gpu cache up-to date with cpu source?
 	cpu_buf [][NREGION]float32 // table data on cpu
 	source  updater            // updates cpu data
-	nUpload int                // debug counters for number of uploads
+	nUpload int                // debug counters for number of uploads TODO: rm
 }
 
 type updater interface {

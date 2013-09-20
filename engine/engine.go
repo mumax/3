@@ -116,7 +116,7 @@ func Close() {
 	drainOutput()
 	Table.flush()
 
-	// debug:
+	// debug. TODO: rm
 	for n, p := range params {
 		if u, ok := p.(interface {
 			NUpload() int

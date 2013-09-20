@@ -77,7 +77,6 @@ func (w *scope) Func(name string, f interface{}, doc ...string) {
 	w.declare(name, newFunction(f), doc...)
 }
 
-
 func (w *scope) PureFunc(name string, f interface{}, doc ...string) {
 	w.declare(name, newPureFunc(f), doc...)
 }

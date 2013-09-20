@@ -78,13 +78,17 @@ func (c *call) Type() reflect.Type {
 	}
 }
 
-func(c*call)Const()bool{
-	if _, ok := c.f.(interface{Pure()}); ok{
-		for _, a:=range c.args{
-			if !Const(a) {return false}
+func (c *call) Const() bool {
+	if _, ok := c.f.(interface {
+		Pure()
+	}); ok {
+		for _, a := range c.args {
+			if !Const(a) {
+				return false
+			}
 		}
 		return true
-	}else{
+	} else {
 		return false
 	}
 }

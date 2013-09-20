@@ -2,8 +2,8 @@ package engine
 
 import (
 	"code.google.com/p/mx3/script"
-	"reflect"
 	"log"
+	"reflect"
 )
 
 type VectorParam struct {

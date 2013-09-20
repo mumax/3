@@ -53,5 +53,5 @@ type autosave struct {
 // returns true when the time is right to save.
 func (a *autosave) needSave() bool {
 	t := Time - a.start
-	return t-float64(a.count)*a.period >= a.period
+	return a.period != 0 && t-float64(a.count)*a.period >= a.period
 }

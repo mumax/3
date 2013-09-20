@@ -30,7 +30,7 @@ func (p *ScalarParam) SetValue(v interface{}) {
 	if f.Const() {
 		p.setUniform([]float64{f.Float()})
 	} else {
-		p.setFunc(0, func() []float64 { // TODO: all regions!!?
+		p.setFunc(0, NREGION, func() []float64 {
 			return []float64{f.Float()}
 		})
 	}

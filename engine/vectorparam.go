@@ -2,7 +2,6 @@ package engine
 
 import (
 	"code.google.com/p/mx3/script"
-	"log"
 	"reflect"
 )
 
@@ -26,12 +25,11 @@ func (p *VectorParam) GetRegion(region int) [3]float64 {
 }
 
 func (p *VectorParam) SetValue(v interface{}) {
-	log.Println(p.Name(), ".SetValue", v)
 	f := v.(script.VectorFunction)
 	if f.Const() {
 		p.setUniform(slice(f.Float3()))
 	} else {
-		p.setFunc(0, func() []float64 { // TODO: ALL REGIONS !!
+		p.setFunc(0, NREGION, func() []float64 {
 			return slice(f.Float3())
 		})
 	}

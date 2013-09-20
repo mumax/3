@@ -70,8 +70,11 @@ func (p *inputParam) bufset_(region int, v []float64) {
 	}
 }
 
-func (p *inputParam) setFunc(region int, f func() []float64) {
-	p.upd_reg[region] = f
+func (p *inputParam) setFunc(r1, r2 int, f func() []float64) {
+	util.Argument(r1 < r2) // exclusive upper bound
+	for r := r1; r < r2; r++ {
+		p.upd_reg[r] = f
+	}
 	p.invalidate()
 }
 

@@ -1,9 +1,9 @@
 #! /bin/bash
 
 scripts=*.txt
-for f in $scripts; do
-	mx3 -vet $f|| exit 1;
-done;
+
+mx3 -vet $scripts
+
 for f in $scripts; do
 	mx3 -f -http "" $f || exit 1;
 	echo ""

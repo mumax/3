@@ -14,11 +14,11 @@ anisU = vector(0, 0, 1)
 Ku1.setRegion(2, 2e6)
 
 //regions.save()
-ku1.save()
+save(ku1)
 
 // relax
 	alpha = 3
 	run(10e-9) 
 	m_ := average(m)
 
-m.save()
+save(m)

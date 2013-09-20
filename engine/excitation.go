@@ -80,6 +80,10 @@ func (e *excitation) TableData() []float64 {
 	return e.perRegion.getRegion(0)
 }
 
+func (p *excitation) Region(r int) TableData {
+	return p.perRegion.Region(r)
+}
+
 // needed for script
 
 func (e *excitation) SetValue(v interface{}) {

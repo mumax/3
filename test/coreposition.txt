@@ -6,7 +6,7 @@ Msat = 800e3
 Aex = 13e-12
 m  = vortex(-1, -1).transl(20e-9, 30e-9, 0)
 
-pos := ext_corepos.getvec()
+pos := ext_corepos.tabledata()
 expect("coreX", pos[0], 20e-9, 0.1e-9)
 expect("coreY", pos[1], 30e-9, 0.1e-9)
 
@@ -15,6 +15,6 @@ alpha = 3
 tableadd(ext_corepos)
 steps(100)
 
-pos = ext_corepos.getvec()
+pos = ext_corepos.tabledata()
 expect("coreX", pos[0], 0e-9, 0.1e-9)
 expect("coreY", pos[1], 0e-9, 0.1e-9)

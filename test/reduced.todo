@@ -13,12 +13,8 @@ DefRegion(1, xrange(0,  inf))
 
 m = Vortex(1, 1)
 
-m0 := MakeAvgRegion(m, 0)
-m1 := MakeAvgRegion(m, 1)
-
-
-tableadd(m0)
-tableadd(m1)
+tableadd(m.avgregion(0))
+tableadd(m.avgregion(1))
 tablesave()
 
 expect("m0x", m0.getVec()[0],  0       , 1e-6)

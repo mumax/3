@@ -3,7 +3,7 @@ package cuda
 // General solver utils.
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"log"
 )
 

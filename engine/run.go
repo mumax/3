@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/cuda"
+	"github.com/mumax/3/cuda"
 	"log"
 )
 

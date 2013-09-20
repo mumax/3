@@ -8,9 +8,9 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"code.google.com/p/mx3/util"
 	"flag"
 	"fmt"
+	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"os"

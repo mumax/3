@@ -1,8 +1,8 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/util"
 	"log"
 	"runtime"
 )

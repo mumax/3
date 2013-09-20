@@ -1,7 +1,7 @@
 package ext
 
 import (
-	"code.google.com/p/mx3/engine"
+	"github.com/mumax/3/engine"
 	"math"
 )
 

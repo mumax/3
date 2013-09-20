@@ -1,7 +1,7 @@
 package prof
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"io/ioutil"
 	"log"
 	"os"

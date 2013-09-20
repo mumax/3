@@ -1,8 +1,8 @@
 package ext
 
 import (
-	"code.google.com/p/mx3/engine"
 	"fmt"
+	"github.com/mumax/3/engine"
 )
 
 func init() {

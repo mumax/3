@@ -1,10 +1,10 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/data"
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/cuda5/cufft"
+	"github.com/mumax/3/data"
 )
 
 // 3D single-precission real-to-complex FFT plan.

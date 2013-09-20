@@ -1,11 +1,11 @@
 package ext
 
 import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/engine"
-	"code.google.com/p/mx3/mag"
-	"code.google.com/p/mx3/util"
 	"fmt"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/engine"
+	"github.com/mumax/3/mag"
+	"github.com/mumax/3/util"
 	"log"
 	"math"
 )

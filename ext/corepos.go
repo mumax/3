@@ -1,6 +1,6 @@
 package ext
 
-import "code.google.com/p/mx3/engine"
+import "github.com/mumax/3/engine"
 
 var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
 

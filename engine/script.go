@@ -2,7 +2,7 @@ package engine
 
 // support for interpreted input scripts
 
-import "code.google.com/p/mx3/script"
+import "github.com/mumax/3/script"
 
 var World = script.NewWorld()
 

@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/data"
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/data"
 	"log"
 	"path"
 	"strings"

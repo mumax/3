@@ -3,7 +3,7 @@ package data
 // Slice stores N-component GPU or host data.
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"log"
 	"reflect"
 	"unsafe"

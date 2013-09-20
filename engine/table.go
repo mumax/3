@@ -2,8 +2,8 @@ package engine
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/util"
 	"fmt"
+	"github.com/mumax/3/util"
 	"log"
 	"os"
 )

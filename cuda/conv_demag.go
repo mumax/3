@@ -1,9 +1,9 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/mag"
 	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/mag"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution

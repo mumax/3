@@ -1,13 +1,13 @@
 package main
 
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/engine"
-	_ "code.google.com/p/mx3/ext"
-	"code.google.com/p/mx3/prof"
-	"code.google.com/p/mx3/util"
 	"flag"
 	"fmt"
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/engine"
+	_ "github.com/mumax/3/ext"
+	"github.com/mumax/3/prof"
+	"github.com/mumax/3/util"
 	"io/ioutil"
 	"log"
 	"os"

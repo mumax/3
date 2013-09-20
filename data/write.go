@@ -1,7 +1,7 @@
 package data
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"hash"
 	"hash/crc64"
 	"io"

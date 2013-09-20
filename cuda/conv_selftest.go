@@ -1,7 +1,7 @@
 package cuda
 
 import (
-	"code.google.com/p/mx3/data"
+	"github.com/mumax/3/data"
 	"log"
 	"math/rand"
 )

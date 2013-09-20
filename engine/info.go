@@ -1,6 +1,6 @@
 package engine
 
-import "code.google.com/p/mx3/data"
+import "github.com/mumax/3/data"
 
 type descr struct {
 	name, unit string

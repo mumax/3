@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/script"
+	"github.com/mumax/3/script"
 	"log"
 	"reflect"
 )

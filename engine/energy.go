@@ -1,6 +1,6 @@
 package engine
 
-import "code.google.com/p/mx3/cuda"
+import "github.com/mumax/3/cuda"
 
 var (
 	energyTerms []func() float64 // registers total energy terms

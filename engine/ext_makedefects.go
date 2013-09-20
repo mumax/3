@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"log"
 	"math/rand"
 )

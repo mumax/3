@@ -4,9 +4,9 @@ package cuda
 // Launch configs range over all complex elements of fft input. This could be optimized: range only over kernel.
 
 import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str cu.Stream) {

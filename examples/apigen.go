@@ -1,9 +1,9 @@
 package main
 
 import (
-	"code.google.com/p/mx3/cuda"
-	"code.google.com/p/mx3/engine"
-	_ "code.google.com/p/mx3/ext"
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/engine"
+	_ "github.com/mumax/3/ext"
 	"io/ioutil"
 	"os"
 	"reflect"

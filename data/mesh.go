@@ -1,8 +1,8 @@
 package data
 
 import (
-	"code.google.com/p/mx3/util"
 	"fmt"
+	"github.com/mumax/3/util"
 	"log"
 )
 

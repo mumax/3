@@ -3,7 +3,7 @@ package engine
 // Management of output directory.
 
 import (
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/util"
 	"log"
 	"os"
 	"path/filepath"

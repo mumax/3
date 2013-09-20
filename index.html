@@ -19,7 +19,7 @@
 
         <header>
           <h1>mumax³</h1>
-          <h2>mumax3 GPU-accelerated micromagnetic simulator</h2>
+          <h2>GPU-accelerated micromagnetic simulator</h2>
         </header>
 
         <section id="downloads" class="clearfix">
@@ -31,9 +31,7 @@
         <hr>
 
         <section id="main_content">
-          <p>mumax3 is a GPU-accelerated micromagnetic simulation package.</p>
-
-<h2>
+          <h2>
 <a name="performance" class="anchor" href="#performance"><span class="octicon octicon-link"></span></a>performance:</h2>
 
 <ul>
@@ -55,13 +53,15 @@
 <a name="bonus-features" class="anchor" href="#bonus-features"><span class="octicon octicon-link"></span></a>bonus features:</h2>
 
 <ul>
-<li>Simulation window can automatically follow a moving domain walls</li>
+<li>Simulation window can automatically follow a moving domain wall</li>
 <li>Nanowire edge charges can be removed to simulate an infinitely long geometry.</li>
 </ul><h2>
-<a name="browser-based-user-interface" class="anchor" href="#browser-based-user-interface"><span class="octicon octicon-link"></span></a>browser-based user interface</h2>
+<a name="web-gui" class="anchor" href="#web-gui"><span class="octicon octicon-link"></span></a>web GUI</h2>
 
 <h2>
-<a name="super-simple-input-scripts" class="anchor" href="#super-simple-input-scripts"><span class="octicon octicon-link"></span></a>super-simple input scripts</h2>
+<a name="simple-scripting" class="anchor" href="#simple-scripting"><span class="octicon octicon-link"></span></a>simple scripting</h2>
+
+<p>mumax3 provides simple yet powerful input scripting. E.g., the example below applies a time-dependent external field to a uniform magnet (FMR experiment).</p>
 
 <pre><code>setgridsize(128, 32, 4)
 setcellsize(5e-9, 5e-9, 5e-9)
@@ -70,11 +70,12 @@ Aex  = 13e-12
 alpha= 0.2
 m=uniform(1, 1, 0)
 
-f := 1e9
-A := 0.01
-B_ext = vector(A*sin(2*pi*f*t), 0, 0)
+f := 1e9  // 1GHz
+A := 0.01 // 10mT
+B_ext = vector(0.1, A*sin(2*pi*f*t), 0)
 
-run(10e-9)                                         
+run(10e-9)   
+~                                      
 </code></pre>
 
 <p>mumax3 is written and maintained by Arne Vansteenkiste (<a href="mailto:a.vansteenkiste@gmail.com">a.vansteenkiste@gmail.com</a>)</p>

@@ -115,6 +115,15 @@ func Close() {
 	log.Println("shutting down")
 	drainOutput()
 	Table.flush()
+
+	// debug:
+	for n, p := range params {
+		if u, ok := p.(interface {
+			NUpload() int
+		}); ok {
+			log.Println(n, "\t:\t", u.NUpload(), "uploads")
+		}
+	}
 }
 
 //func sanitycheck() {

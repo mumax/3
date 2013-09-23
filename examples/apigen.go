@@ -73,7 +73,7 @@ func hidden(name string) bool {
 	switch name {
 	default:
 		return false
-	case "Eval", "InputType":
+	case "Eval", "InputType", "Type":
 		return true
 	}
 }

@@ -14,7 +14,7 @@ func TestIO(t *testing.T) {
 			data[c][i] = float32(c * i)
 		}
 	}
-	time := 1e-15
+	time := Meta{"name", "unit", 1e-15}
 
 	buf := bytes.NewBuffer(nil)
 

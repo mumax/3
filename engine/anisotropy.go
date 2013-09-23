@@ -23,19 +23,19 @@ func init() {
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 
 	ku1_red.init(1, []updater{&Ku1, &Msat}, func(p *derivedParam) {
-		paramDiv(p.cpu_buf, Ku1.CpuLUT(), Msat.CpuLUT())
+		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
 	})
 
 	kc1_red.init(1, []updater{&Kc1, &Msat}, func(p *derivedParam) {
-		paramDiv(p.cpu_buf, Kc1.CpuLUT(), Msat.CpuLUT())
+		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
 	})
 
 	B_anis.init(3, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
 		if !(ku1_red.isZero()) {
-			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.LUT1(), AnisU.LUT(), regions.Gpu())
+			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
 		}
 		if !(kc1_red.isZero()) {
-			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.LUT1(), AnisC1.LUT(), AnisC2.LUT(), regions.Gpu())
+			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
 		}
 	})
 

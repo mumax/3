@@ -22,7 +22,7 @@ func init() {
 
 	LLTorque.init(3, &globalmesh, "lltorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
 		B_eff.set(b)
-		cuda.LLTorque(b, M.buffer, b, Alpha.LUT1(), regions.Gpu())
+		cuda.LLTorque(b, M.buffer, b, Alpha.gpuLUT1(), regions.Gpu())
 	})
 
 	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
@@ -31,7 +31,7 @@ func init() {
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
-			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.LUT1(), Alpha.LUT1(), Xi.LUT1(), regions.Gpu())
+			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), regions.Gpu())
 		}
 	})
 

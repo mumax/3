@@ -105,8 +105,8 @@ func (p *exchParam) Gpu() cuda.SymmLUT {
 
 func (p *exchParam) update() {
 	if !p.cpu_ok {
-		msat := Msat.CpuLUT()
-		aex := Aex.CpuLUT()
+		msat := Msat.cpuLUT()
+		aex := Aex.cpuLUT()
 
 		// todo: conditional
 		for i := 0; i < regions.maxreg; i++ {

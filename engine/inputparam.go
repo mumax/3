@@ -87,7 +87,7 @@ func (p *inputParam) invalidate() {
 }
 
 func (p *inputParam) getRegion(region int) []float64 {
-	cpu := p.CpuLUT()
+	cpu := p.cpuLUT()
 	v := make([]float64, p.NComp())
 	for i := range v {
 		v[i] = float64(cpu[i][region])
@@ -96,7 +96,7 @@ func (p *inputParam) getRegion(region int) []float64 {
 }
 
 func (p *inputParam) IsUniform() bool {
-	cpu := p.CpuLUT()
+	cpu := p.cpuLUT()
 	v1 := p.getRegion(0)
 	for r := 1; r < regions.maxreg; r++ {
 		for c := range v1 {

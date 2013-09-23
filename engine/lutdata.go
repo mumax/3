@@ -28,13 +28,13 @@ func (p *lut) init(nComp int, source updater) {
 }
 
 // get an up-to-date version of the lookup-table on CPU
-func (p *lut) CpuLUT() [][NREGION]float32 {
+func (p *lut) cpuLUT() [][NREGION]float32 {
 	p.source.update()
 	return p.cpu_buf
 }
 
 // get an up-to-date version of the lookup-table on GPU
-func (p *lut) LUT() cuda.LUTPtrs {
+func (p *lut) gpuLUT() cuda.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
 		// upload to GPU
@@ -51,14 +51,14 @@ func (p *lut) LUT() cuda.LUTPtrs {
 }
 
 // utility for LUT of single-component data
-func (p *lut) LUT1() cuda.LUTPtr {
+func (p *lut) gpuLUT1() cuda.LUTPtr {
 	util.Assert(len(p.gpu_buf) == 1)
-	return cuda.LUTPtr(p.LUT()[0])
+	return cuda.LUTPtr(p.gpuLUT()[0])
 }
 
 // all data is 0?
 func (p *lut) isZero() bool {
-	v := p.CpuLUT()
+	v := p.cpuLUT()
 	for c := range v {
 		for i := range v[c] { // TODO: regions.maxreg
 			if v[c][i] != 0 {
@@ -82,7 +82,7 @@ func (b *lut) NUpload() int { return b.nUpload }
 
 // uncompress the table to a full array with parameter values per cell.
 func (p *lut) Get() (*data.Slice, bool) {
-	gpu := p.LUT()
+	gpu := p.gpuLUT()
 	b := cuda.Buffer(p.NComp(), &globalmesh)
 	for c := 0; c < p.NComp(); c++ {
 		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())

@@ -30,7 +30,7 @@ func (p *derivedParam) update() {
 }
 
 func (p *derivedParam) GetRegion(r int) []float64 {
-	lut := p.CpuLUT()
+	lut := p.cpuLUT()
 	v := make([]float64, p.NComp())
 	for c := range v {
 		v[c] = float64(lut[c][r])

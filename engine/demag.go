@@ -32,7 +32,7 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
 	Bsat.init(1, []updater{&Msat}, func(p *derivedParam) {
-		Ms := Msat.CpuLUT()
+		Ms := Msat.cpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms
 		}
@@ -40,7 +40,7 @@ func init() {
 
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field", func(b *data.Slice) {
 		if EnableDemag {
-			demagConv().Exec(b, M.buffer, vol, Bsat.LUT1(), regions.Gpu())
+			demagConv().Exec(b, M.buffer, vol, Bsat.gpuLUT1(), regions.Gpu())
 		} else {
 			cuda.Zero(b)
 		}

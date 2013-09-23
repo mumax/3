@@ -1,9 +1,6 @@
 package script
 
-import (
-	"log"
-	"math"
-)
+import "math"
 
 // Loads standard functions into the world.
 func (w *World) LoadStdlib() {
@@ -11,9 +8,6 @@ func (w *World) LoadStdlib() {
 	// literals
 	w.declare("true", boolLit(true))
 	w.declare("false", boolLit(false))
-
-	// io
-	w.Func("print", myprint)
 
 	// math
 	w.PureFunc("abs", math.Abs)
@@ -63,14 +57,22 @@ func (w *World) LoadStdlib() {
 	w.PureFunc("ldexp", math.Ldexp)
 	w.PureFunc("isInf", math.IsInf)
 	w.PureFunc("isNaN", math.IsNaN)
+	w.PureFunc("heaviside", heaviside)
 	w.declare("pi", floatLit(math.Pi))
 	w.declare("inf", floatLit(math.Inf(1)))
 }
 
-func myprint(msg ...interface{}) {
-	log.Println(msg...)
-}
-
 func square(x float64) float64 {
 	return x * x
+}
+
+func heaviside(x float64) float64 {
+	switch {
+	default:
+		return 1
+	case x == 0:
+		return 0.5
+	case x < 0:
+		return 0
+	}
 }

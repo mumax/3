@@ -17,7 +17,8 @@ func init() {
 	DeclFunc("sign", sign, "Signum function")
 	DeclPure("vector", Vector, "Constructs a vector with given components")
 	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
-	//DeclFunc("LoadFile", LoadFile, "Read .dump file and return contents as array.")
+	DeclFunc("print", myprint, "Print to standard output")
+
 }
 
 // Constructs a vector
@@ -63,4 +64,14 @@ func Download(q Getter) *data.Slice {
 	} else {
 		return buf.HostCopy()
 	}
+}
+
+func myprint(msg ...interface{}) {
+	for i, m := range msg {
+		if m, ok := m.(TableData); ok {
+			msg[i] = m.TableData()
+			continue
+		}
+	}
+	log.Println(msg...)
 }

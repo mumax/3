@@ -26,6 +26,10 @@ tableadd(msat)
 tableadd(aex)
 tableadd(alpha)
 
+tableadd(B_demag)
+tableadd(B_ani)
+tableadd(torque)
+
 tableadd(b_ext.region(0))
 tableadd(msat.region(0))
 tableadd(aex.region(0))

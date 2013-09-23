@@ -1,7 +1,9 @@
 /*
 The mx3-plot utility uses gnuplot to automatically plot mx3 data tables.
-	mx3-plot datatable.txt
-Running it creates graphs of all columns as .svg files.
+	mx3-plot table.txt
+Creates graphs of all columns as .svg files.
+*/
+
 */
 package main
 

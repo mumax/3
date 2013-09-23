@@ -1,12 +1,3 @@
-/*
-Tool to quickly plot mx3 data tables using gnuplot.
-
-Usage
-
-Run
-	mx3-plot datatable.txt
-and SVG graphs will appear in that directory.
-*/
 package main
 
 import (
@@ -64,7 +55,7 @@ func (s *State) Example(in string) string {
 	if *flag_vet {
 		arg = "-vet"
 	}
-	cmd("mx3", "-f", arg, s.infile())
+	cmd("mumax3", "-f", arg, s.infile())
 
 	recordExamples(in, s.count)
 

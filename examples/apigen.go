@@ -100,7 +100,7 @@ const templ = `
 
 <body>
 
-<h1> mx3 API </h1>
+<h1> mumax3 API </h1>
 <hr/>
 
 {{range .Entries}}

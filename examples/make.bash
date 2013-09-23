@@ -1,3 +1,4 @@
 #! /bin/bash
-go build
-./examples
+go build -v
+./examples -vet
+./examples 

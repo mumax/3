@@ -62,11 +62,20 @@ func (e *entry) Methods() []string {
 	m := make([]string, 0, nm)
 	for i := 0; i < nm; i++ {
 		n := t.Method(i).Name
-		if unicode.IsUpper(rune(n[0])) {
+		if unicode.IsUpper(rune(n[0])) && !hidden(n) {
 			m = append(m, n)
 		}
 	}
 	return m
+}
+
+func hidden(name string) bool {
+	switch name {
+	default:
+		return false
+	case "Eval", "InputType":
+		return true
+	}
 }
 
 func (e *entry) Examples() []int {

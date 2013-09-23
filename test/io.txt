@@ -77,6 +77,13 @@ save(alpha)
 save(anisU)
 
 
+save(B_demag.region(0))
+save(B_exch.region(0))
+save(B_anis.region(0))
+save(alpha.region(0))
+save(anisU.region(0))
+
+
 
 save(m)
 save(B_demag)

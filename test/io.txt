@@ -4,21 +4,57 @@
 
 setgridsize(50, 25, 1)
 setcellsize(1e-9, 1e-9, 1e-9)
-
-m = uniform(1, 0, 0)
-
 setgeom(circle(50e-9))
+m.loadfile("testdata/m000000.dump")
 
-msat  = 800e-3
-Aex   = 12e-13
+msat  = 800e3
+aex   = 13e-12
+alpha = 1
+b_ext = vector(.01, 0, 0)
 anisU = vector(1, 0, 0)
 Ku1   = 500e3
 
-m.loadfile("testdata/m000000.dump")
+tableadd(e_total)
+tableadd(e_zeeman)
+tableadd(e_demag)
+tableadd(e_exch)
+tableadd(e_anis)
+tableadd(maxtorque)
+
+tableadd(b_ext)
+tableadd(msat)
+tableadd(aex)
+tableadd(alpha)
+
+tableadd(b_ext.region(0))
+tableadd(msat.region(0))
+tableadd(aex.region(0))
+tableadd(alpha.region(0))
+
 saveas(m, "m")
 saveas(B_demag, "B_demag")
 saveas(B_exch, "B_exch")
 saveas(B_anis, "B_anis")
 saveas(regions, "regions")
+saveas(alpha, "alpha")
+saveas(anisU, "anisU")
 
-fprintln("testfile", "m", average(m))
+save(m)
+save(B_demag)
+save(B_exch)
+save(B_anis)
+save(regions)
+save(alpha)
+save(anisU)
+
+print(m)
+print(B_demag)
+print(B_exch)
+print(B_anis)
+print(regions)
+print(alpha)
+print(anisU)
+
+tableautosave(.0001e-12)
+steps(10)
+

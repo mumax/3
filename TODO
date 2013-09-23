@@ -15,7 +15,7 @@ tableadd() takes func input?
 improvements:
 -------------
 
-remove -f flag, move existing files to name.trash
+remove -f flag, move existing files to name.old
 fprintln: put file in OD if not absolute
 
 web: use next free port if already in use

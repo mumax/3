@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-var Table = *newTable("datatable") // output handle for tabular data (average magnetization etc.)
+var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
 
 func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")

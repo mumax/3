@@ -31,6 +31,9 @@ tableadd(msat.region(0))
 tableadd(aex.region(0))
 tableadd(alpha.region(0))
 
+b_ext.setregion(1, vector(0, 0, 0))
+alpha.setregion(1, 1)
+
 saveas(m, "m")
 saveas(B_demag, "B_demag")
 saveas(B_exch, "B_exch")

@@ -14,7 +14,7 @@ type lut struct {
 	gpu_ok  bool               // gpu cache up-to date with cpu source?
 	cpu_buf [][NREGION]float32 // table data on cpu
 	source  updater            // updates cpu data
-	nUpload int                // debug counters for number of uploads TODO: rm
+	nupload int                // debug counters for number of uploads TODO: rm
 }
 
 type updater interface {
@@ -45,7 +45,7 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
 		}
 		p.gpu_ok = true
-		p.nUpload++
+		p.nupload++
 	}
 	return p.gpu_buf
 }
@@ -78,7 +78,7 @@ func (p *lut) assureAlloc() {
 }
 
 func (b *lut) NComp() int   { return len(b.cpu_buf) }
-func (b *lut) NUpload() int { return b.nUpload }
+func (b *lut) nUpload() int { return b.nupload }
 
 // uncompress the table to a full array with parameter values per cell.
 func (p *lut) Get() (*data.Slice, bool) {

@@ -1,4 +1,4 @@
 #! /bin/bash
-go build -v
-./examples -vet
+go build -v   || exit 1
+./examples -vet || echo no worries
 ./examples 

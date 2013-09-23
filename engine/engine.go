@@ -117,9 +117,9 @@ func Close() {
 	// debug. TODO: rm
 	for n, p := range params {
 		if u, ok := p.(interface {
-			NUpload() int
+			nUpload() int
 		}); ok {
-			log.Println(n, "\t:\t", u.NUpload(), "uploads")
+			log.Println(n, "\t:\t", u.nUpload(), "uploads")
 		}
 	}
 }

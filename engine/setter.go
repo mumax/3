@@ -23,3 +23,6 @@ func (b *setter) Get() (q *data.Slice, recycle bool) {
 	b.set(buffer)
 	return buffer, true // must recycle
 }
+
+func (q *setter) TableData() []float64   { return Average(q) }
+func (q *setter) Region(r int) *inRegion { return &inRegion{q, r} }

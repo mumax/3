@@ -120,13 +120,3 @@ func (p *inputParam) TableData() []float64 {
 func (p *inputParam) Region(r int) TableData {
 	return &selectRegion{p, r}
 }
-
-// TableData for specific region
-type selectRegion struct {
-	*inputParam
-	region int
-}
-
-func (p *selectRegion) TableData() []float64 {
-	return p.getRegion(p.region)
-}

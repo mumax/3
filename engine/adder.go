@@ -25,3 +25,6 @@ func (a *adder) Get() (q *data.Slice, recycle bool) {
 	a.addTo(buf)
 	return buf, true
 }
+
+func (a *adder) TableData() []float64   { return Average(a) }
+func (q *adder) Region(r int) *inRegion { return &inRegion{q, r} }

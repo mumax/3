@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -9,47 +8,36 @@ import (
 
 func init() {
 	DeclFunc("average", Average, "Average of space-dependent quantity")
-	DeclFunc("makeAvg", MakeAvg, "Make new quantity, average of argument")
-	DeclFunc("makeAvgRegion", MakeAvgRegion, "Make new quantity, average of argument in region")
+	//DeclFunc("makeAvg", MakeAvg, "Make new quantity, average of argument")
+	//DeclFunc("makeAvgRegion", MakeAvgRegion, "Make new quantity, average of argument in region")
 }
 
-type reduced struct {
-	doc
-	calc func() []float64
-}
+//type reduced struct {
+//	doc
+//	calc func() []float64
+//}
 
-func newReduced(nComp int, name, unit string, calc func() []float64) *reduced {
-	return &reduced{Doc(nComp, name, unit), calc}
-}
+//func newReduced(nComp int, name, unit string, calc func() []float64) *reduced {
+//	return &reduced{Doc(nComp, name, unit), calc}
+//}
 
-func (r *reduced) GetVec() []float64 {
-	return r.calc()
-}
+//func (r *reduced) GetVec() []float64 {
+//	return r.calc()
+//}
 
-func MakeAvgRegion(s Getter, region int) *reduced {
-	name := fmt.Sprint("avg_", s.Name(), "_reg", region)
-	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
-		src, r := s.Get()
-		if r {
-			defer cuda.Recycle(src)
-		}
-		out := cuda.Buffer(s.NComp(), s.Mesh())
-		defer cuda.Recycle(out)
-		cuda.RegionSelect(out, src, regions.Gpu(), byte(region))
-		return avg(out)
-	})
-}
+//func MakeAvgRegion(s Getter, region int) *reduced {
+//}
 
-func MakeAvg(s Getter) *reduced {
-	name := fmt.Sprint("avg_", s.Name())
-	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
-		full := Average(s)
-		for i := range full {
-			full[i] /= spaceFill
-		}
-		return full
-	})
-}
+//func MakeAvg(s Getter) *reduced {
+//	name := fmt.Sprint("avg_", s.Name())
+//	return newReduced(s.NComp(), name, s.Unit(), func() []float64 {
+//		full := Average(s)
+//		for i := range full {
+//			full[i] /= spaceFill
+//		}
+//		return full
+//	})
+//}
 
 // average in userspace XYZ order
 // does not yet take into account volume.

@@ -133,6 +133,7 @@ func (m *buffered) SetRegion(region int, conf Config) {
 	cuda.Normalize(m.buffer, vol)
 }
 
+func (q *buffered) Region(r int) *inRegion  { return &inRegion{q, r} }
 func (m *buffered) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) } // TODO: SetInShape a bit slowish
 func (m *buffered) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *buffered) Type() reflect.Type      { return reflect.TypeOf(new(buffered)) }

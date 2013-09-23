@@ -89,7 +89,7 @@ func (r *Regions) Gpu() *cuda.Bytes {
 }
 
 // Get returns the regions as a slice of floats, so it can be output.
-func (r *Regions) Get() (*data.Slice, bool) {
+func (r *Regions) Slice() (*data.Slice, bool) {
 	s := data.NewSlice(1, r.Mesh())
 	l := s.Host()[0]
 	for i := range l {

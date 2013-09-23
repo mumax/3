@@ -81,7 +81,7 @@ func (b *lut) NComp() int   { return len(b.cpu_buf) }
 func (b *lut) nUpload() int { return b.nupload }
 
 // uncompress the table to a full array with parameter values per cell.
-func (p *lut) Get() (*data.Slice, bool) {
+func (p *lut) Slice() (*data.Slice, bool) {
 	gpu := p.gpuLUT()
 	b := cuda.Buffer(p.NComp(), &globalmesh)
 	for c := 0; c < p.NComp(); c++ {

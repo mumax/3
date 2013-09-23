@@ -27,7 +27,7 @@ func init() {
 
 	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !JPol.isZero() {
-			jspin, rec := JPol.Get()
+			jspin, rec := JPol.Slice()
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
@@ -44,7 +44,7 @@ func init() {
 
 // TODO: could implement maxnorm(torque) (getfunc)
 func GetMaxTorque() float64 {
-	torque, recycle := Torque.Get()
+	torque, recycle := Torque.Slice()
 	if recycle {
 		defer cuda.Recycle(torque)
 	}

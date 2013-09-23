@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	quants         = make(map[string]Getter)
+	quants         = make(map[string]Slicer)
 	params         = make(map[string]Param)
 	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
 	renderQ        = "m"                                     // quantity to display
@@ -32,7 +32,7 @@ type Param interface {
 
 // data for html template
 type guidata struct {
-	Quants map[string]Getter
+	Quants map[string]Slicer
 	Params map[string]Param
 }
 

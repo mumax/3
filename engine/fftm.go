@@ -16,7 +16,7 @@ func init() {
 // FFT of m
 type fftm struct{}
 
-func (q *fftm) Get() (quant *data.Slice, recycle bool) {
+func (q *fftm) Slice() (quant *data.Slice, recycle bool) {
 
 	dst := data.NewSlice(3, q.Mesh())
 	scale := float32(1 / math.Sqrt(float64(M.Mesh().NCell()))) // logical number of cells

@@ -37,7 +37,7 @@ func guiAdd(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		params[name] = v
 	}
-	if v, ok := value.(Getter); ok {
+	if v, ok := value.(Slicer); ok {
 		quants[name] = v
 	}
 }

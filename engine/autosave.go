@@ -3,7 +3,7 @@ package engine
 import "fmt"
 
 var (
-	output  = make(map[Getter]*autosave) // when to save quantities
+	output  = make(map[Slicer]*autosave) // when to save quantities
 	autonum = make(map[interface{}]int)  // auto number for out file
 )
 
@@ -15,7 +15,7 @@ func init() {
 
 // Register quant to be auto-saved every period.
 // period == 0 stops autosaving.
-func AutoSave(quant Getter, period float64) {
+func AutoSave(quant Slicer, period float64) {
 	if period == 0 {
 		delete(output, quant)
 	} else {
@@ -37,7 +37,7 @@ func DoOutput() {
 }
 
 // Save once, with auto file name
-func Save(q Getter) {
+func Save(q Slicer) {
 	fname := fmt.Sprintf("%s%06d.dump", q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++

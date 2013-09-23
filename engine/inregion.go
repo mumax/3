@@ -8,18 +8,18 @@ import (
 
 // constrains Getter to a region
 type inRegion struct {
-	q      Getter
+	q      Slicer
 	region int
 }
 
-func (q *inRegion) NComp() int               { return q.q.NComp() }
-func (q *inRegion) Name() string             { return fmt.Sprint(q.q.Name(), ".region", q.region) }
-func (q *inRegion) Unit() string             { return q.q.Unit() }
-func (q *inRegion) Mesh() *data.Mesh         { return q.q.Mesh() }
-func (q *inRegion) Get() (*data.Slice, bool) { return getRegion(q.q, q.region) }
+func (q *inRegion) NComp() int                 { return q.q.NComp() }
+func (q *inRegion) Name() string               { return fmt.Sprint(q.q.Name(), ".region", q.region) }
+func (q *inRegion) Unit() string               { return q.q.Unit() }
+func (q *inRegion) Mesh() *data.Mesh           { return q.q.Mesh() }
+func (q *inRegion) Slice() (*data.Slice, bool) { return getRegion(q.q, q.region) }
 
 func (q *inRegion) TableData() []float64 {
-	buf, r := q.Get()
+	buf, r := q.Slice()
 	if r {
 		defer cuda.Recycle(buf)
 	}
@@ -32,15 +32,15 @@ type selectRegion struct {
 	region int
 }
 
-func (p *selectRegion) TableData() []float64     { return p.q.getRegion(p.region) }
-func (p *selectRegion) NComp() int               { return p.q.NComp() }
-func (p *selectRegion) Name() string             { return fmt.Sprint(p.q.Name(), ".region", p.region) }
-func (p *selectRegion) Unit() string             { return p.q.Unit() }
-func (p *selectRegion) Get() (*data.Slice, bool) { return getRegion(p.q, p.region) }
-func (p *selectRegion) Mesh() *data.Mesh         { return p.q.Mesh() }
+func (p *selectRegion) TableData() []float64       { return p.q.getRegion(p.region) }
+func (p *selectRegion) NComp() int                 { return p.q.NComp() }
+func (p *selectRegion) Name() string               { return fmt.Sprint(p.q.Name(), ".region", p.region) }
+func (p *selectRegion) Unit() string               { return p.q.Unit() }
+func (p *selectRegion) Slice() (*data.Slice, bool) { return getRegion(p.q, p.region) }
+func (p *selectRegion) Mesh() *data.Mesh           { return p.q.Mesh() }
 
-func getRegion(q Getter, region int) (*data.Slice, bool) {
-	src, r := q.Get()
+func getRegion(q Slicer, region int) (*data.Slice, bool) {
+	src, r := q.Slice()
 	if r {
 		defer cuda.Recycle(src)
 	}
@@ -50,5 +50,5 @@ func getRegion(q Getter, region int) (*data.Slice, bool) {
 }
 
 func init() {
-	var _ Getter = Alpha.Region(0)
+	var _ Slicer = Alpha.Region(0)
 }

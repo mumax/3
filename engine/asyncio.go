@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-type Getter interface {
-	Get() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
+type Slicer interface {
+	Slice() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
 	NComp() int
 	Name() string
 	Unit() string
@@ -17,14 +17,14 @@ type Getter interface {
 }
 
 // Save under given file name (transparant async I/O).
-func SaveAs(q Getter, fname string) {
+func SaveAs(q Slicer, fname string) {
 	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
 		fname = path.Clean(OD + "/" + fname)
 	}
 	if path.Ext(fname) == "" {
 		fname += ".dump"
 	}
-	buffer, recylce := q.Get()
+	buffer, recylce := q.Slice()
 	if recylce {
 		defer cuda.Recycle(buffer)
 	}

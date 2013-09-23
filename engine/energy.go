@@ -22,12 +22,12 @@ func GetTotalEnergy() float64 {
 }
 
 // vector dot product
-func dot(a, b Getter) float64 {
-	A, recyA := a.Get()
+func dot(a, b Slicer) float64 {
+	A, recyA := a.Slice()
 	if recyA {
 		defer cuda.Recycle(A)
 	}
-	B, recyB := b.Get()
+	B, recyB := b.Slice()
 	if recyB {
 		defer cuda.Recycle(B)
 	}

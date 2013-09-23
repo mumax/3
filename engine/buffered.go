@@ -25,7 +25,7 @@ func (q *buffered) alloc() {
 }
 
 // get buffer (on GPU, no need to recycle)
-func (b *buffered) Get() (q *data.Slice, recycle bool) {
+func (b *buffered) Slice() (q *data.Slice, recycle bool) {
 	return b.buffer, false
 }
 

@@ -41,7 +41,7 @@ func (e *excitation) isZero() bool {
 	return e.perRegion.isZero() && len(e.extraTerms) == 0
 }
 
-func (e *excitation) Get() (*data.Slice, bool) {
+func (e *excitation) Slice() (*data.Slice, bool) {
 	buf := cuda.Buffer(e.NComp(), e.Mesh())
 	cuda.Zero(buf)
 	e.addTo(buf)

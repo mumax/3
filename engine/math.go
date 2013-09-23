@@ -42,8 +42,8 @@ func init() {
 // average in userspace XYZ order
 // does not yet take into account volume.
 // pass volume parameter, possibly nil?
-func Average(s Getter) []float64 {
-	b, recycle := s.Get()
+func Average(s Slicer) []float64 {
+	b, recycle := s.Slice()
 	if recycle {
 		defer cuda.Recycle(b)
 	}

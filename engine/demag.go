@@ -20,7 +20,7 @@ func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red})
 
 	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
-		msat, r := Msat.Get()
+		msat, r := Msat.Slice()
 		if r {
 			defer cuda.Recycle(msat)
 		}

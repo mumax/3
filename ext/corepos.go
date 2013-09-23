@@ -6,7 +6,7 @@ var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", co
 
 func corePos() []float64 {
 
-	m, _ := engine.M.Get()
+	m, _ := engine.M.Slice()
 	m_z := m.Comp(0).HostCopy().Scalars()
 	s := m.Mesh().Size()
 	Nx, Ny, Nz := s[2], s[1], s[0] // (xyz swap)

@@ -130,7 +130,7 @@ func (m *buffered) SetRegion(region int, conf Config) {
 		}
 	}
 	data.Copy(m.buffer, host)
-	cuda.Normalize(m.buffer, vol)
+	cuda.Normalize(m.buffer, vol) // TODO: put in magnetization !!
 }
 
 func (q *buffered) Region(r int) *inRegion  { return &inRegion{q, r} }

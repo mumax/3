@@ -1,0 +1,13 @@
+setgridsize(64, 64, 1)
+c := 4e-9
+setcellsize(c, c, c)
+setgeom(circle(c*64))
+m = vortex(1, 1)
+
+alpha = 1
+msat = 800e3
+aex = 13e-12
+
+B_ext.ext_addexpr("vector(x*1e6, 0, 0)", sin(2*pi*1e9*t))
+
+run(100)

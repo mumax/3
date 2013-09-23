@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
+	"github.com/mumax/3/util"
 	"reflect"
 )
 
@@ -49,8 +50,45 @@ func (e *excitation) Get() (*data.Slice, bool) {
 }
 
 // Add an extra maks*multiplier term to the excitation.
+// TODO: unittest!
 func (e *excitation) Add(mask *data.Slice, mul func() float64) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
+}
+
+// TODO: EvalExpr() to be used everywhere?
+func (e *excitation) Ext_AddExpr(expr string, mul script.ScalarFunction) {
+	World.EnterScope()
+	defer World.ExitScope()
+
+	var x, y, z float64
+	World.Var("x", &x)
+	World.Var("y", &y)
+	World.Var("z", &z)
+	f, err := World.CompileExpr(expr)
+	util.FatalErr(err)
+
+	host := data.NewSlice(3, e.Mesh())
+	h := host.Vectors()
+	n := e.Mesh().Size()
+	c := e.Mesh().CellSize()
+	dx := (float64(n[2]/2) - 0.5) * c[2]
+	dy := (float64(n[1]/2) - 0.5) * c[1]
+	dz := (float64(n[0]/2) - 0.5) * c[0]
+
+	for i := 0; i < n[0]; i++ {
+		z = float64(i)*c[0] - dz
+		for j := 0; j < n[1]; j++ {
+			y = float64(j)*c[1] - dy
+			for k := 0; k < n[2]; k++ {
+				x = float64(k)*c[2] - dx
+				v := f.Eval().([3]float64)
+				h[0][i][j][k] = float32(v[0])
+				h[1][i][j][k] = float32(v[1])
+				h[2][i][j][k] = float32(v[2])
+			}
+		}
+	}
+	e.Add(cuda.GPUCopy(host), func() float64 { return mul.Float() })
 }
 
 func assureGPU(s *data.Slice) *data.Slice {

@@ -19,4 +19,3 @@ for f in *.cu; do
 done
 
 go fmt
-go install -v

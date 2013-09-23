@@ -7,5 +7,3 @@ echo const templText = \` >> html.go
 cat gui.html >> html.go
 echo \` >> html.go
 gofmt -w html.go
-go install -v
-go vet

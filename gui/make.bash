@@ -7,4 +7,3 @@ echo "const js = \`<script type=\"text/javascript\">" >> js.go
 cat script.js >> js.go
 echo "</script>\`" >> js.go
 
-go fmt && go build -v && go build test.go

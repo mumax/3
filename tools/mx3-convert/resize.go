@@ -1,8 +1,8 @@
 package main
 
 import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"log"
 	"strconv"
 	"strings"

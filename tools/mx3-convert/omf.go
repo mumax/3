@@ -5,9 +5,9 @@ package main
 // Modified by Arne Vansteenkiste, 2011, 2012, 2013.
 
 import (
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 	"fmt"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"strings"

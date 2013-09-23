@@ -1,8 +1,8 @@
 package main
 
 import (
-	"code.google.com/p/mx3/data"
 	"encoding/json"
+	"github.com/mumax/3/data"
 	"io"
 )
 

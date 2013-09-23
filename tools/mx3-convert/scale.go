@@ -1,8 +1,8 @@
 package main
 
 //import (
-//	"code.google.com/p/mx3/dump"
-//	"code.google.com/p/mx3/core"
+//	"github.com/mumax/3/dump"
+//	"github.com/mumax/3/core"
 //)
 //
 //func rescale(f *dump.Frame, factor int) {

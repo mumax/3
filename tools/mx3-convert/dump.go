@@ -4,7 +4,7 @@ package main
 // Author: Arne Vansteenkiste
 
 //import (
-//	"code.google.com/p/mx3/dump"
+//	"github.com/mumax/3/dump"
 //	"os"
 //)
 //

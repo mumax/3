@@ -7,11 +7,11 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/util"
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"io"
 	"log"
 )

@@ -5,9 +5,9 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/script"
 	"flag"
 	"fmt"
+	"github.com/mumax/3/script"
 	"io"
 	"log"
 	"os"

@@ -5,8 +5,8 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/mx3/data"
-	"code.google.com/p/mx3/draw"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
 	"image/jpeg"
 	"image/png"
 	"io"

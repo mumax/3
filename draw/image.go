@@ -28,6 +28,10 @@ func Image(f *data.Slice, fmin, fmax string) *image.NRGBA {
 			util.FatalErr(err)
 			max = float32(m)
 		}
+		if min == max {
+			min -= 1
+			max += 1 // make it gray instead of black
+		}
 		return drawFloats(f.Scalars(), min, max)
 	}
 	panic("unreachable")

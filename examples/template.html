@@ -5,10 +5,14 @@
 <h1>mumax<sup>3</sup> examples</h1>
 <hr/>
 
-mumax3 input files are run with the command
+<p>These are example input scripts, the full API can be found <a href="http://mumax.github.io/api.html">here</a>.</p>
+
+mumax<sup>3</sup> input files are run with the command
+
 <pre>mumax3 myfile.txt</pre>
-Output is automatically stored in the "myfile.out" directory. Additionally, a web interface provides live output. Default is localhost:35367.<br/>
-For more details refer to the <a href="http://godoc.org/code.google.com/p/mx3">godoc documentation</a>.
+
+Output is automatically stored in the "myfile.out" directory. Additionally, a web interface provides live output. Default is <code><a href="http://localhost:35367">http://localhost:35367</a></code>.<br/>
+For more details, run <code>mumax3 -help</code> which will show the available command-line flags (e.g. to select a certain GPU).
 
 <hr/><h2>Getting started with Standard Problem #4</h2>
 
@@ -35,9 +39,9 @@ run(1e-9)
 
 `}}
 
-<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-convert>mx3-convert</a>. Below is the output converted to PNG.</p>
+<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <code>mx3-convert</code>. Below is the output converted to PNG.</p>
 
-<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <a href=http://godoc.org/code.google.com/p/mx3/tools/mx3-plot>mx3-plot</a>.
+<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <code>mx3-plot</code>.
 </p>
 
 {{.Output }}
@@ -171,7 +175,7 @@ This example saves the remanent magnetization state, and verifies the average ma
 
 <hr/><h2>Geometry</h2>
 
-mumax3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). See the full <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">API</a>.
+mumax3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). See the full <a href="http://mumax.github.io/api.html">API</a>.
 
 
 {{.Example `
@@ -182,11 +186,11 @@ setgeom( rect(800e-9, 500e-9) )
 m=uniform(1,1,0)
 saveas(m, "rect")
 
-setgeom( cylinder(800e-9, 600e-9) )
+setgeom( cylinder(800e-9, inf) )
 m=uniform(1,1,0)
 saveas(m, "cylinder")
 
-setgeom( cylinder(800e-9, 600e-9).inverse() )
+setgeom( cylinder(800e-9, inf).inverse() )
 m=uniform(1,1,0)
 saveas(m, "cylinder_inverse")
 
@@ -245,7 +249,7 @@ Note: these are 3D geometries seen from above. The displayed magnetization is av
 
 
 <hr/><h2>Initial Magnetization</h2>
-Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://godoc.org/code.google.com/p/mx3/engine#Config">API</a>.
+Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://mumax.github.io/api.html">API</a>.
 
 {{.Example `
 setgridsize(200, 100, 1)
@@ -289,42 +293,6 @@ These initial states are approximate, after setting them it is a good idea to re
 The magnetization can also be set in separate regions, see below.
 
 
-
-<hr/><h2>Hysteresis</h2>
-
-{{.Example `
-nx := 512
-ny := 256
-setgridsize(nx, ny, 1)
-setcellsize(2e-6/Nx, 1e-6/Ny, 20e-9)
-
-Aex   = 1.3e-11
-Msat  = 8e5
-Ku1   = 5e2
-AnisU = vector(1, 0, 0)
-alpha = 3
-
-m = vortex(1, 1)
-run(3e-9)
-
-tableadd(B_ext)
-
-th := 0.0001 // field direction
-
-saveas(m, "m_initial")
-
-// Scan the hysteresis loop:
-for B:=0.; B<100e-3; B+=10e-3{
-	B_ext = vector(B*cos(th), B*sin(th), 0)
-	run(.1e-9)
-	tablesave()
-}
-
-saveas(m, "m_saturated")
-
-`}}{{.Output}}
-
-
 <hr/><h2>Interlude: Rotating Cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
@@ -366,7 +334,7 @@ for i:=0; i<=90; i=i+30{
 
 <p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Region 0 conventionally everything outside your magnet (the vacuum), so setting material parameters starts at 1.</p>
 
-<p>Regions are defined with <code>defregion(number, shape)</code>, where <code>shape</code> is a <a href="http://godoc.org/code.google.com/p/mx3/engine#Shape">Shape</a> as explained in the geometry example.</p>
+<p>Regions are defined with <code>defregion(number, shape)</code>, where <code>shape</code> is explained in the geometry example.</p>
 
 <p>When you're not using regions, like in the above examples, you'll probably set parameters with a simple assign:
 <pre>Aex = 12e-13</pre>

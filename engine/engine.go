@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-const VERSION = "mumax3.0.11 α "
+const VERSION = "mumax3.1.0"
 
 var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
 
@@ -115,13 +115,13 @@ func Close() {
 	Table.flush()
 
 	// debug. TODO: rm
-	for n, p := range params {
-		if u, ok := p.(interface {
-			nUpload() int
-		}); ok {
-			log.Println(n, "\t:\t", u.nUpload(), "uploads")
-		}
-	}
+	//	for n, p := range params {
+	//		if u, ok := p.(interface {
+	//			nUpload() int
+	//		}); ok {
+	//			log.Println(n, "\t:\t", u.nUpload(), "uploads")
+	//		}
+	//	}
 }
 
 //func sanitycheck() {

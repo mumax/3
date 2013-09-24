@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/script"
-	"log"
 	"reflect"
 )
 
@@ -28,10 +27,10 @@ func (p *VectorParam) GetRegion(region int) [3]float64 {
 func (p *VectorParam) SetValue(v interface{}) {
 	f := v.(script.VectorFunction)
 	if f.Const() {
-		log.Println(p.Name(), "is constant")
+		//log.Println(p.Name(), "is constant")
 		p.setUniform(slice(f.Float3()))
 	} else {
-		log.Println(p.Name(), "not constant")
+		//log.Println(p.Name(), "not constant")
 		p.setFunc(0, NREGION, func() []float64 {
 			return slice(f.Float3())
 		})

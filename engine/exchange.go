@@ -6,7 +6,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 	"unsafe"
 )
@@ -140,14 +139,14 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	log.Println("upload lex2:\n", p)
+	//log.Println("upload lex2:\n", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
 
 func (p *exchParam) SetInterRegion(r1, r2 int, val float64) {
 	v := float32(val)
-	log.Println("lex2.setinterregion", r1, r2, val)
+	//log.Println("lex2.setinterregion", r1, r2, val)
 	p.lut[symmidx(r1, r2)] = v
 
 	if r1 == r2 {

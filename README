@@ -1,18 +1,6 @@
-mx3 GPU-accelerated micromagnetic simulator
--------------------------------------------
+== mumax3 GPU micromagnetic simulator
 
-* main binary: mx3, can be moved to anywhere you like.
-
-* mx3-convert can be found in tools/mx3-convert.
-
-* examples in examples/examples.html.
-
-* recompiling, if you want to: 
-	go install
-(only requires Go1.1, no nvcc)
-
-to recompile also the cuda code:
-./make.bash
-(also requires nvcc)
-
-
+  * You can download binaries from [mumax.github.io]
+  * You can fetch and compile the source with {{go get -u -v github.com/mumax/3/mumax3}}
+  * If you already have the source you can rebuild with {{go install github.com/mumax/3/mumax3}}
+  * If you have modified other than Go sources, rebuild with {{./make.bash}}

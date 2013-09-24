@@ -6,11 +6,9 @@ N/A
 API:
 ----
 
-getVec : something with Table (for script output)
 remove excitation_PerRegion exports
 check region defined?
 runwhile(func()bool)
-tableadd() takes func input?
 
 improvements:
 -------------

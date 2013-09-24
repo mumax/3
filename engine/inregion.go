@@ -18,7 +18,7 @@ func (q *inRegion) Unit() string               { return q.q.Unit() }
 func (q *inRegion) Mesh() *data.Mesh           { return q.q.Mesh() }
 func (q *inRegion) Slice() (*data.Slice, bool) { return getRegion(q.q, q.region) }
 func (q *inRegion) TableData() []float64       { return Average(q) }
-func (q *inRegion) volume() float64            { return regions.volume(q.region) } // !!!
+func (q *inRegion) volume() float64            { return regions.volume(q.region) }
 
 // constrains inputParam to a region
 type selectRegion struct {
@@ -32,7 +32,7 @@ func (p *selectRegion) Name() string               { return fmt.Sprint(p.q.Name(
 func (p *selectRegion) Unit() string               { return p.q.Unit() }
 func (p *selectRegion) Slice() (*data.Slice, bool) { return getRegion(p.q, p.region) }
 func (p *selectRegion) Mesh() *data.Mesh           { return p.q.Mesh() }
-func (p *selectRegion) volume() float64            { return regions.volume(p.region) } // !!!
+func (p *selectRegion) volume() float64            { return regions.volume(p.region) }
 
 func getRegion(q Slicer, region int) (*data.Slice, bool) {
 	src, r := q.Slice()
@@ -42,8 +42,4 @@ func getRegion(q Slicer, region int) (*data.Slice, bool) {
 	out := cuda.Buffer(q.NComp(), q.Mesh())
 	cuda.RegionSelect(out, src, regions.Gpu(), byte(region))
 	return out, true
-}
-
-func init() {
-	var _ Slicer = Alpha.Region(0)
 }

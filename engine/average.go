@@ -18,11 +18,20 @@ func Average(s Slicer) []float64 {
 	if recycle {
 		defer cuda.Recycle(b)
 	}
-	return avg(b)
+	if s, ok := s.(volumer); ok {
+		avg := avg(b, nil)
+		spacefill := s.volume()
+		for i := range avg {
+			avg[i] /= spacefill
+		}
+		return avg
+	} else {
+		return avg(b, vol)
+	}
 }
 
 // userspace average
-func avg(b *data.Slice) []float64 {
+func avg(b, vol *data.Slice) []float64 {
 	nComp := b.NComp()
 	nCell := float64(b.Mesh().NCell())
 	avg := make([]float64, nComp)
@@ -35,4 +44,8 @@ func avg(b *data.Slice) []float64 {
 		}
 	}
 	return avg
+}
+
+type volumer interface {
+	volume() float64
 }

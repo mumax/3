@@ -5,24 +5,29 @@ setgridsize(N, N, 1)
 setcellsize(c, c, c)
 
 m = uniform(1, 0, 0)
+alpha = 1
 
 expect("<mx>", average(m)[0], 1, 1e-6)
 expect("<my>", average(m)[1], 0, 1e-6)
 expect("<mz>", average(m)[2], 0, 1e-6)
+expect("alpha", average(alpha)[0], 1, 1e-6)
 
 setgeom(rect(c*N/2, c*N/2))
 
 expect("<mx>", average(m)[0], 1, 1e-6)
 expect("<my>", average(m)[1], 0, 1e-6)
 expect("<mz>", average(m)[2], 0, 1e-6)
+expect("alpha", average(alpha)[0], 1, 1e-6)
 
 defregion(1, xrange(0, inf))
 
 expect("<mx>", average(m)[0], 1, 1e-6)
 expect("<my>", average(m)[1], 0, 1e-6)
 expect("<mz>", average(m)[2], 0, 1e-6)
+expect("alpha", average(alpha)[0], 1, 1e-6)
 
-//expect("<mx0>", average(m.region(0))[0], 1/4, 1e-6)
-//expect("<my0>", average(m.region(0))[1],   0, 1e-6)
-//expect("<mz0>", average(m.region(0))[2],   0, 1e-6)
+expect("<mx0>", average(m.region(0))[0], 1/4, 1e-6)
+expect("<my0>", average(m.region(0))[1],   0, 1e-6)
+expect("<mz0>", average(m.region(0))[2],   0, 1e-6)
+expect("alpha0", average(alpha.region(0))[0], 1, 1e-6)
 

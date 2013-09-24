@@ -65,6 +65,19 @@ func DefRegion(id int, s Shape) {
 	}
 }
 
+// normalized volume (0..1) of region.
+// TODO: might be cached.
+func (r *Regions) volume(region int) float64 {
+	vol := 0
+	reg := byte(region)
+	for _, c := range r.cpu {
+		if c == reg {
+			vol++
+		}
+	}
+	return float64(vol) / float64(globalmesh.NCell())
+}
+
 func checkRegionIdx(id int) {
 	if id < 0 || id > NREGION {
 		log.Fatalf("region id should be 0-255, have: %v", id)

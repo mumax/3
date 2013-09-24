@@ -19,6 +19,6 @@ run(0.2e-9)
 
 m_ := average(m)
 
-expect("mx", m_[0], 0.537903, 1e-6)
-expect("my", m_[1], 0.570360, 1e-6)
-expect("mz", m_[2], 0.016862, 1e-6)
+expect("mx", m_[0], 0.678341, 1e-6)
+expect("my", m_[1], 0.719272, 1e-6)
+expect("mz", m_[2], 0.021264, 1e-6)

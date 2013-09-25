@@ -26,7 +26,7 @@ for c in 4.0 5.0 5.5; do
 
 	arch=$name'_linux_cuda'$c
 	(cd $tmp &&
-		tar c mumax3 | gzip > $mumax$version$arch.tar.gz
+		tar c mumax3 | gzip > mumax$version$arch.tar.gz
 	)
 	
 	echo

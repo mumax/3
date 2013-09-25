@@ -1,6 +1,6 @@
 /*
-The mx3-plot utility uses gnuplot to automatically plot mx3 data tables.
-	mx3-plot table.txt
+The mumax3-plot utility uses gnuplot to automatically plot mumax3 data tables.
+	mumax3-plot table.txt
 Creates graphs of all columns as .svg files.
 */
 package main

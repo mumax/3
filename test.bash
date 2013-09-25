@@ -2,7 +2,7 @@
 
 source ./make.bash || exit 1
 
-PKGS=$(echo github.com/mumax/3/{mumax3,tools/mx3-convert,tools/mx3-plot,data,draw,prof,engine,mag,script,util,cuda})
+PKGS=$(echo github.com/mumax/3/{mumax3,tools/mumax3-convert,tools/mumax3-plot,data,draw,prof,engine,mag,script,util,cuda})
 
 go test -i $PKGS || exit 1
 go test $PKGS  || exit 1

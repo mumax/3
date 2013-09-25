@@ -7,8 +7,8 @@ ln -sf $(pwd)/post-commit .git/hooks/post-commit
 (cd gui && ./make.bash)      || exit 1
 (cd engine && ./make.bash)   || exit 1
 (cd mumax3 && go install -v) || exit 1
-(cd tools/mx3-convert && go build && go install) || exit 1
-(cd tools/mx3-plot && go build && go install)    || exit 1
+(cd tools/mumax3-convert && go build && go install) || exit 1
+(cd tools/mumax3-plot && go build && go install)    || exit 1
 (cd test && mumax3 -vet *.txt)                   || exit 1
 (cd examples && mumax3 -vet *.txt)               || exit 1
 

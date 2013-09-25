@@ -1,26 +1,26 @@
 /*
-mx3-convert converts mx3 output files and .omf files to various formats and images.
+mumax3-convert converts mumax3 output files and .omf files to various formats and images.
 It also provides basic manipulations like data rescale etc.
 
 
 Usage
 
 Command-line flags must always preceed the input files:
-	mx3-convert [flags] files
+	mumax3-convert [flags] files
 For a overview of flags, run:
-	mx3-convert -help
+	mumax3-convert -help
 Example: convert all .dump files to PNG:
-	mx3-convert -png *.dump
+	mumax3-convert -png *.dump
 Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
-	mx3-convert -resize 32x32x1 -normalize -omf binary file.dump
+	mumax3-convert -resize 32x32x1 -normalize -omf binary file.dump
 Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
-	mx3-convert -comp 0 -vtk binary -jpg *.omf
-Example: convert .omf files to .dump, so they can be used as input for mx3 simulations:
-	mx3-convert -dump *.omf
+	mumax3-convert -comp 0 -vtk binary -jpg *.omf
+Example: convert .omf files to .dump, so they can be used as input for mumax3 simulations:
+	mumax3-convert -dump *.omf
 Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
-	mx3-convert -xrange 50:100 -yrange :100 file.dump
+	mumax3-convert -xrange 50:100 -yrange :100 file.dump
 Example: select the bottom layer
-	mx3-convert -zrange :1 file.dump
+	mumax3-convert -zrange :1 file.dump
 
 Output file names are automatically assigned.
 */

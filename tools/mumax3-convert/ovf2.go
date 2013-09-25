@@ -7,7 +7,7 @@
 
 // OVF2 suport added by Mykola Dvornik for mumax1,
 // modified for mumax2 by Arne Vansteenkiste, 2011.
-// modified for mx3 by Arne Vansteenkiste, 2013.
+// modified for mumax3 by Arne Vansteenkiste, 2013.
 
 package main
 

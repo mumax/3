@@ -11,6 +11,8 @@ import (
 	"strings"
 	"text/template"
 	"unicode"
+
+//	"regexp"
 )
 
 var (
@@ -28,8 +30,8 @@ func buildAPI() {
 	for K, v := range doc {
 		k := strings.ToLower(K)
 		t := ident[k].Type()
-		entr := entry{K, t, v}
-		e = append(e, entr)
+		entr := entry{K, t, v, false}
+		e = append(e, &entr)
 		api_ident[k] = entr
 	}
 	sort.Sort(&e)
@@ -45,12 +47,17 @@ func renderAPI() {
 }
 
 type entry struct {
-	Name string
-	Type reflect.Type
-	Doc  string
+	name    string
+	Type    reflect.Type
+	Doc     string
+	touched bool
 }
 
-type entries []entry
+type entries []*entry
+
+func (e *entry) Name() string {
+	return e.name
+}
 
 func (e *entry) Methods() []string {
 	t := e.Type
@@ -79,7 +86,7 @@ func hidden(name string) bool {
 }
 
 func (e *entry) Examples() []int {
-	return api_examples[strings.ToLower(e.Name)]
+	return api_examples[strings.ToLower(e.name)]
 }
 
 func (e *entries) Len() int {
@@ -87,7 +94,7 @@ func (e *entries) Len() int {
 }
 
 func (e *entries) Less(i, j int) bool {
-	return strings.ToLower((*e)[i].Name) < strings.ToLower((*e)[j].Name)
+	return strings.ToLower((*e)[i].name) < strings.ToLower((*e)[j].name)
 }
 
 func (e *entries) Swap(i, j int) {
@@ -102,6 +109,59 @@ func (e *api) Include(fname string) string {
 	b, err := ioutil.ReadFile(fname)
 	check(err)
 	return string(b)
+}
+
+func (a *api) FilterType(typ ...string) []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		if e.touched {
+			continue
+		}
+		for _, t := range typ {
+			if match(t, e.Type.String()) {
+				e.touched = true
+				E = append(E, e)
+			}
+		}
+	}
+	return E
+}
+
+func (a *api) FilterName(typ ...string) []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		if e.touched {
+			continue
+		}
+		for _, t := range typ {
+			if match(t, e.name) {
+				e.touched = true
+				E = append(E, e)
+			}
+		}
+	}
+	return E
+}
+
+func (a *api) FilterLeftovers() []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		if e.touched {
+			continue
+		}
+		E = append(E, e)
+	}
+	return E
+}
+
+func match(a, b string) bool {
+	//match, err := regexp.MatchString(a, b)
+	//check(err)
+	a = strings.ToLower(a)
+	b = strings.ToLower(b)
+	match := a == b
+	println("match", a, "-", b, match)
+	return match
 }
 
 const templ = `
@@ -125,20 +185,25 @@ const templ = `
 	{{end}}
 
 	<br/><hr/>
-
 {{end}}
+
 
 {{.Include "head.html"}}
 
 <h1> mumax<sup>3</sup> API </h1>
 <hr/>
 
+<h1> Setting the simulation box </h1>
+<hr/>
 
-{{range .Entries}}
+{{range .FilterName "setgridsize" "setcellsize"}} {{template "entry" .}} {{end}}
 
-{{template "entry" .}}
 
-{{end}}
+<h1> Setting a geometry </h1>
+<hr/>
+
+{{range .FilterName "setgeom"}} {{template "entry" .}} {{end}}
+{{range .FilterType "engine.Shape"}} {{template "entry" .}} {{end}}
 
 </body>
 `

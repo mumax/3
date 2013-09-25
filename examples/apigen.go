@@ -105,21 +105,38 @@ func (e *api) Include(fname string) string {
 }
 
 const templ = `
+{{define "entry"}}
+	<span style="color:#000088; font-size:1.3em">{{.Name}}</span> &nbsp; &nbsp; 
+	<span style="color:gray; font-size:0.9em"> {{.Type}}  </span> <br/>
+
+	{{with .Doc}} <p> {{.}} </p> {{end}}
+
+	{{with .Examples}} <p> <b>examples:</b> 
+		{{range .}} 
+			<a href="examples.html#example{{.}}">[{{.}}]</a> 
+		{{end}} 
+		</p> 
+	{{end}}
+
+	{{with .Methods}} 
+		<p> <span style="color:grey"> <b>methods:</b> 
+		{{range .}} {{.}} {{end}} 
+		</span> </p> 
+	{{end}}
+
+	<br/><hr/>
+
+{{end}}
+
 {{.Include "head.html"}}
 
 <h1> mumax<sup>3</sup> API </h1>
 <hr/>
 
+
 {{range .Entries}}
 
-<span style="color:#000088; font-size:1.3em">{{.Name}}</span> &nbsp; &nbsp; <span style="color:gray; font-size:0.9em"> {{.Type}}  </span> <br/>
-
-{{with .Doc}} <p> {{.}} </p> {{end}}
-
-{{with .Examples}} <p> <b>examples:</b> {{range .}} <a href="examples.html#example{{.}}">[{{.}}]</a> {{end}} </p> {{end}}
-{{with .Methods}} <p> <span style="color:grey"> <b>methods:</b> {{range .}} {{.}} {{end}} </span> </p> {{end}}
-
-<br/><hr/>
+{{template "entry" .}}
 
 {{end}}
 

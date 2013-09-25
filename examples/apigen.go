@@ -107,9 +107,7 @@ func (e *api) Include(fname string) string {
 const templ = `
 {{.Include "head.html"}}
 
-<body>
-
-<h1> mumax3 API </h1>
+<h1> mumax<sup>3</sup> API </h1>
 <hr/>
 
 {{range .Entries}}

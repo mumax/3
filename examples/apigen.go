@@ -20,6 +20,13 @@ var (
 	api_ident   = make(map[string]entry)
 )
 
+type entry struct {
+	name    string
+	Type    reflect.Type
+	Doc     string
+	touched bool
+}
+
 func buildAPI() {
 	cuda.Init(0, "yield") // gpu 0
 	cuda.LockThread()
@@ -38,25 +45,21 @@ func buildAPI() {
 	api_entries = e
 }
 
-func renderAPI() {
-	e := api_entries
-	t := template.Must(template.New("api").Parse(templ))
-	f, err2 := os.OpenFile("api.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	check(err2)
-	check(t.Execute(f, &api{e}))
-}
-
-type entry struct {
-	name    string
-	Type    reflect.Type
-	Doc     string
-	touched bool
-}
-
-type entries []*entry
-
 func (e *entry) Name() string {
 	return e.name
+}
+
+func (e *entry) Ins() string {
+	t := e.Type.String()
+	if strings.HasPrefix(t, "func(") {
+		return cleanType(t[len("func"):])
+	} else {
+		return ""
+	}
+}
+
+func cleanType(typ string) string {
+	return strings.Replace(typ, "engine.", "", -1)
 }
 
 func (e *entry) Methods() []string {
@@ -76,6 +79,15 @@ func (e *entry) Methods() []string {
 	return m
 }
 
+func (e *entry) Ret() string {
+	t := e.Type
+	if t.Kind() == reflect.Func && t.NumOut() == 1 {
+		return cleanType(t.Out(0).String())
+	} else {
+		return ""
+	}
+}
+
 func hidden(name string) bool {
 	switch name {
 	default:
@@ -87,18 +99,6 @@ func hidden(name string) bool {
 
 func (e *entry) Examples() []int {
 	return api_examples[strings.ToLower(e.name)]
-}
-
-func (e *entries) Len() int {
-	return len(*e)
-}
-
-func (e *entries) Less(i, j int) bool {
-	return strings.ToLower((*e)[i].name) < strings.ToLower((*e)[j].name)
-}
-
-func (e *entries) Swap(i, j int) {
-	(*e)[i], (*e)[j] = (*e)[j], (*e)[i]
 }
 
 type api struct {
@@ -119,6 +119,22 @@ func (a *api) FilterType(typ ...string) []*entry {
 		}
 		for _, t := range typ {
 			if match(t, e.Type.String()) {
+				e.touched = true
+				E = append(E, e)
+			}
+		}
+	}
+	return E
+}
+
+func (a *api) FilterReturn(typ ...string) []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		if e.touched {
+			continue
+		}
+		for _, t := range typ {
+			if match(t, e.Ret()) {
 				e.touched = true
 				E = append(E, e)
 			}
@@ -164,10 +180,17 @@ func match(a, b string) bool {
 	return match
 }
 
+func renderAPI() {
+	e := api_entries
+	t := template.Must(template.New("api").Parse(templ))
+	f, err2 := os.OpenFile("api.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	check(err2)
+	check(t.Execute(f, &api{e}))
+}
+
 const templ = `
 {{define "entry"}}
-	<span style="color:#000088; font-size:1.3em">{{.Name}}</span> &nbsp; &nbsp; 
-	<span style="color:gray; font-size:0.9em"> {{.Type}}  </span> <br/>
+	<p><span style="color:#000088; font-size:1.3em"> <b>{{.Name}}</b>{{.Ins}} </span>
 
 	{{with .Doc}} <p> {{.}} </p> {{end}}
 
@@ -184,26 +207,56 @@ const templ = `
 		</span> </p> 
 	{{end}}
 
-	<br/><hr/>
+	</p><hr/>
 {{end}}
 
 
 {{.Include "head.html"}}
 
 <h1> mumax<sup>3</sup> API </h1>
-<hr/>
 
-<h1> Setting the simulation box </h1>
-<hr/>
+<h1> Setting  the mesh size</h1>
+The simulation mesh defines the maximum size of the magnet. It should be set at the beginning of the script. For the number of cells, powers of two or numbers with small prime factors are advisable. E.g.:
+<pre><code>Nx := 128
+Ny := 64
+Nz := 2
+sizeX := 500e-9
+sizeY := 250e-9
+sizeZ := 10e-9
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
+</code></pre>
 
 {{range .FilterName "setgridsize" "setcellsize"}} {{template "entry" .}} {{end}}
 
 
 <h1> Setting a geometry </h1>
-<hr/>
+
+Once the gridsize has been set, optionally a magnet Shape can be specified. The geometry is always constrained to the simulation box. Primitive shapes are constructed at the origin (box center) by default, and can be rotated and translated if needed. E.g.:
+<pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX().Transl(1e-6,0,0))
+</code></pre>
 
 {{range .FilterName "setgeom"}} {{template "entry" .}} {{end}}
-{{range .FilterType "engine.Shape"}} {{template "entry" .}} {{end}}
+Shape constructors:
+{{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
+
+
+<h1> Misc </h1>
+{{range .FilterLeftovers}} {{template "entry" .}} {{end}}
 
 </body>
 `
+
+type entries []*entry
+
+func (e *entries) Len() int {
+	return len(*e)
+}
+
+func (e *entries) Less(i, j int) bool {
+	return strings.ToLower((*e)[i].name) < strings.ToLower((*e)[j].name)
+}
+
+func (e *entries) Swap(i, j int) {
+	(*e)[i], (*e)[j] = (*e)[j], (*e)[i]
+}

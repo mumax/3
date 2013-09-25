@@ -12,7 +12,15 @@ type ScalarParam struct {
 
 func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 	p.inputParam.init(1, name, unit, children)
-	DeclLValue(name, p, desc)
+	DeclLValue(name, p, cat(desc, unit))
+}
+
+func cat(desc, unit string) string {
+	if unit == "" {
+		return desc
+	} else {
+		return desc + " (" + unit + ")"
+	}
 }
 
 func (p *ScalarParam) SetRegion(region int, value float64) {

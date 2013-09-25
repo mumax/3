@@ -11,7 +11,7 @@ type VectorParam struct {
 
 func (p *VectorParam) init(name, unit, desc string) {
 	p.inputParam.init(3, name, unit, nil) // no vec param has children (yet)
-	DeclLValue(name, p, desc)
+	DeclLValue(name, p, cat(desc, unit))
 }
 
 func (p *VectorParam) SetRegion(region int, value [3]float64) {

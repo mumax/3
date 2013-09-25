@@ -246,9 +246,35 @@ Shape constructors:
 {{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
 
 
+<h1> Defining regions </h1>
+Optionally, up to 256 regions can be defined. Each region can have its own material parameters. E.g.:
+<pre><code>DefRegion(1, circle(1e-6))
+DefRegion(0, circle(1e-6).Inverse())
+</code></pre>
+
+{{range .FilterName "DefRegion" }} {{template "entry" .}} {{end}}
+
 <h1> Material parameters </h1>
 
-{{range .FilterType "*engine.ScalarParam"}} {{template "entry" .}} {{end}}
+Assigning to a material parameter sets a value in all regions. E.g.:
+<pre><code>Msat  = 800e3
+AnisU = vector(1, 0, 0)
+</code></pre>
+
+When regions are defined, they can also be set region-wise:
+<pre><code>Msat.SetRegion(0, 800e3)
+Msat.SetRegion(1, 540e3)
+</code></pre>
+
+Material parameters can be functions of time as well. E.g.:
+<pre><code>f := 500e6
+Ku1 = 500 * sin(2*pi*f*t)
+</code></pre>
+
+{{range .FilterType "*engine.ScalarParam" "*engine.VectorParam"}} {{template "entry" .}} {{end}}
+
+
+<h1> Output quantities </h1>
 
 <h1> Misc </h1>
 {{range .FilterLeftovers}} {{template "entry" .}} {{end}}

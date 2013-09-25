@@ -69,14 +69,19 @@ func (e *entry) Methods() []string {
 		t = t.Out(0)
 	}
 	nm := t.NumMethod()
-	m := make([]string, 0, nm)
+	M := make([]string, 0, nm)
 	for i := 0; i < nm; i++ {
-		n := t.Method(i).Name
+		m := t.Method(i)
+		n := m.Name
 		if unicode.IsUpper(rune(n[0])) && !hidden(n) {
-			m = append(m, n)
+			var args string
+			for i := 1; i < m.Type.NumIn(); i++ {
+				args += cleanType(m.Type.In(i).String()) + " "
+			}
+			M = append(M, n+"( "+args+")")
 		}
 	}
-	return m
+	return M
 }
 
 func (e *entry) Ret() string {
@@ -203,7 +208,7 @@ const templ = `
 
 	{{with .Methods}} 
 		<p> <span style="color:grey"> <b>methods:</b> 
-		{{range .}} {{.}} {{end}} 
+		{{range .}} {{.}} &nbsp;{{end}} 
 		</span> </p> 
 	{{end}}
 
@@ -240,6 +245,10 @@ Once the gridsize has been set, optionally a magnet Shape can be specified. The 
 Shape constructors:
 {{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
 
+
+<h1> Material parameters </h1>
+
+{{range .FilterType "*engine.ScalarParam"}} {{template "entry" .}} {{end}}
 
 <h1> Misc </h1>
 {{range .FilterLeftovers}} {{template "entry" .}} {{end}}

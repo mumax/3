@@ -14,7 +14,7 @@ type adder struct {
 
 func (q *adder) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc func(dst *data.Slice)) {
 	*q = adder{addFunc, Info(nComp, name, unit, m)}
-	DeclROnly(name, q, doc)
+	DeclROnly(name, q, cat(doc, unit))
 }
 
 // Calcuates and returns the quantity.

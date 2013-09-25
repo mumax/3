@@ -20,12 +20,12 @@ func init() {
 
 	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
 
-	LLTorque.init(3, &globalmesh, "lltorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
+	LLTorque.init(3, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
 		B_eff.set(b)
 		cuda.LLTorque(b, M.buffer, b, Alpha.gpuLUT1(), regions.Gpu())
 	})
 
-	STTorque.init(3, &globalmesh, "sttorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
+	STTorque.init(3, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !JPol.isZero() {
 			jspin, rec := JPol.Slice()
 			if rec {

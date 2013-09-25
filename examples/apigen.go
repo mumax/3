@@ -164,6 +164,20 @@ func (a *api) FilterName(typ ...string) []*entry {
 	return E
 }
 
+func (a *api) FilterPrefix(pre string) []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		if e.touched {
+			continue
+		}
+		if strings.HasPrefix(e.name, pre) {
+			e.touched = true
+			E = append(E, e)
+		}
+	}
+	return E
+}
+
 func (a *api) FilterLeftovers() []*entry {
 	var E []*entry
 	for _, e := range a.Entries {
@@ -195,7 +209,7 @@ func renderAPI() {
 
 const templ = `
 {{define "entry"}}
-	<p><span style="color:#000088; font-size:1.3em"> <b>{{.Name}}</b>{{.Ins}} </span>
+	<p><span style="color:#000088; font-size:1.3em"> <b>{{.Name}}</b>{{.Ins}} </span> {{.Type}}
 
 	{{with .Doc}} <p> {{.}} </p> {{end}}
 
@@ -254,6 +268,10 @@ DefRegion(0, circle(1e-6).Inverse())
 
 {{range .FilterName "DefRegion" }} {{template "entry" .}} {{end}}
 
+<h1> Initial magnetization </h1>
+
+{{range .FilterReturn "Config"}} {{template "entry" .}} {{end}}
+
 <h1> Material parameters </h1>
 
 Assigning to a material parameter sets a value in all regions. E.g.:
@@ -273,8 +291,28 @@ Ku1 = 500 * sin(2*pi*f*t)
 
 {{range .FilterType "*engine.ScalarParam" "*engine.VectorParam"}} {{template "entry" .}} {{end}}
 
+<h1> Excitation </h1>
+
+{{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
 
 <h1> Output quantities </h1>
+
+{{range .FilterType "*engine.setter" "*engine.adder" "*engine.buffered" "*engine.GetFunc" "*engine.FFTM" "*engine.Regions"}} {{template "entry" .}} {{end}}
+
+
+<h1> Scheduling output </h1>
+
+{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave"}} {{template "entry" .}} {{end}}
+
+<h1> Running </h1>
+
+{{range .FilterName "run" "steps" "t" "Dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
+
+
+<h1> Extensions </h1>
+
+{{range .FilterPrefix "ext_"}} {{template "entry" .}} {{end}}
+{{range .FilterName "enabledemag" "average" "fprintln" "setexlen"}} {{template "entry" .}} {{end}}
 
 <h1> Misc </h1>
 {{range .FilterLeftovers}} {{template "entry" .}} {{end}}

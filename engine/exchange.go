@@ -23,7 +23,7 @@ func init() {
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 
-	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field (T)", func(dst *data.Slice) {
+	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
 		if Dex.isZero() {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
 		} else {

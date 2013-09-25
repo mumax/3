@@ -74,7 +74,7 @@ func recordExamples(input string, num int) {
 }
 
 func (s *State) Img(fname string) string {
-	cmd("mx3-convert", "-png", s.outfile()+"/"+fname+".dump")
+	cmd("mumax3-convert", "-png", s.outfile()+"/"+fname+".dump")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
 <figure style="float:left">
@@ -106,7 +106,7 @@ func (s *State) Output() string {
 
 	for _, f := range files {
 		if path.Ext(f) == ".txt" {
-			cmd("mx3-plot", s.outfile()+"/"+f)
+			cmd("mumax3-plot", s.outfile()+"/"+f)
 		}
 	}
 

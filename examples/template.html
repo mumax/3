@@ -39,9 +39,9 @@ run(1e-9)
 
 `}}
 
-<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <code>mx3-convert</code>. Below is the output converted to PNG.</p>
+<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <code>mumax3-convert</code>. Below is the output converted to PNG.</p>
 
-<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <code>mx3-plot</code>.
+<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <code>mumax3-plot</code>.
 </p>
 
 {{.Output }}
@@ -103,7 +103,7 @@ save(STTorque) // Spin-transfer torque/γ0
 <hr/><h2>Interlude on Syntax</h2>
 
 <p>
-Before we continue we might have a look at the mx3 input syntax. It is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
+Before we continue we might have a look at the mumax3 input syntax. It is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
 
 <h3>Defining variables</h3>
 {{.Example `

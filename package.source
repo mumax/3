@@ -8,7 +8,7 @@ rm -f $tmp/*
 src='github.com/mumax/3/mumax3'
 version='3.1.0'
 
-go build -o $tmp/mumax3/mx3-convert 'github.com/mumax/3/tools/mx3-convert'  || exit 1
+go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'  || exit 1
 
 out=$tmp/mumax3/mumax3
 

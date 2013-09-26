@@ -49,6 +49,7 @@ func (e *entry) Name() string {
 	return e.name
 }
 
+// input parameters
 func (e *entry) Ins() string {
 	t := e.Type.String()
 	if strings.HasPrefix(t, "func(") {
@@ -58,6 +59,7 @@ func (e *entry) Ins() string {
 	}
 }
 
+// dumbed-down type
 func cleanType(typ string) string {
 	typ = strings.Replace(typ, "engine.", "", -1)
 	typ = strings.Replace(typ, "*data.", "", -1)
@@ -86,6 +88,7 @@ func (e *entry) Methods() []string {
 	return M
 }
 
+// return value
 func (e *entry) Ret() string {
 	t := e.Type
 	if t.Kind() == reflect.Func && t.NumOut() == 1 {
@@ -113,6 +116,7 @@ type api struct {
 	Entries entries
 }
 
+// include file
 func (e *api) Include(fname string) string {
 	b, err := ioutil.ReadFile(fname)
 	check(err)
@@ -134,7 +138,8 @@ func (a *api) FilterType(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.remaining() {
 		for _, t := range typ {
-			if match(t, e.Type.String()) {
+			if match(t, e.Type.String()) &&
+				!strings.HasPrefix(e.name, "ext_") {
 				e.touched = true
 				E = append(E, e)
 			}
@@ -147,7 +152,8 @@ func (a *api) FilterReturn(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.remaining() {
 		for _, t := range typ {
-			if match(t, e.Ret()) {
+			if match(t, e.Ret()) &&
+				!strings.HasPrefix(e.name, "ext_") {
 				e.touched = true
 				E = append(E, e)
 			}
@@ -160,7 +166,8 @@ func (a *api) FilterName(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.remaining() {
 		for _, t := range typ {
-			if match(t, e.name) {
+			if match(t, e.name) &&
+				!strings.HasPrefix(e.name, "ext_") {
 				e.touched = true
 				E = append(E, e)
 			}

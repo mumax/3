@@ -3,7 +3,7 @@ h1   { color: #000088}
 h2   { font-size: 18px; color: #000088}
 h3   { font-size: 15px; font-weight: normal; color: #000088}
 table{ border:"10"; }
-hr   { border-style: none; border-top: 1px solid #CCCCCC; margin-top: 10px; margin-bottom: 40px }
+hr   { border-style: none; border-top: 1px solid #CCCCCC; margin-top: 10px; margin-bottom: 10px }
 a    { color: #375EAB; text-decoration: none; }
 div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 div#footer { color: #555555 }

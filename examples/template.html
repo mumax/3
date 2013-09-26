@@ -493,6 +493,72 @@ Run(1e-9)
 
 Since we center on the domain wall we can not really see the motion, despite the vortex wall moving pretty fast. Note the absence of closure domains at the edges due to the surface charges being removed there.
 
+
+
+<hr/><h2>Grainy Permalloy</h2>
+
+In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions. We vary the material parameters in each grain, as well as the inter-grain exchange coupling.
+
+{{.Example `
+N := 256
+c := 4e-9
+d := 40e-9
+setgridsize(N, N, 1)
+setcellsize(c, c, d)
+
+setGeom(circle(N*c))
+
+// We want grains the same size as the film thickness
+// Number of grains is box surface / grain surface
+surf := N*N*c*c
+Ngrain := ceil(surf / (d*d))
+
+// define grains with region number 1-100
+maxReg := 100
+randSeed(0)
+ext_makegrains(1, maxReg, Ngrain)
+
+// define region 0 as outside our dot
+defregion(0, circle(N*c).Inverse())
+
+alpha = 3
+Kc1 = 1000
+
+A   := 13e-12
+Ms  := 860e3
+lex := sqrt(2* A / Ms) // exchange legth
+
+for i:=1; i<maxReg; i++{
+	// random parameter variation by 10%
+	Msat.SetRegion(i, Ms + randNorm() * 0.1 * Ms)
+	
+	// random cubic anisotropy direction
+	phi := rand() * 2 * pi
+	theta := rand() * pi
+	x := sin(theta) * cos(phi)
+	y := sin(theta) * sin(phi)
+	z := cos(theta)
+	AnisC1.SetRegion(i, vector(x, y, z))
+	AnisC2.SetRegion(i, vector(x, y, z))
+
+	// inter-grain exchange reduction between all pairs of regions
+	red := 0.5
+	for j:=i; j<maxReg; j++{
+		SetExLen(i, j, sqrt(red) * lex)
+	}
+}
+
+save(regions)
+save(Msat)
+
+m = vortex(1, 1)
+run(10e-9)
+
+save(m)
+`}}
+
+{{.Output}}
+
 </body>
 </html>
 

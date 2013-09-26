@@ -8,10 +8,11 @@ import (
 )
 
 func init() {
-	DeclFunc("ext_MakeGrains", makeGrains, "Make randomly distributed grains (startregion, numberofregions, numberofgrains)")
+	DeclFunc("ext_MakeGrains", makeGrains, "Make regions like randomly distributed grains (startregion, maxregion[excl.], numberofgrains)")
 }
 
-func makeGrains(startregion, numberofregions, numberofgrains int) {
+func makeGrains(startregion, stopRegion, numberofgrains int) {
+	numberofregions := stopRegion - startregion
 	log.Printf("making grains in %v regions, starting from %v, number of Voronoi centra=%v", numberofregions, startregion, numberofgrains)
 	util.Argument(len(regions.arr) == 1) // 2D only
 

@@ -3,11 +3,17 @@ setgridsize(512, 128, 1)
 c := 4e-9
 setcellsize(c, c, c)
 
-Msat = 860e3
-Aex = 13e-12
-
 m = uniform(1,0,0) 
+randSeed(0)
 
-ext_makegrains(1,32, 200)
+reg1 := 0
+reg2 := 32
+ext_makegrains(reg1, reg2-reg1, 200)
 
-save(regions)
+for i:=reg1; i<reg2; i++{
+	Msat.SetRegion(i, 860e3  + randNorm() * 86.0e3)
+	 Aex.SetRegion(i, 13e-12 + randNorm() * 1.3e-12)
+}
+
+expect("Msat", average(Msat)[0], 950698.4375, 1)
+expect("Aex", average(Aex)[0], 1.402765230e-11, 1e-16)

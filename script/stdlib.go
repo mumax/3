@@ -1,6 +1,9 @@
 package script
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 // Loads standard functions into the world.
 func (w *World) LoadStdlib() {
@@ -60,11 +63,21 @@ func (w *World) LoadStdlib() {
 	w.PureFunc("heaviside", heaviside)
 	w.declare("pi", floatLit(math.Pi))
 	w.declare("inf", floatLit(math.Inf(1)))
+
+	w.Func("randSeed", intseed, "Sets the random number seed")
+	w.Func("rand", rand.Float64, "Random number between 0 and 1")
+	w.Func("randExp", rand.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
+	w.Func("randNorm", rand.ExpFloat64, "Standard normal random number")
 }
 
-func square(x float64) float64 {
-	return x * x
+// script does not know int64
+func intseed(seed int) {
+	rand.Seed(int64(seed))
 }
+
+//func square(x float64) float64 {
+//	return x * x
+//}
 
 func heaviside(x float64) float64 {
 	switch {

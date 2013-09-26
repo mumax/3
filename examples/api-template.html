@@ -3,17 +3,17 @@
 	<p><span style="color:#000088; font-size:1.3em"> <b>{{.Name}}</b>{{.Ins}} </span> 
 	{{with .Doc}} <p style="margin-left:40px"> {{.}} </p> {{end}}
 
-	{{with .Examples}} <p style="margin-left:40px"> <b>examples:</b> 
-		{{range .}} 
-			<a href="examples.html#example{{.}}">[{{.}}]</a> 
-		{{end}} 
-		</p> 
-	{{end}}
-
 	{{with .Methods}} 
 		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
 		{{range .}} {{.}} &nbsp;{{end}} 
 		</span> </p> 
+	{{end}}
+
+	{{with .Examples}} <p style="margin-left:40px; color:grey"> examples: 
+		{{range .}} 
+			<a href="examples.html#example{{.}}">[{{.}}]</a> 
+		{{end}} 
+		</p> 
 	{{end}}
 
 	</p>

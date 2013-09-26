@@ -1,9 +1,9 @@
 
 {{define "entry"}}
 	<p><span style="color:#000088; font-size:1.3em"> <b>{{.Name}}</b>{{.Ins}} </span> 
-	{{with .Doc}} <p> {{.}} </p> {{end}}
+	{{with .Doc}} <p style="margin-left:40px"> {{.}} </p> {{end}}
 
-	{{with .Examples}} <p> <b>examples:</b> 
+	{{with .Examples}} <p style="margin-left:40px"> <b>examples:</b> 
 		{{range .}} 
 			<a href="examples.html#example{{.}}">[{{.}}]</a> 
 		{{end}} 
@@ -11,7 +11,7 @@
 	{{end}}
 
 	{{with .Methods}} 
-		<p> <span style="color:grey"> <b>methods:</b> 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
 		{{range .}} {{.}} &nbsp;{{end}} 
 		</span> </p> 
 	{{end}}

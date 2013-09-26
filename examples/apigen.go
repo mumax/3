@@ -59,7 +59,9 @@ func (e *entry) Ins() string {
 }
 
 func cleanType(typ string) string {
-	return strings.Replace(typ, "engine.", "", -1)
+	typ = strings.Replace(typ, "engine.", "", -1)
+	typ = strings.Replace(typ, "*data.", "", -1)
+	return typ
 }
 
 func (e *entry) Methods() []string {
@@ -93,11 +95,12 @@ func (e *entry) Ret() string {
 	}
 }
 
+// hidden methods
 func hidden(name string) bool {
 	switch name {
 	default:
 		return false
-	case "Eval", "InputType", "Type", "Slice":
+	case "Eval", "InputType", "Type", "Slice", "Name", "Unit", "NComp", "TableData", "Mesh":
 		return true
 	}
 }
@@ -116,12 +119,20 @@ func (e *api) Include(fname string) string {
 	return string(b)
 }
 
-func (a *api) FilterType(typ ...string) []*entry {
+// list of entries not used so far
+func (a *api) remaining() []*entry {
 	var E []*entry
 	for _, e := range a.Entries {
-		if e.touched {
-			continue
+		if !e.touched {
+			E = append(E, e)
 		}
+	}
+	return E
+}
+
+func (a *api) FilterType(typ ...string) []*entry {
+	var E []*entry
+	for _, e := range a.remaining() {
 		for _, t := range typ {
 			if match(t, e.Type.String()) {
 				e.touched = true
@@ -134,10 +145,7 @@ func (a *api) FilterType(typ ...string) []*entry {
 
 func (a *api) FilterReturn(typ ...string) []*entry {
 	var E []*entry
-	for _, e := range a.Entries {
-		if e.touched {
-			continue
-		}
+	for _, e := range a.remaining() {
 		for _, t := range typ {
 			if match(t, e.Ret()) {
 				e.touched = true
@@ -150,10 +158,7 @@ func (a *api) FilterReturn(typ ...string) []*entry {
 
 func (a *api) FilterName(typ ...string) []*entry {
 	var E []*entry
-	for _, e := range a.Entries {
-		if e.touched {
-			continue
-		}
+	for _, e := range a.remaining() {
 		for _, t := range typ {
 			if match(t, e.name) {
 				e.touched = true
@@ -166,10 +171,7 @@ func (a *api) FilterName(typ ...string) []*entry {
 
 func (a *api) FilterPrefix(pre string) []*entry {
 	var E []*entry
-	for _, e := range a.Entries {
-		if e.touched {
-			continue
-		}
+	for _, e := range a.remaining() {
 		if strings.HasPrefix(e.name, pre) {
 			e.touched = true
 			E = append(E, e)
@@ -179,14 +181,7 @@ func (a *api) FilterPrefix(pre string) []*entry {
 }
 
 func (a *api) FilterLeftovers() []*entry {
-	var E []*entry
-	for _, e := range a.Entries {
-		if e.touched {
-			continue
-		}
-		E = append(E, e)
-	}
-	return E
+	return a.remaining()
 }
 
 func match(a, b string) bool {

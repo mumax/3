@@ -15,6 +15,7 @@ import (
 )
 
 var flag_vet = flag.Bool("vet", false, "only vet source files, don't run them")
+var flag_api = flag.Bool("api", false, "only generate API")
 
 func main() {
 	flag.Parse()
@@ -32,8 +33,10 @@ func main() {
 	check(err2)
 
 	// execute!
-	state := &State{}
-	check(templ.Execute(f, state))
+	if !*flag_api {
+		state := &State{}
+		check(templ.Execute(f, state))
+	}
 
 	renderAPI()
 }

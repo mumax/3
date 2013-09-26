@@ -19,8 +19,8 @@ var (
 )
 
 func init() {
-	DeclFunc("setgridsize", setGridSize, `Sets the number of cells for X,Y,Z`)
-	DeclFunc("setcellsize", setCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclFunc("SetGridSize", setGridSize, `Sets the number of cells for X,Y,Z`)
+	DeclFunc("SetCellSize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 
 	// magnetization
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)

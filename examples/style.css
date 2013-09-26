@@ -8,4 +8,5 @@ a    { color: #375EAB; text-decoration: none; }
 div  { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
 div#footer { color: #555555 }
 pre  { margin-left: 50px; margin-top: 10px; margin-bottom: 20px; color: #000044; font-size: 12px; background-color: #EEEEFF; padding:10px; }
+figure { margin-left: 2px; margin-top: 2px; margin-bottom: 2px; padding:2px; }
 figcaption { color: #555555 }

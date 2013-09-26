@@ -24,8 +24,10 @@
 
 <h1> mumax<sup>3</sup> API </h1>
 
+This is a complete overview of all available functions for writing an input script.
+
 <hr/><h1> Setting  the mesh size</h1>
-The simulation mesh defines the maximum size of the magnet. It should be set at the beginning of the script. For the number of cells, powers of two or numbers with small prime factors are advisable. E.g.:
+The simulation mesh defines the size of the box around your magnet. It should be set at the beginning of the script. The number of cells should preferably be powers of two, or at least have small prime factors (2,3,5,7). E.g.:
 <pre><code>Nx := 128
 Ny := 64
 Nz := 2
@@ -41,7 +43,7 @@ SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
 
 <hr/><h1> Setting a geometry </h1>
 
-Once the gridsize has been set, optionally a magnet Shape can be specified. The geometry is always constrained to the simulation box. Primitive shapes are constructed at the origin (box center) by default, and can be rotated and translated if needed. E.g.:
+Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. E.g.:
 <pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX().Transl(1e-6,0,0))
 </code></pre>
 
@@ -59,6 +61,13 @@ DefRegion(0, circle(1e-6).Inverse())
 
 <hr/><h1> Initial magnetization </h1>
 
+The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
+<pre><code>m = uniform(1, 0, 0)
+m.SetRegion(1, vortex(1, 1))
+m.LoadFile("config.dump")
+</code></pre>
+
+{{range .FilterName "m"}} {{template "entry" .}} {{end}}
 {{range .FilterReturn "Config"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Material parameters </h1>

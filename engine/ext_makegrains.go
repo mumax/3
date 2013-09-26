@@ -58,9 +58,12 @@ func makeGrains(startregion, numberofregions, numberofgrains int) {
 	}
 
 	//3: give every cell its region by diividing its voronoinumber modulo number of regions
-	for j := 0; j < len(arr); j++ {
-		for k := 0; k < len(arr[j]); k++ {
-			arr[j][k] = byte(startregion + voronoi[j][k]%numberofregions)
+	A := regions.arr
+	for _, arr := range A {
+		for j := 0; j < len(arr); j++ {
+			for k := 0; k < len(arr[j]); k++ {
+				arr[j][k] = byte(startregion + voronoi[j][k]%numberofregions)
+			}
 		}
 	}
 }

@@ -52,9 +52,9 @@ Optionally a magnet Shape other than the full simulation box can be specified. O
 
 
 <hr/><h1> Defining regions </h1>
-Optionally, up to 256 regions can be defined. Each region can have its own material parameters. E.g.:
+Optionally, up to 256 regions can be defined. Each cell is associated with exactly one region and is assigned assigned to region 0 by default. Each region can have its own material parameters. E.g.:
 <pre><code>DefRegion(1, circle(1e-6))
-DefRegion(0, circle(1e-6).Inverse())
+DefRegion(0, circle(1e-6).Inverse()) // redundant
 </code></pre>
 
 {{range .FilterName "DefRegion" }} {{template "entry" .}} {{end}}

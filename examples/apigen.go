@@ -103,7 +103,7 @@ func hidden(name string) bool {
 	switch name {
 	default:
 		return false
-	case "Eval", "InputType", "Type", "Slice", "Name", "Unit", "NComp", "TableData", "Mesh":
+	case "Eval", "InputType", "Type", "Slice", "Name", "Unit", "NComp", "TableData", "Mesh", "SetValue":
 		return true
 	}
 }

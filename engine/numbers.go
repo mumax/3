@@ -8,7 +8,7 @@ type GetFunc struct {
 
 func newGetfunc(nComp int, name, unit, doc_ string, get func() []float64) *GetFunc {
 	g := &GetFunc{Doc(nComp, name, unit), get}
-	DeclROnly(name, g, doc_)
+	DeclROnly(name, g, cat(doc_, unit))
 	return g
 }
 

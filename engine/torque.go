@@ -10,7 +10,7 @@ var (
 	LLTorque  setter     // Landau-Lifshitz torque/γ0, in T
 	STTorque  adder      // Spin-transfer torque/γ0, in T
 	JPol      excitation // Polarized electrical current density
-	MaxTorque = NewGetScalar("maxTorque", "T", "", GetMaxTorque)
+	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 )
 
 func init() {

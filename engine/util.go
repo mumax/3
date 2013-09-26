@@ -18,7 +18,7 @@ func init() {
 	DeclPure("vector", Vector, "Constructs a vector with given components")
 	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	DeclFunc("print", myprint, "Print to standard output")
-
+	DeclFunc("LoadFile", LoadFile, "Load a .dump file")
 }
 
 // Constructs a vector

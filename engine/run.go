@@ -11,12 +11,12 @@ func init() {
 	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclVar("t", &Time, "Total simulated time (s)")
-	DeclROnly("Dt", &Solver.Dt_si, "Last solver time step (s)")
+	DeclROnly("dt", &Solver.Dt_si, "Last solver time step (s)")
 	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
 	DeclVar("Headroom", &Solver.Headroom, "Solver headroom")
-	DeclVar("FixDt", &Solver.FixDt, "Enable/disable fixed time step (default: false)")
+	DeclVar("FixDt", &Solver.FixDt, "Set a fixed time step. 0 disables fixed step.")
 }
 
 var (

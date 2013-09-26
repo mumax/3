@@ -59,6 +59,7 @@ DefRegion(0, circle(1e-6).Inverse())
 
 {{range .FilterName "DefRegion" }} {{template "entry" .}} {{end}}
 
+
 <hr/><h1> Initial magnetization </h1>
 
 The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
@@ -69,6 +70,7 @@ m.LoadFile("config.dump")
 
 {{range .FilterName "m"}} {{template "entry" .}} {{end}}
 {{range .FilterReturn "Config"}} {{template "entry" .}} {{end}}
+
 
 <hr/><h1> Material parameters </h1>
 
@@ -89,9 +91,20 @@ Ku1 = 500 * sin(2*pi*f*t)
 
 {{range .FilterType "*engine.ScalarParam" "*engine.VectorParam"}} {{template "entry" .}} {{end}}
 
+
 <hr/><h1> Excitation </h1>
 
+Field or current excitations can be set in the same way as material parameters:
+<pre><code>B_ext = vector(0.01, 1e-6*sin(2*pi*f*t), 0)
+B_ext.SetRegion(1, vector(0, 0, 0.1))
+</code></pre>
+Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(x,y,z) * f(t) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
+<pre><code>B_ext.Add(LoadFile("antenna.dump"), sin(2*pi*f*t))
+JPol.Add(LoadFile("current.dump"), 1)
+</code></pre>
+
 {{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
+{{range .FilterName "LoadFile"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Output quantities </h1>
 
@@ -100,19 +113,43 @@ Ku1 = 500 * sin(2*pi*f*t)
 
 <hr/><h1> Scheduling output </h1>
 
+All input and output quantities (as described above) can be saved in a space-dependent way (".dump" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More coulumns can be added with <code>TableAdd()</code>.
+<pre><code>save(B_ext)
+
+tableadd(B_ext)
+tablesave()
+</code></pre>
+Optionally, the output/averaging can be done over a single region:
+<pre><code>save(m.Region(1))
+tableadd(m.Region(1)) 
+</code></pre>
+
 {{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Running </h1>
 
-{{range .FilterName "run" "steps" "t" "Dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
+<code>Run(time)</code> runs the simulation for a given time in seconds, using sensible error settings. 
+<pre><code>Run(1e-9)
+</code></pre>
+Optionally, the solver accuracy may be fine-tuned. E.g.:
+<pre><code>MaxDt = 1e-12
+MinDt = 1e-15
+MaxErr = 1e-6
+</code></pre>
+
+{{range .FilterName "run" "steps" }} {{template "entry" .}} {{end}}
+{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Extensions </h1>
 
+Extensions are extra functionalities that are not officially supported. They are aimed at rather specific problems and may not work as expected for your particular situation. Their API and functionality may change in future releases.
+
 {{range .FilterPrefix "ext_"}} {{template "entry" .}} {{end}}
-{{range .FilterName "enabledemag" "average" "fprintln" "setexlen"}} {{template "entry" .}} {{end}}
+{{range .FilterName "enabledemag" "average" "fprintln" "setexlen" "expect" "PostStep"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Misc </h1>
+Other available functions.
 {{range .FilterLeftovers}} {{template "entry" .}} {{end}}
 
 </body>

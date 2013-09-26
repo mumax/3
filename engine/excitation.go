@@ -21,7 +21,7 @@ type mulmask struct {
 
 func (e *excitation) init(name, unit, desc string) {
 	e.perRegion.init(name+"_perRegion", unit, "(internal)")
-	DeclLValue(name, e, desc)
+	DeclLValue(name, e, cat(desc, unit))
 }
 
 func (e *excitation) addTo(dst *data.Slice) {

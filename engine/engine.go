@@ -31,6 +31,7 @@ func init() {
 		B_exch.addTo(dst)
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
+		B_therm.addTo(dst)
 	})
 
 	// torque inited in torque.go

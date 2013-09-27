@@ -20,11 +20,12 @@ func init() {
 }
 
 var (
-	Solver   solver
-	Time     float64             // time in seconds  // todo: hide? setting breaks autosaves
-	pause    bool                // set pause at any time to stop running after the current step
-	postStep []func()            // called on after every time step
-	Inject   = make(chan func()) // injects code in between time steps. Used by web interface.
+	Solver     solver
+	Time       float64             // time in seconds  // todo: hide? setting breaks autosaves
+	pause      bool                // set pause at any time to stop running after the current step
+	postStep   []func()            // called on after every time step
+	Inject     = make(chan func()) // injects code in between time steps. Used by web interface.
+	solvertype int
 )
 
 func SetSolver(typ int) {
@@ -36,6 +37,7 @@ func SetSolver(typ int) {
 	case 2:
 		Solver.step = HeunStep
 	}
+	solvertype = typ
 }
 
 // Run the simulation for a number of seconds.

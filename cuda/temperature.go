@@ -14,7 +14,7 @@ func AddTemperature(Beff, noise *data.Slice, Temp, alpha, Bsat LUTPtr, VolDt flo
 	N := Beff.Len()
 	cfg := make1DConf(N)
 
-	kB2_VgammaDt := mag.Kb * mag.Kb * mag.Gamma0 * VolDt
+	kB2_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * VolDt) // TODO -> engine
 
 	k_addtemperature(Beff.DevPtr(0), noise.DevPtr(0), float32(kB2_VgammaDt),
 		unsafe.Pointer(Temp), unsafe.Pointer(alpha), unsafe.Pointer(Bsat),

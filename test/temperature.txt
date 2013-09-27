@@ -4,9 +4,15 @@
 	setgridsize(32, 32, 1)
 	setcellsize(4e-9, 4e-9, 4e-9)
 
+	dot := circle(16*4e-9)
+	setgeom(dot)
+	defregion(1, dot)
+	
 	Msat = 800e3
 	Aex = 13e-12
 	m  = uniform(1, 1, 0)
+
+	//Msat.setregion(0, 0)
 
 	alpha = 3
 	run(.1e-9) 
@@ -20,6 +26,7 @@
 	tableadd(E_therm)
 	save(B_therm)
 
-	steps(10000)
+	steps(3000)
 
-	expect("mx", average(m)[0], 0.712670, 1e-4)
+	expect("mx", average(m)[0], 0.7007331, 1e-5)
+

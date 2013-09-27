@@ -136,9 +136,19 @@ Optionally, the solver accuracy may be fine-tuned. E.g.:
 MinDt = 1e-15
 MaxErr = 1e-6
 </code></pre>
+Also optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
+<ul>
+	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings) </li>
+	<li> <code>2</code>: Adaptive Heun solver (default) </li> 
+</ul>
+E.g.:
+<pre><code>SetSolver(1) // Euler
+FixDt = 1e-15
+</code></pre>
 
 {{range .FilterName "run" "steps" }} {{template "entry" .}} {{end}}
 {{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
+{{range .FilterName "SetSolver"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Extensions </h1>

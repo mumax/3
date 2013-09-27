@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"github.com/mumax/3/cuda"
 	"log"
 )
 
@@ -10,6 +9,7 @@ func init() {
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
 	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
+	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclROnly("dt", &Solver.Dt_si, "Last solver time step (s)")
 	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
@@ -20,12 +20,23 @@ func init() {
 }
 
 var (
-	Solver   cuda.Solver
+	Solver   solver
 	Time     float64             // time in seconds  // todo: hide? setting breaks autosaves
 	pause    bool                // set pause at any time to stop running after the current step
 	postStep []func()            // called on after every time step
 	Inject   = make(chan func()) // injects code in between time steps. Used by web interface.
 )
+
+func SetSolver(typ int) {
+	switch typ {
+	default:
+		log.Panicf("SetSolver: unknown solver type: %v", typ)
+	case 1:
+		Solver.step = EulerStep
+	case 2:
+		Solver.step = HeunStep
+	}
+}
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {

@@ -61,7 +61,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
-	Solver = cuda.NewSolver(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, &Time, cuda.HeunStep)
+	Solver = NewSolver(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, HeunStep)
 	Table.Add(&M)
 	vol = data.NilSlice(1, Mesh())
 }

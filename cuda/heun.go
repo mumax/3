@@ -8,15 +8,11 @@ import (
 
 // Adaptive heun solver for vectors.
 type Heun struct {
-	solverCommon
-	y        *data.Slice       // the quantity to be time stepped
-	torqueFn func(*data.Slice) // updates dy
-	postStep func(*data.Slice) // called on y after successful step, typically normalizes magnetization
+	Solver
 }
 
 func NewHeun(y *data.Slice, torqueFn, postStep func(*data.Slice), dt, multiplier float64, time *float64) *Heun {
-	util.Argument(dt > 0 && multiplier > 0)
-	return &Heun{newSolverCommon(dt, multiplier, time), y, torqueFn, postStep}
+	return &Heun{newSolver(y, torqueFn, postStep, dt, multiplier, time)}
 }
 
 // Take one time step

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/script"
-	"log"
 	"reflect"
 )
 
@@ -33,7 +32,6 @@ func (p *ScalarParam) GetRegion(region int) float64 {
 }
 
 func (p *ScalarParam) SetValue(v interface{}) {
-	log.Println(p.Name(), ".SetValue", v)
 	f := v.(script.ScalarFunction)
 	if f.Const() {
 		p.setUniform([]float64{f.Float()})
@@ -42,7 +40,6 @@ func (p *ScalarParam) SetValue(v interface{}) {
 			return []float64{f.Float()}
 		})
 	}
-	log.Println(p.Name(), ".isZero", p.isZero())
 }
 
 func (p *ScalarParam) Eval() interface{}       { return p }

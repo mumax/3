@@ -1,0 +1,25 @@
+// temperature test.
+// TODO: need OOMMF comparison
+
+	setgridsize(32, 32, 1)
+	setcellsize(4e-9, 4e-9, 4e-9)
+
+	Msat = 800e3
+	Aex = 13e-12
+	m  = uniform(1, 1, 0)
+
+	alpha = 3
+	run(.1e-9) 
+
+	setsolver(1)
+	fixdt = 1e-14
+	Temp = 400
+
+	alpha = 0.02
+
+	tableadd(E_therm)
+	save(B_therm)
+
+	steps(10000)
+
+	expect("mx", average(m)[0], 0.712670, 1e-4)

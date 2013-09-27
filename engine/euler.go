@@ -10,8 +10,9 @@ func EulerStep(e *solver) {
 	dy0 := cuda.Buffer(3, e.y.Mesh())
 	defer cuda.Recycle(dy0)
 
+	e.Dt_si = e.FixDt
 	dt := float32(e.Dt_si * e.dt_mul)
-	util.Assert(dt > 0)
+	util.AssertMsg(dt > 0, "Euler solver requires fixed time step > 0")
 
 	e.torqueFn(dy0)
 	e.NEval++

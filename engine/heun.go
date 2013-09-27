@@ -6,6 +6,7 @@ import (
 	"math"
 )
 
+// can be used as solver.step
 func HeunStep(e *solver) {
 	y := e.y
 	dy0 := cuda.Buffer(3, e.y.Mesh())
@@ -25,7 +26,7 @@ func HeunStep(e *solver) {
 	{
 		dy := cuda.Buffer(3, e.y.Mesh())
 		defer cuda.Recycle(dy)
-		*e.time += e.Dt_si
+		Time += e.Dt_si
 		e.torqueFn(dy)
 		e.NEval++
 
@@ -44,7 +45,7 @@ func HeunStep(e *solver) {
 		} else {
 			// undo bad step
 			util.Assert(e.FixDt == 0)
-			*e.time -= e.Dt_si
+			Time -= e.Dt_si
 			cuda.Madd2(y, y, dy0, 1, -dt)
 			e.NUndone++
 			e.adaptDt(math.Pow(e.MaxErr/err, 1./3.))

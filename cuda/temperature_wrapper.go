@@ -16,16 +16,14 @@ type addtemperature_args struct {
 	arg_B            unsafe.Pointer
 	arg_noise        unsafe.Pointer
 	arg_kB2_VgammaDt float32
-	arg_TempLUT      unsafe.Pointer
-	arg_alphaLUT     unsafe.Pointer
-	arg_BsLUT        unsafe.Pointer
+	arg_tempRedLUT   unsafe.Pointer
 	arg_regions      unsafe.Pointer
 	arg_N            int
-	argptr           [8]unsafe.Pointer
+	argptr           [6]unsafe.Pointer
 }
 
 // Wrapper for addtemperature CUDA kernel, asynchronous.
-func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, TempLUT unsafe.Pointer, alphaLUT unsafe.Pointer, BsLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if addtemperature_code == 0 {
 		addtemperature_code = fatbinLoad(addtemperature_map, "addtemperature")
 	}
@@ -38,25 +36,21 @@ func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_noise)
 	_a_.arg_kB2_VgammaDt = kB2_VgammaDt
 	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_kB2_VgammaDt)
-	_a_.arg_TempLUT = TempLUT
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_TempLUT)
-	_a_.arg_alphaLUT = alphaLUT
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_alphaLUT)
-	_a_.arg_BsLUT = BsLUT
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_BsLUT)
+	_a_.arg_tempRedLUT = tempRedLUT
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_tempRedLUT)
 	_a_.arg_regions = regions
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_regions)
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_regions)
 	_a_.arg_N = N
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_N)
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
 	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 }
 
 // Wrapper for addtemperature CUDA kernel, synchronized.
-func k_addtemperature(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, TempLUT unsafe.Pointer, alphaLUT unsafe.Pointer, BsLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+func k_addtemperature(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	str := stream()
-	k_addtemperature_async(B, noise, kB2_VgammaDt, TempLUT, alphaLUT, BsLUT, regions, N, cfg, str)
+	k_addtemperature_async(B, noise, kB2_VgammaDt, tempRedLUT, regions, N, cfg, str)
 	syncAndRecycle(str)
 }
 
@@ -78,32 +72,26 @@ const (
 	.param .f32 addtemperature_param_2,
 	.param .u64 addtemperature_param_3,
 	.param .u64 addtemperature_param_4,
-	.param .u64 addtemperature_param_5,
-	.param .u64 addtemperature_param_6,
-	.param .u32 addtemperature_param_7
+	.param .u32 addtemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<16>;
-	.reg .f32 	%f<12>;
-	.reg .s64 	%rd<23>;
+	.reg .s32 	%r<14>;
+	.reg .f32 	%f<8>;
+	.reg .s64 	%rd<17>;
 
 
-	ld.param.u64 	%rd7, [addtemperature_param_0];
-	ld.param.u64 	%rd8, [addtemperature_param_1];
+	ld.param.u64 	%rd5, [addtemperature_param_0];
+	ld.param.u64 	%rd6, [addtemperature_param_1];
 	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd9, [addtemperature_param_3];
-	ld.param.u64 	%rd10, [addtemperature_param_4];
-	ld.param.u64 	%rd11, [addtemperature_param_5];
-	ld.param.u64 	%rd12, [addtemperature_param_6];
-	ld.param.u32 	%r2, [addtemperature_param_7];
-	cvta.to.global.u64 	%rd1, %rd7;
-	cvta.to.global.u64 	%rd2, %rd8;
-	cvta.to.global.u64 	%rd3, %rd11;
-	cvta.to.global.u64 	%rd4, %rd10;
-	cvta.to.global.u64 	%rd5, %rd9;
-	cvta.to.global.u64 	%rd6, %rd12;
-	.loc 2 7 1
+	ld.param.u64 	%rd7, [addtemperature_param_3];
+	ld.param.u64 	%rd8, [addtemperature_param_4];
+	ld.param.u32 	%r2, [addtemperature_param_5];
+	cvta.to.global.u64 	%rd1, %rd5;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd7;
+	cvta.to.global.u64 	%rd4, %rd8;
+	.loc 2 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -111,47 +99,35 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 8 1
+	.loc 2 7 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 2 9 1
+	cvt.s64.s32 	%rd9, %r1;
+	add.s64 	%rd10, %rd4, %rd9;
 	.loc 2 10 1
-	cvt.s64.s32 	%rd13, %r1;
-	add.s64 	%rd14, %rd6, %rd13;
+	ld.global.s8 	%rd11, [%rd10];
+	shl.b64 	%rd12, %rd11, 2;
+	add.s64 	%rd13, %rd3, %rd12;
 	.loc 2 11 1
-	ld.global.s8 	%rd15, [%rd14];
-	shl.b64 	%rd16, %rd15, 2;
-	add.s64 	%rd17, %rd5, %rd16;
-	.loc 2 12 1
-	add.s64 	%rd18, %rd4, %rd16;
-	.loc 2 13 1
-	add.s64 	%rd19, %rd3, %rd16;
-	.loc 2 15 1
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd2, %rd20;
-	.loc 2 12 1
-	ld.global.f32 	%f2, [%rd18];
-	.loc 2 15 1
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd15, %rd2, %rd14;
+	.loc 2 10 1
+	ld.global.f32 	%f2, [%rd13];
+	.loc 2 11 1
 	mul.f32 	%f3, %f2, %f1;
+	.loc 3 991 5
+	sqrt.rn.f32 	%f4, %f3;
 	.loc 2 11 1
-	ld.global.f32 	%f4, [%rd17];
-	.loc 2 15 1
-	mul.f32 	%f5, %f3, %f4;
-	.loc 2 13 1
-	ld.global.f32 	%f6, [%rd19];
-	.loc 3 2399 3
-	div.rn.f32 	%f7, %f5, %f6;
-	.loc 4 991 5
-	sqrt.rn.f32 	%f8, %f7;
-	.loc 2 15 1
-	ld.global.f32 	%f9, [%rd21];
-	add.s64 	%rd22, %rd1, %rd20;
-	ld.global.f32 	%f10, [%rd22];
-	fma.rn.f32 	%f11, %f9, %f8, %f10;
-	st.global.f32 	[%rd22], %f11;
+	ld.global.f32 	%f5, [%rd15];
+	add.s64 	%rd16, %rd1, %rd14;
+	ld.global.f32 	%f6, [%rd16];
+	fma.rn.f32 	%f7, %f5, %f4, %f6;
+	st.global.f32 	[%rd16], %f7;
 
 BB0_2:
-	.loc 2 17 2
+	.loc 2 13 2
 	ret;
 }
 
@@ -169,32 +145,26 @@ BB0_2:
 	.param .f32 addtemperature_param_2,
 	.param .u64 addtemperature_param_3,
 	.param .u64 addtemperature_param_4,
-	.param .u64 addtemperature_param_5,
-	.param .u64 addtemperature_param_6,
-	.param .u32 addtemperature_param_7
+	.param .u32 addtemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<16>;
-	.reg .f32 	%f<12>;
-	.reg .s64 	%rd<23>;
+	.reg .s32 	%r<14>;
+	.reg .f32 	%f<8>;
+	.reg .s64 	%rd<17>;
 
 
-	ld.param.u64 	%rd7, [addtemperature_param_0];
-	ld.param.u64 	%rd8, [addtemperature_param_1];
+	ld.param.u64 	%rd5, [addtemperature_param_0];
+	ld.param.u64 	%rd6, [addtemperature_param_1];
 	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd9, [addtemperature_param_3];
-	ld.param.u64 	%rd10, [addtemperature_param_4];
-	ld.param.u64 	%rd11, [addtemperature_param_5];
-	ld.param.u64 	%rd12, [addtemperature_param_6];
-	ld.param.u32 	%r2, [addtemperature_param_7];
-	cvta.to.global.u64 	%rd1, %rd7;
-	cvta.to.global.u64 	%rd2, %rd8;
-	cvta.to.global.u64 	%rd3, %rd11;
-	cvta.to.global.u64 	%rd4, %rd10;
-	cvta.to.global.u64 	%rd5, %rd9;
-	cvta.to.global.u64 	%rd6, %rd12;
-	.loc 2 7 1
+	ld.param.u64 	%rd7, [addtemperature_param_3];
+	ld.param.u64 	%rd8, [addtemperature_param_4];
+	ld.param.u32 	%r2, [addtemperature_param_5];
+	cvta.to.global.u64 	%rd1, %rd5;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd7;
+	cvta.to.global.u64 	%rd4, %rd8;
+	.loc 2 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -202,47 +172,35 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 8 1
+	.loc 2 7 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 2 9 1
+	cvt.s64.s32 	%rd9, %r1;
+	add.s64 	%rd10, %rd4, %rd9;
 	.loc 2 10 1
-	cvt.s64.s32 	%rd13, %r1;
-	add.s64 	%rd14, %rd6, %rd13;
+	ld.global.s8 	%rd11, [%rd10];
+	shl.b64 	%rd12, %rd11, 2;
+	add.s64 	%rd13, %rd3, %rd12;
 	.loc 2 11 1
-	ld.global.s8 	%rd15, [%rd14];
-	shl.b64 	%rd16, %rd15, 2;
-	add.s64 	%rd17, %rd5, %rd16;
-	.loc 2 12 1
-	add.s64 	%rd18, %rd4, %rd16;
-	.loc 2 13 1
-	add.s64 	%rd19, %rd3, %rd16;
-	.loc 2 15 1
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd2, %rd20;
-	.loc 2 12 1
-	ld.global.f32 	%f2, [%rd18];
-	.loc 2 15 1
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd15, %rd2, %rd14;
+	.loc 2 10 1
+	ld.global.f32 	%f2, [%rd13];
+	.loc 2 11 1
 	mul.f32 	%f3, %f2, %f1;
+	.loc 3 991 5
+	sqrt.rn.f32 	%f4, %f3;
 	.loc 2 11 1
-	ld.global.f32 	%f4, [%rd17];
-	.loc 2 15 1
-	mul.f32 	%f5, %f3, %f4;
-	.loc 2 13 1
-	ld.global.f32 	%f6, [%rd19];
-	.loc 3 2399 3
-	div.rn.f32 	%f7, %f5, %f6;
-	.loc 4 991 5
-	sqrt.rn.f32 	%f8, %f7;
-	.loc 2 15 1
-	ld.global.f32 	%f9, [%rd21];
-	add.s64 	%rd22, %rd1, %rd20;
-	ld.global.f32 	%f10, [%rd22];
-	fma.rn.f32 	%f11, %f9, %f8, %f10;
-	st.global.f32 	[%rd22], %f11;
+	ld.global.f32 	%f5, [%rd15];
+	add.s64 	%rd16, %rd1, %rd14;
+	ld.global.f32 	%f6, [%rd16];
+	fma.rn.f32 	%f7, %f5, %f4, %f6;
+	st.global.f32 	[%rd16], %f7;
 
 BB0_2:
-	.loc 2 17 2
+	.loc 2 13 2
 	ret;
 }
 
@@ -288,32 +246,26 @@ BB0_2:
 	.param .f32 addtemperature_param_2,
 	.param .u64 addtemperature_param_3,
 	.param .u64 addtemperature_param_4,
-	.param .u64 addtemperature_param_5,
-	.param .u64 addtemperature_param_6,
-	.param .u32 addtemperature_param_7
+	.param .u32 addtemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<11>;
-	.reg .f32 	%f<12>;
-	.reg .s64 	%rd<23>;
+	.reg .f32 	%f<8>;
+	.reg .s64 	%rd<17>;
 
 
-	ld.param.u64 	%rd7, [addtemperature_param_0];
-	ld.param.u64 	%rd8, [addtemperature_param_1];
+	ld.param.u64 	%rd5, [addtemperature_param_0];
+	ld.param.u64 	%rd6, [addtemperature_param_1];
 	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd9, [addtemperature_param_3];
-	ld.param.u64 	%rd10, [addtemperature_param_4];
-	ld.param.u64 	%rd11, [addtemperature_param_5];
-	ld.param.u64 	%rd12, [addtemperature_param_6];
-	ld.param.u32 	%r2, [addtemperature_param_7];
-	cvta.to.global.u64 	%rd1, %rd7;
-	cvta.to.global.u64 	%rd2, %rd8;
-	cvta.to.global.u64 	%rd3, %rd11;
-	cvta.to.global.u64 	%rd4, %rd10;
-	cvta.to.global.u64 	%rd5, %rd9;
-	cvta.to.global.u64 	%rd6, %rd12;
-	.loc 3 7 1
+	ld.param.u64 	%rd7, [addtemperature_param_3];
+	ld.param.u64 	%rd8, [addtemperature_param_4];
+	ld.param.u32 	%r2, [addtemperature_param_5];
+	cvta.to.global.u64 	%rd1, %rd5;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd7;
+	cvta.to.global.u64 	%rd4, %rd8;
+	.loc 3 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -321,42 +273,33 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 3 8 1
+	.loc 3 7 1
 	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB2_2;
 
+	.loc 3 9 1
+	cvt.s64.s32 	%rd9, %r1;
+	add.s64 	%rd10, %rd4, %rd9;
 	.loc 3 10 1
-	cvt.s64.s32 	%rd13, %r1;
-	add.s64 	%rd14, %rd6, %rd13;
+	ld.global.s8 	%rd11, [%rd10];
+	shl.b64 	%rd12, %rd11, 2;
+	add.s64 	%rd13, %rd3, %rd12;
+	ld.global.nc.f32 	%f2, [%rd13];
 	.loc 3 11 1
-	ld.global.s8 	%rd15, [%rd14];
-	shl.b64 	%rd16, %rd15, 2;
-	add.s64 	%rd17, %rd5, %rd16;
-	ld.global.nc.f32 	%f2, [%rd17];
-	.loc 3 12 1
-	add.s64 	%rd18, %rd4, %rd16;
-	ld.global.nc.f32 	%f3, [%rd18];
-	.loc 3 13 1
-	add.s64 	%rd19, %rd3, %rd16;
-	ld.global.nc.f32 	%f4, [%rd19];
-	.loc 3 15 1
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd2, %rd20;
-	ld.global.nc.f32 	%f5, [%rd21];
-	mul.f32 	%f6, %f3, %f1;
-	mul.f32 	%f7, %f6, %f2;
-	.loc 4 2399 3
-	div.rn.f32 	%f8, %f7, %f4;
-	.loc 5 991 5
-	sqrt.rn.f32 	%f9, %f8;
-	.loc 3 15 1
-	add.s64 	%rd22, %rd1, %rd20;
-	ld.global.nc.f32 	%f10, [%rd22];
-	fma.rn.f32 	%f11, %f5, %f9, %f10;
-	st.global.f32 	[%rd22], %f11;
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd15, %rd2, %rd14;
+	ld.global.nc.f32 	%f3, [%rd15];
+	mul.f32 	%f4, %f2, %f1;
+	.loc 4 991 5
+	sqrt.rn.f32 	%f5, %f4;
+	.loc 3 11 1
+	add.s64 	%rd16, %rd1, %rd14;
+	ld.global.nc.f32 	%f6, [%rd16];
+	fma.rn.f32 	%f7, %f3, %f5, %f6;
+	st.global.f32 	[%rd16], %f7;
 
 BB2_2:
-	.loc 3 17 2
+	.loc 3 13 2
 	ret;
 }
 

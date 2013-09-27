@@ -49,7 +49,7 @@ func getAnisotropyEnergy() float64 {
 // dst = a/b, unless b == 0
 func paramDiv(dst, a, b [][NREGION]float32) {
 	util.Assert(len(dst) == 1 && len(a) == 1 && len(b) == 1)
-	for i := 0; i < NREGION; i++ { // todo: regions.maxreg?
+	for i := 0; i < NREGION; i++ { // not regions.maxreg
 		dst[0][i] = safediv(a[0][i], b[0][i])
 	}
 }

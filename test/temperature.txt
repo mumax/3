@@ -12,7 +12,7 @@
 	Aex = 13e-12
 	m  = uniform(1, 1, 0)
 
-	//Msat.setregion(0, 0)
+	Msat.setregion(0, 0)
 
 	alpha = 3
 	run(.1e-9) 

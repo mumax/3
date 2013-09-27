@@ -22,7 +22,7 @@ type Solver struct {
 	step                   func(*Solver)     //
 }
 
-func newSolver(y *data.Slice, torqueFn, postStep func(*data.Slice), dt_si, dt_mul float64, time *float64, step func(*Solver)) Solver {
+func NewSolver(y *data.Slice, torqueFn, postStep func(*data.Slice), dt_si, dt_mul float64, time *float64, step func(*Solver)) Solver {
 	util.Argument(dt_si > 0 && dt_mul > 0)
 	return Solver{y: y, torqueFn: torqueFn, postStep: postStep,
 		time: time, Dt_si: dt_si, dt_mul: dt_mul,

@@ -20,7 +20,7 @@ func init() {
 }
 
 var (
-	Solver   cuda.Heun
+	Solver   cuda.Solver
 	Time     float64             // time in seconds  // todo: hide? setting breaks autosaves
 	pause    bool                // set pause at any time to stop running after the current step
 	postStep []func()            // called on after every time step

@@ -4,6 +4,7 @@ import (
 	"github.com/barnex/cuda5/curand"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 )
 
@@ -26,13 +27,15 @@ func init() {
 			}
 
 			N := globalmesh.NCell()
-			VolDt := cellVolume() * Solver.Dt_si
+			kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
+
 			noise := cuda.Buffer(1, &globalmesh)
 			defer cuda.Recycle(noise)
 
 			for i := 0; i < 3; i++ {
 				generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), 0, 1)
-				cuda.AddTemperature(dst.Comp(i), noise, Temp.gpuLUT1(), Alpha.gpuLUT1(), Bsat.gpuLUT1(), VolDt, regions.Gpu())
+				cuda.AddTemperature(dst.Comp(i), noise, Temp.gpuLUT1(), Alpha.gpuLUT1(), Bsat.gpuLUT1(),
+					kmu0_VgammaDt, regions.Gpu())
 			}
 		}
 	})

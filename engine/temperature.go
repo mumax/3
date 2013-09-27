@@ -14,10 +14,12 @@ var (
 	B_therm   adder
 	E_therm   = NewGetScalar("E_therm", "J", "Thermal energy", getThermalEnergy)
 	generator curand.Generator
+	thermSeed int64 = 0
 )
 
 func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
+	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
 
 	// TODO: derived parameters are a bit fragile
 	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedParam) {
@@ -35,7 +37,7 @@ func init() {
 			util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
 			if generator == 0 {
 				generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
-				generator.SetSeed(0) // TODO
+				generator.SetSeed(thermSeed)
 			}
 
 			N := globalmesh.NCell()
@@ -57,4 +59,12 @@ func init() {
 
 func getThermalEnergy() float64 {
 	return -cellVolume() * dot(&M_full, &B_therm)
+}
+
+// Seeds the thermal noise generator
+func ThermSeed(seed int) {
+	thermSeed = int64(seed)
+	if generator != 0 {
+		generator.SetSeed(thermSeed)
+	}
 }

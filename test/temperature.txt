@@ -19,7 +19,9 @@
 
 	setsolver(1)
 	fixdt = 1e-14
+	thermSeed(1)
 	Temp = 400
+	thermSeed(0)
 
 	alpha = 0.02
 

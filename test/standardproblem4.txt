@@ -12,9 +12,14 @@
 	Aex = 13e-12
 	m  = uniform(1, .1, 0)
 
+	tableAdd(MaxTorque)
+	tableAutosave(5e-12)
+
 // relax
 	alpha = 3
-	run(10e-9) 
+	MaxErr = 1e-4
+	RunWhile(MaxTorque > 1e-4)
+	run(1e-9)
 	m_ := average(m)
 	expect("mx", m_[0], 0.96696, 1e-3)
 	expect("my", m_[1], 0.12528, 1e-3)
@@ -24,7 +29,6 @@
 	alpha = 0.02
 
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
-	tableautosave(5e-12)
 	run(1e-9)
 	m_ = average(m)
 	expect("mx", m_[0],-0.9845, 1e-3)

@@ -38,6 +38,8 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 
 	case outT == float64_t && inT.AssignableTo(ScalarIf_t):
 		return &getScalar{in.Eval().(ScalarIf)}
+	case outT == float64_t && inT.AssignableTo(VectorIf_t):
+		return &getVector{in.Eval().(VectorIf)}
 
 	// magical expression -> function conversions
 	case inT == float64_t && outT.AssignableTo(ScalarFunction_t):
@@ -75,12 +77,14 @@ var (
 	ScalarFunction_t = reflect.TypeOf(dummy_f).In(0)
 	VectorFunction_t = reflect.TypeOf(dummy_f3).In(0)
 	ScalarIf_t       = reflect.TypeOf(dummy_scalarif).In(0)
+	VectorIf_t       = reflect.TypeOf(dummy_vectorif).In(0)
 )
 
 // maneuvers to get interface type of Func (simpler way?)
 func dummy_f(ScalarFunction)  {}
 func dummy_f3(VectorFunction) {}
 func dummy_scalarif(ScalarIf) {}
+func dummy_vectorif(VectorIf) {}
 
 // converts int to float64
 type intToFloat64 struct{ in Expr }
@@ -102,9 +106,13 @@ func (c *boolToFunc) Eval() interface{}  { return func() bool { return c.in.Eval
 func (c *boolToFunc) Type() reflect.Type { return func_bool_t }
 
 type getScalar struct{ in ScalarIf }
+type getVector struct{ in VectorIf }
 
 func (c *getScalar) Eval() interface{}  { return c.in.Get() }
 func (c *getScalar) Type() reflect.Type { return float64_t }
+
+func (c *getVector) Eval() interface{}  { return c.in.Get() }
+func (c *getVector) Type() reflect.Type { return vector_t }
 
 func safe_int(x float64) int {
 	i := int(x)

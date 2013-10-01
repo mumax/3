@@ -43,22 +43,8 @@ func typeConv(pos token.Pos, in Expr, outT reflect.Type) Expr {
 		return &scalFn{&intToFloat64{in}}
 	case inT == vector_t && outT.AssignableTo(VectorFunction_t):
 		return &vecFn{in}
-
-		// float64 -> func()float64
-		//case inT == float64_t && outT == func_float64_t:
-		//	return &float64ToFunc{in}
-
-		//// float64 -> func()float64
-		//case inT == func_float64_t && outT == float64_t:
-		//	return &funcToFloat64{in}
-
-		// int -> func()float64
-		//case inT == int_t && outT == func_float64_t:
-		//	return &float64ToFunc{&intToFloat64{in}}
-
-		// [3]float64 -> func()[3]float64
-		//case inT == vector_t && outT == func_vector_t:
-		//	return &vectorToFunc{in}
+	case inT == bool_t && outT == func_bool_t:
+		return &boolToFunc{in}
 	}
 }
 
@@ -76,12 +62,13 @@ func inputType(e Expr) reflect.Type {
 // common type definitions
 var (
 	float64_t        = reflect.TypeOf(float64(0))
-	func_float64_t   = reflect.TypeOf(func() float64 { return 0 })
+	bool_t           = reflect.TypeOf(false)
+	func_float64_t   = reflect.TypeOf(func() float64 { panic(0) })
+	func_bool_t      = reflect.TypeOf(func() bool { panic(0) })
 	int_t            = reflect.TypeOf(int(0))
 	string_t         = reflect.TypeOf("")
 	vector_t         = reflect.TypeOf([3]float64{})
 	func_vector_t    = reflect.TypeOf(func() [3]float64 { panic(0) })
-	bool_t           = reflect.TypeOf(false)
 	ScalarFunction_t = reflect.TypeOf(dummy_f).In(0)
 	VectorFunction_t = reflect.TypeOf(dummy_f3).In(0)
 )
@@ -103,6 +90,11 @@ type float64ToInt struct{ in Expr }
 func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
 func (c *float64ToInt) Type() reflect.Type { return int_t }
 func (c *float64ToInt) Const() bool        { return Const(c.in) }
+
+type boolToFunc struct{ in Expr }
+
+func (c *boolToFunc) Eval() interface{}  { return func() bool { return c.in.Eval().(bool) } }
+func (c *boolToFunc) Type() reflect.Type { return func_bool_t }
 
 func safe_int(x float64) int {
 	i := int(x)

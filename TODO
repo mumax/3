@@ -1,7 +1,8 @@
 bugs:
 -----
 
-N/A
+need proper zhang-li boundary conditions
+need to shift geom and regions
 
 API:
 ----
@@ -15,6 +16,7 @@ improvements:
 
 remove -f flag, move existing files to name.old
 fprintln: put file in OD if not absolute
+add "nointeractive" flag, interactive() api
 
 web: use next free port if already in use
 cuda: shift: memeset, don't clamp

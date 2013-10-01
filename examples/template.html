@@ -437,16 +437,21 @@ Aex     = 13e-12
 Xi      = 0.1
 m       = vortexwall(1, -1, 1, 1)
 
+//notch := rect(30e-9, 30e-9).RotZ(45*pi/180).transl(0, 32*3e-9, 0).inverse()
+//setGeom(notch.Repeat(200e-9, 64*3e-9, 0))
+
+
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
 ext_rmSurfaceCharge(0, 1, -1)
 
-// Set post-step function that centers simulation window on domain wall.
-PostStep(ext_centerInplaneWall)
 
 // Relax
 Alpha = 3    // high damping for fast relax
-Run(1e-9)    // relax
+RunWhile(MaxTorque > 1e-3)    // relax
 Alpha = 0.02 // restore normal damping
+
+// Set post-step function that centers simulation window on domain wall.
+PostStep(ext_centerInplaneWall)
 
 // Schedule output
 autosave(m, 100e-12)

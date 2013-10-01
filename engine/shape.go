@@ -127,6 +127,21 @@ func (s Shape) Transl(dx, dy, dz float64) Shape {
 	}
 }
 
+// Infinitely repeats the shape with given period in x, y, z.
+// A period of 0 or infinity means no repetition.
+func (s Shape) Repeat(periodX, periodY, periodZ float64) Shape {
+	return func(x, y, z float64) bool {
+		return s(fmod(x, periodX), fmod(y, periodY), fmod(z, periodZ))
+	}
+}
+
+func fmod(a, b float64) float64 {
+	if b == 0 || math.IsInf(b, 1) {
+		return a
+	}
+	return sign(a) * (math.Mod(math.Abs(a+b/2), b) - b/2)
+}
+
 // Scale returns a scaled copy of the shape.
 func (s Shape) Scale(sx, sy, sz float64) Shape {
 	return func(x, y, z float64) bool {

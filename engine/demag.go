@@ -40,7 +40,7 @@ func init() {
 
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field", func(b *data.Slice) {
 		if EnableDemag {
-			demagConv().Exec(b, M.buffer, vol, Bsat.gpuLUT1(), regions.Gpu())
+			demagConv().Exec(b, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
 		} else {
 			cuda.Zero(b)
 		}

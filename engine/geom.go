@@ -6,22 +6,50 @@ import (
 	"log"
 )
 
-var (
-	vol       *data.Slice // cell fillings (0..1) TODO: allow output
-	spaceFill = 1.0       // filled fraction of space
-	geom      Shape
-)
-
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
+	geometry.init()
+}
+
+var geometry geom
+
+type geom struct {
+	buffered          // cell fillings (0..1)
+	spaceFill float64 // filled fraction of space
+	shape     Shape
+}
+
+func (g *geom) init() {
+	g.buffered.init(1, "geometry", "", "Cell fill fraction", &globalmesh)
+	//DeclROnly("geometry", )
+	g.spaceFill = 1.0 // filled fraction of space
+}
+
+func vol() *data.Slice {
+	return geometry.Gpu()
+}
+
+func spaceFill() float64 {
+	return geometry.spaceFill
+}
+
+func (g *geom) Gpu() *data.Slice {
+	if g.buffer == nil {
+		g.buffer = data.NilSlice(1, Mesh())
+	}
+	return g.buffer
 }
 
 func SetGeom(s Shape) {
-	geom = s
-	if vol.IsNil() {
-		vol = cuda.NewSlice(1, Mesh())
+	geometry.setGeom(s)
+}
+
+func (geometry *geom) setGeom(s Shape) {
+	geometry.shape = s
+	if vol().IsNil() {
+		geometry.buffer = cuda.NewSlice(1, Mesh())
 	}
-	V := data.NewSlice(1, vol.Mesh())
+	V := data.NewSlice(1, vol().Mesh())
 	v := V.Scalars()
 	n := Mesh().Size()
 	c := Mesh().CellSize()
@@ -47,11 +75,18 @@ func SetGeom(s Shape) {
 		}
 	}
 
-	spaceFill = fill / float64(Mesh().NCell())
-	if spaceFill == 0 {
+	if fill == 0 {
 		log.Fatal("SetGeom: geometry completely empty")
 	}
+	geometry.spaceFill = fill / float64(Mesh().NCell())
 
-	data.Copy(vol, V)
-	cuda.Normalize(M.buffer, vol) // removes m outside vol
+	data.Copy(geometry.buffer, V)
+	cuda.Normalize(M.buffer, vol()) // removes m outside vol
+}
+
+func (g *geom) shift(dx int) {
+	if g.buffer.IsNil() {
+		return
+	}
+	panic("TODO: shift geom")
 }

@@ -24,7 +24,7 @@ func Average(s Slicer) []float64 {
 		}
 		return avg
 	} else {
-		return avg(b, vol)
+		return avg(b, vol())
 	}
 }
 
@@ -38,7 +38,7 @@ func avg(b, vol *data.Slice) []float64 {
 		if vol.IsNil() {
 			avg[i] = float64(cuda.Sum(b.Comp(I))) / nCell
 		} else {
-			avg[i] = float64(cuda.Dot(b.Comp(I), vol)) / (spaceFill * nCell)
+			avg[i] = float64(cuda.Dot(b.Comp(I), vol)) / (spaceFill() * nCell)
 		}
 	}
 	return avg

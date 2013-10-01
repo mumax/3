@@ -19,9 +19,7 @@ func updateShift(dir, sign int) {
 func Shift(dx int) {
 	shift(M.buffer, dx, 0, 0)
 	regions.shift(dx, 0, 0)
-	if !vol.IsNil() {
-		shift(vol, dx, 0, 0)
-	}
+	geometry.shift(dx)
 	updateShift(2, -dx)
 }
 

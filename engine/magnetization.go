@@ -15,7 +15,7 @@ func (b *magnetization) Set(src *data.Slice) {
 		src = data.Resample(src, b.buffer.Mesh().Size())
 	}
 	data.Copy(b.buffer, src)
-	cuda.Normalize(b.buffer, vol)
+	cuda.Normalize(b.buffer, vol())
 }
 
 func (b *magnetization) LoadFile(fname string) {

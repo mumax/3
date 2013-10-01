@@ -68,7 +68,6 @@ func alloc() {
 	solvertype = 2 // HeunStep
 
 	Table.Add(&M)
-	vol = data.NilSlice(1, Mesh())
 }
 
 func normalize(m *data.Slice) {

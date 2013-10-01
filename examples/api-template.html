@@ -131,6 +131,10 @@ tableadd(m.Region(1))
 <code>Run(time)</code> runs the simulation for a given time in seconds, using sensible error settings. 
 <pre><code>Run(1e-9)
 </code></pre>
+More fine-grained control is provided by <code>RunWhile(<i>condition</i>)</code>, which runs as long as an arbitrary condition is met. E.g.: 
+<pre><code>RunWhile(MaxTorque &gt; 1e-4)  // handy for relax
+RunWhile(average(m)[0] &lt; 0.1)   // handy during reversal etc.
+</code></pre>
 Optionally, the solver accuracy may be fine-tuned. E.g.:
 <pre><code>MaxDt = 1e-12
 MinDt = 1e-15
@@ -146,7 +150,7 @@ E.g.:
 FixDt = 1e-15
 </code></pre>
 
-{{range .FilterName "run" "steps" }} {{template "entry" .}} {{end}}
+{{range .FilterName "run" "steps" "runwhile"}} {{template "entry" .}} {{end}}
 {{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
 {{range .FilterName "SetSolver"}} {{template "entry" .}} {{end}}
 

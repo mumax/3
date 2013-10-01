@@ -24,6 +24,7 @@ func init() {
 
 	// magnetization
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
+	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
 
 	// effective field
 	B_eff.init(3, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {

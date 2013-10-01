@@ -56,19 +56,6 @@ func (b *buffered) LoadFile(fname string) {
 	b.Set(LoadFile(fname))
 }
 
-// Shift the data over (shx, shy, shz cells), clamping boundary values.
-// Typically used in a PostStep function to center the magnetization on
-// the simulation window.
-func (b *buffered) Shift(shx, shy, shz int) {
-	m2 := cuda.Buffer(1, b.buffer.Mesh())
-	defer cuda.Recycle(m2)
-	for c := 0; c < b.NComp(); c++ {
-		comp := b.buffer.Comp(c)
-		cuda.Shift(m2, comp, [3]int{shz, shy, shx}) // ZYX !
-		data.Copy(comp, m2)
-	}
-}
-
 // Sets the magnetization inside the shape
 // TODO: a bit slowish
 func (m *buffered) SetInShape(region Shape, conf Config) {

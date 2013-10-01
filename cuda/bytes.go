@@ -27,6 +27,11 @@ func (dst *Bytes) Upload(src []byte) {
 	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
+func (dst *Bytes) Copy(src *Bytes) {
+	util.Argument(dst.Len == src.Len)
+	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(dst.Ptr)), int64(dst.Len))
+}
+
 // Frees the GPU memory and disables the slice.
 func (b *Bytes) Free() {
 	cu.MemFree(cu.DevicePtr(uintptr(b.Ptr)))

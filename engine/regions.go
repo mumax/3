@@ -23,7 +23,6 @@ type Regions struct {
 	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool        // gpuCache in sync with cpu
 	maxreg     int         // highest used region
-	//defined    [MAXREG]bool // has region i been defined already (not allowed to set it if not defined)
 	doc
 }
 
@@ -89,15 +88,15 @@ func (r *Regions) volume(region int) float64 {
 	return float64(vol) / float64(globalmesh.NCell())
 }
 
-func checkRegionIdx(id int) {
-	if id < 0 || id > NREGION {
-		log.Fatalf("region id should be 0-255, have: %v", id)
-	}
-}
+//func checkRegionIdx(id int) {
+//	if id < 0 || id > NREGION {
+//		log.Fatalf("region id should be 0-255, have: %v", id)
+//	}
+//}
 
 // Set the region of one cell
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
-	checkRegionIdx(region)
+	//checkRegionIdx(region)
 	r.arr[iz][iy][ix] = byte(region)
 	r.gpuCacheOK = false
 }

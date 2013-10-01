@@ -5,6 +5,10 @@ import (
 	"github.com/mumax/3/engine"
 )
 
+var (
+	DWPos = engine.NewGetScalar("ext_dwpos", "m", "Position of the simulation window while following a domain wall", engine.GetShiftPos) // TODO: make more accurate
+)
+
 func init() {
 	engine.DeclFunc("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
 	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")

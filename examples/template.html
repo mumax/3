@@ -154,6 +154,10 @@ setgeom( cylinder(800e-9, inf) )
 m=uniform(1,1,0)
 saveas(m, "cylinder")
 
+setgeom( circle(200e-9).repeat(300e-9, 400e-9, 0) )
+m=uniform(1,1,0)
+saveas(m, "circle_repeat")
+
 setgeom( cylinder(800e-9, inf).inverse() )
 m=uniform(1,1,0)
 saveas(m, "cylinder_inverse")

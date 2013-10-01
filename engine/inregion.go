@@ -6,7 +6,7 @@ import (
 	"github.com/mumax/3/data"
 )
 
-// constrains Getter to a region
+// constrains Slicer to a region
 type inRegion struct {
 	q      Slicer
 	region int

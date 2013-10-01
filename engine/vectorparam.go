@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/mumax/3/script"
+	"github.com/mumax/3/util"
 	"reflect"
 )
 
@@ -21,7 +22,7 @@ func (p *VectorParam) SetRegion(region int, value [3]float64) {
 
 func (p *VectorParam) GetRegion(region int) [3]float64 {
 	v := p.getRegion(region)
-	return [3]float64{v[0], v[1], v[2]}
+	return unslice(v)
 }
 
 func (p *VectorParam) SetValue(v interface{}) {
@@ -44,4 +45,9 @@ func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t 
 // shortcut for slicing unaddressable_vector()[:]
 func slice(v [3]float64) []float64 {
 	return v[:]
+}
+
+func unslice(v []float64) [3]float64 {
+	util.Assert(len(v) == 3)
+	return [3]float64{v[0], v[1], v[2]}
 }

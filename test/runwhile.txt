@@ -11,7 +11,7 @@ Msat = 800e3
 Aex  = 13e-12
 alpha= 1
 
-RunWhile(MaxTorque.Get() < 1e-3)
+RunWhile(MaxTorque < 1e-3)
 
 B_ext = vector(0, 0.01, 1)
 

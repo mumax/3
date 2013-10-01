@@ -12,7 +12,7 @@ func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFu
 	return getFunc{Doc(nComp, name, unit), get}
 }
 
-type GetScalar struct{ getFunc }
+type GetScalar struct{ getFunc } // TODO: unexport
 type GetVector struct{ getFunc }
 
 func (g *GetScalar) Get() float64    { return g.get()[0] }

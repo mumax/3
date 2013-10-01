@@ -44,7 +44,7 @@ func corePos() []float64 {
 	pos[1] *= c[1]
 	pos[2] *= c[0]
 
-	pos[0] += totalShift // add simulation window shift
+	pos[0] += engine.GetShiftPos() // add simulation window shift
 	return pos
 }
 

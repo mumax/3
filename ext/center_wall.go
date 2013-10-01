@@ -20,14 +20,12 @@ func CenterPMAWall() {
 
 	if mz < tolerance {
 		sign := wall_left_magnetization(M.GetCell(2, 0, ny()/2, nz()/2))
-		M.Shift(sign, 0, 0)
-		updateShift(2, sign)
+		engine.Shift(sign)
 		return
 	}
 	if mz > tolerance {
 		sign := wall_left_magnetization(M.GetCell(2, 0, ny()/2, nz()/2))
-		M.Shift(-sign, 0, 0)
-		updateShift(2, -sign)
+		engine.Shift(-sign)
 	}
 }
 
@@ -41,14 +39,12 @@ func CenterInplaneWall() {
 
 	if mz < tolerance {
 		sign := wall_left_magnetization(M.GetCell(0, 0, ny()/2, nz()/2))
-		M.Shift(sign, 0, 0)
-		updateShift(2, sign)
+		engine.Shift(sign)
 		return
 	}
 	if mz > tolerance {
 		sign := wall_left_magnetization(M.GetCell(0, 0, ny()/2, nz()/2))
-		M.Shift(-sign, 0, 0)
-		updateShift(2, -sign)
+		engine.Shift(-sign)
 	}
 }
 
@@ -62,19 +58,6 @@ func wall_left_magnetization(x float64) int {
 	panic(fmt.Errorf("center wall: unclear in which direction to shift: magnetization at border=%v", x))
 }
 
-var (
-	totalShift float64 // accumulated window shift (X) in meter
-	DWPos      = engine.NewGetScalar("ext_dwpos", "m", "Position of the simulation window while following a domain wall", getShiftPos)
-)
-
-func updateShift(dir, sign int) {
-	totalShift -= float64(sign) * engine.Mesh().CellSize()[dir] // window left means wall right: minus sign
-}
-
-func getShiftPos() float64 {
-	return totalShift
-}
-
 // used for speed
 var (
 	lastShift float64 // shift the last time we queried speed
@@ -84,9 +67,9 @@ var (
 )
 
 func getShiftSpeed() float64 {
-	if lastShift != totalShift {
-		lastV = (totalShift - lastShift) / (engine.Time - lastT)
-		lastShift = totalShift
+	if lastShift != engine.GetShiftPos() {
+		lastV = (engine.GetShiftPos() - lastShift) / (engine.Time - lastT)
+		lastShift = engine.GetShiftPos()
 		lastT = engine.Time
 	}
 	return lastV

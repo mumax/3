@@ -26,6 +26,53 @@
 
 This is a complete overview of all available functions for writing an input script.
 
+<hr/><h1> Syntax </h1>
+
+<p>
+The mumax<sup>3</sup> input syntax is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
+
+<h3>Defining variables</h3>
+
+New variables are declared using <code>:=</code>. Variables have a fixed type, inferred from the declaration's right-hand-side. Assigning to existing variables is done using <code>=</code>. E.g.:
+
+<pre><code>i := 7         // defines a new variable i, type automatically detected to be int
+print(i)       // now we can use i
+i = 5          // assign new value, don't use ':=' (attempt to re-declare)
+
+str := "hello" // defines str, type automatically is string
+//str = 1      // would fail, cannot assign int to string
+</code></pre>
+
+<h3>Arithmetic</h3>
+Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
+
+<pre><code>x := pi*(3+4)/5
+x = pow(x, 3)
+x++
+y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
+</code></pre>
+
+<h3>Control structures</h3>
+Loops are possible as well:
+<pre><code>for i:=0; i<10; i++{
+	print(i)
+}
+</code></pre>
+
+<h3>Implicit functions</h3>
+
+Some of the API features accept a function as argument (e.g.: <code>RunWhile(func()bool)</code>, or all input parameters). In that case, and <i>only</i> in this case, the argument is implicitly converted to a function, which is re-evaluated each time it's needed. E.g.:
+
+<pre><code>
+value := sin(pi*t)  // value is a float64, RHS evaluated only once
+Msat = value        // time-independent Msat
+</code></pre>
+versus:
+<pre><code>
+Msat = sin(pi*t)    // RHS converted to function, re-evaluted every time
+</code></pre>
+
+
 <hr/><h1> Setting  the mesh size</h1>
 The simulation mesh defines the size of the box around your magnet. It should be set at the beginning of the script. The number of cells should preferably be powers of two, or at least have small prime factors (2,3,5,7). E.g.:
 <pre><code>Nx := 128

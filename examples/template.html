@@ -97,40 +97,7 @@ save(STTorque) // Spin-transfer torque/γ0
 
 `}}{{.Output}}
 
-<hr/><h2>Interlude on Syntax</h2>
 
-<p>
-Before we continue we might have a look at the mumax3 input syntax. It is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
-
-<h3>Defining variables</h3>
-{{.Example `
-i := 7    // defines a new variable i, type automatically detected to be int
-print(i)  // now we can use i
-i = 5     // assign new value, don't use ':=' (attempt to re-declare)
-
-str := "hello" // defines str, type automatically is string
-//str = 1      // would fail, cannot assign int to string
-`}}
-
-<h3>Arithmetic</h3>
-Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
-
-{{.Example `
-x := pi*(3+4)/5
-x = pow(x, 3)
-x++
-y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
-`}}
-
-<h3>Control structures</h3>
-Loops are possible as well:
-{{.Example `
-
-for i:=0; i<10; i++{
-	print(i)
-}
-
-`}}
 
 <hr/><h2>Standard Problem #2</h2>
 

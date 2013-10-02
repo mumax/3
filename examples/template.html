@@ -429,16 +429,16 @@ Since we center on the domain wall we can not see that it is actually moving, bu
 // wall. By removing surface charges at the left and right ends, we mimic an infintely
 // long wire.
 
-setgridsize(256, 64, 1)
-setcellsize(3e-9, 3e-9, 30e-9)
+setgridsize(256, 32, 1)
+setcellsize(3e-9, 3e-9, 10e-9)
 
 Msat    = 860e3
 Aex     = 13e-12
 Xi      = 0.1
-m       = vortexwall(1, -1, 1, 1)
+m       = twodomain(1,0,0,  0,1,0,  -1,0,0)
 
-//notch := rect(30e-9, 30e-9).RotZ(45*pi/180).transl(0, 32*3e-9, 0).inverse()
-//setGeom(notch.Repeat(200e-9, 64*3e-9, 0))
+notch := rect(20e-9, 20e-9).RotZ(45*pi/180).transl(0, 16*3e-9, 0).inverse()
+setGeom(notch.Repeat(200e-9, 32*3e-9, 0))
 
 
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.

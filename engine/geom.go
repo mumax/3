@@ -88,5 +88,5 @@ func (g *geom) shift(dx int) {
 	if g.buffer.IsNil() {
 		return
 	}
-	panic("TODO: shift geom")
+	shift(g.buffer, dx, 0, 0)
 }

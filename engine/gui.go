@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	quants         = make(map[string]Slicer)
-	params         = make(map[string]Param)
-	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
+	quants         = make(map[string]Slicer)                 // displayable
 	renderQ        = "m"                                     // quantity to display
+	params         = make(map[string]Param)                  // settable
+	guiRegion      = -1                                      // currently addressed region
 	usingX, usingY = 1, 2                                    // columns to plot
-	guiRegion      = 0                                       // currently addressed region
+	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
 )
 
 // displayable in GUI Parameters section
@@ -28,6 +28,7 @@ type Param interface {
 	Unit() string
 	getRegion(int) []float64
 	setRegion(int, []float64)
+	IsUniform() bool
 }
 
 // data for html template
@@ -85,8 +86,8 @@ func Serve(port string) {
 	gui.OnEvent("usingX", func() { usingX = gui.Value("usingX").(int) })
 	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
 
-	// parameters
-	gui.SetValue("sel_region", 0)
+	// setting parameters
+	gui.SetValue("sel_region", guiRegion)
 	gui.OnEvent("sel_region", func() { guiRegion = atoi(gui.Value("sel_region")) })
 
 	for n, p := range params {
@@ -95,7 +96,12 @@ func Serve(port string) {
 
 		compIds := ((*guidata)(nil)).CompBoxIds(n)
 		handler := func() {
-			cmd := fmt.Sprintf("%v.setRegion(%v,", n, guiRegion)
+			var cmd string
+			if guiRegion == -1 {
+				cmd = fmt.Sprintf("%v = (", n)
+			} else {
+				cmd = fmt.Sprintf("%v.setRegion(%v,", n, guiRegion)
+			}
 			if p.NComp() == 3 {
 				cmd += fmt.Sprintf("vector(%v, %v, %v)",
 					gui.Value(compIds[0]), gui.Value(compIds[1]), gui.Value(compIds[2]))
@@ -117,6 +123,8 @@ func Serve(port string) {
 
 	// periodically update time, steps, etc
 	onrefresh := func() {
+
+		log.Println('*')
 
 		// geometry
 		size := globalmesh.Size()
@@ -155,9 +163,22 @@ func Serve(port string) {
 
 		// parameters
 		for n, p := range params {
-			v := p.getRegion(guiRegion)
-			for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
-				gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+			if guiRegion == -1 {
+				if p.IsUniform() {
+					v := p.getRegion(0)
+					for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
+						gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+					}
+				} else {
+					for _, id := range ((*guidata)(nil)).CompBoxIds(n) {
+						gui.SetValue(id, "")
+					}
+				}
+			} else {
+				v := p.getRegion(guiRegion)
+				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
+					gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+				}
 			}
 		}
 
@@ -185,6 +206,7 @@ func inj(f func()) func() {
 }
 
 func Eval(code string, gui *gui.Doc) {
+	log.Println("eval", code)
 	defer func() {
 		err := recover()
 		if err != nil {

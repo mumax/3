@@ -36,7 +36,7 @@ func (e *solver) adaptDt(corr float64) {
 		e.Dt_si = e.FixDt
 		return
 	}
-	util.Assert(corr != 0)
+	util.AssertMsg(corr != 0, "Time step too small, check if parameters are sensible")
 	corr *= e.Headroom
 	if corr > 2 {
 		corr = 2

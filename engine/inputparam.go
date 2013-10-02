@@ -98,7 +98,7 @@ func (p *inputParam) getRegion(region int) []float64 {
 func (p *inputParam) IsUniform() bool {
 	cpu := p.cpuLUT()
 	v1 := p.getRegion(0)
-	for r := 1; r < regions.maxreg; r++ {
+	for r := 1; r < NREGION; r++ {
 		for c := range v1 {
 			if cpu[c][r] != float32(v1[c]) {
 				return false

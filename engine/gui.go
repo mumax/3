@@ -124,7 +124,7 @@ func Serve(port string) {
 	// periodically update time, steps, etc
 	onrefresh := func() {
 
-		log.Println('*')
+		log.Println("*")
 
 		// geometry
 		size := globalmesh.Size()

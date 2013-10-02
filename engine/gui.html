@@ -97,7 +97,7 @@
 		{{range .Data.MakeRange 0 256}}
 			<option value= {{.}}> {{.}}</option>
 		{{end}}
-	{{.EndSelect}}</td></tr>
+	{{.EndSelect}}</td> <td>(all regions = -1)</td> </tr>
 
 	{{range $k,$v := .Data.Params}}
 		<tr> <td>{{$k}}</td> {{range $.Data.CompBoxIds $k}} <td>{{$.TextBox . "0"}}</td> {{end}} <td> {{$v.Unit}}</td> </tr>

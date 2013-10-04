@@ -11,7 +11,7 @@ func Resize(dst, src *data.Slice, layer int) {
 	dstsize := dst.Mesh().Size()
 	srcsize := src.Mesh().Size()
 	util.Assert(dstsize[0] == 1)
-	util.Assert(dst.NComp() == src.NComp())
+	util.Assert(dst.NComp() == 1 && src.NComp() == 1)
 
 	scale1 := srcsize[1] / dstsize[1]
 	scale2 := srcsize[2] / dstsize[2]
@@ -20,8 +20,6 @@ func Resize(dst, src *data.Slice, layer int) {
 
 	cfg := make3DConf(dstsize)
 
-	for c := 0; c < dst.NComp(); c++ {
-		k_resize(dst.DevPtr(c), dstsize[0], dstsize[1], dstsize[2],
-			src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2], layer, scale1, scale2, cfg)
-	}
+	k_resize(dst.DevPtr(0), dstsize[0], dstsize[1], dstsize[2],
+		src.DevPtr(0), srcsize[0], srcsize[1], srcsize[2], layer, scale1, scale2, cfg)
 }

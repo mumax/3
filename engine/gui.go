@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	quants         = make(map[string]Slicer)                 // displayable
-	renderQ        = "m"                                     // quantity to display
+	quants         = make(map[string]Slicer) // displayable
+	renderQ        = "m"                     // quantity to display
+	renderLayer    = 0
 	params         = make(map[string]Param)                  // settable
 	guiRegion      = -1                                      // currently addressed region
 	usingX, usingY = 1, 2                                    // columns to plot

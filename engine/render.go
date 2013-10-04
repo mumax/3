@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"image"
 	"image/jpeg"
 	"log"
 	"net/http"
@@ -10,6 +11,11 @@ import (
 )
 
 var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
+
+var (
+	rescaleBuf *data.Slice // GPU
+	imgBuf     *data.Slice // CPU
+)
 
 // Render image of quantity.
 // Accepts url: /render/name and /render/name/component
@@ -24,21 +30,27 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	if quant == "" {
 		quant = renderQ
 	}
-	h, ok := quants[quant]
+	q, ok := quants[quant]
 	if !ok {
 		err := "render: unknown quantity: " + url
 		log.Println(err)
 		http.Error(w, err, http.StatusNotFound)
 		return
 	} else {
-		var d *data.Slice
-		// TODO: could download only needed component
-		InjectAndWait(func() { d = Download(h) })
-		if comp != "" && d.NComp() > 1 {
-			c := compstr[comp]
-			d = d.Comp(c)
-		}
-		img := draw.Image(d, "auto", "auto")
+		img := render(q, comp)
 		jpeg.Encode(w, img, &jpeg.Options{Quality: 100})
 	}
+}
+
+func render(quant Slicer, comp string) image.Image {
+	var d *data.Slice
+
+	InjectAndWait(func() { d = Download(quant) })
+
+	if comp != "" && d.NComp() > 1 {
+		c := compstr[comp]
+		d = d.Comp(c)
+	}
+	img := draw.Image(d, "auto", "auto")
+	return img
 }

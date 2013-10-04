@@ -15,6 +15,7 @@ var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user spac
 var (
 	rescaleBuf *data.Slice // GPU
 	imgBuf     *data.Slice // CPU
+	img        = new(image.NRGBA)
 )
 
 // Render image of quantity.
@@ -37,12 +38,12 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err, http.StatusNotFound)
 		return
 	} else {
-		img := render(q, comp)
+		render(q, comp)
 		jpeg.Encode(w, img, &jpeg.Options{Quality: 100})
 	}
 }
 
-func render(quant Slicer, comp string) image.Image {
+func render(quant Slicer, comp string) {
 	var d *data.Slice
 
 	InjectAndWait(func() { d = Download(quant) })
@@ -51,6 +52,5 @@ func render(quant Slicer, comp string) image.Image {
 		c := compstr[comp]
 		d = d.Comp(c)
 	}
-	img := draw.Image(d, "auto", "auto")
-	return img
+	draw.On(img, d, "auto", "auto")
 }

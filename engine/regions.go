@@ -13,6 +13,7 @@ const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
+	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
@@ -36,13 +37,7 @@ func (r *Regions) alloc() {
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
-	if id < 0 || id > NREGION {
-		log.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
-	}
-	if id+1 > regions.maxreg {
-		regions.maxreg = id + 1 // we loop < maxreg, so +1
-	}
-	//regions.defined[id] = true
+	defRegionId(id)
 	regions.gpuCacheOK = false
 
 	n := Mesh().Size()
@@ -63,6 +58,22 @@ func DefRegion(id int, s Shape) {
 			}
 		}
 	}
+}
+
+func DefRegionCell(id int, x, y, z int) {
+	defRegionId(id)
+	regions.gpuCacheOK = false
+	regions.arr[z][y][x] = byte(id)
+}
+
+func defRegionId(id int) {
+	if id < 0 || id > NREGION {
+		log.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
+	}
+	if id+1 > regions.maxreg {
+		regions.maxreg = id + 1 // we loop < maxreg, so +1
+	}
+	checkMesh()
 }
 
 // normalized volume (0..1) of region.

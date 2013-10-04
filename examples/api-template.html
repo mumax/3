@@ -91,7 +91,7 @@ SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
 <hr/><h1> Setting a geometry </h1>
 
 Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. E.g.:
-<pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX().Transl(1e-6,0,0))
+<pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
 </code></pre>
 
 {{range .FilterName "setgeom"}} {{template "entry" .}} {{end}}
@@ -104,7 +104,7 @@ Optionally, up to 256 regions can be defined. Each cell is associated with exact
 DefRegion(0, circle(1e-6).Inverse()) // redundant
 </code></pre>
 
-{{range .FilterName "DefRegion" }} {{template "entry" .}} {{end}}
+{{range .FilterName "DefRegion" "DefRegionCell"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Initial magnetization </h1>
@@ -155,7 +155,7 @@ JPol.Add(LoadFile("current.dump"), 1)
 
 <hr/><h1> Output quantities </h1>
 
-{{range .FilterType "*engine.setter" "*engine.adder" "*engine.buffered" "*engine.GetFunc" "*engine.FFTM" "*engine.Regions"}} {{template "entry" .}} {{end}}
+{{range .FilterType "*engine.setter" "*engine.adder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Scheduling output </h1>

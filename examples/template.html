@@ -462,9 +462,9 @@ Since we center on the domain wall we can not really see the motion, despite the
 
 
 
-<hr/><h2>Grainy Permalloy</h2>
+<hr/><h2>Voronoi tessellation</h2>
 
-In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions. We vary the material parameters in each grain, as well as the inter-grain exchange coupling.
+In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions using Voronoi tessellation. We vary the material parameters in each grain, as well as the inter-grain exchange coupling.
 
 {{.Example `
 N := 256
@@ -510,7 +510,7 @@ for i:=1; i<maxReg; i++{
 
 	// inter-grain exchange reduction between all pairs of regions
 	red := 0.5
-	for j:=i; j<maxReg; j++{
+	for j:=i+1; j<maxReg; j++{
 		SetExLen(i, j, sqrt(red) * lex)
 	}
 }

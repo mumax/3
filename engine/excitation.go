@@ -84,7 +84,9 @@ func (p *excitation) Region(r int) TableData {
 	return p.perRegion.Region(r)
 }
 
-// needed for script
+func (e *excitation) IsUniform() bool {
+	return e.perRegion.IsUniform()
+}
 
 func (e *excitation) SetValue(v interface{}) {
 	e.perRegion.SetValue(v) // allows function of time

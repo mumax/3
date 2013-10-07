@@ -9,7 +9,7 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
                      float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
                      float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
                      float* __restrict__ pxLUT, float* __restrict__ pyLUT, float* __restrict__ pzLUT,
-                     float* __restrict__ msatLUT, float* __restrict__ alphaLUT, float* __restrict__ fltLUT,
+                     float* __restrict__ msatLUT, float* __restrict__ alphaLUT, float flt,
                      float* __restrict__ polLUT, float* __restrict__ lambdaLUT, float* __restrict__ epsilonPrimeLUT,
                      int8_t* __restrict__ regions, int N) {
 
@@ -24,12 +24,11 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
         float3 p            = normalized(make_float3(pxLUT[region], pyLUT[region], pzLUT[region]));
         float  Ms           = msatLUT[region];
         float  alpha        = alphaLUT[region];
-        float  flt          = fltLUT[region]; // free-layer thickness
         float  pol          = polLUT[region];
         float  lambda       = lambdaLUT[region];
         float  epsilonPrime = epsilonPrimeLUT[region];
 
-        if (len(J) == 0.0f || Ms == 0.0f || flt == 0.0f) {
+        if (len(J) == 0.0f || Ms == 0.0f) {
             return;
         }
 

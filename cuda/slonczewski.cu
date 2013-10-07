@@ -7,6 +7,7 @@ extern "C" __global__ void
 addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restrict__ tz,
                      float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
                      float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
+                     float preX, float preY,
                      float* __restrict__ pxLUT, float* __restrict__ pyLUT, float* __restrict__ pzLUT,
                      float* __restrict__ msatLUT,
                      float* __restrict__ alphaLUT,
@@ -14,9 +15,7 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
                      float* __restrict__ polLUT,
                      float* __restrict__ lambdaLUT,
                      float* __restrict__ epsilonPrimeLUT,
-                     float* __restrict__ regions,
-                     float preX, float preY,
-                     float meshSizeX, float meshSizeY, float meshSizeZ,
+                     int8_t* __restrict__ regions,
                      int N) {
 
     int I =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;

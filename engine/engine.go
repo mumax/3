@@ -21,6 +21,7 @@ var (
 func init() {
 	DeclFunc("SetGridSize", setGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("SetCellSize", setCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclFunc("SetPBC", setPBC, `Sets number of repetitions in X,Y,Z`)
 
 	// magnetization
 	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
@@ -54,7 +55,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	if Nx <= 1 {
 		log.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
-	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX)
+	globalmesh = *data.NewMesh(Nz, Ny, Nx, cellSizeZ, cellSizeY, cellSizeX, pbczyx...)
 	log.Println("set mesh:", Mesh().UserString())
 	alloc()
 }
@@ -78,6 +79,7 @@ func normalize(m *data.Slice) {
 var (
 	gridsize []int
 	cellsize []float64
+	pbczyx   []int
 )
 
 func setGridSize(Nx, Ny, Nz int) {
@@ -92,6 +94,16 @@ func setCellSize(cx, cy, cz float64) {
 	if gridsize != nil {
 		SetMesh(gridsize[0], gridsize[1], gridsize[2], cx, cy, cz)
 	}
+}
+
+func setPBC(nx, ny, nz int) {
+	if pbczyx != nil {
+		log.Panicf("PBC alread set")
+	}
+	if globalmesh.Size() != [3]int{0, 0, 0} {
+		log.Panicf("PBC must be set before MeshSize and GridSize")
+	}
+	pbczyx = []int{nz, ny, nx}
 }
 
 // check if mesh is set

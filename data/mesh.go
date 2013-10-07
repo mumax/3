@@ -47,6 +47,10 @@ func (m *Mesh) PBC() [3]int {
 	return m.pbc
 }
 
+func (m *Mesh) SetPBC(nx, ny, nz int) {
+	m.pbc = [3]int{nx, ny, nz}
+}
+
 // Total number of cells, not taking into account PBCs.
 // 	N0 * N1 * N2
 func (m *Mesh) NCell() int {

@@ -58,16 +58,19 @@ func (m *Mesh) WorldSize() [3]float64 {
 	return [3]float64{float64(m.gridSize[0]) * m.cellSize[0], float64(m.gridSize[1]) * m.cellSize[1], float64(m.gridSize[2]) * m.cellSize[2]}
 }
 
-// String representation in internal coordinates (ZYX)
-//func (m *Mesh) InternString() string {
-//	s := m.gridSize
-//	c := m.cellSize
-//	pbc := ""
-//	if m.pbc != [3]int{0, 0, 0} {
-//		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
-//	}
-//	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[0], s[1], s[2], c[0], c[1], c[2], pbc)
-//}
+func (m *Mesh) PBC_code() byte {
+	var code byte
+	if m.pbc[0] != 0 {
+		code = 1
+	}
+	if m.pbc[1] != 0 {
+		code |= 2
+	}
+	if m.pbc[2] != 0 {
+		code |= 4
+	}
+	return code
+}
 
 // String representation in user coordinates (XYZ)
 func (m *Mesh) UserString() string {

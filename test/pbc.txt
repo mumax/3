@@ -1,0 +1,28 @@
+setgridsize(64, 32, 2)
+c := 5e-9
+setcellsize(c, c, c)
+//setpbc(1, 1, 0)
+
+Msat  = 1000e3
+Aex   = 10e-12
+alpha = 1
+
+m = vortex(1, 1)
+
+r := rect(32*c, 16*c)
+dx := 1.5 * 64 * c
+dy := 1.5 * 32 * c
+setgeom( r.repeat(64*c, 32*c, 0).transl(32*c, 16*c, 0) )
+
+defregion(1, xrange(   0, inf).intersect(yrange(   0, inf)))
+defregion(2, xrange(-inf, 0  ).intersect(yrange(   0, inf)))
+defregion(3, xrange(-inf, 0  ).intersect(yrange(-inf, 0  )))
+defregion(4, xrange(   0, inf).intersect(yrange(-inf, 0  )))
+
+run(1e-9)
+save(m)
+
+print(average(m.region(1)))
+print(average(m.region(2)))
+print(average(m.region(3)))
+print(average(m.region(4)))

@@ -34,7 +34,7 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
 
         // derived parameters
         float alphaFac   = 1.0f / (1.0f + alpha * alpha);
-        float beta       = HBAR * GAMMA0 / (MU0 * QE * Ms);    // njn is missing ??
+        float beta       = (HBAR * GAMMA0 / (MU0 * QE)) / Ms;  // njn is missing ??
         float beta_prime = pol * beta;                         // epsilon is missing??
         float lambda2    = lambda * lambda;
         float epsilon    = lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));

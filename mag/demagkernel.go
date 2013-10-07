@@ -31,10 +31,9 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		util.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
 		util.Assert(pbc[0] >= 0 && pbc[1] >= 0 && pbc[2] >= 0)
 		util.Assert(accuracy > 0)
-		// TODO: in case of PBC, this will not be met:
-		util.Assert(size[1]%2 == 0 && size[2]%2 == 0)
+		util.AssertMsg(size[1]%2 == 0 && size[2]%2 == 0, "Even kernel size needed")
 		if size[0] > 1 {
-			util.Assert(size[0]%2 == 0)
+			util.AssertMsg(size[0]%2 == 0, "Even kernel size needed")
 		}
 	}
 

@@ -22,14 +22,14 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	// Shorthand
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
-	periodic := mesh.PBC()
+	pbc := mesh.PBC()
 	log.Println("calculating demag kernel:", "accuracy:", accuracy, ", size:", size[0], "x", size[1], "x", size[2])
 
 	// Sanity check
 	{
 		util.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
 		util.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-		util.Assert(periodic[0] >= 0 && periodic[1] >= 0 && periodic[2] >= 0)
+		util.Assert(pbc[0] >= 0 && pbc[1] >= 0 && pbc[2] >= 0)
 		util.Assert(accuracy > 0)
 		// TODO: in case of PBC, this will not be met:
 		util.Assert(size[1]%2 == 0 && size[2]%2 == 0)
@@ -48,21 +48,17 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	}
 
 	// Field (destination) loop ranges
-	x1, x2 := -(size[X]-1)/2, size[X]/2-1
-	y1, y2 := -(size[Y]-1)/2, size[Y]/2-1
-	z1, z2 := -(size[Z]-1)/2, size[Z]/2-1
+	px := pbc[X] + 1
+	py := pbc[Y] + 1
+	pz := pbc[Z] + 1
+	x1, x2 := -(size[X]*px-1)/2, size[X]*px/2-1
+	y1, y2 := -(size[Y]*py-1)/2, size[Y]*py/2-1
+	z1, z2 := -(size[Z]*pz-1)/2, size[Z]*pz/2-1
 	// support for 2D simulations (thickness 1)
-	if size[X] == 1 && periodic[X] == 0 {
+	if size[X] == 1 && pbc[X] == 0 {
 		x2 = 0
 	}
-	{ // Repeat for PBC:
-		x1 *= (periodic[X] + 1)
-		x2 *= (periodic[X] + 1)
-		y1 *= (periodic[Y] + 1)
-		y2 *= (periodic[Y] + 1)
-		z1 *= (periodic[Z] + 1)
-		z2 *= (periodic[Z] + 1)
-	}
+	log.Println("kernel ranges:", x1, x2, ",", y1, y2, ",", z1, z2)
 
 	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
@@ -82,7 +78,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		pole   [3]float64 // position of point charge on the surface
 		points int        // counts used integration points
 	)
-	for s := 0; s < 3; s++ { // source index Ksdxyz
+	for s := 0; s < 3; s++ { // source index Ksdxyz // TODO: make inner?
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
 		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
@@ -182,6 +178,19 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	kernel[1][0] = kernel[0][1]
 	kernel[2][0] = kernel[0][2]
 	kernel[2][1] = kernel[1][2]
+	for i := 0; i < size[0]; i++ {
+		for j := 0; j < size[1]; j++ {
+			for k := 0; k < size[2]; k++ {
+				if i == size[0]-1 || j == size[1]-1 || k == size[2]-1 {
+					for s := 0; s < 3; s++ {
+						for d := s; d < 3; d++ {
+							array[s][d][i][j][k] = 0
+						}
+					}
+				}
+			}
+		}
+	}
 	return kernel
 }
 

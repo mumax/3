@@ -8,6 +8,10 @@ import (
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
 func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
+	if mesh.PBC_code() != 0 {
+		log.Println("skipping convolution self-test for PBC")
+		return
+	}
 	log.Print("verifying convolution ")
 	inhost := data.NewSlice(3, mesh)
 	initConvTestInput(inhost.Vectors())
@@ -40,7 +44,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 		}
 	}
 	if err > CONV_TOLERANCE {
-		log.Fatal("convolution self-test tolerance: ", err, "FAIL")
+		log.Fatalln("convolution self-test tolerance: ", err, "FAIL")
 	} else {
 		log.Println("convolution self-test tolreance:", err, "OK")
 	}

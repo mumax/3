@@ -14,7 +14,6 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
 		pbc := mesh.PBC()
-		util.Argument(pbc == [3]int{0, 0, 0}) // PBC not supported yet
 		sz := padSize(mesh.Size(), pbc)
 		cs := mesh.CellSize()
 		mesh = data.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)

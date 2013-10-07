@@ -6,5 +6,6 @@
 #define QE     1.60217646E-19     // Electron charge in C
 #define MUB    9.2740091523E-24   // Bohr magneton in J/T
 #define GAMMA0 1.7595e11          // Gyromagnetic ratio of electron, in rad/Ts
+#define HBAR   1.05457173E-34
 
 #endif

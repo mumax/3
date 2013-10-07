@@ -44,7 +44,7 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 	// ...however, we check that the imaginary parts are nearly zero,
 	// just to be sure we did not make a mistake during kernel creation.
 	if maximg/maxreal > FFT_IMAG_TOLERANCE {
-		log.Printf("FFT kernel imaginary/real part: %v\n", maximg/maxreal)
+		log.Fatalf("FFT kernel imaginary/real part: %v\n", maximg/maxreal)
 	}
 }
 

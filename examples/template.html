@@ -500,35 +500,36 @@ defregion(0, circle(N*c).Inverse())
 alpha = 3
 Kc1 = 1000
 
-A   := 13e-12
-Ms  := 860e3
-lex := sqrt(2* A / Ms) // exchange legth
+Aex  = 13e-12
+Msat = 860e3
 
 for i:=1; i<maxReg; i++{
-	// random parameter variation by 10%
-	Msat.SetRegion(i, Ms + randNorm() * 0.1 * Ms)
-	
 	// random cubic anisotropy direction
 	phi := rand() * 2 * pi
 	theta := rand() * pi
-	x := sin(theta) * cos(phi)
-	y := sin(theta) * sin(phi)
-	z := cos(theta)
-	AnisC1.SetRegion(i, vector(x, y, z))
-	AnisC2.SetRegion(i, vector(x, y, z))
 
-	// inter-grain exchange reduction between all pairs of regions
-	red := 0.5
-	for j:=i+1; j<maxReg; j++{
-		SetExLen(i, j, sqrt(red) * lex)
-	}
+	x1 := sin(theta) * cos(phi)
+	y1 := sin(theta) * sin(phi)
+	z1 := cos(theta)
+	AnisC1.SetRegion(i, vector(x1, y1, z1))
+
+	x2 := sin(theta + pi/2) * cos(phi)
+	y2 := sin(theta + pi/2) * sin(phi)
+	z2 := cos(theta + pi/2)
+	AnisC2.SetRegion(i, vector(x2, y2, z2))
+
+	// random 10% anisotropy variation
+	K := 1e5
+	Kc1.SetRegion(i, K + randNorm() * 0.1 * K)
 }
 
 save(regions)
-save(Msat)
+save(Kc1)
+save(AnisC1)
+save(AnisC2)
 
 m = vortex(1, 1)
-run(10e-9)
+run(.1e-9)
 
 save(m)
 `}}

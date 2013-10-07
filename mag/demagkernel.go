@@ -177,10 +177,11 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	kernel[1][0] = kernel[0][1]
 	kernel[2][0] = kernel[0][2]
 	kernel[2][1] = kernel[1][2]
+	_3D := (size[0] > 1)
 	for i := 0; i < size[0]; i++ {
 		for j := 0; j < size[1]; j++ {
 			for k := 0; k < size[2]; k++ {
-				if i == size[0]-1 || j == size[1]-1 || k == size[2]-1 {
+				if (_3D && i == size[0]/2) || j == size[1]/2 || k == size[2]/2 {
 					for s := 0; s < 3; s++ {
 						for d := s; d < 3; d++ {
 							array[s][d][i][j][k] = 0

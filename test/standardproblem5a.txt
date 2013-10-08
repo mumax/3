@@ -42,4 +42,5 @@ J = vector(0, 0, jc)
 autosave(m, 1e-12)
 tableautosave(1e-12)
 
-run(5e-9)
+save(sttorque)
+//run(5e-9)

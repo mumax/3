@@ -6,8 +6,7 @@
 
 extern "C" __global__ void
 addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restrict__ tz,
-                     float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-                     float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
+                     float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz, float* __restrict__ jx,
                      float* __restrict__ pxLUT, float* __restrict__ pyLUT, float* __restrict__ pzLUT,
                      float* __restrict__ msatLUT, float* __restrict__ alphaLUT, float flt,
                      float* __restrict__ polLUT, float* __restrict__ lambdaLUT, float* __restrict__ epsilonPrimeLUT,
@@ -17,10 +16,11 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
     if (I < N) {
 
         float3 m = make_float3(mx[I], my[I], mz[I]);
-        float3 J = make_float3(jx[I], jy[I], jz[I]);
+        float  J = jx[I];
 
         // read parameters
         int8_t region       = regions[I];
+
         float3 p            = normalized(make_float3(pxLUT[region], pyLUT[region], pzLUT[region]));
         float  Ms           = msatLUT[region];
         float  alpha        = alphaLUT[region];
@@ -28,26 +28,21 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
         float  lambda       = lambdaLUT[region];
         float  epsilonPrime = epsilonPrimeLUT[region];
 
-        if (len(J) == 0.0f || Ms == 0.0f) {
+        if (J == 0.0f || Ms == 0.0f) {
             return;
         }
 
-        // derived parameters
-        float alphaFac   = 1.0f / (1.0f + alpha * alpha);
-        float beta       = (HBAR * GAMMA0 / (MU0 * QE)) / Ms;  // njn is missing ??
-        float beta_prime = pol * beta;                         // epsilon is missing??
-        float lambda2    = lambda * lambda;
-        float epsilon    = lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));
+        float gammabeta    = (HBAR * GAMMA0 / (MU0 * QE)) * (J / (flt*Ms) );
 
-        float Jdir  = dot(make_float3(1.0f, 1.0f, 1.0f), normalized(J)); // ??
-        float Jsign = Jdir / fabsf(Jdir);
-        float nJn   = len(J) * Jsign;
+        float lambda2 = lambda * lambda;
+        float epsilon = pol * lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));
 
-        float pre1 = nJn * flt * pol * beta_prime * epsilon / Ms;
-        float pre2 = nJn * flt * beta * epsilonPrime * epsilonPrime / Ms;  // check
+        float A = gammabeta * epsilon;
+        float B = gammabeta * epsilonPrime;
 
-        float  mxpxmFac = alphaFac*(pre1 - alpha * pre2);
-        float  pxmFac   = alphaFac*(pre2 - alpha * pre1);
+        float gilb     = 1.0f / (1.0f + alpha * alpha);
+        float mxpxmFac = gilb * (A - alpha * B);
+        float pxmFac   = gilb * (B - alpha * A);
 
         float3 pxm      = cross(p, m);
         float3 mxpxm    = cross(m, pxm);

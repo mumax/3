@@ -15,7 +15,8 @@ func AddDMI(Beff *data.Slice, m *data.Slice, D_red, A_red float32) {
 	N := mesh.Size()
 	c := mesh.CellSize()
 	cfg := make3DConf(N)
-	util.Argument(N[0] == 1) // 2D implementation only
+	util.AssertMsg(N[0] == 1, "DMI available in 2D only")
+	util.AssertMsg(mesh.PBC_code() == 0, "DMI not available with PBC")
 
 	k_adddmi(Beff.DevPtr(0), Beff.DevPtr(1), Beff.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),

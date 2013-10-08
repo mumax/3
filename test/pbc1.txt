@@ -1,3 +1,5 @@
+// test correct wrapping for exchange
+
 setpbc(2, 2, 0)
 Nx := 128
 Ny := Nx/2

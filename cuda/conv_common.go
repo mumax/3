@@ -31,20 +31,16 @@ func scaleRealParts(dst, src *data.Slice, scale float32) {
 	// Normally, the FFT'ed kernel is purely real because of symmetry,
 	// so we only store the real parts...
 	maximg := float32(0.)
-	maxreal := float32(0.)
 	for i := 0; i < src.Len()/2; i++ {
 		dstList[i] = srcList[2*i] * scale
-		if fabs(srcList[2*i+0]) > maxreal {
-			maxreal = fabs(srcList[2*i+0])
-		}
 		if fabs(srcList[2*i+1]) > maximg {
 			maximg = fabs(srcList[2*i+1])
 		}
 	}
 	// ...however, we check that the imaginary parts are nearly zero,
 	// just to be sure we did not make a mistake during kernel creation.
-	if maximg/maxreal > FFT_IMAG_TOLERANCE {
-		log.Fatalf("FFT kernel imaginary/real part: %v\n", maximg/maxreal)
+	if maximg > FFT_IMAG_TOLERANCE {
+		log.Fatalf("FFT kernel imaginary part: %v\n", maximg)
 	}
 }
 

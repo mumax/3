@@ -6,17 +6,18 @@ import (
 )
 
 var (
-	Alpha, Xi ScalarParam
-	LLTorque  setter     // Landau-Lifshitz torque/γ0, in T
-	STTorque  adder      // Spin-transfer torque/γ0, in T
-	JPol      excitation // Polarized electrical current density
-	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
+	Alpha, Xi, Pol ScalarParam
+	LLTorque       setter     // Landau-Lifshitz torque/γ0, in T
+	STTorque       adder      // Spin-transfer torque/γ0, in T
+	J              excitation // Polarized electrical current density
+	MaxTorque      = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 )
 
 func init() {
 	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
-	JPol.init("JPol", "A/m2", "Polarized electrical current density")
+	J.init("J", "A/m2", "Electrical current density")
+	Pol.init("Pol", "", "Electrical current polarization", nil)
 
 	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
 
@@ -26,12 +27,12 @@ func init() {
 	})
 
 	STTorque.init(3, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
-		if !JPol.isZero() {
-			jspin, rec := JPol.Slice()
+		if !J.isZero() {
+			jspin, rec := J.Slice()
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
-			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), regions.Gpu())
+			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
 		}
 	})
 

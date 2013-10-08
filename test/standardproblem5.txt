@@ -16,7 +16,8 @@
 
 	alpha = 0.1
 	xi    = 0.05
-	JPol  = vector(1e12, 0, 0)
+	J     = vector(1e12, 0, 0)
+	Pol   = 1
 
 	run(1e-9) // run
 

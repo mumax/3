@@ -10,8 +10,8 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
                  float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
                  float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
                  float cx, float cy, float cz,
-                 float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, int8_t* __restrict__ regions,
-                 int N0, int N1, int N2, int8_t PBC) {
+                 float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, float* __restrict__ polLUT,
+                 int8_t* __restrict__ regions, int N0, int N1, int N2, int8_t PBC) {
 
     int i = blockIdx.z * blockDim.z + threadIdx.z;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -27,10 +27,11 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
     float alpha = alphaLUT[r];
     float xi    = xiLUT[r];
     float bsat  = bsatLUT[r];
+    float pol   = polLUT[r];
     float b = PREFACTOR / (bsat * (1.0f + xi*xi));
-    float Jx = jx[I];
-    float Jy = jy[I];
-    float Jz = jz[I];
+    float Jx = pol*jx[I];
+    float Jy = pol*jy[I];
+    float Jz = pol*jz[I];
 
     float3 hspin = make_float3(0.0f, 0.0f, 0.0f); // (u·∇)m
     if (Jx != 0.0f) {

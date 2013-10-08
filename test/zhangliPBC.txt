@@ -15,7 +15,8 @@ run(1e-9)
 
 alpha = 0.01
 xi    = 0.1
-JPol  = vector(1e12, 0, 0)
+J     = vector(1e12, 0, 0)
+Pol   = 1
 
 run(1e-9)
 m1 := average(m)

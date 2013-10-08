@@ -63,8 +63,8 @@ anisU = vector(1,0,0) // Uniaxial anisotropy axis
 Ku1   = 500e3         // Uniaxial anisotropy in J/m3
 
 xi   = 0.04                   // Spin-transfer torque degree of non-adiabaticity
-pol := 0.56                   // Spin polarization
-jpol = vector(pol*1e14, 0, 0) // polarized current density in A/m2
+pol  = 0.56                   // Spin polarization
+j    = vector(1e14, 0, 0)     // current density in A/m2
 
 Dex = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
 
@@ -412,7 +412,8 @@ postStep(ext_centerPMAwall)
 autosave(m, 100e-12)
 
 // Run for 1ns with current through the sample
-jpol = vector(1.5e13, 0, 0)
+j   = vector(1.5e13, 0, 0)
+pol = 1
 run(.5e-9)
 `}}
 
@@ -460,8 +461,8 @@ tableadd(ext_dwspeed) // domain wall speed
 tableautosave(10e-12)
 
 // Run the simulation with current through the sample
-SpinPol:= 0.56
-JPol    = vector(-8e12 * SpinPol, 0, 0)
+pol = 0.56
+J   = vector(-8e12, 0, 0)
 Run(1e-9)
 `}}
 

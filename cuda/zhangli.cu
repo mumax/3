@@ -11,7 +11,7 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
                  float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
                  float cx, float cy, float cz,
                  float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, int8_t* __restrict__ regions,
-                 int N0, int N1, int N2) {
+                 int N0, int N1, int N2, int8_t PBC) {
 
     int i = blockIdx.z * blockDim.z + threadIdx.z;
     int j = blockIdx.y * blockDim.y + threadIdx.y;

@@ -2,13 +2,17 @@ package cuda
 
 import (
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"unsafe"
 )
 
 func AddZhangLiTorque(torque, m, jpol *data.Slice, bsat, alpha, xi LUTPtr, regions *Bytes) {
 
-	c := torque.Mesh().CellSize()
-	N := torque.Mesh().Size()
+	mesh := torque.Mesh()
+	util.AssertMsg(mesh.PBC_code() == 0, "STT not available with PBC")
+
+	c := mesh.CellSize()
+	N := mesh.Size()
 	cfg := make3DConf(N)
 
 	k_addzhanglitorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),

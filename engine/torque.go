@@ -6,11 +6,14 @@ import (
 )
 
 var (
-	Alpha, Xi, Pol ScalarParam
-	LLTorque       setter     // Landau-Lifshitz torque/γ0, in T
-	STTorque       adder      // Spin-transfer torque/γ0, in T
-	J              excitation // Polarized electrical current density
-	MaxTorque      = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
+	Alpha                ScalarParam
+	Xi, Pol              ScalarParam
+	Lambda, EpsilonPrime ScalarParam
+	FixedLayer           VectorParam
+	LLTorque             setter     // Landau-Lifshitz torque/γ0, in T
+	STTorque             adder      // Spin-transfer torque/γ0, in T
+	J                    excitation // Polarized electrical current density
+	MaxTorque            = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 )
 
 func init() {
@@ -18,6 +21,9 @@ func init() {
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
 	J.init("J", "A/m2", "Electrical current density")
 	Pol.init("Pol", "", "Electrical current polarization", nil)
+	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
+	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
+	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 
 	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
 

@@ -104,3 +104,11 @@ func (c Config) RotZ(θ float64) Config {
 		return [3]float64{mx_, my_, m[2]}
 	}
 }
+
+// Infinitely repeats the shape with given period in x, y, z.
+// A period of 0 or infinity means no repetition.
+//func (c Config) Repeat(periodX, periodY, periodZ float64) Config {
+//	return func(x, y, z float64) [3]float64 {
+//		return c(fmod(x, periodX), fmod(y, periodY), fmod(z, periodZ))
+//	}
+//}

@@ -48,7 +48,10 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	log.Print(engine.UNAME, "\n")
+	log.Print("    ", engine.UNAME, "\n")
+	log.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
+	log.Print("    This is free software without any warranty. See license.txt", "\n")
+	log.Print("\n")
 
 	if flag.NArg() != 1 {
 		log.Fatal("need one input file")

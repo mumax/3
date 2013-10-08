@@ -8,9 +8,9 @@ import (
 	"runtime"
 )
 
-const VERSION = "mumax3.2"
+const VERSION = "mumax3.3"
 
-var UNAME = VERSION + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + "(" + runtime.Compiler + ")"
+var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 
 var (
 	globalmesh    data.Mesh     // mesh for m and everything that has the same size

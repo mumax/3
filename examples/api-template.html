@@ -88,6 +88,17 @@ SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
 {{range .FilterName "setgridsize" "setcellsize"}} {{template "entry" .}} {{end}}
 
 
+<hr/><h1> Periodic boundary conditions</h1>
+Optionally, periodic boundary conditions can be enabled <i>before</i> setting the grid size.
+<pre><code>SetPBC(5, 0, 0)        // 5 extra images on left and right sides.
+SetGridSize(128, 64, 1)
+SetCellSize(5e-9, 5e-9, 5e-9)
+</code></pre>
+Setting a nonzero PBC value in a direction enables wrap-around in that direction. The precise value passed determines how many repetitions are seen by the demag field. E.g., in the above example the demag field behaves as if 5 repetitions are present to the left and to the right side. Choosing a large number may cause long initialization time.
+
+{{range .FilterName "SetPBC"}} {{template "entry" .}} {{end}}
+
+
 <hr/><h1> Setting a geometry </h1>
 
 Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. E.g.:

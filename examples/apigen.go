@@ -11,8 +11,6 @@ import (
 	"strings"
 	"text/template"
 	"unicode"
-
-	//	"regexp"
 )
 
 var (
@@ -197,7 +195,6 @@ func match(a, b string) bool {
 	a = strings.ToLower(a)
 	b = strings.ToLower(b)
 	match := a == b
-	println("match", a, "-", b, match)
 	return match
 }
 

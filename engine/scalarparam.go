@@ -25,12 +25,21 @@ func cat(desc, unit string) string {
 }
 
 func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
+	p.setRegionsFunc(region, region+1, f)
+}
+
+func (p *ScalarParam) SetValue(v interface{}) {
+	f := v.(script.ScalarFunction)
+	p.setRegionsFunc(0, NREGION, f)
+}
+
+func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if f.Const() {
-		log.Println(p.Name(), "is constant")
-		p.setRegion(region, []float64{f.Float()})
+		log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
+		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
-		log.Println(p.Name(), "is not constant")
-		p.setFunc(region, region+1, func() []float64 {
+		log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
+		p.setFunc(r1, r2, func() []float64 {
 			return []float64{f.Float()}
 		})
 	}
@@ -38,17 +47,6 @@ func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
 
 func (p *ScalarParam) GetRegion(region int) float64 {
 	return float64(p.getRegion(region)[0])
-}
-
-func (p *ScalarParam) SetValue(v interface{}) {
-	f := v.(script.ScalarFunction)
-	if f.Const() {
-		p.setUniform([]float64{f.Float()})
-	} else {
-		p.setFunc(0, NREGION, func() []float64 {
-			return []float64{f.Float()}
-		})
-	}
 }
 
 func (p *ScalarParam) Eval() interface{}       { return p }

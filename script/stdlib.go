@@ -65,10 +65,13 @@ func (w *World) LoadStdlib() {
 	w.declare("inf", floatLit(math.Inf(1)))
 
 	w.Func("randSeed", intseed, "Sets the random number seed")
-	w.Func("rand", rand.Float64, "Random number between 0 and 1")
-	w.Func("randExp", rand.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
-	w.Func("randNorm", rand.ExpFloat64, "Standard normal random number")
-	w.Func("randInt", randInt, "Random non-negative integer")
+	w.PureFunc("rand", rand.Float64, "Random number between 0 and 1")
+	w.PureFunc("randExp", rand.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
+	w.PureFunc("randNorm", rand.ExpFloat64, "Standard normal random number")
+	w.PureFunc("randInt", randInt, "Random non-negative integer")
+	// NOTE: random fuctions are in prinicple not pure (return different value on every call)
+	// but we declare them pure to avoid them being interpreted as time-dependent.
+	// this could be improved
 }
 
 // script does not know int64

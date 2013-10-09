@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/mumax/3/script"
+	"log"
 	"reflect"
 )
 
@@ -23,8 +24,16 @@ func cat(desc, unit string) string {
 	}
 }
 
-func (p *ScalarParam) SetRegion(region int, value float64) {
-	p.setRegion(region, []float64{value})
+func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
+	if f.Const() {
+		log.Println(p.Name(), "is constant")
+		p.setRegion(region, []float64{f.Float()})
+	} else {
+		log.Println(p.Name(), "is not constant")
+		p.setFunc(region, region+1, func() []float64 {
+			return []float64{f.Float()}
+		})
+	}
 }
 
 func (p *ScalarParam) GetRegion(region int) float64 {

@@ -15,27 +15,28 @@ func (p *VectorParam) init(name, unit, desc string) {
 	DeclLValue(name, p, cat(desc, unit))
 }
 
-func (p *VectorParam) SetRegion(region int, value [3]float64) {
-	//checkRegion(region)
-	p.setRegion(region, value[:])
+func (p *VectorParam) SetRegion(region int, f script.VectorFunction) {
+	p.setRegionsFunc(region, region+1, f)
+}
+
+func (p *VectorParam) SetValue(v interface{}) {
+	f := v.(script.VectorFunction)
+	p.setRegionsFunc(0, NREGION, f)
+}
+
+func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
+	if f.Const() {
+		p.setRegions(r1, r2, slice(f.Float3()))
+	} else {
+		p.setFunc(r1, r2, func() []float64 {
+			return slice(f.Float3())
+		})
+	}
 }
 
 func (p *VectorParam) GetRegion(region int) [3]float64 {
 	v := p.getRegion(region)
 	return unslice(v)
-}
-
-func (p *VectorParam) SetValue(v interface{}) {
-	f := v.(script.VectorFunction)
-	if f.Const() {
-		//log.Println(p.Name(), "is constant")
-		p.setUniform(slice(f.Float3()))
-	} else {
-		//log.Println(p.Name(), "not constant")
-		p.setFunc(0, NREGION, func() []float64 {
-			return slice(f.Float3())
-		})
-	}
 }
 
 func (p *VectorParam) Eval() interface{}       { return p }

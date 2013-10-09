@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
+	"log"
 	"reflect"
 )
 
@@ -62,12 +63,13 @@ func assureGPU(s *data.Slice) *data.Slice {
 }
 
 // user script: has to be 3-vector
-func (e *excitation) SetRegion(region int, value [3]float64) {
-	e.perRegion.setRegion(region, value[:])
+func (e *excitation) SetRegion(region int, f script.VectorFunction) {
+	e.perRegion.SetRegion(region, f)
 }
 
 // for gui (nComp agnostic)
 func (e *excitation) setRegion(region int, value []float64) {
+	log.Println("TODO: time-dep gui")
 	e.perRegion.setRegion(region, value)
 }
 

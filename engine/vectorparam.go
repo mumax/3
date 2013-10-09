@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
+	"log"
 	"reflect"
 )
 
@@ -26,8 +27,10 @@ func (p *VectorParam) SetValue(v interface{}) {
 
 func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	if f.Const() {
+		log.Println(p, "[", r1, ":", r2, "]", "is constant")
 		p.setRegions(r1, r2, slice(f.Float3()))
 	} else {
+		log.Println(p, "[", r1, ":", r2, "]", "is not constant")
 		p.setFunc(r1, r2, func() []float64 {
 			return slice(f.Float3())
 		})

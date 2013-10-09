@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"math"
 )
 
 // input parameter, settable by user
@@ -22,6 +23,7 @@ func (p *inputParam) init(nComp int, name, unit string, children []derived) {
 	p.lut.init(nComp, p)
 	p.descr = descr{name, unit}
 	p.children = children
+	p.timestamp = math.Inf(-1)
 }
 
 func (p *inputParam) update() {

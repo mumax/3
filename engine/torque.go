@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -34,6 +35,7 @@ func init() {
 
 	STTorque.init(3, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !J.isZero() {
+			util.Assert(!Pol.isZero())
 			jspin, rec := J.Slice()
 			if rec {
 				defer cuda.Recycle(jspin)

@@ -32,13 +32,12 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
             return;
         }
 
-        float gammabeta    = (HBAR * GAMMA0 / (MU0 * QE)) * (J / (flt*Ms) );
-
+        float beta    = (HBAR / QE) * (J / (flt*Ms) );
         float lambda2 = lambda * lambda;
         float epsilon = pol * lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));
 
-        float A = gammabeta * epsilon;
-        float B = gammabeta * epsilonPrime;
+        float A = beta * epsilon;
+        float B = beta * epsilonPrime;
 
         float gilb     = 1.0f / (1.0f + alpha * alpha);
         float mxpxmFac = gilb * (A - alpha * B);

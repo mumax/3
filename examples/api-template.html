@@ -63,13 +63,11 @@ Loops are possible as well:
 
 Some of the API features accept a function as argument (e.g.: <code>RunWhile(func()bool)</code>, or all input parameters). In that case, and <i>only</i> in this case, the argument is implicitly converted to a function, which is re-evaluated each time it's needed. E.g.:
 
-<pre><code>
-value := sin(pi*t)  // value is a float64, RHS evaluated only once
+<pre><code>value := sin(pi*t)  // value is a float64, RHS evaluated only once
 Msat = value        // time-independent Msat
 </code></pre>
 versus:
-<pre><code>
-Msat = sin(pi*t)    // RHS converted to function, re-evaluted every time
+<pre><code>Msat = sin(pi*t)    // RHS converted to function, re-evaluted every time
 </code></pre>
 
 

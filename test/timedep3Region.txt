@@ -1,3 +1,5 @@
+// Test time-dependent vector parameter with regions
+
 c:=4e-9
 setgridsize(32, 32, 1)
 setcellsize(c, c, c)
@@ -10,8 +12,12 @@ setgeom(circle(32*4e-9))
 
 f := 1e9
 A := 0.01
+defRegion(0, xrange(0, 0))
 defRegion(1, xrange(-inf, inf))
+defRegion(2, xrange(0, 0))
+B_ext.setRegion(0, vector(0*t, 0, 0))
 B_ext.setRegion(1, vector(A*sin(2*pi*f*t), A*cos(2*pi*f*t), 0))
+B_ext.setRegion(2, vector(0*t, 0, 0))
 
 tableadd(B_ext)
 tableautosave(1e-12)

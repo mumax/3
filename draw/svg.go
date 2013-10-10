@@ -35,6 +35,10 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 			my := My[i][j]
 			mz := Mz[i][j]
 
+			if mx*mx+my*my+mz*mz == 0 {
+				continue
+			}
+
 			theta := math.Atan2(float64(my), float64(mx))
 			c := math.Cos(theta)
 			s := math.Sin(theta)

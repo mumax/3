@@ -9,7 +9,7 @@ import (
 // 	m: normalized magnetization
 // 	B: effective field in Tesla
 // 	Aex_red: 2*Aex / (Msat * 1e18 m2)
-func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes) {
+func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, str int) {
 	mesh := B.Mesh()
 	c := mesh.CellSize()
 	w0 := float32(1e-18 / (c[0] * c[0]))
@@ -18,8 +18,8 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes) {
 	N := mesh.Size()
 	pbc := mesh.PBC_code()
 	cfg := make3DConf(N)
-	k_addexchange(B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
+	k_addexchange_async(B.DevPtr(0), B.DevPtr(1), B.DevPtr(2),
 		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
 		unsafe.Pointer(Aex_red), regions.Ptr,
-		w0, w1, w2, N[0], N[1], N[2], pbc, cfg)
+		w0, w1, w2, N[0], N[1], N[2], pbc, cfg, str)
 }

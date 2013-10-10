@@ -25,7 +25,7 @@ func init() {
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
 		if Dex.isZero() {
-			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
+			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), 0) // async
 		} else {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
@@ -36,7 +36,7 @@ func init() {
 			msat := Msat.GetRegion(0)
 			D := Dex.GetRegion(0) / msat
 			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D), float32(A)) // dmi+exchange
+			cuda.AddDMI(dst, M.buffer, float32(D), float32(A), 0) // dmi+exchange
 		}
 	})
 

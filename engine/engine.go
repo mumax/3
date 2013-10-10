@@ -34,6 +34,7 @@ func init() {
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
 		B_therm.addTo(dst)
+		cuda.Sync(0)
 	})
 
 	// torque inited in torque.go

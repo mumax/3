@@ -49,7 +49,7 @@ func init() {
 			for i := 0; i < 3; i++ {
 				generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), 0, 1)
 				cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
-					kmu0_VgammaDt, regions.Gpu())
+					kmu0_VgammaDt, regions.Gpu(), 0)
 			}
 		}
 	})

@@ -4,6 +4,7 @@ import (
 	"github.com/ajstarks/svgo"
 	"io"
 	"math"
+	"strconv"
 )
 
 func SVG(out io.Writer, arr [3][][][]float32) {
@@ -30,19 +31,22 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 		for j := 0; j < w; j++ {
 			x := S*j + S/2
 
-			mx := float64(Mx[i][j])
-			my := float64(My[i][j])
-			mz := float64(Mz[i][j])
+			mx := Mx[i][j]
+			my := My[i][j]
+			mz := Mz[i][j]
 
-			theta := math.Atan2(my, mx)
+			theta := math.Atan2(float64(my), float64(mx))
 			c := math.Cos(theta)
 			s := math.Sin(theta)
-			r1 := r1 * math.Cos(math.Asin(mz))
+			r1 := r1 * math.Cos(math.Asin(float64(mz)))
 
 			xs := []int{int(r1*c) + x, int(r2*s-r1*c) + x, int(-r2*s-r1*c) + x}
 			ys := []int{int(r1*s) + y, int(-r2*c-r1*s) + y, int(r2*c-r1*s) + y}
 
-			canvas.Polygon(xs, ys)
+			col := HSLMap(mx, my, mz)
+			style := "stroke:black;fill:#" + strconv.FormatInt(int64(col.R), 16) + strconv.FormatInt(int64(col.G), 16) + strconv.FormatInt(int64(col.B), 16)
+
+			canvas.Polygon(xs, ys, style)
 		}
 	}
 

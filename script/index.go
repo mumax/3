@@ -27,3 +27,7 @@ func (e *index) Eval() interface{} {
 	i := e.index.Eval().(int)
 	return x.Index(i).Interface()
 }
+
+func (e *index) Child() []Expr {
+	return []Expr{e.x, e.index}
+}

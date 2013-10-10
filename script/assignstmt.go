@@ -58,6 +58,10 @@ func (a *assignStmt) Eval() interface{} {
 	return nil
 }
 
+func (a *assignStmt) Child() []Expr {
+	return []Expr{a.lhs, a.rhs}
+}
+
 func (w *World) compileAddAssign(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
 	l := w.compileLvalue(lhs)
 	x := typeConv(a.Pos(), l, float64_t)

@@ -45,3 +45,7 @@ func (e *selector) Eval() interface{} {
 func (e *selector) Type() reflect.Type {
 	return reflect.New(e.x.Type()).Elem().MethodByName(e.method).Type()
 }
+
+func (e *selector) Child() []Expr {
+	return []Expr{e.x}
+}

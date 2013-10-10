@@ -92,6 +92,7 @@ type intToFloat64 struct{ in Expr }
 func (c *intToFloat64) Eval() interface{}  { return float64(c.in.Eval().(int)) }
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
 func (c *intToFloat64) Const() bool        { return Const(c.in) }
+func (c *intToFloat64) Child() []Expr      { return []Expr{c.in} }
 
 // converts float64 to int
 type float64ToInt struct{ in Expr }
@@ -99,20 +100,24 @@ type float64ToInt struct{ in Expr }
 func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
 func (c *float64ToInt) Type() reflect.Type { return int_t }
 func (c *float64ToInt) Const() bool        { return Const(c.in) }
+func (c *float64ToInt) Child() []Expr      { return []Expr{c.in} }
 
 type boolToFunc struct{ in Expr }
 
 func (c *boolToFunc) Eval() interface{}  { return func() bool { return c.in.Eval().(bool) } }
 func (c *boolToFunc) Type() reflect.Type { return func_bool_t }
+func (c *boolToFunc) Child() []Expr      { return []Expr{c.in} }
 
 type getScalar struct{ in ScalarIf }
 type getVector struct{ in VectorIf }
 
 func (c *getScalar) Eval() interface{}  { return c.in.Get() }
 func (c *getScalar) Type() reflect.Type { return float64_t }
+func (c *getScalar) Child() []Expr      { return nil }
 
 func (c *getVector) Eval() interface{}  { return c.in.Get() }
 func (c *getVector) Type() reflect.Type { return vector_t }
+func (c *getVector) Child() []Expr      { return nil }
 
 func safe_int(x float64) int {
 	i := int(x)
@@ -129,22 +134,3 @@ type ScalarIf interface {
 type VectorIf interface {
 	Get() [3]float64
 } // TODO: Vector
-
-// converts float64 to func()float64
-//type float64ToFunc struct{ in Expr }
-//
-//func (c *float64ToFunc) Eval() interface{}  { return func() float64 { return c.in.Eval().(float64) } }
-//func (c *float64ToFunc) Type() reflect.Type { return func_float64_t }
-//
-//// converts float64 to func()float64
-//type funcToFloat64 struct{ in Expr }
-//
-//func (c *funcToFloat64) Eval() interface{}  { return (c.in.Eval().(func() float64))() }
-//func (c *funcToFloat64) Type() reflect.Type { return float64_t }
-//
-//type vectorToFunc struct{ in Expr }
-//
-//func (c *vectorToFunc) Eval() interface{} {
-//	return func() [3]float64 { return c.in.Eval().([3]float64) }
-//}
-//func (c *vectorToFunc) Type() reflect.Type { return func_vector_t }

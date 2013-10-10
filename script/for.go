@@ -27,3 +27,7 @@ func (w *World) compileForStmt(n *ast.ForStmt) *forStmt {
 		post: w.compileStmt(n.Post),
 		body: w.compileBlockStmt_noScope(n.Body)}
 }
+
+func (e *forStmt) Child() []Expr {
+	return []Expr{e.init, e.cond, e.post, e.body}
+}

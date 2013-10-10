@@ -32,3 +32,7 @@ func (b *blockStmt) Eval() interface{} {
 func (b *blockStmt) Type() reflect.Type {
 	return nil
 }
+
+func (b *blockStmt) Child() []Expr {
+	return []Expr(*b)
+}

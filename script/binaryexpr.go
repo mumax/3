@@ -37,6 +37,7 @@ type binaryExpr struct{ x, y Expr }
 
 func (b *binaryExpr) Type() reflect.Type { return float64_t }
 func (b *binaryExpr) Const() bool        { return Const(b.x) && Const(b.y) }
+func (b *binaryExpr) Child() []Expr      { return []Expr{b.x, b.y} }
 
 type add struct{ binaryExpr }
 type sub struct{ binaryExpr }
@@ -52,6 +53,7 @@ type comp binaryExpr
 
 func (b *comp) Type() reflect.Type { return bool_t }
 func (b *comp) Const() bool        { return Const(b.x) && Const(b.y) }
+func (b *comp) Child() []Expr      { return []Expr{b.x, b.y} }
 
 type lss struct{ comp }
 type gtr struct{ comp }

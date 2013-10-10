@@ -25,7 +25,7 @@ type copyunpad_args struct {
 }
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
-func k_copyunpad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config, str cu.Stream) {
+func k_copyunpad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config, str int) {
 	if copyunpad_code == 0 {
 		copyunpad_code = fatbinLoad(copyunpad_map, "copyunpad")
 	}
@@ -50,14 +50,14 @@ func k_copyunpad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Po
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_S2)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for copyunpad CUDA kernel, synchronized.
 func k_copyunpad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config) {
-	str := stream()
-	k_copyunpad_async(dst, D0, D1, D2, src, S0, S1, S2, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_copyunpad_async(dst, D0, D1, D2, src, S0, S1, S2, cfg, stream)
+	Sync(stream)
 }
 
 var copyunpad_map = map[int]string{0: "",

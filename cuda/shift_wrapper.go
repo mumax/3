@@ -25,7 +25,7 @@ type shift_args struct {
 }
 
 // Wrapper for shift CUDA kernel, asynchronous.
-func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 int, sh0 int, sh1 int, sh2 int, cfg *config, str cu.Stream) {
+func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 int, sh0 int, sh1 int, sh2 int, cfg *config, str int) {
 	if shift_code == 0 {
 		shift_code = fatbinLoad(shift_map, "shift")
 	}
@@ -50,14 +50,14 @@ func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 in
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_sh2)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for shift CUDA kernel, synchronized.
 func k_shift(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 int, sh0 int, sh1 int, sh2 int, cfg *config) {
-	str := stream()
-	k_shift_async(dst, src, N0, N1, N2, sh0, sh1, sh2, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_shift_async(dst, src, N0, N1, N2, sh0, sh1, sh2, cfg, stream)
+	Sync(stream)
 }
 
 var shift_map = map[int]string{0: "",

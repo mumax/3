@@ -21,7 +21,7 @@ type regiondecode_args struct {
 }
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
-func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str int) {
 	if regiondecode_code == 0 {
 		regiondecode_code = fatbinLoad(regiondecode_map, "regiondecode")
 	}
@@ -38,14 +38,14 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for regiondecode CUDA kernel, synchronized.
 func k_regiondecode(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	str := stream()
-	k_regiondecode_async(dst, LUT, regions, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_regiondecode_async(dst, LUT, regions, N, cfg, stream)
+	Sync(stream)
 }
 
 var regiondecode_map = map[int]string{0: "",

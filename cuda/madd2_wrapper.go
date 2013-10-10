@@ -23,7 +23,7 @@ type madd2_args struct {
 }
 
 // Wrapper for madd2 CUDA kernel, asynchronous.
-func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config, str cu.Stream) {
+func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config, str int) {
 	if madd2_code == 0 {
 		madd2_code = fatbinLoad(madd2_map, "madd2")
 	}
@@ -44,14 +44,14 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(madd2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(madd2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for madd2 CUDA kernel, synchronized.
 func k_madd2(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config) {
-	str := stream()
-	k_madd2_async(dst, src1, fac1, src2, fac2, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_madd2_async(dst, src1, fac1, src2, fac2, N, cfg, stream)
+	Sync(stream)
 }
 
 var madd2_map = map[int]string{0: "",

@@ -25,7 +25,7 @@ type regionaddv_args struct {
 }
 
 // Wrapper for regionaddv CUDA kernel, asynchronous.
-func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Pointer, LUTx unsafe.Pointer, LUTy unsafe.Pointer, LUTz unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Pointer, LUTx unsafe.Pointer, LUTy unsafe.Pointer, LUTz unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str int) {
 	if regionaddv_code == 0 {
 		regionaddv_code = fatbinLoad(regionaddv_map, "regionaddv")
 	}
@@ -50,14 +50,14 @@ func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Po
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(regionaddv_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(regionaddv_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for regionaddv CUDA kernel, synchronized.
 func k_regionaddv(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Pointer, LUTx unsafe.Pointer, LUTy unsafe.Pointer, LUTz unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	str := stream()
-	k_regionaddv_async(dstx, dsty, dstz, LUTx, LUTy, LUTz, regions, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_regionaddv_async(dstx, dsty, dstz, LUTx, LUTy, LUTz, regions, N, cfg, stream)
+	Sync(stream)
 }
 
 var regionaddv_map = map[int]string{0: "",

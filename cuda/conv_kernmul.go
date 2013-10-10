@@ -4,12 +4,11 @@ package cuda
 // Launch configs range over all complex elements of fft input. This could be optimized: range only over kernel.
 
 import (
-	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
 
-func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str cu.Stream) {
+func kernMulRSymm2Dyz_async(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str int) {
 	util.Argument(K11.Len() == (N1/2+1)*N2)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
@@ -17,10 +16,10 @@ func kernMulRSymm2Dyz(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str c
 
 	k_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
-		N1, N2, cfg, str)
+		N1, N2, cfg, 0)
 }
 
-func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int, str cu.Stream) {
+func kernMulRSymm2Dx_async(fftMx, K00 *data.Slice, N1, N2 int, str int) {
 	util.Argument(K00.Len() == (N1/2+1)*N2)
 	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
 
@@ -31,7 +30,7 @@ func kernMulRSymm2Dx(fftMx, K00 *data.Slice, N1, N2 int, str cu.Stream) {
 
 // Does not yet use Y mirror symmetry!!
 // Even though it is implemented partially in kernel
-func kernMulRSymm3D(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int, str cu.Stream) {
+func kernMulRSymm3D_async(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int, str int) {
 	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
 	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
 

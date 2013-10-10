@@ -24,7 +24,7 @@ type kernmulRSymm2Dyz_args struct {
 }
 
 // Wrapper for kernmulRSymm2Dyz CUDA kernel, asynchronous.
-func k_kernmulRSymm2Dyz_async(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, N1 int, N2 int, cfg *config, str cu.Stream) {
+func k_kernmulRSymm2Dyz_async(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, N1 int, N2 int, cfg *config, str int) {
 	if kernmulRSymm2Dyz_code == 0 {
 		kernmulRSymm2Dyz_code = fatbinLoad(kernmulRSymm2Dyz_map, "kernmulRSymm2Dyz")
 	}
@@ -47,14 +47,14 @@ func k_kernmulRSymm2Dyz_async(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy
 	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_N2)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(kernmulRSymm2Dyz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(kernmulRSymm2Dyz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for kernmulRSymm2Dyz CUDA kernel, synchronized.
 func k_kernmulRSymm2Dyz(fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, N1 int, N2 int, cfg *config) {
-	str := stream()
-	k_kernmulRSymm2Dyz_async(fftMy, fftMz, fftKyy, fftKzz, fftKyz, N1, N2, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_kernmulRSymm2Dyz_async(fftMy, fftMz, fftKyy, fftKzz, fftKyz, N1, N2, cfg, stream)
+	Sync(stream)
 }
 
 var kernmulRSymm2Dyz_map = map[int]string{0: "",

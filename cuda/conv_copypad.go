@@ -1,7 +1,6 @@
 package cuda
 
 import (
-	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"unsafe"
@@ -9,7 +8,7 @@ import (
 
 // Copies src (larger) into dst (smaller).
 // Uses to extract demag field after convolution on padded m.
-func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
+func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int, str int) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Argument(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 
@@ -21,7 +20,7 @@ func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int, str cu.Stream) {
 
 // Copies src into dst, which is larger, and multiplies by vol*Bsat.
 // The remainder of dst is not filled with zeros.
-func copyPadMul(dst, src, vol *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr, regions *Bytes, str cu.Stream) {
+func copyPadMul(dst, src, vol *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr, regions *Bytes, str int) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 

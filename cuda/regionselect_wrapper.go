@@ -22,7 +22,7 @@ type regionselect_args struct {
 }
 
 // Wrapper for regionselect CUDA kernel, asynchronous.
-func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config, str cu.Stream) {
+func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config, str int) {
 	if regionselect_code == 0 {
 		regionselect_code = fatbinLoad(regionselect_map, "regionselect")
 	}
@@ -41,14 +41,14 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for regionselect CUDA kernel, synchronized.
 func k_regionselect(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config) {
-	str := stream()
-	k_regionselect_async(dst, src, regions, region, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_regionselect_async(dst, src, regions, region, N, cfg, stream)
+	Sync(stream)
 }
 
 var regionselect_map = map[int]string{0: "",

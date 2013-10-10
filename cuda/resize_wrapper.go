@@ -28,7 +28,7 @@ type resize_args struct {
 }
 
 // Wrapper for resize CUDA kernel, asynchronous.
-func k_resize_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, layer int, scale1 int, scale2 int, cfg *config, str cu.Stream) {
+func k_resize_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, layer int, scale1 int, scale2 int, cfg *config, str int) {
 	if resize_code == 0 {
 		resize_code = fatbinLoad(resize_map, "resize")
 	}
@@ -59,14 +59,14 @@ func k_resize_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Point
 	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_scale2)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(resize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(resize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for resize CUDA kernel, synchronized.
 func k_resize(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, layer int, scale1 int, scale2 int, cfg *config) {
-	str := stream()
-	k_resize_async(dst, D0, D1, D2, src, S0, S1, S2, layer, scale1, scale2, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_resize_async(dst, D0, D1, D2, src, S0, S1, S2, layer, scale1, scale2, cfg, stream)
+	Sync(stream)
 }
 
 var resize_map = map[int]string{0: "",

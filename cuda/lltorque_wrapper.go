@@ -29,7 +29,7 @@ type lltorque_args struct {
 }
 
 // Wrapper for lltorque CUDA kernel, asynchronous.
-func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str int) {
 	if lltorque_code == 0 {
 		lltorque_code = fatbinLoad(lltorque_map, "lltorque")
 	}
@@ -62,14 +62,14 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for lltorque CUDA kernel, synchronized.
 func k_lltorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	str := stream()
-	k_lltorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alphaLUT, regions, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_lltorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alphaLUT, regions, N, cfg, stream)
+	Sync(stream)
 }
 
 var lltorque_map = map[int]string{0: "",

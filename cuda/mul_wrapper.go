@@ -21,7 +21,7 @@ type mul_args struct {
 }
 
 // Wrapper for mul CUDA kernel, asynchronous.
-func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config, str int) {
 	if mul_code == 0 {
 		mul_code = fatbinLoad(mul_map, "mul")
 	}
@@ -38,14 +38,14 @@ func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, 
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for mul CUDA kernel, synchronized.
 func k_mul(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config) {
-	str := stream()
-	k_mul_async(dst, a, b, N, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_mul_async(dst, a, b, N, cfg, stream)
+	Sync(stream)
 }
 
 var mul_map = map[int]string{0: "",

@@ -28,9 +28,8 @@ func RegionSelect(dst, src *data.Slice, regions *Bytes, region byte) {
 	N := dst.Len()
 	cfg := make1DConf(N)
 
-	str := stream()
 	for c := 0; c < dst.NComp(); c++ {
-		k_regionselect_async(dst.DevPtr(c), src.DevPtr(c), regions.Ptr, region, N, cfg, str)
+		k_regionselect_async(dst.DevPtr(c), src.DevPtr(c), regions.Ptr, region, N, cfg, c)
 	}
-	syncAndRecycle(str)
+	SyncAll()
 }

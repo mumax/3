@@ -38,7 +38,7 @@ type addzhanglitorque_args struct {
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, asynchronous.
-func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, N0 int, N1 int, N2 int, PBC byte, cfg *config, str cu.Stream) {
+func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, N0 int, N1 int, N2 int, PBC byte, cfg *config, str int) {
 	if addzhanglitorque_code == 0 {
 		addzhanglitorque_code = fatbinLoad(addzhanglitorque_map, "addzhanglitorque")
 	}
@@ -89,14 +89,14 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 	_a_.argptr[20] = unsafe.Pointer(&_a_.arg_PBC)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, synchronized.
 func k_addzhanglitorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, N0 int, N1 int, N2 int, PBC byte, cfg *config) {
-	str := stream()
-	k_addzhanglitorque_async(tx, ty, tz, mx, my, mz, jx, jy, jz, cx, cy, cz, bsatLUT, alphaLUT, xiLUT, polLUT, regions, N0, N1, N2, PBC, cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_addzhanglitorque_async(tx, ty, tz, mx, my, mz, jx, jy, jz, cx, cy, cz, bsatLUT, alphaLUT, xiLUT, polLUT, regions, N0, N1, N2, PBC, cfg, stream)
+	Sync(stream)
 }
 
 var addzhanglitorque_map = map[int]string{0: "",

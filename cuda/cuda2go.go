@@ -162,7 +162,7 @@ type {{.Name}}_args struct{
 }
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
-func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str cu.Stream) {
+func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str int) {
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = fatbinLoad({{.Name}}_map, "{{.Name}}")
 	}
@@ -174,14 +174,14 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 	{{end}}
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for {{.Name}} CUDA kernel, synchronized.
 func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
-	str := stream()
-	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} cfg, str)
-	syncAndRecycle(str)
+	const stream = 0
+	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} cfg, stream)
+	Sync(stream)
 }
 
 var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}},

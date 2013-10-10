@@ -23,7 +23,7 @@ func (w *World) compileIncDecStmt(n *ast.IncDecStmt) Expr {
 type incdec struct{ x Expr }
 
 func (e *incdec) Type() reflect.Type { return float64_t }
-func (e *incdec) Const() bool        { return Const(e.x) }
+func (e *incdec) Cnst() bool         { return Cnst(e.x) }
 func (e *incdec) Child() []Expr      { return []Expr{e.x} }
 
 type addone struct{ incdec }

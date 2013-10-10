@@ -1,12 +1,12 @@
 package script
 
-func Const(e Expr) bool {
+func Cnst(e Expr) bool { // TODO: rm (unused)
 	switch e := e.(type) {
 	default:
 		return false
 	case interface {
-		Const() bool
+		Cnst() bool
 	}:
-		return e.Const()
+		return e.Cnst()
 	}
 }

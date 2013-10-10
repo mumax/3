@@ -34,7 +34,7 @@ func (p *ScalarParam) SetValue(v interface{}) {
 }
 
 func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
-	if f.Const() {
+	if Const(f) {
 		log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
@@ -52,3 +52,8 @@ func (p *ScalarParam) GetRegion(region int) float64 {
 func (p *ScalarParam) Eval() interface{}       { return p }
 func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }
+
+func Const(e script.Expr) bool {
+	t := World.Resolve("t")
+	return !script.Contains(e, t)
+}

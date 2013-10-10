@@ -82,12 +82,12 @@ func (c *call) Type() reflect.Type {
 	}
 }
 
-func (c *call) Const() bool {
+func (c *call) Cnst() bool {
 	if _, ok := c.f.(interface {
 		Pure()
 	}); ok {
 		for _, a := range c.args {
-			if !Const(a) {
+			if !Cnst(a) {
 				return false
 			}
 		}

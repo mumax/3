@@ -1,9 +1,5 @@
 package script
 
-import (
-	"log"
-)
-
 func Child(e Expr) []Expr {
 	if c, ok := e.(interface {
 		Child() []Expr
@@ -15,7 +11,6 @@ func Child(e Expr) []Expr {
 }
 
 func Contains(tree, search Expr) bool {
-	log.Println(tree)
 	if tree == search {
 		return true
 	} else {

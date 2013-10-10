@@ -106,6 +106,17 @@ func (w *scope) resolve(pos token.Pos, name string) Expr {
 	}
 }
 
+func (w *World) Resolve(identifier string) (e Expr) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			e = nil // not found
+		}
+	}()
+	e = w.toplevel.resolve(0, identifier)
+	return
+}
+
 // add documentation for identifier
 func (w *scope) document(ident string, doc ...string) {
 	if w.Doc != nil { // means we want doc for this scope (toplevel only)

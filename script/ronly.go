@@ -22,5 +22,3 @@ func (l *reflectROnly) Eval() interface{} {
 func (l *reflectROnly) Type() reflect.Type {
 	return l.elem.Type()
 }
-
-func (l *reflectROnly) Child() []Expr { return nil }

@@ -44,6 +44,25 @@ func TestEval(t *testing.T) {
 	}
 }
 
+func TestContains(t *testing.T) {
+	w := NewWorld()
+
+	var x float64
+	w.Var("x", &x)
+
+	X := w.Resolve("x")
+	if X == nil {
+		t.Fail()
+	}
+
+	if !Contains(w.MustCompile("x+1"), X) {
+		t.Fail()
+	}
+	if Contains(w.MustCompile("1+1"), X) {
+		t.Fail()
+	}
+}
+
 func TestTypes(t *testing.T) {
 	w := NewWorld()
 

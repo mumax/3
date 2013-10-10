@@ -159,7 +159,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
 	}
-	SyncAll()
+	//SyncAll()
 }
 
 func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
@@ -187,8 +187,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	for i := 1; i < 3; i++ { // BW FFT yz
 		c.bwFFT(i, outp)
 	}
-
-	SyncAll()
+	//SyncAll()
 }
 
 func (c *DemagConvolution) is2D() bool {

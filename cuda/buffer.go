@@ -38,7 +38,7 @@ func Buffer(nComp int, m *data.Mesh) *data.Slice {
 	buf_pool[N] = pool[:len(pool)-nFromPool]
 
 	for i := nFromPool; i < nComp; i++ {
-		log.Println("cuda: alloc buffer")
+		//log.Println("cuda: alloc buffer")
 		if buf_count >= buf_max {
 			log.Panic("too many buffers in use, possible memory leak")
 		}

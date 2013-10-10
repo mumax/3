@@ -27,6 +27,7 @@ Output file names are automatically assigned.
 package main
 
 import (
+	"compress/gzip"
 	"flag"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
@@ -46,6 +47,7 @@ var (
 	flag_png       = flag.Bool("png", false, "PNG output")
 	flag_jpeg      = flag.Bool("jpg", false, "JPEG output")
 	flag_svg       = flag.Bool("svg", false, "SVG output")
+	flag_svgz      = flag.Bool("svgz", false, "SVGZ output (compressed)")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF (OVF1) output`)
 	flag_ovf1      = flag.String("ovf1", "", `"text" or "binary" OVF1 output`)
@@ -151,6 +153,15 @@ func process(f *data.Slice, info data.Meta, name string) {
 		out := open(name + ".svg")
 		defer out.Close()
 		draw.SVG(out, f.Vectors())
+		haveOutput = true
+	}
+
+	if *flag_svgz {
+		out1 := open(name + ".svgz")
+		defer out1.Close()
+		out2 := gzip.NewWriter(out1)
+		defer out2.Close()
+		draw.SVG(out2, f.Vectors())
 		haveOutput = true
 	}
 

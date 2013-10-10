@@ -29,6 +29,7 @@ package main
 import (
 	"flag"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
 	"github.com/mumax/3/util"
 	"log"
 	"os"
@@ -44,6 +45,7 @@ var (
 	flag_format    = flag.String("f", "%v", "Printf format string")
 	flag_png       = flag.Bool("png", false, "PNG output")
 	flag_jpeg      = flag.Bool("jpg", false, "JPEG output")
+	flag_svg       = flag.Bool("svg", false, "SVG output")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF (OVF1) output`)
 	flag_ovf1      = flag.String("ovf1", "", `"text" or "binary" OVF1 output`)
@@ -142,6 +144,13 @@ func process(f *data.Slice, info data.Meta, name string) {
 		out := open(name + ".png")
 		defer out.Close()
 		dumpPNG(out, f)
+		haveOutput = true
+	}
+
+	if *flag_svg {
+		out := open(name + ".svg")
+		defer out.Close()
+		draw.SVG(out, f.Vectors())
 		haveOutput = true
 	}
 

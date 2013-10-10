@@ -60,7 +60,7 @@ func (p *lut) gpuLUT1() cuda.LUTPtr {
 func (p *lut) isZero() bool {
 	v := p.cpuLUT()
 	for c := range v {
-		for i := range v[c] { // TODO: regions.maxreg
+		for i := 0; i < regions.maxreg; i++ {
 			if v[c][i] != 0 {
 				return false
 			}

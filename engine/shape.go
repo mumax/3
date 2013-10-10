@@ -90,8 +90,8 @@ func Layers(a, b int) Shape {
 	}
 	c := Mesh().CellSize()[0]
 	n := float64(Nz)
-	z1 := ((float64(a) - n/2 - 0.5) * c)
-	z2 := ((float64(b-1) - n/2 + 0.5) * c)
+	z1 := ((float64(a) - n/2) * c)
+	z2 := ((float64(b) - n/2) * c)
 	return ZRange(z1, z2)
 }
 

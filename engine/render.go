@@ -49,6 +49,13 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 
 func render(quant Slicer, comp string) {
 
+	defer func() { // TODO: remove
+		err := recover()
+		if err != nil {
+			log.Println("render:", err)
+		}
+	}()
+
 	size := quant.Mesh().Size()
 
 	// don't slice out of bounds
@@ -74,6 +81,13 @@ func render(quant Slicer, comp string) {
 
 	// rescale and download
 	InjectAndWait(func() {
+
+		defer func() {// TODO: remove
+			err := recover()
+			if err != nil {
+				log.Println("render:", err)
+			}
+		}()
 
 		// make sure buffers are there (in CUDA context)
 		if rescaleBuf.Mesh().Size() != size {

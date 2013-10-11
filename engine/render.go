@@ -49,12 +49,12 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 
 func render(quant Slicer, comp string) {
 
-	defer func() { // TODO: remove
-		err := recover()
-		if err != nil {
-			log.Println("render:", err)
-		}
-	}()
+	//	defer func() { // TODO: remove
+	//		err := recover()
+	//		if err != nil {
+	//			log.Println("render:", err)
+	//		}
+	//	}()
 
 	size := quant.Mesh().Size()
 
@@ -82,25 +82,19 @@ func render(quant Slicer, comp string) {
 	// make sure buffers are there
 	if imgBuf.Mesh().Size() != size {
 		mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
-		imgBuf = data.NewSlice(quant.NComp(), mesh)
+		imgBuf = data.NewSlice(3, mesh) // always 3-comp, may be re-used
 	}
 
 	// rescale and download
 	InjectAndWait(func() {
 
-		defer func() { // TODO: remove
-			err := recover()
-			if err != nil {
-				log.Println("render:", err)
-			}
-		}()
+		//defer func() { // TODO: remove
+		//	err := recover()
+		//	if err != nil {
+		//		log.Println("render inject:", err)
+		//	}
+		//}()
 
-		// make sure buffers are there (in CUDA context)
-		if rescaleBuf.Mesh().Size() != size {
-			mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
-			rescaleBuf.Free()
-			rescaleBuf = cuda.NewSlice(1, mesh)
-		}
 		buf, r := quant.Slice()
 		if r {
 			defer cuda.Recycle(buf)
@@ -108,6 +102,14 @@ func render(quant Slicer, comp string) {
 		if !buf.GPUAccess() {
 			log.Println("no GPU access for", quant.Name)
 			imgBuf = Download(quant) // fallback (no zoom)
+			return
+		}
+
+		// make sure buffers are there (in CUDA context)
+		if rescaleBuf.Mesh().Size() != size {
+			mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+			rescaleBuf.Free()
+			rescaleBuf = cuda.NewSlice(1, mesh)
 		}
 
 		for c := 0; c < quant.NComp(); c++ {

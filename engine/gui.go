@@ -80,6 +80,7 @@ func Serve(port string) {
 	gui.OnEvent("sel_render", func() { renderQ = gui.Value("sel_render").(string) })
 	gui.OnEvent("renderComp", func() { renderComp = gui.Value("renderComp").(string) })
 	gui.OnEvent("renderScale", func() { renderScale = 33 - gui.Value("renderScale").(int) })
+	gui.OnEvent("renderLayer", func() { renderLayer = gui.Value("renderLayer").(int) })
 
 	// display
 	gui.SetValue("sel_render", renderQ)
@@ -158,6 +159,9 @@ func Serve(port string) {
 		// display
 		cachebreaker := "?" + fmt.Sprint(Solver.NSteps)
 		gui.SetValue("render", "/render/"+renderQ+cachebreaker)
+		gui.SetValue("renderComp", renderComp)
+		gui.SetValue("renderLayer", renderLayer)
+		gui.SetValue("renderScale", 33-renderScale)
 
 		// plot
 		gui.SetValue("plot", "/plot/"+cachebreaker)

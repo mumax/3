@@ -63,6 +63,12 @@ func render(quant Slicer, comp string) {
 		renderLayer = size[0] - 1
 		// TODO: update slider
 	}
+	if renderLayer < 0 {
+		renderLayer = 0
+	}
+	if quant.NComp() == 1 {
+		renderComp = ""
+	}
 
 	// scale the size
 	for i := range size {

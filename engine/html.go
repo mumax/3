@@ -127,6 +127,7 @@ const templText = `
 			{{.Option "z"}}
 		{{.EndSelect}}
 
+		z slice: {{.IntBox "renderLayer" 0}}
 		zoom: {{.Range "renderScale" 1 32 32}}
 
 		<br/>

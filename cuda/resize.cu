@@ -26,7 +26,7 @@ resize(float* __restrict__  dst, int D0, int D1, int D2,
                 }
             }
         }
-        dst[D2*(layer*D1 + j) + k] = sum / n;
+        dst[D2*j + k] = sum / n;
     }
 }
 

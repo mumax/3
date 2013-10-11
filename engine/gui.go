@@ -121,6 +121,7 @@ func Serve(port string) {
 	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 	hostname, _ := os.Hostname()
 	gui.SetValue("hostname", hostname)
+	var memstats runtime.MemStats
 
 	// periodically update time, steps, etc
 	onrefresh := func() {
@@ -183,6 +184,8 @@ func Serve(port string) {
 
 		// process
 		gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
+		runtime.ReadMemStats(&memstats)
+		gui.SetValue("memstats", memstats.TotalAlloc/(1024))
 	}
 
 	gui.OnRefresh(func() { Inject <- onrefresh })

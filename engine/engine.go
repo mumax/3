@@ -130,6 +130,9 @@ func Close() {
 	log.Println("shutting down")
 	drainOutput()
 	Table.flush()
+	var memstats runtime.MemStats
+	runtime.ReadMemStats(&memstats)
+	log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
 
 	// debug. TODO: rm
 	//	for n, p := range params {

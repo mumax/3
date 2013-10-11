@@ -139,6 +139,7 @@ const templText = `
 			<tr> <td>host:     </td> <td>{{.Span "hostname"}} </td>  </tr>
 			<tr> <td>gpu:      </td> <td>{{.Span "gpu"}}      </td>  </tr>
 			<tr> <td>walltime: </td> <td>{{.Span "walltime"}} </td>  </tr>
+			<tr> <td>allocs:   </td> <td>{{.Span "memstats"}} </td>  </tr>
 		</table>
 	</div><hr/>
 

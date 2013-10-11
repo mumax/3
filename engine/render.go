@@ -82,7 +82,7 @@ func render(quant Slicer, comp string) {
 	// rescale and download
 	InjectAndWait(func() {
 
-		defer func() {// TODO: remove
+		defer func() { // TODO: remove
 			err := recover()
 			if err != nil {
 				log.Println("render:", err)

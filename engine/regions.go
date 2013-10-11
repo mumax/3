@@ -96,7 +96,6 @@ func (r *Regions) volume(region int) float64 {
 
 // Set the region of one cell
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
-	//checkRegionIdx(region)
 	r.arr[iz][iy][ix] = byte(region)
 	r.gpuCacheOK = false
 }
@@ -111,14 +110,20 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	return r.gpuCache
 }
 
+var unitMap inputParam // unit map used to output regions quantity
+
+func init() {
+	unitMap.init(1, "unit", "", nil)
+	for r := 0; r < NREGION; r++ {
+		unitMap.setRegion(r, []float64{float64(r)})
+	}
+}
+
 // Get returns the regions as a slice of floats, so it can be output.
 func (r *Regions) Slice() (*data.Slice, bool) {
-	s := data.NewSlice(1, r.Mesh())
-	l := s.Host()[0]
-	for i := range l {
-		l[i] = float32(r.cpu[i])
-	}
-	return s, false
+	buf := cuda.Buffer(1, r.Mesh())
+	cuda.RegionDecode(buf, unitMap.gpuLUT1(), regions.Gpu())
+	return buf, true
 }
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.

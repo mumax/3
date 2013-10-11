@@ -15,8 +15,6 @@ func Resize(dst, src *data.Slice, layer int) {
 
 	scale1 := srcsize[1] / dstsize[1]
 	scale2 := srcsize[2] / dstsize[2]
-	util.Assert(srcsize[1]%dstsize[1] == 0)
-	util.Assert(srcsize[2]%dstsize[2] == 0)
 
 	cfg := make3DConf(dstsize)
 

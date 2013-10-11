@@ -88,6 +88,9 @@ const MAX_COMP = 3 // Maximum supported number of Slice components
 // Frees the underlying storage and zeros the Slice header to avoid accidental use.
 // Slices sharing storage will be invalid after Free. Double free is OK.
 func (s *Slice) Free() {
+	if s == nil {
+		return
+	}
 	// free storage
 	switch s.memType {
 	case 0:
@@ -154,7 +157,13 @@ func (s *Slice) Len() int {
 }
 
 // Mesh on which the data is defined.
-func (s *Slice) Mesh() *Mesh { return s.mesh }
+func (s *Slice) Mesh() *Mesh {
+	if s == nil {
+		return nil
+	} else {
+		return s.mesh
+	}
+}
 
 // Comp returns a single component of the Slice.
 func (s *Slice) Comp(i int) *Slice {

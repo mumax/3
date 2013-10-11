@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
 	"image"
@@ -13,9 +14,11 @@ import (
 var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
 
 var (
-	rescaleBuf *data.Slice // GPU
-	imgBuf     *data.Slice // CPU
-	img        = new(image.NRGBA)
+	rescaleBuf  *data.Slice // GPU
+	imgBuf      *data.Slice // CPU
+	img         = new(image.NRGBA)
+	renderScale = 2
+	renderLayer = 0
 )
 
 // Render image of quantity.
@@ -44,10 +47,51 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 }
 
 func render(quant Slicer, comp string) {
-	var d *data.Slice
 
-	InjectAndWait(func() { d = Download(quant) })
+	size := quant.Mesh().Size()
 
+	// don't slice out of bounds
+	if renderLayer >= size[0] {
+		renderLayer = size[0] - 1
+		// TODO: update slider
+	}
+
+	// scale the size
+	for i := range size {
+		size[i] /= renderScale
+		if size[i] == 0 {
+			size[i] = 1
+		}
+	}
+	size[0] = 1 // selects one layer
+
+	// make sure buffers are there
+	if imgBuf.Mesh().Size() != size {
+		mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+		imgBuf = data.NewSlice(quant.NComp(), mesh)
+	}
+
+	// rescale and download
+	InjectAndWait(func() {
+
+		// make sure buffers are there (in CUDA context)
+		if rescaleBuf.Mesh().Size() != size {
+			mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+			rescaleBuf.Free()
+			rescaleBuf = cuda.NewSlice(1, mesh)
+		}
+		buf, r := quant.Slice()
+		if r {
+			defer cuda.Recycle(buf)
+		}
+
+		for c := 0; c < quant.NComp(); c++ {
+			cuda.Resize(rescaleBuf, buf.Comp(c), renderLayer)
+			data.Copy(imgBuf.Comp(c), rescaleBuf)
+		}
+	})
+
+	d := imgBuf
 	if comp != "" && d.NComp() > 1 {
 		c := compstr[comp]
 		d = d.Comp(c)

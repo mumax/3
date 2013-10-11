@@ -34,7 +34,11 @@ func NewMesh(N0, N1, N2 int, cellx, celly, cellz float64, pbc ...int) *Mesh {
 
 // Returns N0, N1, N2, as passed to constructor.
 func (m *Mesh) Size() [3]int {
-	return m.gridSize
+	if m == nil {
+		return [3]int{0, 0, 0}
+	} else {
+		return m.gridSize
+	}
 }
 
 // Returns cellx, celly, cellz, as passed to constructor.

@@ -10,13 +10,21 @@ resize(float* __restrict__  dst, int D0, int D1, int D2,
     int k = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (j<D1 && k<D2) {
+
         float sum = 0.0f;
+        float n = 0.0f;
         for(int J=0; J<scale1; J++) {
+            int j2 = j+J;
             for(int K=0; K<scale2; K++) {
-                sum += src[S2*(layer*S1 + j+J) + k+K];
+                int k2 = k+K;
+                if (j2 < S1 && k < S2) {
+                    sum += src[S2*(layer*S1 + j2) + k2];
+                    n += 1.0f;
+                }
             }
         }
-        dst[D2*(layer*D1 + j) + k] = sum / (float)(scale1 * scale2);
+        dst[D2*(layer*D1 + j) + k] = sum / n;
+
     }
 }
 

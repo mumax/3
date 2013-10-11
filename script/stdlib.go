@@ -64,6 +64,8 @@ func (w *World) LoadStdlib() {
 	w.declare("pi", floatLit(math.Pi))
 	w.declare("inf", floatLit(math.Inf(1)))
 
+	w.PureFunc("sinc", sinc)
+
 	w.Func("randSeed", intseed, "Sets the random number seed")
 	w.Func("rand", rand.Float64, "Random number between 0 and 1")
 	w.Func("randExp", rand.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
@@ -88,5 +90,13 @@ func heaviside(x float64) float64 {
 		return 0.5
 	case x < 0:
 		return 0
+	}
+}
+
+func sinc(x float64) float64 {
+	if x == 0 {
+		return 1
+	} else {
+		return math.Sin(x) / x
 	}
 }

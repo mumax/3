@@ -105,6 +105,10 @@ func render(quant Slicer, comp string) {
 		if r {
 			defer cuda.Recycle(buf)
 		}
+		if !buf.GPUAccess() {
+			log.Println("no GPU access for", quant.Name)
+			imgBuf = Download(quant) // fallback (no zoom)
+		}
 
 		for c := 0; c < quant.NComp(); c++ {
 			cuda.Resize(rescaleBuf, buf.Comp(c), renderLayer)

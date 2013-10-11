@@ -78,6 +78,8 @@ func Serve(port string) {
 	gui.OnEvent("maxdt", inj(func() { Solver.MaxDt = gui.Value("maxdt").(float64) }))
 	gui.OnEvent("maxerr", inj(func() { Solver.MaxErr = gui.Value("maxerr").(float64) }))
 	gui.OnEvent("sel_render", func() { renderQ = gui.Value("sel_render").(string) })
+	gui.OnEvent("renderComp", func() { renderComp = gui.Value("renderComp").(string) })
+	gui.OnEvent("renderScale", func() { renderScale = gui.Value("renderScale").(int) })
 
 	// display
 	gui.SetValue("sel_render", renderQ)

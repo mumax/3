@@ -118,6 +118,17 @@ const templText = `
 		{{.BeginSelect "sel_render"}}
 			{{range $k,$v := .Data.Quants}} {{$.Option $k}} {{end}}
 		{{.EndSelect}}
+
+		component:
+		{{.BeginSelect "renderComp"}}
+			{{.Option ""}}
+			{{.Option "x"}}
+			{{.Option "y"}}
+			{{.Option "z"}}
+		{{.EndSelect}}
+
+		zoom: {{.Range "renderScale" 1 32 1}}
+
 		<br/>
 		{{.Img "render" "/render/m"}}
 

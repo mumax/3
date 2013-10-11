@@ -17,8 +17,9 @@ var (
 	rescaleBuf  *data.Slice // GPU
 	imgBuf      *data.Slice // CPU
 	img         = new(image.NRGBA)
-	renderScale = 2
+	renderScale = 1
 	renderLayer = 0
+	renderComp  string
 )
 
 // Render image of quantity.
@@ -27,7 +28,7 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path[len("/render/"):]
 	words := strings.Split(url, "/")
 	quant := words[0]
-	comp := ""
+	comp := renderComp
 	if len(words) > 1 {
 		comp = words[1]
 	}

@@ -33,6 +33,8 @@ var (
 )
 
 func main() {
+	engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
+
 	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
 	flag.Parse()
 
@@ -120,8 +122,17 @@ func vet() {
 	os.Exit(status)
 }
 
+func Interactive() {
+	log.Println("entering interactive mode")
+	for {
+		f := <-engine.Inject
+		f()
+	}
+}
+
 // Enter interactive mode. Simulation is now exclusively controlled
 // by web GUI (default: http://localhost:35367)
+// TODO: rename
 func RunInteractive() {
 	//engine.Pause()
 	log.Println("entering interactive mode")

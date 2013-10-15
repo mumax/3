@@ -2,13 +2,17 @@ package engine
 
 // Utilities for setting magnetic configurations.
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 func init() {
 	DeclFunc("uniform", Uniform, "Uniform magnetization in given direction")
 	DeclFunc("vortex", Vortex, "Vortex magnetization with given core circulation and polarization")
 	DeclFunc("twodomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
 	DeclFunc("vortexwall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
+	DeclFunc("addnoise", AddNoise, "Add noise with given amplitude to configuration")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -102,6 +106,16 @@ func (c Config) RotZ(θ float64) Config {
 		mx_ := m[0]*cos - m[1]*sin
 		my_ := m[0]*sin + m[1]*cos
 		return [3]float64{mx_, my_, m[2]}
+	}
+}
+
+func AddNoise(amplitude float64, c Config) Config {
+	return func(x, y, z float64) [3]float64 {
+		m := c(x, y, z)
+		for i := range m {
+			m[i] += (rand.Float64() - 0.5)
+		}
+		return m
 	}
 }
 

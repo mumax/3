@@ -56,6 +56,7 @@ func Steps(n int) {
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
+	log.Println("run while", condition)
 	checkM() // TODO: move to failed solver step
 
 	pause = false

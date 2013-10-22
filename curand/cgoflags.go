@@ -20,6 +20,6 @@ package curand
 //
 ////WINDOWS:
 //
-//#cgo LDFLAGS:-LC:/cuda/v5.0/lib/x64
-//#cgo CFLAGS:-IC:/cuda/v5.0/include
+//#cgo LDFLAGS:-LC:/cuda/v5.0/lib/x64 -LC:/cuda/v5.5/lib/x64
+//#cgo CFLAGS:-IC:/cuda/v5.0/include -IC:/cuda/v5.5/include 
 import "C"

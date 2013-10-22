@@ -1,4 +1,4 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package cuda5
     import "github.com/barnex/cuda5"
@@ -6,10 +6,12 @@ package cuda5
     Go bindings for nVIDIA CUDA 5. This package compiles with both gc and
     gccgo.
 
+
 SUBDIRECTORIES
 
 	cu
 	cuda
 	cufft
+	curand
 	safe
 

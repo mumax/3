@@ -313,3 +313,29 @@ func (s *Slice) String() string {
 	util.Fprint(&buf, s.Tensors())
 	return buf.String()
 }
+
+func (s *Slice) Set(comp, x, y, z int, value float64) {
+	s.checkComp(comp)
+	s.Host()[comp][s.Index(z, y, x)] = float32(value)
+}
+
+func (s *Slice) Get(comp, x, y, z int) float64 {
+	s.checkComp(comp)
+	return float64(s.Host()[comp][s.Index(z, y, x)])
+}
+
+func (s *Slice) checkComp(comp int) {
+	if comp < 0 || comp >= s.NComp() {
+		log.Panicf("slice: invalid component index: %v (number of components=%v)\n", comp, s.NComp())
+	}
+}
+
+func (s *Slice) Index(x, y, z int) int {
+	N0 := s.mesh.Size()[0]
+	N1 := s.mesh.Size()[1]
+	N2 := s.mesh.Size()[2]
+	if x < 0 || x >= N0 || y < 0 || y >= N1 || z < 0 || z >= N2 {
+		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", z, y, x, N2, N1, N0) // userspace
+	}
+	return (x*N1+y)*N2 + z
+}

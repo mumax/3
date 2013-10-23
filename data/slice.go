@@ -3,6 +3,7 @@ package data
 // Slice stores N-component GPU or host data.
 
 import (
+	"bytes"
 	"github.com/mumax/3/util"
 	"log"
 	"reflect"
@@ -305,4 +306,10 @@ func (s *Slice) IsNil() bool {
 		return true
 	}
 	return s.ptr_[0] == nil
+}
+
+func (s *Slice) String() string {
+	var buf bytes.Buffer
+	util.Fprint(&buf, s.Tensors())
+	return buf.String()
 }

@@ -5,11 +5,11 @@ import (
 )
 
 func init() {
-	DeclFunc("NewArray", NewArray, "Makes a new in-memory array with given number of components and size")
+	DeclFunc("NewSlice", NewSlice, "Makes a 3D array of scalars with given x,y,z size")
 }
 
-func NewArray(nComp, Nx, Ny, Nz int) *data.Slice {
+func NewSlice(Nx, Ny, Nz int) *data.Slice {
 	const c = 1 // dummy cell size
 	mesh := data.NewMesh(Nz, Ny, Nx, c, c, c)
-	return data.NewSlice(nComp, mesh)
+	return data.NewSlice(1, mesh)
 }

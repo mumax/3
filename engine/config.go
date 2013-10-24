@@ -3,6 +3,7 @@ package engine
 // Utilities for setting magnetic configurations.
 
 import (
+	"github.com/mumax/3/data"
 	"math"
 	"math/rand"
 )
@@ -16,13 +17,13 @@ func init() {
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
-type Config func(x, y, z float64) [3]float64
+type Config func(x, y, z float64) data.Vector
 
 // Returns a uniform magnetization state. E.g.:
 // 	M = Uniform(1, 0, 0)) // saturated along X
 func Uniform(mx, my, mz float64) Config {
-	return func(x, y, z float64) [3]float64 {
-		return [3]float64{mx, my, mz}
+	return func(x, y, z float64) data.Vector {
+		return data.Vector{mx, my, mz}
 	}
 }
 
@@ -30,13 +31,13 @@ func Uniform(mx, my, mz float64) Config {
 // The core is smoothed over a few exchange lengths and should easily relax to its ground state.
 func Vortex(circ, pol int) Config {
 	diam2 := 2 * sqr64(Mesh().CellSize()[2])
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		r2 := x*x + y*y
 		r := math.Sqrt(r2)
 		mx := -y * float64(circ) / r
 		my := x * float64(circ) / r
 		mz := 1.5 * float64(pol) * math.Exp(-r2/diam2)
-		return [3]float64{mx, my, mz}
+		return data.Vector{mx, my, mz}
 	}
 }
 
@@ -44,12 +45,12 @@ func Vortex(circ, pol int) Config {
 func VortexWall(mleft, mright float64, circ, pol int) Config {
 	h := Mesh().WorldSize()[1]
 	v := Vortex(circ, pol)
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		if x < -h/2 {
-			return [3]float64{mleft, 0, 0}
+			return data.Vector{mleft, 0, 0}
 		}
 		if x > h/2 {
-			return [3]float64{mright, 0, 0}
+			return data.Vector{mright, 0, 0}
 		}
 		return v(x, y, z)
 	}
@@ -65,12 +66,12 @@ func VortexWall(mleft, mright float64, circ, pol int) Config {
 // 	TwoDomain(0,0,1,  1,0,0,   0,0,-1)// up-down domains with Bloch wall
 func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Config {
 	ww := 2 * Mesh().CellSize()[2] // wall width in cells
-	return func(x, y, z float64) [3]float64 {
-		var m [3]float64
+	return func(x, y, z float64) data.Vector {
+		var m data.Vector
 		if x < 0 {
-			m = [3]float64{mx1, my1, mz1}
+			m = data.Vector{mx1, my1, mz1}
 		} else {
-			m = [3]float64{mx2, my2, mz2}
+			m = data.Vector{mx2, my2, mz2}
 		}
 		gauss := math.Exp(-sqr64(x / ww))
 		m[0] = (1-gauss)*m[0] + gauss*mxwall
@@ -83,14 +84,14 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 // Transl returns a translated copy of configuration c. E.g.:
 // 	M = Vortex(1, 1).Transl(100e-9, 0, 0)  // vortex with center at x=100nm
 func (c Config) Transl(dx, dy, dz float64) Config {
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		return c(x-dx, y-dy, z-dz)
 	}
 }
 
 // Scale returns a scaled copy of configuration c.
 func (c Config) Scale(sx, sy, sz float64) Config {
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		return c(x/sx, y/sy, z/sz)
 	}
 }
@@ -99,18 +100,18 @@ func (c Config) Scale(sx, sy, sz float64) Config {
 func (c Config) RotZ(θ float64) Config {
 	cos := math.Cos(θ)
 	sin := math.Sin(θ)
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		x_ := x*cos + y*sin
 		y_ := -x*sin + y*cos
 		m := c(x_, y_, z)
 		mx_ := m[0]*cos - m[1]*sin
 		my_ := m[0]*sin + m[1]*cos
-		return [3]float64{mx_, my_, m[2]}
+		return data.Vector{mx_, my_, m[2]}
 	}
 }
 
 func AddNoise(amplitude float64, c Config) Config {
-	return func(x, y, z float64) [3]float64 {
+	return func(x, y, z float64) data.Vector {
 		m := c(x, y, z)
 		for i := range m {
 			m[i] += (rand.Float64() - 0.5)
@@ -122,7 +123,7 @@ func AddNoise(amplitude float64, c Config) Config {
 // Infinitely repeats the shape with given period in x, y, z.
 // A period of 0 or infinity means no repetition.
 //func (c Config) Repeat(periodX, periodY, periodZ float64) Config {
-//	return func(x, y, z float64) [3]float64 {
+//	return func(x, y, z float64) data.Vector {
 //		return c(fmod(x, periodX), fmod(y, periodY), fmod(z, periodZ))
 //	}
 //}

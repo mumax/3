@@ -15,15 +15,16 @@ func init() {
 	DeclFunc("expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
 	DeclFunc("fprintln", Fprintln, "Print to file")
 	DeclFunc("sign", sign, "Signum function")
-	DeclPure("vector", Vector, "Constructs a vector with given components")
+	DeclPure("vector", MakeVector, "Constructs a vector with given components")
 	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	DeclFunc("print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a .dump file")
+	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")
 }
 
 // Constructs a vector
-func Vector(x, y, z float64) [3]float64 {
-	return [3]float64{x, y, z}
+func MakeVector(x, y, z float64) data.Vector {
+	return data.Vector{x, y, z}
 }
 
 // Test if have lies within want +/- maxError,
@@ -76,18 +77,15 @@ func myprint(msg ...interface{}) {
 	log.Println(msg...)
 }
 
-func Index2Coord(i, j, k int) [3]float64 {
+// converts cell index to coordinate, userspace
+func Index2Coord(i, j, k int) data.Vector {
 	m := Mesh()
 	n := m.Size()
 	c := m.CellSize()
-	dx := (float64(n[2]/2) - 0.5) * c[2] // TODO /2
-	dy := (float64(n[1]/2) - 0.5) * c[1]
-	dz := (float64(n[0]/2) - 0.5) * c[0]
 
-	z := float64(i)*c[0] - dz
-	y := float64(j)*c[1] - dy
-	x := float64(k)*c[2] - dx
+	z := c[0] * (float64(i) - 0.5*float64(n[0]-1))
+	y := c[1] * (float64(j) - 0.5*float64(n[1]-1))
+	x := c[2] * (float64(k) - 0.5*float64(n[2]-1))
 
-	return [3]float64{x, y, z}
-
+	return data.Vector{x, y, z}
 }

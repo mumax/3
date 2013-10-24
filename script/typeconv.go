@@ -2,6 +2,7 @@ package script
 
 import (
 	"fmt"
+	"github.com/mumax/3/data"
 	"go/token"
 	"reflect"
 )
@@ -72,8 +73,8 @@ var (
 	func_bool_t      = reflect.TypeOf(func() bool { panic(0) })
 	int_t            = reflect.TypeOf(int(0))
 	string_t         = reflect.TypeOf("")
-	vector_t         = reflect.TypeOf([3]float64{})
-	func_vector_t    = reflect.TypeOf(func() [3]float64 { panic(0) })
+	vector_t         = reflect.TypeOf(data.Vector{})
+	func_vector_t    = reflect.TypeOf(func() data.Vector { panic(0) })
 	ScalarFunction_t = reflect.TypeOf(dummy_f).In(0)
 	VectorFunction_t = reflect.TypeOf(dummy_f3).In(0)
 	ScalarIf_t       = reflect.TypeOf(dummy_scalarif).In(0)
@@ -130,5 +131,5 @@ type ScalarIf interface {
 } // TODO: Scalar
 
 type VectorIf interface {
-	Get() [3]float64
+	Get() data.Vector
 } // TODO: Vector

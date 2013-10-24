@@ -2,7 +2,10 @@ package script
 
 // Here be dragons
 
-import "reflect"
+import (
+	"github.com/mumax/3/data"
+	"reflect"
+)
 
 type ScalarFunction interface {
 	Expr
@@ -21,15 +24,15 @@ func (c *scalFn) Child() []Expr      { return []Expr{c.in} }
 
 type VectorFunction interface {
 	Expr
-	Float3() [3]float64
+	Float3() data.Vector
 	Cnst() bool
 }
 
-// converts [3]float64 to VectorFunction
+// converts data.Vector to VectorFunction
 type vecFn struct{ in Expr }
 
-func (c *vecFn) Eval() interface{}  { return c }
-func (c *vecFn) Type() reflect.Type { return VectorFunction_t }
-func (c *vecFn) Float3() [3]float64 { return c.in.Eval().([3]float64) }
-func (c *vecFn) Cnst() bool         { return Cnst(c.in) } // always false, need more precise implementation
-func (c *vecFn) Child() []Expr      { return []Expr{c.in} }
+func (c *vecFn) Eval() interface{}   { return c }
+func (c *vecFn) Type() reflect.Type  { return VectorFunction_t }
+func (c *vecFn) Float3() data.Vector { return c.in.Eval().(data.Vector) }
+func (c *vecFn) Cnst() bool          { return Cnst(c.in) } // always false, need more precise implementation
+func (c *vecFn) Child() []Expr       { return []Expr{c.in} }

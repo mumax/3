@@ -15,7 +15,7 @@ wireX := 50e-9
 wireZ := 5e-9
 
 for i:=0; i<128; i++{
-	//r := index2coord(i, 0, 0)
+	r := index2coord(i, 0, 0)
 
 	mask.set(Z, i, 0, 0, v)
 }

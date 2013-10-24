@@ -53,19 +53,23 @@ func (e *excitation) Slice() (*data.Slice, bool) {
 // Add an extra mask*multiplier term to the excitation.
 func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 	var mul func() float64
-	if f.Cnst() {
-		val := f.Float()
-		mul = func() float64 {
-			return val
-		}
-	} else {
-		mul = func() float64 {
-			return f.Float()
+	if f != nil {
+		if f.Cnst() {
+			val := f.Float()
+			mul = func() float64 {
+				return val
+			}
+		} else {
+			mul = func() float64 {
+				return f.Float()
+			}
 		}
 	}
-	checkNaN(mask, e.Name()+".add()") // TODO: in more places
-	mask = data.Resample(mask, e.Mesh().Size())
-	mask = assureGPU(mask)
+	if mask != nil {
+		checkNaN(mask, e.Name()+".add()") // TODO: in more places
+		mask = data.Resample(mask, e.Mesh().Size())
+		mask = assureGPU(mask)
+	}
 	e.extraTerms = append(e.extraTerms, mulmask{mul, mask})
 }
 

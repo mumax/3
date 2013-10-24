@@ -6,13 +6,15 @@ import (
 
 // if statement
 type ifStmt struct {
-	cond, body Expr
+	cond, body, else_ Expr
 	void
 }
 
 func (b *ifStmt) Eval() interface{} {
 	if b.cond.Eval().(bool) {
 		b.body.Eval()
+	} else {
+		b.else_.Eval()
 	}
 	return nil // void
 }
@@ -22,10 +24,11 @@ func (w *World) compileIfStmt(n *ast.IfStmt) *ifStmt {
 	defer w.ExitScope()
 
 	return &ifStmt{
-		cond: typeConv(n.Cond.Pos(), w.compileExpr(n.Cond), bool_t),
-		body: w.compileBlockStmt_noScope(n.Body)}
+		cond:  typeConv(n.Cond.Pos(), w.compileExpr(n.Cond), bool_t),
+		body:  w.compileBlockStmt_noScope(n.Body),
+		else_: w.compileStmt(n.Else)}
 }
 
 func (e *ifStmt) Child() []Expr {
-	return []Expr{e.cond, e.body}
+	return []Expr{e.cond, e.body, e.else_}
 }

@@ -75,3 +75,19 @@ func myprint(msg ...interface{}) {
 	}
 	log.Println(msg...)
 }
+
+func Index2Coord(i, j, k int) [3]float64 {
+	m := Mesh()
+	n := m.Size()
+	c := m.CellSize()
+	dx := (float64(n[2]/2) - 0.5) * c[2] // TODO /2
+	dy := (float64(n[1]/2) - 0.5) * c[1]
+	dz := (float64(n[0]/2) - 0.5) * c[0]
+
+	z := float64(i)*c[0] - dz
+	y := float64(j)*c[1] - dy
+	x := float64(k)*c[2] - dx
+
+	return [3]float64{x, y, z}
+
+}

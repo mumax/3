@@ -41,9 +41,9 @@ func DefRegion(id int, s Shape) {
 
 	n := Mesh().Size()
 	c := Mesh().CellSize()
-	dx := (float64(n[2]/2) - 0.5) * c[2]
-	dy := (float64(n[1]/2) - 0.5) * c[1]
-	dz := (float64(n[0]/2) - 0.5) * c[0]
+	dx := (float64(n[2])/2 - 0.5) * c[2]
+	dy := (float64(n[1])/2 - 0.5) * c[1]
+	dz := (float64(n[0])/2 - 0.5) * c[0]
 
 	for i := 0; i < n[0]; i++ {
 		z := float64(i)*c[0] - dz

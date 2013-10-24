@@ -316,11 +316,13 @@ func (s *Slice) String() string {
 
 func (s *Slice) Set(comp, x, y, z int, value float64) {
 	s.checkComp(comp)
+	comp = util.SwapIndex(comp, s.NComp())
 	s.Host()[comp][s.Index(z, y, x)] = float32(value)
 }
 
 func (s *Slice) Get(comp, x, y, z int) float64 {
 	s.checkComp(comp)
+	comp = util.SwapIndex(comp, s.NComp())
 	return float64(s.Host()[comp][s.Index(z, y, x)])
 }
 

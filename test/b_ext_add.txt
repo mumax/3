@@ -1,0 +1,27 @@
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, .01, 0)
+
+X := 0
+Y := 1
+Z := 2
+mask := newSlice(3, 128, 1, 1)
+
+for i:=0; i<128; i++{
+	v := sin(i/10.1)
+	mask.set(Z, i, 0, 0, v)
+}
+
+print(mask)
+
+B_ext.add(mask, 1)
+
+alpha = 3
+MaxErr = 1e-4
+RunWhile(MaxTorque > 1e-4)
+
+print(average(m))
+save(m)

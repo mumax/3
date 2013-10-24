@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"log"
+	"math"
 	"reflect"
 )
 
@@ -49,9 +50,23 @@ func (e *excitation) Slice() (*data.Slice, bool) {
 	return buf, true
 }
 
-// Add an extra maks*multiplier term to the excitation.
-func (e *excitation) Add(mask *data.Slice, mul func() float64) {
-	e.extraTerms = append(e.extraTerms, mulmask{mul, assureGPU(mask)})
+// Add an extra mask*multiplier term to the excitation.
+func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
+	var mul func() float64
+	if f.Cnst() {
+		val := f.Float()
+		mul = func() float64 {
+			return val
+		}
+	} else {
+		mul = func() float64 {
+			return f.Float()
+		}
+	}
+	checkNaN(mask, e.Name()+".add()") // TODO: in more places
+	mask = data.Resample(mask, e.Mesh().Size())
+	mask = assureGPU(mask)
+	e.extraTerms = append(e.extraTerms, mulmask{mul, mask})
 }
 
 func assureGPU(s *data.Slice) *data.Slice {
@@ -101,3 +116,14 @@ func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }
+
+func checkNaN(s *data.Slice, name string) {
+	h := s.Host()
+	for _, h := range h {
+		for _, v := range h {
+			if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) {
+				log.Fatalln("NaN or Inf in", name)
+			}
+		}
+	}
+}

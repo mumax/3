@@ -58,7 +58,7 @@ func (geometry *geom) setGeom(s Shape) {
 	for i := 0; i < n[0]; i++ {
 		for j := 0; j < n[1]; j++ {
 			for k := 0; k < n[2]; k++ {
-				r := Index2Coord(i, j, k)
+				r := index2Coord(i, j, k)
 				x, y, z := r[0], r[1], r[2]
 				if s(x, y, z) { // inside
 					v[i][j][k] = 1

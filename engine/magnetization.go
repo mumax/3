@@ -35,7 +35,7 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 	for i := 0; i < n[0]; i++ {
 		for j := 0; j < n[1]; j++ {
 			for k := 0; k < n[2]; k++ {
-				r := Index2Coord(i, j, k)
+				r := index2Coord(i, j, k)
 				x, y, z := r[0], r[1], r[2]
 				if region(x, y, z) { // inside
 					m := conf(x, y, z)
@@ -59,7 +59,7 @@ func (m *magnetization) SetRegion(region int, conf Config) {
 	for i := 0; i < n[0]; i++ {
 		for j := 0; j < n[1]; j++ {
 			for k := 0; k < n[2]; k++ {
-				pos := Index2Coord(i, j, k)
+				pos := index2Coord(i, j, k)
 				x, y, z := pos[0], pos[1], pos[2]
 				if regions.arr[i][j][k] == r {
 					m := conf(x, y, z)

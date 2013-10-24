@@ -26,6 +26,8 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 		return w.compileAssignStmt(st)
 	case *ast.ExprStmt:
 		return w.compileExpr(st.X)
+	case *ast.IfStmt:
+		return w.compileIfStmt(st)
 	case *ast.ForStmt:
 		return w.compileForStmt(st)
 	case *ast.IncDecStmt:

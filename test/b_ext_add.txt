@@ -13,26 +13,31 @@ mask := newSlice(3, Nx, Ny, 1)
 
 wireX := 0e-9
 wireY := 0e-9
-wireDiam := 20e-9
-current := vector(0, 0, -1)
+wireDiam := 50e-9
+current := vector(0, 0, 1)
 
 
 for i:=0; i<Nx; i++{
 	for j:=0; j<Ny; j++{
-		r := index2coord(i, j, 0)
 
+		r := index2coord(i, j, 0)
 		r = r.sub(vector(wireX, wireY, 0)) // relative position to wire
 	
-		b := vector(0, 0, 0)
+		I := vector(0, 0, 0)
+		B := vector(0, 0, 0)
 
 		if r.len() >= wireDiam{
-			b = r.cross(current).mul(mu0 / pow(r.len(), 2))
+			I := current
+			b = r.cross(I).mul(mu0 / (2*pi*pow(r.len(), 2)))
 		}else{
-			print("Else")
+			relDist := r.len() / wireDiam
+			I := current.mul(relDist * relDist)
+			b = r.cross(I).mul(mu0 / (2*pi*pow(r.len(), 2)))
 		}
-			mask.set(0, i, j, 0, b[0])
-			mask.set(1, i, j, 0, b[1])
-			mask.set(2, i, j, 0, b[2])
+
+		mask.set(0, i, j, 0, b[0])
+		mask.set(1, i, j, 0, b[1])
+		mask.set(2, i, j, 0, b[2])
 	}
 }
 

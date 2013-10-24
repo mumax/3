@@ -1,28 +1,38 @@
-setgridsize(128, 32, 1)
-setcellsize(500e-9/128, 125e-9/32, 3e-9)
+N := 128
+setgridsize(N, N, 1)
 
-/*
+c := 5e-9
+setcellsize(c, c, c)
+
 Msat = 800e3
-Aex = 13e-12
-m  = uniform(1, .01, 0)
+Aex  = 13e-12
+m    = uniform(1, 0, 0)
 
-X := 0
-Y := 1
-Z := 2
-mask := newSlice(3, 128, 1, 1)
+mask := newSlice(3, N, N, 1)
 
 wireX := 50e-9
-wireZ := 5e-9
+wireY := 5e-9
+wireDiam := 20e-9
+current := vector(0, 0, -1)
 
-for i:=0; i<128; i++{
-	r := index2coord(i, 0, 0)
-
-	mask.set(Z, i, 0, 0, v)
+for i:=0; i<N; i++{
+	for j:=0; j<N; j++{
+		r := index2coord(i, j, 0)
+		r = r.sub(vector(wireX, wireY, 0)) // relative position to wire
+	
+		if r.len() >= wireDiam{
+			b := r.cross(current).div(pow(r.len(), 3))
+			mask.set(0, i, j, 0, b[0])
+			mask.set(1, i, j, 0, b[1])
+			mask.set(2, i, j, 0, b[2])
+		}
+	}
 }
 
 print(mask)
 
-B_ext.add(mask, 1)
+B_ext.add(mask, 0.01)
+save(B_ext)
 
 alpha = 3
 MaxErr = 1e-4
@@ -31,4 +41,3 @@ RunWhile(MaxTorque > 1e-4)
 print(average(m))
 save(m)
 
-*/

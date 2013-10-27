@@ -11,32 +11,34 @@ import (
 )
 
 var (
-	Aex, Dex ScalarParam
-	B_exch   adder     // exchange field (T) output handle
-	lex2     exchParam // inter-cell exchange length squared * 1e18
-	E_exch   = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
+	Aex, DL, DH ScalarParam
+	B_exch      adder     // exchange field (T) output handle
+	lex2        exchParam // inter-cell exchange length squared * 1e18
+	E_exch      = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
+	DL.init("DL", "J/m2", "Dzyaloshinskii-Moriya strength, longitudinal", nil)
+	DH.init("DH", "J/m2", "Dzyaloshinskii-Moriya strength, horizontal", nil)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 
 	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
-		if Dex.isZero() {
+		if DH.isZero() && DL.isZero() {
 			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), 0) // async
 		} else {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
-			util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
+			util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && DL.IsUniform() && DH.IsUniform(),
 				"DMI: Msat, Aex, Dex must be uniform")
 			util.AssertMsg(spaceFill() == 1,
 				"DMI: empty cells not yet supported")
 			msat := Msat.GetRegion(0)
-			D := Dex.GetRegion(0) / msat
+			dL := DL.GetRegion(0) / msat
+			dH := DH.GetRegion(0) / msat
 			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D), float32(A), 0) // dmi+exchange
+			cuda.AddDMI(dst, M.buffer, float32(dL), float32(dH), float32(A), 0) // dmi+exchange
 		}
 	})
 

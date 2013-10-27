@@ -9,7 +9,7 @@
 extern "C" __global__ void
 addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
             float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-            float* aLUT2d, int8_t* regions,
+            float* __restrict__ aLUT2d, int8_t* __restrict__ regions,
             float wx, float wy, float wz, int N0, int N1, int N2, int8_t PBC) {
 
     int i = blockIdx.z * blockDim.z + threadIdx.z;

@@ -65,24 +65,34 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
     // y derivatives (along height)
     {
+        float3 m1 = make_float3(0.0f, 0.0f, 0.0f); // right neighbor
+        float3 m2 = make_float3(0.0f, 0.0f, 0.0f); // left neighbor
+
+        if (j+1 < N1) {
+            int I1 = idx(i, j+1, k);
+            m1 = make_float3(mx[I1], my[I1], mz[I1]);
+        }
+        if (j-1 >= 0) {
+            int I2 = idx(i, j-1, k);
+            m2 = make_float3(mx[I2], my[I2], mz[I2]);
+        }
+
         float Dy_2A = (Dy/(2.0f*A));
 
-        int I1 = idx(i, hclamp(j+1, N1), k);
-        int I2 = idx(i, lclamp(j-1), k);
+        if (len(m1) == 0.0f) {
+            m1.x = m.x - (cy * Dy_2A * m.y);
+            m1.y = m.y + (cy * Dy_2A * m.x);
+            m1.z = m.z;
+        }
+        if (len(m2) == 0.0f) {
+            m2.x = m.x + (cy * Dy_2A * m.y);
+            m2.y = m.y - (cy * Dy_2A * m.x);
+            m2.z = m.z;
+        }
 
-        // DMI
-        float my1 = (j+1<N1)? my[I1] : (m.y + (cy * Dy_2A * m.x));
-        float my2 = (j-1>=0)? my[I2] : (m.y - (cy * Dy_2A * m.x));
-        h.x -= Dy*(my1-my2)/cy;
-
-        float mx1 = (j+1<N1)? mx[I1] : (m.x - (cy * Dy_2A * m.y));
-        float mx2 = (j-1>=0)? mx[I2] : (m.x + (cy * Dy_2A * m.y));
-        h.y += Dy*(mx1-mx2)/cy;
-
-        // Exchange
-        float3 m1 = make_float3(mx1, my1, mz[I1]);
-        float3 m2 = make_float3(mx2, my2, mz[I2]);
         h +=  (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
+        h.x -= Dy*(m1.y-m2.y)/cy;
+        h.y += Dy*(m1.x-m2.x)/cy;
     }
 
     // write back, result is H + Hdmi + Hex

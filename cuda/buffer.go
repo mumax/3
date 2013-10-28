@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	buf_lock  sync.Mutex
+	buf_lock  sync.Mutex                  // TODO: redundant?
 	buf_pool  map[int][]unsafe.Pointer    // maps buffer size to pool
 	buf_check map[unsafe.Pointer]struct{} // check if pointer originates here
 	buf_count int                         // total allocated buffers

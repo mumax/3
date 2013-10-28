@@ -43,61 +43,6 @@ run(1e-9)
 
 {{.Output }}
 
-<hr/><h2>Input and Output Parameters</h2>
-
-In this example we set all possible input parameters, to showcase them. Setting a parameter automatically "enables" the corresponding physics (e.g. setting j enables spin-transfer torque). Demag can be explicitly turned on/off with <code>enableDemag=false</code> (it is enabled by default).
-
-{{.Example  `
-
-setgridsize(100, 100, 1)
-setcellsize(4e-9, 4e-9, 8e-9)
-
-/* Input parameters */
-
-Msat  = 1000e3        // Saturation magnetization in A/m
-Aex   = 13e-12        // Exchange stiffness in J/m
-alpha = 0.02          // Gilbert damping constant
-B_ext = vector(0.1,0,0) // Applied field in T
-
-anisU = vector(1,0,0) // Uniaxial anisotropy axis
-Ku1   = 500e3         // Uniaxial anisotropy in J/m3
-
-xi   = 0.04                   // Spin-transfer torque degree of non-adiabaticity
-pol  = 0.56                   // Spin polarization
-j    = vector(1e14, 0, 0)     // current density in A/m2
-
-Dex = 1e-2            // Dzyaloshinskii-Moriya interaction in J/m2
-
-m = vortex(1, 1)      // Initial magnetization
-
-/* Tabular output 
-   Default columns: t, m. More can be added */
-tableadd(E_total)
-tableadd(E_Zeeman)
-tableadd(E_exch)
-tableadd(E_demag)
-tableautosave(10e-12)
-
-/* Space-dependent output */
-
-save(m)        // reduced magnetization
-save(mFFT)     // FFT of m
-
-save(B_eff)    // effective field in T
-save(B_demag)  // demagnetizing field in T
-save(B_exch)   // exchange field in T
-save(B_anis)   // uniaxial anisotropy field in T
-
-save(torque)   // total torque/γ0
-save(LLTorque) // Landau-Lifshitz torque/γ0
-save(STTorque) // Spin-transfer torque/γ0
-
-// The input parameters (Msat, Aex, ...) can be saved as well,
-// but that's only useful when they are defined space- or time-dependent.
-
-`}}{{.Output}}
-
-
 
 <hr/><h2>Standard Problem #2</h2>
 
@@ -127,15 +72,12 @@ m = Uniform(1, 0.1, 0)                   // initial mag
 Run(5e-9)                                // relax
 
 save(m)                                  // remanent magnetization
-m_ := average(m)                         
-expect("mx", m_[0], 0.9627, 1e-3)        // test m against known value
-expect("my", m_[1], 0.0756, 1e-3)
-expect("mz", m_[2], 0, 1e-3)
+print("<m> for d/lex=30: ", average(m))
 `}}
 
 {{.Output}}
 
-This example saves the remanent magnetization state, and verifies the average magnetization has the correct value.
+This example saves and prints the remanent magnetization state so we can verify it against known values.
 
 <hr/><h2>Geometry</h2>
 

@@ -77,19 +77,19 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
         float Dy_2A = (Dy/(2.0f*A));
         if (len(m1) == 0.0f) {
-            m1.x = m.x - (cy * Dy_2A * m.y);
-            m1.y = m.y + (cy * Dy_2A * m.x);
+            m1.x = m.x + (cy * Dy_2A * m.y);
+            m1.y = m.y - (cy * Dy_2A * m.x);
             m1.z = m.z;
         }
         if (len(m2) == 0.0f) {
-            m2.x = m.x + (cy * Dy_2A * m.y);
-            m2.y = m.y - (cy * Dy_2A * m.x);
+            m2.x = m.x - (cy * Dy_2A * m.y);
+            m2.y = m.y + (cy * Dy_2A * m.x);
             m2.z = m.z;
         }
 
         h   += (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
-        h.x += Dy*(m1.y-m2.y)/cy;
-        h.y -= Dy*(m1.x-m2.x)/cy;
+        h.x -= Dy*(m1.y-m2.y)/cy;
+        h.y += Dy*(m1.x-m2.x)/cy;
     }
 
     // write back, result is H + Hdmi + Hex

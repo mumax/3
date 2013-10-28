@@ -45,14 +45,14 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         // BC's for zero cells (either due to grid or hole boundaries)
         float Dz_2A = (Dz/(2.0f*A));
         if (len(m1) == 0.0f) {
-            m1.x = m.x - (cz * Dz_2A * m.z);
+            m1.x = m.x + (cz * Dz_2A * m.z);
             m1.y = m.y;
-            m1.z = m.z + (cz * Dz_2A * m.x);
+            m1.z = m.z - (cz * Dz_2A * m.x);
         }
         if (len(m2) == 0.0f) {
-            m2.x = m.x + (cz * Dz_2A * m.z);
+            m2.x = m.x - (cz * Dz_2A * m.z);
             m2.y = m.y;
-            m2.z = m.z - (cz * Dz_2A * m.x);
+            m2.z = m.z + (cz * Dz_2A * m.x);
         }
 
         h   += (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m)); // exchange
@@ -88,8 +88,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         }
 
         h   += (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
-        h.x -= Dy*(m1.y-m2.y)/cy;
-        h.y += Dy*(m1.x-m2.x)/cy;
+        h.x += Dy*(m1.y-m2.y)/cy;
+        h.y -= Dy*(m1.x-m2.x)/cy;
     }
 
     // write back, result is H + Hdmi + Hex

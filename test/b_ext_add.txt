@@ -51,4 +51,3 @@ RunWhile(MaxTorque > 1e-4)
 print(average(m))
 save(m)
 
-interactive()

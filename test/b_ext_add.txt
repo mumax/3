@@ -23,16 +23,15 @@ for i:=0; i<Nx; i++{
 		r := index2coord(i, j, 0)
 		r = r.sub(vector(wireX, wireY, 0)) // relative position to wire
 	
-		I := vector(0, 0, 0)
+		curr := vector(0, 0, 0)
 		B := vector(0, 0, 0)
 
 		if r.len() >= wireDiam{
-			I := current
-			b = r.cross(I).mul(mu0 / (2*pi*pow(r.len(), 2)))
+			b = r.cross(current).mul(mu0 / (2*pi*pow(r.len(), 2)))
 		}else{
 			relDist := r.len() / wireDiam
-			I := current.mul(relDist * relDist)
-			b = r.cross(I).mul(mu0 / (2*pi*pow(r.len(), 2)))
+			innerCurrent := current.mul(relDist * relDist)
+			b = r.cross(innerCurrent).mul(mu0 / (2*pi*pow(r.len(), 2)))
 		}
 
 		mask.set(0, i, j, 0, b[0])

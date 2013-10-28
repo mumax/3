@@ -25,11 +25,12 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     int I = idx(i, j, k);                        // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
     float3 m = make_float3(mx[I], my[I], mz[I]); // central m
+    float3 m1, m2;                               // right, left neighbor
 
     // z derivatives (along length)
     {
-        float3 m1 = make_float3(0.0f, 0.0f, 0.0f); // right neighbor
-        float3 m2 = make_float3(0.0f, 0.0f, 0.0f); // left neighbor
+        m1 = make_float3(0.0f, 0.0f, 0.0f);
+        m2 = make_float3(0.0f, 0.0f, 0.0f);
 
         // load neighbor m if inside grid, 0 otherwise
         if (k+1 < N2) {
@@ -43,7 +44,6 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
         // BC's for zero cells (either due to grid or hole boundaries)
         float Dz_2A = (Dz/(2.0f*A));
-
         if (len(m1) == 0.0f) {
             m1.x = m.x - (cz * Dz_2A * m.z);
             m1.y = m.y;
@@ -55,18 +55,16 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m2.z = m.z - (cz * Dz_2A * m.x);
         }
 
-        // add exchange field
-        h +=  (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m));
-
-        // add DMI
-        h.x -= Dz*(m1.z-m2.z)/cz; // note: actually 2*D * delta / (2*c)
+        h   += (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m)); // exchange
+        h.x -= Dz*(m1.z-m2.z)/cz;                        // DMI
         h.z += Dz*(m1.x-m2.x)/cz;
+        // note: actually 2*D * delta / (2*c)
     }
 
     // y derivatives (along height)
     {
-        float3 m1 = make_float3(0.0f, 0.0f, 0.0f); // right neighbor
-        float3 m2 = make_float3(0.0f, 0.0f, 0.0f); // left neighbor
+        m1 = make_float3(0.0f, 0.0f, 0.0f);
+        m2 = make_float3(0.0f, 0.0f, 0.0f);
 
         if (j+1 < N1) {
             int I1 = idx(i, j+1, k);
@@ -78,7 +76,6 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         }
 
         float Dy_2A = (Dy/(2.0f*A));
-
         if (len(m1) == 0.0f) {
             m1.x = m.x - (cy * Dy_2A * m.y);
             m1.y = m.y + (cy * Dy_2A * m.x);
@@ -90,7 +87,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m2.z = m.z;
         }
 
-        h +=  (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
+        h   += (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
         h.x -= Dy*(m1.y-m2.y)/cy;
         h.y += Dy*(m1.x-m2.x)/cy;
     }

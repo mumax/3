@@ -32,8 +32,7 @@ func init() {
 			// interaction not clear with space-dependent parameters
 			util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
 				"DMI: Msat, Aex, Dex must be uniform")
-			util.AssertMsg(spaceFill() == 1,
-				"DMI: empty cells not yet supported")
+			util.AssertMsg(Mesh().PBC_code() == 0, "No PBC for DMI")
 			msat := Msat.GetRegion(0)
 			D := Dex.GetRegion(0)
 			A := Aex.GetRegion(0) / msat

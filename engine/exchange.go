@@ -11,15 +11,16 @@ import (
 )
 
 var (
-	Aex, Dex ScalarParam
-	B_exch   adder     // exchange field (T) output handle
-	lex2     exchParam // inter-cell exchange length squared * 1e18
-	E_exch   = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
+	Aex    ScalarParam
+	Dex    VectorParam
+	B_exch adder     // exchange field (T) output handle
+	lex2   exchParam // inter-cell exchange length squared * 1e18
+	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", nil)
+	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 
@@ -34,9 +35,9 @@ func init() {
 			util.AssertMsg(spaceFill() == 1,
 				"DMI: empty cells not yet supported")
 			msat := Msat.GetRegion(0)
-			D := Dex.GetRegion(0) / msat
+			D := Dex.GetRegion(0)
 			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D), float32(A), 0) // dmi+exchange
+			cuda.AddDMI(dst, M.buffer, float32(D[0]/msat), float32(D[1]/msat), float32(D[2]/msat), float32(A), 0) // dmi+exchange
 		}
 	})
 

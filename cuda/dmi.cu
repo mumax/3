@@ -28,25 +28,39 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
     // z derivatives (along length)
     {
+        float3 m1 = make_float3(0.0f, 0.0f, 0.0f); // right neighbor
+        float3 m2 = make_float3(0.0f, 0.0f, 0.0f); // left neighbor
+
+        // load neighbor m if inside grid, 0 otherwise
+        if (k+1 < N2) {
+            int I1 = idx(i, j, k+1);
+            m1 = make_float3(mx[I1], my[I1], mz[I1]);
+        }
+        if (k-1 >= 0) {
+            int I2 = idx(i, j, k-1);
+            m2 = make_float3(mx[I2], my[I2], mz[I2]);
+        }
+
+        // BC's for zero cells (either due to grid or hole boundaries)
         float Dz_2A = (Dz/(2.0f*A));
 
-        int I1 = idx(i, j, hclamp(k+1, N2));  // right index, clamped
-        int I2 = idx(i, j, lclamp(k-1));      // left index, clamped
+        if (len(m1) == 0.0f) {
+            m1.x = m.x - (cz * Dz_2A * m.z);
+            m1.y = m.y;
+            m1.z = m.z + (cz * Dz_2A * m.x);
+        }
+        if (len(m2) == 0.0f) {
+            m2.x = m.x + (cz * Dz_2A * m.z);
+            m2.y = m.y;
+            m2.z = m.z - (cz * Dz_2A * m.x);
+        }
 
-        // DMI
-        float mz1 = (k+1<N2)? mz[I1] : (m.z + (cz * Dz_2A * m.x)); // right neighbor
-        float mz2 = (k-1>=0)? mz[I2] : (m.z - (cz * Dz_2A * m.x)); // left neighbor
-        h.x -= Dz*(mz1-mz2)/cz;
-        // note: actually 2*D * delta / (2*c)
-
-        float mx1 = (k+1<N2)? mx[I1] : (m.x - (cz * Dz_2A * m.z));
-        float mx2 = (k-1>=0)? mx[I2] : (m.x + (cz * Dz_2A * m.z));
-        h.z += Dz*(mx1-mx2)/cz;
-
-        // Exchange
-        float3 m1 = make_float3(mx1, my[I1], mz1); // right neighbor
-        float3 m2 = make_float3(mx2, my[I2], mz2); // left neighbor
+        // add exchange field
         h +=  (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m));
+
+        // add DMI
+        h.x -= Dz*(m1.z-m2.z)/cz; // note: actually 2*D * delta / (2*c)
+        h.z += Dz*(m1.x-m2.x)/cz;
     }
 
     // y derivatives (along height)

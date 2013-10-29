@@ -314,14 +314,14 @@ func (s *Slice) String() string {
 	return buf.String()
 }
 
-func (s *Slice) Set(comp, x, y, z int, value float64) {
+func (s *Slice) Set(comp, ix, iy, iz int, value float64) {
 	s.checkComp(comp)
-	s.Host()[comp][s.Index(x, y, z)] = float32(value)
+	s.Host()[comp][s.Index(ix, iy, iz)] = float32(value)
 }
 
-func (s *Slice) Get(comp, x, y, z int) float64 {
+func (s *Slice) Get(comp, ix, iy, iz int) float64 {
 	s.checkComp(comp)
-	return float64(s.Host()[comp][s.Index(x, y, z)])
+	return float64(s.Host()[comp][s.Index(ix, iy, iz)])
 }
 
 func (s *Slice) checkComp(comp int) {
@@ -330,14 +330,14 @@ func (s *Slice) checkComp(comp int) {
 	}
 }
 
-func (s *Slice) Index(x, y, z int) int {
+func (s *Slice) Index(ix, iy, iz int) int {
 	Nx := s.mesh.Size()[X]
 	Ny := s.mesh.Size()[Y]
 	Nz := s.mesh.Size()[Z]
-	if x < 0 || x >= Nx || y < 0 || y >= Ny || z < 0 || z >= Nz {
-		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", x, y, z, Nx, Ny, Nz)
+	if ix < 0 || ix >= Nx || iy < 0 || iy >= Ny || iz < 0 || iz >= Nz {
+		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", ix, iy, iz, Nx, Ny, Nz)
 	}
-	return (z*Ny+y)*Nx + x
+	return (iz*Ny+iy)*Nx + ix
 }
 
 const (

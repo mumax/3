@@ -331,11 +331,17 @@ func (s *Slice) checkComp(comp int) {
 }
 
 func (s *Slice) Index(x, y, z int) int {
-	N0 := s.mesh.Size()[0]
-	N1 := s.mesh.Size()[1]
-	N2 := s.mesh.Size()[2]
-	if x < 0 || x >= N0 || y < 0 || y >= N1 || z < 0 || z >= N2 {
-		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", x, y, z, N0, N1, N2) // userspace
+	Nx := s.mesh.Size()[X]
+	Ny := s.mesh.Size()[Y]
+	Nz := s.mesh.Size()[Z]
+	if x < 0 || x >= Nx || y < 0 || y >= Ny || z < 0 || z >= Nz {
+		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", x, y, z, Nx, Ny, Nz)
 	}
-	return (z*N1+y)*N2 + x
+	return (z*Ny+y)*Nx + x
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

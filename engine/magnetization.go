@@ -32,11 +32,11 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 	h := host.Vectors()
 	n := m.Mesh().Size()
 
-	for i := 0; i < n[0]; i++ {
-		for j := 0; j < n[1]; j++ {
-			for k := 0; k < n[2]; k++ {
-				r := index2Coord(i, j, k)
-				x, y, z := r[0], r[1], r[2]
+	for i := 0; i < n[Z]; i++ {
+		for j := 0; j < n[Y]; j++ {
+			for k := 0; k < n[X]; k++ {
+				r := index2Coord(k, j, i)
+				x, y, z := r[X], r[Y], r[Z]
 				if region(x, y, z) { // inside
 					m := conf(x, y, z)
 					h[0][i][j][k] = float32(m[0])

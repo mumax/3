@@ -8,35 +8,35 @@ import (
 	"github.com/mumax/3/util"
 )
 
-func kernMulRSymm2Dxy_async(fftMx, fftMy, K11, K22, K12 *data.Slice, Nx, Ny int, str int) {
-	util.Argument(K11.Len() == (Ny/2+1)*Nx)
-	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
+func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int, str int) {
+	util.Argument(Kxx.Len() == (Ny/2+1)*Nx)
+	util.Argument(fftMy.NComp() == 1 && Kxx.NComp() == 1)
 
 	cfg := make3DConf([3]int{1, Ny, Nx})
 
 	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
-		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
+		Kxx.DevPtr(0), Kxx.DevPtr(0), Kxy.DevPtr(0),
 		Nx, Ny, cfg, 0)
 }
 
-func kernMulRSymm2Dz_async(fftMz, K00 *data.Slice, Nx, Ny int, str int) {
-	util.Argument(K00.Len() == (Ny/2+1)*Nx)
-	util.Argument(fftMz.NComp() == 1 && K00.NComp() == 1)
+func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int, str int) {
+	util.Argument(Kzz.Len() == (Ny/2+1)*Nx)
+	util.Argument(fftMz.NComp() == 1 && Kzz.NComp() == 1)
 
 	cfg := make3DConf([3]int{1, Ny, Nx})
 
-	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), K00.DevPtr(0), Nx, Ny, cfg, str)
+	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), Kzz.DevPtr(0), Nx, Ny, cfg, str)
 }
 
 // Does not yet use Y mirror symmetry!!
 // Even though it is implemented partially in kernel
-func kernMulRSymm3D_async(fftM [3]*data.Slice, K00, K11, K22, K12, K02, K01 *data.Slice, N0, N1, N2 int, str int) {
-	util.Argument(K00.Len() == N0*(N1)*N2) // no symmetry yet
-	util.Argument(fftM[0].NComp() == 1 && K00.NComp() == 1)
+func kernMulRSymm3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *data.Slice, Nx, Ny, Nz int, str int) {
+	util.Argument(Kxx.Len() == Nx*(Ny)*Nz) // no symmetry yet
+	util.Argument(fftM[X].NComp() == 1 && Kxx.NComp() == 1)
 
-	cfg := make3DConf([3]int{N0, N1, N2})
+	cfg := make3DConf([3]int{Nz, Ny, Nx})
 
-	k_kernmulRSymm3D_async(fftM[0].DevPtr(0), fftM[1].DevPtr(0), fftM[2].DevPtr(0),
-		K00.DevPtr(0), K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0), K02.DevPtr(0), K01.DevPtr(0),
-		N0, N1, N2, cfg, str)
+	k_kernmulRSymm3D_async(fftM[X].DevPtr(0), fftM[Y].DevPtr(0), fftM[Z].DevPtr(0),
+		Kxx.DevPtr(0), Kyy.DevPtr(0), Kzz.DevPtr(0), Kyz.DevPtr(0), Kxz.DevPtr(0), Kxy.DevPtr(0),
+		Nx, Ny, Nz, cfg, str)
 }

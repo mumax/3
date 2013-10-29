@@ -152,11 +152,11 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	}
 
 	// kern mul
-	N0, N1, N2 := c.fftKernSize[0], c.fftKernSize[1], c.fftKernSize[2]
+	Nx, Ny, Nz := c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z]
 	kernMulRSymm3D_async(c.fftCBuf,
-		c.gpuFFTKern[0][0], c.gpuFFTKern[1][1], c.gpuFFTKern[2][2],
-		c.gpuFFTKern[1][2], c.gpuFFTKern[0][2], c.gpuFFTKern[0][1],
-		N0, N1, N2, 0)
+		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[Z][Z],
+		c.gpuFFTKern[Y][Z], c.gpuFFTKern[X][Z], c.gpuFFTKern[X][Y],
+		Nx, Ny, Nz, 0)
 
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
@@ -169,31 +169,31 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
-	c.fwFFT(0, inp, vol, Bsat, regions) // FFT x
+	c.fwFFT(Z, inp, vol, Bsat, regions) // FFT Z
 
-	// kern mul X
+	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
-	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[0][0], Nx, Ny, 0)
+	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, 0)
 
-	c.bwFFT(0, outp) // bw FFT x
+	c.bwFFT(Z, outp) // bw FFT z
 
-	for i := 1; i < 3; i++ { // FW FFT yz
-		c.fwFFT(i, inp, vol, Bsat, regions)
-	}
+	// FW FFT xy
+	c.fwFFT(X, inp, vol, Bsat, regions)
+	c.fwFFT(Y, inp, vol, Bsat, regions)
 
-	// kern mul yz
+	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
 		Nx, Ny, 0)
 
-	for i := 1; i < 3; i++ { // BW FFT yz
-		c.bwFFT(i, outp)
-	}
+	// BW FFT xy
+	c.bwFFT(X, outp)
+	c.bwFFT(Y, outp)
 	//SyncAll()
 }
 
 func (c *DemagConvolution) is2D() bool {
-	return c.size[0] == 1
+	return c.size[Z] == 1
 }
 
 func (c *DemagConvolution) is3D() bool {
@@ -227,7 +227,7 @@ func (c *DemagConvolution) freeKern() {
 func (c *DemagConvolution) initMesh() {
 	n := fftR2COutputSizeFloats(c.kernSize)
 	cell := c.kern[0][0].Mesh().CellSize()
-	c.FFTMesh = *data.NewMesh(n[0], n[1], n[2], 1/cell[0], 1/cell[1], 1/cell[2])
+	c.FFTMesh = *data.NewMesh(n[X], n[Y], n[Z], 1/cell[X], 1/cell[Y], 1/cell[Z])
 	c.FFTMesh.Unit = "/m"
 }
 

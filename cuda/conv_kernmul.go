@@ -8,24 +8,24 @@ import (
 	"github.com/mumax/3/util"
 )
 
-func kernMulRSymm2Dyz_async(fftMy, fftMz, K11, K22, K12 *data.Slice, N1, N2 int, str int) {
-	util.Argument(K11.Len() == (N1/2+1)*N2)
+func kernMulRSymm2Dxy_async(fftMx, fftMy, K11, K22, K12 *data.Slice, Nx, Ny int, str int) {
+	util.Argument(K11.Len() == (Ny/2+1)*Nx)
 	util.Argument(fftMy.NComp() == 1 && K11.NComp() == 1)
 
-	cfg := make3DConf([3]int{1, N1, N2})
+	cfg := make3DConf([3]int{1, Ny, Nx})
 
-	k_kernmulRSymm2Dyz_async(fftMy.DevPtr(0), fftMz.DevPtr(0),
+	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
 		K11.DevPtr(0), K22.DevPtr(0), K12.DevPtr(0),
-		N1, N2, cfg, 0)
+		Nx, Ny, cfg, 0)
 }
 
-func kernMulRSymm2Dx_async(fftMx, K00 *data.Slice, N1, N2 int, str int) {
-	util.Argument(K00.Len() == (N1/2+1)*N2)
-	util.Argument(fftMx.NComp() == 1 && K00.NComp() == 1)
+func kernMulRSymm2Dz_async(fftMz, K00 *data.Slice, Nx, Ny int, str int) {
+	util.Argument(K00.Len() == (Ny/2+1)*Nx)
+	util.Argument(fftMz.NComp() == 1 && K00.NComp() == 1)
 
-	cfg := make3DConf([3]int{1, N1, N2})
+	cfg := make3DConf([3]int{1, Ny, Nx})
 
-	k_kernmulRSymm2Dx_async(fftMx.DevPtr(0), K00.DevPtr(0), N1, N2, cfg, str)
+	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), K00.DevPtr(0), Nx, Ny, cfg, str)
 }
 
 // Does not yet use Y mirror symmetry!!

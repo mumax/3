@@ -31,14 +31,13 @@ func (c *DemagConvolution) init() {
 	}
 
 	{ // init device buffers
-		// 2D re-uses fftBuf[1] as fftBuf[0], 3D needs all 3 fftBufs.
-		for i := 1; i < 3; i++ {
-			c.fftCBuf[i] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
-		}
+		// 2D re-uses fftBuf[X] as fftBuf[Z], 3D needs all 3 fftBufs.
+		c.fftCBuf[X] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
+		c.fftCBuf[Y] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
 		if c.is3D() {
-			c.fftCBuf[0] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
+			c.fftCBuf[Z] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
 		} else {
-			c.fftCBuf[0] = c.fftCBuf[1]
+			c.fftCBuf[Z] = c.fftCBuf[X]
 		}
 		for i := 0; i < 3; i++ {
 			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize))
@@ -56,8 +55,8 @@ func (c *DemagConvolution) initFFTKern3D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
 	realsize := ffted
-	util.Assert(realsize[0]%2 == 0)
-	realsize[0] /= 2
+	util.Assert(realsize[X]%2 == 0)
+	realsize[X] /= 2
 	c.fftKernSize = realsize
 	halfkern := realsize
 	fwPlan := c.fwPlan
@@ -84,10 +83,11 @@ func (c *DemagConvolution) initFFTKern2D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
 	realsize := ffted
-	realsize[2] /= 2
+	util.Assert(realsize[X]%2 == 0)
+	realsize[X] /= 2
 	c.fftKernSize = realsize
 	halfkern := realsize
-	halfkern[1] = halfkern[1]/2 + 1
+	halfkern[Y] = halfkern[Y]/2 + 1
 	fwPlan := c.fwPlan
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
@@ -172,8 +172,8 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	c.fwFFT(0, inp, vol, Bsat, regions) // FFT x
 
 	// kern mul X
-	N1, N2 := c.fftKernSize[1], c.fftKernSize[2]
-	kernMulRSymm2Dx_async(c.fftCBuf[0], c.gpuFFTKern[0][0], N1, N2, 0)
+	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
+	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[0][0], Nx, Ny, 0)
 
 	c.bwFFT(0, outp) // bw FFT x
 
@@ -182,9 +182,9 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	}
 
 	// kern mul yz
-	kernMulRSymm2Dyz_async(c.fftCBuf[1], c.fftCBuf[2],
-		c.gpuFFTKern[1][1], c.gpuFFTKern[2][2], c.gpuFFTKern[1][2],
-		N1, N2, 0)
+	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
+		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
+		Nx, Ny, 0)
 
 	for i := 1; i < 3; i++ { // BW FFT yz
 		c.bwFFT(i, outp)

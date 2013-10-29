@@ -45,10 +45,10 @@ func Mesh() *data.Mesh {
 	return &globalmesh
 }
 
-func WorldSize() [3]float64 {
-	w := Mesh().WorldSize()
-	return [3]float64{w[2], w[1], w[0]} // swaps XYZ
-}
+//func WorldSize() [3]float64 {
+//	w := Mesh().WorldSize()
+//	return [3]float64{w[2], w[1], w[0]} // swaps XYZ
+//}
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.

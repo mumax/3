@@ -11,7 +11,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 )
@@ -103,18 +102,18 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						fmt.Fprint(out, data[util.SwapIndex(0, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(1, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(3, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(2, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(4, 9)][i][j][k], " ")
-						fmt.Fprint(out, data[util.SwapIndex(5, 9)][i][j][k], " ")
+						fmt.Fprint(out, data[0][i][j][k], " ")
+						fmt.Fprint(out, data[1][i][j][k], " ")
+						fmt.Fprint(out, data[2][i][j][k], " ")
+						fmt.Fprint(out, data[1][i][j][k], " ")
+						fmt.Fprint(out, data[3][i][j][k], " ")
+						fmt.Fprint(out, data[4][i][j][k], " ")
+						fmt.Fprint(out, data[2][i][j][k], " ")
+						fmt.Fprint(out, data[4][i][j][k], " ")
+						fmt.Fprint(out, data[5][i][j][k], " ")
 					} else {
 						for c := 0; c < N; c++ {
-							fmt.Fprint(out, data[util.SwapIndex(c, N)][i][j][k], " ")
+							fmt.Fprint(out, data[c][i][j][k], " ")
 						}
 					}
 				}
@@ -128,18 +127,18 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 				for k := 0; k < gridsize[Z]; k++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(0, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(1, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(2, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(1, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(3, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(4, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(2, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(4, 9)][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(5, 9)][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[0][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[1][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[2][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[1][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[3][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[4][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[2][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[4][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[5][i][j][k])
 					} else {
 						for c := 0; c < N; c++ {
-							binary.Write(buffer, binary.LittleEndian, data[util.SwapIndex(c, N)][i][j][k])
+							binary.Write(buffer, binary.LittleEndian, data[c][i][j][k])
 						}
 					}
 				}

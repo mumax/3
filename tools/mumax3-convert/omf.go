@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"strings"

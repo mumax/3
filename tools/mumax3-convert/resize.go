@@ -22,7 +22,7 @@ func parseSize(arg string) (size [3]int) {
 	for i, w := range words {
 		v, err := strconv.Atoi(w)
 		util.FatalErr(err)
-		size[util.SwapIndex(i, len(words))] = v
+		size[i] = v
 	}
 	return
 }

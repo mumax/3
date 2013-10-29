@@ -14,7 +14,6 @@ package main
 import (
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"strings"
@@ -138,7 +137,7 @@ func writeOvf2Binary4(out io.Writer, array *data.Slice) {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < ncomp; c++ {
-					bytes = (*[4]byte)(unsafe.Pointer(&data[util.SwapIndex(c, ncomp)][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[c][i][j][k]))[:]
 					out.Write(bytes)
 				}
 			}

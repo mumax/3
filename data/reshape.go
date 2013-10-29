@@ -11,13 +11,13 @@ func reshape(array []float32, size [3]int) [][][]float32 {
 	if Nx*Ny*Nz != len(array) {
 		panic(fmt.Errorf("reshape: size mismatch: %v*%v*%v != %v", Nx, Ny, Nz, len(array)))
 	}
-	sliced := make([][][]float32, Nx)
+	sliced := make([][][]float32, Nz)
 	for i := range sliced {
 		sliced[i] = make([][]float32, Ny)
 	}
 	for i := range sliced {
 		for j := range sliced[i] {
-			sliced[i][j] = array[(i*Ny+j)*Nz+0 : (i*Ny+j)*Nz+Nz]
+			sliced[i][j] = array[(i*Ny+j)*Nx+0 : (i*Ny+j)*Nx+Nx]
 		}
 	}
 	return sliced

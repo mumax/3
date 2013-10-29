@@ -14,6 +14,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	}
 	log.Print("verifying convolution ")
 	inhost := data.NewSlice(3, mesh)
+	log.Println("test inhost size=", inhost.Mesh().Size())
 	initConvTestInput(inhost.Vectors())
 	gpu := NewSlice(3, mesh)
 	defer gpu.Free()
@@ -122,14 +123,21 @@ func wrap(number, max int) int {
 func initConvTestInput(input [3][][][]float32) {
 	rng := rand.New(rand.NewSource(0)) // reproducible tests
 	size := sizeOf(input[0])
-	N0, N1, N2 := size[0], size[1], size[2]
-	is := [...]int{0, N0 / 5, N0 / 2, N0 - 1}
-	js := [...]int{0, N1 / 7, N1 / 2, N1 - 1}
-	ks := [...]int{0, N2 / 11, N2 / 2, N2 - 1}
+
+	Nx, Ny, Nz := size[X], size[Y], size[Z]
+	log.Println("conv test size=", Nx, Ny, Nz)
+	ks := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
+	js := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
+	is := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
+	log.Println("conv test ks=", ks)
+	log.Println("conv test js=", js)
+	log.Println("conv test is=", is)
+	log.Println("conv test input size=", len(input), len(input[0]), len(input[0][0]), len(input[0][0][0]))
+
 	for c := range input {
-		for _, i := range is {
-			for _, j := range js {
-				for _, k := range ks {
+		for _, i := range is { // z
+			for _, j := range js { // y
+				for _, k := range ks { // x
 					input[c][i][j][k] = 1 - 2*rng.Float32()
 				}
 			}

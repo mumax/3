@@ -50,3 +50,10 @@ func iMin(a, b int) int {
 func divUp(x, y int) int {
 	return ((x - 1) / y) + 1
 }
+
+// vector components
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

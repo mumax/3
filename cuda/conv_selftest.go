@@ -99,14 +99,14 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 						if kern[dc][sc] == nil {
 							continue // skip zero kernel
 						}
-						for dz := 0; dz < size[2]; dz++ {
-							k := wrap(dz-sz, ksize[2])
+						for dz := 0; dz < size[Z]; dz++ {
+							k := wrap(dz-sz, ksize[Z])
 
-							for dy := 0; dy < size[1]; dy++ {
-								j := wrap(dy-sy, ksize[1])
+							for dy := 0; dy < size[Y]; dy++ {
+								j := wrap(dy-sy, ksize[Y])
 
-								for dx := 0; dx < size[0]; dx++ {
-									i := wrap(dx-sx, ksize[0])
+								for dx := 0; dx < size[X]; dx++ {
+									i := wrap(dx-sx, ksize[X])
 
 									out[dc][dz][dy][dx] += in[sc][sz][sy][sx] * kern[dc][sc][k][j][i]
 								}
@@ -130,11 +130,9 @@ func initConvTestInput(input [3][][][]float32) {
 	size := sizeOf(input[0])
 
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
-	log.Println("conv test size=", Nx, Ny, Nz)
 	ixs := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
 	iys := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
 	izs := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
-	log.Println("conv test input size=", len(input), len(input[0]), len(input[0][0]), len(input[0][0][0]))
 
 	for c := range input {
 		for _, i := range izs {

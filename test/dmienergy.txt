@@ -1,3 +1,7 @@
+/*
+	Test energy dissipation in presence of DMI
+*/
+
 N := 64
 setgridsize(N, N, 1)
 c := 1.15e-9 / 2
@@ -13,9 +17,16 @@ Dex   = vector(3e-3, 3e-3, 0)
 m     = uniform(1, 1, 1)
 alpha = 0.01
 
-// output
-tableadd(E_total)
-tableadd(E_exch)
-tableautosave(.1e-12)
+E0 := E_total.Get()
+print("E0", E0, "J")
 
-run(1e-9)
+run(10e-12)
+E1 := E_total.Get()
+print("E1", E1, "J")
+
+run(10e-12)
+E2 := E_total.Get()
+print("E2", E2, "J")
+
+expect("delta1", E1-E0, -2.62692723e-20, 0.0001e-20)
+expect("delta2", E2-E0, -4.93337113e-20, 0.0001e-20)

@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
@@ -27,7 +26,6 @@ type DemagConvolution struct {
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
-		log.Println("convolution padded size=", padded)
 		c.fwPlan = newFFT3DR2C(padded[0], padded[1], padded[2], stream[0])
 		c.bwPlan = newFFT3DC2R(padded[0], padded[1], padded[2], stream[0])
 	}
@@ -205,13 +203,11 @@ func (c *DemagConvolution) is3D() bool {
 // Initializes a demag convolution for the given mesh geometry and magnetostatic kernel.
 func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution {
 	size := mesh.Size()
-	log.Println("new convolution mesh size=", size)
 	c := new(DemagConvolution)
 	c.size = size
 	c.kern = kernel
 	c.n = prod(size)
 	c.kernSize = kernel[0][0].Mesh().Size()
-	log.Println("new convolution kern size=", c.kernSize)
 	c.init()
 	c.initMesh()
 	testConvolution(c, mesh)

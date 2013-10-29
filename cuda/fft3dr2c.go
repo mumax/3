@@ -25,7 +25,6 @@ func newFFT3DR2C(Nx, Ny, Nz int, stream cu.Stream) fft3DR2CPlan {
 // Execute the FFT plan, asynchronous.
 // src and dst are 3D arrays stored 1D arrays.
 func (p *fft3DR2CPlan) ExecAsync(src, dst *data.Slice) {
-	log.Println("execR2C size=", p.size, "input size=", src.Mesh().Size(), "output size=", dst.Mesh().Size())
 	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
 	oksrclen := p.InputLen()
 	if src.Len() != oksrclen {

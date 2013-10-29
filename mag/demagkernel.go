@@ -16,7 +16,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		pbc := mesh.PBC()
 		sz := padSize(mesh.Size(), pbc)
 		cs := mesh.CellSize()
-		mesh = data.NewMesh(sz[0], sz[1], sz[2], cs[0], cs[1], cs[2], pbc[:]...)
+		mesh = data.NewMesh(sz[X], sz[Y], sz[Z], cs[X], cs[Y], cs[Z], pbc[:]...)
 	}
 
 	// Shorthand
@@ -27,13 +27,13 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	// Sanity check
 	{
-		util.Assert(size[0] > 0 && size[1] > 1 && size[2] > 1)
-		util.Assert(cellsize[0] > 0 && cellsize[1] > 0 && cellsize[2] > 0)
-		util.Assert(pbc[0] >= 0 && pbc[1] >= 0 && pbc[2] >= 0)
+		util.Assert(size[Z] >= 1 && size[Y] >= 2 && size[X] >= 2)
+		util.Assert(cellsize[X] > 0 && cellsize[Y] > 0 && cellsize[Z] > 0)
+		util.Assert(pbc[X] >= 0 && pbc[Y] >= 0 && pbc[Z] >= 0)
 		util.Assert(accuracy > 0)
-		util.AssertMsg(size[1]%2 == 0 && size[2]%2 == 0, "Even kernel size needed")
-		if size[0] > 1 {
-			util.AssertMsg(size[0]%2 == 0, "Even kernel size needed")
+		util.AssertMsg(size[X]%2 == 0 && size[Y]%2 == 0, "Even kernel size needed")
+		if size[Z] > 1 {
+			util.AssertMsg(size[Z]%2 == 0, "Even kernel size needed")
 		}
 	}
 

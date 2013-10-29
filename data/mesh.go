@@ -80,15 +80,14 @@ func (m *Mesh) PBC_code() byte {
 	return code
 }
 
-// String representation in user coordinates (XYZ)
-func (m *Mesh) UserString() string {
+func (m *Mesh) String() string {
 	s := m.gridSize
 	c := m.cellSize
 	pbc := ""
 	if m.pbc != [3]int{0, 0, 0} {
-		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[2], m.pbc[1], m.pbc[0])
+		pbc = fmt.Sprintf(", PBC: [%v x %v x %v],", m.pbc[0], m.pbc[1], m.pbc[2])
 	}
-	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[2], s[1], s[0], float32(c[2]), float32(c[1]), float32(c[0]), pbc)
+	return fmt.Sprintf("[%v x %v x %v] x [%vm x %vm x %vm]%v", s[0], s[1], s[2], float32(c[0]), float32(c[1]), float32(c[2]), pbc)
 }
 
 // product of elements.

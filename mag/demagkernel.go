@@ -48,39 +48,39 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	// Field (destination) loop ranges
 	var x1, x2, y1, y2, z1, z2 int
-
 	// TODO: simplify
-	if pbc[X] == 0 {
-		x1, x2 = -(size[X]-1)/2, (size[X]-1)/2
-	} else {
-		x1, x2 = -(size[X]*pbc[X] - 1), (size[X]*pbc[X] - 1)
+	{
+		if pbc[X] == 0 {
+			x1, x2 = -(size[X]-1)/2, (size[X]-1)/2
+		} else {
+			x1, x2 = -(size[X]*pbc[X] - 1), (size[X]*pbc[X] - 1)
+		}
+		if pbc[Y] == 0 {
+			y1, y2 = -(size[Y]-1)/2, (size[Y]-1)/2
+		} else {
+			y1, y2 = -(size[Y]*pbc[Y] - 1), (size[Y]*pbc[Y] - 1)
+		}
+		if pbc[Z] == 0 {
+			z1, z2 = -(size[Z]-1)/2, (size[Z]-1)/2
+		} else {
+			z1, z2 = -(size[Z]*pbc[Z] - 1), (size[Z]*pbc[Z] - 1)
+		}
+		// support for 2D simulations (thickness 1)
+		if size[X] == 1 && pbc[X] == 0 {
+			x2 = 0
+		}
+		//log.Println("kernel ranges:", x1, x2, ",", y1, y2, ",", z1, z2)
 	}
-
-	if pbc[Y] == 0 {
-		y1, y2 = -(size[Y]-1)/2, (size[Y]-1)/2
-	} else {
-		y1, y2 = -(size[Y]*pbc[Y] - 1), (size[Y]*pbc[Y] - 1)
-	}
-
-	if pbc[Z] == 0 {
-		z1, z2 = -(size[Z]-1)/2, (size[Z]-1)/2
-	} else {
-		z1, z2 = -(size[Z]*pbc[Z] - 1), (size[Z]*pbc[Z] - 1)
-	}
-
-	// support for 2D simulations (thickness 1)
-	if size[X] == 1 && pbc[X] == 0 {
-		x2 = 0
-	}
-	//log.Println("kernel ranges:", x1, x2, ",", y1, y2, ",", z1, z2)
 
 	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
-	if cellsize[Y] < L {
-		L = cellsize[Y]
-	}
-	if cellsize[Z] < L {
-		L = cellsize[Z]
+	{
+		if cellsize[Y] < L {
+			L = cellsize[Y]
+		}
+		if cellsize[Z] < L {
+			L = cellsize[Z]
+		}
 	}
 
 	// Start brute integration
@@ -95,17 +95,16 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	for s := 0; s < 3; s++ { // source index Ksdxyz // TODO: make inner?
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
-		for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
-			xw := wrap(x, size[X])
-			R[X] = float64(x) * cellsize[X]
-
+		for z := z1; z <= z2; z++ {
+			zw := wrap(z, size[Z])
+			R[Z] = float64(z) * cellsize[Z]
 			for y := y1; y <= y2; y++ {
 				yw := wrap(y, size[Y])
 				R[Y] = float64(y) * cellsize[Y]
 
-				for z := z1; z <= z2; z++ {
-					zw := wrap(z, size[Z])
-					R[Z] = float64(z) * cellsize[Z]
+				for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
+					xw := wrap(x, size[X])
+					R[X] = float64(x) * cellsize[X]
 
 					// choose number of integration points depending on how far we are from source.
 					dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
@@ -120,8 +119,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 					ny := int(math.Max(cellsize[Y]/maxSize, 1) + 0.5)
 					nz := int(math.Max(cellsize[Z]/maxSize, 1) + 0.5)
 					// Stagger source and destination grids.
-					// Massively improves accuracy. Could play with variations.
-					// See note.
+					// Massively improves accuracy, see note.
 					nv *= 2
 					nw *= 2
 
@@ -175,7 +173,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 						}
 					}
 					for d := s; d < 3; d++ { // destination index Ksdxyz
-						array[s][d][xw][yw][zw] += float32(B[d])
+						array[s][d][zw][yw][xw] += float32(B[d])
 					}
 				}
 			}
@@ -221,7 +219,7 @@ func wrap(number, max int) int {
 		number -= max
 	}
 	return number
-}
+} // TODO: replace by cuda.wrap
 
 // Returns the size after zero-padding,
 // taking into account periodic boundary conditions.

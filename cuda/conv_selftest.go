@@ -77,33 +77,38 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 	ksize := sizeOf(kern[0][0])
 	// Zero output first
 	for c := 0; c < 3; c++ {
-		for x := 0; x < size[0]; x++ {
-			for y := 0; y < size[1]; y++ {
-				for z := 0; z < size[2]; z++ {
-					out[c][x][y][z] = 0
+		for iz := 0; iz < size[Z]; iz++ {
+			for iy := 0; iy < size[Y]; iy++ {
+				for ix := 0; ix < size[X]; ix++ {
+					out[c][iz][iy][ix] = 0
 				}
 			}
 		}
 	}
 
-	for sc := 0; sc < 3; sc++ {
-		for sx := 0; sx < size[0]; sx++ {
-			for sy := 0; sy < size[1]; sy++ {
-				for sz := 0; sz < size[2]; sz++ {
-					if in[sc][sx][sy][sz] == 0 {
+	for sc := 0; sc < 3; sc++ { // source component // TODO: make inner?
+
+		for sz := 0; sz < size[Z]; sz++ {
+			for sy := 0; sy < size[Y]; sy++ {
+				for sx := 0; sx < size[X]; sx++ {
+
+					if in[sc][sz][sy][sx] == 0 {
 						continue // skip zero source
 					}
-					for dc := 0; dc < 3; dc++ {
+					for dc := 0; dc < 3; dc++ { // dest component
 						if kern[dc][sc] == nil {
 							continue // skip zero kernel
 						}
-						for dx := 0; dx < size[0]; dx++ {
-							i := wrap(dx-sx, ksize[0])
+						for dz := 0; dz < size[2]; dz++ {
+							k := wrap(dz-sz, ksize[2])
+
 							for dy := 0; dy < size[1]; dy++ {
 								j := wrap(dy-sy, ksize[1])
-								for dz := 0; dz < size[2]; dz++ {
-									k := wrap(dz-sz, ksize[2])
-									out[dc][dx][dy][dz] += in[sc][sx][sy][sz] * kern[dc][sc][i][j][k]
+
+								for dx := 0; dx < size[0]; dx++ {
+									i := wrap(dx-sx, ksize[0])
+
+									out[dc][dz][dy][dx] += in[sc][sz][sy][sx] * kern[dc][sc][k][j][i]
 								}
 							}
 						}
@@ -126,18 +131,15 @@ func initConvTestInput(input [3][][][]float32) {
 
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
 	log.Println("conv test size=", Nx, Ny, Nz)
-	ks := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
-	js := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
-	is := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
-	log.Println("conv test ks=", ks)
-	log.Println("conv test js=", js)
-	log.Println("conv test is=", is)
+	ixs := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
+	iys := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
+	izs := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
 	log.Println("conv test input size=", len(input), len(input[0]), len(input[0][0]), len(input[0][0][0]))
 
 	for c := range input {
-		for _, i := range is { // z
-			for _, j := range js { // y
-				for _, k := range ks { // x
+		for _, i := range izs {
+			for _, j := range iys {
+				for _, k := range ixs {
 					input[c][i][j][k] = 1 - 2*rng.Float32()
 				}
 			}
@@ -145,7 +147,7 @@ func initConvTestInput(input [3][][][]float32) {
 	}
 }
 
-// Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
+// Returns the x, y, z size of block
 func sizeOf(block [][][]float32) [3]int {
-	return [3]int{len(block), len(block[0]), len(block[0][0])}
+	return [3]int{len(block[0][0]), len(block[0]), len(block)}
 }

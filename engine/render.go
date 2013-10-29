@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-var compstr = map[string]int{"x": 2, "y": 1, "z": 0} // also swaps XYZ user space
+var compstr = map[string]int{"x": 0, "y": 1, "z": 2} // also swaps XYZ user space
 
 var (
 	rescaleBuf  *data.Slice // GPU

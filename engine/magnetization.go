@@ -39,9 +39,9 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 				x, y, z := r[0], r[1], r[2]
 				if region(x, y, z) { // inside
 					m := conf(x, y, z)
-					h[0][i][j][k] = float32(m[2])
+					h[0][i][j][k] = float32(m[0])
 					h[1][i][j][k] = float32(m[1])
-					h[2][i][j][k] = float32(m[0])
+					h[2][i][j][k] = float32(m[2])
 				}
 			}
 		}
@@ -63,9 +63,9 @@ func (m *magnetization) SetRegion(region int, conf Config) {
 				x, y, z := pos[0], pos[1], pos[2]
 				if regions.arr[i][j][k] == r {
 					m := conf(x, y, z)
-					h[0][i][j][k] = float32(m[2])
+					h[0][i][j][k] = float32(m[0])
 					h[1][i][j][k] = float32(m[1])
-					h[2][i][j][k] = float32(m[0])
+					h[2][i][j][k] = float32(m[2])
 				}
 			}
 		}

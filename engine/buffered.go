@@ -32,13 +32,13 @@ func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := b.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
-		cuda.SetCell(b.buffer, util.SwapIndex(c, nComp), iz, iy, ix, float32(v[c]))
+		cuda.SetCell(b.buffer, c, iz, iy, ix, float32(v[c]))
 	}
 }
 
 // Get the value of one cell.
 func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
-	return float64(cuda.GetCell(b.buffer, util.SwapIndex(comp, b.NComp()), iz, iy, ix))
+	return float64(cuda.GetCell(b.buffer, comp, iz, iy, ix))
 }
 
 func (q *buffered) Region(r int) *inRegion { return &inRegion{q, r} }

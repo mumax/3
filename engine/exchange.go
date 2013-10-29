@@ -36,7 +36,7 @@ func init() {
 			msat := Msat.GetRegion(0)
 			D := Dex.GetRegion(0)
 			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D[2]/msat), float32(D[1]/msat), float32(D[0]/msat), float32(A), 0) // dmi+exchange
+			cuda.AddDMI(dst, M.buffer, float32(D[0]/msat), float32(D[1]/msat), float32(D[2]/msat), float32(A), 0) // dmi+exchange
 		}
 	})
 
@@ -133,7 +133,7 @@ func safediv(a, b float32) float32 {
 	}
 }
 
-// XYZ swap here
+// XYZ swap here (?)
 func (p *exchParam) upload() {
 	// alloc if  needed
 	if p.gpu == nil {

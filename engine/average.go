@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
 func init() {
@@ -34,7 +33,7 @@ func avg(b, vol *data.Slice) []float64 {
 	nCell := float64(b.Mesh().NCell())
 	avg := make([]float64, nComp)
 	for i := range avg {
-		I := util.SwapIndex(i, nComp)
+		I := i // util.SwapIndex(i, nComp)
 		if vol.IsNil() {
 			avg[i] = float64(cuda.Sum(b.Comp(I))) / nCell
 		} else {

@@ -39,9 +39,8 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 	if !p.gpu_ok {
 		// upload to GPU
 		p.assureAlloc()
-		ncomp := p.NComp()
 		for c2 := range p.gpu_buf {
-			c := util.SwapIndex(c2, ncomp) // XYZ swap here
+			c := c2 // XYZ swap here
 			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
 		}
 		p.gpu_ok = true

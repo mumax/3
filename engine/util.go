@@ -92,3 +92,9 @@ func index2Coord(i, j, k int) data.Vector {
 func Index2Coord(i, j, k int) data.Vector {
 	return index2Coord(k, j, i)
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

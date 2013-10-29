@@ -112,7 +112,7 @@ func writeOmfBinary4(out io.Writer, array *data.Slice) (err error) {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < ncomp; c++ {
 					// dirty conversion from float32 to [4]byte
-					bytes = (*[4]byte)(unsafe.Pointer(&data[util.SwapIndex(c, ncomp)][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[c][i][j][k]))[:]
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
 					out.Write(bytes)
 				}
@@ -134,7 +134,7 @@ func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 		for j := 0; j < gridsize[Y]; j++ {
 			for k := 0; k < gridsize[Z]; k++ {
 				for c := 0; c < tens.NComp(); c++ {
-					_, err = fmt.Fprint(out, data[util.SwapIndex(c, tens.NComp())][i][j][k], " ") // converts to user space.
+					_, err = fmt.Fprint(out, data[c][i][j][k], " ") // converts to user space.
 				}
 				_, err = fmt.Fprint(out, "\n")
 			}

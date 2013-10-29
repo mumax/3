@@ -316,14 +316,12 @@ func (s *Slice) String() string {
 
 func (s *Slice) Set(comp, x, y, z int, value float64) {
 	s.checkComp(comp)
-	comp = util.SwapIndex(comp, s.NComp())
-	s.Host()[comp][s.Index(z, y, x)] = float32(value)
+	s.Host()[comp][s.Index(x, y, z)] = float32(value)
 }
 
 func (s *Slice) Get(comp, x, y, z int) float64 {
 	s.checkComp(comp)
-	comp = util.SwapIndex(comp, s.NComp())
-	return float64(s.Host()[comp][s.Index(z, y, x)])
+	return float64(s.Host()[comp][s.Index(x, y, z)])
 }
 
 func (s *Slice) checkComp(comp int) {
@@ -337,7 +335,7 @@ func (s *Slice) Index(x, y, z int) int {
 	N1 := s.mesh.Size()[1]
 	N2 := s.mesh.Size()[2]
 	if x < 0 || x >= N0 || y < 0 || y >= N1 || z < 0 || z >= N2 {
-		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", z, y, x, N2, N1, N0) // userspace
+		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", x, y, z, N0, N1, N2) // userspace
 	}
-	return (x*N1+y)*N2 + z
+	return (z*N1+y)*N2 + x
 }

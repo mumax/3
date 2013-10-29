@@ -7,7 +7,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 )
 
@@ -34,7 +33,7 @@ func dumpGnuplot(out io.Writer, f *data.Slice) (err error) {
 				z := float64(k) * cellsize[2]
 				_, err = fmt.Fprint(buf, z, " ", y, " ", x, "\t")
 				for c := 0; c < ncomp; c++ {
-					_, err = fmt.Fprint(buf, data[util.SwapIndex(c, ncomp)][i][j][k], " ") // converts to user space.
+					_, err = fmt.Fprint(buf, data[c][i][j][k], " ") // converts to user space.
 				}
 				_, err = fmt.Fprint(buf, "\n")
 			}

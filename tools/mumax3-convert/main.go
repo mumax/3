@@ -235,7 +235,7 @@ func preprocess(f *data.Slice) {
 		normpeak(f)
 	}
 	if *flag_comp != -1 {
-		*f = *f.Comp(util.SwapIndex(*flag_comp, f.NComp()))
+		*f = *f.Comp(*flag_comp)
 	}
 	crop(f)
 	if *flag_resize != "" {

@@ -10,6 +10,6 @@ func init() {
 
 func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
 	const c = 1 // dummy cell size
-	mesh := data.NewMesh(Nz, Ny, Nx, c, c, c)
+	mesh := data.NewMesh(Nx, Ny, Nz, c, c, c)
 	return data.NewSlice(ncomp, mesh)
 }

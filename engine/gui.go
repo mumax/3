@@ -130,16 +130,16 @@ func Serve(port string) {
 
 		// geometry
 		size := globalmesh.Size()
-		gui.SetValue("nx", size[2])
+		gui.SetValue("nx", size[0])
 		gui.SetValue("ny", size[1])
-		gui.SetValue("nz", size[0])
+		gui.SetValue("nz", size[2])
 		cellSize := globalmesh.CellSize()
-		gui.SetValue("cx", float32(cellSize[2]*1e9)) // in nm
+		gui.SetValue("cx", float32(cellSize[0]*1e9)) // in nm
 		gui.SetValue("cy", float32(cellSize[1]*1e9))
-		gui.SetValue("cz", float32(cellSize[0]*1e9))
-		gui.SetValue("wx", float32(float64(size[2])*cellSize[2]*1e9))
+		gui.SetValue("cz", float32(cellSize[2]*1e9))
+		gui.SetValue("wx", float32(float64(size[0])*cellSize[0]*1e9))
 		gui.SetValue("wy", float32(float64(size[1])*cellSize[1]*1e9))
-		gui.SetValue("wz", float32(float64(size[0])*cellSize[0]*1e9))
+		gui.SetValue("wz", float32(float64(size[2])*cellSize[2]*1e9))
 
 		// solver
 		gui.SetValue("time", fmt.Sprintf("%6e", Time))

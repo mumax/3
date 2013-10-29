@@ -17,10 +17,10 @@ func updateShift(dir, sign int) {
 
 // shift the simulation window over dx cells in user X direction
 func Shift(dx int) {
-	shift(M.buffer, dx, 0, 0)
-	regions.shift(dx, 0, 0)
+	shift(M.buffer, 0, 0, dx)
+	regions.shift(0, 0, dx)
 	geometry.shift(dx)
-	updateShift(2, -dx)
+	updateShift(X, -dx)
 }
 
 // Shift the data over (shx, shy, shz cells), clamping boundary values.
@@ -31,7 +31,7 @@ func shift(s *data.Slice, shx, shy, shz int) {
 	defer cuda.Recycle(m2)
 	for c := 0; c < s.NComp(); c++ {
 		comp := s.Comp(c)
-		cuda.Shift(m2, comp, [3]int{shz, shy, shx}) // ZYX !
+		cuda.Shift(m2, comp, [3]int{shx, shy, shz})
 		data.Copy(comp, m2)
 	}
 }
@@ -40,6 +40,6 @@ func (b *Regions) shift(shx, shy, shz int) {
 	r1 := b.Gpu()
 	r2 := cuda.NewBytes(b.Mesh()) // TODO: somehow recycle
 	defer r2.Free()
-	cuda.ShiftBytes(r2, r1, b.Mesh(), [3]int{shz, shy, shx}) // ZYX !
+	cuda.ShiftBytes(r2, r1, b.Mesh(), [3]int{shx, shy, shz})
 	r1.Copy(r2)
 }

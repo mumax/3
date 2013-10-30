@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
+	//"log"
 )
 
 // demag variables
@@ -40,7 +41,10 @@ func init() {
 
 	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field", func(b *data.Slice) {
 		if EnableDemag {
-			demagConv().Exec(b, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
+			//log.Println("will Exec", b.HostCopy(), M.buffer.HostCopy(), "...") // OK
+			d := demagConv() // destroys m ?
+			//log.Println("demagConv.Exec", b.HostCopy(), M.buffer.HostCopy(), "...")
+			d.Exec(b, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
 		} else {
 			cuda.Zero(b)
 		}

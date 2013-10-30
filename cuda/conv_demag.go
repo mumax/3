@@ -41,7 +41,7 @@ func (c *DemagConvolution) init() {
 			c.fftCBuf[Z] = c.fftCBuf[X]
 		}
 		for i := 0; i < 3; i++ {
-			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize))
+			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize)) // ?
 		}
 	}
 
@@ -113,6 +113,7 @@ func (c *DemagConvolution) initFFTKern2D() {
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
 func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+	//dbg("demagconv.exec", B.HostCopy(), m.HostCopy(), "...")
 	if c.is2D() {
 		c.exec2D(B, m, vol, Bsat, regions)
 	} else {
@@ -129,8 +130,11 @@ func zero1_async(dst *data.Slice, str int) {
 func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	zero1_async(c.fftRBuf[i], 0)
 	in := inp.Comp(i)
+	dbg("fwfft comp", i, in.HostCopy())
 	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, 0)
+	dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy())
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
+	dbg("fwfft:output", i, c.fftCBuf[i].HostCopy())
 }
 
 // backward FFT component i

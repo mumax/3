@@ -32,16 +32,16 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 	h := host.Vectors()
 	n := m.Mesh().Size()
 
-	for i := 0; i < n[Z]; i++ {
-		for j := 0; j < n[Y]; j++ {
-			for k := 0; k < n[X]; k++ {
-				r := index2Coord(k, j, i)
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				r := Index2Coord(ix, iy, iz)
 				x, y, z := r[X], r[Y], r[Z]
 				if region(x, y, z) { // inside
 					m := conf(x, y, z)
-					h[0][i][j][k] = float32(m[0])
-					h[1][i][j][k] = float32(m[1])
-					h[2][i][j][k] = float32(m[2])
+					h[X][iz][iy][ix] = float32(m[X])
+					h[Y][iz][iy][ix] = float32(m[Y])
+					h[Z][iz][iy][ix] = float32(m[Z])
 				}
 			}
 		}
@@ -56,16 +56,16 @@ func (m *magnetization) SetRegion(region int, conf Config) {
 	n := m.Mesh().Size()
 	r := byte(region)
 
-	for i := 0; i < n[0]; i++ {
-		for j := 0; j < n[1]; j++ {
-			for k := 0; k < n[2]; k++ {
-				pos := index2Coord(i, j, k)
-				x, y, z := pos[0], pos[1], pos[2]
-				if regions.arr[i][j][k] == r {
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				pos := Index2Coord(ix, iy, iz)
+				x, y, z := pos[X], pos[Y], pos[Z]
+				if regions.arr[iz][iy][ix] == r {
 					m := conf(x, y, z)
-					h[0][i][j][k] = float32(m[0])
-					h[1][i][j][k] = float32(m[1])
-					h[2][i][j][k] = float32(m[2])
+					h[X][iz][iy][ix] = float32(m[X])
+					h[Y][iz][iy][ix] = float32(m[Y])
+					h[Z][iz][iy][ix] = float32(m[Z])
 				}
 			}
 		}

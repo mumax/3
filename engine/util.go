@@ -91,19 +91,14 @@ func myprint(msg ...interface{}) {
 }
 
 // converts cell index to coordinate, internal coordinates
-func index2Coord(i, j, k int) data.Vector {
+func Index2Coord(ix, iy, iz int) data.Vector {
 	m := Mesh()
 	n := m.Size()
 	c := m.CellSize()
-	z := c[0] * (float64(i) - 0.5*float64(n[0]-1))
-	y := c[1] * (float64(j) - 0.5*float64(n[1]-1))
-	x := c[2] * (float64(k) - 0.5*float64(n[2]-1))
+	x := c[X] * (float64(ix) - 0.5*float64(n[X]-1))
+	y := c[Y] * (float64(iy) - 0.5*float64(n[Y]-1))
+	z := c[Z] * (float64(iz) - 0.5*float64(n[Z]-1))
 	return data.Vector{x, y, z}
-}
-
-// converts cell index to coordinate, user coordinates
-func Index2Coord(i, j, k int) data.Vector {
-	return index2Coord(k, j, i)
 }
 
 const (

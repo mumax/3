@@ -55,16 +55,16 @@ func (geometry *geom) setGeom(s Shape) {
 
 	fill := 0.0
 
-	for i := 0; i < n[0]; i++ {
-		for j := 0; j < n[1]; j++ {
-			for k := 0; k < n[2]; k++ {
-				r := index2Coord(i, j, k)
-				x, y, z := r[0], r[1], r[2]
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				r := Index2Coord(ix, iy, iz)
+				x, y, z := r[X], r[Y], r[Z]
 				if s(x, y, z) { // inside
-					v[i][j][k] = 1
+					v[iz][iy][ix] = 1
 					fill += 1.0
 				} else {
-					v[i][j][k] = 0
+					v[iz][iy][ix] = 0
 				}
 			}
 		}

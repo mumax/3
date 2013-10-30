@@ -26,31 +26,31 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
                  float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKxy,
                  int Nx, int Ny) {
 
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if(j>= Ny || k>=Nx) {
+    if(ix>= Nx || iy>=Ny) {
         return;
     }
 
-    int I = j*Ny + k;       // linear index for upper half of kernel
-    int I2 = (Ny-j)*Nx + k; // linear index for re-use of lower half
 
+    int I = iy*Nx + ix;       // linear index for upper half of kernel
     int e = 2 * I;
 
-    float reMy = fftMy[e  ];
-    float imMy = fftMy[e+1];
     float reMx = fftMx[e  ];
     float imMx = fftMx[e+1];
+    float reMy = fftMy[e  ];
+    float imMy = fftMy[e+1];
 
     float Kyy, Kxx, Kxy;
-    if (j < Ny/2 + 1) {
-        Kyy = fftKyy[I];
+    if (iy < Ny/2 + 1) {
         Kxx = fftKxx[I];
+        Kyy = fftKyy[I];
         Kxy = fftKxy[I];
     } else {
-        Kyy =  fftKyy[I2];
+        int I2 = (Ny-iy)*Nx + ix; // linear index for re-use of lower half
         Kxx =  fftKxx[I2];
+        Kyy =  fftKyy[I2];
         Kxy = -fftKxy[I2];
     }
 

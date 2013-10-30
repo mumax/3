@@ -46,6 +46,17 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		}
 	}
 
+	// ----------------------------------
+	log.Println(" ****   unit kernel **** ")
+	array[X][X][0][0][0] = 1
+	array[Y][Y][0][0][0] = 1
+	array[Z][Z][0][0][0] = 1
+	kernel[1][0] = kernel[0][1]
+	kernel[2][0] = kernel[0][2]
+	kernel[2][1] = kernel[1][2]
+	return
+	// ------------------------------------
+
 	// Field (destination) loop ranges
 	var x1, x2, y1, y2, z1, z2 int
 	// TODO: simplify

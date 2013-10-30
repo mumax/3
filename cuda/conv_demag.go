@@ -189,7 +189,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 
 	c.bwFFT(Z, outp) // bw FFT z
 
-	dbg("Bz:", c.fftRBuf[Z].HostCopy())
+	dbg("Bz:", outp.Comp(Z).HostCopy())
 
 	// FW FFT xy
 	c.fwFFT(X, inp, vol, Bsat, regions)
@@ -209,8 +209,8 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	c.bwFFT(X, outp)
 	c.bwFFT(Y, outp)
 
-	dbg("Bx:", c.fftCBuf[X].HostCopy())
-	dbg("By:", c.fftCBuf[Y].HostCopy())
+	dbg("Bx:", outp.Comp(X).HostCopy())
+	dbg("By:", outp.Comp(Y).HostCopy())
 	//SyncAll()
 }
 
@@ -232,6 +232,17 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.kernSize = kernel[0][0].Mesh().Size()
 	c.init()
 	c.initMesh()
+
+	dbg("kernel", c.kern)
+
+	for i, k := range c.gpuFFTKern {
+		for j, k := range k {
+			if k != nil {
+				dbg("fftkernel", i, j, k.HostCopy())
+			}
+		}
+	}
+
 	testConvolution(c, mesh)
 	c.freeKern()
 	return c

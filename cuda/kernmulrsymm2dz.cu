@@ -16,25 +16,24 @@
 extern "C" __global__ void
 kernmulRSymm2Dz(float* __restrict__  fftMz, float* __restrict__  fftKzz, int Nx, int Ny) {
 
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(j>= Ny || k>=Nx) {
+    if(ix>= Nx || iy>=Ny) {
         return;
     }
 
-    int I = j*Ny + k;       // linear index for upper half of kernel
-    int I2 = (Ny-j)*Nx + k; // linear index for re-use of lower half
-
+    int I = iy*Nx + ix; // linear index for upper half of kernel
     int e = 2 * I;
 
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
     float Kzz;
-    if (j < Ny/2 + 1) {
+    if (iy < Ny/2 + 1) {
         Kzz = fftKzz[I];
     } else {
+        int I2 = (Ny-iy)*Nx + ix; // linear index for re-use of lower half
         Kzz = fftKzz[I2];
     }
 

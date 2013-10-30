@@ -14,21 +14,21 @@ var copypadmul_code cu.Function
 
 type copypadmul_args struct {
 	arg_dst     unsafe.Pointer
-	arg_D0      int
-	arg_D1      int
-	arg_D2      int
+	arg_Dx      int
+	arg_Dy      int
+	arg_Dz      int
 	arg_src     unsafe.Pointer
 	arg_vol     unsafe.Pointer
-	arg_S0      int
-	arg_S1      int
-	arg_S2      int
+	arg_Sx      int
+	arg_Sy      int
+	arg_Sz      int
 	arg_BsatLUT unsafe.Pointer
 	arg_regions unsafe.Pointer
 	argptr      [11]unsafe.Pointer
 }
 
 // Wrapper for copypadmul CUDA kernel, asynchronous.
-func k_copypadmul_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, vol unsafe.Pointer, S0 int, S1 int, S2 int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config, str int) {
+func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, vol unsafe.Pointer, Sx int, Sy int, Sz int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config, str int) {
 	if copypadmul_code == 0 {
 		copypadmul_code = fatbinLoad(copypadmul_map, "copypadmul")
 	}
@@ -37,22 +37,22 @@ func k_copypadmul_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.P
 
 	_a_.arg_dst = dst
 	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_D0 = D0
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_D0)
-	_a_.arg_D1 = D1
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_D1)
-	_a_.arg_D2 = D2
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_D2)
+	_a_.arg_Dx = Dx
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Dx)
+	_a_.arg_Dy = Dy
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Dy)
+	_a_.arg_Dz = Dz
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Dz)
 	_a_.arg_src = src
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
 	_a_.arg_vol = vol
 	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_vol)
-	_a_.arg_S0 = S0
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_S0)
-	_a_.arg_S1 = S1
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_S1)
-	_a_.arg_S2 = S2
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_S2)
+	_a_.arg_Sx = Sx
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Sx)
+	_a_.arg_Sy = Sy
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Sy)
+	_a_.arg_Sz = Sz
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_Sz)
 	_a_.arg_BsatLUT = BsatLUT
 	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_BsatLUT)
 	_a_.arg_regions = regions
@@ -63,9 +63,9 @@ func k_copypadmul_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.P
 }
 
 // Wrapper for copypadmul CUDA kernel, synchronized.
-func k_copypadmul(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, vol unsafe.Pointer, S0 int, S1 int, S2 int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config) {
+func k_copypadmul(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, vol unsafe.Pointer, Sx int, Sy int, Sz int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config) {
 	const stream = 0
-	k_copypadmul_async(dst, D0, D1, D2, src, vol, S0, S1, S2, BsatLUT, regions, cfg, stream)
+	k_copypadmul_async(dst, Dx, Dy, Dz, src, vol, Sx, Sy, Sz, BsatLUT, regions, cfg, stream)
 	Sync(stream)
 }
 

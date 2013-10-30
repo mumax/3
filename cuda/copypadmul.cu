@@ -2,19 +2,19 @@
 // Copy src (size S, smaller) into dst (size D, larger),
 // and multiply by Bsat as defined in regions.
 extern "C" __global__ void
-copypadmul(float* __restrict__ dst, int D0, int D1, int D2,
-           float* __restrict__ src, float* __restrict__ vol, int S0, int S1, int S2,
+copypadmul(float* __restrict__ dst, int Dx, int Dy, int Dz,
+           float* __restrict__ src, float* __restrict__ vol, int Sx, int Sy, int Sz,
            float* __restrict__ BsatLUT, int8_t* __restrict__ regions) {
 
-    int i = blockIdx.z * blockDim.z + threadIdx.z;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i<S0 && j<S1 && k<S2) {
-        int sI = S2*(i*S1 + j) + k; // source index
+    if (iz<Sz && iy<Sy && ix<Sx) {
+        int sI = (iz*Sy + iy)*Sx + k; // source index
         float Bsat = BsatLUT[regions[sI]];
         float v = (vol == NULL? 1.0f: vol[sI]);
-        dst[D2*(i*D1 + j) + k] = Bsat * v * src[sI];
+        dst[(iz*Dy + iy)*Dx + ix] = Bsat * v * src[sI];
     }
 }
 

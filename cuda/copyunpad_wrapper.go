@@ -14,18 +14,18 @@ var copyunpad_code cu.Function
 
 type copyunpad_args struct {
 	arg_dst unsafe.Pointer
-	arg_D0  int
-	arg_D1  int
-	arg_D2  int
+	arg_Dx  int
+	arg_Dy  int
+	arg_Dz  int
 	arg_src unsafe.Pointer
-	arg_S0  int
-	arg_S1  int
-	arg_S2  int
+	arg_Sx  int
+	arg_Sy  int
+	arg_Sz  int
 	argptr  [8]unsafe.Pointer
 }
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
-func k_copyunpad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config, str int) {
+func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, cfg *config, str int) {
 	if copyunpad_code == 0 {
 		copyunpad_code = fatbinLoad(copyunpad_map, "copyunpad")
 	}
@@ -34,29 +34,29 @@ func k_copyunpad_async(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Po
 
 	_a_.arg_dst = dst
 	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_D0 = D0
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_D0)
-	_a_.arg_D1 = D1
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_D1)
-	_a_.arg_D2 = D2
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_D2)
+	_a_.arg_Dx = Dx
+	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Dx)
+	_a_.arg_Dy = Dy
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Dy)
+	_a_.arg_Dz = Dz
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Dz)
 	_a_.arg_src = src
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_S0 = S0
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_S0)
-	_a_.arg_S1 = S1
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_S1)
-	_a_.arg_S2 = S2
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_S2)
+	_a_.arg_Sx = Sx
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_Sx)
+	_a_.arg_Sy = Sy
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Sy)
+	_a_.arg_Sz = Sz
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Sz)
 
 	args := _a_.argptr[:]
 	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for copyunpad CUDA kernel, synchronized.
-func k_copyunpad(dst unsafe.Pointer, D0 int, D1 int, D2 int, src unsafe.Pointer, S0 int, S1 int, S2 int, cfg *config) {
+func k_copyunpad(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, cfg *config) {
 	const stream = 0
-	k_copyunpad_async(dst, D0, D1, D2, src, S0, S1, S2, cfg, stream)
+	k_copyunpad_async(dst, Dx, Dy, Dz, src, Sx, Sy, Sz, cfg, stream)
 	Sync(stream)
 }
 

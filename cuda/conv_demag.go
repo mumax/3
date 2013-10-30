@@ -132,7 +132,7 @@ func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regio
 	in := inp.Comp(i)
 	dbg("fwfft comp", i, in.HostCopy())
 	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, 0)
-	dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy())
+	dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy().Host())
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 	dbg("fwfft:output", i, c.fftCBuf[i].HostCopy())
 }

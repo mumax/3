@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/barnex/cuda5/cu"
+	//"log"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -38,6 +39,7 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
 		// upload to GPU
+		//log.Println("upload", p)
 		p.assureAlloc()
 		for c2 := range p.gpu_buf {
 			c := c2 // XYZ swap here
@@ -45,6 +47,7 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 		}
 		p.gpu_ok = true
 		p.nupload++
+		//cuda.SyncAll()
 	}
 	return p.gpu_buf
 }

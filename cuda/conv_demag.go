@@ -130,7 +130,7 @@ func zero1_async(dst *data.Slice, str int) {
 func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	zero1_async(c.fftRBuf[i], 0)
 	in := inp.Comp(i)
-	dbg("fwfft comp", i, in.HostCopy())
+	dbg("fwfft comp", i, "in:", in.HostCopy())
 	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, 0)
 	dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy().Host())
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])

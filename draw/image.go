@@ -46,22 +46,27 @@ func On(img *image.NRGBA, f *data.Slice, fmin, fmax string) {
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
 func drawVectors(img *image.NRGBA, arr [3][][][]float32) {
-	h, w := len(arr[0][0]), len(arr[0][0][0])
-	d := len(arr[0])
+	println("--")
+	println(len(arr[X]))
+	println(len(arr[X][0]))
+	println(len(arr[X][0][0]))
+	println("--")
+	w, h := len(arr[X][0][0]), len(arr[X][0])
+	d := len(arr[X])
 	norm := float32(d)
 	*img = *recycle(img, w, h)
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
+	for iy := 0; iy < h; iy++ {
+		for ix := 0; ix < w; ix++ {
 			var x, y, z float32 = 0., 0., 0.
-			for k := 0; k < d; k++ {
-				x += arr[0][k][i][j]
-				y += arr[1][k][i][j]
-				z += arr[2][k][i][j]
+			for iz := 0; iz < d; iz++ {
+				x += arr[0][iz][iy][ix]
+				y += arr[1][iz][iy][ix]
+				z += arr[2][iz][iy][ix]
 			}
 			x /= norm
 			y /= norm
 			z /= norm
-			img.Set(j, (h-1)-i, HSLMap(z, y, x))
+			img.Set(ix, (h-1)-iy, HSLMap(x, y, z))
 		}
 	}
 }
@@ -84,19 +89,19 @@ func extrema(data []float32) (min, max float32) {
 // averages data over X (usually thickness of thin film)
 func drawFloats(img *image.NRGBA, arr [][][]float32, min, max float32) {
 
-	h, w := len(arr[0]), len(arr[0][0])
+	w, h := len(arr[0][0]), len(arr[0])
 	d := len(arr)
 	*img = *recycle(img, w, h)
 
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			var x float32 = 0.
-			for k := 0; k < d; k++ {
-				x += arr[k][i][j]
+	for iy := 0; iy < h; iy++ {
+		for ix := 0; ix < w; ix++ {
+			var v float32 = 0.
+			for iz := 0; iz < d; iz++ {
+				v += arr[iz][iy][ix]
 
 			}
-			x /= float32(d)
-			img.Set(j, (h-1)-i, GreyMap(min, max, x))
+			v /= float32(d)
+			img.Set(ix, (h-1)-iy, GreyMap(min, max, v))
 		}
 	}
 }
@@ -108,3 +113,9 @@ func recycle(img *image.NRGBA, w, h int) *image.NRGBA {
 	}
 	return img
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

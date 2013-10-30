@@ -59,8 +59,8 @@ func render(quant Slicer, comp string) {
 	size := quant.Mesh().Size()
 
 	// don't slice out of bounds
-	if renderLayer >= size[0] {
-		renderLayer = size[0] - 1
+	if renderLayer >= size[Z] {
+		renderLayer = size[Z] - 1
 		// TODO: update slider
 	}
 	if renderLayer < 0 {
@@ -77,11 +77,11 @@ func render(quant Slicer, comp string) {
 			size[i] = 1
 		}
 	}
-	size[0] = 1 // selects one layer
+	size[Z] = 1 // selects one layer
 
 	// make sure buffers are there
 	if imgBuf.Mesh().Size() != size {
-		mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+		mesh := data.NewMesh(size[X], size[Y], size[Z], 1, 1, 1)
 		imgBuf = data.NewSlice(3, mesh) // always 3-comp, may be re-used
 	}
 
@@ -107,7 +107,7 @@ func render(quant Slicer, comp string) {
 
 		// make sure buffers are there (in CUDA context)
 		if rescaleBuf.Mesh().Size() != size {
-			mesh := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
+			mesh := data.NewMesh(size[X], size[Y], size[Z], 1, 1, 1)
 			rescaleBuf.Free()
 			rescaleBuf = cuda.NewSlice(1, mesh)
 		}

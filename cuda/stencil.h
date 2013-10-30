@@ -11,34 +11,34 @@
 #define hclamp(i, N) min((i), (N)-1)
 
 // 3D array indexing
-#define idx(i,j,k) (N2*((i)*N1 + (j)) + (k))
+#define idx(ix,iy,iz) (((iz)*Ny + (iy))*Nx + (ix))
 
 // clamp index to bounds (0:N0, 0:N1, 0:N2)
-#define idxclamp(i, j, k) idx(clamp(i, N0), clamp(j, N1), clamp(k, N2))
+#define idxclamp(ix, iy, iz) idx(clamp(ix, Nx), clamp(iy, Ny), clamp(iz, Nz))
 
 
 // pbc clamps
 
 #define MOD(n, M) ( (( (n) % (M) ) + (M) ) % (M)  )
 
-#define PBC0 (PBC & 1)
-#define PBC1 (PBC & 2)
-#define PBC2 (PBC & 4)
+#define PBCx (PBC & 4)
+#define PBCy (PBC & 2)
+#define PBCz (PBC & 1)
 
-#define hclamp0(i) (PBC0? MOD(i, N0) : min((i), N0-1))
-#define lclamp0(i) (PBC0? MOD(i, N0) : max((i), 0))
+#define hclampx(ix) (PBCx? MOD(i, Nx) : min((i), Nx-1))
+#define lclampx(ix) (PBCx? MOD(i, Nx) : max((i), 0))
 
-#define hclamp1(i) (PBC1? MOD(i, N1) : min((i), N1-1))
-#define lclamp1(i) (PBC1? MOD(i, N1) : max((i), 0))
+#define hclampy(iy) (PBCy? MOD(i, Ny) : min((i), Ny-1))
+#define lclampy(iy) (PBCy? MOD(i, Ny) : max((i), 0))
 
-#define hclamp2(i) (PBC2? MOD(i, N2) : min((i), N2-1))
-#define lclamp2(i) (PBC2? MOD(i, N2) : max((i), 0))
+#define hclampz(iz) (PBCz? MOD(i, Nz) : min((i), Nz-1))
+#define lclampz(iz) (PBCz? MOD(i, Nz) : max((i), 0))
 
 
 // spatial derivatives without dividing by cell size
-#define deltax(in) (in[idx(hclamp0(i+1), j, k)] - in[idx(lclamp0(i-1), j, k)])
-#define deltay(in) (in[idx(i, hclamp1(j+1), k)] - in[idx(i, lclamp1(j-1), k)])
-#define deltaz(in) (in[idx(i, j, hclamp2(k+1))] - in[idx(i, j, lclamp2(k-1))])
+#define deltax(in) (in[idx(hclampx(ix+1), iy, iz)] - in[idx(lclampx(ix-1), iy, iz)])
+#define deltay(in) (in[idx(ix, hclampy(iy+1), iz)] - in[idx(ix, lclampy(iy-1), iz)])
+#define deltaz(in) (in[idx(ix, iy, hclampz(iz+1))] - in[idx(ix, iy, lclampz(iz-1))])
 
 #endif
 

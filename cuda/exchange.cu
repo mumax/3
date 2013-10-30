@@ -10,18 +10,18 @@ extern "C" __global__ void
 addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
             float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
             float* __restrict__ aLUT2d, int8_t* __restrict__ regions,
-            float wx, float wy, float wz, int N0, int N1, int N2, int8_t PBC) {
+            float wx, float wy, float wz, int Nx, int Ny, int Nz, int8_t PBC) {
 
-    int i = blockIdx.z * blockDim.z + threadIdx.z;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i>=N0 || j >= N1 || k >= N2) {
+    if (iz>=Nz || iy >= Ny || ix >= Nx) {
         return;
     }
 
     // central cell
-    int I = idx(i, j, k);
+    int I = idx(ix, iy, iz);
     float3 m0 = make_float3(mx[I], my[I], mz[I]);
     int8_t r0 = regions[I];
     float3 B  = make_float3(Bx[I], By[I], Bz[I]);

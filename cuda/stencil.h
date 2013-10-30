@@ -11,7 +11,8 @@
 #define hclamp(i, N) min((i), (N)-1)
 
 // 3D array indexing
-#define idx(ix,iy,iz) (((iz)*Ny + (iy))*Nx + (ix))
+#define index(ix,iy,iz,Nx,Ny,Nz) (((iz)*Ny + (iy))*Nx + (ix))
+#define idx(ix,iy,iz) ( index((ix),(iy),(iz),(Nx),(Ny),(Nz)) )
 
 // clamp index to bounds (0:N0, 0:N1, 0:N2)
 #define idxclamp(ix, iy, iz) idx(clamp(ix, Nx), clamp(iy, Ny), clamp(iz, Nz))
@@ -25,14 +26,14 @@
 #define PBCy (PBC & 2)
 #define PBCz (PBC & 1)
 
-#define hclampx(ix) (PBCx? MOD(i, Nx) : min((i), Nx-1))
-#define lclampx(ix) (PBCx? MOD(i, Nx) : max((i), 0))
+#define hclampx(ix) (PBCx? MOD(ix, Nx) : min((ix), Nx-1))
+#define lclampx(ix) (PBCx? MOD(ix, Nx) : max((ix), 0))
 
-#define hclampy(iy) (PBCy? MOD(i, Ny) : min((i), Ny-1))
-#define lclampy(iy) (PBCy? MOD(i, Ny) : max((i), 0))
+#define hclampy(iy) (PBCy? MOD(iy, Ny) : min((iy), Ny-1))
+#define lclampy(iy) (PBCy? MOD(iy, Ny) : max((iy), 0))
 
-#define hclampz(iz) (PBCz? MOD(i, Nz) : min((i), Nz-1))
-#define lclampz(iz) (PBCz? MOD(i, Nz) : max((i), 0))
+#define hclampz(iz) (PBCz? MOD(iz, Nz) : min((iz), Nz-1))
+#define lclampz(iz) (PBCz? MOD(iz, Nz) : max((iz), 0))
 
 
 // spatial derivatives without dividing by cell size

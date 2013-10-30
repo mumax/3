@@ -1,3 +1,4 @@
+#include "stencil.h"
 
 // Copy src (size S, smaller) into dst (size D, larger),
 // and multiply by Bsat as defined in regions.
@@ -11,10 +12,10 @@ copypadmul(float* __restrict__ dst, int Dx, int Dy, int Dz,
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (iz<Sz && iy<Sy && ix<Sx) {
-        int sI = (iz*Sy + iy)*Sx + k; // source index
+        int sI = index(ix, iy, iz, Sx, Sy, Sz); //(iz*Sy + iy)*Sx + k; // source index
         float Bsat = BsatLUT[regions[sI]];
         float v = (vol == NULL? 1.0f: vol[sI]);
-        dst[(iz*Dy + iy)*Dx + ix] = Bsat * v * src[sI];
+        dst[index(ix, iy, iz, Dx, Dy, Dz)] = Bsat * v * src[sI];
     }
 }
 

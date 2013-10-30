@@ -24,15 +24,15 @@ type addexchange_args struct {
 	arg_wx      float32
 	arg_wy      float32
 	arg_wz      float32
-	arg_N0      int
-	arg_N1      int
-	arg_N2      int
+	arg_Nx      int
+	arg_Ny      int
+	arg_Nz      int
 	arg_PBC     byte
 	argptr      [15]unsafe.Pointer
 }
 
 // Wrapper for addexchange CUDA kernel, asynchronous.
-func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, PBC byte, cfg *config, str int) {
+func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config, str int) {
 	if addexchange_code == 0 {
 		addexchange_code = fatbinLoad(addexchange_map, "addexchange")
 	}
@@ -61,12 +61,12 @@ func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer
 	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_wy)
 	_a_.arg_wz = wz
 	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_wz)
-	_a_.arg_N0 = N0
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N0)
-	_a_.arg_N1 = N1
-	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_N1)
-	_a_.arg_N2 = N2
-	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_N2)
+	_a_.arg_Nx = Nx
+	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_Nx)
+	_a_.arg_Ny = Ny
+	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_Ny)
+	_a_.arg_Nz = Nz
+	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_Nz)
 	_a_.arg_PBC = PBC
 	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_PBC)
 
@@ -75,9 +75,9 @@ func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer
 }
 
 // Wrapper for addexchange CUDA kernel, synchronized.
-func k_addexchange(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, N0 int, N1 int, N2 int, PBC byte, cfg *config) {
+func k_addexchange(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
 	const stream = 0
-	k_addexchange_async(Bx, By, Bz, mx, my, mz, aLUT2d, regions, wx, wy, wz, N0, N1, N2, PBC, cfg, stream)
+	k_addexchange_async(Bx, By, Bz, mx, my, mz, aLUT2d, regions, wx, wy, wz, Nx, Ny, Nz, PBC, cfg, stream)
 	Sync(stream)
 }
 

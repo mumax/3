@@ -12,52 +12,52 @@ extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
        float Dx, float Dy, float Dz, float A,
-       float cx, float cy, float cz, int N0, int N1, int N2) {
+       float cx, float cy, float cz, int Nx, int Ny, int Nz) {
 
-    int i = blockIdx.z * blockDim.z + threadIdx.z;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i >= N0 || j >= N1 || k >= N2) {
+    if (ix >= Nx || iy >= Ny || iz >= Nz) {
         return;
     }
 
-    int I = idx(i, j, k);                        // central cell index
+    int I = idx(ix, iy, iz);                     // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
     float3 m = make_float3(mx[I], my[I], mz[I]); // central m
     float3 m1, m2;                               // right, left neighbor
 
-    // z derivatives (along length)
+    // x derivatives (along length)
     {
         m1 = make_float3(0.0f, 0.0f, 0.0f);
         m2 = make_float3(0.0f, 0.0f, 0.0f);
 
         // load neighbor m if inside grid, 0 otherwise
-        if (k+1 < N2) {
-            int I1 = idx(i, j, k+1);
+        if (ix+1 < Nx) {
+            int I1 = idx(ix+1, iy, iz);
             m1 = make_float3(mx[I1], my[I1], mz[I1]);
         }
-        if (k-1 >= 0) {
-            int I2 = idx(i, j, k-1);
+        if (ix-1 >= 0) {
+            int I2 = idx(ix-1, iy, iz);
             m2 = make_float3(mx[I2], my[I2], mz[I2]);
         }
 
         // BC's for zero cells (either due to grid or hole boundaries)
-        float Dz_2A = (Dz/(2.0f*A));
+        float Dx_2A = (Dx/(2.0f*A));
         if (len(m1) == 0.0f) {
-            m1.x = m.x + (cz * Dz_2A * m.z);
+            m1.x = m.x - (cx * Dx_2A * m.z);
             m1.y = m.y;
-            m1.z = m.z - (cz * Dz_2A * m.x);
+            m1.z = m.z + (cx * Dx_2A * m.x);
         }
         if (len(m2) == 0.0f) {
-            m2.x = m.x - (cz * Dz_2A * m.z);
+            m2.x = m.x + (cx * Dx_2A * m.z);
             m2.y = m.y;
-            m2.z = m.z + (cz * Dz_2A * m.x);
+            m2.z = m.z - (cx * Dx_2A * m.x);
         }
 
-        h   += (2.0f*A/(cz*cz)) * ((m1 - m) + (m2 - m)); // exchange
-        h.x -= Dz*(m1.z-m2.z)/cz;                        // DMI
-        h.z += Dz*(m1.x-m2.x)/cz;
+        h   += (2.0f*A/(cx*cx)) * ((m1 - m) + (m2 - m)); // exchange
+        h.z -= Dx*(m1.x-m2.x)/cx;                        // DMI
+        h.x += Dx*(m1.z-m2.z)/cx;
         // note: actually 2*D * delta / (2*c)
     }
 
@@ -66,30 +66,30 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         m1 = make_float3(0.0f, 0.0f, 0.0f);
         m2 = make_float3(0.0f, 0.0f, 0.0f);
 
-        if (j+1 < N1) {
-            int I1 = idx(i, j+1, k);
+        if (iy+1 < Ny) {
+            int I1 = idx(ix, iy+1, iz);
             m1 = make_float3(mx[I1], my[I1], mz[I1]);
         }
-        if (j-1 >= 0) {
-            int I2 = idx(i, j-1, k);
+        if (iy-1 >= 0) {
+            int I2 = idx(ix, iy-1, iz);
             m2 = make_float3(mx[I2], my[I2], mz[I2]);
         }
 
         float Dy_2A = (Dy/(2.0f*A));
         if (len(m1) == 0.0f) {
-            m1.x = m.x + (cy * Dy_2A * m.y);
-            m1.y = m.y - (cy * Dy_2A * m.x);
-            m1.z = m.z;
+            m1.x = m.x;
+            m1.y = m.y - (cy * Dy_2A * m.z);
+            m1.z = m.z + (cy * Dy_2A * m.y);
         }
         if (len(m2) == 0.0f) {
-            m2.x = m.x - (cy * Dy_2A * m.y);
-            m2.y = m.y + (cy * Dy_2A * m.x);
-            m2.z = m.z;
+            m2.x = m.x;
+            m2.y = m.y + (cy * Dy_2A * m.z);
+            m2.z = m.z - (cy * Dy_2A * m.y);
         }
 
         h   += (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
-        h.x -= Dy*(m1.y-m2.y)/cy;
-        h.y += Dy*(m1.x-m2.x)/cy;
+        h.z -= Dy*(m1.y-m2.y)/cy;
+        h.y += Dy*(m1.z-m2.z)/cy;
     }
 
     // write back, result is H + Hdmi + Hex

@@ -130,21 +130,21 @@ func zero1_async(dst *data.Slice, str int) {
 func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	zero1_async(c.fftRBuf[i], 0)
 	in := inp.Comp(i)
-	dbg("fwfft comp", i, "in:", in.HostCopy())
+	//dbg("fwfft comp", i, "in:", in.HostCopy())
 	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, 0)
-	dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy().Host())
+	//dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy().Host())
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
-	dbg("fwfft:output", i, c.fftCBuf[i].HostCopy())
+	//dbg("fwfft:output", i, c.fftCBuf[i].HostCopy())
 }
 
 // backward FFT component i
 func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
-	dbg("bwfft in", c.fftCBuf[i].HostCopy())
+	//dbg("bwfft in", c.fftCBuf[i].HostCopy())
 	c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
-	dbg("bwfft out", c.fftRBuf[i].HostCopy().Host())
+	//dbg("bwfft out", c.fftRBuf[i].HostCopy().Host())
 	out := outp.Comp(i)
 	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize, 0)
-	dbg("unpad out", out.HostCopy())
+	//dbg("unpad out", out.HostCopy())
 }
 
 // forward FFT of magnetization one component.
@@ -177,43 +177,43 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
-	dbg("exec2D")
-	dbg("inp:", inp.HostCopy())
+	//dbg("exec2D")
+	//dbg("inp:", inp.HostCopy())
 
 	c.fwFFT(Z, inp, vol, Bsat, regions) // FFT Z
 
-	dbg("fftmz:", c.fftCBuf[Z].HostCopy())
+	//dbg("fftmz:", c.fftCBuf[Z].HostCopy())
 
 	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
 	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, 0)
 
-	dbg("fftBz:", c.fftCBuf[Z].HostCopy())
+	//dbg("fftBz:", c.fftCBuf[Z].HostCopy())
 
 	c.bwFFT(Z, outp) // bw FFT z
 
-	dbg("Bz:", outp.Comp(Z).HostCopy())
+	//dbg("Bz:", outp.Comp(Z).HostCopy())
 
 	// FW FFT xy
 	c.fwFFT(X, inp, vol, Bsat, regions)
 	c.fwFFT(Y, inp, vol, Bsat, regions)
-	dbg("fftmx:", c.fftCBuf[X].HostCopy())
-	dbg("fftmy:", c.fftCBuf[Y].HostCopy())
+	//dbg("fftmx:", c.fftCBuf[X].HostCopy())
+	//dbg("fftmy:", c.fftCBuf[Y].HostCopy())
 
 	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
 		Nx, Ny, 0)
 
-	dbg("fftBx:", c.fftCBuf[X].HostCopy())
-	dbg("fftBy:", c.fftCBuf[Y].HostCopy())
+	//dbg("fftBx:", c.fftCBuf[X].HostCopy())
+	//dbg("fftBy:", c.fftCBuf[Y].HostCopy())
 
 	// BW FFT xy
 	c.bwFFT(X, outp)
 	c.bwFFT(Y, outp)
 
-	dbg("Bx:", outp.Comp(X).HostCopy())
-	dbg("By:", outp.Comp(Y).HostCopy())
+	//dbg("Bx:", outp.Comp(X).HostCopy())
+	//dbg("By:", outp.Comp(Y).HostCopy())
 	//SyncAll()
 }
 
@@ -236,15 +236,15 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.init()
 	c.initMesh()
 
-	dbg("kernel", c.kern)
+	//dbg("kernel", c.kern)
 
-	for i, k := range c.gpuFFTKern {
-		for j, k := range k {
-			if k != nil {
-				dbg("fftkernel", i, j, k.HostCopy())
-			}
-		}
-	}
+	//for i, k := range c.gpuFFTKern {
+	//	for j, k := range k {
+	//		if k != nil {
+	//			dbg("fftkernel", i, j, k.HostCopy())
+	//		}
+	//	}
+	//}
 
 	testConvolution(c, mesh)
 	c.freeKern()

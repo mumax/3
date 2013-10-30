@@ -35,7 +35,7 @@ func make3DConf(N [3]int) *config {
 	NX := divUp(N[X], TileX)
 	gr := cu.Dim3{X: NX, Y: NY, Z: NZ}
 
-	dbg("3dconf", N, "=", config{gr, bl})
+	//dbg("3dconf", N, "=", config{gr, bl})
 	return &config{gr, bl}
 }
 

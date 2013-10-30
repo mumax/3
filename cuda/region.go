@@ -11,8 +11,8 @@ func RegionAddV(dst *data.Slice, lut LUTPtrs, regions *Bytes, str int) {
 	util.Argument(dst.NComp() == 3)
 	N := dst.Len()
 	cfg := make1DConf(N)
-	k_regionaddv_async(dst.DevPtr(0), dst.DevPtr(1), dst.DevPtr(2),
-		lut[0], lut[1], lut[2], regions.Ptr, N, cfg, str)
+	k_regionaddv_async(dst.DevPtr(X), dst.DevPtr(Y), dst.DevPtr(Z),
+		lut[X], lut[Y], lut[Z], regions.Ptr, N, cfg, str)
 }
 
 // decode the regions+LUT pair into an uncompressed array
@@ -31,5 +31,5 @@ func RegionSelect(dst, src *data.Slice, regions *Bytes, region byte) {
 	for c := 0; c < dst.NComp(); c++ {
 		k_regionselect_async(dst.DevPtr(c), src.DevPtr(c), regions.Ptr, region, N, cfg, c)
 	}
-	SyncAll()
+	SyncAll() //??
 }

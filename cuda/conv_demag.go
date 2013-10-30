@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+	"log"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
@@ -169,26 +170,43 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
+	dbg("exec2D")
+	dbg("inp:", inp.HostCopy())
+
 	c.fwFFT(Z, inp, vol, Bsat, regions) // FFT Z
+
+	dbg("fftmz:", c.fftCBuf[Z].HostCopy())
 
 	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
 	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, 0)
 
+	dbg("fftBz:", c.fftCBuf[Z].HostCopy())
+
 	c.bwFFT(Z, outp) // bw FFT z
+
+	dbg("Bz:", c.fftRBuf[Z].HostCopy())
 
 	// FW FFT xy
 	c.fwFFT(X, inp, vol, Bsat, regions)
 	c.fwFFT(Y, inp, vol, Bsat, regions)
+	dbg("fftmx:", c.fftCBuf[X].HostCopy())
+	dbg("fftmy:", c.fftCBuf[Y].HostCopy())
 
 	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
 		Nx, Ny, 0)
 
+	dbg("fftBx:", c.fftCBuf[X].HostCopy())
+	dbg("fftBy:", c.fftCBuf[Y].HostCopy())
+
 	// BW FFT xy
 	c.bwFFT(X, outp)
 	c.bwFFT(Y, outp)
+
+	dbg("Bx:", c.fftCBuf[X].HostCopy())
+	dbg("By:", c.fftCBuf[Y].HostCopy())
 	//SyncAll()
 }
 
@@ -238,4 +256,10 @@ const DEFAULT_KERNEL_ACC = 6
 func NewDemag(mesh *data.Mesh) *DemagConvolution {
 	k := mag.BruteKernel(mesh, DEFAULT_KERNEL_ACC)
 	return newConvolution(mesh, k)
+}
+
+func dbg(msg ...interface{}) {
+	for _, m := range msg {
+		log.Println(m)
+	}
 }

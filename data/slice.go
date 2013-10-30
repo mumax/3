@@ -309,6 +309,9 @@ func (s *Slice) IsNil() bool {
 }
 
 func (s *Slice) String() string {
+	if s == nil {
+		return "nil"
+	}
 	var buf bytes.Buffer
 	util.Fprint(&buf, s.Tensors())
 	return buf.String()

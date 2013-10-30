@@ -30,19 +30,19 @@ extern "C" __global__ void
 kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
                float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKzz,
                float* __restrict__  fftKyz, float* __restrict__  fftKxz, float* __restrict__  fftKxy,
-               int N0, int N1, int N2) {
+               int Nx, int Ny, int Nz) {
 
-    int i = blockIdx.z * blockDim.z + threadIdx.z;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if(i>= N0 || j>= N1 || k>=N2) {
+    if(ix>= Nx || iy>= Ny || iz>=Nz) {
         return;
     }
 
     float Kxx, Kyy, Kzz, Kxy, Kxz, Kyz;
 
-    int I = N2*(i*N1 + j) + k;
+    int I = (iz*Ny + iy)*Nx + ix;
     int e = 2 * I;
     float reMx = fftMx[e  ];
     float imMx = fftMx[e+1];
@@ -51,7 +51,7 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
-    if (j < N1/2 + 1) {
+    if (iy < Ny/2 + 1) {
         Kxx = fftKxx[I];
         Kyy = fftKyy[I];
         Kzz = fftKzz[I];
@@ -59,7 +59,7 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
         Kxz = fftKxz[I];
         Kxy = fftKxy[I];
     } else {
-        int I2 = N2*(i*N1 + (N1-j)) + k;
+        int I2 = (iz*Ny + (Ny-iy))*Nx + ix;
         Kxx =  fftKxx[I2];
         Kyy =  fftKyy[I2];
         Kzz =  fftKzz[I2];

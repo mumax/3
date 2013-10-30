@@ -5,11 +5,11 @@ extern "C" __global__ void
 copyunpad(float* __restrict__  dst, int Dx, int Dy, int Dz,
           float* __restrict__  src, int Sx, int Sy, int Sz) {
 
-    int iz = blockIdx.z * blockDim.z + threadIdx.z;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (iz<Dz && iy<Dy && ix<Dx) {
+    if (ix<Dx && iy<Dy && iz<Dz) {
         dst[index(ix, iy, iz, Dx, Dy, Dz)] = src[index(ix, iy, iz, Sx, Sy, Sz)];
     }
 }

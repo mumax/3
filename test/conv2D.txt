@@ -1,0 +1,18 @@
+setgridsize(4, 2, 1)
+setcellsize(1, 1, 1)
+
+//m = uniform(0,0,1)
+m.setCell(0,0,0,  1.,2.,3.)
+//m.setCell(1,0,0,  0.,0.,2.)
+//m.setCell(2,0,0,  0.,0.,3.)
+//m.setCell(3,0,0,  0.,0.,4.)
+//m.setCell(0,1,0,  0.,0.,5.)
+//m.setCell(1,1,0,  0.,0.,6.)
+//m.setCell(2,1,0,  0.,0.,7.)
+//m.setCell(3,1,0,  0.,0.,8.)
+
+Msat = 1/mu0
+
+//print("m", m) // OK
+
+save(B_demag)

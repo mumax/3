@@ -43,3 +43,4 @@ func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
 
 func (q *buffered) Region(r int) *inRegion { return &inRegion{q, r} }
 func (m *buffered) TableData() []float64   { return Average(m) }
+func (m *buffered) String() string         { return util.Sprint(M.buffer.HostCopy()) }

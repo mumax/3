@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -25,6 +26,12 @@ func Printf(format string, array ...interface{}) {
 // Produces nicely formatted output for multi-dimensional arrays.
 func Fprint(out io.Writer, array ...interface{}) {
 	Fprintf(out, "%v", array...)
+}
+
+func Sprint(array ...interface{}) string {
+	var buf bytes.Buffer
+	Fprint(&buf, array...)
+	return buf.String()
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.

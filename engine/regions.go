@@ -39,23 +39,22 @@ func DefRegion(id int, s Shape) {
 	defRegionId(id)
 	regions.gpuCacheOK = false
 
+	ok := false
 	n := Mesh().Size()
-	c := Mesh().CellSize()
-	dx := (float64(n[2])/2 - 0.5) * c[2]
-	dy := (float64(n[1])/2 - 0.5) * c[1]
-	dz := (float64(n[0])/2 - 0.5) * c[0]
 
-	for i := 0; i < n[0]; i++ {
-		z := float64(i)*c[0] - dz
-		for j := 0; j < n[1]; j++ {
-			y := float64(j)*c[1] - dy
-			for k := 0; k < n[2]; k++ {
-				x := float64(k)*c[2] - dx
-				if s(x, y, z) { // inside
-					regions.arr[i][j][k] = byte(id)
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				r := Index2Coord(ix, iy, iz)
+				if s(r[X], r[Y], r[Z]) { // inside
+					regions.arr[iz][iy][ix] = byte(id)
+					ok = true
 				}
 			}
 		}
+	}
+	if !ok {
+		log.Panic("DefRegion", id, "shape is empty")
 	}
 }
 
@@ -128,15 +127,15 @@ func (r *Regions) Slice() (*data.Slice, bool) {
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
 func resizeBytes(array []byte, size [3]int) [][][]byte {
-	Nx, Ny, Nz := size[0], size[1], size[2]
+	Nx, Ny, Nz := size[X], size[Y], size[Z]
 	util.Argument(Nx*Ny*Nz == len(array))
-	sliced := make([][][]byte, Nx)
+	sliced := make([][][]byte, Nz)
 	for i := range sliced {
 		sliced[i] = make([][]byte, Ny)
 	}
 	for i := range sliced {
 		for j := range sliced[i] {
-			sliced[i][j] = array[(i*Ny+j)*Nz+0 : (i*Ny+j)*Nz+Nz]
+			sliced[i][j] = array[(i*Ny+j)*Nx+0 : (i*Ny+j)*Nx+Nx]
 		}
 	}
 	return sliced

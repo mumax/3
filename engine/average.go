@@ -3,31 +3,31 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"log"
 )
 
 func init() {
 	DeclFunc("average", Average, "Average of space-dependent quantity over magnet volume")
 }
 
-// average in userspace XYZ order
 func Average(s Slicer) []float64 {
-	b, recycle := s.Slice()
+	buf, recycle := s.Slice()
 	if recycle {
-		defer cuda.Recycle(b)
+		defer cuda.Recycle(buf)
 	}
-	if s, ok := s.(volumer); ok {
-		avg := avg(b, nil)
-		spacefill := s.volume()
+	if v, ok := s.(volumer); ok {
+		avg := avg(buf, nil)
+		log.Println(s.Name(), "volume", v.volume())
+		spacefill := v.volume()
 		for i := range avg {
 			avg[i] /= spacefill
 		}
 		return avg
 	} else {
-		return avg(b, vol())
+		return avg(buf, vol())
 	}
 }
 
-// userspace average
 func avg(b, vol *data.Slice) []float64 {
 	nComp := b.NComp()
 	nCell := float64(b.Mesh().NCell())

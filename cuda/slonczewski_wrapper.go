@@ -276,23 +276,23 @@ BB0_3:
 	mul.f32 	%f45, %f39, %f44;
 	.loc 2 46 1
 	mul.f32 	%f46, %f13, %f2;
-	mul.f32 	%f47, %f3, %f12;
-	sub.f32 	%f48, %f46, %f47;
+	mul.f32 	%f47, %f12, %f3;
+	sub.f32 	%f48, %f47, %f46;
 	mul.f32 	%f49, %f11, %f3;
-	mul.f32 	%f50, %f1, %f13;
-	sub.f32 	%f51, %f49, %f50;
+	mul.f32 	%f50, %f13, %f1;
+	sub.f32 	%f51, %f50, %f49;
 	mul.f32 	%f52, %f12, %f1;
-	mul.f32 	%f53, %f2, %f11;
-	sub.f32 	%f54, %f52, %f53;
+	mul.f32 	%f53, %f11, %f2;
+	sub.f32 	%f54, %f53, %f52;
 	.loc 2 47 1
-	mul.f32 	%f55, %f3, %f51;
-	mul.f32 	%f56, %f54, %f2;
+	mul.f32 	%f55, %f2, %f54;
+	mul.f32 	%f56, %f3, %f51;
 	sub.f32 	%f57, %f55, %f56;
-	mul.f32 	%f58, %f1, %f54;
-	mul.f32 	%f59, %f48, %f3;
+	mul.f32 	%f58, %f3, %f48;
+	mul.f32 	%f59, %f1, %f54;
 	sub.f32 	%f60, %f58, %f59;
-	mul.f32 	%f61, %f2, %f48;
-	mul.f32 	%f62, %f51, %f1;
+	mul.f32 	%f61, %f1, %f51;
+	mul.f32 	%f62, %f2, %f48;
 	sub.f32 	%f63, %f61, %f62;
 	.loc 2 49 1
 	mul.f32 	%f64, %f45, %f48;
@@ -510,23 +510,23 @@ BB0_3:
 	mul.f32 	%f45, %f39, %f44;
 	.loc 2 46 1
 	mul.f32 	%f46, %f13, %f2;
-	mul.f32 	%f47, %f3, %f12;
-	sub.f32 	%f48, %f46, %f47;
+	mul.f32 	%f47, %f12, %f3;
+	sub.f32 	%f48, %f47, %f46;
 	mul.f32 	%f49, %f11, %f3;
-	mul.f32 	%f50, %f1, %f13;
-	sub.f32 	%f51, %f49, %f50;
+	mul.f32 	%f50, %f13, %f1;
+	sub.f32 	%f51, %f50, %f49;
 	mul.f32 	%f52, %f12, %f1;
-	mul.f32 	%f53, %f2, %f11;
-	sub.f32 	%f54, %f52, %f53;
+	mul.f32 	%f53, %f11, %f2;
+	sub.f32 	%f54, %f53, %f52;
 	.loc 2 47 1
-	mul.f32 	%f55, %f3, %f51;
-	mul.f32 	%f56, %f54, %f2;
+	mul.f32 	%f55, %f2, %f54;
+	mul.f32 	%f56, %f3, %f51;
 	sub.f32 	%f57, %f55, %f56;
-	mul.f32 	%f58, %f1, %f54;
-	mul.f32 	%f59, %f48, %f3;
+	mul.f32 	%f58, %f3, %f48;
+	mul.f32 	%f59, %f1, %f54;
 	sub.f32 	%f60, %f58, %f59;
-	mul.f32 	%f61, %f2, %f48;
-	mul.f32 	%f62, %f51, %f1;
+	mul.f32 	%f61, %f1, %f51;
+	mul.f32 	%f62, %f2, %f48;
 	sub.f32 	%f63, %f61, %f62;
 	.loc 2 49 1
 	mul.f32 	%f64, %f45, %f48;
@@ -771,23 +771,23 @@ BB2_3:
 	mul.f32 	%f45, %f39, %f44;
 	.loc 3 46 1
 	mul.f32 	%f46, %f13, %f2;
-	mul.f32 	%f47, %f3, %f12;
-	sub.f32 	%f48, %f46, %f47;
+	mul.f32 	%f47, %f12, %f3;
+	sub.f32 	%f48, %f47, %f46;
 	mul.f32 	%f49, %f11, %f3;
-	mul.f32 	%f50, %f1, %f13;
-	sub.f32 	%f51, %f49, %f50;
+	mul.f32 	%f50, %f13, %f1;
+	sub.f32 	%f51, %f50, %f49;
 	mul.f32 	%f52, %f12, %f1;
-	mul.f32 	%f53, %f2, %f11;
-	sub.f32 	%f54, %f52, %f53;
+	mul.f32 	%f53, %f11, %f2;
+	sub.f32 	%f54, %f53, %f52;
 	.loc 3 47 1
-	mul.f32 	%f55, %f3, %f51;
-	mul.f32 	%f56, %f54, %f2;
+	mul.f32 	%f55, %f2, %f54;
+	mul.f32 	%f56, %f3, %f51;
 	sub.f32 	%f57, %f55, %f56;
-	mul.f32 	%f58, %f1, %f54;
-	mul.f32 	%f59, %f48, %f3;
+	mul.f32 	%f58, %f3, %f48;
+	mul.f32 	%f59, %f1, %f54;
 	sub.f32 	%f60, %f58, %f59;
-	mul.f32 	%f61, %f2, %f48;
-	mul.f32 	%f62, %f51, %f1;
+	mul.f32 	%f61, %f1, %f51;
+	mul.f32 	%f62, %f2, %f48;
 	sub.f32 	%f63, %f61, %f62;
 	.loc 3 49 1
 	mul.f32 	%f64, %f45, %f48;

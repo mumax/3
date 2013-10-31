@@ -15,17 +15,17 @@ var shift_code cu.Function
 type shift_args struct {
 	arg_dst unsafe.Pointer
 	arg_src unsafe.Pointer
-	arg_N0  int
-	arg_N1  int
-	arg_N2  int
-	arg_sh0 int
-	arg_sh1 int
-	arg_sh2 int
+	arg_Nx  int
+	arg_Ny  int
+	arg_Nz  int
+	arg_shx int
+	arg_shy int
+	arg_shz int
 	argptr  [8]unsafe.Pointer
 }
 
 // Wrapper for shift CUDA kernel, asynchronous.
-func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 int, sh0 int, sh1 int, sh2 int, cfg *config, str int) {
+func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config, str int) {
 	if shift_code == 0 {
 		shift_code = fatbinLoad(shift_map, "shift")
 	}
@@ -36,27 +36,27 @@ func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 in
 	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
 	_a_.arg_src = src
 	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_N0 = N0
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_N0)
-	_a_.arg_N1 = N1
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N1)
-	_a_.arg_N2 = N2
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N2)
-	_a_.arg_sh0 = sh0
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_sh0)
-	_a_.arg_sh1 = sh1
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_sh1)
-	_a_.arg_sh2 = sh2
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_sh2)
+	_a_.arg_Nx = Nx
+	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Nx)
+	_a_.arg_Ny = Ny
+	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
+	_a_.arg_Nz = Nz
+	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_Nz)
+	_a_.arg_shx = shx
+	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_shx)
+	_a_.arg_shy = shy
+	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_shy)
+	_a_.arg_shz = shz
+	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_shz)
 
 	args := _a_.argptr[:]
 	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
 }
 
 // Wrapper for shift CUDA kernel, synchronized.
-func k_shift(dst unsafe.Pointer, src unsafe.Pointer, N0 int, N1 int, N2 int, sh0 int, sh1 int, sh2 int, cfg *config) {
+func k_shift(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config) {
 	const stream = 0
-	k_shift_async(dst, src, N0, N1, N2, sh0, sh1, sh2, cfg, stream)
+	k_shift_async(dst, src, Nx, Ny, Nz, shx, shy, shz, cfg, stream)
 	Sync(stream)
 }
 
@@ -99,68 +99,70 @@ const (
 	ld.param.u32 	%r9, [shift_param_7];
 	cvta.to.global.u64 	%rd1, %rd3;
 	cvta.to.global.u64 	%rd2, %rd4;
-	.loc 2 10 1
-	mov.u32 	%r10, %ntid.z;
-	mov.u32 	%r11, %ctaid.z;
-	mov.u32 	%r12, %tid.z;
+	.loc 2 9 1
+	mov.u32 	%r10, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r12, %tid.x;
 	mad.lo.s32 	%r1, %r10, %r11, %r12;
-	.loc 2 11 1
+	.loc 2 10 1
 	mov.u32 	%r13, %ntid.y;
 	mov.u32 	%r14, %ctaid.y;
 	mov.u32 	%r15, %tid.y;
 	mad.lo.s32 	%r2, %r13, %r14, %r15;
-	.loc 2 12 1
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r17, %ctaid.x;
-	mov.u32 	%r18, %tid.x;
+	.loc 2 11 1
+	mov.u32 	%r16, %ntid.z;
+	mov.u32 	%r17, %ctaid.z;
+	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	.loc 2 14 1
-	setp.ge.s32 	%p1, %r2, %r5;
-	setp.ge.s32 	%p2, %r1, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r3, %r6;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB0_2;
+	.loc 2 13 1
+	setp.lt.s32 	%p1, %r1, %r4;
+	setp.lt.s32 	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r6;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-	.loc 2 18 1
-	sub.s32 	%r19, %r1, %r7;
+BB0_1:
+	.loc 2 14 1
+	sub.s32 	%r19, %r3, %r9;
 	mov.u32 	%r20, 0;
 	.loc 3 238 5
 	max.s32 	%r21, %r19, %r20;
-	.loc 2 18 1
-	add.s32 	%r22, %r4, -1;
+	.loc 2 14 1
+	add.s32 	%r22, %r6, -1;
 	.loc 3 210 5
 	min.s32 	%r23, %r21, %r22;
-	.loc 2 18 1
+	.loc 2 14 1
 	sub.s32 	%r24, %r2, %r8;
 	.loc 3 238 5
 	max.s32 	%r25, %r24, %r20;
-	.loc 2 18 1
+	.loc 2 14 1
 	add.s32 	%r26, %r5, -1;
 	.loc 3 210 5
 	min.s32 	%r27, %r25, %r26;
-	.loc 2 18 1
+	.loc 2 14 1
 	mad.lo.s32 	%r28, %r23, %r5, %r27;
-	sub.s32 	%r29, %r3, %r9;
+	sub.s32 	%r29, %r1, %r7;
 	.loc 3 238 5
 	max.s32 	%r30, %r29, %r20;
-	.loc 2 18 1
-	add.s32 	%r31, %r6, -1;
+	.loc 2 14 1
+	add.s32 	%r31, %r4, -1;
 	.loc 3 210 5
 	min.s32 	%r32, %r30, %r31;
-	.loc 2 18 1
-	mad.lo.s32 	%r33, %r28, %r6, %r32;
+	.loc 2 14 1
+	mad.lo.s32 	%r33, %r28, %r4, %r32;
 	mul.wide.s32 	%rd5, %r33, 4;
 	add.s64 	%rd6, %rd2, %rd5;
-	mad.lo.s32 	%r34, %r1, %r5, %r2;
-	mad.lo.s32 	%r35, %r34, %r6, %r3;
+	mad.lo.s32 	%r34, %r3, %r5, %r2;
+	mad.lo.s32 	%r35, %r34, %r4, %r1;
 	mul.wide.s32 	%rd7, %r35, 4;
 	add.s64 	%rd8, %rd1, %rd7;
 	ld.global.f32 	%f1, [%rd6];
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
-	.loc 2 19 2
+	.loc 2 16 2
 	ret;
 }
 
@@ -199,68 +201,70 @@ BB0_2:
 	ld.param.u32 	%r9, [shift_param_7];
 	cvta.to.global.u64 	%rd1, %rd3;
 	cvta.to.global.u64 	%rd2, %rd4;
-	.loc 2 10 1
-	mov.u32 	%r10, %ntid.z;
-	mov.u32 	%r11, %ctaid.z;
-	mov.u32 	%r12, %tid.z;
+	.loc 2 9 1
+	mov.u32 	%r10, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r12, %tid.x;
 	mad.lo.s32 	%r1, %r10, %r11, %r12;
-	.loc 2 11 1
+	.loc 2 10 1
 	mov.u32 	%r13, %ntid.y;
 	mov.u32 	%r14, %ctaid.y;
 	mov.u32 	%r15, %tid.y;
 	mad.lo.s32 	%r2, %r13, %r14, %r15;
-	.loc 2 12 1
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r17, %ctaid.x;
-	mov.u32 	%r18, %tid.x;
+	.loc 2 11 1
+	mov.u32 	%r16, %ntid.z;
+	mov.u32 	%r17, %ctaid.z;
+	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	.loc 2 14 1
-	setp.ge.s32 	%p1, %r2, %r5;
-	setp.ge.s32 	%p2, %r1, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r3, %r6;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB0_2;
+	.loc 2 13 1
+	setp.lt.s32 	%p1, %r1, %r4;
+	setp.lt.s32 	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r6;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-	.loc 2 18 1
-	sub.s32 	%r19, %r1, %r7;
+BB0_1:
+	.loc 2 14 1
+	sub.s32 	%r19, %r3, %r9;
 	mov.u32 	%r20, 0;
 	.loc 3 238 5
 	max.s32 	%r21, %r19, %r20;
-	.loc 2 18 1
-	add.s32 	%r22, %r4, -1;
+	.loc 2 14 1
+	add.s32 	%r22, %r6, -1;
 	.loc 3 210 5
 	min.s32 	%r23, %r21, %r22;
-	.loc 2 18 1
+	.loc 2 14 1
 	sub.s32 	%r24, %r2, %r8;
 	.loc 3 238 5
 	max.s32 	%r25, %r24, %r20;
-	.loc 2 18 1
+	.loc 2 14 1
 	add.s32 	%r26, %r5, -1;
 	.loc 3 210 5
 	min.s32 	%r27, %r25, %r26;
-	.loc 2 18 1
+	.loc 2 14 1
 	mad.lo.s32 	%r28, %r23, %r5, %r27;
-	sub.s32 	%r29, %r3, %r9;
+	sub.s32 	%r29, %r1, %r7;
 	.loc 3 238 5
 	max.s32 	%r30, %r29, %r20;
-	.loc 2 18 1
-	add.s32 	%r31, %r6, -1;
+	.loc 2 14 1
+	add.s32 	%r31, %r4, -1;
 	.loc 3 210 5
 	min.s32 	%r32, %r30, %r31;
-	.loc 2 18 1
-	mad.lo.s32 	%r33, %r28, %r6, %r32;
+	.loc 2 14 1
+	mad.lo.s32 	%r33, %r28, %r4, %r32;
 	mul.wide.s32 	%rd5, %r33, 4;
 	add.s64 	%rd6, %rd2, %rd5;
-	mad.lo.s32 	%r34, %r1, %r5, %r2;
-	mad.lo.s32 	%r35, %r34, %r6, %r3;
+	mad.lo.s32 	%r34, %r3, %r5, %r2;
+	mad.lo.s32 	%r35, %r34, %r4, %r1;
 	mul.wide.s32 	%rd7, %r35, 4;
 	add.s64 	%rd8, %rd1, %rd7;
 	ld.global.f32 	%f1, [%rd6];
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
-	.loc 2 19 2
+	.loc 2 16 2
 	ret;
 }
 
@@ -327,68 +331,70 @@ BB0_2:
 	ld.param.u32 	%r9, [shift_param_7];
 	cvta.to.global.u64 	%rd1, %rd3;
 	cvta.to.global.u64 	%rd2, %rd4;
-	.loc 3 10 1
-	mov.u32 	%r10, %ntid.z;
-	mov.u32 	%r11, %ctaid.z;
-	mov.u32 	%r12, %tid.z;
+	.loc 3 9 1
+	mov.u32 	%r10, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r12, %tid.x;
 	mad.lo.s32 	%r1, %r10, %r11, %r12;
-	.loc 3 11 1
+	.loc 3 10 1
 	mov.u32 	%r13, %ntid.y;
 	mov.u32 	%r14, %ctaid.y;
 	mov.u32 	%r15, %tid.y;
 	mad.lo.s32 	%r2, %r13, %r14, %r15;
-	.loc 3 12 1
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r17, %ctaid.x;
-	mov.u32 	%r18, %tid.x;
+	.loc 3 11 1
+	mov.u32 	%r16, %ntid.z;
+	mov.u32 	%r17, %ctaid.z;
+	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	.loc 3 14 1
-	setp.ge.s32 	%p1, %r2, %r5;
-	setp.ge.s32 	%p2, %r1, %r4;
-	or.pred  	%p3, %p1, %p2;
-	setp.ge.s32 	%p4, %r3, %r6;
-	or.pred  	%p5, %p3, %p4;
-	@%p5 bra 	BB2_2;
+	.loc 3 13 1
+	setp.lt.s32 	%p1, %r1, %r4;
+	setp.lt.s32 	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32 	%p4, %r3, %r6;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB2_2;
+	bra.uni 	BB2_1;
 
-	.loc 3 18 1
-	sub.s32 	%r19, %r1, %r7;
+BB2_1:
+	.loc 3 14 1
+	sub.s32 	%r19, %r3, %r9;
 	mov.u32 	%r20, 0;
 	.loc 4 238 5
 	max.s32 	%r21, %r19, %r20;
-	.loc 3 18 1
-	add.s32 	%r22, %r4, -1;
+	.loc 3 14 1
+	add.s32 	%r22, %r6, -1;
 	.loc 4 210 5
 	min.s32 	%r23, %r21, %r22;
-	.loc 3 18 1
+	.loc 3 14 1
 	sub.s32 	%r24, %r2, %r8;
 	.loc 4 238 5
 	max.s32 	%r25, %r24, %r20;
-	.loc 3 18 1
+	.loc 3 14 1
 	add.s32 	%r26, %r5, -1;
 	.loc 4 210 5
 	min.s32 	%r27, %r25, %r26;
-	.loc 3 18 1
+	.loc 3 14 1
 	mad.lo.s32 	%r28, %r23, %r5, %r27;
-	sub.s32 	%r29, %r3, %r9;
+	sub.s32 	%r29, %r1, %r7;
 	.loc 4 238 5
 	max.s32 	%r30, %r29, %r20;
-	.loc 3 18 1
-	add.s32 	%r31, %r6, -1;
+	.loc 3 14 1
+	add.s32 	%r31, %r4, -1;
 	.loc 4 210 5
 	min.s32 	%r32, %r30, %r31;
-	.loc 3 18 1
-	mad.lo.s32 	%r33, %r28, %r6, %r32;
+	.loc 3 14 1
+	mad.lo.s32 	%r33, %r28, %r4, %r32;
 	mul.wide.s32 	%rd5, %r33, 4;
 	add.s64 	%rd6, %rd2, %rd5;
 	ld.global.nc.f32 	%f1, [%rd6];
-	mad.lo.s32 	%r34, %r1, %r5, %r2;
-	mad.lo.s32 	%r35, %r34, %r6, %r3;
+	mad.lo.s32 	%r34, %r3, %r5, %r2;
+	mad.lo.s32 	%r35, %r34, %r4, %r1;
 	mul.wide.s32 	%rd7, %r35, 4;
 	add.s64 	%rd8, %rd1, %rd7;
 	st.global.f32 	[%rd8], %f1;
 
 BB2_2:
-	.loc 3 19 2
+	.loc 3 16 2
 	ret;
 }
 

@@ -7,6 +7,7 @@ import (
 
 // load PTX code for function name, find highest SM that matches our card.
 func fatbinLoad(sm map[int]string, fn string) cu.Function {
+	log.Println("load", fn)
 	best := 0
 	for k, _ := range sm {
 		if k <= cudaCC && k > best {

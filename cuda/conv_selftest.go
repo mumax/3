@@ -8,9 +8,6 @@ import (
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
 func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
-
-	return
-
 	if mesh.PBC_code() != 0 {
 		log.Println("skipping convolution self-test for PBC")
 		return

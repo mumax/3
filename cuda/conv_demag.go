@@ -83,10 +83,12 @@ func (c *DemagConvolution) initFFTKern3D() {
 func (c *DemagConvolution) initFFTKern2D() {
 	padded := c.kernSize
 	ffted := fftR2COutputSizeFloats(padded)
+
 	realsize := ffted
 	util.Assert(realsize[X]%2 == 0)
 	realsize[X] /= 2
 	c.fftKernSize = realsize
+
 	halfkern := realsize
 	halfkern[Y] = halfkern[Y]/2 + 1
 	fwPlan := c.fwPlan

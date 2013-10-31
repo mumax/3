@@ -65,7 +65,7 @@ func VortexWall(mleft, mright float64, circ, pol int) Config {
 // 	TwoDomain(1,0,0,  0,0,1,  -1,0,0) // head-to-head domains with perpendicular (Bloch) wall
 // 	TwoDomain(0,0,1,  1,0,0,   0,0,-1)// up-down domains with Bloch wall
 func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Config {
-	ww := 2 * Mesh().CellSize()[2] // wall width in cells
+	ww := 2 * Mesh().CellSize()[X] // wall width in cells
 	return func(x, y, z float64) data.Vector {
 		var m data.Vector
 		if x < 0 {

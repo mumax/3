@@ -10,6 +10,7 @@ defRegion(0, xrange(-inf, 0))
 defRegion(1, xrange(0, inf))
 
 save(B_exch)
+save(m)
 
 tol := 1e-8
 

@@ -11,17 +11,17 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
                  float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
                  float cx, float cy, float cz,
                  float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, float* __restrict__ polLUT,
-                 int8_t* __restrict__ regions, int N0, int N1, int N2, int8_t PBC) {
+                 int8_t* __restrict__ regions, int Nx, int Ny, int Nz, int8_t PBC) {
 
-    int i = blockIdx.z * blockDim.z + threadIdx.z;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (i >= N0 || j >= N1 || k >= N2) {
+    if (ix >= Nx || iy >= Ny || iz >= Nz) {
         return;
     }
 
-    int I = idx(i, j, k);
+    int I = idx(ix, iy, iz);
 
     int8_t r = regions[I];
     float alpha = alphaLUT[r];

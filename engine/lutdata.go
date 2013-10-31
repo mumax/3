@@ -41,13 +41,12 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 		// upload to GPU
 		//log.Println("upload", p)
 		p.assureAlloc()
-		for c2 := range p.gpu_buf {
-			c := c2 // XYZ swap here
-			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c2][0]), cu.SIZEOF_FLOAT32*NREGION)
+		for c := range p.gpu_buf {
+			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c][0]), cu.SIZEOF_FLOAT32*NREGION)
 		}
 		p.gpu_ok = true
 		p.nupload++
-		//cuda.SyncAll()
+		cuda.SyncAll()
 	}
 	return p.gpu_buf
 }
@@ -62,7 +61,7 @@ func (p *lut) gpuLUT1() cuda.LUTPtr {
 func (p *lut) isZero() bool {
 	v := p.cpuLUT()
 	for c := range v {
-		for i := 0; i < regions.maxreg; i++ {
+		for i := 0; i < NREGION; i++ {
 			if v[c][i] != 0 {
 				return false
 			}

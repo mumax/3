@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"log"
 )
 
 func init() {
@@ -17,7 +16,6 @@ func Average(s Slicer) []float64 {
 	}
 	if v, ok := s.(volumer); ok {
 		avg := avg(buf, nil)
-		log.Println(s.Name(), "volume", v.volume())
 		spacefill := v.volume()
 		for i := range avg {
 			avg[i] /= spacefill

@@ -12,11 +12,11 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
             float* __restrict__ aLUT2d, int8_t* __restrict__ regions,
             float wx, float wy, float wz, int Nx, int Ny, int Nz, int8_t PBC) {
 
-    int iz = blockIdx.z * blockDim.z + threadIdx.z;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (ix>=Nx || iy >= Ny || iz >= Nz) {
+    if (ix >= Nx || iy >= Ny || iz >= Nz) {
         return;
     }
 

@@ -46,11 +46,6 @@ func On(img *image.NRGBA, f *data.Slice, fmin, fmax string) {
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
 func drawVectors(img *image.NRGBA, arr [3][][][]float32) {
-	println("--")
-	println(len(arr[X]))
-	println(len(arr[X][0]))
-	println(len(arr[X][0][0]))
-	println("--")
 	w, h := len(arr[X][0][0]), len(arr[X][0])
 	d := len(arr[X])
 	norm := float32(d)

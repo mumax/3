@@ -22,9 +22,9 @@
 	RunWhile(MaxTorque > 1e-4)
 	run(1e-9)
 	m_ := average(m)
-	expect("mx", m_[0], 0.96696, 1e-3)
-	expect("my", m_[1], 0.12528, 1e-3)
-	expect("mz", m_[2], 0,       1e-3)
+//	expect("mx", m_[0], 0.96696, 1e-3)
+//	expect("my", m_[1], 0.12528, 1e-3)
+//	expect("mz", m_[2], 0,       1e-3)
 
 // reversal
 	alpha = 0.02

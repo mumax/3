@@ -43,7 +43,7 @@ func Vortex(circ, pol int) Config {
 
 // Make a vortex wall configuration.
 func VortexWall(mleft, mright float64, circ, pol int) Config {
-	h := Mesh().WorldSize()[1]
+	h := Mesh().WorldSize()[Y]
 	v := Vortex(circ, pol)
 	return func(x, y, z float64) data.Vector {
 		if x < -h/2 {

@@ -36,7 +36,7 @@ func init() {
 			msat := Msat.GetRegion(0)
 			D := Dex.GetRegion(0)
 			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D[0]/msat), float32(D[1]/msat), float32(D[2]/msat), float32(A), 0) // dmi+exchange
+			cuda.AddDMI(dst, M.buffer, float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A), 0) // dmi+exchange
 		}
 	})
 

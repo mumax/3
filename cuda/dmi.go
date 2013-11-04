@@ -16,6 +16,7 @@ func AddDMI(Beff *data.Slice, m *data.Slice, D_redx, D_redy, D_redz, A_red float
 	util.Argument(m.Mesh().Size() == mesh.Size())
 	util.AssertMsg(N[Z] == 1, "DMI available in 2D only")
 	util.AssertMsg(mesh.PBC_code() == 0, "DMI not available with PBC")
+	util.AssertMsg(D_redz == 0, "not available along z")
 
 	cfg := make3DConf(N)
 

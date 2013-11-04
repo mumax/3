@@ -15,10 +15,10 @@ func updateShift(dir, sign int) {
 	totalShift -= float64(sign) * Mesh().CellSize()[dir] // window left means wall right: minus sign
 }
 
-// shift the simulation window over dx cells in user X direction
+// shift the simulation window over dx cells in X direction
 func Shift(dx int) {
-	shift(M.buffer, 0, 0, dx)
-	regions.shift(0, 0, dx)
+	shift(M.buffer, dx, 0, 0)
+	regions.shift(dx, 0, 0)
 	geometry.shift(dx)
 	updateShift(X, -dx)
 }

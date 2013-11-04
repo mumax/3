@@ -48,7 +48,7 @@ func (p *fft3DC2RPlan) InputSizeFloats() (Nx, Ny, Nz int) {
 
 // 3D size of the output array.
 func (p *fft3DC2RPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
-	return p.size[0], p.size[1], p.size[2]
+	return p.size[X], p.size[Y], p.size[Z]
 }
 
 // Required length of the (1D) input array.

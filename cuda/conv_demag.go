@@ -14,34 +14,34 @@ type DemagConvolution struct {
 	size        [3]int            // 3D size of the input/output data
 	kernSize    [3]int            // Size of kernel and logical FFT size.
 	fftKernSize [3]int            // Size of real, FFTed kernel
-	n           int               // product of size
 	fftRBuf     [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3][3]*data.Slice // FFT kernel on device
 	fwPlan      fft3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      fft3DC2RPlan      // Backward FFT (1 component)
-	kern        [3][3]*data.Slice // Real-space kernel (host)
+	kern        [3][3]*data.Slice // Real-space kernel (host), removed after self-test
 	FFTMesh     data.Mesh         // mesh of FFT m
 }
 
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
-		c.fwPlan = newFFT3DR2C(padded[0], padded[1], padded[2], stream[0])
-		c.bwPlan = newFFT3DC2R(padded[0], padded[1], padded[2], stream[0])
+		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z], stream[0])
+		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z], stream[0])
 	}
 
 	{ // init device buffers
 		// 2D re-uses fftBuf[X] as fftBuf[Z], 3D needs all 3 fftBufs.
-		c.fftCBuf[X] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
-		c.fftCBuf[Y] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
+		nc := fftR2COutputSizeFloats(c.kernSize)
+		c.fftCBuf[X] = makeFloats(nc)
+		c.fftCBuf[Y] = makeFloats(nc)
 		if c.is3D() {
-			c.fftCBuf[Z] = makeFloats(fftR2COutputSizeFloats(c.kernSize))
+			c.fftCBuf[Z] = makeFloats(nc)
 		} else {
 			c.fftCBuf[Z] = c.fftCBuf[X]
 		}
 		for i := 0; i < 3; i++ {
-			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize)) // ?
+			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize))
 		}
 	}
 
@@ -233,10 +233,9 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c := new(DemagConvolution)
 	c.size = size
 	c.kern = kernel
-	c.n = prod(size)
-	c.kernSize = kernel[0][0].Mesh().Size()
+	c.kernSize = kernel[X][X].Mesh().Size()
 	c.init()
-	c.initMesh()
+	c.initFFTMesh()
 
 	//dbg("kernel", c.kern)
 
@@ -262,7 +261,8 @@ func (c *DemagConvolution) freeKern() {
 	}
 }
 
-func (c *DemagConvolution) initMesh() {
+// Mesh for FFT(m) quantity, etc.
+func (c *DemagConvolution) initFFTMesh() {
 	n := fftR2COutputSizeFloats(c.kernSize)
 	cell := c.kern[0][0].Mesh().CellSize()
 	c.FFTMesh = *data.NewMesh(n[X], n[Y], n[Z], 1/cell[X], 1/cell[Y], 1/cell[Z])

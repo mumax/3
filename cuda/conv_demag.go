@@ -213,7 +213,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 }
 
 func (c *DemagConvolution) is2D() bool {
-	//return false // !!!!!!!!!!!!!!!!!!!!!!!
+	return false // !!!!!!!!!!!!!!!!!!!!!!!
 	return c.size[Z] == 1
 }
 

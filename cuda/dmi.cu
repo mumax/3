@@ -14,9 +14,9 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float Dx, float Dy, float Dz, float A,
        float cx, float cy, float cz, int Nx, int Ny, int Nz) {
 
-    int iz = blockIdx.z * blockDim.z + threadIdx.z;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+    int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
     if (ix >= Nx || iy >= Ny || iz >= Nz) {
         return;

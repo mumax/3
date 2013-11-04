@@ -16,7 +16,7 @@ func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int,
 
 	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
 		Kxx.DevPtr(0), Kxx.DevPtr(0), Kxy.DevPtr(0),
-		Nx, Ny, cfg, 0)
+		Nx, Ny, cfg, str)
 }
 
 func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int, str int) {

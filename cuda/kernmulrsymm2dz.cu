@@ -16,8 +16,8 @@
 extern "C" __global__ void
 kernmulRSymm2Dz(float* __restrict__  fftMz, float* __restrict__  fftKzz, int Nx, int Ny) {
 
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
+    int iy = blockIdx.y * blockDim.y + threadIdx.y;
 
     if(ix>= Nx || iy>=Ny) {
         return;

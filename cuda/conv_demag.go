@@ -82,28 +82,27 @@ func (c *DemagConvolution) initFFTKern3D() {
 // Initialize GPU FFT kernel for 2D.
 // Only the non-redundant parts are stored on the GPU.
 func (c *DemagConvolution) initFFTKern2D() {
-	padded := c.kernSize
-	ffted := fftR2COutputSizeFloats(padded)
 
-	realsize := ffted
-	util.Assert(realsize[X]%2 == 0)
-	realsize[X] /= 2
-	c.fftKernSize = realsize
+	// size of FFT(kernel): store real parts only
+	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
+	util.Assert(c.fftKernSize[X]%2 == 0)
+	c.fftKernSize[X] /= 2
 
-	halfkern := realsize
+	// store only 1/2 (symmetry)
+	halfkern := c.fftKernSize
 	halfkern[Y] = halfkern[Y]/2 + 1
-	fwPlan := c.fwPlan
+
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
 
 	// upper triangular part
-	fftKern := data.NewSlice(1, data.NewMesh(halfkern[0], halfkern[1], halfkern[2], 1, 1, 1))
+	fftKern := data.NewSlice(1, data.NewMesh(halfkern[X], halfkern[Y], halfkern[Z], 1, 1, 1)) // host
 	for i := 0; i < 3; i++ {
-		for j := i; j < 3; j++ {
+		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
 				data.Copy(input, c.kern[i][j])
-				fwPlan.Exec(input, output)
-				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.fwPlan.Exec(input, output)
+				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
 			}
 		}
@@ -116,7 +115,6 @@ func (c *DemagConvolution) initFFTKern2D() {
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
 func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
-	//dbg("demagconv.exec", B.HostCopy(), m.HostCopy(), "...")
 	if c.is2D() {
 		c.exec2D(B, m, vol, Bsat, regions)
 	} else {
@@ -131,23 +129,17 @@ func zero1_async(dst *data.Slice, str int) {
 
 // forward FFT component i
 func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
-	zero1_async(c.fftRBuf[i], 0)
+	zero1_async(c.fftRBuf[i], stream0)
 	in := inp.Comp(i)
-	//dbg("fwfft comp", i, "in:", in.HostCopy())
-	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, 0)
-	//dbg("fwfft:padded", i, c.fftRBuf[i].HostCopy().Host())
+	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, stream0)
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
-	//dbg("fwfft:output", i, c.fftCBuf[i].HostCopy())
 }
 
 // backward FFT component i
 func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
-	//dbg("bwfft in", c.fftCBuf[i].HostCopy())
 	c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
-	//dbg("bwfft out", c.fftRBuf[i].HostCopy().Host())
 	out := outp.Comp(i)
-	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize, 0)
-	//dbg("unpad out", out.HostCopy())
+	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize, stream0)
 }
 
 // forward FFT of magnetization one component.
@@ -167,7 +159,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	kernMulRSymm3D_async(c.fftCBuf,
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[Z][Z],
 		c.gpuFFTKern[Y][Z], c.gpuFFTKern[X][Z], c.gpuFFTKern[X][Y],
-		Nx, Ny, Nz, 0)
+		Nx, Ny, Nz, stream0)
 
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
@@ -180,43 +172,43 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	// a 1D convolution for x and a 2D convolution for yz.
 	// So only 2 FFT buffers are needed at the same time.
 
-	//dbg("exec2D")
-	//dbg("inp:", inp.HostCopy())
+	dbg("exec2D")
+	dbg("inp:", inp.HostCopy())
 
 	c.fwFFT(Z, inp, vol, Bsat, regions) // FFT Z
 
-	//dbg("fftmz:", c.fftCBuf[Z].HostCopy())
+	dbg("fftmz:", c.fftCBuf[Z].HostCopy())
 
 	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
-	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, 0)
+	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, stream0)
 
-	//dbg("fftBz:", c.fftCBuf[Z].HostCopy())
+	dbg("fftBz:", c.fftCBuf[Z].HostCopy())
 
 	c.bwFFT(Z, outp) // bw FFT z
 
-	//dbg("Bz:", outp.Comp(Z).HostCopy())
+	dbg("Bz:", outp.Comp(Z).HostCopy())
 
 	// FW FFT xy
 	c.fwFFT(X, inp, vol, Bsat, regions)
 	c.fwFFT(Y, inp, vol, Bsat, regions)
-	//dbg("fftmx:", c.fftCBuf[X].HostCopy())
-	//dbg("fftmy:", c.fftCBuf[Y].HostCopy())
+	dbg("fftmx:", c.fftCBuf[X].HostCopy())
+	dbg("fftmy:", c.fftCBuf[Y].HostCopy())
 
 	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
-		Nx, Ny, 0)
+		Nx, Ny, stream0)
 
-	//dbg("fftBx:", c.fftCBuf[X].HostCopy())
-	//dbg("fftBy:", c.fftCBuf[Y].HostCopy())
+	dbg("fftBx:", c.fftCBuf[X].HostCopy())
+	dbg("fftBy:", c.fftCBuf[Y].HostCopy())
 
 	// BW FFT xy
 	c.bwFFT(X, outp)
 	c.bwFFT(Y, outp)
 
-	//dbg("Bx:", outp.Comp(X).HostCopy())
-	//dbg("By:", outp.Comp(Y).HostCopy())
+	dbg("Bx:", outp.Comp(X).HostCopy())
+	dbg("By:", outp.Comp(Y).HostCopy())
 	//SyncAll()
 }
 
@@ -248,7 +240,7 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	//	}
 	//}
 
-	testConvolution(c, mesh)
+	//testConvolution(c, mesh)
 	c.freeKern()
 	return c
 }

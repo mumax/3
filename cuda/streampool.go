@@ -4,6 +4,10 @@ import "github.com/barnex/cuda5/cu"
 
 var stream [3]cu.Stream // 3 general-purpose CUDA streams, one per vector component
 
+const (
+	stream0 = 0 // for readability
+)
+
 func initStreampool() {
 	for i := range stream {
 		stream[i] = cu.StreamCreate()

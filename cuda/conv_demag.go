@@ -52,26 +52,27 @@ func (c *DemagConvolution) init() {
 	}
 }
 
+// initialize FFT(Kernel) for 3D
 func (c *DemagConvolution) initFFTKern3D() {
-	padded := c.kernSize
-	ffted := fftR2COutputSizeFloats(padded)
-	realsize := ffted
-	util.Assert(realsize[X]%2 == 0)
-	realsize[X] /= 2
-	c.fftKernSize = realsize
-	halfkern := realsize
-	fwPlan := c.fwPlan
+
+	// size of FFT(kernel): store real parts only
+	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
+	util.Assert(c.fftKernSize[X]%2 == 0)
+	c.fftKernSize[X] /= 2
+
+	// will store only 1/4 (symmetry), but not yet
+	halfkern := c.fftKernSize
+
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
 
-	// upper triangular part
-	fftKern := data.NewSlice(1, data.NewMesh(halfkern[0], halfkern[1], halfkern[2], 1, 1, 1))
+	fftKern := data.NewSlice(1, data.NewMesh(halfkern[X], halfkern[Y], halfkern[Z], 1, 1, 1)) // host
 	for i := 0; i < 3; i++ {
-		for j := i; j < 3; j++ {
+		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
 				data.Copy(input, c.kern[i][j])
-				fwPlan.Exec(input, output)
-				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(fwPlan.InputLen()))
+				c.fwPlan.Exec(input, output)
+				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
 			}
 		}

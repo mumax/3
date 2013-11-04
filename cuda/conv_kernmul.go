@@ -9,7 +9,7 @@ import (
 )
 
 func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int, str int) {
-	util.Argument(Kxx.Len() == (Ny/2+1)*Nx)
+	//util.Argument(Kxx.Len() == (Ny/2+1)*Nx)
 	util.Argument(fftMy.NComp() == 1 && Kxx.NComp() == 1)
 
 	cfg := make3DConf([3]int{Nx, Ny, 1})
@@ -20,7 +20,7 @@ func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int,
 }
 
 func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int, str int) {
-	util.Argument(Kzz.Len() == (Ny/2+1)*Nx)
+	//util.Argument(Kzz.Len() == (Ny/2+1)*Nx)
 	util.Argument(fftMz.NComp() == 1 && Kzz.NComp() == 1)
 
 	cfg := make3DConf([3]int{Nx, Ny, 1})

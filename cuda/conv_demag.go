@@ -88,9 +88,9 @@ func (c *DemagConvolution) initFFTKern2D() {
 	util.Assert(c.fftKernSize[X]%2 == 0)
 	c.fftKernSize[X] /= 2
 
-	// store only 1/2 (symmetry)
+	// store only 1/2 (symmetry), not yet
 	halfkern := c.fftKernSize
-	halfkern[Y] = halfkern[Y]/2 + 1
+	//halfkern[Y] = halfkern[Y]/2 + 1
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
@@ -213,6 +213,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 }
 
 func (c *DemagConvolution) is2D() bool {
+	//return false // !!!!!!!!!!!!!!!!!!!!!!!
 	return c.size[Z] == 1
 }
 
@@ -240,7 +241,7 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	//	}
 	//}
 
-	//testConvolution(c, mesh)
+	testConvolution(c, mesh)
 	c.freeKern()
 	return c
 }

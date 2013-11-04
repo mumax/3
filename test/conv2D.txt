@@ -1,4 +1,4 @@
-setgridsize(4, 2, 1)
+setgridsize(4, 3, 1)
 setcellsize(1, 1, 1)
 
 //m = uniform(0,0,1)

@@ -23,7 +23,7 @@ func CenterPMAWall() {
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
-		sign := wall_left_magnetization(M.GetCell(2, 0, ny()/2, nz()/2))
+		sign := wall_left_magnetization(M.GetCell(Z, 0, ny()/2, nz()/2))
 		engine.Shift(sign)
 		return
 	}
@@ -79,6 +79,12 @@ func getShiftSpeed() float64 {
 	return lastV
 }
 
-func nx() int { return engine.Mesh().Size()[2] }
-func ny() int { return engine.Mesh().Size()[1] }
-func nz() int { return engine.Mesh().Size()[0] }
+func nx() int { return engine.Mesh().Size()[X] }
+func ny() int { return engine.Mesh().Size()[Y] }
+func nz() int { return engine.Mesh().Size()[Z] }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

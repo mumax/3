@@ -10,10 +10,10 @@ var DWTiltPMA = engine.NewGetScalar("ext_dwtilt", "rad", "PMA domain wall tilt",
 
 func dwTiltPMA() float64 {
 	m := engine.Download(&engine.M)
-	mz := m.Vectors()[0][0]
+	mz := m.Vectors()[Z][0] // slice0
 
-	nx := engine.Mesh().Size()[2]
-	ny := engine.Mesh().Size()[1]
+	nx := engine.Mesh().Size()[X]
+	ny := engine.Mesh().Size()[Y]
 	// find domain wall at these y positions:
 	y1 := 4
 	y2 := ny - 5

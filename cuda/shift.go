@@ -15,7 +15,7 @@ func Shift(dst, src *data.Slice, shift [3]int) {
 	N := dst.Mesh().Size()
 	cfg := make3DConf(N)
 
-	k_shift(dst.DevPtr(0), src.DevPtr(0), N[0], N[1], N[2], shift[0], shift[1], shift[2], cfg)
+	k_shift(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shift[X], shift[Y], shift[Z], cfg)
 }
 
 // Like Shift, but for bytes
@@ -23,5 +23,5 @@ func ShiftBytes(dst, src *Bytes, m *data.Mesh, shift [3]int) {
 	N := m.Size()
 	cfg := make3DConf(N)
 
-	k_shiftbytes(dst.Ptr, src.Ptr, N[0], N[1], N[2], shift[0], shift[1], shift[2], cfg)
+	k_shiftbytes(dst.Ptr, src.Ptr, N[X], N[Y], N[Z], shift[X], shift[Y], shift[Z], cfg)
 }

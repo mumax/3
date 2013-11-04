@@ -19,16 +19,14 @@ func init() {
 // 	PostStep(CenterPMAWall)
 func CenterPMAWall() {
 	M := &engine.M
-	mz := engine.Average(M)[2]     // TODO: optimize
+	mz := engine.Average(M)[Z]     // TODO: optimize
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
 	if mz < tolerance {
 		sign := wall_left_magnetization(M.GetCell(Z, 0, ny()/2, nz()/2))
 		engine.Shift(sign)
-		return
-	}
-	if mz > tolerance {
-		sign := wall_left_magnetization(M.GetCell(2, 0, ny()/2, nz()/2))
+	} else if mz > tolerance {
+		sign := wall_left_magnetization(M.GetCell(Z, 0, ny()/2, nz()/2))
 		engine.Shift(-sign)
 	}
 }
@@ -38,16 +36,14 @@ func CenterPMAWall() {
 // 	PostStep(CenterInplaneWall)
 func CenterInplaneWall() {
 	M := &engine.M
-	mz := engine.Average(M)[0]     // TODO: optimize
+	mx := engine.Average(M)[X]     // TODO: optimize
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
-	if mz < tolerance {
-		sign := wall_left_magnetization(M.GetCell(0, 0, ny()/2, nz()/2))
+	if mx < tolerance {
+		sign := wall_left_magnetization(M.GetCell(X, 0, ny()/2, nz()/2))
 		engine.Shift(sign)
-		return
-	}
-	if mz > tolerance {
-		sign := wall_left_magnetization(M.GetCell(0, 0, ny()/2, nz()/2))
+	} else if mx > tolerance {
+		sign := wall_left_magnetization(M.GetCell(X, 0, ny()/2, nz()/2))
 		engine.Shift(-sign)
 	}
 }

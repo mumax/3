@@ -26,9 +26,9 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	engine.B_ext.Add(compensateLRSurfaceCharges(engine.Mesh(), mxLeft, mxRight, bsat), nil)
 }
 
-func constVec(x, y, z float64) func() [3]float64 {
-	return func() [3]float64 { return [3]float64{x, y, z} }
-}
+//func constVec(x, y, z float64) func() [3]float64 {
+//	return func() [3]float64 { return [3]float64{x, y, z} }
+//}
 
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
@@ -44,27 +44,35 @@ func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat floa
 	world := m.WorldSize()
 	cell := m.CellSize()
 	size := m.Size()
-	q := cell[0] * cell[1]
+	q := cell[Z] * cell[Y]
 	q1 := q * mxLeft
 	q2 := q * (-mxRight)
 
-	for I := 0; I < size[0]; I++ {
-		for J := 0; J < size[1]; J++ {
+	// surface loop (source)
+	for I := 0; I < size[Z]; I++ {
+		for J := 0; J < size[Y]; J++ {
 
-			x := (float64(I) + 0.5) * cell[0]
-			y := (float64(J) + 0.5) * cell[1]
-			source1 := [3]float64{x, y, 0}
-			source2 := [3]float64{x, y, world[2]}
-			for i := range H[0] {
-				for j := range H[0][i] {
-					for k := range H[0][i][j] {
-						dst := [3]float64{(float64(i) + 0.5) * cell[0],
-							(float64(j) + 0.5) * cell[1],
-							(float64(k) + 0.5) * cell[2]}
+			y := (float64(J) + 0.5) * cell[Y]
+			z := (float64(I) + 0.5) * cell[Z]
+			source1 := [3]float64{0, y, z}        // left surface source
+			source2 := [3]float64{world[X], y, z} // right surface source
+
+			// volume loop (destination)
+			for iz := range H[0] {
+				for iy := range H[0][iz] {
+					for ix := range H[0][iz][iy] {
+
+						dst := [3]float64{ // destination coordinate
+							(float64(ix) + 0.5) * cell[X],
+							(float64(iy) + 0.5) * cell[Y],
+							(float64(iz) + 0.5) * cell[Z]}
+
 						h1 := hfield(q1, source1, dst)
 						h2 := hfield(q2, source2, dst)
+
+						// add this surface charges' field to grand total
 						for c := 0; c < 3; c++ {
-							H[c][i][j][k] += float32(h1[c] + h2[c])
+							H[c][iz][iy][ix] += float32(h1[c] + h2[c])
 						}
 					}
 				}

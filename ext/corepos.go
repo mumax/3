@@ -7,9 +7,9 @@ var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", co
 func corePos() []float64 {
 
 	m, _ := engine.M.Slice()
-	m_z := m.Comp(0).HostCopy().Scalars()
+	m_z := m.Comp(Z).HostCopy().Scalars()
 	s := m.Mesh().Size()
-	Nx, Ny, Nz := s[2], s[1], s[0] // (xyz swap)
+	Nx, Ny, Nz := s[X], s[Y], s[Z]
 
 	max := float32(-1.0)
 	var maxX, maxY, maxZ int
@@ -31,20 +31,20 @@ func corePos() []float64 {
 	mz := m_z[maxZ]
 
 	// sub-cell interpolation in X and Y, but not Z
-	pos[0] = float64(maxX) + interpolate_maxpos(
+	pos[X] = float64(maxX) + interpolate_maxpos(
 		max, -1, abs(mz[maxY][maxX-1]), 1, abs(mz[maxY][maxX+1])) -
 		float64(Nx)/2 + 0.5
-	pos[1] = float64(maxY) + interpolate_maxpos(
+	pos[Y] = float64(maxY) + interpolate_maxpos(
 		max, -1, abs(mz[maxY-1][maxX]), 1, abs(mz[maxY+1][maxX])) -
 		float64(Ny)/2 + 0.5
-	pos[2] = float64(maxZ) - float64(Nz)/2 + 0.5
+	pos[Z] = float64(maxZ) - float64(Nz)/2 + 0.5
 
 	c := m.Mesh().CellSize()
-	pos[0] *= c[2] // (xyz swap)
-	pos[1] *= c[1]
-	pos[2] *= c[0]
+	pos[X] *= c[X]
+	pos[Y] *= c[Y]
+	pos[Z] *= c[Z]
 
-	pos[0] += engine.GetShiftPos() // add simulation window shift
+	pos[X] += engine.GetShiftPos() // add simulation window shift
 	return pos
 }
 

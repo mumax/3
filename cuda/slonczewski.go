@@ -9,11 +9,11 @@ func AddSlonczewskiTorque(torque, m, J *data.Slice, fixedP LUTPtrs, Msat, alpha,
 
 	N := torque.Len()
 	cfg := make1DConf(N)
-	thickness := float32(torque.Mesh().WorldSize()[0])
+	thickness := float32(torque.Mesh().WorldSize()[Z])
 
-	k_addslonczewskitorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
-		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2), J.DevPtr(0),
-		fixedP[0], fixedP[1], fixedP[2],
+	k_addslonczewskitorque(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
+		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z), J.DevPtr(Z),
+		fixedP[X], fixedP[Y], fixedP[Z],
 		unsafe.Pointer(Msat), unsafe.Pointer(alpha),
 		thickness, unsafe.Pointer(pol),
 		unsafe.Pointer(λ), unsafe.Pointer(ε_prime),

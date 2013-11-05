@@ -6,7 +6,7 @@
 
 extern "C" __global__ void
 addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restrict__ tz,
-                     float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz, float* __restrict__ jx,
+                     float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz, float* __restrict__ jz,
                      float* __restrict__ pxLUT, float* __restrict__ pyLUT, float* __restrict__ pzLUT,
                      float* __restrict__ msatLUT, float* __restrict__ alphaLUT, float flt,
                      float* __restrict__ polLUT, float* __restrict__ lambdaLUT, float* __restrict__ epsilonPrimeLUT,
@@ -16,7 +16,7 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
     if (I < N) {
 
         float3 m = make_float3(mx[I], my[I], mz[I]);
-        float  J = jx[I];
+        float  J = jz[I];
 
         // read parameters
         int8_t region       = regions[I];

@@ -35,13 +35,14 @@ func init() {
 
 	STTorque.init(3, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !J.isZero() {
-			util.Assert(!Pol.isZero())
+			util.AssertMsg(!Pol.isZero(), "spin polarization should not be 0")
 			jspin, rec := J.Slice()
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
-			// TODO: select, xi is not enough
+			// TODO: select, xi is not enough  !!!!
 			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
+
 			if !FixedLayer.isZero() {
 				cuda.AddSlonczewskiTorque(dst, M.buffer, jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(), Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu())
 			}

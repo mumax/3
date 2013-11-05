@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-func AddZhangLiTorque(torque, m, jpol *data.Slice, bsat, alpha, xi, pol LUTPtr, regions *Bytes) {
+func AddZhangLiTorque(torque, m, J *data.Slice, bsat, alpha, xi, pol LUTPtr, regions *Bytes) {
 
 	mesh := torque.Mesh()
 
@@ -13,10 +13,10 @@ func AddZhangLiTorque(torque, m, jpol *data.Slice, bsat, alpha, xi, pol LUTPtr, 
 	N := mesh.Size()
 	cfg := make3DConf(N)
 
-	k_addzhanglitorque(torque.DevPtr(0), torque.DevPtr(1), torque.DevPtr(2),
-		m.DevPtr(0), m.DevPtr(1), m.DevPtr(2),
-		jpol.DevPtr(0), jpol.DevPtr(1), jpol.DevPtr(2),
-		float32(c[0]), float32(c[1]), float32(c[2]),
+	k_addzhanglitorque(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
+		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
+		J.DevPtr(X), J.DevPtr(Y), J.DevPtr(Z),
+		float32(c[X]), float32(c[Y]), float32(c[Z]),
 		unsafe.Pointer(bsat), unsafe.Pointer(alpha), unsafe.Pointer(xi), unsafe.Pointer(pol),
-		regions.Ptr, N[0], N[1], N[2], mesh.PBC_code(), cfg)
+		regions.Ptr, N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
 }

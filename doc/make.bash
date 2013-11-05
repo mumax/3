@@ -2,3 +2,4 @@
 go build -v   || exit 1
 ./examples -vet || echo no worries
 ./examples 
+rm -rfv *.out/*.dump examples apigen

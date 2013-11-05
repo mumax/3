@@ -22,9 +22,9 @@
 
 #define MOD(n, M) ( (( (n) % (M) ) + (M) ) % (M)  )
 
-#define PBCx (PBC & 4)
+#define PBCx (PBC & 1)
 #define PBCy (PBC & 2)
-#define PBCz (PBC & 1)
+#define PBCz (PBC & 4)
 
 #define hclampx(ix) (PBCx? MOD(ix, Nx) : min((ix), Nx-1))
 #define lclampx(ix) (PBCx? MOD(ix, Nx) : max((ix), 0))

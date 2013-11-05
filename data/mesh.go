@@ -66,15 +66,17 @@ func (m *Mesh) WorldSize() [3]float64 {
 	return [3]float64{float64(m.gridSize[0]) * m.cellSize[0], float64(m.gridSize[1]) * m.cellSize[1], float64(m.gridSize[2]) * m.cellSize[2]}
 }
 
+// 3 bools, packed in one byte, indicating whether there are periodic boundary conditions in
+// X (LSB), Y(LSB<<1), Z(LSB<<2)
 func (m *Mesh) PBC_code() byte {
 	var code byte
-	if m.pbc[0] != 0 {
+	if m.pbc[X] != 0 {
 		code = 1
 	}
-	if m.pbc[1] != 0 {
+	if m.pbc[Y] != 0 {
 		code |= 2
 	}
-	if m.pbc[2] != 0 {
+	if m.pbc[Z] != 0 {
 		code |= 4
 	}
 	return code

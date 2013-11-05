@@ -16,9 +16,10 @@ alpha = 1
 
 steps(1000)
 
-m_ := average(m)
-expect("mx", m_[0], 0.557367, 1e-5)
-expect("my", m_[1], 0,        1e-5)
-expect("mz", m_[2], 0,        1e-5)
-
 save(m)
+
+m_ := average(m)
+expect("mx", m_[0], 0.557367, 1e-2)
+expect("my", m_[1], 0,        1e-2)
+expect("mz", m_[2], 0,        1e-2)
+

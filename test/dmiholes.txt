@@ -7,7 +7,7 @@ setgridsize(N, N + 4, 1)
 c := 1.15e-9 * 2
 d := 1.15e-9
 setcellsize(c, c, d)
-//setgeom(yrange((-N/2+1)*c, (N/2-1)*c)) // cut of top and bottom strips
+setgeom(yrange((-N/2+1)*c, (N/2-1)*c)) // cut of top and bottom strips
 
 Aex   = 20e-12
 Ku1   = 5.9e5

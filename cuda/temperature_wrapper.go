@@ -61,7 +61,7 @@ var addtemperature_map = map[int]string{0: "",
 
 const (
 	addtemperature_ptx_20 = `
-.version 3.1
+.version 3.2
 .target sm_20
 .address_size 64
 
@@ -76,7 +76,7 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<14>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<8>;
 	.reg .s64 	%rd<17>;
 
@@ -91,7 +91,7 @@ const (
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
 	cvta.to.global.u64 	%rd4, %rd8;
-	.loc 2 6 1
+	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -99,42 +99,40 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 7 1
-	setp.ge.s32 	%p1, %r1, %r2;
+	.loc 1 7 1
+	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	.loc 2 9 1
-	cvt.s64.s32 	%rd9, %r1;
+	cvt.s64.s32	%rd9, %r1;
 	add.s64 	%rd10, %rd4, %rd9;
-	.loc 2 10 1
 	ld.global.s8 	%rd11, [%rd10];
 	shl.b64 	%rd12, %rd11, 2;
 	add.s64 	%rd13, %rd3, %rd12;
-	.loc 2 11 1
 	mul.wide.s32 	%rd14, %r1, 4;
 	add.s64 	%rd15, %rd2, %rd14;
-	.loc 2 10 1
+	.loc 1 9 1
 	ld.global.f32 	%f2, [%rd13];
-	.loc 2 11 1
+	.loc 1 10 1
 	mul.f32 	%f3, %f2, %f1;
-	.loc 3 991 5
+	.loc 2 3055 10
 	sqrt.rn.f32 	%f4, %f3;
-	.loc 2 11 1
+	.loc 1 10 1
 	ld.global.f32 	%f5, [%rd15];
 	add.s64 	%rd16, %rd1, %rd14;
+	.loc 1 10 96
 	ld.global.f32 	%f6, [%rd16];
 	fma.rn.f32 	%f7, %f5, %f4, %f6;
 	st.global.f32 	[%rd16], %f7;
 
 BB0_2:
-	.loc 2 13 2
+	.loc 1 12 2
 	ret;
 }
 
 
 `
 	addtemperature_ptx_30 = `
-.version 3.1
+.version 3.2
 .target sm_30
 .address_size 64
 
@@ -149,7 +147,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<14>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<8>;
 	.reg .s64 	%rd<17>;
 
@@ -164,7 +162,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
 	cvta.to.global.u64 	%rd4, %rd8;
-	.loc 2 6 1
+	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -172,42 +170,40 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 2 7 1
-	setp.ge.s32 	%p1, %r1, %r2;
+	.loc 1 7 1
+	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	.loc 2 9 1
-	cvt.s64.s32 	%rd9, %r1;
+	cvt.s64.s32	%rd9, %r1;
 	add.s64 	%rd10, %rd4, %rd9;
-	.loc 2 10 1
 	ld.global.s8 	%rd11, [%rd10];
 	shl.b64 	%rd12, %rd11, 2;
 	add.s64 	%rd13, %rd3, %rd12;
-	.loc 2 11 1
 	mul.wide.s32 	%rd14, %r1, 4;
 	add.s64 	%rd15, %rd2, %rd14;
-	.loc 2 10 1
+	.loc 1 9 1
 	ld.global.f32 	%f2, [%rd13];
-	.loc 2 11 1
+	.loc 1 10 1
 	mul.f32 	%f3, %f2, %f1;
-	.loc 3 991 5
+	.loc 2 3055 10
 	sqrt.rn.f32 	%f4, %f3;
-	.loc 2 11 1
+	.loc 1 10 1
 	ld.global.f32 	%f5, [%rd15];
 	add.s64 	%rd16, %rd1, %rd14;
+	.loc 1 10 96
 	ld.global.f32 	%f6, [%rd16];
 	fma.rn.f32 	%f7, %f5, %f4, %f6;
 	st.global.f32 	[%rd16], %f7;
 
 BB0_2:
-	.loc 2 13 2
+	.loc 1 12 2
 	ret;
 }
 
 
 `
 	addtemperature_ptx_35 = `
-.version 3.1
+.version 3.2
 .target sm_35
 .address_size 64
 
@@ -250,9 +246,10 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<11>;
+	.reg .s16 	%rs<2>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<8>;
-	.reg .s64 	%rd<17>;
+	.reg .s64 	%rd<18>;
 
 
 	ld.param.u64 	%rd5, [addtemperature_param_0];
@@ -265,7 +262,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
 	cvta.to.global.u64 	%rd4, %rd8;
-	.loc 3 6 1
+	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -273,33 +270,36 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 3 7 1
-	setp.ge.s32 	%p1, %r1, %r2;
+	.loc 1 7 1
+	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB2_2;
 
-	.loc 3 9 1
-	cvt.s64.s32 	%rd9, %r1;
+	cvt.s64.s32	%rd9, %r1;
 	add.s64 	%rd10, %rd4, %rd9;
-	.loc 3 10 1
-	ld.global.s8 	%rd11, [%rd10];
-	shl.b64 	%rd12, %rd11, 2;
-	add.s64 	%rd13, %rd3, %rd12;
-	ld.global.nc.f32 	%f2, [%rd13];
-	.loc 3 11 1
-	mul.wide.s32 	%rd14, %r1, 4;
-	add.s64 	%rd15, %rd2, %rd14;
-	ld.global.nc.f32 	%f3, [%rd15];
-	mul.f32 	%f4, %f2, %f1;
-	.loc 4 991 5
-	sqrt.rn.f32 	%f5, %f4;
-	.loc 3 11 1
-	add.s64 	%rd16, %rd1, %rd14;
-	ld.global.nc.f32 	%f6, [%rd16];
-	fma.rn.f32 	%f7, %f3, %f5, %f6;
-	st.global.f32 	[%rd16], %f7;
+	.loc 1 8 1
+	ld.global.nc.u8 	%rs1, [%rd10];
+	cvt.u64.u16	%rd11, %rs1;
+	cvt.s64.s8 	%rd12, %rd11;
+	shl.b64 	%rd13, %rd12, 2;
+	add.s64 	%rd14, %rd3, %rd13;
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd2, %rd15;
+	.loc 1 9 1
+	ld.global.nc.f32 	%f2, [%rd14];
+	.loc 1 10 1
+	mul.f32 	%f3, %f2, %f1;
+	.loc 3 3055 10
+	sqrt.rn.f32 	%f4, %f3;
+	.loc 1 10 1
+	ld.global.nc.f32 	%f5, [%rd16];
+	add.s64 	%rd17, %rd1, %rd15;
+	.loc 1 10 96
+	ld.global.f32 	%f6, [%rd17];
+	fma.rn.f32 	%f7, %f5, %f4, %f6;
+	st.global.f32 	[%rd17], %f7;
 
 BB2_2:
-	.loc 3 13 2
+	.loc 1 12 2
 	ret;
 }
 

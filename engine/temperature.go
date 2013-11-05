@@ -46,10 +46,12 @@ func init() {
 			noise := cuda.Buffer(1, &globalmesh)
 			defer cuda.Recycle(noise)
 
+			const mean = 0
+			const stddev = 1
 			for i := 0; i < 3; i++ {
-				generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), 0, 1)
+				generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
 				cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
-					kmu0_VgammaDt, regions.Gpu(), 0)
+					kmu0_VgammaDt, regions.Gpu(), stream0)
 			}
 		}
 	})

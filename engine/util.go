@@ -106,3 +106,5 @@ const (
 	Y = 1
 	Z = 2
 )
+
+const stream0 = 0 // for readability

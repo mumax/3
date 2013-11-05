@@ -1,0 +1,79 @@
+\documentclass[12pt]{article}
+
+
+\usepackage{a4wide}
+\usepackage{amsmath}
+
+\newcommand{\vc}[1]{\ensuremath{\vec{\textbf{#1}}}}
+\newcommand{\ofrt}{\ensuremath{\left(\vc{r},t \right)}}
+\newcommand{\m}{\vc{m}}   
+\newcommand{\M}{\vc{M}}   
+\newcommand{\Ms}{M_\mathrm{s}}   
+\newcommand{\B}[1]{\vc{B}_\mathrm{#1}}   
+\newcommand{\Beff}{\B{eff}}   
+\newcommand{\tq}[1]{\vc{\ensuremath{\tau}}\ensuremath{_\mathrm{#1}}}   
+\newcommand{\damp}{\ensuremath{\alpha}}
+\newcommand{\Kern}{\vec{\vec{\textbf{K}}}}
+\newcommand{\FFT}{\mathcal{F}}
+\newcommand{\hspin}{(\vc{u}\cdot\nabla)\vc{m}} 
+
+
+\begin{document}
+\pagestyle{empty}
+
+We solve:
+\begin{eqnarray*}
+	\frac{\partial \m}{\partial t} &=& \gamma_0 \left( \tq{LL} + \tq{STT} \right)
+\end{eqnarray*}
+
+\vspace{3cm}
+
+With boundary conditions:
+\begin{eqnarray*}
+ \left.\frac{\partial m_x}{\partial x}\right|_{\partial V} &=& -\frac{D}{2A}m_z \\
+ \left.\frac{\partial m_y}{\partial x}\right|_{\partial V} &=&  0\\
+ \left.\frac{\partial m_z}{\partial x}\right|_{\partial V} &=& \frac{D}{2A}m_x\\
+ \left.\frac{\partial m_x}{\partial y}\right|_{\partial V} &=&  0\\
+ \left.\frac{\partial m_y}{\partial y}\right|_{\partial V} &=&  -\frac{D}{2A}m_z \\
+ \left.\frac{\partial m_z}{\partial y}\right|_{\partial V} &=&  \frac{D}{2A}m_y\\
+ \left.\frac{\partial m_x}{\partial z}\right|_{\partial V} &=&  0\\
+ \left.\frac{\partial m_y}{\partial z}\right|_{\partial V} &=&  0\\
+ \left.\frac{\partial m_z}{\partial z}\right|_{\partial V} &=&  0\\
+\end{eqnarray*}
+
+Where:
+\begin{eqnarray*}
+	\tq{LL} &=& \frac{1}{1+\damp^2} \left(  \m \times \Beff  +\damp\left( \m \times \left( \m \times \Beff \right)\right)   \right)\\
+	\alpha &=& \alpha\ofrt \\
+	\m &=& \frac{\M\ofrt}{\Ms} \\
+	\Ms &=& {\left| \M\ofrt\right|} \\
+	\Beff &=& \B{d} + \B{ex} + \B{z} + \B{a} + \B{th} \\
+	\B{d}\ofrt &=& \iiint_V \Kern(\vc{r} - \vc{r}') \cdot \mu_0 \M(\vc{r'}, t) \mathrm{d}^3\vc{r}' \\
+	& = & \FFT^{-1} \left( \FFT\left(\Kern(\vc{r})\right) \cdot \FFT\left({\mu_0\M\ofrt}\right) \right) \\
+	\vc{K}_i(\vc{r}) & = &  \frac{1}{4\pi}\left(\frac{3(\vc{e}_i\cdot\hat{\vc{r}})\hat{\vc{r}}-\vc{e}_i}{r^3}\right) + \frac{2}{3}\vc{e}_i\delta^3(\vc{r}) \\
+	\B{ex} &=& \frac{2 A}{\Ms} \Delta \m + \frac{2D}{\Ms} \left(\frac{\partial m_z}{\partial x},\ \frac{\partial m_z}{\partial y},\ -\frac{\partial m_x}{\partial x}-\frac{\partial m_y}{\partial y}\right) \\
+	A &=& A\ofrt \\
+	\B{z} &=& \B{z}\ofrt \\
+	\B{a} &=& \B{u} + \B{c} \\
+	\B{u} &=& 2 K_\mathrm{u1} \left( \m \cdot \vc{u} \right) \vc{u} \\
+	K_\mathrm{u1} &=& K_\mathrm{u1}\ofrt\\
+	\vc{u} &=& \vc{u}\ofrt \\
+	\vc{B}_{\mathrm{c}i} &=& \left( A_{cx} c_{1i} + A_{cy} c_{2i} + A_{cz} c_{3i} \right) \\
+	\vc{A}_{c} &=& K_{c1} \left(a_1(a_2^2+a_3^2),\ a_2(a_1^2+a_3^2),\ a_3(a_1^2+a_2^2)\right)\\
+	a_i &=& \vc{c}_i \cdot \m \\
+	\vc{c}_1 &=& \vc{c}_1 \ofrt \\
+	\vc{c}_2 &=& \vc{c}_2 \ofrt \\
+	\vc{c}_3 &=& \vc{c}_1 \times \vc{c}_2 \\
+	\B{th}\ofrt &=& \eta \ofrt  \sqrt{ \frac{k_B^2 \alpha T} {\mu_0\gamma_0\Ms \Delta V  \Delta t  }} \\
+	\tq{STT} &=& \tq{ZL} + \tq{SL} \\
+	\tq{ZL} &=& \frac{1}{1+\alpha^2} \left( \left(1+\xi\alpha\right) \m \times \left(\m \times \hspin \right) + \left(\xi-\alpha\right)\vc{m}\times \hspin \right) \\
+	\vc{u} &=& \frac{\mu_B \mu_0}{2 e \gamma_0 B_\mathrm{s}  (1 + \xi^2)} \vc{j}\\
+	\vc{j} &=& \vc{j}\ofrt \\
+	\tq{SL} &=& \beta\epsilon (\m \times \m_P \times \m) - \beta\epsilon' \m\times \m_P \\
+	\beta &=& \frac{j_z \hbar}{ \Ms e d} \\
+	\epsilon &=& \frac{P\ofrt \Lambda^2}{(\Lambda^2 + 1)+ (\Lambda^2-1)(\m\cdot\m_P)} \\
+	\epsilon' &=& \epsilon'\ofrt\\
+\end{eqnarray*}
+
+
+\end{document}

@@ -15,6 +15,7 @@ type inputParam struct {
 	descr
 }
 
+// any parameter that depends on an inputParam
 type derived interface {
 	invalidate()
 }
@@ -30,7 +31,7 @@ func (p *inputParam) update() {
 	if p.timestamp != Time {
 		changed := false
 		// update functions of time
-		for r := 0; r < NREGION; r++ { // TODO: 0..maxreg
+		for r := 0; r < NREGION; r++ {
 			updFunc := p.upd_reg[r]
 			if updFunc != nil {
 				p.bufset_(r, updFunc())
@@ -50,7 +51,6 @@ func (p *inputParam) setRegion(region int, v []float64) {
 }
 
 // set in all regions
-// TODO: check if we always start from 0
 func (p *inputParam) setUniform(v []float64) {
 	p.setRegions(0, NREGION, v)
 }

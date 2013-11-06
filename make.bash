@@ -10,5 +10,5 @@ ln -sf $(pwd)/post-commit .git/hooks/post-commit
 (cd tools/mumax3-convert && go build && go install) || exit 1
 (cd tools/mumax3-plot && go build && go install)    || exit 1
 (cd test && mumax3 -vet *.txt)                   || exit 1
-(cd examples && mumax3 -vet *.txt)               || exit 1
+(cd doc && mumax3 -vet *.txt)               || exit 1
 

@@ -30,4 +30,4 @@ func (q *adder) Slice() (s *data.Slice, recycle bool) {
 func (q *adder) TableData() []float64 { return Average(q) }
 
 // Value of this quantity restricted to one region.
-func (q *adder) Region(r int) *inRegion { return &inRegion{q, r} }
+func (q *adder) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }

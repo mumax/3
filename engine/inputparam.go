@@ -119,6 +119,6 @@ func (p *inputParam) TableData() []float64 {
 	return p.getRegion(0)
 }
 
-func (p *inputParam) Region(r int) *selectRegion {
-	return &selectRegion{p, r}
+func (p *inputParam) Region(r int) *paramInRegion {
+	return &paramInRegion{p, r}
 }

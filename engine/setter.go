@@ -24,5 +24,5 @@ func (b *setter) Slice() (q *data.Slice, recycle bool) {
 	return buffer, true // must recycle
 }
 
-func (q *setter) TableData() []float64   { return Average(q) }
-func (q *setter) Region(r int) *inRegion { return &inRegion{q, r} }
+func (q *setter) TableData() []float64        { return Average(q) }
+func (q *setter) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }

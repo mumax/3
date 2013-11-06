@@ -41,7 +41,7 @@ func (q *buffered) GetCell(comp, ix, iy, iz int) float64 {
 	return float64(cuda.GetCell(q.buffer, comp, ix, iy, iz))
 }
 
-func (q *buffered) Region(r int) *inRegion { return &inRegion{q, r} }
+func (q *buffered) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
 
 func (q *buffered) TableData() []float64 { return Average(q) }
 

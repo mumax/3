@@ -4,23 +4,23 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
-	//"log"
 )
 
 // demag variables
 var (
-	Msat            ScalarParam
-	Bsat            derivedParam
-	M_full, B_demag setter
-	E_demag         = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
-	EnableDemag     = true                 // enable/disable demag field
-	demagconv_      *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	Msat        ScalarParam
+	Bsat        derivedParam
+	M_full      setter
+	B_demag     setter
+	E_demag     = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
+	EnableDemag = true                 // enable/disable demag field
+	demagconv_  *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 )
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
 
-	M_full.init(3, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
+	M_full.init(VECTOR, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", func(dst *data.Slice) {
 		msat, r := Msat.Slice()
 		if r {
 			defer cuda.Recycle(msat)
@@ -32,21 +32,19 @@ func init() {
 
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 
-	Bsat.init(1, []updater{&Msat}, func(p *derivedParam) {
+	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedParam) {
+		//Bsat = Msat * mu0
 		Ms := Msat.cpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms
 		}
 	})
 
-	B_demag.init(3, &globalmesh, "B_demag", "T", "Magnetostatic field", func(b *data.Slice) {
+	B_demag.init(VECTOR, &globalmesh, "B_demag", "T", "Magnetostatic field", func(b *data.Slice) {
 		if EnableDemag {
-			//log.Println("will Exec", b.HostCopy(), M.buffer.HostCopy(), "...") // OK
-			d := demagConv() // destroys m ?
-			//log.Println("demagConv.Exec", b.HostCopy(), M.buffer.HostCopy(), "...")
-			d.Exec(b, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
+			demagConv().Exec(b, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
 		} else {
-			cuda.Zero(b)
+			cuda.Zero(b) // will ADD other terms to it
 		}
 	})
 

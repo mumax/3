@@ -11,6 +11,7 @@ import (
 
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
+// TODO: per-component mulmasks
 type excitation struct {
 	perRegion  VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
@@ -22,7 +23,7 @@ type mulmask struct {
 }
 
 func (e *excitation) init(name, unit, desc string) {
-	e.perRegion.init(name+"_perRegion", unit, "(internal)")
+	e.perRegion.init("_"+name+"_perRegion", unit, "(internal)") // name starts with underscore: unexported
 	DeclLValue(name, e, cat(desc, unit))
 }
 

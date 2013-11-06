@@ -3,7 +3,7 @@ package engine
 import "github.com/mumax/3/cuda"
 
 var (
-	energyTerms []func() float64 // registers total energy terms
+	energyTerms []func() float64 // all contributions to total energy
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
 )
 

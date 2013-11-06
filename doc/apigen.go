@@ -61,6 +61,7 @@ func (e *entry) Ins() string {
 func cleanType(typ string) string {
 	typ = strings.Replace(typ, "engine.", "", -1)
 	typ = strings.Replace(typ, "*data.", "", -1)
+	typ = strings.Replace(typ, "script.", "", -1)
 	return typ
 }
 
@@ -101,7 +102,7 @@ func hidden(name string) bool {
 	switch name {
 	default:
 		return false
-	case "Eval", "InputType", "Type", "Slice", "Name", "Unit", "NComp", "TableData", "Mesh", "SetValue":
+	case "Eval", "InputType", "Type", "Slice", "Name", "Unit", "NComp", "Mesh", "SetValue", "String":
 		return true
 	}
 }

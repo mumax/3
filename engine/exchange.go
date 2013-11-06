@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	Aex    ScalarParam
-	Dex    VectorParam
-	B_exch adder     // exchange field (T) output handle
-	lex2   exchParam // inter-cell exchange length squared * 1e18
+	Aex    ScalarParam // Exchange stiffness
+	Dex    VectorParam // DMI strength
+	B_exch adder       // exchange field (T) output handle
+	lex2   exchParam   // inter-cell exchange length squared * 1e18
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 )
 
@@ -24,9 +24,9 @@ func init() {
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 
-	B_exch.init(3, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
+	B_exch.init(VECTOR, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
 		if Dex.isZero() {
-			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), 0) // async
+			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), stream0)
 		} else {
 			// DMI only implemented for uniform parameters
 			// interaction not clear with space-dependent parameters
@@ -75,6 +75,7 @@ func sign(x float64) float64 {
 	}
 }
 
+// stores interregion exchange stiffness
 type exchParam struct {
 	lut, override  [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
@@ -133,20 +134,17 @@ func safediv(a, b float32) float32 {
 	}
 }
 
-// XYZ swap here (?)
 func (p *exchParam) upload() {
 	// alloc if  needed
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	//log.Println("upload lex2:\n", p)
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
 
 func (p *exchParam) SetInterRegion(r1, r2 int, val float64) {
 	v := float32(val)
-	//log.Println("lex2.setinterregion", r1, r2, val)
 	p.lut[symmidx(r1, r2)] = v
 
 	if r1 == r2 {

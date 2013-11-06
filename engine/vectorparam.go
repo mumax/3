@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/util"
 	"log"
 	"reflect"
+	"strings"
 )
 
 type VectorParam struct {
@@ -13,7 +14,9 @@ type VectorParam struct {
 
 func (p *VectorParam) init(name, unit, desc string) {
 	p.inputParam.init(3, name, unit, nil) // no vec param has children (yet)
-	DeclLValue(name, p, cat(desc, unit))
+	if !strings.HasPrefix(name, "_") {    // don't export names beginning with _
+		DeclLValue(name, p, cat(desc, unit))
+	}
 }
 
 func (p *VectorParam) SetRegion(region int, f script.VectorFunction) {

@@ -95,18 +95,15 @@ func Layers(a, b int) Shape {
 }
 
 // Single cell with given index
-func Cell(k, j, i int) Shape {
+func Cell(ix, iy, iz int) Shape {
 	c := Mesh().CellSize()
-	n := Mesh().Size()
-	dx := (float64(n[0]/2) - 0.5) * c[0]
-	dy := (float64(n[1]/2) - 0.5) * c[1]
-	dz := (float64(n[2]/2) - 0.5) * c[2]
-	x1 := float64(k)*c[0] - dx - c[0]/2
-	y1 := float64(j)*c[1] - dy - c[1]/2
-	z1 := float64(i)*c[2] - dz - c[2]/2
-	x2 := float64(k)*c[0] - dx + c[0]/2
-	y2 := float64(j)*c[1] - dy + c[1]/2
-	z2 := float64(i)*c[2] - dz + c[2]/2
+	pos := Index2Coord(ix, iy, iz)
+	x1 := pos[X] - c[X]/2
+	y1 := pos[Y] - c[Y]/2
+	z1 := pos[Z] - c[Z]/2
+	x2 := pos[X] + c[X]/2
+	y2 := pos[Y] + c[Y]/2
+	z2 := pos[Z] + c[Z]/2
 	return func(x, y, z float64) bool {
 		return x > x1 && x < x2 &&
 			y > y1 && y < y2 &&

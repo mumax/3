@@ -5,9 +5,9 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// can be used as solver.step
+// EulerStep can be used as solver.Step.
 func EulerStep(e *solver) {
-	dy0 := cuda.Buffer(3, e.y.Mesh())
+	dy0 := cuda.Buffer(VECTOR, e.y.Mesh())
 	defer cuda.Recycle(dy0)
 
 	e.Dt_si = e.FixDt

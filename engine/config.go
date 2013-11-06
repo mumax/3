@@ -74,9 +74,9 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 			m = data.Vector{mx2, my2, mz2}
 		}
 		gauss := math.Exp(-sqr64(x / ww))
-		m[0] = (1-gauss)*m[0] + gauss*mxwall
-		m[1] = (1-gauss)*m[1] + gauss*mywall
-		m[2] = (1-gauss)*m[2] + gauss*mzwall
+		m[X] = (1-gauss)*m[X] + gauss*mxwall
+		m[Y] = (1-gauss)*m[Y] + gauss*mywall
+		m[Z] = (1-gauss)*m[Z] + gauss*mzwall
 		return m
 	}
 }
@@ -104,9 +104,9 @@ func (c Config) RotZ(θ float64) Config {
 		x_ := x*cos + y*sin
 		y_ := -x*sin + y*cos
 		m := c(x_, y_, z)
-		mx_ := m[0]*cos - m[1]*sin
-		my_ := m[0]*sin + m[1]*cos
-		return data.Vector{mx_, my_, m[2]}
+		mx_ := m[X]*cos - m[Y]*sin
+		my_ := m[X]*sin + m[Y]*cos
+		return data.Vector{mx_, my_, m[Z]}
 	}
 }
 

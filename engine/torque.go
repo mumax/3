@@ -11,6 +11,7 @@ var (
 	Xi, Pol              ScalarParam
 	Lambda, EpsilonPrime ScalarParam
 	FixedLayer           VectorParam
+	Torque               setter     // total torque in T
 	LLTorque             setter     // Landau-Lifshitz torque/γ0, in T
 	STTorque             adder      // Spin-transfer torque/γ0, in T
 	J                    excitation // Polarized electrical current density

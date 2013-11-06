@@ -12,14 +12,22 @@ import (
 )
 
 func init() {
-	DeclFunc("expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
-	DeclFunc("fprintln", Fprintln, "Print to file")
-	DeclFunc("sign", sign, "Signum function")
-	DeclPure("vector", MakeVector, "Constructs a vector with given components")
-	DeclConst("mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
-	DeclFunc("print", myprint, "Print to standard output")
+	DeclFunc("Expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
+	DeclFunc("Fprintln", Fprintln, "Print to file")
+	DeclFunc("Sign", sign, "Signum function")
+	DeclPure("Vector", MakeVector, "Constructs a vector with given components")
+	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
+	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a .dump file")
 	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")
+	DeclFunc("NewSlice", NewSlice, "Makes a 3D array of scalars with given x,y,z size")
+}
+
+// Returns a new new slice (3D array) with given number of components and size.
+func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
+	const c = 1 // dummy cell size
+	mesh := data.NewMesh(Nx, Ny, Nz, c, c, c)
+	return data.NewSlice(ncomp, mesh)
 }
 
 // Constructs a vector
@@ -108,3 +116,8 @@ const (
 )
 
 const stream0 = 0 // for readability
+
+const (
+	SCALAR = 1
+	VECTOR = 3
+)

@@ -13,9 +13,9 @@ const VERSION = "mumax3.4.0"
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 
 var (
-	globalmesh    data.Mesh     // mesh for m and everything that has the same size
-	M             magnetization // reduced magnetization (unit length)
-	B_eff, Torque setter
+	globalmesh data.Mesh     // mesh for m and everything that has the same size
+	M          magnetization // reduced magnetization (unit length)
+	B_eff      setter        // total effective field
 )
 
 func init() {
@@ -24,20 +24,18 @@ func init() {
 	DeclFunc("SetPBC", setPBC, `Sets number of repetitions in X,Y,Z`)
 
 	// magnetization
-	M.init(3, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
+	M.init(VECTOR, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
 
 	// effective field
-	B_eff.init(3, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {
-		B_demag.set(dst)
-		B_exch.addTo(dst)
+	B_eff.init(VECTOR, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {
+		B_demag.set(dst)  // set to B_demag...
+		B_exch.addTo(dst) // ...then add other terms
 		B_anis.addTo(dst)
 		B_ext.addTo(dst)
 		B_therm.addTo(dst)
-		cuda.Sync(0)
+		cuda.Sync(stream0) // probaly not needed
 	})
-
-	// torque inited in torque.go
 }
 
 func Mesh() *data.Mesh {
@@ -144,6 +142,7 @@ func Close() {
 	//	}
 }
 
+// TODO
 //func sanitycheck() {
 //	if Msat() == 0 {
 //		log.Fatal("Msat should be nonzero")

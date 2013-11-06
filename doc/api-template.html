@@ -160,7 +160,7 @@ JPol.Add(LoadFile("current.dump"), 1)
 </code></pre>
 
 {{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
-{{range .FilterName "LoadFile"}} {{template "entry" .}} {{end}}
+{{range .FilterName "LoadFile" "NewSlice" "Index2Coord"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Output quantities </h1>
 

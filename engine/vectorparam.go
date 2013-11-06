@@ -3,18 +3,18 @@ package engine
 import (
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
-	"log"
 	"reflect"
 	"strings"
 )
 
+// vector input parameter, settable by user
 type VectorParam struct {
 	inputParam
 }
 
 func (p *VectorParam) init(name, unit, desc string) {
-	p.inputParam.init(3, name, unit, nil) // no vec param has children (yet)
-	if !strings.HasPrefix(name, "_") {    // don't export names beginning with _
+	p.inputParam.init(VECTOR, name, unit, nil) // no vec param has children (yet)
+	if !strings.HasPrefix(name, "_") {         // don't export names beginning with "_" (e.g. from exciation)
 		DeclLValue(name, p, cat(desc, unit))
 	}
 }
@@ -30,10 +30,10 @@ func (p *VectorParam) SetValue(v interface{}) {
 
 func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	if Const(f) {
-		log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
+		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
 		p.setRegions(r1, r2, slice(f.Float3()))
 	} else {
-		log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
+		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
 		p.setFunc(r1, r2, func() []float64 {
 			return slice(f.Float3())
 		})

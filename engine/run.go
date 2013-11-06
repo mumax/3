@@ -10,7 +10,7 @@ func init() {
 	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
-	DeclVar("t", &Time, "Total simulated time (s)")
+	DeclROnly("t", &Time, "Total simulated time (s)")
 	DeclROnly("dt", &Solver.Dt_si, "Last solver time step (s)")
 	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
@@ -21,7 +21,7 @@ func init() {
 
 var (
 	Solver     solver
-	Time       float64             // time in seconds  // todo: hide? setting breaks autosaves
+	Time       float64             // time in seconds
 	pause      bool                // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step
 	Inject     = make(chan func()) // injects code in between time steps. Used by web interface.

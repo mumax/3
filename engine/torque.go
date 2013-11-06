@@ -27,21 +27,21 @@ func init() {
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 
-	//DeclROnly("MaxTorque", &MaxTorque, "Maximum total torque (T)")
-
-	LLTorque.init(3, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", func(b *data.Slice) {
-		B_eff.set(b)
-		cuda.LLTorque(b, M.buffer, b, Alpha.gpuLUT1(), regions.Gpu())
+	LLTorque.init(VECTOR, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", func(dst *data.Slice) {
+		B_eff.set(dst)                                                    // calc and store B_eff
+		cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
 	})
 
-	STTorque.init(3, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
+	J.SetValue(1) // default spin polarization
+
+	STTorque.init(VECTOR, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !J.isZero() {
 			util.AssertMsg(!Pol.isZero(), "spin polarization should not be 0")
 			jspin, rec := J.Slice()
 			if rec {
 				defer cuda.Recycle(jspin)
 			}
-			// TODO: select, xi is not enough  !!!!
+			// TODO: select, xi is not enough
 			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
 
 			if !FixedLayer.isZero() {

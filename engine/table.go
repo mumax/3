@@ -48,10 +48,6 @@ func (t *DataTable) Add(output TableData) {
 	t.outputs = append(t.outputs, output)
 }
 
-//func (t *DataTable) AddFunc(nComp int, name, unit string, f func() []float64) {
-//	t.Add(newGetfunc(nComp, name, unit, "", f))
-//}
-
 func (t *DataTable) Save() {
 	t.init()
 	fmt.Fprint(t, Time)

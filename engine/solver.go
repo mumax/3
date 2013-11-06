@@ -16,7 +16,7 @@ type solver struct {
 	LastErr                float64           // error of last step
 	NSteps, NUndone, NEval int               // number of good steps, undone steps
 	FixDt                  float64           // fixed time step?
-	step                   func(*solver)     //
+	step                   func(*solver)     // generic step, can be EulerStep, HeunStep, etc
 }
 
 func NewSolver(y *data.Slice, torqueFn, postStep func(*data.Slice), dt_si, dt_mul float64, step func(*solver)) solver {

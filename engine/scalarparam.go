@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/script"
-	"log"
 	"reflect"
 )
 
@@ -12,20 +11,12 @@ type ScalarParam struct {
 }
 
 func (p *ScalarParam) init(name, unit, desc string, children []derived) {
-	p.inputParam.init(1, name, unit, children)
+	p.inputParam.init(SCALAR, name, unit, children)
 	DeclLValue(name, p, cat(desc, unit))
 }
 
-func cat(desc, unit string) string {
-	if unit == "" {
-		return desc
-	} else {
-		return desc + " (" + unit + ")"
-	}
-}
-
 func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
-	p.setRegionsFunc(region, region+1, f)
+	p.setRegionsFunc(region, region+1, f) // upper bound exclusive
 }
 
 func (p *ScalarParam) SetValue(v interface{}) {
@@ -35,10 +26,10 @@ func (p *ScalarParam) SetValue(v interface{}) {
 
 func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if Const(f) {
-		log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
+		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
-		log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
+		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
 		p.setFunc(r1, r2, func() []float64 {
 			return []float64{f.Float()}
 		})
@@ -53,7 +44,16 @@ func (p *ScalarParam) Eval() interface{}       { return p }
 func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }
 
+// checks if a script expression contains t (time)
 func Const(e script.Expr) bool {
 	t := World.Resolve("t")
 	return !script.Contains(e, t)
+}
+
+func cat(desc, unit string) string {
+	if unit == "" {
+		return desc
+	} else {
+		return desc + " (" + unit + ")"
+	}
 }

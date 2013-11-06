@@ -55,7 +55,7 @@ var regiondecode_map = map[int]string{0: "",
 
 const (
 	regiondecode_ptx_20 = `
-.version 3.2
+.version 3.1
 .target sm_20
 .address_size 64
 
@@ -68,7 +68,7 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<2>;
 	.reg .s64 	%rd<14>;
 
@@ -80,7 +80,7 @@ const (
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 2 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -88,30 +88,30 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 2 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvt.s64.s32	%rd7, %r1;
+	.loc 2 9 1
+	cvt.s64.s32 	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
 	ld.global.s8 	%rd9, [%rd8];
 	shl.b64 	%rd10, %rd9, 2;
 	add.s64 	%rd11, %rd2, %rd10;
 	mul.wide.s32 	%rd12, %r1, 4;
 	add.s64 	%rd13, %rd1, %rd12;
-	.loc 1 9 1
 	ld.global.f32 	%f1, [%rd11];
 	st.global.f32 	[%rd13], %f1;
 
 BB0_2:
-	.loc 1 12 2
+	.loc 2 12 2
 	ret;
 }
 
 
 `
 	regiondecode_ptx_30 = `
-.version 3.2
+.version 3.1
 .target sm_30
 .address_size 64
 
@@ -124,7 +124,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<2>;
 	.reg .s64 	%rd<14>;
 
@@ -136,7 +136,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 2 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -144,30 +144,30 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 2 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvt.s64.s32	%rd7, %r1;
+	.loc 2 9 1
+	cvt.s64.s32 	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
 	ld.global.s8 	%rd9, [%rd8];
 	shl.b64 	%rd10, %rd9, 2;
 	add.s64 	%rd11, %rd2, %rd10;
 	mul.wide.s32 	%rd12, %r1, 4;
 	add.s64 	%rd13, %rd1, %rd12;
-	.loc 1 9 1
 	ld.global.f32 	%f1, [%rd11];
 	st.global.f32 	[%rd13], %f1;
 
 BB0_2:
-	.loc 1 12 2
+	.loc 2 12 2
 	ret;
 }
 
 
 `
 	regiondecode_ptx_35 = `
-.version 3.2
+.version 3.1
 .target sm_35
 .address_size 64
 
@@ -208,10 +208,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s16 	%rs<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<11>;
 	.reg .f32 	%f<2>;
-	.reg .s64 	%rd<15>;
+	.reg .s64 	%rd<14>;
 
 
 	ld.param.u64 	%rd4, [regiondecode_param_0];
@@ -221,7 +220,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 3 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -229,26 +228,23 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 3 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB2_2;
 
-	cvt.s64.s32	%rd7, %r1;
+	.loc 3 9 1
+	cvt.s64.s32 	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
-	.loc 1 9 1
-	ld.global.nc.u8 	%rs1, [%rd8];
-	cvt.u64.u16	%rd9, %rs1;
-	cvt.s64.s8 	%rd10, %rd9;
-	shl.b64 	%rd11, %rd10, 2;
-	add.s64 	%rd12, %rd2, %rd11;
-	mul.wide.s32 	%rd13, %r1, 4;
-	add.s64 	%rd14, %rd1, %rd13;
-	.loc 1 9 1
-	ld.global.nc.f32 	%f1, [%rd12];
-	st.global.f32 	[%rd14], %f1;
+	ld.global.s8 	%rd9, [%rd8];
+	shl.b64 	%rd10, %rd9, 2;
+	add.s64 	%rd11, %rd2, %rd10;
+	ld.global.nc.f32 	%f1, [%rd11];
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd1, %rd12;
+	st.global.f32 	[%rd13], %f1;
 
 BB2_2:
-	.loc 1 12 2
+	.loc 3 12 2
 	ret;
 }
 

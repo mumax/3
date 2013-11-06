@@ -13,34 +13,36 @@ type buffered struct {
 }
 
 // init metadata but does not allocate yet
-func (b *buffered) init(nComp int, name, unit, doc_ string, mesh *data.Mesh) {
-	b.info = Info(nComp, name, unit, mesh)
+func (q *buffered) init(nComp int, name, unit, doc_ string, mesh *data.Mesh) {
+	q.info = Info(nComp, name, unit, mesh)
 }
 
-// allocate storage (not done by init)
+// allocate storage (not done by init, as mesh size may not yet be known then)
 func (q *buffered) alloc() {
 	q.buffer = cuda.NewSlice(3, q.Mesh())
 }
 
 // get buffer (on GPU, no need to recycle)
-func (b *buffered) Slice() (q *data.Slice, recycle bool) {
-	return b.buffer, false
+func (q *buffered) Slice() (s *data.Slice, recycle bool) {
+	return q.buffer, false
 }
 
 // Set the value of one cell.
-func (b *buffered) SetCell(ix, iy, iz int, v ...float64) {
-	nComp := b.NComp()
+func (q *buffered) SetCell(ix, iy, iz int, v ...float64) {
+	nComp := q.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
-		cuda.SetCell(b.buffer, c, ix, iy, iz, float32(v[c]))
+		cuda.SetCell(q.buffer, c, ix, iy, iz, float32(v[c]))
 	}
 }
 
 // Get the value of one cell.
-func (b *buffered) GetCell(comp, ix, iy, iz int) float64 {
-	return float64(cuda.GetCell(b.buffer, comp, ix, iy, iz))
+func (q *buffered) GetCell(comp, ix, iy, iz int) float64 {
+	return float64(cuda.GetCell(q.buffer, comp, ix, iy, iz))
 }
 
 func (q *buffered) Region(r int) *inRegion { return &inRegion{q, r} }
-func (m *buffered) TableData() []float64   { return Average(m) }
-func (m *buffered) String() string         { return util.Sprint(M.buffer.HostCopy()) }
+
+func (q *buffered) TableData() []float64 { return Average(q) }
+
+func (q *buffered) String() string { return util.Sprint(q.buffer.HostCopy()) }

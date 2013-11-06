@@ -9,24 +9,28 @@ func init() {
 	DeclFunc("average", Average, "Average of space-dependent quantity over magnet volume")
 }
 
+// Take average of quantity, taking into account the volume in which it is defined. E.g.:
+// 	Average(m)           // averges only inside magnet.
+// 	Average(m.Region(1)) // averages only in region 1
 func Average(s Slicer) []float64 {
 	buf, recycle := s.Slice()
 	if recycle {
 		defer cuda.Recycle(buf)
 	}
 	if v, ok := s.(volumer); ok {
-		avg := avg(buf, nil)
+		avg := averageVolume(buf, nil)
 		spacefill := v.volume()
 		for i := range avg {
 			avg[i] /= spacefill
 		}
 		return avg
 	} else {
-		return avg(buf, vol())
+		return averageVolume(buf, vol())
 	}
 }
 
-func avg(b, vol *data.Slice) []float64 {
+// Average of quantity with explicity given volume mask.
+func averageVolume(b, vol *data.Slice) []float64 {
 	nComp := b.NComp()
 	nCell := float64(b.Mesh().NCell())
 	avg := make([]float64, nComp)
@@ -42,5 +46,5 @@ func avg(b, vol *data.Slice) []float64 {
 }
 
 type volumer interface {
-	volume() float64
+	volume() float64 // normalized volume where quantity is defined (0..1)
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Any space-dependent quantity
 type Slicer interface {
 	Slice() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
 	NComp() int

@@ -13,17 +13,7 @@ func init() {
 	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
 }
 
-// Register quant to be auto-saved every period.
-// period == 0 stops autosaving.
-func AutoSave(quant Slicer, period float64) {
-	if period == 0 {
-		delete(output, quant)
-	} else {
-		output[quant] = &autosave{period, Time, 0}
-	}
-}
-
-// Called to save everything that's needed at this time.
+// Periodically called by run loop to save everything that's needed at this time.
 func DoOutput() {
 	for q, a := range output {
 		if a.needSave() {
@@ -33,6 +23,16 @@ func DoOutput() {
 	}
 	if Table.needSave() {
 		Table.Save()
+	}
+}
+
+// Register quant to be auto-saved every period.
+// period == 0 stops autosaving.
+func AutoSave(quant Slicer, period float64) {
+	if period == 0 {
+		delete(output, quant)
+	} else {
+		output[quant] = &autosave{period, Time, 0}
 	}
 }
 

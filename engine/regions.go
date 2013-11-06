@@ -17,6 +17,7 @@ func init() {
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
+// stores the region index for each cell
 type Regions struct {
 	arr        [][][]byte  // regions map: cell i,j,k -> byte index
 	cpu        []byte      // arr data, stored contiguously
@@ -29,7 +30,7 @@ type Regions struct {
 func (r *Regions) alloc() {
 	mesh := r.Mesh()
 	r.cpu = make([]byte, mesh.NCell())
-	r.arr = resizeBytes(r.cpu, mesh.Size())
+	r.arr = reshapeBytes(r.cpu, mesh.Size())
 	r.gpuCache = cuda.NewBytes(mesh)
 	DefRegion(0, universe)
 }
@@ -75,7 +76,6 @@ func defRegionId(id int) {
 }
 
 // normalized volume (0..1) of region.
-// TODO: might be cached.
 func (r *Regions) volume(region int) float64 {
 	vol := 0
 	reg := byte(region)
@@ -86,12 +86,6 @@ func (r *Regions) volume(region int) float64 {
 	}
 	return float64(vol) / float64(globalmesh.NCell())
 }
-
-//func checkRegionIdx(id int) {
-//	if id < 0 || id > NREGION {
-//		log.Fatalf("region id should be 0-255, have: %v", id)
-//	}
-//}
 
 // Set the region of one cell
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
@@ -126,7 +120,7 @@ func (r *Regions) Slice() (*data.Slice, bool) {
 }
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
-func resizeBytes(array []byte, size [3]int) [][][]byte {
+func reshapeBytes(array []byte, size [3]int) [][][]byte {
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
 	util.Argument(Nx*Ny*Nz == len(array))
 	sliced := make([][][]byte, Nz)

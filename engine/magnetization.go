@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+// Special buffered quantity to store magnetization
+// makes sure it's normalized etc.
 type magnetization struct {
 	buffered
 }
@@ -23,7 +25,6 @@ func (b *magnetization) LoadFile(fname string) {
 }
 
 // Sets the magnetization inside the shape
-// TODO: a bit slowish
 func (m *magnetization) SetInShape(region Shape, conf Config) {
 	if region == nil {
 		region = universe

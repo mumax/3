@@ -5,21 +5,21 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// EulerStep can be used as solver.Step.
-func EulerStep(e *solver) {
-	dy0 := cuda.Buffer(VECTOR, e.y.Mesh())
+// Euler method, can be used as solver.Step.
+func EulerStep(s *solver) {
+	dy0 := cuda.Buffer(VECTOR, s.y.Mesh())
 	defer cuda.Recycle(dy0)
 
-	e.Dt_si = e.FixDt
-	dt := float32(e.Dt_si * e.dt_mul)
+	s.Dt_si = s.FixDt
+	dt := float32(s.Dt_si * s.dt_mul)
 	util.AssertMsg(dt > 0, "Euler solver requires fixed time step > 0")
 
-	e.torqueFn(dy0)
-	e.NEval++
+	s.torqueFn(dy0)
+	s.NEval++
 
-	cuda.Madd2(e.y, e.y, dy0, 1, dt) // y = y + dt * dy
+	cuda.Madd2(s.y, s.y, dy0, 1, dt) // y = y + dt * dy
 
-	Time += e.Dt_si
-	e.postStep(e.y)
-	e.NSteps++
+	Time += s.Dt_si
+	s.postStep(s.y)
+	s.NSteps++
 }

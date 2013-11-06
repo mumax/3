@@ -11,15 +11,16 @@ import (
 	"strings"
 )
 
-var compstr = map[string]int{"x": 0, "y": 1, "z": 2} // also swaps XYZ user space
+var compstr = map[string]int{"x": 0, "y": 1, "z": 2}
 
+// this is GUI state
 var (
 	rescaleBuf  *data.Slice // GPU
 	imgBuf      *data.Slice // CPU
 	img         = new(image.NRGBA)
-	renderScale = 1
-	renderLayer = 0
-	renderComp  string
+	renderScale = 1    // zoom for render
+	renderLayer = 0    // layer to render
+	renderComp  string // component to render
 )
 
 // Render image of quantity.
@@ -48,26 +49,17 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 }
 
 func render(quant Slicer, comp string) {
-
-	//	defer func() { // TODO: remove
-	//		err := recover()
-	//		if err != nil {
-	//			log.Println("render:", err)
-	//		}
-	//	}()
-
 	size := quant.Mesh().Size()
 
 	// don't slice out of bounds
 	if renderLayer >= size[Z] {
 		renderLayer = size[Z] - 1
-		// TODO: update slider
 	}
 	if renderLayer < 0 {
 		renderLayer = 0
 	}
 	if quant.NComp() == 1 {
-		renderComp = ""
+		comp = ""
 	}
 
 	// scale the size
@@ -87,13 +79,6 @@ func render(quant Slicer, comp string) {
 
 	// rescale and download
 	InjectAndWait(func() {
-
-		//defer func() { // TODO: remove
-		//	err := recover()
-		//	if err != nil {
-		//		log.Println("render inject:", err)
-		//	}
-		//}()
 
 		buf, r := quant.Slice()
 		if r {
@@ -118,10 +103,13 @@ func render(quant Slicer, comp string) {
 		}
 	})
 
+	// imgBuf always has 3 components, we may need just one...
 	d := imgBuf
-	if comp != "" && d.NComp() > 1 {
-		c := compstr[comp]
-		d = d.Comp(c)
+	if comp != "" && quant.NComp() > 1 { // ... if one has been selected by gui
+		d = d.Comp(compstr[comp])
+	}
+	if quant.NComp() == 1 { // ...or if the original data only had one (!)
+		d = d.Comp(0)
 	}
 	draw.On(img, d, "auto", "auto")
 }

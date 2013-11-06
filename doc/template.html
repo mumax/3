@@ -289,43 +289,6 @@ saveas(m, "m_final")
 
 {{.Output}}
 
-
-<hr/><h2>Exchange Spring</h2>
-
-The example above showed how to set material parameters in different regions. However, we can also specify the exchange interaction <i>between</i> different regions (instead of just inside one region). Physically it is not always clear how strong the exchange between different materials should be. Therefore, when using regions, the exchange between different regions defaults to zero. We specify the exchange between regions in terms of the <i>exchange length</i> sqrt(2*Aex/Msat), as this quantity is unambiguous in case of different Msat.
-
-{{.Example `
-/*
-Exchange spring consisting of bottom Fe layer and top Ni layer.
-Interlayer exchange estimated from geometrical average of Fe and Ni exchange lengths.
-*/
-Nx := 16
-Ny := 16
-Nz := 8
-setgridsize(Nx, Ny, Nz)
-setcellsize(4e-9, 4e-9, 3e-9)
-
-// Fe
-defregion(1, layers(0, Nz/2))
-Msat.setRegion (1, 1700e3)
-Aex.setRegion  (1, 21e-12)
-alpha.setRegion(1, 0.1)
-
-// Ni
-defregion(2, layers(Nz/2, Nz))
-Msat.setRegion (2, 490e3)
-Aex.setRegion  (2, 9e-12)
-alpha.setRegion(2, 0.05)
-
-// define an intermaterial exchange
-lex2Fe := 21e-12/1700e3
-lex2Ni :=  9e-12/ 490e3
-lex := sqrt(2/(1/lex2Fe + 1/lex2Ni))
-setExLen(1, 2, lex)  // set exchange length between Ni and Fe
-
-`}}
-
-
 <hr/><h2>PMA Racetrack</h2>
 {{.Example `
 // In this example we drive a domain wall in PMA material by spin-transfer torque.
@@ -416,7 +379,7 @@ Since we center on the domain wall we can not really see the motion, despite the
 
 <hr/><h2>Voronoi tessellation</h2>
 
-In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions using Voronoi tessellation. We vary the material parameters in each grain, as well as the inter-grain exchange coupling.
+In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions using Voronoi tessellation. We vary the material parameters in each grain.
 
 {{.Example `
 N := 256

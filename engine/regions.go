@@ -54,7 +54,7 @@ func DefRegion(id int, s Shape) {
 		}
 	}
 	if !ok {
-		log.Panic("DefRegion ", id, ": shape is empty")
+		log.Println("Note: DefRegion ", id, ": shape is empty")
 	}
 }
 

@@ -15,32 +15,34 @@ var (
 	Dex    VectorParam // DMI strength
 	B_exch adder       // exchange field (T) output handle
 	lex2   exchParam   // inter-cell exchange length squared * 1e18
-	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
+	E_exch *GetScalar
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
+	B_exch.init(VECTOR, &globalmesh, "B_exch", "T", "Exchange field", AddExchangeField)
+	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
+	registerEnergy(getExchangeEnergy)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
+}
 
-	B_exch.init(VECTOR, &globalmesh, "B_exch", "T", "Exchange field", func(dst *data.Slice) {
-		if Dex.isZero() {
-			cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), stream0)
-		} else {
-			// DMI only implemented for uniform parameters
-			// interaction not clear with space-dependent parameters
-			util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
-				"DMI: Msat, Aex, Dex must be uniform")
-			util.AssertMsg(Mesh().PBC_code() == 0, "No PBC for DMI")
-			msat := Msat.GetRegion(0)
-			D := Dex.GetRegion(0)
-			A := Aex.GetRegion(0) / msat
-			cuda.AddDMI(dst, M.buffer, float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A), 0) // dmi+exchange
-		}
-	})
-
-	registerEnergy(getExchangeEnergy)
+// Adds the current exchange field to dst
+func AddExchangeField(dst *data.Slice) {
+	if Dex.isZero() {
+		cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu(), stream0)
+	} else {
+		// DMI only implemented for uniform parameters
+		// interaction not clear with space-dependent parameters
+		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
+			"DMI: Msat, Aex, Dex must be uniform")
+		util.AssertMsg(Mesh().PBC_code() == 0, "No PBC for DMI")
+		msat := Msat.GetRegion(0)
+		D := Dex.GetRegion(0)
+		A := Aex.GetRegion(0) / msat
+		cuda.AddDMI(dst, M.buffer, float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A), 0) // dmi+exchange
+	}
 }
 
 // Returns the current exchange energy in Joules.
@@ -62,17 +64,6 @@ func OverrideExchangeLength(region1, region2 int, exlen float64) {
 	l2 := sign(exlen) * (exlen * exlen) * 1e18
 	lex2.override[symmidx(region1, region2)] = float32(l2)
 	lex2.gpu_ok = false
-}
-
-func sign(x float64) float64 {
-	switch {
-	case x > 0:
-		return 1
-	case x < 0:
-		return -1
-	default:
-		return 0
-	}
 }
 
 // stores interregion exchange stiffness
@@ -190,4 +181,15 @@ func (p *exchParam) String() string {
 		str += "\n"
 	}
 	return str
+}
+
+func sign(x float64) float64 {
+	switch {
+	case x > 0:
+		return 1
+	case x < 0:
+		return -1
+	default:
+		return 0
+	}
 }

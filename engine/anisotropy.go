@@ -12,7 +12,7 @@ var (
 	AnisU, AnisC1, AnisC2 VectorParam  // unixial and cubic anis axes
 	ku1_red, kc1_red      derivedParam // K1 / Msat
 	B_anis                adder        // field due to uniaxial anisotropy (T)
-	E_anis                = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
+	E_anis                *GetScalar   // Anisotorpy energy
 )
 
 func init() {
@@ -21,27 +21,29 @@ func init() {
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
+	B_anis.init(VECTOR, &globalmesh, "B_anis", "T", "Anisotropy field", AddAnisotropyField)
+	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
+	registerEnergy(getAnisotropyEnergy)
 
+	//ku1_red = Ku1 / Msat
 	ku1_red.init(1, []updater{&Ku1, &Msat}, func(p *derivedParam) {
-		//ku1_red = Ku1 / Msat
 		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
 	})
 
+	//ku1_red = Ku1 / Msat
 	kc1_red.init(SCALAR, []updater{&Kc1, &Msat}, func(p *derivedParam) {
-		//ku1_red = Ku1 / Msat
 		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
 	})
+}
 
-	B_anis.init(VECTOR, &globalmesh, "B_anis", "T", "Anisotropy field", func(dst *data.Slice) {
-		if !(ku1_red.isZero()) {
-			cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu(), stream0)
-		}
-		if !(kc1_red.isZero()) {
-			cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu(), stream0)
-		}
-	})
-
-	registerEnergy(getAnisotropyEnergy)
+// Add the anisotropy field to dst
+func AddAnisotropyField(dst *data.Slice) {
+	if !(ku1_red.isZero()) {
+		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu(), stream0)
+	}
+	if !(kc1_red.isZero()) {
+		cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu(), stream0)
+	}
 }
 
 func getAnisotropyEnergy() float64 {

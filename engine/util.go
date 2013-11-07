@@ -6,7 +6,6 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 	"os"
 )
@@ -39,9 +38,9 @@ func MakeVector(x, y, z float64) data.Vector {
 // and print suited message.
 func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
-		log.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
+		util.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
-		log.Println(msg, ":", have, "OK")
+		fmt.Println(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
 }
@@ -95,7 +94,7 @@ func myprint(msg ...interface{}) {
 			continue
 		}
 	}
-	log.Println(msg...)
+	fmt.Println(msg...)
 }
 
 // converts cell index to coordinate, internal coordinates

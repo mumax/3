@@ -3,7 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"log"
+	"github.com/mumax/3/util"
 )
 
 func init() {
@@ -71,7 +71,7 @@ func (geometry *geom) setGeom(s Shape) {
 	}
 
 	if fill == 0 {
-		log.Fatal("SetGeom: geometry completely empty")
+		util.Fatal("SetGeom: geometry completely empty")
 	}
 	geometry.spaceFill = fill / float64(Mesh().NCell())
 

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/mumax/3/util"
-	"log"
 	"os"
 )
 
@@ -43,7 +42,7 @@ func TableAutoSave(period float64) {
 
 func (t *DataTable) Add(output TableData) {
 	if t.inited() {
-		log.Fatalln("data table add", output.Name(), ": need to add quantity before table is output the first time")
+		util.Fatal("data table add ", output.Name(), ": need to add quantity before table is output the first time")
 	}
 	t.outputs = append(t.outputs, output)
 }

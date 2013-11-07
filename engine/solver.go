@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 type solver struct {
@@ -52,6 +51,6 @@ func (e *solver) adaptDt(corr float64) {
 		e.Dt_si = e.MaxDt
 	}
 	if e.Dt_si == 0 {
-		log.Fatal("time step too small")
+		util.Fatal("time step too small")
 	}
 }

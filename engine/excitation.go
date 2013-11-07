@@ -4,7 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
-	"log"
+	"github.com/mumax/3/util"
 	"math"
 	"reflect"
 )
@@ -91,7 +91,6 @@ func (e *excitation) SetRegion(region int, f script.VectorFunction) {
 
 // for gui (nComp agnostic)
 func (e *excitation) setRegion(region int, value []float64) {
-	log.Println("TODO: time-dep gui")
 	e.perRegion.setRegion(region, value)
 }
 
@@ -129,7 +128,7 @@ func checkNaN(s *data.Slice, name string) {
 	for _, h := range h {
 		for _, v := range h {
 			if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) {
-				log.Fatalln("NaN or Inf in", name)
+				util.Fatal("NaN or Inf in", name)
 			}
 		}
 	}

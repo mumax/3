@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/gui"
 	"github.com/mumax/3/util"
-	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -195,7 +194,6 @@ func Serve(port string) {
 
 	gui.OnRefresh(func() { Inject <- onrefresh })
 
-	log.Print(" =====\n open your browser and visit http://localhost", port, "\n =====\n")
 	util.LogErr(http.ListenAndServe(port, nil))
 	runtime.Gosched()
 }
@@ -213,12 +211,11 @@ func inj(f func()) func() {
 }
 
 func Eval(code string, gui *gui.Doc) {
-	log.Println("eval", code)
 	defer func() {
 		err := recover()
 		if err != nil {
 			gui.SetValue("ErrorBox", fmt.Sprint(err))
-			log.Println(err)
+			util.Log(err)
 		}
 	}()
 	tree, err := World.Compile(code)
@@ -226,7 +223,7 @@ func Eval(code string, gui *gui.Doc) {
 		tree.Eval()
 	} else {
 		gui.SetValue("paramErr", fmt.Sprint(err))
-		log.Println(err)
+		util.Log(err)
 	}
 }
 

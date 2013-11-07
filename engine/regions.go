@@ -4,7 +4,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 var regions = Regions{doc: Doc(1, "regions", "")} // global regions map
@@ -55,7 +54,7 @@ func DefRegion(id int, s Shape) {
 		}
 	}
 	if !ok {
-		log.Println("Note: DefRegion ", id, ": shape is empty")
+		util.Log("Note: DefRegion ", id, ": shape is empty")
 	}
 }
 
@@ -67,7 +66,7 @@ func DefRegionCell(id int, x, y, z int) {
 
 func defRegionId(id int) {
 	if id < 0 || id > NREGION {
-		log.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
+		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
 	}
 	if id+1 > regions.maxreg {
 		regions.maxreg = id + 1 // we loop < maxreg, so +1

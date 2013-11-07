@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/util"
-	"log"
 	"math/rand"
 )
 
@@ -11,7 +10,7 @@ func init() {
 }
 
 func makeDefects(region, size int, prob float64) {
-	log.Printf("making defects region=%v, size=%vx%v, probabiltiy=%v", region, size, size, prob)
+	//util.Log("making defects region=%v, size=%vx%v, probabiltiy=%v", region, size, size, prob)
 	util.Argument(len(regions.arr) == 1) // 2D only
 	// make sure this region is defined (!)
 	DefRegion(region, func(x, y, z float64) bool { return false })

@@ -1,9 +1,9 @@
 package mag
 
 import (
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 )
 
@@ -23,7 +23,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	pbc := mesh.PBC()
-	log.Println("calculating demag kernel:", "accuracy:", accuracy, ", size:", size[0], "x", size[1], "x", size[2])
+	fmt.Print("calculating demag kernel")
 
 	// Sanity check
 	{
@@ -104,6 +104,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		points int        // counts used integration points
 	)
 	for s := 0; s < 3; s++ { // source index Ksdxyz // TODO: make inner?
+		fmt.Print(".")
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
 		for z := z1; z <= z2; z++ {
@@ -190,7 +191,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			}
 		}
 	}
-	log.Println("kernel used", points, "integration points")
+	fmt.Println()
 	// for 2D these elements are zero:
 	if size[0] == 1 {
 		kernel[0][1] = nil

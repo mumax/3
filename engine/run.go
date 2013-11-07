@@ -1,7 +1,8 @@
 package engine
 
 import (
-	"log"
+	"fmt"
+	"github.com/mumax/3/util"
 )
 
 func init() {
@@ -31,7 +32,7 @@ var (
 func SetSolver(typ int) {
 	switch typ {
 	default:
-		log.Panicf("SetSolver: unknown solver type: %v", typ)
+		util.Fatalf("SetSolver: unknown solver type: %v", typ)
 	case 1:
 		Solver.step = EulerStep
 	case 2:
@@ -42,23 +43,20 @@ func SetSolver(typ int) {
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
-	log.Println("run for", seconds, "s")
 	stop := Time + seconds
 	RunWhile(func() bool { return Time < stop })
 }
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	log.Println("run for", n, "steps")
 	stop := Solver.NSteps + n
 	RunWhile(func() bool { return Solver.NSteps < stop })
 }
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
-	log.Println("run while", condition)
 	checkM() // TODO: move to failed solver step
-
+	fmt.Println("running...")
 	pause = false
 	for condition() && !pause {
 		select {

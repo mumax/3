@@ -3,7 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"log"
+
 	"path"
 	"strings"
 )
@@ -85,7 +85,6 @@ func runSaver() {
 // waits until all asynchronous output has been saved.
 func drainOutput() {
 	if saveQue != nil {
-		log.Println("flushing output")
 		close(saveQue)
 		<-done
 	}

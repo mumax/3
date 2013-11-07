@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	flag_silent  = flag.Bool("s", false, "Don't generate any log info")
 	flag_version = flag.Bool("v", false, "Print version")
 	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od      = flag.String("o", "", "Override output directory")
@@ -39,9 +38,6 @@ func main() {
 
 	log.SetPrefix("")
 	log.SetFlags(0)
-	if *flag_silent {
-		log.SetOutput(ioutil.Discard)
-	}
 
 	if *flag_vet {
 		vet()
@@ -80,6 +76,7 @@ func main() {
 	defer prof.Cleanup()
 
 	if !*flag_vet {
+		fmt.Print("starting GUI at http://localhost", *flag_port, "\n")
 		RunFileAndServe(flag.Arg(0))
 		keepBrowserAlive() // if open, that is
 	}

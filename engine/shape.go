@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"log"
+	"github.com/mumax/3/util"
 	"math"
 )
 
@@ -86,7 +86,7 @@ func ZRange(a, b float64) Shape {
 func Layers(a, b int) Shape {
 	Nz := Mesh().Size()[0]
 	if a < 0 || a > Nz || b < 0 || b < a {
-		log.Fatal("layers ", a, ":", b, " out of bounds (0 - ", Nz, ")")
+		util.Fatal("layers ", a, ":", b, " out of bounds (0 - ", Nz, ")")
 	}
 	c := Mesh().CellSize()[Z]
 	z1 := Index2Coord(0, 0, a)[Z] - c/2

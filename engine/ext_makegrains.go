@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 	"math/rand"
 )
@@ -13,7 +12,7 @@ func init() {
 
 func makeGrains(startregion, stopRegion, numberofgrains int) {
 	numberofregions := stopRegion - startregion
-	log.Printf("making grains in %v regions, starting from %v, number of Voronoi centra=%v", numberofregions, startregion, numberofgrains)
+	//log.Printf("making grains in %v regions, starting from %v, number of Voronoi centra=%v", numberofregions, startregion, numberofgrains)
 	util.Argument(len(regions.arr) == 1) // 2D only
 
 	for i := startregion; i < startregion+numberofregions; i++ {

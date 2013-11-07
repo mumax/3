@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mumax/3/engine"
-	"log"
 	"os/exec"
 	"time"
 )
 
 func Interactive() {
-	log.Println("entering interactive mode")
+	fmt.Println("entering interactive mode")
 	for {
 		f := <-engine.Inject
 		f()
@@ -20,12 +20,12 @@ func Interactive() {
 // TODO: rename
 func RunInteractive() {
 	//engine.Pause()
-	log.Println("entering interactive mode")
+	fmt.Println("entering interactive mode")
 	for time.Since(engine.KeepAlive()) < timeout {
 		f := <-engine.Inject
 		f()
 	}
-	log.Println("interactive session idle: exiting")
+	fmt.Println("interactive session idle, exiting")
 }
 
 // exit finished simulation this long after browser was closed
@@ -33,7 +33,7 @@ const timeout = 2 * time.Second
 
 func keepBrowserAlive() {
 	if time.Since(engine.KeepAlive()) < timeout {
-		log.Println("keeping session open to browser")
+		fmt.Println("keeping session open to browser")
 		go func() {
 			for {
 				engine.Inject <- nop // wake up RunInteractive so it may exit
@@ -51,11 +51,11 @@ func openbrowser(url string) {
 	for _, cmd := range browsers {
 		err := exec.Command(cmd, url).Start()
 		if err == nil {
-			log.Println("\n ====\n openend web interface in", cmd, "\n ====")
+			fmt.Println("openend web interface in", cmd)
 			return
 		}
 	}
-	log.Println("\n ===== \n Please open ", url, " in a browser \n ====")
+	fmt.Println("Please open ", url, " in a browser")
 }
 
 // list of browsers to try.

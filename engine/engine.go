@@ -4,7 +4,8 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
-	"log"
+	"github.com/mumax/3/util"
+
 	"runtime"
 )
 
@@ -47,10 +48,9 @@ func Mesh() *data.Mesh {
 // Can be set only once at the beginning of the simulation.
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	if Nx <= 1 {
-		log.Fatal("mesh size X should be > 1, have: ", Nx)
+		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbcxyz...)
-	log.Println("set mesh:", Mesh())
 	alloc()
 }
 
@@ -92,10 +92,10 @@ func setCellSize(cx, cy, cz float64) {
 
 func setPBC(nx, ny, nz int) {
 	if pbcxyz != nil {
-		log.Panicf("PBC alread set")
+		util.Fatal("PBC alread set")
 	}
 	if globalmesh.Size() != [3]int{0, 0, 0} {
-		log.Panicf("PBC must be set before MeshSize and GridSize")
+		util.Fatal("PBC must be set before MeshSize and GridSize")
 	}
 	pbcxyz = []int{nx, ny, nz}
 }
@@ -103,7 +103,7 @@ func setPBC(nx, ny, nz int) {
 // check if mesh is set
 func checkMesh() {
 	if globalmesh.Size() == [3]int{0, 0, 0} {
-		log.Panic("need to set mesh first")
+		util.Fatal("need to set mesh first")
 	}
 }
 
@@ -111,21 +111,20 @@ func checkMesh() {
 func checkM() {
 	checkMesh()
 	if M.buffer.DevPtr(0) == nil {
-		log.Fatal("need to initialize magnetization first")
+		util.Fatal("need to initialize magnetization first")
 	}
 	if cuda.MaxVecNorm(M.buffer) == 0 {
-		log.Fatal("need to initialize magnetization first")
+		util.Fatal("need to initialize magnetization first")
 	}
 }
 
 // Cleanly exits the simulation, assuring all output is flushed.
 func Close() {
-	log.Println("shutting down")
 	drainOutput()
 	Table.flush()
 	var memstats runtime.MemStats
 	runtime.ReadMemStats(&memstats)
-	log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
+	//log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
 
 	// debug. TODO: rm
 	//	for n, p := range params {

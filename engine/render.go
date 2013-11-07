@@ -4,9 +4,9 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"github.com/mumax/3/util"
 	"image"
 	"image/jpeg"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -39,7 +39,7 @@ func serveRender(w http.ResponseWriter, r *http.Request) {
 	q, ok := quants[quant]
 	if !ok {
 		err := "render: unknown quantity: " + url
-		log.Println(err)
+		util.Log(err)
 		http.Error(w, err, http.StatusNotFound)
 		return
 	} else {
@@ -85,7 +85,7 @@ func render(quant Slicer, comp string) {
 			defer cuda.Recycle(buf)
 		}
 		if !buf.GPUAccess() {
-			log.Println("no GPU access for", quant.Name)
+			util.Log("no GPU access for", quant.Name)
 			imgBuf = Download(quant) // fallback (no zoom)
 			return
 		}

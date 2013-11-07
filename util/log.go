@@ -4,6 +4,14 @@ package util
 
 import "log"
 
+func Fatal(msg ...interface{}) {
+	log.Fatal(msg...)
+}
+
+func Fatalf(format string, msg ...interface{}) {
+	log.Fatalf(format, msg...)
+}
+
 // If err != nil, trigger log.Fatal(msg, err)
 func FatalErr(err interface{}, msg ...interface{}) {
 	if err != nil {
@@ -23,6 +31,10 @@ func LogErr(err error, msg ...interface{}) {
 	if err != nil {
 		log.Println(append(msg, err)...)
 	}
+}
+
+func Log(msg ...interface{}) {
+	log.Println(msg)
 }
 
 // Panics with "illegal argument" if test is false.

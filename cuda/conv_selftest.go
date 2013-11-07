@@ -2,19 +2,18 @@ package cuda
 
 import (
 	"github.com/mumax/3/data"
-	"log"
+	"github.com/mumax/3/util"
 	"math/rand"
 )
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
 func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	if mesh.PBC_code() != 0 {
-		log.Println("skipping convolution self-test for PBC")
+		//log.Println("skipping convolution self-test for PBC")
 		return
 	}
-	log.Print("verifying convolution ")
+	//fmt.Print("convolution test ")
 	inhost := data.NewSlice(3, mesh)
-	log.Println("test inhost size=", inhost.Mesh().Size())
 	initConvTestInput(inhost.Vectors())
 	gpu := NewSlice(3, mesh)
 	defer gpu.Free()
@@ -45,9 +44,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 		}
 	}
 	if err > CONV_TOLERANCE {
-		log.Fatalln("convolution self-test tolerance: ", err, "FAIL")
-	} else {
-		log.Println("convolution self-test tolreance:", err, "OK")
+		util.Fatal("convolution self-test tolerance: ", err, "FAIL")
 	}
 }
 

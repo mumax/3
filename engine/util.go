@@ -115,8 +115,6 @@ const (
 	Z = 2
 )
 
-const stream0 = 0 // for readability
-
 const (
 	SCALAR = 1
 	VECTOR = 3

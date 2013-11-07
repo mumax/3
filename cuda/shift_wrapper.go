@@ -25,9 +25,9 @@ type shift_args struct {
 }
 
 // Wrapper for shift CUDA kernel, asynchronous.
-func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config, str int) {
+func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if shift_code == 0 {
@@ -54,18 +54,18 @@ func k_shift_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz in
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_shz)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(shift_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for shift CUDA kernel, synchronized.
-func k_shift(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config) {
-	const stream = 0
-	k_shift_async(dst, src, Nx, Ny, Nz, shx, shy, shz, cfg, stream)
-	Sync(stream)
+func k_shift_sync(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config) {
+	Sync()
+	k_shift_async(dst, src, Nx, Ny, Nz, shx, shy, shz, cfg, stream0)
+	Sync()
 }
 
 var shift_map = map[int]string{0: "",

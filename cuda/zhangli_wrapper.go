@@ -38,9 +38,9 @@ type addzhanglitorque_args struct {
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, asynchronous.
-func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, Nx int, Ny int, Nz int, PBC byte, cfg *config, str int) {
+func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, Nx int, Ny int, Nz int, PBC byte, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if addzhanglitorque_code == 0 {
@@ -93,18 +93,18 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 	_a_.argptr[20] = unsafe.Pointer(&_a_.arg_PBC)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, synchronized.
-func k_addzhanglitorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
-	const stream = 0
-	k_addzhanglitorque_async(tx, ty, tz, mx, my, mz, jx, jy, jz, cx, cy, cz, bsatLUT, alphaLUT, xiLUT, polLUT, regions, Nx, Ny, Nz, PBC, cfg, stream)
-	Sync(stream)
+func k_addzhanglitorque_sync(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
+	Sync()
+	k_addzhanglitorque_async(tx, ty, tz, mx, my, mz, jx, jy, jz, cx, cy, cz, bsatLUT, alphaLUT, xiLUT, polLUT, regions, Nx, Ny, Nz, PBC, cfg, stream0)
+	Sync()
 }
 
 var addzhanglitorque_map = map[int]string{0: "",

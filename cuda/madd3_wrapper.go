@@ -25,9 +25,9 @@ type madd3_args struct {
 }
 
 // Wrapper for madd3 CUDA kernel, asynchronous.
-func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, cfg *config, str int) {
+func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if madd3_code == 0 {
@@ -54,18 +54,18 @@ func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(madd3_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(madd3_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for madd3 CUDA kernel, synchronized.
-func k_madd3(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, cfg *config) {
-	const stream = 0
-	k_madd3_async(dst, src1, fac1, src2, fac2, src3, fac3, N, cfg, stream)
-	Sync(stream)
+func k_madd3_sync(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, cfg *config) {
+	Sync()
+	k_madd3_async(dst, src1, fac1, src2, fac2, src3, fac3, N, cfg, stream0)
+	Sync()
 }
 
 var madd3_map = map[int]string{0: "",

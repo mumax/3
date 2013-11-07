@@ -22,9 +22,9 @@ type reducemaxdiff_args struct {
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
-func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str int) {
+func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if reducemaxdiff_code == 0 {
@@ -45,18 +45,18 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, synchronized.
-func k_reducemaxdiff(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	const stream = 0
-	k_reducemaxdiff_async(src1, src2, dst, initVal, n, cfg, stream)
-	Sync(stream)
+func k_reducemaxdiff_sync(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	Sync()
+	k_reducemaxdiff_async(src1, src2, dst, initVal, n, cfg, stream0)
+	Sync()
 }
 
 var reducemaxdiff_map = map[int]string{0: "",

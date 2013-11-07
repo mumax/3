@@ -162,9 +162,9 @@ type {{.Name}}_args struct{
 }
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
-func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str int) {
+func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str cu.Stream) {
 	if synchronous{ // debug
-		SyncAll()
+		Sync()
 	}
 
 	if {{.Name}}_code == 0{
@@ -178,18 +178,18 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 	{{end}}
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous{ // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for {{.Name}} CUDA kernel, synchronized.
-func k_{{.Name}} ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
-	const stream = 0
-	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} cfg, stream)
-	Sync(stream)
+func k_{{.Name}}_sync ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
+	Sync()
+	k_{{.Name}}_async ( {{range $.ArgN}}{{.}},{{end}} cfg, stream0)
+	Sync()
 }
 
 var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}},

@@ -26,8 +26,8 @@ type DemagConvolution struct {
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
-		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z], stream[0])
-		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z], stream[0])
+		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z], stream0)
+		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z], stream0)
 	}
 
 	{ // init device buffers
@@ -123,15 +123,16 @@ func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Byt
 }
 
 // zero 1-component slice
-func zero1_async(dst *data.Slice, str int) {
-	cu.MemsetD32Async(cu.DevicePtr(uintptr(dst.DevPtr(0))), 0, int64(dst.Len()), stream[str])
+// TODO: rename: not async
+func zero1_async(dst *data.Slice) {
+	cu.MemsetD32Async(cu.DevicePtr(uintptr(dst.DevPtr(0))), 0, int64(dst.Len()), stream0)
 }
 
 // forward FFT component i
 func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
-	zero1_async(c.fftRBuf[i], stream0)
+	zero1_async(c.fftRBuf[i])
 	in := inp.Comp(i)
-	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions, stream0)
+	copyPadMul(c.fftRBuf[i], in, vol, c.kernSize, c.size, Bsat, regions)
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 }
 
@@ -139,7 +140,7 @@ func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regio
 func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
 	c.bwPlan.ExecAsync(c.fftCBuf[i], c.fftRBuf[i])
 	out := outp.Comp(i)
-	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize, stream0)
+	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize)
 }
 
 // forward FFT of magnetization one component.
@@ -159,7 +160,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	kernMulRSymm3D_async(c.fftCBuf,
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[Z][Z],
 		c.gpuFFTKern[Y][Z], c.gpuFFTKern[X][Z], c.gpuFFTKern[X][Y],
-		Nx, Ny, Nz, stream0)
+		Nx, Ny, Nz)
 
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
@@ -181,7 +182,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 
 	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
-	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny, stream0)
+	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny)
 
 	dbg("fftBz:", c.fftCBuf[Z].HostCopy())
 
@@ -197,8 +198,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 
 	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
-		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y],
-		Nx, Ny, stream0)
+		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y], Nx, Ny)
 
 	dbg("fftBx:", c.fftCBuf[X].HostCopy())
 	dbg("fftBy:", c.fftCBuf[Y].HostCopy())

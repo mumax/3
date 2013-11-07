@@ -12,9 +12,8 @@ func Mul(dst, a, b *data.Slice) {
 	util.Assert(a.Len() == N && a.NComp() == nComp && b.Len() == N && b.NComp() == nComp)
 	cfg := make1DConf(N)
 	for c := 0; c < nComp; c++ {
-		k_mul_async(dst.DevPtr(c), a.DevPtr(c), b.DevPtr(c), N, cfg, c)
+		k_mul_async(dst.DevPtr(c), a.DevPtr(c), b.DevPtr(c), N, cfg, stream0)
 	}
-	SyncAll()
 }
 
 // multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2
@@ -26,9 +25,8 @@ func Madd2(dst, src1, src2 *data.Slice, factor1, factor2 float32) {
 	cfg := make1DConf(N)
 	for c := 0; c < nComp; c++ {
 		k_madd2_async(dst.DevPtr(c), src1.DevPtr(c), factor1,
-			src2.DevPtr(c), factor2, N, cfg, c)
+			src2.DevPtr(c), factor2, N, cfg, stream0)
 	}
-	SyncAll()
 }
 
 // multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
@@ -40,7 +38,6 @@ func Madd3(dst, src1, src2, src3 *data.Slice, factor1, factor2, factor3 float32)
 	cfg := make1DConf(N)
 	for c := 0; c < nComp; c++ {
 		k_madd3_async(dst.DevPtr(c), src1.DevPtr(c), factor1,
-			src2.DevPtr(c), factor2, src3.DevPtr(c), factor3, N, cfg, c)
+			src2.DevPtr(c), factor2, src3.DevPtr(c), factor3, N, cfg, stream0)
 	}
-	SyncAll()
 }

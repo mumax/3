@@ -35,27 +35,39 @@ func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType
 func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(uintptr(ptr))) }
 
 func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
+	Sync() // sync previous kernels
 	cu.MemcpyDtoH(dst, cu.DevicePtr(uintptr(src)), bytes)
+	Sync() // sync copy
 }
 
 func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
+	Sync() // sync previous kernels
 	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst)), src, bytes)
+	Sync() // sync copy
 }
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
-	str := stream[0]
-	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, str)
-	Sync(0)
+	if synchronous { // debug
+		Sync()
+	}
+	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
+	if synchronous { // debug
+		Sync()
+	}
 }
 
 // Memset sets the Slice's components to the specified values.
 func Memset(s *data.Slice, val ...float32) {
-	util.Argument(len(val) == s.NComp())
-	str := stream[0]
-	for c, v := range val {
-		cu.MemsetD32Async(cu.DevicePtr(uintptr(s.DevPtr(c))), math.Float32bits(v), int64(s.Len()), str)
+	if synchronous { // debug
+		Sync()
 	}
-	Sync(0)
+	util.Argument(len(val) == s.NComp())
+	for c, v := range val {
+		cu.MemsetD32Async(cu.DevicePtr(uintptr(s.DevPtr(c))), math.Float32bits(v), int64(s.Len()), stream0)
+	}
+	if synchronous { //debug
+		Sync()
+	}
 }
 
 // Set all elements of all components to zero.

@@ -39,10 +39,10 @@ func init() {
 // Add the anisotropy field to dst
 func AddAnisotropyField(dst *data.Slice) {
 	if !(ku1_red.isZero()) {
-		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu(), stream0)
+		cuda.AddUniaxialAnisotropy(dst, M.buffer, ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
 	}
 	if !(kc1_red.isZero()) {
-		cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu(), stream0)
+		cuda.AddCubicAnisotropy(dst, M.buffer, kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
 	}
 }
 

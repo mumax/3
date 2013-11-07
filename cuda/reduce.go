@@ -71,8 +71,7 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 		initReduceBuf()
 	}
 	buf := <-reduceBuffers
-	str := stream[0]
-	cu.MemsetD32Async(cu.DevicePtr(uintptr(buf)), math.Float32bits(initVal), 1, str)
+	cu.MemsetD32Async(cu.DevicePtr(uintptr(buf)), math.Float32bits(initVal), 1, stream0)
 	//Sync(0) // not needed, kernel in same stream
 	return buf
 }
@@ -80,8 +79,9 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 // copy back single float result from GPU and recycle buffer
 func copyback(buf unsafe.Pointer) float32 {
 	var result float32
-	Sync(0) // sync kernel
+	Sync() // sync kernel
 	cu.MemcpyDtoH(unsafe.Pointer(&result), cu.DevicePtr(uintptr(buf)), cu.SIZEOF_FLOAT32)
+	Sync() // sync result
 	reduceBuffers <- buf
 	return result
 }

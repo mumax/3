@@ -56,8 +56,7 @@ func AddThermalField(dst *data.Slice) {
 	const stddev = 1
 	for i := 0; i < 3; i++ {
 		generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-		cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
-			kmu0_VgammaDt, regions.Gpu(), stream0)
+		cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(), kmu0_VgammaDt, regions.Gpu())
 	}
 }
 

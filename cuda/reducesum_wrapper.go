@@ -21,9 +21,9 @@ type reducesum_args struct {
 }
 
 // Wrapper for reducesum CUDA kernel, asynchronous.
-func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str int) {
+func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if reducesum_code == 0 {
@@ -42,18 +42,18 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducesum_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(reducesum_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for reducesum CUDA kernel, synchronized.
-func k_reducesum(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	const stream = 0
-	k_reducesum_async(src, dst, initVal, n, cfg, stream)
-	Sync(stream)
+func k_reducesum_sync(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	Sync()
+	k_reducesum_async(src, dst, initVal, n, cfg, stream0)
+	Sync()
 }
 
 var reducesum_map = map[int]string{0: "",

@@ -21,9 +21,9 @@ type kernmulRSymm2Dz_args struct {
 }
 
 // Wrapper for kernmulRSymm2Dz CUDA kernel, asynchronous.
-func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int, Ny int, cfg *config, str int) {
+func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int, Ny int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if kernmulRSymm2Dz_code == 0 {
@@ -42,18 +42,18 @@ func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(kernmulRSymm2Dz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(kernmulRSymm2Dz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for kernmulRSymm2Dz CUDA kernel, synchronized.
-func k_kernmulRSymm2Dz(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int, Ny int, cfg *config) {
-	const stream = 0
-	k_kernmulRSymm2Dz_async(fftMz, fftKzz, Nx, Ny, cfg, stream)
-	Sync(stream)
+func k_kernmulRSymm2Dz_sync(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int, Ny int, cfg *config) {
+	Sync()
+	k_kernmulRSymm2Dz_async(fftMz, fftKzz, Nx, Ny, cfg, stream0)
+	Sync()
 }
 
 var kernmulRSymm2Dz_map = map[int]string{0: "",

@@ -24,9 +24,9 @@ type kernmulRSymm2Dxy_args struct {
 }
 
 // Wrapper for kernmulRSymm2Dxy CUDA kernel, asynchronous.
-func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, cfg *config, str int) {
+func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if kernmulRSymm2Dxy_code == 0 {
@@ -51,18 +51,18 @@ func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx
 	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Ny)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(kernmulRSymm2Dxy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(kernmulRSymm2Dxy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for kernmulRSymm2Dxy CUDA kernel, synchronized.
-func k_kernmulRSymm2Dxy(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, cfg *config) {
-	const stream = 0
-	k_kernmulRSymm2Dxy_async(fftMx, fftMy, fftKxx, fftKyy, fftKxy, Nx, Ny, cfg, stream)
-	Sync(stream)
+func k_kernmulRSymm2Dxy_sync(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, cfg *config) {
+	Sync()
+	k_kernmulRSymm2Dxy_async(fftMx, fftMy, fftKxx, fftKyy, fftKxy, Nx, Ny, cfg, stream0)
+	Sync()
 }
 
 var kernmulRSymm2Dxy_map = map[int]string{0: "",

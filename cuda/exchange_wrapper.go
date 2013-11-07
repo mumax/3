@@ -32,9 +32,9 @@ type addexchange_args struct {
 }
 
 // Wrapper for addexchange CUDA kernel, asynchronous.
-func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config, str int) {
+func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if addexchange_code == 0 {
@@ -75,18 +75,18 @@ func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer
 	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_PBC)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(addexchange_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(addexchange_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for addexchange CUDA kernel, synchronized.
-func k_addexchange(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
-	const stream = 0
-	k_addexchange_async(Bx, By, Bz, mx, my, mz, aLUT2d, regions, wx, wy, wz, Nx, Ny, Nz, PBC, cfg, stream)
-	Sync(stream)
+func k_addexchange_sync(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
+	Sync()
+	k_addexchange_async(Bx, By, Bz, mx, my, mz, aLUT2d, regions, wx, wy, wz, Nx, Ny, Nz, PBC, cfg, stream0)
+	Sync()
 }
 
 var addexchange_map = map[int]string{0: "",

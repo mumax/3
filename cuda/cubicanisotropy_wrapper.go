@@ -32,9 +32,9 @@ type addcubicanisotropy_args struct {
 }
 
 // Wrapper for addcubicanisotropy CUDA kernel, asynchronous.
-func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, C1xLUT unsafe.Pointer, C1yLUT unsafe.Pointer, C1zLUT unsafe.Pointer, C2xLUT unsafe.Pointer, C2yLUT unsafe.Pointer, C2zLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str int) {
+func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, C1xLUT unsafe.Pointer, C1yLUT unsafe.Pointer, C1zLUT unsafe.Pointer, C2xLUT unsafe.Pointer, C2yLUT unsafe.Pointer, C2zLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if addcubicanisotropy_code == 0 {
@@ -75,18 +75,18 @@ func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.
 	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(addcubicanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(addcubicanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for addcubicanisotropy CUDA kernel, synchronized.
-func k_addcubicanisotropy(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, C1xLUT unsafe.Pointer, C1yLUT unsafe.Pointer, C1zLUT unsafe.Pointer, C2xLUT unsafe.Pointer, C2yLUT unsafe.Pointer, C2zLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	const stream = 0
-	k_addcubicanisotropy_async(Bx, By, Bz, mx, my, mz, K1LUT, C1xLUT, C1yLUT, C1zLUT, C2xLUT, C2yLUT, C2zLUT, regions, N, cfg, stream)
-	Sync(stream)
+func k_addcubicanisotropy_sync(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, C1xLUT unsafe.Pointer, C1yLUT unsafe.Pointer, C1zLUT unsafe.Pointer, C2xLUT unsafe.Pointer, C2yLUT unsafe.Pointer, C2zLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+	Sync()
+	k_addcubicanisotropy_async(Bx, By, Bz, mx, my, mz, K1LUT, C1xLUT, C1yLUT, C1zLUT, C2xLUT, C2yLUT, C2zLUT, regions, N, cfg, stream0)
+	Sync()
 }
 
 var addcubicanisotropy_map = map[int]string{0: "",

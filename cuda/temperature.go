@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes, str int) {
+func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
 
 	util.Argument(Beff.NComp() == 1 && noise.NComp() == 1)
 
@@ -14,5 +14,5 @@ func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt floa
 	cfg := make1DConf(N)
 
 	k_addtemperature_async(Beff.DevPtr(0), noise.DevPtr(0), float32(kmu0_VgammaDt), unsafe.Pointer(temp_red),
-		regions.Ptr, N, cfg, str)
+		regions.Ptr, N, cfg, stream0)
 }

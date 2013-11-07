@@ -21,9 +21,9 @@ type mul_args struct {
 }
 
 // Wrapper for mul CUDA kernel, asynchronous.
-func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config, str int) {
+func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if mul_code == 0 {
@@ -42,18 +42,18 @@ func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, 
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for mul CUDA kernel, synchronized.
-func k_mul(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config) {
-	const stream = 0
-	k_mul_async(dst, a, b, N, cfg, stream)
-	Sync(stream)
+func k_mul_sync(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, cfg *config) {
+	Sync()
+	k_mul_async(dst, a, b, N, cfg, stream0)
+	Sync()
 }
 
 var mul_map = map[int]string{0: "",

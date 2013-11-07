@@ -29,9 +29,9 @@ type lltorque_args struct {
 }
 
 // Wrapper for lltorque CUDA kernel, asynchronous.
-func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str int) {
+func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if lltorque_code == 0 {
@@ -66,18 +66,18 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for lltorque CUDA kernel, synchronized.
-func k_lltorque(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	const stream = 0
-	k_lltorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alphaLUT, regions, N, cfg, stream)
-	Sync(stream)
+func k_lltorque_sync(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+	Sync()
+	k_lltorque_async(tx, ty, tz, mx, my, mz, hx, hy, hz, alphaLUT, regions, N, cfg, stream0)
+	Sync()
 }
 
 var lltorque_map = map[int]string{0: "",

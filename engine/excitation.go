@@ -31,7 +31,7 @@ func (e *excitation) init(name, unit, desc string) {
 
 func (e *excitation) addTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {
-		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu(), 0)
+		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu())
 	}
 	for _, t := range e.extraTerms {
 		var mul float32 = 1

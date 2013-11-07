@@ -25,9 +25,9 @@ type shiftbytes_args struct {
 }
 
 // Wrapper for shiftbytes CUDA kernel, asynchronous.
-func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config, str int) {
+func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if shiftbytes_code == 0 {
@@ -54,18 +54,18 @@ func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, 
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_shz)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(shiftbytes_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(shiftbytes_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for shiftbytes CUDA kernel, synchronized.
-func k_shiftbytes(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config) {
-	const stream = 0
-	k_shiftbytes_async(dst, src, Nx, Ny, Nz, shx, shy, shz, cfg, stream)
-	Sync(stream)
+func k_shiftbytes_sync(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, shy int, shz int, cfg *config) {
+	Sync()
+	k_shiftbytes_async(dst, src, Nx, Ny, Nz, shx, shy, shz, cfg, stream0)
+	Sync()
 }
 
 var shiftbytes_map = map[int]string{0: "",

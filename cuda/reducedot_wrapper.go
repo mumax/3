@@ -22,9 +22,9 @@ type reducedot_args struct {
 }
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
-func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str int) {
+func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 
 	if reducedot_code == 0 {
@@ -45,18 +45,18 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
 
 	if synchronous { // debug
-		SyncAll()
+		Sync()
 	}
 }
 
 // Wrapper for reducedot CUDA kernel, synchronized.
-func k_reducedot(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	const stream = 0
-	k_reducedot_async(x1, x2, dst, initVal, n, cfg, stream)
-	Sync(stream)
+func k_reducedot_sync(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	Sync()
+	k_reducedot_async(x1, x2, dst, initVal, n, cfg, stream0)
+	Sync()
 }
 
 var reducedot_map = map[int]string{0: "",

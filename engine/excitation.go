@@ -13,6 +13,7 @@ import (
 // can be defined region-wise plus extra mask*multiplier terms.
 // TODO: per-component mulmasks
 type excitation struct {
+	name       string
 	perRegion  VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
 }
@@ -23,6 +24,7 @@ type mulmask struct {
 }
 
 func (e *excitation) init(name, unit, desc string) {
+	e.name = name
 	e.perRegion.init("_"+name+"_perRegion", unit, "(internal)") // name starts with underscore: unexported
 	DeclLValue(name, e, cat(desc, unit))
 }
@@ -114,7 +116,7 @@ func (e *excitation) SetValue(v interface{}) {
 	e.perRegion.SetValue(v) // allows function of time
 }
 
-func (e *excitation) Name() string            { return e.perRegion.Name() }
+func (e *excitation) Name() string            { return e.name }
 func (e *excitation) Unit() string            { return e.perRegion.Unit() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }

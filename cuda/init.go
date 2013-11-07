@@ -8,14 +8,15 @@ import (
 )
 
 var (
-	cudaCtx  cu.Context // gpu context to be used by all threads
-	cudaCC   int        // compute capablity
-	Version  float32
-	DevName  string
-	TotalMem int64
+	cudaCtx     cu.Context // gpu context to be used by all threads
+	cudaCC      int        // compute capablity
+	Version     float32
+	DevName     string
+	TotalMem    int64
+	synchronous bool
 )
 
-func Init(gpu int, sched string) {
+func Init(gpu int, sched string, sync bool) {
 	if cudaCtx != 0 {
 		return // already inited
 	}
@@ -49,6 +50,11 @@ func Init(gpu int, sched string) {
 	}
 	cudaCC = 10*M + m
 	initStreampool()
+
+	synchronous = sync
+	if synchronous {
+		log.Println("synchronized CUDA calls")
+	}
 }
 
 // cu.Init(), but error is fatal and does not dump stack.

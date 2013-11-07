@@ -163,6 +163,10 @@ type {{.Name}}_args struct{
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
 func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config, str int) {
+	if synchronous{ // debug
+		SyncAll()
+	}
+
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = fatbinLoad({{.Name}}_map, "{{.Name}}")
 	}
@@ -175,6 +179,10 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 
 	args := _a_.argptr[:]
 	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream[str], args)
+
+	if synchronous{ // debug
+		SyncAll()
+	}
 }
 
 // Wrapper for {{.Name}} CUDA kernel, synchronized.

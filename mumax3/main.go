@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
 	_ "github.com/mumax/3/ext"
@@ -10,8 +9,6 @@ import (
 	"github.com/mumax/3/util"
 	"io/ioutil"
 	"log"
-	"os"
-	"os/exec"
 	"runtime"
 	"time"
 )
@@ -34,10 +31,12 @@ var (
 )
 
 func main() {
-	engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
 
 	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
+
 	flag.Parse()
+
+	engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
 
 	log.SetPrefix("")
 	log.SetFlags(0)
@@ -57,7 +56,8 @@ func main() {
 	log.Print("\n")
 
 	if flag.NArg() != 1 {
-		log.Fatal("need one input file")
+		batchMode()
+		return
 	}
 
 	if *flag_od == "" { // -o not set
@@ -71,17 +71,13 @@ func main() {
 	cuda.Init(*flag_gpu, *flag_sched, *flag_sync)
 	cuda.LockThread()
 
-	initProf()
+	if *flag_cpuprof {
+		prof.InitCPU(engine.OD)
+	}
+	if *flag_memprof {
+		prof.InitMem(engine.OD)
+	}
 	defer prof.Cleanup()
-
-	// on crash: save magnetization for post-mortem inspection
-	//defer func() {
-	//	err := recover()
-	//	if err != nil {
-	//		engine.SaveAs(&engine.M, "m_crash.dump")
-	//		log.Panic(err)
-	//	}
-	//}()
 
 	RunFileAndServe(flag.Arg(0))
 
@@ -102,86 +98,4 @@ func RunFileAndServe(fname string) {
 
 	// start executing the tree, possibly injecting commands from web gui
 	code.Eval()
-}
-
-// check all input files for errors, don't run.
-func vet() {
-	status := 0
-	for _, f := range flag.Args() {
-		src, ioerr := ioutil.ReadFile(f)
-		util.FatalErr(ioerr)
-		engine.World.EnterScope() // avoid name collisions between separate files
-		_, err := engine.World.Compile(string(src))
-		engine.World.ExitScope()
-		if err != nil {
-			fmt.Println(f, ":", err)
-			status = 1
-		} else {
-			fmt.Println(f, ":", "OK")
-		}
-	}
-	os.Exit(status)
-}
-
-func Interactive() {
-	log.Println("entering interactive mode")
-	for {
-		f := <-engine.Inject
-		f()
-	}
-}
-
-// Enter interactive mode. Simulation is now exclusively controlled
-// by web GUI (default: http://localhost:35367)
-// TODO: rename
-func RunInteractive() {
-	//engine.Pause()
-	log.Println("entering interactive mode")
-	for time.Since(engine.KeepAlive()) < timeout {
-		f := <-engine.Inject
-		f()
-	}
-	log.Println("interactive session idle: exiting")
-}
-
-// exit finished simulation this long after browser was closed
-const timeout = 2 * time.Second
-
-func keepBrowserAlive() {
-	if time.Since(engine.KeepAlive()) < timeout {
-		log.Println("keeping session open to browser")
-		go func() {
-			for {
-				engine.Inject <- nop // wake up RunInteractive so it may exit
-				time.Sleep(1 * time.Second)
-			}
-		}()
-		RunInteractive()
-	}
-}
-
-func nop() {}
-
-// Try to open url in a browser. Instruct to do so if it fails.
-func openbrowser(url string) {
-	for _, cmd := range browsers {
-		err := exec.Command(cmd, url).Start()
-		if err == nil {
-			log.Println("\n ====\n openend web interface in", cmd, "\n ====")
-			return
-		}
-	}
-	log.Println("\n ===== \n Please open ", url, " in a browser \n ====")
-}
-
-// list of browsers to try.
-var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "firefox", "ie", "iexplore"}
-
-func initProf() {
-	if *flag_cpuprof {
-		prof.InitCPU(engine.OD)
-	}
-	if *flag_memprof {
-		prof.InitMem(engine.OD)
-	}
 }

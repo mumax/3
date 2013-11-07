@@ -113,23 +113,15 @@ func TestSliceSlice(t *testing.T) {
 	N0, N1, N2 := 1, 10, 10
 	c := 1e-6
 	m := data.NewMesh(N0, N1, N2, c, c, c)
-	a := NewUnifiedSlice(3, m)
-	h := a.Host()
-	h[1][21] = 42
-	b := a.Slice(20, 30)
+	a := NewSlice(3, m)
+	b := a.Slice(20, 30).HostCopy()
 	if b.Len() != 30-20 {
 		t.Fail()
 	}
 	if b.NComp() != a.NComp() {
 		t.Fail()
 	}
-	if b.Host()[1][1] != 42 {
-		t.Fail()
-	}
 	if *a.Mesh() != *b.Mesh() {
-		t.Fail()
-	}
-	if a.MemType() != b.MemType() {
 		t.Fail()
 	}
 }

@@ -1,6 +1,7 @@
 package cuda
 
 import (
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/util"
 	"log"
@@ -14,6 +15,7 @@ var (
 	DevName     string
 	TotalMem    int64
 	synchronous bool
+	GPUInfo     string
 )
 
 func Init(gpu int, sched string, sync bool) {
@@ -42,9 +44,7 @@ func Init(gpu int, sched string, sync bool) {
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()
 
-	log.Print("CUDA ", Version, " ",
-		DevName, "(", (TotalMem)/(1024*1024), "MB) ",
-		"cc", M, ".", m, "\n")
+	GPUInfo = fmt.Sprint("CUDA ", Version, " ", DevName, "(", (TotalMem)/(1024*1024), "MB) ", "cc", M, ".", m)
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")
 	}

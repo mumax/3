@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
 	_ "github.com/mumax/3/ext"
@@ -15,6 +16,7 @@ import (
 
 var (
 	flag_silent  = flag.Bool("s", false, "Don't generate any log info")
+	flag_version = flag.Bool("v", false, "Print version")
 	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od      = flag.String("o", "", "Override output directory")
 	flag_force   = flag.Bool("f", false, "Force start, clean existing output directory")
@@ -23,32 +25,27 @@ var (
 	flag_memprof = flag.Bool("memprof", false, "Recored gopprof memory profile")
 	flag_gpu     = flag.Int("gpu", 0, "specify GPU")
 	flag_sync    = flag.Bool("sync", false, "synchronize all CUDA calls (debug)")
+	flag_time    = flag.Bool("time", false, "report walltime")
 )
 
 func main() {
 
-	defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
+	if *flag_time {
+		defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
+	}
 
 	flag.Parse()
-
 	engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
 
 	log.SetPrefix("")
 	log.SetFlags(0)
-
-	if *flag_vet {
-		vet()
-		return
-	}
-
 	if *flag_silent {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	log.Print("    ", engine.UNAME, "\n")
-	log.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
-	log.Print("    This is free software without any warranty. See license.txt", "\n")
-	log.Print("\n")
+	if *flag_vet {
+		vet()
+	}
 
 	if flag.NArg() != 1 {
 		batchMode()
@@ -66,6 +63,14 @@ func main() {
 	cuda.Init(*flag_gpu, "yield", *flag_sync)
 	cuda.LockThread()
 
+	if *flag_version {
+		fmt.Print("    ", engine.UNAME, "\n")
+		fmt.Print("    ", cuda.GPUInfo, "\n")
+		fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
+		fmt.Print("    This is free software without any warranty. See license.txt", "\n")
+		fmt.Print("\n")
+	}
+
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)
 	}
@@ -74,9 +79,11 @@ func main() {
 	}
 	defer prof.Cleanup()
 
-	RunFileAndServe(flag.Arg(0))
+	if !*flag_vet {
+		RunFileAndServe(flag.Arg(0))
+		keepBrowserAlive() // if open, that is
+	}
 
-	keepBrowserAlive() // if open, that is
 	engine.Close()
 }
 

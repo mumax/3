@@ -24,7 +24,6 @@ func SetOD(od string, force bool) {
 	if !strings.HasSuffix(OD, "/") {
 		OD += "/"
 	}
-	log.Println("output directory:", OD)
 
 	{ // make OD
 		wd, err := os.Getwd()
@@ -44,7 +43,6 @@ func SetOD(od string, force bool) {
 
 	// clean output dir
 	if len(files) != 0 && OD != "." {
-		log.Println("cleaning files in", OD)
 		filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
 			if path != OD {
 				util.FatalErr(os.RemoveAll(path), "clean output directory:")

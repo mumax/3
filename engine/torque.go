@@ -7,15 +7,17 @@ import (
 )
 
 var (
-	Alpha                ScalarParam
-	Xi, Pol              ScalarParam
-	Lambda, EpsilonPrime ScalarParam
-	FixedLayer           VectorParam
-	Torque               setter     // total torque in T
-	LLTorque             setter     // Landau-Lifshitz torque/γ0, in T
-	STTorque             adder      // Spin-transfer torque/γ0, in T
-	J                    excitation // Polarized electrical current density
-	MaxTorque            = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
+	Alpha        ScalarParam
+	Xi           ScalarParam
+	Pol          ScalarParam
+	Lambda       ScalarParam
+	EpsilonPrime ScalarParam
+	FixedLayer   VectorParam
+	Torque       setter     // total torque in T
+	LLTorque     setter     // Landau-Lifshitz torque/γ0, in T
+	STTorque     adder      // Spin-transfer torque/γ0, in T
+	J            excitation // Polarized electrical current density
+	MaxTorque    *GetScalar
 )
 
 func init() {
@@ -23,41 +25,48 @@ func init() {
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
 	J.init("J", "A/m2", "Electrical current density")
 	Pol.init("Pol", "", "Electrical current polarization", nil)
+	Pol.setUniform([]float64{1}) // default spin polarization
 	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
-
-	LLTorque.init(VECTOR, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", func(dst *data.Slice) {
-		B_eff.set(dst)                                                    // calc and store B_eff
-		cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
-	})
-
-	Pol.setUniform([]float64{1}) // default spin polarization
-
-	STTorque.init(VECTOR, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
-		if !J.isZero() {
-			util.AssertMsg(!Pol.isZero(), "spin polarization should not be 0")
-			jspin, rec := J.Slice()
-			if rec {
-				defer cuda.Recycle(jspin)
-			}
-			// TODO: select, xi is not enough
-			cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(), Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
-
-			if !FixedLayer.isZero() {
-				cuda.AddSlonczewskiTorque(dst, M.buffer, jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(), Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu())
-			}
-		}
-	})
-
-	Torque.init(3, &globalmesh, "torque", "T", "Total torque/γ0", func(b *data.Slice) {
-		LLTorque.set(b)
-		STTorque.addTo(b)
-	})
-
+	LLTorque.init(VECTOR, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
+	STTorque.init(VECTOR, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
+	Torque.init(3, &globalmesh, "torque", "T", "Total torque/γ0", SetTorque)
+	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 }
 
-// TODO: could implement maxnorm(torque) (getfunc)
+// Sets dst to the current total torque
+func SetTorque(dst *data.Slice) {
+	SetLLTorque(dst)
+	AddSTTorque(dst)
+}
+
+// Sets dst to the current Landau-Lifshitz torque
+func SetLLTorque(dst *data.Slice) {
+	B_eff.set(dst)                                                    // calc and store B_eff
+	cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
+}
+
+// Adds the current spin transfer torque to dst
+func AddSTTorque(dst *data.Slice) {
+	if !J.isZero() {
+		util.AssertMsg(!Pol.isZero(), "spin polarization should not be 0")
+		jspin, rec := J.Slice()
+		if rec {
+			defer cuda.Recycle(jspin)
+		}
+		// TODO: select, xi is not enough
+		cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(),
+			Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
+
+		if !FixedLayer.isZero() {
+			cuda.AddSlonczewskiTorque(dst, M.buffer, jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
+				Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu())
+		}
+	}
+}
+
+// Gets
 func GetMaxTorque() float64 {
 	torque, recycle := Torque.Slice()
 	if recycle {

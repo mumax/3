@@ -32,7 +32,7 @@ func init() {
 		cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
 	})
 
-	J.SetValue(1) // default spin polarization
+	Pol.setUniform([]float64{1}) // default spin polarization
 
 	STTorque.init(VECTOR, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", func(dst *data.Slice) {
 		if !J.isZero() {

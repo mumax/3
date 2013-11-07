@@ -12,7 +12,7 @@ var (
 	Temp      ScalarParam
 	temp_red  derivedParam
 	B_therm   adder
-	E_therm   = NewGetScalar("E_therm", "J", "Thermal energy", getThermalEnergy)
+	E_therm   *GetScalar
 	generator curand.Generator
 	thermSeed int64 = 0
 )
@@ -20,8 +20,11 @@ var (
 func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
+	B_therm.init(3, &globalmesh, "B_therm", "T", "Thermal field", AddThermalField)
+	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", getThermalEnergy)
+	registerEnergy(getThermalEnergy)
 
-	// TODO: derived parameters are a bit fragile
+	// reduced temperature = (alpha * T) / (mu0 * Msat)
 	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedParam) {
 		dst := temp_red.cpu_buf
 		alpha := Alpha.cpuLUT()
@@ -31,32 +34,30 @@ func init() {
 			dst[0][i] = safediv(alpha[0][i]*T[0][i], mag.Mu0*Ms[0][i])
 		}
 	})
+}
 
-	B_therm.init(3, &globalmesh, "B_therm", "T", "Thermal field", func(dst *data.Slice) {
-		if !Temp.isZero() {
-			util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
-			if generator == 0 {
-				generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
-				generator.SetSeed(thermSeed)
-			}
-
-			N := globalmesh.NCell()
-			kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
-
-			noise := cuda.Buffer(1, &globalmesh)
-			defer cuda.Recycle(noise)
-
-			const mean = 0
-			const stddev = 1
-			for i := 0; i < 3; i++ {
-				generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-				cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
-					kmu0_VgammaDt, regions.Gpu(), stream0)
-			}
+func AddThermalField(dst *data.Slice) {
+	if !Temp.isZero() {
+		util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
+		if generator == 0 {
+			generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
+			generator.SetSeed(thermSeed)
 		}
-	})
 
-	registerEnergy(getThermalEnergy)
+		N := globalmesh.NCell()
+		kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
+
+		noise := cuda.Buffer(1, &globalmesh)
+		defer cuda.Recycle(noise)
+
+		const mean = 0
+		const stddev = 1
+		for i := 0; i < 3; i++ {
+			generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
+			cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
+				kmu0_VgammaDt, regions.Gpu(), stream0)
+		}
+	}
 }
 
 func getThermalEnergy() float64 {

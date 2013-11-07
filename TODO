@@ -3,12 +3,10 @@ bugs:
 
 need proper zhang-li boundary conditions
 layers shape reportedly not OK
-web gui sometimes shows gray upper part for m image
 
 API:
 ----
 
-remove excitation_PerRegion exports
 check region defined?
 
 improvements:

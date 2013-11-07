@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	Init(0, "auto")
+	Init(0, "auto", false)
 }
 
 func TestSlice(t *testing.T) {
@@ -93,18 +93,18 @@ func TestSliceHost(t *testing.T) {
 	N0, N1, N2 := 1, 10, 10
 	c := 1e-6
 	m := data.NewMesh(N0, N1, N2, c, c, c)
-	a := NewUnifiedSlice(3, m)
+	a := NewSlice(3, m)
 	defer a.Free()
 
-	b := a.Host()
+	b := a.HostCopy().Host()
 	if b[0][0] != 0 || b[1][42] != 0 || b[2][99] != 0 {
-		t.Fail()
+		t.Error("slice not inited to zero")
 	}
 
 	Memset(a, 1, 2, 3)
-	b = a.Host()
+	b = a.HostCopy().Host()
 	if b[0][0] != 1 || b[1][42] != 2 || b[2][99] != 3 {
-		t.Fail()
+		t.Error("slice memset")
 	}
 }
 

@@ -14,9 +14,9 @@ func NewSlice(nComp int, m *data.Mesh) *data.Slice {
 }
 
 // Make a GPU Slice with nComp components each of size length.
-func NewUnifiedSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, cu.MemAllocHost, data.UnifiedMemory)
-}
+//func NewUnifiedSlice(nComp int, m *data.Mesh) *data.Slice {
+//	return newSlice(nComp, m, cu.MemAllocHost, data.UnifiedMemory)
+//}
 
 func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
 	data.EnableGPU(memFree, cu.MemFreeHost, memCpy, memCpyDtoH, memCpyHtoD)
@@ -47,16 +47,13 @@ func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
 }
 
 func memCpy(dst, src unsafe.Pointer, bytes int64) {
-	if synchronous { // debug
-		Sync()
-	}
+	Sync()
 	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
-	if synchronous { // debug
-		Sync()
-	}
+	Sync()
 }
 
 // Memset sets the Slice's components to the specified values.
+// To be carefully used on unified slice (need sync)
 func Memset(s *data.Slice, val ...float32) {
 	if synchronous { // debug
 		Sync()

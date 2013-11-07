@@ -2,12 +2,7 @@ package util
 
 // Logging and error reporting utility functions
 
-import (
-	"log"
-	//"fmt"
-	//"path"
-	//"runtime"
-)
+import "log"
 
 // If err != nil, trigger log.Fatal(msg, err)
 func FatalErr(err interface{}, msg ...interface{}) {
@@ -29,17 +24,6 @@ func LogErr(err error, msg ...interface{}) {
 		log.Println(append(msg, err)...)
 	}
 }
-
-// Debug message, includes file + line.
-//func Debug(msg ...interface{}) {
-//	_, file, line, ok := runtime.Caller(1)
-//	file = path.Base(file)
-//	caller := ""
-//	if ok {
-//		caller = fmt.Sprint(file, ":", line, ":")
-//	}
-//	log.Println(append([]interface{}{caller}, msg...)...)
-//}
 
 // Panics with "illegal argument" if test is false.
 func Argument(test bool) {

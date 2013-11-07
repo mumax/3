@@ -23,30 +23,25 @@ func init() {
 	DeclFunc("SetCellSize", setCellSize, `Sets the X,Y,Z cell size in meters`)
 	DeclFunc("SetPBC", setPBC, `Sets number of repetitions in X,Y,Z`)
 
-	// magnetization
 	M.init(VECTOR, "m", "", `Reduced magnetization (unit length)`, &globalmesh)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
+	B_eff.init(VECTOR, &globalmesh, "B_eff", "T", "Effective field", SetEffectiveField)
+}
 
-	// effective field
-	B_eff.init(VECTOR, &globalmesh, "B_eff", "T", "Effective field", func(dst *data.Slice) {
-		B_demag.set(dst)  // set to B_demag...
-		B_exch.addTo(dst) // ...then add other terms
-		B_anis.addTo(dst)
-		B_ext.addTo(dst)
-		B_therm.addTo(dst)
-		cuda.Sync(stream0) // probaly not needed
-	})
+// Sets dst to the current effective field (T).
+func SetEffectiveField(dst *data.Slice) {
+	B_demag.set(dst)  // set to B_demag...
+	B_exch.addTo(dst) // ...then add other terms
+	B_anis.addTo(dst)
+	B_ext.addTo(dst)
+	B_therm.addTo(dst)
+	//cuda.Sync(stream0) // probaly not needed
 }
 
 func Mesh() *data.Mesh {
 	checkMesh()
 	return &globalmesh
 }
-
-//func WorldSize() [3]float64 {
-//	w := Mesh().WorldSize()
-//	return [3]float64{w[2], w[1], w[0]} // swaps XYZ
-//}
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.

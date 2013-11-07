@@ -37,26 +37,27 @@ func init() {
 }
 
 func AddThermalField(dst *data.Slice) {
-	if !Temp.isZero() {
-		util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
-		if generator == 0 {
-			generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
-			generator.SetSeed(thermSeed)
-		}
+	if Temp.isZero() {
+		return
+	}
+	util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
+	if generator == 0 {
+		generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
+		generator.SetSeed(thermSeed)
+	}
 
-		N := globalmesh.NCell()
-		kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
+	N := globalmesh.NCell()
+	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
 
-		noise := cuda.Buffer(1, &globalmesh)
-		defer cuda.Recycle(noise)
+	noise := cuda.Buffer(1, &globalmesh)
+	defer cuda.Recycle(noise)
 
-		const mean = 0
-		const stddev = 1
-		for i := 0; i < 3; i++ {
-			generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-			cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
-				kmu0_VgammaDt, regions.Gpu(), stream0)
-		}
+	const mean = 0
+	const stddev = 1
+	for i := 0; i < 3; i++ {
+		generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
+		cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(),
+			kmu0_VgammaDt, regions.Gpu(), stream0)
 	}
 }
 

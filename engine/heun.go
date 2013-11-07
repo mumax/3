@@ -27,11 +27,13 @@ func HeunStep(s *solver) {
 	s.torqueFn(dy)
 	s.NEval++
 
+	// determine error
 	err := 0.0
 	if s.FixDt == 0 { // time step not fixed
 		err = cuda.MaxVecDiff(dy0, dy) * float64(dt)
 	}
 
+	// adjust next time step
 	if err < s.MaxErr || s.Dt_si <= s.MinDt { // mindt check to avoid infinite loop
 		// step OK
 		cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)

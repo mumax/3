@@ -1,0 +1,43 @@
+/* Regression test for bug reported by Mathias Helsen, nov 2013
+   region used only for output influences simulation.
+*/
+
+expect("TODO", 0, 1, 0)
+
+Nx := 256
+Ny := 256
+Nz := 1
+
+setgridsize(Nx, Ny, Nz)
+thickness := 20.0e-9
+diameter := 1.0e-6
+setcellsize(diameter/Nx, diameter/Ny, thickness/Nz)
+setgeom(cylinder(diameter, thickness))
+
+m = vortex(1, 1)
+
+Msat = 860.0e3
+Aex = 12e-12
+alpha = 3
+
+runwhile(maxtorque > 5e-4)
+
+alpha = 0.01
+A := 10*1.0e-3
+f := 6.88495e9
+
+mSavetime := 1.0/(8.0*f)
+
+t0 := t 
+
+B_ext = vector( 0.0, 0.0, A*sin(2*pi*f*(t-t0))*(1.0 - exp(-2*pi*f*(t-t0))) )
+
+spot := circle(diameter/50.0).transl(diameter/5.0, diameter/7.0, 0.0)
+defregion(1, spot)
+
+autosave(m, mSavetime)
+tableadd(m.region(1))
+tableadd(B_ext)
+tableautosave(1e-12)
+run(1e-8)
+

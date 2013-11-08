@@ -1,11 +1,14 @@
-setgridsize(4, 3, 1)
-setcellsize(5e-9, 5e-9, 5e-9)
+Nx := 400
+Ny := 400
+c := 2e-9
 
-m = uniform(0,0,1)
+setgridsize(Nx, Ny, 1)
+setcellsize(c, c, c)
 
-MFMLift = 60e-9
 Msat = 1/mu0
 
-print("m", m) 
-print("MFM", MFM)
+m.setcell(0, 0, 0, 1., 0., 0.)
 
+MFMLift = 50e-9
+
+print(MFM)

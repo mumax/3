@@ -3,15 +3,13 @@ package cuda
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
-	"github.com/mumax/3/util"
-	"log"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
 type MFMConvolution struct {
 	size        [3]int         // 3D size of the input/output data
 	kernSize    [3]int         // Size of kernel and logical FFT size.
-	fftKernSize [3]int         // Size of real, FFTed kernel
+	fftKernSize [3]int         //
 	fftRBuf     *data.Slice    // FFT input buf for FFT, shares storage with fftCBuf.
 	fftCBuf     *data.Slice    // FFT output buf, shares storage with fftRBuf
 	gpuFFTKern  [3]*data.Slice // FFT kernel on device
@@ -31,29 +29,25 @@ func (c *MFMConvolution) init() {
 	c.fftCBuf = makeFloats(nc)
 	c.fftRBuf = c.fftCBuf.Slice(0, prod(c.kernSize))
 
+	c.gpuFFTKern[X] = makeFloats(nc)
+	c.gpuFFTKern[Y] = makeFloats(nc)
+	c.gpuFFTKern[Z] = makeFloats(nc)
+
 	c.initFFTKern3D()
 }
 
 func (c *MFMConvolution) initFFTKern3D() {
 
-	// size of FFT(kernel): store real parts only
 	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
-	util.Assert(c.fftKernSize[X]%2 == 0)
-	c.fftKernSize[X] /= 2
 
-	// will store only 1/4 (symmetry), but not yet
-	halfkern := c.fftKernSize
-
-	output := c.fftCBuf
-	input := c.fftRBuf
-
-	fftKern := data.NewSlice(1, data.NewMesh(halfkern[X], halfkern[Y], halfkern[Z], 1, 1, 1)) // host
 	for i := 0; i < 3; i++ {
-		data.Copy(input, c.kern[i])
-		c.fwPlan.Exec(input, output)
-		scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
-		log.Println(fftKern)
-		c.gpuFFTKern[i] = GPUCopy(fftKern)
+		zero1_async(c.fftRBuf)
+		data.Copy(c.fftRBuf, c.kern[i])
+		c.fwPlan.Exec(c.fftRBuf, c.fftCBuf)
+		scale := 2 / float32(c.fwPlan.InputLen())
+		zero1_async(c.gpuFFTKern[i])
+		Madd2(c.gpuFFTKern[i], c.gpuFFTKern[i], c.fftCBuf, 0, scale)
+		dbg("kern", i, c.gpuFFTKern[i].HostCopy())
 	}
 }
 
@@ -64,17 +58,20 @@ func (c *MFMConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes
 func (c *MFMConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 
 	for i := 0; i < 3; i++ {
-		// fw fft
+		dbg("in", inp.Comp(i).HostCopy())
 		zero1_async(c.fftRBuf)
 		copyPadMul(c.fftRBuf, inp.Comp(i), vol, c.kernSize, c.size, Bsat, regions)
 		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)
+		dbg("fw FFT", c.fftCBuf.HostCopy())
 
-		// kern mul Z
 		Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
-		kernMulRSymm2Dz_async(c.fftCBuf, c.gpuFFTKern[i], Nx, Ny)
+		kernMulC_async(c.fftCBuf, c.gpuFFTKern[i], Nx, Ny)
+		dbg("mul", c.fftCBuf.HostCopy())
 
 		c.bwPlan.ExecAsync(c.fftCBuf, c.fftRBuf)
+		dbg("bw FFT", c.fftCBuf.HostCopy())
 		copyUnPad(outp.Comp(i), c.fftRBuf, c.size, c.kernSize)
+		dbg("out ", outp.Comp(i).HostCopy())
 	}
 }
 

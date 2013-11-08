@@ -28,6 +28,13 @@ func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int) {
 	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), Kzz.DevPtr(0), Nx, Ny, cfg, stream0)
 }
 
+func kernMulC_async(fftM, K *data.Slice, Nx, Ny int) {
+	util.Argument(fftM.NComp() == 1 && K.NComp() == 1)
+	cfg := make3DConf([3]int{Nx, Ny, 1})
+	k_kernmulC_async(fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg, stream0)
+	//dbg("k_kernmulC_async(", fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg, stream0)
+}
+
 // Does not yet use Y mirror symmetry!!
 // Even though it is implemented partially in kernel
 func kernMulRSymm3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *data.Slice, Nx, Ny, Nz int) {

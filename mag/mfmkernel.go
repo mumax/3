@@ -9,9 +9,9 @@ import (
 
 func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
-	const TipCharge = 1e-18 // tip charge
-	const Δ = 1e-9          // tip oscillation
-	util.AssertMsg(lift != 0, "MFM tip just crashed into sample, buy new one")
+	const TipCharge = 1 // tip charge
+	const Δ = 1e-9      // tip oscillation
+	util.AssertMsg(lift > 0, "MFM tip crashed into sample, please lift the new one higher")
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
 		pbc := mesh.PBC()
@@ -24,6 +24,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	// Shorthand
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
+	volume := cellsize[X] * cellsize[Y] * cellsize[Z]
 	fmt.Print("calculating MFM kernel")
 
 	// Sanity check
@@ -54,6 +55,8 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 	for s := 0; s < 3; s++ { // source index Ksxyz
 		fmt.Print(".")
+		m := d.Vector{0, 0, 0}
+		m[s] = 1
 
 		for iz := z1; iz <= z2; iz++ {
 			zw := wrap(iz, size[Z])
@@ -70,18 +73,31 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 					R1 := d.Vector{-x, -y, z - lift}
 					r1 := R1.Len()
 					B1 := R1.Mul(TipCharge / (4 * math.Pi * r1 * r1 * r1))
+					// add 2nd pole here
+					E1 := B1.Dot(m) * volume
 
 					R2 := d.Vector{-x, -y, z - (lift + Δ)}
 					r2 := R2.Len()
 					B2 := R2.Mul(TipCharge / (4 * math.Pi * r2 * r2 * r2))
+					// add 2nd pole here
+					E2 := B2.Dot(m) * volume
 
-					Fz_tip := ((B2.Sub(B1)).Div(Δ))[s] // dot m_s (=1)
+					Fz_tip := (E2 - E1) / Δ
 
 					K[s][zw][yw][xw] = float32(Fz_tip)
+					K[s][zw][yw][xw] = 0
 				}
 			}
 		}
 	}
-	fmt.Println(kernel)
+
+	K[X][0][0][0] = 1
+	K[Y][0][0][0] = 1
+	K[Z][0][0][0] = 1
+
+	fmt.Println()
+	d.WriteFile("mfmkx.dump", kernel[X], d.Meta{})
+	d.WriteFile("mfmky.dump", kernel[Y], d.Meta{})
+	d.WriteFile("mfmkz.dump", kernel[Z], d.Meta{})
 	return kernel
 }

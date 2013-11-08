@@ -85,15 +85,15 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 					Fz_tip := (E2 - E1) / Δ
 
 					K[s][zw][yw][xw] = float32(Fz_tip)
-					K[s][zw][yw][xw] = 0
+					//K[s][zw][yw][xw] = 0
 				}
 			}
 		}
 	}
 
-	K[X][0][0][0] = 1
-	K[Y][0][0][0] = 1
-	K[Z][0][0][0] = 1
+	//	K[X][0][0][0] = 1
+	//	K[Y][0][0][0] = 1
+	//	K[Z][0][0][0] = 1
 
 	fmt.Println()
 	d.WriteFile("mfmkx.dump", kernel[X], d.Meta{})

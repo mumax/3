@@ -44,10 +44,10 @@ func (c *MFMConvolution) initFFTKern3D() {
 		zero1_async(c.fftRBuf)
 		data.Copy(c.fftRBuf, c.kern[i])
 		c.fwPlan.Exec(c.fftRBuf, c.fftCBuf)
-		scale := 2 / float32(c.fwPlan.InputLen())
+		scale := 2 / float32(c.fwPlan.InputLen()) // ??
 		zero1_async(c.gpuFFTKern[i])
 		Madd2(c.gpuFFTKern[i], c.gpuFFTKern[i], c.fftCBuf, 0, scale)
-		dbg("kern", i, c.gpuFFTKern[i].HostCopy())
+		//dbg("kern", i, c.gpuFFTKern[i].HostCopy())
 	}
 }
 
@@ -58,20 +58,20 @@ func (c *MFMConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes
 func (c *MFMConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 
 	for i := 0; i < 3; i++ {
-		dbg("in", inp.Comp(i).HostCopy())
+		//dbg("in", inp.Comp(i).HostCopy())
 		zero1_async(c.fftRBuf)
 		copyPadMul(c.fftRBuf, inp.Comp(i), vol, c.kernSize, c.size, Bsat, regions)
 		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)
-		dbg("fw FFT", c.fftCBuf.HostCopy())
+		//dbg("fw FFT", c.fftCBuf.HostCopy())
 
-		Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
+		Nx, Ny := c.fftKernSize[X]/2, c.fftKernSize[Y] //   ??
 		kernMulC_async(c.fftCBuf, c.gpuFFTKern[i], Nx, Ny)
-		dbg("mul", c.fftCBuf.HostCopy())
+		//dbg("mul", c.fftCBuf.HostCopy())
 
 		c.bwPlan.ExecAsync(c.fftCBuf, c.fftRBuf)
-		dbg("bw FFT", c.fftCBuf.HostCopy())
+		//dbg("bw FFT", c.fftCBuf.HostCopy())
 		copyUnPad(outp.Comp(i), c.fftRBuf, c.size, c.kernSize)
-		dbg("out ", outp.Comp(i).HostCopy())
+		//dbg("out ", outp.Comp(i).HostCopy())
 	}
 }
 

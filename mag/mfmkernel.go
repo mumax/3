@@ -9,8 +9,8 @@ import (
 
 func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
-	const TipCharge = 1 // tip charge
-	const Δ = 1e-9      // tip oscillation
+	const TipCharge = 1 / Mu0 // tip charge
+	const Δ = 1e-9            // tip oscillation
 	util.AssertMsg(lift > 0, "MFM tip crashed into sample, please lift the new one higher")
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
@@ -73,13 +73,21 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 					R1 := d.Vector{-x, -y, z - lift}
 					r1 := R1.Len()
 					B1 := R1.Mul(TipCharge / (4 * math.Pi * r1 * r1 * r1))
-					// add 2nd pole here
+
+					R1 = d.Vector{-x, -y, z - (lift + tipsize)}
+					r1 = R1.Len()
+					B1 = B1.Add(R1.Mul(-TipCharge / (4 * math.Pi * r1 * r1 * r1)))
+
 					E1 := B1.Dot(m) * volume
 
 					R2 := d.Vector{-x, -y, z - (lift + Δ)}
 					r2 := R2.Len()
 					B2 := R2.Mul(TipCharge / (4 * math.Pi * r2 * r2 * r2))
-					// add 2nd pole here
+
+					R2 = d.Vector{-x, -y, z - (lift + tipsize + Δ)}
+					r2 = R2.Len()
+					B2 = B2.Add(R2.Mul(-TipCharge / (4 * math.Pi * r2 * r2 * r2)))
+
 					E2 := B2.Dot(m) * volume
 
 					Fz_tip := (E2 - E1) / Δ

@@ -8,13 +8,14 @@ import (
 var (
 	MFM        setter
 	MFMLift    float64 = 30e-9
-	MFMTipSize float64
+	MFMTipSize float64 = 1e-3
 	mfmconv_   *cuda.MFMConvolution
 )
 
 func init() {
 	MFM.init(SCALAR, &globalmesh, "MFM", "", "MFM image", SetMFM)
 	DeclVar("MFMLift", &MFMLift, "MFM tip lift")
+	DeclVar("MFMTipSize", &MFMTipSize, "MFM tip size")
 }
 
 func SetMFM(dst *data.Slice) {

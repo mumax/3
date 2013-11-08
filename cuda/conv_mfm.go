@@ -16,6 +16,7 @@ type MFMConvolution struct {
 	fwPlan      fft3DR2CPlan   // Forward FFT (1 component)
 	bwPlan      fft3DC2RPlan   // Backward FFT (1 component)
 	kern        [3]*data.Slice // Real-space kernel (host)
+	mesh        *data.Mesh
 }
 
 func (c *MFMConvolution) init() {
@@ -58,21 +59,21 @@ func (c *MFMConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes
 func (c *MFMConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 
 	for i := 0; i < 3; i++ {
-		//dbg("in", inp.Comp(i).HostCopy())
 		zero1_async(c.fftRBuf)
 		copyPadMul(c.fftRBuf, inp.Comp(i), vol, c.kernSize, c.size, Bsat, regions)
 		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)
-		//dbg("fw FFT", c.fftCBuf.HostCopy())
 
 		Nx, Ny := c.fftKernSize[X]/2, c.fftKernSize[Y] //   ??
 		kernMulC_async(c.fftCBuf, c.gpuFFTKern[i], Nx, Ny)
-		//dbg("mul", c.fftCBuf.HostCopy())
 
 		c.bwPlan.ExecAsync(c.fftCBuf, c.fftRBuf)
-		//dbg("bw FFT", c.fftCBuf.HostCopy())
 		copyUnPad(outp.Comp(i), c.fftRBuf, c.size, c.kernSize)
-		//dbg("out ", outp.Comp(i).HostCopy())
 	}
+}
+
+func (c *MFMConvolution) Reinit(lift, tipsize float64) {
+	c.kern = mag.MFMKernel(c.mesh, lift, tipsize)
+	c.initFFTKern3D()
 }
 
 // Initializes a convolution to evaluate the demag field for the given mesh geometry.
@@ -84,5 +85,6 @@ func NewMFM(mesh *data.Mesh, lift, tipsize float64) *MFMConvolution {
 	c.kern = k
 	c.kernSize = k[X].Mesh().Size()
 	c.init()
+	c.mesh = mesh
 	return c
 }

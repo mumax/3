@@ -54,7 +54,7 @@ func (s *State) Example(in string) string {
 
 	// exec input file
 	check(ioutil.WriteFile(s.infile(), []byte(in), 0666))
-	arg := "-s"
+	arg := "-v"
 	if *flag_vet {
 		arg = "-vet"
 	}

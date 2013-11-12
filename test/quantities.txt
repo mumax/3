@@ -20,6 +20,5 @@ alpha = 1
 expect("alpha", alpha.Average(), 1, 1e-5)
 
 anisC1 = vector(1, 2, 3)
-n := vector(1, 2, 3).len()
-expectV("anisC1", anisC1.Average(), vector(1/n, 2/n, 3/n), 1e-5)
+expectV("anisC1", anisC1.Average(), vector(1, 2, 3), 1e-5)
 

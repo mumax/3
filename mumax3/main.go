@@ -16,6 +16,7 @@ import (
 
 var (
 	flag_version = flag.Bool("v", false, "Print version")
+	flag_silent  = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	flag_vet     = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od      = flag.String("o", "", "Override output directory")
 	flag_force   = flag.Bool("f", false, "Force start, clean existing output directory")

@@ -3,9 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-
 	"runtime"
 )
 
@@ -36,7 +34,6 @@ func SetEffectiveField(dst *data.Slice) {
 	B_anis.addTo(dst)
 	B_ext.addTo(dst)
 	B_therm.addTo(dst)
-	//cuda.Sync(stream0) // probaly not needed
 }
 
 func Mesh() *data.Mesh {
@@ -58,10 +55,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
-
-	Solver = NewSolver(M.buffer, Torque.set, normalize, 1e-15, mag.Gamma0, HeunStep)
-	solvertype = 2 // HeunStep
-
 	Table.Add(&M)
 }
 

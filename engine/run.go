@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 )
 
@@ -18,10 +19,11 @@ func init() {
 	DeclVar("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
 	DeclVar("Headroom", &Solver.Headroom, "Solver headroom")
 	DeclVar("FixDt", &Solver.FixDt, "Set a fixed time step. 0 disables fixed step.")
+	SetSolver(HEUN)
 }
 
 var (
-	Solver     solver
+	Solver     = NewSolver(Torque.set, normalize, 1e-15, mag.Gamma0, HeunStep)
 	Time       float64             // time in seconds
 	pause      bool                // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step
@@ -40,6 +42,11 @@ func SetSolver(typ int) {
 	}
 	solvertype = typ
 }
+
+const (
+	EULER = 1
+	HEUN  = 2
+)
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
@@ -71,7 +78,7 @@ func RunWhile(condition func() bool) {
 }
 
 func step() {
-	Solver.Step()
+	Solver.Step(M.buffer)
 	for _, f := range postStep {
 		f()
 	}

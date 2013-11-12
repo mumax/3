@@ -22,7 +22,6 @@ type Regions struct {
 	cpu        []byte      // arr data, stored contiguously
 	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool        // gpuCache in sync with cpu
-	//maxreg     int         // highest used region
 	doc
 }
 

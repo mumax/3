@@ -71,7 +71,6 @@ type exchParam struct {
 	lut, override  [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
-
 }
 
 func (p *exchParam) invalidate() { p.cpu_ok = false }
@@ -100,7 +99,7 @@ func (p *exchParam) update() {
 		aex := Aex.cpuLUT()
 
 		// todo: conditional
-		for i := 0; i < regions.maxreg; i++ {
+		for i := 0; i < NREGION; i++ {
 			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
 			for j := 0; j <= i; j++ {
 				I := symmidx(i, j)
@@ -174,7 +173,7 @@ func symmidx(i, j int) int {
 //}
 func (p *exchParam) String() string {
 	str := ""
-	for j := 0; j < regions.maxreg; j++ {
+	for j := 0; j < NREGION; j++ {
 		for i := 0; i <= j; i++ {
 			str += fmt.Sprint(p.lut[symmidx(i, j)], "\t")
 		}

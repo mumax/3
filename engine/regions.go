@@ -22,7 +22,7 @@ type Regions struct {
 	cpu        []byte      // arr data, stored contiguously
 	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool        // gpuCache in sync with cpu
-	maxreg     int         // highest used region
+	//maxreg     int         // highest used region
 	doc
 }
 
@@ -68,9 +68,9 @@ func defRegionId(id int) {
 	if id < 0 || id > NREGION {
 		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
 	}
-	if id+1 > regions.maxreg {
-		regions.maxreg = id + 1 // we loop < maxreg, so +1
-	}
+	//	if id+1 > regions.maxreg {
+	//		regions.maxreg = id + 1 // we loop < maxreg, so +1
+	//	}
 	checkMesh()
 }
 

@@ -2,7 +2,6 @@
    region used only for output influences simulation.
 */
 
-expect("TODO", 0, 1, 0)
 
 Nx := 256
 Ny := 256

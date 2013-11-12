@@ -11,13 +11,12 @@ import (
 // makes sure it's normalized etc.
 type magnetization struct {
 	buffer *data.Slice
-	info
 }
 
-// init metadata but does not allocate yet
-func (m *magnetization) init(nComp int, name, unit, doc_ string, mesh *data.Mesh) {
-	m.info = Info(nComp, name, unit, mesh)
-}
+func (m *magnetization) Mesh() *data.Mesh { return Mesh() }
+func (m *magnetization) NComp() int       { return 3 }
+func (m *magnetization) Name() string     { return "m" }
+func (m *magnetization) Unit() string     { return "" }
 
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (m *magnetization) alloc() {

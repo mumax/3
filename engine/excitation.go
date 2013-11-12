@@ -29,7 +29,7 @@ func (e *excitation) init(name, unit, desc string) {
 	DeclLValue(name, e, cat(desc, unit))
 }
 
-func (e *excitation) addTo(dst *data.Slice) {
+func (e *excitation) AddTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {
 		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu())
 	}
@@ -49,7 +49,7 @@ func (e *excitation) isZero() bool {
 func (e *excitation) Slice() (*data.Slice, bool) {
 	buf := cuda.Buffer(e.NComp(), e.Mesh())
 	cuda.Zero(buf)
-	e.addTo(buf)
+	e.AddTo(buf)
 	return buf, true
 }
 

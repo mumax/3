@@ -8,7 +8,7 @@ import (
 // quantity that is not explicitly stored,
 // but only added to an other quantity (like effective field contributions)
 type adder struct {
-	addTo func(dst *data.Slice) // calculates quantity and add result to dst
+	_addTo func(dst *data.Slice) // calculates quantity and add result to dst
 	info
 }
 
@@ -22,7 +22,7 @@ func (q *adder) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc fu
 func (q *adder) Slice() (s *data.Slice, recycle bool) {
 	buf := cuda.Buffer(q.NComp(), q.Mesh())
 	cuda.Zero(buf)
-	q.addTo(buf)
+	q.AddTo(buf)
 	return buf, true
 }
 
@@ -31,3 +31,5 @@ func (q *adder) TableData() []float64 { return Average(q) }
 
 // Value of this quantity restricted to one region.
 func (q *adder) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
+
+func (q *adder) AddTo(dst *data.Slice) { q._addTo(dst) }

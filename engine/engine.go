@@ -30,10 +30,10 @@ func init() {
 // Sets dst to the current effective field (T).
 func SetEffectiveField(dst *data.Slice) {
 	B_demag.Set(dst)  // set to B_demag...
-	B_exch.addTo(dst) // ...then add other terms
-	B_anis.addTo(dst)
-	B_ext.addTo(dst)
-	B_therm.addTo(dst)
+	B_exch.AddTo(dst) // ...then add other terms
+	B_anis.AddTo(dst)
+	B_ext.AddTo(dst)
+	B_therm.AddTo(dst)
 }
 
 func Mesh() *data.Mesh {

@@ -3,13 +3,25 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"reflect"
 )
 
 // Special buffered quantity to store magnetization
 // makes sure it's normalized etc.
 type magnetization struct {
-	buffered
+	buffer *data.Slice
+	info
+}
+
+// init metadata but does not allocate yet
+func (m *magnetization) init(nComp int, name, unit, doc_ string, mesh *data.Mesh) {
+	m.info = Info(nComp, name, unit, mesh)
+}
+
+// allocate storage (not done by init, as mesh size may not yet be known then)
+func (m *magnetization) alloc() {
+	m.buffer = cuda.NewSlice(3, m.Mesh())
 }
 
 func (b *magnetization) Set(src *data.Slice) {
@@ -20,9 +32,33 @@ func (b *magnetization) Set(src *data.Slice) {
 	cuda.Normalize(b.buffer, vol())
 }
 
-func (b *magnetization) LoadFile(fname string) {
-	b.Set(LoadFile(fname))
+func (m *magnetization) LoadFile(fname string) {
+	m.Set(LoadFile(fname))
 }
+
+func (m *magnetization) Slice() (s *data.Slice, recycle bool) {
+	return m.buffer, false
+}
+
+func (m *magnetization) Region(r int) *sliceInRegion { return &sliceInRegion{m, r} }
+
+func (m *magnetization) String() string { return util.Sprint(m.buffer.HostCopy()) }
+
+// Set the value of one cell.
+func (m *magnetization) SetCell(ix, iy, iz int, v ...float64) {
+	nComp := m.NComp()
+	util.Argument(len(v) == nComp)
+	for c := 0; c < nComp; c++ {
+		cuda.SetCell(m.buffer, c, ix, iy, iz, float32(v[c]))
+	}
+}
+
+// Get the value of one cell.
+func (m *magnetization) GetCell(comp, ix, iy, iz int) float64 {
+	return float64(cuda.GetCell(m.buffer, comp, ix, iy, iz))
+}
+
+func (m *magnetization) TableData() []float64 { return Average(m) }
 
 // Sets the magnetization inside the shape
 func (m *magnetization) SetInShape(region Shape, conf Config) {

@@ -26,7 +26,7 @@ type entry struct {
 }
 
 func buildAPI() {
-	cuda.Init(0, "yield") // gpu 0
+	cuda.Init(0, "yield", false) // gpu 0
 	cuda.LockThread()
 
 	ident := engine.World.Identifiers

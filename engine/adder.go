@@ -21,8 +21,7 @@ func (q *adder) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc fu
 // recycle is true: slice needs to be recycled.
 func (q *adder) Slice() (s *data.Slice, recycle bool) {
 	buf := cuda.Buffer(q.NComp(), q.Mesh())
-	cuda.Zero(buf)
-	q.AddTo(buf)
+	q.Set(buf)
 	return buf, true
 }
 
@@ -33,3 +32,8 @@ func (q *adder) TableData() []float64 { return Average(q) }
 func (q *adder) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
 
 func (q *adder) AddTo(dst *data.Slice) { q._addTo(dst) }
+
+func (q *adder) Set(dst *data.Slice) {
+	cuda.Zero(dst)
+	q.AddTo(dst)
+}

@@ -55,7 +55,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
-	Table.Add(&M)
 }
 
 func normalize(m *data.Slice) {

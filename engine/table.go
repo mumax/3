@@ -13,6 +13,7 @@ func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
 	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
 	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table ever period (s).")
+	Table.Add(&M)
 }
 
 type DataTable struct {

@@ -7,7 +7,7 @@ import (
 
 // quantity that is not stored, but can output to (set) a buffer
 type setter struct {
-	set func(dst *data.Slice) // calculates quantity and stores in dst
+	_set func(dst *data.Slice) // calculates quantity and stores in dst
 	info
 }
 
@@ -20,9 +20,10 @@ func (q *setter) init(nComp int, m *data.Mesh, name, unit, doc string, setFunc f
 // get the quantity, recycle will be true (q needs to be recycled)
 func (b *setter) Slice() (q *data.Slice, recycle bool) {
 	buffer := cuda.Buffer(b.nComp, b.mesh)
-	b.set(buffer)
+	b.Set(buffer)
 	return buffer, true // must recycle
 }
 
 func (q *setter) TableData() []float64        { return Average(q) }
 func (q *setter) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
+func (q *setter) Set(dst *data.Slice)         { q._set(dst) }

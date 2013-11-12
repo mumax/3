@@ -29,7 +29,7 @@ func init() {
 
 // Sets dst to the current effective field (T).
 func SetEffectiveField(dst *data.Slice) {
-	B_demag.set(dst)  // set to B_demag...
+	B_demag.Set(dst)  // set to B_demag...
 	B_exch.addTo(dst) // ...then add other terms
 	B_anis.addTo(dst)
 	B_ext.addTo(dst)

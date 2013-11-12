@@ -43,7 +43,7 @@ func SetTorque(dst *data.Slice) {
 
 // Sets dst to the current Landau-Lifshitz torque
 func SetLLTorque(dst *data.Slice) {
-	B_eff.set(dst)                                                    // calc and store B_eff
+	B_eff.Set(dst)                                                    // calc and store B_eff
 	cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
 }
 

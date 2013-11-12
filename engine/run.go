@@ -23,7 +23,7 @@ func init() {
 }
 
 var (
-	Solver     = NewSolver(Torque.set, normalize, 1e-15, mag.Gamma0, HeunStep)
+	Solver     = NewSolver(Torque.Set, normalize, 1e-15, mag.Gamma0, HeunStep)
 	Time       float64             // time in seconds
 	pause      bool                // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step

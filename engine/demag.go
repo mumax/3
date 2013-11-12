@@ -37,7 +37,7 @@ func init() {
 // Sets dst to the current demag field
 func SetDemagField(dst *data.Slice) {
 	if EnableDemag {
-		demagConv().Exec(dst, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
+		demagConv().Exec(dst, M.Buffer(), vol(), Bsat.gpuLUT1(), regions.Gpu())
 	} else {
 		cuda.Zero(dst) // will ADD other terms to it
 	}
@@ -50,7 +50,7 @@ func SetMFull(dst *data.Slice) {
 		defer cuda.Recycle(msat)
 	}
 	for c := 0; c < 3; c++ {
-		cuda.Mul(dst.Comp(c), M.buffer.Comp(c), msat)
+		cuda.Mul(dst.Comp(c), M.Buffer().Comp(c), msat)
 	}
 }
 

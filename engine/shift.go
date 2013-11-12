@@ -17,7 +17,7 @@ func updateShift(dir, sign int) {
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {
-	shift(M.buffer, dx, 0, 0)
+	shift(M.Buffer(), dx, 0, 0)
 	regions.shift(dx, 0, 0)
 	geometry.shift(dx)
 	updateShift(X, -dx)

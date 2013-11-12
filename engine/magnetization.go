@@ -10,25 +10,26 @@ import (
 // Special buffered quantity to store magnetization
 // makes sure it's normalized etc.
 type magnetization struct {
-	buffer *data.Slice
+	buffer_ *data.Slice
 }
 
-func (m *magnetization) Mesh() *data.Mesh { return Mesh() }
-func (m *magnetization) NComp() int       { return 3 }
-func (m *magnetization) Name() string     { return "m" }
-func (m *magnetization) Unit() string     { return "" }
+func (m *magnetization) Mesh() *data.Mesh    { return Mesh() }
+func (m *magnetization) NComp() int          { return 3 }
+func (m *magnetization) Name() string        { return "m" }
+func (m *magnetization) Unit() string        { return "" }
+func (m *magnetization) Buffer() *data.Slice { return m.buffer_ }
 
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (m *magnetization) alloc() {
-	m.buffer = cuda.NewSlice(3, m.Mesh())
+	m.buffer_ = cuda.NewSlice(3, m.Mesh())
 }
 
 func (b *magnetization) Set(src *data.Slice) {
-	if src.Mesh().Size() != b.buffer.Mesh().Size() {
-		src = data.Resample(src, b.buffer.Mesh().Size())
+	if src.Mesh().Size() != b.Mesh().Size() {
+		src = data.Resample(src, b.Mesh().Size())
 	}
-	data.Copy(b.buffer, src)
-	cuda.Normalize(b.buffer, vol())
+	data.Copy(b.Buffer(), src)
+	cuda.Normalize(b.Buffer(), vol())
 }
 
 func (m *magnetization) LoadFile(fname string) {
@@ -36,25 +37,25 @@ func (m *magnetization) LoadFile(fname string) {
 }
 
 func (m *magnetization) Slice() (s *data.Slice, recycle bool) {
-	return m.buffer, false
+	return m.Buffer(), false
 }
 
 func (m *magnetization) Region(r int) *sliceInRegion { return &sliceInRegion{m, r} }
 
-func (m *magnetization) String() string { return util.Sprint(m.buffer.HostCopy()) }
+func (m *magnetization) String() string { return util.Sprint(m.Buffer().HostCopy()) }
 
 // Set the value of one cell.
 func (m *magnetization) SetCell(ix, iy, iz int, v ...float64) {
 	nComp := m.NComp()
 	util.Argument(len(v) == nComp)
 	for c := 0; c < nComp; c++ {
-		cuda.SetCell(m.buffer, c, ix, iy, iz, float32(v[c]))
+		cuda.SetCell(m.Buffer(), c, ix, iy, iz, float32(v[c]))
 	}
 }
 
 // Get the value of one cell.
 func (m *magnetization) GetCell(comp, ix, iy, iz int) float64 {
-	return float64(cuda.GetCell(m.buffer, comp, ix, iy, iz))
+	return float64(cuda.GetCell(m.Buffer(), comp, ix, iy, iz))
 }
 
 func (m *magnetization) TableData() []float64 { return Average(m) }
@@ -64,7 +65,7 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 	if region == nil {
 		region = universe
 	}
-	host := m.buffer.HostCopy()
+	host := m.Buffer().HostCopy()
 	h := host.Vectors()
 	n := m.Mesh().Size()
 
@@ -87,7 +88,7 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 
 // set m to config in region
 func (m *magnetization) SetRegion(region int, conf Config) {
-	host := m.buffer.HostCopy()
+	host := m.Buffer().HostCopy()
 	h := host.Vectors()
 	n := m.Mesh().Size()
 	r := byte(region)

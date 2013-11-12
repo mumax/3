@@ -31,7 +31,7 @@ func init() {
 // Adds the current exchange field to dst
 func AddExchangeField(dst *data.Slice) {
 	if Dex.isZero() {
-		cuda.AddExchange(dst, M.buffer, lex2.Gpu(), regions.Gpu())
+		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu())
 	} else {
 		// DMI only implemented for uniform parameters
 		// interaction not clear with space-dependent parameters
@@ -41,7 +41,7 @@ func AddExchangeField(dst *data.Slice) {
 		msat := Msat.GetRegion(0)
 		D := Dex.GetRegion(0)
 		A := Aex.GetRegion(0) / msat
-		cuda.AddDMI(dst, M.buffer, float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A)) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A)) // dmi+exchange
 	}
 }
 

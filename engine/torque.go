@@ -43,8 +43,8 @@ func SetTorque(dst *data.Slice) {
 
 // Sets dst to the current Landau-Lifshitz torque
 func SetLLTorque(dst *data.Slice) {
-	B_eff.Set(dst)                                                    // calc and store B_eff
-	cuda.LLTorque(dst, M.buffer, dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
+	B_eff.Set(dst)                                                      // calc and store B_eff
+	cuda.LLTorque(dst, M.Buffer(), dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
 }
 
 // Adds the current spin transfer torque to dst
@@ -58,11 +58,11 @@ func AddSTTorque(dst *data.Slice) {
 		defer cuda.Recycle(jspin)
 	}
 	// TODO: select, xi is not enough
-	cuda.AddZhangLiTorque(dst, M.buffer, jspin, Bsat.gpuLUT1(),
+	cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
 		Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu())
 
 	if !FixedLayer.isZero() {
-		cuda.AddSlonczewskiTorque(dst, M.buffer, jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
+		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
 			Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu())
 	}
 }

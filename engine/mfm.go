@@ -29,7 +29,7 @@ func SetMFM(dst *data.Slice) {
 		mfmconv_ = cuda.NewMFM(Mesh(), MFMLift.v, MFMTipSize.v)
 	}
 
-	mfmconv_.Exec(buf, M.buffer, vol(), Bsat.gpuLUT1(), regions.Gpu())
+	mfmconv_.Exec(buf, M.Buffer(), vol(), Bsat.gpuLUT1(), regions.Gpu())
 	cuda.Madd3(dst, buf.Comp(0), buf.Comp(1), buf.Comp(2), 1, 1, 1)
 }
 

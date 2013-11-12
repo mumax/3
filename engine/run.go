@@ -78,7 +78,7 @@ func RunWhile(condition func() bool) {
 }
 
 func step() {
-	Solver.Step(M.buffer)
+	Solver.Step(M.Buffer())
 	for _, f := range postStep {
 		f()
 	}

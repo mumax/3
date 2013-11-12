@@ -76,7 +76,7 @@ func (geometry *geom) setGeom(s Shape) {
 	geometry.spaceFill = fill / float64(Mesh().NCell())
 
 	data.Copy(geometry.buffer, V)
-	cuda.Normalize(M.buffer, vol()) // removes m outside vol
+	cuda.Normalize(M.Buffer(), vol()) // removes m outside vol
 }
 
 func (g *geom) shift(dx int) {

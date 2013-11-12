@@ -100,10 +100,10 @@ func checkMesh() {
 // check if m is set
 func checkM() {
 	checkMesh()
-	if M.buffer.DevPtr(0) == nil {
+	if M.Buffer().DevPtr(0) == nil {
 		util.Fatal("need to initialize magnetization first")
 	}
-	if cuda.MaxVecNorm(M.buffer) == 0 {
+	if cuda.MaxVecNorm(M.Buffer()) == 0 {
 		util.Fatal("need to initialize magnetization first")
 	}
 }

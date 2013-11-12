@@ -1,8 +1,28 @@
+3.4 changelog
+-------------
+
+  * JPol (spin polarized current density) had to be split in quantities J (current density) and Pol (spin polarization). This allows material dependent spin-polarization and opens the possibility for Oersted-Ampère fields. Existing input files will need to replace "JPol" by "J". Pol defaults to 1 so does not need to be set explicitly.
+
+  * A fix for the nvidia TITAN gpu has been issued, it can now safely be used.
+
+  * The exchange between different regions (materials) does not default to 0 anymore, but to the harmonic mean of exchange lengths in 
+
+  * Some obsolete command line flags like -bl -bx -by have been dropped
+
+minor changes:
+
+  * Internally, the coordinate system has been converted to right-handed. This should be transparent to the user unless low-level functionality is accessed.
+
+
+
+
+
 bugs:
 -----
 
 need proper zhang-li boundary conditions
-layers shape reportedly not OK
+
+reduce operations are non-reproducible, though OK within numerical precission.
 
 API:
 ----
@@ -19,7 +39,6 @@ add "nointeractive" flag, interactive() api
 web: use next free port if already in use
 cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
-hide buffered.Mesh(), .Comp() etc. (ZYX axes)
 non-fatal error handling for GUI
 log.FatalErr: print line number of caller?
 

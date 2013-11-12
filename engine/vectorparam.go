@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"reflect"
@@ -46,6 +47,8 @@ func (p *VectorParam) GetRegion(region int) [3]float64 {
 func (p *VectorParam) Eval() interface{}       { return p }
 func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
 func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t }
+
+func (p *VectorParam) Average() data.Vector { return unslice(Average(p)) }
 
 // shortcut for slicing unaddressable_vector()[:]
 func slice(v [3]float64) []float64 {

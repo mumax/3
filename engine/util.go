@@ -12,6 +12,7 @@ import (
 
 func init() {
 	DeclFunc("Expect", Expect, "Used for automated tests: checks if a value is close enough to the expected value")
+	DeclFunc("ExpectV", ExpectV, "Used for automated tests: checks if a vector is close enough to the expected value")
 	DeclFunc("Fprintln", Fprintln, "Print to file")
 	DeclFunc("Sign", sign, "Signum function")
 	DeclPure("Vector", MakeVector, "Constructs a vector with given components")
@@ -43,6 +44,12 @@ func Expect(msg string, have, want, maxError float64) {
 		fmt.Println(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
+}
+
+func ExpectV(msg string, have, want data.Vector, maxErr float64) {
+	for c := 0; c < 3; c++ {
+		Expect(fmt.Sprintf("%v[%v]", msg, c), have[c], want[c], maxErr)
+	}
 }
 
 // Append msg to file. Used to write aggregated output of many simulations in one file.

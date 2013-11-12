@@ -2,7 +2,6 @@
    region used only for output influences simulation.
 */
 
-
 Nx := 256
 Ny := 256
 Nz := 1
@@ -34,9 +33,19 @@ B_ext = vector( 0.0, 0.0, A*sin(2*pi*f*(t-t0))*(1.0 - exp(-2*pi*f*(t-t0))) )
 spot := circle(diameter/50.0).transl(diameter/5.0, diameter/7.0, 0.0)
 defregion(1, spot)
 
-autosave(m, mSavetime)
-tableadd(m.region(1))
-tableadd(B_ext)
-tableautosave(1e-12)
-run(1e-8)
+run(0.5e-9)
+
+m_ := average(m.region(1))
+tol := 1e-5
+expect("mx", m_[0], -0.4543135506766183, tol)
+expect("my", m_[1],  0.8869750613257998, tol)
+expect("mz", m_[2],  0.0804117293584914, tol)
+
+run(0.5e-9)
+
+m_ = average(m.region(1))
+expect("mx", m_[0], -0.7082362402053106, tol)
+expect("my", m_[1],  0.6975658053443545, tol)
+expect("mz", m_[2], -0.1068760781061081, tol)
+
 

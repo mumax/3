@@ -20,6 +20,10 @@ func (a Vector) Add(b Vector) Vector {
 	return Vector{a[0] + b[0], a[1] + b[1], a[2] + b[2]}
 }
 
+func (a Vector) MAdd(s float64, b Vector) Vector {
+	return Vector{a[0] + s*b[0], a[1] + s*b[1], a[2] + s*b[2]}
+}
+
 func (a Vector) Sub(b Vector) Vector {
 	return Vector{a[0] - b[0], a[1] - b[1], a[2] - b[2]}
 }

@@ -165,26 +165,33 @@ Some initial magnetization functions are provided, as well as transformations si
 setgridsize(200, 100, 1)
 setcellsize(5e-9, 5e-9, 5e-9)
 
-m = uniform(1, 1, 0)  // no need to normalize length
+m = Uniform(1, 1, 0)  // no need to normalize length
 saveas(m, "uniform")
 
-m = vortex(1, -1)     // circulation, polarization
+m = Vortex(1, -1)     // circulation, polarization
 saveas(m, "vortex")
 
-m = twodomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
+m = TwoDomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
 saveas(m, "twodomain")
 
-m = twodomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
+randSeed(123)
+m = RandomMag()
+saveas(m, "randommag")
+
+m = TwoDomain(1,0,0,  0,1,0,  -1,0,0).rotz(-pi/4)
 saveas(m, "twodomain_rot")
 
-m = vortexwall(1, -1, 1, 1) 
+m = VortexWall(1, -1, 1, 1) 
 saveas(m, "vortexwall")
 
-m = vortexwall(1, -1, 1, 1).scale(1/2, 1, 1)
+m = VortexWall(1, -1, 1, 1).scale(1/2, 1, 1)
 saveas(m, "vortexwall_scale")
 
-m = vortex(1,-1).transl(100e-9, 50e-9, 0)
+m = Vortex(1,-1).transl(100e-9, 50e-9, 0)
 saveas(m, "vortex_transl")
+
+m = Vortex(1,-1).Add(0.1, randomMag())
+saveas(m, "vortex_add_random")
 
 // set m in only a part of space, or a single cell:
 m = uniform(1, 1, 1)

@@ -9,15 +9,26 @@ import (
 )
 
 func init() {
-	DeclFunc("uniform", Uniform, "Uniform magnetization in given direction")
-	DeclFunc("vortex", Vortex, "Vortex magnetization with given core circulation and polarization")
-	DeclFunc("twodomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
-	DeclFunc("vortexwall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
-	DeclFunc("addnoise", AddNoise, "Add noise with given amplitude to configuration")
+	DeclFunc("Uniform", Uniform, "Uniform magnetization in given direction")
+	DeclFunc("Vortex", Vortex, "Vortex magnetization with given core circulation and polarization")
+	DeclFunc("TwoDomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
+	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
+	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
 type Config func(x, y, z float64) data.Vector
+
+func RandomMag() Config {
+	return func(x, y, z float64) data.Vector {
+		phi := rand.Float64() * (2 * math.Pi)
+		theta := rand.Float64() * math.Pi
+		x1 := math.Sin(theta) * math.Cos(phi)
+		y1 := math.Sin(theta) * math.Sin(phi)
+		z1 := math.Cos(theta)
+		return data.Vector{x1, y1, z1}
+	}
+}
 
 // Returns a uniform magnetization state. E.g.:
 // 	M = Uniform(1, 0, 0)) // saturated along X
@@ -110,13 +121,9 @@ func (c Config) RotZ(θ float64) Config {
 	}
 }
 
-func AddNoise(amplitude float64, c Config) Config {
+func (c Config) Add(weight float64, other Config) Config {
 	return func(x, y, z float64) data.Vector {
-		m := c(x, y, z)
-		for i := range m {
-			m[i] += (rand.Float64() - 0.5)
-		}
-		return m
+		return c(x, y, z).MAdd(weight, other(x, y, z))
 	}
 }
 

@@ -18,6 +18,10 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 	x := w.compileExpr(n.X)
 	t := x.Type()
 
+	if t == nil {
+		panic(err(n.Pos(), "void does not have member", n.Sel.Name))
+	}
+
 	sel := strings.ToLower(n.Sel.Name)
 	N := ""
 	for i := 0; i < t.NumMethod(); i++ {

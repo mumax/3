@@ -10,41 +10,41 @@ import (
 )
 
 // block statement is a list of statements.
-type blockStmt struct {
+type BlockStmt struct {
 	children []Expr
 	node     []ast.Node
 }
 
 // does not enter scope because it does not necessarily needs to (e.g. for, if).
-func (w *World) compileBlockStmt_noScope(n *ast.BlockStmt) *blockStmt {
-	b := &blockStmt{}
+func (w *World) compileBlockStmt_noScope(n *ast.BlockStmt) *BlockStmt {
+	b := &BlockStmt{}
 	for _, s := range n.List {
 		b.append(w.compileStmt(s), s)
 	}
 	return b
 }
 
-func (b *blockStmt) append(s Expr, n ast.Node) {
+func (b *BlockStmt) append(s Expr, n ast.Node) {
 	b.children = append(b.children, s)
 	b.node = append(b.node, n)
 }
 
-func (b *blockStmt) Eval() interface{} {
+func (b *BlockStmt) Eval() interface{} {
 	for _, s := range b.children {
 		s.Eval()
 	}
 	return nil
 }
 
-func (b *blockStmt) Type() reflect.Type {
+func (b *BlockStmt) Type() reflect.Type {
 	return nil
 }
 
-func (b *blockStmt) Child() []Expr {
+func (b *BlockStmt) Child() []Expr {
 	return b.children
 }
 
-func (b *blockStmt) Format() string {
+func (b *BlockStmt) Format() string {
 	var buf bytes.Buffer
 	fset := token.NewFileSet()
 	for i := range b.children {

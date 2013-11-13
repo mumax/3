@@ -50,7 +50,7 @@ func (w *World) MustCompileExpr(src string) Expr {
 // 	src = "a = 1; b = sin(x)"
 // 	code, err := world.Compile(src)
 // 	code.Eval()
-func (w *World) Compile(src string) (code Expr, e error) {
+func (w *World) Compile(src string) (code *BlockStmt, e error) {
 	// parse
 	exprSrc := "func(){\n" + src + "\n}" // wrap in func to turn into expression
 	tree, err := parser.ParseExpr(exprSrc)
@@ -79,7 +79,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 	if Debug {
 		ast.Print(nil, stmts)
 	}
-	block := new(blockStmt)
+	block := new(BlockStmt)
 	for _, s := range stmts {
 		block.append(w.compile(s), s)
 	}

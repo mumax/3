@@ -32,11 +32,20 @@ check region defined?
 improvements:
 -------------
 
+MFM: also work with PBC (simple kernel change)
+MFM: don't crash on tip crash ;-), just zero kernel
+
+DMI: also work with PBC
+
+
 remove -f flag, move existing files to name.old
 fprintln: put file in OD if not absolute
-add "nointeractive" flag, interactive() api
 
-web: use next free port if already in use
+master process assigns ports (clean fail if port in use, start new instance on next port?) and GPU
+	web iface of master shows que?
+	mumax3 -que add to que, return?
+
+
 cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
 non-fatal error handling for GUI

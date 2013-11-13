@@ -69,6 +69,8 @@ func (p *simpleParam) SetValue(v interface{}) {
 }
 
 func reinitmfmconv() {
+	SetBusy("calculating MFM kernel")
+	defer SetBusy("")
 	if mfmconv_ == nil {
 		mfmconv_ = cuda.NewMFM(Mesh(), MFMLift.v, MFMTipSize.v)
 	} else {

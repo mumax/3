@@ -9,6 +9,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,8 @@ var (
 	guiRegion      = -1                                      // currently addressed region
 	usingX, usingY = 1, 2                                    // columns to plot
 	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
+	busyMsg        string                                    // set busy message here when doing slow initialization
+	guiLock        sync.Mutex
 )
 
 // displayable in GUI Parameters section
@@ -34,6 +37,18 @@ type Param interface {
 type guidata struct {
 	Quants map[string]Slicer
 	Params map[string]Param
+}
+
+func SetBusy(msg string) {
+	guiLock.Lock()
+	defer guiLock.Unlock()
+	busyMsg = msg
+}
+
+func busy() string {
+	guiLock.Lock()
+	defer guiLock.Unlock()
+	return busyMsg
 }
 
 // list of text box id's for component text boxes.
@@ -193,7 +208,15 @@ func Serve(port string) {
 		gui.SetValue("memstats", memstats.TotalAlloc/(1024))
 	}
 
-	gui.OnRefresh(func() { Inject <- onrefresh })
+	gui.OnRefresh(func() {
+		// do not inject into run() loop if we are very busy doing other stuff
+		busy := busy()
+		if busy != "" {
+			gui.SetValue("solverstatus", fmt.Sprint(busy)) // show we are busy, ignore the rest
+		} else {
+			Inject <- onrefresh
+		}
+	})
 
 	util.LogErr(http.ListenAndServe(port, nil))
 	runtime.Gosched()
@@ -215,7 +238,7 @@ func Eval(code string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			gui_.SetValue("ErrorBox", fmt.Sprint(err))
+			gui_.SetValue("solverstatus", fmt.Sprint(err)) // TODO: not solverstatus
 			util.Log(err)
 		}
 	}()

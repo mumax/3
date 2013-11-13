@@ -6,7 +6,6 @@ import (
 	"github.com/mumax/3/engine"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 )
 
@@ -38,7 +37,8 @@ func bSat() float64 {
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
-	log.Println("calculating field to compensate nanowire surface charge")
+	engine.SetBusy("calculating field to compensate nanowire surface charge")
+	defer engine.SetBusy("")
 	h := data.NewSlice(3, m)
 	H := h.Vectors()
 	world := m.WorldSize()

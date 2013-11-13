@@ -252,12 +252,7 @@ func Eval(code string) {
 	}
 }
 
-func atoi(x interface{}) int {
-	i, err := strconv.Atoi(fmt.Sprint(x))
-	util.LogErr(err)
-	return i
-}
-
+// TODO: unify with Eval
 func handleCommand() {
 	gui := gui_
 	command := gui.Value("command").(string)
@@ -276,6 +271,12 @@ func handleCommand() {
 			gui.SetValue("cmdret", "")
 		}
 	}
+}
+
+func atoi(x interface{}) int {
+	i, err := strconv.Atoi(fmt.Sprint(x))
+	util.LogErr(err)
+	return i
 }
 
 func hist(command string) {

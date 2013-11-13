@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+	"time"
 )
 
 func init() {
@@ -75,6 +76,19 @@ func RunWhile(condition func() bool) {
 		}
 	}
 	pause = true
+}
+
+// exit finished simulation this long after browser was closed
+const Timeout = 3 * time.Second
+
+// Enter interactive mode. Simulation is now exclusively controlled by web GUI
+func RunInteractive() {
+	fmt.Println("entering interactive mode")
+	for time.Since(KeepAlive()) < Timeout {
+		f := <-Inject
+		f()
+	}
+	fmt.Println("browser disconnected, exiting")
 }
 
 func step() {

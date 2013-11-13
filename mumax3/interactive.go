@@ -7,32 +7,8 @@ import (
 	"time"
 )
 
-func Interactive() {
-	fmt.Println("entering interactive mode")
-	for {
-		f := <-engine.Inject
-		f()
-	}
-}
-
-// Enter interactive mode. Simulation is now exclusively controlled
-// by web GUI (default: http://localhost:35367)
-// TODO: rename
-func RunInteractive() {
-	//engine.Pause()
-	fmt.Println("entering interactive mode")
-	for time.Since(engine.KeepAlive()) < timeout {
-		f := <-engine.Inject
-		f()
-	}
-	fmt.Println("browser disconnected, exiting")
-}
-
-// exit finished simulation this long after browser was closed
-const timeout = 3 * time.Second
-
 func keepBrowserAlive() {
-	if time.Since(engine.KeepAlive()) < timeout {
+	if time.Since(engine.KeepAlive()) < engine.Timeout {
 		fmt.Println("keeping session open to browser")
 		go func() {
 			for {
@@ -40,7 +16,7 @@ func keepBrowserAlive() {
 				time.Sleep(1 * time.Second)
 			}
 		}()
-		RunInteractive()
+		engine.RunInteractive()
 	}
 }
 

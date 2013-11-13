@@ -35,7 +35,7 @@ func main() {
 	}
 
 	flag.Parse()
-	engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
+	//engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
 
 	log.SetPrefix("")
 	log.SetFlags(0)

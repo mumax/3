@@ -85,7 +85,6 @@ func render(quant Slicer, comp string) {
 			defer cuda.Recycle(buf)
 		}
 		if !buf.GPUAccess() {
-			util.Log("no GPU access for", quant.Name)
 			imgBuf = Download(quant) // fallback (no zoom)
 			return
 		}

@@ -33,6 +33,20 @@ func DeclROnly(name string, value interface{}, doc string) {
 	guiAdd(name, value)
 }
 
+var history string
+
+// evaluate code, exit on error (behavior for input files)
+func EvalFile(code *script.BlockStmt) {
+	for i := range code.Children {
+		history += script.Format(code.Node[i]) + "<br/>"
+		code.Children[i].Eval()
+	}
+}
+
+//func EvalGUI(code*script.BlockStmt){
+//
+//}
+
 func guiAdd(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		params[name] = v

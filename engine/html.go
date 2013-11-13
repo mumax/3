@@ -67,11 +67,9 @@ const templText = `
 
 	<h2> command </h2><div>
 		<p style="font-family:monospace; color:gray; font-size:0.75em">
-		{{.Span "hist2"}} <br/>
-		{{.Span "hist1"}} <br/>
-		{{.Span "hist0"}} <br/>
-		{{.Span "cmdret"}} <br/>
+		{{.Span "hist"}} <br/>
 		{{.TextBoxSize "command" 64 ""}} <br/>
+		<p style="font-weight:bold; color:red"> {{.Span "cmderr" }} </p>
 	</div><hr/>
 
 

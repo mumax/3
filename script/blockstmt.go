@@ -11,8 +11,8 @@ import (
 
 // block statement is a list of statements.
 type BlockStmt struct {
-	children []Expr
-	node     []ast.Node
+	Children []Expr
+	Node     []ast.Node
 }
 
 // does not enter scope because it does not necessarily needs to (e.g. for, if).
@@ -25,12 +25,12 @@ func (w *World) compileBlockStmt_noScope(n *ast.BlockStmt) *BlockStmt {
 }
 
 func (b *BlockStmt) append(s Expr, n ast.Node) {
-	b.children = append(b.children, s)
-	b.node = append(b.node, n)
+	b.Children = append(b.Children, s)
+	b.Node = append(b.Node, n)
 }
 
 func (b *BlockStmt) Eval() interface{} {
-	for _, s := range b.children {
+	for _, s := range b.Children {
 		s.Eval()
 	}
 	return nil
@@ -41,14 +41,21 @@ func (b *BlockStmt) Type() reflect.Type {
 }
 
 func (b *BlockStmt) Child() []Expr {
-	return b.children
+	return b.Children
+}
+
+func Format(n ast.Node) string {
+	var buf bytes.Buffer
+	fset := token.NewFileSet()
+	format.Node(&buf, fset, n)
+	return buf.String()
 }
 
 func (b *BlockStmt) Format() string {
 	var buf bytes.Buffer
 	fset := token.NewFileSet()
-	for i := range b.children {
-		format.Node(&buf, fset, b.node[i])
+	for i := range b.Children {
+		format.Node(&buf, fset, b.Node[i])
 		fmt.Fprintln(&buf)
 	}
 	return buf.String()

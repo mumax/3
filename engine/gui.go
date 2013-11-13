@@ -143,6 +143,8 @@ func Serve(port string) {
 	// periodically update time, steps, etc
 	onrefresh := func() {
 
+		gui.SetValue("hist", history)
+
 		// geometry
 		size := globalmesh.Size()
 		gui.SetValue("nx", size[0])
@@ -244,7 +246,7 @@ func Eval(code string) {
 	}()
 	tree, err := World.Compile(code)
 	if err == nil {
-		hist(tree.Format())
+		history += tree.Format() + "<br/>"
 		tree.Eval()
 	} else {
 		gui_.SetValue("paramErr", fmt.Sprint(err))
@@ -259,17 +261,13 @@ func handleCommand() {
 	Inject <- func() {
 		tree, err := World.Compile(command)
 		if err != nil {
-			gui.SetValue("cmdret", fmt.Sprint(err))
+			gui.SetValue("cmderr", fmt.Sprint(err))
 			return
 		}
-		hist(tree.Format())
+		history += tree.Format() + "<br/>"
 		gui.SetValue("command", "")
-		ret := tree.Eval()
-		if ret != nil {
-			gui.SetValue("cmdret", fmt.Sprint(ret))
-		} else {
-			gui.SetValue("cmdret", "")
-		}
+		tree.Eval()
+		gui.SetValue("cmderr", "")
 	}
 }
 
@@ -277,10 +275,4 @@ func atoi(x interface{}) int {
 	i, err := strconv.Atoi(fmt.Sprint(x))
 	util.LogErr(err)
 	return i
-}
-
-func hist(command string) {
-	gui_.SetValue("hist2", gui_.Value("hist1"))
-	gui_.SetValue("hist1", gui_.Value("hist0"))
-	gui_.SetValue("hist0", command)
 }

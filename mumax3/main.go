@@ -97,5 +97,5 @@ func RunFileAndServe(fname string) {
 	go engine.Serve(*flag_port)
 
 	// start executing the tree, possibly injecting commands from web gui
-	code.Eval()
+	engine.EvalFile(code)
 }

@@ -112,7 +112,7 @@ func Serve(port string) {
 				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}
 			cmd += ");"
-			Inject <- func() { Eval(cmd, gui) }
+			Inject <- func() { Eval(cmd) }
 		}
 		for _, id := range compIds {
 			gui.OnEvent(id, handler)
@@ -211,19 +211,20 @@ func inj(f func()) func() {
 	return func() { Inject <- f }
 }
 
-func Eval(code string, gui *gui.Doc) {
+func Eval(code string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			gui.SetValue("ErrorBox", fmt.Sprint(err))
+			gui_.SetValue("ErrorBox", fmt.Sprint(err))
 			util.Log(err)
 		}
 	}()
 	tree, err := World.Compile(code)
 	if err == nil {
+		hist(code)
 		tree.Eval()
 	} else {
-		gui.SetValue("paramErr", fmt.Sprint(err))
+		gui_.SetValue("paramErr", fmt.Sprint(err))
 		util.Log(err)
 	}
 }
@@ -243,9 +244,7 @@ func handleCommand() {
 			gui.SetValue("cmdret", fmt.Sprint(err))
 			return
 		}
-		gui.SetValue("hist2", gui.Value("hist1"))
-		gui.SetValue("hist1", gui.Value("hist0"))
-		gui.SetValue("hist0", command)
+		hist(command)
 		gui.SetValue("command", "")
 		ret := tree.Eval()
 		if ret != nil {
@@ -254,4 +253,10 @@ func handleCommand() {
 			gui.SetValue("cmdret", "")
 		}
 	}
+}
+
+func hist(command string) {
+	gui_.SetValue("hist2", gui_.Value("hist1"))
+	gui_.SetValue("hist1", gui_.Value("hist0"))
+	gui_.SetValue("hist0", command)
 }

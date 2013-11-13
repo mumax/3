@@ -25,11 +25,11 @@ func RunInteractive() {
 		f := <-engine.Inject
 		f()
 	}
-	fmt.Println("interactive session idle, exiting")
+	fmt.Println("browser disconnected, exiting")
 }
 
 // exit finished simulation this long after browser was closed
-const timeout = 2 * time.Second
+const timeout = 3 * time.Second
 
 func keepBrowserAlive() {
 	if time.Since(engine.KeepAlive()) < timeout {

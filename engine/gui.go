@@ -80,6 +80,7 @@ func Serve(port string) {
 	gui.OnEvent("renderComp", func() { renderComp = gui.Value("renderComp").(string) })
 	gui.OnEvent("renderScale", func() { renderScale = 33 - gui.Value("renderScale").(int) })
 	gui.OnEvent("renderLayer", func() { renderLayer = gui.Value("renderLayer").(int) })
+	gui.OnEvent("command", handleCommand)
 
 	// display
 	gui.SetValue("sel_render", renderQ)
@@ -231,4 +232,26 @@ func atoi(x interface{}) int {
 	i, err := strconv.Atoi(fmt.Sprint(x))
 	util.LogErr(err)
 	return i
+}
+
+func handleCommand() {
+	gui := gui_
+	command := gui.Value("command").(string)
+	Inject <- func() {
+		tree, err := World.Compile(command)
+		if err != nil {
+			gui.SetValue("cmdret", fmt.Sprint(err))
+			return
+		}
+		gui.SetValue("hist2", gui.Value("hist1"))
+		gui.SetValue("hist1", gui.Value("hist0"))
+		gui.SetValue("hist0", command)
+		gui.SetValue("command", "")
+		ret := tree.Eval()
+		if ret != nil {
+			gui.SetValue("cmdret", fmt.Sprint(ret))
+		} else {
+			gui.SetValue("cmdret", "")
+		}
+	}
 }

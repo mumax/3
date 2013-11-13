@@ -65,6 +65,16 @@ const templText = `
 	</div><hr/>
 
 
+	<h2> command </h2><div>
+		{{.Span "hist2"}} <br/>
+		{{.Span "hist1"}} <br/>
+		{{.Span "hist0"}} <br/>
+		{{.TextBoxSize "command" 64 ""}} <br/>
+		{{.Span "cmdret"}}
+	</div><hr/>
+
+
+
 	<h2> solver </h2><div>
 
 		<table>
@@ -144,7 +154,6 @@ const templText = `
 		{{.Img "plot" "/plot/"}}
 
 	</div><hr/>
-
 
 	<h2> process </h2><div>
 		<table>

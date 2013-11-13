@@ -81,7 +81,7 @@ func (w *World) Compile(src string) (code Expr, e error) {
 	}
 	block := new(blockStmt)
 	for _, s := range stmts {
-		block.append(w.compile(s))
+		block.append(w.compile(s), s)
 	}
 	return block, nil
 }

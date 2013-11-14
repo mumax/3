@@ -246,7 +246,7 @@ func Eval(code string) {
 	}()
 	tree, err := World.Compile(code)
 	if err == nil {
-		history += tree.Format() + "<br/>"
+		history += tree.Format() + "\n"
 		tree.Eval()
 	} else {
 		gui_.SetValue("paramErr", fmt.Sprint(err))
@@ -264,7 +264,7 @@ func handleCommand() {
 			gui.SetValue("cmderr", fmt.Sprint(err))
 			return
 		}
-		history += tree.Format() + "<br/>"
+		history += tree.Format() + "\n"
 		gui.SetValue("command", "")
 		tree.Eval()
 		gui.SetValue("cmderr", "")

@@ -12,6 +12,7 @@
 minor changes:
 
   * Internally, the coordinate system has been converted to right-handed. This should be transparent to the user unless low-level functionality is accessed.
+However, make sure you also update mumax3-convert.
 
 
 

@@ -77,8 +77,8 @@ func newWriter(out io.Writer) *writer {
 	return w
 }
 
-const MAGIC = "#dump002" // identifies dump format
-const padding = 0        // padding words before data section
+const MAGIC = "#dump003" // identifies dump format
+const padding = 18       // padding words before data section (forward compatibility)
 
 // Writes the data.
 func (w *writer) writeData(list []float32) {

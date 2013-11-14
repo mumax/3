@@ -38,7 +38,7 @@ var history string
 // evaluate code, exit on error (behavior for input files)
 func EvalFile(code *script.BlockStmt) {
 	for i := range code.Children {
-		history += script.Format(code.Node[i]) + "<br/>"
+		history += script.Format(code.Node[i]) + "\n"
 		code.Children[i].Eval()
 	}
 }

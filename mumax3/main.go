@@ -40,6 +40,14 @@ func main() {
 	log.SetPrefix("")
 	log.SetFlags(0)
 
+	if *flag_version {
+		fmt.Print("    ", engine.UNAME, "\n")
+		fmt.Print("    ", cuda.GPUInfo, "\n")
+		fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
+		fmt.Print("    This is free software without any warranty. See license.txt", "\n")
+		fmt.Print("\n")
+	}
+
 	if *flag_vet {
 		vet()
 	}
@@ -59,14 +67,6 @@ func main() {
 	cuda.TileY = 32
 	cuda.Init(*flag_gpu, "yield", *flag_sync)
 	cuda.LockThread()
-
-	if *flag_version {
-		fmt.Print("    ", engine.UNAME, "\n")
-		fmt.Print("    ", cuda.GPUInfo, "\n")
-		fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
-		fmt.Print("    This is free software without any warranty. See license.txt", "\n")
-		fmt.Print("\n")
-	}
 
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)

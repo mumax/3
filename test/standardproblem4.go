@@ -8,6 +8,7 @@ import (
 func main() {
 
 	Init()
+	SetOD("standardproblem4.out", true)
 	defer Close()
 
 	SetGridSize(128, 32, 1)
@@ -16,7 +17,7 @@ func main() {
 	Msat.Set(800e3)
 	Aex.Set(13e-12)
 	M.Set(Uniform(1, .1, 0))
-	AutoSave(&M, 10e-12)
+	AutoSave(&M, 100e-12)
 
 	TableAdd(MaxTorque)
 	TableAutoSave(5e-12)

@@ -1,4 +1,4 @@
-package mainpkg
+package main
 
 import (
 	"github.com/mumax/3/engine"

@@ -86,10 +86,6 @@ func RunFiles() {
 	}
 }
 
-func Close() {
-	engine.Close()
-}
-
 // Runs a script file.
 func runFileAndServe(fname string) {
 	// first we compile the entire file into an executable tree

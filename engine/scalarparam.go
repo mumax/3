@@ -24,12 +24,14 @@ func (p *ScalarParam) SetValue(v interface{}) {
 	p.setRegionsFunc(0, NREGION, f)
 }
 
+func (p *ScalarParam) Set(v float64) {
+	p.setRegions(0, NREGION, []float64{v})
+}
+
 func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if Const(f) {
-		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is constant")
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
-		//log.Println(p.Name(), "[", r1, ":", r2, "]", "is not constant")
 		p.setFunc(r1, r2, func() []float64 {
 			return []float64{f.Float()}
 		})

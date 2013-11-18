@@ -24,7 +24,7 @@ func (m *magnetization) alloc() {
 	m.buffer_ = cuda.NewSlice(3, m.Mesh())
 }
 
-func (b *magnetization) Set(src *data.Slice) {
+func (b *magnetization) SetArray(src *data.Slice) {
 	if src.Mesh().Size() != b.Mesh().Size() {
 		src = data.Resample(src, b.Mesh().Size())
 	}
@@ -32,8 +32,12 @@ func (b *magnetization) Set(src *data.Slice) {
 	cuda.Normalize(b.Buffer(), vol())
 }
 
+func (m *magnetization) Set(c Config) {
+	m.SetInShape(nil, c)
+}
+
 func (m *magnetization) LoadFile(fname string) {
-	m.Set(LoadFile(fname))
+	m.SetArray(LoadFile(fname))
 }
 
 func (m *magnetization) Slice() (s *data.Slice, recycle bool) {
@@ -83,7 +87,7 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 			}
 		}
 	}
-	m.Set(host)
+	m.SetArray(host)
 }
 
 // set m to config in region
@@ -107,7 +111,7 @@ func (m *magnetization) SetRegion(region int, conf Config) {
 			}
 		}
 	}
-	m.Set(host)
+	m.SetArray(host)
 }
 
 func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }

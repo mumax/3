@@ -115,6 +115,10 @@ func (e *excitation) SetValue(v interface{}) {
 	e.perRegion.SetValue(v) // allows function of time
 }
 
+func (e *excitation) Set(v data.Vector) {
+	e.perRegion.setRegions(0, NREGION, slice(v))
+}
+
 func (e *excitation) Name() string            { return e.name }
 func (e *excitation) Unit() string            { return e.perRegion.Unit() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }

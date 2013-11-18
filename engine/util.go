@@ -15,7 +15,7 @@ func init() {
 	DeclFunc("ExpectV", ExpectV, "Used for automated tests: checks if a vector is close enough to the expected value")
 	DeclFunc("Fprintln", Fprintln, "Print to file")
 	DeclFunc("Sign", sign, "Signum function")
-	DeclPure("Vector", MakeVector, "Constructs a vector with given components")
+	DeclPure("Vector", Vector, "Constructs a vector with given components")
 	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a .dump file")
@@ -31,7 +31,7 @@ func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
 }
 
 // Constructs a vector
-func MakeVector(x, y, z float64) data.Vector {
+func Vector(x, y, z float64) data.Vector {
 	return data.Vector{x, y, z}
 }
 

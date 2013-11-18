@@ -16,17 +16,17 @@ func main() {
 	Msat.Set(800e3)
 	Aex.Set(13e-12)
 	M.Set(Uniform(1, .1, 0))
-	AutoSave(M, 10e-12)
+	AutoSave(&M, 10e-12)
 
 	TableAdd(MaxTorque)
-	TableAutosave(5e-12)
+	TableAutoSave(5e-12)
 
 	// relax
 	Alpha.Set(3)
-	MaxErr.Set(1e-4)
+	Solver.MaxErr = 1e-4
 	RunWhile(func() bool { return MaxTorque.Get() > 1e-4 })
 	Run(1e-9)
-	m_ := Average(M)
+	m_ := Average(&M)
 	Expect("mx", m_[0], 0.96696, 1e-3)
 	Expect("my", m_[1], 0.12528, 1e-3)
 	Expect("mz", m_[2], 0, 1e-3)
@@ -36,7 +36,7 @@ func main() {
 
 	B_ext.Set(Vector(-24.6E-3, 4.3E-3, 0))
 	Run(1e-9)
-	m_ = Average(M)
+	m_ = Average(&M)
 	Expect("mx", m_[0], -0.9845, 1e-3)
 	Expect("my", m_[1], 0.1268, 1e-3)
 	Expect("mz", m_[2], 0.0432, 1e-3)

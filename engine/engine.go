@@ -18,9 +18,9 @@ var (
 )
 
 func init() {
-	DeclFunc("SetGridSize", setGridSize, `Sets the number of cells for X,Y,Z`)
-	DeclFunc("SetCellSize", setCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclFunc("SetPBC", setPBC, `Sets number of repetitions in X,Y,Z`)
+	DeclFunc("SetGridSize", SetGridSize, `Sets the number of cells for X,Y,Z`)
+	DeclFunc("SetCellSize", SetCellSize, `Sets the X,Y,Z cell size in meters`)
+	DeclFunc("SetPBC", SetPBC, `Sets number of repetitions in X,Y,Z`)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
 	B_eff.init(VECTOR, &globalmesh, "B_eff", "T", "Effective field", SetEffectiveField)
 }
@@ -66,21 +66,21 @@ var (
 	pbcxyz   []int
 )
 
-func setGridSize(Nx, Ny, Nz int) {
+func SetGridSize(Nx, Ny, Nz int) {
 	gridsize = []int{Nx, Ny, Nz}
 	if cellsize != nil {
 		SetMesh(Nx, Ny, Nz, cellsize[0], cellsize[1], cellsize[2])
 	}
 }
 
-func setCellSize(cx, cy, cz float64) {
+func SetCellSize(cx, cy, cz float64) {
 	cellsize = []float64{cx, cy, cz}
 	if gridsize != nil {
 		SetMesh(gridsize[0], gridsize[1], gridsize[2], cx, cy, cz)
 	}
 }
 
-func setPBC(nx, ny, nz int) {
+func SetPBC(nx, ny, nz int) {
 	if pbcxyz != nil {
 		util.Fatal("PBC alread set")
 	}

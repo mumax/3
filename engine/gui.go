@@ -174,13 +174,14 @@ func Serve(port string) {
 		}
 
 		// display
-		cachebreaker := "?" + fmt.Sprint(Solver.NSteps)
+		cachebreaker := fmt.Sprint("?", Solver.NSteps, renderScale) // scale needed if we zoom while paused
 		gui.SetValue("render", "/render/"+renderQ+cachebreaker)
 		gui.SetValue("renderComp", renderComp)
 		gui.SetValue("renderLayer", renderLayer)
 		gui.SetValue("renderScale", 33-renderScale)
 
 		// plot
+		cachebreaker = fmt.Sprint("?", Solver.NSteps)
 		gui.SetValue("plot", "/plot/"+cachebreaker)
 
 		// parameters

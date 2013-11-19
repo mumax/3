@@ -3,6 +3,7 @@ package gui
 import (
 	"bytes"
 	"log"
+	"sync"
 	"text/template"
 	"time"
 )
@@ -13,8 +14,9 @@ type Doc struct {
 	htmlCache []byte      // static html content, rendered only once
 	haveJS    bool        // have called JS()?
 	data      interface{} // any additional data to be passed to template
-	keepAlive time.Time   // last time we heard from the browser
+	keepalive time.Time   // last time we heard from the browser
 	onRefresh func()
+	sync.Mutex
 }
 
 func NewDoc(htmlTemplate string, data interface{}) *Doc {

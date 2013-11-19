@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	quants         = make(map[string]Slicer)                 // displayable
-	renderQ        = "m"                                     // quantity to display
-	params         = make(map[string]Param)                  // settable
-	guiRegion      = -1                                      // currently addressed region
-	usingX, usingY = 1, 2                                    // columns to plot
-	KeepAlive      = func() time.Time { return time.Time{} } // overwritten by gui server
-	busyMsg        string                                    // set busy message here when doing slow initialization
+	quants         = make(map[string]Slicer) // displayable
+	renderQ        = "m"                     // quantity to display
+	params         = make(map[string]Param)  // settable
+	guiRegion      = -1                      // currently addressed region
+	usingX, usingY = 1, 2                    // columns to plot
+	busyMsg        string                    // set busy message here when doing slow initialization
 	guiLock        sync.Mutex
 )
 
@@ -76,10 +75,17 @@ var gui_ *gui.Doc // use with caution, may not be inited yet.
 
 // Start web gui on given port, blocks.
 func Serve(port string) {
+	util.LogErr(http.ListenAndServe(port, nil))
+}
+
+func Init() {
+	InitGui()
+}
+
+func InitGui() {
 	data := &guidata{Quants: quants, Params: params}
 	gui_ = gui.NewDoc(templText, data)
 	gui := gui_
-	KeepAlive = gui.KeepAlive
 
 	http.Handle("/", gui)
 	http.HandleFunc("/render/", serveRender)
@@ -223,8 +229,6 @@ func Serve(port string) {
 		}
 	})
 
-	util.LogErr(http.ListenAndServe(port, nil))
-	runtime.Gosched()
 }
 
 var StartTime = time.Now()

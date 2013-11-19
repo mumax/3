@@ -90,6 +90,10 @@ func RunInteractive() {
 	fmt.Println("browser disconnected, exiting")
 }
 
+func KeepAlive() time.Time {
+	return gui_.KeepAlive()
+}
+
 func step() {
 	Solver.Step(M.Buffer())
 	for _, f := range postStep {

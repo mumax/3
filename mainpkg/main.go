@@ -67,6 +67,7 @@ func Init() {
 	}
 	defer prof.Cleanup()
 
+	engine.Init()
 }
 
 func RunFiles() {

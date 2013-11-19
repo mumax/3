@@ -8,7 +8,8 @@ import (
 
 // ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d.keepAlive = time.Now()
+	d.updateKeepAlive()
+
 	switch r.Method {
 	default:
 		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
@@ -22,7 +23,15 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *Doc) KeepAlive() time.Time {
-	return d.keepAlive
+	d.Lock()
+	defer d.Unlock()
+	return d.keepalive
+}
+
+func (d *Doc) updateKeepAlive() {
+	d.Lock()
+	defer d.Unlock()
+	d.keepalive = time.Now()
 }
 
 // serves the html content.

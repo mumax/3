@@ -78,10 +78,6 @@ func Serve(port string) {
 	util.LogErr(http.ListenAndServe(port, nil))
 }
 
-func Init() {
-	InitGui()
-}
-
 func InitGui() {
 	data := &guidata{Quants: quants, Params: params}
 	gui_ = gui.NewDoc(templText, data)

@@ -77,10 +77,6 @@ func (w *scope) Func(name string, f interface{}, doc ...string) {
 	w.declare(name, newFunction(f), doc...)
 }
 
-func (w *scope) PureFunc(name string, f interface{}, doc ...string) {
-	w.declare(name, newPureFunc(f), doc...)
-}
-
 // add identifier but check that it's not declared yet.
 func (w *scope) declare(key string, value Expr, doc ...string) {
 	w.init()

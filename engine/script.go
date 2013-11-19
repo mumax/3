@@ -12,11 +12,6 @@ func DeclFunc(name string, f interface{}, doc string) {
 	World.Func(name, f, doc)
 }
 
-// Add a pure function to the script world
-func DeclPure(name string, f interface{}, doc string) {
-	World.PureFunc(name, f, doc)
-}
-
 // Add a constant to the script world
 func DeclConst(name string, value float64, doc string) {
 	World.Const(name, value, doc)

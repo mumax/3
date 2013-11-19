@@ -15,7 +15,7 @@ func init() {
 	DeclFunc("ExpectV", ExpectV, "Used for automated tests: checks if a vector is close enough to the expected value")
 	DeclFunc("Fprintln", Fprintln, "Print to file")
 	DeclFunc("Sign", sign, "Signum function")
-	DeclPure("Vector", Vector, "Constructs a vector with given components")
+	DeclFunc("Vector", Vector, "Constructs a vector with given components")
 	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a .dump file")

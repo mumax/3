@@ -76,9 +76,6 @@ var gui_ *gui.Doc // use with caution, may not be inited yet.
 
 // Start web gui on given port, blocks.
 func Serve(port string) {
-	guiLock.Lock()
-	defer guiLock.Unlock()
-
 	data := &guidata{Quants: quants, Params: params}
 	gui_ = gui.NewDoc(templText, data)
 	gui := gui_
@@ -132,7 +129,7 @@ func Serve(port string) {
 				cmd += fmt.Sprint(gui.Value(compIds[0]))
 			}
 			cmd += ");"
-			Inject <- func() { Eval(cmd) }
+			Inject <- func() { Eval(cmd) } // Eval(cmd) can be very long, launch but don't wait
 		}
 		for _, id := range compIds {
 			gui.OnEvent(id, handler)
@@ -222,7 +219,7 @@ func Serve(port string) {
 		if busy != "" {
 			gui.SetValue("solverstatus", fmt.Sprint(busy)) // show we are busy, ignore the rest
 		} else {
-			Inject <- onrefresh
+			InjectAndWait(onrefresh) // onrefresh is fast (just fetches values), so wait
 		}
 	})
 

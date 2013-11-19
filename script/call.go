@@ -25,7 +25,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 		fname = Fun.Sel.Name
 	}
 	if f.Type().Kind() != reflect.Func {
-		panic(err(n.Pos(), "can not call", n))
+		panic(err(n.Pos(), "can not call", Format(n)))
 	}
 
 	// compile and check args

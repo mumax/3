@@ -77,10 +77,10 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			z1, z2 = -(size[Z]*pbc[Z] - 1), (size[Z]*pbc[Z] - 1)
 		}
 		// support for 2D simulations (thickness 1)
-		if size[X] == 1 && pbc[X] == 0 {
-			x2 = 0
+		if size[Z] == 1 && pbc[Z] == 0 {
+			z2 = 0
 		}
-		//log.Println("kernel ranges:", x1, x2, ",", y1, y2, ",", z1, z2)
+		fmt.Print(" (ranges:", x1, x2, ",", y1, y2, ",", z1, z2, ")")
 	}
 
 	// smallest cell dimension is our typical length scale

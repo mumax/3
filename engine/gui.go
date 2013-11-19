@@ -24,6 +24,8 @@ var (
 	guiLock        sync.Mutex
 )
 
+const maxZoom = 32
+
 // displayable in GUI Parameters section
 type Param interface {
 	NComp() int
@@ -74,6 +76,9 @@ var gui_ *gui.Doc // use with caution, may not be inited yet.
 
 // Start web gui on given port, blocks.
 func Serve(port string) {
+	guiLock.Lock()
+	defer guiLock.Unlock()
+
 	data := &guidata{Quants: quants, Params: params}
 	gui_ = gui.NewDoc(templText, data)
 	gui := gui_
@@ -93,7 +98,7 @@ func Serve(port string) {
 	gui.OnEvent("maxerr", inj(func() { Solver.MaxErr = gui.Value("maxerr").(float64) }))
 	gui.OnEvent("sel_render", func() { renderQ = gui.Value("sel_render").(string) })
 	gui.OnEvent("renderComp", func() { renderComp = gui.Value("renderComp").(string) })
-	gui.OnEvent("renderScale", func() { renderScale = 33 - gui.Value("renderScale").(int) })
+	gui.OnEvent("renderScale", func() { renderScale = (maxZoom + 1) - gui.Value("renderScale").(int) })
 	gui.OnEvent("renderLayer", func() { renderLayer = gui.Value("renderLayer").(int) })
 	gui.OnEvent("command", handleCommand)
 
@@ -178,7 +183,7 @@ func Serve(port string) {
 		gui.SetValue("render", "/render/"+renderQ+cachebreaker)
 		gui.SetValue("renderComp", renderComp)
 		gui.SetValue("renderLayer", renderLayer)
-		gui.SetValue("renderScale", 33-renderScale)
+		gui.SetValue("renderScale", (maxZoom+1)-renderScale)
 
 		// plot
 		cachebreaker = fmt.Sprint("?", Solver.NSteps)

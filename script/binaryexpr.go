@@ -36,7 +36,6 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 type binaryExpr struct{ x, y Expr }
 
 func (b *binaryExpr) Type() reflect.Type { return float64_t }
-func (b *binaryExpr) Cnst() bool         { return Cnst(b.x) && Cnst(b.y) }
 func (b *binaryExpr) Child() []Expr      { return []Expr{b.x, b.y} }
 
 type add struct{ binaryExpr }
@@ -52,7 +51,6 @@ func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(flo
 type comp binaryExpr
 
 func (b *comp) Type() reflect.Type { return bool_t }
-func (b *comp) Cnst() bool         { return Cnst(b.x) && Cnst(b.y) }
 func (b *comp) Child() []Expr      { return []Expr{b.x, b.y} }
 
 type lss struct{ comp }

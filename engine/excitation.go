@@ -57,7 +57,7 @@ func (e *excitation) Slice() (*data.Slice, bool) {
 func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 	var mul func() float64
 	if f != nil {
-		if f.Cnst() {
+		if Const(f) {
 			val := f.Float()
 			mul = func() float64 {
 				return val

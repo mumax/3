@@ -20,5 +20,4 @@ type minus struct{ x Expr }
 
 func (m *minus) Type() reflect.Type { return float64_t }
 func (m *minus) Eval() interface{}  { return -m.x.Eval().(float64) }
-func (m *minus) Cnst() bool         { return Cnst(m.x) }
 func (m *minus) Child() []Expr      { return []Expr{m.x} }

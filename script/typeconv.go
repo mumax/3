@@ -92,7 +92,6 @@ type intToFloat64 struct{ in Expr }
 
 func (c *intToFloat64) Eval() interface{}  { return float64(c.in.Eval().(int)) }
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
-func (c *intToFloat64) Cnst() bool         { return Cnst(c.in) }
 func (c *intToFloat64) Child() []Expr      { return []Expr{c.in} }
 
 // converts float64 to int
@@ -100,7 +99,6 @@ type float64ToInt struct{ in Expr }
 
 func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
 func (c *float64ToInt) Type() reflect.Type { return int_t }
-func (c *float64ToInt) Cnst() bool         { return Cnst(c.in) }
 func (c *float64ToInt) Child() []Expr      { return []Expr{c.in} }
 
 type boolToFunc struct{ in Expr }

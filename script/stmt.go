@@ -43,4 +43,3 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 type void struct{}
 
 func (v *void) Type() reflect.Type { return nil }
-func (v *void) Cnst() bool         { return false }

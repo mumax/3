@@ -81,18 +81,3 @@ func (c *call) Type() reflect.Type {
 		panic("bug: multiple return values not allowed")
 	}
 }
-
-func (c *call) Cnst() bool {
-	if _, ok := c.f.(interface {
-		Pure()
-	}); ok {
-		for _, a := range c.args {
-			if !Cnst(a) {
-				return false
-			}
-		}
-		return true
-	} else {
-		return false
-	}
-}

@@ -63,7 +63,7 @@ func Steps(n int) {
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
 	checkM() // TODO: move to failed solver step
-	fmt.Println("running...")
+	//fmt.Println("running...")
 	pause = false
 	for condition() && !pause {
 		select {

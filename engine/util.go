@@ -41,7 +41,7 @@ func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
 		util.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
-		fmt.Println(msg, ":", have, "OK")
+		Log(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
 }
@@ -85,15 +85,15 @@ func Download(q Slicer) *data.Slice {
 func myprint(msg ...interface{}) {
 	for i, m := range msg {
 
-		// Slicer: print formatted slice
-		if s, ok := m.(Slicer); ok {
-			s, r := s.Slice()
-			msg[i] = s.HostCopy()
-			if r {
-				cuda.Recycle(s)
-			}
-			continue
-		}
+		//// Slicer: print formatted slice
+		//if s, ok := m.(Slicer); ok {
+		//	s, r := s.Slice()
+		//	msg[i] = s.HostCopy()
+		//	if r {
+		//		cuda.Recycle(s)
+		//	}
+		//	continue
+		//}
 
 		// Tabledata: print average
 		if m, ok := m.(TableData); ok {
@@ -101,7 +101,7 @@ func myprint(msg ...interface{}) {
 			continue
 		}
 	}
-	fmt.Println(msg...)
+	Log(msg...)
 }
 
 // converts cell index to coordinate, internal coordinates

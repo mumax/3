@@ -143,7 +143,7 @@ func Serve(port string) {
 	// periodically update time, steps, etc
 	onrefresh := func() {
 
-		gui.SetValue("hist", history)
+		gui.SetValue("hist", hist)
 
 		// geometry
 		size := globalmesh.Size()
@@ -247,7 +247,7 @@ func Eval(code string) {
 	}()
 	tree, err := World.Compile(code)
 	if err == nil {
-		history += tree.Format() + "\n"
+		Log(tree.Format())
 		tree.Eval()
 	} else {
 		gui_.SetValue("paramErr", fmt.Sprint(err))
@@ -265,7 +265,7 @@ func handleCommand() {
 			gui.SetValue("cmderr", fmt.Sprint(err))
 			return
 		}
-		history += tree.Format() + "\n"
+		Log(tree.Format())
 		gui.SetValue("command", "")
 		tree.Eval()
 		gui.SetValue("cmderr", "")

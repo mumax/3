@@ -1,0 +1,35 @@
+package engine
+
+import (
+	"github.com/mumax/3/script"
+	"reflect"
+)
+
+type numberParam struct {
+	v     float64
+	onSet func()
+	unit  string
+}
+
+func numParam(v float64, unit string, onSet func()) numberParam {
+	return numberParam{v: v, onSet: onSet, unit: unit}
+}
+
+func (p *numberParam) NComp() int              { return 1 }
+func (p *numberParam) Unit() string            { return p.unit }
+func (p *numberParam) getRegion(int) []float64 { return []float64{float64(p.v)} }
+func (p *numberParam) Type() reflect.Type      { return reflect.TypeOf(float64(0)) }
+func (p *numberParam) IsUniform() bool         { return true }
+func (p *numberParam) Eval() interface{}       { return p.v }
+func (p *numberParam) Child() []script.Expr    { return nil }
+
+//func (p *numberParam) setRegion(r int, v []float64) {
+//
+//p.v = v[0]
+//
+//}
+
+func (p *numberParam) SetValue(v interface{}) {
+	p.v = v.(float64)
+	p.onSet()
+}

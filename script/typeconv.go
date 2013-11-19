@@ -112,9 +112,11 @@ type getVector struct{ in VectorIf }
 
 func (c *getScalar) Eval() interface{}  { return c.in.Get() }
 func (c *getScalar) Type() reflect.Type { return float64_t }
+func (c *getScalar) Child() []Expr      { return nil }
 
 func (c *getVector) Eval() interface{}  { return c.in.Get() }
 func (c *getVector) Type() reflect.Type { return vector_t }
+func (c *getVector) Child() []Expr      { return nil }
 
 func safe_int(x float64) int {
 	i := int(x)

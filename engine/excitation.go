@@ -126,6 +126,7 @@ func (e *excitation) Mesh() *data.Mesh        { return &globalmesh }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }
+func (e *excitation) Child() []script.Expr    { return nil }
 
 func checkNaN(s *data.Slice, name string) {
 	h := s.Host()

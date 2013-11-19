@@ -51,3 +51,7 @@ func (l *reflectLvalue) Type() reflect.Type {
 func (l *reflectLvalue) SetValue(rvalue interface{}) {
 	l.elem.Set(reflect.ValueOf(rvalue))
 }
+
+func (l *reflectLvalue) Child() []Expr {
+	return nil
+}

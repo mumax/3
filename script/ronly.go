@@ -15,10 +15,6 @@ func newReflectROnly(addr interface{}) *reflectROnly {
 	return &reflectROnly{elem}
 }
 
-func (l *reflectROnly) Eval() interface{} {
-	return l.elem.Interface()
-}
-
-func (l *reflectROnly) Type() reflect.Type {
-	return l.elem.Type()
-}
+func (l *reflectROnly) Eval() interface{}  { return l.elem.Interface() }
+func (l *reflectROnly) Type() reflect.Type { return l.elem.Type() }
+func (l *reflectROnly) Child() []Expr      { return nil }

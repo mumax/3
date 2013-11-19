@@ -25,3 +25,4 @@ func (f *function) Type() reflect.Type    { return f.Value.Type() }
 func (f *function) NumIn() int            { return f.Type().NumIn() }
 func (f *function) In(i int) reflect.Type { return f.Type().In(i) }
 func (f *function) Eval() interface{}     { return f.Value.Interface() }
+func (f *function) Child() []Expr         { return nil }

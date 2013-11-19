@@ -9,6 +9,7 @@ import (
 type Expr interface {
 	Eval() interface{}  // evaluate and return result (nil for void)
 	Type() reflect.Type // return type, nil for void
+	Child() []Expr
 }
 
 // compiles an expression

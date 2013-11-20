@@ -64,21 +64,21 @@ func writeOmfHeader(out io.Writer, q *data.Slice, meta data.Meta) (err error) {
 	hdr(out, "Title", meta.Name)
 	hdr(out, "meshtype", "rectangular")
 	hdr(out, "meshunit", "m")
-	hdr(out, "xbase", cellsize[Z]/2)
+	hdr(out, "xbase", cellsize[X]/2)
 	hdr(out, "ybase", cellsize[Y]/2)
-	hdr(out, "zbase", cellsize[X]/2)
-	hdr(out, "xstepsize", cellsize[Z])
+	hdr(out, "zbase", cellsize[Z]/2)
+	hdr(out, "xstepsize", cellsize[X])
 	hdr(out, "ystepsize", cellsize[Y])
-	hdr(out, "zstepsize", cellsize[X])
+	hdr(out, "zstepsize", cellsize[Z])
 	hdr(out, "xmin", 0)
 	hdr(out, "ymin", 0)
 	hdr(out, "zmin", 0)
-	hdr(out, "xmax", cellsize[Z]*float64(gridsize[Z]))
+	hdr(out, "xmax", cellsize[X]*float64(gridsize[X]))
 	hdr(out, "ymax", cellsize[Y]*float64(gridsize[Y]))
-	hdr(out, "zmax", cellsize[X]*float64(gridsize[X]))
-	hdr(out, "xnodes", gridsize[Z])
+	hdr(out, "zmax", cellsize[Z]*float64(gridsize[Z]))
+	hdr(out, "xnodes", gridsize[X])
 	hdr(out, "ynodes", gridsize[Y])
-	hdr(out, "znodes", gridsize[X])
+	hdr(out, "znodes", gridsize[Z])
 	hdr(out, "ValueRangeMinMag", 1e-08) // not so "optional" as the OOMMF manual suggests...
 	hdr(out, "ValueRangeMaxMag", 1)     // TODO
 	hdr(out, "valueunit", "?")
@@ -103,15 +103,13 @@ func writeOmfBinary4(out io.Writer, array *data.Slice) (err error) {
 	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
 	_, err = out.Write(bytes)
 
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
 	ncomp := array.NComp()
-	for i := 0; i < gridsize[X]; i++ {
-		for j := 0; j < gridsize[Y]; j++ {
-			for k := 0; k < gridsize[Z]; k++ {
+	for iz := 0; iz < gridsize[Z]; iz++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for ix := 0; ix < gridsize[Z]; ix++ {
 				for c := 0; c < ncomp; c++ {
 					// dirty conversion from float32 to [4]byte
-					bytes = (*[4]byte)(unsafe.Pointer(&data[c][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
 					out.Write(bytes)
 				}
@@ -126,14 +124,15 @@ func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 
 	data := tens.Tensors()
 	gridsize := tens.Mesh().Size()
+	ncomp := tens.NComp()
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because
 	// internal in C-order == external in Fortran-order
-	for i := 0; i < gridsize[X]; i++ {
-		for j := 0; j < gridsize[Y]; j++ {
-			for k := 0; k < gridsize[Z]; k++ {
-				for c := 0; c < tens.NComp(); c++ {
-					_, err = fmt.Fprint(out, data[c][i][j][k], " ") // converts to user space.
+	for iz := 0; iz < gridsize[Z]; iz++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for ix := 0; ix < gridsize[Z]; ix++ {
+				for c := 0; c < ncomp; c++ {
+					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
 				}
 				_, err = fmt.Fprint(out, "\n")
 			}

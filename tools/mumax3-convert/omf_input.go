@@ -23,7 +23,7 @@ func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
 	if c == [3]float32{0, 0, 0} {
 		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
 	}
-	mesh := data.NewMesh(n[Z], n[Y], n[X], float64(c[Z]), float64(c[Y]), float64(c[X]))
+	mesh := data.NewMesh(n[X], n[Y], n[Z], float64(c[X]), float64(c[Y]), float64(c[Z]))
 	data_ := data.NewSlice(3, mesh)
 
 	switch info.Format {
@@ -81,13 +81,11 @@ func (i *Info) DescGetFloat32(key string) float32 {
 func readDataText(in io.Reader, t *data.Slice) {
 	size := t.Mesh().Size()
 	data := t.Tensors()
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
-	for i := 0; i < size[X]; i++ {
-		for j := 0; j < size[Y]; j++ {
-			for k := 0; k < size[Z]; k++ {
-				for c := Z; c >= X; c-- {
-					_, err := fmt.Fscan(in, &data[c][i][j][k])
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				for c := 0; c < 3; c++ {
+					_, err := fmt.Fscan(in, &data[c][iz][iy][ix])
 					if err != nil {
 						panic(err)
 					}
@@ -119,18 +117,16 @@ func readDataBinary4(in io.Reader, t *data.Slice) {
 		panic("invalid control number: " + fmt.Sprint(controlnumber))
 	}
 
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
-	for i := 0; i < size[X]; i++ {
-		for j := 0; j < size[Y]; j++ {
-			for k := 0; k < size[Z]; k++ {
-				for c := Z; c >= X; c-- {
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				for c := 0; c < 3; c++ {
 					n, err := in.Read(bytes) // TODO: check for error, also on output (iotool.MustReader/MustWriter?, have to block until all input is read)
 					if err != nil || n != 4 {
 						panic(err)
 					}
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
-					data[c][i][j][k] = *((*float32)(unsafe.Pointer(&bytes4)))
+					data[c][iz][iy][ix] = *((*float32)(unsafe.Pointer(&bytes4)))
 				}
 			}
 		}

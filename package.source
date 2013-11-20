@@ -16,6 +16,10 @@ for c in 4.2 5.0 5.5; do
 	echo ln -s /usr/local/cuda-$c /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
 
+	lib=/usr/local/cuda-$c/lib64
+	cp $lib/libcufft.so.$c $tmp/mumax3
+	cp $lib/libcurand.so.$c $tmp/mumax3
+
 	arch='cuda'$c
 	out=$tmp/mumax3/mumax3-$arch
 

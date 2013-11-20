@@ -7,15 +7,29 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 )
+
+var env []string
+
+const LD_LIBRARY_PATH = "LD_LIBRARY_PATH"
 
 func main() {
 	bin := execDir()
+
+	env = os.Environ()
+	for i := range env {
+		if strings.HasPrefix(env[i], LD_LIBRARY_PATH+"=") {
+			env[i] += ":" + bin
+			fmt.Println(env[i])
+		}
+	}
+
 	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda5.0", "mumax3-cuda4.2"}
 	mumax := ""
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd
-		err := run(cmd, "-test")
+		err := run(cmd, []string{"-test"})
 		if err == nil {
 			mumax = cmd
 			break
@@ -26,14 +40,15 @@ func main() {
 		fatal("no matching mumax/cuda combination found in", cmds)
 	}
 	fmt.Println(mumax, os.Args[1:])
-	err := run(mumax, os.Args[1:]...)
+	err := run(mumax, os.Args[1:])
 	if err != nil {
 		fatal(err)
 	}
 }
 
-func run(command string, args ...string) error {
+func run(command string, args []string) error {
 	cmd := exec.Command(command, args...)
+	cmd.Env = env
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	done := make(chan int)

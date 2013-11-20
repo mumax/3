@@ -141,10 +141,6 @@ func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 	return
 }
 
-//func floats2bytes(floats []float32) []byte {
-//	return (*[4]byte)(unsafe.Pointer(&floats[0]))[:]
-//}
-
 // Writes a header key/value pair to out:
 // # Key: Value
 func hdr(out io.Writer, key string, value ...interface{}) (err error) {

@@ -27,6 +27,8 @@ reduce operations are non-reproducible, though OK within numerical precission.
 
 check output of all mumax3-convert formats
 
+omf/ovf does not check if enough bytes are read
+
 API:
 ----
 

@@ -102,17 +102,15 @@ func readDataBinary4(in io.Reader, t *data.Slice) {
 	var bytes4 [4]byte
 	bytes := bytes4[:]
 
-	in.Read(bytes)                                                                  // TODO: check for error, also on output (iotool.MustReader/MustWriter?)
+	in.Read(bytes)                                                                  // TODO: must read 4 !
 	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
 
 	// OOMMF requires this number to be first to check the format
 	var controlnumber float32 = 0.
 
-	// Wicked conversion form float32 [4]byte in big-endian
-	// encoding/binary is too slow
+	// Conversion form float32 [4]byte, encoding/binary is too slow
 	// Inlined for performance, terabytes of data will pass here...
 	controlnumber = *((*float32)(unsafe.Pointer(&bytes4)))
-	// 	fmt.Println("Control number:", controlnumber)
 	if controlnumber != OMF_CONTROL_NUMBER {
 		panic("invalid control number: " + fmt.Sprint(controlnumber))
 	}
@@ -121,7 +119,7 @@ func readDataBinary4(in io.Reader, t *data.Slice) {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
 				for c := 0; c < 3; c++ {
-					n, err := in.Read(bytes) // TODO: check for error, also on output (iotool.MustReader/MustWriter?, have to block until all input is read)
+					n, err := in.Read(bytes)
 					if err != nil || n != 4 {
 						panic(err)
 					}

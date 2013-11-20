@@ -25,7 +25,7 @@ func main() {
 		}
 	}
 
-	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda5.0", "mumax3-cuda4.2"}
+	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda5.0", "mumax3-cuda4.2.9"}
 	mumax := ""
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd

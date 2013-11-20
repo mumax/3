@@ -10,6 +10,7 @@ import (
 	"github.com/mumax/3/util"
 	"io/ioutil"
 	"log"
+	"os"
 	"runtime"
 	"time"
 )
@@ -26,6 +27,7 @@ var (
 	flag_gpu     = flag.Int("gpu", 0, "specify GPU")
 	flag_sync    = flag.Bool("sync", false, "synchronize all CUDA calls (debug)")
 	flag_time    = flag.Bool("time", false, "report walltime")
+	flag_test    = flag.Bool("test", false, "cuda test (internal)")
 )
 
 func Init() {
@@ -58,6 +60,10 @@ func Init() {
 	cuda.TileY = 32
 	cuda.Init(*flag_gpu, "yield", *flag_sync)
 	cuda.LockThread()
+
+	if *flag_test {
+		os.Exit(0)
+	}
 
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)

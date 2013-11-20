@@ -1,6 +1,5 @@
 # source this file to bash to build for different cuda versions
 
-
 tmp='tmp/'
 mkdir $tmp
 rm -rf $tmp/*
@@ -8,36 +7,26 @@ rm -rf $tmp/*
 src='github.com/mumax/3/mumax3'
 version='3.3-BETA1'
 
-
 go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
 go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'
 
-out=$tmp/mumax3/mumax3
 
 for c in 4.2 5.0 5.5; do
 	sudo rm -f /usr/local/cuda
 	echo ln -s /usr/local/cuda-$c /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
 
-	echo rm -f $out
-	rm -f $out
+	arch='cuda'$c
+	out=$tmp/mumax3/mumax3-$arch
 
 	echo go build $src -o $out
 	go build -v -o $out $src 
 	ldd $out
-
-	arch=$name'_linux_cuda'$c
-	(cd $tmp &&
-		tar c mumax3 | gzip > mumax$version$arch.tar.gz
-	)
 	
 	echo
 done
 
-rm -rf $tmp/mumax3
-
-
 sudo rm -f /usr/local/cuda
-echo ln -s /usr/local/cuda-5.0 /usr/local/cuda
-sudo ln -s /usr/local/cuda-5.0 /usr/local/cuda
+echo ln -s /usr/local/cuda-5.5 /usr/local/cuda
+sudo ln -s /usr/local/cuda-5.5 /usr/local/cuda
 

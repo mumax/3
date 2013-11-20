@@ -29,6 +29,7 @@ for c in 4.2.9 5.0 5.5; do
 	go build -v -o $out $src 
 	ldd $out
 
+	sudo rm -f /usr/local/cuda
 	(cd $tmp/mumax3 &&
 		./mumax3 -v -test
 	)
@@ -44,7 +45,6 @@ done
 )
 
 sudo rm -f /usr/local/cuda
-
 
 echo ln -s /usr/local/cuda-5.5 /usr/local/cuda
 sudo ln -s /usr/local/cuda-5.5 /usr/local/cuda

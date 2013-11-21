@@ -74,6 +74,15 @@ func (d *Page) elem(id string) El {
 	}
 }
 
+// elem[id] = e, panic if already defined
+func (d *Page) addElem(id string, e El) {
+	if _, ok := d.elems[id]; ok {
+		panic("addElem: already defined: " + id)
+	} else {
+		d.elems[id] = e
+	}
+}
+
 // ServeHTTP implements http.Handler.
 func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {

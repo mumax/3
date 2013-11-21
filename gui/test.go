@@ -43,7 +43,8 @@ const testtempl = `
 	<p> {{.ErrorBox}} </p>
 	<p> {{.RefreshButton}} {{.RefreshBox}}
 	<hr/>
-
+	
+	{{.Span "time" "time flies" "style=color:blue"}}
 
 	<hr/>
 </body>

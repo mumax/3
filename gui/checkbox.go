@@ -10,8 +10,7 @@ import (
 func (t *Templ) CheckBox(id, text string, value bool) string {
 	d := (*Doc)(t)
 	el := d.addElem(id)
-	el.data = &boolData{interfaceData{false}}
-	el.setValue(value)
+	el.data = BoolData(value)
 	el.update = func(id string) jsCall {
 		return jsCall{F: "setAttr", Args: []interface{}{id, "checked", el.value().(bool)}}
 	}

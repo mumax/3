@@ -19,13 +19,13 @@ func (t *Templ) TextBoxSize(id string, size int, value string) string {
 // {{.Numbox id value}} adds a textbox for numbers to the document.
 // value is the initial text in the box.
 func (t *Templ) NumBox(id string, value float64) string {
-	return t.textbox("text", id, &floatData{value}, value, fmt.Sprintf("size=%v", TextBoxSize))
+	return t.textbox("text", id, FloatData(value), value, fmt.Sprintf("size=%v", TextBoxSize))
 }
 
 // {{.IntBox id value}} adds a textbox for integer numbers to the document.
 // value is the initial text in the box.
 func (t *Templ) IntBox(id string, value int) string {
-	return t.textbox("number", id, &intData{value}, value, "min=0 max=99999") // hack to get width right
+	return t.textbox("number", id, IntData(value), value, "min=0 max=99999") // hack to get width right
 }
 
 // general textbox with data model (nil = default interfaceData)

@@ -17,10 +17,10 @@ type Page struct {
 	sync.Mutex
 }
 
-func NewPage(htmlTemplate string, data interface{}) *Page {
+func NewPage(htmlTemplate string, data interface{}, onrefresh func()) *Page {
 	d := &Page{elems: make(map[string]El),
 		data:      data,
-		onRefresh: func() {}}
+		onRefresh: onrefresh}
 
 	// exec template (once)
 	t := template.Must(template.New("").Parse(htmlTemplate))
@@ -49,6 +49,16 @@ func (d *Page) JS() string {
 // CSS rules for class ErrorBox may be set, e.g., to render errors in red.
 func (t *Page) ErrorBox() string {
 	return `<span id=ErrorBox class=ErrorBox></span> <span id=MsgBox class=ErrorBox></span>`
+}
+
+// {{.RefreshButton}} adds a page refresh button
+func (t *Page) RefreshButton() string {
+	return `<button onclick="refresh();"> &#x21bb; </button>`
+}
+
+// {{.RefreshBox}} adds an auto refresh checkbox
+func (t *Page) RefreshBox() string {
+	return `<input type=checkbox id=RefreshBox class=CheckBox checked=true onchange="autorefresh=elementById('RefreshBox').checked").checked"> autorefresh</input>`
 }
 
 // {{.Data}} returns the extra data that was passed to NewPage
@@ -102,7 +112,7 @@ type event struct {
 
 // HTTP handler for refreshing the dynamic elements
 func (d *Page) serveRefresh(w http.ResponseWriter, r *http.Request) {
-	//d.onRefresh()
+	d.onRefresh()
 	//calls := make([]jsCall, 0, len(d.elems))
 	//for id, el := range d.elems {
 	//	calls = append(calls, el.update(id))

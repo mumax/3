@@ -4,19 +4,24 @@ package main
 
 import (
 	. "."
+	"fmt"
+	"log"
 	//"fmt"
 	"net/http"
-
-//"time"
+	//"time"
 )
 
 func main() {
-	p := NewPage(testtempl, nil)
+	p := NewPage(testtempl, nil, onrefresh)
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func onrefresh() {
+	fmt.Println("*")
 }
 
 const testtempl = `
@@ -36,7 +41,7 @@ const testtempl = `
 
 	<h1> GUI test </h1>
 	<p> {{.ErrorBox}} </p>
-	<p> <button onclick="refresh();"> &#x21bb; </button> </p>
+	<p> {{.RefreshButton}} {{.RefreshBox}}
 	<hr/>
 
 

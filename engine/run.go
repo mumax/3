@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+	"sync"
 	"time"
 )
 
@@ -90,8 +91,21 @@ func RunInteractive() {
 	fmt.Println("browser disconnected, exiting")
 }
 
+var (
+	keepalive time.Time
+	keepalock sync.Mutex
+)
+
 func KeepAlive() time.Time {
-	return gui_.KeepAlive()
+	keepalock.Lock()
+	defer keepalock.Unlock()
+	return keepalive
+}
+
+func updateKeepAlive() {
+	keepalock.Lock()
+	defer keepalock.Unlock()
+	keepalive = time.Now()
 }
 
 func step() {

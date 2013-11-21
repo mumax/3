@@ -147,6 +147,7 @@ func InitGui() {
 	// periodically update time, steps, etc
 	onrefresh := func() {
 
+		updateKeepAlive()
 		gui.SetValue("hist", hist)
 
 		// geometry

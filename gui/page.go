@@ -2,6 +2,8 @@ package gui
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -25,10 +27,7 @@ func NewPage(htmlTemplate string, data interface{}, onrefresh func()) *Page {
 	// exec template (once)
 	t := template.Must(template.New("").Parse(htmlTemplate))
 	cache := bytes.NewBuffer(nil)
-	err := t.Execute(cache, d)
-	if err != nil {
-		log.Panic(err)
-	}
+	check(t.Execute(cache, d))
 	d.htmlCache = cache.Bytes()
 
 	// check if template contains {{.JS}}
@@ -96,8 +95,9 @@ func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
 
 // HTTP handler for event notifications by button clicks etc
 func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
-	//var ev event
-	//check(json.NewDecoder(r.Body).Decode(&ev))
+	var ev event
+	check(json.NewDecoder(r.Body).Decode(&ev))
+	fmt.Println(ev)
 	//el := d.elem(ev.ID)
 	//el.setValue(ev.Arg)
 	//if el.onevent != nil {
@@ -124,4 +124,10 @@ func (d *Page) serveRefresh(w http.ResponseWriter, r *http.Request) {
 type jsCall struct {
 	F    string        // function to call
 	Args []interface{} // function arguments
+}
+
+func check(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
 }

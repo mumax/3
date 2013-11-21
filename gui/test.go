@@ -2,14 +2,21 @@
 
 package main
 
-import . "."
+import (
+	. "."
+	//"fmt"
+	"net/http"
 
-//"fmt"
-//"net/http"
 //"time"
+)
 
 func main() {
-	NewPage(testtempl, nil)
+	p := NewPage(testtempl, nil)
+	http.Handle("/", p)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 const testtempl = `

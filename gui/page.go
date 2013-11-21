@@ -3,6 +3,7 @@ package gui
 import (
 	"bytes"
 	"log"
+	"net/http"
 	"sync"
 	"text/template"
 )
@@ -50,6 +51,67 @@ func (t *Page) ErrorBox() string {
 	return `<span id=ErrorBox class=ErrorBox></span> <span id=MsgBox class=ErrorBox></span>`
 }
 
+// {{.Data}} returns the extra data that was passed to NewPage
 func (t *Page) Data() interface{} {
 	return t.data
+}
+
+// return elem[id], panic if non-existent
+func (d *Page) elem(id string) El {
+	if e, ok := d.elems[id]; ok {
+		return e
+	} else {
+		panic("no element with id: " + id)
+	}
+}
+
+// ServeHTTP implements http.Handler.
+func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	default:
+		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
+	case "GET":
+		d.serveContent(w, r)
+	case "POST":
+		d.serveRefresh(w, r)
+	case "PUT":
+		d.serveEvent(w, r)
+	}
+}
+
+// serves the html content.
+func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
+	w.Write(d.htmlCache)
+}
+
+// HTTP handler for event notifications by button clicks etc
+func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
+	//var ev event
+	//check(json.NewDecoder(r.Body).Decode(&ev))
+	//el := d.elem(ev.ID)
+	//el.setValue(ev.Arg)
+	//if el.onevent != nil {
+	//	el.onevent()
+	//}
+}
+
+type event struct {
+	ID  string
+	Arg interface{}
+}
+
+// HTTP handler for refreshing the dynamic elements
+func (d *Page) serveRefresh(w http.ResponseWriter, r *http.Request) {
+	//d.onRefresh()
+	//calls := make([]jsCall, 0, len(d.elems))
+	//for id, el := range d.elems {
+	//	calls = append(calls, el.update(id))
+	//}
+	//check(json.NewEncoder(w).Encode(calls))
+}
+
+// javascript call
+type jsCall struct {
+	F    string        // function to call
+	Args []interface{} // function arguments
 }

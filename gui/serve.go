@@ -36,11 +36,6 @@ func (d *Doc) serveEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type event struct {
-	ID  string
-	Arg interface{}
-}
-
 // HTTP handler for refreshing the dynamic elements
 func (d *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 	d.onRefresh()
@@ -49,10 +44,4 @@ func (d *Doc) serveRefresh(w http.ResponseWriter, r *http.Request) {
 		calls = append(calls, el.update(id))
 	}
 	check(json.NewEncoder(w).Encode(calls))
-}
-
-// javascript call
-type jsCall struct {
-	F    string        // function to call
-	Args []interface{} // function arguments
 }

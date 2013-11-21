@@ -3,12 +3,10 @@ package gui
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 )
 
 // ServeHTTP implements http.Handler.
 func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d.updateKeepAlive()
 
 	switch r.Method {
 	default:
@@ -20,18 +18,6 @@ func (d *Doc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "PUT":
 		d.serveEvent(w, r)
 	}
-}
-
-func (d *Doc) KeepAlive() time.Time {
-	d.Lock()
-	defer d.Unlock()
-	return d.keepalive
-}
-
-func (d *Doc) updateKeepAlive() {
-	d.Lock()
-	defer d.Unlock()
-	d.keepalive = time.Now()
 }
 
 // serves the html content.

@@ -8,7 +8,7 @@ type Templ Doc
 func (t *Templ) JS() string {
 	d := (*Doc)(t)
 	d.haveJS = true
-	return js
+	return JS
 }
 
 // {{.ErrorBox}} should be embedded in the template where errors are to be shown.

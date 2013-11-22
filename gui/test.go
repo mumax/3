@@ -28,6 +28,9 @@ func main() {
 	p.OnEvent("text2", func() {
 		p.Set("text", p.StringValue("text2"))
 	})
+	p.OnEvent("range", func() {
+		p.Set("rangeEcho", p.Value("range"))
+	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -60,6 +63,7 @@ const testtempl = `
 	<p>{{.Button "button2" "don't click" }}	{{.Button "button" "click me" }} </p>
 	<p>{{.TextBox "text3" "don't type" }} {{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
 	<p>{{.TextArea "texta" 8 64 ""}} </p>
+	<p>{{.Range "range" 0 100 50}} {{.Span "rangeEcho" 50}} </p>
 
 	<hr/>
 </body>

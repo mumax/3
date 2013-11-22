@@ -1,8 +1,6 @@
 package gui
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type span struct {
 	data

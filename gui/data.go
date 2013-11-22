@@ -1,9 +1,5 @@
 package gui
 
-import (
-	"fmt"
-)
-
 type data struct {
 	val interface{}
 }

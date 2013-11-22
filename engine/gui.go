@@ -9,18 +9,17 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"sync"
 	"time"
 )
 
 var (
+	gui_           *gui.Page
 	quants         = make(map[string]Slicer) // displayable
 	renderQ        = "m"                     // quantity to display
 	params         = make(map[string]Param)  // settable
 	guiRegion      = -1                      // currently addressed region
 	usingX, usingY = 1, 2                    // columns to plot
 	busyMsg        string                    // set busy message here when doing slow initialization
-	guiLock        sync.Mutex
 )
 
 const maxZoom = 32
@@ -41,14 +40,14 @@ type guidata struct {
 }
 
 func SetBusy(msg string) {
-	guiLock.Lock()
-	defer guiLock.Unlock()
+	//guiLock.Lock()
+	//defer guiLock.Unlock()
 	busyMsg = msg
 }
 
 func busy() string {
-	guiLock.Lock()
-	defer guiLock.Unlock()
+	//guiLock.Lock()
+	//defer guiLock.Unlock()
 	return busyMsg
 }
 
@@ -71,8 +70,6 @@ func (d *guidata) MakeRange(min, max int) []int {
 	return l
 }
 
-var gui_ *gui.Doc // use with caution, may not be inited yet.
-
 // Start web gui on given port, blocks.
 func Serve(port string) {
 	util.LogErr(http.ListenAndServe(port, nil))
@@ -80,7 +77,7 @@ func Serve(port string) {
 
 func InitGui() {
 	data := &guidata{Quants: quants, Params: params}
-	gui_ = gui.NewDoc(templText, data)
+	gui_ = gui.NewPage(templText, data)
 	gui := gui_
 
 	http.Handle("/", gui)
@@ -102,14 +99,14 @@ func InitGui() {
 	gui.OnEvent("command", handleCommand)
 
 	// display
-	gui.SetValue("sel_render", renderQ)
+	gui.Set("sel_render", renderQ)
 
 	// gnuplot
 	gui.OnEvent("usingX", func() { usingX = gui.Value("usingX").(int) })
 	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
 
 	// setting parameters
-	gui.SetValue("sel_region", guiRegion)
+	gui.Set("sel_region", guiRegion)
 	gui.OnEvent("sel_region", func() { guiRegion = atoi(gui.Value("sel_region")) })
 
 	for n, p := range params {
@@ -139,55 +136,55 @@ func InitGui() {
 	}
 
 	// process
-	gui.SetValue("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
+	gui.Set("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 	hostname, _ := os.Hostname()
-	gui.SetValue("hostname", hostname)
+	gui.Set("hostname", hostname)
 	var memstats runtime.MemStats
 
 	// periodically update time, steps, etc
 	onrefresh := func() {
 
 		updateKeepAlive()
-		gui.SetValue("hist", hist)
+		gui.Set("hist", hist)
 
 		// geometry
 		size := globalmesh.Size()
-		gui.SetValue("nx", size[0])
-		gui.SetValue("ny", size[1])
-		gui.SetValue("nz", size[2])
+		gui.Set("nx", size[0])
+		gui.Set("ny", size[1])
+		gui.Set("nz", size[2])
 		cellSize := globalmesh.CellSize()
-		gui.SetValue("cx", float32(cellSize[0]*1e9)) // in nm
-		gui.SetValue("cy", float32(cellSize[1]*1e9))
-		gui.SetValue("cz", float32(cellSize[2]*1e9))
-		gui.SetValue("wx", float32(float64(size[0])*cellSize[0]*1e9))
-		gui.SetValue("wy", float32(float64(size[1])*cellSize[1]*1e9))
-		gui.SetValue("wz", float32(float64(size[2])*cellSize[2]*1e9))
+		gui.Set("cx", float32(cellSize[0]*1e9)) // in nm
+		gui.Set("cy", float32(cellSize[1]*1e9))
+		gui.Set("cz", float32(cellSize[2]*1e9))
+		gui.Set("wx", float32(float64(size[0])*cellSize[0]*1e9))
+		gui.Set("wy", float32(float64(size[1])*cellSize[1]*1e9))
+		gui.Set("wz", float32(float64(size[2])*cellSize[2]*1e9))
 
 		// solver
-		gui.SetValue("time", fmt.Sprintf("%6e", Time))
-		gui.SetValue("dt", fmt.Sprintf("%4e", Solver.Dt_si))
-		gui.SetValue("step", Solver.NSteps)
-		gui.SetValue("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-		gui.SetValue("maxerr", Solver.MaxErr)
-		gui.SetValue("mindt", Solver.MinDt)
-		gui.SetValue("maxdt", Solver.MaxDt)
-		gui.SetValue("fixdt", Solver.FixDt)
+		gui.Set("time", fmt.Sprintf("%6e", Time))
+		gui.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
+		gui.Set("step", Solver.NSteps)
+		gui.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
+		gui.Set("maxerr", Solver.MaxErr)
+		gui.Set("mindt", Solver.MinDt)
+		gui.Set("maxdt", Solver.MaxDt)
+		gui.Set("fixdt", Solver.FixDt)
 		if pause {
-			gui.SetValue("solverstatus", "paused")
+			gui.Set("solverstatus", "paused")
 		} else {
-			gui.SetValue("solverstatus", "running")
+			gui.Set("solverstatus", "running")
 		}
 
 		// display
 		cachebreaker := fmt.Sprint("?", Solver.NSteps, renderScale) // scale needed if we zoom while paused
-		gui.SetValue("render", "/render/"+renderQ+cachebreaker)
-		gui.SetValue("renderComp", renderComp)
-		gui.SetValue("renderLayer", renderLayer)
-		gui.SetValue("renderScale", (maxZoom+1)-renderScale)
+		gui.Set("render", "/render/"+renderQ+cachebreaker)
+		gui.Set("renderComp", renderComp)
+		gui.Set("renderLayer", renderLayer)
+		gui.Set("renderScale", (maxZoom+1)-renderScale)
 
 		// plot
 		cachebreaker = fmt.Sprint("?", Solver.NSteps)
-		gui.SetValue("plot", "/plot/"+cachebreaker)
+		gui.Set("plot", "/plot/"+cachebreaker)
 
 		// parameters
 		for n, p := range params {
@@ -195,32 +192,32 @@ func InitGui() {
 				if p.IsUniform() {
 					v := p.getRegion(0)
 					for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
-						gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+						gui.Set(id, fmt.Sprintf("%g", float32(v[comp])))
 					}
 				} else {
 					for _, id := range ((*guidata)(nil)).CompBoxIds(n) {
-						gui.SetValue(id, "")
+						gui.Set(id, "")
 					}
 				}
 			} else {
 				v := p.getRegion(guiRegion)
 				for comp, id := range ((*guidata)(nil)).CompBoxIds(n) {
-					gui.SetValue(id, fmt.Sprintf("%g", float32(v[comp])))
+					gui.Set(id, fmt.Sprintf("%g", float32(v[comp])))
 				}
 			}
 		}
 
 		// process
-		gui.SetValue("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
+		gui.Set("walltime", fmt.Sprint(roundt(time.Since(StartTime))))
 		runtime.ReadMemStats(&memstats)
-		gui.SetValue("memstats", memstats.TotalAlloc/(1024))
+		gui.Set("memstats", memstats.TotalAlloc/(1024))
 	}
 
-	gui.OnRefresh(func() {
+	gui.OnUpdate(func() {
 		// do not inject into run() loop if we are very busy doing other stuff
 		busy := busy()
 		if busy != "" {
-			gui.SetValue("solverstatus", fmt.Sprint(busy)) // show we are busy, ignore the rest
+			gui.Set("solverstatus", fmt.Sprint(busy)) // show we are busy, ignore the rest
 		} else {
 			InjectAndWait(onrefresh) // onrefresh is fast (just fetches values), so wait
 		}
@@ -244,7 +241,7 @@ func Eval(code string) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			gui_.SetValue("solverstatus", fmt.Sprint(err)) // TODO: not solverstatus
+			gui_.Set("solverstatus", fmt.Sprint(err)) // TODO: not solverstatus
 			util.Log(err)
 		}
 	}()
@@ -253,7 +250,7 @@ func Eval(code string) {
 		Log(tree.Format())
 		tree.Eval()
 	} else {
-		gui_.SetValue("paramErr", fmt.Sprint(err))
+		gui_.Set("paramErr", fmt.Sprint(err))
 		util.Log(err)
 	}
 }
@@ -265,13 +262,13 @@ func handleCommand() {
 	Inject <- func() {
 		tree, err := World.Compile(command)
 		if err != nil {
-			gui.SetValue("cmderr", fmt.Sprint(err))
+			gui.Set("cmderr", fmt.Sprint(err))
 			return
 		}
 		Log(tree.Format())
-		gui.SetValue("command", "")
+		gui.Set("command", "")
 		tree.Eval()
-		gui.SetValue("cmderr", "")
+		gui.Set("cmderr", "")
 	}
 }
 

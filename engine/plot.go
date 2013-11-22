@@ -27,13 +27,13 @@ func servePlot(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Write(emptyIMG())
 		if gui_ != nil {
-			gui_.SetValue("plotErr", string(out))
+			gui_.Set("plotErr", string(out))
 		}
 		return
 	} else {
 		w.Header().Set("Content-Type", "image/svg+xml")
 		w.Write(out)
-		gui_.SetValue("plotErr", "")
+		gui_.Set("plotErr", "")
 	}
 }
 

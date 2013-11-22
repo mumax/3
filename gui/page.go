@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 	"text/template"
 )
@@ -42,10 +43,21 @@ func (d *Page) Value(id string) interface{} {
 
 func (d *Page) StringValue(id string) string {
 	v := d.Value(id)
-	if v, ok := v.(string); ok {
-		return v
+	if s, ok := v.(string); ok {
+		return s
 	} else {
 		return fmt.Sprint(v)
+	}
+}
+
+func (d *Page) BoolValue(id string) bool {
+	v := d.Value(id)
+	if b, ok := v.(bool); ok {
+		return b
+	} else {
+		b, err := strconv.ParseBool(fmt.Sprint(v))
+		check(err)
+		return b
 	}
 }
 

@@ -11,7 +11,8 @@ import (
 
 func main() {
 	p := NewPage(testtempl, nil)
-	p.Attr("attrtest", "innerHTML", "it works")
+	p.Attr("attrtest", "innerHTML", "innerHTML works")
+	p.Attr("range", "max", 200)
 	p.Disable("button2", true)
 	p.Disable("text3", true)
 	p.Disable("button", true)
@@ -30,6 +31,9 @@ func main() {
 	})
 	p.OnEvent("range", func() {
 		p.Set("rangeEcho", p.Value("range"))
+	})
+	p.OnEvent("check", func() {
+		p.Disable("check", p.BoolValue("check"))
 	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
@@ -64,7 +68,7 @@ const testtempl = `
 	<p>{{.TextBox "text3" "don't type" }} {{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
 	<p>{{.TextArea "texta" 8 64 ""}} </p>
 	<p>{{.Range "range" 0 100 50}} {{.Span "rangeEcho" 50}} </p>
-
+	<p>{{.Checkbox "check" "checked" true}} </p>
 	<hr/>
 </body>
 </html>

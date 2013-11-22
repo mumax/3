@@ -11,6 +11,7 @@ import (
 
 func main() {
 	p := NewPage(testtempl, nil)
+	p.Attr("attrtest", "innerHTML", "it works")
 	p.OnUpdate(func() {
 		p.Set("time", time.Now().Format(time.ANSIC))
 	})
@@ -37,12 +38,12 @@ const testtempl = `
 <body>
 
 	<h1> GUI test </h1>
-	<p> {{.ErrorBox}} </p>
-	<p> {{.UpdateButton}} {{.UpdateBox}}
+	<p> {{.UpdateButton ""}} {{.UpdateBox "live"}} {{.ErrorBox}} </p>
 	<hr/>
 	
-	{{.Span "static" "static span" "style=color:blue"}}
-	{{.Span "time" "time" }}
+	<p>{{.Span "static" "static span" "style=color:blue"}} </p>
+	<p>{{.Span "time" "time" }} </p>
+	<p>{{.Span "attrtest" "" }} </p>
 
 	<hr/>
 </body>

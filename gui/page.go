@@ -21,8 +21,7 @@ type Page struct {
 }
 
 func NewPage(htmlTemplate string, data interface{}) *Page {
-	d := &Page{elems: make(map[string]*E),
-		data: data}
+	d := &Page{elems: make(map[string]*E), data: data}
 
 	// exec template (once)
 	t := template.Must(template.New("").Parse(htmlTemplate))
@@ -39,6 +38,10 @@ func NewPage(htmlTemplate string, data interface{}) *Page {
 
 func (d *Page) Set(id string, v interface{}) {
 	d.elem(id).set(v)
+}
+
+func (d *Page) Attr(id string, k string, v interface{}) {
+	d.elem(id).attr(k, v)
 }
 
 // Set func to be executed each time javascript polls for updates
@@ -60,13 +63,19 @@ func (t *Page) ErrorBox() string {
 }
 
 // {{.UpdateButton}} adds a page Update button
-func (t *Page) UpdateButton() string {
-	return `<button onclick="update();"> &#x21bb; </button>`
+func (t *Page) UpdateButton(text string) string {
+	if text == "" {
+		text = `&#x21bb;`
+	}
+	return `<button onclick="update();"> ` + text + ` </button>`
 }
 
 // {{.UpdateBox}} adds an auto update checkbox
-func (t *Page) UpdateBox() string {
-	return `<input type=checkbox id=UpdateBox class=CheckBox checked=true onchange="autoUpdate=elementById('UpdateBox').checked").checked">auto update</input>`
+func (t *Page) UpdateBox(text string) string {
+	if text == "" {
+		text = "auto update"
+	}
+	return `<input type=checkbox id=UpdateBox class=CheckBox checked=true onchange="autoUpdate=elementById('UpdateBox').checked").checked">` + text + `</input>`
 }
 
 // {{.Data}} returns the extra data that was passed to NewPage
@@ -88,7 +97,7 @@ func (d *Page) addElem(id string, e El) {
 	if _, ok := d.elems[id]; ok {
 		panic("addElem: already defined: " + id)
 	} else {
-		d.elems[id] = &E{el: e, dirty: true}
+		d.elems[id] = newE(e)
 	}
 }
 
@@ -148,9 +157,12 @@ func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, e := range d.elems {
 		if e.dirty {
-			calls = append(calls, e.el.update(id))
+			calls = append(calls, e.update(id)...)
 			e.dirty = false
 		}
+	}
+	if len(calls) != 0 {
+		fmt.Println(calls) // debug
 	}
 	check(json.NewEncoder(w).Encode(calls))
 }

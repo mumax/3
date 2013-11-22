@@ -59,6 +59,7 @@ const testtempl = `
 	<p>{{.Span "attrtest" "" }} </p>
 	<p>{{.Button "button2" "don't click" }}	{{.Button "button" "click me" }} </p>
 	<p>{{.TextBox "text3" "don't type" }} {{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
+	<p>{{.TextArea "texta" 8 64 ""}} </p>
 
 	<hr/>
 </body>

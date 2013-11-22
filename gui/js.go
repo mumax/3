@@ -133,6 +133,10 @@ function notify(id, arg){
 	update();
 }
 
+function notifyel(id, key){
+	notify(id, elementById(id)[key]);
+}
+
 function notifyButton(id){
 	notify(id, elementById(id).innerHTML);
 }

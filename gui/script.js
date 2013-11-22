@@ -127,8 +127,8 @@ function notify(id, arg){
 	update();
 }
 
-function notifyButton(id){
-	notify(id, elementById(id).innerHTML);
+function notifyel(id, key){
+	notify(id, elementById(id)[key]);
 }
 
 function notifytextbox(id){

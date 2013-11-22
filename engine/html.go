@@ -53,13 +53,11 @@ const templText = `
 	<span style="color:gray; font-weight:bold; font-size:1.5em"> mumax<sup>3</sup> web interface </span> {{.ErrorBox}} <br/>
 	<hr/>
 
-	
-
 
 	<h2> console </h2><div>
 		<p style="font-family:monospace; color:gray; font-size:0.75em">
 		{{.TextArea "hist" 8 84 ""}} <br/>
-		{{.TextBoxSize "command" 64 ""}} <br/>
+		{{.TextBox "command" 64 "" "placeholder='type commands here'" "size=64"}} <br/>
 		<p style="font-weight:bold; color:red"> {{.Span "cmderr" ""}} </p>
 	</div><hr/>
 
@@ -82,8 +80,8 @@ const templText = `
 	
 		<table>
 			<tr> <td> {{.Button "break" "Break"}}</td> <td> status: {{.Span "solverstatus" "initializing"}} </td></tr>
-			<tr> <td> {{.Button "run"   "Run"  }}</td> <td> {{.NumBox "runtime" 1e-9}}s</td></tr> 
-			<tr> <td> {{.Button "steps" "Steps"}}</td> <td> {{.IntBox "runsteps" 1000}}</td></tr>
+			<tr> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime" "1e-9"}}s</td></tr> 
+			<tr> <td> {{.Button "steps" "Steps"}}</td> <td> {{.TextBox "runsteps" "1000"}}</td></tr>
 		</table>
 
 		</td><td>
@@ -91,10 +89,10 @@ const templText = `
 		</td><td>
 
 		<table>
-			<tr> <td>step:    </td><td>{{.Span   "step" ""}}    </td><td>time:  </td><td>{{.Span   "time" "0"}}s    </td></tr>
-			<tr> <td>dt:      </td><td>{{.Span   "dt" ""}}s     </td><td>fixdt: </td><td>{{.NumBox "fixdt"  0}}s    </td></tr>
-			<tr> <td>mindt:   </td><td>{{.NumBox "mindt" 0}}s   </td><td>maxdt: </td><td>{{.NumBox "maxdt"  0}}s    </td></tr>
-			<tr> <td>err/step:</td><td>{{.Span   "lasterr" ""}} </td><td>maxerr:</td><td>{{.NumBox "maxerr" 0}}/step</td></tr>
+			<tr> <td>step:    </td><td>{{.Span    "step"     ""}}</td><td>time:  </td><td>{{.Span    "time"   "0"}}s    </td></tr>
+			<tr> <td>dt:      </td><td>{{.Span    "dt"      ""}}s</td><td>fixdt: </td><td>{{.TextBox "fixdt"  "0"}}s   </td></tr>
+			<tr> <td>mindt:   </td><td>{{.TextBox "mindt"  "0"}}s</td><td>maxdt: </td><td>{{.TextBox "maxdt"  "0"}}s  </td></tr>
+			<tr> <td>err/step:</td><td>{{.Span    "lasterr" ""}} </td><td>maxerr:</td><td>{{.TextBox "maxerr" "0"}}/step</td></tr>
 		</table>
 
 			</td></tr>

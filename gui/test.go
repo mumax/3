@@ -4,15 +4,15 @@ package main
 
 import (
 	. "."
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
 	p := NewPage(testtempl, nil)
 	p.OnUpdate(func() {
-		p.Set("time", time.Now)
+		p.Set("time", time.Now().Format(time.ANSIC))
 	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)

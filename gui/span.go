@@ -14,7 +14,6 @@ func (e *span) set(v interface{}) {
 }
 
 func (e *span) update(id string) jsCall {
-	fmt.Println("update", id)
 	return jsCall{F: "setAttr", Args: []interface{}{id, "innerHTML", e.value}}
 }
 

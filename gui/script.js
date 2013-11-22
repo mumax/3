@@ -6,6 +6,11 @@ var autoUpdate = true;
 
 // show error in document (non-intrusive alert())
 function showErr(err){
+	if (err != ""){
+		document.body.style.background = "#DDDDDD";
+	}else{
+		document.body.style.background = "#FFFFFF";
+	}
 	document.getElementById("ErrorBox").innerHTML = err;
 }
 

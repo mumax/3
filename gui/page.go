@@ -144,11 +144,11 @@ func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
 	var ev event
 	check(json.NewDecoder(r.Body).Decode(&ev))
 	fmt.Println(ev)
-	//el := d.elem(ev.ID)
-	//el.setValue(ev.Arg)
-	//if el.onevent != nil {
-	//	el.onevent()
-	//}
+	el := d.elem(ev.ID)
+	el.set(ev.Arg)
+	if el.onevent != nil {
+		el.onevent()
+	}
 }
 
 type event struct {

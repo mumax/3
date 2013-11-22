@@ -131,18 +131,6 @@ function notifyel(id, key){
 	notify(id, elementById(id)[key]);
 }
 
-function notifytextbox(id){
-	notify(id, elementById(id).value);
-}
-
-function notifycheckbox(id){
-	notify(id, elementById(id).checked);
-}
-
-function notifyrange(id){
-	notify(id, elementById(id).value);
-}
-
 function notifyselect(id){
 	var e = elementById(id);
 	var value = e.options[e.selectedIndex].text;

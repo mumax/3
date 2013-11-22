@@ -137,14 +137,6 @@ function notifyel(id, key){
 	notify(id, elementById(id)[key]);
 }
 
-function notifyButton(id){
-	notify(id, elementById(id).innerHTML);
-}
-
-function notifytextbox(id){
-	notify(id, elementById(id).value);
-}
-
 function notifycheckbox(id){
 	notify(id, elementById(id).checked);
 }

@@ -29,8 +29,13 @@ check output of all mumax3-convert formats
 
 omf/ovf does not check if enough bytes are read
 
+script: if w/o else crashes
+script: compile selector?
+
 API:
 ----
+
+mask.setv, getv
 
 check region defined?
 

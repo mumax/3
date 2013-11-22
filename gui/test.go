@@ -6,22 +6,20 @@ import (
 	. "."
 	"fmt"
 	"log"
-	//"fmt"
 	"net/http"
-	//"time"
 )
 
 func main() {
-	p := NewPage(testtempl, nil, onrefresh)
+	p := NewPage(testtempl, nil)
+	p.OnUpdate(func() {
+		fmt.Println("*")
+		//p.Set("time", time.Now)
+	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func onrefresh() {
-	fmt.Println("*")
 }
 
 const testtempl = `
@@ -41,10 +39,11 @@ const testtempl = `
 
 	<h1> GUI test </h1>
 	<p> {{.ErrorBox}} </p>
-	<p> {{.RefreshButton}} {{.RefreshBox}}
+	<p> {{.UpdateButton}} {{.UpdateBox}}
 	<hr/>
 	
-	{{.Span "time" "time flies" "style=color:blue"}}
+	{{.Span "static" "static span" "style=color:blue"}}
+	{{.Span "time" "time" }}
 
 	<hr/>
 </body>

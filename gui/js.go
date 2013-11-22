@@ -5,9 +5,9 @@ package gui
 
 const JS = `<script type="text/javascript">
 
-// auto-refresh rate
+// auto-update rate
 var tick = 300;
-var autorefresh = true;
+var autoUpdate = true;
 
 // show error in document (non-intrusive alert())
 function showErr(err){
@@ -29,12 +29,12 @@ function elementById(id){
 	return elem;
 }
 
-// called on change of auto-refresh button
-function setautorefresh(){
-	autorefresh =  elementById("AutoRefresh").checked;
-}
+// called on change of auto-update button
+//function setautoupdate(){
+//	autoupdate =  elementById("AutoUpdate").checked;
+//}
 
-// Id of element that has focus. We don't auto-refresh a focused textbox
+// Id of element that has focus. We don't auto-update a focused textbox
 // as this would overwrite the users input.
 var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
@@ -69,8 +69,8 @@ function setSelect(id, value){
 
 
 // onreadystatechange function for update http request.
-// refreshes the DOM with new values received from server.
-function refreshDOM(req){
+// updates the DOM with new values received from server.
+function updateDOM(req){
 	if (req.readyState == 4) { // DONE
 		if (req.status == 200) {	
 			showErr("");
@@ -90,27 +90,27 @@ function refreshDOM(req){
 	}
 }
 
-// refreshes the contents of all dynamic elements.
+// updates the contents of all dynamic elements.
 // periodically called via setInterval()
-function refresh(){
+function update(){
 		try{
 			var req = new XMLHttpRequest();
 			req.open("POST", document.URL, true); 
 			req.timeout = tick;
-			req.onreadystatechange = function(){ refreshDOM(req) };
+			req.onreadystatechange = function(){ updateDOM(req) };
 			req.send(null);
 		}catch(e){
-			showErr(e); // TODO: same message as refresh
+			showErr(e); // TODO: same message as update
 		}
 }
 
-function doAutorefresh(){
-	if (autorefresh){
-		refresh();
+function doAutoUpdate(){
+	if (autoUpdate){
+		update();
 	}
 }
 
-setInterval(doAutorefresh, tick);
+setInterval(doAutoUpdate, tick);
 
 // sends event notification to server, called on button clicks etc.
 function notify(id, arg){
@@ -122,7 +122,7 @@ function notify(id, arg){
 	}catch(e){
 		showErr(e); // TODO
 	}
-	refresh();
+	update();
 }
 
 function notifyButton(id){
@@ -147,5 +147,5 @@ function notifyselect(id){
 	notify(id, value);
 }
 
-window.onload = refresh;
+window.onload = update;
 </script>`

@@ -6,23 +6,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 	"text/template"
 )
 
 type Page struct {
-	elems     map[string]El
+	elems     map[string]*E
 	htmlCache []byte      // static html content, rendered only once
 	haveJS    bool        // have called JS()?
 	data      interface{} // any additional data to be passed to template
-	onRefresh func()
-	sync.Mutex
+	onUpdate  func()
 }
 
-func NewPage(htmlTemplate string, data interface{}, onrefresh func()) *Page {
-	d := &Page{elems: make(map[string]El),
-		data:      data,
-		onRefresh: onrefresh}
+func NewPage(htmlTemplate string, data interface{}) *Page {
+	d := &Page{elems: make(map[string]*E),
+		data: data}
 
 	// exec template (once)
 	t := template.Must(template.New("").Parse(htmlTemplate))
@@ -35,6 +32,15 @@ func NewPage(htmlTemplate string, data interface{}, onrefresh func()) *Page {
 		log.Panic("template should call {{.JS}}")
 	}
 	return d
+}
+
+func (d *Page) Set(id string, v interface{}) {
+	d.elem(id).set(v)
+}
+
+// Set func to be executed each time javascript polls for updates
+func (d *Page) OnUpdate(f func()) {
+	d.onUpdate = f
 }
 
 // {{.JS}} should always be embedded in the template <head>.
@@ -50,14 +56,14 @@ func (t *Page) ErrorBox() string {
 	return `<span id=ErrorBox class=ErrorBox></span> <span id=MsgBox class=ErrorBox></span>`
 }
 
-// {{.RefreshButton}} adds a page refresh button
-func (t *Page) RefreshButton() string {
-	return `<button onclick="refresh();"> &#x21bb; </button>`
+// {{.UpdateButton}} adds a page Update button
+func (t *Page) UpdateButton() string {
+	return `<button onclick="update();"> &#x21bb; </button>`
 }
 
-// {{.RefreshBox}} adds an auto refresh checkbox
-func (t *Page) RefreshBox() string {
-	return `<input type=checkbox id=RefreshBox class=CheckBox checked=true onchange="autorefresh=elementById('RefreshBox').checked").checked"> autorefresh</input>`
+// {{.UpdateBox}} adds an auto update checkbox
+func (t *Page) UpdateBox() string {
+	return `<input type=checkbox id=UpdateBox class=CheckBox checked=true onchange="autoUpdate=elementById('UpdateBox').checked").checked">auto update</input>`
 }
 
 // {{.Data}} returns the extra data that was passed to NewPage
@@ -66,7 +72,7 @@ func (t *Page) Data() interface{} {
 }
 
 // return elem[id], panic if non-existent
-func (d *Page) elem(id string) El {
+func (d *Page) elem(id string) *E {
 	if e, ok := d.elems[id]; ok {
 		return e
 	} else {
@@ -79,7 +85,7 @@ func (d *Page) addElem(id string, e El) {
 	if _, ok := d.elems[id]; ok {
 		panic("addElem: already defined: " + id)
 	} else {
-		d.elems[id] = e
+		d.elems[id] = &E{el: e, dirty: true}
 	}
 }
 
@@ -91,7 +97,7 @@ func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		d.serveContent(w, r)
 	case "POST":
-		d.serveRefresh(w, r)
+		d.serveUpdate(w, r)
 	case "PUT":
 		d.serveEvent(w, r)
 	}
@@ -99,6 +105,9 @@ func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // serves the html content.
 func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
+	for _, e := range d.elems {
+		e.dirty = true
+	}
 	w.Write(d.htmlCache)
 }
 
@@ -119,14 +128,17 @@ type event struct {
 	Arg interface{}
 }
 
-// HTTP handler for refreshing the dynamic elements
-func (d *Page) serveRefresh(w http.ResponseWriter, r *http.Request) {
-	d.onRefresh()
-	//calls := make([]jsCall, 0, len(d.elems))
-	//for id, el := range d.elems {
-	//	calls = append(calls, el.update(id))
-	//}
-	//check(json.NewEncoder(w).Encode(calls))
+// HTTP handler for updating the dynamic elements
+func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
+	d.onUpdate()
+	calls := make([]jsCall, 0, len(d.elems))
+	for id, e := range d.elems {
+		if e.dirty {
+			calls = append(calls, e.el.update(id))
+			e.dirty = false
+		}
+	}
+	check(json.NewEncoder(w).Encode(calls))
 }
 
 // javascript call

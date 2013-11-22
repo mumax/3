@@ -1,9 +1,10 @@
 package gui
 
 type E struct {
-	dirty bool
-	_attr map[string]interface{}
-	_elem El
+	dirty   bool
+	_attr   map[string]interface{}
+	_elem   El
+	onevent func()
 }
 
 func newE(elem El) *E {
@@ -39,6 +40,10 @@ func (e *E) update(id string) []jsCall {
 
 func (e *E) value() interface{} {
 	return e._elem.value()
+}
+
+func (e *E) OnEvent(f func()) {
+	e.onevent = f
 }
 
 type El interface {

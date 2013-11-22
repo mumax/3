@@ -36,12 +36,29 @@ func NewPage(htmlTemplate string, data interface{}) *Page {
 	return d
 }
 
+func (d *Page) Value(id string) interface{} {
+	return d.elem(id).value()
+}
+
+func (d *Page) StringValue(id string) string {
+	v := d.Value(id)
+	if v, ok := v.(string); ok {
+		return v
+	} else {
+		return fmt.Sprint(v)
+	}
+}
+
 func (d *Page) Set(id string, v interface{}) {
 	d.elem(id).set(v)
 }
 
 func (d *Page) Attr(id string, k string, v interface{}) {
 	d.elem(id).attr(k, v)
+}
+
+func (d *Page) OnEvent(id string, handler func()) {
+	d.elem(id).onevent = handler
 }
 
 // Set func to be executed each time javascript polls for updates

@@ -15,6 +15,9 @@ func main() {
 	p.OnUpdate(func() {
 		p.Set("time", time.Now().Format(time.ANSIC))
 	})
+	p.OnEvent("button", func() {
+		p.Set("button", p.StringValue("button")+" again")
+	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -44,6 +47,7 @@ const testtempl = `
 	<p>{{.Span "static" "static span" "style=color:blue"}} </p>
 	<p>{{.Span "time" "time" }} </p>
 	<p>{{.Span "attrtest" "" }} </p>
+	<p>{{.Button "button" "click me" }} </p>
 
 	<hr/>
 </body>

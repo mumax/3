@@ -12,8 +12,7 @@ import (
 func main() {
 	p := NewPage(testtempl, nil)
 	p.OnUpdate(func() {
-		fmt.Println("*")
-		//p.Set("time", time.Now)
+		p.Set("time", time.Now)
 	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)

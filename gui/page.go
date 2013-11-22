@@ -6,15 +6,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"text/template"
 )
 
 type Page struct {
-	elems     map[string]*E
-	htmlCache []byte      // static html content, rendered only once
-	haveJS    bool        // have called JS()?
-	data      interface{} // any additional data to be passed to template
-	onUpdate  func()
+	elems      map[string]*E
+	htmlCache  []byte      // static html content, rendered only once
+	haveJS     bool        // have called JS()?
+	data       interface{} // any additional data to be passed to template
+	onUpdate   func()
+	httpLock   sync.Mutex
+	lastPageID string
 }
 
 func NewPage(htmlTemplate string, data interface{}) *Page {
@@ -91,6 +94,8 @@ func (d *Page) addElem(id string, e El) {
 
 // ServeHTTP implements http.Handler.
 func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	d.httpLock.Lock()
+	defer d.httpLock.Unlock()
 	switch r.Method {
 	default:
 		http.Error(w, "not allowed: "+r.Method+" "+r.URL.Path, http.StatusForbidden)
@@ -105,9 +110,6 @@ func (d *Page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // serves the html content.
 func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
-	for _, e := range d.elems {
-		e.dirty = true
-	}
 	w.Write(d.htmlCache)
 }
 
@@ -132,9 +134,16 @@ type event struct {
 func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	d.onUpdate()
 
-	buf := make([]byte, 1024)
+	// read page ID from body
+	buf := make([]byte, 100)
 	r.Body.Read(buf)
-	fmt.Println(string(buf))
+	pageID := string(buf)
+	if pageID != d.lastPageID {
+		for _, e := range d.elems {
+			e.dirty = true
+		}
+		d.lastPageID = pageID
+	}
 
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, e := range d.elems {

@@ -35,6 +35,9 @@ func main() {
 	p.OnEvent("check", func() {
 		p.Disable("check", p.BoolValue("check"))
 	})
+	p.OnEvent("select", func() {
+		p.Set("selectEcho", p.Value("select"))
+	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -69,6 +72,7 @@ const testtempl = `
 	<p>{{.TextArea "texta" 8 64 ""}} </p>
 	<p>{{.Range "range" 0 100 50}} {{.Span "rangeEcho" 50}} </p>
 	<p>{{.Checkbox "check" "checked" true}} </p>
+	<p>{{.Select "select" "a" "a" "b" "c"}} {{.Select "selectEcho" "a" "a" "b" "c"}} </p>
 	<hr/>
 </body>
 </html>

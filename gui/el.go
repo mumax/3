@@ -1,9 +1,12 @@
 package gui
 
+import "sync"
+
 type E struct {
 	dirty   bool
 	_attr   map[string]interface{}
 	_elem   El
+	_m      sync.Mutex
 	onevent func()
 }
 
@@ -12,14 +15,20 @@ func newE(elem El) *E {
 }
 
 func (e *E) set(v interface{}) {
-	old := e.value() // carefully check if value changed, set/value may do things behind the screens
+	e._m.Lock()
+	defer e._m.Unlock()
+
+	old := e._elem.value() // carefully check if value changed, set/value may do things behind the screens
 	e._elem.set(v)
-	if e.value() != old {
+	if e._elem.value() != old {
 		e.dirty = true
 	}
 }
 
 func (e *E) attr(key string, v interface{}) {
+	e._m.Lock()
+	defer e._m.Unlock()
+
 	if e._attr == nil {
 		e._attr = make(map[string]interface{})
 	}
@@ -31,6 +40,9 @@ func (e *E) attr(key string, v interface{}) {
 }
 
 func (e *E) update(id string) []jsCall {
+	e._m.Lock()
+	defer e._m.Unlock()
+
 	upd := e._elem.update(id)
 	for k, v := range e._attr {
 		upd = append(upd, jsCall{F: "setAttr", Args: []interface{}{id, k, v}})
@@ -39,10 +51,16 @@ func (e *E) update(id string) []jsCall {
 }
 
 func (e *E) value() interface{} {
+	e._m.Lock()
+	defer e._m.Unlock()
+
 	return e._elem.value()
 }
 
 func (e *E) OnEvent(f func()) {
+	e._m.Lock()
+	defer e._m.Unlock()
+
 	e.onevent = f
 }
 

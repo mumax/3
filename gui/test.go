@@ -12,6 +12,10 @@ import (
 func main() {
 	p := NewPage(testtempl, nil)
 	p.Attr("attrtest", "innerHTML", "it works")
+	p.Disable("button2", true)
+	p.Disable("text3", true)
+	p.Disable("button", true)
+	p.Disable("button", false)
 	p.OnUpdate(func() {
 		p.Set("time", time.Now().Format(time.ANSIC))
 	})
@@ -53,8 +57,8 @@ const testtempl = `
 	<p>{{.Span "static" "static span" "style=color:blue"}} </p>
 	<p>{{.Span "time" "time" }} </p>
 	<p>{{.Span "attrtest" "" }} </p>
-	<p>{{.Button "button" "click me" }} </p>
-	<p>{{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
+	<p>{{.Button "button2" "don't click" }}	{{.Button "button" "click me" }} </p>
+	<p>{{.TextBox "text3" "don't type" }} {{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
 
 	<hr/>
 </body>

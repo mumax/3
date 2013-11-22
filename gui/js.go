@@ -4,6 +4,7 @@ package gui
 // EDITING IS FUTILE
 
 const JS = `<script type="text/javascript">
+var pageID = Math.floor((Math.random()* 10000000000)+1);
 
 // auto-update rate
 var tick = 300;
@@ -98,7 +99,8 @@ function update(){
 			req.open("POST", document.URL, true); 
 			req.timeout = tick;
 			req.onreadystatechange = function(){ updateDOM(req) };
-			req.send(null);
+			req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			req.send("id=" + pageID);
 		}catch(e){
 			showErr(e); // TODO: same message as update
 		}

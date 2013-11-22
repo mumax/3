@@ -131,6 +131,11 @@ type event struct {
 // HTTP handler for updating the dynamic elements
 func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	d.onUpdate()
+
+	buf := make([]byte, 1024)
+	r.Body.Read(buf)
+	fmt.Println(string(buf))
+
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, e := range d.elems {
 		if e.dirty {

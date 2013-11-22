@@ -4,6 +4,7 @@ package gui
 // EDITING IS FUTILE
 
 const JS = `<script type="text/javascript">
+// random ID number for this page, to assure proper update if open in multiple browsers
 var pageID = Math.floor((Math.random()* 10000000000)+1);
 
 // auto-update rate

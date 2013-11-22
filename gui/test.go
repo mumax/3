@@ -18,6 +18,12 @@ func main() {
 	p.OnEvent("button", func() {
 		p.Set("button", p.StringValue("button")+" again")
 	})
+	p.OnEvent("text", func() {
+		p.Set("text2", p.StringValue("text"))
+	})
+	p.OnEvent("text2", func() {
+		p.Set("text", p.StringValue("text2"))
+	})
 	http.Handle("/", p)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -48,6 +54,7 @@ const testtempl = `
 	<p>{{.Span "time" "time" }} </p>
 	<p>{{.Span "attrtest" "" }} </p>
 	<p>{{.Button "button" "click me" }} </p>
+	<p>{{.TextBox "text2" "" "placeholder='type here'"}} {{.TextBox "text" "echo here" }} </p>
 
 	<hr/>
 </body>

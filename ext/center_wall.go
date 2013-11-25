@@ -21,13 +21,13 @@ func centerWall(c int) {
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
 	zero := data.Vector{0, 0, 0}
-	if engine.ShiftClampL == zero || engine.ShiftClampR == zero {
+	if engine.ShiftMagL == zero || engine.ShiftMagR == zero {
 		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
-		engine.ShiftClampL[c] = float64(sign)
-		engine.ShiftClampR[c] = -float64(sign)
+		engine.ShiftMagL[c] = float64(sign)
+		engine.ShiftMagR[c] = -float64(sign)
 	}
 
-	sign := magsign(engine.ShiftClampL[c])
+	sign := magsign(engine.ShiftMagL[c])
 
 	if mc < tolerance {
 		engine.Shift(sign)

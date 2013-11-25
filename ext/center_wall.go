@@ -11,8 +11,7 @@ var (
 )
 
 func init() {
-	engine.DeclFunc("ext_centerPMAWall", CenterPMAWall, "This post-step function tries to center the simulation window on the domain wall in a perpendicular medium")
-	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
+	engine.DeclFunc("ext_centerWall", CenterWall, "centerWall(c) shifts m after each step to keep m_c close to zero")
 }
 
 func centerWall(c int) {
@@ -39,15 +38,8 @@ func centerWall(c int) {
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:
 // 	PostStep(CenterPMAWall)
-func CenterPMAWall() {
-	centerWall(Z)
-}
-
-// This post-step function centers the simulation window on a domain wall
-// between left-right (or right-left) domains (like in soft thin films). E.g.:
-// 	PostStep(CenterInplaneWall)
-func CenterInplaneWall() {
-	centerWall(X)
+func CenterWall(magComp int) {
+	engine.PostStep(func() { centerWall(magComp) })
 }
 
 func magsign(x float64) int {

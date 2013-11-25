@@ -27,7 +27,7 @@ tableadd(ext_dwtilt)
 
 alpha=0.05
 xi=0.4
-poststep(ext_centerpmawall)
+ext_centerWall(2)
 
 Pol = 1
 J = vector(-1e9, 0, 0)

@@ -318,7 +318,7 @@ run(0.1e-9)                                   // relax
 alpha = 0.02                                  // normal damping
 
 // Set post-step function that centers simulation window on domain wall.
-postStep(ext_centerPMAwall)
+ext_centerWall(2) // keep m[2] (= m_z) close to zero
 
 // Schedule output
 autosave(m, 100e-12)
@@ -364,7 +364,7 @@ RunWhile(MaxTorque > 1e-3)    // relax
 Alpha = 0.02 // restore normal damping
 
 // Set post-step function that centers simulation window on domain wall.
-PostStep(ext_centerInplaneWall)
+ext_centerWall(0) // keep m[0] (= m_x) close to zero
 
 // Schedule output
 autosave(m, 100e-12)

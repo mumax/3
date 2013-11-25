@@ -17,7 +17,7 @@ func init() {
 func centerWall(c int) {
 	M := &engine.M
 	mc := engine.Average(M)[c]     // TODO: optimize
-	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
+	tolerance := 4 / float64(nx()) // x*2 * expected <m> change for 1 cell shift
 
 	zero := data.Vector{0, 0, 0}
 	if engine.ShiftMagL == zero || engine.ShiftMagR == zero {
@@ -28,7 +28,9 @@ func centerWall(c int) {
 
 	sign := magsign(engine.ShiftMagL[c])
 
-	if mc < tolerance {
+	//log.Println("mc", mc, "tol", tolerance)
+
+	if mc < -tolerance {
 		engine.Shift(sign)
 	} else if mc > tolerance {
 		engine.Shift(-sign)

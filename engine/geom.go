@@ -22,8 +22,8 @@ type geom struct {
 }
 
 func (g *geom) init() {
-	g.buffered.init(1, "geometry", "", &globalmesh)
-	DeclROnly("geometry", &geometry, "Cell fill fraction (0..1)")
+	g.buffered.init(1, "geom", "", &globalmesh)
+	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
 	g.spaceFill = 1.0 // filled fraction of space
 }
 
@@ -104,7 +104,7 @@ func (g *geom) shift(dx int) {
 	var x1, x2 int
 	util.Argument(dx != 0)
 	if dx < 0 {
-		x1 = nx - dx
+		x1 = nx + dx
 		x2 = nx
 	} else {
 		x1 = 0
@@ -114,11 +114,13 @@ func (g *geom) shift(dx int) {
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := x1; ix < x2; ix++ {
-				r := Index2Coord(ix, iy, iz)
+				r := Index2Coord(ix, iy, iz) // includes shift
 				if !g.shape(r[X], r[Y], r[Z]) {
 					g.SetCell(ix, iy, iz, 0) // a bit slowish, but hardly reached
 				}
 			}
 		}
 	}
+
+	cuda.Normalize(M.Buffer(), vol())
 }

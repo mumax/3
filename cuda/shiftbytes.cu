@@ -1,17 +1,24 @@
 #include "stencil.h"
 
-// Copies src to dst, shifting elements by (u, v, w).
-// Clamps at the boundaries.
+// shift dst by shx cells (positive or negative) along X-axis.
+// new edge value is clampL at left edge or clampR at right edge.
 extern "C" __global__ void
 shiftbytes(int8_t* __restrict__  dst, int8_t* __restrict__  src,
-           int Nx,  int Ny,  int Nz, int shx, int shy, int shz) {
+           int Nx,  int Ny,  int Nz, int shx, int8_t clamp) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
     int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
     if(ix < Nx && iy < Ny && iz < Nz) {
-        dst[idx(ix, iy, iz)] = src[idxclamp(ix-shx, iy-shy, iz-shz)];
+        int ix2 = ix-shx;
+        int8_t newval;
+        if (ix2 < 0 || ix2 >= Nx) {
+            newval = clamp;
+        } else {
+            newval = src[idx(ix2, iy, iz)];
+        }
+        dst[idx(ix, iy, iz)] = newval;
     }
 }
 

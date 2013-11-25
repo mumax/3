@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"log"
 )
 
 var (
@@ -16,20 +17,21 @@ func GetShiftPos() float64 { return TotalShift }
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {
+	util.Argument(dx == 1 || dx == -1) // one cell at a time please
 
-	util.Argument(dx == 1 || dx == -1)
+	TotalShift += float64(dx) * Mesh().CellSize()[X] // needed to re-init geom, regions
 
-	// shift m
 	if ShiftM {
-		shiftMag(M.Buffer(), dx)
+		shiftMag(M.Buffer(), dx) // TODO: M.shift?
 	}
-
-	//	regions.shift(dx, 0, 0)
+	if ShiftRegions {
+		log.Println("rs")
+		regions.shift(dx)
+	}
 	if ShiftGeom {
 		geometry.shift(dx)
 	}
 
-	TotalShift += float64(dx) * Mesh().CellSize()[X]
 }
 
 func shiftMag(m *data.Slice, dx int) {
@@ -40,12 +42,4 @@ func shiftMag(m *data.Slice, dx int) {
 		cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
 		data.Copy(comp, m2) // str0 ?
 	}
-}
-
-func (b *Regions) shift(shx, shy, shz int) {
-	r1 := b.Gpu()
-	r2 := cuda.NewBytes(b.Mesh()) // TODO: somehow recycle
-	defer r2.Free()
-	cuda.ShiftBytes(r2, r1, b.Mesh(), [3]int{shx, shy, shz})
-	r1.Copy(r2)
 }

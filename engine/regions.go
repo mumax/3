@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"log"
 )
 
 var regions = Regions{doc: Doc(1, "regions", "")} // global regions map
@@ -22,6 +23,10 @@ type Regions struct {
 	cpu        []byte      // arr data, stored contiguously
 	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
 	gpuCacheOK bool        // gpuCache in sync with cpu
+	deflist    []struct {
+		r int
+		s Shape
+	} // history
 	doc
 }
 
@@ -52,6 +57,12 @@ func DefRegion(id int, s Shape) {
 			}
 		}
 	}
+
+	regions.deflist = append(regions.deflist, struct {
+		r int
+		s Shape
+	}{id, s})
+
 	if !ok {
 		util.Log("Note: DefRegion ", id, ": shape is empty")
 	}
@@ -67,9 +78,6 @@ func defRegionId(id int) {
 	if id < 0 || id > NREGION {
 		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
 	}
-	//	if id+1 > regions.maxreg {
-	//		regions.maxreg = id + 1 // we loop < maxreg, so +1
-	//	}
 	checkMesh()
 }
 
@@ -87,6 +95,7 @@ func (r *Regions) volume(region int) float64 {
 
 // Set the region of one cell
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
+	// TODO: broken if also shifting! rm cpucache alltogehter, use local cache in loop
 	r.arr[iz][iy][ix] = byte(region)
 	r.gpuCacheOK = false
 }
@@ -96,6 +105,7 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	if r.gpuCacheOK {
 		return r.gpuCache
 	}
+	log.Print("regions.upload")
 	r.gpuCache.Upload(r.cpu)
 	r.gpuCacheOK = true
 	return r.gpuCache
@@ -131,6 +141,46 @@ func reshapeBytes(array []byte, size [3]int) [][][]byte {
 		}
 	}
 	return sliced
+}
+
+func (b *Regions) shift(dx int) {
+	// TODO: return if no regions defined
+	log.Println("regionshift", dx)
+	r1 := b.Gpu()
+	r2 := cuda.NewBytes(b.Mesh()) // TODO: somehow recycle
+	defer r2.Free()
+	newreg := byte(0) // new region at edge
+	cuda.ShiftBytes(r2, r1, b.Mesh(), dx, newreg)
+	r1.Copy(r2)
+
+	// TODO: dedup from geom.shift!
+
+	//n := b.Mesh().Size()
+	//nx := n[X]
+	// re-evaluate edge regions
+	//var x1, x2 int
+	//util.Argument(dx != 0)
+	//if dx < 0 {
+	//	x1 = nx + dx
+	//	x2 = nx
+	//} else {
+	//	x1 = 0
+	//	x2 = dx
+	//}
+
+	//panic("todo")
+	//	for iz := 0; iz < n[Z]; iz++ {
+	//		for iy := 0; iy < n[Y]; iy++ {
+	//			for ix := x1; ix < x2; ix++ {
+	//				r := Index2Coord(ix, iy, iz) // includes shift
+	//				reg :=
+	//				if !g.shape(r[X], r[Y], r[Z]) {
+	//					g.SetCell(ix, iy, iz, 0) // a bit slowish, but hardly reached
+	//				}
+	//			}
+	//		}
+	//	}
+	//
 }
 
 func (r *Regions) Mesh() *data.Mesh { return &globalmesh }

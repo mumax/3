@@ -10,7 +10,6 @@ import (
 func init() {
 	DeclFunc("Run", Run, "Run the simulation for a time in seconds")
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
-	DeclFunc("PostStep", PostStep, "Set up a function to be executed after every time step")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")

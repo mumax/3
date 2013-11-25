@@ -83,6 +83,11 @@ func (g *geom) shift(dx int) {
 	if g.buffer.IsNil() {
 		return
 	}
-	panic("todo")
-	shiftSlice(g.buffer, dx)
+
+	s := g.buffer
+	s2 := cuda.Buffer(1, g.Mesh())
+	defer cuda.Recycle(s2)
+	newv := float32(1) // initially fill edges with 1's
+	cuda.ShiftX(s2, s, dx, newv, newv)
+	data.Copy(s, s2)
 }

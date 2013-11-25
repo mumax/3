@@ -18,7 +18,7 @@ func Shift(dx int) {
 
 	// shift m
 	if ShiftM {
-		shiftSlice(M.Buffer(), dx)
+		shiftMag(M.Buffer(), dx)
 	}
 
 	//	regions.shift(dx, 0, 0)
@@ -29,7 +29,7 @@ func Shift(dx int) {
 	TotalShift += float64(dx) * Mesh().CellSize()[X]
 }
 
-func shiftSlice(m *data.Slice, dx int) {
+func shiftMag(m *data.Slice, dx int) {
 	m2 := cuda.Buffer(1, m.Mesh())
 	defer cuda.Recycle(m2)
 	for c := 0; c < m.NComp(); c++ {

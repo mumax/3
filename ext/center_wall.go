@@ -20,15 +20,18 @@ func centerWall(c int) {
 	mc := engine.Average(M)[c]     // TODO: optimize
 	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
 
-	if mc < tolerance {
+	zero := data.Vector{0, 0, 0}
+	if engine.ShiftClampL == zero || engine.ShiftClampR == zero {
 		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
-		engine.ShiftClampL = data.Vector{0, 0, 0}
 		engine.ShiftClampL[c] = float64(sign)
+		engine.ShiftClampR[c] = -float64(sign)
+	}
+
+	sign := magsign(engine.ShiftClampL[c])
+
+	if mc < tolerance {
 		engine.Shift(sign)
 	} else if mc > tolerance {
-		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
-		engine.ShiftClampR = data.Vector{0, 0, 0}
-		engine.ShiftClampR[c] = float64(-sign)
 		engine.Shift(-sign)
 	}
 }
@@ -54,7 +57,7 @@ func magsign(x float64) int {
 	if x < -0.1 {
 		return -1
 	}
-	panic(fmt.Errorf("center wall: unclear in which direction to shift: magnetization at border=%v", x))
+	panic(fmt.Errorf("center wall: unclear in which direction to shift: magnetization at border=%v. Set ShiftMagL, ShiftMagR", x))
 }
 
 // used for speed

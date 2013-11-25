@@ -79,9 +79,10 @@ func (geometry *geom) setGeom(s Shape) {
 	cuda.Normalize(M.Buffer(), vol()) // removes m outside vol
 }
 
-//func (g *geom) shift(dx int) {
-//	if g.buffer.IsNil() {
-//		return
-//	}
-//	shift(g.buffer, dx, 0, 0)
-//}
+func (g *geom) shift(dx int) {
+	if g.buffer.IsNil() {
+		return
+	}
+	panic("todo")
+	shiftSlice(g.buffer, dx)
+}

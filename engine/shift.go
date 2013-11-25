@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	TotalShift           float64            // accumulated window shift (X) in meter
-	ShiftMagL, ShiftMagR data.Vector        // when shifting m, put these value at the left/right edge.
-	shiftM               bool        = true // should shift act on magnetization?
+	TotalShift                      float64                        // accumulated window shift (X) in meter
+	ShiftMagL, ShiftMagR            data.Vector                    // when shifting m, put these value at the left/right edge.
+	ShiftM, ShiftGeom, ShiftRegions bool        = true, true, true // should shift act on magnetization, geometry, regions?
 )
 
 func GetShiftPos() float64 { return TotalShift }
@@ -17,21 +17,26 @@ func GetShiftPos() float64 { return TotalShift }
 func Shift(dx int) {
 
 	// shift m
-	if shiftM {
-		m := M.Buffer()
-		m2 := cuda.Buffer(1, m.Mesh())
-		defer cuda.Recycle(m2)
-		for c := 0; c < m.NComp(); c++ {
-			comp := m.Comp(c)
-			cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
-			data.Copy(comp, m2) // str0 ?
-		}
+	if ShiftM {
+		shiftSlice(M.Buffer(), dx)
 	}
 
 	//	regions.shift(dx, 0, 0)
-	//	geometry.shift(dx)
+	if ShiftGeom {
+		geometry.shift(dx)
+	}
 
 	TotalShift += float64(dx) * Mesh().CellSize()[X]
+}
+
+func shiftSlice(m *data.Slice, dx int) {
+	m2 := cuda.Buffer(1, m.Mesh())
+	defer cuda.Recycle(m2)
+	for c := 0; c < m.NComp(); c++ {
+		comp := m.Comp(c)
+		cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
+		data.Copy(comp, m2) // str0 ?
+	}
 }
 
 func (b *Regions) shift(shx, shy, shz int) {

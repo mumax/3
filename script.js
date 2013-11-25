@@ -41,17 +41,22 @@ var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
 function notifyblur (id){hasFocus = "";}
 
-// called by server to manipulate the DOM
-function setAttr(id, attr, value){
-	var elem = elementById(id);
-	if (elem == null){
-		return;
-	}
+function setattr_(elem, attr, value){
 	if (elem[attr] == null){
 		showErr("settAttr: undefined: " + id + "[" + attr + "]");
 		return;
 	}
 	elem[attr] = value;
+}
+
+// called by server to manipulate the DOM
+function setAttr(id, attr, value){
+	var elem = elementById(id);
+	if (elem == null){
+		showErr("undefined: " + id);
+		return;
+	}
+	setattr_(elem, attr, value);
 }
 
 // set textbox value unless focused

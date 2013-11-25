@@ -73,6 +73,14 @@ func (d *Page) Disable(id string, disable bool) {
 	d.Attr(id, "disabled", disable)
 }
 
+func (d *Page) Display(id string, visible bool) {
+	if visible {
+		d.Attr(id, "style.display", "none")
+	} else {
+		d.Attr(id, "style.display", "block")
+	}
+}
+
 func (d *Page) OnEvent(id string, handler func()) {
 	d.elem(id).onevent = handler
 }

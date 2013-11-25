@@ -33,7 +33,8 @@ func main() {
 		p.Set("rangeEcho", p.Value("range"))
 	})
 	p.OnEvent("check", func() {
-		p.Disable("check", p.BoolValue("check"))
+		p.Disable("text2", p.BoolValue("check"))
+		p.Display("static", p.BoolValue("check"))
 	})
 	p.OnEvent("select", func() {
 		p.Set("selectEcho", p.Value("select"))

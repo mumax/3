@@ -51,14 +51,14 @@ const (
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
-	gui_.Set("runtime", seconds)
+	//GUI.Set("runtime", seconds) // TODO
 	stop := Time + seconds
 	RunWhile(func() bool { return Time < stop })
 }
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	gui_.Set("runsteps", n)
+	//GUI.Set("runsteps", n) // TODO
 	stop := Solver.NSteps + n
 	RunWhile(func() bool { return Solver.NSteps < stop })
 }

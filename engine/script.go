@@ -21,31 +21,20 @@ func DeclConst(name string, value float64, doc string) {
 // It can be changed, but not by the user.
 func DeclROnly(name string, value interface{}, doc string) {
 	World.ROnly(name, value, doc)
-	guiAdd(name, value)
+	GUI.Add(name, value)
 }
 
 // Add a (pointer to) variable to the script world
 func DeclVar(name string, value interface{}, doc string) {
 	World.Var(name, value, doc)
-	guiAdd(name, value)
+	GUI.Add(name, value)
 }
 
 // Add an LValue to the script world.
 // Assign to LValue invokes SetValue()
 func DeclLValue(name string, value script.LValue, doc string) {
 	World.LValue(name, value, doc)
-	guiAdd(name, value)
-}
-
-// Internal:add a quantity to the GUI, will be visible in web interface.
-// Automatically called by Decl*()
-func guiAdd(name string, value interface{}) {
-	if v, ok := value.(Param); ok {
-		params[name] = v
-	}
-	if v, ok := value.(Slicer); ok {
-		quants[name] = v
-	}
+	GUI.Add(name, value)
 }
 
 // evaluate code, exit on error (behavior for input files)

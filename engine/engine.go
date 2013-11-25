@@ -5,11 +5,14 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"runtime"
+	"time"
 )
 
 const VERSION = "mumax3.4.0"
 
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
+
+var StartTime = time.Now()
 
 var (
 	globalmesh data.Mesh     // mesh for m and everything that has the same size

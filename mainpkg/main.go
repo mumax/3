@@ -73,7 +73,7 @@ func Init() {
 	}
 	defer prof.Cleanup()
 
-	engine.InitGui()
+	engine.GUI.PrepareServer()
 }
 
 func RunFiles() {

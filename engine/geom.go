@@ -17,22 +17,24 @@ type geom struct {
 	buffered              // cell fillings (0..1) // todo: unbed
 	host      *data.Slice // cpu copy of buffered
 	array     [][][]float32
-	spaceFill float64 // filled fraction of space
 	shape     Shape
 }
 
 func (g *geom) init() {
 	g.buffered.init(1, "geom", "", &globalmesh)
 	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
-	g.spaceFill = 1.0 // filled fraction of space
 }
 
 func vol() *data.Slice {
 	return geometry.Gpu()
 }
 
-func spaceFill() float64 {
-	return geometry.spaceFill
+func spaceFill()float64{
+	if geometry.Gpu().IsNil(){
+		return 1
+	}else{
+		return float64(cuda.Sum(geometry.buffer)) / float64(geometry.Mesh().NCell())
+	}
 }
 
 func (g *geom) Gpu() *data.Slice {
@@ -57,8 +59,8 @@ func (geometry *geom) setGeom(s Shape) {
 	v := geometry.array
 	n := Mesh().Size()
 
-	fill := 0.0
 
+	var ok bool
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
@@ -66,7 +68,7 @@ func (geometry *geom) setGeom(s Shape) {
 				x, y, z := r[X], r[Y], r[Z]
 				if s(x, y, z) { // inside
 					v[iz][iy][ix] = 1
-					fill += 1.0
+					ok = true
 				} else {
 					v[iz][iy][ix] = 0
 				}
@@ -74,10 +76,9 @@ func (geometry *geom) setGeom(s Shape) {
 		}
 	}
 
-	if fill == 0 {
+	if !ok {
 		util.Fatal("SetGeom: geometry completely empty")
 	}
-	geometry.spaceFill = fill / float64(Mesh().NCell())
 
 	data.Copy(geometry.buffer, V)
 	cuda.Normalize(M.Buffer(), vol()) // removes m outside vol

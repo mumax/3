@@ -35,11 +35,10 @@ func averageVolume(b, vol *data.Slice) []float64 {
 	nCell := float64(b.Mesh().NCell())
 	avg := make([]float64, nComp)
 	for i := range avg {
-		I := i // util.SwapIndex(i, nComp)
 		if vol.IsNil() {
-			avg[i] = float64(cuda.Sum(b.Comp(I))) / nCell
+			avg[i] = float64(cuda.Sum(b.Comp(i))) / nCell
 		} else {
-			avg[i] = float64(cuda.Dot(b.Comp(I), vol)) / (spaceFill() * nCell)
+			avg[i] = float64(cuda.Dot(b.Comp(i), vol)) / (spaceFill() * nCell)
 		}
 	}
 	return avg

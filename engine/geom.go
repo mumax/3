@@ -20,8 +20,8 @@ type geom struct {
 }
 
 func (g *geom) init() {
-	g.buffered.init(1, "geometry", "", "Cell fill fraction", &globalmesh)
-	//DeclROnly("geometry", )
+	g.buffered.init(1, "geometry", "", &globalmesh)
+	DeclROnly("geometry", &geometry, "Cell fill fraction (0..1)")
 	g.spaceFill = 1.0 // filled fraction of space
 }
 

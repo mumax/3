@@ -118,3 +118,4 @@ func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config))
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(magnetization)) }
 func (m *magnetization) Eval() interface{}       { return m }
+func (m *magnetization) Average() data.Vector    { return unslice(Average(&M)) }

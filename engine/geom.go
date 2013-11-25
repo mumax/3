@@ -14,10 +14,10 @@ func init() {
 var geometry geom
 
 type geom struct {
-	buffered              // cell fillings (0..1) // todo: unbed
-	host      *data.Slice // cpu copy of buffered
-	array     [][][]float32
-	shape     Shape
+	buffered             // cell fillings (0..1) // todo: unbed
+	host     *data.Slice // cpu copy of buffered
+	array    [][][]float32
+	shape    Shape
 }
 
 func (g *geom) init() {
@@ -29,10 +29,10 @@ func vol() *data.Slice {
 	return geometry.Gpu()
 }
 
-func spaceFill()float64{
-	if geometry.Gpu().IsNil(){
+func spaceFill() float64 {
+	if geometry.Gpu().IsNil() {
 		return 1
-	}else{
+	} else {
 		return float64(cuda.Sum(geometry.buffer)) / float64(geometry.Mesh().NCell())
 	}
 }
@@ -58,7 +58,6 @@ func (geometry *geom) setGeom(s Shape) {
 	V := geometry.host
 	v := geometry.array
 	n := Mesh().Size()
-
 
 	var ok bool
 	for iz := 0; iz < n[Z]; iz++ {

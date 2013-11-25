@@ -2,6 +2,7 @@ package ext
 
 import (
 	"fmt"
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/engine"
 )
 
@@ -14,45 +15,43 @@ func init() {
 	engine.DeclFunc("ext_centerInplaneWall", CenterInplaneWall, "This post-step function tries to center the simulation window on the domain wall of an in-plane medium")
 }
 
+func centerWall(c int) {
+	M := &engine.M
+	mc := engine.Average(M)[c]     // TODO: optimize
+	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
+
+	if mc < tolerance {
+		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
+		engine.ShiftClampL = data.Vector{0, 0, 0}
+		engine.ShiftClampL[c] = float64(sign)
+		engine.Shift(sign)
+	} else if mc > tolerance {
+		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
+		engine.ShiftClampR = data.Vector{0, 0, 0}
+		engine.ShiftClampR[c] = float64(-sign)
+		engine.Shift(-sign)
+	}
+}
+
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:
 // 	PostStep(CenterPMAWall)
 func CenterPMAWall() {
-	M := &engine.M
-	mz := engine.Average(M)[Z]     // TODO: optimize
-	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
-
-	if mz < tolerance {
-		sign := wall_left_magnetization(M.GetCell(Z, 0, ny()/2, nz()/2))
-		engine.Shift(sign)
-	} else if mz > tolerance {
-		sign := wall_left_magnetization(M.GetCell(Z, 0, ny()/2, nz()/2))
-		engine.Shift(-sign)
-	}
+	centerWall(Z)
 }
 
 // This post-step function centers the simulation window on a domain wall
 // between left-right (or right-left) domains (like in soft thin films). E.g.:
 // 	PostStep(CenterInplaneWall)
 func CenterInplaneWall() {
-	M := &engine.M
-	mx := engine.Average(M)[X]     // TODO: optimize
-	tolerance := 4 / float64(nx()) // 2 * expected <m> change for 1 cell shift
-
-	if mx < tolerance {
-		sign := wall_left_magnetization(M.GetCell(X, 0, ny()/2, nz()/2))
-		engine.Shift(sign)
-	} else if mx > tolerance {
-		sign := wall_left_magnetization(M.GetCell(X, 0, ny()/2, nz()/2))
-		engine.Shift(-sign)
-	}
+	centerWall(X)
 }
 
-func wall_left_magnetization(x float64) int {
-	if x > 0.6 {
+func magsign(x float64) int {
+	if x > 0.1 {
 		return 1
 	}
-	if x < -0.6 {
+	if x < -0.1 {
 		return -1
 	}
 	panic(fmt.Errorf("center wall: unclear in which direction to shift: magnetization at border=%v", x))

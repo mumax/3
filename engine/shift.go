@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	TotalShift               float64        // accumulated window shift (X) in meter
-	ShiftClampL, ShiftClampR float32        // when shifting m, put these value at the left/right edge.
-	shiftM                   bool    = true // should shift act on magnetization?
+	TotalShift               float64            // accumulated window shift (X) in meter
+	ShiftClampL, ShiftClampR data.Vector        // when shifting m, put these value at the left/right edge.
+	shiftM                   bool        = true // should shift act on magnetization?
 )
 
 func GetShiftPos() float64 { return TotalShift }
@@ -23,7 +23,7 @@ func Shift(dx int) {
 		defer cuda.Recycle(m2)
 		for c := 0; c < m.NComp(); c++ {
 			comp := m.Comp(c)
-			cuda.ShiftX(m2, comp, dx, ShiftClampL, ShiftClampR)
+			cuda.ShiftX(m2, comp, dx, float32(ShiftClampL[c]), float32(ShiftClampR[c]))
 			data.Copy(comp, m2) // str0 ?
 		}
 	}

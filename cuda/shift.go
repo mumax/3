@@ -5,17 +5,16 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Copy dst to src, shifting data by given number of cells.
-// Off-boundary values are clamped. Used, e.g., to make the
-// simulation window follow interesting features.
-func Shift(dst, src *data.Slice, shift [3]int) {
+// shift dst by shx cells (positive or negative) along X-axis.
+// new edge value is clampL at left edge or clampR at right edge.
+func ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
 
 	N := dst.Mesh().Size()
 	cfg := make3DConf(N)
 
-	k_shift_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shift[X], shift[Y], shift[Z], cfg, stream0)
+	k_shiftx_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg, stream0)
 }
 
 // Like Shift, but for bytes

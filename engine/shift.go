@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -15,6 +16,8 @@ func GetShiftPos() float64 { return TotalShift }
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {
+
+	util.Argument(dx == 1 || dx == -1)
 
 	// shift m
 	if ShiftM {

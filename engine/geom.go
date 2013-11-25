@@ -14,7 +14,9 @@ func init() {
 var geometry geom
 
 type geom struct {
-	buffered          // cell fillings (0..1)
+	buffered              // cell fillings (0..1) // todo: unbed
+	host      *data.Slice // cpu copy of buffered
+	array     [][][]float32
 	spaceFill float64 // filled fraction of space
 	shape     Shape
 }
@@ -48,9 +50,11 @@ func (geometry *geom) setGeom(s Shape) {
 	geometry.shape = s
 	if vol().IsNil() {
 		geometry.buffer = cuda.NewSlice(1, Mesh())
+		geometry.host = data.NewSlice(1, vol().Mesh())
+		geometry.array = geometry.host.Scalars()
 	}
-	V := data.NewSlice(1, vol().Mesh())
-	v := V.Scalars()
+	V := geometry.host
+	v := geometry.array
 	n := Mesh().Size()
 
 	fill := 0.0
@@ -80,14 +84,41 @@ func (geometry *geom) setGeom(s Shape) {
 }
 
 func (g *geom) shift(dx int) {
+	// empty mask, nothing to do
 	if g.buffer.IsNil() {
 		return
 	}
 
+	// allocated mask: shift
 	s := g.buffer
 	s2 := cuda.Buffer(1, g.Mesh())
 	defer cuda.Recycle(s2)
 	newv := float32(1) // initially fill edges with 1's
 	cuda.ShiftX(s2, s, dx, newv, newv)
 	data.Copy(s, s2)
+
+	n := Mesh().Size()
+	nx := n[X]
+
+	// re-evaluate edge regions
+	var x1, x2 int
+	util.Argument(dx != 0)
+	if dx < 0 {
+		x1 = nx - dx
+		x2 = nx
+	} else {
+		x1 = 0
+		x2 = dx
+	}
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := x1; ix < x2; ix++ {
+				r := Index2Coord(ix, iy, iz)
+				if !g.shape(r[X], r[Y], r[Z]) {
+					g.SetCell(ix, iy, iz, 0) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
 }

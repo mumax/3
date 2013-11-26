@@ -79,8 +79,21 @@ func alloc() {
 	regions.alloc()
 }
 
-func FreeAll() {
+var freelist []interface {
+	Free()
+}
 
+func FreeAll() {
+	for _, f := range freelist {
+		f.Free()
+	}
+	freelist = nil
+}
+
+func RegisterFree(f interface {
+	Free()
+}) {
+	freelist = append(freelist, f)
 }
 
 func normalize(m *data.Slice) {

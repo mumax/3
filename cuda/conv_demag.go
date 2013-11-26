@@ -23,6 +23,25 @@ type DemagConvolution struct {
 	FFTMesh     data.Mesh         // mesh of FFT m
 }
 
+func (c *DemagConvolution) Free() {
+	c.size = [3]int{}
+	c.kernSize = [3]int{}
+	for i := 0; i < 3; i++ {
+		c.fftCBuf[i].Free() // shared with fftRbuf
+		c.fftCBuf[i] = nil
+		c.fftRBuf[i] = nil
+
+		for j := 0; j < 3; j++ {
+			c.gpuFFTKern[i][j].Free()
+			c.gpuFFTKern[i][j] = nil
+			c.kern[i][j] = nil
+		}
+		c.fwPlan.Free()
+		c.bwPlan.Free()
+		c.FFTMesh = data.Mesh{}
+	}
+}
+
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize

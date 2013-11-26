@@ -27,7 +27,7 @@ const templText = `
 		a         { color: #375EAB; text-decoration: none; }
 		div       { margin-left: 20px; margin-top: 5px; margin-bottom: 20px; }
 		div#footer{ color:gray; font-size:14px; border:none; }
-		.ErrorBox { color: red; font-weight: bold; } 
+		.ErrorBox { color: red; font-weight: bold; font-size: 1.5em; } 
 		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; }
 		textarea  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4ps; color:gray; font-size: 1em; }
 	</style>
@@ -39,7 +39,7 @@ const templText = `
 
 <body>
 
-	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} </span> {{.ErrorBox}} <br/>
+	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span> {{.UpdateButton ""}} {{.UpdateBox "live"}} &nbsp; &nbsp; {{.ErrorBox}} <br/>
 	<hr/>
 
 </body>

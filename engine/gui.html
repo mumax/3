@@ -38,6 +38,7 @@
 
 
 <script>
+	// auto scroll the console window down unless focused.
 	var console_focus = false;
 	function console_scrolldown(){
 		if (!console_focus){
@@ -48,13 +49,14 @@
 	setInterval(console_scrolldown, tick);
 </script>
 
-<span>
 
-{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
+{{.Data.Div "console"}}
 
-{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=65" "style=\"font-family:monospace; font-size:0.8em;\""}}
+{{.TextArea "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-</span>
+{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""}}
+
+</div>
 
 </body>
 </html>

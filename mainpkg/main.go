@@ -81,7 +81,6 @@ func Init() {
 }
 
 func RunFiles() {
-
 	if !*flag_vet {
 		fmt.Print("starting GUI at http://localhost", *flag_port, "\n")
 		runFileAndServe(flag.Arg(0))

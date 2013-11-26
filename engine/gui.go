@@ -2,13 +2,12 @@ package engine
 
 import (
 	"fmt"
-
 	"github.com/barnex/gui"
 	"github.com/mumax/3/util"
-
 	"net/http"
 	"path"
 	"sync"
+	"time"
 )
 
 // global GUI state stores what is currently shown in the web page.
@@ -55,6 +54,10 @@ func (g *guistate) PrepareServer() {
 		cmd := GUI.StringValue("cli")
 		Log(cmd)
 		GUI.Set("cli", "")
+	})
+
+	GUI.OnUpdate(func() {
+		updateKeepAlive()
 	})
 }
 
@@ -327,3 +330,20 @@ func (g *guistate) SetBusy(busy bool) {
 //	util.LogErr(err)
 //	return i
 //}
+
+var (
+	keepalive time.Time
+	keepalock sync.Mutex
+)
+
+func KeepAlive() time.Time {
+	keepalock.Lock()
+	defer keepalock.Unlock()
+	return keepalive
+}
+
+func updateKeepAlive() {
+	keepalock.Lock()
+	defer keepalock.Unlock()
+	keepalive = time.Now()
+}

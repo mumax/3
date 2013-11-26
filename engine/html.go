@@ -54,11 +54,11 @@ const templText = `
 	setInterval(console_scrolldown, tick);
 </script>
 
-<span style="font-family: monospace; font-size: 0.8em; ">
+<span>
 
-{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" }}	<br/>
+{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=64" "style=\"font-family:monospace; \""}}
+{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=65" "style=\"font-family:monospace; font-size:0.8em;\""}}
 
 </span>
 

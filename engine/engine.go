@@ -44,11 +44,17 @@ func Mesh() *data.Mesh {
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
-func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
+func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int) {
 	if Nx <= 1 {
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
+
+	if globalmesh.Size() != [3]int{0, 0, 0} {
+		FreeAll()
+	}
+
 	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)
 	GUI.Set("nz", Nz)
@@ -63,6 +69,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	GUI.Set("wx", w[X]*1e9)
 	GUI.Set("wy", w[Y]*1e9)
 	GUI.Set("wz", w[Z]*1e9)
+
 	alloc()
 }
 
@@ -70,6 +77,10 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 func alloc() {
 	M.alloc()
 	regions.alloc()
+}
+
+func FreeAll() {
+
 }
 
 func normalize(m *data.Slice) {
@@ -86,25 +97,22 @@ var (
 func SetGridSize(Nx, Ny, Nz int) {
 	gridsize = []int{Nx, Ny, Nz}
 	if cellsize != nil {
-		SetMesh(Nx, Ny, Nz, cellsize[0], cellsize[1], cellsize[2])
+		SetMesh(Nx, Ny, Nz, cellsize[X], cellsize[Y], cellsize[Z], pbc)
 	}
 }
 
 func SetCellSize(cx, cy, cz float64) {
 	cellsize = []float64{cx, cy, cz}
 	if gridsize != nil {
-		SetMesh(gridsize[0], gridsize[1], gridsize[2], cx, cy, cz)
+		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cx, cy, cz, pbc)
 	}
 }
 
 func SetPBC(nx, ny, nz int) {
-	if pbc != nil {
-		util.Fatal("PBC alread set")
-	}
-	if globalmesh.Size() != [3]int{0, 0, 0} {
-		util.Fatal("PBC must be set before MeshSize and GridSize")
-	}
 	pbc = []int{nx, ny, nz}
+	if gridsize != nil && cellsize != nil {
+		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cellsize[X], cellsize[Y], cellsize[Z], pbc)
+	}
 }
 
 // check if mesh is set

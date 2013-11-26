@@ -4,6 +4,7 @@ package engine
 
 import (
 	"github.com/mumax/3/util"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +16,7 @@ var OD = "./" // Output directory
 // The -o flag can also be used for this purpose.
 func SetOD(od string, force bool) {
 	if OD != "./" {
-		panic("setod: output directory already set to " + OD)
+		log.Println("setod: output directory already set to " + OD)
 	}
 
 	OD = od

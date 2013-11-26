@@ -7,6 +7,7 @@ import (
 	"go/format"
 	"go/token"
 	"reflect"
+	"strings"
 )
 
 // block statement is a list of statements.
@@ -48,7 +49,11 @@ func Format(n ast.Node) string {
 	var buf bytes.Buffer
 	fset := token.NewFileSet()
 	format.Node(&buf, fset, n)
-	return buf.String()
+	str := buf.String()
+	if strings.HasSuffix(str, "\n") {
+		str = str[:len(str)-1]
+	}
+	return str
 }
 
 func (b *BlockStmt) Format() string {

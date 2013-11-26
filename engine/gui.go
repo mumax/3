@@ -51,10 +51,16 @@ func (g *guistate) PrepareServer() {
 	//http.HandleFunc("/render/", serveRender)
 	//http.HandleFunc("/plot/", servePlot)
 
+	// console
 	GUI.OnEvent("cli", func() {
 		cmd := GUI.StringValue("cli")
-		Log(cmd)
+		Inject <- func() { Eval(cmd) }
 		GUI.Set("cli", "")
+	})
+
+	// geometry
+	GUI.OnEvent("setmesh", func() {
+
 	})
 
 	GUI.OnUpdate(func() {
@@ -85,6 +91,17 @@ func (g *guistate) SetBusy(busy bool) {
 	defer g.mutex.Unlock()
 	g.busy = busy
 	GUI.Disable("cli", busy)
+	GUI.Disable("setmesh", busy)
+}
+
+func Eval(code string) {
+	tree, err := World.Compile(code)
+	if err == nil {
+		Log(tree.Format())
+		tree.Eval()
+	} else {
+		Log(err)
+	}
 }
 
 //

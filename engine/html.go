@@ -80,10 +80,13 @@ const templText = `
 {{.Data.Div "geometry"}}
 
 		<table>
-			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=4"}} </td> <td> &times; {{.TextBox "ny" "" "size=4"}}</td> <td> &times; {{.TextBox "nz" "" "size=4"}}</td> <td>  cells          </td> </tr>
-			<tr> <td>cellsize: </td> <td>{{.TextBox "cx" "" "size=4"}} </td> <td> &times; {{.TextBox "cy" "" "size=4"}}</td> <td> &times; {{.TextBox "cz" "" "size=4"}}</td> <td>  nm<sup>3</sup> </td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=8"}} </td> <td> &times; {{.TextBox "ny" "" "size=8"}}</td> <td> &times; {{.TextBox "nz" "" "size=8"}}</td> <td>  cells             </td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.TextBox "cx" "" "size=8"}} </td> <td> &times; {{.TextBox "cy" "" "size=8"}}</td> <td> &times; {{.TextBox "cz" "" "size=8"}}</td> <td>  nm<sup>3</sup>    </td> </tr>
+			<tr> <td>PBC:      </td> <td>{{.TextBox "px" "" "size=8"}} </td> <td> &times; {{.TextBox "py" "" "size=8"}}</td> <td> &times; {{.TextBox "pz" "" "size=8"}}</td> <td>  repetitions </td> </tr>
 			<tr> <td>worldsize:</td> <td>{{.Span    "wx" ""}} </td> <td> &times; {{.Span    "wy" ""}}</td> <td> &times; {{.Span    "wz" ""}}</td> <td>  nm<sup>3</sup> </td> </tr>
 		</table>
+
+		{{.Button "setmesh" "&#x26a0; update"}}
 
 
 </div>

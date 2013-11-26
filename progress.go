@@ -13,5 +13,5 @@ func (e *progress) update(id string) []jsCall {
 func (d *Page) Progress(id string, max, value int, extra ...string) string {
 	e := &progress{data: data{value}}
 	d.addElem(id, e)
-	return fmt.Sprintf(`<progress id=%v max=%v />`, id, max)
+	return fmt.Sprintf(`<progress id=%v max=%v></progress>`, id, max)
 }

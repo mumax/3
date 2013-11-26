@@ -51,9 +51,11 @@ func (g *guistate) PrepareServer() {
 	//http.HandleFunc("/render/", serveRender)
 	//http.HandleFunc("/plot/", servePlot)
 
-	// solver
-	//gui.OnEvent("break", inj(func() { pause = true }))
-	//gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
+	GUI.OnEvent("cli", func() {
+		cmd := GUI.StringValue("cli")
+		Log(cmd)
+		GUI.Set("cli", "")
+	})
 }
 
 func (g *guistate) Title() string {

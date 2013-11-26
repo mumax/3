@@ -29,7 +29,7 @@ const templText = `
 		div#footer{ color:gray; font-size:14px; border:none; }
 		.ErrorBox { color: red; font-weight: bold; font-size: 1.5em; } 
 		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; }
-		textarea  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4ps; color:gray; font-size: 1em; }
+		textarea  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; color:gray; font-size: 1em; }
 	</style>
 
 	{{.JS}}
@@ -54,7 +54,13 @@ const templText = `
 	setInterval(console_scrolldown, tick);
 </script>
 
-{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\""}}	
+<span style="font-family: monospace; font-size: 0.8em; ">
+
+{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" }}	<br/>
+
+{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=64" "style=\"font-family:monospace; \""}}
+
+</span>
 
 </body>
 </html>

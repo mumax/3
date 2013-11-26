@@ -39,7 +39,7 @@ const templText = `
 
 <body>
 
-	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span> {{.UpdateButton ""}} {{.UpdateBox "live"}} &nbsp; &nbsp; {{.ErrorBox}} <br/>
+	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span>  {{.ErrorBox}} <br/>
 	<hr/>
 
 
@@ -78,6 +78,13 @@ const templText = `
 
 
 {{.Data.Div "geometry"}}
+
+		<table>
+			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=4"}} </td> <td> &times; {{.TextBox "ny" "" "size=4"}}</td> <td> &times; {{.TextBox "nz" "" "size=4"}}</td> <td>  cells          </td> </tr>
+			<tr> <td>cellsize: </td> <td>{{.TextBox "cx" "" "size=4"}} </td> <td> &times; {{.TextBox "cy" "" "size=4"}}</td> <td> &times; {{.TextBox "cz" "" "size=4"}}</td> <td>  nm<sup>3</sup> </td> </tr>
+			<tr> <td>worldsize:</td> <td>{{.Span    "wx" ""}} </td> <td> &times; {{.Span    "wy" ""}}</td> <td> &times; {{.Span    "wz" ""}}</td> <td>  nm<sup>3</sup> </td> </tr>
+		</table>
+
 
 </div>
 

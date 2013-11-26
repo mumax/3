@@ -73,18 +73,14 @@ func Init() {
 	}
 	defer prof.Cleanup()
 
+	if *flag_od == "" { // -o not set
+		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)
+	}
+
 	engine.GUI.PrepareServer()
 }
 
 func RunFiles() {
-	if flag.NArg() != 1 {
-		batchMode()
-		return
-	}
-
-	if *flag_od == "" { // -o not set
-		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)
-	}
 
 	if !*flag_vet {
 		fmt.Print("starting GUI at http://localhost", *flag_port, "\n")

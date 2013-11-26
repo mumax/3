@@ -1,12 +1,17 @@
 package engine
 
 import (
+	"fmt"
+
 	"github.com/barnex/gui"
 	"github.com/mumax/3/util"
+
 	"net/http"
+	"path"
 	"sync"
 )
 
+// global GUI state stores what is currently shown in the web page.
 var GUI = guistate{Quants: make(map[string]Slicer), Params: make(map[string]Param)}
 
 type guistate struct {
@@ -17,7 +22,7 @@ type guistate struct {
 	busy   bool
 }
 
-// displayable in GUI Parameters section
+// displayable quantity in GUI Parameters section
 type Param interface {
 	NComp() int
 	Unit() string
@@ -27,7 +32,7 @@ type Param interface {
 }
 
 // Internal:add a quantity to the GUI, will be visible in web interface.
-// Automatically called by Decl*(), still before InitGui()
+// Automatically called by Decl*(), still before PrepareServer()
 func (g *guistate) Add(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		g.Params[name] = v
@@ -51,11 +56,19 @@ func (g *guistate) PrepareServer() {
 	//gui.OnEvent("run", inj(func() { Run(gui.Value("runtime").(float64)) }))
 }
 
+func (g *guistate) Title() string {
+	fmt.Println("od", OD)
+	fmt.Println("title", util.NoExt(path.Base(OD)))
+	return util.NoExt(path.Base(OD))
+}
+
 // Start web gui on given port, blocks.
 func Serve(port string) {
 	util.LogErr(http.ListenAndServe(port, nil))
 }
 
+// When gui is busy it can only accept read-only
+// commands, not change any state. E.g. during kernel init.
 func (g *guistate) SetBusy(busy bool) {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()

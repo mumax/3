@@ -49,7 +49,7 @@ function notifyblur (id){hasFocus = "";}
 
 function setattr_(elem, attr, value){
 	if (elem[attr] == null){
-		showErr("settAttr: undefined: " + id + "[" + attr + "]");
+		showErr("settAttr: undefined: " + elem + "[" + attr + "]");
 		return;
 	}
 	elem[attr] = value;

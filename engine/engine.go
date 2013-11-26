@@ -48,7 +48,21 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64) {
 	if Nx <= 1 {
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
-	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbcxyz...)
+	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+	GUI.Set("nx", Nx)
+	GUI.Set("ny", Ny)
+	GUI.Set("nz", Nz)
+	GUI.Set("cx", cellSizeX*1e9)
+	GUI.Set("cy", cellSizeY*1e9)
+	GUI.Set("cz", cellSizeZ*1e9)
+	p := globalmesh.PBC()
+	GUI.Set("px", p[X])
+	GUI.Set("py", p[Y])
+	GUI.Set("pz", p[Z])
+	w := globalmesh.WorldSize()
+	GUI.Set("wx", w[X]*1e9)
+	GUI.Set("wy", w[Y]*1e9)
+	GUI.Set("wz", w[Z]*1e9)
 	alloc()
 }
 
@@ -66,7 +80,7 @@ func normalize(m *data.Slice) {
 var (
 	gridsize []int
 	cellsize []float64
-	pbcxyz   []int
+	pbc      []int
 )
 
 func SetGridSize(Nx, Ny, Nz int) {
@@ -84,13 +98,13 @@ func SetCellSize(cx, cy, cz float64) {
 }
 
 func SetPBC(nx, ny, nz int) {
-	if pbcxyz != nil {
+	if pbc != nil {
 		util.Fatal("PBC alread set")
 	}
 	if globalmesh.Size() != [3]int{0, 0, 0} {
 		util.Fatal("PBC must be set before MeshSize and GridSize")
 	}
-	pbcxyz = []int{nx, ny, nz}
+	pbc = []int{nx, ny, nz}
 }
 
 // check if mesh is set

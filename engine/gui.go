@@ -65,6 +65,7 @@ func (g *guistate) PrepareServer() {
 
 	GUI.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
+
 	})
 }
 

@@ -36,5 +36,19 @@
 	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span> {{.UpdateButton ""}} {{.UpdateBox "live"}} &nbsp; &nbsp; {{.ErrorBox}} <br/>
 	<hr/>
 
+
+<script>
+	var console_focus = false;
+	function console_scrolldown(){
+		if (!console_focus){
+			var textarea = document.getElementById('console');
+			textarea.scrollTop = textarea.scrollHeight;
+		}
+	}
+	setInterval(console_scrolldown, tick);
+</script>
+
+{{.TextArea "console" 8 64 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\""}}	
+
 </body>
 </html>

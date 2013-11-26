@@ -57,7 +57,7 @@ func (g *guistate) PrepareServer() {
 	})
 
 	GUI.OnUpdate(func() {
-		updateKeepAlive()
+		updateKeepAlive() // keep track of when browser was last seen alive
 	})
 }
 
@@ -78,6 +78,7 @@ func (g *guistate) SetBusy(busy bool) {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	g.busy = busy
+	GUI.Disable("cli", busy)
 }
 
 //

@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/barnex/gui"
 	"github.com/mumax/3/util"
 	"net/http"
@@ -62,8 +61,6 @@ func (g *guistate) PrepareServer() {
 }
 
 func (g *guistate) Title() string {
-	fmt.Println("od", OD)
-	fmt.Println("title", util.NoExt(path.Base(OD)))
 	return util.NoExt(path.Base(OD))
 }
 

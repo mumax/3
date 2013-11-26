@@ -182,7 +182,9 @@ type event struct {
 
 // HTTP handler for updating the dynamic elements
 func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
-	d.onUpdate()
+	if d.onUpdate != nil {
+		d.onUpdate()
+	}
 
 	// read page ID from body
 	buf := make([]byte, 100)

@@ -192,17 +192,14 @@ func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	pageID := string(buf)
 	if pageID != d.lastPageID {
 		for _, e := range d.elems {
-			e.dirty = true
+			e.setDirty()
 		}
 		d.lastPageID = pageID
 	}
 
 	calls := make([]jsCall, 0, len(d.elems))
 	for id, e := range d.elems {
-		if e.dirty {
-			calls = append(calls, e.update(id)...)
-			e.dirty = false
-		}
+		calls = append(calls, e.update(id)...) // update atomically checks dirty and clears it
 	}
 	if len(calls) != 0 {
 		fmt.Println(calls) // debug

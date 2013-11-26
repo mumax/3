@@ -1,8 +1,10 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/barnex/gui"
 	"github.com/mumax/3/util"
+	"math/rand"
 	"net/http"
 	"path"
 	"sync"
@@ -60,8 +62,15 @@ func (g *guistate) PrepareServer() {
 	})
 }
 
+// renders page title for PrepareServer
 func (g *guistate) Title() string {
 	return util.NoExt(path.Base(OD))
+}
+
+// renders a <div> that toggles visibility on click for PrepareServer
+func (g *guistate) Div(heading string) string {
+	id := fmt.Sprint("div_", rand.Int())
+	return fmt.Sprintf(`<h2 style="cursor:pointer" onclick="toggle('%v')">&dtrif; %v</h2> <div id="%v">`, id, heading, id)
 }
 
 // Start web gui on given port, blocks.

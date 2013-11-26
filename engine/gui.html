@@ -50,6 +50,18 @@
 </script>
 
 
+<script>
+	function toggle(id) {
+       var el = document.getElementById(id);
+       if(el.style.display != 'none'){
+          el.style.display = 'none';
+		} else {
+          el.style.display = 'block';
+		}
+    }
+</script>
+
+
 {{.Data.Div "console"}}
 
 {{.TextArea "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>

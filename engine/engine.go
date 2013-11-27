@@ -79,10 +79,6 @@ func alloc() {
 	regions.alloc()
 }
 
-func normalize(m *data.Slice) {
-	cuda.Normalize(m, nil)
-}
-
 // for lazy setmesh: set gridsize and cellsize in separate calls
 var (
 	gridsize []int

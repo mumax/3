@@ -17,8 +17,8 @@ expect("my", m_[1], 0.12528, 1e-3)
 expect("mz", m_[2], 0,       1e-3)
 
 
-setgridsize(128*2, 32*2, 1)
-setcellsize(500e-9/(128*2), 125e-9/(32*2), 3e-9)
+setgridsize(128*2, 32*2, 2)
+setcellsize(500e-9/(128*2), 125e-9/(32*2), 3e-9/2)
 
 m_ = average(m)
 save(m)

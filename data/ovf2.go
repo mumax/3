@@ -1,26 +1,18 @@
-//  This file is part of MuMax, a high-performance micromagnetic simulator.
-//  Copyright 2011  Arne Vansteenkiste and Ben Van de Wiele.
-//  Use of this source code is governed by the GNU General Public License version 3
-//  (as published by the Free Software Foundation) that can be found in the license.txt file.
-//  Note that you are welcome to modify this code under the condition that you do not remove any
-//  copyright notices and prominently state that you modified it, giving a relevant date.
-
-// OVF2 suport added by Mykola Dvornik for mumax1,
+// OVF2 suport written by Mykola Dvornik for mumax1,
 // modified for mumax2 by Arne Vansteenkiste, 2011.
 // modified for mumax3 by Arne Vansteenkiste, 2013.
 
-package main
+package data
 
 import (
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
 	"log"
 	"strings"
 	"unsafe"
 )
 
-func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
+func DumpOvf2(out io.Writer, q *Slice, dataformat string, meta Meta) {
 
 	switch strings.ToLower(dataformat) {
 	case "binary", "binary 4":
@@ -31,14 +23,13 @@ func dumpOvf2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
 		log.Fatalf("Illegal OMF data format: %v", dataformat)
 	}
 
-	tstep := 0.0 // TODO
-	writeOvf2Header(out, q, meta, tstep)
+	writeOvf2Header(out, q, meta)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
 	return
 }
 
-func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
+func writeOvf2Data(out io.Writer, q *Slice, dataformat string) {
 	hdr(out, "Begin", "Data "+dataformat)
 	switch strings.ToLower(dataformat) {
 	case "text":
@@ -51,9 +42,9 @@ func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
 	hdr(out, "End", "Data "+dataformat)
 }
 
-func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta, tstep float64) {
-	gridsize := q.Mesh().Size()
-	cellsize := q.Mesh().CellSize()
+func writeOvf2Header(out io.Writer, q *Slice, meta Meta) {
+	gridsize := q.Size()
+	cellsize := meta.CellSize
 
 	fmt.Fprintln(out, "# OOMMF OVF 2.0")
 	fmt.Fprintln(out, "#")
@@ -97,7 +88,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta, tstep float64
 	}
 
 	// We don't really have stages
-	fmt.Fprintln(out, "# Desc: Stage simulation time: ", tstep, " s")
+	//fmt.Fprintln(out, "# Desc: Stage simulation time: ", meta.TimeStep, " s") // TODO
 	fmt.Fprintln(out, "# Desc: Total simulation time: ", meta.Time, " s")
 
 	hdr(out, "xbase", cellsize[Z]/2)
@@ -116,9 +107,9 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta, tstep float64
 	fmt.Fprintln(out, "#")
 }
 
-func writeOvf2Binary4(out io.Writer, array *data.Slice) {
+func writeOvf2Binary4(out io.Writer, array *Slice) {
 	data := array.Tensors()
-	gridsize := array.Mesh().Size()
+	gridsize := array.Size()
 
 	var bytes []byte
 
@@ -144,3 +135,35 @@ func writeOvf2Binary4(out io.Writer, array *data.Slice) {
 		}
 	}
 }
+
+// Writes a header key/value pair to out:
+// # Key: Value
+func hdr(out io.Writer, key string, value ...interface{}) (err error) {
+	_, err = fmt.Fprint(out, "# ", key, ": ")
+	_, err = fmt.Fprintln(out, value...)
+	return
+}
+
+// Writes data in OMF Text format
+func writeOmfText(out io.Writer, tens *Slice) (err error) {
+
+	data := tens.Tensors()
+	gridsize := tens.Size()
+	ncomp := tens.NComp()
+
+	// Here we loop over X,Y,Z, not Z,Y,X, because
+	// internal in C-order == external in Fortran-order
+	for iz := 0; iz < gridsize[Z]; iz++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for ix := 0; ix < gridsize[Z]; ix++ {
+				for c := 0; c < ncomp; c++ {
+					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
+				}
+				_, err = fmt.Fprint(out, "\n")
+			}
+		}
+	}
+	return
+}
+
+const OMF_CONTROL_NUMBER = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number

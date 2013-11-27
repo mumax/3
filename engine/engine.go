@@ -62,6 +62,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		//mfmconv = nil
 		M.resize([3]int{Nx, Ny, Nz})
 		// regions... // TODO
+		// TODO: vol, excitations
 		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 	}
 

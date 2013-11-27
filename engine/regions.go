@@ -26,20 +26,27 @@ type Regions struct {
 	deflist    []struct {
 		r int
 		s Shape
-	} // history
+	} // history // TODO: use for shift
 	doc
 }
 
 func (r *Regions) alloc() {
 	mesh := r.Mesh()
 	r.cpu = make([]byte, mesh.NCell())
-	r.arr = reshapeBytes(r.cpu, mesh.Size())
+	r.arr = reshapeBytes(r.cpu, mesh.Size()) // TODO: use deflist instead of resample
 	r.gpuCache = cuda.NewBytes(mesh.NCell())
 	DefRegion(0, universe)
+	r.gpuCacheOK = false
 }
 
 func (r *Regions) resize(newSize [3]int) {
-	panic("todo")
+	newCpu := make([]byte, prod(newSize))
+	newArr := reshapeBytes(newCpu, newSize)
+	data.ResampleBytes(newArr, r.arr)
+	r.cpu = newCpu
+	r.arr = newArr
+	r.gpuCache.Free()
+	r.gpuCache = cuda.NewBytes(prod(newSize))
 }
 
 // Define a region with id (0-255) to be inside the Shape.
@@ -188,3 +195,7 @@ func (b *Regions) shift(dx int) {
 }
 
 func (r *Regions) Mesh() *data.Mesh { return &globalmesh }
+
+func prod(s [3]int) int {
+	return s[0] * s[1] * s[2]
+}

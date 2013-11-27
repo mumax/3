@@ -16,8 +16,6 @@ const templText = `
 	<style media="all" type="text/css">
 
 		body  { margin-left: 5%; margin-right:5%; font-family: sans-serif; font-size: 14px; }
-		h1    { font-size: 22px; color: gray; }
-		h2    { font-size: 18px; color: gray; }
 		img   { margin: 10px; }
 		table { border-collapse: collapse; }
 		tr:nth-child(even) { background-color: white; }
@@ -131,6 +129,18 @@ const templText = `
 
 
 </div>
+
+
+<hr/>
+
+<div style="font-size:0.9em; color:gray; text-align:center">
+
+{{.Data.Version}} <br/>
+&copy; 2013 Arne Vansteenkiste, DyNaMat LAB, UGent.
+
+
+</div>
+
 
 </body>
 </html>

@@ -113,6 +113,10 @@ func (g *guistate) Title() string {
 	return util.NoExt(path.Base(OD))
 }
 
+func (g *guistate) Version() string {
+	return UNAME
+}
+
 func (g *guistate) QuantNames() []string {
 	names := make([]string, 0, len(g.Quants))
 	for k, _ := range g.Quants {
@@ -125,7 +129,7 @@ func (g *guistate) QuantNames() []string {
 // renders a <div> that toggles visibility on click for PrepareServer
 func (g *guistate) Div(heading string) string {
 	id := fmt.Sprint("div_", rand.Int())
-	return fmt.Sprintf(`<h2 style="cursor:pointer" onclick="toggle('%v')">&dtrif; %v</h2> <div id="%v">`, id, heading, id)
+	return fmt.Sprintf(`<span style="cursor:pointer; font-size:1.2em; font-weight:bold; color:gray" onclick="toggle('%v')">&dtrif; %v</span> <br/> <div id="%v">`, id, heading, id)
 }
 
 // Start web gui on given port, blocks.

@@ -21,6 +21,8 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+gui CLI double exec
+
 need proper zhang-li boundary conditions
 
 reduce operations are non-reproducible, though OK within numerical precission.

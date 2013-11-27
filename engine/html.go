@@ -65,27 +65,27 @@ const templText = `
 	}
 	setInterval(console_scrolldown, tick);
 
-	// CLI history
-	var history = new Array();
-	var histindex = 0;
-
-	function clikeydown(){
-		var cli = document.getElementById('cli');
-		var key = event.keyCode;
-		if (key == 13 && cli.value != ""){ // return key
-			history.push(cli.value);
-			histindex = history.length;
-			cli.onchange();
-		}
-		if (key == 38){ // up key
-			if (histindex > 0) { histindex--; }
-			if (history[histindex] != undefined) { cli.value = history[histindex]; }
-		}
-		if (key == 40){ // down key
-			if (histindex < history.length-1) { histindex++; }
-			if (history[histindex] != undefined) { cli.value = history[histindex]; }
-		}
-	}	
+//	// CLI history
+//	var history = new Array();
+//	var histindex = 0;
+//
+//	function clikeydown(){
+//		var cli = document.getElementById('cli');
+//		var key = event.keyCode;
+//		if (key == 13 && cli.value != ""){ // return key
+//			history.push(cli.value);
+//			histindex = history.length;
+//			cli.onchange();
+//		}
+//		if (key == 38){ // up key
+//			if (histindex > 0) { histindex--; }
+//			if (history[histindex] != undefined) { cli.value = history[histindex]; }
+//		}
+//		if (key == 40){ // down key
+//			if (histindex < history.length-1) { histindex++; }
+//			if (history[histindex] != undefined) { cli.value = history[histindex]; }
+//		}
+//	}	
 </script>
 
 
@@ -94,7 +94,7 @@ const templText = `
 
 {{.TextArea "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-{{.TextBox "cli" "" "onkeydown=\"clikeydown()\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""}}
+{{.TextBox "cli" "" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""}}
 
 </div>
 

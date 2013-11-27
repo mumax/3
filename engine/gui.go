@@ -60,13 +60,32 @@ func (g *guistate) PrepareServer() {
 
 	// geometry
 	GUI.OnEvent("setmesh", func() {
-
+		n := GUI.intValues("nx", "ny", "nz")
+		c := GUI.floatValues("cx", "cy", "cz")
+		p := GUI.intValues("px", "py", "pz")
+		SetMesh(n[X], n[Y], n[Z], c[X], c[Y], c[Z], p)
 	})
 
 	GUI.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
 	})
+}
+
+func (g *guistate) floatValues(id ...string) []float64 {
+	v := make([]float64, len(id))
+	for i := range id {
+		v[i] = g.FloatValue(id[i])
+	}
+	return v
+}
+
+func (g *guistate) intValues(id ...string) []int {
+	v := make([]int, len(id))
+	for i := range id {
+		v[i] = g.IntValue(id[i])
+	}
+	return v
 }
 
 // renders page title for PrepareServer

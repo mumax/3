@@ -110,6 +110,13 @@ const templText = `
 
 		{{.Button "setmesh" "&#x26a0; update"}}
 
+</div>
+
+{{.Data.Div "display"}}
+
+{{.Data.QuantNames | .SelectArray "renderQuant" "m"}}
+
+
 
 </div>
 

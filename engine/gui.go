@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"path"
+	"sort"
 	"sync"
 	"time"
 )
@@ -91,6 +92,15 @@ func (g *guistate) intValues(id ...string) []int {
 // renders page title for PrepareServer
 func (g *guistate) Title() string {
 	return util.NoExt(path.Base(OD))
+}
+
+func (g *guistate) QuantNames() []string {
+	names := make([]string, 0, len(g.Quants))
+	for k, _ := range g.Quants {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	return names
 }
 
 // renders a <div> that toggles visibility on click for PrepareServer

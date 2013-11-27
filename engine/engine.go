@@ -55,6 +55,9 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 
 	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 
+	M.alloc()
+	regions.alloc()
+
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)
 	GUI.Set("nz", Nz)
@@ -69,14 +72,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	GUI.Set("wx", w[X]*1e9)
 	GUI.Set("wy", w[Y]*1e9)
 	GUI.Set("wz", w[Z]*1e9)
-
-	alloc()
-}
-
-// allocate m and regions buffer (after mesh is set)
-func alloc() {
-	M.alloc()
-	regions.alloc()
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

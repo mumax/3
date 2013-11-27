@@ -24,6 +24,7 @@ func (m *magnetization) Child() []script.Expr { return nil }
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (m *magnetization) alloc() {
 	m.buffer_ = cuda.NewSlice(3, m.Mesh())
+	RegisterFree(m.buffer_) // Free buffer upon simulation resize
 }
 
 func (b *magnetization) SetArray(src *data.Slice) {

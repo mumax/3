@@ -11,8 +11,7 @@ func init() {
 
 func TestSlice(t *testing.T) {
 	N0, N1, N2 := 2, 4, 8
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
+	m := [3]int{N0, N1, N2}
 	N := N0 * N1 * N2
 
 	a := NewSlice(3, m)
@@ -39,7 +38,7 @@ func TestSlice(t *testing.T) {
 	if b.NComp() != 1 {
 		t.Error("b.NComp", b.NComp())
 	}
-	if *b.Mesh() != *a.Mesh() {
+	if b.Size() != a.Size() {
 		t.Fail()
 	}
 }
@@ -47,7 +46,7 @@ func TestSlice(t *testing.T) {
 func TestCpy(t *testing.T) {
 	N0, N1, N2 := 2, 4, 32
 	N := N0 * N1 * N2
-	mesh := data.NewMesh(N0, N1, N2, 1, 1, 1)
+	mesh := [3]int{N0, N1, N2}
 
 	h1 := make([]float32, N)
 	for i := range h1 {
@@ -75,8 +74,7 @@ func TestCpy(t *testing.T) {
 func TestSliceFree(t *testing.T) {
 	LockThread()
 	N0, N1, N2 := 128, 1024, 1024
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
+	m := [3]int{N0, N1, N2}
 	N := 17
 	// not freeing would attempt to allocate 17GB.
 	for i := 0; i < N; i++ {
@@ -91,8 +89,7 @@ func TestSliceFree(t *testing.T) {
 func TestSliceHost(t *testing.T) {
 	LockThread()
 	N0, N1, N2 := 1, 10, 10
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
+	m := [3]int{N0, N1, N2}
 	a := NewSlice(3, m)
 	defer a.Free()
 
@@ -111,8 +108,7 @@ func TestSliceHost(t *testing.T) {
 func TestSliceSlice(t *testing.T) {
 	LockThread()
 	N0, N1, N2 := 1, 10, 10
-	c := 1e-6
-	m := data.NewMesh(N0, N1, N2, c, c, c)
+	m := [3]int{N0, N1, N2}
 	a := NewSlice(3, m)
 	b := a.Slice(20, 30).HostCopy()
 	if b.Len() != 30-20 {
@@ -121,7 +117,7 @@ func TestSliceSlice(t *testing.T) {
 	if b.NComp() != a.NComp() {
 		t.Fail()
 	}
-	if *a.Mesh() != *b.Mesh() {
+	if a.Size() != b.Size() {
 		t.Fail()
 	}
 }

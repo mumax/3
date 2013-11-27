@@ -1,18 +1,14 @@
 package cuda
 
-import (
-	"github.com/mumax/3/data"
-	"testing"
-)
+import "testing"
 
 func init() {
 	Init(0, "auto", false)
 }
 
 func TestBuffer(t *testing.T) {
-	C := 1e-9
-	m1 := data.NewMesh(2, 1024, 2048, C, C, C)
-	m2 := data.NewMesh(4, 1024, 2048, C, C, C)
+	m1 := [3]int{2, 1024, 2048}
+	m2 := [3]int{4, 1024, 2048}
 	a := Buffer(3, m1)
 	b := Buffer(3, m2)
 	c := Buffer(1, m1)
@@ -31,8 +27,7 @@ func TestBuffer(t *testing.T) {
 
 func BenchmarkBuffer(b *testing.B) {
 	b.StopTimer()
-	C := 1e-9
-	m := data.NewMesh(2, 1024, 2048, C, C, C)
+	m := [3]int{2, 1024, 2048}
 	a := Buffer(3, m)
 	Recycle(a)
 	b.StartTimer()

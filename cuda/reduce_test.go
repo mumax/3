@@ -31,7 +31,7 @@ func initTest() {
 }
 
 func toGPU(list []float32) *data.Slice {
-	mesh := data.NewMesh(1, 1, len(list), 1, 1, 1)
+	mesh := [3]int{1, 1, len(list)}
 	h := data.SliceFromList([][]float32{list}, mesh)
 	d := NewSlice(1, mesh)
 	data.Copy(d, h)
@@ -59,7 +59,7 @@ func TestReduceDot(t *testing.T) {
 
 	// test for 3 comp
 	const N = 32
-	mesh := data.NewMesh(1, 1, N, 1, 1, 1)
+	mesh := [3]int{1, 1, N}
 	c := NewSlice(3, mesh)
 	d := NewSlice(3, mesh)
 	Memset(c, 1, 2, 3)

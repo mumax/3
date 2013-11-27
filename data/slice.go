@@ -15,7 +15,7 @@ type Slice struct {
 	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
 	ptrs    []unsafe.Pointer         // points into ptr_
 	mesh    *Mesh
-	len_    int32
+	len_    int
 	memType int8
 }
 
@@ -65,7 +65,7 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	util.Argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
-	s.len_ = int32(length)
+	s.len_ = length
 	s.mesh = m
 	for c := range ptrs {
 		s.ptrs[c] = ptrs[c]
@@ -202,7 +202,7 @@ func (s *Slice) Slice(a, b int) *Slice {
 	for i := range s.ptrs {
 		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
 	}
-	slice.len_ = int32(b - a)
+	slice.len_ = b - a
 	return slice
 }
 

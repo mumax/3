@@ -1,19 +1,18 @@
-package ext
+package engine
 
 import (
-	"github.com/mumax/3/engine"
 	"math"
 )
 
 // PMA domain wall tilt assuming straight wall.
-var DWTiltPMA = engine.NewGetScalar("ext_dwtilt", "rad", "PMA domain wall tilt", dwTiltPMA)
+var DWTiltPMA = NewGetScalar("ext_dwtilt", "rad", "PMA domain wall tilt", dwTiltPMA)
 
 func dwTiltPMA() float64 {
-	m := engine.Download(&engine.M)
+	m := Download(&M)
 	mz := m.Vectors()[Z][0] // slice0
 
-	nx := engine.Mesh().Size()[X]
-	ny := engine.Mesh().Size()[Y]
+	nx := Mesh().Size()[X]
+	ny := Mesh().Size()[Y]
 	// find domain wall at these y positions:
 	y1 := 4
 	y2 := ny - 5

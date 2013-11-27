@@ -1,16 +1,15 @@
-package ext
+package engine
 
 import (
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/engine"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"math"
 )
 
 func init() {
-	engine.DeclFunc("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: region, mx on left and right side, resp.")
+	DeclFunc("ext_rmSurfaceCharge", RemoveLRSurfaceCharge, "Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: region, mx on left and right side, resp.")
 }
 
 // For a nanowire magnetized in-plane, with mx = mxLeft on the left end and
@@ -20,9 +19,9 @@ func init() {
 func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	bsat := engine.Bsat.GetRegion(region)[0]
+	bsat := Bsat.GetRegion(region)[0]
 	util.AssertMsg(bsat != 0, "RemoveSurfaceCharges: Msat is zero in region "+fmt.Sprint(region))
-	engine.B_ext.Add(compensateLRSurfaceCharges(engine.Mesh(), mxLeft, mxRight, bsat), nil)
+	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight, bsat), nil)
 }
 
 //func constVec(x, y, z float64) func() [3]float64 {
@@ -32,13 +31,13 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
 func bSat() float64 {
-	util.AssertMsg(engine.Msat.IsUniform(), "Remove surface charge: Msat must be uniform")
-	return mag.Mu0 * engine.Msat.GetRegion(0)
+	util.AssertMsg(Msat.IsUniform(), "Remove surface charge: Msat must be uniform")
+	return mag.Mu0 * Msat.GetRegion(0)
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
-	engine.GUI.SetBusy(true)
-	defer engine.GUI.SetBusy(false)
+	GUI.SetBusy(true)
+	defer GUI.SetBusy(false)
 	h := data.NewSlice(3, m.Size())
 	H := h.Vectors()
 	world := m.WorldSize()

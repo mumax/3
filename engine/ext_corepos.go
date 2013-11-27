@@ -1,12 +1,10 @@
-package ext
+package engine
 
-import "github.com/mumax/3/engine"
-
-var CorePos = engine.NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
+var CorePos = NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
 
 func corePos() []float64 {
 
-	m, _ := engine.M.Slice()
+	m, _ := M.Slice()
 	m_z := m.Comp(Z).HostCopy().Scalars()
 	s := m.Size()
 	Nx, Ny, Nz := s[X], s[Y], s[Z]
@@ -39,12 +37,12 @@ func corePos() []float64 {
 		float64(Ny)/2 + 0.5
 	pos[Z] = float64(maxZ) - float64(Nz)/2 + 0.5
 
-	c := m.Mesh().CellSize()
+	c := Mesh().CellSize()
 	pos[X] *= c[X]
 	pos[Y] *= c[Y]
 	pos[Z] *= c[Z]
 
-	pos[X] += engine.GetShiftPos() // add simulation window shift
+	pos[X] += GetShiftPos() // add simulation window shift
 	return pos
 }
 

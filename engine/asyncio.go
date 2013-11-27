@@ -1,8 +1,11 @@
 package engine
 
 import (
+	"bufio"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
+	"os"
 	"path"
 	"strings"
 )
@@ -22,21 +25,15 @@ func SaveAs(q Slicer, fname string) {
 		fname = path.Clean(OD + "/" + fname)
 	}
 	if path.Ext(fname) == "" {
-		fname += ".dump"
+		fname += ".ovf"
 	}
 	buffer, recylce := q.Slice()
 	if recylce {
 		defer cuda.Recycle(buffer)
 	}
 	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit()}
-	AsyncSave(fname, assureCPU(buffer), info)
-}
-
-// Asynchronously save slice to file. Slice should be on CPU and
-// not be written after this call.
-func AsyncSave(fname string, s *data.Slice, info data.Meta) {
 	initQue()
-	saveQue <- saveTask{fname, s, info}
+	saveQue <- saveTask{fname, assureCPU(buffer), info}
 }
 
 // Copy to CPU, if needed
@@ -75,7 +72,12 @@ type saveTask struct {
 // the rather big queue allows big output bursts to be concurrent with GPU.
 func runSaver() {
 	for t := range saveQue {
-		data.MustWriteFile(t.fname, t.output, t.info)
+		f, err := os.OpenFile(t.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		util.FatalErr(err)
+		out := bufio.NewWriter(f)
+		data.DumpOvf2(out, t.output, "binary", t.info)
+		out.Flush()
+		f.Close()
 	}
 	done <- true
 }

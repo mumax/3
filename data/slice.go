@@ -19,13 +19,6 @@ type Slice struct {
 	memType int8
 }
 
-type Meta struct {
-	Name, Unit string
-	Time       float64
-	CellSize   [3]float64
-	MeshUnit   string
-}
-
 // this package must not depend on CUDA. If CUDA is
 // loaded, these functions are set to cu.MemFree, ...
 // NOTE: cpyDtoH and cpuHtoD are only needed to support 32-bit builds,

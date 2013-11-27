@@ -1,8 +1,10 @@
 package engine
 
-var freelist []interface {
+type Free interface {
 	Free()
 }
+
+var freelist []Free
 
 func FreeAll() {
 	for _, f := range freelist {
@@ -11,8 +13,6 @@ func FreeAll() {
 	freelist = nil
 }
 
-func RegisterFree(f interface {
-	Free()
-}) {
+func RegisterFree(f Free) {
 	freelist = append(freelist, f)
 }

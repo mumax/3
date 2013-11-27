@@ -40,7 +40,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
 	var K [3][][][]float32
 	for i := 0; i < 3; i++ {
-		kernel[i] = d.NewSlice(1, mesh)
+		kernel[i] = d.NewSlice(1, mesh.Size())
 		K[i] = kernel[i].Scalars()
 	}
 

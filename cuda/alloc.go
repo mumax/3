@@ -21,15 +21,14 @@ func MemAlloc(bytes int64) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(cu.MemAlloc(bytes)))
 }
 
-// make slice of given size, but with dummy mesh.
+// make slice of given size, but with dummy mesh. // TODO: rm
 func makeFloats(size [3]int) *data.Slice {
-	m := data.NewMesh(size[0], size[1], size[2], 1, 1, 1)
-	return NewSlice(1, m)
+	return NewSlice(1, size)
 }
 
 // Returns a copy of in, allocated on GPU.
 func GPUCopy(in *data.Slice) *data.Slice {
-	s := NewSlice(in.NComp(), in.Mesh())
+	s := NewSlice(in.NComp(), in.Size())
 	data.Copy(s, in)
 	return s
 }

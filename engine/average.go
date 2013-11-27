@@ -32,7 +32,7 @@ func Average(s Slicer) []float64 {
 // Average of quantity with explicitly given volume mask.
 func averageVolume(b, vol *data.Slice) []float64 {
 	nComp := b.NComp()
-	nCell := float64(b.Mesh().NCell())
+	nCell := float64(b.Len())
 	avg := make([]float64, nComp)
 	for i := range avg {
 		if vol.IsNil() {

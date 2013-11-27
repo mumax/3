@@ -8,7 +8,7 @@ import (
 
 // Add uniaxial magnetocrystalline anisotropy field to Beff.
 func AddUniaxialAnisotropy(Beff, m *data.Slice, k1_red LUTPtr, u LUTPtrs, regions *Bytes) {
-	util.Argument(Beff.Mesh().Size() == m.Mesh().Size())
+	util.Argument(Beff.Size() == m.Size())
 
 	N := Beff.Len()
 	cfg := make1DConf(N)

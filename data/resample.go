@@ -5,12 +5,7 @@ import "log"
 // Resample returns a slice of new size N,
 // using nearest neighbor interpolation over the input slice.
 func Resample(in *Slice, N [3]int) *Slice {
-	m1 := in.Mesh()
-	w := m1.WorldSize()
-	n0, n1, n2 := float64(N[0]), float64(N[1]), float64(N[2])
-	pbc := m1.PBC()
-	m2 := NewMesh(N[0], N[1], N[2], w[0]/n0, w[1]/n1, w[2]/n2, pbc[:]...)
-	out := NewSlice(in.NComp(), m2)
+	out := NewSlice(in.NComp(), N)
 	resampleNearest(out.Tensors(), in.Tensors())
 	return out
 }

@@ -6,11 +6,10 @@ func Crop(in *Slice, x1, x2, y1, y2, z1, z2 int) *Slice {
 	Ny := y2 - y1
 	Nz := z2 - z1
 
-	mesh := *in.Mesh()
-	mesh.gridSize = [3]int{Nx, Ny, Nz}
+	size := [3]int{Nx, Ny, Nz}
 	ncomp := in.NComp()
 
-	out := NewSlice(ncomp, &mesh)
+	out := NewSlice(ncomp, size)
 
 	a := in.Tensors()
 	b := out.Tensors()

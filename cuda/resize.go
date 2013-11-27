@@ -8,8 +8,8 @@ import (
 // Select and resize one layer for interactive output
 func Resize(dst, src *data.Slice, layer int) {
 
-	dstsize := dst.Mesh().Size()
-	srcsize := src.Mesh().Size()
+	dstsize := dst.Size()
+	srcsize := src.Size()
 	util.Assert(dstsize[Z] == 1)
 	util.Assert(dst.NComp() == 1 && src.NComp() == 1)
 

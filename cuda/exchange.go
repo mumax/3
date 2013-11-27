@@ -9,8 +9,7 @@ import (
 // 	m: normalized magnetization
 // 	B: effective field in Tesla
 // 	Aex_red: 2*Aex / (Msat * 1e18 m2)
-func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes) {
-	mesh := B.Mesh()
+func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
 	c := mesh.CellSize()
 	wx := float32(1e-18 / (c[X] * c[X]))
 	wy := float32(1e-18 / (c[Y] * c[Y]))

@@ -22,7 +22,7 @@ func init() {
 
 func SetMFM(dst *data.Slice) {
 
-	buf := cuda.Buffer(3, Mesh())
+	buf := cuda.Buffer(3, Mesh().Size())
 	defer cuda.Recycle(buf)
 	if mfmconv_ == nil {
 		mfmconv_ = cuda.NewMFM(Mesh(), MFMLift.v, MFMTipSize.v)

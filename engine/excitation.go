@@ -47,7 +47,7 @@ func (e *excitation) isZero() bool {
 }
 
 func (e *excitation) Slice() (*data.Slice, bool) {
-	buf := cuda.Buffer(e.NComp(), e.Mesh())
+	buf := cuda.Buffer(e.NComp(), e.Mesh().Size())
 	cuda.Zero(buf)
 	e.AddTo(buf)
 	return buf, true

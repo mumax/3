@@ -18,7 +18,7 @@ type fftm struct{}
 
 func (q *fftm) Slice() (quant *data.Slice, recycle bool) {
 
-	dst := data.NewSlice(3, q.Mesh())
+	dst := data.NewSlice(3, q.Mesh().Size())
 	scale := float32(1 / math.Sqrt(float64(M.Mesh().NCell()))) // logical number of cells
 
 	for i := 0; i < 3; i++ {

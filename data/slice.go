@@ -14,7 +14,7 @@ import (
 type Slice struct {
 	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
 	ptrs    []unsafe.Pointer         // points into ptr_
-	mesh    *Mesh
+	size    [3]int
 	len_    int
 	memType int8
 }
@@ -22,6 +22,8 @@ type Slice struct {
 type Meta struct {
 	Name, Unit string
 	Time       float64
+	CellSize   [3]float64
+	MeshUnit   string
 }
 
 // this package must not depend on CUDA. If CUDA is
@@ -44,29 +46,29 @@ func EnableGPU(free, freeHost func(unsafe.Pointer),
 }
 
 // Make a CPU Slice with nComp components of size length.
-func NewSlice(nComp int, m *Mesh) *Slice {
-	length := m.NCell()
+func NewSlice(nComp int, size [3]int) *Slice {
+	length := prod(size)
 	ptrs := make([]unsafe.Pointer, nComp)
 	for i := range ptrs {
 		ptrs[i] = unsafe.Pointer(&(make([]float32, length)[0]))
 	}
-	return SliceFromPtrs(m, CPUMemory, ptrs)
+	return SliceFromPtrs(size, CPUMemory, ptrs)
 }
 
 // Return a slice without underlying storage. Used to represent a mask containing all 1's.
-func NilSlice(nComp int, m *Mesh) *Slice {
-	return SliceFromPtrs(m, UnifiedMemory, make([]unsafe.Pointer, nComp))
+func NilSlice(nComp int, size [3]int) *Slice {
+	return SliceFromPtrs(size, UnifiedMemory, make([]unsafe.Pointer, nComp))
 }
 
 // Internal: construct a Slice using bare memory pointers. Used by cuda.
-func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
-	length := m.NCell()
+func SliceFromPtrs(size [3]int, memType int8, ptrs []unsafe.Pointer) *Slice {
+	length := prod(size)
 	nComp := len(ptrs)
 	util.Argument(nComp > 0 && length > 0 && nComp <= MAX_COMP)
 	s := new(Slice)
 	s.ptrs = s.ptr_[:nComp]
 	s.len_ = length
-	s.mesh = m
+	s.size = size
 	for c := range ptrs {
 		s.ptrs[c] = ptrs[c]
 	}
@@ -74,13 +76,13 @@ func SliceFromPtrs(m *Mesh, memType int8, ptrs []unsafe.Pointer) *Slice {
 	return s
 }
 
-func SliceFromList(data [][]float32, mesh *Mesh) *Slice {
+func SliceFromList(data [][]float32, size [3]int) *Slice {
 	ptrs := make([]unsafe.Pointer, len(data))
 	for i := range ptrs {
-		util.Argument(len(data[i]) == mesh.NCell())
+		util.Argument(len(data[i]) == prod(size))
 		ptrs[i] = unsafe.Pointer(&data[i][0])
 	}
-	return SliceFromPtrs(mesh, CPUMemory, ptrs)
+	return SliceFromPtrs(size, CPUMemory, ptrs)
 }
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
@@ -117,7 +119,7 @@ func (s *Slice) Disable() {
 	s.ptr_ = [MAX_COMP]unsafe.Pointer{}
 	s.ptrs = s.ptrs[:0]
 	s.len_ = 0
-	s.mesh = nil
+	s.size = [3]int{0, 0, 0}
 	s.memType = 0
 }
 
@@ -157,12 +159,16 @@ func (s *Slice) Len() int {
 }
 
 // Mesh on which the data is defined.
-func (s *Slice) Mesh() *Mesh {
-	if s == nil {
-		return nil
-	} else {
-		return s.mesh
-	}
+//func (s *Slice) Mesh() *Mesh {
+//	if s == nil {
+//		return nil
+//	} else {
+//		return s.mesh
+//	}
+//}
+
+func (s *Slice) Size() [3]int {
+	return s.size
 }
 
 // Comp returns a single component of the Slice.
@@ -170,7 +176,7 @@ func (s *Slice) Comp(i int) *Slice {
 	sl := new(Slice)
 	sl.ptr_[0] = s.ptrs[i]
 	sl.ptrs = sl.ptr_[:1]
-	sl.mesh = s.mesh
+	sl.size = s.size
 	sl.len_ = s.len_
 	sl.memType = s.memType
 	return sl
@@ -197,7 +203,7 @@ func (s *Slice) Slice(a, b int) *Slice {
 		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
 	}
 
-	slice := &Slice{memType: s.memType, mesh: s.mesh}
+	slice := &Slice{memType: s.memType, size: s.size}
 	slice.ptrs = slice.ptr_[:s.NComp()]
 	for i := range s.ptrs {
 		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
@@ -226,7 +232,7 @@ func (s *Slice) Host() [][]float32 {
 
 // Returns a copy of the Slice, allocated on CPU.
 func (s *Slice) HostCopy() *Slice {
-	cpy := NewSlice(s.NComp(), s.Mesh())
+	cpy := NewSlice(s.NComp(), s.Size())
 	// make it work if s is a part of a bigger slice:
 	if cpy.Len() != s.Len() {
 		cpy = cpy.Slice(0, s.Len())
@@ -294,7 +300,7 @@ func (f *Slice) Tensors() [][][][]float32 {
 	tensors := make([][][][]float32, f.NComp())
 	host := f.Host()
 	for i := range tensors {
-		tensors[i] = reshape(host[i], f.Mesh().Size())
+		tensors[i] = reshape(host[i], f.Size())
 	}
 	return tensors
 }
@@ -333,9 +339,9 @@ func (s *Slice) checkComp(comp int) {
 }
 
 func (s *Slice) Index(ix, iy, iz int) int {
-	Nx := s.mesh.Size()[X]
-	Ny := s.mesh.Size()[Y]
-	Nz := s.mesh.Size()[Z]
+	Nx := s.Size()[X]
+	Ny := s.Size()[Y]
+	Nz := s.Size()[Z]
 	if ix < 0 || ix >= Nx || iy < 0 || iy >= Ny || iz < 0 || iz >= Nz {
 		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", ix, iy, iz, Nx, Ny, Nz)
 	}

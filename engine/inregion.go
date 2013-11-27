@@ -40,7 +40,7 @@ func getRegion(q Slicer, region int) (*data.Slice, bool) {
 	if r {
 		defer cuda.Recycle(src)
 	}
-	out := cuda.Buffer(q.NComp(), q.Mesh())
+	out := cuda.Buffer(q.NComp(), q.Mesh().Size())
 	cuda.RegionSelect(out, src, regions.Gpu(), byte(region))
 	return out, true
 }

@@ -18,7 +18,7 @@ var (
 const buf_max = 100 // maximum number of buffers to allocate
 
 // Returns a GPU slice for temporary use. To be returned to the pool with Recycle
-func Buffer(nComp int, m *data.Mesh) *data.Slice {
+func Buffer(nComp int, size [3]int) *data.Slice {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()
 
@@ -27,7 +27,7 @@ func Buffer(nComp int, m *data.Mesh) *data.Slice {
 		buf_check = make(map[unsafe.Pointer]struct{})
 	}
 
-	N := m.NCell()
+	N := prod(size)
 	pool := buf_pool[N]
 	nFromPool := iMin(nComp, len(pool))
 	ptrs := make([]unsafe.Pointer, nComp)
@@ -46,7 +46,7 @@ func Buffer(nComp int, m *data.Mesh) *data.Slice {
 		ptrs[i] = MemAlloc(int64(cu.SIZEOF_FLOAT32 * N))
 		buf_check[ptrs[i]] = struct{}{} // mark this pointer as mine
 	}
-	return data.SliceFromPtrs(m, data.GPUMemory, ptrs)
+	return data.SliceFromPtrs(size, data.GPUMemory, ptrs)
 }
 
 // Returns a buffer obtained from GetBuffer to the pool.
@@ -54,7 +54,7 @@ func Recycle(s *data.Slice) {
 	buf_lock.Lock()
 	defer buf_lock.Unlock()
 
-	N := s.Mesh().NCell()
+	N := s.Len()
 	pool := buf_pool[N]
 	for i := 0; i < s.NComp(); i++ {
 		ptr := s.DevPtr(i)

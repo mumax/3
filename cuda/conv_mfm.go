@@ -83,7 +83,7 @@ func NewMFM(mesh *data.Mesh, lift, tipsize float64) *MFMConvolution {
 	c := new(MFMConvolution)
 	c.size = size
 	c.kern = k
-	c.kernSize = k[X].Mesh().Size()
+	c.kernSize = k[X].Size()
 	c.init()
 	c.mesh = mesh
 	return c

@@ -13,9 +13,9 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 		return
 	}
 	//fmt.Print("convolution test ")
-	inhost := data.NewSlice(3, mesh)
+	inhost := data.NewSlice(3, mesh.Size())
 	initConvTestInput(inhost.Vectors())
-	gpu := NewSlice(3, mesh)
+	gpu := NewSlice(3, mesh.Size())
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
 
@@ -26,12 +26,12 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	Memset(Bsat, 1)
 	BsatLUT := LUTPtr(Bsat.DevPtr(0))
 
-	vol := data.NilSlice(1, mesh)
+	vol := data.NilSlice(1, mesh.Size())
 	c.Exec(gpu, gpu, vol, BsatLUT, regions)
 
 	output := gpu.HostCopy()
 
-	brute := data.NewSlice(3, mesh)
+	brute := data.NewSlice(3, mesh.Size())
 	bruteConv(inhost.Vectors(), brute.Vectors(), c.kern)
 
 	a, b := output.Host(), brute.Host()

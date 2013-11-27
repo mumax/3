@@ -49,7 +49,7 @@ func AddThermalField(dst *data.Slice) {
 	N := globalmesh.NCell()
 	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
 
-	noise := cuda.Buffer(1, &globalmesh)
+	noise := cuda.Buffer(1, globalmesh.Size())
 	defer cuda.Recycle(noise)
 
 	const mean = 0

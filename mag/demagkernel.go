@@ -41,7 +41,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			kernel[i][j] = data.NewSlice(1, mesh)
+			kernel[i][j] = data.NewSlice(1, mesh.Size())
 			array[i][j] = kernel[i][j].Scalars()
 		}
 	}

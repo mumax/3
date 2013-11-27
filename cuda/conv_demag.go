@@ -85,7 +85,7 @@ func (c *DemagConvolution) initFFTKern3D() {
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
 
-	fftKern := data.NewSlice(1, data.NewMesh(halfkern[X], halfkern[Y], halfkern[Z], 1, 1, 1)) // host
+	fftKern := data.NewSlice(1, halfkern) // host
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
@@ -115,7 +115,7 @@ func (c *DemagConvolution) initFFTKern2D() {
 	input := c.fftRBuf[0]
 
 	// upper triangular part
-	fftKern := data.NewSlice(1, data.NewMesh(halfkern[X], halfkern[Y], halfkern[Z], 1, 1, 1)) // host
+	fftKern := data.NewSlice(1, halfkern) // host
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
@@ -246,7 +246,7 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c := new(DemagConvolution)
 	c.size = size
 	c.kern = kernel
-	c.kernSize = kernel[X][X].Mesh().Size()
+	c.kernSize = kernel[X][X].Size()
 	c.init()
 	c.initFFTMesh()
 
@@ -274,11 +274,10 @@ func (c *DemagConvolution) freeKern() {
 	}
 }
 
-// Mesh for FFT(m) quantity, etc.
+// Mesh for FFT(m) quantity, etc. // TODO: rm, move into FFTM quantity
 func (c *DemagConvolution) initFFTMesh() {
 	n := fftR2COutputSizeFloats(c.kernSize)
-	cell := c.kern[0][0].Mesh().CellSize()
-	c.FFTMesh = *data.NewMesh(n[X], n[Y], n[Z], 1/cell[X], 1/cell[Y], 1/cell[Z])
+	c.FFTMesh = *data.NewMesh(n[X], n[Y], n[Z], 1, 1, 1)
 	c.FFTMesh.Unit = "/m"
 }
 

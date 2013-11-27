@@ -8,7 +8,7 @@ func corePos() []float64 {
 
 	m, _ := engine.M.Slice()
 	m_z := m.Comp(Z).HostCopy().Scalars()
-	s := m.Mesh().Size()
+	s := m.Size()
 	Nx, Ny, Nz := s[X], s[Y], s[Z]
 
 	max := float32(-1.0)

@@ -122,7 +122,7 @@ func init() {
 
 // Get returns the regions as a slice of floats, so it can be output.
 func (r *Regions) Slice() (*data.Slice, bool) {
-	buf := cuda.Buffer(1, r.Mesh())
+	buf := cuda.Buffer(1, r.Mesh().Size())
 	cuda.RegionDecode(buf, unitMap.gpuLUT1(), regions.Gpu())
 	return buf, true
 }

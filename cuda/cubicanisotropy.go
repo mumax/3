@@ -7,7 +7,7 @@ import (
 )
 
 func AddCubicAnisotropy(Beff, m *data.Slice, k1_red LUTPtr, c1, c2 LUTPtrs, regions *Bytes) {
-	util.Argument(Beff.Mesh().Size() == m.Mesh().Size())
+	util.Argument(Beff.Size() == m.Size())
 
 	N := Beff.Len()
 	cfg := make1DConf(N)

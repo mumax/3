@@ -25,9 +25,7 @@ func init() {
 
 // Returns a new new slice (3D array) with given number of components and size.
 func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
-	const c = 1 // dummy cell size
-	mesh := data.NewMesh(Nx, Ny, Nz, c, c, c)
-	return data.NewSlice(ncomp, mesh)
+	return data.NewSlice(ncomp, [3]int{Nx, Ny, Nz})
 }
 
 // Constructs a vector

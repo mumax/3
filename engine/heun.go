@@ -9,7 +9,7 @@ import (
 
 // Adaptive Heun method, can be used as solver.Step
 func HeunStep(s *solver, y *data.Slice) {
-	dy0 := cuda.Buffer(VECTOR, y.Mesh())
+	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
 
 	dt := float32(s.Dt_si * s.dt_mul)
@@ -21,7 +21,7 @@ func HeunStep(s *solver, y *data.Slice) {
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
 	// stage 2
-	dy := cuda.Buffer(3, y.Mesh())
+	dy := cuda.Buffer(3, y.Size())
 	defer cuda.Recycle(dy)
 	Time += s.Dt_si
 	s.torqueFn(dy)

@@ -35,7 +35,7 @@ func Shift(dx int) {
 }
 
 func shiftMag(m *data.Slice, dx int) {
-	m2 := cuda.Buffer(1, m.Mesh())
+	m2 := cuda.Buffer(1, m.Size())
 	defer cuda.Recycle(m2)
 	for c := 0; c < m.NComp(); c++ {
 		comp := m.Comp(c)

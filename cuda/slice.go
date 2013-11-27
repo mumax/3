@@ -9,8 +9,8 @@ import (
 )
 
 // Make a GPU Slice with nComp components each of size length.
-func NewSlice(nComp int, m *data.Mesh) *data.Slice {
-	return newSlice(nComp, m, MemAlloc, data.GPUMemory)
+func NewSlice(nComp int, size [3]int) *data.Slice {
+	return newSlice(nComp, size, MemAlloc, data.GPUMemory)
 }
 
 // Make a GPU Slice with nComp components each of size length.
@@ -18,16 +18,16 @@ func NewSlice(nComp int, m *data.Mesh) *data.Slice {
 //	return newSlice(nComp, m, cu.MemAllocHost, data.UnifiedMemory)
 //}
 
-func newSlice(nComp int, m *data.Mesh, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
+func newSlice(nComp int, size [3]int, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
 	data.EnableGPU(memFree, cu.MemFreeHost, memCpy, memCpyDtoH, memCpyHtoD)
-	length := m.NCell()
+	length := prod(size)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	ptrs := make([]unsafe.Pointer, nComp)
 	for c := range ptrs {
 		ptrs[c] = unsafe.Pointer(alloc(bytes))
 		cu.MemsetD32(cu.DevicePtr(uintptr(ptrs[c])), 0, int64(length))
 	}
-	return data.SliceFromPtrs(m, memType, ptrs)
+	return data.SliceFromPtrs(size, memType, ptrs)
 }
 
 // wrappers for data.EnableGPU arguments

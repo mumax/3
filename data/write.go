@@ -17,13 +17,13 @@ func Write(out io.Writer, s *Slice, info Meta) error {
 	// Writes the header.
 	w.writeString(MAGIC)
 	w.writeUInt64(uint64(s.NComp()))
-	for _, s := range s.Mesh().Size() {
+	for _, s := range s.Size() {
 		w.writeUInt64(uint64(s))
 	}
-	for _, s := range s.Mesh().CellSize() {
+	for _, s := range info.CellSize {
 		w.writeFloat64(s)
 	}
-	w.writeString(s.Mesh().Unit)
+	w.writeString(info.MeshUnit)
 	w.writeFloat64(info.Time)
 	w.writeString("s") // time unit
 	w.writeString(info.Name)

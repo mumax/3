@@ -19,7 +19,7 @@ func (q *setter) init(nComp int, m *data.Mesh, name, unit, doc string, setFunc f
 
 // get the quantity, recycle will be true (q needs to be recycled)
 func (b *setter) Slice() (q *data.Slice, recycle bool) {
-	buffer := cuda.Buffer(b.nComp, b.mesh)
+	buffer := cuda.Buffer(b.NComp(), b.Mesh().Size())
 	b.Set(buffer)
 	return buffer, true // must recycle
 }

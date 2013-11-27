@@ -39,7 +39,7 @@ func spaceFill() float64 {
 
 func (g *geom) Gpu() *data.Slice {
 	if g.buffer == nil {
-		g.buffer = data.NilSlice(1, Mesh())
+		g.buffer = data.NilSlice(1, g.Mesh().Size())
 	}
 	return g.buffer
 }
@@ -51,8 +51,8 @@ func SetGeom(s Shape) {
 func (geometry *geom) setGeom(s Shape) {
 	geometry.shape = s
 	if vol().IsNil() {
-		geometry.buffer = cuda.NewSlice(1, Mesh())
-		geometry.host = data.NewSlice(1, vol().Mesh())
+		geometry.buffer = cuda.NewSlice(1, geometry.Mesh().Size())
+		geometry.host = data.NewSlice(1, vol().Size())
 		geometry.array = geometry.host.Scalars()
 	}
 	V := geometry.host
@@ -91,7 +91,7 @@ func (g *geom) shift(dx int) {
 
 	// allocated mask: shift
 	s := g.buffer
-	s2 := cuda.Buffer(1, g.Mesh())
+	s2 := cuda.Buffer(1, g.Mesh().Size())
 	defer cuda.Recycle(s2)
 	newv := float32(1) // initially fill edges with 1's
 	cuda.ShiftX(s2, s, dx, newv, newv)

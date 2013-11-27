@@ -19,7 +19,7 @@ func (q *buffered) init(nComp int, name, unit string, mesh *data.Mesh) {
 
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (q *buffered) alloc() {
-	q.buffer = cuda.NewSlice(3, q.Mesh())
+	q.buffer = cuda.NewSlice(3, q.Mesh().Size())
 }
 
 // get buffer (on GPU, no need to recycle)

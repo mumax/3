@@ -64,13 +64,12 @@ func (r *reader) readSlice() (slice *Slice, info Meta, err error) {
 	for i := range cell {
 		cell[i] = r.readFloat64()
 	}
-	mesh := NewMesh(size[0], size[1], size[2], cell[0], cell[1], cell[2])
 
-	mesh.Unit = r.readString()
+	info.MeshUnit = r.readString()
 	info.Time = r.readFloat64()
 	_ = r.readString() // time unit
 
-	s := NewSlice(nComp, mesh)
+	s := NewSlice(nComp, size)
 
 	info.Name = r.readString()
 	info.Unit = r.readString()
@@ -86,7 +85,7 @@ func (r *reader) readSlice() (slice *Slice, info Meta, err error) {
 	}
 
 	host := s.Host()
-	length := mesh.NCell()
+	length := prod(size)
 	for _, data := range host {
 		buf := (*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[0 : SIZEOF_FLOAT32*length]
 		r.read(buf)

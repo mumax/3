@@ -167,7 +167,7 @@ func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
 func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
 	var ev event
 	check(json.NewDecoder(r.Body).Decode(&ev))
-	fmt.Println(ev)
+	//fmt.Println(ev)
 	el := d.elem(ev.ID)
 	el.set(ev.Arg)
 	if el.onevent != nil {
@@ -201,9 +201,9 @@ func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	for id, e := range d.elems {
 		calls = append(calls, e.update(id)...) // update atomically checks dirty and clears it
 	}
-	if len(calls) != 0 {
-		fmt.Println(calls) // debug
-	}
+	//	if len(calls) != 0 {
+	//		fmt.Println(calls) // debug
+	//	}
 	check(json.NewEncoder(w).Encode(calls))
 }
 

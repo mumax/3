@@ -19,7 +19,12 @@ func prod3(x, y, z int) int {
 }
 
 // Releases all resources associated with the FFT plan.
-func (p *fftplan) Free() { p.handle.Destroy() }
+func (p *fftplan) Free() {
+	if p.handle != 0 {
+		p.handle.Destroy()
+		p.handle = 0
+	}
+}
 
 // Associates a CUDA stream with the FFT plan.
 func (p *fftplan) setStream(stream cu.Stream) {

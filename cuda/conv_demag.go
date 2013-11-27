@@ -24,6 +24,9 @@ type DemagConvolution struct {
 }
 
 func (c *DemagConvolution) Free() {
+	if c == nil {
+		return
+	}
 	c.size = [3]int{}
 	c.kernSize = [3]int{}
 	for i := 0; i < 3; i++ {

@@ -24,7 +24,6 @@ func (m *magnetization) Child() []script.Expr { return nil }
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (m *magnetization) alloc() {
 	m.buffer_ = cuda.NewSlice(3, m.Mesh().Size())
-	RegisterFree(m.buffer_) // Free buffer upon simulation resize
 }
 
 func (b *magnetization) SetArray(src *data.Slice) {
@@ -125,4 +124,12 @@ func (m *magnetization) Average() data.Vector    { return unslice(Average(&M)) }
 
 func normalize(m *data.Slice) {
 	cuda.Normalize(m, vol())
+}
+
+func (m *magnetization) resize(s2 [3]int) {
+	backup := m.Buffer().HostCopy()
+	resized := data.Resample(backup, s2)
+	m.buffer_.Free()
+	m.buffer_ = cuda.NewSlice(VECTOR, s2)
+	data.Copy(m.buffer_, resized)
 }

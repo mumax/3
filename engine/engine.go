@@ -49,14 +49,21 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 
-	if globalmesh.Size() != [3]int{0, 0, 0} {
-		FreeAll()
+	if globalmesh.Size() == [3]int{0, 0, 0} {
+		// first time mesh is set
+		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+		M.alloc()
+		regions.alloc()
+	} else {
+		Log("resizing...")
+		demagconv_.Free()
+		demagconv_ = nil
+		//mfmconv_.Free() // TODO
+		//mfmconv = nil
+		M.resize([3]int{Nx, Ny, Nz})
+		// regions... // TODO
+		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 	}
-
-	globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
-
-	M.alloc()
-	regions.alloc()
 
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)

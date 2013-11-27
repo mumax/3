@@ -19,7 +19,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
 
-	regions := NewBytes(mesh)
+	regions := NewBytes(mesh.NCell())
 	defer regions.Free()
 	Bsat := makeFloats([3]int{1, 1, 256})
 	defer Bsat.Free()

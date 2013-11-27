@@ -55,13 +55,15 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		M.alloc()
 		regions.alloc()
 	} else {
+		// here be dragons
 		Log("resizing...")
 		demagconv_.Free()
 		demagconv_ = nil
 		//mfmconv_.Free() // TODO
 		//mfmconv = nil
-		M.resize([3]int{Nx, Ny, Nz})
-		// regions... // TODO
+		newSize := [3]int{Nx, Ny, Nz}
+		M.resize(newSize)
+		regions.resize(newSize)
 		// TODO: vol, excitations
 		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 	}

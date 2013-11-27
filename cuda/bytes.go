@@ -2,7 +2,6 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
-	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"unsafe"
 )
@@ -14,10 +13,9 @@ type Bytes struct {
 }
 
 // Construct new 3D byte slice for given mesh.
-func NewBytes(m *data.Mesh) *Bytes {
-	Len := int64(m.NCell())
-	ptr := cu.MemAlloc(Len)
-	cu.MemsetD8(cu.DevicePtr(ptr), 0, Len)
+func NewBytes(Len int) *Bytes {
+	ptr := cu.MemAlloc(int64(Len))
+	cu.MemsetD8(cu.DevicePtr(ptr), 0, int64(Len))
 	return &Bytes{unsafe.Pointer(uintptr(ptr)), int(Len)}
 }
 
@@ -34,7 +32,9 @@ func (dst *Bytes) Copy(src *Bytes) {
 
 // Frees the GPU memory and disables the slice.
 func (b *Bytes) Free() {
-	cu.MemFree(cu.DevicePtr(uintptr(b.Ptr)))
+	if b.Ptr != nil {
+		cu.MemFree(cu.DevicePtr(uintptr(b.Ptr)))
+	}
 	b.Ptr = nil
 	b.Len = 0
 }

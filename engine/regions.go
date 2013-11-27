@@ -34,8 +34,12 @@ func (r *Regions) alloc() {
 	mesh := r.Mesh()
 	r.cpu = make([]byte, mesh.NCell())
 	r.arr = reshapeBytes(r.cpu, mesh.Size())
-	r.gpuCache = cuda.NewBytes(mesh)
+	r.gpuCache = cuda.NewBytes(mesh.NCell())
 	DefRegion(0, universe)
+}
+
+func (r *Regions) resize(newSize [3]int) {
+	panic("todo")
 }
 
 // Define a region with id (0-255) to be inside the Shape.
@@ -147,7 +151,7 @@ func (b *Regions) shift(dx int) {
 	// TODO: return if no regions defined
 	log.Println("regionshift", dx)
 	r1 := b.Gpu()
-	r2 := cuda.NewBytes(b.Mesh()) // TODO: somehow recycle
+	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
 	defer r2.Free()
 	newreg := byte(0) // new region at edge
 	cuda.ShiftBytes(r2, r1, b.Mesh(), dx, newreg)

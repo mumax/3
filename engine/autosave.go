@@ -38,7 +38,7 @@ func AutoSave(quant Slicer, period float64) {
 
 // Save once, with auto file name
 func Save(q Slicer) {
-	fname := fmt.Sprintf("%s%06d.dump", q.Name(), autonum[q])
+	fname := fmt.Sprintf("%s%06d.ovf", q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 }

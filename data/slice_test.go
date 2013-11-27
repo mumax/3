@@ -5,7 +5,7 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-	mesh := NewMesh(6, 5, 4, 1e-9, 2e-9, 3e-9)
+	mesh := [3]int{6, 5, 4}
 	slice := NewSlice(3, mesh)
 	data := slice.Tensors()
 

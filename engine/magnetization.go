@@ -31,7 +31,7 @@ func (b *magnetization) SetArray(src *data.Slice) {
 		src = data.Resample(src, b.Mesh().Size())
 	}
 	data.Copy(b.Buffer(), src)
-	cuda.Normalize(b.Buffer(), vol())
+	cuda.Normalize(b.Buffer(), geometry.Gpu())
 }
 
 func (m *magnetization) Set(c Config) {
@@ -123,7 +123,7 @@ func (m *magnetization) Eval() interface{}       { return m }
 func (m *magnetization) Average() data.Vector    { return unslice(Average(&M)) }
 
 func normalize(m *data.Slice) {
-	cuda.Normalize(m, vol())
+	cuda.Normalize(m, geometry.Gpu())
 }
 
 func (m *magnetization) resize(s2 [3]int) {

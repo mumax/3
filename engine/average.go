@@ -25,7 +25,7 @@ func Average(s Slicer) []float64 {
 		}
 		return avg
 	} else {
-		return averageVolume(buf, vol())
+		return averageVolume(buf, geometry.Gpu())
 	}
 }
 

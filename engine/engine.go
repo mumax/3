@@ -63,11 +63,14 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		//mfmconv_.Free() // TODO
 		//mfmconv = nil
 		newSize := [3]int{Nx, Ny, Nz}
-		newCellSize := [3]float64{cellSizeX, cellSizeY, cellSizeZ}
 		M.resize(newSize)
 		regions.resize(newSize)
-		geometry.resize(newSize, newCellSize)
+
 		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+
+		geometry.buffer.Free()
+		geometry.buffer = data.NilSlice(1, newSize)
+		geometry.setGeom(geometry.shape) // uses global mesh
 	}
 
 	Log("//SetMesh", &globalmesh)

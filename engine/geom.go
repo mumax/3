@@ -14,23 +14,15 @@ func init() {
 var geometry geom
 
 type geom struct {
-	buffered // cell fillings (0..1) // todo: unbed
-	//host     *data.Slice // cpu copy of buffered
-	//array    [][][]float32
-	shape Shape
-}
-
-func (g *geom) resize(newSize [3]int, newCellSize [3]float64) {
-
+	info
+	buffer *data.Slice
+	shape  Shape
 }
 
 func (g *geom) init() {
-	g.buffered.init(1, "geom", "", &globalmesh)
+	g.buffer = nil
+	g.info = Info(1, "geom", "", &globalmesh)
 	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
-}
-
-func vol() *data.Slice {
-	return geometry.Gpu()
 }
 
 func spaceFill() float64 {
@@ -54,11 +46,14 @@ func SetGeom(s Shape) {
 
 func (geometry *geom) setGeom(s Shape) {
 	geometry.shape = s
-	if vol().IsNil() { // TODO: get rid of vol global, make member
+	if geometry.Gpu().IsNil() {
 		geometry.buffer = cuda.NewSlice(1, geometry.Mesh().Size())
 	}
+	if s == nil {
+		s = universe
+	}
 
-	host := data.NewSlice(1, vol().Size())
+	host := data.NewSlice(1, geometry.Gpu().Size())
 	array := host.Scalars()
 	V := host
 	v := array
@@ -85,7 +80,7 @@ func (geometry *geom) setGeom(s Shape) {
 	}
 
 	data.Copy(geometry.buffer, V)
-	cuda.Normalize(M.Buffer(), vol()) // removes m outside vol
+	cuda.Normalize(M.Buffer(), geometry.Gpu()) // removes m outside vol
 }
 
 func (g *geom) shift(dx int) {
@@ -121,11 +116,11 @@ func (g *geom) shift(dx int) {
 			for ix := x1; ix < x2; ix++ {
 				r := Index2Coord(ix, iy, iz) // includes shift
 				if !g.shape(r[X], r[Y], r[Z]) {
-					g.SetCell(ix, iy, iz, 0) // a bit slowish, but hardly reached
+					cuda.SetCell(g.buffer, 0, ix, iy, iz, 0) // a bit slowish, but hardly reached
 				}
 			}
 		}
 	}
 
-	cuda.Normalize(M.Buffer(), vol())
+	cuda.Normalize(M.Buffer(), geometry.Gpu())
 }

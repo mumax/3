@@ -82,6 +82,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	GUI.Set("wx", w[X]*1e9)
 	GUI.Set("wy", w[Y]*1e9)
 	GUI.Set("wz", w[Z]*1e9)
+	GUI.Attr("renderLayer", "max", Nz)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

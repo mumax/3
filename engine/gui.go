@@ -69,6 +69,14 @@ func (g *guistate) PrepareServer() {
 	GUI.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
+		// solver
+		GUI.Set("steps", Solver.NSteps)
+
+		// display
+		quant := GUI.StringValue("renderQuant")
+		comp := GUI.StringValue("renderComp")
+		cachebreaker := "?" + GUI.StringValue("steps") + "_" + GUI.StringValue("renderScale") // scale needed if we zoom while paused
+		GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 	})
 }
 

@@ -106,10 +106,22 @@
 
 </div>
 
+{{.Data.Div "solver"}}
+
+{{.Span "steps" ""}}
+
+</div>
+
 {{.Data.Div "display"}}
 
-{{.Data.QuantNames | .SelectArray "renderQuant" "m"}}
+<p> 
+{{.Data.QuantNames | .SelectArray "renderQuant" "m"}} {{.Select "renderComp" "" "" "x" "y" "z"}} {{.Span "renderDoc" "m"}} <br/>
+    z-slice: {{.Range "renderLayer" 0 0 0 }} zoom out: {{.Range "renderScale" 0 31 31}}
+</p>
 
+<p> 
+{{.Img "display" "/render/m" "alt=\"display\""}}
+</p>
 
 
 </div>

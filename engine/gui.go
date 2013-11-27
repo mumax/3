@@ -66,6 +66,10 @@ func (g *guistate) PrepareServer() {
 		SetMesh(n[X], n[Y], n[Z], c[X], c[Y], c[Z], p)
 	})
 
+	GUI.OnEvent("renderQuant", func() {
+		GUI.Set("renderDoc", World.Doc[GUI.StringValue("renderQuant")])
+	})
+
 	GUI.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 

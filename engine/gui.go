@@ -60,10 +60,12 @@ func (g *guistate) PrepareServer() {
 
 	// geometry
 	GUI.OnEvent("setmesh", func() {
-		n := GUI.intValues("nx", "ny", "nz")
-		c := GUI.floatValues("cx", "cy", "cz")
-		p := GUI.intValues("px", "py", "pz")
-		SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
+		InjectAndWait(func() {
+			n := GUI.intValues("nx", "ny", "nz")
+			c := GUI.floatValues("cx", "cy", "cz")
+			p := GUI.intValues("px", "py", "pz")
+			SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
+		})
 	})
 
 	GUI.OnEvent("renderQuant", func() {

@@ -25,7 +25,7 @@ func main() {
 	length := float64(Nx) * cellsize
 	SetCellSize(cellsize, cellsize, thickness/float64(Nz))
 
-	mask := data.NewSlice(3, Mesh())
+	mask := data.NewSlice(3, Mesh().Size())
 	wireX := -length * 0.45
 	//wireY := 0.0
 	wireZ := thickness * 5.0

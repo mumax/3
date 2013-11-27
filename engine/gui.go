@@ -63,7 +63,7 @@ func (g *guistate) PrepareServer() {
 		n := GUI.intValues("nx", "ny", "nz")
 		c := GUI.floatValues("cx", "cy", "cz")
 		p := GUI.intValues("px", "py", "pz")
-		SetMesh(n[X], n[Y], n[Z], c[X], c[Y], c[Z], p)
+		SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
 	})
 
 	GUI.OnEvent("renderQuant", func() {
@@ -72,6 +72,10 @@ func (g *guistate) PrepareServer() {
 
 	GUI.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
+
+		if GUI.Busy() {
+			return
+		}
 
 		InjectAndWait(func() {
 			// solver
@@ -135,6 +139,12 @@ func (g *guistate) SetBusy(busy bool) {
 	g.busy = busy
 	GUI.Disable("cli", busy)
 	GUI.Disable("setmesh", busy)
+}
+
+func (g *guistate) Busy() bool {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	return g.busy
 }
 
 func Eval(code string) {

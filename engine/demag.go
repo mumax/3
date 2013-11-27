@@ -14,7 +14,7 @@ var (
 	B_demag     setter
 	E_demag     *GetScalar
 	EnableDemag = true                 // enable/disable demag field
-	demagconv_  *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	conv_       *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 )
 
 func init() {
@@ -56,13 +56,13 @@ func SetMFull(dst *data.Slice) {
 
 // returns demag convolution, making sure it's initialized
 func demagConv() *cuda.DemagConvolution {
-	if demagconv_ == nil {
+	if conv_ == nil {
 		Log("//calculating demag kernel...")
 		GUI.SetBusy(true)
 		defer GUI.SetBusy(false)
-		demagconv_ = cuda.NewDemag(Mesh())
+		conv_ = cuda.NewDemag(Mesh())
 	}
-	return demagconv_
+	return conv_
 }
 
 // Returns the current demag energy in Joules.

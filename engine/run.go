@@ -79,6 +79,10 @@ func RunWhile(condition func() bool) {
 	pause = true
 }
 
+func break_() {
+	pause = true
+}
+
 // exit finished simulation this long after browser was closed
 const Timeout = 3 * time.Second
 

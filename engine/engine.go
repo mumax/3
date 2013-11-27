@@ -57,8 +57,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	} else {
 		// here be dragons
 		Log("resizing...")
-		demagconv_.Free()
-		demagconv_ = nil
+		conv_.Free()
+		conv_ = nil
 		//mfmconv_.Free() // TODO
 		//mfmconv = nil
 		newSize := [3]int{Nx, Ny, Nz}
@@ -67,6 +67,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		// TODO: vol, excitations
 		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 	}
+
+	Log("//SetMesh", &globalmesh)
 
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)

@@ -161,6 +161,9 @@ func (s *Slice) Len() int {
 //}
 
 func (s *Slice) Size() [3]int {
+	if s == nil {
+		return [3]int{0, 0, 0}
+	}
 	return s.size
 }
 

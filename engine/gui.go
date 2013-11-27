@@ -48,7 +48,7 @@ func (g *guistate) PrepareServer() {
 	GUI.Page = gui.NewPage(templText, &GUI)
 
 	http.Handle("/", GUI)
-	//http.HandleFunc("/render/", serveRender)
+	http.Handle("/render/", &renderer)
 	//http.HandleFunc("/plot/", servePlot)
 
 	// console

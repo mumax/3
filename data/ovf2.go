@@ -115,20 +115,16 @@ func writeOvf2Binary4(out io.Writer, array *Slice) {
 
 	// OOMMF requires this number to be first to check the format
 	var controlnumber float32 = OMF_CONTROL_NUMBER
-	// Conversion form float32 [4]byte in big-endian
-	// encoding/binary is too slow
-	// Inlined for performance, terabytes of data will pass here...
+	// Conversion form float32 [4]byte in big-endian (encoding/binary is too slow)
 	bytes = (*[4]byte)(unsafe.Pointer(&controlnumber))[:]
 	out.Write(bytes)
 
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
 	ncomp := array.NComp()
-	for i := 0; i < gridsize[X]; i++ {
-		for j := 0; j < gridsize[Y]; j++ {
-			for k := 0; k < gridsize[Z]; k++ {
+	for iz := 0; iz < gridsize[Z]; iz++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for ix := 0; ix < gridsize[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
-					bytes = (*[4]byte)(unsafe.Pointer(&data[c][i][j][k]))[:]
+					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					out.Write(bytes)
 				}
 			}

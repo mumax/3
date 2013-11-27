@@ -44,6 +44,7 @@ func Mesh() *data.Mesh {
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
+// TODO: dedup arguments from globals
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int) {
 	if Nx <= 1 {
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
@@ -62,9 +63,10 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		//mfmconv_.Free() // TODO
 		//mfmconv = nil
 		newSize := [3]int{Nx, Ny, Nz}
+		newCellSize := [3]float64{cellSizeX, cellSizeY, cellSizeZ}
 		M.resize(newSize)
 		regions.resize(newSize)
-		// TODO: vol, excitations
+		geometry.resize(newSize, newCellSize)
 		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 	}
 

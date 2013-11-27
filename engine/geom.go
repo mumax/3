@@ -14,10 +14,14 @@ func init() {
 var geometry geom
 
 type geom struct {
-	buffered             // cell fillings (0..1) // todo: unbed
-	host     *data.Slice // cpu copy of buffered
-	array    [][][]float32
-	shape    Shape
+	buffered // cell fillings (0..1) // todo: unbed
+	//host     *data.Slice // cpu copy of buffered
+	//array    [][][]float32
+	shape Shape
+}
+
+func (g *geom) resize(newSize [3]int, newCellSize [3]float64) {
+
 }
 
 func (g *geom) init() {
@@ -50,13 +54,14 @@ func SetGeom(s Shape) {
 
 func (geometry *geom) setGeom(s Shape) {
 	geometry.shape = s
-	if vol().IsNil() {
+	if vol().IsNil() { // TODO: get rid of vol global, make member
 		geometry.buffer = cuda.NewSlice(1, geometry.Mesh().Size())
-		geometry.host = data.NewSlice(1, vol().Size())
-		geometry.array = geometry.host.Scalars()
 	}
-	V := geometry.host
-	v := geometry.array
+
+	host := data.NewSlice(1, vol().Size())
+	array := host.Scalars()
+	V := host
+	v := array
 	n := Mesh().Size()
 
 	var ok bool

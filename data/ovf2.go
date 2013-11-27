@@ -120,9 +120,9 @@ func writeOvf2Binary4(out io.Writer, array *Slice) {
 	out.Write(bytes)
 
 	ncomp := array.NComp()
-	for iz := 0; iz < gridsize[Z]; iz++ {
+	for ix := 0; ix < gridsize[X]; ix++ {
 		for iy := 0; iy < gridsize[Y]; iy++ {
-			for ix := 0; ix < gridsize[X]; ix++ {
+			for iz := 0; iz < gridsize[Z]; iz++ {
 				for c := 0; c < ncomp; c++ {
 					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					out.Write(bytes)

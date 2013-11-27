@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"net/http"
 	"path"
-	"sort"
 	"sync"
 	"time"
 )
@@ -99,7 +98,7 @@ func (g *guistate) QuantNames() []string {
 	for k, _ := range g.Quants {
 		names = append(names, k)
 	}
-	sort.Strings(names)
+	sortNoCase(names)
 	return names
 }
 

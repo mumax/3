@@ -2,12 +2,16 @@ package engine
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+
 	"math"
 	"os"
+	"sort"
+	"strings"
 )
 
 func init() {
@@ -111,6 +115,17 @@ func Index2Coord(ix, iy, iz int) data.Vector {
 	y := c[Y] * (float64(iy) - 0.5*float64(n[Y]-1))
 	z := c[Z] * (float64(iz) - 0.5*float64(n[Z]-1))
 	return data.Vector{x, y, z}
+}
+
+type caseIndep []string
+
+func (s *caseIndep) Len() int           { return len(*s) }
+func (s *caseIndep) Less(i, j int) bool { return strings.ToLower((*s)[i]) < strings.ToLower((*s)[j]) }
+func (s *caseIndep) Swap(i, j int)      { (*s)[i], (*s)[j] = (*s)[j], (*s)[i] }
+
+func sortNoCase(s []string) {
+	i := caseIndep(s)
+	sort.Sort(&i)
 }
 
 const (

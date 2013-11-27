@@ -30,6 +30,19 @@ func resampleNearest(out, in [][][][]float32) {
 	}
 }
 
+func ResampleBytes(out, in [][][]byte) {
+	for i := range out {
+		i1 := (i * len(in)) / len(out)
+		for j := range out[i] {
+			j1 := (j * len(in[0])) / len(out[0])
+			for k := range out[i][j] {
+				k1 := (k * len(in[0][0])) / len(out[0][0])
+				out[i][j][k] = in[i1][j1][k1]
+			}
+		}
+	}
+}
+
 // Returns the size of block, i.e., len(block), len(block[0]), len(block[0][0]).
 func sizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block), len(block[0]), len(block[0][0])}

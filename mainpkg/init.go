@@ -3,12 +3,10 @@ package mainpkg
 import (
 	"flag"
 	"fmt"
-
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
 	"github.com/mumax/3/prof"
 	"github.com/mumax/3/util"
-
 	"log"
 	"os"
 	"runtime"
@@ -32,12 +30,11 @@ var (
 
 func Init() {
 
+	flag.Parse()
+
 	if *flag_time {
 		defer func() { log.Println("walltime:", time.Since(engine.StartTime)) }()
 	}
-
-	flag.Parse()
-	//engine.DeclFunc("interactive", Interactive, "Wait for GUI interaction")
 
 	log.SetPrefix("")
 	log.SetFlags(0)

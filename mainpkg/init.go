@@ -76,7 +76,7 @@ func Init() {
 	fname := flag.Arg(0)
 	if fname == "" {
 		now := time.Now()
-		fname = fmt.Sprintf("mumax%v-%v-%v-%v:%v.txt", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute())
+		fname = fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.txt", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
 	}
 	if *flag_od == "" { // -o not set
 		engine.SetOD(util.NoExt(fname)+".out", *flag_force)

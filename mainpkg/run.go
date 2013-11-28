@@ -1,11 +1,39 @@
 package mainpkg
 
 import (
+	"flag"
 	"fmt"
+
 	"github.com/mumax/3/engine"
+	"github.com/mumax/3/util"
+
+	"io/ioutil"
 	"os/exec"
 	"time"
 )
+
+func RunFiles() {
+	if !*flag_vet {
+		fmt.Print("starting GUI at http://localhost", *flag_port, "\n")
+		runFileAndServe(flag.Arg(0))
+		keepBrowserAlive() // if open, that is
+	}
+}
+
+// Runs a script file.
+func runFileAndServe(fname string) {
+	// first we compile the entire file into an executable tree
+	bytes, err := ioutil.ReadFile(fname)
+	util.FatalErr(err)
+	code, err2 := engine.World.Compile(string(bytes))
+	util.FatalErr(err2)
+
+	// now the parser is not used anymore so it can handle web requests
+	go engine.Serve(*flag_port)
+
+	// start executing the tree, possibly injecting commands from web gui
+	engine.EvalFile(code)
+}
 
 func keepBrowserAlive() {
 	if time.Since(engine.KeepAlive()) < engine.Timeout {

@@ -23,6 +23,7 @@ bugs:
 
 check mesh init!
 
+free: also cuda buffers
 
 gui CLI double exec
 
@@ -36,6 +37,8 @@ omf/ovf does not check if enough bytes are read
 
 script: if w/o else crashes
 script: compile selector?
+
+upon resize auto refresh dispaly quits working
 
 API:
 ----

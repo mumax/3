@@ -41,7 +41,6 @@ func runFileAndServe(fname string) {
 	} else {
 		fmt.Println("no input files: starting interactive session")
 		openbrowser("http://localhost" + *flag_port)
-		engine.RunInteractive()
 		keepBrowserAlive()
 	}
 }

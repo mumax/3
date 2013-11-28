@@ -52,40 +52,41 @@ func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ren *render) render(quant Slicer, comp string) {
-	size := quant.Mesh().Size()
-
-	// don't slice out of bounds
-	renderLayer := GUI.IntValue("renderLayer")
-	if renderLayer >= size[Z] {
-		renderLayer = size[Z] - 1
-		GUI.Set("renderLayer", renderLayer)
-	}
-	if renderLayer < 0 {
-		renderLayer = 0
-		GUI.Set("renderLayer", renderLayer)
-	}
-	if quant.NComp() == 1 {
-		comp = ""
-		GUI.Set("renderComp", "")
-	}
-
-	// scale the size
-	renderScale := maxScale - GUI.IntValue("renderScale")
-	for i := range size {
-		size[i] /= renderScale
-		if size[i] == 0 {
-			size[i] = 1
-		}
-	}
-	size[Z] = 1 // selects one layer
-
-	// make sure buffers are there
-	if ren.imgBuf.Size() != size {
-		ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
-	}
 
 	// rescale and download
 	InjectAndWait(func() {
+
+		size := quant.Mesh().Size()
+
+		// don't slice out of bounds
+		renderLayer := GUI.IntValue("renderLayer")
+		if renderLayer >= size[Z] {
+			renderLayer = size[Z] - 1
+			GUI.Set("renderLayer", renderLayer)
+		}
+		if renderLayer < 0 {
+			renderLayer = 0
+			GUI.Set("renderLayer", renderLayer)
+		}
+		if quant.NComp() == 1 {
+			comp = ""
+			GUI.Set("renderComp", "")
+		}
+
+		// scale the size
+		renderScale := maxScale - GUI.IntValue("renderScale")
+		for i := range size {
+			size[i] /= renderScale
+			if size[i] == 0 {
+				size[i] = 1
+			}
+		}
+		size[Z] = 1 // selects one layer
+
+		// make sure buffers are there
+		if ren.imgBuf.Size() != size {
+			ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
+		}
 
 		buf, r := quant.Slice()
 		if r {

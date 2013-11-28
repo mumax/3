@@ -41,6 +41,15 @@ func runFileAndServe(fname string) {
 	} else {
 		fmt.Println("no input files: starting interactive session")
 		openbrowser("http://localhost" + *flag_port)
+
+		engine.Log("// setting up default parameters")
+		// set up some sensible start configuration
+		engine.Eval(`SetGridSize(32, 32, 1)
+		SetCellSize(3e-9, 3e-9, 3e-9)
+		Msat = 1/(4e-7*Pi)
+		Aex = 10e-12
+		alpha = 1
+		m = RandomMag()`)
 		keepBrowserAlive()
 	}
 }

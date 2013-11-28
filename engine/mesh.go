@@ -43,8 +43,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		geometry.setGeom(geometry.shape) // uses global mesh
 	}
 
-	Log("//SetMesh", &globalmesh_)
-
+	//Log("SetMesh", &globalmesh_)
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)
 	GUI.Set("nz", Nz)

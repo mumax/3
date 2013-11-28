@@ -59,14 +59,27 @@ func (g *guistate) PrepareServer() {
 		GUI.Set("cli", "")
 	})
 
-	// geometry
+	// mesh
+	GUI.Disable("setmesh", true) // button only enabled if pressing makes sense
+	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
+	meshboxes := []string{"nx", "ny", "nz", "cx", "cy", "cz", "px", "py", "pz"}
+	warnmesh := func() {
+		GUI.Disable("setmesh", false)
+		GUI.Set("setmeshwarn", MESHWARN)
+	}
+	for _, e := range meshboxes {
+		GUI.OnEvent(e, warnmesh)
+	}
+
 	GUI.OnEvent("setmesh", func() {
+		GUI.Disable("setmesh", true)
 		InjectAndWait(func() {
 			n := GUI.intValues("nx", "ny", "nz")
 			c := GUI.floatValues("cx", "cy", "cz")
 			p := GUI.intValues("px", "py", "pz")
 			SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
 		})
+		GUI.Set("setmeshwarn", "")
 	})
 
 	GUI.OnEvent("renderQuant", func() {

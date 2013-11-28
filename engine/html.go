@@ -97,7 +97,7 @@ const templText = `
 </div>
 
 
-{{.Data.Div "geometry"}}
+{{.Data.Div "mesh"}}
 
 		<table>
 			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=8"}} </td> <td> &times; {{.TextBox "ny" "" "size=8"}}</td> <td> &times; {{.TextBox "nz" "" "size=8"}}</td> <td>  cells             </td> </tr>
@@ -106,7 +106,7 @@ const templText = `
 			<tr> <td>worldsize:</td> <td>{{.Span    "wx" ""}} </td> <td> &times; {{.Span    "wy" ""}}</td> <td> &times; {{.Span    "wz" ""}}</td> <td>  nm<sup>3</sup> </td> </tr>
 		</table>
 
-		{{.Button "setmesh" "&#x26a0; update"}}
+		{{.Button "setmesh" "update"}} {{.Span "setmeshwarn" ""}}
 
 </div>
 

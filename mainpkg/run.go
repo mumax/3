@@ -3,10 +3,8 @@ package mainpkg
 import (
 	"flag"
 	"fmt"
-
 	"github.com/mumax/3/engine"
 	"github.com/mumax/3/util"
-
 	"io/ioutil"
 	"os/exec"
 	"time"

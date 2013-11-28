@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/barnex/gui"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/util"
 	"math/rand"
 	"net/http"
@@ -115,6 +116,10 @@ func (g *guistate) Title() string {
 
 func (g *guistate) Version() string {
 	return UNAME
+}
+
+func (g *guistate) GPUInfo() string {
+	return cuda.GPUInfo
 }
 
 func (g *guistate) QuantNames() []string {

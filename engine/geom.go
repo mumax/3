@@ -21,7 +21,7 @@ type geom struct {
 
 func (g *geom) init() {
 	g.buffer = nil
-	g.info = Info(1, "geom", "", &globalmesh)
+	g.info = Info(1, "geom", "")
 	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
 }
 
@@ -124,3 +124,5 @@ func (g *geom) shift(dx int) {
 
 	cuda.Normalize(M.Buffer(), geometry.Gpu())
 }
+
+func (g *geom) Mesh() *data.Mesh { return Mesh() }

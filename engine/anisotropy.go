@@ -21,7 +21,7 @@ func init() {
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
-	B_anis.init(VECTOR, &globalmesh, "B_anis", "T", "Anisotropy field", AddAnisotropyField)
+	B_anis.init(VECTOR, "B_anis", "T", "Anisotropy field", AddAnisotropyField)
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
 	registerEnergy(getAnisotropyEnergy)
 

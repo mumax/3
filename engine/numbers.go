@@ -2,14 +2,14 @@ package engine
 
 // unifies getScalar and getVector
 type getFunc struct {
-	doc
+	info
 	get func() []float64
 }
 
 func (g *getFunc) TableData() []float64 { return g.get() }
 
 func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFunc {
-	return getFunc{Doc(nComp, name, unit), get}
+	return getFunc{Info(nComp, name, unit), get}
 }
 
 type GetScalar struct{ getFunc }

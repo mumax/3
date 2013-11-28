@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-var regions = Regions{doc: Doc(1, "regions", "")} // global regions map
+var regions = Regions{info: Info(1, "regions", "")} // global regions map
 
 const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
 
@@ -27,7 +27,7 @@ type Regions struct {
 		r int
 		s Shape
 	} // history // TODO: use for shift
-	doc
+	info
 }
 
 func (r *Regions) alloc() {
@@ -101,7 +101,7 @@ func (r *Regions) volume(region int) float64 {
 			vol++
 		}
 	}
-	return float64(vol) / float64(globalmesh.NCell())
+	return float64(vol) / float64(r.Mesh().NCell())
 }
 
 // Set the region of one cell
@@ -194,7 +194,7 @@ func (b *Regions) shift(dx int) {
 	//
 }
 
-func (r *Regions) Mesh() *data.Mesh { return &globalmesh }
+func (r *Regions) Mesh() *data.Mesh { return Mesh() }
 
 func prod(s [3]int) int {
 	return s[0] * s[1] * s[2]

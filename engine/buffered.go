@@ -13,8 +13,8 @@ type buffered struct {
 }
 
 // init metadata but does not allocate yet
-func (q *buffered) init(nComp int, name, unit string, mesh *data.Mesh) {
-	q.info = Info(nComp, name, unit, mesh)
+func (q *buffered) init(nComp int, name, unit string) {
+	q.info = Info(nComp, name, unit)
 }
 
 // allocate storage (not done by init, as mesh size may not yet be known then)
@@ -46,3 +46,5 @@ func (q *buffered) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
 func (q *buffered) TableData() []float64 { return Average(q) }
 
 func (q *buffered) String() string { return util.Sprint(q.buffer.HostCopy()) }
+
+func (q *buffered) Mesh() *data.Mesh { return Mesh() }

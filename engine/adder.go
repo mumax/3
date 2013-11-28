@@ -12,8 +12,8 @@ type adder struct {
 	info
 }
 
-func (q *adder) init(nComp int, m *data.Mesh, name, unit, doc string, addFunc func(dst *data.Slice)) {
-	*q = adder{addFunc, Info(nComp, name, unit, m)}
+func (q *adder) init(nComp int, name, unit, doc string, addFunc func(dst *data.Slice)) {
+	*q = adder{addFunc, Info(nComp, name, unit)}
 	DeclROnly(name, q, cat(doc, unit))
 }
 
@@ -27,6 +27,8 @@ func (q *adder) Slice() (s *data.Slice, recycle bool) {
 
 // Output for data table.
 func (q *adder) TableData() []float64 { return Average(q) }
+
+func (q *adder) Mesh() *data.Mesh { return Mesh() }
 
 // Value of this quantity restricted to one region.
 func (q *adder) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }

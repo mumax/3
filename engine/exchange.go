@@ -21,7 +21,7 @@ var (
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
-	B_exch.init(VECTOR, &globalmesh, "B_exch", "T", "Exchange field", AddExchangeField)
+	B_exch.init(VECTOR, "B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
 	registerEnergy(getExchangeEnergy)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")

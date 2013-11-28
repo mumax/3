@@ -83,7 +83,7 @@ func (b *lut) nUpload() int { return b.nupload }
 // uncompress the table to a full array with parameter values per cell.
 func (p *lut) Slice() (*data.Slice, bool) {
 	gpu := p.gpuLUT()
-	b := cuda.Buffer(p.NComp(), globalmesh.Size())
+	b := cuda.Buffer(p.NComp(), Mesh().Size())
 	for c := 0; c < p.NComp(); c++ {
 		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
 	}

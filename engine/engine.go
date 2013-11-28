@@ -15,9 +15,8 @@ var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.
 var StartTime = time.Now()
 
 var (
-	globalmesh data.Mesh     // mesh for m and everything that has the same size
-	M          magnetization // reduced magnetization (unit length)
-	B_eff      setter        // total effective field
+	M     magnetization // reduced magnetization (unit length)
+	B_eff setter        // total effective field
 )
 
 func init() {
@@ -25,7 +24,7 @@ func init() {
 	DeclFunc("SetCellSize", SetCellSize, `Sets the X,Y,Z cell size in meters`)
 	DeclFunc("SetPBC", SetPBC, `Sets number of repetitions in X,Y,Z`)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
-	B_eff.init(VECTOR, &globalmesh, "B_eff", "T", "Effective field", SetEffectiveField)
+	B_eff.init(VECTOR, "B_eff", "T", "Effective field", SetEffectiveField)
 }
 
 // Sets dst to the current effective field (T).

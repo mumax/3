@@ -13,7 +13,7 @@ var (
 )
 
 func init() {
-	MFM.init(SCALAR, &globalmesh, "MFM", "", "MFM image", SetMFM)
+	MFM.init(SCALAR, "MFM", "", "MFM image", SetMFM)
 	MFMLift = numParam(50e-9, "m", reinitmfmconv)
 	MFMTipSize = numParam(1e-3, "m", reinitmfmconv)
 	DeclLValue("MFMLift", &MFMLift, "MFM lift height")

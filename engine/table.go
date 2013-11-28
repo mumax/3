@@ -18,7 +18,7 @@ func init() {
 
 type DataTable struct {
 	*bufio.Writer
-	doc
+	info
 	outputs []TableData
 	autosave
 }

@@ -9,10 +9,10 @@ import (
 // input parameter, settable by user
 type inputParam struct {
 	lut
-	upd_reg   [NREGION]func() []float64 // time-dependent values
-	timestamp float64                   // used not to double-evaluate f(t)
-	children  []derived                 // derived parameters
-	descr
+	upd_reg    [NREGION]func() []float64 // time-dependent values
+	timestamp  float64                   // used not to double-evaluate f(t)
+	children   []derived                 // derived parameters
+	name, unit string
 }
 
 // any parameter that depends on an inputParam
@@ -22,7 +22,8 @@ type derived interface {
 
 func (p *inputParam) init(nComp int, name, unit string, children []derived) {
 	p.lut.init(nComp, p)
-	p.descr = descr{name, unit}
+	p.name = name
+	p.unit = unit
 	p.children = children
 	p.timestamp = math.Inf(-1)
 }
@@ -110,8 +111,6 @@ func (p *inputParam) IsUniform() bool {
 	return true
 }
 
-func (p *inputParam) Mesh() *data.Mesh { return Mesh() }
-
 // Table output
 
 // Parameter TableData is region 0
@@ -122,3 +121,7 @@ func (p *inputParam) TableData() []float64 {
 func (p *inputParam) Region(r int) *sliceInRegion {
 	return &sliceInRegion{p, r}
 }
+
+func (p *inputParam) Name() string     { return p.name }
+func (p *inputParam) Unit() string     { return p.unit }
+func (p *inputParam) Mesh() *data.Mesh { return Mesh() }

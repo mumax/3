@@ -29,9 +29,9 @@ func init() {
 	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
-	LLTorque.init(VECTOR, &globalmesh, "LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
-	STTorque.init(VECTOR, &globalmesh, "STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
-	Torque.init(3, &globalmesh, "torque", "T", "Total torque/γ0", SetTorque)
+	LLTorque.init(VECTOR, "LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
+	STTorque.init(VECTOR, "STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
+	Torque.init(VECTOR, "torque", "T", "Total torque/γ0", SetTorque)
 	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 }
 

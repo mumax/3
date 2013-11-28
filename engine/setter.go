@@ -12,8 +12,8 @@ type setter struct {
 }
 
 // initialize setter and declare as quantity (for script and gui)
-func (q *setter) init(nComp int, m *data.Mesh, name, unit, doc string, setFunc func(dst *data.Slice)) {
-	*q = setter{setFunc, Info(nComp, name, unit, m)}
+func (q *setter) init(nComp int, name, unit, doc string, setFunc func(dst *data.Slice)) {
+	*q = setter{setFunc, Info(nComp, name, unit)}
 	DeclROnly(name, q, cat(doc, unit))
 }
 
@@ -27,3 +27,4 @@ func (b *setter) Slice() (q *data.Slice, recycle bool) {
 func (q *setter) TableData() []float64        { return Average(q) }
 func (q *setter) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
 func (q *setter) Set(dst *data.Slice)         { q._set(dst) }
+func (q *setter) Mesh() *data.Mesh            { return Mesh() }

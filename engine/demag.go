@@ -19,9 +19,9 @@ var (
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
-	M_full.init(VECTOR, &globalmesh, "m_full", "A/m", "Unnormalized magnetization", SetMFull)
+	M_full.init(VECTOR, "m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
-	B_demag.init(VECTOR, &globalmesh, "B_demag", "T", "Magnetostatic field", SetDemagField)
+	B_demag.init(VECTOR, "B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", getDemagEnergy)
 	registerEnergy(getDemagEnergy)
 

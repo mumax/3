@@ -20,7 +20,7 @@ var (
 func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
-	B_therm.init(3, &globalmesh, "B_therm", "T", "Thermal field", AddThermalField)
+	B_therm.init(3, "B_therm", "T", "Thermal field", AddThermalField)
 	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", getThermalEnergy)
 	registerEnergy(getThermalEnergy)
 
@@ -46,10 +46,10 @@ func AddThermalField(dst *data.Slice) {
 		generator.SetSeed(thermSeed)
 	}
 
-	N := globalmesh.NCell()
+	N := Mesh().NCell()
 	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (mag.Gamma0 * cellVolume() * Solver.Dt_si)
 
-	noise := cuda.Buffer(1, globalmesh.Size())
+	noise := cuda.Buffer(1, Mesh().Size())
 	defer cuda.Recycle(noise)
 
 	const mean = 0

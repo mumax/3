@@ -5,9 +5,11 @@ import (
 	"github.com/mumax/3/util"
 )
 
+var globalmesh_ data.Mesh // mesh for m and everything that has the same size
+
 func Mesh() *data.Mesh {
 	checkMesh()
-	return &globalmesh
+	return &globalmesh_
 }
 
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
@@ -18,9 +20,9 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}
 
-	if globalmesh.Size() == [3]int{0, 0, 0} {
+	if globalmesh_.Size() == [3]int{0, 0, 0} {
 		// first time mesh is set
-		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+		globalmesh_ = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 		M.alloc()
 		regions.alloc()
 	} else {
@@ -34,14 +36,14 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		M.resize(newSize)
 		regions.resize(newSize)
 
-		globalmesh = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+		globalmesh_ = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
 
 		geometry.buffer.Free()
 		geometry.buffer = data.NilSlice(1, newSize)
 		geometry.setGeom(geometry.shape) // uses global mesh
 	}
 
-	Log("//SetMesh", &globalmesh)
+	Log("//SetMesh", &globalmesh_)
 
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)
@@ -49,11 +51,11 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	GUI.Set("cx", cellSizeX*1e9)
 	GUI.Set("cy", cellSizeY*1e9)
 	GUI.Set("cz", cellSizeZ*1e9)
-	p := globalmesh.PBC()
+	p := Mesh().PBC()
 	GUI.Set("px", p[X])
 	GUI.Set("py", p[Y])
 	GUI.Set("pz", p[Z])
-	w := globalmesh.WorldSize()
+	w := Mesh().WorldSize()
 	GUI.Set("wx", w[X]*1e9)
 	GUI.Set("wy", w[Y]*1e9)
 	GUI.Set("wz", w[Z]*1e9)
@@ -90,7 +92,7 @@ func SetPBC(nx, ny, nz int) {
 
 // check if mesh is set
 func checkMesh() {
-	if globalmesh.Size() == [3]int{0, 0, 0} {
+	if globalmesh_.Size() == [3]int{0, 0, 0} {
 		util.Fatal("need to set mesh first")
 	}
 }

@@ -49,6 +49,7 @@ func Init() {
 
 	if *flag_vet {
 		vet()
+		return
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -58,6 +59,8 @@ func Init() {
 	cuda.Init(*flag_gpu, "yield", *flag_sync)
 	cuda.LockThread()
 
+	// used by bootstrap launcher to test cuda
+	// successful exit means cuda was initialized fine
 	if *flag_test {
 		os.Exit(0)
 	}
@@ -70,8 +73,15 @@ func Init() {
 	}
 	defer prof.Cleanup()
 
+	fname := flag.Arg(0)
+	if fname == "" {
+		now := time.Now()
+		fname = fmt.Sprintf("mumax%v-%v-%v-%v:%v.txt", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute())
+	}
 	if *flag_od == "" { // -o not set
-		engine.SetOD(util.NoExt(flag.Arg(0))+".out", *flag_force)
+		engine.SetOD(util.NoExt(fname)+".out", *flag_force)
+	} else {
+		engine.SetOD(*flag_od, *flag_force)
 	}
 
 	engine.GUI.PrepareServer()

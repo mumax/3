@@ -420,7 +420,7 @@ func Eval(code string) {
 //}
 
 var (
-	keepalive time.Time
+	keepalive = time.Now()
 	keepalock sync.Mutex
 )
 

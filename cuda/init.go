@@ -48,6 +48,7 @@ func Init(gpu int, sched string, sync bool) {
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")
 	}
+
 	cudaCC = 10*M + m
 
 	synchronous = sync

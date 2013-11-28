@@ -21,6 +21,9 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+check mesh init!
+
+
 gui CLI double exec
 
 need proper zhang-li boundary conditions

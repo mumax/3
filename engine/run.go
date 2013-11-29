@@ -50,7 +50,7 @@ const (
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
-	//GUI.Set("runtime", seconds) // TODO
+	GUI.Set("runtime", seconds)
 	stop := Time + seconds
 	RunWhile(func() bool { return Time < stop })
 }

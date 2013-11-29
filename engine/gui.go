@@ -88,6 +88,10 @@ func (g *guistate) PrepareServer() {
 		GUI.Set("setmeshwarn", "mesh up to date")
 	})
 
+	// solver
+	GUI.OnEvent("run", GUI.cmd("run", "runtime"))
+
+	// display
 	GUI.OnEvent("renderQuant", func() {
 		GUI.Set("renderDoc", World.Doc[GUI.StringValue("renderQuant")])
 	})
@@ -127,6 +131,22 @@ func (g *guistate) PrepareServer() {
 			GUI.Set("memfree", memfree)
 		})
 	})
+}
+
+func (g *guistate) cmd(cmd string, args ...string) func() {
+	return func() {
+		Inject <- func() {
+			code := cmd + "("
+			if len(args) > 0 {
+				code += g.StringValue(args[0])
+			}
+			for i := 1; i < len(args); i++ {
+				code += ", " + g.StringValue(args[i])
+			}
+			code += ")"
+			Eval(code)
+		}
+	}
 }
 
 func (g *guistate) floatValues(id ...string) []float64 {

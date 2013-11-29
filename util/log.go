@@ -57,3 +57,11 @@ func Assert(test bool) {
 		log.Panic("assertion failed")
 	}
 }
+
+var Progress_ func(a, b int)
+
+func Progress(a, total int) {
+	if Progress_ != nil {
+		Progress_(a, total)
+	}
+}

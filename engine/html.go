@@ -87,6 +87,7 @@ const templText = `
 </script>
 
 
+<p>{{.Progress "progress" 100 0}} {{.Span "busy" ""}} </p>
 
 {{.Data.Div "console"}}
 

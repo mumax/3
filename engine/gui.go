@@ -229,6 +229,19 @@ func (g *guistate) SetBusy(busy bool) {
 	g.busy = busy
 	g.disableControls(busy)
 	updateKeepAlive() // needed after long busy period to avoid browser considered disconnected
+	if busy {
+		GUI.Set("busy", "Initializing")
+	} else {
+		GUI.Set("busy", "")
+	}
+}
+
+func init() {
+	util.Progress_ = GUI.Prog
+}
+
+func (g *guistate) Prog(a, total int) {
+	g.Set("progress", (a*100)/total)
 }
 
 func (g *guistate) disableControls(busy bool) {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 )
 
@@ -60,7 +59,6 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	// Field (destination) loop ranges
 	r1, r2 := kernelRanges(size, pbc)
-	log.Println(" (ranges:", r1, r2)
 
 	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
@@ -92,6 +90,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			for y := r1[Y]; y <= r2[Y]; y++ {
 				yw := wrap(y, size[Y])
 				R[Y] = float64(y) * cellsize[Y]
+				util.Progress((z-r1[Z])*(r2[Y]-r1[Y])+(y-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
 
 				for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 					xw := wrap(x, size[X])

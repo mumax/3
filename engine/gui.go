@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/barnex/cuda5/cu"
 	"github.com/barnex/gui"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/util"
@@ -102,6 +103,11 @@ func (g *guistate) PrepareServer() {
 			comp := GUI.StringValue("renderComp")
 			cachebreaker := "?" + GUI.StringValue("steps") + "_" + GUI.StringValue("renderScale") // scale needed if we zoom while paused
 			GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
+
+			// gpu
+			memfree, _ := cu.MemGetInfo()
+			memfree /= (1024 * 1024)
+			GUI.Set("memfree", memfree)
 		})
 	})
 }

@@ -33,8 +33,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		// free everything
 		conv_.Free()
 		conv_ = nil
-		//mfmconv_.Free() // TODO
-		//mfmconv = nil
+		mfmconv_.Free() // TODO
+		mfmconv_ = nil
 		cuda.FreeBuffers()
 
 		// resize everything

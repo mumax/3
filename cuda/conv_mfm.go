@@ -19,6 +19,25 @@ type MFMConvolution struct {
 	mesh        *data.Mesh
 }
 
+func (c *MFMConvolution) Free() {
+	if c == nil {
+		return
+	}
+	c.size = [3]int{}
+	c.kernSize = [3]int{}
+	c.fftCBuf.Free() // shared with fftRbuf
+	c.fftCBuf = nil
+	c.fftRBuf = nil
+
+	for j := 0; j < 3; j++ {
+		c.gpuFFTKern[j].Free()
+		c.gpuFFTKern[j] = nil
+		c.kern[j] = nil
+	}
+	c.fwPlan.Free()
+	c.bwPlan.Free()
+}
+
 func (c *MFMConvolution) init() {
 	// init FFT plans
 	padded := c.kernSize

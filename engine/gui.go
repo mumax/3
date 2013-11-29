@@ -244,7 +244,7 @@ func (g *guistate) Busy() bool {
 func Eval(code string) {
 	tree, err := World.Compile(code)
 	if err == nil {
-		LogInput(tree.Format())
+		LogInput(rmln(tree.Format()))
 		tree.Eval()
 	} else {
 		LogOutput(code + "\n" + err.Error())

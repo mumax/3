@@ -126,6 +126,14 @@ func sortNoCase(s []string) {
 	sort.Sort(&i)
 }
 
+// trim trailing newlines
+func rmln(a string) string {
+	for strings.HasSuffix(a, "\n") {
+		a = a[:len(a)-1]
+	}
+	return a
+}
+
 const (
 	X = 0
 	Y = 1

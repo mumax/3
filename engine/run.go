@@ -25,7 +25,7 @@ func init() {
 var (
 	Solver     = NewSolver(Torque.Set, normalize, 1e-15, mag.Gamma0, HeunStep)
 	Time       float64             // time in seconds
-	pause      bool                // set pause at any time to stop running after the current step
+	pause      = true              // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step
 	Inject     = make(chan func()) // injects code in between time steps. Used by web interface.
 	solvertype int
@@ -65,7 +65,7 @@ func Steps(n int) {
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
 	checkM() // TODO: move to failed solver step
-	//fmt.Println("running...")
+	//fmt.Println("running")
 	pause = false
 	for condition() && !pause {
 		select {

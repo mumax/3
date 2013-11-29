@@ -91,6 +91,7 @@ func (g *guistate) PrepareServer() {
 	// solver
 	GUI.OnEvent("run", GUI.cmd("Run", "runtime"))
 	GUI.OnEvent("steps", GUI.cmd("Steps", "runsteps"))
+	GUI.OnEvent("break", func() { Inject <- func() { pause = true } })
 
 	// display
 	GUI.OnEvent("renderQuant", func() {
@@ -119,6 +120,13 @@ func (g *guistate) PrepareServer() {
 			GUI.Set("mindt", Solver.MinDt)
 			GUI.Set("maxdt", Solver.MaxDt)
 			GUI.Set("fixdt", Solver.FixDt)
+			if pause {
+				GUI.Set("solverstatus", "paused")
+				GUI.Disable("break", true)
+			} else {
+				GUI.Set("solverstatus", "running")
+				GUI.Disable("break", false)
+			}
 
 			// display
 			quant := GUI.StringValue("renderQuant")

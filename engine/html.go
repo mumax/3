@@ -136,7 +136,7 @@ const templText = `
 <div style="font-size:0.9em; color:gray; text-align:center">
 
 {{.Data.Version}} <br/>
-{{.Data.GPUInfo}} <br/>
+{{.Data.GPUInfo}} ({{.Span "memfree" ""}} MB free) <br/>
 &copy; 2013 Arne Vansteenkiste, DyNaMat LAB, UGent.
 
 

@@ -92,6 +92,9 @@ func (g *guistate) PrepareServer() {
 	GUI.OnEvent("run", GUI.cmd("Run", "runtime"))
 	GUI.OnEvent("steps", GUI.cmd("Steps", "runsteps"))
 	GUI.OnEvent("break", func() { Inject <- func() { pause = true } })
+	GUI.OnEvent("mindt", func() { Inject <- func() { Eval("MinDt=" + GUI.StringValue("mindt")) } })
+	GUI.OnEvent("maxdt", func() { Inject <- func() { Eval("MaxDt=" + GUI.StringValue("maxdt")) } })
+	GUI.OnEvent("fixdt", func() { Inject <- func() { Eval("FixDt=" + GUI.StringValue("fixdt")) } })
 
 	// display
 	GUI.OnEvent("renderQuant", func() {

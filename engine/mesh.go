@@ -36,7 +36,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		// free everything
 		conv_.Free()
 		conv_ = nil
-		mfmconv_.Free() // TODO
+		mfmconv_.Free()
 		mfmconv_ = nil
 		cuda.FreeBuffers()
 
@@ -46,7 +46,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		regions.resize(newSize)
 
 		globalmesh_ = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
-
 		geometry.buffer.Free()
 		geometry.buffer = data.NilSlice(1, newSize)
 		geometry.setGeom(geometry.shape) // uses global mesh

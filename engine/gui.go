@@ -95,6 +95,15 @@ func (g *guistate) PrepareServer() {
 	GUI.OnEvent("mindt", func() { Inject <- func() { Eval("MinDt=" + GUI.StringValue("mindt")) } })
 	GUI.OnEvent("maxdt", func() { Inject <- func() { Eval("MaxDt=" + GUI.StringValue("maxdt")) } })
 	GUI.OnEvent("fixdt", func() { Inject <- func() { Eval("FixDt=" + GUI.StringValue("fixdt")) } })
+	GUI.OnEvent("solvertype", func() {
+		Inject <- func() {
+			typ := map[string]string{"euler": "1", "heun": "2"}[GUI.StringValue("solvertype")]
+			Eval("SetSolver(" + typ + ")")
+			if Solver.FixDt == 0 { // euler must have fixed time step
+				Solver.FixDt = 1e-15
+			}
+		}
+	})
 
 	// display
 	GUI.OnEvent("renderQuant", func() {

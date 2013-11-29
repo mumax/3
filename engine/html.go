@@ -112,8 +112,7 @@ const templText = `
 
 {{.Data.Div "solver"}}
 
-
-
+	Type: {{.Select "solvertype" "heun" "euler" "heun"}}
 	<table>
 		<tr style="background-color:white"> <td>
 

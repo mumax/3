@@ -29,6 +29,9 @@ func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ren.mutex.Lock()
 	defer ren.mutex.Unlock()
 
+	Req(1)
+	defer Req(-1)
+
 	url := r.URL.Path[len("/render/"):]
 	words := strings.Split(url, "/")
 	quant := words[0]

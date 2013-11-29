@@ -17,6 +17,9 @@ func Mesh() *data.Mesh {
 // Can be set only once at the beginning of the simulation.
 // TODO: dedup arguments from globals
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int) {
+	GUI.SetBusy(true)
+	defer GUI.SetBusy(false)
+
 	if Nx <= 1 {
 		util.Fatal("mesh size X should be > 1, have: ", Nx)
 	}

@@ -88,6 +88,7 @@ const Timeout = 3 * time.Second
 
 // Enter interactive mode. Simulation is now exclusively controlled by web GUI
 func RunInteractive() {
+	updateKeepAlive()
 	fmt.Println("entering interactive mode")
 	for time.Since(KeepAlive()) < Timeout {
 		f := <-Inject

@@ -19,10 +19,11 @@ var GUI = guistate{Quants: make(map[string]Slicer), Params: make(map[string]Para
 
 type guistate struct {
 	*gui.Page
-	Quants map[string]Slicer
-	Params map[string]Param
-	mutex  sync.Mutex
-	busy   bool
+	Quants            map[string]Slicer
+	Params            map[string]Param
+	mutex             sync.Mutex
+	eventCacheBreaker int // changed on any event to make sure display is updated
+	busy              bool
 }
 
 // displayable quantity in GUI Parameters section
@@ -49,6 +50,9 @@ func (g *guistate) Add(name string, value interface{}) {
 // initialize the GUI Page (pre-renders template) and register http handlers
 func (g *guistate) PrepareServer() {
 	GUI.Page = gui.NewPage(templText, &GUI)
+	//	GUI.OnAnyEvent(func(){
+	//		GUI.eventCacheBreaker++
+	//	})
 
 	http.Handle("/", GUI)
 	http.Handle("/render/", &renderer)
@@ -81,7 +85,7 @@ func (g *guistate) PrepareServer() {
 			p := GUI.intValues("px", "py", "pz")
 			SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
 		})
-		GUI.Set("setmeshwarn", "")
+		GUI.Set("setmeshwarn", "mesh up to date")
 	})
 
 	GUI.OnEvent("renderQuant", func() {
@@ -89,6 +93,8 @@ func (g *guistate) PrepareServer() {
 	})
 
 	GUI.OnUpdate(func() {
+		Req(1)
+		defer Req(-1)
 		updateKeepAlive() // keep track of when browser was last seen alive
 
 		if GUI.Busy() {
@@ -103,7 +109,7 @@ func (g *guistate) PrepareServer() {
 			// display
 			quant := GUI.StringValue("renderQuant")
 			comp := GUI.StringValue("renderComp")
-			cachebreaker := "?" + GUI.StringValue("steps") + "_" + GUI.StringValue("renderScale") // scale needed if we zoom while paused
+			cachebreaker := "?" + GUI.StringValue("steps") + "_" + fmt.Sprint(GUI.eventCacheBreaker)
 			GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// gpu
@@ -171,6 +177,7 @@ func (g *guistate) SetBusy(busy bool) {
 	g.busy = busy
 	GUI.Disable("cli", busy)
 	GUI.Disable("setmesh", busy)
+	updateKeepAlive() // needed after long busy period to avoid browser considered disconnected
 }
 
 func (g *guistate) Busy() bool {

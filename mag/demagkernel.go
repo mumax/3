@@ -80,29 +80,30 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		pole   [3]float64 // position of point charge on the surface
 		points int        // counts used integration points
 	)
-	for s := 0; s < 3; s++ { // source index Ksdxyz // TODO: make inner?
-		fmt.Print(".")
-		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
-		for z := r1[Z]; z <= r2[Z]; z++ {
-			zw := wrap(z, size[Z])
-			R[Z] = float64(z) * cellsize[Z]
-			for y := r1[Y]; y <= r2[Y]; y++ {
-				yw := wrap(y, size[Y])
-				R[Y] = float64(y) * cellsize[Y]
-				util.Progress((z-r1[Z])*(r2[Y]-r1[Y])+(y-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
+	for z := r1[Z]; z <= r2[Z]; z++ {
+		zw := wrap(z, size[Z])
+		R[Z] = float64(z) * cellsize[Z]
+		for y := r1[Y]; y <= r2[Y]; y++ {
+			yw := wrap(y, size[Y])
+			R[Y] = float64(y) * cellsize[Y]
+			util.Progress((z-r1[Z])*(r2[Y]-r1[Y])+(y-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
 
-				for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
-					xw := wrap(x, size[X])
-					R[X] = float64(x) * cellsize[X]
+			for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
+				xw := wrap(x, size[X])
+				R[X] = float64(x) * cellsize[X]
 
-					// choose number of integration points depending on how far we are from source.
-					dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
-					d := math.Sqrt(dx*dx + dy*dy + dz*dz)
-					if d == 0 {
-						d = L
-					}
-					maxSize := d / accuracy // maximum acceptable integration size
+				// choose number of integration points depending on how far we are from source.
+				dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
+				d := math.Sqrt(dx*dx + dy*dy + dz*dz)
+				if d == 0 {
+					d = L
+				}
+				maxSize := d / accuracy // maximum acceptable integration size
+
+				for s := 0; s < 3; s++ { // source index Ksdxyz
+					u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
+
 					nv := int(math.Max(cellsize[v]/maxSize, 1) + 0.5)
 					nw := int(math.Max(cellsize[w]/maxSize, 1) + 0.5)
 					nx := int(math.Max(cellsize[X]/maxSize, 1) + 0.5)

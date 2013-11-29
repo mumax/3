@@ -75,7 +75,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 	GUI.Set("wy", printf(w[Y]*1e9))
 	GUI.Set("wz", printf(w[Z]*1e9))
 	GUI.Set("display", "/render/") // force display update
-	GUI.Attr("renderLayer", "max", Nz)
+	GUI.Attr("renderLayer", "max", Nz-1)
 }
 
 func printf(f float64) float32 {

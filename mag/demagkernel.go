@@ -59,22 +59,8 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	//	//------------------------------------
 
 	// Field (destination) loop ranges
-	var r1, r2 [3]int
-	// TODO: simplify
-	{
-		for c := 0; c < 3; c++ {
-			if pbc[c] == 0 {
-				r1[c], r2[c] = -(size[c]-1)/2, (size[c]-1)/2
-			} else {
-				r1[c], r2[c] = -(size[c]*pbc[c] - 1), (size[c]*pbc[c] - 1)
-			}
-		}
-		// support for 2D simulations (thickness 1)
-		if size[Z] == 1 && pbc[Z] == 0 {
-			r2[Z] = 0
-		}
-		log.Println(" (ranges:", r1, r2)
-	}
+	r1, r2 := kernelRanges(size, pbc)
+	log.Println(" (ranges:", r1, r2)
 
 	// smallest cell dimension is our typical length scale
 	L := cellsize[X]
@@ -195,6 +181,22 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	kernel[2][0] = kernel[0][2]
 	kernel[2][1] = kernel[1][2]
 	return kernel
+}
+
+// integration ranges for kernel
+func kernelRanges(size, pbc [3]int) (r1, r2 [3]int) {
+	for c := 0; c < 3; c++ {
+		if pbc[c] == 0 {
+			r1[c], r2[c] = -(size[c]-1)/2, (size[c]-1)/2
+		} else {
+			r1[c], r2[c] = -(size[c]*pbc[c] - 1), (size[c]*pbc[c] - 1)
+		}
+	}
+	// support for 2D simulations (thickness 1)
+	if size[Z] == 1 && pbc[Z] == 0 {
+		r2[Z] = 0
+	}
+	return
 }
 
 const (

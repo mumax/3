@@ -4,9 +4,9 @@ scripts=*.txt
 
 mumax3 -vet $scripts || exit 1;
 
-for g in *.go; do
-	go run $g || exit 1;
-done
+#for g in *.go; do
+#	go run $g || exit 1;
+#done
 
 time (
 for f in $scripts; do

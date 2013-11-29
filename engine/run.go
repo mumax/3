@@ -57,7 +57,7 @@ func Run(seconds float64) {
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	//GUI.Set("runsteps", n) // TODO
+	GUI.Set("runsteps", n)
 	stop := Solver.NSteps + n
 	RunWhile(func() bool { return Solver.NSteps < stop })
 }

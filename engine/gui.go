@@ -89,7 +89,8 @@ func (g *guistate) PrepareServer() {
 	})
 
 	// solver
-	GUI.OnEvent("run", GUI.cmd("run", "runtime"))
+	GUI.OnEvent("run", GUI.cmd("Run", "runtime"))
+	GUI.OnEvent("steps", GUI.cmd("Steps", "runsteps"))
 
 	// display
 	GUI.OnEvent("renderQuant", func() {
@@ -133,6 +134,8 @@ func (g *guistate) PrepareServer() {
 	})
 }
 
+// returns func that injects func that executes cmd(args),
+// with args ids for GUI element values.
 func (g *guistate) cmd(cmd string, args ...string) func() {
 	return func() {
 		Inject <- func() {

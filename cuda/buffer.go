@@ -12,7 +12,7 @@ var (
 	buf_lock  sync.Mutex                  // TODO: redundant?
 	buf_pool  map[int][]unsafe.Pointer    // maps buffer size to pool
 	buf_check map[unsafe.Pointer]struct{} // check if pointer originates here
-	buf_count int                         // total allocated buffers
+	//buf_count int                         // total allocated buffers
 )
 
 const buf_max = 100 // maximum number of buffers to allocate
@@ -39,10 +39,9 @@ func Buffer(nComp int, size [3]int) *data.Slice {
 
 	for i := nFromPool; i < nComp; i++ {
 		//log.Println("cuda: alloc buffer")
-		if buf_count >= buf_max {
+		if len(buf_check) >= buf_max {
 			log.Panic("too many buffers in use, possible memory leak")
 		}
-		buf_count++
 		ptrs[i] = MemAlloc(int64(cu.SIZEOF_FLOAT32 * N))
 		buf_check[ptrs[i]] = struct{}{} // mark this pointer as mine
 	}
@@ -65,4 +64,15 @@ func Recycle(s *data.Slice) {
 	}
 	s.Disable() // make it unusable, protect against accidental use after recycle
 	buf_pool[N] = pool
+}
+
+func FreeBuffers() {
+	for _, size := range buf_pool {
+		for i := range size {
+			cu.DevicePtr(size[i]).Free()
+			size[i] = nil
+		}
+	}
+	buf_pool = make(map[int][]unsafe.Pointer)
+	buf_check = make(map[unsafe.Pointer]struct{})
 }

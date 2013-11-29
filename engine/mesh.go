@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
@@ -28,10 +29,15 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	} else {
 		// here be dragons
 		LogOutput("resizing")
+
+		// free everything
 		conv_.Free()
 		conv_ = nil
 		//mfmconv_.Free() // TODO
 		//mfmconv = nil
+		cuda.FreeBuffers()
+
+		// resize everything
 		newSize := [3]int{Nx, Ny, Nz}
 		M.resize(newSize)
 		regions.resize(newSize)

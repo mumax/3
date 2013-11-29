@@ -50,9 +50,9 @@ func (g *guistate) Add(name string, value interface{}) {
 // initialize the GUI Page (pre-renders template) and register http handlers
 func (g *guistate) PrepareServer() {
 	GUI.Page = gui.NewPage(templText, &GUI)
-	//	GUI.OnAnyEvent(func(){
-	//		GUI.eventCacheBreaker++
-	//	})
+	GUI.OnAnyEvent(func() {
+		GUI.eventCacheBreaker++
+	})
 
 	http.Handle("/", GUI)
 	http.Handle("/render/", &renderer)

@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -56,19 +57,23 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	GUI.Set("nx", Nx)
 	GUI.Set("ny", Ny)
 	GUI.Set("nz", Nz)
-	GUI.Set("cx", cellSizeX*1e9)
-	GUI.Set("cy", cellSizeY*1e9)
-	GUI.Set("cz", cellSizeZ*1e9)
+	GUI.Set("cx", printf(cellSizeX*1e9))
+	GUI.Set("cy", printf(cellSizeY*1e9))
+	GUI.Set("cz", printf(cellSizeZ*1e9))
 	p := Mesh().PBC()
 	GUI.Set("px", p[X])
 	GUI.Set("py", p[Y])
 	GUI.Set("pz", p[Z])
 	w := Mesh().WorldSize()
-	GUI.Set("wx", w[X]*1e9)
-	GUI.Set("wy", w[Y]*1e9)
-	GUI.Set("wz", w[Z]*1e9)
+	GUI.Set("wx", printf(w[X]*1e9))
+	GUI.Set("wy", printf(w[Y]*1e9))
+	GUI.Set("wz", printf(w[Z]*1e9))
 	GUI.Set("display", "/render/") // force display update
 	GUI.Attr("renderLayer", "max", Nz)
+}
+
+func printf(f float64) string {
+	return fmt.Sprintf("%6f", f)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

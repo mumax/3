@@ -100,16 +100,25 @@ func (g *guistate) PrepareServer() {
 		if GUI.Busy() {
 			log.Println("gui busy")
 			return
+		} else {
+			g.disableControls(false) // make sure everything is enabled
 		}
 
 		InjectAndWait(func() {
 			// solver
-			GUI.Set("steps", Solver.NSteps)
+			GUI.Set("nsteps", Solver.NSteps)
+			GUI.Set("time", fmt.Sprintf("%6e", Time))
+			GUI.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
+			GUI.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
+			GUI.Set("maxerr", Solver.MaxErr)
+			GUI.Set("mindt", Solver.MinDt)
+			GUI.Set("maxdt", Solver.MaxDt)
+			GUI.Set("fixdt", Solver.FixDt)
 
 			// display
 			quant := GUI.StringValue("renderQuant")
 			comp := GUI.StringValue("renderComp")
-			cachebreaker := "?" + GUI.StringValue("steps") + "_" + fmt.Sprint(GUI.eventCacheBreaker)
+			cachebreaker := "?" + GUI.StringValue("nsteps") + "_" + fmt.Sprint(GUI.eventCacheBreaker)
 			GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// gpu
@@ -175,9 +184,12 @@ func (g *guistate) SetBusy(busy bool) {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	g.busy = busy
-	GUI.Disable("cli", busy)
-	GUI.Disable("setmesh", busy)
+	g.disableControls(busy)
 	updateKeepAlive() // needed after long busy period to avoid browser considered disconnected
+}
+
+func (g *guistate) disableControls(busy bool) {
+	g.Disable("cli", busy)
 }
 
 func (g *guistate) Busy() bool {

@@ -106,7 +106,31 @@
 
 {{.Data.Div "solver"}}
 
-{{.Span "steps" ""}}
+
+
+	<table>
+		<tr style="background-color:white"> <td>
+
+	<table>
+		<tr> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime"    1e-9 "size=8"}}s</td></tr> 
+		<tr> <td> {{.Button "steps" "Steps"}}</td> <td> {{.TextBox "runsteps" "1000" "size=8"}} </td></tr>
+		<tr> <td> {{.Button "break" "Break"}}</td> <td>                                </td></tr>
+	</table>
+
+	</td><td>
+		&nbsp; &nbsp; &nbsp; &nbsp;
+	</td><td>
+
+	<table>
+		<tr> <td>step:    </td><td>{{.Span    "nsteps"  "0"}}            </td><td>time:  </td><td>{{.Span    "time"   "0"}}s             </td></tr>
+		<tr> <td>dt:      </td><td>{{.Span    "dt"      "0"}} s          </td><td>fixdt: </td><td>{{.TextBox "fixdt"  "0" "size=8"}}s    </td></tr>
+		<tr> <td>mindt:   </td><td>{{.TextBox "mindt"   "0" "size=8"}} s </td><td>maxdt: </td><td>{{.TextBox "maxdt"  "0" "size=8"}}s    </td></tr>
+		<tr> <td>err/step:</td><td>{{.Span    "lasterr" "0"}}            </td><td>maxerr:</td><td>{{.TextBox "maxerr" "0" "size=8"}}/step</td></tr>
+	</table>
+
+		</td></tr>
+	</table>
+</div>
 
 </div>
 

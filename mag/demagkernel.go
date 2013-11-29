@@ -164,7 +164,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 						}
 					}
 					for d := s; d < 3; d++ { // destination index Ksdxyz
-						array[s][d][zw][yw][xw] += float32(B[d])
+						array[s][d][zw][yw][xw] += float32(B[d]) // += needed in case of PBC
 					}
 				}
 			}
@@ -189,7 +189,7 @@ func kernelRanges(size, pbc [3]int) (r1, r2 [3]int) {
 		if pbc[c] == 0 {
 			r1[c], r2[c] = -(size[c]-1)/2, (size[c]-1)/2
 		} else {
-			r1[c], r2[c] = -(size[c]*pbc[c] - 1), (size[c]*pbc[c] - 1)
+			r1[c], r2[c] = -(size[c]*pbc[c] - 1), (size[c]*pbc[c] - 1) // no /2 here, or we would take half right and half left image
 		}
 	}
 	// support for 2D simulations (thickness 1)

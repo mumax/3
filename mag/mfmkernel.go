@@ -87,7 +87,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 					Fz_tip := (E2 - E1) / Δ
 
-					K[s][zw][yw][xw] += float32(Fz_tip)
+					K[s][zw][yw][xw] += float32(Fz_tip) // += needed in case of PBC
 				}
 			}
 		}

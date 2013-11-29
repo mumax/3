@@ -51,8 +51,11 @@ func checkM() {
 func Close() {
 	drainOutput()
 	Table.flush()
-	var memstats runtime.MemStats
-	runtime.ReadMemStats(&memstats)
+	if logfile != nil {
+		logfile.Close()
+	}
+	//var memstats runtime.MemStats
+	//runtime.ReadMemStats(&memstats)
 	//log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
 
 	// debug. TODO: rm

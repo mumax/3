@@ -174,10 +174,10 @@ func (g *guistate) Busy() bool {
 func Eval(code string) {
 	tree, err := World.Compile(code)
 	if err == nil {
-		Log(tree.Format())
+		LogInput(tree.Format())
 		tree.Eval()
 	} else {
-		Log(err)
+		LogOutput(code + "\n" + err.Error())
 	}
 }
 

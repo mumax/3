@@ -43,7 +43,7 @@ func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
 		util.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
-		Log(msg, ":", have, "OK")
+		LogOutput(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
 }
@@ -103,7 +103,7 @@ func myprint(msg ...interface{}) {
 			continue
 		}
 	}
-	Log(msg...)
+	LogOutput(msg...)
 }
 
 // converts cell index to coordinate, internal coordinates

@@ -27,7 +27,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 		regions.alloc()
 	} else {
 		// here be dragons
-		Log("resizing...")
+		LogOutput("resizing")
 		conv_.Free()
 		conv_ = nil
 		//mfmconv_.Free() // TODO

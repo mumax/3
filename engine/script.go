@@ -40,7 +40,7 @@ func DeclLValue(name string, value script.LValue, doc string) {
 // evaluate code, exit on error (behavior for input files)
 func EvalFile(code *script.BlockStmt) {
 	for i := range code.Children {
-		Log(script.Format(code.Node[i]))
+		LogInput(script.Format(code.Node[i]))
 		code.Children[i].Eval()
 	}
 }

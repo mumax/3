@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -72,8 +71,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbc []int)
 	GUI.Attr("renderLayer", "max", Nz)
 }
 
-func printf(f float64) string {
-	return fmt.Sprintf("%6f", f)
+func printf(f float64) float32 {
+	return float32(f)
 }
 
 // for lazy setmesh: set gridsize and cellsize in separate calls

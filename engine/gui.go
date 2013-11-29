@@ -6,6 +6,7 @@ import (
 	"github.com/barnex/gui"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/util"
+	"log"
 	"math/rand"
 	"net/http"
 	"path"
@@ -91,6 +92,7 @@ func (g *guistate) PrepareServer() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
 		if GUI.Busy() {
+			log.Println("gui busy")
 			return
 		}
 

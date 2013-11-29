@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"log"
 	"math"
 )
 
@@ -58,29 +59,21 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	//	//------------------------------------
 
 	// Field (destination) loop ranges
-	var x1, x2, y1, y2, z1, z2 int
+	var r1, r2 [3]int
 	// TODO: simplify
 	{
-		if pbc[X] == 0 {
-			x1, x2 = -(size[X]-1)/2, (size[X]-1)/2
-		} else {
-			x1, x2 = -(size[X]*pbc[X] - 1), (size[X]*pbc[X] - 1)
-		}
-		if pbc[Y] == 0 {
-			y1, y2 = -(size[Y]-1)/2, (size[Y]-1)/2
-		} else {
-			y1, y2 = -(size[Y]*pbc[Y] - 1), (size[Y]*pbc[Y] - 1)
-		}
-		if pbc[Z] == 0 {
-			z1, z2 = -(size[Z]-1)/2, (size[Z]-1)/2
-		} else {
-			z1, z2 = -(size[Z]*pbc[Z] - 1), (size[Z]*pbc[Z] - 1)
+		for c := 0; c < 3; c++ {
+			if pbc[c] == 0 {
+				r1[c], r2[c] = -(size[c]-1)/2, (size[c]-1)/2
+			} else {
+				r1[c], r2[c] = -(size[c]*pbc[c] - 1), (size[c]*pbc[c] - 1)
+			}
 		}
 		// support for 2D simulations (thickness 1)
 		if size[Z] == 1 && pbc[Z] == 0 {
-			z2 = 0
+			r2[Z] = 0
 		}
-		fmt.Print(" (ranges:", x1, x2, ",", y1, y2, ",", z1, z2, ")")
+		log.Println(" (ranges:", r1, r2)
 	}
 
 	// smallest cell dimension is our typical length scale
@@ -107,14 +100,14 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		fmt.Print(".")
 		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
-		for z := z1; z <= z2; z++ {
+		for z := r1[Z]; z <= r2[Z]; z++ {
 			zw := wrap(z, size[Z])
 			R[Z] = float64(z) * cellsize[Z]
-			for y := y1; y <= y2; y++ {
+			for y := r1[Y]; y <= r2[Y]; y++ {
 				yw := wrap(y, size[Y])
 				R[Y] = float64(y) * cellsize[Y]
 
-				for x := x1; x <= x2; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
+				for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 					xw := wrap(x, size[X])
 					R[X] = float64(x) * cellsize[X]
 

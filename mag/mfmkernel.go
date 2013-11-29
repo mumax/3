@@ -48,22 +48,22 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	r1, r2 := kernelRanges(size, pbc)
 	log.Println("mfm kernel ranges:", r1, r2)
 
-	for s := 0; s < 3; s++ { // source index Ksxyz
-		fmt.Print(".")
-		m := d.Vector{0, 0, 0}
-		m[s] = 1
+	for iz := r1[Z]; iz <= r2[Z]; iz++ {
+		zw := wrap(iz, size[Z])
+		z := float64(iz) * cellsize[Z]
 
-		for iz := r1[Z]; iz <= r2[Z]; iz++ {
-			zw := wrap(iz, size[Z])
-			z := float64(iz) * cellsize[Z]
+		for iy := r1[Y]; iy <= r2[Y]; iy++ {
+			yw := wrap(iy, size[Y])
+			y := float64(iy) * cellsize[Y]
+			util.Progress((iz-r1[Z])*(r2[Y]-r1[Y])+(iy-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
 
-			for iy := r1[Y]; iy <= r2[Y]; iy++ {
-				yw := wrap(iy, size[Y])
-				y := float64(iy) * cellsize[Y]
+			for ix := r1[X]; ix <= r2[X]; ix++ {
+				x := float64(ix) * cellsize[X]
+				xw := wrap(ix, size[X])
 
-				for ix := r1[X]; ix <= r2[X]; ix++ {
-					x := float64(ix) * cellsize[X]
-					xw := wrap(ix, size[X])
+				for s := 0; s < 3; s++ { // source index Ksxyz
+					m := d.Vector{0, 0, 0}
+					m[s] = 1
 
 					R1 := d.Vector{-x, -y, z - lift}
 					r1 := R1.Len()

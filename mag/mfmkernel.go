@@ -4,6 +4,7 @@ import (
 	"fmt"
 	d "github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"log"
 	"math"
 )
 
@@ -15,7 +16,6 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
 		pbc := mesh.PBC()
-		util.AssertMsg(pbc == [3]int{0, 0, 0}, "no PBC for MFM")
 		sz := padSize(mesh.Size(), pbc)
 		cs := mesh.CellSize()
 		mesh = d.NewMesh(sz[X], sz[Y], sz[Z], cs[X], cs[Y], cs[Z], pbc[:]...)
@@ -23,6 +23,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 	// Shorthand
 	size := mesh.Size()
+	pbc := mesh.PBC()
 	cellsize := mesh.CellSize()
 	volume := cellsize[X] * cellsize[Y] * cellsize[Z]
 	fmt.Print("calculating MFM kernel")
@@ -44,29 +45,23 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 		K[i] = kernel[i].Scalars()
 	}
 
-	// Field (destination) loop ranges
-	var x1, x2 = -(size[X] - 1) / 2, (size[X] - 1) / 2
-	var y1, y2 = -(size[Y] - 1) / 2, (size[Y] - 1) / 2
-	var z1, z2 = -(size[Z] - 1) / 2, (size[Z] - 1) / 2
-	// support for 2D simulations (thickness 1)
-	if size[Z] == 1 {
-		z2 = 0
-	}
+	r1, r2 := kernelRanges(size, pbc)
+	log.Println("mfm kernel ranges:", r1, r2)
 
 	for s := 0; s < 3; s++ { // source index Ksxyz
 		fmt.Print(".")
 		m := d.Vector{0, 0, 0}
 		m[s] = 1
 
-		for iz := z1; iz <= z2; iz++ {
+		for iz := r1[Z]; iz <= r2[Z]; iz++ {
 			zw := wrap(iz, size[Z])
 			z := float64(iz) * cellsize[Z]
 
-			for iy := y1; iy <= y2; iy++ {
+			for iy := r1[Y]; iy <= r2[Y]; iy++ {
 				yw := wrap(iy, size[Y])
 				y := float64(iy) * cellsize[Y]
 
-				for ix := x1; ix <= x2; ix++ {
+				for ix := r1[X]; ix <= r2[X]; ix++ {
 					x := float64(ix) * cellsize[X]
 					xw := wrap(ix, size[X])
 
@@ -92,15 +87,12 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 					Fz_tip := (E2 - E1) / Δ
 
-					K[s][zw][yw][xw] = float32(Fz_tip)
+					K[s][zw][yw][xw] += float32(Fz_tip)
 				}
 			}
 		}
 	}
 
 	fmt.Println()
-	d.WriteFile("mfmkx.dump", kernel[X], d.Meta{})
-	d.WriteFile("mfmky.dump", kernel[Y], d.Meta{})
-	d.WriteFile("mfmkz.dump", kernel[Z], d.Meta{})
 	return kernel
 }

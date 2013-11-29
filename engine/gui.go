@@ -80,10 +80,16 @@ func (g *guistate) PrepareServer() {
 	GUI.OnEvent("setmesh", func() {
 		GUI.Disable("setmesh", true)
 		InjectAndWait(func() {
-			n := GUI.intValues("nx", "ny", "nz")
-			c := GUI.floatValues("cx", "cy", "cz")
-			p := GUI.intValues("px", "py", "pz")
-			SetMesh(n[X], n[Y], n[Z], c[X]*1e-9, c[Y]*1e-9, c[Z]*1e-9, p)
+			Eval(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
+				GUI.Value("nx"),
+				GUI.Value("ny"),
+				GUI.Value("nz"),
+				GUI.Value("cx"),
+				GUI.Value("cy"),
+				GUI.Value("cz"),
+				GUI.Value("px"),
+				GUI.Value("py"),
+				GUI.Value("pz")))
 		})
 		GUI.Set("setmeshwarn", "mesh up to date")
 	})

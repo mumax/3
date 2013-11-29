@@ -20,9 +20,6 @@ var (
 )
 
 func init() {
-	DeclFunc("SetGridSize", SetGridSize, `Sets the number of cells for X,Y,Z`)
-	DeclFunc("SetCellSize", SetCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclFunc("SetPBC", SetPBC, `Sets number of repetitions in X,Y,Z`)
 	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
 	B_eff.init(VECTOR, "B_eff", "T", "Effective field", SetEffectiveField)
 }

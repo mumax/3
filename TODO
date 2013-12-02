@@ -21,6 +21,8 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+MFM 3D not OK
+
 check mesh init!
 
 free: also cuda buffers
@@ -46,6 +48,8 @@ API:
 mask.setv, getv
 
 check region defined?
+
+load PNG geom (shape?)
 
 improvements:
 -------------

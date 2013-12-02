@@ -48,7 +48,8 @@ const templText = `
 
 <body>
 
-	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span>  {{.ErrorBox}} <br/>
+	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span>  {{.ErrorBox}}
+	{{.Progress "progress" 100 0}} {{.Span "busy" "" }} <br/>
 	<hr/>
 
 
@@ -87,7 +88,6 @@ const templText = `
 </script>
 
 
-<p>{{.Progress "progress" 100 0}} {{.Span "busy" ""}} </p>
 
 {{.Data.Div "console"}}
 
@@ -120,7 +120,7 @@ const templText = `
 	<table>
 		<tr> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime"   1e-9  "size=8"}}s</td></tr> 
 		<tr> <td> {{.Button "steps" "Steps"}}</td> <td> {{.TextBox "runsteps" "1000" "size=8"}} </td></tr>
-		<tr> <td> {{.Span "solverstatus" ""}}</td> <td> {{.Button  "break"    "Break"}}         </td></tr>
+		<tr> <td> {{.Button "break" "Break"}}</td> <td></td>                                         </tr>
 	</table>
 
 	</td><td>

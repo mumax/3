@@ -58,10 +58,11 @@ func Assert(test bool) {
 	}
 }
 
-var Progress_ func(a, b int)
+// Hack to avoid cyclic dependency on engine.
+var Progress_ func(int, int, string)
 
-func Progress(a, total int) {
+func Progress(progress, total int, msg string) {
 	if Progress_ != nil {
-		Progress_(a, total)
+		Progress_(progress, total, msg)
 	}
 }

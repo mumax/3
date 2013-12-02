@@ -55,7 +55,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 			yw := wrap(iy, size[Y])
 			y := float64(iy) * cellsize[Y]
 			progress++
-			util.Progress(progress, progmax)
+			util.Progress(progress, progmax, "Calculating MFM kernel")
 
 			for ix := r1[X]; ix <= r2[X]; ix++ {
 				x := float64(ix) * cellsize[X]

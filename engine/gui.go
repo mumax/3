@@ -123,7 +123,8 @@ func (g *guistate) PrepareServer() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
 		if GUI.Busy() {
-			log.Println("gui busy")
+			g.disableControls(true)
+			log.Print(".")
 			return
 		} else {
 			g.disableControls(false) // make sure everything is enabled
@@ -140,10 +141,10 @@ func (g *guistate) PrepareServer() {
 			GUI.Set("maxdt", Solver.MaxDt)
 			GUI.Set("fixdt", Solver.FixDt)
 			if pause {
-				GUI.Set("solverstatus", "paused")
+				GUI.Set("busy", "Paused")
 				GUI.Disable("break", true)
 			} else {
-				GUI.Set("solverstatus", "running")
+				GUI.Set("busy", "Running")
 				GUI.Disable("break", false)
 			}
 
@@ -240,6 +241,7 @@ func (g *guistate) SetBusy(busy bool) {
 		GUI.Set("busy", "Initializing")
 	} else {
 		GUI.Set("busy", "")
+		GUI.Set("progress", 0)
 	}
 }
 
@@ -247,12 +249,18 @@ func init() {
 	util.Progress_ = GUI.Prog
 }
 
-func (g *guistate) Prog(a, total int) {
+func (g *guistate) Prog(a, total int, msg string) {
 	g.Set("progress", (a*100)/total)
+	g.Set("busy", msg)
+	//visible := (a!=total)
+	//g.Display("progress", visible)
 }
 
 func (g *guistate) disableControls(busy bool) {
 	g.Disable("cli", busy)
+	g.Disable("run", busy)
+	g.Disable("steps", busy)
+	g.Disable("break", busy)
 }
 
 func (g *guistate) Busy() bool {

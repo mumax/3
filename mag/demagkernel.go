@@ -88,7 +88,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			yw := wrap(y, size[Y])
 			R[Y] = float64(y) * cellsize[Y]
 			progress++
-			util.Progress(progress, progmax)
+			util.Progress(progress, progmax, "Calculating demag kernel")
 
 			for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 				xw := wrap(x, size[X])

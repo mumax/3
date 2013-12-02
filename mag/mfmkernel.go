@@ -25,7 +25,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	pbc := mesh.PBC()
 	cellsize := mesh.CellSize()
 	volume := cellsize[X] * cellsize[Y] * cellsize[Z]
-	fmt.Print("calculating MFM kernel")
+	fmt.Println("calculating MFM kernel")
 
 	// Sanity check
 	{
@@ -93,6 +93,5 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 		}
 	}
 
-	fmt.Println()
 	return kernel
 }

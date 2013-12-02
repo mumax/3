@@ -18,3 +18,4 @@ mx3
 mumax3.*linux*cuda*
 *.*~
 tmp/
+*.out

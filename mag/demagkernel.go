@@ -80,14 +80,15 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		pole   [3]float64 // position of point charge on the surface
 		points int        // counts used integration points
 	)
-
+	progress, progmax := 0, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z])
 	for z := r1[Z]; z <= r2[Z]; z++ {
 		zw := wrap(z, size[Z])
 		R[Z] = float64(z) * cellsize[Z]
 		for y := r1[Y]; y <= r2[Y]; y++ {
 			yw := wrap(y, size[Y])
 			R[Y] = float64(y) * cellsize[Y]
-			util.Progress((z-r1[Z])*(r2[Y]-r1[Y])+(y-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
+			progress++
+			util.Progress(progress, progmax)
 
 			for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
 				xw := wrap(x, size[X])

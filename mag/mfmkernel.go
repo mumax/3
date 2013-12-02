@@ -4,7 +4,6 @@ import (
 	"fmt"
 	d "github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 )
 
@@ -46,7 +45,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	}
 
 	r1, r2 := kernelRanges(size, pbc)
-	log.Println("mfm kernel ranges:", r1, r2)
+	progress, progmax := 0, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z])
 
 	for iz := r1[Z]; iz <= r2[Z]; iz++ {
 		zw := wrap(iz, size[Z])
@@ -55,7 +54,8 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 		for iy := r1[Y]; iy <= r2[Y]; iy++ {
 			yw := wrap(iy, size[Y])
 			y := float64(iy) * cellsize[Y]
-			util.Progress((iz-r1[Z])*(r2[Y]-r1[Y])+(iy-r1[Y])+1, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z]))
+			progress++
+			util.Progress(progress, progmax)
 
 			for ix := r1[X]; ix <= r2[X]; ix++ {
 				x := float64(ix) * cellsize[X]

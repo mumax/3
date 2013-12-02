@@ -44,6 +44,7 @@ for i:=0; i<alpha_reg; i++{
     r_newY := CellY*Ny - ABC + i*CellY
     defregion(i+3, Ellipse(r_newX, r_newY).inverse())
 }
+setgeom(Ellipse(CellX*Nx, CellY*Ny))
 defregion(0, Ellipse(CellX*Nx, CellY*Ny).inverse())
 
 // ALLOCATE VARIABLES
@@ -89,9 +90,6 @@ tableautosave(5e-12)
 // RUN
 run(1e-9)
 
-m_ := average(m)
 tol := 1e-3
-expect("mx", m_[0], -0.02271644026041031 , tol)
-expect("my", m_[1], -0.32864493131637573 , tol)
-expect("mz", m_[2], -0.00015423778677359223, tol)
+expectv("m", m.average(), vector(-0.02892563,  -0.418475056, -0.00015423), tol)
 

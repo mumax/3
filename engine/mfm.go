@@ -25,9 +25,7 @@ func SetMFM(dst *data.Slice) {
 	buf := cuda.Buffer(3, Mesh().Size())
 	defer cuda.Recycle(buf)
 	if mfmconv_ == nil {
-		GUI.SetBusy(true)
-		defer GUI.SetBusy(false)
-		mfmconv_ = cuda.NewMFM(Mesh(), MFMLift.v, MFMTipSize.v)
+		reinitmfmconv()
 	}
 
 	mfmconv_.Exec(buf, M.Buffer(), geometry.Gpu(), Bsat.gpuLUT1(), regions.Gpu())

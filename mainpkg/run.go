@@ -45,11 +45,10 @@ func runFileAndServe(fname string) {
 	} else {
 		fmt.Println("no input files: starting interactive session")
 		engine.Timeout = 365 * 24 * time.Hour // forever
-		engine.LogOutput("setting up default parameters")
 		// set up some sensible start configuration
-		engine.Eval(`SetGridSize(32, 32, 1)
-		SetCellSize(3e-9, 3e-9, 3e-9)
-		Msat = 1/(4e-7*Pi)
+		engine.Eval(`SetGridSize(128, 64, 1)
+		SetCellSize(4e-9, 4e-9, 4e-9)
+		Msat = 1e6
 		Aex = 10e-12
 		alpha = 1
 		m = RandomMag()`)

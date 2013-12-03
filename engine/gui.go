@@ -59,14 +59,24 @@ func (g *guistate) PrepareServer() {
 	http.Handle("/render/", &renderer)
 	//http.HandleFunc("/plot/", servePlot)
 
-	// console
+	g.prepareConsole()
+	g.prepareMesh()
+	g.prepareGeom()
+	g.prepareM()
+	g.prepareSolver()
+	g.prepareParam()
+	g.prepareHandlers()
+}
+
+func (g *guistate) prepareConsole() {
 	g.OnEvent("cli", func() {
 		cmd := g.StringValue("cli")
 		Inject <- func() { Eval(cmd) }
 		g.Set("cli", "")
 	})
+}
 
-	// mesh
+func (g *guistate) prepareMesh() {
 	g.Disable("setmesh", true) // button only enabled if pressing makes sense
 	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
 	meshboxes := []string{"nx", "ny", "nz", "cx", "cy", "cz", "px", "py", "pz"}
@@ -94,8 +104,9 @@ func (g *guistate) PrepareServer() {
 		})
 		g.Set("setmeshwarn", "mesh up to date")
 	})
+}
 
-	// geometry
+func (g *guistate) prepareGeom() {
 	g.OnEvent("geomselect", func() {
 		ident := g.StringValue("geomselect")
 		t := World.Resolve(ident).Type()
@@ -124,8 +135,13 @@ func (g *guistate) PrepareServer() {
 		g.Set("geomargs", args)
 		g.Set("geomdoc", World.Doc[ident])
 	})
-
-	// initial m
+	g.OnEvent("setgeom", func() {
+		Inject <- (func() {
+			Eval(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
+		})
+	})
+}
+func (g *guistate) prepareM() {
 	g.OnEvent("mselect", func() {
 		ident := g.StringValue("mselect")
 		t := World.Resolve(ident).Type()
@@ -151,20 +167,13 @@ func (g *guistate) PrepareServer() {
 		g.Set("margs", args)
 		g.Set("mdoc", World.Doc[ident])
 	})
-
-	g.OnEvent("setgeom", func() {
-		Inject <- (func() {
-			Eval(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
-		})
-	})
-
 	g.OnEvent("setm", func() {
 		Inject <- (func() {
 			Eval(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
 		})
 	})
-
-	// solver
+}
+func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
 	g.OnEvent("break", func() { Inject <- func() { pause = true } })
@@ -181,8 +190,8 @@ func (g *guistate) PrepareServer() {
 			}
 		}
 	})
-
-	// parameters
+}
+func (g *guistate) prepareParam() {
 	for _, p := range g.Params {
 		p := p
 		n := p.Name()
@@ -206,12 +215,15 @@ func (g *guistate) PrepareServer() {
 			}
 		})
 	}
+}
 
-	// display
+func (g *guistate) prepareDisplay() {
 	g.OnEvent("renderQuant", func() {
 		g.Set("renderDoc", World.Doc[g.StringValue("renderQuant")])
 	})
+}
 
+func (g *guistate) prepareHandlers() {
 	g.OnUpdate(func() {
 		Req(1)
 		defer Req(-1)

@@ -20,11 +20,11 @@ var GUI = guistate{Quants: make(map[string]Slicer), Params: make(map[string]Para
 
 type guistate struct {
 	*gui.Page
-	Quants            map[string]Slicer
-	Params            map[string]Param
-	mutex             sync.Mutex
-	eventCacheBreaker int // changed on any event to make sure display is updated
-	busy              bool
+	Quants             map[string]Slicer
+	Params             map[string]Param
+	mutex              sync.Mutex
+	_eventCacheBreaker int // changed on any event to make sure display is updated
+	busy               bool
 }
 
 // displayable quantity in GUI Parameters section
@@ -52,7 +52,7 @@ func (g *guistate) Add(name string, value interface{}) {
 func (g *guistate) PrepareServer() {
 	GUI.Page = gui.NewPage(templText, &GUI)
 	GUI.OnAnyEvent(func() {
-		GUI.eventCacheBreaker++
+		GUI.incCacheBreaker()
 	})
 
 	http.Handle("/", GUI)
@@ -186,7 +186,7 @@ func (g *guistate) PrepareServer() {
 			// display
 			quant := GUI.StringValue("renderQuant")
 			comp := GUI.StringValue("renderComp")
-			cachebreaker := "?" + GUI.StringValue("nsteps") + "_" + fmt.Sprint(GUI.eventCacheBreaker)
+			cachebreaker := "?" + GUI.StringValue("nsteps") + "_" + fmt.Sprint(GUI.cacheBreaker())
 			GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// gpu
@@ -215,6 +215,7 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 	}
 }
 
+// todo: rm?
 func (g *guistate) floatValues(id ...string) []float64 {
 	v := make([]float64, len(id))
 	for i := range id {
@@ -223,6 +224,7 @@ func (g *guistate) floatValues(id ...string) []float64 {
 	return v
 }
 
+// todo: rm?
 func (g *guistate) intValues(id ...string) []int {
 	v := make([]int, len(id))
 	for i := range id {
@@ -232,16 +234,21 @@ func (g *guistate) intValues(id ...string) []int {
 }
 
 // renders page title for PrepareServer
-func (g *guistate) Title() string {
-	return util.NoExt(path.Base(OD))
+func (g *guistate) Title() string { return util.NoExt(path.Base(OD)) }
+
+func (g *guistate) Version() string { return UNAME }
+
+func (g *guistate) GPUInfo() string { return cuda.GPUInfo }
+func (g *guistate) incCacheBreaker() {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	g._eventCacheBreaker++
 }
 
-func (g *guistate) Version() string {
-	return UNAME
-}
-
-func (g *guistate) GPUInfo() string {
-	return cuda.GPUInfo
+func (g *guistate) cacheBreaker() int {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	return g._eventCacheBreaker
 }
 
 func (g *guistate) QuantNames() []string {

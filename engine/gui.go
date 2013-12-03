@@ -50,54 +50,54 @@ func (g *guistate) Add(name string, value interface{}) {
 // Once Params/Quants have been declared and added,
 // initialize the GUI Page (pre-renders template) and register http handlers
 func (g *guistate) PrepareServer() {
-	GUI.Page = gui.NewPage(templText, &GUI)
-	GUI.OnAnyEvent(func() {
-		GUI.incCacheBreaker()
+	g.Page = gui.NewPage(templText, g)
+	g.OnAnyEvent(func() {
+		g.incCacheBreaker()
 	})
 
-	http.Handle("/", GUI)
+	http.Handle("/", g)
 	http.Handle("/render/", &renderer)
 	//http.HandleFunc("/plot/", servePlot)
 
 	// console
-	GUI.OnEvent("cli", func() {
-		cmd := GUI.StringValue("cli")
+	g.OnEvent("cli", func() {
+		cmd := g.StringValue("cli")
 		Inject <- func() { Eval(cmd) }
-		GUI.Set("cli", "")
+		g.Set("cli", "")
 	})
 
 	// mesh
-	GUI.Disable("setmesh", true) // button only enabled if pressing makes sense
+	g.Disable("setmesh", true) // button only enabled if pressing makes sense
 	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
 	meshboxes := []string{"nx", "ny", "nz", "cx", "cy", "cz", "px", "py", "pz"}
 	warnmesh := func() {
-		GUI.Disable("setmesh", false)
-		GUI.Set("setmeshwarn", MESHWARN)
+		g.Disable("setmesh", false)
+		g.Set("setmeshwarn", MESHWARN)
 	}
 	for _, e := range meshboxes {
-		GUI.OnEvent(e, warnmesh)
+		g.OnEvent(e, warnmesh)
 	}
 
-	GUI.OnEvent("setmesh", func() {
-		GUI.Disable("setmesh", true)
+	g.OnEvent("setmesh", func() {
+		g.Disable("setmesh", true)
 		Inject <- (func() {
 			Eval(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
-				GUI.Value("nx"),
-				GUI.Value("ny"),
-				GUI.Value("nz"),
-				GUI.Value("cx"),
-				GUI.Value("cy"),
-				GUI.Value("cz"),
-				GUI.Value("px"),
-				GUI.Value("py"),
-				GUI.Value("pz")))
+				g.Value("nx"),
+				g.Value("ny"),
+				g.Value("nz"),
+				g.Value("cx"),
+				g.Value("cy"),
+				g.Value("cz"),
+				g.Value("px"),
+				g.Value("py"),
+				g.Value("pz")))
 		})
-		GUI.Set("setmeshwarn", "mesh up to date")
+		g.Set("setmeshwarn", "mesh up to date")
 	})
 
 	// geometry
-	GUI.OnEvent("geomselect", func() {
-		ident := GUI.StringValue("geomselect")
+	g.OnEvent("geomselect", func() {
+		ident := g.StringValue("geomselect")
 		t := World.Resolve(ident).Type()
 		// set sensible args: world size
 		args := "("
@@ -121,13 +121,13 @@ func (g *guistate) PrepareServer() {
 		case ident == "layers":
 			args = "(0, 1)"
 		}
-		GUI.Set("geomargs", args)
-		GUI.Set("geomdoc", World.Doc[ident])
+		g.Set("geomargs", args)
+		g.Set("geomdoc", World.Doc[ident])
 	})
 
 	// initial m
-	GUI.OnEvent("mselect", func() {
-		ident := GUI.StringValue("mselect")
+	g.OnEvent("mselect", func() {
+		ident := g.StringValue("mselect")
 		t := World.Resolve(ident).Type()
 		args := "("
 		for i := 0; i < t.NumIn(); i++ {
@@ -148,33 +148,33 @@ func (g *guistate) PrepareServer() {
 		case "vortexwall":
 			args = "(1, -1, 1, 1)"
 		}
-		GUI.Set("margs", args)
-		GUI.Set("mdoc", World.Doc[ident])
+		g.Set("margs", args)
+		g.Set("mdoc", World.Doc[ident])
 	})
 
-	GUI.OnEvent("setgeom", func() {
+	g.OnEvent("setgeom", func() {
 		Inject <- (func() {
-			Eval(fmt.Sprint("SetGeom(", GUI.StringValue("geomselect"), GUI.StringValue("geomargs"), ")"))
+			Eval(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
 		})
 	})
 
-	GUI.OnEvent("setm", func() {
+	g.OnEvent("setm", func() {
 		Inject <- (func() {
-			Eval(fmt.Sprint("m = ", GUI.StringValue("mselect"), GUI.StringValue("margs")))
+			Eval(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
 		})
 	})
 
 	// solver
-	GUI.OnEvent("run", GUI.cmd("Run", "runtime"))
-	GUI.OnEvent("steps", GUI.cmd("Steps", "runsteps"))
-	GUI.OnEvent("break", func() { Inject <- func() { pause = true } })
-	GUI.OnEvent("mindt", func() { Inject <- func() { Eval("MinDt=" + GUI.StringValue("mindt")) } })
-	GUI.OnEvent("maxdt", func() { Inject <- func() { Eval("MaxDt=" + GUI.StringValue("maxdt")) } })
-	GUI.OnEvent("fixdt", func() { Inject <- func() { Eval("FixDt=" + GUI.StringValue("fixdt")) } })
-	GUI.OnEvent("maxerr", func() { Inject <- func() { Eval("MaxErr=" + GUI.StringValue("maxerr")) } })
-	GUI.OnEvent("solvertype", func() {
+	g.OnEvent("run", g.cmd("Run", "runtime"))
+	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
+	g.OnEvent("break", func() { Inject <- func() { pause = true } })
+	g.OnEvent("mindt", func() { Inject <- func() { Eval("MinDt=" + g.StringValue("mindt")) } })
+	g.OnEvent("maxdt", func() { Inject <- func() { Eval("MaxDt=" + g.StringValue("maxdt")) } })
+	g.OnEvent("fixdt", func() { Inject <- func() { Eval("FixDt=" + g.StringValue("fixdt")) } })
+	g.OnEvent("maxerr", func() { Inject <- func() { Eval("MaxErr=" + g.StringValue("maxerr")) } })
+	g.OnEvent("solvertype", func() {
 		Inject <- func() {
-			typ := map[string]string{"euler": "1", "heun": "2"}[GUI.StringValue("solvertype")]
+			typ := map[string]string{"euler": "1", "heun": "2"}[g.StringValue("solvertype")]
 			Eval("SetSolver(" + typ + ")")
 			if Solver.FixDt == 0 { // euler must have fixed time step
 				Solver.FixDt = 1e-15
@@ -204,16 +204,16 @@ func (g *guistate) PrepareServer() {
 	}
 
 	// display
-	GUI.OnEvent("renderQuant", func() {
-		GUI.Set("renderDoc", World.Doc[GUI.StringValue("renderQuant")])
+	g.OnEvent("renderQuant", func() {
+		g.Set("renderDoc", World.Doc[g.StringValue("renderQuant")])
 	})
 
-	GUI.OnUpdate(func() {
+	g.OnUpdate(func() {
 		Req(1)
 		defer Req(-1)
 		updateKeepAlive() // keep track of when browser was last seen alive
 
-		if GUI.Busy() {
+		if g.Busy() {
 			g.disableControls(true)
 			log.Print(".")
 			return
@@ -223,32 +223,51 @@ func (g *guistate) PrepareServer() {
 
 		Inject <- (func() {
 			// solver
-			GUI.Set("nsteps", Solver.NSteps)
-			GUI.Set("time", fmt.Sprintf("%6e", Time))
-			GUI.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
-			GUI.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			GUI.Set("maxerr", Solver.MaxErr)
-			GUI.Set("mindt", Solver.MinDt)
-			GUI.Set("maxdt", Solver.MaxDt)
-			GUI.Set("fixdt", Solver.FixDt)
+			g.Set("nsteps", Solver.NSteps)
+			g.Set("time", fmt.Sprintf("%6e", Time))
+			g.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
+			g.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
+			g.Set("maxerr", Solver.MaxErr)
+			g.Set("mindt", Solver.MinDt)
+			g.Set("maxdt", Solver.MaxDt)
+			g.Set("fixdt", Solver.FixDt)
 			if pause {
-				GUI.Set("busy", "Paused")
-				GUI.Disable("break", true)
+				g.Set("busy", "Paused")
+				g.Disable("break", true)
 			} else {
-				GUI.Set("busy", "Running")
-				GUI.Disable("break", false)
+				g.Set("busy", "Running")
+				g.Disable("break", false)
 			}
 
 			// display
-			quant := GUI.StringValue("renderQuant")
-			comp := GUI.StringValue("renderComp")
-			cachebreaker := "?" + GUI.StringValue("nsteps") + "_" + fmt.Sprint(GUI.cacheBreaker())
-			GUI.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
+			quant := g.StringValue("renderQuant")
+			comp := g.StringValue("renderComp")
+			cachebreaker := "?" + g.StringValue("nsteps") + "_" + fmt.Sprint(g.cacheBreaker())
+			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
+
+			// parameters
+			for _, p := range g.Params {
+				n := p.Name()
+				r := g.IntValue("region")
+				if r == -1 && !p.IsUniform() {
+					g.Set(n, "")
+				} else {
+					if r == -1 {
+						r = 0 // uniform, so pick one
+					}
+					v := p.getRegion(r)
+					if p.NComp() == 1 {
+						g.Set(n, float32(v[0]))
+					} else {
+						g.Set(n, fmt.Sprintf("(%v, %v, %v)", float32(v[X]), float32(v[Y]), float32(v[Z])))
+					}
+				}
+			}
 
 			// gpu
 			memfree, _ := cu.MemGetInfo()
 			memfree /= (1024 * 1024)
-			GUI.Set("memfree", memfree)
+			g.Set("memfree", memfree)
 		})
 	})
 }
@@ -332,11 +351,12 @@ func (g *guistate) apifilter(outputtype string) []string {
 	return match
 }
 
-func (g *guistate) Parameters() []Param {
-	var params []Param
+func (g *guistate) Parameters() []string {
+	var params []string
 	for _, v := range g.Params {
-		params = append(params, v)
+		params = append(params, v.Name())
 	}
+	sortNoCase(params)
 	return params
 }
 

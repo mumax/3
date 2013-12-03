@@ -84,7 +84,7 @@ func break_() {
 }
 
 // exit finished simulation this long after browser was closed
-const Timeout = 3 * time.Second
+var Timeout = 3 * time.Second
 
 // Enter interactive mode. Simulation is now exclusively controlled by web GUI
 func RunInteractive() {

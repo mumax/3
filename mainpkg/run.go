@@ -35,13 +35,16 @@ func runFileAndServe(fname string) {
 	fmt.Print("starting GUI at http://localhost", *flag_port, "\n")
 	go engine.Serve(*flag_port)
 
+	if *flag_interactive {
+		openbrowser("http://localhost" + *flag_port)
+	}
+
 	if fname != "" {
 		// start executing the tree, possibly injecting commands from web gui
 		engine.EvalFile(code)
 	} else {
 		fmt.Println("no input files: starting interactive session")
-		openbrowser("http://localhost" + *flag_port)
-
+		engine.Timeout = 365 * 24 * time.Hour // forever
 		engine.LogOutput("setting up default parameters")
 		// set up some sensible start configuration
 		engine.Eval(`SetGridSize(32, 32, 1)

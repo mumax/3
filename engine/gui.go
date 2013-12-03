@@ -30,6 +30,7 @@ type guistate struct {
 // displayable quantity in GUI Parameters section
 type Param interface {
 	NComp() int
+	Name() string
 	Unit() string
 	getRegion(int) []float64
 	setRegion(int, []float64)
@@ -259,6 +260,7 @@ func (g *guistate) QuantNames() []string {
 	return names
 }
 
+// List all available shapes
 func (g *guistate) Shapes() []string {
 	var shapes []string
 	for k, v := range World.Identifiers {
@@ -269,6 +271,14 @@ func (g *guistate) Shapes() []string {
 	}
 	sortNoCase(shapes)
 	return shapes
+}
+
+func (g *guistate) Parameters() []Param {
+	var params []Param
+	for _, v := range g.Params {
+		params = append(params, v)
+	}
+	return params
 }
 
 // renders a <div> that toggles visibility on click for PrepareServer

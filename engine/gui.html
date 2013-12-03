@@ -145,6 +145,14 @@ SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geo
 </div>
 
 
+{{.Data.Div "parameters"}}
+
+
+<table>
+{{range .Data.Parameters}}
+<tr> <td>{{.Name}}</td> <td> {{$.TextBox .Name ""}} </td> </tr>
+{{end}}
+</table>
 
 {{.Data.Div "display"}}
 

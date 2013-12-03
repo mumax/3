@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"time"
 )
 
 func init() {
@@ -45,6 +46,9 @@ func SetGeom(s Shape) {
 }
 
 func (geometry *geom) setGeom(s Shape) {
+	GUI.SetBusy(true)
+	defer GUI.SetBusy(false)
+
 	geometry.shape = s
 	if geometry.Gpu().IsNil() {
 		geometry.buffer = cuda.NewSlice(1, geometry.Mesh().Size())
@@ -59,9 +63,16 @@ func (geometry *geom) setGeom(s Shape) {
 	v := array
 	n := Mesh().Size()
 
+	progress, progmax := 0, (n[Y]+1)*(n[Z]+1)
+
 	var ok bool
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
+
+			progress++
+			util.Progress(progress, progmax, "Initializing geometry")
+			time.Sleep(1 * time.Millisecond)
+
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)
 				x, y, z := r[X], r[Y], r[Z]

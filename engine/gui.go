@@ -80,7 +80,7 @@ func (g *guistate) PrepareServer() {
 
 	GUI.OnEvent("setmesh", func() {
 		GUI.Disable("setmesh", true)
-		InjectAndWait(func() {
+		Inject <- (func() {
 			Eval(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
 				GUI.Value("nx"),
 				GUI.Value("ny"),
@@ -124,7 +124,7 @@ func (g *guistate) PrepareServer() {
 	})
 
 	GUI.OnEvent("setgeom", func() {
-		InjectAndWait(func() {
+		Inject <- (func() {
 			Eval(fmt.Sprint("SetGeom(", GUI.StringValue("geomselect"), GUI.StringValue("geomargs"), ")"))
 		})
 	})
@@ -165,7 +165,7 @@ func (g *guistate) PrepareServer() {
 			g.disableControls(false) // make sure everything is enabled
 		}
 
-		InjectAndWait(func() {
+		Inject <- (func() {
 			// solver
 			GUI.Set("nsteps", Solver.NSteps)
 			GUI.Set("time", fmt.Sprintf("%6e", Time))

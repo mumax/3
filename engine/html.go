@@ -146,8 +146,8 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 	</td><td>
 
 	<table>
-		<tr title="Time steps taken"> <td>step:    </td><td>{{.Span "nsteps"  "0"}}   </td></tr>
-        <tr title="{{.Data.Doc "t"}}"> <td>time:    </td><td>{{.Span "time"    "0"}} s </td></tr>
+		<tr title="Time steps taken">   <td>step:    </td><td>{{.Span "nsteps"  "0"}}   </td></tr>
+        <tr title="{{.Data.Doc "t"}}">  <td>time:    </td><td>{{.Span "time"    "0"}} s </td></tr>
 		<tr title="{{.Data.Doc "dt"}}"> <td>dt:      </td><td>{{.Span "dt"      "0"}} s </td></tr>
 		<tr title="Maximum relative error/step"> <td>err/step:</td><td>{{.Span "lasterr" "0"}}   </td></tr>
 	</table>
@@ -157,10 +157,10 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 	</td><td>
 
 	<table>
-		<tr> <td>fixdt:   </td><td>{{.TextBox "fixdt"  "0" "size=8"}} s   </td></tr>
-		<tr> <td>mindt:   </td><td>{{.TextBox "mindt"  "0" "size=8"}} s   </td></tr>
-		<tr> <td>maxdt:   </td><td>{{.TextBox "maxdt"  "0" "size=8"}} s   </td></tr>
-		<tr> <td>maxerr:  </td><td>{{.TextBox "maxerr" "0" "size=8"}}/step</td></tr>
+		<tr title="{{.Data.Doc "FixDt" }}"> <td>fixdt:   </td><td>{{.TextBox "fixdt"  "0" "size=8"}} s   </td></tr>
+		<tr title="{{.Data.Doc "MinDt" }}"> <td>mindt:   </td><td>{{.TextBox "mindt"  "0" "size=8"}} s   </td></tr>
+		<tr title="{{.Data.Doc "MaxDt" }}"> <td>maxdt:   </td><td>{{.TextBox "maxdt"  "0" "size=8"}} s   </td></tr>
+		<tr title="{{.Data.Doc "MaxErr"}}"> <td>maxerr:  </td><td>{{.TextBox "maxerr" "0" "size=8"}}/step</td></tr>
 	</table>
 
 		</td></tr>

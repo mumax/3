@@ -85,15 +85,9 @@ func Download(q Slicer) *data.Slice {
 func myprint(msg ...interface{}) {
 	for i, m := range msg {
 
-		//// Slicer: print formatted slice
-		//if s, ok := m.(Slicer); ok {
-		//	s, r := s.Slice()
-		//	msg[i] = s.HostCopy()
-		//	if r {
-		//		cuda.Recycle(s)
-		//	}
-		//	continue
-		//}
+		if e, ok := m.(*float64); ok {
+			msg[i] = *e
+		}
 
 		// Tabledata: print average
 		if m, ok := m.(TableData); ok {

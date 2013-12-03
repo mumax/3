@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"path"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -92,6 +93,38 @@ func (g *guistate) PrepareServer() {
 				GUI.Value("pz")))
 		})
 		GUI.Set("setmeshwarn", "mesh up to date")
+	})
+
+	// geometry
+	GUI.OnEvent("geomselect", func() {
+		ident := GUI.StringValue("geomselect")
+		t := World.Resolve(ident).Type()
+		args := "("
+		for i := 0; i < t.NumIn(); i++ {
+			val := 0.0
+			if i < 3 {
+				val = Mesh().WorldSize()[i]
+			}
+			if i > 0 {
+				args += ", "
+			}
+			args += fmt.Sprint(val)
+		}
+		args += ")"
+		if ident == "cell" {
+			args = "(0, 0, 0)"
+		}
+		if ident == "xrange" || ident == "yrange" || ident == "zrange" {
+			args = "(0, inf)"
+		}
+		GUI.Set("geomargs", args)
+		GUI.Set("geomdoc", World.Doc[ident])
+	})
+
+	GUI.OnEvent("setgeom", func() {
+		InjectAndWait(func() {
+			Eval(fmt.Sprint("SetGeom(", GUI.StringValue("geomselect"), GUI.StringValue("geomargs"), ")"))
+		})
 	})
 
 	// solver
@@ -216,6 +249,18 @@ func (g *guistate) QuantNames() []string {
 	}
 	sortNoCase(names)
 	return names
+}
+
+func (g *guistate) Shapes() []string {
+	var shapes []string
+	for k, v := range World.Identifiers {
+		t := v.Type()
+		if t.Kind() == reflect.Func && t.NumOut() == 1 && t.Out(0).Name() == "Shape" {
+			shapes = append(shapes, k)
+		}
+	}
+	sortNoCase(shapes)
+	return shapes
 }
 
 // renders a <div> that toggles visibility on click for PrepareServer

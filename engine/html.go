@@ -111,6 +111,16 @@ const templText = `
 
 </div>
 
+
+
+{{.Data.Div "geometry"}}
+
+SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geomargs" "()" }} ) {{.Button "setgeom" "Set"}} </br>
+{{.Span "geomdoc" ""}}
+
+</div>
+
+
 {{.Data.Div "solver"}}
 
 	Type: {{.Select "solvertype" "heun" "euler" "heun"}}
@@ -139,6 +149,8 @@ const templText = `
 </div>
 
 </div>
+
+
 
 {{.Data.Div "display"}}
 

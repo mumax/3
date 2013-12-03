@@ -183,7 +183,7 @@ Region: {{.Number "region" -1 255 -1}} </br>
 
 <table>
 {{range .Data.Parameters}}
-<tr> <td>{{.}}</td> <td> {{$.TextBox . ""}} </td> </tr>
+<tr> <td>{{.}}</td> <td> {{$.TextBox . ""}} {{$.Data.UnitOf . }}</td> </tr>
 {{end}}
 </table>
 

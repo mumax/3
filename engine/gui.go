@@ -358,6 +358,15 @@ func (g *guistate) Parameters() []string {
 	return params
 }
 
+func (g *guistate) UnitOf(quant string) string {
+	p := g.Params[quant]
+	if p != nil {
+		return p.Unit()
+	} else {
+		return ""
+	}
+}
+
 // renders a <div> that toggles visibility on click for PrepareServer
 func (g *guistate) Div(heading string) string {
 	id := fmt.Sprint("div_", rand.Int())

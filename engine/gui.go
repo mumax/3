@@ -126,11 +126,11 @@ func (g *guistate) prepareGeom() {
 		args += ")"
 		// overwrite args for special cases
 		switch {
-		case ident == "cell":
+		case ident == "Cell":
 			args = "(0, 0, 0)"
-		case ident == "xrange" || ident == "yrange" || ident == "zrange":
+		case ident == "XRange" || ident == "YRange" || ident == "ZRange":
 			args = "(0, inf)"
-		case ident == "layers":
+		case ident == "Layers":
 			args = "(0, 1)"
 		}
 		g.Set("geomargs", args)

@@ -216,29 +216,28 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 }
 
 // todo: rm?
-func (g *guistate) floatValues(id ...string) []float64 {
-	v := make([]float64, len(id))
-	for i := range id {
-		v[i] = g.FloatValue(id[i])
-	}
-	return v
-}
-
-// todo: rm?
-func (g *guistate) intValues(id ...string) []int {
-	v := make([]int, len(id))
-	for i := range id {
-		v[i] = g.IntValue(id[i])
-	}
-	return v
-}
+//func (g *guistate) floatValues(id ...string) []float64 {
+//	v := make([]float64, len(id))
+//	for i := range id {
+//		v[i] = g.FloatValue(id[i])
+//	}
+//	return v
+//}
+//
+//// todo: rm?
+//func (g *guistate) intValues(id ...string) []int {
+//	v := make([]int, len(id))
+//	for i := range id {
+//		v[i] = g.IntValue(id[i])
+//	}
+//	return v
+//}
 
 // renders page title for PrepareServer
-func (g *guistate) Title() string { return util.NoExt(path.Base(OD)) }
-
+func (g *guistate) Title() string   { return util.NoExt(path.Base(OD)) }
 func (g *guistate) Version() string { return UNAME }
-
 func (g *guistate) GPUInfo() string { return cuda.GPUInfo }
+
 func (g *guistate) incCacheBreaker() {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()

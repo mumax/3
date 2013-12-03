@@ -19,7 +19,7 @@ var (
 	flag_silent      = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	flag_vet         = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od          = flag.String("o", "", "Override output directory")
-	flag_force       = flag.Bool("f", false, "Force start, clean existing output directory")
+	flag_force       = flag.Bool("f", true, "Force start, clean existing output directory")
 	flag_port        = flag.String("http", ":35367", "Port to serve web gui")
 	flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	flag_memprof     = flag.Bool("memprof", false, "Recored gopprof memory profile")

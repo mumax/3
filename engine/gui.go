@@ -64,6 +64,7 @@ func (g *guistate) PrepareServer() {
 	g.prepareGeom()
 	g.prepareM()
 	g.prepareSolver()
+	g.prepareDisplay()
 	g.prepareParam()
 	g.prepareOnUpdate()
 }
@@ -133,7 +134,7 @@ func (g *guistate) prepareGeom() {
 			args = "(0, 1)"
 		}
 		g.Set("geomargs", args)
-		g.Set("geomdoc", World.Doc[ident])
+		g.Set("geomdoc", g.Doc(ident))
 	})
 	g.OnEvent("setgeom", func() {
 		Inject <- (func() {
@@ -141,6 +142,7 @@ func (g *guistate) prepareGeom() {
 		})
 	})
 }
+
 func (g *guistate) prepareM() {
 	g.OnEvent("mselect", func() {
 		ident := g.StringValue("mselect")
@@ -165,7 +167,7 @@ func (g *guistate) prepareM() {
 			args = "(1, -1, 1, 1)"
 		}
 		g.Set("margs", args)
-		g.Set("mdoc", World.Doc[ident])
+		g.Set("mdoc", g.Doc(ident))
 	})
 	g.OnEvent("setm", func() {
 		Inject <- (func() {
@@ -197,6 +199,7 @@ func (g *guistate) prepareSolver() {
 		}
 	})
 }
+
 func (g *guistate) prepareParam() {
 	for _, p := range g.Params {
 		p := p
@@ -236,7 +239,7 @@ func (g *guistate) prepareParam() {
 
 func (g *guistate) prepareDisplay() {
 	g.OnEvent("renderQuant", func() {
-		g.Set("renderDoc", World.Doc[g.StringValue("renderQuant")])
+		g.Set("renderDoc", g.Doc(g.StringValue("renderQuant")))
 	})
 }
 
@@ -304,8 +307,17 @@ func (g *guistate) prepareOnUpdate() {
 	})
 }
 
+func (g *guistate) Doc(quant string) string {
+	doc, ok := World.Doc[quant]
+	if !ok {
+		log.Println("no doc for", quant)
+	}
+	return doc
+}
+
 // returns func that injects func that executes cmd(args),
 // with args ids for GUI element values.
+// TODO: rm
 func (g *guistate) cmd(cmd string, args ...string) func() {
 	return func() {
 		Inject <- func() {

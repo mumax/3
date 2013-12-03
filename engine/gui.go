@@ -385,7 +385,8 @@ func (g *guistate) Configs() []string { return g.apifilter("Config") }
 // List all api functions that return outputtype (Shape, Config, ...)
 func (g *guistate) apifilter(outputtype string) []string {
 	var match []string
-	for k, v := range World.Identifiers {
+	for k, _ := range World.Doc {
+		v := World.Resolve(k)
 		t := v.Type()
 		if t.Kind() == reflect.Func && t.NumOut() == 1 && t.Out(0).Name() == outputtype {
 			match = append(match, k)

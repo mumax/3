@@ -121,6 +121,8 @@ SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geo
 </div>
 
 
+
+
 {{.Data.Div "solver"}}
 
 	Type: {{.Select "solvertype" "heun" "euler" "heun"}}
@@ -148,18 +150,9 @@ SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geo
 	</table>
 </div>
 
-</div>
 
 
-{{.Data.Div "parameters"}}
 
-Region: {{.Number "region" -1 255 -1}} </br>
-
-<table>
-{{range .Data.Parameters}}
-<tr> <td>{{.Name}}</td> <td> {{$.TextBox .Name ""}} </td> </tr>
-{{end}}
-</table>
 
 {{.Data.Div "display"}}
 
@@ -174,6 +167,22 @@ Region: {{.Number "region" -1 255 -1}} </br>
 
 
 </div>
+
+
+
+
+{{.Data.Div "parameters"}}
+
+Region: {{.Number "region" -1 255 -1}} </br>
+
+<table>
+{{range .Data.Parameters}}
+<tr> <td>{{.Name}}</td> <td> {{$.TextBox .Name ""}} </td> </tr>
+{{end}}
+</table>
+
+</div>
+
 
 
 <hr/>

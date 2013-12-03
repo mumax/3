@@ -33,7 +33,6 @@ type Param interface {
 	Name() string
 	Unit() string
 	getRegion(int) []float64
-	setRegion(int, []float64)
 	IsUniform() bool
 }
 

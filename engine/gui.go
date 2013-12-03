@@ -65,7 +65,7 @@ func (g *guistate) PrepareServer() {
 	g.prepareM()
 	g.prepareSolver()
 	g.prepareParam()
-	g.prepareHandlers()
+	g.prepareOnUpdate()
 }
 
 func (g *guistate) prepareConsole() {
@@ -173,6 +173,12 @@ func (g *guistate) prepareM() {
 		})
 	})
 }
+
+var (
+	solvertypes = map[string]string{"euler": "1", "heun": "2"}
+	solvernames = map[int]string{1: "euler", 2: "heun"}
+)
+
 func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
@@ -183,7 +189,7 @@ func (g *guistate) prepareSolver() {
 	g.OnEvent("maxerr", func() { Inject <- func() { Eval("MaxErr=" + g.StringValue("maxerr")) } })
 	g.OnEvent("solvertype", func() {
 		Inject <- func() {
-			typ := map[string]string{"euler": "1", "heun": "2"}[g.StringValue("solvertype")]
+			typ := solvertypes[g.StringValue("solvertype")]
 			Eval("SetSolver(" + typ + ")")
 			if Solver.FixDt == 0 { // euler must have fixed time step
 				Solver.FixDt = 1e-15
@@ -215,6 +221,17 @@ func (g *guistate) prepareParam() {
 			}
 		})
 	}
+	g.OnEvent("Temp", func() {
+		Inject <- func() {
+			if solvertype != 1 {
+				Eval("SetSolver(1)")
+			}
+			if Solver.FixDt == 0 {
+				Eval("FixDt = 1e-15")
+			}
+			Eval("Temp = " + g.StringValue("Temp"))
+		}
+	})
 }
 
 func (g *guistate) prepareDisplay() {
@@ -223,7 +240,7 @@ func (g *guistate) prepareDisplay() {
 	})
 }
 
-func (g *guistate) prepareHandlers() {
+func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
 		Req(1)
 		defer Req(-1)
@@ -247,6 +264,7 @@ func (g *guistate) prepareHandlers() {
 			g.Set("mindt", Solver.MinDt)
 			g.Set("maxdt", Solver.MaxDt)
 			g.Set("fixdt", Solver.FixDt)
+			g.Set("solvertype", solvernames[solvertype])
 			if pause {
 				g.Set("busy", "Paused")
 			} else {

@@ -153,6 +153,7 @@ SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geo
 
 {{.Data.Div "parameters"}}
 
+Region: {{.Number "region" -1 255 -1}} </br>
 
 <table>
 {{range .Data.Parameters}}

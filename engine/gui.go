@@ -100,6 +100,7 @@ func (g *guistate) PrepareServer() {
 	GUI.OnEvent("geomselect", func() {
 		ident := GUI.StringValue("geomselect")
 		t := World.Resolve(ident).Type()
+		// set sensible args: world size
 		args := "("
 		for i := 0; i < t.NumIn(); i++ {
 			val := 0.0
@@ -112,6 +113,7 @@ func (g *guistate) PrepareServer() {
 			args += fmt.Sprint(val)
 		}
 		args += ")"
+		// overwrite args for special cases
 		switch {
 		case ident == "cell":
 			args = "(0, 0, 0)"
@@ -147,6 +149,27 @@ func (g *guistate) PrepareServer() {
 			}
 		}
 	})
+
+	// parameters
+	for _, p := range g.Params {
+		p := p
+		n := p.Name()
+		g.OnEvent(n, func() {
+			cmd := p.Name()
+			if g.Value("region") == -1 {
+				cmd += " = ("
+			} else {
+				cmd += fmt.Sprint(".SetRegion(", g.Value("region"), ", ")
+			}
+			if p.NComp() == 3 {
+				cmd += "vector"
+			}
+			cmd += g.StringValue(p.Name()) + ")"
+			Inject <- func() {
+				Eval(cmd)
+			}
+		})
+	}
 
 	// display
 	GUI.OnEvent("renderQuant", func() {
@@ -425,32 +448,7 @@ func Eval(code string) {
 //	gui.Set("sel_region", guiRegion)
 //	gui.OnEvent("sel_region", func() { guiRegion = atoi(gui.Value("sel_region")) })
 //
-//	for n, p := range params {
-//		n := n // closure caveats...
-//		p := p
-//
-//		compIds := ((*guidata)(nil)).CompBoxIds(n)
-//		handler := func() {
-//			var cmd string
-//			if guiRegion == -1 {
-//				cmd = fmt.Sprintf("%v = (", n)
-//			} else {
-//				cmd = fmt.Sprintf("%v.setRegion(%v,", n, guiRegion)
-//			}
-//			if p.NComp() == 3 {
-//				cmd += fmt.Sprintf("vector(%v, %v, %v)",
-//					gui.Value(compIds[0]), gui.Value(compIds[1]), gui.Value(compIds[2]))
-//			} else {
-//				cmd += fmt.Sprint(gui.Value(compIds[0]))
-//			}
-//			cmd += ");"
-//			Inject <- func() { Eval(cmd) } // Eval(cmd) can be very long, launch but don't wait
-//		}
-//		for _, id := range compIds {
-//			gui.OnEvent(id, handler)
-//		}
-//	}
-//
+
 //	// process
 //	gui.Set("gpu", fmt.Sprint(cuda.DevName, " (", (cuda.TotalMem)/(1024*1024), "MB)", ", CUDA ", cuda.Version))
 //	hostname, _ := os.Hostname()

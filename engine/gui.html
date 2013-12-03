@@ -115,6 +115,12 @@ SetGeom( {{.Data.Shapes | .SelectArray "geomselect" "universe"}} {{.TextBox "geo
 </div>
 
 
+{{.Data.Div "initial m"}}
+
+m = {{.Data.Configs | .SelectArray "mselect" "uniform"}} {{.TextBox "margs" "(1, 0, 0)" }} {{.Button "setm" "Set"}} </br>
+{{.Span "mdoc" ""}}
+
+</div>
 
 
 {{.Data.Div "solver"}}

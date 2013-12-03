@@ -126,9 +126,42 @@ func (g *guistate) PrepareServer() {
 		GUI.Set("geomdoc", World.Doc[ident])
 	})
 
+	// initial m
+	GUI.OnEvent("mselect", func() {
+		ident := GUI.StringValue("mselect")
+		t := World.Resolve(ident).Type()
+		args := "("
+		for i := 0; i < t.NumIn(); i++ {
+			val := "0"
+			if i%3 == 0 {
+				val = "1"
+			}
+			if i > 0 {
+				args += ", "
+			}
+			args += val
+		}
+		args += ")"
+		// overwrite args for special cases
+		switch ident {
+		case "vortex":
+			args = "(1, 1)"
+		case "vortexwall":
+			args = "(1, -1, 1, 1)"
+		}
+		GUI.Set("margs", args)
+		GUI.Set("mdoc", World.Doc[ident])
+	})
+
 	GUI.OnEvent("setgeom", func() {
 		Inject <- (func() {
 			Eval(fmt.Sprint("SetGeom(", GUI.StringValue("geomselect"), GUI.StringValue("geomargs"), ")"))
+		})
+	})
+
+	GUI.OnEvent("setm", func() {
+		Inject <- (func() {
+			Eval(fmt.Sprint("m = ", GUI.StringValue("mselect"), GUI.StringValue("margs")))
 		})
 	})
 
@@ -284,16 +317,20 @@ func (g *guistate) QuantNames() []string {
 }
 
 // List all available shapes
-func (g *guistate) Shapes() []string {
-	var shapes []string
+func (g *guistate) Shapes() []string  { return g.apifilter("Shape") }
+func (g *guistate) Configs() []string { return g.apifilter("Config") }
+
+// List all api functions that return outputtype (Shape, Config, ...)
+func (g *guistate) apifilter(outputtype string) []string {
+	var match []string
 	for k, v := range World.Identifiers {
 		t := v.Type()
-		if t.Kind() == reflect.Func && t.NumOut() == 1 && t.Out(0).Name() == "Shape" {
-			shapes = append(shapes, k)
+		if t.Kind() == reflect.Func && t.NumOut() == 1 && t.Out(0).Name() == outputtype {
+			match = append(match, k)
 		}
 	}
-	sortNoCase(shapes)
-	return shapes
+	sortNoCase(match)
+	return match
 }
 
 func (g *guistate) Parameters() []Param {

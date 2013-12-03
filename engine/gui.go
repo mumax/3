@@ -233,10 +233,8 @@ func (g *guistate) PrepareServer() {
 			g.Set("fixdt", Solver.FixDt)
 			if pause {
 				g.Set("busy", "Paused")
-				g.Disable("break", true)
 			} else {
 				g.Set("busy", "Running")
-				g.Disable("break", false)
 			}
 
 			// display

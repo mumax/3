@@ -21,13 +21,17 @@ type Config func(x, y, z float64) data.Vector
 
 func RandomMag() Config {
 	return func(x, y, z float64) data.Vector {
-		phi := rand.Float64() * (2 * math.Pi)
-		theta := rand.Float64() * math.Pi
-		x1 := math.Sin(theta) * math.Cos(phi)
-		y1 := math.Sin(theta) * math.Sin(phi)
-		z1 := math.Cos(theta)
-		return data.Vector{x1, y1, z1}
+		return randomDir()
 	}
+}
+
+func randomDir() data.Vector {
+	phi := rand.Float64() * (2 * math.Pi)
+	theta := rand.Float64() * math.Pi
+	x1 := math.Sin(theta) * math.Cos(phi)
+	y1 := math.Sin(theta) * math.Sin(phi)
+	z1 := math.Cos(theta)
+	return data.Vector{x1, y1, z1}
 }
 
 // Returns a uniform magnetization state. E.g.:

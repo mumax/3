@@ -16,6 +16,7 @@ func init() {
 	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
 	DeclFunc("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
+	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 }
 
@@ -109,6 +110,10 @@ func Cell(ix, iy, iz int) Shape {
 			y > y1 && y < y2 &&
 			z > z1 && z < z2
 	}
+}
+
+func Universe() Shape {
+	return universe
 }
 
 // The entire space.

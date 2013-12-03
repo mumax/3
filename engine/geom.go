@@ -80,6 +80,26 @@ func (geometry *geom) setGeom(s Shape) {
 	}
 
 	data.Copy(geometry.buffer, V)
+
+	// M inside geom but previously outside needs to be re-inited
+	needupload := false
+	geomlist := host.Host()[0]
+	mhost := M.Buffer().HostCopy()
+	m := mhost.Host()
+	for i := range m[0] {
+		if geomlist[i] != 0 {
+			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
+			if mx == 0 && my == 0 && mz == 0 {
+				needupload = true
+				rnd := randomDir()
+				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
+			}
+		}
+	}
+	if needupload {
+		data.Copy(M.Buffer(), mhost)
+	}
+
 	cuda.Normalize(M.Buffer(), geometry.Gpu()) // removes m outside vol
 }
 

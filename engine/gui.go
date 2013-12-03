@@ -111,11 +111,13 @@ func (g *guistate) PrepareServer() {
 			args += fmt.Sprint(val)
 		}
 		args += ")"
-		if ident == "cell" {
+		switch {
+		case ident == "cell":
 			args = "(0, 0, 0)"
-		}
-		if ident == "xrange" || ident == "yrange" || ident == "zrange" {
+		case ident == "xrange" || ident == "yrange" || ident == "zrange":
 			args = "(0, inf)"
+		case ident == "layers":
+			args = "(0, 1)"
 		}
 		GUI.Set("geomargs", args)
 		GUI.Set("geomdoc", World.Doc[ident])

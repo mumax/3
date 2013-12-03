@@ -195,7 +195,7 @@ func (g *guistate) PrepareServer() {
 				cmd += fmt.Sprint(".SetRegion(", g.Value("region"), ", ")
 			}
 			if p.NComp() == 3 {
-				cmd += "vector"
+				cmd += "vector " // space needed
 			}
 			cmd += g.StringValue(p.Name()) + ")"
 			Inject <- func() {

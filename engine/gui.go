@@ -417,7 +417,7 @@ func (g *guistate) UnitOf(quant string) string {
 // renders a <div> that toggles visibility on click for PrepareServer
 func (g *guistate) Div(heading string) string {
 	id := fmt.Sprint("div_", rand.Int())
-	return fmt.Sprintf(`<span style="cursor:pointer; font-size:1.2em; font-weight:bold; color:gray" onclick="toggle('%v')">&dtrif; %v</span> <br/> <div id="%v">`, id, heading, id)
+	return fmt.Sprintf(`<span title="Click to show/hide" style="cursor:pointer; font-size:1.2em; font-weight:bold; color:gray" onclick="toggle('%v')">&dtrif; %v</span> <br/> <div id="%v">`, id, heading, id)
 }
 
 // Start web gui on given port, blocks.

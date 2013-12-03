@@ -16,7 +16,11 @@ func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 }
 
 func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
-	p.setRegionsFunc(region, region+1, f) // upper bound exclusive
+	if region == -1 {
+		p.setRegionsFunc(0, NREGION, f) // uniform
+	} else {
+		p.setRegionsFunc(region, region+1, f) // upper bound exclusive
+	}
 }
 
 func (p *ScalarParam) SetValue(v interface{}) {

@@ -48,7 +48,11 @@ func (p *inputParam) update() {
 
 // set in one region
 func (p *inputParam) setRegion(region int, v []float64) {
-	p.setRegions(region, region+1, v)
+	if region == -1 {
+		p.setUniform(v)
+	} else {
+		p.setRegions(region, region+1, v)
+	}
 }
 
 // set in all regions

@@ -21,7 +21,11 @@ func (p *VectorParam) init(name, unit, desc string) {
 }
 
 func (p *VectorParam) SetRegion(region int, f script.VectorFunction) {
-	p.setRegionsFunc(region, region+1, f)
+	if region == -1 {
+		p.setRegionsFunc(0, NREGION, f) //uniform
+	} else {
+		p.setRegionsFunc(region, region+1, f)
+	}
 }
 
 func (p *VectorParam) SetValue(v interface{}) {

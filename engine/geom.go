@@ -129,18 +129,7 @@ func (g *geom) shift(dx int) {
 	data.Copy(s, s2)
 
 	n := Mesh().Size()
-	nx := n[X]
-
-	// re-evaluate edge regions
-	var x1, x2 int
-	util.Argument(dx != 0)
-	if dx < 0 {
-		x1 = nx + dx
-		x2 = nx
-	} else {
-		x1 = 0
-		x2 = dx
-	}
+	x1, x2 := shiftDirtyRange(dx)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
@@ -154,6 +143,20 @@ func (g *geom) shift(dx int) {
 	}
 
 	cuda.Normalize(M.Buffer(), geometry.Gpu())
+}
+
+// x range that needs to be refreshed after shift over dx
+func shiftDirtyRange(dx int) (x1, x2 int) {
+	nx := Mesh().Size()[X]
+	util.Argument(dx != 0)
+	if dx < 0 {
+		x1 = nx + dx
+		x2 = nx
+	} else {
+		x1 = 0
+		x2 = dx
+	}
+	return
 }
 
 func (g *geom) Mesh() *data.Mesh { return Mesh() }

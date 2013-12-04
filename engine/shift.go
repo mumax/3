@@ -13,6 +13,15 @@ var (
 	ShiftM, ShiftGeom, ShiftRegions bool        = true, true, true // should shift act on magnetization, geometry, regions?
 )
 
+func init() {
+	DeclFunc("Shift", Shift, "Shifts the simulation by +1/-1 cells along X")
+	DeclVar("ShiftMagL", &ShiftMagL, "Upon shift, insert this magnetization from the left")
+	DeclVar("ShiftMagR", &ShiftMagR, "Upon shift, insert this magnetization from the right")
+	DeclVar("ShiftM", &ShiftM, "Whether Shift() acts on magnetization")
+	DeclVar("ShiftGeom", &ShiftM, "Whether Shift() acts on geometry")
+	DeclVar("ShiftRegions", &ShiftM, "Whether Shift() acts on regions")
+}
+
 func GetShiftPos() float64 { return TotalShift }
 
 // shift the simulation window over dx cells in X direction

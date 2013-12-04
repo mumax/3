@@ -49,22 +49,24 @@ func (r *Regions) resize() {
 	r.arr = newArr
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
+	nx := Mesh().Size()[X]
 	for _, d := range r.deflist {
-		r.render(d.region, d.shape)
+		r.render(d.region, d.shape, 0, nx)
 	}
 }
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
-	regions.render(id, s)
+	nx := Mesh().Size()[X]
+	regions.render(id, s, 0, nx) // render s everywhere
 	regions.deflist = append(regions.deflist, regionHist{id, s})
 }
 
-func (r *Regions) render(id int, s Shape) {
+// renders (rasterizes) shape, filling it with region number #id, between x1 and x2
+func (r *Regions) render(id int, s Shape, x1, x2 int) {
 	regions.gpuCacheOK = false
 
-	ok := false
 	n := Mesh().Size()
 
 	for iz := 0; iz < n[Z]; iz++ {
@@ -73,14 +75,20 @@ func (r *Regions) render(id int, s Shape) {
 				r := Index2Coord(ix, iy, iz)
 				if s(r[X], r[Y], r[Z]) { // inside
 					regions.arr[iz][iy][ix] = byte(id)
-					ok = true
 				}
 			}
 		}
 	}
-	if !ok {
-		util.Log("Note: DefRegion ", id, ": shape is empty")
+}
+
+func (r *Regions) get(R data.Vector) int {
+	for i := len(r.deflist) - 1; i >= 0; i-- {
+		d := r.deflist[i]
+		if d.shape(R[X], R[Y], R[Z]) {
+			return d.region
+		}
 	}
+	return 0
 }
 
 func DefRegionCell(id int, x, y, z int) {
@@ -160,6 +168,7 @@ func reshapeBytes(array []byte, size [3]int) [][][]byte {
 
 func (b *Regions) shift(dx int) {
 	// TODO: return if no regions defined
+
 	log.Println("regionshift", dx)
 	r1 := b.Gpu()
 	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
@@ -168,34 +177,21 @@ func (b *Regions) shift(dx int) {
 	cuda.ShiftBytes(r2, r1, b.Mesh(), dx, newreg)
 	r1.Copy(r2)
 
-	// TODO: dedup from geom.shift!
+	n := Mesh().Size()
+	x1, x2 := shiftDirtyRange(dx)
 
-	//n := b.Mesh().Size()
-	//nx := n[X]
-	// re-evaluate edge regions
-	//var x1, x2 int
-	//util.Argument(dx != 0)
-	//if dx < 0 {
-	//	x1 = nx + dx
-	//	x2 = nx
-	//} else {
-	//	x1 = 0
-	//	x2 = dx
-	//}
-
-	//panic("todo")
-	//	for iz := 0; iz < n[Z]; iz++ {
-	//		for iy := 0; iy < n[Y]; iy++ {
-	//			for ix := x1; ix < x2; ix++ {
-	//				r := Index2Coord(ix, iy, iz) // includes shift
-	//				reg :=
-	//				if !g.shape(r[X], r[Y], r[Z]) {
-	//					g.SetCell(ix, iy, iz, 0) // a bit slowish, but hardly reached
-	//				}
-	//			}
-	//		}
-	//	}
-	//
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := x1; ix < x2; ix++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				reg := b.get(r)
+				if reg != 0 {
+					b.SetCell(ix, iy, iz, reg) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+	b.gpuCacheOK = true // ?
 }
 
 func (r *Regions) Mesh() *data.Mesh { return Mesh() }

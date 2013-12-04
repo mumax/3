@@ -16,18 +16,23 @@ type Bytes struct {
 func NewBytes(Len int) *Bytes {
 	ptr := cu.MemAlloc(int64(Len))
 	cu.MemsetD8(cu.DevicePtr(ptr), 0, int64(Len))
-	return &Bytes{unsafe.Pointer(uintptr(ptr)), int(Len)}
+	return &Bytes{unsafe.Pointer(uintptr(ptr)), Len}
 }
 
 // Upload src (host) to dst (gpu)
 func (dst *Bytes) Upload(src []byte) {
-	util.Argument(int(dst.Len) == len(src))
+	util.Argument(dst.Len == len(src))
 	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
 func (dst *Bytes) Copy(src *Bytes) {
 	util.Argument(dst.Len == src.Len)
 	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(src.Ptr)), int64(dst.Len))
+}
+
+func (src *Bytes) Download(dst []byte) {
+	util.Argument(src.Len == len(dst))
+	cu.MemcpyDtoH(unsafe.Pointer(&dst[0]), cu.DevicePtr(uintptr(src.Ptr)), int64(src.Len))
 }
 
 func (dst *Bytes) Set(index int, value byte) {

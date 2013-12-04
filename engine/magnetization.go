@@ -97,29 +97,32 @@ func (m *magnetization) SetInShape(region Shape, conf Config) {
 }
 
 // set m to config in region
-// TODO: re-enable
-//func (m *magnetization) SetRegion(region int, conf Config) {
-//	host := m.Buffer().HostCopy()
-//	h := host.Vectors()
-//	n := m.Mesh().Size()
-//	r := byte(region)
-//
-//	for iz := 0; iz < n[Z]; iz++ {
-//		for iy := 0; iy < n[Y]; iy++ {
-//			for ix := 0; ix < n[X]; ix++ {
-//				pos := Index2Coord(ix, iy, iz)
-//				x, y, z := pos[X], pos[Y], pos[Z]
-//				if regions.arr[iz][iy][ix] == r {
-//					m := conf(x, y, z)
-//					h[X][iz][iy][ix] = float32(m[X])
-//					h[Y][iz][iy][ix] = float32(m[Y])
-//					h[Z][iz][iy][ix] = float32(m[Z])
-//				}
-//			}
-//		}
-//	}
-//	m.SetArray(host)
-//}
+func (m *magnetization) SetRegion(region int, conf Config) {
+	host := m.Buffer().HostCopy()
+	h := host.Vectors()
+	n := m.Mesh().Size()
+	r := byte(region)
+
+	regionsList := make([]byte, regions.Mesh().NCell())
+	regions.gpuCache.Download(regionsList)
+	regionsArr := reshapeBytes(regionsList, n)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				pos := Index2Coord(ix, iy, iz)
+				x, y, z := pos[X], pos[Y], pos[Z]
+				if regionsArr[iz][iy][ix] == r {
+					m := conf(x, y, z)
+					h[X][iz][iy][ix] = float32(m[X])
+					h[Y][iz][iy][ix] = float32(m[Y])
+					h[Z][iz][iy][ix] = float32(m[Z])
+				}
+			}
+		}
+	}
+	m.SetArray(host)
+}
 
 func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }

@@ -103,9 +103,7 @@ func (m *magnetization) SetRegion(region int, conf Config) {
 	n := m.Mesh().Size()
 	r := byte(region)
 
-	regionsList := make([]byte, regions.Mesh().NCell())
-	regions.gpuCache.Download(regionsList)
-	regionsArr := reshapeBytes(regionsList, n)
+	regionsArr := regions.HostArray()
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {

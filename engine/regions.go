@@ -53,10 +53,11 @@ func DefRegion(id int, s Shape) {
 }
 
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
+// TODO: a tidbit expensive
 func (r *Regions) render(id int, s Shape) {
 	n := Mesh().Size()
-	cpu := make([]byte, Mesh().NCell())
-	arr := reshapeBytes(cpu, n)
+	l := r.HostList() // need to start from previous state
+	arr := reshapeBytes(l, r.Mesh().Size())
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
@@ -69,7 +70,7 @@ func (r *Regions) render(id int, s Shape) {
 		}
 	}
 	log.Print("regions.upload")
-	r.gpuCache.Upload(cpu)
+	r.gpuCache.Upload(l)
 }
 
 func (r *Regions) get(R data.Vector) int {
@@ -80,6 +81,16 @@ func (r *Regions) get(R data.Vector) int {
 		}
 	}
 	return 0
+}
+
+func (r *Regions) HostArray() [][][]byte {
+	return reshapeBytes(r.HostList(), r.Mesh().Size())
+}
+
+func (r *Regions) HostList() []byte {
+	regionsList := make([]byte, r.Mesh().NCell())
+	regions.gpuCache.Download(regionsList)
+	return regionsList
 }
 
 func DefRegionCell(id int, x, y, z int) {
@@ -96,16 +107,19 @@ func defRegionId(id int) {
 }
 
 // normalized volume (0..1) of region.
-func (r *Regions) volume(region int) float64 {
-	panic("todo: region volume")
-	//vol := 0
-	//reg := byte(region)
-	//for _, c := range r.cpu {
-	//	if c == reg {
-	//		vol++
-	//	}
-	//}
-	//return float64(vol) / float64(r.Mesh().NCell())
+// TODO: a tidbit too expensive
+func (r *Regions) volume(region_ int) float64 {
+	region := byte(region_)
+	vol := 0
+	list := r.HostList()
+	for _, reg := range list {
+		if reg == region {
+			vol++
+		}
+	}
+	V := float64(vol) / float64(r.Mesh().NCell())
+	log.Println("volume of region", region_, ":", V)
+	return V
 }
 
 // Set the region of one cell

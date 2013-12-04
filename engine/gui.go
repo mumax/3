@@ -161,9 +161,9 @@ func (g *guistate) prepareM() {
 		args += ")"
 		// overwrite args for special cases
 		switch ident {
-		case "vortex":
+		case "Vortex":
 			args = "(1, 1)"
-		case "vortexwall":
+		case "VortexWall":
 			args = "(1, -1, 1, 1)"
 		}
 		g.Set("margs", args)

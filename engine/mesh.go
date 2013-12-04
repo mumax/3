@@ -49,13 +49,11 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		cuda.FreeBuffers()
 
 		// resize everything
-		newSize := [3]int{Nx, Ny, Nz}
-		M.resize(newSize)
-		regions.resize(newSize)
-
 		globalmesh_ = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
+		M.resize()
+		regions.resize()
 		geometry.buffer.Free()
-		geometry.buffer = data.NilSlice(1, newSize)
+		geometry.buffer = data.NilSlice(1, Mesh().Size())
 		geometry.setGeom(geometry.shape) // uses global mesh
 	}
 

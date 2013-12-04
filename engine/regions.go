@@ -19,15 +19,17 @@ func init() {
 
 // stores the region index for each cell
 type Regions struct {
-	arr        [][][]byte  // regions map: cell i,j,k -> byte index
-	cpu        []byte      // arr data, stored contiguously
-	gpuCache   *cuda.Bytes // gpu copy of cpu data, possibly out-of-sync
-	gpuCacheOK bool        // gpuCache in sync with cpu
-	deflist    []struct {
-		r int
-		s Shape
-	} // history // TODO: use for shift
+	arr        [][][]byte   // regions map: cell i,j,k -> byte index
+	cpu        []byte       // arr data, stored contiguously
+	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
+	gpuCacheOK bool         // gpuCache in sync with cpu
+	deflist    []regionHist // history // TODO: use for shift
 	info
+}
+
+type regionHist struct {
+	region int
+	shape  Shape
 }
 
 func (r *Regions) alloc() {
@@ -39,19 +41,27 @@ func (r *Regions) alloc() {
 	r.gpuCacheOK = false
 }
 
-func (r *Regions) resize(newSize [3]int) {
+func (r *Regions) resize() {
+	newSize := Mesh().Size()
 	newCpu := make([]byte, prod(newSize))
 	newArr := reshapeBytes(newCpu, newSize)
-	data.ResampleBytes(newArr, r.arr)
 	r.cpu = newCpu
 	r.arr = newArr
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
+	for _, d := range r.deflist {
+		r.render(d.region, d.shape)
+	}
 }
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
+	regions.render(id, s)
+	regions.deflist = append(regions.deflist, regionHist{id, s})
+}
+
+func (r *Regions) render(id int, s Shape) {
 	regions.gpuCacheOK = false
 
 	ok := false
@@ -68,12 +78,6 @@ func DefRegion(id int, s Shape) {
 			}
 		}
 	}
-
-	regions.deflist = append(regions.deflist, struct {
-		r int
-		s Shape
-	}{id, s})
-
 	if !ok {
 		util.Log("Note: DefRegion ", id, ": shape is empty")
 	}

@@ -130,8 +130,9 @@ func normalize(m *data.Slice) {
 	cuda.Normalize(m, geometry.Gpu())
 }
 
-func (m *magnetization) resize(s2 [3]int) {
+func (m *magnetization) resize() {
 	backup := m.Buffer().HostCopy()
+	s2 := Mesh().Size()
 	resized := data.Resample(backup, s2)
 	m.buffer_.Free()
 	m.buffer_ = cuda.NewSlice(VECTOR, s2)

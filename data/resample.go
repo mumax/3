@@ -30,6 +30,7 @@ func resampleNearest(out, in [][][][]float32) {
 	}
 }
 
+// TODO: rm
 func ResampleBytes(out, in [][][]byte) {
 	for i := range out {
 		i1 := (i * len(in)) / len(out)

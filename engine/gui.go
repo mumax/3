@@ -132,6 +132,8 @@ func (g *guistate) prepareGeom() {
 			args = "(0, inf)"
 		case ident == "Layers":
 			args = "(0, 1)"
+		case ident == "ImageShape":
+			args = `("filename.png")`
 		}
 		g.Set("geomargs", args)
 		g.Set("geomdoc", g.Doc(ident))

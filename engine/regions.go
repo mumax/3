@@ -13,17 +13,14 @@ const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
-	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
+	//DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
 // stores the region index for each cell
 type Regions struct {
-	arr        [][][]byte   // regions map: cell i,j,k -> byte index
-	cpu        []byte       // arr data, stored contiguously
-	gpuCache   *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
-	gpuCacheOK bool         // gpuCache in sync with cpu
-	deflist    []regionHist // history // TODO: use for shift
+	gpuCache *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
+	deflist  []regionHist // history // TODO: use for shift
 	info
 }
 
@@ -34,51 +31,44 @@ type regionHist struct {
 
 func (r *Regions) alloc() {
 	mesh := r.Mesh()
-	r.cpu = make([]byte, mesh.NCell())
-	r.arr = reshapeBytes(r.cpu, mesh.Size()) // TODO: use deflist instead of resample
 	r.gpuCache = cuda.NewBytes(mesh.NCell())
 	DefRegion(0, universe)
-	r.gpuCacheOK = false
 }
 
 func (r *Regions) resize() {
 	newSize := Mesh().Size()
-	newCpu := make([]byte, prod(newSize))
-	newArr := reshapeBytes(newCpu, newSize)
-	r.cpu = newCpu
-	r.arr = newArr
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
-	nx := Mesh().Size()[X]
 	for _, d := range r.deflist {
-		r.render(d.region, d.shape, 0, nx)
+		r.render(d.region, d.shape)
 	}
 }
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
-	nx := Mesh().Size()[X]
-	regions.render(id, s, 0, nx) // render s everywhere
+	regions.render(id, s)
 	regions.deflist = append(regions.deflist, regionHist{id, s})
 }
 
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
-func (r *Regions) render(id int, s Shape, x1, x2 int) {
-	regions.gpuCacheOK = false
-
+func (r *Regions) render(id int, s Shape) {
 	n := Mesh().Size()
+	cpu := make([]byte, Mesh().NCell())
+	arr := reshapeBytes(cpu, n)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)
 				if s(r[X], r[Y], r[Z]) { // inside
-					regions.arr[iz][iy][ix] = byte(id)
+					arr[iz][iy][ix] = byte(id)
 				}
 			}
 		}
 	}
+	log.Print("regions.upload")
+	r.gpuCache.Upload(cpu)
 }
 
 func (r *Regions) get(R data.Vector) int {
@@ -91,11 +81,11 @@ func (r *Regions) get(R data.Vector) int {
 	return 0
 }
 
-func DefRegionCell(id int, x, y, z int) {
-	defRegionId(id)
-	regions.gpuCacheOK = false
-	regions.arr[z][y][x] = byte(id)
-}
+// TODO: re-enable
+//func DefRegionCell(id int, x, y, z int) {
+//	defRegionId(id)
+//	regions.arr[z][y][x] = byte(id)
+//}
 
 func defRegionId(id int) {
 	if id < 0 || id > NREGION {
@@ -106,31 +96,26 @@ func defRegionId(id int) {
 
 // normalized volume (0..1) of region.
 func (r *Regions) volume(region int) float64 {
-	vol := 0
-	reg := byte(region)
-	for _, c := range r.cpu {
-		if c == reg {
-			vol++
-		}
-	}
-	return float64(vol) / float64(r.Mesh().NCell())
+	panic("todo: region volume")
+	//vol := 0
+	//reg := byte(region)
+	//for _, c := range r.cpu {
+	//	if c == reg {
+	//		vol++
+	//	}
+	//}
+	//return float64(vol) / float64(r.Mesh().NCell())
 }
 
 // Set the region of one cell
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
-	// TODO: broken if also shifting! rm cpucache alltogehter, use local cache in loop
-	r.arr[iz][iy][ix] = byte(region)
-	r.gpuCacheOK = false
+	size := Mesh().Size()
+	i := data.Index(size, ix, iy, iz)
+	r.gpuCache.Set(i, byte(region))
 }
 
-// Get the region data on GPU, first uploading it if needed.
+// Get the region data on GPU
 func (r *Regions) Gpu() *cuda.Bytes {
-	if r.gpuCacheOK {
-		return r.gpuCache
-	}
-	log.Print("regions.upload")
-	r.gpuCache.Upload(r.cpu)
-	r.gpuCacheOK = true
 	return r.gpuCache
 }
 
@@ -191,7 +176,6 @@ func (b *Regions) shift(dx int) {
 			}
 		}
 	}
-	b.gpuCacheOK = true // ?
 }
 
 func (r *Regions) Mesh() *data.Mesh { return Mesh() }

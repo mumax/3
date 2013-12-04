@@ -335,13 +335,14 @@ func (s *Slice) checkComp(comp int) {
 }
 
 func (s *Slice) Index(ix, iy, iz int) int {
-	Nx := s.Size()[X]
-	Ny := s.Size()[Y]
-	Nz := s.Size()[Z]
-	if ix < 0 || ix >= Nx || iy < 0 || iy >= Ny || iz < 0 || iz >= Nz {
-		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v,%v,%v)\n", ix, iy, iz, Nx, Ny, Nz)
+	return Index(s.Size(), ix, iy, iz)
+}
+
+func Index(size [3]int, ix, iy, iz int) int {
+	if ix < 0 || ix >= size[X] || iy < 0 || iy >= size[Y] || iz < 0 || iz >= size[Z] {
+		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v)\n", ix, iy, iz, size)
 	}
-	return (iz*Ny+iy)*Nx + ix
+	return (iz*size[Y]+iy)*size[X] + ix
 }
 
 const (

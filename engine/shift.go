@@ -4,7 +4,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 var (
@@ -35,7 +34,6 @@ func Shift(dx int) {
 		shiftMag(M.Buffer(), dx) // TODO: M.shift?
 	}
 	if ShiftRegions {
-		log.Println("rs")
 		regions.shift(dx)
 	}
 	if ShiftGeom {

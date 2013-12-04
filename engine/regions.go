@@ -118,7 +118,6 @@ func (r *Regions) volume(region_ int) float64 {
 		}
 	}
 	V := float64(vol) / float64(r.Mesh().NCell())
-	log.Println("volume of region", region_, ":", V)
 	return V
 }
 

@@ -13,7 +13,7 @@ const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
-	//DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
+	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 }
 
@@ -82,11 +82,11 @@ func (r *Regions) get(R data.Vector) int {
 	return 0
 }
 
-// TODO: re-enable
-//func DefRegionCell(id int, x, y, z int) {
-//	defRegionId(id)
-//	regions.arr[z][y][x] = byte(id)
-//}
+func DefRegionCell(id int, x, y, z int) {
+	defRegionId(id)
+	index := data.Index(Mesh().Size(), z, y, x)
+	regions.gpuCache.Set(index, byte(id))
+}
 
 func defRegionId(id int) {
 	if id < 0 || id > NREGION {
@@ -154,8 +154,6 @@ func reshapeBytes(array []byte, size [3]int) [][][]byte {
 
 func (b *Regions) shift(dx int) {
 	// TODO: return if no regions defined
-
-	log.Println("regionshift", dx)
 	r1 := b.Gpu()
 	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
 	defer r2.Free()

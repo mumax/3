@@ -19,11 +19,12 @@ func init() {
 
 // stores the region index for each cell
 type Regions struct {
-	gpuCache *cuda.Bytes  // gpu copy of cpu data, possibly out-of-sync
-	deflist  []regionHist // history // TODO: use for shift
+	gpuCache *cuda.Bytes  // TODO: rename: buffer
+	deflist  []regionHist // history
 	info
 }
 
+// keeps history of region definitions
 type regionHist struct {
 	region int
 	shape  Shape

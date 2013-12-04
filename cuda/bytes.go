@@ -27,7 +27,7 @@ func (dst *Bytes) Upload(src []byte) {
 
 func (dst *Bytes) Copy(src *Bytes) {
 	util.Argument(dst.Len == src.Len)
-	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(dst.Ptr)), int64(dst.Len))
+	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(src.Ptr)), int64(dst.Len))
 }
 
 func (dst *Bytes) Set(index int, value byte) {

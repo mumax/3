@@ -2,7 +2,11 @@ package engine
 
 import (
 	"github.com/mumax/3/util"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"math"
+	"os"
 )
 
 func init() {
@@ -18,6 +22,7 @@ func init() {
 	DeclFunc("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
 	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
+	DeclFunc("ImageShape", ImageShape, "Use black/white image as shape")
 }
 
 // geometrical shape for setting sample geometry
@@ -119,6 +124,46 @@ func Universe() Shape {
 // The entire space.
 func universe(x, y, z float64) bool {
 	return true
+}
+
+func ImageShape(fname string) Shape {
+	r, err1 := os.Open(fname)
+	util.FatalErr(err1)
+	img, _, err2 := image.Decode(r)
+	util.FatalErr(err2)
+
+	width := img.Bounds().Max.X
+	height := img.Bounds().Max.Y
+
+	inside := make([][]bool, height)
+	for iy := range inside {
+		inside[iy] = make([]bool, width)
+	}
+
+	for iy := 0; iy < height; iy++ {
+		for ix := 0; ix < width; ix++ {
+			r, g, b, a := img.At(ix, height-1-iy).RGBA()
+			if a > 128 && r+g+b < (0xFFFF*3)/2 {
+				inside[iy][ix] = true
+			}
+		}
+	}
+
+	s := Mesh().Size()
+	sx, sy := float64(s[X]), float64(s[Y])
+	c := Mesh().CellSize()
+	nx, ny := float64(width), float64(height) // use width, height so it automatically rescales
+	wx, wy := sx*c[X], sy*c[Y]
+
+	return func(x, y, z float64) bool {
+		ix := int(((x/wx)+0.5)*nx + 0.5)
+		iy := int(((y/wy)+0.5)*ny + 0.5)
+		if ix < 0 || ix >= width || iy < 0 || iy >= height {
+			return false
+		} else {
+			return inside[iy][ix]
+		}
+	}
 }
 
 // Transl returns a translated copy of the shape.

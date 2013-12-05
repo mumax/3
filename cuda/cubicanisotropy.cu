@@ -22,7 +22,7 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
         uint8_t r  = regions[i];
         float  k1 = K1LUT[r];
         float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
-        float3 c2 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
+        float3 c2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
         float3 c3 = cross(c1, c2); // 3rd axis perpendicular to c1,c2
         float3 m  = make_float3(mx[i], my[i], mz[i]);
 

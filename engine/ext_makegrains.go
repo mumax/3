@@ -1,8 +1,6 @@
 package engine
 
 import (
-	"github.com/mumax/3/util"
-	"log"
 	"math"
 	"math/rand"
 )
@@ -16,25 +14,8 @@ func Voronoi(grainsize float64, numRegions, seed int) {
 	defer GUI.SetBusy(false)
 
 	t := newTesselation(grainsize, numRegions, int64(seed))
-
-	r := &regions
-	n := Mesh().Size()
-	l := r.HostList() // TODO: fresh list
-	arr := reshapeBytes(l, r.Mesh().Size())
-
-	progress, progmax := 0, n[Z]*n[Y]+1
-	for iz := 0; iz < n[Z]; iz++ {
-		for iy := 0; iy < n[Y]; iy++ {
-			progress++
-			util.Progress(progress, progmax, "Voronoi tessellation")
-			for ix := 0; ix < n[X]; ix++ {
-				r := Index2Coord(ix, iy, iz) // incl shift
-				arr[iz][iy][ix] = t.RegionOf(r[X], r[Y], r[Z])
-			}
-		}
-	}
-	log.Println("upload voronoi")
-	r.gpuCache.Upload(l)
+	regions.hist = append(regions.hist, t.RegionOf)
+	regions.render(t.RegionOf)
 }
 
 type tesselation struct {
@@ -71,7 +52,7 @@ const (
 )
 
 // Returns the region of the grain where cell at x,y,z belongs to
-func (t *tesselation) RegionOf(x, y, z float64) byte {
+func (t *tesselation) RegionOf(x, y, z float64) int {
 	tile := t.tileOf(x, y) // tile containing x,y
 
 	// look for nearest center in tile + neighbors
@@ -91,7 +72,7 @@ func (t *tesselation) RegionOf(x, y, z float64) byte {
 	}
 
 	//fmt.Println("nearest", x, y, ":", nearest)
-	return nearest.region
+	return int(nearest.region)
 }
 
 // Returns the list of Voronoi centers in tile(ix, iy), using only ix,iy to seed the random generator

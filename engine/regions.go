@@ -19,15 +19,9 @@ func init() {
 
 // stores the region index for each cell
 type Regions struct {
-	gpuCache *cuda.Bytes  // TODO: rename: buffer
-	deflist  []regionHist // history
+	gpuCache *cuda.Bytes                 // TODO: rename: buffer
+	hist     []func(x, y, z float64) int // history of region set operations
 	info
-}
-
-// keeps history of region definitions
-type regionHist struct {
-	region int
-	shape  Shape
 }
 
 func (r *Regions) alloc() {
@@ -42,22 +36,28 @@ func (r *Regions) resize() {
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
 	log.Println("regions.re-alloc")
-	for _, d := range r.deflist {
-		r.render(d.region, d.shape)
+	for _, f := range r.hist {
+		r.render(f)
 	}
 }
 
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
-	regions.render(id, s)
-	regions.deflist = append(regions.deflist, regionHist{id, s})
+	f := func(x, y, z float64) int {
+		if s(x, y, z) {
+			return id
+		} else {
+			return -1
+		}
+	}
+	regions.render(f)
+	regions.hist = append(regions.hist, f)
 }
 
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
 // TODO: a tidbit expensive
-func (r *Regions) render(id int, s Shape) {
-	log.Println("regions.render", id, s)
+func (r *Regions) render(f func(x, y, z float64) int) {
 	n := Mesh().Size()
 	l := r.HostList() // need to start from previous state
 	arr := reshapeBytes(l, r.Mesh().Size())
@@ -66,8 +66,9 @@ func (r *Regions) render(id int, s Shape) {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)
-				if s(r[X], r[Y], r[Z]) { // inside
-					arr[iz][iy][ix] = byte(id)
+				region := f(r[X], r[Y], r[Z])
+				if region >= 0 {
+					arr[iz][iy][ix] = byte(region)
 				}
 			}
 		}
@@ -77,10 +78,11 @@ func (r *Regions) render(id int, s Shape) {
 }
 
 func (r *Regions) get(R data.Vector) int {
-	for i := len(r.deflist) - 1; i >= 0; i-- {
-		d := r.deflist[i]
-		if d.shape(R[X], R[Y], R[Z]) {
-			return d.region
+	for i := len(r.hist) - 1; i >= 0; i-- {
+		f := r.hist[i]
+		region := f(R[X], R[Y], R[Z])
+		if region >= 0 {
+			return region
 		}
 	}
 	return 0

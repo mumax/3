@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/mumax/3/util"
 	"log"
 	"math"
 	"math/rand"
@@ -11,6 +12,9 @@ func init() {
 }
 
 func Voronoi(grainsize float64, numRegions, seed int) {
+	GUI.SetBusy(true)
+	defer GUI.SetBusy(false)
+
 	t := newTesselation(grainsize, numRegions, int64(seed))
 
 	r := &regions
@@ -18,8 +22,11 @@ func Voronoi(grainsize float64, numRegions, seed int) {
 	l := r.HostList() // TODO: fresh list
 	arr := reshapeBytes(l, r.Mesh().Size())
 
+	progress, progmax := 0, n[Z]*n[Y]+1
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
+			progress++
+			util.Progress(progress, progmax, "Voronoi tessellation")
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz) // incl shift
 				arr[iz][iy][ix] = t.RegionOf(r[X], r[Y], r[Z])
@@ -28,7 +35,6 @@ func Voronoi(grainsize float64, numRegions, seed int) {
 	}
 	log.Println("upload voronoi")
 	r.gpuCache.Upload(l)
-	log.Println(r.HostArray())
 }
 
 type tesselation struct {
@@ -36,6 +42,7 @@ type tesselation struct {
 	tilesize  float64
 	maxRegion int
 	cache     map[int2][]center
+	seed      int64
 	rnd       *rand.Rand
 }
 
@@ -53,6 +60,7 @@ func newTesselation(grainsize float64, maxRegion int, seed int64) *tesselation {
 		float64(float32(grainsize * TILE)), // expect 4 grains/block, 36 per 3x3 blocks = safe, relatively round number
 		maxRegion,
 		make(map[int2][]center),
+		seed,
 		rand.New(rand.NewSource(0))}
 }
 
@@ -92,8 +100,8 @@ func (t *tesselation) centersInTile(tx, ty int) []center {
 		return c
 	} else {
 		// tile-specific seed that works for positive and negative tx, ty
-		seed := ((int64(ty) + (2 << 30)) << 30) + (int64(tx) + (2 << 30))
-		t.rnd.Seed(seed)
+		seed := (int64(ty)+(1<<24))*(1<<24) + (int64(tx) + (1 << 24))
+		t.rnd.Seed(seed ^ t.seed)
 		N := t.poisson(LAMBDA)
 		c := make([]center, N)
 
@@ -114,8 +122,8 @@ func (t *tesselation) centersInTile(tx, ty int) []center {
 func sqr(x float64) float64 { return x * x }
 
 func (t *tesselation) tileOf(x, y float64) int2 {
-	ix := int(x / t.tilesize)
-	iy := int(y / t.tilesize)
+	ix := int(math.Floor(x / t.tilesize))
+	iy := int(math.Floor(y / t.tilesize))
 	return int2{ix, iy}
 }
 

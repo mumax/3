@@ -6,6 +6,6 @@ setcellsize(c, c, c)
 m = uniform(1,0,0) 
 randSeed(0)
 
+print(regions)
 ext_makegrains(40e-9, 255, 0)
-
-
+print(regions)

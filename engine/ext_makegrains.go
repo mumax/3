@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"fmt"
+	"log"
 	"math"
 	"math/rand"
 )
@@ -15,19 +15,20 @@ func Voronoi(grainsize float64, numRegions, seed int) {
 
 	r := &regions
 	n := Mesh().Size()
-	l := r.HostList() // need to start from previous state
+	l := r.HostList() // TODO: fresh list
 	arr := reshapeBytes(l, r.Mesh().Size())
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
-				r := Index2Coord(ix, iy, iz)
+				r := Index2Coord(ix, iy, iz) // incl shift
 				arr[iz][iy][ix] = t.RegionOf(r[X], r[Y], r[Z])
 			}
 		}
 	}
-	fmt.Println(l)
+	log.Println("upload voronoi")
 	r.gpuCache.Upload(l)
+	log.Println(r.HostArray())
 }
 
 type tesselation struct {

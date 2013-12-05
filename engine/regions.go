@@ -31,6 +31,7 @@ type regionHist struct {
 }
 
 func (r *Regions) alloc() {
+	log.Println("regions.alloc")
 	mesh := r.Mesh()
 	r.gpuCache = cuda.NewBytes(mesh.NCell())
 	DefRegion(0, universe)
@@ -40,6 +41,7 @@ func (r *Regions) resize() {
 	newSize := Mesh().Size()
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
+	log.Println("regions.re-alloc")
 	for _, d := range r.deflist {
 		r.render(d.region, d.shape)
 	}
@@ -55,6 +57,7 @@ func DefRegion(id int, s Shape) {
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
 // TODO: a tidbit expensive
 func (r *Regions) render(id int, s Shape) {
+	log.Println("regions.render", id, s)
 	n := Mesh().Size()
 	l := r.HostList() // need to start from previous state
 	arr := reshapeBytes(l, r.Mesh().Size())

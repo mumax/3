@@ -7,9 +7,9 @@ rm -rf $tmp/*
 src='github.com/mumax/3/mumax3'
 version='3.3-BETA1'
 
-go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
-go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'
-go build -o $tmp/mumax3/mumax3 'github.com/mumax/3/bootstrap'
+#go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
+#go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'
+#go build -o $tmp/mumax3/mumax3 'github.com/mumax/3/bootstrap'
 
 
 for c in 4.2.9 5.0 5.5; do

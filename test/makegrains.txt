@@ -1,0 +1,15 @@
+// regression test for bug with region > 127
+
+setgridsize(512, 512, 1)
+c := 4e-9
+setcellsize(c, c, c)
+m = uniform(1,0,0) 
+
+ext_makegrains(40e-9, 255, 0)
+
+alpha = 1
+
+for i:=0; i<255; i++{
+	Aex.SetRegion(i, 13e-12 + randNorm()*1.3e-12)
+	Msat.SetRegion(i, 800e3 + randNorm()*80e3)
+}

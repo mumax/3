@@ -55,10 +55,11 @@ type center struct {
 	region byte    // region for all cells near center
 }
 
-func newTesselation(grainsize float64, maxRegion int, seed int64) *tesselation {
+// nRegion exclusive
+func newTesselation(grainsize float64, nRegion int, seed int64) *tesselation {
 	return &tesselation{grainsize,
 		float64(float32(grainsize * TILE)), // expect 4 grains/block, 36 per 3x3 blocks = safe, relatively round number
-		maxRegion,
+		nRegion,
 		make(map[int2][]center),
 		seed,
 		rand.New(rand.NewSource(0))}

@@ -1,0 +1,18 @@
+// regression test for bug with region > 127
+
+setgridsize(512, 512, 1)
+c := 4e-9
+setcellsize(c, c, c)
+
+m = uniform(1,0,0) 
+
+//ext_makegrains(40e-9, 255, 0)
+defregion(1, circle(200*c))
+defregion(2, circle(100*c))
+defregion(128, circle(50*c))
+
+expect("0", Ku1.average(), 0, 0)
+expect("0", Kc1.average(), 0, 0)
+expectv("0", AnisC1.average(), vector(0, 0, 0), 0)
+expectv("0", AnisC2.average(), vector(0, 0, 0), 0)
+expectv("0", AnisU.average(), vector(0, 0, 0), 0)

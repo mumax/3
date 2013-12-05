@@ -10,6 +10,10 @@ func (e *sel) update(id string) []jsCall {
 	return []jsCall{{F: "setSelect", Args: []interface{}{id, e.value()}}}
 }
 
+func (d *Page) SelectArray(id string, value string, options []string) string {
+	return d.Select(id, value, options...)
+}
+
 func (d *Page) Select(id string, value string, options ...string) string {
 	e := &sel{data: data{value}}
 	d.addElem(id, e)

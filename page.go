@@ -11,16 +11,23 @@ import (
 	"text/template"
 )
 
+var Debug = false
+
+// Page holds the state to serve a single GUI page to the browser
 type Page struct {
 	elems      map[string]*E
 	htmlCache  []byte      // static html content, rendered only once
 	haveJS     bool        // have called JS()?
 	data       interface{} // any additional data to be passed to template
 	onUpdate   func()
+	onAnyEvent func()
 	httpLock   sync.Mutex
 	lastPageID string
 }
 
+// NewPage constructs a Page based on an HTML template containing
+// element tags like {{.Button}}, {{.Textbox}}, etc. data is fed
+// to the template as additional arbitrary data, available as {{.Data}}.
 func NewPage(htmlTemplate string, data interface{}) *Page {
 	d := &Page{elems: make(map[string]*E), data: data}
 
@@ -37,10 +44,14 @@ func NewPage(htmlTemplate string, data interface{}) *Page {
 	return d
 }
 
+// Value returns the value of the HTML element with given id.
+// E.g.: the text in a textbox, the checked value of a checkbox, etc.
 func (d *Page) Value(id string) interface{} {
 	return d.elem(id).value()
 }
 
+// StringValue is like Value but returns the value as string,
+// converting if necessary.
 func (d *Page) StringValue(id string) string {
 	v := d.Value(id)
 	if s, ok := v.(string); ok {
@@ -50,12 +61,40 @@ func (d *Page) StringValue(id string) string {
 	}
 }
 
+// BoolValue is like Value but returns the value as bool,
+// converting if necessary. Panics if conversion is not possible.
 func (d *Page) BoolValue(id string) bool {
 	v := d.Value(id)
 	if b, ok := v.(bool); ok {
 		return b
 	} else {
 		b, err := strconv.ParseBool(fmt.Sprint(v))
+		check(err)
+		return b
+	}
+}
+
+// IntValue is like Value but returns the value as int,
+// converting if necessary. Panics if conversion is not possible.
+func (d *Page) IntValue(id string) int {
+	v := d.Value(id)
+	if b, ok := v.(int); ok {
+		return b
+	} else {
+		b, err := strconv.Atoi(fmt.Sprint(v))
+		check(err)
+		return b
+	}
+}
+
+// FloatValue is like Value but returns the value as float64,
+// converting if necessary. Panics if conversion is not possible.
+func (d *Page) FloatValue(id string) float64 {
+	v := d.Value(id)
+	if b, ok := v.(float64); ok {
+		return b
+	} else {
+		b, err := strconv.ParseFloat(fmt.Sprint(v), 64)
 		check(err)
 		return b
 	}
@@ -81,8 +120,17 @@ func (d *Page) Display(id string, visible bool) {
 	}
 }
 
+// OnEvent sets a handler to be called when an event happens
+// to the HTML element with given id. The event depends on the
+// element type: click for Button, change for TextBox, etc...
 func (d *Page) OnEvent(id string, handler func()) {
 	d.elem(id).onevent = handler
+}
+
+// OnEvent sets a handler to be called when an event happens
+// to any of the page's HTML elements.
+func (d *Page) OnAnyEvent(handler func()) {
+	d.onAnyEvent = handler
 }
 
 // Set func to be executed each time javascript polls for updates
@@ -167,7 +215,12 @@ func (d *Page) serveContent(w http.ResponseWriter, r *http.Request) {
 func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
 	var ev event
 	check(json.NewDecoder(r.Body).Decode(&ev))
-	//fmt.Println(ev)
+	if Debug {
+		fmt.Println(ev)
+	}
+	if d.onAnyEvent != nil {
+		d.onAnyEvent()
+	}
 	el := d.elem(ev.ID)
 	el.set(ev.Arg)
 	if el.onevent != nil {
@@ -201,9 +254,9 @@ func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 	for id, e := range d.elems {
 		calls = append(calls, e.update(id)...) // update atomically checks dirty and clears it
 	}
-	//	if len(calls) != 0 {
-	//		fmt.Println(calls) // debug
-	//	}
+	if Debug && len(calls) != 0 {
+		fmt.Println(calls) // debug
+	}
 	check(json.NewEncoder(w).Encode(calls))
 }
 

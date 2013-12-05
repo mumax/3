@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "float3.h"
 
 // Landau-Lifshitz torque.
@@ -5,7 +6,7 @@ extern "C" __global__ void
 lltorque(float* __restrict__  tx, float* __restrict__  ty, float* __restrict__  tz,
          float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz,
          float* __restrict__  hx, float* __restrict__  hy, float* __restrict__  hz,
-         float* alphaLUT, int8_t* regions, int N) {
+         float* alphaLUT, uint8_t* regions, int N) {
 
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
     if (i < N) {

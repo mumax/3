@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "stencil.h"
 #include "float3.h"
 
@@ -9,8 +10,8 @@
 extern "C" __global__ void
 addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
             float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-            float* __restrict__ aLUT2d, int8_t* __restrict__ regions,
-            float wx, float wy, float wz, int Nx, int Ny, int Nz, int8_t PBC) {
+            float* __restrict__ aLUT2d, uint8_t* __restrict__ regions,
+            float wx, float wy, float wz, int Nx, int Ny, int Nz, uint8_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -23,7 +24,7 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
     // central cell
     int I = idx(ix, iy, iz);
     float3 m0 = make_float3(mx[I], my[I], mz[I]);
-    int8_t r0 = regions[I];
+    uint8_t r0 = regions[I];
     float3 B  = make_float3(Bx[I], By[I], Bz[I]);
 
     int i_;    // neighbor index

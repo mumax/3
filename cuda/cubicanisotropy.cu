@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "float3.h"
 
 // add cubic anisotropy field to B.
@@ -13,12 +14,12 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
                    float* __restrict__ K1LUT,
                    float* __restrict__ C1xLUT, float* __restrict__ C1yLUT, float* __restrict__ C1zLUT,
                    float* __restrict__ C2xLUT, float* __restrict__ C2yLUT, float* __restrict__ C2zLUT,
-                   int8_t* __restrict__ regions, int N) {
+                   uint8_t* __restrict__ regions, int N) {
 
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
     if (i < N) {
 
-        int8_t r  = regions[i];
+        uint8_t r  = regions[i];
         float  k1 = K1LUT[r];
         float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
         float3 c2 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));

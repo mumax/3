@@ -1,11 +1,12 @@
 #include "stencil.h"
+#include <stdint.h>
 
 // Copy src (size S, smaller) into dst (size D, larger),
 // and multiply by Bsat as defined in regions.
 extern "C" __global__ void
 copypadmul(float* __restrict__ dst, int Dx, int Dy, int Dz,
            float* __restrict__ src, float* __restrict__ vol, int Sx, int Sy, int Sz,
-           float* __restrict__ BsatLUT, int8_t* __restrict__ regions) {
+           float* __restrict__ BsatLUT, uint8_t* __restrict__ regions) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;

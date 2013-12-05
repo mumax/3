@@ -88,7 +88,7 @@ const (
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 1 7 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -96,23 +96,23 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
+	.loc 1 8 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 1 10 1
 	cvt.s64.s32	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
-	ld.global.s8 	%rd9, [%rd8];
+	ld.global.u8 	%rd9, [%rd8];
 	shl.b64 	%rd10, %rd9, 2;
 	add.s64 	%rd11, %rd2, %rd10;
 	mul.wide.s32 	%rd12, %r1, 4;
 	add.s64 	%rd13, %rd1, %rd12;
-	.loc 1 9 1
 	ld.global.f32 	%f1, [%rd11];
 	st.global.f32 	[%rd13], %f1;
 
 BB0_2:
-	.loc 1 12 2
+	.loc 1 13 2
 	ret;
 }
 
@@ -144,7 +144,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 1 7 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -152,23 +152,23 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
+	.loc 1 8 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 1 10 1
 	cvt.s64.s32	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
-	ld.global.s8 	%rd9, [%rd8];
+	ld.global.u8 	%rd9, [%rd8];
 	shl.b64 	%rd10, %rd9, 2;
 	add.s64 	%rd11, %rd2, %rd10;
 	mul.wide.s32 	%rd12, %r1, 4;
 	add.s64 	%rd13, %rd1, %rd12;
-	.loc 1 9 1
 	ld.global.f32 	%f1, [%rd11];
 	st.global.f32 	[%rd13], %f1;
 
 BB0_2:
-	.loc 1 12 2
+	.loc 1 13 2
 	ret;
 }
 
@@ -229,7 +229,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd5;
 	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
+	.loc 1 7 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -237,26 +237,25 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
+	.loc 1 8 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB2_2;
 
+	.loc 1 10 1
 	cvt.s64.s32	%rd7, %r1;
 	add.s64 	%rd8, %rd3, %rd7;
-	.loc 1 9 1
 	ld.global.nc.u8 	%rs1, [%rd8];
 	cvt.u64.u16	%rd9, %rs1;
-	cvt.s64.s8 	%rd10, %rd9;
+	and.b64  	%rd10, %rd9, 255;
 	shl.b64 	%rd11, %rd10, 2;
 	add.s64 	%rd12, %rd2, %rd11;
 	mul.wide.s32 	%rd13, %r1, 4;
 	add.s64 	%rd14, %rd1, %rd13;
-	.loc 1 9 1
 	ld.global.nc.f32 	%f1, [%rd12];
 	st.global.f32 	[%rd14], %f1;
 
 BB2_2:
-	.loc 1 12 2
+	.loc 1 13 2
 	ret;
 }
 

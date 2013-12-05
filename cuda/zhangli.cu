@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "float3.h"
 #include "stencil.h"
 #include "constants.h"
@@ -11,7 +12,7 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
                  float* __restrict__ jx, float* __restrict__ jy, float* __restrict__ jz,
                  float cx, float cy, float cz,
                  float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, float* __restrict__ polLUT,
-                 int8_t* __restrict__ regions, int Nx, int Ny, int Nz, int8_t PBC) {
+                 uint8_t* __restrict__ regions, int Nx, int Ny, int Nz, uint8_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -23,7 +24,7 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
 
     int I = idx(ix, iy, iz);
 
-    int8_t r = regions[I];
+    uint8_t r = regions[I];
     float alpha = alphaLUT[r];
     float xi    = xiLUT[r];
     float bsat  = bsatLUT[r];

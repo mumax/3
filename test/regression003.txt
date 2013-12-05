@@ -6,7 +6,7 @@ setcellsize(c, c, c)
 
 m = uniform(1,0,0) 
 
-//ext_makegrains(40e-9, 255, 0)
+ext_makegrains(40e-9, 255, 0)
 defregion(1, circle(200*c))
 defregion(2, circle(100*c))
 defregion(128, circle(50*c))

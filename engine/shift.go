@@ -3,14 +3,12 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
 var (
 	TotalShift                      float64                        // accumulated window shift (X) in meter
 	ShiftMagL, ShiftMagR            data.Vector                    // when shifting m, put these value at the left/right edge.
 	ShiftM, ShiftGeom, ShiftRegions bool        = true, true, true // should shift act on magnetization, geometry, regions?
-	// TODO: shiftregions false by default
 )
 
 func init() {

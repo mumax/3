@@ -20,16 +20,16 @@ func init() {
 	DeclVar("ShiftM", &ShiftM, "Whether Shift() acts on magnetization")
 	DeclVar("ShiftGeom", &ShiftM, "Whether Shift() acts on geometry")
 	DeclVar("ShiftRegions", &ShiftM, "Whether Shift() acts on regions")
+	DeclVar("TotalShift", &TotalShift, "Amount by which the simulation has been shifted (m).")
 }
 
 func GetShiftPos() float64 { return TotalShift }
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {
-	util.Argument(dx == 1 || dx == -1) // one cell at a time please
+	//util.Argument(dx == 1 || dx == -1) // one cell at a time please
 
 	TotalShift += float64(dx) * Mesh().CellSize()[X] // needed to re-init geom, regions
-
 	if ShiftM {
 		shiftMag(M.Buffer(), dx) // TODO: M.shift?
 	}
@@ -39,7 +39,7 @@ func Shift(dx int) {
 	if ShiftGeom {
 		geometry.shift(dx)
 	}
-
+	cuda.Normalize(M.Buffer(), geometry.Gpu()) // check!
 }
 
 func shiftMag(m *data.Slice, dx int) {

@@ -77,7 +77,9 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 	r.gpuCache.Upload(l)
 }
 
+// get the region for position R based on the history
 func (r *Regions) get(R data.Vector) int {
+	// reverse order, last one set wins.
 	for i := len(r.hist) - 1; i >= 0; i-- {
 		f := r.hist[i]
 		region := f(R[X], R[Y], R[Z])
@@ -104,6 +106,14 @@ func DefRegionCell(id int, x, y, z int) {
 	regions.gpuCache.Set(index, byte(id))
 }
 
+// Set the region of one cell
+// TODO dedup
+func (r *Regions) SetCell(ix, iy, iz int, region int) {
+	size := Mesh().Size()
+	i := data.Index(size, ix, iy, iz)
+	r.gpuCache.Set(i, byte(region))
+}
+
 func defRegionId(id int) {
 	if id < 0 || id > NREGION {
 		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
@@ -124,13 +134,6 @@ func (r *Regions) volume(region_ int) float64 {
 	}
 	V := float64(vol) / float64(r.Mesh().NCell())
 	return V
-}
-
-// Set the region of one cell
-func (r *Regions) SetCell(ix, iy, iz int, region int) {
-	size := Mesh().Size()
-	i := data.Index(size, ix, iy, iz)
-	r.gpuCache.Set(i, byte(region))
 }
 
 // Get the region data on GPU

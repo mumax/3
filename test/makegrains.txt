@@ -12,6 +12,7 @@ Aex = 13e-12
 Msat = 800e3
 ext_makegrains(40e-9, 255, 0)
 ext_rmsurfacecharge(0, 1, -1)
+defregion(1, circle(100*c).repeat(200*c,0,0))
 
 alpha = 1
 

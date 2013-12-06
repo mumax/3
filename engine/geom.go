@@ -142,7 +142,6 @@ func (g *geom) shift(dx int) {
 		}
 	}
 
-	cuda.Normalize(M.Buffer(), geometry.Gpu())
 }
 
 // x range that needs to be refreshed after shift over dx

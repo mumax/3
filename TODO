@@ -52,7 +52,8 @@ load PNG geom (shape?)
 improvements:
 -------------
 
-MFM: also work with PBC (simple kernel change)
+save self-defined variable.
+
 MFM: don't crash on tip crash ;-), just zero kernel
 
 DMI: also work with PBC

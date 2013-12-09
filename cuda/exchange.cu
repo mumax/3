@@ -5,6 +5,8 @@
 // indexing in symmetric matrix
 #define symidx(i, j) ( (j<=i)? ( (((i)*((i)+1)) /2 )+(j) )  :  ( (((j)*((j)+1)) /2 )+(i) ) )
 
+#define is0(m) ( dot(m, m) == 0.0f )
+
 // m is normalized.
 // See exchange.go for more details.
 extern "C" __global__ void
@@ -24,6 +26,11 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
     // central cell
     int I = idx(ix, iy, iz);
     float3 m0 = make_float3(mx[I], my[I], mz[I]);
+
+    if (is0(m0)) {
+        return;
+    }
+
     uint8_t r0 = regions[I];
     float3 B  = make_float3(Bx[I], By[I], Bz[I]);
 

@@ -149,7 +149,8 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 		<tr title="Time steps taken">   <td>step:    </td><td>{{.Span "nsteps"  "0"}}   </td></tr>
         <tr title="{{.Data.Doc "t"}}">  <td>time:    </td><td>{{.Span "time"    "0"}} s </td></tr>
 		<tr title="{{.Data.Doc "dt"}}"> <td>dt:      </td><td>{{.Span "dt"      "0"}} s </td></tr>
-		<tr title="Maximum relative error/step"> <td>err/step:</td><td>{{.Span "lasterr" "0"}}   </td></tr>
+		<tr title="Maximum relative error/step"> <td>err/step: </td><td>{{.Span "lasterr" "0"}}     </td></tr>
+		<tr title="Maximum absolute torque">     <td>MaxTorque:</td><td>{{.Span "maxtorque" "0"}} T </td></tr> 
 	</table>
 
 	</td><td>

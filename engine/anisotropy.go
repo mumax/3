@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 )
 
@@ -13,6 +14,7 @@ var (
 	ku1_red, kc1_red      derivedParam // K1 / Msat
 	B_anis                adder        // field due to uniaxial anisotropy (T)
 	E_anis                *GetScalar   // Anisotorpy energy
+	Edens_anis            adder        // Anisotropy energy density
 )
 
 func init() {
@@ -23,7 +25,8 @@ func init() {
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 	B_anis.init(VECTOR, "B_anis", "T", "Anisotropy field", AddAnisotropyField)
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", getAnisotropyEnergy)
-	registerEnergy(getAnisotropyEnergy)
+	Edens_anis.init(SCALAR, "Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", AddAnisotropyEdens)
+	registerEnergy(getAnisotropyEnergy, AddAnisotropyEdens)
 
 	//ku1_red = Ku1 / Msat
 	ku1_red.init(1, []updater{&Ku1, &Msat}, func(p *derivedParam) {
@@ -48,6 +51,15 @@ func AddAnisotropyField(dst *data.Slice) {
 
 func getAnisotropyEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_anis)
+}
+
+func AddAnisotropyEdens(dst *data.Slice) {
+	B, r := B_anis.Slice()
+	if r {
+		defer cuda.Recycle(B)
+	}
+	prefac := float32(-0.5 * cellVolume() * mag.Mu0)
+	cuda.AddDotProduct(dst, prefac, B, M.Buffer(), geometry.Gpu())
 }
 
 // dst = a/b, unless b == 0

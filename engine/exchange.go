@@ -5,25 +5,28 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"math"
 	"unsafe"
 )
 
 var (
-	Aex    ScalarParam // Exchange stiffness
-	Dex    VectorParam // DMI strength
-	B_exch adder       // exchange field (T) output handle
-	lex2   exchParam   // inter-cell exchange length squared * 1e18
-	E_exch *GetScalar
+	Aex        ScalarParam // Exchange stiffness
+	Dex        VectorParam // DMI strength
+	B_exch     adder       // exchange field (T) output handle
+	lex2       exchParam   // inter-cell exchange length squared * 1e18
+	E_exch     *GetScalar
+	Edens_exch adder
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
 	B_exch.init(VECTOR, "B_exch", "T", "Exchange field", AddExchangeField)
-	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", getExchangeEnergy)
-	registerEnergy(getExchangeEnergy)
+	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
+	Edens_exch.init(SCALAR, "Edens_exch", "J/m3", "Exchange energy density (normal+DM)", AddExchangeEdens)
+	registerEnergy(GetExchangeEnergy, AddExchangeEdens)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 }
@@ -49,8 +52,17 @@ func AddExchangeField(dst *data.Slice) {
 // Note: the energy is defined up to an arbitrary constant,
 // ground state energy is not necessarily zero or comparable
 // to other simulation programs.
-func getExchangeEnergy() float64 {
+func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
+}
+
+func AddExchangeEdens(dst *data.Slice) {
+	B, r := B_exch.Slice()
+	if r {
+		defer cuda.Recycle(B)
+	}
+	prefactor := float32(-0.5 * mag.Mu0)
+	cuda.AddDotProduct(dst, prefactor, B, M.Buffer(), geometry.Gpu())
 }
 
 // Defines the exchange coupling between different regions by specifying the

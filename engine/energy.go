@@ -1,15 +1,20 @@
 package engine
 
-import "github.com/mumax/3/cuda"
+import (
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/data"
+)
 
 var (
-	energyTerms []func() float64 // all contributions to total energy
+	energyTerms []func() float64    // all contributions to total energy
+	edensTerms  []func(*data.Slice) // all contributions to total energy density (add to dst)
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
 )
 
 // add energy term to global energy
-func registerEnergy(term func() float64) {
+func registerEnergy(term func() float64, dens func(*data.Slice)) {
 	energyTerms = append(energyTerms, term)
+	edensTerms = append(edensTerms, dens)
 }
 
 // Returns the total energy in J.

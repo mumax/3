@@ -1,7 +1,6 @@
 package mag
 
 import (
-	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"math"
@@ -23,7 +22,6 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	size := mesh.Size()
 	cellsize := mesh.CellSize()
 	pbc := mesh.PBC()
-	fmt.Print("calculating demag kernel")
 
 	// Sanity check
 	{
@@ -171,7 +169,6 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			}
 		}
 	}
-	fmt.Println()
 	// for 2D these elements are zero:
 	if size[0] == 1 {
 		kernel[0][1] = nil

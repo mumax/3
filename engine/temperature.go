@@ -23,7 +23,8 @@ func init() {
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
 	B_therm.init(3, "B_therm", "T", "Thermal field", AddThermalField)
 	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", GetThermalEnergy)
-	registerEnergy(GetThermalEnergy, AddThermalEdens)
+	Edens_therm.init(SCALAR, "Edens_therm", "J/m3", "Thermal energy density", addEdens(&B_therm, -1))
+	registerEnergy(GetThermalEnergy, Edens_therm.AddTo)
 
 	// reduced temperature = (alpha * T) / (mu0 * Msat)
 	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedParam) {
@@ -63,15 +64,6 @@ func AddThermalField(dst *data.Slice) {
 
 func GetThermalEnergy() float64 {
 	return -cellVolume() * dot(&M_full, &B_therm)
-}
-
-func AddThermalEdens(dst *data.Slice) {
-	B, r := B_therm.Slice()
-	if r {
-		defer cuda.Recycle(B)
-	}
-	prefactor := float32(-mag.Mu0)
-	cuda.AddDotProduct(dst, prefactor, B, M.Buffer(), geometry.Gpu())
 }
 
 // Seeds the thermal noise generator

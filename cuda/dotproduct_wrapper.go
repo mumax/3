@@ -21,13 +21,12 @@ type dotproduct_args struct {
 	arg_bx        unsafe.Pointer
 	arg_by        unsafe.Pointer
 	arg_bz        unsafe.Pointer
-	arg_vol       unsafe.Pointer
 	arg_N         int
-	argptr        [10]unsafe.Pointer
+	argptr        [9]unsafe.Pointer
 }
 
 // Wrapper for dotproduct CUDA kernel, asynchronous.
-func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config, str cu.Stream) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -54,10 +53,8 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_by)
 	_a_.arg_bz = bz
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_bz)
-	_a_.arg_vol = vol
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_vol)
 	_a_.arg_N = N
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_N)
+	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
 	cu.LaunchKernel(dotproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
@@ -68,9 +65,9 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 }
 
 // Wrapper for dotproduct CUDA kernel, synchronized.
-func k_dotproduct_sync(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config) {
+func k_dotproduct_sync(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config) {
 	Sync()
-	k_dotproduct_async(dst, prefactor, ax, ay, az, bx, by, bz, vol, N, cfg, stream0)
+	k_dotproduct_async(dst, prefactor, ax, ay, az, bx, by, bz, N, cfg, stream0)
 	Sync()
 }
 
@@ -95,34 +92,31 @@ const (
 	.param .u64 dotproduct_param_5,
 	.param .u64 dotproduct_param_6,
 	.param .u64 dotproduct_param_7,
-	.param .u64 dotproduct_param_8,
-	.param .u32 dotproduct_param_9
+	.param .u32 dotproduct_param_8
 )
 {
-	.reg .pred 	%p<3>;
+	.reg .pred 	%p<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<18>;
-	.reg .s64 	%rd<27>;
+	.reg .f32 	%f<13>;
+	.reg .s64 	%rd<23>;
 
 
-	ld.param.u64 	%rd10, [dotproduct_param_0];
-	ld.param.f32 	%f3, [dotproduct_param_1];
-	ld.param.u64 	%rd11, [dotproduct_param_2];
-	ld.param.u64 	%rd12, [dotproduct_param_3];
-	ld.param.u64 	%rd13, [dotproduct_param_4];
-	ld.param.u64 	%rd14, [dotproduct_param_5];
-	ld.param.u64 	%rd15, [dotproduct_param_6];
-	ld.param.u64 	%rd16, [dotproduct_param_7];
-	ld.param.u64 	%rd9, [dotproduct_param_8];
-	ld.param.u32 	%r2, [dotproduct_param_9];
-	cvta.to.global.u64 	%rd1, %rd10;
-	cvta.to.global.u64 	%rd2, %rd16;
-	cvta.to.global.u64 	%rd3, %rd15;
-	cvta.to.global.u64 	%rd4, %rd14;
-	cvta.to.global.u64 	%rd5, %rd13;
-	cvta.to.global.u64 	%rd6, %rd12;
-	cvta.to.global.u64 	%rd7, %rd11;
-	cvta.to.global.u64 	%rd8, %rd9;
+	ld.param.u64 	%rd8, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd9, [dotproduct_param_2];
+	ld.param.u64 	%rd10, [dotproduct_param_3];
+	ld.param.u64 	%rd11, [dotproduct_param_4];
+	ld.param.u64 	%rd12, [dotproduct_param_5];
+	ld.param.u64 	%rd13, [dotproduct_param_6];
+	ld.param.u64 	%rd14, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	cvta.to.global.u64 	%rd1, %rd8;
+	cvta.to.global.u64 	%rd2, %rd14;
+	cvta.to.global.u64 	%rd3, %rd13;
+	cvta.to.global.u64 	%rd4, %rd12;
+	cvta.to.global.u64 	%rd5, %rd11;
+	cvta.to.global.u64 	%rd6, %rd10;
+	cvta.to.global.u64 	%rd7, %rd9;
 	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -133,55 +127,40 @@ const (
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_5;
+	@%p1 bra 	BB0_2;
 
-	.loc 1 13 1
-	setp.ne.s64	%p2, %rd9, 0;
-	@%p2 bra 	BB0_3;
-
-	mov.f32 	%f17, 0f3F800000;
-	bra.uni 	BB0_4;
-
-BB0_3:
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd8, %rd17;
-	.loc 1 13 1
-	ld.global.f32 	%f17, [%rd18];
-
-BB0_4:
-	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd7, %rd19;
-	add.s64 	%rd21, %rd6, %rd19;
-	add.s64 	%rd22, %rd5, %rd19;
-	add.s64 	%rd23, %rd4, %rd19;
-	add.s64 	%rd24, %rd3, %rd19;
-	add.s64 	%rd25, %rd2, %rd19;
-	.loc 1 15 1
-	ld.global.f32 	%f5, [%rd23];
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd7, %rd15;
+	add.s64 	%rd17, %rd6, %rd15;
+	add.s64 	%rd18, %rd5, %rd15;
+	add.s64 	%rd19, %rd4, %rd15;
+	add.s64 	%rd20, %rd3, %rd15;
+	add.s64 	%rd21, %rd2, %rd15;
 	.loc 1 14 1
-	ld.global.f32 	%f6, [%rd20];
+	ld.global.f32 	%f2, [%rd19];
+	.loc 1 13 1
+	ld.global.f32 	%f3, [%rd16];
+	.loc 1 14 1
+	ld.global.f32 	%f4, [%rd20];
+	.loc 1 13 1
+	ld.global.f32 	%f5, [%rd17];
 	.loc 1 15 1
-	ld.global.f32 	%f7, [%rd24];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
 	.loc 1 14 1
 	ld.global.f32 	%f8, [%rd21];
-	.loc 1 16 1
-	mul.f32 	%f9, %f8, %f7;
-	fma.rn.f32 	%f10, %f6, %f5, %f9;
+	.loc 1 13 1
+	ld.global.f32 	%f9, [%rd18];
 	.loc 1 15 1
-	ld.global.f32 	%f11, [%rd25];
-	.loc 1 14 1
-	ld.global.f32 	%f12, [%rd22];
-	.loc 1 16 1
-	fma.rn.f32 	%f13, %f12, %f11, %f10;
-	mul.f32 	%f14, %f17, %f3;
-	add.s64 	%rd26, %rd1, %rd19;
-	.loc 1 16 1
-	ld.global.f32 	%f15, [%rd26];
-	fma.rn.f32 	%f16, %f14, %f13, %f15;
-	st.global.f32 	[%rd26], %f16;
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	add.s64 	%rd22, %rd1, %rd15;
+	.loc 1 15 1
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
 
-BB0_5:
-	.loc 1 18 2
+BB0_2:
+	.loc 1 17 2
 	ret;
 }
 
@@ -202,34 +181,31 @@ BB0_5:
 	.param .u64 dotproduct_param_5,
 	.param .u64 dotproduct_param_6,
 	.param .u64 dotproduct_param_7,
-	.param .u64 dotproduct_param_8,
-	.param .u32 dotproduct_param_9
+	.param .u32 dotproduct_param_8
 )
 {
-	.reg .pred 	%p<3>;
+	.reg .pred 	%p<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<18>;
-	.reg .s64 	%rd<27>;
+	.reg .f32 	%f<13>;
+	.reg .s64 	%rd<23>;
 
 
-	ld.param.u64 	%rd10, [dotproduct_param_0];
-	ld.param.f32 	%f3, [dotproduct_param_1];
-	ld.param.u64 	%rd11, [dotproduct_param_2];
-	ld.param.u64 	%rd12, [dotproduct_param_3];
-	ld.param.u64 	%rd13, [dotproduct_param_4];
-	ld.param.u64 	%rd14, [dotproduct_param_5];
-	ld.param.u64 	%rd15, [dotproduct_param_6];
-	ld.param.u64 	%rd16, [dotproduct_param_7];
-	ld.param.u64 	%rd9, [dotproduct_param_8];
-	ld.param.u32 	%r2, [dotproduct_param_9];
-	cvta.to.global.u64 	%rd1, %rd10;
-	cvta.to.global.u64 	%rd2, %rd16;
-	cvta.to.global.u64 	%rd3, %rd15;
-	cvta.to.global.u64 	%rd4, %rd14;
-	cvta.to.global.u64 	%rd5, %rd13;
-	cvta.to.global.u64 	%rd6, %rd12;
-	cvta.to.global.u64 	%rd7, %rd11;
-	cvta.to.global.u64 	%rd8, %rd9;
+	ld.param.u64 	%rd8, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd9, [dotproduct_param_2];
+	ld.param.u64 	%rd10, [dotproduct_param_3];
+	ld.param.u64 	%rd11, [dotproduct_param_4];
+	ld.param.u64 	%rd12, [dotproduct_param_5];
+	ld.param.u64 	%rd13, [dotproduct_param_6];
+	ld.param.u64 	%rd14, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	cvta.to.global.u64 	%rd1, %rd8;
+	cvta.to.global.u64 	%rd2, %rd14;
+	cvta.to.global.u64 	%rd3, %rd13;
+	cvta.to.global.u64 	%rd4, %rd12;
+	cvta.to.global.u64 	%rd5, %rd11;
+	cvta.to.global.u64 	%rd6, %rd10;
+	cvta.to.global.u64 	%rd7, %rd9;
 	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -240,55 +216,40 @@ BB0_5:
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_5;
+	@%p1 bra 	BB0_2;
 
-	.loc 1 13 1
-	setp.ne.s64	%p2, %rd9, 0;
-	@%p2 bra 	BB0_3;
-
-	mov.f32 	%f17, 0f3F800000;
-	bra.uni 	BB0_4;
-
-BB0_3:
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd8, %rd17;
-	.loc 1 13 1
-	ld.global.f32 	%f17, [%rd18];
-
-BB0_4:
-	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd7, %rd19;
-	add.s64 	%rd21, %rd6, %rd19;
-	add.s64 	%rd22, %rd5, %rd19;
-	add.s64 	%rd23, %rd4, %rd19;
-	add.s64 	%rd24, %rd3, %rd19;
-	add.s64 	%rd25, %rd2, %rd19;
-	.loc 1 15 1
-	ld.global.f32 	%f5, [%rd23];
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd7, %rd15;
+	add.s64 	%rd17, %rd6, %rd15;
+	add.s64 	%rd18, %rd5, %rd15;
+	add.s64 	%rd19, %rd4, %rd15;
+	add.s64 	%rd20, %rd3, %rd15;
+	add.s64 	%rd21, %rd2, %rd15;
 	.loc 1 14 1
-	ld.global.f32 	%f6, [%rd20];
+	ld.global.f32 	%f2, [%rd19];
+	.loc 1 13 1
+	ld.global.f32 	%f3, [%rd16];
+	.loc 1 14 1
+	ld.global.f32 	%f4, [%rd20];
+	.loc 1 13 1
+	ld.global.f32 	%f5, [%rd17];
 	.loc 1 15 1
-	ld.global.f32 	%f7, [%rd24];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
 	.loc 1 14 1
 	ld.global.f32 	%f8, [%rd21];
-	.loc 1 16 1
-	mul.f32 	%f9, %f8, %f7;
-	fma.rn.f32 	%f10, %f6, %f5, %f9;
+	.loc 1 13 1
+	ld.global.f32 	%f9, [%rd18];
 	.loc 1 15 1
-	ld.global.f32 	%f11, [%rd25];
-	.loc 1 14 1
-	ld.global.f32 	%f12, [%rd22];
-	.loc 1 16 1
-	fma.rn.f32 	%f13, %f12, %f11, %f10;
-	mul.f32 	%f14, %f17, %f3;
-	add.s64 	%rd26, %rd1, %rd19;
-	.loc 1 16 1
-	ld.global.f32 	%f15, [%rd26];
-	fma.rn.f32 	%f16, %f14, %f13, %f15;
-	st.global.f32 	[%rd26], %f16;
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	add.s64 	%rd22, %rd1, %rd15;
+	.loc 1 15 1
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
 
-BB0_5:
-	.loc 1 18 2
+BB0_2:
+	.loc 1 17 2
 	ret;
 }
 
@@ -337,34 +298,31 @@ BB0_5:
 	.param .u64 dotproduct_param_5,
 	.param .u64 dotproduct_param_6,
 	.param .u64 dotproduct_param_7,
-	.param .u64 dotproduct_param_8,
-	.param .u32 dotproduct_param_9
+	.param .u32 dotproduct_param_8
 )
 {
-	.reg .pred 	%p<3>;
+	.reg .pred 	%p<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<18>;
-	.reg .s64 	%rd<27>;
+	.reg .f32 	%f<13>;
+	.reg .s64 	%rd<23>;
 
 
-	ld.param.u64 	%rd10, [dotproduct_param_0];
-	ld.param.f32 	%f3, [dotproduct_param_1];
-	ld.param.u64 	%rd11, [dotproduct_param_2];
-	ld.param.u64 	%rd12, [dotproduct_param_3];
-	ld.param.u64 	%rd13, [dotproduct_param_4];
-	ld.param.u64 	%rd14, [dotproduct_param_5];
-	ld.param.u64 	%rd15, [dotproduct_param_6];
-	ld.param.u64 	%rd16, [dotproduct_param_7];
-	ld.param.u64 	%rd9, [dotproduct_param_8];
-	ld.param.u32 	%r2, [dotproduct_param_9];
-	cvta.to.global.u64 	%rd1, %rd10;
-	cvta.to.global.u64 	%rd2, %rd16;
-	cvta.to.global.u64 	%rd3, %rd15;
-	cvta.to.global.u64 	%rd4, %rd14;
-	cvta.to.global.u64 	%rd5, %rd13;
-	cvta.to.global.u64 	%rd6, %rd12;
-	cvta.to.global.u64 	%rd7, %rd11;
-	cvta.to.global.u64 	%rd8, %rd9;
+	ld.param.u64 	%rd8, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd9, [dotproduct_param_2];
+	ld.param.u64 	%rd10, [dotproduct_param_3];
+	ld.param.u64 	%rd11, [dotproduct_param_4];
+	ld.param.u64 	%rd12, [dotproduct_param_5];
+	ld.param.u64 	%rd13, [dotproduct_param_6];
+	ld.param.u64 	%rd14, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	cvta.to.global.u64 	%rd1, %rd8;
+	cvta.to.global.u64 	%rd2, %rd14;
+	cvta.to.global.u64 	%rd3, %rd13;
+	cvta.to.global.u64 	%rd4, %rd12;
+	cvta.to.global.u64 	%rd5, %rd11;
+	cvta.to.global.u64 	%rd6, %rd10;
+	cvta.to.global.u64 	%rd7, %rd9;
 	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -375,55 +333,40 @@ BB0_5:
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_5;
+	@%p1 bra 	BB2_2;
 
-	.loc 1 13 1
-	setp.ne.s64	%p2, %rd9, 0;
-	@%p2 bra 	BB2_3;
-
-	mov.f32 	%f17, 0f3F800000;
-	bra.uni 	BB2_4;
-
-BB2_3:
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd8, %rd17;
-	.loc 1 13 1
-	ld.global.nc.f32 	%f17, [%rd18];
-
-BB2_4:
-	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd7, %rd19;
-	add.s64 	%rd21, %rd6, %rd19;
-	add.s64 	%rd22, %rd5, %rd19;
-	add.s64 	%rd23, %rd4, %rd19;
-	add.s64 	%rd24, %rd3, %rd19;
-	add.s64 	%rd25, %rd2, %rd19;
-	.loc 1 15 1
-	ld.global.nc.f32 	%f5, [%rd23];
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd7, %rd15;
+	add.s64 	%rd17, %rd6, %rd15;
+	add.s64 	%rd18, %rd5, %rd15;
+	add.s64 	%rd19, %rd4, %rd15;
+	add.s64 	%rd20, %rd3, %rd15;
+	add.s64 	%rd21, %rd2, %rd15;
 	.loc 1 14 1
-	ld.global.nc.f32 	%f6, [%rd20];
+	ld.global.nc.f32 	%f2, [%rd19];
+	.loc 1 13 1
+	ld.global.nc.f32 	%f3, [%rd16];
+	.loc 1 14 1
+	ld.global.nc.f32 	%f4, [%rd20];
+	.loc 1 13 1
+	ld.global.nc.f32 	%f5, [%rd17];
 	.loc 1 15 1
-	ld.global.nc.f32 	%f7, [%rd24];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
 	.loc 1 14 1
 	ld.global.nc.f32 	%f8, [%rd21];
-	.loc 1 16 1
-	mul.f32 	%f9, %f8, %f7;
-	fma.rn.f32 	%f10, %f6, %f5, %f9;
+	.loc 1 13 1
+	ld.global.nc.f32 	%f9, [%rd18];
 	.loc 1 15 1
-	ld.global.nc.f32 	%f11, [%rd25];
-	.loc 1 14 1
-	ld.global.nc.f32 	%f12, [%rd22];
-	.loc 1 16 1
-	fma.rn.f32 	%f13, %f12, %f11, %f10;
-	mul.f32 	%f14, %f17, %f3;
-	add.s64 	%rd26, %rd1, %rd19;
-	.loc 1 16 1
-	ld.global.f32 	%f15, [%rd26];
-	fma.rn.f32 	%f16, %f14, %f13, %f15;
-	st.global.f32 	[%rd26], %f16;
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	add.s64 	%rd22, %rd1, %rd15;
+	.loc 1 15 1
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
 
-BB2_5:
-	.loc 1 18 2
+BB2_2:
+	.loc 1 17 2
 	ret;
 }
 

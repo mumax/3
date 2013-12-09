@@ -56,3 +56,20 @@ func cellVolume() float64 {
 	c := Mesh().CellSize()
 	return c[0] * c[1] * c[2]
 }
+
+// returns a function that adds to dst the energy density:
+// 	prefactor * dot (M_full, field)
+func addEdens(field Slicer, prefactor float64) func(*data.Slice) {
+	return func(dst *data.Slice) {
+		B, r1 := field.Slice()
+		if r1 {
+			defer cuda.Recycle(B)
+		}
+		m, r2 := M_full.Slice()
+		if r2 {
+			defer cuda.Recycle(m)
+		}
+		factor := float32(prefactor)
+		cuda.AddDotProduct(dst, factor, B, m)
+	}
+}

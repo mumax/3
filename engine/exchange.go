@@ -5,7 +5,6 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"math"
 	"unsafe"
@@ -25,8 +24,8 @@ func init() {
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
 	B_exch.init(VECTOR, "B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
-	Edens_exch.init(SCALAR, "Edens_exch", "J/m3", "Exchange energy density (normal+DM)", AddExchangeEdens)
-	registerEnergy(GetExchangeEnergy, AddExchangeEdens)
+	Edens_exch.init(SCALAR, "Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
+	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()
 }
@@ -54,15 +53,6 @@ func AddExchangeField(dst *data.Slice) {
 // to other simulation programs.
 func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
-}
-
-func AddExchangeEdens(dst *data.Slice) {
-	B, r := B_exch.Slice()
-	if r {
-		defer cuda.Recycle(B)
-	}
-	prefactor := float32(-0.5 * mag.Mu0)
-	cuda.AddDotProduct(dst, prefactor, B, M.Buffer(), geometry.Gpu())
 }
 
 // Defines the exchange coupling between different regions by specifying the

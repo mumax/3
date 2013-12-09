@@ -24,8 +24,8 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	B_demag.init(VECTOR, "B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
-	Edens_demag.init(SCALAR, "Edens_demag", "J/m3", "Exchange energy density (normal+DM)", AddExchangeEdens)
-	registerEnergy(GetDemagEnergy, AddDemagEdens)
+	Edens_demag.init(SCALAR, "Edens_demag", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_demag, -0.5))
+	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)
 
 	//Bsat = Msat * mu0
 	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedParam) {
@@ -70,13 +70,4 @@ func demagConv() *cuda.DemagConvolution {
 // Returns the current demag energy in Joules.
 func GetDemagEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_demag)
-}
-
-func AddDemagEdens(dst *data.Slice) {
-	B, r := B_demag.Slice()
-	if r {
-		defer cuda.Recycle(B)
-	}
-	prefactor := float32(-0.5 * mag.Mu0)
-	cuda.AddDotProduct(dst, prefactor, B, M.Buffer(), geometry.Gpu())
 }

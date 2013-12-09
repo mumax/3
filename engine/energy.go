@@ -9,7 +9,12 @@ var (
 	energyTerms []func() float64    // all contributions to total energy
 	edensTerms  []func(*data.Slice) // all contributions to total energy density (add to dst)
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
+	Edens_total setter
 )
+
+func init() {
+	Edens_total.init(SCALAR, "Edens_total", "J/m3", "Total energy density", SetTotalEdens)
+}
 
 // add energy term to global energy
 func registerEnergy(term func() float64, dens func(*data.Slice)) {
@@ -24,6 +29,13 @@ func GetTotalEnergy() float64 {
 		E += f()
 	}
 	return E
+}
+
+func SetTotalEdens(dst *data.Slice) {
+	cuda.Zero(dst)
+	for _, addTerm := range edensTerms {
+		addTerm(dst)
+	}
 }
 
 // vector dot product

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "stencil.h"
 #include "float3.h"
 
@@ -12,7 +13,7 @@ extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
        float Dx, float Dy, float Dz, float A,
-       float cx, float cy, float cz, int Nx, int Ny, int Nz) {
+       float cx, float cy, float cz, int Nx, int Ny, int Nz, uint8_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -25,6 +26,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     int I = idx(ix, iy, iz);                     // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
     float3 m = make_float3(mx[I], my[I], mz[I]); // central m
+    int i_;
 
     // x derivatives (along length)
     {
@@ -32,13 +34,14 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         float3 m2 = make_float3(0.0f, 0.0f, 0.0f); // right neighbor
 
         // load neighbor m if inside grid, 0 otherwise
-        if (ix-1 >= 0) {
-            int i = idx(ix-1, iy, iz);
-            m1 = make_float3(mx[i], my[i], mz[i]);
+        i_ = idx(lclampx(ix-1), iy, iz);
+        if (ix-1 >= 0 || PBCx) {
+            m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        if (ix+1 < Nx) {
-            int i = idx(ix+1, iy, iz);
-            m2 = make_float3(mx[i], my[i], mz[i]);
+
+        i_ = idx(hclampx(ix+1), iy, iz);
+        if (ix+1 < Nx || PBCx) {
+            m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
 
         // BC's for zero cells (either due to grid or hole boundaries)
@@ -65,13 +68,14 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
         float3 m2 = make_float3(0.0f, 0.0f, 0.0f);
 
-        if (iy-1 >= 0) {
-            int i = idx(ix, iy-1, iz);
-            m1 = make_float3(mx[i], my[i], mz[i]);
+        i_ = idx(ix, lclampy(iy-1), iz);
+        if (iy-1 >= 0 || PBCy) {
+            m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        if (iy+1 < Ny) {
-            int i = idx(ix, iy+1, iz);
-            m2 = make_float3(mx[i], my[i], mz[i]);
+
+        i_ = idx(ix, hclampy(iy+1), iz);
+        if  (iy+1 < Ny || PBCy) {
+            m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
 
         float Dy_2A = (Dy/(2.0f*A));

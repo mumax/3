@@ -39,7 +39,6 @@ func AddExchangeField(dst *data.Slice) {
 		// interaction not clear with space-dependent parameters
 		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
 			"DMI: Msat, Aex, Dex must be uniform")
-		util.AssertMsg(Mesh().PBC_code() == 0, "No PBC for DMI")
 		msat := Msat.GetRegion(0)
 		D := Dex.GetRegion(0)
 		A := Aex.GetRegion(0) / msat

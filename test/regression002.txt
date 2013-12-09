@@ -36,7 +36,7 @@ defregion(1, spot)
 run(0.5e-9)
 
 m_ := average(m.region(1))
-tol := 1e-5
+tol := 2e-3
 expect("mx", m_[0], -0.4543135506766183, tol)
 expect("my", m_[1],  0.8869750613257998, tol)
 expect("mz", m_[2],  0.0804117293584914, tol)

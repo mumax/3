@@ -5,7 +5,6 @@
 // indexing in symmetric matrix
 #define symidx(i, j) ( (j<=i)? ( (((i)*((i)+1)) /2 )+(j) )  :  ( (((j)*((j)+1)) /2 )+(i) ) )
 
-#define is0(m) ( dot(m, m) == 0.0f )
 
 // m is normalized.
 // See exchange.go for more details.

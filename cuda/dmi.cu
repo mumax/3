@@ -28,6 +28,10 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     float3 m0 = make_float3(mx[I], my[I], mz[I]); // central m
     int i_;
 
+    if(is0(m0)) {
+        return;
+    }
+
     // x derivatives (along length)
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f); // left neighbor
@@ -46,12 +50,12 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
         // BC's for zero cells (either due to grid or hole boundaries)
         float Dx_2A = (Dx/(2.0f*A));
-        if (dot(m1, m1) == 0.0f) {             // left neigbor missing
+        if (is0(m1)) {             // left neigbor missing
             m1.x = m0.x - (-cx * Dx_2A * m0.z);  // extrapolate to left (-cx)
             m1.y = m0.y;
             m1.z = m0.z + (-cx * Dx_2A * m0.x);
         }
-        if (dot(m2, m2) == 0.0f) {            // right neigbor missing
+        if (is0(m2)) {            // right neigbor missing
             m2.x = m0.x - (cx * Dx_2A * m0.z);  // extrapolate to right (+cx)
             m2.y = m0.y;
             m2.z = m0.z + (cx * Dx_2A * m0.x);
@@ -79,12 +83,12 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         }
 
         float Dy_2A = (Dy/(2.0f*A));
-        if (dot(m1, m1) == 0.0f) {
+        if (is0(m1)) {
             m1.x = m0.x;
             m1.y = m0.y - (-cy * Dy_2A * m0.z);
             m1.z = m0.z + (-cy * Dy_2A * m0.y);
         }
-        if (dot(m2, m2) == 0.0f) {
+        if (is0(m2)) {
             m2.x = m0.x;
             m2.y = m0.y - (cy * Dy_2A * m0.z);
             m2.z = m0.z + (cy * Dy_2A * m0.y);

@@ -68,4 +68,6 @@ inline __device__ float sqr(float x){
 	return x * x;
 }
 
+#define is0(m) ( dot(m, m) == 0.0f )
+
 #endif

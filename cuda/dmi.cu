@@ -25,7 +25,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
     int I = idx(ix, iy, iz);                     // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]); // add to H
-    float3 m = make_float3(mx[I], my[I], mz[I]); // central m
+    float3 m0 = make_float3(mx[I], my[I], mz[I]); // central m
     int i_;
 
     // x derivatives (along length)
@@ -47,17 +47,17 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         // BC's for zero cells (either due to grid or hole boundaries)
         float Dx_2A = (Dx/(2.0f*A));
         if (dot(m1, m1) == 0.0f) {             // left neigbor missing
-            m1.x = m.x - (-cx * Dx_2A * m.z);  // extrapolate to left (-cx)
-            m1.y = m.y;
-            m1.z = m.z + (-cx * Dx_2A * m.x);
+            m1.x = m0.x - (-cx * Dx_2A * m0.z);  // extrapolate to left (-cx)
+            m1.y = m0.y;
+            m1.z = m0.z + (-cx * Dx_2A * m0.x);
         }
         if (dot(m2, m2) == 0.0f) {            // right neigbor missing
-            m2.x = m.x - (cx * Dx_2A * m.z);  // extrapolate to right (+cx)
-            m2.y = m.y;
-            m2.z = m.z + (cx * Dx_2A * m.x);
+            m2.x = m0.x - (cx * Dx_2A * m0.z);  // extrapolate to right (+cx)
+            m2.y = m0.y;
+            m2.z = m0.z + (cx * Dx_2A * m0.x);
         }
 
-        h   += (2.0f*A/(cx*cx)) * ((m1 - m) + (m2 - m)); // exchange
+        h   += (2.0f*A/(cx*cx)) * ((m1 - m0) + (m2 - m0)); // exchange
         h.x += Dx*(m2.z-m1.z)/cx;
         h.z -= Dx*(m2.x-m1.x)/cx;
         // note: actually 2*D * delta / (2*c)
@@ -80,17 +80,17 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 
         float Dy_2A = (Dy/(2.0f*A));
         if (dot(m1, m1) == 0.0f) {
-            m1.x = m.x;
-            m1.y = m.y - (-cy * Dy_2A * m.z);
-            m1.z = m.z + (-cy * Dy_2A * m.y);
+            m1.x = m0.x;
+            m1.y = m0.y - (-cy * Dy_2A * m0.z);
+            m1.z = m0.z + (-cy * Dy_2A * m0.y);
         }
         if (dot(m2, m2) == 0.0f) {
-            m2.x = m.x;
-            m2.y = m.y - (cy * Dy_2A * m.z);
-            m2.z = m.z + (cy * Dy_2A * m.y);
+            m2.x = m0.x;
+            m2.y = m0.y - (cy * Dy_2A * m0.z);
+            m2.z = m0.z + (cy * Dy_2A * m0.y);
         }
 
-        h   += (2.0f*A/(cy*cy)) * ((m1 - m) + (m2 - m));
+        h   += (2.0f*A/(cy*cy)) * ((m1 - m0) + (m2 - m0));
         h.y += Dy*(m2.z-m1.z)/cy;
         h.z -= Dy*(m2.y-m1.y)/cy;
     }

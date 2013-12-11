@@ -118,7 +118,13 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 
 // Wraps an index to [0, max] (python-like modulus)
 func wrap(number, max int) int {
-	return ((number % max) + max) % max
+	for number < 0 {
+		number += max
+	}
+	for number >= max {
+		number -= max
+	}
+	return number
 }
 
 // generate sparse input data for testing the convolution.

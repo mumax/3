@@ -10,7 +10,8 @@ import (
 
 func init() {
 	DeclFunc("Uniform", Uniform, "Uniform magnetization in given direction")
-	DeclFunc("Vortex", Vortex, "Vortex magnetization with given core circulation and polarization")
+	DeclFunc("Vortex", Vortex, "Vortex magnetization with given circulation and core polarization")
+	DeclFunc("Skyrmion", Skyrmion, "Skyrmion magnetization with given circulation and core polarization")
 	DeclFunc("TwoDomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
@@ -52,6 +53,19 @@ func Vortex(circ, pol int) Config {
 		mx := -y * float64(circ) / r
 		my := x * float64(circ) / r
 		mz := 1.5 * float64(pol) * math.Exp(-r2/diam2)
+		return data.Vector{mx, my, mz}
+	}
+}
+
+func Skyrmion(circ, pol int) Config {
+	w := 8 * Mesh().CellSize()[X]
+	w2 := w * w
+	return func(x, y, z float64) data.Vector {
+		r2 := x*x + y*y
+		r := math.Sqrt(r2)
+		mz := 2*float64(pol)*math.Exp(-r2/w2) - 1
+		mx := (-y * float64(circ) / r) * (1 - math.Abs(mz))
+		my := (x * float64(circ) / r) * (1 - math.Abs(mz))
 		return data.Vector{mx, my, mz}
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/mumax/3/util"
 	"math"
 	"os"
+	"path"
 	"sort"
 	"strings"
 )
@@ -54,10 +55,13 @@ func ExpectV(msg string, have, want data.Vector, maxErr float64) {
 
 // Append msg to file. Used to write aggregated output of many simulations in one file.
 func Fprintln(filename string, msg ...interface{}) {
+	if !path.IsAbs(filename) {
+		filename = OD + "/" + filename
+	}
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	util.FatalErr(err)
 	defer f.Close()
-	_, err = fmt.Fprintln(f, msg...)
+	_, err = fmt.Fprintln(f, myFmt(msg)...)
 	util.FatalErr(err)
 }
 
@@ -83,19 +87,22 @@ func Download(q Slicer) *data.Slice {
 
 // print with special formatting for some known types
 func myprint(msg ...interface{}) {
-	for i, m := range msg {
+	LogOutput(myFmt(msg)...)
+}
 
+// mumax specific formatting (Slice -> average, etc).
+func myFmt(msg []interface{}) []interface{} {
+	for i, m := range msg {
 		if e, ok := m.(*float64); ok {
 			msg[i] = *e
 		}
-
 		// Tabledata: print average
 		if m, ok := m.(TableData); ok {
 			msg[i] = m.TableData()
 			continue
 		}
 	}
-	LogOutput(msg...)
+	return msg
 }
 
 // converts cell index to coordinate, internal coordinates

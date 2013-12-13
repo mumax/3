@@ -47,27 +47,22 @@ mask.setv, getv
 
 check region defined?
 
-load PNG geom (shape?)
 
 improvements:
 -------------
 
 save self-defined variable.
 
+resettable tables, multiple tables?
+
 MFM: don't crash on tip crash ;-), just zero kernel
 
-DMI: also work with PBC
-
-
-remove -f flag, move existing files to name.old
-fprintln: put file in OD if not absolute
 
 master process assigns ports (clean fail if port in use, start new instance on next port?) and GPU
 	web iface of master shows que?
 	mumax3 -que add to que, return?
 
 
-cuda: shift: memeset, don't clamp
 cuda.HostBuffer()
 non-fatal error handling for GUI
 log.FatalErr: print line number of caller?

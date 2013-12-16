@@ -25,7 +25,7 @@ func (q *sliceInRegion) Slice() (*data.Slice, bool) {
 		defer cuda.Recycle(src)
 	}
 	out := cuda.Buffer(q.NComp(), q.Mesh().Size())
-	cuda.RegionSelect(out, src, regions.Gpu(), byte(region))
+	cuda.RegionSelect(out, src, regions.Gpu(), byte(q.region))
 	return out, true
 
 }

@@ -1,0 +1,10 @@
+setgridsize(500, 250, 2)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+m = vortex(1, 1)
+
+defregion(1, circle(5e-9) )
+defregion(2, circle(5e-9).transl(200e-9, 0, 0 ))
+
+print(average(m.region(1)))
+print(average(m.region(2)))

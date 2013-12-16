@@ -44,6 +44,7 @@ func averageVolume(b, vol *data.Slice) []float64 {
 	return avg
 }
 
+// TODO: remove, make explicit
 type volumer interface {
 	volume() float64 // normalized volume where quantity is defined (0..1)
 }

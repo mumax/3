@@ -100,9 +100,11 @@ func main() {
 		var info data.Meta
 		var err error
 
-		if path.Ext(fname) == ".omf" {
+		ext := path.Ext(fname)
+		switch ext {
+		case ".omf", ".ovf":
 			slice, info, err = ReadOMF(fname)
-		} else {
+		default:
 			slice, info, err = data.ReadFile(fname)
 		}
 		if err != nil {
@@ -168,7 +170,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_gnuplot {
 		out := open(name + ".gplot")
 		defer out.Close()
-		dumpGnuplot(out, f)
+		dumpGnuplot(out, f, info)
 		haveOutput = true
 	}
 
@@ -189,7 +191,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_ovf2 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOvf2(out, f, *flag_ovf2, info)
+		data.DumpOvf2(out, f, *flag_ovf2, info)
 		haveOutput = true
 	}
 
@@ -244,7 +246,7 @@ func preprocess(f *data.Slice) {
 }
 
 func crop(f *data.Slice) {
-	N := f.Mesh().Size()
+	N := f.Size()
 	x1, x2 := 0, N[2]
 	y1, y2 := 0, N[1]
 	z1, z2 := 0, N[0]

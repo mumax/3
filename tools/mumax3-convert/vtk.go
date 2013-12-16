@@ -18,13 +18,13 @@ import (
 func dumpVTK(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) (err error) {
 	err = writeVTKHeader(out, q)
 	err = writeVTKCellData(out, q, meta, dataformat)
-	err = writeVTKPoints(out, q, dataformat)
+	err = writeVTKPoints(out, q, dataformat, meta)
 	err = writeVTKFooter(out)
 	return
 }
 
 func writeVTKHeader(out io.Writer, q *data.Slice) (err error) {
-	gridsize := q.Mesh().Size()
+	gridsize := q.Size()
 	_, err = fmt.Fprintln(out, "<?xml version=\"1.0\"?>")
 	_, err = fmt.Fprintln(out, "<VTKFile type=\"StructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">")
 	_, err = fmt.Fprintf(out, "\t<StructuredGrid WholeExtent=\"0 %d 0 %d 0 %d\">\n", gridsize[Z]-1, gridsize[Y]-1, gridsize[X]-1)
@@ -32,11 +32,11 @@ func writeVTKHeader(out io.Writer, q *data.Slice) (err error) {
 	return
 }
 
-func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string) (err error) {
+func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string, info data.Meta) (err error) {
 	_, err = fmt.Fprintln(out, "\t\t\t<Points>")
 	fmt.Fprintf(out, "\t\t\t\t<DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"%s\">\n\t\t\t\t\t", dataformat)
-	gridsize := q.Mesh().Size()
-	cellsize := q.Mesh().CellSize()
+	gridsize := q.Size()
+	cellsize := info.CellSize
 	switch dataformat {
 	case "ascii":
 		for k := 0; k < gridsize[X]; k++ {
@@ -94,7 +94,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 	default:
 		log.Fatalf("vtk: cannot handle %v components", N)
 	}
-	gridsize := q.Mesh().Size()
+	gridsize := q.Size()
 	switch dataformat {
 	case "ascii":
 		for i := 0; i < gridsize[X]; i++ {

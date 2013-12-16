@@ -10,13 +10,13 @@ import (
 	"io"
 )
 
-func dumpGnuplot(out io.Writer, f *data.Slice) (err error) {
+func dumpGnuplot(out io.Writer, f *data.Slice, m data.Meta) (err error) {
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
 
 	data := f.Tensors()
-	gridsize := f.Mesh().Size()
-	cellsize := f.Mesh().CellSize()
+	gridsize := f.Size()
+	cellsize := m.CellSize
 	// If no cell size is set, use generic cell index.
 	if cellsize == [3]float64{0, 0, 0} {
 		cellsize = [3]float64{1, 1, 1}

@@ -51,8 +51,8 @@ func writeOmfData(out io.Writer, q *data.Slice, dataformat string) (err error) {
 
 // Writes the OMF header
 func writeOmfHeader(out io.Writer, q *data.Slice, meta data.Meta) (err error) {
-	gridsize := q.Mesh().Size()
-	cellsize := q.Mesh().CellSize()
+	gridsize := q.Size()
+	cellsize := meta.CellSize
 
 	err = hdr(out, "OOMMF", "rectangular mesh v1.0")
 	hdr(out, "Segment count", "1")
@@ -91,7 +91,7 @@ func writeOmfHeader(out io.Writer, q *data.Slice, meta data.Meta) (err error) {
 // Writes data in OMF Binary 4 format
 func writeOmfBinary4(out io.Writer, array *data.Slice) (err error) {
 	data := array.Tensors()
-	gridsize := array.Mesh().Size()
+	gridsize := array.Size()
 
 	var bytes []byte
 
@@ -123,7 +123,7 @@ func writeOmfBinary4(out io.Writer, array *data.Slice) (err error) {
 func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
 
 	data := tens.Tensors()
-	gridsize := tens.Mesh().Size()
+	gridsize := tens.Size()
 	ncomp := tens.NComp()
 
 	// Here we loop over X,Y,Z, not Z,Y,X, because

@@ -23,8 +23,7 @@ func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
 	if c == [3]float32{0, 0, 0} {
 		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
 	}
-	mesh := data.NewMesh(n[X], n[Y], n[Z], float64(c[X]), float64(c[Y]), float64(c[Z]))
-	data_ := data.NewSlice(3, mesh)
+	data_ := data.NewSlice(3, n)
 
 	switch info.Format {
 	default:
@@ -79,7 +78,7 @@ func (i *Info) DescGetFloat32(key string) float32 {
 }
 
 func readDataText(in io.Reader, t *data.Slice) {
-	size := t.Mesh().Size()
+	size := t.Size()
 	data := t.Tensors()
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
@@ -96,7 +95,7 @@ func readDataText(in io.Reader, t *data.Slice) {
 }
 
 func readDataBinary4(in io.Reader, t *data.Slice) {
-	size := t.Mesh().Size()
+	size := t.Size()
 	data := t.Tensors()
 
 	var bytes4 [4]byte
@@ -135,6 +134,9 @@ func readDataBinary4(in io.Reader, t *data.Slice) {
 // INTERNAL: Splits "# key: value" into "key", "value"
 func parseHeaderLine(str string) (key, value string) {
 	strs := strings.SplitN(str, ":", 2)
+	if len(strs) != 2 {
+		panic(fmt.Sprint("illegal header entry:", str))
+	}
 	key = strings.Trim(strs[0], "# ")
 	value = strings.Trim(strs[1], "# ")
 	return

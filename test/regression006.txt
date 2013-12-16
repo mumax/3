@@ -1,0 +1,35 @@
+// Reported by Jonathan Leliaert
+// TODO: autocheck
+
+setgridsize(512, 128, 1)
+setcellsize(3.125e-9, 3.125e-9, 10e-9)
+
+Msat    = 860e3
+Aex     = 13e-12
+Xi      = 0.0
+m       = vortexwall(1,-1,1,1)
+
+
+// Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
+ext_rmSurfaceCharge(0, 1, -1)
+
+// Relax
+Alpha = 3    // high damping for fast relax
+RunWhile(MaxTorque > 1e-3)    // relax
+Alpha = 0.02 // restore normal damping
+
+// Set post-step function that centers simulation window on domain wall.
+ext_centerwall(0)
+ext_makegrains(4e-8, 10, 0) 
+
+for i :=0; i<10;i+=1{
+        for j :=i+1; j<10;j+=1{
+                SetExLen(i, j, 0.0) 
+        }
+}
+
+// Run the simulation with current through the sample
+Pol =0.56
+J    = vector(-10e12 , 0, 0)
+Run(1e-8)
+

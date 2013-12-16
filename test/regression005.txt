@@ -1,0 +1,22 @@
+// Reported by Pete Metaxas
+// TODO: autocheck
+
+Nx := 256
+Ny := 256
+Nz := 5
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(3e-9, 3e-9, 3e-9)
+
+defregion(1, Cylinder(192e-9,9e-9).Transl(0, 0, 3e-9))
+Msat.setRegion (1, 860e3)
+Aex.setRegion  (1, 13e-12)
+alpha.setRegion(1, 0.1)
+
+m.setRegion(1, vortex(1,1).transl(0,0,3e-9))
+
+saveas(m,"m.ini.dump")
+tableautosave(0.01e-9)
+SetSolver(2) //Adaptive Heun solver (default)
+MaxErr = 1e-4 //1e-4 (default)
+Run(0.001e-9)
+saveas(m,"m.fin.dump")

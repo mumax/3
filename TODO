@@ -20,8 +20,6 @@ However, make sure you also update mumax3-convert.
 
 
 
-
-
 bugs:
 -----
 
@@ -39,6 +37,8 @@ script: if w/o else crashes
 script: compile selector?
 
 upon resize auto refresh dispaly quits working
+
+setexlen not ok, also api, output
 
 API:
 ----

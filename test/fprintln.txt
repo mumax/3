@@ -1,0 +1,3 @@
+
+fprintln("out.log", "hello", "world")
+fprintln("out.log", t)

@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"log"
 )
 
 func init() {
@@ -39,6 +40,22 @@ func averageVolume(b, vol *data.Slice) []float64 {
 			avg[i] = float64(cuda.Sum(b.Comp(i))) / nCell
 		} else {
 			avg[i] = float64(cuda.Dot(b.Comp(i), vol)) / (spaceFill() * nCell)
+		}
+	}
+	return avg
+}
+
+func averageRegion(s *data.Slice, regionvolume float64) []float64 {
+	log.Println("regionvolume", regionvolume)
+	nComp := s.NComp()
+	nCell := float64(s.Len())
+	avg := make([]float64, nComp)
+	vol := geometry.Gpu()
+	for i := range avg {
+		if vol.IsNil() {
+			avg[i] = float64(cuda.Sum(s.Comp(i))) / (nCell * regionvolume)
+		} else {
+			avg[i] = float64(cuda.Dot(s.Comp(i), vol)) / (nCell * regionvolume)
 		}
 	}
 	return avg

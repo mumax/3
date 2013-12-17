@@ -19,6 +19,9 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 		panic(err(n.Pos(), "not allowed:", typ(n.Fun)))
 	case *ast.Ident: // function call
 		fname = Fun.Name
+		if fname == "source" {
+			return w.compileSource(n)
+		}
 		f = w.compileExpr(Fun)
 	case *ast.SelectorExpr: // method call
 		f = w.compileSelectorStmt(Fun)

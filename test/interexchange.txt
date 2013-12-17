@@ -13,7 +13,7 @@
 	m  = uniform(1, .1, 0)
 
 	lex := sqrt(2*Aex.GetRegion(0) / Msat.GetRegion(0))
-	setExLen(1, 2, 0)
+	setExLen(1, 2, lex)
 
 // relax
 	alpha = 3

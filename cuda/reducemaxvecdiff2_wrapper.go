@@ -27,7 +27,7 @@ type reducemaxvecdiff2_args struct {
 
 // Wrapper for reducemaxvecdiff2 CUDA kernel, asynchronous.
 func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.Pointer, x2 unsafe.Pointer, y2 unsafe.Pointer, z2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -59,7 +59,7 @@ func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.P
 	args := _a_.argptr[:]
 	cu.LaunchKernel(reducemaxvecdiff2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

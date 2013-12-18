@@ -26,7 +26,7 @@ type madd3_args struct {
 
 // Wrapper for madd3 CUDA kernel, asynchronous.
 func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -56,7 +56,7 @@ func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	args := _a_.argptr[:]
 	cu.LaunchKernel(madd3_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

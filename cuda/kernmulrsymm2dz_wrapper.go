@@ -22,7 +22,7 @@ type kernmulRSymm2Dz_args struct {
 
 // Wrapper for kernmulRSymm2Dz CUDA kernel, asynchronous.
 func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int, Ny int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -44,7 +44,7 @@ func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int
 	args := _a_.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

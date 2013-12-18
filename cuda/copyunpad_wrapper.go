@@ -26,7 +26,7 @@ type copyunpad_args struct {
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
 func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -56,7 +56,7 @@ func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Po
 	args := _a_.argptr[:]
 	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

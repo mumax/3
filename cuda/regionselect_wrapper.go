@@ -23,7 +23,7 @@ type regionselect_args struct {
 
 // Wrapper for regionselect CUDA kernel, asynchronous.
 func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -47,7 +47,7 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 	args := _a_.argptr[:]
 	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

@@ -30,7 +30,7 @@ type adduniaxialanisotropy_args struct {
 
 // Wrapper for adduniaxialanisotropy CUDA kernel, asynchronous.
 func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -68,7 +68,7 @@ func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsa
 	args := _a_.argptr[:]
 	cu.LaunchKernel(adduniaxialanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

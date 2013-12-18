@@ -24,7 +24,7 @@ type addtemperature_args struct {
 
 // Wrapper for addtemperature CUDA kernel, asynchronous.
 func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -50,7 +50,7 @@ func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 	args := _a_.argptr[:]
 	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

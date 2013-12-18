@@ -29,7 +29,7 @@ type resize_args struct {
 
 // Wrapper for resize CUDA kernel, asynchronous.
 func k_resize_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, layer int, scalex int, scaley int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -65,7 +65,7 @@ func k_resize_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Point
 	args := _a_.argptr[:]
 	cu.LaunchKernel(resize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

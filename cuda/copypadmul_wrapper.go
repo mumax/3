@@ -29,7 +29,7 @@ type copypadmul_args struct {
 
 // Wrapper for copypadmul CUDA kernel, asynchronous.
 func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, vol unsafe.Pointer, Sx int, Sy int, Sz int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -65,7 +65,7 @@ func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.P
 	args := _a_.argptr[:]
 	cu.LaunchKernel(copypadmul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

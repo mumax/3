@@ -55,14 +55,14 @@ func memCpy(dst, src unsafe.Pointer, bytes int64) {
 // Memset sets the Slice's components to the specified values.
 // To be carefully used on unified slice (need sync)
 func Memset(s *data.Slice, val ...float32) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 	util.Argument(len(val) == s.NComp())
 	for c, v := range val {
 		cu.MemsetD32Async(cu.DevicePtr(uintptr(s.DevPtr(c))), math.Float32bits(v), int64(s.Len()), stream0)
 	}
-	if synchronous { //debug
+	if Synchronous { //debug
 		Sync()
 	}
 }

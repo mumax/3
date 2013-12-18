@@ -22,7 +22,7 @@ type regiondecode_args struct {
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
 func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -44,7 +44,7 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	args := _a_.argptr[:]
 	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

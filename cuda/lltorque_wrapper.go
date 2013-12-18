@@ -30,7 +30,7 @@ type lltorque_args struct {
 
 // Wrapper for lltorque CUDA kernel, asynchronous.
 func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, alphaLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -68,7 +68,7 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 	args := _a_.argptr[:]
 	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

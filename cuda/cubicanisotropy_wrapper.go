@@ -33,7 +33,7 @@ type addcubicanisotropy_args struct {
 
 // Wrapper for addcubicanisotropy CUDA kernel, asynchronous.
 func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, C1xLUT unsafe.Pointer, C1yLUT unsafe.Pointer, C1zLUT unsafe.Pointer, C2xLUT unsafe.Pointer, C2yLUT unsafe.Pointer, C2zLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -77,7 +77,7 @@ func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.
 	args := _a_.argptr[:]
 	cu.LaunchKernel(addcubicanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

@@ -26,7 +26,7 @@ type shiftx_args struct {
 
 // Wrapper for shiftx CUDA kernel, asynchronous.
 func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clampL float32, clampR float32, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -56,7 +56,7 @@ func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz i
 	args := _a_.argptr[:]
 	cu.LaunchKernel(shiftx_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

@@ -36,7 +36,7 @@ type addslonczewskitorque_args struct {
 
 // Wrapper for addslonczewskitorque CUDA kernel, asynchronous.
 func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jz unsafe.Pointer, pxLUT unsafe.Pointer, pyLUT unsafe.Pointer, pzLUT unsafe.Pointer, msatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, flt float32, polLUT unsafe.Pointer, lambdaLUT unsafe.Pointer, epsilonPrimeLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -86,7 +86,7 @@ func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsaf
 	args := _a_.argptr[:]
 	cu.LaunchKernel(addslonczewskitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

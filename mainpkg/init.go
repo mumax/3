@@ -57,7 +57,8 @@ func Init() {
 	cuda.BlockSize = 512
 	cuda.TileX = 32
 	cuda.TileY = 32
-	cuda.Init(*flag_gpu, *flag_sync)
+	cuda.Init(*flag_gpu)
+	cuda.Synchronous = *flag_sync
 
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine

@@ -27,7 +27,7 @@ type dotproduct_args struct {
 
 // Wrapper for dotproduct CUDA kernel, asynchronous.
 func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -59,7 +59,7 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 	args := _a_.argptr[:]
 	cu.LaunchKernel(dotproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

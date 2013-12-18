@@ -22,7 +22,7 @@ type reducemaxabs_args struct {
 
 // Wrapper for reducemaxabs CUDA kernel, asynchronous.
 func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 
@@ -44,7 +44,7 @@ func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float3
 	args := _a_.argptr[:]
 	cu.LaunchKernel(reducemaxabs_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous { // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }

@@ -25,16 +25,19 @@ func (dst *Bytes) Upload(src []byte) {
 	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)), unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
+// copy: dst = src
 func (dst *Bytes) Copy(src *Bytes) {
 	util.Argument(dst.Len == src.Len)
 	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(src.Ptr)), int64(dst.Len))
 }
 
+// copy to host: dst = src
 func (src *Bytes) Download(dst []byte) {
 	util.Argument(src.Len == len(dst))
 	cu.MemcpyDtoH(unsafe.Pointer(&dst[0]), cu.DevicePtr(uintptr(src.Ptr)), int64(src.Len))
 }
 
+// Set one element to value
 func (dst *Bytes) Set(index int, value byte) {
 	src := value
 	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)+uintptr(index)), unsafe.Pointer(&src), 1)

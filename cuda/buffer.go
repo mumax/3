@@ -4,24 +4,18 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"log"
-	"sync"
 	"unsafe"
 )
 
 var (
-	buf_lock  sync.Mutex                  // TODO: redundant?
 	buf_pool  map[int][]unsafe.Pointer    // maps buffer size to pool
 	buf_check map[unsafe.Pointer]struct{} // check if pointer originates here
-	//buf_count int                         // total allocated buffers
 )
 
 const buf_max = 100 // maximum number of buffers to allocate
 
 // Returns a GPU slice for temporary use. To be returned to the pool with Recycle
 func Buffer(nComp int, size [3]int) *data.Slice {
-	buf_lock.Lock()
-	defer buf_lock.Unlock()
-
 	if buf_pool == nil {
 		buf_pool = make(map[int][]unsafe.Pointer)
 		buf_check = make(map[unsafe.Pointer]struct{})
@@ -38,7 +32,6 @@ func Buffer(nComp int, size [3]int) *data.Slice {
 	buf_pool[N] = pool[:len(pool)-nFromPool]
 
 	for i := nFromPool; i < nComp; i++ {
-		//log.Println("cuda: alloc buffer")
 		if len(buf_check) >= buf_max {
 			log.Panic("too many buffers in use, possible memory leak")
 		}
@@ -50,9 +43,6 @@ func Buffer(nComp int, size [3]int) *data.Slice {
 
 // Returns a buffer obtained from GetBuffer to the pool.
 func Recycle(s *data.Slice) {
-	buf_lock.Lock()
-	defer buf_lock.Unlock()
-
 	N := s.Len()
 	pool := buf_pool[N]
 	for i := 0; i < s.NComp(); i++ {

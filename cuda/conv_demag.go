@@ -55,10 +55,10 @@ func (c *DemagConvolution) init() {
 	{ // init device buffers
 		// 2D re-uses fftBuf[X] as fftBuf[Z], 3D needs all 3 fftBufs.
 		nc := fftR2COutputSizeFloats(c.kernSize)
-		c.fftCBuf[X] = makeFloats(nc)
-		c.fftCBuf[Y] = makeFloats(nc)
+		c.fftCBuf[X] = NewSlice(1, nc)
+		c.fftCBuf[Y] = NewSlice(1, nc)
 		if c.is3D() {
-			c.fftCBuf[Z] = makeFloats(nc)
+			c.fftCBuf[Z] = NewSlice(1, nc)
 		} else {
 			c.fftCBuf[Z] = c.fftCBuf[X]
 		}

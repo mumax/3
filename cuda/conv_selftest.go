@@ -21,7 +21,7 @@ func testConvolution(c *DemagConvolution, mesh *data.Mesh) {
 
 	regions := NewBytes(mesh.NCell())
 	defer regions.Free()
-	Bsat := makeFloats([3]int{1, 1, 256})
+	Bsat := NewSlice(1, [3]int{1, 1, 256})
 	defer Bsat.Free()
 	Memset(Bsat, 1)
 	BsatLUT := LUTPtr(Bsat.DevPtr(0))

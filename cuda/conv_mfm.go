@@ -46,12 +46,12 @@ func (c *MFMConvolution) init() {
 
 	// init device buffers
 	nc := fftR2COutputSizeFloats(c.kernSize)
-	c.fftCBuf = makeFloats(nc)
+	c.fftCBuf = NewSlice(1, nc)
 	c.fftRBuf = c.fftCBuf.Slice(0, prod(c.kernSize))
 
-	c.gpuFFTKern[X] = makeFloats(nc)
-	c.gpuFFTKern[Y] = makeFloats(nc)
-	c.gpuFFTKern[Z] = makeFloats(nc)
+	c.gpuFFTKern[X] = NewSlice(1, nc)
+	c.gpuFFTKern[Y] = NewSlice(1, nc)
+	c.gpuFFTKern[Z] = NewSlice(1, nc)
 
 	c.initFFTKern3D()
 }

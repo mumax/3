@@ -23,12 +23,6 @@ func (p *numberParam) IsUniform() bool         { return true }
 func (p *numberParam) Eval() interface{}       { return p.v }
 func (p *numberParam) Child() []script.Expr    { return nil }
 
-//func (p *numberParam) setRegion(r int, v []float64) {
-//
-//p.v = v[0]
-//
-//}
-
 func (p *numberParam) SetValue(v interface{}) {
 	p.v = v.(float64)
 	p.onSet()

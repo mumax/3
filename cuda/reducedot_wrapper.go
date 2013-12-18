@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for reducedot kernel
 var reducedot_code cu.Function
 
+// Stores the arguments for reducedot kernel invocation
 type reducedot_args_t struct {
 	arg_x1      unsafe.Pointer
 	arg_x2      unsafe.Pointer
@@ -23,15 +25,16 @@ type reducedot_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for reducedot kernel invocation
 var reducedot_args reducedot_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
 	reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
 	reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
 	reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
 	reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
-
 }
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
@@ -61,11 +64,13 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 	}
 }
 
+// maps compute capability on PTX code for reducedot kernel.
 var reducedot_map = map[int]string{0: "",
 	20: reducedot_ptx_20,
 	30: reducedot_ptx_30,
 	35: reducedot_ptx_35}
 
+// reducedot PTX code for various compute capabilities.
 const (
 	reducedot_ptx_20 = `
 .version 3.2

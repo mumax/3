@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for madd3 kernel
 var madd3_code cu.Function
 
+// Stores the arguments for madd3 kernel invocation
 type madd3_args_t struct {
 	arg_dst  unsafe.Pointer
 	arg_src1 unsafe.Pointer
@@ -26,9 +28,11 @@ type madd3_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for madd3 kernel invocation
 var madd3_args madd3_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	madd3_args.argptr[0] = unsafe.Pointer(&madd3_args.arg_dst)
 	madd3_args.argptr[1] = unsafe.Pointer(&madd3_args.arg_src1)
 	madd3_args.argptr[2] = unsafe.Pointer(&madd3_args.arg_fac1)
@@ -37,7 +41,6 @@ func init() {
 	madd3_args.argptr[5] = unsafe.Pointer(&madd3_args.arg_src3)
 	madd3_args.argptr[6] = unsafe.Pointer(&madd3_args.arg_fac3)
 	madd3_args.argptr[7] = unsafe.Pointer(&madd3_args.arg_N)
-
 }
 
 // Wrapper for madd3 CUDA kernel, asynchronous.
@@ -70,11 +73,13 @@ func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	}
 }
 
+// maps compute capability on PTX code for madd3 kernel.
 var madd3_map = map[int]string{0: "",
 	20: madd3_ptx_20,
 	30: madd3_ptx_30,
 	35: madd3_ptx_35}
 
+// madd3 PTX code for various compute capabilities.
 const (
 	madd3_ptx_20 = `
 .version 3.2

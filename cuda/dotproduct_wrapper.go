@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for dotproduct kernel
 var dotproduct_code cu.Function
 
+// Stores the arguments for dotproduct kernel invocation
 type dotproduct_args_t struct {
 	arg_dst       unsafe.Pointer
 	arg_prefactor float32
@@ -27,9 +29,11 @@ type dotproduct_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for dotproduct kernel invocation
 var dotproduct_args dotproduct_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	dotproduct_args.argptr[0] = unsafe.Pointer(&dotproduct_args.arg_dst)
 	dotproduct_args.argptr[1] = unsafe.Pointer(&dotproduct_args.arg_prefactor)
 	dotproduct_args.argptr[2] = unsafe.Pointer(&dotproduct_args.arg_ax)
@@ -39,7 +43,6 @@ func init() {
 	dotproduct_args.argptr[6] = unsafe.Pointer(&dotproduct_args.arg_by)
 	dotproduct_args.argptr[7] = unsafe.Pointer(&dotproduct_args.arg_bz)
 	dotproduct_args.argptr[8] = unsafe.Pointer(&dotproduct_args.arg_N)
-
 }
 
 // Wrapper for dotproduct CUDA kernel, asynchronous.
@@ -73,11 +76,13 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 	}
 }
 
+// maps compute capability on PTX code for dotproduct kernel.
 var dotproduct_map = map[int]string{0: "",
 	20: dotproduct_ptx_20,
 	30: dotproduct_ptx_30,
 	35: dotproduct_ptx_35}
 
+// dotproduct PTX code for various compute capabilities.
 const (
 	dotproduct_ptx_20 = `
 .version 3.2

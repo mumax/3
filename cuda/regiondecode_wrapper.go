@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for regiondecode kernel
 var regiondecode_code cu.Function
 
+// Stores the arguments for regiondecode kernel invocation
 type regiondecode_args_t struct {
 	arg_dst     unsafe.Pointer
 	arg_LUT     unsafe.Pointer
@@ -22,14 +24,15 @@ type regiondecode_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for regiondecode kernel invocation
 var regiondecode_args regiondecode_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	regiondecode_args.argptr[0] = unsafe.Pointer(&regiondecode_args.arg_dst)
 	regiondecode_args.argptr[1] = unsafe.Pointer(&regiondecode_args.arg_LUT)
 	regiondecode_args.argptr[2] = unsafe.Pointer(&regiondecode_args.arg_regions)
 	regiondecode_args.argptr[3] = unsafe.Pointer(&regiondecode_args.arg_N)
-
 }
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
@@ -58,11 +61,13 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	}
 }
 
+// maps compute capability on PTX code for regiondecode kernel.
 var regiondecode_map = map[int]string{0: "",
 	20: regiondecode_ptx_20,
 	30: regiondecode_ptx_30,
 	35: regiondecode_ptx_35}
 
+// regiondecode PTX code for various compute capabilities.
 const (
 	regiondecode_ptx_20 = `
 .version 3.2

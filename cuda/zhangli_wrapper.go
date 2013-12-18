@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for addzhanglitorque kernel
 var addzhanglitorque_code cu.Function
 
+// Stores the arguments for addzhanglitorque kernel invocation
 type addzhanglitorque_args_t struct {
 	arg_tx       unsafe.Pointer
 	arg_ty       unsafe.Pointer
@@ -39,9 +41,11 @@ type addzhanglitorque_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for addzhanglitorque kernel invocation
 var addzhanglitorque_args addzhanglitorque_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	addzhanglitorque_args.argptr[0] = unsafe.Pointer(&addzhanglitorque_args.arg_tx)
 	addzhanglitorque_args.argptr[1] = unsafe.Pointer(&addzhanglitorque_args.arg_ty)
 	addzhanglitorque_args.argptr[2] = unsafe.Pointer(&addzhanglitorque_args.arg_tz)
@@ -63,7 +67,6 @@ func init() {
 	addzhanglitorque_args.argptr[18] = unsafe.Pointer(&addzhanglitorque_args.arg_Ny)
 	addzhanglitorque_args.argptr[19] = unsafe.Pointer(&addzhanglitorque_args.arg_Nz)
 	addzhanglitorque_args.argptr[20] = unsafe.Pointer(&addzhanglitorque_args.arg_PBC)
-
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, asynchronous.
@@ -109,11 +112,13 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 	}
 }
 
+// maps compute capability on PTX code for addzhanglitorque kernel.
 var addzhanglitorque_map = map[int]string{0: "",
 	20: addzhanglitorque_ptx_20,
 	30: addzhanglitorque_ptx_30,
 	35: addzhanglitorque_ptx_35}
 
+// addzhanglitorque PTX code for various compute capabilities.
 const (
 	addzhanglitorque_ptx_20 = `
 .version 3.2

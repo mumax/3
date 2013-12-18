@@ -155,20 +155,23 @@ import(
 	"sync"
 )
 
+// CUDA handle for {{.Name}} kernel
 var {{.Name}}_code cu.Function
 
+// Stores the arguments for {{.Name}} kernel invocation
 type {{.Name}}_args_t struct{
 	{{range $i, $_ := .ArgN}} arg_{{.}} {{index $.ArgT $i}}
 	{{end}} argptr [{{len .ArgN}}]unsafe.Pointer
 	sync.Mutex
 }
 
+// Stores the arguments for {{.Name}} kernel invocation
 var {{.Name}}_args {{.Name}}_args_t
 
 func init(){
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	{{range $i, $t := .ArgN}} {{$.Name}}_args.argptr[{{$i}}] = unsafe.Pointer(&{{$.Name}}_args.arg_{{.}})
-	{{end}}
-}
+	{{end}} }
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
 func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
@@ -194,9 +197,11 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 	}
 }
 
+// maps compute capability on PTX code for {{.Name}} kernel.
 var {{.Name}}_map = map[int]string{ 0: "" {{range $k, $v := .PTX}},
 {{$k}}: {{$.Name}}_ptx_{{$k}} {{end}} }
 
+// {{.Name}} PTX code for various compute capabilities.
 const(
 {{range $k, $v := .PTX}}  {{$.Name}}_ptx_{{$k}} = {{$v}}
  {{end}})

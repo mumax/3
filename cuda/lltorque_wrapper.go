@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for lltorque kernel
 var lltorque_code cu.Function
 
+// Stores the arguments for lltorque kernel invocation
 type lltorque_args_t struct {
 	arg_tx       unsafe.Pointer
 	arg_ty       unsafe.Pointer
@@ -30,9 +32,11 @@ type lltorque_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for lltorque kernel invocation
 var lltorque_args lltorque_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	lltorque_args.argptr[0] = unsafe.Pointer(&lltorque_args.arg_tx)
 	lltorque_args.argptr[1] = unsafe.Pointer(&lltorque_args.arg_ty)
 	lltorque_args.argptr[2] = unsafe.Pointer(&lltorque_args.arg_tz)
@@ -45,7 +49,6 @@ func init() {
 	lltorque_args.argptr[9] = unsafe.Pointer(&lltorque_args.arg_alphaLUT)
 	lltorque_args.argptr[10] = unsafe.Pointer(&lltorque_args.arg_regions)
 	lltorque_args.argptr[11] = unsafe.Pointer(&lltorque_args.arg_N)
-
 }
 
 // Wrapper for lltorque CUDA kernel, asynchronous.
@@ -82,11 +85,13 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 	}
 }
 
+// maps compute capability on PTX code for lltorque kernel.
 var lltorque_map = map[int]string{0: "",
 	20: lltorque_ptx_20,
 	30: lltorque_ptx_30,
 	35: lltorque_ptx_35}
 
+// lltorque PTX code for various compute capabilities.
 const (
 	lltorque_ptx_20 = `
 .version 3.2

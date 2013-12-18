@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for mul kernel
 var mul_code cu.Function
 
+// Stores the arguments for mul kernel invocation
 type mul_args_t struct {
 	arg_dst unsafe.Pointer
 	arg_a   unsafe.Pointer
@@ -22,14 +24,15 @@ type mul_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for mul kernel invocation
 var mul_args mul_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	mul_args.argptr[0] = unsafe.Pointer(&mul_args.arg_dst)
 	mul_args.argptr[1] = unsafe.Pointer(&mul_args.arg_a)
 	mul_args.argptr[2] = unsafe.Pointer(&mul_args.arg_b)
 	mul_args.argptr[3] = unsafe.Pointer(&mul_args.arg_N)
-
 }
 
 // Wrapper for mul CUDA kernel, asynchronous.
@@ -58,11 +61,13 @@ func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, 
 	}
 }
 
+// maps compute capability on PTX code for mul kernel.
 var mul_map = map[int]string{0: "",
 	20: mul_ptx_20,
 	30: mul_ptx_30,
 	35: mul_ptx_35}
 
+// mul PTX code for various compute capabilities.
 const (
 	mul_ptx_20 = `
 .version 3.2

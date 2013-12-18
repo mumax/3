@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for regionselect kernel
 var regionselect_code cu.Function
 
+// Stores the arguments for regionselect kernel invocation
 type regionselect_args_t struct {
 	arg_dst     unsafe.Pointer
 	arg_src     unsafe.Pointer
@@ -23,15 +25,16 @@ type regionselect_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for regionselect kernel invocation
 var regionselect_args regionselect_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	regionselect_args.argptr[0] = unsafe.Pointer(&regionselect_args.arg_dst)
 	regionselect_args.argptr[1] = unsafe.Pointer(&regionselect_args.arg_src)
 	regionselect_args.argptr[2] = unsafe.Pointer(&regionselect_args.arg_regions)
 	regionselect_args.argptr[3] = unsafe.Pointer(&regionselect_args.arg_region)
 	regionselect_args.argptr[4] = unsafe.Pointer(&regionselect_args.arg_N)
-
 }
 
 // Wrapper for regionselect CUDA kernel, asynchronous.
@@ -61,11 +64,13 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 	}
 }
 
+// maps compute capability on PTX code for regionselect kernel.
 var regionselect_map = map[int]string{0: "",
 	20: regionselect_ptx_20,
 	30: regionselect_ptx_30,
 	35: regionselect_ptx_35}
 
+// regionselect PTX code for various compute capabilities.
 const (
 	regionselect_ptx_20 = `
 .version 3.2

@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for reducesum kernel
 var reducesum_code cu.Function
 
+// Stores the arguments for reducesum kernel invocation
 type reducesum_args_t struct {
 	arg_src     unsafe.Pointer
 	arg_dst     unsafe.Pointer
@@ -22,14 +24,15 @@ type reducesum_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for reducesum kernel invocation
 var reducesum_args reducesum_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	reducesum_args.argptr[0] = unsafe.Pointer(&reducesum_args.arg_src)
 	reducesum_args.argptr[1] = unsafe.Pointer(&reducesum_args.arg_dst)
 	reducesum_args.argptr[2] = unsafe.Pointer(&reducesum_args.arg_initVal)
 	reducesum_args.argptr[3] = unsafe.Pointer(&reducesum_args.arg_n)
-
 }
 
 // Wrapper for reducesum CUDA kernel, asynchronous.
@@ -58,11 +61,13 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 	}
 }
 
+// maps compute capability on PTX code for reducesum kernel.
 var reducesum_map = map[int]string{0: "",
 	20: reducesum_ptx_20,
 	30: reducesum_ptx_30,
 	35: reducesum_ptx_35}
 
+// reducesum PTX code for various compute capabilities.
 const (
 	reducesum_ptx_20 = `
 .version 3.2

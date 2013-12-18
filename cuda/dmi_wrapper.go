@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for adddmi kernel
 var adddmi_code cu.Function
 
+// Stores the arguments for adddmi kernel invocation
 type adddmi_args_t struct {
 	arg_Hx  unsafe.Pointer
 	arg_Hy  unsafe.Pointer
@@ -35,9 +37,11 @@ type adddmi_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for adddmi kernel invocation
 var adddmi_args adddmi_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	adddmi_args.argptr[0] = unsafe.Pointer(&adddmi_args.arg_Hx)
 	adddmi_args.argptr[1] = unsafe.Pointer(&adddmi_args.arg_Hy)
 	adddmi_args.argptr[2] = unsafe.Pointer(&adddmi_args.arg_Hz)
@@ -55,7 +59,6 @@ func init() {
 	adddmi_args.argptr[14] = unsafe.Pointer(&adddmi_args.arg_Ny)
 	adddmi_args.argptr[15] = unsafe.Pointer(&adddmi_args.arg_Nz)
 	adddmi_args.argptr[16] = unsafe.Pointer(&adddmi_args.arg_PBC)
-
 }
 
 // Wrapper for adddmi CUDA kernel, asynchronous.
@@ -97,11 +100,13 @@ func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx 
 	}
 }
 
+// maps compute capability on PTX code for adddmi kernel.
 var adddmi_map = map[int]string{0: "",
 	20: adddmi_ptx_20,
 	30: adddmi_ptx_30,
 	35: adddmi_ptx_35}
 
+// adddmi PTX code for various compute capabilities.
 const (
 	adddmi_ptx_20 = `
 .version 3.2

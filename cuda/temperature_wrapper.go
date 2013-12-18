@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for addtemperature kernel
 var addtemperature_code cu.Function
 
+// Stores the arguments for addtemperature kernel invocation
 type addtemperature_args_t struct {
 	arg_B            unsafe.Pointer
 	arg_noise        unsafe.Pointer
@@ -24,16 +26,17 @@ type addtemperature_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for addtemperature kernel invocation
 var addtemperature_args addtemperature_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	addtemperature_args.argptr[0] = unsafe.Pointer(&addtemperature_args.arg_B)
 	addtemperature_args.argptr[1] = unsafe.Pointer(&addtemperature_args.arg_noise)
 	addtemperature_args.argptr[2] = unsafe.Pointer(&addtemperature_args.arg_kB2_VgammaDt)
 	addtemperature_args.argptr[3] = unsafe.Pointer(&addtemperature_args.arg_tempRedLUT)
 	addtemperature_args.argptr[4] = unsafe.Pointer(&addtemperature_args.arg_regions)
 	addtemperature_args.argptr[5] = unsafe.Pointer(&addtemperature_args.arg_N)
-
 }
 
 // Wrapper for addtemperature CUDA kernel, asynchronous.
@@ -64,11 +67,13 @@ func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 	}
 }
 
+// maps compute capability on PTX code for addtemperature kernel.
 var addtemperature_map = map[int]string{0: "",
 	20: addtemperature_ptx_20,
 	30: addtemperature_ptx_30,
 	35: addtemperature_ptx_35}
 
+// addtemperature PTX code for various compute capabilities.
 const (
 	addtemperature_ptx_20 = `
 .version 3.2

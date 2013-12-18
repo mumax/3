@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for shiftx kernel
 var shiftx_code cu.Function
 
+// Stores the arguments for shiftx kernel invocation
 type shiftx_args_t struct {
 	arg_dst    unsafe.Pointer
 	arg_src    unsafe.Pointer
@@ -26,9 +28,11 @@ type shiftx_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for shiftx kernel invocation
 var shiftx_args shiftx_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	shiftx_args.argptr[0] = unsafe.Pointer(&shiftx_args.arg_dst)
 	shiftx_args.argptr[1] = unsafe.Pointer(&shiftx_args.arg_src)
 	shiftx_args.argptr[2] = unsafe.Pointer(&shiftx_args.arg_Nx)
@@ -37,7 +41,6 @@ func init() {
 	shiftx_args.argptr[5] = unsafe.Pointer(&shiftx_args.arg_shx)
 	shiftx_args.argptr[6] = unsafe.Pointer(&shiftx_args.arg_clampL)
 	shiftx_args.argptr[7] = unsafe.Pointer(&shiftx_args.arg_clampR)
-
 }
 
 // Wrapper for shiftx CUDA kernel, asynchronous.
@@ -70,11 +73,13 @@ func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz i
 	}
 }
 
+// maps compute capability on PTX code for shiftx kernel.
 var shiftx_map = map[int]string{0: "",
 	20: shiftx_ptx_20,
 	30: shiftx_ptx_30,
 	35: shiftx_ptx_35}
 
+// shiftx PTX code for various compute capabilities.
 const (
 	shiftx_ptx_20 = `
 .version 3.2

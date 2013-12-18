@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for normalize kernel
 var normalize_code cu.Function
 
+// Stores the arguments for normalize kernel invocation
 type normalize_args_t struct {
 	arg_vx  unsafe.Pointer
 	arg_vy  unsafe.Pointer
@@ -23,15 +25,16 @@ type normalize_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for normalize kernel invocation
 var normalize_args normalize_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	normalize_args.argptr[0] = unsafe.Pointer(&normalize_args.arg_vx)
 	normalize_args.argptr[1] = unsafe.Pointer(&normalize_args.arg_vy)
 	normalize_args.argptr[2] = unsafe.Pointer(&normalize_args.arg_vz)
 	normalize_args.argptr[3] = unsafe.Pointer(&normalize_args.arg_vol)
 	normalize_args.argptr[4] = unsafe.Pointer(&normalize_args.arg_N)
-
 }
 
 // Wrapper for normalize CUDA kernel, asynchronous.
@@ -61,11 +64,13 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 	}
 }
 
+// maps compute capability on PTX code for normalize kernel.
 var normalize_map = map[int]string{0: "",
 	20: normalize_ptx_20,
 	30: normalize_ptx_30,
 	35: normalize_ptx_35}
 
+// normalize PTX code for various compute capabilities.
 const (
 	normalize_ptx_20 = `
 .version 3.2

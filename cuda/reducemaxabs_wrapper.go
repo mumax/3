@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for reducemaxabs kernel
 var reducemaxabs_code cu.Function
 
+// Stores the arguments for reducemaxabs kernel invocation
 type reducemaxabs_args_t struct {
 	arg_src     unsafe.Pointer
 	arg_dst     unsafe.Pointer
@@ -22,14 +24,15 @@ type reducemaxabs_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for reducemaxabs kernel invocation
 var reducemaxabs_args reducemaxabs_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	reducemaxabs_args.argptr[0] = unsafe.Pointer(&reducemaxabs_args.arg_src)
 	reducemaxabs_args.argptr[1] = unsafe.Pointer(&reducemaxabs_args.arg_dst)
 	reducemaxabs_args.argptr[2] = unsafe.Pointer(&reducemaxabs_args.arg_initVal)
 	reducemaxabs_args.argptr[3] = unsafe.Pointer(&reducemaxabs_args.arg_n)
-
 }
 
 // Wrapper for reducemaxabs CUDA kernel, asynchronous.
@@ -58,11 +61,13 @@ func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float3
 	}
 }
 
+// maps compute capability on PTX code for reducemaxabs kernel.
 var reducemaxabs_map = map[int]string{0: "",
 	20: reducemaxabs_ptx_20,
 	30: reducemaxabs_ptx_30,
 	35: reducemaxabs_ptx_35}
 
+// reducemaxabs PTX code for various compute capabilities.
 const (
 	reducemaxabs_ptx_20 = `
 .version 3.2

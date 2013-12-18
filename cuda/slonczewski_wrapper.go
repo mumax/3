@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for addslonczewskitorque kernel
 var addslonczewskitorque_code cu.Function
 
+// Stores the arguments for addslonczewskitorque kernel invocation
 type addslonczewskitorque_args_t struct {
 	arg_tx              unsafe.Pointer
 	arg_ty              unsafe.Pointer
@@ -36,9 +38,11 @@ type addslonczewskitorque_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for addslonczewskitorque kernel invocation
 var addslonczewskitorque_args addslonczewskitorque_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	addslonczewskitorque_args.argptr[0] = unsafe.Pointer(&addslonczewskitorque_args.arg_tx)
 	addslonczewskitorque_args.argptr[1] = unsafe.Pointer(&addslonczewskitorque_args.arg_ty)
 	addslonczewskitorque_args.argptr[2] = unsafe.Pointer(&addslonczewskitorque_args.arg_tz)
@@ -57,7 +61,6 @@ func init() {
 	addslonczewskitorque_args.argptr[15] = unsafe.Pointer(&addslonczewskitorque_args.arg_epsilonPrimeLUT)
 	addslonczewskitorque_args.argptr[16] = unsafe.Pointer(&addslonczewskitorque_args.arg_regions)
 	addslonczewskitorque_args.argptr[17] = unsafe.Pointer(&addslonczewskitorque_args.arg_N)
-
 }
 
 // Wrapper for addslonczewskitorque CUDA kernel, asynchronous.
@@ -100,11 +103,13 @@ func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsaf
 	}
 }
 
+// maps compute capability on PTX code for addslonczewskitorque kernel.
 var addslonczewskitorque_map = map[int]string{0: "",
 	20: addslonczewskitorque_ptx_20,
 	30: addslonczewskitorque_ptx_30,
 	35: addslonczewskitorque_ptx_35}
 
+// addslonczewskitorque PTX code for various compute capabilities.
 const (
 	addslonczewskitorque_ptx_20 = `
 .version 3.2

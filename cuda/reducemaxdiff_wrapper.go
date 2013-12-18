@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for reducemaxdiff kernel
 var reducemaxdiff_code cu.Function
 
+// Stores the arguments for reducemaxdiff kernel invocation
 type reducemaxdiff_args_t struct {
 	arg_src1    unsafe.Pointer
 	arg_src2    unsafe.Pointer
@@ -23,15 +25,16 @@ type reducemaxdiff_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for reducemaxdiff kernel invocation
 var reducemaxdiff_args reducemaxdiff_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
 	reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
 	reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
 	reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
 	reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
-
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
@@ -61,11 +64,13 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 	}
 }
 
+// maps compute capability on PTX code for reducemaxdiff kernel.
 var reducemaxdiff_map = map[int]string{0: "",
 	20: reducemaxdiff_ptx_20,
 	30: reducemaxdiff_ptx_30,
 	35: reducemaxdiff_ptx_35}
 
+// reducemaxdiff PTX code for various compute capabilities.
 const (
 	reducemaxdiff_ptx_20 = `
 .version 3.2

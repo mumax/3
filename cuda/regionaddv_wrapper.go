@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for regionaddv kernel
 var regionaddv_code cu.Function
 
+// Stores the arguments for regionaddv kernel invocation
 type regionaddv_args_t struct {
 	arg_dstx    unsafe.Pointer
 	arg_dsty    unsafe.Pointer
@@ -26,9 +28,11 @@ type regionaddv_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for regionaddv kernel invocation
 var regionaddv_args regionaddv_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	regionaddv_args.argptr[0] = unsafe.Pointer(&regionaddv_args.arg_dstx)
 	regionaddv_args.argptr[1] = unsafe.Pointer(&regionaddv_args.arg_dsty)
 	regionaddv_args.argptr[2] = unsafe.Pointer(&regionaddv_args.arg_dstz)
@@ -37,7 +41,6 @@ func init() {
 	regionaddv_args.argptr[5] = unsafe.Pointer(&regionaddv_args.arg_LUTz)
 	regionaddv_args.argptr[6] = unsafe.Pointer(&regionaddv_args.arg_regions)
 	regionaddv_args.argptr[7] = unsafe.Pointer(&regionaddv_args.arg_N)
-
 }
 
 // Wrapper for regionaddv CUDA kernel, asynchronous.
@@ -70,11 +73,13 @@ func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Po
 	}
 }
 
+// maps compute capability on PTX code for regionaddv kernel.
 var regionaddv_map = map[int]string{0: "",
 	20: regionaddv_ptx_20,
 	30: regionaddv_ptx_30,
 	35: regionaddv_ptx_35}
 
+// regionaddv PTX code for various compute capabilities.
 const (
 	regionaddv_ptx_20 = `
 .version 3.2

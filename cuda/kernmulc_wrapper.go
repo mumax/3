@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for kernmulC kernel
 var kernmulC_code cu.Function
 
+// Stores the arguments for kernmulC kernel invocation
 type kernmulC_args_t struct {
 	arg_fftM unsafe.Pointer
 	arg_fftK unsafe.Pointer
@@ -22,14 +24,15 @@ type kernmulC_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for kernmulC kernel invocation
 var kernmulC_args kernmulC_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	kernmulC_args.argptr[0] = unsafe.Pointer(&kernmulC_args.arg_fftM)
 	kernmulC_args.argptr[1] = unsafe.Pointer(&kernmulC_args.arg_fftK)
 	kernmulC_args.argptr[2] = unsafe.Pointer(&kernmulC_args.arg_Nx)
 	kernmulC_args.argptr[3] = unsafe.Pointer(&kernmulC_args.arg_Ny)
-
 }
 
 // Wrapper for kernmulC CUDA kernel, asynchronous.
@@ -58,11 +61,13 @@ func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, 
 	}
 }
 
+// maps compute capability on PTX code for kernmulC kernel.
 var kernmulC_map = map[int]string{0: "",
 	20: kernmulC_ptx_20,
 	30: kernmulC_ptx_30,
 	35: kernmulC_ptx_35}
 
+// kernmulC PTX code for various compute capabilities.
 const (
 	kernmulC_ptx_20 = `
 .version 3.2

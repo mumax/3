@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for adduniaxialanisotropy kernel
 var adduniaxialanisotropy_code cu.Function
 
+// Stores the arguments for adduniaxialanisotropy kernel invocation
 type adduniaxialanisotropy_args_t struct {
 	arg_Bx      unsafe.Pointer
 	arg_By      unsafe.Pointer
@@ -30,9 +32,11 @@ type adduniaxialanisotropy_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for adduniaxialanisotropy kernel invocation
 var adduniaxialanisotropy_args adduniaxialanisotropy_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	adduniaxialanisotropy_args.argptr[0] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_Bx)
 	adduniaxialanisotropy_args.argptr[1] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_By)
 	adduniaxialanisotropy_args.argptr[2] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_Bz)
@@ -45,7 +49,6 @@ func init() {
 	adduniaxialanisotropy_args.argptr[9] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_uzLUT)
 	adduniaxialanisotropy_args.argptr[10] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_regions)
 	adduniaxialanisotropy_args.argptr[11] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_N)
-
 }
 
 // Wrapper for adduniaxialanisotropy CUDA kernel, asynchronous.
@@ -82,11 +85,13 @@ func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsa
 	}
 }
 
+// maps compute capability on PTX code for adduniaxialanisotropy kernel.
 var adduniaxialanisotropy_map = map[int]string{0: "",
 	20: adduniaxialanisotropy_ptx_20,
 	30: adduniaxialanisotropy_ptx_30,
 	35: adduniaxialanisotropy_ptx_35}
 
+// adduniaxialanisotropy PTX code for various compute capabilities.
 const (
 	adduniaxialanisotropy_ptx_20 = `
 .version 3.2

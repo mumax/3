@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for madd2 kernel
 var madd2_code cu.Function
 
+// Stores the arguments for madd2 kernel invocation
 type madd2_args_t struct {
 	arg_dst  unsafe.Pointer
 	arg_src1 unsafe.Pointer
@@ -24,16 +26,17 @@ type madd2_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for madd2 kernel invocation
 var madd2_args madd2_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	madd2_args.argptr[0] = unsafe.Pointer(&madd2_args.arg_dst)
 	madd2_args.argptr[1] = unsafe.Pointer(&madd2_args.arg_src1)
 	madd2_args.argptr[2] = unsafe.Pointer(&madd2_args.arg_fac1)
 	madd2_args.argptr[3] = unsafe.Pointer(&madd2_args.arg_src2)
 	madd2_args.argptr[4] = unsafe.Pointer(&madd2_args.arg_fac2)
 	madd2_args.argptr[5] = unsafe.Pointer(&madd2_args.arg_N)
-
 }
 
 // Wrapper for madd2 CUDA kernel, asynchronous.
@@ -64,11 +67,13 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	}
 }
 
+// maps compute capability on PTX code for madd2 kernel.
 var madd2_map = map[int]string{0: "",
 	20: madd2_ptx_20,
 	30: madd2_ptx_30,
 	35: madd2_ptx_35}
 
+// madd2 PTX code for various compute capabilities.
 const (
 	madd2_ptx_20 = `
 .version 3.2

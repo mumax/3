@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for shiftbytes kernel
 var shiftbytes_code cu.Function
 
+// Stores the arguments for shiftbytes kernel invocation
 type shiftbytes_args_t struct {
 	arg_dst   unsafe.Pointer
 	arg_src   unsafe.Pointer
@@ -25,9 +27,11 @@ type shiftbytes_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for shiftbytes kernel invocation
 var shiftbytes_args shiftbytes_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	shiftbytes_args.argptr[0] = unsafe.Pointer(&shiftbytes_args.arg_dst)
 	shiftbytes_args.argptr[1] = unsafe.Pointer(&shiftbytes_args.arg_src)
 	shiftbytes_args.argptr[2] = unsafe.Pointer(&shiftbytes_args.arg_Nx)
@@ -35,7 +39,6 @@ func init() {
 	shiftbytes_args.argptr[4] = unsafe.Pointer(&shiftbytes_args.arg_Nz)
 	shiftbytes_args.argptr[5] = unsafe.Pointer(&shiftbytes_args.arg_shx)
 	shiftbytes_args.argptr[6] = unsafe.Pointer(&shiftbytes_args.arg_clamp)
-
 }
 
 // Wrapper for shiftbytes CUDA kernel, asynchronous.
@@ -67,11 +70,13 @@ func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, 
 	}
 }
 
+// maps compute capability on PTX code for shiftbytes kernel.
 var shiftbytes_map = map[int]string{0: "",
 	20: shiftbytes_ptx_20,
 	30: shiftbytes_ptx_30,
 	35: shiftbytes_ptx_35}
 
+// shiftbytes PTX code for various compute capabilities.
 const (
 	shiftbytes_ptx_20 = `
 .version 3.2

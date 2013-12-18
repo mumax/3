@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for reducemaxvecdiff2 kernel
 var reducemaxvecdiff2_code cu.Function
 
+// Stores the arguments for reducemaxvecdiff2 kernel invocation
 type reducemaxvecdiff2_args_t struct {
 	arg_x1      unsafe.Pointer
 	arg_y1      unsafe.Pointer
@@ -27,9 +29,11 @@ type reducemaxvecdiff2_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for reducemaxvecdiff2 kernel invocation
 var reducemaxvecdiff2_args reducemaxvecdiff2_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	reducemaxvecdiff2_args.argptr[0] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_x1)
 	reducemaxvecdiff2_args.argptr[1] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_y1)
 	reducemaxvecdiff2_args.argptr[2] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_z1)
@@ -39,7 +43,6 @@ func init() {
 	reducemaxvecdiff2_args.argptr[6] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_dst)
 	reducemaxvecdiff2_args.argptr[7] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_initVal)
 	reducemaxvecdiff2_args.argptr[8] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_n)
-
 }
 
 // Wrapper for reducemaxvecdiff2 CUDA kernel, asynchronous.
@@ -73,11 +76,13 @@ func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.P
 	}
 }
 
+// maps compute capability on PTX code for reducemaxvecdiff2 kernel.
 var reducemaxvecdiff2_map = map[int]string{0: "",
 	20: reducemaxvecdiff2_ptx_20,
 	30: reducemaxvecdiff2_ptx_30,
 	35: reducemaxvecdiff2_ptx_35}
 
+// reducemaxvecdiff2 PTX code for various compute capabilities.
 const (
 	reducemaxvecdiff2_ptx_20 = `
 .version 3.2

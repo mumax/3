@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for addcubicanisotropy kernel
 var addcubicanisotropy_code cu.Function
 
+// Stores the arguments for addcubicanisotropy kernel invocation
 type addcubicanisotropy_args_t struct {
 	arg_Bx      unsafe.Pointer
 	arg_By      unsafe.Pointer
@@ -33,9 +35,11 @@ type addcubicanisotropy_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for addcubicanisotropy kernel invocation
 var addcubicanisotropy_args addcubicanisotropy_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	addcubicanisotropy_args.argptr[0] = unsafe.Pointer(&addcubicanisotropy_args.arg_Bx)
 	addcubicanisotropy_args.argptr[1] = unsafe.Pointer(&addcubicanisotropy_args.arg_By)
 	addcubicanisotropy_args.argptr[2] = unsafe.Pointer(&addcubicanisotropy_args.arg_Bz)
@@ -51,7 +55,6 @@ func init() {
 	addcubicanisotropy_args.argptr[12] = unsafe.Pointer(&addcubicanisotropy_args.arg_C2zLUT)
 	addcubicanisotropy_args.argptr[13] = unsafe.Pointer(&addcubicanisotropy_args.arg_regions)
 	addcubicanisotropy_args.argptr[14] = unsafe.Pointer(&addcubicanisotropy_args.arg_N)
-
 }
 
 // Wrapper for addcubicanisotropy CUDA kernel, asynchronous.
@@ -91,11 +94,13 @@ func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.
 	}
 }
 
+// maps compute capability on PTX code for addcubicanisotropy kernel.
 var addcubicanisotropy_map = map[int]string{0: "",
 	20: addcubicanisotropy_ptx_20,
 	30: addcubicanisotropy_ptx_30,
 	35: addcubicanisotropy_ptx_35}
 
+// addcubicanisotropy PTX code for various compute capabilities.
 const (
 	addcubicanisotropy_ptx_20 = `
 .version 3.2

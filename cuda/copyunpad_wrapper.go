@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for copyunpad kernel
 var copyunpad_code cu.Function
 
+// Stores the arguments for copyunpad kernel invocation
 type copyunpad_args_t struct {
 	arg_dst unsafe.Pointer
 	arg_Dx  int
@@ -26,9 +28,11 @@ type copyunpad_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for copyunpad kernel invocation
 var copyunpad_args copyunpad_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	copyunpad_args.argptr[0] = unsafe.Pointer(&copyunpad_args.arg_dst)
 	copyunpad_args.argptr[1] = unsafe.Pointer(&copyunpad_args.arg_Dx)
 	copyunpad_args.argptr[2] = unsafe.Pointer(&copyunpad_args.arg_Dy)
@@ -37,7 +41,6 @@ func init() {
 	copyunpad_args.argptr[5] = unsafe.Pointer(&copyunpad_args.arg_Sx)
 	copyunpad_args.argptr[6] = unsafe.Pointer(&copyunpad_args.arg_Sy)
 	copyunpad_args.argptr[7] = unsafe.Pointer(&copyunpad_args.arg_Sz)
-
 }
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
@@ -70,11 +73,13 @@ func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Po
 	}
 }
 
+// maps compute capability on PTX code for copyunpad kernel.
 var copyunpad_map = map[int]string{0: "",
 	20: copyunpad_ptx_20,
 	30: copyunpad_ptx_30,
 	35: copyunpad_ptx_35}
 
+// copyunpad PTX code for various compute capabilities.
 const (
 	copyunpad_ptx_20 = `
 .version 3.2

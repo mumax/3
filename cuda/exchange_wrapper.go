@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for addexchange kernel
 var addexchange_code cu.Function
 
+// Stores the arguments for addexchange kernel invocation
 type addexchange_args_t struct {
 	arg_Bx      unsafe.Pointer
 	arg_By      unsafe.Pointer
@@ -33,9 +35,11 @@ type addexchange_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for addexchange kernel invocation
 var addexchange_args addexchange_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	addexchange_args.argptr[0] = unsafe.Pointer(&addexchange_args.arg_Bx)
 	addexchange_args.argptr[1] = unsafe.Pointer(&addexchange_args.arg_By)
 	addexchange_args.argptr[2] = unsafe.Pointer(&addexchange_args.arg_Bz)
@@ -51,7 +55,6 @@ func init() {
 	addexchange_args.argptr[12] = unsafe.Pointer(&addexchange_args.arg_Ny)
 	addexchange_args.argptr[13] = unsafe.Pointer(&addexchange_args.arg_Nz)
 	addexchange_args.argptr[14] = unsafe.Pointer(&addexchange_args.arg_PBC)
-
 }
 
 // Wrapper for addexchange CUDA kernel, asynchronous.
@@ -91,11 +94,13 @@ func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer
 	}
 }
 
+// maps compute capability on PTX code for addexchange kernel.
 var addexchange_map = map[int]string{0: "",
 	20: addexchange_ptx_20,
 	30: addexchange_ptx_30,
 	35: addexchange_ptx_35}
 
+// addexchange PTX code for various compute capabilities.
 const (
 	addexchange_ptx_20 = `
 .version 3.2

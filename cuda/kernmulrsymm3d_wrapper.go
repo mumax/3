@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for kernmulRSymm3D kernel
 var kernmulRSymm3D_code cu.Function
 
+// Stores the arguments for kernmulRSymm3D kernel invocation
 type kernmulRSymm3D_args_t struct {
 	arg_fftMx  unsafe.Pointer
 	arg_fftMy  unsafe.Pointer
@@ -30,9 +32,11 @@ type kernmulRSymm3D_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for kernmulRSymm3D kernel invocation
 var kernmulRSymm3D_args kernmulRSymm3D_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
 	kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
 	kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
@@ -45,7 +49,6 @@ func init() {
 	kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
 	kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
 	kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
-
 }
 
 // Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
@@ -82,11 +85,13 @@ func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz un
 	}
 }
 
+// maps compute capability on PTX code for kernmulRSymm3D kernel.
 var kernmulRSymm3D_map = map[int]string{0: "",
 	20: kernmulRSymm3D_ptx_20,
 	30: kernmulRSymm3D_ptx_30,
 	35: kernmulRSymm3D_ptx_35}
 
+// kernmulRSymm3D PTX code for various compute capabilities.
 const (
 	kernmulRSymm3D_ptx_20 = `
 .version 3.2

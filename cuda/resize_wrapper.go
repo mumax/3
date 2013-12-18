@@ -11,8 +11,10 @@ import (
 	"unsafe"
 )
 
+// CUDA handle for resize kernel
 var resize_code cu.Function
 
+// Stores the arguments for resize kernel invocation
 type resize_args_t struct {
 	arg_dst    unsafe.Pointer
 	arg_Dx     int
@@ -29,9 +31,11 @@ type resize_args_t struct {
 	sync.Mutex
 }
 
+// Stores the arguments for resize kernel invocation
 var resize_args resize_args_t
 
 func init() {
+	// CUDA driver kernel call wants pointers to arguments, set them up once.
 	resize_args.argptr[0] = unsafe.Pointer(&resize_args.arg_dst)
 	resize_args.argptr[1] = unsafe.Pointer(&resize_args.arg_Dx)
 	resize_args.argptr[2] = unsafe.Pointer(&resize_args.arg_Dy)
@@ -43,7 +47,6 @@ func init() {
 	resize_args.argptr[8] = unsafe.Pointer(&resize_args.arg_layer)
 	resize_args.argptr[9] = unsafe.Pointer(&resize_args.arg_scalex)
 	resize_args.argptr[10] = unsafe.Pointer(&resize_args.arg_scaley)
-
 }
 
 // Wrapper for resize CUDA kernel, asynchronous.
@@ -79,11 +82,13 @@ func k_resize_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Point
 	}
 }
 
+// maps compute capability on PTX code for resize kernel.
 var resize_map = map[int]string{0: "",
 	20: resize_ptx_20,
 	30: resize_ptx_30,
 	35: resize_ptx_35}
 
+// resize PTX code for various compute capabilities.
 const (
 	resize_ptx_20 = `
 .version 3.2

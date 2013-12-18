@@ -9,37 +9,26 @@ import (
 )
 
 var (
-	cudaCtx     cu.Context // gpu context to be used by all threads
+	Version     float32    // cuda version
+	DevName     string     // GPU name
+	TotalMem    int64      // total GPU memory
+	GPUInfo     string     // Human-readable GPU description
+	synchronous bool       // for debug: synchronize stream0 at every kernel launch
+	cudaCtx     cu.Context // global CUDA context
 	cudaCC      int        // compute capablity
-	Version     float32
-	DevName     string
-	TotalMem    int64
-	synchronous bool
-	GPUInfo     string
 )
 
-func Init(gpu int, sched string, sync bool) {
+// Locks to an OS thread and initializes CUDA for that thread.
+func Init(gpu int, sync bool) {
 	if cudaCtx != 0 {
-		return // already inited
+		panic("cuda already inited")
 	}
-	var flag uint
-	switch sched {
-	default:
-		panic("sched flag: expecting auto,spin,yield or sync: " + sched)
-	case "auto":
-		flag = cu.CTX_SCHED_AUTO
-	case "spin":
-		flag = cu.CTX_SCHED_SPIN
-	case "yield":
-		flag = cu.CTX_SCHED_YIELD
-	case "sync":
-		flag = cu.CTX_BLOCKING_SYNC
-	}
+
+	runtime.LockOSThread()
 	tryCuInit()
 	dev := cu.Device(gpu)
-	cudaCtx = cu.CtxCreate(flag, dev)
+	cudaCtx = cu.CtxCreate(cu.CTX_SCHED_YIELD, dev)
 	M, m := dev.ComputeCapability()
-
 	Version = float32(cu.Version()) / 1000
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()
@@ -53,8 +42,10 @@ func Init(gpu int, sched string, sync bool) {
 
 	synchronous = sync
 	if synchronous {
-		log.Println("synchronized CUDA calls")
+		log.Println("DEBUG: synchronized CUDA calls")
 	}
+
+	cudaCtx.SetCurrent()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.
@@ -66,16 +57,11 @@ func tryCuInit() {
 	cu.Init(0)
 }
 
-// LockCudaThread locks the current goroutine to an OS thread
-// and sets the CUDA context for that thread. To be called by
-// every fresh goroutine that will use CUDA.
-func LockThread() {
-	runtime.LockOSThread()
-	cudaCtx.SetCurrent()
-}
+// Global stream used for everything
+const stream0 = cu.Stream(0)
 
-const stream0 = cu.Stream(0) // for readability
-
+// Synchronize the global stream
+// (usually not needed, done automatically with -sync)
 func Sync() {
 	stream0.Synchronize()
 }

@@ -72,12 +72,6 @@ func Zero(s *data.Slice) {
 	Memset(s, make([]float32, s.NComp())...)
 }
 
-//func index(i, j, k int, size [3]int) int {
-//	util.Argument(i >= 0 && j >= 0 && k >= 0 &&
-//		i < size[0] && j < size[1] && k < size[2])
-//	return ((i)*size[1]*size[2] + (j)*size[2] + (k))
-//}
-
 func SetCell(s *data.Slice, comp int, ix, iy, iz int, value float32) {
 	SetElem(s, comp, s.Index(ix, iy, iz), value)
 }

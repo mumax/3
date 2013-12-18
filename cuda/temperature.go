@@ -7,7 +7,6 @@ import (
 )
 
 func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
-
 	util.Argument(Beff.NComp() == 1 && noise.NComp() == 1)
 
 	N := Beff.Len()

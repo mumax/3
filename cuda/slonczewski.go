@@ -6,7 +6,6 @@ import (
 )
 
 func AddSlonczewskiTorque(torque, m, J *data.Slice, fixedP LUTPtrs, Msat, alpha, pol, λ, ε_prime LUTPtr, regions *Bytes, mesh *data.Mesh) {
-
 	N := torque.Len()
 	cfg := make1DConf(N)
 	thickness := float32(mesh.WorldSize()[Z])

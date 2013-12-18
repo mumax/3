@@ -64,8 +64,8 @@ func Steps(n int) {
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
-	checkM() // TODO: move to failed solver step
-	//fmt.Println("running")
+	GUI.Set("maxtorque", "--") // only updated on page refresh, avoid showing out-of-date value
+	checkM()                   // TODO: move to failed solver step
 	pause = false
 	for condition() && !pause {
 		select {

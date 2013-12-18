@@ -265,7 +265,9 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("time", fmt.Sprintf("%6e", Time))
 			g.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 			g.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			g.Set("maxtorque", fmt.Sprintf("%6e", MaxTorque.Get()))
+			if !pause { // Don't go updating stuff while paused
+				g.Set("maxtorque", fmt.Sprintf("%6e T", MaxTorque.Get()))
+			}
 			g.Set("maxerr", Solver.MaxErr)
 			g.Set("mindt", Solver.MinDt)
 			g.Set("maxdt", Solver.MaxDt)

@@ -162,16 +162,6 @@ func symmidx(i, j int) int {
 	}
 }
 
-//func (p *exchParam) SetUniform(v float64) {
-//	for i := range p.lut {
-//		p.lut[i] = float32(v)
-//	}
-//	p.ok = false
-//}
-
-//func (p *exchParam) getInter(r1, r2 int) float64 {
-//	return float64(p.lut[symmidx(r1, r2)])
-//}
 func (p *exchParam) String() string {
 	str := ""
 	for j := 0; j < NREGION; j++ {

@@ -3,7 +3,6 @@ package engine
 var CorePos = NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
 
 func corePos() []float64 {
-
 	m, _ := M.Slice()
 	m_z := m.Comp(Z).HostCopy().Scalars()
 	s := m.Size()

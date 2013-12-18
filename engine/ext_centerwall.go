@@ -15,12 +15,13 @@ func init() {
 
 func centerWall(c int) {
 	M := &M
-	mc := Average(M)[c]            // TODO: optimize
-	tolerance := 4 / float64(nx()) // x*2 * expected <m> change for 1 cell shift
+	mc := Average(M)[c] // TODO: optimize
+	n := Mesh().Size()
+	tolerance := 4 / float64(n[X]) // x*2 * expected <m> change for 1 cell shift
 
 	zero := data.Vector{0, 0, 0}
 	if ShiftMagL == zero || ShiftMagR == zero {
-		sign := magsign(M.GetCell(c, 0, ny()/2, nz()/2))
+		sign := magsign(M.GetCell(c, 0, n[Y]/2, n[Z]/2))
 		ShiftMagL[c] = float64(sign)
 		ShiftMagR[c] = -float64(sign)
 	}
@@ -69,7 +70,3 @@ func getShiftSpeed() float64 {
 	}
 	return lastV
 }
-
-func nx() int { return Mesh().Size()[X] }
-func ny() int { return Mesh().Size()[Y] }
-func nz() int { return Mesh().Size()[Z] }

@@ -22,7 +22,7 @@ type normalize_args struct {
 }
 
 // Wrapper for normalize CUDA kernel, asynchronous.
-func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -45,18 +45,11 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(normalize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(normalize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for normalize CUDA kernel, synchronized.
-func k_normalize_sync(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config) {
-	Sync()
-	k_normalize_async(vx, vy, vz, vol, N, cfg, stream0)
-	Sync()
 }
 
 var normalize_map = map[int]string{0: "",

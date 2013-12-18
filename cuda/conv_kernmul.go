@@ -16,7 +16,7 @@ func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int)
 
 	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
 		Kxx.DevPtr(0), Kxx.DevPtr(0), Kxy.DevPtr(0),
-		Nx, Ny, cfg, stream0)
+		Nx, Ny, cfg)
 }
 
 func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int) {
@@ -25,14 +25,14 @@ func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int) {
 
 	cfg := make3DConf([3]int{Nx, Ny, 1})
 
-	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), Kzz.DevPtr(0), Nx, Ny, cfg, stream0)
+	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), Kzz.DevPtr(0), Nx, Ny, cfg)
 }
 
 func kernMulC_async(fftM, K *data.Slice, Nx, Ny int) {
 	util.Argument(fftM.NComp() == 1 && K.NComp() == 1)
 	cfg := make3DConf([3]int{Nx, Ny, 1})
-	k_kernmulC_async(fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg, stream0)
-	//dbg("k_kernmulC_async(", fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg, stream0)
+	k_kernmulC_async(fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg)
+	//dbg("k_kernmulC_async(", fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg)
 }
 
 // Does not yet use Y mirror symmetry!!
@@ -45,5 +45,5 @@ func kernMulRSymm3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *dat
 
 	k_kernmulRSymm3D_async(fftM[X].DevPtr(0), fftM[Y].DevPtr(0), fftM[Z].DevPtr(0),
 		Kxx.DevPtr(0), Kyy.DevPtr(0), Kzz.DevPtr(0), Kyz.DevPtr(0), Kxz.DevPtr(0), Kxy.DevPtr(0),
-		Nx, Ny, Nz, cfg, stream0)
+		Nx, Ny, Nz, cfg)
 }

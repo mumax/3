@@ -23,7 +23,7 @@ type reducemaxvecnorm2_args struct {
 }
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel, asynchronous.
-func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
+func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -48,18 +48,11 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for reducemaxvecnorm2 CUDA kernel, synchronized.
-func k_reducemaxvecnorm2_sync(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	Sync()
-	k_reducemaxvecnorm2_async(x, y, z, dst, initVal, n, cfg, stream0)
-	Sync()
 }
 
 var reducemaxvecnorm2_map = map[int]string{0: "",

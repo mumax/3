@@ -26,7 +26,7 @@ type dotproduct_args struct {
 }
 
 // Wrapper for dotproduct CUDA kernel, asynchronous.
-func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -57,18 +57,11 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(dotproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(dotproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for dotproduct CUDA kernel, synchronized.
-func k_dotproduct_sync(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config) {
-	Sync()
-	k_dotproduct_async(dst, prefactor, ax, ay, az, bx, by, bz, N, cfg, stream0)
-	Sync()
 }
 
 var dotproduct_map = map[int]string{0: "",

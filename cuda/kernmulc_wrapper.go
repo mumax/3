@@ -21,7 +21,7 @@ type kernmulC_args struct {
 }
 
 // Wrapper for kernmulC CUDA kernel, asynchronous.
-func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, cfg *config, str cu.Stream) {
+func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -42,18 +42,11 @@ func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, 
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(kernmulC_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(kernmulC_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for kernmulC CUDA kernel, synchronized.
-func k_kernmulC_sync(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, cfg *config) {
-	Sync()
-	k_kernmulC_async(fftM, fftK, Nx, Ny, cfg, stream0)
-	Sync()
 }
 
 var kernmulC_map = map[int]string{0: "",

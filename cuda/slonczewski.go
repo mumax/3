@@ -17,5 +17,5 @@ func AddSlonczewskiTorque(torque, m, J *data.Slice, fixedP LUTPtrs, Msat, alpha,
 		unsafe.Pointer(Msat), unsafe.Pointer(alpha),
 		thickness, unsafe.Pointer(pol),
 		unsafe.Pointer(λ), unsafe.Pointer(ε_prime),
-		regions.Ptr, N, cfg, stream0)
+		regions.Ptr, N, cfg)
 }

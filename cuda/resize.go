@@ -20,5 +20,5 @@ func Resize(dst, src *data.Slice, layer int) {
 	cfg := make3DConf(dstsize)
 
 	k_resize_async(dst.DevPtr(0), dstsize[X], dstsize[Y], dstsize[Z],
-		src.DevPtr(0), srcsize[X], srcsize[Y], srcsize[Z], layer, scalex, scaley, cfg, stream0)
+		src.DevPtr(0), srcsize[X], srcsize[Y], srcsize[Z], layer, scalex, scaley, cfg)
 }

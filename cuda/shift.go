@@ -12,12 +12,12 @@ func ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32) {
 	util.Assert(dst.Len() == src.Len())
 	N := dst.Size()
 	cfg := make3DConf(N)
-	k_shiftx_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg, stream0)
+	k_shiftx_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg)
 }
 
 // Like Shift, but for bytes
 func ShiftBytes(dst, src *Bytes, m *data.Mesh, shiftX int, clamp byte) {
 	N := m.Size()
 	cfg := make3DConf(N)
-	k_shiftbytes_async(dst.Ptr, src.Ptr, N[X], N[Y], N[Z], shiftX, clamp, cfg, stream0)
+	k_shiftbytes_async(dst.Ptr, src.Ptr, N[X], N[Y], N[Z], shiftX, clamp, cfg)
 }

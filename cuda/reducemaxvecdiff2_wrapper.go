@@ -26,7 +26,7 @@ type reducemaxvecdiff2_args struct {
 }
 
 // Wrapper for reducemaxvecdiff2 CUDA kernel, asynchronous.
-func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.Pointer, x2 unsafe.Pointer, y2 unsafe.Pointer, z2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
+func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.Pointer, x2 unsafe.Pointer, y2 unsafe.Pointer, z2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -57,18 +57,11 @@ func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.P
 	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducemaxvecdiff2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(reducemaxvecdiff2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for reducemaxvecdiff2 CUDA kernel, synchronized.
-func k_reducemaxvecdiff2_sync(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.Pointer, x2 unsafe.Pointer, y2 unsafe.Pointer, z2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	Sync()
-	k_reducemaxvecdiff2_async(x1, y1, z1, x2, y2, z2, dst, initVal, n, cfg, stream0)
-	Sync()
 }
 
 var reducemaxvecdiff2_map = map[int]string{0: "",

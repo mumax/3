@@ -18,5 +18,5 @@ func AddCubicAnisotropy(Beff, m *data.Slice, k1_red LUTPtr, c1, c2 LUTPtrs, regi
 		unsafe.Pointer(k1_red),
 		c1[X], c1[Y], c1[Z],
 		c2[X], c2[Y], c2[Z],
-		regions.Ptr, N, cfg, stream0)
+		regions.Ptr, N, cfg)
 }

@@ -16,5 +16,5 @@ func AddUniaxialAnisotropy(Beff, m *data.Slice, k1_red LUTPtr, u LUTPtrs, region
 	k_adduniaxialanisotropy_async(Beff.DevPtr(X), Beff.DevPtr(Y), Beff.DevPtr(Z),
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		unsafe.Pointer(k1_red), u[X], u[Y], u[Z],
-		regions.Ptr, N, cfg, stream0)
+		regions.Ptr, N, cfg)
 }

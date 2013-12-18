@@ -20,5 +20,5 @@ func AddDMI(Beff *data.Slice, m *data.Slice, D_redx, D_redy, D_redz, A_red float
 	k_adddmi_async(Beff.DevPtr(X), Beff.DevPtr(Y), Beff.DevPtr(Z),
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		float32(D_redx), float32(D_redy), float32(D_redz), A_red,
-		float32(cellsize[X]), float32(cellsize[Y]), float32(cellsize[Z]), N[X], N[Y], N[Z], mesh.PBC_code(), cfg, stream0)
+		float32(cellsize[X]), float32(cellsize[Y]), float32(cellsize[Z]), N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
 }

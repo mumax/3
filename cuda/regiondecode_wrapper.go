@@ -21,7 +21,7 @@ type regiondecode_args struct {
 }
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
-func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -42,18 +42,11 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for regiondecode CUDA kernel, synchronized.
-func k_regiondecode_sync(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	Sync()
-	k_regiondecode_async(dst, LUT, regions, N, cfg, stream0)
-	Sync()
 }
 
 var regiondecode_map = map[int]string{0: "",

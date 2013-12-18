@@ -14,5 +14,5 @@ func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt floa
 	cfg := make1DConf(N)
 
 	k_addtemperature_async(Beff.DevPtr(0), noise.DevPtr(0), float32(kmu0_VgammaDt), unsafe.Pointer(temp_red),
-		regions.Ptr, N, cfg, stream0)
+		regions.Ptr, N, cfg)
 }

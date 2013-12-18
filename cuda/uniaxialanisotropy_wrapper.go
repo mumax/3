@@ -29,7 +29,7 @@ type adduniaxialanisotropy_args struct {
 }
 
 // Wrapper for adduniaxialanisotropy CUDA kernel, asynchronous.
-func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -66,18 +66,11 @@ func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsa
 	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(adduniaxialanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(adduniaxialanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for adduniaxialanisotropy CUDA kernel, synchronized.
-func k_adduniaxialanisotropy_sync(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, K1LUT unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	Sync()
-	k_adduniaxialanisotropy_async(Bx, By, Bz, mx, my, mz, K1LUT, uxLUT, uyLUT, uzLUT, regions, N, cfg, stream0)
-	Sync()
 }
 
 var adduniaxialanisotropy_map = map[int]string{0: "",

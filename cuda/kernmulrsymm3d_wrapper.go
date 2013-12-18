@@ -29,7 +29,7 @@ type kernmulRSymm3D_args struct {
 }
 
 // Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
-func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config, str cu.Stream) {
+func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -66,18 +66,11 @@ func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz un
 	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_Nz)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(kernmulRSymm3D_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(kernmulRSymm3D_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for kernmulRSymm3D CUDA kernel, synchronized.
-func k_kernmulRSymm3D_sync(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config) {
-	Sync()
-	k_kernmulRSymm3D_async(fftMx, fftMy, fftMz, fftKxx, fftKyy, fftKzz, fftKyz, fftKxz, fftKxy, Nx, Ny, Nz, cfg, stream0)
-	Sync()
 }
 
 var kernmulRSymm3D_map = map[int]string{0: "",

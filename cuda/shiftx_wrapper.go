@@ -25,7 +25,7 @@ type shiftx_args struct {
 }
 
 // Wrapper for shiftx CUDA kernel, asynchronous.
-func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clampL float32, clampR float32, cfg *config, str cu.Stream) {
+func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clampL float32, clampR float32, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -54,18 +54,11 @@ func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz i
 	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_clampR)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(shiftx_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(shiftx_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for shiftx CUDA kernel, synchronized.
-func k_shiftx_sync(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clampL float32, clampR float32, cfg *config) {
-	Sync()
-	k_shiftx_async(dst, src, Nx, Ny, Nz, shx, clampL, clampR, cfg, stream0)
-	Sync()
 }
 
 var shiftx_map = map[int]string{0: "",

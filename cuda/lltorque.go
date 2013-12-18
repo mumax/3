@@ -17,5 +17,5 @@ func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
 	k_lltorque_async(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z),
-		unsafe.Pointer(alpha), regions.Ptr, N, cfg, stream0)
+		unsafe.Pointer(alpha), regions.Ptr, N, cfg)
 }

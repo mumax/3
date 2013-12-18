@@ -21,7 +21,7 @@ type reducemaxabs_args struct {
 }
 
 // Wrapper for reducemaxabs CUDA kernel, asynchronous.
-func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config, str cu.Stream) {
+func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -42,18 +42,11 @@ func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float3
 	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_n)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(reducemaxabs_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(reducemaxabs_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for reducemaxabs CUDA kernel, synchronized.
-func k_reducemaxabs_sync(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	Sync()
-	k_reducemaxabs_async(src, dst, initVal, n, cfg, stream0)
-	Sync()
 }
 
 var reducemaxabs_map = map[int]string{0: "",

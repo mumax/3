@@ -20,5 +20,5 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.M
 	k_addexchange_async(B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z),
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		unsafe.Pointer(Aex_red), regions.Ptr,
-		wx, wy, wz, N[X], N[Y], N[Z], pbc, cfg, stream0)
+		wx, wy, wz, N[X], N[Y], N[Z], pbc, cfg)
 }

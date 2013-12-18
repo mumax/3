@@ -73,3 +73,9 @@ func LockThread() {
 	runtime.LockOSThread()
 	cudaCtx.SetCurrent()
 }
+
+const stream0 = cu.Stream(0) // for readability
+
+func Sync() {
+	stream0.Synchronize()
+}

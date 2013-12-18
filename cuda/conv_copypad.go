@@ -15,7 +15,7 @@ func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int) {
 	cfg := make3DConf(dstsize)
 
 	k_copyunpad_async(dst.DevPtr(0), dstsize[X], dstsize[Y], dstsize[Z],
-		src.DevPtr(0), srcsize[X], srcsize[Y], srcsize[Z], cfg, stream0)
+		src.DevPtr(0), srcsize[X], srcsize[Y], srcsize[Z], cfg)
 }
 
 // Copies src into dst, which is larger, and multiplies by vol*Bsat.
@@ -28,5 +28,5 @@ func copyPadMul(dst, src, vol *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr,
 
 	k_copypadmul_async(dst.DevPtr(0), dstsize[X], dstsize[Y], dstsize[Z],
 		src.DevPtr(0), vol.DevPtr(0), srcsize[X], srcsize[Y], srcsize[Z],
-		unsafe.Pointer(Bsat), regions.Ptr, cfg, stream0)
+		unsafe.Pointer(Bsat), regions.Ptr, cfg)
 }

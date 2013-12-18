@@ -23,7 +23,7 @@ type addtemperature_args struct {
 }
 
 // Wrapper for addtemperature CUDA kernel, asynchronous.
-func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config, str cu.Stream) {
+func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if synchronous { // debug
 		Sync()
 	}
@@ -48,18 +48,11 @@ func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
 
 	args := _a_.argptr[:]
-	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, str, args)
+	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if synchronous { // debug
 		Sync()
 	}
-}
-
-// Wrapper for addtemperature CUDA kernel, synchronized.
-func k_addtemperature_sync(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	Sync()
-	k_addtemperature_async(B, noise, kB2_VgammaDt, tempRedLUT, regions, N, cfg, stream0)
-	Sync()
 }
 
 var addtemperature_map = map[int]string{0: "",

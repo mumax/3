@@ -20,7 +20,6 @@ func (q *sliceInRegion) volume() float64  { return regions.volume(q.region) }
 
 // returns a new slice equal to q in the given region, 0 outside.
 func (q *sliceInRegion) Slice() (*data.Slice, bool) {
-
 	src, r := q.slicer.Slice()
 	if r {
 		defer cuda.Recycle(src)
@@ -28,7 +27,6 @@ func (q *sliceInRegion) Slice() (*data.Slice, bool) {
 	out := cuda.Buffer(q.NComp(), q.Mesh().Size())
 	cuda.RegionSelect(out, src, regions.Gpu(), byte(q.region))
 	return out, true
-
 }
 
 func (q *sliceInRegion) TableData() []float64 {

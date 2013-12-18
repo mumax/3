@@ -21,6 +21,6 @@ func EulerStep(s *solver, y *data.Slice) {
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
 	Time += s.Dt_si
-	s.postStep(y)
+	s.postStep()
 	s.NSteps++
 }

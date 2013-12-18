@@ -37,7 +37,7 @@ func Shift(dx int) {
 	if ShiftGeom {
 		geometry.shift(dx)
 	}
-	cuda.Normalize(M.Buffer(), geometry.Gpu()) // check!
+	M.normalize()
 }
 
 func shiftMag(m *data.Slice, dx int) {

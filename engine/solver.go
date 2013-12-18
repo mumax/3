@@ -7,7 +7,7 @@ import (
 
 type solver struct {
 	torqueFn               func(*data.Slice)          // updates dy
-	postStep               func(*data.Slice)          // called on y after successful step, typically normalizes magnetization
+	postStep               func()                     // called on y after successful step, typically normalizes magnetization
 	Dt_si, dt_mul          float64                    // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	MinDt, MaxDt           float64                    // minimum and maximum time step
 	MaxErr, Headroom       float64                    // maximum error per step
@@ -17,7 +17,7 @@ type solver struct {
 	step                   func(*solver, *data.Slice) // generic step, can be EulerStep, HeunStep, etc
 }
 
-func NewSolver(torqueFn, postStep func(*data.Slice), dt_si, dt_mul float64, step func(*solver, *data.Slice)) solver {
+func NewSolver(torqueFn func(dst *data.Slice), postStep func(), dt_si, dt_mul float64, step func(*solver, *data.Slice)) solver {
 	util.Argument(dt_si > 0 && dt_mul > 0)
 	return solver{torqueFn: torqueFn, postStep: postStep,
 		Dt_si: dt_si, dt_mul: dt_mul,

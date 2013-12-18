@@ -111,7 +111,7 @@ func (geometry *geom) setGeom(s Shape) {
 		data.Copy(M.Buffer(), mhost)
 	}
 
-	cuda.Normalize(M.Buffer(), geometry.Gpu()) // removes m outside vol
+	M.normalize() // removes m outside vol
 }
 
 func (g *geom) shift(dx int) {

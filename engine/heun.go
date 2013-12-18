@@ -37,7 +37,7 @@ func HeunStep(s *solver, y *data.Slice) {
 	if err < s.MaxErr || s.Dt_si <= s.MinDt { // mindt check to avoid infinite loop
 		// step OK
 		cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-		s.postStep(y)
+		s.postStep()
 		s.NSteps++
 		s.adaptDt(math.Pow(s.MaxErr/err, 1./2.))
 		s.LastErr = err

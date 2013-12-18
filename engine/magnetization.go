@@ -8,6 +8,10 @@ import (
 	"reflect"
 )
 
+var M magnetization // reduced magnetization (unit length)
+
+func init() { DeclLValue("m", &M, `Reduced magnetization (unit length)`) }
+
 // Special buffered quantity to store magnetization
 // makes sure it's normalized etc.
 type magnetization struct {

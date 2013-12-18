@@ -241,8 +241,6 @@ func (g *guistate) prepareDisplay() {
 
 func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
-		Req(1)
-		defer Req(-1)
 		updateKeepAlive() // keep track of when browser was last seen alive
 
 		if g.Busy() {

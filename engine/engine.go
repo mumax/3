@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"runtime"
 	"time"
@@ -13,25 +12,6 @@ const VERSION = "mumax3.4.0"
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 
 var StartTime = time.Now()
-
-var (
-	M     magnetization // reduced magnetization (unit length)
-	B_eff setter        // total effective field
-)
-
-func init() {
-	DeclLValue("m", &M, `Reduced magnetization (unit length)`)
-	B_eff.init(VECTOR, "B_eff", "T", "Effective field", SetEffectiveField)
-}
-
-// Sets dst to the current effective field (T).
-func SetEffectiveField(dst *data.Slice) {
-	B_demag.Set(dst)  // set to B_demag...
-	B_exch.AddTo(dst) // ...then add other terms
-	B_anis.AddTo(dst)
-	B_ext.AddTo(dst)
-	B_therm.AddTo(dst)
-}
 
 // check if m is set
 func checkM() {

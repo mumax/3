@@ -24,10 +24,6 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight, bsat), nil)
 }
 
-//func constVec(x, y, z float64) func() [3]float64 {
-//	return func() [3]float64 { return [3]float64{x, y, z} }
-//}
-
 // Returns the saturation magnetization in Tesla.
 // Cannot be set. Set Msat and bsat() will automatically be updated.
 func bSat() float64 {

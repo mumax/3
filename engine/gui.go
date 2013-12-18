@@ -151,20 +151,14 @@ func (g *guistate) prepareM() {
 		t := World.Resolve(ident).Type()
 		args := "("
 		for i := 0; i < t.NumIn(); i++ {
-			val := "0"
-			if i%3 == 0 {
-				val = "1"
-			}
 			if i > 0 {
 				args += ", "
 			}
-			args += val
+			args += "1"
 		}
 		args += ")"
 		// overwrite args for special cases
 		switch ident {
-		case "Vortex":
-			args = "(1, 1)"
 		case "VortexWall":
 			args = "(1, -1, 1, 1)"
 		}

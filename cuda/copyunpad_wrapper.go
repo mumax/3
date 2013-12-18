@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var copyunpad_code cu.Function
 
-type copyunpad_args struct {
+type copyunpad_args_t struct {
 	arg_dst unsafe.Pointer
 	arg_Dx  int
 	arg_Dy  int
@@ -22,6 +23,21 @@ type copyunpad_args struct {
 	arg_Sy  int
 	arg_Sz  int
 	argptr  [8]unsafe.Pointer
+	sync.Mutex
+}
+
+var copyunpad_args copyunpad_args_t
+
+func init() {
+	copyunpad_args.argptr[0] = unsafe.Pointer(&copyunpad_args.arg_dst)
+	copyunpad_args.argptr[1] = unsafe.Pointer(&copyunpad_args.arg_Dx)
+	copyunpad_args.argptr[2] = unsafe.Pointer(&copyunpad_args.arg_Dy)
+	copyunpad_args.argptr[3] = unsafe.Pointer(&copyunpad_args.arg_Dz)
+	copyunpad_args.argptr[4] = unsafe.Pointer(&copyunpad_args.arg_src)
+	copyunpad_args.argptr[5] = unsafe.Pointer(&copyunpad_args.arg_Sx)
+	copyunpad_args.argptr[6] = unsafe.Pointer(&copyunpad_args.arg_Sy)
+	copyunpad_args.argptr[7] = unsafe.Pointer(&copyunpad_args.arg_Sz)
+
 }
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
@@ -30,30 +46,23 @@ func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Po
 		Sync()
 	}
 
+	copyunpad_args.Lock()
+	defer copyunpad_args.Unlock()
+
 	if copyunpad_code == 0 {
 		copyunpad_code = fatbinLoad(copyunpad_map, "copyunpad")
 	}
 
-	var _a_ copyunpad_args
+	copyunpad_args.arg_dst = dst
+	copyunpad_args.arg_Dx = Dx
+	copyunpad_args.arg_Dy = Dy
+	copyunpad_args.arg_Dz = Dz
+	copyunpad_args.arg_src = src
+	copyunpad_args.arg_Sx = Sx
+	copyunpad_args.arg_Sy = Sy
+	copyunpad_args.arg_Sz = Sz
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_Dx = Dx
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Dx)
-	_a_.arg_Dy = Dy
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Dy)
-	_a_.arg_Dz = Dz
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Dz)
-	_a_.arg_src = src
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_Sx = Sx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_Sx)
-	_a_.arg_Sy = Sy
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Sy)
-	_a_.arg_Sz = Sz
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Sz)
-
-	args := _a_.argptr[:]
+	args := copyunpad_args.argptr[:]
 	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

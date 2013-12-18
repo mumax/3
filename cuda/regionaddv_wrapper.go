@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var regionaddv_code cu.Function
 
-type regionaddv_args struct {
+type regionaddv_args_t struct {
 	arg_dstx    unsafe.Pointer
 	arg_dsty    unsafe.Pointer
 	arg_dstz    unsafe.Pointer
@@ -22,6 +23,21 @@ type regionaddv_args struct {
 	arg_regions unsafe.Pointer
 	arg_N       int
 	argptr      [8]unsafe.Pointer
+	sync.Mutex
+}
+
+var regionaddv_args regionaddv_args_t
+
+func init() {
+	regionaddv_args.argptr[0] = unsafe.Pointer(&regionaddv_args.arg_dstx)
+	regionaddv_args.argptr[1] = unsafe.Pointer(&regionaddv_args.arg_dsty)
+	regionaddv_args.argptr[2] = unsafe.Pointer(&regionaddv_args.arg_dstz)
+	regionaddv_args.argptr[3] = unsafe.Pointer(&regionaddv_args.arg_LUTx)
+	regionaddv_args.argptr[4] = unsafe.Pointer(&regionaddv_args.arg_LUTy)
+	regionaddv_args.argptr[5] = unsafe.Pointer(&regionaddv_args.arg_LUTz)
+	regionaddv_args.argptr[6] = unsafe.Pointer(&regionaddv_args.arg_regions)
+	regionaddv_args.argptr[7] = unsafe.Pointer(&regionaddv_args.arg_N)
+
 }
 
 // Wrapper for regionaddv CUDA kernel, asynchronous.
@@ -30,30 +46,23 @@ func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Po
 		Sync()
 	}
 
+	regionaddv_args.Lock()
+	defer regionaddv_args.Unlock()
+
 	if regionaddv_code == 0 {
 		regionaddv_code = fatbinLoad(regionaddv_map, "regionaddv")
 	}
 
-	var _a_ regionaddv_args
+	regionaddv_args.arg_dstx = dstx
+	regionaddv_args.arg_dsty = dsty
+	regionaddv_args.arg_dstz = dstz
+	regionaddv_args.arg_LUTx = LUTx
+	regionaddv_args.arg_LUTy = LUTy
+	regionaddv_args.arg_LUTz = LUTz
+	regionaddv_args.arg_regions = regions
+	regionaddv_args.arg_N = N
 
-	_a_.arg_dstx = dstx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dstx)
-	_a_.arg_dsty = dsty
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_dsty)
-	_a_.arg_dstz = dstz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_dstz)
-	_a_.arg_LUTx = LUTx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_LUTx)
-	_a_.arg_LUTy = LUTy
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_LUTy)
-	_a_.arg_LUTz = LUTz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_LUTz)
-	_a_.arg_regions = regions
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := regionaddv_args.argptr[:]
 	cu.LaunchKernel(regionaddv_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

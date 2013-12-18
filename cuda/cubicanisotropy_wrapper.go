@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var addcubicanisotropy_code cu.Function
 
-type addcubicanisotropy_args struct {
+type addcubicanisotropy_args_t struct {
 	arg_Bx      unsafe.Pointer
 	arg_By      unsafe.Pointer
 	arg_Bz      unsafe.Pointer
@@ -29,6 +30,28 @@ type addcubicanisotropy_args struct {
 	arg_regions unsafe.Pointer
 	arg_N       int
 	argptr      [15]unsafe.Pointer
+	sync.Mutex
+}
+
+var addcubicanisotropy_args addcubicanisotropy_args_t
+
+func init() {
+	addcubicanisotropy_args.argptr[0] = unsafe.Pointer(&addcubicanisotropy_args.arg_Bx)
+	addcubicanisotropy_args.argptr[1] = unsafe.Pointer(&addcubicanisotropy_args.arg_By)
+	addcubicanisotropy_args.argptr[2] = unsafe.Pointer(&addcubicanisotropy_args.arg_Bz)
+	addcubicanisotropy_args.argptr[3] = unsafe.Pointer(&addcubicanisotropy_args.arg_mx)
+	addcubicanisotropy_args.argptr[4] = unsafe.Pointer(&addcubicanisotropy_args.arg_my)
+	addcubicanisotropy_args.argptr[5] = unsafe.Pointer(&addcubicanisotropy_args.arg_mz)
+	addcubicanisotropy_args.argptr[6] = unsafe.Pointer(&addcubicanisotropy_args.arg_K1LUT)
+	addcubicanisotropy_args.argptr[7] = unsafe.Pointer(&addcubicanisotropy_args.arg_C1xLUT)
+	addcubicanisotropy_args.argptr[8] = unsafe.Pointer(&addcubicanisotropy_args.arg_C1yLUT)
+	addcubicanisotropy_args.argptr[9] = unsafe.Pointer(&addcubicanisotropy_args.arg_C1zLUT)
+	addcubicanisotropy_args.argptr[10] = unsafe.Pointer(&addcubicanisotropy_args.arg_C2xLUT)
+	addcubicanisotropy_args.argptr[11] = unsafe.Pointer(&addcubicanisotropy_args.arg_C2yLUT)
+	addcubicanisotropy_args.argptr[12] = unsafe.Pointer(&addcubicanisotropy_args.arg_C2zLUT)
+	addcubicanisotropy_args.argptr[13] = unsafe.Pointer(&addcubicanisotropy_args.arg_regions)
+	addcubicanisotropy_args.argptr[14] = unsafe.Pointer(&addcubicanisotropy_args.arg_N)
+
 }
 
 // Wrapper for addcubicanisotropy CUDA kernel, asynchronous.
@@ -37,44 +60,30 @@ func k_addcubicanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.
 		Sync()
 	}
 
+	addcubicanisotropy_args.Lock()
+	defer addcubicanisotropy_args.Unlock()
+
 	if addcubicanisotropy_code == 0 {
 		addcubicanisotropy_code = fatbinLoad(addcubicanisotropy_map, "addcubicanisotropy")
 	}
 
-	var _a_ addcubicanisotropy_args
+	addcubicanisotropy_args.arg_Bx = Bx
+	addcubicanisotropy_args.arg_By = By
+	addcubicanisotropy_args.arg_Bz = Bz
+	addcubicanisotropy_args.arg_mx = mx
+	addcubicanisotropy_args.arg_my = my
+	addcubicanisotropy_args.arg_mz = mz
+	addcubicanisotropy_args.arg_K1LUT = K1LUT
+	addcubicanisotropy_args.arg_C1xLUT = C1xLUT
+	addcubicanisotropy_args.arg_C1yLUT = C1yLUT
+	addcubicanisotropy_args.arg_C1zLUT = C1zLUT
+	addcubicanisotropy_args.arg_C2xLUT = C2xLUT
+	addcubicanisotropy_args.arg_C2yLUT = C2yLUT
+	addcubicanisotropy_args.arg_C2zLUT = C2zLUT
+	addcubicanisotropy_args.arg_regions = regions
+	addcubicanisotropy_args.arg_N = N
 
-	_a_.arg_Bx = Bx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_Bx)
-	_a_.arg_By = By
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_By)
-	_a_.arg_Bz = Bz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Bz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_K1LUT = K1LUT
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_K1LUT)
-	_a_.arg_C1xLUT = C1xLUT
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_C1xLUT)
-	_a_.arg_C1yLUT = C1yLUT
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_C1yLUT)
-	_a_.arg_C1zLUT = C1zLUT
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_C1zLUT)
-	_a_.arg_C2xLUT = C2xLUT
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_C2xLUT)
-	_a_.arg_C2yLUT = C2yLUT
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_C2yLUT)
-	_a_.arg_C2zLUT = C2zLUT
-	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_C2zLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := addcubicanisotropy_args.argptr[:]
 	cu.LaunchKernel(addcubicanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

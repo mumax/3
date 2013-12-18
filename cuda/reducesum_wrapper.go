@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducesum_code cu.Function
 
-type reducesum_args struct {
+type reducesum_args_t struct {
 	arg_src     unsafe.Pointer
 	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducesum_args reducesum_args_t
+
+func init() {
+	reducesum_args.argptr[0] = unsafe.Pointer(&reducesum_args.arg_src)
+	reducesum_args.argptr[1] = unsafe.Pointer(&reducesum_args.arg_dst)
+	reducesum_args.argptr[2] = unsafe.Pointer(&reducesum_args.arg_initVal)
+	reducesum_args.argptr[3] = unsafe.Pointer(&reducesum_args.arg_n)
+
 }
 
 // Wrapper for reducesum CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 		Sync()
 	}
 
+	reducesum_args.Lock()
+	defer reducesum_args.Unlock()
+
 	if reducesum_code == 0 {
 		reducesum_code = fatbinLoad(reducesum_map, "reducesum")
 	}
 
-	var _a_ reducesum_args
+	reducesum_args.arg_src = src
+	reducesum_args.arg_dst = dst
+	reducesum_args.arg_initVal = initVal
+	reducesum_args.arg_n = n
 
-	_a_.arg_src = src
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_dst = dst
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducesum_args.argptr[:]
 	cu.LaunchKernel(reducesum_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

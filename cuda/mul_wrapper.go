@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var mul_code cu.Function
 
-type mul_args struct {
+type mul_args_t struct {
 	arg_dst unsafe.Pointer
 	arg_a   unsafe.Pointer
 	arg_b   unsafe.Pointer
 	arg_N   int
 	argptr  [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var mul_args mul_args_t
+
+func init() {
+	mul_args.argptr[0] = unsafe.Pointer(&mul_args.arg_dst)
+	mul_args.argptr[1] = unsafe.Pointer(&mul_args.arg_a)
+	mul_args.argptr[2] = unsafe.Pointer(&mul_args.arg_b)
+	mul_args.argptr[3] = unsafe.Pointer(&mul_args.arg_N)
+
 }
 
 // Wrapper for mul CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_mul_async(dst unsafe.Pointer, a unsafe.Pointer, b unsafe.Pointer, N int, 
 		Sync()
 	}
 
+	mul_args.Lock()
+	defer mul_args.Unlock()
+
 	if mul_code == 0 {
 		mul_code = fatbinLoad(mul_map, "mul")
 	}
 
-	var _a_ mul_args
+	mul_args.arg_dst = dst
+	mul_args.arg_a = a
+	mul_args.arg_b = b
+	mul_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_a = a
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_a)
-	_a_.arg_b = b
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_b)
-	_a_.arg_N = N
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := mul_args.argptr[:]
 	cu.LaunchKernel(mul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

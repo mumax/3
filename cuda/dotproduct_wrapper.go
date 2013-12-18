@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var dotproduct_code cu.Function
 
-type dotproduct_args struct {
+type dotproduct_args_t struct {
 	arg_dst       unsafe.Pointer
 	arg_prefactor float32
 	arg_ax        unsafe.Pointer
@@ -23,6 +24,22 @@ type dotproduct_args struct {
 	arg_bz        unsafe.Pointer
 	arg_N         int
 	argptr        [9]unsafe.Pointer
+	sync.Mutex
+}
+
+var dotproduct_args dotproduct_args_t
+
+func init() {
+	dotproduct_args.argptr[0] = unsafe.Pointer(&dotproduct_args.arg_dst)
+	dotproduct_args.argptr[1] = unsafe.Pointer(&dotproduct_args.arg_prefactor)
+	dotproduct_args.argptr[2] = unsafe.Pointer(&dotproduct_args.arg_ax)
+	dotproduct_args.argptr[3] = unsafe.Pointer(&dotproduct_args.arg_ay)
+	dotproduct_args.argptr[4] = unsafe.Pointer(&dotproduct_args.arg_az)
+	dotproduct_args.argptr[5] = unsafe.Pointer(&dotproduct_args.arg_bx)
+	dotproduct_args.argptr[6] = unsafe.Pointer(&dotproduct_args.arg_by)
+	dotproduct_args.argptr[7] = unsafe.Pointer(&dotproduct_args.arg_bz)
+	dotproduct_args.argptr[8] = unsafe.Pointer(&dotproduct_args.arg_N)
+
 }
 
 // Wrapper for dotproduct CUDA kernel, asynchronous.
@@ -31,32 +48,24 @@ func k_dotproduct_async(dst unsafe.Pointer, prefactor float32, ax unsafe.Pointer
 		Sync()
 	}
 
+	dotproduct_args.Lock()
+	defer dotproduct_args.Unlock()
+
 	if dotproduct_code == 0 {
 		dotproduct_code = fatbinLoad(dotproduct_map, "dotproduct")
 	}
 
-	var _a_ dotproduct_args
+	dotproduct_args.arg_dst = dst
+	dotproduct_args.arg_prefactor = prefactor
+	dotproduct_args.arg_ax = ax
+	dotproduct_args.arg_ay = ay
+	dotproduct_args.arg_az = az
+	dotproduct_args.arg_bx = bx
+	dotproduct_args.arg_by = by
+	dotproduct_args.arg_bz = bz
+	dotproduct_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_prefactor = prefactor
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_prefactor)
-	_a_.arg_ax = ax
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_ax)
-	_a_.arg_ay = ay
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_ay)
-	_a_.arg_az = az
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_az)
-	_a_.arg_bx = bx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_bx)
-	_a_.arg_by = by
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_by)
-	_a_.arg_bz = bz
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_bz)
-	_a_.arg_N = N
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := dotproduct_args.argptr[:]
 	cu.LaunchKernel(dotproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

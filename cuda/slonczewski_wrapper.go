@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var addslonczewskitorque_code cu.Function
 
-type addslonczewskitorque_args struct {
+type addslonczewskitorque_args_t struct {
 	arg_tx              unsafe.Pointer
 	arg_ty              unsafe.Pointer
 	arg_tz              unsafe.Pointer
@@ -32,6 +33,31 @@ type addslonczewskitorque_args struct {
 	arg_regions         unsafe.Pointer
 	arg_N               int
 	argptr              [18]unsafe.Pointer
+	sync.Mutex
+}
+
+var addslonczewskitorque_args addslonczewskitorque_args_t
+
+func init() {
+	addslonczewskitorque_args.argptr[0] = unsafe.Pointer(&addslonczewskitorque_args.arg_tx)
+	addslonczewskitorque_args.argptr[1] = unsafe.Pointer(&addslonczewskitorque_args.arg_ty)
+	addslonczewskitorque_args.argptr[2] = unsafe.Pointer(&addslonczewskitorque_args.arg_tz)
+	addslonczewskitorque_args.argptr[3] = unsafe.Pointer(&addslonczewskitorque_args.arg_mx)
+	addslonczewskitorque_args.argptr[4] = unsafe.Pointer(&addslonczewskitorque_args.arg_my)
+	addslonczewskitorque_args.argptr[5] = unsafe.Pointer(&addslonczewskitorque_args.arg_mz)
+	addslonczewskitorque_args.argptr[6] = unsafe.Pointer(&addslonczewskitorque_args.arg_jz)
+	addslonczewskitorque_args.argptr[7] = unsafe.Pointer(&addslonczewskitorque_args.arg_pxLUT)
+	addslonczewskitorque_args.argptr[8] = unsafe.Pointer(&addslonczewskitorque_args.arg_pyLUT)
+	addslonczewskitorque_args.argptr[9] = unsafe.Pointer(&addslonczewskitorque_args.arg_pzLUT)
+	addslonczewskitorque_args.argptr[10] = unsafe.Pointer(&addslonczewskitorque_args.arg_msatLUT)
+	addslonczewskitorque_args.argptr[11] = unsafe.Pointer(&addslonczewskitorque_args.arg_alphaLUT)
+	addslonczewskitorque_args.argptr[12] = unsafe.Pointer(&addslonczewskitorque_args.arg_flt)
+	addslonczewskitorque_args.argptr[13] = unsafe.Pointer(&addslonczewskitorque_args.arg_polLUT)
+	addslonczewskitorque_args.argptr[14] = unsafe.Pointer(&addslonczewskitorque_args.arg_lambdaLUT)
+	addslonczewskitorque_args.argptr[15] = unsafe.Pointer(&addslonczewskitorque_args.arg_epsilonPrimeLUT)
+	addslonczewskitorque_args.argptr[16] = unsafe.Pointer(&addslonczewskitorque_args.arg_regions)
+	addslonczewskitorque_args.argptr[17] = unsafe.Pointer(&addslonczewskitorque_args.arg_N)
+
 }
 
 // Wrapper for addslonczewskitorque CUDA kernel, asynchronous.
@@ -40,50 +66,33 @@ func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsaf
 		Sync()
 	}
 
+	addslonczewskitorque_args.Lock()
+	defer addslonczewskitorque_args.Unlock()
+
 	if addslonczewskitorque_code == 0 {
 		addslonczewskitorque_code = fatbinLoad(addslonczewskitorque_map, "addslonczewskitorque")
 	}
 
-	var _a_ addslonczewskitorque_args
+	addslonczewskitorque_args.arg_tx = tx
+	addslonczewskitorque_args.arg_ty = ty
+	addslonczewskitorque_args.arg_tz = tz
+	addslonczewskitorque_args.arg_mx = mx
+	addslonczewskitorque_args.arg_my = my
+	addslonczewskitorque_args.arg_mz = mz
+	addslonczewskitorque_args.arg_jz = jz
+	addslonczewskitorque_args.arg_pxLUT = pxLUT
+	addslonczewskitorque_args.arg_pyLUT = pyLUT
+	addslonczewskitorque_args.arg_pzLUT = pzLUT
+	addslonczewskitorque_args.arg_msatLUT = msatLUT
+	addslonczewskitorque_args.arg_alphaLUT = alphaLUT
+	addslonczewskitorque_args.arg_flt = flt
+	addslonczewskitorque_args.arg_polLUT = polLUT
+	addslonczewskitorque_args.arg_lambdaLUT = lambdaLUT
+	addslonczewskitorque_args.arg_epsilonPrimeLUT = epsilonPrimeLUT
+	addslonczewskitorque_args.arg_regions = regions
+	addslonczewskitorque_args.arg_N = N
 
-	_a_.arg_tx = tx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_tx)
-	_a_.arg_ty = ty
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_ty)
-	_a_.arg_tz = tz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_tz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_jz = jz
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_jz)
-	_a_.arg_pxLUT = pxLUT
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_pxLUT)
-	_a_.arg_pyLUT = pyLUT
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_pyLUT)
-	_a_.arg_pzLUT = pzLUT
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_pzLUT)
-	_a_.arg_msatLUT = msatLUT
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_msatLUT)
-	_a_.arg_alphaLUT = alphaLUT
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_alphaLUT)
-	_a_.arg_flt = flt
-	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_flt)
-	_a_.arg_polLUT = polLUT
-	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_polLUT)
-	_a_.arg_lambdaLUT = lambdaLUT
-	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_lambdaLUT)
-	_a_.arg_epsilonPrimeLUT = epsilonPrimeLUT
-	_a_.argptr[15] = unsafe.Pointer(&_a_.arg_epsilonPrimeLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[16] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[17] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := addslonczewskitorque_args.argptr[:]
 	cu.LaunchKernel(addslonczewskitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

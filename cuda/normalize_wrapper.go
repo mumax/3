@@ -7,18 +7,31 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var normalize_code cu.Function
 
-type normalize_args struct {
+type normalize_args_t struct {
 	arg_vx  unsafe.Pointer
 	arg_vy  unsafe.Pointer
 	arg_vz  unsafe.Pointer
 	arg_vol unsafe.Pointer
 	arg_N   int
 	argptr  [5]unsafe.Pointer
+	sync.Mutex
+}
+
+var normalize_args normalize_args_t
+
+func init() {
+	normalize_args.argptr[0] = unsafe.Pointer(&normalize_args.arg_vx)
+	normalize_args.argptr[1] = unsafe.Pointer(&normalize_args.arg_vy)
+	normalize_args.argptr[2] = unsafe.Pointer(&normalize_args.arg_vz)
+	normalize_args.argptr[3] = unsafe.Pointer(&normalize_args.arg_vol)
+	normalize_args.argptr[4] = unsafe.Pointer(&normalize_args.arg_N)
+
 }
 
 // Wrapper for normalize CUDA kernel, asynchronous.
@@ -27,24 +40,20 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 		Sync()
 	}
 
+	normalize_args.Lock()
+	defer normalize_args.Unlock()
+
 	if normalize_code == 0 {
 		normalize_code = fatbinLoad(normalize_map, "normalize")
 	}
 
-	var _a_ normalize_args
+	normalize_args.arg_vx = vx
+	normalize_args.arg_vy = vy
+	normalize_args.arg_vz = vz
+	normalize_args.arg_vol = vol
+	normalize_args.arg_N = N
 
-	_a_.arg_vx = vx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_vx)
-	_a_.arg_vy = vy
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_vy)
-	_a_.arg_vz = vz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_vz)
-	_a_.arg_vol = vol
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_vol)
-	_a_.arg_N = N
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := normalize_args.argptr[:]
 	cu.LaunchKernel(normalize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

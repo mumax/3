@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var addtemperature_code cu.Function
 
-type addtemperature_args struct {
+type addtemperature_args_t struct {
 	arg_B            unsafe.Pointer
 	arg_noise        unsafe.Pointer
 	arg_kB2_VgammaDt float32
@@ -20,6 +21,19 @@ type addtemperature_args struct {
 	arg_regions      unsafe.Pointer
 	arg_N            int
 	argptr           [6]unsafe.Pointer
+	sync.Mutex
+}
+
+var addtemperature_args addtemperature_args_t
+
+func init() {
+	addtemperature_args.argptr[0] = unsafe.Pointer(&addtemperature_args.arg_B)
+	addtemperature_args.argptr[1] = unsafe.Pointer(&addtemperature_args.arg_noise)
+	addtemperature_args.argptr[2] = unsafe.Pointer(&addtemperature_args.arg_kB2_VgammaDt)
+	addtemperature_args.argptr[3] = unsafe.Pointer(&addtemperature_args.arg_tempRedLUT)
+	addtemperature_args.argptr[4] = unsafe.Pointer(&addtemperature_args.arg_regions)
+	addtemperature_args.argptr[5] = unsafe.Pointer(&addtemperature_args.arg_N)
+
 }
 
 // Wrapper for addtemperature CUDA kernel, asynchronous.
@@ -28,26 +42,21 @@ func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 		Sync()
 	}
 
+	addtemperature_args.Lock()
+	defer addtemperature_args.Unlock()
+
 	if addtemperature_code == 0 {
 		addtemperature_code = fatbinLoad(addtemperature_map, "addtemperature")
 	}
 
-	var _a_ addtemperature_args
+	addtemperature_args.arg_B = B
+	addtemperature_args.arg_noise = noise
+	addtemperature_args.arg_kB2_VgammaDt = kB2_VgammaDt
+	addtemperature_args.arg_tempRedLUT = tempRedLUT
+	addtemperature_args.arg_regions = regions
+	addtemperature_args.arg_N = N
 
-	_a_.arg_B = B
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_B)
-	_a_.arg_noise = noise
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_noise)
-	_a_.arg_kB2_VgammaDt = kB2_VgammaDt
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_kB2_VgammaDt)
-	_a_.arg_tempRedLUT = tempRedLUT
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_tempRedLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := addtemperature_args.argptr[:]
 	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

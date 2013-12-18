@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var madd3_code cu.Function
 
-type madd3_args struct {
+type madd3_args_t struct {
 	arg_dst  unsafe.Pointer
 	arg_src1 unsafe.Pointer
 	arg_fac1 float32
@@ -22,6 +23,21 @@ type madd3_args struct {
 	arg_fac3 float32
 	arg_N    int
 	argptr   [8]unsafe.Pointer
+	sync.Mutex
+}
+
+var madd3_args madd3_args_t
+
+func init() {
+	madd3_args.argptr[0] = unsafe.Pointer(&madd3_args.arg_dst)
+	madd3_args.argptr[1] = unsafe.Pointer(&madd3_args.arg_src1)
+	madd3_args.argptr[2] = unsafe.Pointer(&madd3_args.arg_fac1)
+	madd3_args.argptr[3] = unsafe.Pointer(&madd3_args.arg_src2)
+	madd3_args.argptr[4] = unsafe.Pointer(&madd3_args.arg_fac2)
+	madd3_args.argptr[5] = unsafe.Pointer(&madd3_args.arg_src3)
+	madd3_args.argptr[6] = unsafe.Pointer(&madd3_args.arg_fac3)
+	madd3_args.argptr[7] = unsafe.Pointer(&madd3_args.arg_N)
+
 }
 
 // Wrapper for madd3 CUDA kernel, asynchronous.
@@ -30,30 +46,23 @@ func k_madd3_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 		Sync()
 	}
 
+	madd3_args.Lock()
+	defer madd3_args.Unlock()
+
 	if madd3_code == 0 {
 		madd3_code = fatbinLoad(madd3_map, "madd3")
 	}
 
-	var _a_ madd3_args
+	madd3_args.arg_dst = dst
+	madd3_args.arg_src1 = src1
+	madd3_args.arg_fac1 = fac1
+	madd3_args.arg_src2 = src2
+	madd3_args.arg_fac2 = fac2
+	madd3_args.arg_src3 = src3
+	madd3_args.arg_fac3 = fac3
+	madd3_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_src1 = src1
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src1)
-	_a_.arg_fac1 = fac1
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fac1)
-	_a_.arg_src2 = src2
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_src2)
-	_a_.arg_fac2 = fac2
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fac2)
-	_a_.arg_src3 = src3
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_src3)
-	_a_.arg_fac3 = fac3
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_fac3)
-	_a_.arg_N = N
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := madd3_args.argptr[:]
 	cu.LaunchKernel(madd3_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var resize_code cu.Function
 
-type resize_args struct {
+type resize_args_t struct {
 	arg_dst    unsafe.Pointer
 	arg_Dx     int
 	arg_Dy     int
@@ -25,6 +26,24 @@ type resize_args struct {
 	arg_scalex int
 	arg_scaley int
 	argptr     [11]unsafe.Pointer
+	sync.Mutex
+}
+
+var resize_args resize_args_t
+
+func init() {
+	resize_args.argptr[0] = unsafe.Pointer(&resize_args.arg_dst)
+	resize_args.argptr[1] = unsafe.Pointer(&resize_args.arg_Dx)
+	resize_args.argptr[2] = unsafe.Pointer(&resize_args.arg_Dy)
+	resize_args.argptr[3] = unsafe.Pointer(&resize_args.arg_Dz)
+	resize_args.argptr[4] = unsafe.Pointer(&resize_args.arg_src)
+	resize_args.argptr[5] = unsafe.Pointer(&resize_args.arg_Sx)
+	resize_args.argptr[6] = unsafe.Pointer(&resize_args.arg_Sy)
+	resize_args.argptr[7] = unsafe.Pointer(&resize_args.arg_Sz)
+	resize_args.argptr[8] = unsafe.Pointer(&resize_args.arg_layer)
+	resize_args.argptr[9] = unsafe.Pointer(&resize_args.arg_scalex)
+	resize_args.argptr[10] = unsafe.Pointer(&resize_args.arg_scaley)
+
 }
 
 // Wrapper for resize CUDA kernel, asynchronous.
@@ -33,36 +52,26 @@ func k_resize_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Point
 		Sync()
 	}
 
+	resize_args.Lock()
+	defer resize_args.Unlock()
+
 	if resize_code == 0 {
 		resize_code = fatbinLoad(resize_map, "resize")
 	}
 
-	var _a_ resize_args
+	resize_args.arg_dst = dst
+	resize_args.arg_Dx = Dx
+	resize_args.arg_Dy = Dy
+	resize_args.arg_Dz = Dz
+	resize_args.arg_src = src
+	resize_args.arg_Sx = Sx
+	resize_args.arg_Sy = Sy
+	resize_args.arg_Sz = Sz
+	resize_args.arg_layer = layer
+	resize_args.arg_scalex = scalex
+	resize_args.arg_scaley = scaley
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_Dx = Dx
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Dx)
-	_a_.arg_Dy = Dy
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Dy)
-	_a_.arg_Dz = Dz
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Dz)
-	_a_.arg_src = src
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_Sx = Sx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_Sx)
-	_a_.arg_Sy = Sy
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Sy)
-	_a_.arg_Sz = Sz
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Sz)
-	_a_.arg_layer = layer
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_layer)
-	_a_.arg_scalex = scalex
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_scalex)
-	_a_.arg_scaley = scaley
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_scaley)
-
-	args := _a_.argptr[:]
+	args := resize_args.argptr[:]
 	cu.LaunchKernel(resize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

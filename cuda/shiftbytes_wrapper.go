@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var shiftbytes_code cu.Function
 
-type shiftbytes_args struct {
+type shiftbytes_args_t struct {
 	arg_dst   unsafe.Pointer
 	arg_src   unsafe.Pointer
 	arg_Nx    int
@@ -21,6 +22,20 @@ type shiftbytes_args struct {
 	arg_shx   int
 	arg_clamp byte
 	argptr    [7]unsafe.Pointer
+	sync.Mutex
+}
+
+var shiftbytes_args shiftbytes_args_t
+
+func init() {
+	shiftbytes_args.argptr[0] = unsafe.Pointer(&shiftbytes_args.arg_dst)
+	shiftbytes_args.argptr[1] = unsafe.Pointer(&shiftbytes_args.arg_src)
+	shiftbytes_args.argptr[2] = unsafe.Pointer(&shiftbytes_args.arg_Nx)
+	shiftbytes_args.argptr[3] = unsafe.Pointer(&shiftbytes_args.arg_Ny)
+	shiftbytes_args.argptr[4] = unsafe.Pointer(&shiftbytes_args.arg_Nz)
+	shiftbytes_args.argptr[5] = unsafe.Pointer(&shiftbytes_args.arg_shx)
+	shiftbytes_args.argptr[6] = unsafe.Pointer(&shiftbytes_args.arg_clamp)
+
 }
 
 // Wrapper for shiftbytes CUDA kernel, asynchronous.
@@ -29,28 +44,22 @@ func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, 
 		Sync()
 	}
 
+	shiftbytes_args.Lock()
+	defer shiftbytes_args.Unlock()
+
 	if shiftbytes_code == 0 {
 		shiftbytes_code = fatbinLoad(shiftbytes_map, "shiftbytes")
 	}
 
-	var _a_ shiftbytes_args
+	shiftbytes_args.arg_dst = dst
+	shiftbytes_args.arg_src = src
+	shiftbytes_args.arg_Nx = Nx
+	shiftbytes_args.arg_Ny = Ny
+	shiftbytes_args.arg_Nz = Nz
+	shiftbytes_args.arg_shx = shx
+	shiftbytes_args.arg_clamp = clamp
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_src = src
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_Nx = Nx
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
-	_a_.arg_Nz = Nz
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_Nz)
-	_a_.arg_shx = shx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_shx)
-	_a_.arg_clamp = clamp
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_clamp)
-
-	args := _a_.argptr[:]
+	args := shiftbytes_args.argptr[:]
 	cu.LaunchKernel(shiftbytes_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

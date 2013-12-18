@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var adddmi_code cu.Function
 
-type adddmi_args struct {
+type adddmi_args_t struct {
 	arg_Hx  unsafe.Pointer
 	arg_Hy  unsafe.Pointer
 	arg_Hz  unsafe.Pointer
@@ -31,6 +32,30 @@ type adddmi_args struct {
 	arg_Nz  int
 	arg_PBC byte
 	argptr  [17]unsafe.Pointer
+	sync.Mutex
+}
+
+var adddmi_args adddmi_args_t
+
+func init() {
+	adddmi_args.argptr[0] = unsafe.Pointer(&adddmi_args.arg_Hx)
+	adddmi_args.argptr[1] = unsafe.Pointer(&adddmi_args.arg_Hy)
+	adddmi_args.argptr[2] = unsafe.Pointer(&adddmi_args.arg_Hz)
+	adddmi_args.argptr[3] = unsafe.Pointer(&adddmi_args.arg_mx)
+	adddmi_args.argptr[4] = unsafe.Pointer(&adddmi_args.arg_my)
+	adddmi_args.argptr[5] = unsafe.Pointer(&adddmi_args.arg_mz)
+	adddmi_args.argptr[6] = unsafe.Pointer(&adddmi_args.arg_Dx)
+	adddmi_args.argptr[7] = unsafe.Pointer(&adddmi_args.arg_Dy)
+	adddmi_args.argptr[8] = unsafe.Pointer(&adddmi_args.arg_Dz)
+	adddmi_args.argptr[9] = unsafe.Pointer(&adddmi_args.arg_A)
+	adddmi_args.argptr[10] = unsafe.Pointer(&adddmi_args.arg_cx)
+	adddmi_args.argptr[11] = unsafe.Pointer(&adddmi_args.arg_cy)
+	adddmi_args.argptr[12] = unsafe.Pointer(&adddmi_args.arg_cz)
+	adddmi_args.argptr[13] = unsafe.Pointer(&adddmi_args.arg_Nx)
+	adddmi_args.argptr[14] = unsafe.Pointer(&adddmi_args.arg_Ny)
+	adddmi_args.argptr[15] = unsafe.Pointer(&adddmi_args.arg_Nz)
+	adddmi_args.argptr[16] = unsafe.Pointer(&adddmi_args.arg_PBC)
+
 }
 
 // Wrapper for adddmi CUDA kernel, asynchronous.
@@ -39,48 +64,32 @@ func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx 
 		Sync()
 	}
 
+	adddmi_args.Lock()
+	defer adddmi_args.Unlock()
+
 	if adddmi_code == 0 {
 		adddmi_code = fatbinLoad(adddmi_map, "adddmi")
 	}
 
-	var _a_ adddmi_args
+	adddmi_args.arg_Hx = Hx
+	adddmi_args.arg_Hy = Hy
+	adddmi_args.arg_Hz = Hz
+	adddmi_args.arg_mx = mx
+	adddmi_args.arg_my = my
+	adddmi_args.arg_mz = mz
+	adddmi_args.arg_Dx = Dx
+	adddmi_args.arg_Dy = Dy
+	adddmi_args.arg_Dz = Dz
+	adddmi_args.arg_A = A
+	adddmi_args.arg_cx = cx
+	adddmi_args.arg_cy = cy
+	adddmi_args.arg_cz = cz
+	adddmi_args.arg_Nx = Nx
+	adddmi_args.arg_Ny = Ny
+	adddmi_args.arg_Nz = Nz
+	adddmi_args.arg_PBC = PBC
 
-	_a_.arg_Hx = Hx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_Hx)
-	_a_.arg_Hy = Hy
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Hy)
-	_a_.arg_Hz = Hz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Hz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_Dx = Dx
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Dx)
-	_a_.arg_Dy = Dy
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Dy)
-	_a_.arg_Dz = Dz
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_Dz)
-	_a_.arg_A = A
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_A)
-	_a_.arg_cx = cx
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_cx)
-	_a_.arg_cy = cy
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_cy)
-	_a_.arg_cz = cz
-	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_cz)
-	_a_.arg_Nx = Nx
-	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_Ny)
-	_a_.arg_Nz = Nz
-	_a_.argptr[15] = unsafe.Pointer(&_a_.arg_Nz)
-	_a_.arg_PBC = PBC
-	_a_.argptr[16] = unsafe.Pointer(&_a_.arg_PBC)
-
-	args := _a_.argptr[:]
+	args := adddmi_args.argptr[:]
 	cu.LaunchKernel(adddmi_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

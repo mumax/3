@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var adduniaxialanisotropy_code cu.Function
 
-type adduniaxialanisotropy_args struct {
+type adduniaxialanisotropy_args_t struct {
 	arg_Bx      unsafe.Pointer
 	arg_By      unsafe.Pointer
 	arg_Bz      unsafe.Pointer
@@ -26,6 +27,25 @@ type adduniaxialanisotropy_args struct {
 	arg_regions unsafe.Pointer
 	arg_N       int
 	argptr      [12]unsafe.Pointer
+	sync.Mutex
+}
+
+var adduniaxialanisotropy_args adduniaxialanisotropy_args_t
+
+func init() {
+	adduniaxialanisotropy_args.argptr[0] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_Bx)
+	adduniaxialanisotropy_args.argptr[1] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_By)
+	adduniaxialanisotropy_args.argptr[2] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_Bz)
+	adduniaxialanisotropy_args.argptr[3] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_mx)
+	adduniaxialanisotropy_args.argptr[4] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_my)
+	adduniaxialanisotropy_args.argptr[5] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_mz)
+	adduniaxialanisotropy_args.argptr[6] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_K1LUT)
+	adduniaxialanisotropy_args.argptr[7] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_uxLUT)
+	adduniaxialanisotropy_args.argptr[8] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_uyLUT)
+	adduniaxialanisotropy_args.argptr[9] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_uzLUT)
+	adduniaxialanisotropy_args.argptr[10] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_regions)
+	adduniaxialanisotropy_args.argptr[11] = unsafe.Pointer(&adduniaxialanisotropy_args.arg_N)
+
 }
 
 // Wrapper for adduniaxialanisotropy CUDA kernel, asynchronous.
@@ -34,38 +54,27 @@ func k_adduniaxialanisotropy_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsa
 		Sync()
 	}
 
+	adduniaxialanisotropy_args.Lock()
+	defer adduniaxialanisotropy_args.Unlock()
+
 	if adduniaxialanisotropy_code == 0 {
 		adduniaxialanisotropy_code = fatbinLoad(adduniaxialanisotropy_map, "adduniaxialanisotropy")
 	}
 
-	var _a_ adduniaxialanisotropy_args
+	adduniaxialanisotropy_args.arg_Bx = Bx
+	adduniaxialanisotropy_args.arg_By = By
+	adduniaxialanisotropy_args.arg_Bz = Bz
+	adduniaxialanisotropy_args.arg_mx = mx
+	adduniaxialanisotropy_args.arg_my = my
+	adduniaxialanisotropy_args.arg_mz = mz
+	adduniaxialanisotropy_args.arg_K1LUT = K1LUT
+	adduniaxialanisotropy_args.arg_uxLUT = uxLUT
+	adduniaxialanisotropy_args.arg_uyLUT = uyLUT
+	adduniaxialanisotropy_args.arg_uzLUT = uzLUT
+	adduniaxialanisotropy_args.arg_regions = regions
+	adduniaxialanisotropy_args.arg_N = N
 
-	_a_.arg_Bx = Bx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_Bx)
-	_a_.arg_By = By
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_By)
-	_a_.arg_Bz = Bz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Bz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_K1LUT = K1LUT
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_K1LUT)
-	_a_.arg_uxLUT = uxLUT
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_uxLUT)
-	_a_.arg_uyLUT = uyLUT
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_uyLUT)
-	_a_.arg_uzLUT = uzLUT
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_uzLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := adduniaxialanisotropy_args.argptr[:]
 	cu.LaunchKernel(adduniaxialanisotropy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

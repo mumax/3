@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducemaxvecdiff2_code cu.Function
 
-type reducemaxvecdiff2_args struct {
+type reducemaxvecdiff2_args_t struct {
 	arg_x1      unsafe.Pointer
 	arg_y1      unsafe.Pointer
 	arg_z1      unsafe.Pointer
@@ -23,6 +24,22 @@ type reducemaxvecdiff2_args struct {
 	arg_initVal float32
 	arg_n       int
 	argptr      [9]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducemaxvecdiff2_args reducemaxvecdiff2_args_t
+
+func init() {
+	reducemaxvecdiff2_args.argptr[0] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_x1)
+	reducemaxvecdiff2_args.argptr[1] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_y1)
+	reducemaxvecdiff2_args.argptr[2] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_z1)
+	reducemaxvecdiff2_args.argptr[3] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_x2)
+	reducemaxvecdiff2_args.argptr[4] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_y2)
+	reducemaxvecdiff2_args.argptr[5] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_z2)
+	reducemaxvecdiff2_args.argptr[6] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_dst)
+	reducemaxvecdiff2_args.argptr[7] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_initVal)
+	reducemaxvecdiff2_args.argptr[8] = unsafe.Pointer(&reducemaxvecdiff2_args.arg_n)
+
 }
 
 // Wrapper for reducemaxvecdiff2 CUDA kernel, asynchronous.
@@ -31,32 +48,24 @@ func k_reducemaxvecdiff2_async(x1 unsafe.Pointer, y1 unsafe.Pointer, z1 unsafe.P
 		Sync()
 	}
 
+	reducemaxvecdiff2_args.Lock()
+	defer reducemaxvecdiff2_args.Unlock()
+
 	if reducemaxvecdiff2_code == 0 {
 		reducemaxvecdiff2_code = fatbinLoad(reducemaxvecdiff2_map, "reducemaxvecdiff2")
 	}
 
-	var _a_ reducemaxvecdiff2_args
+	reducemaxvecdiff2_args.arg_x1 = x1
+	reducemaxvecdiff2_args.arg_y1 = y1
+	reducemaxvecdiff2_args.arg_z1 = z1
+	reducemaxvecdiff2_args.arg_x2 = x2
+	reducemaxvecdiff2_args.arg_y2 = y2
+	reducemaxvecdiff2_args.arg_z2 = z2
+	reducemaxvecdiff2_args.arg_dst = dst
+	reducemaxvecdiff2_args.arg_initVal = initVal
+	reducemaxvecdiff2_args.arg_n = n
 
-	_a_.arg_x1 = x1
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_x1)
-	_a_.arg_y1 = y1
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_y1)
-	_a_.arg_z1 = z1
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_z1)
-	_a_.arg_x2 = x2
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_x2)
-	_a_.arg_y2 = y2
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_y2)
-	_a_.arg_z2 = z2
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_z2)
-	_a_.arg_dst = dst
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducemaxvecdiff2_args.argptr[:]
 	cu.LaunchKernel(reducemaxvecdiff2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

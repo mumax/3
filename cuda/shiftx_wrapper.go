@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var shiftx_code cu.Function
 
-type shiftx_args struct {
+type shiftx_args_t struct {
 	arg_dst    unsafe.Pointer
 	arg_src    unsafe.Pointer
 	arg_Nx     int
@@ -22,6 +23,21 @@ type shiftx_args struct {
 	arg_clampL float32
 	arg_clampR float32
 	argptr     [8]unsafe.Pointer
+	sync.Mutex
+}
+
+var shiftx_args shiftx_args_t
+
+func init() {
+	shiftx_args.argptr[0] = unsafe.Pointer(&shiftx_args.arg_dst)
+	shiftx_args.argptr[1] = unsafe.Pointer(&shiftx_args.arg_src)
+	shiftx_args.argptr[2] = unsafe.Pointer(&shiftx_args.arg_Nx)
+	shiftx_args.argptr[3] = unsafe.Pointer(&shiftx_args.arg_Ny)
+	shiftx_args.argptr[4] = unsafe.Pointer(&shiftx_args.arg_Nz)
+	shiftx_args.argptr[5] = unsafe.Pointer(&shiftx_args.arg_shx)
+	shiftx_args.argptr[6] = unsafe.Pointer(&shiftx_args.arg_clampL)
+	shiftx_args.argptr[7] = unsafe.Pointer(&shiftx_args.arg_clampR)
+
 }
 
 // Wrapper for shiftx CUDA kernel, asynchronous.
@@ -30,30 +46,23 @@ func k_shiftx_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz i
 		Sync()
 	}
 
+	shiftx_args.Lock()
+	defer shiftx_args.Unlock()
+
 	if shiftx_code == 0 {
 		shiftx_code = fatbinLoad(shiftx_map, "shiftx")
 	}
 
-	var _a_ shiftx_args
+	shiftx_args.arg_dst = dst
+	shiftx_args.arg_src = src
+	shiftx_args.arg_Nx = Nx
+	shiftx_args.arg_Ny = Ny
+	shiftx_args.arg_Nz = Nz
+	shiftx_args.arg_shx = shx
+	shiftx_args.arg_clampL = clampL
+	shiftx_args.arg_clampR = clampR
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_src = src
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_Nx = Nx
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
-	_a_.arg_Nz = Nz
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_Nz)
-	_a_.arg_shx = shx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_shx)
-	_a_.arg_clampL = clampL
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_clampL)
-	_a_.arg_clampR = clampR
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_clampR)
-
-	args := _a_.argptr[:]
+	args := shiftx_args.argptr[:]
 	cu.LaunchKernel(shiftx_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

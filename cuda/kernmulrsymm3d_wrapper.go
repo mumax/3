@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var kernmulRSymm3D_code cu.Function
 
-type kernmulRSymm3D_args struct {
+type kernmulRSymm3D_args_t struct {
 	arg_fftMx  unsafe.Pointer
 	arg_fftMy  unsafe.Pointer
 	arg_fftMz  unsafe.Pointer
@@ -26,6 +27,25 @@ type kernmulRSymm3D_args struct {
 	arg_Ny     int
 	arg_Nz     int
 	argptr     [12]unsafe.Pointer
+	sync.Mutex
+}
+
+var kernmulRSymm3D_args kernmulRSymm3D_args_t
+
+func init() {
+	kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
+	kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
+	kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
+	kernmulRSymm3D_args.argptr[3] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxx)
+	kernmulRSymm3D_args.argptr[4] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyy)
+	kernmulRSymm3D_args.argptr[5] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKzz)
+	kernmulRSymm3D_args.argptr[6] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyz)
+	kernmulRSymm3D_args.argptr[7] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxz)
+	kernmulRSymm3D_args.argptr[8] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxy)
+	kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
+	kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
+	kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
+
 }
 
 // Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
@@ -34,38 +54,27 @@ func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz un
 		Sync()
 	}
 
+	kernmulRSymm3D_args.Lock()
+	defer kernmulRSymm3D_args.Unlock()
+
 	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = fatbinLoad(kernmulRSymm3D_map, "kernmulRSymm3D")
 	}
 
-	var _a_ kernmulRSymm3D_args
+	kernmulRSymm3D_args.arg_fftMx = fftMx
+	kernmulRSymm3D_args.arg_fftMy = fftMy
+	kernmulRSymm3D_args.arg_fftMz = fftMz
+	kernmulRSymm3D_args.arg_fftKxx = fftKxx
+	kernmulRSymm3D_args.arg_fftKyy = fftKyy
+	kernmulRSymm3D_args.arg_fftKzz = fftKzz
+	kernmulRSymm3D_args.arg_fftKyz = fftKyz
+	kernmulRSymm3D_args.arg_fftKxz = fftKxz
+	kernmulRSymm3D_args.arg_fftKxy = fftKxy
+	kernmulRSymm3D_args.arg_Nx = Nx
+	kernmulRSymm3D_args.arg_Ny = Ny
+	kernmulRSymm3D_args.arg_Nz = Nz
 
-	_a_.arg_fftMx = fftMx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftMx)
-	_a_.arg_fftMy = fftMy
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftMy)
-	_a_.arg_fftMz = fftMz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fftMz)
-	_a_.arg_fftKxx = fftKxx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_fftKxx)
-	_a_.arg_fftKyy = fftKyy
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fftKyy)
-	_a_.arg_fftKzz = fftKzz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_fftKzz)
-	_a_.arg_fftKyz = fftKyz
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_fftKyz)
-	_a_.arg_fftKxz = fftKxz
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_fftKxz)
-	_a_.arg_fftKxy = fftKxy
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_fftKxy)
-	_a_.arg_Nx = Nx
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_Ny)
-	_a_.arg_Nz = Nz
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_Nz)
-
-	args := _a_.argptr[:]
+	args := kernmulRSymm3D_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm3D_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

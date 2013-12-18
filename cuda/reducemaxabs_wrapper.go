@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducemaxabs_code cu.Function
 
-type reducemaxabs_args struct {
+type reducemaxabs_args_t struct {
 	arg_src     unsafe.Pointer
 	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducemaxabs_args reducemaxabs_args_t
+
+func init() {
+	reducemaxabs_args.argptr[0] = unsafe.Pointer(&reducemaxabs_args.arg_src)
+	reducemaxabs_args.argptr[1] = unsafe.Pointer(&reducemaxabs_args.arg_dst)
+	reducemaxabs_args.argptr[2] = unsafe.Pointer(&reducemaxabs_args.arg_initVal)
+	reducemaxabs_args.argptr[3] = unsafe.Pointer(&reducemaxabs_args.arg_n)
+
 }
 
 // Wrapper for reducemaxabs CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float3
 		Sync()
 	}
 
+	reducemaxabs_args.Lock()
+	defer reducemaxabs_args.Unlock()
+
 	if reducemaxabs_code == 0 {
 		reducemaxabs_code = fatbinLoad(reducemaxabs_map, "reducemaxabs")
 	}
 
-	var _a_ reducemaxabs_args
+	reducemaxabs_args.arg_src = src
+	reducemaxabs_args.arg_dst = dst
+	reducemaxabs_args.arg_initVal = initVal
+	reducemaxabs_args.arg_n = n
 
-	_a_.arg_src = src
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_dst = dst
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducemaxabs_args.argptr[:]
 	cu.LaunchKernel(reducemaxabs_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

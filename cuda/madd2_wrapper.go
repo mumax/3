@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var madd2_code cu.Function
 
-type madd2_args struct {
+type madd2_args_t struct {
 	arg_dst  unsafe.Pointer
 	arg_src1 unsafe.Pointer
 	arg_fac1 float32
@@ -20,6 +21,19 @@ type madd2_args struct {
 	arg_fac2 float32
 	arg_N    int
 	argptr   [6]unsafe.Pointer
+	sync.Mutex
+}
+
+var madd2_args madd2_args_t
+
+func init() {
+	madd2_args.argptr[0] = unsafe.Pointer(&madd2_args.arg_dst)
+	madd2_args.argptr[1] = unsafe.Pointer(&madd2_args.arg_src1)
+	madd2_args.argptr[2] = unsafe.Pointer(&madd2_args.arg_fac1)
+	madd2_args.argptr[3] = unsafe.Pointer(&madd2_args.arg_src2)
+	madd2_args.argptr[4] = unsafe.Pointer(&madd2_args.arg_fac2)
+	madd2_args.argptr[5] = unsafe.Pointer(&madd2_args.arg_N)
+
 }
 
 // Wrapper for madd2 CUDA kernel, asynchronous.
@@ -28,26 +42,21 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 		Sync()
 	}
 
+	madd2_args.Lock()
+	defer madd2_args.Unlock()
+
 	if madd2_code == 0 {
 		madd2_code = fatbinLoad(madd2_map, "madd2")
 	}
 
-	var _a_ madd2_args
+	madd2_args.arg_dst = dst
+	madd2_args.arg_src1 = src1
+	madd2_args.arg_fac1 = fac1
+	madd2_args.arg_src2 = src2
+	madd2_args.arg_fac2 = fac2
+	madd2_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_src1 = src1
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src1)
-	_a_.arg_fac1 = fac1
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fac1)
-	_a_.arg_src2 = src2
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_src2)
-	_a_.arg_fac2 = fac2
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fac2)
-	_a_.arg_N = N
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := madd2_args.argptr[:]
 	cu.LaunchKernel(madd2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

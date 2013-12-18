@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var kernmulRSymm2Dxy_code cu.Function
 
-type kernmulRSymm2Dxy_args struct {
+type kernmulRSymm2Dxy_args_t struct {
 	arg_fftMx  unsafe.Pointer
 	arg_fftMy  unsafe.Pointer
 	arg_fftKxx unsafe.Pointer
@@ -21,6 +22,20 @@ type kernmulRSymm2Dxy_args struct {
 	arg_Nx     int
 	arg_Ny     int
 	argptr     [7]unsafe.Pointer
+	sync.Mutex
+}
+
+var kernmulRSymm2Dxy_args kernmulRSymm2Dxy_args_t
+
+func init() {
+	kernmulRSymm2Dxy_args.argptr[0] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMx)
+	kernmulRSymm2Dxy_args.argptr[1] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMy)
+	kernmulRSymm2Dxy_args.argptr[2] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxx)
+	kernmulRSymm2Dxy_args.argptr[3] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKyy)
+	kernmulRSymm2Dxy_args.argptr[4] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxy)
+	kernmulRSymm2Dxy_args.argptr[5] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Nx)
+	kernmulRSymm2Dxy_args.argptr[6] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Ny)
+
 }
 
 // Wrapper for kernmulRSymm2Dxy CUDA kernel, asynchronous.
@@ -29,28 +44,22 @@ func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx
 		Sync()
 	}
 
+	kernmulRSymm2Dxy_args.Lock()
+	defer kernmulRSymm2Dxy_args.Unlock()
+
 	if kernmulRSymm2Dxy_code == 0 {
 		kernmulRSymm2Dxy_code = fatbinLoad(kernmulRSymm2Dxy_map, "kernmulRSymm2Dxy")
 	}
 
-	var _a_ kernmulRSymm2Dxy_args
+	kernmulRSymm2Dxy_args.arg_fftMx = fftMx
+	kernmulRSymm2Dxy_args.arg_fftMy = fftMy
+	kernmulRSymm2Dxy_args.arg_fftKxx = fftKxx
+	kernmulRSymm2Dxy_args.arg_fftKyy = fftKyy
+	kernmulRSymm2Dxy_args.arg_fftKxy = fftKxy
+	kernmulRSymm2Dxy_args.arg_Nx = Nx
+	kernmulRSymm2Dxy_args.arg_Ny = Ny
 
-	_a_.arg_fftMx = fftMx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftMx)
-	_a_.arg_fftMy = fftMy
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftMy)
-	_a_.arg_fftKxx = fftKxx
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_fftKxx)
-	_a_.arg_fftKyy = fftKyy
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_fftKyy)
-	_a_.arg_fftKxy = fftKxy
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_fftKxy)
-	_a_.arg_Nx = Nx
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Ny)
-
-	args := _a_.argptr[:]
+	args := kernmulRSymm2Dxy_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dxy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

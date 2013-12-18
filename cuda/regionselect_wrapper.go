@@ -7,18 +7,31 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var regionselect_code cu.Function
 
-type regionselect_args struct {
+type regionselect_args_t struct {
 	arg_dst     unsafe.Pointer
 	arg_src     unsafe.Pointer
 	arg_regions unsafe.Pointer
 	arg_region  byte
 	arg_N       int
 	argptr      [5]unsafe.Pointer
+	sync.Mutex
+}
+
+var regionselect_args regionselect_args_t
+
+func init() {
+	regionselect_args.argptr[0] = unsafe.Pointer(&regionselect_args.arg_dst)
+	regionselect_args.argptr[1] = unsafe.Pointer(&regionselect_args.arg_src)
+	regionselect_args.argptr[2] = unsafe.Pointer(&regionselect_args.arg_regions)
+	regionselect_args.argptr[3] = unsafe.Pointer(&regionselect_args.arg_region)
+	regionselect_args.argptr[4] = unsafe.Pointer(&regionselect_args.arg_N)
+
 }
 
 // Wrapper for regionselect CUDA kernel, asynchronous.
@@ -27,24 +40,20 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 		Sync()
 	}
 
+	regionselect_args.Lock()
+	defer regionselect_args.Unlock()
+
 	if regionselect_code == 0 {
 		regionselect_code = fatbinLoad(regionselect_map, "regionselect")
 	}
 
-	var _a_ regionselect_args
+	regionselect_args.arg_dst = dst
+	regionselect_args.arg_src = src
+	regionselect_args.arg_regions = regions
+	regionselect_args.arg_region = region
+	regionselect_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_src = src
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_regions = regions
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_region = region
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_region)
-	_a_.arg_N = N
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := regionselect_args.argptr[:]
 	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

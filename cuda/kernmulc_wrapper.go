@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var kernmulC_code cu.Function
 
-type kernmulC_args struct {
+type kernmulC_args_t struct {
 	arg_fftM unsafe.Pointer
 	arg_fftK unsafe.Pointer
 	arg_Nx   int
 	arg_Ny   int
 	argptr   [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var kernmulC_args kernmulC_args_t
+
+func init() {
+	kernmulC_args.argptr[0] = unsafe.Pointer(&kernmulC_args.arg_fftM)
+	kernmulC_args.argptr[1] = unsafe.Pointer(&kernmulC_args.arg_fftK)
+	kernmulC_args.argptr[2] = unsafe.Pointer(&kernmulC_args.arg_Nx)
+	kernmulC_args.argptr[3] = unsafe.Pointer(&kernmulC_args.arg_Ny)
+
 }
 
 // Wrapper for kernmulC CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, 
 		Sync()
 	}
 
+	kernmulC_args.Lock()
+	defer kernmulC_args.Unlock()
+
 	if kernmulC_code == 0 {
 		kernmulC_code = fatbinLoad(kernmulC_map, "kernmulC")
 	}
 
-	var _a_ kernmulC_args
+	kernmulC_args.arg_fftM = fftM
+	kernmulC_args.arg_fftK = fftK
+	kernmulC_args.arg_Nx = Nx
+	kernmulC_args.arg_Ny = Ny
 
-	_a_.arg_fftM = fftM
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftM)
-	_a_.arg_fftK = fftK
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftK)
-	_a_.arg_Nx = Nx
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
-
-	args := _a_.argptr[:]
+	args := kernmulC_args.argptr[:]
 	cu.LaunchKernel(kernmulC_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

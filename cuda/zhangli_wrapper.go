@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var addzhanglitorque_code cu.Function
 
-type addzhanglitorque_args struct {
+type addzhanglitorque_args_t struct {
 	arg_tx       unsafe.Pointer
 	arg_ty       unsafe.Pointer
 	arg_tz       unsafe.Pointer
@@ -35,6 +36,34 @@ type addzhanglitorque_args struct {
 	arg_Nz       int
 	arg_PBC      byte
 	argptr       [21]unsafe.Pointer
+	sync.Mutex
+}
+
+var addzhanglitorque_args addzhanglitorque_args_t
+
+func init() {
+	addzhanglitorque_args.argptr[0] = unsafe.Pointer(&addzhanglitorque_args.arg_tx)
+	addzhanglitorque_args.argptr[1] = unsafe.Pointer(&addzhanglitorque_args.arg_ty)
+	addzhanglitorque_args.argptr[2] = unsafe.Pointer(&addzhanglitorque_args.arg_tz)
+	addzhanglitorque_args.argptr[3] = unsafe.Pointer(&addzhanglitorque_args.arg_mx)
+	addzhanglitorque_args.argptr[4] = unsafe.Pointer(&addzhanglitorque_args.arg_my)
+	addzhanglitorque_args.argptr[5] = unsafe.Pointer(&addzhanglitorque_args.arg_mz)
+	addzhanglitorque_args.argptr[6] = unsafe.Pointer(&addzhanglitorque_args.arg_jx)
+	addzhanglitorque_args.argptr[7] = unsafe.Pointer(&addzhanglitorque_args.arg_jy)
+	addzhanglitorque_args.argptr[8] = unsafe.Pointer(&addzhanglitorque_args.arg_jz)
+	addzhanglitorque_args.argptr[9] = unsafe.Pointer(&addzhanglitorque_args.arg_cx)
+	addzhanglitorque_args.argptr[10] = unsafe.Pointer(&addzhanglitorque_args.arg_cy)
+	addzhanglitorque_args.argptr[11] = unsafe.Pointer(&addzhanglitorque_args.arg_cz)
+	addzhanglitorque_args.argptr[12] = unsafe.Pointer(&addzhanglitorque_args.arg_bsatLUT)
+	addzhanglitorque_args.argptr[13] = unsafe.Pointer(&addzhanglitorque_args.arg_alphaLUT)
+	addzhanglitorque_args.argptr[14] = unsafe.Pointer(&addzhanglitorque_args.arg_xiLUT)
+	addzhanglitorque_args.argptr[15] = unsafe.Pointer(&addzhanglitorque_args.arg_polLUT)
+	addzhanglitorque_args.argptr[16] = unsafe.Pointer(&addzhanglitorque_args.arg_regions)
+	addzhanglitorque_args.argptr[17] = unsafe.Pointer(&addzhanglitorque_args.arg_Nx)
+	addzhanglitorque_args.argptr[18] = unsafe.Pointer(&addzhanglitorque_args.arg_Ny)
+	addzhanglitorque_args.argptr[19] = unsafe.Pointer(&addzhanglitorque_args.arg_Nz)
+	addzhanglitorque_args.argptr[20] = unsafe.Pointer(&addzhanglitorque_args.arg_PBC)
+
 }
 
 // Wrapper for addzhanglitorque CUDA kernel, asynchronous.
@@ -43,56 +72,36 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 		Sync()
 	}
 
+	addzhanglitorque_args.Lock()
+	defer addzhanglitorque_args.Unlock()
+
 	if addzhanglitorque_code == 0 {
 		addzhanglitorque_code = fatbinLoad(addzhanglitorque_map, "addzhanglitorque")
 	}
 
-	var _a_ addzhanglitorque_args
+	addzhanglitorque_args.arg_tx = tx
+	addzhanglitorque_args.arg_ty = ty
+	addzhanglitorque_args.arg_tz = tz
+	addzhanglitorque_args.arg_mx = mx
+	addzhanglitorque_args.arg_my = my
+	addzhanglitorque_args.arg_mz = mz
+	addzhanglitorque_args.arg_jx = jx
+	addzhanglitorque_args.arg_jy = jy
+	addzhanglitorque_args.arg_jz = jz
+	addzhanglitorque_args.arg_cx = cx
+	addzhanglitorque_args.arg_cy = cy
+	addzhanglitorque_args.arg_cz = cz
+	addzhanglitorque_args.arg_bsatLUT = bsatLUT
+	addzhanglitorque_args.arg_alphaLUT = alphaLUT
+	addzhanglitorque_args.arg_xiLUT = xiLUT
+	addzhanglitorque_args.arg_polLUT = polLUT
+	addzhanglitorque_args.arg_regions = regions
+	addzhanglitorque_args.arg_Nx = Nx
+	addzhanglitorque_args.arg_Ny = Ny
+	addzhanglitorque_args.arg_Nz = Nz
+	addzhanglitorque_args.arg_PBC = PBC
 
-	_a_.arg_tx = tx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_tx)
-	_a_.arg_ty = ty
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_ty)
-	_a_.arg_tz = tz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_tz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_jx = jx
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_jx)
-	_a_.arg_jy = jy
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_jy)
-	_a_.arg_jz = jz
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_jz)
-	_a_.arg_cx = cx
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_cx)
-	_a_.arg_cy = cy
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_cy)
-	_a_.arg_cz = cz
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_cz)
-	_a_.arg_bsatLUT = bsatLUT
-	_a_.argptr[12] = unsafe.Pointer(&_a_.arg_bsatLUT)
-	_a_.arg_alphaLUT = alphaLUT
-	_a_.argptr[13] = unsafe.Pointer(&_a_.arg_alphaLUT)
-	_a_.arg_xiLUT = xiLUT
-	_a_.argptr[14] = unsafe.Pointer(&_a_.arg_xiLUT)
-	_a_.arg_polLUT = polLUT
-	_a_.argptr[15] = unsafe.Pointer(&_a_.arg_polLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[16] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_Nx = Nx
-	_a_.argptr[17] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[18] = unsafe.Pointer(&_a_.arg_Ny)
-	_a_.arg_Nz = Nz
-	_a_.argptr[19] = unsafe.Pointer(&_a_.arg_Nz)
-	_a_.arg_PBC = PBC
-	_a_.argptr[20] = unsafe.Pointer(&_a_.arg_PBC)
-
-	args := _a_.argptr[:]
+	args := addzhanglitorque_args.argptr[:]
 	cu.LaunchKernel(addzhanglitorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

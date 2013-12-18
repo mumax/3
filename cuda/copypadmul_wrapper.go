@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var copypadmul_code cu.Function
 
-type copypadmul_args struct {
+type copypadmul_args_t struct {
 	arg_dst     unsafe.Pointer
 	arg_Dx      int
 	arg_Dy      int
@@ -25,6 +26,24 @@ type copypadmul_args struct {
 	arg_BsatLUT unsafe.Pointer
 	arg_regions unsafe.Pointer
 	argptr      [11]unsafe.Pointer
+	sync.Mutex
+}
+
+var copypadmul_args copypadmul_args_t
+
+func init() {
+	copypadmul_args.argptr[0] = unsafe.Pointer(&copypadmul_args.arg_dst)
+	copypadmul_args.argptr[1] = unsafe.Pointer(&copypadmul_args.arg_Dx)
+	copypadmul_args.argptr[2] = unsafe.Pointer(&copypadmul_args.arg_Dy)
+	copypadmul_args.argptr[3] = unsafe.Pointer(&copypadmul_args.arg_Dz)
+	copypadmul_args.argptr[4] = unsafe.Pointer(&copypadmul_args.arg_src)
+	copypadmul_args.argptr[5] = unsafe.Pointer(&copypadmul_args.arg_vol)
+	copypadmul_args.argptr[6] = unsafe.Pointer(&copypadmul_args.arg_Sx)
+	copypadmul_args.argptr[7] = unsafe.Pointer(&copypadmul_args.arg_Sy)
+	copypadmul_args.argptr[8] = unsafe.Pointer(&copypadmul_args.arg_Sz)
+	copypadmul_args.argptr[9] = unsafe.Pointer(&copypadmul_args.arg_BsatLUT)
+	copypadmul_args.argptr[10] = unsafe.Pointer(&copypadmul_args.arg_regions)
+
 }
 
 // Wrapper for copypadmul CUDA kernel, asynchronous.
@@ -33,36 +52,26 @@ func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.P
 		Sync()
 	}
 
+	copypadmul_args.Lock()
+	defer copypadmul_args.Unlock()
+
 	if copypadmul_code == 0 {
 		copypadmul_code = fatbinLoad(copypadmul_map, "copypadmul")
 	}
 
-	var _a_ copypadmul_args
+	copypadmul_args.arg_dst = dst
+	copypadmul_args.arg_Dx = Dx
+	copypadmul_args.arg_Dy = Dy
+	copypadmul_args.arg_Dz = Dz
+	copypadmul_args.arg_src = src
+	copypadmul_args.arg_vol = vol
+	copypadmul_args.arg_Sx = Sx
+	copypadmul_args.arg_Sy = Sy
+	copypadmul_args.arg_Sz = Sz
+	copypadmul_args.arg_BsatLUT = BsatLUT
+	copypadmul_args.arg_regions = regions
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_Dx = Dx
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_Dx)
-	_a_.arg_Dy = Dy
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Dy)
-	_a_.arg_Dz = Dz
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Dz)
-	_a_.arg_src = src
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_src)
-	_a_.arg_vol = vol
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_vol)
-	_a_.arg_Sx = Sx
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_Sx)
-	_a_.arg_Sy = Sy
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_Sy)
-	_a_.arg_Sz = Sz
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_Sz)
-	_a_.arg_BsatLUT = BsatLUT
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_BsatLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
-
-	args := _a_.argptr[:]
+	args := copypadmul_args.argptr[:]
 	cu.LaunchKernel(copypadmul_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var regiondecode_code cu.Function
 
-type regiondecode_args struct {
+type regiondecode_args_t struct {
 	arg_dst     unsafe.Pointer
 	arg_LUT     unsafe.Pointer
 	arg_regions unsafe.Pointer
 	arg_N       int
 	argptr      [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var regiondecode_args regiondecode_args_t
+
+func init() {
+	regiondecode_args.argptr[0] = unsafe.Pointer(&regiondecode_args.arg_dst)
+	regiondecode_args.argptr[1] = unsafe.Pointer(&regiondecode_args.arg_LUT)
+	regiondecode_args.argptr[2] = unsafe.Pointer(&regiondecode_args.arg_regions)
+	regiondecode_args.argptr[3] = unsafe.Pointer(&regiondecode_args.arg_N)
+
 }
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 		Sync()
 	}
 
+	regiondecode_args.Lock()
+	defer regiondecode_args.Unlock()
+
 	if regiondecode_code == 0 {
 		regiondecode_code = fatbinLoad(regiondecode_map, "regiondecode")
 	}
 
-	var _a_ regiondecode_args
+	regiondecode_args.arg_dst = dst
+	regiondecode_args.arg_LUT = LUT
+	regiondecode_args.arg_regions = regions
+	regiondecode_args.arg_N = N
 
-	_a_.arg_dst = dst
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_LUT = LUT
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_LUT)
-	_a_.arg_regions = regions
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := regiondecode_args.argptr[:]
 	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

@@ -152,35 +152,44 @@ const templText = `package cuda
 import(
 	"unsafe"
 	"github.com/barnex/cuda5/cu"
+	"sync"
 )
 
 var {{.Name}}_code cu.Function
 
-type {{.Name}}_args struct{
+type {{.Name}}_args_t struct{
 	{{range $i, $_ := .ArgN}} arg_{{.}} {{index $.ArgT $i}}
 	{{end}} argptr [{{len .ArgN}}]unsafe.Pointer
+	sync.Mutex
+}
+
+var {{.Name}}_args {{.Name}}_args_t
+
+func init(){
+	{{range $i, $t := .ArgN}} {{$.Name}}_args.argptr[{{$i}}] = unsafe.Pointer(&{{$.Name}}_args.arg_{{.}})
+	{{end}}
 }
 
 // Wrapper for {{.Name}} CUDA kernel, asynchronous.
 func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
-	if synchronous{ // debug
+	if Synchronous{ // debug
 		Sync()
 	}
+
+	{{.Name}}_args.Lock()
+	defer {{.Name}}_args.Unlock()
 
 	if {{.Name}}_code == 0{
 		{{.Name}}_code = fatbinLoad({{.Name}}_map, "{{.Name}}")
 	}
 
-	var _a_ {{.Name}}_args
-
-	{{range $i, $t := .ArgN}} _a_.arg_{{.}} = {{.}}
-	_a_.argptr[{{$i}}] = unsafe.Pointer(&_a_.arg_{{.}})
+	{{range $i, $t := .ArgN}} {{$.Name}}_args.arg_{{.}} = {{.}}
 	{{end}}
 
-	args := _a_.argptr[:]
+	args := {{.Name}}_args.argptr[:]
 	cu.LaunchKernel({{.Name}}_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if synchronous{ // debug
+	if Synchronous{ // debug
 		Sync()
 	}
 }

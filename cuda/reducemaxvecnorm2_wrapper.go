@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducemaxvecnorm2_code cu.Function
 
-type reducemaxvecnorm2_args struct {
+type reducemaxvecnorm2_args_t struct {
 	arg_x       unsafe.Pointer
 	arg_y       unsafe.Pointer
 	arg_z       unsafe.Pointer
@@ -20,6 +21,19 @@ type reducemaxvecnorm2_args struct {
 	arg_initVal float32
 	arg_n       int
 	argptr      [6]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducemaxvecnorm2_args reducemaxvecnorm2_args_t
+
+func init() {
+	reducemaxvecnorm2_args.argptr[0] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_x)
+	reducemaxvecnorm2_args.argptr[1] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_y)
+	reducemaxvecnorm2_args.argptr[2] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_z)
+	reducemaxvecnorm2_args.argptr[3] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_dst)
+	reducemaxvecnorm2_args.argptr[4] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_initVal)
+	reducemaxvecnorm2_args.argptr[5] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_n)
+
 }
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel, asynchronous.
@@ -28,26 +42,21 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 		Sync()
 	}
 
+	reducemaxvecnorm2_args.Lock()
+	defer reducemaxvecnorm2_args.Unlock()
+
 	if reducemaxvecnorm2_code == 0 {
 		reducemaxvecnorm2_code = fatbinLoad(reducemaxvecnorm2_map, "reducemaxvecnorm2")
 	}
 
-	var _a_ reducemaxvecnorm2_args
+	reducemaxvecnorm2_args.arg_x = x
+	reducemaxvecnorm2_args.arg_y = y
+	reducemaxvecnorm2_args.arg_z = z
+	reducemaxvecnorm2_args.arg_dst = dst
+	reducemaxvecnorm2_args.arg_initVal = initVal
+	reducemaxvecnorm2_args.arg_n = n
 
-	_a_.arg_x = x
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_x)
-	_a_.arg_y = y
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_y)
-	_a_.arg_z = z
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_z)
-	_a_.arg_dst = dst
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducemaxvecnorm2_args.argptr[:]
 	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

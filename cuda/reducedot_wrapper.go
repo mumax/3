@@ -7,18 +7,31 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducedot_code cu.Function
 
-type reducedot_args struct {
+type reducedot_args_t struct {
 	arg_x1      unsafe.Pointer
 	arg_x2      unsafe.Pointer
 	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [5]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducedot_args reducedot_args_t
+
+func init() {
+	reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
+	reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
+	reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
+	reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
+	reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
+
 }
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
@@ -27,24 +40,20 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 		Sync()
 	}
 
+	reducedot_args.Lock()
+	defer reducedot_args.Unlock()
+
 	if reducedot_code == 0 {
 		reducedot_code = fatbinLoad(reducedot_map, "reducedot")
 	}
 
-	var _a_ reducedot_args
+	reducedot_args.arg_x1 = x1
+	reducedot_args.arg_x2 = x2
+	reducedot_args.arg_dst = dst
+	reducedot_args.arg_initVal = initVal
+	reducedot_args.arg_n = n
 
-	_a_.arg_x1 = x1
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_x1)
-	_a_.arg_x2 = x2
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_x2)
-	_a_.arg_dst = dst
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducedot_args.argptr[:]
 	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

@@ -7,18 +7,31 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var reducemaxdiff_code cu.Function
 
-type reducemaxdiff_args struct {
+type reducemaxdiff_args_t struct {
 	arg_src1    unsafe.Pointer
 	arg_src2    unsafe.Pointer
 	arg_dst     unsafe.Pointer
 	arg_initVal float32
 	arg_n       int
 	argptr      [5]unsafe.Pointer
+	sync.Mutex
+}
+
+var reducemaxdiff_args reducemaxdiff_args_t
+
+func init() {
+	reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
+	reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
+	reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
+	reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
+	reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
+
 }
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
@@ -27,24 +40,20 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 		Sync()
 	}
 
+	reducemaxdiff_args.Lock()
+	defer reducemaxdiff_args.Unlock()
+
 	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = fatbinLoad(reducemaxdiff_map, "reducemaxdiff")
 	}
 
-	var _a_ reducemaxdiff_args
+	reducemaxdiff_args.arg_src1 = src1
+	reducemaxdiff_args.arg_src2 = src2
+	reducemaxdiff_args.arg_dst = dst
+	reducemaxdiff_args.arg_initVal = initVal
+	reducemaxdiff_args.arg_n = n
 
-	_a_.arg_src1 = src1
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_src1)
-	_a_.arg_src2 = src2
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_src2)
-	_a_.arg_dst = dst
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_dst)
-	_a_.arg_initVal = initVal
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_initVal)
-	_a_.arg_n = n
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_n)
-
-	args := _a_.argptr[:]
+	args := reducemaxdiff_args.argptr[:]
 	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

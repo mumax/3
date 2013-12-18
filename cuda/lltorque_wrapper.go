@@ -7,12 +7,13 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var lltorque_code cu.Function
 
-type lltorque_args struct {
+type lltorque_args_t struct {
 	arg_tx       unsafe.Pointer
 	arg_ty       unsafe.Pointer
 	arg_tz       unsafe.Pointer
@@ -26,6 +27,25 @@ type lltorque_args struct {
 	arg_regions  unsafe.Pointer
 	arg_N        int
 	argptr       [12]unsafe.Pointer
+	sync.Mutex
+}
+
+var lltorque_args lltorque_args_t
+
+func init() {
+	lltorque_args.argptr[0] = unsafe.Pointer(&lltorque_args.arg_tx)
+	lltorque_args.argptr[1] = unsafe.Pointer(&lltorque_args.arg_ty)
+	lltorque_args.argptr[2] = unsafe.Pointer(&lltorque_args.arg_tz)
+	lltorque_args.argptr[3] = unsafe.Pointer(&lltorque_args.arg_mx)
+	lltorque_args.argptr[4] = unsafe.Pointer(&lltorque_args.arg_my)
+	lltorque_args.argptr[5] = unsafe.Pointer(&lltorque_args.arg_mz)
+	lltorque_args.argptr[6] = unsafe.Pointer(&lltorque_args.arg_hx)
+	lltorque_args.argptr[7] = unsafe.Pointer(&lltorque_args.arg_hy)
+	lltorque_args.argptr[8] = unsafe.Pointer(&lltorque_args.arg_hz)
+	lltorque_args.argptr[9] = unsafe.Pointer(&lltorque_args.arg_alphaLUT)
+	lltorque_args.argptr[10] = unsafe.Pointer(&lltorque_args.arg_regions)
+	lltorque_args.argptr[11] = unsafe.Pointer(&lltorque_args.arg_N)
+
 }
 
 // Wrapper for lltorque CUDA kernel, asynchronous.
@@ -34,38 +54,27 @@ func k_lltorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, m
 		Sync()
 	}
 
+	lltorque_args.Lock()
+	defer lltorque_args.Unlock()
+
 	if lltorque_code == 0 {
 		lltorque_code = fatbinLoad(lltorque_map, "lltorque")
 	}
 
-	var _a_ lltorque_args
+	lltorque_args.arg_tx = tx
+	lltorque_args.arg_ty = ty
+	lltorque_args.arg_tz = tz
+	lltorque_args.arg_mx = mx
+	lltorque_args.arg_my = my
+	lltorque_args.arg_mz = mz
+	lltorque_args.arg_hx = hx
+	lltorque_args.arg_hy = hy
+	lltorque_args.arg_hz = hz
+	lltorque_args.arg_alphaLUT = alphaLUT
+	lltorque_args.arg_regions = regions
+	lltorque_args.arg_N = N
 
-	_a_.arg_tx = tx
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_tx)
-	_a_.arg_ty = ty
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_ty)
-	_a_.arg_tz = tz
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_tz)
-	_a_.arg_mx = mx
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_mx)
-	_a_.arg_my = my
-	_a_.argptr[4] = unsafe.Pointer(&_a_.arg_my)
-	_a_.arg_mz = mz
-	_a_.argptr[5] = unsafe.Pointer(&_a_.arg_mz)
-	_a_.arg_hx = hx
-	_a_.argptr[6] = unsafe.Pointer(&_a_.arg_hx)
-	_a_.arg_hy = hy
-	_a_.argptr[7] = unsafe.Pointer(&_a_.arg_hy)
-	_a_.arg_hz = hz
-	_a_.argptr[8] = unsafe.Pointer(&_a_.arg_hz)
-	_a_.arg_alphaLUT = alphaLUT
-	_a_.argptr[9] = unsafe.Pointer(&_a_.arg_alphaLUT)
-	_a_.arg_regions = regions
-	_a_.argptr[10] = unsafe.Pointer(&_a_.arg_regions)
-	_a_.arg_N = N
-	_a_.argptr[11] = unsafe.Pointer(&_a_.arg_N)
-
-	args := _a_.argptr[:]
+	args := lltorque_args.argptr[:]
 	cu.LaunchKernel(lltorque_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

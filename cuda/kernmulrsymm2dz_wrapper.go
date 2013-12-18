@@ -7,17 +7,29 @@ package cuda
 
 import (
 	"github.com/barnex/cuda5/cu"
+	"sync"
 	"unsafe"
 )
 
 var kernmulRSymm2Dz_code cu.Function
 
-type kernmulRSymm2Dz_args struct {
+type kernmulRSymm2Dz_args_t struct {
 	arg_fftMz  unsafe.Pointer
 	arg_fftKzz unsafe.Pointer
 	arg_Nx     int
 	arg_Ny     int
 	argptr     [4]unsafe.Pointer
+	sync.Mutex
+}
+
+var kernmulRSymm2Dz_args kernmulRSymm2Dz_args_t
+
+func init() {
+	kernmulRSymm2Dz_args.argptr[0] = unsafe.Pointer(&kernmulRSymm2Dz_args.arg_fftMz)
+	kernmulRSymm2Dz_args.argptr[1] = unsafe.Pointer(&kernmulRSymm2Dz_args.arg_fftKzz)
+	kernmulRSymm2Dz_args.argptr[2] = unsafe.Pointer(&kernmulRSymm2Dz_args.arg_Nx)
+	kernmulRSymm2Dz_args.argptr[3] = unsafe.Pointer(&kernmulRSymm2Dz_args.arg_Ny)
+
 }
 
 // Wrapper for kernmulRSymm2Dz CUDA kernel, asynchronous.
@@ -26,22 +38,19 @@ func k_kernmulRSymm2Dz_async(fftMz unsafe.Pointer, fftKzz unsafe.Pointer, Nx int
 		Sync()
 	}
 
+	kernmulRSymm2Dz_args.Lock()
+	defer kernmulRSymm2Dz_args.Unlock()
+
 	if kernmulRSymm2Dz_code == 0 {
 		kernmulRSymm2Dz_code = fatbinLoad(kernmulRSymm2Dz_map, "kernmulRSymm2Dz")
 	}
 
-	var _a_ kernmulRSymm2Dz_args
+	kernmulRSymm2Dz_args.arg_fftMz = fftMz
+	kernmulRSymm2Dz_args.arg_fftKzz = fftKzz
+	kernmulRSymm2Dz_args.arg_Nx = Nx
+	kernmulRSymm2Dz_args.arg_Ny = Ny
 
-	_a_.arg_fftMz = fftMz
-	_a_.argptr[0] = unsafe.Pointer(&_a_.arg_fftMz)
-	_a_.arg_fftKzz = fftKzz
-	_a_.argptr[1] = unsafe.Pointer(&_a_.arg_fftKzz)
-	_a_.arg_Nx = Nx
-	_a_.argptr[2] = unsafe.Pointer(&_a_.arg_Nx)
-	_a_.arg_Ny = Ny
-	_a_.argptr[3] = unsafe.Pointer(&_a_.arg_Ny)
-
-	args := _a_.argptr[:]
+	args := kernmulRSymm2Dz_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug

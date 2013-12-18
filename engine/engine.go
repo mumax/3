@@ -3,6 +3,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/util"
+	"log"
 	"runtime"
 	"time"
 )
@@ -31,9 +32,10 @@ func Close() {
 	if logfile != nil {
 		logfile.Close()
 	}
-	//var memstats runtime.MemStats
-	//runtime.ReadMemStats(&memstats)
-	//log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
+
+	var memstats runtime.MemStats
+	runtime.ReadMemStats(&memstats)
+	log.Println("Total memory allocation", memstats.TotalAlloc/(1024), "KiB")
 
 	// debug. TODO: rm
 	//	for n, p := range params {

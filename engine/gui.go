@@ -287,6 +287,9 @@ func (g *guistate) prepareOnUpdate() {
 			cachebreaker := "?" + g.StringValue("nsteps") + "_" + fmt.Sprint(g.cacheBreaker())
 			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
+			// plot
+			GUI.Set("plot", "/plot/?"+cachebreaker)
+
 			// parameters
 			for _, p := range g.Params {
 				n := p.Name()
@@ -482,16 +485,6 @@ func Eval(code string) {
 	}
 }
 
-//
-//	// gnuplot
-//	gui.OnEvent("usingX", func() { usingX = gui.Value("usingX").(int) })
-//	gui.OnEvent("usingY", func() { usingY = gui.Value("usingY").(int) })
-//
-//
-//		// plot
-//		cachebreaker = fmt.Sprint("?", Solver.NSteps)
-//		gui.Set("plot", "/plot/"+cachebreaker)
-//
 //
 //// round duration to 1s accuracy
 //func roundt(t time.Duration) time.Duration {

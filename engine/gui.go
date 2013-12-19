@@ -73,7 +73,7 @@ func (g *guistate) PrepareServer() {
 
 	http.Handle("/", g)
 	http.Handle("/render/", &renderer)
-	//http.HandleFunc("/plot/", servePlot)
+	http.HandleFunc("/plot/", servePlot)
 
 	g.prepareConsole()
 	g.prepareMesh()

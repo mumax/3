@@ -98,7 +98,8 @@ func myFmt(msg []interface{}) []interface{} {
 		}
 		// Tabledata: print average
 		if m, ok := m.(TableData); ok {
-			msg[i] = m.TableData()
+			str := fmt.Sprint(m.TableData())
+			msg[i] = str[1 : len(str)-1] // remove [ ]
 			continue
 		}
 	}

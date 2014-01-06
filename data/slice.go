@@ -53,7 +53,7 @@ func NilSlice(nComp int, size [3]int) *Slice {
 	return SliceFromPtrs(size, UnifiedMemory, make([]unsafe.Pointer, nComp))
 }
 
-// Internal: construct a Slice using bare memory pointers. Used by cuda.
+// Internal: construct a Slice using bare memory pointers.
 func SliceFromPtrs(size [3]int, memType int8, ptrs []unsafe.Pointer) *Slice {
 	length := prod(size)
 	nComp := len(ptrs)
@@ -67,15 +67,6 @@ func SliceFromPtrs(size [3]int, memType int8, ptrs []unsafe.Pointer) *Slice {
 	}
 	s.memType = memType
 	return s
-}
-
-func SliceFromList(data [][]float32, size [3]int) *Slice {
-	ptrs := make([]unsafe.Pointer, len(data))
-	for i := range ptrs {
-		util.Argument(len(data[i]) == prod(size))
-		ptrs[i] = unsafe.Pointer(&data[i][0])
-	}
-	return SliceFromPtrs(size, CPUMemory, ptrs)
 }
 
 const MAX_COMP = 3 // Maximum supported number of Slice components
@@ -150,15 +141,6 @@ func (s *Slice) NComp() int {
 func (s *Slice) Len() int {
 	return int(s.len_)
 }
-
-// Mesh on which the data is defined.
-//func (s *Slice) Mesh() *Mesh {
-//	if s == nil {
-//		return nil
-//	} else {
-//		return s.mesh
-//	}
-//}
 
 func (s *Slice) Size() [3]int {
 	if s == nil {

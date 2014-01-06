@@ -1,5 +1,7 @@
 package cuda
 
+// Convolution self-test, performed once at the start of each simulation
+
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"

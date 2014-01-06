@@ -48,8 +48,8 @@ func (c *DemagConvolution) Free() {
 func (c *DemagConvolution) init() {
 	{ // init FFT plans
 		padded := c.kernSize
-		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z], stream0)
-		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z], stream0)
+		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z])
+		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z])
 	}
 
 	{ // init device buffers
@@ -93,7 +93,7 @@ func (c *DemagConvolution) initFFTKern3D() {
 		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
 				data.Copy(input, c.kern[i][j])
-				c.fwPlan.Exec(input, output)
+				c.fwPlan.ExecAsync(input, output)
 				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
 			}
@@ -123,7 +123,7 @@ func (c *DemagConvolution) initFFTKern2D() {
 		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
 				data.Copy(input, c.kern[i][j])
-				c.fwPlan.Exec(input, output)
+				c.fwPlan.ExecAsync(input, output)
 				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
 			}
@@ -290,6 +290,7 @@ func NewDemag(mesh *data.Mesh) *DemagConvolution {
 	return newConvolution(mesh, k)
 }
 
+// TODO: remove when 2D convolution works
 func dbg(msg ...interface{}) {
 	for _, m := range msg {
 		log.Println(m)

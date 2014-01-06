@@ -14,16 +14,19 @@ type fft3DC2RPlan struct {
 }
 
 // 3D single-precission real-to-complex FFT plan.
-func newFFT3DC2R(Nx, Ny, Nz int, stream cu.Stream) fft3DC2RPlan {
+func newFFT3DC2R(Nx, Ny, Nz int) fft3DC2RPlan {
 	handle := cufft.Plan3d(Nz, Ny, Nx, cufft.C2R) // new xyz swap
 	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
-	handle.SetStream(stream)
+	handle.SetStream(stream0)
 	return fft3DC2RPlan{fftplan{handle, 0}, [3]int{Nx, Ny, Nz}}
 }
 
 // Execute the FFT plan, asynchronous.
 // src and dst are 3D arrays stored 1D arrays.
 func (p *fft3DC2RPlan) ExecAsync(src, dst *data.Slice) {
+	if Synchronous {
+		Sync()
+	}
 	oksrclen := p.InputLenFloats()
 	if src.Len() != oksrclen {
 		panic(fmt.Errorf("fft size mismatch: expecting src len %v, got %v", oksrclen, src.Len()))
@@ -33,12 +36,9 @@ func (p *fft3DC2RPlan) ExecAsync(src, dst *data.Slice) {
 		panic(fmt.Errorf("fft size mismatch: expecting dst len %v, got %v", okdstlen, dst.Len()))
 	}
 	p.handle.ExecC2R(cu.DevicePtr(uintptr(src.DevPtr(0))), cu.DevicePtr(uintptr(dst.DevPtr(0))))
-}
-
-// Execute the FFT plan, synchronized.
-func (p *fft3DC2RPlan) Exec(src, dst *data.Slice) {
-	p.ExecAsync(src, dst)
-	p.stream.Synchronize()
+	if Synchronous {
+		Sync()
+	}
 }
 
 // 3D size of the input array.

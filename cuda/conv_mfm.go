@@ -1,5 +1,7 @@
 package cuda
 
+// Generation of Magnetic Force Microscopy images.
+
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
@@ -41,8 +43,8 @@ func (c *MFMConvolution) Free() {
 func (c *MFMConvolution) init() {
 	// init FFT plans
 	padded := c.kernSize
-	c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z], stream0)
-	c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z], stream0)
+	c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z])
+	c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z])
 
 	// init device buffers
 	nc := fftR2COutputSizeFloats(c.kernSize)
@@ -57,26 +59,20 @@ func (c *MFMConvolution) init() {
 }
 
 func (c *MFMConvolution) initFFTKern3D() {
-
 	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
 
 	for i := 0; i < 3; i++ {
 		zero1_async(c.fftRBuf)
 		data.Copy(c.fftRBuf, c.kern[i])
-		c.fwPlan.Exec(c.fftRBuf, c.fftCBuf)
+		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)
 		scale := 2 / float32(c.fwPlan.InputLen()) // ??
 		zero1_async(c.gpuFFTKern[i])
 		Madd2(c.gpuFFTKern[i], c.gpuFFTKern[i], c.fftCBuf, 0, scale)
-		//dbg("kern", i, c.gpuFFTKern[i].HostCopy())
 	}
 }
 
-func (c *MFMConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
-	c.exec3D(B, m, vol, Bsat, regions)
-}
-
-func (c *MFMConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
-
+// store MFM image in output, based on magnetization in inp.
+func (c *MFMConvolution) Exec(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	for i := 0; i < 3; i++ {
 		zero1_async(c.fftRBuf)
 		copyPadMul(c.fftRBuf, inp.Comp(i), vol, c.kernSize, c.size, Bsat, regions)

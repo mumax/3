@@ -22,8 +22,9 @@ func (m *magnetization) Mesh() *data.Mesh     { return Mesh() }
 func (m *magnetization) NComp() int           { return 3 }
 func (m *magnetization) Name() string         { return "m" }
 func (m *magnetization) Unit() string         { return "" }
-func (m *magnetization) Buffer() *data.Slice  { return m.buffer_ }
+func (m *magnetization) Buffer() *data.Slice  { return m.buffer_ } // todo: rename Gpu()?
 func (m *magnetization) Child() []script.Expr { return nil }
+func (m *magnetization) Comp(c int) *comp     { return Comp(m, c) }
 
 func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }

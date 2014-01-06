@@ -53,6 +53,7 @@ func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(Vecto
 func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t }
 func (p *VectorParam) Child() []script.Expr    { return nil }
 func (p *VectorParam) Average() data.Vector    { return unslice(Average(p)) }
+func (p *VectorParam) Comp(c int) *comp        { return Comp(p, c) }
 
 // shortcut for slicing unaddressable_vector()[:]
 func slice(v [3]float64) []float64 {

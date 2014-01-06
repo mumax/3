@@ -39,3 +39,5 @@ func (q *adder) Set(dst *data.Slice) {
 	cuda.Zero(dst)
 	q.AddTo(dst)
 }
+
+func (q *adder) Comp(c int) *comp { return Comp(q, c) }

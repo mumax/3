@@ -127,6 +127,7 @@ func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }
 func (e *excitation) Child() []script.Expr    { return nil }
+func (e *excitation) Comp(c int) *comp        { return Comp(e, c) }
 
 func checkNaN(s *data.Slice, name string) {
 	h := s.Host()

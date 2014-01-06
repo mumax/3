@@ -1,5 +1,7 @@
 package cuda
 
+// Pool of re-usable GPU buffers.
+
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
@@ -8,11 +10,11 @@ import (
 )
 
 var (
-	buf_pool  map[int][]unsafe.Pointer    // maps buffer size to pool
-	buf_check map[unsafe.Pointer]struct{} // check if pointer originates here
+	buf_pool  map[int][]unsafe.Pointer    // pool of GPU buffers indexed by size
+	buf_check map[unsafe.Pointer]struct{} // checks if pointer originates here to avoid unintended recycle
 )
 
-const buf_max = 100 // maximum number of buffers to allocate
+const buf_max = 100 // maximum number of buffers to allocate (detect memory leak early)
 
 // Returns a GPU slice for temporary use. To be returned to the pool with Recycle
 func Buffer(nComp int, size [3]int) *data.Slice {
@@ -56,6 +58,7 @@ func Recycle(s *data.Slice) {
 	buf_pool[N] = pool
 }
 
+// Frees all buffers. Called after mesh resize.
 func FreeBuffers() {
 	for _, size := range buf_pool {
 		for i := range size {

@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-// dst += LUT[region], for vectors. Used for complex excitation.
+// dst += LUT[region], for vectors. Used to add terms to excitation.
 func RegionAddV(dst *data.Slice, lut LUTPtrs, regions *Bytes) {
 	util.Argument(dst.NComp() == 3)
 	N := dst.Len()

@@ -10,6 +10,7 @@ import (
 // 	torque in Tesla
 // 	m normalized
 // 	B in Tesla
+// see lltorque.cu
 func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
 	N := torque.Len()
 	cfg := make1DConf(N)

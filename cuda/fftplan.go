@@ -11,7 +11,6 @@ import (
 // Base implementation for all FFT plans.
 type fftplan struct {
 	handle cufft.Handle
-	stream cu.Stream
 }
 
 func prod3(x, y, z int) int {
@@ -29,5 +28,4 @@ func (p *fftplan) Free() {
 // Associates a CUDA stream with the FFT plan.
 func (p *fftplan) setStream(stream cu.Stream) {
 	p.handle.SetStream(stream)
-	p.stream = stream
 }

@@ -19,7 +19,7 @@ func newFFT3DR2C(Nx, Ny, Nz int) fft3DR2CPlan {
 	handle := cufft.Plan3d(Nz, Ny, Nx, cufft.R2C) // new xyz swap
 	handle.SetCompatibilityMode(cufft.COMPATIBILITY_NATIVE)
 	handle.SetStream(stream0)
-	return fft3DR2CPlan{fftplan{handle, 0}, [3]int{Nx, Ny, Nz}}
+	return fft3DR2CPlan{fftplan{handle}, [3]int{Nx, Ny, Nz}}
 }
 
 // Execute the FFT plan, asynchronous.

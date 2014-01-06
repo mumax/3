@@ -7,6 +7,7 @@ import (
 	"math"
 )
 
+// Renders svg image of vector data.
 func SVG(out io.Writer, arr [3][][][]float32) {
 
 	h, w := len(arr[0][0]), len(arr[0][0][0])

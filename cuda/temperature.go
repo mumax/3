@@ -6,6 +6,8 @@ import (
 	"unsafe"
 )
 
+// Add thermal noise (Brown) to Beff.
+// see temperature.cu
 func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
 	util.Argument(Beff.NComp() == 1 && noise.NComp() == 1)
 

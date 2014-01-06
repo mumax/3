@@ -23,6 +23,8 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+always using 3D convolution
+
 MFM 3D not OK
 
 need proper zhang-li boundary conditions

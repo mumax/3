@@ -145,7 +145,6 @@ func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Byt
 }
 
 // zero 1-component slice
-// TODO: rename: not async
 func zero1_async(dst *data.Slice) {
 	cu.MemsetD32Async(cu.DevicePtr(uintptr(dst.DevPtr(0))), 0, int64(dst.Len()), stream0)
 }
@@ -187,7 +186,6 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
 	}
-	//SyncAll()
 }
 
 func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
@@ -231,12 +229,11 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 
 	dbg("Bx:", outp.Comp(X).HostCopy())
 	dbg("By:", outp.Comp(Y).HostCopy())
-	//SyncAll()
 }
 
 func (c *DemagConvolution) is2D() bool {
-	return false // !!!!!!!!!!!!!!!!!!!!!!!
-	return c.size[Z] == 1
+	return false // TODO TODO TODO: make 2D convolution work
+	//return c.size[Z] == 1
 }
 
 func (c *DemagConvolution) is3D() bool {

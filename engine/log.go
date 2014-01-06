@@ -15,7 +15,7 @@ var (
 func openlog() *os.File {
 	if logfile == nil {
 		var err error
-		logfile, err = os.OpenFile(OD+"/log.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		logfile, err = os.OpenFile(OD+"/input.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
 			log.Println(err)
 		}

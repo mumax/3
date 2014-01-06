@@ -132,7 +132,7 @@ func (s *State) Output() string {
 }
 
 func (s *State) infile() string {
-	return fmt.Sprintf("example%v.txt", s.count)
+	return fmt.Sprintf("example%v.in", s.count)
 }
 
 func (s *State) outfile() string {

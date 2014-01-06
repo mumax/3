@@ -33,7 +33,6 @@ check output of all mumax3-convert formats
 
 omf/ovf does not check if enough bytes are read
 
-script: if w/o else crashes
 script: compile selector?
 
 upon resize auto refresh dispaly quits working

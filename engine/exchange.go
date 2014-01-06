@@ -37,6 +37,8 @@ func AddExchangeField(dst *data.Slice) {
 	} else {
 		// DMI only implemented for uniform parameters
 		// interaction not clear with space-dependent parameters
+		util.AssertMsg(Mesh().Size()[Z] == 1,
+			"DMI: mesh must be 2D")
 		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
 			"DMI: Msat, Aex, Dex must be uniform")
 		msat := Msat.GetRegion(0)

@@ -56,6 +56,9 @@ resettable tables, multiple tables?
 
 MFM: don't crash on tip crash ;-), just zero kernel
 
+kernel cache
+
+DMI in 3D
 
 master process assigns ports (clean fail if port in use, start new instance on next port?) and GPU
 	web iface of master shows que?

@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+	//_ "github.com/mumax/3/mainpkg" // for flags definitions
 )
 
 var env []string
@@ -15,13 +17,15 @@ var env []string
 const LD_LIBRARY_PATH = "LD_LIBRARY_PATH"
 
 func main() {
+	//flag.Parse()
+
 	bin := execDir()
 
 	env = os.Environ()
 	for i := range env {
 		if strings.HasPrefix(env[i], LD_LIBRARY_PATH+"=") {
 			env[i] += ":" + bin
-			fmt.Println(env[i])
+			//fmt.Println(env[i])
 		}
 	}
 
@@ -39,7 +43,7 @@ func main() {
 	if mumax == "" {
 		fatal("no matching mumax/cuda combination found in", cmds)
 	}
-	fmt.Println(mumax, os.Args[1:])
+	//fmt.Println(mumax, os.Args[1:])
 	err := run(mumax, os.Args[1:])
 	if err != nil {
 		fatal(err)
@@ -47,16 +51,33 @@ func main() {
 }
 
 func run(command string, args []string) error {
+	// prepare command
 	cmd := exec.Command(command, args...)
 	cmd.Env = env
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	done := make(chan int)
-	go func() { io.Copy(os.Stdout, stdout); done <- 1 }()
-	go func() { io.Copy(os.Stderr, stderr); done <- 1 }()
+
+	// prepare output
+	outfname := "test.out" // TODO: proper name
+	outfile := ioutil.Discard
+	f, erro := os.OpenFile(outfname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	if erro == nil {
+		defer f.Close()
+		outfile = f
+	} else {
+		log.Println(erro)
+	}
+	multiOut := io.MultiWriter(os.Stdout, outfile)
+	multiErr := io.MultiWriter(os.Stderr, outfile)
+	go func() { io.Copy(multiOut, stdout); done <- 1 }()
+	go func() { io.Copy(multiErr, stderr); done <- 1 }()
+
+	// run & flush output
 	err := cmd.Run()
 	<-done
 	<-done
+
 	return err
 }
 

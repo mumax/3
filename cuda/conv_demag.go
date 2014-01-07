@@ -128,13 +128,6 @@ func (c *DemagConvolution) bwFFT(i int, outp *data.Slice) {
 	copyUnPad(out, c.fftRBuf[i], c.size, c.kernSize)
 }
 
-// forward FFT of magnetization one component.
-// returned slice is valid until next FFT or convolution
-func (c *DemagConvolution) FFT(m, vol *data.Slice, comp int, Bsat LUTPtr, regions *Bytes) *data.Slice {
-	c.fwFFT(comp, m, vol, Bsat, regions)
-	return c.fftCBuf[comp]
-}
-
 func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	for i := 0; i < 3; i++ { // FW FFT
 		c.fwFFT(i, inp, vol, Bsat, regions)

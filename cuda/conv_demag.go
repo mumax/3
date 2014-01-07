@@ -20,7 +20,6 @@ type DemagConvolution struct {
 	fwPlan      fft3DR2CPlan      // Forward FFT (1 component)
 	bwPlan      fft3DC2RPlan      // Backward FFT (1 component)
 	kern        [3][3]*data.Slice // Real-space kernel (host), removed after self-test
-	FFTMesh     data.Mesh         // mesh of FFT m
 }
 
 func (c *DemagConvolution) Free() {
@@ -41,7 +40,6 @@ func (c *DemagConvolution) Free() {
 		}
 		c.fwPlan.Free()
 		c.bwPlan.Free()
-		c.FFTMesh = data.Mesh{}
 	}
 }
 
@@ -232,8 +230,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 }
 
 func (c *DemagConvolution) is2D() bool {
-	return false // TODO TODO TODO: make 2D convolution work
-	//return c.size[Z] == 1
+	return c.size[Z] == 1
 }
 
 func (c *DemagConvolution) is3D() bool {
@@ -248,7 +245,6 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.kern = kernel
 	c.kernSize = kernel[X][X].Size()
 	c.init()
-	c.initFFTMesh()
 
 	//dbg("kernel", c.kern)
 
@@ -272,13 +268,6 @@ func (c *DemagConvolution) freeKern() {
 			c.kern[i][j] = nil
 		}
 	}
-}
-
-// Mesh for FFT(m) quantity, etc. // TODO: rm, move into FFTM quantity
-func (c *DemagConvolution) initFFTMesh() {
-	n := fftR2COutputSizeFloats(c.kernSize)
-	c.FFTMesh = *data.NewMesh(n[X], n[Y], n[Z], 1, 1, 1)
-	c.FFTMesh.Unit = "/m"
 }
 
 // Default accuracy setting for demag kernel.

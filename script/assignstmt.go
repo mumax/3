@@ -26,7 +26,6 @@ func (w *World) compileAssignStmt(a *ast.AssignStmt) Expr {
 	case token.SUB_ASSIGN: // -=
 		return w.compileSubAssign(a, lhs, r)
 	}
-
 }
 
 // compile a = b

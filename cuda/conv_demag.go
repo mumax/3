@@ -65,57 +65,23 @@ func (c *DemagConvolution) init() {
 		}
 	}
 
-	if c.is2D() {
-		c.initFFTKern2D()
-	} else {
-		c.initFFTKern3D()
-	}
+	c.initFFTKern()
 }
 
 // initialize FFT(Kernel) for 3D
-func (c *DemagConvolution) initFFTKern3D() {
-
+func (c *DemagConvolution) initFFTKern() {
 	// size of FFT(kernel): store real parts only
 	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
 	util.Assert(c.fftKernSize[X]%2 == 0)
 	c.fftKernSize[X] /= 2
 
 	// will store only 1/4 (symmetry), but not yet
+	// TODO: if 2D/3D...
 	halfkern := c.fftKernSize
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
 
-	fftKern := data.NewSlice(1, halfkern) // host
-	for i := 0; i < 3; i++ {
-		for j := i; j < 3; j++ { // upper triangular part
-			if c.kern[i][j] != nil { // ignore 0's
-				data.Copy(input, c.kern[i][j])
-				c.fwPlan.ExecAsync(input, output)
-				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
-				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
-			}
-		}
-	}
-}
-
-// Initialize GPU FFT kernel for 2D.
-// Only the non-redundant parts are stored on the GPU.
-func (c *DemagConvolution) initFFTKern2D() {
-
-	// size of FFT(kernel): store real parts only
-	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
-	util.Assert(c.fftKernSize[X]%2 == 0)
-	c.fftKernSize[X] /= 2
-
-	// store only 1/2 (symmetry), not yet
-	halfkern := c.fftKernSize
-	//halfkern[Y] = halfkern[Y]/2 + 1
-
-	output := c.fftCBuf[0]
-	input := c.fftRBuf[0]
-
-	// upper triangular part
 	fftKern := data.NewSlice(1, halfkern) // host
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part

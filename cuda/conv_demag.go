@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
@@ -44,26 +43,25 @@ func (c *DemagConvolution) Free() {
 }
 
 func (c *DemagConvolution) init() {
-	{ // init FFT plans
-		padded := c.kernSize
-		c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z])
-		c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z])
+	padded := c.kernSize
+
+	// init device buffers
+	// 2D re-uses fftBuf[X] as fftBuf[Z], 3D needs all 3 fftBufs.
+	nc := fftR2COutputSizeFloats(padded)
+	c.fftCBuf[X] = NewSlice(1, nc)
+	c.fftCBuf[Y] = NewSlice(1, nc)
+	if c.is2D() {
+		c.fftCBuf[Z] = c.fftCBuf[X]
+	} else {
+		c.fftCBuf[Z] = NewSlice(1, nc)
+	}
+	for i := 0; i < 3; i++ {
+		c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(padded))
 	}
 
-	{ // init device buffers
-		// 2D re-uses fftBuf[X] as fftBuf[Z], 3D needs all 3 fftBufs.
-		nc := fftR2COutputSizeFloats(c.kernSize)
-		c.fftCBuf[X] = NewSlice(1, nc)
-		c.fftCBuf[Y] = NewSlice(1, nc)
-		if c.is3D() {
-			c.fftCBuf[Z] = NewSlice(1, nc)
-		} else {
-			c.fftCBuf[Z] = c.fftCBuf[X]
-		}
-		for i := 0; i < 3; i++ {
-			c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(c.kernSize))
-		}
-	}
+	// init FFT plans
+	c.fwPlan = newFFT3DR2C(padded[X], padded[Y], padded[Z])
+	c.bwPlan = newFFT3DC2R(padded[X], padded[Y], padded[Z])
 
 	c.initFFTKern()
 }
@@ -134,11 +132,10 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	}
 
 	// kern mul
-	Nx, Ny, Nz := c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z]
 	kernMulRSymm3D_async(c.fftCBuf,
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[Z][Z],
 		c.gpuFFTKern[Y][Z], c.gpuFFTKern[X][Z], c.gpuFFTKern[X][Y],
-		Nx, Ny, Nz)
+		c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z])
 
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
@@ -147,53 +144,26 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 
 func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
 	// Convolution is separated into
-	// a 1D convolution for x and a 2D convolution for yz.
+	// a 1D convolution for z and a 2D convolution for xy.
 	// So only 2 FFT buffers are needed at the same time.
-
-	dbg("exec2D")
-	dbg("inp:", inp.HostCopy())
-
-	c.fwFFT(Z, inp, vol, Bsat, regions) // FFT Z
-
-	dbg("fftmz:", c.fftCBuf[Z].HostCopy())
-
-	// kern mul Z
 	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
+
+	// Z
+	c.fwFFT(Z, inp, vol, Bsat, regions)
 	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.gpuFFTKern[Z][Z], Nx, Ny)
+	c.bwFFT(Z, outp)
 
-	dbg("fftBz:", c.fftCBuf[Z].HostCopy())
-
-	c.bwFFT(Z, outp) // bw FFT z
-
-	dbg("Bz:", outp.Comp(Z).HostCopy())
-
-	// FW FFT xy
+	// XY
 	c.fwFFT(X, inp, vol, Bsat, regions)
 	c.fwFFT(Y, inp, vol, Bsat, regions)
-	dbg("fftmx:", c.fftCBuf[X].HostCopy())
-	dbg("fftmy:", c.fftCBuf[Y].HostCopy())
-
-	// kern mul xy
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.gpuFFTKern[X][X], c.gpuFFTKern[Y][Y], c.gpuFFTKern[X][Y], Nx, Ny)
-
-	dbg("fftBx:", c.fftCBuf[X].HostCopy())
-	dbg("fftBy:", c.fftCBuf[Y].HostCopy())
-
-	// BW FFT xy
 	c.bwFFT(X, outp)
 	c.bwFFT(Y, outp)
-
-	dbg("Bx:", outp.Comp(X).HostCopy())
-	dbg("By:", outp.Comp(Y).HostCopy())
 }
 
 func (c *DemagConvolution) is2D() bool {
 	return c.size[Z] == 1
-}
-
-func (c *DemagConvolution) is3D() bool {
-	return !c.is2D()
 }
 
 // Initializes a demag convolution for the given mesh geometry and magnetostatic kernel.
@@ -204,17 +174,6 @@ func newConvolution(mesh *data.Mesh, kernel [3][3]*data.Slice) *DemagConvolution
 	c.kern = kernel
 	c.kernSize = kernel[X][X].Size()
 	c.init()
-
-	//dbg("kernel", c.kern)
-
-	//for i, k := range c.gpuFFTKern {
-	//	for j, k := range k {
-	//		if k != nil {
-	//			dbg("fftkernel", i, j, k.HostCopy())
-	//		}
-	//	}
-	//}
-
 	testConvolution(c, mesh)
 	c.freeKern()
 	return c
@@ -236,11 +195,4 @@ const DEFAULT_KERNEL_ACC = 6
 func NewDemag(mesh *data.Mesh) *DemagConvolution {
 	k := mag.BruteKernel(mesh, DEFAULT_KERNEL_ACC)
 	return newConvolution(mesh, k)
-}
-
-// TODO: remove when 2D convolution works
-func dbg(msg ...interface{}) {
-	for _, m := range msg {
-		log.Println(m)
-	}
 }

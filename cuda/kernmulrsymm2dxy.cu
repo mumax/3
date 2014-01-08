@@ -54,9 +54,9 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
     //     Kxy = -fftKxy[I2];
     // }
 
-    fftMx[e  ] = reMx * Kxx + reMy * Kxy ;
-    fftMx[e+1] = imMx * Kxx + imMy * Kxy ;
-    fftMy[e  ] = reMx * Kxy + reMy * Kyy ;
-    fftMy[e+1] = imMx * Kxy + imMy * Kyy ;
+    fftMx[e  ] = reMx * Kxx + reMy * Kxy;
+    fftMx[e+1] = imMx * Kxx + imMy * Kxy;
+    fftMy[e  ] = reMx * Kxy + reMy * Kyy;
+    fftMy[e+1] = imMx * Kxy + imMy * Kyy;
 }
 

@@ -5,7 +5,7 @@ package cuda
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math/rand"
+	_ "math/rand"
 )
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
@@ -131,23 +131,26 @@ func wrap(number, max int) int {
 
 // generate sparse input data for testing the convolution.
 func initConvTestInput(input [3][][][]float32) {
-	rng := rand.New(rand.NewSource(0)) // reproducible tests
-	size := sizeOf(input[0])
+	input[X][0][0][0] = 1
+	input[Y][0][0][0] = 2
+	input[Z][0][0][0] = 3
+	//rng := rand.New(rand.NewSource(0)) // reproducible tests
+	//size := sizeOf(input[0])
 
-	Nx, Ny, Nz := size[X], size[Y], size[Z]
-	ixs := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
-	iys := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
-	izs := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
+	//Nx, Ny, Nz := size[X], size[Y], size[Z]
+	//ixs := [...]int{0, Nx / 5, Nx / 2, Nx - 1}
+	//iys := [...]int{0, Ny / 7, Ny / 2, Ny - 1}
+	//izs := [...]int{0, Nz / 11, Nz / 2, Nz - 1}
 
-	for c := range input {
-		for _, i := range izs {
-			for _, j := range iys {
-				for _, k := range ixs {
-					input[c][i][j][k] = 1 - 2*rng.Float32()
-				}
-			}
-		}
-	}
+	//for c := range input {
+	//	for _, i := range izs {
+	//		for _, j := range iys {
+	//			for _, k := range ixs {
+	//				input[c][i][j][k] = 1 - 2*rng.Float32()
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 // Returns the x, y, z size of block

@@ -44,16 +44,19 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 		}
 	}
 
-	//	//----------------------------------
-	//	log.Println(" ****   unit kernel **** ")
-	//	array[X][X][0][0][0] = 1
-	//	array[Y][Y][0][0][0] = 1
-	//	array[Z][Z][0][0][0] = 1
-	//	kernel[1][0] = kernel[0][1]
-	//	kernel[2][0] = kernel[0][2]
-	//	kernel[2][1] = kernel[1][2]
-	//	return
-	//	//------------------------------------
+	//----------------------------------
+	//println(" ****   fake kernel **** ")
+	//array[X][X][0][0][0] = 1
+	//array[Y][Y][0][0][0] = 0
+	//array[Z][Z][0][0][0] = 0
+
+	//array[X][Y][0][0][0] = 0
+
+	//kernel[Y][X] = kernel[X][Y]
+	//kernel[Z][X] = kernel[X][Z]
+	//kernel[Z][Y] = kernel[Y][Z]
+	//return
+	//------------------------------------
 
 	// Field (destination) loop ranges
 	r1, r2 := kernelRanges(size, pbc)
@@ -169,15 +172,16 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			}
 		}
 	}
+	println("TODO: 2D zero kernel elems")
 	// for 2D these elements are zero:
-	if size[0] == 1 {
-		kernel[0][1] = nil
-		kernel[0][2] = nil
-	}
+	//	if size[Z] == 1 {
+	//		kernel[X][Z] = nil
+	//		kernel[Y][Z] = nil
+	//	}
 	// make result symmetric for tools that expect it so.
-	kernel[1][0] = kernel[0][1]
-	kernel[2][0] = kernel[0][2]
-	kernel[2][1] = kernel[1][2]
+	kernel[Y][X] = kernel[X][Y]
+	kernel[Z][X] = kernel[X][Z]
+	kernel[Z][Y] = kernel[Y][Z]
 	return kernel
 }
 

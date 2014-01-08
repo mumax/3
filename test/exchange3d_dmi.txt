@@ -1,0 +1,19 @@
+
+// Test that tiny DMI does not break 3D exchange
+
+d := 100e-9                
+N := 32                   
+setgridsize(N, N, N/4)
+setcellsize(d/N, d/N, d/N)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 3
+m     = vortex(1, 1)
+e := 1e-20
+Dex = vector(e, e, 0) // should have no physical effect, but calls different kernel.
+
+run(2e-9) 
+expect("mz", average(m)[2], 0.02785073, 1e-5)
+
+

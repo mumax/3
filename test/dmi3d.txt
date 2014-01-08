@@ -1,7 +1,10 @@
 
+// Test DMI + exchange for 3D simulation.
+// reference solution from the same geometry with 2D discretization.
+
 SetGridSize(64, 64, 2)
-c := 1e-9
-SetCellSize(c, c, c)
+c := 0.6e-9
+SetCellSize(c, c, c/2)
 
 Msat  = 1100e3
 Aex   = 16e-12
@@ -14,10 +17,8 @@ Dex   = vector(D, D, 0)
 m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
 
 MaxErr = 1e-4
-Maxdt = 1e-13
-runwhile(maxTorque > 5e-4)
+run(0.5e-9)
 
-
-expect("mx", m.getcell(0, 32, 32, 0), 0.7106, 0.01)
-expect("my", m.getcell(1, 32, 32, 0), 0.0426, 0.01)
+expect("mx", m.getcell(0, 32, 32, 0), 0.8979, 0.001)
+expect("my", m.getcell(1, 32, 32, 0), 0.3989, 0.001)
 

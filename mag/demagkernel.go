@@ -172,12 +172,11 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 			}
 		}
 	}
-	println("TODO: 2D zero kernel elems")
 	// for 2D these elements are zero:
-	//	if size[Z] == 1 {
-	//		kernel[X][Z] = nil
-	//		kernel[Y][Z] = nil
-	//	}
+	if size[Z] == 1 {
+		kernel[X][Z] = nil
+		kernel[Y][Z] = nil
+	}
 	// make result symmetric for tools that expect it so.
 	kernel[Y][X] = kernel[X][Y]
 	kernel[Z][X] = kernel[X][Z]

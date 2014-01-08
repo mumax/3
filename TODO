@@ -1,12 +1,6 @@
 3.4 changelog
 -------------
 
-  * JPol (spin polarized current density) had to be split in quantities J (current density) and Pol (spin polarization). This allows material dependent spin-polarization and opens the possibility for Oersted-Ampère fields. Existing input files will need to replace "JPol" by "J". Pol defaults to 1 so does not need to be set explicitly.
-
-  * A fix for the nvidia TITAN gpu has been issued, it can now safely be used.
-
-  * Cubic anisotropy has been fixed (Thanks Damien Louis)
-
   * The exchange between different regions (materials) does not default to 0 anymore, but to the harmonic mean of exchange lengths in 
 
   * It is now default behavior to clear a pre-existing output directory (-f flag is on by default). Run mumax3 -f=0 to get the old behavior (refuse to run with non-empty output directory).
@@ -22,8 +16,6 @@ However, make sure you also update mumax3-convert.
 
 bugs:
 -----
-
-always using 3D convolution
 
 MFM 3D not OK
 
@@ -62,13 +54,17 @@ kernel cache
 
 DMI in 3D
 
+optimization for small simulatons? one big multi-FFT on all components, one big kenrel mul?
+
 master process assigns ports (clean fail if port in use, start new instance on next port?) and GPU
 	web iface of master shows que?
 	mumax3 -que add to que, return?
 
 
-cuda.HostBuffer()
+cuda.HostBuffer() for faster I/O
+
 non-fatal error handling for GUI
+
 log.FatalErr: print line number of caller?
 
 
@@ -77,7 +73,6 @@ new features:
 
 web: (clean) exit button
 web: show/hide/auto refresh
-web: -web flag opens browser
 
 
 windows:

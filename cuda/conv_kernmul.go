@@ -15,7 +15,7 @@ func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int)
 	cfg := make3DConf([3]int{Nx, Ny, 1})
 
 	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
-		Kxx.DevPtr(0), Kxx.DevPtr(0), Kxy.DevPtr(0),
+		Kxx.DevPtr(0), Kyy.DevPtr(0), Kxy.DevPtr(0),
 		Nx, Ny, cfg)
 }
 

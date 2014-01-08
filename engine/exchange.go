@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
@@ -119,19 +118,12 @@ func (p *exchParam) update() {
 	}
 }
 
-func safediv(a, b float32) float32 {
-	if b == 0 {
-		return 0
-	} else {
-		return a / b
-	}
-}
-
 func (p *exchParam) upload() {
 	// alloc if  needed
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
+	// TODO: sync?
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
@@ -146,7 +138,7 @@ func (p *exchParam) SetInterRegion(r1, r2 int, val float64) {
 			if p.lut[symmidx(i, i)] == v {
 				p.lut[symmidx(r, i)] = v
 			} else {
-				p.lut[symmidx(r, i)] = 0
+				p.lut[symmidx(r, i)] = 0 // TODO: harmnoic avg !!!
 			}
 		}
 	}
@@ -164,24 +156,13 @@ func symmidx(i, j int) int {
 	}
 }
 
-func (p *exchParam) String() string {
-	str := ""
-	for j := 0; j < NREGION; j++ {
-		for i := 0; i <= j; i++ {
-			str += fmt.Sprint(p.lut[symmidx(i, j)], "\t")
-		}
-		str += "\n"
-	}
-	return str
-}
-
-func sign(x float64) float64 {
-	switch {
-	case x > 0:
-		return 1
-	case x < 0:
-		return -1
-	default:
-		return 0
-	}
-}
+//func (p *exchParam) String() string {
+//	str := ""
+//	for j := 0; j < NREGION; j++ {
+//		for i := 0; i <= j; i++ {
+//			str += fmt.Sprint(p.lut[symmidx(i, j)], "\t")
+//		}
+//		str += "\n"
+//	}
+//	return str
+//}

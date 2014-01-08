@@ -117,6 +117,26 @@ func Index2Coord(ix, iy, iz int) data.Vector {
 	return data.Vector{x, y, z}
 }
 
+func sign(x float64) float64 {
+	switch {
+	case x > 0:
+		return 1
+	case x < 0:
+		return -1
+	default:
+		return 0
+	}
+}
+
+// returns a/b, or 0 when b == 0
+func safediv(a, b float32) float32 {
+	if b == 0 {
+		return 0
+	} else {
+		return a / b
+	}
+}
+
 type caseIndep []string
 
 func (s *caseIndep) Len() int           { return len(*s) }

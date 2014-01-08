@@ -1,0 +1,23 @@
+
+SetGridSize(64, 64, 2)
+c := 1e-9
+SetCellSize(c, c, c)
+
+Msat  = 1100e3
+Aex   = 16e-12
+alpha = 3
+AnisU = vector(0, 0, 1)
+Ku1   = 1.27E6
+D    := 0.1e-3 // J/m2.
+Dex   = vector(D, D, 0)
+
+m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
+
+MaxErr = 1e-4
+Maxdt = 1e-13
+runwhile(maxTorque > 5e-4)
+
+
+expect("mx", m.getcell(0, 32, 32, 0), 0.7106, 0.01)
+expect("my", m.getcell(1, 32, 32, 0), 0.0426, 0.01)
+

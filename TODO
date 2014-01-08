@@ -36,6 +36,10 @@ setexlen not ok, also api, output
 API:
 ----
 
+review getcell()
+
+q.average()
+
 mask.setv, getv
 
 check region defined?

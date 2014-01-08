@@ -18,7 +18,12 @@ m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between B
 
 MaxErr = 1e-4
 Maxdt = 5e-13
-Run(5e-9)
+runwhile(maxtorque > 1e-3)
+//Run(5e-9)
+
+
+print("mx", m.getcell(0, 64, 64, 0))
+print("my", m.getcell(1, 64, 64, 0))
 
 expect("mx", Average(m)[0], 0.059, 0.01)
 expect("my", Average(m)[1], 0.035, 0.01)

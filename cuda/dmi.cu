@@ -99,6 +99,21 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         h.z -= Dy*(m2.y-m1.y)/cy;
     }
 
+    // only take vertical derivative for 3D sim
+    if (Nz != 1) {
+        // bottom neighbor
+        i_  = idx(ix, iy, lclampz(iz-1));
+        float3 m1  = make_float3(mx[i_], my[i_], mz[i_]);
+        m1  = ( is0(m1)? m0: m1 );
+
+        // top neighbor
+        i_  = idx(ix, iy, hclampz(iz+1));
+        float3 m2  = make_float3(mx[i_], my[i_], mz[i_]);
+        m2  = ( is0(m2)? m0: m2 );
+
+        h += (2.0f*A/(cz*cz)) * ((m1 - m0) + (m2 - m0));
+    }
+
     // write back, result is H + Hdmi + Hex
     Hx[I] = h.x;
     Hy[I] = h.y;

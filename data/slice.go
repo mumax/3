@@ -13,7 +13,7 @@ import (
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
 type Slice struct {
 	ptr_    [MAX_COMP]unsafe.Pointer // keeps data local // TODO: rm (premature optimization)
-	ptrs    []unsafe.Pointer         // points into ptr_
+	ptrs    []unsafe.Pointer         // points into ptr_, limited to NComp()
 	size    [3]int
 	memType int8
 }
@@ -49,7 +49,7 @@ func NewSlice(nComp int, size [3]int) *Slice {
 
 // Return a slice without underlying storage. Used to represent a mask containing all 1's.
 func NilSlice(nComp int, size [3]int) *Slice {
-	return SliceFromPtrs(size, UnifiedMemory, make([]unsafe.Pointer, nComp))
+	return SliceFromPtrs(size, GPUMemory, make([]unsafe.Pointer, nComp))
 }
 
 // Internal: construct a Slice using bare memory pointers.
@@ -83,10 +83,10 @@ func (s *Slice) Free() {
 		for _, ptr := range s.ptrs {
 			memFree(ptr)
 		}
-	case UnifiedMemory:
-		for _, ptr := range s.ptrs {
-			memFreeHost(ptr)
-		}
+	//case UnifiedMemory:
+	//	for _, ptr := range s.ptrs {
+	//		memFreeHost(ptr)
+	//	}
 	case CPUMemory:
 		// nothing to do
 	default:
@@ -106,9 +106,9 @@ func (s *Slice) Disable() {
 
 // value for Slice.memType
 const (
-	CPUMemory     = 1 << 0
-	GPUMemory     = 1 << 1
-	UnifiedMemory = CPUMemory | GPUMemory
+	CPUMemory = 1 << 0
+	GPUMemory = 1 << 1
+	//UnifiedMemory = CPUMemory | GPUMemory
 )
 
 // MemType returns the memory type of the underlying storage:
@@ -169,23 +169,6 @@ func (s *Slice) DevPtr(component int) unsafe.Pointer {
 	return s.ptrs[component]
 }
 
-// Slice returns a slice sharing memory with the original.
-// Beware that it may contain less elements than would be expected from Mesh().NCell().
-//func (s *Slice) Slice(a, b int) *Slice {
-//	len_ := int(s.len_)
-//	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {
-//		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
-//	}
-//
-//	slice := &Slice{memType: s.memType, size: s.size}
-//	slice.ptrs = slice.ptr_[:s.NComp()]
-//	for i := range s.ptrs {
-//		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
-//	}
-//	slice.len_ = b - a
-//	return slice
-//}
-
 const SIZEOF_FLOAT32 = 4
 
 // Host returns the Slice as a [][]float32 indexed by component, cell number.
@@ -207,12 +190,7 @@ func (s *Slice) Host() [][]float32 {
 // Returns a copy of the Slice, allocated on CPU.
 func (s *Slice) HostCopy() *Slice {
 	cpy := NewSlice(s.NComp(), s.Size())
-	// make it work if s is a part of a bigger slice:
-	//	if cpy.Len() != s.Len() {
-	//		cpy = cpy.Slice(0, s.Len())
-	//	}
 	Copy(cpy, s)
-	util.Assert(s.ptrs[0] != nil) // todo rm
 	return cpy
 }
 

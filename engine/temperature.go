@@ -42,6 +42,10 @@ func AddThermalField(dst *data.Slice) {
 	if Temp.isZero() {
 		return
 	}
+	/* With higher-order solvers, the thermal field should remain constant during the step,
+	   requiring us to save it. While possible, it hardly is worth the effort given the fact
+	   that the time step will be extremely small anyway.
+	*/
 	util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
 	if generator == 0 {
 		generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)

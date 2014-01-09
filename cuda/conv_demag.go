@@ -83,12 +83,10 @@ func (c *DemagConvolution) init() {
 				data.Copy(input, c.kern[i][j])
 				c.fwPlan.ExecAsync(input, output)
 				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
-
-				util.Println("fftK", i, j)
-				util.Printf("% 7f", fftKern.Scalars())
-				util.Println()
-
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
+				//util.Println("fftK", i, j)
+				//util.Printf("% 7f", fftKern.Scalars())
+				//util.Println()
 			}
 		}
 	}

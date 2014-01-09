@@ -17,6 +17,10 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+omf/ovf does not check if enough bytes are read
+
+JPEG output
+
 MFM 3D not OK
 
 need proper zhang-li boundary conditions
@@ -24,8 +28,6 @@ need proper zhang-li boundary conditions
 reduce operations are non-reproducible, though OK within numerical precission.
 
 check output of all mumax3-convert formats
-
-omf/ovf does not check if enough bytes are read
 
 script: compile selector?
 

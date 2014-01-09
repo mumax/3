@@ -175,20 +175,20 @@ func (s *Slice) DevPtr(component int) unsafe.Pointer {
 
 // Slice returns a slice sharing memory with the original.
 // Beware that it may contain less elements than would be expected from Mesh().NCell().
-func (s *Slice) Slice(a, b int) *Slice {
-	len_ := int(s.len_)
-	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {
-		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
-	}
-
-	slice := &Slice{memType: s.memType, size: s.size}
-	slice.ptrs = slice.ptr_[:s.NComp()]
-	for i := range s.ptrs {
-		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
-	}
-	slice.len_ = b - a
-	return slice
-}
+//func (s *Slice) Slice(a, b int) *Slice {
+//	len_ := int(s.len_)
+//	if a >= len_ || b > len_ || a > b || a < 0 || b < 0 {
+//		log.Panicf("slice range out of bounds: [%v:%v] (len=%v)", a, b, len_)
+//	}
+//
+//	slice := &Slice{memType: s.memType, size: s.size}
+//	slice.ptrs = slice.ptr_[:s.NComp()]
+//	for i := range s.ptrs {
+//		slice.ptrs[i] = unsafe.Pointer(uintptr(s.ptrs[i]) + SIZEOF_FLOAT32*uintptr(a))
+//	}
+//	slice.len_ = b - a
+//	return slice
+//}
 
 const SIZEOF_FLOAT32 = 4
 
@@ -212,9 +212,9 @@ func (s *Slice) Host() [][]float32 {
 func (s *Slice) HostCopy() *Slice {
 	cpy := NewSlice(s.NComp(), s.Size())
 	// make it work if s is a part of a bigger slice:
-	if cpy.Len() != s.Len() {
-		cpy = cpy.Slice(0, s.Len())
-	}
+	//	if cpy.Len() != s.Len() {
+	//		cpy = cpy.Slice(0, s.Len())
+	//	}
 	Copy(cpy, s)
 	util.Assert(s.ptrs[0] != nil) // todo rm
 	return cpy

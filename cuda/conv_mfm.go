@@ -5,6 +5,7 @@ package cuda
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
+	"unsafe"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
@@ -49,7 +50,7 @@ func (c *MFMConvolution) init() {
 	// init device buffers
 	nc := fftR2COutputSizeFloats(c.kernSize)
 	c.fftCBuf = NewSlice(1, nc)
-	c.fftRBuf = c.fftCBuf.Slice(0, prod(c.kernSize))
+	c.fftRBuf = data.SliceFromPtrs(c.kernSize, data.GPUMemory, []unsafe.Pointer{c.fftCBuf.DevPtr(0)})
 
 	c.gpuFFTKern[X] = NewSlice(1, nc)
 	c.gpuFFTKern[Y] = NewSlice(1, nc)

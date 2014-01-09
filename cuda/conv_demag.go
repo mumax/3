@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+	"unsafe"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
@@ -56,7 +57,7 @@ func (c *DemagConvolution) init() {
 		c.fftCBuf[Z] = NewSlice(1, nc)
 	}
 	for i := 0; i < 3; i++ {
-		c.fftRBuf[i] = c.fftCBuf[i].Slice(0, prod(padded))
+		c.fftRBuf[i] = data.SliceFromPtrs(padded, data.GPUMemory, []unsafe.Pointer{c.fftCBuf[i].DevPtr(0)})
 	}
 
 	// init FFT plans
@@ -69,9 +70,8 @@ func (c *DemagConvolution) init() {
 	util.Assert(c.fftKernSize[X]%2 == 0)
 	c.fftKernSize[X] /= 2
 
-	// will store only 1/4 (symmetry), but not yet
-	// TODO: if 2D/3D...
-	halfkern := c.fftKernSize
+	//halfkern := [3]int{c.fftKernSize[X], c.fftKernSize[Y]/2 + 1, c.fftKernSize[Z]/2 + 1}
+	halfkern := [3]int{c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z]}
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
@@ -81,8 +81,12 @@ func (c *DemagConvolution) init() {
 		for j := i; j < 3; j++ { // upper triangular part
 			if c.kern[i][j] != nil { // ignore 0's
 				data.Copy(input, c.kern[i][j])
+				//util.Println("input")
+				//util.Printf("% 6f", input.HostCopy().Scalars())
 				c.fwPlan.ExecAsync(input, output)
-				scaleRealParts(fftKern, output.Slice(0, prod(halfkern)*2), 1/float32(c.fwPlan.InputLen()))
+				//util.Println("output")
+				//util.Printf("% 6f", output.HostCopy().Scalars())
+				scaleRealParts(fftKern, output, 1/float32(c.fwPlan.InputLen()))
 				c.gpuFFTKern[i][j] = GPUCopy(fftKern)
 				//util.Println("fftK", i, j)
 				//util.Printf("% 7f", fftKern.Scalars())

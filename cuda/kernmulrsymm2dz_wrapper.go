@@ -82,8 +82,8 @@ const (
 	.param .u32 kernmulRSymm2Dz_param_3
 )
 {
-	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
+	.reg .pred 	%p<5>;
+	.reg .s32 	%r<20>;
 	.reg .f32 	%f<6>;
 	.reg .s64 	%rd<9>;
 
@@ -119,9 +119,20 @@ const (
 	add.s64 	%rd6, %rd2, %rd5;
 	.loc 1 30 1
 	ld.global.f32 	%f1, [%rd6+4];
-	mul.wide.s32 	%rd7, %r11, 4;
+	.loc 1 33 1
+	shr.u32 	%r13, %r4, 31;
+	add.s32 	%r14, %r4, %r13;
+	shr.s32 	%r15, %r14, 1;
+	add.s32 	%r16, %r15, 1;
+	setp.lt.s32	%p4, %r2, %r16;
+	.loc 1 36 1
+	sub.s32 	%r17, %r4, %r2;
+	mad.lo.s32 	%r18, %r17, %r3, %r1;
+	.loc 1 33 1
+	selp.b32	%r19, %r11, %r18, %p4;
+	mul.wide.s32 	%rd7, %r19, 4;
 	add.s64 	%rd8, %rd1, %rd7;
-	.loc 1 34 1
+	.loc 1 40 1
 	ld.global.f32 	%f2, [%rd8];
 	.loc 1 29 1
 	ld.global.f32 	%f3, [%rd6];
@@ -152,8 +163,8 @@ BB0_2:
 	.param .u32 kernmulRSymm2Dz_param_3
 )
 {
-	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
+	.reg .pred 	%p<5>;
+	.reg .s32 	%r<20>;
 	.reg .f32 	%f<6>;
 	.reg .s64 	%rd<9>;
 
@@ -189,9 +200,20 @@ BB0_2:
 	add.s64 	%rd6, %rd2, %rd5;
 	.loc 1 30 1
 	ld.global.f32 	%f1, [%rd6+4];
-	mul.wide.s32 	%rd7, %r11, 4;
+	.loc 1 33 1
+	shr.u32 	%r13, %r4, 31;
+	add.s32 	%r14, %r4, %r13;
+	shr.s32 	%r15, %r14, 1;
+	add.s32 	%r16, %r15, 1;
+	setp.lt.s32	%p4, %r2, %r16;
+	.loc 1 36 1
+	sub.s32 	%r17, %r4, %r2;
+	mad.lo.s32 	%r18, %r17, %r3, %r1;
+	.loc 1 33 1
+	selp.b32	%r19, %r11, %r18, %p4;
+	mul.wide.s32 	%rd7, %r19, 4;
 	add.s64 	%rd8, %rd1, %rd7;
-	.loc 1 34 1
+	.loc 1 40 1
 	ld.global.f32 	%f2, [%rd8];
 	.loc 1 29 1
 	ld.global.f32 	%f3, [%rd6];
@@ -250,8 +272,8 @@ BB0_2:
 	.param .u32 kernmulRSymm2Dz_param_3
 )
 {
-	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
+	.reg .pred 	%p<5>;
+	.reg .s32 	%r<20>;
 	.reg .f32 	%f<6>;
 	.reg .s64 	%rd<9>;
 
@@ -287,9 +309,20 @@ BB0_2:
 	add.s64 	%rd6, %rd2, %rd5;
 	.loc 1 30 1
 	ld.global.f32 	%f1, [%rd6+4];
-	mul.wide.s32 	%rd7, %r11, 4;
+	.loc 1 33 1
+	shr.u32 	%r13, %r4, 31;
+	add.s32 	%r14, %r4, %r13;
+	shr.s32 	%r15, %r14, 1;
+	add.s32 	%r16, %r15, 1;
+	setp.lt.s32	%p4, %r2, %r16;
+	.loc 1 36 1
+	sub.s32 	%r17, %r4, %r2;
+	mad.lo.s32 	%r18, %r17, %r3, %r1;
+	.loc 1 33 1
+	selp.b32	%r19, %r11, %r18, %p4;
+	mul.wide.s32 	%rd7, %r19, 4;
 	add.s64 	%rd8, %rd1, %rd7;
-	.loc 1 34 1
+	.loc 1 40 1
 	ld.global.nc.f32 	%f2, [%rd8];
 	.loc 1 29 1
 	ld.global.f32 	%f3, [%rd6];

@@ -32,7 +32,6 @@ func kernMulC_async(fftM, K *data.Slice, Nx, Ny int) {
 	util.Argument(fftM.NComp() == 1 && K.NComp() == 1)
 	cfg := make3DConf([3]int{Nx, Ny, 1})
 	k_kernmulC_async(fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg)
-	//dbg("k_kernmulC_async(", fftM.DevPtr(0), K.DevPtr(0), Nx, Ny, cfg)
 }
 
 // Does not yet use Y mirror symmetry!!

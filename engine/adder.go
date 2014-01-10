@@ -17,7 +17,7 @@ func (q *adder) init(nComp int, name, unit, doc string, addFunc func(dst *data.S
 	DeclROnly(name, q, cat(doc, unit))
 }
 
-// Calcuates and returns the quantity.
+// Calculates and returns the quantity.
 // recycle is true: slice needs to be recycled.
 func (q *adder) Slice() (s *data.Slice, recycle bool) {
 	buf := cuda.Buffer(q.NComp(), q.Mesh().Size())
@@ -26,7 +26,7 @@ func (q *adder) Slice() (s *data.Slice, recycle bool) {
 }
 
 // Output for data table.
-func (q *adder) TableData() []float64 { return Average(q) }
+func (q *adder) TableData() []float64 { return qAverageUniverse(q) }
 
 func (q *adder) Mesh() *data.Mesh { return Mesh() }
 
@@ -40,4 +40,4 @@ func (q *adder) Set(dst *data.Slice) {
 	q.AddTo(dst)
 }
 
-func (q *adder) Comp(c int) *comp { return Comp(q, c) }
+//func (q *adder) Comp(c int) *comp { return Comp(q, c) }

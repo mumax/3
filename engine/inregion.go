@@ -34,5 +34,13 @@ func (q *sliceInRegion) TableData() []float64 {
 	if r {
 		defer cuda.Recycle(slice)
 	}
-	return averageRegion(slice, regions.volume(q.region))
+	avg := sAverageUniverse(slice)
+	sDiv(avg, regions.volume(q.region))
+	return avg
+}
+
+func sDiv(v []float64, x float64) {
+	for i := range v {
+		v[i] /= x
+	}
 }

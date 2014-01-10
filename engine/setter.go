@@ -24,8 +24,9 @@ func (b *setter) Slice() (q *data.Slice, recycle bool) {
 	return buffer, true // must recycle
 }
 
-func (q *setter) TableData() []float64        { return Average(q) }
+func (q *setter) TableData() []float64        { return qAverageUniverse(q) }
 func (q *setter) Region(r int) *sliceInRegion { return &sliceInRegion{q, r} }
 func (q *setter) Set(dst *data.Slice)         { q._set(dst) }
 func (q *setter) Mesh() *data.Mesh            { return Mesh() }
-func (q *setter) Comp(c int) *comp            { return Comp(q, c) }
+
+//func (q *setter) Comp(c int) *comp            { return Comp(q, c) }

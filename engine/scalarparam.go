@@ -49,7 +49,7 @@ func (p *ScalarParam) GetRegion(region int) float64 {
 func (p *ScalarParam) Eval() interface{}       { return p }
 func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }
-func (p *ScalarParam) Average() float64        { return Average(p)[0] }
+func (p *ScalarParam) Average() float64        { return qAverageUniverse(p)[0] }
 func (p *ScalarParam) Child() []script.Expr    { return nil }
 
 // checks if a script expression contains t (time)

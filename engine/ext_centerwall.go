@@ -15,7 +15,7 @@ func init() {
 
 func centerWall(c int) {
 	M := &M
-	mc := Average(M)[c] // TODO: optimize
+	mc := sAverageUniverse(M.Buffer().Comp(c))[0]
 	n := Mesh().Size()
 	tolerance := 4 / float64(n[X]) // x*2 * expected <m> change for 1 cell shift
 

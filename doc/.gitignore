@@ -1,5 +1,6 @@
 *.txt
 *.out
+*.in
 examples.html
 api.html
 doc

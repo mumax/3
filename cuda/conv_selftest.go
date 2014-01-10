@@ -9,31 +9,31 @@ import (
 )
 
 // compares FFT-accelerated convolution against brute-force on sparse data.
-func testConvolution(c *DemagConvolution, mesh *data.Mesh, realKern [3][3]*data.Slice) {
-	if mesh.PBC_code() != 0 {
+func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice) {
+	if PBC != [3]int{0, 0, 0} {
 		//log.Println("skipping convolution self-test for PBC")
 		return
 	}
 	//fmt.Print("convolution test ")
-	inhost := data.NewSlice(3, mesh.Size())
+	inhost := data.NewSlice(3, c.inputSize)
 	initConvTestInput(inhost.Vectors())
-	gpu := NewSlice(3, mesh.Size())
+	gpu := NewSlice(3, c.inputSize)
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
 
-	regions := NewBytes(mesh.NCell())
+	regions := NewBytes(prod(c.inputSize))
 	defer regions.Free()
 	Bsat := NewSlice(1, [3]int{1, 1, 256})
 	defer Bsat.Free()
 	Memset(Bsat, 1)
 	BsatLUT := LUTPtr(Bsat.DevPtr(0))
 
-	vol := data.NilSlice(1, mesh.Size())
+	vol := data.NilSlice(1, c.inputSize)
 	c.Exec(gpu, gpu, vol, BsatLUT, regions)
 
 	output := gpu.HostCopy()
 
-	brute := data.NewSlice(3, mesh.Size())
+	brute := data.NewSlice(3, c.inputSize)
 	bruteConv(inhost.Vectors(), brute.Vectors(), realKern)
 
 	a, b := output.Host(), brute.Host()

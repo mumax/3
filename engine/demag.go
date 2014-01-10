@@ -63,10 +63,14 @@ func demagConv() *cuda.DemagConvolution {
 		defer LogOutput("kernel done")
 		GUI.SetBusy(true)
 		defer GUI.SetBusy(false)
-		conv_ = cuda.NewDemag(Mesh())
+		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DEFAULT_KERNEL_ACC)
+		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
 	}
 	return conv_
 }
+
+// Default accuracy setting for demag kernel. TODO: variable?
+const DEFAULT_KERNEL_ACC = 6
 
 // Returns the current demag energy in Joules.
 func GetDemagEnergy() float64 {

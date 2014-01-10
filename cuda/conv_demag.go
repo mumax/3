@@ -3,7 +3,6 @@ package cuda
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"unsafe"
 )
@@ -22,19 +21,14 @@ type DemagConvolution struct {
 }
 
 // Initializes a convolution to evaluate the demag field for the given mesh geometry.
-func NewDemag(mesh *data.Mesh) *DemagConvolution {
-	kernel := mag.BruteKernel(mesh, DEFAULT_KERNEL_ACC)
-	size := mesh.Size()
+func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice) *DemagConvolution {
 	c := new(DemagConvolution)
-	c.inputSize = size
+	c.inputSize = inputSize
 	c.realKernSize = kernel[X][X].Size()
 	c.init(kernel)
-	testConvolution(c, mesh, kernel)
+	testConvolution(c, PBC, kernel)
 	return c
 }
-
-// Default accuracy setting for demag kernel.
-const DEFAULT_KERNEL_ACC = 6
 
 // Calculate the demag field of m * vol * Bsat, store result in B.
 // 	m:    magnetization normalized to unit length

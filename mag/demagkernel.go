@@ -9,19 +9,10 @@ import (
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces and averages over cell volumes.
 // Mesh should NOT yet be zero-padded.
-func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
+func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (kernel [3][3]*data.Slice) {
 
-	{ // Kernel mesh is 2x larger than input, instead in case of PBC
-		pbc := mesh.PBC()
-		sz := padSize(mesh.Size(), pbc)
-		cs := mesh.CellSize()
-		mesh = data.NewMesh(sz[X], sz[Y], sz[Z], cs[X], cs[Y], cs[Z], pbc[:]...)
-	}
-
-	// Shorthand
-	size := mesh.Size()
-	cellsize := mesh.CellSize()
-	pbc := mesh.PBC()
+	// Add zero-padding in non-PBC directions
+	size := padSize(inputSize, pbc)
 
 	// Sanity check
 	{
@@ -39,7 +30,7 @@ func BruteKernel(mesh *data.Mesh, accuracy float64) (kernel [3][3]*data.Slice) {
 	var array [3][3][][][]float32
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
-			kernel[i][j] = data.NewSlice(1, mesh.Size())
+			kernel[i][j] = data.NewSlice(1, size)
 			array[i][j] = kernel[i][j].Scalars()
 		}
 	}

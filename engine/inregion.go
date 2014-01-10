@@ -28,7 +28,7 @@ func (q *sliceInRegion) Slice() (*data.Slice, bool) {
 	return out, true
 }
 
-func (q *sliceInRegion) TableData() []float64 {
+func (q *sliceInRegion) average() []float64 {
 	slice, r := q.slicer.Slice()
 	if r {
 		defer cuda.Recycle(slice)
@@ -37,6 +37,8 @@ func (q *sliceInRegion) TableData() []float64 {
 	sDiv(avg, regions.volume(q.region))
 	return avg
 }
+
+func (q *sliceInRegion) Average() []float64 { return q.average() }
 
 // slice division
 func sDiv(v []float64, x float64) {

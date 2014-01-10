@@ -35,6 +35,8 @@ upon resize auto refresh dispaly quits working
 
 setexlen not ok, also api, output
 
+replace TableData by averageable
+
 API:
 ----
 

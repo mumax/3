@@ -13,7 +13,11 @@ tol := 1e-6
 m = uniform(0, 1, 0)
 
 expectv("m", m.average(), vector(0, 1, 0), tol)
+
 expect("mx", m.comp(0).average(), 0, tol)
 expect("my", m.comp(1).average(), 1, tol)
 expect("mz", m.comp(2).average(), 0, tol)
 
+expect("m1x", m.region(1).average()[0], 0, tol)
+expect("m1y", m.region(1).average()[1], 1*pi/4, tol)
+expect("m1z", m.region(1).average()[2], 0, tol)

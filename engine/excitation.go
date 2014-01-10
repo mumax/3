@@ -99,12 +99,8 @@ func (e *excitation) getRegion(region int) []float64 {
 	return e.perRegion.getRegion(region)
 }
 
-func (e *excitation) TableData() []float64 {
-	return e.perRegion.getRegion(0)
-}
-
-func (p *excitation) Region(r int) TableData {
-	return p.perRegion.Region(r)
+func (e *excitation) average() []float64 {
+	return qAverageUniverse(e)
 }
 
 func (e *excitation) IsUniform() bool {

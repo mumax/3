@@ -52,7 +52,7 @@ func (t *DataTable) Save() {
 	t.init()
 	fmt.Fprint(t, Time)
 	for _, o := range t.outputs {
-		vec := o.TableData()
+		vec := o.average()
 		for _, v := range vec {
 			fmt.Fprint(t, "\t", v)
 		}
@@ -97,7 +97,7 @@ func (t *DataTable) flush() {
 
 // can be saved in table
 type TableData interface {
-	TableData() []float64 // TODO: output float32s only
+	average() []float64
 	Name() string
 	Unit() string
 	NComp() int

@@ -8,7 +8,7 @@ setgeom(circle(N*c))
 defregion(1, xrange(-inf, 0))
 defregion(2, xrange( 0, inf))
 
-tol := 1e-4 // limited by FD circle approximationt<
+tol := 1e-4 // limited by FD circle approximation
 
 m = uniform(0, 1, 0)
 

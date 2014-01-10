@@ -16,7 +16,6 @@ func (q *sliceInRegion) NComp() int       { return q.slicer.NComp() }
 func (q *sliceInRegion) Name() string     { return fmt.Sprint(q.slicer.Name(), ".region", q.region) }
 func (q *sliceInRegion) Unit() string     { return q.slicer.Unit() }
 func (q *sliceInRegion) Mesh() *data.Mesh { return q.slicer.Mesh() }
-func (q *sliceInRegion) volume() float64  { return regions.volume(q.region) }
 
 // returns a new slice equal to q in the given region, 0 outside.
 func (q *sliceInRegion) Slice() (*data.Slice, bool) {
@@ -39,6 +38,7 @@ func (q *sliceInRegion) TableData() []float64 {
 	return avg
 }
 
+// slice division
 func sDiv(v []float64, x float64) {
 	for i := range v {
 		v[i] /= x

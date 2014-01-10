@@ -39,7 +39,7 @@ func SetTotalEdens(dst *data.Slice) {
 }
 
 // vector dot product
-func dot(a, b Slicer) float64 {
+func dot(a, b Quantity) float64 {
 	A, recyA := a.Slice()
 	if recyA {
 		defer cuda.Recycle(A)
@@ -59,7 +59,7 @@ func cellVolume() float64 {
 
 // returns a function that adds to dst the energy density:
 // 	prefactor * dot (M_full, field)
-func addEdens(field Slicer, prefactor float64) func(*data.Slice) {
+func addEdens(field Quantity, prefactor float64) func(*data.Slice) {
 	return func(dst *data.Slice) {
 		B, r1 := field.Slice()
 		if r1 {

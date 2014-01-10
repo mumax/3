@@ -17,7 +17,7 @@ import (
 
 // global GUI state stores what is currently shown in the web page.
 var (
-	GUI           = guistate{Quants: make(map[string]Slicer), Params: make(map[string]Param)}
+	GUI           = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 	keepalive     = time.Now()
 	keepaliveLock sync.Mutex
 )
@@ -36,7 +36,7 @@ func updateKeepAlive() {
 
 type guistate struct {
 	*gui.Page
-	Quants             map[string]Slicer
+	Quants             map[string]Quantity
 	Params             map[string]Param
 	mutex              sync.Mutex
 	_eventCacheBreaker int // changed on any event to make sure display is updated
@@ -58,7 +58,7 @@ func (g *guistate) Add(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		g.Params[name] = v
 	}
-	if v, ok := value.(Slicer); ok {
+	if v, ok := value.(Quantity); ok {
 		g.Quants[name] = v
 	}
 }

@@ -13,7 +13,7 @@ func init() {
 // Take average of quantity, taking into account the volume in which it is defined. E.g.:
 // 	Average(m)           // averges only inside magnet.
 // 	Average(m.Region(1)) // averages only in region 1
-func Average(s Slicer) []float64 {
+func Average(s Quantity) []float64 {
 	buf, recycle := s.Slice()
 	if recycle {
 		defer cuda.Recycle(buf)

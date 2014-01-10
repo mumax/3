@@ -8,7 +8,7 @@ import (
 
 // represents a new quantity equal to q in the given region, 0 outside.
 type sliceInRegion struct {
-	slicer Slicer
+	slicer Quantity
 	region int
 }
 

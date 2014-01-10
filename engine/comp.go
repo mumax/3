@@ -8,11 +8,11 @@ import (
 )
 
 type comp struct {
-	parent Slicer
+	parent Quantity
 	comp   int
 }
 
-func Comp(parent Slicer, c int) *comp {
+func Comp(parent Quantity, c int) *comp {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return &comp{parent, c}
 }

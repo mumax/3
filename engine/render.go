@@ -51,7 +51,7 @@ func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ren *render) render(quant Slicer, comp string) {
+func (ren *render) render(quant Quantity, comp string) {
 	// rescale and download
 	InjectAndWait(func() {
 		size := quant.Mesh().Size()

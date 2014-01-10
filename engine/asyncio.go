@@ -10,17 +10,8 @@ import (
 	"strings"
 )
 
-// Any space-dependent quantity
-type Slicer interface {
-	Slice() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
-	NComp() int
-	Name() string
-	Unit() string
-	Mesh() *data.Mesh
-}
-
 // Save under given file name (transparant async I/O).
-func SaveAs(q Slicer, fname string) {
+func SaveAs(q Quantity, fname string) {
 	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
 		fname = path.Clean(OD + "/" + fname)
 	}

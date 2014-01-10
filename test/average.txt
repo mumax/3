@@ -22,9 +22,9 @@ expect("m1x", m.region(1).average()[0], 0, tol)
 expect("m1y", m.region(1).average()[1], 1*pi/4, tol)
 expect("m1z", m.region(1).average()[2], 0, tol)
 
-expect("m1x", m.comp(0).region(1).average()[0], 0, tol)
-expect("m1y", m.comp(1).region(1).average()[0], 1*pi/4, tol)
-expect("m1z", m.comp(2).region(1).average()[0], 0, tol)
+expect("m1x", m.comp(0).region(1).average(), 0, tol)
+expect("m1y", m.comp(1).region(1).average(), 1*pi/4, tol)
+expect("m1z", m.comp(2).region(1).average(), 0, tol)
 
 alpha = 2
 

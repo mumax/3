@@ -61,7 +61,7 @@ func (m *magnetization) Slice() (s *data.Slice, recycle bool) {
 	return m.Buffer(), false
 }
 
-func (m *magnetization) Region(r int) *oneRegion { return &oneRegion{m, r} }
+func (m *magnetization) Region(r int) *vOneReg { return vOneRegion(m, r) }
 
 func (m *magnetization) String() string { return util.Sprint(m.Buffer().HostCopy()) }
 

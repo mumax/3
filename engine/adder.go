@@ -30,8 +30,8 @@ func (q *adder) TableData() []float64 { return qAverageUniverse(q) }
 
 func (q *adder) Mesh() *data.Mesh { return Mesh() }
 
-// Value of this quantity restricted to one region.
-func (q *adder) Region(r int) *oneRegion { return &oneRegion{q, r} }
+//// Value of this quantity restricted to one region.
+//func (q *adder) Region(r int) *oneRegion { return &oneRegion{q, r} }
 
 func (q *adder) AddTo(dst *data.Slice) { q._addTo(dst) }
 

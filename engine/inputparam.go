@@ -122,9 +122,9 @@ func (p *inputParam) TableData() []float64 {
 	return p.getRegion(0)
 }
 
-func (p *inputParam) Region(r int) *oneRegion {
-	return &oneRegion{p, r}
-}
+//func (p *inputParam) Region(r int) *oneRegion {
+//	return &oneRegion{p, r}
+//}
 
 func (p *inputParam) Name() string     { return p.name }
 func (p *inputParam) Unit() string     { return p.unit }

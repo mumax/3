@@ -8,7 +8,7 @@ setgeom(circle(N*c))
 defregion(1, xrange(-inf, 0))
 defregion(2, xrange( 0, inf))
 
-tol := 1e-4 // limited by FD circle approximation
+tol := 1e-4 // limited by FD circle approximationt<
 
 m = uniform(0, 1, 0)
 
@@ -21,3 +21,12 @@ expect("mz", m.comp(2).average(), 0, tol)
 expect("m1x", m.region(1).average()[0], 0, tol)
 expect("m1y", m.region(1).average()[1], 1*pi/4, tol)
 expect("m1z", m.region(1).average()[2], 0, tol)
+
+expect("m1x", m.comp(0).region(1).average()[0], 0, tol)
+expect("m1y", m.comp(1).region(1).average()[0], 1*pi/4, tol)
+expect("m1z", m.comp(2).region(1).average()[0], 0, tol)
+
+alpha = 2
+
+expect("alpha", alpha.average(), 2, tol)
+//expect("alpha", alpha.region(1).average(), 2, tol)

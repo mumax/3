@@ -22,12 +22,13 @@ func Comp(parent Averagable, c int) *comp {
 	return &comp{parent, c}
 }
 
-func (q *comp) NComp() int         { return 1 }
-func (q *comp) Name() string       { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
-func (q *comp) Unit() string       { return q.parent.Unit() }
-func (q *comp) Mesh() *data.Mesh   { return q.parent.Mesh() }
-func (q *comp) average() []float64 { return []float64{q.parent.average()[q.comp]} }
-func (q *comp) Average() float64   { return q.average()[0] }
+func (q *comp) NComp() int              { return 1 }
+func (q *comp) Name() string            { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
+func (q *comp) Unit() string            { return q.parent.Unit() }
+func (q *comp) Mesh() *data.Mesh        { return q.parent.Mesh() }
+func (q *comp) average() []float64      { return []float64{q.parent.average()[q.comp]} }
+func (q *comp) Average() float64        { return q.average()[0] }
+func (q *comp) Region(r int) *oneRegion { return &oneRegion{q, r} }
 
 // returns a new slice equal to q in the given region, 0 outside.
 func (q *comp) Slice() (*data.Slice, bool) {

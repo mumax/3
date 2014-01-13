@@ -41,13 +41,15 @@ for i:=0; i<Nx; i++{
 }
 
 
-B_ext.add(mask, 0.01)
+B_ext.add(mask, 0.1)
 save(B_ext)
 
 alpha = 3
 MaxErr = 1e-4
 RunWhile(MaxTorque > 1e-4)
 
-print(average(m))
-save(m)
+print(m.average())
 
+tol := 1e-4
+
+expectv("m", m.average(), vector(0, 0, 0.000990899), tol) // vortex

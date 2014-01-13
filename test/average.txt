@@ -54,3 +54,4 @@ expect("B_ext_1z", B_ext.region(1).average()[2], 3, tol)
 expect("B_ext_1x", B_ext.comp(0).region(1).average(), 1, tol)
 expect("B_ext_1y", B_ext.comp(1).region(1).average(), 2, tol)
 expect("B_ext_1z", B_ext.comp(2).region(1).average(), 3, tol)
+

@@ -13,8 +13,8 @@ var (
 	Lambda       ScalarParam
 	EpsilonPrime ScalarParam
 	FixedLayer   VectorParam
-	Torque       sSetter    // total torque in T
-	LLTorque     sSetter    // Landau-Lifshitz torque/γ0, in T
+	Torque       vSetter    // total torque in T
+	LLTorque     vSetter    // Landau-Lifshitz torque/γ0, in T
 	STTorque     vAdder     // Spin-transfer torque/γ0, in T
 	J            excitation // Polarized electrical current density
 	MaxTorque    *GetScalar

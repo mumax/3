@@ -28,7 +28,5 @@
 	MaxErr = 1e-5
 	Run(2e-9)
 
-	m_ := average(m)                             // remanent magnetization
-	expect("mx", m_[0], 0.9627, 1e-3)
-	expect("my", m_[1], 0.0756, 1e-3)
-	expect("mz", m_[2], 0, 1e-3)
+	// remanent magnetization
+	expectv("m", m.average(), vector(0.9627, 0.0756, 0), 1e-3)

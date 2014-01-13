@@ -1,3 +1,4 @@
+// test quantity components
 
 setgridsize(100, 50, 2)
 setcellsize(5e-9, 4e-9, 3e-9)

@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	MFM        setter
+	MFM        sSetter
 	MFMLift    numberParam
 	MFMTipSize numberParam
 	mfmconv_   *cuda.MFMConvolution
 )
 
 func init() {
-	MFM.init(SCALAR, "MFM", "", "MFM image", SetMFM)
+	MFM.init("MFM", "", "MFM image", SetMFM)
 	MFMLift = numParam(50e-9, "m", reinitmfmconv)
 	MFMTipSize = numParam(1e-3, "m", reinitmfmconv)
 	DeclLValue("MFMLift", &MFMLift, "MFM lift height")

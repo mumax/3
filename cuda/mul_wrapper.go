@@ -70,7 +70,7 @@ var mul_map = map[int]string{0: "",
 // mul PTX code for various compute capabilities.
 const (
 	mul_ptx_20 = `
-.version 3.2
+.version 3.1
 .target sm_20
 .address_size 64
 
@@ -83,7 +83,7 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<4>;
 	.reg .s64 	%rd<11>;
 
@@ -95,7 +95,7 @@ const (
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd5;
-	.loc 1 5 1
+	.loc 2 5 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -103,30 +103,29 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 2 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 2 8 1
 	mul.wide.s32 	%rd7, %r1, 4;
 	add.s64 	%rd8, %rd3, %rd7;
 	add.s64 	%rd9, %rd2, %rd7;
-	.loc 1 8 1
 	ld.global.f32 	%f1, [%rd9];
 	ld.global.f32 	%f2, [%rd8];
 	mul.f32 	%f3, %f2, %f1;
 	add.s64 	%rd10, %rd1, %rd7;
-	.loc 1 8 1
 	st.global.f32 	[%rd10], %f3;
 
 BB0_2:
-	.loc 1 10 2
+	.loc 2 10 2
 	ret;
 }
 
 
 `
 	mul_ptx_30 = `
-.version 3.2
+.version 3.1
 .target sm_30
 .address_size 64
 
@@ -139,7 +138,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<12>;
 	.reg .f32 	%f<4>;
 	.reg .s64 	%rd<11>;
 
@@ -151,7 +150,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd5;
-	.loc 1 5 1
+	.loc 2 5 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -159,30 +158,29 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 2 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
+	.loc 2 8 1
 	mul.wide.s32 	%rd7, %r1, 4;
 	add.s64 	%rd8, %rd3, %rd7;
 	add.s64 	%rd9, %rd2, %rd7;
-	.loc 1 8 1
 	ld.global.f32 	%f1, [%rd9];
 	ld.global.f32 	%f2, [%rd8];
 	mul.f32 	%f3, %f2, %f1;
 	add.s64 	%rd10, %rd1, %rd7;
-	.loc 1 8 1
 	st.global.f32 	[%rd10], %f3;
 
 BB0_2:
-	.loc 1 10 2
+	.loc 2 10 2
 	ret;
 }
 
 
 `
 	mul_ptx_35 = `
-.version 3.2
+.version 3.1
 .target sm_35
 .address_size 64
 
@@ -223,7 +221,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<10>;
 	.reg .f32 	%f<4>;
 	.reg .s64 	%rd<11>;
 
@@ -235,7 +233,7 @@ BB0_2:
 	cvta.to.global.u64 	%rd1, %rd4;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd5;
-	.loc 1 5 1
+	.loc 3 5 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -243,23 +241,22 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r1, %r2;
+	.loc 3 7 1
+	setp.ge.s32 	%p1, %r1, %r2;
 	@%p1 bra 	BB2_2;
 
+	.loc 3 8 1
 	mul.wide.s32 	%rd7, %r1, 4;
 	add.s64 	%rd8, %rd3, %rd7;
+	ld.global.nc.f32 	%f1, [%rd8];
 	add.s64 	%rd9, %rd2, %rd7;
-	.loc 1 8 1
-	ld.global.nc.f32 	%f1, [%rd9];
-	ld.global.nc.f32 	%f2, [%rd8];
-	mul.f32 	%f3, %f2, %f1;
+	ld.global.nc.f32 	%f2, [%rd9];
+	mul.f32 	%f3, %f1, %f2;
 	add.s64 	%rd10, %rd1, %rd7;
-	.loc 1 8 1
 	st.global.f32 	[%rd10], %f3;
 
 BB2_2:
-	.loc 1 10 2
+	.loc 3 10 2
 	ret;
 }
 

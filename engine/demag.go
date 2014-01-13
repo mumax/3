@@ -10,8 +10,8 @@ import (
 var (
 	Msat        ScalarParam
 	Bsat        derivedParam
-	M_full      setter
-	B_demag     setter
+	M_full      vSetter
+	B_demag     vSetter
 	E_demag     *GetScalar
 	Edens_demag adder
 	EnableDemag = true                 // enable/disable demag field
@@ -20,9 +20,9 @@ var (
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
-	M_full.init(VECTOR, "m_full", "A/m", "Unnormalized magnetization", SetMFull)
+	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
-	B_demag.init(VECTOR, "B_demag", "T", "Magnetostatic field", SetDemagField)
+	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 	Edens_demag.init(SCALAR, "Edens_demag", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_demag, -0.5))
 	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)

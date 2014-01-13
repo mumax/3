@@ -11,28 +11,16 @@
 	Msat = 800e3
 	Aex = 13e-12
 	m  = uniform(1, .1, 0)
-	autosave(m, 10e-12)
-
-	tableAdd(MaxTorque)
-	tableAutosave(5e-12)
 
 // relax
 	alpha = 3
 	MaxErr = 1e-4
 	RunWhile(MaxTorque > 1e-4)
 	run(1e-9)
-	m_ := average(m)
-	expect("mx", m_[0], 0.96696, 1e-3)
-	expect("my", m_[1], 0.12528, 1e-3)
-	expect("mz", m_[2], 0,       1e-3)
+	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 
 // reversal
 	alpha = 0.02
-
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)
-	m_ = average(m)
-	expect("mx", m_[0],-0.9845, 1e-3)
-	expect("my", m_[1], 0.1268, 1e-3)
-	expect("mz", m_[2], 0.0432, 1e-3)
-
+	expectv("m", m.average(), vector(-0.9845, 0.1268, 0.0432), 1e-3)

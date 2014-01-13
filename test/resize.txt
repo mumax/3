@@ -10,27 +10,15 @@ alpha = 3
 MaxErr = 1e-4
 RunWhile(MaxTorque > 1e-4)
 run(1e-9)
-save(m)
-m_ := average(m)
-expect("mx", m_[0], 0.96696, 1e-3)
-expect("my", m_[1], 0.12528, 1e-3)
-expect("mz", m_[2], 0,       1e-3)
 
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 
 setgridsize(128*2, 32*2, 2)
 setcellsize(500e-9/(128*2), 125e-9/(32*2), 3e-9/2)
 
-m_ = average(m)
-save(m)
-expect("mx", m_[0], 0.96696, 1e-3)
-expect("my", m_[1], 0.12528, 1e-3)
-expect("mz", m_[2], 0,       1e-3)
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 
 run(1e-9)
 
-m_ = average(m)
-save(m)
-expect("mx", m_[0], 0.96696, 1e-3)
-expect("my", m_[1], 0.12528, 1e-3)
-expect("mz", m_[2], 0,       1e-3)
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 

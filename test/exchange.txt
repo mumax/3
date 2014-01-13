@@ -14,15 +14,8 @@ save(m)
 
 tol := 1e-8
 
-expect("B_exch x", average(B_exch)[0], 0, tol)
-expect("B_exch y", average(B_exch)[1], 0, tol)
-expect("B_exch z", average(B_exch)[2], 0, tol)
+expectv("B_exch", B_exch.Average(), vector(0, 0, 0), tol)
 
-expect("B_exch0x", average(B_exch.region(0))[0],  0.00118888104756673, tol)
-expect("B_exch0y", average(B_exch.region(0))[1], -0.00164631487528483, tol)
-expect("B_exch0z", average(B_exch.region(0))[2], -0.00074591267903645, tol)
-
-expect("B_exch1x", average(B_exch.region(1))[0], -0.00118888041178385, tol)
-expect("B_exch1y", average(B_exch.region(1))[1],  0.00164631512959798, tol)
-expect("B_exch1z", average(B_exch.region(1))[2],  0.00074591242472330, tol)
+expectv("B_exch0", B_exch.region(0).Average(), vector(0.00118888104756673, -0.00164631487528483, -0.00074591267903645), tol)
+expectv("B_exch1", B_exch.region(1).Average(), vector(-0.00118888041178385, 0.00164631512959798, 0.00074591242472330), tol)
 

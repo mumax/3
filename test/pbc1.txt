@@ -21,10 +21,9 @@ save(m)
 run(1e-9)
 save(m)
 
-m1 := average(m)
-expect("mx", m1[0], 0.89947968, 1e-3)
-expect("my", m1[1], 0.23352228, 1e-3)
-expect("mz", m1[2],-0.00010287, 1e-3)
+ 0.89947968, 1e-3)
+ 0.23352228, 1e-3)
+-0.00010287, 1e-3)
 
 
 setgeom( r.repeat(Nx*c, Ny*c, 0))

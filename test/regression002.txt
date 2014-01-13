@@ -35,17 +35,11 @@ defregion(1, spot)
 
 run(0.5e-9)
 
-m_ := average(m.region(1))
 tol := 2e-3
-expect("mx", m_[0], -0.4543135506766183, tol)
-expect("my", m_[1],  0.8869750613257998, tol)
-expect("mz", m_[2],  0.0804117293584914, tol)
+expectv("m", m.region(1).average(), vector(-0.4543135506766183, 0.8869750613257998, 0.0804117293584914), tol)
 
 run(0.5e-9)
 
-m_ = average(m.region(1))
-expect("mx", m_[0], -0.7082362402053106, tol)
-expect("my", m_[1],  0.6975658053443545, tol)
-expect("mz", m_[2], -0.1068760781061081, tol)
+expectv("m", m.region(1).average(), vector( -0.7082362402053106, 0.6975658053443545, -0.1068760781061081), tol)
 
 

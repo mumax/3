@@ -8,5 +8,5 @@ defregion(2, circle(5e-9).transl(200e-9, 0, 0 ))
 
 tol := 1e-3
 
-expect("mcore", average(m.region(1))[2],  0.42637932, tol)
-expect("mdomain", average(m.region(2))[1],  0.999984, tol)
+expect("mcore", m.region(1).average()[2],  0.42637932, tol)
+expect("mdomain", m.region(2).average()[1],  0.999984, tol)

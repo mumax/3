@@ -14,18 +14,13 @@
 
 // relax
 	alpha = 3
-	run(10e-9) 
-	m_ := average(m)
-	expect("mx", m_[0], 0.96696, 1e-3)
-	expect("my", m_[1], 0.12528, 1e-3)
-	expect("mz", m_[2], 0,       1e-3)
+	runwhile(maxtorque > 1e-4)
+	steps(10000)
+	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 
 // reversal
 	alpha = 0.02
 	B_ext = vector(-35.5E-3, -6.3E-3, 0)
 	run(1e-9)
-	m_ = average(m)
-	expect("mx", m_[0], -0.9687, 1e-3)
-	expect("my", m_[1], -0.1186, 1e-3)
-	expect("mz", m_[2], -0.0056, 1e-3)
+	expectv("m", m.average(), vector( -0.9687, -0.1186, -0.0056), 1e-3)
 

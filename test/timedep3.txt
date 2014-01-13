@@ -11,14 +11,11 @@ setgeom(circle(32*4e-9))
 f := 1e9
 A := 0.01
 B_ext = vector(A*sin(2*pi*f*t), A*cos(2*pi*f*t), 0)
-
 tableadd(B_ext)
-tableautosave(1e-12)
 
 run(0.2e-9)
 
-m_ := average(m)
-print(m_)
+m_ := m.average()
 
 expect("mx", m_[0], 0.6783973430765087, 1e-3)
 expect("my", m_[1], 0.7192199406365456, 1e-3)

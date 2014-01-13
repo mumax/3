@@ -14,7 +14,7 @@ Ku1.setRegion(1, 1e5 * sin(2 * pi * f * t))
 
 run(0.5e-9)
 
-m_ := average(m)
+m_ := m.average()
 expect("mx", m_[0],  0,       1e-4)
 expect("my", m_[1],  0.99093, 1e-4)
 expect("mz", m_[2],  0,       1e-4)

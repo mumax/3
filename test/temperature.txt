@@ -30,5 +30,5 @@
 
 	steps(3000)
 
-	expect("mx", average(m)[0], 0.714344978, 1e-5)
+	expect("mx", m.comp(0).average(), 0.714344978, 1e-5)
 

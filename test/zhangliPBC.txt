@@ -19,7 +19,7 @@ J     = vector(1e12, 0, 0)
 Pol   = 1
 
 run(1e-9)
-m1 := average(m)
+m1 := m.average()
 expect("mx", m1[0], -0.081425920, 1e-4)
 expect("my", m1[1], -0.003434650, 1e-4)
 expect("mz", m1[2], -0.015030215, 1e-4)

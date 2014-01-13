@@ -10,17 +10,17 @@
 	Msat = 1 / mu0
 
 	m = uniform(1, 0, 0)
-	expect("kxx", average(B_demag)[0], -0.496, 1e-2)
-	expect("kxy", average(B_demag)[1],  0,     1e-2)
-	expect("kxz", average(B_demag)[2],  0,     1e-2)
+	expect("kxx", B_demag.Average()[0], -0.496, 1e-2)
+	expect("kxy", B_demag.Average()[1],  0,     1e-2)
+	expect("kxz", B_demag.Average()[2],  0,     1e-2)
 
 	m = uniform(0, 1, 0)
-	expect("kyx", average(B_demag)[0],  0,     1e-2)
-	expect("kyy", average(B_demag)[1], -0.496, 1e-2) 
-	expect("kyz", average(B_demag)[2],  0,     1e-2)
+	expect("kyx", B_demag.Average()[0],  0,     1e-2)
+	expect("kyy", B_demag.Average()[1], -0.496, 1e-2) 
+	expect("kyz", B_demag.Average()[2],  0,     1e-2)
 
 	m = uniform(0, 0, 1)
-	expect("kzx", average(B_demag)[0], 0, 1e-2)
-	expect("kzy", average(B_demag)[1], 0, 1e-2)
-	expect("kzz", average(B_demag)[2], 0, 1e-2) 
+	expect("kzx", B_demag.Average()[0], 0, 1e-2)
+	expect("kzy", B_demag.Average()[1], 0, 1e-2)
+	expect("kzz", B_demag.Average()[2], 0, 1e-2) 
 

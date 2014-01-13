@@ -6,17 +6,17 @@
 	tol := 1e-6
 
 	m = uniform(1, 0, 0)
-	expect("kxx", average(B_demag)[0],-0.15768295526, tol)
-	expect("kxy", average(B_demag)[1],  0, tol)
-	expect("kxz", average(B_demag)[2],  0, tol)
+	expect("kxx", B_demag.Average()[0],-0.15768295526, tol)
+	expect("kxy", B_demag.Average()[1],  0, tol)
+	expect("kxz", B_demag.Average()[2],  0, tol)
 
 	m = uniform(0, 1, 0)
-	expect("kyx", average(B_demag)[0], 0, tol)
-	expect("kyy", average(B_demag)[1],-0.05676037073, tol) 
-	expect("kyz", average(B_demag)[2], 0, tol)
+	expect("kyx", B_demag.Average()[0], 0, tol)
+	expect("kyy", B_demag.Average()[1],-0.05676037073, tol) 
+	expect("kyz", B_demag.Average()[2], 0, tol)
 
 	m = uniform(0, 0, 1)
-	expect("kzx", average(B_demag)[0], 0, tol)
-	expect("kzy", average(B_demag)[1], 0, tol)
-	expect("kzz", average(B_demag)[2],-0.78447151184, tol) 
+	expect("kzx", B_demag.Average()[0], 0, tol)
+	expect("kzy", B_demag.Average()[1], 0, tol)
+	expect("kzz", B_demag.Average()[2],-0.78447151184, tol) 
 

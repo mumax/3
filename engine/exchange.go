@@ -12,18 +12,18 @@ import (
 var (
 	Aex        ScalarParam // Exchange stiffness
 	Dex        VectorParam // DMI strength
-	B_exch     adder       // exchange field (T) output handle
+	B_exch     vAdder      // exchange field (T) output handle
 	lex2       exchParam   // inter-cell exchange length squared * 1e18
 	E_exch     *GetScalar
-	Edens_exch adder
+	Edens_exch sAdder
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
-	B_exch.init(VECTOR, "B_exch", "T", "Exchange field", AddExchangeField)
+	B_exch.init("B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
-	Edens_exch.init(SCALAR, "Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
+	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
 	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
 	lex2.init()

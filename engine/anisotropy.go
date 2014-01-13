@@ -11,9 +11,9 @@ var (
 	Ku1, Kc1              ScalarParam  // uniaxial and cubic anis constants
 	AnisU, AnisC1, AnisC2 VectorParam  // unixial and cubic anis axes
 	ku1_red, kc1_red      derivedParam // K1 / Msat
-	B_anis                adder        // field due to uniaxial anisotropy (T)
+	B_anis                vAdder       // field due to uniaxial anisotropy (T)
 	E_anis                *GetScalar   // Anisotorpy energy
-	Edens_anis            adder        // Anisotropy energy density
+	Edens_anis            sAdder       // Anisotropy energy density
 )
 
 func init() {
@@ -22,9 +22,9 @@ func init() {
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
-	B_anis.init(VECTOR, "B_anis", "T", "Anisotropy field", AddAnisotropyField)
+	B_anis.init("B_anis", "T", "Anisotropy field", AddAnisotropyField)
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", GetAnisotropyEnergy)
-	Edens_anis.init(SCALAR, "Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", addEdens(&B_anis, -0.5))
+	Edens_anis.init("Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", addEdens(&B_anis, -0.5))
 	registerEnergy(GetAnisotropyEnergy, Edens_anis.AddTo)
 
 	//ku1_red = Ku1 / Msat

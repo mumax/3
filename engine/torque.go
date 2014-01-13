@@ -15,7 +15,7 @@ var (
 	FixedLayer   VectorParam
 	Torque       sSetter    // total torque in T
 	LLTorque     sSetter    // Landau-Lifshitz torque/γ0, in T
-	STTorque     adder      // Spin-transfer torque/γ0, in T
+	STTorque     vAdder     // Spin-transfer torque/γ0, in T
 	J            excitation // Polarized electrical current density
 	MaxTorque    *GetScalar
 )
@@ -30,7 +30,7 @@ func init() {
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	LLTorque.init("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
-	STTorque.init(VECTOR, "STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
+	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	Torque.init("torque", "T", "Total torque/γ0", SetTorque)
 	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 }

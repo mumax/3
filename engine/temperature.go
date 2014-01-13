@@ -11,9 +11,9 @@ import (
 var (
 	Temp        ScalarParam
 	temp_red    derivedParam
-	B_therm     adder
+	B_therm     vAdder
 	E_therm     *GetScalar
-	Edens_therm adder
+	Edens_therm sAdder
 	generator   curand.Generator
 	thermSeed   int64 = 0
 )
@@ -21,9 +21,9 @@ var (
 func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
-	B_therm.init(3, "B_therm", "T", "Thermal field", AddThermalField)
+	B_therm.init("B_therm", "T", "Thermal field", AddThermalField)
 	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", GetThermalEnergy)
-	Edens_therm.init(SCALAR, "Edens_therm", "J/m3", "Thermal energy density", addEdens(&B_therm, -1))
+	Edens_therm.init("Edens_therm", "J/m3", "Thermal energy density", addEdens(&B_therm, -1))
 	registerEnergy(GetThermalEnergy, Edens_therm.AddTo)
 
 	// reduced temperature = (alpha * T) / (mu0 * Msat)

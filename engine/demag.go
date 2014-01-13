@@ -13,7 +13,7 @@ var (
 	M_full      vSetter
 	B_demag     vSetter
 	E_demag     *GetScalar
-	Edens_demag adder
+	Edens_demag sAdder
 	EnableDemag = true                 // enable/disable demag field
 	conv_       *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 )
@@ -24,7 +24,7 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
-	Edens_demag.init(SCALAR, "Edens_demag", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_demag, -0.5))
+	Edens_demag.init("Edens_demag", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_demag, -0.5))
 	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)
 
 	//Bsat = Msat * mu0

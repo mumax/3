@@ -50,6 +50,7 @@ func (p *ScalarParam) Eval() interface{}       { return p }
 func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
 func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }
 func (p *ScalarParam) Average() float64        { return qAverageUniverse(p)[0] }
+func (p *ScalarParam) Region(r int) *sOneReg   { return sOneRegion(p, r) }
 func (p *ScalarParam) Child() []script.Expr    { return nil }
 
 // checks if a script expression contains t (time)

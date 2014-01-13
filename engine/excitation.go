@@ -103,6 +103,10 @@ func (e *excitation) average() []float64 {
 	return qAverageUniverse(e)
 }
 
+func (e *excitation) Average() data.Vector {
+	return unslice(qAverageUniverse(e))
+}
+
 func (e *excitation) IsUniform() bool {
 	return e.perRegion.IsUniform()
 }
@@ -119,6 +123,8 @@ func (e *excitation) Name() string            { return e.name }
 func (e *excitation) Unit() string            { return e.perRegion.Unit() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *excitation) Mesh() *data.Mesh        { return Mesh() }
+func (e *excitation) Region(r int) *vOneReg   { return vOneRegion(e, r) }
+func (e *excitation) Comp(c int) *comp        { return Comp(e, c) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }

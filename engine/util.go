@@ -137,6 +137,16 @@ func safediv(a, b float32) float32 {
 	}
 }
 
+// shortcut for slicing unaddressable_vector()[:]
+func slice(v [3]float64) []float64 {
+	return v[:]
+}
+
+func unslice(v []float64) [3]float64 {
+	util.Assert(len(v) == 3)
+	return [3]float64{v[0], v[1], v[2]}
+}
+
 type caseIndep []string
 
 func (s *caseIndep) Len() int           { return len(*s) }

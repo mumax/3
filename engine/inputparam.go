@@ -115,17 +115,7 @@ func (p *inputParam) IsUniform() bool {
 	return true
 }
 
-// Table output
-
-// Parameter TableData is region 0
-func (p *inputParam) TableData() []float64 {
-	return p.getRegion(0)
-}
-
-//func (p *inputParam) Region(r int) *oneRegion {
-//	return &oneRegion{p, r}
-//}
-
-func (p *inputParam) Name() string     { return p.name }
-func (p *inputParam) Unit() string     { return p.unit }
-func (p *inputParam) Mesh() *data.Mesh { return Mesh() }
+func (p *inputParam) average() []float64 { return qAverageUniverse(p) }
+func (p *inputParam) Name() string       { return p.name }
+func (p *inputParam) Unit() string       { return p.unit }
+func (p *inputParam) Mesh() *data.Mesh   { return Mesh() }

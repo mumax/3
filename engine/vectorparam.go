@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
-	"github.com/mumax/3/util"
 	"reflect"
 	"strings"
 )
@@ -54,15 +53,4 @@ func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t 
 func (p *VectorParam) Region(r int) *vOneReg   { return vOneRegion(p, r) }
 func (p *VectorParam) Child() []script.Expr    { return nil }
 func (p *VectorParam) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
-
-//func (p *VectorParam) Comp(c int) *comp        { return Comp(p, c) }
-
-// shortcut for slicing unaddressable_vector()[:]
-func slice(v [3]float64) []float64 {
-	return v[:]
-}
-
-func unslice(v []float64) [3]float64 {
-	util.Assert(len(v) == 3)
-	return [3]float64{v[0], v[1], v[2]}
-}
+func (p *VectorParam) Comp(c int) *comp        { return Comp(p, c) }

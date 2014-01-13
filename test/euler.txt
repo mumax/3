@@ -19,8 +19,5 @@
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(0.1e-9)
 
-	m_ := average(m)
-	expect("mx", m_[0],  0.59293, 1e-3)
-	expect("my", m_[1],  0.63278, 1e-3)
-	expect("mz", m_[2], -0.08152, 1e-3)
+	expectv("m", m.average(), vector(0.59293, 0.63278, -0.08152), 1e-3)
 

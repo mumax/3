@@ -17,21 +17,21 @@ anisU = vector(1,0,0)
 m = vortex(1, 1) 
 run(5e-9)
 
-E1_tot := E_total.tabledata()[0]
-E1_exc := E_exch.tabledata()[0]
-E1_ani := E_anis.tabledata()[0]
-E1_dem := E_demag.tabledata()[0]
-E1_zee := E_zeeman.tabledata()[0]
+E1_tot := E_total.get()
+E1_exc := E_exch.get()
+E1_ani := E_anis.get()
+E1_dem := E_demag.get()
+E1_zee := E_zeeman.get()
 
 
 B_ext = vector(100e-3, 0, 0)
 run(5e-9)
 
-E2_tot := E_total.tabledata()[0]
-E2_exc := E_exch.tabledata()[0]
-E2_ani := E_anis.tabledata()[0]
-E2_dem := E_demag.tabledata()[0]
-E2_zee := E_zeeman.tabledata()[0]
+E2_tot := E_total.get()
+E2_exc := E_exch.get()
+E2_ani := E_anis.get()
+E2_dem := E_demag.get()
+E2_zee := E_zeeman.get()
 
 
 // OOMMF energy density differences:

@@ -25,11 +25,11 @@ m = vortex(1,1)
 
 run(0.1e-9)
 
-avg_total  := average(Edens_total)[0]
-avg_anis   := average(Edens_anis)[0]
-avg_demag  := average(Edens_demag)[0]
-avg_exch   := average(Edens_exch)[0]
-avg_zeeman := average(Edens_Zeeman)[0]
+avg_total  := Edens_total.average()
+avg_anis   := Edens_anis.average()
+avg_demag  := Edens_demag.average()
+avg_exch   := Edens_exch.average()
+avg_zeeman := Edens_Zeeman.average()
 
 // check if energy density gives same result as energy
 tol := 1e-3

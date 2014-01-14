@@ -17,6 +17,8 @@ However, make sure you also update mumax3-convert.
 bugs:
 -----
 
+energy density presumably not correct
+
 omf/ovf does not check if enough bytes are read
 
 JPEG output

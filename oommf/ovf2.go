@@ -1,61 +1,15 @@
-package data
+package oommf
 
 import (
-	"bufio"
 	"fmt"
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"io"
-	"os"
+	"log"
 	"strconv"
 	"strings"
 	"unsafe"
 )
-
-func ReadOMF(fname string) (s *Slice, meta Meta, err error) {
-	in_, err := os.Open(fname)
-	util.FatalErr(err)
-	in := BlockingReader{bufio.NewReader(in_)}
-	info := ReadHeader(in)
-
-	n := info.Size
-	c := info.StepSize
-	if c == [3]float32{0, 0, 0} {
-		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
-	}
-	data_ := NewSlice(3, n)
-
-	switch info.Format {
-	default:
-		panic("Unknown format: " + info.Format)
-	case "text":
-		readDataText(in, data_)
-	case "binary":
-		switch info.DataFormat {
-		default:
-			panic("Unknown format: " + info.Format + " " + info.DataFormat)
-		case "4":
-			readDataBinary4(in, data_)
-		}
-	}
-	return data_, Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
-}
-
-// omf.Info represents the header part of an omf file.
-// TODO: add Err to return error status
-// Perhaps CheckErr() func
-type Info struct {
-	Desc            map[string]interface{}
-	Size            [3]int
-	ValueMultiplier float32
-	ValueUnit       string
-	Format          string // binary or text
-	OVFVersion      int
-	TotalTime       float64
-	StageTime       float64
-	DataFormat      string // 4 or 8
-	StepSize        [3]float32
-	MeshUnit        string
-}
 
 // Safe way to get Desc values: panics when key not present
 func (i *Info) DescGet(key string) interface{} {
@@ -76,7 +30,7 @@ func (i *Info) DescGetFloat32(key string) float32 {
 	return float32(fl)
 }
 
-func readDataText(in io.Reader, t *Slice) {
+func readDataText(in io.Reader, t *data.Slice) {
 	size := t.Size()
 	data := t.Tensors()
 	for iz := 0; iz < size[Z]; iz++ {
@@ -93,7 +47,7 @@ func readDataText(in io.Reader, t *Slice) {
 	}
 }
 
-func readDataBinary4(in io.Reader, t *Slice) {
+func readDataBinary4(in io.Reader, t *data.Slice) {
 	size := t.Size()
 	data := t.Tensors()
 
@@ -253,3 +207,147 @@ func isEOF(char int) bool {
 func isEndline(char int) bool {
 	return isEOF(char) || char == int('\n')
 }
+
+// OVF2 suport written by Mykola Dvornik for mumax1,
+// modified for mumax2 by Arne Vansteenkiste, 2011.
+// modified for mumax3 by Arne Vansteenkiste, 2013, 2014
+
+func DumpOvf2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
+	writeOvf2Header(out, q, meta)
+	writeOvf2Data(out, q, dataformat)
+	hdr(out, "End", "Segment")
+}
+
+func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
+	gridsize := q.Size()
+	cellsize := meta.CellSize
+
+	//fmt.Fprintln(out, "# OOMMF OVF 2.0")
+	hdr(out, "OOMMF", "rectangular mesh v1.0")
+	hdr(out, "Segment count", "1")
+	hdr(out, "Begin", "Segment")
+	hdr(out, "Begin", "Header")
+
+	hdr(out, "Title", meta.Name)
+	hdr(out, "meshtype", "rectangular")
+	hdr(out, "meshunit", "m")
+
+	hdr(out, "xmin", 0)
+	hdr(out, "ymin", 0)
+	hdr(out, "zmin", 0)
+
+	hdr(out, "xmax", cellsize[Z]*float64(gridsize[Z]))
+	hdr(out, "ymax", cellsize[Y]*float64(gridsize[Y]))
+	hdr(out, "zmax", cellsize[X]*float64(gridsize[X]))
+
+	name := meta.Name
+	var labels []interface{}
+	if q.NComp() == 1 {
+		labels = []interface{}{name}
+	} else {
+		for i := 0; i < q.NComp(); i++ {
+			labels = append(labels, name+"_"+string('x'+i))
+		}
+	}
+	hdr(out, "valuedim", q.NComp())
+	hdr(out, "valuelabels", labels...) // TODO
+	unit := meta.Unit
+	if unit == "" {
+		unit = "1"
+	}
+	if q.NComp() == 1 {
+		hdr(out, "valueunits", unit)
+	} else {
+		hdr(out, "valueunits", unit, unit, unit)
+	}
+
+	// We don't really have stages
+	//fmt.Fprintln(out, "# Desc: Stage simulation time: ", meta.TimeStep, " s") // TODO
+	hdr(out, "Desc", "Total simulation time: ", meta.Time, " s")
+
+	hdr(out, "xbase", cellsize[Z]/2)
+	hdr(out, "ybase", cellsize[Y]/2)
+	hdr(out, "zbase", cellsize[X]/2)
+	hdr(out, "xnodes", gridsize[Z])
+	hdr(out, "ynodes", gridsize[Y])
+	hdr(out, "znodes", gridsize[X])
+	hdr(out, "xstepsize", cellsize[Z])
+	hdr(out, "ystepsize", cellsize[Y])
+	hdr(out, "zstepsize", cellsize[X])
+	hdr(out, "End", "Header")
+}
+
+// Writes a header key/value pair to out:
+// # Key: Value
+func hdr(out io.Writer, key string, value ...interface{}) {
+	_, err := fmt.Fprint(out, "# ", key, ": ")
+	util.FatalErr(err, "while reading OOMMF header")
+	_, err = fmt.Fprintln(out, value)
+	util.FatalErr(err, "while reading OOMMF header")
+}
+
+func dsc(out io.Writer, k, v interface{}) {
+	hdr(out, "Desc", k, ": ", v)
+}
+
+func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
+	hdr(out, "Begin", "Data "+dataformat)
+	switch strings.ToLower(dataformat) {
+	case "text":
+		writeOmfText(out, q)
+	case "binary 4":
+		writeOvf2Binary4(out, q)
+	default:
+		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)
+	}
+	hdr(out, "End", "Data "+dataformat)
+}
+
+func writeOvf2Binary4(out io.Writer, array *data.Slice) {
+	data := array.Tensors()
+	gridsize := array.Size()
+
+	var bytes []byte
+
+	// OOMMF requires this number to be first to check the format
+	var controlnumber float32 = OMF_CONTROL_NUMBER
+	// Conversion form float32 [4]byte in big-endian (encoding/binary is too slow)
+	bytes = (*[4]byte)(unsafe.Pointer(&controlnumber))[:]
+	out.Write(bytes)
+
+	ncomp := array.NComp()
+	for ix := 0; ix < gridsize[X]; ix++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for iz := 0; iz < gridsize[Z]; iz++ {
+				for c := 0; c < ncomp; c++ {
+					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
+					out.Write(bytes)
+				}
+			}
+		}
+	}
+}
+
+// Writes data in OMF Text format
+func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
+
+	data := tens.Tensors()
+	gridsize := tens.Size()
+	ncomp := tens.NComp()
+
+	// Here we loop over X,Y,Z, not Z,Y,X, because
+	// internal in C-order == external in Fortran-order
+	for iz := 0; iz < gridsize[Z]; iz++ {
+		for iy := 0; iy < gridsize[Y]; iy++ {
+			for ix := 0; ix < gridsize[Z]; ix++ {
+				for c := 0; c < ncomp; c++ {
+					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
+				}
+				_, err = fmt.Fprint(out, "\n")
+			}
+		}
+	}
+	return
+}
+
+const OMF_CONTROL_NUMBER = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number

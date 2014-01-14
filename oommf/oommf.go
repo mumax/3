@@ -3,6 +3,7 @@ package oommf
 import (
 	"bufio"
 	"fmt"
+	//"strconv"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"io"
@@ -28,6 +29,8 @@ func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
 	switch info.OVF {
 	default:
 		panic(fmt.Sprint("Unknown OVF format: ", info.OVF))
+	case 2:
+		readOVF2Data(in, info.Format, data_)
 	}
 	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
 }
@@ -37,6 +40,7 @@ func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
 // Perhaps CheckErr() func
 type Info struct {
 	Desc            map[string]interface{}
+	NComp           int
 	Size            [3]int
 	ValueMultiplier float32
 	ValueUnit       string
@@ -44,7 +48,7 @@ type Info struct {
 	OVF             int
 	TotalTime       float64
 	StageTime       float64
-	DataFormat      string // 4 or 8
+	SizeofFloat     int // 4/8
 	StepSize        [3]float32
 	MeshUnit        string
 }
@@ -70,7 +74,12 @@ func readHeader(in io.Reader) *Info {
 		default:
 			panic("Unknown key: " + key)
 			// ignored
-		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xstepsize", "ystepsize", "zstepsize", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end", "":
+		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xstepsize", "ystepsize", "zstepsize", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end": // ignored (OVF1)
+		case "", "valuelabels": // ignored (OVF2)
+		case "valueunits":
+			info.ValueUnit = strings.Split(value, " ")[0] // take unit of first component, we don't support per-component units
+		case "valuedim":
+			info.NComp = atoi(value)
 		case "xnodes":
 			info.Size[X] = atoi(value)
 		case "ynodes":
@@ -105,7 +114,9 @@ func readHeader(in io.Reader) *Info {
 	}
 	info.Format = strings.ToLower(strs[1])
 	if len(strs) >= 3 { // dataformat for text is empty
-		info.DataFormat = strs[2]
+		info.Format = "binary " + strs[2]
+	} else {
+		info.Format = "text"
 	}
 	return info
 }
@@ -129,10 +140,29 @@ func isHeaderEnd(str string) bool {
 	return strings.HasPrefix(str, "begin:data")
 }
 
+//// Safe way to get Desc values: panics when key not present
+//func (i *Info) DescGet(key string) interface{} {
+//	value, ok := i.Desc[key]
+//	if !ok {
+//		panic("Key not found in Desc: " + key)
+//	}
+//	return value
+//}
+
+// Safe way to get a float from Desc
+//func (i *Info) DescGetFloat32(key string) float32 {
+//	value := i.DescGet(key)
+//	fl, err := strconv.ParseFloat(value.(string), 32)
+//	if err != nil {
+//		panic("Could not parse " + key + " to float32: " + err.Error())
+//	}
+//	return float32(fl)
+//}
+
 const OVF_CONTROL_NUMBER_4 = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
 
 // read data block in text format, for OVF1 and OVF2
-func readOVFText(in io.Reader, t *data.Slice) {
+func readOVFDataText(in io.Reader, t *data.Slice) {
 	size := t.Size()
 	data := t.Tensors()
 	for iz := 0; iz < size[Z]; iz++ {

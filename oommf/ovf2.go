@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/data"
 	"io"
 	"log"
-	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -112,21 +111,29 @@ func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
 	}
 }
 
-func readOVF1DataBinary4(in io.Reader, t *data.Slice) {
-	size := t.Size()
-	data := t.Tensors()
+func readOVF2Data(in io.Reader, format string, array *data.Slice) {
+	switch format {
+	default:
+		panic("unknown OVF2 data format: " + format)
+	case "binary 4":
+		readOVF1DataBinary4(in, array)
+	case "text":
+		readOVFDataText(in, array)
+	}
+}
+
+func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
+	size := array.Size()
+	data := array.Tensors()
 
 	var bytes4 [4]byte
 	bytes := bytes4[:]
 
-	in.Read(bytes)                                                                  // TODO: must read 4 !
-	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
+	in.Read(bytes) // TODO: must read 4 !
 
 	// OOMMF requires this number to be first to check the format
 	var controlnumber float32 = 0.
 
-	// Conversion form float32 [4]byte, encoding/binary is too slow
-	// Inlined for performance, terabytes of data will pass here...
 	controlnumber = *((*float32)(unsafe.Pointer(&bytes4)))
 	if controlnumber != OVF_CONTROL_NUMBER_4 {
 		panic("invalid control number: " + fmt.Sprint(controlnumber))
@@ -140,29 +147,9 @@ func readOVF1DataBinary4(in io.Reader, t *data.Slice) {
 					if err != nil || n != 4 {
 						panic(err)
 					}
-					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
 					data[c][iz][iy][ix] = *((*float32)(unsafe.Pointer(&bytes4)))
 				}
 			}
 		}
 	}
-}
-
-// Safe way to get Desc values: panics when key not present
-func (i *Info) DescGet(key string) interface{} {
-	value, ok := i.Desc[key]
-	if !ok {
-		panic("Key not found in Desc: " + key)
-	}
-	return value
-}
-
-// Safe way to get a float from Desc
-func (i *Info) DescGetFloat32(key string) float32 {
-	value := i.DescGet(key)
-	fl, err := strconv.ParseFloat(value.(string), 32)
-	if err != nil {
-		panic("Could not parse " + key + " to float32: " + err.Error())
-	}
-	return float32(fl)
 }

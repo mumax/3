@@ -53,3 +53,9 @@ func (a Vector) Cross(b Vector) Vector {
 	z := a[0]*b[1] - a[1]*b[0]
 	return Vector{x, y, z}
 }
+
+const (
+	X = 0
+	Y = 1
+	Z = 2
+)

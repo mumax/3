@@ -1,6 +1,6 @@
 // OVF2 suport written by Mykola Dvornik for mumax1,
 // modified for mumax2 by Arne Vansteenkiste, 2011.
-// modified for mumax3 by Arne Vansteenkiste, 2013.
+// modified for mumax3 by Arne Vansteenkiste, 2013, 2014
 
 package data
 
@@ -13,46 +13,20 @@ import (
 )
 
 func DumpOvf2(out io.Writer, q *Slice, dataformat string, meta Meta) {
-
-	switch strings.ToLower(dataformat) {
-	case "binary", "binary 4":
-		dataformat = "binary 4"
-	case "text":
-		dataformat = "text"
-	default:
-		log.Fatalf("Illegal OMF data format: %v", dataformat)
-	}
-
 	writeOvf2Header(out, q, meta)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
-	return
-}
-
-func writeOvf2Data(out io.Writer, q *Slice, dataformat string) {
-	hdr(out, "Begin", "Data "+dataformat)
-	switch strings.ToLower(dataformat) {
-	case "text":
-		writeOmfText(out, q)
-	case "binary 4":
-		writeOvf2Binary4(out, q)
-	default:
-		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)
-	}
-	hdr(out, "End", "Data "+dataformat)
 }
 
 func writeOvf2Header(out io.Writer, q *Slice, meta Meta) {
 	gridsize := q.Size()
 	cellsize := meta.CellSize
 
-	fmt.Fprintln(out, "# OOMMF OVF 2.0")
-	fmt.Fprintln(out, "#")
+	//fmt.Fprintln(out, "# OOMMF OVF 2.0")
+	hdr(out, "OOMMF", "rectangular mesh v1.0")
 	hdr(out, "Segment count", "1")
-	fmt.Fprintln(out, "#")
 	hdr(out, "Begin", "Segment")
 	hdr(out, "Begin", "Header")
-	fmt.Fprintln(out, "#")
 
 	hdr(out, "Title", meta.Name)
 	hdr(out, "meshtype", "rectangular")
@@ -89,22 +63,39 @@ func writeOvf2Header(out io.Writer, q *Slice, meta Meta) {
 
 	// We don't really have stages
 	//fmt.Fprintln(out, "# Desc: Stage simulation time: ", meta.TimeStep, " s") // TODO
-	fmt.Fprintln(out, "# Desc: Total simulation time: ", meta.Time, " s")
+	hdr(out, "Desc", "Total simulation time: ", meta.Time, " s")
 
 	hdr(out, "xbase", cellsize[Z]/2)
 	hdr(out, "ybase", cellsize[Y]/2)
 	hdr(out, "zbase", cellsize[X]/2)
-
 	hdr(out, "xnodes", gridsize[Z])
 	hdr(out, "ynodes", gridsize[Y])
 	hdr(out, "znodes", gridsize[X])
-
 	hdr(out, "xstepsize", cellsize[Z])
 	hdr(out, "ystepsize", cellsize[Y])
 	hdr(out, "zstepsize", cellsize[X])
-	fmt.Fprintln(out, "#")
 	hdr(out, "End", "Header")
-	fmt.Fprintln(out, "#")
+}
+
+// Writes a header key/value pair to out:
+// # Key: Value
+func hdr(out io.Writer, key string, value ...interface{}) (err error) {
+	_, err = fmt.Fprint(out, "# ", key, ": ")
+	_, err = fmt.Fprintln(out, value...)
+	return
+}
+
+func writeOvf2Data(out io.Writer, q *Slice, dataformat string) {
+	hdr(out, "Begin", "Data "+dataformat)
+	switch strings.ToLower(dataformat) {
+	case "text":
+		writeOmfText(out, q)
+	case "binary 4":
+		writeOvf2Binary4(out, q)
+	default:
+		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)
+	}
+	hdr(out, "End", "Data "+dataformat)
 }
 
 func writeOvf2Binary4(out io.Writer, array *Slice) {
@@ -130,14 +121,6 @@ func writeOvf2Binary4(out io.Writer, array *Slice) {
 			}
 		}
 	}
-}
-
-// Writes a header key/value pair to out:
-// # Key: Value
-func hdr(out io.Writer, key string, value ...interface{}) (err error) {
-	_, err = fmt.Fprint(out, "# ", key, ": ")
-	_, err = fmt.Fprintln(out, value...)
-	return
 }
 
 // Writes data in OMF Text format

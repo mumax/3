@@ -3,7 +3,6 @@ package oommf
 import (
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"strconv"
@@ -30,23 +29,6 @@ func (i *Info) DescGetFloat32(key string) float32 {
 	return float32(fl)
 }
 
-func readDataText(in io.Reader, t *data.Slice) {
-	size := t.Size()
-	data := t.Tensors()
-	for iz := 0; iz < size[Z]; iz++ {
-		for iy := 0; iy < size[Y]; iy++ {
-			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < 3; c++ {
-					_, err := fmt.Fscan(in, &data[c][iz][iy][ix])
-					if err != nil {
-						panic(err)
-					}
-				}
-			}
-		}
-	}
-}
-
 func readDataBinary4(in io.Reader, t *data.Slice) {
 	size := t.Size()
 	data := t.Tensors()
@@ -63,7 +45,7 @@ func readDataBinary4(in io.Reader, t *data.Slice) {
 	// Conversion form float32 [4]byte, encoding/binary is too slow
 	// Inlined for performance, terabytes of data will pass here...
 	controlnumber = *((*float32)(unsafe.Pointer(&bytes4)))
-	if controlnumber != OMF_CONTROL_NUMBER {
+	if controlnumber != OVF_CONTROL_NUMBER_4 {
 		panic("invalid control number: " + fmt.Sprint(controlnumber))
 	}
 
@@ -109,7 +91,7 @@ func ReadHeader(in io.Reader) *Info {
 	info := new(Info)
 	info.Desc = desc
 
-	line, eof := ReadLine(in)
+	line, eof := readLine(in)
 	for !eof && !isHeaderEnd(line) {
 		key, value := parseHeaderLine(line)
 
@@ -141,7 +123,7 @@ func ReadHeader(in io.Reader) *Info {
 			desc[desc_key] = desc_value
 		}
 
-		line, eof = ReadLine(in)
+		line, eof = readLine(in)
 	}
 	// the remaining line should now be the begin:data clause
 	key, value := parseHeaderLine(line)
@@ -188,31 +170,7 @@ func ReadChar(in io.Reader) int {
 	panic("unreachable")
 }
 
-//
-func ReadLine(in io.Reader) (line string, eof bool) {
-	char := ReadChar(in)
-	eof = isEOF(char)
-
-	for !isEndline(char) {
-		line += string(byte(char))
-		char = ReadChar(in)
-	}
-	return line, eof
-}
-
-func isEOF(char int) bool {
-	return char == -1
-}
-
-func isEndline(char int) bool {
-	return isEOF(char) || char == int('\n')
-}
-
-// OVF2 suport written by Mykola Dvornik for mumax1,
-// modified for mumax2 by Arne Vansteenkiste, 2011.
-// modified for mumax3 by Arne Vansteenkiste, 2013, 2014
-
-func DumpOvf2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
+func WriteOVF2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
 	writeOvf2Header(out, q, meta)
 	writeOvf2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
@@ -277,24 +235,11 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	hdr(out, "End", "Header")
 }
 
-// Writes a header key/value pair to out:
-// # Key: Value
-func hdr(out io.Writer, key string, value ...interface{}) {
-	_, err := fmt.Fprint(out, "# ", key, ": ")
-	util.FatalErr(err, "while reading OOMMF header")
-	_, err = fmt.Fprintln(out, value)
-	util.FatalErr(err, "while reading OOMMF header")
-}
-
-func dsc(out io.Writer, k, v interface{}) {
-	hdr(out, "Desc", k, ": ", v)
-}
-
 func writeOvf2Data(out io.Writer, q *data.Slice, dataformat string) {
 	hdr(out, "Begin", "Data "+dataformat)
 	switch strings.ToLower(dataformat) {
 	case "text":
-		writeOmfText(out, q)
+		writeOVFText(out, q)
 	case "binary 4":
 		writeOvf2Binary4(out, q)
 	default:
@@ -310,7 +255,7 @@ func writeOvf2Binary4(out io.Writer, array *data.Slice) {
 	var bytes []byte
 
 	// OOMMF requires this number to be first to check the format
-	var controlnumber float32 = OMF_CONTROL_NUMBER
+	var controlnumber float32 = OVF_CONTROL_NUMBER_4
 	// Conversion form float32 [4]byte in big-endian (encoding/binary is too slow)
 	bytes = (*[4]byte)(unsafe.Pointer(&controlnumber))[:]
 	out.Write(bytes)
@@ -327,27 +272,3 @@ func writeOvf2Binary4(out io.Writer, array *data.Slice) {
 		}
 	}
 }
-
-// Writes data in OMF Text format
-func writeOmfText(out io.Writer, tens *data.Slice) (err error) {
-
-	data := tens.Tensors()
-	gridsize := tens.Size()
-	ncomp := tens.NComp()
-
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
-	for iz := 0; iz < gridsize[Z]; iz++ {
-		for iy := 0; iy < gridsize[Y]; iy++ {
-			for ix := 0; ix < gridsize[Z]; ix++ {
-				for c := 0; c < ncomp; c++ {
-					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
-				}
-				_, err = fmt.Fprint(out, "\n")
-			}
-		}
-	}
-	return
-}
-
-const OMF_CONTROL_NUMBER = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number

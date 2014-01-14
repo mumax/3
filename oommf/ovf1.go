@@ -5,7 +5,6 @@ package oommf
 // Modified by Arne Vansteenkiste, 2011, 2012, 2013.
 
 import (
-	"fmt"
 	"github.com/mumax/3/data"
 	"io"
 	"log"
@@ -91,7 +90,7 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 	var bytes []byte
 
 	// OOMMF requires this number to be first to check the format
-	var controlnumber float32 = OMF_CONTROL_NUMBER
+	var controlnumber float32 = OVF_CONTROL_NUMBER_4
 	// Conversion form float32 [4]byte in big-endian
 	// Inlined for performance, terabytes of data will pass here...
 	bytes = (*[4]byte)(unsafe.Pointer(&controlnumber))[:]
@@ -108,26 +107,6 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
 					out.Write(bytes)
 				}
-			}
-		}
-	}
-	return
-}
-
-func writeOVFText(out io.Writer, tens *data.Slice) (err error) {
-	data := tens.Tensors()
-	gridsize := tens.Size()
-	ncomp := tens.NComp()
-
-	// Here we loop over X,Y,Z, not Z,Y,X, because
-	// internal in C-order == external in Fortran-order
-	for iz := 0; iz < gridsize[Z]; iz++ {
-		for iy := 0; iy < gridsize[Y]; iy++ {
-			for ix := 0; ix < gridsize[Z]; ix++ {
-				for c := 0; c < ncomp; c++ {
-					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
-				}
-				_, err = fmt.Fprint(out, "\n")
 			}
 		}
 	}

@@ -116,7 +116,7 @@ func readOVF2Data(in io.Reader, format string, array *data.Slice) {
 	default:
 		panic("unknown OVF2 data format: " + format)
 	case "binary 4":
-		readOVF1DataBinary4(in, array)
+		readOVF2DataBinary4(in, array)
 	case "text":
 		readOVFDataText(in, array)
 	}
@@ -128,8 +128,7 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 
 	var bytes4 [4]byte
 	bytes := bytes4[:]
-
-	in.Read(bytes) // TODO: must read 4 !
+	in.Read(bytes)
 
 	// OOMMF requires this number to be first to check the format
 	var controlnumber float32 = 0.

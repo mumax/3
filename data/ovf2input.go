@@ -130,15 +130,16 @@ func readDataBinary4(in io.Reader, t *Slice) {
 
 }
 
-// INTERNAL: Splits "# key: value" into "key", "value"
+// INTERNAL: Splits "# key: value" into "key", "value".
+// Both may be empty
 func parseHeaderLine(str string) (key, value string) {
 	strs := strings.SplitN(str, ":", 2)
-	if len(strs) != 2 {
-		panic(fmt.Sprint("illegal header entry:", str))
-	}
 	key = strings.Trim(strs[0], "# ")
+	if len(strs) != 2 {
+		return key, ""
+	}
 	value = strings.Trim(strs[1], "# ")
-	return
+	return key, value
 }
 
 // INTERNAL: true if line == "# begin_data"

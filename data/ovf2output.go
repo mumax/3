@@ -6,6 +6,7 @@ package data
 
 import (
 	"fmt"
+	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"strings"
@@ -79,10 +80,15 @@ func writeOvf2Header(out io.Writer, q *Slice, meta Meta) {
 
 // Writes a header key/value pair to out:
 // # Key: Value
-func hdr(out io.Writer, key string, value ...interface{}) (err error) {
-	_, err = fmt.Fprint(out, "# ", key, ": ")
-	_, err = fmt.Fprintln(out, value...)
-	return
+func hdr(out io.Writer, key string, value ...interface{}) {
+	_, err := fmt.Fprint(out, "# ", key, ": ")
+	util.FatalErr(err, "while reading OOMMF header")
+	_, err = fmt.Fprintln(out, value)
+	util.FatalErr(err, "while reading OOMMF header")
+}
+
+func dsc(out io.Writer, k, v interface{}) {
+	hdr(out, "Desc", k, ": ", v)
 }
 
 func writeOvf2Data(out io.Writer, q *Slice, dataformat string) {

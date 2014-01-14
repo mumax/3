@@ -300,9 +300,3 @@ func Index(size [3]int, ix, iy, iz int) int {
 	}
 	return (iz*size[Y]+iy)*size[X] + ix
 }
-
-const (
-	X = 0
-	Y = 1
-	Z = 2
-)

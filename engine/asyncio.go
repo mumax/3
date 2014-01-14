@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"os"
 	"path"
@@ -66,7 +67,7 @@ func runSaver() {
 		f, err := os.OpenFile(t.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
 		out := bufio.NewWriter(f)
-		data.DumpOvf2(out, t.output, "binary", t.info)
+		oommf.WriteOVF2(out, t.output, "binary 4", t.info)
 		out.Flush()
 		f.Close()
 	}

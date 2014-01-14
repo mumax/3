@@ -121,13 +121,9 @@ func readOVF1DataBinary4(in io.Reader, t *data.Slice) {
 	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
 
 	// OOMMF requires this number to be first to check the format
-	var controlnumber float32 = 0.
-
-	// Conversion form float32 [4]byte, encoding/binary is too slow
-	// Inlined for performance, terabytes of data will pass here...
-	controlnumber = *((*float32)(unsafe.Pointer(&bytes4)))
+	controlnumber := *((*float32)(unsafe.Pointer(&bytes4)))
 	if controlnumber != OVF_CONTROL_NUMBER_4 {
-		panic("invalid control number: " + fmt.Sprint(controlnumber))
+		panic("invalid OVF1 control number: " + fmt.Sprint(controlnumber))
 	}
 
 	for iz := 0; iz < size[Z]; iz++ {

@@ -124,7 +124,7 @@ func readHeader(in io.Reader) *Info {
 	}
 	info.Format = strings.ToLower(strs[1])
 	if len(strs) >= 3 { // dataformat for text is empty
-		info.Format = "binary " + strs[2]
+		info.Format = "binary " + strs[2] // binary + 4 or 8
 	} else {
 		info.Format = "text"
 	}
@@ -215,7 +215,7 @@ func writeOVFText(out io.Writer, tens *data.Slice) (err error) {
 func hdr(out io.Writer, key string, value ...interface{}) {
 	_, err := fmt.Fprint(out, "# ", key, ": ")
 	util.FatalErr(err, "while reading OOMMF header")
-	_, err = fmt.Fprintln(out, value)
+	_, err = fmt.Fprintln(out, value...)
 	util.FatalErr(err, "while reading OOMMF header")
 }
 

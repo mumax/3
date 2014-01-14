@@ -19,8 +19,7 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	gridsize := q.Size()
 	cellsize := meta.CellSize
 
-	//fmt.Fprintln(out, "# OOMMF OVF 2.0")
-	hdr(out, "OOMMF", "rectangular mesh v1.0")
+	fmt.Fprintln(out, "# OOMMF OVF 2.0")
 	hdr(out, "Segment count", "1")
 	hdr(out, "Begin", "Segment")
 	hdr(out, "Begin", "Header")
@@ -33,9 +32,9 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	hdr(out, "ymin", 0)
 	hdr(out, "zmin", 0)
 
-	hdr(out, "xmax", cellsize[Z]*float64(gridsize[Z]))
+	hdr(out, "xmax", cellsize[X]*float64(gridsize[X]))
 	hdr(out, "ymax", cellsize[Y]*float64(gridsize[Y]))
-	hdr(out, "zmax", cellsize[X]*float64(gridsize[X]))
+	hdr(out, "zmax", cellsize[Z]*float64(gridsize[Z]))
 
 	name := meta.Name
 	var labels []interface{}
@@ -62,15 +61,15 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	//fmt.Fprintln(out, "# Desc: Stage simulation time: ", meta.TimeStep, " s") // TODO
 	hdr(out, "Desc", "Total simulation time: ", meta.Time, " s")
 
-	hdr(out, "xbase", cellsize[Z]/2)
+	hdr(out, "xbase", cellsize[X]/2)
 	hdr(out, "ybase", cellsize[Y]/2)
-	hdr(out, "zbase", cellsize[X]/2)
-	hdr(out, "xnodes", gridsize[Z])
+	hdr(out, "zbase", cellsize[Z]/2)
+	hdr(out, "xnodes", gridsize[X])
 	hdr(out, "ynodes", gridsize[Y])
-	hdr(out, "znodes", gridsize[X])
-	hdr(out, "xstepsize", cellsize[Z])
+	hdr(out, "znodes", gridsize[Z])
+	hdr(out, "xstepsize", cellsize[X])
 	hdr(out, "ystepsize", cellsize[Y])
-	hdr(out, "zstepsize", cellsize[X])
+	hdr(out, "zstepsize", cellsize[Z])
 	hdr(out, "End", "Header")
 }
 
@@ -89,7 +88,7 @@ func writeOVF2Data(out io.Writer, q *data.Slice, dataformat string) {
 
 func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
 	data := array.Tensors()
-	gridsize := array.Size()
+	size := array.Size()
 
 	var bytes []byte
 
@@ -99,9 +98,9 @@ func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
 	out.Write(bytes)
 
 	ncomp := array.NComp()
-	for ix := 0; ix < gridsize[X]; ix++ {
-		for iy := 0; iy < gridsize[Y]; iy++ {
-			for iz := 0; iz < gridsize[Z]; iz++ {
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
 					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					out.Write(bytes)
@@ -120,17 +119,16 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 	in.Read(bytes)
 
 	// OOMMF requires this number to be first to check the format
-	var controlnumber float32 = 0.
-
-	controlnumber = *((*float32)(unsafe.Pointer(&bytes4)))
+	controlnumber := *((*float32)(unsafe.Pointer(&bytes4)))
 	if controlnumber != OVF_CONTROL_NUMBER_4 {
-		panic("invalid control number: " + fmt.Sprint(controlnumber))
+		panic("invalid OVF2 control number: " + fmt.Sprint(controlnumber))
 	}
 
+	ncomp := array.NComp()
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < 3; c++ {
+				for c := 0; c < ncomp; c++ {
 					n, err := in.Read(bytes)
 					if err != nil || n != 4 {
 						panic(err)

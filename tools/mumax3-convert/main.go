@@ -1,5 +1,5 @@
 /*
-mumax3-convert converts mumax3 output files and .omf files to various formats and images.
+mumax3-convert converts mumax3 output files and .ovf files to various formats and images.
 It also provides basic manipulations like data rescale etc.
 
 
@@ -12,11 +12,11 @@ For a overview of flags, run:
 Example: convert all .dump files to PNG:
 	mumax3-convert -png *.dump
 Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
-	mumax3-convert -resize 32x32x1 -normalize -omf binary file.dump
-Example: convert all .omf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
-	mumax3-convert -comp 0 -vtk binary -jpg *.omf
-Example: convert .omf files to .dump, so they can be used as input for mumax3 simulations:
-	mumax3-convert -dump *.omf
+	mumax3-convert -resize 32x32x1 -normalize -ovf binary file.dump
+Example: convert all .ovf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
+	mumax3-convert -comp 0 -vtk binary -jpg *.ovf
+Example: convert .ovf files to .dump, so they can be used as input for mumax3 simulations:
+	mumax3-convert -dump *.ovf
 Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
 	mumax3-convert -xrange 50:100 -yrange :100 file.dump
 Example: select the bottom layer
@@ -31,10 +31,10 @@ import (
 	"flag"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"log"
 	"os"
-	"path"
 	"runtime"
 	"strconv"
 	"strings"
@@ -50,8 +50,7 @@ var (
 	flag_svg       = flag.Bool("svg", false, "SVG output")
 	flag_svgz      = flag.Bool("svgz", false, "SVGZ output (compressed)")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
-	flag_omf       = flag.String("omf", "", `"text" or "binary" OMF (OVF1) output`)
-	flag_ovf1      = flag.String("ovf1", "", `"text" or "binary" OVF1 output`)
+	flag_ovf1      = flag.String("ovf", "", `"text" or "binary" OVF1 output`)
 	flag_ovf2      = flag.String("ovf2", "", `"text" or "binary" OVF2 output`)
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
@@ -101,13 +100,7 @@ func main() {
 		var info data.Meta
 		var err error
 
-		ext := path.Ext(fname)
-		switch ext {
-		case ".omf", ".ovf":
-			slice, info, err = data.ReadOMF(fname)
-		default:
-			slice, info, err = data.ReadFile(fname)
-		}
+		slice, info, err = oommf.Read(fname)
 		if err != nil {
 			log.Println(err)
 			continue
@@ -175,24 +168,17 @@ func process(f *data.Slice, info data.Meta, name string) {
 		haveOutput = true
 	}
 
-	if *flag_omf != "" {
-		out := open(name + ".omf")
-		defer out.Close()
-		dumpOmf(out, f, info, *flag_omf)
-		haveOutput = true
-	}
-
 	if *flag_ovf1 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		dumpOmf(out, f, info, *flag_ovf1)
+		oommf.WriteOVF1(out, f, info, *flag_ovf1)
 		haveOutput = true
 	}
 
 	if *flag_ovf2 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		data.DumpOvf2(out, f, *flag_ovf2, info)
+		oommf.WriteOVF2(out, f, *flag_ovf2, info)
 		haveOutput = true
 	}
 
@@ -293,3 +279,9 @@ func atoi(a string) int {
 	}
 	return i
 }
+
+const (
+	X = data.X
+	Y = data.Y
+	Z = data.Z
+)

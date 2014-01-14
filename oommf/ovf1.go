@@ -112,9 +112,3 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 	}
 	return
 }
-
-const (
-	X = 0
-	Y = 1
-	Z = 2
-)

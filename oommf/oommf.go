@@ -25,9 +25,9 @@ func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
 	}
 	data_ := data.NewSlice(3, n)
 
-	switch info.OOMMF {
+	switch info.OVF {
 	default:
-		panic("Unknown format: " + info.OOMMF)
+		panic(fmt.Sprint("Unknown OVF format: ", info.OVF))
 	}
 	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
 }
@@ -41,13 +41,12 @@ type Info struct {
 	ValueMultiplier float32
 	ValueUnit       string
 	Format          string // binary or text
-	OVFVersion      int
+	OVF             int
 	TotalTime       float64
 	StageTime       float64
 	DataFormat      string // 4 or 8
 	StepSize        [3]float32
 	MeshUnit        string
-	OOMMF           string
 }
 
 // Parses the header part of the OVF1/OVF2 file
@@ -60,7 +59,8 @@ func readHeader(in io.Reader) *Info {
 	switch line {
 	default:
 		panic("unknown header: " + line)
-
+	case "# OOMMF OVF 2.0":
+		info.OVF = 2
 	}
 	line, eof = readLine(in)
 	for !eof && !isHeaderEnd(line) {
@@ -70,7 +70,7 @@ func readHeader(in io.Reader) *Info {
 		default:
 			panic("Unknown key: " + key)
 			// ignored
-		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xstepsize", "ystepsize", "zstepsize", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end":
+		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xstepsize", "ystepsize", "zstepsize", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end", "":
 		case "xnodes":
 			info.Size[X] = atoi(value)
 		case "ynodes":

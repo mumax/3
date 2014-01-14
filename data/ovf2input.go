@@ -1,9 +1,8 @@
-package main
+package data
 
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"io"
 	"os"
@@ -12,7 +11,7 @@ import (
 	"unsafe"
 )
 
-func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
+func ReadOMF(fname string) (s *Slice, meta Meta, err error) {
 	in_, err := os.Open(fname)
 	util.FatalErr(err)
 	in := BlockingReader{bufio.NewReader(in_)}
@@ -23,7 +22,7 @@ func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
 	if c == [3]float32{0, 0, 0} {
 		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
 	}
-	data_ := data.NewSlice(3, n)
+	data_ := NewSlice(3, n)
 
 	switch info.Format {
 	default:
@@ -38,7 +37,7 @@ func ReadOMF(fname string) (s *data.Slice, meta data.Meta, err error) {
 			readDataBinary4(in, data_)
 		}
 	}
-	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
+	return data_, Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
 }
 
 // omf.Info represents the header part of an omf file.
@@ -77,7 +76,7 @@ func (i *Info) DescGetFloat32(key string) float32 {
 	return float32(fl)
 }
 
-func readDataText(in io.Reader, t *data.Slice) {
+func readDataText(in io.Reader, t *Slice) {
 	size := t.Size()
 	data := t.Tensors()
 	for iz := 0; iz < size[Z]; iz++ {
@@ -94,7 +93,7 @@ func readDataText(in io.Reader, t *data.Slice) {
 	}
 }
 
-func readDataBinary4(in io.Reader, t *data.Slice) {
+func readDataBinary4(in io.Reader, t *Slice) {
 	size := t.Size()
 	data := t.Tensors()
 

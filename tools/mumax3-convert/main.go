@@ -36,6 +36,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -103,7 +104,7 @@ func main() {
 		ext := path.Ext(fname)
 		switch ext {
 		case ".omf", ".ovf":
-			slice, info, err = ReadOMF(fname)
+			slice, info, err = data.ReadOMF(fname)
 		default:
 			slice, info, err = data.ReadFile(fname)
 		}
@@ -283,4 +284,12 @@ func parseRange(r string, max int) (int, int) {
 		b = atoi(spl[1])
 	}
 	return a, b
+}
+
+func atoi(a string) int {
+	i, err := strconv.Atoi(a)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }

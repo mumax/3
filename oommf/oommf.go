@@ -3,7 +3,6 @@ package oommf
 import (
 	"bufio"
 	"fmt"
-	//"strconv"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"io"
@@ -24,14 +23,22 @@ func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
 	if c == [3]float32{0, 0, 0} {
 		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
 	}
-	data_ := data.NewSlice(3, n)
+	data_ := data.NewSlice(info.NComp, n)
 
-	switch info.OVF {
+	format := strings.ToLower(info.Format)
+	ovf := info.OVF
+
+	switch {
 	default:
-		panic(fmt.Sprint("Unknown OVF format: ", info.OVF))
-	case 2:
-		readOVF2Data(in, info.Format, data_)
+		panic(fmt.Sprint("unknown format: OVF", ovf, " ", format))
+	case format == "text":
+		readOVFDataText(in, data_)
+	case format == "binary 4" && ovf == 1:
+		readOVF1DataBinary4(in, data_)
+	case format == "binary 4" && ovf == 2:
+		readOVF2DataBinary4(in, data_)
 	}
+
 	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
 }
 
@@ -60,11 +67,14 @@ func readHeader(in io.Reader) *Info {
 	info.Desc = desc
 
 	line, eof := readLine(in)
-	switch line {
+	switch strings.ToLower(line) {
 	default:
 		panic("unknown header: " + line)
-	case "# OOMMF OVF 2.0":
+	case "# oommf ovf 2.0":
 		info.OVF = 2
+	case "# oommf: rectangular mesh v1.0":
+		info.OVF = 1
+		info.NComp = 3 // OVF1 only supports vector
 	}
 	line, eof = readLine(in)
 	for !eof && !isHeaderEnd(line) {

@@ -111,17 +111,6 @@ func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
 	}
 }
 
-func readOVF2Data(in io.Reader, format string, array *data.Slice) {
-	switch format {
-	default:
-		panic("unknown OVF2 data format: " + format)
-	case "binary 4":
-		readOVF2DataBinary4(in, array)
-	case "text":
-		readOVFDataText(in, array)
-	}
-}
-
 func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 	size := array.Size()
 	data := array.Tensors()

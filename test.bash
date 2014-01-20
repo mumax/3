@@ -7,7 +7,6 @@ PKGS=$(echo github.com/mumax/3/{mumax3,tools/mumax3-convert,tools/mumax3-plot,da
 go test -i $PKGS || exit 1
 go test $PKGS  || exit 1
 
-(cd doc && mumax3 -vet *.txt) || exit 1
 (cd test && ./run.bash) || exit 1
 
 #go test -i -compiler=$gccgo $PKGS

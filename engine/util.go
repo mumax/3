@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/dump"
 	"github.com/mumax/3/mag"
+	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"math"
 	"os"
@@ -21,7 +23,7 @@ func init() {
 	DeclFunc("Vector", Vector, "Constructs a vector with given components")
 	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
 	DeclFunc("Print", myprint, "Print to standard output")
-	DeclFunc("LoadFile", LoadFile, "Load a .dump file")
+	DeclFunc("LoadFile", LoadFile, "Load a data file (ovf or dump)")
 	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")
 	DeclFunc("NewSlice", NewSlice, "Makes a 3D array of scalars with given x,y,z size")
 }
@@ -67,9 +69,13 @@ func Fprintln(filename string, msg ...interface{}) {
 
 // Read a magnetization state from .dump file.
 func LoadFile(fname string) *data.Slice {
-	panic("todo: loadfile")
-	//s, _ := data.MustReadFile(fname)
-	//return s
+	if path.Ext(fname) == ".dump" {
+		s, _ := dump.MustReadFile(fname)
+		return s
+	} else {
+		s, _ := oommf.MustReadFile(fname)
+		return s
+	}
 }
 
 // Download a quantity to host,

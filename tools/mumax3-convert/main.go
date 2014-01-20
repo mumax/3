@@ -109,7 +109,7 @@ func main() {
 			log.Println("skipping unsupported type", path.Ext(fname))
 			continue
 		case ".ovf", ".omf":
-			slice, info, err = oommf.Read(fname)
+			slice, info, err = oommf.ReadFile(fname)
 		case ".dump":
 			slice, info, err = dump.ReadFile(fname)
 		}

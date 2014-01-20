@@ -1,7 +1,7 @@
 3.4 changelog
 -------------
 
-  * The default output format is now ovf2 binary instead of dump. mumax3-convert (version 3.4!) can be used to convert between dump and several ovf formats (ovf1/ovf2, text/binary). Reason for the change is that the ovf2 implementation has become more efficient (due to internal data re-ordering), making dump obsolete. Also, the ovf format is well documented (see OOMMF manual), and many tools accept it (e.g. muview).
+  * The default output format is now ovf2 binary instead of dump. mumax3-convert (version 3.4!) can be used to convert between dump and several ovf formats (ovf1/ovf2, text/binary). Reason for the change is that the ovf2 implementation has become more efficient (due to internal data re-ordering), making dump obsolete. Also, the ovf format is well documented (see OOMMF manual), and many tools accept it (e.g. muview). dump support may be removed in the future.
 
   * The exchange between different regions (materials) does not default to 0 anymore, but to the harmonic mean of exchange lengths in 
 

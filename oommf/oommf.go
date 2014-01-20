@@ -11,11 +11,8 @@ import (
 )
 
 // Read any OOMMF file, autodetect OVF1/OVF2 format
-func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
-	in_, err := os.Open(fname)
-	util.FatalErr(err)
+func Read(in_ io.Reader) (s *data.Slice, meta data.Meta, err error) {
 	in := fullReader{bufio.NewReader(in_)}
-
 	info := readHeader(in)
 
 	n := info.Size
@@ -40,6 +37,21 @@ func Read(fname string) (s *data.Slice, meta data.Meta, err error) {
 	}
 
 	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
+}
+
+func ReadFile(fname string) (*data.Slice, data.Meta, error) {
+	f, err := os.Open(fname)
+	if err != nil {
+		return nil, data.Meta{}, err
+	}
+	defer f.Close()
+	return Read(f)
+}
+
+func MustReadFile(fname string) (*data.Slice, data.Meta) {
+	s, t, err := ReadFile(fname)
+	util.FatalErr(err)
+	return s, t
 }
 
 // omf.Info represents the header part of an omf file.

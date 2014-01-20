@@ -72,7 +72,7 @@ m = Uniform(1, 0.1, 0)                   // initial mag
 Run(5e-9)                                // relax
 
 save(m)                                  // remanent magnetization
-print("<m> for d/lex=30: ", average(m))
+print("<m> for d/lex=30: ", m.average())
 `}}
 
 {{.Output}}

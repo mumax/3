@@ -26,5 +26,5 @@ for i:=0; i< 56; i++{
 }
 
 
-expect("aex", Aex.Average(), 1.4154971465785149e-11, 1e-16)
-expect("msat", MSat.Average(), 875350.875, 1)
+expect("aex", Aex.Average(), 1.3038166900292136e-11, 1e-16)
+expect("msat", MSat.Average(), 807112.1875, 1)

@@ -87,6 +87,9 @@ func writeOVF2Data(out io.Writer, q *data.Slice, dataformat string) {
 }
 
 func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
+
+	//w.count(w.out.Write((*(*[1<<31 - 1]byte)(unsafe.Pointer(&list[0])))[0 : 4*len(list)])) // (shortcut)
+
 	data := array.Tensors()
 	size := array.Size()
 

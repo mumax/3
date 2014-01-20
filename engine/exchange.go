@@ -41,7 +41,7 @@ func AddExchangeField(dst *data.Slice) {
 		msat := Msat.GetRegion(0)
 		D := Dex.GetRegion(0)
 		A := Aex.GetRegion(0) / msat
-		cuda.AddDMI(dst, M.Buffer(), float32(D/msat), float32(D/msat), float32(D/msat), float32(A), M.Mesh()) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), float32(D/msat), float32(D/msat), 0, float32(A), M.Mesh()) // dmi+exchange
 	}
 }
 

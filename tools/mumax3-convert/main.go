@@ -31,10 +31,12 @@ import (
 	"flag"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"github.com/mumax/3/dump"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"log"
 	"os"
+	"path"
 	"runtime"
 	"strconv"
 	"strings"
@@ -96,11 +98,21 @@ func main() {
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		log.Println(fname)
+
 		var slice *data.Slice
 		var info data.Meta
 		var err error
 
-		slice, info, err = oommf.Read(fname)
+		switch path.Ext(fname) {
+		default:
+			log.Println("skipping unsupported type", path.Ext(fname))
+			continue
+		case ".ovf", ".omf":
+			slice, info, err = oommf.Read(fname)
+		case ".dump":
+			slice, info, err = dump.ReadFile(fname)
+		}
+
 		if err != nil {
 			log.Println(err)
 			continue
@@ -204,7 +216,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	}
 
 	if *flag_dump {
-		data.MustWriteFile(name+".dump", f, info)
+		dump.MustWriteFile(name+".dump", f, info)
 		haveOutput = true
 	}
 

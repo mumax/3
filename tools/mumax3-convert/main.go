@@ -1,5 +1,5 @@
 /*
-mumax3-convert converts mumax3 output files and .ovf files to various formats and images.
+mumax3-convert converts mumax3 output files to various formats and images.
 It also provides basic manipulations like data rescale etc.
 
 
@@ -9,18 +9,18 @@ Command-line flags must always preceed the input files:
 	mumax3-convert [flags] files
 For a overview of flags, run:
 	mumax3-convert -help
-Example: convert all .dump files to PNG:
-	mumax3-convert -png *.dump
+Example: convert all .ovf files to PNG:
+	mumax3-convert -png *.ovf
 Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
-	mumax3-convert -resize 32x32x1 -normalize -ovf binary file.dump
+	mumax3-convert -resize 32x32x1 -normalize -ovf binary file.ovf
 Example: convert all .ovf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
 	mumax3-convert -comp 0 -vtk binary -jpg *.ovf
-Example: convert .ovf files to .dump, so they can be used as input for mumax3 simulations:
-	mumax3-convert -dump *.ovf
+Example: convert legacy .dump files to .ovf:
+	mumax3-convert -ovf2 *.dump
 Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
-	mumax3-convert -xrange 50:100 -yrange :100 file.dump
+	mumax3-convert -xrange 50:100 -yrange :100 file.ovf
 Example: select the bottom layer
-	mumax3-convert -zrange :1 file.dump
+	mumax3-convert -zrange :1 file.ovf
 
 Output file names are automatically assigned.
 */
@@ -29,6 +29,7 @@ package main
 import (
 	"compress/gzip"
 	"flag"
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
 	"github.com/mumax/3/dump"
@@ -221,7 +222,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	}
 
 	if !haveOutput || *flag_show {
-		// TODO: header
+		fmt.Println(info)
 		util.Fprintf(os.Stdout, *flag_format, f.Tensors())
 		haveOutput = true
 	}

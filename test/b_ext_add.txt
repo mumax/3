@@ -47,6 +47,7 @@ save(B_ext)
 alpha = 3
 MaxErr = 1e-4
 RunWhile(MaxTorque > 1e-4)
+steps(1000)
 
 print(m.average())
 

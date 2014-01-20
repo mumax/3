@@ -14,6 +14,7 @@ for f in $scripts; do
 	echo ""
 done;)
 
+mumax3-convert -png testdata/*.ovf testdata/*.dump
 
 #	mumax3 -sync -f -http "" $f || exit 1;
 #	mumax3 -bx 16 -by 16 -bl 1024  -f -http "" $f || exit 1;

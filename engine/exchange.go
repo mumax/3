@@ -11,7 +11,7 @@ import (
 
 var (
 	Aex        ScalarParam // Exchange stiffness
-	Dex        VectorParam // DMI strength
+	Dex        ScalarParam // DMI strength
 	B_exch     vAdder      // exchange field (T) output handle
 	lex2       exchParam   // inter-cell exchange length squared * 1e18
 	E_exch     *GetScalar
@@ -20,7 +20,7 @@ var (
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength")
+	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", []derived{})
 	B_exch.init("B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
 	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
@@ -41,7 +41,7 @@ func AddExchangeField(dst *data.Slice) {
 		msat := Msat.GetRegion(0)
 		D := Dex.GetRegion(0)
 		A := Aex.GetRegion(0) / msat
-		cuda.AddDMI(dst, M.Buffer(), float32(D[X]/msat), float32(D[Y]/msat), float32(D[Z]/msat), float32(A), M.Mesh()) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), float32(D/msat), float32(D/msat), float32(D/msat), float32(A), M.Mesh()) // dmi+exchange
 	}
 }
 

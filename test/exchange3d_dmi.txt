@@ -10,8 +10,7 @@ msat  = 800e3
 aex   = 13e-12
 alpha = 3
 m     = vortex(1, 1)
-e := 1e-20
-Dex = vector(e, e, 0) // should have no physical effect, but calls different kernel.
+Dex  = 1e-20 // should have no physical effect, but calls different kernel.
 
 run(2e-9) 
 expect("mz", m.comp(2).average(), 0.02785073, 1e-5)

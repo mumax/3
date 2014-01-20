@@ -12,7 +12,7 @@ Aex   = 20e-12
 Ku1   = 5.9e5
 Msat  = 6e5
 AnisU = vector(0, 0, 1)
-Dex   = vector(1e-3, 1e-3, 0)
+Dex   = 1e-3
 
 // relax
 alpha = 3

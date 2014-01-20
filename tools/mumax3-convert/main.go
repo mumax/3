@@ -45,7 +45,7 @@ import (
 )
 
 var (
-	flag_comp      = flag.Int("comp", -1, "Select a component of vector data. 0=x, 1=y, ...")
+	flag_comp      = flag.String("comp", "", "Select a component of vector data. (0,1,2 or x,y,z)")
 	flag_show      = flag.Bool("show", false, "Human-readible output to stdout")
 	flag_format    = flag.String("f", "%v", "Printf format string")
 	flag_png       = flag.Bool("png", false, "PNG output")
@@ -236,12 +236,29 @@ func preprocess(f *data.Slice) {
 	if *flag_normpeak {
 		normpeak(f)
 	}
-	if *flag_comp != -1 {
-		*f = *f.Comp(*flag_comp)
+	if *flag_comp != "" {
+		*f = *f.Comp(parseComp(*flag_comp))
 	}
 	crop(f)
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
+	}
+}
+
+func parseComp(c string) int {
+	if i, err := strconv.Atoi(c); err != nil {
+		return i
+	}
+	switch c {
+	default:
+		log.Fatal("illegal component:", c, "(need x, y or z)")
+		panic(0)
+	case "x", "X":
+		return 0
+	case "y", "Y":
+		return 1
+	case "z", "Z":
+		return 2
 	}
 }
 

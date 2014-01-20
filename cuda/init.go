@@ -21,7 +21,7 @@ var (
 // Locks to an OS thread and initializes CUDA for that thread.
 func Init(gpu int) {
 	if cudaCtx != 0 {
-		panic("cuda already inited")
+		return // needed for tests
 	}
 
 	runtime.LockOSThread()

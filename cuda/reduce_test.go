@@ -2,18 +2,19 @@ package cuda
 
 import (
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"testing"
+	"unsafe"
 )
 
 // test input data
 var in1, in2, in3 *data.Slice
 
 func initTest() {
+	Init(0)
 	if in1 != nil {
 		return
 	}
-	LockThread()
-	Init(0, "auto", false)
 	{
 		inh1 := make([]float32, 1000)
 		for i := range inh1 {
@@ -32,7 +33,7 @@ func initTest() {
 
 func toGPU(list []float32) *data.Slice {
 	mesh := [3]int{1, 1, len(list)}
-	h := data.SliceFromList([][]float32{list}, mesh)
+	h := sliceFromList([][]float32{list}, mesh)
 	d := NewSlice(1, mesh)
 	data.Copy(d, h)
 	return d
@@ -81,72 +82,11 @@ func TestReduceMaxAbs(t *testing.T) {
 	}
 }
 
-//func TestReduceMaxDiff(t *testing.T) {
-//	LockCudaThread()
-//	N := 100001
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = -float32(i) / 100
-//	}
-//	input2 := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in2 := input2.Host()
-//	for i := range in2 {
-//		in2[i] = float32(i) / 100
-//	}
-//	result := MaxDiff(input.Device(), input2.Device())
-//	if result != 2000 {
-//		t.Error("got:", result)
-//	}
-//}
-//
-//func BenchmarkReduceSum(b *testing.B) {
-//	core.LOG = false
-//	b.StopTimer()
-//	LockCudaThread()
-//	const N = 32 * 1024 * 1024
-//	input := nimble.MakeSlice(N, nimble.GPUMemory)
-//	b.SetBytes(N * 4)
-//	b.StartTimer()
-//	for i := 0; i < b.N; i++ {
-//		Sum(input.Device())
-//	}
-//}
-//
-//func TestReduceMaxVecNorm(t *testing.T) {
-//	LockCudaThread()
-//	N := 1234
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = -float32(i) / 1000
-//	}
-//	x := input.Device()
-//	result := MaxVecNorm(x, x, x)
-//	want := math.Sqrt(3) * 1233. / 1000.
-//	if math.Abs(result-want) > 1e-7 {
-//		t.Error("got:", result, "want:", want)
-//	}
-//}
-//
-//func TestReduceMaxVecDiff(t *testing.T) {
-//	LockCudaThread()
-//	N := 1234
-//	input := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in := input.Host()
-//	for i := range in {
-//		in[i] = -float32(i) / 1000
-//	}
-//	x := input.Device()
-//	input2 := nimble.MakeSlice(N, nimble.UnifiedMemory)
-//	in2 := input2.Host()
-//	for i := range in2 {
-//		in2[i] = 0
-//	}
-//	y := input2.Device()
-//	result := MaxVecDiff(x, x, x, y, y, y)
-//	want := math.Sqrt(3) * 1233. / 1000.
-//	if math.Abs(result-want) > 1e-7 {
-//		t.Error("got:", result, "want:", want)
-//	}
-//}
+func sliceFromList(arr [][]float32, size [3]int) *data.Slice {
+	ptrs := make([]unsafe.Pointer, len(arr))
+	for i := range ptrs {
+		util.Argument(len(arr[i]) == prod(size))
+		ptrs[i] = unsafe.Pointer(&arr[i][0])
+	}
+	return data.SliceFromPtrs(size, data.CPUMemory, ptrs)
+}

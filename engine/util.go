@@ -67,8 +67,9 @@ func Fprintln(filename string, msg ...interface{}) {
 
 // Read a magnetization state from .dump file.
 func LoadFile(fname string) *data.Slice {
-	s, _ := data.MustReadFile(fname)
-	return s
+	panic("todo: loadfile")
+	//s, _ := data.MustReadFile(fname)
+	//return s
 }
 
 // Download a quantity to host,

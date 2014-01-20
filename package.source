@@ -1,18 +1,18 @@
 # source this file to bash to build for different cuda versions
 
 tmp='tmp/'
+rm -rf $tmp
 mkdir $tmp
-rm -rf $tmp/*
 
 src='github.com/mumax/3/mumax3'
-version='3.3-BETA1'
+version='3.4-BETA1'
 
-#go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
-#go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'
-#go build -o $tmp/mumax3/mumax3 'github.com/mumax/3/bootstrap'
+go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
+go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'
+go build -o $tmp/mumax3/mumax3-bootstrap 'github.com/mumax/3/bootstrap'
 
 
-for c in 4.2.9 5.0 5.5; do
+for c in 5.0 5.5; do
 	sudo rm -f /usr/local/cuda
 	echo ln -s /usr/local/cuda-$c /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
@@ -25,8 +25,8 @@ for c in 4.2.9 5.0 5.5; do
 	arch='cuda'$c
 	out=$tmp/mumax3/mumax3-$arch
 
-	echo go build $src -o $out
 	go build -v -o $out $src 
+	echo go build -v -o $out $src 
 	ldd $out
 
 	sudo rm -f /usr/local/cuda
@@ -38,9 +38,6 @@ for c in 4.2.9 5.0 5.5; do
 done
 
 (cd $tmp/mumax3 &&
-	mv libcufft.so.4.2.9 libcufft.so.4
-	mv libcurand.so.4.2.9 libcurand.so.4
-	mv libcudart.so.4.2.9 libcudart.so.4
 	rm libcudart.so.5.5
 )
 

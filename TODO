@@ -18,11 +18,7 @@ minor changes:
 bugs:
 -----
 
-remove dump output, hack mumax3-convert to accept dump002 properly, but deprecate
-
 mumax3-convert -o does not work
-
-energy density presumably not correct
 
 omf/ovf does not check if enough bytes are read
 

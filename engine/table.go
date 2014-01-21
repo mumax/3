@@ -38,7 +38,7 @@ func TableSave() {
 }
 
 func TableAutoSave(period float64) {
-	Table.autosave = autosave{period, Time, 0}
+	Table.autosave = autosave{period, Time, 0, nil}
 }
 
 func (t *DataTable) Add(output TableData) {

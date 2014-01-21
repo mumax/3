@@ -22,9 +22,9 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 	canvas.Start(S*w, S*h)
 
 	for slice := 0; slice < len(arr[0]); slice++ {
-		Mx := arr[2][slice]
-		My := arr[1][slice]
-		Mz := arr[0][slice]
+		Mx := arr[X][slice]
+		My := arr[Y][slice]
+		Mz := arr[Z][slice]
 
 		for i := 0; i < h; i++ {
 			y := S*i + S/2

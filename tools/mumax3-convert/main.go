@@ -64,7 +64,7 @@ var (
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
 	flag_normalize = flag.Bool("normalize", false, `Normalize vector data to unit length`)
 	flag_normpeak  = flag.Bool("normpeak", false, `Scale vector data, maximum to unit length`)
-	flag_resize    = flag.String("resize", "", "Resize. E.g.: 4x128x128")
+	flag_resize    = flag.String("resize", "", "Resize. E.g.: 128x128x4")
 	flag_cropx     = flag.String("xrange", "", "Crop x range min:max (both optional, max=exclusive)")
 	flag_cropy     = flag.String("yrange", "", "Crop y range min:max (both optional, max=exclusive)")
 	flag_cropz     = flag.String("zrange", "", "Crop z range min:max (both optional, max=exclusive)")

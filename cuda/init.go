@@ -1,3 +1,4 @@
+// Package cuda provides GPU interaction
 package cuda
 
 import (

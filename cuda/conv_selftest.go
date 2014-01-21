@@ -85,7 +85,7 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 		}
 	}
 
-	for sc := 0; sc < 3; sc++ { // source component // TODO: make inner?
+	for sc := 0; sc < 3; sc++ {
 
 		for sz := 0; sz < size[Z]; sz++ {
 			for sy := 0; sy < size[Y]; sy++ {

@@ -22,15 +22,11 @@ mumax3-convert -o does not work
 
 omf/ovf does not check if enough bytes are read
 
-JPEG output
-
 MFM 3D not OK
 
 need proper zhang-li boundary conditions
 
 reduce operations are non-reproducible, though OK within numerical precission.
-
-check output of all mumax3-convert formats
 
 script: compile selector?
 
@@ -38,14 +34,11 @@ upon resize auto refresh dispaly quits working
 
 setexlen not ok, also api, output
 
-replace TableData by averageable
 
 API:
 ----
 
 review getcell()
-
-q.average()
 
 mask.setv, getv
 

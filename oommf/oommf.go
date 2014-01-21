@@ -1,3 +1,4 @@
+// package oommf provides the OVF data format as used by OOMMF.
 package oommf
 
 import (

@@ -5,7 +5,9 @@ rm -rf $tmp
 mkdir $tmp
 
 src='github.com/mumax/3/mumax3'
-version='3.4-BETA1'
+version='3.4-BETA2'
+
+cp -r doc $tmp
 
 go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/tools/mumax3-convert'
 go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/tools/mumax3-plot'

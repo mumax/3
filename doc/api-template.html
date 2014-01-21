@@ -174,12 +174,12 @@ m.Comp(0)   // x-component
 m.Region(1) // magnetization in region 1 (0 elsewhere)
 </pre></code>
 
-{{range .FilterType "*engine.setter" "*engine.adder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions"}} {{template "entry" .}} {{end}}
+{{range .FilterType "*engine.sSetter" "*engine.vSetter" "*engine.sAdder" "*engine.vAdder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions" "engine.Quantity"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Scheduling output </h1>
 
-All input and output quantities (as described above) can be saved in a space-dependent way (".dump" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More coulumns can be added with <code>TableAdd()</code>.
+All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More coulumns can be added with <code>TableAdd()</code>.
 <pre><code>save(B_ext)
 
 tableadd(B_ext)
@@ -190,7 +190,7 @@ Optionally, the output/averaging can be done over a single region:
 tableadd(m.Region(1)) 
 </code></pre>
 
-{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave"}} {{template "entry" .}} {{end}}
+{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotformat" "autosnapshot" "filenameformat"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Running </h1>
 

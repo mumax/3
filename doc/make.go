@@ -77,7 +77,7 @@ func recordExamples(input string, num int) {
 }
 
 func (s *State) Img(fname string) string {
-	cmd("mumax3-convert", "-png", s.outfile()+"/"+fname+".dump")
+	cmd("mumax3-convert", "-png", s.outfile()+"/"+fname+".ovf")
 	pngfile := s.outfile() + "/" + fname + ".png"
 	return fmt.Sprintf(`
 <figure style="float:left">
@@ -101,8 +101,8 @@ func (s *State) Output() string {
 	check(err2)
 	sort.Strings(files)
 	for _, f := range files {
-		if path.Ext(f) == ".dump" {
-			out += s.Img(f[:len(f)-len(".dump")])
+		if path.Ext(f) == ".ovf" {
+			out += s.Img(f[:len(f)-len(".ovf")])
 		}
 	}
 	out += `<br style="clear:both"/> `

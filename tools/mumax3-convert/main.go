@@ -266,26 +266,27 @@ func parseComp(c string) int {
 
 func crop(f *data.Slice) {
 	N := f.Size()
-	x1, x2 := 0, N[2]
-	y1, y2 := 0, N[1]
-	z1, z2 := 0, N[0]
-	todo := false
+	// default ranges
+	x1, x2 := 0, N[X]
+	y1, y2 := 0, N[Y]
+	z1, z2 := 0, N[Z]
+	havework := false
 
 	if *flag_cropz != "" {
-		z1, z2 = parseRange(*flag_cropz, N[0])
-		todo = true
+		z1, z2 = parseRange(*flag_cropz, N[Z])
+		havework = true
 	}
 	if *flag_cropy != "" {
-		y1, y2 = parseRange(*flag_cropy, N[1])
-		todo = true
+		y1, y2 = parseRange(*flag_cropy, N[Y])
+		havework = true
 	}
 	if *flag_cropx != "" {
-		x1, x2 = parseRange(*flag_cropx, N[2])
-		todo = true
+		x1, x2 = parseRange(*flag_cropx, N[X])
+		havework = true
 	}
 
-	if todo {
-		*f = *data.Crop(f, z1, z2, y1, y2, x1, x2)
+	if havework {
+		*f = *data.Crop(f, x1, x2, y1, y2, z1, z2)
 	}
 }
 

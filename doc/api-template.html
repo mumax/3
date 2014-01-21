@@ -85,10 +85,8 @@ SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
 
 The mesh can be changed at any later time in the simulation. This will cause the magnetization to be stretched onto the new mesh if needed, and the geometry and regions to be re-calculated. After resize some cells which had zero magnetization may now fall inside the magnet geometry, they will be initialized to random magnetization.
 
-{{range .FilterName "setgridsize" "setcellsize"}} {{template "entry" .}} {{end}}
+{{range .FilterName "setgridsize" "setcellsize" "setpbc" "setmesh"}} {{template "entry" .}} {{end}}
 
-
-<hr/><h1> Periodic boundary conditions</h1>
 Optionally, periodic boundary conditions can be enabled, preferentially before setting the grid size.
 <pre><code>SetPBC(5, 0, 0)        // 5 extra images on left and right sides.
 SetGridSize(128, 64, 1)
@@ -96,7 +94,6 @@ SetCellSize(5e-9, 5e-9, 5e-9)
 </code></pre>
 Setting a nonzero PBC value in a direction enables wrap-around in that direction. The precise value passed determines how many repetitions are seen by the demag field. E.g., in the above example the demag field behaves as if 5 repetitions are present to the left and to the right side. Choosing a large number may cause long initialization time.
 
-{{range .FilterName "SetPBC"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Setting a geometry </h1>
@@ -219,6 +216,20 @@ FixDt = 1e-15
 {{range .FilterName "run" "steps" "runwhile"}} {{template "entry" .}} {{end}}
 {{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
 {{range .FilterName "SetSolver"}} {{template "entry" .}} {{end}}
+
+<hr/><h1> Moving simulation window </h1>
+
+Mumax<sup>3</sup> can automatically shift the magnetization so that the simulation "window" stays centered on a region of interest. Shifting is done to keep a freely chosen magnetization component nearly zero. E.g.
+
+<pre><code>ext_centerwall(0)
+ext_rmSurfaceCharge(0, -1, 1)
+TableAdd(TotalShift)
+</code></pre>
+
+will try to keep <code>mx</code> (component 0, counting from 0) close to zero. If desired, one can override which "new" magnetization is inserted from the sides by setting <code>ShiftMagL</code> and <code>ShiftMagR</code>, though the default behaviour is usually OK.
+
+
+{{range .FilterName "ext_centerwall" "ext_rmSurfaceCharge" "shift" "shiftgeom" "shiftm" "shiftregions" "shiftmagl" "shiftmagr" "totalshift"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Extensions </h1>
 

@@ -50,6 +50,7 @@ var (
 	flag_format    = flag.String("f", "%v", "Printf format string")
 	flag_png       = flag.Bool("png", false, "PNG output")
 	flag_jpeg      = flag.Bool("jpg", false, "JPEG output")
+	flag_gif       = flag.Bool("gif", false, "GIF output")
 	flag_svg       = flag.Bool("svg", false, "SVG output")
 	flag_svgz      = flag.Bool("svgz", false, "SVGZ output (compressed)")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
@@ -145,16 +146,17 @@ func process(f *data.Slice, info data.Meta, name string) {
 	haveOutput := false
 
 	if *flag_jpeg {
-		out := open(name + ".jpg")
-		defer out.Close()
-		dumpJPEG(out, f)
+		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max)
 		haveOutput = true
 	}
 
 	if *flag_png {
-		out := open(name + ".png")
-		defer out.Close()
-		dumpPNG(out, f)
+		draw.RenderFile(name+".png", f, *flag_min, *flag_max)
+		haveOutput = true
+	}
+
+	if *flag_gif {
+		draw.RenderFile(name+".gif", f, *flag_min, *flag_max)
 		haveOutput = true
 	}
 

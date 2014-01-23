@@ -3,7 +3,7 @@
 
   * The default output format is now ovf2 binary instead of dump. mumax3-convert (version 3.4!) can be used to convert between dump and several ovf formats (ovf1/ovf2, text/binary). Reason for the change is that the ovf2 implementation has become more efficient (due to internal data re-ordering), making dump obsolete. Also, the ovf format is well documented (see OOMMF manual), and many tools accept it (e.g. muview). dump support may be removed in the future.
 
-  * The exchange between different regions (materials) does not default to 0 anymore, but to the harmonic mean of exchange lengths in 
+  * The exchange between different regions (materials) is now set to the harmonic mean of the two materials. Inter-region exchange can be tuned by ScaleExchRegion(reg1, reg2, factor). 
 
   * It is now default behavior to clear a pre-existing output directory (-f flag is on by default). Run mumax3 -f=0 to get the old behavior (refuse to run with non-empty output directory).
 

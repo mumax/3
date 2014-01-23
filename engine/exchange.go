@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
 	"unsafe"
 )
 
@@ -13,7 +12,7 @@ var (
 	Aex        ScalarParam // Exchange stiffness
 	Dex        ScalarParam // DMI strength
 	B_exch     vAdder      // exchange field (T) output handle
-	lex2       exchParam   // inter-cell exchange length squared * 1e18
+	lex2       exchParam   // inter-cell exchange in 2e18 * Aex / Msat
 	E_exch     *GetScalar
 	Edens_exch sAdder
 )
@@ -25,7 +24,7 @@ func init() {
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
 	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
-	DeclFunc("SetExLen", OverrideExchangeLength, "Sets inter-material exchange length between two regions.")
+	DeclFunc("ScaleExchReg", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
 }
 
@@ -60,26 +59,26 @@ func GetExchangeEnergy() float64 {
 // between them should be, especially if they have different Msat. By specifying
 // the exchange length, it is up to the user to decide which Msat to use.
 // A negative length may be specified to obtain antiferromagnetic coupling.
-func OverrideExchangeLength(region1, region2 int, exlen float64) {
-	l2 := sign(exlen) * (exlen * exlen) * 1e18
-	lex2.override[symmidx(region1, region2)] = float32(l2)
-	lex2.gpu_ok = false
+func ScaleInterExchange(region1, region2 int, scale float64) {
+	lex2.scale[symmidx(region1, region2)] = float32(scale)
+	lex2.invalidate()
 }
 
 // stores interregion exchange stiffness
 type exchParam struct {
-	lut, override  [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
+	lut, scale     [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 }
 
-func (p *exchParam) invalidate() { p.cpu_ok = false }
-
-const no_override = math.MaxFloat32
+func (p *exchParam) invalidate() {
+	p.cpu_ok = false
+	p.gpu_ok = false
+}
 
 func (p *exchParam) init() {
-	for i := range p.override {
-		p.override[i] = no_override // dummy value means no override
+	for i := range p.scale {
+		p.scale[i] = 1
 	}
 }
 
@@ -102,13 +101,9 @@ func (p *exchParam) update() {
 		for i := 0; i < NREGION; i++ {
 			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
 			for j := 0; j <= i; j++ {
+				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
 				I := symmidx(i, j)
-				if p.override[I] == no_override {
-					lexj := 2e18 * safediv(aex[0][j], msat[0][j])
-					p.lut[I] = 2 / (1/lexi + 1/lexj)
-				} else {
-					p.lut[I] = p.override[I]
-				}
+				p.lut[I] = p.scale[I] * 2 / (1/lexi + 1/lexj)
 			}
 		}
 		p.gpu_ok = false
@@ -121,27 +116,10 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	// TODO: sync?
+	cuda.Sync()
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
+	cuda.Sync()
 	p.gpu_ok = true
-}
-
-func (p *exchParam) SetInterRegion(r1, r2 int, val float64) {
-	v := float32(val)
-	p.lut[symmidx(r1, r2)] = v
-
-	if r1 == r2 {
-		r := r1
-		for i := 0; i < NREGION; i++ {
-			if p.lut[symmidx(i, i)] == v {
-				p.lut[symmidx(r, i)] = v
-			} else {
-				p.lut[symmidx(r, i)] = 0 // TODO: harmnoic avg !!!
-			}
-		}
-	}
-
-	p.gpu_ok = false
 }
 
 // Index in symmetric matrix where only one half is stored.

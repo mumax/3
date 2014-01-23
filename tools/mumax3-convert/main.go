@@ -248,7 +248,7 @@ func preprocess(f *data.Slice) {
 }
 
 func parseComp(c string) int {
-	if i, err := strconv.Atoi(c); err != nil {
+	if i, err := strconv.Atoi(c); err == nil {
 		return i
 	}
 	switch c {

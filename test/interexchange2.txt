@@ -21,11 +21,10 @@
 	save(B_exch)
 	save(m)
 	run(10e-9) 
-	expectv("m", m.average(), vector(0.966962456703186, 0.1252903491258621, -1.4529632608173415e-08), 1e-6)
+	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
 
 // reversal
 	alpha = 0.02
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)
-	expectv("m", m.average(), vector( -0.9845125675201416,  0.12704907357692719,  0.04322132468223572), 1e-6)
-
+	expectv("m", m.average(), vector(-0.9845, 0.1268, 0.0432), 1e-3)

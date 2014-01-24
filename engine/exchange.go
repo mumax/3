@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	Aex        ScalarParam // Exchange stiffness
-	Dex        ScalarParam // DMI strength
-	B_exch     vAdder      // exchange field (T) output handle
-	lex2       exchParam   // inter-cell exchange in 2e18 * Aex / Msat
-	E_exch     *GetScalar  // Exchange energy
-	Edens_exch sAdder      // Exchange energy density
+	Aex          ScalarParam // Exchange stiffness
+	Dex          ScalarParam // DMI strength
+	B_exch       vAdder      // exchange field (T) output handle
+	lex2         exchParam   // inter-cell exchange in 2e18 * Aex / Msat
+	E_exch       *GetScalar  // Exchange energy
+	Edens_exch   sAdder      // Exchange energy density
+	ExchCoupling sSetter     // Average exchange coupling with neighbors. Useful to debug inter-region exchange
 )
 
 func init() {
@@ -29,6 +30,7 @@ func init() {
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
+	ExchCoupling.init("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 }
 
 // Adds the current exchange field to dst
@@ -45,6 +47,10 @@ func AddExchangeField(dst *data.Slice) {
 		A := Aex.GetRegion(0) / msat
 		cuda.AddDMI(dst, M.Buffer(), float32(D/msat), float32(D/msat), 0, float32(A), M.Mesh()) // dmi+exchange
 	}
+}
+
+func exchangeDecode(dst *data.Slice) {
+	cuda.ExchangeDecode(dst, lex2.Gpu(), regions.Gpu(), M.Mesh())
 }
 
 // Returns the current exchange energy in Joules.
@@ -96,7 +102,7 @@ func (p *exchParam) update() {
 
 		for i := 0; i < NREGION; i++ {
 			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
-			for j := 0; j <= i; j++ {
+			for j := i; j < NREGION; j++ {
 				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
 				I := symmidx(i, j)
 				p.lut[I] = p.scale[I] * 2 / (1/lexi + 1/lexj)

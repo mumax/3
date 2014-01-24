@@ -23,3 +23,14 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.M
 		unsafe.Pointer(Aex_red), regions.Ptr,
 		wx, wy, wz, N[X], N[Y], N[Z], pbc, cfg)
 }
+
+func ExchangeDecode(dst *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
+	c := mesh.CellSize()
+	wx := float32(1e-18 / (c[X] * c[X]))
+	wy := float32(1e-18 / (c[Y] * c[Y]))
+	wz := float32(1e-18 / (c[Z] * c[Z]))
+	N := mesh.Size()
+	pbc := mesh.PBC_code()
+	cfg := make3DConf(N)
+	k_exchangedecode_async(dst.DevPtr(0), unsafe.Pointer(Aex_red), regions.Ptr, wx, wy, wz, N[X], N[Y], N[Z], pbc, cfg)
+}

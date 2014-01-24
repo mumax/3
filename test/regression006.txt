@@ -21,11 +21,11 @@ Alpha = 0.02 // restore normal damping
 ext_centerwall(0)
 ext_makegrains(4e-8, 10, 0) 
 
-//for i :=0; i<10;i+=1{
-//        for j :=i+1; j<10;j+=1{
-//                ScaleExchReg(i, j, 0.5) 
-//        }
-//}
+for i :=0; i<10;i+=1{
+        for j :=i+1; j<10;j+=1{
+                ScaleExchReg(i, j, 0.5) 
+        }
+}
 
 // Run the simulation with current through the sample
 Pol =0.56

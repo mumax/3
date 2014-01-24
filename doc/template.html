@@ -267,19 +267,19 @@ Behind the screens, this sets Aex in <i>all</i> regions.
 {{.Example `
 N := 128
 setgridsize(N, N, 1)
-setcellsize(4e-9, 4e-9, 4e-9)
-d := 4e-9 * N  
+c := 4e-9
+setcellsize(c, c, c)
 
 // disk with different anisotropy in left and right half
-defregion(1, xrange(0, inf))
-defregion(2, xrange(-inf, 0))
-defregion(0, cylinder(d, d).inverse()) // everything outside is vacuum
+setgeom(circle(N*c))
+defregion(1, xrange(0, inf))  // left half
+defregion(2, xrange(-inf, 0)) // right half
 save(regions)
 
 Ku1.setregion(1, .1e6)
 anisU.setRegion(1, vector(1, 0, 0))
 
-Ku1.setregion(2, .1e6)
+Ku1.setregion(2, .2e6)
 anisU.setRegion(2, vector(0, 1, 0))
 
 save(Ku1)
@@ -342,11 +342,10 @@ Since we center on the domain wall we can not see that it is actually moving, bu
 
 {{.Example `
 // In this example we drive a vortex wall in Permalloy by spin-transfer torque.
-// We set up a post-step function that makes the simulation box "follow" the domain
-// wall. By removing surface charges at the left and right ends, we mimic an infintely
-// long wire.
+// The simulation box "follows" the domain wall.
+// By removing surface charges at the left and right ends, we mimic an infintely long wire.
 
-setgridsize(256, 32, 1)
+setgridsize(256, 64, 1)
 setcellsize(3e-9, 3e-9, 10e-9)
 
 Msat    = 860e3
@@ -354,32 +353,31 @@ Aex     = 13e-12
 Xi      = 0.1
 m       = twodomain(1,0,0,  0,1,0,  -1,0,0)
 
-notch := rect(20e-9, 20e-9).RotZ(45*pi/180).transl(0, 16*3e-9, 0).inverse()
-setGeom(notch.Repeat(200e-9, 32*3e-9, 0))
-
+notch := rect(15e-9, 15e-9).RotZ(45*pi/180).transl(0, 32*3e-9, 0).inverse()
+setGeom(notch.Repeat(200e-9, 64*3e-9, 0))
 
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
-ext_rmSurfaceCharge(0, 1, -1)
-
+BoundaryRegion := 0
+MagLeft  := 1
+MagRight := -1
+ext_rmSurfaceCharge(BoundaryRegion, MagLeft, MagRight)
 
 // Relax
 Alpha = 3    // high damping for fast relax
 RunWhile(MaxTorque > 1e-3)    // relax
 Alpha = 0.02 // restore normal damping
 
-// Set post-step function that centers simulation window on domain wall.
 ext_centerWall(0) // keep m[0] (= m_x) close to zero
 
 // Schedule output
-autosave(m, 100e-12)
+autosave(m, 50e-12)
 tableadd(ext_dwpos)   // domain wall position
-tableadd(ext_dwspeed) // domain wall speed
 tableautosave(10e-12)
 
 // Run the simulation with current through the sample
 pol = 0.56
-J   = vector(-8e12, 0, 0)
-Run(1e-9)
+J   = vector(-10e12, 0, 0)
+Run(0.5e-9)
 `}}
 
 {{.Output}}

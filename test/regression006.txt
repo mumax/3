@@ -23,7 +23,7 @@ ext_makegrains(4e-8, 10, 0)
 
 for i :=0; i<10;i+=1{
         for j :=i+1; j<10;j+=1{
-                ScaleExchReg(i, j, 0.5) 
+                ext_ScaleExchange(i, j, 0.5) 
         }
 }
 

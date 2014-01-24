@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"time"
 )
@@ -23,7 +22,7 @@ func init() {
 }
 
 var (
-	Solver     = NewSolver(Torque.Set, M.normalize, 1e-15, mag.Gamma0, HeunStep)
+	Solver     = NewSolver(Torque.Set, M.normalize, 1e-15, &GammaLL, HeunStep)
 	Time       float64             // time in seconds
 	pause      = true              // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step

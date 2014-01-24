@@ -18,6 +18,7 @@ var (
 	STTorque     vAdder     // Spin-transfer torque/γ0, in T
 	J            excitation // Polarized electrical current density
 	MaxTorque    *GetScalar
+	GammaLL      float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
 )
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 	LLTorque.init("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	Torque.init("torque", "T", "Total torque/γ0", SetTorque)
+	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
 }
 

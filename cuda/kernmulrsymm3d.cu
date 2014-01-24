@@ -51,22 +51,13 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
     float reMz = fftMz[e  ];
     float imMz = fftMz[e+1];
 
-    if (iy < Ny/2 + 1) {
-        Kxx = fftKxx[I];
-        Kyy = fftKyy[I];
-        Kzz = fftKzz[I];
-        Kyz = fftKyz[I];
-        Kxz = fftKxz[I];
-        Kxy = fftKxy[I];
-    } else {
-        int I2 = (iz*Ny + (Ny-iy))*Nx + ix;
-        Kxx =  fftKxx[I2];
-        Kyy =  fftKyy[I2];
-        Kzz =  fftKzz[I2];
-        Kyz = -fftKyz[I2]; // !
-        Kxz =  fftKxz[I2];
-        Kxy = -fftKxy[I2]; // !
-    }
+    // not using symmetry right now
+    Kxx = fftKxx[I];
+    Kyy = fftKyy[I];
+    Kzz = fftKzz[I];
+    Kyz = fftKyz[I];
+    Kxz = fftKxz[I];
+    Kxy = fftKxy[I];
 
     fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
     fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;

@@ -42,17 +42,11 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
     float reMy = fftMy[e  ];
     float imMy = fftMy[e+1];
 
+    // not using symmetry for now
     float Kyy, Kxx, Kxy;
-    if (iy < Ny/2 + 1) {
-        Kxx = fftKxx[I];
-        Kyy = fftKyy[I];
-        Kxy = fftKxy[I];
-    } else {
-        int I2 = (Ny-iy)*Nx + ix; // linear index for re-use of lower half
-        Kxx =  fftKxx[I2];
-        Kyy =  fftKyy[I2];
-        Kxy = -fftKxy[I2]; // !
-    }
+    Kxx = fftKxx[I];
+    Kyy = fftKyy[I];
+    Kxy = fftKxy[I];
 
     fftMx[e  ] = reMx * Kxx + reMy * Kxy;
     fftMx[e+1] = imMx * Kxx + imMy * Kxy;

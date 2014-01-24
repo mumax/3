@@ -8,20 +8,22 @@ import (
 
 // demag variables
 var (
-	Msat        ScalarParam
-	Bsat        derivedParam
-	M_full      vSetter
-	B_demag     vSetter
-	E_demag     *GetScalar
-	Edens_demag sAdder
-	EnableDemag = true                 // enable/disable demag field
-	conv_       *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	Msat          ScalarParam
+	Bsat          derivedParam
+	M_full        vSetter
+	B_demag       vSetter
+	E_demag       *GetScalar
+	Edens_demag   sAdder
+	EnableDemag   = true                 // enable/disable demag field
+	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	DemagAccuracy = 6.0
 )
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
 	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
+	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 	Edens_demag.init("Edens_demag", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_demag, -0.5))
@@ -63,14 +65,11 @@ func demagConv() *cuda.DemagConvolution {
 		defer LogOutput("kernel done")
 		GUI.SetBusy(true)
 		defer GUI.SetBusy(false)
-		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DEFAULT_KERNEL_ACC)
+		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy)
 		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
 	}
 	return conv_
 }
-
-// Default accuracy setting for demag kernel. TODO: variable?
-const DEFAULT_KERNEL_ACC = 6
 
 // Returns the current demag energy in Joules.
 func GetDemagEnergy() float64 {

@@ -402,15 +402,18 @@ setcellsize(c, c, d)
 setGeom(circle(N*c))
 
 // define grains with region number 0-255
-seed := 123
-ext_makegrains(40e-9, 255, seed)
+grainSize  := 40e-9  // m
+randomSeed := 1234567
+maxRegion  := 255
+ext_makegrains(grainSize, maxRegion, randomSeed)
 
 alpha = 3
 Kc1   = 1000
 Aex   = 13e-12
 Msat  = 860e3
 
-for i:=0; i<255; i++{
+// set random parameters per region
+for i:=0; i<maxRegion; i++{
 	// random cubic anisotropy direction
 	phi := rand() * 2 * pi
 	theta := rand() * pi
@@ -430,14 +433,20 @@ for i:=0; i<255; i++{
 	Kc1.SetRegion(i, K + randNorm() * 0.1 * K)
 }
 
-save(regions)
-save(Kc1)
-save(AnisC1)
-save(AnisC2)
+// reduce exchange coupling between grains by 10%
+for i:=0; i<maxRegion; i++{
+	for j:=i+i; j<maxRegion; j++{
+		ext_ScaleExchange(i, j, 0.9)
+	}
+}
 
 m = vortex(1, 1)
 run(.1e-9)
 
+save(regions)
+save(Kc1)
+save(AnisC1)
+save(AnisC2)
 save(m)
 `}}
 

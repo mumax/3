@@ -27,7 +27,7 @@ func init() {
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
 	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
-	DeclFunc("ScaleExchReg", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
+	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
 }
 

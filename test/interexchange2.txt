@@ -14,7 +14,7 @@
 
 	defregion(1, Yrange(0, inf))
 	defregion(2, Yrange(-inf, 0))
-	ScaleExchReg(1, 2, 1.0)   // make sure scale by one works
+	ext_ScaleExchange(1, 2, 1.0)   // make sure scale by one works
 
 // relax
 	alpha = 3

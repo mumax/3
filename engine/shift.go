@@ -21,7 +21,8 @@ func init() {
 	DeclVar("TotalShift", &TotalShift, "Amount by which the simulation has been shifted (m).")
 }
 
-func GetShiftPos() float64 { return TotalShift }
+// position of the window lab frame
+func GetShiftPos() float64 { return -TotalShift }
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {

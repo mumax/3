@@ -1,5 +1,8 @@
 package engine
 
+// Exchange interaction (Heisenberg + Dzyaloshinskii-Moriya)
+// See also cuda/exchange.cu and cuda/dmi.cu
+
 import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
@@ -13,8 +16,8 @@ var (
 	Dex        ScalarParam // DMI strength
 	B_exch     vAdder      // exchange field (T) output handle
 	lex2       exchParam   // inter-cell exchange in 2e18 * Aex / Msat
-	E_exch     *GetScalar
-	Edens_exch sAdder
+	E_exch     *GetScalar  // Exchange energy
+	Edens_exch sAdder      // Exchange energy density
 )
 
 func init() {
@@ -45,20 +48,12 @@ func AddExchangeField(dst *data.Slice) {
 }
 
 // Returns the current exchange energy in Joules.
-// Note: the energy is defined up to an arbitrary constant,
-// ground state energy is not necessarily zero or comparable
-// to other simulation programs.
 func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
 }
 
-// Defines the exchange coupling between different regions by specifying the
-// exchange length of the interaction between them.
-// 	lex := sqrt(2*Aex / Msat)
-// In case of different materials it is not always clear what the exchange
-// between them should be, especially if they have different Msat. By specifying
-// the exchange length, it is up to the user to decide which Msat to use.
-// A negative length may be specified to obtain antiferromagnetic coupling.
+// Scales the heisenberg exchange interaction between region1 and 2.
+// Scale = 1 means the harmonic mean over the regions of Aex/Msat.
 func ScaleInterExchange(region1, region2 int, scale float64) {
 	lex2.scale[symmidx(region1, region2)] = float32(scale)
 	lex2.invalidate()
@@ -66,11 +61,13 @@ func ScaleInterExchange(region1, region2 int, scale float64) {
 
 // stores interregion exchange stiffness
 type exchParam struct {
-	lut, scale     [NREGION * (NREGION + 1) / 2]float32 // cpu lookup-table
+	lut            [NREGION * (NREGION + 1) / 2]float32 // 2e18 * harmonic mean of Aex/Msat in regions (i,j)
+	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 }
 
+// to be called after Aex, Msat or scaling changed
 func (p *exchParam) invalidate() {
 	p.cpu_ok = false
 	p.gpu_ok = false
@@ -78,7 +75,7 @@ func (p *exchParam) invalidate() {
 
 func (p *exchParam) init() {
 	for i := range p.scale {
-		p.scale[i] = 1
+		p.scale[i] = 1 // default scaling
 	}
 }
 
@@ -97,7 +94,6 @@ func (p *exchParam) update() {
 		msat := Msat.cpuLUT()
 		aex := Aex.cpuLUT()
 
-		// todo: conditional
 		for i := 0; i < NREGION; i++ {
 			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
 			for j := 0; j <= i; j++ {
@@ -131,14 +127,3 @@ func symmidx(i, j int) int {
 		return j*(j+1)/2 + i
 	}
 }
-
-//func (p *exchParam) String() string {
-//	str := ""
-//	for j := 0; j < NREGION; j++ {
-//		for i := 0; i <= j; i++ {
-//			str += fmt.Sprint(p.lut[symmidx(i, j)], "\t")
-//		}
-//		str += "\n"
-//	}
-//	return str
-//}

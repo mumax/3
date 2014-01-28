@@ -20,6 +20,8 @@ bugs:
 
 mumax3-convert -o does not work
 
+mumax3-convert -svg mirrors along Y
+
 omf/ovf does not check if enough bytes are read
 
 MFM 3D not OK

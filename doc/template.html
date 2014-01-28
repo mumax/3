@@ -405,6 +405,8 @@ randomSeed := 1234567
 maxRegion  := 255
 ext_makegrains(grainSize, maxRegion, randomSeed)
 
+defregion(256, circle(N*c).inverse()) // region 256 is outside, not really needed
+
 alpha = 3
 Kc1   = 1000
 Aex   = 13e-12
@@ -433,7 +435,7 @@ for i:=0; i<maxRegion; i++{
 
 // reduce exchange coupling between grains by 10%
 for i:=0; i<maxRegion; i++{
-	for j:=i+i; j<maxRegion; j++{
+	for j:=i+1; j<maxRegion; j++{
 		ext_ScaleExchange(i, j, 0.9)
 	}
 }
@@ -446,6 +448,7 @@ save(Kc1)
 save(AnisC1)
 save(AnisC2)
 save(m)
+save(exchCoupling)
 `}}
 
 {{.Output}}

@@ -72,7 +72,6 @@ func Init() {
 	if *flag_memprof {
 		prof.InitMem(engine.OD)
 	}
-	defer prof.Cleanup()
 
 	fname := flag.Arg(0)
 	if fname == "" {

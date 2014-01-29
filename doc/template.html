@@ -453,6 +453,36 @@ save(exchCoupling)
 
 {{.Output}}
 
+
+<hr/><h2>RKKY</h2>
+
+{{.Example `
+N := 64
+c := 4e-9
+SetGridSize(N, N, 2)
+SetCellSize(c, c, c)
+
+Aex   = 13e-12
+Msat  = 1e6
+alpha = 0.2
+
+DefRegion(0, layers(0, 1)) // layers [0,1[ = just layer 0
+DefRegion(1, layers(1, 2)) // layers [1,2[ = just layer 1
+ext_ScaleExchange(0, 1, -0.2) // scale exchange between layers by -0.2
+
+m.setRegion(0, uniform(1, 0, 0))
+m.setRegion(1, uniform(0, 1, 0))
+
+tableAdd(m.Region(0))
+tableAdd(m.Region(1))
+
+tableAutoSave(1e-12)
+run(250e-12)
+
+`}}
+
+{{.Output}}
+
 </body>
 </html>
 

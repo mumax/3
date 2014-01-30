@@ -1,12 +1,8 @@
 #include <stdint.h>
 #include "stencil.h"
 #include "float3.h"
+#include "exchange.h"
 
-// indexing in symmetric matrix
-#define symidx(i, j) ( (j<=i)? ( (((i)*((i)+1)) /2 )+(j) )  :  ( (((j)*((j)+1)) /2 )+(i) ) )
-
-
-// m is normalized.
 // See exchange.go for more details.
 extern "C" __global__ void
 addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,

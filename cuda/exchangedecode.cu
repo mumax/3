@@ -1,11 +1,9 @@
 #include <stdint.h>
 #include "stencil.h"
 #include "float3.h"
+#include "exchange.h"
 
-// indexing in symmetric matrix
-#define symidx(i, j) ( (j<=i)? ( (((i)*((i)+1)) /2 )+(j) )  :  ( (((j)*((j)+1)) /2 )+(i) ) )
-
-
+// see exchange.go
 extern "C" __global__ void
 exchangedecode(float* __restrict__ dst, float* __restrict__ aLUT2d, uint8_t* __restrict__ regions,
                float wx, float wy, float wz, int Nx, int Ny, int Nz, uint8_t PBC) {

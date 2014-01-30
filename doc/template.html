@@ -457,27 +457,32 @@ save(exchCoupling)
 <hr/><h2>RKKY</h2>
 
 {{.Example `
-N := 64
-c := 4e-9
-SetGridSize(N, N, 2)
-SetCellSize(c, c, c)
+N := 10
+setgridsize(N, N, 2)
 
-Aex   = 13e-12
-Msat  = 1e6
-alpha = 0.2
+c := 1e-9
+setcellsize(c, c, c)
 
-DefRegion(0, layers(0, 1)) // layers [0,1[ = just layer 0
-DefRegion(1, layers(1, 2)) // layers [1,2[ = just layer 1
-ext_ScaleExchange(0, 1, -0.2) // scale exchange between layers by -0.2
+defRegion(0, layer(0))
+defRegion(1, layer(1))
+
+Msat = 1e6
+
+Aex  = 10e-12
+RKKY := -1e-3 // 1mJ/m2
+scale := (RKKY * c) / (2 * Aex.Average())
+ext_scaleExchange(0, 1, scale)
+
+tableAdd(E_total)
 
 m.setRegion(0, uniform(1, 0, 0))
-m.setRegion(1, uniform(0, 1, 0))
 
-tableAdd(m.Region(0))
-tableAdd(m.Region(1))
+for ang:=0; ang<360; ang++{
+	m.setRegion(1, uniform(cos(ang*pi/180), sin(ang*pi/180), 0))	
+	t = ang * 1e-9 // output "time" is really angle
+	tablesave()
+}
 
-tableAutoSave(1e-12)
-run(250e-12)
 
 `}}
 

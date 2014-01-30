@@ -60,6 +60,7 @@ func (w *World) LoadStdlib() {
 	w.Func("ldexp", math.Ldexp)
 	w.Func("isInf", math.IsInf)
 	w.Func("isNaN", math.IsNaN)
+	w.Func("norm", norm, "Standard normal distribution")
 	w.Func("heaviside", heaviside)
 	w.Func("sinc", sinc)
 	w.Func("randSeed", intseed, "Sets the random number seed")
@@ -89,6 +90,10 @@ func heaviside(x float64) float64 {
 	case x < 0:
 		return 0
 	}
+}
+
+func norm(x float64) float64 {
+	return (1 / math.Sqrt(2*math.Pi)) * math.Exp(-0.5*x*x)
 }
 
 func sinc(x float64) float64 {

@@ -20,6 +20,7 @@ func init() {
 	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
 	DeclFunc("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
+	DeclFunc("Layer", Layer, "Single layer (along z), by integer index starting from 0")
 	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 	DeclFunc("ImageShape", ImageShape, "Use black/white image as shape")
@@ -98,6 +99,10 @@ func Layers(a, b int) Shape {
 	z1 := Index2Coord(0, 0, a)[Z] - c/2
 	z2 := Index2Coord(0, 0, b)[Z] - c/2
 	return ZRange(z1, z2)
+}
+
+func Layer(index int) Shape {
+	return Layers(index, index+1)
 }
 
 // Single cell with given index

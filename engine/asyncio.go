@@ -6,10 +6,19 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
+	"io"
 	"os"
 	"path"
 	"strings"
 )
+
+func init() {
+	DeclVar("OutputFormat", &outputformat, "Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY")
+	DeclROnly("OVF1_BINARY", OVF1_BINARY, "OutputFormat = OVF1_BINARY sets binary OVF1 output")
+	DeclROnly("OVF2_BINARY", OVF2_BINARY, "OutputFormat = OVF2_BINARY sets binary OVF2 output")
+	DeclROnly("OVF1_TEXT", OVF1_TEXT, "OutputFormat = OVF1_TEXT sets text OVF1 output")
+	DeclROnly("OVF2_TEXT", OVF2_TEXT, "OutputFormat = OVF2_TEXT sets text OVF2 output")
+}
 
 // Save under given file name (transparant async I/O).
 func SaveAs(q Quantity, fname string) {
@@ -67,11 +76,37 @@ func runSaver() {
 		f, err := os.OpenFile(t.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
 		out := bufio.NewWriter(f)
-		oommf.WriteOVF2(out, t.output, "binary 4", t.info)
+		save(out, t.output, t.info)
 		out.Flush()
 		f.Close()
 	}
 	done <- true
+}
+
+var outputformat = OVF2_BINARY
+
+type OutputFormat int
+
+const (
+	OVF1_TEXT OutputFormat = iota + 1
+	OVF1_BINARY
+	OVF2_TEXT
+	OVF2_BINARY
+)
+
+func save(out io.Writer, s *data.Slice, info data.Meta) {
+	switch outputformat {
+	case OVF1_TEXT:
+		oommf.WriteOVF1(out, s, info, "text")
+	case OVF1_BINARY:
+		oommf.WriteOVF1(out, s, info, "binary 4")
+	case OVF2_TEXT:
+		oommf.WriteOVF2(out, s, info, "text")
+	case OVF2_BINARY:
+		oommf.WriteOVF2(out, s, info, "binary 4")
+	default:
+		panic("invalid output format")
+	}
 }
 
 // finalizer function called upon program exit.

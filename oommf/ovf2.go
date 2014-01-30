@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-func WriteOVF2(out io.Writer, q *data.Slice, dataformat string, meta data.Meta) {
+func WriteOVF2(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) {
 	writeOvf2Header(out, q, meta)
 	writeOVF2Data(out, q, dataformat)
 	hdr(out, "End", "Segment")

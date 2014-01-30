@@ -193,7 +193,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_ovf2 != "" {
 		out := open(name + ".ovf")
 		defer out.Close()
-		oommf.WriteOVF2(out, f, *flag_ovf2, info)
+		oommf.WriteOVF2(out, f, info, *flag_ovf2)
 		haveOutput = true
 	}
 

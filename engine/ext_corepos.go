@@ -1,6 +1,6 @@
 package engine
 
-var CorePos = NewGetVector("ext_corepos", "m", "Vortex core position", corePos)
+var CorePos = NewGetVector("ext_corepos", "m", "Vortex core position (x,y) + polarization (z)", corePos)
 
 func corePos() []float64 {
 	m, _ := M.Slice()
@@ -34,12 +34,11 @@ func corePos() []float64 {
 	pos[Y] = float64(maxY) + interpolate_maxpos(
 		max, -1, abs(mz[maxY-1][maxX]), 1, abs(mz[maxY+1][maxX])) -
 		float64(Ny)/2 + 0.5
-	pos[Z] = float64(maxZ) - float64(Nz)/2 + 0.5
 
 	c := Mesh().CellSize()
 	pos[X] *= c[X]
 	pos[Y] *= c[Y]
-	pos[Z] *= c[Z]
+	pos[Z] = float64(m_z[maxZ][maxY][maxX]) // 3rd coordinate is core polarization
 
 	pos[X] += GetShiftPos() // add simulation window shift
 	return pos

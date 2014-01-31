@@ -29,6 +29,10 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 		return &leq{comp{x, y}}
 	case token.GEQ:
 		return &geq{comp{x, y}}
+	case token.EQL:
+		return &eql{comp{x, y}}
+	case token.NEQ:
+		return &neq{comp{x, y}}
 	}
 }
 
@@ -57,8 +61,12 @@ type lss struct{ comp }
 type gtr struct{ comp }
 type leq struct{ comp }
 type geq struct{ comp }
+type eql struct{ comp }
+type neq struct{ comp }
 
 func (b *lss) Eval() interface{} { return b.x.Eval().(float64) < b.y.Eval().(float64) }
 func (b *gtr) Eval() interface{} { return b.x.Eval().(float64) > b.y.Eval().(float64) }
 func (b *leq) Eval() interface{} { return b.x.Eval().(float64) <= b.y.Eval().(float64) }
 func (b *geq) Eval() interface{} { return b.x.Eval().(float64) >= b.y.Eval().(float64) }
+func (b *eql) Eval() interface{} { return b.x.Eval().(float64) == b.y.Eval().(float64) }
+func (b *neq) Eval() interface{} { return b.x.Eval().(float64) != b.y.Eval().(float64) }

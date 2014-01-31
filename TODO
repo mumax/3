@@ -32,10 +32,6 @@ reduce operations are non-reproducible, though OK within numerical precission.
 
 script: compile selector?
 
-upon resize auto refresh dispaly quits working
-
-setexlen not ok, also api, output
-
 
 API:
 ----

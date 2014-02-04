@@ -83,19 +83,19 @@ func printf(f float64) float32 {
 // for lazy setmesh: set gridsize and cellsize in separate calls
 var (
 	gridsize []int
-	cellsize []float64
+	cellsize [3]float64
 	pbc      = []int{0, 0, 0}
 )
 
 func SetGridSize(Nx, Ny, Nz int) {
 	gridsize = []int{Nx, Ny, Nz}
-	if cellsize != nil {
+	if len(cellsize) != 0 {
 		SetMesh(Nx, Ny, Nz, cellsize[X], cellsize[Y], cellsize[Z], pbc[X], pbc[Y], pbc[Z])
 	}
 }
 
 func SetCellSize(cx, cy, cz float64) {
-	cellsize = []float64{cx, cy, cz}
+	cellsize = [3]float64{cx, cy, cz}
 	if gridsize != nil {
 		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cx, cy, cz, pbc[X], pbc[Y], pbc[Z])
 	}
@@ -103,7 +103,7 @@ func SetCellSize(cx, cy, cz float64) {
 
 func SetPBC(nx, ny, nz int) {
 	pbc = []int{nx, ny, nz}
-	if gridsize != nil && cellsize != nil {
+	if gridsize != nil && len(cellsize) != 0 {
 		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cellsize[X], cellsize[Y], cellsize[Z], pbc[X], pbc[Y], pbc[Z])
 	}
 }

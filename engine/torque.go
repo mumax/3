@@ -59,7 +59,7 @@ func AddSTTorque(dst *data.Slice) {
 	if rec {
 		defer cuda.Recycle(jspin)
 	}
-	// TODO: select, xi is not enough
+
 	cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
 		Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
 

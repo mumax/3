@@ -32,7 +32,7 @@ func SaveAs(q Quantity, fname string) {
 	if recylce {
 		defer cuda.Recycle(buffer)
 	}
-	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit()}
+	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
 	initQue()
 	saveQue <- saveTask{fname, assureCPU(buffer), info}
 }

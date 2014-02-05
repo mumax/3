@@ -48,8 +48,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	engine.GUI.PrepareServer() // needed even if not serving
-
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)
 	}
@@ -94,6 +92,7 @@ func runInteractive() {
 // Runs a script file.
 func runFileAndServe(fname string) {
 	suggestOD(util.NoExt(fname) + ".out")
+	engine.GUI.PrepareServer() // needed even if not serving it
 	var code *script.BlockStmt
 	var err2 error
 	if fname != "" {

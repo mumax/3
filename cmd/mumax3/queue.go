@@ -1,10 +1,13 @@
 package main
 
+// File que for distributing multiple input files over GPUs.
+
 import (
 	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"sync"
@@ -13,7 +16,8 @@ import (
 func RunQueue(files []string) {
 	s := NewStateTab(files)
 	s.PrintTo(os.Stdout)
-	runStateTab(s)
+	go s.ListenAndServe(*flag_port)
+	s.Run()
 }
 
 // StateTab holds the queue state (list of jobs + statuses).
@@ -73,7 +77,7 @@ func (s *StateTab) PrintTo(w io.Writer) {
 	}
 }
 
-func runStateTab(s *StateTab) {
+func (s *StateTab) Run() {
 	nGPU := cu.DeviceGetCount()
 	idle := initGPUs(nGPU)
 	for {
@@ -93,6 +97,15 @@ func runStateTab(s *StateTab) {
 	for i := 1; i < nGPU; i++ {
 		<-idle
 	}
+}
+
+func (s *StateTab) ListenAndServe(addr string) {
+	http.Handle("/", s)
+	go http.ListenAndServe(addr, nil)
+}
+
+func (s *StateTab) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.PrintTo(w)
 }
 
 func run(inFile string, gpu int, webAddr string) {
@@ -116,71 +129,3 @@ func initGPUs(nGpu int) chan int {
 	}
 	return idle
 }
-
-//func(o*Overlord)PushJob(f string){
-//	o.queued.Push(NewJob(f))
-//}
-//
-//type Queue struct {
-//	list *list.List
-//}
-//
-//func (q *Queue) Push(j Job) {
-//	q.l****
-//	if q.list == nil {
-//		q.list = list.New()
-//	}
-//	q.list.PushBack(j)
-//}
-//
-//func (q *Queue) Pop() Job {
-//	f := q.list.Front()
-//	if f == nil {
-//		return nil
-//	} else {
-//		return q.list.Remove(f).(Job)
-//	}
-//}
-//
-//type Job struct {
-//	inFile string
-//}
-//
-//func NewJob(inFile string) *Job {
-//	return &Job{inFile: inFile}
-//}
-//
-//type Provider struct {
-//	gpu int
-//}
-//
-//
-//
-//
-//func runQueue(files []string) {
-//	o := Overlord{rpc: make(chan func())}
-//	o.initProviders()
-//	o.GoServeHTTP()
-//	for _, f := range files {
-//		o.PushJob(f)
-//	}
-//	o.RunQueue()
-//}
-//
-//func(o*Overlord)RunQueue(){
-//	for j := o.queued.Pop(); j != nil; j = o.queued.Pop() {
-//		select{
-//		case p := <-o.idle:
-//		go func(j*Job){
-//			p.Run(j)
-//			o.finished.Push(j)
-//		}(j)
-//		case f := <- o.rpc:
-//			f()
-//		}
-//	}
-//}
-//
-//func Log(msg ...interface{}) {
-//	log.Println(msg...)
-//}

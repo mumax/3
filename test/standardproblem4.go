@@ -1,13 +1,14 @@
 package main
 
 import (
+	"github.com/mumax/3/cuda"
 	. "github.com/mumax/3/engine"
-	. "github.com/mumax/3/init"
 )
 
 func main() {
 
-	Init()
+	cuda.Init(0)
+	GUI.PrepareServer()
 	SetOD("standardproblem4.out", true)
 	defer Close()
 

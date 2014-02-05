@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	. "github.com/mumax/3/engine"
-	. "github.com/mumax/3/init"
 	"github.com/mumax/3/oommf"
 	"math"
 	"os"
@@ -13,7 +13,8 @@ const Mu0 = 4 * math.Pi * 1e-7
 
 func main() {
 
-	Init()
+	cuda.Init(0)
+	GUI.PrepareServer()
 	defer Close()
 
 	Nx := 512

@@ -163,25 +163,6 @@ func isHeaderEnd(str string) bool {
 	return strings.HasPrefix(str, "begin:data")
 }
 
-//// Safe way to get Desc values: panics when key not present
-//func (i *Info) DescGet(key string) interface{} {
-//	value, ok := i.Desc[key]
-//	if !ok {
-//		panic("Key not found in Desc: " + key)
-//	}
-//	return value
-//}
-
-// Safe way to get a float from Desc
-//func (i *Info) DescGetFloat32(key string) float32 {
-//	value := i.DescGet(key)
-//	fl, err := strconv.ParseFloat(value.(string), 32)
-//	if err != nil {
-//		panic("Could not parse " + key + " to float32: " + err.Error())
-//	}
-//	return float32(fl)
-//}
-
 const OVF_CONTROL_NUMBER_4 = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
 
 // read data block in text format, for OVF1 and OVF2
@@ -212,7 +193,7 @@ func writeOVFText(out io.Writer, tens *data.Slice) (err error) {
 	// internal in C-order == external in Fortran-order
 	for iz := 0; iz < gridsize[Z]; iz++ {
 		for iy := 0; iy < gridsize[Y]; iy++ {
-			for ix := 0; ix < gridsize[Z]; ix++ {
+			for ix := 0; ix < gridsize[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
 					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
 				}

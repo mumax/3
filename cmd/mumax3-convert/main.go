@@ -55,6 +55,7 @@ var (
 	flag_svgz      = flag.Bool("svgz", false, "SVGZ output (compressed)")
 	flag_gnuplot   = flag.Bool("gplot", false, "Gnuplot-compatible output")
 	flag_ovf1      = flag.String("ovf", "", `"text" or "binary" OVF1 output`)
+	flag_omf       = flag.String("omf", "", `"text" or "binary" OVF1 output`)
 	flag_ovf2      = flag.String("ovf2", "", `"text" or "binary" OVF2 output`)
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
@@ -109,7 +110,7 @@ func main() {
 		default:
 			log.Println("skipping unsupported type", path.Ext(fname))
 			continue
-		case ".ovf", ".omf":
+		case ".ovf", ".omf", ".ovf2":
 			slice, info, err = oommf.ReadFile(fname)
 		case ".dump":
 			slice, info, err = dump.ReadFile(fname)
@@ -187,6 +188,13 @@ func process(f *data.Slice, info data.Meta, name string) {
 		out := open(name + ".ovf")
 		defer out.Close()
 		oommf.WriteOVF1(out, f, info, *flag_ovf1)
+		haveOutput = true
+	}
+
+	if *flag_omf != "" {
+		out := open(name + ".omf")
+		defer out.Close()
+		oommf.WriteOVF1(out, f, info, *flag_omf)
 		haveOutput = true
 	}
 

@@ -22,15 +22,14 @@ func RunQueue(files []string) {
 
 // StateTab holds the queue state (list of jobs + statuses).
 // All operations are atomic.
-type StateTab struct {
+type stateTab struct {
 	lock sync.Mutex
-	jobs []Job
+	jobs []job
 	next int
 }
 
-// Job holds a copy of job info.
-// Modifying the fields has no effect.
-type Job struct {
+// Job info.
+type job struct {
 	inFile  string // input file to run
 	webAddr string // http address for gui of running process
 	uid     int
@@ -38,11 +37,11 @@ type Job struct {
 
 // NewStateTab constructs a queue for the given input files.
 // After construction, it is accessed atomically.
-func NewStateTab(inFiles []string) *StateTab {
-	s := new(StateTab)
-	s.jobs = make([]Job, len(inFiles))
+func NewStateTab(inFiles []string) *stateTab {
+	s := new(stateTab)
+	s.jobs = make([]job, len(inFiles))
 	for i, f := range inFiles {
-		s.jobs[i] = Job{inFile: f, uid: i}
+		s.jobs[i] = job{inFile: f, uid: i}
 	}
 	return s
 }
@@ -50,11 +49,11 @@ func NewStateTab(inFiles []string) *StateTab {
 // StartNext advances the next job and marks it running, setting its webAddr to indicate the GUI url.
 // A copy of the job info is returned, the original remains unmodified.
 // ok is false if there is no next job.
-func (s *StateTab) StartNext(webAddr string) (next Job, ok bool) {
+func (s *stateTab) StartNext(webAddr string) (next job, ok bool) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if s.next >= len(s.jobs) {
-		return Job{}, false
+		return job{}, false
 	}
 	s.jobs[s.next].webAddr = webAddr
 	jobCopy := s.jobs[s.next]
@@ -63,13 +62,13 @@ func (s *StateTab) StartNext(webAddr string) (next Job, ok bool) {
 }
 
 // Finish marks the job with j's uid as finished.
-func (s *StateTab) Finish(j Job) {
+func (s *stateTab) Finish(j job) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.jobs[j.uid].webAddr = ""
 }
 
-func (s *StateTab) PrintTo(w io.Writer) {
+func (s *stateTab) PrintTo(w io.Writer) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	for i, j := range s.jobs {
@@ -77,7 +76,39 @@ func (s *StateTab) PrintTo(w io.Writer) {
 	}
 }
 
-func (s *StateTab) Run() {
+func (s *stateTab) RenderHTML(w io.Writer) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	fmt.Fprintln(w, ` 
+<!DOCTYPE html> <html> <head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="refresh" content="1">
+
+	<style media="all" type="text/css">
+		body  { margin-left: 5%; margin-right:5%; font-family: sans-serif; font-size: 14px; }
+		img   { margin: 10px; }
+		table { border-collapse: collapse; }
+		tr:nth-child(even) { background-color: white; }
+		tr:nth-child(odd)  { background-color: white; }
+		td        { padding: 1px 5px; }
+		hr        { border-style: none; border-top: 1px solid #CCCCCC; }
+		a         { color: #375EAB; text-decoration: none; }
+		div       { margin-left: 20px; margin-top: 5px; margin-bottom: 20px; }
+		div#footer{ color:gray; font-size:14px; border:none; }
+		.ErrorBox { color: red; font-weight: bold; font-size: 1.5em; } 
+		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; }
+		textarea  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; color:gray; font-size: 1em; }
+	</style>
+	</head><body><pre>
+`)
+	for _, j := range s.jobs {
+		fmt.Fprintln(w, j.uid, j.inFile, j.webAddr)
+	}
+
+	fmt.Fprintln(w, `</pre></body></html>`)
+}
+
+func (s *stateTab) Run() {
 	nGPU := cu.DeviceGetCount()
 	idle := initGPUs(nGPU)
 	for {
@@ -99,13 +130,13 @@ func (s *StateTab) Run() {
 	}
 }
 
-func (s *StateTab) ListenAndServe(addr string) {
+func (s *stateTab) ListenAndServe(addr string) {
 	http.Handle("/", s)
 	go http.ListenAndServe(addr, nil)
 }
 
-func (s *StateTab) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.PrintTo(w)
+func (s *stateTab) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.RenderHTML(w)
 }
 
 func run(inFile string, gpu int, webAddr string) {

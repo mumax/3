@@ -32,18 +32,12 @@ var (
 )
 
 func main() {
-
 	flag.Parse()
-
 	log.SetPrefix("")
 	log.SetFlags(0)
 
 	if *Flag_version {
-		fmt.Print("    ", engine.UNAME, "\n")
-		fmt.Print("    ", cuda.GPUInfo, "\n")
-		fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
-		fmt.Print("    This is free software without any warranty. See license.txt", "\n")
-		fmt.Print("\n")
+		printVersion()
 	}
 
 	engine.GUI.PrepareServer()
@@ -155,3 +149,11 @@ func openbrowser(url string) {
 
 // list of browsers to try.
 var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "firefox", "ie", "iexplore"}
+
+func printVersion() {
+	fmt.Print("    ", engine.UNAME, "\n")
+	fmt.Print("    ", cuda.GPUInfo, "\n")
+	fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
+	fmt.Print("    This is free software without any warranty. See license.txt", "\n")
+	fmt.Print("\n")
+}

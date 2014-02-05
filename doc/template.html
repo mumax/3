@@ -490,6 +490,55 @@ for ang:=0; ang<360; ang++{
 {{.Output}}
 
 
+<hr/><h2>Slonczewski STT</h2>
+
+Example of a spin-torque MRAM stack consisting of a fixed layer, spacer and free layer. Only the free layer magnetization is explicitly modeled, so we use a 2D grid. The fixed layer polarization is set with <code>FixedLayer = ...</code>, which can be space-dependent. The spacer layer properties are modeled by setting the parameters <code>Lambda</code> and <code>EpsilonPrime</code>. Finally <code>Pol</code> sets the current polarization and <code>J</code> the current density, which should be along z in this case.
+
+Below we switch an MRAM bit.
+
+{{.Example `
+// geometry
+sizeX := 160e-9
+sizeY := 80e-9
+sizeZ := 5e-9
+
+Nx := 64
+Ny := 32
+ 
+setgridsize(Nx, Ny, 1)
+setcellsize(sizeX/Nx, sizeY/Ny, sizeZ)
+setGeom(ellipse(sizeX, sizeY))
+
+// set up free layer
+Msat  = 800e3
+Aex   = 13e-12
+alpha = 0.01
+m     = uniform(1, 0, 0)
+
+// set up spacer layer parameters
+lambda       = 1
+Pol          = 0.5669
+epsilonprime = 0
+
+// set up fixed layer polarization
+angle := 20
+px := cos(angle * pi/180)
+py := sin(angle * pi/180)
+fixedlayer = vector(px, py, 0)
+
+// send current
+Jtot := -0.008            // total current in A
+area := sizeX*sizeY*pi/4
+jc   := Jtot / area       // current density in A/m2
+J = vector(0, 0, jc)
+
+// schedule output & run
+autosave(m, 100e-12)
+tableautosave(10e-12)
+run(1e-9)
+`}}
+
+{{.Output}}
 
 
 <hr/><h2>Spinning hard disk</h2>
@@ -540,8 +589,7 @@ f := 0.5e9
 A := 1.5
 B_ext.add(mask, -A*sin(2*pi*f*t))
 
-autosave(m, 300e-12)
-autosave(B_ext, 600e-12)
+autosave(m, 600e-12)
 
 // Spin the hard disk
 ShiftMagR = vector(0, 0, 1) // new magnetization to enter

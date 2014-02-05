@@ -5,8 +5,7 @@ ln -sf $(pwd)/post-commit .git/hooks/post-commit
 
 (cd cuda && ./make.bash)     || exit 1
 (cd engine && ./make.bash)   || exit 1
-(cd mumax3 && go install -v) || exit 1
-(cd tools/mumax3-convert && go build && go install) || exit 1
+go install -v github.com/mumax/3/cmd/{mumax3,mumax3-convert,mumax3-plot,bootstrap} || exit 1
 (cd test && mumax3 -vet *.txt)                   || exit 1
 (cd doc && mumax3 -vet *.in)               || exit 1
 

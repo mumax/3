@@ -13,9 +13,8 @@ for f in *.cu; do
 		fi
 	done
 	if [[ $f -nt $g'_wrapper.go' ]]; then
-		astyle $f 
+		astyle $f || echo " "
 		./cuda2go $f || exit 1
 	fi
 done
 
-go fmt

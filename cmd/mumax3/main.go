@@ -28,8 +28,6 @@ func main() {
 		engine.SetOD(*Flag_od, *Flag_force)
 	}
 
-	engine.GUI.PrepareServer()
-
 	defer prof.Cleanup()
 	defer engine.Close()
 	RunFiles()

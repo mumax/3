@@ -2,7 +2,7 @@ package main
 
 import (
 	. "github.com/mumax/3/engine"
-	. "github.com/mumax/3/mainpkg"
+	. "github.com/mumax/3/init"
 )
 
 func main() {
@@ -27,19 +27,11 @@ func main() {
 	Solver.MaxErr = 1e-4
 	RunWhile(func() bool { return MaxTorque.Get() > 1e-4 })
 	Run(1e-9)
-	m_ := Average(&M)
-	Expect("mx", m_[0], 0.96696, 1e-3)
-	Expect("my", m_[1], 0.12528, 1e-3)
-	Expect("mz", m_[2], 0, 1e-3)
 
 	// reversal
 	Alpha.Set(0.02)
 
 	B_ext.Set(Vector(-24.6E-3, 4.3E-3, 0))
 	Run(1e-9)
-	m_ = Average(&M)
-	Expect("mx", m_[0], -0.9845, 1e-3)
-	Expect("my", m_[1], 0.1268, 1e-3)
-	Expect("mz", m_[2], 0.0432, 1e-3)
-
+	ExpectV("m", M.Average(), Vector(-0.9845, 0.1268, 0.0432), 1e-3)
 }

@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/mumax/3/data"
 	. "github.com/mumax/3/engine"
-	. "github.com/mumax/3/mainpkg"
+	. "github.com/mumax/3/init"
+	"github.com/mumax/3/oommf"
 	"math"
+	"os"
 )
 
 const Mu0 = 4 * math.Pi * 1e-7
@@ -47,5 +49,7 @@ func main() {
 		}
 	}
 
-	data.MustWriteFile("mask.dump", mask, data.Meta{})
+	f, _ := os.OpenFile("antenna.ovf", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	defer f.Close()
+	oommf.WriteOVF2(f, mask, data.Meta{}, "binary 4")
 }

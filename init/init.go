@@ -49,6 +49,8 @@ func Init() {
 		fmt.Print("\n")
 	}
 
+	engine.GUI.PrepareServer()
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	cuda.BlockSize = 512
 	cuda.TileX = 32

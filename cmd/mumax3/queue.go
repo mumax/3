@@ -7,15 +7,20 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sync"
 )
 
 var queued, finished Queue
 
 type Queue struct {
 	list *list.List
+	lock sync.Mutex
 }
 
 func (q *Queue) Push(j *Job) {
+	q.lock.Lock()
+	defer q.lock.Unlock()
+
 	if q.list == nil {
 		q.list = list.New()
 	}
@@ -23,6 +28,9 @@ func (q *Queue) Push(j *Job) {
 }
 
 func (q *Queue) Pop() *Job {
+	q.lock.Lock()
+	defer q.lock.Unlock()
+
 	f := q.list.Front()
 	if f == nil {
 		return nil
@@ -55,6 +63,7 @@ func (p *Provider) Run(j *Job, idle chan *Provider) {
 		Log(j, err)
 	}
 
+	finished.Push(j)
 	p.job = nil
 	idle <- p
 }

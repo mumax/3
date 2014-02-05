@@ -71,15 +71,15 @@ func main() {
 	case 1:
 		runFileAndServe(flag.Arg(0))
 	default:
-		runQueue(flag.Args())
+		RunQueue(flag.Args())
 	}
 }
 
 func runInteractive() {
 	fmt.Println("no input files: starting interactive session")
 	now := time.Now()
-	fname := fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.txt", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
-	suggestOD(util.NoExt(fname) + ".out")
+	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
+	suggestOD(outdir)
 	engine.Timeout = 365 * 24 * time.Hour // forever
 	// set up some sensible start configuration
 	engine.Eval(`SetGridSize(128, 64, 1)
@@ -93,7 +93,7 @@ func runInteractive() {
 
 // Runs a script file.
 func runFileAndServe(fname string) {
-
+	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
 	if fname != "" {

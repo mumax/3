@@ -46,6 +46,8 @@ check region defined?
 improvements:
 -------------
 
+Sanity check for Lambda, Epsilonprime; do not Nan on zero.
+
 cleanup LValue interface, M should not have to implement it.
 
 save self-defined variable.

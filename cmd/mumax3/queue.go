@@ -68,6 +68,52 @@ func (s *stateTab) Finish(j job) {
 	s.jobs[j.uid].webAddr = ""
 }
 
+// Runs all the jobs in stateTab.
+func (s *stateTab) Run() {
+	nGPU := cu.DeviceGetCount()
+	idle := initGPUs(nGPU)
+	for {
+		gpu := <-idle
+		addr := fmt.Sprint(":", 35368+gpu)
+		j, ok := s.StartNext(addr)
+		if !ok {
+			break
+		}
+		go func() {
+			run(j.inFile, gpu, j.webAddr)
+			s.Finish(j)
+			idle <- gpu
+		}()
+	}
+	// drain remaining tasks (one already done)
+	for i := 1; i < nGPU; i++ {
+		<-idle
+	}
+}
+
+func run(inFile string, gpu int, webAddr string) {
+	gpuFlag := fmt.Sprint("-gpu=", gpu)
+	httpFlag := fmt.Sprint("-http=", webAddr)
+	cmd := exec.Command(os.Args[0], gpuFlag, httpFlag, inFile)
+	log.Println(os.Args[0], gpuFlag, httpFlag, inFile)
+	err := cmd.Run()
+	if err != nil {
+		log.Println(inFile, err)
+	}
+}
+
+func initGPUs(nGpu int) chan int {
+	if nGpu == 0 {
+		log.Fatal("no GPUs available")
+		panic(0)
+	}
+	idle := make(chan int, nGpu)
+	for i := 0; i < nGpu; i++ {
+		idle <- i
+	}
+	return idle
+}
+
 func (s *stateTab) PrintTo(w io.Writer) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -108,28 +154,6 @@ func (s *stateTab) RenderHTML(w io.Writer) {
 	fmt.Fprintln(w, `</pre></body></html>`)
 }
 
-func (s *stateTab) Run() {
-	nGPU := cu.DeviceGetCount()
-	idle := initGPUs(nGPU)
-	for {
-		gpu := <-idle
-		addr := fmt.Sprint(":", 35368+gpu)
-		j, ok := s.StartNext(addr)
-		if !ok {
-			break
-		}
-		go func() {
-			run(j.inFile, gpu, j.webAddr)
-			s.Finish(j)
-			idle <- gpu
-		}()
-	}
-	// drain remaining tasks (one already done)
-	for i := 1; i < nGPU; i++ {
-		<-idle
-	}
-}
-
 func (s *stateTab) ListenAndServe(addr string) {
 	http.Handle("/", s)
 	go http.ListenAndServe(addr, nil)
@@ -137,26 +161,4 @@ func (s *stateTab) ListenAndServe(addr string) {
 
 func (s *stateTab) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.RenderHTML(w)
-}
-
-func run(inFile string, gpu int, webAddr string) {
-	gpuFlag := fmt.Sprint("-gpu=", gpu)
-	cmd := exec.Command(os.Args[0], gpuFlag, inFile)
-	log.Println("exec", os.Args[0], gpuFlag, inFile)
-	err := cmd.Run()
-	if err != nil {
-		log.Println(inFile, err)
-	}
-}
-
-func initGPUs(nGpu int) chan int {
-	if nGpu == 0 {
-		log.Fatal("no GPUs available")
-		panic(0)
-	}
-	idle := make(chan int, nGpu)
-	for i := 0; i < nGpu; i++ {
-		idle <- i
-	}
-	return idle
 }

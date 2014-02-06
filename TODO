@@ -38,8 +38,6 @@ API:
 
 review getcell()
 
-mask.setv, getv
-
 check region defined?
 
 

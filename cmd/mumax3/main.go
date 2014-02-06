@@ -41,10 +41,13 @@ func main() {
 		printVersion()
 	}
 
+	cuda.Init(*flag_gpu)
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	cuda.Synchronous = *flag_sync
+
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine
 	if *flag_test {
-		cuda.Init(*flag_gpu)
 		os.Exit(0)
 	}
 
@@ -124,9 +127,6 @@ func runFileAndServe(fname string) {
 // initialize the simulation engine and cuda
 // not needed when we manage a queue (slave processes will run actual sim)
 func initEngine() {
-	cuda.Init(*flag_gpu)
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	cuda.Synchronous = *flag_sync
 	engine.GUI.PrepareServer() // needed even if not serving it
 }
 

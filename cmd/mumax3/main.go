@@ -1,5 +1,7 @@
 package main
 
+// mumax3 main command
+
 import (
 	"flag"
 	"fmt"
@@ -39,12 +41,10 @@ func main() {
 		printVersion()
 	}
 
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	cuda.Init(*flag_gpu)
-	cuda.Synchronous = *flag_sync
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine
 	if *flag_test {
+		cuda.Init(*flag_gpu)
 		os.Exit(0)
 	}
 
@@ -54,14 +54,13 @@ func main() {
 	if *flag_memprof {
 		prof.InitMem(engine.OD)
 	}
+	defer prof.Cleanup()
+	defer engine.Close() // flushes pending output, if any
 
 	if *flag_vet {
 		vet()
 		return
 	}
-
-	defer prof.Cleanup()
-	defer engine.Close()
 
 	switch flag.NArg() {
 	case 0:
@@ -74,12 +73,16 @@ func main() {
 }
 
 func runInteractive() {
-	engine.GUI.PrepareServer() // needed even if not serving it
 	fmt.Println("no input files: starting interactive session")
+	initEngine()
+
+	// setup outut dir
 	now := time.Now()
 	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
 	suggestOD(outdir)
+
 	engine.Timeout = 365 * 24 * time.Hour // forever
+
 	// set up some sensible start configuration
 	engine.Eval(`SetGridSize(128, 64, 1)
 		SetCellSize(4e-9, 4e-9, 4e-9)
@@ -93,7 +96,7 @@ func runInteractive() {
 
 // Runs a script file.
 func runFileAndServe(fname string) {
-	engine.GUI.PrepareServer() // needed even if not serving it
+	initEngine()
 	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
@@ -118,6 +121,16 @@ func runFileAndServe(fname string) {
 	keepBrowserAlive() // if open, that is
 }
 
+// initialize the simulation engine and cuda
+// not needed when we manage a queue (slave processes will run actual sim)
+func initEngine() {
+	cuda.Init(*flag_gpu)
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	cuda.Synchronous = *flag_sync
+	engine.GUI.PrepareServer() // needed even if not serving it
+}
+
+// start Gui server and return
 func goServeGUI() {
 	hostname, _ := os.Hostname()
 	if hostname == "" {
@@ -135,6 +148,7 @@ func suggestOD(fname string) {
 	engine.SetOD(fname, *flag_force)
 }
 
+// print version to stdout
 func printVersion() {
 	fmt.Print("    ", engine.UNAME, "\n")
 	fmt.Print("    ", cuda.GPUInfo, "\n")

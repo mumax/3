@@ -91,7 +91,7 @@ func (g *guistate) PrepareServer() {
 func (g *guistate) prepareConsole() {
 	g.OnEvent("cli", func() {
 		cmd := g.StringValue("cli")
-		Inject <- func() { Eval(cmd) }
+		Inject <- func() { EvalGUI(cmd) }
 		g.Set("cli", "")
 	})
 }
@@ -112,10 +112,11 @@ func (g *guistate) prepareMesh() {
 	g.OnEvent("setmesh", func() {
 		g.Disable("setmesh", true)
 		Inject <- (func() {
-			Eval(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
+			EvalGUI(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
 				g.Value("nx"), g.Value("ny"), g.Value("nz"),
 				g.Value("cx"), g.Value("cy"), g.Value("cz"),
 				g.Value("px"), g.Value("py"), g.Value("pz")))
+
 		})
 		g.Set("setmeshwarn", "mesh up to date")
 	})
@@ -155,7 +156,7 @@ func (g *guistate) prepareGeom() {
 	})
 	g.OnEvent("setgeom", func() {
 		Inject <- (func() {
-			Eval(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
+			EvalGUI(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
 		})
 	})
 }
@@ -183,7 +184,7 @@ func (g *guistate) prepareM() {
 	})
 	g.OnEvent("setm", func() {
 		Inject <- (func() {
-			Eval(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
+			EvalGUI(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
 		})
 	})
 }
@@ -198,14 +199,14 @@ func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
 	g.OnEvent("break", func() { Inject <- func() { pause = true } })
-	g.OnEvent("mindt", func() { Inject <- func() { Eval("MinDt=" + g.StringValue("mindt")) } })
-	g.OnEvent("maxdt", func() { Inject <- func() { Eval("MaxDt=" + g.StringValue("maxdt")) } })
-	g.OnEvent("fixdt", func() { Inject <- func() { Eval("FixDt=" + g.StringValue("fixdt")) } })
-	g.OnEvent("maxerr", func() { Inject <- func() { Eval("MaxErr=" + g.StringValue("maxerr")) } })
+	g.OnEvent("mindt", func() { Inject <- func() { EvalGUI("MinDt=" + g.StringValue("mindt")) } })
+	g.OnEvent("maxdt", func() { Inject <- func() { EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
+	g.OnEvent("fixdt", func() { Inject <- func() { EvalGUI("FixDt=" + g.StringValue("fixdt")) } })
+	g.OnEvent("maxerr", func() { Inject <- func() { EvalGUI("MaxErr=" + g.StringValue("maxerr")) } })
 	g.OnEvent("solvertype", func() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
-			Eval("SetSolver(" + typ + ")")
+			EvalGUI("SetSolver(" + typ + ")")
 			if Solver.FixDt == 0 { // euler must have fixed time step
 				Solver.FixDt = 1e-15
 			}
@@ -234,19 +235,19 @@ func (g *guistate) prepareParam() {
 				cmd += ")"
 			}
 			Inject <- func() {
-				Eval(cmd)
+				EvalGUI(cmd)
 			}
 		})
 	}
 	g.OnEvent("Temp", func() {
 		Inject <- func() {
 			if solvertype != 1 {
-				Eval("SetSolver(1)")
+				EvalGUI("SetSolver(1)")
 			}
 			if Solver.FixDt == 0 {
-				Eval("FixDt = 1e-15")
+				EvalGUI("FixDt = 1e-15")
 			}
-			Eval("Temp = " + g.StringValue("Temp"))
+			EvalGUI("Temp = " + g.StringValue("Temp"))
 		}
 	})
 }
@@ -361,7 +362,7 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 				code += ", " + g.StringValue(args[i])
 			}
 			code += ")"
-			Eval(code)
+			EvalGUI(code)
 		}
 	}
 }
@@ -467,6 +468,12 @@ func (g *guistate) Busy() bool {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	return g.busy
+}
+
+// Eval code + update keepalive in case the code runs long
+func EvalGUI(code string) {
+	Eval(code)
+	updateKeepAlive()
 }
 
 func Eval(code string) {

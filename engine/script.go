@@ -2,7 +2,10 @@ package engine
 
 // declare functionality for interpreted input scripts
 
-import "github.com/mumax/3/script"
+import (
+	"github.com/mumax/3/script"
+	"reflect"
+)
 
 // holds the script state (variables etc)
 var World = script.NewWorld()
@@ -32,9 +35,16 @@ func DeclVar(name string, value interface{}, doc string) {
 
 // Add an LValue to the script world.
 // Assign to LValue invokes SetValue()
-func DeclLValue(name string, value script.LValue, doc string) {
-	World.LValue(name, value, doc)
+func DeclLValue(name string, value LValue, doc string) {
+	World.LValue(name, newLValueWrapper(value), doc)
 	GUI.Add(name, value)
+}
+
+// LValue is settable
+type LValue interface {
+	SetValue(interface{}) // assigns a new value
+	Eval() interface{}    // evaluate and return result (nil for void)
+	Type() reflect.Type   // type that can be assigned and will be returned by Eval
 }
 
 // evaluate code, exit on error (behavior for input files)
@@ -50,3 +60,24 @@ func EvalFile(code *script.BlockStmt) {
 //func EvalGUI(code*script.BlockStmt){
 //
 //}
+
+// wraps LValue and provides empty Child()
+type lValueWrapper struct {
+	LValue
+}
+
+func newLValueWrapper(lv LValue) script.LValue {
+	return &lValueWrapper{lv}
+}
+
+func (w *lValueWrapper) Child() []script.Expr { return nil }
+
+func (w *lValueWrapper) InputType() reflect.Type {
+	if i, ok := w.LValue.(interface {
+		InputType() reflect.Type
+	}); ok {
+		return i.InputType()
+	} else {
+		return w.Type()
+	}
+}

@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"reflect"
 )
@@ -18,12 +17,11 @@ type magnetization struct {
 	buffer_ *data.Slice
 }
 
-func (m *magnetization) Mesh() *data.Mesh     { return Mesh() }
-func (m *magnetization) NComp() int           { return 3 }
-func (m *magnetization) Name() string         { return "m" }
-func (m *magnetization) Unit() string         { return "" }
-func (m *magnetization) Buffer() *data.Slice  { return m.buffer_ } // todo: rename Gpu()?
-func (m *magnetization) Child() []script.Expr { return nil }
+func (m *magnetization) Mesh() *data.Mesh    { return Mesh() }
+func (m *magnetization) NComp() int          { return 3 }
+func (m *magnetization) Name() string        { return "m" }
+func (m *magnetization) Unit() string        { return "" }
+func (m *magnetization) Buffer() *data.Slice { return m.buffer_ } // todo: rename Gpu()?
 
 func (m *magnetization) Comp(c int) *comp        { return Comp(m, c) }
 func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }

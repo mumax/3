@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"github.com/mumax/3/script"
 	"reflect"
 )
 
@@ -21,7 +20,6 @@ func (p *numberParam) getRegion(int) []float64 { return []float64{float64(p.v)} 
 func (p *numberParam) Type() reflect.Type      { return reflect.TypeOf(float64(0)) }
 func (p *numberParam) IsUniform() bool         { return true }
 func (p *numberParam) Eval() interface{}       { return p.v }
-func (p *numberParam) Child() []script.Expr    { return nil }
 
 func (p *numberParam) SetValue(v interface{}) {
 	p.v = v.(float64)

@@ -33,6 +33,7 @@ func (e *excitation) AddTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {
 		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu())
 	}
+
 	for _, t := range e.extraTerms {
 		var mul float32 = 1
 		if t.mul != nil {
@@ -76,49 +77,13 @@ func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, mask})
 }
 
-func assureGPU(s *data.Slice) *data.Slice {
-	if s.GPUAccess() {
-		return s
-	} else {
-		return cuda.GPUCopy(s)
-	}
-}
+func (e *excitation) SetRegion(region int, f script.VectorFunction) { e.perRegion.SetRegion(region, f) }
+func (e *excitation) SetValue(v interface{})                        { e.perRegion.SetValue(v) }
+func (e *excitation) Set(v data.Vector)                             { e.perRegion.setRegions(0, NREGION, slice(v)) }
 
-// user script: has to be 3-vector
-func (e *excitation) SetRegion(region int, f script.VectorFunction) {
-	e.perRegion.SetRegion(region, f)
-}
-
-// for gui (nComp agnostic)
-func (e *excitation) setRegion(region int, value []float64) {
-	e.perRegion.setRegion(region, value)
-}
-
-// does not use extramask!
-func (e *excitation) getRegion(region int) []float64 {
-	return e.perRegion.getRegion(region)
-}
-
-func (e *excitation) average() []float64 {
-	return qAverageUniverse(e)
-}
-
-func (e *excitation) Average() data.Vector {
-	return unslice(qAverageUniverse(e))
-}
-
-func (e *excitation) IsUniform() bool {
-	return e.perRegion.IsUniform()
-}
-
-func (e *excitation) SetValue(v interface{}) {
-	e.perRegion.SetValue(v) // allows function of time
-}
-
-func (e *excitation) Set(v data.Vector) {
-	e.perRegion.setRegions(0, NREGION, slice(v))
-}
-
+func (e *excitation) average() []float64      { return qAverageUniverse(e) }
+func (e *excitation) Average() data.Vector    { return unslice(qAverageUniverse(e)) }
+func (e *excitation) IsUniform() bool         { return e.perRegion.IsUniform() }
 func (e *excitation) Name() string            { return e.name }
 func (e *excitation) Unit() string            { return e.perRegion.Unit() }
 func (e *excitation) NComp() int              { return e.perRegion.NComp() }
@@ -128,8 +93,6 @@ func (e *excitation) Comp(c int) *comp        { return Comp(e, c) }
 func (e *excitation) Eval() interface{}       { return e }
 func (e *excitation) Type() reflect.Type      { return reflect.TypeOf(new(excitation)) }
 func (e *excitation) InputType() reflect.Type { return script.VectorFunction_t }
-
-//func (e *excitation) Comp(c int) *comp        { return Comp(e, c) }
 
 func checkNaN(s *data.Slice, name string) {
 	h := s.Host()

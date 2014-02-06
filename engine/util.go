@@ -154,6 +154,14 @@ func unslice(v []float64) [3]float64 {
 	return [3]float64{v[0], v[1], v[2]}
 }
 
+func assureGPU(s *data.Slice) *data.Slice {
+	if s.GPUAccess() {
+		return s
+	} else {
+		return cuda.GPUCopy(s)
+	}
+}
+
 type caseIndep []string
 
 func (s *caseIndep) Len() int           { return len(*s) }

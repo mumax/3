@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
+	"log"
 	"math"
 	"reflect"
 )
@@ -52,6 +53,21 @@ func (e *excitation) Slice() (*data.Slice, bool) {
 	cuda.Zero(buf)
 	e.AddTo(buf)
 	return buf, true
+}
+
+// After resizing the mesh, the extra terms don't fit the grid anymore
+// and there is no reasonable way to resize them. So remove them and have
+// the user re-add them.
+func (e *excitation) RemoveExtraTerms() {
+	if len(e.extraTerms) == 0 {
+		return
+	}
+
+	log.Println("REMOVING EXTRA TERMS FROM", e.Name())
+	for _, m := range e.extraTerms {
+		m.mask.Free()
+	}
+	e.extraTerms = nil
 }
 
 // Add an extra mask*multiplier term to the excitation.

@@ -74,6 +74,7 @@ func main() {
 }
 
 func runInteractive() {
+	engine.GUI.PrepareServer() // needed even if not serving it
 	fmt.Println("no input files: starting interactive session")
 	now := time.Now()
 	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
@@ -86,13 +87,14 @@ func runInteractive() {
 		Aex = 10e-12
 		alpha = 1
 		m = RandomMag()`)
+	goServeGUI()
 	keepBrowserAlive()
 }
 
 // Runs a script file.
 func runFileAndServe(fname string) {
-	suggestOD(util.NoExt(fname) + ".out")
 	engine.GUI.PrepareServer() // needed even if not serving it
+	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
 	if fname != "" {
@@ -104,8 +106,7 @@ func runFileAndServe(fname string) {
 	}
 
 	// now the parser is not used anymore so it can handle web requests
-	fmt.Print("starting GUI at http://localhost", *flag_port, "\n")
-	go engine.Serve(*flag_port)
+	goServeGUI()
 
 	if *flag_interactive {
 		openbrowser("http://localhost" + *flag_port)
@@ -115,6 +116,15 @@ func runFileAndServe(fname string) {
 	engine.EvalFile(code)
 
 	keepBrowserAlive() // if open, that is
+}
+
+func goServeGUI() {
+	hostname, _ := os.Hostname()
+	if hostname == "" {
+		hostname = "localhost"
+	}
+	fmt.Print("starting GUI at http://", hostname, *flag_port, "\n")
+	go engine.Serve(*flag_port)
 }
 
 // set output directory unless flag_od overrides it

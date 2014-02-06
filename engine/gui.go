@@ -22,12 +22,14 @@ var (
 	keepaliveLock sync.Mutex
 )
 
+// Returns the time when updateKeepAlive was called.
 func KeepAlive() time.Time {
 	keepaliveLock.Lock()
 	defer keepaliveLock.Unlock()
 	return keepalive
 }
 
+// Called on each http request to signal browser is still open.
 func updateKeepAlive() {
 	keepaliveLock.Lock()
 	defer keepaliveLock.Unlock()
@@ -35,12 +37,12 @@ func updateKeepAlive() {
 }
 
 type guistate struct {
-	*gui.Page
-	Quants             map[string]Quantity
-	Params             map[string]Param
-	mutex              sync.Mutex
-	_eventCacheBreaker int // changed on any event to make sure display is updated
-	busy               bool
+	*gui.Page                              // GUI elements (buttons...)
+	Quants             map[string]Quantity // displayable quantities by name
+	Params             map[string]Param    // displayable parameters by name
+	mutex              sync.Mutex          // protects eventCacheBreaker and busy
+	_eventCacheBreaker int                 // changed on any event to make sure display is updated
+	busy               bool                // are we so busy we can't respond from run loop? (e.g. calc kernel)
 }
 
 // displayable quantity in GUI Parameters section
@@ -85,6 +87,7 @@ func (g *guistate) PrepareServer() {
 	g.prepareOnUpdate()
 }
 
+// see prepareServer
 func (g *guistate) prepareConsole() {
 	g.OnEvent("cli", func() {
 		cmd := g.StringValue("cli")
@@ -93,6 +96,7 @@ func (g *guistate) prepareConsole() {
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareMesh() {
 	g.Disable("setmesh", true) // button only enabled if pressing makes sense
 	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
@@ -117,6 +121,7 @@ func (g *guistate) prepareMesh() {
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareGeom() {
 	g.OnEvent("geomselect", func() {
 		ident := g.StringValue("geomselect")
@@ -155,6 +160,7 @@ func (g *guistate) prepareGeom() {
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareM() {
 	g.OnEvent("mselect", func() {
 		ident := g.StringValue("mselect")
@@ -187,6 +193,7 @@ var (
 	solvernames = map[int]string{1: "euler", 2: "heun"}
 )
 
+// see prepareServer
 func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
@@ -206,6 +213,7 @@ func (g *guistate) prepareSolver() {
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareParam() {
 	for _, p := range g.Params {
 		p := p
@@ -243,12 +251,14 @@ func (g *guistate) prepareParam() {
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareDisplay() {
 	g.OnEvent("renderQuant", func() {
 		g.Set("renderDoc", g.Doc(g.StringValue("renderQuant")))
 	})
 }
 
+// see prepareServer
 func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
@@ -317,6 +327,8 @@ func (g *guistate) prepareOnUpdate() {
 	})
 }
 
+// Returns documentation string for quantity name. E.g.:
+// 	"m" -> "Reduced magnetization"
 func (g *guistate) Doc(quant string) string {
 	doc, ok := World.Doc[quant]
 	if !ok {
@@ -325,9 +337,19 @@ func (g *guistate) Doc(quant string) string {
 	return doc
 }
 
+// Returns unit for quantity name. E.g.:
+// 	"Msat" -> "A/m"
+func (g *guistate) UnitOf(quant string) string {
+	p := g.Params[quant]
+	if p != nil {
+		return p.Unit()
+	} else {
+		return ""
+	}
+}
+
 // returns func that injects func that executes cmd(args),
 // with args ids for GUI element values.
-// TODO: rm
 func (g *guistate) cmd(cmd string, args ...string) func() {
 	return func() {
 		Inject <- func() {
@@ -343,24 +365,6 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 		}
 	}
 }
-
-// todo: rm?
-//func (g *guistate) floatValues(id ...string) []float64 {
-//	v := make([]float64, len(id))
-//	for i := range id {
-//		v[i] = g.FloatValue(id[i])
-//	}
-//	return v
-//}
-//
-//// todo: rm?
-//func (g *guistate) intValues(id ...string) []int {
-//	v := make([]int, len(id))
-//	for i := range id {
-//		v[i] = g.IntValue(id[i])
-//	}
-//	return v
-//}
 
 // renders page title for PrepareServer
 func (g *guistate) Title() string   { return util.NoExt(path.Base(OD)) }
@@ -415,15 +419,6 @@ func (g *guistate) Parameters() []string {
 	return params
 }
 
-func (g *guistate) UnitOf(quant string) string {
-	p := g.Params[quant]
-	if p != nil {
-		return p.Unit()
-	} else {
-		return ""
-	}
-}
-
 // renders a <div> that toggles visibility on click for PrepareServer
 func (g *guistate) Div(heading string) string {
 	id := fmt.Sprint("div_", rand.Int())
@@ -455,11 +450,10 @@ func init() {
 	util.Progress_ = GUI.Prog
 }
 
+// Prog advances the GUI progress bar to fraction a/total and displays message.
 func (g *guistate) Prog(a, total int, msg string) {
 	g.Set("progress", (a*100)/total)
 	g.Set("busy", msg)
-	//visible := (a!=total)
-	//g.Display("progress", visible)
 }
 
 func (g *guistate) disableControls(busy bool) {

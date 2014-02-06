@@ -49,12 +49,13 @@ func (geometry *geom) setGeom(s Shape) {
 	GUI.SetBusy(true)
 	defer GUI.SetBusy(false)
 
+	if s == nil {
+		s = universe
+	}
+
 	geometry.shape = s
 	if geometry.Gpu().IsNil() {
 		geometry.buffer = cuda.NewSlice(1, geometry.Mesh().Size())
-	}
-	if s == nil {
-		s = universe
 	}
 
 	host := data.NewSlice(1, geometry.Gpu().Size())
@@ -116,7 +117,7 @@ func (geometry *geom) setGeom(s Shape) {
 
 func (g *geom) shift(dx int) {
 	// empty mask, nothing to do
-	if g.buffer.IsNil() {
+	if g == nil || g.buffer.IsNil() {
 		return
 	}
 

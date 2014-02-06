@@ -121,7 +121,9 @@ func runFileAndServe(fname string) {
 	// start executing the tree, possibly injecting commands from web gui
 	engine.EvalFile(code)
 
-	keepBrowserAlive() // if open, that is
+	if *flag_interactive {
+		keepBrowserAlive() // if open, that is
+	}
 }
 
 // initialize the simulation engine and cuda

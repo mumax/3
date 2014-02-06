@@ -54,7 +54,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		regions.resize()
 		geometry.buffer.Free()
 		geometry.buffer = data.NilSlice(1, Mesh().Size())
-		geometry.setGeom(geometry.shape) // uses global mesh
+		geometry.setGeom(geometry.shape)
 	}
 
 	//Log("SetMesh", &globalmesh_)

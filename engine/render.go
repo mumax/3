@@ -9,7 +9,6 @@ import (
 	"image"
 	"image/jpeg"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -30,19 +29,11 @@ func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ren.mutex.Lock()
 	defer ren.mutex.Unlock()
 
-	url := r.URL.Path[len("/render/"):]
-	words := strings.Split(url, "/")
-	quant := words[0]
 	comp := GUI.StringValue("renderComp")
-	if len(words) > 1 {
-		comp = words[1]
-	}
-	if quant == "" {
-		quant = GUI.StringValue("renderQuant")
-	}
+	quant := GUI.StringValue("renderQuant")
 	q, ok := GUI.Quants[quant]
 	if !ok {
-		err := "render: unknown quantity: " + url
+		err := "render: unknown quantity: " + quant
 		util.Log(err)
 		http.Error(w, err, http.StatusNotFound)
 		return
@@ -106,16 +97,16 @@ func (ren *render) download(quant Quantity, comp string) {
 	})
 }
 
-func (ren *render) getQuant(quant Quantity, comp string, time int) {
-	if time > 0 {
-		ren.download(quant, comp)
-	} else {
-
-	}
+func (ren *render) getQuant(quant Quantity, comp string) {
+	//if time > 0 {
+	ren.download(quant, comp)
+	//	} else {
+	//
+	//	}
 }
 
 func (ren *render) render(quant Quantity, comp string) {
-	ren.getQuant(quant, comp, GUI.IntValue("renderTime")) // downloads or reads from disk
+	ren.getQuant(quant, comp)
 	// imgBuf always has 3 components, we may need just one...
 	d := ren.imgBuf
 	if comp != "" && quant.NComp() > 1 { // ... if one has been selected by gui

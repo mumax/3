@@ -96,6 +96,7 @@ func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 func (e *excitation) SetRegion(region int, f script.VectorFunction) { e.perRegion.SetRegion(region, f) }
 func (e *excitation) SetValue(v interface{})                        { e.perRegion.SetValue(v) }
 func (e *excitation) Set(v data.Vector)                             { e.perRegion.setRegions(0, NREGION, slice(v)) }
+func (e *excitation) getRegion(region int) []float64                { return e.perRegion.getRegion(region) } // for gui
 
 func (e *excitation) average() []float64      { return qAverageUniverse(e) }
 func (e *excitation) Average() data.Vector    { return unslice(qAverageUniverse(e)) }

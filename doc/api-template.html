@@ -107,12 +107,15 @@ Optionally a magnet Shape other than the full simulation box can be specified. O
 
 
 <hr/><h1> Defining regions </h1>
-Optionally, up to 256 regions can be defined. Each cell is associated with exactly one region and is assigned assigned to region 0 by default. Each region can have its own material parameters. E.g.:
+Optionally, up to 256 regions can be defined. Each cell is associated with exactly one region, so <em>regions can not overlap</em>. Each cell is assigned region 0 by default. It's a good idea to output <code>regions</code> to verify whether each cell is assigned to the intended region. Each region can have its own material parameters, and we can output averages over each region. E.g.:
 <pre><code>DefRegion(1, circle(1e-6))
 DefRegion(0, circle(1e-6).Inverse()) // redundant
+save(regions)
+Msat.SetRegion(1, 800e6)
+tableAdd(m.Region(1))    // add average m over region 1 to table
 </code></pre>
 
-{{range .FilterName "DefRegion" "DefRegionCell"}} {{template "entry" .}} {{end}}
+{{range .FilterName "DefRegion" "DefRegionCell" "regions"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Initial magnetization </h1>
@@ -187,7 +190,7 @@ Optionally, the output/averaging can be done over a single region:
 tableadd(m.Region(1)) 
 </code></pre>
 
-{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotformat" "autosnapshot" "filenameformat"}} {{template "entry" .}} {{end}}
+{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotformat" "autosnapshot" "filenameformat" "outputformat" "ovf1_text" "ovf1_binary" "ovf2_text" "ovf2_binary"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Running </h1>
 

@@ -141,6 +141,8 @@ func readHeader(in io.Reader) *Info {
 	} else {
 		info.Format = "text"
 	}
+	// TODO: total time according to OOMMF convention, other params
+	//info.TotalTime = atoi/(info.Desc["Time (s)"]
 	return info
 }
 

@@ -22,6 +22,7 @@ type render struct {
 	img           *image.NRGBA
 	saveCountLock sync.Mutex
 	saveCount     map[Quantity]int
+	prevSaveCount int // previous max slider value of time
 }
 
 const maxScale = 32
@@ -118,14 +119,20 @@ func (ren *render) getSaveCount(q Quantity) int {
 	return ren.saveCount[q]
 }
 
+// TODO: have browser cache the images
 func (ren *render) getQuant(quant Quantity, comp string) {
-	// TODO: it would be nice if the displayed time would not advance while saving and slider is to the right
-	saveCount := ren.getSaveCount(quant)
-	GUI.Attr("renderTime", "min", -saveCount) // negative time is the past
 	rTime := GUI.IntValue("renderTime")
-	saveNum := saveCount + rTime
-	fmt.Println("saveCount:", saveCount, "renderTime", rTime, "saveNum:", saveNum)
-	if saveNum == saveCount { // live view
+	saveCount := ren.getSaveCount(quant)
+	GUI.Attr("renderTime", "max", saveCount)
+
+	// if we were "live" (extreme right), keep right
+	if rTime == ren.prevSaveCount {
+		rTime = saveCount
+		GUI.Set("renderTime", rTime)
+	}
+	ren.prevSaveCount = saveCount
+
+	if rTime == saveCount { // live view
 		ren.download(quant, comp)
 		GUI.Set("renderTimeLabel", Time)
 	} else {
@@ -134,7 +141,7 @@ func (ren *render) getQuant(quant Quantity, comp string) {
 				LogOutput(err)
 			}
 		}()
-		slice, info, err := oommf.ReadFile(autoFname(quant.Name(), saveNum))
+		slice, info, err := oommf.ReadFile(autoFname(quant.Name(), rTime))
 		if err != nil {
 			LogOutput(err)
 			return

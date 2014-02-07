@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"sync/atomic"
 )
 
 func RunQueue(files []string) {
@@ -18,6 +19,7 @@ func RunQueue(files []string) {
 	s.PrintTo(os.Stdout)
 	go s.ListenAndServe(*flag_port)
 	s.Run()
+	os.Exit(int(exitStatus))
 }
 
 // StateTab holds the queue state (list of jobs + statuses).
@@ -91,6 +93,13 @@ func (s *stateTab) Run() {
 	}
 }
 
+type atom int32
+
+func (a *atom) set(v int) { atomic.StoreInt32((*int32)(a), int32(v)) }
+func (a *atom) get() int  { return int(atomic.LoadInt32((*int32)(a))) }
+
+var exitStatus atom = 0
+
 func run(inFile string, gpu int, webAddr string) {
 	gpuFlag := fmt.Sprint("-gpu=", gpu)
 	httpFlag := fmt.Sprint("-http=", webAddr)
@@ -99,6 +108,7 @@ func run(inFile string, gpu int, webAddr string) {
 	err := cmd.Run()
 	if err != nil {
 		log.Println(inFile, err)
+		exitStatus.set(1)
 	}
 }
 

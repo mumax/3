@@ -15,10 +15,12 @@ import (
 var renderer = render{img: new(image.NRGBA)}
 
 type render struct {
-	mutex      sync.Mutex
-	rescaleBuf *data.Slice // GPU
-	imgBuf     *data.Slice // CPU
-	img        *image.NRGBA
+	mutex         sync.Mutex
+	rescaleBuf    *data.Slice // GPU
+	imgBuf        *data.Slice // CPU
+	img           *image.NRGBA
+	saveCountLock sync.Mutex
+	saveCount     map[Quantity]int
 }
 
 const maxScale = 32
@@ -97,12 +99,33 @@ func (ren *render) download(quant Quantity, comp string) {
 	})
 }
 
+func (ren *render) registerSaveCount(q Quantity, autonum int) {
+	ren.saveCountLock.Lock()
+	defer ren.saveCountLock.Unlock()
+	if ren.saveCount == nil {
+		ren.saveCount = make(map[Quantity]int)
+	}
+	ren.saveCount[q] = autonum
+}
+
+func (ren *render) getSaveCount(q Quantity) int {
+	ren.saveCountLock.Lock()
+	defer ren.saveCountLock.Unlock()
+	if ren.saveCount == nil {
+		return 0
+	}
+	return ren.saveCount[q]
+}
+
 func (ren *render) getQuant(quant Quantity, comp string) {
-	//if time > 0 {
-	ren.download(quant, comp)
-	//	} else {
-	//
-	//	}
+	saveCount := ren.getSaveCount(quant)
+	GUI.Attr("renderTime", "min", -saveCount)  // negative time is the past
+	saveNum := -GUI.IntValue("renderTime") - 1 // -1 is live, >= 0 is the autosave number
+	if saveNum < 0 {                           // live view
+		ren.download(quant, comp)
+	} else {
+
+	}
 }
 
 func (ren *render) render(quant Quantity, comp string) {

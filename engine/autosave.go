@@ -60,6 +60,7 @@ func Save(q Quantity) {
 	fname := fmt.Sprintf(OD+FilenameFormat+".ovf", q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
+	renderer.registerSaveCount(q, autonum[q]) // let renderer know how many times it was saved, to set back-in-time slider
 }
 
 var SnapshotFormat = "jpg"

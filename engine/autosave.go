@@ -57,10 +57,14 @@ var FilenameFormat = "%s%06d"
 
 // Save once, with auto file name
 func Save(q Quantity) {
-	fname := fmt.Sprintf(OD+FilenameFormat+".ovf", q.Name(), autonum[q])
+	fname := autoFname(q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 	renderer.registerSaveCount(q, autonum[q]) // let renderer know how many times it was saved, to set back-in-time slider
+}
+
+func autoFname(name string, num int) string {
+	return fmt.Sprintf(OD+FilenameFormat+".ovf", name, num)
 }
 
 var SnapshotFormat = "jpg"

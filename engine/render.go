@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
@@ -66,6 +67,7 @@ func (ren *render) render(quant Quantity, comp string) {
 			renderLayer = 0
 			GUI.Set("renderLayer", renderLayer)
 		}
+		GUI.Set("renderLayerLabel", fmt.Sprint(renderLayer, "/", Mesh().Size()[Z]))
 		if quant.NComp() == 1 {
 			comp = ""
 			GUI.Set("renderComp", "")
@@ -73,6 +75,7 @@ func (ren *render) render(quant Quantity, comp string) {
 
 		// scale the size
 		renderScale := maxScale - GUI.IntValue("renderScale")
+		GUI.Set("renderScaleLabel", fmt.Sprint("1/", renderScale))
 		for i := range size {
 			size[i] /= renderScale
 			if size[i] == 0 {

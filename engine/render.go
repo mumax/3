@@ -46,14 +46,13 @@ func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		util.Log(err)
 		http.Error(w, err, http.StatusNotFound)
 		return
-	} else {
-		ren.render(q, comp)
-		jpeg.Encode(w, ren.img, &jpeg.Options{Quality: 100})
 	}
+	ren.render(q, comp)
+	jpeg.Encode(w, ren.img, &jpeg.Options{Quality: 100})
 }
 
-func (ren *render) render(quant Quantity, comp string) {
-	// rescale and download
+// rescale and download quantity, save in rescaleBuf
+func (ren *render) download(quant Quantity, comp string) {
 	InjectAndWait(func() {
 		size := quant.Mesh().Size()
 
@@ -72,7 +71,6 @@ func (ren *render) render(quant Quantity, comp string) {
 			comp = ""
 			GUI.Set("renderComp", "")
 		}
-
 		// scale the size
 		renderScale := maxScale - GUI.IntValue("renderScale")
 		GUI.Set("renderScaleLabel", fmt.Sprint("1/", renderScale))
@@ -88,7 +86,6 @@ func (ren *render) render(quant Quantity, comp string) {
 		if ren.imgBuf.Size() != size {
 			ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
 		}
-
 		buf, r := quant.Slice()
 		if r {
 			defer cuda.Recycle(buf)
@@ -97,19 +94,28 @@ func (ren *render) render(quant Quantity, comp string) {
 			ren.imgBuf = Download(quant) // fallback (no zoom)
 			return
 		}
-
 		// make sure buffers are there (in CUDA context)
 		if ren.rescaleBuf.Size() != size {
 			ren.rescaleBuf.Free()
 			ren.rescaleBuf = cuda.NewSlice(1, size)
 		}
-
 		for c := 0; c < quant.NComp(); c++ {
 			cuda.Resize(ren.rescaleBuf, buf.Comp(c), renderLayer)
 			data.Copy(ren.imgBuf.Comp(c), ren.rescaleBuf)
 		}
 	})
+}
 
+func (ren *render) getQuant(quant Quantity, comp string, time int) {
+	if time > 0 {
+		ren.download(quant, comp)
+	} else {
+
+	}
+}
+
+func (ren *render) render(quant Quantity, comp string) {
+	ren.getQuant(quant, comp, GUI.IntValue("renderTime")) // downloads or reads from disk
 	// imgBuf always has 3 components, we may need just one...
 	d := ren.imgBuf
 	if comp != "" && quant.NComp() > 1 { // ... if one has been selected by gui

@@ -177,9 +177,9 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 <p> 
 	Quantity: {{.Data.QuantNames | .SelectArray "renderQuant" "m"}} {{.Select "renderComp" "" "" "x" "y" "z"}} {{.Span "renderDoc" "" "style=\"color:gray\""}} <br/>
 	<table>
-		<tr title="Scroll through previously saved data"> <td> Time:  {{.Range "renderTime" -1000 1 1}} </td><td> {{.Span "renderTimeLabel" "live"}}  </td></tr>
-		<tr title="Slice through z layers">               <td> Slice: {{.Range "renderLayer" 0 0 0 }}   </td><td> {{.Span "renderLayerLabel" "0"}}    </td></tr>
-		<tr title="Zoom out large images">                <td> Scale: {{.Range "renderScale" 0 31 31}}  </td><td> {{.Span "renderScaleLabel" "1/1"}}  </td></tr>
+		<tr title="Scroll through previously saved data"> <td> Time:  {{.Range "renderTime"  1 1 1 }}  </td><td> {{.Span "renderTimeLabel" "live"}}  </td></tr>
+		<tr title="Slice through z layers">               <td> Slice: {{.Range "renderLayer" 0 0 0 }}  </td><td> {{.Span "renderLayerLabel" "0"}}    </td></tr>
+		<tr title="Zoom out large images">                <td> Scale: {{.Range "renderScale" 0 31 31}} </td><td> {{.Span "renderScaleLabel" "1/1"}}  </td></tr>
 	</table>
 </p>
 

@@ -457,6 +457,8 @@ save(exchCoupling)
 
 <hr/><h2>RKKY</h2>
 
+Scaling the exchange coupling between regions can be used to obtain antiferromagnetic coupling like the RKKY interaction. In that case we only model the magnetic layers and do not explicitly add a spacer layer (which is negligibly thin). We scale the exchange coupling to get the desired RKKY strength: <code>scale = (RKKY * cellsize_z) / (2 * Aex)</code>.
+
 {{.Example `
 N := 10
 setgridsize(N, N, 2)
@@ -542,6 +544,8 @@ run(1e-9)
 
 
 <hr/><h2>Spinning hard disk</h2>
+
+Using the <code>Shift</code> function, we can shift the system (magnetization, regions and geometry) by a given number of cells. Here we use this feature to simulate a moving hard disk platter. A time-dependent gaussian field profile mimics the write field.
 
 {{.Example `
 Nx := 512

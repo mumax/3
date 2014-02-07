@@ -4,7 +4,7 @@ tmp='tmp/'
 rm -rf $tmp
 mkdir $tmp
 
-src='github.com/mumax/3/mumax3'
+src='github.com/mumax/3/cmd/mumax3'
 version='3.4-BETA2'
 
 cp -r doc $tmp

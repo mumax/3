@@ -11,7 +11,7 @@ import (
 func init() {
 	DeclFunc("Uniform", Uniform, "Uniform magnetization in given direction")
 	DeclFunc("Vortex", Vortex, "Vortex magnetization with given circulation and core polarization")
-	DeclFunc("Anitvortex", AntiVortex, "Antivortex magnetization with given circulation and core polarization")
+	DeclFunc("Antivortex", AntiVortex, "Antivortex magnetization with given circulation and core polarization")
 	DeclFunc("Skyrmion", Skyrmion, "Skyrmion magnetization with given charge and core polarization")
 	DeclFunc("Antiskyrmion", Antiskyrmion, "Antiskyrmion magnetization with given charge and core polarization")
 	DeclFunc("TwoDomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")

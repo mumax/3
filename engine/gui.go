@@ -71,6 +71,7 @@ func (g *guistate) Add(name string, value interface{}) {
 // initialize the GUI Page (pre-renders template) and register http handlers
 func (g *guistate) PrepareServer() {
 	g.Page = gui.NewPage(templText, g)
+	util.Progress_ = gui_.Prog
 	g.OnAnyEvent(func() {
 		g.incCacheBreaker()
 	})
@@ -288,11 +289,12 @@ func (g *guistate) prepareOnUpdate() {
 		g.UpdateKeepAlive() // keep track of when browser was last seen alive
 
 		if GetBusy() { // busy, e.g., calculating kernel, run loop will not accept commands.
-			//g.disableControls(true)
+			g.disableControls(true)
 			return
-		} //else {
-		//		g.disableControls(false) // make sure everything is enabled
-		//	}
+		} else {
+			g.disableControls(false) // make sure everything is enabled
+			g.Prog(0, 100, "")       // reset progress bar in case we forgot
+		}
 
 		Inject <- (func() { // sends to run loop to be executed in between time steps
 			g.Set("console", hist)
@@ -468,10 +470,6 @@ func (g *guistate) Div(heading string) string {
 func Serve(port string) {
 	gui_.PrepareServer()
 	util.LogErr(http.ListenAndServe(port, nil))
-}
-
-func init() {
-	//util.Progress_ = gui_.Prog // TODO
 }
 
 // Prog advances the GUI progress bar to fraction a/total and displays message.

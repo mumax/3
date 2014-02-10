@@ -4,7 +4,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"time"
 )
 
 func init() {
@@ -72,7 +71,6 @@ func (geometry *geom) setGeom(s Shape) {
 
 			progress++
 			util.Progress(progress, progmax, "Initializing geometry")
-			time.Sleep(1 * time.Millisecond)
 
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)

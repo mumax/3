@@ -14,7 +14,7 @@ const Mu0 = 4 * math.Pi * 1e-7
 func main() {
 
 	cuda.Init(0)
-	GUI.PrepareServer()
+	PrepareServer()
 	defer Close()
 
 	Nx := 512

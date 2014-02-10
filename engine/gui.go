@@ -314,7 +314,6 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("wx", printf(w[X]*1e9))
 			g.Set("wy", printf(w[Y]*1e9))
 			g.Set("wz", printf(w[Z]*1e9))
-			g.Attr("renderLayer", "max", N[Z]-1)
 
 			// solver
 			g.Set("nsteps", Solver.NSteps)
@@ -338,6 +337,7 @@ func (g *guistate) prepareOnUpdate() {
 			quant := g.StringValue("renderQuant")
 			comp := g.StringValue("renderComp")
 			cachebreaker := "?" + g.StringValue("nsteps") + "_" + fmt.Sprint(g.cacheBreaker())
+			g.Attr("renderLayer", "max", N[Z]-1)
 			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// plot

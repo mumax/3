@@ -60,7 +60,6 @@ func Save(q Quantity) {
 	fname := autoFname(q.Name(), autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
-	renderer.registerSaveCount(q, autonum[q]) // let renderer know how many times it was saved, to set back-in-time slider
 }
 
 func autoFname(name string, num int) string {

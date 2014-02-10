@@ -5,7 +5,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
-	"github.com/mumax/3/oommf"
+	//"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"image"
 	"image/jpeg"
@@ -102,55 +102,55 @@ func (ren *render) download(quant Quantity, comp string) {
 	})
 }
 
-func (ren *render) registerSaveCount(q Quantity, autonum int) {
-	ren.saveCountLock.Lock()
-	defer ren.saveCountLock.Unlock()
-	if ren.saveCount == nil {
-		ren.saveCount = make(map[Quantity]int)
-	}
-	ren.saveCount[q] = autonum
-}
-
-func (ren *render) getSaveCount(q Quantity) int {
-	ren.saveCountLock.Lock()
-	defer ren.saveCountLock.Unlock()
-	if ren.saveCount == nil {
-		return 0
-	}
-	return ren.saveCount[q]
-}
+//func (ren *render) registerSaveCount(q Quantity, autonum int) {
+//	ren.saveCountLock.Lock()
+//	defer ren.saveCountLock.Unlock()
+//	if ren.saveCount == nil {
+//		ren.saveCount = make(map[Quantity]int)
+//	}
+//	ren.saveCount[q] = autonum
+//}
+//
+//func (ren *render) getSaveCount(q Quantity) int {
+//	ren.saveCountLock.Lock()
+//	defer ren.saveCountLock.Unlock()
+//	if ren.saveCount == nil {
+//		return 0
+//	}
+//	return ren.saveCount[q]
+//}
 
 // TODO: have browser cache the images
 func (ren *render) getQuant(quant Quantity, comp string) {
-	rTime := GUI.IntValue("renderTime")
-	saveCount := ren.getSaveCount(quant)
-	GUI.Attr("renderTime", "max", saveCount)
+	//rTime := GUI.IntValue("renderTime")
+	//saveCount := ren.getSaveCount(quant)
+	//GUI.Attr("renderTime", "max", saveCount)
 
-	// if we were "live" (extreme right), keep right
-	if rTime == ren.prevSaveCount {
-		rTime = saveCount
-		GUI.Set("renderTime", rTime)
-	}
-	ren.prevSaveCount = saveCount
+	//// if we were "live" (extreme right), keep right
+	//if rTime == ren.prevSaveCount {
+	//	rTime = saveCount
+	//	GUI.Set("renderTime", rTime)
+	//}
+	//ren.prevSaveCount = saveCount
 
-	if rTime == saveCount { // live view
-		ren.download(quant, comp)
-		GUI.Set("renderTimeLabel", Time)
-	} else {
-		defer func() {
-			if err := recover(); err != nil {
-				LogOutput(err)
-			}
-		}()
-		slice, info, err := oommf.ReadFile(autoFname(quant.Name(), rTime))
-		if err != nil {
-			LogOutput(err)
-			return
-		}
-		println("read ovf")
-		GUI.Set("renderTimeLabel", info.Time)
-		ren.imgBuf = slice
-	}
+	//if rTime == saveCount { // live view
+	ren.download(quant, comp)
+	GUI.Set("renderTimeLabel", Time)
+	//} else {
+	//	defer func() {
+	//		if err := recover(); err != nil {
+	//			LogOutput(err)
+	//		}
+	//	}()
+	//	slice, info, err := oommf.ReadFile(autoFname(quant.Name(), rTime))
+	//	if err != nil {
+	//		LogOutput(err)
+	//		return
+	//	}
+	//	println("read ovf")
+	//	GUI.Set("renderTimeLabel", info.Time)
+	//	ren.imgBuf = slice
+	//}
 }
 
 func (ren *render) render(quant Quantity, comp string) {

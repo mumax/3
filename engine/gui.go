@@ -17,25 +17,7 @@ import (
 )
 
 // global GUI state stores what is currently shown in the web page.
-var (
-	gui_          = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
-	keepalive     = time.Now()
-	keepaliveLock sync.Mutex
-)
-
-// Returns the time when updateKeepAlive was called.
-func KeepAlive() time.Time {
-	keepaliveLock.Lock()
-	defer keepaliveLock.Unlock()
-	return keepalive
-}
-
-// Called on each http request to signal browser is still open.
-func updateKeepAlive() {
-	keepaliveLock.Lock()
-	defer keepaliveLock.Unlock()
-	keepalive = time.Now()
-}
+var gui_ = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 
 type guistate struct {
 	*gui.Page                              // GUI elements (buttons...)
@@ -43,7 +25,26 @@ type guistate struct {
 	Params             map[string]Param    // displayable parameters by name
 	mutex              sync.Mutex          // protects eventCacheBreaker and busy
 	_eventCacheBreaker int                 // changed on any event to make sure display is updated
+	keepalive          time.Time
 	oneReq             sync.Mutex
+}
+
+// Returns the time when updateKeepAlive was called.
+func (g *guistate) KeepAlive() time.Time {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	return g.keepalive
+}
+
+// Called on each http request to signal browser is still open.
+func (g *guistate) UpdateKeepAlive() {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	g.keepalive = time.Now()
+}
+
+func KeepAlive() time.Time {
+	return gui_.KeepAlive()
 }
 
 // displayable quantity in GUI Parameters section
@@ -114,7 +115,7 @@ func (g *guistate) mux(w http.ResponseWriter, r *http.Request) {
 func (g *guistate) prepareConsole() {
 	g.OnEvent("cli", func() {
 		cmd := g.StringValue("cli")
-		Inject <- func() { EvalGUI(cmd) }
+		Inject <- func() { g.EvalGUI(cmd) }
 		g.Set("cli", "")
 	})
 }
@@ -135,7 +136,7 @@ func (g *guistate) prepareMesh() {
 	g.OnEvent("setmesh", func() {
 		g.Disable("setmesh", true)
 		Inject <- (func() {
-			EvalGUI(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
+			g.EvalGUI(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
 				g.Value("nx"), g.Value("ny"), g.Value("nz"),
 				g.Value("cx"), g.Value("cy"), g.Value("cz"),
 				g.Value("px"), g.Value("py"), g.Value("pz")))
@@ -179,7 +180,7 @@ func (g *guistate) prepareGeom() {
 	})
 	g.OnEvent("setgeom", func() {
 		Inject <- (func() {
-			EvalGUI(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
+			g.EvalGUI(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
 		})
 	})
 }
@@ -207,7 +208,7 @@ func (g *guistate) prepareM() {
 	})
 	g.OnEvent("setm", func() {
 		Inject <- (func() {
-			EvalGUI(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
+			g.EvalGUI(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
 		})
 	})
 }
@@ -222,14 +223,14 @@ func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
 	g.OnEvent("break", func() { Inject <- func() { pause = true } })
-	g.OnEvent("mindt", func() { Inject <- func() { EvalGUI("MinDt=" + g.StringValue("mindt")) } })
-	g.OnEvent("maxdt", func() { Inject <- func() { EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
-	g.OnEvent("fixdt", func() { Inject <- func() { EvalGUI("FixDt=" + g.StringValue("fixdt")) } })
-	g.OnEvent("maxerr", func() { Inject <- func() { EvalGUI("MaxErr=" + g.StringValue("maxerr")) } })
+	g.OnEvent("mindt", func() { Inject <- func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) } })
+	g.OnEvent("maxdt", func() { Inject <- func() { g.EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
+	g.OnEvent("fixdt", func() { Inject <- func() { g.EvalGUI("FixDt=" + g.StringValue("fixdt")) } })
+	g.OnEvent("maxerr", func() { Inject <- func() { g.EvalGUI("MaxErr=" + g.StringValue("maxerr")) } })
 	g.OnEvent("solvertype", func() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
-			EvalGUI("SetSolver(" + typ + ")")
+			g.EvalGUI("SetSolver(" + typ + ")")
 			if Solver.FixDt == 0 { // euler must have fixed time step
 				Solver.FixDt = 1e-15
 			}
@@ -258,19 +259,19 @@ func (g *guistate) prepareParam() {
 				cmd += ")"
 			}
 			Inject <- func() {
-				EvalGUI(cmd)
+				g.EvalGUI(cmd)
 			}
 		})
 	}
 	g.OnEvent("Temp", func() {
 		Inject <- func() {
 			if solvertype != 1 {
-				EvalGUI("SetSolver(1)")
+				g.EvalGUI("SetSolver(1)")
 			}
 			if Solver.FixDt == 0 {
-				EvalGUI("FixDt = 1e-15")
+				g.EvalGUI("FixDt = 1e-15")
 			}
-			EvalGUI("Temp = " + g.StringValue("Temp"))
+			g.EvalGUI("Temp = " + g.StringValue("Temp"))
 		}
 	})
 }
@@ -285,7 +286,7 @@ func (g *guistate) prepareDisplay() {
 // see prepareServer
 func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
-		updateKeepAlive() // keep track of when browser was last seen alive
+		g.UpdateKeepAlive() // keep track of when browser was last seen alive
 
 		if GetBusy() { // busy, e.g., calculating kernel, run loop will not accept commands.
 			//g.disableControls(true)
@@ -404,7 +405,7 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 				code += ", " + g.StringValue(args[i])
 			}
 			code += ")"
-			EvalGUI(code)
+			g.EvalGUI(code)
 		}
 	}
 }
@@ -491,9 +492,9 @@ func (g *guistate) disableControls(busy bool) {
 }
 
 // Eval code + update keepalive in case the code runs long
-func EvalGUI(code string) {
+func (g *guistate) EvalGUI(code string) {
 	Eval(code)
-	updateKeepAlive()
+	g.UpdateKeepAlive()
 }
 
 func Eval(code string) {

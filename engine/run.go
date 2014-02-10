@@ -84,9 +84,13 @@ func break_() {
 // exit finished simulation this long after browser was closed
 var Timeout = 3 * time.Second
 
-// Enter interactive mode. Simulation is now exclusively controlled by web GUI
 func RunInteractive() {
-	updateKeepAlive()
+	gui_.RunInteractive()
+}
+
+// Enter interactive mode. Simulation is now exclusively controlled by web GUI
+func (g *guistate) RunInteractive() {
+	g.UpdateKeepAlive()
 	fmt.Println("entering interactive mode")
 	for time.Since(KeepAlive()) < Timeout {
 		f := <-Inject

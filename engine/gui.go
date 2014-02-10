@@ -264,23 +264,19 @@ func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
-		if g.Busy() {
+		if g.Busy() { // busy, e.g., calculating kernel, run loop will not accept commands.
 			g.disableControls(true)
-			log.Print(".")
 			return
 		} else {
 			g.disableControls(false) // make sure everything is enabled
 		}
 
-		Inject <- (func() {
+		Inject <- (func() { // sends to run loop to be executed in between time steps
 			// solver
 			g.Set("nsteps", Solver.NSteps)
 			g.Set("time", fmt.Sprintf("%6e", Time))
 			g.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
 			g.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			if !pause { // Don't go updating stuff while paused
-				g.Set("maxtorque", fmt.Sprintf("%6e T", MaxTorque.Get()))
-			}
 			g.Set("maxerr", Solver.MaxErr)
 			g.Set("mindt", Solver.MinDt)
 			g.Set("maxdt", Solver.MaxDt)
@@ -290,6 +286,8 @@ func (g *guistate) prepareOnUpdate() {
 				g.Set("busy", "Paused")
 			} else {
 				g.Set("busy", "Running")
+				// Don't re-evaluate all the time if not running
+				g.Set("maxtorque", fmt.Sprintf("%6e T", MaxTorque.Get()))
 			}
 
 			// display

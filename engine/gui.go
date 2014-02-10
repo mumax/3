@@ -56,10 +56,6 @@ func GUIAdd(name string, value interface{}) {
 	gui_.Add(name, value)
 }
 
-//func PrepareServer() {
-//	gui_.PrepareServer()
-//}
-
 // Internal:add a quantity to the GUI, will be visible in web interface.
 // Automatically called by Decl*(), still before PrepareServer()
 func (g *guistate) Add(name string, value interface{}) {

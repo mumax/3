@@ -8,7 +8,6 @@ import (
 func main() {
 
 	cuda.Init(0)
-	PrepareServer()
 	SetOD("standardproblem4.out", true)
 	defer Close()
 

@@ -65,7 +65,9 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 			J.RemoveExtraTerms()
 		}
 	}
-
+	lazy_gridsize = []int{Nx, Ny, Nz}
+	lazy_cellsize = []float64{cellSizeX, cellSizeY, cellSizeZ}
+	lazy_pbc = []int{pbcx, pbcy, pbcz}
 }
 
 func printf(f float64) float32 {
@@ -74,29 +76,31 @@ func printf(f float64) float32 {
 
 // for lazy setmesh: set gridsize and cellsize in separate calls
 var (
-	gridsize []int
-	cellsize []float64
-	pbc      = []int{0, 0, 0}
+	lazy_gridsize []int
+	lazy_cellsize []float64
+	lazy_pbc      = []int{0, 0, 0}
 )
 
 func SetGridSize(Nx, Ny, Nz int) {
-	gridsize = []int{Nx, Ny, Nz}
-	if cellsize != nil {
-		SetMesh(Nx, Ny, Nz, cellsize[X], cellsize[Y], cellsize[Z], pbc[X], pbc[Y], pbc[Z])
+	lazy_gridsize = []int{Nx, Ny, Nz}
+	if lazy_cellsize != nil {
+		SetMesh(Nx, Ny, Nz, lazy_cellsize[X], lazy_cellsize[Y], lazy_cellsize[Z], lazy_pbc[X], lazy_pbc[Y], lazy_pbc[Z])
 	}
 }
 
 func SetCellSize(cx, cy, cz float64) {
-	cellsize = []float64{cx, cy, cz}
-	if gridsize != nil {
-		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cx, cy, cz, pbc[X], pbc[Y], pbc[Z])
+	lazy_cellsize = []float64{cx, cy, cz}
+	if lazy_gridsize != nil {
+		SetMesh(lazy_gridsize[X], lazy_gridsize[Y], lazy_gridsize[Z], cx, cy, cz, lazy_pbc[X], lazy_pbc[Y], lazy_pbc[Z])
 	}
 }
 
 func SetPBC(nx, ny, nz int) {
-	pbc = []int{nx, ny, nz}
-	if gridsize != nil && cellsize != nil {
-		SetMesh(gridsize[X], gridsize[Y], gridsize[Z], cellsize[X], cellsize[Y], cellsize[Z], pbc[X], pbc[Y], pbc[Z])
+	lazy_pbc = []int{nx, ny, nz}
+	if lazy_gridsize != nil && lazy_cellsize != nil {
+		SetMesh(lazy_gridsize[X], lazy_gridsize[Y], lazy_gridsize[Z],
+			lazy_cellsize[X], lazy_cellsize[Y], lazy_cellsize[Z],
+			lazy_pbc[X], lazy_pbc[Y], lazy_pbc[Z])
 	}
 }
 

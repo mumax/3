@@ -125,8 +125,8 @@ func PostStep(f func()) {
 }
 
 // inject code into engine and wait for it to complete.
-func InjectAndWait(task func()) {
-	ready := make(chan int)
-	Inject <- func() { task(); ready <- 1 }
-	<-ready
-}
+//func InjectAndWait(task func()) {
+//	ready := make(chan int)
+//	Inject <- func() { task(); ready <- 1 }
+//	<-ready
+//}

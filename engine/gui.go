@@ -116,14 +116,21 @@ func (g *guistate) prepareConsole() {
 func (g *guistate) prepareMesh() {
 	g.Disable("setmesh", true) // button only enabled if pressing makes sense
 	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
-	meshboxes := []string{"nx", "ny", "nz", "cx", "cy", "cz", "px", "py", "pz"}
+
 	warnmesh := func() {
 		g.Disable("setmesh", false)
 		g.Set("setmeshwarn", MESHWARN)
 	}
-	for _, e := range meshboxes {
-		g.OnEvent(e, warnmesh)
-	}
+
+	g.OnEvent("nx", func() { Inject <- func() { lazy_gridsize[X] = g.IntValue("nx"); warnmesh() } })
+	g.OnEvent("ny", func() { Inject <- func() { lazy_gridsize[Y] = g.IntValue("ny"); warnmesh() } })
+	g.OnEvent("nz", func() { Inject <- func() { lazy_gridsize[Z] = g.IntValue("nz"); warnmesh() } })
+	g.OnEvent("cx", func() { Inject <- func() { lazy_cellsize[X] = g.FloatValue("cx"); warnmesh() } })
+	g.OnEvent("cy", func() { Inject <- func() { lazy_cellsize[Y] = g.FloatValue("cy"); warnmesh() } })
+	g.OnEvent("cz", func() { Inject <- func() { lazy_cellsize[Z] = g.FloatValue("cz"); warnmesh() } })
+	g.OnEvent("px", func() { Inject <- func() { lazy_pbc[X] = g.IntValue("px"); warnmesh() } })
+	g.OnEvent("py", func() { Inject <- func() { lazy_pbc[Y] = g.IntValue("py"); warnmesh() } })
+	g.OnEvent("pz", func() { Inject <- func() { lazy_pbc[Z] = g.IntValue("pz"); warnmesh() } })
 
 	g.OnEvent("setmesh", func() {
 		g.Disable("setmesh", true)
@@ -291,22 +298,18 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("console", hist)
 
 			// mesh
-			N := Mesh().Size()
-			g.Set("nx", N[X])
-			g.Set("ny", N[Y])
-			g.Set("nz", N[Z])
-			c := Mesh().CellSize()
-			g.Set("cx", printf(c[X]))
-			g.Set("cy", printf(c[Y]))
-			g.Set("cz", printf(c[Z]))
-			p := Mesh().PBC()
-			g.Set("px", p[X])
-			g.Set("py", p[Y])
-			g.Set("pz", p[Z])
-			w := Mesh().WorldSize()
-			g.Set("wx", printf(w[X]*1e9))
-			g.Set("wy", printf(w[Y]*1e9))
-			g.Set("wz", printf(w[Z]*1e9))
+			g.Set("nx", lazy_gridsize[X])
+			g.Set("ny", lazy_gridsize[Y])
+			g.Set("nz", lazy_gridsize[Z])
+			g.Set("cx", lazy_cellsize[X])
+			g.Set("cy", lazy_cellsize[Y])
+			g.Set("cz", lazy_cellsize[Z])
+			g.Set("px", lazy_pbc[X])
+			g.Set("py", lazy_pbc[Y])
+			g.Set("pz", lazy_pbc[Z])
+			g.Set("wx", printf(lazy_cellsize[X]*float64(lazy_gridsize[X])*1e9))
+			g.Set("wy", printf(lazy_cellsize[Y]*float64(lazy_gridsize[Y])*1e9))
+			g.Set("wz", printf(lazy_cellsize[Z]*float64(lazy_gridsize[Z])*1e9))
 
 			// solver
 			g.Set("nsteps", Solver.NSteps)
@@ -330,7 +333,7 @@ func (g *guistate) prepareOnUpdate() {
 			quant := g.StringValue("renderQuant")
 			comp := g.StringValue("renderComp")
 			cachebreaker := "?" + g.StringValue("nsteps") + "_" + fmt.Sprint(g.cacheBreaker())
-			g.Attr("renderLayer", "max", N[Z]-1)
+			g.Attr("renderLayer", "max", Mesh().Size()[Z]-1)
 			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// plot

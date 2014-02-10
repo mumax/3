@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"path"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 )
@@ -75,9 +74,9 @@ func (g *guistate) PrepareServer() {
 		g.incCacheBreaker()
 	})
 
-	http.HandleFunc("/", g.mux)
-	//	http.Handle("/render/", &renderer)
-	//	http.HandleFunc("/plot/", servePlot)
+	http.Handle("/", g)
+	http.Handle("/render/", &renderer)
+	http.HandleFunc("/plot/", servePlot)
 
 	g.prepareConsole()
 	g.prepareMesh()
@@ -87,32 +86,6 @@ func (g *guistate) PrepareServer() {
 	g.prepareDisplay()
 	g.prepareParam()
 	g.prepareOnUpdate()
-}
-
-var (
-	oneReq sync.Mutex
-	nReq   int
-)
-
-func (g *guistate) mux(w http.ResponseWriter, r *http.Request) {
-	oneReq.Lock()
-	nReq++
-	if nReq > 1 {
-		fmt.Println(nReq, "pending requests")
-	}
-	oneReq.Unlock()
-
-	url := r.URL.Path
-	switch {
-	default:
-		g.ServeHTTP(w, r)
-	case strings.HasPrefix(url, "/render/"): //renderer.ServeHTTP(w, r)
-	case strings.HasPrefix(url, "/plot/"): //servePlot(w, r)
-	}
-
-	oneReq.Lock()
-	nReq--
-	oneReq.Unlock()
 }
 
 // see prepareServer

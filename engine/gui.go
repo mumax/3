@@ -26,7 +26,6 @@ type guistate struct {
 	mutex              sync.Mutex          // protects eventCacheBreaker and busy
 	_eventCacheBreaker int                 // changed on any event to make sure display is updated
 	keepalive          time.Time
-	oneReq             sync.Mutex
 }
 
 // Returns the time when updateKeepAlive was called.
@@ -90,9 +89,18 @@ func (g *guistate) PrepareServer() {
 	g.prepareOnUpdate()
 }
 
+var (
+	oneReq sync.Mutex
+	nReq   int
+)
+
 func (g *guistate) mux(w http.ResponseWriter, r *http.Request) {
-	g.oneReq.Lock()
-	defer g.oneReq.Unlock()
+	oneReq.Lock()
+	nReq++
+	if nReq > 1 {
+		fmt.Println(nReq, "pending requests")
+	}
+	oneReq.Unlock()
 
 	url := r.URL.Path
 	switch {
@@ -102,6 +110,9 @@ func (g *guistate) mux(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(url, "/plot/"): //servePlot(w, r)
 	}
 
+	oneReq.Lock()
+	nReq--
+	oneReq.Unlock()
 }
 
 // see prepareServer
@@ -293,7 +304,7 @@ func (g *guistate) prepareOnUpdate() {
 			return
 		} else {
 			g.disableControls(false) // make sure everything is enabled
-			g.Prog(0, 100, "")       // reset progress bar in case we forgot
+			//g.Prog(0, 100, "Running") // reset progress bar in case we forgot
 		}
 
 		Inject <- (func() { // sends to run loop to be executed in between time steps

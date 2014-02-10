@@ -70,7 +70,7 @@ func (g *guistate) Add(name string, value interface{}) {
 // initialize the GUI Page (pre-renders template) and register http handlers
 func (g *guistate) PrepareServer() {
 	g.Page = gui.NewPage(templText, g)
-	util.Progress_ = gui_.Prog
+	util.SetProgress(gui_.Prog)
 	g.OnAnyEvent(func() {
 		g.incCacheBreaker()
 	})

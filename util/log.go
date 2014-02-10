@@ -2,7 +2,10 @@ package util
 
 // Logging and error reporting utility functions
 
-import "log"
+import (
+	"log"
+	"sync"
+)
 
 func Fatal(msg ...interface{}) {
 	log.Fatal(msg...)
@@ -59,10 +62,25 @@ func Assert(test bool) {
 }
 
 // Hack to avoid cyclic dependency on engine.
-var Progress_ func(int, int, string)
+var (
+	progress_ func(int, int, string)
+	progLock  sync.Mutex
+)
 
+// Set progress bar to progress/total and display msg
+// if GUI is up and running.
 func Progress(progress, total int, msg string) {
-	if Progress_ != nil {
-		Progress_(progress, total, msg)
+	progLock.Lock()
+	defer progLock.Unlock()
+	if progress_ != nil {
+		progress_(progress, total, msg)
 	}
+}
+
+// Sets the function to be used internally by Progress.
+// Avoids cyclic dependency on engine.
+func SetProgress(f func(int, int, string)) {
+	progLock.Lock()
+	defer progLock.Unlock()
+	progress_ = f
 }

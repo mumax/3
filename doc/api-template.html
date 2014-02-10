@@ -179,7 +179,7 @@ m.Region(1) // magnetization in region 1 (0 elsewhere)
 
 <hr/><h1> Scheduling output </h1>
 
-All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More coulumns can be added with <code>TableAdd()</code>.
+All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More coulumns can be added with <code>TableAdd()</code>. 
 <pre><code>save(B_ext)
 
 tableadd(B_ext)
@@ -187,10 +187,16 @@ tablesave()
 </code></pre>
 Optionally, the output/averaging can be done over a single region:
 <pre><code>save(m.Region(1))
-tableadd(m.Region(1)) 
+TableAdd(m.Region(1)) 
 </code></pre>
 
-{{range .FilterName "tableadd" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotformat" "autosnapshot" "filenameformat" "outputformat" "ovf1_text" "ovf1_binary" "ovf2_text" "ovf2_binary"}} {{template "entry" .}} {{end}}
+User-defined variables can be added to the table with <code>TableAddVar()</code>.
+<pre><code>myField := 0.42
+TableAddVar(myField, "B_extra", "T")
+myField = ...
+</code></pre>
+
+{{range .FilterName "tableadd" "tableaddvar" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotformat" "autosnapshot" "filenameformat" "outputformat" "ovf1_text" "ovf1_binary" "ovf2_text" "ovf2_binary"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Running </h1>
 

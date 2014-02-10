@@ -15,14 +15,14 @@ import (
 //var renderer = render{img: new(image.NRGBA)}
 
 type render struct {
-	mutex         sync.Mutex
-	quant         Quantity
-	comp          string
-	layer, scale  int
-	prevSaveCount int         // previous max slider value of time
-	rescaleBuf    *data.Slice // GPU
-	imgBuf        *data.Slice // CPU
-	img_          *image.NRGBA
+	mutex        sync.Mutex
+	quant        Quantity
+	comp         string
+	layer, scale int
+	saveCount    int         // previous max slider value of time
+	rescaleBuf   *data.Slice // GPU
+	imgBuf       *data.Slice // CPU
+	img_         *image.NRGBA
 }
 
 const maxScale = 32

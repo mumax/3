@@ -19,12 +19,12 @@ import (
 var gui_ = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 
 type guistate struct {
-	*gui.Page                     // GUI elements (buttons...)
-	Quants    map[string]Quantity // displayable quantities by name
-	Params    map[string]Param    // displayable parameters by name
-	render
-	mutex              sync.Mutex // protects eventCacheBreaker and keepalive
-	_eventCacheBreaker int        // changed on any event to make sure display is updated
+	*gui.Page                              // GUI elements (buttons...)
+	Quants             map[string]Quantity // displayable quantities by name
+	Params             map[string]Param    // displayable parameters by name
+	render                                 // renders displayed quantity
+	mutex              sync.Mutex          // protects eventCacheBreaker and keepalive
+	_eventCacheBreaker int                 // changed on any event to make sure display is updated
 	keepalive          time.Time
 }
 

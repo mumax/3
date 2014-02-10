@@ -88,11 +88,22 @@ func RunInteractive() {
 	gui_.RunInteractive()
 }
 
+func nop() {}
+
 // Enter interactive mode. Simulation is now exclusively controlled by web GUI
 func (g *guistate) RunInteractive() {
-	g.UpdateKeepAlive()
+
+	// periodically wake up Run so it may exit on timeout
+	go func() {
+		for {
+			Inject <- nop
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
 	fmt.Println("entering interactive mode")
-	for time.Since(KeepAlive()) < Timeout {
+	g.UpdateKeepAlive()
+	for time.Since(g.KeepAlive()) < Timeout {
 		f := <-Inject
 		f()
 	}

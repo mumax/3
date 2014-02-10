@@ -43,9 +43,9 @@ func (g *guistate) UpdateKeepAlive() {
 	g.keepalive = time.Now()
 }
 
-func KeepAlive() time.Time {
-	return gui_.KeepAlive()
-}
+//func KeepAlive() time.Time {
+//	return gui_.KeepAlive()
+//}
 
 // displayable quantity in GUI Parameters section
 type Param interface {

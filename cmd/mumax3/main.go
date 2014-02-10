@@ -94,7 +94,7 @@ func runInteractive() {
 		alpha = 1
 		m = RandomMag()`)
 	goServeGUI()
-	keepBrowserAlive()
+	engine.RunInteractive()
 }
 
 // Runs a script file.
@@ -122,7 +122,7 @@ func runFileAndServe(fname string) {
 	engine.EvalFile(code)
 
 	if *flag_interactive {
-		keepBrowserAlive() // if open, that is
+		engine.RunInteractive()
 	}
 }
 

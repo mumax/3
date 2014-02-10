@@ -77,7 +77,7 @@ func main() {
 
 func runInteractive() {
 	fmt.Println("no input files: starting interactive session")
-	initEngine()
+	//initEngine()
 
 	// setup outut dir
 	now := time.Now()
@@ -99,7 +99,7 @@ func runInteractive() {
 
 // Runs a script file.
 func runFileAndServe(fname string) {
-	initEngine()
+	//initEngine()
 	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
@@ -128,9 +128,9 @@ func runFileAndServe(fname string) {
 
 // initialize the simulation engine and cuda
 // not needed when we manage a queue (slave processes will run actual sim)
-func initEngine() {
-	engine.PrepareServer() // needed even if not serving it
-}
+//func initEngine() {
+//	engine.PrepareServer() // needed even if not serving it
+//}
 
 // start Gui server and return
 func goServeGUI() {

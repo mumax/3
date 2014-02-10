@@ -43,10 +43,6 @@ func (g *guistate) UpdateKeepAlive() {
 	g.keepalive = time.Now()
 }
 
-//func KeepAlive() time.Time {
-//	return gui_.KeepAlive()
-//}
-
 // displayable quantity in GUI Parameters section
 type Param interface {
 	NComp() int
@@ -60,9 +56,9 @@ func GUIAdd(name string, value interface{}) {
 	gui_.Add(name, value)
 }
 
-func PrepareServer() {
-	gui_.PrepareServer()
-}
+//func PrepareServer() {
+//	gui_.PrepareServer()
+//}
 
 // Internal:add a quantity to the GUI, will be visible in web interface.
 // Automatically called by Decl*(), still before PrepareServer()
@@ -471,11 +467,12 @@ func (g *guistate) Div(heading string) string {
 
 // Start web gui on given port, blocks.
 func Serve(port string) {
+	gui_.PrepareServer()
 	util.LogErr(http.ListenAndServe(port, nil))
 }
 
 func init() {
-	util.Progress_ = gui_.Prog
+	//util.Progress_ = gui_.Prog // TODO
 }
 
 // Prog advances the GUI progress bar to fraction a/total and displays message.

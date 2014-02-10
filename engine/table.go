@@ -3,6 +3,7 @@ package engine
 import (
 	"bufio"
 	"fmt"
+	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"os"
 )
@@ -11,6 +12,7 @@ var Table = *newTable("table") // output handle for tabular data (average magnet
 
 func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
+	DeclFunc("TableAddVar", TableAddVariable, "Add user-defined variable + name + unit to data table.")
 	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
 	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table ever period (s).")
 	Table.Add(&M)
@@ -32,6 +34,24 @@ func newTable(name string) *DataTable {
 func TableAdd(col TableData) {
 	Table.Add(col)
 }
+
+func TableAddVariable(x script.ScalarFunction, name, unit string) {
+	Table.AddVariable(x, name, unit)
+}
+
+func (t *DataTable) AddVariable(x script.ScalarFunction, name, unit string) {
+	TableAdd(&userVar{x, name, unit})
+}
+
+type userVar struct {
+	value      script.ScalarFunction
+	name, unit string
+}
+
+func (x *userVar) Name() string       { return x.name }
+func (x *userVar) NComp() int         { return 1 }
+func (x *userVar) Unit() string       { return x.unit }
+func (x *userVar) average() []float64 { return []float64{x.value.Float()} }
 
 func TableSave() {
 	Table.Save()

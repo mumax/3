@@ -52,7 +52,4 @@ func logGUI(msg ...interface{}) {
 	}
 	hist += m
 	fmt.Println(m)
-	if GUI.Page != nil {
-		GUI.Set("console", hist)
-	}
 }

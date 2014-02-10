@@ -2,6 +2,7 @@ package engine
 
 import (
 	"runtime"
+	"sync"
 	"time"
 )
 
@@ -10,6 +11,25 @@ const VERSION = "mumax3.4.0"
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 
 var StartTime = time.Now()
+
+var (
+	busyLock sync.Mutex
+	busy     bool // are we so busy we can't respond from run loop? (e.g. calc kernel)
+)
+
+// When gui is busy it can only accept read-only
+// commands, not change any state. E.g. during kernel init.
+func SetBusy(b bool) {
+	busyLock.Lock()
+	defer busyLock.Unlock()
+	busy = b
+}
+
+func GetBusy() bool {
+	busyLock.Lock()
+	defer busyLock.Unlock()
+	return busy
+}
 
 // Cleanly exits the simulation, assuring all output is flushed.
 func Close() {

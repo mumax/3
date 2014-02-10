@@ -129,7 +129,7 @@ func runFileAndServe(fname string) {
 // initialize the simulation engine and cuda
 // not needed when we manage a queue (slave processes will run actual sim)
 func initEngine() {
-	engine.GUI.PrepareServer() // needed even if not serving it
+	engine.PrepareServer() // needed even if not serving it
 }
 
 // start Gui server and return

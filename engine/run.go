@@ -49,21 +49,21 @@ const (
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
-	GUI.Set("runtime", seconds)
+	//GUI.Set("runtime", seconds)
 	stop := Time + seconds
 	RunWhile(func() bool { return Time < stop })
 }
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
-	GUI.Set("runsteps", n)
+	//GUI.Set("runsteps", n)
 	stop := Solver.NSteps + n
 	RunWhile(func() bool { return Solver.NSteps < stop })
 }
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
-	GUI.Set("maxtorque", "--") // only updated on page refresh, avoid showing out-of-date value
+	//GUI.Set("maxtorque", "--") // only updated on page refresh, avoid showing out-of-date value
 	pause = false
 	for condition() && !pause {
 		select {

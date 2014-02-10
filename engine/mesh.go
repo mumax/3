@@ -24,8 +24,8 @@ func Mesh() *data.Mesh {
 // Can be set only once at the beginning of the simulation.
 // TODO: dedup arguments from globals
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy, pbcz int) {
-	GUI.SetBusy(true)
-	defer GUI.SetBusy(false)
+	SetBusy(true)
+	defer SetBusy(false)
 
 	prevSize := globalmesh_.Size()
 	pbc := []int{pbcx, pbcy, pbcz}
@@ -66,23 +66,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		}
 	}
 
-	//Log("SetMesh", &globalmesh_)
-	GUI.Set("nx", Nx)
-	GUI.Set("ny", Ny)
-	GUI.Set("nz", Nz)
-	GUI.Set("cx", printf(cellSizeX))
-	GUI.Set("cy", printf(cellSizeY))
-	GUI.Set("cz", printf(cellSizeZ))
-	p := Mesh().PBC()
-	GUI.Set("px", p[X])
-	GUI.Set("py", p[Y])
-	GUI.Set("pz", p[Z])
-	w := Mesh().WorldSize()
-	GUI.Set("wx", printf(w[X]*1e9))
-	GUI.Set("wy", printf(w[Y]*1e9))
-	GUI.Set("wz", printf(w[Z]*1e9))
-	GUI.Set("display", "/render/") // force display update
-	GUI.Attr("renderLayer", "max", Nz-1)
 }
 
 func printf(f float64) float32 {

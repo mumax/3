@@ -18,7 +18,7 @@ func servePlot(w http.ResponseWriter, r *http.Request) {
 	if len(u) == 2 {
 		a, b = u[0], u[1]
 	} else {
-		a, b = GUI.Value("usingx"), GUI.Value("usingy")
+		a, b = 1, 2 // TODO: GUI.Value("usingx"), GUI.Value("usingy")
 	}
 
 	cmd := "gnuplot"
@@ -26,12 +26,12 @@ func servePlot(w http.ResponseWriter, r *http.Request) {
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
 		w.Write(emptyIMG())
-		GUI.Set("plotErr", string(out))
+		//GUI.Set("plotErr", string(out)) // TODO
 		return
 	} else {
 		w.Header().Set("Content-Type", "image/svg+xml")
 		w.Write(out)
-		GUI.Set("plotErr", "")
+		// GUI.Set("plotErr", "") // TODO
 	}
 }
 

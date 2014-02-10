@@ -11,13 +11,14 @@ import (
 	"net/http"
 	"path"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 )
 
 // global GUI state stores what is currently shown in the web page.
 var (
-	GUI           = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
+	gui_          = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 	keepalive     = time.Now()
 	keepaliveLock sync.Mutex
 )
@@ -42,7 +43,7 @@ type guistate struct {
 	Params             map[string]Param    // displayable parameters by name
 	mutex              sync.Mutex          // protects eventCacheBreaker and busy
 	_eventCacheBreaker int                 // changed on any event to make sure display is updated
-	busy               bool                // are we so busy we can't respond from run loop? (e.g. calc kernel)
+	oneReq             sync.Mutex
 }
 
 // displayable quantity in GUI Parameters section
@@ -52,6 +53,14 @@ type Param interface {
 	Unit() string
 	getRegion(int) []float64
 	IsUniform() bool
+}
+
+func GUIAdd(name string, value interface{}) {
+	gui_.Add(name, value)
+}
+
+func PrepareServer() {
+	gui_.PrepareServer()
 }
 
 // Internal:add a quantity to the GUI, will be visible in web interface.
@@ -73,9 +82,9 @@ func (g *guistate) PrepareServer() {
 		g.incCacheBreaker()
 	})
 
-	http.Handle("/", g)
-	http.Handle("/render/", &renderer)
-	http.HandleFunc("/plot/", servePlot)
+	http.HandleFunc("/", g.mux)
+	//	http.Handle("/render/", &renderer)
+	//	http.HandleFunc("/plot/", servePlot)
 
 	g.prepareConsole()
 	g.prepareMesh()
@@ -85,6 +94,20 @@ func (g *guistate) PrepareServer() {
 	g.prepareDisplay()
 	g.prepareParam()
 	g.prepareOnUpdate()
+}
+
+func (g *guistate) mux(w http.ResponseWriter, r *http.Request) {
+	g.oneReq.Lock()
+	defer g.oneReq.Unlock()
+
+	url := r.URL.Path
+	switch {
+	default:
+		g.ServeHTTP(w, r)
+	case strings.HasPrefix(url, "/render/"): //renderer.ServeHTTP(w, r)
+	case strings.HasPrefix(url, "/plot/"): //servePlot(w, r)
+	}
+
 }
 
 // see prepareServer
@@ -264,14 +287,35 @@ func (g *guistate) prepareOnUpdate() {
 	g.OnUpdate(func() {
 		updateKeepAlive() // keep track of when browser was last seen alive
 
-		if g.Busy() { // busy, e.g., calculating kernel, run loop will not accept commands.
-			g.disableControls(true)
+		if GetBusy() { // busy, e.g., calculating kernel, run loop will not accept commands.
+			//g.disableControls(true)
 			return
-		} else {
-			g.disableControls(false) // make sure everything is enabled
-		}
+		} //else {
+		//		g.disableControls(false) // make sure everything is enabled
+		//	}
 
 		Inject <- (func() { // sends to run loop to be executed in between time steps
+			g.Set("console", hist)
+
+			// mesh
+			N := Mesh().Size()
+			g.Set("nx", N[X])
+			g.Set("ny", N[Y])
+			g.Set("nz", N[Z])
+			c := Mesh().CellSize()
+			g.Set("cx", printf(c[X]))
+			g.Set("cy", printf(c[Y]))
+			g.Set("cz", printf(c[Z]))
+			p := Mesh().PBC()
+			g.Set("px", p[X])
+			g.Set("py", p[Y])
+			g.Set("pz", p[Z])
+			w := Mesh().WorldSize()
+			g.Set("wx", printf(w[X]*1e9))
+			g.Set("wy", printf(w[Y]*1e9))
+			g.Set("wz", printf(w[Z]*1e9))
+			g.Attr("renderLayer", "max", N[Z]-1)
+
 			// solver
 			g.Set("nsteps", Solver.NSteps)
 			g.Set("time", fmt.Sprintf("%6e", Time))
@@ -297,7 +341,7 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// plot
-			GUI.Set("plot", "/plot/?"+cachebreaker)
+			gui_.Set("plot", "/plot/?"+cachebreaker)
 
 			// parameters
 			for _, p := range g.Params {
@@ -429,24 +473,8 @@ func Serve(port string) {
 	util.LogErr(http.ListenAndServe(port, nil))
 }
 
-// When gui is busy it can only accept read-only
-// commands, not change any state. E.g. during kernel init.
-func (g *guistate) SetBusy(busy bool) {
-	g.mutex.Lock()
-	defer g.mutex.Unlock()
-	g.busy = busy
-	g.disableControls(busy)
-	updateKeepAlive() // needed after long busy period to avoid browser considered disconnected
-	if busy {
-		GUI.Set("busy", "Initializing")
-	} else {
-		GUI.Set("busy", "")
-		GUI.Set("progress", 0)
-	}
-}
-
 func init() {
-	util.Progress_ = GUI.Prog
+	util.Progress_ = gui_.Prog
 }
 
 // Prog advances the GUI progress bar to fraction a/total and displays message.
@@ -460,12 +488,6 @@ func (g *guistate) disableControls(busy bool) {
 	g.Disable("run", busy)
 	g.Disable("steps", busy)
 	g.Disable("break", busy)
-}
-
-func (g *guistate) Busy() bool {
-	g.mutex.Lock()
-	defer g.mutex.Unlock()
-	return g.busy
 }
 
 // Eval code + update keepalive in case the code runs long

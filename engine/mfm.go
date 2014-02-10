@@ -32,8 +32,8 @@ func SetMFM(dst *data.Slice) {
 }
 
 func reinitmfmconv() {
-	GUI.SetBusy(true)
-	defer GUI.SetBusy(false)
+	SetBusy(true)
+	defer SetBusy(false)
 	if mfmconv_ == nil {
 		mfmconv_ = cuda.NewMFM(Mesh(), MFMLift.v, MFMTipSize.v)
 	} else {

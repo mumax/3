@@ -32,8 +32,8 @@ func bSat() float64 {
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
-	GUI.SetBusy(true)
-	defer GUI.SetBusy(false)
+	SetBusy(true)
+	defer SetBusy(false)
 	h := data.NewSlice(3, m.Size())
 	H := h.Vectors()
 	world := m.WorldSize()

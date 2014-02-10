@@ -63,8 +63,8 @@ func demagConv() *cuda.DemagConvolution {
 	if conv_ == nil {
 		LogOutput("calculating demag kernel")
 		defer LogOutput("kernel done")
-		GUI.SetBusy(true)
-		defer GUI.SetBusy(false)
+		SetBusy(true)
+		defer SetBusy(false)
 		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy)
 		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
 	}

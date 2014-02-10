@@ -24,20 +24,20 @@ func DeclConst(name string, value float64, doc string) {
 // It can be changed, but not by the user.
 func DeclROnly(name string, value interface{}, doc string) {
 	World.ROnly(name, value, doc)
-	GUI.Add(name, value)
+	GUIAdd(name, value)
 }
 
 // Add a (pointer to) variable to the script world
 func DeclVar(name string, value interface{}, doc string) {
 	World.Var(name, value, doc)
-	GUI.Add(name, value)
+	GUIAdd(name, value)
 }
 
 // Add an LValue to the script world.
 // Assign to LValue invokes SetValue()
 func DeclLValue(name string, value LValue, doc string) {
 	World.LValue(name, newLValueWrapper(value), doc)
-	GUI.Add(name, value)
+	GUIAdd(name, value)
 }
 
 // LValue is settable

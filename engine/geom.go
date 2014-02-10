@@ -46,8 +46,8 @@ func SetGeom(s Shape) {
 }
 
 func (geometry *geom) setGeom(s Shape) {
-	GUI.SetBusy(true)
-	defer GUI.SetBusy(false)
+	SetBusy(true)
+	defer SetBusy(false)
 
 	if s == nil {
 		s = universe

@@ -10,8 +10,8 @@ func init() {
 }
 
 func Voronoi(grainsize float64, numRegions, seed int) {
-	GUI.SetBusy(true)
-	defer GUI.SetBusy(false)
+	SetBusy(true)
+	defer SetBusy(false)
 
 	t := newTesselation(grainsize, numRegions, int64(seed))
 	regions.hist = append(regions.hist, t.RegionOf)

@@ -19,11 +19,12 @@ import (
 var gui_ = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 
 type guistate struct {
-	*gui.Page                              // GUI elements (buttons...)
-	Quants             map[string]Quantity // displayable quantities by name
-	Params             map[string]Param    // displayable parameters by name
-	mutex              sync.Mutex          // protects eventCacheBreaker and busy
-	_eventCacheBreaker int                 // changed on any event to make sure display is updated
+	*gui.Page                     // GUI elements (buttons...)
+	Quants    map[string]Quantity // displayable quantities by name
+	Params    map[string]Param    // displayable parameters by name
+	render
+	mutex              sync.Mutex // protects eventCacheBreaker and keepalive
+	_eventCacheBreaker int        // changed on any event to make sure display is updated
 	keepalive          time.Time
 }
 
@@ -75,7 +76,7 @@ func (g *guistate) PrepareServer() {
 	})
 
 	http.Handle("/", g)
-	http.Handle("/render/", &renderer)
+	http.HandleFunc("/render/", g.ServeRender)
 	http.HandleFunc("/plot/", servePlot)
 
 	g.prepareConsole()
@@ -263,7 +264,34 @@ func (g *guistate) prepareParam() {
 // see prepareServer
 func (g *guistate) prepareDisplay() {
 	g.OnEvent("renderQuant", func() {
+		g.render.mutex.Lock()
+		defer g.render.mutex.Unlock()
+		name := g.StringValue("renderQuant")
+		q := g.Quants[name]
+		if q == nil {
+			LogOutput("display: unknown quantity:", name)
+			return
+		}
+		g.render.quant = q
 		g.Set("renderDoc", g.Doc(g.StringValue("renderQuant")))
+	})
+	g.OnEvent("renderComp", func() {
+		g.render.mutex.Lock()
+		defer g.render.mutex.Unlock()
+		g.render.comp = g.StringValue("renderComp")
+		// TODO: set to "" if q.Ncomp < 3
+	})
+	g.OnEvent("renderLayer", func() {
+		g.render.mutex.Lock()
+		defer g.render.mutex.Unlock()
+		g.render.layer = g.IntValue("renderLayer")
+		g.Set("renderLayerLabel", fmt.Sprint(g.render.layer, "/", Mesh().Size()[Z]))
+	})
+	g.OnEvent("renderScale", func() {
+		g.render.mutex.Lock()
+		defer g.render.mutex.Unlock()
+		g.render.scale = maxScale - g.IntValue("renderScale")
+		g.Set("renderScaleLabel", fmt.Sprint("1/", g.render.scale))
 	})
 }
 

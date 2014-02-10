@@ -2,126 +2,98 @@ package engine
 
 import (
 	//"fmt"
-	//"github.com/mumax/3/cuda"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
 	//"github.com/mumax/3/oommf"
-	//"github.com/mumax/3/util"
 	"image"
-	//"image/jpeg"
+	"image/jpeg"
 	"net/http"
 	"sync"
 )
 
-var renderer = render{img: new(image.NRGBA)}
+//var renderer = render{img: new(image.NRGBA)}
 
 type render struct {
-	saveCountLock sync.Mutex
-	saveCount     map[Quantity]int
-	prevSaveCount int // previous max slider value of time
-
-	mutex      sync.Mutex
-	rescaleBuf *data.Slice // GPU
-	imgBuf     *data.Slice // CPU
-	img        *image.NRGBA
+	mutex         sync.Mutex
+	quant         Quantity
+	comp          string
+	layer, scale  int
+	prevSaveCount int         // previous max slider value of time
+	rescaleBuf    *data.Slice // GPU
+	imgBuf        *data.Slice // CPU
+	img_          *image.NRGBA
 }
 
 const maxScale = 32
 
 // Render image of quantity.
-// Accepts url: /render/name and /render/name/component
-func (ren *render) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//ren.mutex.Lock()
-	//defer ren.mutex.Unlock()
+func (g *guistate) ServeRender(w http.ResponseWriter, r *http.Request) {
+	g.render.mutex.Lock()
+	defer g.render.mutex.Unlock()
 
-	//comp := GUI.StringValue("renderComp")
-	//quant := GUI.StringValue("renderQuant")
-	//q, ok := GUI.Quants[quant]
-	//if !ok {
-	//	err := "render: unknown quantity: " + quant
-	//	util.Log(err)
-	//	http.Error(w, err, http.StatusNotFound)
-	//	return
-	//}
-	//ren.render(q, comp)
-	//jpeg.Encode(w, ren.img, &jpeg.Options{Quality: 100})
+	g.render.render()
+	jpeg.Encode(w, g.render.img_, &jpeg.Options{Quality: 100})
 }
 
 // rescale and download quantity, save in rescaleBuf
-func (ren *render) download(quant Quantity, comp string) {
-	//InjectAndWait(func() {
-	//	size := quant.Mesh().Size()
+func (ren *render) download() {
+	InjectAndWait(func() {
+		if ren.quant == nil { // not yet set, default = m
+			ren.quant = &M
+		}
+		quant := ren.quant
+		size := quant.Mesh().Size()
 
-	//	// don't slice out of bounds
-	//	renderLayer := GUI.IntValue("renderLayer")
-	//	if renderLayer >= size[Z] {
-	//		renderLayer = size[Z] - 1
-	//		GUI.Set("renderLayer", renderLayer)
-	//	}
-	//	if renderLayer < 0 {
-	//		renderLayer = 0
-	//		GUI.Set("renderLayer", renderLayer)
-	//	}
-	//	GUI.Set("renderLayerLabel", fmt.Sprint(renderLayer, "/", Mesh().Size()[Z]))
-	//	if quant.NComp() == 1 {
-	//		comp = ""
-	//		GUI.Set("renderComp", "")
-	//	}
-	//	// scale the size
-	//	renderScale := maxScale - GUI.IntValue("renderScale")
-	//	GUI.Set("renderScaleLabel", fmt.Sprint("1/", renderScale))
-	//	for i := range size {
-	//		size[i] /= renderScale
-	//		if size[i] == 0 {
-	//			size[i] = 1
-	//		}
-	//	}
-	//	size[Z] = 1 // selects one layer
+		// don't slice out of bounds
+		renderLayer := ren.layer
+		if renderLayer >= size[Z] {
+			renderLayer = size[Z] - 1
+		}
+		if renderLayer < 0 {
+			renderLayer = 0
+		}
 
-	//	// make sure buffers are there
-	//	if ren.imgBuf.Size() != size {
-	//		ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
-	//	}
-	//	buf, r := quant.Slice()
-	//	if r {
-	//		defer cuda.Recycle(buf)
-	//	}
-	//	if !buf.GPUAccess() {
-	//		ren.imgBuf = Download(quant) // fallback (no zoom)
-	//		return
-	//	}
-	//	// make sure buffers are there (in CUDA context)
-	//	if ren.rescaleBuf.Size() != size {
-	//		ren.rescaleBuf.Free()
-	//		ren.rescaleBuf = cuda.NewSlice(1, size)
-	//	}
-	//	for c := 0; c < quant.NComp(); c++ {
-	//		cuda.Resize(ren.rescaleBuf, buf.Comp(c), renderLayer)
-	//		data.Copy(ren.imgBuf.Comp(c), ren.rescaleBuf)
-	//	}
-	//})
+		if ren.scale < 1 {
+			ren.scale = 1
+		}
+		if ren.scale > maxScale {
+			ren.scale = maxScale
+		}
+		for i := range size {
+			size[i] /= ren.scale
+			if size[i] == 0 {
+				size[i] = 1
+			}
+		}
+		size[Z] = 1 // selects one layer
+
+		// make sure buffers are there
+		if ren.imgBuf.Size() != size {
+			ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
+		}
+		buf, r := quant.Slice()
+		if r {
+			defer cuda.Recycle(buf)
+		}
+		if !buf.GPUAccess() {
+			ren.imgBuf = Download(quant) // fallback (no zoom)
+			return
+		}
+		// make sure buffers are there (in CUDA context)
+		if ren.rescaleBuf.Size() != size {
+			ren.rescaleBuf.Free()
+			ren.rescaleBuf = cuda.NewSlice(1, size)
+		}
+		for c := 0; c < quant.NComp(); c++ {
+			cuda.Resize(ren.rescaleBuf, buf.Comp(c), renderLayer)
+			data.Copy(ren.imgBuf.Comp(c), ren.rescaleBuf)
+		}
+	})
 }
 
-//func (ren *render) registerSaveCount(q Quantity, autonum int) {
-//	ren.saveCountLock.Lock()
-//	defer ren.saveCountLock.Unlock()
-//	if ren.saveCount == nil {
-//		ren.saveCount = make(map[Quantity]int)
-//	}
-//	ren.saveCount[q] = autonum
-//}
-//
-//func (ren *render) getSaveCount(q Quantity) int {
-//	ren.saveCountLock.Lock()
-//	defer ren.saveCountLock.Unlock()
-//	if ren.saveCount == nil {
-//		return 0
-//	}
-//	return ren.saveCount[q]
-//}
-
 // TODO: have browser cache the images
-func (ren *render) getQuant(quant Quantity, comp string) {
+func (ren *render) getQuant() {
 	//rTime := GUI.IntValue("renderTime")
 	//saveCount := ren.getSaveCount(quant)
 	//GUI.Attr("renderTime", "max", saveCount)
@@ -134,7 +106,7 @@ func (ren *render) getQuant(quant Quantity, comp string) {
 	//ren.prevSaveCount = saveCount
 
 	//if rTime == saveCount { // live view
-	//ren.download(quant, comp)
+	ren.download()
 	//GUI.Set("renderTimeLabel", Time)
 	//} else {
 	//	defer func() {
@@ -153,17 +125,22 @@ func (ren *render) getQuant(quant Quantity, comp string) {
 	//}
 }
 
-func (ren *render) render(quant Quantity, comp string) {
-	ren.getQuant(quant, comp)
+func (ren *render) render() {
+	ren.getQuant()
 	// imgBuf always has 3 components, we may need just one...
 	d := ren.imgBuf
+	comp := ren.comp
+	quant := ren.quant
 	if comp != "" && quant.NComp() > 1 { // ... if one has been selected by gui
 		d = d.Comp(compstr[comp])
 	}
 	if quant.NComp() == 1 { // ...or if the original data only had one (!)
 		d = d.Comp(0)
 	}
-	draw.On(ren.img, d, "auto", "auto")
+	if ren.img_ == nil {
+		ren.img_ = new(image.NRGBA)
+	}
+	draw.On(ren.img_, d, "auto", "auto")
 }
 
 var compstr = map[string]int{"x": 0, "y": 1, "z": 2}

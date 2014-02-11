@@ -1,0 +1,22 @@
+// Test regions.loadfile
+
+setgridsize(256, 128, 2)
+setcellsize(5e-9, 5e-9, 5e-9)
+
+defregion(1, circle(500e-9))
+defregion(2, circle(500e-9).inverse())
+m.setRegion(1, uniform(1, 0, 0))
+m.setRegion(2, uniform(0, 1, 0))
+
+// save regions to disk
+saveAs(regions, "regions.ovf")
+
+// overwrite regions
+defregion(256, universe())
+
+// re-load previous state from disk
+regions.loadFile("regionsload.out/regions.ovf")
+
+// check
+expectv("m1", m.region(1).average(), vector(1, 0, 0), 1e-5)
+expectv("m2", m.region(2).average(), vector(0, 1, 0), 1e-5)

@@ -23,6 +23,7 @@ func sAverageUniverse(s *data.Slice) []float64 {
 	return avg
 }
 
+// average over the magnet volume
 func sAverageMagnet(s *data.Slice) []float64 {
 	if geometry.Gpu().IsNil() {
 		return sAverageUniverse(s)

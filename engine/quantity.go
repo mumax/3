@@ -11,4 +11,5 @@ type Quantity interface {
 	Name() string
 	Unit() string
 	Mesh() *data.Mesh
+	average() []float64
 }

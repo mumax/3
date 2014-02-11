@@ -1,5 +1,7 @@
 package engine
 
+// Comp is a Derived Quantity pointing to a single component of vector Quantity
+
 import (
 	"fmt"
 	"github.com/mumax/3/cuda"
@@ -7,17 +9,13 @@ import (
 	"github.com/mumax/3/util"
 )
 
-type Averagable interface {
-	Quantity
-	average() []float64
-}
-
 type comp struct {
-	parent Averagable
+	parent Quantity
 	comp   int
 }
 
-func Comp(parent Averagable, c int) *comp {
+// Comp returns vector component c of the parent Quantity
+func Comp(parent Quantity, c int) *comp {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return &comp{parent, c}
 }
@@ -30,7 +28,6 @@ func (q *comp) average() []float64    { return []float64{q.parent.average()[q.co
 func (q *comp) Average() float64      { return q.average()[0] }
 func (q *comp) Region(r int) *sOneReg { return sOneRegion(q, r) }
 
-// returns a new slice equal to q in the given region, 0 outside.
 func (q *comp) Slice() (*data.Slice, bool) {
 	p := q.parent
 	src, r := p.Slice()

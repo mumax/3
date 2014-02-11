@@ -2,27 +2,17 @@ package engine
 
 // Bookkeeping for auto-saving quantities at given intervals.
 
-import (
-	"fmt"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/draw"
-	"github.com/mumax/3/util"
-)
+import "fmt"
+
+func init() {
+	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
+	DeclFunc("AutoSnapshot", AutoSnapshot, "Auto save image of quantity every period (s).")
+}
 
 var (
 	output  = make(map[Quantity]*autosave) // when to save quantities
 	autonum = make(map[interface{}]int)    // auto number for out file
 )
-
-func init() {
-	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
-	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
-	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
-	DeclVar("SnapshotFormat", &SnapshotFormat, "Image format for snapshots: jpg, png or gif.")
-	DeclVar("FilenameFormat", &FilenameFormat, "printf formatting string for output filenames.")
-	DeclFunc("Snapshot", Snapshot, "Save image of quantity")
-	DeclFunc("AutoSnapshot", AutoSnapshot, "Auto save image of quantity every period (s).")
-}
 
 // Periodically called by run loop to save everything that's needed at this time.
 func DoOutput() {
@@ -57,34 +47,10 @@ func autoSave(q Quantity, period float64, save func(Quantity)) {
 	}
 }
 
-var (
-	FilenameFormat = "%s%06d" // formatting string for auto filenames.
-	SnapshotFormat = "jpg"
-)
-
-// Save once, with auto file name
-func Save(q Quantity) {
-	fname := autoFname(q.Name(), autonum[q])
-	SaveAs(q, fname)
-	autonum[q]++
-}
-
 // generate auto file name based on save count and FilenameFormat. E.g.:
 // 	m000001.ovf
 func autoFname(name string, num int) string {
 	return fmt.Sprintf(OD+FilenameFormat+".ovf", name, num)
-}
-
-// Save image once, with auto file name
-func Snapshot(q Quantity) {
-	fname := fmt.Sprintf(OD+FilenameFormat+"."+SnapshotFormat, q.Name(), autonum[q])
-	s, r := q.Slice()
-	if r {
-		defer cuda.Recycle(s)
-	}
-	data := s.HostCopy() // must be copy (asyncio)
-	autonum[q]++
-	saveQue <- func() { util.FatalErr(draw.RenderFile(fname, data, "", "")) }
 }
 
 // keeps info needed to decide when a quantity needs to be periodically saved

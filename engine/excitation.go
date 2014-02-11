@@ -12,13 +12,13 @@ import (
 
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
-// TODO: per-component mulmasks
 type excitation struct {
 	name       string
 	perRegion  VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
 }
 
+// space-dependent mask plus time dependent multiplier
 type mulmask struct {
 	mul  func() float64
 	mask *data.Slice

@@ -49,6 +49,7 @@ func AddExchangeField(dst *data.Slice) {
 	}
 }
 
+// Set dst to the average exchange coupling per cell (average of lex2 with all neighbors).
 func exchangeDecode(dst *data.Slice) {
 	cuda.ExchangeDecode(dst, lex2.Gpu(), regions.Gpu(), M.Mesh())
 }

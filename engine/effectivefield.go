@@ -1,5 +1,7 @@
 package engine
 
+// Effective field
+
 import "github.com/mumax/3/data"
 
 var B_eff vSetter // total effective field

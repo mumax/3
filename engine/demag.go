@@ -1,12 +1,14 @@
 package engine
 
+// Calculation of magnetostatic field
+
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 )
 
-// demag variables
+// Demag variables
 var (
 	Msat          ScalarParam
 	Bsat          derivedParam

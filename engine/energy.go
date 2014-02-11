@@ -1,15 +1,17 @@
 package engine
 
+// Total energy calculation
+
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 )
 
 var (
-	energyTerms []func() float64    // all contributions to total energy
-	edensTerms  []func(*data.Slice) // all contributions to total energy density (add to dst)
+	energyTerms []func() float64        // all contributions to total energy
+	edensTerms  []func(dst *data.Slice) // all contributions to total energy density (add to dst)
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
-	Edens_total sSetter
+	Edens_total sSetter // Total energy density
 )
 
 func init() {
@@ -31,6 +33,7 @@ func GetTotalEnergy() float64 {
 	return E
 }
 
+// Set dst to total energy density in J/m3
 func SetTotalEdens(dst *data.Slice) {
 	cuda.Zero(dst)
 	for _, addTerm := range edensTerms {

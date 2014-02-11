@@ -1,5 +1,7 @@
 package engine
 
+// Asynchronous I/O queue flushes data to disk while simulation keeps running.
+
 import (
 	"bufio"
 	"github.com/mumax/3/cuda"
@@ -20,7 +22,7 @@ func init() {
 	DeclROnly("OVF2_TEXT", OVF2_TEXT, "OutputFormat = OVF2_TEXT sets text OVF2 output")
 }
 
-// Save under given file name (transparant async I/O).
+// Save under given file name (transparent async I/O).
 func SaveAs(q Quantity, fname string) {
 	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
 		fname = path.Clean(OD + "/" + fname)
@@ -34,56 +36,18 @@ func SaveAs(q Quantity, fname string) {
 	}
 	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
 	initQue()
-	saveQue <- saveTask{fname, assureCPU(buffer), info}
-}
-
-// Copy to CPU, if needed
-func assureCPU(s *data.Slice) *data.Slice {
-	if s.CPUAccess() {
-		return s
-	} else {
-		return s.HostCopy()
-	}
+	data := buffer.HostCopy() // must be copy (async io)
+	saveQue <- func() { saveFile(fname, data, info) }
 }
 
 var (
-	saveQue chan saveTask     // passes save requests from runDownloader to runSaver
-	done    = make(chan bool) // marks output server is completely done after closing dlQue
-	nOutBuf int               // number of output buffers actually in use (<= maxOutputQueLen)
+	saveQue      chan func()       // passes save requests from runDownloader to runSaver
+	done         = make(chan bool) // marks output server is completely done after closing dlQue
+	nOutBuf      int               // number of output buffers actually in use (<= maxOutputQueLen)
+	outputformat = OVF2_BINARY     // user-settable output format
 )
 
 const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
-
-func initQue() {
-	if saveQue == nil {
-		saveQue = make(chan saveTask)
-		go runSaver()
-	}
-}
-
-// output task
-type saveTask struct {
-	fname  string
-	output *data.Slice
-	info   data.Meta
-}
-
-// continuously takes save tasks and flushes them to disk.
-// the save queue can accommodate many outputs (stored on host).
-// the rather big queue allows big output bursts to be concurrent with GPU.
-func runSaver() {
-	for t := range saveQue {
-		f, err := os.OpenFile(t.fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		util.FatalErr(err)
-		out := bufio.NewWriter(f)
-		save(out, t.output, t.info)
-		out.Flush()
-		f.Close()
-	}
-	done <- true
-}
-
-var outputformat = OVF2_BINARY
 
 type OutputFormat int
 
@@ -94,6 +58,34 @@ const (
 	OVF2_BINARY
 )
 
+func initQue() {
+	if saveQue == nil {
+		saveQue = make(chan func())
+		go runSaver()
+	}
+}
+
+// continuously takes save tasks and flushes them to disk.
+// the save queue can accommodate many outputs (stored on host).
+// the rather big queue allows big output bursts to be concurrent with GPU.
+func runSaver() {
+	for f := range saveQue {
+		f()
+	}
+	done <- true
+}
+
+// synchronous save
+func saveFile(fname string, output *data.Slice, info data.Meta) {
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	util.FatalErr(err)
+	out := bufio.NewWriter(f)
+	save(out, output, info)
+	out.Flush()
+	f.Close()
+}
+
+// synchronous save
 func save(out io.Writer, s *data.Slice, info data.Meta) {
 	switch outputformat {
 	case OVF1_TEXT:

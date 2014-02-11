@@ -34,6 +34,7 @@ func (q *_adder) Set(dst *data.Slice) {
 	q.AddTo(dst)
 }
 
+// scalar adder
 type sAdder struct{ _adder }
 
 func (q *sAdder) init(name, unit, doc string, addFunc func(dst *data.Slice)) {
@@ -43,6 +44,7 @@ func (q *sAdder) init(name, unit, doc string, addFunc func(dst *data.Slice)) {
 func (q *sAdder) Average() float64      { return q.average()[0] }
 func (q *sAdder) Region(r int) *sOneReg { return sOneRegion(q, r) }
 
+// vector adder
 type vAdder struct{ _adder }
 
 func (q *vAdder) init(name, unit, doc string, addFunc func(dst *data.Slice)) {

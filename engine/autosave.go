@@ -1,5 +1,7 @@
 package engine
 
+// Bookkeeping for auto-saving quantities at given intervals.
+
 import (
 	"fmt"
 	"github.com/mumax/3/cuda"
@@ -41,10 +43,12 @@ func AutoSave(q Quantity, period float64) {
 	autoSave(q, period, Save)
 }
 
+// Register quant to be auto-saved as image, every period.
 func AutoSnapshot(q Quantity, period float64) {
 	autoSave(q, period, Snapshot)
 }
 
+// register save(q) to be called every period
 func autoSave(q Quantity, period float64, save func(Quantity)) {
 	if period == 0 {
 		delete(output, q)
@@ -53,7 +57,10 @@ func autoSave(q Quantity, period float64, save func(Quantity)) {
 	}
 }
 
-var FilenameFormat = "%s%06d"
+var (
+	FilenameFormat = "%s%06d" // formatting string for auto filenames.
+	SnapshotFormat = "jpg"
+)
 
 // Save once, with auto file name
 func Save(q Quantity) {
@@ -62,11 +69,11 @@ func Save(q Quantity) {
 	autonum[q]++
 }
 
+// generate auto file name based on save count and FilenameFormat. E.g.:
+// 	m000001.ovf
 func autoFname(name string, num int) string {
 	return fmt.Sprintf(OD+FilenameFormat+".ovf", name, num)
 }
-
-var SnapshotFormat = "jpg"
 
 // Save image once, with auto file name
 func Snapshot(q Quantity) {
@@ -75,8 +82,9 @@ func Snapshot(q Quantity) {
 	if r {
 		defer cuda.Recycle(s)
 	}
-	util.FatalErr(draw.RenderFile(fname, assureCPU(s), "", ""))
+	data := s.HostCopy() // must be copy (asyncio)
 	autonum[q]++
+	saveQue <- func() { util.FatalErr(draw.RenderFile(fname, data, "", "")) }
 }
 
 // keeps info needed to decide when a quantity needs to be periodically saved

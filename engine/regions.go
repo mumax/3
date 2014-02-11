@@ -130,6 +130,14 @@ func (r *Regions) LoadFile(fname string) {
 	r.gpuCache.Upload(l)
 }
 
+func (r *Regions) average() []float64 {
+	s, recycle := r.Slice()
+	if recycle {
+		defer cuda.Recycle(s)
+	}
+	return sAverageUniverse(s)
+}
+
 // Set the region of one cell
 // TODO dedup
 func (r *Regions) SetCell(ix, iy, iz int, region int) {

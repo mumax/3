@@ -1,6 +1,10 @@
 package cuda
 
 // Pool of re-usable GPU buffers.
+// Synchronization subtlety:
+// async kernel launches mean a buffer may already be recycled when still in use.
+// That should be fine since the next launch run in the same stream (0), and will
+// effectively wait for the previous operation on the buffer.
 
 import (
 	"github.com/barnex/cuda5/cu"
@@ -18,6 +22,9 @@ const buf_max = 100 // maximum number of buffers to allocate (detect memory leak
 
 // Returns a GPU slice for temporary use. To be returned to the pool with Recycle
 func Buffer(nComp int, size [3]int) *data.Slice {
+	if Synchronous {
+		Sync()
+	}
 	if buf_pool == nil {
 		buf_pool = make(map[int][]unsafe.Pointer)
 		buf_check = make(map[unsafe.Pointer]struct{})
@@ -45,6 +52,9 @@ func Buffer(nComp int, size [3]int) *data.Slice {
 
 // Returns a buffer obtained from GetBuffer to the pool.
 func Recycle(s *data.Slice) {
+	if Synchronous {
+		Sync()
+	}
 	N := s.Len()
 	pool := buf_pool[N]
 	for i := 0; i < s.NComp(); i++ {
@@ -60,6 +70,7 @@ func Recycle(s *data.Slice) {
 
 // Frees all buffers. Called after mesh resize.
 func FreeBuffers() {
+	Sync()
 	for _, size := range buf_pool {
 		for i := range size {
 			cu.DevicePtr(size[i]).Free()

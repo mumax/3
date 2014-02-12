@@ -123,7 +123,7 @@ tableAdd(m.Region(1))    // add average m over region 1 to table
 The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
 <pre><code>m = uniform(1, 0, 0)
 m.SetRegion(1, vortex(1, 1))
-m.LoadFile("config.dump")
+m.LoadFile("config.ovf")
 </code></pre>
 
 {{range .FilterName "m"}} {{template "entry" .}} {{end}}
@@ -157,8 +157,8 @@ Field or current excitations can be set in the same way as material parameters:
 B_ext.SetRegion(1, vector(0, 0, 0.1))
 </code></pre>
 Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(x,y,z) * f(t) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
-<pre><code>B_ext.Add(LoadFile("antenna.dump"), sin(2*pi*f*t))
-JPol.Add(LoadFile("current.dump"), 1)
+<pre><code>B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*f*t))
+JPol.Add(LoadFile("current.ovf"), 1)
 </code></pre>
 
 {{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
@@ -168,13 +168,35 @@ JPol.Add(LoadFile("current.dump"), 1)
 
 The quantities listed below can be output. Also, derived quantities can be produced: the quantity restricted to a certain region or a single component. E.g.:
 
-<code><pre>
-m           // magnetization quantity
+<code><pre>m           // magnetization quantity
 m.Comp(0)   // x-component
 m.Region(1) // magnetization in region 1 (0 elsewhere)
 </pre></code>
 
 {{range .FilterType "*engine.sSetter" "*engine.vSetter" "*engine.sAdder" "*engine.vAdder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions" "engine.Quantity"}} {{template "entry" .}} {{end}}
+
+
+<hr/><h1>Slicing and dicing output</h1>
+
+To save storage space, it's possible to save only the part of the output we're interested in. This works on all output quantities (not only m)
+
+<code><pre>
+save(m)                         // save full magnetization
+save(m.Comp(0))                 // save only x-component
+save(CropLayer(m, 13))          // save only layer 13
+save(CropLayer(m.Comp(0), 13))  // save only x-component of layer 13
+</pre></code>
+
+Or even:
+<code><pre>
+mx   := m.Comp(0)
+mx13 := CropLayer(mx, 13) 
+save(mx13)
+tableAdd(mx13)
+</pre></code>
+
+
+{{range .FilterName "Crop" "CropX" "CropY" "CropZ" "CropLayer"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1> Scheduling output </h1>

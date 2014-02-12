@@ -301,6 +301,39 @@ saveas(m, "m_final")
 
 {{.Output}}
 
+
+<hr/><h2>Slicing and dicing output</h2>
+
+The example below illustrates how to save only the part of the output you're interested in.
+
+{{.Example `
+Nx := 256
+Ny := 256
+Nz := 1
+setgridsize(Ny, Nx, Nz)
+c := 4e-9
+setcellsize(c, c, c)
+
+setgeom(circle(Nx*c))
+
+Msat  = 800e3 
+Aex   = 12e-13
+alpha = 1
+m = vortex(1, 1)
+
+save(m)
+save(m.Comp(0))
+save(Crop(m, 0, Nx/2, 0, Ny/2, 0, Nz))
+
+mx := m.Comp(0)
+mx_center := CropY(mx, Ny/4, 3*Ny/4)
+save(mx_center)
+
+`}}
+
+{{.Output}}
+
+
 <hr/><h2>PMA Racetrack</h2>
 {{.Example `
 // In this example we drive a domain wall in PMA material by spin-transfer torque.

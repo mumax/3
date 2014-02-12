@@ -50,13 +50,13 @@ func Crop(parent Quantity, x1, x2, y1, y2, z1, z2 int) *cropped {
 	util.Argument(x2 <= n[X] && y2 <= n[Y] && z2 <= n[Z])
 
 	name := parent.Name()
-	if x1 != 0 && x2 != n[X] {
+	if x1 != 0 || x2 != n[X] {
 		name += "_xrange" + rangeStr(x1, x2)
 	}
-	if y1 != 0 && y2 != n[Y] {
+	if y1 != 0 || y2 != n[Y] {
 		name += "_yrange" + rangeStr(y1, y2)
 	}
-	if z1 != 0 && z2 != n[Z] {
+	if z1 != 0 || z2 != n[Z] {
 		name += "_zrange" + rangeStr(z1, z2)
 	}
 
@@ -65,10 +65,11 @@ func Crop(parent Quantity, x1, x2, y1, y2, z1, z2 int) *cropped {
 
 func rangeStr(a, b int) string {
 	if a+1 == b {
-		return fmt.Sprint(a)
+		return fmt.Sprint(a, "_")
 	} else {
-		return fmt.Sprint(a, "-", b)
+		return fmt.Sprint(a, "-", b, "_")
 	}
+	// (trailing underscore to separate from subsequent autosave number)
 }
 
 func (q *cropped) NComp() int   { return q.parent.NComp() }
@@ -76,11 +77,12 @@ func (q *cropped) Name() string { return q.name }
 func (q *cropped) Unit() string { return q.parent.Unit() }
 
 func (q *cropped) Mesh() *data.Mesh {
-	c := q.Mesh().CellSize()
+	c := q.parent.Mesh().CellSize()
 	return data.NewMesh(q.x2-q.x1, q.y2-q.y1, q.z2-q.z1, c[X], c[Y], c[Z])
 }
 
-func (q *cropped) average() []float64 { return qAverageUniverse(q) }
+func (q *cropped) average() []float64 { return qAverageUniverse(q) } // needed for table
+func (q *cropped) Average() []float64 { return q.average() }         // handy for script
 
 func (q *cropped) Slice() (*data.Slice, bool) {
 	src, r := q.parent.Slice()

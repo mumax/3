@@ -1,3 +1,7 @@
+// Test for crop functionality.
+// Slice and dice the magnetization and check
+// for correct averages. Also check that we can save/tabulate
+
 Nx := 160
 Ny := 50
 Nz := 4
@@ -17,27 +21,26 @@ save(m)
 tol := 1e-6
 
 m0 := CropX(m, 0, Nx/2)
-save(m0)
 expect("m0x", m0.Average()[0],  0.5, tol)
 expect("m0y", m0.Average()[1],  0.0, tol)
 expect("m0z", m0.Average()[2], -0.5, tol)
 
 m1 := CropX(m, Nx/2, Nx)
-save(m1)
 expect("m1x", m1.Average()[0],  0.0, tol)
 expect("m1y", m1.Average()[1],  0.5, tol)
 expect("m1z", m1.Average()[2], -0.5, tol)
 
 m2 := CropY(m, 0, Ny/2)
-save(m2)
 expect("m2x", m2.Average()[0],  0.5, tol)
 expect("m2y", m2.Average()[1],  0.5, tol)
 expect("m2z", m2.Average()[2],  0.0, tol)
 
 m3 := CropY(m, Ny/2, Ny)
-save(m3)
 expect("m3x", m3.Average()[0],  0.0, tol)
 expect("m3y", m3.Average()[1],  0.0, tol)
 expect("m3z", m3.Average()[2], -1.0, tol)
 
-
+tableadd(m0)
+save(m0)
+tableadd(CropLayer(m.Comp(1), 2))
+tablesave()

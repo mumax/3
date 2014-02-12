@@ -1,5 +1,6 @@
 #include "stencil.h"
 
+// See crop.go
 extern "C" __global__ void
 crop(float* __restrict__  dst, int Dx, int Dy, int Dz,
      float* __restrict__  src, int Sx, int Sy, int Sz,

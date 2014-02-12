@@ -16,9 +16,10 @@ func qAverageUniverse(q Quantity) []float64 {
 
 // average of slice over universe
 func sAverageUniverse(s *data.Slice) []float64 {
+	nCell := float64(prod(s.Size()))
 	avg := make([]float64, s.NComp())
 	for i := range avg {
-		avg[i] = float64(cuda.Sum(s.Comp(i))) / float64(Mesh().NCell())
+		avg[i] = float64(cuda.Sum(s.Comp(i))) / nCell
 	}
 	return avg
 }

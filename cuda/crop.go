@@ -5,7 +5,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-func crop(dst, src *data.Slice, dstsize, offX, offY, offZ int) {
+func Crop(dst, src *data.Slice, offX, offY, offZ int) {
 	D := dst.Size()
 	S := src.Size()
 	util.Argument(dst.NComp() == src.NComp())

@@ -5,6 +5,8 @@ import (
 	"github.com/mumax/3/util"
 )
 
+// Crop stores in dst a rectangle cropped from src at given offset position.
+// dst size may be smaller than src.
 func Crop(dst, src *data.Slice, offX, offY, offZ int) {
 	D := dst.Size()
 	S := src.Size()

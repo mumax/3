@@ -10,7 +10,7 @@ crop(float* __restrict__  dst, int Dx, int Dy, int Dz,
     int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
     if (ix<Dx && iy<Dy && iz<Dz) {
-        dst[index(ix, iy, iz, Dx, Dy, Dz)] = src[index(ix-Offx, iy-Offy, iz-Offz, Sx, Sy, Sz)];
+        dst[index(ix, iy, iz, Dx, Dy, Dz)] = src[index(ix+Offx, iy+Offy, iz+Offz, Sx, Sy, Sz)];
     }
 }
 

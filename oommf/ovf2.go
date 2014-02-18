@@ -78,7 +78,7 @@ func writeOVF2Data(out io.Writer, q *data.Slice, dataformat string) {
 	switch strings.ToLower(dataformat) {
 	case "text":
 		writeOVFText(out, q)
-	case "binary 4":
+	case "binary", "binary 4":
 		writeOVF2DataBinary4(out, q)
 	default:
 		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)

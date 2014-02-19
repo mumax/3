@@ -8,36 +8,40 @@ import (
 
 // compiles a binary expression x 'op' y
 func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
-	x := typeConv(n.Pos(), w.compileExpr(n.X), float64_t)
-	y := typeConv(n.Pos(), w.compileExpr(n.Y), float64_t)
 	switch n.Op {
 	default:
 		panic(err(n.Pos(), "not allowed:", n.Op))
 	case token.ADD:
-		return &add{binaryExpr{x, y}}
+		return &add{w.newBinExpr(n)}
 	case token.SUB:
-		return &sub{binaryExpr{x, y}}
+		return &sub{w.newBinExpr(n)}
 	case token.MUL:
-		return &mul{binaryExpr{x, y}}
+		return &mul{w.newBinExpr(n)}
 	case token.QUO:
-		return &quo{binaryExpr{x, y}}
+		return &quo{w.newBinExpr(n)}
 	case token.LSS:
-		return &lss{comp{x, y}}
+		return &lss{w.newComp(n)}
 	case token.GTR:
-		return &gtr{comp{x, y}}
+		return &gtr{w.newComp(n)}
 	case token.LEQ:
-		return &leq{comp{x, y}}
+		return &leq{w.newComp(n)}
 	case token.GEQ:
-		return &geq{comp{x, y}}
+		return &geq{w.newComp(n)}
 	case token.EQL:
-		return &eql{comp{x, y}}
+		return &eql{w.newComp(n)}
 	case token.NEQ:
-		return &neq{comp{x, y}}
+		return &neq{w.newComp(n)}
 	}
 }
 
 // abstract superclass for all binary expressions
 type binaryExpr struct{ x, y Expr }
+
+func (w *World) newBinExpr(n *ast.BinaryExpr) binaryExpr {
+	x := typeConv(n.Pos(), w.compileExpr(n.X), float64_t)
+	y := typeConv(n.Pos(), w.compileExpr(n.Y), float64_t)
+	return binaryExpr{x, y}
+}
 
 func (b *binaryExpr) Type() reflect.Type { return float64_t }
 func (b *binaryExpr) Child() []Expr      { return []Expr{b.x, b.y} }
@@ -53,6 +57,10 @@ func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(flo
 func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
 
 type comp binaryExpr
+
+func (w *World) newComp(n *ast.BinaryExpr) comp {
+	return comp(w.newBinExpr(n))
+}
 
 func (b *comp) Type() reflect.Type { return bool_t }
 func (b *comp) Child() []Expr      { return []Expr{b.x, b.y} }

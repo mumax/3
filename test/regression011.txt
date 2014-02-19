@@ -1,0 +1,8 @@
+// Binary boolean operations were missing.
+// Reported by Gabriel Chaves
+
+t0 := 0
+timestep := 1
+Tq := 1e-3
+b := (((t-t0) < timestep ) && ( (Tq > 1e-4) || ( t < 1.0e-13)))
+

@@ -31,6 +31,10 @@ func (w *World) compileBinaryExpr(n *ast.BinaryExpr) Expr {
 		return &eql{w.newComp(n)}
 	case token.NEQ:
 		return &neq{w.newComp(n)}
+	case token.LAND:
+		return &and{w.newBoolOp(n)}
+	case token.LOR:
+		return &or{w.newBoolOp(n)}
 	}
 }
 
@@ -78,3 +82,20 @@ func (b *leq) Eval() interface{} { return b.x.Eval().(float64) <= b.y.Eval().(fl
 func (b *geq) Eval() interface{} { return b.x.Eval().(float64) >= b.y.Eval().(float64) }
 func (b *eql) Eval() interface{} { return b.x.Eval().(float64) == b.y.Eval().(float64) }
 func (b *neq) Eval() interface{} { return b.x.Eval().(float64) != b.y.Eval().(float64) }
+
+type boolOp struct{ x, y Expr }
+
+func (w *World) newBoolOp(n *ast.BinaryExpr) boolOp {
+	x := typeConv(n.Pos(), w.compileExpr(n.X), bool_t)
+	y := typeConv(n.Pos(), w.compileExpr(n.Y), bool_t)
+	return boolOp{x, y}
+}
+
+func (b *boolOp) Child() []Expr      { return []Expr{b.x, b.y} }
+func (b *boolOp) Type() reflect.Type { return bool_t }
+
+type and struct{ boolOp }
+type or struct{ boolOp }
+
+func (b *and) Eval() interface{} { return b.x.Eval().(bool) && b.y.Eval().(bool) }
+func (b *or) Eval() interface{}  { return b.x.Eval().(bool) || b.y.Eval().(bool) }

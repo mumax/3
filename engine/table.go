@@ -15,6 +15,7 @@ func init() {
 	DeclFunc("TableAddVar", TableAddVariable, "Add user-defined variable + name + unit to data table.")
 	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
 	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table ever period (s).")
+	DeclFunc("TablePrint", TablePrint, "Print anyting in the data table")
 	Table.Add(&M)
 }
 
@@ -80,6 +81,15 @@ func (t *DataTable) Save() {
 	fmt.Fprintln(t)
 	t.Flush()
 	t.count++
+}
+
+func (t *DataTable) Println(msg ...interface{}) {
+	t.init()
+	fmt.Fprintln(t, msg...)
+}
+
+func TablePrint(msg ...interface{}) {
+	Table.Println(msg...)
 }
 
 // open writer and write header

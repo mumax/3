@@ -30,9 +30,9 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 	prevSize := globalmesh_.Size()
 	pbc := []int{pbcx, pbcy, pbcz}
 
-	if Nx <= 1 {
-		util.Fatal("mesh size X should be > 1, have: ", Nx)
-	}
+	//if Nx <= 1 {
+	//	util.Fatal("mesh size X should be > 1, have: ", Nx)
+	//}
 
 	if globalmesh_.Size() == [3]int{0, 0, 0} {
 		// first time mesh is set

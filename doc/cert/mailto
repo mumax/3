@@ -1,0 +1,10 @@
+{{/*
+	Template for a mailto link. Usage:
+
+		{{.Inc "mailto" "address@domain.net" }}
+*/}}
+
+{{.Def "addr"  (.Arg 0) }}
+
+<a href="mailto:{{.Var "addr"}}">{{.Var "addr"}}</a>
+

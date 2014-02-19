@@ -1,0 +1,11 @@
+{{/* Include this footer at the end of your html templates */}}
+
+<div class=footer> 
+<hr/>
+
+	{{.Inc "mailto" "arne@vansteenkiste.io"}}
+
+</div>
+
+</body>
+</html>

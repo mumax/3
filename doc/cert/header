@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>mumax3</title>
+	
+	<style>
+		{{.Raw "pure-min.css"}}
+		{{.Raw "style.css"}}
+	</style>
+
+</head>
+
+<body>
+
+<div style="float:left">
+	<img src="cubes.png"/>
+</div>
+
+<div style="float:left">
+<span style="font-size:48px"><b>mumax</b><sup>3</sup><br/></span>
+	GPU-accelerated micromagnetism <br/><br/>
+	<a class="pure-button pure-button-primary" href="index.html">Home</a>
+	<a class="pure-button pure-button-primary" href="https://github.com/mumax/3/releases">Download</a>
+	<a class="pure-button pure-button-primary" href="examples.html">Examples</a>
+	<a class="pure-button pure-button-primary" href="api.html">API</a>
+</div>
+<br style="clear:both"/> 
+
+<hr/>

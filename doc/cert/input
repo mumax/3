@@ -1,0 +1,9 @@
+{{/*
+	Template for including mumax input file. Usage:
+
+		{{.Inc "input" "file.txt" }}
+*/}}
+
+{{.Def "file"  (.Arg 0) }}
+
+<pre><code>{{.Esc (.Var "file") }} </code></pre>

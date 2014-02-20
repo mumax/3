@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide}
+\usepackage{amsmath}
+\usepackage{xspace}
+\usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newcommand{\vc}[1]{\ensuremath{\vec{\textbf{#1}}}}
+\newcommand{\ofrt}{\ensuremath{\left(\vc{r},t \right)}}
+\newcommand{\m}{\vc{m}}   
+\newcommand{\M}{\vc{M}}   
+\newcommand{\Ms}{M_\mathrm{s}}   
+\newcommand{\B}[1]{\vc{B}_\mathrm{#1}}   
+\newcommand{\Beff}{\B{eff}}   
+\newcommand{\tq}[1]{\vc{\ensuremath{\tau}}\ensuremath{_\mathrm{#1}}}   
+\newcommand{\damp}{\ensuremath{\alpha}}
+\newcommand{\Kern}{\vec{\vec{\textbf{K}}}}
+\newcommand{\FFT}{\mathcal{F}}
+\newcommand{\hspin}{(\vc{u}\cdot\nabla)\vc{m}} 
+\newcommand{\mumax}{{mumax$^3$}\xspace}
+\newcommand{\api}[1]{\texttt{#1}\xspace}
+
+
+\begin{document}
+\sf
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\parindent}{0em}
+
+\begin{center}
+\huge{\mumax internals}\\
+\normalsize
+Arne Vansteenkiste.\\
+\end{center}
+
+\tableofcontents
+
+\section{Dynamical equation}
+
+\mumax solves
+
+\begin{equation}
+	\frac{\partial \m}{\partial t} = \gamma_\mathrm{LL} \tq{}
+\end{equation}
+
+
+with variables accessible as:\\
+\begin{tabular}{ll}
+\m                   & \api{m}       \\
+$\gamma_\mathrm{LL}$ & \api{gammaLL} \\
+\tq{}                & \api{torque}  \\
+\end{tabular}
+
+
+\section{Torque}
+
+The total torque is defined as
+
+\begin{equation}
+	\tq{} = \tq{LL} + \tq{ZL} + \tq{SL}
+\end{equation}
+
+with variables accessible as:\\
+\begin{tabular}{lll}
+\tq{}                & \api{torque}   & total torque           \\
+\tq{LL}              & \api{LLtorque} & Landau-Lifshitz torque \\
+\tq{ZL} + \tq{SL}    & \api{STtorque} & Spin-transfer torque   \\
+\end{tabular}
+
+\subsection{Landau-Lifshitz}
+
+\begin{equation}
+	\tq{LL} = \frac{1}{1+\damp^2} \left(  \m \times \Beff  +\damp\left( \m \times \left( \m \times \Beff \right)\right)   \right)
+\end{equation}
+
+\subsection{Zhang-Li}
+\subsection{Slonczewski}
+
+%
+%{{.Inc "formula" "lltorque"}}
+%
+%with variables accessible as:<br/>
+%{{.Inc "tex" `\alpha`}} = {{.Inc "api" "alpha" }} <br/>
+%{{.Inc "tex" `\vec{B}_\mathrm{eff}` }}  = {{.Inc "api" "B_eff"}} = {{.Inc "api" "B_exch" }} + {{.Inc "api" "B_demag" }} + {{.Inc "api" "B_anis" }} + {{.Inc "api" "B_ext" }}
+%
+%<h2>LLtorque test</h2>
+%
+%Damping-less precession of single spin in 100mT field:
+%{{.Inc "input" "precession.txt"}}
+%{{.Inc "img"   "precession.svg"}}
+%
+%<h1>exchange</h1>
+%
+%The exchange field is defined as:
+%
+%{{.Inc "formula" "bexch" }}
+%
+%with variables accessible as:<br/>
+%{{.Inc "tex" `A`}} = {{.Inc "api" "Aex" }} <br/>
+%{{.Inc "tex" `D`}} = {{.Inc "api" "Dex" }} <br/>
+%
+%<p>The first term is the Heisenberg exchange. The discretized form uses a 6-neighbor approximation with Neumann boundary conditions. See M.J. Donahue and D.G. Porter, Physica B, 343, 177-183 (2004).</p>
+%
+%
+%
+%<p>The second term the Dzyaloshinskii-Moriya interaction according to Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).</p>
+%
+%
+%
+%Mumax uses is a linear approximation suitable for small spin-spin angles. It is the user's responsibility to choose a sufficiently small cell size.
+%We test the exchange interaction by setting the magnetization to a uniform spiral and calculating the exchange energy as a function of the spiral period.
+%
+%{{.Inc "input" "exchange1d.txt"}}
+%{{.Inc "img"   "exchange1dspiral.svg"}}
+%{{.Inc "img"   "exchange1d.svg"}}
+%{{.Inc "img"   "exchange1d2.svg"}}
+%
+%
+%<h1>Solver precission</h1>
+%{{.Inc "input" "heun.txt"}}
+%{{.Inc "img"   "heun1.svg"}}
+%{{.Inc "img"   "heun2.svg"}}
+%
+%
+%
+%{{.Inc "footer"}}
+%
+%
+
+\end{document}

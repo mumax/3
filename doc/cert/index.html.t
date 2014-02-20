@@ -1,6 +1,6 @@
 {{.Inc "header"}}
 
-<h1>Mumax internals</h1>
+<h1>Mumax certification</h1>
 
 Mumax solves
 
@@ -9,17 +9,17 @@ Mumax solves
 with variables accessible as:<br/>
 {{.Inc "tex" `\vec m`}} = {{.Inc "api" "m" }} <br/>
 {{.Inc "tex" `\gamma_\mathrm{LL}`}} = {{.Inc "api" "gammaLL" }} <br/>
-{{.Inc "tex" `\vec\tau` }}          = {{.Inc "api" "torque"}} = {{.Inc "api" "LLtorque" }} + {{.Inc "api" "STtorque" }}
+{{.Inc "tex" `\vec\tau` }}          = {{.Inc "api" "torque"}} 
 
-<h1>LLtorque</h1>
+<h1>torque</h1>
 
 Landau-Lifshitz torque expressed in Tesla:
 
 {{.Inc "formula" "lltorque"}}
 
 with variables accessible as:<br/>
-{{.Inc "tex" `\alpha`}} = {{.Inc "api" "alpha" }} <br/>
-{{.Inc "tex" `\vec{B}_\mathrm{eff}` }}  = {{.Inc "api" "B_eff"}} = {{.Inc "api" "B_exch" }} + {{.Inc "api" "B_demag" }} + {{.Inc "api" "B_anis" }} + {{.Inc "api" "B_ext" }}
+{{.Inc "tex" `\alpha`}}                  {{.Inc "api" "alpha" }} <br/>
+{{.Inc "tex" `\vec{B}_\mathrm{eff}` }}   {{.Inc "api" "B_eff"}} = {{.Inc "api" "B_exch" }} + {{.Inc "api" "B_demag" }} + {{.Inc "api" "B_anis" }} + {{.Inc "api" "B_ext" }}
 
 <h2>LLtorque test</h2>
 

@@ -20,6 +20,8 @@ func HeunStep(s *solver, y *data.Slice) {
 	s.NEval++
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
+	// s.postStep()  // improves accuracy for good steps but painful for subtracting bad torque
+
 	// stage 2
 	dy := cuda.Buffer(3, y.Size())
 	defer cuda.Recycle(dy)

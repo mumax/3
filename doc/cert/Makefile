@@ -1,3 +1,6 @@
+quick:
+	boilerplate *.t
+
 all:
 	./precession.gplot
 	./heun.gplot

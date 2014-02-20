@@ -31,17 +31,19 @@ img  {
 }
 
 h1   { 
-	font-color: gray; 
+	color: #375EAB; 
+	font-size: 1.5em;
 }
 
 
 h2   { 
-	font-color: gray; 
+	color: #375EAB; 
+	font-size: 1.2em;
 }
 
 
 h3   { 
-	font-color: gray; 
+	color: #375EAB; 
 }
 
 hr   { 
@@ -106,8 +108,108 @@ pre  {
 <hr/>
 
 
+<h1>Mumax internals</h1>
 
-<h1>Precession</h1>
+Mumax solves
+
+
+
+
+
+<p style="text-align:center">
+	<img src="llg.png" />
+</p>
+
+
+
+with variables accessible as:<br/>
+
+
+
+
+
+<img src="33f47126390a7227
+.png" />
+
+ = 
+<code>m</code>
+ <br/>
+
+
+
+
+
+<img src="146f9157913c3622
+.png" />
+
+ = 
+<code>gammaLL</code>
+ <br/>
+
+
+
+
+
+<img src="89cd55ef24fcb013
+.png" />
+
+          = 
+<code>torque</code>
+ = 
+<code>LLtorque</code>
+ + 
+<code>STtorque</code>
+
+
+<h1>LLtorque</h1>
+
+Landau-Lifshitz torque expressed in Tesla:
+
+
+
+
+
+<p style="text-align:center">
+	<img src="lltorque.png" />
+</p>
+
+
+
+with variables accessible as:<br/>
+
+
+
+
+
+<img src="0246c06091fcea9f
+.png" />
+
+ = 
+<code>alpha</code>
+ <br/>
+
+
+
+
+
+<img src="604e9adc0910c1e3
+.png" />
+
+  = 
+<code>B_eff</code>
+ = 
+<code>B_exch</code>
+ + 
+<code>B_demag</code>
+ + 
+<code>B_anis</code>
+ + 
+<code>B_ext</code>
+
+
+<h2>LLtorque test</h2>
+
+Damping-less precession of single spin in 100mT field:
 
 
 
@@ -126,6 +228,110 @@ Run(3e-9)
 
 
 <a href="precession.svg"> <img src="precession.svg"/> </a>
+
+
+
+<h1>exchange</h1>
+
+The exchange field is defined as:
+
+
+
+
+
+<p style="text-align:center">
+	<img src="bexch.png" />
+</p>
+
+
+
+with variables accessible as:<br/>
+
+
+
+
+
+<img src="bf072e9119077b4e
+.png" />
+
+ = 
+<code>Aex</code>
+ <br/>
+
+
+
+
+
+<img src="57b8d74538412734
+.png" />
+
+ = 
+<code>Dex</code>
+ <br/>
+
+<p>The first term is the Heisenberg exchange. The discretized form uses a 6-neighbor approximation with Neumann boundary conditions. See M.J. Donahue and D.G. Porter, Physica B, 343, 177-183 (2004).</p>
+
+
+
+<p>The second term the Dzyaloshinskii-Moriya interaction according to Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).</p>
+
+
+
+Mumax uses is a linear approximation suitable for small spin-spin angles. It is the user's responsibility to choose a sufficiently small cell size.
+We test the exchange interaction by setting the magnetization to a uniform spiral and calculating the exchange energy as a function of the spiral period.
+
+
+
+
+
+<pre><code>N := 1024
+c := 1e-9
+SetGridSize(N, 1, 1)
+SetCellSize(c, c, c)
+vol := N * c * c * c
+
+A  := 10e-12
+Aex = A
+Msat = 1e6
+EnableDemag = false
+
+mag := newSlice(3, N, 1, 1)
+for k:=0; k&lt;N/2; k++{
+	for i:=0; i&lt;N; i++{
+		phase := (i * k * 2*pi) / N
+		my := sin(phase)
+		mz := cos(phase)
+		mag.set(1, i, 0, 0, my)
+		mag.set(2, i, 0, 0, mz)
+	}
+	m.SetArray(mag)
+	save(m)
+	
+	Energy := vol * A * pow( 2*pi*k / (N*c), 2 ) 
+	fprintln(&#34;output.txt&#34;, k, Energy, E_exch)
+}
+ </code></pre>
+
+
+
+
+
+<a href="exchange1dspiral.svg"> <img src="exchange1dspiral.svg"/> </a>
+
+
+
+
+
+
+<a href="exchange1d.svg"> <img src="exchange1d.svg"/> </a>
+
+
+
+
+
+
+<a href="exchange1d2.svg"> <img src="exchange1d2.svg"/> </a>
+
 
 
 
@@ -188,59 +394,6 @@ for t &lt; 10e-9{
 
 
 
-<h1>Exchange interaction</h1>
-
-
-
-
-<pre><code>N := 1024
-c := 1e-9
-SetGridSize(N, 1, 1)
-SetCellSize(c, c, c)
-vol := N * c * c * c
-
-A  := 10e-12
-Aex = A
-Msat = 1e6
-EnableDemag = false
-
-mag := newSlic/2e(3, N, 1, 1)
-for k:=0; k&lt;N/2; k++{
-	for i:=0; i&lt;N; i++{
-		phase := (i * k * 2*pi) / N
-		my := sin(phase)
-		mz := cos(phase)
-		mag.set(1, i, 0, 0, my)
-		mag.set(2, i, 0, 0, mz)
-	}
-	m.SetArray(mag)
-	save(m)
-	
-	Energy := vol * A * pow( 2*pi*k / (N*c), 2 ) 
-	fprintln(&#34;output.txt&#34;, k, Energy, E_exch)
-}
- </code></pre>
-
-
-
-
-
-<a href="exchange1dspiral.svg"> <img src="exchange1dspiral.svg"/> </a>
-
-
-
-
-
-
-<a href="exchange1d.svg"> <img src="exchange1d.svg"/> </a>
-
-
-
-
-
-
-<a href="exchange1d2.svg"> <img src="exchange1d2.svg"/> </a>
-
 
 
 
@@ -260,4 +413,6 @@ for k:=0; k&lt;N/2; k++{
 
 </body>
 </html>
+
+
 

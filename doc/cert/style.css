@@ -13,17 +13,19 @@ img  {
 }
 
 h1   { 
-	font-color: gray; 
+	color: #375EAB; 
+	font-size: 1.5em;
 }
 
 
 h2   { 
-	font-color: gray; 
+	color: #375EAB; 
+	font-size: 1.2em;
 }
 
 
 h3   { 
-	font-color: gray; 
+	color: #375EAB; 
 }
 
 hr   { 

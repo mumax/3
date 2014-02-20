@@ -60,6 +60,9 @@ func (b *thermField) update() {
 	}
 	if b.noise == nil {
 		b.noise = cuda.NewSlice(b.NComp(), b.Mesh().Size())
+		// when noise was (re-)allocated it's invalid for sure.
+		B_therm.step = -1
+		B_therm.dt = -1
 	}
 
 	util.AssertMsg(Solver.FixDt != 0, "Temperature requires fixed time step")

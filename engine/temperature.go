@@ -72,7 +72,6 @@ func (b *thermField) update() {
 		return
 	}
 
-	cuda.Memset(b.noise, 0, 0, 0)
 	N := Mesh().NCell()
 	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (GammaLL * cellVolume() * Solver.Dt_si)
 	noise := cuda.Buffer(1, Mesh().Size())
@@ -83,7 +82,7 @@ func (b *thermField) update() {
 	dst := b.noise
 	for i := 0; i < 3; i++ {
 		b.generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-		cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(), kmu0_VgammaDt, regions.Gpu())
+		cuda.SetTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(), kmu0_VgammaDt, regions.Gpu())
 	}
 
 	b.step = Solver.NSteps

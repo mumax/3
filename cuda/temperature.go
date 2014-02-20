@@ -6,14 +6,14 @@ import (
 	"unsafe"
 )
 
-// Add thermal noise (Brown) to Beff.
+// Set Bth to thermal noise (Brown).
 // see temperature.cu
-func AddTemperature(Beff, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
-	util.Argument(Beff.NComp() == 1 && noise.NComp() == 1)
+func SetTemperature(Bth, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
+	util.Argument(Bth.NComp() == 1 && noise.NComp() == 1)
 
-	N := Beff.Len()
+	N := Bth.Len()
 	cfg := make1DConf(N)
 
-	k_addtemperature_async(Beff.DevPtr(0), noise.DevPtr(0), float32(kmu0_VgammaDt), unsafe.Pointer(temp_red),
+	k_settemperature_async(Bth.DevPtr(0), noise.DevPtr(0), float32(kmu0_VgammaDt), unsafe.Pointer(temp_red),
 		regions.Ptr, N, cfg)
 }

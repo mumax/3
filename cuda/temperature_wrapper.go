@@ -11,11 +11,11 @@ import (
 	"unsafe"
 )
 
-// CUDA handle for addtemperature kernel
-var addtemperature_code cu.Function
+// CUDA handle for settemperature kernel
+var settemperature_code cu.Function
 
-// Stores the arguments for addtemperature kernel invocation
-type addtemperature_args_t struct {
+// Stores the arguments for settemperature kernel invocation
+type settemperature_args_t struct {
 	arg_B            unsafe.Pointer
 	arg_noise        unsafe.Pointer
 	arg_kB2_VgammaDt float32
@@ -26,82 +26,82 @@ type addtemperature_args_t struct {
 	sync.Mutex
 }
 
-// Stores the arguments for addtemperature kernel invocation
-var addtemperature_args addtemperature_args_t
+// Stores the arguments for settemperature kernel invocation
+var settemperature_args settemperature_args_t
 
 func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	addtemperature_args.argptr[0] = unsafe.Pointer(&addtemperature_args.arg_B)
-	addtemperature_args.argptr[1] = unsafe.Pointer(&addtemperature_args.arg_noise)
-	addtemperature_args.argptr[2] = unsafe.Pointer(&addtemperature_args.arg_kB2_VgammaDt)
-	addtemperature_args.argptr[3] = unsafe.Pointer(&addtemperature_args.arg_tempRedLUT)
-	addtemperature_args.argptr[4] = unsafe.Pointer(&addtemperature_args.arg_regions)
-	addtemperature_args.argptr[5] = unsafe.Pointer(&addtemperature_args.arg_N)
+	settemperature_args.argptr[0] = unsafe.Pointer(&settemperature_args.arg_B)
+	settemperature_args.argptr[1] = unsafe.Pointer(&settemperature_args.arg_noise)
+	settemperature_args.argptr[2] = unsafe.Pointer(&settemperature_args.arg_kB2_VgammaDt)
+	settemperature_args.argptr[3] = unsafe.Pointer(&settemperature_args.arg_tempRedLUT)
+	settemperature_args.argptr[4] = unsafe.Pointer(&settemperature_args.arg_regions)
+	settemperature_args.argptr[5] = unsafe.Pointer(&settemperature_args.arg_N)
 }
 
-// Wrapper for addtemperature CUDA kernel, asynchronous.
-func k_addtemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+// Wrapper for settemperature CUDA kernel, asynchronous.
+func k_settemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
 	}
 
-	addtemperature_args.Lock()
-	defer addtemperature_args.Unlock()
+	settemperature_args.Lock()
+	defer settemperature_args.Unlock()
 
-	if addtemperature_code == 0 {
-		addtemperature_code = fatbinLoad(addtemperature_map, "addtemperature")
+	if settemperature_code == 0 {
+		settemperature_code = fatbinLoad(settemperature_map, "settemperature")
 	}
 
-	addtemperature_args.arg_B = B
-	addtemperature_args.arg_noise = noise
-	addtemperature_args.arg_kB2_VgammaDt = kB2_VgammaDt
-	addtemperature_args.arg_tempRedLUT = tempRedLUT
-	addtemperature_args.arg_regions = regions
-	addtemperature_args.arg_N = N
+	settemperature_args.arg_B = B
+	settemperature_args.arg_noise = noise
+	settemperature_args.arg_kB2_VgammaDt = kB2_VgammaDt
+	settemperature_args.arg_tempRedLUT = tempRedLUT
+	settemperature_args.arg_regions = regions
+	settemperature_args.arg_N = N
 
-	args := addtemperature_args.argptr[:]
-	cu.LaunchKernel(addtemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
+	args := settemperature_args.argptr[:]
+	cu.LaunchKernel(settemperature_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug
 		Sync()
 	}
 }
 
-// maps compute capability on PTX code for addtemperature kernel.
-var addtemperature_map = map[int]string{0: "",
-	20: addtemperature_ptx_20,
-	30: addtemperature_ptx_30,
-	35: addtemperature_ptx_35}
+// maps compute capability on PTX code for settemperature kernel.
+var settemperature_map = map[int]string{0: "",
+	20: settemperature_ptx_20,
+	30: settemperature_ptx_30,
+	35: settemperature_ptx_35}
 
-// addtemperature PTX code for various compute capabilities.
+// settemperature PTX code for various compute capabilities.
 const (
-	addtemperature_ptx_20 = `
+	settemperature_ptx_20 = `
 .version 3.2
 .target sm_20
 .address_size 64
 
 
-.visible .entry addtemperature(
-	.param .u64 addtemperature_param_0,
-	.param .u64 addtemperature_param_1,
-	.param .f32 addtemperature_param_2,
-	.param .u64 addtemperature_param_3,
-	.param .u64 addtemperature_param_4,
-	.param .u32 addtemperature_param_5
+.visible .entry settemperature(
+	.param .u64 settemperature_param_0,
+	.param .u64 settemperature_param_1,
+	.param .f32 settemperature_param_2,
+	.param .u64 settemperature_param_3,
+	.param .u64 settemperature_param_4,
+	.param .u32 settemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<8>;
+	.reg .f32 	%f<7>;
 	.reg .s64 	%rd<17>;
 
 
-	ld.param.u64 	%rd5, [addtemperature_param_0];
-	ld.param.u64 	%rd6, [addtemperature_param_1];
-	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd7, [addtemperature_param_3];
-	ld.param.u64 	%rd8, [addtemperature_param_4];
-	ld.param.u32 	%r2, [addtemperature_param_5];
+	ld.param.u64 	%rd5, [settemperature_param_0];
+	ld.param.u64 	%rd6, [settemperature_param_1];
+	ld.param.f32 	%f1, [settemperature_param_2];
+	ld.param.u64 	%rd7, [settemperature_param_3];
+	ld.param.u64 	%rd8, [settemperature_param_4];
+	ld.param.u32 	%r2, [settemperature_param_5];
 	cvta.to.global.u64 	%rd1, %rd5;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
@@ -136,11 +136,10 @@ const (
 	sqrt.rn.f32 	%f4, %f3;
 	.loc 1 11 1
 	ld.global.f32 	%f5, [%rd15];
-	.loc 1 11 96
+	.loc 1 11 95
+	mul.f32 	%f6, %f5, %f4;
 	add.s64 	%rd16, %rd1, %rd14;
-	ld.global.f32 	%f6, [%rd16];
-	fma.rn.f32 	%f7, %f5, %f4, %f6;
-	st.global.f32 	[%rd16], %f7;
+	st.global.f32 	[%rd16], %f6;
 
 BB0_2:
 	.loc 1 13 2
@@ -149,33 +148,33 @@ BB0_2:
 
 
 `
-	addtemperature_ptx_30 = `
+	settemperature_ptx_30 = `
 .version 3.2
 .target sm_30
 .address_size 64
 
 
-.visible .entry addtemperature(
-	.param .u64 addtemperature_param_0,
-	.param .u64 addtemperature_param_1,
-	.param .f32 addtemperature_param_2,
-	.param .u64 addtemperature_param_3,
-	.param .u64 addtemperature_param_4,
-	.param .u32 addtemperature_param_5
+.visible .entry settemperature(
+	.param .u64 settemperature_param_0,
+	.param .u64 settemperature_param_1,
+	.param .f32 settemperature_param_2,
+	.param .u64 settemperature_param_3,
+	.param .u64 settemperature_param_4,
+	.param .u32 settemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<8>;
+	.reg .f32 	%f<7>;
 	.reg .s64 	%rd<17>;
 
 
-	ld.param.u64 	%rd5, [addtemperature_param_0];
-	ld.param.u64 	%rd6, [addtemperature_param_1];
-	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd7, [addtemperature_param_3];
-	ld.param.u64 	%rd8, [addtemperature_param_4];
-	ld.param.u32 	%r2, [addtemperature_param_5];
+	ld.param.u64 	%rd5, [settemperature_param_0];
+	ld.param.u64 	%rd6, [settemperature_param_1];
+	ld.param.f32 	%f1, [settemperature_param_2];
+	ld.param.u64 	%rd7, [settemperature_param_3];
+	ld.param.u64 	%rd8, [settemperature_param_4];
+	ld.param.u32 	%r2, [settemperature_param_5];
 	cvta.to.global.u64 	%rd1, %rd5;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
@@ -210,11 +209,10 @@ BB0_2:
 	sqrt.rn.f32 	%f4, %f3;
 	.loc 1 11 1
 	ld.global.f32 	%f5, [%rd15];
-	.loc 1 11 96
+	.loc 1 11 95
+	mul.f32 	%f6, %f5, %f4;
 	add.s64 	%rd16, %rd1, %rd14;
-	ld.global.f32 	%f6, [%rd16];
-	fma.rn.f32 	%f7, %f5, %f4, %f6;
-	st.global.f32 	[%rd16], %f7;
+	st.global.f32 	[%rd16], %f6;
 
 BB0_2:
 	.loc 1 13 2
@@ -223,7 +221,7 @@ BB0_2:
 
 
 `
-	addtemperature_ptx_35 = `
+	settemperature_ptx_35 = `
 .version 3.2
 .target sm_35
 .address_size 64
@@ -257,28 +255,28 @@ BB0_2:
 	ret;
 }
 
-.visible .entry addtemperature(
-	.param .u64 addtemperature_param_0,
-	.param .u64 addtemperature_param_1,
-	.param .f32 addtemperature_param_2,
-	.param .u64 addtemperature_param_3,
-	.param .u64 addtemperature_param_4,
-	.param .u32 addtemperature_param_5
+.visible .entry settemperature(
+	.param .u64 settemperature_param_0,
+	.param .u64 settemperature_param_1,
+	.param .f32 settemperature_param_2,
+	.param .u64 settemperature_param_3,
+	.param .u64 settemperature_param_4,
+	.param .u32 settemperature_param_5
 )
 {
 	.reg .pred 	%p<2>;
 	.reg .s16 	%rs<2>;
 	.reg .s32 	%r<9>;
-	.reg .f32 	%f<8>;
+	.reg .f32 	%f<7>;
 	.reg .s64 	%rd<18>;
 
 
-	ld.param.u64 	%rd5, [addtemperature_param_0];
-	ld.param.u64 	%rd6, [addtemperature_param_1];
-	ld.param.f32 	%f1, [addtemperature_param_2];
-	ld.param.u64 	%rd7, [addtemperature_param_3];
-	ld.param.u64 	%rd8, [addtemperature_param_4];
-	ld.param.u32 	%r2, [addtemperature_param_5];
+	ld.param.u64 	%rd5, [settemperature_param_0];
+	ld.param.u64 	%rd6, [settemperature_param_1];
+	ld.param.f32 	%f1, [settemperature_param_2];
+	ld.param.u64 	%rd7, [settemperature_param_3];
+	ld.param.u64 	%rd8, [settemperature_param_4];
+	ld.param.u32 	%r2, [settemperature_param_5];
 	cvta.to.global.u64 	%rd1, %rd5;
 	cvta.to.global.u64 	%rd2, %rd6;
 	cvta.to.global.u64 	%rd3, %rd7;
@@ -315,11 +313,10 @@ BB0_2:
 	sqrt.rn.f32 	%f4, %f3;
 	.loc 1 11 1
 	ld.global.nc.f32 	%f5, [%rd16];
-	.loc 1 11 96
+	.loc 1 11 95
+	mul.f32 	%f6, %f5, %f4;
 	add.s64 	%rd17, %rd1, %rd15;
-	ld.global.f32 	%f6, [%rd17];
-	fma.rn.f32 	%f7, %f5, %f4, %f6;
-	st.global.f32 	[%rd17], %f7;
+	st.global.f32 	[%rd17], %f6;
 
 BB2_2:
 	.loc 1 13 2

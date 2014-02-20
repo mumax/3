@@ -11,20 +11,28 @@ import (
 var (
 	Temp        ScalarParam
 	temp_red    derivedParam
-	B_therm     vAdder
 	E_therm     *GetScalar
 	Edens_therm sAdder
-	generator   curand.Generator
-	thermSeed   int64 = 0
+	B_therm     thermField
 )
+
+// thermField calculates and caches thermal noise.
+type thermField struct {
+	seed      int64 // seed for generator
+	generator curand.Generator
+	noise     *data.Slice // noise buffer
+	step      int         // solver step corresponding to noise
+	dt        float64     // solver timestep corresponding to noise
+}
 
 func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
-	B_therm.init("B_therm", "T", "Thermal field", AddThermalField)
 	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", GetThermalEnergy)
 	Edens_therm.init("Edens_therm", "J/m3", "Thermal energy density", addEdens(&B_therm, -1))
 	registerEnergy(GetThermalEnergy, Edens_therm.AddTo)
+	B_therm.step = -1 // invalidate noise cache
+	DeclROnly("B_therm", &B_therm, "Thermal field (T)")
 
 	// reduced temperature = (alpha * T) / (mu0 * Msat)
 	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedParam) {
@@ -38,32 +46,45 @@ func init() {
 	})
 }
 
-func AddThermalField(dst *data.Slice) {
-	if Temp.isZero() {
+func (b *thermField) AddTo(dst *data.Slice) {
+	if !Temp.isZero() {
+		b.update()
+		cuda.Madd2(dst, dst, b.noise, 1, 1)
+	}
+}
+
+func (b *thermField) update() {
+	if b.generator == 0 {
+		b.generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
+		b.generator.SetSeed(b.seed)
+	}
+	if b.noise == nil {
+		b.noise = cuda.NewSlice(b.NComp(), b.Mesh().Size())
+	}
+
+	util.AssertMsg(Solver.FixDt != 0, "Temperature requires fixed time step")
+
+	// keep constant during time step
+	if Solver.NSteps == b.step && Solver.Dt_si == b.dt {
 		return
 	}
-	/* With higher-order solvers, the thermal field should remain constant during the step,
-	   requiring us to save it. While possible, it hardly is worth the effort given the fact
-	   that the time step will be extremely small anyway.
-	*/
-	util.AssertMsg(solvertype == 1, "Temperature can only be used with Euler solver (solvertype 1)")
-	if generator == 0 {
-		generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
-		generator.SetSeed(thermSeed)
-	}
 
+	cuda.Memset(b.noise, 0, 0, 0)
 	N := Mesh().NCell()
 	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (GammaLL * cellVolume() * Solver.Dt_si)
-
 	noise := cuda.Buffer(1, Mesh().Size())
 	defer cuda.Recycle(noise)
 
 	const mean = 0
 	const stddev = 1
+	dst := b.noise
 	for i := 0; i < 3; i++ {
-		generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
+		b.generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
 		cuda.AddTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(), kmu0_VgammaDt, regions.Gpu())
 	}
+
+	b.step = Solver.NSteps
+	b.dt = Solver.Dt_si
 }
 
 func GetThermalEnergy() float64 {
@@ -72,8 +93,18 @@ func GetThermalEnergy() float64 {
 
 // Seeds the thermal noise generator
 func ThermSeed(seed int) {
-	thermSeed = int64(seed)
-	if generator != 0 {
-		generator.SetSeed(thermSeed)
+	B_therm.seed = int64(seed)
+	if B_therm.generator != 0 {
+		B_therm.generator.SetSeed(B_therm.seed)
 	}
+}
+
+func (b *thermField) Mesh() *data.Mesh   { return Mesh() }
+func (b *thermField) NComp() int         { return 3 }
+func (b *thermField) Name() string       { return "Thermal field" }
+func (b *thermField) Unit() string       { return "T" }
+func (b *thermField) average() []float64 { return qAverageUniverse(b) }
+func (b *thermField) Slice() (*data.Slice, bool) {
+	b.update()
+	return b.noise, false
 }

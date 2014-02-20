@@ -250,11 +250,8 @@ func (g *guistate) prepareParam() {
 	}
 	g.OnEvent("Temp", func() {
 		Inject <- func() {
-			if solvertype != 1 {
-				g.EvalGUI("SetSolver(1)")
-			}
 			if Solver.FixDt == 0 {
-				g.EvalGUI("FixDt = 1e-15")
+				g.EvalGUI("FixDt = 10e-15") // finite temperature requires fixed time step
 			}
 			g.EvalGUI("Temp = " + g.StringValue("Temp"))
 		}

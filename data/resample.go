@@ -13,8 +13,8 @@ func Resample(in *Slice, N [3]int) *Slice {
 	In := in.Tensors()
 	out := NewSlice(in.NComp(), N)
 	Out := out.Tensors()
-	size1 := sizeOf(In[0])
-	size2 := sizeOf(Out[0])
+	size1 := SizeOf(In[0])
+	size2 := SizeOf(Out[0])
 	for c := range Out {
 		for i := range Out[c] {
 			i1 := (i * size1[Z]) / size2[Z]
@@ -33,17 +33,17 @@ func Resample(in *Slice, N [3]int) *Slice {
 // Downsample returns a slice of new size N, smaller than in.Size().
 // Averaging interpolation over the input slice.
 // in is returned untouched if the sizes are equal.
-func Downsample(in *Slice, N [3]int) *Slice {
-	if in.Size() == N {
-		return in // nothing to do
+func Downsample(In [][][][]float32, N [3]int) [][][][]float32 {
+	if SizeOf(In[0]) == N {
+		return In // nothing to do
 	}
 
-	In := in.Tensors()
-	out := NewSlice(in.NComp(), N)
+	nComp := len(In)
+	out := NewSlice(nComp, N)
 	Out := out.Tensors()
 
-	srcsize := sizeOf(In[0])
-	dstsize := sizeOf(Out[0])
+	srcsize := SizeOf(In[0])
+	dstsize := SizeOf(Out[0])
 
 	Dx := dstsize[X]
 	Dy := dstsize[Y]
@@ -83,10 +83,10 @@ func Downsample(in *Slice, N [3]int) *Slice {
 		}
 	}
 
-	return out
+	return Out
 }
 
-// Returns the size of block
-func sizeOf(block [][][]float32) [3]int {
+// Returns the 3D size of block
+func SizeOf(block [][][]float32) [3]int {
 	return [3]int{len(block[0][0]), len(block[0]), len(block)}
 }

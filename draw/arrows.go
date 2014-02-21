@@ -25,17 +25,13 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 			mx := small[X][0][iy][ix]
 			my := small[Y][0][iy][ix]
 			mz := small[Z][0][iy][ix]
-			//col := HSLMap(mx, my, mz)
-			//col.R /= 2
-			//col.G /= 2
-			//col.B /= 2
-			//col.A = 128
-			col := color.RGBA{0, 0, 0, 128}
-			c.SetColor(col)
 			c.Arrow(Ax, Ay, mx, my, mz)
 
 		}
 	}
+
+	c.rasterizer.Rasterize(c.RGBAPainter)
+	c.rasterizer.Clear()
 }
 
 // A Canvas is used to draw on.
@@ -43,8 +39,6 @@ type Canvas struct {
 	*image.RGBA
 	*raster.RGBAPainter
 	rasterizer  *raster.Rasterizer
-	strokewidth raster.Fix32
-	strokecap   raster.Capper
 }
 
 // Make a new canvas of size w x h.
@@ -54,8 +48,7 @@ func NewCanvas(img *image.RGBA) *Canvas {
 	c.RGBAPainter = raster.NewRGBAPainter(c.RGBA)
 	c.rasterizer = raster.NewRasterizer(img.Bounds().Max.X, img.Bounds().Max.Y)
 	c.rasterizer.UseNonZeroWinding = true
-	c.SetColor(color.Black)
-	c.SetStroke(1, raster.RoundCapper)
+	c.SetColor(color.RGBA{0, 0, 0, 128})
 	return c
 }
 
@@ -75,22 +68,15 @@ func (c *Canvas) Arrow(x, y, mx, my, mz float32) {
 	pt2 := pt((r2*sin-r1*cos)+x, (-r2*cos-r1*sin)+y)
 	pt3 := pt((-r2*sin-r1*cos)+x, (r2*cos-r1*sin)+y)
 
-	var path  raster.Path
+	var path raster.Path
 	path.Start(pt1)
 	path.Add1(pt2)
 	path.Add1(pt3)
 	path.Add1(pt1)
 
 	c.rasterizer.AddPath(path)
-	c.rasterizer.Rasterize(c.RGBAPainter)
-	c.rasterizer.Clear()
 }
 
-// Set the line width and end capping style.
-func (c *Canvas) SetStroke(width float32, cap_ raster.Capper) {
-	c.strokewidth = fix32(width)
-	c.strokecap = cap_
-}
 
 func pt(x, y float32) raster.Point {
 	return raster.Point{fix32(x), fix32(y)}

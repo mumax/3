@@ -98,7 +98,7 @@ Setting a nonzero PBC value in a direction enables wrap-around in that direction
 
 <hr/><h1> Setting a geometry </h1>
 
-Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. E.g.:
+Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. All positions are specified in meters and the origin lies in the center of the simulation box. E.g.:
 <pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
 </code></pre>
 
@@ -106,8 +106,8 @@ Optionally a magnet Shape other than the full simulation box can be specified. O
 {{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
 
 
-<hr/><h1> Defining regions </h1>
-Optionally, up to 256 regions can be defined. Each cell is associated with exactly one region, so <em>regions can not overlap</em>. Each cell is assigned region 0 by default. It's a good idea to output <code>regions</code> to verify whether each cell is assigned to the intended region. Each region can have its own material parameters, and we can output averages over each region. E.g.:
+<hr/><h1> Defining material regions </h1>
+Optionally, up to 256 material regions can be defined. Since each cell is made from one material, it is associated with exactly one region. So <em>regions can not overlap</em>. Each cell is assigned material region 0 by default. It's a good idea to output <code>regions</code> to verify whether each cell is assigned to the intended region. Each region can have its own material parameters, and we can output averages over each region. E.g.:
 <pre><code>DefRegion(1, circle(1e-6))
 DefRegion(0, circle(1e-6).Inverse()) // redundant
 save(regions)

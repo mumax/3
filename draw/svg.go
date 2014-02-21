@@ -27,7 +27,7 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 		Mz := arr[Z][slice]
 
 		for i := 0; i < h; i++ {
-			y := S*i + S/2
+			y := (S * h) - (S*i + S/2)
 			for j := 0; j < w; j++ {
 				x := S*j + S/2
 
@@ -46,7 +46,7 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 				r1 := r1 * math.Cos(math.Asin(float64(mz)))
 
 				xs := []int{int(r1*c) + x, int(r2*s-r1*c) + x, int(-r2*s-r1*c) + x}
-				ys := []int{int(r1*s) + y, int(-r2*c-r1*s) + y, int(r2*c-r1*s) + y}
+				ys := []int{-int(r1*s) + y, -int(-r2*c-r1*s) + y, -int(r2*c-r1*s) + y}
 
 				col := HSLMap(mx, my, mz)
 				style := "fill:#" + hex(col.R) + hex(col.G) + hex(col.B)

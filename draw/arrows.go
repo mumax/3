@@ -12,7 +12,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 	c := NewCanvas(img)
 
 	Na := data.SizeOf(arr[0]) // number of arrows
-	h := Na[Y] // orignal image height
+	h := Na[Y]                // orignal image height
 	Na[X] = imax(Na[X]/sub, 1)
 	Na[Y] = imax(Na[Y]/sub, 1)
 	Na[Z] = 1
@@ -20,7 +20,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 	S := float32(sub)
 
 	for iy := 0; iy < Na[Y]; iy++ {
-		Ay := float32(h)-(float32(iy) + 0.5) * S
+		Ay := float32(h) - (float32(iy)+0.5)*S
 		for ix := 0; ix < Na[X]; ix++ {
 			Ax := (float32(ix) + 0.5) * S
 			mx := small[X][0][iy][ix]

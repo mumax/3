@@ -4,7 +4,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 var regions = Regions{info: Info(1, "regions", "")} // global regions map
@@ -25,7 +24,6 @@ type Regions struct {
 }
 
 func (r *Regions) alloc() {
-	log.Println("regions.alloc")
 	mesh := r.Mesh()
 	r.gpuCache = cuda.NewBytes(mesh.NCell())
 	DefRegion(0, universe)
@@ -35,7 +33,6 @@ func (r *Regions) resize() {
 	newSize := Mesh().Size()
 	r.gpuCache.Free()
 	r.gpuCache = cuda.NewBytes(prod(newSize))
-	log.Println("regions.re-alloc")
 	for _, f := range r.hist {
 		r.render(f)
 	}

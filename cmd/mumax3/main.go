@@ -128,6 +128,10 @@ func runFileAndServe(fname string) {
 
 // start Gui server and return
 func goServeGUI() {
+	if *flag_port == ""{
+		log.Println(`not starting GUI (-http="")`)
+		return
+	}
 	hostname, _ := os.Hostname()
 	if hostname == "" {
 		hostname = "localhost"

@@ -241,7 +241,7 @@ const (
 	mov.f64 	%fd2, 0d3B6F3C7407C7122B;
 	.loc 2 3614 3
 	div.rn.f64 	%fd3, %fd2, %fd1;
-	.loc 1 37 50
+	.loc 1 37 49
 	cvt.rn.f32.f64	%f49, %fd3;
 	.loc 1 38 1
 	setp.eq.f32	%p6, %f47, 0f00000000;
@@ -706,21 +706,21 @@ BB0_62:
 	mov.f32 	%f73, 0fBF800000;
 	.loc 2 3608 3
 	div.rn.f32 	%f74, %f73, %f72;
-	.loc 1 57 67
+	.loc 1 57 66
 	fma.rn.f32 	%f75, %f2, %f1, 0f3F800000;
 	.loc 1 56 1
 	ld.global.f32 	%f76, [%rd93];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f77, %f76, %f112;
 	.loc 1 56 1
 	ld.global.f32 	%f78, [%rd95];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f79, %f78, %f111;
 	sub.f32 	%f80, %f77, %f79;
 	mul.f32 	%f81, %f78, %f110;
 	.loc 1 56 1
 	ld.global.f32 	%f82, [%rd91];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f83, %f82, %f112;
 	sub.f32 	%f84, %f81, %f83;
 	mul.f32 	%f85, %f82, %f111;
@@ -889,7 +889,7 @@ BB0_63:
 	mov.f64 	%fd2, 0d3B6F3C7407C7122B;
 	.loc 2 3614 3
 	div.rn.f64 	%fd3, %fd2, %fd1;
-	.loc 1 37 50
+	.loc 1 37 49
 	cvt.rn.f32.f64	%f49, %fd3;
 	.loc 1 38 1
 	setp.eq.f32	%p6, %f47, 0f00000000;
@@ -1354,21 +1354,21 @@ BB0_62:
 	mov.f32 	%f73, 0fBF800000;
 	.loc 2 3608 3
 	div.rn.f32 	%f74, %f73, %f72;
-	.loc 1 57 67
+	.loc 1 57 66
 	fma.rn.f32 	%f75, %f2, %f1, 0f3F800000;
 	.loc 1 56 1
 	ld.global.f32 	%f76, [%rd93];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f77, %f76, %f112;
 	.loc 1 56 1
 	ld.global.f32 	%f78, [%rd95];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f79, %f78, %f111;
 	sub.f32 	%f80, %f77, %f79;
 	mul.f32 	%f81, %f78, %f110;
 	.loc 1 56 1
 	ld.global.f32 	%f82, [%rd91];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f83, %f82, %f112;
 	sub.f32 	%f84, %f81, %f83;
 	mul.f32 	%f85, %f82, %f111;
@@ -1567,7 +1567,7 @@ BB0_63:
 	mov.f64 	%fd2, 0d3B6F3C7407C7122B;
 	.loc 3 3614 3
 	div.rn.f64 	%fd3, %fd2, %fd1;
-	.loc 1 37 50
+	.loc 1 37 49
 	cvt.rn.f32.f64	%f49, %fd3;
 	.loc 1 38 1
 	setp.eq.f32	%p6, %f47, 0f00000000;
@@ -2032,21 +2032,21 @@ BB2_62:
 	mov.f32 	%f73, 0fBF800000;
 	.loc 3 3608 3
 	div.rn.f32 	%f74, %f73, %f72;
-	.loc 1 57 67
+	.loc 1 57 66
 	fma.rn.f32 	%f75, %f2, %f1, 0f3F800000;
 	.loc 1 56 1
 	ld.global.nc.f32 	%f76, [%rd94];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f77, %f76, %f112;
 	.loc 1 56 1
 	ld.global.nc.f32 	%f78, [%rd96];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f79, %f78, %f111;
 	sub.f32 	%f80, %f77, %f79;
 	mul.f32 	%f81, %f78, %f110;
 	.loc 1 56 1
 	ld.global.nc.f32 	%f82, [%rd92];
-	.loc 1 57 67
+	.loc 1 57 66
 	mul.f32 	%f83, %f82, %f112;
 	sub.f32 	%f84, %f81, %f83;
 	mul.f32 	%f85, %f82, %f111;

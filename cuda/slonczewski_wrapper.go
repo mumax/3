@@ -261,7 +261,7 @@ BB0_4:
 	mul.f32 	%f24, %f18, %f19;
 	.loc 2 3608 3
 	div.rn.f32 	%f25, %f4, %f24;
-	.loc 1 36 92
+	.loc 1 36 91
 	cvt.f64.f32	%fd1, %f25;
 	mul.f64 	%fd2, %fd1, 0d3CC7B6EF14E9250C;
 	cvt.rn.f32.f64	%f26, %fd2;
@@ -498,7 +498,7 @@ BB0_4:
 	mul.f32 	%f24, %f18, %f19;
 	.loc 2 3608 3
 	div.rn.f32 	%f25, %f4, %f24;
-	.loc 1 36 92
+	.loc 1 36 91
 	cvt.f64.f32	%fd1, %f25;
 	mul.f64 	%fd2, %fd1, 0d3CC7B6EF14E9250C;
 	cvt.rn.f32.f64	%f26, %fd2;
@@ -766,7 +766,7 @@ BB2_4:
 	mul.f32 	%f24, %f18, %f19;
 	.loc 3 3608 3
 	div.rn.f32 	%f25, %f4, %f24;
-	.loc 1 36 92
+	.loc 1 36 91
 	cvt.f64.f32	%fd1, %f25;
 	mul.f64 	%fd2, %fd1, 0d3CC7B6EF14E9250C;
 	cvt.rn.f32.f64	%f26, %fd2;

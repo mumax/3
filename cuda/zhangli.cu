@@ -19,48 +19,48 @@ addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restri
                  float* __restrict__ bsatLUT, float* __restrict__ alphaLUT, float* __restrict__ xiLUT, float* __restrict__ polLUT,
                  uint8_t* __restrict__ regions, int Nx, int Ny, int Nz, uint8_t PBC) {
 
-    int ix = blockIdx.x * blockDim.x + threadIdx.x;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
-    int iz = blockIdx.z * blockDim.z + threadIdx.z;
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;
+	int iy = blockIdx.y * blockDim.y + threadIdx.y;
+	int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if (ix >= Nx || iy >= Ny || iz >= Nz) {
-        return;
-    }
+	if (ix >= Nx || iy >= Ny || iz >= Nz) {
+		return;
+	}
 
-    int I = idx(ix, iy, iz);
+	int I = idx(ix, iy, iz);
 
-    uint8_t r = regions[I];
-    float alpha = alphaLUT[r];
-    float xi    = xiLUT[r];
-    float bsat  = bsatLUT[r];
-    float pol   = polLUT[r];
-    float b = PREFACTOR / (bsat * (1.0f + xi*xi));
-    if(bsat == 0.0f) {
-        b = 0.0f;
-    }
-    float Jx = pol*jx[I];
-    float Jy = pol*jy[I];
-    float Jz = pol*jz[I];
+	uint8_t r = regions[I];
+	float alpha = alphaLUT[r];
+	float xi    = xiLUT[r];
+	float bsat  = bsatLUT[r];
+	float pol   = polLUT[r];
+	float b = PREFACTOR / (bsat * (1.0f + xi*xi));
+	if(bsat == 0.0f) {
+		b = 0.0f;
+	}
+	float Jx = pol*jx[I];
+	float Jy = pol*jy[I];
+	float Jz = pol*jz[I];
 
-    float3 hspin = make_float3(0.0f, 0.0f, 0.0f); // (u·∇)m
-    if (Jx != 0.0f) {
-        hspin += (b/cx)*Jx * make_float3(deltax(mx), deltax(my), deltax(mz));
-    }
-    if (Jy != 0.0f) {
-        hspin += (b/cy)*Jy * make_float3(deltay(mx), deltay(my), deltay(mz));
-    }
-    if (Jz != 0.0f) {
-        hspin += (b/cz)*Jz * make_float3(deltaz(mx), deltaz(my), deltaz(mz));
-    }
+	float3 hspin = make_float3(0.0f, 0.0f, 0.0f); // (u·∇)m
+	if (Jx != 0.0f) {
+		hspin += (b/cx)*Jx * make_float3(deltax(mx), deltax(my), deltax(mz));
+	}
+	if (Jy != 0.0f) {
+		hspin += (b/cy)*Jy * make_float3(deltay(mx), deltay(my), deltay(mz));
+	}
+	if (Jz != 0.0f) {
+		hspin += (b/cz)*Jz * make_float3(deltaz(mx), deltaz(my), deltaz(mz));
+	}
 
-    float3 m      = make_float3(mx[I], my[I], mz[I]);
-    float3 torque = (-1.0f/(1.0f + alpha*alpha)) * (
-                        (1.0f+xi*alpha) * cross(m, cross(m, hspin))
-                        +(  xi-alpha) * cross(m, hspin)           );
+	float3 m      = make_float3(mx[I], my[I], mz[I]);
+	float3 torque = (-1.0f/(1.0f + alpha*alpha)) * (
+	                    (1.0f+xi*alpha) * cross(m, cross(m, hspin))
+	                    +(  xi-alpha) * cross(m, hspin)           );
 
-    // write back, adding to torque
-    tx[I] += torque.x;
-    ty[I] += torque.y;
-    tz[I] += torque.z;
+	// write back, adding to torque
+	tx[I] += torque.x;
+	ty[I] += torque.y;
+	tz[I] += torque.z;
 }
 

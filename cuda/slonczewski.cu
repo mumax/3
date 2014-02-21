@@ -13,43 +13,43 @@ addslonczewskitorque(float* __restrict__ tx, float* __restrict__ ty, float* __re
                      float* __restrict__ polLUT, float* __restrict__ lambdaLUT, float* __restrict__ epsilonPrimeLUT,
                      uint8_t* __restrict__ regions, int N) {
 
-    int I =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
-    if (I < N) {
+	int I =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
+	if (I < N) {
 
-        float3 m = make_float3(mx[I], my[I], mz[I]);
-        float  J = jz[I];
+		float3 m = make_float3(mx[I], my[I], mz[I]);
+		float  J = jz[I];
 
-        // read parameters
-        uint8_t region       = regions[I];
+		// read parameters
+		uint8_t region       = regions[I];
 
-        float3 p            = normalized(make_float3(pxLUT[region], pyLUT[region], pzLUT[region]));
-        float  Ms           = msatLUT[region];
-        float  alpha        = alphaLUT[region];
-        float  pol          = polLUT[region];
-        float  lambda       = lambdaLUT[region];
-        float  epsilonPrime = epsilonPrimeLUT[region];
+		float3 p            = normalized(make_float3(pxLUT[region], pyLUT[region], pzLUT[region]));
+		float  Ms           = msatLUT[region];
+		float  alpha        = alphaLUT[region];
+		float  pol          = polLUT[region];
+		float  lambda       = lambdaLUT[region];
+		float  epsilonPrime = epsilonPrimeLUT[region];
 
-        if (J == 0.0f || Ms == 0.0f) {
-            return;
-        }
+		if (J == 0.0f || Ms == 0.0f) {
+			return;
+		}
 
-        float beta    = (HBAR / QE) * (J / (flt*Ms) );
-        float lambda2 = lambda * lambda;
-        float epsilon = pol * lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));
+		float beta    = (HBAR / QE) * (J / (flt*Ms) );
+		float lambda2 = lambda * lambda;
+		float epsilon = pol * lambda2 / ((lambda2 + 1.0f) + (lambda2 - 1.0f) * dot(p, m));
 
-        float A = beta * epsilon;
-        float B = beta * epsilonPrime;
+		float A = beta * epsilon;
+		float B = beta * epsilonPrime;
 
-        float gilb     = 1.0f / (1.0f + alpha * alpha);
-        float mxpxmFac = gilb * (A - alpha * B);
-        float pxmFac   = gilb * (B - alpha * A);
+		float gilb     = 1.0f / (1.0f + alpha * alpha);
+		float mxpxmFac = gilb * (A - alpha * B);
+		float pxmFac   = gilb * (B - alpha * A);
 
-        float3 pxm      = cross(p, m);
-        float3 mxpxm    = cross(m, pxm);
+		float3 pxm      = cross(p, m);
+		float3 mxpxm    = cross(m, pxm);
 
-        tx[I] += mxpxmFac * mxpxm.x + pxmFac * pxm.x;
-        ty[I] += mxpxmFac * mxpxm.y + pxmFac * pxm.y;
-        tz[I] += mxpxmFac * mxpxm.z + pxmFac * pxm.z;
-    }
+		tx[I] += mxpxmFac * mxpxm.x + pxmFac * pxm.x;
+		ty[I] += mxpxmFac * mxpxm.y + pxmFac * pxm.y;
+		tz[I] += mxpxmFac * mxpxm.z + pxmFac * pxm.z;
+	}
 }
 

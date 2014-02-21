@@ -32,38 +32,38 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
                float* __restrict__  fftKyz, float* __restrict__  fftKxz, float* __restrict__  fftKxy,
                int Nx, int Ny, int Nz) {
 
-    int ix = blockIdx.x * blockDim.x + threadIdx.x;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
-    int iz = blockIdx.z * blockDim.z + threadIdx.z;
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;
+	int iy = blockIdx.y * blockDim.y + threadIdx.y;
+	int iz = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if(ix>= Nx || iy>= Ny || iz>=Nz) {
-        return;
-    }
+	if(ix>= Nx || iy>= Ny || iz>=Nz) {
+		return;
+	}
 
-    float Kxx, Kyy, Kzz, Kxy, Kxz, Kyz;
+	float Kxx, Kyy, Kzz, Kxy, Kxz, Kyz;
 
-    int I = (iz*Ny + iy)*Nx + ix;
-    int e = 2 * I;
-    float reMx = fftMx[e  ];
-    float imMx = fftMx[e+1];
-    float reMy = fftMy[e  ];
-    float imMy = fftMy[e+1];
-    float reMz = fftMz[e  ];
-    float imMz = fftMz[e+1];
+	int I = (iz*Ny + iy)*Nx + ix;
+	int e = 2 * I;
+	float reMx = fftMx[e  ];
+	float imMx = fftMx[e+1];
+	float reMy = fftMy[e  ];
+	float imMy = fftMy[e+1];
+	float reMz = fftMz[e  ];
+	float imMz = fftMz[e+1];
 
-    // not using symmetry right now
-    Kxx = fftKxx[I];
-    Kyy = fftKyy[I];
-    Kzz = fftKzz[I];
-    Kyz = fftKyz[I];
-    Kxz = fftKxz[I];
-    Kxy = fftKxy[I];
+	// not using symmetry right now
+	Kxx = fftKxx[I];
+	Kyy = fftKyy[I];
+	Kzz = fftKzz[I];
+	Kyz = fftKyz[I];
+	Kxz = fftKxz[I];
+	Kxy = fftKxy[I];
 
-    fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
-    fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;
-    fftMy[e  ] = reMx * Kxy + reMy * Kyy + reMz * Kyz;
-    fftMy[e+1] = imMx * Kxy + imMy * Kyy + imMz * Kyz;
-    fftMz[e  ] = reMx * Kxz + reMy * Kyz + reMz * Kzz;
-    fftMz[e+1] = imMx * Kxz + imMy * Kyz + imMz * Kzz;
+	fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
+	fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;
+	fftMy[e  ] = reMx * Kxy + reMy * Kyy + reMz * Kyz;
+	fftMy[e+1] = imMx * Kxy + imMy * Kyy + imMz * Kyz;
+	fftMz[e  ] = reMx * Kxz + reMy * Kyz + reMz * Kzz;
+	fftMz[e+1] = imMx * Kxz + imMy * Kyz + imMz * Kzz;
 }
 

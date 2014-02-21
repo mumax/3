@@ -26,31 +26,31 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
                  float* __restrict__  fftKxx, float* __restrict__  fftKyy, float* __restrict__  fftKxy,
                  int Nx, int Ny) {
 
-    int ix = blockIdx.x * blockDim.x + threadIdx.x;
-    int iy = blockIdx.y * blockDim.y + threadIdx.y;
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;
+	int iy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if(ix>= Nx || iy>=Ny) {
-        return;
-    }
+	if(ix>= Nx || iy>=Ny) {
+		return;
+	}
 
 
-    int I = iy*Nx + ix;       // linear index for upper half of kernel
-    int e = 2 * I;
+	int I = iy*Nx + ix;       // linear index for upper half of kernel
+	int e = 2 * I;
 
-    float reMx = fftMx[e  ];
-    float imMx = fftMx[e+1];
-    float reMy = fftMy[e  ];
-    float imMy = fftMy[e+1];
+	float reMx = fftMx[e  ];
+	float imMx = fftMx[e+1];
+	float reMy = fftMy[e  ];
+	float imMy = fftMy[e+1];
 
-    // not using symmetry for now
-    float Kyy, Kxx, Kxy;
-    Kxx = fftKxx[I];
-    Kyy = fftKyy[I];
-    Kxy = fftKxy[I];
+	// not using symmetry for now
+	float Kyy, Kxx, Kxy;
+	Kxx = fftKxx[I];
+	Kyy = fftKyy[I];
+	Kxy = fftKxy[I];
 
-    fftMx[e  ] = reMx * Kxx + reMy * Kxy;
-    fftMx[e+1] = imMx * Kxx + imMy * Kxy;
-    fftMy[e  ] = reMx * Kxy + reMy * Kyy;
-    fftMy[e+1] = imMx * Kxy + imMy * Kyy;
+	fftMx[e  ] = reMx * Kxx + reMy * Kxy;
+	fftMx[e+1] = imMx * Kxx + imMy * Kxy;
+	fftMy[e  ] = reMx * Kxy + reMy * Kyy;
+	fftMy[e+1] = imMx * Kxy + imMy * Kyy;
 }
 

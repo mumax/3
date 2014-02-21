@@ -92,7 +92,7 @@ const (
 	.reg .f32 	%f<33>;
 	.reg .s64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33761_35_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33761_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -134,7 +134,7 @@ BB0_1:
 BB0_2:
 	.loc 1 8 1
 	mul.wide.s32 	%rd11, %r2, 4;
-	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33761_35_non_const_sdata;
+	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33761_32_non_const_sdata;
 	add.s64 	%rd4, %rd12, %rd11;
 	st.shared.f32 	[%rd4], %f32;
 	bar.sync 	0;
@@ -215,7 +215,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 1 8 1
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33761_35_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33761_32_non_const_sdata];
 	.loc 2 2750 10
 	abs.f32 	%f31, %f30;
 	.loc 1 8 37
@@ -250,7 +250,7 @@ BB0_10:
 	.reg .f32 	%f<33>;
 	.reg .s64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33834_35_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33834_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -292,7 +292,7 @@ BB0_1:
 BB0_2:
 	.loc 1 8 1
 	mul.wide.s32 	%rd11, %r2, 4;
-	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33834_35_non_const_sdata;
+	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33834_32_non_const_sdata;
 	add.s64 	%rd4, %rd12, %rd11;
 	st.shared.f32 	[%rd4], %f32;
 	bar.sync 	0;
@@ -373,7 +373,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	.loc 1 8 1
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33834_35_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33834_32_non_const_sdata];
 	.loc 2 2750 10
 	abs.f32 	%f31, %f30;
 	.loc 1 8 37
@@ -436,7 +436,7 @@ BB0_10:
 	.reg .f32 	%f<33>;
 	.reg .s64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33997_35_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_33997_32_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -478,7 +478,7 @@ BB2_1:
 BB2_2:
 	.loc 1 8 1
 	mul.wide.s32 	%rd11, %r2, 4;
-	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33997_35_non_const_sdata;
+	mov.u64 	%rd12, reducemaxdiff$__cuda_local_var_33997_32_non_const_sdata;
 	add.s64 	%rd4, %rd12, %rd11;
 	st.shared.f32 	[%rd4], %f32;
 	bar.sync 	0;
@@ -559,7 +559,7 @@ BB2_8:
 	@%p7 bra 	BB2_10;
 
 	.loc 1 8 1
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33997_35_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_33997_32_non_const_sdata];
 	.loc 3 2750 10
 	abs.f32 	%f31, %f30;
 	.loc 1 8 37

@@ -16,24 +16,24 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
                    float* __restrict__ C2xLUT, float* __restrict__ C2yLUT, float* __restrict__ C2zLUT,
                    uint8_t* __restrict__ regions, int N) {
 
-    int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
-    if (i < N) {
+	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
+	if (i < N) {
 
-        uint8_t r  = regions[i];
-        float  k1 = K1LUT[r];
-        float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
-        float3 c2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
-        float3 c3 = cross(c1, c2); // 3rd axis perpendicular to c1,c2
-        float3 m  = make_float3(mx[i], my[i], mz[i]);
+		uint8_t r  = regions[i];
+		float  k1 = K1LUT[r];
+		float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
+		float3 c2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
+		float3 c3 = cross(c1, c2); // 3rd axis perpendicular to c1,c2
+		float3 m  = make_float3(mx[i], my[i], mz[i]);
 
-        float a1 = dot(c1, m);
-        float a2 = dot(c2, m);
-        float a3 = dot(c3, m);
+		float a1 = dot(c1, m);
+		float a2 = dot(c2, m);
+		float a3 = dot(c3, m);
 
-        float3 A = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
+		float3 A = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
 
-        Bx[i] += A.x*c1.x + A.y*c2.x + A.z*c3.x;
-        By[i] += A.x*c1.y + A.y*c2.y + A.z*c3.y;
-        Bz[i] += A.x*c1.z + A.y*c2.z + A.z*c3.z;
-    }
+		Bx[i] += A.x*c1.x + A.y*c2.x + A.z*c3.x;
+		By[i] += A.x*c1.y + A.y*c2.y + A.z*c3.y;
+		Bz[i] += A.x*c1.z + A.y*c2.z + A.z*c3.z;
+	}
 }

@@ -16,8 +16,8 @@ func init() {
 	DeclVar("ShiftMagL", &ShiftMagL, "Upon shift, insert this magnetization from the left")
 	DeclVar("ShiftMagR", &ShiftMagR, "Upon shift, insert this magnetization from the right")
 	DeclVar("ShiftM", &ShiftM, "Whether Shift() acts on magnetization")
-	DeclVar("ShiftGeom", &ShiftM, "Whether Shift() acts on geometry")
-	DeclVar("ShiftRegions", &ShiftM, "Whether Shift() acts on regions")
+	DeclVar("ShiftGeom", &ShiftGeom, "Whether Shift() acts on geometry")
+	DeclVar("ShiftRegions", &ShiftRegions, "Whether Shift() acts on regions")
 	DeclVar("TotalShift", &TotalShift, "Amount by which the simulation has been shifted (m).")
 }
 

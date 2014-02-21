@@ -138,6 +138,8 @@ func (r *Regions) average() []float64 {
 	return sAverageUniverse(s)
 }
 
+func (r *Regions) Average() float64 { return r.average()[0] }
+
 // Set the region of one cell
 // TODO dedup
 func (r *Regions) SetCell(ix, iy, iz int, region int) {

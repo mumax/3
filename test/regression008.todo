@@ -1,3 +1,4 @@
+// NaN's when slonczewski parameters not OK
 Nx := 64
 Ny := 32
 Nz := 1
@@ -21,7 +22,7 @@ m = uniform(1, 1, 0.001)
 run(3e-9)
 
 alpha        = 0.01
-//lambda       = 1
+lambda       = 1
 Pol          = 0.5669
 epsilonprime = 0
 

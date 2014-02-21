@@ -28,6 +28,7 @@ func init() {
 	Pol.init("Pol", "", "Electrical current polarization", nil)
 	Pol.setUniform([]float64{1}) // default spin polarization
 	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
+	Lambda.Set(1) // sensible default value (?). TODO: should not be zero
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	LLTorque.init("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)

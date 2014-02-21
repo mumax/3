@@ -9,14 +9,14 @@ import (
 )
 
 // Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.
-func Image(f *data.Slice, fmin, fmax string) *image.NRGBA {
-	img := new(image.NRGBA)
+func Image(f *data.Slice, fmin, fmax string) *image.RGBA {
+	img := new(image.RGBA)
 	On(img, f, fmin, fmax)
 	return img
 }
 
 // Render on existing image buffer. Resize it if needed
-func On(img *image.NRGBA, f *data.Slice, fmin, fmax string) {
+func On(img *image.RGBA, f *data.Slice, fmin, fmax string) {
 	dim := f.NComp()
 	switch dim {
 	default:
@@ -45,7 +45,7 @@ func On(img *image.NRGBA, f *data.Slice, fmin, fmax string) {
 
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
-func drawVectors(img *image.NRGBA, arr [3][][][]float32) {
+func drawVectors(img *image.RGBA, arr [3][][][]float32) {
 	w, h := len(arr[X][0][0]), len(arr[X][0])
 	d := len(arr[X])
 	norm := float32(d)
@@ -64,6 +64,7 @@ func drawVectors(img *image.NRGBA, arr [3][][][]float32) {
 			img.Set(ix, (h-1)-iy, HSLMap(x, y, z))
 		}
 	}
+	drawArrows(img, arr, 16)
 }
 
 func extrema(data []float32) (min, max float32) {
@@ -82,7 +83,7 @@ func extrema(data []float32) (min, max float32) {
 
 // Draws rank 3 tensor (3D scalar field) as image
 // averages data over X (usually thickness of thin film)
-func drawFloats(img *image.NRGBA, arr [][][]float32, min, max float32) {
+func drawFloats(img *image.RGBA, arr [][][]float32, min, max float32) {
 
 	w, h := len(arr[0][0]), len(arr[0])
 	d := len(arr)
@@ -102,9 +103,9 @@ func drawFloats(img *image.NRGBA, arr [][][]float32, min, max float32) {
 }
 
 // recycle image if it has right size
-func recycle(img *image.NRGBA, w, h int) *image.NRGBA {
+func recycle(img *image.RGBA, w, h int) *image.RGBA {
 	if img == nil || img.Bounds().Size().X != w || img.Bounds().Size().Y != h {
-		img = image.NewNRGBA(image.Rect(0, 0, w, h))
+		img = image.NewRGBA(image.Rect(0, 0, w, h))
 	}
 	return img
 }

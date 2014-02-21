@@ -6,7 +6,7 @@ import (
 )
 
 // Colormap for 3D vector data.
-func HSLMap(x, y, z float32) color.NRGBA {
+func HSLMap(x, y, z float32) color.RGBA {
 	s := sqrtf(x*x + y*y + z*z)
 	l := 0.5*z + 0.5
 	h := float32(math.Atan2(float64(y), float64(x)))
@@ -14,7 +14,7 @@ func HSLMap(x, y, z float32) color.NRGBA {
 }
 
 // h = 0..2pi, s=0..1, l=0..1
-func HSLtoRGB(h, s, l float32) color.NRGBA {
+func HSLtoRGB(h, s, l float32) color.RGBA {
 	if s > 1 {
 		s = 1
 	}
@@ -58,7 +58,7 @@ func HSLtoRGB(h, s, l float32) color.NRGBA {
 	m := l - 0.5*c
 	r, g, b = r+m, g+m, b+m
 	R, G, B := uint8(255*r), uint8(255*g), uint8(255*b)
-	return color.NRGBA{R, G, B, 255}
+	return color.RGBA{R, G, B, 255}
 }
 
 // modulo

@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-//var renderer = render{img: new(image.NRGBA)}
+//var renderer = render{img: new(image.RGBA)}
 
 type render struct {
 	mutex        sync.Mutex
@@ -22,7 +22,7 @@ type render struct {
 	saveCount    int         // previous max slider value of time
 	rescaleBuf   *data.Slice // GPU
 	imgBuf       *data.Slice // CPU
-	img_         *image.NRGBA
+	img_         *image.RGBA
 }
 
 const maxScale = 32
@@ -138,7 +138,7 @@ func (ren *render) render() {
 		d = d.Comp(0)
 	}
 	if ren.img_ == nil {
-		ren.img_ = new(image.NRGBA)
+		ren.img_ = new(image.RGBA)
 	}
 	draw.On(ren.img_, d, "auto", "auto")
 }

@@ -1,7 +1,7 @@
 package draw
 
 import (
-	"github.com/mumax/3/data"
+	//"github.com/mumax/3/data"
 	"image"
 )
 

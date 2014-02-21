@@ -52,7 +52,6 @@ func SaveAs(q Quantity, fname string) {
 		defer cuda.Recycle(buffer)
 	}
 	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
-	initQue()
 	data := buffer.HostCopy() // must be copy (async io)
 	SaveQue <- func() { saveAs_sync(fname, data, info, outputformat) }
 }

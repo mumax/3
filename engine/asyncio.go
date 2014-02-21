@@ -11,11 +11,9 @@ var (
 
 const maxOutputQueLen = 16 // number of outputs that can be queued for asynchronous I/O.
 
-func initQue() {
-	if SaveQue == nil {
-		SaveQue = make(chan func())
-		go runSaver()
-	}
+func init() {
+	SaveQue = make(chan func())
+	go runSaver()
 }
 
 // Continuously executes tasks the from SaveQue channel.

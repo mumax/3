@@ -12,6 +12,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 	c := NewCanvas(img)
 
 	Na := data.SizeOf(arr[0]) // number of arrows
+	h := Na[Y] // orignal image height
 	Na[X] = imax(Na[X]/sub, 1)
 	Na[Y] = imax(Na[Y]/sub, 1)
 	Na[Z] = 1
@@ -19,7 +20,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 	S := float32(sub)
 
 	for iy := 0; iy < Na[Y]; iy++ {
-		Ay := (float32(iy) + 0.5) * S
+		Ay := float32(h)-(float32(iy) + 0.5) * S
 		for ix := 0; ix < Na[X]; ix++ {
 			Ax := (float32(ix) + 0.5) * S
 			mx := small[X][0][iy][ix]
@@ -38,7 +39,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 type Canvas struct {
 	*image.RGBA
 	*raster.RGBAPainter
-	rasterizer  *raster.Rasterizer
+	rasterizer *raster.Rasterizer
 }
 
 // Make a new canvas of size w x h.
@@ -48,7 +49,7 @@ func NewCanvas(img *image.RGBA) *Canvas {
 	c.RGBAPainter = raster.NewRGBAPainter(c.RGBA)
 	c.rasterizer = raster.NewRasterizer(img.Bounds().Max.X, img.Bounds().Max.Y)
 	c.rasterizer.UseNonZeroWinding = true
-	c.SetColor(color.RGBA{0, 0, 0, 128})
+	c.SetColor(color.RGBA{0, 0, 0, 100})
 	return c
 }
 
@@ -64,9 +65,9 @@ func (c *Canvas) Arrow(x, y, mx, my, mz float32) {
 	sin := float32(math.Sin(theta))
 	r1 := ln * float32(math.Cos(math.Asin(float64(mz))))
 
-	pt1 := pt((r1*cos)+x, (r1*sin)+y)
-	pt2 := pt((r2*sin-r1*cos)+x, (-r2*cos-r1*sin)+y)
-	pt3 := pt((-r2*sin-r1*cos)+x, (r2*cos-r1*sin)+y)
+	pt1 := pt((r1*cos)+x, -(r1*sin)+y)
+	pt2 := pt((r2*sin-r1*cos)+x, -(-r2*cos-r1*sin)+y)
+	pt3 := pt((-r2*sin-r1*cos)+x, -(r2*cos-r1*sin)+y)
 
 	var path raster.Path
 	path.Start(pt1)
@@ -76,7 +77,6 @@ func (c *Canvas) Arrow(x, y, mx, my, mz float32) {
 
 	c.rasterizer.AddPath(path)
 }
-
 
 func pt(x, y float32) raster.Point {
 	return raster.Point{fix32(x), fix32(y)}

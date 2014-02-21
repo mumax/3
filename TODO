@@ -32,6 +32,7 @@ reduce operations are non-reproducible, though OK within numerical precission.
 
 script: compile selector?
 
+gui: use of IntValue, FloatValue panics on bad input
 
 API:
 ----

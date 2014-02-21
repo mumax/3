@@ -65,6 +65,13 @@ func (b *thermField) update() {
 		B_therm.dt = -1
 	}
 
+	if Temp.isZero() {
+		cuda.Memset(b.noise, 0, 0, 0)
+		b.step = Solver.NSteps
+		b.dt = Solver.Dt_si
+		return
+	}
+
 	util.AssertMsg(Solver.FixDt != 0, "Temperature requires fixed time step")
 
 	// keep constant during time step
@@ -90,7 +97,11 @@ func (b *thermField) update() {
 }
 
 func GetThermalEnergy() float64 {
-	return -cellVolume() * dot(&M_full, &B_therm)
+	if Temp.isZero() {
+		return 0
+	} else {
+		return -cellVolume() * dot(&M_full, &B_therm)
+	}
 }
 
 // Seeds the thermal noise generator

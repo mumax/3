@@ -9,6 +9,8 @@
 # 
 # Runs gofmt on the code and stops commit if files were affected.
 # 
-gofmt -w -l */*.go */*/*.go | grep \.go || exit 0
-echo formatted your code, please commit again
-exit 1
+gofmt -w -l */*.go */*/*.go | grep \.go && (echo formatted your Go code, please commit again; exit 1)
+
+astyle --indent=tab cuda/*.cu | grep Formatted && (echo formatted your CUDA code, please commit again; exit 1)
+
+exit 0

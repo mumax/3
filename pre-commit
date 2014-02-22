@@ -9,8 +9,10 @@
 # 
 # Runs gofmt on the code and stops commit if files were affected.
 # 
-gofmt -w -l */*.go */*/*.go | grep \.go && (echo formatted your Go code, please commit again; exit 1)
+fail=0;
 
-astyle --indent=tab cuda/*.cu | grep Formatted && (echo formatted your CUDA code, please commit again; exit 1)
+if (gofmt -w -l */*.go */*/*.go | grep \.go); then exit 1; fi;
+
+if astyle --indent=tab cuda/*.cu | grep Formatted; then exit 1; fi;
 
 exit 0

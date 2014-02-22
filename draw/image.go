@@ -43,6 +43,8 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string) {
 	}
 }
 
+const ARROW_SIZE = 16
+
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
 func drawVectors(img *image.RGBA, arr [3][][][]float32) {
@@ -64,7 +66,7 @@ func drawVectors(img *image.RGBA, arr [3][][][]float32) {
 			img.Set(ix, (h-1)-iy, HSLMap(x, y, z))
 		}
 	}
-	drawArrows(img, arr, 16)
+	drawArrows(img, arr, ARROW_SIZE)
 }
 
 func extrema(data []float32) (min, max float32) {

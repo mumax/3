@@ -55,14 +55,16 @@ func NewCanvas(img *image.RGBA) *Canvas {
 
 func (c *Canvas) Arrow(x, y, mx, my, mz, size float32) {
 
-		arrlen := 0.4 * size
-		arrw := 0.2 * size
+	arrlen := 0.4 * size
+	arrw := 0.2 * size
 
-	norm := float32(math.Sqrt(float64(mx*mx+my*my+mz*mz)))
-	if norm ==0{
-	return
+	norm := float32(math.Sqrt(float64(mx*mx + my*my + mz*mz)))
+	if norm == 0 {
+		return
 	}
-	if norm > 1{norm = 1}
+	if norm > 1 {
+		norm = 1
+	}
 
 	theta := math.Atan2(float64(my), float64(mx))
 	cos := float32(math.Cos(theta))

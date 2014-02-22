@@ -26,7 +26,7 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 			mx := small[X][0][iy][ix]
 			my := small[Y][0][iy][ix]
 			mz := small[Z][0][iy][ix]
-			c.Arrow(Ax, Ay, mx, my, mz)
+			c.Arrow(Ax, Ay, mx, my, mz, float32(sub))
 
 		}
 	}
@@ -53,17 +53,22 @@ func NewCanvas(img *image.RGBA) *Canvas {
 	return c
 }
 
-func (c *Canvas) Arrow(x, y, mx, my, mz float32) {
+func (c *Canvas) Arrow(x, y, mx, my, mz, size float32) {
 
-	const (
-		ln = 7
-		r2 = 3
-	)
+		arrlen := 0.4 * size
+		arrw := 0.2 * size
+
+	norm := float32(math.Sqrt(float64(mx*mx+my*my+mz*mz)))
+	if norm ==0{
+	return
+	}
+	if norm > 1{norm = 1}
 
 	theta := math.Atan2(float64(my), float64(mx))
 	cos := float32(math.Cos(theta))
 	sin := float32(math.Sin(theta))
-	r1 := ln * float32(math.Cos(math.Asin(float64(mz))))
+	r1 := arrlen * norm * float32(math.Cos(math.Asin(float64(mz))))
+	r2 := arrw * norm
 
 	pt1 := pt((r1*cos)+x, -(r1*sin)+y)
 	pt2 := pt((r2*sin-r1*cos)+x, -(-r2*cos-r1*sin)+y)

@@ -11,6 +11,8 @@ need proper zhang-li boundary conditions
 
 gui: use of IntValue, FloatValue panics on bad input
 
+gnuplot using a:b broken.
+
 API:
 ----
 

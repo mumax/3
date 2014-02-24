@@ -7,31 +7,23 @@ import (
 	"image/png"
 	"net/http"
 	"os/exec"
-	"strings"
 )
 
-func servePlot(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Path[len("/plot/"):]
-
-	var a, b interface{}
-	u := strings.Split(url, "/") // u a:b
-	if len(u) == 2 {
-		a, b = u[0], u[1]
-	} else {
-		a, b = 1, 2 // TODO: GUI.Value("usingx"), GUI.Value("usingy")
-	}
+func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
+	a := g.StringValue("usingx")
+	b := g.StringValue("usingy")
 
 	cmd := "gnuplot"
 	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 fsize 10; plot "%vtable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
 		w.Write(emptyIMG())
-		//GUI.Set("plotErr", string(out)) // TODO
+		g.Set("plotErr", string(out))
 		return
 	} else {
 		w.Header().Set("Content-Type", "image/svg+xml")
 		w.Write(out)
-		// GUI.Set("plotErr", "") // TODO
+		g.Set("plotErr", "")
 	}
 }
 

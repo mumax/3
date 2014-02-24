@@ -77,7 +77,7 @@ func (g *guistate) PrepareServer() {
 
 	http.Handle("/", g)
 	http.HandleFunc("/render/", g.ServeRender)
-	http.HandleFunc("/plot/", servePlot)
+	http.HandleFunc("/plot/", g.servePlot)
 
 	g.prepareConsole()
 	g.prepareMesh()

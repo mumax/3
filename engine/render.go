@@ -1,11 +1,9 @@
 package engine
 
 import (
-	//"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
-	//"github.com/mumax/3/oommf"
 	"image"
 	"image/jpeg"
 	"net/http"
@@ -92,41 +90,8 @@ func (ren *render) download() {
 	})
 }
 
-// TODO: have browser cache the images
-func (ren *render) getQuant() {
-	//rTime := GUI.IntValue("renderTime")
-	//saveCount := ren.getSaveCount(quant)
-	//GUI.Attr("renderTime", "max", saveCount)
-
-	//// if we were "live" (extreme right), keep right
-	//if rTime == ren.prevSaveCount {
-	//	rTime = saveCount
-	//	GUI.Set("renderTime", rTime)
-	//}
-	//ren.prevSaveCount = saveCount
-
-	//if rTime == saveCount { // live view
-	ren.download()
-	//GUI.Set("renderTimeLabel", Time)
-	//} else {
-	//	defer func() {
-	//		if err := recover(); err != nil {
-	//			LogOutput(err)
-	//		}
-	//	}()
-	//	slice, info, err := oommf.ReadFile(autoFname(quant.Name(), rTime))
-	//	if err != nil {
-	//		LogOutput(err)
-	//		return
-	//	}
-	//	println("read ovf")
-	//	GUI.Set("renderTimeLabel", info.Time)
-	//	ren.imgBuf = slice
-	//}
-}
-
 func (ren *render) render() {
-	ren.getQuant()
+	ren.download()
 	// imgBuf always has 3 components, we may need just one...
 	d := ren.imgBuf
 	comp := ren.comp

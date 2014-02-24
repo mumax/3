@@ -1,0 +1,13 @@
+{{/*
+	Template for formula image. Usage:
+
+		{{.Inc "formula" "imagefile" }}
+	
+*/}}
+
+{{.Def "file"     (.Arg 0) }}
+
+<p style="text-align:center">
+	<img src="formulae/{{.Var "file"}}.png" />
+</p>
+

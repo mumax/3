@@ -1,0 +1,13 @@
+{{/*
+	Template for inline latex formula. Usage:
+
+		{{.Inc "tex" "x^2 + y^2" }}
+	
+	This creates formulae/SOMEHASH.png and embeds it as html image.
+*/}}
+
+{{.Def "formula"  (.Arg 0) }}
+
+{{.Def "file" (.Cmd "./latexit" (.Var "formula")) }}
+<img src="{{.Var "file"}}.png" />
+

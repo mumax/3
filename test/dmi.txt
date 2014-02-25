@@ -20,10 +20,6 @@ Maxdt = 5e-13
 runwhile(maxtorque > 1e-3)
 //Run(5e-9)
 
-
-print("mx", m.getcell(0, 64, 64, 0))
-print("my", m.getcell(1, 64, 64, 0))
-
 expect("mx", m.Average()[0], 0.059, 0.01)
 expect("my", m.Average()[1], 0.035, 0.01)
 

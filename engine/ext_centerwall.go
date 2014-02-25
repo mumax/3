@@ -21,7 +21,7 @@ func centerWall(c int) {
 
 	zero := data.Vector{0, 0, 0}
 	if ShiftMagL == zero || ShiftMagR == zero {
-		sign := magsign(M.GetCell(c, 0, n[Y]/2, n[Z]/2))
+		sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[c])
 		ShiftMagL[c] = float64(sign)
 		ShiftMagR[c] = -float64(sign)
 	}

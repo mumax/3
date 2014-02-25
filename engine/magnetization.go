@@ -64,17 +64,18 @@ func (m *magnetization) Region(r int) *vOneReg { return vOneRegion(m, r) }
 func (m *magnetization) String() string { return util.Sprint(m.Buffer().HostCopy()) }
 
 // Set the value of one cell.
-func (m *magnetization) SetCell(ix, iy, iz int, v ...float64) {
-	nComp := m.NComp()
-	util.Argument(len(v) == nComp)
-	for c := 0; c < nComp; c++ {
+func (m *magnetization) SetCell(ix, iy, iz int, v data.Vector) {
+	for c := 0; c < 3; c++ {
 		cuda.SetCell(m.Buffer(), c, ix, iy, iz, float32(v[c]))
 	}
 }
 
 // Get the value of one cell.
-func (m *magnetization) GetCell(comp, ix, iy, iz int) float64 {
-	return float64(cuda.GetCell(m.Buffer(), comp, ix, iy, iz))
+func (m *magnetization) GetCell(ix, iy, iz int) data.Vector {
+	mx := float64(cuda.GetCell(m.Buffer(), X, ix, iy, iz))
+	my := float64(cuda.GetCell(m.Buffer(), Y, ix, iy, iz))
+	mz := float64(cuda.GetCell(m.Buffer(), Z, ix, iy, iz))
+	return Vector(mx, my, mz)
 }
 
 func (m *magnetization) TableData() []float64 { return slice(m.Average()) }

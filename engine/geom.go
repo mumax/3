@@ -40,6 +40,25 @@ func (g *geom) Gpu() *data.Slice {
 	return g.buffer
 }
 
+func (g *geom) Slice() (*data.Slice, bool) {
+	s := g.Gpu()
+	if s.IsNil() {
+		s := cuda.Buffer(g.NComp(), g.Mesh().Size())
+		cuda.Memset(s, 1)
+		return s, true
+	} else {
+		return s, false
+	}
+}
+
+func (g *geom) average() []float64 {
+	s, r := g.Slice()
+	if r {
+		defer cuda.Recycle(s)
+	}
+	return sAverageUniverse(s)
+}
+
 func SetGeom(s Shape) {
 	geometry.setGeom(s)
 }

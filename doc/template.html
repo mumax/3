@@ -89,71 +89,55 @@ setgridsize(100, 100, 50)
 setcellsize(1e-6/100, 1e-6/100, 1e-6/50)
 
 setgeom( rect(800e-9, 500e-9) )
-m=uniform(1,1,0)
-saveas(m, "rect")
+saveas(geom, "rect")
 
 setgeom( cylinder(800e-9, inf) )
-m=uniform(1,1,0)
-saveas(m, "cylinder")
+saveas(geom, "cylinder")
 
 setgeom( circle(200e-9).repeat(300e-9, 400e-9, 0) )
-m=uniform(1,1,0)
-saveas(m, "circle_repeat")
+saveas(geom, "circle_repeat")
 
 setgeom( cylinder(800e-9, inf).inverse() )
-m=uniform(1,1,0)
-saveas(m, "cylinder_inverse")
+saveas(geom, "cylinder_inverse")
 
 setgeom( cylinder(800e-9, 600e-9).transl(200e-9, 100e-9, 0) )
-m=uniform(1,1,0)
-saveas(m, "cylinder_transl")
+saveas(geom, "cylinder_transl")
 
 setgeom( ellipsoid(800e-9, 600e-9, 500e-9) )
-m=uniform(1,1,0)
-saveas(m, "ellipsoid")
+saveas(geom, "ellipsoid")
 
 setgeom( cuboid(800e-9, 600e-9, 500e-9) )
-m=uniform(1,1,0)
-saveas(m, "cuboid")
+saveas(geom, "cuboid")
 
 setgeom( cuboid(800e-9, 600e-9, 500e-9).rotz(-10*pi/180) )
-m=uniform(1,1,0)
-saveas(m, "cuboid_rotZ")
+saveas(geom, "cuboid_rotZ")
 
 setgeom( layers(0, 25) )
-m=uniform(1,1,0)
-saveas(m, "layers")
+saveas(geom, "layers")
 
 setgeom( cell(50, 20, 0) )
-m=uniform(1,1,0)
-saveas(m, "cell")
+saveas(geom, "cell")
 
 setgeom( xrange(0, inf) )
-m=uniform(1,1,0)
-saveas(m, "xrange")
+saveas(geom, "xrange")
 
 a := cylinder(600e-9, 600e-9).transl(-150e-9, 50e-9, 0 )
 b := rect(600e-9, 600e-9).transl(150e-9, -50e-9, 0)
 
 setgeom( a.add(b) )
-m=uniform(1,1,0)
-saveas(m, "logicAdd")
+saveas(geom, "logicAdd")
 
 setgeom( a.sub(b) )
-m=uniform(1,1,0)
-saveas(m, "logicSub")
+saveas(geom, "logicSub")
 
 setgeom( a.intersect(b) )
-m=uniform(1,1,0)
-saveas(m, "logicAnd")
+saveas(geom, "logicAnd")
 
 setgeom( a.xor(b) )
-m=uniform(1,1,0)
-saveas(m, "logicXor")
+saveas(geom, "logicXor")
 
 setgeom( imageShape("mask.png") )
-m=uniform(1,1,0)
-saveas(m, "imageShape")
+saveas(geom, "imageShape")
 
 `}}
 

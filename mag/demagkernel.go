@@ -35,19 +35,6 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 		}
 	}
 
-	//----------------------------------
-	//println(" ****   fake kernel **** ")
-	//array[X][X][0][0][0] = 1
-	//array[Y][Y][0][0][0] = 0
-	//array[Z][Z][0][0][0] = 0
-
-	//array[X][Y][0][0][0] = 0
-
-	//kernel[Y][X] = kernel[X][Y]
-	//kernel[Z][X] = kernel[X][Z]
-	//kernel[Z][Y] = kernel[Y][Z]
-	//return
-	//------------------------------------
 
 	// Field (destination) loop ranges
 	r1, r2 := kernelRanges(size, pbc)
@@ -218,7 +205,7 @@ func wrap(number, max int) int {
 		number -= max
 	}
 	return number
-} // TODO: replace by cuda.wrap
+} 
 
 // Returns the size after zero-padding,
 // taking into account periodic boundary conditions.

@@ -1,4 +1,4 @@
-// Test if smoothed geometry is handled correctly by demag calculation.
+// Test if smoothed geometry is handled correctly by demag calculation and Mfull
 
 Nx := 100
 Ny := 50
@@ -10,6 +10,7 @@ setcellsize(c, c , c)
 msat = 1/mu0
 m = uniform(1, 0, 0)
 expectv("B_demag", b_demag.average(), vector(-0.02648, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(1/mu0, 0, 0), 1)
 
 slab := cuboid(Nx*c, Ny*c, c)
 
@@ -17,9 +18,11 @@ slab := cuboid(Nx*c, Ny*c, c)
 setgeom(slab.transl(0, 0, -c/2))
 m = uniform(1, 0, 0)
 expectv("B_demag", b_demag.average(), vector(-0.02648 / 2, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(0.5/mu0, 0, 0), 1)
 
 // Same magnet, but halfway between the two layers.
 // Without smoothed geometry, this fails miserably.
 setgeom(slab.transl(0, 0, 0))
 m = uniform(1, 0, 0)
 expectv("B_demag", b_demag.average(), vector(-0.02648 / 2, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(0.5/mu0, 0, 0), 1)

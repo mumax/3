@@ -21,7 +21,7 @@ func copyUnPad(dst, src *data.Slice, dstsize, srcsize [3]int) {
 // Copies src into dst, which is larger, and multiplies by vol*Bsat.
 // The remainder of dst is not filled with zeros.
 // Used to zero-pad magnetization before convolution and in the meanwhile multiply m by its length.
-func copyPadMul(dst, src, vol *data.Slice, dstsize, srcsize [3]int, Bsat LUTPtr, regions *Bytes) {
+func copyPadMul(dst, src, vol *data.Slice, dstsize, srcsize [3]int, Bsat data.LUTPtr, regions *Bytes) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == prod(dstsize) && src.Len() == prod(srcsize))
 

@@ -26,7 +26,7 @@ func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice
 	Bsat := NewSlice(1, [3]int{1, 1, 256})
 	defer Bsat.Free()
 	Memset(Bsat, 1)
-	BsatLUT := LUTPtr(Bsat.DevPtr(0))
+	BsatLUT := data.LUTPtr(Bsat.DevPtr(0))
 
 	vol := data.NilSlice(1, c.inputSize)
 	c.Exec(gpu, gpu, vol, BsatLUT, regions)

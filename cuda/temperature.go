@@ -8,7 +8,7 @@ import (
 
 // Set Bth to thermal noise (Brown).
 // see temperature.cu
-func SetTemperature(Bth, noise *data.Slice, temp_red LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
+func SetTemperature(Bth, noise *data.Slice, temp_red data.LUTPtr, kmu0_VgammaDt float64, regions *Bytes) {
 	util.Argument(Bth.NComp() == 1 && noise.NComp() == 1)
 
 	N := Bth.Len()

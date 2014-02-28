@@ -10,7 +10,7 @@ import (
 
 // look-up table for region based parameters
 type lut struct {
-	gpu_buf cuda.LUTPtrs       // gpu copy of cpu buffer, only transferred when needed
+	gpu_buf data.LUTPtrs       // gpu copy of cpu buffer, only transferred when needed
 	gpu_ok  bool               // gpu cache up-to date with cpu source?
 	cpu_buf [][NREGION]float32 // table data on cpu
 	source  updater            // updates cpu data
@@ -21,7 +21,7 @@ type updater interface {
 }
 
 func (p *lut) init(nComp int, source updater) {
-	p.gpu_buf = make(cuda.LUTPtrs, nComp)
+	p.gpu_buf = make(data.LUTPtrs, nComp)
 	p.cpu_buf = make([][NREGION]float32, nComp)
 	p.source = source
 }
@@ -33,7 +33,7 @@ func (p *lut) cpuLUT() [][NREGION]float32 {
 }
 
 // get an up-to-date version of the lookup-table on GPU
-func (p *lut) gpuLUT() cuda.LUTPtrs {
+func (p *lut) gpuLUT() data.LUTPtrs {
 	p.source.update()
 	if !p.gpu_ok {
 		// upload to GPU
@@ -49,9 +49,9 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 }
 
 // utility for LUT of single-component data
-func (p *lut) gpuLUT1() cuda.LUTPtr {
+func (p *lut) gpuLUT1() data.LUTPtr {
 	util.Assert(len(p.gpu_buf) == 1)
-	return cuda.LUTPtr(p.gpuLUT()[0])
+	return data.LUTPtr(p.gpuLUT()[0])
 }
 
 // all data is 0?
@@ -82,7 +82,7 @@ func (p *lut) Slice() (*data.Slice, bool) {
 	gpu := p.gpuLUT()
 	b := cuda.Buffer(p.NComp(), Mesh().Size())
 	for c := 0; c < p.NComp(); c++ {
-		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
+		cuda.RegionDecode(b.Comp(c), data.LUTPtr(gpu[c]), regions.Gpu())
 	}
 	return b, true
 }

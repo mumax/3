@@ -70,7 +70,7 @@ func ScaleInterExchange(region1, region2 int, scale float64) {
 type exchParam struct {
 	lut            [NREGION * (NREGION + 1) / 2]float32 // 2e18 * harmonic mean of Aex/Msat in regions (i,j)
 	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
-	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
+	gpu            data.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 }
 
@@ -88,7 +88,7 @@ func (p *exchParam) init() {
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
-func (p *exchParam) Gpu() cuda.SymmLUT {
+func (p *exchParam) Gpu() data.SymmLUT {
 	p.update()
 	if !p.gpu_ok {
 		p.upload()
@@ -117,7 +117,7 @@ func (p *exchParam) update() {
 func (p *exchParam) upload() {
 	// alloc if  needed
 	if p.gpu == nil {
-		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
+		p.gpu = data.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
 	cuda.Sync()
 	cu.MemcpyHtoD(cu.DevicePtr(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))

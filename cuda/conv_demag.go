@@ -35,7 +35,7 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice) *DemagConvolution
 // 	vol:  unitless mask used to scale m's length, may be nil
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
-func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat data.LUTPtr, regions *Bytes) {
 	if c.is2D() {
 		c.exec2D(B, m, vol, Bsat, regions)
 	} else {
@@ -43,7 +43,7 @@ func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Byt
 	}
 }
 
-func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat data.LUTPtr, regions *Bytes) {
 	for i := 0; i < 3; i++ { // FW FFT
 		c.fwFFT(i, inp, vol, Bsat, regions)
 	}
@@ -59,7 +59,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	}
 }
 
-func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat data.LUTPtr, regions *Bytes) {
 	// Convolution is separated into
 	// a 1D convolution for z and a 2D convolution for xy.
 	// So only 2 FFT buffers are needed at the same time.
@@ -89,7 +89,7 @@ func zero1_async(dst *data.Slice) {
 }
 
 // forward FFT component i
-func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat data.LUTPtr, regions *Bytes) {
 	zero1_async(c.fftRBuf[i])
 	in := inp.Comp(i)
 	copyPadMul(c.fftRBuf[i], in, vol, c.realKernSize, c.inputSize, Bsat, regions)

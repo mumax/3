@@ -8,7 +8,7 @@ import (
 
 // Adds cubic anisotropy field to Beff.
 // see cubicanisotropy.cu
-func AddCubicAnisotropy(Beff, m *data.Slice, k1_red LUTPtr, c1, c2 LUTPtrs, regions *Bytes) {
+func AddCubicAnisotropy(Beff, m *data.Slice, k1_red data.LUTPtr, c1, c2 data.LUTPtrs, regions *Bytes) {
 	util.Argument(Beff.Size() == m.Size())
 
 	N := Beff.Len()

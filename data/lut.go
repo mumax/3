@@ -1,4 +1,4 @@
-package cuda
+package data
 
 // Look-up tables holding per-region parameter values.
 // LUT[regions[cellindex]] gives parameter value for cell.

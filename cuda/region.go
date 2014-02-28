@@ -7,7 +7,7 @@ import (
 )
 
 // dst += LUT[region], for vectors. Used to add terms to excitation.
-func RegionAddV(dst *data.Slice, lut LUTPtrs, regions *Bytes) {
+func RegionAddV(dst *data.Slice, lut data.LUTPtrs, regions *Bytes) {
 	util.Argument(dst.NComp() == 3)
 	N := dst.Len()
 	cfg := make1DConf(N)
@@ -16,7 +16,7 @@ func RegionAddV(dst *data.Slice, lut LUTPtrs, regions *Bytes) {
 }
 
 // decode the regions+LUT pair into an uncompressed array
-func RegionDecode(dst *data.Slice, lut LUTPtr, regions *Bytes) {
+func RegionDecode(dst *data.Slice, lut data.LUTPtr, regions *Bytes) {
 	N := dst.Len()
 	cfg := make1DConf(N)
 	k_regiondecode_async(dst.DevPtr(0), unsafe.Pointer(lut), regions.Ptr, N, cfg)

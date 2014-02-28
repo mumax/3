@@ -8,6 +8,7 @@ import (
 
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
+	DeclVar("SmoothGeom", &smoothgeom, "Amount of geometry edge smoothing, 0=staircase")
 	geometry.init()
 }
 
@@ -59,9 +60,13 @@ func (g *geom) average() []float64 {
 	return sAverageUniverse(s)
 }
 
+func (g *geom) Average() float64 { return g.average()[0] }
+
 func SetGeom(s Shape) {
 	geometry.setGeom(s)
 }
+
+var smoothgeom int = 8
 
 func (geometry *geom) setGeom(s Shape) {
 	SetBusy(true)
@@ -105,13 +110,16 @@ func (geometry *geom) setGeom(s Shape) {
 				} else {
 					allIn = false
 				}
-				for _, Δx := range []float64{-cx / 2, cx / 2} {
-					for _, Δy := range []float64{-cy / 2, cy / 2} {
-						for _, Δz := range []float64{-cz / 2, cz / 2} {
-							if s(x0+Δx, y0+Δy, z0+Δz) { // inside
-								allOut = false
-							} else {
-								allIn = false
+
+				if smoothgeom != 0 { // center is sufficient if we're not really smoothing
+					for _, Δx := range []float64{-cx / 2, cx / 2} {
+						for _, Δy := range []float64{-cy / 2, cy / 2} {
+							for _, Δz := range []float64{-cz / 2, cz / 2} {
+								if s(x0+Δx, y0+Δy, z0+Δz) { // inside
+									allOut = false
+								} else {
+									allIn = false
+								}
 							}
 						}
 					}
@@ -125,7 +133,7 @@ func (geometry *geom) setGeom(s Shape) {
 					v[iz][iy][ix] = 0
 				default:
 					v[iz][iy][ix] = geometry.cellVolume(ix, iy, iz)
-					ok = true // already know there's something inside
+					ok = ok || (v[iz][iy][ix] != 0)
 				}
 			}
 		}
@@ -159,6 +167,7 @@ func (geometry *geom) setGeom(s Shape) {
 	M.normalize() // removes m outside vol
 }
 
+// Sample smoothgeom^3 points inside the cell to estimate its volume.
 func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	r := Index2Coord(ix, iy, iz)
 	x0, y0, z0 := r[X], r[Y], r[Z]
@@ -168,14 +177,15 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	s := geometry.shape
 	var vol float32
 
-	const N = 8
+	N := smoothgeom
+	S := float64(smoothgeom)
 
 	for dx := 0; dx < N; dx++ {
-		Δx := -cx/2 + (cx / (2 * N)) + (cx/N)*float64(dx)
+		Δx := -cx/2 + (cx / (2 * S)) + (cx/S)*float64(dx)
 		for dy := 0; dy < N; dy++ {
-			Δy := -cy/2 + (cy / (2 * N)) + (cy/N)*float64(dy)
+			Δy := -cy/2 + (cy / (2 * S)) + (cy/S)*float64(dy)
 			for dz := 0; dz < N; dz++ {
-				Δz := -cz/2 + (cz / (2 * N)) + (cz/N)*float64(dz)
+				Δz := -cz/2 + (cz / (2 * S)) + (cz/S)*float64(dz)
 
 				if s(x0+Δx, y0+Δy, z0+Δz) { // inside
 					vol++
@@ -183,7 +193,7 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 			}
 		}
 	}
-	return vol / (N * N * N)
+	return vol / float32(N*N*N)
 }
 
 func (g *geom) shift(dx int) {

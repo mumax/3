@@ -1,0 +1,16 @@
+// Test smooth geometry
+
+N := 10
+setgridsize(2*N, N, 1)
+c := 1e-9
+setcellsize(c, 2*c, 3*c)
+
+disk := circle(2*N*c)
+
+smoothgeom=0
+setgeom(disk)
+expect("staircase", geom.Average(), 0.8, 1e-3)
+
+smoothgeom=10
+setgeom(disk)
+expect("smooth", geom.Average(), pi/4, 1e-3)

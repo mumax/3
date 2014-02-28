@@ -11,6 +11,8 @@ need proper zhang-li boundary conditions
 
 gui: use of IntValue, FloatValue panics on bad input
 
+ovf output does not always handle total time correctly (Thanks Henning Ulrichs)
+
 API:
 ----
 

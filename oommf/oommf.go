@@ -8,6 +8,7 @@ import (
 	"github.com/mumax/3/util"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -112,7 +113,7 @@ func readHeader(in io.Reader) *Info {
 		case "valuemultiplier":
 		case "valueunit":
 		case "meshunit":
-			// desc tags: parse further and add to metadata table
+		// desc tags: parse further and add to metadata table
 		case "desc":
 			strs := strings.SplitN(value, ":", 2)
 			desc_key := strings.Trim(strs[0], "# ")
@@ -122,7 +123,6 @@ func readHeader(in io.Reader) *Info {
 			if len(strs) > 1 {
 				desc_value = strings.Trim(strs[1], "# ")
 			}
-			// 			fmt.Println(desc_key, " : ", desc_value)
 			desc[desc_key] = desc_value
 		}
 
@@ -141,8 +141,10 @@ func readHeader(in io.Reader) *Info {
 	} else {
 		info.Format = "text"
 	}
-	// TODO: total time according to OOMMF convention, other params
-	//info.TotalTime = atoi/(info.Desc["Time (s)"]
+
+	timestr := fmt.Sprint(info.Desc["Time (s)"])
+	t, _ := strconv.ParseFloat(timestr, 64)
+	info.TotalTime = t
 	return info
 }
 

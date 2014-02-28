@@ -80,7 +80,9 @@ func (geometry *geom) setGeom(s Shape) {
 	array := host.Scalars()
 	V := host
 	v := array
-	n := Mesh().Size()
+	n := geometry.Mesh().Size()
+	c := geometry.Mesh().CellSize()
+	cx, cy, cz := c[X], c[Y], c[Z]
 
 	progress, progmax := 0, (n[Y]+1)*(n[Z]+1)
 
@@ -92,13 +94,38 @@ func (geometry *geom) setGeom(s Shape) {
 			util.Progress(progress, progmax, "Initializing geometry")
 
 			for ix := 0; ix < n[X]; ix++ {
+
 				r := Index2Coord(ix, iy, iz)
-				x, y, z := r[X], r[Y], r[Z]
-				if s(x, y, z) { // inside
+				x0, y0, z0 := r[X], r[Y], r[Z]
+
+				// check if center and all vertices lie inside or all outside
+				allIn, allOut := true, true
+				if s(x0, y0, z0) {
+					allOut = false
+				} else {
+					allIn = false
+				}
+				for _, Δx := range []float64{-cx / 2, cx / 2} {
+					for _, Δy := range []float64{-cy / 2, cy / 2} {
+						for _, Δz := range []float64{-cz / 2, cz / 2} {
+							if s(x0+Δx, y0+Δy, z0+Δz) { // inside
+								allOut = false
+							} else {
+								allIn = false
+							}
+						}
+					}
+				}
+
+				switch {
+				case allIn:
 					v[iz][iy][ix] = 1
 					ok = true
-				} else {
+				case allOut:
 					v[iz][iy][ix] = 0
+				default:
+					v[iz][iy][ix] = geometry.cellVolume(ix, iy, iz)
+					ok = true // already know there's something inside
 				}
 			}
 		}
@@ -130,6 +157,33 @@ func (geometry *geom) setGeom(s Shape) {
 	}
 
 	M.normalize() // removes m outside vol
+}
+
+func (g *geom) cellVolume(ix, iy, iz int) float32 {
+	r := Index2Coord(ix, iy, iz)
+	x0, y0, z0 := r[X], r[Y], r[Z]
+
+	c := geometry.Mesh().CellSize()
+	cx, cy, cz := c[X], c[Y], c[Z]
+	s := geometry.shape
+	var vol float32
+
+	const N = 8
+
+	for dx := 0; dx < N; dx++ {
+		Δx := -cx/2 + (cx / (2 * N)) + (cx/N)*float64(dx)
+		for dy := 0; dy < N; dy++ {
+			Δy := -cy/2 + (cy / (2 * N)) + (cy/N)*float64(dy)
+			for dz := 0; dz < N; dz++ {
+				Δz := -cz/2 + (cz / (2 * N)) + (cz/N)*float64(dz)
+
+				if s(x0+Δx, y0+Δy, z0+Δz) { // inside
+					vol++
+				}
+			}
+		}
+	}
+	return vol / (N * N * N)
 }
 
 func (g *geom) shift(dx int) {

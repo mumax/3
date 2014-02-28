@@ -35,7 +35,6 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 		}
 	}
 
-
 	// Field (destination) loop ranges
 	r1, r2 := kernelRanges(size, pbc)
 
@@ -205,7 +204,7 @@ func wrap(number, max int) int {
 		number -= max
 	}
 	return number
-} 
+}
 
 // Returns the size after zero-padding,
 // taking into account periodic boundary conditions.

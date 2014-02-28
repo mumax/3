@@ -20,7 +20,7 @@ type DemagConvolution struct {
 	bwPlan       fft3DC2RPlan      // Backward FFT (1 component)
 }
 
-// Initializes a convolution to evaluate the demag field for the given mesh geometry.
+// Initializes a convolution to evaluate the demag field for the given grid size.
 func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice) *DemagConvolution {
 	c := new(DemagConvolution)
 	c.inputSize = inputSize

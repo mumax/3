@@ -65,9 +65,9 @@ func (w *World) LoadStdlib() {
 	w.Func("heaviside", heaviside)
 	w.Func("sinc", sinc)
 	w.Func("randSeed", intseed, "Sets the random number seed")
-	w.Func("rand", rand.Float64, "Random number between 0 and 1")
-	w.Func("randExp", rand.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
-	w.Func("randNorm", rand.NormFloat64, "Standard normal random number")
+	w.Func("rand", rng.Float64, "Random number between 0 and 1")
+	w.Func("randExp", rng.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")
+	w.Func("randNorm", rng.NormFloat64, "Standard normal random number")
 	w.Func("randInt", randInt, "Random non-negative integer")
 	w.declare("pi", floatLit(math.Pi))
 	w.declare("inf", floatLit(math.Inf(1)))
@@ -77,14 +77,11 @@ func (w *World) LoadStdlib() {
 	w.Func("sprintf", fmt.Sprintf, "Print to string with C-style formatting.")
 }
 
-// script does not know int64
-func intseed(seed int) {
-	rand.Seed(int64(seed))
-}
+var rng = rand.New(rand.NewSource(0))
 
-func randInt(upper int) int {
-	return rand.Int() % upper
-}
+// script does not know int64
+func intseed(seed int)      { rng.Seed(int64(seed)) }
+func randInt(upper int) int { return rng.Int() % upper }
 
 func heaviside(x float64) float64 {
 	switch {

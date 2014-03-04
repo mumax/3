@@ -13,10 +13,9 @@ for g in *.go; do
 	go run $g;
 done
 
-time (
 for f in $scripts; do
 	mumax3 -f -http "" $f;
 	echo ""
-done;)
+done;
 
 

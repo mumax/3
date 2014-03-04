@@ -174,7 +174,7 @@ m.Comp(0)   // x-component
 m.Region(1) // magnetization in region 1 (0 elsewhere)
 </pre></code>
 
-{{range .FilterType "*engine.sSetter" "*engine.vSetter" "*engine.sAdder" "*engine.vAdder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions" "engine.Quantity"}} {{template "entry" .}} {{end}}
+{{range .FilterType "*engine.sSetter" "*engine.vSetter" "*engine.sAdder" "*engine.vAdder" "*engine.buffered" "*engine.GetScalar" "*engine.GetVector" "*engine.FFTM" "*engine.Regions" "engine.Quantity" "*engine.geom" "*engine.thermField"}} {{template "entry" .}} {{end}}
 
 
 <hr/><h1>Slicing and dicing output</h1>
@@ -246,7 +246,7 @@ FixDt = 1e-15
 </code></pre>
 
 {{range .FilterName "run" "steps" "runwhile"}} {{template "entry" .}} {{end}}
-{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr"}} {{template "entry" .}} {{end}}
+{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step"}} {{template "entry" .}} {{end}}
 {{range .FilterName "SetSolver"}} {{template "entry" .}} {{end}}
 
 <hr/><h1> Moving simulation window </h1>

@@ -1,25 +1,22 @@
 
-	setgridsize(128, 32, 1)
-	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+	setgridsize(32, 8, 2)
+	setcellsize(1e-9, 1e-9, 1e-9)
 
 	Msat = 800e3
 	Aex = 13e-12
 	m  = uniform(1, .1, 0)
 
-	steps(10)
+	steps(1)
 
-	step=1
 	outputformat = OVF1_TEXT
-	saveas(m, sprintf("m%v", step))
+	saveas(m, sprintf("mumax_ovf1_text"))
 
-	step=2
 	outputformat = OVF1_BINARY
-	saveas(m, sprintf("m%v", step))
+	saveas(m, sprintf("mumax_ovf1_binary"))
 
-	step=3
 	outputformat = OVF2_TEXT
-	saveas(m, sprintf("m%v", step))
+	saveas(m, sprintf("mumax_ovf2_text"))
 
 	step=4
 	outputformat = OVF2_BINARY
-	saveas(m, sprintf("m%v", step))
+	saveas(m, sprintf("mumax_ovf2_binary"))

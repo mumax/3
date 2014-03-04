@@ -1,7 +1,12 @@
 bugs:
 -----
 
+3.4.2:
 mumax3-convert -o does not work
+ovf output does not always handle total time correctly (Thanks Henning Ulrichs)
++mumax3-convert full test
++mumax3-convert optional arrows/subsample
+
 
 omf/ovf does not check if enough bytes are read
 
@@ -11,7 +16,6 @@ need proper zhang-li boundary conditions
 
 gui: use of IntValue, FloatValue panics on bad input
 
-ovf output does not always handle total time correctly (Thanks Henning Ulrichs)
 
 API:
 ----
@@ -28,17 +32,11 @@ Sanity check for Lambda, Epsilonprime; do not Nan on zero.
 
 cleanup LValue interface, M should not have to implement it.
 
-save self-defined variable.
-
 resettable tables, multiple tables?
 
 MFM: don't crash on tip crash ;-), just zero kernel
 
 kernel cache
-
-DMI in 3D
-
-optimization for small simulatons? one big multi-FFT on all components, one big kenrel mul?
 
 master process assigns ports (clean fail if port in use, start new instance on next port?) and GPU
 	web iface of master shows que?

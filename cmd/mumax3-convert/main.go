@@ -158,17 +158,17 @@ func process(f *data.Slice, info data.Meta, name string) {
 	haveOutput := false
 
 	if *flag_jpeg {
-		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max)
+		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows)
 		haveOutput = true
 	}
 
 	if *flag_png {
-		draw.RenderFile(name+".png", f, *flag_min, *flag_max)
+		draw.RenderFile(name+".png", f, *flag_min, *flag_max, *flag_arrows)
 		haveOutput = true
 	}
 
 	if *flag_gif {
-		draw.RenderFile(name+".gif", f, *flag_min, *flag_max)
+		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows)
 		haveOutput = true
 	}
 

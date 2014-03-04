@@ -9,20 +9,20 @@ import (
 )
 
 // Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.
-func Image(f *data.Slice, fmin, fmax string) *image.RGBA {
+func Image(f *data.Slice, fmin, fmax string, arrowSize int) *image.RGBA {
 	img := new(image.RGBA)
-	On(img, f, fmin, fmax)
+	On(img, f, fmin, fmax, arrowSize)
 	return img
 }
 
 // Render on existing image buffer. Resize it if needed
-func On(img *image.RGBA, f *data.Slice, fmin, fmax string) {
+func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int) {
 	dim := f.NComp()
 	switch dim {
 	default:
 		log.Fatalf("unsupported number of components: %v", dim)
 	case 3:
-		drawVectors(img, f.Vectors())
+		drawVectors(img, f.Vectors(), arrowSize)
 	case 1:
 		min, max := extrema(f.Host()[0])
 		if fmin != "auto" {
@@ -43,11 +43,9 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string) {
 	}
 }
 
-const ARROW_SIZE = 16
-
 // Draws rank 4 tensor (3D vector field) as image
 // averages data over X (usually thickness of thin film)
-func drawVectors(img *image.RGBA, arr [3][][][]float32) {
+func drawVectors(img *image.RGBA, arr [3][][][]float32, arrowSize int) {
 	w, h := len(arr[X][0][0]), len(arr[X][0])
 	d := len(arr[X])
 	norm := float32(d)
@@ -66,7 +64,9 @@ func drawVectors(img *image.RGBA, arr [3][][][]float32) {
 			img.Set(ix, (h-1)-iy, HSLMap(x, y, z))
 		}
 	}
-	drawArrows(img, arr, ARROW_SIZE)
+	if arrowSize > 0 {
+		drawArrows(img, arr, arrowSize)
+	}
 }
 
 func extrema(data []float32) (min, max float32) {

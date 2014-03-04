@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func RenderFile(fname string, f *data.Slice, min, max string) error {
+func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int) error {
 	codecs := map[string]codec{".png": PNG, ".jpg": JPEG100, ".gif": GIF256}
 	ext := strings.ToLower(path.Ext(fname))
 	enc := codecs[ext]
@@ -26,15 +26,15 @@ func RenderFile(fname string, f *data.Slice, min, max string) error {
 		return err
 	}
 	defer out.Close()
-	return Render(out, f, min, max, enc)
+	return Render(out, f, min, max, arrowSize, enc)
 }
 
 // encodes an image
 type codec func(io.Writer, image.Image) error
 
 // Render data and encode with arbitrary codec.
-func Render(out io.Writer, f *data.Slice, min, max string, encode codec) error {
-	img := Image(f, min, max)
+func Render(out io.Writer, f *data.Slice, min, max string, arrowSize int, encode codec) error {
+	img := Image(f, min, max, arrowSize)
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
 	return encode(buf, img)

@@ -90,6 +90,8 @@ func (ren *render) download() {
 	})
 }
 
+var arrowSize = 16
+
 func (ren *render) render() {
 	ren.download()
 	// imgBuf always has 3 components, we may need just one...
@@ -105,7 +107,7 @@ func (ren *render) render() {
 	if ren.img_ == nil {
 		ren.img_ = new(image.RGBA)
 	}
-	draw.On(ren.img_, d, "auto", "auto")
+	draw.On(ren.img_, d, "auto", "auto", arrowSize)
 }
 
 var compstr = map[string]int{"x": 0, "y": 1, "z": 2}

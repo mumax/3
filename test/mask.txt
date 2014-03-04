@@ -4,15 +4,14 @@ c := 10e-9
 setgridsize(N, N/2, 1)
 setcellsize(c, c, c)
 
-m = uniform(1, 0, 0)
 alpha=1
 Msat = 1e6
 Aex = 13e-12
 
 setgeom(imageShape("testdata/mask.png"))
-
-steps(1000)
+m = uniform(1, 0, 0)
+setgeom(universe())
 
 print(m.average())
 
-expectv("m", m.average(), vector(0.93454806, 0.01674462, 8.967280e-06), 1e-5)
+expectv("m", m.average(), vector(0.118564697, 0, 0), 1e-2)

@@ -3,7 +3,6 @@ bugs:
 
 3.4.2:
 mumax3-convert -o does not work
-ovf output does not always handle total time correctly (Thanks Henning Ulrichs)
 +mumax3-convert full test
 +mumax3-convert optional arrows/subsample
 

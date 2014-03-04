@@ -69,6 +69,7 @@ var (
 	flag_cropx     = flag.String("xrange", "", "Crop x range min:max (both optional, max=exclusive)")
 	flag_cropy     = flag.String("yrange", "", "Crop y range min:max (both optional, max=exclusive)")
 	flag_cropz     = flag.String("zrange", "", "Crop z range min:max (both optional, max=exclusive)")
+	flag_dir       = flag.String("o", "", "Save all output in this directory")
 )
 
 var que chan task
@@ -98,6 +99,11 @@ func main() {
 		go work()
 	}
 
+	// politely try to make the output directory
+	if *flag_dir != "" {
+		_ = os.Mkdir(*flag_dir, 0777)
+	}
+
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
 		log.Println(fname)
@@ -121,7 +127,11 @@ func main() {
 			continue
 		}
 		wg.Add(1)
-		que <- task{slice, info, util.NoExt(fname)}
+		outfname := util.NoExt(fname)
+		if *flag_dir != "" {
+			outfname = *flag_dir + "/" + path.Base(outfname)
+		}
+		que <- task{slice, info, outfname}
 	}
 
 	// wait for work to finish

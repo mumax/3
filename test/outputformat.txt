@@ -8,14 +8,18 @@
 
 	save(m)
 
+	step=1
 	outputformat = OVF1_TEXT
-	save(m)
+	saveas(m, sprintf("m%v", step))
 
+	step=2
 	outputformat = OVF1_BINARY
-	save(m)
+	saveas(m, sprintf("m%v", step))
 
+	step=3
 	outputformat = OVF2_TEXT
-	save(m)
+	saveas(m, sprintf("m%v", step))
 
+	step=4
 	outputformat = OVF2_BINARY
-	save(m)
+	saveas(m, sprintf("m%v", step))

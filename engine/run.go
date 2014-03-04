@@ -12,12 +12,13 @@ func init() {
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
+	DeclVar("step", &Solver.NSteps, "Total number of time steps taken")
 	DeclROnly("dt", &Solver.Dt_si, "Last solver time step (s)")
 	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
 	DeclVar("Headroom", &Solver.Headroom, "Solver headroom")
-	DeclVar("FixDt", &Solver.FixDt, "Set a fixed time step. 0 disables fixed step.")
+	DeclVar("FixDt", &Solver.FixDt, "Set a fixed time step, 0 disables fixed step")
 	SetSolver(HEUN)
 }
 

@@ -22,7 +22,7 @@
 
 {{.Include "head.html"}}
 
-<h1> mumax 3.4.1 API </h1>
+<h1> mumax 3.4.2 API </h1>
 
 This is a complete overview of all available functions for writing an input script.
 
@@ -103,6 +103,7 @@ Optionally a magnet Shape other than the full simulation box can be specified. O
 </code></pre>
 
 {{range .FilterName "setgeom"}} {{template "entry" .}} {{end}}
+{{range .FilterName "edgesmooth"}} {{template "entry" .}} {{end}}
 {{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
 
 

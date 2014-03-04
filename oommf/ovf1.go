@@ -97,7 +97,7 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 	ncomp := array.NComp()
 	for iz := 0; iz < gridsize[Z]; iz++ {
 		for iy := 0; iy < gridsize[Y]; iy++ {
-			for ix := 0; ix < gridsize[Z]; ix++ {
+			for ix := 0; ix < gridsize[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
 					// dirty conversion from float32 to [4]byte
 					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]

@@ -1,8 +1,10 @@
 #! /bin/bash
 
-source ./make.bash || exit 1
+set -e
 
-PKGS=$(echo github.com/mumax/3/{,tools/mumax3-convert,data,draw,prof,engine,mag,script,util,cuda})
+source ./make.bash
+
+PKGS=$(echo github.com/mumax/3/{cmd/mumax3-convert,data,draw,prof,engine,mag,script,util,cuda})
 
 go test -i -race $PKGS || exit 1
 go test -race $PKGS  || exit 1

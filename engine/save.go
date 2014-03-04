@@ -17,7 +17,7 @@ func init() {
 	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
 	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
 	DeclVar("FilenameFormat", &FilenameFormat, "printf formatting string for output filenames.")
-	DeclVar("OutputFormat", &outputformat, "Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY")
+	DeclVar("OutputFormat", &outputFormat, "Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY")
 	DeclROnly("OVF1_BINARY", OVF1_BINARY, "OutputFormat = OVF1_BINARY sets binary OVF1 output")
 	DeclROnly("OVF2_BINARY", OVF2_BINARY, "OutputFormat = OVF2_BINARY sets binary OVF2 output")
 	DeclROnly("OVF1_TEXT", OVF1_TEXT, "OutputFormat = OVF1_TEXT sets text OVF1 output")
@@ -29,7 +29,7 @@ func init() {
 var (
 	FilenameFormat = "%s%06d"    // formatting string for auto filenames.
 	SnapshotFormat = "jpg"       // user-settable snapshot format
-	outputformat   = OVF2_BINARY // user-settable output format
+	outputFormat   = OVF2_BINARY // user-settable output format
 )
 
 // Save once, with auto file name
@@ -53,7 +53,7 @@ func SaveAs(q Quantity, fname string) {
 	}
 	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
 	data := buffer.HostCopy() // must be copy (async io)
-	SaveQue <- func() { saveAs_sync(fname, data, info, outputformat) }
+	SaveQue <- func() { saveAs_sync(fname, data, info, outputFormat) }
 }
 
 // Save image once, with auto file name

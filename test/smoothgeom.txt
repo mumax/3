@@ -7,10 +7,10 @@ setcellsize(c, 2*c, 3*c)
 
 disk := circle(2*N*c)
 
-smoothgeom=0
+edgesmooth=0
 setgeom(disk)
 expect("staircase", geom.Average(), 0.8, 1e-3)
 
-smoothgeom=10
+edgesmooth=10
 setgeom(disk)
 expect("smooth", geom.Average(), pi/4, 1e-3)

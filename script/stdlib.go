@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -70,6 +71,10 @@ func (w *World) LoadStdlib() {
 	w.Func("randInt", randInt, "Random non-negative integer")
 	w.declare("pi", floatLit(math.Pi))
 	w.declare("inf", floatLit(math.Inf(1)))
+
+	//string
+	w.Func("sprint", fmt.Sprint, "Print all arguments to string with automatic formatting")
+	w.Func("sprintf", fmt.Sprintf, "Print to string with C-style formatting.")
 }
 
 // script does not know int64

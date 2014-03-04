@@ -6,7 +6,7 @@
 	Aex = 13e-12
 	m  = uniform(1, .1, 0)
 
-	save(m)
+	steps(10)
 
 	step=1
 	outputformat = OVF1_TEXT

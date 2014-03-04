@@ -142,9 +142,19 @@ func readHeader(in io.Reader) *Info {
 		info.Format = "text"
 	}
 
-	timestr := fmt.Sprint(info.Desc["Time (s)"])
-	t, _ := strconv.ParseFloat(timestr, 64)
-	info.TotalTime = t
+	// OVF1-style time info
+	if t1, ok := info.Desc["Time (s)"]; ok {
+		timestr := fmt.Sprint(t1)
+		t, _ := strconv.ParseFloat(timestr, 64)
+		info.TotalTime = t
+	}
+	// OVF2-style time info
+	if t2, ok := info.Desc["Total simulation time"]; ok {
+		timestr := fmt.Sprint(t2)
+		words := strings.Split(timestr, " ")
+		t, _ := strconv.ParseFloat(words[0], 64)
+		info.TotalTime = t
+	}
 	return info
 }
 

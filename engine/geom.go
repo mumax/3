@@ -8,11 +8,14 @@ import (
 
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
-	DeclVar("SmoothGeom", &smoothgeom, "Amount of geometry edge smoothing, 0=staircase")
+	DeclVar("EdgeSmooth", &edgeSmooth, "Geometry edge smoothing with edgeSmooth^3 samples per cell, 0=staircase, ~8=very smooth")
 	geometry.init()
 }
 
-var geometry geom
+var (
+	geometry   geom
+	edgeSmooth int = 0 // disabled for now
+)
 
 type geom struct {
 	info
@@ -66,8 +69,6 @@ func SetGeom(s Shape) {
 	geometry.setGeom(s)
 }
 
-var smoothgeom int = 8
-
 func (geometry *geom) setGeom(s Shape) {
 	SetBusy(true)
 	defer SetBusy(false)
@@ -111,7 +112,7 @@ func (geometry *geom) setGeom(s Shape) {
 					allIn = false
 				}
 
-				if smoothgeom != 0 { // center is sufficient if we're not really smoothing
+				if edgeSmooth != 0 { // center is sufficient if we're not really smoothing
 					for _, Δx := range []float64{-cx / 2, cx / 2} {
 						for _, Δy := range []float64{-cy / 2, cy / 2} {
 							for _, Δz := range []float64{-cz / 2, cz / 2} {
@@ -167,7 +168,7 @@ func (geometry *geom) setGeom(s Shape) {
 	M.normalize() // removes m outside vol
 }
 
-// Sample smoothgeom^3 points inside the cell to estimate its volume.
+// Sample edgeSmooth^3 points inside the cell to estimate its volume.
 func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	r := Index2Coord(ix, iy, iz)
 	x0, y0, z0 := r[X], r[Y], r[Z]
@@ -177,8 +178,8 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	s := geometry.shape
 	var vol float32
 
-	N := smoothgeom
-	S := float64(smoothgeom)
+	N := edgeSmooth
+	S := float64(edgeSmooth)
 
 	for dx := 0; dx < N; dx++ {
 		Δx := -cx/2 + (cx / (2 * S)) + (cx/S)*float64(dx)

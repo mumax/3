@@ -2,12 +2,7 @@ bugs:
 -----
 
 3.4.2:
-mumax3-convert -o does not work
-+mumax3-convert full test
 +mumax3-convert optional arrows/subsample
-
-
-omf/ovf does not check if enough bytes are read
 
 MFM 3D not OK
 

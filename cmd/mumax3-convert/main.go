@@ -70,6 +70,7 @@ var (
 	flag_cropy     = flag.String("yrange", "", "Crop y range min:max (both optional, max=exclusive)")
 	flag_cropz     = flag.String("zrange", "", "Crop z range min:max (both optional, max=exclusive)")
 	flag_dir       = flag.String("o", "", "Save all output in this directory")
+	flag_arrows    = flag.Int("arrows", 0, "Arrow size for vector bitmap image output")
 )
 
 var que chan task

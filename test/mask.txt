@@ -9,7 +9,7 @@ alpha=1
 Msat = 1e6
 Aex = 13e-12
 
-setgeom(imageShape("mask.png"))
+setgeom(imageShape("testdata/mask.png"))
 
 steps(1000)
 

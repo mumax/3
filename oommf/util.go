@@ -55,6 +55,14 @@ func atoi(a string) int {
 	return i
 }
 
+func atof(a string) float64 {
+	i, err := strconv.ParseFloat(a, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
 const (
 	X = 0
 	Y = 1

@@ -19,8 +19,8 @@ func Read(in_ io.Reader) (s *data.Slice, meta data.Meta, err error) {
 
 	n := info.Size
 	c := info.StepSize
-	if c == [3]float32{0, 0, 0} {
-		c = [3]float32{1, 1, 1} // default (presumably unitless) cell size
+	if c == [3]float64{0, 0, 0} {
+		c = [3]float64{1, 1, 1} // default (presumably unitless) cell size
 	}
 	data_ := data.NewSlice(info.NComp, n)
 
@@ -38,7 +38,7 @@ func Read(in_ io.Reader) (s *data.Slice, meta data.Meta, err error) {
 		readOVF2DataBinary4(in, data_)
 	}
 
-	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit}, nil
+	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit, CellSize: info.StepSize}, nil
 }
 
 func ReadFile(fname string) (*data.Slice, data.Meta, error) {
@@ -70,7 +70,7 @@ type Info struct {
 	TotalTime       float64
 	StageTime       float64
 	SizeofFloat     int // 4/8
-	StepSize        [3]float32
+	StepSize        [3]float64
 	MeshUnit        string
 }
 
@@ -98,7 +98,7 @@ func readHeader(in io.Reader) *Info {
 		default:
 			panic("Unknown key: " + key)
 			// ignored
-		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xstepsize", "ystepsize", "zstepsize", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end": // ignored (OVF1)
+		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end": // ignored (OVF1)
 		case "", "valuelabels": // ignored (OVF2)
 		case "valueunits":
 			info.ValueUnit = strings.Split(value, " ")[0] // take unit of first component, we don't support per-component units
@@ -110,6 +110,12 @@ func readHeader(in io.Reader) *Info {
 			info.Size[Y] = atoi(value)
 		case "znodes":
 			info.Size[Z] = atoi(value)
+		case "xstepsize":
+			info.StepSize[X] = atof(value)
+		case "ystepsize":
+			info.StepSize[Y] = atof(value)
+		case "zstepsize":
+			info.StepSize[Z] = atof(value)
 		case "valuemultiplier":
 		case "valueunit":
 		case "meshunit":

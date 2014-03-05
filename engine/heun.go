@@ -12,6 +12,10 @@ func HeunStep(y *data.Slice) {
 	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
 
+	if FixDt != 0 {
+		Dt_si = FixDt
+	}
+
 	dt := float32(Dt_si * *dt_mul)
 	util.Assert(dt > 0)
 

@@ -39,13 +39,18 @@ func SetSolver(typ int) {
 		stepper = EulerStep
 	case 2:
 		stepper = HeunStep
+	case 3:
+		// TODO: free etc
+		solver := new(RK23)
+		stepper = solver.Step
 	}
 	solvertype = typ
 }
 
 const (
-	EULER = 1
-	HEUN  = 2
+	EULER          = 1
+	HEUN           = 2
+	BOGAKISHAMPINE = 3
 )
 
 // Run the simulation for a number of seconds.

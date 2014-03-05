@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	//"github.com/mumax/3/util"
 	//"math"
 )
 
@@ -21,12 +20,72 @@ type RK23 struct {
 	k1 *data.Slice // torque at end of step is kept for beginning of next step
 }
 
-func (rk *RK23) Step(y *data.Slice) {
+func (rk *RK23) Step(unused *data.Slice) {
+	m := M.Buffer()
+	size := m.Size()
+
+	if FixDt != 0 {
+		Dt_si = FixDt
+	}
+
 	// first step ever: one-time k1 init and eval
 	if rk.k1 == nil {
-		rk.k1 = cuda.NewSlice(3, y.Size())
+		rk.k1 = cuda.NewSlice(3, size)
 		torqueFn(rk.k1)
 	}
+
+	// backup magnetization
+	m0 := cuda.Buffer(3, size)
+	defer cuda.Recycle(m0)
+	data.Copy(m0, m)
+
+	k1 := rk.k1 // from previous step
+	k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
+	defer cuda.Recycle(k2)
+	defer cuda.Recycle(k3)
+	defer cuda.Recycle(k4)
+
+	t0 := Time
+	h := float32(Dt_si * *dt_mul) // internal time step
+
+	cuda.Madd2(m, m0, k1, 1, (1./2.)*h) // m = m0*1 + k1*h/2
+	//postStep()
+	Time = t0 + (1./2.)*Dt_si
+	torqueFn(k2)
+
+	Time = t0 + (3./4.)*Dt_si
+	cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
+	//postStep()
+	torqueFn(k3)
+
+	// actual stepping
+	τ2, τ3 := cuda.Buffer(3, size), cuda.Buffer(3, size) // 3rd and 2nd order torques
+	defer cuda.Recycle(τ2)
+	defer cuda.Recycle(τ3)
+	cuda.Madd3(τ3, k1, k2, k3, (2. / 9.), (1. / 3.), (4. / 9.))
+	cuda.Madd2(m, m0, τ3, 1, h)
+	solverPostStep()
+	Time = t0 + Dt_si
+
+	// error estimate
+	//torqueFn(k4)
+	//madd4(τ2, k1, k2, k3, k4, (7./24.), (1./4.), (1./3.), (1./8.))
+
+	// determine error
+	err := 0.0
+	if FixDt == 0 { // time step not fixed
+		err = cuda.MaxVecDiff(τ2, τ3) * float64(h)
+	}
+
+	NSteps++
+	LastErr = err // TODO: on good step only
+
+}
+
+// TODO: into cuda
+func madd4(dst, src1, src2, src3, src4 *data.Slice, w1, w2, w3, w4 float32) {
+	cuda.Madd3(dst, src1, src2, src3, w1, w2, w3)
+	cuda.Madd2(dst, dst, src4, 1, w4)
 }
 
 //func RK23Step(s *solver, y *data.Slice) {

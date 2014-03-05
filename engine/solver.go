@@ -8,8 +8,8 @@ import (
 var (
 	solverPostStep         func()            = M.normalize // called on y after successful step, typically normalizes magnetization
 	Dt_si                  float64           = 1e-15       // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	dt_mul                 *float64          = &GammaLL
-	MinDt, MaxDt           float64           // minimum and maximum time step
+	dt_mul                 *float64          = &GammaLL    // TODO: simplify
+	MinDt, MaxDt           float64                         // minimum and maximum time step
 	MaxErr                 float64           = 1e-4
 	Headroom               float64           = 0.75      // maximum error per step
 	LastErr                float64                       // error of last step

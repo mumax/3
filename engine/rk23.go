@@ -3,7 +3,8 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	//"math"
+	"github.com/mumax/3/util"
+	"math"
 )
 
 // Bogacki-Shampine solver. 3rd order, 3 evaluations per step, adaptive step.
@@ -34,6 +35,7 @@ func (rk *RK23) Step(unused *data.Slice) {
 		torqueFn(rk.k1)
 	}
 
+	t0 := Time
 	// backup magnetization
 	m0 := cuda.Buffer(3, size)
 	defer cuda.Recycle(m0)
@@ -45,31 +47,35 @@ func (rk *RK23) Step(unused *data.Slice) {
 	defer cuda.Recycle(k3)
 	defer cuda.Recycle(k4)
 
-	t0 := Time
-	h := float32(Dt_si * *dt_mul) // internal time step
+	h := float32(Dt_si * *dt_mul) // internal time step = Dt * gammaLL
 
+	// there is no explicit stage 1: k1 from previous step
+
+	// stage 2
+	Time = t0 + (1./2.)*Dt_si
 	cuda.Madd2(m, m0, k1, 1, (1./2.)*h) // m = m0*1 + k1*h/2
 	//postStep()
-	Time = t0 + (1./2.)*Dt_si
 	torqueFn(k2)
 
+	// stage 3
 	Time = t0 + (3./4.)*Dt_si
 	cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
 	//postStep()
 	torqueFn(k3)
 
-	// actual stepping
-	τ2, τ3 := cuda.Buffer(3, size), cuda.Buffer(3, size) // 3rd and 2nd order torques
-	defer cuda.Recycle(τ2)
+	// 3rd order solution
+	τ3 := cuda.Buffer(3, size)
 	defer cuda.Recycle(τ3)
 	cuda.Madd3(τ3, k1, k2, k3, (2. / 9.), (1. / 3.), (4. / 9.))
 	cuda.Madd2(m, m0, τ3, 1, h)
 	solverPostStep()
-	Time = t0 + Dt_si
 
 	// error estimate
-	//torqueFn(k4)
-	//madd4(τ2, k1, k2, k3, k4, (7./24.), (1./4.), (1./3.), (1./8.))
+	τ2 := cuda.Buffer(3, size)
+	defer cuda.Recycle(τ2)
+	Time = t0 + Dt_si
+	torqueFn(k4)
+	madd4(τ2, k1, k2, k3, k4, (7. / 24.), (1. / 4.), (1. / 3.), (1. / 8.))
 
 	// determine error
 	err := 0.0
@@ -77,9 +83,22 @@ func (rk *RK23) Step(unused *data.Slice) {
 		err = cuda.MaxVecDiff(τ2, τ3) * float64(h)
 	}
 
-	NSteps++
-	LastErr = err // TODO: on good step only
-
+	// adjust next time step
+	if err < MaxErr || Dt_si <= MinDt { // mindt check to avoid infinite loop
+		// step OK
+		LastErr = err // output error/step for good steps only
+		NSteps++
+		Time = t0 + Dt_si
+		adaptDt(math.Pow(MaxErr/err, 1./3.))
+		data.Copy(rk.k1, k4) // FSAL
+	} else {
+		// undo bad step
+		util.Assert(FixDt == 0)
+		Time = t0
+		data.Copy(m, m0)
+		NUndone++
+		adaptDt(math.Pow(MaxErr/err, 1./4.))
+	}
 }
 
 // TODO: into cuda

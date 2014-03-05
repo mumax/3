@@ -17,6 +17,8 @@ func init() {
 // for the surface charges on the left and right edges.
 // This will mimic an infinitely long wire.
 func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
+	SetBusy(true)
+	defer SetBusy(false)
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
 	bsat := Bsat.GetRegion(region)[0]
@@ -32,8 +34,6 @@ func bSat() float64 {
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
-	SetBusy(true)
-	defer SetBusy(false)
 	h := data.NewSlice(3, m.Size())
 	H := h.Vectors()
 	world := m.WorldSize()
@@ -43,9 +43,13 @@ func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat floa
 	q1 := q * mxLeft
 	q2 := q * (-mxRight)
 
+	prog, maxProg := 0, (size[Z]+1)*(size[Y]+1)
+
 	// surface loop (source)
 	for I := 0; I < size[Z]; I++ {
 		for J := 0; J < size[Y]; J++ {
+			prog++
+			util.Progress(prog, maxProg, "removing surface charges")
 
 			y := (float64(J) + 0.5) * cell[Y]
 			z := (float64(I) + 0.5) * cell[Z]

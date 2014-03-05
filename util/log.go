@@ -3,6 +3,7 @@ package util
 // Logging and error reporting utility functions
 
 import (
+	"fmt"
 	"log"
 	"sync"
 )
@@ -63,7 +64,7 @@ func Assert(test bool) {
 
 // Hack to avoid cyclic dependency on engine.
 var (
-	progress_ func(int, int, string)
+	progress_ func(int, int, string) = PrintProgress
 	progLock  sync.Mutex
 )
 
@@ -74,6 +75,16 @@ func Progress(progress, total int, msg string) {
 	defer progLock.Unlock()
 	if progress_ != nil {
 		progress_(progress, total, msg)
+	}
+}
+
+var lastPct = -1
+
+func PrintProgress(prog, total int, msg string) {
+	pct := (prog * 100) / total
+	if pct != lastPct {
+		fmt.Println(msg, pct, "%")
+		lastPct = pct
 	}
 }
 

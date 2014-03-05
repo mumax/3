@@ -216,8 +216,8 @@ func (g *guistate) prepareSolver() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
 			g.EvalGUI("SetSolver(" + typ + ")")
-			if Solver.FixDt == 0 { // euler must have fixed time step
-				Solver.FixDt = 1e-15
+			if FixDt == 0 { // euler must have fixed time step
+				FixDt = 1e-15
 			}
 		}
 	})
@@ -250,7 +250,7 @@ func (g *guistate) prepareParam() {
 	}
 	g.OnEvent("Temp", func() {
 		Inject <- func() {
-			if Solver.FixDt == 0 {
+			if FixDt == 0 {
 				g.EvalGUI("FixDt = 10e-15") // finite temperature requires fixed time step
 			}
 			g.EvalGUI("Temp = " + g.StringValue("Temp"))
@@ -323,14 +323,14 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("wz", printf(lazy_cellsize[Z]*float64(lazy_gridsize[Z])*1e9))
 
 			// solver
-			g.Set("nsteps", Solver.NSteps)
+			g.Set("nsteps", NSteps)
 			g.Set("time", fmt.Sprintf("%6e", Time))
-			g.Set("dt", fmt.Sprintf("%4e", Solver.Dt_si))
-			g.Set("lasterr", fmt.Sprintf("%3e", Solver.LastErr))
-			g.Set("maxerr", Solver.MaxErr)
-			g.Set("mindt", Solver.MinDt)
-			g.Set("maxdt", Solver.MaxDt)
-			g.Set("fixdt", Solver.FixDt)
+			g.Set("dt", fmt.Sprintf("%4e", Dt_si))
+			g.Set("lasterr", fmt.Sprintf("%3e", LastErr))
+			g.Set("maxerr", MaxErr)
+			g.Set("mindt", MinDt)
+			g.Set("maxdt", MaxDt)
+			g.Set("fixdt", FixDt)
 			g.Set("solvertype", solvernames[solvertype])
 			if pause {
 				g.Set("busy", "Paused")
@@ -485,6 +485,7 @@ func Serve(port string) {
 func (g *guistate) Prog(a, total int, msg string) {
 	g.Set("progress", (a*100)/total)
 	g.Set("busy", msg)
+	util.PrintProgress(a, total, msg)
 }
 
 func (g *guistate) disableControls(busy bool) {

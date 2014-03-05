@@ -75,8 +75,6 @@ func SetMFull(dst *data.Slice) {
 // returns demag convolution, making sure it's initialized
 func demagConv() *cuda.DemagConvolution {
 	if conv_ == nil {
-		LogOutput("calculating demag kernel")
-		defer LogOutput("kernel done")
 		SetBusy(true)
 		defer SetBusy(false)
 		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy)

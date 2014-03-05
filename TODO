@@ -22,6 +22,8 @@ check region defined?
 improvements:
 -------------
 
+ext rm surface charge: setbusy
+
 Sanity check for Lambda, Epsilonprime; do not Nan on zero.
 
 cleanup LValue interface, M should not have to implement it.

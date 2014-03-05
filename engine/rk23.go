@@ -21,11 +21,11 @@ type RK23 struct {
 	k1 *data.Slice // torque at end of step is kept for beginning of next step
 }
 
-func (rk *RK23) Step(s *solver, y *data.Slice) {
+func (rk *RK23) Step(y *data.Slice) {
 	// first step ever: one-time k1 init and eval
 	if rk.k1 == nil {
 		rk.k1 = cuda.NewSlice(3, y.Size())
-		s.torqueFn(rk.k1)
+		torqueFn(rk.k1)
 	}
 }
 

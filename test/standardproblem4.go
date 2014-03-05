@@ -24,7 +24,7 @@ func main() {
 
 	// relax
 	Alpha.Set(3)
-	Solver.MaxErr = 1e-4
+	MaxErr = 1e-4
 	RunWhile(func() bool { return MaxTorque.Get() > 1e-4 })
 	Run(1e-9)
 

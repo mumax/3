@@ -7,20 +7,20 @@ import (
 )
 
 // Euler method, can be used as solver.Step.
-func EulerStep(s *solver, y *data.Slice) {
+func EulerStep(y *data.Slice) {
 	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
 
-	s.Dt_si = s.FixDt
-	dt := float32(s.Dt_si * *s.dt_mul)
+	Dt_si = FixDt
+	dt := float32(Dt_si * *dt_mul)
 	util.AssertMsg(dt > 0, "Euler solver requires fixed time step > 0")
 
-	s.torqueFn(dy0)
-	s.NEval++
+	torqueFn(dy0)
+	NEval++
 
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
-	Time += s.Dt_si
-	s.postStep()
-	s.NSteps++
+	Time += Dt_si
+	solverPostStep()
+	NSteps++
 }

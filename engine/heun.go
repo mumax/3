@@ -8,16 +8,16 @@ import (
 )
 
 // Adaptive Heun method, can be used as solver.Step
-func HeunStep(s *solver, y *data.Slice) {
+func HeunStep(y *data.Slice) {
 	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
 
-	dt := float32(s.Dt_si * *s.dt_mul)
+	dt := float32(Dt_si * *dt_mul)
 	util.Assert(dt > 0)
 
 	// stage 1
-	s.torqueFn(dy0)
-	s.NEval++
+	torqueFn(dy0)
+	NEval++
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
 	// s.postStep()  // improves accuracy for good steps but painful for subtracting bad torque
@@ -25,30 +25,30 @@ func HeunStep(s *solver, y *data.Slice) {
 	// stage 2
 	dy := cuda.Buffer(3, y.Size())
 	defer cuda.Recycle(dy)
-	Time += s.Dt_si
-	s.torqueFn(dy)
-	s.NEval++
+	Time += Dt_si
+	torqueFn(dy)
+	NEval++
 
 	// determine error
 	err := 0.0
-	if s.FixDt == 0 { // time step not fixed
+	if FixDt == 0 { // time step not fixed
 		err = cuda.MaxVecDiff(dy0, dy) * float64(dt)
 	}
 
 	// adjust next time step
-	if err < s.MaxErr || s.Dt_si <= s.MinDt { // mindt check to avoid infinite loop
+	if err < MaxErr || Dt_si <= MinDt { // mindt check to avoid infinite loop
 		// step OK
 		cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
-		s.postStep()
-		s.NSteps++
-		s.adaptDt(math.Pow(s.MaxErr/err, 1./2.))
-		s.LastErr = err
+		solverPostStep()
+		NSteps++
+		adaptDt(math.Pow(MaxErr/err, 1./2.))
+		LastErr = err
 	} else {
 		// undo bad step
-		util.Assert(s.FixDt == 0)
-		Time -= s.Dt_si
+		util.Assert(FixDt == 0)
+		Time -= Dt_si
 		cuda.Madd2(y, y, dy0, 1, -dt)
-		s.NUndone++
-		s.adaptDt(math.Pow(s.MaxErr/err, 1./3.))
+		NUndone++
+		adaptDt(math.Pow(MaxErr/err, 1./3.))
 	}
 }

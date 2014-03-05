@@ -67,20 +67,20 @@ func (b *thermField) update() {
 
 	if Temp.isZero() {
 		cuda.Memset(b.noise, 0, 0, 0)
-		b.step = Solver.NSteps
-		b.dt = Solver.Dt_si
+		b.step = NSteps
+		b.dt = Dt_si
 		return
 	}
 
-	util.AssertMsg(Solver.FixDt != 0, "Temperature requires fixed time step")
+	util.AssertMsg(FixDt != 0, "Temperature requires fixed time step")
 
 	// keep constant during time step
-	if Solver.NSteps == b.step && Solver.Dt_si == b.dt {
+	if NSteps == b.step && Dt_si == b.dt {
 		return
 	}
 
 	N := Mesh().NCell()
-	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (GammaLL * cellVolume() * Solver.Dt_si)
+	kmu0_VgammaDt := mag.Mu0 * mag.Kb / (GammaLL * cellVolume() * Dt_si)
 	noise := cuda.Buffer(1, Mesh().Size())
 	defer cuda.Recycle(noise)
 
@@ -92,8 +92,8 @@ func (b *thermField) update() {
 		cuda.SetTemperature(dst.Comp(i), noise, temp_red.gpuLUT1(), kmu0_VgammaDt, regions.Gpu())
 	}
 
-	b.step = Solver.NSteps
-	b.dt = Solver.Dt_si
+	b.step = NSteps
+	b.dt = Dt_si
 }
 
 func GetThermalEnergy() float64 {

@@ -12,18 +12,18 @@ func init() {
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
-	DeclVar("step", &Solver.NSteps, "Total number of time steps taken")
-	DeclROnly("dt", &Solver.Dt_si, "Last solver time step (s)")
-	DeclVar("MinDt", &Solver.MinDt, "Minimum time step the solver can take (s)")
-	DeclVar("MaxDt", &Solver.MaxDt, "Maximum time step the solver can take (s)")
-	DeclVar("MaxErr", &Solver.MaxErr, "Maximum error per step the solver can tolerate")
-	DeclVar("Headroom", &Solver.Headroom, "Solver headroom")
-	DeclVar("FixDt", &Solver.FixDt, "Set a fixed time step, 0 disables fixed step")
+	DeclVar("step", &NSteps, "Total number of time steps taken")
+	DeclROnly("dt", &Dt_si, "Last solver time step (s)")
+	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
+	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
+	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
+	DeclVar("Headroom", &Headroom, "Solver headroom")
+	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
 	SetSolver(HEUN)
 }
 
 var (
-	Solver     = NewSolver(Torque.Set, M.normalize, 1e-15, &GammaLL, HeunStep)
+	//Solver     = NewSolver(Torque.Set, M.normalize, 1e-15, &GammaLL, HeunStep)
 	Time       float64             // time in seconds
 	pause      = true              // set pause at any time to stop running after the current step
 	postStep   []func()            // called on after every time step
@@ -36,9 +36,9 @@ func SetSolver(typ int) {
 	default:
 		util.Fatalf("SetSolver: unknown solver type: %v", typ)
 	case 1:
-		Solver.step = EulerStep
+		stepper = EulerStep
 	case 2:
-		Solver.step = HeunStep
+		stepper = HeunStep
 	}
 	solvertype = typ
 }
@@ -58,8 +58,8 @@ func Run(seconds float64) {
 // Run the simulation for a number of steps.
 func Steps(n int) {
 	//GUI.Set("runsteps", n)
-	stop := Solver.NSteps + n
-	RunWhile(func() bool { return Solver.NSteps < stop })
+	stop := NSteps + n
+	RunWhile(func() bool { return NSteps < stop })
 }
 
 // Runs as long as condition returns true.
@@ -112,7 +112,7 @@ func (g *guistate) RunInteractive() {
 }
 
 func step() {
-	Solver.Step(M.Buffer())
+	Step(M.Buffer())
 	for _, f := range postStep {
 		f()
 	}

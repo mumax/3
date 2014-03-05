@@ -23,7 +23,10 @@ type render struct {
 	img_         *image.RGBA
 }
 
-const maxScale = 32
+const (
+	maxScale   = 32  // maximum zoom-out setting
+	maxImgSize = 512 // maximum render image size
+)
 
 // Render image of quantity.
 func (g *guistate) ServeRender(w http.ResponseWriter, r *http.Request) {
@@ -52,12 +55,21 @@ func (ren *render) download() {
 			renderLayer = 0
 		}
 
+		// scaling sanity check
 		if ren.scale < 1 {
 			ren.scale = 1
 		}
 		if ren.scale > maxScale {
 			ren.scale = maxScale
 		}
+		// Don't render too large images or we choke
+		for size[X]/ren.scale > maxImgSize {
+			ren.scale++
+		}
+		for size[Y]/ren.scale > maxImgSize {
+			ren.scale++
+		}
+
 		for i := range size {
 			size[i] /= ren.scale
 			if size[i] == 0 {

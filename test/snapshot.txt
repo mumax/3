@@ -22,6 +22,6 @@
 
 // relax
 	alpha = 3
-	MaxErr = 1e-4
+	//MaxErr = 1e-4
 	RunWhile(MaxTorque > 1e-4)
 	run(1e-9)

@@ -15,7 +15,7 @@ Dex   = 0.1e-3 // J/m2.
 
 m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
 
-MaxErr = 1e-4
+//MaxErr = 1e-4
 Maxdt = 5e-13
 runwhile(maxtorque > 1e-3)
 //Run(5e-9)

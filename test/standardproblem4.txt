@@ -14,7 +14,7 @@
 
 // relax
 	alpha = 3
-	MaxErr = 1e-4
+	//MaxErr = 1e-4
 	RunWhile(MaxTorque > 1e-4)
 	run(1e-9)
 	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)

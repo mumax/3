@@ -7,7 +7,7 @@ setgridsize(N, N, 1)
 c := 1.15e-9 / 2
 d := 1.15e-9
 setcellsize(c, c, d)
-maxerr = 1e-5
+//maxerr = 1e-5
 
 Aex   = 20e-12
 Ku1   = 5.9e5

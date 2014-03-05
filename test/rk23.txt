@@ -4,7 +4,7 @@
 */
 
 setSolver(3)
-maxErr = 1e-5
+//maxErr = 1e-5
 //headroom=1
 
 // geometry

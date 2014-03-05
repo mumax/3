@@ -25,7 +25,7 @@
 
 	Maxdt = 1e-12
 	Run(2e-9)
-	MaxErr = 1e-5
+	//MaxErr = 1e-5
 	Run(2e-9)
 
 	// remanent magnetization

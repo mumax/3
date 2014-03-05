@@ -7,7 +7,7 @@ Aex = 13e-12
 m  = uniform(1, .1, 0)
 
 alpha = 3
-MaxErr = 1e-4
+//MaxErr = 1e-4
 RunWhile(MaxTorque > 1e-4)
 run(1e-9)
 

@@ -15,7 +15,7 @@ Dex   = 0.1e-3 // J/m2.
 
 m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
 
-MaxErr = 1e-4
+//MaxErr = 1e-4
 run(0.5e-9)
 
 expectv("m", m.getcell(32, 32, 0), vector(0.8979, 0.3989, 0.1859), 0.001)

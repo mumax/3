@@ -33,7 +33,7 @@ Aex_v   := 10e-12
 // ADJUST SOLVER
 MaxDt = 1e-12
 MinDt = 1e-18
-MaxErr = 1e-5
+//MaxErr = 1e-5
 
 // SET GEOMETRY AND REGIONS
 defregion(1, Ellipse(Rc, Rc).transl(posX,posY,0))

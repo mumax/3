@@ -20,7 +20,8 @@ func init() {
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
 	DeclVar("Headroom", &Headroom, "Solver headroom")
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
-	SetSolver(HEUN)
+	SetSolver(BOGAKISHAMPINE)
+	MaxErr = 1e-5
 }
 
 var (

@@ -16,7 +16,7 @@ Dex   = 0.1e-3 // J/m2.
 
 m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1).RotZ(pi/2)
 
-MaxErr = 1e-4
+//MaxErr = 1e-4
 Maxdt = 5e-13
 Run(5e-9)
 expect("mx", m.Average()[0], -0.035, 0.01)

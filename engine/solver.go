@@ -6,17 +6,16 @@ import (
 )
 
 var (
-	solverPostStep         func()            = M.normalize // called on y after successful step, typically normalizes magnetization
-	Dt_si                  float64           = 1e-15       // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	dt_mul                 *float64          = &GammaLL    // TODO: simplify
-	MinDt, MaxDt           float64                         // minimum and maximum time step
-	MaxErr                 float64           = 1e-4
-	Headroom               float64           = 0.75      // maximum error per step
-	LastErr                float64                       // error of last step
-	NSteps, NUndone, NEval int                           // number of good steps, undone steps
-	FixDt                  float64                       // fixed time step?
-	torqueFn               func(*data.Slice) = SetTorque // writes torque to dst // TODO: rm
-	stepper                func(*data.Slice)             // generic step, can be EulerStep, HeunStep, etc
+	solverPostStep          func()            = M.normalize // called on y after successful step, typically normalizes magnetization
+	Dt_si                   float64           = 1e-15       // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	dt_mul                  *float64          = &GammaLL    // TODO: simplify
+	MinDt, MaxDt            float64                         // minimum and maximum time step
+	MaxErr                  float64           = 1e-4
+	Headroom                float64           = 0.75 // maximum error per step
+	LastErr                 float64                  // error of last step
+	NSteps, NUndone, NEvals int                      // number of good steps, undone steps
+	FixDt                   float64                  // fixed time step?
+	stepper                 func(*data.Slice)        // generic step, can be EulerStep, HeunStep, etc
 )
 
 //func NewSolver(torqueFn func(dst *data.Slice), postStep func(), dt_si float64, dt_mul *float64, step func(*solver, *data.Slice)) solver {
@@ -29,6 +28,11 @@ var (
 // TODO: rm
 func Step(y *data.Slice) {
 	stepper(y)
+}
+
+func torqueFn(dst *data.Slice) {
+	SetTorque(dst)
+	NEvals++
 }
 
 // adapt time step: dt *= corr, but limited to sensible values.

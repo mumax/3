@@ -25,6 +25,7 @@ maxErr = 1e-5
 
 
 // reversal
+	eval0 := NEval()
 	autosave(m, 10e-12)
 	tableAutoSave(5e-12)
 	alpha = 0.02
@@ -32,3 +33,4 @@ maxErr = 1e-5
 	run(1e-9)
 	expectv("m", m.average(), vector(-0.9845, 0.1268, 0.0432), 1e-3)
 
+	print(NEval()-eval0, "evaluations")

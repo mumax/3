@@ -14,6 +14,7 @@ func init() {
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclROnly("dt", &Dt_si, "Last solver time step (s)")
+	DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
@@ -45,6 +46,10 @@ func SetSolver(typ int) {
 		stepper = solver.Step
 	}
 	solvertype = typ
+}
+
+func getNEval() int {
+	return NEvals
 }
 
 const (

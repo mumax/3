@@ -21,7 +21,6 @@ func HeunStep(y *data.Slice) {
 
 	// stage 1
 	torqueFn(dy0)
-	NEval++
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
 	// s.postStep()  // improves accuracy for good steps but painful for subtracting bad torque
@@ -31,7 +30,6 @@ func HeunStep(y *data.Slice) {
 	defer cuda.Recycle(dy)
 	Time += Dt_si
 	torqueFn(dy)
-	NEval++
 
 	// determine error
 	err := 0.0

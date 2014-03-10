@@ -1,9 +1,10 @@
 package engine
 
+// Magnetocrystalline anisotropy.
+
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
 // Anisotropy variables
@@ -48,14 +49,7 @@ func AddAnisotropyField(dst *data.Slice) {
 	}
 }
 
+// Returns anisotropy energy in joules.
 func GetAnisotropyEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_anis)
-}
-
-// dst = a/b, unless b == 0
-func paramDiv(dst, a, b [][NREGION]float32) {
-	util.Assert(len(dst) == 1 && len(a) == 1 && len(b) == 1)
-	for i := 0; i < NREGION; i++ { // not regions.maxreg
-		dst[0][i] = safediv(a[0][i], b[0][i])
-	}
 }

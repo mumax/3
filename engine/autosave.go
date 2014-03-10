@@ -4,15 +4,15 @@ package engine
 
 import "fmt"
 
-func init() {
-	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
-	DeclFunc("AutoSnapshot", AutoSnapshot, "Auto save image of quantity every period (s).")
-}
-
 var (
 	output  = make(map[Quantity]*autosave) // when to save quantities
 	autonum = make(map[interface{}]int)    // auto number for out file
 )
+
+func init() {
+	DeclFunc("AutoSave", AutoSave, "Auto save space-dependent quantity every period (s).")
+	DeclFunc("AutoSnapshot", AutoSnapshot, "Auto save image of quantity every period (s).")
+}
 
 // Periodically called by run loop to save everything that's needed at this time.
 func DoOutput() {

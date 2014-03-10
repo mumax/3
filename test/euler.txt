@@ -8,6 +8,7 @@
 	m  = uniform(1, .1, 0)
 
 // relax (heun)
+	setsolver(2)
 	alpha = 3
 	run(1e-9) 
 

@@ -12,16 +12,15 @@ var (
 	postStep                []func()            // called on after every full time step
 	Inject                  = make(chan func()) // injects code in between time steps. Used by web interface.
 	solvertype              int
-	solverPostStep          func()   = M.normalize // called on y after successful step, typically normalizes magnetization
-	Dt_si                   float64  = 1e-15       // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	dt_mul                  *float64 = &GammaLL    // TODO: simplify
-	MinDt, MaxDt            float64                // minimum and maximum time step
-	MaxErr                  float64  = 1e-5        // maximum error/step
-	Headroom                float64  = 0.75        //
-	lastErr, peakErr        float64                // error of last step, highest error ever
-	NSteps, NUndone, NEvals int                    // number of good steps, undone steps
-	FixDt                   float64                // fixed time step?
-	stepper                 Stepper                // generic step, can be EulerStep, HeunStep, etc
+	Dt_si                   float64  = 1e-15    // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	dt_mul                  *float64 = &GammaLL // TODO: simplify
+	MinDt, MaxDt            float64             // minimum and maximum time step
+	MaxErr                  float64  = 1e-5     // maximum error/step
+	Headroom                float64  = 0.75     //
+	lastErr, peakErr        float64             // error of last step, highest error ever
+	NSteps, NUndone, NEvals int                 // number of good steps, undone steps
+	FixDt                   float64             // fixed time step?
+	stepper                 Stepper             // generic step, can be EulerStep, HeunStep, etc
 )
 
 func init() {

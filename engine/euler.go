@@ -21,7 +21,7 @@ func (_ *Euler) Step() {
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
 	Time += Dt_si
-	solverPostStep()
+	M.normalize()
 	NSteps++
 }
 

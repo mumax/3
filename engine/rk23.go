@@ -72,7 +72,7 @@ func (rk *RK23) Step() {
 	defer cuda.Recycle(τ3)
 	cuda.Madd3(τ3, k1, k2, k3, (2. / 9.), (1. / 3.), (4. / 9.))
 	cuda.Madd2(m, m0, τ3, 1, h)
-	solverPostStep()
+	M.normalize()
 
 	// error estimate
 	τ2 := cuda.Buffer(3, size)

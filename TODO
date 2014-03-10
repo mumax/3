@@ -10,6 +10,8 @@ need proper zhang-li boundary conditions
 
 gui: use of IntValue, FloatValue panics on bad input
 
+doc: examples: random anisotropy direction not OK
+
 
 API:
 ----

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 func Fatal(msg ...interface{}) {
@@ -78,13 +79,19 @@ func Progress(progress, total int, msg string) {
 	}
 }
 
-var lastPct = -1
+var (
+	lastPct   = -1      // last progress percentage shown
+	lastProgT time.Time // last time we showed progress percentage
+)
 
 func PrintProgress(prog, total int, msg string) {
 	pct := (prog * 100) / total
-	if pct != lastPct {
-		fmt.Println(msg, pct, "%")
-		lastPct = pct
+	if pct != lastPct { // only print percentage if changed
+		if (time.Since(lastProgT) > time.Second) || pct == 100 { // only print percentage once/second unless finished
+			fmt.Println(msg, pct, "%")
+			lastPct = pct
+			lastProgT = time.Now()
+		}
 	}
 }
 

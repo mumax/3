@@ -29,7 +29,7 @@ func main() {
 		}
 	}
 
-	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda5.0", "mumax3-cuda4.2.9"}
+	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda5.0"}
 	mumax := ""
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd
@@ -52,6 +52,7 @@ func main() {
 
 func run(command string, args []string) error {
 	// prepare command
+	fmt.Println(command, args)
 	cmd := exec.Command(command, args...)
 	cmd.Env = env
 	stdout, _ := cmd.StdoutPipe()

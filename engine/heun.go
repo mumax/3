@@ -2,13 +2,15 @@ package engine
 
 import (
 	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"math"
 )
 
+type Heun struct{}
+
 // Adaptive Heun method, can be used as solver.Step
-func HeunStep(y *data.Slice) {
+func (_ *Heun) Step() {
+	y := M.Buffer()
 	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
 
@@ -54,3 +56,5 @@ func HeunStep(y *data.Slice) {
 		adaptDt(math.Pow(MaxErr/err, 1./3.))
 	}
 }
+
+func (_ *Heun) Free() {}

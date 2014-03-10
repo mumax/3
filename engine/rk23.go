@@ -20,7 +20,7 @@ type RK23 struct {
 	k1 *data.Slice // torque at end of step is kept for beginning of next step
 }
 
-func (rk *RK23) Step(unused *data.Slice) {
+func (rk *RK23) Step() {
 	m := M.Buffer()
 	size := m.Size()
 
@@ -30,8 +30,7 @@ func (rk *RK23) Step(unused *data.Slice) {
 
 	// upon resize: remove wrongly sized k1
 	if rk.k1.Size() != m.Size() {
-		rk.k1.Free()
-		rk.k1 = nil // will be re-allocated
+		rk.Free()
 	}
 
 	// first step ever: one-time k1 init and eval
@@ -104,6 +103,11 @@ func (rk *RK23) Step(unused *data.Slice) {
 		NUndone++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))
 	}
+}
+
+func (rk *RK23) Free() {
+	rk.k1.Free()
+	rk.k1 = nil
 }
 
 // TODO: into cuda

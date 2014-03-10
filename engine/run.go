@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"time"
 )
@@ -24,33 +25,81 @@ func init() {
 	MaxErr = 1e-5
 }
 
+// Solver globals
 var (
-	//Solver     = NewSolver(Torque.Set, M.normalize, 1e-15, &GammaLL, HeunStep)
-	Time       float64             // time in seconds
-	pause      = true              // set pause at any time to stop running after the current step
-	postStep   []func()            // called on after every time step
-	Inject     = make(chan func()) // injects code in between time steps. Used by web interface.
-	solvertype int
+	Time                    float64             // time in seconds
+	pause                   = true              // set pause at any time to stop running after the current step
+	postStep                []func()            // called on after every time step
+	Inject                  = make(chan func()) // injects code in between time steps. Used by web interface.
+	solvertype              int
+	solverPostStep          func()   = M.normalize // called on y after successful step, typically normalizes magnetization
+	Dt_si                   float64  = 1e-15       // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	dt_mul                  *float64 = &GammaLL    // TODO: simplify
+	MinDt, MaxDt            float64                // minimum and maximum time step
+	MaxErr                  float64  = 1e-4
+	Headroom                float64  = 0.75 // maximum error per step
+	LastErr                 float64         // error of last step
+	NSteps, NUndone, NEvals int             // number of good steps, undone steps
+	FixDt                   float64         // fixed time step?
+	stepper                 Stepper         // generic step, can be EulerStep, HeunStep, etc
 )
 
+// Time stepper like Euler, Heun, RK23
+type Stepper interface {
+	Step() // take time step using solver globals
+	Free() // free resources, if any (e.g.: RK23 previous torque)
+}
+
 func SetSolver(typ int) {
+	if stepper != nil {
+		stepper.Free()
+	}
 	switch typ {
 	default:
 		util.Fatalf("SetSolver: unknown solver type: %v", typ)
 	case 1:
-		stepper = EulerStep
+		stepper = new(Euler)
 	case 2:
-		stepper = HeunStep
+		stepper = new(Heun)
 	case 3:
-		// TODO: free etc
-		solver := new(RK23)
-		stepper = solver.Step
+		stepper = new(RK23)
 	}
 	solvertype = typ
 }
 
+func torqueFn(dst *data.Slice) {
+	SetTorque(dst)
+	NEvals++
+}
+
 func getNEval() int {
 	return NEvals
+}
+
+// adapt time step: dt *= corr, but limited to sensible values.
+func adaptDt(corr float64) {
+	if FixDt != 0 {
+		Dt_si = FixDt
+		return
+	}
+	util.AssertMsg(corr != 0, "Time step too small, check if parameters are sensible")
+	corr *= Headroom
+	if corr > 2 {
+		corr = 2
+	}
+	if corr < 1./2. {
+		corr = 1. / 2.
+	}
+	Dt_si *= corr
+	if MinDt != 0 && Dt_si < MinDt {
+		Dt_si = MinDt
+	}
+	if MaxDt != 0 && Dt_si > MaxDt {
+		Dt_si = MaxDt
+	}
+	if Dt_si == 0 {
+		util.Fatal("time step too small")
+	}
 }
 
 const (
@@ -123,7 +172,7 @@ func (g *guistate) RunInteractive() {
 }
 
 func step() {
-	Step(M.Buffer())
+	stepper.Step()
 	for _, f := range postStep {
 		f()
 	}

@@ -4,6 +4,8 @@ N := 16
 c := 5e-9
 setgridsize(N, N, 1)
 setcellsize(c, c, c)
+setSolver(2)
+maxerr = 1e-4
 
 Msat = 1/mu0
 Aex  = 10e-12
@@ -20,4 +22,4 @@ run(0.1e-9)
 gammaLL = gammaLL * 2 // make sure changing at a late point still has effect
 run(0.1e-9)
 
-expectv("m", m.average(), vector(-0.261, -0.7555, 0.597), 1e-3)
+expectv("m", m.average(), vector(-0.283, -0.747, 0.597), 1e-3)

@@ -1,5 +1,7 @@
 package engine
 
+// Averaging of quantities over entire universe or just magnet.
+
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
@@ -24,7 +26,7 @@ func sAverageUniverse(s *data.Slice) []float64 {
 	return avg
 }
 
-// average over the magnet volume
+// average of slice over the magnet volume
 func sAverageMagnet(s *data.Slice) []float64 {
 	if geometry.Gpu().IsNil() {
 		return sAverageUniverse(s)
@@ -37,6 +39,8 @@ func sAverageMagnet(s *data.Slice) []float64 {
 	}
 }
 
+// number of cells in the magnet.
+// not necessarily integer as cells can have fractional volume.
 func magnetNCell() float64 {
 	if geometry.Gpu().IsNil() {
 		return float64(Mesh().NCell())

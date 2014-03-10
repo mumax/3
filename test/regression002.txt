@@ -35,8 +35,8 @@ defregion(1, spot)
 
 run(0.5e-9)
 
-tol := 2e-3
-expectv("m", m.region(1).average(), vector(-0.4543135506766183, 0.8869750613257998, 0.0804117293584914), tol)
+tol := 0.01
+expectv("m", m.region(1).average(), vector(-0.450, 0.8869750613257998, 0.0804117293584914), tol)
 
 run(0.5e-9)
 

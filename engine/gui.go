@@ -224,8 +224,8 @@ func (g *guistate) prepareM() {
 }
 
 var (
-	solvertypes = map[string]string{"euler": "1", "heun": "2"}
-	solvernames = map[int]string{1: "euler", 2: "heun"}
+	solvertypes = map[string]string{"euler": "1", "heun": "2", "rk23": "3"}
+	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23"}
 )
 
 // see prepareServer
@@ -241,7 +241,7 @@ func (g *guistate) prepareSolver() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
 			g.EvalGUI("SetSolver(" + typ + ")")
-			if FixDt == 0 { // euler must have fixed time step
+			if solvertype == EULER && FixDt == 0 { // euler must have fixed time step
 				FixDt = 1e-15
 			}
 		}

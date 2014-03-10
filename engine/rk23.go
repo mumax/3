@@ -58,13 +58,13 @@ func (rk *RK23) Step() {
 	// stage 2
 	Time = t0 + (1./2.)*Dt_si
 	cuda.Madd2(m, m0, k1, 1, (1./2.)*h) // m = m0*1 + k1*h/2
-	//postStep()
+	M.normalize()
 	torqueFn(k2)
 
 	// stage 3
 	Time = t0 + (3./4.)*Dt_si
 	cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
-	//postStep()
+	M.normalize()
 	torqueFn(k3)
 
 	// 3rd order solution

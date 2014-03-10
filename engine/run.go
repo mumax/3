@@ -7,18 +7,18 @@ import (
 
 // Solver globals
 var (
-	Time                    float64             // time in seconds
-	pause                   = true              // set pause at any time to stop running after the current step
-	postStep                []func()            // called on after every full time step
-	Inject                  = make(chan func()) // injects code in between time steps. Used by web interface.
-	Dt_si                   float64  = 1e-15    // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	MinDt, MaxDt            float64             // minimum and maximum time step
-	MaxErr                  float64  = 1e-5     // maximum error/step
-	Headroom                float64  = 0.75     //
-	lastErr, peakErr        float64             // error of last step, highest error ever
-	NSteps, NUndone, NEvals int                 // number of good steps, undone steps
-	FixDt                   float64             // fixed time step?
-	stepper                 Stepper             // generic step, can be EulerStep, HeunStep, etc
+	Time                    float64                      // time in seconds
+	pause                   = true                       // set pause at any time to stop running after the current step
+	postStep                []func()                     // called on after every full time step
+	Inject                           = make(chan func()) // injects code in between time steps. Used by web interface.
+	Dt_si                   float64  = 1e-15             // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	MinDt, MaxDt            float64                      // minimum and maximum time step
+	MaxErr                  float64  = 1e-5              // maximum error/step
+	Headroom                float64  = 0.75              // solver headroom: keep dt this factor smaller than it could be
+	lastErr, peakErr        float64                      // error of last step, highest error ever
+	NSteps, NUndone, NEvals int                          // number of good steps, undone steps
+	FixDt                   float64                      // fixed time step?
+	stepper                 Stepper                      // generic step, can be EulerStep, HeunStep, etc
 	solvertype              int
 )
 

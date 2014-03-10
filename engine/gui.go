@@ -16,7 +16,10 @@ import (
 )
 
 // global GUI state stores what is currently shown in the web page.
-var gui_ = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
+var (
+	gui_    = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
+	Timeout = 3 * time.Second // exit finished simulation this long after browser was closed
+)
 
 type guistate struct {
 	*gui.Page                              // GUI elements (buttons...)
@@ -40,6 +43,28 @@ func (g *guistate) UpdateKeepAlive() {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	g.keepalive = time.Now()
+}
+
+func nop() {}
+
+// Enter interactive mode. Simulation is now exclusively controlled by web GUI
+func (g *guistate) RunInteractive() {
+
+	// periodically wake up Run so it may exit on timeout
+	go func() {
+		for {
+			Inject <- nop
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	fmt.Println("entering interactive mode")
+	g.UpdateKeepAlive()
+	for time.Since(g.KeepAlive()) < Timeout {
+		f := <-Inject
+		f()
+	}
+	fmt.Println("browser disconnected, exiting")
 }
 
 // displayable quantity in GUI Parameters section

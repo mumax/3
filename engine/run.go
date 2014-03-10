@@ -17,8 +17,8 @@ var (
 	dt_mul                  *float64 = &GammaLL    // TODO: simplify
 	MinDt, MaxDt            float64                // minimum and maximum time step
 	MaxErr                  float64  = 1e-5        // maximum error/step
-	Headroom                float64  = 0.75        // maximum error per step
-	LastErr                 float64                // error of last step
+	Headroom                float64  = 0.75        //
+	lastErr, peakErr        float64                // error of last step, highest error ever
 	NSteps, NUndone, NEvals int                    // number of good steps, undone steps
 	FixDt                   float64                // fixed time step?
 	stepper                 Stepper                // generic step, can be EulerStep, HeunStep, etc
@@ -32,6 +32,8 @@ func init() {
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclROnly("dt", &Dt_si, "Last solver time step (s)")
+	DeclROnly("lastErr", &lastErr, "Maximum error of last time step")
+	DeclROnly("peakErr", &peakErr, "Maximum error over all time steps")
 	DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
@@ -81,6 +83,14 @@ func torqueFn(dst *data.Slice) {
 // returns number of torque evaluations
 func getNEval() int {
 	return NEvals
+}
+
+// update lastErr and peakErr
+func setLastErr(err float64) {
+	lastErr = err
+	if err > peakErr {
+		peakErr = err
+	}
 }
 
 // adapt time step: dt *= corr, but limited to sensible values.

@@ -82,15 +82,12 @@ func (rk *RK23) Step() {
 	madd4(τ2, k1, k2, k3, k4, (7. / 24.), (1. / 4.), (1. / 3.), (1. / 8.))
 
 	// determine error
-	err := 0.0
-	if FixDt == 0 { // time step not fixed
-		err = cuda.MaxVecDiff(τ2, τ3) * float64(h)
-	}
+	err := cuda.MaxVecDiff(τ2, τ3) * float64(h)
 
 	// adjust next time step
-	if err < MaxErr || Dt_si <= MinDt { // mindt check to avoid infinite loop
+	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
-		LastErr = err // output error/step for good steps only
+		setLastErr(err)
 		NSteps++
 		Time = t0 + Dt_si
 		adaptDt(math.Pow(MaxErr/err, 1./3.))

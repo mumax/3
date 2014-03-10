@@ -25,28 +25,22 @@ func (_ *Heun) Step() {
 	torqueFn(dy0)
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 
-	// s.postStep()  // improves accuracy for good steps but painful for subtracting bad torque
-
 	// stage 2
 	dy := cuda.Buffer(3, y.Size())
 	defer cuda.Recycle(dy)
 	Time += Dt_si
 	torqueFn(dy)
 
-	// determine error
-	err := 0.0
-	if FixDt == 0 { // time step not fixed
-		err = cuda.MaxVecDiff(dy0, dy) * float64(dt)
-	}
+	err := cuda.MaxVecDiff(dy0, dy) * float64(dt)
 
 	// adjust next time step
-	if err < MaxErr || Dt_si <= MinDt { // mindt check to avoid infinite loop
+	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
 		cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 		solverPostStep()
 		NSteps++
 		adaptDt(math.Pow(MaxErr/err, 1./2.))
-		LastErr = err
+		setLastErr(err)
 	} else {
 		// undo bad step
 		util.Assert(FixDt == 0)

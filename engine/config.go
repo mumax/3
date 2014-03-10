@@ -17,24 +17,31 @@ func init() {
 	DeclFunc("TwoDomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
+	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
 type Config func(x, y, z float64) data.Vector
 
 func RandomMag() Config {
+	return RandomMagSeed(0)
+}
+
+func RandomMagSeed(seed int) Config {
+	rng := rand.New(rand.NewSource(int64(seed)))
 	return func(x, y, z float64) data.Vector {
-		return randomDir()
+		return randomDir(rng)
 	}
 }
 
-func randomDir() data.Vector {
-	phi := rand.Float64() * (2 * math.Pi)
-	theta := rand.Float64() * math.Pi
-	x1 := math.Sin(theta) * math.Cos(phi)
-	y1 := math.Sin(theta) * math.Sin(phi)
-	z1 := math.Cos(theta)
-	return data.Vector{x1, y1, z1}
+// generate anisotropic random unit vector
+func randomDir(rng *rand.Rand) data.Vector {
+	theta := 2 * rng.Float64() * math.Pi
+	z := 2 * (rng.Float64() - 0.5)
+	b := math.Sqrt(1 - z*z)
+	x := b * math.Cos(theta)
+	y := b * math.Sin(theta)
+	return data.Vector{x, y, z}
 }
 
 // Returns a uniform magnetization state. E.g.:

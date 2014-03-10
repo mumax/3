@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"math/rand"
 )
 
 func init() {
@@ -151,12 +152,13 @@ func (geometry *geom) setGeom(s Shape) {
 	geomlist := host.Host()[0]
 	mhost := M.Buffer().HostCopy()
 	m := mhost.Host()
+	rng := rand.New(rand.NewSource(0))
 	for i := range m[0] {
 		if geomlist[i] != 0 {
 			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
 			if mx == 0 && my == 0 && mz == 0 {
 				needupload = true
-				rnd := randomDir()
+				rnd := randomDir(rng)
 				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
 			}
 		}

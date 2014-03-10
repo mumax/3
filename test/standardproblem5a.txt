@@ -49,8 +49,8 @@ expect("mz", m0[2], 0.0000000, 1e-3)
 
 run(1e-9)
 m1 := m.average()
-expect("mx", m1[0], 0.6440672, 1e-3)
-expect("my", m1[1], 0.5133638, 1e-3)
+expect("mx", m1[0], 0.642389, 1e-3)
+expect("my", m1[1], 0.51473337, 1e-3)
 expect("mz", m1[2],-0.1571195, 1e-3)
 
 run(1e-9)

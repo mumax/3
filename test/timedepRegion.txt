@@ -16,5 +16,5 @@ run(0.5e-9)
 
 m_ := m.average()
 expect("mx", m_[0],  0,       1e-4)
-expect("my", m_[1],  0.99080, 1e-4)
+expect("my", m_[1],  0.99090, 1e-4)
 expect("mz", m_[2],  0,       1e-4)

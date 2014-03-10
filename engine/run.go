@@ -11,9 +11,7 @@ var (
 	pause                   = true              // set pause at any time to stop running after the current step
 	postStep                []func()            // called on after every full time step
 	Inject                  = make(chan func()) // injects code in between time steps. Used by web interface.
-	solvertype              int
 	Dt_si                   float64  = 1e-15    // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	dt_mul                  *float64 = &GammaLL // TODO: simplify
 	MinDt, MaxDt            float64             // minimum and maximum time step
 	MaxErr                  float64  = 1e-5     // maximum error/step
 	Headroom                float64  = 0.75     //
@@ -21,6 +19,7 @@ var (
 	NSteps, NUndone, NEvals int                 // number of good steps, undone steps
 	FixDt                   float64             // fixed time step?
 	stepper                 Stepper             // generic step, can be EulerStep, HeunStep, etc
+	solvertype              int
 )
 
 func init() {

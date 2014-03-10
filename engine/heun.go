@@ -6,6 +6,7 @@ import (
 	"math"
 )
 
+// Adaptive Heun solver.
 type Heun struct{}
 
 // Adaptive Heun method, can be used as solver.Step
@@ -18,7 +19,7 @@ func (_ *Heun) Step() {
 		Dt_si = FixDt
 	}
 
-	dt := float32(Dt_si * *dt_mul)
+	dt := float32(Dt_si * GammaLL)
 	util.Assert(dt > 0)
 
 	// stage 1

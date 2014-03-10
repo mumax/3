@@ -14,7 +14,7 @@ func (_ *Euler) Step() {
 	defer cuda.Recycle(dy0)
 
 	Dt_si = FixDt
-	dt := float32(Dt_si * *dt_mul)
+	dt := float32(Dt_si * GammaLL)
 	util.AssertMsg(dt > 0, "Euler solver requires fixed time step > 0")
 
 	torqueFn(dy0)

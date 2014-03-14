@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"math"
+	//"fmt"
 )
 
 // Calculates the magnetostatic kernel by brute-force integration
@@ -62,13 +63,18 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 	for z := r1[Z]; z <= r2[Z]; z++ {
 		zw := wrap(z, size[Z])
 		R[Z] = float64(z) * cellsize[Z]
+
 		for y := r1[Y]; y <= r2[Y]; y++ {
-			yw := wrap(y, size[Y])
-			R[Y] = float64(y) * cellsize[Y]
 			progress++
 			util.Progress(progress, progmax, "Calculating demag kernel")
 
-			for x := r1[X]; x <= r2[X]; x++ { // in each dimension, go from -(size-1)/2 to size/2 -1, wrapped.
+			yw := wrap(y, size[Y])
+			R[Y] = float64(y) * cellsize[Y]
+			if yw > size[Y]/2+1 { // skip one half, reconstruct from symmetry later
+				continue
+			}
+
+			for x := r1[X]; x <= r2[X]; x++ {
 				xw := wrap(x, size[X])
 				R[X] = float64(x) * cellsize[X]
 
@@ -149,6 +155,31 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 			}
 		}
 	}
+
+	// Reconstruct skipped parts from symmetry
+	for z := 0; z < size[Z]; z++ {
+		for y := size[Y]/2 + 1; y < size[Y]; y++ {
+			y2 := size[Y] - y
+			for x := 0; x < size[X]; x++ {
+
+				array[X][X][z][y][x] = array[X][X][z][y2][x]
+				array[X][Y][z][y][x] = -array[X][Y][z][y2][x]
+				array[X][Z][z][y][x] = array[X][Z][z][y2][x]
+				array[Y][Y][z][y][x] = array[Y][Y][z][y2][x]
+				array[Y][Z][z][y][x] = -array[Y][Z][z][y2][x]
+				array[Z][Z][z][y][x] = array[Z][Z][z][y2][x]
+
+				//fmt.Println("XX", array[X][X][z][y][x],array[X][X][z][y2][x] )
+				//fmt.Println("XY", array[X][Y][z][y][x],array[X][Y][z][y2][x] )
+				//fmt.Println("XZ", array[X][Z][z][y][x],array[X][Z][z][y2][x] )
+				//fmt.Println("YY", array[Y][Y][z][y][x],array[Y][Y][z][y2][x] )
+				//fmt.Println("YZ", array[Y][Z][z][y][x],array[Y][Z][z][y2][x] )
+				//fmt.Println("ZZ", array[Z][Z][z][y][x],array[Z][Z][z][y2][x] )
+
+			}
+		}
+	}
+
 	// for 2D these elements are zero:
 	if size[Z] == 1 {
 		kernel[X][Z] = nil

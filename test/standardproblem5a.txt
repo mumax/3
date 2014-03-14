@@ -11,14 +11,12 @@ setcellsize(sX/Nx, sY/Ny, sZ/Nz)
 
 Msat  = 800e3
 Aex   = 13e-12
-alpha = 1
-
-maxdt    = 1e-12
+alpha = 3
 
 // Set a initial magnetisation to C-state
 m = uniform(1, 1, 0.001)
 
-run(3e-9)
+run(10e-9)
 
 alpha        = 0.01
 lambda       = 1
@@ -42,20 +40,16 @@ J = vector(0, 0, jc)
 tableautosave(10e-12)
 
 save(sttorque)
+TOL := 1e-5
+
 m0 := m.average()
-expect("mx", m0[0], 0.9586285, 1e-3)
-expect("my", m0[1], 0.2039081, 1e-3)
-expect("mz", m0[2], 0.0000000, 1e-3)
+expectv("m", m0, vector(0.9586266279220581, 0.20391345024108887, 0), TOL)
 
 run(1e-9)
 m1 := m.average()
-expect("mx", m1[0], 0.642389, 1e-3)
-expect("my", m1[1], 0.51473337, 1e-3)
-expect("mz", m1[2],-0.1571195, 1e-3)
+expectv("m", m1, vector(0.6440994739532471, 0.5131782293319702, -0.1569230705499649), TOL)
 
 run(1e-9)
 m2 := m.average()
-expect("mx", m2[0], -0.9574024, 1e3)
-expect("my", m2[1],  0.2069624, 1e3)
-expect("mz", m2[2],  0.0096634, 1e3)
+expectv("m", m2, vector(-0.957406222820282, 0.20698121190071106, 0.009677470661699772), TOL)
 

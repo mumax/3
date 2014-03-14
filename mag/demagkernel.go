@@ -63,10 +63,10 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 		zw := wrap(z, size[Z])
 		R[Z] = float64(z) * cellsize[Z]
 		// skip one half, reconstruct from symmetry later
-		// check on wrapped index so it also works for PBC
-		//	if zw > size[Z]/2+1 {
-		//		continue
-		//	}
+		// check on wrapped index instead of loop range so it also works for PBC
+		if zw > size[Z]/2+1 {
+			continue
+		}
 
 		for y := r1[Y]; y <= r2[Y]; y++ {
 			progress++
@@ -74,16 +74,16 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 
 			yw := wrap(y, size[Y])
 			R[Y] = float64(y) * cellsize[Y]
-			//if yw > size[Y]/2+1 {
-			//	continue
-			//}
+			if yw > size[Y]/2+1 {
+				continue
+			}
 
 			for x := r1[X]; x <= r2[X]; x++ {
 				xw := wrap(x, size[X])
 				R[X] = float64(x) * cellsize[X]
-				//if xw > size[X]/2+1 {
-				//	continue
-				//}
+				if xw > size[X]/2+1 {
+					continue
+				}
 
 				// choose number of integration points depending on how far we are from source.
 				dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
@@ -163,53 +163,51 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 		}
 	}
 
-	/*
-		// Reconstruct skipped parts from symmetry (X)
-		for z := 0; z < size[Z]; z++ {
-			for y := 0; y < size[Y]; y++ {
-				for x := size[X]/2 + 1; x < size[X]; x++ {
-					x2 := size[X] - x
-					array[X][X][z][y][x] = array[X][X][z][y][x2]
-					array[X][Y][z][y][x] = -array[X][Y][z][y][x2]
-					array[X][Z][z][y][x] = -array[X][Z][z][y][x2]
-					array[Y][Y][z][y][x] = array[Y][Y][z][y][x2]
-					array[Y][Z][z][y][x] = array[Y][Z][z][y][x2]
-					array[Z][Z][z][y][x] = array[Z][Z][z][y][x2]
-				}
+	// Reconstruct skipped parts from symmetry (X)
+	for z := 0; z < size[Z]; z++ {
+		for y := 0; y < size[Y]; y++ {
+			for x := size[X]/2 + 1; x < size[X]; x++ {
+				x2 := size[X] - x
+				array[X][X][z][y][x] = array[X][X][z][y][x2]
+				array[X][Y][z][y][x] = -array[X][Y][z][y][x2]
+				array[X][Z][z][y][x] = -array[X][Z][z][y][x2]
+				array[Y][Y][z][y][x] = array[Y][Y][z][y][x2]
+				array[Y][Z][z][y][x] = array[Y][Z][z][y][x2]
+				array[Z][Z][z][y][x] = array[Z][Z][z][y][x2]
 			}
 		}
+	}
 
-		// Reconstruct skipped parts from symmetry (Y)
-		for z := 0; z < size[Z]; z++ {
-			for y := size[Y]/2 + 1; y < size[Y]; y++ {
-				y2 := size[Y] - y
-				for x := 0; x < size[X]; x++ {
-					array[X][X][z][y][x] = array[X][X][z][y2][x]
-					array[X][Y][z][y][x] = -array[X][Y][z][y2][x]
-					array[X][Z][z][y][x] = array[X][Z][z][y2][x]
-					array[Y][Y][z][y][x] = array[Y][Y][z][y2][x]
-					array[Y][Z][z][y][x] = -array[Y][Z][z][y2][x]
-					array[Z][Z][z][y][x] = array[Z][Z][z][y2][x]
+	// Reconstruct skipped parts from symmetry (Y)
+	for z := 0; z < size[Z]; z++ {
+		for y := size[Y]/2 + 1; y < size[Y]; y++ {
+			y2 := size[Y] - y
+			for x := 0; x < size[X]; x++ {
+				array[X][X][z][y][x] = array[X][X][z][y2][x]
+				array[X][Y][z][y][x] = -array[X][Y][z][y2][x]
+				array[X][Z][z][y][x] = array[X][Z][z][y2][x]
+				array[Y][Y][z][y][x] = array[Y][Y][z][y2][x]
+				array[Y][Z][z][y][x] = -array[Y][Z][z][y2][x]
+				array[Z][Z][z][y][x] = array[Z][Z][z][y2][x]
 
-				}
 			}
 		}
+	}
 
-		// Reconstruct skipped parts from symmetry (Z)
-		for z := size[Z]/2 + 1; z < size[Z]; z++ {
-			z2 := size[Z] - z
-			for y := 0; y < size[Y]; y++ {
-				for x := 0; x < size[X]; x++ {
-					array[X][X][z][y][x] = array[X][X][z2][y][x]
-					array[X][Y][z][y][x] = array[X][Y][z2][y][x]
-					array[X][Z][z][y][x] = -array[X][Z][z2][y][x]
-					array[Y][Y][z][y][x] = array[Y][Y][z2][y][x]
-					array[Y][Z][z][y][x] = -array[Y][Z][z2][y][x]
-					array[Z][Z][z][y][x] = array[Z][Z][z2][y][x]
-				}
+	// Reconstruct skipped parts from symmetry (Z)
+	for z := size[Z]/2 + 1; z < size[Z]; z++ {
+		z2 := size[Z] - z
+		for y := 0; y < size[Y]; y++ {
+			for x := 0; x < size[X]; x++ {
+				array[X][X][z][y][x] = array[X][X][z2][y][x]
+				array[X][Y][z][y][x] = array[X][Y][z2][y][x]
+				array[X][Z][z][y][x] = -array[X][Z][z2][y][x]
+				array[Y][Y][z][y][x] = array[Y][Y][z2][y][x]
+				array[Y][Z][z][y][x] = -array[Y][Z][z2][y][x]
+				array[Z][Z][z][y][x] = array[Z][Z][z2][y][x]
 			}
 		}
-	*/
+	}
 
 	// for 2D these elements are zero:
 	if size[Z] == 1 {

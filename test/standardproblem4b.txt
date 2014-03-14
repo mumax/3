@@ -14,13 +14,15 @@
 
 // relax
 	alpha = 3
-	runwhile(maxtorque > 1e-4)
-	steps(10000)
-	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+	run(10e-9)
+	print(m.average())
+	TOL := 1e-6
+	expectv("m", m.average(), vector(0.9669623970985413, 0.12529028952121735, 0), TOL)
 
 // reversal
 	alpha = 0.02
 	B_ext = vector(-35.5E-3, -6.3E-3, 0)
 	run(1e-9)
-	expectv("m", m.average(), vector( -0.9687, -0.1186, -0.0056), 1e-3)
+	print(m.average())
+	expectv("m", m.average(), vector(-0.9686716198921204, -0.11842965334653854, -0.005764320492744446), TOL)
 

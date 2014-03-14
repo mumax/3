@@ -14,10 +14,10 @@
 
 // relax
 	alpha = 3
-	//MaxErr = 1e-4
-	RunWhile(MaxTorque > 1e-4)
-	run(1e-9)
-	expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+	run(10e-9)
+	print(m.average())
+	TOL := 1e-6
+	expectv("m", m.average(), vector(0.9669623970985413, 0.12529028952121735, 0), TOL)
 
 // reversal
 	eval0 := NEval()
@@ -26,5 +26,6 @@
 	alpha = 0.02
 	B_ext = vector(-24.6E-3, 4.3E-3, 0)
 	run(1e-9)
-	expectv("m", m.average(), vector(-0.9845, 0.1268, 0.0432), 1e-3)
+	print(m.average())
+	expectv("m", m.average(), vector(-0.9846177101135254, 0.12599533796310425, 0.043271854519844055), TOL)
 	print(NEval()-eval0, "evaluations")

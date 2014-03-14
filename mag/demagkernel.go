@@ -61,13 +61,12 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 	progress, progmax := 0, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z])
 	for z := r1[Z]; z <= r2[Z]; z++ {
 		zw := wrap(z, size[Z])
+		R[Z] = float64(z) * cellsize[Z]
 		// skip one half, reconstruct from symmetry later
 		// check on wrapped index so it also works for PBC
-		if zw > size[Z]/2+1 {
-			continue
-		}
-
-		R[Z] = float64(z) * cellsize[Z]
+		//	if zw > size[Z]/2+1 {
+		//		continue
+		//	}
 
 		for y := r1[Y]; y <= r2[Y]; y++ {
 			progress++
@@ -81,10 +80,10 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 
 			for x := r1[X]; x <= r2[X]; x++ {
 				xw := wrap(x, size[X])
+				R[X] = float64(x) * cellsize[X]
 				if xw > size[X]/2+1 {
 					continue
 				}
-				R[X] = float64(x) * cellsize[X]
 
 				// choose number of integration points depending on how far we are from source.
 				dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]

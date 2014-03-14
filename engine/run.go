@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
@@ -8,6 +9,7 @@ import (
 // Solver globals
 var (
 	Time                    float64                      // time in seconds
+	alarm                   float64                      // alarm clock marks end time of run, dt adaptation must not cross it!
 	pause                   = true                       // set pause at any time to stop running after the current step
 	postStep                []func()                     // called on after every full time step
 	Inject                           = make(chan func()) // injects code in between time steps. Used by web interface.
@@ -115,11 +117,19 @@ func adaptDt(corr float64) {
 	if Dt_si == 0 {
 		util.Fatal("time step too small")
 	}
+
+	// do not cross alarm time
+	if Time < alarm && Time+Dt_si > alarm {
+		Dt_si = alarm - Time
+	}
+
+	util.AssertMsg(Dt_si > 0, fmt.Sprint("Time step too small: ", Dt_si))
 }
 
 // Run the simulation for a number of seconds.
 func Run(seconds float64) {
 	stop := Time + seconds
+	alarm = stop // don't have dt adapt to go over alarm
 	RunWhile(func() bool { return Time < stop })
 }
 

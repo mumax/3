@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
 // Loads standard functions into the world.
@@ -75,6 +76,10 @@ func (w *World) LoadStdlib() {
 	//string
 	w.Func("sprint", fmt.Sprint, "Print all arguments to string with automatic formatting")
 	w.Func("sprintf", fmt.Sprintf, "Print to string with C-style formatting.")
+
+	//time
+	w.Func("now", time.Now, "Returns the current time")
+	w.Func("since", time.Since, "Returns the time elapsed since argument")
 }
 
 var rng = rand.New(rand.NewSource(0))

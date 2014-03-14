@@ -70,12 +70,17 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 
 			yw := wrap(y, size[Y])
 			R[Y] = float64(y) * cellsize[Y]
-			if yw > size[Y]/2+1 { // skip one half, reconstruct from symmetry later
+			// skip one half, reconstruct from symmetry later
+			// check on wrapped index so it also works for PBC
+			if yw > size[Y]/2+1 {
 				continue
 			}
 
 			for x := r1[X]; x <= r2[X]; x++ {
 				xw := wrap(x, size[X])
+				if xw > size[X]/2+1 {
+					continue
+				}
 				R[X] = float64(x) * cellsize[X]
 
 				// choose number of integration points depending on how far we are from source.
@@ -152,6 +157,30 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 						array[s][d][zw][yw][xw] += float32(B[d]) // += needed in case of PBC
 					}
 				}
+			}
+		}
+	}
+
+	// Reconstruct skipped parts from symmetry
+	for z := 0; z < size[Z]; z++ {
+		for y := 0; y < size[Y]; y++ {
+			for x := size[X]/2 + 1; x < size[X]; x++ {
+				x2 := size[X] - x
+
+				array[X][X][z][y][x] = array[X][X][z][y][x2]
+				array[X][Y][z][y][x] = -array[X][Y][z][y][x2]
+				array[X][Z][z][y][x] = -array[X][Z][z][y][x2]
+				array[Y][Y][z][y][x] = array[Y][Y][z][y][x2]
+				array[Y][Z][z][y][x] = array[Y][Z][z][y][x2]
+				array[Z][Z][z][y][x] = array[Z][Z][z][y][x2]
+
+				//fmt.Println("XX", array[X][X][z][y][x],array[X][X][z][y][x2] )
+				//fmt.Println("XY", array[X][Y][z][y][x],array[X][Y][z][y][x2] )
+				//fmt.Println("XZ", array[X][Z][z][y][x],array[X][Z][z][y][x2] )
+				//fmt.Println("YY", array[Y][Y][z][y][x],array[Y][Y][z][y][x2] )
+				//fmt.Println("YZ", array[Y][Z][z][y][x],array[Y][Z][z][y][x2] )
+				//fmt.Println("ZZ", array[Z][Z][z][y][x],array[Z][Z][z][y][x2] )
+
 			}
 		}
 	}

@@ -14,7 +14,5 @@ tableadd(Ku1)
 
 run(0.5e-9)
 
-m_ := m.average()
-expect("mx", m_[0], 0,          1e-4)
-expect("my", m_[1], 0.9908052, 1e-4)
-expect("mz", m_[2], 0,          1e-4)
+TOL := 1e-5
+expectv("m", m.average(), vector(0, 0.9909376502037048, 0), TOL)

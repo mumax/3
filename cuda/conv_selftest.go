@@ -46,7 +46,7 @@ func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice
 		}
 	}
 	if err > CONV_TOLERANCE {
-		util.Fatal("convolution self-test tolerance: ", err, "FAIL")
+		util.Fatal("convolution self-test tolerance: ", err, " FAIL")
 	}
 }
 

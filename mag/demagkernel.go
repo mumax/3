@@ -52,49 +52,49 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 	// Start brute integration
 	// 9 nested loops, does that stress you out?
 	// Fortunately, the 5 inner ones usually loop over just one element.
-	// It might be nice to get rid of that branching though.
 	var (
 		R, R2  [3]float64 // field and source cell center positions
 		pole   [3]float64 // position of point charge on the surface
 		points int        // counts used integration points
 	)
 	progress, progmax := 0, (1+r2[Y]-r1[Y])*(1+r2[Z]-r1[Z])
-	for z := r1[Z]; z <= r2[Z]; z++ {
-		zw := wrap(z, size[Z])
-		R[Z] = float64(z) * cellsize[Z]
-		// skip one half, reconstruct from symmetry later
-		// check on wrapped index instead of loop range so it also works for PBC
-		if zw > size[Z]/2+1 {
-			continue
-		}
 
-		for y := r1[Y]; y <= r2[Y]; y++ {
-			progress++
-			util.Progress(progress, progmax, "Calculating demag kernel")
+	for s := 0; s < 3; s++ { // source index Ksdxyz
+		u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 
-			yw := wrap(y, size[Y])
-			R[Y] = float64(y) * cellsize[Y]
-			if yw > size[Y]/2+1 {
+		for z := r1[Z]; z <= r2[Z]; z++ {
+			zw := wrap(z, size[Z])
+			R[Z] = float64(z) * cellsize[Z]
+			// skip one half, reconstruct from symmetry later
+			// check on wrapped index instead of loop range so it also works for PBC
+			if zw > size[Z]/2 {
 				continue
 			}
 
-			for x := r1[X]; x <= r2[X]; x++ {
-				xw := wrap(x, size[X])
-				R[X] = float64(x) * cellsize[X]
-				if xw > size[X]/2+1 {
+			for y := r1[Y]; y <= r2[Y]; y++ {
+				progress++
+				util.Progress(progress, progmax, "Calculating demag kernel")
+
+				yw := wrap(y, size[Y])
+				R[Y] = float64(y) * cellsize[Y]
+				if yw > size[Y]/2 {
 					continue
 				}
 
-				// choose number of integration points depending on how far we are from source.
-				dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
-				d := math.Sqrt(dx*dx + dy*dy + dz*dz)
-				if d == 0 {
-					d = L
-				}
-				maxSize := d / accuracy // maximum acceptable integration size
+				for x := r1[X]; x <= r2[X]; x++ {
+					xw := wrap(x, size[X])
+					R[X] = float64(x) * cellsize[X]
+					if xw > size[X]/2 {
+						continue
+					}
 
-				for s := 0; s < 3; s++ { // source index Ksdxyz
-					u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
+					// choose number of integration points depending on how far we are from source.
+					dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
+					d := math.Sqrt(dx*dx + dy*dy + dz*dz)
+					if d == 0 {
+						d = L
+					}
+					maxSize := d / accuracy // maximum acceptable integration size
 
 					nv := int(math.Max(cellsize[v]/maxSize, 1) + 0.5)
 					nw := int(math.Max(cellsize[w]/maxSize, 1) + 0.5)

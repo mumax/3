@@ -49,13 +49,14 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 		}
 	}
 
+	progress, progmax := 0, (1+(r2[Y]-r1[Y])/2)*(1+(r2[Z]-r1[Z])/2) // progress bar
+	done := make(chan struct{}, 3)                                  // parallel calculation of one component done?
+
 	// Start brute integration
 	// 9 nested loops, does that stress you out?
 	// Fortunately, the 5 inner ones usually loop over just one element.
-	progress, progmax := 0, (1+(r2[Y]-r1[Y])/2)*(1+(r2[Z]-r1[Z])/2)
 
-	done := make(chan struct{}, 3)
-	for s := 0; s < 3; s++ { // source index Ksdxyz
+	for s := 0; s < 3; s++ { // source index Ksdxyz (parallelized over)
 		go func(s int) {
 			u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 			var (
@@ -66,31 +67,31 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 
 			for z := r1[Z]; z <= r2[Z]; z++ {
 				zw := wrap(z, size[Z])
-				R[Z] = float64(z) * cellsize[Z]
 				// skip one half, reconstruct from symmetry later
 				// check on wrapped index instead of loop range so it also works for PBC
 				if zw > size[Z]/2 {
 					continue
 				}
+				R[Z] = float64(z) * cellsize[Z]
 
 				for y := r1[Y]; y <= r2[Y]; y++ {
-
 					yw := wrap(y, size[Y])
-					R[Y] = float64(y) * cellsize[Y]
 					if yw > size[Y]/2 {
 						continue
 					}
-					if s == 0 {
+					R[Y] = float64(y) * cellsize[Y]
+
+					if s == 0 { // show progress of only one component
 						progress++
 						util.Progress(progress, progmax, "Calculating demag kernel")
 					}
 
 					for x := r1[X]; x <= r2[X]; x++ {
 						xw := wrap(x, size[X])
-						R[X] = float64(x) * cellsize[X]
 						if xw > size[X]/2 {
 							continue
 						}
+						R[X] = float64(x) * cellsize[X]
 
 						// choose number of integration points depending on how far we are from source.
 						dx, dy, dz := delta(x)*cellsize[X], delta(y)*cellsize[Y], delta(z)*cellsize[Z]
@@ -165,9 +166,10 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (
 					}
 				}
 			}
-			done <- struct{}{}
+			done <- struct{}{} // notify parallel computation of this component is done
 		}(s)
 	}
+	// wait for all 3 components to finish
 	<-done
 	<-done
 	<-done

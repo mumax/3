@@ -51,13 +51,30 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 	float reMz = fftMz[e  ];
 	float imMz = fftMz[e+1];
 
-	// not using symmetry right now
+	// symmetry factors
+	float fyz = 1.0f;
+	float fxz = 1.0f;
+	float fxy = 1.0f;
+
+	if (iy > Ny/2) {
+		iy = Ny-iy;
+		fyz = -fyz;
+		fxy = -fxy;
+	}
+	if (iz > Nz/2) {
+		iz = Nz-iz;
+		fyz = -fyz;
+		fxz = -fxz;
+	}
+
+	I = (iz*Ny + iy)*Nx + ix;
+
 	Kxx = fftKxx[I];
 	Kyy = fftKyy[I];
 	Kzz = fftKzz[I];
-	Kyz = fftKyz[I];
-	Kxz = fftKxz[I];
-	Kxy = fftKxy[I];
+	Kyz = fyz * fftKyz[I];
+	Kxz = fxz * fftKxz[I];
+	Kxy = fxy * fftKxy[I];
 
 	fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
 	fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;

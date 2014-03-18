@@ -4,7 +4,7 @@
 // |My| = |Kxy Kyy Kyz| * |My|
 // |Mz|   |Kxz Kyz Kzz|   |Mz|
 //
-// ~kernel has mirror symmetry along Y and X-axis,
+// ~kernel has mirror symmetry along Y and Z-axis,
 // apart form first row,
 // and is only stored (roughly) half:
 //
@@ -21,10 +21,8 @@
 // aaaaa
 // bbbbb
 // ...
-// -aaaa
 // -bbbb
-
-// 3D array indexing
+// -aaaa
 
 extern "C" __global__ void
 kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* __restrict__  fftMz,
@@ -40,8 +38,7 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 		return;
 	}
 
-	float Kxx, Kyy, Kzz, Kxy, Kxz, Kyz;
-
+	// fetch (complex) FFT'ed magnetization
 	int I = (iz*Ny + iy)*Nx + ix;
 	int e = 2 * I;
 	float reMx = fftMx[e  ];
@@ -51,30 +48,38 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 	float reMz = fftMz[e  ];
 	float imMz = fftMz[e+1];
 
-	// symmetry factors
-	float fyz = 1.0f;
-	float fxz = 1.0f;
-	float fxy = 1.0f;
+	// fetch kernel
 
+	// minus signs are added to some elements if
+	// reconstructed from symmetry.
+	float signYZ = 1.0f;
+	float signXZ = 1.0f;
+	float signXY = 1.0f;
+
+	// use symmetry to fetch from redundant parts:
+	// mirror index into first quadrant and set signs.
 	if (iy > Ny/2) {
 		iy = Ny-iy;
-		fyz = -fyz;
-		fxy = -fxy;
+		signYZ = -signYZ;
+		signXY = -signXY;
 	}
 	if (iz > Nz/2) {
 		iz = Nz-iz;
-		fyz = -fyz;
-		fxz = -fxz;
+		signYZ = -signYZ;
+		signXZ = -signXZ;
 	}
+
+	// fetch kernel element from non-redundant part
+	// and apply minus signs for mirrored parts.
 	I = (iz*Ny + iy)*Nx + ix;
+	float Kxx = fftKxx[I];
+	float Kyy = fftKyy[I];
+	float Kzz = fftKzz[I];
+	float Kyz = fftKyz[I] * signYZ;
+	float Kxz = fftKxz[I] * signXZ;
+	float Kxy = fftKxy[I] * signXY;
 
-	Kxx = fftKxx[I];
-	Kyy = fftKyy[I];
-	Kzz = fftKzz[I];
-	Kyz = fyz * fftKyz[I];
-	Kxz = fxz * fftKxz[I];
-	Kxy = fxy * fftKxy[I];
-
+	// m * K matrix multiplication, overwrite m with result.
 	fftMx[e  ] = reMx * Kxx + reMy * Kxy + reMz * Kxz;
 	fftMx[e+1] = imMx * Kxx + imMy * Kxy + imMz * Kxz;
 	fftMy[e  ] = reMx * Kxy + reMy * Kyy + reMz * Kyz;

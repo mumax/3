@@ -263,6 +263,16 @@ will try to keep <code>mx</code> (component 0, counting from 0) close to zero. I
 
 {{range .FilterName "ext_centerwall" "ext_rmSurfaceCharge" "shift" "shiftgeom" "shiftm" "shiftregions" "shiftmagl" "shiftmagr" "totalshift"}} {{template "entry" .}} {{end}}
 
+<hr/><h1> Magnetic Force Microscopy </h1>
+
+
+<p>Mumax3 has built-in generation of MFM images from the magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
+
+<p><img width=500px src=mfm.svg/></p>
+
+{{range .FilterPrefix "MFM"}} {{template "entry" .}} {{end}}
+
+
 <hr/><h1> Extensions </h1>
 
 Extensions are extra functionalities that are not officially supported. They are aimed at rather specific problems and may not work as expected for your particular situation. Their API and functionality may change in future releases.

@@ -321,6 +321,37 @@ save(mx_center)
 {{.Output}}
 
 
+
+<a id=MFM><hr/><h2>Magnetic Force Microscopy</h2></a>
+
+<p>Mumax3 has built-in generation of MFM images from the magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
+
+
+{{.Example `
+setgridsize(256, 256, 1)
+setcellsize(2e-9, 2e-9, 1e-9)
+setgeom(rect(400e-9, 400e-9))
+
+msat    = 600e3
+aex     = 10e-12
+alpha   = 3     
+m       = vortex(1, 1)
+run(0.5e-9)           // relax
+
+save(m)
+
+MFMLift = 10e-9
+saveas(MFM, "lift_10nm")
+
+MFMLift = 40e-9
+saveas(MFM, "lift_40nm")
+
+MFMLift = 100e-9
+saveas(MFM, "lift_100nm")
+`}}
+{{.Output}}
+
+
 <hr/><h2>PMA Racetrack</h2>
 {{.Example `
 // In this example we drive a domain wall in PMA material by spin-transfer torque.

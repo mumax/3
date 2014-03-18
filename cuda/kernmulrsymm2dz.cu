@@ -29,8 +29,13 @@ kernmulRSymm2Dz(float* __restrict__  fftMz, float* __restrict__  fftKzz, int Nx,
 	float reMz = fftMz[e  ];
 	float imMz = fftMz[e+1];
 
-	// not using symmetry for now
 	float Kzz;
+
+	if (iy > Ny/2) {
+		iy = Ny-iy;
+	}
+	I = iy*Nx + ix;
+
 	Kzz = fftKzz[I];
 
 	fftMz[e  ] = reMz * Kzz;

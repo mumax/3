@@ -66,7 +66,6 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 		fyz = -fyz;
 		fxz = -fxz;
 	}
-
 	I = (iz*Ny + iy)*Nx + ix;
 
 	Kxx = fftKxx[I];

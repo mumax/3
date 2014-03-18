@@ -33,7 +33,6 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
 		return;
 	}
 
-
 	int I = iy*Nx + ix;       // linear index for upper half of kernel
 	int e = 2 * I;
 
@@ -42,11 +41,20 @@ kernmulRSymm2Dxy(float* __restrict__  fftMx,  float* __restrict__  fftMy,
 	float reMy = fftMy[e  ];
 	float imMy = fftMy[e+1];
 
-	// not using symmetry for now
 	float Kyy, Kxx, Kxy;
+
+	// symmetry factors
+	float fxy = 1.0f;
+
+	if (iy > Ny/2) {
+		iy = Ny-iy;
+		fxy = -fxy;
+	}
+	I = iy*Nx + ix;
+
 	Kxx = fftKxx[I];
 	Kyy = fftKyy[I];
-	Kxy = fftKxy[I];
+	Kxy = fxy * fftKxy[I];
 
 	fftMx[e  ] = reMx * Kxx + reMy * Kxy;
 	fftMx[e+1] = imMx * Kxx + imMy * Kxy;

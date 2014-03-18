@@ -5,96 +5,95 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/barnex/cuda5/cu"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for kernmulRSymm3D kernel
 var kernmulRSymm3D_code cu.Function
 
 // Stores the arguments for kernmulRSymm3D kernel invocation
-type kernmulRSymm3D_args_t struct{
-	 arg_fftMx unsafe.Pointer
-	 arg_fftMy unsafe.Pointer
-	 arg_fftMz unsafe.Pointer
-	 arg_fftKxx unsafe.Pointer
-	 arg_fftKyy unsafe.Pointer
-	 arg_fftKzz unsafe.Pointer
-	 arg_fftKyz unsafe.Pointer
-	 arg_fftKxz unsafe.Pointer
-	 arg_fftKxy unsafe.Pointer
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 argptr [12]unsafe.Pointer
+type kernmulRSymm3D_args_t struct {
+	arg_fftMx  unsafe.Pointer
+	arg_fftMy  unsafe.Pointer
+	arg_fftMz  unsafe.Pointer
+	arg_fftKxx unsafe.Pointer
+	arg_fftKyy unsafe.Pointer
+	arg_fftKzz unsafe.Pointer
+	arg_fftKyz unsafe.Pointer
+	arg_fftKxz unsafe.Pointer
+	arg_fftKxy unsafe.Pointer
+	arg_Nx     int
+	arg_Ny     int
+	arg_Nz     int
+	argptr     [12]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for kernmulRSymm3D kernel invocation
 var kernmulRSymm3D_args kernmulRSymm3D_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
-	 kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
-	 kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
-	 kernmulRSymm3D_args.argptr[3] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxx)
-	 kernmulRSymm3D_args.argptr[4] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyy)
-	 kernmulRSymm3D_args.argptr[5] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKzz)
-	 kernmulRSymm3D_args.argptr[6] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyz)
-	 kernmulRSymm3D_args.argptr[7] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxz)
-	 kernmulRSymm3D_args.argptr[8] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxy)
-	 kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
-	 kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
-	 kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
-	 }
+	kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
+	kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
+	kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
+	kernmulRSymm3D_args.argptr[3] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxx)
+	kernmulRSymm3D_args.argptr[4] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyy)
+	kernmulRSymm3D_args.argptr[5] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKzz)
+	kernmulRSymm3D_args.argptr[6] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyz)
+	kernmulRSymm3D_args.argptr[7] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxz)
+	kernmulRSymm3D_args.argptr[8] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxy)
+	kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
+	kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
+	kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
+}
 
 // Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
-func k_kernmulRSymm3D_async ( fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int,  cfg *config) {
-	if Synchronous{ // debug
+func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 	}
 
 	kernmulRSymm3D_args.Lock()
 	defer kernmulRSymm3D_args.Unlock()
 
-	if kernmulRSymm3D_code == 0{
+	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = fatbinLoad(kernmulRSymm3D_map, "kernmulRSymm3D")
 	}
 
-	 kernmulRSymm3D_args.arg_fftMx = fftMx
-	 kernmulRSymm3D_args.arg_fftMy = fftMy
-	 kernmulRSymm3D_args.arg_fftMz = fftMz
-	 kernmulRSymm3D_args.arg_fftKxx = fftKxx
-	 kernmulRSymm3D_args.arg_fftKyy = fftKyy
-	 kernmulRSymm3D_args.arg_fftKzz = fftKzz
-	 kernmulRSymm3D_args.arg_fftKyz = fftKyz
-	 kernmulRSymm3D_args.arg_fftKxz = fftKxz
-	 kernmulRSymm3D_args.arg_fftKxy = fftKxy
-	 kernmulRSymm3D_args.arg_Nx = Nx
-	 kernmulRSymm3D_args.arg_Ny = Ny
-	 kernmulRSymm3D_args.arg_Nz = Nz
-	
+	kernmulRSymm3D_args.arg_fftMx = fftMx
+	kernmulRSymm3D_args.arg_fftMy = fftMy
+	kernmulRSymm3D_args.arg_fftMz = fftMz
+	kernmulRSymm3D_args.arg_fftKxx = fftKxx
+	kernmulRSymm3D_args.arg_fftKyy = fftKyy
+	kernmulRSymm3D_args.arg_fftKzz = fftKzz
+	kernmulRSymm3D_args.arg_fftKyz = fftKyz
+	kernmulRSymm3D_args.arg_fftKxz = fftKxz
+	kernmulRSymm3D_args.arg_fftKxy = fftKxy
+	kernmulRSymm3D_args.arg_Nx = Nx
+	kernmulRSymm3D_args.arg_Ny = Ny
+	kernmulRSymm3D_args.arg_Nz = Nz
 
 	args := kernmulRSymm3D_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm3D_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }
 
 // maps compute capability on PTX code for kernmulRSymm3D kernel.
-var kernmulRSymm3D_map = map[int]string{ 0: "" ,
-20: kernmulRSymm3D_ptx_20 ,
-30: kernmulRSymm3D_ptx_30 ,
-35: kernmulRSymm3D_ptx_35  }
+var kernmulRSymm3D_map = map[int]string{0: "",
+	20: kernmulRSymm3D_ptx_20,
+	30: kernmulRSymm3D_ptx_30,
+	35: kernmulRSymm3D_ptx_35}
 
 // kernmulRSymm3D PTX code for various compute capabilities.
-const(
-  kernmulRSymm3D_ptx_20 = `
+const (
+	kernmulRSymm3D_ptx_20 = `
 .version 3.2
 .target sm_20
 .address_size 64
@@ -205,77 +204,77 @@ const(
 	selp.b32	%r28, %r27, %r3, %p7;
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
-	.loc 1 70 1
+	.loc 1 69 1
 	mad.lo.s32 	%r29, %r28, %r5, %r23;
 	mad.lo.s32 	%r30, %r29, %r4, %r1;
 	mul.wide.s32 	%rd23, %r30, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
-	.loc 1 73 1
+	.loc 1 72 1
 	ld.global.f32 	%f8, [%rd25];
 	add.s64 	%rd26, %rd4, %rd23;
-	.loc 1 74 1
+	.loc 1 73 1
 	ld.global.f32 	%f9, [%rd26];
 	add.s64 	%rd27, %rd3, %rd23;
-	.loc 1 75 1
+	.loc 1 74 1
 	ld.global.f32 	%f10, [%rd27];
 	mul.f32 	%f11, %f6, %f10;
 	add.s64 	%rd28, %rd2, %rd23;
-	.loc 1 76 1
+	.loc 1 75 1
 	ld.global.f32 	%f12, [%rd28];
 	mul.f32 	%f13, %f7, %f12;
 	add.s64 	%rd29, %rd1, %rd23;
-	.loc 1 77 1
+	.loc 1 76 1
 	ld.global.f32 	%f14, [%rd29];
 	mul.f32 	%f15, %f4, %f14;
-	.loc 1 72 1
+	.loc 1 71 1
 	ld.global.f32 	%f16, [%rd24];
 	.loc 1 47 1
 	ld.global.f32 	%f17, [%rd19];
 	.loc 1 49 1
 	ld.global.f32 	%f18, [%rd21];
-	.loc 1 79 1
+	.loc 1 78 1
 	mul.f32 	%f19, %f18, %f15;
 	fma.rn.f32 	%f20, %f17, %f16, %f19;
 	.loc 1 51 1
 	ld.global.f32 	%f21, [%rd22];
-	.loc 1 79 1
+	.loc 1 78 1
 	fma.rn.f32 	%f22, %f21, %f13, %f20;
 	st.global.f32 	[%rd19], %f22;
-	.loc 1 80 1
+	.loc 1 79 1
 	mul.f32 	%f23, %f2, %f15;
 	fma.rn.f32 	%f24, %f1, %f16, %f23;
 	fma.rn.f32 	%f25, %f3, %f13, %f24;
 	st.global.f32 	[%rd19+4], %f25;
-	.loc 1 81 1
+	.loc 1 80 1
 	mul.f32 	%f26, %f18, %f8;
 	fma.rn.f32 	%f27, %f17, %f15, %f26;
 	fma.rn.f32 	%f28, %f21, %f11, %f27;
 	st.global.f32 	[%rd21], %f28;
-	.loc 1 82 1
+	.loc 1 81 1
 	mul.f32 	%f29, %f2, %f8;
 	fma.rn.f32 	%f30, %f1, %f15, %f29;
 	fma.rn.f32 	%f31, %f3, %f11, %f30;
 	st.global.f32 	[%rd21+4], %f31;
-	.loc 1 83 1
+	.loc 1 82 1
 	mul.f32 	%f32, %f18, %f11;
 	fma.rn.f32 	%f33, %f17, %f13, %f32;
 	fma.rn.f32 	%f34, %f21, %f9, %f33;
 	st.global.f32 	[%rd22], %f34;
-	.loc 1 84 1
+	.loc 1 83 1
 	mul.f32 	%f35, %f2, %f11;
 	fma.rn.f32 	%f36, %f1, %f13, %f35;
 	fma.rn.f32 	%f37, %f3, %f9, %f36;
 	st.global.f32 	[%rd22+4], %f37;
 
 BB0_2:
-	.loc 1 85 2
+	.loc 1 84 2
 	ret;
 }
 
 
 `
-   kernmulRSymm3D_ptx_30 = `
+	kernmulRSymm3D_ptx_30 = `
 .version 3.2
 .target sm_30
 .address_size 64
@@ -386,77 +385,77 @@ BB0_2:
 	selp.b32	%r28, %r27, %r3, %p7;
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
-	.loc 1 70 1
+	.loc 1 69 1
 	mad.lo.s32 	%r29, %r28, %r5, %r23;
 	mad.lo.s32 	%r30, %r29, %r4, %r1;
 	mul.wide.s32 	%rd23, %r30, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
-	.loc 1 73 1
+	.loc 1 72 1
 	ld.global.f32 	%f8, [%rd25];
 	add.s64 	%rd26, %rd4, %rd23;
-	.loc 1 74 1
+	.loc 1 73 1
 	ld.global.f32 	%f9, [%rd26];
 	add.s64 	%rd27, %rd3, %rd23;
-	.loc 1 75 1
+	.loc 1 74 1
 	ld.global.f32 	%f10, [%rd27];
 	mul.f32 	%f11, %f6, %f10;
 	add.s64 	%rd28, %rd2, %rd23;
-	.loc 1 76 1
+	.loc 1 75 1
 	ld.global.f32 	%f12, [%rd28];
 	mul.f32 	%f13, %f7, %f12;
 	add.s64 	%rd29, %rd1, %rd23;
-	.loc 1 77 1
+	.loc 1 76 1
 	ld.global.f32 	%f14, [%rd29];
 	mul.f32 	%f15, %f4, %f14;
-	.loc 1 72 1
+	.loc 1 71 1
 	ld.global.f32 	%f16, [%rd24];
 	.loc 1 47 1
 	ld.global.f32 	%f17, [%rd19];
 	.loc 1 49 1
 	ld.global.f32 	%f18, [%rd21];
-	.loc 1 79 1
+	.loc 1 78 1
 	mul.f32 	%f19, %f18, %f15;
 	fma.rn.f32 	%f20, %f17, %f16, %f19;
 	.loc 1 51 1
 	ld.global.f32 	%f21, [%rd22];
-	.loc 1 79 1
+	.loc 1 78 1
 	fma.rn.f32 	%f22, %f21, %f13, %f20;
 	st.global.f32 	[%rd19], %f22;
-	.loc 1 80 1
+	.loc 1 79 1
 	mul.f32 	%f23, %f2, %f15;
 	fma.rn.f32 	%f24, %f1, %f16, %f23;
 	fma.rn.f32 	%f25, %f3, %f13, %f24;
 	st.global.f32 	[%rd19+4], %f25;
-	.loc 1 81 1
+	.loc 1 80 1
 	mul.f32 	%f26, %f18, %f8;
 	fma.rn.f32 	%f27, %f17, %f15, %f26;
 	fma.rn.f32 	%f28, %f21, %f11, %f27;
 	st.global.f32 	[%rd21], %f28;
-	.loc 1 82 1
+	.loc 1 81 1
 	mul.f32 	%f29, %f2, %f8;
 	fma.rn.f32 	%f30, %f1, %f15, %f29;
 	fma.rn.f32 	%f31, %f3, %f11, %f30;
 	st.global.f32 	[%rd21+4], %f31;
-	.loc 1 83 1
+	.loc 1 82 1
 	mul.f32 	%f32, %f18, %f11;
 	fma.rn.f32 	%f33, %f17, %f13, %f32;
 	fma.rn.f32 	%f34, %f21, %f9, %f33;
 	st.global.f32 	[%rd22], %f34;
-	.loc 1 84 1
+	.loc 1 83 1
 	mul.f32 	%f35, %f2, %f11;
 	fma.rn.f32 	%f36, %f1, %f13, %f35;
 	fma.rn.f32 	%f37, %f3, %f9, %f36;
 	st.global.f32 	[%rd22+4], %f37;
 
 BB0_2:
-	.loc 1 85 2
+	.loc 1 84 2
 	ret;
 }
 
 
 `
-   kernmulRSymm3D_ptx_35 = `
+	kernmulRSymm3D_ptx_35 = `
 .version 3.2
 .target sm_35
 .address_size 64
@@ -595,74 +594,74 @@ BB0_2:
 	selp.b32	%r28, %r27, %r3, %p7;
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
-	.loc 1 70 1
+	.loc 1 69 1
 	mad.lo.s32 	%r29, %r28, %r5, %r23;
 	mad.lo.s32 	%r30, %r29, %r4, %r1;
 	mul.wide.s32 	%rd23, %r30, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
-	.loc 1 73 1
+	.loc 1 72 1
 	ld.global.nc.f32 	%f8, [%rd25];
 	add.s64 	%rd26, %rd4, %rd23;
-	.loc 1 74 1
+	.loc 1 73 1
 	ld.global.nc.f32 	%f9, [%rd26];
 	add.s64 	%rd27, %rd3, %rd23;
-	.loc 1 75 1
+	.loc 1 74 1
 	ld.global.nc.f32 	%f10, [%rd27];
 	mul.f32 	%f11, %f6, %f10;
 	add.s64 	%rd28, %rd2, %rd23;
-	.loc 1 76 1
+	.loc 1 75 1
 	ld.global.nc.f32 	%f12, [%rd28];
 	mul.f32 	%f13, %f7, %f12;
 	add.s64 	%rd29, %rd1, %rd23;
-	.loc 1 77 1
+	.loc 1 76 1
 	ld.global.nc.f32 	%f14, [%rd29];
 	mul.f32 	%f15, %f4, %f14;
-	.loc 1 72 1
+	.loc 1 71 1
 	ld.global.nc.f32 	%f16, [%rd24];
 	.loc 1 47 1
 	ld.global.f32 	%f17, [%rd19];
 	.loc 1 49 1
 	ld.global.f32 	%f18, [%rd21];
-	.loc 1 79 1
+	.loc 1 78 1
 	mul.f32 	%f19, %f18, %f15;
 	fma.rn.f32 	%f20, %f17, %f16, %f19;
 	.loc 1 51 1
 	ld.global.f32 	%f21, [%rd22];
-	.loc 1 79 1
+	.loc 1 78 1
 	fma.rn.f32 	%f22, %f21, %f13, %f20;
 	st.global.f32 	[%rd19], %f22;
-	.loc 1 80 1
+	.loc 1 79 1
 	mul.f32 	%f23, %f2, %f15;
 	fma.rn.f32 	%f24, %f1, %f16, %f23;
 	fma.rn.f32 	%f25, %f3, %f13, %f24;
 	st.global.f32 	[%rd19+4], %f25;
-	.loc 1 81 1
+	.loc 1 80 1
 	mul.f32 	%f26, %f18, %f8;
 	fma.rn.f32 	%f27, %f17, %f15, %f26;
 	fma.rn.f32 	%f28, %f21, %f11, %f27;
 	st.global.f32 	[%rd21], %f28;
-	.loc 1 82 1
+	.loc 1 81 1
 	mul.f32 	%f29, %f2, %f8;
 	fma.rn.f32 	%f30, %f1, %f15, %f29;
 	fma.rn.f32 	%f31, %f3, %f11, %f30;
 	st.global.f32 	[%rd21+4], %f31;
-	.loc 1 83 1
+	.loc 1 82 1
 	mul.f32 	%f32, %f18, %f11;
 	fma.rn.f32 	%f33, %f17, %f13, %f32;
 	fma.rn.f32 	%f34, %f21, %f9, %f33;
 	st.global.f32 	[%rd22], %f34;
-	.loc 1 84 1
+	.loc 1 83 1
 	mul.f32 	%f35, %f2, %f11;
 	fma.rn.f32 	%f36, %f1, %f13, %f35;
 	fma.rn.f32 	%f37, %f3, %f9, %f36;
 	st.global.f32 	[%rd22+4], %f37;
 
 BB2_2:
-	.loc 1 85 2
+	.loc 1 84 2
 	ret;
 }
 
 
 `
- )
+)

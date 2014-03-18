@@ -141,6 +141,7 @@ func Steps(n int) {
 
 // Runs as long as condition returns true.
 func RunWhile(condition func() bool) {
+	SanityCheck()
 	pause = false
 	for condition() && !pause {
 		select {
@@ -179,4 +180,13 @@ func InjectAndWait(task func()) {
 	ready := make(chan int)
 	Inject <- func() { task(); ready <- 1 }
 	<-ready
+}
+
+func SanityCheck() {
+	if Msat.isZero() {
+		util.Fatal("Msat should be != 0")
+	}
+	if Aex.isZero() {
+		util.Fatal("Aex should be != 0")
+	}
 }

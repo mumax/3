@@ -74,16 +74,20 @@ func writeOvf2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 }
 
 func writeOVF2Data(out io.Writer, q *data.Slice, dataformat string) {
-	hdr(out, "Begin", "Data "+dataformat)
+	canonicalFormat := ""
 	switch strings.ToLower(dataformat) {
 	case "text":
+		canonicalFormat = "Text"
+		hdr(out, "Begin", "Data "+canonicalFormat)
 		writeOVFText(out, q)
 	case "binary", "binary 4":
+		canonicalFormat = "Binary 4"
+		hdr(out, "Begin", "Data "+canonicalFormat)
 		writeOVF2DataBinary4(out, q)
 	default:
 		log.Fatalf("Illegal OMF data format: %v. Options are: Text, Binary 4", dataformat)
 	}
-	hdr(out, "End", "Data "+dataformat)
+	hdr(out, "End", "Data "+canonicalFormat)
 }
 
 func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {

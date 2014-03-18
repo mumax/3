@@ -216,8 +216,8 @@ func (s Shape) RotY(θ float64) Shape {
 	cos := math.Cos(θ)
 	sin := math.Sin(θ)
 	return func(x, y, z float64) bool {
-		x_ := x*cos + z*sin
-		z_ := -x*sin + z*cos
+		x_ := x*cos - z*sin
+		z_ := x*sin + z*cos
 		return s(x_, y, z_)
 	}
 }
@@ -227,8 +227,8 @@ func (s Shape) RotX(θ float64) Shape {
 	cos := math.Cos(θ)
 	sin := math.Sin(θ)
 	return func(x, y, z float64) bool {
-		y_ := z*cos + y*sin
-		z_ := -z*sin + y*cos
+		y_ := y*cos + z*sin
+		z_ := -y*sin + z*cos
 		return s(x, y_, z_)
 	}
 }

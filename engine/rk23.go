@@ -42,10 +42,9 @@ func (rk *RK23) Step() {
 	t0 := Time
 	// backup magnetization
 	m0 := cuda.Buffer(3, size)
-	//defer cuda.Recycle(m0) // see below
+	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
 
-	k1 := rk.k1 // from previous step
 	k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
 	defer cuda.Recycle(k2)
 	defer cuda.Recycle(k3)
@@ -57,38 +56,29 @@ func (rk *RK23) Step() {
 
 	// stage 2
 	Time = t0 + (1./2.)*Dt_si
-	cuda.Madd2(m, m0, k1, 1, (1./2.)*h) // m = m0*1 + k1*h/2
+	cuda.Madd2(m, m, rk.k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
 	M.normalize()
 	torqueFn(k2)
 
 	// stage 3
 	Time = t0 + (3./4.)*Dt_si
-	... could sub k1 and add k2
 	cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
 	M.normalize()
 	torqueFn(k3)
 
-
 	// 3rd order solution
-	τ3 := cuda.Buffer(3, size)
-	defer cuda.Recycle(τ3)
-	... could subk2 and add k1,k2
-	cuda.Madd3(τ3, k1, k2, k3, (2. / 9.), (1. / 3.), (4. / 9.))
-	cuda.Madd2(m, m0, τ3, 1, h)
+	madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
 	M.normalize()
 
-	cuda.Recycle(m0)
-	... madd k1,k2,k3 into partial t2 (stored as k1), free k2, k3, then add k4
-
 	// error estimate
-	τ2 := cuda.Buffer(3, size)
-	defer cuda.Recycle(τ2)
 	Time = t0 + Dt_si
 	torqueFn(k4)
-	madd4(τ2, k1, k2, k3, k4, (7. / 24.), (1. / 4.), (1. / 3.), (1. / 8.))
+	Err := k2 // re-use k2 as error
+	// difference of 3rd and 2nd order torque without explicitly storing them first
+	madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
 
 	// determine error
-	err := cuda.MaxVecDiff(τ2, τ3) * float64(h)
+	err := cuda.MaxVecNorm(Err) * float64(h)
 
 	// adjust next time step
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
@@ -102,7 +92,7 @@ func (rk *RK23) Step() {
 		// undo bad step
 		util.Assert(FixDt == 0)
 		Time = t0
-		data.Copy(m, m0)   .. m -= t3
+		data.Copy(m, m0)
 		NUndone++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))
 	}

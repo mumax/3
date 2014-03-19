@@ -42,7 +42,7 @@ func (rk *RK23) Step() {
 	t0 := Time
 	// backup magnetization
 	m0 := cuda.Buffer(3, size)
-	defer cuda.Recycle(m0)
+	//defer cuda.Recycle(m0) // see below
 	data.Copy(m0, m)
 
 	k1 := rk.k1 // from previous step
@@ -63,16 +63,22 @@ func (rk *RK23) Step() {
 
 	// stage 3
 	Time = t0 + (3./4.)*Dt_si
+	... could sub k1 and add k2
 	cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
 	M.normalize()
 	torqueFn(k3)
 
+
 	// 3rd order solution
 	τ3 := cuda.Buffer(3, size)
 	defer cuda.Recycle(τ3)
+	... could subk2 and add k1,k2
 	cuda.Madd3(τ3, k1, k2, k3, (2. / 9.), (1. / 3.), (4. / 9.))
 	cuda.Madd2(m, m0, τ3, 1, h)
 	M.normalize()
+
+	cuda.Recycle(m0)
+	... madd k1,k2,k3 into partial t2 (stored as k1), free k2, k3, then add k4
 
 	// error estimate
 	τ2 := cuda.Buffer(3, size)
@@ -96,7 +102,7 @@ func (rk *RK23) Step() {
 		// undo bad step
 		util.Assert(FixDt == 0)
 		Time = t0
-		data.Copy(m, m0)
+		data.Copy(m, m0)   .. m -= t3
 		NUndone++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))
 	}

@@ -1,11 +1,9 @@
 package cuda
 
 import (
-	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	_ "math"
 	"unsafe"
 )
 
@@ -152,7 +150,6 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 				kCSize[X] *= 2 // size of kernel after removing Y,Z redundant parts, but still complex
 				kCmplx := data.NewSlice(1, kCSize)
 				kc := kCmplx.Scalars()
-				fmt.Println("inputSize:", c.inputSize, "kLogic:", c.fftKernLogicSize, "kPhys:", physKSize, "kCSize:", kCSize)
 				for iz := 0; iz < kCSize[Z]; iz++ {
 					for iy := 0; iy < kCSize[Y]; iy++ {
 						for ix := 0; ix < kCSize[X]; ix++ {

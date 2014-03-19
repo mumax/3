@@ -136,8 +136,10 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
-
 	fftKern := data.NewSlice(1, physKSize) // host
+	kfull := data.NewSlice(1, output.Size())
+	kfulls := kfull.Scalars()
+
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part
 			if realKern[i][j] != nil { // ignore 0's
@@ -145,7 +147,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 				c.fwPlan.ExecAsync(input, output)
 
 				// extract non-redundant part (Y,Z symmetry)
-				kfull := output.HostCopy().Scalars()
+				data.Copy(kfull, output)
 				kCSize := physKSize
 				kCSize[X] *= 2 // size of kernel after removing Y,Z redundant parts, but still complex
 				kCmplx := data.NewSlice(1, kCSize)
@@ -153,7 +155,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 				for iz := 0; iz < kCSize[Z]; iz++ {
 					for iy := 0; iy < kCSize[Y]; iy++ {
 						for ix := 0; ix < kCSize[X]; ix++ {
-							kc[iz][iy][ix] = kfull[iz][iy][ix]
+							kc[iz][iy][ix] = kfulls[iz][iy][ix]
 						}
 					}
 				}

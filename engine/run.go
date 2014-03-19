@@ -16,7 +16,7 @@ var (
 	Dt_si                   float64  = 1e-15             // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	MinDt, MaxDt            float64                      // minimum and maximum time step
 	MaxErr                  float64  = 1e-5              // maximum error/step
-	Headroom                float64  = 0.75              // solver headroom: keep dt this factor smaller than it could be
+	Headroom                float64  = 0.8               // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
 	lastErr, peakErr        float64                      // error of last step, highest error ever
 	NSteps, NUndone, NEvals int                          // number of good steps, undone steps
 	FixDt                   float64                      // fixed time step?

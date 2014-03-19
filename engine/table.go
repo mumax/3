@@ -75,7 +75,7 @@ func (t *DataTable) Save() {
 	for _, o := range t.outputs {
 		vec := o.average()
 		for _, v := range vec {
-			fmt.Fprint(t, "\t", v)
+			fmt.Fprint(t, "\t", float32(v))
 		}
 	}
 	fmt.Fprintln(t)

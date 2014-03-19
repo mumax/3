@@ -125,6 +125,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 	c.bwPlan = newFFT3DC2R(c.realKernSize[X], c.realKernSize[Y], c.realKernSize[Z])
 
 	// init FFT kernel
+
 	// logic size of FFT(kernel): store real parts only
 	c.fftKernLogicSize = fftR2COutputSizeFloats(c.realKernSize)
 	util.Assert(c.fftKernLogicSize[X]%2 == 0)
@@ -136,17 +137,18 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
-	fftKern := data.NewSlice(1, physKSize) // host
-	kfull := data.NewSlice(1, output.Size())
+	fftKern := data.NewSlice(1, physKSize)
+	kfull := data.NewSlice(1, output.Size()) // not yet exploiting symmetry
 	kfulls := kfull.Scalars()
 	kCSize := physKSize
-	kCSize[X] *= 2 // size of kernel after removing Y,Z redundant parts, but still complex
-	kCmplx := data.NewSlice(1, kCSize)
+	kCSize[X] *= 2                     // size of kernel after removing Y,Z redundant parts, but still complex
+	kCmplx := data.NewSlice(1, kCSize) // not yet exploiting X symmetry
 	kc := kCmplx.Scalars()
 
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part
 			if realKern[i][j] != nil { // ignore 0's
+				// FW FFT
 				data.Copy(input, realKern[i][j])
 				c.fwPlan.ExecAsync(input, output)
 				data.Copy(kfull, output)

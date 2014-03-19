@@ -1,18 +1,6 @@
 // 2D Z (out-of-plane only) micromagnetic kernel multiplication:
 // Mz = Kzz * Mz
-//
-// ~kernel has mirror symmetry along Y-axis,
-// apart form first row,
-// and is only stored (roughly) half:
-//
-// K00:
-// xxxxx
-// aaaaa
-// bbbbb
-// ....
-// bbbbb
-// aaaaa
-//
+// Using the same symmetries as kernmulrsymm3d.cu
 extern "C" __global__ void
 kernmulRSymm2Dz(float* __restrict__  fftMz, float* __restrict__  fftKzz, int Nx, int Ny) {
 
@@ -23,20 +11,18 @@ kernmulRSymm2Dz(float* __restrict__  fftMz, float* __restrict__  fftKzz, int Nx,
 		return;
 	}
 
-	int I = iy*Nx + ix; // linear index for upper half of kernel
+	int I = iy*Nx + ix;
 	int e = 2 * I;
 
 	float reMz = fftMz[e  ];
 	float imMz = fftMz[e+1];
-
-	float Kzz;
 
 	if (iy > Ny/2) {
 		iy = Ny-iy;
 	}
 	I = iy*Nx + ix;
 
-	Kzz = fftKzz[I];
+	float Kzz = fftKzz[I];
 
 	fftMz[e  ] = reMz * Kzz;
 	fftMz[e+1] = imMz * Kzz;

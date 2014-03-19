@@ -16,5 +16,5 @@ RunWhile(MaxTorque > 1e-3)
 B_ext = vector(0, 0.01, 1)
 
 RunWhile(m.comp(1).average() < 0.5)
-expect("my", m.comp(1).average(), 0.5, 1e-2)
+expect("my", m.comp(1).average(), 0.51, 1e-2)
 

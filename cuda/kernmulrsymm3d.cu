@@ -71,7 +71,7 @@ kernmulRSymm3D(float* __restrict__  fftMx,  float* __restrict__  fftMy,  float* 
 
 	// fetch kernel element from non-redundant part
 	// and apply minus signs for mirrored parts.
-	I = (iz*Ny + iy)*Nx + ix;
+	I = (iz*(Ny/2+1) + iy)*Nx + ix; // Ny/2+1: only half is stored
 	float Kxx = fftKxx[I];
 	float Kyy = fftKyy[I];
 	float Kzz = fftKzz[I];

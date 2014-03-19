@@ -115,7 +115,7 @@ const (
 )
 {
 	.reg .pred 	%p<8>;
-	.reg .s32 	%r<31>;
+	.reg .s32 	%r<32>;
 	.reg .f32 	%f<38>;
 	.reg .s64 	%rd<30>;
 
@@ -205,9 +205,10 @@ const (
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
 	.loc 1 74 1
-	mad.lo.s32 	%r29, %r28, %r5, %r23;
-	mad.lo.s32 	%r30, %r29, %r4, %r1;
-	mul.wide.s32 	%rd23, %r30, 4;
+	add.s32 	%r29, %r21, 1;
+	mad.lo.s32 	%r30, %r28, %r29, %r23;
+	mad.lo.s32 	%r31, %r30, %r4, %r1;
+	mul.wide.s32 	%rd23, %r31, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
 	.loc 1 76 1
@@ -296,7 +297,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<8>;
-	.reg .s32 	%r<31>;
+	.reg .s32 	%r<32>;
 	.reg .f32 	%f<38>;
 	.reg .s64 	%rd<30>;
 
@@ -386,9 +387,10 @@ BB0_2:
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
 	.loc 1 74 1
-	mad.lo.s32 	%r29, %r28, %r5, %r23;
-	mad.lo.s32 	%r30, %r29, %r4, %r1;
-	mul.wide.s32 	%rd23, %r30, 4;
+	add.s32 	%r29, %r21, 1;
+	mad.lo.s32 	%r30, %r28, %r29, %r23;
+	mad.lo.s32 	%r31, %r30, %r4, %r1;
+	mul.wide.s32 	%rd23, %r31, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
 	.loc 1 76 1
@@ -505,7 +507,7 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<8>;
-	.reg .s32 	%r<31>;
+	.reg .s32 	%r<32>;
 	.reg .f32 	%f<38>;
 	.reg .s64 	%rd<30>;
 
@@ -595,9 +597,10 @@ BB0_2:
 	selp.f32	%f6, %f5, %f4, %p7;
 	selp.f32	%f7, 0fBF800000, 0f3F800000, %p7;
 	.loc 1 74 1
-	mad.lo.s32 	%r29, %r28, %r5, %r23;
-	mad.lo.s32 	%r30, %r29, %r4, %r1;
-	mul.wide.s32 	%rd23, %r30, 4;
+	add.s32 	%r29, %r21, 1;
+	mad.lo.s32 	%r30, %r28, %r29, %r23;
+	mad.lo.s32 	%r31, %r30, %r4, %r1;
+	mul.wide.s32 	%rd23, %r31, 4;
 	add.s64 	%rd24, %rd6, %rd23;
 	add.s64 	%rd25, %rd5, %rd23;
 	.loc 1 76 1

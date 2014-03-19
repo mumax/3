@@ -5,7 +5,7 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
+	_ "math"
 	"unsafe"
 )
 
@@ -134,7 +134,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 
 	// physical size of FFT(kernel): store only non-redundant part exploiting Y, Z mirror symmetry
 	// X mirror symmetry already exploited: FFT(kernel) is purely real.
-	physKSize := [3]int{c.fftKernLogicSize[X], c.fftKernLogicSize[Y], c.fftKernLogicSize[Z]}
+	physKSize := [3]int{c.fftKernLogicSize[X], c.fftKernLogicSize[Y]/2 + 1, c.fftKernLogicSize[Z]/2 + 1}
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
@@ -146,39 +146,23 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 				data.Copy(input, realKern[i][j])
 				c.fwPlan.ExecAsync(input, output)
 
-				// extract non-redundant part
+				// extract non-redundant part (Y,Z symmetry)
 				kfull := output.HostCopy().Scalars()
 				kCSize := physKSize
 				kCSize[X] *= 2 // size of kernel after removing Y,Z redundant parts, but still complex
 				kCmplx := data.NewSlice(1, kCSize)
 				kc := kCmplx.Scalars()
 				fmt.Println("inputSize:", c.inputSize, "kLogic:", c.fftKernLogicSize, "kPhys:", physKSize, "kCSize:", kCSize)
-
-				s := kCmplx.Host()[0]
-				for i := range s {
-					s[i] = float32(math.NaN())
-				}
-
-				util.Print("kfull\n")
-				util.Printf("%+4f", kfull)
 				for iz := 0; iz < kCSize[Z]; iz++ {
-					for iy := 0; iy < kCSize[Y]/2+1; iy++ {
+					for iy := 0; iy < kCSize[Y]; iy++ {
 						for ix := 0; ix < kCSize[X]; ix++ {
 							kc[iz][iy][ix] = kfull[iz][iy][ix]
 						}
 					}
 				}
 
-				util.Print("kCmplx\n")
-				util.Printf("%+4f", kCmplx.Scalars())
-				util.Print("\n\n")
-
+				// extract real parts (X symmetry)
 				scaleRealParts(fftKern, kCmplx, 1/float32(c.fwPlan.InputLen()))
-
-				// util.Print("fftKern\n")
-				// util.Printf("%+4f", fftKern.Scalars())
-				// util.Print("\n\n")
-
 				c.kern[i][j] = GPUCopy(fftKern)
 			}
 		}

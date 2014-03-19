@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const VERSION = "mumax3.5 BETA1"
+const VERSION = "mumax3.5 BETA2"
 
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 
@@ -39,10 +39,3 @@ func Close() {
 		logfile.Close()
 	}
 }
-
-// TODO
-//func sanitycheck() {
-//	if Msat() == 0 {
-//		log.Fatal("Msat should be nonzero")
-//	}
-//}

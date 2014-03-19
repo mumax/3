@@ -4,6 +4,7 @@ package cuda
 // Launch configs range over all complex elements of fft input. This could be optimized: range only over kernel.
 
 import (
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
@@ -37,8 +38,9 @@ func kernMulC_async(fftM, K *data.Slice, Nx, Ny int) {
 // Does not yet use Y mirror symmetry!!
 // Even though it is implemented partially in kernel
 func kernMulRSymm3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *data.Slice, Nx, Ny, Nz int) {
-	util.Argument(Kxx.Len() == Nx*(Ny)*Nz) // no symmetry yet
+	//util.Argument(Kxx.Len() == Nx*(Ny)*Nz) // no symmetry yet
 	util.Argument(fftM[X].NComp() == 1 && Kxx.NComp() == 1)
+	fmt.Println("kernmul3D", "fftM:", fftM[X].Size(), "K:", Kxx.Size(), "Nx,Ny,Nz:", Nx, Ny, Nz)
 
 	cfg := make3DConf([3]int{Nx, Ny, Nz})
 

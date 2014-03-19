@@ -1,23 +1,25 @@
 package cuda
 
 import (
+	"fmt"
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"math"
 	"unsafe"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution
 // with magnetostatic kernel (or other kernel of same symmetry).
 type DemagConvolution struct {
-	inputSize    [3]int            // 3D size of the input/output data
-	realKernSize [3]int            // Size of kernel and logical FFT size.
-	fftKernSize  [3]int            // Size FFTed kernel, real parts only
-	fftRBuf      [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf. 2D: Z shares storage with X.
-	fftCBuf      [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
-	kern         [3][3]*data.Slice // FFT kernel on device
-	fwPlan       fft3DR2CPlan      // Forward FFT (1 component)
-	bwPlan       fft3DC2RPlan      // Backward FFT (1 component)
+	inputSize        [3]int            // 3D size of the input/output data
+	realKernSize     [3]int            // Size of kernel and logical FFT size.
+	fftKernLogicSize [3]int            // logic size FFTed kernel, real parts only, we store less
+	fftRBuf          [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf. 2D: Z shares storage with X.
+	fftCBuf          [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
+	kern             [3][3]*data.Slice // FFT kernel on device
+	fwPlan           fft3DR2CPlan      // Forward FFT (1 component)
+	bwPlan           fft3DC2RPlan      // Backward FFT (1 component)
 }
 
 // Initializes a convolution to evaluate the demag field for the given mesh geometry.
@@ -36,6 +38,7 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice) *DemagConvolution
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
 func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+	util.Argument(B.Size() == c.inputSize && m.Size() == c.inputSize)
 	if c.is2D() {
 		c.exec2D(B, m, vol, Bsat, regions)
 	} else {
@@ -52,7 +55,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	kernMulRSymm3D_async(c.fftCBuf,
 		c.kern[X][X], c.kern[Y][Y], c.kern[Z][Z],
 		c.kern[Y][Z], c.kern[X][Z], c.kern[X][Y],
-		c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z])
+		c.fftKernLogicSize[X], c.fftKernLogicSize[Y], c.fftKernLogicSize[Z])
 
 	for i := 0; i < 3; i++ { // BW FFT
 		c.bwFFT(i, outp)
@@ -63,7 +66,7 @@ func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	// Convolution is separated into
 	// a 1D convolution for z and a 2D convolution for xy.
 	// So only 2 FFT buffers are needed at the same time.
-	Nx, Ny := c.fftKernSize[X], c.fftKernSize[Y]
+	Nx, Ny := c.fftKernLogicSize[X], c.fftKernLogicSize[Y]
 
 	// Z
 	c.fwFFT(Z, inp, vol, Bsat, regions)
@@ -114,6 +117,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 	} else {
 		c.fftCBuf[Z] = NewSlice(1, nc)
 	}
+	// Real buffer shares storage with Complex buffer
 	for i := 0; i < 3; i++ {
 		c.fftRBuf[i] = data.SliceFromPtrs(c.realKernSize, data.GPUMemory, []unsafe.Pointer{c.fftCBuf[i].DevPtr(0)})
 	}
@@ -123,32 +127,59 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 	c.bwPlan = newFFT3DC2R(c.realKernSize[X], c.realKernSize[Y], c.realKernSize[Z])
 
 	// init FFT kernel
-	c.fftKernSize = fftR2COutputSizeFloats(c.realKernSize)
-	// size of FFT(kernel): store real parts only
-	util.Assert(c.fftKernSize[X]%2 == 0)
-	c.fftKernSize[X] /= 2
+	// logic size of FFT(kernel): store real parts only
+	c.fftKernLogicSize = fftR2COutputSizeFloats(c.realKernSize)
+	util.Assert(c.fftKernLogicSize[X]%2 == 0)
+	c.fftKernLogicSize[X] /= 2
 
-	//halfkern := [3]int{c.fftKernSize[X], c.fftKernSize[Y]/2 + 1, c.fftKernSize[Z]/2 + 1}
-	halfkern := [3]int{c.fftKernSize[X], c.fftKernSize[Y], c.fftKernSize[Z]}
+	// physical size of FFT(kernel): store only non-redundant part exploiting Y, Z mirror symmetry
+	// X mirror symmetry already exploited: FFT(kernel) is purely real.
+	physKSize := [3]int{c.fftKernLogicSize[X], c.fftKernLogicSize[Y], c.fftKernLogicSize[Z]}
 
 	output := c.fftCBuf[0]
 	input := c.fftRBuf[0]
 
-	fftKern := data.NewSlice(1, halfkern) // host
+	fftKern := data.NewSlice(1, physKSize) // host
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ { // upper triangular part
 			if realKern[i][j] != nil { // ignore 0's
 				data.Copy(input, realKern[i][j])
-				//util.Println("input")
-				//util.Printf("% 6f", input.HostCopy().Scalars())
 				c.fwPlan.ExecAsync(input, output)
-				//util.Println("output")
-				//util.Printf("% 6f", output.HostCopy().Scalars())
-				scaleRealParts(fftKern, output, 1/float32(c.fwPlan.InputLen()))
+
+				// extract non-redundant part
+				kfull := output.HostCopy().Scalars()
+				kCSize := physKSize
+				kCSize[X] *= 2 // size of kernel after removing Y,Z redundant parts, but still complex
+				kCmplx := data.NewSlice(1, kCSize)
+				kc := kCmplx.Scalars()
+				fmt.Println("inputSize:", c.inputSize, "kLogic:", c.fftKernLogicSize, "kPhys:", physKSize, "kCSize:", kCSize)
+
+				s := kCmplx.Host()[0]
+				for i := range s {
+					s[i] = float32(math.NaN())
+				}
+
+				util.Print("kfull\n")
+				util.Printf("%+4f", kfull)
+				for iz := 0; iz < kCSize[Z]; iz++ {
+					for iy := 0; iy < kCSize[Y]/2+1; iy++ {
+						for ix := 0; ix < kCSize[X]; ix++ {
+							kc[iz][iy][ix] = kfull[iz][iy][ix]
+						}
+					}
+				}
+
+				util.Print("kCmplx\n")
+				util.Printf("%+4f", kCmplx.Scalars())
+				util.Print("\n\n")
+
+				scaleRealParts(fftKern, kCmplx, 1/float32(c.fwPlan.InputLen()))
+
+				// util.Print("fftKern\n")
+				// util.Printf("%+4f", fftKern.Scalars())
+				// util.Print("\n\n")
+
 				c.kern[i][j] = GPUCopy(fftKern)
-				//util.Println("fftK", i, j)
-				//util.Printf("% 7f", fftKern.Scalars())
-				//util.Println()
 			}
 		}
 	}

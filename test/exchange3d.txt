@@ -1,3 +1,4 @@
+// Test exchange with 3D grid.
 
 d := 100e-9                
 N := 32                   
@@ -9,7 +10,7 @@ aex   = 13e-12
 alpha = 3
 m     = vortex(1, 1)
 
-run(2e-9) 
+relax()
 expect("mz", m.comp(2).average(), 0.02785073, 1e-5)
 
 

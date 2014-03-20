@@ -237,8 +237,9 @@ MaxErr = 1e-6
 </code></pre>
 Also optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
 <ul>
-	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings) </li>
-	<li> <code>2</code>: Adaptive Heun solver (default) </li> 
+	<li> <code>3</code>: RK23 (Bogacki-Shampine) solver, the default. An accurate and fast solver with excellent adaptive time step control and modest memory requirements. </li> 
+	<li> <code>2</code>: Adaptive Heun solver. Uses a bit less memory but takes smaller time steps than RK23. Only useful when the time step already has to be small, e.g. with finite temperature. </li> 
+	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings). Only useful in exceptional situations or for debugging. </li>
 </ul>
 E.g.:
 <pre><code>SetSolver(1) // Euler
@@ -268,7 +269,7 @@ will try to keep <code>mx</code> (component 0, counting from 0) close to zero. I
 
 <p>Mumax3 has built-in generation of MFM images from the magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
 
-<p><img width=500px src=mfm.svg/></p>
+<p><img width=400px src="mfm.svg" /></p>
 
 {{range .FilterPrefix "MFM"}} {{template "entry" .}} {{end}}
 

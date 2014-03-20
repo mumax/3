@@ -19,6 +19,7 @@ var (
 	J            excitation // Polarized electrical current density
 	MaxTorque    *GetScalar
 	GammaLL      float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
+	Precess              = true
 )
 
 func init() {
@@ -46,8 +47,12 @@ func SetTorque(dst *data.Slice) {
 
 // Sets dst to the current Landau-Lifshitz torque
 func SetLLTorque(dst *data.Slice) {
-	B_eff.Set(dst)                                                      // calc and store B_eff
-	cuda.LLTorque(dst, M.Buffer(), dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
+	B_eff.Set(dst) // calc and store B_eff
+	if Precess {
+		cuda.LLTorque(dst, M.Buffer(), dst, Alpha.gpuLUT1(), regions.Gpu()) // overwrite dst with torque
+	} else {
+		cuda.LLNoPrecess(dst, M.Buffer(), dst)
+	}
 }
 
 // Adds the current spin transfer torque to dst

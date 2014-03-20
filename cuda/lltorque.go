@@ -20,3 +20,12 @@ func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
 		B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z),
 		unsafe.Pointer(alpha), regions.Ptr, N, cfg)
 }
+
+func LLNoPrecess(torque, m, B *data.Slice) {
+	N := torque.Len()
+	cfg := make1DConf(N)
+
+	k_llnoprecess_async(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
+		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
+		B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z), N, cfg)
+}

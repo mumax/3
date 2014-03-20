@@ -14,13 +14,16 @@ func Relax() {
 	prevType := solvertype
 	prevErr := MaxErr
 	prevFixDt := FixDt
+	prevPrecess := Precess
 
 	SetSolver(BOGAKISHAMPINE)
 	FixDt = 0
+	Precess = false
 	defer func() {
 		SetSolver(prevType)
 		MaxErr = prevErr
 		FixDt = prevFixDt
+		Precess = prevPrecess
 	}()
 
 	solver := stepper.(*RK23)

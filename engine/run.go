@@ -31,7 +31,7 @@ func init() {
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
-	DeclROnly("dt", &Dt_si, "Last solver time step (s)")
+	DeclVar("dt", &Dt_si, "Last solver time step (s)")
 	DeclROnly("lastErr", &lastErr, "Maximum error of last time step")
 	DeclROnly("peakErr", &peakErr, "Maximum error over all time steps")
 	DeclFunc("NEval", getNEval, "Total number of torque evaluations")

@@ -1,3 +1,5 @@
+// test loading geometry mask image
+
 N := 400
 c := 10e-9
 

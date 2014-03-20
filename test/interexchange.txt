@@ -13,8 +13,6 @@ ext_ScaleExchange(1, 2, -1.0)   // AFM exchange
 Aex = 13e-12
 
 alpha = 3
-save(B_exch)
-save(m)
 run(10e-9) 
 expectv("m", m.average(), vector(0,  0.114170685410499, 0), 1e-5)
 

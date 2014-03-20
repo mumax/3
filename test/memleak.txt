@@ -1,4 +1,3 @@
-
 // test for memory leaks when resizing
 
 c := 5e-9

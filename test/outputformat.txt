@@ -1,3 +1,4 @@
+// save data with different output formats
 
 	setgridsize(32, 8, 2)
 	setcellsize(1e-9, 1e-9, 1e-9)

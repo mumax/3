@@ -14,10 +14,10 @@ var (
 
 func init() {
 	MFM.init("MFM", "", "MFM image", SetMFM)
-	MFMLift = numParam(50e-9, "m", reinitmfmconv)
-	MFMTipSize = numParam(1e-3, "m", reinitmfmconv)
+	MFMLift = numParam(50e-9, "MFMLift", "m", reinitmfmconv)
+	MFMTipSize = numParam(1e-3, "MFMDipole", "m", reinitmfmconv)
 	DeclLValue("MFMLift", &MFMLift, "MFM lift height")
-	DeclLValue("MFMTipSize", &MFMTipSize, "MFM tip size")
+	DeclLValue("MFMDipole", &MFMTipSize, "Height of vertically magnetized part of MFM tip")
 }
 
 func SetMFM(dst *data.Slice) {

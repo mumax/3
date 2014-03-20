@@ -1,3 +1,6 @@
+// Test different energy contributions,
+// reference solutions from OOMMF.
+
 l := 512e-9
 w := 256e-9
 d := 40e-9
@@ -15,7 +18,7 @@ alpha = 3
 anisU = vector(1,0,0)
 
 m = vortex(1, 1) 
-run(5e-9)
+relax()
 
 E1_tot := E_total.get()
 E1_exc := E_exch.get()
@@ -25,7 +28,7 @@ E1_zee := E_zeeman.get()
 
 
 B_ext = vector(100e-3, 0, 0)
-run(5e-9)
+relax()
 
 E2_tot := E_total.get()
 E2_exc := E_exch.get()

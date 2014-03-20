@@ -12,7 +12,7 @@ alpha = 3
 m     = vortex(1, 1)
 Dex  = 1e-20 // should have no physical effect, but calls different kernel.
 
-run(2e-9) 
+relax()
 expect("mz", m.comp(2).average(), 0.02785073, 1e-5)
 
 

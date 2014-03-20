@@ -38,23 +38,23 @@
 	tol := 1e-2
   
 	B_ext = vector(0.00, 0.00, 0)
-	run(2e-9)
+	relax()
 	expectv("m", m.average(), vector(1, 0, 0), tol)
 
 	B_ext = vector(0.01, 0.01, 0)
-	run(2e-9)
+	relax()
 	expectv("m", m.average(), vector(0.9994, 0.0270, 0), tol)
 
 	B_ext = vector(0.03, 0.03, 0)
-	run(2e-9)
+	relax()
 	expectv("m", m.average(), vector(0.9967, 0.0776, 0), tol)
 
 	B_ext = vector(0.10, 0.10, 0)
-	run(2e-9)
+	relax()
 	expectv("m", m.average(), vector(0.9711, 0.2367, 0), tol)
 
 	B_ext = vector(0.30, 0.30, 0)
-	run(2e-9)
+	relax()
 	expectv("m", m.average(), vector(0.7040, 0.7040, 0), tol)
 
 

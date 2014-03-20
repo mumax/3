@@ -233,6 +233,7 @@ func (g *guistate) prepareSolver() {
 	g.OnEvent("run", g.cmd("Run", "runtime"))
 	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
 	g.OnEvent("break", func() { Inject <- func() { pause = true } })
+	g.OnEvent("relax", func() { Inject <- func() { g.EvalGUI("relax()") } })
 	g.OnEvent("mindt", func() { Inject <- func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) } })
 	g.OnEvent("maxdt", func() { Inject <- func() { g.EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
 	g.OnEvent("fixdt", func() { Inject <- func() { g.EvalGUI("FixDt=" + g.StringValue("fixdt")) } })

@@ -130,9 +130,10 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 		<tr style="background-color:white"> <td>
 
 	<table>
-		<tr> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime"   1e-9  "size=8"}}s</td></tr> 
-		<tr> <td> {{.Button "steps" "Steps"}}</td> <td> {{.TextBox "runsteps" "1000" "size=8"}} </td></tr>
-		<tr> <td> {{.Button "break" "Break"}}</td> <td></td>                                         </tr>
+		<tr title="{{.Data.Doc "Run"   }}"> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime"   1e-9  "size=8"}}s</td></tr> 
+		<tr title="{{.Data.Doc "Steps" }}"> <td> {{.Button "steps" "Steps"}}</td> <td> {{.TextBox "runsteps" "1000" "size=8"}} </td></tr>
+		<tr title="{{.Data.Doc "Relax" }}"> <td> {{.Button "relax" "Relax"}}</td> <td></td>                                         </tr>
+		<tr title="Break current run loop"> <td> {{.Button "break" "Break"}}</td> <td></td>                                         </tr>
 	</table>
 
 	</td><td>

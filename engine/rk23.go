@@ -90,6 +90,7 @@ func (rk *RK23) Step() {
 		data.Copy(rk.k1, k4) // FSAL
 	} else {
 		// undo bad step
+		//util.Println("Bad step at t=", t0, ", err=", err)
 		util.Assert(FixDt == 0)
 		Time = t0
 		data.Copy(m, m0)

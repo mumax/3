@@ -1,3 +1,5 @@
+// Test for m.inRegion() quantity
+
 setgridsize(500, 250, 2)
 setcellsize(1e-9, 1e-9, 1e-9)
 

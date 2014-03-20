@@ -1,3 +1,4 @@
+// print somthing to a file
 
 fprintln("out.log", "hello", "world")
 fprintln("out.log", t)

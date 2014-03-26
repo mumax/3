@@ -6,10 +6,21 @@ import (
 	"math"
 )
 
+// Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
+// Empty cacheDir disables caching.
+func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, cacheDir string) (kernel [3][3]*data.Slice) {
+	defer func() {
+		if err := recover(); err != nil {
+			util.Log("Unable to use kernel cache:", err)
+			kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+		}
+	}()
+	panic("test")
+}
+
 // Calculates the magnetostatic kernel by brute-force integration
 // of magnetic charges over the faces and averages over cell volumes.
-// Mesh should NOT yet be zero-padded.
-func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (kernel [3][3]*data.Slice) {
+func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64) (kernel [3][3]*data.Slice) {
 
 	// Add zero-padding in non-PBC directions
 	size := padSize(inputSize, pbc)

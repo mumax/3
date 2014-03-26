@@ -27,9 +27,10 @@ var (
 	flag_port        = flag.String("http", ":35367", "Port to serve web gui")
 	flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	flag_memprof     = flag.Bool("memprof", false, "Recored gopprof memory profile")
-	flag_gpu         = flag.Int("gpu", 0, "specify GPU")
-	flag_sync        = flag.Bool("sync", false, "synchronize all CUDA calls (debug)")
-	flag_test        = flag.Bool("test", false, "cuda test (internal)")
+	flag_gpu         = flag.Int("gpu", 0, "Specify GPU")
+	flag_sync        = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
+	flag_test        = flag.Bool("test", false, "Cuda test (internal)")
+	flag_cachedir    = flag.String("cache", "", "Kernel cache directory")
 )
 
 func main() {
@@ -51,6 +52,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	engine.CacheDir = *flag_cachedir
 	if *flag_cpuprof {
 		prof.InitCPU(engine.OD)
 	}

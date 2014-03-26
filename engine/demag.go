@@ -18,7 +18,8 @@ var (
 	Edens_demag   sAdder
 	EnableDemag   = true                 // enable/disable demag field
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
-	DemagAccuracy = 6.0
+	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
+	CacheDir      = ""                   // directory for kernel cache
 )
 
 func init() {
@@ -77,7 +78,7 @@ func demagConv() *cuda.DemagConvolution {
 	if conv_ == nil {
 		SetBusy(true)
 		defer SetBusy(false)
-		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy)
+		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, CacheDir)
 		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
 	}
 	return conv_

@@ -1,11 +1,12 @@
 package mag
 
 import (
-	"errors"
 	"fmt"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"math"
+	"os"
 )
 
 // Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
@@ -30,6 +31,9 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	var errLoad error
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
+			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
+				continue // element not needed in 2D
+			}
 			kernel[i][j], errLoad = LoadKernel(fmt.Sprint(basename, i, j, ".ovf"))
 			if errLoad != nil {
 				break
@@ -39,6 +43,11 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 			break
 		}
 	}
+	// make result symmetric for tools that expect it so.
+	kernel[Y][X] = kernel[X][Y]
+	kernel[Z][X] = kernel[X][Z]
+	kernel[Z][Y] = kernel[Y][Z]
+
 	if errLoad != nil {
 		util.Log("Did not use cached kernel:", errLoad)
 		kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
@@ -53,6 +62,9 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
 	for i := 0; i < 3; i++ {
 		for j := i; j < 3; j++ {
+			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
+				continue // element not needed in 2D
+			}
 			errSave = SaveKernel(fmt.Sprint(basename, i, j, ".ovf"), kernel[i][j])
 			if errSave != nil {
 				break
@@ -64,17 +76,25 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	}
 	if errSave != nil {
 		util.Log("Failed to cache kernel:", errSave)
+	} else {
+		util.Log("Cached kernel:", basename)
 	}
 
 	return kernel
 }
 
 func LoadKernel(fname string) (kernel *data.Slice, err error) {
-	return nil, errors.New("load not implemented")
+	kernel, _, err = oommf.ReadFile(fname)
+	return
 }
 
 func SaveKernel(fname string, kernel *data.Slice) error {
-	return errors.New("save not implemented")
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	oommf.WriteOVF2(f, kernel, data.Meta{}, "binary 4")
+	return nil
 }
 
 // Calculates the magnetostatic kernel by brute-force integration

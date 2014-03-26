@@ -1,6 +1,8 @@
 package mag
 
 import (
+	"errors"
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"math"
@@ -9,13 +11,70 @@ import (
 // Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
 // Empty cacheDir disables caching.
 func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, cacheDir string) (kernel [3][3]*data.Slice) {
+	// Cache disabled
+	if cacheDir == "" {
+		util.Log(`Not using kernel cache (-cache="")`)
+		return CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+	}
+
+	// Error-resilient kernel cache: if anything goes wrong, return calculated kernel.
 	defer func() {
 		if err := recover(); err != nil {
 			util.Log("Unable to use kernel cache:", err)
 			kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
 		}
 	}()
-	panic("test")
+
+	// Try to load kernel
+	basename := fmt.Sprint(cacheDir, "/", "mumax3kernel_", inputSize, "_", pbc, "_", cellsize, "_", accuracy, "_")
+	var errLoad error
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			kernel[i][j], errLoad = LoadKernel(fmt.Sprint(basename, i, j, ".ovf"))
+			if errLoad != nil {
+				break
+			}
+		}
+		if errLoad != nil {
+			break
+		}
+	}
+	if errLoad != nil {
+		util.Log("Did not use cached kernel:", errLoad)
+		kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+		// don't return yet, still need to save
+	} else {
+		util.Log("Using cached kernel:", basename)
+		return kernel
+	}
+
+	// Could not load kernel: calculate it and save
+	var errSave error
+	kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
+	for i := 0; i < 3; i++ {
+		for j := i; j < 3; j++ {
+			errSave = SaveKernel(fmt.Sprint(basename, i, j, ".ovf"), kernel[i][j])
+			if errSave != nil {
+				break
+			}
+		}
+		if errSave != nil {
+			break
+		}
+	}
+	if errSave != nil {
+		util.Log("Failed to cache kernel:", errSave)
+	}
+
+	return kernel
+}
+
+func LoadKernel(fname string) (kernel *data.Slice, err error) {
+	return nil, errors.New("load not implemented")
+}
+
+func SaveKernel(fname string, kernel *data.Slice) error {
+	return errors.New("save not implemented")
 }
 
 // Calculates the magnetostatic kernel by brute-force integration

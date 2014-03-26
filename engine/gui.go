@@ -517,6 +517,7 @@ func (g *guistate) Prog(a, total int, msg string) {
 func (g *guistate) disableControls(busy bool) {
 	g.Disable("cli", busy)
 	g.Disable("run", busy)
+	g.Disable("relax", busy)
 	g.Disable("steps", busy)
 	g.Disable("break", busy)
 }

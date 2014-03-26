@@ -34,12 +34,12 @@ func Relax() {
 	}
 
 	const N = 3
-	rSteps(N)
+	relaxSteps(N)
 	E0 := GetTotalEnergy()
-	rSteps(N)
+	relaxSteps(N)
 	E1 := GetTotalEnergy()
 	for E1 < E0 && !pause {
-		rSteps(N)
+		relaxSteps(N)
 		E0, E1 = E1, GetTotalEnergy()
 	}
 
@@ -47,12 +47,10 @@ func Relax() {
 
 	for MaxErr > 1e-9 && !pause {
 		MaxErr /= math.Sqrt2
-		//util.Println(MaxErr)
-		//util.Println(avgTorque())
-		rSteps(N)
+		relaxSteps(N)
 		T0, T1 = T1, avgTorque()
 		for T1 < T0 && !pause {
-			rSteps(1)
+			relaxSteps(1)
 			T0, T1 = T1, avgTorque()
 		}
 	}
@@ -60,13 +58,15 @@ func Relax() {
 	pause = true
 }
 
-// take n steps without setting pause when done.
-func rSteps(n int) {
+// take n steps without setting pause when done or advancing time
+func relaxSteps(n int) {
 	stop := NSteps + n
+	t0 := Time
 	for NSteps < stop && !pause {
 		select {
 		default:
 			step()
+			Time = t0
 		// accept tasks form Inject channel
 		case f := <-Inject:
 			f()

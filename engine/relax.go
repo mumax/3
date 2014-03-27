@@ -1,5 +1,7 @@
 package engine
 
+// Relax tries to find the minimum energy state.
+
 import (
 	"github.com/mumax/3/cuda"
 	"math"
@@ -13,14 +15,13 @@ func Relax() {
 	SanityCheck()
 	pause = false
 
+	// Save the settings we are changing...
 	prevType := solvertype
 	prevErr := MaxErr
 	prevFixDt := FixDt
 	prevPrecess := Precess
 
-	SetSolver(BOGAKISHAMPINE)
-	FixDt = 0
-	Precess = false
+	// ...to restore them later
 	defer func() {
 		SetSolver(prevType)
 		MaxErr = prevErr
@@ -28,12 +29,14 @@ func Relax() {
 		Precess = prevPrecess
 	}()
 
-	solver := stepper.(*RK23)
-	avgTorque := func() float32 {
-		return cuda.Dot(solver.k1, solver.k1)
-	}
+	// Set good solver for relax
+	SetSolver(BOGAKISHAMPINE)
+	FixDt = 0
+	Precess = false
 
-	const N = 3
+	// Minimize energy: take steps as long as energy goes down.
+	// This stops when energy reaches the numerical noise floor.
+	const N = 3 // evaluate energy (expensive) every N steps
 	relaxSteps(N)
 	E0 := GetTotalEnergy()
 	relaxSteps(N)
@@ -43,8 +46,16 @@ func Relax() {
 		E0, E1 = E1, GetTotalEnergy()
 	}
 
+	// Now we are already close to equilibrium, but energy is too noisy to be used any further.
+	// So now we minimize the total torque which is less noisy and does not have to cross any
+	// bumps once we are close to equilibrium.
+	solver := stepper.(*RK23)
+	avgTorque := func() float32 {
+		return cuda.Dot(solver.k1, solver.k1)
+	}
 	var T0, T1 float32 = 0, avgTorque()
 
+	// Step as long as torque goes down. Then increase the accuracy and step more.
 	for MaxErr > 1e-9 && !pause {
 		MaxErr /= math.Sqrt2
 		relaxSteps(N)

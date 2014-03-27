@@ -36,10 +36,9 @@ run(1e-9)
 
 `}}
 
-<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in the efficient ".dump" format, which can be converted with <code>mumax3-convert</code>. Below is the output converted to PNG.</p>
+<p>This example should be pretty straight-forward to follow. Space-dependent output is stored in OVF format, which is compatible with OOMMF and can be converted with <a href="http://godoc.org/github.com/mumax/3/cmd/mumax3-convert"><code>mumax3-convert</code></a>. Below is the output converted to PNG.</p>
 
-<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>. The plot below was created with <code>mumax3-plot</code>.
-</p>
+<p>The data table is stored in a simple text format compatible with <a href=http://www.gnuplot.info>gnuplot</a>, like used for the plot below.</p>
 
 {{.Output }}
 
@@ -147,7 +146,7 @@ saveas(geom, "imageShape")
 
 {{.Output}}
 
-Note: these are 3D geometries seen from above. The displayed cell filling is averaged along the thickness (notable in ellipse and layers example). 
+Note: these are 3D geometries seen from above. The displayed cell filling is averaged along the thickness (notable in ellipse and layers example). Black means empty space, white is filled.
 
 <hr/><h2>Initial Magnetization</h2>
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://mumax.github.io/api.html">API</a>.
@@ -165,7 +164,6 @@ saveas(m, "vortex")
 m = TwoDomain(1,0,0,  0,1,0,  -1,0,0) // Néel wall
 saveas(m, "twodomain")
 
-randSeed(123)
 m = RandomMag()
 saveas(m, "randommag")
 
@@ -230,7 +228,7 @@ for i:=0; i<=90; i=i+30{
 	angle := i*pi/180
 	setgeom(cheese.rotz(angle))
 	m = uniform(cos(angle), sin(angle), 0)
-	run(1e-9)
+	relax()
 	save(m)
 }
 
@@ -241,7 +239,7 @@ for i:=0; i<=90; i=i+30{
 
 <hr/><h2>Regions: Space-dependent Parameters</h2>
 
-<p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Region 0 conventionally everything outside your magnet (the vacuum), so setting material parameters starts at 1.</p>
+<p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Each cell can belong to only one region. At the start of a simulation all cells have region number 0.</p>
 
 <p>Regions are defined with <code>defregion(number, shape)</code>, where <code>shape</code> is explained in the geometry example.</p>
 

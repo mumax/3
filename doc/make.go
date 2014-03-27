@@ -58,7 +58,7 @@ func (s *State) Example(in string) string {
 	if *flag_vet {
 		arg = "-vet"
 	}
-	cmd("mumax3", "-f", arg, s.infile())
+	cmd("mumax3", "-cache", "/tmp", arg, s.infile())
 
 	recordExamples(in, s.count)
 

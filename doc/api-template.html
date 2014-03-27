@@ -258,8 +258,8 @@ MaxErr = 1e-6
 
 Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
 <ul>
-	<li> <code>3</code>: RK23 (Bogacki-Shampine) solver, the default. An accurate and fast solver with excellent adaptive time step control and modest memory requirements. </li> 
-	<li> <code>2</code>: Adaptive Heun solver. Uses a bit less memory but takes smaller time steps than RK23. Only useful when the time step already has to be small, e.g. with finite temperature. </li> 
+	<li> <code>3</code>: RK23 (Bogacki-Shampine) solver, the default. An accurate and fast solver with excellent adaptive time step control and modest memory requirements. Cannot be used with finite temperature.</li> 
+	<li> <code>2</code>: Adaptive Heun solver.Uses less memory but takes smaller time steps than RK23. Suited for finite temperature. </li> 
 	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings). Only useful in exceptional situations or for debugging. </li>
 </ul>
 E.g.:

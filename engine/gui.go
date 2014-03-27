@@ -224,7 +224,7 @@ func (g *guistate) prepareM() {
 }
 
 var (
-	solvertypes = map[string]string{"euler": "1", "heun": "2", "rk23": "3"}
+	solvertypes = map[string]int{"euler": 1, "heun": 2, "rk23": 3}
 	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23"}
 )
 
@@ -241,10 +241,19 @@ func (g *guistate) prepareSolver() {
 	g.OnEvent("solvertype", func() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
-			g.EvalGUI("SetSolver(" + typ + ")")
-			if solvertype == EULER && FixDt == 0 { // euler must have fixed time step
-				FixDt = 1e-15
+
+			// temperature requires low order solver (see temperature.go)
+			if !Temp.isZero() && typ >= BOGAKISHAMPINE {
+				util.Log("Temperature requires Euler or Heun solver")
+				return
 			}
+
+			// euler must have fixed time step
+			if typ == EULER && FixDt == 0 {
+				g.EvalGUI("FixDt = 1e-15")
+			}
+
+			g.EvalGUI(fmt.Sprint("SetSolver(", typ, ")"))
 		}
 	})
 }
@@ -274,10 +283,15 @@ func (g *guistate) prepareParam() {
 			}
 		})
 	}
+	// overwrite handler for temperature
+	// do not crash when we enter bogus values (see temperature.go)
 	g.OnEvent("Temp", func() {
 		Inject <- func() {
 			if FixDt == 0 {
-				g.EvalGUI("FixDt = 10e-15") // finite temperature requires fixed time step
+				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
+			}
+			if solvertype >= BOGAKISHAMPINE {
+				g.EvalGUI("SetSolver(2)") // finite temperature requires low-order solver
 			}
 			g.EvalGUI("Temp = " + g.StringValue("Temp"))
 		}
@@ -357,7 +371,7 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("mindt", MinDt)
 			g.Set("maxdt", MaxDt)
 			g.Set("fixdt", FixDt)
-			g.Set("solvertype", solvernames[solvertype])
+			g.Set("solvertype", fmt.Sprint(solvernames[solvertype]))
 			if pause {
 				g.Set("busy", "Paused")
 			} else {

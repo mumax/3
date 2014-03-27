@@ -152,7 +152,7 @@ Note: these are 3D geometries seen from above. The displayed cell filling is ave
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://mumax.github.io/api.html">API</a>.
 
 {{.Example `
-setgridsize(200, 100, 1)
+setgridsize(256, 128, 1)
 setcellsize(5e-9, 5e-9, 5e-9)
 
 m = Uniform(1, 1, 0)  // no need to normalize length
@@ -182,10 +182,10 @@ saveas(m, "vortex_transl")
 m = Vortex(1,-1).Add(0.1, randomMag())
 saveas(m, "vortex_add_random")
 
-m = Skyrmion(-1,-1)
+m = Skyrmion(1, -1).scale(3,3,1)
 saveas(m, "skyrmion")
 
-m = NeelSkyrmion(-1,-1)
+m = NeelSkyrmion(1,-1).scale(3,3,1)
 saveas(m, "Néel_skyrmion")
 
 // set m in only a part of space, or a single cell:

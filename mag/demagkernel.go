@@ -106,14 +106,10 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 
 	// Sanity check
 	{
-		util.Assert(size[Z] >= 1 && size[Y] >= 2 && size[X] >= 2)
+		util.Assert(size[Z] > 0 && size[Y] > 0 && size[X] > 0)
 		util.Assert(cellsize[X] > 0 && cellsize[Y] > 0 && cellsize[Z] > 0)
 		util.Assert(pbc[X] >= 0 && pbc[Y] >= 0 && pbc[Z] >= 0)
 		util.Assert(accuracy > 0)
-		util.AssertMsg(size[X]%2 == 0 && size[Y]%2 == 0, "Even kernel size needed")
-		if size[Z] > 1 {
-			util.AssertMsg(size[Z]%2 == 0, "Even kernel size needed")
-		}
 	}
 
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
@@ -367,15 +363,28 @@ func wrap(number, max int) int {
 	return number
 }
 
-// Returns the size after zero-padding,
-// taking into account periodic boundary conditions.
+// Returns the size after zero-padding, taking into account periodic boundary conditions.
+// In a certain direction, there is no padding in case of PBC (it should wrap around).
+// Without PBC there should be zero padding up to at least 2*N - 1. In that case there
+// is a trade-off: for large N, padding up to 2*N can be much more efficient since
+// power-of-two sized FFT's are ludicrously fast on CUDA. However for very small N,
+// in particular N=1, we should not over-pad.
 func padSize(size, periodic [3]int) [3]int {
+	var padded [3]int
 	for i := range size {
-		if periodic[i] == 0 && size[i] > 1 {
-			size[i] *= 2
+		if periodic[i] != 0 {
+			padded[i] = size[i]
+			continue
+		}
+		if size[i] > 1 {
+			// large N: zero pad * 2 for FFT performance
+			padded[i] = size[i] * 2
+		} else {
+			// small N: minimal zero padding for memory/performance
+			padded[i] = size[i]*2 - 1
 		}
 	}
-	return size
+	return padded
 }
 
 // "If brute force doesn't solve your problem,

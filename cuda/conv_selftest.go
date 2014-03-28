@@ -8,10 +8,13 @@ import (
 	"math/rand"
 )
 
-// compares FFT-accelerated convolution against brute-force on sparse data.
+// Compares FFT-accelerated convolution against brute-force on sparse data.
+// This is not really needed but very quickly uncovers newly introduced bugs.
 func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice) {
-	if PBC != [3]int{0, 0, 0} {
-		//log.Println("skipping convolution self-test for PBC")
+	if PBC != [3]int{0, 0, 0} || prod(c.inputSize) > 512*512 {
+		// the brute-force method does not work for pbc,
+		// and for large simulations it gets just too slow.
+		util.Log("skipping convolution self-test")
 		return
 	}
 	//fmt.Print("convolution test ")

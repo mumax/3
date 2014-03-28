@@ -338,10 +338,9 @@ setgeom(rect(400e-9, 400e-9))
 
 msat    = 600e3
 aex     = 10e-12
-alpha   = 3     
 m       = vortex(1, 1)
-run(0.5e-9)           // relax
 
+relax()
 save(m)
 
 MFMLift = 10e-9
@@ -350,32 +349,28 @@ saveas(MFM, "lift_10nm")
 MFMLift = 40e-9
 saveas(MFM, "lift_40nm")
 
-MFMLift = 100e-9
-saveas(MFM, "lift_100nm")
+MFMLift = 90e-9
+saveas(MFM, "lift_90nm")
 `}}
 {{.Output}}
 
 
 <hr/><h2>PMA Racetrack</h2>
+In this example we drive a domain wall in PMA material by spin-transfer torque.  We set up a post-step function that makes the simulation box "follow" the domain wall. Like this, only a small number of cells is needed to simulate an infinitely long magnetic wire.
+
 {{.Example `
-// In this example we drive a domain wall in PMA material by spin-transfer torque.
-// We set up a post-step function that makes the simulation box "follow" the domain
-// wall. Like this, only a small number of cells is needed to simulate an infinitely
-// long magnetic wire.
+setGridSize(128, 128, 1)
+setCellSize(2e-9, 2e-9, 1e-9)
 
-setgridsize(128, 128, 1)
-setcellsize(2e-9, 2e-9, 1e-9)
-
-msat    = 600e3
-aex     = 10e-12
+Msat    = 600e3
+Aex     = 10e-12
 anisU   = vector(0, 0, 1)
 Ku1     = 0.59e6
-xi      = 0.2
-alpha   = 3                                   // high damping for fast relax
+alpha   = 0.02 
+Xi      = 0.2
 
 m     = twoDomain(0, 0, 1, 1, 1, 0, 0, 0, -1) // up-down domains with wall between Bloch and Néél type
-run(0.1e-9)                                   // relax
-alpha = 0.02                                  // normal damping
+relax()
 
 // Set post-step function that centers simulation window on domain wall.
 ext_centerWall(2) // keep m[2] (= m_z) close to zero
@@ -396,17 +391,16 @@ Since we center on the domain wall we can not see that it is actually moving, bu
 
 <hr/><h2>Py Racetrack</h2>
 
-{{.Example `
-// In this example we drive a vortex wall in Permalloy by spin-transfer torque.
-// The simulation box "follows" the domain wall.
-// By removing surface charges at the left and right ends, we mimic an infintely long wire.
+In this example we drive a vortex wall in Permalloy by spin-transfer torque. The simulation box "follows" the domain wall. By removing surface charges at the left and right ends, we mimic an infintely long wire.
 
-setgridsize(256, 64, 1)
-setcellsize(3e-9, 3e-9, 10e-9)
+{{.Example `
+setGridSize(256, 64, 1)
+setCellSize(3e-9, 3e-9, 10e-9)
 
 Msat    = 860e3
 Aex     = 13e-12
 Xi      = 0.1
+alpha   = 0.02 
 m       = twodomain(1,0,0,  0,1,0,  -1,0,0)
 
 notch := rect(15e-9, 15e-9).RotZ(45*pi/180).transl(0, 32*3e-9, 0).inverse()
@@ -414,16 +408,13 @@ setGeom(notch.Repeat(200e-9, 64*3e-9, 0))
 
 // Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
 BoundaryRegion := 0
-MagLeft  := 1
-MagRight := -1
+MagLeft        := 1
+MagRight       := -1
 ext_rmSurfaceCharge(BoundaryRegion, MagLeft, MagRight)
 
-// Relax
-Alpha = 3    // high damping for fast relax
-RunWhile(MaxTorque > 1e-3)    // relax
-Alpha = 0.02 // restore normal damping
+relax()
 
-ext_centerWall(0) // keep m[0] (= m_x) close to zero
+ext_centerWall(0) // keep m[0] (m_x) close to zero
 
 // Schedule output
 autosave(m, 50e-12)
@@ -439,7 +430,6 @@ Run(0.5e-9)
 {{.Output}}
 
 Since we center on the domain wall we can not really see the motion, despite the vortex wall moving pretty fast. Note the absence of closure domains at the edges due to the surface charges being removed there.
-
 
 
 <hr/><h2>Voronoi tessellation</h2>

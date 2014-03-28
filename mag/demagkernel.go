@@ -376,7 +376,7 @@ func padSize(size, periodic [3]int) [3]int {
 			padded[i] = size[i]
 			continue
 		}
-		if size[i] > 1 {
+		if i != Z || size[i] > SMALL_N { // for some reason it only works for Z, perhaps we assume even FFT size elsewhere?
 			// large N: zero pad * 2 for FFT performance
 			padded[i] = size[i] * 2
 		} else {
@@ -386,6 +386,12 @@ func padSize(size, periodic [3]int) [3]int {
 	}
 	return padded
 }
+
+// Use 2N-1 padding instead of 2N for sizes up to SMALL_N.
+// 5 seems a good choice since for all n<=5, 2*n-1 only has
+// prime factors 2,3,5,7 (good CUFFT performance).
+// starting from 6 it becomes problematic so we use 2*n.
+const SMALL_N = 5
 
 // "If brute force doesn't solve your problem,
 // you're not using enough of it."

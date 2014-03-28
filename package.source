@@ -5,7 +5,7 @@ rm -rf $tmp
 mkdir $tmp
 
 src='github.com/mumax/3/cmd/mumax3'
-version='3.4-BETA2'
+version='3.5-BETA2'
 
 cp -r doc $tmp
 
@@ -14,7 +14,7 @@ go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/cmd/mumax3-plot'
 go build -o $tmp/mumax3/mumax3-bootstrap 'github.com/mumax/3/cmd/bootstrap'
 
 
-for c in 5.0 5.5; do
+for c in 5.0 5.5 6.0; do
 	sudo rm -f /usr/local/cuda
 	echo ln -s /usr/local/cuda-$c /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda

@@ -184,9 +184,9 @@ func InjectAndWait(task func()) {
 
 func SanityCheck() {
 	if Msat.isZero() {
-		util.Fatal("Msat should be != 0")
+		util.Log("Note: Msat = 0")
 	}
 	if Aex.isZero() {
-		util.Fatal("Aex should be != 0")
+		util.Log("Note: Aex = 0")
 	}
 }

@@ -2,10 +2,6 @@
 	Test cubic anisotropy.
 	We let the anisotropy compete with an external field
 	and verify the relaxed my against OOMMF values.
-	
-	There seems to be a ~10% difference with OOMMF,
-	probably due to different understandings of what is an ellipse exactly.
-	
 */
 
 	setgridsize(64, 64, 1)
@@ -35,7 +31,7 @@
 
 	Msat  = 1100e3
 
-	tol := 1e-2
+	tol := 1e-3
   
 	B_ext = vector(0.00, 0.00, 0)
 	relax()

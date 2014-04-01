@@ -1,7 +1,7 @@
 # MIF 1.1
 ms:1100E3
 a:13E-12
-k1:0.2E6
+k1:0.5E6
 damp coef:0.25
 anisotropy type:cubic
 anisotropy init:constant

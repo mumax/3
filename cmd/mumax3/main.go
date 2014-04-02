@@ -83,7 +83,7 @@ func runInteractive() {
 
 	// setup outut dir
 	now := time.Now()
-	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02d:%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
+	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02dh%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
 	suggestOD(outdir)
 
 	engine.Timeout = 365 * 24 * time.Hour // forever

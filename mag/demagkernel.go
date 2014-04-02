@@ -318,7 +318,7 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 	return kernel
 }
 
-// integration ranges for kernel
+// integration ranges for kernel. size=kernelsize, so padded for no PBC, not padded for PBC
 func kernelRanges(size, pbc [3]int) (r1, r2 [3]int) {
 	for c := 0; c < 3; c++ {
 		if pbc[c] == 0 {

@@ -99,7 +99,7 @@ func (r *Regions) HostList() []byte {
 
 func DefRegionCell(id int, x, y, z int) {
 	defRegionId(id)
-	index := data.Index(Mesh().Size(), z, y, x)
+	index := data.Index(Mesh().Size(), x, y, z)
 	regions.gpuCache.Set(index, byte(id))
 }
 

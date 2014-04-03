@@ -16,6 +16,7 @@ func init() {
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
+	DeclFunc("Square", Square, "2D square with size in meter")
 	DeclFunc("XRange", XRange, "Part of space between x1 and x2, in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
@@ -66,6 +67,11 @@ func Rect(sidex, sidey float64) Shape {
 		rx, ry := sidex/2, sidey/2
 		return x < rx && x > -rx && y < ry && y > -ry
 	}
+}
+
+// 2D square with given side.
+func Square(side float64) Shape {
+	return Rect(side, side)
 }
 
 // All cells with x-coordinate between a and b

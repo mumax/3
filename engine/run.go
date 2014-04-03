@@ -146,7 +146,7 @@ func RunWhile(condition func() bool) {
 	for condition() && !pause {
 		select {
 		default:
-			step()
+			step(true) // output = true
 		// accept tasks form Inject channel
 		case f := <-Inject:
 			f()
@@ -161,12 +161,14 @@ func RunInteractive() {
 }
 
 // take one time step
-func step() {
+func step(output bool) {
 	stepper.Step()
 	for _, f := range postStep {
 		f()
 	}
-	DoOutput()
+	if output {
+		DoOutput()
+	}
 }
 
 // Register function f to be called after every time step.

@@ -72,11 +72,11 @@ func Relax() {
 // take n steps without setting pause when done or advancing time
 func relaxSteps(n int) {
 	stop := NSteps + n
-	t0 := Time
 	for NSteps < stop && !pause {
 		select {
 		default:
-			step()
+			t0 := Time
+			step(false) // output=false
 			Time = t0
 		// accept tasks form Inject channel
 		case f := <-Inject:

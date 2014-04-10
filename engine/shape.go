@@ -160,15 +160,13 @@ func ImageShape(fname string) Shape {
 		}
 	}
 
-	s := Mesh().Size()
-	sx, sy := float64(s[X]), float64(s[Y])
 	c := Mesh().CellSize()
+	cx, cy := c[X], c[Y]
 	nx, ny := float64(width), float64(height) // use width, height so it automatically rescales
-	wx, wy := sx*c[X], sy*c[Y]
 
 	return func(x, y, z float64) bool {
-		ix := int(((x/wx)+0.5)*nx + 0.5)
-		iy := int(((y/wy)+0.5)*ny + 0.5)
+		ix := int(x/cx + 0.5*nx)
+		iy := int(y/cy + 0.5*ny)
 		if ix < 0 || ix >= width || iy < 0 || iy >= height {
 			return false
 		} else {

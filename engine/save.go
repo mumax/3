@@ -70,7 +70,7 @@ func Snapshot(q Quantity) {
 
 // synchronous snapshot
 func snapshot_sync(fname string, output *data.Slice) {
-	util.FatalErr(draw.RenderFile(fname, output, "", "", arrowSize))
+	util.FatalErr(draw.RenderFile(fname, output, "auto", "auto", arrowSize))
 }
 
 // synchronous save

@@ -27,12 +27,16 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int) {
 		min, max := extrema(f.Host()[0])
 		if fmin != "auto" {
 			m, err := strconv.ParseFloat(fmin, 32)
-			util.FatalErr(err)
+			if err != nil {
+				util.Fatal("draw: scale:", err)
+			}
 			min = float32(m)
 		}
 		if fmax != "auto" {
 			m, err := strconv.ParseFloat(fmax, 32)
-			util.FatalErr(err)
+			if err != nil {
+				util.Fatal("draw: scale:", err)
+			}
 			max = float32(m)
 		}
 		if min == max {

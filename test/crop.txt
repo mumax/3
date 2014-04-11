@@ -1,6 +1,8 @@
-// Test for crop functionality.
-// Slice and dice the magnetization and check
-// for correct averages. Also check that we can save/tabulate
+/* 
+	Test for crop functionality.
+	Slice and dice the magnetization and check
+	for correct averages. Also check that we can save/tabulate
+*/
 
 Nx := 160
 Ny := 50

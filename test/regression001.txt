@@ -1,5 +1,7 @@
-// Regression test for bug reported by Ezio Iacocca <ezio.iacocca@physics.gu.se> okt 2013
-// failed on GTX TITAN for reasons unknown, but fixed since xyz branch
+/* 
+	Regression test for bug reported by Ezio Iacocca <ezio.iacocca@physics.gu.se> okt 2013
+	failed on GTX TITAN, presumably because of race conditions. Fixed since xyz branch.
+*/
 
 Nx := 256
 Ny := 256

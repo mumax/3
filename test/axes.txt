@@ -1,3 +1,7 @@
+/*
+	Not really a test. Makes a snapshot showing the orientation of our axes.
+*/
+
 setgridsize(400, 300, 1)
 c := 1e-9
 setcellsize(c, c, c)
@@ -7,7 +11,6 @@ S := 8 * c
 I := rect(S, 5*S)
 X := I.rotz(35*pi/180).add(I.rotz(-35*pi/180))
 X = X.transl(12*S, -2*S, 0)
-
 
 I = rect(S, 2.5*S)
 

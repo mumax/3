@@ -35,7 +35,7 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
 
 		float3 A1 = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
 		float3 A2 = (-2.0f * k2) * make_float3(a1*a2*a2*a3*a3, a1*a1*a2*a3*a3, a1*a1*a2*a2*a3);
-        float3 A = A1 + A2
+		float3 A = A1 + A2
 
 		Bx[i] += A.x*c1.x + A.y*c2.x + A.z*c3.x;
 		By[i] += A.x*c1.y + A.y*c2.y + A.z*c3.y;

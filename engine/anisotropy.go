@@ -9,17 +9,19 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1, Kc1              ScalarParam  // uniaxial and cubic anis constants
+	Ku1, Kc1, Kc2         ScalarParam  // uniaxial and cubic anis constants
 	AnisU, AnisC1, AnisC2 VectorParam  // unixial and cubic anis axes
-	ku1_red, kc1_red      derivedParam // K1 / Msat
-	B_anis                vAdder       // field due to uniaxial anisotropy (T)
-	E_anis                *GetScalar   // Anisotorpy energy
-	Edens_anis            sAdder       // Anisotropy energy density
+	ku1_red               derivedParam // K1 / Msat
+	kc1_red, kc2_red      derivedParam
+	B_anis                vAdder     // field due to uniaxial anisotropy (T)
+	E_anis                *GetScalar // Anisotorpy energy
+	Edens_anis            sAdder     // Anisotropy energy density
 )
 
 func init() {
 	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant", []derived{&ku1_red})
 	Kc1.init("Kc1", "J/m3", "Cubic anisotropy constant", []derived{&kc1_red})
+	Kc2.init("Kc2", "J/m3", "Cubic anisotropy constant", []derived{&kc2_red})
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
@@ -33,9 +35,14 @@ func init() {
 		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
 	})
 
-	//ku1_red = Ku1 / Msat
+	//kc1_red = Kc1 / Msat
 	kc1_red.init(SCALAR, []updater{&Kc1, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
+	})
+
+	//kc2_red = Kc2 / Msat
+	kc2_red.init(SCALAR, []updater{&Kc2, &Msat}, func(p *derivedParam) {
+		paramDiv(p.cpu_buf, Kc2.cpuLUT(), Msat.cpuLUT())
 	})
 }
 
@@ -44,8 +51,8 @@ func AddAnisotropyField(dst *data.Slice) {
 	if !(ku1_red.isZero()) {
 		cuda.AddUniaxialAnisotropy(dst, M.Buffer(), ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
 	}
-	if !(kc1_red.isZero()) {
-		cuda.AddCubicAnisotropy(dst, M.Buffer(), kc1_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+	if !(kc1_red.isZero()) || !(kc2_red.isZero()) {
+		cuda.AddCubicAnisotropy(dst, M.Buffer(), kc1_red.gpuLUT1(), kc2_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
 	}
 }
 

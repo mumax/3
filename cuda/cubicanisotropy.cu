@@ -5,13 +5,15 @@
 // B:      effective field in T
 // m:      reduced magnetization (unit length)
 // K1:     Kc1/Msat in T
+// K2:     Kc2/Msat in T
 // C1, C2: anisotropy axes
 //
 // Author: Arne Vansteenkiste, based on Kelvin Fong's mumax2 implementation
+//         Colin Jermain, added 2nd order anisotropy term
 extern "C" __global__ void
 addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
                    float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-                   float* __restrict__ K1LUT,
+                   float* __restrict__ K1LUT, float* __restrict__ K2LUT,
                    float* __restrict__ C1xLUT, float* __restrict__ C1yLUT, float* __restrict__ C1zLUT,
                    float* __restrict__ C2xLUT, float* __restrict__ C2yLUT, float* __restrict__ C2zLUT,
                    uint8_t* __restrict__ regions, int N) {
@@ -21,6 +23,7 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
 
 		uint8_t r  = regions[i];
 		float  k1 = K1LUT[r];
+		float  k2 = K2LUT[r];
 		float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
 		float3 c2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
 		float3 c3 = cross(c1, c2); // 3rd axis perpendicular to c1,c2
@@ -30,7 +33,9 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
 		float a2 = dot(c2, m);
 		float a3 = dot(c3, m);
 
-		float3 A = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
+		float3 A1 = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
+		float3 A2 = (-2.0f * k2) * make_float3(a1*a2*a2*a3*a3, a1*a1*a2*a3*a3, a1*a1*a2*a2*a3);
+		float3 A = A1 + A2
 
 		Bx[i] += A.x*c1.x + A.y*c2.x + A.z*c3.x;
 		By[i] += A.x*c1.y + A.y*c2.y + A.z*c3.y;

@@ -50,6 +50,7 @@ func Relax() {
 	// So now we minimize the total torque which is less noisy and does not have to cross any
 	// bumps once we are close to equilibrium.
 	solver := stepper.(*RK23)
+	defer stepper.Free() // purge previous rk.k1 because FSAL will be dead wrong.
 	avgTorque := func() float32 {
 		return cuda.Dot(solver.k1, solver.k1)
 	}

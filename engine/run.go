@@ -54,6 +54,7 @@ const (
 	EULER          = 1
 	HEUN           = 2
 	BOGAKISHAMPINE = 3
+	DORMANDPRINCE  = 5
 )
 
 func SetSolver(typ int) {
@@ -70,6 +71,8 @@ func SetSolver(typ int) {
 		stepper = new(Heun)
 	case BOGAKISHAMPINE:
 		stepper = new(RK23)
+	case DORMANDPRINCE:
+		stepper = new(RK45DP)
 	}
 	solvertype = typ
 }

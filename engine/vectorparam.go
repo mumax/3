@@ -42,6 +42,12 @@ func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	}
 }
 
+func (p *VectorParam) SetRegionFn(region int, f func() [3]float64) {
+	p.setFunc(region, region+1, func() []float64 {
+		return slice(f())
+	})
+}
+
 func (p *VectorParam) GetRegion(region int) [3]float64 {
 	v := p.getRegion(region)
 	return unslice(v)

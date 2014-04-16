@@ -98,6 +98,12 @@ func (e *excitation) SetValue(v interface{})                        { e.perRegio
 func (e *excitation) Set(v data.Vector)                             { e.perRegion.setRegions(0, NREGION, slice(v)) }
 func (e *excitation) getRegion(region int) []float64                { return e.perRegion.getRegion(region) } // for gui
 
+func (e *excitation) SetRegionFn(region int, f func() [3]float64) {
+	e.perRegion.setFunc(region, region+1, func() []float64 {
+		return slice(f())
+	})
+}
+
 func (e *excitation) average() []float64      { return qAverageUniverse(e) }
 func (e *excitation) Average() data.Vector    { return unslice(qAverageUniverse(e)) }
 func (e *excitation) IsUniform() bool         { return e.perRegion.IsUniform() }

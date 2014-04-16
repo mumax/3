@@ -1,23 +1,25 @@
-// save data with different output formats
+/* 
+	Save data with different output formats.
+*/
 
-	setgridsize(32, 8, 2)
-	setcellsize(1e-9, 1e-9, 1e-9)
+setgridsize(32, 8, 2)
+setcellsize(1e-9, 1e-9, 1e-9)
 
-	Msat = 800e3
-	Aex = 13e-12
-	m  = uniform(1, .1, 0)
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, .1, 0)
 
-	steps(1)
+steps(1)
 
-	outputformat = OVF1_TEXT
-	saveas(m, sprintf("mumax_ovf1_text"))
+outputformat = OVF1_TEXT
+saveas(m, sprintf("mumax_ovf1_text"))
 
-	outputformat = OVF1_BINARY
-	saveas(m, sprintf("mumax_ovf1_binary"))
+outputformat = OVF1_BINARY
+saveas(m, sprintf("mumax_ovf1_binary"))
 
-	outputformat = OVF2_TEXT
-	saveas(m, sprintf("mumax_ovf2_text"))
+outputformat = OVF2_TEXT
+saveas(m, sprintf("mumax_ovf2_text"))
 
-	step=4
-	outputformat = OVF2_BINARY
-	saveas(m, sprintf("mumax_ovf2_binary"))
+step=4
+outputformat = OVF2_BINARY
+saveas(m, sprintf("mumax_ovf2_binary"))

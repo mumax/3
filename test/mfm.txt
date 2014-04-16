@@ -1,4 +1,6 @@
-// save an mfm image
+/*
+	Save an mfm image
+*/
 
 Nx := 400
 Ny := 400

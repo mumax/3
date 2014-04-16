@@ -1,5 +1,5 @@
 /*
-	Test demag field for thin film. 
+	Test demag field for thin film using flat cells.
 	Kernel should be approximately 0, 0, -1 
 */
 

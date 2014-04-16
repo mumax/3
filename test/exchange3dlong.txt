@@ -1,5 +1,7 @@
-// Test exchange-demag competition by relaxing a vortex.
-// Use elongated cells to stress the implementation.
+/* 
+	Test exchange-demag competition by relaxing a vortex.
+	Use elongated cells to stress the implementation.
+*/
 
 d := 100e-9
 N := 32

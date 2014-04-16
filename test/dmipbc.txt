@@ -1,3 +1,6 @@
+/*
+	Regression test for DMI with PBC.
+*/
 
 N := 64
 setPBC(1, 0, 0)

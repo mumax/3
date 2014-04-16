@@ -1,5 +1,7 @@
-// test energy densities:
-// integral of energy density should give energy
+/* 
+	Test energy densities:
+	integral of energy density should give energy
+*/
 
 setgridsize(200, 50, 2)
 setcellsize(5e-9, 4e-9, 3e-9)

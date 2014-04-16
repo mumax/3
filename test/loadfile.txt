@@ -1,4 +1,6 @@
-// test loading external data files
+/*
+	Test loading external data files.
+*/
 
 Nx := 128
 Ny := 64

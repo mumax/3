@@ -1,4 +1,7 @@
-// test for loop with missing cond, post
+/*
+	Test for loop with missing cond, post.
+	Should not crash script.
+*/
 
 i:=0
 

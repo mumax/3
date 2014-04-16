@@ -1,4 +1,6 @@
-// test demag for odd N
+/*
+	Test demag tensor of cube for odd N.
+*/
 
 N := 5
 c := 1e-9

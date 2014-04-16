@@ -1,5 +1,6 @@
-/* Regression test for bug reported by Mathias Helsen, nov 2013
-   region used only for output influences simulation.
+/* 
+	Regression test for bug reported by Mathias Helsen, nov 2013.
+  	Region used only for output influenced simulation.
 */
 
 Nx := 256

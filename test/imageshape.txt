@@ -1,6 +1,8 @@
-/* Regression test for imageshape offset by 1 cell.
-   Reported by Aurelio Hierro.
+/* 
+	Regression test for imageshape offset by 1 cell.
+	Reported by Aurelio Hierro.
 */
+
 SetGridSize(32, 16, 1)
 c := 1e-9
 SetCellSize(c, c, c)

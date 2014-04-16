@@ -1,4 +1,6 @@
-// regression test for bug with region > 127
+/* 
+	Regression test for bug with region > 127 which was turned into negative number.
+*/
 
 setgridsize(512, 512, 1)
 c := 4e-9

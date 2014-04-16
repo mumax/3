@@ -1,4 +1,6 @@
-// check if setting gammaLL has effect
+/*
+	Check if setting gammaLL has effect
+*/
 
 N := 16
 c := 5e-9

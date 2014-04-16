@@ -1,4 +1,6 @@
-// Test exchange with 3D grid.
+/*
+	Test exchange with 3D grid.
+*/
 
 d := 100e-9                
 N := 32                   

@@ -1,4 +1,6 @@
-// Test exchange field
+/*
+	Test exchange field
+*/
 
 setgridsize(300, 200, 4)
 setcellsize(2e-9, 3e-9, 4e-9)

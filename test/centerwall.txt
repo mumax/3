@@ -1,4 +1,6 @@
-// tests centerinplanewall and compensatesurfacecharges
+/*
+	tests CenterInplaneWall and CompensateSurfaceCharges
+*/
 
 setgridsize(128, 32, 1)
 setcellsize(5e-9, 5e-9, 30e-9)

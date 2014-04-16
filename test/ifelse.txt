@@ -1,4 +1,6 @@
-// regression test for crash on if w/o else
+/*
+	Regression test for crash on if w/o else
+*/
 
 a := 0.0
 

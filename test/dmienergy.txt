@@ -1,5 +1,6 @@
 /*
-	Test energy dissipation in presence of DMI
+	Test energy dissipation in presence of DMI.
+	Wrong boundary conditions can give huge non-preservation of energy.
 */
 
 N := 64

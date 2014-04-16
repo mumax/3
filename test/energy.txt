@@ -1,5 +1,7 @@
-// Test different energy contributions,
-// reference solutions from OOMMF.
+/*
+	Test different energy contributions,
+	reference solutions from OOMMF (energy.mif).
+*/
 
 l := 512e-9
 w := 256e-9

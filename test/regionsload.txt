@@ -1,4 +1,6 @@
-// Test regions.loadfile
+/*
+	Test regions.loadfile
+*/
 
 setgridsize(256, 128, 2)
 setcellsize(5e-9, 5e-9, 5e-9)

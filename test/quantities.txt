@@ -1,3 +1,7 @@
+/*
+	Test quantity averages.
+*/
+
 Nx := 200
 Ny := 100
 setgridsize(Nx, Ny, 1)

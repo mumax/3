@@ -1,5 +1,8 @@
-
-// Test that tiny DMI does not break 3D exchange
+/* 
+	Test that tiny DMI does not break 3D exchange.
+	As soon as we have nonzero DMI, we use the DMI+Exchange kernel.
+	For vanishingly small DMI, this should give the same result as exchange only.
+*/
 
 d := 100e-9                
 N := 32                   

@@ -44,7 +44,7 @@ J = vector(0, 0, jc)
 tableautosave(10e-12)
 
 save(sttorque)
-TOL := 1e-5
+TOL := 1e-3
 
 m0 := m.average()
 expectv("m", m0, vector(0.9586266279220581, 0.20391345024108887, 0), TOL)

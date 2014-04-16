@@ -12,8 +12,8 @@ func init() {
 	DeclFunc("Uniform", Uniform, "Uniform magnetization in given direction")
 	DeclFunc("Vortex", Vortex, "Vortex magnetization with given circulation and core polarization")
 	DeclFunc("Antivortex", AntiVortex, "Antivortex magnetization with given circulation and core polarization")
-	DeclFunc("Skyrmion", Skyrmion, "Bloch skyrmion magnetization with given charge and core polarization")
-	DeclFunc("NeelSkyrmion", NeelSkyrmion, "Néel skyrmion magnetization with given chirality and core polarization")
+	DeclFunc("NeelSkyrmion", NeelSkyrmion, "Néél skyrmion magnetization with given charge and core polarization")
+	DeclFunc("BlochSkyrmion", BlochSkyrmion, "Bloch skyrmion magnetization with given chirality and core polarization")
 	DeclFunc("TwoDomain", TwoDomain, "Twodomain magnetization with with given magnetization in left domain, wall, and right domain")
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
@@ -66,7 +66,7 @@ func Vortex(circ, pol int) Config {
 	}
 }
 
-func Skyrmion(charge, pol int) Config {
+func NeelSkyrmion(charge, pol int) Config {
 	w := 8 * Mesh().CellSize()[X]
 	w2 := w * w
 	return func(x, y, z float64) data.Vector {
@@ -79,7 +79,7 @@ func Skyrmion(charge, pol int) Config {
 	}
 }
 
-func NeelSkyrmion(charge, pol int) Config {
+func BlochSkyrmion(charge, pol int) Config {
 	w := 8 * Mesh().CellSize()[X]
 	w2 := w * w
 	return func(x, y, z float64) data.Vector {

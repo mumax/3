@@ -51,10 +51,9 @@ Using the scripting language explained above, relatively complex input files can
 {{.Example  `
 Msat  = 1000e3
 Aex   = 10e-12
-alpha = 3
 
 // define exchange length
-lex := sqrt(Aex.GetRegion(1) / (0.5 * mu0 * pow(Msat.GetRegion(1),2)))
+lex := sqrt(10e-12 / (0.5 * mu0 * pow(1000e3 ,2)))
 
 d     := 30 * lex                        // we test for d/lex = 30
 Sizex := 5*d                             // magnet size x
@@ -182,8 +181,8 @@ saveas(m, "vortex_transl")
 m = Vortex(1,-1).Add(0.1, randomMag())
 saveas(m, "vortex_add_random")
 
-m = Skyrmion(1, -1).scale(3,3,1)
-saveas(m, "skyrmion")
+m = BlochSkyrmion(1, -1).scale(3,3,1)
+saveas(m, "Bloch_skyrmion")
 
 m = NeelSkyrmion(1,-1).scale(3,3,1)
 saveas(m, "Néel_skyrmion")
@@ -216,13 +215,13 @@ setgridsize(128, 128, 1)
 setcellsize(2e-9, 2e-9, 2e-9)
 
 d      := 200e-9
-square := rect(d, d)                 // square with side d
+sq     := rect(d, d)                 // square with side d
 
 h     := 50e-9
 hole  := cylinder(h, h)              // circle with diameter h
 hole1 := hole.transl(100e-9, 0, 0)   // translated circle #1
 hole2 := hole.transl(0, -50e-9, 0)   // translated cricle #2
-cheese:= square.sub(hole1).sub(hole2)// subtract the circles form the square (makes holes).
+cheese:= sq.sub(hole1).sub(hole2)// subtract the circles form the square (makes holes).
 setgeom(cheese)
 
 msat = 600e3

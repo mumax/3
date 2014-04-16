@@ -1,4 +1,6 @@
-// regression test for buggy intergrain exchange reported by Jonathan Leliaert
+/*
+	Regression test for buggy intergrain exchange reported by Jonathan Leliaert
+*/
 
 setgridsize(256, 64, 1)
 setcellsize(3.125e-9, 3.125e-9, 15e-9)

@@ -1,5 +1,7 @@
-// Binary boolean operations were missing.
-// Reported by Gabriel Chaves
+/*
+	Binary boolean operations were missing.
+	Reported by Gabriel Chaves.
+*/
 
 t0 := 0
 timestep := 1

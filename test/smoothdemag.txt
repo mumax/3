@@ -1,4 +1,6 @@
-// Test if smoothed geometry is handled correctly by demag calculation and Mfull
+/* 
+	Test if smoothed geometry is handled correctly by demag calculation and Mfull.
+*/
 
 Nx := 100
 Ny := 50

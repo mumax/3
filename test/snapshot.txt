@@ -1,27 +1,17 @@
 /*
-	Micromagnetic standard problem 4 (a) according to
-	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+	Test saving snapshots on-the-fly.
 */
 
-// geometry
-	setgridsize(128, 32, 1)
-	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
 
-// material
-	Msat = 800e3
-	Aex = 13e-12
-	m  = uniform(1, .1, 0)
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, .1, 0)
 
-	snapshot(m)
-	snapshotformat = "png"
-	snapshot(m)
-	snapshotformat = "gif"
-	snapshot(m)
+snapshot(m)
+snapshotformat = "png"
+snapshot(m)
+snapshotformat = "gif"
+snapshot(m)
 
-	//autosnapshot(m, .1e-9)
-
-// relax
-	alpha = 3
-	//MaxErr = 1e-4
-	RunWhile(MaxTorque > 1e-4)
-	run(1e-9)

@@ -1,3 +1,7 @@
+/*
+	Test for runwhile().
+*/
+
 N := 20
 c := 4e-9
 

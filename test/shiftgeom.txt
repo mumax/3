@@ -1,4 +1,6 @@
-// regression test for bug with region > 127
+/*
+	Test that shifting introduces the correct geometry from the sides.
+*/
 
 setgridsize(512, 64, 1)
 c := 2e-9

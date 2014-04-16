@@ -1,3 +1,7 @@
+/*
+	Test Zhang-li torque with PBCs.
+*/
+
 setPBC(1, 0, 0)
 setGridSize(256, 32, 1)
 c := 5e-9

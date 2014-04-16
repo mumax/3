@@ -1,3 +1,6 @@
+/*
+	Test basic vector math.
+*/
 
 x := vector(1, 0, 0)
 y := vector(0, 1, 0)

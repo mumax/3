@@ -1,5 +1,8 @@
-// Reported by Jonathan Lelieart
-// Zhang-Li used to give NaN's because of division by Bsat
+/* 
+	Reported by Jonathan Lelieart
+	Zhang-Li used to give NaN's because of division by Bsat
+*/
+
 setgridsize(128, 32, 1)
 setcellsize(3.125e-9, 3.125e-9, 10e-9)
 

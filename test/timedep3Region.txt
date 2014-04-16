@@ -1,4 +1,6 @@
-// Test time-dependent vector parameter with regions
+/* 
+	Test time-dependent vector parameter with regions
+*/
 
 c:=4e-9
 setgridsize(32, 32, 1)

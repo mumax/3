@@ -1,3 +1,7 @@
+/*
+	Test setting an absolute RKKY coupling.
+*/
+
 N := 10
 setgridsize(N, N, 2)
 

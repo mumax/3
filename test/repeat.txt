@@ -1,3 +1,7 @@
+/*
+	Test Shape.repeat()
+*/
+
 N := 128
 c := 5e-9
 

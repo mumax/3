@@ -1,3 +1,7 @@
+/*
+	Test for reversal driven by Slonczewski STT.
+*/
+
 Nx := 64
 Ny := 32
 Nz := 1

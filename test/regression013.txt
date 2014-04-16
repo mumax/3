@@ -1,5 +1,7 @@
-// Shift should not act on regions if ShiftRegios == false
-// Reported by Ben Van de Wiele.
+/*
+	Shift should not act on regions if ShiftRegios == false
+	Reported by Ben Van de Wiele.
+*/
 
 Ny := 64
 Nx := 16*Ny

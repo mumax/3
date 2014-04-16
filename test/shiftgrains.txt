@@ -1,4 +1,7 @@
-// test shift of voronoi cells
+/* 
+	Test shift of voronoi cells:
+	new ones should enter from the side.
+*/
 
 setgridsize(512, 64, 1)
 c := 4e-9

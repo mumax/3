@@ -1,4 +1,7 @@
-// regression test for crash after resize when adding to exciations
+/* 
+	Regression test for crash after resize when adding to exciations.
+*/
+
 Nx := 32
 Ny := 16
 setgridsize(Nx, Ny, 1)

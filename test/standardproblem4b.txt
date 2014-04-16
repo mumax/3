@@ -10,19 +10,16 @@
 // material
 	Msat  = 800e3
 	Aex   = 13e-12
+	alpha = 0.02
 	m     = uniform(1, .1, 0)
 
 // relax
-	alpha = 3
-	run(10e-9)
-	print(m.average())
+	relax()
 	TOL := 1e-5
 	expectv("m", m.average(), vector(0.9669623970985413, 0.12529028952121735, 0), TOL)
 
 // reversal
-	alpha = 0.02
 	B_ext = vector(-35.5E-3, -6.3E-3, 0)
 	run(1e-9)
-	print(m.average())
 	expectv("m", m.average(), vector(-0.968669, -0.11842965369, -0.00576432049), TOL)
 

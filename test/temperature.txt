@@ -1,5 +1,7 @@
-// temperature test.
-// TODO: need OOMMF comparison
+/* 
+	Temperature test.
+	TODO: need OOMMF comparison
+*/
 
 	setgridsize(32, 32, 1)
 	setcellsize(4e-9, 4e-9, 4e-9)

@@ -43,6 +43,10 @@ func SetOD(od string, force bool) {
 
 	// clean output dir
 	if len(files) != 0 && OD != "." {
+
+		logfile.Close() // Suggested by Raffaele Pellicelli <raffaele.pellicelli@fis.unipr.it> for
+		logfile = nil   // windows platform, which cannot remove open file.
+
 		filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
 			if path != OD {
 				util.FatalErr(os.RemoveAll(path), "clean output directory:")

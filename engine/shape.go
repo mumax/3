@@ -146,11 +146,11 @@ func ImageShape(fname string) Shape {
 	width := img.Bounds().Max.X
 	height := img.Bounds().Max.Y
 
+	// decode image into bool matrix for fast pixel lookup
 	inside := make([][]bool, height)
 	for iy := range inside {
 		inside[iy] = make([]bool, width)
 	}
-
 	for iy := 0; iy < height; iy++ {
 		for ix := 0; ix < width; ix++ {
 			r, g, b, a := img.At(ix, height-1-iy).RGBA()
@@ -160,13 +160,15 @@ func ImageShape(fname string) Shape {
 		}
 	}
 
+	// stretch the image onto the gridsize
 	c := Mesh().CellSize()
 	cx, cy := c[X], c[Y]
-	nx, ny := float64(width), float64(height) // use width, height so it automatically rescales
-
+	N := Mesh().Size()
+	nx, ny := float64(N[X]), float64(N[Y])
+	w, h := float64(width), float64(height)
 	return func(x, y, z float64) bool {
-		ix := int(x/cx + 0.5*nx)
-		iy := int(y/cy + 0.5*ny)
+		ix := int((w/nx)*(x/cx) + 0.5*w)
+		iy := int((h/ny)*(y/cy) + 0.5*h)
 		if ix < 0 || ix >= width || iy < 0 || iy >= height {
 			return false
 		} else {

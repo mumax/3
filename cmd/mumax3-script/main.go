@@ -24,6 +24,7 @@ func main() {
 	log.SetFlags(0)
 	flag.Parse()
 	world = script.NewWorld()
+	world.Func("exit", exit)
 	script.Debug = *debug
 
 	if flag.NArg() > 1 {
@@ -61,9 +62,8 @@ func safecall(code string) {
 	}()
 	tree, err := world.Compile(code)
 	if err == nil {
-		ret := tree.Eval()
-		if ret != nil {
-			fmt.Println(ret)
+		for _, stmt := range tree.Child() {
+			fmt.Println(stmt.Eval())
 		}
 	} else {
 		fmt.Fprintln(os.Stderr, err)
@@ -76,4 +76,8 @@ func check(e error) {
 		fmt.Fprintln(os.Stderr, e)
 		os.Exit(1)
 	}
+}
+
+func exit() {
+	os.Exit(0)
 }

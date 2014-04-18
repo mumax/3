@@ -12,4 +12,8 @@ SetGeom(ImageShape("frame.png"))
 TOL := 1e-6
 expect("geom", geom.average(), 0.26171875, TOL)
 
+SetGeom(ImageShape("framex2.png"))  // 2x larger image should get scaled
+
+expect("geom", geom.average(), 0.26171875, TOL)
+
 snapshot(geom) // test crash on snapshot of scalar

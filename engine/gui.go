@@ -104,6 +104,7 @@ func (g *guistate) PrepareServer() {
 	http.HandleFunc("/render/", g.ServeRender)
 	http.HandleFunc("/plot/", g.servePlot)
 
+	g.Set("title", util.NoExt(OD[:len(OD)-1]))
 	g.prepareConsole()
 	g.prepareMesh()
 	g.prepareGeom()

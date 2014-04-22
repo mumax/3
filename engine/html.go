@@ -30,7 +30,9 @@ const templText = `
 
 <body>
 
-	<span style="color:gray; font-weight:bold; font-size:1.5em"> {{.Data.Title}} &nbsp; &nbsp; </span>  {{.ErrorBox}}
+<span style="color:gray; font-weight:bold; font-size:1.5em" >
+	{{.Span "title" "mumax3"}} &nbsp; &nbsp; {{.ErrorBox}}
+</span>
 	{{.Progress "progress" 100 0}} {{.Span "busy" "" }} <br/>
 	<hr/>
 

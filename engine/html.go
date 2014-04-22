@@ -1,8 +1,5 @@
 package engine
 
-// THIS FILE IS AUTO GENERATED FROM gui.html
-// EDITING IS FUTILE
-
 const templText = `
 <!DOCTYPE html>
 <html>
@@ -11,7 +8,7 @@ const templText = `
 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-	<title>{{.Data.Title}}</title>
+	<title> mumax3 </title>
 
 	<style media="all" type="text/css">
 

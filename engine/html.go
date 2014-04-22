@@ -29,7 +29,7 @@ const templText = `
 
 
 <body>
-
+<iframe src="http://mumax.github.io/header.html" width="100%" height="180" frameborder="0"></iframe>
 <span style="color:gray; font-weight:bold; font-size:1.5em" >
 	{{.Span "title" "mumax3"}} &nbsp; &nbsp; {{.ErrorBox}}
 </span>

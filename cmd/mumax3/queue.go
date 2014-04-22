@@ -101,10 +101,11 @@ func (a *atom) get() int  { return int(atomic.LoadInt32((*int32)(a))) }
 var exitStatus atom = 0
 
 func run(inFile string, gpu int, webAddr string) {
-	gpuFlag := fmt.Sprint("-gpu=", gpu)
-	httpFlag := fmt.Sprint("-http=", webAddr)
-	cmd := exec.Command(os.Args[0], gpuFlag, httpFlag, inFile)
-	log.Println(os.Args[0], gpuFlag, httpFlag, inFile)
+	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
+	httpFlag := fmt.Sprint(`-http=`, webAddr)
+	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
+	cmd := exec.Command(os.Args[0], cacheFlag, gpuFlag, httpFlag, inFile)
+	log.Println(os.Args[0], cacheFlag, gpuFlag, httpFlag, inFile)
 	err := cmd.Run()
 	if err != nil {
 		log.Println(inFile, err)
@@ -155,13 +156,23 @@ func (s *stateTab) RenderHTML(w io.Writer) {
 		.TextBox  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; }
 		textarea  { border:solid; border-color:#BBBBBB; border-width:1px; padding-left:4px; color:gray; font-size: 1em; }
 	</style>
-	</head><body><pre>
+	</head><body>
+	<span style="color:gray; font-weight:bold; font-size:1.5em"> mumax<sup>3</sup> queue status </span><br/>
+	<hr/>
+	<pre>
 `)
+
+	hostname := "localhost"
+	hostname, _ = os.Hostname()
 	for _, j := range s.jobs {
-		fmt.Fprintln(w, j.uid, j.inFile, j.webAddr)
+		if j.webAddr != "" {
+			fmt.Fprint(w, `<b>`, j.uid, ` <a href="`, "http://", hostname+j.webAddr, `">`, j.inFile, " ", j.webAddr, "</a></b>\n")
+		} else {
+			fmt.Fprint(w, j.uid, " ", j.inFile, "\n")
+		}
 	}
 
-	fmt.Fprintln(w, `</pre></body></html>`)
+	fmt.Fprintln(w, `</pre><hr/></body></html>`)
 }
 
 func (s *stateTab) ListenAndServe(addr string) {

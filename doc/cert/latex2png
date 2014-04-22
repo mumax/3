@@ -1,8 +1,0 @@
-#! /bin/bash
-for f in $@; do
-	pdflatex $f.tex
-	pdfcrop $f.pdf $f.pdf.out
-	mv $f.pdf.out $f.pdf
-	convert -density 120 $f.pdf formulae/$f.png
-	rm -f $f.pdf $f.aux $f.log
-done;

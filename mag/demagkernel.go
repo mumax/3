@@ -50,8 +50,6 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 
 	if errLoad != nil {
 		util.Log("Did not use cached kernel:", errLoad)
-		kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
-		// don't return yet, still need to save
 	} else {
 		util.Log("Using cached kernel:", basename)
 		return kernel

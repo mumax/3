@@ -57,6 +57,18 @@ func (dst *Bytes) Set(index int, value byte) {
 	Sync()
 }
 
+// Set one element to value
+func (src *Bytes) Get(index int) byte {
+	if index < 0 || index >= src.Len {
+		log.Panic("Bytes.Set: index out of range:", index)
+	}
+	var dst byte
+	Sync()
+	cu.MemcpyDtoH(unsafe.Pointer(&dst), cu.DevicePtr(uintptr(src.Ptr)+uintptr(index)), 1)
+	Sync()
+	return dst
+}
+
 // Frees the GPU memory and disables the slice.
 func (b *Bytes) Free() {
 	if b.Ptr != nil {

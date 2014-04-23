@@ -24,3 +24,6 @@ save(Msat)
 
 m = uniform(1, 0, 0)
 save(m)
+
+regions.setcell(5, 6, 0, 123)
+expect("getcell", regions.getcell(5, 6, 0), 123, 0)

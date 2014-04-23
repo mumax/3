@@ -138,11 +138,16 @@ func (r *Regions) average() []float64 {
 func (r *Regions) Average() float64 { return r.average()[0] }
 
 // Set the region of one cell
-// TODO dedup
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
 	size := Mesh().Size()
 	i := data.Index(size, ix, iy, iz)
 	r.gpuCache.Set(i, byte(region))
+}
+
+func (r *Regions) GetCell(ix, iy, iz int) int {
+	size := Mesh().Size()
+	i := data.Index(size, ix, iy, iz)
+	return int(r.gpuCache.Get(i))
 }
 
 func defRegionId(id int) {

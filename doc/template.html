@@ -460,18 +460,11 @@ Msat  = 860e3
 // set random parameters per region
 for i:=0; i<maxRegion; i++{
 	// random cubic anisotropy direction
-	phi := rand() * 2 * pi
-	theta := rand() * pi
-
-	x1 := sin(theta) * cos(phi)
-	y1 := sin(theta) * sin(phi)
-	z1 := cos(theta)
-	AnisC1.SetRegion(i, vector(x1, y1, z1))
-
-	x2 := sin(theta + pi/2) * cos(phi)
-	y2 := sin(theta + pi/2) * sin(phi)
-	z2 := cos(theta + pi/2)
-	AnisC2.SetRegion(i, vector(x2, y2, z2))
+	axis1  := vector(randNorm(), randNorm(), randNorm())
+	helper := vector(randNorm(), randNorm(), randNorm())
+	axis2  := axis1.cross(helper)  // perpendicular to axis1
+	AnisC1.SetRegion(i, axis1)     // axes need not be normalized
+	AnisC2.SetRegion(i, axis2)
 
 	// random 10% anisotropy variation
 	K := 1e5

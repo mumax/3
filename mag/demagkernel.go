@@ -1,6 +1,7 @@
 package mag
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/oommf"
@@ -91,7 +92,9 @@ func SaveKernel(fname string, kernel *data.Slice) error {
 	if err != nil {
 		return err
 	}
-	oommf.WriteOVF2(f, kernel, data.Meta{}, "binary 4")
+	out := bufio.NewWriter(f)
+	defer out.Flush()
+	oommf.WriteOVF2(out, kernel, data.Meta{}, "binary 4")
 	return nil
 }
 

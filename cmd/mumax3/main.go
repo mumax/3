@@ -96,6 +96,7 @@ func runInteractive() {
 		alpha = 1
 		m = RandomMag()`)
 	goServeGUI()
+	openbrowser("http://localhost" + *flag_port)
 	engine.RunInteractive()
 }
 

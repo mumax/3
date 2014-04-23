@@ -8,7 +8,7 @@ import (
 
 var regions = Regions{info: Info(1, "regions", "")} // global regions map
 
-const NREGION = 256 // maximum number of regions. (!) duplicated in CUDA
+const NREGION = 256 // maximum number of regions, limited by size of byte.
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")

@@ -13,7 +13,7 @@
 extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-       float* __restrict__ dLUT2d, float* __restrict__ aLUT2d, uint8_t* __restrict__ regions,
+       float* __restrict__ aLUT2d, float* __restrict__ dLUT2d, uint8_t* __restrict__ regions,
        float cx, float cy, float cz, int Nx, int Ny, int Nz, uint8_t PBC) {
 
 	int ix = blockIdx.x * blockDim.x + threadIdx.x;

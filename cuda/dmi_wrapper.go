@@ -22,8 +22,8 @@ type adddmi_args_t struct {
 	arg_mx      unsafe.Pointer
 	arg_my      unsafe.Pointer
 	arg_mz      unsafe.Pointer
-	arg_dLUT2d  unsafe.Pointer
 	arg_aLUT2d  unsafe.Pointer
+	arg_dLUT2d  unsafe.Pointer
 	arg_regions unsafe.Pointer
 	arg_cx      float32
 	arg_cy      float32
@@ -47,8 +47,8 @@ func init() {
 	adddmi_args.argptr[3] = unsafe.Pointer(&adddmi_args.arg_mx)
 	adddmi_args.argptr[4] = unsafe.Pointer(&adddmi_args.arg_my)
 	adddmi_args.argptr[5] = unsafe.Pointer(&adddmi_args.arg_mz)
-	adddmi_args.argptr[6] = unsafe.Pointer(&adddmi_args.arg_dLUT2d)
-	adddmi_args.argptr[7] = unsafe.Pointer(&adddmi_args.arg_aLUT2d)
+	adddmi_args.argptr[6] = unsafe.Pointer(&adddmi_args.arg_aLUT2d)
+	adddmi_args.argptr[7] = unsafe.Pointer(&adddmi_args.arg_dLUT2d)
 	adddmi_args.argptr[8] = unsafe.Pointer(&adddmi_args.arg_regions)
 	adddmi_args.argptr[9] = unsafe.Pointer(&adddmi_args.arg_cx)
 	adddmi_args.argptr[10] = unsafe.Pointer(&adddmi_args.arg_cy)
@@ -60,7 +60,7 @@ func init() {
 }
 
 // Wrapper for adddmi CUDA kernel, asynchronous.
-func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, dLUT2d unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
+func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, aLUT2d unsafe.Pointer, dLUT2d unsafe.Pointer, regions unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
 	if Synchronous { // debug
 		Sync()
 	}
@@ -78,8 +78,8 @@ func k_adddmi_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx 
 	adddmi_args.arg_mx = mx
 	adddmi_args.arg_my = my
 	adddmi_args.arg_mz = mz
-	adddmi_args.arg_dLUT2d = dLUT2d
 	adddmi_args.arg_aLUT2d = aLUT2d
+	adddmi_args.arg_dLUT2d = dLUT2d
 	adddmi_args.arg_regions = regions
 	adddmi_args.arg_cx = cx
 	adddmi_args.arg_cy = cy
@@ -298,7 +298,7 @@ BB0_10:
 	add.s32 	%r310, %r120, %r4;
 
 BB0_11:
-	cvta.to.global.u64 	%rd36, %rd15;
+	cvta.to.global.u64 	%rd36, %rd14;
 	mul.wide.s32 	%rd37, %r310, 4;
 	add.s64 	%rd38, %rd36, %rd37;
 	.loc 1 44 1
@@ -324,7 +324,7 @@ BB0_13:
 	add.s32 	%r311, %r130, %r4;
 
 BB0_14:
-	cvta.to.global.u64 	%rd39, %rd14;
+	cvta.to.global.u64 	%rd39, %rd15;
 	mul.wide.s32 	%rd40, %r311, 4;
 	add.s64 	%rd41, %rd39, %rd40;
 	.loc 1 45 1
@@ -1190,7 +1190,7 @@ BB0_10:
 	add.s32 	%r310, %r120, %r4;
 
 BB0_11:
-	cvta.to.global.u64 	%rd36, %rd15;
+	cvta.to.global.u64 	%rd36, %rd14;
 	mul.wide.s32 	%rd37, %r310, 4;
 	add.s64 	%rd38, %rd36, %rd37;
 	.loc 1 44 1
@@ -1216,7 +1216,7 @@ BB0_13:
 	add.s32 	%r311, %r130, %r4;
 
 BB0_14:
-	cvta.to.global.u64 	%rd39, %rd14;
+	cvta.to.global.u64 	%rd39, %rd15;
 	mul.wide.s32 	%rd40, %r311, 4;
 	add.s64 	%rd41, %rd39, %rd40;
 	.loc 1 45 1
@@ -2112,7 +2112,7 @@ BB2_10:
 	add.s32 	%r316, %r121, %r4;
 
 BB2_11:
-	cvta.to.global.u64 	%rd36, %rd15;
+	cvta.to.global.u64 	%rd36, %rd14;
 	mul.wide.s32 	%rd37, %r316, 4;
 	add.s64 	%rd38, %rd36, %rd37;
 	.loc 1 44 1
@@ -2138,7 +2138,7 @@ BB2_13:
 	add.s32 	%r317, %r131, %r4;
 
 BB2_14:
-	cvta.to.global.u64 	%rd39, %rd14;
+	cvta.to.global.u64 	%rd39, %rd15;
 	mul.wide.s32 	%rd40, %r317, 4;
 	add.s64 	%rd41, %rd39, %rd40;
 	.loc 1 45 1

@@ -7,7 +7,6 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"unsafe"
 )
 
@@ -15,7 +14,8 @@ var (
 	Aex          ScalarParam // Exchange stiffness
 	Dex          ScalarParam // DMI strength
 	B_exch       vAdder      // exchange field (T) output handle
-	lex2         exchParam   // inter-cell exchange in 2e18 * Aex / Msat
+	lex2         aexchParam  // inter-cell exchange in 1e18 * Aex / Msat
+	dex2         dexchParam  // inter-cell DMI in 1e9 * Dex / Msat
 	E_exch       *GetScalar  // Exchange energy
 	Edens_exch   sAdder      // Exchange energy density
 	ExchCoupling sSetter     // Average exchange coupling with neighbors. Useful to debug inter-region exchange
@@ -23,13 +23,14 @@ var (
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dex.init("Dex", "J/m2", "Dzyaloshinskii-Moriya strength", []derived{})
+	Dex.init("Dex", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&dex2})
 	B_exch.init("B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
 	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
+	dex2.init()
 	ExchCoupling.init("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 }
 
@@ -38,14 +39,7 @@ func AddExchangeField(dst *data.Slice) {
 	if Dex.isZero() {
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())
 	} else {
-		// DMI only implemented for uniform parameters
-		// interaction not clear with space-dependent parameters
-		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
-			"DMI: Msat, Aex, Dex must be uniform")
-		msat := Msat.GetRegion(0)
-		D := Dex.GetRegion(0)
-		A := Aex.GetRegion(0) / msat
-		cuda.AddDMI(dst, M.Buffer(), float32(D/msat), float32(D/msat), 0, float32(A), M.Mesh()) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), dex2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	}
 }
 
@@ -68,7 +62,7 @@ func ScaleInterExchange(region1, region2 int, scale float64) {
 
 // stores interregion exchange stiffness
 type exchParam struct {
-	lut            [NREGION * (NREGION + 1) / 2]float32 // 2e18 * harmonic mean of Aex/Msat in regions (i,j)
+	lut            [NREGION * (NREGION + 1) / 2]float32 // 1e18 * harmonic mean of Aex/Msat in regions (i,j)
 	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
@@ -88,7 +82,7 @@ func (p *exchParam) init() {
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
-func (p *exchParam) Gpu() cuda.SymmLUT {
+func (p *dexchParam) Gpu() cuda.SymmLUT {
 	p.update()
 	if !p.gpu_ok {
 		p.upload()
@@ -96,17 +90,47 @@ func (p *exchParam) Gpu() cuda.SymmLUT {
 	return p.gpu
 }
 
-func (p *exchParam) update() {
+func (p *aexchParam) Gpu() cuda.SymmLUT {
+	p.update()
+	if !p.gpu_ok {
+		p.upload()
+	}
+	return p.gpu
+	// TODO: dedup
+}
+
+type aexchParam struct{ exchParam }
+type dexchParam struct{ exchParam }
+
+func (p *aexchParam) update() {
 	if !p.cpu_ok {
 		msat := Msat.cpuLUT()
 		aex := Aex.cpuLUT()
 
 		for i := 0; i < NREGION; i++ {
-			lexi := 2e18 * safediv(aex[0][i], msat[0][i])
+			lexi := 1e18 * safediv(aex[0][i], msat[0][i])
 			for j := i; j < NREGION; j++ {
-				lexj := 2e18 * safediv(aex[0][j], msat[0][j])
+				lexj := 1e18 * safediv(aex[0][j], msat[0][j])
 				I := symmidx(i, j)
 				p.lut[I] = p.scale[I] * 2 / (1/lexi + 1/lexj)
+			}
+		}
+		p.gpu_ok = false
+		p.cpu_ok = true
+	}
+}
+
+func (p *dexchParam) update() {
+	if !p.cpu_ok {
+		msat := Msat.cpuLUT()
+		dex := Dex.cpuLUT()
+
+		for i := 0; i < NREGION; i++ {
+			dexi := 1e9 * safediv(dex[0][i], msat[0][i])
+			for j := i; j < NREGION; j++ {
+				dexj := 1e9 * safediv(dex[0][j], msat[0][j])
+				I := symmidx(i, j)
+				p.lut[I] = p.scale[I] * 2 / (1/dexi + 1/dexj)
 			}
 		}
 		p.gpu_ok = false

@@ -8,13 +8,13 @@ import (
 // Add exchange field to Beff.
 // 	m: normalized magnetization
 // 	B: effective field in Tesla
-// 	Aex_red: 2*Aex / (Msat * 1e18 m2)
+// 	Aex_red: Aex / (Msat * 1e18 m2)
 // see exchange.cu
 func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
 	c := mesh.CellSize()
-	wx := float32(1e-18 / (c[X] * c[X]))
-	wy := float32(1e-18 / (c[Y] * c[Y]))
-	wz := float32(1e-18 / (c[Z] * c[Z]))
+	wx := float32(2 * 1e-18 / (c[X] * c[X]))
+	wy := float32(2 * 1e-18 / (c[Y] * c[Y]))
+	wz := float32(2 * 1e-18 / (c[Z] * c[Z]))
 	N := mesh.Size()
 	pbc := mesh.PBC_code()
 	cfg := make3DConf(N)
@@ -26,9 +26,9 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.M
 
 func ExchangeDecode(dst *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
 	c := mesh.CellSize()
-	wx := float32(1e-18 / (c[X] * c[X]))
-	wy := float32(1e-18 / (c[Y] * c[Y]))
-	wz := float32(1e-18 / (c[Z] * c[Z]))
+	wx := float32(2 * 1e-18 / (c[X] * c[X]))
+	wy := float32(2 * 1e-18 / (c[Y] * c[Y]))
+	wz := float32(2 * 1e-18 / (c[Z] * c[Z]))
 	N := mesh.Size()
 	pbc := mesh.PBC_code()
 	cfg := make3DConf(N)

@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "stencil.h"
-#include "float3.h"
 #include "exchange.h"
+#include "float3.h"
+#include "stencil.h"
 
 // See exchange.go for more details.
 extern "C" __global__ void

@@ -50,7 +50,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
 		}
 		h   += (2.0f*A1/(cx*cx)) * (m1 - m0);          // exchange
 		h.x += (D1/cx)*(m0.z - m1.z);                  // DM (first 1/2 contribution, 2*D * deltaM / (2*c))
-		h.z -= (D1/cx)*(m0.x-m1.x);
+		h.z -= (D1/cx)*(m0.x - m1.x);
 	}
 
 

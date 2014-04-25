@@ -42,6 +42,7 @@ func (_ *Heun) Step() {
 		NSteps++
 		adaptDt(math.Pow(MaxErr/err, 1./2.))
 		setLastErr(err)
+		setMaxTorque(dy)
 	} else {
 		// undo bad step
 		util.Assert(FixDt == 0)

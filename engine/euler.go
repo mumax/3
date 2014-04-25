@@ -19,6 +19,8 @@ func (_ *Euler) Step() {
 
 	torqueFn(dy0)
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
+	setMaxTorque(dy0)
+	setLastErr(0) // unknown
 
 	Time += Dt_si
 	M.normalize()

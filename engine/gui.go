@@ -365,9 +365,9 @@ func (g *guistate) prepareOnUpdate() {
 
 			// solver
 			g.Set("nsteps", NSteps)
-			g.Set("time", fmt.Sprintf("%6e", Time))
-			g.Set("dt", fmt.Sprintf("%4e", Dt_si))
-			g.Set("lasterr", fmt.Sprintf("%3e", lastErr))
+			g.Set("time", fmt.Sprintf("%1.5e", Time))
+			g.Set("dt", fmt.Sprintf("%1.3e", Dt_si))
+			g.Set("lasterr", fmt.Sprintf("%1.3e", lastErr))
 			g.Set("maxerr", MaxErr)
 			g.Set("mindt", MinDt)
 			g.Set("maxdt", MaxDt)
@@ -378,7 +378,7 @@ func (g *guistate) prepareOnUpdate() {
 			} else {
 				g.Set("busy", "Running")
 				// Don't re-evaluate all the time if not running
-				g.Set("maxtorque", fmt.Sprintf("%6e T", MaxTorque.Get()))
+				g.Set("maxtorque", fmt.Sprintf("%1.3e T", lastTorque))
 			}
 
 			// display

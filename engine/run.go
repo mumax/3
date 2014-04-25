@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
@@ -18,6 +19,7 @@ var (
 	MaxErr                  float64  = 1e-5              // maximum error/step
 	Headroom                float64  = 0.8               // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
 	lastErr, peakErr        float64                      // error of last step, highest error ever
+	lastTorque              float64                      // maxTorque of last time step
 	NSteps, NUndone, NEvals int                          // number of good steps, undone steps
 	FixDt                   float64                      // fixed time step?
 	stepper                 Stepper                      // generic step, can be EulerStep, HeunStep, etc
@@ -94,6 +96,10 @@ func setLastErr(err float64) {
 	if err > peakErr {
 		peakErr = err
 	}
+}
+
+func setMaxTorque(τ *data.Slice) {
+	lastTorque = cuda.MaxVecNorm(τ)
 }
 
 // adapt time step: dt *= corr, but limited to sensible values.

@@ -84,6 +84,7 @@ func (rk *RK23) Step() {
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
 		setLastErr(err)
+		setMaxTorque(k4)
 		NSteps++
 		Time = t0 + Dt_si
 		adaptDt(math.Pow(MaxErr/err, 1./3.))

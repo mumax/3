@@ -96,7 +96,7 @@ func runInteractive() {
 		alpha = 1
 		m = RandomMag()`)
 	goServeGUI()
-	openbrowser("http://localhost" + *flag_port)
+	openbrowser("http://127.0.0.1" + *flag_port)
 	engine.RunInteractive()
 }
 
@@ -118,7 +118,7 @@ func runFileAndServe(fname string) {
 	goServeGUI()
 
 	if *flag_interactive {
-		openbrowser("http://localhost" + *flag_port)
+		openbrowser("http://127.0.0.1" + *flag_port)
 	}
 
 	// start executing the tree, possibly injecting commands from web gui
@@ -135,11 +135,7 @@ func goServeGUI() {
 		log.Println(`not starting GUI (-http="")`)
 		return
 	}
-	hostname, _ := os.Hostname()
-	if hostname == "" {
-		hostname = "localhost"
-	}
-	fmt.Print("starting GUI at http://", hostname, *flag_port, "\n")
+	fmt.Print("starting GUI at http://127.0.0.1", *flag_port, "\n")
 	go engine.Serve(*flag_port)
 }
 

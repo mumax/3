@@ -18,4 +18,4 @@ func openbrowser(url string) {
 }
 
 // list of browsers to try.
-var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "firefox", "ie", "iexplore"}
+var browsers = []string{"x-www-browser", "google-chrome", "chromium-browser", "firefox", "explorer"}

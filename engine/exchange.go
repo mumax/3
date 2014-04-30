@@ -112,7 +112,7 @@ func (p *aexchParam) update() {
 			for j := i; j < NREGION; j++ {
 				lexj := 1e18 * safediv(aex[0][j], msat[0][j])
 				I := symmidx(i, j)
-				p.lut[I] = p.scale[I] * (lexi * lexj) / (lexi + lexj) // Harmonic mean
+				p.lut[I] = p.scale[I] * 2 / (1/lexi + 1/lexj)
 			}
 		}
 		p.gpu_ok = false

@@ -1,5 +1,7 @@
 package main
 
+// Bootstrap looks for a mumax+cuda combination that works on your system.
+
 import (
 	"fmt"
 	"io"
@@ -9,7 +11,6 @@ import (
 	"os/exec"
 	"path"
 	"strings"
-	//_ "github.com/mumax/3/mainpkg" // for flags definitions
 )
 
 var env []string
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	cmds := []string{"mumax3-cuda6.0", "mumax3-cuda5.5", "mumax3-cuda5.0"}
-	mumax := ""
+	mumax := "mumax3-cuda5.5" // default
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd
 		err := run(cmd, []string{"-test"})
@@ -40,10 +41,12 @@ func main() {
 		}
 	}
 
-	if mumax == "" {
-		fatal("no matching mumax/cuda combination found in", cmds)
-	}
+	//	if mumax == "" {
+	//		fatal("no matching mumax/cuda combination found in", cmds)
+	//	}
 	//fmt.Println(mumax, os.Args[1:])
+
+	fmt.Println("using", mumax)
 	err := run(mumax, os.Args[1:])
 	if err != nil {
 		fatal(err)
@@ -52,7 +55,7 @@ func main() {
 
 func run(command string, args []string) error {
 	// prepare command
-	fmt.Println(command, args)
+	//fmt.Println(command, args)
 	cmd := exec.Command(command, args...)
 	cmd.Env = env
 	stdout, _ := cmd.StdoutPipe()

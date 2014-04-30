@@ -73,7 +73,7 @@ func FreeBuffers() {
 	Sync()
 	for _, size := range buf_pool {
 		for i := range size {
-			cu.DevicePtr(size[i]).Free()
+			cu.DevicePtr(uintptr(size[i])).Free()
 			size[i] = nil
 		}
 	}

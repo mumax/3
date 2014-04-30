@@ -13,20 +13,23 @@ import (
 	"strings"
 )
 
-var env []string
-
 const LD_LIBRARY_PATH = "LD_LIBRARY_PATH"
+const PATH = "PATH"
 
 func main() {
-	//flag.Parse()
 
+	sep := string(os.PathListSeparator)
 	bin := execDir()
 
-	env = os.Environ()
+	env := os.Environ()
 	for i := range env {
 		if strings.HasPrefix(env[i], LD_LIBRARY_PATH+"=") {
-			env[i] += ":" + bin
-			//fmt.Println(env[i])
+			env[i] += sep + bin
+			check(os.Setenv(LD_LIBRARY_PATH, env[i][len(LD_LIBRARY_PATH):]))
+		}
+		if strings.HasPrefix(env[i], PATH+"=") {
+			env[i] += sep + bin
+			check(os.Setenv(PATH, env[i][len(PATH):]))
 		}
 	}
 
@@ -34,60 +37,56 @@ func main() {
 	mumax := "mumax3-cuda5.5" // default
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd
-		err := run(cmd, []string{"-test"})
+		err := run(cmd, []string{"-test"}, false)
 		if err == nil {
 			mumax = cmd
 			break
 		}
 	}
 
-	//	if mumax == "" {
-	//		fatal("no matching mumax/cuda combination found in", cmds)
-	//	}
-	//fmt.Println(mumax, os.Args[1:])
-
-	fmt.Println("using", mumax)
-	err := run(mumax, os.Args[1:])
+	fmt.Println("running", mumax)
+	err := run(mumax, os.Args[1:], true)
 	if err != nil {
 		fatal(err)
 	}
 }
 
-func run(command string, args []string) error {
+func run(command string, args []string, pipe bool) error {
 	// prepare command
-	//fmt.Println(command, args)
 	cmd := exec.Command(command, args...)
-	cmd.Env = env
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
+
 	done := make(chan int)
+	var stdout, stderr io.ReadCloser
+	if pipe {
+		stdout, _ = cmd.StdoutPipe()
+		stderr, _ = cmd.StderrPipe()
+	}
 
 	// prepare output
-	outfname := "test.out" // TODO: proper name
+	//outfname := "test.out" // TODO: proper name
 	outfile := ioutil.Discard
-	f, erro := os.OpenFile(outfname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-	if erro == nil {
-		defer f.Close()
-		outfile = f
-	} else {
-		log.Println(erro)
+	//f, erro := os.OpenFile(outfname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	//if erro == nil {
+	//	defer f.Close()
+	//	outfile = f
+	//} else {
+	//	log.Println(erro)
+	//}
+	if pipe {
+		multiOut := io.MultiWriter(os.Stdout, outfile)
+		multiErr := io.MultiWriter(os.Stderr, outfile)
+		go func() { io.Copy(multiOut, stdout); done <- 1 }()
+		go func() { io.Copy(multiErr, stderr); done <- 1 }()
 	}
-	multiOut := io.MultiWriter(os.Stdout, outfile)
-	multiErr := io.MultiWriter(os.Stderr, outfile)
-	go func() { io.Copy(multiOut, stdout); done <- 1 }()
-	go func() { io.Copy(multiErr, stderr); done <- 1 }()
 
 	// run & flush output
 	err := cmd.Run()
-	<-done
-	<-done
+	if pipe {
+		<-done
+		<-done
+	}
 
 	return err
-}
-
-func fatal(msg ...interface{}) {
-	fmt.Fprintln(os.Stderr, msg...)
-	os.Exit(1)
 }
 
 // try really hard to get the executable's directory
@@ -103,4 +102,15 @@ func execDir() string {
 	}
 	log.Println(err)
 	return "."
+}
+
+func check(e error) {
+	if e != nil {
+		fatal(e)
+	}
+}
+
+func fatal(msg ...interface{}) {
+	fmt.Fprintln(os.Stderr, msg...)
+	os.Exit(1)
 }

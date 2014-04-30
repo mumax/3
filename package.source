@@ -1,50 +1,33 @@
 # source this file to bash to build for different cuda versions
 
-tmp='tmp/'
-rm -rf $tmp
-mkdir $tmp
+#set -v
 
-src='github.com/mumax/3/cmd/mumax3'
-version='3.5-BETA2'
+out='cmd/mumax3-bootstrap/'
 
-cp -r doc $tmp
-
-go build -o $tmp/mumax3/mumax3-convert 'github.com/mumax/3/cmd/mumax3-convert'
-go build -o $tmp/mumax3/mumax3-plot 'github.com/mumax/3/cmd/mumax3-plot'
-go build -o $tmp/mumax3/mumax3-bootstrap 'github.com/mumax/3/cmd/bootstrap'
+go build -o $out/mumax3-convert 'github.com/mumax/3/cmd/mumax3-convert'
+go build -o $out/mumax3         'github.com/mumax/3/cmd/mumax3-bootstrap'
 
 
 for c in 5.0 5.5 6.0; do
 	sudo rm -f /usr/local/cuda
-	echo ln -s /usr/local/cuda-$c /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
 
     lib=/usr/local/cuda-$c/lib64
-    cp $lib/libcufft.so.$c $tmp/mumax3
-    cp $lib/libcurand.so.$c $tmp/mumax3
-    cp $lib/libcudart.so.$c $tmp/mumax3
+    cp $lib/libcufft.so.$c  $out
+    cp $lib/libcurand.so.$c $out
+    cp $lib/libcudart.so.$c $out
 
 	arch='cuda'$c
-	out=$tmp/mumax3/mumax3-$arch
-
-	go build -v -o $out $src 
-	echo go build -v -o $out $src 
-	ldd $out
+	go build -v -o $out/mumax3-$arch 'github.com/mumax/3/cmd/mumax3'
+	ldd $out/mumax3-$arch
 
 	sudo rm -f /usr/local/cuda
-	(cd $tmp/mumax3 &&
-		./mumax3 -v -test
-	)
-	
+
 	echo
 done
 
-(cd $tmp/mumax3 &&
-	rm libcudart.so.5.5
-)
+rm $out/libcudart.so.5.5 $out/libcudart.so.6.0 # cuda5.0 requires libcudart, others not
 
 sudo rm -f /usr/local/cuda
-
-echo ln -s /usr/local/cuda-5.5 /usr/local/cuda
-sudo ln -s /usr/local/cuda-5.5 /usr/local/cuda
+#sudo ln -s /usr/local/cuda-5.5 /usr/local/cuda
 

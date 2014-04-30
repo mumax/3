@@ -2,6 +2,8 @@
 
 source ./make.bash || exit 1
 
+./cmd/mumax3-bootstrap/mumax3-bootstrap test/average.mx3
+
 PKGS=$(echo github.com/mumax/3/{cmd/mumax3,cmd/mumax3-convert,cmd/mumax3-plot,data,draw,prof,engine,mag,script,util,cuda})
 
 go test -i $PKGS || exit 1

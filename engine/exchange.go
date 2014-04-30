@@ -7,6 +7,7 @@ import (
 	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 	"unsafe"
 )
 
@@ -39,6 +40,10 @@ func AddExchangeField(dst *data.Slice) {
 	if Dex.isZero() {
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())
 	} else {
+		// DMI kernel has space-dependent parameters, but
+		// correct averaging between regions not yet clear nor tested, so disallow.
+		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(),
+			"DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), dex2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	}
 }

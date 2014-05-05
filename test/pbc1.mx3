@@ -14,10 +14,10 @@ Aex   = 10e-12
 alpha = 1
 
 r := rect(Nx/2*c, Ny/2*c)
-dx := Nx/2*c
-dy := Ny/2*c
+deltax := Nx/2*c
+deltay := Ny/2*c
 
-setgeom( r.repeat(Nx*c, Ny*c, 0).transl(dx, dy, 0) )
+setgeom( r.repeat(Nx*c, Ny*c, 0).transl(deltax, deltay, 0) )
 m = uniform(1, 0.1, 0.01)
 save(m)
 run(1e-9)

@@ -13,6 +13,7 @@ import (
 // Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
 // Empty cacheDir disables caching.
 func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, cacheDir string) (kernel [3][3]*data.Slice) {
+	sanityCheck(cellsize, pbc)
 	// Cache disabled
 	if cacheDir == "" {
 		util.Log(`Not using kernel cache (-cache="")`)
@@ -362,6 +363,21 @@ func wrap(number, max int) int {
 		number -= max
 	}
 	return number
+}
+
+const maxAspect = 100.0 // maximum sane cell aspect ratio
+
+func sanityCheck(cellsize [3]float64, pbc [3]int) {
+	a3 := cellsize[X] / cellsize[Y]
+	a2 := cellsize[Y] / cellsize[Z]
+	a1 := cellsize[Z] / cellsize[X]
+
+	aMax := math.Max(a1, math.Max(a2, a3))
+	aMin := math.Min(a1, math.Min(a2, a3))
+
+	if aMax > maxAspect || aMin < 1./maxAspect {
+		util.Fatal("Unrealistic cell aspect ratio:", cellsize)
+	}
 }
 
 // Returns the size after zero-padding, taking into account periodic boundary conditions.

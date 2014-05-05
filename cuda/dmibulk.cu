@@ -110,23 +110,45 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 
 	// only take vertical derivative for 3D sim
 	if (Nz != 1) {
-		//	// bottom neighbor
-		//	{
-		//		i_  = idx(ix, iy, lclampz(iz-1));
-		//		float3 m1  = make_float3(mx[i_], my[i_], mz[i_]);
-		//		m1  = ( is0(m1)? m0: m1 );                         // Neumann BC
-		//		float A1 = aLUT2d[symidx(r0, regions[i_])];
-		//		h += (2.0f*A1/(cz*cz)) * (m1 - m0);                // Exchange only
-		//	}
+		// bottom neighbor
+		{
+			float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
+			i_ = idx(ix, iy, lclampz(iz-1));
+			if (iz-1 >= 0 || PBCz) {
+				m1 = make_float3(mx[i_], my[i_], mz[i_]);
+			}
+			float A1 = aLUT2d[symidx(r0, regions[i_])];
+			float Dx = DxLUT2d[symidx(r0, regions[i_])];
+			float Dy = DyLUT2d[symidx(r0, regions[i_])];
+			if (is0(m1)) {
+				A1 = 0;
+				Dx = 0;
+				Dy = 0;
+			}
+			h   += (2.0f*A1/(cz*cz)) * (m1 - m0);
+			h.x -= (Dx/cz)*(m0.y - m1.y);
+			h.y += (Dy/cz)*(m0.x - m1.x);
+		}
 
-		//	// top neighbor
-		//	{
-		//		i_  = idx(ix, iy, hclampz(iz+1));
-		//		float3 m2  = make_float3(mx[i_], my[i_], mz[i_]);
-		//		m2  = ( is0(m2)? m0: m2 );
-		//		float A2 = aLUT2d[symidx(r0, regions[i_])];
-		//		h += (2.0f*A2/(cz*cz)) * (m2 - m0);
-		//	}
+		// top neighbor
+		{
+			float3 m2 = make_float3(0.0f, 0.0f, 0.0f);
+			i_ = idx(ix, iy, hclampz(iz+1));
+			if (iz+1 < Nz || PBCz) {
+				m2 = make_float3(mx[i_], my[i_], mz[i_]);
+			}
+			float A2 = aLUT2d[symidx(r0, regions[i_])];
+			float Dx = DxLUT2d[symidx(r0, regions[i_])];
+			float Dy = DyLUT2d[symidx(r0, regions[i_])];
+			if (is0(m2)) {
+				A2 = 0;
+				Dx = 0;
+				Dy = 0;
+			}
+			h   += (2.0f*A2/(cz*cz)) * (m2 - m0);
+			h.x -= (Dx/cz)*(m2.y - m0.y);
+			h.y += (Dy/cz)*(m2.x - m0.x);
+		}
 	}
 
 	// write back, result is H + Hdmi + Hex

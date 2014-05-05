@@ -13,6 +13,8 @@ func (w *World) compileUnaryExpr(n *ast.UnaryExpr) Expr {
 		panic(err(n.Pos(), "not allowed:", n.Op))
 	case token.SUB:
 		return &minus{typeConv(n.X.Pos(), x, float64_t)}
+	case token.NOT:
+		return &not{typeConv(n.X.Pos(), x, bool_t)}
 	}
 }
 
@@ -21,3 +23,9 @@ type minus struct{ x Expr }
 func (m *minus) Type() reflect.Type { return float64_t }
 func (m *minus) Eval() interface{}  { return -m.x.Eval().(float64) }
 func (m *minus) Child() []Expr      { return []Expr{m.x} }
+
+type not struct{ x Expr }
+
+func (m *not) Type() reflect.Type { return bool_t }
+func (m *not) Eval() interface{}  { return !m.x.Eval().(bool) }
+func (m *not) Child() []Expr      { return []Expr{m.x} }

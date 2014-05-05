@@ -8,5 +8,7 @@ timestep := 1
 Tq := 1e-3
 b := (((t-t0) < timestep ) && ( (Tq > 1e-4) || ( t < 1.0e-13)))
 
-a_lie := !true
+if !true{
+	expect("should_not_happen", 0, 1, 0)
+}
 

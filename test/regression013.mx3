@@ -5,9 +5,9 @@
 
 Ny := 64
 Nx := 16*Ny
-Dx := 3.125e-9
+c := 3.125e-9
 setgridsize(Nx, Ny, 1)
-setcellsize(Dx, Dx, 15e-9)
+setcellsize(c, c, 15e-9)
 
 Msat    = 1.7e6
 Aex     = 21e-12

@@ -1,10 +1,12 @@
 /*
-	Binary boolean operations were missing.
-	Reported by Gabriel Chaves.
+	Binary boolean operations were missing (reported by Gabriel Chaves).
+	Unary ! was missing (reported by Raffaele Pellicelli)
 */
 
 t0 := 0
 timestep := 1
 Tq := 1e-3
 b := (((t-t0) < timestep ) && ( (Tq > 1e-4) || ( t < 1.0e-13)))
+
+a_lie := !true
 

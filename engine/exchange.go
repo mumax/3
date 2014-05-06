@@ -12,24 +12,24 @@ import (
 )
 
 var (
-	Aex           ScalarParam // Exchange stiffness
-	Dex           ScalarParam // interfacial DMI strength
-	Dx, Dy, Dz    ScalarParam // bulk DMI strength
-	B_exch        vAdder      // exchange field (T) output handle
-	lex2          aexchParam  // inter-cell exchange in 1e18 * Aex / Msat
-	dex2          dexchParam  // inter-cell DMI in 1e9 * Dex / Msat
-	dx2, dy2, dz2 dexchParam  // inter-cell DMI in 1e9 * Dex / Msat
-	E_exch        *GetScalar  // Exchange energy
-	Edens_exch    sAdder      // Exchange energy density
-	ExchCoupling  sSetter     // Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	Aex ScalarParam // Exchange stiffness
+	Dex ScalarParam // interfacial DMI strength
+	//Dx, Dy, Dz    ScalarParam // bulk DMI strength
+	B_exch vAdder     // exchange field (T) output handle
+	lex2   aexchParam // inter-cell exchange in 1e18 * Aex / Msat
+	dex2   dexchParam // inter-cell DMI in 1e9 * Dex / Msat
+	//dx2, dy2, dz2 dexchParam  // inter-cell DMI in 1e9 * Dex / Msat
+	E_exch       *GetScalar // Exchange energy
+	Edens_exch   sAdder     // Exchange energy density
+	ExchCoupling sSetter    // Average exchange coupling with neighbors. Useful to debug inter-region exchange
 )
 
 func init() {
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dex.init("Dex", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&dex2})
-	Dx.init("Dx", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dx2})
-	Dy.init("Dy", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dy2})
-	Dz.init("Dz", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dz2})
+	//Dx.init("Dx", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dx2})
+	//Dy.init("Dy", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dy2})
+	//Dz.init("Dz", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dz2})
 	B_exch.init("B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
 	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
@@ -37,16 +37,17 @@ func init() {
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
 	dex2.init(&Dex)
-	dx2.init(&Dx)
-	dy2.init(&Dy)
-	dz2.init(&Dz)
+	//dx2.init(&Dx)
+	//dy2.init(&Dy)
+	//dz2.init(&Dz)
 	ExchCoupling.init("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 }
 
 // Adds the current exchange field to dst
 func AddExchangeField(dst *data.Slice) {
 	inter := !Dex.isZero()
-	bulk := !(Dx.isZero() && Dy.isZero() && Dz.isZero())
+	//bulk := !(Dx.isZero() && Dy.isZero() && Dz.isZero())
+	bulk := false
 	switch {
 	case !inter && !bulk:
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())
@@ -56,8 +57,9 @@ func AddExchangeField(dst *data.Slice) {
 		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dex.IsUniform(), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), dex2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case bulk && !inter:
-		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dx.IsUniform() && Dy.IsUniform() && Dz.IsUniform(), "DMI: Msat, Aex, Dex must be uniform")
-		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dx2.Gpu(), dy2.Gpu(), dz2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
+		panic("todo")
+		//util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dx.IsUniform() && Dy.IsUniform() && Dz.IsUniform(), "DMI: Msat, Aex, Dex must be uniform")
+		//cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dx2.Gpu(), dy2.Gpu(), dz2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case inter && bulk:
 		util.Fatal("Cannot have induced and interfacial DMI at the same time")
 	}

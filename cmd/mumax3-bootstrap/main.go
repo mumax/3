@@ -16,12 +16,15 @@ import (
 const LD_LIBRARY_PATH = "LD_LIBRARY_PATH"
 const PATH = "PATH"
 
+var env []string
+
 func main() {
 
 	sep := string(os.PathListSeparator)
 	bin := execDir()
+	fmt.Println("bin:", bin)
 
-	env := os.Environ()
+	env = os.Environ()
 	for i := range env {
 		if strings.HasPrefix(env[i], LD_LIBRARY_PATH+"=") {
 			env[i] += sep + bin
@@ -29,7 +32,7 @@ func main() {
 		}
 		if strings.HasPrefix(env[i], PATH+"=") {
 			env[i] += sep + bin
-			check(os.Setenv(PATH, env[i][len(PATH):]))
+			fmt.Println(env[i])
 		}
 	}
 
@@ -54,6 +57,7 @@ func main() {
 func run(command string, args []string, pipe bool) error {
 	// prepare command
 	cmd := exec.Command(command, args...)
+	cmd.Env = env
 
 	done := make(chan int)
 	var stdout, stderr io.ReadCloser

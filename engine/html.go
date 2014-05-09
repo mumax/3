@@ -58,7 +58,7 @@ const templText = `
 	var history = new Array();
 	var histindex = 0;
 
-	function clikeydown(){
+	function clikeydown(event){
 		var cli = document.getElementById('cli');
 		var key = event.keyCode;
 		if (key == 13 && cli.value != ""){ // return key
@@ -84,7 +84,7 @@ const templText = `
 
 {{.Console "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-{{.CliBox "cli" "" "onkeydown=\"clikeydown();\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
+{{.CliBox "cli" "" "onkeydown=\"clikeydown(event);\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
 
 </div>
 

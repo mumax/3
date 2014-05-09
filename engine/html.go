@@ -64,6 +64,8 @@ const templText = `
 		if (key == 13 && cli.value != ""){ // return key
 			history.push(cli.value);
 			histindex = history.length;
+			notifyel('cli', 'value');
+			cli.value = "";
 		}
 		if (key == 38){ // up key
 			if (histindex > 0) { histindex--; }
@@ -82,7 +84,7 @@ const templText = `
 
 {{.Console "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-{{.TextBox "cli" "" "onkeydown=\"clikeydown();\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""}}
+{{.CliBox "cli" "" "onkeydown=\"clikeydown();\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
 
 </div>
 

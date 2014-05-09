@@ -543,16 +543,6 @@ func (g *guistate) EvalGUI(code string) {
 	g.UpdateKeepAlive()
 }
 
-func Eval(code string) {
-	tree, err := World.Compile(code)
-	if err == nil {
-		LogIn(rmln(tree.Format()))
-		tree.Eval()
-	} else {
-		LogErr(code + "\n" + err.Error())
-	}
-}
-
 //
 //// round duration to 1s accuracy
 //func roundt(t time.Duration) time.Duration {

@@ -79,13 +79,20 @@ func (w *scope) Func(name string, f interface{}, doc ...string) {
 
 // add identifier but check that it's not declared yet.
 func (w *scope) declare(key string, value Expr, doc ...string) {
+	if ok := w.safeDeclare(key, value); !ok {
+		panic("identifier " + key + " already defined")
+	}
+	w.document(key, doc...)
+}
+
+func (w *scope) safeDeclare(key string, value Expr) (ok bool) {
 	w.init()
 	lname := strings.ToLower(key)
 	if _, ok := w.Identifiers[lname]; ok {
-		panic("identifier " + key + " already defined")
+		return false
 	}
 	w.Identifiers[lname] = value
-	w.document(key, doc...)
+	return true
 }
 
 // resolve identifier in this scope or its parents

@@ -42,7 +42,10 @@ func (w *World) compileDefine(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
 		panic(err(a.Pos(), "non-name on left side of :="))
 	}
 	addr := reflect.New(r.Type())
-	w.declare(ident.Name, &reflectLvalue{addr.Elem()})
+	ok = w.safeDeclare(ident.Name, &reflectLvalue{addr.Elem()})
+	if !ok {
+		panic(err(a.Pos(), "already defined: "+ident.Name))
+	}
 	return w.compileAssign(a, lhs, r)
 }
 

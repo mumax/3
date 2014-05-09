@@ -7,6 +7,17 @@ import (
 	"reflect"
 )
 
+func Eval(code string) {
+	tree, err := World.Compile(code)
+	if err != nil {
+		LogIn(code)
+		LogErr(err.Error())
+		return
+	}
+	LogIn(rmln(tree.Format()))
+	tree.Eval()
+}
+
 // holds the script state (variables etc)
 var World = script.NewWorld()
 
@@ -55,11 +66,6 @@ func EvalFile(code *script.BlockStmt) {
 		code.Children[i].Eval()
 	}
 }
-
-// evaluate code, report error (behaviour for GUI)
-//func EvalGUI(code*script.BlockStmt){
-//
-//}
 
 // wraps LValue and provides empty Child()
 type lValueWrapper struct {

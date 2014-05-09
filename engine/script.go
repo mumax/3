@@ -18,6 +18,15 @@ func Eval(code string) {
 	tree.Eval()
 }
 
+func Eval1Line(code string) interface{} {
+	tree, err := World.Compile(code)
+	if err != nil {
+		LogErr(err.Error())
+		return nil
+	}
+	return tree.Children[0].Eval()
+}
+
 // holds the script state (variables etc)
 var World = script.NewWorld()
 

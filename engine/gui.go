@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"path"
 	"reflect"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -155,6 +156,20 @@ func (g *guistate) prepareMesh() {
 		})
 		g.Set("setmeshwarn", "mesh up to date")
 	})
+}
+
+func (g *guistate) IntValue(id string) int {
+	s := g.StringValue(id)
+	r := fmt.Sprint(Eval1Line(s))
+	i, _ := strconv.Atoi(r)
+	return i
+}
+
+func (g *guistate) FloatValue(id string) float64 {
+	s := g.StringValue(id)
+	r := fmt.Sprint(Eval1Line(s))
+	f, _ := strconv.ParseFloat(r, 64)
+	return f
 }
 
 // see prepareServer

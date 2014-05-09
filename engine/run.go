@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"os"
 )
 
 // Solver globals
@@ -42,6 +43,7 @@ func init() {
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
 	DeclVar("Headroom", &Headroom, "Solver headroom")
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
+	DeclFunc("Exit", Exit, "Exit from the program")
 	SetSolver(DORMANDPRINCE)
 }
 
@@ -200,4 +202,9 @@ func SanityCheck() {
 	if Aex.isZero() {
 		util.Log("Note: Aex = 0")
 	}
+}
+
+func Exit() {
+	Close()
+	os.Exit(0)
 }

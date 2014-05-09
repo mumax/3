@@ -64,7 +64,6 @@ const templText = `
 		if (key == 13 && cli.value != ""){ // return key
 			history.push(cli.value);
 			histindex = history.length;
-			//cli.onchange();
 		}
 		if (key == 38){ // up key
 			if (histindex > 0) { histindex--; }

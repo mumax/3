@@ -44,7 +44,7 @@ func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
 		util.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
 	} else {
-		LogOutput(msg, ":", have, "OK")
+		LogOut(msg, ":", have, "OK")
 	}
 	// note: we also check "want" for NaN in case "have" and "want" are switched.
 }
@@ -94,7 +94,7 @@ func Download(q Quantity) *data.Slice {
 
 // print with special formatting for some known types
 func myprint(msg ...interface{}) {
-	LogOutput(myFmt(msg)...)
+	LogOut(myFmt(msg)...)
 }
 
 // mumax specific formatting (Slice -> average, etc).

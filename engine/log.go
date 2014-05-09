@@ -11,6 +11,43 @@ var (
 	logfile *os.File // saves history of input commands +  output
 )
 
+func LogIn(msg ...interface{}) {
+	logGUI("", sprint(msg...), "")
+	logFile(msg...)
+	fmt.Println(msg...)
+}
+
+func LogOut(msg ...interface{}) {
+	msg2 := "/*" + fmt.Sprintln(msg...) + "*/"
+	logFile(msg2)
+	fmt.Println(msg2)
+}
+
+func LogErr(msg ...interface{}) {
+	msg2 := "/*" + fmt.Sprintln(msg...) + "*/"
+	logFile(msg2)
+	logGUI(`<b>`, msg2, `</b>`)
+	fmt.Fprintln(os.Stderr, msg2)
+}
+
+func logFile(msg ...interface{}) {
+	out := openlog()
+	if out != nil {
+		fmt.Fprintln(out, msg...)
+	}
+}
+
+func logGUI(pre, msg, post string) {
+	if len(msg) > 1000 {
+		msg = msg[:1000-len("...")] + "..."
+	}
+	if hist != "" { // prepend newline
+		hist += "\n"
+	}
+	hist += pre + msg + post
+	// TODO: push to web !!
+}
+
 // returns log file of input commands, opening it first if needed
 func openlog() *os.File {
 	if logfile == nil {
@@ -23,33 +60,9 @@ func openlog() *os.File {
 	return logfile
 }
 
-func logFile(msg ...interface{}) {
-	out := openlog()
-	if out != nil {
-		fmt.Fprintln(out, msg...)
-	}
-}
-
-func LogInput(msg ...interface{}) {
-	logFile(msg...)
-	logGUI(msg...)
-}
-
-func LogOutput(msg ...interface{}) {
-	logGUI(msg...)
-	msg2 := "/*" + fmt.Sprintln(msg...) + "*/"
-	logFile(msg2)
-}
-
-func logGUI(msg ...interface{}) {
-	m := fmt.Sprintln(msg...)
-	m = m[:len(m)-1] // strip newline
-	if len(m) > 1000 {
-		m = m[:1000-3] + "..."
-	}
-	if hist != "" { // prepend newline
-		hist += "\n"
-	}
-	hist += m
-	fmt.Println(m)
+// like fmt.Sprint but with spaces between args
+func sprint(msg ...interface{}) string {
+	str := fmt.Sprintln(msg...)
+	str = str[:len(str)-1] // strip newline
+	return str
 }

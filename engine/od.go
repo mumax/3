@@ -23,7 +23,7 @@ func SetOD(od string, force bool) {
 	if !strings.HasSuffix(OD, "/") {
 		OD += "/"
 	}
-	LogOutput("output directory:", OD)
+	LogOut("output directory:", OD)
 
 	{ // make OD
 		wd, err := os.Getwd()

@@ -51,7 +51,7 @@ type LValue interface {
 func EvalFile(code *script.BlockStmt) {
 	for i := range code.Children {
 		formatted := rmln(script.Format(code.Node[i]))
-		LogInput(formatted)
+		LogIn(formatted)
 		code.Children[i].Eval()
 	}
 }

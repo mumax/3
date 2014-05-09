@@ -307,7 +307,7 @@ func (g *guistate) prepareDisplay() {
 		name := g.StringValue("renderQuant")
 		q := g.Quants[name]
 		if q == nil {
-			LogOutput("display: unknown quantity:", name)
+			LogErr("display: unknown quantity:", name)
 			return
 		}
 		g.render.quant = q
@@ -546,10 +546,10 @@ func (g *guistate) EvalGUI(code string) {
 func Eval(code string) {
 	tree, err := World.Compile(code)
 	if err == nil {
-		LogInput(rmln(tree.Format()))
+		LogIn(rmln(tree.Format()))
 		tree.Eval()
 	} else {
-		LogOutput(code + "\n" + err.Error())
+		LogErr(code + "\n" + err.Error())
 	}
 }
 

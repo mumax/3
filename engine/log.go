@@ -12,40 +12,42 @@ var (
 )
 
 func LogIn(msg ...interface{}) {
-	logGUI("", sprint(msg...), "")
-	logFile(msg...)
-	fmt.Println(msg...)
+	str := sprint(msg...)
+	log2GUI(str)
+	log2File(str)
+	fmt.Println(str)
 }
 
 func LogOut(msg ...interface{}) {
-	msg2 := "/*" + fmt.Sprintln(msg...) + "*/"
-	logFile(msg2)
-	fmt.Println(msg2)
+	str := "//" + sprint(msg...)
+	log2GUI(str)
+	log2File(str)
+	fmt.Println(str)
 }
 
 func LogErr(msg ...interface{}) {
-	msg2 := "/*" + fmt.Sprintln(msg...) + "*/"
-	logFile(msg2)
-	logGUI(`<b>`, msg2, `</b>`)
-	fmt.Fprintln(os.Stderr, msg2)
+	str := "//" + sprint(msg...)
+	log2GUI(str)
+	log2File(str)
+	fmt.Fprintln(os.Stderr, str)
 }
 
-func logFile(msg ...interface{}) {
+func log2File(msg string) {
 	out := openlog()
 	if out != nil {
-		fmt.Fprintln(out, msg...)
+		fmt.Fprintln(out, msg)
 	}
 }
 
-func logGUI(pre, msg, post string) {
+func log2GUI(msg string) {
 	if len(msg) > 1000 {
 		msg = msg[:1000-len("...")] + "..."
 	}
 	if hist != "" { // prepend newline
 		hist += "\n"
 	}
-	hist += pre + msg + post
-	// TODO: push to web !!
+	hist += msg
+	// TODO: push to web ?
 }
 
 // returns log file of input commands, opening it first if needed

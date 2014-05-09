@@ -36,7 +36,6 @@ func (w *World) compileAssign(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
 
 // compile a := b
 func (w *World) compileDefine(a *ast.AssignStmt, lhs ast.Expr, r Expr) Expr {
-	// TODO: catch
 	ident, ok := lhs.(*ast.Ident)
 	if !ok {
 		panic(err(a.Pos(), "non-name on left side of :="))

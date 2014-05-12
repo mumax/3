@@ -108,17 +108,18 @@ func (d *Page) Attr(id string, k string, v interface{}) {
 	d.elem(id).attr(k, v)
 }
 
-func (d *Page) Disable(id string, disable bool) {
-	d.Attr(id, "disabled", disable)
-}
 
-func (d *Page) Display(id string, visible bool) {
+/*func (d *Page) Disable(id string, disable bool) {
+	d.Attr(id, "disabled", disable)
+}*/
+
+/*func (d *Page) Display(id string, visible bool) {
 	if visible {
 		d.Attr(id, "style.display", "none")
 	} else {
 		d.Attr(id, "style.display", "block")
 	}
-}
+}*/
 
 // OnEvent sets a handler to be called when an event happens
 // to the HTML element with given id. The event depends on the

@@ -20,9 +20,9 @@ func Mesh() *data.Mesh {
 	return &globalmesh_
 }
 
-func arg(test bool){
+func arg(msg string, test bool){
 	if !test{
-		panic(UserErr("illegal arugment"))
+		panic(UserErr(msg + ": illegal arugment"))
 	}
 }
 
@@ -33,9 +33,9 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 	SetBusy(true)
 	defer SetBusy(false)
 
-	arg(Nx > 0 && Ny > 0 && Nz > 0)
-	arg(cellSizeX > 0 && cellSizeY > 0 && cellSizeZ > 0)
-	arg(pbcx >= 0 && pbcy >= 0 && pbcz >= 0)
+	arg("GridSize", Nx > 0 && Ny > 0 && Nz > 0)
+	arg("CellSize", cellSizeX > 0 && cellSizeY > 0 && cellSizeZ > 0)
+	arg("PBC", pbcx >= 0 && pbcy >= 0 && pbcz >= 0)
 
 	prevSize := globalmesh_.Size()
 	pbc := []int{pbcx, pbcy, pbcz}

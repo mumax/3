@@ -127,11 +127,11 @@ func (g *guistate) prepareConsole() {
 
 // see prepareServer
 func (g *guistate) prepareMesh() {
-	g.Disable("setmesh", true) // button only enabled if pressing makes sense
+	//g.Disable("setmesh", true) // button only enabled if pressing makes sense
 	const MESHWARN = "&#x26a0; Click to update mesh (may take some time)"
 
 	warnmesh := func() {
-		g.Disable("setmesh", false)
+		//g.Disable("setmesh", false)
 		g.Set("setmeshwarn", MESHWARN)
 	}
 
@@ -146,7 +146,7 @@ func (g *guistate) prepareMesh() {
 	g.OnEvent("pz", func() { Inject <- func() { lazy_pbc[Z] = g.IntValue("pz"); warnmesh() } })
 
 	g.OnEvent("setmesh", func() {
-		g.Disable("setmesh", true)
+		//g.Disable("setmesh", true)
 		Inject <- (func() {
 			g.EvalGUI(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
 				g.Value("nx"), g.Value("ny"), g.Value("nz"),
@@ -361,11 +361,7 @@ func (g *guistate) prepareOnUpdate() {
 		g.UpdateKeepAlive() // keep track of when browser was last seen alive
 
 		if GetBusy() { // busy, e.g., calculating kernel, run loop will not accept commands.
-			g.disableControls(true)
 			return
-		} else {
-			g.disableControls(false) // make sure everything is enabled
-			//g.Prog(0, 100, "Running") // reset progress bar in case we forgot
 		}
 
 		Inject <- (func() { // sends to run loop to be executed in between time steps
@@ -551,13 +547,13 @@ func (g *guistate) Prog(a, total int, msg string) {
 	util.PrintProgress(a, total, msg)
 }
 
-func (g *guistate) disableControls(busy bool) {
+/*func (g *guistate) disableControls(busy bool) {
 	g.Disable("cli", busy)
 	g.Disable("run", busy)
 	g.Disable("relax", busy)
 	g.Disable("steps", busy)
 	g.Disable("break", busy)
-}
+}*/
 
 // Eval code + update keepalive in case the code runs long
 func (g *guistate) EvalGUI(code string) {

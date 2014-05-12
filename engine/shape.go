@@ -139,9 +139,10 @@ func universe(x, y, z float64) bool {
 
 func ImageShape(fname string) Shape {
 	r, err1 := os.Open(fname)
-	util.FatalErr(err1)
+	CheckRecoverable(err1)
+	defer r.Close()
 	img, _, err2 := image.Decode(r)
-	util.FatalErr(err2)
+	CheckRecoverable(err2)
 
 	width := img.Bounds().Max.X
 	height := img.Bounds().Max.Y

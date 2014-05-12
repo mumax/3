@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
-	"log"
 	"math"
 	"reflect"
 )
@@ -63,7 +62,7 @@ func (e *excitation) RemoveExtraTerms() {
 		return
 	}
 
-	log.Println("REMOVING EXTRA TERMS FROM", e.Name())
+	LogOut("REMOVING EXTRA TERMS FROM", e.Name())
 	for _, m := range e.extraTerms {
 		m.mask.Free()
 	}

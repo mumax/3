@@ -6,7 +6,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/gui"
 	"github.com/mumax/3/util"
-	"log"
 	"math/rand"
 	"net/http"
 	"path"
@@ -445,7 +444,7 @@ func (g *guistate) prepareOnUpdate() {
 func (g *guistate) Doc(quant string) string {
 	doc, ok := World.Doc[quant]
 	if !ok {
-		log.Println("no doc for", quant)
+		LogErr("no doc for", quant)
 	}
 	return doc
 }
@@ -574,7 +573,6 @@ func (g *guistate) EvalGUI(code string) {
 	g.UpdateKeepAlive()
 }
 
-type UserErr string
 
 //
 //// round duration to 1s accuracy

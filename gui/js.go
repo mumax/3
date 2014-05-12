@@ -1,8 +1,13 @@
 package gui
 
 const JS = `<script type="text/javascript">
+
+function genPageID(){
+	return Math.floor((Math.random()* 10000000000)+1);
+}
+
 // random ID number for this page, to assure proper update if open in multiple browsers
-var pageID = Math.floor((Math.random()* 10000000000)+1);
+var pageID = genPageID();
 
 // auto-update rate
 var tick = 300;
@@ -86,6 +91,7 @@ function setSelect(id, value){
 	}
 }
 
+var pending = false; // only one request at a time
 
 // onreadystatechange function for update http request.
 // updates the DOM with new values received from server.
@@ -105,7 +111,9 @@ function updateDOM(req){
 			}
 		} else {
 			showErr("Disconnected");	
+			pageID = genPageID(); // communication got lost, so refresh everything next time
 		}
+		pending=false;
 	}
 }
 
@@ -113,6 +121,7 @@ function updateDOM(req){
 // periodically called via setInterval()
 function update(){
 		try{
+			pending = true;
 			var req = new XMLHttpRequest();
 			req.open("POST", document.URL, true); 
 			req.timeout = tick;
@@ -125,7 +134,7 @@ function update(){
 }
 
 function doAutoUpdate(){
-	if (autoUpdate){
+	if (autoUpdate && !pending){
 		update();
 	}
 }

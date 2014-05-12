@@ -123,7 +123,7 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 	Type: {{.Select "solvertype" "rk45" "euler" "heun" "rk23" "rk45"}}
 	<table>
-		<tr style="background-color:white"> <td>
+		<tr> <td>
 
 	<table>
 		<tr title="{{.Data.Doc "Run"   }}"> <td> {{.Button "run"   "Run"  }}</td> <td> {{.TextBox "runtime"   1e-9  "size=8"}}s</td></tr> 
@@ -229,8 +229,6 @@ const CSS = `
 		body  { margin-left: 5%; margin-right:5%; font-family: sans-serif; font-size: 14px; }
 		img   { margin: 10px; }
 		table { border-collapse: collapse; }
-		tr:nth-child(even) { background-color: white; }
-		tr:nth-child(odd)  { background-color: white; }
 		td        { padding: 1px 5px; }
 		hr        { border-style: none; border-top: 1px solid #CCCCCC; }
 		a         { color: #375EAB; text-decoration: none; }

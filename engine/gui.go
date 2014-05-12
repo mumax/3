@@ -152,6 +152,13 @@ func (g *guistate) prepareMesh() {
 				g.Value("nx"), g.Value("ny"), g.Value("nz"),
 				g.Value("cx"), g.Value("cy"), g.Value("cz"),
 				g.Value("px"), g.Value("py"), g.Value("pz")))
+			// update lazy_* sizes to be up-to date with proper mesh
+			n := Mesh().Size()
+			c := Mesh().CellSize()
+			p := Mesh().PBC()
+			lazy_gridsize = []int{n[X], n[Y], n[Z]}
+			lazy_cellsize = []float64{c[X], c[Y], c[Z]}
+			lazy_pbc = []int{p[X], p[Y], p[Z]}
 
 		})
 		g.Set("setmeshwarn", "mesh up to date")
@@ -554,9 +561,20 @@ func (g *guistate) disableControls(busy bool) {
 
 // Eval code + update keepalive in case the code runs long
 func (g *guistate) EvalGUI(code string) {
+	defer func(){
+		if err := recover(); err != nil{
+			if userErr, ok := err.(UserErr); ok{
+				LogErr(userErr)
+			}else{
+				panic(err)
+			}
+		}
+	}()
 	Eval(code)
 	g.UpdateKeepAlive()
 }
+
+type UserErr string
 
 //
 //// round duration to 1s accuracy

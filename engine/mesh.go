@@ -20,12 +20,22 @@ func Mesh() *data.Mesh {
 	return &globalmesh_
 }
 
+func arg(test bool){
+	if !test{
+		panic(UserErr("illegal arugment"))
+	}
+}
+
 // Set the simulation mesh to Nx x Ny x Nz cells of given size.
 // Can be set only once at the beginning of the simulation.
 // TODO: dedup arguments from globals
 func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy, pbcz int) {
 	SetBusy(true)
 	defer SetBusy(false)
+
+	arg(Nx > 0 && Ny > 0 && Nz > 0)
+	arg(cellSizeX > 0 && cellSizeY > 0 && cellSizeZ > 0)
+	arg(pbcx >= 0 && pbcy >= 0 && pbcz >= 0)
 
 	prevSize := globalmesh_.Size()
 	pbc := []int{pbcx, pbcy, pbcz}

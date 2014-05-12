@@ -150,6 +150,7 @@ func Steps(n int) {
 	RunWhile(func() bool { return NSteps < stop })
 }
 
+// Runs as long as condition returns true, saves output.
 func RunWhile(condition func()bool){
 	SanityCheck()
 	pause = false // may be set by <-Inject
@@ -158,7 +159,6 @@ func RunWhile(condition func()bool){
 	pause = true
 }
 
-// Runs as long as condition returns true.
 func runWhile(condition func() bool, output bool) {
 	for condition() && !pause {
 		select {

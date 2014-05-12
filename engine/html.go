@@ -84,7 +84,7 @@ const templText = `
 
 {{.Console "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
-{{.CliBox "cli" "" "onkeydown=\"clikeydown(event);\"" "placeholder=\"type commands here\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
+{{.CliBox "cli" "" "onkeydown=\"clikeydown(event);\"" "placeholder=\"type commands here, or up/down\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
 
 </div>
 
@@ -92,7 +92,7 @@ const templText = `
 {{.Data.Div "mesh"}}
 
 		<table>
-			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=8"}} </td> <td> &times; {{.TextBox "ny" "" "size=8"}}</td> <td> &times; {{.TextBox "nz" "" "size=8"}}</td> <td>  cells             </td> </tr>
+			<tr> <td>gridsize: </td> <td>{{.TextBox "nx" "" "size=8"}} </td> <td> &times; {{.TextBox "ny" "" "size=8"}}</td> <td> &times; {{.TextBox "nz" "" "size=8"}}</td> <td>  cells            </td> </tr>
 			<tr> <td>cellsize: </td> <td>{{.TextBox "cx" "" "size=8"}} </td> <td> &times; {{.TextBox "cy" "" "size=8"}}</td> <td> &times; {{.TextBox "cz" "" "size=8"}}</td> <td>  m<sup>3</sup>    </td> </tr>
 			<tr> <td>PBC:      </td> <td>{{.TextBox "px" "" "size=8"}} </td> <td> &times; {{.TextBox "py" "" "size=8"}}</td> <td> &times; {{.TextBox "pz" "" "size=8"}}</td> <td>  repetitions </td> </tr>
 			<tr> <td>worldsize:</td> <td>{{.Span    "wx" ""}} </td> <td> &times; {{.Span    "wy" ""}}</td> <td> &times; {{.Span    "wz" ""}}</td> <td>  nm<sup>3</sup> </td> </tr>

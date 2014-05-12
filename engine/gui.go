@@ -251,12 +251,16 @@ var (
 	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23", 5: "rk45"}
 )
 
+func Break(){
+	Inject <- func() { pause = true } 
+}
+
 // see prepareServer
 func (g *guistate) prepareSolver() {
-	g.OnEvent("run", g.cmd("Run", "runtime"))
-	g.OnEvent("steps", g.cmd("Steps", "runsteps"))
-	g.OnEvent("break", func() { Inject <- func() { pause = true } })
-	g.OnEvent("relax", func() { Inject <- func() { g.EvalGUI("relax()") } })
+	g.OnEvent("run", func() { Break(); Inject<-func(){ g.EvalGUI(sprint("Run(", g.StringValue("runtime"), ")")) }}) 
+	g.OnEvent("steps", func() { Break(); Inject<-func(){ g.EvalGUI(sprint("Steps(", g.StringValue("runsteps"), ")")) }}) 
+	g.OnEvent("break", Break)
+	g.OnEvent("relax", func() { Break(); Inject <- func() { g.EvalGUI("relax()") } })
 	g.OnEvent("mindt", func() { Inject <- func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) } })
 	g.OnEvent("maxdt", func() { Inject <- func() { g.EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
 	g.OnEvent("fixdt", func() { Inject <- func() { g.EvalGUI("FixDt=" + g.StringValue("fixdt")) } })
@@ -459,7 +463,7 @@ func (g *guistate) UnitOf(quant string) string {
 
 // returns func that injects func that executes cmd(args),
 // with args ids for GUI element values.
-func (g *guistate) cmd(cmd string, args ...string) func() {
+/*func (g *guistate) cmd(cmd string, args ...string) func() {
 	return func() {
 		Inject <- func() {
 			code := cmd + "("
@@ -473,7 +477,7 @@ func (g *guistate) cmd(cmd string, args ...string) func() {
 			g.EvalGUI(code)
 		}
 	}
-}
+}*/
 
 // renders page title for PrepareServer
 func (g *guistate) Title() string   { return util.NoExt(path.Base(OD)) }

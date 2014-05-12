@@ -13,5 +13,5 @@ func (e *slider) update(id string) []jsCall {
 func (d *Page) Range(id string, min, max, value int, extra ...string) string {
 	e := &slider{data: data{value}}
 	d.addElem(id, e)
-	return fmt.Sprintf(`<input type=range id=%v min=%v max=%v onchange="notifyel('%v', 'value')"/>`, id, min, max, id)
+	return fmt.Sprintf(`<input type=range id=%v min=%v max=%v oninput="notifyel('%v', 'value')" onchange="notifyel('%v', 'value')"/>`, id, min, max, id)
 }

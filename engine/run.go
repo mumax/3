@@ -150,14 +150,19 @@ func Steps(n int) {
 	RunWhile(func() bool { return NSteps < stop })
 }
 
+func RunWhile(condition func()bool){
+	const output = true
+	runWhile(condition, output)
+}
+
 // Runs as long as condition returns true.
-func RunWhile(condition func() bool) {
+func runWhile(condition func() bool, output bool) {
 	SanityCheck()
 	pause = false
 	for condition() && !pause {
 		select {
 		default:
-			step(true) // output = true
+			step(output) 
 		// accept tasks form Inject channel
 		case f := <-Inject:
 			f()

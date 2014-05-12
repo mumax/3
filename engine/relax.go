@@ -76,14 +76,6 @@ func relaxSteps(n int) {
 	stop := NSteps + n
 	cond := func()bool{return NSteps < stop}
 	const output = false
-	for cond() && !pause {
-		select {
-		default:
-			step(output) // output=false
-		// accept tasks form Inject channel
-		case f := <-Inject:
-			f()
-		}
-	}
+	runWhile(cond, output)
 	Time = t0
 }

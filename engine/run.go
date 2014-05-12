@@ -151,14 +151,15 @@ func Steps(n int) {
 }
 
 func RunWhile(condition func()bool){
+	SanityCheck()
+	pause = false // may be set by <-Inject
 	const output = true
 	runWhile(condition, output)
+	pause = true
 }
 
 // Runs as long as condition returns true.
 func runWhile(condition func() bool, output bool) {
-	SanityCheck()
-	pause = false
 	for condition() && !pause {
 		select {
 		default:
@@ -168,7 +169,6 @@ func runWhile(condition func() bool, output bool) {
 			f()
 		}
 	}
-	pause = true
 }
 
 // Runs as long as browser is connected to gui.

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	//"strconv"
 	"sync"
 	"text/template"
 )
@@ -61,45 +60,6 @@ func (d *Page) StringValue(id string) string {
 	}
 }
 
-// BoolValue is like Value but returns the value as bool,
-// converting if necessary. Panics if conversion is not possible.
-//func (d *Page) BoolValue(id string) bool {
-//	v := d.Value(id)
-//	if b, ok := v.(bool); ok {
-//		return b
-//	} else {
-//		b, err := strconv.ParseBool(fmt.Sprint(v))
-//		check(err)
-//		return b
-//	}
-//}
-
-// IntValue is like Value but returns the value as int,
-// converting if necessary. Panics if conversion is not possible.
-//func (d *Page) IntValue(id string) int {
-//	v := d.Value(id)
-//	if b, ok := v.(int); ok {
-//		return b
-//	} else {
-//		b, err := strconv.Atoi(fmt.Sprint(v))
-//		check(err)
-//		return b
-//	}
-//}
-
-// FloatValue is like Value but returns the value as float64,
-// converting if necessary. Panics if conversion is not possible.
-//func (d *Page) FloatValue(id string) float64 {
-//	v := d.Value(id)
-//	if b, ok := v.(float64); ok {
-//		return b
-//	} else {
-//		b, err := strconv.ParseFloat(fmt.Sprint(v), 64)
-//		check(err)
-//		return b
-//	}
-//}
-
 func (d *Page) Set(id string, v interface{}) {
 	d.elem(id).set(v)
 }
@@ -107,18 +67,6 @@ func (d *Page) Set(id string, v interface{}) {
 func (d *Page) Attr(id string, k string, v interface{}) {
 	d.elem(id).attr(k, v)
 }
-
-/*func (d *Page) Disable(id string, disable bool) {
-	d.Attr(id, "disabled", disable)
-}*/
-
-/*func (d *Page) Display(id string, visible bool) {
-	if visible {
-		d.Attr(id, "style.display", "none")
-	} else {
-		d.Attr(id, "style.display", "block")
-	}
-}*/
 
 // OnEvent sets a handler to be called when an event happens
 // to the HTML element with given id. The event depends on the

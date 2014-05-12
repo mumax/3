@@ -460,24 +460,6 @@ func (g *guistate) UnitOf(quant string) string {
 	}
 }
 
-// returns func that injects func that executes cmd(args),
-// with args ids for GUI element values.
-/*func (g *guistate) cmd(cmd string, args ...string) func() {
-	return func() {
-		Inject <- func() {
-			code := cmd + "("
-			if len(args) > 0 {
-				code += g.StringValue(args[0])
-			}
-			for i := 1; i < len(args); i++ {
-				code += ", " + g.StringValue(args[i])
-			}
-			code += ")"
-			g.EvalGUI(code)
-		}
-	}
-}*/
-
 // renders page title for PrepareServer
 func (g *guistate) Title() string   { return util.NoExt(path.Base(OD)) }
 func (g *guistate) Version() string { return UNAME }
@@ -549,14 +531,6 @@ func (g *guistate) Prog(a, total int, msg string) {
 	g.Set("busy", msg)
 	util.PrintProgress(a, total, msg)
 }
-
-/*func (g *guistate) disableControls(busy bool) {
-	g.Disable("cli", busy)
-	g.Disable("run", busy)
-	g.Disable("relax", busy)
-	g.Disable("steps", busy)
-	g.Disable("break", busy)
-}*/
 
 // Eval code + update keepalive in case the code runs long
 func (g *guistate) EvalGUI(code string) {

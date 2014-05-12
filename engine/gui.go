@@ -250,14 +250,14 @@ var (
 	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23", 5: "rk45"}
 )
 
-func Break(){
-	Inject <- func() { pause = true } 
+func Break() {
+	Inject <- func() { pause = true }
 }
 
 // see prepareServer
 func (g *guistate) prepareSolver() {
-	g.OnEvent("run", func() { Break(); Inject<-func(){ g.EvalGUI(sprint("Run(", g.StringValue("runtime"), ")")) }}) 
-	g.OnEvent("steps", func() { Break(); Inject<-func(){ g.EvalGUI(sprint("Steps(", g.StringValue("runsteps"), ")")) }}) 
+	g.OnEvent("run", func() { Break(); Inject <- func() { g.EvalGUI(sprint("Run(", g.StringValue("runtime"), ")")) } })
+	g.OnEvent("steps", func() { Break(); Inject <- func() { g.EvalGUI(sprint("Steps(", g.StringValue("runsteps"), ")")) } })
 	g.OnEvent("break", Break)
 	g.OnEvent("relax", func() { Break(); Inject <- func() { g.EvalGUI("relax()") } })
 	g.OnEvent("mindt", func() { Inject <- func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) } })
@@ -560,11 +560,11 @@ func (g *guistate) Prog(a, total int, msg string) {
 
 // Eval code + update keepalive in case the code runs long
 func (g *guistate) EvalGUI(code string) {
-	defer func(){
-		if err := recover(); err != nil{
-			if userErr, ok := err.(UserErr); ok{
+	defer func() {
+		if err := recover(); err != nil {
+			if userErr, ok := err.(UserErr); ok {
 				LogErr(userErr)
-			}else{
+			} else {
 				panic(err)
 			}
 		}
@@ -572,7 +572,6 @@ func (g *guistate) EvalGUI(code string) {
 	Eval(code)
 	g.UpdateKeepAlive()
 }
-
 
 //
 //// round duration to 1s accuracy

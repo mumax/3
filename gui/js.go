@@ -8,15 +8,25 @@ var pageID = Math.floor((Math.random()* 10000000000)+1);
 var tick = 300;
 var autoUpdate = true;
 
+var disconnects = 0; // number of successive disconnects
+
 // show error in document (non-intrusive alert())
 function showErr(err){
-	if (err != ""){
-		document.body.style.background = "#DDDDDD";
+	if (err != ""){ 
+		disconnects++; // don't show error just yet
 	}else{
+		disconnects = 0;
+		document.getElementById("ErrorBox").innerHTML = "";
 		document.body.style.background = "#FFFFFF";
 	}
-	document.getElementById("ErrorBox").innerHTML = err;
+	if (disconnects > 3){ // disconnected for some time, show error
+		var col = (256+3)-disconnects; // gradually fade out background color
+		if(col<210){col=210;}
+		document.body.style.background = "rgb(" + col+"," + col+"," + col+")";
+		document.getElementById("ErrorBox").innerHTML = err;
+	}
 }
+
 
 // show debug message in document
 function msg(err){

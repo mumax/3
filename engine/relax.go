@@ -74,7 +74,7 @@ func Relax() {
 func relaxSteps(n int) {
 	t0 := Time
 	stop := NSteps + n
-	cond := func()bool{return NSteps < stop}
+	cond := func() bool { return NSteps < stop }
 	const output = false
 	runWhile(cond, output)
 	Time = t0

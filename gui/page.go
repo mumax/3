@@ -108,7 +108,6 @@ func (d *Page) Attr(id string, k string, v interface{}) {
 	d.elem(id).attr(k, v)
 }
 
-
 /*func (d *Page) Disable(id string, disable bool) {
 	d.Attr(id, "disabled", disable)
 }*/

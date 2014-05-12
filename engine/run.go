@@ -151,7 +151,7 @@ func Steps(n int) {
 }
 
 // Runs as long as condition returns true, saves output.
-func RunWhile(condition func()bool){
+func RunWhile(condition func() bool) {
 	SanityCheck()
 	pause = false // may be set by <-Inject
 	const output = true
@@ -163,7 +163,7 @@ func runWhile(condition func() bool, output bool) {
 	for condition() && !pause {
 		select {
 		default:
-			step(output) 
+			step(output)
 		// accept tasks form Inject channel
 		case f := <-Inject:
 			f()

@@ -20,8 +20,8 @@ func Mesh() *data.Mesh {
 	return &globalmesh_
 }
 
-func arg(msg string, test bool){
-	if !test{
+func arg(msg string, test bool) {
+	if !test {
 		panic(UserErr(msg + ": illegal arugment"))
 	}
 }

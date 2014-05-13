@@ -1,3 +1,4 @@
+// package prof provides run-time profiling.
 package prof
 
 import (

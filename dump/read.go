@@ -1,3 +1,4 @@
+// legacy dump data format.
 package dump
 
 import (

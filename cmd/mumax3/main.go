@@ -1,6 +1,5 @@
-package main
-
 // mumax3 main command
+package main
 
 import (
 	"flag"

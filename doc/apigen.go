@@ -1,6 +1,5 @@
-package main
-
 // Automatic generation of api.html based on template.
+package main
 
 import (
 	"github.com/mumax/3/cuda"

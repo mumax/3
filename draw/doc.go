@@ -1,4 +1,2 @@
-/*
- 2D rendering of slices.
-*/
-package documentation
+// 2D rendering of data slices.
+package draw

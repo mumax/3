@@ -1,6 +1,5 @@
-package main
-
 // Bootstrap looks for a mumax+cuda combination that works on your system.
+package main
 
 import (
 	"fmt"

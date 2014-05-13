@@ -1,3 +1,4 @@
+// package util provides common utilities for all other packages.
 package util
 
 import "path"

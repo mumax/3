@@ -1,3 +1,4 @@
+// engine does the simulation bookkeeping, I/O and GUI.
 package engine
 
 import (

@@ -65,6 +65,7 @@ func (r *reader) readSlice() (s *data.Slice, info data.Meta, err error) {
 	cell[2] = r.readFloat64()
 	cell[1] = r.readFloat64()
 	cell[0] = r.readFloat64()
+	info.CellSize = cell
 
 	info.MeshUnit = r.readString()
 	info.Time = r.readFloat64()

@@ -38,7 +38,7 @@ func Read(in_ io.Reader) (s *data.Slice, meta data.Meta, err error) {
 		readOVF2DataBinary4(in, data_)
 	}
 
-	return data_, data.Meta{Time: info.TotalTime, Unit: info.ValueUnit, CellSize: info.StepSize}, nil
+	return data_, data.Meta{Name: info.Title, Time: info.TotalTime, Unit: info.ValueUnit, CellSize: info.StepSize}, nil
 }
 
 func ReadFile(fname string) (*data.Slice, data.Meta, error) {
@@ -61,6 +61,7 @@ func MustReadFile(fname string) (*data.Slice, data.Meta) {
 // Perhaps CheckErr() func
 type Info struct {
 	Desc            map[string]interface{}
+	Title           string
 	NComp           int
 	Size            [3]int
 	ValueMultiplier float32
@@ -98,8 +99,10 @@ func readHeader(in io.Reader) *Info {
 		default:
 			panic("Unknown key: " + key)
 			// ignored
-		case "oommf", "segment count", "begin", "title", "meshtype", "xbase", "ybase", "zbase", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end": // ignored (OVF1)
+		case "oommf", "segment count", "begin", "meshtype", "xbase", "ybase", "zbase", "xmin", "ymin", "zmin", "xmax", "ymax", "zmax", "valuerangeminmag", "valuerangemaxmag", "end": // ignored (OVF1)
 		case "", "valuelabels": // ignored (OVF2)
+		case "title":
+			info.Title = value
 		case "valueunits":
 			info.ValueUnit = strings.Split(value, " ")[0] // take unit of first component, we don't support per-component units
 		case "valuedim":

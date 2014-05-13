@@ -156,6 +156,7 @@ function notify(id, arg){
 function notifyel(id, key){
 	var el = elementById(id);
 	notify(id, el[key]);
+	hasFocus = "";  // give up focus so that value can change after hitting return
 }
 
 function makered(id, key){

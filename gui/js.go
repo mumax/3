@@ -1,5 +1,7 @@
 package gui
 
+// Javascript for the GUI page.
+
 const JS = `<script type="text/javascript">
 
 function genPageID(){

@@ -123,7 +123,6 @@ function update(){
 			pending = true;
 			var req = new XMLHttpRequest();
 			req.open("POST", document.URL, true); 
-			req.timeout = tick;
 			req.onreadystatechange = function(){ updateDOM(req) };
 			req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 			req.send("id=" + pageID);

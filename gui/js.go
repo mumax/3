@@ -62,7 +62,6 @@ function setattr_(elem, attr, value){
 		return;
 	}
 	elem[attr] = value;
-	elem.style.color = "black";
 }
 
 // called by server to manipulate the DOM

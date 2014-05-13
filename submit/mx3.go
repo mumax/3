@@ -4,18 +4,18 @@ import (
 	"flag"
 )
 
-var flag_mx3 = flag.Bool("mx3", false, "submit to mx3")
+var flag_mumax3 = flag.Bool("mumax3", false, "submit to mumax3")
 
 func init() {
 	flag.Parse()
-	if *flag_mx3 {
-		setMkjob(mx3)
+	if *flag_mumax3 {
+		setMkjob(mumax3)
 	}
 }
 
-func mx3(file string) Job {
+func mumax3(file string) Job {
 	var job Job
-	job.Command = "mx3"
-	job.Args = []string{`-gpu=%GPU`, `-sched=yield`, file}
+	job.Command = "mumax3"
+	job.Args = []string{`-gpu=%GPU`, file}
 	return job
 }

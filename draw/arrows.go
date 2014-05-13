@@ -1,8 +1,8 @@
 package draw
 
 import (
-	"code.google.com/p/freetype-go/freetype/raster"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/freetype/raster"
 	"image"
 	"image/color"
 	"math"

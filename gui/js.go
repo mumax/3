@@ -50,11 +50,11 @@ function elementById(id){
 //	autoupdate =  elementById("AutoUpdate").checked;
 //}
 
-// Id of element that has focus. We don't auto-update a focused textbox
+// Id of textbox that has focus. We don't auto-update a focused textbox
 // as this would overwrite the users input.
 var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
-function notifyblur (id){hasFocus = "";}
+function notifyblur (id){hasFocus = ""; notifyel(id, "value");}
 
 function setattr_(elem, attr, value){
 	if (elem[attr] == null){

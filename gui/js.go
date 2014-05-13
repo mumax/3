@@ -4,18 +4,14 @@ package gui
 
 const JS = `<script type="text/javascript">
 
-function genPageID(){
-	return Math.floor((Math.random()* 10000000000)+1);
-}
+function genPageID(){ return Math.floor((Math.random()* 10000000000)+1); }
 
 // random ID number for this page, to assure proper update if open in multiple browsers
 var pageID = genPageID();
 
-// auto-update rate
-var tick = 300;
+var tick = 300;         // auto-update rate
 var autoUpdate = true;
-
-var disconnects = 0; // number of successive disconnects
+var disconnects = 0;    // number of successive disconnects
 
 // show error in document (non-intrusive alert())
 function showErr(err){
@@ -27,18 +23,17 @@ function showErr(err){
 		document.body.style.background = "#FFFFFF";
 	}
 	if (disconnects > 3){ // disconnected for some time, show error
-		var col = (256+3)-disconnects; // gradually fade out background color
-		if(col<210){col=210;}
+		var col = (256+3)-disconnects;   // gradually fade out background color
+		if(col<210){col=210;}            // not too dark
 		document.body.style.background = "rgb(" + col+"," + col+"," + col+")";
 		document.getElementById("ErrorBox").innerHTML = err;
 	}
 }
 
-
 // show debug message in document
-function msg(err){
-	document.getElementById("MsgBox").innerHTML = err;
-}
+//function msg(err){
+//	document.getElementById("MsgBox").innerHTML = err;
+//}
 
 // wraps document.getElementById, shows error if not found
 function elementById(id){
@@ -67,6 +62,7 @@ function setattr_(elem, attr, value){
 		return;
 	}
 	elem[attr] = value;
+	elem.style.color = "black";
 }
 
 // called by server to manipulate the DOM
@@ -82,7 +78,9 @@ function setAttr(id, attr, value){
 // set textbox value unless focused
 function setTextbox(id, value){
 	if (hasFocus != id){
-		elementById(id).value = value;
+		var el = elementById(id);
+		el.value = value;
+		el.style.color = "black"; // was red during edit, back up-to-date now
 	}
 }
 
@@ -157,7 +155,13 @@ function notify(id, arg){
 }
 
 function notifyel(id, key){
-	notify(id, elementById(id)[key]);
+	var el = elementById(id);
+	notify(id, el[key]);
+}
+
+function makered(id, key){
+	var el = elementById(id);
+	el.style.color = "red";
 }
 
 function notifyselect(id){

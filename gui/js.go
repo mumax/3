@@ -164,7 +164,7 @@ function makered(id, event){
 	var key = event.keyCode;
 	if (key == 13){ // return key
 		hasFocus = "";  // give up focus so that value can change after hitting return
-		notifyel(id, "value");
+		notifyel(id, "value"); // already done by onchange
 	}else{
 		hasFocus = id; // grab focus back
 	}

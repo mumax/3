@@ -54,7 +54,7 @@ function elementById(id){
 // as this would overwrite the users input.
 var hasFocus = "";
 function notifyfocus(id){hasFocus = id;}
-function notifyblur (id){hasFocus = ""; notifyel(id, "value");}
+function notifyblur (id){hasFocus = "";}
 
 function setattr_(elem, attr, value){
 	if (elem[attr] == null){
@@ -156,12 +156,18 @@ function notify(id, arg){
 function notifyel(id, key){
 	var el = elementById(id);
 	notify(id, el[key]);
-	hasFocus = "";  // give up focus so that value can change after hitting return
 }
 
-function makered(id, key){
+function makered(id, event){
 	var el = elementById(id);
 	el.style.color = "red";
+	var key = event.keyCode;
+	if (key == 13){ // return key
+		hasFocus = "";  // give up focus so that value can change after hitting return
+		notifyel(id);
+	}else{
+		hasFocus = id; // grab focus back
+	}
 }
 
 function notifyselect(id){

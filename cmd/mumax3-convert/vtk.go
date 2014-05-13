@@ -27,8 +27,8 @@ func writeVTKHeader(out io.Writer, q *data.Slice) (err error) {
 	gridsize := q.Size()
 	_, err = fmt.Fprintln(out, "<?xml version=\"1.0\"?>")
 	_, err = fmt.Fprintln(out, "<VTKFile type=\"StructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">")
-	_, err = fmt.Fprintf(out, "\t<StructuredGrid WholeExtent=\"0 %d 0 %d 0 %d\">\n", gridsize[Z]-1, gridsize[Y]-1, gridsize[X]-1)
-	_, err = fmt.Fprintf(out, "\t\t<Piece Extent=\"0 %d 0 %d 0 %d\">\n", gridsize[Z]-1, gridsize[Y]-1, gridsize[X]-1)
+	_, err = fmt.Fprintf(out, "\t<StructuredGrid WholeExtent=\"0 %d 0 %d 0 %d\">\n", gridsize[0]-1, gridsize[1]-1, gridsize[2]-1)
+	_, err = fmt.Fprintf(out, "\t\t<Piece Extent=\"0 %d 0 %d 0 %d\">\n", gridsize[0]-1, gridsize[1]-1, gridsize[2]-1)
 	return
 }
 
@@ -39,24 +39,24 @@ func writeVTKPoints(out io.Writer, q *data.Slice, dataformat string, info data.M
 	cellsize := info.CellSize
 	switch dataformat {
 	case "ascii":
-		for k := 0; k < gridsize[X]; k++ {
-			for j := 0; j < gridsize[Y]; j++ {
-				for i := 0; i < gridsize[Z]; i++ {
-					x := (float32)(i) * (float32)(cellsize[Z])
-					y := (float32)(j) * (float32)(cellsize[Y])
-					z := (float32)(k) * (float32)(cellsize[X])
+		for k := 0; k < gridsize[2]; k++ {
+			for j := 0; j < gridsize[1]; j++ {
+				for i := 0; i < gridsize[0]; i++ {
+					x := (float32)(i) * (float32)(cellsize[0])
+					y := (float32)(j) * (float32)(cellsize[1])
+					z := (float32)(k) * (float32)(cellsize[2])
 					_, err = fmt.Fprint(out, x, " ", y, " ", z, " ")
 				}
 			}
 		}
 	case "binary":
 		buffer := new(bytes.Buffer)
-		for k := 0; k < gridsize[X]; k++ {
-			for j := 0; j < gridsize[Y]; j++ {
-				for i := 0; i < gridsize[Z]; i++ {
-					x := (float32)(i) * (float32)(cellsize[Z])
-					y := (float32)(j) * (float32)(cellsize[Y])
-					z := (float32)(k) * (float32)(cellsize[X])
+		for k := 0; k < gridsize[2]; k++ {
+			for j := 0; j < gridsize[1]; j++ {
+				for i := 0; i < gridsize[0]; i++ {
+					x := (float32)(i) * (float32)(cellsize[0])
+					y := (float32)(j) * (float32)(cellsize[1])
+					z := (float32)(k) * (float32)(cellsize[2])
 					binary.Write(buffer, binary.LittleEndian, x)
 					binary.Write(buffer, binary.LittleEndian, y)
 					binary.Write(buffer, binary.LittleEndian, z)
@@ -97,23 +97,23 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 	gridsize := q.Size()
 	switch dataformat {
 	case "ascii":
-		for i := 0; i < gridsize[X]; i++ {
-			for j := 0; j < gridsize[Y]; j++ {
-				for k := 0; k < gridsize[Z]; k++ {
+		for k := 0; k < gridsize[2]; k++ {
+			for j := 0; j < gridsize[1]; j++ {
+				for i := 0; i < gridsize[0]; i++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						fmt.Fprint(out, data[0][i][j][k], " ")
-						fmt.Fprint(out, data[1][i][j][k], " ")
-						fmt.Fprint(out, data[2][i][j][k], " ")
-						fmt.Fprint(out, data[1][i][j][k], " ")
-						fmt.Fprint(out, data[3][i][j][k], " ")
-						fmt.Fprint(out, data[4][i][j][k], " ")
-						fmt.Fprint(out, data[2][i][j][k], " ")
-						fmt.Fprint(out, data[4][i][j][k], " ")
-						fmt.Fprint(out, data[5][i][j][k], " ")
+						fmt.Fprint(out, data[0][k][j][i], " ")
+						fmt.Fprint(out, data[1][k][j][i], " ")
+						fmt.Fprint(out, data[2][k][j][i], " ")
+						fmt.Fprint(out, data[1][k][j][i], " ")
+						fmt.Fprint(out, data[3][k][j][i], " ")
+						fmt.Fprint(out, data[4][k][j][i], " ")
+						fmt.Fprint(out, data[2][k][j][i], " ")
+						fmt.Fprint(out, data[4][k][j][i], " ")
+						fmt.Fprint(out, data[5][k][j][i], " ")
 					} else {
 						for c := 0; c < N; c++ {
-							fmt.Fprint(out, data[c][i][j][k], " ")
+							fmt.Fprint(out, data[c][k][j][i], " ")
 						}
 					}
 				}
@@ -122,23 +122,23 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 	case "binary":
 		// Inlined for performance, terabytes of data will pass here...
 		buffer := new(bytes.Buffer)
-		for i := 0; i < gridsize[X]; i++ {
-			for j := 0; j < gridsize[Y]; j++ {
-				for k := 0; k < gridsize[Z]; k++ {
+		for k := 0; k < gridsize[2]; k++ {
+			for j := 0; j < gridsize[1]; j++ {
+				for i := 0; i < gridsize[0]; i++ {
 					// if symmetric tensor manage it appart to write the full 9 components
 					if N == 6 {
-						binary.Write(buffer, binary.LittleEndian, data[0][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[1][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[2][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[1][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[3][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[4][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[2][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[4][i][j][k])
-						binary.Write(buffer, binary.LittleEndian, data[5][i][j][k])
+						binary.Write(buffer, binary.LittleEndian, data[0][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[1][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[2][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[1][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[3][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[4][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[2][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[4][k][j][i])
+						binary.Write(buffer, binary.LittleEndian, data[5][k][j][i])
 					} else {
 						for c := 0; c < N; c++ {
-							binary.Write(buffer, binary.LittleEndian, data[c][i][j][k])
+							binary.Write(buffer, binary.LittleEndian, data[c][k][j][i])
 						}
 					}
 				}

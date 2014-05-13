@@ -7,7 +7,7 @@ type textbox struct {
 }
 
 func (e *textbox) update(id string) []jsCall {
-	return []jsCall{{F: "setAttr", Args: []interface{}{id, "value", e.value()}}}
+	return []jsCall{{F: "setTextbox", Args: []interface{}{id, e.value()}}}
 }
 
 func (d *Page) TextBox(id string, value interface{}, extra ...string) string {

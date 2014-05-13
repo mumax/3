@@ -24,6 +24,10 @@ func Eval1Line(code string) interface{} {
 		LogErr(err.Error())
 		return nil
 	}
+	if len(tree.Children) != 1 {
+		LogErr("expected single statement:" + code)
+		return nil
+	}
 	return tree.Children[0].Eval()
 }
 

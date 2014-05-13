@@ -159,13 +159,13 @@ function notifyel(id, key){
 
 function makered(id, event){
 	var el = elementById(id);
-	el.style.color = "red";
 	var key = event.keyCode;
 	if (key == 13){ // return key
 		hasFocus = "";  // give up focus so that value can change after hitting return
-		notifyel(id, "value"); // already done by onchange
+		//notifyel(id, "value"); // already done by onchange
 	}else{
 		hasFocus = id; // grab focus back
+		el.style.color = "red"; // changed
 	}
 }
 

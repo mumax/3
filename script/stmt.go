@@ -22,6 +22,8 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 	switch st := st.(type) {
 	default:
 		panic(err(st.Pos(), "not allowed:", typ(st)))
+	case *ast.EmptyStmt:
+		return &emptyStmt{}
 	case *ast.AssignStmt:
 		return w.compileAssignStmt(st)
 	case *ast.ExprStmt:
@@ -43,3 +45,9 @@ func (w *World) compileStmt(st ast.Stmt) Expr {
 type void struct{}
 
 func (v *void) Type() reflect.Type { return nil }
+
+type emptyStmt struct{}
+
+func (*emptyStmt) Child() []Expr      { return nil }
+func (*emptyStmt) Eval() interface{}  { return nil }
+func (*emptyStmt) Type() reflect.Type { return nil }

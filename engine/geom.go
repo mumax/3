@@ -75,6 +75,7 @@ func (geometry *geom) setGeom(s Shape) {
 	defer SetBusy(false)
 
 	if s == nil {
+		// TODO: would be nice not to save volume if entirely filled
 		s = universe
 	}
 
@@ -91,7 +92,7 @@ func (geometry *geom) setGeom(s Shape) {
 	c := geometry.Mesh().CellSize()
 	cx, cy, cz := c[X], c[Y], c[Z]
 
-	progress, progmax := 0, (n[Y]+1)*(n[Z]+1)
+	progress, progmax := 0, n[Y]*n[Z]
 
 	var ok bool
 	for iz := 0; iz < n[Z]; iz++ {

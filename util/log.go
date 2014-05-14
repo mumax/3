@@ -39,7 +39,7 @@ func LogErr(err error, msg ...interface{}) {
 }
 
 func Log(msg ...interface{}) {
-	log.Println(msg)
+	log.Println(msg...)
 }
 
 // Panics with "illegal argument" if test is false.

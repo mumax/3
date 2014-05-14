@@ -62,7 +62,7 @@ func Relax() {
 		relaxSteps(1) // TODO: Play with other values
 		T0, T1 = T1, avgTorque()
 		for T1 < T0 && !pause {
-			relaxSteps(N)
+			relaxSteps(1) // TODO: Play with other values
 			T0, T1 = T1, avgTorque()
 		}
 	}

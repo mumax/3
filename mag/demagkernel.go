@@ -137,8 +137,8 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 		}
 	}
 
-	progress, progmax := 0, (1+(r2[Y]-r1[Y])/2)*(1+(r2[Z]-r1[Z])/2) // progress bar
-	done := make(chan struct{}, 3)                                  // parallel calculation of one component done?
+	progress, progmax := 0, (1+(r2[Y]-r1[Y]))*(1+(r2[Z]-r1[Z])) // progress bar
+	done := make(chan struct{}, 3)                              // parallel calculation of one component done?
 
 	// Start brute integration
 	// 9 nested loops, does that stress you out?
@@ -158,21 +158,25 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 				// skip one half, reconstruct from symmetry later
 				// check on wrapped index instead of loop range so it also works for PBC
 				if zw > size[Z]/2 {
+					if s == 0 {
+						progress += (1 + (r2[Y] - r1[Y]))
+					}
 					continue
 				}
 				R[Z] = float64(z) * cellsize[Z]
 
 				for y := r1[Y]; y <= r2[Y]; y++ {
-					yw := wrap(y, size[Y])
-					if yw > size[Y]/2 {
-						continue
-					}
-					R[Y] = float64(y) * cellsize[Y]
 
 					if s == 0 { // show progress of only one component
 						progress++
 						util.Progress(progress, progmax, "Calculating demag kernel")
 					}
+
+					yw := wrap(y, size[Y])
+					if yw > size[Y]/2 {
+						continue
+					}
+					R[Y] = float64(y) * cellsize[Y]
 
 					for x := r1[X]; x <= r2[X]; x++ {
 						xw := wrap(x, size[X])

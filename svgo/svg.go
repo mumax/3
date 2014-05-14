@@ -345,8 +345,8 @@ func (svg *SVG) Qbezier(sx int, sy int, cx int, cy int, ex int, ey int, tx int, 
 
 // Line draws a straight line between two points, with optional style.
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#LineElement
-func (svg *SVG) Line(x1 int, y1 int, x2 int, y2 int, s ...string) {
-	svg.printf(`<line x1="%d" y1="%d" x2="%d" y2="%d" %s`, x1, y1, x2, y2, endstyle(s, emptyclose))
+func (svg *SVG) Line(x1, y1, x2, y2 interface{}, s ...string) {
+	svg.printf(`<line x1="%v" y1="%v" x2="%v" y2="%v" %s`, x1, y1, x2, y2, endstyle(s, emptyclose))
 }
 
 // Polyline draws connected lines between coordinates, with optional style.

@@ -2,19 +2,31 @@
 package graph
 
 import (
+	"fmt"
 	"github.com/mumax/3/svgo"
+	"io"
 )
 
-const S = 256 // fixed-point scaling
+const (
+	ML = 32
+	MR = 32
+	MT = 32
+	MB = 32
+)
 
-func SVG(out io.Writer, w, h int) {
+func SVG(out io.Writer, wTotal, hTotal int) {
 
-	canvas := svg.New(out)
-	canvas.Start(S*w, S*h)
+	c := svg.New(out)
+	c.Start(wTotal, hTotal)
 
-	canvas.End()
+	w := wTotal - ML - MR
+	h := hTotal - MT - MB
+
+	c.Rect(ML, MR, w, h, `style="fill:none;stroke:black"`)
+
+	c.End()
 }
 
 func hex(i uint8) string {
-	return fmt.Sprintf("%02X", j)
+	return fmt.Sprintf("%02X", i)
 }

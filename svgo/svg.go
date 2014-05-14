@@ -1,4 +1,6 @@
 // Package svg provides an API for generating Scalable Vector Graphics (SVG)
+// Edited by Arne Vansteenkiste, 2014:
+// allow non-integer coordinates
 package svg
 
 // package main
@@ -273,7 +275,7 @@ func (svg *SVG) Polygon(x []int, y []int, s ...string) {
 
 // Rect draws a rectangle with upper left-hand corner at x,y, with width w, and height h, with optional style
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#RectElement
-func (svg *SVG) Rect(x int, y int, w int, h int, s ...string) {
+func (svg *SVG) Rect(x, y, w, h interface{}, s ...string) {
 	svg.printf(`<rect %s %s`, dim(x, y, w, h), endstyle(s, emptyclose))
 }
 
@@ -903,8 +905,8 @@ func loc(x int, y int) string { return fmt.Sprintf(`x="%d" y="%d"`, x, y) }
 func href(s string) string { return fmt.Sprintf(`xlink:href="%s"`, s) }
 
 // dim returns the dimension string (x, y coordinates and width, height)
-func dim(x int, y int, w int, h int) string {
-	return fmt.Sprintf(`x="%d" y="%d" width="%d" height="%d"`, x, y, w, h)
+func dim(x, y, w, h interface{}) string {
+	return fmt.Sprintf(`x="%v" y="%v" width="%v" height="%v"`, x, y, w, h)
 }
 
 // fsattr returns the XML attribute representation of a filterspec, ignoring empty attributes

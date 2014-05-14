@@ -36,7 +36,7 @@ func init() {
 	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	Torque.init("torque", "T", "Total torque/γ0", SetTorque)
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
-	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque over all cells", GetMaxTorque)
+	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 }
 
 // Sets dst to the current total torque

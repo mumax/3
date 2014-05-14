@@ -13,6 +13,7 @@ type Graph struct {
 	yMin, yMax       float64
 	marginL, marginR float64
 	marginB, marginT float64
+	LineStyle        string
 }
 
 func New(out io.Writer, width, height int) *Graph {
@@ -21,6 +22,7 @@ func New(out io.Writer, width, height int) *Graph {
 	g := &Graph{canvas: canvas, w: float64(width), h: float64(height)}
 	g.SetMargins(width/16, width/16, height/16, height/16)
 	g.SetRanges(0, 1, 0, 1)
+	g.LineStyle = `style="stroke:black"`
 	return g
 }
 
@@ -45,7 +47,7 @@ func (g *Graph) SetRanges(xMin, xMax, yMin, yMax float64) {
 func (g *Graph) Line(x1, y1, x2, y2 float64) {
 	x1, y1 = g.transf(x1, y1)
 	x2, y2 = g.transf(x2, y2)
-	g.canvas.Line(x1, y1, x2, y2, `style="stroke:black"`)
+	g.canvas.Line(x1, y1, x2, y2, g.LineStyle)
 }
 
 func (g *Graph) transf(x, y float64) (x2, y2 float64) {

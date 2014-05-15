@@ -15,8 +15,9 @@ func main() {
 	defer out.Close()
 
 	g := New(out, 600, 400)
+	g.SetRanges(-1e-9, 5e-9, -1, 2)
 	defer g.End()
 
-	g.DrawAxes(0.1, 0.1)
-	g.Line(0, 0, 0.5, 0.5)
+	g.DrawAxes(1e-9, 0.5)
+	g.Line(0, 0, 1e-9, 0.5)
 }

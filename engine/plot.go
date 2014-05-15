@@ -1,40 +1,35 @@
 package engine
 
 import (
-	"bytes"
-	"fmt"
-	"image"
-	"image/png"
+	"github.com/mumax/3/graph"
+	"log"
 	"net/http"
-	"os/exec"
+)
+
+var (
+	_graphx, _graphy []float64
 )
 
 func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
-	a := g.StringValue("usingx")
-	b := g.StringValue("usingy")
 
-	cmd := "gnuplot"
-	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 fsize 10; plot "%vtable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}
-	out, err := exec.Command(cmd, args...).CombinedOutput()
-	if err != nil {
-		w.Write(emptyIMG())
-		g.Set("plotErr", string(out))
-		return
-	} else {
-		w.Header().Set("Content-Type", "image/svg+xml")
-		w.Write(out)
-		g.Set("plotErr", "")
+	log.Println("plotting...")
+
+	// atomically get local copies to
+	var (
+		graphx, graphy []float64
+		t              float64
+	)
+	InjectAndWait(func() {
+		t = Time
+		graphx, graphy = _graphx, _graphy // copy of slice header is enough to avoid race as long as we only append to it
+	})
+
+	w.Header().Set("Content-Type", "image/svg+xml")
+	plot := graph.New(w, 600, 300) // (!) canvas size duplicated in html.go
+	plot.SetRanges(0, t, -1, 1)
+	plot.DrawAxes(t/5, 0.5)
+	if len(graphx) > 1 {
+		plot.Polyline(graphx, graphy)
 	}
-}
-
-var empty_img []byte
-
-// empty image to show if there's no plot...
-func emptyIMG() []byte {
-	if empty_img == nil {
-		o := bytes.NewBuffer(nil)
-		png.Encode(o, image.NewNRGBA(image.Rect(0, 0, 4, 4)))
-		empty_img = o.Bytes()
-	}
-	return empty_img
+	plot.End()
 }

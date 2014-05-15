@@ -1,0 +1,464 @@
+PACKAGE
+
+package safe
+    import "github.com/barnex/cuda5/safe"
+
+    Safe and more idiomatic wrappers for the low-level CUDA functions.
+
+FUNCTIONS
+
+func InitCuda()
+
+
+TYPES
+
+type Complex128s struct {
+    // contains filtered or unexported fields
+}
+    Slice of complex128's on the GPU.
+
+func MakeComplex128s(len_ int) Complex128s
+    Make a slice of complex128's on the GPU. Initialized to zero.
+
+func (s *Complex128s) Cap() int
+    Slice capacity.
+
+func (dst Complex128s) CopyDtoD(src Complex128s)
+    Copy src on host to dst on host.
+
+func (dst Complex128s) CopyDtoDAsync(src Complex128s, stream cu.Stream)
+    Copy src on host to dst on host, asynchronously.
+
+func (src Complex128s) CopyDtoH(dst []complex128)
+    Copy src form device to dst on host.
+
+func (src Complex128s) CopyDtoHAsync(dst []complex128, stream cu.Stream)
+    Copy src form device to dst on host, asynchronously.
+
+func (dst Complex128s) CopyHtoD(src []complex128)
+    Copy src from host to dst on the device.
+
+func (dst Complex128s) CopyHtoDAsync(src []complex128, stream cu.Stream)
+    Copy src from host to dst on the device, asynchronously.
+
+func (s Complex128s) Float() Float64s
+    Re-interpret the array as float numbers, in interleaved format.
+    Underlying storage is shared.
+
+func (s *Complex128s) Free()
+    Free the underlying storage. To be used with care. Free() should only be
+    called on a slice created by MakeXXX(), not on a slice created by
+    x.Slice(). Freeing a slice invalidates all other slices referring to it.
+
+func (src Complex128s) Host() []complex128
+    Returns a fresh copy on host.
+
+func (s *Complex128s) Len() int
+    Slice length (number of elements).
+
+func (s *Complex128s) Pointer() cu.DevicePtr
+    Pointer to the first element.
+
+func (s Complex128s) Slice(start, stop int) Complex128s
+    Return a slice from start (inclusive) to stop (exclusive), sharing the
+    underlying storage with the original slice. Slices obtained in this way
+    should not be Free()'d
+
+func (s *Complex128s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
+type Complex64s struct {
+    // contains filtered or unexported fields
+}
+    Slice of complex64's on the GPU.
+
+func MakeComplex64s(len_ int) Complex64s
+    Make a slice of complex64's on the GPU. Initialized to zero.
+
+func (s *Complex64s) Cap() int
+    Slice capacity.
+
+func (dst Complex64s) CopyDtoD(src Complex64s)
+    Copy src on host to dst on host.
+
+func (dst Complex64s) CopyDtoDAsync(src Complex64s, stream cu.Stream)
+    Copy src on host to dst on host, asynchronously.
+
+func (src Complex64s) CopyDtoH(dst []complex64)
+    Copy src form device to dst on host.
+
+func (src Complex64s) CopyDtoHAsync(dst []complex64, stream cu.Stream)
+    Copy src form device to dst on host, asynchronously.
+
+func (dst Complex64s) CopyHtoD(src []complex64)
+    Copy src from host to dst on the device.
+
+func (dst Complex64s) CopyHtoDAsync(src []complex64, stream cu.Stream)
+    Copy src from host to dst on the device, asynchronously.
+
+func (s Complex64s) Float() Float32s
+    Re-interpret the array as float numbers, in interleaved format.
+    Underlying storage is shared.
+
+func (s *Complex64s) Free()
+    Free the underlying storage. To be used with care. Free() should only be
+    called on a slice created by MakeXXX(), not on a slice created by
+    x.Slice(). Freeing a slice invalidates all other slices referring to it.
+
+func (src Complex64s) Host() []complex64
+    Returns a fresh copy on host.
+
+func (s *Complex64s) Len() int
+    Slice length (number of elements).
+
+func (s *Complex64s) Pointer() cu.DevicePtr
+    Pointer to the first element.
+
+func (s Complex64s) Slice(start, stop int) Complex64s
+    Return a slice from start (inclusive) to stop (exclusive), sharing the
+    underlying storage with the original slice. Slices obtained in this way
+    should not be Free()'d
+
+func (s *Complex64s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
+type FFT1DC2RPlan struct {
+    // contains filtered or unexported fields
+}
+    1D single-precission complex-to-real FFT plan.
+
+func FFT1DC2R(size, batch int) FFT1DC2RPlan
+    1D single-precission complex-to-real FFT plan.
+
+func (p FFT1DC2RPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT1DC2RPlan) Exec(src Complex64s, dst Float32s)
+    Execute the FFT plan. Synchronized.
+
+func (p FFT1DC2RPlan) InputLen() int
+    Required length of the output array.
+
+func (p FFT1DC2RPlan) OutputLen() int
+    Required length of the input array.
+
+func (p FFT1DC2RPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT1DC2RPlan) Size() int
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT1DC2RPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type FFT1DR2CPlan struct {
+    // contains filtered or unexported fields
+}
+    1D single-precission real-to-complex FFT plan.
+
+func FFT1DR2C(size, batch int) FFT1DR2CPlan
+    1D single-precission real-to-complex FFT plan.
+
+func (p FFT1DR2CPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT1DR2CPlan) Exec(src Float32s, dst Complex64s)
+    Execute the FFT plan. Synchronized.
+
+func (p FFT1DR2CPlan) InputLen() int
+    Required length of the input array.
+
+func (p FFT1DR2CPlan) OutputLen() int
+    Required length of the output array.
+
+func (p FFT1DR2CPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT1DR2CPlan) Size() int
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT1DR2CPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type FFT3DC2RPlan struct {
+    // contains filtered or unexported fields
+}
+    3D single-precission real-to-complex FFT plan.
+
+func FFT3DC2R(Nx, Ny, Nz int) FFT3DC2RPlan
+    3D single-precission real-to-complex FFT plan.
+
+func (p FFT3DC2RPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT3DC2RPlan) Exec(src Complex64s, dst Float32s)
+    Execute the FFT plan. src and dst are 3D arrays stored 1D arrays.
+
+func (p FFT3DC2RPlan) InputLen() int
+    Required length of the (1D) input array.
+
+func (p FFT3DC2RPlan) InputSize() (Nx, Ny, Nz int)
+    3D size of the input array.
+
+func (p FFT3DC2RPlan) OutputLen() int
+    Required length of the (1D) output array.
+
+func (p FFT3DC2RPlan) OutputSize() (Nx, Ny, Nz int)
+    3D size of the output array.
+
+func (p FFT3DC2RPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT3DC2RPlan) Size() (Nx, Ny, Nz int)
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT3DC2RPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type FFT3DD2ZPlan struct {
+    // contains filtered or unexported fields
+}
+    3D single-precission real-to-complex FFT plan.
+
+func FFT3DD2Z(Nx, Ny, Nz int) FFT3DD2ZPlan
+    3D single-precission real-to-complex FFT plan.
+
+func (p FFT3DD2ZPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT3DD2ZPlan) Exec(src Float64s, dst Complex128s)
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
+
+func (p FFT3DD2ZPlan) InputLen() int
+    Required length of the (1D) input array.
+
+func (p FFT3DD2ZPlan) InputSize() (Nx, Ny, Nz int)
+    3D size of the input array.
+
+func (p FFT3DD2ZPlan) OutputLen() int
+    Required length of the (1D) output array.
+
+func (p FFT3DD2ZPlan) OutputSize() (Nx, Ny, Nz int)
+    3D size of the output array.
+
+func (p FFT3DD2ZPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT3DD2ZPlan) Size() (Nx, Ny, Nz int)
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT3DD2ZPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type FFT3DR2CPlan struct {
+    // contains filtered or unexported fields
+}
+    3D single-precission real-to-complex FFT plan.
+
+func FFT3DR2C(Nx, Ny, Nz int) FFT3DR2CPlan
+    3D single-precission real-to-complex FFT plan.
+
+func (p FFT3DR2CPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT3DR2CPlan) Exec(src Float32s, dst Complex64s)
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
+
+func (p FFT3DR2CPlan) InputLen() int
+    Required length of the (1D) input array.
+
+func (p FFT3DR2CPlan) InputSize() (Nx, Ny, Nz int)
+    3D size of the input array.
+
+func (p FFT3DR2CPlan) OutputLen() int
+    Required length of the (1D) output array.
+
+func (p FFT3DR2CPlan) OutputSize() (Nx, Ny, Nz int)
+    3D size of the output array.
+
+func (p FFT3DR2CPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT3DR2CPlan) Size() (Nx, Ny, Nz int)
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT3DR2CPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type FFT3DZ2DPlan struct {
+    // contains filtered or unexported fields
+}
+    3D single-precission real-to-complex FFT plan.
+
+func FFT3DZ2D(Nx, Ny, Nz int) FFT3DZ2DPlan
+    3D single-precission real-to-complex FFT plan.
+
+func (p FFT3DZ2DPlan) Destroy()
+    Releases all resources associated with the FFT plan.
+
+func (p FFT3DZ2DPlan) Exec(src Complex128s, dst Float64s)
+    Execute the FFT plan. Synchronized. src and dst are 3D arrays stored 1D
+    arrays.
+
+func (p FFT3DZ2DPlan) InputLen() int
+    Required length of the (1D) input array.
+
+func (p FFT3DZ2DPlan) InputSize() (Nx, Ny, Nz int)
+    3D size of the input array.
+
+func (p FFT3DZ2DPlan) OutputLen() int
+    Required length of the (1D) output array.
+
+func (p FFT3DZ2DPlan) OutputSize() (Nx, Ny, Nz int)
+    3D size of the output array.
+
+func (p FFT3DZ2DPlan) SetStream(stream cu.Stream)
+    Associates a CUDA stream with the FFT plan. If a stream is set,
+    plan.Stream().Synchronize() can to be called to wait for the execution
+    to finish.
+
+func (s FFT3DZ2DPlan) Size() (Nx, Ny, Nz int)
+    Returns the logical size of the FFT: the number of elements (real or
+    complex) it transforms.
+
+func (p FFT3DZ2DPlan) Stream() cu.Stream
+    Returns the CUDA stream associated with the FFT plan.
+
+type Float32s struct {
+    // contains filtered or unexported fields
+}
+    Slice of float32's on the GPU.
+
+func MakeFloat32s(len_ int) Float32s
+    Make a slice of float32's on the GPU. Initialized to zero.
+
+func (s *Float32s) Cap() int
+    Slice capacity.
+
+func (s Float32s) Complex() Complex64s
+    Re-interpret the array as complex numbers, in interleaved format.
+    Underlying storage is shared.
+
+func (dst Float32s) CopyDtoD(src Float32s)
+    Copy src on host to dst on host.
+
+func (dst Float32s) CopyDtoDAsync(src Float32s, stream cu.Stream)
+    Copy src on host to dst on host, asynchronously.
+
+func (src Float32s) CopyDtoH(dst []float32)
+    Copy src form device to dst on host.
+
+func (src Float32s) CopyDtoHAsync(dst []float32, stream cu.Stream)
+    Copy src form device to dst on host, asynchronously.
+
+func (dst Float32s) CopyHtoD(src []float32)
+    Copy src from host to dst on the device.
+
+func (dst Float32s) CopyHtoDAsync(src []float32, stream cu.Stream)
+    Copy src from host to dst on the device, asynchronously.
+
+func (s *Float32s) Free()
+    Free the underlying storage. To be used with care. Free() should only be
+    called on a slice created by MakeXXX(), not on a slice created by
+    x.Slice(). Freeing a slice invalidates all other slices referring to it.
+
+func (src Float32s) Host() []float32
+    Returns a fresh copy on host.
+
+func (s *Float32s) Len() int
+    Slice length (number of elements).
+
+func (s Float32s) Memset(value float32)
+    Set the entire slice to this value.
+
+func (s Float32s) MemsetAsync(value float32, stream cu.Stream)
+    Set the entire slice to this value, asynchronously.
+
+func (s *Float32s) Pointer() cu.DevicePtr
+    Pointer to the first element.
+
+func (s Float32s) Slice(start, stop int) Float32s
+    Return a slice from start (inclusive) to stop (exclusive), sharing the
+    underlying storage with the original slice. Slices obtained in this way
+    should not be Free()'d
+
+func (s *Float32s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
+type Float64s struct {
+    // contains filtered or unexported fields
+}
+    Slice of float64's on the GPU.
+
+func MakeFloat64s(len_ int) Float64s
+    Make a slice of float64's on the GPU. Initialized to zero.
+
+func (s *Float64s) Cap() int
+    Slice capacity.
+
+func (s Float64s) Complex() Complex128s
+    Re-interpret the array as complex numbers, in interleaved format.
+    Underlying storage is shared.
+
+func (dst Float64s) CopyDtoD(src Float64s)
+    Copy src on host to dst on host.
+
+func (dst Float64s) CopyDtoDAsync(src Float64s, stream cu.Stream)
+    Copy src on host to dst on host, asynchronously.
+
+func (src Float64s) CopyDtoH(dst []float64)
+    Copy src form device to dst on host.
+
+func (src Float64s) CopyDtoHAsync(dst []float64, stream cu.Stream)
+    Copy src form device to dst on host, asynchronously.
+
+func (dst Float64s) CopyHtoD(src []float64)
+    Copy src from host to dst on the device.
+
+func (dst Float64s) CopyHtoDAsync(src []float64, stream cu.Stream)
+    Copy src from host to dst on the device, asynchronously.
+
+func (s *Float64s) Free()
+    Free the underlying storage. To be used with care. Free() should only be
+    called on a slice created by MakeXXX(), not on a slice created by
+    x.Slice(). Freeing a slice invalidates all other slices referring to it.
+
+func (src Float64s) Host() []float64
+    Returns a fresh copy on host.
+
+func (s *Float64s) Len() int
+    Slice length (number of elements).
+
+func (s *Float64s) Pointer() cu.DevicePtr
+    Pointer to the first element.
+
+func (s Float64s) Slice(start, stop int) Float64s
+    Return a slice from start (inclusive) to stop (exclusive), sharing the
+    underlying storage with the original slice. Slices obtained in this way
+    should not be Free()'d
+
+func (s *Float64s) UnsafeSet(pointer unsafe.Pointer, length, capacity int)
+    Manually set the pointer, length and capacity. Side-steps the security
+    mechanisms, use with caution.
+
+

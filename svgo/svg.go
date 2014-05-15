@@ -269,7 +269,7 @@ func (svg *SVG) Ellipse(x int, y int, w int, h int, s ...string) {
 
 // Polygon draws a series of line segments using an array of x, y coordinates, with optional style.
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#PolygonElement
-func (svg *SVG) Polygon(x []int, y []int, s ...string) {
+func (svg *SVG) Polygon(x []float64, y []float64, s ...string) {
 	svg.poly(x, y, "polygon", s...)
 }
 
@@ -351,7 +351,7 @@ func (svg *SVG) Line(x1, y1, x2, y2 interface{}, s ...string) {
 
 // Polyline draws connected lines between coordinates, with optional style.
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#PolylineElement
-func (svg *SVG) Polyline(x []int, y []int, s ...string) {
+func (svg *SVG) Polyline(x []float64, y []float64, s ...string) {
 	svg.poly(x, y, "polyline", s...)
 }
 
@@ -805,7 +805,7 @@ func style(s string) string {
 }
 
 // pp returns a series of polygon points
-func (svg *SVG) pp(x []int, y []int, tag string) {
+func (svg *SVG) pp(x []float64, y []float64, tag string) {
 	svg.print(tag)
 	if len(x) != len(y) {
 		svg.print(" ")
@@ -844,7 +844,7 @@ func (svg *SVG) tt(tag string, s string) {
 }
 
 // poly compiles the polygon element
-func (svg *SVG) poly(x []int, y []int, tag string, s ...string) {
+func (svg *SVG) poly(x []float64, y []float64, tag string, s ...string) {
 	svg.pp(x, y, "<"+tag+" points=\"")
 	svg.print(`" ` + endstyle(s, "/>\n"))
 }
@@ -893,7 +893,7 @@ func rotate(r float64) string { return fmt.Sprintf(`rotate(%g)`, r) }
 func translate(x, y int) string { return fmt.Sprintf(`translate(%d,%d)`, x, y) }
 
 // coord returns a coordinate string
-func coord(x int, y int) string { return fmt.Sprintf(`%d,%d`, x, y) }
+func coord(x interface{}, y interface{}) string { return fmt.Sprintf(`%v,%v`, x, y) }
 
 // ptag returns the beginning of the path element
 func ptag(x int, y int) string { return fmt.Sprintf(`<path d="M%s`, coord(x, y)) }

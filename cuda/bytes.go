@@ -3,7 +3,7 @@ package cuda
 // GPU byte slice, used to store regions.
 
 import (
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/util"
 	"log"
 	"unsafe"

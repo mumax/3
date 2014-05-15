@@ -1,7 +1,7 @@
 package cuda
 
 import (
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"log"
 )
 

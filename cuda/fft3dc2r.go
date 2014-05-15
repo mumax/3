@@ -2,8 +2,8 @@ package cuda
 
 import (
 	"fmt"
-	"github.com/barnex/cuda5/cu"
-	"github.com/barnex/cuda5/cufft"
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/cuda/cufft"
 	"github.com/mumax/3/data"
 )
 

@@ -8,7 +8,7 @@ package cufft
 import "C"
 
 import (
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"unsafe"
 )
 

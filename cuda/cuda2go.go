@@ -151,7 +151,7 @@ const templText = `package cuda
 
 import(
 	"unsafe"
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"sync"
 )
 

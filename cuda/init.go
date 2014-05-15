@@ -3,7 +3,7 @@ package cuda
 
 import (
 	"fmt"
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/util"
 	"log"
 	"runtime"

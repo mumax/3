@@ -4,8 +4,8 @@ package cuda
 // Base implementation for all FFT plans.
 
 import (
-	"github.com/barnex/cuda5/cu"
-	"github.com/barnex/cuda5/cufft"
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/cuda/cufft"
 )
 
 // Base implementation for all FFT plans.

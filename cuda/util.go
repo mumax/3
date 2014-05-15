@@ -1,6 +1,6 @@
 package cuda
 
-import "github.com/barnex/cuda5/cu"
+import "github.com/mumax/3/cuda/cu"
 
 // CUDA Launch parameters.
 // there might be better choices for recent hardware,

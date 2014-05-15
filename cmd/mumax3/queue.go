@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/barnex/cuda5/cu"
+	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/engine"
 	"io"
 	"log"

@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"unsafe"

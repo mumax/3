@@ -2,8 +2,8 @@ package engine
 
 import (
 	"fmt"
-	"github.com/barnex/cuda5/cu"
 	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/gui"
 	"github.com/mumax/3/util"
 	"math/rand"

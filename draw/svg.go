@@ -13,13 +13,12 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 	h, w := len(arr[0][0]), len(arr[0][0][0])
 
 	const (
-		S  = 256 // scale
-		r1 = S / 2
-		r2 = S / 4
+		r1 = 1. / 2. // arrow half length
+		r2 = 1. / 4. // arrow half width
 	)
 
 	canvas := svg.New(out)
-	canvas.Start(S*w, S*h)
+	canvas.Start(w, h)
 
 	for slice := 0; slice < len(arr[0]); slice++ {
 		Mx := arr[X][slice]
@@ -27,9 +26,9 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 		Mz := arr[Z][slice]
 
 		for i := 0; i < h; i++ {
-			y := (S * h) - (S*i + S/2)
+			y := float64(h) - (float64(i) + 1./2.)
 			for j := 0; j < w; j++ {
-				x := S*j + S/2
+				x := float64(j) + 1./2.
 
 				mx := Mx[i][j]
 				my := My[i][j]
@@ -45,8 +44,8 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 				s := math.Sin(theta)
 				r1 := r1 * math.Cos(math.Asin(float64(mz)))
 
-				xs := []int{int(r1*c) + x, int(r2*s-r1*c) + x, int(-r2*s-r1*c) + x}
-				ys := []int{-int(r1*s) + y, -int(-r2*c-r1*s) + y, -int(r2*c-r1*s) + y}
+				xs := []float64{(r1 * c) + x, (r2*s - r1*c) + x, (-r2*s - r1*c) + x}
+				ys := []float64{-(r1 * s) + y, -(-r2*c - r1*s) + y, -(r2*c - r1*s) + y}
 
 				col := HSLMap(mx, my, mz)
 				style := "fill:#" + hex(col.R) + hex(col.G) + hex(col.B)

@@ -19,5 +19,6 @@ func main() {
 	defer g.End()
 
 	g.DrawAxes(1e-9, 0.5)
+	g.DrawXLabel("Object-oriented design is the roman numerals of computing.")
 	g.Line(0, 0, 1e-9, 0.5)
 }

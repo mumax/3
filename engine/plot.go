@@ -28,6 +28,7 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	plot := graph.New(w, 600, 300) // (!) canvas size duplicated in html.go
 	plot.SetRanges(0, t, -1, 1)
 	plot.DrawAxes(t/5, 0.5)
+	plot.DrawXLabel("t (s)")
 	if len(graphx) > 1 {
 		plot.Polyline(graphx, graphy)
 	}

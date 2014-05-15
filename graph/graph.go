@@ -22,7 +22,7 @@ func New(out io.Writer, width, height int) *Graph {
 	canvas := svg.New(out)
 	canvas.Start(width, height)
 	g := &Graph{canvas: canvas, w: float64(width), h: float64(height)}
-	g.SetMargins(32, 24, 24, 16) // suited margin for DrawAxes
+	g.SetMargins(48, 24, 52, 16) // suited margin for DrawAxes
 	g.SetRanges(0, 1, 0, 1)
 	g.LineStyle = `style="fill:none;stroke:black"`
 	g.FillStyle = `style="fill:black"`
@@ -66,7 +66,12 @@ func (g *Graph) DrawAxes(xTic, yTic float64) {
 		x2, y2 = g.transf(g.xMax, y)
 		g.canvas.Line(x2, y2, x2-g.TicSize, y2, g.LineStyle)
 	}
+}
 
+func (g *Graph) DrawXLabel(text string) {
+	const vpad = 32 // pixels between x-axis and x label
+	_, y2 := g.transf(0, g.yMin)
+	g.canvas.Text(int(g.w/2), int(y2)+vpad, text, g.TextStyle, `dominant-baseline="hanging"`, `style="text-anchor:middle"`)
 }
 
 func (g *Graph) Polyline(x []float64, y []float64) {

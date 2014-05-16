@@ -3,13 +3,12 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/graph"
+	"github.com/mumax/3/svgo"
 	"log"
 	"net/http"
 )
 
 func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
-
-	log.Println("plotting...")
 
 	// atomically get local copies to avoid race conditions
 	var (
@@ -29,16 +28,16 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.Header().Set("Content-Type", "image/svg+xml")
-	plot := graph.New(w, 600, 300) // (!) canvas size duplicated in html.go
-	defer plot.End()
 
 	if len(data) == 0 || len(data[0]) == 0 || len(data[0][0]) < 2 { // need 2 points (from time column)
-		//log.Println("no data to plot, len(data) = ", len(data))
-		//	if len(data) > 0{
-		//	log.Println("len(data[0]) = ", len(data[0]))
-		//	}
+		// send a small empty plot as placeholder
+		plot := svg.New(w)
+		plot.Start(600, 64)
+		plot.Text(0, 32, "Enable with TableAutosave(interval)")
+		plot.End()
 		return
 	}
+	plot := graph.New(w, 600, 300)
 	tMax := data[0][0][len(data[0][0])-1]
 	plot.SetRanges(0, tMax, -1, 1)
 	plot.DrawAxes(tMax/5, 0.5)
@@ -47,4 +46,5 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 		plot.LineStyle = fmt.Sprintf(`style="fill:none;stroke-width:2;stroke:%v"`, [3]string{"red", "green", "blue"}[c])
 		plot.Polyline(data[0][0], data[1][c])
 	}
+	plot.End()
 }

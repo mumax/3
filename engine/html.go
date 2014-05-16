@@ -183,7 +183,7 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 
 {{.Data.Div "plot"}}
-		{{.Img "plot" "/plot/" "alt=\"plot\"" "width=600" "height=300"}}
+		{{.Img "plot" "/plot/" "alt=\"plot\""}}
 </div>
 
 

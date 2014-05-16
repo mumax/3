@@ -327,9 +327,9 @@ func (g *guistate) prepareParam() {
 // see prepareServer
 func (g *guistate) prepareDisplay() {
 	// plot
-	g.OnEvent("tableautosave", func() {
+	g.OnEvent("tableAutoSave", func() {
 		Inject <- func() {
-			g.EvalGUI("TableAutosave(" + g.StringValue("tableautosavearg") + ")")
+			g.EvalGUI("TableAutosave(" + g.StringValue("tableAutoSave") + ")")
 		}
 	})
 
@@ -411,6 +411,7 @@ func (g *guistate) prepareOnUpdate() {
 			}
 
 			// display
+			g.Set("tableAutoSave", Table.autosave.period)
 			quant := g.StringValue("renderQuant")
 			comp := g.StringValue("renderComp")
 			cachebreaker := "?" + g.StringValue("nsteps") + "_" + fmt.Sprint(g.cacheBreaker())
@@ -418,7 +419,7 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("display", "/render/"+quant+"/"+comp+cachebreaker)
 
 			// plot
-			gui_.Set("plot", "/plot/?"+cachebreaker)
+			gui_.Set("plot", "/plot/"+cachebreaker)
 
 			// parameters
 			for _, p := range g.Params {

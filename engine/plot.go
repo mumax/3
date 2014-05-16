@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/graph"
 	"github.com/mumax/3/svgo"
-	"log"
 	"net/http"
 )
 
@@ -20,10 +19,6 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 		for i := range data {
 			data[i] = make([][]float64, len(hist[i]))
 			copy(data[i], hist[i]) // only copies slice headers, sufficient to avoid races (append to slices only)
-		}
-		if len(hist) > 0 {
-			log.Println("len(table.hisotry[0]) = ", len(hist[0]))
-			log.Println("len(data[0]) = ", len(data[0]))
 		}
 	})
 

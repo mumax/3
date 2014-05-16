@@ -326,6 +326,14 @@ func (g *guistate) prepareParam() {
 
 // see prepareServer
 func (g *guistate) prepareDisplay() {
+	// plot
+	g.OnEvent("tableautosave", func() {
+		Inject <- func() {
+			g.EvalGUI("TableAutosave(" + g.StringValue("tableautosavearg") + ")")
+		}
+	})
+
+	// render
 	g.OnEvent("renderQuant", func() {
 		g.render.mutex.Lock()
 		defer g.render.mutex.Unlock()

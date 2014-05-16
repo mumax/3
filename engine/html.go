@@ -183,7 +183,10 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 
 {{.Data.Div "plot"}}
-		{{.Img "plot" "/plot/" "alt=\"plot\""}}
+<p title="{{$.Data.Doc "TableAutoSave"}}">
+	TableAutosave( {{.TextBox "tableautosavearg" "0" }} ) s {{.Button "tableautosave" "Set"}}
+</p>
+	{{.Img "plot" "/plot/" "alt=\"plot\""}}
 </div>
 
 

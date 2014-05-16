@@ -14,7 +14,7 @@ func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
 	DeclFunc("TableAddVar", TableAddVariable, "Add user-defined variable + name + unit to data table.")
 	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
-	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table ever period (s).")
+	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table every period (s). Zero disables save.")
 	DeclFunc("TablePrint", TablePrint, "Print anyting in the data table")
 	Table.Add(&M)
 }

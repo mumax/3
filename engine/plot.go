@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/mumax/3/graph"
 	"github.com/mumax/3/svgo"
+	"log"
+	"math"
 	"net/http"
 )
 
@@ -34,6 +36,7 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	}
 	plot := graph.New(w, 600, 300)
 	tMax := data[0][0][len(data[0][0])-1]
+	tMax = roundNice(tMax)
 	plot.SetRanges(0, tMax, -1, 1)
 	plot.DrawAxes(tMax/5, 0.5)
 	plot.DrawXLabel("t (s)")
@@ -42,4 +45,13 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 		plot.Polyline(data[0][0], data[1][c])
 	}
 	plot.End()
+}
+
+// round (up) to nice 2 digit number for max axis range.
+func roundNice(x float64) float64 {
+	order := int(math.Log10(x))
+	y := math.Ceil(100 * x / math.Pow10(order))
+	r := y * math.Pow10(order) / 100
+	log.Println("roundnice", x, r)
+	return r
 }

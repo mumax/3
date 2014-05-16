@@ -24,6 +24,7 @@ type DataTable struct {
 	info
 	outputs []TableData
 	autosave
+	history [][][]float64 // history for plot, indexed by: quantity, component, row
 }
 
 func newTable(name string) *DataTable {
@@ -72,10 +73,12 @@ func (t *DataTable) Add(output TableData) {
 func (t *DataTable) Save() {
 	t.init()
 	fmt.Fprint(t, Time)
-	for _, o := range t.outputs {
+	t.history[0][0] = append(t.history[0][0], Time) // first column: time (1 component)
+	for i, o := range t.outputs {
 		vec := o.average()
-		for _, v := range vec {
+		for c, v := range vec {
 			fmt.Fprint(t, "\t", float32(v))
+			t.history[i+1][c] = append(t.history[i+1][c], v)
 		}
 	}
 	fmt.Fprintln(t)
@@ -112,6 +115,13 @@ func (t *DataTable) init() {
 		}
 		fmt.Fprintln(t)
 		t.Flush()
+
+		// history for plot
+		t.history = make([][][]float64, len(t.outputs)+1) // outputs + time column
+		t.history[0] = make([][]float64, 1)               // time column (1 component)
+		for q := range t.outputs {                        // other columns
+			t.history[q+1] = make([][]float64, t.outputs[q].NComp())
+		}
 	}
 }
 

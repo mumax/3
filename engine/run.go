@@ -184,11 +184,6 @@ func step(output bool) {
 	}
 	if output {
 		DoOutput()
-		// --
-		_graphx = append(_graphx, Time)
-		mx := M.Comp(0)
-		_graphy = append(_graphy, mx.Average())
-		// --
 	}
 }
 

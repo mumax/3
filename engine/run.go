@@ -160,6 +160,7 @@ func RunWhile(condition func() bool) {
 }
 
 func runWhile(condition func() bool, output bool) {
+	DoOutput() // allow t=0 output
 	for condition() && !pause {
 		select {
 		default:

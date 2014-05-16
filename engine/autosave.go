@@ -43,7 +43,7 @@ func autoSave(q Quantity, period float64, save func(Quantity)) {
 	if period == 0 {
 		delete(output, q)
 	} else {
-		output[q] = &autosave{period, Time, 0, save}
+		output[q] = &autosave{period, Time, -1, save} // init count to -1 allows save at t=0
 	}
 }
 

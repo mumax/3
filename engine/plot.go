@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/graph"
 	"github.com/mumax/3/svgo"
-	"log"
 	"math"
 	"net/http"
 )
@@ -50,8 +49,6 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 // round (up) to nice 2 digit number for max axis range.
 func roundNice(x float64) float64 {
 	order := int(math.Log10(x))
-	y := math.Ceil(100 * x / math.Pow10(order))
-	r := y * math.Pow10(order) / 100
-	log.Println("roundnice", x, r)
-	return r
+	y := math.Ceil(1E2 * x / math.Pow10(order)) // 1E2: 2 digits
+	return y * math.Pow10(order) / 1E2
 }

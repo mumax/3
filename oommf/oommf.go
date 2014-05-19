@@ -179,7 +179,7 @@ func parseHeaderLine(str string) (key, value string) {
 	return key, value
 }
 
-// INTERNAL: true if line == "# begin_data"
+// INTERNAL: true if line starts with "# begin:data"
 func isHeaderEnd(str string) bool {
 	str = strings.ToLower(strings.Trim(str, "# "))
 	str = strings.Replace(str, " ", "", -1)
@@ -195,7 +195,7 @@ func readOVFDataText(in io.Reader, t *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < 3; c++ {
+				for c := 0; c < t.NComp(); c++ {
 					_, err := fmt.Fscan(in, &data[c][iz][iy][ix])
 					if err != nil {
 						panic(err)

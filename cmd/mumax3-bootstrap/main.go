@@ -21,7 +21,7 @@ func main() {
 
 	sep := string(os.PathListSeparator)
 	bin := execDir()
-	fmt.Println("bin:", bin)
+	//fmt.Println("bin:", bin)
 
 	env = os.Environ()
 	for i := range env {
@@ -31,7 +31,7 @@ func main() {
 		}
 		if strings.HasPrefix(env[i], PATH+"=") {
 			env[i] += sep + bin
-			fmt.Println(env[i])
+			//fmt.Println(env[i])
 		}
 	}
 

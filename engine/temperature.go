@@ -54,6 +54,12 @@ func (b *thermField) AddTo(dst *data.Slice) {
 }
 
 func (b *thermField) update() {
+	// we need to fix the time step here because solver will not yet have done it before the first step.
+	// FixDt as an lvalue that sets Dt_si on change might be cleaner.
+	if FixDt != 0 {
+		Dt_si = FixDt
+	}
+
 	if b.generator == 0 {
 		b.generator = curand.CreateGenerator(curand.PSEUDO_DEFAULT)
 		b.generator.SetSeed(b.seed)

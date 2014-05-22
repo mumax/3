@@ -9,20 +9,20 @@ import (
 )
 
 var (
-	Temp        ScalarParam
-	temp_red    derivedParam
-	E_therm     *GetScalar
-	Edens_therm sAdder
-	B_therm     thermField
+	Temp        ScalarParam  // Temperature in K
+	temp_red    derivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
+	E_therm     *GetScalar   // Thermal energy in J
+	Edens_therm sAdder       // Thermal energy density
+	B_therm     thermField   // Thermal effective field (T)
 )
 
 // thermField calculates and caches thermal noise.
 type thermField struct {
-	seed      int64 // seed for generator
-	generator curand.Generator
-	noise     *data.Slice // noise buffer
-	step      int         // solver step corresponding to noise
-	dt        float64     // solver timestep corresponding to noise
+	seed      int64            // seed for generator
+	generator curand.Generator //
+	noise     *data.Slice      // noise buffer
+	step      int              // solver step corresponding to noise
+	dt        float64          // solver timestep corresponding to noise
 }
 
 func init() {

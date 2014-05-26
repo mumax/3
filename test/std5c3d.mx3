@@ -1,6 +1,6 @@
 /*
-	Test for Slonczewski STT with zero epsilonprime.
-	Standard solution was verified against oommf 1.2a5bis
+	Test for Slonczewski STT with 3D discretization
+	Standard solution was verified against oommf 1.2a5bis with 2D discretization
 */
 
 total_current := -0.006 // Current in amps
@@ -19,7 +19,7 @@ thick  :=  5e-9
 
 Nx := 64
 Ny := 32
-Nz := 1
+Nz := 2
 
 current_area := length*width
 current_density := total_current/current_area
@@ -36,5 +36,5 @@ m = uniform(1,0,0)
 
 tableautosave(10e-12)
 run(0.5e-9)
-TOL := 1e-5
+TOL := 1e-2 // a small 2D/3D difference is acceptable
 expectv("m", m.average(), vector(0.905612587928772, -0.2860856354236603, -0.011005667969584465), TOL)

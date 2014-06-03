@@ -32,7 +32,7 @@ func init() {
 	//Dz.init("Dz", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dz2})
 	B_exch.init("B_exch", "T", "Exchange field", AddExchangeField)
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
-	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", addEdens(&B_exch, -0.5))
+	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", makeEdensAdder(&B_exch, -0.5))
 	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()

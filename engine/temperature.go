@@ -29,7 +29,7 @@ func init() {
 	Temp.init("Temp", "K", "Temperature", []derived{&temp_red})
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
 	E_therm = NewGetScalar("E_therm", "J", "Thermal energy", GetThermalEnergy)
-	Edens_therm.init("Edens_therm", "J/m3", "Thermal energy density", addEdens(&B_therm, -1))
+	Edens_therm.init("Edens_therm", "J/m3", "Thermal energy density", makeEdensAdder(&B_therm, -1))
 	registerEnergy(GetThermalEnergy, Edens_therm.AddTo)
 	B_therm.step = -1 // invalidate noise cache
 	DeclROnly("B_therm", &B_therm, "Thermal field (T)")

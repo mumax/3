@@ -18,6 +18,8 @@ var (
 	Edens_anis            sAdder     // Anisotropy energy density
 )
 
+var zero ScalarParam // utility zero parameter
+
 func init() {
 	Ku1.init("Ku1", "J/m3", "Uniaxial anisotropy constant", []derived{&ku1_red})
 	Kc1.init("Kc1", "J/m3", "1st order cubic anisotropy constant", []derived{&kc1_red})
@@ -27,7 +29,7 @@ func init() {
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 	B_anis.init("B_anis", "T", "Anisotropy field", AddAnisotropyField)
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", GetAnisotropyEnergy)
-	Edens_anis.init("Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", addEdens(&B_anis, -0.5))
+	Edens_anis.init("Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", AddAnisotropyEnergyDensity)
 	registerEnergy(GetAnisotropyEnergy, Edens_anis.AddTo)
 
 	//ku1_red = Ku1 / Msat
@@ -56,7 +58,54 @@ func AddAnisotropyField(dst *data.Slice) {
 	}
 }
 
+func AddAnisotropyEnergyDensity(dst *data.Slice) {
+	buf := cuda.Buffer(B_anis.NComp(), B_anis.Mesh().Size())
+	defer cuda.Recycle(buf)
+
+	// unnormalized magnetization:
+	Mf, r := M_full.Slice()
+	if r {
+		defer cuda.Recycle(Mf)
+	}
+
+	if !Ku1.isZero() {
+		cuda.Zero(buf)
+		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -0.5, buf, Mf)
+	}
+
+	if !Kc1.isZero() {
+		cuda.Zero(buf)
+		cuda.AddCubicAnisotropy(buf, M.Buffer(), kc1_red.gpuLUT1(), kc2_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -0.25, buf, Mf)
+	}
+}
+
 // Returns anisotropy energy in joules.
 func GetAnisotropyEnergy() float64 {
-	return -0.5 * cellVolume() * dot(&M_full, &B_anis)
+	buf := cuda.Buffer(B_anis.NComp(), B_anis.Mesh().Size())
+	defer cuda.Recycle(buf)
+
+	// unnormalized magnetization:
+	Mf, r := M_full.Slice()
+	if r {
+		defer cuda.Recycle(Mf)
+	}
+
+	// add terms with correct prefactor
+	E := 0.
+
+	if !Ku1.isZero() {
+		cuda.Zero(buf)
+		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), ku1_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
+		E += -0.5 * cellVolume() * float64(cuda.Dot(Mf, buf))
+	}
+
+	if !Kc1.isZero() {
+		cuda.Zero(buf)
+		cuda.AddCubicAnisotropy(buf, M.Buffer(), kc1_red.gpuLUT1(), kc2_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		E += -0.25 * cellVolume() * float64(cuda.Dot(Mf, buf))
+	}
+
+	return E
 }

@@ -8,8 +8,7 @@
 // K2:     Kc2/Msat in T
 // C1, C2: anisotropy axes
 //
-// Author: Arne Vansteenkiste, based on Kelvin Fong's mumax2 implementation
-//         Colin Jermain, added 2nd order anisotropy term
+// based on http://www.southampton.ac.uk/~fangohr/software/oxs_cubic8.html
 extern "C" __global__ void
 addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
                    float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
@@ -23,22 +22,23 @@ addcubicanisotropy(float* __restrict__ Bx, float* __restrict__ By, float* __rest
 
 		uint8_t r  = regions[i];
 		float  k1 = K1LUT[r];
-		float  k2 = K2LUT[r];
-		float3 c1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
-		float3 c2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
-		float3 c3 = cross(c1, c2); // 3rd axis perpendicular to c1,c2
+		//float  k2 = K2LUT[r];
+		float3 u1 = normalized(make_float3(C1xLUT[r], C1yLUT[r], C1zLUT[r]));
+		float3 u2 = normalized(make_float3(C2xLUT[r], C2yLUT[r], C2zLUT[r]));
+		float3 u3 = cross(u1, u2); // 3rd axis perpendicular to u1,u2
 		float3 m  = make_float3(mx[i], my[i], mz[i]);
 
-		float a1 = dot(c1, m);
-		float a2 = dot(c2, m);
-		float a3 = dot(c3, m);
+		float u1m = dot(u1, m);
+		float u2m = dot(u2, m);
+		float u3m = dot(u3, m);
 
-		float3 A1 = (-2.0f * k1) * make_float3(a1*(a2*a2+a3*a3), a2*(a1*a1+a3*a3), a3*(a1*a1+a2*a2));
-		float3 A2 = (-2.0f * k2) * make_float3(a1*a2*a2*a3*a3, a1*a1*a2*a3*a3, a1*a1*a2*a2*a3);
-		float3 A = A1 + A2;
+		float3 B = -2.0f * k1 *(
+		               (sqr(u2m)+sqr(u3m))*(u1m*u1) +
+		               (sqr(u1m)+sqr(u3m))*(u2m*u2) +
+		               (sqr(u1m)+sqr(u2m))*(u3m*u3) );
 
-		Bx[i] += A.x*c1.x + A.y*c2.x + A.z*c3.x;
-		By[i] += A.x*c1.y + A.y*c2.y + A.z*c3.y;
-		Bz[i] += A.x*c1.z + A.y*c2.z + A.z*c3.z;
+		Bx[i] += B.x;
+		By[i] += B.y;
+		Bz[i] += B.z;
 	}
 }

@@ -14,12 +14,11 @@ var (
 	AnisU, AnisC1, AnisC2     VectorParam  // unixial and cubic anis axes
 	ku1_red, ku2_red          derivedParam // K1 / Msat
 	kc1_red, kc2_red, kc3_red derivedParam
-	B_anis                    vAdder     // field due to uniaxial anisotropy (T)
-	E_anis                    *GetScalar // Anisotorpy energy
-	Edens_anis                sAdder     // Anisotropy energy density
+	B_anis                    vAdder      // field due to uniaxial anisotropy (T)
+	E_anis                    *GetScalar  // Anisotorpy energy
+	Edens_anis                sAdder      // Anisotropy energy density
+	zero                      ScalarParam // utility zero parameter
 )
-
-var zero ScalarParam // utility zero parameter
 
 func init() {
 	Ku1.init("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
@@ -34,6 +33,7 @@ func init() {
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", GetAnisotropyEnergy)
 	Edens_anis.init("Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", AddAnisotropyEnergyDensity)
 	registerEnergy(GetAnisotropyEnergy, Edens_anis.AddTo)
+	zero.init("_zero", "", "", []derived{})
 
 	//ku1_red = Ku1 / Msat
 	ku1_red.init(SCALAR, []updater{&Ku1, &Msat}, func(p *derivedParam) {
@@ -94,9 +94,15 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 	}
 
 	if haveUnixial {
+		// 1st
 		cuda.Zero(buf)
-		addUniaxialAnisotropyField(buf)
+		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), ku1_red.gpuLUT1(), zero.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
 		cuda.AddDotProduct(dst, -0.5, buf, Mf)
+
+		// 2nd
+		cuda.Zero(buf)
+		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), zero.gpuLUT1(), ku2_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -0.25, buf, Mf)
 	}
 
 	if haveCubic {

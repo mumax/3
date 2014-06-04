@@ -67,6 +67,8 @@ func (p *lut) isZero() bool {
 	return true
 }
 
+func (p *lut) nonZero() bool { return !p.isZero() }
+
 func (p *lut) assureAlloc() {
 	if p.gpu_buf[0] == nil {
 		for i := range p.gpu_buf {

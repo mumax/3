@@ -64,8 +64,21 @@ inline __device__ float3 normalized(float3 a){
 }
 
 // square
-inline __device__ float sqr(float x){
+inline __device__ float pow2(float x){
 	return x * x;
+}
+
+
+// pow(x, 3)
+inline __device__ float pow3(float x){
+	return x * x * x;
+}
+
+
+// pow(x, 4)
+inline __device__ float pow4(float x){
+	float s = x*x;
+	return s*s;
 }
 
 #define is0(m) ( dot(m, m) == 0.0f )

@@ -1,0 +1,30 @@
+/*
+	Test higher-order anisotropy energy conservation.
+	Add cubic and uniaxial anisotropy, so that an off-by-a-factor error in one of them
+	would give an total energy oscillation.
+*/
+
+setgridsize(1, 1, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+Msat  = 1000e3
+alpha = 1e-6
+Kc1 = 1e3
+Kc3 = 1e3
+maxDt = 1e-13
+Ku1 = 1e5
+enabledemag = false
+AnisC1 = vector(1, 0, 0)
+AnisC2 = vector(0, 1, 0)
+AnisU  = vector(1, 1, 0)
+M     = uniform(0.3, 0.7, 0.1)
+
+E0 := E_total.Get()
+TOL := 1e-5
+for i:=0; i<10; i++{
+	run(10e-12)
+	E := E_total.Get()
+	expect("deltaE", (E0-E)/E0, 0, TOL)
+}
+
+

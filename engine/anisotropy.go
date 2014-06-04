@@ -97,18 +97,29 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 		// 1st
 		cuda.Zero(buf)
 		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), ku1_red.gpuLUT1(), zero.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
-		cuda.AddDotProduct(dst, -0.5, buf, Mf)
+		cuda.AddDotProduct(dst, -1./2., buf, Mf)
 
 		// 2nd
 		cuda.Zero(buf)
 		cuda.AddUniaxialAnisotropy(buf, M.Buffer(), zero.gpuLUT1(), ku2_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
-		cuda.AddDotProduct(dst, -0.25, buf, Mf)
+		cuda.AddDotProduct(dst, -1./4., buf, Mf)
 	}
 
 	if haveCubic {
+		// 1st
 		cuda.Zero(buf)
-		addCubicAnisotropyField(buf)
-		cuda.AddDotProduct(dst, -0.25, buf, Mf)
+		cuda.AddCubicAnisotropy(buf, M.Buffer(), kc1_red.gpuLUT1(), zero.gpuLUT1(), zero.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -1./4., buf, Mf)
+
+		// 2nd
+		cuda.Zero(buf)
+		cuda.AddCubicAnisotropy(buf, M.Buffer(), zero.gpuLUT1(), kc2_red.gpuLUT1(), zero.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -1./6., buf, Mf)
+
+		// 3nd
+		cuda.Zero(buf)
+		cuda.AddCubicAnisotropy(buf, M.Buffer(), zero.gpuLUT1(), zero.gpuLUT1(), kc3_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		cuda.AddDotProduct(dst, -1./8., buf, Mf)
 	}
 }
 

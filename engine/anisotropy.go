@@ -58,6 +58,8 @@ func AddAnisotropyField(dst *data.Slice) {
 	}
 }
 
+//todo: unite, add higher order
+
 func AddAnisotropyEnergyDensity(dst *data.Slice) {
 	buf := cuda.Buffer(B_anis.NComp(), B_anis.Mesh().Size())
 	defer cuda.Recycle(buf)

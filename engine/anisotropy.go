@@ -80,9 +80,9 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 	haveUnixial := ku1_red.nonZero() || ku2_red.nonZero()
 	haveCubic := kc1_red.nonZero() || kc2_red.nonZero() || kc3_red.nonZero()
 
-	//	if !haveUnixial && !haveCubic{
-	//		return;
-	//	}
+	if !haveUnixial && !haveCubic {
+		return
+	}
 
 	buf := cuda.Buffer(B_anis.NComp(), B_anis.Mesh().Size())
 	defer cuda.Recycle(buf)

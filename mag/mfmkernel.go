@@ -7,10 +7,12 @@ import (
 	"math"
 )
 
+// Kernel for the vertical derivative of the force on an MFM tip due to mx, my, mz.
+// This is the 2nd derivative of the energy w.r.t. z.
 func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 	const TipCharge = 1 / Mu0 // tip charge
-	const Δ = 1e-9            // tip oscillation
+	const Δ = 1e-9            // tip oscillation, take 2nd derivative over this distance
 	util.AssertMsg(lift > 0, "MFM tip crashed into sample, please lift the new one higher")
 
 	{ // Kernel mesh is 2x larger than input, instead in case of PBC
@@ -65,29 +67,24 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 					m := d.Vector{0, 0, 0}
 					m[s] = 1
 
-					R1 := d.Vector{-x, -y, z - lift}
-					r1 := R1.Len()
-					B1 := R1.Mul(TipCharge / (4 * math.Pi * r1 * r1 * r1))
+					var E [3]float64 // 3 energies for 2nd derivative
 
-					R1 = d.Vector{-x, -y, z - (lift + tipsize)}
-					r1 = R1.Len()
-					B1 = B1.Add(R1.Mul(-TipCharge / (4 * math.Pi * r1 * r1 * r1)))
+					for i := -1; i <= 1; i++ {
+						I := float64(i)
+						R := d.Vector{-x, -y, z - (lift + (I * Δ))}
+						r := R.Len()
+						B := R.Mul(TipCharge / (4 * math.Pi * r * r * r))
 
-					E1 := B1.Dot(m) * volume
+						R = d.Vector{-x, -y, z - (lift + tipsize + (I * Δ))}
+						r = R.Len()
+						B = B.Add(R.Mul(-TipCharge / (4 * math.Pi * r * r * r)))
 
-					R2 := d.Vector{-x, -y, z - (lift + Δ)}
-					r2 := R2.Len()
-					B2 := R2.Mul(TipCharge / (4 * math.Pi * r2 * r2 * r2))
+						E[i+1] = B.Dot(m) * volume // i=-1 stored in  E[0]
+					}
 
-					R2 = d.Vector{-x, -y, z - (lift + tipsize + Δ)}
-					r2 = R2.Len()
-					B2 = B2.Add(R2.Mul(-TipCharge / (4 * math.Pi * r2 * r2 * r2)))
+					dFdz_tip := ((E[0] - E[1]) + (E[2] - E[1])) / (Δ * Δ) // dFz/dz = d2E/dz2
 
-					E2 := B2.Dot(m) * volume
-
-					Fz_tip := (E2 - E1) / Δ
-
-					K[s][zw][yw][xw] += float32(Fz_tip) // += needed in case of PBC
+					K[s][zw][yw][xw] += float32(dFdz_tip) // += needed in case of PBC
 				}
 			}
 		}

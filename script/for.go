@@ -27,6 +27,8 @@ func (w *World) compileForStmt(n *ast.ForStmt) *forStmt {
 	}
 	if n.Cond != nil {
 		stmt.cond = typeConv(n.Cond.Pos(), w.compileExpr(n.Cond), bool_t)
+	} else {
+		stmt.cond = boolLit(true)
 	}
 	if n.Post != nil {
 		stmt.post = w.compileStmt(n.Post)

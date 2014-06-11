@@ -10,7 +10,6 @@
 #define deltay(in) (in[idx(ix, hclampy(iy+1), iz)] - in[idx(ix, lclampy(iy-1), iz)])
 #define deltaz(in) (in[idx(ix, iy, hclampz(iz+1))] - in[idx(ix, iy, lclampz(iz-1))])
 
-// (ux, uy, uz) is 0.5 * U_spintorque / cellsize(x, y, z)
 extern "C" __global__ void
 addzhanglitorque(float* __restrict__ tx, float* __restrict__ ty, float* __restrict__ tz,
                  float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,

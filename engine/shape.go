@@ -25,6 +25,7 @@ func init() {
 	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 	DeclFunc("ImageShape", ImageShape, "Use black/white image as shape")
+	DeclFunc("GrainRoughness", GrainRoughness, "Grainy surface with different heights per grain")
 }
 
 // geometrical shape for setting sample geometry
@@ -175,6 +176,20 @@ func ImageShape(fname string) Shape {
 		} else {
 			return inside[iy][ix]
 		}
+	}
+}
+
+func GrainRoughness(grainsize, zmin, zmax float64, seed int) Shape {
+	t := newTesselation(grainsize, 256, int64(seed))
+	return func(x, y, z float64) bool {
+		if z <= zmin {
+			return true
+		}
+		if z >= zmax {
+			return false
+		}
+		r := t.RegionOf(x, y, z)
+		return (z-zmin)/(zmax-zmin) < (float64(r) / 256)
 	}
 }
 

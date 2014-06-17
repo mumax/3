@@ -1,0 +1,14 @@
+/*
+	Regression test for Roughness shape.
+*/
+
+Nx := 500
+Ny := 200
+Nz := 10
+c := 1e-9
+setgridsize(Nx, Ny, Nz)
+setcellsize(c, c, c)
+
+setgeom(ellipse(Nx*c, Ny*c).intersect(grainroughness(40e-9, 0, 5e-9, 123)))
+
+expect("volume", geom.average(), 0.577983, 1e-4)  // this volume was OK so should not change unexpectedly

@@ -12,7 +12,7 @@ Aex   = 16e-12
 alpha = 3
 AnisU = vector(0, 0, 1)
 Ku1   = 1.27E6
-Dex   = 0.1e-3 // J/m2.
+Dind   = 0.1e-3 // J/m2.
 
 m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1).RotZ(pi/2)
 

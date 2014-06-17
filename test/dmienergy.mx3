@@ -14,7 +14,7 @@ Aex   = 20e-12
 Ku1   = 5.9e5
 Msat  = 6e5
 AnisU = vector(0, 0, 1)
-Dex   = 3e-3
+Dind   = 3e-3
 m     = uniform(1, 1, 1)
 alpha = 0.01
 

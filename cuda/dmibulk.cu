@@ -44,8 +44,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 			m1.z = m0.z + (-cx * D_2A * m0.y);
 		}
 		h   += (2.0f*A/(cx*cx)) * (m1 - m0);          // exchange
-		h.y += (D/cx)*(m0.z - m1.z);                  // actually (2*D)/(2*cx) * delta m
-		h.z -= (D/cx)*(m0.y - m1.y);
+		h.y += (D/cx)*(-m1.z);                  // actually (2*D)/(2*cx) * delta m
+		h.z -= (D/cx)*(-m1.y);
 	}
 
 
@@ -61,8 +61,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 			m2.z = m0.z + (+cx * D_2A * m0.y);
 		}
 		h   += (2.0f*A/(cx*cx)) * (m2 - m0);
-		h.y += (D/cx)*(m2.z - m0.z);
-		h.z -= (D/cx)*(m2.y - m0.y);
+		h.y += (D/cx)*(m2.z);
+		h.z -= (D/cx)*(m2.y);
 	}
 
 	// y derivatives (along height)
@@ -78,8 +78,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 			m1.z = m0.z - (-cy * D_2A * m0.x);
 		}
 		h   += (2.0f*A/(cy*cy)) * (m1 - m0);
-		h.x -= (D/cy)*(m0.z - m1.z);
-		h.z += (D/cy)*(m0.x - m1.x);
+		h.x -= (D/cy)*(-m1.z);
+		h.z += (D/cy)*(-m1.x);
 	}
 
 	{
@@ -94,8 +94,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 			m2.z = m0.z - (+cy * D_2A * m0.x);
 		}
 		h   += (2.0f*A/(cy*cy)) * (m2 - m0);
-		h.x -= (D/cy)*(m2.z - m0.z);
-		h.z += (D/cy)*(m2.x - m0.x);
+		h.x -= (D/cy)*(m2.z);
+		h.z += (D/cy)*(m2.x);
 	}
 
 	// only take vertical derivative for 3D sim
@@ -113,8 +113,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 				m1.z = m0.z;
 			}
 			h   += (2.0f*A/(cz*cz)) * (m1 - m0);
-			h.x += (D/cz)*(m0.y - m1.y);
-			h.y -= (D/cz)*(m0.x - m1.x);
+			h.x += (D/cz)*(- m1.y);
+			h.y -= (D/cz)*(- m1.x);
 		}
 
 		// top neighbor
@@ -130,8 +130,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
 				m2.z = m0.z;
 			}
 			h   += (2.0f*A/(cz*cz)) * (m2 - m0);
-			h.x += (D/cz)*(m2.y - m0.y);
-			h.y -= (D/cz)*(m2.x - m0.x);
+			h.x += (D/cz)*(m2.y );
+			h.y -= (D/cz)*(m2.x );
 		}
 	}
 

@@ -83,9 +83,9 @@ func (w *writer) writeData(array *data.Slice) {
 
 	ncomp := array.NComp()
 	for c := 0; c < ncomp; c++ {
-		for ix := 0; ix < size[0]; ix++ {
+		for iz := 0; iz < size[2]; iz++ {
 			for iy := 0; iy < size[1]; iy++ {
-				for iz := 0; iz < size[2]; iz++ {
+				for ix := 0; ix < size[0]; ix++ {
 					w.writeFloat32(data[c][iz][iy][ix])
 				}
 			}

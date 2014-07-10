@@ -85,7 +85,7 @@ func (r *reader) readSlice() (s *data.Slice, info data.Meta, err error) {
 
 	host := s.Tensors()
 	ncomp := s.NComp()
-	for c := 0; c < ncomp; c++ {
+	for c := ncomp - 1; c >= 0; c-- {
 		for iz := 0; iz < size[2]; iz++ {
 			for iy := 0; iy < size[1]; iy++ {
 				for ix := 0; ix < size[0]; ix++ {

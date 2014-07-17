@@ -12,7 +12,7 @@ func init() {
 	go Serve("testdata", addr)
 }
 
-func TestBadServer(t *testing.T) {
+func TestBadAddress(t *testing.T) {
 	if _, err := Dial("badport:111111"); err == nil {
 		t.Error("should get error on invalid port")
 	} else {
@@ -22,16 +22,15 @@ func TestBadServer(t *testing.T) {
 	if _, err := Dial(":abc"); err == nil {
 		t.Error("should get error on malformed port")
 	} else {
-
 		fmt.Println(err)
 	}
 
 	if _, err := Dial(":malformed:"); err == nil {
 		t.Error("should get error on malformed address")
 	} else {
-
 		fmt.Println(err)
 	}
+
 	if _, err := Dial("nonexistingghostserver.blabla:123"); err == nil {
 		t.Error("should get lookup error")
 	} else {

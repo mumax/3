@@ -3,13 +3,47 @@ package httpfs
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
+	"time"
 )
 
 var addr = "localhost:12345"
 
 func init() {
 	go Serve("testdata", addr)
+}
+
+func TestWrite(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+	w, err := fs.OpenWrite("output")
+	if err != nil {
+		t.Error(err)
+	}
+	msg := time.Now().String()
+	_, e2 := w.Write([]byte(msg))
+	if e2 != nil {
+		t.Error(e2)
+	}
+	w.Close()
+
+	//	{
+	//		f, err := fs.Open("output")
+	//		if err != nil {
+	//			t.Error(err)
+	//		}
+	//		bytes, err2 := ioutil.ReadAll(f)
+	//		if err2 != nil {
+	//			t.Error(err2)
+	//			return
+	//		}
+	//		if string(bytes) != msg {
+	//			t.Error("read", string(bytes), "instead of", msg)
+	//		}
+	//	}
 }
 
 func TestBadAddress(t *testing.T) {
@@ -38,14 +72,6 @@ func TestBadAddress(t *testing.T) {
 	}
 }
 
-//func TestServerGone(t *testing.T) {
-//	fs, err := Dial(":1111") // use noexisting server nevertheless
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	fs.Open("file.txt")
-//}
-
 var specialFiles = []string{"=", ":", "!", "?", "[", "*", "%"}
 
 func TestSpecialFiles(t *testing.T) {
@@ -54,6 +80,17 @@ func TestSpecialFiles(t *testing.T) {
 		if _, err := fs.Open(f); err != nil {
 			t.Error(err)
 		}
+	}
+}
+
+// TODO: also for other methods (!)
+func TestPath(t *testing.T) {
+	fs, _ := Dial(addr)
+	if _, err := fs.Open("//hello.txt"); err != nil {
+		t.Error(err)
+	}
+	if _, err := fs.Open("./hello.txt"); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -86,6 +123,9 @@ func TestHelloFile(t *testing.T) {
 }
 
 func TestBigFile(t *testing.T) {
+	const SIZE = 1 << 24
+	writeZeros("testdata/bigfile", SIZE)
+
 	fs, _ := Dial(addr)
 	f, err := fs.Open("bigfile")
 	if err != nil {
@@ -99,7 +139,18 @@ func TestBigFile(t *testing.T) {
 		t.Error(err2)
 		return
 	}
-	if len(bytes) != 1<<21 {
+	if len(bytes) != SIZE {
 		t.Error("bigfile: read", len(bytes), "bytes")
 	}
+}
+
+// make file of size N
+func writeZeros(fname string, N int) {
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	zeros := make([]byte, N)
+	f.Write(zeros)
 }

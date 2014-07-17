@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-type FS struct {
+type Client struct {
 	serverAddr string
 	client     http.Client
 }
@@ -17,15 +17,15 @@ type FS struct {
 const PROTOCOL = "http://"
 
 //
-func Mount(addr string) *FS {
-	fs := &FS{serverAddr: PROTOCOL + addr + "/", client: http.Client{}}
+func Dial(addr string) *Client {
+	fs := &Client{serverAddr: PROTOCOL + addr + "/", client: http.Client{}}
 	// test connection once
 	//resp, err := fs.client.Head("/")
 	return fs //, nil
 }
 
 // Open file for reading.
-func (f *FS) Open(name string) (io.ReadCloser, error) {
+func (f *Client) Open(name string) (io.ReadCloser, error) {
 	resp, err := f.client.Get(f.serverAddr + "/" + name)
 	if err != nil {
 		panic(err)
@@ -37,7 +37,7 @@ func (f *FS) Open(name string) (io.ReadCloser, error) {
 	return resp.Body, nil // to be closed by user
 }
 
-func (f *FS) Write(name string) io.WriteCloser {
+func (f *Client) Write(name string) io.WriteCloser {
 	r, w := io.Pipe()
 
 	go func() {

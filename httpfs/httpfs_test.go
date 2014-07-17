@@ -13,12 +13,18 @@ func init() {
 }
 
 func TestBadServer(t *testing.T) {
-	fs := Mount("noexist:1")
-	fs.Open("file.txt")
+	fs, err := Dial("nonexistingserverblabla:1")
+	if err != nil {
+		t.Error("should get error on nonexisting server")
+	}
+	_, err2 := fs.Open("file.txt")
+	if err2 != nil {
+		t.Error("nonexisting server should not open files")
+	}
 }
 
 func TestNonExisting(t *testing.T) {
-	fs := Mount(addr)
+	fs := Dial(addr)
 	_, err := fs.Open("nonexisting.txt")
 	if err == nil {
 		t.Error("should get error on nonexisting file")
@@ -27,7 +33,7 @@ func TestNonExisting(t *testing.T) {
 }
 
 func TestHelloFile(t *testing.T) {
-	fs := Mount(addr)
+	fs := Dial(addr)
 	f, err := fs.Open("hello.txt")
 	if err != nil {
 		t.Error(err)
@@ -46,7 +52,7 @@ func TestHelloFile(t *testing.T) {
 }
 
 func TestBigFile(t *testing.T) {
-	fs := Mount(addr)
+	fs := Dial(addr)
 	f, err := fs.Open("bigfile")
 	if err != nil {
 		t.Error(err)

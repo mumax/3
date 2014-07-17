@@ -7,19 +7,21 @@ import (
 )
 
 var (
-	Alpha        ScalarParam
-	Xi           ScalarParam
-	Pol          ScalarParam
-	Lambda       ScalarParam
-	EpsilonPrime ScalarParam
-	FixedLayer   VectorParam
-	Torque       vSetter    // total torque in T
-	LLTorque     vSetter    // Landau-Lifshitz torque/γ0, in T
-	STTorque     vAdder     // Spin-transfer torque/γ0, in T
-	J            excitation // Polarized electrical current density
-	MaxTorque    *GetScalar
-	GammaLL      float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
-	Precess              = true
+	Alpha                   ScalarParam
+	Xi                      ScalarParam
+	Pol                     ScalarParam
+	Lambda                  ScalarParam
+	EpsilonPrime            ScalarParam
+	FixedLayer              VectorParam
+	Torque                  vSetter    // total torque in T
+	LLTorque                vSetter    // Landau-Lifshitz torque/γ0, in T
+	STTorque                vAdder     // Spin-transfer torque/γ0, in T
+	J                       excitation // Polarized electrical current density
+	MaxTorque               *GetScalar
+	GammaLL                 float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
+	Precess                         = true
+	EnableZhangLiTorque             = true
+	EnableSlonczewskiTorque         = true
 )
 
 func init() {
@@ -36,6 +38,8 @@ func init() {
 	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	Torque.init("torque", "T", "Total torque/γ0", SetTorque)
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
+	DeclVar("EnableZhangLiTorque", &EnableZhangLiTorque, "Enables/disables Zhang-Li torque (default=true)")
+	DeclVar("EnableSlonczewskiTorque", &EnableSlonczewskiTorque, "Enables/disables Slonczewski torque (default=true)")
 	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 }
 
@@ -65,11 +69,11 @@ func AddSTTorque(dst *data.Slice) {
 	if rec {
 		defer cuda.Recycle(jspin)
 	}
-
-	cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
-		Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
-
-	if !FixedLayer.isZero() {
+	if EnableZhangLiTorque {
+		cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
+			Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
+	}
+	if !FixedLayer.isZero() && EnableSlonczewskiTorque {
 		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
 			Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu(), Mesh())
 	}

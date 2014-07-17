@@ -46,6 +46,17 @@ func TestBadAddress(t *testing.T) {
 //	fs.Open("file.txt")
 //}
 
+var specialFiles = []string{"=", ":", "!", "?", "[", "*", "%"}
+
+func TestSpecialFiles(t *testing.T) {
+	fs, _ := Dial(addr)
+	for _, f := range specialFiles {
+		if _, err := fs.Open(f); err != nil {
+			t.Error(err)
+		}
+	}
+}
+
 func TestNonExisting(t *testing.T) {
 	fs, _ := Dial(addr)
 	_, err := fs.Open("nonexisting.txt")

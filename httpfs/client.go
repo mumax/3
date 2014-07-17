@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 )
 
 type Client struct {
@@ -33,7 +34,7 @@ func Dial(addr string) (*Client, error) {
 
 // Open file for reading.
 func (f *Client) Open(name string) (io.ReadCloser, error) {
-	resp, err := f.client.Get(f.serverAddr + "/" + name)
+	resp, err := f.client.Get(f.serverAddr + "/" + url.QueryEscape(name))
 	if err != nil {
 		panic(err)
 	}

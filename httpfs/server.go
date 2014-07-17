@@ -10,6 +10,7 @@ import (
 
 func Serve(root, addr string) {
 	http.Handle("/", &fileHandler{path: root})
+	log.Println("serving", root, "at", addr)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		panic(err)
@@ -19,7 +20,7 @@ func Serve(root, addr string) {
 type fileHandler struct{ path string }
 
 func (f *fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL)
+	log.Println(r.Method, r.URL.Path)
 
 	switch r.Method {
 	default:

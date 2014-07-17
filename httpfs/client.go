@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 )
 
@@ -14,14 +15,20 @@ type Client struct {
 	client     http.Client
 }
 
-const PROTOCOL = "http://"
+const (
+	PROTOCOL = "http://"
+	MAXPORT  = 1<<16 - 1
+)
 
-//
-func Dial(addr string) *Client {
+// Dial sets up a Client to access files served on addr.
+// An error is returned only if addr cannot be resolved by net.ResolveTCPAddr.
+// It is not an error if the server is down at the time of Dial.
+func Dial(addr string) (*Client, error) {
+	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
+		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
+	}
 	fs := &Client{serverAddr: PROTOCOL + addr + "/", client: http.Client{}}
-	// test connection once
-	//resp, err := fs.client.Head("/")
-	return fs //, nil
+	return fs, nil
 }
 
 // Open file for reading.

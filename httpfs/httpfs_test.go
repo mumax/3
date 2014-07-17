@@ -13,18 +13,42 @@ func init() {
 }
 
 func TestBadServer(t *testing.T) {
-	fs, err := Dial("nonexistingserverblabla:1")
-	if err != nil {
-		t.Error("should get error on nonexisting server")
+	if _, err := Dial("badport:111111"); err == nil {
+		t.Error("should get error on invalid port")
+	} else {
+		fmt.Println(err)
 	}
-	_, err2 := fs.Open("file.txt")
-	if err2 != nil {
-		t.Error("nonexisting server should not open files")
+
+	if _, err := Dial(":abc"); err == nil {
+		t.Error("should get error on malformed port")
+	} else {
+
+		fmt.Println(err)
+	}
+
+	if _, err := Dial(":malformed:"); err == nil {
+		t.Error("should get error on malformed address")
+	} else {
+
+		fmt.Println(err)
+	}
+	if _, err := Dial("nonexistingghostserver.blabla:123"); err == nil {
+		t.Error("should get lookup error")
+	} else {
+		fmt.Println(err)
 	}
 }
 
+//func TestServerGone(t *testing.T) {
+//	fs, err := Dial(":1111") // use noexisting server nevertheless
+//	if err != nil {
+//		t.Error(err)
+//	}
+//	fs.Open("file.txt")
+//}
+
 func TestNonExisting(t *testing.T) {
-	fs := Dial(addr)
+	fs, _ := Dial(addr)
 	_, err := fs.Open("nonexisting.txt")
 	if err == nil {
 		t.Error("should get error on nonexisting file")
@@ -33,7 +57,7 @@ func TestNonExisting(t *testing.T) {
 }
 
 func TestHelloFile(t *testing.T) {
-	fs := Dial(addr)
+	fs, _ := Dial(addr)
 	f, err := fs.Open("hello.txt")
 	if err != nil {
 		t.Error(err)
@@ -52,7 +76,7 @@ func TestHelloFile(t *testing.T) {
 }
 
 func TestBigFile(t *testing.T) {
-	fs := Dial(addr)
+	fs, _ := Dial(addr)
 	f, err := fs.Open("bigfile")
 	if err != nil {
 		t.Error(err)

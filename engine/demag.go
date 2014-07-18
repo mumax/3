@@ -10,23 +10,25 @@ import (
 
 // Demag variables
 var (
-	Msat          ScalarParam
-	Bsat          derivedParam
-	M_full        vSetter
-	B_demag       vSetter
-	E_demag       *GetScalar
-	Edens_demag   sAdder
-	EnableDemag   = true                 // enable/disable demag field
-	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
-	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
-	CacheDir      = ""                   // directory for kernel cache
+	Msat              ScalarParam
+	Bsat              derivedParam
+	M_full            vSetter
+	B_demag           vSetter
+	E_demag           *GetScalar
+	Edens_demag       sAdder
+	EnableDemag       = true                 // enable/disable demag field
+	conv_             *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	asymptotic_radius = 32                   // Radius (in number of cells) beyond which demag calculations fall back to far-field approximation
+	zero_self_demag   = 0                    // Include/exclude self-demag
+	CacheDir          = ""                   // directory for kernel cache
 )
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
 	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
-	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
+	DeclVar("asymptotic_radius", &asymptotic_radius, "Radius (in number of cells) beyond which demag calculations fall back to far-field approximiation (default=32)")
+	DeclVar("zero_self_demag", &zero_self_demag, "Includes/excludes self-demag in each cell (default=true)")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", makeEdensAdder(&B_demag, -0.5))
@@ -78,7 +80,7 @@ func demagConv() *cuda.DemagConvolution {
 	if conv_ == nil {
 		SetBusy(true)
 		defer SetBusy(false)
-		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, CacheDir)
+		kernel := mag.NewellDemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), asymptotic_radius, zero_self_demag, CacheDir)
 		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
 	}
 	return conv_

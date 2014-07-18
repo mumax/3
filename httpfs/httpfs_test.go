@@ -49,6 +49,22 @@ func TestWrite(t *testing.T) {
 	}
 }
 
+func TestWriteNonexit(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+
+	w, err := fs.OpenFile("nonexisting", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err == nil {
+		t.Error("opened non-exising file for writing: no error")
+	}
+	if w != nil {
+		t.Error("opened non-exising file for writing: non-nil file")
+	}
+
+}
+
 func TestBadAddress(t *testing.T) {
 	if _, err := Dial("badport:111111"); err == nil {
 		t.Error("should get error on invalid port")

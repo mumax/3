@@ -19,6 +19,8 @@ func TestWrite(t *testing.T) {
 	if e != nil {
 		t.Error(e)
 	}
+
+	// write current time to file
 	w, err := fs.OpenWrite("output")
 	if err != nil {
 		t.Error(err)
@@ -30,20 +32,21 @@ func TestWrite(t *testing.T) {
 	}
 	w.Close()
 
-	//	{
-	//		f, err := fs.Open("output")
-	//		if err != nil {
-	//			t.Error(err)
-	//		}
-	//		bytes, err2 := ioutil.ReadAll(f)
-	//		if err2 != nil {
-	//			t.Error(err2)
-	//			return
-	//		}
-	//		if string(bytes) != msg {
-	//			t.Error("read", string(bytes), "instead of", msg)
-	//		}
-	//	}
+	// read back
+	{
+		f, err := fs.Open("output")
+		if err != nil {
+			t.Error(err)
+		}
+		bytes, err2 := ioutil.ReadAll(f)
+		if err2 != nil {
+			t.Error(err2)
+			return
+		}
+		if string(bytes) != msg {
+			t.Error("read", string(bytes), "instead of", msg)
+		}
+	}
 }
 
 func TestBadAddress(t *testing.T) {
@@ -83,7 +86,6 @@ func TestSpecialFiles(t *testing.T) {
 	}
 }
 
-// TODO: also for other methods (!)
 func TestPath(t *testing.T) {
 	fs, _ := Dial(addr)
 	if _, err := fs.Open("//hello.txt"); err != nil {

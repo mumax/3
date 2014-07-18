@@ -14,8 +14,8 @@ import (
 
 // An httpfs Client provides access to an httpfs file system.
 type Client struct {
-	serverURL string // server base URL, e.g.: "http://server.com:1234/"
-	client    http.Client
+	serverAddr string // server address
+	client     http.Client
 }
 
 // Dial sets up a Client to access files served on addr.
@@ -25,80 +25,91 @@ func Dial(addr string) (*Client, error) {
 	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
-	c := http.Client{}
-	fs := &Client{serverURL: PROTOCOL + addr + "/", client: c}
+	fs := &Client{serverAddr: addr}
 	return fs, nil
 }
 
-// Open file for reading, similar to os.Open.
-func (f *Client) Open(fname string) (*File, error) {
-	return f.openRead(fname, os.O_RDONLY, 0666)
+// Open opens a file for reading, similar to os.Open.
+func (f *Client) Open(name string) (*File, error) {
+	return f.OpenFile(name, os.O_RDONLY, 0)
 }
 
-// Open file for writing, unlike os.Create it is write-only.
-func (f *Client) Create(fname string) (*File, error) {
-	return f.openRead(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+// Create opens a file for reading/writing, similar to os.Create
+func (f *Client) Create(name string) (*File, error) {
+	return f.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 }
 
-// Generalized open call. Most users will use Open or Create instead.
-// The specified flag (O_RDONLY etc.) cannot be O_RDWR: httpfs Files are
-// either read-only or write-only.
-func (f *Client) OpenFile(fname string, flag int, perm os.FileMode) (*File, error) {
-	if (flag & os.O_RDWR) != 0 {
-		return nil, fmt.Errorf("httpfs: open %v: flag O_RDWR not allowed")
+// OpenFile is similar to os.OpenFile. Most users will use Open or Create instead.
+func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error) {
+
+	// prepare URL
+	u := url.URL{Scheme: "http", Host: f.serverAddr, Path: name}
+	q := u.Query()
+	q.Set("flag", fmt.Sprint(flag))
+	q.Set("perm", fmt.Sprint(perm))
+	u.RawQuery = q.Encode()
+
+	// send OPEN request
+	req, eReq := http.NewRequest("OPEN", u.String(), nil)
+	panicOn(eReq)
+	resp, eResp := f.client.Do(req)
+	if eResp != nil {
+		return nil, fmt.Errorf(`httpfs open "%v": %v`, name, eResp)
 	}
-	if (flag & os.O_WRONLY) != 0 {
-		return f.openWrite(fname, flag, perm)
-	}
-	if (flag & os.O_RDONLY) != 0 {
-		return f.openRead(fname, flag, perm)
-	}
-	return nil, fmt.Errorf("httpfs: open %v: invalid flag: %v", flag)
+	defer resp.Body.Close()
+
+	return nil, nil
 }
 
-func (f *Client) openRead(fname string, flag int, perm os.FileMode) (*File, error) {
-	resp, err := f.client.Get(f.fileURL(fname))
+func panicOn(err error) {
 	if err != nil {
 		panic(err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		defer resp.Body.Close()
-		return nil, fmt.Errorf("httpfs: open %v: server response %v (%s)", fname, resp.StatusCode, readError(resp.Body))
-	}
-	return &File{name: fname, r: resp.Body}, nil // to be closed by user
 }
 
-func (f *Client) openWrite(fname string, flag int, perm os.FileMode) (*File, error) {
-	// TODO: sanitize flag
+//func (f *Client) openRead(fname string, flag int, perm os.FileMode) (*File, error) {
+//	resp, err := f.client.Get(f.fileURL(fname))
+//	if err != nil {
+//		panic(err)
+//	}
+//	if resp.StatusCode != http.StatusOK {
+//		defer resp.Body.Close()
+//		return nil, fmt.Errorf("httpfs: open %v: server response %v (%s)", fname, resp.StatusCode, readError(resp.Body))
+//	}
+//	return &File{name: fname, r: resp.Body}, nil // to be closed by user
+//}
+//
+//func (f *Client) openWrite(fname string, flag int, perm os.FileMode) (*File, error) {
+//	// TODO: sanitize flag
+//
+//	r, w := io.Pipe()
+//	req, e1 := http.NewRequest("PUT", f.fileURL(fname), r)
+//	req.Header.Add(X_OPEN_PERM, fmt.Sprint(perm))
+//	req.Header.Add(X_OPEN_FLAG, fmt.Sprint(flag))
+//
+//	if e1 != nil {
+//		return nil, fmt.Errorf("httpfs: open %v: %v", fname, e1)
+//	}
+//
+//	go func() {
+//		resp, err := f.client.Do(req) //, strings.NewReader("hi"))
+//
+//		log.Println("c: openwrite err=", err, "resp", resp)
+//		if resp != nil {
+//			resp.Body.Close()
+//		}
+//	}()
+//	return &File{name: fname, w: w}, nil
+//}
 
-	r, w := io.Pipe()
-	req, e1 := http.NewRequest("PUT", f.fileURL(fname), r)
-	req.Header.Add(X_OPEN_PERM, fmt.Sprint(perm))
-	req.Header.Add(X_OPEN_FLAG, fmt.Sprint(flag))
-
-	if e1 != nil {
-		return nil, fmt.Errorf("httpfs: open %v: %v", fname, e1)
-	}
-
-	go func() {
-		resp, err := f.client.Do(req) //, strings.NewReader("hi"))
-
-		log.Println("c: openwrite err=", err, "resp", resp)
-		if resp != nil {
-			resp.Body.Close()
-		}
-	}()
-	return &File{name: fname, w: w}, nil
-}
-
-func (f *Client) fileURL(name string) string {
-	return f.serverURL + escapeURLPath(name)
-}
-
-func escapeURLPath(path string) string {
-	u := url.URL{Path: path}
-	return u.String()
-}
+//func (f *Client) fileURL(name string) string {
+//	return f.serverAddr + escapeURLPath(name)
+//}
+//
+//func escapeURLPath(path string) string {
+//	u := url.URL{Path: path}
+//	return u.String()
+//}
 
 // read error message from http.Response.Body
 func readError(r io.Reader) []byte {

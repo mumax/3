@@ -31,7 +31,7 @@ func init() {
 	DeclVar("zero_self_demag", &zero_self_demag, "Includes/excludes self-demag in each cell (default=true)")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
-	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", makeEdensAdder(&B_demag, -0.5))
+	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", addEdens(&B_demag, -0.5))
 	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)
 
 	//Bsat = Msat * mu0

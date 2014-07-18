@@ -10,17 +10,17 @@ import (
 
 // Demag variables
 var (
-	Msat              ScalarParam
-	Bsat              derivedParam
-	M_full            vSetter
-	B_demag           vSetter
-	E_demag           *GetScalar
-	Edens_demag       sAdder
-	EnableDemag       = true                 // enable/disable demag field
-	conv_             *cuda.DemagConvolution // does the heavy lifting and provides FFTM
-	asymptotic_radius = 32                   // Radius (in number of cells) beyond which demag calculations fall back to far-field approximation
-	zero_self_demag   = 0                    // Include/exclude self-demag
-	CacheDir          = ""                   // directory for kernel cache
+	Msat          ScalarParam
+	Bsat          derivedParam
+	M_full        vSetter
+	B_demag       vSetter
+	E_demag       *GetScalar
+	Edens_demag   sAdder
+	EnableDemag   = true                 // enable/disable demag field
+	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	asymptotic_radius = 32               // Radius (in number of cells) beyond which demag calculations fall back to far-field approximation
+	zero_self_demag = 0                  // Include/exclude self-demag
+	CacheDir      = ""                   // directory for kernel cache
 )
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 	DeclVar("zero_self_demag", &zero_self_demag, "Includes/excludes self-demag in each cell (default=true)")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
-	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", makeEdensAdder(&B_demag, -0.5))
+	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", addEdens(&B_demag, -0.5))
 	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)
 
 	//Bsat = Msat * mu0

@@ -1259,6 +1259,7 @@ func CalcNewellDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, asymptoti
 
 	scaled_arad_sq := scaled_arad * scaled_arad
 
+	// Go through entire grid, computing demag tensor at every point...
 	for z := r1[Z]; z <= r2[Z]; z++ {
 		go func(z int) {
 			zw := wrap(z, size[Z])
@@ -1414,30 +1415,6 @@ func CalcNewellDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, asymptoti
 	kernel[Y][X] = kernel[X][Y]
 	kernel[Z][X] = kernel[X][Z]
 	kernel[Z][Y] = kernel[Y][Z]
-
-	/*	// Debug the tensor
-
-		for i := r1[X]; i<=r2[X]; i++ {
-			iw := wrap(i,size[X])
-			for j := r1[Y]; j<=r2[Y]; j++ {
-				jw := wrap(j,size[Y])
-				for k := r1[Z]; k<=r2[Z]; k++ {
-					kw := wrap(k,size[Z])
-					util.Log("kern at [X, Y, Z] = [", iw, ", ", jw, ", ", kw, "]")
-					for s := 0; s < 3; s++ {
-						var (
-							outVar	[3]float32
-						)
-						outVar[0], outVar[1], outVar[2] = 0.0, 0.0, 0.0
-						for d := s; d < 3; d++ {
-							outVar[d] = array[s][d][kw][jw][iw]
-						}
-							util.Log("    [ ", outVar[0]," ", outVar[1]," ", outVar[2]," ]")
-					}
-				}
-			}
-		}
-	*/
 
 	return kernel
 }

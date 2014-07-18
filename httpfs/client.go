@@ -14,8 +14,8 @@ import (
 
 // An httpfs Client provides access to an httpfs file system.
 type Client struct {
-	serverAddr string
-	client     http.Client
+	serverURL string // server base URL, e.g.: "http://server.com:1234/"
+	client    http.Client
 }
 
 // Dial sets up a Client to access files served on addr.
@@ -26,7 +26,7 @@ func Dial(addr string) (*Client, error) {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
 	c := http.Client{}
-	fs := &Client{serverAddr: PROTOCOL + addr + "/", client: c}
+	fs := &Client{serverURL: PROTOCOL + addr + "/", client: c}
 	return fs, nil
 }
 
@@ -92,7 +92,12 @@ func (f *Client) openWrite(fname string, flag int, perm os.FileMode) (*File, err
 }
 
 func (f *Client) fileURL(name string) string {
-	return f.serverAddr + url.QueryEscape(name)
+	return f.serverURL + escapeURLPath(name)
+}
+
+func escapeURLPath(path string) string {
+	u := url.URL{Path: path}
+	return u.String()
 }
 
 // read error message from http.Response.Body

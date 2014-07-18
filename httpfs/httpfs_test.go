@@ -14,6 +14,32 @@ func init() {
 	go Serve("testdata", addr)
 }
 
+func TestDial(t *testing.T) {
+	if _, err := Dial("badport:111111"); err == nil {
+		t.Error("should get error on invalid port")
+	} else {
+		fmt.Println(err)
+	}
+
+	if _, err := Dial(":abc"); err == nil {
+		t.Error("should get error on malformed port")
+	} else {
+		fmt.Println(err)
+	}
+
+	if _, err := Dial(":malformed:"); err == nil {
+		t.Error("should get error on malformed address")
+	} else {
+		fmt.Println(err)
+	}
+
+	if _, err := Dial("nonexistingghostserver.blabla:123"); err == nil {
+		t.Error("should get lookup error")
+	} else {
+		fmt.Println(err)
+	}
+}
+
 func TestWrite(t *testing.T) {
 	fs, e := Dial(addr)
 	if e != nil {
@@ -63,32 +89,6 @@ func TestWriteNonexit(t *testing.T) {
 		t.Error("opened non-exising file for writing: non-nil file")
 	}
 
-}
-
-func TestBadAddress(t *testing.T) {
-	if _, err := Dial("badport:111111"); err == nil {
-		t.Error("should get error on invalid port")
-	} else {
-		fmt.Println(err)
-	}
-
-	if _, err := Dial(":abc"); err == nil {
-		t.Error("should get error on malformed port")
-	} else {
-		fmt.Println(err)
-	}
-
-	if _, err := Dial(":malformed:"); err == nil {
-		t.Error("should get error on malformed address")
-	} else {
-		fmt.Println(err)
-	}
-
-	if _, err := Dial("nonexistingghostserver.blabla:123"); err == nil {
-		t.Error("should get lookup error")
-	} else {
-		fmt.Println(err)
-	}
 }
 
 var specialFiles = []string{"=", ":", "!", "?", "[", "*", "%"}

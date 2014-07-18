@@ -9,17 +9,13 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 type Client struct {
 	serverAddr string
 	client     http.Client
 }
-
-const (
-	PROTOCOL = "http://"
-	MAXPORT  = 1<<16 - 1
-)
 
 // Dial sets up a Client to access files served on addr.
 // An error is returned only if addr cannot be resolved by net.ResolveTCPAddr.
@@ -34,7 +30,11 @@ func Dial(addr string) (*Client, error) {
 }
 
 // Open file for reading.
-func (f *Client) Open(fname string) (io.ReadCloser, error) {
+func (f *Client) Open(fname string) (*File, error) {
+	return f.openRead(fname, os.O_RDONLY, 0666)
+}
+
+func (f *Client) openRead(fname string, flag int, perm os.FileMode) (*File, error) {
 	resp, err := f.client.Get(f.fileURL(fname))
 	if err != nil {
 		panic(err)
@@ -43,23 +43,43 @@ func (f *Client) Open(fname string) (io.ReadCloser, error) {
 		defer resp.Body.Close()
 		return nil, fmt.Errorf("httpfs: open %v: server response %v (%s)", fname, resp.StatusCode, readError(resp.Body))
 	}
-	return resp.Body, nil // to be closed by user
+	return &File{name: fname, r: resp.Body}, nil // to be closed by user
 }
 
-func (f *Client) OpenWrite(fname string) (io.WriteCloser, error) {
+func (f *Client) OpenFile(fname string, flag int, perm os.FileMode) (*File, error) {
+	if (flag & os.O_RDWR) != 0 {
+		return nil, fmt.Errorf("httpfs: open %v: flag O_RDWR not allowed")
+	}
+	if (flag & os.O_WRONLY) != 0 {
+		return f.openWrite(fname, flag, perm)
+	}
+	if (flag & os.O_RDONLY) != 0 {
+		return f.openRead(fname, flag, perm)
+	}
+	return nil, fmt.Errorf("httpfs: open %v: invalid flag: %v", flag)
+}
+
+func (f *Client) openWrite(fname string, flag int, perm os.FileMode) (*File, error) {
 	log.Println("c: openwrite", fname)
+	// TODO: sanitize flag
+
 	r, w := io.Pipe()
 	req, e1 := http.NewRequest("PUT", f.fileURL(fname), r)
+	req.Header.Add(X_OPEN_PERM, fmt.Sprint(perm))
+	req.Header.Add(X_OPEN_FLAG, fmt.Sprint(flag))
 
 	if e1 != nil {
-		return nil, fmt.Errorf("httpfs: openwrite %v: %v", fname, e1)
+		return nil, fmt.Errorf("httpfs: open %v: %v", fname, e1)
 	}
+
 	go func() {
-		log.Println("c: openwrite", "Do")
 		r, err := f.client.Do(req) //, strings.NewReader("hi"))
 		log.Println("c: openwrite err=", err, "resp", r)
+		if r != nil {
+			r.Body.Close()
+		}
 	}()
-	return w, nil
+	return &File{name: fname, w: w}, nil
 }
 
 func (f *Client) fileURL(name string) string {

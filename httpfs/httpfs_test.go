@@ -21,7 +21,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	// write current time to file
-	w, err := fs.OpenWrite("output")
+	w, err := fs.OpenFile("output", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		t.Error(err)
 	}

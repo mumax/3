@@ -8,6 +8,12 @@ import (
 	"path"
 )
 
+const (
+	PROTOCOL    = "http://"
+	X_OPEN_FLAG = "X-HTTPFS-OpenFlag"
+	X_OPEN_PERM = "X-HTTPFS-OpenPerm"
+)
+
 func Serve(root, addr string) {
 	log.Println("serving", root, "at", addr)
 	err := http.ListenAndServe(addr, &fileHandler{path: root}) // don't use DefaultServeMux which redirects some requests behind our back.

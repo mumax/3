@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 )
 
 // An httpfs Client provides access to an httpfs file system.
@@ -58,7 +59,17 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	}
 	defer resp.Body.Close()
 
-	return nil, nil
+	// read file descriptor
+	body, eBody := ioutil.ReadAll(resp.Body)
+	if eBody != nil {
+		return nil, fmt.Errorf(`httpfs open "%v": %v`, name, eBody)
+	}
+	fd, eFd := strconv.Atoi(string(body))
+	if eFd != nil {
+		return nil, fmt.Errorf(`httpfs open "%v": received invalid file descriptor: "%s"`, name, body)
+	}
+
+	return &File{client: f, name: name, fd: uintptr(fd)}, nil
 }
 
 func panicOn(err error) {

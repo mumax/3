@@ -9,20 +9,18 @@ import (
 	"strconv"
 )
 
-func Serve(root, addr string) {
+type server struct {
+	path      string               // served path
+	openFiles map[uintptr]*os.File // active file descriptors
+}
+
+func Serve(root, addr string) error {
 	log.Println("serving", root, "at", addr)
-	err := http.ListenAndServe(addr, &fileHandler{path: root}) // don't use DefaultServeMux which redirects some requests behind our back.
-	if err != nil {
-		panic(err)
-	}
+	err := http.ListenAndServe(addr, &server{path: root}) // don't use DefaultServeMux which redirects some requests behind our back.
+	return err
 }
 
-type fileHandler struct {
-	path string               // served path
-	fd   map[uintptr]*os.File // active file descriptors
-}
-
-func (f *fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (f *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, r.URL.Path)
 	defer r.Body.Close()
 
@@ -34,7 +32,7 @@ func (f *fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (f *fileHandler) open(w http.ResponseWriter, r *http.Request) {
+func (f *server) open(w http.ResponseWriter, r *http.Request) {
 
 	// by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
 	p := path.Clean(r.URL.Path)
@@ -64,9 +62,11 @@ func (f *fileHandler) open(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400) // TODO: could distinguish: not found, forbidden, ...
 		return
 	}
+
 	fd := file.Fd()
-	f.fd[fd] = file
+	f.openFiles[fd] = file
 	fmt.Fprint(w, fd)
+	log.Println("httpfs: opened", fname, ", fd:", fd)
 }
 
 func assert(test bool) {

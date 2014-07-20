@@ -34,11 +34,15 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	default:
-		http.Error(w, "method not allowed: "+r.Method, http.StatusMethodNotAllowed)
+		msg := "method not allowed: " + r.Method
+		log.Println("ERROR:", msg)
+		http.Error(w, msg, http.StatusMethodNotAllowed)
 	case "OPEN":
 		s.open(w, r)
 	case "READ":
 		s.read(w, r)
+	case "WRITE":
+		s.write(w, r)
 	}
 }
 
@@ -81,8 +85,9 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	// TODO: limit N
 	fdStr := r.URL.Path[len("/"):]
-	fd, eFd := strconv.Atoi(fdStr)
-	if eFd != nil {
+	fd, _ := strconv.Atoi(fdStr)
+	file := s.getFD(uintptr(fd))
+	if file == nil {
 		http.Error(w, "read: invalid file descriptor: "+fdStr, http.StatusBadRequest)
 		return
 	}
@@ -95,17 +100,30 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("httpfs: read fd", fd, "n=", n)
-	file := s.getFD(uintptr(fd))
-	// TODO: file = nil: internal server error?
 
+	// first read into buffer...
 	buf := make([]byte, n)
 	nRead, err := file.Read(buf)
-
+	// ...so we can put error in header
 	if err != nil && err != io.EOF {
 		w.Header().Set(X_READ_ERROR, err.Error())
 	}
+	// upload error is server error, not client. TODO: client: check if enough received!
 	nUpload, eUpload := w.Write(buf[:nRead])
 	log.Println(nUpload, "bytes uploaded, error=", eUpload)
+}
+
+func (s *server) write(w http.ResponseWriter, r *http.Request) {
+	fdStr := r.URL.Path[len("/"):]
+	fd, _ := strconv.Atoi(fdStr)
+	file := s.getFD(uintptr(fd))
+	if file == nil {
+		http.Error(w, "read: invalid file descriptor: "+fdStr, http.StatusBadRequest)
+		return
+	}
+
+	n, err := io.Copy(file, r.Body)
+	fmt.Fprint(w, n, err)
 }
 
 // thread-safe openFiles[fd]

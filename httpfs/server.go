@@ -2,12 +2,17 @@ package httpfs
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
 	"sync"
+)
+
+const (
+	X_READ_ERROR = "X-HTTPFS-ReadError"
 )
 
 type server struct {
@@ -24,7 +29,7 @@ func Serve(root, addr string) error {
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL.Path)
+	log.Println(r.Method, r.URL)
 	defer r.Body.Close()
 
 	switch r.Method {
@@ -54,7 +59,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 
 	// parse permissions
 	permStr := query.Get("perm")
-	perm, ePerm := strconv.Atoi(permStr)
+	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
 	if ePerm != nil {
 		http.Error(w, "invalid perm: "+permStr, http.StatusBadRequest)
 		return
@@ -73,7 +78,35 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, fd) // respond with file descriptor
 }
 
-func (s *server) read(w http.ResponseWriter, r *http.Request) {}
+func (s *server) read(w http.ResponseWriter, r *http.Request) {
+	// TODO: limit N
+	fdStr := r.URL.Path[len("/"):]
+	fd, eFd := strconv.Atoi(fdStr)
+	if eFd != nil {
+		http.Error(w, "read: invalid file descriptor: "+fdStr, http.StatusBadRequest)
+		return
+	}
+
+	nStr := r.URL.Query().Get("n")
+	n, eN := strconv.Atoi(nStr)
+	if eN != nil {
+		http.Error(w, "read: invalid number of bytes: "+nStr, http.StatusBadRequest)
+		return
+	}
+
+	log.Println("httpfs: read fd", fd, "n=", n)
+	file := s.getFD(uintptr(fd))
+	// TODO: file = nil: internal server error?
+
+	buf := make([]byte, n)
+	nRead, err := file.Read(buf)
+
+	if err != nil && err != io.EOF {
+		w.Header().Set(X_READ_ERROR, err.Error())
+	}
+	nUpload, eUpload := w.Write(buf[:nRead])
+	log.Println(nUpload, "bytes uploaded, error=", eUpload)
+}
 
 // thread-safe openFiles[fd]
 func (s *server) getFD(fd uintptr) *os.File {

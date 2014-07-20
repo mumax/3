@@ -1,6 +1,7 @@
 package httpfs
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -15,10 +16,11 @@ type File struct {
 }
 
 func (f *File) Read(p []byte) (n int, err error) {
-
 	// send OPEN request
-	u := f.u                               // copy
-	u.Query().Set("n", fmt.Sprint(len(p))) // number of bytes to read
+	u := f.u // copy
+	q := u.Query()
+	q.Set("n", fmt.Sprint(len(p))) // number of bytes to read
+	u.RawQuery = q.Encode()
 	req, eReq := http.NewRequest("READ", u.String(), nil)
 	panicOn(eReq)
 	resp, eResp := f.client.client.Do(req)
@@ -26,7 +28,13 @@ func (f *File) Read(p []byte) (n int, err error) {
 		return 0, fmt.Errorf(`httpfs read "%v": %v`, f.name, eResp)
 	}
 	defer resp.Body.Close()
-	return resp.Body.Read(p)
+	nRead, eRead := resp.Body.Read(p)
+
+	errStr := resp.Header.Get(X_READ_ERROR)
+	if errStr != "" {
+		return nRead, errors.New(errStr) // other than EOF error
+	}
+	return nRead, eRead // passes on EOF
 }
 
 func (f *File) Write(p []byte) (n int, err error) {

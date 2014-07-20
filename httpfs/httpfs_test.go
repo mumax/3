@@ -138,6 +138,19 @@ func TestWriteNonexit(t *testing.T) {
 	}
 }
 
+func TestNoAccess(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+	os.Chmod("testdata/ronly", 0)
+	if _, err := fs.OpenFile("ronly", os.O_WRONLY, 1000); err == nil {
+		t.Error("opened read-only file for writing")
+	} else {
+		fmt.Println(err)
+	}
+}
+
 func TestSandbox(t *testing.T) {
 	fs, e := Dial(addr)
 	if e != nil {

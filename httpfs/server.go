@@ -72,7 +72,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	// open file, answer with file descriptor
 	file, err := os.OpenFile(fname, flag, os.FileMode(perm))
 	if err != nil {
-		http.Error(w, err.Error(), 400) // TODO: could distinguish: not found, forbidden, ...
+		http.Error(w, err.Error(), statusCode(err))
 		return
 	}
 
@@ -80,6 +80,20 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	s.storeFD(fd, file)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
+}
+
+func statusCode(err error) int {
+	switch {
+	default:
+		return 400 // general error
+	case err == nil:
+		return http.StatusOK
+	case os.IsNotExist(err):
+		return http.StatusNotFound
+	case os.IsPermission(err):
+		return http.StatusForbidden
+		// TODO: dir exits
+	}
 }
 
 func (s *server) read(w http.ResponseWriter, r *http.Request) {

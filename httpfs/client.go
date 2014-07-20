@@ -61,8 +61,8 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	// read file descriptor
 	body := readBody(resp.Body)
 	fd, eFd := strconv.Atoi(body)
-	if eFd != nil {
-		return nil, fmt.Errorf(`httpfs open "%v": server response: "%s"`, name, body)
+	if eFd != nil || resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(`httpfs open "%v": server response: %v: "%s"`, name, resp.StatusCode, body)
 	}
 
 	// prepare *File

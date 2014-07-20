@@ -16,7 +16,8 @@ type server struct {
 
 func Serve(root, addr string) error {
 	log.Println("serving", root, "at", addr)
-	err := http.ListenAndServe(addr, &server{path: root}) // don't use DefaultServeMux which redirects some requests behind our back.
+	server := &server{path: root, openFiles: make(map[uintptr]*os.File)}
+	err := http.ListenAndServe(addr, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
 }
 

@@ -47,7 +47,7 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	u := url.URL{Scheme: "http", Host: f.serverAddr, Path: name}
 	q := u.Query()
 	q.Set("flag", fmt.Sprint(flag))
-	q.Set("perm", fmt.Sprint(perm))
+	q.Set("perm", fmt.Sprint(uint32(perm)))
 	u.RawQuery = q.Encode()
 
 	// send OPEN request

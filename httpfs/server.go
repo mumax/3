@@ -7,10 +7,12 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"sync"
 )
 
 type server struct {
-	path      string               // served path
+	path string // served path
+	sync.Mutex
 	openFiles map[uintptr]*os.File // active file descriptors
 }
 
@@ -65,9 +67,25 @@ func (f *server) open(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fd := file.Fd()
-	f.openFiles[fd] = file
+
+	f.storeFD(fd, file)
+
 	fmt.Fprint(w, fd)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
+}
+
+// thread-safe openFiles[fd]
+func (s *server) getFD(fd uintptr) *os.File {
+	s.Lock()
+	defer s.Unlock()
+	return s.openFiles[fd] // TODO: protect against nonexisting FD
+}
+
+// thread-safe openFiles[fd] = f
+func (s *server) storeFD(fd uintptr, f *os.File) {
+	s.Lock()
+	defer s.Unlock()
+	s.openFiles[fd] = f
 }
 
 func assert(test bool) {

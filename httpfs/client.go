@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -60,13 +59,10 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	defer resp.Body.Close()
 
 	// read file descriptor
-	body, eBody := ioutil.ReadAll(resp.Body)
-	if eBody != nil {
-		return nil, fmt.Errorf(`httpfs open "%v": %v`, name, eBody)
-	}
-	fd, eFd := strconv.Atoi(string(body))
+	body := readBody(resp.Body)
+	fd, eFd := strconv.Atoi(body)
 	if eFd != nil {
-		return nil, fmt.Errorf(`httpfs open "%v": received invalid file descriptor: "%s"`, name, body)
+		return nil, fmt.Errorf(`httpfs open "%v": server response: "%s"`, name, body)
 	}
 
 	// prepare *File
@@ -126,14 +122,14 @@ func panicOn(err error) {
 //}
 
 // read error message from http.Response.Body
-func readError(r io.Reader) []byte {
+func readBody(r io.Reader) string {
 	B, err := ioutil.ReadAll(r)
 	if err != nil {
-		log.Println("httpfs client: readerror:", err)
+		return "<could not read error: " + err.Error() + ">"
 	}
 	// strip trailing newline
 	if bytes.HasSuffix(B, []byte{'\n'}) {
 		B = B[:len(B)-1]
 	}
-	return B
+	return string(B)
 }

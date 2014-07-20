@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // A https File implements a subset of os.File's methods.
@@ -48,16 +50,17 @@ func (f *File) Write(p []byte) (n int, err error) {
 		return 0, fmt.Errorf(`httpfs write "%v": %v`, f.name, eResp)
 	}
 
-	// TODO: read response
 	defer resp.Body.Close()
-	return len(p), nil
+	body, eBody := ioutil.ReadAll(resp.Body)
+	if eBody != nil {
+		return 0, fmt.Errorf("httpfs write: %v", eBody) // actually no idea how many bytes written!
+	}
+	nRead, eNRead := strconv.Atoi(string(body))
+	if eNRead != nil {
+		return 0, fmt.Errorf("httpfs write: bad response: %v", eNRead)
+	}
 
-	//nRead, eRead := resp.Body.Read(p)
-	//errStr := resp.Header.Get(X_READ_ERROR)
-	//if errStr != "" {
-	//	return nRead, errors.New(errStr) // other than EOF error goes to header
-	//}
-	//return nRead, eRead // passes on EOF or http errors
+	return nRead, nil
 }
 
 func (f *File) Close() error {

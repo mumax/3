@@ -122,21 +122,34 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-//func TestWriteNonexit(t *testing.T) {
-//	fs, e := Dial(addr)
-//	if e != nil {
-//		t.Error(e)
-//	}
-//
-//	w, err := fs.OpenFile("nonexisting", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-//	if err == nil {
-//		t.Error("opened non-exising file for writing: no error")
-//	}
-//	if w != nil {
-//		t.Error("opened non-exising file for writing: non-nil file")
-//	}
-//
-//}
+func TestWriteNonexit(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+	w, err := fs.OpenFile("nonexisting", os.O_WRONLY, 0666)
+	if err == nil {
+		t.Error("opened non-exising file for writing: no error")
+	} else {
+		fmt.Println(err)
+	}
+	if w != nil {
+		t.Error("opened non-exising file for writing: non-nil file")
+	}
+}
+
+func TestSandbox(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+	// try to access file outside of served directory
+	if _, err := fs.OpenFile("../file.go", os.O_RDONLY, 0); err == nil {
+		t.Error("escaped from sandbox")
+	} else {
+		fmt.Println(err)
+	}
+}
 
 var specialFiles = []string{"=", ":", "!", "?", "[", "*", "%", " ", `"`}
 

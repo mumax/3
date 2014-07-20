@@ -123,7 +123,10 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) {
 	}
 
 	n, err := io.Copy(file, r.Body)
-	fmt.Fprint(w, n, err)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+	}
+	fmt.Fprint(w, n)
 }
 
 // thread-safe openFiles[fd]

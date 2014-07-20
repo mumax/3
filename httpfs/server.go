@@ -23,7 +23,7 @@ func Serve(root, addr string) error {
 	return err
 }
 
-func (f *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, r.URL.Path)
 	defer r.Body.Close()
 
@@ -31,16 +31,17 @@ func (f *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "method not allowed: "+r.Method, http.StatusMethodNotAllowed)
 	case "OPEN":
-		f.open(w, r)
+		s.open(w, r)
+	case "READ":
+		s.read(w, r)
 	}
 }
 
-func (f *server) open(w http.ResponseWriter, r *http.Request) {
-
+func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	// by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
 	p := path.Clean(r.URL.Path)
 	assert(path.IsAbs(p))
-	fname := path.Join(f.path, p)
+	fname := path.Join(s.path, p)
 
 	// parse open flags
 	query := r.URL.Query()
@@ -67,12 +68,12 @@ func (f *server) open(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fd := file.Fd()
-
-	f.storeFD(fd, file)
-
-	fmt.Fprint(w, fd)
+	s.storeFD(fd, file)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
+	fmt.Fprint(w, fd) // respond with file descriptor
 }
+
+func (s *server) read(w http.ResponseWriter, r *http.Request) {}
 
 // thread-safe openFiles[fd]
 func (s *server) getFD(fd uintptr) *os.File {

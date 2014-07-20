@@ -43,7 +43,7 @@ func (f *Client) Create(name string) (*File, error) {
 // OpenFile is similar to os.OpenFile. Most users will use Open or Create instead.
 func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error) {
 
-	// prepare URL
+	// prepare URL for OPEN request
 	u := url.URL{Scheme: "http", Host: f.serverAddr, Path: name}
 	q := u.Query()
 	q.Set("flag", fmt.Sprint(flag))
@@ -69,7 +69,10 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 		return nil, fmt.Errorf(`httpfs open "%v": received invalid file descriptor: "%s"`, name, body)
 	}
 
-	return &File{client: f, name: name, fd: uintptr(fd)}, nil
+	// prepare *File
+	fdURL := url.URL{Scheme: "http", Host: f.serverAddr, Path: fmt.Sprint(fd)}
+	file := &File{client: f, u: fdURL, name: name, fd: uintptr(fd)}
+	return file, nil
 }
 
 func panicOn(err error) {

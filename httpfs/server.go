@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	X_READ_ERROR = "X-HTTPFS-ReadError"
+	X_ERROR = "X-HTTPFS-Error"
 )
 
 type server struct {
@@ -72,10 +72,10 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	// open file, answer with file descriptor
 	file, err := os.OpenFile(fname, flag, os.FileMode(perm))
 	if err != nil {
-		http.Error(w, err.Error(), statusCode(err))
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(statusCode(err))
 		return
 	}
-
 	fd := file.Fd()
 	s.storeFD(fd, file)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
@@ -120,7 +120,8 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	nRead, err := file.Read(buf)
 	// ...so we can put error in header
 	if err != nil && err != io.EOF {
-		w.Header().Set(X_READ_ERROR, err.Error())
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(400)
 	}
 	// upload error is server error, not client. TODO: client: check if enough received!
 	nUpload, eUpload := w.Write(buf[:nRead])

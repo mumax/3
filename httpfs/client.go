@@ -62,7 +62,7 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	body := readBody(resp.Body)
 	fd, eFd := strconv.Atoi(body)
 	if eFd != nil || resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`httpfs open "%v": server response: %v: "%s"`, name, resp.StatusCode, body)
+		return nil, fmt.Errorf(`httpfs open "%v": server response: %v: "%s"`, name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	}
 
 	// prepare *File
@@ -77,51 +77,7 @@ func panicOn(err error) {
 	}
 }
 
-//func (f *Client) openRead(fname string, flag int, perm os.FileMode) (*File, error) {
-//	resp, err := f.client.Get(f.fileURL(fname))
-//	if err != nil {
-//		panic(err)
-//	}
-//	if resp.StatusCode != http.StatusOK {
-//		defer resp.Body.Close()
-//		return nil, fmt.Errorf("httpfs: open %v: server response %v (%s)", fname, resp.StatusCode, readError(resp.Body))
-//	}
-//	return &File{name: fname, r: resp.Body}, nil // to be closed by user
-//}
-//
-//func (f *Client) openWrite(fname string, flag int, perm os.FileMode) (*File, error) {
-//	// TODO: sanitize flag
-//
-//	r, w := io.Pipe()
-//	req, e1 := http.NewRequest("PUT", f.fileURL(fname), r)
-//	req.Header.Add(X_OPEN_PERM, fmt.Sprint(perm))
-//	req.Header.Add(X_OPEN_FLAG, fmt.Sprint(flag))
-//
-//	if e1 != nil {
-//		return nil, fmt.Errorf("httpfs: open %v: %v", fname, e1)
-//	}
-//
-//	go func() {
-//		resp, err := f.client.Do(req) //, strings.NewReader("hi"))
-//
-//		log.Println("c: openwrite err=", err, "resp", resp)
-//		if resp != nil {
-//			resp.Body.Close()
-//		}
-//	}()
-//	return &File{name: fname, w: w}, nil
-//}
-
-//func (f *Client) fileURL(name string) string {
-//	return f.serverAddr + escapeURLPath(name)
-//}
-//
-//func escapeURLPath(path string) string {
-//	u := url.URL{Path: path}
-//	return u.String()
-//}
-
-// read error message from http.Response.Body
+// read body as string
 func readBody(r io.Reader) string {
 	B, err := ioutil.ReadAll(r)
 	if err != nil {

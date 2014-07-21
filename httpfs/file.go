@@ -34,7 +34,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	// read response
 	defer resp.Body.Close()
 	nRead, eRead := resp.Body.Read(p)
-	errStr := resp.Header.Get(X_READ_ERROR)
+	errStr := resp.Header.Get(X_ERROR)
 	if errStr != "" {
 		return nRead, errors.New(errStr) // other than EOF error goes to header
 	}

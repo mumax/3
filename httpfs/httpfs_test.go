@@ -213,16 +213,21 @@ func TestSpecialPath(t *testing.T) {
 
 func TestBigFile(t *testing.T) {
 	const SIZE = 1 << 24
-	writeZeros("testdata/bigfile", SIZE)
+	data := make([]byte, 1024)
 
 	fs, _ := Dial(addr)
-	f, err := fs.Open("bigfile")
+	f, err := fs.Create("bigfile")
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	defer f.Close()
+	for n := 0; n < SIZE; n += len(data) {
+		f.Write(data)
+	}
+	f.Close()
 
+	f, _ = fs.Open("bigfile")
+	defer f.Close()
 	bytes, err2 := ioutil.ReadAll(f)
 	if err2 != nil {
 		t.Error(err2)
@@ -231,15 +236,4 @@ func TestBigFile(t *testing.T) {
 	if len(bytes) != SIZE {
 		t.Error("bigfile: read", len(bytes), "bytes")
 	}
-}
-
-// make file of size N
-func writeZeros(fname string, N int) {
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	zeros := make([]byte, N)
-	f.Write(zeros)
 }

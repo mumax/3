@@ -30,7 +30,6 @@ func Serve(root, addr string) error {
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL)
 	defer r.Body.Close()
 
 	switch r.Method {
@@ -50,6 +49,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) open(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method, r.URL)
+
 	// by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
 	p := path.Clean(r.URL.Path)
 	assert(path.IsAbs(p))
@@ -140,6 +141,8 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) close(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method, r.URL)
+
 	fdStr := r.URL.Path[len("/"):]
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))

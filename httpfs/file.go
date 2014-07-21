@@ -2,7 +2,6 @@ package httpfs
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -27,17 +26,16 @@ func (f *File) Read(p []byte) (n int, err error) {
 	panicOn(eReq)
 	resp, eResp := f.client.client.Do(req)
 	if eResp != nil {
-		return 0, fmt.Errorf(`httpfs read "%v": status %v "%v"`, f.name, resp.StatusCode, eResp)
+		return 0, fmt.Errorf(`httpfs read "%v": %v`, f.name, eResp)
 	}
 
 	// read response
 	defer resp.Body.Close()
 	nRead, eRead := resp.Body.Read(p)
-	errStr := resp.Header.Get(X_ERROR)
-	if errStr != "" {
-		return nRead, errors.New(errStr) // other than EOF error goes to header
+	if resp.StatusCode != http.StatusOK {
+		return nRead, fmt.Errorf(`httpfs read "%v": status %v: "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	}
-	return nRead, eRead // passes on EOF or http errors
+	return nRead, eRead // passes on EOF
 }
 
 func (f *File) Write(p []byte) (n int, err error) {

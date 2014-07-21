@@ -43,6 +43,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.read(w, r)
 	case "WRITE":
 		s.write(w, r)
+	case "CLOSE":
+		s.close(w, r)
 	}
 }
 
@@ -80,20 +82,6 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	s.storeFD(fd, file)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
-}
-
-func statusCode(err error) int {
-	switch {
-	default:
-		return 400 // general error
-	case err == nil:
-		return http.StatusOK
-	case os.IsNotExist(err):
-		return http.StatusNotFound
-	case os.IsPermission(err):
-		return http.StatusForbidden
-		// TODO: dir exits
-	}
 }
 
 func (s *server) read(w http.ResponseWriter, r *http.Request) {
@@ -139,9 +127,45 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) {
 
 	n, err := io.Copy(file, r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(400)
+		return
 	}
 	fmt.Fprint(w, n)
+}
+
+func (s *server) close(w http.ResponseWriter, r *http.Request) {
+	fdStr := r.URL.Path[len("/"):]
+	fd, _ := strconv.Atoi(fdStr)
+	file := s.getFD(uintptr(fd))
+	if file == nil {
+		w.Header().Set(X_ERROR, "invalid argument")
+		w.WriteHeader(400)
+		return
+	}
+
+	err := file.Close()
+	if err != nil {
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(400)
+		return
+	}
+	s.rmFD(uintptr(fd))
+}
+
+// return suited status code for error
+func statusCode(err error) int {
+	switch {
+	default:
+		return 400 // general error
+	case err == nil:
+		return http.StatusOK
+	case os.IsNotExist(err):
+		return http.StatusNotFound
+	case os.IsPermission(err):
+		return http.StatusForbidden
+		// TODO: dir exits
+	}
 }
 
 // thread-safe openFiles[fd]
@@ -156,6 +180,13 @@ func (s *server) storeFD(fd uintptr, f *os.File) {
 	s.Lock()
 	defer s.Unlock()
 	s.openFiles[fd] = f
+}
+
+// thread-safe delete(openFiles,fd)
+func (s *server) rmFD(fd uintptr) {
+	s.Lock()
+	defer s.Unlock()
+	delete(s.openFiles, fd)
 }
 
 func assert(test bool) {

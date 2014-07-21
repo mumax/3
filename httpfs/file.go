@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -28,7 +27,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	panicOn(eReq)
 	resp, eResp := f.client.client.Do(req)
 	if eResp != nil {
-		return 0, fmt.Errorf(`httpfs read "%v": %v`, f.name, eResp)
+		return 0, fmt.Errorf(`httpfs read "%v": status %v "%v"`, f.name, resp.StatusCode, eResp)
 	}
 
 	// read response
@@ -51,18 +50,36 @@ func (f *File) Write(p []byte) (n int, err error) {
 	}
 
 	defer resp.Body.Close()
-	body, eBody := ioutil.ReadAll(resp.Body)
-	if eBody != nil {
-		return 0, fmt.Errorf("httpfs write: %v", eBody) // actually no idea how many bytes written!
-	}
+	body := readBody(resp.Body)
 	nRead, eNRead := strconv.Atoi(string(body))
 	if eNRead != nil {
 		return 0, fmt.Errorf("httpfs write: bad response: %v", eNRead)
 	}
 
-	return nRead, nil
+	if resp.StatusCode != http.StatusOK {
+		err = fmt.Errorf(`httpfs write %v: status %v "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))
+	}
+	return nRead, err
 }
 
+//
 func (f *File) Close() error {
-	return nil
+	if f == nil {
+		return fmt.Errorf("invalid argument")
+	}
+
+	// send CLOSE request
+	req, eReq := http.NewRequest("CLOSE", f.u.String(), nil)
+	panicOn(eReq)
+	resp, eResp := f.client.client.Do(req)
+	if eResp != nil {
+		return fmt.Errorf(`httpfs close "%v": %v`, f.name, eResp)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf(`httpfs close %v: status %v "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))
+	} else {
+		return nil
+	}
 }

@@ -122,6 +122,31 @@ func TestWrite(t *testing.T) {
 	}
 }
 
+func TestClose(t *testing.T) {
+	fs, e := Dial(addr)
+	if e != nil {
+		t.Error(e)
+	}
+	// Not properly closing so many files gives "too many open files" error
+	for i := 0; i < 1025; i++ {
+		f, err := fs.Open("hello.txt")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := f.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Test double close
+	f, _ := fs.Open("hello.txt")
+	f.Close()
+	if err := f.Close(); err == nil {
+		t.Error("double close")
+	} else {
+		fmt.Println(err)
+	}
+}
+
 func TestWriteNonexit(t *testing.T) {
 	fs, e := Dial(addr)
 	if e != nil {

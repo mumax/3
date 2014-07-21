@@ -211,45 +211,35 @@ func TestSpecialPath(t *testing.T) {
 	}
 }
 
-//func TestNonExisting(t *testing.T) {
-//	fs, _ := Dial(addr)
-//	_, err := fs.Open("nonexisting.txt")
-//	if err == nil {
-//		t.Error("should get error on nonexisting file")
-//	}
-//	fmt.Println(err)
-//}
-//
-//
-//func TestBigFile(t *testing.T) {
-//	const SIZE = 1 << 24
-//	writeZeros("testdata/bigfile", SIZE)
-//
-//	fs, _ := Dial(addr)
-//	f, err := fs.Open("bigfile")
-//	if err != nil {
-//		t.Error(err)
-//		return
-//	}
-//	defer f.Close()
-//
-//	bytes, err2 := ioutil.ReadAll(f)
-//	if err2 != nil {
-//		t.Error(err2)
-//		return
-//	}
-//	if len(bytes) != SIZE {
-//		t.Error("bigfile: read", len(bytes), "bytes")
-//	}
-//}
-//
-//// make file of size N
-//func writeZeros(fname string, N int) {
-//	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-//	if err != nil {
-//		panic(err)
-//	}
-//	defer f.Close()
-//	zeros := make([]byte, N)
-//	f.Write(zeros)
-//}
+func TestBigFile(t *testing.T) {
+	const SIZE = 1 << 24
+	writeZeros("testdata/bigfile", SIZE)
+
+	fs, _ := Dial(addr)
+	f, err := fs.Open("bigfile")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer f.Close()
+
+	bytes, err2 := ioutil.ReadAll(f)
+	if err2 != nil {
+		t.Error(err2)
+		return
+	}
+	if len(bytes) != SIZE {
+		t.Error("bigfile: read", len(bytes), "bytes")
+	}
+}
+
+// make file of size N
+func writeZeros(fname string, N int) {
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	zeros := make([]byte, N)
+	f.Write(zeros)
+}

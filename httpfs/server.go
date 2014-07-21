@@ -113,6 +113,9 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
+	if err == io.EOF {
+		w.Header().Set(X_ERROR, "EOF")
+	}
 	// upload error is server error, not client. TODO: client: check if enough received!
 	nUpload, eUpload := w.Write(buf[:nRead])
 	log.Println(nUpload, "bytes uploaded, error=", eUpload)

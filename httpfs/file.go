@@ -3,6 +3,7 @@ package httpfs
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -36,7 +37,13 @@ func (f *File) Read(p []byte) (n int, err error) {
 	if resp.StatusCode != http.StatusOK {
 		return nRead, fmt.Errorf(`httpfs read "%v": status %v: "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	}
-	return nRead, eRead // passes on EOF
+	if eRead != nil && eRead != io.EOF {
+		return nRead, fmt.Errorf(`httpfs read "%v": "%v"`, f.name, eRead.Error())
+	}
+	if resp.Header.Get(X_ERROR) == "EOF" {
+		err = io.EOF
+	}
+	return nRead, err // passes on EOF
 }
 
 // Write implements io.Writer.

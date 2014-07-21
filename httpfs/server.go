@@ -11,9 +11,8 @@ import (
 	"sync"
 )
 
-const (
-	X_ERROR = "X-HTTPFS-Error"
-)
+// HTTP header key for storing errors
+const X_ERROR = "X-HTTPFS-Error"
 
 type server struct {
 	path string // served path
@@ -105,6 +104,7 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("httpfs: read fd", fd, "n=", n)
 
+	// TODO: use trailer for error instead of header
 	// first read into buffer...
 	buf := make([]byte, n)
 	nRead, err := file.Read(buf)
@@ -117,7 +117,7 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	if err == io.EOF {
 		w.Header().Set(X_ERROR, "EOF")
 	}
-	// upload error is server error, not client. TODO: client: check if enough received!
+	// upload error is server error, not client.
 	nUpload, eUpload := w.Write(buf[:nRead])
 	log.Println(nUpload, "bytes uploaded, error=", eUpload)
 }

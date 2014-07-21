@@ -21,6 +21,7 @@ type server struct {
 	openFiles map[uintptr]*os.File // active file descriptors
 }
 
+// Serve serves the files under directory root at tcp address addr.
 func Serve(root, addr string) error {
 	log.Println("serving", root, "at", addr)
 	server := &server{path: root, openFiles: make(map[uintptr]*os.File)}
@@ -110,6 +111,7 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	if err != nil && err != io.EOF {
 		w.Header().Set(X_ERROR, err.Error())
 		w.WriteHeader(400)
+		return
 	}
 	// upload error is server error, not client. TODO: client: check if enough received!
 	nUpload, eUpload := w.Write(buf[:nRead])

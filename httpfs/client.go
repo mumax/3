@@ -89,3 +89,5 @@ func readBody(r io.Reader) string {
 	}
 	return string(B)
 }
+
+//TODO: disconnect, keepalive, close all files on disconnect/reconnect

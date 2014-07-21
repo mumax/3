@@ -16,6 +16,7 @@ type File struct {
 	fd     uintptr // file descriptor on server
 }
 
+// Read implements io.Reader.
 func (f *File) Read(p []byte) (n int, err error) {
 	// send READ request
 	u := f.u // (a copy)
@@ -38,6 +39,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	return nRead, eRead // passes on EOF
 }
 
+// Write implements io.Writer.
 func (f *File) Write(p []byte) (n int, err error) {
 	// send WRITE request
 	req, eReq := http.NewRequest("WRITE", f.u.String(), bytes.NewBuffer(p))
@@ -60,7 +62,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 	return nRead, err
 }
 
-//
+// Close implements io.Closer.
 func (f *File) Close() error {
 	if f == nil {
 		return fmt.Errorf("invalid argument")
@@ -81,3 +83,5 @@ func (f *File) Close() error {
 		return nil
 	}
 }
+
+//TODO: sync

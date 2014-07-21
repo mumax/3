@@ -18,7 +18,7 @@ type File struct {
 
 // Read implements io.Reader.
 func (f *File) Read(p []byte) (n int, err error) {
-	// send READ request
+	// prepare request
 	u := f.u // (a copy)
 	q := u.Query()
 	q.Set("n", fmt.Sprint(len(p))) // number of bytes to read
@@ -60,15 +60,7 @@ func (f *File) Close() error {
 	if f == nil {
 		return fmt.Errorf("invalid argument")
 	}
-
-	// send CLOSE request
-	req, eReq := http.NewRequest("CLOSE", f.u.String(), nil)
-	panicOn(eReq)
-	resp, eResp := f.client.client.Do(req)
-	if eResp != nil {
-		return fmt.Errorf(`httpfs close "%v": %v`, f.name, eResp)
-	}
-
+	resp := f.client.do("CLOSE", f.u.String(), nil)
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf(`httpfs close %v: status %v "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))

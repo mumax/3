@@ -1,7 +1,6 @@
 package httpfs
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -49,14 +47,13 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	q.Set("perm", fmt.Sprint(uint32(perm)))
 	u.RawQuery = q.Encode()
 
-	// send OPEN request
-	resp := f.do("OPEN", u.String())
+	resp := f.do("OPEN", u.String(), nil)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf(`httpfs open "%v": status %v: "%s"`, name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	}
 	defer resp.Body.Close()
-	fd := f.readFD(resp.Body)
-	if fd == 0 {
+	fd := readUInt(resp.Body)
+	if fd < 0 {
 		return nil, fmt.Errorf(`httpfs open "%v": invalid argument`, name)
 	}
 
@@ -73,8 +70,8 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 
 // do Does a HTTP request. If an error occurs, it returns a fake response
 // with status Teapot and the error message in the header.
-func (f *Client) do(method string, URL string) *http.Response {
-	req, eReq := http.NewRequest(method, URL, nil)
+func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
+	req, eReq := http.NewRequest(method, URL, body)
 	panicOn(eReq)
 	resp, eResp := f.client.Do(req)
 	if eResp != nil {
@@ -86,22 +83,6 @@ func (f *Client) do(method string, URL string) *http.Response {
 	return resp
 }
 
-func (f *Client) readFD(r io.Reader) uintptr {
-	B, err := ioutil.ReadAll(r)
-	if err != nil {
-		return 0
-	}
-	// strip trailing newline
-	if bytes.HasSuffix(B, []byte{'\n'}) {
-		B = B[:len(B)-1]
-	}
-	fd, eFd := strconv.Atoi(string(B))
-	if eFd != nil {
-		return 0
-	}
-	return uintptr(fd)
-}
-
 // TODO: rm
 func panicOn(err error) {
 	if err != nil {
@@ -109,17 +90,11 @@ func panicOn(err error) {
 	}
 }
 
-// read body as string: todo rm
-func readBody(r io.Reader) string {
-	B, err := ioutil.ReadAll(r)
-	if err != nil {
-		return "<could not read error: " + err.Error() + ">"
-	}
-	// strip trailing newline
-	if bytes.HasSuffix(B, []byte{'\n'}) {
-		B = B[:len(B)-1]
-	}
-	return string(B)
+// read int from body, -1 in case of error
+func readUInt(r io.Reader) int {
+	v := -1
+	fmt.Fscan(r, &v)
+	return v
 }
 
 //TODO: disconnect, keepalive, close all files on disconnect/reconnect

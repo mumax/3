@@ -43,12 +43,12 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	URL := mkURL(f.serverAddr, name, "flag", flag, "perm", uint32(perm))
 	resp := f.do("OPEN", URL, nil)
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(`httpfs open "%v": status %v: "%s"`, name, resp.StatusCode, resp.Header.Get(X_ERROR))
+		return nil, mkError("open", name, resp)
 	}
 	defer resp.Body.Close()
 	fd := readUInt(resp.Body)
 	if fd < 0 {
-		return nil, fmt.Errorf(`httpfs open "%v": invalid argument`, name)
+		return nil, &os.PathError{"httpfs open", name, illegalArgument}
 	}
 
 	// prepare *File
@@ -68,6 +68,8 @@ func (f *Client) Mkdir(name string, perm os.FileMode) error {
 	}
 }
 
+// mkError returns an *os.PathError whose Err field is based on the response status and error message.
+// os.IsExist, os.IsNotExist and os.IsPermission can be used on the error.
 func mkError(op, name string, resp *http.Response) error {
 	var err error
 	switch resp.StatusCode {

@@ -40,14 +40,8 @@ func (f *Client) Create(name string) (*File, error) {
 
 // OpenFile is similar to os.OpenFile. Most users will use Open or Create instead.
 func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error) {
-	// prepare URL for OPEN request
-	u := url.URL{Scheme: "http", Host: f.serverAddr, Path: name}
-	q := u.Query()
-	q.Set("flag", fmt.Sprint(flag))
-	q.Set("perm", fmt.Sprint(uint32(perm)))
-	u.RawQuery = q.Encode()
-
-	resp := f.do("OPEN", u.String(), nil)
+	URL := mkURL(f.serverAddr, name, "flag", flag, "perm", uint32(perm))
+	resp := f.do("OPEN", URL, nil)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf(`httpfs open "%v": status %v: "%s"`, name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	}
@@ -64,9 +58,41 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 }
 
 // Mkdir creates a new directory with the specified name and permission bits. If there is an error, it will be of type *PathError.
-//func (f*Client) Mkdir(name string, perm FileMode) error{
-//
-//}
+func (f *Client) Mkdir(name string, perm os.FileMode) error {
+	URL := mkURL(f.serverAddr, name, "perm", uint32(perm))
+	resp := f.do("MKDIR", URL, nil)
+	if resp.StatusCode != http.StatusOK {
+		return mkError("mkdir", name, resp)
+	} else {
+		return nil
+	}
+}
+
+func mkError(op, name string, resp *http.Response) error {
+	var err error
+	switch resp.StatusCode {
+	default:
+		err = fmt.Errorf(`status %v "%v"`, resp.StatusCode, resp.Header.Get(X_ERROR))
+	case http.StatusNotFound:
+		err = os.ErrNotExist
+	case http.StatusFound:
+		err = os.ErrExist
+	case http.StatusForbidden:
+		err = os.ErrPermission
+	}
+	return &os.PathError{Op: "httpfs " + op, Path: name, Err: err}
+}
+
+// returns "http://host/path?query[0]=query[1]...
+func mkURL(host, path string, query ...interface{}) string {
+	u := url.URL{Scheme: "http", Host: host, Path: path}
+	q := u.Query()
+	for i := 0; i < len(query); i += 2 {
+		q.Set(query[i].(string), fmt.Sprint(query[i+1]))
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
+}
 
 // do Does a HTTP request. If an error occurs, it returns a fake response
 // with status Teapot and the error message in the header.

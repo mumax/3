@@ -44,16 +44,22 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.write(w, r)
 	case "CLOSE":
 		s.close(w, r)
+	case "MKDIR":
+		s.mkdir(w, r)
 	}
+}
+
+// by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
+func (s *server) sandboxPath(p string) string {
+	p = path.Clean(p)
+	assert(path.IsAbs(p))
+	return path.Join(s.path, p)
 }
 
 func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, r.URL)
 
-	// by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
-	p := path.Clean(r.URL.Path)
-	assert(path.IsAbs(p))
-	fname := path.Join(s.path, p)
+	fname := s.sandboxPath(r.URL.Path)
 
 	// parse open flags
 	query := r.URL.Query()
@@ -83,6 +89,28 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	s.storeFD(fd, file)
 	log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
+}
+
+func (s *server) mkdir(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method, r.URL)
+
+	fname := s.sandboxPath(r.URL.Path)
+
+	// parse permissions
+	query := r.URL.Query()
+	permStr := query.Get("perm")
+	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
+	if ePerm != nil {
+		http.Error(w, "invalid perm: "+permStr, http.StatusBadRequest)
+		return
+	}
+
+	err := os.Mkdir(fname, os.FileMode(perm))
+	if err != nil {
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(statusCode(err))
+		return
+	}
 }
 
 func (s *server) read(w http.ResponseWriter, r *http.Request) {
@@ -172,7 +200,8 @@ func statusCode(err error) int {
 		return http.StatusNotFound
 	case os.IsPermission(err):
 		return http.StatusForbidden
-		// TODO: dir exits
+	case os.IsExist(err):
+		return http.StatusFound
 	}
 }
 

@@ -249,3 +249,20 @@ func TestBigFile(t *testing.T) {
 		t.Error("bigfile: read", len(bytes), "bytes")
 	}
 }
+
+func TestMkdir(t *testing.T) {
+	fs, _ := Dial(addr)
+	if err := fs.Mkdir("existingdir", 0777); err == nil {
+		t.Fail()
+	} else {
+		if !os.IsExist(err) {
+			t.Fail()
+		}
+		fmt.Println(err)
+	}
+
+	os.Remove("testdata/newdir")
+	if err := fs.Mkdir("newdir", 0777); err != nil {
+		t.Error(err)
+	}
+}

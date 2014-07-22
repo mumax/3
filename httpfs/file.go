@@ -57,11 +57,15 @@ func (f *File) Write(p []byte) (n int, err error) {
 
 // Close implements io.Closer.
 func (f *File) Close() error {
-	if f == nil {
+	if f == nil || f.client == nil || f.fd == 0 {
 		return fmt.Errorf("invalid argument")
 	}
 	resp := f.client.do("CLOSE", f.u.String(), nil)
 	defer resp.Body.Close()
+	// invalidate file to avoid accidental use after close
+	f.client = nil
+	f.fd = 0
+	f.u = url.URL{}
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf(`httpfs close %v: status %v "%v"`, f.name, resp.StatusCode, resp.Header.Get(X_ERROR))
 	} else {

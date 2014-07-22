@@ -156,6 +156,15 @@ func TestWriteNonexit(t *testing.T) {
 	if err == nil {
 		t.Error("opened non-exising file for writing: no error")
 	} else {
+		if !os.IsNotExist(err) {
+			t.Error("should get IsNoExist")
+		}
+		if os.IsExist(err) {
+			t.Error("should not get IsExist")
+		}
+		if os.IsPermission(err) {
+			t.Error("should not get IsPermission")
+		}
 		fmt.Println(err)
 	}
 	if w != nil {
@@ -172,6 +181,9 @@ func TestNoAccess(t *testing.T) {
 	if _, err := fs.OpenFile("ronly", os.O_WRONLY, 1000); err == nil {
 		t.Error("opened read-only file for writing")
 	} else {
+		if !os.IsPermission(err) {
+			t.Error("should get IsPermission")
+		}
 		fmt.Println(err)
 	}
 }

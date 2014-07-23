@@ -132,10 +132,11 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("httpfs: read fd", fd, "n=", n)
 
-	// TODO: use trailer for error instead of header
+	// Go http server does not support Trailer,
 	// first read into buffer...
 	buf := make([]byte, n)
 	nRead, err := file.Read(buf)
+
 	// ...so we can put error in header
 	if err != nil && err != io.EOF {
 		w.Header().Set(X_ERROR, err.Error())

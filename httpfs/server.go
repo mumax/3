@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strconv"
@@ -111,9 +112,7 @@ func (s *server) mkdir(w http.ResponseWriter, r *http.Request) error {
 
 func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 	// TODO: limit N
-	fdStr := r.URL.Path[len("/"):]
-	fd, _ := strconv.Atoi(fdStr)
-	file := s.getFD(uintptr(fd))
+	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
 	}
@@ -143,15 +142,13 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 	_, eUpload := w.Write(buf[:nRead])
 	//log.Println(nUpload, "bytes uploaded, error=", eUpload)
 	if eUpload != nil {
-		log.Println("ERROR: upload read FD", fd, ":", eUpload)
+		log.Println("ERROR: upload read FD", file.Fd(), ":", eUpload)
 	}
 	return eUpload
 }
 
 func (s *server) write(w http.ResponseWriter, r *http.Request) error {
-	fdStr := r.URL.Path[len("/"):]
-	fd, _ := strconv.Atoi(fdStr)
-	file := s.getFD(uintptr(fd))
+	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
 	}
@@ -164,21 +161,23 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
-func (s *server) close(w http.ResponseWriter, r *http.Request) error {
-	//log.Println(r.Method, r.URL)
+func (s *server) parseFD(URL *url.URL) *os.File {
+	fdStr := URL.Path[len("/"):]
+	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
+	return s.getFD(uintptr(fd))
+}
 
-	fdStr := r.URL.Path[len("/"):]
-	fd, _ := strconv.Atoi(fdStr)
-	file := s.getFD(uintptr(fd))
-	s.rmFD(uintptr(fd))
+func (s *server) close(w http.ResponseWriter, r *http.Request) error {
+	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
 	}
+	s.rmFD(file.Fd())
 	return file.Close()
 }
 
-//func(s*server)readdir(w ){
-//
+//func(s*server)readdir(w http.ResponseWriter, r*http.Request)error{
+//	list, err :=
 //}
 
 // return suited status code for error

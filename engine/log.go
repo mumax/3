@@ -2,13 +2,14 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mumax/3/httpfs"
 	"log"
 	"os"
 )
 
 var (
-	hist    string   // console history for GUI
-	logfile *os.File // saves history of input commands +  output
+	hist    string       // console history for GUI
+	logfile *httpfs.File // saves history of input commands +  output
 )
 
 // Special error that is not fatal when paniced on and called from GUI
@@ -63,10 +64,10 @@ func log2GUI(msg string) {
 }
 
 // returns log file of input commands, opening it first if needed
-func openlog() *os.File {
+func openlog() *httpfs.File {
 	if logfile == nil {
 		var err error
-		logfile, err = os.OpenFile(OD+"/input.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		logfile, err = fs.Create(OD + "/input.log")
 		if err != nil {
 			log.Println(err)
 		}

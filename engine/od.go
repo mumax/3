@@ -25,15 +25,11 @@ func SetOD(od string, force bool) {
 	LogOut("output directory:", OD)
 
 	{ // make OD
-		wd, err := os.Getwd()
-		util.FatalErr(err, "create output directory:")
-		stat, err2 := os.Stat(wd)
-		util.FatalErr(err2, "create output directory:")
-		_ = os.Mkdir(od, stat.Mode()) // already exists is OK
+		_ = fs.Mkdir(od, 0777) // already exists is OK
 	}
 
 	// fail on non-empty OD
-	f, err3 := os.Open(od)
+	f, err3 := fs.Open(od)
 	util.FatalErr(err3, "open output directory:")
 	files, _ := f.Readdir(1)
 	if !force && len(files) != 0 {
@@ -46,9 +42,12 @@ func SetOD(od string, force bool) {
 		logfile.Close() // Suggested by Raffaele Pellicelli <raffaele.pellicelli@fis.unipr.it> for
 		logfile = nil   // windows platform, which cannot remove open file.
 
+		for _, f := range files {
+			fs.RemoveAll(f.Name)
+		}
 		filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
 			if path != OD {
-				util.FatalErr(os.RemoveAll(path), "clean output directory:")
+				util.FatalErr(fs.RemoveAll(path), "clean output directory:")
 			}
 			return nil
 		})

@@ -28,25 +28,22 @@ func Serve(root, addr string) error {
 	return err
 }
 
+var methods = map[string]func(*server, http.ResponseWriter, *http.Request){
+	"OPEN":  (*server).open,
+	"READ":  (*server).read,
+	"WRITE": (*server).write,
+	"CLOSE": (*server).close,
+	"MKDIR": (*server).mkdir}
+
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	switch r.Method {
-	default:
-		msg := "method not allowed: " + r.Method
-		log.Println("ERROR:", msg)
-		respondError(w, fmt.Errorf(msg))
-	case "OPEN":
-		s.open(w, r)
-	case "READ":
-		s.read(w, r)
-	case "WRITE":
-		s.write(w, r)
-	case "CLOSE":
-		s.close(w, r)
-	case "MKDIR":
-		s.mkdir(w, r)
+	handler := methods[r.Method]
+	if handler == nil {
+		respondError(w, fmt.Errorf("method not allowed: %s", r.Method))
+		return
 	}
+	handler(s, w, r)
 }
 
 // by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.

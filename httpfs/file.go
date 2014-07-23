@@ -2,6 +2,7 @@ package httpfs
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -37,7 +38,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	defer resp.Body.Close()
 	nRead, eRead := resp.Body.Read(p)
 	if eRead != nil && eRead != io.EOF {
-		return nRead, &os.PathError{`httpfs read`, f.name, eRead}
+		return nRead, pathErr("read", f.name, eRead)
 	}
 	if resp.Header.Get(X_ERROR) == "EOF" {
 		err = io.EOF
@@ -54,7 +55,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 	defer resp.Body.Close()
 	nRead := readUInt(resp.Body)
 	if nRead < 0 {
-		return 0, &os.PathError{"httpfs write", f.name, illegalArgument}
+		return 0, pathErr("write", f.name, illegalArgument)
 	}
 	return nRead, err
 }
@@ -62,7 +63,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 // Close implements io.Closer.
 func (f *File) Close() error {
 	if f == nil || f.client == nil || f.fd == 0 {
-		return &os.PathError{"httpfs close", f.name, illegalArgument}
+		return pathErr("close", f.name, illegalArgument)
 	}
 	resp := f.client.do("CLOSE", f.u.String(), nil)
 	defer resp.Body.Close()
@@ -75,6 +76,28 @@ func (f *File) Close() error {
 	} else {
 		return nil
 	}
+}
+
+func (f *File) Readdir(n int) (fi []os.FileInfo, err error) {
+	resp := f.client.do("READDIR", mkURL(f.u.Host, f.u.Path, "n", n), nil)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, mkError("readdir", f.name, resp)
+	} else {
+		e2 := json.NewDecoder(resp.Body).Decode(&fi)
+		if e2 != nil {
+			return nil, pathErr("readdir", f.name, e2)
+		}
+		return
+	}
+}
+
+func pathErr(op, path string, err error) *os.PathError {
+	return &os.PathError{
+		Op:   "httpfs " + op,
+		Path: path,
+		Err:  err}
+
 }
 
 //TODO: sync

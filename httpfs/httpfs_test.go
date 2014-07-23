@@ -266,3 +266,18 @@ func TestMkdir(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestReaddir(t *testing.T) {
+	fs, _ := Dial(addr)
+	dir, err := fs.Open(".")
+	if err != nil {
+		t.Error(err)
+	}
+	list, err2 := dir.Readdir(0)
+	if err2 != nil {
+		t.Error(err2)
+	}
+	if len(list) != 2 {
+		t.Fail()
+	}
+}

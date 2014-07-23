@@ -48,7 +48,7 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	defer resp.Body.Close()
 	fd := readUInt(resp.Body)
 	if fd < 0 {
-		return nil, &os.PathError{"httpfs open", name, illegalArgument}
+		return nil, &os.PathError{Op: "httpfs open", Path: name, Err: illegalArgument}
 	}
 
 	// prepare *File

@@ -35,7 +35,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		msg := "method not allowed: " + r.Method
 		log.Println("ERROR:", msg)
-		http.Error(w, msg, http.StatusMethodNotAllowed)
+		respondError(w, fmt.Errorf(msg))
 	case "OPEN":
 		s.open(w, r)
 	case "READ":
@@ -57,7 +57,7 @@ func (s *server) sandboxPath(p string) string {
 }
 
 func (s *server) open(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL)
+	//log.Println(r.Method, r.URL)
 
 	fname := s.sandboxPath(r.URL.Path)
 
@@ -66,7 +66,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	flagStr := query.Get("flag")
 	flag, eFlag := strconv.Atoi(flagStr)
 	if eFlag != nil {
-		http.Error(w, "invalid flag: "+flagStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
@@ -74,7 +74,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	permStr := query.Get("perm")
 	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
 	if ePerm != nil {
-		http.Error(w, "invalid perm: "+permStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
@@ -87,12 +87,12 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	}
 	fd := file.Fd()
 	s.storeFD(fd, file)
-	log.Println("httpfs: opened", fname, ", fd:", fd)
+	//log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
 }
 
 func (s *server) mkdir(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL)
+	//log.Println(r.Method, r.URL)
 
 	fname := s.sandboxPath(r.URL.Path)
 
@@ -101,16 +101,20 @@ func (s *server) mkdir(w http.ResponseWriter, r *http.Request) {
 	permStr := query.Get("perm")
 	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
 	if ePerm != nil {
-		http.Error(w, "invalid perm: "+permStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
 	err := os.Mkdir(fname, os.FileMode(perm))
 	if err != nil {
-		w.Header().Set(X_ERROR, err.Error())
-		w.WriteHeader(statusCode(err))
+		respondError(w, err)
 		return
 	}
+}
+
+func respondError(w http.ResponseWriter, err error) {
+	w.Header().Set(X_ERROR, err.Error())
+	w.WriteHeader(statusCode(err))
 }
 
 func (s *server) read(w http.ResponseWriter, r *http.Request) {
@@ -119,18 +123,18 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))
 	if file == nil {
-		http.Error(w, "read: invalid file descriptor: "+fdStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
 	nStr := r.URL.Query().Get("n")
 	n, eN := strconv.Atoi(nStr)
 	if eN != nil {
-		http.Error(w, "read: invalid number of bytes: "+nStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
-	log.Println("httpfs: read fd", fd, "n=", n)
+	//log.Println("httpfs: read fd", fd, "n=", n)
 
 	// Go http server does not support Trailer,
 	// first read into buffer...
@@ -147,8 +151,11 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(X_ERROR, "EOF")
 	}
 	// upload error is server error, not client.
-	nUpload, eUpload := w.Write(buf[:nRead])
-	log.Println(nUpload, "bytes uploaded, error=", eUpload)
+	_, eUpload := w.Write(buf[:nRead])
+	//log.Println(nUpload, "bytes uploaded, error=", eUpload)
+	if eUpload != nil {
+		log.Println("ERROR: upload read FD", fd, ":", eUpload)
+	}
 }
 
 func (s *server) write(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +163,7 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) {
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))
 	if file == nil {
-		http.Error(w, "read: invalid file descriptor: "+fdStr, http.StatusBadRequest)
+		respondError(w, illegalArgument)
 		return
 	}
 
@@ -170,7 +177,7 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) close(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, r.URL)
+	//log.Println(r.Method, r.URL)
 
 	fdStr := r.URL.Path[len("/"):]
 	fd, _ := strconv.Atoi(fdStr)

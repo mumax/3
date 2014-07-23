@@ -28,22 +28,30 @@ func Serve(root, addr string) error {
 	return err
 }
 
-var methods = map[string]func(*server, http.ResponseWriter, *http.Request){
+var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
 	"OPEN":  (*server).open,
 	"READ":  (*server).read,
 	"WRITE": (*server).write,
 	"CLOSE": (*server).close,
-	"MKDIR": (*server).mkdir}
+	"MKDIR": (*server).mkdir,
+	//"READDIR": (*server).readdir,
+}
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	handler := methods[r.Method]
 	if handler == nil {
-		respondError(w, fmt.Errorf("method not allowed: %s", r.Method))
+		w.Header().Set(X_ERROR, "method not allowed: "+r.Method)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	handler(s, w, r)
+
+	err := handler(s, w, r)
+	if err != nil {
+		w.Header().Set(X_ERROR, err.Error())
+		w.WriteHeader(statusCode(err))
+	}
 }
 
 // by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
@@ -53,7 +61,7 @@ func (s *server) sandboxPath(p string) string {
 	return path.Join(s.path, p)
 }
 
-func (s *server) open(w http.ResponseWriter, r *http.Request) {
+func (s *server) open(w http.ResponseWriter, r *http.Request) error {
 	//log.Println(r.Method, r.URL)
 
 	fname := s.sandboxPath(r.URL.Path)
@@ -63,32 +71,29 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) {
 	flagStr := query.Get("flag")
 	flag, eFlag := strconv.Atoi(flagStr)
 	if eFlag != nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
 	// parse permissions
 	permStr := query.Get("perm")
 	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
 	if ePerm != nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
 	// open file, answer with file descriptor
 	file, err := os.OpenFile(fname, flag, os.FileMode(perm))
 	if err != nil {
-		w.Header().Set(X_ERROR, err.Error())
-		w.WriteHeader(statusCode(err))
-		return
+		return err
 	}
 	fd := file.Fd()
 	s.storeFD(fd, file)
 	//log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
+	return nil
 }
 
-func (s *server) mkdir(w http.ResponseWriter, r *http.Request) {
+func (s *server) mkdir(w http.ResponseWriter, r *http.Request) error {
 	//log.Println(r.Method, r.URL)
 
 	fname := s.sandboxPath(r.URL.Path)
@@ -98,37 +103,25 @@ func (s *server) mkdir(w http.ResponseWriter, r *http.Request) {
 	permStr := query.Get("perm")
 	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
 	if ePerm != nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
-	err := os.Mkdir(fname, os.FileMode(perm))
-	if err != nil {
-		respondError(w, err)
-		return
-	}
+	return os.Mkdir(fname, os.FileMode(perm))
 }
 
-func respondError(w http.ResponseWriter, err error) {
-	w.Header().Set(X_ERROR, err.Error())
-	w.WriteHeader(statusCode(err))
-}
-
-func (s *server) read(w http.ResponseWriter, r *http.Request) {
+func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 	// TODO: limit N
 	fdStr := r.URL.Path[len("/"):]
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))
 	if file == nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
 	nStr := r.URL.Query().Get("n")
 	n, eN := strconv.Atoi(nStr)
 	if eN != nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
 	//log.Println("httpfs: read fd", fd, "n=", n)
@@ -140,12 +133,11 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 
 	// ...so we can put error in header
 	if err != nil && err != io.EOF {
-		w.Header().Set(X_ERROR, err.Error())
-		w.WriteHeader(400)
-		return
+		return err
 	}
 	if err == io.EOF {
 		w.Header().Set(X_ERROR, "EOF")
+		// But statusOK, EOF not treated as actual error
 	}
 	// upload error is server error, not client.
 	_, eUpload := w.Write(buf[:nRead])
@@ -153,46 +145,41 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) {
 	if eUpload != nil {
 		log.Println("ERROR: upload read FD", fd, ":", eUpload)
 	}
+	return eUpload
 }
 
-func (s *server) write(w http.ResponseWriter, r *http.Request) {
+func (s *server) write(w http.ResponseWriter, r *http.Request) error {
 	fdStr := r.URL.Path[len("/"):]
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))
 	if file == nil {
-		respondError(w, illegalArgument)
-		return
+		return illegalArgument
 	}
 
 	n, err := io.Copy(file, r.Body)
 	if err != nil {
-		w.Header().Set(X_ERROR, err.Error())
-		w.WriteHeader(400)
-		return
+		return illegalArgument
 	}
-	fmt.Fprint(w, n)
+	_, err = fmt.Fprint(w, n)
+	return err
 }
 
-func (s *server) close(w http.ResponseWriter, r *http.Request) {
+func (s *server) close(w http.ResponseWriter, r *http.Request) error {
 	//log.Println(r.Method, r.URL)
 
 	fdStr := r.URL.Path[len("/"):]
 	fd, _ := strconv.Atoi(fdStr)
 	file := s.getFD(uintptr(fd))
-	if file == nil {
-		w.Header().Set(X_ERROR, "invalid argument")
-		w.WriteHeader(400)
-		return
-	}
-
-	err := file.Close()
-	if err != nil {
-		w.Header().Set(X_ERROR, err.Error())
-		w.WriteHeader(400)
-		return
-	}
 	s.rmFD(uintptr(fd))
+	if file == nil {
+		return illegalArgument
+	}
+	return file.Close()
 }
+
+//func(s*server)readdir(w ){
+//
+//}
 
 // return suited status code for error
 func statusCode(err error) int {
@@ -236,18 +223,3 @@ func assert(test bool) {
 		panic("assertion failed")
 	}
 }
-
-//func(f*fileHandler) get(){
-//f, err := os.Open(fname)
-//if err != nil {
-//	log.Println(err)
-//	http.Error(w, err.Error(), http.StatusNotFound) // TODO: others?
-//	return
-//}
-//defer f.Close()
-//n, err2 := io.Copy(w, f)
-//if err2 != nil {
-//	log.Println("upload", fname, ":", err2.Error())
-//}
-//log.Println(n, "bytes sent")
-//}

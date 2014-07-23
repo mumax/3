@@ -269,7 +269,7 @@ func TestMkdir(t *testing.T) {
 
 func TestReaddir(t *testing.T) {
 	fs, _ := Dial(addr)
-	dir, err := fs.Open(".")
+	dir, err := fs.Open("existingdir")
 	if err != nil {
 		t.Error(err)
 	}
@@ -278,6 +278,7 @@ func TestReaddir(t *testing.T) {
 		t.Error(err2)
 	}
 	if len(list) != 2 {
-		t.Fail()
+		t.Error("readdir .:", list)
 	}
+	// TODO: test all file attributes
 }

@@ -84,9 +84,15 @@ func (f *File) Readdir(n int) (fi []os.FileInfo, err error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, mkError("readdir", f.name, resp)
 	} else {
-		e2 := json.NewDecoder(resp.Body).Decode(&fi)
+		var list []*fileInfo
+		//io.Copy(os.Stdout, resp.Body); return
+		e2 := json.NewDecoder(resp.Body).Decode(&list)
 		if e2 != nil {
 			return nil, pathErr("readdir", f.name, e2)
+		}
+		fi = make([]os.FileInfo, len(list))
+		for i, l := range list {
+			fi[i] = l
 		}
 		return
 	}

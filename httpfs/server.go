@@ -1,6 +1,7 @@
 package httpfs
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -30,16 +31,24 @@ func Serve(root, addr string) error {
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
-	"OPEN":  (*server).open,
-	"READ":  (*server).read,
-	"WRITE": (*server).write,
-	"CLOSE": (*server).close,
-	"MKDIR": (*server).mkdir,
-	//"READDIR": (*server).readdir,
+	"OPEN":    (*server).open,
+	"READ":    (*server).read,
+	"WRITE":   (*server).write,
+	"CLOSE":   (*server).close,
+	"MKDIR":   (*server).mkdir,
+	"READDIR": (*server).readdir,
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+
+	// crash protection
+	defer func() {
+		if err := recover(); err != nil {
+			w.Header().Set(X_ERROR, fmt.Sprint("panic: ", err))
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	}()
 
 	handler := methods[r.Method]
 	if handler == nil {
@@ -62,74 +71,49 @@ func (s *server) sandboxPath(p string) string {
 	return path.Join(s.path, p)
 }
 
+// open file, respond with file descriptor
 func (s *server) open(w http.ResponseWriter, r *http.Request) error {
-	//log.Println(r.Method, r.URL)
-
 	fname := s.sandboxPath(r.URL.Path)
+	flag := intQuery(r, "flag")
+	perm := intQuery(r, "perm")
 
-	// parse open flags
-	query := r.URL.Query()
-	flagStr := query.Get("flag")
-	flag, eFlag := strconv.Atoi(flagStr)
-	if eFlag != nil {
-		return illegalArgument
-	}
-
-	// parse permissions
-	permStr := query.Get("perm")
-	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
-	if ePerm != nil {
-		return illegalArgument
-	}
-
-	// open file, answer with file descriptor
 	file, err := os.OpenFile(fname, flag, os.FileMode(perm))
 	if err != nil {
 		return err
 	}
 	fd := file.Fd()
 	s.storeFD(fd, file)
-	//log.Println("httpfs: opened", fname, ", fd:", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
 	return nil
 }
 
 func (s *server) mkdir(w http.ResponseWriter, r *http.Request) error {
-	//log.Println(r.Method, r.URL)
-
 	fname := s.sandboxPath(r.URL.Path)
-
-	// parse permissions
-	query := r.URL.Query()
-	permStr := query.Get("perm")
-	perm, ePerm := strconv.Atoi(permStr) // TODO: base8 (also client)
-	if ePerm != nil {
-		return illegalArgument
-	}
-
+	perm := intQuery(r, "perm")
 	return os.Mkdir(fname, os.FileMode(perm))
 }
 
+func intQuery(r *http.Request, key string) int {
+	str := r.URL.Query().Get(key)
+	n, err := strconv.Atoi(str)
+	if err != nil {
+		log.Println(err) //should not happen
+		return 0
+	}
+	return n
+}
+
 func (s *server) read(w http.ResponseWriter, r *http.Request) error {
-	// TODO: limit N
 	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
 	}
-
-	nStr := r.URL.Query().Get("n")
-	n, eN := strconv.Atoi(nStr)
-	if eN != nil {
-		return illegalArgument
-	}
-
-	//log.Println("httpfs: read fd", fd, "n=", n)
+	n := intQuery(r, "n")
 
 	// Go http server does not support Trailer,
 	// first read into buffer...
 	buf := make([]byte, n)
 	nRead, err := file.Read(buf)
-
 	// ...so we can put error in header
 	if err != nil && err != io.EOF {
 		return err
@@ -140,11 +124,10 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 	}
 	// upload error is server error, not client.
 	_, eUpload := w.Write(buf[:nRead])
-	//log.Println(nUpload, "bytes uploaded, error=", eUpload)
 	if eUpload != nil {
 		log.Println("ERROR: upload read FD", file.Fd(), ":", eUpload)
 	}
-	return eUpload
+	return nil
 }
 
 func (s *server) write(w http.ResponseWriter, r *http.Request) error {
@@ -155,16 +138,10 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) error {
 
 	n, err := io.Copy(file, r.Body)
 	if err != nil {
-		return illegalArgument
+		return err
 	}
-	_, err = fmt.Fprint(w, n)
-	return err
-}
-
-func (s *server) parseFD(URL *url.URL) *os.File {
-	fdStr := URL.Path[len("/"):]
-	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
-	return s.getFD(uintptr(fd))
+	fmt.Fprint(w, n)
+	return nil
 }
 
 func (s *server) close(w http.ResponseWriter, r *http.Request) error {
@@ -176,15 +153,44 @@ func (s *server) close(w http.ResponseWriter, r *http.Request) error {
 	return file.Close()
 }
 
-//func(s*server)readdir(w http.ResponseWriter, r*http.Request)error{
-//	list, err :=
-//}
+func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {
+	file := s.parseFD(r.URL)
+	if file == nil {
+		return illegalArgument
+	}
+	fi, err := file.Readdir(intQuery(r, "n"))
+	if err != nil {
+		return err
+	}
+	list := make([]fileInfo, len(fi))
+	for i, fi := range fi {
+		list[i] = fileInfo{
+			Nm:   fi.Name(),
+			Sz:   fi.Size(),
+			Md:   fi.Mode(),
+			MdTm: fi.ModTime(),
+		}
+	}
+	return json.NewEncoder(w).Encode(list)
+}
+
+// retrieve file belonging to file descriptor in URL. E.g.:
+// 	http://server/2 -> openFiles[2]
+func (s *server) parseFD(URL *url.URL) *os.File {
+	fdStr := URL.Path[len("/"):]
+	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
+	return s.getFD(uintptr(fd))
+}
 
 // return suited status code for error
 func statusCode(err error) int {
 	switch {
 	default:
 		return 400 // general error
+	case err == nil:
+		return http.StatusOK
+	case err == io.EOF:
+		return http.StatusOK // EOF not treated as real error
 	case err == nil:
 		return http.StatusOK
 	case os.IsNotExist(err):

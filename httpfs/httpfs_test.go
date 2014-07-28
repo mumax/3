@@ -282,3 +282,23 @@ func TestReaddir(t *testing.T) {
 	}
 	// TODO: test all file attributes
 }
+
+func TestRemove(t *testing.T) {
+	fs, _ := Dial(addr)
+	if f, err := fs.Create("removeMe"); err != nil {
+		t.Fatal(err)
+	} else {
+		f.Close()
+	}
+	if err := fs.Remove("removeMe"); err != nil {
+		t.Fatal(err)
+	}
+	if err := fs.Remove("removeMe"); err == nil {
+		t.Fail()
+	} else {
+		//fmt.Println(err)
+		if !os.IsNotExist(err) {
+			t.Fail()
+		}
+	}
+}

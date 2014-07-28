@@ -37,6 +37,7 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 	"CLOSE":   (*server).close,
 	"MKDIR":   (*server).mkdir,
 	"READDIR": (*server).readdir,
+	"DELETE":  (*server).delete,
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -151,6 +152,11 @@ func (s *server) close(w http.ResponseWriter, r *http.Request) error {
 	}
 	s.rmFD(file.Fd())
 	return file.Close()
+}
+
+func (s *server) delete(w http.ResponseWriter, r *http.Request) error {
+	path := s.sandboxPath(r.URL.Path)
+	return os.Remove(path)
 }
 
 func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {

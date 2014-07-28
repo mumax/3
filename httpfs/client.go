@@ -61,11 +61,20 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 func (f *Client) Mkdir(name string, perm os.FileMode) error {
 	URL := mkURL(f.serverAddr, name, "perm", uint32(perm))
 	resp := f.do("MKDIR", URL, nil)
-	if resp.StatusCode != http.StatusOK {
-		return mkError("mkdir", name, resp)
-	} else {
-		return nil
-	}
+	return mkError("mkdir", name, resp)
+}
+
+// Remove removes the named file or directory. If there is an error, it will be of type *PathError.
+func (f *Client) Remove(name string) error {
+	URL := mkURL(f.serverAddr, name)
+	resp := f.do("DELETE", URL, nil)
+	return mkError("remove", name, resp)
+}
+
+func (f *Client) RemoveAll(name string) error {
+	URL := mkURL(f.serverAddr, name)
+	resp := f.do("REMOVEALL", URL, nil)
+	return mkError("removeAll", name, resp)
 }
 
 // mkError returns an *os.PathError whose Err field is based on the response status and error message.
@@ -75,6 +84,8 @@ func mkError(op, name string, resp *http.Response) error {
 	switch resp.StatusCode {
 	default:
 		err = fmt.Errorf(`status %v "%v"`, resp.StatusCode, resp.Header.Get(X_ERROR))
+	case http.StatusOK:
+		return nil
 	case http.StatusNotFound:
 		err = os.ErrNotExist
 	case http.StatusFound:

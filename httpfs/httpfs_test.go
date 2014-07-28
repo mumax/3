@@ -302,3 +302,22 @@ func TestRemove(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveAll(t *testing.T) {
+	fs, _ := Dial(addr)
+	if err := fs.Mkdir("removeDir", 0777); err != nil && !os.IsExist(err) {
+		t.Fatal(err)
+	}
+	if f, err := fs.Create("removeDir/file"); err != nil {
+		t.Fatal(err)
+	} else {
+		f.Close()
+	}
+
+	if err := fs.RemoveAll("removeDir"); err != nil {
+		t.Fatal(err)
+	}
+	if err := fs.RemoveAll("removeDir"); err != nil {
+		t.Error("removeAll(non-existing) should not give error")
+	}
+}

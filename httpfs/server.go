@@ -31,13 +31,14 @@ func Serve(root, addr string) error {
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
-	"OPEN":    (*server).open,
-	"READ":    (*server).read,
-	"WRITE":   (*server).write,
-	"CLOSE":   (*server).close,
-	"MKDIR":   (*server).mkdir,
-	"READDIR": (*server).readdir,
-	"DELETE":  (*server).delete,
+	"OPEN":      (*server).open,
+	"READ":      (*server).read,
+	"WRITE":     (*server).write,
+	"CLOSE":     (*server).close,
+	"MKDIR":     (*server).mkdir,
+	"READDIR":   (*server).readdir,
+	"DELETE":    (*server).delete,
+	"REMOVEALL": (*server).removeAll,
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +158,11 @@ func (s *server) close(w http.ResponseWriter, r *http.Request) error {
 func (s *server) delete(w http.ResponseWriter, r *http.Request) error {
 	path := s.sandboxPath(r.URL.Path)
 	return os.Remove(path)
+}
+
+func (s *server) removeAll(w http.ResponseWriter, r *http.Request) error {
+	path := s.sandboxPath(r.URL.Path)
+	return os.RemoveAll(path)
 }
 
 func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {

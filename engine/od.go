@@ -43,7 +43,7 @@ func SetOD(od string, force bool) {
 		logfile = nil   // windows platform, which cannot remove open file.
 
 		for _, f := range files {
-			fs.RemoveAll(f.Name)
+			fs.RemoveAll(f.Name())
 		}
 		filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
 			if path != OD {

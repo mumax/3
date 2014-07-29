@@ -7,6 +7,7 @@ import (
 	"github.com/mumax/3/gui"
 	"github.com/mumax/3/util"
 	"math/rand"
+	"net"
 	"net/http"
 	"path"
 	"reflect"
@@ -529,9 +530,22 @@ func (g *guistate) Div(heading string) string {
 }
 
 // Start web gui on given port, blocks.
-func Serve(port string) {
+func GoServe(addr string) (actualAddr string) {
 	gui_.PrepareServer()
-	util.LogErr(http.ListenAndServe(port, nil))
+	l, err := net.Listen("tcp", addr)
+	for err != nil {
+		h, p, _ := net.SplitHostPort(addr)
+		addr = fmt.Sprint(h, ":", atoi(p)+1)
+		l, err = net.Listen("tcp", addr)
+	}
+	go util.LogErr(http.Serve(l, nil))
+	return actualAddr
+}
+
+func atoi(a string) int {
+	i, err := strconv.Atoi(a)
+	util.PanicErr(err)
+	return i
 }
 
 // Prog advances the GUI progress bar to fraction a/total and displays message.

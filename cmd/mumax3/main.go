@@ -102,6 +102,7 @@ func runInteractive() {
 // Runs a script file.
 func runFileAndServe(fname string) {
 	//initEngine()
+
 	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
@@ -134,8 +135,8 @@ func goServeGUI() {
 		log.Println(`not starting GUI (-http="")`)
 		return
 	}
-	fmt.Print("starting GUI at http://127.0.0.1", *flag_port, "\n")
-	go engine.Serve(*flag_port)
+	addr := engine.GoServe(*flag_port)
+	fmt.Print("starting GUI at http://127.0.0.1", addr, "\n")
 }
 
 // set output directory unless flag_od overrides it

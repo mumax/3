@@ -77,3 +77,14 @@ func initFS() {
 	util.FatalErr(err)
 	util.Log("connected to httpfs", l.Addr())
 }
+
+func MountHTTPFS(addr string) {
+	if fs != nil {
+		util.Fatal("httpfs already mounted")
+	}
+
+	var err error
+	fs, err = httpfs.Dial(addr)
+	util.FatalErr(err)
+	util.Log("connected to httpfs", addr)
+}

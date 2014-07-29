@@ -10,8 +10,10 @@ import (
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"log"
+	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -102,6 +104,11 @@ func runInteractive() {
 func runFileAndServe(fname string) {
 	//initEngine()
 
+	if strings.HasPrefix(fname, "http://") {
+		runRemote(fname)
+		return
+	}
+
 	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
@@ -124,6 +131,14 @@ func runFileAndServe(fname string) {
 	if *flag_interactive {
 		engine.RunInteractive()
 	}
+}
+
+func runRemote(fname string) {
+	URL, err := url.Parse(fname)
+	util.FatalErr(err)
+	host := URL.Host
+	engine.MountHTTPFS(host)
+	runFileAndServe(URL.Path) // TODO proxyserve?
 }
 
 // start Gui server and return server address

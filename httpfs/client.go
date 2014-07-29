@@ -18,13 +18,12 @@ type Client struct {
 }
 
 // Dial sets up a Client to access files served on addr.
-// An error is returned only if addr cannot be resolved by net.ResolveTCPAddr.
-// It is not an error if the server is down at the time of Dial.
 func Dial(addr string) (*Client, error) {
 	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
 	fs := &Client{serverAddr: addr}
+	// TODO: check connection
 	return fs, nil
 }
 

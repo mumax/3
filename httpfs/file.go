@@ -1,6 +1,7 @@
 package httpfs
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -13,16 +14,35 @@ import (
 
 var illegalArgument = errors.New("illegal argument")
 
+const BUFFER_SIZE = 1 << 20
+
 // A https File implements a subset of os.File's methods.
+// Reading and writing a httpfs File is transparently buffered
+// to minimize network overhead.
 type File struct {
 	name   string // local file name passed to Open
 	client *Client
 	u      url.URL // url to access file on remote machine
 	fd     uintptr // file descriptor on server
+	inBuf  *bufio.Reader
+	outBuf *bufio.Writer
 }
 
 // Read implements io.Reader.
 func (f *File) Read(p []byte) (n int, err error) {
+	if f.inBuf == nil {
+		f.inBuf = bufio.NewReaderSize((*syncFile)(f), BUFFER_SIZE)
+	}
+	return f.inBuf.Read(p)
+}
+
+// wrapper for File that redirects Read,Write to unbuffered implementations
+type syncFile File
+
+func (f *syncFile) Read(p []byte) (n int, err error)  { return (*File)(f).syncRead(p) }
+func (f *syncFile) Write(p []byte) (n int, err error) { return (*File)(f).syncWrite(p) }
+
+func (f *File) syncRead(p []byte) (n int, err error) {
 	// prepare request
 	u := f.u // (a copy)
 	q := u.Query()
@@ -48,6 +68,13 @@ func (f *File) Read(p []byte) (n int, err error) {
 
 // Write implements io.Writer.
 func (f *File) Write(p []byte) (n int, err error) {
+	if f.outBuf == nil {
+		f.outBuf = bufio.NewWriterSize((*syncFile)(f), BUFFER_SIZE)
+	}
+	return f.outBuf.Write(p)
+}
+
+func (f *File) syncWrite(p []byte) (n int, err error) {
 	resp := f.client.do("WRITE", f.u.String(), bytes.NewBuffer(p))
 	if resp.StatusCode != http.StatusOK {
 		return 0, mkError("write", f.name, resp)
@@ -64,6 +91,9 @@ func (f *File) Write(p []byte) (n int, err error) {
 func (f *File) Close() error {
 	if f == nil || f.client == nil || f.fd == 0 {
 		return pathErr("close", f.name, illegalArgument)
+	}
+	if f.outBuf != nil {
+		f.outBuf.Flush()
 	}
 	resp := f.client.do("CLOSE", f.u.String(), nil)
 	defer resp.Body.Close()

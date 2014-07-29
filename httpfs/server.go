@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	//"time"
 	"net/url"
 	"os"
 	"path"
@@ -53,6 +54,8 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	//log.Println("httpfs server:", r.Method, r.URL)
+
+	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
 
 	// crash protection
 	defer func() {

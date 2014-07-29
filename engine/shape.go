@@ -6,7 +6,6 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"math"
-	"os"
 )
 
 func init() {
@@ -139,7 +138,7 @@ func universe(x, y, z float64) bool {
 }
 
 func ImageShape(fname string) Shape {
-	r, err1 := os.Open(fname)
+	r, err1 := fs.Open(fname)
 	CheckRecoverable(err1)
 	defer r.Close()
 	img, _, err2 := image.Decode(r)

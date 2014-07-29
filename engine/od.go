@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	OD = "./"         // Output directory
+	OD = "/"          // Output directory
 	fs *httpfs.Client // abstract file system
 )
 
@@ -20,7 +20,7 @@ var (
 // The -o flag can also be used for this purpose.
 func SetOD(od string, force bool) {
 	initFS()
-	if OD != "./" {
+	if OD != "/" {
 		LogErr("setod: output directory already set to " + OD)
 	}
 
@@ -31,7 +31,9 @@ func SetOD(od string, force bool) {
 	LogOut("output directory:", OD)
 
 	{ // make OD
-		_ = fs.Mkdir(od, 0777) // already exists is OK
+		if err := fs.Mkdir(od, 0777); err != nil && !os.IsExist(err) {
+			util.FatalErr(err)
+		}
 	}
 
 	// fail on non-empty OD
@@ -67,7 +69,10 @@ func initFS() {
 	l, err := net.Listen("tcp", ":")
 	util.Log("httpfs listening", l.Addr())
 	util.FatalErr(err)
-	go func() { util.FatalErr(httpfs.Serve(".", l)) }()
+	root, eRoot := os.Getwd()
+	util.FatalErr(eRoot)
+	go func() { util.FatalErr(httpfs.Serve(root, l)) }()
+	util.FatalErr(os.Chdir("/")) // avoid accidental use of os instead of fs. TODO: rm
 	fs, err = httpfs.Dial(l.Addr().String())
 	util.FatalErr(err)
 	util.Log("connected to httpfs", l.Addr())

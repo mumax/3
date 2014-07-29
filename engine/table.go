@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
-	"os"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
@@ -98,7 +97,7 @@ func TablePrint(msg ...interface{}) {
 // open writer and write header
 func (t *DataTable) init() {
 	if !t.inited() {
-		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		f, err := fs.Create(OD + t.name + ".txt")
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
 

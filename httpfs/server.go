@@ -33,7 +33,7 @@ func ListenAndServe(root, addr string) error {
 }
 
 func Serve(root string, l net.Listener) error {
-	log.Println("serving", root, "at", l.Addr())
+	//log.Println("serving", root, "at", l.Addr())
 	server := &server{path: root, openFiles: make(map[uintptr]*os.File)}
 	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
@@ -52,7 +52,7 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	log.Println("httpfs server:", r.Method, r.URL)
+	//log.Println("httpfs server:", r.Method, r.URL)
 
 	// crash protection
 	defer func() {

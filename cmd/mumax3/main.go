@@ -9,7 +9,6 @@ import (
 	"github.com/mumax/3/prof"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
-	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -94,8 +93,8 @@ func runInteractive() {
 		Aex = 10e-12
 		alpha = 1
 		m = RandomMag()`)
-	goServeGUI()
-	openbrowser("http://127.0.0.1" + *flag_port)
+	addr := goServeGUI()
+	openbrowser("http://127.0.0.1" + addr)
 	engine.RunInteractive()
 }
 
@@ -108,9 +107,7 @@ func runFileAndServe(fname string) {
 	var err2 error
 	if fname != "" {
 		// first we compile the entire file into an executable tree
-		bytes, err := ioutil.ReadFile(fname)
-		util.FatalErr(err)
-		code, err2 = engine.World.Compile(string(bytes))
+		code, err2 = engine.CompileFile(fname)
 		util.FatalErr(err2)
 	}
 
@@ -129,14 +126,15 @@ func runFileAndServe(fname string) {
 	}
 }
 
-// start Gui server and return
-func goServeGUI() {
+// start Gui server and return server address
+func goServeGUI() string {
 	if *flag_port == "" {
 		log.Println(`not starting GUI (-http="")`)
-		return
+		return ""
 	}
 	addr := engine.GoServe(*flag_port)
 	fmt.Print("starting GUI at http://127.0.0.1", addr, "\n")
+	return addr
 }
 
 // set output directory unless flag_od overrides it

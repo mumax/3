@@ -7,6 +7,14 @@ import (
 	"reflect"
 )
 
+func CompileFile(fname string) (*script.BlockStmt, error) {
+	bytes, err := fs.ReadFile(fname)
+	if err != nil {
+		return nil, err
+	}
+	return World.Compile(string(bytes))
+}
+
 func Eval(code string) {
 	tree, err := World.Compile(code)
 	if err != nil {

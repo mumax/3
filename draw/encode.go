@@ -2,7 +2,7 @@ package draw
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"github.com/mumax/3/data"
 	"image"
 	"image/gif"
@@ -15,17 +15,21 @@ import (
 )
 
 func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int) error {
-	codecs := map[string]codec{".png": PNG, ".jpg": JPEG100, ".gif": GIF256}
-	ext := strings.ToLower(path.Ext(fname))
-	enc := codecs[ext]
-	if enc == nil {
-		return errors.New("renderfile: unhandled image type: " + ext)
-	}
-	out, err := os.OpenFile(fname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	out, err := os.Create(fname)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
+	return RenderFormat(out, f, min, max, arrowSize, fname)
+}
+
+func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, format string) error {
+	var codecs = map[string]codec{".png": PNG, ".jpg": JPEG100, ".gif": GIF256}
+	ext := strings.ToLower(path.Ext(format))
+	enc := codecs[ext]
+	if enc == nil {
+		return fmt.Errorf("render: unhandled image type: " + ext)
+	}
 	return Render(out, f, min, max, arrowSize, enc)
 }
 

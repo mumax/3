@@ -8,7 +8,6 @@ import (
 	"github.com/mumax/3/draw"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"os"
 	"path"
 	"strings"
 )
@@ -70,12 +69,15 @@ func Snapshot(q Quantity) {
 
 // synchronous snapshot
 func snapshot_sync(fname string, output *data.Slice) {
-	util.FatalErr(draw.RenderFile(fname, output, "auto", "auto", arrowSize))
+	f, err := fs.Create(fname)
+	util.FatalErr(err)
+	defer f.Close()
+	draw.RenderFormat(f, output, "auto", "auto", arrowSize, path.Ext(fname))
 }
 
 // synchronous save
 func saveAs_sync(fname string, s *data.Slice, info data.Meta, format OutputFormat) {
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	f, err := fs.Create(fname)
 	util.FatalErr(err)
 	out := bufio.NewWriter(f)
 

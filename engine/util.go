@@ -60,7 +60,7 @@ func Fprintln(filename string, msg ...interface{}) {
 	if !path.IsAbs(filename) {
 		filename = OD + "/" + filename
 	}
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+	f, err := fs.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	util.FatalErr(err)
 	defer f.Close()
 	_, err = fmt.Fprintln(f, myFmt(msg)...)
@@ -69,13 +69,16 @@ func Fprintln(filename string, msg ...interface{}) {
 
 // Read a magnetization state from .dump file.
 func LoadFile(fname string) *data.Slice {
+	in, err := fs.Open(fname)
+	util.FatalErr(err)
+	var s *data.Slice
 	if path.Ext(fname) == ".dump" {
-		s, _ := dump.MustReadFile(fname)
-		return s
+		s, _, err = dump.Read(in)
 	} else {
-		s, _ := oommf.MustReadFile(fname)
-		return s
+		s, _, err = oommf.Read(in)
 	}
+	util.FatalErr(err)
+	return s
 }
 
 // Download a quantity to host,

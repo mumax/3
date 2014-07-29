@@ -71,10 +71,21 @@ func (f *Client) Remove(name string) error {
 	return mkError("remove", name, resp)
 }
 
+// RemoveAll is similar to os.RemoveAll.
 func (f *Client) RemoveAll(name string) error {
 	URL := mkURL(f.serverAddr, name)
 	resp := f.do("REMOVEALL", URL, nil)
 	return mkError("removeAll", name, resp)
+}
+
+// ReadFile reads a file entirely and returns the content, similar to ioutil.ReadFile.
+func (f *Client) ReadFile(fname string) ([]byte, error) {
+	file, err := f.Open(fname)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return ioutil.ReadAll(file)
 }
 
 // mkError returns an *os.PathError whose Err field is based on the response status and error message.

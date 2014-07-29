@@ -10,7 +10,7 @@ import (
 func main() {
 
 	cuda.Init(0)
-	go Serve(":35367")
+	GoServe(":35367")
 	SetOD("standardproblem4.out", true)
 	defer Close()
 

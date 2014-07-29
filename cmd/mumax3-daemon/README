@@ -1,7 +1,4 @@
-PACKAGE
-
-package main
-    import "github.com/barnex/mumax-daemon/daemon"
+COMMAND DOCUMENTATION
 
     daemon runs on the cluster's compute nodes. E.g.:
 
@@ -21,32 +18,5 @@ package main
 		stdout     // contains the job subprocess output
 
     Author: Arne Vansteenkiste
-
-FUNCTIONS
-
-func RunWatchdog()
-
-func SetWatchdog(cmd *exec.Cmd, lockdir string)
-    Sets the command and lock dir to be polled by the watchdog. If the lock
-    dir disappears, cmd is killed.
-
-
-TYPES
-
-type Job struct {
-    Command string
-    Args    []string
-    Wd      string
-    User    string
-}
-
-type Status struct {
-    Name      string
-    Status    int // -1: failed, 0: finished, 1:running
-    StartTime time.Time
-    Runtime   time.Duration
-    Node      string
-    Gpu       int
-}
 
 

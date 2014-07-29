@@ -32,8 +32,7 @@ expect("ncomp", s.ncomp(), 3, 0)
 expect("size", s.size()[0], 128, 0)
 expect("size", s.size()[1],  64, 0)
 expect("size", s.size()[2],   1, 0)
-expect("elem", s.get(2, 99, 24, 0),  0.0077220075763762, 0)
-
+expect("elem", s.get(2, 99, 24, 0), -0.002278769388794899, 0)
 
 s = loadfile("testdata/movf2.ovf")
 expect("ncomp", s.ncomp(), 3, 0)

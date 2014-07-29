@@ -52,6 +52,7 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	log.Println("httpfs server:", r.Method, r.URL)
 
 	// crash protection
 	defer func() {

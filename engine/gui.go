@@ -529,7 +529,6 @@ func (g *guistate) Div(heading string) string {
 	return fmt.Sprintf(`<span title="Click to show/hide" style="cursor:pointer; font-size:1.2em; font-weight:bold; color:gray" onclick="toggle('%v')">&dtrif; %v</span> <br/> <div id="%v">`, id, heading, id)
 }
 
-// Start web gui on given port, blocks.
 func GoServe(addr string) (actualAddr string) {
 	gui_.PrepareServer()
 	l, err := net.Listen("tcp", addr)
@@ -538,7 +537,7 @@ func GoServe(addr string) (actualAddr string) {
 		addr = fmt.Sprint(h, ":", atoi(p)+1)
 		l, err = net.Listen("tcp", addr)
 	}
-	go util.LogErr(http.Serve(l, nil))
+	go func() { util.LogErr(http.Serve(l, nil)) }()
 	return actualAddr
 }
 

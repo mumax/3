@@ -5,6 +5,7 @@ package engine
 import (
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -63,5 +64,11 @@ func initFS() {
 	if fs != nil {
 		return
 	}
-
+	l, err := net.Listen("tcp", ":")
+	util.Log("httpfs listening", l.Addr())
+	util.FatalErr(err)
+	go func() { util.FatalErr(httpfs.Serve(".", l)) }()
+	fs, err = httpfs.Dial(l.Addr().String())
+	util.FatalErr(err)
+	util.Log("connected to httpfs", l.Addr())
 }

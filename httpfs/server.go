@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -23,10 +24,18 @@ type server struct {
 }
 
 // Serve serves the files under directory root at tcp address addr.
-func Serve(root, addr string) error {
-	log.Println("serving", root, "at", addr)
+func ListenAndServe(root, addr string) error {
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	return Serve(root, l)
+}
+
+func Serve(root string, l net.Listener) error {
+	log.Println("serving", root, "at", l.Addr())
 	server := &server{path: root, openFiles: make(map[uintptr]*os.File)}
-	err := http.ListenAndServe(addr, server) // don't use DefaultServeMux which redirects some requests behind our back.
+	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
 }
 

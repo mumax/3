@@ -3,17 +3,22 @@ package engine
 // Management of output directory.
 
 import (
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-var OD = "./" // Output directory
+var (
+	OD = "./"         // Output directory
+	fs *httpfs.Client // abstract file system
+)
 
 // SetOD sets the output directory where auto-saved files will be stored.
 // The -o flag can also be used for this purpose.
 func SetOD(od string, force bool) {
+	initFS()
 	if OD != "./" {
 		LogErr("setod: output directory already set to " + OD)
 	}
@@ -52,4 +57,11 @@ func SetOD(od string, force bool) {
 			return nil
 		})
 	}
+}
+
+func initFS() {
+	if fs != nil {
+		return
+	}
+
 }

@@ -11,7 +11,7 @@ import (
 var addr = "localhost:12345"
 
 func init() {
-	go Serve("testdata", addr)
+	go ListenAndServe("testdata", addr)
 }
 
 func TestDial(t *testing.T) {

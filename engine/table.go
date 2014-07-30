@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
+	"io"
 	"os"
 )
 
@@ -21,6 +22,7 @@ func init() {
 
 type DataTable struct {
 	*bufio.Writer
+	file io.Closer
 	info
 	outputs []TableData
 	autosave
@@ -101,6 +103,7 @@ func (t *DataTable) init() {
 		f, err := os.OpenFile(OD+t.name+".txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
+		t.file = f // so we can close it
 
 		// write header
 		fmt.Fprint(t, "# t (s)")
@@ -132,6 +135,13 @@ func (t *DataTable) inited() bool {
 func (t *DataTable) flush() {
 	if t.Writer != nil {
 		t.Flush()
+	}
+}
+
+func (t *DataTable) close() {
+	t.flush()
+	if t.file != nil {
+		t.file.Close()
 	}
 }
 

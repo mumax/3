@@ -35,7 +35,7 @@ func GetBusy() bool {
 // Cleanly exits the simulation, assuring all output is flushed.
 func Close() {
 	drainOutput()
-	Table.flush()
+	Table.close()
 	if logfile != nil {
 		logfile.Close()
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
+	"io"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
@@ -20,6 +21,7 @@ func init() {
 
 type DataTable struct {
 	*bufio.Writer
+	file io.Closer
 	info
 	outputs []TableData
 	autosave
@@ -100,6 +102,7 @@ func (t *DataTable) init() {
 		f, err := fs.Create(OD + t.name + ".txt")
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
+		t.file = f // so we can close it
 
 		// write header
 		fmt.Fprint(t, "# t (s)")
@@ -131,6 +134,13 @@ func (t *DataTable) inited() bool {
 func (t *DataTable) flush() {
 	if t.Writer != nil {
 		t.Flush()
+	}
+}
+
+func (t *DataTable) close() {
+	t.flush()
+	if t.file != nil {
+		t.file.Close()
 	}
 }
 

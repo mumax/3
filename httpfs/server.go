@@ -7,10 +7,10 @@ import (
 	"log"
 	"net"
 	"net/http"
-	//"time"
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"sync"
 )
@@ -87,8 +87,24 @@ func (s *server) get(w http.ResponseWriter, r *http.Request) error {
 		"Type":      "httpfs server",
 		"RootDir":   s.path,
 		"Addr":      s.addr.String(),
-		"OpenFiles": s.NOpenFiles()}
-	return json.NewEncoder(w).Encode(info)
+		"OpenFiles": s.LsOF()}
+	bytes, err := json.MarshalIndent(info, "", "\t")
+	if err != nil {
+		return err
+	}
+	_, eWrite := w.Write(bytes)
+	return eWrite
+}
+
+func (s *server) LsOF() []string {
+	s.Lock()
+	defer s.Unlock()
+	of := make([]string, 0, len(s.openFiles))
+	for _, v := range s.openFiles {
+		of = append(of, v.Name())
+	}
+	sort.Strings(of)
+	return of
 }
 
 func (s *server) NOpenFiles() int {

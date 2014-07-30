@@ -39,6 +39,7 @@ func SetOD(od string, force bool) {
 	// fail on non-empty OD
 	f, err3 := fs.Open(od)
 	util.FatalErr(err3, "open output directory:")
+	defer f.Close()
 	files, _ := f.Readdir(1)
 	if !force && len(files) != 0 {
 		util.Fatal(od, " not empty, clean it or force with -f")

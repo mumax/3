@@ -2,6 +2,7 @@ package httpfs
 
 import (
 	"fmt"
+	//"runtime"
 	"io"
 	"io/ioutil"
 	"net"
@@ -53,6 +54,7 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 	// prepare *File
 	fdURL := url.URL{Scheme: "http", Host: f.serverAddr, Path: fmt.Sprint(fd)}
 	file := &File{client: f, u: fdURL, name: name, fd: uintptr(fd)}
+	//runtime.SetFinalizer(file, file.Close())
 	return file, nil
 }
 

@@ -20,6 +20,7 @@ const X_ERROR = "X-HTTPFS-Error"
 
 type server struct {
 	path string // served path
+	addr net.Addr
 	sync.Mutex
 	openFiles map[uintptr]*os.File // active file descriptors
 }
@@ -35,12 +36,13 @@ func ListenAndServe(root, addr string) error {
 
 func Serve(root string, l net.Listener) error {
 	//log.Println("serving", root, "at", l.Addr())
-	server := &server{path: root, openFiles: make(map[uintptr]*os.File)}
+	server := &server{path: root, addr: l.Addr(), openFiles: make(map[uintptr]*os.File)}
 	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
+	"GET":       (*server).get,
 	"OPEN":      (*server).open,
 	"READ":      (*server).read,
 	"WRITE":     (*server).write,
@@ -76,7 +78,23 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set(X_ERROR, err.Error())
 		w.WriteHeader(statusCode(err))
+		log.Println("httpfs server error:", err)
 	}
+}
+
+func (s *server) get(w http.ResponseWriter, r *http.Request) error {
+	info := map[string]interface{}{
+		"Type":      "httpfs server",
+		"RootDir":   s.path,
+		"Addr":      s.addr.String(),
+		"OpenFiles": s.NOpenFiles()}
+	return json.NewEncoder(w).Encode(info)
+}
+
+func (s *server) NOpenFiles() int {
+	s.Lock()
+	defer s.Unlock()
+	return len(s.openFiles)
 }
 
 // by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.

@@ -46,7 +46,7 @@ func (RPC) Status(peerStat Status, ret *Status) error {
 	// and possibly add as new peer.
 	pipe <- func() {
 		if _, ok := peers[peerStat.Addr]; !ok {
-			workers <- func() { RPCProbe(peerStat.Addr, myStatus) }
+			go func() { RPCProbe(peerStat.Addr, myStatus) }()
 		}
 	}
 

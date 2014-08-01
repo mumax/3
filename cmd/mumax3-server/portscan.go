@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/rpc"
-	"time"
 )
 
-const N_SCANNERS = 4
+const N_SCANNERS = 128
 
 func FindPeers(IPs []string, minPort, maxPort int, myStatus Status) {
 	log.Println("Portscan start")
@@ -32,15 +32,15 @@ func FindPeers(IPs []string, minPort, maxPort int, myStatus Status) {
 	log.Println("Portscan done")
 }
 
-const PROBE_TIMEOUT = 1 * time.Second
-
 func RPCProbe(addr string, myStatus Status) {
 
-	client, err := rpc.DialHTTP("tcp", addr)
+	conn, err := net.DialTimeout("tcp", addr, *flag_timeout)
 	if err != nil {
 		//log.Println("      ERR:", err)
 		return
 	}
+	log.Println("                    probing", addr)
+	client := rpc.NewClient(conn)
 
 	var stat Status
 	err = client.Call("RPC.Status", myStatus, &stat)

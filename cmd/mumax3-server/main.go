@@ -6,13 +6,15 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
-	flag_slave = flag.Bool("slave", false, "Run as compute node")
-	flag_addr  = flag.String("addr", ":35360", "Serve at this network address")
-	flag_scan  = flag.String("scan", "127.0.0.1,192.168.0-1.1-254", "Scan these IP address for other servers")
-	flag_ports = flag.String("ports", "35360-35361", "Scan these ports for other servers")
+	flag_slave   = flag.Bool("slave", false, "Run as compute node")
+	flag_addr    = flag.String("addr", ":35360", "Serve at this network address")
+	flag_scan    = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
+	flag_ports   = flag.String("ports", "35360-35361", "Scan these ports for other servers")
+	flag_timeout = flag.Duration("timeout", 1*time.Second, "Portscan timeout")
 )
 
 const MaxIPs = 1024
@@ -24,8 +26,6 @@ func main() {
 
 	IPs := parseIPs()
 	minPort, maxPort := parsePorts()
-
-	StartWorkers()
 
 	if *flag_slave {
 		MainSlave(*flag_addr, IPs, minPort, maxPort)

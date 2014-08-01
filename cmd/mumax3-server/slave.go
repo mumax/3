@@ -11,7 +11,7 @@ import (
 var (
 	pipe     = make(chan func(), 1000)
 	peers    = make(map[string]Peer)
-	myStatus Status
+	MyStatus Status
 )
 
 func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
@@ -23,12 +23,11 @@ func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
 		h, _ = os.Hostname()
 	}
 	laddr = net.JoinHostPort(h, p)
-	myStatus = Status{Addr: laddr}
-	log.Println("Status:", myStatus)
+	MyStatus = Status{Addr: laddr}
+	log.Println("Status:", MyStatus)
 
 	go ServeRPC(laddr, RPC{})
-
-	go FindPeers(IPs, minPort, maxPort, myStatus)
+	go FindPeers(IPs, minPort, maxPort)
 
 	for {
 		log.Println("                    [waiting]")
@@ -40,13 +39,15 @@ func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
 
 func (RPC) Status(peerStat Status, ret *Status) error {
 	//log.Println("status called by", peerStat)
-	*ret = myStatus
+	*ret = MyStatus
 
 	// Somebody just called my status, let's probe him
 	// and possibly add as new peer.
-	pipe <- func() {
-		if _, ok := peers[peerStat.Addr]; !ok {
-			go func() { RPCProbe(peerStat.Addr, myStatus) }()
+	if peerStat.Addr != MyStatus.Addr {
+		pipe <- func() {
+			if _, ok := peers[peerStat.Addr]; !ok {
+				go func() { RPCProbe(peerStat.Addr) }()
+			}
 		}
 	}
 

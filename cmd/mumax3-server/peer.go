@@ -1,9 +1,7 @@
 package main
 
-import (
-	"net/rpc"
-)
+import ()
 
 type Peer struct {
-	*rpc.Client
+	Status
 }

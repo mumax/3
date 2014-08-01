@@ -10,14 +10,9 @@ import (
 
 var (
 	flag_slave = flag.Bool("slave", false, "Run as compute node")
-	flag_ip    = flag.String("ip", "", "Serve at this IP address, blank means auto")
-	flag_scan  = flag.String("scan", "192.168.0-1.1-64,127.0.0.1", "Scan these IP address for other servers")
-	flag_ports = flag.String("ports", "35360-35369", "Scan these ports for other servers")
-)
-
-var (
-	MinPort, MaxPort int      // port range to use and portscan
-	IPs              []string // all IP addresses to portscan
+	flag_addr  = flag.String("addr", ":35360", "Serve at this network address")
+	flag_scan  = flag.String("scan", "192.168.0-1.1-254,127.0.0.1", "Scan these IP address for other servers")
+	flag_ports = flag.String("ports", "35360-35361", "Scan these ports for other servers")
 )
 
 const MaxIPs = 1024
@@ -27,32 +22,39 @@ func main() {
 	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
-	parsePorts()
-	parseIPs()
+	IPs := parseIPs()
+	minPort, maxPort := parsePorts()
 
 	if *flag_slave {
-		new(slave).Main(*flag_ip)
+		MainSlave(*flag_addr, IPs, minPort, maxPort)
 	} else {
-		new(master).Main(*flag_ip)
+		MainMaster(*flag_addr, IPs, minPort, maxPort)
 	}
 }
 
 // init MinPort, MaxPort from CLI flag
-func parsePorts() {
+func parsePorts() (minPort, maxPort int) {
 	p := *flag_ports
 	split := strings.Split(p, "-")
-	if len(split) != 2 {
+	if len(split) > 2 {
 		log.Fatal("invalid port range:", p)
 	}
-	MinPort, _ = strconv.Atoi(split[0])
-	MaxPort, _ = strconv.Atoi(split[1])
-	if MinPort == 0 || MaxPort == 0 || MaxPort < MinPort {
+	minPort, _ = strconv.Atoi(split[0])
+	if len(split) > 1 {
+		maxPort, _ = strconv.Atoi(split[1])
+	}
+	if maxPort == 0 {
+		maxPort = minPort
+	}
+	if minPort == 0 || maxPort == 0 || maxPort < minPort {
 		log.Fatal("invalid port range:", p)
 	}
+	return
 }
 
 // init IPs from flag
-func parseIPs() {
+func parseIPs() []string {
+	var IPs []string
 	defer func() {
 		if err := recover(); err != nil {
 			log.Fatal("invalid IP range:", *flag_scan)
@@ -89,6 +91,7 @@ func parseIPs() {
 			}
 		}
 	}
+	return IPs
 }
 
 func atobyte(a string) byte {

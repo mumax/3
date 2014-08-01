@@ -23,11 +23,17 @@ func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
 		h, _ = os.Hostname()
 	}
 	laddr = net.JoinHostPort(h, p)
-	MyStatus = Status{Addr: laddr}
+
+	MyStatus = Status{
+		Type: "slave",
+		Addr: laddr,
+	}
+
 	log.Println("Status:", MyStatus)
 
 	go ServeRPC(laddr, RPC{})
 	go FindPeers(IPs, minPort, maxPort)
+	go ServeHTTP()
 
 	for {
 		log.Println("                    [waiting]")
@@ -35,6 +41,16 @@ func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
 		log.Println("                    [working]", runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
 		f()
 	}
+}
+
+// pipe <- f and wait for f() to return
+func PipeAndWait(f func()) {
+	wait := make(chan struct{})
+	pipe <- func() {
+		f()
+		wait <- struct{}{}
+	}
+	<-wait
 }
 
 func (RPC) Status(peerStat Status, ret *Status) error {

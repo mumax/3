@@ -22,6 +22,7 @@ func handleHTTP(w http.ResponseWriter, r *http.Request) {
 			"Type":  MyStatus.Type,
 			"Peers": peers,
 			"Jobs":  jobs.ListFiles(),
+			"GPUs":  gpus,
 		}
 	})
 	bytes, err := json.MarshalIndent(info, "", "\t")

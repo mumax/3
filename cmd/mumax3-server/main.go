@@ -15,6 +15,7 @@ var (
 	flag_ports   = flag.String("ports", "35360-35361", "Scan these ports for other servers")
 	flag_timeout = flag.Duration("timeout", 1*time.Second, "Portscan timeout")
 	flag_http    = flag.String("http", ":8080", "Port to serve status over HTTP")
+	flag_mumax   = flag.String("exec", "mumax3", "Mumax3 executable")
 )
 
 const MaxIPs = 1024

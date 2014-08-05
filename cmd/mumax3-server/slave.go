@@ -9,12 +9,17 @@ import (
 )
 
 var (
-	pipe     = make(chan func(), 1000)
-	peers    = make(map[string]Peer)
 	MyStatus Status
+	peers    = make(map[string]Peer)
+	jobs     = new(jobList)
+	pipe     = make(chan func(), 1000)
 )
 
-func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
+type Peer struct {
+	Status
+}
+
+func MainSlave(laddr string, IPs []string, minPort, maxPort int, jobs []string) {
 
 	// replace laddr by canonical form, as it will serve as unique ID
 	h, p, err := net.SplitHostPort(laddr)
@@ -35,12 +40,23 @@ func MainSlave(laddr string, IPs []string, minPort, maxPort int) {
 	go FindPeers(IPs, minPort, maxPort)
 	go ServeHTTP()
 
+	go func() {
+		for _, j := range jobs {
+			j := j // persistent copy (closure caveat)
+			pipe <- func() { AddJob(j) }
+		}
+	}()
+
 	for {
 		log.Println("                    [waiting]")
 		f := <-pipe
 		log.Println("                    [working]", runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
 		f()
 	}
+}
+
+func AddJob(file string) {
+	jobs.Push(NewJob(file))
 }
 
 // pipe <- f and wait for f() to return

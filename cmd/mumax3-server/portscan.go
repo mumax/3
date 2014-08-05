@@ -39,7 +39,7 @@ func RPCProbe(addr string) {
 		//log.Println("      ERR:", err)
 		return
 	}
-	log.Println("                    probing", addr)
+	//log.Println("                    probing", addr)
 	client := rpc.NewClient(conn)
 	defer client.Close()
 
@@ -51,7 +51,7 @@ func RPCProbe(addr string) {
 			// new peer (not myself): add to peers
 			if _, ok := peers[peerStat.Addr]; !ok && peerStat.Addr != MyStatus.Addr {
 				log.Println("Found new peer:", peerStat)
-				peers[peerStat.Addr] = Peer{peerStat}
+				peers[peerStat.Addr] = Peer{Status: peerStat}
 			}
 		}
 	}

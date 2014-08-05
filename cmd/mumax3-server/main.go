@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	flag_slave   = flag.Bool("slave", false, "Run as compute node")
 	flag_addr    = flag.String("addr", ":35360", "Serve at this network address")
 	flag_scan    = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
 	flag_ports   = flag.String("ports", "35360-35361", "Scan these ports for other servers")
@@ -28,11 +27,8 @@ func main() {
 	IPs := parseIPs()
 	minPort, maxPort := parsePorts()
 
-	if *flag_slave {
-		MainSlave(*flag_addr, IPs, minPort, maxPort)
-	} else {
-		MainMaster(*flag_addr, IPs, minPort, maxPort)
-	}
+	jobs := flag.Args()
+	MainSlave(*flag_addr, IPs, minPort, maxPort, jobs)
 }
 
 func Fatal(err error) {
@@ -41,7 +37,8 @@ func Fatal(err error) {
 	}
 }
 
-// init MinPort, MaxPort from CLI flag
+// Parse port range flag. E.g.:
+// 	1234-1237 -> 1234, 1237
 func parsePorts() (minPort, maxPort int) {
 	p := *flag_ports
 	split := strings.Split(p, "-")

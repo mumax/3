@@ -12,7 +12,7 @@ type Node struct {
 	upSince time.Time
 	peers   map[string]NodeInfo
 	m       sync.Mutex
-	jobs    jobList
+	jobs    que
 	value   reflect.Value
 	lockT   time.Time
 }
@@ -23,7 +23,9 @@ type NodeInfo struct {
 	GPUs         []GPU  // number of available GPUs
 }
 
-func (n *Node) Uptime() time.Duration { return time.Since(n.upSince) }
+func (n *Node) Uptime() time.Duration {
+	return time.Since(n.upSince)
+}
 
 func (n *Node) AddJob(fname string) {
 	n.lock()

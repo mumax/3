@@ -41,13 +41,14 @@ func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	argV := make([]reflect.Value, len(args))
 	for i := 0; i < nArgs; i++ {
 		argT := methT.In(i)
-		arg := reflect.Zero(argT)
-		err := json.Unmarshal(([]byte)(args[i]), arg.Addr().Interface())
+		arg := reflect.New(argT).Interface()
+
+		err := json.Unmarshal(([]byte)(args[i]), (reflect.ValueOf(arg)).Interface())
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		argV[i] = arg
+		argV[i] = reflect.ValueOf(arg).Elem()
 	}
 	ret := meth.Call(argV)
 	retV := make([]interface{}, len(ret))

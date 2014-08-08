@@ -8,15 +8,15 @@ import (
 )
 
 type Node struct {
-	inf          NodeInfo
-	MumaxVersion string
-	GPUs         []GPU
-	upSince      time.Time
-	peers        map[string]NodeInfo
-	m            sync.Mutex
-	jobs         que
-	value        reflect.Value
-	lockT        time.Time
+	inf           NodeInfo
+	MumaxVersion  string
+	GPUs          []GPU
+	upSince       time.Time
+	peers         map[string]NodeInfo
+	m             sync.Mutex
+	jobs, running []Job
+	value         reflect.Value
+	lockT         time.Time
 }
 
 type NodeInfo struct {
@@ -25,12 +25,6 @@ type NodeInfo struct {
 
 func (n *Node) Uptime() time.Duration {
 	return time.Since(n.upSince)
-}
-
-func (n *Node) AddJob(fname string) {
-	n.lock()
-	defer n.unlock()
-	n.jobs.Push(NewJob(fname))
 }
 
 // Thread-safe info()

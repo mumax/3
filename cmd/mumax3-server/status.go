@@ -37,8 +37,8 @@ func (n *Node) Status() NodeStatus {
 	}
 	return NodeStatus{
 		NodeInfo: n.inf,
-		Queue:    n.jobs.listQue(),
-		Running:  n.jobs.listRunning(),
+		Queue:    copyJobs(n.jobs),
+		Running:  copyJobs(n.running),
 		Uptime:   time.Since(n.upSince),
 		Peers:    peers,
 	}

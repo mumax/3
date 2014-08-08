@@ -8,19 +8,19 @@ import (
 )
 
 type Node struct {
-	inf     NodeInfo
-	upSince time.Time
-	peers   map[string]NodeInfo
-	m       sync.Mutex
-	jobs    que
-	value   reflect.Value
-	lockT   time.Time
+	inf          NodeInfo
+	MumaxVersion string
+	GPUs         []GPU
+	upSince      time.Time
+	peers        map[string]NodeInfo
+	m            sync.Mutex
+	jobs         que
+	value        reflect.Value
+	lockT        time.Time
 }
 
 type NodeInfo struct {
-	Addr         string // node's RPC address, also serves as unique ID
-	MumaxVersion string // which mumax version this node runs, if any
-	GPUs         []GPU  // number of available GPUs
+	Addr string // node's RPC address, also serves as unique ID
 }
 
 func (n *Node) Uptime() time.Duration {

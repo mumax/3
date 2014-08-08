@@ -31,11 +31,11 @@ func main() {
 
 	node = &Node{
 		inf: NodeInfo{
-			Addr:         laddr,
-			MumaxVersion: DetectMumax(),
-			GPUs:         DetectGPUs(),
+			Addr: laddr,
 		},
-		upSince: time.Now(),
+		upSince:      time.Now(),
+		MumaxVersion: DetectMumax(),
+		GPUs:         DetectGPUs(),
 	}
 
 	for _, file := range flag.Args() {
@@ -47,6 +47,7 @@ func main() {
 
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/", node.HandleStatus)
+
 	go func() {
 		log.Println("serving at", laddr)
 		Fatal(http.ListenAndServe(laddr, nil))

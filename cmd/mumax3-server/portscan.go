@@ -3,12 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
-	"net/rpc"
 )
 
 const (
-	N_SCANNERS = 128
+	N_SCANNERS = 8
 	MaxIPs     = 1024
 )
 
@@ -37,19 +35,11 @@ func FindPeers(IPs []string, minPort, maxPort int) {
 
 //
 func ProbePeer(addr string) {
-	conn, err := net.DialTimeout("tcp", addr, *flag_timeout)
-	if err != nil {
-		return
-	}
-
-	client := rpc.NewClient(conn)
-	defer client.Close()
-
-	var pInf NodeInfo
-	err = client.Call("RPC.Ping", node.Info(), &pInf)
+	ret, err := node.RPCCall(addr, "Ping", node.Info())
 	if err == nil {
-		node.AddPeer(pInf)
+		peerInfo := ret.(NodeInfo)
+		node.AddPeer(peerInfo)
 	} else {
-		log.Println("probe", addr, ":", err)
+		//log.Println("probe", addr, ":", err)
 	}
 }

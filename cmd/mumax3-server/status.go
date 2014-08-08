@@ -4,7 +4,6 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"time"
 )
@@ -14,7 +13,6 @@ var (
 )
 
 func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
-	log.Println("handle http status")
 	err := templ.Execute(w, node.Status())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -23,17 +21,25 @@ func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
 
 type NodeStatus struct {
 	NodeInfo
-	Queue  []string
-	Uptime time.Duration
+	MumaxVersion string // which mumax version this node runs, if any
+	GPUs         []GPU  // number of available GPUs
+	Queue        []string
+	Peers        []string
+	Uptime       time.Duration
 }
 
 func (n *Node) Status() NodeStatus {
 	n.lock()
 	defer n.unlock()
+	peers := make([]string, 0, len(n.peers))
+	for k, _ := range n.peers {
+		peers = append(peers, k)
+	}
 	return NodeStatus{
 		NodeInfo: n.inf,
 		Queue:    n.jobs.ListFiles(),
 		Uptime:   time.Since(n.upSince),
+		Peers:    peers,
 	}
 }
 
@@ -65,6 +71,11 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue</h2>
 {{range .Queue}}
+	{{.}}</br>
+{{end}}
+
+<h2>Peers</h2>
+{{range .Peers}}
 	{{.}}</br>
 {{end}}
 

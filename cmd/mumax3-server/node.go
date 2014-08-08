@@ -10,11 +10,20 @@ type Node struct {
 	inf   NodeInfo
 	peers map[string]NodeInfo
 	m     sync.Mutex
+	jobs  jobList
 	lockT time.Time
 }
 
 type NodeInfo struct {
-	Addr string // node's RPC address, also serves as unique ID
+	Addr         string // node's RPC address, also serves as unique ID
+	MumaxVersion string // which mumax version this node runs, if any
+	GPUs         []GPU  // number of available GPUs
+}
+
+func (n *Node) AddJob(fname string) {
+	n.lock()
+	defer n.unlock()
+	n.jobs.Push(NewJob(fname))
 }
 
 // Thread-safe info()

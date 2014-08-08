@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 )
 
 type GPU struct {
-	info string
+	Info string
 }
 
 const MAXGPU = 16
@@ -22,8 +23,21 @@ func DetectGPUs() []GPU {
 			if strings.HasSuffix(info, "\n") {
 				info = info[:len(info)-1]
 			}
+			log.Println("gpu", i, ":", info)
 			gpus = append(gpus, GPU{info})
 		}
 	}
 	return gpus
+}
+
+func DetectMumax() string {
+	out, err := exec.Command(*flag_mumax, "-test", "-v").Output()
+	if err == nil {
+		info := string(out)
+		split := strings.SplitN(info, "\n", 2)
+		version := split[0]
+		log.Println("have", version)
+		return version
+	}
+	return ""
 }

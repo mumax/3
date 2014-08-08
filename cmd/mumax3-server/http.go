@@ -19,12 +19,55 @@ func ServeHTTP() {
 }
 
 func (n *Node) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := templ.Execute(w, node.Info())
+	err := templ.Execute(w, node.Status())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
+type NodeStatus struct {
+	NodeInfo
+	Queue []string
+}
+
+func (n *Node) Status() NodeStatus {
+	n.lock()
+	defer n.unlock()
+	return NodeStatus{
+		NodeInfo: n.inf,
+		Queue:    n.jobs.ListFiles(),
+	}
+}
+
 const templText = `
-	{{.Addr}}
+<html>
+
+<head>
+	<style>
+		body{font-family:monospace}
+	</style>
+</head>
+
+<body>
+
+<h1>{{.Addr}}</h1>
+
+{{with .MumaxVersion}}
+	Running {{.}}
+{{end}}
+
+{{with .GPUs}}
+	<h2>GPUs</h2>
+	{{range .}}
+		{{.Info}}</br>
+	{{end}}
+{{end}}
+
+<h2>Queue</h2>
+{{range .Queue}}
+	{{.}}</br>
+{{end}}
+
+</body>
+</html>
 `

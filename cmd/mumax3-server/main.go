@@ -27,15 +27,19 @@ func main() {
 	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
-	// replace laddr by canonical form, as it will serve as unique ID
-	laddr := *flag_addr
-	h, p, err := net.SplitHostPort(laddr)
-	Fatal(err)
-	if h == "" {
-		h, _ = os.Hostname()
+	laddr := canonicalAddr(*flag_addr)
+
+	node = &Node{
+		inf: NodeInfo{
+			Addr:         laddr,
+			MumaxVersion: DetectMumax(),
+			GPUs:         DetectGPUs(),
+		},
 	}
-	laddr = net.JoinHostPort(h, p)
-	node = &Node{inf: NodeInfo{laddr}}
+
+	for _, file := range flag.Args() {
+		node.AddJob(file)
+	}
 
 	IPs := parseIPs()
 	minPort, maxPort := parsePorts()
@@ -46,6 +50,16 @@ func main() {
 	go ServeHTTP()
 
 	<-make(chan struct{}) // wait forever
+}
+
+// replace laddr by a canonical form, as it will serve as unique ID
+func canonicalAddr(laddr string) string {
+	h, p, err := net.SplitHostPort(laddr)
+	Fatal(err)
+	if h == "" {
+		h, _ = os.Hostname()
+	}
+	return net.JoinHostPort(h, p)
 }
 
 func Fatal(err error) {

@@ -7,7 +7,10 @@ import (
 	"net/rpc"
 )
 
-const N_SCANNERS = 128
+const (
+	N_SCANNERS = 128
+	MaxIPs     = 1024
+)
 
 func FindPeers(IPs []string, minPort, maxPort int) {
 	log.Println("Portscan start")
@@ -25,7 +28,7 @@ func FindPeers(IPs []string, minPort, maxPort int) {
 	for _, ip := range IPs {
 		for port := minPort; port <= maxPort; port++ {
 			addr := fmt.Sprint(ip, ":", port)
-			scanners <- func() { RPCProbe(addr) }
+			scanners <- func() { ProbePeer(addr) }
 		}
 	}
 	close(scanners)
@@ -33,26 +36,20 @@ func FindPeers(IPs []string, minPort, maxPort int) {
 }
 
 //
-func RPCProbe(addr string) {
+func ProbePeer(addr string) {
 	conn, err := net.DialTimeout("tcp", addr, *flag_timeout)
 	if err != nil {
-		//log.Println("      ERR:", err)
 		return
 	}
-	//log.Println("                    probing", addr)
+
 	client := rpc.NewClient(conn)
 	defer client.Close()
 
-	var peerStat Status
-	err = client.Call("RPC.Status", MyStatus, &peerStat)
-
+	var pInf NodeInfo
+	err = client.Call("RPC.Ping", node.Info(), &pInf)
 	if err == nil {
-		pipe <- func() {
-			// new peer (not myself): add to peers
-			if _, ok := peers[peerStat.Addr]; !ok && peerStat.Addr != MyStatus.Addr {
-				log.Println("Found new peer:", peerStat)
-				peers[peerStat.Addr] = Peer{Status: peerStat}
-			}
-		}
+		node.AddPeer(pInf)
+	} else {
+		log.Println("probe", addr, ":", err)
 	}
 }

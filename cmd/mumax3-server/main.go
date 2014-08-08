@@ -4,32 +4,48 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
 var (
-	flag_addr    = flag.String("addr", ":35360", "Serve at this network address")
+	flag_addr    = flag.String("l", ":35360", "Listen and serve at this network address")
 	flag_scan    = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
 	flag_ports   = flag.String("ports", "35360-35361", "Scan these ports for other servers")
-	flag_timeout = flag.Duration("timeout", 1*time.Second, "Portscan timeout")
+	flag_timeout = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_http    = flag.String("http", ":8080", "Port to serve status over HTTP")
 	flag_mumax   = flag.String("exec", "mumax3", "Mumax3 executable")
 )
 
-const MaxIPs = 1024
+var node *Node
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
+	// replace laddr by canonical form, as it will serve as unique ID
+	laddr := *flag_addr
+	h, p, err := net.SplitHostPort(laddr)
+	Fatal(err)
+	if h == "" {
+		h, _ = os.Hostname()
+	}
+	laddr = net.JoinHostPort(h, p)
+	node = &Node{inf: NodeInfo{laddr}}
+
 	IPs := parseIPs()
 	minPort, maxPort := parsePorts()
 
-	jobs := flag.Args()
-	MainSlave(*flag_addr, IPs, minPort, maxPort, jobs)
+	GoRunRPCService(laddr, &RPC{node}) // in goroutine but returns only when RPC up and running
+
+	go FindPeers(IPs, minPort, maxPort)
+	//jobs := flag.Args()
+
+	<-make(chan struct{}) // wait forever
 }
 
 func Fatal(err error) {

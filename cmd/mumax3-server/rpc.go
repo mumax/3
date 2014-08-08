@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -71,12 +72,12 @@ func (n *Node) RPCCall(addr, method string, args ...interface{}) (interface{}, e
 func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	//log.Println("got called", r.URL.Path)
 
-	//defer func() {
-	//	if err := recover(); err != nil {
-	//		log.Println("RPC panic", err)
-	//		http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-	//	}
-	//}()
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("RPC panic", err)
+			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		}
+	}()
 
 	if n.value.Kind() == 0 {
 		n.value = reflect.ValueOf(n)

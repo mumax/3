@@ -1,7 +1,8 @@
 package main
 
 type Job struct {
-	fname string
+	File string
+	Node string
 }
 
-func NewJob(file string) *Job { return &Job{fname: file} }
+func NewJob(file string) Job { return Job{File: file} }

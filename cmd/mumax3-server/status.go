@@ -21,11 +21,11 @@ func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
 
 type NodeStatus struct {
 	NodeInfo
-	MumaxVersion string // which mumax version this node runs, if any
-	GPUs         []GPU  // number of available GPUs
-	Queue        []string
-	Peers        []string
-	Uptime       time.Duration
+	MumaxVersion   string // which mumax version this node runs, if any
+	GPUs           []GPU  // number of available GPUs
+	Queue, Running []Job
+	Peers          []string
+	Uptime         time.Duration
 }
 
 func (n *Node) Status() NodeStatus {
@@ -37,7 +37,8 @@ func (n *Node) Status() NodeStatus {
 	}
 	return NodeStatus{
 		NodeInfo: n.inf,
-		Queue:    n.jobs.ListFiles(),
+		Queue:    n.jobs.listQue(),
+		Running:  n.jobs.listRunning(),
 		Uptime:   time.Since(n.upSince),
 		Peers:    peers,
 	}
@@ -69,9 +70,15 @@ Uptime: {{.Uptime}} <br/>
 	{{end}}
 {{end}}
 
-<h2>Queue</h2>
+
+<h2>Running</h2>
+{{range .Running}}
+	{{.File}} on {{.Node}} </br>
+{{end}}
+
+<h2>Queued</h2>
 {{range .Queue}}
-	{{.}}</br>
+	{{.File}}</br>
 {{end}}
 
 <h2>Peers</h2>

@@ -43,7 +43,7 @@ func main() {
 	GoRunRPCService(laddr, &RPC{node}) // in goroutine but returns only when RPC up and running
 
 	go FindPeers(IPs, minPort, maxPort)
-	//jobs := flag.Args()
+	go ServeHTTP()
 
 	<-make(chan struct{}) // wait forever
 }

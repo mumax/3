@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -35,6 +36,7 @@ func main() {
 			MumaxVersion: DetectMumax(),
 			GPUs:         DetectGPUs(),
 		},
+		upSince: time.Now(),
 	}
 
 	for _, file := range flag.Args() {
@@ -44,10 +46,14 @@ func main() {
 	IPs := parseIPs()
 	minPort, maxPort := parsePorts()
 
-	GoRunRPCService(laddr, &RPC{node}) // in goroutine but returns only when RPC up and running
+	http.HandleFunc("/call/", node.HandleRPC)
+	http.HandleFunc("/", node.HandleStatus)
+	go func() {
+		log.Println("serving at", laddr)
+		Fatal(http.ListenAndServe(laddr, nil))
+	}()
 
 	go FindPeers(IPs, minPort, maxPort)
-	go ServeHTTP()
 
 	<-make(chan struct{}) // wait forever
 }

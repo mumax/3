@@ -1,33 +1,76 @@
 package main
 
 import (
+	"encoding/json"
+	//"fmt"
 	"log"
-	"net"
-	"net/rpc"
+	"net/http"
+	"reflect"
+	"strings"
 )
 
-type RPC struct{ node *Node }
+func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
+	log.Println("call", r.URL.Path)
 
-// go serve rpc for service in a separate goroutine.
-// returns when the rpc is up and running.
-func GoRunRPCService(addr string, service interface{}) {
-	server := rpc.NewServer()
-	server.Register(service)
-	l, err := net.Listen("tcp", addr)
-	Fatal(err)
-	log.Printf("serving RPC for %T at %v\n", service, l.Addr())
-	go server.Accept(l)
-}
+	n.lock()
+	defer n.unlock()
 
-func (r *RPC) Ping(peerInf NodeInfo, myInf *NodeInfo) error {
-	n := r.node
-	*myInf = n.Info()
+	//	defer func() {
+	//		if err := recover(); err != nil {
+	//			log.Println("RPC panic", err)
+	//			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+	//		}
+	//	}()
 
-	// Somebody just called my status, let's probe him
-	// and possibly add as new peer.
-	if _, ok := n.PeerInfo(peerInf.Addr); !ok {
-		n.AddPeer(peerInf)
-		//ProbePeer(peerInf.Addr)
+	if n.value.Kind() == 0 {
+		n.value = reflect.ValueOf(n)
 	}
-	return nil
+
+	split := strings.Split(r.URL.Path, "/")
+	// split = {"", "call", methodname, args...}
+	name := split[2]
+	args := split[3:]
+	meth := n.value.MethodByName(name)
+	if meth.Kind() == 0 {
+		http.Error(w, "call: no such method: "+name, http.StatusBadRequest)
+		return
+	}
+
+	methT := meth.Type()
+	nArgs := methT.NumIn()
+	argV := make([]reflect.Value, len(args))
+	for i := 0; i < nArgs; i++ {
+		argT := methT.In(i)
+		arg := reflect.Zero(argT)
+		err := json.Unmarshal(([]byte)(args[i]), arg.Addr().Interface())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		argV[i] = arg
+	}
+	ret := meth.Call(argV)
+	retV := make([]interface{}, len(ret))
+	for i := range retV {
+		retV[i] = ret[i].Interface()
+	}
+	resp, err := json.MarshalIndent(retV, "", "\t")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(resp)
 }
+
+//func (r *RPC) Ping(peerInf NodeInfo, myInf *NodeInfo) error {
+//	n := r.node
+//	*myInf = n.Info()
+//
+//	// Somebody just called my status, let's probe him
+//	// and possibly add as new peer.
+//	if _, ok := n.PeerInfo(peerInf.Addr); !ok {
+//		n.AddPeer(peerInf)
+//		//ProbePeer(peerInf.Addr)
+//	}
+//	return nil
+//}

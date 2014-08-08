@@ -2,16 +2,19 @@ package main
 
 import (
 	"log"
+	"reflect"
 	"sync"
 	"time"
 )
 
 type Node struct {
-	inf   NodeInfo
-	peers map[string]NodeInfo
-	m     sync.Mutex
-	jobs  jobList
-	lockT time.Time
+	inf     NodeInfo
+	upSince time.Time
+	peers   map[string]NodeInfo
+	m       sync.Mutex
+	jobs    jobList
+	value   reflect.Value
+	lockT   time.Time
 }
 
 type NodeInfo struct {
@@ -19,6 +22,8 @@ type NodeInfo struct {
 	MumaxVersion string // which mumax version this node runs, if any
 	GPUs         []GPU  // number of available GPUs
 }
+
+func (n *Node) Uptime() time.Duration { return time.Since(n.upSince) }
 
 func (n *Node) AddJob(fname string) {
 	n.lock()
@@ -50,7 +55,7 @@ func (n *Node) addPeer(pInf NodeInfo) {
 	}
 	a := pInf.Addr
 	if _, ok := n.peers[a]; !ok {
-		log.Println("add new peer:", a, "->", pInf)
+		log.Println("add new peer:", a)
 		n.peers[a] = pInf
 	}
 }

@@ -145,6 +145,12 @@ func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
 			Header:     http.Header{X_ERROR: []string{eResp.Error()}},
 			Body:       ioutil.NopCloser(strings.NewReader(""))}
 	}
+	if resp.Header.Get(X_HTTPFS) == "" {
+		return &http.Response{
+			StatusCode: http.StatusTeapot, // indicates that it's not a real HTTP status
+			Header:     http.Header{X_ERROR: []string{"response did not have X_HTTPFS set"}},
+			Body:       ioutil.NopCloser(strings.NewReader(""))}
+	}
 	return resp
 }
 

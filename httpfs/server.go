@@ -15,8 +15,10 @@ import (
 	"sync"
 )
 
-// HTTP header key for storing errors
-const X_ERROR = "X-HTTPFS-Error"
+const (
+	X_ERROR  = "X-HTTPFS-Error" // HTTP header key for storing errors
+	X_HTTPFS = "X-HTTPFS"       // HTTP header identifying response comes from httpfs server, not other
+)
 
 type server struct {
 	root string // served path
@@ -87,6 +89,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	w.Header().Set(X_HTTPFS, "true")
 	handler := methods[r.Method]
 	if handler == nil {
 		w.Header().Set(X_ERROR, "method not allowed: "+r.Method)

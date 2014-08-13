@@ -26,26 +26,37 @@ type server struct {
 
 // Serve serves the files under directory root at tcp address addr.
 func ListenAndServe(root, addr string) error {
+
+	URL, err := url.Parse(addr)
+	if err != nil {
+		panic(err)
+	}
+	if URL.Scheme != "http" {
+		panic("httpfs: unknown scheme:" + URL.Scheme)
+	}
+
+	addr = URL.Host
+	prefix := URL.Path
+
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
-	return Serve(root, l)
+	return Serve(root, l, prefix)
 }
 
-func Serve(root string, l net.Listener) error {
-	//log.Println("serving", root, "at", l.Addr())
-	server := NewServer(root)
+func Serve(root string, l net.Listener, prefix string) error {
+	server := NewServer(root, prefix)
 	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
 }
 
 // NewServer returns a http handler that serves the fs rooted at given root directory.
-func NewServer(root string) http.Handler {
-	if !path.IsAbs(root) {
-		panic(`httpfs needs absolute root path, got: "` + root + `"`)
-	}
-	return &server{root: root, openFiles: make(map[uintptr]*os.File)}
+func NewServer(root string, prefix string) http.Handler {
+	//	if !path.IsAbs(root) {
+	//		panic(`httpfs needs absolute root path, got: "` + root + `"`)
+	//	}
+	return http.StripPrefix(prefix, &server{root: root, openFiles: make(map[uintptr]*os.File)})
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
@@ -62,7 +73,8 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	log.Println("httpfs server:", r.Method, r.URL)
+	log.Println(">>httpfs server:", r.Method, r.URL)
+	defer log.Println("<<httpfs server done:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
 
@@ -139,6 +151,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) error {
 	}
 	fd := file.Fd()
 	s.storeFD(fd, file)
+	//log.Println("open", fname, "->", fd)
 	fmt.Fprint(w, fd) // respond with file descriptor
 	return nil
 }
@@ -179,6 +192,7 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 		// But statusOK, EOF not treated as actual error
 	}
 	// upload error is server error, not client.
+	log.Println("uploading", nRead, "bytes:", string(buf[:10])+"...")
 	_, eUpload := w.Write(buf[:nRead])
 	if eUpload != nil {
 		log.Println("ERROR: upload read FD", file.Fd(), ":", eUpload)

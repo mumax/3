@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -63,6 +64,7 @@ func (f *File) syncRead(p []byte) (n int, err error) {
 	if resp.Header.Get(X_ERROR) == "EOF" {
 		err = io.EOF
 	}
+	log.Println("read", nRead, "bytes")
 	return nRead, err // passes on EOF
 }
 

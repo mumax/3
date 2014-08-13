@@ -8,33 +8,39 @@ import (
 	"time"
 )
 
-var addr = "localhost:12345"
+var addr = "http://localhost:12345/fs"
 
 func init() {
 	go ListenAndServe("testdata", addr)
 }
 
 func TestDial(t *testing.T) {
-	if _, err := Dial("badport:111111"); err == nil {
+	if _, err := Dial("http://badport:111111"); err == nil {
 		t.Error("should get error on invalid port")
 	} else {
 		fmt.Println(err)
 	}
 
-	if _, err := Dial(":abc"); err == nil {
+	if _, err := Dial("http//:abc"); err == nil {
 		t.Error("should get error on malformed port")
 	} else {
 		fmt.Println(err)
 	}
 
-	if _, err := Dial(":malformed:"); err == nil {
+	if _, err := Dial("http//:malformed:"); err == nil {
 		t.Error("should get error on malformed address")
 	} else {
 		fmt.Println(err)
 	}
 
-	if _, err := Dial("nonexistingghostserver.blabla:123"); err == nil {
+	if _, err := Dial("http//nonexistingghostserver.blabla:123"); err == nil {
 		t.Error("should get lookup error")
+	} else {
+		fmt.Println(err)
+	}
+
+	if _, err := Dial("nohttp.com:123"); err == nil {
+		t.Error("should get scheme error")
 	} else {
 		fmt.Println(err)
 	}

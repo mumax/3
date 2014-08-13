@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -20,10 +21,20 @@ type Client struct {
 
 // Dial sets up a Client to access files served on addr.
 func Dial(addr string) (*Client, error) {
+	URL, err := url.Parse(addr)
+	if err != nil {
+		panic(err)
+	}
+	addr = URL.Host
+	if URL.Scheme != "http" {
+		return nil, fmt.Errorf("httpfs dial: unsupported scheme: %v (need http)", URL.Scheme)
+	}
+	prefix := URL.Path
+
 	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
-	fs := &Client{serverAddr: addr}
+	fs := &Client{serverAddr: addr + prefix}
 	// TODO: check connection
 	return fs, nil
 }
@@ -125,6 +136,8 @@ func mkURL(host, Path string, query ...interface{}) string {
 func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
 	req, eReq := http.NewRequest(method, URL, body)
 	panicOn(eReq)
+	log.Println(">>>client do", req.Method, req.URL)
+	defer log.Println("<<<client do", req.Method, req.URL)
 	resp, eResp := f.client.Do(req)
 	if eResp != nil {
 		return &http.Response{

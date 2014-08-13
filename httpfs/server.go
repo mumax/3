@@ -19,8 +19,7 @@ import (
 const X_ERROR = "X-HTTPFS-Error"
 
 type server struct {
-	path string // served path
-	addr net.Addr
+	root string // served path
 	sync.Mutex
 	openFiles map[uintptr]*os.File // active file descriptors
 }
@@ -36,9 +35,17 @@ func ListenAndServe(root, addr string) error {
 
 func Serve(root string, l net.Listener) error {
 	//log.Println("serving", root, "at", l.Addr())
-	server := &server{path: root, addr: l.Addr(), openFiles: make(map[uintptr]*os.File)}
+	server := NewServer(root)
 	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
+}
+
+// NewServer returns a http handler that serves the fs rooted at given root directory.
+func NewServer(root string) http.Handler {
+	if !path.IsAbs(root) {
+		panic(`httpfs needs absolute root path, got: "` + root + `"`)
+	}
+	return &server{root: root, openFiles: make(map[uintptr]*os.File)}
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
@@ -55,13 +62,14 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	//log.Println("httpfs server:", r.Method, r.URL)
+	log.Println("httpfs server:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
 
 	// crash protection
 	defer func() {
 		if err := recover(); err != nil {
+			log.Println("httpfs panic:", err)
 			w.Header().Set(X_ERROR, fmt.Sprint("panic: ", err))
 			w.WriteHeader(http.StatusInternalServerError)
 		}
@@ -85,8 +93,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) get(w http.ResponseWriter, r *http.Request) error {
 	info := map[string]interface{}{
 		"Type":      "httpfs server",
-		"RootDir":   s.path,
-		"Addr":      s.addr.String(),
+		"RootDir":   s.root,
 		"OpenFiles": s.LsOF()}
 	bytes, err := json.MarshalIndent(info, "", "\t")
 	if err != nil {
@@ -117,7 +124,7 @@ func (s *server) NOpenFiles() int {
 func (s *server) sandboxPath(p string) string {
 	p = path.Clean(p)
 	assert(path.IsAbs(p))
-	return path.Join(s.path, p)
+	return path.Join(s.root, p)
 }
 
 // open file, respond with file descriptor

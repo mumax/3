@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"time"
 )
@@ -28,7 +29,7 @@ func (n *Node) RunComputeService() {
 func (n *Node) WaitForJob() string {
 	URL := n.FindJob()
 	for URL == "" {
-		time.Sleep(1 * time.Second) // TODO: don't poll
+		time.Sleep(2 * time.Second) // TODO: don't poll
 		URL = n.FindJob()
 	}
 	log.Println("found job", URL)
@@ -52,6 +53,9 @@ func run(inFile string, gpu int, webAddr string) {
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
 	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
 	cmd := exec.Command(command, gpuFlag, httpFlag, inFile)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
 	log.Println(command, cacheFlag, gpuFlag, httpFlag, inFile)
 	err := cmd.Run()
 	if err != nil {

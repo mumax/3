@@ -2,13 +2,13 @@ package httpfs
 
 import (
 	"fmt"
-	//"runtime"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -109,8 +109,9 @@ func mkError(op, name string, resp *http.Response) error {
 }
 
 // returns "http://host/path?query[0]=query[1]...
-func mkURL(host, path string, query ...interface{}) string {
-	u := url.URL{Scheme: "http", Host: host, Path: path}
+func mkURL(host, Path string, query ...interface{}) string {
+	Path = path.Clean(Path)
+	u := url.URL{Scheme: "http", Host: host, Path: Path}
 	q := u.Query()
 	for i := 0; i < len(query); i += 2 {
 		q.Set(query[i].(string), fmt.Sprint(query[i+1]))

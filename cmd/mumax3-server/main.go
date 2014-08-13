@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mumax/3/httpfs"
 )
 
 var (
@@ -19,6 +21,7 @@ var (
 	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
 	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
+	flag_rootdir  = flag.String("root", ".", "httpfs root directory")
 )
 
 var node *Node
@@ -47,6 +50,7 @@ func main() {
 
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/", node.HandleStatus)
+	http.Handle("/fs/", http.StripPrefix("/fs", httpfs.NewServer(*flag_rootdir)))
 
 	go func() {
 		log.Println("serving at", laddr)

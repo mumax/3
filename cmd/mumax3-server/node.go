@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"reflect"
-	"runtime"
+	//"runtime"
 	"sync"
 	"time"
 )
@@ -25,10 +25,10 @@ func (n *Node) Uptime() time.Duration {
 }
 
 func (n *Node) lock() {
-	pc, file, line, _ := runtime.Caller(1)
-	log.Println(" -> wait ", runtime.FuncForPC(pc).Name(), file, line)
+	//	pc, file, line, _ := runtime.Caller(1)
+	//	log.Println(" -> wait ", runtime.FuncForPC(pc).Name(), file, line)
 	n.mutex.Lock()
-	log.Println(" -> lock ", runtime.FuncForPC(pc).Name(), file, line)
+	//log.Println(" -> lock ", runtime.FuncForPC(pc).Name(), file, line)
 	n.lockT = time.Now()
 }
 
@@ -39,7 +39,7 @@ func (n *Node) unlock() {
 	if d > maxLatency {
 		log.Println("*** locked for more than", d)
 	}
-	pc, file, line, _ := runtime.Caller(1)
-	log.Println(" <- unlock ", runtime.FuncForPC(pc).Name(), file, line, "after", d)
+	//pc, file, line, _ := runtime.Caller(1)
+	//log.Println(" <- unlock ", runtime.FuncForPC(pc).Name(), file, line, "after", d)
 	n.mutex.Unlock()
 }

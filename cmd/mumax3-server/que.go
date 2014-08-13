@@ -8,12 +8,11 @@ func (n *Node) GiveJob(nodeAddr string) string {
 	n.lock()
 	defer n.unlock()
 
-	jobs := n.jobs
-	if len(jobs) == 0 {
+	if len(n.jobs) == 0 {
 		return "" // indicates no job available
 	}
-	job := jobs[len(jobs)-1]
-	jobs = jobs[:len(jobs)-1]
+	job := n.jobs[len(n.jobs)-1]
+	n.jobs = n.jobs[:len(n.jobs)-1]
 
 	job.Node = nodeAddr
 	n.running = append(n.running, job)

@@ -13,11 +13,12 @@ import (
 )
 
 var (
-	flag_addr    = flag.String("l", ":35360", "Listen and serve at this network address")
-	flag_scan    = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
-	flag_ports   = flag.String("ports", "35360-35361", "Scan these ports for other servers")
-	flag_timeout = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
-	flag_mumax   = flag.String("exec", "mumax3", "Mumax3 executable")
+	flag_addr     = flag.String("l", ":35360", "Listen and serve at this network address")
+	flag_scan     = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
+	flag_ports    = flag.String("ports", "35360-35361", "Scan these ports for other servers")
+	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
+	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
+	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
 )
 
 var node *Node
@@ -52,11 +53,12 @@ func main() {
 		Fatal(http.ListenAndServe(laddr, nil))
 	}()
 
-	go FindPeers(IPs, minPort, maxPort)
+	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
+	go node.FindPeers(IPs, minPort, maxPort)
 
-	//if len(node.GPUs) > 0{
-	//	go RunComputeService()
-	//}
+	if len(node.GPUs) > 0 {
+		go node.RunComputeService()
+	}
 
 	<-make(chan struct{}) // wait forever
 }

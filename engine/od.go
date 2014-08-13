@@ -19,7 +19,7 @@ var (
 // SetOD sets the output directory where auto-saved files will be stored.
 // The -o flag can also be used for this purpose.
 func SetOD(od string, force bool) {
-	initFS()
+	assureFS()
 	if OD != "/" {
 		LogErr("setod: output directory already set to " + OD)
 	}
@@ -63,7 +63,9 @@ func SetOD(od string, force bool) {
 	}
 }
 
-func initFS() {
+// if no (possibly remote) httpfs filesystem is connected,
+// mount the local FS.
+func assureFS() {
 	if fs != nil {
 		return
 	}
@@ -72,11 +74,12 @@ func initFS() {
 	util.FatalErr(err)
 	root, eRoot := os.Getwd()
 	util.FatalErr(eRoot)
-	go func() { util.FatalErr(httpfs.Serve(root, l)) }()
+	go func() { util.FatalErr(httpfs.Serve(root, l, "/fs/")) }()
 	util.FatalErr(os.Chdir("/")) // avoid accidental use of os instead of fs. TODO: rm
-	fs, err = httpfs.Dial(l.Addr().String())
+	URL := "http://" + l.Addr().String() + "/fs/"
+	fs, err = httpfs.Dial(URL)
 	util.FatalErr(err)
-	util.Log("connected to httpfs", l.Addr())
+	util.Log("connected to httpfs", URL)
 }
 
 func MountHTTPFS(addr string) {

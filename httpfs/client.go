@@ -140,6 +140,7 @@ func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
 	defer log.Println("<<<client do", req.Method, req.URL)
 	resp, eResp := f.client.Do(req)
 	if eResp != nil {
+		log.Println("do", method, URL, ":", eResp)
 		return &http.Response{
 			StatusCode: http.StatusTeapot, // indicates that it's not a real HTTP status
 			Header:     http.Header{X_ERROR: []string{eResp.Error()}},

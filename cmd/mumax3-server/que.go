@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"path"
+	"strings"
 )
 
 // RPC-callable method: picks a job of the queue returns it
@@ -28,6 +29,13 @@ func (n *Node) AddJob(fname string) {
 	n.lock()
 	defer n.unlock()
 	log.Println("Push job:", fname)
+
+	if path.IsAbs(fname) {
+		if !strings.HasPrefix(fname, n.RootDir) {
+			panic("AddJob " + fname + ": not in root: " + n.RootDir) // TODO: handle gracefully
+		}
+		fname = fname[len(n.RootDir):] // strip root prefix
+	}
 	n.jobs = append(n.jobs, Job{File: fname})
 }
 

@@ -103,7 +103,6 @@ func runInteractive() {
 
 // Runs a script file.
 func runFileAndServe(fname string) {
-	//initEngine()
 
 	if strings.HasPrefix(fname, "http://") {
 		runRemote(fname)

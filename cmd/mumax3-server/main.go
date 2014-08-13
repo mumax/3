@@ -21,7 +21,7 @@ var (
 	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
 	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
-	flag_rootdir  = flag.String("root", ".", "httpfs root directory")
+	flag_root     = flag.String("root", ".", "httpfs root directory")
 )
 
 var node *Node
@@ -34,8 +34,13 @@ func main() {
 	jobs := flag.Args()
 	laddr := canonicalAddr(*flag_addr)
 
+	root := *flag_root
+	if !strings.HasSuffix(root, "/") {
+		root = root + "/"
+	}
 	node = &Node{
 		Addr:         laddr,
+		RootDir:      root,
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
@@ -50,7 +55,7 @@ func main() {
 
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/", node.HandleStatus)
-	http.Handle("/fs/", http.StripPrefix("/fs", httpfs.NewServer(*flag_rootdir)))
+	http.Handle("/fs/", httpfs.NewServer(node.RootDir, "/fs/"))
 
 	go func() {
 		log.Println("serving at", laddr)

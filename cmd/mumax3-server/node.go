@@ -10,6 +10,7 @@ import (
 
 type Node struct {
 	Addr          string // canonical (unique) address of node, read-only
+	RootDir       string // httpfs storage root
 	MumaxVersion  string
 	GPUs          []GPU
 	upSince       time.Time

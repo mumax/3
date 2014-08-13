@@ -41,6 +41,7 @@ func (n *Node) Status() NodeStatus {
 		Running:  copyJobs(n.running),
 		Uptime:   time.Since(n.upSince),
 		Peers:    peers,
+		GPUs:     n.GPUs, // read-only
 	}
 }
 

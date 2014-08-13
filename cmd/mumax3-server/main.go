@@ -27,18 +27,17 @@ func main() {
 	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
+	jobs := flag.Args()
 	laddr := canonicalAddr(*flag_addr)
 
 	node = &Node{
-		inf: NodeInfo{
-			Addr: laddr,
-		},
+		Addr:         laddr,
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
 	}
 
-	for _, file := range flag.Args() {
+	for _, file := range jobs {
 		node.AddJob(file)
 	}
 
@@ -54,6 +53,10 @@ func main() {
 	}()
 
 	go FindPeers(IPs, minPort, maxPort)
+
+	//if len(node.GPUs) > 0{
+	//	go RunComputeService()
+	//}
 
 	<-make(chan struct{}) // wait forever
 }

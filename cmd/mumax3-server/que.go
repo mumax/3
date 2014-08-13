@@ -2,6 +2,8 @@ package main
 
 import "log"
 
+// RPC-callable method: picks a job of the queue returns it
+// for the node to run it.
 func (n *Node) GiveJob(nodeAddr string) string {
 	n.lock()
 	defer n.unlock()
@@ -15,7 +17,7 @@ func (n *Node) GiveJob(nodeAddr string) string {
 
 	job.Node = nodeAddr
 	n.running = append(n.running, job)
-	url := "http://" + n.inf.Addr + "/fs/" + job.File
+	url := "http://" + n.Addr + "/fs/" + job.File
 	log.Println("give job", url, "->", nodeAddr)
 	return url
 }

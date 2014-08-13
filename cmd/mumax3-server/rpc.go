@@ -125,12 +125,3 @@ func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(resp)
 }
-
-func (n *Node) Ping(peerInf NodeInfo) NodeInfo {
-	// Somebody just called my status,
-	// and him as a peer (if not yet so).
-	if _, ok := n.PeerInfo(peerInf.Addr); !ok {
-		n.AddPeer(peerInf)
-	}
-	return n.Info()
-}

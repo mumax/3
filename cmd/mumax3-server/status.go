@@ -20,7 +20,7 @@ func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 type NodeStatus struct {
-	NodeInfo
+	Addr           string
 	MumaxVersion   string // which mumax version this node runs, if any
 	GPUs           []GPU  // number of available GPUs
 	Queue, Running []Job
@@ -36,12 +36,12 @@ func (n *Node) Status() NodeStatus {
 		peers = append(peers, k)
 	}
 	return NodeStatus{
-		NodeInfo: n.inf,
-		Queue:    copyJobs(n.jobs),
-		Running:  copyJobs(n.running),
-		Uptime:   time.Since(n.upSince),
-		Peers:    peers,
-		GPUs:     n.GPUs, // read-only
+		Addr:    n.Addr,
+		Queue:   copyJobs(n.jobs),
+		Running: copyJobs(n.running),
+		Uptime:  time.Since(n.upSince),
+		Peers:   peers,
+		GPUs:    n.GPUs, // read-only
 	}
 }
 

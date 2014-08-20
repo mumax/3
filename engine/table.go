@@ -74,23 +74,28 @@ func (t *DataTable) Add(output TableData) {
 
 func (t *DataTable) Save() {
 	t.init()
-	fmt.Fprint(t, Time)
+	_, err := fmt.Fprint(t, Time)
+	util.FatalErr(err)
 	t.history[0][0] = append(t.history[0][0], Time) // first column: time (1 component)
 	for i, o := range t.outputs {
 		vec := o.average()
 		for c, v := range vec {
-			fmt.Fprint(t, "\t", float32(v))
+			_, err := fmt.Fprint(t, "\t", float32(v))
+			util.FatalErr(err)
 			t.history[i+1][c] = append(t.history[i+1][c], v)
 		}
 	}
-	fmt.Fprintln(t)
-	t.Flush()
+	_, err = fmt.Fprintln(t)
+	util.FatalErr(err)
+	err = t.Flush()
+	util.FatalErr(err)
 	t.count++
 }
 
 func (t *DataTable) Println(msg ...interface{}) {
 	t.init()
-	fmt.Fprintln(t, msg...)
+	_, err := fmt.Fprintln(t, msg...)
+	util.FatalErr(err)
 }
 
 func TablePrint(msg ...interface{}) {
@@ -106,18 +111,23 @@ func (t *DataTable) init() {
 		t.file = f // so we can close it
 
 		// write header
-		fmt.Fprint(t, "# t (s)")
+		_, err = fmt.Fprint(t, "# t (s)")
+		util.FatalErr(err)
 		for _, o := range t.outputs {
 			if o.NComp() == 1 {
-				fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+				_, err := fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+				util.FatalErr(err)
 			} else {
 				for c := 0; c < o.NComp(); c++ {
-					fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
+					_, err := fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
+					util.FatalErr(err)
 				}
 			}
 		}
-		fmt.Fprintln(t)
-		t.Flush()
+		_, err = fmt.Fprintln(t)
+		util.FatalErr(err)
+		err = t.Flush()
+		util.FatalErr(err)
 
 		// history for plot
 		t.history = make([][][]float64, len(t.outputs)+1) // outputs + time column
@@ -134,14 +144,16 @@ func (t *DataTable) inited() bool {
 
 func (t *DataTable) flush() {
 	if t.Writer != nil {
-		t.Flush()
+		err := t.Flush()
+		util.FatalErr(err)
 	}
 }
 
 func (t *DataTable) close() {
 	t.flush()
 	if t.file != nil {
-		t.file.Close()
+		err := t.file.Close()
+		util.FatalErr(err)
 	}
 }
 

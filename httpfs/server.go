@@ -76,7 +76,7 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	log.Println("httpfs server:", r.Method, r.URL)
+	//log.Println("httpfs server:", r.Method, r.URL)
 	//defer log.Println("<<httpfs server done:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking

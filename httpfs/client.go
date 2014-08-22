@@ -143,7 +143,7 @@ func mkURL(host, Path string, query ...interface{}) string {
 func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
 	req, eReq := http.NewRequest(method, URL, body)
 	panicOn(eReq)
-	log.Println("httpfs client", req.Method, req.URL)
+	//log.Println("httpfs client", req.Method, req.URL)
 	//defer log.Println("<<<client do", req.Method, req.URL)
 	resp, eResp := f.client.Do(req)
 	if eResp != nil {

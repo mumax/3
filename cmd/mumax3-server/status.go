@@ -28,21 +28,25 @@ type NodeStatus struct {
 	Uptime         time.Duration
 }
 
-func (n *Node) Status() NodeStatus {
+func (n *Node) Status() *NodeStatus {
 	n.lock()
 	defer n.unlock()
 	peers := make([]string, 0, len(n.peers))
 	for k, _ := range n.peers {
 		peers = append(peers, k)
 	}
-	return NodeStatus{
+	return &NodeStatus{
 		Addr:    n.Addr,
 		Queue:   copyJobs(n.jobs),
 		Running: copyJobs(n.running),
-		Uptime:  time.Since(n.upSince),
+		Uptime:  n.Uptime(),
 		Peers:   peers,
 		GPUs:    n.GPUs, // read-only
 	}
+}
+
+func (n *NodeStatus) IPRange() string {
+	return *flag_scan + ": " + *flag_ports
 }
 
 const templText = `
@@ -52,6 +56,7 @@ const templText = `
 	<style>
 		body{font-family:monospace}
 	</style>
+	<meta http-equiv="refresh" content="2">
 </head>
 
 <body>
@@ -74,7 +79,7 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Running</h2>
 {{range .Running}}
-	{{.File}} on {{.Node}} </br>
+	{{.File}} on {{.Node}} <br/>
 {{end}}
 
 <h2>Queued</h2>
@@ -84,8 +89,9 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Peers</h2>
 {{range .Peers}}
-	{{.}}</br>
+	{{.}}<br/>
 {{end}}
+<br/>(in scan range: {{.IPRange}})<br/>
 
 </body>
 </html>

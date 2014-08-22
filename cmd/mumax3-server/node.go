@@ -22,7 +22,8 @@ type Node struct {
 }
 
 func (n *Node) Uptime() time.Duration {
-	return time.Since(n.upSince)
+	t := time.Since(n.upSince)
+	return (t / 1e9) * 1e9
 }
 
 func (n *Node) lock() {

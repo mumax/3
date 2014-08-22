@@ -44,6 +44,7 @@ func main() {
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
+		RunningHere:  make(map[string]Job),
 	}
 
 	for _, file := range jobs {

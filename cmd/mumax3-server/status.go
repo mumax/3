@@ -5,8 +5,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"sort"
-	"time"
 )
 
 var (
@@ -14,40 +12,15 @@ var (
 )
 
 func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
-	err := templ.Execute(w, node.Status())
+	n.lock()
+	defer n.unlock()
+	err := templ.Execute(w, node)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-type NodeStatus struct {
-	Addr           string
-	MumaxVersion   string // which mumax version this node runs, if any
-	GPUs           []GPU  // number of available GPUs
-	Queue, Running []Job
-	Peers          []string
-	Uptime         time.Duration
-}
-
-func (n *Node) Status() *NodeStatus {
-	n.lock()
-	defer n.unlock()
-	peers := make([]string, 0, len(n.peers))
-	for k, _ := range n.peers {
-		peers = append(peers, k)
-	}
-	sort.Strings(peers)
-	return &NodeStatus{
-		Addr:    n.Addr,
-		Queue:   copyJobs(n.jobs),
-		Running: copyJobs(n.running),
-		Uptime:  n.Uptime(),
-		Peers:   peers,
-		GPUs:    n.GPUs, // read-only
-	}
-}
-
-func (n *NodeStatus) IPRange() string {
+func (n *Node) IPRange() string {
 	return *flag_scan + ": " + *flag_ports
 }
 
@@ -67,15 +40,28 @@ const templText = `
 
 Uptime: {{.Uptime}} <br/>
 
-{{with .MumaxVersion}}
-	Running {{.}}
+
+<h2>Compute service</h2>
+
+<h3>GPUs</h3>
+{{with .GPUs}}
+	{{range .}}
+		{{.Info}}<br/>
+	{{end}}
+{{else}}
+	No GPUs available<br/>
 {{end}}
 
-{{with .GPUs}}
-	<h2>GPUs</h2>
-	{{range .}}
-		{{.Info}}</br>
-	{{end}}
+<h3>Mumax</h3>
+{{with .MumaxVersion}}
+	Has {{.}}
+{{else}}
+	No mumax available<br/>
+{{end}}
+
+<h3>Jobs running on tis node</h3>
+{{range .RunningHere}}
+	[GPU {{.GPU}}] [<a href="{{.File}}">{{.File}}</a>] [{{.Runtime}}] <br/>
 {{end}}
 
 

@@ -9,21 +9,31 @@ import (
 )
 
 type Node struct {
-	Addr          string // canonical (unique) address of node, read-only
-	RootDir       string // httpfs storage root
-	MumaxVersion  string
-	GPUs          []GPU
-	upSince       time.Time
-	peers         map[string]PeerInfo
-	mutex         sync.Mutex
+	Addr         string // canonical (unique) address of node, read-only
+	RootDir      string // httpfs storage root
+	MumaxVersion string
+	upSince      time.Time
+
+	// compute service
+	GPUs        []GPU
+	RunningHere map[string]Job
+
+	peers map[string]PeerInfo
+
 	jobs, running []Job
-	value         reflect.Value
-	lockT         time.Time
+
+	mutex sync.Mutex
+	value reflect.Value
+	lockT time.Time
 }
 
 func (n *Node) Uptime() time.Duration {
-	t := time.Since(n.upSince)
-	return (t / 1e9) * 1e9
+	return since(n.upSince)
+}
+
+func since(t time.Time) time.Duration {
+	d := time.Since(t)
+	return (d / 1e9) * 1e9
 }
 
 func (n *Node) lock() {

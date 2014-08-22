@@ -107,6 +107,11 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) get(w http.ResponseWriter, r *http.Request) error {
+	http.ServeFile(w, r, r.URL.Path)
+	return nil
+}
+
+func (s *server) status(w http.ResponseWriter, r *http.Request) error {
 	info := map[string]interface{}{
 		"Type":      "httpfs server",
 		"RootDir":   s.root,

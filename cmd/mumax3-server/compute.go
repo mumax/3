@@ -19,7 +19,22 @@ func (n *Node) RunComputeService() {
 		addr := fmt.Sprint(":", 35367+gpu)
 		URL := n.WaitForJob()
 		go func() {
+			n.lock()
+
+			n.RunningHere[URL] = Job{
+				File:  URL,
+				Node:  n.Addr,
+				GPU:   gpu,
+				Start: time.Now(),
+			}
+			n.unlock()
+
 			run(URL, gpu, addr)
+
+			n.lock()
+			delete(n.RunningHere, URL)
+			n.unlock()
+
 			// add job to finished, report, etc
 			idle <- gpu
 		}()

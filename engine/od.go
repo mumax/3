@@ -6,30 +6,53 @@ import (
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 	"net"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 var (
-	OD = "/"          // Output directory
-	fs *httpfs.Client // abstract file system
+	outputdir string // Output directory
+	InputFile string
+	fs        *httpfs.Client // abstract file system
 )
+
+func OD() string {
+	if outputdir == "" {
+		panic("output not yet initialized")
+	}
+	return outputdir
+}
 
 // SetOD sets the output directory where auto-saved files will be stored.
 // The -o flag can also be used for this purpose.
-func SetOD(od string, force bool) {
-	assureFS()
-	if OD != "/" {
-		LogErr("setod: output directory already set to " + OD)
+func InitIO(inputfile string, force bool) {
+	if outputdir != "" {
+		panic("output directory already set")
 	}
 
-	OD = od
-	if !strings.HasSuffix(OD, "/") {
-		OD += "/"
+	if !strings.HasPrefix(inputfile, "http://") {
+		mountLocalFS()
+		InputFile = inputfile
+	} else {
+		URL, err := url.Parse(inputfile)
+		split := strings.Split(URL.Path, "/")
+		if len(split) < 3 {
+			util.Fatal("invalid url:", inputfile)
+		}
+		baseHandler := "/" + split[1]
+		InputFile = URL.Path[len(baseHandler):]
+		util.Log("inputFile:", InputFile)
+		util.Log("dialing:", URL.Scheme+"://"+URL.Host+baseHandler)
+		fs, err = httpfs.Dial(URL.Scheme + "://" + URL.Host + baseHandler)
+		util.FatalErr(err)
 	}
-	LogOut("output directory:", OD)
 
+	outputdir = util.NoExt(InputFile) + ".out/"
+	LogOut("output directory:", outputdir)
+
+	od := OD()
 	{ // make OD
 		if err := fs.Mkdir(od, 0777); err != nil && !os.IsExist(err) {
 			util.FatalErr(err)
@@ -38,7 +61,7 @@ func SetOD(od string, force bool) {
 
 	// fail on non-empty OD
 	f, err3 := fs.Open(od)
-	util.FatalErr(err3, "open output directory:")
+	util.FatalErr(err3)
 	defer f.Close()
 	files, _ := f.Readdir(1)
 	if !force && len(files) != 0 {
@@ -46,28 +69,27 @@ func SetOD(od string, force bool) {
 	}
 
 	// clean output dir
-	if len(files) != 0 && OD != "." {
-
-		logfile.Close() // Suggested by Raffaele Pellicelli <raffaele.pellicelli@fis.unipr.it> for
-		logfile = nil   // windows platform, which cannot remove open file.
+	if len(files) != 0 {
 
 		for _, f := range files {
 			fs.RemoveAll(f.Name())
 		}
-		filepath.Walk(OD, func(path string, i os.FileInfo, err error) error {
-			if path != OD {
-				util.FatalErr(fs.RemoveAll(path), "clean output directory:")
+		filepath.Walk(OD(), func(path string, i os.FileInfo, err error) error {
+			if path != OD() {
+				util.FatalErr(fs.RemoveAll(path))
 			}
 			return nil
 		})
 	}
+
+	initLog()
 }
 
 // if no (possibly remote) httpfs filesystem is connected,
 // mount the local FS.
-func assureFS() {
+func mountLocalFS() {
 	if fs != nil {
-		return
+		panic("httpfs already mounted")
 	}
 	l, err := net.Listen("tcp", ":")
 	util.Log("httpfs listening", l.Addr())

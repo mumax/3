@@ -50,7 +50,7 @@ func autoSave(q Quantity, period float64, save func(Quantity)) {
 // generate auto file name based on save count and FilenameFormat. E.g.:
 // 	m000001.ovf
 func autoFname(name string, num int) string {
-	return fmt.Sprintf(OD+FilenameFormat+".ovf", name, num)
+	return fmt.Sprintf(OD()+FilenameFormat+".ovf", name, num)
 }
 
 // keeps info needed to decide when a quantity needs to be periodically saved

@@ -105,7 +105,7 @@ func (g *guistate) PrepareServer() {
 	http.HandleFunc("/render/", g.ServeRender)
 	http.HandleFunc("/plot/", g.servePlot)
 
-	g.Set("title", util.NoExt(OD[:len(OD)-1]))
+	g.Set("title", util.NoExt(OD()[:len(OD())-1]))
 	g.prepareConsole()
 	g.prepareMesh()
 	g.prepareGeom()
@@ -471,7 +471,7 @@ func (g *guistate) UnitOf(quant string) string {
 }
 
 // renders page title for PrepareServer
-func (g *guistate) Title() string   { return util.NoExt(path.Base(OD)) }
+func (g *guistate) Title() string   { return util.NoExt(path.Base(OD())) }
 func (g *guistate) Version() string { return UNAME }
 func (g *guistate) GPUInfo() string { return cuda.GPUInfo }
 

@@ -35,7 +35,14 @@ func Dial(addr string) (*Client, error) {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
 	fs := &Client{serverAddr: addr + prefix}
-	// TODO: check connection
+
+	// test connection by opening root
+	f, err := fs.Open("/")
+	if err != nil {
+		return nil, fmt.Errorf(`httpfs dial "%v": could not stat "/": %v`, addr, err)
+	}
+	f.Close()
+
 	return fs, nil
 }
 
@@ -136,19 +143,20 @@ func mkURL(host, Path string, query ...interface{}) string {
 func (f *Client) do(method string, URL string, body io.Reader) *http.Response {
 	req, eReq := http.NewRequest(method, URL, body)
 	panicOn(eReq)
-	log.Println(">>>client do", req.Method, req.URL)
-	defer log.Println("<<<client do", req.Method, req.URL)
+	log.Println("httpfs client", req.Method, req.URL)
+	//defer log.Println("<<<client do", req.Method, req.URL)
 	resp, eResp := f.client.Do(req)
 	if eResp != nil {
 		log.Println("do", method, URL, ":", eResp)
 		return &http.Response{
 			StatusCode: http.StatusTeapot, // indicates that it's not a real HTTP status
 			Header:     http.Header{X_ERROR: []string{eResp.Error()}},
-			Body:       ioutil.NopCloser(strings.NewReader(""))}
+			Body:       ioutil.NopCloser(strings.NewReader(eResp.Error()))}
 	}
 	if resp.Header.Get(X_HTTPFS) == "" {
+		log.Println("httpfs client", method, URL, "response did not have X_HTTPFS set")
 		return &http.Response{
-			StatusCode: http.StatusTeapot, // indicates that it's not a real HTTP status
+			StatusCode: http.StatusNotImplemented,
 			Header:     http.Header{X_ERROR: []string{"response did not have X_HTTPFS set"}},
 			Body:       ioutil.NopCloser(strings.NewReader(""))}
 	}

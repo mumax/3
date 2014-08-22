@@ -40,8 +40,8 @@ func Save(q Quantity) {
 
 // Save under given file name (transparent async I/O).
 func SaveAs(q Quantity, fname string) {
-	if !path.IsAbs(fname) && !strings.HasPrefix(fname, OD) {
-		fname = path.Clean(OD + "/" + fname)
+	if !strings.HasPrefix(fname, OD()) {
+		fname = path.Clean(OD() + fname)
 	}
 	if path.Ext(fname) == "" {
 		fname += ".ovf"
@@ -57,7 +57,7 @@ func SaveAs(q Quantity, fname string) {
 
 // Save image once, with auto file name
 func Snapshot(q Quantity) {
-	fname := fmt.Sprintf(OD+FilenameFormat+"."+SnapshotFormat, q.Name(), autonum[q])
+	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, q.Name(), autonum[q])
 	s, r := q.Slice()
 	if r {
 		defer cuda.Recycle(s)

@@ -5,6 +5,7 @@ package util
 import (
 	"fmt"
 	"log"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -18,9 +19,10 @@ func Fatalf(format string, msg ...interface{}) {
 }
 
 // If err != nil, trigger log.Fatal(msg, err)
-func FatalErr(err interface{}, msg ...interface{}) {
+func FatalErr(err interface{}) {
+	_, file, line, _ := runtime.Caller(1)
 	if err != nil {
-		log.Fatal(append(msg, err)...)
+		log.Fatal(file, ":", line, err)
 	}
 }
 

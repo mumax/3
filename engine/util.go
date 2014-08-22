@@ -58,7 +58,7 @@ func ExpectV(msg string, have, want data.Vector, maxErr float64) {
 // Append msg to file. Used to write aggregated output of many simulations in one file.
 func Fprintln(filename string, msg ...interface{}) {
 	if !path.IsAbs(filename) {
-		filename = OD + "/" + filename
+		filename = OD() + filename
 	}
 	f, err := fs.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	util.FatalErr(err)

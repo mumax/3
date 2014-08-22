@@ -11,7 +11,7 @@ func main() {
 
 	cuda.Init(0)
 	GoServe(":35367")
-	SetOD("standardproblem4.out", true)
+	InitIO("standardproblem4.mx3", true)
 	defer Close()
 
 	SetGridSize(128, 32, 1)

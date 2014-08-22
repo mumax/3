@@ -10,10 +10,8 @@ import (
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"log"
-	"net/url"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 )
 
@@ -23,7 +21,7 @@ var (
 	flag_silent      = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	flag_vet         = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	flag_od          = flag.String("o", "", "Override output directory")
-	flag_force       = flag.Bool("f", true, "Force start, clean existing output directory")
+	flag_forceclean  = flag.Bool("f", true, "Force start, clean existing output directory")
 	flag_port        = flag.String("http", ":35367", "Port to serve web gui")
 	flag_cpuprof     = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	flag_memprof     = flag.Bool("memprof", false, "Recored gopprof memory profile")
@@ -55,10 +53,10 @@ func main() {
 
 	engine.CacheDir = *flag_cachedir
 	if *flag_cpuprof {
-		prof.InitCPU(engine.OD)
+		prof.InitCPU(".")
 	}
 	if *flag_memprof {
-		prof.InitMem(engine.OD)
+		prof.InitMem(".")
 	}
 	defer prof.Cleanup()
 	defer engine.Close() // flushes pending output, if any
@@ -85,9 +83,9 @@ func runInteractive() {
 	// setup outut dir
 	now := time.Now()
 	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02dh%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
-	suggestOD(outdir)
+	engine.InitIO(outdir, *flag_forceclean)
 
-	engine.Timeout = 365 * 24 * time.Hour // forever
+	engine.Timeout = 365 * 24 * time.Hour // basically forever
 
 	// set up some sensible start configuration
 	engine.Eval(`SetGridSize(128, 64, 1)
@@ -104,12 +102,9 @@ func runInteractive() {
 // Runs a script file.
 func runFileAndServe(fname string) {
 
-	if strings.HasPrefix(fname, "http://") {
-		runRemote(fname)
-		return
-	}
+	engine.InitIO(fname, *flag_forceclean)
+	fname = engine.InputFile
 
-	suggestOD(util.NoExt(fname) + ".out")
 	var code *script.BlockStmt
 	var err2 error
 	if fname != "" {
@@ -133,13 +128,15 @@ func runFileAndServe(fname string) {
 	}
 }
 
-func runRemote(fname string) {
-	URL, err := url.Parse(fname)
-	util.FatalErr(err)
-	host := URL.Host
-	engine.MountHTTPFS(host)
-	runFileAndServe(URL.Path) // TODO proxyserve?
-}
+//func runRemote(fname string) {
+//	URL, err := url.Parse(fname)
+//	util.FatalErr(err)
+//	host := URL.Host
+//	engine.MountHTTPFS("http://" + host)
+//	od := util.NoExt(URL.Path) + ".out"
+//	engine.InitIO(od, *flag_force)
+//	runFileAndServe(URL.Path) // TODO proxyserve?
+//}
 
 // start Gui server and return server address
 func goServeGUI() string {
@@ -150,14 +147,6 @@ func goServeGUI() string {
 	addr := engine.GoServe(*flag_port)
 	fmt.Print("starting GUI at http://127.0.0.1", addr, "\n")
 	return addr
-}
-
-// set output directory unless flag_od overrides it
-func suggestOD(fname string) {
-	if *flag_od != "" {
-		fname = *flag_od
-	}
-	engine.SetOD(fname, *flag_force)
 }
 
 // print version to stdout

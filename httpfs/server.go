@@ -12,6 +12,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -75,8 +76,8 @@ var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	log.Println(">>httpfs server:", r.Method, r.URL)
-	defer log.Println("<<httpfs server done:", r.Method, r.URL)
+	log.Println("httpfs server:", r.Method, r.URL)
+	//defer log.Println("<<httpfs server done:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
 
@@ -137,7 +138,7 @@ func (s *server) NOpenFiles() int {
 
 // by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
 func (s *server) sandboxPath(p string) string {
-	p = path.Clean(p)
+	p = path.Clean("/" + p)
 	assert(path.IsAbs(p))
 	return path.Join(s.root, p)
 }
@@ -195,10 +196,10 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 		// But statusOK, EOF not treated as actual error
 	}
 	// upload error is server error, not client.
-	log.Println("uploading", nRead, "bytes:", string(buf[:10])+"...")
+	//log.Println("uploading", nRead, "bytes:", string(buf[:10])+"...")
 	_, eUpload := w.Write(buf[:nRead])
 	if eUpload != nil {
-		log.Println("ERROR: upload read FD", file.Fd(), ":", eUpload)
+		log.Println("upload error for read FD", file.Fd(), ":", eUpload)
 	}
 	return nil
 }
@@ -260,7 +261,7 @@ func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {
 // retrieve file belonging to file descriptor in URL. E.g.:
 // 	http://server/2 -> openFiles[2]
 func (s *server) parseFD(URL *url.URL) *os.File {
-	fdStr := URL.Path[len("/"):]
+	fdStr := strings.Trim(URL.Path, "/")
 	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
 	return s.getFD(uintptr(fd))
 }

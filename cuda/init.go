@@ -53,7 +53,7 @@ func Init(gpu int) {
 func tryCuInit() {
 	defer func() {
 		err := recover()
-		util.FatalErr(err, "initialize GPU:")
+		util.FatalErr(err)
 	}()
 	cu.Init(0)
 }

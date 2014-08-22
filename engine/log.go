@@ -3,7 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/httpfs"
-	"log"
+	"github.com/mumax/3/util"
 	"os"
 )
 
@@ -46,10 +46,21 @@ func LogErr(msg ...interface{}) {
 }
 
 func log2File(msg string) {
-	out := openlog()
-	if out != nil {
-		fmt.Fprintln(out, msg)
+	if logfile != nil {
+		fmt.Fprintln(logfile, msg)
 	}
+}
+
+func initLog() {
+	if logfile != nil {
+		panic("log already inited")
+	}
+	// open log file and flush what was logged before the file existed
+	var err error
+	logfile, err = fs.Create(OD() + "log.txt")
+	util.FatalErr(err)
+	logfile.Write(([]byte)(hist))
+	logfile.Write([]byte{'\n'})
 }
 
 func log2GUI(msg string) {
@@ -64,16 +75,16 @@ func log2GUI(msg string) {
 }
 
 // returns log file of input commands, opening it first if needed
-func openlog() *httpfs.File {
-	if logfile == nil {
-		var err error
-		logfile, err = fs.Create(OD + "/input.log")
-		if err != nil {
-			log.Println(err)
-		}
-	}
-	return logfile
-}
+//func openlog() *httpfs.File {
+//	if logfile == nil {
+//		var err error
+//		logfile, err = fs.Create(OD + "/input.log")
+//		if err != nil {
+//			log.Println(err)
+//		}
+//	}
+//	return logfile
+//}
 
 // like fmt.Sprint but with spaces between args
 func sprint(msg ...interface{}) string {

@@ -231,9 +231,9 @@ func writeOVFText(out io.Writer, tens *data.Slice) (err error) {
 // # Key: Value
 func hdr(out io.Writer, key string, value ...interface{}) {
 	_, err := fmt.Fprint(out, "# ", key, ": ")
-	util.FatalErr(err, "while reading OOMMF header")
+	util.FatalErr(err)
 	_, err = fmt.Fprintln(out, value...)
-	util.FatalErr(err, "while reading OOMMF header")
+	util.FatalErr(err)
 }
 
 func dsc(out io.Writer, k, v interface{}) {

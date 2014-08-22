@@ -99,7 +99,7 @@ func TablePrint(msg ...interface{}) {
 // open writer and write header
 func (t *DataTable) init() {
 	if !t.inited() {
-		f, err := fs.Create(OD + t.name + ".txt")
+		f, err := fs.Create(OD() + t.name + ".txt")
 		util.FatalErr(err)
 		t.Writer = bufio.NewWriter(f)
 		t.file = f // so we can close it

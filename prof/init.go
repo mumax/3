@@ -14,9 +14,9 @@ func InitCPU(OD string) {
 	// start CPU profile to file
 	fname := OD + "cpu.pprof"
 	f, err := os.Create(fname)
-	util.FatalErr(err, "CPU profile")
+	util.FatalErr(err)
 	err = pprof.StartCPUProfile(f)
-	util.FatalErr(err, "CPU profile")
+	util.FatalErr(err)
 	log.Println("writing CPU profile to", fname)
 
 	// at exit: exec go tool pprof to generate SVG output

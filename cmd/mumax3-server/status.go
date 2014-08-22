@@ -5,6 +5,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -35,6 +36,7 @@ func (n *Node) Status() *NodeStatus {
 	for k, _ := range n.peers {
 		peers = append(peers, k)
 	}
+	sort.Strings(peers)
 	return &NodeStatus{
 		Addr:    n.Addr,
 		Queue:   copyJobs(n.jobs),
@@ -89,7 +91,7 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Peers</h2>
 {{range .Peers}}
-	{{.}}<br/>
+	<a href="http://{{.}}">{{.}}</a><br/>
 {{end}}
 <br/>(in scan range: {{.IPRange}})<br/>
 

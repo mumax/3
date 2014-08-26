@@ -1,0 +1,18 @@
+// Regression test for vortex config yielding NaN in case of an odd number of cells.
+// Reported by Mathias Helsen.
+
+Nx := 257
+Ny := 257
+Nz := 1
+
+setgridsize(Nx, Ny, Nz)
+thickness := 10.0e-9
+diameter := 1.0e-6
+setcellsize(diameter/Nx, diameter/Ny, thickness/Nz)
+setgeom(cylinder(diameter, thickness))
+mask := newslice(3, Nx, Ny, Nz)
+mask.set(2, 127, 127, 0, 1.0)
+
+m = vortex(1, 1)
+
+expectv("m", m.average(), vector(0, 0,  0.0001), 1e-2)

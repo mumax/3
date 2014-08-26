@@ -62,7 +62,7 @@ func Vortex(circ, pol int) Config {
 		mx := -y * float64(circ) / r
 		my := x * float64(circ) / r
 		mz := 1.5 * float64(pol) * math.Exp(-r2/diam2)
-		return data.Vector{mx, my, mz}
+		return noNaN(data.Vector{mx, my, mz}, pol)
 	}
 }
 
@@ -75,7 +75,7 @@ func NeelSkyrmion(charge, pol int) Config {
 		mz := 2 * float64(pol) * (math.Exp(-r2/w2) - 0.5)
 		mx := (x * float64(charge) / r) * (1 - math.Abs(mz))
 		my := (y * float64(charge) / r) * (1 - math.Abs(mz))
-		return data.Vector{mx, my, mz}
+		return noNaN(data.Vector{mx, my, mz}, pol)
 	}
 }
 
@@ -88,7 +88,7 @@ func BlochSkyrmion(charge, pol int) Config {
 		mz := 2 * float64(pol) * (math.Exp(-r2/w2) - 0.5)
 		mx := (-y * float64(charge) / r) * (1 - math.Abs(mz))
 		my := (x * float64(charge) / r) * (1 - math.Abs(mz))
-		return data.Vector{mx, my, mz}
+		return noNaN(data.Vector{mx, my, mz}, pol)
 	}
 }
 
@@ -100,7 +100,7 @@ func AntiVortex(circ, pol int) Config {
 		mx := -x * float64(circ) / r
 		my := y * float64(circ) / r
 		mz := 1.5 * float64(pol) * math.Exp(-r2/diam2)
-		return data.Vector{mx, my, mz}
+		return noNaN(data.Vector{mx, my, mz}, pol)
 	}
 }
 
@@ -116,6 +116,14 @@ func VortexWall(mleft, mright float64, circ, pol int) Config {
 			return data.Vector{mright, 0, 0}
 		}
 		return v(x, y, z)
+	}
+}
+
+func noNaN(v data.Vector, pol int) data.Vector {
+	if math.IsNaN(v[X]) || math.IsNaN(v[Y]) || math.IsNaN(v[Z]) {
+		return data.Vector{0, 0, float64(pol)}
+	} else {
+		return v
 	}
 }
 

@@ -21,7 +21,7 @@ func (n *Node) RunComputeService() {
 		go func() {
 			n.lock()
 
-			n.RunningHere[URL] = Job{
+			n.RunningHere[URL] = &Job{
 				File:  URL,
 				Node:  n.Addr,
 				GPU:   gpu,

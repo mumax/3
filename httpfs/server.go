@@ -24,7 +24,8 @@ const (
 type server struct {
 	root string // served path
 	sync.Mutex
-	openFiles map[uintptr]*os.File // active file descriptors
+	openFiles  map[uintptr]*os.File // active file descriptors
+	fileServer http.Handler         // fileserver only handles GET-requests from browser, not httpfs filesystem
 }
 
 // Serve serves the files under directory root at tcp address addr.
@@ -59,7 +60,11 @@ func NewServer(root string, prefix string) http.Handler {
 	//	if !path.IsAbs(root) {
 	//		panic(`httpfs needs absolute root path, got: "` + root + `"`)
 	//	}
-	return http.StripPrefix(prefix, &server{root: root, openFiles: make(map[uintptr]*os.File)})
+	return http.StripPrefix(prefix, &server{
+		root:       root,
+		openFiles:  make(map[uintptr]*os.File),
+		fileServer: http.FileServer(http.Dir(root)),
+	})
 }
 
 var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
@@ -106,8 +111,9 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// servers classical GET requests so the FS is also accessible from browser.
 func (s *server) get(w http.ResponseWriter, r *http.Request) error {
-	http.ServeFile(w, r, r.URL.Path)
+	s.fileServer.ServeHTTP(w, r)
 	return nil
 }
 

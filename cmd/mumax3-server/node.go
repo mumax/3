@@ -16,7 +16,7 @@ type Node struct {
 
 	// compute service
 	GPUs        []GPU
-	RunningHere map[string]Job
+	RunningHere map[string]*Job
 
 	Peers map[string]PeerInfo
 

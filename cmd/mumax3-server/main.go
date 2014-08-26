@@ -44,7 +44,7 @@ func main() {
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
-		RunningHere:  make(map[string]Job),
+		RunningHere:  make(map[string]*Job),
 		Users:        make(map[string]*User),
 	}
 

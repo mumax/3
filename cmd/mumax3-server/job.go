@@ -5,14 +5,15 @@ import (
 )
 
 type Job struct {
-	File  string
-	Node  string
-	GPU   int
-	Start time.Time
+	File   string
+	Node   string
+	GPU    int
+	Start  time.Time
+	Status int
 }
 
 func NewJob(file string) Job { return Job{File: file} }
 
-func (j Job) Runtime() time.Duration {
+func (j *Job) Runtime() time.Duration {
 	return since(j.Start)
 }

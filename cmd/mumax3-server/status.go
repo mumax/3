@@ -64,7 +64,7 @@ Uptime: {{.Uptime}} <br/>
 {{end}}
 
 <h2>Queue service</h2>
-Storage root: <a href="http://{{.Addr}}/fs/{{.RootDir}}">{{.RootDir}}</a>
+Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 
 {{range $k,$v := .Users}}
 	<h3>{{$k}}</h3>

@@ -31,7 +31,7 @@ const templText = `
 	<style>
 		body{font-family:monospace}
 	</style>
-	<meta http-equiv="refresh" content="2">
+	<meta http-equiv="refresh" content="1">
 </head>
 
 <body>
@@ -39,7 +39,6 @@ const templText = `
 <h1>{{.Addr}}</h1>
 
 Uptime: {{.Uptime}} <br/>
-
 
 <h2>Compute service</h2>
 
@@ -59,27 +58,27 @@ Uptime: {{.Uptime}} <br/>
 	No mumax available<br/>
 {{end}}
 
-<h3>Jobs running on tis node</h3>
+<h3>Jobs running on this node</h3>
 {{range .RunningHere}}
 	[GPU {{.GPU}}] [<a href="{{.File}}">{{.File}}</a>] [{{.Runtime}}] <br/>
 {{end}}
 
+<h2>Queue service</h2>
+Storage root: <a href="http://{{.Addr}}/fs/{{.RootDir}}">{{.RootDir}}</a>
 
-<h2>Running</h2>
-{{range .Running}}
-	{{.File}} on {{.Node}} <br/>
+{{range $k,$v := .Users}}
+	<h3>{{$k}}</h3>
+	Share: {{.Used}}/{{.Share}} <br/>
+	{{range $v.Jobs}}
+		<a href="http://{{$.Addr}}/fs/{{.File}}">{{.File}}</a> {{.Node}}/{{.GPU}} <br/>
+	{{end}}
 {{end}}
 
-<h2>Queued</h2>
-{{range .Queue}}
-	{{.File}}</br>
-{{end}}
-
-<h2>Peers</h2>
+<h2>Port scanner service</h2>
+Peers in IP:port range {{.IPRange}}:<br/>
 {{range .Peers}}
 	<a href="http://{{.}}">{{.}}</a><br/>
 {{end}}
-<br/>(in scan range: {{.IPRange}})<br/>
 
 </body>
 </html>

@@ -83,7 +83,7 @@ func (n *Node) PeersWithJobs() []PeerInfo {
 	n.lock()
 	defer n.unlock()
 	var peers []PeerInfo
-	for _, p := range n.peers {
+	for _, p := range n.Peers {
 		if p.HaveJobs {
 			peers = append(peers, p)
 		}

@@ -45,6 +45,7 @@ func main() {
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
 		RunningHere:  make(map[string]Job),
+		Users:        make(map[string]*User),
 	}
 
 	for _, file := range jobs {

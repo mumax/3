@@ -18,9 +18,9 @@ type Node struct {
 	GPUs        []GPU
 	RunningHere map[string]Job
 
-	peers map[string]PeerInfo
+	Peers map[string]PeerInfo
 
-	jobs, running []Job
+	Users map[string]*User
 
 	mutex sync.Mutex
 	value reflect.Value

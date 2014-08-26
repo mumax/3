@@ -22,12 +22,12 @@ type PeerInfo struct {
 func (n *Node) AddPeer(pAddr string) {
 	n.lock()
 	defer n.unlock()
-	if n.peers == nil {
-		n.peers = make(map[string]PeerInfo)
+	if n.Peers == nil {
+		n.Peers = make(map[string]PeerInfo)
 	}
-	if _, ok := n.peers[pAddr]; !ok {
+	if _, ok := n.Peers[pAddr]; !ok {
 		log.Println("add new peer:", pAddr)
-		n.peers[pAddr] = PeerInfo{
+		n.Peers[pAddr] = PeerInfo{
 			Addr:     pAddr,
 			HaveJobs: true, // makes sure we ask for jobs at least once
 		}
@@ -40,7 +40,7 @@ func (n *Node) AddPeer(pAddr string) {
 func (n *Node) PeerInfo(pAddr string) (p PeerInfo, ok bool) {
 	n.lock()
 	defer n.unlock()
-	p, ok = n.peers[pAddr]
+	p, ok = n.Peers[pAddr]
 	return
 }
 

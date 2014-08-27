@@ -28,7 +28,7 @@ const templText = `
 
 {{define "Job"}}
 	<tr>
-		<td> [{{.Status.String}}] </td>
+		<td class={{.Status.String}}> [{{.Status.String}}] </td>
 		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
 		<td> [{{with .Status}}GPU{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutDir}}">output</a>{{end}}] </td>
@@ -43,9 +43,13 @@ const templText = `
 		body{font-family:monospace; margin-left:5%; margin-top:1em}
 		p{margin-left: 2em}
 		h3{margin-left: 2em}
-		a{text-decoration: none; color:blue}
-		a:visited{text-decoration: none; color:blue}
-		a:hover{text-decoration: underline; color:blue}
+		a{text-decoration: none; color:#0000AA}
+		a:hover{text-decoration: underline}
+		a:visited{color:#0000AA}
+		.FAILED{color:red; font-weight:bold}
+		.RUNNING{font-weight: bold; color:blue}
+		.QUEUED{color:black}
+		.FINISHED{color: grey}
 	</style>
 	<meta http-equiv="refresh" content="1">
 </head>

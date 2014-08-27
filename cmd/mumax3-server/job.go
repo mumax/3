@@ -53,6 +53,14 @@ func (j *Job) OutDir() string {
 	return j.outDir
 }
 
+func (j *Job) IsRunning() bool {
+	return j.Status == RUNNING
+}
+
+func (j *Job) Failed() bool {
+	return j.Status == FAILED
+}
+
 func JobHost(URL string) string {
 	split := strings.Split(URL, "/")
 	return split[2]

@@ -67,7 +67,13 @@ func (n *Node) NotifyJobFinished(jobURL string, status int) {
 	user := n.Users[username]
 
 	job := user.Running[jobURL]
-	job.Status = FINISHED
+
+	if status == 0 {
+		job.Status = FINISHED
+	} else {
+		job.Status = FAILED
+	}
+
 	job.Stop = time.Now()
 	delete(user.Running, jobURL)
 	user.Finished[jobURL] = job

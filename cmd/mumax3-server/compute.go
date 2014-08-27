@@ -22,10 +22,11 @@ func (n *Node) RunComputeService() {
 			n.lock()
 
 			n.RunningHere[URL] = &Job{
-				File:  URL,
-				Node:  n.Addr,
-				GPU:   gpu,
-				Start: time.Now(),
+				File:   URL,
+				Node:   n.Addr,
+				GPU:    gpu,
+				Start:  time.Now(),
+				Status: RUNNING,
 			}
 			n.unlock()
 

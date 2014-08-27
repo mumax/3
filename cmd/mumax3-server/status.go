@@ -25,15 +25,28 @@ func (n *Node) IPRange() string {
 }
 
 const templText = `
+
+{{define "Job"}}
+	<tr>
+		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
+		<td> [{{with .Status}}GPU{{$.GPU}}{{end}}] </td>
+		<td> [{{with .Status}}<a href="{{$.OutDir}}">output</a>{{end}}] </td>
+		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
+	</tr>
+{{end}}
+
 <html>
 
 <head>
 	<style>
-		body{font-family:monospace}
-		h3{margin-left: 2em}
+		body{font-family:monospace; margin-left:5%; margin-top:1em}
 		p{margin-left: 2em}
+		h3{margin-left: 2em}
+		a{text-decoration: none; color:blue}
+		a:visited{text-decoration: none; color:blue}
+		a:hover{text-decoration: underline; color:blue}
 	</style>
-	<meta http-equiv="refresh" content="1">
+	<meta http-equiv="refresh" content="60">
 </head>
 
 <body>
@@ -42,8 +55,8 @@ const templText = `
 
 Uptime: {{.Uptime}} <br/>
 
-<h2>Compute service</h2>
-<p>
+<h2>Compute service</h2><p>
+
 <b>mumax:</b>
 {{with .MumaxVersion}}
 	{{.}}
@@ -59,23 +72,31 @@ Uptime: {{.Uptime}} <br/>
 {{else}}
 	No GPUs available<br/>
 {{end}}
-
-<h3>Running jobs</h3>
-{{range .RunningHere}}
-	[GPU {{.GPU}}] [<a href="{{.File}}">{{.File}}</a>] [{{.Runtime}}] <br/>
-{{end}}
 </p>
 
-<h2>Queue service</h2>
+
+<h3>Running jobs</h3><p>
+	<table>
+		{{range .RunningHere}}
+			{{template "Job" .}}
+		{{end}}
+	</table>
+</p>
+
+<h2>Queue service</h2><p>
 Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 
 {{range $k,$v := .Users}}
-	<h3>{{$k}}</h3>
+	<h3>{{$k}}</h3><p>
 	Share: {{.Used}}/{{.Share}} <br/>
-	{{range $v.Jobs}}
-		<a href="http://{{$.Addr}}/fs/{{.File}}">{{.File}}</a> {{.Node}}/{{.GPU}} <br/>
-	{{end}}
+	<table>
+		{{range $v.Jobs}}
+			{{template "Job" .}}
+		{{end}}
+	</table>
+	</p>
 {{end}}
+</p>
 
 <h2>Port scanner service</h2>
 Peers in IP:port range {{.IPRange}}:<br/>

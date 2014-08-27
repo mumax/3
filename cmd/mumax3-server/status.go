@@ -89,11 +89,9 @@ Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 {{range $k,$v := .Users}}
 	<h3>{{$k}}</h3><p>
 	Share: {{.Used}}/{{.Share}} <br/>
-	<table>
-		{{range $v.Jobs}}
-			{{template "Job" .}}
-		{{end}}
-	</table>
+	<table> {{range $v.Running}}  {{template "Job" .}} {{end}} 
+	        {{range $v.Queue}}    {{template "Job" .}} {{end}} 
+	        {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
 	</p>
 {{end}}
 </p>

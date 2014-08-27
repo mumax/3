@@ -9,14 +9,13 @@ import (
 )
 
 type User struct {
-	Share   float64 // Relative share of compute time
-	Used    float64 // Used-up compute time (decays)
-	Jobs    []*Job  // User's job queue
-	NextJob int     // Points to next job to be run
+	Share                    float64         // Relative share of compute time
+	Used                     float64         // Used-up compute time (decays)
+	Queue, Running, Finished map[string]*Job // Queued, Running, Finished jobs
 }
 
 func (u *User) HasJob() bool {
-	return len(u.Jobs) > 0 && u.NextJob < len(u.Jobs)
+	return len(u.Queue) > 0
 }
 
 // RPC-callable method: picks a job of the queue returns it
@@ -42,14 +41,36 @@ func (n *Node) GiveJob(nodeAddr string) string {
 }
 
 func (u *User) GiveJob(nodeAddr string) string {
-	job := u.Jobs[u.NextJob]
+	var job *Job
+
+	// take random job from Queue map
+	for _, j := range u.Queue {
+		job = j
+		break
+	}
+	delete(u.Queue, job.File)
+
 	job.Status = RUNNING
 	job.Start = time.Now()
 	job.Node = nodeAddr
-	u.NextJob++
 	job.Node = nodeAddr
+
+	u.Running[job.File] = job
+
 	log.Println("give job", job.File, "->", nodeAddr)
 	return job.File
+}
+
+func (n *Node) NotifyJobFinished(jobURL string, status int) {
+	split := strings.Split(jobURL, "/")
+	username := split[3]
+	user := n.Users[username]
+
+	job := user.Running[jobURL]
+	job.Status = FINISHED
+	job.Stop = time.Now()
+	delete(user.Running, jobURL)
+	user.Finished[jobURL] = job
 }
 
 func (n *Node) AddJob(fname string) {
@@ -81,10 +102,15 @@ func (n *Node) AddJob(fname string) {
 }
 
 func (u *User) AddJob(fname string) {
+	if u.Queue == nil {
+		u.Queue = make(map[string]*Job)
+		u.Running = make(map[string]*Job)
+		u.Finished = make(map[string]*Job)
+	}
 	url := "http://" + node.Addr + path.Clean("/fs/"+fname)
-	u.Jobs = append(u.Jobs, &Job{
+	u.Queue[url] = &Job{
 		File: url,
-	})
+	}
 }
 
 // convert []*Job to []string (job names),

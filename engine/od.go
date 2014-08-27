@@ -60,26 +60,28 @@ func InitIO(inputfile string, force bool) {
 	}
 
 	// fail on non-empty OD
-	f, err3 := fs.Open(od)
-	util.FatalErr(err3)
-	defer f.Close()
-	files, _ := f.Readdir(1)
-	if !force && len(files) != 0 {
-		util.Fatal(od, " not empty, clean it or force with -f")
-	}
 
-	// clean output dir
-	if len(files) != 0 {
+	if force {
+		f, err3 := fs.Open(od)
+		util.FatalErr(err3)
+		defer f.Close()
+		files, _ := f.Readdir(1)
+		//if !force && len(files) != 0 {
+		//	util.Fatal(od, " not empty, clean it or force with -f")
+		//}
 
-		for _, f := range files {
-			fs.RemoveAll(f.Name())
-		}
-		filepath.Walk(OD(), func(path string, i os.FileInfo, err error) error {
-			if path != OD() {
-				util.FatalErr(fs.RemoveAll(path))
+		// clean output dir
+		if len(files) != 0 {
+			for _, f := range files {
+				fs.RemoveAll(f.Name())
 			}
-			return nil
-		})
+			filepath.Walk(OD(), func(path string, i os.FileInfo, err error) error {
+				if path != OD() {
+					util.FatalErr(fs.RemoveAll(path))
+				}
+				return nil
+			})
+		}
 	}
 
 	initLog()

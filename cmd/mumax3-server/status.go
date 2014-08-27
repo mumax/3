@@ -30,7 +30,7 @@ const templText = `
 	<tr>
 		<td class={{.Status.String}}> [{{.Status.String}}] </td>
 		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
-		<td> [{{with .Status}}GPU{{$.GPU}}{{end}}] </td>
+		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutDir}}">output</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
 	</tr>
@@ -51,7 +51,7 @@ const templText = `
 		.QUEUED{color:black}
 		.FINISHED{color: grey}
 	</style>
-	<meta http-equiv="refresh" content="1">
+	<meta http-equiv="refresh" content="2">
 </head>
 
 <body>

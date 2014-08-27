@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mumax/3/util"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -69,4 +70,17 @@ func JobHost(URL string) string {
 func JobUser(URL string) string {
 	split := strings.Split(URL, "/")
 	return split[4]
+}
+
+func JobInputFile(inputFile string) string {
+	URL, err := url.Parse(inputFile)
+	if err != nil {
+		panic(err)
+	}
+	split := strings.Split(URL.Path, "/")
+	if len(split) < 3 {
+		panic("invalid url:" + inputFile)
+	}
+	baseHandler := "/" + split[1]
+	return URL.Path[len(baseHandler):]
 }

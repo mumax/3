@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 	"log"
 	"os/exec"
 	"time"
@@ -67,14 +69,33 @@ func (n *Node) FindJob() string {
 }
 
 func run(inFile string, gpu int, webAddr string) int {
+	log.Println("run:", inFile, gpu, webAddr)
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
 	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
-	cmd := exec.Command(command, gpuFlag, httpFlag, inFile)
-	//cmd.Stderr = os.Stderr
-	//cmd.Stdout = os.Stdout
+	forceFlag := `-f=0`
+	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inFile)
+
+	// Pipe stdout, stderr to file
+	fs, errFS := httpfs.Dial("http://" + JobHost(inFile) + "/fs")
+	if errFS != nil {
+		log.Println(errFS)
+		return -1
+	}
+	outDir := util.NoExt(JobInputFile(inFile)) + ".out"
+	fs.Mkdir(outDir, 0777)
+	out, errD := fs.Create(outDir + "/stdout.txt")
+	if errD != nil {
+		log.Println(errD)
+		return -1
+	}
+	defer out.Close()
+
+	cmd.Stderr = out
+	cmd.Stdout = out
 	//cmd.Stdin = os.Stdin
+
 	log.Println(command, cacheFlag, gpuFlag, httpFlag, inFile)
 	err := cmd.Run()
 	// TODO: determine proper status number

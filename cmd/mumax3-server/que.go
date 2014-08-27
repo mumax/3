@@ -48,9 +48,8 @@ func (u *User) GiveJob(nodeAddr string) string {
 	job.Node = nodeAddr
 	u.NextJob++
 	job.Node = nodeAddr
-	url := "http://" + node.Addr + path.Clean("/fs/"+job.File)
-	log.Println("give job", url, "->", nodeAddr)
-	return url
+	log.Println("give job", job.File, "->", nodeAddr)
+	return job.File
 }
 
 func (n *Node) AddJob(fname string) {
@@ -82,8 +81,9 @@ func (n *Node) AddJob(fname string) {
 }
 
 func (u *User) AddJob(fname string) {
+	url := "http://" + node.Addr + path.Clean("/fs/"+fname)
 	u.Jobs = append(u.Jobs, &Job{
-		File: fname,
+		File: url,
 	})
 }
 

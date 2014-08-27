@@ -46,7 +46,7 @@ const templText = `
 		a:visited{text-decoration: none; color:blue}
 		a:hover{text-decoration: underline; color:blue}
 	</style>
-	<meta http-equiv="refresh" content="60">
+	<meta http-equiv="refresh" content="1">
 </head>
 
 <body>

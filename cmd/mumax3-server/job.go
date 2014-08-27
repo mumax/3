@@ -11,6 +11,7 @@ type Job struct {
 	Node   string
 	GPU    int
 	Start  time.Time
+	Stop   time.Time
 	Status
 }
 
@@ -37,7 +38,11 @@ func (s Status) String() string {
 func NewJob(file string) Job { return Job{File: file} }
 
 func (j *Job) Runtime() time.Duration {
-	return since(j.Start)
+	if j.Stop.IsZero() {
+		return since(time.Now(), j.Start)
+	} else {
+		return since(j.Stop, j.Start)
+	}
 }
 
 func (j *Job) OutDir() string {

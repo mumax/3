@@ -5,6 +5,7 @@ import (
 	"math"
 	"path"
 	"strings"
+	"time"
 )
 
 type User struct {
@@ -42,6 +43,9 @@ func (n *Node) GiveJob(nodeAddr string) string {
 
 func (u *User) GiveJob(nodeAddr string) string {
 	job := u.Jobs[u.NextJob]
+	job.Status = RUNNING
+	job.Start = time.Now()
+	job.Node = nodeAddr
 	u.NextJob++
 	job.Node = nodeAddr
 	url := "http://" + node.Addr + path.Clean("/fs/"+job.File)

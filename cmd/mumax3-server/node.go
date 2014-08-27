@@ -28,11 +28,11 @@ type Node struct {
 }
 
 func (n *Node) Uptime() time.Duration {
-	return since(n.upSince)
+	return since(time.Now(), n.upSince)
 }
 
-func since(t time.Time) time.Duration {
-	d := time.Since(t)
+func since(a, b time.Time) time.Duration {
+	d := a.Sub(b)
 	return (d / 1e9) * 1e9
 }
 

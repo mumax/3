@@ -30,6 +30,8 @@ const templText = `
 <head>
 	<style>
 		body{font-family:monospace}
+		h3{margin-left: 2em}
+		p{margin-left: 2em}
 	</style>
 	<meta http-equiv="refresh" content="1">
 </head>
@@ -41,27 +43,28 @@ const templText = `
 Uptime: {{.Uptime}} <br/>
 
 <h2>Compute service</h2>
+<p>
+<b>mumax:</b>
+{{with .MumaxVersion}}
+	{{.}}
+{{else}}
+	not available<br/>
+{{end}}
+<br/>
 
-<h3>GPUs</h3>
 {{with .GPUs}}
-	{{range .}}
-		{{.Info}}<br/>
+	{{range $i, $v := .}}
+		<b>GPU{{$i}}</b>: {{$v.Info}}<br/>
 	{{end}}
 {{else}}
 	No GPUs available<br/>
 {{end}}
 
-<h3>Mumax</h3>
-{{with .MumaxVersion}}
-	Has {{.}}
-{{else}}
-	No mumax available<br/>
-{{end}}
-
-<h3>Jobs running on this node</h3>
+<h3>Running jobs</h3>
 {{range .RunningHere}}
 	[GPU {{.GPU}}] [<a href="{{.File}}">{{.File}}</a>] [{{.Runtime}}] <br/>
 {{end}}
+</p>
 
 <h2>Queue service</h2>
 Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
@@ -77,7 +80,7 @@ Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 <h2>Port scanner service</h2>
 Peers in IP:port range {{.IPRange}}:<br/>
 {{range .Peers}}
-	<a href="http://{{.}}">{{.}}</a><br/>
+	<a href="http://{{.Addr}}">{{.Addr}}</a><br/>
 {{end}}
 
 </body>

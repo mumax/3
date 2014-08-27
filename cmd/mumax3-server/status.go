@@ -28,6 +28,7 @@ const templText = `
 
 {{define "Job"}}
 	<tr>
+		<td> [{{.Status.String}}] </td>
 		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
 		<td> [{{with .Status}}GPU{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutDir}}">output</a>{{end}}] </td>

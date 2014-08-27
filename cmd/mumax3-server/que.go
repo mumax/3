@@ -62,8 +62,8 @@ func (u *User) GiveJob(nodeAddr string) string {
 }
 
 func (n *Node) NotifyJobFinished(jobURL string, status int) {
-	split := strings.Split(jobURL, "/")
-	username := split[3]
+	log.Println("NotifyJobFinished", jobURL, status)
+	username := JobUser(jobURL)
 	user := n.Users[username]
 
 	job := user.Running[jobURL]

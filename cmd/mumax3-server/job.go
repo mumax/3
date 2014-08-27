@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mumax/3/util"
+	"strings"
 	"time"
 )
 
@@ -50,4 +51,14 @@ func (j *Job) OutDir() string {
 		j.outDir = util.NoExt(j.File) + ".out/"
 	}
 	return j.outDir
+}
+
+func JobHost(URL string) string {
+	split := strings.Split(URL, "/")
+	return split[2]
+}
+
+func JobUser(URL string) string {
+	split := strings.Split(URL, "/")
+	return split[4]
 }

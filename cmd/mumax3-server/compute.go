@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
 	"time"
 )
@@ -30,13 +29,17 @@ func (n *Node) RunComputeService() {
 			}
 			n.unlock()
 
-			run(URL, gpu, addr)
+			status := run(URL, gpu, addr)
 
 			n.lock()
 			delete(n.RunningHere, URL)
 			n.unlock()
 
-			// add job to finished, report, etc
+			_, err := n.RPCCall(JobHost(URL), "NotifyJobFinished", URL, status)
+			if err != nil {
+				log.Println(err)
+			}
+
 			idle <- gpu
 		}()
 	}
@@ -63,21 +66,23 @@ func (n *Node) FindJob() string {
 	return ""
 }
 
-func run(inFile string, gpu int, webAddr string) {
+func run(inFile string, gpu int, webAddr string) int {
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
 	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
 	cmd := exec.Command(command, gpuFlag, httpFlag, inFile)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
+	//cmd.Stderr = os.Stderr
+	//cmd.Stdout = os.Stdout
+	//cmd.Stdin = os.Stdin
 	log.Println(command, cacheFlag, gpuFlag, httpFlag, inFile)
 	err := cmd.Run()
+	// TODO: determine proper status number
 	if err != nil {
 		log.Println(inFile, err)
-		// TODO: report back
+		return 1
 	}
+	return 0
 }
 
 func (n *Node) PeersWithJobs() []PeerInfo {

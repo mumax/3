@@ -14,38 +14,38 @@ import (
 )
 
 func (n *Node) RPCCall(addr, method string, args ...interface{}) (interface{}, error) {
-	//log.Println("call", addr, method, args)
-	c := http.Client{
+	c := http.Client{ // TODO: re-use client?
 		Timeout: 2 * time.Second,
-	}
-
-	var buf bytes.Buffer
-	for _, a := range args {
-		b, err := json.Marshal(a)
-		Fatal(err)
-		(&buf).Write(([]byte)("/"))
-		(&buf).Write(b)
 	}
 
 	URL := url.URL{
 		Scheme: "http",
 		Host:   addr,
-		Path:   "/call/" + method + "/" + (&buf).String(),
+		Path:   "/call/" + method,
 	}
-	resp, err := c.Get(URL.String())
+
+	reqBody := new(bytes.Buffer)
+	for i := range args {
+		errJson := json.NewEncoder(reqBody).Encode(args[i])
+		if errJson != nil {
+			panic(errJson)
+		}
+	}
+
+	req, errReq := http.NewRequest("GET", URL.String(), reqBody)
+	if errReq != nil {
+		panic(errReq)
+	}
+	//log.Println("call:", URL.String(), reqBody.String())
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	//log.Println("call", addr, method, args, " -> ", string(body))
-
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s", body)
+		return nil, fmt.Errorf("http status %v", resp.Status)
 	}
 
 	meth := reflect.ValueOf(n).MethodByName(method)
@@ -53,6 +53,13 @@ func (n *Node) RPCCall(addr, method string, args ...interface{}) (interface{}, e
 	if nOut == 0 {
 		return nil, nil
 	}
+
+	body, errB := ioutil.ReadAll(resp.Body)
+	if errB != nil {
+		return nil, errB
+	}
+	log.Println("call:", addr, method, args, " -> ", string(body))
+
 	if nOut > 1 {
 		panic("rpc supports only 1 return value")
 	}
@@ -65,49 +72,59 @@ func (n *Node) RPCCall(addr, method string, args ...interface{}) (interface{}, e
 		//panic(err) // todo: rm
 		return nil, err
 	}
-
 	return reflect.ValueOf(out).Elem().Interface(), nil
 }
 
 func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
-	//log.Println("got called", r.URL.Path)
+	//bdy := make([]byte, 1000)
+	//N, _ := r.Body.Read(bdy )
+	//log.Println("got called", r.URL.Path, string(bdy[:N]))
 
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("RPC panic", err)
-			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-		}
-	}()
+	defer r.Body.Close()
+	//	defer func() {
+	//		if err := recover(); err != nil {
+	//			log.Println("RPC panic", err)
+	//			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+	//		}
+	//	}()
 
+	// initialize node's own reflect value
 	if n.value.Kind() == 0 {
 		n.value = reflect.ValueOf(n)
 	}
 
-	split := strings.Split(r.URL.Path, "/") // split = {"", "call", methodname, args...}
+	split := strings.Split(r.URL.Path, "/")
 	name := split[2]
-	args := split[3:]
 	meth := n.value.MethodByName(name)
 	if meth.Kind() == 0 {
+		log.Println("handle rpc error: no such method:", name)
 		http.Error(w, "call: no such method: "+name, http.StatusBadRequest)
 		return
 	}
 
 	methT := meth.Type()
 	nArgs := methT.NumIn()
-	argV := make([]reflect.Value, len(args))
+	args := make([]interface{}, nArgs)
 	for i := 0; i < nArgs; i++ {
 		argT := methT.In(i)
-		arg := reflect.New(argT).Interface()
+		args[i] = reflect.New(argT).Interface()
+	}
 
-		err := json.Unmarshal(([]byte)(args[i]), (reflect.ValueOf(arg)).Interface())
+	decoder := json.NewDecoder(r.Body)
+	for i := range args {
+		err := decoder.Decode(&args[i])
 		if err != nil {
+			log.Println("handle rpc error: ", err)
 			//panic(err) // TODO: rm
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		argV[i] = reflect.ValueOf(arg).Elem()
 	}
 
+	argV := make([]reflect.Value, len(args))
+	for i := range argV {
+		argV[i] = reflect.ValueOf(args[i]).Elem()
+	}
 	ret := meth.Call(argV)
 
 	if methT.NumOut() == 0 {

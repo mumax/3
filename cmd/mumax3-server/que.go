@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math"
 	"path"
 	"strings"
@@ -57,12 +56,12 @@ func (u *User) GiveJob(nodeAddr string) string {
 
 	u.Running[job.File] = job
 
-	log.Println("give job", job.File, "->", nodeAddr)
+	//log.Println("give job", job.File, "->", nodeAddr)
 	return job.File
 }
 
 func (n *Node) NotifyJobFinished(jobURL string, status int) {
-	log.Println("NotifyJobFinished", jobURL, status)
+	//log.Println("NotifyJobFinished", jobURL, status)
 	username := JobUser(jobURL)
 	user := n.Users[username]
 
@@ -82,7 +81,7 @@ func (n *Node) NotifyJobFinished(jobURL string, status int) {
 func (n *Node) AddJob(fname string) {
 	n.lock()
 	defer n.unlock()
-	log.Println("Push job:", fname)
+	//log.Println("Push job:", fname)
 
 	if path.IsAbs(fname) {
 		if !strings.HasPrefix(fname, n.RootDir) {

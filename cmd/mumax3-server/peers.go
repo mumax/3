@@ -26,7 +26,7 @@ func (n *Node) AddPeer(pAddr string) {
 		n.Peers = make(map[string]PeerInfo)
 	}
 	if _, ok := n.Peers[pAddr]; !ok {
-		log.Println("add new peer:", pAddr)
+		//log.Println("add new peer:", pAddr)
 		n.Peers[pAddr] = PeerInfo{
 			Addr:     pAddr,
 			HaveJobs: true, // makes sure we ask for jobs at least once
@@ -68,7 +68,7 @@ func (n *Node) ProbePeer(addr string) {
 // Scan IPs and port range for peers that respond to Ping,
 // add them to peers list.
 func (n *Node) FindPeers(IPs []string, minPort, maxPort int) {
-	log.Println("Portscan start")
+	//log.Println("Portscan start")
 
 	scanners := make(chan func())
 
@@ -87,5 +87,5 @@ func (n *Node) FindPeers(IPs []string, minPort, maxPort int) {
 		}
 	}
 	close(scanners)
-	log.Println("Portscan done")
+	log.Println("-- portscan done")
 }

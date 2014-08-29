@@ -9,7 +9,13 @@ import (
 	"time"
 )
 
+// Runs a compute service on this node, if GPUs are available.
+// The compute service asks storage nodes for a job, runs it,
+// saves results over httpfs and notifies storage when ready.
 func (n *Node) RunComputeService() {
+	if len(n.GPUs) == 0 {
+		return
+	}
 	idle := make(chan int, len(n.GPUs))
 	for i := range n.GPUs {
 		idle <- i
@@ -53,7 +59,7 @@ func (n *Node) WaitForJob() string {
 		time.Sleep(2 * time.Second) // TODO: don't poll
 		URL = n.FindJob()
 	}
-	log.Println("found job", URL)
+	//log.Println("found job", URL)
 	return URL
 }
 
@@ -68,8 +74,7 @@ func (n *Node) FindJob() string {
 	return ""
 }
 
-func run(inFile string, gpu int, webAddr string) int {
-	log.Println("run:", inFile, gpu, webAddr)
+func run(inFile string, gpu int, webAddr string) (status int) {
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
@@ -96,7 +101,9 @@ func run(inFile string, gpu int, webAddr string) int {
 	cmd.Stdout = out
 	//cmd.Stdin = os.Stdin
 
-	log.Println(command, cacheFlag, gpuFlag, httpFlag, inFile)
+	log.Println("=> exec  ", cmd.Path, cmd.Args)
+
+	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 	err := cmd.Run()
 	// TODO: determine proper status number
 	if err != nil {

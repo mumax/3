@@ -22,6 +22,7 @@ var (
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
 	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
 	flag_root     = flag.String("root", ".", "httpfs root directory")
+	flag_log      = flag.Bool("log", true, "log debug output")
 )
 
 var node *Node

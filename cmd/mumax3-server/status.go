@@ -31,7 +31,8 @@ const templText = `
 		<td class={{.Status.String}}> [{{.Status.String}}] </td>
 		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
-		<td> [{{with .Status}}<a href="{{$.OutDir}}">output</a>{{end}}] </td>
+		<td> [{{with .Status}}<a href="{{$.OutDir}}">out</a>{{end}}] </td>
+		<td> [{{with .IsRunning}}<a href="http://{{$.HostName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
 	</tr>
 {{end}}

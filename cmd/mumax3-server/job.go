@@ -54,6 +54,15 @@ func (j *Job) OutDir() string {
 	return j.outDir
 }
 
+func (j *Job) HostName() string {
+	colon := strings.Index(j.Node, ":")
+	return j.Node[:colon]
+}
+
+func (j *Job) GUIPort() int {
+	return GUI_PORT + j.GPU
+}
+
 func (j *Job) IsRunning() bool {
 	return j.Status == RUNNING
 }

@@ -25,6 +25,8 @@ var (
 	flag_log      = flag.Bool("log", true, "log debug output")
 )
 
+const GUI_PORT = 35367 // base port number for GUI (to be incremented by GPU number)
+
 var node *Node
 
 func main() {

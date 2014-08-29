@@ -6,6 +6,7 @@ import (
 	"github.com/mumax/3/util"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func (n *Node) RunComputeService() {
 
 	for {
 		gpu := <-idle
-		addr := fmt.Sprint(":", 35367+gpu)
+		addr := fmt.Sprint(":", GUI_PORT+gpu)
 		URL := n.WaitForJob()
 		go func() {
 			n.lock()
@@ -74,7 +75,9 @@ func (n *Node) FindJob() string {
 	return ""
 }
 
+// run input file and return status number
 func run(inFile string, gpu int, webAddr string) (status int) {
+	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
@@ -82,7 +85,7 @@ func run(inFile string, gpu int, webAddr string) (status int) {
 	forceFlag := `-f=0`
 	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inFile)
 
-	// Pipe stdout, stderr to file
+	// Pipe stdout, stderr to log file over httpfs
 	fs, errFS := httpfs.Dial("http://" + JobHost(inFile) + "/fs")
 	if errFS != nil {
 		log.Println(errFS)
@@ -96,13 +99,10 @@ func run(inFile string, gpu int, webAddr string) (status int) {
 		return -1
 	}
 	defer out.Close()
-
 	cmd.Stderr = out
 	cmd.Stdout = out
-	//cmd.Stdin = os.Stdin
 
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
-
 	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 	err := cmd.Run()
 	// TODO: determine proper status number
@@ -123,4 +123,39 @@ func (n *Node) PeersWithJobs() []PeerInfo {
 		}
 	}
 	return peers
+}
+
+type GPU struct {
+	Info string
+}
+
+const MAXGPU = 16
+
+func DetectGPUs() []GPU {
+	var gpus []GPU
+	for i := 0; i < MAXGPU; i++ {
+		gpuflag := fmt.Sprint("-gpu=", i)
+		out, err := exec.Command(*flag_mumax, "-test", gpuflag).Output()
+		if err == nil {
+			info := string(out)
+			if strings.HasSuffix(info, "\n") {
+				info = info[:len(info)-1]
+			}
+			log.Println("gpu", i, ":", info)
+			gpus = append(gpus, GPU{info})
+		}
+	}
+	return gpus
+}
+
+func DetectMumax() string {
+	out, err := exec.Command(*flag_mumax, "-test", "-v").Output()
+	if err == nil {
+		info := string(out)
+		split := strings.SplitN(info, "\n", 2)
+		version := split[0]
+		log.Println("have", version)
+		return version
+	}
+	return ""
 }

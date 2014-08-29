@@ -102,6 +102,7 @@ func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+// make RPC call to method on node with given address.
 func (n *Node) RPCCall(addr, method string, args ...interface{}) (ret interface{}, err error) {
 
 	defer log.Println(" > call  ", addr, method, args, "->", ret, err)

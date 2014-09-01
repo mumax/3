@@ -102,7 +102,12 @@ Uptime: {{.Uptime}} <br/>
 </p>
 
 <h2>HTTPFS service</h2><p>
-Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
+<b>Storage root:</b> <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
+<br/><b>Open Files:</b><br/>
+{{range .FSServer.LsOF}}
+	{{.}}<br/>
+{{end}}
+
 
 <h2>Port scanner service</h2>
 Peers in IP:port range {{.IPRange}}:<br/>

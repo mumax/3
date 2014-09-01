@@ -90,7 +90,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	log.Println("httpfs server:", r.Method, r.URL)
+	//log.Println("httpfs server:", r.Method, r.URL)
 	//defer log.Println("<<httpfs server done:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
@@ -163,7 +163,7 @@ func (s *Server) open(w http.ResponseWriter, r *http.Request) error {
 	fd := fileName(r.URL)
 	s.storeFD(fd, file) // TODO: close previous if already open
 	fmt.Fprint(w, fd)   // respond with file descriptor
-	log.Println("httpfs server OPEN", r.URL.Path, "->", fd)
+	//log.Println("httpfs server OPEN", r.URL.Path, "->", fd)
 	return nil
 }
 

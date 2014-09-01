@@ -63,14 +63,14 @@ func (f *Client) Create(name string) (*File, error) {
 // OpenFile is similar to os.OpenFile. Most users will use Open or Create instead.
 func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error) {
 	URL := mkURL(f.serverAddr, name, "flag", flag, "perm", uint32(perm))
-	log.Println("httpfs client open", name)
+	//log.Println("httpfs client open", name)
 	resp := f.do("OPEN", URL, nil)
 	if resp.StatusCode != http.StatusOK {
 		return nil, mkError("open", name, resp)
 	}
 	defer resp.Body.Close()
 	fd := readString(resp.Body)
-	log.Println("httpfs client open", name, "->", fd)
+	//log.Println("httpfs client open", name, "->", fd)
 	if fd == "" {
 		return nil, &os.PathError{Op: "httpfs open", Path: name, Err: illegalArgument}
 	}

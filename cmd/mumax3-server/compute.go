@@ -98,13 +98,19 @@ func run(inFile string, gpu int, webAddr string) (status int) {
 		log.Println(errD)
 		return -1
 	}
-	defer out.Close()
 	cmd.Stderr = out
 	cmd.Stdout = out
 
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
 	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
+
+	defer node.FSServer.CloseAll(outDir)
 	err := cmd.Run()
+
+	defer out.Close()
+
+	// close all this simulation's files in case process exited ungracefully
+
 	// TODO: determine proper status number
 	if err != nil {
 		log.Println(inFile, err)

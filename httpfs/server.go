@@ -265,6 +265,23 @@ func (s *Server) readdir(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(list)
 }
 
+func (s *Server) CloseAll(prefix string) {
+	s.Lock()
+	defer s.Unlock()
+
+	var files []string
+	for name, file := range s.openFiles {
+		if strings.HasPrefix(name, prefix) {
+			log.Println("httpfs server: close dangling file", file)
+			files = append(files, name)
+			file.Close()
+		}
+	}
+	for _, f := range files {
+		delete(s.openFiles, f)
+	}
+}
+
 func (s *Server) parseFD(URL *url.URL) *os.File {
 	return s.getFD(fileName(URL))
 }

@@ -21,11 +21,12 @@ const (
 	X_HTTPFS = "X-HTTPFS"       // HTTP header identifying response comes from httpfs server, not other
 )
 
-type server struct {
+type Server struct {
 	root string // served path
 	sync.Mutex
-	openFiles  map[uintptr]*os.File // active file descriptors
-	fileServer http.Handler         // fileserver only handles GET-requests from browser, not httpfs filesystem
+	openFiles   map[uintptr]*os.File // active file descriptors
+	fileServer  http.Handler         // fileserver only handles GET-requests from browser, not httpfs filesystem
+	stripPrefix http.Handler
 }
 
 // Serve serves the files under directory root at tcp address addr.
@@ -50,36 +51,45 @@ func ListenAndServe(root, addr string) error {
 }
 
 func Serve(root string, l net.Listener, prefix string) error {
-	server := NewServer(root, prefix)
-	err := http.Serve(l, server) // don't use DefaultServeMux which redirects some requests behind our back.
+	Server := NewServer(root, prefix)
+	err := http.Serve(l, Server) // don't use DefaultServeMux which redirects some requests behind our back.
 	return err
 }
 
+// converts http.HandlerFunc to http.Handler, sigh.
+type func2Handler struct{ f http.HandlerFunc }
+
+func (h *func2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) { h.f(w, r) }
+
 // NewServer returns a http handler that serves the fs rooted at given root directory.
-func NewServer(root string, prefix string) http.Handler {
-	//	if !path.IsAbs(root) {
-	//		panic(`httpfs needs absolute root path, got: "` + root + `"`)
-	//	}
-	return http.StripPrefix(prefix, &server{
+func NewServer(root string, prefix string) *Server {
+	s := &Server{
 		root:       root,
 		openFiles:  make(map[uintptr]*os.File),
 		fileServer: http.FileServer(http.Dir(root)),
-	})
+	}
+
+	s.stripPrefix = http.StripPrefix(prefix, &func2Handler{s.serveHTTP})
+	return s
 }
 
-var methods = map[string]func(*server, http.ResponseWriter, *http.Request) error{
-	"GET":       (*server).get,
-	"OPEN":      (*server).open,
-	"READ":      (*server).read,
-	"WRITE":     (*server).write,
-	"CLOSE":     (*server).close,
-	"MKDIR":     (*server).mkdir,
-	"READDIR":   (*server).readdir,
-	"DELETE":    (*server).delete,
-	"REMOVEALL": (*server).removeAll,
+var methods = map[string]func(*Server, http.ResponseWriter, *http.Request) error{
+	"GET":       (*Server).get,
+	"OPEN":      (*Server).open,
+	"READ":      (*Server).read,
+	"WRITE":     (*Server).write,
+	"CLOSE":     (*Server).close,
+	"MKDIR":     (*Server).mkdir,
+	"READDIR":   (*Server).readdir,
+	"DELETE":    (*Server).delete,
+	"REMOVEALL": (*Server).removeAll,
 }
 
-func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.stripPrefix.ServeHTTP(w, r)
+}
+
+func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	//log.Println("httpfs server:", r.Method, r.URL)
 	//defer log.Println("<<httpfs server done:", r.Method, r.URL)
@@ -112,25 +122,25 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // servers classical GET requests so the FS is also accessible from browser.
-func (s *server) get(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) get(w http.ResponseWriter, r *http.Request) error {
 	s.fileServer.ServeHTTP(w, r)
 	return nil
 }
 
-func (s *server) status(w http.ResponseWriter, r *http.Request) error {
-	info := map[string]interface{}{
-		"Type":      "httpfs server",
-		"RootDir":   s.root,
-		"OpenFiles": s.LsOF()}
-	bytes, err := json.MarshalIndent(info, "", "\t")
-	if err != nil {
-		return err
-	}
-	_, eWrite := w.Write(bytes)
-	return eWrite
-}
+//func (s *Server) status(w http.ResponseWriter, r *http.Request) error {
+//	info := map[string]interface{}{
+//		"Type":      "httpfs server",
+//		"RootDir":   s.root,
+//		"OpenFiles": s.LsOF()}
+//	bytes, err := json.MarshalIndent(info, "", "\t")
+//	if err != nil {
+//		return err
+//	}
+//	_, eWrite := w.Write(bytes)
+//	return eWrite
+//}
 
-func (s *server) LsOF() []string {
+func (s *Server) LsOF() []string {
 	s.Lock()
 	defer s.Unlock()
 	of := make([]string, 0, len(s.openFiles))
@@ -141,21 +151,21 @@ func (s *server) LsOF() []string {
 	return of
 }
 
-func (s *server) NOpenFiles() int {
+func (s *Server) NOpenFiles() int {
 	s.Lock()
 	defer s.Unlock()
 	return len(s.openFiles)
 }
 
 // by cleaning the (absolute) path, we sandbox it so that ../ can't go above the root export.
-func (s *server) sandboxPath(p string) string {
+func (s *Server) sandboxPath(p string) string {
 	p = path.Clean("/" + p)
 	assert(path.IsAbs(p))
 	return path.Join(s.root, p)
 }
 
 // open file, respond with file descriptor
-func (s *server) open(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) open(w http.ResponseWriter, r *http.Request) error {
 	fname := s.sandboxPath(r.URL.Path)
 	flag := intQuery(r, "flag")
 	perm := intQuery(r, "perm")
@@ -171,7 +181,7 @@ func (s *server) open(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *server) mkdir(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) mkdir(w http.ResponseWriter, r *http.Request) error {
 	fname := s.sandboxPath(r.URL.Path)
 	perm := intQuery(r, "perm")
 	return os.Mkdir(fname, os.FileMode(perm))
@@ -187,7 +197,7 @@ func intQuery(r *http.Request, key string) int {
 	return n
 }
 
-func (s *server) read(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) read(w http.ResponseWriter, r *http.Request) error {
 	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
@@ -215,7 +225,7 @@ func (s *server) read(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *server) write(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) write(w http.ResponseWriter, r *http.Request) error {
 	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
@@ -229,7 +239,7 @@ func (s *server) write(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *server) close(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) close(w http.ResponseWriter, r *http.Request) error {
 	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
@@ -238,17 +248,17 @@ func (s *server) close(w http.ResponseWriter, r *http.Request) error {
 	return file.Close()
 }
 
-func (s *server) delete(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) delete(w http.ResponseWriter, r *http.Request) error {
 	path := s.sandboxPath(r.URL.Path)
 	return os.Remove(path)
 }
 
-func (s *server) removeAll(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) removeAll(w http.ResponseWriter, r *http.Request) error {
 	path := s.sandboxPath(r.URL.Path)
 	return os.RemoveAll(path)
 }
 
-func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) readdir(w http.ResponseWriter, r *http.Request) error {
 	file := s.parseFD(r.URL)
 	if file == nil {
 		return illegalArgument
@@ -271,7 +281,7 @@ func (s *server) readdir(w http.ResponseWriter, r *http.Request) error {
 
 // retrieve file belonging to file descriptor in URL. E.g.:
 // 	http://server/2 -> openFiles[2]
-func (s *server) parseFD(URL *url.URL) *os.File {
+func (s *Server) parseFD(URL *url.URL) *os.File {
 	fdStr := strings.Trim(URL.Path, "/")
 	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
 	return s.getFD(uintptr(fd))
@@ -298,21 +308,21 @@ func statusCode(err error) int {
 }
 
 // thread-safe openFiles[fd]
-func (s *server) getFD(fd uintptr) *os.File {
+func (s *Server) getFD(fd uintptr) *os.File {
 	s.Lock()
 	defer s.Unlock()
 	return s.openFiles[fd] // TODO: protect against nonexisting FD
 }
 
 // thread-safe openFiles[fd] = f
-func (s *server) storeFD(fd uintptr, f *os.File) {
+func (s *Server) storeFD(fd uintptr, f *os.File) {
 	s.Lock()
 	defer s.Unlock()
 	s.openFiles[fd] = f
 }
 
 // thread-safe delete(openFiles,fd)
-func (s *server) rmFD(fd uintptr) {
+func (s *Server) rmFD(fd uintptr) {
 	s.Lock()
 	defer s.Unlock()
 	delete(s.openFiles, fd)

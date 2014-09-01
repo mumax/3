@@ -90,7 +90,6 @@ Uptime: {{.Uptime}} <br/>
 </p>
 
 <h2>Queue service</h2><p>
-Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 
 {{range $k,$v := .Users}}
 	<h3>{{$k}}</h3><p>
@@ -101,6 +100,9 @@ Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 	</p>
 {{end}}
 </p>
+
+<h2>HTTPFS service</h2><p>
+Storage root: <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 
 <h2>Port scanner service</h2>
 Peers in IP:port range {{.IPRange}}:<br/>

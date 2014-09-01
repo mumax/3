@@ -60,7 +60,8 @@ func main() {
 
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/", node.HandleStatus)
-	http.Handle("/fs/", httpfs.NewServer(node.RootDir, "/fs/"))
+	node.FSServer = httpfs.NewServer(node.RootDir, "/fs/")
+	http.Handle("/fs/", node.FSServer)
 
 	go func() {
 		log.Println("serving at", laddr)

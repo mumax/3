@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/mumax/3/httpfs"
 	"log"
 	"reflect"
-	//"runtime"
 	"sync"
 	"time"
 )
@@ -13,6 +13,7 @@ type Node struct {
 	RootDir      string // httpfs storage root
 	MumaxVersion string
 	upSince      time.Time
+	FSServer     *httpfs.Server
 
 	// compute service
 	GPUs        []GPU

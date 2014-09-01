@@ -24,7 +24,7 @@ type File struct {
 	name   string // local file name passed to Open
 	client *Client
 	u      url.URL // url to access file on remote machine
-	fd     uintptr // file descriptor on server
+	fd     string  // file descriptor on server
 	inBuf  *bufio.Reader
 	outBuf *bufio.Writer
 }

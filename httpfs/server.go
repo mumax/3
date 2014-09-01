@@ -12,7 +12,6 @@ import (
 	"path"
 	"sort"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -24,8 +23,8 @@ const (
 type Server struct {
 	root string // served path
 	sync.Mutex
-	openFiles   map[uintptr]*os.File // active file descriptors
-	fileServer  http.Handler         // fileserver only handles GET-requests from browser, not httpfs filesystem
+	openFiles   map[string]*os.File // active file descriptors
+	fileServer  http.Handler        // fileserver only handles GET-requests from browser, not httpfs filesystem
 	stripPrefix http.Handler
 }
 
@@ -65,7 +64,7 @@ func (h *func2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) { h.f(w
 func NewServer(root string, prefix string) *Server {
 	s := &Server{
 		root:       root,
-		openFiles:  make(map[uintptr]*os.File),
+		openFiles:  make(map[string]*os.File),
 		fileServer: http.FileServer(http.Dir(root)),
 	}
 
@@ -127,25 +126,12 @@ func (s *Server) get(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-//func (s *Server) status(w http.ResponseWriter, r *http.Request) error {
-//	info := map[string]interface{}{
-//		"Type":      "httpfs server",
-//		"RootDir":   s.root,
-//		"OpenFiles": s.LsOF()}
-//	bytes, err := json.MarshalIndent(info, "", "\t")
-//	if err != nil {
-//		return err
-//	}
-//	_, eWrite := w.Write(bytes)
-//	return eWrite
-//}
-
 func (s *Server) LsOF() []string {
 	s.Lock()
 	defer s.Unlock()
 	of := make([]string, 0, len(s.openFiles))
-	for _, v := range s.openFiles {
-		of = append(of, v.Name())
+	for k, _ := range s.openFiles {
+		of = append(of, k)
 	}
 	sort.Strings(of)
 	return of
@@ -174,10 +160,8 @@ func (s *Server) open(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	fd := file.Fd()
-	s.storeFD(fd, file)
-	//log.Println("open", fname, "->", fd)
-	fmt.Fprint(w, fd) // respond with file descriptor
+	s.storeFD(fname, file)
+	fmt.Fprint(w, fname) // respond with file descriptor
 	return nil
 }
 
@@ -244,7 +228,7 @@ func (s *Server) close(w http.ResponseWriter, r *http.Request) error {
 	if file == nil {
 		return illegalArgument
 	}
-	s.rmFD(file.Fd())
+	s.rmFD(r.URL.Path)
 	return file.Close()
 }
 
@@ -279,12 +263,8 @@ func (s *Server) readdir(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(list)
 }
 
-// retrieve file belonging to file descriptor in URL. E.g.:
-// 	http://server/2 -> openFiles[2]
 func (s *Server) parseFD(URL *url.URL) *os.File {
-	fdStr := strings.Trim(URL.Path, "/")
-	fd, _ := strconv.Atoi(fdStr) // fd == 0 is error
-	return s.getFD(uintptr(fd))
+	return s.getFD(path.Clean(URL.Path))
 }
 
 // return suited status code for error
@@ -308,21 +288,22 @@ func statusCode(err error) int {
 }
 
 // thread-safe openFiles[fd]
-func (s *Server) getFD(fd uintptr) *os.File {
+func (s *Server) getFD(fd string) *os.File {
 	s.Lock()
 	defer s.Unlock()
 	return s.openFiles[fd] // TODO: protect against nonexisting FD
 }
 
 // thread-safe openFiles[fd] = f
-func (s *Server) storeFD(fd uintptr, f *os.File) {
+func (s *Server) storeFD(fd string, f *os.File) {
 	s.Lock()
 	defer s.Unlock()
+	fd = path.Clean(fd)
 	s.openFiles[fd] = f
 }
 
 // thread-safe delete(openFiles,fd)
-func (s *Server) rmFD(fd uintptr) {
+func (s *Server) rmFD(fd string) {
 	s.Lock()
 	defer s.Unlock()
 	delete(s.openFiles, fd)

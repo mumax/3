@@ -64,14 +64,14 @@ func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error
 		return nil, mkError("open", name, resp)
 	}
 	defer resp.Body.Close()
-	fd := readUInt(resp.Body)
+	fd := readString(resp.Body)
 	if fd < 0 {
 		return nil, &os.PathError{Op: "httpfs open", Path: name, Err: illegalArgument}
 	}
 
 	// prepare *File
 	fdURL := url.URL{Scheme: "http", Host: f.serverAddr, Path: fmt.Sprint(fd)}
-	file := &File{client: f, u: fdURL, name: name, fd: uintptr(fd)}
+	file := &File{client: f, u: fdURL, name: name, fd: fd}
 	//runtime.SetFinalizer(file, file.Close())
 	return file, nil
 }

@@ -31,6 +31,10 @@ func Dial(addr string) (*Client, error) {
 	}
 	prefix := URL.Path
 
+	if strings.HasSuffix(prefix, "/") {
+		prefix = prefix[:len(prefix)-1]
+	}
+
 	if _, err := net.ResolveTCPAddr("tcp", addr); err != nil {
 		return nil, fmt.Errorf("httpfs: dial %v: %v", addr, err)
 	}
@@ -59,13 +63,15 @@ func (f *Client) Create(name string) (*File, error) {
 // OpenFile is similar to os.OpenFile. Most users will use Open or Create instead.
 func (f *Client) OpenFile(name string, flag int, perm os.FileMode) (*File, error) {
 	URL := mkURL(f.serverAddr, name, "flag", flag, "perm", uint32(perm))
+	log.Println("httpfs client open", name)
 	resp := f.do("OPEN", URL, nil)
 	if resp.StatusCode != http.StatusOK {
 		return nil, mkError("open", name, resp)
 	}
 	defer resp.Body.Close()
 	fd := readString(resp.Body)
-	if fd < 0 {
+	log.Println("httpfs client open", name, "->", fd)
+	if fd == "" {
 		return nil, &os.PathError{Op: "httpfs open", Path: name, Err: illegalArgument}
 	}
 
@@ -171,6 +177,15 @@ func panicOn(err error) {
 }
 
 // read int from body, -1 in case of error
+func readString(r io.Reader) string {
+	bytes, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Println("httpfs client readString:", err)
+		return ""
+	}
+	return string(bytes)
+}
+
 func readUInt(r io.Reader) int {
 	v := -1
 	fmt.Fscan(r, &v)

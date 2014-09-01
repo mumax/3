@@ -12,6 +12,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -30,7 +31,6 @@ type Server struct {
 
 // Serve serves the files under directory root at tcp address addr.
 func ListenAndServe(root, addr string) error {
-
 	URL, err := url.Parse(addr)
 	if err != nil {
 		panic(err)
@@ -90,7 +90,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	//log.Println("httpfs server:", r.Method, r.URL)
+	log.Println("httpfs server:", r.Method, r.URL)
 	//defer log.Println("<<httpfs server done:", r.Method, r.URL)
 
 	//time.Sleep(30*time.Millisecond) // artificial latency for benchmarking
@@ -160,8 +160,10 @@ func (s *Server) open(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	s.storeFD(fname, file)
-	fmt.Fprint(w, fname) // respond with file descriptor
+	fd := fileName(r.URL)
+	s.storeFD(fd, file) // TODO: close previous if already open
+	fmt.Fprint(w, fd)   // respond with file descriptor
+	log.Println("httpfs server OPEN", r.URL.Path, "->", fd)
 	return nil
 }
 
@@ -228,7 +230,7 @@ func (s *Server) close(w http.ResponseWriter, r *http.Request) error {
 	if file == nil {
 		return illegalArgument
 	}
-	s.rmFD(r.URL.Path)
+	s.rmFD(fileName(r.URL))
 	return file.Close()
 }
 
@@ -264,7 +266,15 @@ func (s *Server) readdir(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) parseFD(URL *url.URL) *os.File {
-	return s.getFD(path.Clean(URL.Path))
+	return s.getFD(fileName(URL))
+}
+
+func fileName(URL *url.URL) string {
+	p := URL.Path
+	if !strings.HasPrefix(p, "/") {
+		p = "/" + p
+	}
+	return path.Clean(p)
 }
 
 // return suited status code for error
@@ -298,7 +308,6 @@ func (s *Server) getFD(fd string) *os.File {
 func (s *Server) storeFD(fd string, f *os.File) {
 	s.Lock()
 	defer s.Unlock()
-	fd = path.Clean(fd)
 	s.openFiles[fd] = f
 }
 

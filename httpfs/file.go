@@ -91,7 +91,7 @@ func (f *File) syncWrite(p []byte) (n int, err error) {
 
 // Close implements io.Closer.
 func (f *File) Close() error {
-	if f == nil || f.client == nil || f.fd == 0 {
+	if f == nil || f.client == nil || f.fd == "" {
 		return pathErr("close", f.name, illegalArgument)
 	}
 	if f.outBuf != nil {
@@ -101,7 +101,7 @@ func (f *File) Close() error {
 	defer resp.Body.Close()
 	// invalidate file to avoid accidental use after close
 	f.client = nil
-	f.fd = 0
+	f.fd = ""
 	f.u = url.URL{}
 	if resp.StatusCode != http.StatusOK {
 		return mkError("close", f.name, resp)

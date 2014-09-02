@@ -29,9 +29,9 @@ const templText = `
 {{define "Job"}}
 	<tr>
 		<td class={{.Status.String}}> [{{.Status.String}}] </td>
-		<td> [<a href="{{.File}}">{{.File}}</a>] </td>
+		<td> [<a href="{{.URL}}">{{.URL}}</a>] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
-		<td> [{{with .Status}}<a href="{{$.OutDir}}">out</a>{{end}}] </td>
+		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
 		<td> [{{with .IsRunning}}<a href="http://{{$.HostName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
 	</tr>
@@ -101,12 +101,18 @@ Uptime: {{.Uptime}} <br/>
 {{end}}
 </p>
 
+<h2>Job scanner</h2><p>
+<b>Last scan:</b> {{.LastJobScanTime}} {{.LastJobScanFiles}} files.
+<a href="http://{{.Addr}}/call/ReScan">Click to rescan</a>
+</p>
+
 <h2>HTTPFS service</h2><p>
 <b>Storage root:</b> <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
 <br/><b>Open Files:</b><br/>
 {{range .FSServer.LsOF}}
 	{{.}}<br/>
 {{end}}
+</p>
 
 
 <h2>Port scanner service</h2>

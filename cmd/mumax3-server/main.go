@@ -70,6 +70,8 @@ func main() {
 
 	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
 	go node.FindPeers(IPs, minPort, maxPort)
+	go RunJobScan(*flag_root)
+	scan <- struct{}{}
 
 	if len(node.GPUs) > 0 {
 		go node.RunComputeService()

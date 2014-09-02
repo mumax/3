@@ -191,6 +191,3 @@ func readUInt(r io.Reader) int {
 	fmt.Fscan(r, &v)
 	return v
 }
-
-//TODO: disconnect, keepalive, close all files on disconnect/reconnect
-//TODO: return *os.PathError

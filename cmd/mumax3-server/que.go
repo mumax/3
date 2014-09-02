@@ -47,17 +47,17 @@ func (u *User) GiveJob(nodeAddr string) string {
 		job = j
 		break
 	}
-	delete(u.Queue, job.File)
+	delete(u.Queue, job.URL)
 
 	job.Status = RUNNING
 	job.Start = time.Now()
 	job.Node = nodeAddr
 	job.Node = nodeAddr
 
-	u.Running[job.File] = job
+	u.Running[job.URL] = job
 
-	//log.Println("give job", job.File, "->", nodeAddr)
-	return job.File
+	//log.Println("give job", job.URL, "->", nodeAddr)
+	return job.URL
 }
 
 func (n *Node) NotifyJobFinished(jobURL string, status int) {
@@ -114,7 +114,7 @@ func (u *User) AddJob(fname string) {
 	}
 	url := "http://" + node.Addr + path.Clean("/fs/"+fname)
 	u.Queue[url] = &Job{
-		File: url,
+		URL: url,
 	}
 }
 

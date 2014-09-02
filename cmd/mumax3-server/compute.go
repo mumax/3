@@ -14,23 +14,27 @@ import (
 // The compute service asks storage nodes for a job, runs it,
 // saves results over httpfs and notifies storage when ready.
 func (n *Node) RunComputeService() {
+
 	if len(n.GPUs) == 0 {
 		return
 	}
-	idle := make(chan int, len(n.GPUs))
+
+	// stack of available GPU numbers
+	idle := make(chan int, 2*len(n.GPUs)) // TODO: 1*
 	for i := range n.GPUs {
 		idle <- i
+		idle <- i // TODO: rm
 	}
 
 	for {
-		gpu := <-idle
-		addr := fmt.Sprint(":", GUI_PORT+gpu)
-		URL := n.WaitForJob()
+		gpu := <-idle // take an available GPU
+		GUIAddr := fmt.Sprint(":", GUI_PORT+gpu)
+		URL := n.WaitForJob() // take an available job
 		go func() {
+			// put job in "running" list (for status reporting)
 			n.lock()
-
 			n.RunningHere[URL] = &Job{
-				File:   URL,
+				URL:    URL,
 				Node:   n.Addr,
 				GPU:    gpu,
 				Start:  time.Now(),
@@ -38,17 +42,21 @@ func (n *Node) RunComputeService() {
 			}
 			n.unlock()
 
-			status := run(URL, gpu, addr)
+			// run the job
+			status := run(URL, gpu, GUIAddr)
 
+			// remove from "running" list
 			n.lock()
 			delete(n.RunningHere, URL)
 			n.unlock()
 
+			// notify job queue it's ready (for status)
 			_, err := n.RPCCall(JobHost(URL), "NotifyJobFinished", URL, status)
 			if err != nil {
 				log.Println(err)
 			}
 
+			// add GPU number back to idle stack
 			idle <- gpu
 		}()
 	}
@@ -75,23 +83,23 @@ func (n *Node) FindJob() string {
 	return ""
 }
 
-// run input file and return status number
-func run(inFile string, gpu int, webAddr string) (status int) {
+// run input file at URL on gpu number, serve GUI at wabAddr and return status number
+func run(inputURL string, gpu int, webAddr string) (status int) {
 	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
 	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
 	forceFlag := `-f=0`
-	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inFile)
+	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inputURL)
 
 	// Pipe stdout, stderr to log file over httpfs
-	fs, errFS := httpfs.Dial("http://" + JobHost(inFile) + "/fs")
+	fs, errFS := httpfs.Dial("http://" + JobHost(inputURL) + "/fs")
 	if errFS != nil {
 		log.Println(errFS)
 		return -1
 	}
-	outDir := util.NoExt(JobInputFile(inFile)) + ".out"
+	outDir := util.NoExt(JobInputFile(inputURL)) + ".out"
 	fs.Mkdir(outDir, 0777)
 	out, errD := fs.Create(outDir + "/stdout.txt")
 	if errD != nil {
@@ -113,7 +121,7 @@ func run(inFile string, gpu int, webAddr string) (status int) {
 
 	// TODO: determine proper status number
 	if err != nil {
-		log.Println(inFile, err)
+		log.Println(inputURL, err)
 		return 1
 	}
 	return 0

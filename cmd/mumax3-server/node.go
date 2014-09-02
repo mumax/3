@@ -21,7 +21,9 @@ type Node struct {
 
 	Peers map[string]PeerInfo
 
-	Users map[string]*User
+	Users            map[string]*User
+	LastJobScanTime  time.Time // last time job scanner ran (for status reporting)
+	LastJobScanFiles int       // how many new jobs scanner picked up last time (for status)
 
 	mutex sync.Mutex
 	value reflect.Value

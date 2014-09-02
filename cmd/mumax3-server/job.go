@@ -7,16 +7,18 @@ import (
 	"time"
 )
 
+// compute Job
 type Job struct {
-	File   string
-	outDir string
-	Node   string
-	GPU    int
-	Start  time.Time
-	Stop   time.Time
-	Status
+	URL       string    // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
+	outputURL string    // URL of the output directory, access via OutputURL()
+	Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
+	GPU       int       // GPU number on the compute node that runs/ran this job, if any
+	Start     time.Time // When this job was started, if applicable
+	Stop      time.Time // When this job was finished, if applicable
+	Status              // Job status: queued, running,...
 }
 
+// Job status number queued, running,...
 type Status int
 
 const (
@@ -37,9 +39,13 @@ func (s Status) String() string {
 	return statusString[s]
 }
 
-func NewJob(file string) Job { return Job{File: file} }
+func NewJob(URL string) Job { return Job{URL: URL} }
 
+// Returns how long this job has been running
 func (j *Job) Runtime() time.Duration {
+	if j.Start.IsZero() {
+		return 0
+	}
 	if j.Stop.IsZero() {
 		return since(time.Now(), j.Start)
 	} else {
@@ -47,11 +53,12 @@ func (j *Job) Runtime() time.Duration {
 	}
 }
 
-func (j *Job) OutDir() string {
-	if j.outDir == "" {
-		j.outDir = util.NoExt(j.File) + ".out/"
+// URL of the output directory.
+func (j *Job) OutputURL() string {
+	if j.outputURL == "" {
+		j.outputURL = util.NoExt(j.URL) + ".out/"
 	}
-	return j.outDir
+	return j.outputURL
 }
 
 func (j *Job) HostName() string {

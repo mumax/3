@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 // Runs a compute service on this node, if GPUs are available.

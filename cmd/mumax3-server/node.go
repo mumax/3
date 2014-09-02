@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/mumax/3/httpfs"
 	"log"
 	"reflect"
 	"sync"
 	"time"
+
+	"github.com/mumax/3/httpfs"
 )
 
 type Node struct {
@@ -34,9 +35,10 @@ func (n *Node) Uptime() time.Duration {
 	return since(time.Now(), n.upSince)
 }
 
+// rounded up to 1s precission
 func since(a, b time.Time) time.Duration {
 	d := a.Sub(b)
-	return (d / 1e9) * 1e9
+	return (d/1e9)*1e9 + 1e9
 }
 
 func (n *Node) lock() {

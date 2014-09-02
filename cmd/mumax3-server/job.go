@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/mumax/3/util"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/mumax/3/util"
 )
 
 // compute Job

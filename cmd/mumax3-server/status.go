@@ -27,8 +27,8 @@ func (n *Node) IPRange() string {
 const templText = `
 
 {{define "Job"}}
-	<tr>
-		<td class={{.Status.String}}> [{{.Status.String}}] </td>
+<tr>
+<td class={{.Status.String}}> [{{.Status.String}}] </td>
 		<td> [<a href="{{.URL}}">{{.URL}}</a>] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
@@ -46,7 +46,6 @@ const templText = `
 		h3{margin-left: 2em}
 		a{text-decoration: none; color:#0000AA}
 		a:hover{text-decoration: underline}
-		a:visited{color:#0000AA}
 		.FAILED{color:red; font-weight:bold}
 		.RUNNING{font-weight: bold; color:blue}
 		.QUEUED{color:black}
@@ -98,16 +97,16 @@ Uptime: {{.Uptime}} <br/>
 
 {{range $k,$v := .Users}}
 	<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
-	<b>Share:</b> {{.Used}}/{{.Share}} <br/>
+	<b>Share:</b> {{.UsedShare}}/{{.Share}} <br/>
 	<b>Jobs:</b>
-		<span class=RUNNING> [{{len .Running}}  running  ]</span>
-		<span class=QUEUED>  [{{len .Queue}}    queued   ]</span> 
-		<span class=FINISHED>[{{len .Finished}} finished ]</span> 
+		<a href="#{{$k}}_finished" class=FINISHED>[{{len .Finished}} finished ]</a> 
+		<a href="#{{$k}}_running"  class=RUNNING> [{{len .Running}}  running  ]</a>
+		<a href="#{{$k}}_queued"   class=QUEUED>  [{{len .Queue}}    queued   ]</a> 
 	<br/>
 	<br/>
-	<table> {{range $v.Running}}  {{template "Job" .}} {{end}} 
-	        {{range $v.Queue}}    {{template "Job" .}} {{end}} 
-	        {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
+	<a id="{{$k}}_finished"></a>  <table> {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
+	<a id="{{$k}}_running" ></a>  <table> {{range $v.Running}}  {{template "Job" .}} {{end}} </table>
+	<a id="{{$k}}_queued"  ></a>  <table> {{range $v.Queue}}    {{template "Job" .}} {{end}} </table>
 	</p>
 {{end}}
 </p>

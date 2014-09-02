@@ -11,12 +11,13 @@ type User struct {
 	Queue, Running, Finished map[string]*Job // Queued, Running, Finished jobs
 }
 
+// used share in GPU*hours
 func (u *User) UsedShare() float64 {
 	used := u.usedShare
 	for _, j := range u.Running {
 		used += j.Runtime().Seconds()
 	}
-	return used
+	return used / 3600
 }
 
 func (u *User) HasJob() bool {

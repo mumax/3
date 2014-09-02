@@ -22,6 +22,7 @@ var (
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
 	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
 	flag_log      = flag.Bool("log", true, "log debug output")
+	flag_halflife = flag.Duration("halflife", 24*time.Hour, "share decay half-life")
 )
 
 const GUI_PORT = 35367 // base port number for GUI (to be incremented by GPU number)
@@ -66,6 +67,7 @@ func main() {
 	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
 	go node.FindPeers(IPs, minPort, maxPort)
 	go RunJobScan("./")
+	go RunShareDecay()
 	scan <- struct{}{}
 
 	if len(node.GPUs) > 0 {

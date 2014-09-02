@@ -81,8 +81,18 @@ func (n *Node) AddJob(fname string) {
 	n.Users[first].AddJob(fname)
 }
 
-// convert []*Job to []string (job names),
-// for http status etc.
-func copyJobs(jobs []Job) []Job {
-	return append([]Job{}, jobs...)
+// Periodically updates user's usedShare so they decay
+// exponentially according to flag_haflife
+func RunShareDecay() {
+	halflife := *flag_halflife
+	quantum := halflife / 100 // several updates per half-life gives smooth decay
+	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
+	for {
+		time.Sleep(quantum)
+		node.lock()
+		for _, u := range node.Users {
+			u.usedShare *= reduce
+		}
+		node.unlock()
+	}
 }

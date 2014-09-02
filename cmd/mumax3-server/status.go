@@ -88,23 +88,30 @@ Uptime: {{.Uptime}} <br/>
 	</table>
 </p>
 
+
+<h2>Job scanner</h2><p>
+<b>Last scan:</b> {{.LastJobScanTime}}: {{.LastJobScanFiles}} files.
+<a href="http://{{.Addr}}/call/ReScan">Click to rescan</a>
+</p>
+
+
 <h2>Queue service</h2><p>
 
 <table>
 	{{range $k,$v := .Users}} <tr>
 		<td> <a href="#{{$k}}">{{$k}}</a> </td>
-		<td> <a href="#{{$k}}_running" class=RUNNING> [{{len $v.Running}} running ]</a> </td>
-		<td> <b>share:</b> [{{$v.UsedShare}}/{{$v.Share}}] </td>
+		<td> <a href="#{{$k}}_running" class=RUNNING> [{{len $v.Running}} running]</a> </td>
+		<td> <b>share:</b> [{{printf "%.3f" $v.UsedShare}}h/{{$v.Share}}] </td>
 	</tr>{{end}}
 </table>
 
 {{range $k,$v := .Users}}
 	<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
-	<b>Share:</b> {{.UsedShare}}/{{.Share}} <br/>
+	<b>Share:</b> {{printf "%.3f" .UsedShare}}h/{{.Share}} <br/>
 	<b>Jobs:</b>
-		<a href="#{{$k}}_finished" class=FINISHED>[{{len .Finished}} finished ]</a> 
-		<a href="#{{$k}}_running"  class=RUNNING> [{{len .Running}}  running  ]</a>
-		<a href="#{{$k}}_queued"   class=QUEUED>  [{{len .Queue}}    queued   ]</a> 
+		<a href="#{{$k}}_finished" class=FINISHED>[{{len .Finished}} finished]</a> 
+		<a href="#{{$k}}_running"  class=RUNNING> [{{len .Running}}  running]</a>
+		<a href="#{{$k}}_queued"   class=QUEUED>  [{{len .Queue}}    queued]</a> 
 	<br/>
 	<br/>
 	<a id="{{$k}}_finished"></a>  <table> {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
@@ -112,11 +119,6 @@ Uptime: {{.Uptime}} <br/>
 	<a id="{{$k}}_queued"  ></a>  <table> {{range $v.Queue}}    {{template "Job" .}} {{end}} </table>
 	</p>
 {{end}}
-</p>
-
-<h2>Job scanner</h2><p>
-<b>Last scan:</b> {{.LastJobScanTime}}: {{.LastJobScanFiles}} files.
-<a href="http://{{.Addr}}/call/ReScan">Click to rescan</a>
 </p>
 
 <h2>HTTPFS service</h2><p>

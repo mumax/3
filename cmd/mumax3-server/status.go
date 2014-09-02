@@ -90,10 +90,13 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue service</h2><p>
 
-<b>Jump to:</b>
-{{range $k,$v := .Users}}
-	<a href="#{{$k}}">{{$k}}</a>
-{{end}}
+<table>
+	{{range $k,$v := .Users}} <tr>
+		<td> <a href="#{{$k}}">{{$k}}</a> </td>
+		<td> <a href="#{{$k}}_running" class=RUNNING> [{{len $v.Running}} running ]</a> </td>
+		<td> <b>share:</b> [{{$v.UsedShare}}/{{$v.Share}}] </td>
+	</tr>{{end}}
+</table>
 
 {{range $k,$v := .Users}}
 	<a id="{{$k}}"></a><h3>{{$k}}</h3><p>

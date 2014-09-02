@@ -21,7 +21,6 @@ var (
 	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
 	flag_cachedir = flag.String("cache", "", "mumax3 kernel cache path")
-	flag_root     = flag.String("root", ".", "httpfs root directory")
 	flag_log      = flag.Bool("log", true, "log debug output")
 )
 
@@ -37,13 +36,9 @@ func main() {
 	jobs := flag.Args()
 	laddr := canonicalAddr(*flag_addr)
 
-	root := *flag_root
-	if !strings.HasSuffix(root, "/") {
-		root = root + "/"
-	}
 	node = &Node{
 		Addr:         laddr,
-		RootDir:      root,
+		RootDir:      "./",
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
@@ -70,7 +65,7 @@ func main() {
 
 	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
 	go node.FindPeers(IPs, minPort, maxPort)
-	go RunJobScan(*flag_root)
+	go RunJobScan("./")
 	scan <- struct{}{}
 
 	if len(node.GPUs) > 0 {

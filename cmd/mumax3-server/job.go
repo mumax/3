@@ -56,7 +56,7 @@ func (j *Job) Runtime() time.Duration {
 // URL of the output directory.
 func (j *Job) OutputURL() string {
 	if j.outputURL == "" {
-		j.outputURL = util.NoExt(j.URL) + ".out/"
+		j.outputURL = JobOutputDir(j.URL)
 	}
 	return j.outputURL
 }
@@ -64,6 +64,10 @@ func (j *Job) OutputURL() string {
 func (j *Job) HostName() string {
 	colon := strings.Index(j.Node, ":")
 	return j.Node[:colon]
+}
+
+func JobOutputDir(URL string) string {
+	return util.NoExt(URL) + ".out/"
 }
 
 func (j *Job) GUIPort() int {

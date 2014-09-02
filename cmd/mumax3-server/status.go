@@ -52,7 +52,7 @@ const templText = `
 		.QUEUED{color:black}
 		.FINISHED{color: grey}
 	</style>
-	<meta http-equiv="refresh" content="2">
+	<meta http-equiv="refresh" content="60">
 </head>
 
 <body>
@@ -91,9 +91,20 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue service</h2><p>
 
+<b>Jump to:</b>
 {{range $k,$v := .Users}}
-	<h3>{{$k}}</h3><p>
-	Share: {{.Used}}/{{.Share}} <br/>
+	<a href="#{{$k}}">{{$k}}</a>
+{{end}}
+
+{{range $k,$v := .Users}}
+	<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
+	<b>Share:</b> {{.Used}}/{{.Share}} <br/>
+	<b>Jobs:</b>
+		<span class=RUNNING> [{{len .Running}}  running  ]</span>
+		<span class=QUEUED>  [{{len .Queue}}    queued   ]</span> 
+		<span class=FINISHED>[{{len .Finished}} finished ]</span> 
+	<br/>
+	<br/>
 	<table> {{range $v.Running}}  {{template "Job" .}} {{end}} 
 	        {{range $v.Queue}}    {{template "Job" .}} {{end}} 
 	        {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
@@ -102,7 +113,7 @@ Uptime: {{.Uptime}} <br/>
 </p>
 
 <h2>Job scanner</h2><p>
-<b>Last scan:</b> {{.LastJobScanTime}} {{.LastJobScanFiles}} files.
+<b>Last scan:</b> {{.LastJobScanTime}}: {{.LastJobScanFiles}} files.
 <a href="http://{{.Addr}}/call/ReScan">Click to rescan</a>
 </p>
 

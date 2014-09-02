@@ -62,8 +62,12 @@ func (j *Job) OutputURL() string {
 	return j.outputURL
 }
 
-func (j *Job) HostName() string {
+// Node host (w/o port) this job runs on, if any
+func (j *Job) NodeName() string {
 	colon := strings.Index(j.Node, ":")
+	if colon < 0 {
+		return ""
+	}
 	return j.Node[:colon]
 }
 

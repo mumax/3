@@ -20,7 +20,6 @@ func (n *Node) ReScan() {
 }
 
 func RunJobScan(dir string) {
-
 	for {
 		<-scan // wait for start sign
 
@@ -33,7 +32,7 @@ func RunJobScan(dir string) {
 
 		count := 0
 		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-			if strings.HasSuffix(path, ".mx3") && !exist(JobOutputDir(path)) {
+			if strings.Contains(path, "/") && strings.HasSuffix(path, ".mx3") && !exist(JobOutputDir(path)) {
 				log.Println("found", path)
 				node.AddJob(path)
 				count++

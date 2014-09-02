@@ -21,10 +21,9 @@ func (n *Node) RunComputeService() {
 	}
 
 	// stack of available GPU numbers
-	idle := make(chan int, 2*len(n.GPUs)) // TODO: 1*
+	idle := make(chan int, len(n.GPUs))
 	for i := range n.GPUs {
 		idle <- i
-		idle <- i // TODO: rm
 	}
 
 	for {

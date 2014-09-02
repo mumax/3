@@ -32,7 +32,7 @@ const templText = `
 		<td> [<a href="{{.URL}}">{{.URL}}</a>] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
-		<td> [{{with .IsRunning}}<a href="http://{{$.HostName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
+		<td> [{{with .IsRunning}}<a href="http://{{$.NodeName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
 	</tr>
 {{end}}

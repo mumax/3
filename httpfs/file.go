@@ -23,18 +23,28 @@ const BUFFER_SIZE = 1 << 20
 type File struct {
 	name   string // local file name passed to Open
 	client *Client
-	u      url.URL // url to access file on remote machine
-	fd     string  // file descriptor on server
-	inBuf  *bufio.Reader
+	u      url.URL   // url to access file on remote machine
+	fd     string    // file descriptor on server
+	inBuf  io.Reader //*bufio.Reader
 	outBuf *bufio.Writer
 }
 
 // Read implements io.Reader.
 func (f *File) Read(p []byte) (n int, err error) {
 	if f.inBuf == nil {
-		f.inBuf = bufio.NewReaderSize((*syncFile)(f), BUFFER_SIZE)
+		f.inBuf = &fullReader{bufio.NewReaderSize((*syncFile)(f), BUFFER_SIZE)}
 	}
 	return f.inBuf.Read(p)
+}
+
+type fullReader struct{ io.Reader }
+
+func (r *fullReader) Read(p []byte) (n int, err error) {
+	n, err = io.ReadFull(r.Reader, p)
+	if err == io.ErrUnexpectedEOF {
+		err = io.EOF
+	}
+	return n, err
 }
 
 // wrapper for File that redirects Read,Write to unbuffered implementations

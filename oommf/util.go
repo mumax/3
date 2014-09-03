@@ -24,12 +24,12 @@ func isEndline(char int) bool {
 	return isEOF(char) || char == int('\n')
 }
 
-// Blocks until all requested bytes are read.
-type fullReader struct{ io.Reader }
-
-func (r fullReader) Read(p []byte) (n int, err error) {
-	return io.ReadFull(r.Reader, p)
-}
+//// Blocks until all requested bytes are read.
+//type fullReader struct{ io.Reader }
+//
+//func (r fullReader) Read(p []byte) (n int, err error) {
+//	return io.ReadFull(r.Reader, p)
+//}
 
 // Reads one character from the Reader.
 // -1 means EOF.

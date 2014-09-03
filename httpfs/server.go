@@ -116,7 +116,7 @@ func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set(X_ERROR, err.Error())
 		w.WriteHeader(statusCode(err))
-		log.Println("httpfs server error:", err)
+		log.Println("httpfs server error:", r.Method, r.URL.Path, ":", err)
 	}
 }
 
@@ -163,7 +163,7 @@ func (s *Server) open(w http.ResponseWriter, r *http.Request) error {
 	fd := fileName(r.URL)
 	s.storeFD(fd, file) // TODO: close previous if already open
 	fmt.Fprint(w, fd)   // respond with file descriptor
-	//log.Println("httpfs server OPEN", r.URL.Path, "->", fd)
+	log.Println("httpfs server OPEN", r.URL.Path, "->", fd)
 	return nil
 }
 

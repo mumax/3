@@ -2,7 +2,6 @@
 package oommf
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -13,8 +12,8 @@ import (
 )
 
 // Read any OOMMF file, autodetect OVF1/OVF2 format
-func Read(in_ io.Reader) (s *data.Slice, meta data.Meta, err error) {
-	in := fullReader{bufio.NewReader(in_)}
+func Read(in io.Reader) (s *data.Slice, meta data.Meta, err error) {
+	//in := fullReader{bufio.NewReader(in_)}
 	info := readHeader(in)
 
 	n := info.Size

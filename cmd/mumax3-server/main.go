@@ -16,7 +16,7 @@ import (
 
 var (
 	flag_addr     = flag.String("l", ":35360", "Listen and serve at this network address")
-	flag_scan     = flag.String("scan", "127.0.0-1.1,192.168.0.1-253", "Scan these IP address for other servers")
+	flag_scan     = flag.String("scan", "192.168.0.1-253", "Scan these IP address for other servers")
 	flag_ports    = flag.String("ports", "35360-35361", "Scan these ports for other servers")
 	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
@@ -34,8 +34,11 @@ func main() {
 	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
+	IPs := parseIPs()
+	minPort, maxPort := parsePorts()
+
 	jobs := flag.Args()
-	laddr := canonicalAddr(*flag_addr)
+	laddr := canonicalAddr(*flag_addr, IPs)
 
 	node = &Node{
 		Addr:         laddr,
@@ -50,9 +53,6 @@ func main() {
 	for _, file := range jobs {
 		node.AddJob(file)
 	}
-
-	IPs := parseIPs()
-	minPort, maxPort := parsePorts()
 
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/", node.HandleStatus)
@@ -78,13 +78,33 @@ func main() {
 }
 
 // replace laddr by a canonical form, as it will serve as unique ID
-func canonicalAddr(laddr string) string {
+func canonicalAddr(laddr string, IPs []string) string {
+	// safe initial guess: hostname:port
 	h, p, err := net.SplitHostPort(laddr)
 	Fatal(err)
 	if h == "" {
 		h, _ = os.Hostname()
 	}
-	return net.JoinHostPort(h, p)
+	name := net.JoinHostPort(h, p)
+
+	addrs, _ := net.InterfaceAddrs()
+	for _, addr := range addrs {
+		IpCidr := strings.Split(addr.String(), "/")
+		IP := IpCidr[0]
+		if contains(IPs, IP) {
+			return net.JoinHostPort(IP, p)
+		}
+	}
+	return name
+}
+
+func contains(arr []string, x string) bool {
+	for _, s := range arr {
+		if x == s {
+			return true
+		}
+	}
+	return false
 }
 
 func Fatal(err error) {

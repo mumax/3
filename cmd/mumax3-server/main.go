@@ -61,6 +61,14 @@ func main() {
 
 	go func() {
 		log.Println("serving at", laddr)
+
+		_, p, err := net.SplitHostPort(laddr)
+		Fatal(err)
+		ips := interfaceAddrs()
+		for _, ip := range ips {
+			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
+		}
+
 		Fatal(http.ListenAndServe(laddr, nil))
 	}()
 
@@ -77,6 +85,17 @@ func main() {
 	<-make(chan struct{}) // wait forever
 }
 
+// returns all network interface addresses, without CIDR mask
+func interfaceAddrs() []string {
+	addrs, _ := net.InterfaceAddrs()
+	ips := make([]string, 0, len(addrs))
+	for _, addr := range addrs {
+		IpCidr := strings.Split(addr.String(), "/")
+		ips = append(ips, IpCidr[0])
+	}
+	return ips
+}
+
 // replace laddr by a canonical form, as it will serve as unique ID
 func canonicalAddr(laddr string, IPs []string) string {
 	// safe initial guess: hostname:port
@@ -87,14 +106,14 @@ func canonicalAddr(laddr string, IPs []string) string {
 	}
 	name := net.JoinHostPort(h, p)
 
-	addrs, _ := net.InterfaceAddrs()
-	for _, addr := range addrs {
-		IpCidr := strings.Split(addr.String(), "/")
-		IP := IpCidr[0]
-		if contains(IPs, IP) {
-			return net.JoinHostPort(IP, p)
+	ips := interfaceAddrs()
+	for _, ip := range ips {
+		if contains(IPs, ip) {
+			return net.JoinHostPort(ip, p)
+
 		}
 	}
+
 	return name
 }
 

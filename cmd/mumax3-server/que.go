@@ -41,16 +41,34 @@ func (n *Node) NotifyJobFinished(jobURL string, status int) {
 
 	job := user.Running[jobURL]
 
-	if status == 0 {
-		job.Status = FINISHED
-	} else {
+	// TODO: job == nil?
+
+	switch {
+	case status > 0:
 		job.Status = FAILED
+	case status == 0:
+		job.Status = FINISHED
+	case status < 0:
+		job.Status = QUEUED
+		job.Reque++
+		job.Start = time.Time{}
+		job.Stop = time.Time{}
 	}
 
+	// TODO: rm .out on requeue
 	job.Stop = time.Now()
-	user.usedShare += job.Runtime().Seconds()
+	if job.Status != QUEUED {
+		user.usedShare += job.Runtime().Seconds()
+	}
+
 	delete(user.Running, jobURL)
-	user.Finished[jobURL] = job
+
+	if job.Status == FINISHED || job.Status == FAILED {
+		user.Finished[jobURL] = job
+	}
+	if job.Status == QUEUED {
+		user.Queue[jobURL] = job
+	}
 }
 
 func (n *Node) AddJob(fname string) {

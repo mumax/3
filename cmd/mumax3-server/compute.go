@@ -56,9 +56,13 @@ func (n *Node) RunComputeService() {
 			n.lock()
 			job.Cmd = nil
 			delete(n.RunningHere, URL)
+			requeue := job.Reque > 0
 			n.unlock()
 
 			// notify job queue it's ready (for status)
+			if requeue {
+				status = -1
+			}
 			_, err := n.RPCCall(JobHost(URL), "NotifyJobFinished", URL, status)
 			if err != nil {
 				log.Println(err)
@@ -100,6 +104,7 @@ func (n *Node) KillJob(url string) error {
 	if job == nil {
 		return fmt.Errorf("kill %v: job not running.", url)
 	}
+	job.Reque++
 	err := job.Cmd.Process.Kill()
 	return err
 }
@@ -137,7 +142,7 @@ func runJob(job *Job) (status int) {
 	cmd := job.Cmd
 
 	if cmd == nil {
-		return -1
+		return 1
 	}
 
 	log.Println("=> exec  ", cmd.Path, cmd.Args)

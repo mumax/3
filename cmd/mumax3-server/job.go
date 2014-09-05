@@ -19,6 +19,7 @@ type Job struct {
 	Stop      time.Time // When this job was finished, if applicable
 	Status              // Job status: queued, running,...
 	Cmd       *exec.Cmd
+	Reque     int // how many times requeued.
 }
 
 // Job status number queued, running,...

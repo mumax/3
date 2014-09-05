@@ -34,7 +34,10 @@ const templText = `
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
 		<td> [{{with .IsRunning}}<a href="http://{{$.NodeName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
-		{{with .Cmd}} <td> [<a href="http://{{$.Node}}/do/kill/{{$.Path}}">kill</a>]  </td> {{end}}
+		<td> 
+			{{with .Cmd}} [<a href="http://{{$.Node}}/do/kill/{{$.Path}}">kill</a>]   {{end}} 
+			{{with .Reque}} [{{.}}x requeued]   {{end}} 
+		</td>
 	</tr>
 {{end}}
 

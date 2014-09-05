@@ -31,6 +31,10 @@ func (n *Node) RunComputeService() {
 		GUIAddr := fmt.Sprint(":", GUI_PORT+gpu)
 		URL := n.WaitForJob() // take an available job
 		go func() {
+
+			cmd, _ := makeProcess(URL, gpu, GUIAddr)
+			//defer stdout.Close()
+
 			// put job in "running" list (for status reporting)
 			job := &Job{
 				URL:    URL,
@@ -38,7 +42,7 @@ func (n *Node) RunComputeService() {
 				GPU:    gpu,
 				Start:  time.Now(),
 				Status: RUNNING,
-				Cmd:    makeProcess(URL, gpu, GUIAddr),
+				Cmd:    cmd,
 			}
 
 			n.lock()
@@ -46,6 +50,7 @@ func (n *Node) RunComputeService() {
 			n.unlock()
 
 			status := runJob(job)
+			n.FSServer.CloseAll(JobOutputDir(JobInputFile(job.URL)))
 
 			// remove from "running" list
 			n.lock()
@@ -99,8 +104,8 @@ func (n *Node) KillJob(url string) error {
 	return err
 }
 
-// run input file at URL on gpu number, serve GUI at wabAddr and return status number
-func makeProcess(inputURL string, gpu int, webAddr string) *exec.Cmd {
+// prepare exec.Cmd to run mumax3 compute process
+func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, *httpfs.File) {
 	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
@@ -113,19 +118,19 @@ func makeProcess(inputURL string, gpu int, webAddr string) *exec.Cmd {
 	fs, errFS := httpfs.Dial("http://" + JobHost(inputURL) + "/fs")
 	if errFS != nil {
 		log.Println(errFS)
-		return nil
+		return nil, nil
 	}
 	outDir := util.NoExt(JobInputFile(inputURL)) + ".out"
 	fs.Mkdir(outDir, 0777)
 	out, errD := fs.Create(outDir + "/stdout.txt")
 	if errD != nil {
 		log.Println(errD)
-		return nil
+		return nil, nil
 	}
 	cmd.Stderr = out
 	cmd.Stdout = out
 
-	return cmd
+	return cmd, out
 }
 
 func runJob(job *Job) (status int) {
@@ -138,8 +143,7 @@ func runJob(job *Job) (status int) {
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
 	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 
-	outDir := JobOutputDir(job.URL)
-	defer node.FSServer.CloseAll(outDir) // TODO: doesn't work because of http://??
+	//outDir := JobOutputDir(job.URL)
 	err := cmd.Run()
 
 	//defer cmd.Stdout.Close() // TODO: in closeall?

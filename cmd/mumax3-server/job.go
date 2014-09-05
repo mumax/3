@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ type Job struct {
 	Start     time.Time // When this job was started, if applicable
 	Stop      time.Time // When this job was finished, if applicable
 	Status              // Job status: queued, running,...
+	Cmd       *exec.Cmd
 }
 
 // Job status number queued, running,...
@@ -38,6 +40,10 @@ var statusString = map[Status]string{
 
 func (s Status) String() string {
 	return statusString[s]
+}
+
+func (j *Job) Path() string {
+	return j.URL[len("http://"):]
 }
 
 func NewJob(URL string) Job { return Job{URL: URL} }

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	N_SCANNERS = 8
+	N_SCANNERS = 128
 	MaxIPs     = 1024
 )
 

@@ -55,6 +55,7 @@ func main() {
 	}
 
 	http.HandleFunc("/call/", node.HandleRPC)
+	http.HandleFunc("/do/", node.HandleHumanRPC)
 	http.HandleFunc("/", node.HandleStatus)
 	node.FSServer = httpfs.NewServer(node.RootDir, "/fs/")
 	http.Handle("/fs/", node.FSServer)

@@ -32,21 +32,24 @@ func (n *Node) RunComputeService() {
 		URL := n.WaitForJob() // take an available job
 		go func() {
 			// put job in "running" list (for status reporting)
-			n.lock()
-			n.RunningHere[URL] = &Job{
+			job := &Job{
 				URL:    URL,
 				Node:   n.Addr,
 				GPU:    gpu,
 				Start:  time.Now(),
 				Status: RUNNING,
+				Cmd:    makeProcess(URL, gpu, GUIAddr),
 			}
+
+			n.lock()
+			n.RunningHere[URL] = job
 			n.unlock()
 
-			// run the job
-			status := run(URL, gpu, GUIAddr)
+			status := runJob(job)
 
 			// remove from "running" list
 			n.lock()
+			job.Cmd = nil
 			delete(n.RunningHere, URL)
 			n.unlock()
 
@@ -83,8 +86,21 @@ func (n *Node) FindJob() string {
 	return ""
 }
 
+func (n *Node) KillJob(url string) error {
+	n.lock()
+	defer n.unlock()
+
+	log.Println("kill", url)
+	job := n.RunningHere[url]
+	if job == nil {
+		return fmt.Errorf("kill %v: job not running.", url)
+	}
+	err := job.Cmd.Process.Kill()
+	return err
+}
+
 // run input file at URL on gpu number, serve GUI at wabAddr and return status number
-func run(inputURL string, gpu int, webAddr string) (status int) {
+func makeProcess(inputURL string, gpu int, webAddr string) *exec.Cmd {
 	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
@@ -97,44 +113,56 @@ func run(inputURL string, gpu int, webAddr string) (status int) {
 	fs, errFS := httpfs.Dial("http://" + JobHost(inputURL) + "/fs")
 	if errFS != nil {
 		log.Println(errFS)
-		return -1
+		return nil
 	}
 	outDir := util.NoExt(JobInputFile(inputURL)) + ".out"
 	fs.Mkdir(outDir, 0777)
 	out, errD := fs.Create(outDir + "/stdout.txt")
 	if errD != nil {
 		log.Println(errD)
-		return -1
+		return nil
 	}
 	cmd.Stderr = out
 	cmd.Stdout = out
 
+	return cmd
+}
+
+func runJob(job *Job) (status int) {
+	cmd := job.Cmd
+
+	if cmd == nil {
+		return -1
+	}
+
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
 	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 
-	defer node.FSServer.CloseAll(outDir)
+	outDir := JobOutputDir(job.URL)
+	defer node.FSServer.CloseAll(outDir) // TODO: doesn't work because of http://??
 	err := cmd.Run()
 
-	defer out.Close()
+	//defer cmd.Stdout.Close() // TODO: in closeall?
 
 	// close all this simulation's files in case process exited ungracefully
 
 	// TODO: determine proper status number
 	if err != nil {
-		log.Println(inputURL, err)
+		log.Println(job.URL, err)
 		return 1
 	}
 	return 0
 }
 
+// TODO: revise
 func (n *Node) PeersWithJobs() []PeerInfo {
 	n.lock()
 	defer n.unlock()
 	var peers []PeerInfo
 	for _, p := range n.Peers {
-		if p.HaveJobs {
-			peers = append(peers, p)
-		}
+		//if p.HaveJobs {
+		peers = append(peers, p)
+		//}
 	}
 	return peers
 }

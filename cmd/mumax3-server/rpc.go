@@ -13,6 +13,27 @@ import (
 	"time"
 )
 
+func (n *Node) HandleHumanRPC(w http.ResponseWriter, r *http.Request) {
+	request := r.URL.Path[len("/do/"):]
+	slashPos := strings.Index(request, "/")
+	method := request[:slashPos]
+	arg := request[slashPos+1:]
+
+	switch method {
+	default:
+		http.Error(w, "bad request: "+method, http.StatusBadRequest)
+		return
+	case "kill":
+		if err := n.KillJob("http://" + arg); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	case "rescan":
+		n.ReScan()
+	}
+	fmt.Fprintf(w, `<html><head></head><body><a href="http://%v">back</a></body></html>`, n.Addr)
+}
+
 // http Handler for incoming RPC calls.
 func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 

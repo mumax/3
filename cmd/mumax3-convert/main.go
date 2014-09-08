@@ -36,7 +36,6 @@ import (
 	"github.com/mumax/3/dump"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"io"
 	"log"
 	"os"
 	"path"
@@ -148,7 +147,7 @@ func work() {
 	}
 }
 
-func open(fname string) (*os.File, io.Writer) {
+func open(fname string) (*os.File, *bufio.Writer) {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.FatalErr(err)
 	return f, bufio.NewWriter(f)
@@ -177,6 +176,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_svg {
 		out, bufout := open(name + ".svg")
 		defer out.Close()
+		defer bufout.Flush()
 		draw.SVG(bufout, f.Vectors())
 		haveOutput = true
 	}
@@ -193,6 +193,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_gnuplot {
 		out, bufout := open(name + ".gplot")
 		defer out.Close()
+		defer bufout.Flush()
 		dumpGnuplot(bufout, f, info)
 		haveOutput = true
 	}
@@ -200,6 +201,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_ovf1 != "" {
 		out, bufout := open(name + ".ovf")
 		defer out.Close()
+		defer bufout.Flush()
 		oommf.WriteOVF1(bufout, f, info, *flag_ovf1)
 		haveOutput = true
 	}
@@ -207,6 +209,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_omf != "" {
 		out, bufout := open(name + ".omf")
 		defer out.Close()
+		defer bufout.Flush()
 		oommf.WriteOVF1(bufout, f, info, *flag_omf)
 		haveOutput = true
 	}
@@ -214,6 +217,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_ovf2 != "" {
 		out, bufout := open(name + ".ovf")
 		defer out.Close()
+		defer bufout.Flush()
 		oommf.WriteOVF2(bufout, f, info, *flag_ovf2)
 		haveOutput = true
 	}
@@ -221,6 +225,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_vtk != "" {
 		out, bufout := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
 		defer out.Close()
+		defer bufout.Flush()
 		dumpVTK(bufout, f, info, *flag_vtk)
 		haveOutput = true
 	}
@@ -228,6 +233,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_csv {
 		out, bufout := open(name + ".csv")
 		defer out.Close()
+		defer bufout.Flush()
 		dumpCSV(bufout, f)
 		haveOutput = true
 	}
@@ -235,6 +241,7 @@ func process(f *data.Slice, info data.Meta, name string) {
 	if *flag_json {
 		out, bufout := open(name + ".json")
 		defer out.Close()
+		defer bufout.Flush()
 		dumpJSON(bufout, f)
 		haveOutput = true
 	}

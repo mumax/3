@@ -2,6 +2,7 @@
 package dump
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -24,7 +25,7 @@ func ReadFile(fname string) (*data.Slice, data.Meta, error) {
 		return nil, data.Meta{}, err
 	}
 	defer f.Close()
-	return Read(f)
+	return Read(bufio.NewReader(f))
 }
 
 func MustReadFile(fname string) (*data.Slice, data.Meta) {

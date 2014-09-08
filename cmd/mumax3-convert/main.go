@@ -27,6 +27,7 @@ Output file names are automatically assigned.
 package main
 
 import (
+	"bufio"
 	"compress/gzip"
 	"flag"
 	"fmt"
@@ -35,6 +36,7 @@ import (
 	"github.com/mumax/3/dump"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -146,10 +148,10 @@ func work() {
 	}
 }
 
-func open(fname string) *os.File {
+func open(fname string) (*os.File, io.Writer) {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	util.FatalErr(err)
-	return f
+	return f, bufio.NewWriter(f)
 }
 
 func process(f *data.Slice, info data.Meta, name string) {
@@ -173,14 +175,14 @@ func process(f *data.Slice, info data.Meta, name string) {
 	}
 
 	if *flag_svg {
-		out := open(name + ".svg")
+		out, bufout := open(name + ".svg")
 		defer out.Close()
-		draw.SVG(out, f.Vectors())
+		draw.SVG(bufout, f.Vectors())
 		haveOutput = true
 	}
 
 	if *flag_svgz {
-		out1 := open(name + ".svgz")
+		out1, _ := open(name + ".svgz")
 		defer out1.Close()
 		out2 := gzip.NewWriter(out1)
 		defer out2.Close()
@@ -189,51 +191,51 @@ func process(f *data.Slice, info data.Meta, name string) {
 	}
 
 	if *flag_gnuplot {
-		out := open(name + ".gplot")
+		out, bufout := open(name + ".gplot")
 		defer out.Close()
-		dumpGnuplot(out, f, info)
+		dumpGnuplot(bufout, f, info)
 		haveOutput = true
 	}
 
 	if *flag_ovf1 != "" {
-		out := open(name + ".ovf")
+		out, bufout := open(name + ".ovf")
 		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_ovf1)
+		oommf.WriteOVF1(bufout, f, info, *flag_ovf1)
 		haveOutput = true
 	}
 
 	if *flag_omf != "" {
-		out := open(name + ".omf")
+		out, bufout := open(name + ".omf")
 		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_omf)
+		oommf.WriteOVF1(bufout, f, info, *flag_omf)
 		haveOutput = true
 	}
 
 	if *flag_ovf2 != "" {
-		out := open(name + ".ovf")
+		out, bufout := open(name + ".ovf")
 		defer out.Close()
-		oommf.WriteOVF2(out, f, info, *flag_ovf2)
+		oommf.WriteOVF2(bufout, f, info, *flag_ovf2)
 		haveOutput = true
 	}
 
 	if *flag_vtk != "" {
-		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
+		out, bufout := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
 		defer out.Close()
-		dumpVTK(out, f, info, *flag_vtk)
+		dumpVTK(bufout, f, info, *flag_vtk)
 		haveOutput = true
 	}
 
 	if *flag_csv {
-		out := open(name + ".csv")
+		out, bufout := open(name + ".csv")
 		defer out.Close()
-		dumpCSV(out, f)
+		dumpCSV(bufout, f)
 		haveOutput = true
 	}
 
 	if *flag_json {
-		out := open(name + ".json")
+		out, bufout := open(name + ".json")
 		defer out.Close()
-		dumpJSON(out, f)
+		dumpJSON(bufout, f)
 		haveOutput = true
 	}
 

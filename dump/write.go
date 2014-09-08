@@ -1,6 +1,7 @@
 package dump
 
 import (
+	"bufio"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"hash"
@@ -50,7 +51,9 @@ func WriteFile(fname string, s *data.Slice, info data.Meta) error {
 		return err
 	}
 	defer f.Close()
-	return Write(f, s, info)
+	w := bufio.NewWriter(f)
+	defer w.Flush()
+	return Write(w, s, info)
 }
 
 // Write the slice to file in binary format, panic on error.

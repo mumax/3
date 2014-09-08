@@ -51,7 +51,10 @@ func WriteFile(fname string, s *data.Slice, info data.Meta) error {
 		return err
 	}
 	defer f.Close()
-	return Write(bufio.NewWriter(f), s, info)
+	w := bufio.NewWriter(f)
+	defer w.Flush()
+	err = Write(w, s, info)
+	return err
 }
 
 // Write the slice to file in binary format, panic on error.

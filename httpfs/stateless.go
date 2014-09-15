@@ -1,5 +1,6 @@
 package httpfs
 
+/*
 import (
 	"encoding/json"
 	"fmt"
@@ -237,3 +238,5 @@ func localRead(fname string) (io.ReadCloser, error) {
 func localRemove(fname string) error {
 	return os.RemoveAll(fname)
 }
+
+*/

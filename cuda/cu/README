@@ -1,4 +1,4 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package cu
     import "github.com/barnex/cuda5/cu"
@@ -10,7 +10,7 @@ CONSTANTS
 const (
     // If  the number of contexts > number of CPUs, yield to other OS threads when waiting for the GPU, otherwise CUDA spin on the processor.
     CTX_SCHED_AUTO = C.CU_CTX_SCHED_AUTO
-    // Spin when waiting for results from the GPU. 
+    // Spin when waiting for results from the GPU.
     CTX_SCHED_SPIN = C.CU_CTX_SCHED_SPIN
     // Yield its thread when waiting for results from the GPU.
     CTX_SCHED_YIELD = C.CU_CTX_SCHED_YIELD
@@ -18,10 +18,11 @@ const (
     CTX_BLOCKING_SYNC
     // Support mapped pinned allocations. This flag must be set in order to allocate pinned host memory that is accessible to the GPU.
     CTX_MAP_HOST = C.CU_CTX_MAP_HOST
-    //Do not reduce local memory after resizing local memory for a kernel. 
+    //Do not reduce local memory after resizing local memory for a kernel.
     CTX_LMEM_RESIZE_TO_MAX = C.CU_CTX_LMEM_RESIZE_TO_MAX
 )
     Flags for CtxCreate
+
 const (
     SIZEOF_FLOAT32    = 4
     SIZEOF_FLOAT64    = 8
@@ -29,7 +30,6 @@ const (
     SIZEOF_COMPLEX128 = 16
 )
     Type size in bytes
-
 
 FUNCTIONS
 
@@ -87,9 +87,8 @@ func LaunchKernel(f Function, gridDimX, gridDimY, gridDimZ int, blockDimX, block
 
 func MemAllocHost(bytes int64) unsafe.Pointer
 
-func MemFree(ptr *DevicePtr)
-    Frees device memory allocated by MemAlloc(). Overwrites the pointer with
-    NULL. It is safe to double-free.
+func MemFree(p DevicePtr)
+    Frees device memory allocated by MemAlloc(). It is safe to double-free.
 
 func MemFreeHost(ptr unsafe.Pointer)
 
@@ -164,7 +163,6 @@ func StreamSynchronize(stream Stream)
 
 func Version() int
     Returns the CUDA driver version.
-
 
 TYPES
 
@@ -280,7 +278,7 @@ const (
     L2_CACHE_SIZE                    DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE                    // Size of L2 cache in bytes
     MAX_THREADS_PER_MULTIPROCESSOR   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR   // Maximum resident threads per multiprocessor
     ASYNC_ENGINE_COUNT               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT               // Number of asynchronous engines
-    UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host 
+    UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host
     MAXIMUM_TEXTURE1D_LAYERED_WIDTH  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH  // Maximum 1D layered texture width
     MAXIMUM_TEXTURE1D_LAYERED_LAYERS DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS // Maximum layers in a 1D layered texture
 )
@@ -294,7 +292,7 @@ func (ptr DevicePtr) Bytes() (bytes int64)
     Returns the size of the allocation (by MemAlloc) that contains the input
     pointer ptr.
 
-func (ptr *DevicePtr) Free()
+func (ptr DevicePtr) Free()
     Frees device memory allocated by MemAlloc(). Overwrites the pointer with
     NULL. It is safe to double-free.
 
@@ -323,11 +321,11 @@ type FunctionAttribute int
 
 const (
     FUNC_A_MAX_THREADS_PER_BLOCK FunctionAttribute = C.CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK // The maximum number of threads per block, beyond which a launch of the function would fail.
-    FUNC_A_SHARED_SIZE_BYTES     FunctionAttribute = C.CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES     // The size in bytes of statically-allocated shared memory required by this function. 
+    FUNC_A_SHARED_SIZE_BYTES     FunctionAttribute = C.CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES     // The size in bytes of statically-allocated shared memory required by this function.
     FUNC_A_CONST_SIZE_BYTES      FunctionAttribute = C.CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES      // The size in bytes of user-allocated constant memory required by this function.
     FUNC_A_LOCAL_SIZE_BYTES      FunctionAttribute = C.CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES      // The size in bytes of local memory used by each thread of this function.
     FUNC_A_NUM_REGS              FunctionAttribute = C.CU_FUNC_ATTRIBUTE_NUM_REGS              // The number of registers used by each thread of this function.
-    FUNC_A_PTX_VERSION           FunctionAttribute = C.CU_FUNC_ATTRIBUTE_PTX_VERSION           // The PTX virtual architecture version for which the function was compiled. 
+    FUNC_A_PTX_VERSION           FunctionAttribute = C.CU_FUNC_ATTRIBUTE_PTX_VERSION           // The PTX virtual architecture version for which the function was compiled.
     FUNC_A_BINARY_VERSION        FunctionAttribute = C.CU_FUNC_ATTRIBUTE_BINARY_VERSION        // The binary architecture version for which the function was compiled.
 )
 
@@ -342,6 +340,7 @@ const (
     Flag for MemHostRegister
 
 type MemoryType uint
+    Physical memory type of device pointer.
 
 const (
     MemoryTypeHost    MemoryType = C.CU_MEMORYTYPE_HOST
@@ -419,6 +418,13 @@ const (
     ERROR_TOO_MANY_PEERS                 Result = C.CUDA_ERROR_TOO_MANY_PEERS
     ERROR_HOST_MEMORY_ALREADY_REGISTERED Result = C.CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED
     ERROR_HOST_MEMORY_NOT_REGISTERED     Result = C.CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED
+    ERROR_HARDWARE_STACK_ERROR           Result = 714 //C.CUDA_ERROR_HARDWARE_STACK_ERROR
+    ERROR_ILLEGAL_INSTRUCTION            Result = 715 //C.CUDA_ERROR_ILLEGAL_INSTRUCTION
+    ERROR_MISALIGNED_ADDRESS             Result = 716 //C.CUDA_ERROR_MISALIGNED_ADDRESS
+    ERROR_INVALID_ADDRESS_SPACE          Result = 717 //C.CUDA_ERROR_INVALID_ADDRESS_SPACE
+    ERROR_INVALID_PC                     Result = 718 //C.CUDA_ERROR_INVALID_PC
+    ERROR_NOT_PERMITTED                  Result = 800 //C.CUDA_ERROR_NOT_PERMITTED
+    ERROR_NOT_SUPPORTED                  Result = 801 //C.CUDA_ERROR_NOT_SUPPORTED
     ERROR_UNKNOWN                        Result = C.CUDA_ERROR_UNKNOWN
 )
 

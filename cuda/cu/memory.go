@@ -165,20 +165,22 @@ func MemGetInfo() (free, total int64) {
 // Page-locks memory specified by the pointer and bytes.
 // The pointer and byte size must be aligned to the host page size (4KB)
 // See also: MemHostUnregister()
-func MemHostRegister(ptr unsafe.Pointer, bytes int64, flags MemHostRegisterFlag) {
-	err := Result(C.cuMemHostRegister(ptr, C.size_t(bytes), C.uint(flags)))
-	if err != SUCCESS {
-		panic(err)
-	}
-}
+// doesn't link with cuda6.5
+//func MemHostRegister(ptr unsafe.Pointer, bytes int64, flags MemHostRegisterFlag) {
+//	err := Result(C.cuMemHostRegister(ptr, C.size_t(bytes), C.uint(flags)))
+//	if err != SUCCESS {
+//		panic(err)
+//	}
+//}
 
 // Unmaps memory locked by MemHostRegister().
-func MemHostUnregister(ptr unsafe.Pointer) {
-	err := Result(C.cuMemHostUnregister(ptr))
-	if err != SUCCESS {
-		panic(err)
-	}
-}
+// doesn't link with cuda6.5
+//func MemHostUnregister(ptr unsafe.Pointer) {
+//	err := Result(C.cuMemHostUnregister(ptr))
+//	if err != SUCCESS {
+//		panic(err)
+//	}
+//}
 
 func MemAllocHost(bytes int64) unsafe.Pointer {
 	var p unsafe.Pointer

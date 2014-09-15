@@ -94,7 +94,7 @@ var lltorque_map = map[int]string{0: "",
 // lltorque PTX code for various compute capabilities.
 const (
 	lltorque_ptx_20 = `
-.version 3.2
+.version 4.1
 .target sm_20
 .address_size 64
 
@@ -120,28 +120,18 @@ const (
 	.reg .s64 	%rd<38>;
 
 
-	ld.param.u64 	%rd12, [lltorque_param_0];
-	ld.param.u64 	%rd13, [lltorque_param_1];
-	ld.param.u64 	%rd14, [lltorque_param_2];
-	ld.param.u64 	%rd10, [lltorque_param_3];
-	ld.param.u64 	%rd11, [lltorque_param_4];
-	ld.param.u64 	%rd15, [lltorque_param_5];
-	ld.param.u64 	%rd16, [lltorque_param_6];
-	ld.param.u64 	%rd17, [lltorque_param_7];
-	ld.param.u64 	%rd18, [lltorque_param_8];
-	ld.param.u64 	%rd19, [lltorque_param_9];
-	ld.param.u64 	%rd20, [lltorque_param_10];
+	ld.param.u64 	%rd1, [lltorque_param_0];
+	ld.param.u64 	%rd2, [lltorque_param_1];
+	ld.param.u64 	%rd3, [lltorque_param_2];
+	ld.param.u64 	%rd4, [lltorque_param_3];
+	ld.param.u64 	%rd5, [lltorque_param_4];
+	ld.param.u64 	%rd6, [lltorque_param_5];
+	ld.param.u64 	%rd7, [lltorque_param_6];
+	ld.param.u64 	%rd8, [lltorque_param_7];
+	ld.param.u64 	%rd9, [lltorque_param_8];
+	ld.param.u64 	%rd10, [lltorque_param_9];
+	ld.param.u64 	%rd11, [lltorque_param_10];
 	ld.param.u32 	%r2, [lltorque_param_11];
-	cvta.to.global.u64 	%rd1, %rd14;
-	cvta.to.global.u64 	%rd2, %rd13;
-	cvta.to.global.u64 	%rd3, %rd12;
-	cvta.to.global.u64 	%rd4, %rd19;
-	cvta.to.global.u64 	%rd5, %rd20;
-	cvta.to.global.u64 	%rd6, %rd18;
-	cvta.to.global.u64 	%rd7, %rd17;
-	cvta.to.global.u64 	%rd8, %rd16;
-	cvta.to.global.u64 	%rd9, %rd15;
-	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -149,61 +139,51 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd21, %rd10;
-	.loc 1 14 1
+	cvta.to.global.u64 	%rd12, %rd3;
+	cvta.to.global.u64 	%rd13, %rd2;
+	cvta.to.global.u64 	%rd14, %rd1;
+	cvta.to.global.u64 	%rd15, %rd10;
+	cvta.to.global.u64 	%rd16, %rd11;
+	cvta.to.global.u64 	%rd17, %rd9;
+	cvta.to.global.u64 	%rd18, %rd8;
+	cvta.to.global.u64 	%rd19, %rd7;
+	cvta.to.global.u64 	%rd20, %rd6;
+	cvta.to.global.u64 	%rd21, %rd4;
 	cvt.s64.s32	%rd22, %r1;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd21, %rd23;
-	cvta.to.global.u64 	%rd25, %rd11;
-	.loc 1 14 1
+	cvta.to.global.u64 	%rd25, %rd5;
 	add.s64 	%rd26, %rd25, %rd23;
-	add.s64 	%rd27, %rd9, %rd23;
-	.loc 1 15 1
-	add.s64 	%rd28, %rd8, %rd23;
-	add.s64 	%rd29, %rd7, %rd23;
-	add.s64 	%rd30, %rd6, %rd23;
-	.loc 1 16 1
-	add.s64 	%rd31, %rd5, %rd22;
+	add.s64 	%rd27, %rd20, %rd23;
+	add.s64 	%rd28, %rd19, %rd23;
+	add.s64 	%rd29, %rd18, %rd23;
+	add.s64 	%rd30, %rd17, %rd23;
+	add.s64 	%rd31, %rd16, %rd22;
 	ld.global.u8 	%rd32, [%rd31];
 	shl.b64 	%rd33, %rd32, 2;
-	add.s64 	%rd34, %rd4, %rd33;
-	.loc 1 15 1
+	add.s64 	%rd34, %rd15, %rd33;
 	ld.global.f32 	%f1, [%rd30];
-	.loc 1 14 1
 	ld.global.f32 	%f2, [%rd26];
-	.loc 1 18 1
 	mul.f32 	%f3, %f2, %f1;
-	.loc 1 15 1
 	ld.global.f32 	%f4, [%rd29];
-	.loc 1 14 1
 	ld.global.f32 	%f5, [%rd27];
-	.loc 1 18 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
-	.loc 1 15 1
 	ld.global.f32 	%f8, [%rd28];
-	.loc 1 18 1
 	mul.f32 	%f9, %f5, %f8;
-	.loc 1 14 1
 	ld.global.f32 	%f10, [%rd24];
-	.loc 1 18 1
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
-	.loc 1 16 1
 	ld.global.f32 	%f16, [%rd34];
-	.loc 1 19 1
 	fma.rn.f32 	%f17, %f16, %f16, 0f3F800000;
 	mov.f32 	%f18, 0fBF800000;
-	.loc 2 3608 3
 	div.rn.f32 	%f19, %f18, %f17;
-	.loc 1 20 1
 	mul.f32 	%f20, %f2, %f15;
 	mul.f32 	%f21, %f5, %f12;
 	sub.f32 	%f22, %f20, %f21;
@@ -219,25 +199,21 @@ const (
 	mul.f32 	%f32, %f19, %f29;
 	mul.f32 	%f33, %f19, %f30;
 	mul.f32 	%f34, %f19, %f31;
-	.loc 1 22 1
-	add.s64 	%rd35, %rd3, %rd23;
+	add.s64 	%rd35, %rd14, %rd23;
 	st.global.f32 	[%rd35], %f32;
-	.loc 1 23 1
-	add.s64 	%rd36, %rd2, %rd23;
+	add.s64 	%rd36, %rd13, %rd23;
 	st.global.f32 	[%rd36], %f33;
-	.loc 1 24 1
-	add.s64 	%rd37, %rd1, %rd23;
+	add.s64 	%rd37, %rd12, %rd23;
 	st.global.f32 	[%rd37], %f34;
 
 BB0_2:
-	.loc 1 26 2
 	ret;
 }
 
 
 `
 	lltorque_ptx_30 = `
-.version 3.2
+.version 4.1
 .target sm_30
 .address_size 64
 
@@ -263,28 +239,18 @@ BB0_2:
 	.reg .s64 	%rd<38>;
 
 
-	ld.param.u64 	%rd12, [lltorque_param_0];
-	ld.param.u64 	%rd13, [lltorque_param_1];
-	ld.param.u64 	%rd14, [lltorque_param_2];
-	ld.param.u64 	%rd10, [lltorque_param_3];
-	ld.param.u64 	%rd11, [lltorque_param_4];
-	ld.param.u64 	%rd15, [lltorque_param_5];
-	ld.param.u64 	%rd16, [lltorque_param_6];
-	ld.param.u64 	%rd17, [lltorque_param_7];
-	ld.param.u64 	%rd18, [lltorque_param_8];
-	ld.param.u64 	%rd19, [lltorque_param_9];
-	ld.param.u64 	%rd20, [lltorque_param_10];
+	ld.param.u64 	%rd1, [lltorque_param_0];
+	ld.param.u64 	%rd2, [lltorque_param_1];
+	ld.param.u64 	%rd3, [lltorque_param_2];
+	ld.param.u64 	%rd4, [lltorque_param_3];
+	ld.param.u64 	%rd5, [lltorque_param_4];
+	ld.param.u64 	%rd6, [lltorque_param_5];
+	ld.param.u64 	%rd7, [lltorque_param_6];
+	ld.param.u64 	%rd8, [lltorque_param_7];
+	ld.param.u64 	%rd9, [lltorque_param_8];
+	ld.param.u64 	%rd10, [lltorque_param_9];
+	ld.param.u64 	%rd11, [lltorque_param_10];
 	ld.param.u32 	%r2, [lltorque_param_11];
-	cvta.to.global.u64 	%rd1, %rd14;
-	cvta.to.global.u64 	%rd2, %rd13;
-	cvta.to.global.u64 	%rd3, %rd12;
-	cvta.to.global.u64 	%rd4, %rd19;
-	cvta.to.global.u64 	%rd5, %rd20;
-	cvta.to.global.u64 	%rd6, %rd18;
-	cvta.to.global.u64 	%rd7, %rd17;
-	cvta.to.global.u64 	%rd8, %rd16;
-	cvta.to.global.u64 	%rd9, %rd15;
-	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -292,61 +258,51 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd21, %rd10;
-	.loc 1 14 1
+	cvta.to.global.u64 	%rd12, %rd3;
+	cvta.to.global.u64 	%rd13, %rd2;
+	cvta.to.global.u64 	%rd14, %rd1;
+	cvta.to.global.u64 	%rd15, %rd10;
+	cvta.to.global.u64 	%rd16, %rd11;
+	cvta.to.global.u64 	%rd17, %rd9;
+	cvta.to.global.u64 	%rd18, %rd8;
+	cvta.to.global.u64 	%rd19, %rd7;
+	cvta.to.global.u64 	%rd20, %rd6;
+	cvta.to.global.u64 	%rd21, %rd4;
 	cvt.s64.s32	%rd22, %r1;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd21, %rd23;
-	cvta.to.global.u64 	%rd25, %rd11;
-	.loc 1 14 1
+	cvta.to.global.u64 	%rd25, %rd5;
 	add.s64 	%rd26, %rd25, %rd23;
-	add.s64 	%rd27, %rd9, %rd23;
-	.loc 1 15 1
-	add.s64 	%rd28, %rd8, %rd23;
-	add.s64 	%rd29, %rd7, %rd23;
-	add.s64 	%rd30, %rd6, %rd23;
-	.loc 1 16 1
-	add.s64 	%rd31, %rd5, %rd22;
+	add.s64 	%rd27, %rd20, %rd23;
+	add.s64 	%rd28, %rd19, %rd23;
+	add.s64 	%rd29, %rd18, %rd23;
+	add.s64 	%rd30, %rd17, %rd23;
+	add.s64 	%rd31, %rd16, %rd22;
 	ld.global.u8 	%rd32, [%rd31];
 	shl.b64 	%rd33, %rd32, 2;
-	add.s64 	%rd34, %rd4, %rd33;
-	.loc 1 15 1
+	add.s64 	%rd34, %rd15, %rd33;
 	ld.global.f32 	%f1, [%rd30];
-	.loc 1 14 1
 	ld.global.f32 	%f2, [%rd26];
-	.loc 1 18 1
 	mul.f32 	%f3, %f2, %f1;
-	.loc 1 15 1
 	ld.global.f32 	%f4, [%rd29];
-	.loc 1 14 1
 	ld.global.f32 	%f5, [%rd27];
-	.loc 1 18 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
-	.loc 1 15 1
 	ld.global.f32 	%f8, [%rd28];
-	.loc 1 18 1
 	mul.f32 	%f9, %f5, %f8;
-	.loc 1 14 1
 	ld.global.f32 	%f10, [%rd24];
-	.loc 1 18 1
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
-	.loc 1 16 1
 	ld.global.f32 	%f16, [%rd34];
-	.loc 1 19 1
 	fma.rn.f32 	%f17, %f16, %f16, 0f3F800000;
 	mov.f32 	%f18, 0fBF800000;
-	.loc 2 3608 3
 	div.rn.f32 	%f19, %f18, %f17;
-	.loc 1 20 1
 	mul.f32 	%f20, %f2, %f15;
 	mul.f32 	%f21, %f5, %f12;
 	sub.f32 	%f22, %f20, %f21;
@@ -362,25 +318,21 @@ BB0_2:
 	mul.f32 	%f32, %f19, %f29;
 	mul.f32 	%f33, %f19, %f30;
 	mul.f32 	%f34, %f19, %f31;
-	.loc 1 22 1
-	add.s64 	%rd35, %rd3, %rd23;
+	add.s64 	%rd35, %rd14, %rd23;
 	st.global.f32 	[%rd35], %f32;
-	.loc 1 23 1
-	add.s64 	%rd36, %rd2, %rd23;
+	add.s64 	%rd36, %rd13, %rd23;
 	st.global.f32 	[%rd36], %f33;
-	.loc 1 24 1
-	add.s64 	%rd37, %rd1, %rd23;
+	add.s64 	%rd37, %rd12, %rd23;
 	st.global.f32 	[%rd37], %f34;
 
 BB0_2:
-	.loc 1 26 2
 	ret;
 }
 
 
 `
 	lltorque_ptx_35 = `
-.version 3.2
+.version 4.1
 .target sm_35
 .address_size 64
 
@@ -395,7 +347,6 @@ BB0_2:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
-	.loc 2 66 3
 	ret;
 }
 
@@ -409,7 +360,47 @@ BB0_2:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
-	.loc 2 71 3
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
 	ret;
 }
 
@@ -435,28 +426,18 @@ BB0_2:
 	.reg .s64 	%rd<39>;
 
 
-	ld.param.u64 	%rd12, [lltorque_param_0];
-	ld.param.u64 	%rd13, [lltorque_param_1];
-	ld.param.u64 	%rd14, [lltorque_param_2];
-	ld.param.u64 	%rd10, [lltorque_param_3];
-	ld.param.u64 	%rd11, [lltorque_param_4];
-	ld.param.u64 	%rd15, [lltorque_param_5];
-	ld.param.u64 	%rd16, [lltorque_param_6];
-	ld.param.u64 	%rd17, [lltorque_param_7];
-	ld.param.u64 	%rd18, [lltorque_param_8];
-	ld.param.u64 	%rd19, [lltorque_param_9];
-	ld.param.u64 	%rd20, [lltorque_param_10];
+	ld.param.u64 	%rd1, [lltorque_param_0];
+	ld.param.u64 	%rd2, [lltorque_param_1];
+	ld.param.u64 	%rd3, [lltorque_param_2];
+	ld.param.u64 	%rd4, [lltorque_param_3];
+	ld.param.u64 	%rd5, [lltorque_param_4];
+	ld.param.u64 	%rd6, [lltorque_param_5];
+	ld.param.u64 	%rd7, [lltorque_param_6];
+	ld.param.u64 	%rd8, [lltorque_param_7];
+	ld.param.u64 	%rd9, [lltorque_param_8];
+	ld.param.u64 	%rd10, [lltorque_param_9];
+	ld.param.u64 	%rd11, [lltorque_param_10];
 	ld.param.u32 	%r2, [lltorque_param_11];
-	cvta.to.global.u64 	%rd1, %rd14;
-	cvta.to.global.u64 	%rd2, %rd13;
-	cvta.to.global.u64 	%rd3, %rd12;
-	cvta.to.global.u64 	%rd4, %rd19;
-	cvta.to.global.u64 	%rd5, %rd20;
-	cvta.to.global.u64 	%rd6, %rd18;
-	cvta.to.global.u64 	%rd7, %rd17;
-	cvta.to.global.u64 	%rd8, %rd16;
-	cvta.to.global.u64 	%rd9, %rd15;
-	.loc 1 11 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -464,63 +445,53 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_2;
+	@%p1 bra 	BB5_2;
 
-	cvta.to.global.u64 	%rd21, %rd10;
-	.loc 1 14 1
-	cvt.s64.s32	%rd22, %r1;
-	mul.wide.s32 	%rd23, %r1, 4;
-	add.s64 	%rd24, %rd21, %rd23;
-	cvta.to.global.u64 	%rd25, %rd11;
-	.loc 1 14 1
-	add.s64 	%rd26, %rd25, %rd23;
-	add.s64 	%rd27, %rd9, %rd23;
-	.loc 1 15 1
-	add.s64 	%rd28, %rd8, %rd23;
-	add.s64 	%rd29, %rd7, %rd23;
-	add.s64 	%rd30, %rd6, %rd23;
-	.loc 1 16 1
-	add.s64 	%rd31, %rd5, %rd22;
+	cvta.to.global.u64 	%rd12, %rd3;
+	cvta.to.global.u64 	%rd13, %rd2;
+	cvta.to.global.u64 	%rd14, %rd1;
+	cvta.to.global.u64 	%rd15, %rd10;
+	cvta.to.global.u64 	%rd16, %rd11;
+	cvta.to.global.u64 	%rd17, %rd9;
+	cvta.to.global.u64 	%rd18, %rd8;
+	cvta.to.global.u64 	%rd19, %rd7;
+	cvta.to.global.u64 	%rd20, %rd6;
+	cvta.to.global.u64 	%rd21, %rd5;
+	cvta.to.global.u64 	%rd22, %rd4;
+	cvt.s64.s32	%rd23, %r1;
+	mul.wide.s32 	%rd24, %r1, 4;
+	add.s64 	%rd25, %rd22, %rd24;
+	add.s64 	%rd26, %rd21, %rd24;
+	add.s64 	%rd27, %rd20, %rd24;
+	add.s64 	%rd28, %rd19, %rd24;
+	add.s64 	%rd29, %rd18, %rd24;
+	add.s64 	%rd30, %rd17, %rd24;
+	add.s64 	%rd31, %rd16, %rd23;
 	ld.global.nc.u8 	%rs1, [%rd31];
 	cvt.u64.u16	%rd32, %rs1;
 	and.b64  	%rd33, %rd32, 255;
 	shl.b64 	%rd34, %rd33, 2;
-	add.s64 	%rd35, %rd4, %rd34;
-	.loc 1 15 1
+	add.s64 	%rd35, %rd15, %rd34;
 	ld.global.nc.f32 	%f1, [%rd30];
-	.loc 1 14 1
 	ld.global.nc.f32 	%f2, [%rd26];
-	.loc 1 18 1
 	mul.f32 	%f3, %f2, %f1;
-	.loc 1 15 1
 	ld.global.nc.f32 	%f4, [%rd29];
-	.loc 1 14 1
 	ld.global.nc.f32 	%f5, [%rd27];
-	.loc 1 18 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
-	.loc 1 15 1
 	ld.global.nc.f32 	%f8, [%rd28];
-	.loc 1 18 1
 	mul.f32 	%f9, %f5, %f8;
-	.loc 1 14 1
-	ld.global.nc.f32 	%f10, [%rd24];
-	.loc 1 18 1
+	ld.global.nc.f32 	%f10, [%rd25];
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
-	.loc 1 16 1
 	ld.global.nc.f32 	%f16, [%rd35];
-	.loc 1 19 1
 	fma.rn.f32 	%f17, %f16, %f16, 0f3F800000;
 	mov.f32 	%f18, 0fBF800000;
-	.loc 3 3608 3
 	div.rn.f32 	%f19, %f18, %f17;
-	.loc 1 20 1
 	mul.f32 	%f20, %f2, %f15;
 	mul.f32 	%f21, %f5, %f12;
 	sub.f32 	%f22, %f20, %f21;
@@ -536,18 +507,14 @@ BB0_2:
 	mul.f32 	%f32, %f19, %f29;
 	mul.f32 	%f33, %f19, %f30;
 	mul.f32 	%f34, %f19, %f31;
-	.loc 1 22 1
-	add.s64 	%rd36, %rd3, %rd23;
+	add.s64 	%rd36, %rd14, %rd24;
 	st.global.f32 	[%rd36], %f32;
-	.loc 1 23 1
-	add.s64 	%rd37, %rd2, %rd23;
+	add.s64 	%rd37, %rd13, %rd24;
 	st.global.f32 	[%rd37], %f33;
-	.loc 1 24 1
-	add.s64 	%rd38, %rd1, %rd23;
+	add.s64 	%rd38, %rd12, %rd24;
 	st.global.f32 	[%rd38], %f34;
 
-BB2_2:
-	.loc 1 26 2
+BB5_2:
 	ret;
 }
 

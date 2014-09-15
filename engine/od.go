@@ -15,7 +15,7 @@ import (
 var (
 	outputdir string // Output directory
 	InputFile string
-	//fs        *httpfs.Client // abstract file system
+	fs        *httpfs.Client // abstract file system
 )
 
 func OD() string {
@@ -33,22 +33,22 @@ func InitIO(inputfile string, force bool) {
 	}
 
 	InputFile = inputfile
-	//	if !strings.HasPrefix(inputfile, "http://") {
-	//		mountLocalFS()
-	//		InputFile = inputfile
-	//	} else {
-	//		URL, err := url.Parse(inputfile)
-	//		split := strings.Split(URL.Path, "/")
-	//		if len(split) < 3 {
-	//			util.Fatal("invalid url:", inputfile)
-	//		}
-	//		baseHandler := "/" + split[1]
-	//		InputFile = URL.Path[len(baseHandler):]
-	//		util.Log("inputFile:", InputFile)
-	//		util.Log("dialing:", URL.Scheme+"://"+URL.Host+baseHandler)
-	//		fs, err = httpfs.Dial(URL.Scheme + "://" + URL.Host + baseHandler)
-	//		util.FatalErr(err)
-	//	}
+	if !strings.HasPrefix(inputfile, "http://") {
+		mountLocalFS()
+		InputFile = inputfile
+	} else {
+		URL, err := url.Parse(inputfile)
+		split := strings.Split(URL.Path, "/")
+		if len(split) < 3 {
+			util.Fatal("invalid url:", inputfile)
+		}
+		baseHandler := "/" + split[1]
+		InputFile = URL.Path[len(baseHandler):]
+		util.Log("inputFile:", InputFile)
+		util.Log("dialing:", URL.Scheme+"://"+URL.Host+baseHandler)
+		fs, err = httpfs.Dial(URL.Scheme + "://" + URL.Host + baseHandler)
+		util.FatalErr(err)
+	}
 
 	outputdir = util.NoExt(InputFile) + ".out/"
 	LogOut("output directory:", outputdir)

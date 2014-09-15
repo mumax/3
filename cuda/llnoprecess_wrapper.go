@@ -88,7 +88,7 @@ var llnoprecess_map = map[int]string{0: "",
 // llnoprecess PTX code for various compute capabilities.
 const (
 	llnoprecess_ptx_20 = `
-.version 4.1
+.version 3.2
 .target sm_20
 .address_size 64
 
@@ -112,16 +112,26 @@ const (
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd1, [llnoprecess_param_0];
-	ld.param.u64 	%rd2, [llnoprecess_param_1];
-	ld.param.u64 	%rd3, [llnoprecess_param_2];
-	ld.param.u64 	%rd4, [llnoprecess_param_3];
-	ld.param.u64 	%rd5, [llnoprecess_param_4];
-	ld.param.u64 	%rd6, [llnoprecess_param_5];
-	ld.param.u64 	%rd7, [llnoprecess_param_6];
-	ld.param.u64 	%rd8, [llnoprecess_param_7];
-	ld.param.u64 	%rd9, [llnoprecess_param_8];
+	ld.param.u64 	%rd10, [llnoprecess_param_0];
+	ld.param.u64 	%rd11, [llnoprecess_param_1];
+	ld.param.u64 	%rd12, [llnoprecess_param_2];
+	ld.param.u64 	%rd13, [llnoprecess_param_3];
+	ld.param.u64 	%rd14, [llnoprecess_param_4];
+	ld.param.u64 	%rd15, [llnoprecess_param_5];
+	ld.param.u64 	%rd16, [llnoprecess_param_6];
+	ld.param.u64 	%rd17, [llnoprecess_param_7];
+	ld.param.u64 	%rd18, [llnoprecess_param_8];
 	ld.param.u32 	%r2, [llnoprecess_param_9];
+	cvta.to.global.u64 	%rd1, %rd12;
+	cvta.to.global.u64 	%rd2, %rd11;
+	cvta.to.global.u64 	%rd3, %rd10;
+	cvta.to.global.u64 	%rd4, %rd18;
+	cvta.to.global.u64 	%rd5, %rd17;
+	cvta.to.global.u64 	%rd6, %rd16;
+	cvta.to.global.u64 	%rd7, %rd15;
+	cvta.to.global.u64 	%rd8, %rd14;
+	cvta.to.global.u64 	%rd9, %rd13;
+	.loc 1 10 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -129,40 +139,43 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 1 11 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd10, %rd3;
-	cvta.to.global.u64 	%rd11, %rd2;
-	cvta.to.global.u64 	%rd12, %rd1;
-	cvta.to.global.u64 	%rd13, %rd9;
-	cvta.to.global.u64 	%rd14, %rd8;
-	cvta.to.global.u64 	%rd15, %rd7;
-	cvta.to.global.u64 	%rd16, %rd6;
-	cvta.to.global.u64 	%rd17, %rd5;
-	cvta.to.global.u64 	%rd18, %rd4;
 	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd18, %rd19;
-	add.s64 	%rd21, %rd17, %rd19;
-	add.s64 	%rd22, %rd16, %rd19;
-	add.s64 	%rd23, %rd15, %rd19;
-	add.s64 	%rd24, %rd14, %rd19;
-	add.s64 	%rd25, %rd13, %rd19;
+	add.s64 	%rd20, %rd9, %rd19;
+	add.s64 	%rd21, %rd8, %rd19;
+	add.s64 	%rd22, %rd7, %rd19;
+	add.s64 	%rd23, %rd6, %rd19;
+	add.s64 	%rd24, %rd5, %rd19;
+	add.s64 	%rd25, %rd4, %rd19;
+	.loc 1 14 1
 	ld.global.f32 	%f1, [%rd25];
+	.loc 1 13 1
 	ld.global.f32 	%f2, [%rd21];
+	.loc 1 16 1
 	mul.f32 	%f3, %f2, %f1;
+	.loc 1 14 1
 	ld.global.f32 	%f4, [%rd24];
+	.loc 1 13 1
 	ld.global.f32 	%f5, [%rd22];
+	.loc 1 16 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
+	.loc 1 14 1
 	ld.global.f32 	%f8, [%rd23];
+	.loc 1 16 1
 	mul.f32 	%f9, %f5, %f8;
+	.loc 1 13 1
 	ld.global.f32 	%f10, [%rd20];
+	.loc 1 16 1
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
+	.loc 1 17 1
 	mul.f32 	%f16, %f2, %f15;
 	mul.f32 	%f17, %f5, %f12;
 	sub.f32 	%f18, %f16, %f17;
@@ -175,21 +188,25 @@ const (
 	neg.f32 	%f25, %f18;
 	neg.f32 	%f26, %f21;
 	neg.f32 	%f27, %f24;
-	add.s64 	%rd26, %rd12, %rd19;
+	add.s64 	%rd26, %rd3, %rd19;
+	.loc 1 19 1
 	st.global.f32 	[%rd26], %f25;
-	add.s64 	%rd27, %rd11, %rd19;
+	add.s64 	%rd27, %rd2, %rd19;
+	.loc 1 20 1
 	st.global.f32 	[%rd27], %f26;
-	add.s64 	%rd28, %rd10, %rd19;
+	add.s64 	%rd28, %rd1, %rd19;
+	.loc 1 21 1
 	st.global.f32 	[%rd28], %f27;
 
 BB0_2:
+	.loc 1 23 2
 	ret;
 }
 
 
 `
 	llnoprecess_ptx_30 = `
-.version 4.1
+.version 3.2
 .target sm_30
 .address_size 64
 
@@ -213,16 +230,26 @@ BB0_2:
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd1, [llnoprecess_param_0];
-	ld.param.u64 	%rd2, [llnoprecess_param_1];
-	ld.param.u64 	%rd3, [llnoprecess_param_2];
-	ld.param.u64 	%rd4, [llnoprecess_param_3];
-	ld.param.u64 	%rd5, [llnoprecess_param_4];
-	ld.param.u64 	%rd6, [llnoprecess_param_5];
-	ld.param.u64 	%rd7, [llnoprecess_param_6];
-	ld.param.u64 	%rd8, [llnoprecess_param_7];
-	ld.param.u64 	%rd9, [llnoprecess_param_8];
+	ld.param.u64 	%rd10, [llnoprecess_param_0];
+	ld.param.u64 	%rd11, [llnoprecess_param_1];
+	ld.param.u64 	%rd12, [llnoprecess_param_2];
+	ld.param.u64 	%rd13, [llnoprecess_param_3];
+	ld.param.u64 	%rd14, [llnoprecess_param_4];
+	ld.param.u64 	%rd15, [llnoprecess_param_5];
+	ld.param.u64 	%rd16, [llnoprecess_param_6];
+	ld.param.u64 	%rd17, [llnoprecess_param_7];
+	ld.param.u64 	%rd18, [llnoprecess_param_8];
 	ld.param.u32 	%r2, [llnoprecess_param_9];
+	cvta.to.global.u64 	%rd1, %rd12;
+	cvta.to.global.u64 	%rd2, %rd11;
+	cvta.to.global.u64 	%rd3, %rd10;
+	cvta.to.global.u64 	%rd4, %rd18;
+	cvta.to.global.u64 	%rd5, %rd17;
+	cvta.to.global.u64 	%rd6, %rd16;
+	cvta.to.global.u64 	%rd7, %rd15;
+	cvta.to.global.u64 	%rd8, %rd14;
+	cvta.to.global.u64 	%rd9, %rd13;
+	.loc 1 10 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -230,40 +257,43 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 1 11 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd10, %rd3;
-	cvta.to.global.u64 	%rd11, %rd2;
-	cvta.to.global.u64 	%rd12, %rd1;
-	cvta.to.global.u64 	%rd13, %rd9;
-	cvta.to.global.u64 	%rd14, %rd8;
-	cvta.to.global.u64 	%rd15, %rd7;
-	cvta.to.global.u64 	%rd16, %rd6;
-	cvta.to.global.u64 	%rd17, %rd5;
-	cvta.to.global.u64 	%rd18, %rd4;
 	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd18, %rd19;
-	add.s64 	%rd21, %rd17, %rd19;
-	add.s64 	%rd22, %rd16, %rd19;
-	add.s64 	%rd23, %rd15, %rd19;
-	add.s64 	%rd24, %rd14, %rd19;
-	add.s64 	%rd25, %rd13, %rd19;
+	add.s64 	%rd20, %rd9, %rd19;
+	add.s64 	%rd21, %rd8, %rd19;
+	add.s64 	%rd22, %rd7, %rd19;
+	add.s64 	%rd23, %rd6, %rd19;
+	add.s64 	%rd24, %rd5, %rd19;
+	add.s64 	%rd25, %rd4, %rd19;
+	.loc 1 14 1
 	ld.global.f32 	%f1, [%rd25];
+	.loc 1 13 1
 	ld.global.f32 	%f2, [%rd21];
+	.loc 1 16 1
 	mul.f32 	%f3, %f2, %f1;
+	.loc 1 14 1
 	ld.global.f32 	%f4, [%rd24];
+	.loc 1 13 1
 	ld.global.f32 	%f5, [%rd22];
+	.loc 1 16 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
+	.loc 1 14 1
 	ld.global.f32 	%f8, [%rd23];
+	.loc 1 16 1
 	mul.f32 	%f9, %f5, %f8;
+	.loc 1 13 1
 	ld.global.f32 	%f10, [%rd20];
+	.loc 1 16 1
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
+	.loc 1 17 1
 	mul.f32 	%f16, %f2, %f15;
 	mul.f32 	%f17, %f5, %f12;
 	sub.f32 	%f18, %f16, %f17;
@@ -276,21 +306,25 @@ BB0_2:
 	neg.f32 	%f25, %f18;
 	neg.f32 	%f26, %f21;
 	neg.f32 	%f27, %f24;
-	add.s64 	%rd26, %rd12, %rd19;
+	add.s64 	%rd26, %rd3, %rd19;
+	.loc 1 19 1
 	st.global.f32 	[%rd26], %f25;
-	add.s64 	%rd27, %rd11, %rd19;
+	add.s64 	%rd27, %rd2, %rd19;
+	.loc 1 20 1
 	st.global.f32 	[%rd27], %f26;
-	add.s64 	%rd28, %rd10, %rd19;
+	add.s64 	%rd28, %rd1, %rd19;
+	.loc 1 21 1
 	st.global.f32 	[%rd28], %f27;
 
 BB0_2:
+	.loc 1 23 2
 	ret;
 }
 
 
 `
 	llnoprecess_ptx_35 = `
-.version 4.1
+.version 3.2
 .target sm_35
 .address_size 64
 
@@ -305,6 +339,7 @@ BB0_2:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 66 3
 	ret;
 }
 
@@ -318,47 +353,7 @@ BB0_2:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
+	.loc 2 71 3
 	ret;
 }
 
@@ -381,16 +376,26 @@ BB0_2:
 	.reg .s64 	%rd<29>;
 
 
-	ld.param.u64 	%rd1, [llnoprecess_param_0];
-	ld.param.u64 	%rd2, [llnoprecess_param_1];
-	ld.param.u64 	%rd3, [llnoprecess_param_2];
-	ld.param.u64 	%rd4, [llnoprecess_param_3];
-	ld.param.u64 	%rd5, [llnoprecess_param_4];
-	ld.param.u64 	%rd6, [llnoprecess_param_5];
-	ld.param.u64 	%rd7, [llnoprecess_param_6];
-	ld.param.u64 	%rd8, [llnoprecess_param_7];
-	ld.param.u64 	%rd9, [llnoprecess_param_8];
+	ld.param.u64 	%rd10, [llnoprecess_param_0];
+	ld.param.u64 	%rd11, [llnoprecess_param_1];
+	ld.param.u64 	%rd12, [llnoprecess_param_2];
+	ld.param.u64 	%rd13, [llnoprecess_param_3];
+	ld.param.u64 	%rd14, [llnoprecess_param_4];
+	ld.param.u64 	%rd15, [llnoprecess_param_5];
+	ld.param.u64 	%rd16, [llnoprecess_param_6];
+	ld.param.u64 	%rd17, [llnoprecess_param_7];
+	ld.param.u64 	%rd18, [llnoprecess_param_8];
 	ld.param.u32 	%r2, [llnoprecess_param_9];
+	cvta.to.global.u64 	%rd1, %rd12;
+	cvta.to.global.u64 	%rd2, %rd11;
+	cvta.to.global.u64 	%rd3, %rd10;
+	cvta.to.global.u64 	%rd4, %rd18;
+	cvta.to.global.u64 	%rd5, %rd17;
+	cvta.to.global.u64 	%rd6, %rd16;
+	cvta.to.global.u64 	%rd7, %rd15;
+	cvta.to.global.u64 	%rd8, %rd14;
+	cvta.to.global.u64 	%rd9, %rd13;
+	.loc 1 10 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -398,40 +403,43 @@ BB0_2:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 1 11 1
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB5_2;
+	@%p1 bra 	BB2_2;
 
-	cvta.to.global.u64 	%rd10, %rd3;
-	cvta.to.global.u64 	%rd11, %rd2;
-	cvta.to.global.u64 	%rd12, %rd1;
-	cvta.to.global.u64 	%rd13, %rd9;
-	cvta.to.global.u64 	%rd14, %rd8;
-	cvta.to.global.u64 	%rd15, %rd7;
-	cvta.to.global.u64 	%rd16, %rd6;
-	cvta.to.global.u64 	%rd17, %rd5;
-	cvta.to.global.u64 	%rd18, %rd4;
 	mul.wide.s32 	%rd19, %r1, 4;
-	add.s64 	%rd20, %rd18, %rd19;
-	add.s64 	%rd21, %rd17, %rd19;
-	add.s64 	%rd22, %rd16, %rd19;
-	add.s64 	%rd23, %rd15, %rd19;
-	add.s64 	%rd24, %rd14, %rd19;
-	add.s64 	%rd25, %rd13, %rd19;
+	add.s64 	%rd20, %rd9, %rd19;
+	add.s64 	%rd21, %rd8, %rd19;
+	add.s64 	%rd22, %rd7, %rd19;
+	add.s64 	%rd23, %rd6, %rd19;
+	add.s64 	%rd24, %rd5, %rd19;
+	add.s64 	%rd25, %rd4, %rd19;
+	.loc 1 14 1
 	ld.global.nc.f32 	%f1, [%rd25];
+	.loc 1 13 1
 	ld.global.nc.f32 	%f2, [%rd21];
+	.loc 1 16 1
 	mul.f32 	%f3, %f2, %f1;
+	.loc 1 14 1
 	ld.global.nc.f32 	%f4, [%rd24];
+	.loc 1 13 1
 	ld.global.nc.f32 	%f5, [%rd22];
+	.loc 1 16 1
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
+	.loc 1 14 1
 	ld.global.nc.f32 	%f8, [%rd23];
+	.loc 1 16 1
 	mul.f32 	%f9, %f5, %f8;
+	.loc 1 13 1
 	ld.global.nc.f32 	%f10, [%rd20];
+	.loc 1 16 1
 	mul.f32 	%f11, %f10, %f1;
 	sub.f32 	%f12, %f9, %f11;
 	mul.f32 	%f13, %f10, %f4;
 	mul.f32 	%f14, %f2, %f8;
 	sub.f32 	%f15, %f13, %f14;
+	.loc 1 17 1
 	mul.f32 	%f16, %f2, %f15;
 	mul.f32 	%f17, %f5, %f12;
 	sub.f32 	%f18, %f16, %f17;
@@ -444,14 +452,18 @@ BB0_2:
 	neg.f32 	%f25, %f18;
 	neg.f32 	%f26, %f21;
 	neg.f32 	%f27, %f24;
-	add.s64 	%rd26, %rd12, %rd19;
+	add.s64 	%rd26, %rd3, %rd19;
+	.loc 1 19 1
 	st.global.f32 	[%rd26], %f25;
-	add.s64 	%rd27, %rd11, %rd19;
+	add.s64 	%rd27, %rd2, %rd19;
+	.loc 1 20 1
 	st.global.f32 	[%rd27], %f26;
-	add.s64 	%rd28, %rd10, %rd19;
+	add.s64 	%rd28, %rd1, %rd19;
+	.loc 1 21 1
 	st.global.f32 	[%rd28], %f27;
 
-BB5_2:
+BB2_2:
+	.loc 1 23 2
 	ret;
 }
 

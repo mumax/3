@@ -182,11 +182,15 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 
 
-{{.Data.Div "plot"}}
+{{.Data.Div "gnuplot"}}
 <p title="{{$.Data.Doc "TableAutoSave"}}">
-	TableAutosave: {{.TextBox "tableAutoSave" "0" }} ) s 
+	TableAutosave: {{.TextBox "tableAutoSave" "0" }}  s 
 </p>
-	{{.Img "plot" "/plot/" "alt=\"plot\""}}
+		Plot of "table.txt", provided table is being autosaved and gnuplot installed.<br>
+		<b>plot "table.txt" using {{.TextBox "usingx" "1"}} : {{.TextBox "usingy" "2"}} with lines </b><br/>
+		<p class=ErrorBox>{{.Span "plotErr" ""}}</p>
+		{{.Img "plot" "/plot/"}}
+
 </div>
 
 

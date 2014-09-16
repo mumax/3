@@ -1,6 +1,6 @@
 {{.Include "head.html"}}
 
-<h1>mumax 3.5 examples</h1>
+<h1>mumax 3.6 examples</h1>
 
 <p>These are example input scripts, the full API can be found <a href="http://mumax.github.io/api.html">here</a>.</p>
 
@@ -614,14 +614,14 @@ for i:=0; i<256; i++{
 m = uniform(0, 0, 1)
 
 // Gaussian external field profile
-mask := newslice(3, Nx, Ny, 1)
+mask := newVectorMask(Nx, Ny, 1)
 for i:=0; i<Nx; i++{
 	for j:=0; j<Ny; j++{
 		r := index2coord(i, j, 0)
 		x := r.X()
 		y := r.Y()
-		B := exp(-pow((x-500e-9)/100e-9, 2)) * exp(-pow(y/250e-9, 2))
-		mask.set(2, i, j, 0, B)
+		Bz := exp(-pow((x-500e-9)/100e-9, 2)) * exp(-pow(y/250e-9, 2))
+		mask.setVector(i, j, 0, vector(0, 0, Bz))
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const VERSION = "mumax 3.6 alpha"
+const VERSION = "mumax 3.6 beta"
 
 var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
 

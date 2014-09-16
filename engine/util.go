@@ -25,12 +25,22 @@ func init() {
 	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a data file (ovf or dump)")
 	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")
-	DeclFunc("NewSlice", NewSlice, "Makes a 3D array of scalars with given x,y,z size")
+	DeclFunc("NewSlice", NewSlice, "Makes a 4D array of scalars with given ncomp,x,y,z size")
+	DeclFunc("NewVectorMask", NewVectorMask, "Makes a 3D array of vectors")
+	DeclFunc("NewScalarMask", NewScalarMask, "Makes a 3D array of scalars")
 }
 
 // Returns a new new slice (3D array) with given number of components and size.
 func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
 	return data.NewSlice(ncomp, [3]int{Nx, Ny, Nz})
+}
+
+func NewVectorMask(Nx, Ny, Nz int) *data.Slice {
+	return data.NewSlice(3, [3]int{Nx, Ny, Nz})
+}
+
+func NewScalarMask(Nx, Ny, Nz int) *data.Slice {
+	return data.NewSlice(1, [3]int{Nx, Ny, Nz})
 }
 
 // Constructs a vector

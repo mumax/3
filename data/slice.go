@@ -279,6 +279,17 @@ func (s *Slice) Set(comp, ix, iy, iz int, value float64) {
 	s.Host()[comp][s.Index(ix, iy, iz)] = float32(value)
 }
 
+func (s *Slice) SetVector(ix, iy, iz int, v Vector) {
+	i := s.Index(ix, iy, iz)
+	for c := range v {
+		s.Host()[c][i] = float32(v[c])
+	}
+}
+
+func (s *Slice) SetScalar(ix, iy, iz int, v float64) {
+	s.Host()[0][s.Index(ix, iy, iz)] = float32(v)
+}
+
 func (s *Slice) Get(comp, ix, iy, iz int) float64 {
 	s.checkComp(comp)
 	return float64(s.Host()[comp][s.Index(ix, iy, iz)])

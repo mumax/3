@@ -12,6 +12,8 @@ const templText = `
 
 ` + CSS + `
 
+	<script> ; </script>
+
 	{{.JS}}
 
 	<script>
@@ -54,7 +56,7 @@ const templText = `
 	}
 
 	// CLI history
-	var history = new Array();
+	var clihistory = new Array();
 	var histindex = 0;
 
 	function clikeydown(event){
@@ -65,16 +67,16 @@ const templText = `
 			var backup = cli.value;
 			cli.value = "";
 			// history code goes last: prevent flackyness of messing up what came before
-			history.push(backup);
-			histindex = history.length;
+			clihistory.push(backup);
+			histindex = clihistory.length;
 		}
 		if (key == 38){ // up key
 			if (histindex > 0) { histindex--; }
-			if (history[histindex] != undefined) { cli.value = history[histindex]; }
+			if (clihistory[histindex] != undefined) { cli.value = clihistory[histindex]; }
 		}
 		if (key == 40){ // down key
-			if (histindex < history.length-1) { histindex++; }
-			if (history[histindex] != undefined) { cli.value = history[histindex]; }
+			if (histindex < clihistory.length-1) { histindex++; }
+			if (clihistory[histindex] != undefined) { cli.value = clihistory[histindex]; }
 		}
 	}	
 </script>

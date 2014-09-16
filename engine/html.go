@@ -61,10 +61,12 @@ const templText = `
 		var cli = document.getElementById('cli');
 		var key = event.keyCode;
 		if (key == 13 && cli.value != ""){ // return key
-			history.push(cli.value);
-			histindex = history.length;
 			notifyel('cli', 'value');
+			var backup = cli.value;
 			cli.value = "";
+			// history code goes last: prevent flackyness of messing up what came before
+			history.push(backup);
+			histindex = history.length;
 		}
 		if (key == 38){ // up key
 			if (histindex > 0) { histindex--; }

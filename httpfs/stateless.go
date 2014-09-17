@@ -1,8 +1,9 @@
 package httpfs
 
-/*
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -37,7 +38,7 @@ func Remove(URL string) error {
 	}
 }
 
-func Read(URL string) (io.ReadCloser, error) {
+func Read(URL string) ([]byte, error) {
 	if isRemote(URL) {
 		return httpRead(URL)
 	} else {
@@ -45,11 +46,11 @@ func Read(URL string) (io.ReadCloser, error) {
 	}
 }
 
-func Append(URL string) (io.WriteCloser, error) {
+func Append(URL string, p []byte) error {
 	if isRemote(URL) {
-		return httpAppend(URL)
+		return httpAppend(URL, p)
 	} else {
-		return localAppend(URL)
+		return localAppend(URL, p)
 	}
 }
 
@@ -83,6 +84,7 @@ func Handle() {
 	}
 }
 
+// general handler func for file name, input data and response writer.
 type handlerFunc func(fname string, data []byte, w io.Writer) error
 
 func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
@@ -97,7 +99,7 @@ func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
-		log.Println("server:", prefix, fname, len(data), "payload")
+		log.Println("server:", prefix, fname, len(data), "B payload")
 
 		err2 := f(fname, data, w)
 		if err2 != nil {
@@ -136,16 +138,16 @@ func handleRemove(fname string, data []byte, w io.Writer) error {
 	return localRemove(fname)
 }
 
-func do(a action, URL string, body io.Reader) (resp io.ReadCloser, err error) {
+func do(a action, URL string, body []byte) (resp []byte, err error) {
 	u, err := url.Parse(URL)
 	u.Path = string(a) + "/" + u.Path
-	response, errR := http.Post(u.String(), "data", body)
+	response, errR := http.Post(u.String(), "data", bytes.NewReader(body))
 	if errR != nil {
 		return nil, mkErr(a, URL, errR)
 	}
-	//defer response.Body.Close()
+	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return nil, mkErr(a, URL, response.Status+":"+readBody(response))
+		return nil, mkErr(a, URL, errors.New(response.Status+":"+readBody(response.Body)))
 	}
 	resp, err = ioutil.ReadAll(response.Body)
 	err = mkErr(a, URL, err)
@@ -188,15 +190,12 @@ func httpLs(URL string) (ls []string, err error) {
 	return ls, nil
 }
 
-func httpAppend(URL string) (io.WriteCloser, error) {
-	w, err := do(APPEND, URL, data)
-	if err != nil {
-		return nil, err
-	}
-
+func httpAppend(URL string, data []byte) error {
+	_, err := do(APPEND, URL, data)
+	return err
 }
 
-func httpRead(URL string) (io.ReadCloser, error) {
+func httpRead(URL string) ([]byte, error) {
 	return do(READ, URL, nil)
 }
 
@@ -231,12 +230,10 @@ func localAppend(fname string, data []byte) error {
 	return err2
 }
 
-func localRead(fname string) (io.ReadCloser, error) {
-	return os.Open(fname)
+func localRead(fname string) ([]byte, error) {
+	return ioutil.ReadFile(fname)
 }
 
 func localRemove(fname string) error {
 	return os.RemoveAll(fname)
 }
-
-*/

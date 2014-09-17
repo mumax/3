@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
+	"io"
 	"os"
 )
 
 var (
-	hist    string       // console history for GUI
-	logfile *httpfs.File // saves history of input commands +  output
+	hist    string         // console history for GUI
+	logfile io.WriteCloser // saves history of input commands +  output
 )
 
 // Special error that is not fatal when paniced on and called from GUI
@@ -57,7 +58,7 @@ func initLog() {
 	}
 	// open log file and flush what was logged before the file existed
 	var err error
-	logfile, err = fs.Create(OD() + "log.txt")
+	logfile, err = httpfs.Create(OD() + "log.txt")
 	util.FatalErr(err)
 	logfile.Write(([]byte)(hist))
 	logfile.Write([]byte{'\n'})

@@ -11,9 +11,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"strings"
 )
 
+// Creates the directory at specified URL (or local file),
+// creating all needed parent directories as well.
 func Mkdir(URL string) error {
 	if isRemote(URL) {
 		return httpMkdir(URL)
@@ -80,7 +83,7 @@ func Handle() {
 		RM:     handleRemove,
 	}
 	for k, v := range m {
-		http.HandleFunc(string(k)+"/", newHandler(k, v))
+		http.HandleFunc("/"+string(k)+"/", newHandler(k, v))
 	}
 }
 
@@ -91,20 +94,20 @@ func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//defer r.Body.Close()
-		fname := r.URL.Path[len(prefix)+1:]
+		fname := r.URL.Path[len(prefix)+2:] // strip "/prefix/"
 		data, err := ioutil.ReadAll(r.Body)
+
+		log.Println("server:", prefix, fname, len(data), "B payload")
 
 		if err != nil {
 			log.Println("httpfs", prefix, fname, ":", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
-		log.Println("server:", prefix, fname, len(data), "B payload")
-
 		err2 := f(fname, data, w)
 		if err2 != nil {
 			log.Println("httpfs", prefix, fname, ":", err2)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err2.Error(), http.StatusInternalServerError)
 		}
 	}
 }
@@ -140,14 +143,14 @@ func handleRemove(fname string, data []byte, w io.Writer) error {
 
 func do(a action, URL string, body []byte) (resp []byte, err error) {
 	u, err := url.Parse(URL)
-	u.Path = string(a) + "/" + u.Path
+	u.Path = string(a) + path.Clean("/"+u.Path)
 	response, errR := http.Post(u.String(), "data", bytes.NewReader(body))
 	if errR != nil {
 		return nil, mkErr(a, URL, errR)
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return nil, mkErr(a, URL, errors.New(response.Status+":"+readBody(response.Body)))
+		return nil, errors.New("do " + u.String() + ":" + response.Status + ":" + readBody(response.Body))
 	}
 	resp, err = ioutil.ReadAll(response.Body)
 	err = mkErr(a, URL, err)
@@ -206,7 +209,9 @@ func httpRemove(URL string) error {
 
 // client-side, local server
 
-func localMkdir(fname string) error { return os.Mkdir(fname, 0777) }
+func localMkdir(fname string) error {
+	return os.MkdirAll(fname, 0777)
+}
 
 func localLs(fname string) ([]string, error) {
 	f, err := os.Open(fname)

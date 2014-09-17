@@ -15,7 +15,6 @@ import (
 var (
 	outputdir string // Output directory
 	InputFile string
-	fs        *httpfs.Client // abstract file system
 )
 
 func OD() string {

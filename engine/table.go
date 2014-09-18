@@ -1,12 +1,12 @@
 package engine
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"io"
+	"time"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
@@ -21,12 +21,30 @@ func init() {
 }
 
 type DataTable struct {
-	*bufio.Writer
-	file io.Closer
+	output interface {
+		io.Writer
+		Flush() error
+	}
 	info
 	outputs []TableData
 	autosave
-	history [][][]float64 // history for plot, indexed by: quantity, component, row
+	history   [][][]float64 // history for plot, indexed by: quantity, component, row
+	lastFlush time.Time
+}
+
+func (t *DataTable) Write(p []byte) (int, error) {
+	n, err := t.output.Write(p)
+	util.FatalErr(err)
+	return n, err
+}
+
+func (t *DataTable) Flush() error {
+	if t.output == nil {
+		return nil
+	}
+	err := t.output.Flush()
+	util.FatalErr(err)
+	return err
 }
 
 func newTable(name string) *DataTable {
@@ -84,7 +102,7 @@ func (t *DataTable) Save() {
 		}
 	}
 	fmt.Fprintln(t)
-	t.Flush()
+	//t.Flush()
 	t.count++
 }
 
@@ -102,8 +120,7 @@ func (t *DataTable) init() {
 	if !t.inited() {
 		f, err := httpfs.Create(OD() + t.name + ".txt")
 		util.FatalErr(err)
-		t.Writer = bufio.NewWriter(f)
-		t.file = f // so we can close it
+		t.output = f
 
 		// write header
 		fmt.Fprint(t, "# t (s)")
@@ -129,21 +146,23 @@ func (t *DataTable) init() {
 }
 
 func (t *DataTable) inited() bool {
-	return t.Writer != nil
+	return t.output != nil
 }
 
 func (t *DataTable) flush() {
-	if t.Writer != nil {
+	now := time.Now()
+	if now.Sub(t.lastFlush) > 1*time.Second {
+		t.lastFlush = now
 		t.Flush()
 	}
 }
 
-func (t *DataTable) close() {
-	t.flush()
-	if t.file != nil {
-		t.file.Close()
-	}
-}
+//func (t *DataTable) close() {
+//	t.flush()
+//	if t.file != nil {
+//		t.file.Close()
+//	}
+//}
 
 // can be saved in table
 type TableData interface {

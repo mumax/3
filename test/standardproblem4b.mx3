@@ -15,7 +15,7 @@
 
 // relax
 	relax()
-	TOL := 1e-4
+	TOL := 1e-3
 	expectv("m", m.average(), vector(0.9669684171676636, 0.1252732276916504, 0), TOL)
 
 // reversal

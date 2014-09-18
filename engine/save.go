@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
@@ -79,24 +78,22 @@ func snapshot_sync(fname string, output *data.Slice) {
 // synchronous save
 func saveAs_sync(fname string, s *data.Slice, info data.Meta, format OutputFormat) {
 	f, err := httpfs.Create(fname)
+	defer f.Close()
 	util.FatalErr(err)
-	out := bufio.NewWriter(f)
 
 	switch format {
 	case OVF1_TEXT:
-		oommf.WriteOVF1(out, s, info, "text")
+		oommf.WriteOVF1(f, s, info, "text")
 	case OVF1_BINARY:
-		oommf.WriteOVF1(out, s, info, "binary 4")
+		oommf.WriteOVF1(f, s, info, "binary 4")
 	case OVF2_TEXT:
-		oommf.WriteOVF2(out, s, info, "text")
+		oommf.WriteOVF2(f, s, info, "text")
 	case OVF2_BINARY:
-		oommf.WriteOVF2(out, s, info, "binary 4")
+		oommf.WriteOVF2(f, s, info, "binary 4")
 	default:
 		panic("invalid output format")
 	}
 
-	out.Flush()
-	f.Close()
 }
 
 type OutputFormat int

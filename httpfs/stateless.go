@@ -15,6 +15,8 @@ import (
 	"strings"
 )
 
+var Logging = false
+
 // Creates the directory at specified URL (or local file),
 // creating all needed parent directories as well.
 func Mkdir(URL string) error {
@@ -85,6 +87,7 @@ func Handle() {
 	for k, v := range m {
 		http.HandleFunc("/"+string(k)+"/", newHandler(k, v))
 	}
+	http.Handle("/fs/", http.StripPrefix("/fs/", http.FileServer(http.Dir("."))))
 }
 
 // general handler func for file name, input data and response writer.
@@ -93,20 +96,23 @@ type handlerFunc func(fname string, data []byte, w io.Writer) error
 func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		//log.Println("SLEEPING")
+		//time.Sleep(50 * time.Millisecond)
+
 		//defer r.Body.Close()
 		fname := r.URL.Path[len(prefix)+2:] // strip "/prefix/"
 		data, err := ioutil.ReadAll(r.Body)
 
-		log.Println("server:", prefix, fname, len(data), "B payload")
+		Log("httpfs req:", prefix, fname, len(data), "B payload")
 
 		if err != nil {
-			log.Println("httpfs", prefix, fname, ":", err)
+			Log("httpfs err:", prefix, fname, ":", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 		err2 := f(fname, data, w)
 		if err2 != nil {
-			log.Println("httpfs", prefix, fname, ":", err2)
+			Log("httpfs err:", prefix, fname, ":", err2)
 			http.Error(w, err2.Error(), http.StatusInternalServerError)
 		}
 	}
@@ -241,4 +247,10 @@ func localRead(fname string) ([]byte, error) {
 
 func localRemove(fname string) error {
 	return os.RemoveAll(fname)
+}
+
+func Log(msg ...interface{}) {
+	if Logging {
+		log.Println(msg...)
+	}
 }

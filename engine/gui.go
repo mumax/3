@@ -529,7 +529,7 @@ func (g *guistate) Div(heading string) string {
 	return fmt.Sprintf(`<span title="Click to show/hide" style="cursor:pointer; font-size:1.2em; font-weight:bold; color:gray" onclick="toggle('%v')">&dtrif; %v</span> <br/> <div id="%v">`, id, heading, id)
 }
 
-func GoServe(addr string) (actualAddr string) {
+func GoServe(addr string) string {
 	gui_.PrepareServer()
 	l, err := net.Listen("tcp", addr)
 	for err != nil {
@@ -538,7 +538,7 @@ func GoServe(addr string) (actualAddr string) {
 		l, err = net.Listen("tcp", addr)
 	}
 	go func() { util.LogErr(http.Serve(l, nil)) }()
-	return actualAddr
+	return addr
 }
 
 func atoi(a string) int {

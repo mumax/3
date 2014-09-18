@@ -226,7 +226,7 @@ func localLs(fname string) ([]string, error) {
 }
 
 func localAppend(fname string, data []byte) error {
-	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}

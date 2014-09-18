@@ -6,6 +6,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"path"
@@ -69,7 +70,7 @@ func Snapshot(q Quantity) {
 
 // synchronous snapshot
 func snapshot_sync(fname string, output *data.Slice) {
-	f, err := fs.Create(fname)
+	f, err := httpfs.Create(fname)
 	util.FatalErr(err)
 	defer f.Close()
 	draw.RenderFormat(f, output, "auto", "auto", arrowSize, path.Ext(fname))
@@ -77,7 +78,7 @@ func snapshot_sync(fname string, output *data.Slice) {
 
 // synchronous save
 func saveAs_sync(fname string, s *data.Slice, info data.Meta, format OutputFormat) {
-	f, err := fs.Create(fname)
+	f, err := httpfs.Create(fname)
 	util.FatalErr(err)
 	out := bufio.NewWriter(f)
 

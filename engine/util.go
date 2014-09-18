@@ -5,11 +5,11 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/dump"
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"math"
-	"os"
 	"path"
 	"sort"
 	"strings"
@@ -70,16 +70,13 @@ func Fprintln(filename string, msg ...interface{}) {
 	if !path.IsAbs(filename) {
 		filename = OD() + filename
 	}
-	f, err := fs.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
-	util.FatalErr(err)
-	defer f.Close()
-	_, err = fmt.Fprintln(f, myFmt(msg)...)
+	err := httpfs.Append(filename, []byte(fmt.Sprintln(myFmt(msg)...)))
 	util.FatalErr(err)
 }
 
 // Read a magnetization state from .dump file.
 func LoadFile(fname string) *data.Slice {
-	in, err := fs.Open(fname)
+	in, err := httpfs.Open(fname)
 	util.FatalErr(err)
 	var s *data.Slice
 	if path.Ext(fname) == ".dump" {

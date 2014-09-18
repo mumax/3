@@ -3,12 +3,13 @@ package engine
 // declare functionality for interpreted input scripts
 
 import (
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"reflect"
 )
 
 func CompileFile(fname string) (*script.BlockStmt, error) {
-	bytes, err := fs.ReadFile(fname)
+	bytes, err := httpfs.Read(fname)
 	if err != nil {
 		return nil, err
 	}

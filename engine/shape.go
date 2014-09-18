@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 	"image"
 	_ "image/jpeg"
@@ -138,7 +139,7 @@ func universe(x, y, z float64) bool {
 }
 
 func ImageShape(fname string) Shape {
-	r, err1 := fs.Open(fname)
+	r, err1 := httpfs.Open(fname)
 	CheckRecoverable(err1)
 	defer r.Close()
 	img, _, err2 := image.Decode(r)

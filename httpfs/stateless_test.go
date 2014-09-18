@@ -46,6 +46,9 @@ func TestStatelessRead(t *testing.T) {
 }
 
 func TestStatelessAppend(t *testing.T) {
+	if err := Mkdir(testURL + "testdata/delete/bla/bla/"); err != nil {
+		t.Error(err)
+	}
 	if err := Append(testURL+"testdata/delete/bla/bla/file", []byte("hello world")); err != nil {
 		t.Error(err)
 	}

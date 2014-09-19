@@ -531,13 +531,28 @@ func (g *guistate) Div(heading string) string {
 
 func GoServe(addr string) string {
 	gui_.PrepareServer()
+
+	// find a free port starting from the usual number
 	l, err := net.Listen("tcp", addr)
 	for err != nil {
 		h, p, _ := net.SplitHostPort(addr)
 		addr = fmt.Sprint(h, ":", atoi(p)+1)
 		l, err = net.Listen("tcp", addr)
 	}
-	go func() { util.LogErr(http.Serve(l, nil)) }()
+	l.Close()
+	// brief but unlikely race opportunity here
+
+	// Listen and serve on all interfaces
+	go func() {
+		_, p, err := net.SplitHostPort(addr)
+		util.FatalErr(err)
+		ips := util.InterfaceAddrs()
+		for _, ip := range ips {
+			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
+		}
+
+		util.FatalErr(http.ListenAndServe(addr, nil))
+	}()
 	return addr
 }
 

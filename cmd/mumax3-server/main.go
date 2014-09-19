@@ -42,7 +42,6 @@ func main() {
 
 	node = &Node{
 		Addr:         laddr,
-		RootDir:      "./",
 		upSince:      time.Now(),
 		MumaxVersion: DetectMumax(),
 		GPUs:         DetectGPUs(),
@@ -57,8 +56,7 @@ func main() {
 	http.HandleFunc("/call/", node.HandleRPC)
 	http.HandleFunc("/do/", node.HandleHumanRPC)
 	http.HandleFunc("/", node.HandleStatus)
-	node.FSServer = httpfs.NewServer(node.RootDir, "/fs/")
-	http.Handle("/fs/", node.FSServer)
+	httpfs.Handle()
 
 	go func() {
 		log.Println("serving at", laddr)

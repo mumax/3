@@ -126,11 +126,7 @@ Uptime: {{.Uptime}} <br/>
 </p>
 
 <h2>HTTPFS service</h2><p>
-<b>Storage root:</b> <a href="http://{{.Addr}}/fs/">{{.RootDir}}</a>
-<br/><b>Open Files:</b><br/>
-{{range .FSServer.LsOF}}
-	{{.}}<br/>
-{{end}}
+	:-)
 </p>
 
 

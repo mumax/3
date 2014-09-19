@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"path"
 	"strings"
 	"time"
 )
@@ -76,12 +75,12 @@ func (n *Node) AddJob(fname string) {
 	defer n.unlock()
 	//log.Println("Push job:", fname)
 
-	if path.IsAbs(fname) {
-		if !strings.HasPrefix(fname, n.RootDir) {
-			panic("AddJob " + fname + ": not in root: " + n.RootDir) // TODO: handle gracefully
-		}
-		fname = fname[len(n.RootDir):] // strip root prefix
-	}
+	//	if path.IsAbs(fname) {
+	//		if !strings.HasPrefix(fname, n.RootDir) {
+	//			panic("AddJob " + fname + ": not in root: " + n.RootDir) // TODO: handle gracefully
+	//		}
+	//		fname = fname[len(n.RootDir):] // strip root prefix
+	//	}
 
 	split := strings.Split(fname, "/")
 	first := ""

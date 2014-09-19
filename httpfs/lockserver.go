@@ -54,7 +54,6 @@ func (l *LockServer) Lock(owner, key string) (ok bool) {
 		l.leases[key] = &lease{owner: owner, t: now}
 		return true
 	}
-
 }
 
 // remove expired leases. a run is linear in the total number of leases,

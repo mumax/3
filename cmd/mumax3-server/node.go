@@ -5,16 +5,12 @@ import (
 	"reflect"
 	"sync"
 	"time"
-
-	"github.com/mumax/3/httpfs"
 )
 
 type Node struct {
 	Addr         string // canonical (unique) address of node, read-only
-	RootDir      string // httpfs storage root
 	MumaxVersion string
 	upSince      time.Time
-	FSServer     *httpfs.Server
 
 	// compute service
 	GPUs        []GPU

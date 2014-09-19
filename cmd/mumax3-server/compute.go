@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
+	"io"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
-
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 )
 
 // Runs a compute service on this node, if GPUs are available.
@@ -20,7 +20,7 @@ func (n *Node) RunComputeService() {
 		return
 	}
 
-	// stack of available GPU numbers
+	// queue of available GPU numbers
 	idle := make(chan int, len(n.GPUs))
 	for i := range n.GPUs {
 		idle <- i
@@ -50,7 +50,7 @@ func (n *Node) RunComputeService() {
 			n.unlock()
 
 			status := runJob(job)
-			n.FSServer.CloseAll(JobOutputDir(JobInputFile(job.URL)))
+			//n.FSServer.CloseAll(JobOutputDir(JobInputFile(job.URL)))
 
 			// remove from "running" list
 			n.lock()
@@ -110,7 +110,7 @@ func (n *Node) KillJob(url string) error {
 }
 
 // prepare exec.Cmd to run mumax3 compute process
-func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, *httpfs.File) {
+func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, io.WriteCloser) {
 	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
@@ -120,14 +120,9 @@ func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, *httpfs.F
 	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inputURL)
 
 	// Pipe stdout, stderr to log file over httpfs
-	fs, errFS := httpfs.Dial("http://" + JobHost(inputURL) + "/fs")
-	if errFS != nil {
-		log.Println(errFS)
-		return nil, nil
-	}
 	outDir := util.NoExt(JobInputFile(inputURL)) + ".out"
-	fs.Mkdir(outDir, 0777)
-	out, errD := fs.Create(outDir + "/stdout.txt")
+	httpfs.Mkdir(outDir)
+	out, errD := httpfs.Create(outDir + "/stdout.txt")
 	if errD != nil {
 		log.Println(errD)
 		return nil, nil

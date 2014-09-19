@@ -1,17 +1,17 @@
 package main
 
 import (
+	"github.com/mumax/3/util"
 	"net/url"
 	"os/exec"
 	"strings"
 	"time"
-
-	"github.com/mumax/3/util"
 )
 
 // compute Job
 type Job struct {
-	URL       string    // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
+	URL string // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
+	// all of this is cache:
 	outputURL string    // URL of the output directory, access via OutputURL()
 	Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
 	GPU       int       // GPU number on the compute node that runs/ran this job, if any
@@ -47,7 +47,9 @@ func (j *Job) Path() string {
 	return j.URL[len("http://"):]
 }
 
-func NewJob(URL string) Job { return Job{URL: URL} }
+func NewJob(URL string) Job {
+	return Job{URL: URL}
+}
 
 // Returns how long this job has been running
 func (j *Job) Runtime() time.Duration {

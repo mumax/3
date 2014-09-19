@@ -5,24 +5,31 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"time"
 )
 
 var (
-	templ = template.Must(template.New("status").Parse(templText))
+	templ   = template.Must(template.New("status").Parse(templText))
+	upSince = time.Now()
 )
 
-func (n *Node) HandleStatus(w http.ResponseWriter, r *http.Request) {
-	n.lock()
-	defer n.unlock()
-	err := templ.Execute(w, node)
+func HandleStatus(w http.ResponseWriter, r *http.Request) {
+	RLock()
+	defer RUnLock()
+	err := templ.Execute(w, &status{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func (n *Node) IPRange() string {
-	return *flag_scan + ": " + *flag_ports
-}
+type status struct{} // dummy type to define template methods on
+
+func (*status) IPRange() string              { return *flag_scan + ": " + *flag_ports }
+func (*status) ThisAddr() string             { return thisAddr }
+func (*status) Uptime() time.Duration        { return Since(time.Now(), upSince) }
+func (*status) MumaxVersion() string         { return MumaxVersion }
+func (*status) GPUs() []string               { return GPUs }
+func (*status) RunningHere() map[string]*Job { return RunningHere }
 
 const templText = `
 
@@ -60,7 +67,7 @@ const templText = `
 
 <body>
 
-<h1>{{.Addr}}</h1>
+<h1>{{.ThisAddr}}</h1>
 
 Uptime: {{.Uptime}} <br/>
 

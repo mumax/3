@@ -1,115 +1,131 @@
 package main
 
 import (
-	"math"
+	"os"
+	"path/filepath"
 	"strings"
-	"time"
 )
+
+/*
+Queue service scans the working directory for job files,
+decides which job to hand out to free compute node.
+
+The working directory should contain per-user subdirectories. E.g.:
+	arne/
+	bartel/
+	...
+
+*/
+
+var (
+	Jobs map[string][]*Job // maps user -> joblist
+	//Users  map[string]*User
+)
+
+// (Re-)load all jobs in the working directory.
+func LoadJobs() {
+	dir, err := os.Open(".")
+	Fatal(err)
+	subdirs, err2 := dir.Readdir(-1)
+	Fatal(err2)
+
+	for _, d := range subdirs {
+		if d.IsDir() {
+			LoadUserJobs(d.Name())
+		}
+	}
+}
+
+// (Re-)load all jobs in the user's subdirectory.
+func LoadUserJobs(dir string) {
+	newJobs := make(map[string][]*Job)
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if strings.HasSuffix(path, ".mx3") {
+			URL := "http://" + thisAddr + "/" + path
+			newJobs[dir] = append(newJobs[dir], &Job{URL: URL})
+		}
+		return nil
+	})
+	Fatal(err)
+	WLock()
+	defer WUnlock()
+	Jobs = newJobs
+}
 
 // RPC-callable method: picks a job of the queue returns it
 // for the node to run it.
-func (n *Node) GiveJob(nodeAddr string) string {
-	n.lock()
-	defer n.unlock()
-
+func (*RPC) GiveJob(nodeAddr string) string {
+	return ""
 	// search user with least share and jobs in queue
-	leastShare := math.Inf(1)
-	var bestUser *User
-	for _, u := range n.Users {
-		used := u.UsedShare()
-		if u.HasJob() && used/u.Share < leastShare {
-			leastShare = used / u.Share
-			bestUser = u
-		}
-	}
-	if bestUser == nil {
-		return ""
-	}
-
-	return bestUser.GiveJob(nodeAddr)
-}
-
-func (n *Node) NotifyJobFinished(jobURL string, status int) {
-	//log.Println("NotifyJobFinished", jobURL, status)
-
-	n.lock()
-	defer n.unlock()
-
-	username := JobUser(jobURL)
-	user := n.Users[username]
-
-	job := user.Running[jobURL]
-
-	// TODO: job == nil?
-
-	switch {
-	case status > 0:
-		job.Status = FAILED
-	case status == 0:
-		job.Status = FINISHED
-	case status < 0:
-		job.Status = QUEUED
-		job.Reque++
-		job.Start = time.Time{}
-		job.Stop = time.Time{}
-	}
-
-	// TODO: rm .out on requeue
-	job.Stop = time.Now()
-	if job.Status != QUEUED {
-		user.usedShare += job.Runtime().Seconds()
-	}
-
-	delete(user.Running, jobURL)
-
-	if job.Status == FINISHED || job.Status == FAILED {
-		user.Finished[jobURL] = job
-	}
-	if job.Status == QUEUED {
-		user.Queue[jobURL] = job
-	}
-}
-
-func (n *Node) AddJob(fname string) {
-	n.lock()
-	defer n.unlock()
-	//log.Println("Push job:", fname)
-
-	//	if path.IsAbs(fname) {
-	//		if !strings.HasPrefix(fname, n.RootDir) {
-	//			panic("AddJob " + fname + ": not in root: " + n.RootDir) // TODO: handle gracefully
+	//	leastShare := math.Inf(1)
+	//	var bestUser *User
+	//	for _, u := range n.Users {
+	//		used := u.UsedShare()
+	//		if u.HasJob() && used/u.Share < leastShare {
+	//			leastShare = used / u.Share
+	//			bestUser = u
 	//		}
-	//		fname = fname[len(n.RootDir):] // strip root prefix
+	//	}
+	//	if bestUser == nil {
+	//		return ""
 	//	}
 
-	split := strings.Split(fname, "/")
-	first := ""
-	for _, s := range split {
-		if s != "" {
-			first = s
-			break
-		}
-	}
+	//return giveJob(bestUser, nodeAddr)
+}
 
-	if n.Users[first] == nil {
-		n.Users[first] = &User{Share: 1}
-	}
+func (*RPC) NotifyJobFinished(jobURL string) {
+	////log.Println("NotifyJobFinished", jobURL, status)
 
-	n.Users[first].AddJob(fname)
+	//n.lock()
+	//defer n.unlock()
+
+	//username := JobUser(jobURL)
+	//user := n.Users[username]
+
+	//job := user.Running[jobURL]
+
+	//// TODO: job == nil?
+
+	//switch {
+	//case status > 0:
+	//	job.Status = FAILED
+	//case status == 0:
+	//	job.Status = FINISHED
+	//case status < 0:
+	//	job.Status = QUEUED
+	//	job.Reque++
+	//	job.Start = time.Time{}
+	//	job.Stop = time.Time{}
+	//}
+
+	//// TODO: rm .out on requeue
+	//job.Stop = time.Now()
+	//if job.Status != QUEUED {
+	//	user.usedShare += job.Runtime().Seconds()
+	//}
+
+	//delete(user.Running, jobURL)
+
+	//if job.Status == FINISHED || job.Status == FAILED {
+	//	user.Finished[jobURL] = job
+	//}
+	//if job.Status == QUEUED {
+	//	user.Queue[jobURL] = job
+	//}
 }
 
 // Periodically updates user's usedShare so they decay
 // exponentially according to flag_haflife
-func RunShareDecay() {
-	halflife := *flag_halflife
-	quantum := halflife / 100 // several updates per half-life gives smooth decay
-	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
-	for {
-		time.Sleep(quantum)
-		node.lock()
-		for _, u := range node.Users {
-			u.usedShare *= reduce
-		}
-		node.unlock()
-	}
-}
+//func RunShareDecay() {
+//	halflife := *flag_halflife
+//	quantum := halflife / 100 // several updates per half-life gives smooth decay
+//	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
+//	for {
+//		time.Sleep(quantum)
+//		node.lock()
+//		for _, u := range node.Users {
+//			u.usedShare *= reduce
+//		}
+//		node.unlock()
+//	}
+//}

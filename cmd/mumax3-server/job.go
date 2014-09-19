@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/mumax/3/util"
 	"net/url"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/mumax/3/util"
 )
 
 // compute Job
@@ -57,9 +58,9 @@ func (j *Job) Runtime() time.Duration {
 		return 0
 	}
 	if j.Stop.IsZero() {
-		return since(time.Now(), j.Start)
+		return Since(time.Now(), j.Start)
 	} else {
-		return since(j.Stop, j.Start)
+		return Since(j.Stop, j.Start)
 	}
 }
 

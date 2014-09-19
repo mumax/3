@@ -1,19 +1,19 @@
 package main
 
+/*
 import (
 	"path"
 	"time"
 )
 
-type User struct {
-	Share                    float64         // Relative share of compute time
-	usedShare                float64         // Used-up compute time in the past (decays)
-	Queue, Running, Finished map[string]*Job // Queued, Running, Finished jobs
+type Share struct {
+	total               float64         // Relative share of compute time
+	used                float64         // Used-up compute time in the past (decays)
 }
 
 // used share in GPU*hours
-func (u *User) UsedShare() float64 {
-	used := u.usedShare
+func (u *Share) Used() float64 {
+	used := u.used
 	for _, j := range u.Running {
 		used += j.Runtime().Seconds()
 	}
@@ -56,3 +56,4 @@ func (u *User) AddJob(fname string) {
 		URL: url,
 	}
 }
+*/

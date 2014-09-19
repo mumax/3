@@ -9,9 +9,11 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -25,74 +27,77 @@ var (
 	flag_halflife = flag.Duration("halflife", 24*time.Hour, "share decay half-life")
 )
 
+const (
+	MaxIPs     = 1024 // maximum number of IP address to portscan
+	N_SCANNERS = 128  // number of parallel portscan goroutines
+	MAXGPU     = 16   // maximum number of GPU's to check for
+)
+
+var (
+	thisAddr    string
+	global_lock sync.RWMutex
+)
+
+func RLock()   { global_lock.RLock() }
+func RUnLock() { global_lock.RUnlock() }
+func WLock()   { global_lock.Lock() }
+func WUnlock() { global_lock.Unlock() }
+
 const GUI_PORT = 35367 // base port number for GUI (to be incremented by GPU number)
 
-var node *Node
-
 func main() {
-	log.SetFlags(0)
-	log.SetPrefix("mumax3-server: ")
 	flag.Parse()
 
 	IPs := parseIPs()
-	minPort, maxPort := parsePorts()
+	//minPort, maxPort := parsePorts()
 
-	jobs := flag.Args()
-	laddr := canonicalAddr(*flag_addr, IPs)
+	thisAddr = canonicalAddr(*flag_addr, IPs)
+	DetectMumax()
+	DetectGPUs()
 
-	node = &Node{
-		Addr:         laddr,
-		upSince:      time.Now(),
-		MumaxVersion: DetectMumax(),
-		GPUs:         DetectGPUs(),
-		RunningHere:  make(map[string]*Job),
-		Users:        make(map[string]*User),
-	}
+	LoadJobs()
 
-	for _, file := range jobs {
-		node.AddJob(file)
-	}
+	//	node = &Node{
+	//		Addr:         laddr,
+	//		upSince:      time.Now(),
+	//		MumaxVersion: DetectMumax(),
+	//		GPUs:         DetectGPUs(),
+	//		RunningHere:  make(map[string]*Job),
+	//		Users:        make(map[string]*User),
+	//	}
 
-	http.HandleFunc("/call/", node.HandleRPC)
-	http.HandleFunc("/do/", node.HandleHumanRPC)
-	http.HandleFunc("/", node.HandleStatus)
+	//	http.HandleFunc("/call/", node.HandleRPC)
+	//	http.HandleFunc("/do/", node.HandleHumanRPC)
+
+	http.HandleFunc("/", HandleStatus)
 	httpfs.Handle()
 
+	// Listen and serve on all interfaces
 	go func() {
-		log.Println("serving at", laddr)
+		log.Println("serving at", thisAddr)
 
-		_, p, err := net.SplitHostPort(laddr)
+		_, p, err := net.SplitHostPort(thisAddr)
 		Fatal(err)
-		ips := interfaceAddrs()
+		ips := util.InterfaceAddrs()
 		for _, ip := range ips {
 			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
 		}
 
-		Fatal(http.ListenAndServe(laddr, nil))
+		Fatal(http.ListenAndServe(thisAddr, nil))
 	}()
 
-	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
-	go node.FindPeers(IPs, minPort, maxPort)
-	go RunJobScan("./")
-	go RunShareDecay()
-	scan <- struct{}{}
-
-	if len(node.GPUs) > 0 {
-		go node.RunComputeService()
-	}
-
+	//
+	//	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
+	//	go node.FindPeers(IPs, minPort, maxPort)
+	//	go RunJobScan("./")
+	//	go RunShareDecay()
+	//	scan <- struct{}{}
+	//
+	//	if len(node.GPUs) > 0 {
+	//		go node.RunComputeService()
+	//	}
+	//
 	<-make(chan struct{}) // wait forever
-}
-
-// returns all network interface addresses, without CIDR mask
-func interfaceAddrs() []string {
-	addrs, _ := net.InterfaceAddrs()
-	ips := make([]string, 0, len(addrs))
-	for _, addr := range addrs {
-		IpCidr := strings.Split(addr.String(), "/")
-		ips = append(ips, IpCidr[0])
-	}
-	return ips
 }
 
 // replace laddr by a canonical form, as it will serve as unique ID
@@ -105,7 +110,7 @@ func canonicalAddr(laddr string, IPs []string) string {
 	}
 	name := net.JoinHostPort(h, p)
 
-	ips := interfaceAddrs()
+	ips := util.InterfaceAddrs()
 	for _, ip := range ips {
 		if contains(IPs, ip) {
 			return net.JoinHostPort(ip, p)
@@ -123,12 +128,6 @@ func contains(arr []string, x string) bool {
 		}
 	}
 	return false
-}
-
-func Fatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 // Parse port range flag. E.g.:

@@ -48,13 +48,10 @@ func TestLockServer(t *testing.T) {
 		}
 	}
 
-	/*
-		// stress test, many keys
-		for i := 0; i < 100000; i++ {
-			if !l.Lock("Arne", fmt.Sprint(i)) {
-				t.Fail()
-			}
+	// stress test, many keys
+	for i := 0; i < 100000; i++ {
+		if !l.Lock("Arne", fmt.Sprint(i)) {
+			t.Fail()
 		}
-	*/
-
+	}
 }

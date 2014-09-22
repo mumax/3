@@ -44,7 +44,9 @@ func LoadUserJobs(dir string) {
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".mx3") {
 			URL := "http://" + thisAddr + "/" + path
-			newJobs = append(newJobs, &Job{URL: URL})
+			job := &Job{URL: URL}
+			job.Update()
+			newJobs = append(newJobs, job)
 		}
 		return nil
 	})

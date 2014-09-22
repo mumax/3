@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -13,6 +14,8 @@ import (
 type Job struct {
 	URL string // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
 	// all of this is cache:
+	Output string // if exists, points to output url
+	// old
 	outputURL string    // URL of the output directory, access via OutputURL()
 	Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
 	GPU       int       // GPU number on the compute node that runs/ran this job, if any
@@ -21,6 +24,37 @@ type Job struct {
 	Status              // Job status: queued, running,...
 	Cmd       *exec.Cmd
 	Reque     int // how many times requeued.
+}
+
+// read job files from storage and update status cache
+func (j *Job) Update() {
+	out := j.LocalOutputDir()
+	if exists(out) {
+		j.Output = j.OutputURL()
+	} else {
+		j.Output = ""
+	}
+}
+
+// local path of input file
+func (j *Job) LocalPath() string {
+	return MustParseURL(j.URL).Path[1:]
+}
+
+// local path of output dir
+func (j *Job) LocalOutputDir() string {
+	return util.NoExt(j.LocalPath()) + ".out/"
+}
+
+func (*Job) FS(url string) string {
+	u := MustParseURL(url)
+	u.Path = "/fs" + u.Path
+	return u.String()
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 // Job status number queued, running,...

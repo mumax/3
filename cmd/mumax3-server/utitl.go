@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -35,4 +36,13 @@ func Fatal(err error) {
 func Since(a, b time.Time) time.Duration {
 	d := a.Sub(b)
 	return (d/1e9)*1e9 + 1e9
+}
+
+// Parse URL, panic on error
+func MustParseURL(URL string) *url.URL {
+	u, err := url.Parse(URL)
+	if err != nil {
+		panic(err)
+	}
+	return u
 }

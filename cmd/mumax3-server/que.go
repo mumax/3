@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -51,6 +52,8 @@ func LoadUserJobs(dir string) {
 		}
 		return nil
 	})
+	l := joblist(newJobs)
+	sort.Sort(&l)
 	Fatal(err)
 	WLock()
 	defer WUnlock()
@@ -59,6 +62,12 @@ func LoadUserJobs(dir string) {
 	}
 	Users[dir].Jobs = newJobs
 }
+
+type joblist []*Job
+
+func (l *joblist) Len() int           { return len(*l) }
+func (l *joblist) Less(i, j int) bool { return (*l)[i].URL < (*l)[j].URL }
+func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
 
 // RPC-callable method: picks a job of the queue returns it
 // for the node to run it.

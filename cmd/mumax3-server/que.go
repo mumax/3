@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +19,7 @@ The working directory should contain per-user subdirectories. E.g.:
 */
 
 var (
-	Jobs map[string][]*Job // maps user -> joblist
+	Jobs = make(map[string][]*Job) // maps user -> joblist
 	//Users  map[string]*User
 )
 
@@ -38,18 +39,19 @@ func LoadJobs() {
 
 // (Re-)load all jobs in the user's subdirectory.
 func LoadUserJobs(dir string) {
-	newJobs := make(map[string][]*Job)
+	log.Println("LoadUserJobs", dir)
+	var newJobs []*Job
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".mx3") {
 			URL := "http://" + thisAddr + "/" + path
-			newJobs[dir] = append(newJobs[dir], &Job{URL: URL})
+			newJobs = append(newJobs, &Job{URL: URL})
 		}
 		return nil
 	})
 	Fatal(err)
 	WLock()
 	defer WUnlock()
-	Jobs = newJobs
+	Jobs[dir] = newJobs
 }
 
 // RPC-callable method: picks a job of the queue returns it

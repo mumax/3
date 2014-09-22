@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -23,6 +24,30 @@ The queue service decides which job to hand out to a node if asked so.
 var (
 	Users = make(map[string]*User) // maps user -> joblist
 )
+
+// RPC-callable method: picks a job of the queue returns it
+// for the node to run it.
+func (*RPC) GiveJob(nodeAddr string) string {
+	WLock()
+	defer WUnlock()
+	return ""
+}
+
+func nextUser() string {
+	// search user with least share and jobs in queue
+	leastShare := math.Inf(1)
+	var bestUser *User
+	for _, u := range Users {
+		used := u.FairShare
+		if u.HasJob() && used/u.FairShare < leastShare {
+			leastShare = used / u.FairShare
+			bestUser = u
+		}
+	}
+	if bestUser == nil {
+		return ""
+	}
+}
 
 // (Re-)load all jobs in the working directory.
 // Called upon program startup.
@@ -68,28 +93,6 @@ type joblist []*Job
 func (l *joblist) Len() int           { return len(*l) }
 func (l *joblist) Less(i, j int) bool { return (*l)[i].URL < (*l)[j].URL }
 func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
-
-// RPC-callable method: picks a job of the queue returns it
-// for the node to run it.
-func (*RPC) GiveJob(nodeAddr string) string {
-	return ""
-}
-
-//func nextUser()string{
-//	// search user with least share and jobs in queue
-//      leastShare := math.Inf(1)
-//      var bestUser *User
-//      for _, u := range n.Users {
-//              used := u.UsedShare()
-//              if u.HasJob() && used/u.Share < leastShare {
-//                      leastShare = used / u.Share
-//                      bestUser = u
-//              }
-//      }
-//      if bestUser == nil {
-//              return ""
-//      }
-//}
 
 func (*RPC) NotifyJobFinished(jobURL string) {
 	////log.Println("NotifyJobFinished", jobURL, status)

@@ -3,6 +3,7 @@ package main
 type User struct {
 	Jobs      []*Job
 	FairShare float64 // Used-up compute time in the past (decays)
+	nextPtr   int     // pointer suggesting next job to start. Reset on re-scan. len(Jobs) means no queued job
 }
 
 func NewUser() *User {
@@ -18,10 +19,28 @@ func NewUser() *User {
 //	return used / 3600
 //}
 
-//func (u *User) HasJob() bool {
-//	return len(u.Queue) > 0
-//}
+// nextJob looks for the next free job in the list.
+// it does a tiny bit of linear search, starting from nextPtr.
+//func (u *User) giveJob(node string) *Job {
 //
+//	return nil
+//}
+
+func (u *User) HasJob() bool {
+	i := u.nextJobPtr()
+	return i < len(u.Jobs)
+}
+
+func (u *User) nextJobPtr() int {
+	for ; u.nextPtr < len(u.Jobs); u.nextPtr++ {
+		j := u.Jobs[u.nextPtr]
+		if j.IsQueued() {
+			return u.nextPtr
+		}
+	}
+	return u.nextPtr
+}
+
 //func (u *User) GiveJob(nodeAddr string) string {
 //	var job *Job
 //

@@ -14,7 +14,8 @@ import (
 type Job struct {
 	URL string // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
 	// all of this is cache:
-	Output string // if exists, points to output url
+	Output  string // if exists, points to output url
+	Engaged string // node address this job was last given to
 	// old
 	outputURL string    // URL of the output directory, access via OutputURL()
 	Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
@@ -51,6 +52,10 @@ func (*Job) FS(url string) string {
 	u := MustParseURL(url)
 	u.Path = "/fs" + u.Path
 	return u.String()
+}
+
+func (j *Job) IsQueued() bool {
+	return j.Output == "" && j.Engaged == ""
 }
 
 func exists(path string) bool {

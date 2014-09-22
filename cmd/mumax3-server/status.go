@@ -38,6 +38,7 @@ const templText = `
 <tr>
 <td class={{.Status.String}}> [{{.Status.String}}] </td>
 		<td> [<a href="{{.FS .URL}}">{{.LocalPath}}</a>] </td>
+		<td> [{{with .Engaged}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
 		<td> [{{with .Output}}<a href="{{$.FS $.OutputURL}}">.out</a>{{end}}] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
@@ -105,7 +106,7 @@ Uptime: {{.Uptime}} <br/>
 <h2>Queue service</h2><p>
 
 	{{range $k,$v := .Users}}
-		{{$k}} {{$v.FairShare}} GPU-hour <br/>
+		{{$k}} {{$v.FairShare}} GPU-hour, {{with .HasJob}} has {{else}} no {{end}} queued jobs<br/>
 	{{end}}
 
 	{{range $k,$v := .Users}}

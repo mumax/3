@@ -46,6 +46,7 @@ func (j *Job) LocalOutputDir() string {
 	return util.NoExt(j.LocalPath()) + ".out/"
 }
 
+// insert "/fs" in front of url path
 func (*Job) FS(url string) string {
 	u := MustParseURL(url)
 	u.Path = "/fs" + u.Path

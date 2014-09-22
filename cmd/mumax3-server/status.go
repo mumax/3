@@ -83,7 +83,7 @@ Uptime: {{.Uptime}} <br/>
 
 {{with .GPUs}}
 	{{range $i, $v := .}}
-		<b>GPU{{$i}}</b>: {{$v.Info}}<br/>
+		<b>GPU{{$i}}</b>: {{$v}}<br/>
 	{{end}}
 {{else}}
 	No GPUs available<br/>

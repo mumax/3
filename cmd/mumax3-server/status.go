@@ -30,7 +30,7 @@ func (*status) Uptime() time.Duration        { return Since(time.Now(), upSince)
 func (*status) MumaxVersion() string         { return MumaxVersion }
 func (*status) GPUs() []string               { return GPUs }
 func (*status) RunningHere() map[string]*Job { return RunningHere }
-func (*status) Jobs() map[string][]*Job      { return Jobs }
+func (*status) Users() map[string]*User      { return Users }
 
 const templText = `
 
@@ -104,11 +104,14 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue service</h2><p>
 
+	{{range $k,$v := .Users}}
+		{{$k}} {{$v.FairShare}} GPU-hour <br/>
+	{{end}}
 
-	{{range $k,$v := .Jobs}}
+	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
 		<b>Jobs:</b>
-		<table> {{range $v}} {{template "Job" .}} {{end}} </table>
+		<table> {{range $v.Jobs}} {{template "Job" .}} {{end}} </table>
 		</p>
 	{{end}}
 	</p>

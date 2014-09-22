@@ -8,22 +8,23 @@ import (
 )
 
 /*
-Queue service scans the working directory for job files,
-decides which job to hand out to free compute node.
-
+Queue service scans the working directory for job files.
 The working directory should contain per-user subdirectories. E.g.:
 	arne/
 	bartel/
 	...
+The in-memory representation is a cache and can be out-of-date at any point.
+
+The queue service decides which job to hand out to a node if asked so.
 
 */
 
 var (
-	Jobs = make(map[string][]*Job) // maps user -> joblist
-	//Users  map[string]*User
+	Users = make(map[string]*User) // maps user -> joblist
 )
 
 // (Re-)load all jobs in the working directory.
+// Called upon program startup.
 func LoadJobs() {
 	dir, err := os.Open(".")
 	Fatal(err)
@@ -53,29 +54,33 @@ func LoadUserJobs(dir string) {
 	Fatal(err)
 	WLock()
 	defer WUnlock()
-	Jobs[dir] = newJobs
+	if _, ok := Users[dir]; !ok {
+		Users[dir] = NewUser()
+	}
+	Users[dir].Jobs = newJobs
 }
 
 // RPC-callable method: picks a job of the queue returns it
 // for the node to run it.
 func (*RPC) GiveJob(nodeAddr string) string {
 	return ""
-	// search user with least share and jobs in queue
-	//	leastShare := math.Inf(1)
-	//	var bestUser *User
-	//	for _, u := range n.Users {
-	//		used := u.UsedShare()
-	//		if u.HasJob() && used/u.Share < leastShare {
-	//			leastShare = used / u.Share
-	//			bestUser = u
-	//		}
-	//	}
-	//	if bestUser == nil {
-	//		return ""
-	//	}
-
-	//return giveJob(bestUser, nodeAddr)
 }
+
+//func nextUser()string{
+//	// search user with least share and jobs in queue
+//      leastShare := math.Inf(1)
+//      var bestUser *User
+//      for _, u := range n.Users {
+//              used := u.UsedShare()
+//              if u.HasJob() && used/u.Share < leastShare {
+//                      leastShare = used / u.Share
+//                      bestUser = u
+//              }
+//      }
+//      if bestUser == nil {
+//              return ""
+//      }
+//}
 
 func (*RPC) NotifyJobFinished(jobURL string) {
 	////log.Println("NotifyJobFinished", jobURL, status)
@@ -120,19 +125,19 @@ func (*RPC) NotifyJobFinished(jobURL string) {
 
 // Periodically updates user's usedShare so they decay
 // exponentially according to flag_haflife
-//func RunShareDecay() {
-//	halflife := *flag_halflife
-//	quantum := halflife / 100 // several updates per half-life gives smooth decay
-//	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
-//	for {
-//		time.Sleep(quantum)
-//		node.lock()
-//		for _, u := range node.Users {
-//			u.usedShare *= reduce
-//		}
-//		node.unlock()
-//	}
-//}
+func RunShareDecay() {
+	//	halflife := *flag_halflife
+	//	quantum := halflife / 100 // several updates per half-life gives smooth decay
+	//	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
+	//	for {
+	//		time.Sleep(quantum)
+	//		WLock()
+	//		for u, _ := range FairShare {
+	//			 FairShare[u] *= reduce
+	//		}
+	//		WUnlock()
+	//	}
+}
 
 //
 //var scan = make(chan struct{})

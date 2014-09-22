@@ -30,6 +30,7 @@ func (*status) Uptime() time.Duration        { return Since(time.Now(), upSince)
 func (*status) MumaxVersion() string         { return MumaxVersion }
 func (*status) GPUs() []string               { return GPUs }
 func (*status) RunningHere() map[string]*Job { return RunningHere }
+func (*status) Jobs() map[string][]*Job      { return Jobs }
 
 const templText = `
 
@@ -73,75 +74,51 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Compute service</h2><p>
 
-<b>mumax:</b>
-{{with .MumaxVersion}}
-	{{.}}
-{{else}}
-	not available<br/>
-{{end}}
-<br/>
-
-{{with .GPUs}}
-	{{range $i, $v := .}}
-		<b>GPU{{$i}}</b>: {{$v}}<br/>
+	<b>mumax:</b>
+	{{with .MumaxVersion}}
+		{{.}}
+	{{else}}
+		not available<br/>
 	{{end}}
-{{else}}
-	No GPUs available<br/>
-{{end}}
-</p>
-
-
-<h3>Running jobs</h3><p>
-	<table>
-		{{range .RunningHere}}
-			{{template "Job" .}}
+	<br/>
+	
+	{{with .GPUs}}
+		{{range $i, $v := .}}
+			<b>GPU{{$i}}</b>: {{$v}}<br/>
 		{{end}}
-	</table>
-</p>
-
-
-<h2>Job scanner</h2><p>
-<b>Last scan:</b> {{.LastJobScanTime}}: {{.LastJobScanFiles}} files.
-<a href="http://{{.Addr}}/call/ReScan">Click to rescan</a>
-</p>
+	{{else}}
+		No GPUs available<br/>
+	{{end}}
+	</p>
+	
+	
+	<h3>Running jobs</h3><p>
+		<table>
+			{{range .RunningHere}}
+				{{template "Job" .}}
+			{{end}}
+		</table>
+	</p>
 
 
 <h2>Queue service</h2><p>
 
-<table>
-	{{range $k,$v := .Users}} <tr>
-		<td> <a href="#{{$k}}">{{$k}}</a> </td>
-		<td> <a href="#{{$k}}_running" class=RUNNING> [{{len $v.Running}} running]</a> </td>
-		<td> <b>share:</b> [{{printf "%.3f" $v.UsedShare}}h/{{$v.Share}}] </td>
-	</tr>{{end}}
-</table>
 
-{{range $k,$v := .Users}}
-	<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
-	<b>Share:</b> {{printf "%.3f" .UsedShare}}h/{{.Share}} <br/>
-	<b>Jobs:</b>
-		<a href="#{{$k}}_finished" class=FINISHED>[{{len .Finished}} finished]</a> 
-		<a href="#{{$k}}_running"  class=RUNNING> [{{len .Running}}  running]</a>
-		<a href="#{{$k}}_queued"   class=QUEUED>  [{{len .Queue}}    queued]</a> 
-	<br/>
-	<br/>
-	<a id="{{$k}}_finished"></a>  <table> {{range $v.Finished}} {{template "Job" .}} {{end}} </table>
-	<a id="{{$k}}_running" ></a>  <table> {{range $v.Running}}  {{template "Job" .}} {{end}} </table>
-	<a id="{{$k}}_queued"  ></a>  <table> {{range $v.Queue}}    {{template "Job" .}} {{end}} </table>
+	{{range $k,$v := .Jobs}}
+		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
+		<b>Jobs:</b>
+		<table> {{range $v}} {{template "Job" .}} {{end}} </table>
+		</p>
+	{{end}}
 	</p>
-{{end}}
-</p>
+	
+
+
 
 <h2>HTTPFS service</h2><p>
 	:-)
 </p>
 
-
-<h2>Port scanner service</h2>
-Peers in IP:port range {{.IPRange}}:<br/>
-{{range .Peers}}
-	<a href="http://{{.Addr}}">{{.Addr}}</a><br/>
-{{end}}
 
 </body>
 </html>

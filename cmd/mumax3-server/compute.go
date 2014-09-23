@@ -6,13 +6,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 var (

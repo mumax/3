@@ -30,7 +30,7 @@ type Job struct {
 func (j *Job) Update() {
 	out := j.LocalOutputDir()
 	if exists(out) {
-		j.Output = j.OutputURL()
+		j.Output = out
 	} else {
 		j.Output = ""
 	}
@@ -83,13 +83,13 @@ func (s Status) String() string {
 	return statusString[s]
 }
 
-func (j *Job) Path() string {
-	return j.URL[len("http://"):]
-}
+//func (j *Job) Path() string {
+//	return j.URL[len("http://"):]
+//}
 
-func NewJob(URL string) Job {
-	return Job{URL: URL}
-}
+//func NewJob(URL string) Job {
+//	return Job{URL: URL}
+//}
 
 // Returns how long this job has been running
 func (j *Job) Runtime() time.Duration {
@@ -104,48 +104,48 @@ func (j *Job) Runtime() time.Duration {
 }
 
 // URL of the output directory.
-func (j *Job) OutputURL() string {
-	if j.outputURL == "" {
-		j.outputURL = JobOutputDir(j.URL)
-	}
-	return j.outputURL
-}
+//func (j *Job) OutputURL() string {
+//	if j.outputURL == "" {
+//		j.outputURL = JobOutputDir(j.URL)
+//	}
+//	return j.outputURL
+//}
 
-// Node host (w/o port) this job runs on, if any
-func (j *Job) NodeName() string {
-	colon := strings.Index(j.Node, ":")
-	if colon < 0 {
-		return ""
-	}
-	return j.Node[:colon]
-}
+//// Node host (w/o port) this job runs on, if any
+//func (j *Job) NodeName() string {
+//	colon := strings.Index(j.Node, ":")
+//	if colon < 0 {
+//		return ""
+//	}
+//	return j.Node[:colon]
+//}
 
-func JobOutputDir(URL string) string {
-	return util.NoExt(URL) + ".out/"
-}
+//func JobOutputDir(URL string) string {
+//	return util.NoExt(URL) + ".out/"
+//}
 
-func (j *Job) GUIPort() int {
-	return GUI_PORT + j.GPU
-}
-
-func (j *Job) IsRunning() bool {
-	return j.Status == RUNNING
-}
-
-func (j *Job) Failed() bool {
-	return j.Status == FAILED
-}
-
+//func (j *Job) GUIPort() int {
+//	return GUI_PORT + j.GPU
+//}
+//
+//func (j *Job) IsRunning() bool {
+//	return j.Status == RUNNING
+//}
+//
+//func (j *Job) Failed() bool {
+//	return j.Status == FAILED
+//}
+//
 func JobHost(URL string) string {
 	split := strings.Split(URL, "/")
 	return split[2]
 }
 
-func JobUser(URL string) string {
-	split := strings.Split(URL, "/")
-	return split[4]
-}
-
+//func JobUser(URL string) string {
+//	split := strings.Split(URL, "/")
+//	return split[4]
+//}
+//
 //func JobInputFile(inputFile string) string {
 //	URL, err := url.Parse(inputFile)
 //	if err != nil {

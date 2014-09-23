@@ -18,7 +18,7 @@ import (
 var (
 	MumaxVersion string
 	GPUs         []string
-	RunningHere  map[string]*Job
+	RunningHere  = make(map[string]*Job)
 )
 
 // Runs a compute service on this node, if GPUs are available.
@@ -130,11 +130,11 @@ func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, io.WriteC
 	cmd := exec.Command(command, gpuFlag, httpFlag, cacheFlag, forceFlag, inputURL)
 
 	// Pipe stdout, stderr to log file over httpfs
-	outDir := util.NoExt(JobInputFile(inputURL)) + ".out"
+	outDir := util.NoExt(inputURL) + ".out"
 	httpfs.Mkdir(outDir)
 	out, errD := httpfs.Create(outDir + "/stdout.txt")
 	if errD != nil {
-		log.Println(errD)
+		log.Println("makeProcess", errD)
 		return nil, nil
 	}
 	cmd.Stderr = out

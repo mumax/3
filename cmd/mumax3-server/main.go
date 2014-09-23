@@ -76,6 +76,7 @@ func main() {
 
 	ProbePeer(thisAddr) // make sure we have ourself as peer
 	go FindPeers(IPs, minPort, maxPort)
+	go RunComputeService()
 
 	//	go RunJobScan("./")
 	//	go RunShareDecay()

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -147,15 +146,15 @@ func JobUser(URL string) string {
 	return split[4]
 }
 
-func JobInputFile(inputFile string) string {
-	URL, err := url.Parse(inputFile)
-	if err != nil {
-		panic(err)
-	}
-	split := strings.Split(URL.Path, "/")
-	if len(split) < 3 {
-		panic("invalid url:" + inputFile)
-	}
-	baseHandler := "/" + split[1]
-	return URL.Path[len(baseHandler):]
-}
+//func JobInputFile(inputFile string) string {
+//	URL, err := url.Parse(inputFile)
+//	if err != nil {
+//		panic(err)
+//	}
+//	split := strings.Split(URL.Path, "/")
+//	if len(split) < 3 {
+//		panic("invalid url:" + inputFile)
+//	}
+//	baseHandler := "/" + split[1]
+//	return URL.Path[len(baseHandler):]
+//}

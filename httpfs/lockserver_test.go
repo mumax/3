@@ -7,7 +7,7 @@ import (
 )
 
 func TestLockServer(t *testing.T) {
-	D := 50 * time.Millisecond
+	D := 100 * time.Millisecond
 	l := NewLockServer(D)
 
 	// user can indefinitely acquire lock
@@ -42,14 +42,14 @@ func TestLockServer(t *testing.T) {
 	}
 
 	// stress test, many users
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 1000; i++ {
 		if l.Lock(fmt.Sprint(i), "chocolate") {
 			t.Fail()
 		}
 	}
 
 	// stress test, many keys
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 1000; i++ {
 		if !l.Lock("Arne", fmt.Sprint(i)) {
 			t.Fail()
 		}

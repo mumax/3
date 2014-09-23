@@ -17,6 +17,11 @@ import (
 
 var Logging = false
 
+const (
+	DirPerm  = 0777 // permissions for new directory
+	FilePerm = 0666 // permissions for new files
+)
+
 // Creates the directory at specified URL (or local file),
 // creating all needed parent directories as well.
 func Mkdir(URL string) error {
@@ -216,7 +221,7 @@ func httpRemove(URL string) error {
 // client-side, local server
 
 func localMkdir(fname string) error {
-	return os.MkdirAll(fname, 0777)
+	return os.MkdirAll(fname, DirPerm)
 }
 
 func localLs(fname string) ([]string, error) {
@@ -232,7 +237,8 @@ func localLs(fname string) ([]string, error) {
 }
 
 func localAppend(fname string, data []byte) error {
-	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	_ = os.MkdirAll(path.Dir(fname), DirPerm)
+	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, FilePerm)
 	if err != nil {
 		return err
 	}

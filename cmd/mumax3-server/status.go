@@ -45,7 +45,7 @@ const templText = `
 {{define "Job"}}
 <tr>
 <td class={{.Status.String}}> [{{.Status.String}}] </td>
-		<td> [<a href="http://{{.FS .ID}}">{{.ID}}</a>] </td>
+		<td> [<a href="http://{{.FS .ID}}">{{.LocalPath}}</a>] </td>
 		<td> [{{with .Engaged}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
 		<td> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
@@ -79,13 +79,13 @@ const templText = `
 function doEvent(method, arg){
 	try{
 		var req = new XMLHttpRequest();
-		var URL = "http://" + {{.ThisAddr}} + "/do/" + method + "/" + arg;
+		var URL = "http://" + window.location.hostname + ":" + window.location.port + "/do/" + method + "/" + arg;
 		req.open("GET", URL, false);
-		req.send("");
-		location.reload();
+		req.send(null);
 	}catch(e){
 		alert(e);
 	}
+	location.reload();
 }
 </script>
 
@@ -139,12 +139,14 @@ Uptime: {{.Uptime}} <br/>
 	<b>Next job for:</b> {{.NextUser}}
 
 	<h3>Jobs</h3>
+		<button onclick='doEvent("LoadJobs", "")'>Reload all</button> (consider reloading just your own files).
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
 	
-		<button onclick='doEvent("LoadUserDir", "{{$k}}")'>Reload files</button>
 
-		<b>Jobs:</b>
+		<b>Jobs</b>
+		<button onclick='doEvent("LoadUserJobs", "{{$k}}")'>Reload</button> (only needed when you changed your files on disk)
+
 		<table> {{range $v.Jobs}} {{template "Job" .}} {{end}} </table>
 		</p>
 	{{end}}

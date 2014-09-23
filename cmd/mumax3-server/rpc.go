@@ -12,9 +12,15 @@ import (
 type RPCFunc func(string) string
 
 var methods = map[string]RPCFunc{
-	"GiveJob":   GiveJob,
-	"UpdateJob": UpdateJob,
-	"Ping":      Ping,
+	"GiveJob":      GiveJob,
+	"UpdateJob":    UpdateJob,
+	"Ping":         Ping,
+	"LoadUserJobs": LoadUserJobs,
+	"LoadJobs":     wrap(LoadJobs),
+}
+
+func wrap(f func()) RPCFunc {
+	return func(string) string { f(); return "" }
 }
 
 func HandleRPC(w http.ResponseWriter, r *http.Request) {

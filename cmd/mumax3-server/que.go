@@ -66,7 +66,7 @@ func LoadJobs() {
 }
 
 // (Re-)load all jobs in the user's subdirectory.
-func LoadUserJobs(dir string) {
+func LoadUserJobs(dir string) string {
 	log.Println("LoadUserJobs", dir)
 	var newJobs []*Job
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -80,7 +80,9 @@ func LoadUserJobs(dir string) {
 	})
 	l := joblist(newJobs)
 	sort.Sort(&l)
-	Fatal(err)
+
+	Fatal(err) // TODO: recover?
+
 	WLock()
 	defer WUnlock()
 	if _, ok := Users[dir]; !ok {
@@ -88,6 +90,8 @@ func LoadUserJobs(dir string) {
 	}
 	Users[dir].Jobs = newJobs
 	Users[dir].nextPtr = 0
+
+	return ""
 }
 
 type joblist []*Job

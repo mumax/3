@@ -13,6 +13,7 @@ type RPCFunc func(string) string
 
 var methods = map[string]RPCFunc{
 	"GiveJob": GiveJob,
+	"Ping":    Ping,
 }
 
 func HandleRPC(w http.ResponseWriter, r *http.Request) {
@@ -141,15 +142,18 @@ func RPCCall(addr, method, arg string) (ret string, err error) {
 	//TODO: escape args?
 	resp, err := httpClient.Get("http://" + addr + "/do/" + method + "/" + arg)
 	if err != nil {
+		//log.Println("*** RPC  error: ", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		log.Println("*** RPC  error: ", resp.Status)
 		return "", fmt.Errorf("http status %v", resp.Status)
 	}
 
 	if b, err := ioutil.ReadAll(resp.Body); err != nil {
+		log.Println("*** RPC  read error: ", err)
 		return "", err
 	} else {
 		return string(b), nil

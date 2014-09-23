@@ -84,8 +84,8 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Peer nodes</h2>
 
-	{{range .Peers}} 
-		{{.}} <br/>
+	{{range $k,$v := .Peers}} 
+		{{$k}} {{$v}} <br/>
 	{{end}}
 
 <h2>Compute service</h2><p>

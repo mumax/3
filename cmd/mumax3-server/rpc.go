@@ -17,12 +17,15 @@ var methods = map[string]RPCFunc{
 
 func HandleRPC(w http.ResponseWriter, r *http.Request) {
 
+	var ret string
+
 	defer func() {
+		log.Println(" < call  ", r.Host, r.URL.Path, "->", ret)
 		if err := recover(); err != nil {
+			log.Println("*** RPC   panic: ", r.URL.Path, ":", err)
 			http.Error(w, "Does not compute: "+r.URL.Path, http.StatusBadRequest)
 		}
 	}()
-
 	request := r.URL.Path[len("/do/"):]
 	slashPos := strings.Index(request, "/")
 	method := request[:slashPos]
@@ -30,10 +33,11 @@ func HandleRPC(w http.ResponseWriter, r *http.Request) {
 
 	m, ok := methods[method]
 	if !ok {
+		log.Println("*** RPC   no such method", r.URL.Path)
 		http.Error(w, "Does not compute: "+method, http.StatusBadRequest)
 		return
 	}
-	ret := m(arg)
+	ret = m(arg)
 	fmt.Fprint(w, ret)
 }
 

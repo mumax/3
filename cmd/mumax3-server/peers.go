@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	peers = make(map[string]*PeerInfo)
+	peers = make(map[string]*Peer)
 )
 
-type PeerInfo struct {
+type Peer struct {
 }
 
 func AddPeer(pAddr string) {
@@ -28,8 +28,8 @@ func AddPeer(pAddr string) {
 	// TODO: notify compute upon findpeer
 }
 
-func NewPeer() *PeerInfo {
-	return &PeerInfo{}
+func NewPeer() *Peer {
+	return &Peer{}
 }
 
 // Thread-safe n.peers[pAddr]

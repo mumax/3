@@ -38,6 +38,7 @@ func (*status) GPUs() []string               { return GPUs }
 func (*status) RunningHere() map[string]*Job { return RunningHere }
 func (*status) Users() map[string]*User      { return Users }
 func (*status) NextUser() string             { return nextUser() }
+func (*status) Peers() map[string]*Peer      { return peers }
 
 const templText = `
 
@@ -80,6 +81,12 @@ const templText = `
 <h1>{{.ThisAddr}}</h1>
 
 Uptime: {{.Uptime}} <br/>
+
+<h2>Peer nodes</h2>
+
+	{{range .Peers}} 
+		{{.}} <br/>
+	{{end}}
 
 <h2>Compute service</h2><p>
 

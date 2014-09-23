@@ -104,12 +104,9 @@ func (j *Job) Runtime() time.Duration {
 }
 
 // URL of the output directory.
-//func (j *Job) OutputURL() string {
-//	if j.outputURL == "" {
-//		j.outputURL = JobOutputDir(j.URL)
-//	}
-//	return j.outputURL
-//}
+func (j *Job) OutputURL() string {
+	return util.NoExt(j.URL) + ".out"
+}
 
 //// Node host (w/o port) this job runs on, if any
 //func (j *Job) NodeName() string {

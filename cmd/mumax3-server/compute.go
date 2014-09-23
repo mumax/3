@@ -1,7 +1,7 @@
 package main
 
 /*
-	Compute service runs jobs on this node's GPUs, if any
+	Compute service runs jobs on this node's GPUs, if any.
 */
 
 import (
@@ -19,8 +19,14 @@ import (
 var (
 	MumaxVersion string
 	GPUs         []string
-	RunningHere  = make(map[string]*Job)
+	RunningHere  = make(map[string]*Process)
 )
+
+type Process struct {
+	*exec.Cmd
+	Start time.Time
+	Out   io.WriteCloser
+}
 
 // Runs a compute service on this node, if GPUs are available.
 // The compute service asks storage nodes for a job, runs it,
@@ -43,38 +49,19 @@ func RunComputeService() {
 		URL := WaitForJob() // take an available job
 		go func() {
 
-			cmd, _ := makeProcess(URL, gpu, GUIAddr)
-			//defer stdout.Close()
-
-			// put job in "running" list (for status reporting)
-			job := &Job{
-				URL: URL,
-				Cmd: cmd,
-				//Node:   n.Addr,
-				//GPU:    gpu,
-				//Start:  time.Now(),
-				//Status: RUNNING,
-			}
+			p := NewProcess(URL, gpu, GUIAddr)
 
 			WLock()
-			RunningHere[URL] = job
+			RunningHere[URL] = p
 			WUnlock()
 
-			_ = runJob(job)
-			// TODO: write status
-			//n.FSServer.CloseAll(JobOutputDir(JobInputFile(job.URL)))
+			p.Run()
 
 			// remove from "running" list
 			WLock()
-			job.Cmd = nil
 			delete(RunningHere, URL)
-			//requeue := job.Reque > 0
 			WUnlock()
 
-			// notify job queue it's ready (for status)
-			//if requeue {
-			//	status = -1
-			//}
 			_, err := RPCCall(JobHost(URL), "NotifyJob", URL)
 			if err != nil {
 				log.Println(err)
@@ -85,6 +72,8 @@ func RunComputeService() {
 		}()
 	}
 }
+
+func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
 
 func WaitForJob() string {
 	URL := FindJob()
@@ -121,7 +110,7 @@ func FindJob() string {
 //}
 
 // prepare exec.Cmd to run mumax3 compute process
-func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, io.WriteCloser) {
+func NewProcess(inputURL string, gpu int, webAddr string) *Process {
 	// prepare command
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
@@ -136,34 +125,25 @@ func makeProcess(inputURL string, gpu int, webAddr string) (*exec.Cmd, io.WriteC
 	out, errD := httpfs.Create(outDir + "/stdout.txt")
 	if errD != nil {
 		log.Println("makeProcess", errD)
-		return nil, nil
 	}
 	cmd.Stderr = out
 	cmd.Stdout = out
 
-	return cmd, out
+	return &Process{Cmd: cmd, Start: time.Now(), Out: out}
 }
 
-func runJob(job *Job) (status int) {
-	cmd := job.Cmd
-
-	if cmd == nil {
-		return 1
-	}
-
+func (p *Process) Run() (status int) {
+	cmd := p.Cmd
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
 	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 
 	//outDir := JobOutputDir(job.URL)
+	defer p.Out.Close()
 	err := cmd.Run()
-
-	//defer cmd.Stdout.Close() // TODO: in closeall?
-
-	// close all this simulation's files in case process exited ungracefully
 
 	// TODO: determine proper status number
 	if err != nil {
-		log.Println(job.URL, err)
+		log.Println(cmd.Path, cmd.Args, err)
 		return 1
 	}
 	return 0

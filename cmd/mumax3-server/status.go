@@ -30,15 +30,15 @@ func HandleStatus(w http.ResponseWriter, r *http.Request) {
 
 type status struct{} // dummy type to define template methods on
 
-func (*status) IPRange() string              { return *flag_scan + ": " + *flag_ports }
-func (*status) ThisAddr() string             { return thisAddr }
-func (*status) Uptime() time.Duration        { return Since(time.Now(), upSince) }
-func (*status) MumaxVersion() string         { return MumaxVersion }
-func (*status) GPUs() []string               { return GPUs }
-func (*status) RunningHere() map[string]*Job { return RunningHere }
-func (*status) Users() map[string]*User      { return Users }
-func (*status) NextUser() string             { return nextUser() }
-func (*status) Peers() map[string]*Peer      { return peers }
+func (*status) IPRange() string                  { return *flag_scan + ": " + *flag_ports }
+func (*status) ThisAddr() string                 { return thisAddr }
+func (*status) Uptime() time.Duration            { return Since(time.Now(), upSince) }
+func (*status) MumaxVersion() string             { return MumaxVersion }
+func (*status) GPUs() []string                   { return GPUs }
+func (*status) RunningHere() map[string]*Process { return RunningHere }
+func (*status) Users() map[string]*User          { return Users }
+func (*status) NextUser() string                 { return nextUser() }
+func (*status) Peers() map[string]*Peer          { return peers }
 
 const templText = `
 
@@ -50,7 +50,6 @@ const templText = `
 		<td> [{{with .Output}}<a href="{{$.FS $.OutputURL}}">.out</a>{{end}}] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
-		<td> [{{with .IsRunning}}<a href="http://{{$.NodeName}}:{{$.GUIPort}}">gui</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
 		<td> 
 			{{with .Cmd}} [<a href="http://{{$.Node}}/do/kill/{{$.Path}}">kill</a>]   {{end}} 
@@ -110,8 +109,8 @@ Uptime: {{.Uptime}} <br/>
 	
 	<h3>Running jobs</h3><p>
 		<table>
-			{{range .RunningHere}}
-				{{template "Job" .}}
+			{{range $k,$v := .RunningHere}}
+				{{$v.Duration}} {{$v.Path}} {{$v.Args}} 
 			{{end}}
 		</table>
 	</p>

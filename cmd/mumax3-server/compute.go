@@ -96,15 +96,13 @@ func WaitForJob() string {
 }
 
 func FindJob() string {
-	return "" // TODO
-	//peers := PeersWithJobs()
-	//for _, p := range peers {
-	//	URL, err := n.RPCCall(p.Addr, "GiveJob", n.Addr)
-	//	if err == nil && URL.(string) != "" {
-	//		return URL.(string)
-	//	}
-	//}
-	//return ""
+	for addr, _ := range peers {
+		URL, _ := RPCCall(addr, "GiveJob", thisAddr)
+		if URL != "" {
+			return URL
+		}
+	}
+	return ""
 }
 
 //func (n *Node) KillJob(url string) error {

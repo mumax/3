@@ -49,7 +49,7 @@ func main() {
 	flag.Parse()
 
 	IPs := parseIPs()
-	//minPort, maxPort := parsePorts()
+	minPort, maxPort := parsePorts()
 
 	thisAddr = canonicalAddr(*flag_addr, IPs)
 	DetectMumax()
@@ -74,9 +74,9 @@ func main() {
 		Fatal(http.ListenAndServe(thisAddr, nil))
 	}()
 
-	//
-	//	go node.ProbePeer(node.Addr) // make sure we have ourself as peer
-	//	go node.FindPeers(IPs, minPort, maxPort)
+	ProbePeer(thisAddr) // make sure we have ourself as peer
+	go FindPeers(IPs, minPort, maxPort)
+
 	//	go RunJobScan("./")
 	//	go RunShareDecay()
 	//	scan <- struct{}{}

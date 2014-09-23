@@ -13,7 +13,7 @@ import (
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// all of this is cache:
-	Output  string // if exists, points to output url
+	Output  string // if exists, points to output ID
 	Engaged string // node address this job was last given to
 	// old
 	outputURL string    // URL of the output directory, access via OutputURL()
@@ -30,16 +30,13 @@ type Job struct {
 func (j *Job) Update() {
 	out := j.LocalOutputDir()
 	if exists(out) {
-		j.Output = out
+		j.Output = thisAddr + "/" + out
 	} else {
 		j.Output = ""
 	}
 }
 
 func JobByName(ID string) *Job {
-
-	log.Println("**enter jobbyname", ID)
-	defer log.Println("**exit jobbyname", ID)
 
 	user := Users[BaseDir(LocalPath(ID))]
 	if user == nil {
@@ -55,12 +52,12 @@ func JobByName(ID string) *Job {
 	for low <= high {
 		mid = (low + high) / 2
 		switch {
-		case jobs[mid].ID < ID:
-			high = mid - 1
 		case jobs[mid].ID > ID:
+			high = mid - 1
+		case jobs[mid].ID < ID:
 			low = mid + 1
 		default:
-			break
+			low = high + 1 // break for loop :-(
 		}
 	}
 

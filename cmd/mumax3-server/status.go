@@ -45,9 +45,9 @@ const templText = `
 {{define "Job"}}
 <tr>
 <td class={{.Status.String}}> [{{.Status.String}}] </td>
-		<td> [<a href="{{.FS .URL}}">{{.LocalPath}}</a>] </td>
+		<td> [<a href="http://{{.FS .ID}}">{{.ID}}</a>] </td>
 		<td> [{{with .Engaged}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
-		<td> [{{with .Output}}<a href="{{$.FS $.OutputURL}}">.out</a>{{end}}] </td>
+		<td> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
 		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
 		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
 		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
@@ -74,6 +74,20 @@ const templText = `
 	</style>
 	<meta http-equiv="refresh" content="60">
 </head>
+
+<script>
+function doEvent(method, arg){
+	try{
+		var req = new XMLHttpRequest();
+		var URL = "http://" + {{.ThisAddr}} + "/do/" + method + "/" + arg;
+		req.open("GET", URL, false);
+		req.send("");
+		location.reload();
+	}catch(e){
+		alert(e);
+	}
+}
+</script>
 
 <body>
 
@@ -127,6 +141,9 @@ Uptime: {{.Uptime}} <br/>
 	<h3>Jobs</h3>
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
+	
+		<button onclick='doEvent("LoadUserDir", "{{$k}}")'>Reload files</button>
+
 		<b>Jobs:</b>
 		<table> {{range $v.Jobs}} {{template "Job" .}} {{end}} </table>
 		</p>

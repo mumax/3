@@ -46,24 +46,25 @@ func RunComputeService() {
 	for {
 		gpu := <-idle // take an available GPU
 		GUIAddr := fmt.Sprint(":", GUI_PORT+gpu)
-		URL := WaitForJob() // take an available job
+		ID := WaitForJob() // take an available job
 		go func() {
 
-			p := NewProcess(URL, gpu, GUIAddr)
+			p := NewProcess("http://"+ID, gpu, GUIAddr)
 
 			WLock()
-			RunningHere[URL] = p
+			RunningHere[ID] = p
 			WUnlock()
 
-			_, _ = RPCCall(JobHost(URL), "UpdateJob", URL) // update so we see .out appear on start
+			_, _ = RPCCall(JobHost(ID), "UpdateJob", ID) // update so we see .out appear on start
+
 			p.Run()
 
 			// remove from "running" list
 			WLock()
-			delete(RunningHere, URL)
+			delete(RunningHere, ID)
 			WUnlock()
 
-			_, err := RPCCall(JobHost(URL), "UpdateJob", URL)
+			_, err := RPCCall(JobHost(ID), "UpdateJob", ID)
 			if err != nil {
 				log.Println(err)
 			}
@@ -77,20 +78,20 @@ func RunComputeService() {
 func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
 
 func WaitForJob() string {
-	URL := FindJob()
-	for URL == "" {
+	ID := FindJob()
+	for ID == "" {
 		time.Sleep(2 * time.Second) // TODO: don't poll
-		URL = FindJob()
+		ID = FindJob()
 	}
-	//log.Println("found job", URL)
-	return URL
+	//log.Println("found job", ID)
+	return ID
 }
 
 func FindJob() string {
 	for addr, _ := range peers {
-		URL, _ := RPCCall(addr, "GiveJob", thisAddr)
-		if URL != "" {
-			return URL
+		ID, _ := RPCCall(addr, "GiveJob", thisAddr)
+		if ID != "" {
+			return ID
 		}
 	}
 	return ""

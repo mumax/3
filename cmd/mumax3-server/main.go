@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"strings"
@@ -29,7 +30,7 @@ var (
 
 const (
 	MaxIPs     = 1024 // maximum number of IP address to portscan
-	N_SCANNERS = 128  // number of parallel portscan goroutines
+	N_SCANNERS = 1    // number of parallel portscan goroutines
 	MAXGPU     = 16   // maximum number of GPU's to check for
 )
 
@@ -49,7 +50,7 @@ func main() {
 	flag.Parse()
 
 	IPs := parseIPs()
-	minPort, maxPort := parsePorts()
+	//minPort, maxPort := parsePorts()
 
 	thisAddr = canonicalAddr(*flag_addr, IPs)
 	DetectMumax()
@@ -75,7 +76,7 @@ func main() {
 	}()
 
 	ProbePeer(thisAddr) // make sure we have ourself as peer
-	go FindPeers(IPs, minPort, maxPort)
+	//go FindPeers(IPs, minPort, maxPort)
 	go RunComputeService()
 
 	//	go RunJobScan("./")

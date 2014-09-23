@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/mumax/3/util"
@@ -12,7 +11,7 @@ import (
 
 // compute Job
 type Job struct {
-	URL string // URL of the input file, e.g., http://hostname/fs/user/inputfile.mx3
+	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// all of this is cache:
 	Output  string // if exists, points to output url
 	Engaged string // node address this job was last given to
@@ -37,10 +36,14 @@ func (j *Job) Update() {
 	}
 }
 
-func JobByName(URL string) *Job {
-	user := Users[BaseDir(LocalPath(URL))]
+func JobByName(ID string) *Job {
+
+	log.Println("**enter jobbyname", ID)
+	defer log.Println("**exit jobbyname", ID)
+
+	user := Users[BaseDir(LocalPath(ID))]
 	if user == nil {
-		log.Println("JobByName: no user for", URL)
+		log.Println("JobByName: no user for", ID)
 		return nil
 	}
 	jobs := user.Jobs
@@ -52,35 +55,41 @@ func JobByName(URL string) *Job {
 	for low <= high {
 		mid = (low + high) / 2
 		switch {
-		case jobs[mid].URL < URL:
+		case jobs[mid].ID < ID:
+			high = mid - 1
+		case jobs[mid].ID > ID:
 			low = mid + 1
-		case jobs[mid].URL > URL:
-			high = mid + -1
 		default:
 			break
 		}
 	}
 
-	if mid >= 0 && mid < len(jobs) && jobs[mid].URL == URL {
+	if mid >= 0 && mid < len(jobs) && jobs[mid].ID == ID {
 		return jobs[mid]
 	} else {
-		log.Println("JobByName: not found:", URL)
+		log.Println("JobByName: not found:", ID)
 		return nil
 	}
 }
 
 func (j *Job) User() string {
-	return BaseDir(j.LocalPath())
+	return JobUser(j.ID)
+}
+
+func JobUser(ID string) string {
+	return BaseDir(LocalPath(ID))
 }
 
 // local path of input file
 func (j *Job) LocalPath() string {
-	return LocalPath(j.URL)
+	return LocalPath(j.ID)
 }
 
-// local path of input file
-func LocalPath(URL string) string {
-	return MustParseURL(URL).Path[1:]
+// local path of input file, without host prefix. E.g.:
+// 	host:123/user/file.mx3 -> user/file.mx3
+func LocalPath(ID string) string {
+	host := JobHost(ID)
+	return ID[len(host)+1:]
 }
 
 // local path of output dir
@@ -90,9 +99,7 @@ func (j *Job) LocalOutputDir() string {
 
 // insert "/fs" in front of url path
 func (*Job) FS(url string) string {
-	u := MustParseURL(url)
-	u.Path = "/fs" + u.Path
-	return u.String()
+	return BaseDir(url) + "/fs/" + LocalPath(url)
 }
 
 func (j *Job) IsQueued() bool {
@@ -146,8 +153,19 @@ func (j *Job) Runtime() time.Duration {
 }
 
 // URL of the output directory.
-func (j *Job) OutputURL() string {
-	return util.NoExt(j.URL) + ".out"
+//func (j *Job) URL() string {
+//	return "http://" + j.ID
+//}
+
+// URL of the output directory.
+//func (j *Job) OutputURL() string {
+//	return util.NoExt(j.URL()) + ".out"
+//}
+
+// Host of job with this ID (=first path element). E.g.:
+// 	host:123/user/file.mx3 -> host:123
+func JobHost(ID string) string {
+	return BaseDir(ID)
 }
 
 //// Node host (w/o port) this job runs on, if any
@@ -175,10 +193,6 @@ func (j *Job) OutputURL() string {
 //	return j.Status == FAILED
 //}
 //
-func JobHost(URL string) string {
-	split := strings.Split(URL, "/")
-	return split[2]
-}
 
 //func JobUser(URL string) string {
 //	split := strings.Split(URL, "/")

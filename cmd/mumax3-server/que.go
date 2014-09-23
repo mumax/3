@@ -34,7 +34,7 @@ func GiveJob(nodeAddr string) string {
 	if user == "" {
 		return ""
 	}
-	return Users[user].giveJob(nodeAddr).URL
+	return Users[user].giveJob(nodeAddr).ID
 }
 
 func nextUser() string {
@@ -71,8 +71,8 @@ func LoadUserJobs(dir string) {
 	var newJobs []*Job
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".mx3") {
-			URL := "http://" + thisAddr + "/" + path
-			job := &Job{URL: URL}
+			ID := thisAddr + "/" + path
+			job := &Job{ID: ID}
 			job.Update()
 			newJobs = append(newJobs, job)
 		}
@@ -93,7 +93,7 @@ func LoadUserJobs(dir string) {
 type joblist []*Job
 
 func (l *joblist) Len() int           { return len(*l) }
-func (l *joblist) Less(i, j int) bool { return (*l)[i].URL < (*l)[j].URL }
+func (l *joblist) Less(i, j int) bool { return (*l)[i].ID < (*l)[j].ID }
 func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
 
 // RPC-callable function. Refreshes the in-memory cached info about this job.
@@ -101,7 +101,7 @@ func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
 func UpdateJob(jobURL string) string {
 
 	WLock()
-	WUnlock()
+	defer WUnlock()
 
 	j := JobByName(jobURL)
 	if j == nil {

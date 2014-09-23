@@ -49,7 +49,7 @@ var httpClient = http.Client{Timeout: 2 * time.Second}
 // make RPC call to method on node with given address.
 func RPCCall(addr, method, arg string) (ret string, err error) {
 
-	defer log.Println(" > call  ", addr, method, arg, "->", ret, err)
+	defer func() { log.Println(" > call  ", addr, method, arg, "->", ret, err) }()
 
 	//TODO: escape args?
 	resp, err := httpClient.Get("http://" + addr + "/do/" + method + "/" + arg)

@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type RPCFunc func(string) string
@@ -122,69 +125,30 @@ func HandleRPC(w http.ResponseWriter, r *http.Request) {
 //	}
 //	w.Write(resp)
 //}
-//
-//// make RPC call to method on node with given address.
-//func (n *Node) RPCCall(addr, method string, args ...interface{}) (ret interface{}, err error) {
-//
-//	defer log.Println(" > call  ", addr, method, args, "->", ret, err)
-//
-//	c := http.Client{ // TODO: re-use client?
-//		Timeout: 2 * time.Second,
-//	}
-//
-//	URL := url.URL{
-//		Scheme: "http",
-//		Host:   addr,
-//		Path:   "/call/" + method,
-//	}
-//
-//	reqBody := new(bytes.Buffer)
-//	for i := range args {
-//		errJson := json.NewEncoder(reqBody).Encode(args[i])
-//		if errJson != nil {
-//			panic(errJson)
-//		}
-//	}
-//
-//	req, errReq := http.NewRequest("GET", URL.String(), reqBody)
-//	if errReq != nil {
-//		panic(errReq)
-//	}
-//	//log.Println("call:", URL.String(), reqBody.String())
-//	resp, err := c.Do(req)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	defer resp.Body.Close()
-//
-//	if resp.StatusCode != http.StatusOK {
-//		return nil, fmt.Errorf("http status %v", resp.Status)
-//	}
-//
-//	meth := reflect.ValueOf(n).MethodByName(method)
-//	nOut := meth.Type().NumOut()
-//	if nOut == 0 {
-//		return nil, nil
-//	}
-//
-//	body, errB := ioutil.ReadAll(resp.Body)
-//	if errB != nil {
-//		return nil, errB
-//	}
-//	//log.Println("call:", addr, method, args, " -> ", string(body))
-//
-//	if nOut > 1 {
-//		panic("rpc supports only 1 return value")
-//	}
-//
-//	outT := meth.Type().Out(0)
-//	out := reflect.New(outT).Interface()
-//
-//	err = json.Unmarshal(body, out)
-//	if err != nil {
-//		//panic(err) // todo: rm
-//		return nil, err
-//	}
-//	return reflect.ValueOf(out).Elem().Interface(), nil
-//}
+
+// re-usable http client for making RPC calls
+var httpClient = http.Client{Timeout: 2 * time.Second}
+
+// make RPC call to method on node with given address.
+func RPCCall(addr, method, arg string) (ret string, err error) {
+
+	defer log.Println(" > call  ", addr, method, arg, "->", ret, err)
+
+	//TODO: escape args?
+	resp, err := httpClient.Get("http://" + addr + "/do/" + method + "/" + arg)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("http status %v", resp.Status)
+	}
+
+	if b, err := ioutil.ReadAll(resp.Body); err != nil {
+		return "", err
+	} else {
+		return string(b), nil
+	}
+
+}

@@ -21,16 +21,21 @@ func NewUser() *User {
 
 // nextJob looks for the next free job in the list.
 // it does a tiny bit of linear search, starting from nextPtr.
-//func (u *User) giveJob(node string) *Job {
-//
-//	return nil
-//}
+func (u *User) giveJob(node string) *Job {
+	index := u.nextJobPtr()
+	if index >= len(u.Jobs) {
+		return nil
+	}
+	u.nextPtr++
+	return u.Jobs[index]
+}
 
 func (u *User) HasJob() bool {
 	i := u.nextJobPtr()
 	return i < len(u.Jobs)
 }
 
+// returns
 func (u *User) nextJobPtr() int {
 	for ; u.nextPtr < len(u.Jobs); u.nextPtr++ {
 		j := u.Jobs[u.nextPtr]

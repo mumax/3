@@ -16,6 +16,12 @@ var (
 func HandleStatus(w http.ResponseWriter, r *http.Request) {
 	RLock()
 	defer RUnLock()
+
+	if r.URL.Path != "/" {
+		http.Error(w, "Does not compute", http.StatusNotFound)
+		return
+	}
+
 	err := templ.Execute(w, &status{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -31,6 +37,7 @@ func (*status) MumaxVersion() string         { return MumaxVersion }
 func (*status) GPUs() []string               { return GPUs }
 func (*status) RunningHere() map[string]*Job { return RunningHere }
 func (*status) Users() map[string]*User      { return Users }
+func (*status) NextUser() string             { return nextUser() }
 
 const templText = `
 
@@ -105,10 +112,13 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue service</h2><p>
 
+	<h3>Users</h3>
 	{{range $k,$v := .Users}}
 		{{$k}} {{$v.FairShare}} GPU-hour, {{with .HasJob}} has {{else}} no {{end}} queued jobs<br/>
 	{{end}}
+	<b>Next job for:</b> {{.NextUser}}
 
+	<h3>Jobs</h3>
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
 		<b>Jobs:</b>

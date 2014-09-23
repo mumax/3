@@ -54,21 +54,10 @@ func main() {
 	thisAddr = canonicalAddr(*flag_addr, IPs)
 	DetectMumax()
 	DetectGPUs()
-
 	LoadJobs()
 
-	//	node = &Node{
-	//		Addr:         laddr,
-	//		upSince:      time.Now(),
-	//		MumaxVersion: DetectMumax(),
-	//		GPUs:         DetectGPUs(),
-	//		RunningHere:  make(map[string]*Job),
-	//		Users:        make(map[string]*User),
-	//	}
-
-	//	http.HandleFunc("/call/", node.HandleRPC)
-	//	http.HandleFunc("/do/", node.HandleHumanRPC)
-
+	//http.HandleFunc("/call/", node.HandleRPC)
+	//http.HandleFunc("/do/", node.HandleHumanRPC)
 	http.HandleFunc("/", HandleStatus)
 	httpfs.Handle()
 

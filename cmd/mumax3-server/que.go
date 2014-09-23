@@ -30,23 +30,24 @@ var (
 func (*RPC) GiveJob(nodeAddr string) string {
 	WLock()
 	defer WUnlock()
-	return ""
+	user := nextUser()
+	if user == "" {
+		return ""
+	}
+	return Users[user].giveJob(nodeAddr).URL
 }
 
 func nextUser() string {
 	// search user with least share and jobs in queue
 	leastShare := math.Inf(1)
-	var bestUser *User
-	for _, u := range Users {
-		used := u.FairShare
-		if u.HasJob() && used/u.FairShare < leastShare {
-			leastShare = used / u.FairShare
-			bestUser = u
+	var bestUser string
+	for n, u := range Users {
+		if u.HasJob() && u.FairShare < leastShare {
+			leastShare = u.FairShare
+			bestUser = n
 		}
 	}
-	if bestUser == nil {
-		return ""
-	}
+	return bestUser
 }
 
 // (Re-)load all jobs in the working directory.
@@ -86,6 +87,7 @@ func LoadUserJobs(dir string) {
 		Users[dir] = NewUser()
 	}
 	Users[dir].Jobs = newJobs
+	Users[dir].nextPtr = 0
 }
 
 type joblist []*Job

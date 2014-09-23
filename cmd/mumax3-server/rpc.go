@@ -22,7 +22,7 @@ type RPC struct{} // dummy type to define RPC methods on
 //	}
 //	fmt.Fprintf(w, `<html><head></head><body><a href="http://%v">back</a></body></html>`, n.Addr)
 //}
-//
+
 //// http Handler for incoming RPC calls.
 //func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {
 //

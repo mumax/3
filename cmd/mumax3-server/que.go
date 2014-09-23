@@ -27,7 +27,7 @@ var (
 
 // RPC-callable method: picks a job of the queue returns it
 // for the node to run it.
-func (*RPC) GiveJob(nodeAddr string) string {
+func GiveJob(nodeAddr string) string {
 	WLock()
 	defer WUnlock()
 	user := nextUser()
@@ -96,7 +96,7 @@ func (l *joblist) Len() int           { return len(*l) }
 func (l *joblist) Less(i, j int) bool { return (*l)[i].URL < (*l)[j].URL }
 func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
 
-func (*RPC) NotifyJobFinished(jobURL string) {
+func NotifyJob(jobURL string) {
 	////log.Println("NotifyJobFinished", jobURL, status)
 
 	//n.lock()

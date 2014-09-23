@@ -1,27 +1,38 @@
 package main
 
-type RPC struct{} // dummy type to define RPC methods on
+import (
+	"fmt"
+	"net/http"
+	"strings"
+)
 
-//func (n *Node) HandleHumanRPC(w http.ResponseWriter, r *http.Request) {
-//	request := r.URL.Path[len("/do/"):]
-//	slashPos := strings.Index(request, "/")
-//	method := request[:slashPos]
-//	arg := request[slashPos+1:]
-//
-//	switch method {
-//	default:
-//		http.Error(w, "bad request: "+method, http.StatusBadRequest)
-//		return
-//	case "kill":
-//		if err := n.KillJob("http://" + arg); err != nil {
-//			http.Error(w, err.Error(), http.StatusInternalServerError)
-//			return
-//		}
-//	case "rescan":
-//		n.ReScan()
-//	}
-//	fmt.Fprintf(w, `<html><head></head><body><a href="http://%v">back</a></body></html>`, n.Addr)
-//}
+type RPCFunc func(string) string
+
+var methods = map[string]RPCFunc{
+	"GiveJob": GiveJob,
+}
+
+func HandleRPC(w http.ResponseWriter, r *http.Request) {
+
+	defer func() {
+		if err := recover(); err != nil {
+			http.Error(w, "Does not compute: "+r.URL.Path, http.StatusBadRequest)
+		}
+	}()
+
+	request := r.URL.Path[len("/do/"):]
+	slashPos := strings.Index(request, "/")
+	method := request[:slashPos]
+	arg := request[slashPos+1:]
+
+	m, ok := methods[method]
+	if !ok {
+		http.Error(w, "Does not compute: "+method, http.StatusBadRequest)
+		return
+	}
+	ret := m(arg)
+	fmt.Fprint(w, ret)
+}
 
 //// http Handler for incoming RPC calls.
 //func (n *Node) HandleRPC(w http.ResponseWriter, r *http.Request) {

@@ -56,8 +56,7 @@ func main() {
 	DetectGPUs()
 	LoadJobs()
 
-	//http.HandleFunc("/call/", node.HandleRPC)
-	//http.HandleFunc("/do/", node.HandleHumanRPC)
+	http.HandleFunc("/do/", HandleRPC)
 	http.HandleFunc("/", HandleStatus)
 	httpfs.Handle()
 

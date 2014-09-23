@@ -55,6 +55,7 @@ func RunComputeService() {
 			RunningHere[URL] = p
 			WUnlock()
 
+			_, _ = RPCCall(JobHost(URL), "UpdateJob", URL) // update so we see .out appear on start
 			p.Run()
 
 			// remove from "running" list
@@ -62,7 +63,7 @@ func RunComputeService() {
 			delete(RunningHere, URL)
 			WUnlock()
 
-			_, err := RPCCall(JobHost(URL), "NotifyJob", URL)
+			_, err := RPCCall(JobHost(URL), "UpdateJob", URL)
 			if err != nil {
 				log.Println(err)
 			}

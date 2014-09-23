@@ -96,45 +96,21 @@ func (l *joblist) Len() int           { return len(*l) }
 func (l *joblist) Less(i, j int) bool { return (*l)[i].URL < (*l)[j].URL }
 func (l *joblist) Swap(i, j int)      { (*l)[i], (*l)[j] = (*l)[j], (*l)[i] }
 
-func NotifyJob(jobURL string) {
-	////log.Println("NotifyJobFinished", jobURL, status)
+// RPC-callable function. Refreshes the in-memory cached info about this job.
+// Called, e.g., after a node has finished a job.
+func UpdateJob(jobURL string) string {
 
-	//n.lock()
-	//defer n.unlock()
+	WLock()
+	WUnlock()
 
-	//username := JobUser(jobURL)
-	//user := n.Users[username]
+	j := JobByName(jobURL)
+	if j == nil {
+		log.Println("update", jobURL, ": no such job")
+		return "" // empty conventionally means error
+	}
+	j.Update()
 
-	//job := user.Running[jobURL]
-
-	//// TODO: job == nil?
-
-	//switch {
-	//case status > 0:
-	//	job.Status = FAILED
-	//case status == 0:
-	//	job.Status = FINISHED
-	//case status < 0:
-	//	job.Status = QUEUED
-	//	job.Reque++
-	//	job.Start = time.Time{}
-	//	job.Stop = time.Time{}
-	//}
-
-	//// TODO: rm .out on requeue
-	//job.Stop = time.Now()
-	//if job.Status != QUEUED {
-	//	user.usedShare += job.Runtime().Seconds()
-	//}
-
-	//delete(user.Running, jobURL)
-
-	//if job.Status == FINISHED || job.Status == FAILED {
-	//	user.Finished[jobURL] = job
-	//}
-	//if job.Status == QUEUED {
-	//	user.Queue[jobURL] = job
-	//}
+	return "updated " + jobURL // not used, but handy if called by Human.
 }
 
 // Periodically updates user's usedShare so they decay

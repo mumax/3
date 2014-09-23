@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -36,9 +37,50 @@ func (j *Job) Update() {
 	}
 }
 
+func JobByName(URL string) *Job {
+	user := Users[BaseDir(LocalPath(URL))]
+	if user == nil {
+		log.Println("JobByName: no user for", URL)
+		return nil
+	}
+	jobs := user.Jobs
+
+	low := 0
+	high := len(jobs) - 1
+	mid := -1
+
+	for low <= high {
+		mid = (low + high) / 2
+		switch {
+		case jobs[mid].URL < URL:
+			low = mid + 1
+		case jobs[mid].URL > URL:
+			high = mid + -1
+		default:
+			break
+		}
+	}
+
+	if mid >= 0 && mid < len(jobs) && jobs[mid].URL == URL {
+		return jobs[mid]
+	} else {
+		log.Println("JobByName: not found:", URL)
+		return nil
+	}
+}
+
+func (j *Job) User() string {
+	return BaseDir(j.LocalPath())
+}
+
 // local path of input file
 func (j *Job) LocalPath() string {
-	return MustParseURL(j.URL).Path[1:]
+	return LocalPath(j.URL)
+}
+
+// local path of input file
+func LocalPath(URL string) string {
+	return MustParseURL(URL).Path[1:]
 }
 
 // local path of output dir

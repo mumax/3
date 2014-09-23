@@ -12,8 +12,9 @@ import (
 type RPCFunc func(string) string
 
 var methods = map[string]RPCFunc{
-	"GiveJob": GiveJob,
-	"Ping":    Ping,
+	"GiveJob":   GiveJob,
+	"UpdateJob": UpdateJob,
+	"Ping":      Ping,
 }
 
 func HandleRPC(w http.ResponseWriter, r *http.Request) {
@@ -22,10 +23,10 @@ func HandleRPC(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		log.Println(" < call  ", r.Host, r.URL.Path, "->", ret)
-		if err := recover(); err != nil {
-			log.Println("*** RPC   panic: ", r.URL.Path, ":", err)
-			http.Error(w, "Does not compute: "+r.URL.Path, http.StatusBadRequest)
-		}
+		//if err := recover(); err != nil {
+		//	log.Println("*** RPC   panic: ", r.URL.Path, ":", err)
+		//	http.Error(w, "Does not compute: "+r.URL.Path, http.StatusBadRequest)
+		//}
 	}()
 	request := r.URL.Path[len("/do/"):]
 	slashPos := strings.Index(request, "/")

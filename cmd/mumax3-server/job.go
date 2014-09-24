@@ -91,7 +91,11 @@ func LocalPath(ID string) string {
 
 // local path of output dir
 func (j *Job) LocalOutputDir() string {
-	return util.NoExt(j.LocalPath()) + ".out/"
+	return OutputDir(j.LocalPath())
+}
+
+func OutputDir(path string) string {
+	return util.NoExt(path) + ".out/"
 }
 
 // insert "/fs" in front of url path

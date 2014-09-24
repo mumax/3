@@ -24,8 +24,9 @@ var (
 
 type Process struct {
 	*exec.Cmd
-	Start time.Time
-	Out   io.WriteCloser
+	Start     time.Time
+	Out       io.WriteCloser
+	OutputURL string
 }
 
 // Runs a compute service on this node, if GPUs are available.
@@ -135,15 +136,15 @@ func NewProcess(inputURL string, gpu int, webAddr string) *Process {
 	cmd.Stderr = out
 	cmd.Stdout = out
 
-	return &Process{Cmd: cmd, Start: time.Now(), Out: out}
+	return &Process{Cmd: cmd, Start: time.Now(), Out: out, OutputURL: OutputDir(inputURL)}
 }
 
 func (p *Process) Run() {
-	cmd := p.Cmd
-	log.Println("=> exec  ", cmd.Path, cmd.Args)
+	log.Println("=> exec  ", p.Path, p.Args)
 
-	//outDir := JobOutputDir(job.URL)
 	defer p.Out.Close()
+
+	httpfs.Put(p.OutputURL+"host", []byte(thisAddr))
 
 	WLock()               // Cmd.Start() modifies state
 	err1 := p.Cmd.Start() // err?
@@ -151,31 +152,20 @@ func (p *Process) Run() {
 
 	err2 := p.Cmd.Wait()
 
+	status := -1
+
 	// TODO: determine proper status number
 	if err1 != nil || err2 != nil {
-		log.Println(cmd.Path, cmd.Args, err1, err2)
-		return // TODO: write stat
+		log.Println(p.Path, p.Args, err1, err2)
+		status = 1
+	} else {
+		status = 0
 	}
+
+	httpfs.Put(p.OutputURL+"exitstatus", []byte(fmt.Sprint(status)))
+
 	return // TODO: write stat
 }
-
-//// TODO: revise
-//func (n *Node) PeersWithJobs() []PeerInfo {
-//	n.lock()
-//	defer n.unlock()
-//	var peers []PeerInfo
-//	for _, p := range n.Peers {
-//		//if p.HaveJobs {
-//		peers = append(peers, p)
-//		//}
-//	}
-//	return peers
-//}
-//
-//type GPU struct {
-//	Info string
-//}
-//
 
 func DetectGPUs() {
 	if GPUs != nil {

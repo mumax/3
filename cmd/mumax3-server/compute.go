@@ -83,14 +83,18 @@ func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
 
 // RPC-callable function, answers by this node's time
 func WhatsTheTime(string) string {
-	return time.Now().Format(time.ANSIC)
+	return time.Now().Format(time.UnixDate)
 }
 
 func AskTime(host string) time.Time {
 	str, _ := RPCCall(host, "WhatsTheTime", "")
-	t, err := time.Parse(time.ANSIC, str)
+	return parseTime(str)
+}
+
+func parseTime(str string) time.Time {
+	t, err := time.Parse(time.UnixDate, str)
 	if err != nil {
-		log.Println("AskTime", host, err)
+		log.Println("ParseTime:", str, err)
 	}
 	return t
 }
@@ -164,13 +168,23 @@ func (p *Process) Run() {
 	httpfs.Put(p.OutputURL+"host", []byte(thisAddr))
 
 	startTime := AskTime(p.Host())
-	httpfs.Put(p.OutputURL+"start", []byte(startTime.Format(time.ANSIC)))
+	httpfs.Put(p.OutputURL+"start", []byte(startTime.Format(time.UnixDate)))
 
 	WLock()               // Cmd.Start() modifies state
 	err1 := p.Cmd.Start() // err?
 	WUnlock()
 
+	timeOffset := time.Now().Sub(startTime) // our clock is most likely out-of-sync with host
+	tick := time.NewTicker(KeepaliveInterval)
+
+	go func() {
+		for t := range tick.C {
+			httpfs.Put(p.OutputURL+"alive", []byte(t.Add(timeOffset).Format(time.UnixDate)))
+		}
+	}()
+
 	err2 := p.Cmd.Wait()
+	tick.Stop()
 
 	status := -1
 

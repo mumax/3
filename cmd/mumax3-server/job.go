@@ -40,6 +40,7 @@ func (j *Job) Update() {
 	if j.Output != "" {
 		j.Host = httpfsRead(out + "host")
 		j.ExitStatus = httpfsRead(out + "exitstatus")
+		j.Start = parseTime(httpfsRead(out + "start"))
 	}
 }
 

@@ -1,5 +1,7 @@
 package main
 
+import "time"
+
 type User struct {
 	Jobs      []*Job
 	FairShare float64 // Used-up compute time in the past (decays)
@@ -28,8 +30,11 @@ func (u *User) giveJob(node string) *Job {
 	}
 	u.nextPtr++
 	j := u.Jobs[index]
-	j.Host = node              // preliminary, to get rapid gui response
-	j.Output = OutputDir(j.ID) // preliminary, to get rapid gui response
+	// all below are preliminary, to get rapid gui response.
+	// may be overwritten by update
+	j.Host = node
+	j.Output = OutputDir(j.ID)
+	j.Start = time.Now()
 	return j
 }
 

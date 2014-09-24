@@ -35,7 +35,8 @@ const (
 )
 
 var (
-	thisAddr    string
+	thisAddr    string // unique address of this node, e.g., name:1234
+	thisHost    string // unique hostname of this node, e.g., name
 	global_lock sync.RWMutex
 )
 
@@ -53,6 +54,9 @@ func main() {
 	//minPort, maxPort := parsePorts()
 
 	thisAddr = canonicalAddr(*flag_addr, IPs)
+	var err error
+	thisHost, _, err = net.SplitHostPort(thisAddr)
+	util.FatalErr(err)
 	DetectMumax()
 	DetectGPUs()
 	LoadJobs()

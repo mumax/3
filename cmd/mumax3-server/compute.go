@@ -46,7 +46,7 @@ func RunComputeService() {
 
 	for {
 		gpu := <-idle // take an available GPU
-		GUIAddr := fmt.Sprint(":", GUI_PORT+gpu)
+		GUIAddr := fmt.Sprint(thisHost+":", GUI_PORT+gpu)
 		ID := WaitForJob() // take an available job
 		go func() {
 

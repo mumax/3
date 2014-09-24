@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/gui"
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 	"math/rand"
 	"net"
@@ -539,20 +540,8 @@ func GoServe(addr string) string {
 		addr = fmt.Sprint(h, ":", atoi(p)+1)
 		l, err = net.Listen("tcp", addr)
 	}
-	l.Close()
-	// brief but unlikely race opportunity here
-
-	// Listen and serve on all interfaces
-	go func() {
-		_, p, err := net.SplitHostPort(addr)
-		util.FatalErr(err)
-		ips := util.InterfaceAddrs()
-		for _, ip := range ips {
-			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
-		}
-
-		util.FatalErr(http.ListenAndServe(addr, nil))
-	}()
+	go func() { LogErr(http.Serve(l, nil)) }()
+	httpfs.Put(OD()+"gui", []byte(l.Addr().String()))
 	return addr
 }
 

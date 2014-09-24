@@ -31,6 +31,7 @@ func HandleStatus(w http.ResponseWriter, r *http.Request) {
 type status struct{} // dummy type to define template methods on
 
 func (*status) IPRange() string                { return *flag_scan + ": " + *flag_ports }
+func (*status) Ports() string                  { return *flag_ports }
 func (*status) ThisAddr() string               { return thisAddr }
 func (*status) Uptime() time.Duration          { return Since(time.Now(), upSince) }
 func (*status) MumaxVersion() string           { return MumaxVersion }
@@ -91,8 +92,11 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Peer nodes</h2>
 
+	<b>scan</b> {{.IPRange}}<br/>
+	<b>ports</b> {{.Ports}}<br/>
+	<button onclick='doEvent("Rescan", "")'>Rescan</button> <br/>
 	{{range $k,$v := .Peers}} 
-		{{$k}} {{$v}} <br/>
+		<a href="http://{{$k}}">{{$k}}</a> <br/>
 	{{end}}
 
 <h2>Compute service</h2><p>

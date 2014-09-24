@@ -77,6 +77,20 @@ func RunComputeService() {
 
 func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
 
+// RPC-callable function, answers by this node's time
+func WhatsTheTime(string) string {
+	return time.Now().Format(time.ANSIC)
+}
+
+func AskTime(host string) time.Time {
+	str, _ := RPCCall(host, "WhatsTheTime", "")
+	t, err := time.Parse(time.ANSIC, str)
+	if err != nil {
+		log.Println("AskTime", host, err)
+	}
+	return t
+}
+
 func WaitForJob() string {
 	ID := FindJob()
 	for ID == "" {
@@ -144,6 +158,8 @@ func (p *Process) Run() {
 	defer p.Out.Close()
 
 	httpfs.Put(p.OutputURL+"host", []byte(thisAddr))
+
+	//startTime := time.Parse(
 
 	WLock()               // Cmd.Start() modifies state
 	err1 := p.Cmd.Start() // err?

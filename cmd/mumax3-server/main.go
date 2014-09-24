@@ -19,7 +19,7 @@ import (
 
 var (
 	flag_addr     = flag.String("l", ":35360", "Listen and serve at this network address")
-	flag_scan     = flag.String("scan", "192.168.0.1-253", "Scan these IP address for other servers")
+	flag_scan     = flag.String("scan", "192.168.0.1-128", "Scan these IP address for other servers")
 	flag_ports    = flag.String("ports", "35360-35361", "Scan these ports for other servers")
 	flag_timeout  = flag.Duration("timeout", 2*time.Second, "Portscan timeout")
 	flag_mumax    = flag.String("exec", "mumax3", "mumax3 executable")
@@ -30,14 +30,16 @@ var (
 
 const (
 	MaxIPs     = 1024 // maximum number of IP address to portscan
-	N_SCANNERS = 1    // number of parallel portscan goroutines
+	N_SCANNERS = 32   // number of parallel portscan goroutines
 	MAXGPU     = 16   // maximum number of GPU's to check for
 )
 
 var (
-	thisAddr    string // unique address of this node, e.g., name:1234
-	thisHost    string // unique hostname of this node, e.g., name
-	global_lock sync.RWMutex
+	thisAddr         string // unique address of this node, e.g., name:1234
+	thisHost         string // unique hostname of this node, e.g., name
+	IPs              []string
+	MinPort, MaxPort int
+	global_lock      sync.RWMutex
 )
 
 func RLock()   { global_lock.RLock() }
@@ -50,8 +52,8 @@ const GUI_PORT = 35367 // base port number for GUI (to be incremented by GPU num
 func main() {
 	flag.Parse()
 
-	IPs := parseIPs()
-	//minPort, maxPort := parsePorts()
+	IPs = parseIPs()
+	MinPort, MaxPort = parsePorts()
 
 	thisAddr = canonicalAddr(*flag_addr, IPs)
 	var err error
@@ -80,7 +82,7 @@ func main() {
 	}()
 
 	ProbePeer(thisAddr) // make sure we have ourself as peer
-	//go FindPeers(IPs, minPort, maxPort)
+	go FindPeers(IPs, MinPort, MaxPort)
 	go RunComputeService()
 
 	//	go RunJobScan("./")

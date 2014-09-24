@@ -19,7 +19,7 @@ import (
 var (
 	MumaxVersion string
 	GPUs         []string
-	RunningHere  = make(map[string]*Process)
+	Processes    = make(map[string]*Process)
 )
 
 type Process struct {
@@ -52,7 +52,7 @@ func RunComputeService() {
 			p := NewProcess("http://"+ID, gpu, GUIAddr)
 
 			WLock()
-			RunningHere[ID] = p
+			Processes[ID] = p
 			WUnlock()
 
 			_, _ = RPCCall(JobHost(ID), "UpdateJob", ID) // update so we see .out appear on start
@@ -61,7 +61,7 @@ func RunComputeService() {
 
 			// remove from "running" list
 			WLock()
-			delete(RunningHere, ID)
+			delete(Processes, ID)
 			WUnlock()
 
 			_, err := RPCCall(JobHost(ID), "UpdateJob", ID)

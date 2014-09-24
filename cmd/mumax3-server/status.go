@@ -30,15 +30,16 @@ func HandleStatus(w http.ResponseWriter, r *http.Request) {
 
 type status struct{} // dummy type to define template methods on
 
-func (*status) IPRange() string                  { return *flag_scan + ": " + *flag_ports }
-func (*status) ThisAddr() string                 { return thisAddr }
-func (*status) Uptime() time.Duration            { return Since(time.Now(), upSince) }
-func (*status) MumaxVersion() string             { return MumaxVersion }
-func (*status) GPUs() []string                   { return GPUs }
-func (*status) RunningHere() map[string]*Process { return RunningHere }
-func (*status) Users() map[string]*User          { return Users }
-func (*status) NextUser() string                 { return nextUser() }
-func (*status) Peers() map[string]*Peer          { return peers }
+func (*status) IPRange() string                { return *flag_scan + ": " + *flag_ports }
+func (*status) ThisAddr() string               { return thisAddr }
+func (*status) Uptime() time.Duration          { return Since(time.Now(), upSince) }
+func (*status) MumaxVersion() string           { return MumaxVersion }
+func (*status) GPUs() []string                 { return GPUs }
+func (*status) Processes() map[string]*Process { return Processes }
+func (*status) Users() map[string]*User        { return Users }
+func (*status) NextUser() string               { return nextUser() }
+func (*status) Peers() map[string]*Peer        { return peers }
+func (*status) FS(a string) string             { return FS(a) }
 
 const templText = `
 
@@ -123,8 +124,12 @@ Uptime: {{.Uptime}} <br/>
 	
 	<h3>Running jobs</h3><p>
 		<table>
-			{{range $k,$v := .RunningHere}}
-				{{$v.Duration}} {{$v.Path}} {{$v.Args}} 
+			{{range $k,$v := .Processes}}
+				<tr>
+					<td> [<a href="http://{{$.FS $k}}">{{$k}}</a>] </td>
+					<td> [{{$v.Duration}}]</td> 
+					<td> <button onclick='doEvent("Kill", "{{$k}}")'>kill</button> </td>
+				</tr>
 			{{end}}
 		</table>
 	</p>

@@ -95,8 +95,12 @@ func (j *Job) LocalOutputDir() string {
 }
 
 // insert "/fs" in front of url path
-func (*Job) FS(url string) string {
-	return BaseDir(url) + "/fs/" + LocalPath(url)
+func (*Job) FS(id string) string {
+	return FS(id)
+}
+
+func FS(id string) string {
+	return BaseDir(id) + "/fs/" + LocalPath(id)
 }
 
 func (j *Job) IsQueued() bool {

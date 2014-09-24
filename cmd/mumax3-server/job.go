@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 	"os"
-	"os/exec"
 	"time"
 
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 )
 
@@ -13,17 +13,19 @@ import (
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// all of this is cache:
-	Output  string // if exists, points to output ID
-	Engaged string // node address this job was last given to
+	Output     string // if exists, points to output ID
+	Engaged    string // node address this job was last given to
+	Host       string // node address in host file (=last host who started this job)
+	ExitStatus string // what's in the exitstatus file
 	// old
-	outputURL string    // URL of the output directory, access via OutputURL()
-	Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
-	GPU       int       // GPU number on the compute node that runs/ran this job, if any
-	Start     time.Time // When this job was started, if applicable
-	Stop      time.Time // When this job was finished, if applicable
-	Status              // Job status: queued, running,...
-	Cmd       *exec.Cmd
-	Reque     int // how many times requeued.
+	//outputURL string    // URL of the output directory, access via OutputURL()
+	//Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
+	//GPU       int       // GPU number on the compute node that runs/ran this job, if any
+	Start time.Time // When this job was started, if applicable
+	Stop  time.Time // When this job was finished, if applicable
+	//Status              // Job status: queued, running,...
+	//Cmd       *exec.Cmd
+	Reque int // how many times requeued.
 }
 
 // read job files from storage and update status cache
@@ -34,6 +36,19 @@ func (j *Job) Update() {
 	} else {
 		j.Output = ""
 	}
+
+	if j.Output != "" {
+		j.Host = httpfsRead(out + "host")
+		j.ExitStatus = httpfsRead(out + "exitstatus")
+	}
+}
+
+func httpfsRead(fname string) string {
+	data, err := httpfs.Read(fname)
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }
 
 func JobByName(ID string) *Job {
@@ -135,6 +150,22 @@ var statusString = map[Status]string{
 
 func (s Status) String() string {
 	return statusString[s]
+}
+
+func (j *Job) Status() string {
+	if j.IsQueued() {
+		return QUEUED.String()
+	}
+	if j.ExitStatus == "0" {
+		return FINISHED.String()
+	}
+	if j.Host != "" && j.ExitStatus == "" {
+		return RUNNING.String()
+	}
+	if j.ExitStatus != "" && j.ExitStatus != "0" {
+		return FAILED.String()
+	}
+	return "UNKNOWN"
 }
 
 //func (j *Job) Path() string {

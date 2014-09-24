@@ -44,19 +44,12 @@ func (*status) FS(a string) string             { return FS(a) }
 const templText = `
 
 {{define "Job"}}
-<tr>
-<td class={{.Status.String}}> [{{.Status.String}}] </td>
-		<td> [<a href="http://{{.FS .ID}}">{{.LocalPath}}</a>] </td>
-		<td> [{{with .Engaged}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
-		<td> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
-		<td> [{{with .Status}}<a href="http://{{$.Node}}">{{$.Node}}</a>/{{$.GPU}}{{end}}] </td>
-		<td> [{{with .Status}}<a href="{{$.OutputURL}}">out</a>{{end}}] </td>
-		<td> [{{with .Status}}{{$.Runtime}}{{end}}] </td>
-		<td> 
-			{{with .Cmd}} [<a href="http://{{$.Node}}/do/kill/{{$.Path}}">kill</a>]   {{end}} 
-			{{with .Reque}} [{{.}}x requeued]   {{end}} 
-		</td>
-	</tr>
+<tr class={{.Status}}>
+		<td class={{.Status}}> [<a href="http://{{.FS .ID}}">{{.LocalPath}}</a>] </td>
+		<td class={{.Status}}> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
+		<td class={{.Status}}> [{{with .Host}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
+		<td class={{.Status}}> [{{with .ExitStatus}}{{if eq . "0"}} OK {{else}}FAIL{{end}}{{end}}] </td>
+</tr>
 {{end}}
 
 <html>

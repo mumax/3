@@ -40,7 +40,7 @@ var (
 )
 
 func RLock()   { global_lock.RLock() }
-func RUnLock() { global_lock.RUnlock() }
+func RUnlock() { global_lock.RUnlock() }
 func WLock()   { global_lock.Lock() }
 func WUnlock() { global_lock.Unlock() }
 

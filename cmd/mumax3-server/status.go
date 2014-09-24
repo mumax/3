@@ -15,7 +15,7 @@ var (
 
 func HandleStatus(w http.ResponseWriter, r *http.Request) {
 	RLock()
-	defer RUnLock()
+	defer RUnlock()
 
 	if r.URL.Path != "/" {
 		http.Error(w, "Does not compute", http.StatusNotFound)

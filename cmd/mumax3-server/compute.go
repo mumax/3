@@ -97,19 +97,23 @@ func FindJob() string {
 	return ""
 }
 
-//func (n *Node) KillJob(url string) error {
-//	n.lock()
-//	defer n.unlock()
-//
-//	log.Println("kill", url)
-//	job := n.RunningHere[url]
-//	if job == nil {
-//		return fmt.Errorf("kill %v: job not running.", url)
-//	}
-//	job.Reque++
-//	err := job.Cmd.Process.Kill()
-//	return err
-//}
+// RPC-callable function kills job corresponding to given job id.
+// The job has to be running on this node.
+func Kill(id string) string {
+	WLock() // modifies Cmd state
+	defer WUnlock()
+
+	log.Println("KILL", id)
+	job := Processes[id]
+	if job == nil {
+		return fmt.Sprintf("kill %v: job not running.", id)
+	}
+	err := job.Cmd.Process.Kill()
+	if err != nil {
+		return err.Error()
+	}
+	return "" // OK
+}
 
 // prepare exec.Cmd to run mumax3 compute process
 func NewProcess(inputURL string, gpu int, webAddr string) *Process {
@@ -134,21 +138,25 @@ func NewProcess(inputURL string, gpu int, webAddr string) *Process {
 	return &Process{Cmd: cmd, Start: time.Now(), Out: out}
 }
 
-func (p *Process) Run() (status int) {
+func (p *Process) Run() {
 	cmd := p.Cmd
 	log.Println("=> exec  ", cmd.Path, cmd.Args)
-	defer log.Println("<= exec  ", cmd.Path, cmd.Args, "status", status)
 
 	//outDir := JobOutputDir(job.URL)
 	defer p.Out.Close()
-	err := cmd.Run()
+
+	WLock()               // Cmd.Start() modifies state
+	err1 := p.Cmd.Start() // err?
+	WUnlock()
+
+	err2 := p.Cmd.Wait()
 
 	// TODO: determine proper status number
-	if err != nil {
-		log.Println(cmd.Path, cmd.Args, err)
-		return 1
+	if err1 != nil || err2 != nil {
+		log.Println(cmd.Path, cmd.Args, err1, err2)
+		return // TODO: write stat
 	}
-	return 0
+	return // TODO: write stat
 }
 
 //// TODO: revise

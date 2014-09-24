@@ -17,6 +17,7 @@ var methods = map[string]RPCFunc{
 	"Ping":         Ping,
 	"LoadUserJobs": LoadUserJobs,
 	"LoadJobs":     wrap(LoadJobs),
+	"Kill":         Kill,
 }
 
 func wrap(f func()) RPCFunc {

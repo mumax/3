@@ -30,6 +30,10 @@ type Process struct {
 	GUI       string
 }
 
+func (p *Process) Host() string {
+	return JobHost(p.OutputURL)
+}
+
 // Runs a compute service on this node, if GPUs are available.
 // The compute service asks storage nodes for a job, runs it,
 // saves results over httpfs and notifies storage when ready.
@@ -159,7 +163,8 @@ func (p *Process) Run() {
 
 	httpfs.Put(p.OutputURL+"host", []byte(thisAddr))
 
-	//startTime := time.Parse(
+	startTime := AskTime(p.Host())
+	httpfs.Put(p.OutputURL+"start", []byte(startTime.Format(time.ANSIC)))
 
 	WLock()               // Cmd.Start() modifies state
 	err1 := p.Cmd.Start() // err?

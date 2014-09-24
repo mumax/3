@@ -27,6 +27,7 @@ type Process struct {
 	Start     time.Time
 	Out       io.WriteCloser
 	OutputURL string
+	GUI       string
 }
 
 // Runs a compute service on this node, if GPUs are available.
@@ -136,7 +137,7 @@ func NewProcess(inputURL string, gpu int, webAddr string) *Process {
 	cmd.Stderr = out
 	cmd.Stdout = out
 
-	return &Process{Cmd: cmd, Start: time.Now(), Out: out, OutputURL: OutputDir(inputURL)}
+	return &Process{Cmd: cmd, Start: time.Now(), Out: out, OutputURL: OutputDir(inputURL), GUI: webAddr}
 }
 
 func (p *Process) Run() {

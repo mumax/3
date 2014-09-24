@@ -121,6 +121,7 @@ Uptime: {{.Uptime}} <br/>
 				<tr>
 					<td> [<a href="http://{{$.FS $k}}">{{$k}}</a>] </td>
 					<td> [{{$v.Duration}}]</td> 
+					<td> [<a href="http://{{$v.GUI}}">GUI</a>]</td> 
 					<td> <button onclick='doEvent("Kill", "{{$k}}")'>kill</button> </td>
 				</tr>
 			{{end}}

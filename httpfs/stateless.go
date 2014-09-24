@@ -64,6 +64,14 @@ func Append(URL string, p []byte) error {
 	}
 }
 
+func Put(URL string, p []byte) error {
+	if isRemote(URL) {
+		return httpPut(URL, p)
+	} else {
+		return localPut(URL, p)
+	}
+}
+
 func isRemote(URL string) bool {
 	return strings.HasPrefix(URL, "http://")
 }
@@ -75,6 +83,7 @@ const (
 	APPEND action = "append"
 	LS     action = "ls"
 	MKDIR  action = "mkdir"
+	PUT    action = "put"
 	READ   action = "read"
 	RM     action = "rm"
 )
@@ -86,6 +95,7 @@ func Handle() {
 		APPEND: handleAppend,
 		LS:     handleLs,
 		MKDIR:  handleMkdir,
+		PUT:    handlePut,
 		READ:   handleRead,
 		RM:     handleRemove,
 	}
@@ -125,6 +135,10 @@ func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
 
 func handleAppend(fname string, data []byte, w io.Writer) error {
 	return localAppend(fname, data)
+}
+
+func handlePut(fname string, data []byte, w io.Writer) error {
+	return localPut(fname, data)
 }
 
 func handleLs(fname string, data []byte, w io.Writer) error {
@@ -209,6 +223,11 @@ func httpAppend(URL string, data []byte) error {
 	return err
 }
 
+func httpPut(URL string, data []byte) error {
+	_, err := do(PUT, URL, data)
+	return err
+}
+
 func httpRead(URL string) ([]byte, error) {
 	return do(READ, URL, nil)
 }
@@ -239,6 +258,17 @@ func localLs(fname string) ([]string, error) {
 func localAppend(fname string, data []byte) error {
 	_ = os.MkdirAll(path.Dir(fname), DirPerm)
 	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, FilePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err2 := f.Write(data)
+	return err2
+}
+
+func localPut(fname string, data []byte) error {
+	_ = os.MkdirAll(path.Dir(fname), DirPerm)
+	f, err := os.OpenFile(fname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, FilePerm)
 	if err != nil {
 		return err
 	}

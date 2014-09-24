@@ -21,7 +21,7 @@ func init() {
 	}()
 }
 
-func TestStatelessMkdir(t *testing.T) {
+func TestMkdir(t *testing.T) {
 	if err := Mkdir("testdata/delete/local/this/is/a/dir"); err != nil {
 		t.Error(err)
 	}
@@ -33,19 +33,25 @@ func TestStatelessMkdir(t *testing.T) {
 	}
 }
 
-func TestStatelessReadDir(t *testing.T) {
+func TestReadDir(t *testing.T) {
 
 }
 
-func TestStatelessRemove(t *testing.T) {
+func TestRemove(t *testing.T) {
 
 }
 
-func TestStatelessRead(t *testing.T) {
+func TestRead(t *testing.T) {
 
 }
 
-func TestStatelessAppend(t *testing.T) {
+func TestPut(t *testing.T) {
+	if err := Put(testURL+"testdata/a/file.txt", []byte("hello")); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAppend(t *testing.T) {
 	if err := Mkdir(testURL + "testdata/delete/bla/bla/"); err != nil {
 		t.Error(err)
 	}

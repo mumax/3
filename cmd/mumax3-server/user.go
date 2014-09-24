@@ -27,7 +27,10 @@ func (u *User) giveJob(node string) *Job {
 		return nil
 	}
 	u.nextPtr++
-	return u.Jobs[index]
+	j := u.Jobs[index]
+	j.Host = node              // preliminary, to get rapid gui response
+	j.Output = OutputDir(j.ID) // preliminary, to get rapid gui response
+	return j
 }
 
 func (u *User) HasJob() bool {

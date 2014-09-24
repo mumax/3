@@ -57,8 +57,6 @@ func RunComputeService() {
 			Processes[ID] = p
 			WUnlock()
 
-			_, _ = RPCCall(JobHost(ID), "UpdateJob", ID) // update so we see .out appear on start
-
 			p.Run()
 
 			// remove from "running" list

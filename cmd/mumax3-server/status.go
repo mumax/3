@@ -150,14 +150,6 @@ Uptime: {{.Uptime}} <br/>
 		</p>
 	{{end}}
 	</p>
-	
-
-
-
-<h2>HTTPFS service</h2><p>
-	:-)
-</p>
-
 
 </body>
 </html>

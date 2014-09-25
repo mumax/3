@@ -52,5 +52,9 @@ func DoWatchdog() {
 				}
 			}
 		}
+		// re-set nextPtr to beginning so we can start re-queued jobs
+		if u.nextPtr >= len(u.Jobs) {
+			u.nextPtr = 0
+		}
 	}
 }

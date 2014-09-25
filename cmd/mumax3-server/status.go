@@ -50,7 +50,7 @@ const templText = `
 		<td class={{.Status}}> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
 		<td class={{.Status}}> [{{with .Host}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
 		<td class={{.Status}}> [{{with .ExitStatus}}{{if eq . "0"}} OK {{else}}<a class={{$.Status}} href="http://{{$.FS $.Output}}stdout.txt">FAIL</a>{{end}}{{end}}] </td>
-		<td class={{.Status}}> [{{with .Output}}{{$.Start}}{{end}}] </td>
+		<td class={{.Status}}> [{{with .Output}}{{$.Start}}{{end}}{{with .RequeCount}} {{.}}x re-queued{{end}}] </td>
 </tr>
 {{end}}
 
@@ -143,7 +143,8 @@ Uptime: {{.Uptime}} <br/>
 	<b>Next job for:</b> {{.NextUser}}
 
 	<h3>Jobs</h3>
-		<button onclick='doEvent("LoadJobs", "")'>Reload all</button> (consider reloading just your own files).
+		<button onclick='doEvent("LoadJobs", "")'>Reload all</button> (consider reloading just your own files). <br/>
+		<button onclick='doEvent("WakeupWatchdog", "")'>Wake-up Watchdog</button> (re-queue dead simulations right now).
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
 	

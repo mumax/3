@@ -85,6 +85,7 @@ func main() {
 	ProbePeer(thisAddr) // make sure we have ourself as peer
 	go FindPeers(IPs, MinPort, MaxPort)
 	go RunComputeService()
+	go LoopWatchdog()
 
 	//	go RunJobScan("./")
 	//	go RunShareDecay()

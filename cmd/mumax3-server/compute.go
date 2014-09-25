@@ -134,10 +134,10 @@ func FindJob() string {
 func Kill(id string) string {
 	log.Println("KILL", id)
 
-	if JobHost(id) != thisAddr {
-		ret, _ := RPCCall(JobHost(id), "Kill", id)
-		return ret
-	}
+//	if JobHost(id) != thisAddr {
+//		ret, _ := RPCCall(JobHost(id), "Kill", id)
+//		return ret
+//	}
 
 	WLock() // modifies Cmd state
 	defer WUnlock()

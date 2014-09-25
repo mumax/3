@@ -20,6 +20,7 @@ var methods = map[string]RPCFunc{
 	"UpdateJob":    UpdateJob,
 	"Rescan":       func(string) string { go FindPeers(IPs, MinPort, MaxPort); return "" },
 	"WhatsTheTime": WhatsTheTime,
+	"WakeupWatchdog": WakeupWatchdog,
 }
 
 func wrap(f func()) RPCFunc {
@@ -31,7 +32,7 @@ func HandleRPC(w http.ResponseWriter, r *http.Request) {
 	var ret string
 
 	defer func() {
-		log.Println(" < call  ", r.Host, r.URL.Path, "->", ret)
+		//log.Println(" < call  ", r.Host, r.URL.Path, "->", ret)
 		if err := recover(); err != nil {
 			log.Println("*** RPC   panic: ", r.URL.Path, ":", err)
 			http.Error(w, "Does not compute: "+r.URL.Path, http.StatusBadRequest)
@@ -58,7 +59,7 @@ var httpClient = http.Client{Timeout: 2 * time.Second}
 // make RPC call to method on node with given address.
 func RPCCall(addr, method, arg string) (ret string, err error) {
 
-	defer func() { log.Println(" > call  ", addr, method, arg, "->", ret, err) }()
+	//defer func() { log.Println(" > call  ", addr, method, arg, "->", ret, err) }()
 
 	//TODO: escape args?
 	resp, err := httpClient.Get("http://" + addr + "/do/" + method + "/" + arg)

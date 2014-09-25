@@ -88,6 +88,14 @@ func main() {
 	go LoopWatchdog()
 	go RunShareDecay()
 
+	// re-load jobs every hour so we don't stall on very exceptional circumstances
+	go func() {
+		for {
+			time.Sleep(1 * time.Hour)
+			LoadJobs()
+		}
+	}()
+
 	<-make(chan struct{}) // wait forever
 }
 

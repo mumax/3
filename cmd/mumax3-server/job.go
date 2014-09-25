@@ -33,8 +33,6 @@ type Job struct {
 // read job files from storage and update status cache
 func (j *Job) Update() {
 
-	prevDuration := j.duration
-
 	out := j.LocalOutputDir()
 	if exists(out) {
 		j.Output = thisAddr + "/" + out
@@ -53,12 +51,6 @@ func (j *Job) Update() {
 		j.Engaged = ""
 	}
 
-	if prevDuration == 0 && j.duration != 0 {
-		u := Users[JobUser(j.ID)]
-		if u != nil {
-			u.FairShare += j.Duration().Seconds()
-		}
-	}
 }
 
 func atoi(a string) int64 {

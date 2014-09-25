@@ -27,6 +27,7 @@ type Process struct {
 	*exec.Cmd
 	Start     time.Time
 	Out       io.WriteCloser
+	ID        string
 	OutputURL string
 	GUI       string
 	Killed    bool
@@ -57,7 +58,7 @@ func RunComputeService() {
 		ID := WaitForJob() // take an available job
 		go func() {
 
-			p := NewProcess("http://"+ID, gpu, GUIAddr)
+			p := NewProcess(ID, gpu, GUIAddr)
 
 			WLock()
 			Processes[ID] = p
@@ -149,8 +150,9 @@ func Kill(id string) string {
 }
 
 // prepare exec.Cmd to run mumax3 compute process
-func NewProcess(inputURL string, gpu int, webAddr string) *Process {
+func NewProcess(ID string, gpu int, webAddr string) *Process {
 	// prepare command
+	inputURL := "http://" + ID
 	command := *flag_mumax
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
@@ -168,7 +170,7 @@ func NewProcess(inputURL string, gpu int, webAddr string) *Process {
 	cmd.Stderr = out
 	cmd.Stdout = out
 
-	return &Process{Cmd: cmd, Start: time.Now(), Out: out, OutputURL: OutputDir(inputURL), GUI: webAddr}
+	return &Process{ID: ID, Cmd: cmd, Start: time.Now(), Out: out, OutputURL: OutputDir(inputURL), GUI: webAddr}
 }
 
 func (p *Process) Run() {
@@ -216,7 +218,15 @@ func (p *Process) Run() {
 	}
 
 	stopTime := AskTime(p.Host())
-	httpfs.Put(p.OutputURL+"duration", []byte(fmt.Sprint(stopTime.Sub(startTime).Nanoseconds())))
+	nanos := stopTime.Sub(startTime).Nanoseconds()
+	httpfs.Put(p.OutputURL+"duration", []byte(fmt.Sprint(nanos)))
+
+	if status == 0 {
+		ret, err := RPCCall(p.Host(), "AddFairShare", JobUser(p.ID)+"/"+fmt.Sprint(nanos/1e9))
+		if err != nil || ret != "" {
+			log.Println("***ERR: AddFairShare", JobUser(p.ID), ret, err)
+		}
+	}
 
 	return
 }

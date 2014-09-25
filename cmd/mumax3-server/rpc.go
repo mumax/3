@@ -12,6 +12,7 @@ import (
 type RPCFunc func(string) string
 
 var methods = map[string]RPCFunc{
+	"AddFairShare":   AddFairShare,
 	"GiveJob":        GiveJob,
 	"Kill":           Kill,
 	"LoadJobs":       wrap(LoadJobs),

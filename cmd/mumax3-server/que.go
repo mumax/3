@@ -39,6 +39,21 @@ func GiveJob(nodeAddr string) string {
 	return Users[user].giveJob(nodeAddr).ID
 }
 
+func AddFairShare(s string) string {
+	username := BaseDir(s)
+	share := atoi(s[len(username)+1:])
+
+	WLock()
+	defer WUnlock()
+	u := Users[username]
+	if u == nil {
+		return "no user " + username
+	}
+	log.Println("AddFairShare", username, share)
+	u.FairShare += float64(share)
+	return "" // ok
+}
+
 func nextUser() string {
 	// search user with least share and jobs in queue
 	leastShare := math.Inf(1)

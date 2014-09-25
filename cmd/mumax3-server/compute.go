@@ -110,7 +110,17 @@ func WaitForJob() string {
 }
 
 func FindJob() string {
+
+	// quickly list peers first
+	RLock()
+	p := make([]string, 0, len(peers))
 	for addr, _ := range peers {
+		p = append(p, addr)
+	}
+	RUnlock()
+
+	// then do slow RPC calls without blocking the rest of the program
+	for _, addr := range p {
 		ID, _ := RPCCall(addr, "GiveJob", thisAddr)
 		if ID != "" {
 			return ID
@@ -122,10 +132,16 @@ func FindJob() string {
 // RPC-callable function kills job corresponding to given job id.
 // The job has to be running on this node.
 func Kill(id string) string {
+	log.Println("KILL", id)
+
+	if JobHost(id) != thisAddr {
+		ret, _ := RPCCall(JobHost(id), "Kill", id)
+		return ret
+	}
+
 	WLock() // modifies Cmd state
 	defer WUnlock()
 
-	log.Println("KILL", id)
 	job := Processes[id]
 	if job == nil {
 		return fmt.Sprintf("kill %v: job not running.", id)

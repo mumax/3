@@ -22,10 +22,11 @@ type Job struct {
 	//Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
 	//GPU       int       // GPU number on the compute node that runs/ran this job, if any
 	Start time.Time // When this job was started, if applicable
+	Alive time.Time // Last time when this job was seen alive
 	Stop  time.Time // When this job was finished, if applicable
 	//Status              // Job status: queued, running,...
 	//Cmd       *exec.Cmd
-	Reque int // how many times requeued.
+	RequeCount int // how many times requeued.
 }
 
 // read job files from storage and update status cache
@@ -41,7 +42,12 @@ func (j *Job) Update() {
 		j.Host = httpfsRead(out + "host")
 		j.ExitStatus = httpfsRead(out + "exitstatus")
 		j.Start = parseTime(httpfsRead(out + "start"))
+		j.Alive = parseTime(httpfsRead(out + "alive"))
 	}
+}
+
+func (j *Job) Reque() {
+
 }
 
 func httpfsRead(fname string) string {
@@ -125,6 +131,10 @@ func FS(id string) string {
 
 func (j *Job) IsQueued() bool {
 	return j.Output == "" && j.Engaged == ""
+}
+
+func (j *Job) IsRunning() bool {
+	return j.Output != "" && j.ExitStatus == ""
 }
 
 func exists(path string) bool {

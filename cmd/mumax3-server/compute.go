@@ -22,6 +22,7 @@ var (
 	Processes    = make(map[string]*Process)
 )
 
+// Process is a running simulation process
 type Process struct {
 	*exec.Cmd
 	Start     time.Time
@@ -93,10 +94,7 @@ func AskTime(host string) time.Time {
 }
 
 func parseTime(str string) time.Time {
-	t, err := time.Parse(time.UnixDate, str)
-	if err != nil {
-		//log.Println("ParseTime:", str, err) // TODO
-	}
+	t, _ := time.Parse(time.UnixDate, str)
 	return t
 }
 
@@ -106,7 +104,6 @@ func WaitForJob() string {
 		time.Sleep(2 * time.Second) // TODO: don't poll
 		ID = FindJob()
 	}
-	//log.Println("found job", ID)
 	return ID
 }
 
@@ -119,6 +116,7 @@ func FindJob() string {
 		p = append(p, addr)
 	}
 	RUnlock()
+	// TODO: pick peers fairly
 
 	// then do slow RPC calls without blocking the rest of the program
 	for _, addr := range p {
@@ -135,11 +133,6 @@ func FindJob() string {
 func Kill(id string) string {
 	log.Println("KILL", id)
 
-	//	if JobHost(id) != thisAddr {
-	//		ret, _ := RPCCall(JobHost(id), "Kill", id)
-	//		return ret
-	//	}
-
 	WLock() // modifies Cmd state
 	defer WUnlock()
 
@@ -152,7 +145,6 @@ func Kill(id string) string {
 	if err != nil {
 		return err.Error()
 	}
-
 	return "" // OK
 }
 
@@ -223,7 +215,10 @@ func (p *Process) Run() {
 		httpfs.Put(p.OutputURL+"exitstatus", []byte(fmt.Sprint(status)))
 	}
 
-	return // TODO: write stat
+	stopTime := AskTime(p.Host())
+	httpfs.Put(p.OutputURL+"duration", []byte(fmt.Sprint(stopTime.Sub(startTime).Nanoseconds())))
+
+	return
 }
 
 func DetectGPUs() {

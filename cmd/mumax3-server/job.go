@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/mumax/3/httpfs"
@@ -21,9 +22,9 @@ type Job struct {
 	//outputURL string    // URL of the output directory, access via OutputURL()
 	//Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
 	//GPU       int       // GPU number on the compute node that runs/ran this job, if any
-	Start time.Time // When this job was started, if applicable
-	Alive time.Time // Last time when this job was seen alive
-	Stop  time.Time // When this job was finished, if applicable
+	Start    time.Time // When this job was started, if applicable
+	Alive    time.Time // Last time when this job was seen alive
+	duration time.Duration
 	//Status              // Job status: queued, running,...
 	//Cmd       *exec.Cmd
 	RequeCount int // how many times requeued.
@@ -31,6 +32,9 @@ type Job struct {
 
 // read job files from storage and update status cache
 func (j *Job) Update() {
+
+	prevDuration := j.duration
+
 	out := j.LocalOutputDir()
 	if exists(out) {
 		j.Output = thisAddr + "/" + out
@@ -43,10 +47,36 @@ func (j *Job) Update() {
 		j.ExitStatus = httpfsRead(out + "exitstatus")
 		j.Start = parseTime(httpfsRead(out + "start"))
 		j.Alive = parseTime(httpfsRead(out + "alive"))
+		j.duration = time.Duration(atoi(httpfsRead(out + "duration")))
 	}
 	if !j.Start.IsZero() {
 		j.Engaged = ""
 	}
+
+	if prevDuration == 0 && j.duration != 0 {
+		u := Users[JobUser(j.ID)]
+		if u != nil {
+			u.FairShare += j.Duration().Seconds()
+		}
+	}
+}
+
+func atoi(a string) int64 {
+	i, _ := strconv.ParseInt(a, 10, 64)
+	return i
+}
+
+func (j *Job) Duration() time.Duration {
+	if j.Start.IsZero() {
+		return 0
+	}
+	if j.duration != 0 {
+		return j.duration
+	}
+	if j.IsRunning() {
+		return Since(time.Now(), j.Start)
+	}
+	return 0 // unknown duration
 }
 
 func (j *Job) Reque() {
@@ -195,16 +225,16 @@ func (j *Job) Status() string {
 //}
 
 // Returns how long this job has been running
-func (j *Job) Runtime() time.Duration {
-	if j.Start.IsZero() {
-		return 0
-	}
-	if j.Stop.IsZero() {
-		return Since(time.Now(), j.Start)
-	} else {
-		return Since(j.Stop, j.Start)
-	}
-}
+//func (j *Job) Runtime() time.Duration {
+//	if j.Start.IsZero() {
+//		return 0
+//	}
+//	if j.Stop.IsZero() {
+//		return Since(time.Now(), j.Start)
+//	} else {
+//		return Since(j.Stop, j.Start)
+//	}
+//}
 
 // URL of the output directory.
 //func (j *Job) URL() string {

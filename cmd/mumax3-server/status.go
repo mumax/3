@@ -50,7 +50,7 @@ const templText = `
 		<td class={{.Status}}> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
 		<td class={{.Status}}> [{{with .Host}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
 		<td class={{.Status}}> [{{with .ExitStatus}}{{if eq . "0"}} OK {{else}}<a class={{$.Status}} href="http://{{$.FS $.Output}}stdout.txt">FAIL</a>{{end}}{{end}}] </td>
-		<td class={{.Status}}> [{{with .Output}}{{$.Start}}{{end}}{{with .RequeCount}} {{.}}x re-queued{{end}}] </td>
+		<td class={{.Status}}> [{{with .Output}}{{$.Duration}}{{end}}{{with .RequeCount}} {{.}}x re-queued{{end}}] </td>
 </tr>
 {{end}}
 
@@ -136,11 +136,14 @@ Uptime: {{.Uptime}} <br/>
 
 <h2>Queue service</h2><p>
 
-	<h3>Users</h3>
-	{{range $k,$v := .Users}}
-		{{$k}} {{$v.FairShare}} GPU-hour, {{with .HasJob}} has {{else}} no {{end}} queued jobs<br/>
-	{{end}}
+	<h3>Users</h3><p>
+	<table>
+	{{range $k,$v := .Users}} <tr>
+		<td>{{$k}}</td><td>{{$v.FairShare}} GPU-seconds</td><td>{{with .HasJob}} has {{else}} no {{end}} queued jobs</td>
+	</tr>{{end}}
+	</table>
 	<b>Next job for:</b> {{.NextUser}}
+	</p>
 
 	<h3>Jobs</h3>
 		<button onclick='doEvent("LoadJobs", "")'>Reload all</button> (consider reloading just your own files). <br/>

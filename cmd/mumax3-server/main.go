@@ -86,15 +86,8 @@ func main() {
 	go FindPeers(IPs, MinPort, MaxPort)
 	go RunComputeService()
 	go LoopWatchdog()
+	go RunShareDecay()
 
-	//	go RunJobScan("./")
-	//	go RunShareDecay()
-	//	scan <- struct{}{}
-	//
-	//	if len(node.GPUs) > 0 {
-	//		go node.RunComputeService()
-	//	}
-	//
 	<-make(chan struct{}) // wait forever
 }
 

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 /*
@@ -34,6 +35,7 @@ func GiveJob(nodeAddr string) string {
 	if user == "" {
 		return ""
 	}
+	Users[user].FairShare += 1 // 1 second penalty because a job has started
 	return Users[user].giveJob(nodeAddr).ID
 }
 
@@ -120,17 +122,17 @@ func UpdateJob(jobURL string) string {
 // Periodically updates user's usedShare so they decay
 // exponentially according to flag_haflife
 func RunShareDecay() {
-	//	halflife := *flag_halflife
-	//	quantum := halflife / 100 // several updates per half-life gives smooth decay
-	//	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
-	//	for {
-	//		time.Sleep(quantum)
-	//		WLock()
-	//		for u, _ := range FairShare {
-	//			 FairShare[u] *= reduce
-	//		}
-	//		WUnlock()
-	//	}
+	halflife := *flag_halflife
+	quantum := halflife / 100 // several updates per half-life gives smooth decay
+	reduce := math.Pow(0.5, float64(quantum)/float64(halflife))
+	for {
+		time.Sleep(quantum)
+		WLock()
+		for _, u := range Users {
+			u.FairShare *= reduce
+		}
+		WUnlock()
+	}
 }
 
 //

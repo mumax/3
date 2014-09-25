@@ -44,11 +44,15 @@ func (j *Job) Update() {
 		j.Start = parseTime(httpfsRead(out + "start"))
 		j.Alive = parseTime(httpfsRead(out + "alive"))
 	}
+	if !j.Start.IsZero() {
+		j.Engaged = ""
+	}
 }
 
 func (j *Job) Reque() {
 	log.Println("requeue", j.ID)
 	j.RequeCount++
+	j.Engaged = ""
 	httpfs.Remove(j.LocalOutputDir())
 	j.Update()
 }
@@ -137,7 +141,7 @@ func (j *Job) IsQueued() bool {
 }
 
 func (j *Job) IsRunning() bool {
-	return j.Engaged != "" && j.ExitStatus == ""
+	return j.Output != "" && j.ExitStatus == ""
 }
 
 func exists(path string) bool {

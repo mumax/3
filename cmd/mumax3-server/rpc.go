@@ -12,14 +12,14 @@ import (
 type RPCFunc func(string) string
 
 var methods = map[string]RPCFunc{
-	"GiveJob":      GiveJob,
-	"Kill":         Kill,
-	"LoadJobs":     wrap(LoadJobs),
-	"LoadUserJobs": LoadUserJobs,
-	"Ping":         Ping,
-	"UpdateJob":    UpdateJob,
-	"Rescan":       func(string) string { go FindPeers(IPs, MinPort, MaxPort); return "" },
-	"WhatsTheTime": WhatsTheTime,
+	"GiveJob":        GiveJob,
+	"Kill":           Kill,
+	"LoadJobs":       wrap(LoadJobs),
+	"LoadUserJobs":   LoadUserJobs,
+	"Ping":           Ping,
+	"UpdateJob":      UpdateJob,
+	"Rescan":         func(string) string { go FindPeers(IPs, MinPort, MaxPort); return "" },
+	"WhatsTheTime":   WhatsTheTime,
 	"WakeupWatchdog": WakeupWatchdog,
 }
 

@@ -28,6 +28,7 @@ type Process struct {
 	Out       io.WriteCloser
 	OutputURL string
 	GUI       string
+	Killed    bool
 }
 
 func (p *Process) Host() string {
@@ -94,7 +95,7 @@ func AskTime(host string) time.Time {
 func parseTime(str string) time.Time {
 	t, err := time.Parse(time.UnixDate, str)
 	if err != nil {
-		log.Println("ParseTime:", str, err)
+		//log.Println("ParseTime:", str, err) // TODO
 	}
 	return t
 }
@@ -134,10 +135,10 @@ func FindJob() string {
 func Kill(id string) string {
 	log.Println("KILL", id)
 
-//	if JobHost(id) != thisAddr {
-//		ret, _ := RPCCall(JobHost(id), "Kill", id)
-//		return ret
-//	}
+	//	if JobHost(id) != thisAddr {
+	//		ret, _ := RPCCall(JobHost(id), "Kill", id)
+	//		return ret
+	//	}
 
 	WLock() // modifies Cmd state
 	defer WUnlock()
@@ -146,10 +147,12 @@ func Kill(id string) string {
 	if job == nil {
 		return fmt.Sprintf("kill %v: job not running.", id)
 	}
+	job.Killed = true
 	err := job.Cmd.Process.Kill()
 	if err != nil {
 		return err.Error()
 	}
+
 	return "" // OK
 }
 
@@ -193,6 +196,8 @@ func (p *Process) Run() {
 	timeOffset := time.Now().Sub(startTime) // our clock is most likely out-of-sync with host
 	tick := time.NewTicker(KeepaliveInterval)
 
+	// need initial alive in case watchdog sniffs between start and first alive tick
+	httpfs.Put(p.OutputURL+"alive", []byte(time.Now().Add(timeOffset).Format(time.UnixDate)))
 	go func() {
 		for t := range tick.C {
 			httpfs.Put(p.OutputURL+"alive", []byte(t.Add(timeOffset).Format(time.UnixDate)))
@@ -212,7 +217,11 @@ func (p *Process) Run() {
 		status = 0
 	}
 
-	httpfs.Put(p.OutputURL+"exitstatus", []byte(fmt.Sprint(status)))
+	if p.Killed {
+		httpfs.Put(p.OutputURL+"killed", []byte(time.Now().Format(time.UnixDate)))
+	} else {
+		httpfs.Put(p.OutputURL+"exitstatus", []byte(fmt.Sprint(status)))
+	}
 
 	return // TODO: write stat
 }

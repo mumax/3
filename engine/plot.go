@@ -14,7 +14,7 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	b := g.StringValue("usingy")
 
 	cmd := "gnuplot"
-	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 fsize 10; plot "%vtable.txt" u %v:%v w li; set output;exit;`, OD, a, b)}
+	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 fsize 10; plot "%vtable.txt" u %v:%v w li; set output;exit;`, OD(), a, b)}
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
 		w.Write(emptyIMG())

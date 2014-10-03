@@ -6,6 +6,7 @@ import (
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
 	"io"
+	"sync"
 	"time"
 )
 
@@ -28,7 +29,7 @@ type DataTable struct {
 	info
 	outputs []TableData
 	autosave
-	lastFlush time.Time
+	flushlock sync.Mutex
 }
 
 func (t *DataTable) Write(p []byte) (int, error) {
@@ -99,7 +100,7 @@ func (t *DataTable) Save() {
 		}
 	}
 	fmt.Fprintln(t)
-	//t.Flush()
+	t.flush()
 	t.count++
 }
 
@@ -114,25 +115,31 @@ func TablePrint(msg ...interface{}) {
 
 // open writer and write header
 func (t *DataTable) init() {
-	if !t.inited() {
-		f, err := httpfs.Create(OD() + t.name + ".txt")
-		util.FatalErr(err)
-		t.output = f
+	if t.inited() {
+		return
+	}
+	f, err := httpfs.Create(OD() + t.name + ".txt")
+	util.FatalErr(err)
+	t.output = f
 
-		// write header
-		fmt.Fprint(t, "# t (s)")
-		for _, o := range t.outputs {
-			if o.NComp() == 1 {
-				fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
-			} else {
-				for c := 0; c < o.NComp(); c++ {
-					fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
-				}
+	// write header
+	fmt.Fprint(t, "# t (s)")
+	for _, o := range t.outputs {
+		if o.NComp() == 1 {
+			fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+		} else {
+			for c := 0; c < o.NComp(); c++ {
+				fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
 			}
 		}
-		fmt.Fprintln(t)
-		t.Flush()
 	}
+	fmt.Fprintln(t)
+	t.Flush()
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		Table.flush()
+	}()
 }
 
 func (t *DataTable) inited() bool {
@@ -140,11 +147,9 @@ func (t *DataTable) inited() bool {
 }
 
 func (t *DataTable) flush() {
-	now := time.Now()
-	if now.Sub(t.lastFlush) > 1*time.Second {
-		t.lastFlush = now
-		t.Flush()
-	}
+	t.flushlock.Lock()
+	defer t.flushlock.Unlock()
+	t.Flush()
 }
 
 //func (t *DataTable) close() {

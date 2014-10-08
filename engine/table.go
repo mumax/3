@@ -152,13 +152,6 @@ func (t *DataTable) flush() {
 	t.Flush()
 }
 
-//func (t *DataTable) close() {
-//	t.flush()
-//	if t.file != nil {
-//		t.file.Close()
-//	}
-//}
-
 // can be saved in table
 type TableData interface {
 	average() []float64

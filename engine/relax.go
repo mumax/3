@@ -59,10 +59,10 @@ func Relax() {
 	// Step as long as torque goes down. Then increase the accuracy and step more.
 	for MaxErr > 1e-9 && !pause {
 		MaxErr /= math.Sqrt2
-		relaxSteps(1) // TODO: Play with other values
+		relaxSteps(N) // TODO: Play with other values
 		T0, T1 = T1, avgTorque()
 		for T1 < T0 && !pause {
-			relaxSteps(1) // TODO: Play with other values
+			relaxSteps(N) // TODO: Play with other values
 			T0, T1 = T1, avgTorque()
 		}
 	}

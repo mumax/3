@@ -24,21 +24,11 @@ func AddPeer(pAddr string) {
 		log.Println("add new peer:", pAddr)
 		peers[pAddr] = NewPeer()
 	}
-
-	// TODO: notify compute upon findpeer
 }
 
 func NewPeer() *Peer {
 	return &Peer{}
 }
-
-// Thread-safe n.peers[pAddr]
-//func  PeerInfo(pAddr string) (p PeerInfo, ok bool) {
-//	n.lock()
-//	defer n.unlock()
-//	p, ok = n.Peers[pAddr]
-//	return
-//}
 
 // RPC-called
 func Ping(peerAddr string) string {

@@ -14,19 +14,13 @@ import (
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// all of this is cache:
-	Output     string // if exists, points to output ID
-	Engaged    string // node address this job was last given to
-	Host       string // node address in host file (=last host who started this job)
-	ExitStatus string // what's in the exitstatus file
-	// old
-	//outputURL string    // URL of the output directory, access via OutputURL()
-	//Node      string    // Address of the node that runs/ran this job, if any. E.g.: computenode2:35360
-	//GPU       int       // GPU number on the compute node that runs/ran this job, if any
-	Start    time.Time // When this job was started, if applicable
-	Alive    time.Time // Last time when this job was seen alive
-	duration time.Duration
-	//Status              // Job status: queued, running,...
-	//Cmd       *exec.Cmd
+	Output     string    // if exists, points to output ID
+	Engaged    string    // node address this job was last given to
+	Host       string    // node address in host file (=last host who started this job)
+	ExitStatus string    // what's in the exitstatus file
+	Start      time.Time // When this job was started, if applicable
+	Alive      time.Time // Last time when this job was seen alive
+	duration   time.Duration
 	RequeCount int // how many times requeued.
 }
 
@@ -216,85 +210,11 @@ func (j *Job) Status() string {
 	return "UNKNOWN"
 }
 
-//func (j *Job) Path() string {
-//	return j.URL[len("http://"):]
-//}
-
-//func NewJob(URL string) Job {
-//	return Job{URL: URL}
-//}
-
-// Returns how long this job has been running
-//func (j *Job) Runtime() time.Duration {
-//	if j.Start.IsZero() {
-//		return 0
-//	}
-//	if j.Stop.IsZero() {
-//		return Since(time.Now(), j.Start)
-//	} else {
-//		return Since(j.Stop, j.Start)
-//	}
-//}
-
-// URL of the output directory.
-//func (j *Job) URL() string {
-//	return "http://" + j.ID
-//}
-
-// URL of the output directory.
-//func (j *Job) OutputURL() string {
-//	return util.NoExt(j.URL()) + ".out"
-//}
-
 // Host of job with this ID (=first path element). E.g.:
 // 	host:123/user/file.mx3 -> host:123
 func JobHost(ID string) string {
 	return BaseDir(ID)
 }
-
-//// Node host (w/o port) this job runs on, if any
-//func (j *Job) NodeName() string {
-//	colon := strings.Index(j.Node, ":")
-//	if colon < 0 {
-//		return ""
-//	}
-//	return j.Node[:colon]
-//}
-
-//func JobOutputDir(URL string) string {
-//	return util.NoExt(URL) + ".out/"
-//}
-
-//func (j *Job) GUIPort() int {
-//	return GUI_PORT + j.GPU
-//}
-//
-//func (j *Job) IsRunning() bool {
-//	return j.Status == RUNNING
-//}
-//
-//func (j *Job) Failed() bool {
-//	return j.Status == FAILED
-//}
-//
-
-//func JobUser(URL string) string {
-//	split := strings.Split(URL, "/")
-//	return split[4]
-//}
-//
-//func JobInputFile(inputFile string) string {
-//	URL, err := url.Parse(inputFile)
-//	if err != nil {
-//		panic(err)
-//	}
-//	split := strings.Split(URL.Path, "/")
-//	if len(split) < 3 {
-//		panic("invalid url:" + inputFile)
-//	}
-//	baseHandler := "/" + split[1]
-//	return URL.Path[len(baseHandler):]
-//}
 
 // remove job output
 func Rm(URL string) string {

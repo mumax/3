@@ -38,6 +38,10 @@ func (j *Job) Update() {
 		j.Output = thisAddr + "/" + out
 	} else {
 		j.Output = ""
+		j.ExitStatus = ""
+		j.Start = time.Time{}
+		j.Alive = time.Time{}
+		j.duration = 0
 	}
 
 	if j.Output != "" {
@@ -137,7 +141,11 @@ func (j *Job) LocalPath() string {
 // 	host:123/user/file.mx3 -> user/file.mx3
 func LocalPath(ID string) string {
 	host := JobHost(ID)
-	return ID[len(host)+1:] // TODO: out-of-bounds
+	if len(host)+1 >= len(ID) {
+		log.Println("Invalid LocalPath call on", ID)
+		return ""
+	}
+	return ID[len(host)+1:]
 }
 
 // local path of output dir
@@ -287,3 +295,30 @@ func JobHost(ID string) string {
 //	baseHandler := "/" + split[1]
 //	return URL.Path[len(baseHandler):]
 //}
+
+// remove job output
+func Rm(URL string) string {
+	err := httpfs.Remove("http://" + OutputDir(URL))
+
+	// update status after output removal
+	UpdateJob(URL)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	// report re-queue
+	// handy if others remove your jobs
+	job := JobByName(URL)
+	if job != nil {
+		job.RequeCount++
+	}
+
+	// make sure job runs again quickly
+	user := JobUser(URL)
+	u := Users[user]
+	if u != nil {
+		u.nextPtr = 0
+	}
+	return ""
+}

@@ -63,7 +63,7 @@ const templText = `
 		p{margin-left: 2em}
 		h3{margin-left: 2em}
 		a{text-decoration: none; color:#0000AA}
-		a:hover{text-decoration: underline}
+		a:hover{text-decoration: underline; cursor: hand;}
 		.FAILED{color:red; font-weight:bold}
 		.RUNNING{font-weight: bold; color:blue}
 		.QUEUED{color:black}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/mumax/3/httpfs"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -84,14 +83,4 @@ func RPCCall(addr, method, arg string) (ret string, err error) {
 		return string(b), nil
 	}
 
-}
-
-func Rm(URL string) string {
-	//log.Println("rm", URL)
-	err := httpfs.Remove("http://" + OutputDir(URL))
-	UpdateJob(URL)
-	if err != nil {
-		return err.Error()
-	}
-	return ""
 }

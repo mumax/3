@@ -24,6 +24,7 @@ func AddExchange(B, m *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.M
 		wx, wy, wz, N[X], N[Y], N[Z], pbc, cfg)
 }
 
+// Finds the average exchange strength around each cell, for debugging.
 func ExchangeDecode(dst *data.Slice, Aex_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
 	c := mesh.CellSize()
 	wx := float32(2 * 1e-18 / (c[X] * c[X]))

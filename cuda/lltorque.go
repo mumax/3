@@ -21,6 +21,8 @@ func LLTorque(torque, m, B *data.Slice, alpha LUTPtr, regions *Bytes) {
 		unsafe.Pointer(alpha), regions.Ptr, N, cfg)
 }
 
+// Landau-Lifshitz torque with precession disabled.
+// Used by engine.Relax().
 func LLNoPrecess(torque, m, B *data.Slice) {
 	N := torque.Len()
 	cfg := make1DConf(N)

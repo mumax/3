@@ -62,7 +62,7 @@ func tryCuInit() {
 const stream0 = cu.Stream(0)
 
 // Synchronize the global stream
-// (usually not needed, done automatically with -sync)
+// This is called before and after all memcopy operations between host and device.
 func Sync() {
 	stream0.Synchronize()
 }

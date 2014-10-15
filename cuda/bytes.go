@@ -1,6 +1,6 @@
 package cuda
 
-// GPU byte slice, used to store regions.
+// This file provides GPU byte slices, used to store regions.
 
 import (
 	"github.com/mumax/3/cuda/cu"
@@ -15,7 +15,8 @@ type Bytes struct {
 	Len int
 }
 
-// Construct new byte slice with given length.
+// Construct new byte slice with given length,
+// initialised to zeros.
 func NewBytes(Len int) *Bytes {
 	ptr := cu.MemAlloc(int64(Len))
 	cu.MemsetD8(cu.DevicePtr(ptr), 0, int64(Len))
@@ -46,7 +47,8 @@ func (src *Bytes) Download(dst []byte) {
 	Sync()
 }
 
-// Set one element to value
+// Set one element to value.
+// data.Index can be used to find the index for x,y,z.
 func (dst *Bytes) Set(index int, value byte) {
 	if index < 0 || index >= dst.Len {
 		log.Panic("Bytes.Set: index out of range:", index)
@@ -57,7 +59,8 @@ func (dst *Bytes) Set(index int, value byte) {
 	Sync()
 }
 
-// Set one element to value
+// Get one element.
+// data.Index can be used to find the index for x,y,z.
 func (src *Bytes) Get(index int) byte {
 	if index < 0 || index >= src.Len {
 		log.Panic("Bytes.Set: index out of range:", index)

@@ -6,6 +6,8 @@ import (
 	"unsafe"
 )
 
+// Add effective field due to bulk Dzyaloshinskii-Moriya interaction to Beff.
+// See dmibulk.cu
 func AddDMIBulk(Beff *data.Slice, m *data.Slice, Aex_red, D_red SymmLUT, regions *Bytes, mesh *data.Mesh) {
 	cellsize := mesh.CellSize()
 	N := Beff.Size()

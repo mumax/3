@@ -2,6 +2,7 @@ package cuda
 
 import "testing"
 
+// In case of memory leak, this will crash
 func TestBuffer(t *testing.T) {
 	Init(0)
 	m1 := [3]int{2, 1024, 2048}

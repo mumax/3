@@ -27,7 +27,7 @@ func Dot(a, b *data.Slice) float32 {
 	nComp := a.NComp()
 	util.Argument(nComp == b.NComp())
 	out := reduceBuf(0)
-	// not async over components, quing with memset in stream 0
+	// not async over components
 	for c := 0; c < nComp; c++ {
 		k_reducedot_async(a.DevPtr(c), b.DevPtr(c), out, 0, a.Len(), reducecfg) // all components add to out
 	}
@@ -72,7 +72,6 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 	}
 	buf := <-reduceBuffers
 	cu.MemsetD32Async(cu.DevicePtr(uintptr(buf)), math.Float32bits(initVal), 1, stream0)
-	//Sync(0) // not needed, kernel in same stream
 	return buf
 }
 

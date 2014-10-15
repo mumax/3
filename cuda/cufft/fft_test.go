@@ -13,12 +13,12 @@ func ExampleFFT1D() {
 	hostIn[0] = 1
 
 	devIn := cu.MemAlloc(int64(len(hostIn)) * cu.SIZEOF_FLOAT32)
-	defer cu.MemFree(&devIn)
+	defer cu.MemFree(devIn)
 	cu.MemcpyHtoD(devIn, unsafe.Pointer(&hostIn[0]), devIn.Bytes())
 
 	hostOut := make([]complex64, N/2+1)
 	devOut := cu.MemAlloc(int64(len(hostOut)) * cu.SIZEOF_COMPLEX64)
-	defer cu.MemFree(&devOut)
+	defer cu.MemFree(devOut)
 
 	plan := Plan1d(N, R2C, 1)
 	defer plan.Destroy()
@@ -31,5 +31,5 @@ func ExampleFFT1D() {
 
 	// Output:
 	// hostIn: [1 0 0 0 0 0 0 0]
-	// hostOut: [(1+0i) (+1+0i) (+1+0i) (+1-0i) (+1+0i)]
+	// hostOut: [(1+0i) (1+0i) (1+0i) (1-0i) (1+0i)]
 }

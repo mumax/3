@@ -17,7 +17,7 @@ saveAs(regions, "regions.ovf")
 defregion(256, universe())
 
 // re-load previous state from disk
-regions.loadFile("regionsload.out/regions.ovf")
+regions.loadFile("testdata/regions.ovf")
 
 // check
 expectv("m1", m.region(1).average(), vector(1, 0, 0), 1e-5)

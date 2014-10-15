@@ -15,16 +15,33 @@ import (
 	"strings"
 )
 
-var Logging = false
+var (
+	Logging = false // enables logging
+	wd      = ""
+)
 
 const (
 	DirPerm  = 0777 // permissions for new directory
 	FilePerm = 0666 // permissions for new files
 )
 
+// SetWD sets a "working directory", prefixed to all relative local paths.
+// dir may start with "http://", turning local relative paths into remote paths.
+// E.g.:
+// 	http://path -> http://path
+// 	path/file   -> wd/path/file
+//  /path/file  -> /path/file
+func SetWD(dir string) {
+	if dir != "" && !strings.HasSuffix(dir, "/") {
+		dir = dir + "/"
+	}
+	wd = dir
+}
+
 // Creates the directory at specified URL (or local file),
 // creating all needed parent directories as well.
 func Mkdir(URL string) error {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpMkdir(URL)
 	} else {
@@ -33,6 +50,7 @@ func Mkdir(URL string) error {
 }
 
 func ReadDir(URL string) ([]string, error) {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpLs(URL)
 	} else {
@@ -41,6 +59,7 @@ func ReadDir(URL string) ([]string, error) {
 }
 
 func Remove(URL string) error {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpRemove(URL)
 	} else {
@@ -49,6 +68,7 @@ func Remove(URL string) error {
 }
 
 func Read(URL string) ([]byte, error) {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpRead(URL)
 	} else {
@@ -57,6 +77,7 @@ func Read(URL string) ([]byte, error) {
 }
 
 func Append(URL string, p []byte) error {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpAppend(URL, p)
 	} else {
@@ -65,6 +86,7 @@ func Append(URL string, p []byte) error {
 }
 
 func Put(URL string, p []byte) error {
+	URL = cleanup(URL)
 	if isRemote(URL) {
 		return httpPut(URL, p)
 	} else {
@@ -74,6 +96,16 @@ func Put(URL string, p []byte) error {
 
 func isRemote(URL string) bool {
 	return strings.HasPrefix(URL, "http://")
+}
+
+func cleanup(URL string) string {
+	if isRemote(URL) {
+		return URL
+	}
+	if !path.IsAbs(URL) {
+		return wd + URL
+	}
+	return URL
 }
 
 // file action gets its own type to avoid mixing up with other strings

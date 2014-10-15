@@ -5,6 +5,7 @@ package engine
 import (
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
+	"strings"
 )
 
 var (
@@ -28,6 +29,9 @@ func InitIO(inputfile string, force bool) {
 
 	InputFile = inputfile
 	outputdir = util.NoExt(InputFile) + ".out/"
+	if strings.HasPrefix(outputdir, "http://") {
+		httpfs.SetWD(outputdir + "/../")
+	}
 	LogOut("output directory:", outputdir)
 
 	od := OD()

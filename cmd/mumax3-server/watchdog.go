@@ -36,7 +36,7 @@ func WakeupWatchdog(string) string {
 // single watchdog run:
 // re-queues all dead processes
 func DoWatchdog() {
-	log.Println("Watchdog wake-up")
+	//log.Println("Watchdog wake-up")
 	WLock()
 	defer WUnlock()
 	for _, u := range Users {

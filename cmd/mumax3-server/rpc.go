@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mumax/3/httpfs"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,6 +23,7 @@ var methods = map[string]RPCFunc{
 	"Rescan":         func(string) string { go FindPeers(IPs, MinPort, MaxPort); return "" },
 	"WhatsTheTime":   WhatsTheTime,
 	"WakeupWatchdog": WakeupWatchdog,
+	"rm":             Rm,
 }
 
 func wrap(f func()) RPCFunc {
@@ -82,4 +84,14 @@ func RPCCall(addr, method, arg string) (ret string, err error) {
 		return string(b), nil
 	}
 
+}
+
+func Rm(URL string) string {
+	//log.Println("rm", URL)
+	err := httpfs.Remove("http://" + OutputDir(URL))
+	UpdateJob(URL)
+	if err != nil {
+		return err.Error()
+	}
+	return ""
 }

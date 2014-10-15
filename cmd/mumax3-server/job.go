@@ -137,7 +137,7 @@ func (j *Job) LocalPath() string {
 // 	host:123/user/file.mx3 -> user/file.mx3
 func LocalPath(ID string) string {
 	host := JobHost(ID)
-	return ID[len(host)+1:]
+	return ID[len(host)+1:] // TODO: out-of-bounds
 }
 
 // local path of output dir

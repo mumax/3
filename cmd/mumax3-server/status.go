@@ -48,6 +48,7 @@ const templText = `
 <tr class={{.Status}}>
 		<td class={{.Status}}> [<a class={{.Status}} href="http://{{.FS .ID}}">{{.LocalPath}}</a>] </td>
 		<td class={{.Status}}> [{{with .Output}}<a href="http://{{$.FS $.Output}}">.out</a>{{end}}] </td>
+		<td class={{.Status}}> [{{with .Output}}<a onclick='doEvent("rm", "{{$.ID}}")'>rm</a>{{end}}]</td>
 		<td class={{.Status}}> [{{with .Host}}<a href="http://{{.}}">{{.}}</a>{{end}}] </td>
 		<td class={{.Status}}> [{{with .ExitStatus}}{{if eq . "0"}} OK {{else}}<a class={{$.Status}} href="http://{{$.FS $.Output}}stdout.txt">FAIL</a>{{end}}{{end}}] </td>
 		<td class={{.Status}}> [{{with .Output}}{{$.Duration}}{{end}}{{with .RequeCount}} {{.}}x re-queued{{end}}] </td>

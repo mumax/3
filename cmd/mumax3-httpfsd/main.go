@@ -29,7 +29,7 @@ import (
 
 var (
 	flag_addr = flag.String("l", ":35360", "Listen and serve at this network address")
-	flag_log  = flag.Bool("log", true, "log debug output")
+	flag_log  = flag.Bool("log", false, "log debug output")
 )
 
 func main() {

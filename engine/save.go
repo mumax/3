@@ -40,9 +40,11 @@ func Save(q Quantity) {
 
 // Save under given file name (transparent async I/O).
 func SaveAs(q Quantity, fname string) {
+
 	if !strings.HasPrefix(fname, OD()) {
-		fname = path.Clean(OD() + fname)
+		fname = OD() + fname // don't clean, turns http:// in http:/
 	}
+
 	if path.Ext(fname) == "" {
 		fname += ".ovf"
 	}

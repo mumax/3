@@ -1,0 +1,16 @@
+// test httpfs saveas: should not create "http:/..." directory
+// reported by Jonathan Leliaert.
+
+Gsize := 20
+Ared := 0.75
+Delta_x := 450.0/128.0
+SetGridsize(128, 128, 1)
+SetCellsize(Delta_x*1e-9, Delta_x*1e-9, 30e-9)
+
+alpha = 0.02
+Msat  = 860e3
+Aex   = 13e-12
+
+m = Vortex(1, 1)
+Mstring := sprint("m_Relaxed_Ared=", Ared, "_Gsize=", Gsize, ".ovf")
+saveAs(m, Mstring)

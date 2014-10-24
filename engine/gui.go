@@ -248,8 +248,8 @@ func (g *guistate) prepareM() {
 }
 
 var (
-	solvertypes = map[string]int{"euler": 1, "heun": 2, "rk23": 3, "rk45": 5}
-	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23", 5: "rk45"}
+	solvertypes = map[string]int{"euler": 1, "heun": 2, "rk23": 3, "rk4": 4, "rk45": 5}
+	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23", 4: "rk4",  5: "rk45"}
 )
 
 func Break() {

@@ -40,7 +40,7 @@ func (rk *RK4) Step() {
 
 	// stage 2
 	Time = t0 + (1./2.)*Dt_si
-	cuda.Madd2(m, m, rk.k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
+	cuda.Madd2(m, m, k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
 	M.normalize()
 	torqueFn(k2)
 
@@ -61,7 +61,7 @@ func (rk *RK4) Step() {
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
 		// 4th order solution
-		madd5(m, m0, k1, k2, k3, k4, 1, (1./6.)*h, (1./3.)*h, (1./6.)*h, (1./3.)*h)
+		madd5(m, m0, k1, k2, k3, k4, 1, (1./6.)*h, (1./3.)*h, (1./3.)*h, (1./6.)*h)
 		M.normalize()
 		NSteps++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))
@@ -78,17 +78,4 @@ func (rk *RK4) Step() {
 	}
 }
 
-
-// TODO: into cuda
-func madd4(dst, src1, src2, src3, src4 *data.Slice, w1, w2, w3, w4 float32) {
-	cuda.Madd3(dst, src1, src2, src3, w1, w2, w3)
-	cuda.Madd2(dst, dst, src4, 1, w4)
-}
-
-// TODO: into cuda
-func madd5(dst, src1, src2, src3, src4, src5 *data.Slice, w1, w2, w3, w4, w5 float32) {
-	cuda.Madd3(dst, src1, src2, src3, w1, w2, w3)
-	cuda.Madd3(dst, dst, src4, src5, 1, w4, w5)
-}
-
-
+func (_ *RK4) Free() {}

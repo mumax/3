@@ -125,7 +125,7 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 {{.Data.Div "solver"}}
 
-	Type: {{.Select "solvertype" "rk45" "euler" "heun" "rk23" "rk45"}}
+	Type: {{.Select "solvertype" "rk45" "euler" "heun" "rk4" "rk23" "rk45"}}
 	<table>
 		<tr> <td>
 

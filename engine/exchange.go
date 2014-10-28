@@ -49,10 +49,10 @@ func AddExchangeField(dst *data.Slice) {
 	case inter && !bulk:
 		// DMI kernel has space-dependent parameters, but
 		// correct averaging between regions not yet clear nor tested, so disallow.
-		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dind.IsUniform(), "DMI: Msat, Aex, Dex must be uniform")
+		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dind.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case bulk && !inter:
-		util.AssertMsg(Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform(), "DMI: Msat, Aex, Dex must be uniform")
+		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case inter && bulk:
 		util.Fatal("Cannot have induced and interfacial DMI at the same time")

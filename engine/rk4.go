@@ -26,7 +26,7 @@ func (rk *RK4) Step() {
 	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
 
-	k1,k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
+	k1, k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
 
 	defer cuda.Recycle(k1)
 	defer cuda.Recycle(k2)
@@ -48,7 +48,7 @@ func (rk *RK4) Step() {
 	cuda.Madd2(m, m0, k2, 1, (1./2.)*h) // m = m0*1 + k2*1/2
 	M.normalize()
 	torqueFn(k3)
-	
+
 	// stage 4
 	Time = t0 + Dt_si
 	cuda.Madd2(m, m0, k3, 1, 1.*h) // m = m0*1 + k3*1

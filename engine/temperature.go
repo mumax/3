@@ -84,8 +84,8 @@ func (b *thermField) update() {
 	// Also, as the amplitude of the thermal field depends on dt, we require dt
 	// to be fixed. Otherwise some hard-to-grasp feedback loop with the adaptive
 	// time step would occur.
-	//TODO 
-	util.AssertMsg(((solvertype != BOGAKISHAMPINE )&&(solvertype != DORMANDPRINCE)), "Temperature requires Euler, Heun or Runge Kutta4 solver type")
+	//TODO
+	util.AssertMsg(((solvertype != BOGAKISHAMPINE) && (solvertype != DORMANDPRINCE)), "Temperature requires Euler, Heun or Runge Kutta4 solver type")
 	util.AssertMsg(FixDt != 0, "Temperature requires fixed time step")
 
 	// keep constant during time step

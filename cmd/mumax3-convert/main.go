@@ -35,6 +35,7 @@ import (
 	"github.com/mumax/3/dump"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
+	"image/color"
 	"log"
 	"os"
 	"path"
@@ -71,6 +72,7 @@ var (
 	flag_cropz     = flag.String("zrange", "", "Crop z range min:max (both optional, max=exclusive)")
 	flag_dir       = flag.String("o", "", "Save all output in this directory")
 	flag_arrows    = flag.Int("arrows", 0, "Arrow size for vector bitmap image output")
+	flag_color     = flag.String("color", "black,gray,white", "Colormap for scalar image output.")
 )
 
 var que chan task
@@ -157,18 +159,20 @@ func process(f *data.Slice, info data.Meta, name string) {
 
 	haveOutput := false
 
+	colormap := parseColors(*flag_color)
+
 	if *flag_jpeg {
-		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows)
+		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows, colormap...)
 		haveOutput = true
 	}
 
 	if *flag_png {
-		draw.RenderFile(name+".png", f, *flag_min, *flag_max, *flag_arrows)
+		draw.RenderFile(name+".png", f, *flag_min, *flag_max, *flag_arrows, colormap...)
 		haveOutput = true
 	}
 
 	if *flag_gif {
-		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows)
+		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows, colormap...)
 		haveOutput = true
 	}
 
@@ -337,3 +341,39 @@ const (
 	Y = data.Y
 	Z = data.Z
 )
+
+func parseColors(s string) (m []color.RGBA) {
+	words := strings.Split(s, ",")
+	for _, w := range words {
+		m = append(m, parseColor(w))
+	}
+	return
+}
+
+func parseColor(s string) color.RGBA {
+	if c, ok := colors[s]; ok {
+		return c
+	}
+	fmt.Println("refusing to use ugly color '" + s + "', options are:")
+	for k, _ := range colors {
+		fmt.Println(k)
+	}
+	log.Fatal("illegal color")
+	return color.RGBA{}
+}
+
+var colors = map[string]color.RGBA{
+	"white":       color.RGBA{R: 255, G: 255, B: 255, A: 255},
+	"black":       color.RGBA{R: 0, G: 0, B: 0, A: 255},
+	"transparent": color.RGBA{R: 0, G: 0, B: 0, A: 0},
+	"red":         color.RGBA{R: 255, G: 0, B: 0, A: 255},
+	"green":       color.RGBA{R: 0, G: 255, B: 0, A: 255},
+	"blue":        color.RGBA{R: 0, G: 0, B: 255, A: 255},
+	"yellow":      color.RGBA{R: 255, G: 255, B: 0, A: 255},
+	"darkyellow":  color.RGBA{R: 127, G: 127, B: 0, A: 255},
+	"cyan":        color.RGBA{R: 0, G: 255, B: 255, A: 255},
+	"darkcyan":    color.RGBA{R: 0, G: 127, B: 127, A: 255},
+	"magenta":     color.RGBA{R: 255, G: 0, B: 255, A: 255},
+	"darkmagenta": color.RGBA{R: 127, G: 0, B: 127, A: 255},
+	"gray":        color.RGBA{R: 127, G: 127, B: 127, A: 255},
+}

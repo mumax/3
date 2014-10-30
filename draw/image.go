@@ -4,19 +4,20 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 	"image"
+	"image/color"
 	"log"
 	"strconv"
 )
 
 // Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.
-func Image(f *data.Slice, fmin, fmax string, arrowSize int) *image.RGBA {
+func Image(f *data.Slice, fmin, fmax string, arrowSize int, colormap ...color.RGBA) *image.RGBA {
 	img := new(image.RGBA)
-	On(img, f, fmin, fmax, arrowSize)
+	On(img, f, fmin, fmax, arrowSize, colormap...)
 	return img
 }
 
 // Render on existing image buffer. Resize it if needed
-func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int) {
+func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colormap ...color.RGBA) {
 	dim := f.NComp()
 	switch dim {
 	default:
@@ -43,7 +44,7 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int) {
 			min -= 1
 			max += 1 // make it gray instead of black
 		}
-		drawFloats(img, f.Scalars(), min, max)
+		drawFloats(img, f.Scalars(), min, max, colormap...)
 	}
 }
 
@@ -89,7 +90,7 @@ func extrema(data []float32) (min, max float32) {
 
 // Draws rank 3 tensor (3D scalar field) as image
 // averages data over X (usually thickness of thin film)
-func drawFloats(img *image.RGBA, arr [][][]float32, min, max float32) {
+func drawFloats(img *image.RGBA, arr [][][]float32, min, max float32, colormap ...color.RGBA) {
 
 	w, h := len(arr[0][0]), len(arr[0])
 	d := len(arr)
@@ -103,7 +104,7 @@ func drawFloats(img *image.RGBA, arr [][][]float32, min, max float32) {
 
 			}
 			v /= float32(d)
-			img.Set(ix, (h-1)-iy, GreyMap(min, max, v))
+			img.Set(ix, (h-1)-iy, ColorMap(min, max, v, colormap...))
 		}
 	}
 }

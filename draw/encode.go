@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/data"
 	"image"
+	"image/color"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -14,31 +15,31 @@ import (
 	"strings"
 )
 
-func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int) error {
+func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int, colormap ...color.RGBA) error {
 	out, err := os.Create(fname)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	return RenderFormat(out, f, min, max, arrowSize, fname)
+	return RenderFormat(out, f, min, max, arrowSize, fname, colormap...)
 }
 
-func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, format string) error {
+func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, format string, colormap ...color.RGBA) error {
 	var codecs = map[string]codec{".png": PNG, ".jpg": JPEG100, ".gif": GIF256}
 	ext := strings.ToLower(path.Ext(format))
 	enc := codecs[ext]
 	if enc == nil {
 		return fmt.Errorf("render: unhandled image type: " + ext)
 	}
-	return Render(out, f, min, max, arrowSize, enc)
+	return Render(out, f, min, max, arrowSize, enc, colormap...)
 }
 
 // encodes an image
 type codec func(io.Writer, image.Image) error
 
 // Render data and encode with arbitrary codec.
-func Render(out io.Writer, f *data.Slice, min, max string, arrowSize int, encode codec) error {
-	img := Image(f, min, max, arrowSize)
+func Render(out io.Writer, f *data.Slice, min, max string, arrowSize int, encode codec, colormap ...color.RGBA) error {
+	img := Image(f, min, max, arrowSize, colormap...)
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
 	return encode(buf, img)

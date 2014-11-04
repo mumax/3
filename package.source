@@ -6,6 +6,7 @@ out='cmd/mumax3-bootstrap/'
 
 go build -o $out/mumax3-convert 'github.com/mumax/3/cmd/mumax3-convert'
 go build -o $out/mumax3         'github.com/mumax/3/cmd/mumax3-bootstrap'
+go build -o $out/mumax3-server  'github.com/mumax/3/cmd/mumax3-server'
 
 
 for c in 5.0 5.5 6.0 6.5; do

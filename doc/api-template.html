@@ -259,12 +259,13 @@ MaxErr = 1e-6
 Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
 <ul>
 	<li> <code>5</code>: RK45 (Dormand-Prince) solver (the default). An accurate solver, very fast for magnetization dynamics at the cost of some memory usage. Cannot be used with finite temperature.</li> 
+	<li> <code>4</code>: Classic 4th-order Runge-Kutta method. Intended for finite temperature simulations with a large, fixed time step.</li> 
 	<li> <code>3</code>: RK23 (Bogacki-Shampine) solver. A robust and reasonably fast solver with low memory requirements. Typically outperforms RK45 when relaxing the magnetization with little dynamics, so it used internally by <code>Relax()</code>. Cannot be used with finite temperature.</li> 
-	<li> <code>2</code>: Adaptive Heun solver. Robust and uses very little memory but takes smaller time steps than the higher-order solvers. Suited for finite temperature. </li> 
+	<li> <code>2</code>: Adaptive Heun solver. Robust and uses very little memory but takes smaller time steps than the higher-order solvers. Suited for finite temperature simulations with a small, fixed time step. </li> 
 	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings). Only useful in exceptional situations or for debugging. </li>
 </ul>
 E.g.:
-<pre><code>SetSolver(1) // Euler
+<pre><code>SetSolver(2) // Heun
 FixDt = 1e-15
 </code></pre>
 

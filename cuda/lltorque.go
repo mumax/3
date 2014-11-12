@@ -31,3 +31,12 @@ func LLNoPrecess(torque, m, B *data.Slice) {
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z), N, cfg)
 }
+
+// Disables torque for the given set of regions.
+func LLFreezeSpins(torque *data.Slice, frozenSpins LUTPtr, regions *Bytes) {
+	N := torque.Len()
+	cfg := make1DConf(N)
+
+	k_llfreezespins_async(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
+		unsafe.Pointer(frozenSpins), regions.Ptr, N, cfg)
+}

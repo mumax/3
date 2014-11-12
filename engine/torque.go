@@ -12,6 +12,7 @@ var (
 	Pol                      ScalarParam
 	Lambda                   ScalarParam
 	EpsilonPrime             ScalarParam
+	FrozenSpins              ScalarParam
 	FixedLayer               VectorParam
 	Torque                   vSetter    // total torque in T
 	LLTorque                 vSetter    // Landau-Lifshitz torque/γ0, in T
@@ -33,6 +34,8 @@ func init() {
 	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
 	Lambda.Set(1) // sensible default value (?). TODO: should not be zero
 	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
+	FrozenSpins.init("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
+	FrozenSpins.Set(0)                                                             // by default torque is enabled everywhere
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	LLTorque.init("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
@@ -47,6 +50,7 @@ func init() {
 func SetTorque(dst *data.Slice) {
 	SetLLTorque(dst)
 	AddSTTorque(dst)
+	FreezeSpins(dst)
 }
 
 // Sets dst to the current Landau-Lifshitz torque
@@ -77,6 +81,10 @@ func AddSTTorque(dst *data.Slice) {
 		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
 			Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu(), Mesh())
 	}
+}
+
+func FreezeSpins(dst *data.Slice) {
+	cuda.LLFreezeSpins(dst, FrozenSpins.gpuLUT1(), regions.Gpu()) // overwrite torque with torque * FrozenSpins
 }
 
 // Gets

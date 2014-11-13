@@ -83,7 +83,9 @@ func AddSTTorque(dst *data.Slice) {
 }
 
 func FreezeSpins(dst *data.Slice) {
-	cuda.LLFreezeSpins(dst, FrozenSpins.gpuLUT1(), regions.Gpu()) // overwrite torque with torque * FrozenSpins
+	if !FrozenSpins.isZero() {
+		cuda.LLFreezeSpins(dst, FrozenSpins.gpuLUT1(), regions.Gpu()) // overwrite torque with torque * FrozenSpins
+	}
 }
 
 // Gets

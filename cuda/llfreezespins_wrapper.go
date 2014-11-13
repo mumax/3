@@ -5,78 +5,77 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for llfreezespins kernel
 var llfreezespins_code cu.Function
 
 // Stores the arguments for llfreezespins kernel invocation
-type llfreezespins_args_t struct{
-	 arg_tx unsafe.Pointer
-	 arg_ty unsafe.Pointer
-	 arg_tz unsafe.Pointer
-	 arg_frozenSpinsLUT unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_N int
-	 argptr [6]unsafe.Pointer
+type llfreezespins_args_t struct {
+	arg_tx             unsafe.Pointer
+	arg_ty             unsafe.Pointer
+	arg_tz             unsafe.Pointer
+	arg_frozenSpinsLUT unsafe.Pointer
+	arg_regions        unsafe.Pointer
+	arg_N              int
+	argptr             [6]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for llfreezespins kernel invocation
 var llfreezespins_args llfreezespins_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 llfreezespins_args.argptr[0] = unsafe.Pointer(&llfreezespins_args.arg_tx)
-	 llfreezespins_args.argptr[1] = unsafe.Pointer(&llfreezespins_args.arg_ty)
-	 llfreezespins_args.argptr[2] = unsafe.Pointer(&llfreezespins_args.arg_tz)
-	 llfreezespins_args.argptr[3] = unsafe.Pointer(&llfreezespins_args.arg_frozenSpinsLUT)
-	 llfreezespins_args.argptr[4] = unsafe.Pointer(&llfreezespins_args.arg_regions)
-	 llfreezespins_args.argptr[5] = unsafe.Pointer(&llfreezespins_args.arg_N)
-	 }
+	llfreezespins_args.argptr[0] = unsafe.Pointer(&llfreezespins_args.arg_tx)
+	llfreezespins_args.argptr[1] = unsafe.Pointer(&llfreezespins_args.arg_ty)
+	llfreezespins_args.argptr[2] = unsafe.Pointer(&llfreezespins_args.arg_tz)
+	llfreezespins_args.argptr[3] = unsafe.Pointer(&llfreezespins_args.arg_frozenSpinsLUT)
+	llfreezespins_args.argptr[4] = unsafe.Pointer(&llfreezespins_args.arg_regions)
+	llfreezespins_args.argptr[5] = unsafe.Pointer(&llfreezespins_args.arg_N)
+}
 
 // Wrapper for llfreezespins CUDA kernel, asynchronous.
-func k_llfreezespins_async ( tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, frozenSpinsLUT unsafe.Pointer, regions unsafe.Pointer, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_llfreezespins_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, frozenSpinsLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 	}
 
 	llfreezespins_args.Lock()
 	defer llfreezespins_args.Unlock()
 
-	if llfreezespins_code == 0{
+	if llfreezespins_code == 0 {
 		llfreezespins_code = fatbinLoad(llfreezespins_map, "llfreezespins")
 	}
 
-	 llfreezespins_args.arg_tx = tx
-	 llfreezespins_args.arg_ty = ty
-	 llfreezespins_args.arg_tz = tz
-	 llfreezespins_args.arg_frozenSpinsLUT = frozenSpinsLUT
-	 llfreezespins_args.arg_regions = regions
-	 llfreezespins_args.arg_N = N
-	
+	llfreezespins_args.arg_tx = tx
+	llfreezespins_args.arg_ty = ty
+	llfreezespins_args.arg_tz = tz
+	llfreezespins_args.arg_frozenSpinsLUT = frozenSpinsLUT
+	llfreezespins_args.arg_regions = regions
+	llfreezespins_args.arg_N = N
 
 	args := llfreezespins_args.argptr[:]
 	cu.LaunchKernel(llfreezespins_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 	}
 }
 
 // maps compute capability on PTX code for llfreezespins kernel.
-var llfreezespins_map = map[int]string{ 0: "" ,
-20: llfreezespins_ptx_20 ,
-30: llfreezespins_ptx_30 ,
-35: llfreezespins_ptx_35  }
+var llfreezespins_map = map[int]string{0: "",
+	20: llfreezespins_ptx_20,
+	30: llfreezespins_ptx_30,
+	35: llfreezespins_ptx_35}
 
 // llfreezespins PTX code for various compute capabilities.
-const(
-  llfreezespins_ptx_20 = `
+const (
+	llfreezespins_ptx_20 = `
 .version 4.1
 .target sm_20
 .address_size 64
@@ -146,7 +145,7 @@ BB0_2:
 
 
 `
-   llfreezespins_ptx_30 = `
+	llfreezespins_ptx_30 = `
 .version 4.1
 .target sm_30
 .address_size 64
@@ -216,7 +215,7 @@ BB0_2:
 
 
 `
-   llfreezespins_ptx_35 = `
+	llfreezespins_ptx_35 = `
 .version 4.1
 .target sm_35
 .address_size 64
@@ -356,4 +355,4 @@ BB5_2:
 
 
 `
- )
+)

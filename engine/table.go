@@ -92,21 +92,21 @@ func (t *DataTable) Add(output TableData) {
 
 func (t *DataTable) Save() {
 	t.init()
-	fmt.Fprint(t, Time)
+	fprint(t, Time)
 	for _, o := range t.outputs {
 		vec := o.average()
 		for _, v := range vec {
-			fmt.Fprint(t, "\t", float32(v))
+			fprint(t, "\t", float32(v))
 		}
 	}
-	fmt.Fprintln(t)
+	fprintln(t)
 	t.flush()
 	t.count++
 }
 
 func (t *DataTable) Println(msg ...interface{}) {
 	t.init()
-	fmt.Fprintln(t, msg...)
+	fprintln(t, msg...)
 }
 
 func TablePrint(msg ...interface{}) {
@@ -123,17 +123,17 @@ func (t *DataTable) init() {
 	t.output = f
 
 	// write header
-	fmt.Fprint(t, "# t (s)")
+	fprint(t, "# t (s)")
 	for _, o := range t.outputs {
 		if o.NComp() == 1 {
-			fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+			fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
 		} else {
 			for c := 0; c < o.NComp(); c++ {
-				fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
+				fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
 			}
 		}
 	}
-	fmt.Fprintln(t)
+	fprintln(t)
 	t.Flush()
 
 	go func() {
@@ -158,4 +158,17 @@ type TableData interface {
 	Name() string
 	Unit() string
 	NComp() int
+}
+
+// Safe fmt.Fprint, will fail on error
+func fprint(out io.Writer, x ...interface{}) {
+	_, err := fmt.Fprint(out, x...)
+	util.FatalErr(err)
+}
+
+// Safe fmt.Fprintln, will fail on error
+func fprintln(out io.Writer, x ...interface{}) {
+	_, err := fmt.Fprintln(out, x...)
+	util.FatalErr(err)
+
 }

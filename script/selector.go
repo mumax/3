@@ -8,6 +8,8 @@ import (
 	"unicode"
 )
 
+const GoExclusiveMethodSuffix = "Go"
+
 type selector struct {
 	x      Expr
 	method string
@@ -26,7 +28,7 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 	N := ""
 	for i := 0; i < t.NumMethod(); i++ {
 		name := t.Method(i).Name
-		if strings.ToLower(name) == sel && unicode.IsUpper(rune(name[0])) {
+		if strings.ToLower(name) == sel && unicode.IsUpper(rune(name[0])) && !strings.HasSuffix(name, GoExclusiveMethodSuffix) {
 			N = t.Method(i).Name
 			break
 		}

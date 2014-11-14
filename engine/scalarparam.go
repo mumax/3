@@ -65,3 +65,25 @@ func cat(desc, unit string) string {
 		return desc + " (" + unit + ")"
 	}
 }
+
+// these methods should only be accesible from Go
+
+func (p *ScalarParam) SetRegionValueGo(region int, v float64) {
+	if region == -1 {
+		p.setRegions(0, NREGION, []float64{v})
+	} else {
+		p.setRegions(region, region+1, []float64{v})
+	}
+}
+
+func (p *ScalarParam) SetRegionFuncGo(region int, f func() float64) {
+	if region == -1 {
+		p.setFunc(0, NREGION, func() []float64 {
+			return []float64{f()}
+		})
+	} else {
+		p.setFunc(region, region+1, func() []float64 {
+			return []float64{f()}
+		})
+	}
+}

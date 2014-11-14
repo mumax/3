@@ -34,19 +34,20 @@ import (
 	"compress/gzip"
 	"flag"
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/draw"
-	"github.com/mumax/3/dump"
-	"github.com/mumax/3/oommf"
-	"github.com/mumax/3/util"
 	"image/color"
+	"io"
 	"log"
 	"os"
 	"path"
-	"runtime"
 	"strconv"
 	"strings"
-	"sync"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
+	"github.com/mumax/3/dump"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/oommf"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -79,8 +80,9 @@ var (
 	flag_color     = flag.String("color", "black,gray,white", "Colormap for scalar image output.")
 )
 
-var que chan task
-var wg sync.WaitGroup
+var (
+	colormap []color.RGBA
+)
 
 type task struct {
 	*data.Slice
@@ -95,167 +97,207 @@ func main() {
 		log.Fatal("no input files")
 	}
 
-	// start many worker goroutines taking tasks from que
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	ncpu := runtime.GOMAXPROCS(-1)
-	que = make(chan task, ncpu)
-	if ncpu == 0 {
-		ncpu = 1
-	}
-	for i := 0; i < ncpu; i++ {
-		go work()
-	}
+	colormap = parseColors(*flag_color)
 
 	// politely try to make the output directory
 	if *flag_dir != "" {
 		_ = os.Mkdir(*flag_dir, 0777)
 	}
 
+	// determine which outputs we want
+	var wantOut []output
+	for flag, out := range outputs {
+		if *flag {
+			wantOut = append(wantOut, out)
+		}
+	}
+	switch {
+	case *flag_ovf1 != "":
+		wantOut = append(wantOut, output{".ovf", outputOVF1})
+	case *flag_omf != "":
+		wantOut = append(wantOut, output{".omf", outputOMF})
+	case *flag_ovf2 != "":
+		wantOut = append(wantOut, output{".ovf", outputOVF2})
+	case *flag_vtk != "":
+		wantOut = append(wantOut, output{".vts", outputVTK})
+	}
+	if len(wantOut) == 0 && *flag_show == false {
+		log.Fatal("no output format specified (e.g.: -png)")
+	}
+
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
-		log.Println(fname)
-
-		var slice *data.Slice
-		var info data.Meta
-		var err error
-
-		switch path.Ext(fname) {
-		default:
-			log.Println("skipping unsupported type", path.Ext(fname))
-			continue
-		case ".ovf", ".omf", ".ovf2":
-			slice, info, err = oommf.ReadFile(fname)
-		case ".dump":
-			slice, info, err = dump.ReadFile(fname)
+		for _, outp := range wantOut {
+			fname := fname // closure caveats
+			outp := outp
+			Queue(func() {
+				doFile(fname, outp)
+			})
 		}
-
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		wg.Add(1)
-		outfname := util.NoExt(fname)
-		if *flag_dir != "" {
-			outfname = *flag_dir + "/" + path.Base(outfname)
-		}
-		que <- task{slice, info, outfname}
 	}
 
 	// wait for work to finish
-	wg.Wait()
-}
+	Wait()
 
-func work() {
-	for task := range que {
-		process(task.Slice, task.info, task.fname)
-		wg.Done()
+	fmt.Println(succeeded, "files converted, ", skipped, "skipped, ", failed, "failed")
+	if failed > 0 {
+		os.Exit(1)
 	}
 }
 
-func open(fname string) *os.File {
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	util.FatalErr(err)
-	return f
+var (
+	failed, skipped, succeeded Atom
+)
+
+func doFile(infname string, outp output) {
+	// determine output file
+	outfname := util.NoExt(infname) + outp.Ext
+	if *flag_dir != "" {
+		outfname = *flag_dir + "/" + path.Base(outfname)
+	}
+
+	msg := infname + "\t-> " + outfname
+	defer func() { log.Println(msg) }()
+
+	if infname == outfname {
+		msg = fail(msg, "input and output file are the same")
+		return
+	}
+
+	defer func() {
+		if err := recover(); err != nil {
+			msg = fail(msg, err)
+			os.Remove(outfname)
+		}
+	}()
+
+	inStat, errS := os.Stat(infname)
+	if errS != nil {
+		panic(errS)
+	}
+	outStat, errO := os.Stat(outfname)
+
+	if errO == nil && outStat.ModTime().Sub(inStat.ModTime()) > 0 {
+		msg = "[skip] " + msg + ": skipped based on time stamps"
+		skipped.Add(1)
+		return
+	}
+
+	var slice *data.Slice
+	var info data.Meta
+	var err error
+
+	switch path.Ext(infname) {
+	default:
+		msg = fail(msg, ": skipping unsupported type: "+path.Ext(infname))
+		return
+	case ".ovf", ".omf", ".ovf2":
+		slice, info, err = oommf.ReadFile(infname)
+	case ".dump":
+		slice, info, err = dump.ReadFile(infname)
+	}
+
+	if err != nil {
+		msg = fail(msg, err)
+		return
+	}
+
+	out, err := httpfs.Create(outfname)
+	if err != nil {
+		msg = fail(msg, err)
+		return
+	}
+	defer out.Close()
+
+	preprocess(slice)
+	outp.Convert(slice, info, panicWriter{out})
+	succeeded.Add(1)
+	msg = "[ ok ] " + msg
+
 }
 
-func process(f *data.Slice, info data.Meta, name string) {
-	preprocess(f)
+func fail(msg string, x ...interface{}) string {
+	failed.Add(1)
+	return "[fail] " + msg + ": " + fmt.Sprint(x...)
+}
 
-	haveOutput := false
+// writer that panics on error, so we don't have to check it
+type panicWriter struct {
+	io.Writer
+}
 
-	colormap := parseColors(*flag_color)
-
-	if *flag_jpeg {
-		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows, colormap...)
-		haveOutput = true
+func (w panicWriter) Write(p []byte) (int, error) {
+	n, err := w.Writer.Write(p)
+	if err != nil {
+		panic(err)
 	}
+	return n, nil
+}
 
-	if *flag_png {
-		draw.RenderFile(name+".png", f, *flag_min, *flag_max, *flag_arrows, colormap...)
-		haveOutput = true
-	}
+type output struct {
+	Ext     string
+	Convert func(*data.Slice, data.Meta, io.Writer)
+}
 
-	if *flag_gif {
-		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows, colormap...)
-		haveOutput = true
-	}
+var outputs = map[*bool]output{
+	flag_png:     {".png", renderPNG},
+	flag_jpeg:    {".jpg", renderJPG},
+	flag_gif:     {".gif", renderGIF},
+	flag_svg:     {".svg", renderSVG},
+	flag_svgz:    {".svgz", renderSVGZ},
+	flag_gnuplot: {".gplot", dumpGnuplot},
+	flag_dump:    {".dump", outputDUMP},
+	flag_csv:     {".csv", dumpCSV},
+	flag_json:    {".json", dumpJSON},
+	flag_show:    {"", show},
+}
 
-	if *flag_svg {
-		out := open(name + ".svg")
-		defer out.Close()
-		draw.SVG(out, f.Vectors())
-		haveOutput = true
-	}
+func renderPNG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".png", colormap...)
+}
 
-	if *flag_svgz {
-		out1 := open(name + ".svgz")
-		defer out1.Close()
-		out2 := gzip.NewWriter(out1)
-		defer out2.Close()
-		draw.SVG(out2, f.Vectors())
-		haveOutput = true
-	}
+func renderJPG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".jpg", colormap...)
+}
 
-	if *flag_gnuplot {
-		out := open(name + ".gplot")
-		defer out.Close()
-		dumpGnuplot(out, f, info)
-		haveOutput = true
-	}
+func renderGIF(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".gif", colormap...)
+}
 
-	if *flag_ovf1 != "" {
-		out := open(name + ".ovf")
-		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_ovf1)
-		haveOutput = true
-	}
+func renderSVG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.SVG(out, f.Vectors())
+}
 
-	if *flag_omf != "" {
-		out := open(name + ".omf")
-		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_omf)
-		haveOutput = true
-	}
+func renderSVGZ(f *data.Slice, info data.Meta, out io.Writer) {
+	out2 := gzip.NewWriter(out)
+	defer out2.Close()
+	draw.SVG(out2, f.Vectors())
+}
 
-	if *flag_ovf2 != "" {
-		out := open(name + ".ovf")
-		defer out.Close()
-		oommf.WriteOVF2(out, f, info, *flag_ovf2)
-		haveOutput = true
-	}
+func outputOVF1(f *data.Slice, info data.Meta, out io.Writer) {
+	oommf.WriteOVF1(out, f, info, *flag_ovf1)
+}
 
-	if *flag_vtk != "" {
-		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
-		defer out.Close()
-		dumpVTK(out, f, info, *flag_vtk)
-		haveOutput = true
-	}
+func outputOMF(f *data.Slice, info data.Meta, out io.Writer) {
+	oommf.WriteOVF1(out, f, info, *flag_omf)
+}
 
-	if *flag_csv {
-		out := open(name + ".csv")
-		defer out.Close()
-		dumpCSV(out, f)
-		haveOutput = true
-	}
+func outputOVF2(f *data.Slice, info data.Meta, out io.Writer) {
+	oommf.WriteOVF2(out, f, info, *flag_ovf2)
+}
 
-	if *flag_json {
-		out := open(name + ".json")
-		defer out.Close()
-		dumpJSON(out, f)
-		haveOutput = true
-	}
+func outputVTK(f *data.Slice, info data.Meta, out io.Writer) {
+	dumpVTK(out, f, info, *flag_vtk)
+}
 
-	if *flag_dump {
-		dump.MustWriteFile(name+".dump", f, info)
-		haveOutput = true
-	}
+func outputDUMP(f *data.Slice, info data.Meta, out io.Writer) {
+	dump.Write(out, f, info)
+}
 
-	if !haveOutput || *flag_show {
-		fmt.Println(info)
-		util.Fprintf(os.Stdout, *flag_format, f.Tensors())
-		haveOutput = true
-	}
-
+// does not output to out, just prints to stdout
+func show(f *data.Slice, info data.Meta, out io.Writer) {
+	fmt.Println(info)
+	util.Fprintf(os.Stdout, *flag_format, f.Tensors())
 }
 
 func preprocess(f *data.Slice) {

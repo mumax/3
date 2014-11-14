@@ -10,9 +10,10 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
 	"log"
+
+	"github.com/mumax/3/data"
 )
 
 func dumpVTK(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) (err error) {

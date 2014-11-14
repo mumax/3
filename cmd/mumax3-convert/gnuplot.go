@@ -5,8 +5,9 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
+
+	"github.com/mumax/3/data"
 )
 
 func dumpGnuplot(out io.Writer, f *data.Slice, m data.Meta) (err error) {

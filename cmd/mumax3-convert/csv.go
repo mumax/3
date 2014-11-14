@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
+
+	"github.com/mumax/3/data"
 )
 
 // comma-separated values

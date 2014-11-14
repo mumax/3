@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 func resize(f *data.Slice, arg string) {

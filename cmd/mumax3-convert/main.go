@@ -34,19 +34,20 @@ import (
 	"compress/gzip"
 	"flag"
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/draw"
-	"github.com/mumax/3/dump"
-	"github.com/mumax/3/oommf"
-	"github.com/mumax/3/util"
 	"image/color"
+	"io"
 	"log"
 	"os"
 	"path"
-	"runtime"
 	"strconv"
 	"strings"
-	"sync"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
+	"github.com/mumax/3/dump"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/oommf"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -79,8 +80,9 @@ var (
 	flag_color     = flag.String("color", "black,gray,white", "Colormap for scalar image output.")
 )
 
-var que chan task
-var wg sync.WaitGroup
+var (
+	colormap []color.RGBA
+)
 
 type task struct {
 	*data.Slice
@@ -95,62 +97,106 @@ func main() {
 		log.Fatal("no input files")
 	}
 
-	// start many worker goroutines taking tasks from que
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	ncpu := runtime.GOMAXPROCS(-1)
-	que = make(chan task, ncpu)
-	if ncpu == 0 {
-		ncpu = 1
-	}
-	for i := 0; i < ncpu; i++ {
-		go work()
-	}
+	colormap = parseColors(*flag_color)
 
 	// politely try to make the output directory
 	if *flag_dir != "" {
 		_ = os.Mkdir(*flag_dir, 0777)
 	}
 
+	// determine which outputs we want
+	var wantOut []output
+	for flag, out := range outputs {
+		if *flag {
+			wantOut = append(wantOut, out)
+		}
+	}
+	if len(wantOut) == 0 && *flag_show == false {
+		log.Fatal("no output format specified (e.g.: -png)")
+	}
+
 	// read all input files and put them in the task que
 	for _, fname := range flag.Args() {
-		log.Println(fname)
-
-		var slice *data.Slice
-		var info data.Meta
-		var err error
-
-		switch path.Ext(fname) {
-		default:
-			log.Println("skipping unsupported type", path.Ext(fname))
-			continue
-		case ".ovf", ".omf", ".ovf2":
-			slice, info, err = oommf.ReadFile(fname)
-		case ".dump":
-			slice, info, err = dump.ReadFile(fname)
+		for _, outp := range wantOut {
+			fname := fname // closure caveats
+			Queue(func() {
+				doFile(fname, outp)
+			})
 		}
-
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		wg.Add(1)
-		outfname := util.NoExt(fname)
-		if *flag_dir != "" {
-			outfname = *flag_dir + "/" + path.Base(outfname)
-		}
-		que <- task{slice, info, outfname}
 	}
 
 	// wait for work to finish
-	wg.Wait()
+	Wait()
 }
 
-func work() {
-	for task := range que {
-		process(task.Slice, task.info, task.fname)
-		wg.Done()
+func doFile(infname string, outp output) {
+	// determine output file
+	outfname := util.NoExt(infname) + outp.Ext
+	if *flag_dir != "" {
+		outfname = *flag_dir + "/" + path.Base(outfname)
 	}
+
+	msg := infname + "\t-> " + outfname
+	defer func() { log.Println(msg) }()
+
+	var slice *data.Slice
+	var info data.Meta
+	var err error
+
+	switch path.Ext(infname) {
+	default:
+		msg = "[fail] " + msg + ": skipping unsupported type: " + path.Ext(infname)
+		return
+	case ".ovf", ".omf", ".ovf2":
+		slice, info, err = oommf.ReadFile(infname)
+	case ".dump":
+		slice, info, err = dump.ReadFile(infname)
+	}
+
+	if err != nil {
+		msg += ": " + err.Error()
+		return
+	}
+
+	out, err := httpfs.Create(outfname)
+	if err != nil {
+		msg += "[fail] " + msg + ": " + err.Error()
+		return
+	}
+	defer out.Close()
+
+	outp.Convert(slice, info, out)
+	msg = "[ ok ] " + msg
+
 }
+
+type output struct {
+	Ext     string
+	Convert func(*data.Slice, data.Meta, io.Writer)
+}
+
+var outputs = map[*bool]output{
+	flag_png: {".png", renderPNG},
+	//flag_jpeg      :
+	//flag_gif       :
+	//flag_svg       :
+	//flag_svgz      :
+	//flag_gnuplot   :
+	//flag_ovf1      :
+	//flag_omf       :
+	//flag_ovf2      :
+	//flag_vtk       :
+	//flag_dump      :
+	//flag_csv       :
+	//flag_json      :
+}
+
+//func work() {
+//	for task := range que {
+//		process(task.Slice, task.info, task.fname)
+//		wg.Done()
+//	}
+//}
 
 func open(fname string) *os.File {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
@@ -158,12 +204,14 @@ func open(fname string) *os.File {
 	return f
 }
 
+func renderPNG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".png", colormap...)
+}
+
 func process(f *data.Slice, info data.Meta, name string) {
 	preprocess(f)
 
 	haveOutput := false
-
-	colormap := parseColors(*flag_color)
 
 	if *flag_jpeg {
 		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows, colormap...)
@@ -171,7 +219,6 @@ func process(f *data.Slice, info data.Meta, name string) {
 	}
 
 	if *flag_png {
-		draw.RenderFile(name+".png", f, *flag_min, *flag_max, *flag_arrows, colormap...)
 		haveOutput = true
 	}
 

@@ -19,7 +19,7 @@ var (
 	MinDt, MaxDt            float64                      // minimum and maximum time step
 	MaxErr                  float64  = 1e-5              // maximum error/step
 	Headroom                float64  = 0.8               // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
-	lastErr, peakErr        float64                      // error of last step, highest error ever
+	LastErr, peakErr        float64                      // error of last step, highest error ever
 	lastTorque              float64                      // maxTorque of last time step
 	NSteps, NUndone, NEvals int                          // number of good steps, undone steps
 	FixDt                   float64                      // fixed time step?
@@ -35,7 +35,7 @@ func init() {
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclVar("dt", &Dt_si, "Last solver time step (s)")
-	DeclROnly("lastErr", &lastErr, "Maximum error of last time step")
+	DeclROnly("lastErr", &LastErr, "Maximum error of last time step")
 	DeclROnly("peakErr", &peakErr, "Maximum error over all time steps")
 	DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
@@ -97,7 +97,7 @@ func getNEval() int {
 
 // update lastErr and peakErr
 func setLastErr(err float64) {
-	lastErr = err
+	LastErr = err
 	if err > peakErr {
 		peakErr = err
 	}

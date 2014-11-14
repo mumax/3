@@ -398,7 +398,7 @@ func (g *guistate) prepareOnUpdate() {
 			g.Set("nsteps", NSteps)
 			g.Set("time", fmt.Sprintf("%1.5e", Time))
 			g.Set("dt", fmt.Sprintf("%1.3e", Dt_si))
-			g.Set("lasterr", fmt.Sprintf("%1.3e", lastErr))
+			g.Set("lasterr", fmt.Sprintf("%1.3e", LastErr))
 			g.Set("maxerr", MaxErr)
 			g.Set("mindt", MinDt)
 			g.Set("maxdt", MaxDt)

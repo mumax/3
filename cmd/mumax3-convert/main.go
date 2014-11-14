@@ -159,6 +159,17 @@ func doFile(infname string, outp output) {
 		panic("input and output file are the same")
 	}
 
+	inStat, errS := os.Stat(infname)
+	if errS != nil {
+		panic(errS)
+	}
+	outStat, errO := os.Stat(outfname)
+
+	if errO == nil && outStat.ModTime().Sub(inStat.ModTime()) > 0 {
+		msg = "[skip] " + msg + ": skipped based on time stamps"
+		return
+	}
+
 	var slice *data.Slice
 	var info data.Meta
 	var err error

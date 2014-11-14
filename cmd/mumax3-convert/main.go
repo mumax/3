@@ -139,7 +139,7 @@ func main() {
 	// wait for work to finish
 	Wait()
 
-	fmt.Println(succeeded, "files converted, ", failed, "failed, ", skipped, "skipped")
+	fmt.Println(succeeded, "files converted, ", skipped, "skipped, ", failed, "failed")
 	if failed > 0 {
 		os.Exit(1)
 	}
@@ -158,15 +158,18 @@ func doFile(infname string, outp output) {
 
 	msg := infname + "\t-> " + outfname
 	defer func() { log.Println(msg) }()
+
+	if infname == outfname {
+		msg = fail(msg, "input and output file are the same")
+		return
+	}
+
 	defer func() {
 		if err := recover(); err != nil {
 			msg = fail(msg, err)
+			os.Remove(outfname)
 		}
 	}()
-
-	if outfname == infname {
-		panic("input and output file are the same")
-	}
 
 	inStat, errS := os.Stat(infname)
 	if errS != nil {

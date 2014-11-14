@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 )
 
+const BUFSIZE = 16 * 1024 * 1024 // bufio buffer size
+
 // create a file for writing, clobbers previous content if any.
 func Create(URL string) (WriteCloseFlusher, error) {
 	_ = Remove(URL)
@@ -16,7 +18,7 @@ func Create(URL string) (WriteCloseFlusher, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &bufWriter{bufio.NewWriterSize(&appendWriter{URL}, 4*1024*1024)}, nil
+	return &bufWriter{bufio.NewWriterSize(&appendWriter{URL}, BUFSIZE)}, nil
 }
 
 type WriteCloseFlusher interface {

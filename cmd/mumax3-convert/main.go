@@ -220,6 +220,7 @@ var outputs = map[*bool]output{
 	flag_dump:    {".dump", outputDUMP},
 	flag_csv:     {".csv", dumpCSV},
 	flag_json:    {".json", dumpJSON},
+	flag_show:    {"", show},
 }
 
 func renderPNG(f *data.Slice, info data.Meta, out io.Writer) {
@@ -262,6 +263,11 @@ func outputVTK(f *data.Slice, info data.Meta, out io.Writer) {
 
 func outputDUMP(f *data.Slice, info data.Meta, out io.Writer) {
 	dump.Write(out, f, info)
+}
+
+// does not output to out, just prints to stdout
+func show(f *data.Slice, info data.Meta, out io.Writer) {
+
 }
 
 func preprocess(f *data.Slice) {

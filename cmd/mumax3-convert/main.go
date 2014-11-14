@@ -111,7 +111,6 @@ func main() {
 			wantOut = append(wantOut, out)
 		}
 	}
-
 	switch {
 	case *flag_ovf1 != "":
 		wantOut = append(wantOut, output{".ovf", outputOVF1})
@@ -122,7 +121,6 @@ func main() {
 	case *flag_vtk != "":
 		wantOut = append(wantOut, output{".vts", outputVTK})
 	}
-
 	if len(wantOut) == 0 && *flag_show == false {
 		log.Fatal("no output format specified (e.g.: -png)")
 	}
@@ -131,6 +129,7 @@ func main() {
 	for _, fname := range flag.Args() {
 		for _, outp := range wantOut {
 			fname := fname // closure caveats
+			outp := outp
 			Queue(func() {
 				doFile(fname, outp)
 			})
@@ -267,7 +266,8 @@ func outputDUMP(f *data.Slice, info data.Meta, out io.Writer) {
 
 // does not output to out, just prints to stdout
 func show(f *data.Slice, info data.Meta, out io.Writer) {
-
+	fmt.Println(info)
+	util.Fprintf(os.Stdout, *flag_format, f.Tensors())
 }
 
 func preprocess(f *data.Slice) {

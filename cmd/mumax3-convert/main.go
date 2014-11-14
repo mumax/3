@@ -138,6 +138,11 @@ func doFile(infname string, outp output) {
 
 	msg := infname + "\t-> " + outfname
 	defer func() { log.Println(msg) }()
+	defer func() {
+		if err := recover(); err != nil {
+			msg = "[fail] " + msg + ": " + fmt.Sprint(err)
+		}
+	}()
 
 	var slice *data.Slice
 	var info data.Meta
@@ -165,6 +170,7 @@ func doFile(infname string, outp output) {
 	}
 	defer out.Close()
 
+	preprocess(slice)
 	outp.Convert(slice, info, out)
 	msg = "[ ok ] " + msg
 
@@ -176,11 +182,11 @@ type output struct {
 }
 
 var outputs = map[*bool]output{
-	flag_png: {".png", renderPNG},
-	//flag_jpeg      :
-	//flag_gif       :
-	//flag_svg       :
-	//flag_svgz      :
+	flag_png:  {".png", renderPNG},
+	flag_jpeg: {".jpg", renderJPG},
+	flag_gif:  {".gif", renderGIF},
+	flag_svg:  {".svg", renderSVG},
+	flag_svgz: {".svgz", renderSVGZ},
 	//flag_gnuplot   :
 	//flag_ovf1      :
 	//flag_omf       :
@@ -191,119 +197,130 @@ var outputs = map[*bool]output{
 	//flag_json      :
 }
 
-//func work() {
-//	for task := range que {
-//		process(task.Slice, task.info, task.fname)
-//		wg.Done()
-//	}
+//func open(fname string) *os.File {
+//	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+//	util.FatalErr(err)
+//	return f
 //}
-
-func open(fname string) *os.File {
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	util.FatalErr(err)
-	return f
-}
 
 func renderPNG(f *data.Slice, info data.Meta, out io.Writer) {
 	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".png", colormap...)
 }
 
-func process(f *data.Slice, info data.Meta, name string) {
-	preprocess(f)
-
-	haveOutput := false
-
-	if *flag_jpeg {
-		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows, colormap...)
-		haveOutput = true
-	}
-
-	if *flag_png {
-		haveOutput = true
-	}
-
-	if *flag_gif {
-		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows, colormap...)
-		haveOutput = true
-	}
-
-	if *flag_svg {
-		out := open(name + ".svg")
-		defer out.Close()
-		draw.SVG(out, f.Vectors())
-		haveOutput = true
-	}
-
-	if *flag_svgz {
-		out1 := open(name + ".svgz")
-		defer out1.Close()
-		out2 := gzip.NewWriter(out1)
-		defer out2.Close()
-		draw.SVG(out2, f.Vectors())
-		haveOutput = true
-	}
-
-	if *flag_gnuplot {
-		out := open(name + ".gplot")
-		defer out.Close()
-		dumpGnuplot(out, f, info)
-		haveOutput = true
-	}
-
-	if *flag_ovf1 != "" {
-		out := open(name + ".ovf")
-		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_ovf1)
-		haveOutput = true
-	}
-
-	if *flag_omf != "" {
-		out := open(name + ".omf")
-		defer out.Close()
-		oommf.WriteOVF1(out, f, info, *flag_omf)
-		haveOutput = true
-	}
-
-	if *flag_ovf2 != "" {
-		out := open(name + ".ovf")
-		defer out.Close()
-		oommf.WriteOVF2(out, f, info, *flag_ovf2)
-		haveOutput = true
-	}
-
-	if *flag_vtk != "" {
-		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
-		defer out.Close()
-		dumpVTK(out, f, info, *flag_vtk)
-		haveOutput = true
-	}
-
-	if *flag_csv {
-		out := open(name + ".csv")
-		defer out.Close()
-		dumpCSV(out, f)
-		haveOutput = true
-	}
-
-	if *flag_json {
-		out := open(name + ".json")
-		defer out.Close()
-		dumpJSON(out, f)
-		haveOutput = true
-	}
-
-	if *flag_dump {
-		dump.MustWriteFile(name+".dump", f, info)
-		haveOutput = true
-	}
-
-	if !haveOutput || *flag_show {
-		fmt.Println(info)
-		util.Fprintf(os.Stdout, *flag_format, f.Tensors())
-		haveOutput = true
-	}
-
+func renderJPG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".jpg", colormap...)
 }
+
+func renderGIF(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.RenderFormat(out, f, *flag_min, *flag_max, *flag_arrows, ".gif", colormap...)
+}
+
+func renderSVG(f *data.Slice, info data.Meta, out io.Writer) {
+	draw.SVG(out, f.Vectors())
+}
+
+func renderSVGZ(f *data.Slice, info data.Meta, out io.Writer) {
+	out2 := gzip.NewWriter(out)
+	defer out2.Close()
+	draw.SVG(out2, f.Vectors())
+}
+
+//func process(f *data.Slice, info data.Meta, name string) {
+//	preprocess(f)
+//
+//	haveOutput := false
+//
+//	if *flag_jpeg {
+//		draw.RenderFile(name+".jpg", f, *flag_min, *flag_max, *flag_arrows, colormap...)
+//		haveOutput = true
+//	}
+//
+//	if *flag_png {
+//		haveOutput = true
+//	}
+//
+//	if *flag_gif {
+//		draw.RenderFile(name+".gif", f, *flag_min, *flag_max, *flag_arrows, colormap...)
+//		haveOutput = true
+//	}
+//
+//	if *flag_svg {
+//		out := open(name + ".svg")
+//		defer out.Close()
+//		draw.SVG(out, f.Vectors())
+//		haveOutput = true
+//	}
+//
+//	if *flag_svgz {
+//		out1 := open(name + ".svgz")
+//		defer out1.Close()
+//		out2 := gzip.NewWriter(out1)
+//		defer out2.Close()
+//		draw.SVG(out2, f.Vectors())
+//		haveOutput = true
+//	}
+//
+//	if *flag_gnuplot {
+//		out := open(name + ".gplot")
+//		defer out.Close()
+//		dumpGnuplot(out, f, info)
+//		haveOutput = true
+//	}
+//
+//	if *flag_ovf1 != "" {
+//		out := open(name + ".ovf")
+//		defer out.Close()
+//		oommf.WriteOVF1(out, f, info, *flag_ovf1)
+//		haveOutput = true
+//	}
+//
+//	if *flag_omf != "" {
+//		out := open(name + ".omf")
+//		defer out.Close()
+//		oommf.WriteOVF1(out, f, info, *flag_omf)
+//		haveOutput = true
+//	}
+//
+//	if *flag_ovf2 != "" {
+//		out := open(name + ".ovf")
+//		defer out.Close()
+//		oommf.WriteOVF2(out, f, info, *flag_ovf2)
+//		haveOutput = true
+//	}
+//
+//	if *flag_vtk != "" {
+//		out := open(name + ".vts") // vts is the official extension for VTK files containing StructuredGrid data
+//		defer out.Close()
+//		dumpVTK(out, f, info, *flag_vtk)
+//		haveOutput = true
+//	}
+//
+//	if *flag_csv {
+//		out := open(name + ".csv")
+//		defer out.Close()
+//		dumpCSV(out, f)
+//		haveOutput = true
+//	}
+//
+//	if *flag_json {
+//		out := open(name + ".json")
+//		defer out.Close()
+//		dumpJSON(out, f)
+//		haveOutput = true
+//	}
+//
+//	if *flag_dump {
+//		dump.MustWriteFile(name+".dump", f, info)
+//		haveOutput = true
+//	}
+//
+//	if !haveOutput || *flag_show {
+//		fmt.Println(info)
+//		util.Fprintf(os.Stdout, *flag_format, f.Tensors())
+//		haveOutput = true
+//	}
+//
+//}
 
 func preprocess(f *data.Slice) {
 	if *flag_normalize {

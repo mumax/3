@@ -8,7 +8,7 @@ import (
 )
 
 // comma-separated values
-func dumpCSV(out io.Writer, f *data.Slice) {
+func dumpCSV(f *data.Slice, info data.Meta, out io.Writer) {
 	f2 := ", " + *flag_format
 	a := f.Tensors()
 	for _, a := range a {

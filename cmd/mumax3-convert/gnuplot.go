@@ -10,7 +10,7 @@ import (
 	"github.com/mumax/3/data"
 )
 
-func dumpGnuplot(out io.Writer, f *data.Slice, m data.Meta) (err error) {
+func dumpGnuplot(f *data.Slice, m data.Meta, out io.Writer) {
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
 
@@ -28,14 +28,13 @@ func dumpGnuplot(out io.Writer, f *data.Slice, m data.Meta) (err error) {
 			y := float64(iy) * cellsize[Y]
 			for ix := range data[0][iz][iy] {
 				x := float64(ix) * cellsize[X]
-				_, err = fmt.Fprint(buf, x, " ", y, " ", z, "\t")
+				fmt.Fprint(buf, x, " ", y, " ", z, "\t")
 				for c := 0; c < ncomp; c++ {
-					_, err = fmt.Fprint(buf, data[c][iz][iy][ix], " ")
+					fmt.Fprint(buf, data[c][iz][iy][ix], " ")
 				}
-				_, err = fmt.Fprint(buf, "\n")
+				fmt.Fprint(buf, "\n")
 			}
-			_, err = fmt.Fprint(buf, "\n")
+			fmt.Fprint(buf, "\n")
 		}
 	}
-	return
 }

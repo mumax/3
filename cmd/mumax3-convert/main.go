@@ -171,30 +171,38 @@ func doFile(infname string, outp output) {
 		}
 	}()
 
-	inStat, errS := os.Stat(infname)
-	if errS != nil {
-		panic(errS)
-	}
-	outStat, errO := os.Stat(outfname)
-
-	if errO == nil && outStat.ModTime().Sub(inStat.ModTime()) > 0 {
-		msg = "[skip] " + msg + ": skipped based on time stamps"
-		skipped.Add(1)
-		return
+	if !(strings.HasPrefix(infname, "http://") || strings.HasPrefix(outfname, "http://")) {
+		inStat, errS := os.Stat(infname)
+		if errS != nil {
+			panic(errS)
+		}
+		outStat, errO := os.Stat(outfname)
+		if errO == nil && outStat.ModTime().Sub(inStat.ModTime()) > 0 {
+			msg = "[skip] " + msg + ": skipped based on time stamps"
+			skipped.Add(1)
+			return
+		}
 	}
 
 	var slice *data.Slice
 	var info data.Meta
 	var err error
 
+	in, errI := httpfs.Open(infname)
+	if errI != nil {
+		msg = fail(msg, errI)
+		return
+	}
+	defer in.Close()
+
 	switch path.Ext(infname) {
 	default:
 		msg = fail(msg, ": skipping unsupported type: "+path.Ext(infname))
 		return
 	case ".ovf", ".omf", ".ovf2":
-		slice, info, err = oommf.ReadFile(infname)
+		slice, info, err = oommf.Read(in)
 	case ".dump":
-		slice, info, err = dump.ReadFile(infname)
+		slice, info, err = dump.Read(in)
 	}
 
 	if err != nil {

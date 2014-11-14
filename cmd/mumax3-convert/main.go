@@ -138,7 +138,16 @@ func main() {
 
 	// wait for work to finish
 	Wait()
+
+	fmt.Println(succeeded, "files converted, ", failed, "failed, ", skipped, "skipped")
+	if failed > 0 {
+		os.Exit(1)
+	}
 }
+
+var (
+	failed, skipped, succeeded Atom
+)
 
 func doFile(infname string, outp output) {
 	// determine output file
@@ -151,7 +160,7 @@ func doFile(infname string, outp output) {
 	defer func() { log.Println(msg) }()
 	defer func() {
 		if err := recover(); err != nil {
-			msg = "[fail] " + msg + ": " + fmt.Sprint(err)
+			msg = fail(msg, err)
 		}
 	}()
 
@@ -167,6 +176,7 @@ func doFile(infname string, outp output) {
 
 	if errO == nil && outStat.ModTime().Sub(inStat.ModTime()) > 0 {
 		msg = "[skip] " + msg + ": skipped based on time stamps"
+		skipped.Add(1)
 		return
 	}
 
@@ -176,7 +186,7 @@ func doFile(infname string, outp output) {
 
 	switch path.Ext(infname) {
 	default:
-		msg = "[fail] " + msg + ": skipping unsupported type: " + path.Ext(infname)
+		msg = fail(msg, ": skipping unsupported type: "+path.Ext(infname))
 		return
 	case ".ovf", ".omf", ".ovf2":
 		slice, info, err = oommf.ReadFile(infname)
@@ -185,21 +195,27 @@ func doFile(infname string, outp output) {
 	}
 
 	if err != nil {
-		msg = "[fail] " + msg + ": " + err.Error()
+		msg = fail(msg, err)
 		return
 	}
 
 	out, err := httpfs.Create(outfname)
 	if err != nil {
-		msg += "[fail] " + msg + ": " + err.Error()
+		msg = fail(msg, err)
 		return
 	}
 	defer out.Close()
 
 	preprocess(slice)
 	outp.Convert(slice, info, panicWriter{out})
+	succeeded.Add(1)
 	msg = "[ ok ] " + msg
 
+}
+
+func fail(msg string, x ...interface{}) string {
+	failed.Add(1)
+	return "[fail] " + msg + ": " + fmt.Sprint(x...)
 }
 
 // writer that panics on error, so we don't have to check it

@@ -4,6 +4,7 @@ package data
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/mumax/3/util"
 	"log"
 	"reflect"
@@ -196,7 +197,7 @@ func (s *Slice) HostCopy() *Slice {
 
 func Copy(dst, src *Slice) {
 	if dst.NComp() != src.NComp() || dst.Len() != src.Len() {
-		log.Panicf("slice copy: illegal sizes: dst: %vx%v, src: %vx%v", dst.NComp(), dst.Len(), src.NComp(), src.Len())
+		panic(fmt.Sprintf("slice copy: illegal sizes: dst: %vx%v, src: %vx%v", dst.NComp(), dst.Len(), src.NComp(), src.Len()))
 	}
 	d, s := dst.GPUAccess(), src.GPUAccess()
 	bytes := SIZEOF_FLOAT32 * int64(dst.Len())
@@ -229,7 +230,7 @@ func Copy(dst, src *Slice) {
 func (f *Slice) Scalars() [][][]float32 {
 	x := f.Tensors()
 	if len(x) != 1 {
-		log.Panicf("expecting 1 component, got %v", f.NComp())
+		panic(fmt.Sprintf("expecting 1 component, got %v", f.NComp()))
 	}
 	return x[0]
 }
@@ -240,7 +241,7 @@ func (f *Slice) Scalars() [][][]float32 {
 func (f *Slice) Vectors() [3][][][]float32 {
 	x := f.Tensors()
 	if len(x) != 3 {
-		log.Panicf("expecting 3 components, got %v", f.NComp())
+		panic(fmt.Sprintf("expecting 3 components, got %v", f.NComp()))
 	}
 	return [3][][][]float32{x[0], x[1], x[2]}
 }
@@ -297,7 +298,7 @@ func (s *Slice) Get(comp, ix, iy, iz int) float64 {
 
 func (s *Slice) checkComp(comp int) {
 	if comp < 0 || comp >= s.NComp() {
-		log.Panicf("slice: invalid component index: %v (number of components=%v)\n", comp, s.NComp())
+		panic(fmt.Sprintf("slice: invalid component index: %v (number of components=%v)\n", comp, s.NComp()))
 	}
 }
 
@@ -307,7 +308,7 @@ func (s *Slice) Index(ix, iy, iz int) int {
 
 func Index(size [3]int, ix, iy, iz int) int {
 	if ix < 0 || ix >= size[X] || iy < 0 || iy >= size[Y] || iz < 0 || iz >= size[Z] {
-		log.Panicf("Slice index out of bounds: %v,%v,%v (bounds=%v)\n", ix, iy, iz, size)
+		panic(fmt.Sprintf("Slice index out of bounds: %v,%v,%v (bounds=%v)\n", ix, iy, iz, size))
 	}
 	return (iz*size[Y]+iy)*size[X] + ix
 }

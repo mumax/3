@@ -84,6 +84,11 @@ func (e *excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 			}
 		}
 	}
+	e.AddGo(mask, mul)
+}
+
+// An Add(mask, f) equivalent for Go use
+func (e *excitation) AddGo(mask *data.Slice, mul func() float64) {
 	if mask != nil {
 		checkNaN(mask, e.Name()+".add()") // TODO: in more places
 		mask = data.Resample(mask, e.Mesh().Size())

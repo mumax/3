@@ -146,3 +146,33 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 		}
 	}
 }
+
+func readOVF2DataBinary8(in io.Reader, array *data.Slice) {
+	size := array.Size()
+	data := array.Tensors()
+
+	var bytes8 [8]byte
+	bytes := bytes8[:]
+	in.Read(bytes)
+
+	// OOMMF requires this number to be first to check the format
+	controlnumber := *((*float64)(unsafe.Pointer(&bytes8)))
+	if controlnumber != OVF_CONTROL_NUMBER_8 {
+		panic("invalid OVF2 control number: " + fmt.Sprint(controlnumber))
+	}
+
+	ncomp := array.NComp()
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				for c := 0; c < ncomp; c++ {
+					n, err := in.Read(bytes)
+					if err != nil || n != 8 {
+						panic(err)
+					}
+					data[c][iz][iy][ix] = float32(*((*float64)(unsafe.Pointer(&bytes8))))
+				}
+			}
+		}
+	}
+}

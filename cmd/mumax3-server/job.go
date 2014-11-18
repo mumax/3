@@ -15,7 +15,6 @@ type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// all of this is cache:
 	Output     string    // if exists, points to output ID
-	Engaged    string    // node address this job was last given to
 	Host       string    // node address in host file (=last host who started this job)
 	ExitStatus string    // what's in the exitstatus file
 	Start      time.Time // When this job was started, if applicable
@@ -45,10 +44,6 @@ func (j *Job) Update() {
 		j.Alive = parseTime(httpfsRead(out + "alive"))
 		j.duration = time.Duration(atoi(httpfsRead(out + "duration")))
 	}
-	if !j.Start.IsZero() {
-		j.Engaged = ""
-	}
-
 }
 
 func atoi(a string) int64 {
@@ -72,7 +67,6 @@ func (j *Job) Duration() time.Duration {
 func (j *Job) Reque() {
 	log.Println("requeue", j.ID)
 	j.RequeCount++
-	j.Engaged = ""
 	httpfs.Remove(j.LocalOutputDir())
 	j.Update()
 }
@@ -161,7 +155,7 @@ func FS(id string) string {
 }
 
 func (j *Job) IsQueued() bool {
-	return j.Output == "" && j.Engaged == ""
+	return j.Output == ""
 }
 
 func (j *Job) IsRunning() bool {

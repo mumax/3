@@ -33,6 +33,8 @@ func Read(in io.Reader) (s *data.Slice, meta data.Meta, err error) {
 		readOVFDataText(in, data_)
 	case format == "binary 4" && ovf == 1:
 		readOVF1DataBinary4(in, data_)
+	case format == "binary 8" && ovf == 1:
+		readOVF1DataBinary8(in, data_)
 	case format == "binary 4" && ovf == 2:
 		readOVF2DataBinary4(in, data_)
 	case format == "binary 8" && ovf == 2:

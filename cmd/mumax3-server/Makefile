@@ -1,2 +1,2 @@
 all:
-	go install -v -race
+	go install

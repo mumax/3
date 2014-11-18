@@ -13,6 +13,9 @@ import (
 // compute Job
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
+	// in-memory properties:
+	RequeCount int   // how many times requeued.
+	Error      error // error that cannot be consolidated to disk
 	// all of this is cache:
 	Output     string    // if exists, points to output ID
 	Host       string    // node address in host file (=last host who started this job)
@@ -20,7 +23,6 @@ type Job struct {
 	Start      time.Time // When this job was started, if applicable
 	Alive      time.Time // Last time when this job was seen alive
 	duration   time.Duration
-	RequeCount int // how many times requeued.
 }
 
 // read job files from storage and update status cache
@@ -46,11 +48,7 @@ func (j *Job) Update() {
 	}
 }
 
-func atoi(a string) int64 {
-	i, _ := strconv.ParseInt(a, 10, 64)
-	return i
-}
-
+// How long job has been running, if running.
 func (j *Job) Duration() time.Duration {
 	if j.Start.IsZero() {
 		return 0
@@ -64,6 +62,7 @@ func (j *Job) Duration() time.Duration {
 	return 0 // unknown duration
 }
 
+// Put job back in queue for later, e.g., when killed.
 func (j *Job) Reque() {
 	log.Println("requeue", j.ID)
 	j.RequeCount++
@@ -71,16 +70,8 @@ func (j *Job) Reque() {
 	j.Update()
 }
 
-func httpfsRead(fname string) string {
-	data, err := httpfs.Read(fname)
-	if err != nil {
-		return ""
-	}
-	return string(data)
-}
-
+// Find job belonging to ID
 func JobByName(ID string) *Job {
-
 	user := Users[BaseDir(LocalPath(ID))]
 	if user == nil {
 		log.Println("JobByName: no user for", ID)
@@ -235,4 +226,18 @@ func Rm(URL string) string {
 		u.nextPtr = 0
 	}
 	return ""
+}
+
+func atoi(a string) int64 {
+	i, _ := strconv.ParseInt(a, 10, 64)
+	return i
+}
+
+// return file content as string
+func httpfsRead(fname string) string {
+	data, err := httpfs.Read(fname)
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }

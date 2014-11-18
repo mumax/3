@@ -19,7 +19,7 @@ import (
 var (
 	MumaxVersion string
 	GPUs         []string
-	Processes    = make(map[string]*Process)
+	Processes    = make(map[string]*Process) // job id -> process
 )
 
 // Process is a running simulation process
@@ -58,10 +58,13 @@ func RunComputeService() {
 		ID := WaitForJob() // take an available job
 		go func() {
 
-			defer func() {
-				// add GPU number back to idle stack
-				idle <- gpu
-			}()
+			//	defer func() {
+			//		// add GPU number back to idle stack
+			//		idle <- gpu
+			//		if err:=recover(); err != nil{
+			//			log.Println("Compute caught panic:", err)
+			//		}
+			//	}()
 
 			p := NewProcess(ID, gpu, GUIAddr)
 
@@ -81,25 +84,10 @@ func RunComputeService() {
 				log.Println(err)
 			}
 
+			idle <- gpu
+
 		}()
 	}
-}
-
-func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
-
-// RPC-callable function, answers by this node's time
-func WhatsTheTime(string) string {
-	return time.Now().Format(time.UnixDate)
-}
-
-func AskTime(host string) time.Time {
-	str, _ := RPCCall(host, "WhatsTheTime", "")
-	return parseTime(str)
-}
-
-func parseTime(str string) time.Time {
-	t, _ := time.Parse(time.UnixDate, str)
-	return t
 }
 
 func WaitForJob() string {
@@ -177,10 +165,6 @@ func NewProcess(ID string, gpu int, webAddr string) *Process {
 }
 
 func (p *Process) Run() {
-	if p == nil {
-		log.Println("ERROR: running nil process")
-		return
-	}
 
 	log.Println("=> exec  ", p.Path, p.Args)
 
@@ -239,6 +223,8 @@ func (p *Process) Run() {
 	return
 }
 
+func (p *Process) Duration() time.Duration { return Since(time.Now(), p.Start) }
+
 func DetectGPUs() {
 	if GPUs != nil {
 		panic("multiple DetectGPUs() calls")
@@ -269,4 +255,19 @@ func DetectMumax() {
 	} else {
 		MumaxVersion = fmt.Sprint(*flag_mumax, "-test", ": ", err, info)
 	}
+}
+
+// RPC-callable function, answers by this node's time
+func WhatsTheTime(string) string {
+	return time.Now().Format(time.UnixDate)
+}
+
+func AskTime(host string) time.Time {
+	str, _ := RPCCall(host, "WhatsTheTime", "")
+	return parseTime(str)
+}
+
+func parseTime(str string) time.Time {
+	t, _ := time.Parse(time.UnixDate, str)
+	return t
 }

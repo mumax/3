@@ -11,6 +11,7 @@ import (
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
+const TableAutoflushRate = 5   // auto-flush table every X seconds
 
 func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
@@ -91,6 +92,8 @@ func (t *DataTable) Add(output TableData) {
 }
 
 func (t *DataTable) Save() {
+	t.flushlock.Lock() // flush during write gives errShortWrite
+	defer t.flushlock.Unlock()
 	t.init()
 	fprint(t, Time)
 	for _, o := range t.outputs {
@@ -100,7 +103,7 @@ func (t *DataTable) Save() {
 		}
 	}
 	fprintln(t)
-	t.flush()
+	//t.flush()
 	t.count++
 }
 
@@ -136,9 +139,14 @@ func (t *DataTable) init() {
 	fprintln(t)
 	t.Flush()
 
+	// periodically flush so GUI shows graph,
+	// but don't flush after every output for performance
+	// (httpfs flush is expensive)
 	go func() {
-		time.Sleep(1 * time.Second)
-		Table.flush()
+		for {
+			time.Sleep(TableAutoflushRate * time.Second)
+			Table.flush()
+		}
 	}()
 }
 

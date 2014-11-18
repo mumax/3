@@ -1,6 +1,7 @@
 package oommf
 
 import (
+	"encoding/binary"
 	"fmt"
 	"github.com/mumax/3/data"
 	"io"
@@ -10,23 +11,10 @@ import (
 )
 
 func WriteOVF1(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) {
-	switch strings.ToLower(dataformat) {
-	case "binary", "binary 4":
-		dataformat = "Binary 4"
-	case "text":
-		dataformat = "Text"
-	default:
-		log.Fatalf("Illegal OMF data format: %v", dataformat)
-	}
-
 	writeOVF1Header(out, q, meta)
 	writeOVF1Data(out, q, dataformat)
 	hdr(out, "End", "Segment")
 }
-
-const (
-	OMMF_CONTROL_NUMBER = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
-)
 
 func writeOVF1Data(out io.Writer, q *data.Slice, dataformat string) {
 	canonicalFormat := ""
@@ -118,28 +106,53 @@ func readOVF1DataBinary4(in io.Reader, t *data.Slice) {
 	size := t.Size()
 	data := t.Tensors()
 
-	var bytes4 [4]byte
-	bytes := bytes4[:]
-
-	in.Read(bytes)                                                                  // TODO: must read 4 !
-	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
-
 	// OOMMF requires this number to be first to check the format
-	controlnumber := *((*float32)(unsafe.Pointer(&bytes4)))
+	var controlnumber float32
+	// OVF 1.0 is network byte order (MSB)
+	binary.Read(in, binary.BigEndian, &controlnumber)
 	if controlnumber != OVF_CONTROL_NUMBER_4 {
 		panic("invalid OVF1 control number: " + fmt.Sprint(controlnumber))
 	}
 
+	var tmp float32
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
 				for c := 0; c < 3; c++ {
-					n, err := in.Read(bytes)
-					if err != nil || n != 4 {
+					err := binary.Read(in, binary.BigEndian, &tmp)
+					if err != nil {
 						panic(err)
 					}
-					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
-					data[c][iz][iy][ix] = *((*float32)(unsafe.Pointer(&bytes4)))
+					data[c][iz][iy][ix] = tmp
+				}
+			}
+		}
+	}
+}
+
+func readOVF1DataBinary8(in io.Reader, t *data.Slice) {
+	size := t.Size()
+	data := t.Tensors()
+
+	// OOMMF requires this number to be first to check the format
+	var controlnumber float64
+	// OVF 1.0 is network byte order (MSB)
+	binary.Read(in, binary.BigEndian, &controlnumber)
+
+	if controlnumber != OVF_CONTROL_NUMBER_8 {
+		panic("invalid OVF1 control number: " + fmt.Sprint(controlnumber))
+	}
+
+	var tmp float64
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				for c := 0; c < 3; c++ {
+					err := binary.Read(in, binary.BigEndian, &tmp)
+					if err != nil {
+						panic(err)
+					}
+					data[c][iz][iy][ix] = float32(tmp)
 				}
 			}
 		}

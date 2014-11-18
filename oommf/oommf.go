@@ -35,6 +35,8 @@ func Read(in io.Reader) (s *data.Slice, meta data.Meta, err error) {
 		readOVF1DataBinary4(in, data_)
 	case format == "binary 4" && ovf == 2:
 		readOVF2DataBinary4(in, data_)
+	case format == "binary 8" && ovf == 2:
+		readOVF2DataBinary8(in, data_)
 	}
 
 	return data_, data.Meta{Name: info.Title, Time: info.TotalTime, Unit: info.ValueUnit, CellSize: info.StepSize}, nil
@@ -186,6 +188,7 @@ func isHeaderEnd(str string) bool {
 }
 
 const OVF_CONTROL_NUMBER_4 = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
+const OVF_CONTROL_NUMBER_8 = 123456789012345.0
 
 // read data block in text format, for OVF1 and OVF2
 func readOVFDataText(in io.Reader, t *data.Slice) {

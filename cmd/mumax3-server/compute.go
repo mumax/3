@@ -58,15 +58,19 @@ func RunComputeService() {
 		ID := WaitForJob() // take an available job
 		go func() {
 
-			//	defer func() {
-			//		// add GPU number back to idle stack
-			//		idle <- gpu
-			//		if err:=recover(); err != nil{
-			//			log.Println("Compute caught panic:", err)
-			//		}
-			//	}()
+			defer func() {
+				// remove from "running" list
+				WLock()
+				delete(Processes, ID)
+				WUnlock()
+				// add GPU number back to idle stack
+				idle <- gpu
+			}()
 
 			p := NewProcess(ID, gpu, GUIAddr)
+			if p == nil {
+				return
+			}
 
 			WLock()
 			Processes[ID] = p
@@ -74,17 +78,10 @@ func RunComputeService() {
 
 			p.Run()
 
-			// remove from "running" list
-			WLock()
-			delete(Processes, ID)
-			WUnlock()
-
 			_, err := RPCCall(JobHost(ID), "UpdateJob", ID)
 			if err != nil {
 				log.Println(err)
 			}
-
-			idle <- gpu
 
 		}()
 	}
@@ -156,7 +153,13 @@ func NewProcess(ID string, gpu int, webAddr string) *Process {
 	httpfs.Mkdir(outDir)
 	out, errD := httpfs.Create(outDir + "/stdout.txt")
 	if errD != nil {
+		SetJobError(ID, errD)
 		log.Println("makeProcess", errD)
+		j := JobByName(ID)
+		if j != nil {
+			j.Reque()
+		}
+		return nil
 	}
 	cmd.Stderr = out
 	cmd.Stdout = out
@@ -178,6 +181,9 @@ func (p *Process) Run() {
 	WLock()               // Cmd.Start() modifies state
 	err1 := p.Cmd.Start() // err?
 	WUnlock()
+	if err1 != nil {
+		SetJobError(p.ID, err1)
+	}
 
 	timeOffset := time.Now().Sub(startTime) // our clock is most likely out-of-sync with host
 	tick := time.NewTicker(KeepaliveInterval)
@@ -191,6 +197,9 @@ func (p *Process) Run() {
 	}()
 
 	err2 := p.Cmd.Wait()
+	if err1 == nil && err2 != nil {
+		SetJobError(p.ID, err2)
+	}
 	tick.Stop()
 
 	status := -1

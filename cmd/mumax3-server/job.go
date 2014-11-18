@@ -16,8 +16,8 @@ const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// in-memory properties:
-	RequeCount int   // how many times requeued.
-	Error      error // error that cannot be consolidated to disk
+	RequeCount int         // how many times requeued.
+	Error      interface{} // error that cannot be consolidated to disk
 	// all of this is cache:
 	Output     string    // if exists, points to output ID
 	Host       string    // node address in host file (=last host who started this job)
@@ -25,51 +25,6 @@ type Job struct {
 	Start      time.Time // When this job was started, if applicable
 	Alive      time.Time // Last time when this job was seen alive
 	duration   time.Duration
-}
-
-// read job files from storage and update status cache
-func (j *Job) Update() {
-
-	out := j.LocalOutputDir()
-	if exists(out) {
-		j.Output = thisAddr + "/" + out
-	} else {
-		j.Output = ""
-		j.ExitStatus = ""
-		j.Start = time.Time{}
-		j.Alive = time.Time{}
-		j.duration = 0
-	}
-
-	if j.Output != "" {
-		j.Host = httpfsRead(out + "host")
-		j.ExitStatus = httpfsRead(out + "exitstatus")
-		j.Start = parseTime(httpfsRead(out + "start"))
-		j.Alive = parseTime(httpfsRead(out + "alive"))
-		j.duration = time.Duration(atoi(httpfsRead(out + "duration")))
-	}
-}
-
-// How long job has been running, if running.
-func (j *Job) Duration() time.Duration {
-	if j.Start.IsZero() {
-		return 0
-	}
-	if j.duration != 0 {
-		return j.duration
-	}
-	if j.IsRunning() {
-		return Since(time.Now(), j.Start)
-	}
-	return 0 // unknown duration
-}
-
-// Put job back in queue for later, e.g., when killed.
-func (j *Job) Reque() {
-	log.Println("requeue", j.ID)
-	j.RequeCount++
-	httpfs.Remove(j.LocalOutputDir())
-	j.Update()
 }
 
 // Find job belonging to ID
@@ -103,6 +58,60 @@ func JobByName(ID string) *Job {
 		log.Println("JobByName: not found:", ID)
 		return nil
 	}
+}
+
+// read job files from storage and update status cache
+func (j *Job) Update() {
+	out := j.LocalOutputDir()
+	if exists(out) {
+		j.Output = thisAddr + "/" + out
+	} else {
+		j.Output = ""
+		j.ExitStatus = ""
+		j.Start = time.Time{}
+		j.Alive = time.Time{}
+		j.duration = 0
+	}
+	if j.Output != "" {
+		j.Host = httpfsRead(out + "host")
+		j.ExitStatus = httpfsRead(out + "exitstatus")
+		j.Start = parseTime(httpfsRead(out + "start"))
+		j.Alive = parseTime(httpfsRead(out + "alive"))
+		j.duration = time.Duration(atoi(httpfsRead(out + "duration")))
+	}
+}
+
+// Put job back in queue for later, e.g., when killed.
+func (j *Job) Reque() {
+	log.Println("requeue", j.ID)
+	j.RequeCount++
+	httpfs.Remove(j.LocalOutputDir())
+	j.Update()
+}
+
+func SetJobError(ID string, err interface{}) {
+	log.Println("SetJobErr", ID, err)
+	WLock()
+	defer WUnlock()
+	j := JobByName(ID)
+	if j == nil {
+		return
+	}
+	j.Error = err
+}
+
+// How long job has been running, if running.
+func (j *Job) Duration() time.Duration {
+	if j.Start.IsZero() {
+		return 0
+	}
+	if j.duration != 0 {
+		return j.duration
+	}
+	if j.IsRunning() {
+		return Since(time.Now(), j.Start)
+	}
+	return 0 // unknown duration
 }
 
 // user name for this job ID

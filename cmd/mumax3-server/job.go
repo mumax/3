@@ -10,6 +10,8 @@ import (
 	"github.com/mumax/3/util"
 )
 
+const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued to many times
+
 // compute Job
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
@@ -103,10 +105,12 @@ func JobByName(ID string) *Job {
 	}
 }
 
+// user name for this job ID
 func (j *Job) User() string {
 	return JobUser(j.ID)
 }
 
+// user name for this job ID
 func JobUser(ID string) string {
 	return BaseDir(LocalPath(ID))
 }
@@ -132,6 +136,7 @@ func (j *Job) LocalOutputDir() string {
 	return OutputDir(j.LocalPath())
 }
 
+// output directory for input file
 func OutputDir(path string) string {
 	return util.NoExt(path) + ".out/"
 }
@@ -141,21 +146,25 @@ func (*Job) FS(id string) string {
 	return FS(id)
 }
 
+// insert "/fs" in front of url path
 func FS(id string) string {
 	return BaseDir(id) + "/fs/" + LocalPath(id)
 }
 
+// is job queued?
 func (j *Job) IsQueued() bool {
-	return j.Output == ""
+	return j.Output == "" && j.RequeCount < MaxRequeue
 }
 
+// is job running?
 func (j *Job) IsRunning() bool {
 	return j.Output != "" && j.ExitStatus == ""
 }
 
-func exists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
+// Host of job with this ID (=first path element). E.g.:
+// 	host:123/user/file.mx3 -> host:123
+func JobHost(ID string) string {
+	return BaseDir(ID)
 }
 
 // Job status number queued, running,...
@@ -179,6 +188,7 @@ func (s Status) String() string {
 	return statusString[s]
 }
 
+// human-readable status string (for gui)
 func (j *Job) Status() string {
 	if j.IsQueued() {
 		return QUEUED.String()
@@ -193,12 +203,6 @@ func (j *Job) Status() string {
 		return FAILED.String()
 	}
 	return "UNKNOWN"
-}
-
-// Host of job with this ID (=first path element). E.g.:
-// 	host:123/user/file.mx3 -> host:123
-func JobHost(ID string) string {
-	return BaseDir(ID)
 }
 
 // remove job output
@@ -228,12 +232,19 @@ func Rm(URL string) string {
 	return ""
 }
 
+// check if path exists
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// atoi, does not return error
 func atoi(a string) int64 {
 	i, _ := strconv.ParseInt(a, 10, 64)
 	return i
 }
 
-// return file content as string
+// return file content as string, no errors
 func httpfsRead(fname string) string {
 	data, err := httpfs.Read(fname)
 	if err != nil {

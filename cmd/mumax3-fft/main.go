@@ -27,7 +27,7 @@ Zero padding
 
 To apply zero padding to the input data:
  	mumax3-fft -zeropad 2 table.txt
-this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resultion by 2x.
+this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resolution by 2x.
 
 
 Windowing

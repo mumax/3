@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"os"
 	"path"
 	"strings"
 
@@ -33,11 +34,13 @@ import (
 )
 
 var (
-	flag_Re  = flag.Bool("re", false, "output real part")
-	flag_Im  = flag.Bool("im", false, "output imaginary part")
-	flag_Mag = flag.Bool("mag", false, "output magnitude")
-	flag_Ph  = flag.Bool("ph", false, "output phase")
-	flag_Pad = flag.Int("zeropad", 0, "zero-pad input by N times its size")
+	flag_Re     = flag.Bool("re", false, "output real part")
+	flag_Im     = flag.Bool("im", false, "output imaginary part")
+	flag_Mag    = flag.Bool("mag", false, "output magnitude")
+	flag_Ph     = flag.Bool("ph", false, "output phase")
+	flag_Pad    = flag.Int("zeropad", 0, "zero-pad input by N times its size")
+	flag_Win    = flag.String("window", "boxcar", "apply windowing function")
+	flag_Stdout = flag.Bool("stdout", false, "output to stdout instead of file")
 )
 
 func main() {
@@ -46,19 +49,19 @@ func main() {
 	if !(*flag_Re || *flag_Im || *flag_Mag || *flag_Ph) {
 		*flag_Mag = true
 	}
-	fmt.Print("outputting")
-	for _, o := range outputs {
-		if !*o.Enabled {
-			continue
-		}
-		fmt.Print(" ", o.Name)
-	}
-	fmt.Println()
+	//fmt.Fprint(os.Stderr, "outputting")
+	//for _, o := range outputs {
+	//	if !*o.Enabled {
+	//		continue
+	//	}
+	//	fmt.Fprint(os.Stderr, " ", o.Name)
+	//}
+	//fmt.Fprintln(os.Stderr)
 
 	// process files
 	for _, f := range flag.Args() {
 		outFname := util.NoExt(f) + "_fft" + path.Ext(f)
-		fmt.Println(f, "->", outFname)
+		//fmt.Println(f, "->", outFname)
 		doFile(f, outFname)
 	}
 
@@ -96,15 +99,27 @@ func doFile(infname, outfname string) {
 	deltaT *= float32(1 + *flag_Pad)
 	deltaF := 1 / (deltaT)
 
+	window := windows[*flag_Win]
+	if window == nil {
+		panic(fmt.Sprint("invalid window:", *flag_Win, " options:", windows))
+	}
+
 	for c := range data {
+		applyWindow(data[c], window)
 		data[c] = zeropad(data[c], rows*(1+*flag_Pad))
 	}
 
 	transf := FFT(data[1:]) // FFT all but first (time) column
 
 	// write output file
-	out := httpfs.MustCreate(outfname)
-	defer out.Close()
+	var out io.Writer
+	if *flag_Stdout {
+		out = os.Stdout
+	} else {
+		o := httpfs.MustCreate(outfname)
+		defer o.Close()
+		out = o
+	}
 
 	// write header
 	Fprint(out, "# f(Hz)")
@@ -141,6 +156,16 @@ func doFile(infname, outfname string) {
 //func interp(data [][]float32)[][]float32){
 //
 //}
+
+type windowFunc func(float32, float32) float32
+
+func applyWindow(data []float32, window windowFunc) {
+	N := float32(len(data))
+	for i := range data {
+		n := float32(i) / N
+		data[i] *= window(n, N)
+	}
+}
 
 func zeropad(data []float32, length int) []float32 {
 	if len(data) == length {
@@ -234,4 +259,32 @@ func phase(c complex64) float32 {
 	re := float64(real(c))
 	im := float64(imag(c))
 	return float32(math.Atan2(im, re))
+}
+
+func boxcar(n, N float32) float32 {
+	return 1
+}
+
+func welch(n, N float32) float32 {
+	return 1 - sqr((n-(N-1)/2)/((N-1)/2))
+}
+
+func hann(n, N float32) float32 {
+	return 0.5 * (1 - cos((2*math.Pi*n)/(N-1)))
+}
+
+func hamming(n, N float32) float32 {
+	const a = 0.54
+	const b = 1 - a
+	return a - b*cos((2*math.Pi*n)/(N-1))
+}
+
+func sqr(x float32) float32 { return x * x }
+func cos(x float32) float32 { return float32(math.Cos(float64(x))) }
+
+var windows = map[string]windowFunc{
+	"boxcar":  boxcar,
+	"hamming": hamming,
+	"hann":    hann,
+	"welch":   welch,
 }

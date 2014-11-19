@@ -21,6 +21,14 @@ func Create(URL string) (WriteCloseFlusher, error) {
 	return &bufWriter{bufio.NewWriterSize(&appendWriter{URL}, BUFSIZE)}, nil
 }
 
+func MustCreate(URL string) WriteCloseFlusher {
+	f, err := Create(URL)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 type WriteCloseFlusher interface {
 	io.WriteCloser
 	Flush() error
@@ -33,6 +41,14 @@ func Open(URL string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	return ioutil.NopCloser(bytes.NewReader(data)), nil
+}
+
+func MustOpen(URL string) io.ReadCloser {
+	f, err := Open(URL)
+	if err != nil {
+		panic(err)
+	}
+	return f
 }
 
 func Touch(URL string) error {

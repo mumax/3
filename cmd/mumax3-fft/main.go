@@ -30,9 +30,17 @@ To apply zero padding to the input data:
 this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resultion by 2x.
 
 
+Windowing
+
+
+
 The following windowing functions are provided: boxcar (no windowing), hamming, hann, welch:
  	mumax3-fft -window hann table.txt
 
+
+License
+
+mumax3-fft inherits the GPLv3 from the FFTW bindings at http://github.com/barnex/fftw
 
 */
 package main

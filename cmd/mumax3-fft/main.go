@@ -37,6 +37,7 @@ var (
 	flag_Im  = flag.Bool("im", false, "output imaginary part")
 	flag_Mag = flag.Bool("mag", false, "output magnitude")
 	flag_Ph  = flag.Bool("ph", false, "output phase")
+	flag_Pad = flag.Int("zeropad", 0, "zero-pad input by N times its size")
 )
 
 func main() {
@@ -85,13 +86,21 @@ func doFile(infname, outfname string) {
 
 	header, data := ReadTable(in)
 
-	// do FFT
-	transf := FFT(data[1:]) // FFT all but first (time) column
+	// Process data
+	//data = interp(data) // interpolate to equidistant times
 
+	// determine frequency step, beware zero padding
 	const TIME = 0 // time column
 	rows := len(data[TIME])
 	deltaT := data[TIME][rows-1] - data[TIME][0]
+	deltaT *= float32(1 + *flag_Pad)
 	deltaF := 1 / (deltaT)
+
+	for c := range data {
+		data[c] = zeropad(data[c], rows*(1+*flag_Pad))
+	}
+
+	transf := FFT(data[1:]) // FFT all but first (time) column
 
 	// write output file
 	out := httpfs.MustCreate(outfname)
@@ -127,6 +136,19 @@ func doFile(infname, outfname string) {
 		}
 		Fprint(out, "\n")
 	}
+}
+
+//func interp(data [][]float32)[][]float32){
+//
+//}
+
+func zeropad(data []float32, length int) []float32 {
+	if len(data) == length {
+		return data
+	}
+	padded := make([]float32, length)
+	copy(padded, data)
+	return padded
 }
 
 func FFT(data [][]float32) [][]complex64 {

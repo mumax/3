@@ -18,8 +18,9 @@ Output
 By default, the magnitude of the FFT is output. To output magnitude and phase:
  	mumax3-fft -mag -ph table.txt
 
-To outupt real and imaginary part:
+To output real and imaginary part:
  	mumax3-fft -re -im table.txt
+Other combinations of flags may be used.
 
 
 

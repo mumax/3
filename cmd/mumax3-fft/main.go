@@ -4,16 +4,35 @@ mumax3-fft performs a Fourier transform on mumax3 table output. E.g.:
 will create table_fft.txt with per-column FFTs of the data in table.txt.
 The first column will contain frequencies in Hz.
 
+
 Flags
+
 
 To see all flags, run:
 	mumax3-fft -help
+
+
+Output
+
 
 By default, the magnitude of the FFT is output. To output magnitude and phase:
  	mumax3-fft -mag -ph table.txt
 
 To outupt real and imaginary part:
  	mumax3-fft -re -im table.txt
+
+
+Zero padding
+
+
+To apply zero padding to the input data:
+ 	mumax3-fft -zeropad 2 table.txt
+this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resultion by 2x.
+
+
+The following windowing functions are provided: boxcar (no windowing), hamming, hann, welch:
+ 	mumax3-fft -window hann table.txt
+
 
 */
 package main
@@ -38,7 +57,7 @@ var (
 	flag_Im     = flag.Bool("im", false, "output imaginary part")
 	flag_Mag    = flag.Bool("mag", false, "output magnitude")
 	flag_Ph     = flag.Bool("ph", false, "output phase")
-	flag_Pad    = flag.Int("zeropad", 0, "zero-pad input by N times its size")
+	flag_Pad    = flag.Int("zeropad", 1, "zero-pad input by N times its size")
 	flag_Win    = flag.String("window", "boxcar", "apply windowing function")
 	flag_Stdout = flag.Bool("stdout", false, "output to stdout instead of file")
 )
@@ -96,7 +115,7 @@ func doFile(infname, outfname string) {
 	const TIME = 0 // time column
 	rows := len(data[TIME])
 	deltaT := data[TIME][rows-1] - data[TIME][0]
-	deltaT *= float32(1 + *flag_Pad)
+	deltaT *= float32(*flag_Pad)
 	deltaF := 1 / (deltaT)
 
 	window := windows[*flag_Win]
@@ -106,7 +125,7 @@ func doFile(infname, outfname string) {
 
 	for c := range data {
 		applyWindow(data[c], window)
-		data[c] = zeropad(data[c], rows*(1+*flag_Pad))
+		data[c] = zeropad(data[c], rows*(*flag_Pad))
 	}
 
 	transf := FFT(data[1:]) // FFT all but first (time) column

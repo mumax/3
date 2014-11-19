@@ -38,6 +38,15 @@ The following windowing functions are provided: boxcar (no windowing), hamming, 
  	mumax3-fft -window hann table.txt
 
 
+
+Use with gnuplot
+
+
+mumax3-fft is easy to use with gnuplot. Inside gnuplot, type, e.g.:
+ 	gnuplot> plot "<mumax3-fft -stdout table.txt"
+this will perform the FFT on-the-fly and pipe the output directly to gnuplot.
+
+
 License
 
 mumax3-fft inherits the GPLv3 from the FFTW bindings at http://github.com/barnex/fftw
@@ -73,22 +82,14 @@ var (
 func main() {
 	// process flags
 	flag.Parse()
+	// no flags: output magnitude
 	if !(*flag_Re || *flag_Im || *flag_Mag || *flag_Ph) {
 		*flag_Mag = true
 	}
-	//fmt.Fprint(os.Stderr, "outputting")
-	//for _, o := range outputs {
-	//	if !*o.Enabled {
-	//		continue
-	//	}
-	//	fmt.Fprint(os.Stderr, " ", o.Name)
-	//}
-	//fmt.Fprintln(os.Stderr)
 
 	// process files
 	for _, f := range flag.Args() {
 		outFname := util.NoExt(f) + "_fft" + path.Ext(f)
-		//fmt.Println(f, "->", outFname)
 		doFile(f, outFname)
 	}
 
@@ -147,7 +148,10 @@ func doFile(infname, outfname string) {
 		defer o.Close()
 		out = o
 	}
+	writeOutput(out, header, transf, deltaF)
+}
 
+func writeOutput(out io.Writer, header []string, transf [][]complex64, deltaF float32) {
 	// write header
 	Fprint(out, "# f(Hz)")
 	for _, h := range header[1:] {

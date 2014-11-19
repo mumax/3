@@ -1,57 +1,3 @@
-/*
-mumax3-fft performs a Fourier transform on mumax3 table output. E.g.:
- 	mumax3-fft table.txt
-will create table_fft.txt with per-column FFTs of the data in table.txt.
-The first column will contain frequencies in Hz.
-
-
-Flags
-
-
-To see all flags, run:
-	mumax3-fft -help
-
-
-Output
-
-
-By default, the magnitude of the FFT is output. To output magnitude and phase:
- 	mumax3-fft -mag -ph table.txt
-
-To outupt real and imaginary part:
- 	mumax3-fft -re -im table.txt
-
-
-Zero padding
-
-
-To apply zero padding to the input data:
- 	mumax3-fft -zeropad 2 table.txt
-this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resolution by 2x.
-
-
-Windowing
-
-
-
-The following windowing functions are provided: boxcar (no windowing), hamming, hann, welch:
- 	mumax3-fft -window hann table.txt
-
-
-
-Use with gnuplot
-
-
-mumax3-fft is easy to use with gnuplot. Inside gnuplot, type, e.g.:
- 	gnuplot> plot "<mumax3-fft -stdout table.txt"
-this will perform the FFT on-the-fly and pipe the output directly to gnuplot.
-
-
-License
-
-mumax3-fft inherits the GPLv3 from the FFTW bindings at http://github.com/barnex/fftw
-
-*/
 package main
 
 import (
@@ -188,16 +134,6 @@ func writeOutput(out io.Writer, header []string, transf [][]complex64, deltaF fl
 //
 //}
 
-type windowFunc func(float32, float32) float32
-
-func applyWindow(data []float32, window windowFunc) {
-	N := float32(len(data))
-	for i := range data {
-		n := float32(i) / N
-		data[i] *= window(n, N)
-	}
-}
-
 func zeropad(data []float32, length int) []float32 {
 	if len(data) == length {
 		return data
@@ -290,32 +226,4 @@ func phase(c complex64) float32 {
 	re := float64(real(c))
 	im := float64(imag(c))
 	return float32(math.Atan2(im, re))
-}
-
-func boxcar(n, N float32) float32 {
-	return 1
-}
-
-func welch(n, N float32) float32 {
-	return 1 - sqr((n-(N-1)/2)/((N-1)/2))
-}
-
-func hann(n, N float32) float32 {
-	return 0.5 * (1 - cos((2*math.Pi*n)/(N-1)))
-}
-
-func hamming(n, N float32) float32 {
-	const a = 0.54
-	const b = 1 - a
-	return a - b*cos((2*math.Pi*n)/(N-1))
-}
-
-func sqr(x float32) float32 { return x * x }
-func cos(x float32) float32 { return float32(math.Cos(float64(x))) }
-
-var windows = map[string]windowFunc{
-	"boxcar":  boxcar,
-	"hamming": hamming,
-	"hann":    hann,
-	"welch":   welch,
 }

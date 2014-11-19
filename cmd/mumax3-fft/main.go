@@ -145,8 +145,8 @@ func interp(data [][]float32) [][]float32 {
 	deltaT := data[TIME][rows-1] - data[TIME][0]
 
 	time := data[TIME]
-	si := 0                               // source index
-	for di := 0; di < len(time)-1; di++ { // dst index
+	si := 0                             // source index
+	for di := 0; di < len(time); di++ { // dst index
 		want := float32(di) * deltaT / float32(len(time)) // wanted time
 		for si < len(time)-1 && !(time[si] <= want && time[si+1] > want && time[si] != time[si+1]) {
 			si++
@@ -154,17 +154,12 @@ func interp(data [][]float32) [][]float32 {
 
 		x := (want - time[si]) / (time[si+1] - time[si])
 		if x < 0 || x > 1 {
-			fmt.Fprintln(os.Stderr, fmt.Sprint("x=", x))
+			panic(fmt.Sprint("x=", x))
 		}
 
 		for c := range interp {
 			interp[c][di] = (1-x)*data[c][si] + x*data[c][si+1]
 		}
-	}
-	// last point should not go out-of-bounds
-	N := len(interp[0]) - 1
-	for c := range interp {
-		interp[c][N] = data[c][N]
 	}
 	return interp
 }

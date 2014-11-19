@@ -22,6 +22,13 @@ To outupt real and imaginary part:
  	mumax3-fft -re -im table.txt
 
 
+
+Auto interpolation
+
+
+For performance reasons, mumax3's AutoSave outputs data at the requested intervals but truncated to solver time steps. This causes some jitter on the output times, which degrades the FFT spectrum. Therefore mumax3-fft automatically interpolates the data to fit equidistant times. The resulting spectrum is very clean. If desired, interpolation may be turned off by the flag -interpolate=false
+
+
 Zero padding
 
 

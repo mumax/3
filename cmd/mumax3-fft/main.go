@@ -23,6 +23,7 @@ var (
 	flag_Pad    = flag.Int("zeropad", 1, "zero-pad input by N times its size")
 	flag_Win    = flag.String("window", "boxcar", "apply windowing function")
 	flag_Stdout = flag.Bool("stdout", false, "output to stdout instead of file")
+	flag_Interp = flag.Bool("interpolate", true, "re-sample intput at equidistant points")
 )
 
 func main() {
@@ -64,7 +65,9 @@ func doFile(infname, outfname string) {
 	header, data := ReadTable(in)
 
 	// Process data
-	//data = interp(data) // interpolate to equidistant times
+	if *flag_Interp {
+		data = interp(data) // interpolate to equidistant times
+	}
 
 	// determine frequency step, beware zero padding
 	const TIME = 0 // time column
@@ -130,9 +133,41 @@ func writeOutput(out io.Writer, header []string, transf [][]complex64, deltaF fl
 	}
 }
 
-//func interp(data [][]float32)[][]float32){
-//
-//}
+func interp(data [][]float32) [][]float32 {
+
+	interp := make([][]float32, len(data))
+	for i := range interp {
+		interp[i] = make([]float32, len(data[i]))
+	}
+
+	const TIME = 0 // time column
+	rows := len(data[TIME])
+	deltaT := data[TIME][rows-1] - data[TIME][0]
+
+	time := data[TIME]
+	si := 0                               // source index
+	for di := 0; di < len(time)-1; di++ { // dst index
+		want := float32(di) * deltaT / float32(len(time)) // wanted time
+		for si < len(time)-1 && !(time[si] <= want && time[si+1] > want && time[si] != time[si+1]) {
+			si++
+		}
+
+		x := (want - time[si]) / (time[si+1] - time[si])
+		if x < 0 || x > 1 {
+			fmt.Fprintln(os.Stderr, fmt.Sprint("x=", x))
+		}
+
+		for c := range interp {
+			interp[c][di] = (1-x)*data[c][si] + x*data[c][si+1]
+		}
+	}
+	// last point should not go out-of-bounds
+	N := len(interp[0]) - 1
+	for c := range interp {
+		interp[c][N] = data[c][N]
+	}
+	return interp
+}
 
 func zeropad(data []float32, length int) []float32 {
 	if len(data) == length {

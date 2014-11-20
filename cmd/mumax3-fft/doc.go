@@ -38,6 +38,15 @@ To apply zero padding to the input data:
 this will zero-pad the input to 2x its original size, thus increasing the apparent frequency resolution by 2x.
 
 
+
+Divide by excitation spectrum
+
+
+A typical use of mumax3-fft is to extract an FMR spectrum after pulsed excitation. In theory, a sinc excitation is ideal since it has a flat spectrum up a to a cutoff bandwidth. In practice, however, a smooth pulse like a gaussian is numerically more friendly and may lead to a faster simulation.
+
+
+
+
 Windowing
 
 

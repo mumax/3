@@ -57,6 +57,15 @@ func processTable(infname, outfname string) {
 
 	transf := FFT(data[1:]) // FFT all but first (time) column
 
+	if *flag_NormCol == 1 {
+		errPrintln("-divcol may start at column 2")
+		os.Exit(1)
+	}
+
+	if *flag_NormCol > 1 {
+		divCol(transf, transf[*flag_NormCol-2])
+	}
+
 	// write output file
 	var out io.Writer
 	if *flag_Stdout {
@@ -177,6 +186,15 @@ func FFT(data [][]float32) [][]complex64 {
 	}
 
 	return transf
+}
+
+func divCol(data [][]complex64, norm []complex64) {
+	for i := range data[0] {
+		for c := range data {
+			n := 1 / norm[i]
+			data[c][i] *= n
+		}
+	}
 }
 
 // read data table

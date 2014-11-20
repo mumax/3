@@ -1,24 +1,29 @@
-Nx := 128
-Ny := 64
+Nx := 1
+Ny := 1
 setgridsize(Nx, Ny, 1)
 setcellsize(3e-9, 3e-9, 3e-9)
 
-Msat = 800e6
+Msat = 800e3
 Aex = 13e-12
 alpha = 0.02
-m = uniform(1, 0, 0)
+m = uniform(1, .1, 0)
+enabledemag=false
 
-bias := 0.05
+bias := 0.01
 B_ext = vector(bias, 0, 0)
 relax()
 
+BW := 1e9
+maxDt = 1/(8*BW)
 
-BW := 3e9
-maxDt = 1/(2*BW)
-t0 := 5e-9
+res := 1e6
+t0 := 30/BW
 A := 5e-3 * 1e-9 // impulse in T*s
-B_ext = vector(bias, (A*BW)*sinc((t-t0)*2*pi*BW), 0)
+B_ext = vector(bias, 0, (A*BW)*sinc((t-t0)*2*pi*BW))
+
+runtime := 1/res + t0
+print("bandwidth:", BW, "Hz, resolution:", res, "Hz, runtime:", t0, "s")
 
 tableAdd(B_ext)
-tableAutoSave(1/(10*BW))
-run(50e-9)
+tableAutoSave(1/(8*BW))
+run(runtime)

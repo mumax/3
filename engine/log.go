@@ -43,12 +43,12 @@ func LogErr(msg ...interface{}) {
 	str := "//" + sprint(msg...)
 	log2GUI(str)
 	log2File(str)
-	fprintln(os.Stderr, str)
+	fmt.Fprintln(os.Stderr, str)
 }
 
 func log2File(msg string) {
 	if logfile != nil {
-		fprintln(logfile, msg)
+		fmt.Fprintln(logfile, msg)
 	}
 }
 

@@ -129,9 +129,10 @@ func interp(data [][]float32) [][]float32 {
 	deltaT := data[TIME][rows-1] - data[TIME][0]
 
 	time := data[TIME]
+	time0 := time[0]                    // start time, not neccesarily 0
 	si := 0                             // source index
 	for di := 0; di < len(time); di++ { // dst index
-		want := float32(di) * deltaT / float32(len(time)) // wanted time
+		want := time0 + float32(di)*deltaT/float32(len(time)) // wanted time
 		for si < len(time)-1 && !(time[si] <= want && time[si+1] > want && time[si] != time[si+1]) {
 			si++
 		}

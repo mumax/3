@@ -18,6 +18,7 @@ func init() {
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
+	DeclFunc("Landau", Landau, "Landau pattern with given circulation")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -185,6 +186,48 @@ func (c Config) Add(weight float64, other Config) Config {
 	return func(x, y, z float64) data.Vector {
 		return c(x, y, z).MAdd(weight, other(x, y, z))
 	}
+}
+
+func Landau(circ int) Config {
+	return func(x, y, z float64) data.Vector {
+		hx := Mesh().WorldSize()[X]
+		hy := Mesh().WorldSize()[Y]
+		b := 0.5*hx
+		a := 0.5*hy
+		x_ := x 
+		var m data.Vector
+		if x_ <= (-b+a) && y >= 0 && y <= -x_ -(b-a)  {
+			m = data.Vector{0, 1*float64(circ), 0}
+		} 
+		if x_ <= (-b+a) && y <= 0 && y >= x_ + (b-a)  {
+			m = data.Vector{0, 1*float64(circ), 0}
+		}
+		if x_ >= (b - a) && y >= 0 && y <= x_ - (b-a)  {
+			m = data.Vector{0, -1*float64(circ), 0}
+		}
+		if x_ >= (b-a) && y <= 0 && y >= -x_ + (b-a)  {
+			m = data.Vector{0, -1*float64(circ), 0}
+		}
+		if x_ <= (-b+a) && y >= 0 && y >= -x_ -(b-a)  {
+			m = data.Vector{1*float64(circ),0,0}
+		}
+		if x_ <= (-b+a) && y <= 0 && y <= x_ + (b-a)  {
+			m = data.Vector{-1*float64(circ), 0, 0}
+		}
+		if x_ >= (b - a) && y >= 0 && y >= x_ - (b-a)  {
+			m = data.Vector{1*float64(circ), 0, 0}
+		}
+		if x_ >= (b - a) && y <= 0 && y <= -x_ + (b-a)  {
+			m = data.Vector{-1*float64(circ), 0, 0}
+		}
+		if x*x <= (b-a)*(b-a) && y <= 0  {
+			m = data.Vector{-1*float64(circ), 0, 0}	
+		} 
+		if x_*x_ <= (b-a)*(b-a) && y >= 0 {
+			m = data.Vector{1*float64(circ), 0, 0}	
+		}
+		return m
+		}	
 }
 
 // Infinitely repeats the shape with given period in x, y, z.

@@ -1,18 +1,24 @@
-setgridsize(1, 1, 1)
+Nx := 128
+Ny := 64
+setgridsize(Nx, Ny, 1)
 setcellsize(3e-9, 3e-9, 3e-9)
 
 Msat = 800e6
 Aex = 13e-12
-m = uniform(1,1,1)
-enabledemag = false
+alpha = 0.02
+m = uniform(1, 0, 0)
 
-tableadd(B_ext)
+bias := 0.05
+B_ext = vector(bias, 0, 0)
+relax()
 
-f1 := 1e9
-f2 := 0 // 0.75e9
-A1 := 0.1
-A2 := 0.05
-B_ext = vector(A1*sin(2*pi*f1*t) + A2*cos(2*pi*f2*t), 0, 0)
 
-tableAutoSave(10e-12)
+BW := 3e9
+maxDt = 1/(2*BW)
+t0 := 5e-9
+A := 5e-3 * 1e-9 // impulse in T*s
+B_ext = vector(bias, (A*BW)*sinc((t-t0)*2*pi*BW), 0)
+
+tableAdd(B_ext)
+tableAutoSave(1/(10*BW))
 run(50e-9)

@@ -42,12 +42,11 @@ this will zero-pad the input to 2x its original size, thus increasing the appare
 Divide by excitation spectrum
 
 
-A typical use of mumax3-fft is to extract an FMR spectrum after pulsed excitation. In theory, a sinc excitation is ideal since it has a flat spectrum up a to a cutoff bandwidth. In case an other excitation is used (e.g. guassian pulse), the spectrum should be divided by the spectrum of the excitation. For convienience, mumax3-fft provides a -divcol flag, to divide the data by the FFT of a column (counting from 1, like gnuplot). E.g.:
+A typical use of mumax3-fft is to extract an FMR spectrum after pulsed excitation. In that case, the spectrum should be divided by the spectrum of the excitation, in complex arithmetic. For convienience, mumax3-fft provides a -divcol flag, to divide the data by the FFT of a column (counting from 1, like gnuplot). E.g.:
 
  	mumax3-fft -divcol 7 table.txt
 
-gives spectra divided by the spectrum of column 7 of the file (which may contain, e.g., B_ext_z). Division happens in complex arithmetic.
-
+gives spectra divided by the (complex) spectrum of column 7 of the file (which may contain, e.g., B_ext_z). Division by the excitation allows to extract meaningful phase information and corrects for non-uniform power spectral density of the exctitation (e.g. when exciting with a gaussian instead of sinc).
 
 
 Windowing

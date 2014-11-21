@@ -66,6 +66,8 @@ func processTable(infname, outfname string) {
 		divCol(transf, transf[*flag_NormCol-2])
 	}
 
+	output := reduce(transf, deltaF)
+
 	// write output file
 	var out io.Writer
 	if *flag_Stdout {
@@ -75,7 +77,7 @@ func processTable(infname, outfname string) {
 		defer o.Close()
 		out = o
 	}
-	writeTable(out, makeFFTHeader(header), transf, deltaF)
+	writeTable(out, makeFFTHeader(header), output)
 }
 
 // turn original table header into FFT header
@@ -92,26 +94,51 @@ func makeFFTHeader(origHeader []string) []string {
 	return fftHdr
 }
 
-// output FFT data table
-func writeTable(out io.Writer, header []string, transf [][]complex64, deltaF float32) {
+func reduce(transf [][]complex64, deltaF float32) [][]float32 {
 
-	WriteHeader(out, header)
+	// count # outputs per input column
+	outPerCol := 0
+	for _, o := range outputs {
+		if *o.Enabled {
+			outPerCol++
+		}
+	}
+	nOut := 1 + outPerCol*len(transf)
 
-	// write data
+	out := make([][]float32, nOut)
+	for i := range out {
+		out[i] = make([]float32, len(transf[0]))
+	}
+
 	for r := range transf[0] {
 		// frequency first
 		freq := float32(r) * deltaF
-		Fprint(out, freq)
+		out[0][r] = freq
 
-		// then FFT data
+		i := 0
 		for c := range transf {
 			v := transf[c][r]
 			for _, o := range outputs {
 				if !*o.Enabled {
 					continue
 				}
-				Fprint(out, "\t", o.Filter(v))
+				out[i+1][r] = o.Filter(v)
+				i++
 			}
+		}
+	}
+	return out
+}
+
+// output FFT data table
+func writeTable(out io.Writer, header []string, output [][]float32) {
+
+	WriteHeader(out, header)
+
+	// write data
+	for r := range output[0] {
+		for c := range output {
+			Fprint(out, output[c][r], "\t")
 		}
 		Fprint(out, "\n")
 	}

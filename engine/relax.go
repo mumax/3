@@ -20,7 +20,7 @@ func Relax() {
 	prevErr := MaxErr
 	prevFixDt := FixDt
 	prevPrecess := Precess
-	prevTemp := Temp
+	//prevTemp := Temp.upd_reg
 
 	// ...to restore them later
 	defer func() {
@@ -28,14 +28,16 @@ func Relax() {
 		MaxErr = prevErr
 		FixDt = prevFixDt
 		Precess = prevPrecess
-		Temp = prevTemp
+		//	Temp.upd_reg = prevTemp
+		//	Temp.invalidate()
+		//	Temp.update()
 	}()
 
 	// Set good solver for relax
 	SetSolver(BOGAKISHAMPINE)
 	FixDt = 0
 	Precess = false
-	Temp = ScalarParam{zero}
+	//Temp.Set(0)
 
 	// Minimize energy: take steps as long as energy goes down.
 	// This stops when energy reaches the numerical noise floor.

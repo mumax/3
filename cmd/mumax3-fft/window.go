@@ -31,13 +31,13 @@ func welch(n, N float32) float32 {
 }
 
 func hann(n, N float32) float32 {
-	return 0.5 * (1 - cos((2*math.Pi*n)/(N-1)))
+	return 0.5 * (1 + cos((2*math.Pi*n)/(N-1)))
 }
 
 func hamming(n, N float32) float32 {
 	const a = 0.54
 	const b = 1 - a
-	return a - b*cos((2*math.Pi*n)/(N-1))
+	return a + b*cos((2*math.Pi*n)/(N-1))
 }
 
 func sqr(x float32) float32 { return x * x }

@@ -68,6 +68,15 @@ func processTable(infname, outfname string) {
 
 	output := reduce(transf, deltaF)
 
+	outHdr := makeFFTHeader(header)
+	if *flag_CleanPhase {
+		for c := range output[1:] {
+			if strings.HasPrefix(outHdr[c], "Ph_") {
+				cleanPhase(output[c])
+			}
+		}
+	}
+
 	// write output file
 	var out io.Writer
 	if *flag_Stdout {
@@ -77,7 +86,7 @@ func processTable(infname, outfname string) {
 		defer o.Close()
 		out = o
 	}
-	writeTable(out, makeFFTHeader(header), output)
+	writeTable(out, outHdr, output)
 }
 
 // turn original table header into FFT header
@@ -92,6 +101,17 @@ func makeFFTHeader(origHeader []string) []string {
 		}
 	}
 	return fftHdr
+}
+
+func cleanPhase(data []float32) {
+	for i := 1; i < len(data); i++ {
+		for data[i]-data[i-1] > math.Pi {
+			data[i] -= 2 * math.Pi
+		}
+		for data[i]-data[i-1] < -math.Pi {
+			data[i] += 2 * math.Pi
+		}
+	}
 }
 
 func reduce(transf [][]complex64, deltaF float32) [][]float32 {

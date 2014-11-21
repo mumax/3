@@ -25,16 +25,13 @@ var (
 func main() {
 	// process flags
 	flag.Parse()
-	// no flags: output magnitude
-	if !(*flag_Re || *flag_Im || *flag_Mag || *flag_Ph || *flag_CleanPhase) {
-		*flag_Mag = true
-	}
 
 	if *flag_CleanPhase {
-		*flag_Mag = false
-		*flag_Re = false
-		*flag_Im = false
 		*flag_Ph = true
+	}
+	// no flags: output magnitude
+	if !(*flag_Re || *flag_Im || *flag_Mag || *flag_Ph) {
+		*flag_Mag = true
 	}
 
 	if flag.NArg() == 0 {

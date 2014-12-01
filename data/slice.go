@@ -48,6 +48,19 @@ func NewSlice(nComp int, size [3]int) *Slice {
 	return SliceFromPtrs(size, CPUMemory, ptrs)
 }
 
+func SliceFromArray(data [][]float32, size [3]int) *Slice {
+	nComp := len(data)
+	length := prod(size)
+	ptrs := make([]unsafe.Pointer, nComp)
+	for i := range ptrs {
+		if len(data[i]) != length {
+			panic("size mismatch")
+		}
+		ptrs[i] = unsafe.Pointer(&data[i][0])
+	}
+	return SliceFromPtrs(size, CPUMemory, ptrs)
+}
+
 // Return a slice without underlying storage. Used to represent a mask containing all 1's.
 func NilSlice(nComp int, size [3]int) *Slice {
 	return SliceFromPtrs(size, GPUMemory, make([]unsafe.Pointer, nComp))

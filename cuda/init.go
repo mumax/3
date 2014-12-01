@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	Version     float32    // cuda version
+	Version     int        // cuda version
 	DevName     string     // GPU name
 	TotalMem    int64      // total GPU memory
 	GPUInfo     string     // Human-readable GPU description
@@ -33,7 +33,7 @@ func Init(gpu int) {
 
 	M, m := dev.ComputeCapability()
 	cudaCC = 10*M + m
-	Version = float32(cu.Version()) / 1000
+	Version = cu.Version()
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()
 	GPUInfo = fmt.Sprint("CUDA ", Version, " ", DevName, "(", (TotalMem)/(1024*1024), "MB) ", "cc", M, ".", m)

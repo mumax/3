@@ -13,7 +13,8 @@ import (
 
 func mainSpatial() {
 
-	Nt := flag.NArg()
+	Nt := flag.NArg()    // time points
+	Nf := 2 * (Nt/2 + 1) // frequency points
 
 	comp := 0 // todo
 
@@ -28,8 +29,8 @@ func mainSpatial() {
 	Ny := size[1]
 	Nz := size[2]
 
-	dataList := make([]float32, Nt*Nx*Ny*Nz)
-	dataLists := matrix.ReshapeR2(dataList, [2]int{Nt, Nz * Ny * Nx})
+	dataList := make([]float32, Nf*Nx*Ny*Nz)
+	dataLists := matrix.ReshapeR2(dataList, [2]int{Nf, Nz * Ny * Nx})
 	//dataArr := matrix.ReshapeR4(dataList, [4]int{Nt, Nz, Ny, Nx})
 
 	deltaT := t1 - t0
@@ -39,7 +40,6 @@ func mainSpatial() {
 	for di := 0; di < Nt; di++ { // dst index
 		want := time0 + float32(di)*deltaT/float32(Nt) // wanted time
 		for si < Nt-1 && !(time(si) <= want && time(si+1) > want && time(si) != time(si+1)) {
-			log.Println("want:", want, "have:", time(si)) // wanted time
 			si++
 		}
 
@@ -47,7 +47,6 @@ func mainSpatial() {
 		if x < 0 || x > 1 {
 			panic(fmt.Sprint("x=", x))
 		}
-		log.Println(di, si, x)
 		interp3D(dataLists[di], 1-x, file(si).Host()[comp], x, file(si + 1).Host()[comp])
 	}
 

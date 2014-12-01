@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/barnex/fftw"
 	"github.com/barnex/matrix"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
@@ -50,7 +51,25 @@ func mainSpatial() {
 		interp3D(dataLists[di], 1-x, file(si).Host()[comp], x, file(si + 1).Host()[comp])
 	}
 
+	fftMany(dataList, Nt, Nf, Nx*Ny*Nz)
+
 	output3D(dataLists, size, "interp", deltaT)
+}
+
+func fftMany(dataList []float32, Nt, Nf int, howmany int) {
+	//howmany = 1 // !!!!!!!!!!!!!!!!
+	n := []int{Nt}
+	in := dataList
+	out := matrix.CastRtoC(in)
+	istride := howmany
+	idist := 1
+	inembed := []int{Nf}
+	ostride := howmany
+	odist := 1
+	onembed := []int{Nf}
+	plan := fftw.PlanManyR2C(n, howmany, in, inembed, istride, idist, out, onembed, ostride, odist, fftw.ESTIMATE)
+	plan.Execute()
+	//plan.Destroy()
 }
 
 func output3D(d [][]float32, size [3]int, prefix string, deltaT float32) {

@@ -22,19 +22,21 @@ func OD() string {
 
 // SetOD sets the output directory where auto-saved files will be stored.
 // The -o flag can also be used for this purpose.
-func InitIO(inputfile string, force bool) {
+func InitIO(inputfile, od string, force bool) {
 	if outputdir != "" {
 		panic("output directory already set")
 	}
 
 	InputFile = inputfile
-	outputdir = util.NoExt(InputFile) + ".out/"
+	if !strings.HasSuffix(od, "/") {
+		od += "/"
+	}
+	outputdir = od
 	if strings.HasPrefix(outputdir, "http://") {
 		httpfs.SetWD(outputdir + "/../")
 	}
 	LogOut("output directory:", outputdir)
 
-	od := OD()
 	if force {
 		httpfs.Remove(od)
 	}

@@ -68,27 +68,31 @@ func mainSpatial() {
 
 	log.Println("output")
 	deltaF := 1 / (2 * deltaT)
-	output3D(dataLists, mag, size, "fft", deltaF)
+	for _, o := range outputs {
+		if *o.Enabled {
+			output3D(dataLists, o.Filter, size, "fft_"+o.Name, deltaF)
+		}
+	}
 }
 
 // normalize all but DC
-func normalize(dataList [][]complex64){
+func normalize(dataList [][]complex64) {
 	var max float32
-	for j:=1; j<len(dataList); j++{ // skip DC
-		for i := range dataList[j]{
-		v := dataList[j][i]
-		norm2 := real(v)*real(v) + imag(v)*imag(v)
-		if norm2 > max{
-			max = norm2
+	for j := 1; j < len(dataList); j++ { // skip DC
+		for i := range dataList[j] {
+			v := dataList[j][i]
+			norm2 := real(v)*real(v) + imag(v)*imag(v)
+			if norm2 > max {
+				max = norm2
+			}
 		}
-	}
 	}
 	norm := complex(float32(1/math.Sqrt(float64(max))), 0)
 
-	for _,dataList := range dataList{
-	for i := range dataList{
-		dataList[i] *= norm
-	}
+	for _, dataList := range dataList {
+		for i := range dataList {
+			dataList[i] *= norm
+		}
 	}
 }
 
@@ -117,6 +121,7 @@ func output3D(D [][]complex64, reduce func(complex64) float32, size [3]int, pref
 		slice := data.NewSlice(NCOMP, size)
 		doReduce(slice.Host()[0], d, reduce)
 		meta := data.Meta{}
+		log.Println(fname)
 		f := httpfs.MustCreate(fname)
 		oommf.WriteOVF2(f, slice, meta, "binary")
 		f.Close()

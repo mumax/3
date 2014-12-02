@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-	"runtime"
 	"fmt"
 	"io"
 	"math"
 	"os"
 	"path"
+	"runtime"
 )
 
 var (

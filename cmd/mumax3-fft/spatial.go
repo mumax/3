@@ -14,28 +14,34 @@ import (
 
 func mainSpatial() {
 
-	Nt := flag.NArg()    // time points
-	Nf := 2 * (Nt/2 + 1) // frequency points
+	// time points
+	Nt := flag.NArg()
+	if Nt < 2 {
+		log.Fatal("need at least 2 inputs")
+	}
 
+	// select one component
 	comp := 0 // todo
 
+	// get size, time span from first and last file
 	data1, meta1 := oommf.MustReadFile(flag.Args()[0])
 	_, metaL := oommf.MustReadFile(flag.Args()[Nt-1])
 
-	size := data1.Size()
 	t0 := float32(meta1.Time)
 	t1 := float32(metaL.Time)
+	deltaT := t1 - t0
 
+	size := data1.Size()
 	Nx := size[0]
 	Ny := size[1]
 	Nz := size[2]
 
-	dataList := make([]float32, Nf*Nx*Ny*Nz)
-	dataLists := matrix.ReshapeR2(dataList, [2]int{Nf, Nz * Ny * Nx})
-	//dataArr := matrix.ReshapeR4(dataList, [4]int{Nt, Nz, Ny, Nx})
+	// allocate buffer for everything
+	dataList := make([]complex64, Nt*Nx*Ny*Nz)
+	dataLists := matrix.ReshapeC2(dataList, [2]int{Nt, Nz * Ny * Nx})
 
-	deltaT := t1 - t0
-
+	// interpolate non-equidistant time points
+	// make complex in the meanwhile
 	time0 := t0                  // start time, not neccesarily 0
 	si := 0                      // source index
 	for di := 0; di < Nt; di++ { // dst index
@@ -51,31 +57,33 @@ func mainSpatial() {
 		interp3D(dataLists[di], 1-x, file(si).Host()[comp], x, file(si + 1).Host()[comp])
 	}
 
-	fftMany(dataList, Nt, Nf, Nx*Ny*Nz)
+	fftMany(dataList, Nt, Nx*Ny*Nz)
 
-	output3D(dataLists, size, "interp", deltaT)
+	output3D(dataLists, mag, size, "interp", deltaT)
 }
 
-func fftMany(dataList []float32, Nt, Nf int, howmany int) {
-	//howmany = 1 // !!!!!!!!!!!!!!!!
+func fftMany(dataList []complex64, Nt, Nc int) {
+	howmany := Nc
 	n := []int{Nt}
 	in := dataList
-	out := matrix.CastRtoC(in)
-	istride := howmany
+	out := dataList
+	istride := Nc
 	idist := 1
-	inembed := []int{Nf}
-	ostride := howmany
-	odist := 1
-	onembed := []int{Nf}
-	plan := fftw.PlanManyR2C(n, howmany, in, inembed, istride, idist, out, onembed, ostride, odist, fftw.ESTIMATE)
+	inembed := n
+	ostride := istride
+	odist := idist
+	onembed := inembed
+	plan := fftw.PlanManyC2C(n, howmany, in, inembed, istride, idist, out, onembed, ostride, odist, fftw.FORWARD, fftw.ESTIMATE)
 	plan.Execute()
 	//plan.Destroy()
 }
 
-func output3D(d [][]float32, size [3]int, prefix string, deltaT float32) {
+func output3D(d [][]complex64, reduce func(complex64) float32, size [3]int, prefix string, deltaT float32) {
+	const NCOMP = 1
 	for i, d := range d {
 		fname := fmt.Sprintf("%s%06d.ovf", prefix, i)
-		slice := data.SliceFromArray([][]float32{d}, size)
+		slice := data.NewSlice(NCOMP, size)
+		doReduce(slice.Host()[0], d, reduce)
 		meta := data.Meta{}
 		f := httpfs.MustCreate(fname)
 		oommf.WriteOVF2(f, slice, meta, "binary")
@@ -83,9 +91,15 @@ func output3D(d [][]float32, size [3]int, prefix string, deltaT float32) {
 	}
 }
 
-func interp3D(dst []float32, w1 float32, src1 []float32, w2 float32, src2 []float32) {
+func doReduce(dst []float32, src []complex64, f func(complex64) float32) {
 	for i := range dst {
-		dst[i] = w1*src1[i] + w2*src2[i]
+		dst[i] = f(src[i])
+	}
+}
+
+func interp3D(dst []complex64, w1 float32, src1 []float32, w2 float32, src2 []float32) {
+	for i := range dst {
+		dst[i] = complex(w1*src1[i]+w2*src2[i], 0)
 	}
 }
 

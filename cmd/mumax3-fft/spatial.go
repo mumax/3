@@ -59,7 +59,8 @@ func mainSpatial() {
 
 	fftMany(dataList, Nt, Nx*Ny*Nz)
 
-	output3D(dataLists, mag, size, "interp", deltaT)
+	deltaF :=  1/(2*deltaT)
+	output3D(dataLists, mag, size, "fft", deltaF)
 }
 
 func fftMany(dataList []complex64, Nt, Nc int) {
@@ -78,10 +79,12 @@ func fftMany(dataList []complex64, Nt, Nc int) {
 	//plan.Destroy()
 }
 
-func output3D(d [][]complex64, reduce func(complex64) float32, size [3]int, prefix string, deltaT float32) {
+func output3D(D [][]complex64, reduce func(complex64) float32, size [3]int, prefix string, deltaF float32) {
 	const NCOMP = 1
-	for i, d := range d {
-		fname := fmt.Sprintf("%s%06d.ovf", prefix, i)
+	for i:=0; i<len(D)/2; i++{
+		d := D[i]
+		MHz := int((float32(i)*deltaF) / 1e6)
+		fname := fmt.Sprintf("%sf%06dMHz.ovf", prefix, MHz)
 		slice := data.NewSlice(NCOMP, size)
 		doReduce(slice.Host()[0], d, reduce)
 		meta := data.Meta{}

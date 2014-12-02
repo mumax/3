@@ -20,6 +20,8 @@ func mainSpatial() {
 		log.Fatal("need at least 2 inputs")
 	}
 
+	go loadloop()
+
 	// select one component
 	comp := 0 // todo
 
@@ -59,7 +61,7 @@ func mainSpatial() {
 
 	fftMany(dataList, Nt, Nx*Ny*Nz)
 
-	deltaF :=  1/(2*deltaT)
+	deltaF := 1 / (2 * deltaT)
 	output3D(dataLists, mag, size, "fft", deltaF)
 }
 
@@ -81,9 +83,9 @@ func fftMany(dataList []complex64, Nt, Nc int) {
 
 func output3D(D [][]complex64, reduce func(complex64) float32, size [3]int, prefix string, deltaF float32) {
 	const NCOMP = 1
-	for i:=0; i<len(D)/2; i++{
+	for i := 0; i < len(D)/2; i++ {
 		d := D[i]
-		MHz := int((float32(i)*deltaF) / 1e6)
+		MHz := int((float32(i) * deltaF) / 1e6)
 		fname := fmt.Sprintf("%sf%06dMHz.ovf", prefix, MHz)
 		slice := data.NewSlice(NCOMP, size)
 		doReduce(slice.Host()[0], d, reduce)
@@ -136,11 +138,27 @@ func loadFile(i int) (*data.Slice, data.Meta) {
 	}
 	if i == cachedIndex+1 {
 		prevData, prevMeta = cachedData, cachedMeta
-		fname := flag.Args()[i]
-		log.Println("loading", fname)
-		cachedData, cachedMeta = oommf.MustReadFile(fname) // TODO: preprocess here
-		cachedIndex = i
+		cachedIndex++
+		inp := <-inpipe
+		cachedData = inp.D
+		cachedMeta = inp.M
 		return cachedData, cachedMeta
 	}
 	panic("bug")
+}
+
+var inpipe = make(chan inp, 2)
+
+func loadloop() {
+	for _, fname := range flag.Args() {
+		log.Println("loading", fname)
+		cachedData, cachedMeta = oommf.MustReadFile(fname) // TODO: preprocess here
+		inpipe <- inp{cachedData, cachedMeta}
+	}
+	close(inpipe)
+}
+
+type inp struct {
+	D *data.Slice
+	M data.Meta
 }

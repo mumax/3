@@ -108,7 +108,7 @@ func (s *State) Output() string {
 	out += `<br style="clear:both"/> `
 
 	for _, f := range files {
-		if path.Ext(f) == ".txt" {
+		if f == "table.txt" {
 			cmd("mumax3-plot", s.outfile()+"/"+f)
 		}
 	}

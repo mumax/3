@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/barnex/fftw"
 	"github.com/barnex/matrix"
@@ -59,10 +60,36 @@ func mainSpatial() {
 		interp3D(dataLists[di], 1-x, file(si).Host()[comp], x, file(si + 1).Host()[comp])
 	}
 
+	log.Println("FFT")
 	fftMany(dataList, Nt, Nx*Ny*Nz)
 
+	log.Println("normalize")
+	normalize(dataLists)
+
+	log.Println("output")
 	deltaF := 1 / (2 * deltaT)
 	output3D(dataLists, mag, size, "fft", deltaF)
+}
+
+// normalize all but DC
+func normalize(dataList [][]complex64){
+	var max float32
+	for j:=1; j<len(dataList); j++{ // skip DC
+		for i := range dataList[j]{
+		v := dataList[j][i]
+		norm2 := real(v)*real(v) + imag(v)*imag(v)
+		if norm2 > max{
+			max = norm2
+		}
+	}
+	}
+	norm := complex(float32(1/math.Sqrt(float64(max))), 0)
+
+	for _,dataList := range dataList{
+	for i := range dataList{
+		dataList[i] *= norm
+	}
+	}
 }
 
 func fftMany(dataList []complex64, Nt, Nc int) {

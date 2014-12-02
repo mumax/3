@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"runtime"
 	"fmt"
 	"io"
 	"math"
@@ -23,6 +24,7 @@ var (
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 	// process flags
 	flag.Parse()
 

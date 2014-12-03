@@ -33,6 +33,7 @@ func mainSpatial() {
 	t0 := float32(meta1.Time)
 	t1 := float32(metaL.Time)
 	deltaT := t1 - t0
+	deltaF := 1 / deltaT // frequency resolution
 
 	size := data1.Size()
 	Nx := size[0]
@@ -63,16 +64,39 @@ func mainSpatial() {
 	log.Println("FFT")
 	fftMany(dataList, Nt, Nx*Ny*Nz)
 
+	spectrum := magSpectrum(dataLists)
+	freqs := make([]float32, len(spectrum))
+	for i := range freqs {
+		freqs[i] = float32(i) * deltaF
+	}
+	header := []string{"f (Hz)", "Mag ()"}
+	f := httpfs.MustCreate("spectrum.txt")
+	writeTable(f, header, [][]float32{freqs, spectrum})
+	f.Close()
+
 	log.Println("normalize")
 	normalize(dataLists)
 
 	log.Println("output")
-	deltaF := 1 / (2 * deltaT)
 	for _, o := range outputs {
 		if *o.Enabled {
 			output3D(dataLists, o.Filter, size, "fft_"+o.Name, deltaF)
 		}
 	}
+}
+
+func magSpectrum(dataLists [][]complex64) []float32 {
+	Nf := len(dataLists) / 2
+	spec := make([]float32, Nf)
+	for f := range spec {
+		sum := 0.
+		for _, v := range dataLists[f] {
+			sum += float64(real(v)*real(v) + imag(v)*imag(v))
+		}
+		sum = math.Sqrt(sum)
+		spec[f] = float32(sum)
+	}
+	return spec
 }
 
 // normalize all but DC

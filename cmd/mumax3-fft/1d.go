@@ -45,6 +45,12 @@ func processTable(infname, outfname string) {
 	deltaT *= float32(*flag_Pad)
 	deltaF := 1 / (deltaT)
 
+	// mumax outputs one row too much
+	rows--
+	for i := range data {
+		data[i] = data[i][:rows]
+	}
+
 	window := windows[*flag_Win]
 	if window == nil {
 		panic(fmt.Sprint("invalid window:", *flag_Win, " options:", windows))
@@ -230,6 +236,11 @@ func FFT(data [][]float32) [][]complex64 {
 		for i := range transf[c] {
 			transf[c][i] /= complex64(complex(norm, 0))
 		}
+	}
+
+	// remove nyquist freq
+	for i := range transf {
+		transf[i] = transf[i][:len(transf[i])-1]
 	}
 
 	return transf

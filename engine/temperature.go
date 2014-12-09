@@ -111,7 +111,7 @@ func (b *thermField) update() {
 }
 
 func GetThermalEnergy() float64 {
-	if Temp.isZero() {
+	if Temp.isZero() || relaxing {
 		return 0
 	} else {
 		return -cellVolume() * dot(&M_full, &B_therm)

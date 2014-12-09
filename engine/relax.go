@@ -11,6 +11,9 @@ func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy")
 }
 
+// are we relaxing?
+var relaxing = false
+
 func Relax() {
 	SanityCheck()
 	pause = false
@@ -20,7 +23,6 @@ func Relax() {
 	prevErr := MaxErr
 	prevFixDt := FixDt
 	prevPrecess := Precess
-	//prevTemp := Temp.upd_reg
 
 	// ...to restore them later
 	defer func() {
@@ -28,6 +30,7 @@ func Relax() {
 		MaxErr = prevErr
 		FixDt = prevFixDt
 		Precess = prevPrecess
+		relaxing = false
 		//	Temp.upd_reg = prevTemp
 		//	Temp.invalidate()
 		//	Temp.update()
@@ -37,7 +40,7 @@ func Relax() {
 	SetSolver(BOGAKISHAMPINE)
 	FixDt = 0
 	Precess = false
-	//Temp.Set(0)
+	relaxing = true
 
 	// Minimize energy: take steps as long as energy goes down.
 	// This stops when energy reaches the numerical noise floor.

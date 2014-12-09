@@ -14,5 +14,7 @@ func SetEffectiveField(dst *data.Slice) {
 	B_exch.AddTo(dst) // ...then add other terms
 	B_anis.AddTo(dst)
 	B_ext.AddTo(dst)
-	B_therm.AddTo(dst)
+	if !relaxing {
+		B_therm.AddTo(dst)
+	}
 }

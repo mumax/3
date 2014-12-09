@@ -35,8 +35,8 @@ func main() {
 		}
 	}
 
-	cmds := []string{"mumax3-cuda5.0", "mumax3-cuda5.5", "mumax3-cuda6.0"}
-	mumax := "mumax3-cuda5.5" // default
+	cmds := []string{"mumax3-cuda5.5", "mumax3-cuda6.0", "mumax3-cuda6.5"}
+	mumax := "mumax3-cuda6.0" // default
 	for _, cmd := range cmds {
 		cmd := bin + "/" + cmd
 		err := run(cmd, []string{"-test"}, false)

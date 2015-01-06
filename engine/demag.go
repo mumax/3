@@ -16,7 +16,8 @@ var (
 	B_demag       vSetter
 	E_demag       *GetScalar
 	Edens_demag   sAdder
-	EnableDemag   = true                 // enable/disable demag field
+	EnableDemag   = true                 // enable/disable global demag field
+	NoDemagSpins  ScalarParam            // disable demag field per-cell
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 	CacheDir      = ""                   // directory for kernel cache
@@ -24,6 +25,7 @@ var (
 
 func init() {
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &ku1_red, &kc1_red, &temp_red})
+	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
 	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
@@ -44,7 +46,11 @@ func init() {
 // Sets dst to the current demag field
 func SetDemagField(dst *data.Slice) {
 	if EnableDemag {
-		demagConv().Exec(dst, M.Buffer(), geometry.Gpu(), Bsat.gpuLUT1(), regions.Gpu())
+		if NoDemagSpins.isZero() {
+			demagConv().Exec(dst, M.Buffer(), geometry.Gpu(), Bsat.gpuLUT1(), regions.Gpu())
+		} else {
+			//TODO
+		}
 	} else {
 		cuda.Zero(dst) // will ADD other terms to it
 	}

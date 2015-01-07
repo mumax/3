@@ -80,8 +80,8 @@ func snapshot_sync(fname string, output *data.Slice) {
 // synchronous save
 func saveAs_sync(fname string, s *data.Slice, info data.Meta, format OutputFormat) {
 	f, err := httpfs.Create(fname)
-	defer f.Close()
 	util.FatalErr(err)
+	defer f.Close()
 
 	switch format {
 	case OVF1_TEXT:

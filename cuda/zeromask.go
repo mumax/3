@@ -10,6 +10,7 @@ func ZeroMask(dst *data.Slice, mask LUTPtr, regions *Bytes) {
 	N := dst.Len()
 	cfg := make1DConf(N)
 
-	k_zeromask_async(dst.DevPtr(X), dst.DevPtr(Y), dst.DevPtr(Z),
-		unsafe.Pointer(mask), regions.Ptr, N, cfg)
+	for c := 0; c < dst.NComp(); c++ {
+		k_zeromask_async(dst.DevPtr(c), unsafe.Pointer(mask), regions.Ptr, N, cfg)
+	}
 }

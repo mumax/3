@@ -61,9 +61,18 @@ func SetDemagField(dst *data.Slice) {
 func setMaskedDemagField(dst *data.Slice) {
 	// No-demag spins: mask-out geometry with zeros where NoDemagSpins is set,
 	// so these spins do not generate a field
-	buf := cuda.Buffer(SCALAR, geometry.Gpu().Size())
+
+	buf := cuda.Buffer(SCALAR, geometry.Gpu().Size()) // masked-out geometry
 	defer cuda.Recycle(buf)
-	data.Copy(buf, geometry.Gpu())
+
+	// obtain a copy of the geometry mask, which we can overwrite
+	geom, r := geometry.Slice()
+	if r {
+		defer cuda.Recycle(geom)
+	}
+	data.Copy(buf, geom)
+
+	// mask-out
 	cuda.ZeroMask(buf, NoDemagSpins.gpuLUT1(), regions.Gpu())
 
 	// convolution with masked-out cells.

@@ -18,7 +18,7 @@ func Create(URL string) (WriteCloseFlusher, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &bufWriter{bufio.NewWriterSize(&appendWriter{URL}, BUFSIZE)}, nil
+	return &bufWriter{bufio.NewWriterSize(&appendWriter{URL, 0}, BUFSIZE)}, nil
 }
 
 func MustCreate(URL string) WriteCloseFlusher {
@@ -64,19 +64,21 @@ func (w *bufWriter) Close() error                { return w.buf.Flush() }
 func (w *bufWriter) Flush() error                { return w.buf.Flush() }
 
 type appendWriter struct {
-	URL string
+	URL       string
+	byteCount int64
 }
 
 // TODO: buffer heavily, Flush() on close
 func (w *appendWriter) Write(p []byte) (int, error) {
-	err := Append(w.URL, p)
+	err := AppendSize(w.URL, p, w.byteCount)
 	if err != nil {
 		return 0, err // don't know how many bytes written
 	}
+	w.byteCount += int64(len(p))
 	return len(p), nil
 }
 
 // TODO: flush
-func (w *appendWriter) Close() error {
-	return nil
-}
+//func (w *appendWriter) Close() error {
+//return nil
+//}

@@ -73,7 +73,7 @@ var regionselect_map = map[int]string{0: "",
 // regionselect PTX code for various compute capabilities.
 const (
 	regionselect_ptx_20 = `
-.version 3.2
+.version 4.0
 .target sm_20
 .address_size 64
 
@@ -93,14 +93,11 @@ const (
 	.reg .s64 	%rd<13>;
 
 
-	ld.param.u64 	%rd4, [regionselect_param_0];
-	ld.param.u64 	%rd5, [regionselect_param_1];
-	ld.param.u64 	%rd6, [regionselect_param_2];
+	ld.param.u64 	%rd1, [regionselect_param_0];
+	ld.param.u64 	%rd2, [regionselect_param_1];
+	ld.param.u64 	%rd3, [regionselect_param_2];
+	ld.param.u8 	%rs1, [regionselect_param_3];
 	ld.param.u32 	%r2, [regionselect_param_4];
-	cvta.to.global.u64 	%rd1, %rd4;
-	cvta.to.global.u64 	%rd2, %rd5;
-	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -108,16 +105,13 @@ const (
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
 	setp.ge.s32	%p1, %r1, %r2;
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	.loc 1 7 1
 	@%p1 bra 	BB0_5;
 
-	cvt.s64.s32	%rd7, %r1;
-	add.s64 	%rd8, %rd3, %rd7;
-	.loc 1 8 1
-	ld.global.u8 	%rs2, [%rd8];
+	cvta.to.global.u64 	%rd4, %rd3;
+	cvt.s64.s32	%rd5, %r1;
+	add.s64 	%rd6, %rd4, %rd5;
+	ld.global.u8 	%rs2, [%rd6];
 	setp.eq.s16	%p2, %rs2, %rs1;
 	@%p2 bra 	BB0_3;
 
@@ -125,26 +119,25 @@ const (
 	bra.uni 	BB0_4;
 
 BB0_3:
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd2, %rd9;
-	.loc 1 8 1
-	ld.global.f32 	%f4, [%rd10];
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.f32 	%f4, [%rd9];
 
 BB0_4:
+	cvta.to.global.u64 	%rd10, %rd1;
 	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd1, %rd11;
-	.loc 1 8 1
+	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
 BB0_5:
-	.loc 1 10 2
 	ret;
 }
 
 
 `
 	regionselect_ptx_30 = `
-.version 3.2
+.version 4.0
 .target sm_30
 .address_size 64
 
@@ -164,14 +157,11 @@ BB0_5:
 	.reg .s64 	%rd<13>;
 
 
-	ld.param.u64 	%rd4, [regionselect_param_0];
-	ld.param.u64 	%rd5, [regionselect_param_1];
-	ld.param.u64 	%rd6, [regionselect_param_2];
+	ld.param.u64 	%rd1, [regionselect_param_0];
+	ld.param.u64 	%rd2, [regionselect_param_1];
+	ld.param.u64 	%rd3, [regionselect_param_2];
+	ld.param.u8 	%rs1, [regionselect_param_3];
 	ld.param.u32 	%r2, [regionselect_param_4];
-	cvta.to.global.u64 	%rd1, %rd4;
-	cvta.to.global.u64 	%rd2, %rd5;
-	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -179,16 +169,13 @@ BB0_5:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
 	setp.ge.s32	%p1, %r1, %r2;
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	.loc 1 7 1
 	@%p1 bra 	BB0_5;
 
-	cvt.s64.s32	%rd7, %r1;
-	add.s64 	%rd8, %rd3, %rd7;
-	.loc 1 8 1
-	ld.global.u8 	%rs2, [%rd8];
+	cvta.to.global.u64 	%rd4, %rd3;
+	cvt.s64.s32	%rd5, %r1;
+	add.s64 	%rd6, %rd4, %rd5;
+	ld.global.u8 	%rs2, [%rd6];
 	setp.eq.s16	%p2, %rs2, %rs1;
 	@%p2 bra 	BB0_3;
 
@@ -196,26 +183,25 @@ BB0_5:
 	bra.uni 	BB0_4;
 
 BB0_3:
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd2, %rd9;
-	.loc 1 8 1
-	ld.global.f32 	%f4, [%rd10];
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.f32 	%f4, [%rd9];
 
 BB0_4:
+	cvta.to.global.u64 	%rd10, %rd1;
 	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd1, %rd11;
-	.loc 1 8 1
+	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
 BB0_5:
-	.loc 1 10 2
 	ret;
 }
 
 
 `
 	regionselect_ptx_35 = `
-.version 3.2
+.version 4.0
 .target sm_35
 .address_size 64
 
@@ -230,7 +216,6 @@ BB0_5:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
-	.loc 2 66 3
 	ret;
 }
 
@@ -244,7 +229,6 @@ BB0_5:
 
 	mov.u32 	%r1, 30;
 	st.param.b32	[func_retval0+0], %r1;
-	.loc 2 71 3
 	ret;
 }
 
@@ -263,14 +247,11 @@ BB0_5:
 	.reg .s64 	%rd<13>;
 
 
-	ld.param.u64 	%rd4, [regionselect_param_0];
-	ld.param.u64 	%rd5, [regionselect_param_1];
-	ld.param.u64 	%rd6, [regionselect_param_2];
+	ld.param.u64 	%rd1, [regionselect_param_0];
+	ld.param.u64 	%rd2, [regionselect_param_1];
+	ld.param.u64 	%rd3, [regionselect_param_2];
+	ld.param.u8 	%rs1, [regionselect_param_3];
 	ld.param.u32 	%r2, [regionselect_param_4];
-	cvta.to.global.u64 	%rd1, %rd4;
-	cvta.to.global.u64 	%rd2, %rd5;
-	cvta.to.global.u64 	%rd3, %rd6;
-	.loc 1 6 1
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -278,16 +259,13 @@ BB0_5:
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 7 1
 	setp.ge.s32	%p1, %r1, %r2;
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	.loc 1 7 1
 	@%p1 bra 	BB2_5;
 
-	cvt.s64.s32	%rd7, %r1;
-	add.s64 	%rd8, %rd3, %rd7;
-	.loc 1 8 1
-	ld.global.nc.u8 	%rs2, [%rd8];
+	cvta.to.global.u64 	%rd4, %rd3;
+	cvt.s64.s32	%rd5, %r1;
+	add.s64 	%rd6, %rd4, %rd5;
+	ld.global.nc.u8 	%rs2, [%rd6];
 	and.b16  	%rs3, %rs2, 255;
 	setp.eq.s16	%p2, %rs3, %rs1;
 	@%p2 bra 	BB2_3;
@@ -296,19 +274,18 @@ BB0_5:
 	bra.uni 	BB2_4;
 
 BB2_3:
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd2, %rd9;
-	.loc 1 8 1
-	ld.global.nc.f32 	%f4, [%rd10];
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
 
 BB2_4:
+	cvta.to.global.u64 	%rd10, %rd1;
 	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd1, %rd11;
-	.loc 1 8 1
+	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
 BB2_5:
-	.loc 1 10 2
 	ret;
 }
 

@@ -13,11 +13,13 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 )
 
 var (
-	Logging = false // enables logging
-	wd      = ""
+	Logging = false    // enables logging
+	wd      = ""       // working directory, see SetWD
+	lock    sync.Mutex // synchronous local FS access to avoid races
 )
 
 const (
@@ -272,10 +274,14 @@ func httpRemove(URL string) error {
 // client-side, local server
 
 func localMkdir(fname string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	return os.MkdirAll(fname, DirPerm)
 }
 
 func localLs(fname string) ([]string, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	f, err := os.Open(fname)
 	if err != nil {
 		return nil, err
@@ -288,6 +294,8 @@ func localLs(fname string) ([]string, error) {
 }
 
 func localAppend(fname string, data []byte) error {
+	lock.Lock()
+	defer lock.Unlock()
 	_ = os.MkdirAll(path.Dir(fname), DirPerm)
 	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, FilePerm)
 	if err != nil {
@@ -299,6 +307,8 @@ func localAppend(fname string, data []byte) error {
 }
 
 func localPut(fname string, data []byte) error {
+	lock.Lock()
+	defer lock.Unlock()
 	_ = os.MkdirAll(path.Dir(fname), DirPerm)
 	f, err := os.OpenFile(fname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, FilePerm)
 	if err != nil {
@@ -310,10 +320,14 @@ func localPut(fname string, data []byte) error {
 }
 
 func localRead(fname string) ([]byte, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	return ioutil.ReadFile(fname)
 }
 
 func localRemove(fname string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	return os.RemoveAll(fname)
 }
 

@@ -326,8 +326,8 @@ func localLs(fname string) ([]string, error) {
 func localAppend(fname string, data []byte) error {
 	lock.Lock()
 	defer lock.Unlock()
-	_ = os.MkdirAll(path.Dir(fname), DirPerm)
-	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, FilePerm)
+
+	f, err := os.OpenFile(fname, os.O_APPEND|os.O_WRONLY, FilePerm)
 	if err != nil {
 		return err
 	}

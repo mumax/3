@@ -70,6 +70,7 @@ func Fprintln(filename string, msg ...interface{}) {
 	if !path.IsAbs(filename) {
 		filename = OD() + filename
 	}
+	httpfs.Touch(filename)
 	err := httpfs.Append(filename, []byte(fmt.Sprintln(myFmt(msg)...)))
 	util.FatalErr(err)
 }

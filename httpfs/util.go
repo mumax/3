@@ -51,10 +51,6 @@ func MustOpen(URL string) io.ReadCloser {
 	return f
 }
 
-//func Touch(URL string) error {
-//	return Append(URL, []byte{})
-//}
-
 type bufWriter struct {
 	buf *bufio.Writer
 }
@@ -68,7 +64,6 @@ type appendWriter struct {
 	byteCount int64
 }
 
-// TODO: buffer heavily, Flush() on close
 func (w *appendWriter) Write(p []byte) (int, error) {
 	err := AppendSize(w.URL, p, w.byteCount)
 	if err != nil {
@@ -77,8 +72,3 @@ func (w *appendWriter) Write(p []byte) (int, error) {
 	w.byteCount += int64(len(p))
 	return len(p), nil
 }
-
-// TODO: flush
-//func (w *appendWriter) Close() error {
-//return nil
-//}

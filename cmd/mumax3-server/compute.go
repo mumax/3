@@ -150,7 +150,17 @@ func NewProcess(ID string, gpu int, webAddr string) *Process {
 
 	// Pipe stdout, stderr to log file over httpfs
 	outDir := util.NoExt(inputURL) + ".out"
-	httpfs.Mkdir(outDir)
+	errMkdir := httpfs.Mkdir(outDir)
+	if errMkdir != nil {
+		SetJobError(ID, errMkdir)
+		log.Println("makeProcess", errMkdir)
+		j := JobByName(ID)
+		if j != nil {
+			j.Reque()
+		}
+		return nil
+	}
+
 	out, errD := httpfs.Create(outDir + "/stdout.txt")
 	if errD != nil {
 		SetJobError(ID, errD)

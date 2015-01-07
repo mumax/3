@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	Logging = true     // enables logging
+	Logging = false    // enables logging
 	wd      = ""       // working directory, see SetWD
 	lock    sync.Mutex // synchronous local FS access to avoid races
 )
@@ -316,7 +316,7 @@ func httpRemove(URL string) error {
 func localMkdir(fname string) error {
 	lock.Lock()
 	defer lock.Unlock()
-	return os.MkdirAll(fname, DirPerm)
+	return os.Mkdir(fname, DirPerm)
 }
 
 func localTouch(fname string) error {

@@ -4,7 +4,6 @@ package engine
 
 import (
 	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"strings"
 )
 
@@ -40,9 +39,8 @@ func InitIO(inputfile, od string, force bool) {
 	if force {
 		httpfs.Remove(od)
 	}
-	if err := httpfs.Mkdir(od); err != nil {
-		util.FatalErr(err)
-	}
+
+	_ = httpfs.Mkdir(od)
 
 	initLog()
 }

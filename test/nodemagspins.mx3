@@ -30,6 +30,9 @@ NoDemagSpins.SetRegion(LEFT, 1)
 expectv("L", B_demag.Region(LEFT).Average(), vector(0, 0, 0), 0)
 expectv("R", B_demag.Region(RIGHT).Average(), vector(0, 0, 0), 0)
 
+FixDt = 1e-14
+steps(1000) // test for memleaks
+
 airgap := yrange(0, inf)
 SetGeom(airgap.inverse())
 defregion(AIR, airgap)
@@ -46,3 +49,6 @@ expectv("L", B_demag.Region(LEFT).Average(), vector(-0.0046074, -0.0391400, -0.5
 expectv("R", B_demag.Region(RIGHT).Average(), vector(-0.0046074, -0.0391400, -0.53594726), TOL)
 expectv("A", B_demag.Region(AIR).Average(), vector(-0.000692, 0.0170129, -0.01630170), TOL)
 
+NoDemagSpins.SetRegion(LEFT, 1)
+
+steps(1000) // test for memleaks

@@ -51,6 +51,15 @@ func Mkdir(URL string) error {
 	}
 }
 
+func Touch(URL string) error {
+	URL = cleanup(URL)
+	if isRemote(URL) {
+		return httpTouch(URL)
+	} else {
+		return localTouch(URL)
+	}
+}
+
 func ReadDir(URL string) ([]string, error) {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -120,6 +129,7 @@ const (
 	PUT    action = "put"
 	READ   action = "read"
 	RM     action = "rm"
+	TOUCH  action = "touch"
 )
 
 // server-side
@@ -132,6 +142,7 @@ func Handle() {
 		PUT:    handlePut,
 		READ:   handleRead,
 		RM:     handleRemove,
+		TOUCH:  handleTouch,
 	}
 	for k, v := range m {
 		http.HandleFunc("/"+string(k)+"/", newHandler(k, v))
@@ -187,6 +198,10 @@ func handleMkdir(fname string, data []byte, w io.Writer) error {
 	return localMkdir(fname)
 }
 
+func handleTouch(fname string, data []byte, w io.Writer) error {
+	return localTouch(fname)
+}
+
 func handleRead(fname string, data []byte, w io.Writer) error {
 	b, err := localRead(fname)
 	if err != nil {
@@ -240,6 +255,11 @@ func httpMkdir(URL string) error {
 	return err
 }
 
+func httpTouch(URL string) error {
+	_, err := do(TOUCH, URL, nil)
+	return err
+}
+
 func httpLs(URL string) (ls []string, err error) {
 	r, errHTTP := do(LS, URL, nil)
 	if errHTTP != nil {
@@ -277,6 +297,16 @@ func localMkdir(fname string) error {
 	lock.Lock()
 	defer lock.Unlock()
 	return os.MkdirAll(fname, DirPerm)
+}
+
+func localTouch(fname string) error {
+	lock.Lock()
+	defer lock.Unlock()
+	f, err := os.Create(fname)
+	if err != nil {
+		f.Close()
+	}
+	return err
 }
 
 func localLs(fname string) ([]string, error) {

@@ -51,9 +51,9 @@ func MustOpen(URL string) io.ReadCloser {
 	return f
 }
 
-func Touch(URL string) error {
-	return Append(URL, []byte{})
-}
+//func Touch(URL string) error {
+//	return Append(URL, []byte{})
+//}
 
 type bufWriter struct {
 	buf *bufio.Writer

@@ -95,6 +95,7 @@ func Append(URL string, p []byte) error {
 	return AppendSize(URL, p, -1)
 }
 
+// Create file given by URL and put data from p there.
 func Put(URL string, p []byte) error {
 	URL = addWorkDir(URL)
 	if isRemote(URL) {

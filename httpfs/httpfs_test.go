@@ -135,6 +135,28 @@ func TestAppendRead(t *testing.T) {
 	}
 }
 
+func TestPutRead(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Mkdir("testdata"))
+
+	data := []byte("hello httpfs\n")
+
+	// must pass if file does not yet exist
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, Put("testdata/file", data))
+	}
+
+	b, errR := Read("testdata/file")
+	if errR != nil {
+		t.Error(errR)
+	}
+	if len(b) != len(data) {
+		t.Error(len(b), (MANYFILES+1)*len(data))
+	}
+}
+
 func mustPass(t *testing.T, err error) {
 	if err != nil {
 		t.Fatal(err)

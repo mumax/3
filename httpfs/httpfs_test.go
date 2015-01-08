@@ -17,7 +17,7 @@ func init() {
 		panic(err)
 	}
 
-	addr := "http://" + l.Addr().String() + "/"
+	addr := "http://" + l.Addr().String()
 	SetWD(addr)
 
 	RegisterHandlers()
@@ -155,6 +155,24 @@ func TestPutRead(t *testing.T) {
 	if len(b) != len(data) {
 		t.Error(len(b), (MANYFILES+1)*len(data))
 	}
+}
+
+func TestReaderWriter(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Mkdir("testdata"))
+
+	{
+		out, errO := Open("testdata/file")
+		if errO == nil {
+			t.Fail()
+		}
+		if out != nil {
+			t.Fail()
+		}
+	}
+
 }
 
 func mustPass(t *testing.T, err error) {

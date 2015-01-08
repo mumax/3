@@ -112,6 +112,29 @@ func TestRemove(t *testing.T) {
 	}
 }
 
+func TestAppendRead(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Mkdir("testdata"))
+
+	data := []byte("hello httpfs\n")
+	mustFail(t, Append("testdata/file", data)) // file does not exist yet
+
+	mustPass(t, Touch("testdata/file"))
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, Append("testdata/file", data))
+	}
+
+	b, errR := Read("testdata/file")
+	if errR != nil {
+		t.Error(errR)
+	}
+	if len(b) != (MANYFILES)*len(data) {
+		t.Error(len(b), (MANYFILES+1)*len(data))
+	}
+}
+
 func mustPass(t *testing.T, err error) {
 	if err != nil {
 		t.Fatal(err)

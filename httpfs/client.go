@@ -28,7 +28,7 @@ func SetWD(dir string) {
 
 // Mkdir creates a directory at specified URL.
 func Mkdir(URL string) error {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpMkdir(URL)
 	} else {
@@ -38,7 +38,7 @@ func Mkdir(URL string) error {
 
 // Touch creates an empty file at the specified URL.
 func Touch(URL string) error {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpTouch(URL)
 	} else {
@@ -48,7 +48,7 @@ func Touch(URL string) error {
 
 // ReadDir reads and returns all file names in the directory at URL.
 func ReadDir(URL string) ([]string, error) {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpLs(URL)
 	} else {
@@ -59,7 +59,7 @@ func ReadDir(URL string) ([]string, error) {
 // Remove removes the file or directory at URL, and all children it may contain.
 // Similar to os.RemoveAll.
 func Remove(URL string) error {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpRemove(URL)
 	} else {
@@ -69,7 +69,7 @@ func Remove(URL string) error {
 
 // Read the entire file and return its contents.
 func Read(URL string) ([]byte, error) {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpRead(URL)
 	} else {
@@ -82,7 +82,7 @@ func Read(URL string) ([]byte, error) {
 // Used to avoid accidental concurrent writes by two processes to the same file.
 // Size < 0 disables size check.
 func AppendSize(URL string, p []byte, size int64) error {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpAppend(URL, p, size)
 	} else {
@@ -96,7 +96,7 @@ func Append(URL string, p []byte) error {
 }
 
 func Put(URL string, p []byte) error {
-	URL = cleanup(URL)
+	URL = addWorkDir(URL)
 	if isRemote(URL) {
 		return httpPut(URL, p)
 	} else {
@@ -108,7 +108,9 @@ func isRemote(URL string) bool {
 	return strings.HasPrefix(URL, "http://")
 }
 
-func cleanup(URL string) string {
+// prefix wd to URL if URL is a relative file path
+// does not start with "/", "http://"
+func addWorkDir(URL string) string {
 	if isRemote(URL) {
 		return URL
 	}
@@ -118,7 +120,7 @@ func cleanup(URL string) string {
 	return URL
 }
 
-// TODO: query values
+// do a http request.
 func do(a action, URL string, body []byte, query url.Values) (resp []byte, err error) {
 	u, err := url.Parse(URL)
 	u.Path = string(a) + path.Clean("/"+u.Path)

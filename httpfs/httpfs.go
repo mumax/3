@@ -332,10 +332,13 @@ func localTouch(fname string) error {
 func localLs(fname string) ([]string, error) {
 	lock.Lock()
 	defer lock.Unlock()
+
 	f, err := os.Open(fname)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+
 	ls, err2 := f.Readdirnames(-1)
 	if err2 != nil {
 		return nil, err2
@@ -351,6 +354,7 @@ func localAppend(fname string, data []byte, size int64) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	if size >= 0 {
 		fi, errFi := f.Stat()
@@ -363,7 +367,6 @@ func localAppend(fname string, data []byte, size int64) error {
 		}
 	}
 
-	defer f.Close()
 	_, err2 := f.Write(data)
 	return err2
 }
@@ -372,11 +375,13 @@ func localPut(fname string, data []byte) error {
 	lock.Lock()
 	defer lock.Unlock()
 	_ = os.MkdirAll(path.Dir(fname), DirPerm)
+
 	f, err := os.OpenFile(fname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, FilePerm)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
+
 	_, err2 := f.Write(data)
 	return err2
 }

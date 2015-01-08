@@ -56,6 +56,8 @@ func ReadDir(URL string) ([]string, error) {
 	}
 }
 
+// Remove removes the file or directory at URL, and all children it may contain.
+// Similar to os.RemoveAll.
 func Remove(URL string) error {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -65,6 +67,7 @@ func Remove(URL string) error {
 	}
 }
 
+// Read the entire file and return its contents.
 func Read(URL string) ([]byte, error) {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -77,6 +80,7 @@ func Read(URL string) ([]byte, error) {
 // Append p to the file given by URL,
 // but first assure that the file had the expected size.
 // Used to avoid accidental concurrent writes by two processes to the same file.
+// Size < 0 disables size check.
 func AppendSize(URL string, p []byte, size int64) error {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -86,6 +90,7 @@ func AppendSize(URL string, p []byte, size int64) error {
 	}
 }
 
+// Append p to the file given by URL.
 func Append(URL string, p []byte) error {
 	return AppendSize(URL, p, -1)
 }

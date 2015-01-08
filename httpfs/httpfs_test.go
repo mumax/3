@@ -100,6 +100,18 @@ func TestReaddir(t *testing.T) {
 	}
 }
 
+func TestRemove(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Remove("testdata"))
+
+	// test for closing files (internally)
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, Remove("testdata"))
+	}
+}
+
 func mustPass(t *testing.T, err error) {
 	if err != nil {
 		t.Fatal(err)

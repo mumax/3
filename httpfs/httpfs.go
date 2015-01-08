@@ -17,13 +17,11 @@ import (
 	"log"
 	"os"
 	"path"
-	"sync"
 )
 
 var (
-	Logging = false    // enables logging
-	wd      = ""       // working directory, see SetWD
-	lock    sync.Mutex // synchronous local FS access to avoid races
+	Logging = false // enables logging
+	wd      = ""    // working directory, see SetWD
 )
 
 const (
@@ -98,14 +96,10 @@ func httpRemove(URL string) error {
 // client-side, local server
 
 func localMkdir(fname string) error {
-	lock.Lock()
-	defer lock.Unlock()
 	return os.Mkdir(fname, DirPerm)
 }
 
 func localTouch(fname string) error {
-	lock.Lock()
-	defer lock.Unlock()
 	f, err := os.Create(fname)
 	if err != nil {
 		f.Close()
@@ -114,8 +108,6 @@ func localTouch(fname string) error {
 }
 
 func localLs(fname string) ([]string, error) {
-	lock.Lock()
-	defer lock.Unlock()
 
 	f, err := os.Open(fname)
 	if err != nil {
@@ -131,8 +123,6 @@ func localLs(fname string) ([]string, error) {
 }
 
 func localAppend(fname string, data []byte, size int64) error {
-	lock.Lock()
-	defer lock.Unlock()
 
 	f, err := os.OpenFile(fname, os.O_APPEND|os.O_WRONLY, FilePerm)
 	if err != nil {
@@ -156,8 +146,6 @@ func localAppend(fname string, data []byte, size int64) error {
 }
 
 func localPut(fname string, data []byte) error {
-	lock.Lock()
-	defer lock.Unlock()
 	_ = os.MkdirAll(path.Dir(fname), DirPerm)
 
 	f, err := os.OpenFile(fname, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, FilePerm)
@@ -171,14 +159,10 @@ func localPut(fname string, data []byte) error {
 }
 
 func localRead(fname string) ([]byte, error) {
-	lock.Lock()
-	defer lock.Unlock()
 	return ioutil.ReadFile(fname)
 }
 
 func localRemove(fname string) error {
-	lock.Lock()
-	defer lock.Unlock()
 	return os.RemoveAll(fname)
 }
 

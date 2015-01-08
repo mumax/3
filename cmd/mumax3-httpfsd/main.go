@@ -36,7 +36,7 @@ func main() {
 	flag.Parse()
 	log.Println("serving at", *flag_addr)
 	httpfs.Logging = *flag_log
-	httpfs.Handle()
+	httpfs.RegisterHandlers()
 	err := http.ListenAndServe(*flag_addr, nil)
 	if err != nil {
 		log.Fatal(err)

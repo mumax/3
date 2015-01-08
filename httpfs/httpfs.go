@@ -1,3 +1,12 @@
+/*
+Package httpfs provides a (userspace) file system API over http.
+httpfs is used by mumax3-server to proved file system access to the compute nodes.
+
+The API is similar to go's os package, but both local file names and URLs may be passed.
+When the file "name" starts with "http://", it is treated as a remote file, otherwise
+it is local. Hence, the same API is used for local and remote file access.
+
+*/
 package httpfs
 
 import (
@@ -12,7 +21,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -28,8 +36,9 @@ const (
 	FilePerm = 0666 // permissions for new files
 )
 
-// SetWD sets a "working directory", prefixed to all relative local paths.
-// dir may start with "http://", turning local relative paths into remote paths.
+// SetWD sets a "working directory" for the client side,
+// prefixed to all relative local paths passed to client functions (Mkdir, Touch, Remove, ...).
+// dir may start with "http://", turning local relative client paths into remote paths.
 // E.g.:
 // 	http://path -> http://path
 // 	path/file   -> wd/path/file
@@ -125,108 +134,6 @@ func cleanup(URL string) string {
 		return wd + URL
 	}
 	return URL
-}
-
-// file action gets its own type to avoid mixing up with other strings
-type action string
-
-const (
-	APPEND action = "append"
-	LS     action = "ls"
-	MKDIR  action = "mkdir"
-	PUT    action = "put"
-	READ   action = "read"
-	RM     action = "rm"
-	TOUCH  action = "touch"
-)
-
-// server-side
-
-func Handle() {
-	m := map[action]handlerFunc{
-		APPEND: handleAppend,
-		LS:     handleLs,
-		MKDIR:  handleMkdir,
-		PUT:    handlePut,
-		READ:   handleRead,
-		RM:     handleRemove,
-		TOUCH:  handleTouch,
-	}
-	for k, v := range m {
-		http.HandleFunc("/"+string(k)+"/", newHandler(k, v))
-	}
-	http.Handle("/fs/", http.StripPrefix("/fs/", http.FileServer(http.Dir("."))))
-}
-
-// general handler func for file name, input data and response writer.
-type handlerFunc func(fname string, data []byte, w io.Writer, query url.Values) error
-
-func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		fname := r.URL.Path[len(prefix)+2:] // strip "/prefix/"
-		query := r.URL.Query()
-		data, err := ioutil.ReadAll(r.Body)
-
-		Log("httpfs req:", prefix, fname, query.Encode(), len(data), "B payload")
-
-		if err != nil {
-			Log("httpfs err:", prefix, fname, ":", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
-
-		err2 := f(fname, data, w, query)
-		if err2 != nil {
-			Log("httpfs err:", prefix, fname, ":", err2)
-			http.Error(w, err2.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-func handleAppend(fname string, data []byte, w io.Writer, q url.Values) error {
-	size := int64(-1)
-	s := q.Get("size")
-	if s != "" {
-		var err error
-		size, err = strconv.ParseInt(s, 0, 64)
-		if err != nil {
-			return err
-		}
-	}
-	return localAppend(fname, data, size)
-}
-
-func handlePut(fname string, data []byte, w io.Writer, q url.Values) error {
-	return localPut(fname, data)
-}
-
-func handleLs(fname string, data []byte, w io.Writer, q url.Values) error {
-	ls, err := localLs(fname)
-	if err != nil {
-		return err
-	}
-	return json.NewEncoder(w).Encode(ls)
-}
-
-func handleMkdir(fname string, data []byte, w io.Writer, q url.Values) error {
-	return localMkdir(fname)
-}
-
-func handleTouch(fname string, data []byte, w io.Writer, q url.Values) error {
-	return localTouch(fname)
-}
-
-func handleRead(fname string, data []byte, w io.Writer, q url.Values) error {
-	b, err := localRead(fname)
-	if err != nil {
-		return err
-	}
-	_, err2 := w.Write(b)
-	return err2
-}
-
-func handleRemove(fname string, data []byte, w io.Writer, q url.Values) error {
-	return localRemove(fname)
 }
 
 // TODO: query values

@@ -66,7 +66,7 @@ func main() {
 
 	http.HandleFunc("/do/", HandleRPC)
 	http.HandleFunc("/", HandleStatus)
-	httpfs.Handle()
+	httpfs.RegisterHandlers()
 
 	// Listen and serve on all interfaces
 	go func() {

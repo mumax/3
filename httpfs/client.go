@@ -1,6 +1,6 @@
 package httpfs
 
-// client-side code
+// client-side API
 
 import (
 	"bytes"
@@ -26,8 +26,7 @@ func SetWD(dir string) {
 	wd = dir
 }
 
-// Creates the directory at specified URL (or local file),
-// creating all needed parent directories as well.
+// Mkdir creates a directory at specified URL.
 func Mkdir(URL string) error {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -37,6 +36,7 @@ func Mkdir(URL string) error {
 	}
 }
 
+// Touch creates an empty file at the specified URL.
 func Touch(URL string) error {
 	URL = cleanup(URL)
 	if isRemote(URL) {
@@ -46,6 +46,7 @@ func Touch(URL string) error {
 	}
 }
 
+// ReadDir reads and returns all file names in the directory at URL.
 func ReadDir(URL string) ([]string, error) {
 	URL = cleanup(URL)
 	if isRemote(URL) {

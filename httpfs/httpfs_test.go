@@ -31,7 +31,8 @@ func init() {
 }
 
 func TestMkdirRemove(t *testing.T) {
-	_ = Remove("testdata")
+	Remove("testdata")
+	defer Remove("testdata")
 
 	mustPass(t, Mkdir("testdata"))
 	mustFail(t, Mkdir("testdata"))
@@ -44,12 +45,59 @@ func TestMkdirRemove(t *testing.T) {
 }
 
 func TestMkdir(t *testing.T) {
-	_ = Remove("testdata")
+	Remove("testdata")
+	defer Remove("testdata")
 
 	mustFail(t, Mkdir("testdata/bla/bla"))
 	mustPass(t, Mkdir("testdata/"))
 	mustPass(t, Mkdir("testdata/bla"))
 	mustPass(t, Mkdir("testdata/bla/bla"))
+}
+
+func TestTouch(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustFail(t, Touch("testdata/file"))
+	mustPass(t, Mkdir("testdata/"))
+	mustPass(t, Touch("testdata/file"))
+
+	// test for closing files (internally)
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, Touch("testdata/file"))
+	}
+}
+
+func TestReaddir(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	s := func(s []string, e error) error { return e }
+
+	mustFail(t, s(ReadDir("testdata")))
+
+	// test for closing files (internally)
+	for i := 0; i < MANYFILES; i++ {
+		mustFail(t, s(ReadDir("testdata")))
+	}
+
+	mustPass(t, Mkdir("testdata/"))
+	mustPass(t, Touch("testdata/file1"))
+	mustPass(t, Touch("testdata/file2"))
+	mustPass(t, Touch("testdata/file3"))
+
+	ls, err := ReadDir("testdata")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(ls) != 3 {
+		t.Fail()
+	}
+
+	// test for closing files (internally)
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, s(ReadDir("testdata")))
+	}
 }
 
 func mustPass(t *testing.T, err error) {

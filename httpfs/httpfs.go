@@ -10,7 +10,6 @@ it is local. Hence, the same API is used for local and remote file access.
 package httpfs
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,17 +18,15 @@ import (
 	"path"
 )
 
-var (
-	Logging = false // enables logging
-	wd      = ""    // working directory, see SetWD
-)
+var Logging = false // enables logging
 
 const (
 	DirPerm  = 0777 // permissions for new directory
 	FilePerm = 0666 // permissions for new files
 )
 
-func readBody(r io.Reader) string {
+func readBody(r io.ReadCloser) string {
+	defer r.Close()
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Println("readbody:", err)
@@ -45,55 +42,6 @@ func mkErr(a action, URL string, err error) error {
 		return fmt.Errorf("httpfs %v %v: %v", a, URL, err)
 	}
 }
-
-// client-side, remote server
-
-func httpMkdir(URL string) error {
-	_, err := do(MKDIR, URL, nil, nil)
-	return err
-}
-
-func httpTouch(URL string) error {
-	_, err := do(TOUCH, URL, nil, nil)
-	return err
-}
-
-func httpLs(URL string) (ls []string, err error) {
-	r, errHTTP := do(LS, URL, nil, nil)
-	if errHTTP != nil {
-		return nil, errHTTP
-	}
-	errJSON := json.Unmarshal(r, &ls)
-	if errJSON != nil {
-		return nil, mkErr(LS, URL, errJSON)
-	}
-	return ls, nil
-}
-
-func httpAppend(URL string, data []byte, size int64) error {
-	var query map[string][]string
-	if size >= 0 {
-		query = map[string][]string{"size": {fmt.Sprint(size)}}
-	}
-	_, err := do(APPEND, URL, data, query)
-	return err
-}
-
-func httpPut(URL string, data []byte) error {
-	_, err := do(PUT, URL, data, nil)
-	return err
-}
-
-func httpRead(URL string) ([]byte, error) {
-	return do(READ, URL, nil, nil)
-}
-
-func httpRemove(URL string) error {
-	_, err := do(RM, URL, nil, nil)
-	return err
-}
-
-// client-side, local server
 
 func localMkdir(fname string) error {
 	return os.Mkdir(fname, DirPerm)

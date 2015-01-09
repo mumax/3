@@ -24,7 +24,15 @@ var (
 )
 
 func init() {
-	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
+	msatDerived := []derived{&Bsat, &lex2, &din2, &dbulk2, &kc1_red, &kc2_red, &kc3_red, &temp_red}
+
+	for i := 0; i < NANIS; i++ {
+		ku1_red := &ku1_red[i]
+		ku2_red := &ku2_red[i]
+		msatDerived = append(msatDerived, ku1_red, ku2_red)
+	}
+
+	Msat.init("Msat", "A/m", "Saturation magnetization", msatDerived)
 	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
 	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")

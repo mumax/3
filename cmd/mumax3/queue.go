@@ -15,11 +15,17 @@ import (
 	"sync/atomic"
 )
 
+var (
+	exitStatus       atom = 0
+	numOK, numFailed atom = 0, 0
+)
+
 func RunQueue(files []string) {
 	s := NewStateTab(files)
 	s.PrintTo(os.Stdout)
 	go s.ListenAndServe(*flag_port)
 	s.Run()
+	fmt.Println(numOK.get(), "OK, ", numFailed.get(), "failed")
 	os.Exit(int(exitStatus))
 }
 
@@ -98,8 +104,7 @@ type atom int32
 
 func (a *atom) set(v int) { atomic.StoreInt32((*int32)(a), int32(v)) }
 func (a *atom) get() int  { return int(atomic.LoadInt32((*int32)(a))) }
-
-var exitStatus atom = 0
+func (a *atom) inc()      { atomic.AddInt32((*int32)(a), 1) }
 
 func run(inFile string, gpu int, webAddr string) {
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
@@ -111,6 +116,12 @@ func run(inFile string, gpu int, webAddr string) {
 	if err != nil {
 		log.Println(inFile, err)
 		exitStatus.set(1)
+		numFailed.inc()
+		if *flag_failfast {
+			os.Exit(1)
+		}
+	} else {
+		numOK.inc()
 	}
 }
 

@@ -29,6 +29,7 @@ var (
 	flag_sync        = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
 	flag_test        = flag.Bool("test", false, "Cuda test (internal)")
 	flag_cachedir    = flag.String("cache", "", "Kernel cache directory")
+	flag_failfast    = flag.Bool("failfast", false, "If one simulation fails, stop entire batch immediately")
 )
 
 func main() {

@@ -135,6 +135,43 @@ func TestAppendRead(t *testing.T) {
 	}
 }
 
+func TestAppendSize(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Mkdir("testdata"))
+
+	data := []byte("hello httpfs\n")
+	mustFail(t, AppendSize("testdata/file", data, 0)) // file does not exist yet
+	mustFail(t, AppendSize("testdata/file", data, 1)) // file does not exist yet
+
+	mustPass(t, Touch("testdata/file"))
+	for i := 0; i < MANYFILES; i++ {
+		mustPass(t, AppendSize("testdata/file", data, int64(i)*int64(len(data))))
+	}
+
+	b, errR := Read("testdata/file")
+	if errR != nil {
+		t.Error(errR)
+	}
+	if len(b) != (MANYFILES)*len(data) {
+		t.Error(len(b), (MANYFILES+1)*len(data))
+	}
+}
+
+func TestAppendSizeBad(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+
+	mustPass(t, Mkdir("testdata"))
+	mustPass(t, Touch("testdata/file"))
+
+	data := []byte("hello httpfs\n")
+	for i := 0; i < MANYFILES; i++ {
+		mustFail(t, AppendSize("testdata/file", data, 3)) // bad size
+	}
+}
+
 func TestPutRead(t *testing.T) {
 	Remove("testdata")
 	defer Remove("testdata")
@@ -163,6 +200,7 @@ func TestReaderWriter(t *testing.T) {
 
 	mustPass(t, Mkdir("testdata"))
 
+	// open file for reading when it's not yet there
 	{
 		out, errO := Open("testdata/file")
 		if errO == nil {
@@ -173,6 +211,53 @@ func TestReaderWriter(t *testing.T) {
 		}
 	}
 
+	for i := 0; i < MANYFILES; i++ {
+
+		// create and write to file
+		{
+			out, errO := Create("testdata/file")
+			if errO != nil {
+				t.Fail()
+			}
+			if out == nil {
+				t.Fail()
+			}
+
+			_, errW := fmt.Fprintln(out, "hello_httpfs")
+			if errW != nil {
+				t.Fail()
+			}
+
+			mustPass(t, out.Close())
+		}
+
+		// open file for reading and check content
+		{
+			f, errO := Open("testdata/file")
+			if errO != nil {
+				t.Fail()
+			}
+			if f == nil {
+				t.Fail()
+			}
+
+			var str string
+			_, err := fmt.Fscan(f, &str)
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if str != "hello_httpfs" {
+				t.Error(str)
+			}
+
+			if i == 0 {
+				mustPass(t, f.Close()) // it's not needed to close the file
+
+			}
+		}
+	}
 }
 
 func mustPass(t *testing.T, err error) {

@@ -115,7 +115,6 @@ func TestRemove(t *testing.T) {
 func TestAppendRead(t *testing.T) {
 	Remove("testdata")
 	defer Remove("testdata")
-
 	mustPass(t, Mkdir("testdata"))
 
 	data := []byte("hello httpfs\n")
@@ -133,6 +132,31 @@ func TestAppendRead(t *testing.T) {
 	if len(b) != (MANYFILES)*len(data) {
 		t.Error(len(b), (MANYFILES+1)*len(data))
 	}
+}
+
+func TestConcurrentWrite(t *testing.T) {
+	Remove("testdata")
+	defer Remove("testdata")
+	mustPass(t, Mkdir("testdata"))
+	mustPass(t, Touch("testdata/file"))
+
+	f1 := MustCreate("testdata/file")
+	f2 := MustCreate("testdata/file")
+
+	fmt.Fprintln(f1, "a")
+	mustPass(t, f1.Flush())
+
+	fmt.Fprintln(f2, "a")
+	mustFail(t, f2.Flush())
+
+	for i := 0; i < MANYFILES; i++ {
+		fmt.Fprintln(f1, "a")
+		mustPass(t, f1.Flush())
+
+		fmt.Fprintln(f2, "a")
+		mustFail(t, f2.Flush())
+	}
+
 }
 
 func TestAppendSize(t *testing.T) {

@@ -8,8 +8,11 @@
 	setcellsize(500e-9/128, 125e-9/32, 3e-9)
 
 // material
-	Msat  = 800e3
+	Msat  = 1600e3
 	Aex   = 13e-12
+	E_total.get()  // try to trigger bad lex2
+
+	Msat  = 800e3
 	alpha = 0.02
 	m  = uniform(1, .1, 0)
 

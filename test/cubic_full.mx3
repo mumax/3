@@ -18,8 +18,11 @@ m = uniform(sin(phi)*cos(theta), sin(phi)*sin(theta), cos(phi))
 
 TOL := 1e-2
 
-Msat   = 100e3
+// try to trigger bad XXX_red update:
+Msat   = 1e3
 Kc1 = 1e6; Kc2 = 0; Kc3 = 0
+E_total.get() 
+
 Msat   = 1000e3
 expect("easy1", E_anis.get()/V, 35254.015625, TOL)
 

@@ -19,6 +19,11 @@ TOL := 1
 
 Msat  = 100e3
 Ku1 = 0; Ku2 = 1e6
+
+// try to trigger bad ku_red update
+steps(1)
+m = uniform(cos(theta), sin(theta), 0)
+
 Msat  = 1000e3
 expect("easy2", E_anis.get()/V, -836344.9375, TOL)
 
@@ -31,8 +36,10 @@ Ku1 = 1e6; Ku2 = 0
 Msat  = 1000e3
 expect("easy1", E_anis.get()/V, -914519, TOL)
 
-Msat  = 100e3
+Msat  = 1e3
 Ku1 = -10e6; Ku2 = 0
+E_total.get()
+
 Msat  = 1000e3
 Ku1 = -1e6; Ku2 = 0
 expect("hard1", E_anis.get()/V, 914519, TOL)

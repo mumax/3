@@ -15,7 +15,7 @@ func init() {
 
 var (
 	geometry   geom
-	edgeSmooth int = 0 // disabled for now
+	edgeSmooth int = 0 // disabled by default
 )
 
 type geom struct {

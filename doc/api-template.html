@@ -240,7 +240,8 @@ myField = ...
 <pre><code>Run(1e-9)
 </code></pre>
 More fine-grained control is provided by <code>RunWhile(<i>condition</i>)</code>, which runs as long as an arbitrary condition is met. E.g.: 
-<pre><code>RunWhile(average(m)[0] &lt; 0)   // search for switching field during reversal
+<pre><code>mx := m.comp(0)
+RunWhile(mx.average() &lt; 0)   // search for switching field during reversal
 </code></pre>
 Optionally, the solver accuracy may be fine-tuned. E.g.:
 <pre><code>MaxDt = 1e-12

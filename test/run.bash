@@ -6,11 +6,7 @@ scripts=*.mx3
 
 mumax3 -vet $scripts
 
-
-for f in $scripts; do
-	mumax3 -cache /tmp -f -http "" $f;
-	echo ""
-done;
+mumax3 -cache /tmp -f -http "" $scripts;
 
 for g in *.go; do
 	if [ "$g" != "doc.go" ]; then

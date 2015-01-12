@@ -121,12 +121,8 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 	size := array.Size()
 	data := array.Tensors()
 
-	var bytes4 [4]byte
-	bytes := bytes4[:]
-	in.Read(bytes)
-
 	// OOMMF requires this number to be first to check the format
-	controlnumber := *((*float32)(unsafe.Pointer(&bytes4)))
+	controlnumber := readFloat32(in)
 	if controlnumber != OVF_CONTROL_NUMBER_4 {
 		panic("invalid OVF2 control number: " + fmt.Sprint(controlnumber))
 	}
@@ -136,27 +132,44 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
-					n, err := in.Read(bytes)
-					if err != nil || n != 4 {
-						panic(err)
-					}
-					data[c][iz][iy][ix] = *((*float32)(unsafe.Pointer(&bytes4)))
+					data[c][iz][iy][ix] = readFloat32(in)
 				}
 			}
 		}
 	}
 }
 
+// fully read buf, panic on error
+func readFull(in io.Reader, buf []byte) {
+	_, err := io.ReadFull(in, buf)
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
+// read float32 in machine endianess, panic on error
+func readFloat32(in io.Reader) float32 {
+	var bytes4 [4]byte
+	bytes := bytes4[:]
+	readFull(in, bytes)
+	return *((*float32)(unsafe.Pointer(&bytes4)))
+}
+
+// read float64 in machine endianess, panic on error
+func readFloat64(in io.Reader) float64 {
+	var bytes8 [8]byte
+	bytes := bytes8[:]
+	readFull(in, bytes)
+	return *((*float64)(unsafe.Pointer(&bytes8)))
+}
+
 func readOVF2DataBinary8(in io.Reader, array *data.Slice) {
 	size := array.Size()
 	data := array.Tensors()
 
-	var bytes8 [8]byte
-	bytes := bytes8[:]
-	in.Read(bytes)
-
 	// OOMMF requires this number to be first to check the format
-	controlnumber := *((*float64)(unsafe.Pointer(&bytes8)))
+	controlnumber := readFloat64(in)
 	if controlnumber != OVF_CONTROL_NUMBER_8 {
 		panic("invalid OVF2 control number: " + fmt.Sprint(controlnumber))
 	}
@@ -166,11 +179,7 @@ func readOVF2DataBinary8(in io.Reader, array *data.Slice) {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
 				for c := 0; c < ncomp; c++ {
-					n, err := in.Read(bytes)
-					if err != nil || n != 8 {
-						panic(err)
-					}
-					data[c][iz][iy][ix] = float32(*((*float64)(unsafe.Pointer(&bytes8))))
+					data[c][iz][iy][ix] = float32(readFloat64(in))
 				}
 			}
 		}

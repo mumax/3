@@ -1,8 +1,9 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
 	"unsafe"
+
+	"github.com/mumax/3/data"
 )
 
 // Landau-Lifshitz torque divided by gamma0:

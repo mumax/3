@@ -1,9 +1,10 @@
 package cuda
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 // Set Bth to thermal noise (Brown).

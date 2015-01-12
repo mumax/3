@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/mumax/3/util"
 	"io"
 	"log"
 	"os"
@@ -18,6 +17,8 @@ import (
 	"strconv"
 	"text/scanner"
 	"text/template"
+
+	"github.com/mumax/3/util"
 )
 
 func main() {

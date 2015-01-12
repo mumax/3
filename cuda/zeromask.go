@@ -1,8 +1,9 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
 	"unsafe"
+
+	"github.com/mumax/3/data"
 )
 
 // Sets vector dst to zero where mask != 0.

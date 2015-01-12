@@ -1,10 +1,11 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"testing"
 	"unsafe"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 // test input data

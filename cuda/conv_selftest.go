@@ -3,9 +3,10 @@ package cuda
 // Convolution self-test, performed once at the start of each simulation
 
 import (
+	"math/rand"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math/rand"
 )
 
 // Compares FFT-accelerated convolution against brute-force on sparse data.

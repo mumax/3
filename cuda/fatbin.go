@@ -1,8 +1,9 @@
 package cuda
 
 import (
-	"github.com/mumax/3/cuda/cu"
 	"log"
+
+	"github.com/mumax/3/cuda/cu"
 )
 
 // load PTX code for function name, find highest SM that matches our card.

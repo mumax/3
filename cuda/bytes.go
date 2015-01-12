@@ -3,10 +3,11 @@ package cuda
 // This file provides GPU byte slices, used to store regions.
 
 import (
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/util"
 	"log"
 	"unsafe"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/util"
 )
 
 // 3D byte slice, used for region lookup.

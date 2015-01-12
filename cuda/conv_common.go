@@ -3,10 +3,11 @@ package cuda
 // common code for all convolutions.
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"log"
 	"math"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 // Output size of R2C FFT with given logic size, expressed in floats.

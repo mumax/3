@@ -1,11 +1,12 @@
 package cuda
 
 import (
+	"math"
+	"unsafe"
+
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
-	"unsafe"
 )
 
 // Make a GPU Slice with nComp components each of size length.

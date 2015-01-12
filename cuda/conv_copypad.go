@@ -1,9 +1,10 @@
 package cuda
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 // Copies src (larger) into dst (smaller).

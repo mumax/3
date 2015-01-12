@@ -1,8 +1,9 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
 	"testing"
+
+	"github.com/mumax/3/data"
 )
 
 func TestSlice(t *testing.T) {

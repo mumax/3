@@ -1,11 +1,13 @@
 package cuda
 
 import (
+	"log"
+
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/cuda/cufft"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
-	"log"
 )
 
 // 3D single-precission real-to-complex FFT plan.
@@ -27,6 +29,7 @@ func newFFT3DR2C(Nx, Ny, Nz int) fft3DR2CPlan {
 func (p *fft3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 	if Synchronous {
 		Sync()
+		timer.Start("fft")
 	}
 	util.Argument(src.NComp() == 1 && dst.NComp() == 1)
 	oksrclen := p.InputLen()
@@ -40,6 +43,7 @@ func (p *fft3DR2CPlan) ExecAsync(src, dst *data.Slice) {
 	p.handle.ExecR2C(cu.DevicePtr(uintptr(src.DevPtr(0))), cu.DevicePtr(uintptr(dst.DevPtr(0))))
 	if Synchronous {
 		Sync()
+		timer.Stop("fft")
 	}
 }
 

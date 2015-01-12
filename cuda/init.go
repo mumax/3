@@ -3,10 +3,11 @@ package cuda
 
 import (
 	"fmt"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/util"
 	"log"
 	"runtime"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/util"
 )
 
 var (

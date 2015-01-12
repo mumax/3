@@ -7,10 +7,11 @@ package cuda
 // effectively wait for the previous operation on the buffer.
 
 import (
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/data"
 	"log"
 	"unsafe"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/data"
 )
 
 var (

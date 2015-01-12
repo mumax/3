@@ -1,10 +1,11 @@
 package cuda
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 // Stores the necessary state to perform FFT-accelerated convolution

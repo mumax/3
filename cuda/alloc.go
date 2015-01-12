@@ -1,10 +1,11 @@
 package cuda
 
 import (
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/data"
 	"log"
 	"unsafe"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/data"
 )
 
 // Wrapper for cu.MemAlloc, fatal exit on out of memory.

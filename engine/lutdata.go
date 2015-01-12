@@ -1,11 +1,12 @@
 package engine
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 // look-up table for region based parameters

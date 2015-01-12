@@ -1,8 +1,9 @@
 package engine
 
 import (
-	"github.com/mumax/3/script"
 	"reflect"
+
+	"github.com/mumax/3/script"
 )
 
 // specialized param with 1 component

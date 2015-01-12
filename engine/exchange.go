@@ -4,11 +4,12 @@ package engine
 // See also cuda/exchange.cu and cuda/dmi.cu
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 var (

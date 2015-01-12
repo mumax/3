@@ -1,9 +1,11 @@
 package engine
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
 )
 
 // input parameter, settable by user
@@ -87,6 +89,7 @@ func (p *inputParam) setFunc(r1, r2 int, f func() []float64) {
 
 // mark my GPU copy and my children as invalid (need update)
 func (p *inputParam) invalidate() {
+	fmt.Println(p.Name(), " invalidate")
 	p.gpu_ok = false
 	for _, c := range p.children {
 		c.invalidate()

@@ -10,6 +10,10 @@ import (
 	"io"
 	"sync"
 	"time"
+
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/script"
+	"github.com/mumax/3/util"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)

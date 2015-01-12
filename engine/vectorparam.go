@@ -1,10 +1,11 @@
 package engine
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/script"
 	"reflect"
 	"strings"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/script"
 )
 
 // vector input parameter, settable by user

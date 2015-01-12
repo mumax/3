@@ -1,10 +1,11 @@
 package engine
 
 import (
+	"math"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
 )
 
 // Classical 4th order RK solver.

@@ -3,12 +3,13 @@ package engine
 import (
 	"bytes"
 	"fmt"
-	"github.com/mumax/3/httpfs"
 	"image"
 	"image/png"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+
+	"github.com/mumax/3/httpfs"
 )
 
 func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {

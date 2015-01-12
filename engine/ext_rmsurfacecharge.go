@@ -2,10 +2,11 @@ package engine
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
-	"math"
 )
 
 func init() {

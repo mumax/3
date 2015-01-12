@@ -3,9 +3,10 @@ package engine
 // declare functionality for interpreted input scripts
 
 import (
+	"reflect"
+
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
-	"reflect"
 )
 
 func CompileFile(fname string) (*script.BlockStmt, error) {

@@ -3,8 +3,9 @@ package engine
 // Relax tries to find the minimum energy state.
 
 import (
-	"github.com/mumax/3/cuda"
 	"math"
+
+	"github.com/mumax/3/cuda"
 )
 
 func init() {

@@ -2,14 +2,15 @@ package engine
 
 import (
 	"fmt"
+	"path"
+	"strings"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"path"
-	"strings"
 )
 
 func init() {

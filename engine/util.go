@@ -2,6 +2,11 @@ package engine
 
 import (
 	"fmt"
+	"math"
+	"path"
+	"sort"
+	"strings"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/dump"
@@ -9,10 +14,6 @@ import (
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"math"
-	"path"
-	"sort"
-	"strings"
 )
 
 func init() {

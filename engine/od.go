@@ -3,8 +3,9 @@ package engine
 // Management of output directory.
 
 import (
-	"github.com/mumax/3/httpfs"
 	"strings"
+
+	"github.com/mumax/3/httpfs"
 )
 
 var (

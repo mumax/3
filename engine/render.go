@@ -1,13 +1,14 @@
 package engine
 
 import (
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/draw"
 	"image"
 	"image/jpeg"
 	"net/http"
 	"sync"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
 )
 
 //var renderer = render{img: new(image.RGBA)}

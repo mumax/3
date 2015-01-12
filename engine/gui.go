@@ -2,11 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/gui"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"math/rand"
 	"net"
 	"net/http"
@@ -15,6 +10,12 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/gui"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 // global GUI state stores what is currently shown in the web page.

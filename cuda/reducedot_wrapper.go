@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -41,6 +42,7 @@ func init() {
 func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("reducedot")
 	}
 
 	reducedot_args.Lock()
@@ -61,6 +63,7 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("reducedot")
 	}
 }
 

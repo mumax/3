@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -51,6 +52,7 @@ func init() {
 func k_llnoprecess_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, hx unsafe.Pointer, hy unsafe.Pointer, hz unsafe.Pointer, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("llnoprecess")
 	}
 
 	llnoprecess_args.Lock()
@@ -76,6 +78,7 @@ func k_llnoprecess_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("llnoprecess")
 	}
 }
 

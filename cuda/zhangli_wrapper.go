@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -73,6 +74,7 @@ func init() {
 func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jx unsafe.Pointer, jy unsafe.Pointer, jz unsafe.Pointer, cx float32, cy float32, cz float32, bsatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, xiLUT unsafe.Pointer, polLUT unsafe.Pointer, regions unsafe.Pointer, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("addzhanglitorque")
 	}
 
 	addzhanglitorque_args.Lock()
@@ -109,6 +111,7 @@ func k_addzhanglitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Po
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("addzhanglitorque")
 	}
 }
 

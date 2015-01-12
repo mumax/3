@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -67,6 +68,7 @@ func init() {
 func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, jz unsafe.Pointer, pxLUT unsafe.Pointer, pyLUT unsafe.Pointer, pzLUT unsafe.Pointer, msatLUT unsafe.Pointer, alphaLUT unsafe.Pointer, flt float32, polLUT unsafe.Pointer, lambdaLUT unsafe.Pointer, epsilonPrimeLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("addslonczewskitorque")
 	}
 
 	addslonczewskitorque_args.Lock()
@@ -100,6 +102,7 @@ func k_addslonczewskitorque_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsaf
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("addslonczewskitorque")
 	}
 }
 

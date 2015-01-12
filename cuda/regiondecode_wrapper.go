@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -39,6 +40,7 @@ func init() {
 func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("regiondecode")
 	}
 
 	regiondecode_args.Lock()
@@ -58,6 +60,7 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("regiondecode")
 	}
 }
 

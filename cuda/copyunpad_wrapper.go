@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -47,6 +48,7 @@ func init() {
 func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("copyunpad")
 	}
 
 	copyunpad_args.Lock()
@@ -70,6 +72,7 @@ func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Po
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("copyunpad")
 	}
 }
 

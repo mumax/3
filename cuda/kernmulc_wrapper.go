@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -39,6 +40,7 @@ func init() {
 func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("kernmulC")
 	}
 
 	kernmulC_args.Lock()
@@ -58,6 +60,7 @@ func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, 
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("kernmulC")
 	}
 }
 

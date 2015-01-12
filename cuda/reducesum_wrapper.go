@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -39,6 +40,7 @@ func init() {
 func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("reducesum")
 	}
 
 	reducesum_args.Lock()
@@ -58,6 +60,7 @@ func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, 
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("reducesum")
 	}
 }
 

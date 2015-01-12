@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -53,6 +54,7 @@ func init() {
 func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, vol unsafe.Pointer, Sx int, Sy int, Sz int, BsatLUT unsafe.Pointer, regions unsafe.Pointer, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("copypadmul")
 	}
 
 	copypadmul_args.Lock()
@@ -79,6 +81,7 @@ func k_copypadmul_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.P
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("copypadmul")
 	}
 }
 

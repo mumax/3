@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -45,6 +46,7 @@ func init() {
 func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clamp byte, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("shiftbytes")
 	}
 
 	shiftbytes_args.Lock()
@@ -67,6 +69,7 @@ func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, 
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("shiftbytes")
 	}
 }
 

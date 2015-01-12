@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -41,6 +42,7 @@ func init() {
 func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("regionselect")
 	}
 
 	regionselect_args.Lock()
@@ -61,6 +63,7 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("regionselect")
 	}
 }
 

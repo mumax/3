@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -43,6 +44,7 @@ func init() {
 func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("reducemaxvecnorm2")
 	}
 
 	reducemaxvecnorm2_args.Lock()
@@ -64,6 +66,7 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("reducemaxvecnorm2")
 	}
 }
 

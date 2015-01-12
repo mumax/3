@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -43,6 +44,7 @@ func init() {
 func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("madd2")
 	}
 
 	madd2_args.Lock()
@@ -64,6 +66,7 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("madd2")
 	}
 }
 

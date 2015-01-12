@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -43,6 +44,7 @@ func init() {
 func k_settemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt float32, tempRedLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("settemperature")
 	}
 
 	settemperature_args.Lock()
@@ -64,6 +66,7 @@ func k_settemperature_async(B unsafe.Pointer, noise unsafe.Pointer, kB2_VgammaDt
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("settemperature")
 	}
 }
 

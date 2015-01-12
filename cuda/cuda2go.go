@@ -152,6 +152,7 @@ const templText = `package cuda
 import(
 	"unsafe"
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 )
 
@@ -177,6 +178,7 @@ func init(){
 func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{end}} cfg *config) {
 	if Synchronous{ // debug
 		Sync()
+		timer.Start("{{.Name}}")
 	}
 
 	{{.Name}}_args.Lock()
@@ -194,6 +196,7 @@ func k_{{.Name}}_async ( {{range $i, $t := .ArgT}}{{index $.ArgN $i}} {{$t}}, {{
 
 	if Synchronous{ // debug
 		Sync()
+		timer.Stop("{{.Name}}")
 	}
 }
 

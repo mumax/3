@@ -7,6 +7,7 @@ package cuda
 
 import (
 	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 	"sync"
 	"unsafe"
 )
@@ -51,6 +52,7 @@ func init() {
 func k_exchangedecode_async(dst unsafe.Pointer, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("exchangedecode")
 	}
 
 	exchangedecode_args.Lock()
@@ -76,6 +78,7 @@ func k_exchangedecode_async(dst unsafe.Pointer, aLUT2d unsafe.Pointer, regions u
 
 	if Synchronous { // debug
 		Sync()
+		timer.Stop("exchangedecode")
 	}
 }
 

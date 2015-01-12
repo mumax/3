@@ -8,6 +8,7 @@ import (
 	"github.com/mumax/3/engine"
 	"github.com/mumax/3/prof"
 	"github.com/mumax/3/script"
+	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
 	"log"
 	"os"
@@ -61,6 +62,10 @@ func main() {
 	}
 	defer prof.Cleanup()
 	defer engine.Close() // flushes pending output, if any
+
+	defer func() {
+		timer.Print(os.Stdout)
+	}()
 
 	if *flag_vet {
 		vet()

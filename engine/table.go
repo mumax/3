@@ -11,13 +11,13 @@ import (
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
-const TableAutoflushRate = 5   // auto-flush table every X seconds
 
 func init() {
 	DeclFunc("TableAdd", TableAdd, "Add quantity as a column to the data table.")
 	DeclFunc("TableAddVar", TableAddVariable, "Add user-defined variable + name + unit to data table.")
 	DeclFunc("TableSave", TableSave, "Save the data table right now (appends one line).")
 	DeclFunc("TableAutoSave", TableAutoSave, "Auto-save the data table every period (s). Zero disables save.")
+	DeclFunc("TableAutoSaveStep", TableAutoSaveStep, "Auto-save the data table every steps. Zero disables save.")
 	DeclFunc("TablePrint", TablePrint, "Print anyting in the data table")
 	Table.Add(&M)
 }
@@ -81,7 +81,13 @@ func TableSave() {
 }
 
 func TableAutoSave(period float64) {
-	Table.autosave = autosave{period, Time, -1, nil} // count -1 allows output on t=0
+	nbr_steps := 0
+	Table.autosave = autosave{period, nbr_steps, Time, -1, nil} // count -1 allows output on t=0
+}
+
+func TableAutoSaveStep(nbr_steps int) {
+	period := 0.0
+	Table.autosave = autosave{period, nbr_steps, Time, -1, nil} // count -1 allows output on t=0
 }
 
 func (t *DataTable) Add(output TableData) {
@@ -92,24 +98,22 @@ func (t *DataTable) Add(output TableData) {
 }
 
 func (t *DataTable) Save() {
-	t.flushlock.Lock() // flush during write gives errShortWrite
-	defer t.flushlock.Unlock()
 	t.init()
-	fprint(t, Time)
+	fmt.Fprint(t, Time)
 	for _, o := range t.outputs {
 		vec := o.average()
 		for _, v := range vec {
-			fprint(t, "\t", float32(v))
+			fmt.Fprint(t, "\t", float32(v))
 		}
 	}
-	fprintln(t)
-	//t.flush()
+	fmt.Fprintln(t)
+	t.flush()
 	t.count++
 }
 
 func (t *DataTable) Println(msg ...interface{}) {
 	t.init()
-	fprintln(t, msg...)
+	fmt.Fprintln(t, msg...)
 }
 
 func TablePrint(msg ...interface{}) {
@@ -126,27 +130,22 @@ func (t *DataTable) init() {
 	t.output = f
 
 	// write header
-	fprint(t, "# t (s)")
+	fmt.Fprint(t, "# t (s)")
 	for _, o := range t.outputs {
 		if o.NComp() == 1 {
-			fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+			fmt.Fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
 		} else {
 			for c := 0; c < o.NComp(); c++ {
-				fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
+				fmt.Fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
 			}
 		}
 	}
-	fprintln(t)
+	fmt.Fprintln(t)
 	t.Flush()
 
-	// periodically flush so GUI shows graph,
-	// but don't flush after every output for performance
-	// (httpfs flush is expensive)
 	go func() {
-		for {
-			time.Sleep(TableAutoflushRate * time.Second)
-			Table.flush()
-		}
+		time.Sleep(1 * time.Second)
+		Table.flush()
 	}()
 }
 
@@ -166,17 +165,4 @@ type TableData interface {
 	Name() string
 	Unit() string
 	NComp() int
-}
-
-// Safe fmt.Fprint, will fail on error
-func fprint(out io.Writer, x ...interface{}) {
-	_, err := fmt.Fprint(out, x...)
-	util.FatalErr(err)
-}
-
-// Safe fmt.Fprintln, will fail on error
-func fprintln(out io.Writer, x ...interface{}) {
-	_, err := fmt.Fprintln(out, x...)
-	util.FatalErr(err)
-
 }

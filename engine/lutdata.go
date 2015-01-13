@@ -40,7 +40,7 @@ func (p *lut) gpuLUT() cuda.LUTPtrs {
 		p.assureAlloc()
 		cuda.Sync() // sync previous kernels, may still be using gpu lut
 		for c := range p.gpu_buf {
-			cu.MemcpyHtoD(cu.DevicePtr(p.gpu_buf[c]), unsafe.Pointer(&p.cpu_buf[c][0]), cu.SIZEOF_FLOAT32*NREGION)
+			cuda.MemCpyHtoD(p.gpu_buf[c], unsafe.Pointer(&p.cpu_buf[c][0]), cu.SIZEOF_FLOAT32*NREGION)
 		}
 		p.gpu_ok = true
 		cuda.Sync() //sync upload

@@ -6,6 +6,7 @@ import (
 
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
 )
 
@@ -20,7 +21,7 @@ func NewSlice(nComp int, size [3]int) *data.Slice {
 //}
 
 func newSlice(nComp int, size [3]int, alloc func(int64) unsafe.Pointer, memType int8) *data.Slice {
-	data.EnableGPU(memFree, cu.MemFreeHost, memCpy, memCpyDtoH, memCpyHtoD)
+	data.EnableGPU(memFree, cu.MemFreeHost, MemCpy, MemCpyDtoH, MemCpyHtoD)
 	length := prod(size)
 	bytes := int64(length) * cu.SIZEOF_FLOAT32
 	ptrs := make([]unsafe.Pointer, nComp)
@@ -35,22 +36,28 @@ func newSlice(nComp int, size [3]int, alloc func(int64) unsafe.Pointer, memType 
 
 func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(uintptr(ptr))) }
 
-func memCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
+func MemCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
 	Sync() // sync previous kernels
-	cu.MemcpyDtoH(dst, cu.DevicePtr(uintptr(src)), bytes)
+	timer.Start("memcpyDtoH")
+	cu.MemcpyDtoH_(dst, cu.DevicePtr(uintptr(src)), bytes)
 	Sync() // sync copy
+	timer.Stop("memcpyDtoH")
 }
 
-func memCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
+func MemCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
 	Sync() // sync previous kernels
-	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst)), src, bytes)
+	timer.Start("memcpyHtoD")
+	cu.MemcpyHtoD_(cu.DevicePtr(uintptr(dst)), src, bytes)
 	Sync() // sync copy
+	timer.Stop("memcpyHtoD")
 }
 
-func memCpy(dst, src unsafe.Pointer, bytes int64) {
+func MemCpy(dst, src unsafe.Pointer, bytes int64) {
 	Sync()
-	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
+	timer.Start("memcpy")
+	cu.MemcpyAsync_(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
 	Sync()
+	timer.Stop("memcpy")
 }
 
 // Memset sets the Slice's components to the specified values.
@@ -58,6 +65,7 @@ func memCpy(dst, src unsafe.Pointer, bytes int64) {
 func Memset(s *data.Slice, val ...float32) {
 	if Synchronous { // debug
 		Sync()
+		timer.Start("memset")
 	}
 	util.Argument(len(val) == s.NComp())
 	for c, v := range val {
@@ -65,6 +73,7 @@ func Memset(s *data.Slice, val ...float32) {
 	}
 	if Synchronous { //debug
 		Sync()
+		timer.Stop("memset")
 	}
 }
 
@@ -80,13 +89,13 @@ func SetCell(s *data.Slice, comp int, ix, iy, iz int, value float32) {
 func SetElem(s *data.Slice, comp int, index int, value float32) {
 	f := value
 	dst := unsafe.Pointer(uintptr(s.DevPtr(comp)) + uintptr(index)*cu.SIZEOF_FLOAT32)
-	memCpyHtoD(dst, unsafe.Pointer(&f), cu.SIZEOF_FLOAT32)
+	MemCpyHtoD(dst, unsafe.Pointer(&f), cu.SIZEOF_FLOAT32)
 }
 
 func GetElem(s *data.Slice, comp int, index int) float32 {
 	var f float32
 	src := unsafe.Pointer(uintptr(s.DevPtr(comp)) + uintptr(index)*cu.SIZEOF_FLOAT32)
-	memCpyDtoH(unsafe.Pointer(&f), src, cu.SIZEOF_FLOAT32)
+	MemCpyDtoH(unsafe.Pointer(&f), src, cu.SIZEOF_FLOAT32)
 	return f
 }
 

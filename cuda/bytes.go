@@ -27,25 +27,19 @@ func NewBytes(Len int) *Bytes {
 // Upload src (host) to dst (gpu).
 func (dst *Bytes) Upload(src []byte) {
 	util.Argument(dst.Len == len(src))
-	Sync()
-	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)), unsafe.Pointer(&src[0]), int64(dst.Len))
-	Sync()
+	MemCpyHtoD(dst.Ptr, unsafe.Pointer(&src[0]), int64(dst.Len))
 }
 
 // Copy on device: dst = src.
 func (dst *Bytes) Copy(src *Bytes) {
 	util.Argument(dst.Len == src.Len)
-	Sync()
-	cu.MemcpyDtoD(cu.DevicePtr(uintptr(dst.Ptr)), cu.DevicePtr(uintptr(src.Ptr)), int64(dst.Len))
-	Sync()
+	MemCpy(dst.Ptr, src.Ptr, int64(dst.Len))
 }
 
 // Copy to host: dst = src.
 func (src *Bytes) Download(dst []byte) {
 	util.Argument(src.Len == len(dst))
-	Sync()
-	cu.MemcpyDtoH(unsafe.Pointer(&dst[0]), cu.DevicePtr(uintptr(src.Ptr)), int64(src.Len))
-	Sync()
+	MemCpyDtoH(unsafe.Pointer(&dst[0]), src.Ptr, int64(src.Len))
 }
 
 // Set one element to value.
@@ -55,9 +49,7 @@ func (dst *Bytes) Set(index int, value byte) {
 		log.Panic("Bytes.Set: index out of range:", index)
 	}
 	src := value
-	Sync()
-	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst.Ptr)+uintptr(index)), unsafe.Pointer(&src), 1)
-	Sync()
+	MemCpyHtoD(unsafe.Pointer(uintptr(dst.Ptr)+uintptr(index)), unsafe.Pointer(&src), 1)
 }
 
 // Get one element.
@@ -67,9 +59,7 @@ func (src *Bytes) Get(index int) byte {
 		log.Panic("Bytes.Set: index out of range:", index)
 	}
 	var dst byte
-	Sync()
-	cu.MemcpyDtoH(unsafe.Pointer(&dst), cu.DevicePtr(uintptr(src.Ptr)+uintptr(index)), 1)
-	Sync()
+	MemCpyDtoH(unsafe.Pointer(&dst), unsafe.Pointer(uintptr(src.Ptr)+uintptr(index)), 1)
 	return dst
 }
 

@@ -79,9 +79,7 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 // copy back single float result from GPU and recycle buffer
 func copyback(buf unsafe.Pointer) float32 {
 	var result float32
-	Sync() // sync kernel
-	cu.MemcpyDtoH(unsafe.Pointer(&result), cu.DevicePtr(uintptr(buf)), cu.SIZEOF_FLOAT32)
-	Sync() // sync result
+	MemCpyDtoH(unsafe.Pointer(&result), buf, cu.SIZEOF_FLOAT32)
 	reduceBuffers <- buf
 	return result
 }

@@ -45,7 +45,7 @@ func (ptr DevicePtr) Free() {
 // Requires unified addressing to be supported.
 // See also: MemcpyDtoD().
 // TODO(a): is actually an auto copy for device and/or host memory
-func Memcpy(dst, src DevicePtr, bytes int64) {
+func Memcpy_(dst, src DevicePtr, bytes int64) {
 	err := Result(C.cuMemcpy(C.CUdeviceptr(dst), C.CUdeviceptr(src), C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
@@ -53,7 +53,7 @@ func Memcpy(dst, src DevicePtr, bytes int64) {
 }
 
 // Asynchronously copies a number of bytes on the current device.
-func MemcpyAsync(dst, src DevicePtr, bytes int64, stream Stream) {
+func MemcpyAsync_(dst, src DevicePtr, bytes int64, stream Stream) {
 	err := Result(C.cuMemcpyAsync(C.CUdeviceptr(dst), C.CUdeviceptr(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
@@ -61,7 +61,7 @@ func MemcpyAsync(dst, src DevicePtr, bytes int64, stream Stream) {
 }
 
 // Copies a number of bytes from host to device.
-func MemcpyDtoD(dst, src DevicePtr, bytes int64) {
+func MemcpyDtoD_(dst, src DevicePtr, bytes int64) {
 	err := Result(C.cuMemcpyDtoD(C.CUdeviceptr(dst), C.CUdeviceptr(src), C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
@@ -69,7 +69,7 @@ func MemcpyDtoD(dst, src DevicePtr, bytes int64) {
 }
 
 // Asynchronously copies a number of bytes from host to device.
-func MemcpyDtoDAsync(dst, src DevicePtr, bytes int64, stream Stream) {
+func MemcpyDtoDAsync_(dst, src DevicePtr, bytes int64, stream Stream) {
 	err := Result(C.cuMemcpyDtoDAsync(C.CUdeviceptr(dst), C.CUdeviceptr(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
@@ -77,7 +77,7 @@ func MemcpyDtoDAsync(dst, src DevicePtr, bytes int64, stream Stream) {
 }
 
 // Copies a number of bytes from host to device.
-func MemcpyHtoD(dst DevicePtr, src unsafe.Pointer, bytes int64) {
+func MemcpyHtoD_(dst DevicePtr, src unsafe.Pointer, bytes int64) {
 	err := Result(C.cuMemcpyHtoD(C.CUdeviceptr(dst), src, C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
@@ -86,7 +86,7 @@ func MemcpyHtoD(dst DevicePtr, src unsafe.Pointer, bytes int64) {
 
 // Asynchronously copies a number of bytes from host to device.
 // The host memory must be page-locked (see MemRegister)
-func MemcpyHtoDAsync(dst DevicePtr, src unsafe.Pointer, bytes int64, stream Stream) {
+func MemcpyHtoDAsync_(dst DevicePtr, src unsafe.Pointer, bytes int64, stream Stream) {
 	err := Result(C.cuMemcpyHtoDAsync(C.CUdeviceptr(dst), src, C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)
@@ -94,7 +94,7 @@ func MemcpyHtoDAsync(dst DevicePtr, src unsafe.Pointer, bytes int64, stream Stre
 }
 
 // Copies a number of bytes from device to host.
-func MemcpyDtoH(dst unsafe.Pointer, src DevicePtr, bytes int64) {
+func MemcpyDtoH_(dst unsafe.Pointer, src DevicePtr, bytes int64) {
 	err := Result(C.cuMemcpyDtoH(dst, C.CUdeviceptr(src), C.size_t(bytes)))
 	if err != SUCCESS {
 		panic(err)
@@ -103,7 +103,7 @@ func MemcpyDtoH(dst unsafe.Pointer, src DevicePtr, bytes int64) {
 
 // Asynchronously copies a number of bytes device host to host.
 // The host memory must be page-locked (see MemRegister)
-func MemcpyDtoHAsync(dst unsafe.Pointer, src DevicePtr, bytes int64, stream Stream) {
+func MemcpyDtoHAsync_(dst unsafe.Pointer, src DevicePtr, bytes int64, stream Stream) {
 	err := Result(C.cuMemcpyDtoHAsync(dst, C.CUdeviceptr(src), C.size_t(bytes), C.CUstream(unsafe.Pointer(uintptr(stream)))))
 	if err != SUCCESS {
 		panic(err)

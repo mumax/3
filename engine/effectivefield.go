@@ -15,4 +15,5 @@ func SetEffectiveField(dst *data.Slice) {
 	B_anis.AddTo(dst)
 	B_ext.AddTo(dst)
 	B_therm.AddTo(dst)
+	B_iec.AddTo(dst)
 }

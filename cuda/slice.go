@@ -39,7 +39,7 @@ func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(uintptr(ptr))) }
 func MemCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
 	Sync() // sync previous kernels
 	timer.Start("memcpyDtoH")
-	cu.MemcpyDtoH_(dst, cu.DevicePtr(uintptr(src)), bytes)
+	cu.MemcpyDtoH(dst, cu.DevicePtr(uintptr(src)), bytes)
 	Sync() // sync copy
 	timer.Stop("memcpyDtoH")
 }
@@ -47,7 +47,7 @@ func MemCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
 func MemCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
 	Sync() // sync previous kernels
 	timer.Start("memcpyHtoD")
-	cu.MemcpyHtoD_(cu.DevicePtr(uintptr(dst)), src, bytes)
+	cu.MemcpyHtoD(cu.DevicePtr(uintptr(dst)), src, bytes)
 	Sync() // sync copy
 	timer.Stop("memcpyHtoD")
 }
@@ -55,7 +55,7 @@ func MemCpyHtoD(dst, src unsafe.Pointer, bytes int64) {
 func MemCpy(dst, src unsafe.Pointer, bytes int64) {
 	Sync()
 	timer.Start("memcpy")
-	cu.MemcpyAsync_(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
+	cu.MemcpyAsync(cu.DevicePtr(uintptr(dst)), cu.DevicePtr(uintptr(src)), bytes, stream0)
 	Sync()
 	timer.Stop("memcpy")
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/oommf"
+	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
 	"math"
 	"os"
@@ -13,6 +14,12 @@ import (
 // Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
 // Empty cacheDir disables caching.
 func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, cacheDir string) (kernel [3][3]*data.Slice) {
+	timer.Start("kernel_init")
+	timer.Stop("kernel_init") // warm-up
+
+	timer.Start("kernel_init")
+	defer timer.Stop("kernel_init")
+
 	sanityCheck(cellsize, pbc)
 	// Cache disabled
 	if cacheDir == "" {

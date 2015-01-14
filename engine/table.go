@@ -2,8 +2,10 @@ package engine
 
 import (
 	"fmt"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
+	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
 	"io"
 	"sync"
@@ -43,7 +45,14 @@ func (t *DataTable) Flush() error {
 	if t.output == nil {
 		return nil
 	}
+
+	if cuda.Synchronous {
+		timer.Start("io")
+	}
 	err := t.output.Flush()
+	if cuda.Synchronous {
+		timer.Stop("io")
+	}
 	util.FatalErr(err)
 	return err
 }
@@ -94,6 +103,10 @@ func (t *DataTable) Add(output TableData) {
 func (t *DataTable) Save() {
 	t.flushlock.Lock() // flush during write gives errShortWrite
 	defer t.flushlock.Unlock()
+
+	if cuda.Synchronous {
+		timer.Start("io")
+	}
 	t.init()
 	fprint(t, Time)
 	for _, o := range t.outputs {
@@ -105,6 +118,10 @@ func (t *DataTable) Save() {
 	fprintln(t)
 	//t.flush()
 	t.count++
+
+	if cuda.Synchronous {
+		timer.Stop("io")
+	}
 }
 
 func (t *DataTable) Println(msg ...interface{}) {

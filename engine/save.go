@@ -54,7 +54,7 @@ func SaveAs(q Quantity, fname string) {
 	}
 	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
 	data := buffer.HostCopy() // must be copy (async io)
-	SaveQue <- func() { saveAs_sync(fname, data, info, outputFormat) }
+	queOutput(func() { saveAs_sync(fname, data, info, outputFormat) })
 }
 
 // Save image once, with auto file name
@@ -65,7 +65,7 @@ func Snapshot(q Quantity) {
 		defer cuda.Recycle(s)
 	}
 	data := s.HostCopy() // must be copy (asyncio)
-	SaveQue <- func() { snapshot_sync(fname, data) }
+	queOutput(func() { snapshot_sync(fname, data) })
 	autonum[q]++
 }
 

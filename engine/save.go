@@ -2,14 +2,16 @@ package engine
 
 import (
 	"fmt"
+	"path"
+	"strings"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/draw"
+	"github.com/mumax/3/dump"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"path"
-	"strings"
 )
 
 func init() {
@@ -21,6 +23,7 @@ func init() {
 	DeclROnly("OVF2_BINARY", OVF2_BINARY, "OutputFormat = OVF2_BINARY sets binary OVF2 output")
 	DeclROnly("OVF1_TEXT", OVF1_TEXT, "OutputFormat = OVF1_TEXT sets text OVF1 output")
 	DeclROnly("OVF2_TEXT", OVF2_TEXT, "OutputFormat = OVF2_TEXT sets text OVF2 output")
+	DeclROnly("DUMP", DUMP, "OutputFormat = DUMP sets text DUMP output")
 	DeclFunc("Snapshot", Snapshot, "Save image of quantity")
 	DeclVar("SnapshotFormat", &SnapshotFormat, "Image format for snapshots: jpg, png or gif.")
 }
@@ -33,7 +36,7 @@ var (
 
 // Save once, with auto file name
 func Save(q Quantity) {
-	fname := autoFname(q.Name(), autonum[q])
+	fname := autoFname(q.Name(), outputFormat, autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 }
@@ -46,7 +49,7 @@ func SaveAs(q Quantity, fname string) {
 	}
 
 	if path.Ext(fname) == "" {
-		fname += ".ovf"
+		fname += ("." + StringFromOutputFormat[outputFormat])
 	}
 	buffer, recylce := q.Slice()
 	if recylce {
@@ -92,6 +95,8 @@ func saveAs_sync(fname string, s *data.Slice, info data.Meta, format OutputForma
 		oommf.WriteOVF2(f, s, info, "text")
 	case OVF2_BINARY:
 		oommf.WriteOVF2(f, s, info, "binary 4")
+	case DUMP:
+		dump.Write(f, s, info)
 	default:
 		panic("invalid output format")
 	}
@@ -105,4 +110,14 @@ const (
 	OVF1_BINARY
 	OVF2_TEXT
 	OVF2_BINARY
+	DUMP
+)
+
+var (
+	StringFromOutputFormat = map[OutputFormat]string{
+		OVF1_TEXT:   "ovf",
+		OVF1_BINARY: "ovf",
+		OVF2_TEXT:   "ovf",
+		OVF2_BINARY: "ovf",
+		DUMP:        "dump"}
 )

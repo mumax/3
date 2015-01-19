@@ -23,3 +23,7 @@ saveas(m, sprintf("mumax_ovf2_text"))
 step=4
 outputformat = OVF2_BINARY
 saveas(m, sprintf("mumax_ovf2_binary"))
+
+step=5
+outputformat = DUMP
+saveas(m, sprintf("mumax_dump"))

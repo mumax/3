@@ -6,6 +6,7 @@ import (
 	"github.com/mumax/3/draw"
 	"image"
 	"image/jpeg"
+	"math"
 	"net/http"
 	"sync"
 )
@@ -110,6 +111,9 @@ func (ren *render) render() {
 	d := ren.imgBuf
 	comp := ren.comp
 	quant := ren.quant
+	if comp == "" {
+		normalize(d)
+	}
 	if comp != "" && quant.NComp() > 1 { // ... if one has been selected by gui
 		d = d.Comp(compstr[comp])
 	}
@@ -123,3 +127,33 @@ func (ren *render) render() {
 }
 
 var compstr = map[string]int{"x": 0, "y": 1, "z": 2}
+
+func normalize(f *data.Slice) {
+	a := f.Vectors()
+	maxnorm := 0.
+	for i := range a[0] {
+		for j := range a[0][i] {
+			for k := range a[0][i][j] {
+
+				x, y, z := a[0][i][j][k], a[1][i][j][k], a[2][i][j][k]
+				norm := math.Sqrt(float64(x*x + y*y + z*z))
+				if norm > maxnorm {
+					maxnorm = norm
+				}
+
+			}
+		}
+	}
+	factor := float32(1 / maxnorm)
+
+	for i := range a[0] {
+		for j := range a[0][i] {
+			for k := range a[0][i][j] {
+				a[0][i][j][k] *= factor
+				a[1][i][j][k] *= factor
+				a[2][i][j][k] *= factor
+
+			}
+		}
+	}
+}

@@ -28,6 +28,12 @@ func ColorMap(min, max, value float32, colormap ...color.RGBA) color.RGBA {
 
 	// get two neighboring colors
 	i := int(index)
+	if i < 0 {
+		i = 0
+	}
+	if i >= len(colormap)-1 {
+		i = len(colormap) - 2
+	}
 	c1 := colormap[i]
 	c2 := colormap[i+1]
 

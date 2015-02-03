@@ -1,0 +1,32 @@
+Nx := 128
+Ny := 32
+Nz := 2
+
+cx := 5e-9
+cy := 4e-9
+cz := 3e-9
+
+V := Nx * Ny * Nz * cx * cy * cz
+
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(cx, cy, cz)
+
+Ms := 100e3
+Msat = Ms
+
+M = Uniform(1, 0, 0)
+
+print(E_zeeman)
+
+B := 1e-3
+
+tol := B*Ms*V / 1e5
+
+B_ext = vector(B, 0, 0)
+expect("E", E_zeeman, -B*Ms*V, tol)
+
+B_ext = vector(0, B, 0)
+expect("E", E_zeeman, 0, tol)
+
+B_ext = vector(-B, 0, 0)
+expect("E", E_zeeman, B*Ms*V, tol)

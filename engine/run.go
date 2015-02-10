@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+	"math"
 	"os"
 )
 
@@ -113,6 +114,13 @@ func adaptDt(corr float64) {
 		Dt_si = FixDt
 		return
 	}
+
+	// corner case triggered by err = 0: just keep time step.
+	// see test/regression017.mx3
+	if math.IsNaN(corr) {
+		corr = 1
+	}
+
 	util.AssertMsg(corr != 0, "Time step too small, check if parameters are sensible")
 	corr *= Headroom
 	if corr > 2 {

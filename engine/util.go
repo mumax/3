@@ -10,6 +10,7 @@ import (
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
 	"math"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -52,7 +53,9 @@ func Vector(x, y, z float64) data.Vector {
 // and print suited message.
 func Expect(msg string, have, want, maxError float64) {
 	if math.IsNaN(have) || math.IsNaN(want) || math.Abs(have-want) > maxError {
-		util.Fatal(msg, ":", " have: ", have, " want: ", want, "±", maxError)
+		LogOut(msg, ":", " have: ", have, " want: ", want, "±", maxError)
+		Close()
+		os.Exit(1)
 	} else {
 		LogOut(msg, ":", have, "OK")
 	}

@@ -1,0 +1,29 @@
+/* 
+	Test topological charge calculation:
+	for vortex S = -0.5, 0.5, 1.5... 
+*/
+
+tol := 0.0005
+
+setgridsize(64, 128, 8)
+setcellsize(3e-9, 1.5e-9, 4e-9)
+
+// aka Py
+Msat    = 800e3
+Aex     = 13e-12
+
+m = vortex(1, 1)
+relax()
+expect("Skyrmion number" , ext_topologicalcharge,  0.5, tol)
+
+m = vortex(-1, 1)
+relax()
+expect("Skyrmion number" , ext_topologicalcharge,  0.5, tol)
+
+m = vortex(1, -1)
+relax()
+expect("Skyrmion number" , ext_topologicalcharge,  -0.5, tol)
+
+m = vortex(-1, -1)
+relax()
+expect("Skyrmion number" , ext_topologicalcharge,  -0.5, tol)

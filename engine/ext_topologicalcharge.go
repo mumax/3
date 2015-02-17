@@ -14,7 +14,7 @@ var (
 
 func init() {
 	Ext_TopologicalCharge = NewGetScalar("ext_topologicalcharge", "", "Topological charge", GetTopologicalCharge)
-	Ext_TopologicalChargeDensity.init("ext_topologicalchargedensity", "1/m3", "Topological charge density", SetTopologicalChargeDensity)
+	Ext_TopologicalChargeDensity.init("ext_topologicalchargedensity", "1/m2", "Topological charge density", SetTopologicalChargeDensity)
 }
 
 func SetTopologicalChargeDensity(dst *data.Slice) {

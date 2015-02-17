@@ -3,6 +3,31 @@
 #include "float3.h"
 #include "stencil.h"
 
+// Exchange + Dzyaloshinskii-Moriya interaction for bulk material.
+// Energy:
+//
+// 	E  = D M . rot(M)
+//
+// Effective field:
+//
+// 	Hx = 2A/Bs nabla²Mx + 2D/Bs dzMy - 2D/Bs dyMz
+// 	Hy = 2A/Bs nabla²My + 2D/Bs dxMz - 2D/Bs dzMx
+// 	Hz = 2A/Bs nabla²Mz + 2D/Bs dyMx - 2D/Bs dxMy
+//
+// Boundary conditions:
+//
+// 	        2A dxMx = 0
+// 	 D Mz + 2A dxMy = 0
+// 	-D My + 2A dxMz = 0
+//
+// 	-D Mz + 2A dyMx = 0
+// 	        2A dyMy = 0
+// 	 D Mx + 2A dyMz = 0
+//
+// 	 D My + 2A dzMx = 0
+// 	-D Mx + 2A dzMy = 0
+// 	        2A dzMz = 0
+//
 extern "C" __global__ void
 adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
            float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,

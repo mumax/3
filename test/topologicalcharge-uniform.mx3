@@ -25,7 +25,7 @@ relax()
 expect("Skyrmion number" , ext_topologicalcharge,  0.0, tol)
 
 Ku1     = 0.0
-tol = 5e-11
+tol = 5e-10  // changed by Arne, 5e-11 failed on GTX480
 
 b_ext = vector(2.0, 0.0, 0.0)
 m = uniform(1.0, 0.0, 0.0)

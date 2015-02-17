@@ -14,11 +14,11 @@ var (
 
 func init() {
 	Ext_TopologicalCharge = NewGetScalar("ext_topologicalcharge", "", "Topological charge", GetTopologicalCharge)
-	Ext_TopologicalChargeDensity.init("ext_topologicalchargedensity", "1/m3", "Topological charge density", GetTopologicalChargeDensity)
+	Ext_TopologicalChargeDensity.init("ext_topologicalchargedensity", "1/m3", "Topological charge density", SetTopologicalChargeDensity)
 }
 
-func GetTopologicalChargeDensity(dst *data.Slice) {
-	cuda.AddTopologicalCharge(dst, M.Buffer(), M.Mesh())
+func SetTopologicalChargeDensity(dst *data.Slice) {
+	cuda.SetTopologicalCharge(dst, M.Buffer(), M.Mesh())
 }
 
 func GetTopologicalCharge() float64 {

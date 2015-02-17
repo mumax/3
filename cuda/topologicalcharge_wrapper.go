@@ -12,11 +12,11 @@ import (
 	"unsafe"
 )
 
-// CUDA handle for addtopologicalcharge kernel
-var addtopologicalcharge_code cu.Function
+// CUDA handle for settopologicalcharge kernel
+var settopologicalcharge_code cu.Function
 
-// Stores the arguments for addtopologicalcharge kernel invocation
-type addtopologicalcharge_args_t struct {
+// Stores the arguments for settopologicalcharge kernel invocation
+type settopologicalcharge_args_t struct {
 	arg_s     unsafe.Pointer
 	arg_mx    unsafe.Pointer
 	arg_my    unsafe.Pointer
@@ -30,79 +30,79 @@ type addtopologicalcharge_args_t struct {
 	sync.Mutex
 }
 
-// Stores the arguments for addtopologicalcharge kernel invocation
-var addtopologicalcharge_args addtopologicalcharge_args_t
+// Stores the arguments for settopologicalcharge kernel invocation
+var settopologicalcharge_args settopologicalcharge_args_t
 
 func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	addtopologicalcharge_args.argptr[0] = unsafe.Pointer(&addtopologicalcharge_args.arg_s)
-	addtopologicalcharge_args.argptr[1] = unsafe.Pointer(&addtopologicalcharge_args.arg_mx)
-	addtopologicalcharge_args.argptr[2] = unsafe.Pointer(&addtopologicalcharge_args.arg_my)
-	addtopologicalcharge_args.argptr[3] = unsafe.Pointer(&addtopologicalcharge_args.arg_mz)
-	addtopologicalcharge_args.argptr[4] = unsafe.Pointer(&addtopologicalcharge_args.arg_icxcy)
-	addtopologicalcharge_args.argptr[5] = unsafe.Pointer(&addtopologicalcharge_args.arg_Nx)
-	addtopologicalcharge_args.argptr[6] = unsafe.Pointer(&addtopologicalcharge_args.arg_Ny)
-	addtopologicalcharge_args.argptr[7] = unsafe.Pointer(&addtopologicalcharge_args.arg_Nz)
-	addtopologicalcharge_args.argptr[8] = unsafe.Pointer(&addtopologicalcharge_args.arg_PBC)
+	settopologicalcharge_args.argptr[0] = unsafe.Pointer(&settopologicalcharge_args.arg_s)
+	settopologicalcharge_args.argptr[1] = unsafe.Pointer(&settopologicalcharge_args.arg_mx)
+	settopologicalcharge_args.argptr[2] = unsafe.Pointer(&settopologicalcharge_args.arg_my)
+	settopologicalcharge_args.argptr[3] = unsafe.Pointer(&settopologicalcharge_args.arg_mz)
+	settopologicalcharge_args.argptr[4] = unsafe.Pointer(&settopologicalcharge_args.arg_icxcy)
+	settopologicalcharge_args.argptr[5] = unsafe.Pointer(&settopologicalcharge_args.arg_Nx)
+	settopologicalcharge_args.argptr[6] = unsafe.Pointer(&settopologicalcharge_args.arg_Ny)
+	settopologicalcharge_args.argptr[7] = unsafe.Pointer(&settopologicalcharge_args.arg_Nz)
+	settopologicalcharge_args.argptr[8] = unsafe.Pointer(&settopologicalcharge_args.arg_PBC)
 }
 
-// Wrapper for addtopologicalcharge CUDA kernel, asynchronous.
-func k_addtopologicalcharge_async(s unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, icxcy float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
+// Wrapper for settopologicalcharge CUDA kernel, asynchronous.
+func k_settopologicalcharge_async(s unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, icxcy float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
 	if Synchronous { // debug
 		Sync()
-		timer.Start("addtopologicalcharge")
+		timer.Start("settopologicalcharge")
 	}
 
-	addtopologicalcharge_args.Lock()
-	defer addtopologicalcharge_args.Unlock()
+	settopologicalcharge_args.Lock()
+	defer settopologicalcharge_args.Unlock()
 
-	if addtopologicalcharge_code == 0 {
-		addtopologicalcharge_code = fatbinLoad(addtopologicalcharge_map, "addtopologicalcharge")
+	if settopologicalcharge_code == 0 {
+		settopologicalcharge_code = fatbinLoad(settopologicalcharge_map, "settopologicalcharge")
 	}
 
-	addtopologicalcharge_args.arg_s = s
-	addtopologicalcharge_args.arg_mx = mx
-	addtopologicalcharge_args.arg_my = my
-	addtopologicalcharge_args.arg_mz = mz
-	addtopologicalcharge_args.arg_icxcy = icxcy
-	addtopologicalcharge_args.arg_Nx = Nx
-	addtopologicalcharge_args.arg_Ny = Ny
-	addtopologicalcharge_args.arg_Nz = Nz
-	addtopologicalcharge_args.arg_PBC = PBC
+	settopologicalcharge_args.arg_s = s
+	settopologicalcharge_args.arg_mx = mx
+	settopologicalcharge_args.arg_my = my
+	settopologicalcharge_args.arg_mz = mz
+	settopologicalcharge_args.arg_icxcy = icxcy
+	settopologicalcharge_args.arg_Nx = Nx
+	settopologicalcharge_args.arg_Ny = Ny
+	settopologicalcharge_args.arg_Nz = Nz
+	settopologicalcharge_args.arg_PBC = PBC
 
-	args := addtopologicalcharge_args.argptr[:]
-	cu.LaunchKernel(addtopologicalcharge_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
+	args := settopologicalcharge_args.argptr[:]
+	cu.LaunchKernel(settopologicalcharge_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous { // debug
 		Sync()
-		timer.Stop("addtopologicalcharge")
+		timer.Stop("settopologicalcharge")
 	}
 }
 
-// maps compute capability on PTX code for addtopologicalcharge kernel.
-var addtopologicalcharge_map = map[int]string{0: "",
-	20: addtopologicalcharge_ptx_20,
-	30: addtopologicalcharge_ptx_30,
-	35: addtopologicalcharge_ptx_35}
+// maps compute capability on PTX code for settopologicalcharge kernel.
+var settopologicalcharge_map = map[int]string{0: "",
+	20: settopologicalcharge_ptx_20,
+	30: settopologicalcharge_ptx_30,
+	35: settopologicalcharge_ptx_35}
 
-// addtopologicalcharge PTX code for various compute capabilities.
+// settopologicalcharge PTX code for various compute capabilities.
 const (
-	addtopologicalcharge_ptx_20 = `
+	settopologicalcharge_ptx_20 = `
 .version 4.1
 .target sm_20
 .address_size 64
 
 
-.visible .entry addtopologicalcharge(
-	.param .u64 addtopologicalcharge_param_0,
-	.param .u64 addtopologicalcharge_param_1,
-	.param .u64 addtopologicalcharge_param_2,
-	.param .u64 addtopologicalcharge_param_3,
-	.param .f32 addtopologicalcharge_param_4,
-	.param .u32 addtopologicalcharge_param_5,
-	.param .u32 addtopologicalcharge_param_6,
-	.param .u32 addtopologicalcharge_param_7,
-	.param .u8 addtopologicalcharge_param_8
+.visible .entry settopologicalcharge(
+	.param .u64 settopologicalcharge_param_0,
+	.param .u64 settopologicalcharge_param_1,
+	.param .u64 settopologicalcharge_param_2,
+	.param .u64 settopologicalcharge_param_3,
+	.param .f32 settopologicalcharge_param_4,
+	.param .u32 settopologicalcharge_param_5,
+	.param .u32 settopologicalcharge_param_6,
+	.param .u32 settopologicalcharge_param_7,
+	.param .u8 settopologicalcharge_param_8
 )
 {
 	.reg .pred 	%p<79>;
@@ -112,15 +112,15 @@ const (
 	.reg .s64 	%rd<61>;
 
 
-	ld.param.u64 	%rd5, [addtopologicalcharge_param_0];
-	ld.param.u64 	%rd6, [addtopologicalcharge_param_1];
-	ld.param.u64 	%rd7, [addtopologicalcharge_param_2];
-	ld.param.u64 	%rd8, [addtopologicalcharge_param_3];
-	ld.param.f32 	%f126, [addtopologicalcharge_param_4];
-	ld.param.u32 	%r38, [addtopologicalcharge_param_5];
-	ld.param.u32 	%r39, [addtopologicalcharge_param_6];
-	ld.param.u32 	%r40, [addtopologicalcharge_param_7];
-	ld.param.u8 	%rs3, [addtopologicalcharge_param_8];
+	ld.param.u64 	%rd5, [settopologicalcharge_param_0];
+	ld.param.u64 	%rd6, [settopologicalcharge_param_1];
+	ld.param.u64 	%rd7, [settopologicalcharge_param_2];
+	ld.param.u64 	%rd8, [settopologicalcharge_param_3];
+	ld.param.f32 	%f126, [settopologicalcharge_param_4];
+	ld.param.u32 	%r38, [settopologicalcharge_param_5];
+	ld.param.u32 	%r39, [settopologicalcharge_param_6];
+	ld.param.u32 	%r40, [settopologicalcharge_param_7];
+	ld.param.u8 	%rs3, [settopologicalcharge_param_8];
 	cvta.to.global.u64 	%rd1, %rd8;
 	cvta.to.global.u64 	%rd2, %rd7;
 	cvta.to.global.u64 	%rd3, %rd6;
@@ -702,22 +702,22 @@ BB0_72:
 
 
 `
-	addtopologicalcharge_ptx_30 = `
+	settopologicalcharge_ptx_30 = `
 .version 4.1
 .target sm_30
 .address_size 64
 
 
-.visible .entry addtopologicalcharge(
-	.param .u64 addtopologicalcharge_param_0,
-	.param .u64 addtopologicalcharge_param_1,
-	.param .u64 addtopologicalcharge_param_2,
-	.param .u64 addtopologicalcharge_param_3,
-	.param .f32 addtopologicalcharge_param_4,
-	.param .u32 addtopologicalcharge_param_5,
-	.param .u32 addtopologicalcharge_param_6,
-	.param .u32 addtopologicalcharge_param_7,
-	.param .u8 addtopologicalcharge_param_8
+.visible .entry settopologicalcharge(
+	.param .u64 settopologicalcharge_param_0,
+	.param .u64 settopologicalcharge_param_1,
+	.param .u64 settopologicalcharge_param_2,
+	.param .u64 settopologicalcharge_param_3,
+	.param .f32 settopologicalcharge_param_4,
+	.param .u32 settopologicalcharge_param_5,
+	.param .u32 settopologicalcharge_param_6,
+	.param .u32 settopologicalcharge_param_7,
+	.param .u8 settopologicalcharge_param_8
 )
 {
 	.reg .pred 	%p<79>;
@@ -727,15 +727,15 @@ BB0_72:
 	.reg .s64 	%rd<61>;
 
 
-	ld.param.u64 	%rd5, [addtopologicalcharge_param_0];
-	ld.param.u64 	%rd6, [addtopologicalcharge_param_1];
-	ld.param.u64 	%rd7, [addtopologicalcharge_param_2];
-	ld.param.u64 	%rd8, [addtopologicalcharge_param_3];
-	ld.param.f32 	%f126, [addtopologicalcharge_param_4];
-	ld.param.u32 	%r38, [addtopologicalcharge_param_5];
-	ld.param.u32 	%r39, [addtopologicalcharge_param_6];
-	ld.param.u32 	%r40, [addtopologicalcharge_param_7];
-	ld.param.u8 	%rs3, [addtopologicalcharge_param_8];
+	ld.param.u64 	%rd5, [settopologicalcharge_param_0];
+	ld.param.u64 	%rd6, [settopologicalcharge_param_1];
+	ld.param.u64 	%rd7, [settopologicalcharge_param_2];
+	ld.param.u64 	%rd8, [settopologicalcharge_param_3];
+	ld.param.f32 	%f126, [settopologicalcharge_param_4];
+	ld.param.u32 	%r38, [settopologicalcharge_param_5];
+	ld.param.u32 	%r39, [settopologicalcharge_param_6];
+	ld.param.u32 	%r40, [settopologicalcharge_param_7];
+	ld.param.u8 	%rs3, [settopologicalcharge_param_8];
 	cvta.to.global.u64 	%rd1, %rd8;
 	cvta.to.global.u64 	%rd2, %rd7;
 	cvta.to.global.u64 	%rd3, %rd6;
@@ -1317,7 +1317,7 @@ BB0_72:
 
 
 `
-	addtopologicalcharge_ptx_35 = `
+	settopologicalcharge_ptx_35 = `
 .version 4.1
 .target sm_35
 .address_size 64
@@ -1390,16 +1390,16 @@ BB0_72:
 	ret;
 }
 
-.visible .entry addtopologicalcharge(
-	.param .u64 addtopologicalcharge_param_0,
-	.param .u64 addtopologicalcharge_param_1,
-	.param .u64 addtopologicalcharge_param_2,
-	.param .u64 addtopologicalcharge_param_3,
-	.param .f32 addtopologicalcharge_param_4,
-	.param .u32 addtopologicalcharge_param_5,
-	.param .u32 addtopologicalcharge_param_6,
-	.param .u32 addtopologicalcharge_param_7,
-	.param .u8 addtopologicalcharge_param_8
+.visible .entry settopologicalcharge(
+	.param .u64 settopologicalcharge_param_0,
+	.param .u64 settopologicalcharge_param_1,
+	.param .u64 settopologicalcharge_param_2,
+	.param .u64 settopologicalcharge_param_3,
+	.param .f32 settopologicalcharge_param_4,
+	.param .u32 settopologicalcharge_param_5,
+	.param .u32 settopologicalcharge_param_6,
+	.param .u32 settopologicalcharge_param_7,
+	.param .u8 settopologicalcharge_param_8
 )
 {
 	.reg .pred 	%p<79>;
@@ -1409,15 +1409,15 @@ BB0_72:
 	.reg .s64 	%rd<46>;
 
 
-	ld.param.u64 	%rd5, [addtopologicalcharge_param_0];
-	ld.param.u64 	%rd6, [addtopologicalcharge_param_1];
-	ld.param.u64 	%rd7, [addtopologicalcharge_param_2];
-	ld.param.u64 	%rd8, [addtopologicalcharge_param_3];
-	ld.param.f32 	%f126, [addtopologicalcharge_param_4];
-	ld.param.u32 	%r40, [addtopologicalcharge_param_5];
-	ld.param.u32 	%r41, [addtopologicalcharge_param_6];
-	ld.param.u32 	%r42, [addtopologicalcharge_param_7];
-	ld.param.u8 	%rs3, [addtopologicalcharge_param_8];
+	ld.param.u64 	%rd5, [settopologicalcharge_param_0];
+	ld.param.u64 	%rd6, [settopologicalcharge_param_1];
+	ld.param.u64 	%rd7, [settopologicalcharge_param_2];
+	ld.param.u64 	%rd8, [settopologicalcharge_param_3];
+	ld.param.f32 	%f126, [settopologicalcharge_param_4];
+	ld.param.u32 	%r40, [settopologicalcharge_param_5];
+	ld.param.u32 	%r41, [settopologicalcharge_param_6];
+	ld.param.u32 	%r42, [settopologicalcharge_param_7];
+	ld.param.u8 	%rs3, [settopologicalcharge_param_8];
 	cvta.to.global.u64 	%rd1, %rd8;
 	cvta.to.global.u64 	%rd2, %rd7;
 	cvta.to.global.u64 	%rd3, %rd6;

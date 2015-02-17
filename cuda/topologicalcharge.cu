@@ -64,21 +64,21 @@ settopologicalcharge(float* __restrict__ s,
             m_p2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
 
-        if (is0(m_p1) && is0(m_m1))					//  +0
+        if (is0(m_p1) && is0(m_m1))                       //  +0
         {
-            dmdx = make_float3(0.0f, 0.0f, 0.0f);	// --1-- zero
+            dmdx = make_float3(0.0f, 0.0f, 0.0f);         // --1-- zero
         }
         else if ((is0(m_m2) | is0(m_p2)) && !is0(m_p1) && !is0(m_m1))
         {
-            dmdx = 0.5f * (m_p1 - m_m1);			// -111-, 1111-, -1111 central difference,  ε ~ h^2
+            dmdx = 0.5f * (m_p1 - m_m1);                  // -111-, 1111-, -1111 central difference,  ε ~ h^2
         }
         else if (is0(m_p1) && is0(m_m2))
         {
-            dmdx =  m0 - m_m1;						// -11-- backward difference, ε ~ h^1
+            dmdx =  m0 - m_m1;                            // -11-- backward difference, ε ~ h^1
         }
         else if (is0(m_m1) && is0(m_p2))
         {
-            dmdx = -m0 + m_p1;						// --11- forward difference,  ε ~ h^1
+            dmdx = -m0 + m_p1;                            // --11- forward difference,  ε ~ h^1
         }
         else if (!is0(m_m2) && is0(m_p1))
         {
@@ -124,29 +124,29 @@ settopologicalcharge(float* __restrict__ s,
             m_p2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
 
-        if (is0(m_p1) && is0(m_m1))					//  +0
+        if (is0(m_p1) && is0(m_m1))                                        //  +0
         {
-            dmdy = make_float3(0.0f, 0.0f, 0.0f);	// --1-- zero
+            dmdy = make_float3(0.0f, 0.0f, 0.0f);                          // --1-- zero
         }
         else if ((is0(m_m2) | is0(m_p2)) && !is0(m_p1) && !is0(m_m1))
         {
-            dmdy = 0.5f * (m_p1 - m_m1);			// -111-, 1111-, -1111 central difference,  ε ~ h^2
+            dmdy = 0.5f * (m_p1 - m_m1);                                   // -111-, 1111-, -1111 central difference,  ε ~ h^2
         }
         else if (is0(m_p1) && is0(m_m2))
         {
-            dmdy =  m0 - m_m1;						// -11-- backward difference, ε ~ h^1
+            dmdy =  m0 - m_m1;                                             // -11-- backward difference, ε ~ h^1
         }
         else if (is0(m_m1) && is0(m_p2))
         {
-            dmdy = -m0 + m_p1;						// --11- forward difference,  ε ~ h^1
+            dmdy = -m0 + m_p1;                                             // --11- forward difference,  ε ~ h^1
         }
         else if (!is0(m_m2) && is0(m_p1))
         {
-            dmdy =  0.5f * m_m2 - 2.0f * m_m1 + 1.5f * m0; // 111-- backward difference, ε ~ h^2
+            dmdy =  0.5f * m_m2 - 2.0f * m_m1 + 1.5f * m0;                 // 111-- backward difference, ε ~ h^2
         }
         else if (!is0(m_p2) && is0(m_m1))
         {
-            dmdy = -0.5f * m_p2 + 2.0f * m_p1 - 1.5f * m0; // --111 forward difference,  ε ~ h^2
+            dmdy = -0.5f * m_p2 + 2.0f * m_p1 - 1.5f * m0;                 // --111 forward difference,  ε ~ h^2
         }
         else
         {

@@ -28,5 +28,5 @@ func GetTopologicalCharge() float64 {
 	}
 	c := Mesh().CellSize()
 	N := Mesh().Size()
-	return (0.25 * c[0] * c[1] / math.Pi / float64(N[2])) * float64(cuda.Sum(s))
+	return (0.25 * c[X] * c[Y] / math.Pi / float64(N[Z])) * float64(cuda.Sum(s))
 }

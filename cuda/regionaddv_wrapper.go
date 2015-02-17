@@ -6,11 +6,10 @@ package cuda
 */
 
 import (
-	"sync"
-	"unsafe"
-
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
+	"sync"
+	"unsafe"
 )
 
 // CUDA handle for regionaddv kernel
@@ -81,12 +80,13 @@ func k_regionaddv_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Po
 var regionaddv_map = map[int]string{0: "",
 	20: regionaddv_ptx_20,
 	30: regionaddv_ptx_30,
-	35: regionaddv_ptx_35}
+	35: regionaddv_ptx_35,
+	50: regionaddv_ptx_50}
 
 // regionaddv PTX code for various compute capabilities.
 const (
 	regionaddv_ptx_20 = `
-.version 4.0
+.version 4.1
 .target sm_20
 .address_size 64
 
@@ -164,7 +164,7 @@ BB0_2:
 
 `
 	regionaddv_ptx_30 = `
-.version 4.0
+.version 4.1
 .target sm_30
 .address_size 64
 
@@ -242,7 +242,7 @@ BB0_2:
 
 `
 	regionaddv_ptx_35 = `
-.version 4.0
+.version 4.1
 .target sm_35
 .address_size 64
 
@@ -263,6 +263,47 @@ BB0_2:
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
 )
 {
 	.reg .s32 	%r<2>;
@@ -307,7 +348,7 @@ BB0_2:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_2;
+	@%p1 bra 	BB5_2;
 
 	cvta.to.global.u64 	%rd8, %rd3;
 	cvta.to.global.u64 	%rd9, %rd6;
@@ -342,7 +383,155 @@ BB0_2:
 	add.f32 	%f9, %f7, %f8;
 	st.global.f32 	[%rd26], %f9;
 
-BB2_2:
+BB5_2:
+	ret;
+}
+
+
+`
+	regionaddv_ptx_50 = `
+.version 4.1
+.target sm_50
+.address_size 64
+
+
+.weak .func  (.param .b32 func_retval0) cudaMalloc(
+	.param .b64 cudaMalloc_param_0,
+	.param .b64 cudaMalloc_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
+	.param .b64 cudaFuncGetAttributes_param_0,
+	.param .b64 cudaFuncGetAttributes_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.visible .entry regionaddv(
+	.param .u64 regionaddv_param_0,
+	.param .u64 regionaddv_param_1,
+	.param .u64 regionaddv_param_2,
+	.param .u64 regionaddv_param_3,
+	.param .u64 regionaddv_param_4,
+	.param .u64 regionaddv_param_5,
+	.param .u64 regionaddv_param_6,
+	.param .u32 regionaddv_param_7
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .s16 	%rs<2>;
+	.reg .s32 	%r<9>;
+	.reg .f32 	%f<10>;
+	.reg .s64 	%rd<27>;
+
+
+	ld.param.u64 	%rd1, [regionaddv_param_0];
+	ld.param.u64 	%rd2, [regionaddv_param_1];
+	ld.param.u64 	%rd3, [regionaddv_param_2];
+	ld.param.u64 	%rd4, [regionaddv_param_3];
+	ld.param.u64 	%rd5, [regionaddv_param_4];
+	ld.param.u64 	%rd6, [regionaddv_param_5];
+	ld.param.u64 	%rd7, [regionaddv_param_6];
+	ld.param.u32 	%r2, [regionaddv_param_7];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB5_2;
+
+	cvta.to.global.u64 	%rd8, %rd3;
+	cvta.to.global.u64 	%rd9, %rd6;
+	cvta.to.global.u64 	%rd10, %rd2;
+	cvta.to.global.u64 	%rd11, %rd5;
+	cvta.to.global.u64 	%rd12, %rd1;
+	cvta.to.global.u64 	%rd13, %rd4;
+	cvta.to.global.u64 	%rd14, %rd7;
+	cvt.s64.s32	%rd15, %r1;
+	add.s64 	%rd16, %rd14, %rd15;
+	ld.global.nc.u8 	%rs1, [%rd16];
+	cvt.u64.u16	%rd17, %rs1;
+	and.b64  	%rd18, %rd17, 255;
+	shl.b64 	%rd19, %rd18, 2;
+	add.s64 	%rd20, %rd13, %rd19;
+	mul.wide.s32 	%rd21, %r1, 4;
+	add.s64 	%rd22, %rd12, %rd21;
+	ld.global.f32 	%f1, [%rd22];
+	ld.global.nc.f32 	%f2, [%rd20];
+	add.f32 	%f3, %f1, %f2;
+	st.global.f32 	[%rd22], %f3;
+	add.s64 	%rd23, %rd11, %rd19;
+	add.s64 	%rd24, %rd10, %rd21;
+	ld.global.f32 	%f4, [%rd24];
+	ld.global.nc.f32 	%f5, [%rd23];
+	add.f32 	%f6, %f4, %f5;
+	st.global.f32 	[%rd24], %f6;
+	add.s64 	%rd25, %rd9, %rd19;
+	add.s64 	%rd26, %rd8, %rd21;
+	ld.global.f32 	%f7, [%rd26];
+	ld.global.nc.f32 	%f8, [%rd25];
+	add.f32 	%f9, %f7, %f8;
+	st.global.f32 	[%rd26], %f9;
+
+BB5_2:
 	ret;
 }
 

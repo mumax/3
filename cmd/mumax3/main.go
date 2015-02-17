@@ -64,7 +64,7 @@ func main() {
 	defer engine.Close() // flushes pending output, if any
 
 	defer func() {
-		if *flag_sync{
+		if *flag_sync {
 			timer.Print(os.Stdout)
 		}
 	}()

@@ -1,0 +1,52 @@
+// Test MaxAngle, and indirectly SpinAngle.
+
+setgridsize(128, 128, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Aex   = 13e-12
+Msat  = 800e3
+alpha = 0.02
+
+save(SpinAngle)
+
+defregion(1, xrange(0, inf))
+
+TOL := 1e-3 // cuda acosf is very inaccurate
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(1, 0, 0))
+expect("angle", MaxAngle, 0, TOL)
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(0, 1, 0))
+expect("angle", MaxAngle, pi/2, TOL)
+
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(-1, 0, 0))
+expect("angle", MaxAngle, pi, TOL)
+
+
+// Test de-coupled region
+defregion(2, yrange(0, inf))
+m.SetRegion(2, uniform(1, 1, 1))
+ext_scaleExchange(0, 2, 0)
+ext_scaleExchange(1, 2, 0)
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(1, 0, 0))
+expect("angle", MaxAngle, 0, TOL)
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(0, 1, 0))
+expect("angle", MaxAngle, pi/2, TOL)
+
+
+m.SetRegion(0, uniform(1, 0, 0))
+m.SetRegion(1, uniform(-1, 0, 0))
+expect("angle", MaxAngle, pi, TOL)
+
+// Test wrap-around with PBC
+SetPBC(1, 1, 0)
+m=vortex(1, 1)
+expect("angle", MaxAngle, pi, 0.1)

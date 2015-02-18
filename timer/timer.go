@@ -10,6 +10,7 @@ import (
 var (
 	clocks     map[string]*clock
 	firstStart time.Time
+	Timeout    time.Duration
 )
 
 func Start(key string) {
@@ -45,8 +46,12 @@ func (c *clock) Stop() {
 	if (c.started == time.Time{}) {
 		return // not started
 	}
-	c.total += time.Since(c.started)
+	d := time.Since(c.started)
+	c.total += d
 	c.started = time.Time{}
+	if Timeout != 0 && d > Timeout {
+		panic("launch timeout: " + d.String())
+	}
 }
 
 // entry for sorted output by Print()

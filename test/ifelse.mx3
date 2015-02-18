@@ -2,6 +2,9 @@
 	Regression test for crash on if w/o else
 */
 
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
 a := 0.0
 
 

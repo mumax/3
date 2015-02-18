@@ -2,6 +2,9 @@
 	Test basic slice operations.
 */
 
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
 a := NewSlice(1, 10, 4, 2)
 a.set(0, 0, 0, 0, 0)
 a.set(0, 1, 0, 0, 100)

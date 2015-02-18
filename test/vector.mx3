@@ -2,6 +2,9 @@
 	Test basic vector math.
 */
 
+setgridsize(1,1,1)
+setcellsize(1,1,1)
+
 x := vector(1, 0, 0)
 y := vector(0, 1, 0)
 z := vector(0, 0, 1)

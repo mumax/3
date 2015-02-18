@@ -22,6 +22,7 @@ func sAverageUniverse(s *data.Slice) []float64 {
 	avg := make([]float64, s.NComp())
 	for i := range avg {
 		avg[i] = float64(cuda.Sum(s.Comp(i))) / nCell
+		checkNaN1(avg[i])
 	}
 	return avg
 }
@@ -34,6 +35,7 @@ func sAverageMagnet(s *data.Slice) []float64 {
 		avg := make([]float64, s.NComp())
 		for i := range avg {
 			avg[i] = float64(cuda.Dot(s.Comp(i), geometry.Gpu())) / magnetNCell()
+			checkNaN1(avg[i])
 		}
 		return avg
 	}

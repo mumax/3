@@ -195,6 +195,12 @@ func sortNoCase(s []string) {
 	sort.Sort(&i)
 }
 
+func checkNaN1(x float64) {
+	if math.IsNaN(x) {
+		panic("NaN")
+	}
+}
+
 // trim trailing newlines
 func rmln(a string) string {
 	for strings.HasSuffix(a, "\n") {

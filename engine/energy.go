@@ -30,6 +30,7 @@ func GetTotalEnergy() float64 {
 	for _, f := range energyTerms {
 		E += f()
 	}
+	checkNaN1(E)
 	return E
 }
 

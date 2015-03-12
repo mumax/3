@@ -59,6 +59,9 @@ func initLog() {
 	// open log file and flush what was logged before the file existed
 	var err error
 	logfile, err = httpfs.Create(OD() + "log.txt")
+	if err != nil {
+		panic(err)
+	}
 	util.FatalErr(err)
 	logfile.Write(([]byte)(hist))
 	logfile.Write([]byte{'\n'})

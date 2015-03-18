@@ -5,7 +5,6 @@ import (
 	"github.com/mumax/3/cuda/curand"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
-	"github.com/mumax/3/util"
 )
 
 var (
@@ -85,8 +84,8 @@ func (b *thermField) update() {
 	// to be fixed. Otherwise some hard-to-grasp feedback loop with the adaptive
 	// time step would occur.
 	//TODO
-	util.AssertMsg(((solvertype != BOGAKISHAMPINE) && (solvertype != DORMANDPRINCE)), "Temperature requires Euler, Heun or Runge Kutta4 solver type")
-	util.AssertMsg(FixDt != 0, "Temperature requires fixed time step")
+	//util.AssertMsg(((solvertype != BOGAKISHAMPINE) && (solvertype != DORMANDPRINCE)), "Temperature requires Euler, Heun or Runge Kutta4 solver type")
+	//util.AssertMsg(FixDt != 0, "Temperature requires fixed time step")
 
 	// keep constant during time step
 	if NSteps == b.step && Dt_si == b.dt {

@@ -39,6 +39,11 @@ func (rk *RK23) Step() {
 		torqueFn(rk.k1)
 	}
 
+	// FSAL cannot be used with temperature
+	if !Temp.isZero() {
+		torqueFn(rk.k1)
+	}
+
 	t0 := Time
 	// backup magnetization
 	m0 := cuda.Buffer(3, size)

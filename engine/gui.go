@@ -271,10 +271,10 @@ func (g *guistate) prepareSolver() {
 			typ := solvertypes[g.StringValue("solvertype")]
 
 			// temperature requires low order solver (see temperature.go)
-			if !Temp.isZero() && typ >= BOGAKISHAMPINE {
-				util.Log("Temperature requires Euler or Heun solver")
-				return
-			}
+			//if !Temp.isZero() && typ >= BOGAKISHAMPINE {
+			//	util.Log("Temperature requires Euler or Heun solver")
+			//	return
+			//}
 
 			// euler must have fixed time step
 			if typ == EULER && FixDt == 0 {
@@ -313,17 +313,17 @@ func (g *guistate) prepareParam() {
 	}
 	// overwrite handler for temperature
 	// do not crash when we enter bogus values (see temperature.go)
-	g.OnEvent("Temp", func() {
-		Inject <- func() {
-			if FixDt == 0 {
-				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
-			}
-			if solvertype >= BOGAKISHAMPINE {
-				g.EvalGUI("SetSolver(2)") // finite temperature requires low-order solver
-			}
-			g.EvalGUI("Temp = " + g.StringValue("Temp"))
-		}
-	})
+	//g.OnEvent("Temp", func() {
+	//	Inject <- func() {
+	//		//if FixDt == 0 {
+	//		//	g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
+	//		//}
+	//		//if solvertype >= BOGAKISHAMPINE {
+	//		//	g.EvalGUI("SetSolver(2)") // finite temperature requires low-order solver
+	//		//}
+	//		g.EvalGUI("Temp = " + g.StringValue("Temp"))
+	//	}
+	//})
 }
 
 // see prepareServer

@@ -75,7 +75,8 @@ var settemperature_map = map[int]string{0: "",
 	20: settemperature_ptx_20,
 	30: settemperature_ptx_30,
 	35: settemperature_ptx_35,
-	50: settemperature_ptx_50}
+	50: settemperature_ptx_50,
+	52: settemperature_ptx_52}
 
 // settemperature PTX code for various compute capabilities.
 const (
@@ -95,9 +96,9 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<10>;
 	.reg .f32 	%f<7>;
-	.reg .s64 	%rd<17>;
+	.reg .s64 	%rd<16>;
 
 
 	ld.param.u64 	%rd1, [settemperature_param_0];
@@ -106,34 +107,34 @@ const (
 	ld.param.u64 	%rd3, [settemperature_param_3];
 	ld.param.u64 	%rd4, [settemperature_param_4];
 	ld.param.u32 	%r2, [settemperature_param_5];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd5, %rd1;
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvta.to.global.u64 	%rd8, %rd4;
-	cvt.s64.s32	%rd9, %r1;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32	%rd6, %r1;
+	add.s64 	%rd7, %rd5, %rd6;
+	cvta.to.global.u64 	%rd8, %rd3;
+	ld.global.u8 	%r9, [%rd7];
+	mul.wide.u32 	%rd9, %r9, 4;
 	add.s64 	%rd10, %rd8, %rd9;
-	ld.global.u8 	%rd11, [%rd10];
-	shl.b64 	%rd12, %rd11, 2;
-	add.s64 	%rd13, %rd7, %rd12;
-	mul.wide.s32 	%rd14, %r1, 4;
-	add.s64 	%rd15, %rd6, %rd14;
-	ld.global.f32 	%f2, [%rd13];
+	cvta.to.global.u64 	%rd11, %rd2;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd11, %rd12;
+	ld.global.f32 	%f2, [%rd10];
 	mul.f32 	%f3, %f2, %f1;
 	sqrt.rn.f32 	%f4, %f3;
-	ld.global.f32 	%f5, [%rd15];
+	ld.global.f32 	%f5, [%rd13];
 	mul.f32 	%f6, %f5, %f4;
-	add.s64 	%rd16, %rd5, %rd14;
-	st.global.f32 	[%rd16], %f6;
+	cvta.to.global.u64 	%rd14, %rd1;
+	add.s64 	%rd15, %rd14, %rd12;
+	st.global.f32 	[%rd15], %f6;
 
 BB0_2:
 	ret;
@@ -157,9 +158,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<10>;
 	.reg .f32 	%f<7>;
-	.reg .s64 	%rd<17>;
+	.reg .s64 	%rd<16>;
 
 
 	ld.param.u64 	%rd1, [settemperature_param_0];
@@ -168,34 +169,34 @@ BB0_2:
 	ld.param.u64 	%rd3, [settemperature_param_3];
 	ld.param.u64 	%rd4, [settemperature_param_4];
 	ld.param.u32 	%r2, [settemperature_param_5];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd5, %rd1;
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvta.to.global.u64 	%rd8, %rd4;
-	cvt.s64.s32	%rd9, %r1;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32	%rd6, %r1;
+	add.s64 	%rd7, %rd5, %rd6;
+	cvta.to.global.u64 	%rd8, %rd3;
+	ld.global.u8 	%r9, [%rd7];
+	mul.wide.u32 	%rd9, %r9, 4;
 	add.s64 	%rd10, %rd8, %rd9;
-	ld.global.u8 	%rd11, [%rd10];
-	shl.b64 	%rd12, %rd11, 2;
-	add.s64 	%rd13, %rd7, %rd12;
-	mul.wide.s32 	%rd14, %r1, 4;
-	add.s64 	%rd15, %rd6, %rd14;
-	ld.global.f32 	%f2, [%rd13];
+	cvta.to.global.u64 	%rd11, %rd2;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd11, %rd12;
+	ld.global.f32 	%f2, [%rd10];
 	mul.f32 	%f3, %f2, %f1;
 	sqrt.rn.f32 	%f4, %f3;
-	ld.global.f32 	%f5, [%rd15];
+	ld.global.f32 	%f5, [%rd13];
 	mul.f32 	%f6, %f5, %f4;
-	add.s64 	%rd16, %rd5, %rd14;
-	st.global.f32 	[%rd16], %f6;
+	cvta.to.global.u64 	%rd14, %rd1;
+	add.s64 	%rd15, %rd14, %rd12;
+	st.global.f32 	[%rd15], %f6;
 
 BB0_2:
 	ret;
@@ -287,9 +288,9 @@ BB0_2:
 {
 	.reg .pred 	%p<2>;
 	.reg .s16 	%rs<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<11>;
 	.reg .f32 	%f<7>;
-	.reg .s64 	%rd<18>;
+	.reg .s64 	%rd<16>;
 
 
 	ld.param.u64 	%rd1, [settemperature_param_0];
@@ -298,36 +299,36 @@ BB0_2:
 	ld.param.u64 	%rd3, [settemperature_param_3];
 	ld.param.u64 	%rd4, [settemperature_param_4];
 	ld.param.u32 	%r2, [settemperature_param_5];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB5_2;
 
-	cvta.to.global.u64 	%rd5, %rd1;
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvta.to.global.u64 	%rd8, %rd4;
-	cvt.s64.s32	%rd9, %r1;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32	%rd6, %r1;
+	add.s64 	%rd7, %rd5, %rd6;
+	ld.global.nc.u8 	%rs1, [%rd7];
+	cvta.to.global.u64 	%rd8, %rd3;
+	cvt.u32.u16	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd9, %r10, 4;
 	add.s64 	%rd10, %rd8, %rd9;
-	ld.global.nc.u8 	%rs1, [%rd10];
-	cvt.u64.u16	%rd11, %rs1;
-	and.b64  	%rd12, %rd11, 255;
-	shl.b64 	%rd13, %rd12, 2;
-	add.s64 	%rd14, %rd7, %rd13;
-	mul.wide.s32 	%rd15, %r1, 4;
-	add.s64 	%rd16, %rd6, %rd15;
-	ld.global.nc.f32 	%f2, [%rd14];
+	cvta.to.global.u64 	%rd11, %rd2;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd11, %rd12;
+	ld.global.nc.f32 	%f2, [%rd10];
 	mul.f32 	%f3, %f2, %f1;
 	sqrt.rn.f32 	%f4, %f3;
-	ld.global.nc.f32 	%f5, [%rd16];
+	ld.global.nc.f32 	%f5, [%rd13];
 	mul.f32 	%f6, %f5, %f4;
-	add.s64 	%rd17, %rd5, %rd15;
-	st.global.f32 	[%rd17], %f6;
+	cvta.to.global.u64 	%rd14, %rd1;
+	add.s64 	%rd15, %rd14, %rd12;
+	st.global.f32 	[%rd15], %f6;
 
 BB5_2:
 	ret;
@@ -419,9 +420,9 @@ BB5_2:
 {
 	.reg .pred 	%p<2>;
 	.reg .s16 	%rs<2>;
-	.reg .s32 	%r<9>;
+	.reg .s32 	%r<11>;
 	.reg .f32 	%f<7>;
-	.reg .s64 	%rd<18>;
+	.reg .s64 	%rd<16>;
 
 
 	ld.param.u64 	%rd1, [settemperature_param_0];
@@ -430,38 +431,193 @@ BB5_2:
 	ld.param.u64 	%rd3, [settemperature_param_3];
 	ld.param.u64 	%rd4, [settemperature_param_4];
 	ld.param.u32 	%r2, [settemperature_param_5];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB5_2;
 
-	cvta.to.global.u64 	%rd5, %rd1;
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvta.to.global.u64 	%rd8, %rd4;
-	cvt.s64.s32	%rd9, %r1;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32	%rd6, %r1;
+	add.s64 	%rd7, %rd5, %rd6;
+	ld.global.nc.u8 	%rs1, [%rd7];
+	cvta.to.global.u64 	%rd8, %rd3;
+	cvt.u32.u16	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd9, %r10, 4;
 	add.s64 	%rd10, %rd8, %rd9;
-	ld.global.nc.u8 	%rs1, [%rd10];
-	cvt.u64.u16	%rd11, %rs1;
-	and.b64  	%rd12, %rd11, 255;
-	shl.b64 	%rd13, %rd12, 2;
-	add.s64 	%rd14, %rd7, %rd13;
-	mul.wide.s32 	%rd15, %r1, 4;
-	add.s64 	%rd16, %rd6, %rd15;
-	ld.global.nc.f32 	%f2, [%rd14];
+	cvta.to.global.u64 	%rd11, %rd2;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd11, %rd12;
+	ld.global.nc.f32 	%f2, [%rd10];
 	mul.f32 	%f3, %f2, %f1;
 	sqrt.rn.f32 	%f4, %f3;
-	ld.global.nc.f32 	%f5, [%rd16];
+	ld.global.nc.f32 	%f5, [%rd13];
 	mul.f32 	%f6, %f5, %f4;
-	add.s64 	%rd17, %rd5, %rd15;
-	st.global.f32 	[%rd17], %f6;
+	cvta.to.global.u64 	%rd14, %rd1;
+	add.s64 	%rd15, %rd14, %rd12;
+	st.global.f32 	[%rd15], %f6;
 
 BB5_2:
+	ret;
+}
+
+
+`
+	settemperature_ptx_52 = `
+.version 4.2
+.target sm_52
+.address_size 64
+
+	// .weak	cudaMalloc
+
+.weak .func  (.param .b32 func_retval0) cudaMalloc(
+	.param .b64 cudaMalloc_param_0,
+	.param .b64 cudaMalloc_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaFuncGetAttributes
+.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
+	.param .b64 cudaFuncGetAttributes_param_0,
+	.param .b64 cudaFuncGetAttributes_param_1
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaDeviceGetAttribute
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaGetDevice
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .globl	settemperature
+.visible .entry settemperature(
+	.param .u64 settemperature_param_0,
+	.param .u64 settemperature_param_1,
+	.param .f32 settemperature_param_2,
+	.param .u64 settemperature_param_3,
+	.param .u64 settemperature_param_4,
+	.param .u32 settemperature_param_5
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .s16 	%rs<2>;
+	.reg .f32 	%f<7>;
+	.reg .s32 	%r<11>;
+	.reg .s64 	%rd<16>;
+
+
+	ld.param.u64 	%rd1, [settemperature_param_0];
+	ld.param.u64 	%rd2, [settemperature_param_1];
+	ld.param.f32 	%f1, [settemperature_param_2];
+	ld.param.u64 	%rd3, [settemperature_param_3];
+	ld.param.u64 	%rd4, [settemperature_param_4];
+	ld.param.u32 	%r2, [settemperature_param_5];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB6_2;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32	%rd6, %r1;
+	add.s64 	%rd7, %rd5, %rd6;
+	ld.global.nc.u8 	%rs1, [%rd7];
+	cvta.to.global.u64 	%rd8, %rd3;
+	cvt.u32.u16	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd9, %r10, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	cvta.to.global.u64 	%rd11, %rd2;
+	mul.wide.s32 	%rd12, %r1, 4;
+	add.s64 	%rd13, %rd11, %rd12;
+	ld.global.nc.f32 	%f2, [%rd10];
+	mul.f32 	%f3, %f2, %f1;
+	sqrt.rn.f32 	%f4, %f3;
+	ld.global.nc.f32 	%f5, [%rd13];
+	mul.f32 	%f6, %f5, %f4;
+	cvta.to.global.u64 	%rd14, %rd1;
+	add.s64 	%rd15, %rd14, %rd12;
+	st.global.f32 	[%rd15], %f6;
+
+BB6_2:
 	ret;
 }
 

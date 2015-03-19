@@ -48,8 +48,8 @@ func localMkdir(fname string) error {
 }
 
 func localTouch(fname string) error {
-	f, err := os.Create(fname)
-	if err != nil {
+	f, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err == nil {
 		f.Close()
 	}
 	return err
@@ -71,7 +71,6 @@ func localLs(fname string) ([]string, error) {
 }
 
 func localAppend(fname string, data []byte, size int64) error {
-
 	f, err := os.OpenFile(fname, os.O_APPEND|os.O_WRONLY, FilePerm)
 	if err != nil {
 		return err

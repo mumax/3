@@ -77,16 +77,6 @@ func (b *thermField) update() {
 		return
 	}
 
-	// Finite temperature cannot work with RK23 solver because of FSAL property:
-	// last torque is re-used for next step, but then the field has jumped
-	// so the previous torque is not valid anymore.
-	// Also, as the amplitude of the thermal field depends on dt, we require dt
-	// to be fixed. Otherwise some hard-to-grasp feedback loop with the adaptive
-	// time step would occur.
-	//TODO
-	//util.AssertMsg(((solvertype != BOGAKISHAMPINE) && (solvertype != DORMANDPRINCE)), "Temperature requires Euler, Heun or Runge Kutta4 solver type")
-	//util.AssertMsg(FixDt != 0, "Temperature requires fixed time step")
-
 	// keep constant during time step
 	if NSteps == b.step && Dt_si == b.dt {
 		return

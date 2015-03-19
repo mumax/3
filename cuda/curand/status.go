@@ -4,7 +4,7 @@ package curand
 import "C"
 
 import (
-//"unsafe"
+	"fmt"
 )
 
 type Status int
@@ -23,5 +23,28 @@ const (
 	ARCH_MISMATCH         Status = C.CURAND_STATUS_ARCH_MISMATCH         // Architecture mismatch, GPU does not support requested feature
 	INTERNAL_ERROR        Status = C.CURAND_STATUS_INTERNAL_ERROR        // Internal library error
 )
+
+func (s Status) String() string {
+	if str, ok := statusStr[s]; ok {
+		return str
+	} else {
+		return fmt.Sprint("CURAND ERROR NUMBER ", int(s))
+	}
+}
+
+var statusStr = map[Status]string{
+	SUCCESS:               "CURAND_STATUS_SUCCESS",
+	VERSION_MISMATCH:      "CURAND_STATUS_VERSION_MISMATCH",
+	NOT_INITIALIZED:       "CURAND_STATUS_NOT_INITIALIZED",
+	ALLOCATION_FAILED:     "CURAND_STATUS_ALLOCATION_FAILED",
+	TYPE_ERROR:            "CURAND_STATUS_TYPE_ERROR",
+	OUT_OF_RANGE:          "CURAND_STATUS_OUT_OF_RANGE",
+	LENGTH_NOT_MULTIPLE:   "CURAND_STATUS_LENGTH_NOT_MULTIPLE",
+	LAUNCH_FAILURE:        "CURAND_STATUS_LAUNCH_FAILURE",
+	PREEXISTING_FAILURE:   "CURAND_STATUS_PREEXISTING_FAILURE",
+	INITIALIZATION_FAILED: "CURAND_STATUS_INITIALIZATION_FAILED",
+	ARCH_MISMATCH:         "CURAND_STATUS_ARCH_MISMATCH",
+	INTERNAL_ERROR:        "CURAND_STATUS_INTERNAL_ERROR",
+}
 
 // Documentation was taken from the curand headers.

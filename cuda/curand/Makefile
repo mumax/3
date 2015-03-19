@@ -2,7 +2,6 @@ all: 6g gccgo doc
 
 6g:
 	go install -v
-	go tool vet *.go
 	gofmt -w *.go
 
 GCCGO=gccgo -gccgoflags '-static-libgcc -O3'

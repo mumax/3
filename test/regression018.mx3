@@ -3,8 +3,8 @@
 	+ httpfs touch did not close file
 */
 
-SetSolver(5)
-//FixDt = 1e-15
+SetSolver(2)
+FixDt = 1e-14
 Bval := 0.0
 mos := -1.0
 kval := 278607
@@ -72,4 +72,4 @@ Ku1 = kval
 m.set(uniform(1,1,1))
 B_ext = vector (Bval,0.0,0.0)
 count := 0
-run(timestep)
+//run(timestep)

@@ -5,6 +5,7 @@ import (
 	"github.com/mumax/3/cuda/curand"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -80,6 +81,10 @@ func (b *thermField) update() {
 	// keep constant during time step
 	if NSteps == b.step && Dt_si == b.dt {
 		return
+	}
+
+	if FixDt == 0 {
+		util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
 	}
 
 	N := Mesh().NCell()

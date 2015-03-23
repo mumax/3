@@ -313,17 +313,14 @@ func (g *guistate) prepareParam() {
 	}
 	// overwrite handler for temperature
 	// do not crash when we enter bogus values (see temperature.go)
-	//g.OnEvent("Temp", func() {
-	//	Inject <- func() {
-	//		//if FixDt == 0 {
-	//		//	g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
-	//		//}
-	//		//if solvertype >= BOGAKISHAMPINE {
-	//		//	g.EvalGUI("SetSolver(2)") // finite temperature requires low-order solver
-	//		//}
-	//		g.EvalGUI("Temp = " + g.StringValue("Temp"))
-	//	}
-	//})
+	g.OnEvent("Temp", func() {
+		Inject <- func() {
+			if FixDt == 0 {
+				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
+			}
+			g.EvalGUI("Temp = " + g.StringValue("Temp"))
+		}
+	})
 }
 
 // see prepareServer

@@ -10,6 +10,8 @@ import (
 	"github.com/mumax/3/data"
 )
 
+const DELIM = "\t"
+
 func dumpGnuplot(f *data.Slice, m data.Meta, out io.Writer) {
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()
@@ -28,10 +30,11 @@ func dumpGnuplot(f *data.Slice, m data.Meta, out io.Writer) {
 			y := float64(iy) * cellsize[Y]
 			for ix := range data[0][iz][iy] {
 				x := float64(ix) * cellsize[X]
-				fmt.Fprint(buf, x, " ", y, " ", z, "\t")
-				for c := 0; c < ncomp; c++ {
-					fmt.Fprint(buf, data[c][iz][iy][ix], " ")
+				fmt.Fprint(buf, x, DELIM, y, DELIM, z, DELIM)
+				for c := 0; c < ncomp-1; c++ {
+					fmt.Fprint(buf, data[c][iz][iy][ix], DELIM)
 				}
+				fmt.Fprint(buf, data[ncomp-1][iz][iy][ix])
 				fmt.Fprint(buf, "\n")
 			}
 			fmt.Fprint(buf, "\n")

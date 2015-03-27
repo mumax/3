@@ -20,7 +20,7 @@ func determineCC() int {
 	}
 
 	for k, _ := range madd2_map {
-		if k > ccCache && okCC(k) {
+		if k > ccCache && ccIsOK(k) {
 			ccCache = k
 		}
 	}
@@ -30,12 +30,12 @@ func determineCC() int {
 	return ccCache
 }
 
-func okCC(cc int) (ok bool) {
+// check wheter compute capability cc works
+func ccIsOK(cc int) (ok bool) {
 	defer func() {
 		if err := recover(); err == cu.ERROR_NO_BINARY_FOR_GPU {
 			ok = false
 		}
-		log.Println("OK CC", cc, ok)
 	}()
 	cu.ModuleLoadData(madd2_map[cc]).GetFunction("madd2")
 	return true

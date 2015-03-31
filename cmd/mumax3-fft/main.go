@@ -11,16 +11,17 @@ import (
 )
 
 var (
-	flag_Re         = flag.Bool("re", false, "output real part")
-	flag_Im         = flag.Bool("im", false, "output imaginary part")
-	flag_Mag        = flag.Bool("mag", false, "output magnitude")
-	flag_Ph         = flag.Bool("ph", false, "output phase")
-	flag_Pad        = flag.Int("zeropad", 1, "zero-pad input by N times its size")
-	flag_Win        = flag.String("window", "boxcar", "apply windowing function")
-	flag_Stdout     = flag.Bool("stdout", false, "output to stdout instead of file")
-	flag_Interp     = flag.Bool("interpolate", true, "re-sample intput at equidistant points")
-	flag_NormCol    = flag.Int("divcol", 0, "divide by this column in fourier space (counts from 1)")
 	flag_CleanPhase = flag.Bool("cleanph", false, "output phase without 2pi jumps")
+	flag_Im         = flag.Bool("im", false, "output imaginary part")
+	flag_Interp     = flag.Bool("interpolate", true, "re-sample intput at equidistant points")
+	flag_Inv        = flag.Bool("inv", false, "inverse FFT")
+	flag_Mag        = flag.Bool("mag", false, "output magnitude")
+	flag_NormCol    = flag.Int("divcol", 0, "divide by this column in fourier space (counts from 1)")
+	flag_Pad        = flag.Int("zeropad", 1, "zero-pad input by N times its size")
+	flag_Ph         = flag.Bool("ph", false, "output phase")
+	flag_Re         = flag.Bool("re", false, "output real part")
+	flag_Stdout     = flag.Bool("stdout", false, "output to stdout instead of file")
+	flag_Win        = flag.String("window", "boxcar", "apply windowing function")
 )
 
 func main() {

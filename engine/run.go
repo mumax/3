@@ -35,9 +35,9 @@ func init() {
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
-	DeclVar("dt", &Dt_si, "Last solver time step (s)")
-	DeclROnly("lastErr", &LastErr, "Maximum error of last time step")
-	DeclROnly("peakErr", &PeakErr, "Maximum error over all time steps")
+	//DeclROnly("dt", dt_table, "Last solver time step (s)")
+	//DeclROnly("LastErr", lastErr_table, "Maximum error of last time step")
+	//DeclROnly("PeakErr", peakErr_table, "Maximum error over all time steps")
 	DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
@@ -46,6 +46,10 @@ func init() {
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
 	DeclFunc("Exit", Exit, "Exit from the program")
 	SetSolver(DORMANDPRINCE)
+
+	_ = NewGetScalar("dt", "s", "Time Step", func() float64 { return Dt_si })
+	_ = NewGetScalar("LastErr", "", "Error of last step", func() float64 { return LastErr })
+	_ = NewGetScalar("PeakErr", "", "Overall maxium error per step", func() float64 { return PeakErr })
 }
 
 // Time stepper like Euler, Heun, RK23
@@ -56,6 +60,7 @@ type Stepper interface {
 
 // Arguments for SetSolver
 const (
+	BACKWARD_EULER = -1
 	EULER          = 1
 	HEUN           = 2
 	BOGAKISHAMPINE = 3
@@ -71,6 +76,8 @@ func SetSolver(typ int) {
 	switch typ {
 	default:
 		util.Fatalf("SetSolver: unknown solver type: %v", typ)
+	case BACKWARD_EULER:
+		stepper = new(BackwardEuler)
 	case EULER:
 		stepper = new(Euler)
 	case HEUN:

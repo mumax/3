@@ -248,8 +248,8 @@ func (g *guistate) prepareM() {
 }
 
 var (
-	solvertypes = map[string]int{"euler": 1, "heun": 2, "rk23": 3, "rk4": 4, "rk45": 5}
-	solvernames = map[int]string{1: "euler", 2: "heun", 3: "rk23", 4: "rk4", 5: "rk45"}
+	solvertypes = map[string]int{"bw_euler": -1, "euler": 1, "heun": 2, "rk23": 3, "rk4": 4, "rk45": 5}
+	solvernames = map[int]string{-1: "bw_euler", 1: "euler", 2: "heun", 3: "rk23", 4: "rk4", 5: "rk45"}
 )
 
 func Break() {
@@ -270,15 +270,12 @@ func (g *guistate) prepareSolver() {
 		Inject <- func() {
 			typ := solvertypes[g.StringValue("solvertype")]
 
-			// temperature requires low order solver (see temperature.go)
-			//if !Temp.isZero() && typ >= BOGAKISHAMPINE {
-			//	util.Log("Temperature requires Euler or Heun solver")
-			//	return
-			//}
-
 			// euler must have fixed time step
 			if typ == EULER && FixDt == 0 {
 				g.EvalGUI("FixDt = 1e-15")
+			}
+			if typ == BACKWARD_EULER && FixDt == 0 {
+				g.EvalGUI("FixDt = 1e-13")
 			}
 
 			g.EvalGUI(fmt.Sprint("SetSolver(", typ, ")"))

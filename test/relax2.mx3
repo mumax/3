@@ -1,0 +1,27 @@
+SetGridSize(128, 128, 1)
+SetCellSize(4e-9, 4e-9, 4e-9)
+
+Msat = 800e3
+Aex = 13e-12
+Alpha = 10
+
+m = randommag()
+
+relax()
+
+m = randommag()
+
+MaxErr = 1e-2
+SetSolver(-1)
+
+Run(999)
+
+TableAdd(E_total)
+TableAdd(Torque)
+TableAdd(LastErr)
+TableAdd(Dt)
+
+for{
+	TableSave()
+	Steps(1)
+}

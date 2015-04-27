@@ -64,7 +64,7 @@ timestep := 10.0e-9
 //tableautosave(1e-15)
 for i:=0; i<1000; i++ {
 	steps(1)
-	fprintln("dt.txt", Neval(), dt)
+	//fprintln("dt.txt", Neval.get(), dt)
 }
 
 Ku1 = kval

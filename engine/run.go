@@ -38,7 +38,7 @@ func init() {
 	//DeclROnly("dt", dt_table, "Last solver time step (s)")
 	//DeclROnly("LastErr", lastErr_table, "Maximum error of last time step")
 	//DeclROnly("PeakErr", peakErr_table, "Maximum error over all time steps")
-	DeclFunc("NEval", getNEval, "Total number of torque evaluations")
+	//DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
@@ -50,6 +50,7 @@ func init() {
 	_ = NewGetScalar("dt", "s", "Time Step", func() float64 { return Dt_si })
 	_ = NewGetScalar("LastErr", "", "Error of last step", func() float64 { return LastErr })
 	_ = NewGetScalar("PeakErr", "", "Overall maxium error per step", func() float64 { return PeakErr })
+	_ = NewGetScalar("NEval", "", "Total number of torque evaluations", func() float64 { return float64(NEvals) })
 }
 
 // Time stepper like Euler, Heun, RK23

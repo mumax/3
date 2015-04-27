@@ -42,6 +42,7 @@ func init() {
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")
+	DeclVar("DoPrecess", &Precess, "Enables LL precession (default=true)")
 	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 }
 

@@ -16,6 +16,10 @@ package curand
 //#cgo CFLAGS: -I/usr/local/cuda-5.5/include/
 //#cgo CFLAGS: -I/usr/local/cuda-5.0/include/
 //
+////Ubuntu 15.04:
+//#cgo LDFLAGS:-L/usr/lib/x86_64-linux-gnu/
+//#cgo CFLAGS: -I/usr/include
+//
 ////arch linux:
 //#cgo LDFLAGS:-L/opt/cuda/lib64 -L/opt/cuda/lib
 //#cgo CFLAGS: -I/opt/cuda/include

@@ -54,6 +54,9 @@ func Init(gpu int) {
 func tryCuInit() {
 	defer func() {
 		err := recover()
+		if err == cu.ERROR_UNKNOWN {
+
+		}
 		util.FatalErr(err)
 	}()
 	cu.Init(0)

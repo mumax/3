@@ -25,7 +25,7 @@ func determineCC() int {
 		}
 	}
 	if ccCache == 0 {
-		log.Fatalln("Unsupported GPU compute capability:", ccCache)
+		log.Fatalln("\nNo binary for GPU. Your nvidia driver may be out-of-date\n")
 	}
 	return ccCache
 }

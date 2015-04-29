@@ -235,7 +235,7 @@ BB0_4:
 
 `
 	shiftbytes_ptx_35 = `
-.version 4.0
+.version 4.1
 .target sm_35
 .address_size 64
 
@@ -266,6 +266,47 @@ BB0_4:
 	ret;
 }
 
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 .visible .entry shiftbytes(
 	.param .u64 shiftbytes_param_0,
 	.param .u64 shiftbytes_param_1,
@@ -306,16 +347,16 @@ BB0_4:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r9;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB2_4;
-	bra.uni 	BB2_1;
+	@!%p5 bra 	BB5_4;
+	bra.uni 	BB5_1;
 
-BB2_1:
+BB5_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
 	or.pred  	%p8, %p6, %p7;
 	mad.lo.s32 	%r5, %r3, %r7, %r2;
-	@%p8 bra 	BB2_3;
+	@%p8 bra 	BB5_3;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	mad.lo.s32 	%r19, %r5, %r6, %r4;
@@ -323,24 +364,25 @@ BB2_1:
 	add.s64 	%rd5, %rd3, %rd4;
 	ld.global.nc.u8 	%rs4, [%rd5];
 
-BB2_3:
+BB5_3:
 	cvta.to.global.u64 	%rd6, %rd1;
 	mad.lo.s32 	%r20, %r5, %r6, %r1;
 	cvt.s64.s32	%rd7, %r20;
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.u8 	[%rd8], %rs4;
 
-BB2_4:
+BB5_4:
 	ret;
 }
 
 
 `
 	shiftbytes_ptx_50 = `
-.version 4.0
+.version 4.2
 .target sm_50
 .address_size 64
 
+	// .weak	cudaMalloc
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
@@ -355,6 +397,7 @@ BB2_4:
 	ret;
 }
 
+	// .weak	cudaFuncGetAttributes
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
@@ -368,6 +411,68 @@ BB2_4:
 	ret;
 }
 
+	// .weak	cudaDeviceGetAttribute
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaGetDevice
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .globl	shiftbytes
 .visible .entry shiftbytes(
 	.param .u64 shiftbytes_param_0,
 	.param .u64 shiftbytes_param_1,
@@ -408,16 +513,16 @@ BB2_4:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r9;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB2_4;
-	bra.uni 	BB2_1;
+	@!%p5 bra 	BB6_4;
+	bra.uni 	BB6_1;
 
-BB2_1:
+BB6_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
 	or.pred  	%p8, %p6, %p7;
 	mad.lo.s32 	%r5, %r3, %r7, %r2;
-	@%p8 bra 	BB2_3;
+	@%p8 bra 	BB6_3;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	mad.lo.s32 	%r19, %r5, %r6, %r4;
@@ -425,14 +530,14 @@ BB2_1:
 	add.s64 	%rd5, %rd3, %rd4;
 	ld.global.nc.u8 	%rs4, [%rd5];
 
-BB2_3:
+BB6_3:
 	cvta.to.global.u64 	%rd6, %rd1;
 	mad.lo.s32 	%r20, %r5, %r6, %r1;
 	cvt.s64.s32	%rd7, %r20;
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.u8 	[%rd8], %rs4;
 
-BB2_4:
+BB6_4:
 	ret;
 }
 

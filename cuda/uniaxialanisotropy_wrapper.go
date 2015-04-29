@@ -371,7 +371,7 @@ BB0_5:
 
 `
 	adduniaxialanisotropy_ptx_35 = `
-.version 4.0
+.version 4.1
 .target sm_35
 .address_size 64
 
@@ -402,6 +402,47 @@ BB0_5:
 	ret;
 }
 
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 .visible .entry adduniaxialanisotropy(
 	.param .u64 adduniaxialanisotropy_param_0,
 	.param .u64 adduniaxialanisotropy_param_1,
@@ -446,7 +487,7 @@ BB0_5:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_5;
+	@%p1 bra 	BB5_5;
 
 	cvta.to.global.u64 	%rd15, %rd13;
 	cvta.to.global.u64 	%rd16, %rd12;
@@ -469,15 +510,15 @@ BB0_5:
 	fma.rn.f32 	%f9, %f3, %f3, %f8;
 	sqrt.rn.f32 	%f4, %f9;
 	setp.neu.f32	%p2, %f4, 0f00000000;
-	@%p2 bra 	BB2_3;
+	@%p2 bra 	BB5_3;
 
 	mov.f32 	%f40, 0f00000000;
-	bra.uni 	BB2_4;
+	bra.uni 	BB5_4;
 
-BB2_3:
+BB5_3:
 	rcp.rn.f32 	%f40, %f4;
 
-BB2_4:
+BB5_4:
 	cvta.to.global.u64 	%rd25, %rd5;
 	cvta.to.global.u64 	%rd26, %rd4;
 	cvta.to.global.u64 	%rd27, %rd3;
@@ -528,17 +569,18 @@ BB2_4:
 	add.f32 	%f39, %f38, %f33;
 	st.global.f32 	[%rd42], %f39;
 
-BB2_5:
+BB5_5:
 	ret;
 }
 
 
 `
 	adduniaxialanisotropy_ptx_50 = `
-.version 4.0
+.version 4.2
 .target sm_50
 .address_size 64
 
+	// .weak	cudaMalloc
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
@@ -553,6 +595,7 @@ BB2_5:
 	ret;
 }
 
+	// .weak	cudaFuncGetAttributes
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
@@ -566,6 +609,68 @@ BB2_5:
 	ret;
 }
 
+	// .weak	cudaDeviceGetAttribute
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaGetDevice
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .globl	adduniaxialanisotropy
 .visible .entry adduniaxialanisotropy(
 	.param .u64 adduniaxialanisotropy_param_0,
 	.param .u64 adduniaxialanisotropy_param_1,
@@ -584,8 +689,8 @@ BB2_5:
 {
 	.reg .pred 	%p<3>;
 	.reg .s16 	%rs<2>;
-	.reg .s32 	%r<9>;
 	.reg .f32 	%f<41>;
+	.reg .s32 	%r<11>;
 	.reg .s64 	%rd<43>;
 
 
@@ -610,38 +715,37 @@ BB2_5:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_5;
+	@%p1 bra 	BB6_4;
 
-	cvta.to.global.u64 	%rd15, %rd13;
-	cvta.to.global.u64 	%rd16, %rd12;
-	cvta.to.global.u64 	%rd17, %rd11;
-	cvta.to.global.u64 	%rd18, %rd14;
+	cvta.to.global.u64 	%rd15, %rd14;
 	cvt.s64.s32	%rd1, %r1;
-	add.s64 	%rd19, %rd18, %rd1;
-	ld.global.nc.u8 	%rs1, [%rd19];
-	cvt.u64.u16	%rd20, %rs1;
-	and.b64  	%rd2, %rd20, 255;
-	shl.b64 	%rd21, %rd2, 2;
-	add.s64 	%rd22, %rd17, %rd21;
-	add.s64 	%rd23, %rd16, %rd21;
-	add.s64 	%rd24, %rd15, %rd21;
-	ld.global.nc.f32 	%f1, [%rd22];
-	ld.global.nc.f32 	%f2, [%rd23];
-	mul.f32 	%f7, %f2, %f2;
-	fma.rn.f32 	%f8, %f1, %f1, %f7;
+	add.s64 	%rd16, %rd15, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd16];
+	cvt.u64.u16	%rd17, %rs1;
+	and.b64  	%rd2, %rd17, 255;
+	cvta.to.global.u64 	%rd18, %rd11;
+	cvt.u32.u16	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd19, %r10, 4;
+	add.s64 	%rd20, %rd18, %rd19;
+	cvta.to.global.u64 	%rd21, %rd12;
+	add.s64 	%rd22, %rd21, %rd19;
+	cvta.to.global.u64 	%rd23, %rd13;
+	add.s64 	%rd24, %rd23, %rd19;
+	ld.global.nc.f32 	%f1, [%rd20];
+	ld.global.nc.f32 	%f2, [%rd22];
+	mul.f32 	%f8, %f2, %f2;
+	fma.rn.f32 	%f9, %f1, %f1, %f8;
 	ld.global.nc.f32 	%f3, [%rd24];
-	fma.rn.f32 	%f9, %f3, %f3, %f8;
-	sqrt.rn.f32 	%f4, %f9;
-	setp.neu.f32	%p2, %f4, 0f00000000;
-	@%p2 bra 	BB2_3;
-
+	fma.rn.f32 	%f10, %f3, %f3, %f9;
+	sqrt.rn.f32 	%f4, %f10;
 	mov.f32 	%f40, 0f00000000;
-	bra.uni 	BB2_4;
+	setp.eq.f32	%p2, %f4, 0f00000000;
+	@%p2 bra 	BB6_3;
 
-BB2_3:
 	rcp.rn.f32 	%f40, %f4;
 
-BB2_4:
+BB6_3:
 	cvta.to.global.u64 	%rd25, %rd5;
 	cvta.to.global.u64 	%rd26, %rd4;
 	cvta.to.global.u64 	%rd27, %rd3;
@@ -653,32 +757,33 @@ BB2_4:
 	shl.b64 	%rd33, %rd1, 2;
 	add.s64 	%rd34, %rd30, %rd33;
 	ld.global.nc.f32 	%f11, [%rd34];
-	mul.f32 	%f12, %f40, %f1;
+	mul.f32 	%f12, %f1, %f40;
 	add.s64 	%rd35, %rd29, %rd33;
 	ld.global.nc.f32 	%f13, [%rd35];
-	mul.f32 	%f14, %f40, %f2;
-	mul.f32 	%f15, %f13, %f14;
-	fma.rn.f32 	%f16, %f11, %f12, %f15;
+	mul.f32 	%f14, %f2, %f40;
+	mul.f32 	%f15, %f14, %f13;
+	fma.rn.f32 	%f16, %f12, %f11, %f15;
 	add.s64 	%rd36, %rd28, %rd33;
 	ld.global.nc.f32 	%f17, [%rd36];
-	mul.f32 	%f18, %f40, %f3;
-	fma.rn.f32 	%f19, %f17, %f18, %f16;
-	add.s64 	%rd38, %rd32, %rd21;
+	mul.f32 	%f18, %f3, %f40;
+	fma.rn.f32 	%f19, %f18, %f17, %f16;
+	shl.b64 	%rd37, %rd2, 2;
+	add.s64 	%rd38, %rd32, %rd37;
 	ld.global.nc.f32 	%f20, [%rd38];
 	add.f32 	%f21, %f20, %f20;
 	mul.f32 	%f22, %f21, %f19;
-	add.s64 	%rd39, %rd31, %rd21;
+	add.s64 	%rd39, %rd31, %rd37;
 	ld.global.nc.f32 	%f23, [%rd39];
 	mul.f32 	%f24, %f23, 0f40800000;
 	mul.f32 	%f25, %f19, %f19;
-	mul.f32 	%f26, %f25, %f19;
+	mul.f32 	%f26, %f19, %f25;
 	mul.f32 	%f27, %f24, %f26;
-	mul.f32 	%f28, %f27, %f12;
-	mul.f32 	%f29, %f27, %f14;
-	mul.f32 	%f30, %f27, %f18;
-	fma.rn.f32 	%f31, %f22, %f12, %f28;
-	fma.rn.f32 	%f32, %f22, %f14, %f29;
-	fma.rn.f32 	%f33, %f22, %f18, %f30;
+	mul.f32 	%f28, %f12, %f27;
+	mul.f32 	%f29, %f14, %f27;
+	mul.f32 	%f30, %f18, %f27;
+	fma.rn.f32 	%f31, %f12, %f22, %f28;
+	fma.rn.f32 	%f32, %f14, %f22, %f29;
+	fma.rn.f32 	%f33, %f18, %f22, %f30;
 	add.s64 	%rd40, %rd27, %rd33;
 	ld.global.f32 	%f34, [%rd40];
 	add.f32 	%f35, %f34, %f31;
@@ -692,7 +797,7 @@ BB2_4:
 	add.f32 	%f39, %f38, %f33;
 	st.global.f32 	[%rd42], %f39;
 
-BB2_5:
+BB6_4:
 	ret;
 }
 

@@ -510,7 +510,7 @@ BB0_6:
 
 `
 	addslonczewskitorque_ptx_35 = `
-.version 4.0
+.version 4.1
 .target sm_35
 .address_size 64
 
@@ -541,6 +541,47 @@ BB0_6:
 	ret;
 }
 
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 .visible .entry addslonczewskitorque(
 	.param .u64 addslonczewskitorque_param_0,
 	.param .u64 addslonczewskitorque_param_1,
@@ -596,7 +637,7 @@ BB0_6:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_6;
+	@%p1 bra 	BB5_6;
 
 	cvta.to.global.u64 	%rd19, %rd12;
 	cvta.to.global.u64 	%rd20, %rd11;
@@ -632,22 +673,22 @@ BB0_6:
 	fma.rn.f32 	%f15, %f7, %f7, %f14;
 	sqrt.rn.f32 	%f8, %f15;
 	setp.neu.f32	%p2, %f8, 0f00000000;
-	@%p2 bra 	BB2_3;
+	@%p2 bra 	BB5_3;
 
 	mov.f32 	%f76, 0f00000000;
-	bra.uni 	BB2_4;
+	bra.uni 	BB5_4;
 
-BB2_3:
+BB5_3:
 	rcp.rn.f32 	%f76, %f8;
 
-BB2_4:
+BB5_4:
 	cvta.to.global.u64 	%rd38, %rd13;
 	add.s64 	%rd40, %rd38, %rd34;
 	ld.global.nc.f32 	%f11, [%rd40];
 	setp.eq.f32	%p3, %f11, 0f00000000;
 	setp.eq.f32	%p4, %f4, 0f00000000;
 	or.pred  	%p5, %p4, %p3;
-	@%p5 bra 	BB2_6;
+	@%p5 bra 	BB5_6;
 
 	cvta.to.global.u64 	%rd41, %rd5;
 	cvta.to.global.u64 	%rd42, %rd4;
@@ -655,10 +696,10 @@ BB2_4:
 	cvta.to.global.u64 	%rd44, %rd17;
 	cvta.to.global.u64 	%rd45, %rd16;
 	cvta.to.global.u64 	%rd46, %rd15;
-	cvta.to.global.u64 	%rd47, %rd14;
 	mul.f32 	%f17, %f76, %f5;
 	mul.f32 	%f18, %f76, %f6;
 	mul.f32 	%f19, %f76, %f7;
+	cvta.to.global.u64 	%rd47, %rd14;
 	add.s64 	%rd49, %rd47, %rd34;
 	ld.global.nc.f32 	%f20, [%rd49];
 	add.s64 	%rd50, %rd46, %rd34;
@@ -729,17 +770,18 @@ BB2_4:
 	add.f32 	%f75, %f74, %f73;
 	st.global.f32 	[%rd56], %f75;
 
-BB2_6:
+BB5_6:
 	ret;
 }
 
 
 `
 	addslonczewskitorque_ptx_50 = `
-.version 4.0
+.version 4.2
 .target sm_50
 .address_size 64
 
+	// .weak	cudaMalloc
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
@@ -754,6 +796,7 @@ BB2_6:
 	ret;
 }
 
+	// .weak	cudaFuncGetAttributes
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
@@ -767,6 +810,68 @@ BB2_6:
 	ret;
 }
 
+	// .weak	cudaDeviceGetAttribute
+.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
+	.param .b64 cudaDeviceGetAttribute_param_0,
+	.param .b32 cudaDeviceGetAttribute_param_1,
+	.param .b32 cudaDeviceGetAttribute_param_2
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaGetDevice
+.weak .func  (.param .b32 func_retval0) cudaGetDevice(
+	.param .b64 cudaGetDevice_param_0
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .s32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
+	// .globl	addslonczewskitorque
 .visible .entry addslonczewskitorque(
 	.param .u64 addslonczewskitorque_param_0,
 	.param .u64 addslonczewskitorque_param_1,
@@ -790,10 +895,10 @@ BB2_6:
 {
 	.reg .pred 	%p<6>;
 	.reg .s16 	%rs<2>;
-	.reg .s32 	%r<9>;
 	.reg .f32 	%f<77>;
-	.reg .s64 	%rd<57>;
+	.reg .s32 	%r<11>;
 	.reg .f64 	%fd<3>;
+	.reg .s64 	%rd<57>;
 
 
 	ld.param.u64 	%rd3, [addslonczewskitorque_param_0];
@@ -822,58 +927,58 @@ BB2_6:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB2_6;
+	@%p1 bra 	BB6_5;
 
-	cvta.to.global.u64 	%rd19, %rd12;
-	cvta.to.global.u64 	%rd20, %rd11;
-	cvta.to.global.u64 	%rd21, %rd10;
-	cvta.to.global.u64 	%rd22, %rd18;
-	cvta.to.global.u64 	%rd23, %rd9;
-	cvta.to.global.u64 	%rd24, %rd8;
-	cvta.to.global.u64 	%rd25, %rd7;
-	cvta.to.global.u64 	%rd26, %rd6;
+	cvta.to.global.u64 	%rd19, %rd6;
 	cvt.s64.s32	%rd1, %r1;
-	mul.wide.s32 	%rd27, %r1, 4;
-	add.s64 	%rd28, %rd26, %rd27;
-	ld.global.nc.f32 	%f1, [%rd28];
-	add.s64 	%rd29, %rd25, %rd27;
-	ld.global.nc.f32 	%f2, [%rd29];
-	add.s64 	%rd30, %rd24, %rd27;
-	ld.global.nc.f32 	%f3, [%rd30];
-	add.s64 	%rd31, %rd23, %rd27;
-	ld.global.nc.f32 	%f4, [%rd31];
-	add.s64 	%rd32, %rd22, %rd1;
-	ld.global.nc.u8 	%rs1, [%rd32];
-	cvt.u64.u16	%rd33, %rs1;
-	and.b64  	%rd2, %rd33, 255;
-	shl.b64 	%rd34, %rd2, 2;
-	add.s64 	%rd35, %rd21, %rd34;
-	add.s64 	%rd36, %rd20, %rd34;
-	add.s64 	%rd37, %rd19, %rd34;
-	ld.global.nc.f32 	%f5, [%rd35];
-	ld.global.nc.f32 	%f6, [%rd36];
-	mul.f32 	%f13, %f6, %f6;
-	fma.rn.f32 	%f14, %f5, %f5, %f13;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f1, [%rd21];
+	cvta.to.global.u64 	%rd22, %rd7;
+	add.s64 	%rd23, %rd22, %rd20;
+	ld.global.nc.f32 	%f2, [%rd23];
+	cvta.to.global.u64 	%rd24, %rd8;
+	add.s64 	%rd25, %rd24, %rd20;
+	ld.global.nc.f32 	%f3, [%rd25];
+	cvta.to.global.u64 	%rd26, %rd9;
+	add.s64 	%rd27, %rd26, %rd20;
+	ld.global.nc.f32 	%f4, [%rd27];
+	cvta.to.global.u64 	%rd28, %rd18;
+	add.s64 	%rd29, %rd28, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd29];
+	cvt.u64.u16	%rd30, %rs1;
+	and.b64  	%rd2, %rd30, 255;
+	cvta.to.global.u64 	%rd31, %rd10;
+	cvt.u32.u16	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd32, %r10, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	cvta.to.global.u64 	%rd34, %rd11;
+	add.s64 	%rd35, %rd34, %rd32;
+	cvta.to.global.u64 	%rd36, %rd12;
+	add.s64 	%rd37, %rd36, %rd32;
+	ld.global.nc.f32 	%f5, [%rd33];
+	ld.global.nc.f32 	%f6, [%rd35];
+	mul.f32 	%f14, %f6, %f6;
+	fma.rn.f32 	%f15, %f5, %f5, %f14;
 	ld.global.nc.f32 	%f7, [%rd37];
-	fma.rn.f32 	%f15, %f7, %f7, %f14;
-	sqrt.rn.f32 	%f8, %f15;
-	setp.neu.f32	%p2, %f8, 0f00000000;
-	@%p2 bra 	BB2_3;
-
+	fma.rn.f32 	%f16, %f7, %f7, %f15;
+	sqrt.rn.f32 	%f8, %f16;
 	mov.f32 	%f76, 0f00000000;
-	bra.uni 	BB2_4;
+	setp.eq.f32	%p2, %f8, 0f00000000;
+	@%p2 bra 	BB6_3;
 
-BB2_3:
 	rcp.rn.f32 	%f76, %f8;
 
-BB2_4:
+BB6_3:
 	cvta.to.global.u64 	%rd38, %rd13;
-	add.s64 	%rd40, %rd38, %rd34;
+	shl.b64 	%rd39, %rd2, 2;
+	add.s64 	%rd40, %rd38, %rd39;
 	ld.global.nc.f32 	%f11, [%rd40];
 	setp.eq.f32	%p3, %f11, 0f00000000;
 	setp.eq.f32	%p4, %f4, 0f00000000;
 	or.pred  	%p5, %p4, %p3;
-	@%p5 bra 	BB2_6;
+	@%p5 bra 	BB6_5;
 
 	cvta.to.global.u64 	%rd41, %rd5;
 	cvta.to.global.u64 	%rd42, %rd4;
@@ -881,34 +986,34 @@ BB2_4:
 	cvta.to.global.u64 	%rd44, %rd17;
 	cvta.to.global.u64 	%rd45, %rd16;
 	cvta.to.global.u64 	%rd46, %rd15;
+	mul.f32 	%f17, %f5, %f76;
+	mul.f32 	%f18, %f6, %f76;
+	mul.f32 	%f19, %f7, %f76;
 	cvta.to.global.u64 	%rd47, %rd14;
-	mul.f32 	%f17, %f76, %f5;
-	mul.f32 	%f18, %f76, %f6;
-	mul.f32 	%f19, %f76, %f7;
-	add.s64 	%rd49, %rd47, %rd34;
+	add.s64 	%rd49, %rd47, %rd39;
 	ld.global.nc.f32 	%f20, [%rd49];
-	add.s64 	%rd50, %rd46, %rd34;
-	ld.global.nc.f32 	%f21, [%rd50];
-	add.s64 	%rd51, %rd45, %rd34;
-	ld.global.nc.f32 	%f22, [%rd51];
-	add.s64 	%rd52, %rd44, %rd34;
-	ld.global.nc.f32 	%f23, [%rd52];
-	mul.f32 	%f24, %f11, %f12;
-	div.rn.f32 	%f25, %f4, %f24;
-	cvt.f64.f32	%fd1, %f25;
+	add.s64 	%rd50, %rd46, %rd39;
+	add.s64 	%rd51, %rd45, %rd39;
+	ld.global.nc.f32 	%f21, [%rd51];
+	add.s64 	%rd52, %rd44, %rd39;
+	ld.global.nc.f32 	%f22, [%rd52];
+	mul.f32 	%f23, %f11, %f12;
+	div.rn.f32 	%f24, %f4, %f23;
+	cvt.f64.f32	%fd1, %f24;
 	mul.f64 	%fd2, %fd1, 0d3CC7B6EF14E9250C;
-	cvt.rn.f32.f64	%f26, %fd2;
-	mul.f32 	%f27, %f22, %f22;
-	mul.f32 	%f28, %f21, %f27;
-	add.f32 	%f29, %f27, 0f3F800000;
-	add.f32 	%f30, %f27, 0fBF800000;
-	mul.f32 	%f31, %f18, %f2;
-	fma.rn.f32 	%f32, %f17, %f1, %f31;
-	fma.rn.f32 	%f33, %f19, %f3, %f32;
-	fma.rn.f32 	%f34, %f30, %f33, %f29;
+	cvt.rn.f32.f64	%f25, %fd2;
+	mul.f32 	%f26, %f21, %f21;
+	ld.global.nc.f32 	%f27, [%rd50];
+	mul.f32 	%f28, %f26, %f27;
+	add.f32 	%f29, %f26, 0f3F800000;
+	add.f32 	%f30, %f26, 0fBF800000;
+	mul.f32 	%f31, %f2, %f18;
+	fma.rn.f32 	%f32, %f1, %f17, %f31;
+	fma.rn.f32 	%f33, %f3, %f19, %f32;
+	fma.rn.f32 	%f34, %f33, %f30, %f29;
 	div.rn.f32 	%f35, %f28, %f34;
-	mul.f32 	%f36, %f26, %f35;
-	mul.f32 	%f37, %f26, %f23;
+	mul.f32 	%f36, %f35, %f25;
+	mul.f32 	%f37, %f22, %f25;
 	fma.rn.f32 	%f38, %f20, %f20, 0f3F800000;
 	rcp.rn.f32 	%f39, %f38;
 	mul.f32 	%f40, %f20, %f37;
@@ -917,14 +1022,14 @@ BB2_4:
 	mul.f32 	%f43, %f20, %f36;
 	sub.f32 	%f44, %f37, %f43;
 	mul.f32 	%f45, %f39, %f44;
-	mul.f32 	%f46, %f19, %f2;
-	mul.f32 	%f47, %f18, %f3;
+	mul.f32 	%f46, %f2, %f19;
+	mul.f32 	%f47, %f3, %f18;
 	sub.f32 	%f48, %f47, %f46;
-	mul.f32 	%f49, %f17, %f3;
-	mul.f32 	%f50, %f19, %f1;
+	mul.f32 	%f49, %f3, %f17;
+	mul.f32 	%f50, %f1, %f19;
 	sub.f32 	%f51, %f50, %f49;
-	mul.f32 	%f52, %f18, %f1;
-	mul.f32 	%f53, %f17, %f2;
+	mul.f32 	%f52, %f1, %f18;
+	mul.f32 	%f53, %f2, %f17;
 	sub.f32 	%f54, %f53, %f52;
 	mul.f32 	%f55, %f2, %f54;
 	mul.f32 	%f56, %f3, %f51;
@@ -935,27 +1040,27 @@ BB2_4:
 	mul.f32 	%f61, %f1, %f51;
 	mul.f32 	%f62, %f2, %f48;
 	sub.f32 	%f63, %f61, %f62;
-	mul.f32 	%f64, %f45, %f48;
-	fma.rn.f32 	%f65, %f42, %f57, %f64;
+	mul.f32 	%f64, %f48, %f45;
+	fma.rn.f32 	%f65, %f57, %f42, %f64;
 	shl.b64 	%rd53, %rd1, 2;
 	add.s64 	%rd54, %rd43, %rd53;
 	ld.global.f32 	%f66, [%rd54];
 	add.f32 	%f67, %f66, %f65;
 	st.global.f32 	[%rd54], %f67;
-	mul.f32 	%f68, %f45, %f51;
-	fma.rn.f32 	%f69, %f42, %f60, %f68;
+	mul.f32 	%f68, %f51, %f45;
+	fma.rn.f32 	%f69, %f60, %f42, %f68;
 	add.s64 	%rd55, %rd42, %rd53;
 	ld.global.f32 	%f70, [%rd55];
 	add.f32 	%f71, %f70, %f69;
 	st.global.f32 	[%rd55], %f71;
-	mul.f32 	%f72, %f45, %f54;
-	fma.rn.f32 	%f73, %f42, %f63, %f72;
+	mul.f32 	%f72, %f54, %f45;
+	fma.rn.f32 	%f73, %f63, %f42, %f72;
 	add.s64 	%rd56, %rd41, %rd53;
 	ld.global.f32 	%f74, [%rd56];
 	add.f32 	%f75, %f74, %f73;
 	st.global.f32 	[%rd56], %f75;
 
-BB2_6:
+BB6_5:
 	ret;
 }
 

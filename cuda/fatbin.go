@@ -12,22 +12,22 @@ func fatbinLoad(sm map[int]string, fn string) cu.Function {
 	return cu.ModuleLoadData(sm[cc]).GetFunction(fn)
 }
 
-var ccCache = 0
+var UseCC = 0
 
 func determineCC() int {
-	if ccCache != 0 {
-		return ccCache
+	if UseCC != 0 {
+		return UseCC
 	}
 
 	for k, _ := range madd2_map {
-		if k > ccCache && ccIsOK(k) {
-			ccCache = k
+		if k > UseCC && ccIsOK(k) {
+			UseCC = k
 		}
 	}
-	if ccCache == 0 {
+	if UseCC == 0 {
 		log.Fatalln("\nNo binary for GPU. Your nvidia driver may be out-of-date\n")
 	}
-	return ccCache
+	return UseCC
 }
 
 // check wheter compute capability cc works

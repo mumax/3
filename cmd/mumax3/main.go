@@ -30,7 +30,7 @@ var (
 	flag_silent        = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	flag_sync          = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
 	flag_test          = flag.Bool("test", false, "Cuda test (internal)")
-	flag_version       = flag.Bool("v", false, "Print version")
+	flag_version       = flag.Bool("v", true, "Print version")
 	flag_vet           = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 )
 
@@ -39,13 +39,12 @@ func main() {
 	log.SetPrefix("")
 	log.SetFlags(0)
 
-	if *flag_version {
-		printVersion()
-	}
-
 	cuda.Init(*flag_gpu)
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	cuda.Synchronous = *flag_sync
+	if *flag_version {
+		printVersion()
+	}
 
 	timer.Timeout = *flag_launchtimeout
 	if *flag_launchtimeout != 0 {
@@ -91,7 +90,7 @@ func main() {
 }
 
 func runInteractive() {
-	fmt.Println("no input files: starting interactive session")
+	fmt.Println("//no input files: starting interactive session")
 	//initEngine()
 
 	// setup outut dir
@@ -159,19 +158,18 @@ func runFileAndServe(fname string) {
 // start Gui server and return server address
 func goServeGUI() string {
 	if *flag_port == "" {
-		log.Println(`not starting GUI (-http="")`)
+		log.Println(`//not starting GUI (-http="")`)
 		return ""
 	}
 	addr := engine.GoServe(*flag_port)
-	fmt.Print("starting GUI at http://127.0.0.1", addr, "\n")
+	fmt.Print("//starting GUI at http://127.0.0.1", addr, "\n")
 	return addr
 }
 
 // print version to stdout
 func printVersion() {
-	fmt.Print("    ", engine.UNAME, "\n")
-	fmt.Print("    ", cuda.GPUInfo, "\n")
-	fmt.Print("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
-	fmt.Print("    This is free software without any warranty. See license.txt", "\n")
-	fmt.Print("\n")
+	fmt.Print("//", engine.UNAME, "\n")
+	fmt.Print("//", cuda.GPUInfo, ", using CC", cuda.UseCC, " PTX \n")
+	fmt.Print("//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
+	fmt.Print("//This is free software without any warranty. See license.txt", "\n")
 }

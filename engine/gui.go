@@ -60,13 +60,13 @@ func (g *guistate) RunInteractive() {
 		}
 	}()
 
-	fmt.Println("entering interactive mode")
+	fmt.Println("//entering interactive mode")
 	g.UpdateKeepAlive()
 	for time.Since(g.KeepAlive()) < Timeout {
 		f := <-Inject
 		f()
 	}
-	fmt.Println("browser disconnected, exiting")
+	fmt.Println("//browser disconnected, exiting")
 }
 
 // displayable quantity in GUI Parameters section

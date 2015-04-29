@@ -2,10 +2,9 @@
 
 #set -v
 
-out='cmd/mumax3-bootstrap/'
+out='mumax3.7_linux/'
 
 go build -o $out/mumax3-convert 'github.com/mumax/3/cmd/mumax3-convert'
-go build -o $out/mumax3         'github.com/mumax/3/cmd/mumax3-bootstrap'
 go build -o $out/mumax3-server  'github.com/mumax/3/cmd/mumax3-server'
 
 

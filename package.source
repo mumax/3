@@ -9,7 +9,7 @@ go build -o $out/mumax3         'github.com/mumax/3/cmd/mumax3-bootstrap'
 go build -o $out/mumax3-server  'github.com/mumax/3/cmd/mumax3-server'
 
 
-for c in 5.0 5.5 6.0 6.5; do
+for c in 6.0 6.5 7.0; do
 	sudo rm -f /usr/local/cuda
 	sudo ln -s /usr/local/cuda-$c /usr/local/cuda
 
@@ -26,8 +26,6 @@ for c in 5.0 5.5 6.0 6.5; do
 
 	echo
 done
-
-rm $out/libcudart.so.5.5 $out/libcudart.so.6.0 # cuda5.0 requires libcudart, others not
 
 sudo rm -f /usr/local/cuda
 #sudo ln -s /usr/local/cuda-5.5 /usr/local/cuda

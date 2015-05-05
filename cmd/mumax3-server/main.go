@@ -74,12 +74,11 @@ func main() {
 
 		_, p, err := net.SplitHostPort(thisAddr)
 		Fatal(err)
+
 		ips := util.InterfaceAddrs()
 		for _, ip := range ips {
 			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
 		}
-
-		Fatal(http.ListenAndServe(thisAddr, nil))
 	}()
 
 	ProbePeer(thisAddr) // make sure we have ourself as peer

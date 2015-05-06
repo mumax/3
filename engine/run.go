@@ -35,10 +35,6 @@ func init() {
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
 	DeclVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
-	//DeclROnly("dt", dt_table, "Last solver time step (s)")
-	//DeclROnly("LastErr", lastErr_table, "Maximum error of last time step")
-	//DeclROnly("PeakErr", peakErr_table, "Maximum error over all time steps")
-	//DeclFunc("NEval", getNEval, "Total number of torque evaluations")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
@@ -46,7 +42,6 @@ func init() {
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
 	DeclFunc("Exit", Exit, "Exit from the program")
 	SetSolver(DORMANDPRINCE)
-
 	_ = NewGetScalar("dt", "s", "Time Step", func() float64 { return Dt_si })
 	_ = NewGetScalar("LastErr", "", "Error of last step", func() float64 { return LastErr })
 	_ = NewGetScalar("PeakErr", "", "Overall maxium error per step", func() float64 { return PeakErr })

@@ -19,12 +19,12 @@ for e:=5; e<14; e++{
 	m=uniform(1, 0, 0) // start!
 	t = 0
 	start := now()
-	neval0 := Neval()
+	neval0 := Neval.get()
 
 	steps(100)
 
 	wall := since(start).Seconds() 
-	nevl := Neval() - neval0
+	nevl := Neval.get() - neval0
 	N2 := n*n
 	fprintln("benchmark.txt", N2, N2*nevl/wall, t/nevl)
 

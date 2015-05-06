@@ -72,13 +72,26 @@ func main() {
 	go func() {
 		log.Println("serving at", thisAddr)
 
+		// try to listen and serve on all interfaces other than thisAddr
+		// this is for convenience, errors are not fatal.
 		_, p, err := net.SplitHostPort(thisAddr)
 		Fatal(err)
-
 		ips := util.InterfaceAddrs()
 		for _, ip := range ips {
-			go http.ListenAndServe(net.JoinHostPort(ip, p), nil)
+			addr := net.JoinHostPort(ip, p)
+			if addr != thisAddr { // skip thisAddr, will start later and is fatal on error
+				go func() {
+					err := http.ListenAndServe(addr, nil)
+					if err != nil {
+						log.Println("info:", err, "(but still serving other interfaces)")
+					}
+				}()
+			}
 		}
+
+		// only on thisAddr, this server's unique address,
+		// we HAVE to be listening.
+		Fatal(http.ListenAndServe(thisAddr, nil))
 	}()
 
 	ProbePeer(thisAddr) // make sure we have ourself as peer

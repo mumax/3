@@ -65,3 +65,7 @@ func (b *BlockStmt) Format() string {
 	}
 	return buf.String()
 }
+
+func (b *BlockStmt) Fix() Expr {
+	return &BlockStmt{Children: fixExprs(b.Children), Node: b.Node}
+}

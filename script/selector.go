@@ -55,3 +55,7 @@ func (e *selector) Type() reflect.Type {
 func (e *selector) Child() []Expr {
 	return []Expr{e.x}
 }
+
+func (e *selector) Fix() Expr {
+	return &selector{x: e.x.Fix(), method: e.method}
+}

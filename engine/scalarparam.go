@@ -36,8 +36,9 @@ func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if Const(f) {
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
+		f := f.Fix() // fix values of all variables except t
 		p.setFunc(r1, r2, func() []float64 {
-			return []float64{f.Float()}
+			return []float64{f.Eval().(script.ScalarFunction).Float()}
 		})
 	}
 }

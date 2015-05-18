@@ -18,3 +18,4 @@ func newReflectROnly(addr interface{}) *reflectROnly {
 func (l *reflectROnly) Eval() interface{}  { return l.elem.Interface() }
 func (l *reflectROnly) Type() reflect.Type { return l.elem.Type() }
 func (l *reflectROnly) Child() []Expr      { return nil }
+func (l *reflectROnly) Fix() Expr          { return NewConst(l) }

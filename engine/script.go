@@ -66,6 +66,13 @@ func DeclVar(name string, value interface{}, doc string) {
 	GUIAdd(name, value)
 }
 
+// Hack for fixing the closure caveat:
+// Defines "t", the time variable, handled specially by Fix()
+func DeclTVar(name string, value interface{}, doc string) {
+	World.TVar(name, value, doc)
+	GUIAdd(name, value)
+}
+
 // Add an LValue to the script world.
 // Assign to LValue invokes SetValue()
 func DeclLValue(name string, value LValue, doc string) {
@@ -99,6 +106,7 @@ func newLValueWrapper(lv LValue) script.LValue {
 }
 
 func (w *lValueWrapper) Child() []script.Expr { return nil }
+func (w *lValueWrapper) Fix() script.Expr     { return script.NewConst(w) }
 
 func (w *lValueWrapper) InputType() reflect.Type {
 	if i, ok := w.LValue.(interface {

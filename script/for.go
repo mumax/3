@@ -43,6 +43,7 @@ type nop struct{ void }
 
 func (e *nop) Child() []Expr     { return nil }
 func (e *nop) Eval() interface{} { return nil }
+func (e *nop) Fix() Expr         { return e }
 
 func (e *forStmt) Child() []Expr {
 	return []Expr{e.init, e.cond, e.post, e.body}

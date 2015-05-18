@@ -93,6 +93,7 @@ type intToFloat64 struct{ in Expr }
 func (c *intToFloat64) Eval() interface{}  { return float64(c.in.Eval().(int)) }
 func (c *intToFloat64) Type() reflect.Type { return float64_t }
 func (c *intToFloat64) Child() []Expr      { return []Expr{c.in} }
+func (c *intToFloat64) Fix() Expr          { return &intToFloat64{in: c.in.Fix()} }
 
 // converts float64 to int
 type float64ToInt struct{ in Expr }
@@ -100,12 +101,14 @@ type float64ToInt struct{ in Expr }
 func (c *float64ToInt) Eval() interface{}  { return safe_int(c.in.Eval().(float64)) }
 func (c *float64ToInt) Type() reflect.Type { return int_t }
 func (c *float64ToInt) Child() []Expr      { return []Expr{c.in} }
+func (c *float64ToInt) Fix() Expr          { return &float64ToInt{in: c.in.Fix()} }
 
 type boolToFunc struct{ in Expr }
 
 func (c *boolToFunc) Eval() interface{}  { return func() bool { return c.in.Eval().(bool) } }
 func (c *boolToFunc) Type() reflect.Type { return func_bool_t }
 func (c *boolToFunc) Child() []Expr      { return []Expr{c.in} }
+func (c *boolToFunc) Fix() Expr          { return &boolToFunc{in: c.in.Fix()} }
 
 type getScalar struct{ in ScalarIf }
 type getVector struct{ in VectorIf }
@@ -113,10 +116,12 @@ type getVector struct{ in VectorIf }
 func (c *getScalar) Eval() interface{}  { return c.in.Get() }
 func (c *getScalar) Type() reflect.Type { return float64_t }
 func (c *getScalar) Child() []Expr      { return nil }
+func (c *getScalar) Fix() Expr          { return NewConst(c) }
 
 func (c *getVector) Eval() interface{}  { return c.in.Get() }
 func (c *getVector) Type() reflect.Type { return vector_t }
 func (c *getVector) Child() []Expr      { return nil }
+func (c *getVector) Fix() Expr          { return NewConst(c) }
 
 func safe_int(x float64) int {
 	i := int(x)

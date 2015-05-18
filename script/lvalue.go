@@ -55,3 +55,15 @@ func (l *reflectLvalue) SetValue(rvalue interface{}) {
 func (l *reflectLvalue) Child() []Expr {
 	return nil
 }
+
+func (l *reflectLvalue) Fix() Expr {
+	return NewConst(l)
+}
+
+type TVar struct {
+	LValue
+}
+
+func (t *TVar) Fix() Expr {
+	return t // only variable that's not fixed
+}

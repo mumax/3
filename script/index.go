@@ -31,3 +31,7 @@ func (e *index) Eval() interface{} {
 func (e *index) Child() []Expr {
 	return []Expr{e.x, e.index}
 }
+
+func (e *index) Fix() Expr {
+	return &index{x: e.x.Fix(), index: e.index.Fix()}
+}

@@ -84,3 +84,14 @@ func (c *call) Type() reflect.Type {
 		panic("bug: multiple return values not allowed")
 	}
 }
+
+func (c *call) Fix() Expr { return &call{f: c.f, args: fixExprs(c.args)} }
+
+// apply .Fix() to all elements
+func fixExprs(e []Expr) []Expr {
+	f := make([]Expr, len(e))
+	for i := range f {
+		f[i] = e[i].Fix()
+	}
+	return f
+}

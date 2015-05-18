@@ -44,6 +44,12 @@ func (w *scope) Var(name string, addr interface{}, doc ...string) {
 	w.declare(name, newReflectLvalue(addr), doc...)
 }
 
+// Hack for fixing the closure caveat:
+// Decleare the time variable, the only variable closures close over.
+func (w *scope) TVar(name string, addr interface{}, doc ...string) {
+	w.declare(name, &TVar{newReflectLvalue(addr)}, doc...)
+}
+
 // adds a native variable to the world. It cannot be changed from script.
 // 	var x = 3.14
 // 	world.ROnly("x", &x)

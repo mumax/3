@@ -24,6 +24,7 @@ type incdec struct{ x Expr }
 
 func (e *incdec) Type() reflect.Type { return float64_t }
 func (e *incdec) Child() []Expr      { return []Expr{e.x} }
+func (e *incdec) Fix() Expr          { panic(invalid_closure) }
 
 type addone struct{ incdec }
 type subone struct{ incdec }

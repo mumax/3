@@ -60,6 +60,11 @@ func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(flo
 func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
 func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
 
+func (b *add) Fix() Expr { return &add{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *sub) Fix() Expr { return &sub{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *mul) Fix() Expr { return &mul{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *quo) Fix() Expr { return &quo{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
+
 type comp binaryExpr
 
 func (w *World) newComp(n *ast.BinaryExpr) comp {
@@ -83,6 +88,13 @@ func (b *geq) Eval() interface{} { return b.x.Eval().(float64) >= b.y.Eval().(fl
 func (b *eql) Eval() interface{} { return b.x.Eval().(float64) == b.y.Eval().(float64) }
 func (b *neq) Eval() interface{} { return b.x.Eval().(float64) != b.y.Eval().(float64) }
 
+func (b *lss) Fix() Expr { return &lss{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *gtr) Fix() Expr { return &gtr{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *leq) Fix() Expr { return &leq{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *geq) Fix() Expr { return &geq{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *eql) Fix() Expr { return &eql{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *neq) Fix() Expr { return &neq{comp{x: b.x.Fix(), y: b.y.Fix()}} }
+
 type boolOp struct{ x, y Expr }
 
 func (w *World) newBoolOp(n *ast.BinaryExpr) boolOp {
@@ -99,3 +111,6 @@ type or struct{ boolOp }
 
 func (b *and) Eval() interface{} { return b.x.Eval().(bool) && b.y.Eval().(bool) }
 func (b *or) Eval() interface{}  { return b.x.Eval().(bool) || b.y.Eval().(bool) }
+
+func (b *and) Fix() Expr { return &and{boolOp{x: b.x.Fix(), y: b.y.Fix()}} }
+func (b *or) Fix() Expr  { return &or{boolOp{x: b.x.Fix(), y: b.y.Fix()}} }

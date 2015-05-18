@@ -36,8 +36,9 @@ func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	if Const(f) {
 		p.setRegions(r1, r2, slice(f.Float3()))
 	} else {
+		f := f.Fix() // fix values of all variables except t
 		p.setFunc(r1, r2, func() []float64 {
-			return slice(f.Float3())
+			return slice(f.Eval().(script.VectorFunction).Float3())
 		})
 	}
 }

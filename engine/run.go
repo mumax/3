@@ -33,7 +33,7 @@ func init() {
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
-	DeclVar("t", &Time, "Total simulated time (s)")
+	DeclTVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")

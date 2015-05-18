@@ -146,7 +146,7 @@ func main() {
 }
 
 var (
-	failed, skipped, succeeded Atom
+	failed, skipped, succeeded util.Atom
 )
 
 func doFile(infname string, outp output) {

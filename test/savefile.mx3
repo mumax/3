@@ -33,6 +33,8 @@ saveas(m, sprintf("ovf2b"))
 outputformat = DUMP
 saveas(m, sprintf("dump"))
 
+flush() // make sure output is saved before loading
+
 s := loadfile("savefile.out/ovf1t.ovf")
 expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
 expect("elem", s.get(1, 99, 50, 24), mref[1], 0)

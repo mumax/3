@@ -1,7 +1,8 @@
-package main
+package util
 
 import "sync/atomic"
 
+// Atomic int
 type Atom int32
 
 func (a *Atom) Add(v int32) {

@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"path"
+	"reflect"
 	"strings"
 
 	"github.com/mumax/3/cuda"
@@ -17,8 +18,10 @@ import (
 func init() {
 	DeclFunc("Save", Save, "Save space-dependent quantity once, with auto filename")
 	DeclFunc("SaveAs", SaveAs, "Save space-dependent with custom filename")
-	DeclVar("FilenameFormat", &FilenameFormat, "printf formatting string for output filenames.")
-	DeclVar("OutputFormat", &outputFormat, "Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY")
+
+	DeclLValue("FilenameFormat", &fformat{}, "printf formatting string for output filenames.")
+	DeclLValue("OutputFormat", &oformat{}, "Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY")
+
 	DeclROnly("OVF1_BINARY", OVF1_BINARY, "OutputFormat = OVF1_BINARY sets binary OVF1 output")
 	DeclROnly("OVF2_BINARY", OVF2_BINARY, "OutputFormat = OVF2_BINARY sets binary OVF2 output")
 	DeclROnly("OVF1_TEXT", OVF1_TEXT, "OutputFormat = OVF1_TEXT sets text OVF1 output")
@@ -33,6 +36,18 @@ var (
 	SnapshotFormat = "jpg"       // user-settable snapshot format
 	outputFormat   = OVF2_BINARY // user-settable output format
 )
+
+type fformat struct{}
+
+func (*fformat) Eval() interface{}      { return FilenameFormat }
+func (*fformat) SetValue(v interface{}) { drainOutput(); FilenameFormat = v.(string) }
+func (*fformat) Type() reflect.Type     { return reflect.TypeOf("") }
+
+type oformat struct{}
+
+func (*oformat) Eval() interface{}      { return outputFormat }
+func (*oformat) SetValue(v interface{}) { drainOutput(); outputFormat = v.(OutputFormat) }
+func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
 
 // Save once, with auto file name
 func Save(q Quantity) {

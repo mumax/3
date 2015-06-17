@@ -73,9 +73,3 @@ Ku1   = -1e6
 minimize()
 expect("mz", m.average()[2], 0, 1e-3)
 
-// Easy, perpendicular
-Ku1   = 1e6
-minimize()
-expect("mx", m.average()[0], 0, 1e-3)
-expect("my", m.average()[0], 0, 1e-3)
-

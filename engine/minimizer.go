@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	DmSamples   int = 10    // number of dm to keep for convergence check
-	StopMaxDm float64 = 1e-6  // stop minimizer if sampled dm is smaller than this
+	DmSamples int     = 10   // number of dm to keep for convergence check
+	StopMaxDm float64 = 1e-6 // stop minimizer if sampled dm is smaller than this
 )
 
 func init() {
@@ -22,8 +22,8 @@ func init() {
 type fifoRing struct {
 	count  int
 	length int
-    tail   int   // index to put next item. Will loop to 0 after exceeding length
-    data   []float64
+	tail   int // index to put next item. Will loop to 0 after exceeding length
+	data   []float64
 }
 
 func FifoRing(length int) *fifoRing {
@@ -54,9 +54,9 @@ func (r *fifoRing) Free() {
 }
 
 type Minimizer struct {
-	k *data.Slice // torque saved to calculate time step
+	k      *data.Slice // torque saved to calculate time step
 	lastDm *fifoRing
-	h float32
+	h      float32
 }
 
 func (mini *Minimizer) Step() {
@@ -65,7 +65,7 @@ func (mini *Minimizer) Step() {
 	k := mini.k
 	h := mini.h
 
-    // save original magnetization
+	// save original magnetization
 	m0 := cuda.Buffer(3, size)
 	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
@@ -81,35 +81,34 @@ func (mini *Minimizer) Step() {
 
 	// just to make the following readable
 	dm := m0
-    dk := k0
+	dk := k0
 
-    // calculate step difference of m and k
+	// calculate step difference of m and k
 	cuda.Madd2(dm, m, m0, 1., -1.)
-	cuda.Madd2(dk, k, k0, -1., 1.)  // reversed due to LLNoPrecess sign
+	cuda.Madd2(dk, k, k0, -1., 1.) // reversed due to LLNoPrecess sign
 
-    // get maxdiff and add to list
-    max_dm := cuda.MaxVecNorm(dm)
-    mini.lastDm.Add(max_dm)
-    // adjust next time step
-    nom, div := float32(0.), float32(0.)
-    	    if NSteps % 2 == 0 {
-    	    	nom = cuda.Dot(dm, dm)
-    	    	div = cuda.Dot(dm, dk)
-    	    } else {
-    	    	nom = cuda.Dot(dm, dk)
-    	    	div = cuda.Dot(dk, dk)
-    	    }
-    if div != 0. {
-    	mini.h = nom / div
-    } else { // in case of division by zero
-    	mini.h = 1e-4
-    }
+	// get maxdiff and add to list
+	max_dm := cuda.MaxVecNorm(dm)
+	mini.lastDm.Add(max_dm)
+	// adjust next time step
+	nom, div := float32(0.), float32(0.)
+	if NSteps%2 == 0 {
+		nom = cuda.Dot(dm, dm)
+		div = cuda.Dot(dm, dk)
+	} else {
+		nom = cuda.Dot(dm, dk)
+		div = cuda.Dot(dk, dk)
+	}
+	if div != 0. {
+		mini.h = nom / div
+	} else { // in case of division by zero
+		mini.h = 1e-4
+	}
 
-    // time probably has no physical meaning, but triggers scheduled output
-    Time += float64(mini.h) / GammaLL
+	// time probably has no physical meaning, but triggers scheduled output
+	Time += float64(mini.h) / GammaLL
 	NSteps++
 }
-
 
 func (mini *Minimizer) Free() {
 	mini.k.Free()
@@ -124,7 +123,7 @@ func Minimize() {
 	prevType := solvertype
 	prevFixDt := FixDt
 	prevPrecess := Precess
-	relaxing = true  // disable temperature noise
+	relaxing = true // disable temperature noise
 	t0 := Time
 
 	// ...to restore them later
@@ -158,6 +157,6 @@ func Minimize() {
 		return (lastDm.count < DmSamples || lastDm.Max() > StopMaxDm)
 	}
 
-    RunWhile(cond)
+	RunWhile(cond)
 	pause = true
 }

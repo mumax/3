@@ -2,7 +2,7 @@
 
 #set -v
 
-out='mumax3.7_linux/'
+out='mumax3.8final_linux/'
 
 go build -o $out/mumax3-convert 'github.com/mumax/3/cmd/mumax3-convert'
 go build -o $out/mumax3-server  'github.com/mumax/3/cmd/mumax3-server'

@@ -14,28 +14,27 @@ var (
 
 func init() {
 	DeclFunc("Minimize", Minimize, "Use steepest conjugate gradient method to minimize the total energy")
-	DeclVar("StopMaxDm", &StopMaxDm, "Stopping max dM for minimizer")
-	DeclVar("DmSamples", &DmSamples, "Number of max dM to collect for minimizer convergence check.")
+	DeclVar("MinimizerStop", &StopMaxDm, "Stopping max dM for minimizer")
+	DeclVar("MinimizerSamples", &DmSamples, "Number of max dM to collect for minimizer convergence check.")
 }
 
 // fixed length FIFO. Items can be added but not removed
 type fifoRing struct {
-	count  int
-	length int
-	tail   int // index to put next item. Will loop to 0 after exceeding length
-	data   []float64
+	count int
+	tail  int // index to put next item. Will loop to 0 after exceeding length
+	data  []float64
 }
 
 func FifoRing(length int) *fifoRing {
-	return &fifoRing{0, length, 0, make([]float64, length)} //TODO
+	return &fifoRing{data: make([]float64, length)}
 }
 
 func (r *fifoRing) Add(item float64) {
 	r.data[r.tail] = item
 	r.count++
-	r.tail = (r.tail + 1) % r.length
-	if r.count > r.length {
-		r.count = r.length
+	r.tail = (r.tail + 1) % len(r.data)
+	if r.count > len(r.data) {
+		r.count = len(r.data)
 	}
 }
 
@@ -47,10 +46,6 @@ func (r *fifoRing) Max() float64 {
 		}
 	}
 	return max
-}
-
-func (r *fifoRing) Free() {
-	r.data = nil
 }
 
 type Minimizer struct {
@@ -105,16 +100,15 @@ func (mini *Minimizer) Step() {
 		mini.h = 1e-4
 	}
 
-	// time probably has no physical meaning, but triggers scheduled output
-	Time += float64(mini.h) / GammaLL
+	M.normalize()
+
+	// as a convention, time does not advance during relax
 	NSteps++
 }
 
 func (mini *Minimizer) Free() {
 	mini.k.Free()
 	mini.k = nil
-	mini.lastDm.Free()
-	mini.lastDm = nil
 }
 
 func Minimize() {

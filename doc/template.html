@@ -1,6 +1,6 @@
 {{.Include "head.html"}}
 
-<h1>mumax 3.8 examples</h1>
+<h1>mumax 3.9c examples</h1>
 
 <p>These are example input scripts, the full API can be found <a href="http://mumax.github.io/api.html">here</a>.</p>
 
@@ -76,6 +76,41 @@ print("<m> for d/lex=30: ", m.average())
 {{.Output}}
 
 This example saves and prints the remanent magnetization state so we can verify it against known values.
+
+
+
+
+<hr/><h2>Hysteresis</h2>
+
+
+{{.Example  `
+SetGridsize(128, 32, 1)
+SetCellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat  = 800e3
+Aex   = 13e-12
+
+m = uniform(-1, .1, 0)
+
+MinimizerStop = 1e-6
+
+Bmin := 0.0
+Bmax := 30e-3
+Bstep := 1e-3
+
+for B:=Bmin; B<=Bmax; B+=Bstep{
+    B_ext = vector(B, 0, 0)
+    minimize()
+    tablesave()
+    save(m)
+}
+
+`}}
+
+{{.Output}}
+
+
+
 
 <hr/><h2>Geometry</h2>
 
@@ -233,7 +268,7 @@ for i:=0; i<=90; i=i+30{
 	angle := i*pi/180
 	setgeom(cheese.rotz(angle))
 	m = uniform(cos(angle), sin(angle), 0)
-	relax()
+	minimize()
 	save(m)
 }
 

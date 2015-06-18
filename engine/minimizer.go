@@ -14,8 +14,8 @@ var (
 
 func init() {
 	DeclFunc("Minimize", Minimize, "Use steepest conjugate gradient method to minimize the total energy")
-	DeclVar("MinimizerStop", &StopMaxDm, "Stopping max dM for minimizer")
-	DeclVar("MinimizerSamples", &DmSamples, "Number of max dM to collect for minimizer convergence check.")
+	DeclVar("MinimizerStop", &StopMaxDm, "Stopping max dM for Minimize")
+	DeclVar("MinimizerSamples", &DmSamples, "Number of max dM to collect for Minimize convergence check.")
 }
 
 // fixed length FIFO. Items can be added but not removed
@@ -25,8 +25,8 @@ type fifoRing struct {
 	data  []float64
 }
 
-func FifoRing(length int) *fifoRing {
-	return &fifoRing{data: make([]float64, length)}
+func FifoRing(length int) fifoRing {
+	return fifoRing{data: make([]float64, length)}
 }
 
 func (r *fifoRing) Add(item float64) {
@@ -50,7 +50,7 @@ func (r *fifoRing) Max() float64 {
 
 type Minimizer struct {
 	k      *data.Slice // torque saved to calculate time step
-	lastDm *fifoRing
+	lastDm fifoRing
 	h      float32
 }
 
@@ -73,6 +73,7 @@ func (mini *Minimizer) Step() {
 	defer cuda.Recycle(k0)
 	data.Copy(k0, k)
 	torqueFn(k)
+	setMaxTorque(k) // report to user
 
 	// just to make the following readable
 	dm := m0
@@ -85,8 +86,10 @@ func (mini *Minimizer) Step() {
 	// get maxdiff and add to list
 	max_dm := cuda.MaxVecNorm(dm)
 	mini.lastDm.Add(max_dm)
+	setLastErr(mini.lastDm.Max()) // report maxDm to user as LastErr
+
 	// adjust next time step
-	nom, div := float32(0.), float32(0.)
+	var nom, div float32
 	if NSteps%2 == 0 {
 		nom = cuda.Dot(dm, dm)
 		div = cuda.Dot(dm, dk)
@@ -107,8 +110,7 @@ func (mini *Minimizer) Step() {
 }
 
 func (mini *Minimizer) Free() {
-	mini.k.Free()
-	mini.k = nil
+	cuda.Recycle(mini.k)
 }
 
 func Minimize() {
@@ -117,38 +119,39 @@ func Minimize() {
 	prevType := solvertype
 	prevFixDt := FixDt
 	prevPrecess := Precess
-	relaxing = true // disable temperature noise
 	t0 := Time
+
+	relaxing = true // disable temperature noise
 
 	// ...to restore them later
 	defer func() {
 		SetSolver(prevType)
 		FixDt = prevFixDt
 		Precess = prevPrecess
-		relaxing = false
 		Time = t0
+
+		relaxing = false
 	}()
 
-	// disable precession for torque calculation
-	Precess = false
+	Precess = false // disable precession for torque calculation
 	// remove previous stepper
 	if stepper != nil {
 		stepper.Free()
 	}
+
 	// set stepper to the minimizer
-	stepper = new(Minimizer)
-	mini := stepper.(*Minimizer)
-	mini.h = 1e-4
 	size := M.Buffer().Size()
-	mini.k = cuda.NewSlice(3, size)
+	mini := Minimizer{
+		h:      1e-4,
+		k:      cuda.Buffer(3, size),
+		lastDm: FifoRing(DmSamples)}
+	stepper = &mini
+
 	// calculate initial torque
 	torqueFn(mini.k)
 
-	mini.lastDm = FifoRing(DmSamples)
-	lastDm := mini.lastDm
-
 	cond := func() bool {
-		return (lastDm.count < DmSamples || lastDm.Max() > StopMaxDm)
+		return (mini.lastDm.count < DmSamples || mini.lastDm.Max() > StopMaxDm)
 	}
 
 	RunWhile(cond)

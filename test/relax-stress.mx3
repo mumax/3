@@ -1,0 +1,14 @@
+// stress-test relax for memleaks etc.
+
+
+	setgridsize(128, 128, 1)
+	setcellsize(3e-9, 3e-9 , 3e-9)
+
+	Aex   = 13e-12
+	Msat  = 800e3
+	alpha = 0.02
+	m  = uniform(-1, .1, 0)
+
+	for i:=0; i<100; i++{
+		relax()
+	}

@@ -249,14 +249,6 @@ MinDt = 1e-15
 MaxErr = 1e-6
 </code></pre>
 
-<h2>Relax</h2>
-
-<p><code>Relax()</code> tries to evolve the magnetization as closely as possible to the minimum energy state. This function assumes all excitations have been turned off (temperature, electrical current, time-dependent magnetic fields). During relax precession is disabled and the time <code>t</code> does not increase. There is no need to set high damping.</p> 
-
-<p>In general it is difficult to be sure the minimum energy state has been truly reached. Hence, relax may occasionally return after the energy has reached a local minimum, a saddle point, or a rather flat valley in the energy landscape.</p>
-
-<h2>Solver types</h2>
-
 Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
 <ul>
 	<li> <code>5</code>: RK45 (Dormand-Prince) solver (the default). An accurate solver, very fast for magnetization dynamics at the cost of some memory usage. </li> 
@@ -270,8 +262,20 @@ E.g.:
 FixDt = 1e-15
 </code></pre>
 
-{{range .FilterName "run" "steps" "runwhile" "relax" }} {{template "entry" .}} {{end}}
-{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step" "NEval" "peakErr" "lastErr"}} {{template "entry" .}} {{end}}
+<h2>Relax</h2>
+
+<p><code>Relax()</code> tries to evolve the magnetization as closely as possible to the minimum energy state. This function assumes all excitations have been turned off (temperature, electrical current, time-dependent magnetic fields). During relax precession is disabled and the time <code>t</code> does not increase. There is no need to set high damping.</p> 
+
+<p>In general it is difficult to be sure the minimum energy state has been truly reached. Hence, relax may occasionally return after the energy has reached a local minimum, a saddle point, or a rather flat valley in the energy landscape.</p>
+
+<h2>Minimize</h2>
+<p><code>Minimize()</code> is like Relax, but uses the conjugate gradient method to find the energy minimum. It is usually much faster than Relax, but is a bit less robust against divergence. E.g., a random starting configuration can be Relaxed, but may fail with Minimize. Minimize is very well suited for hysteresis calculations, where we are never far away from the ground state.</p> 
+
+
+
+
+{{range .FilterName "run" "steps" "runwhile" "relax" "minimize"}} {{template "entry" .}} {{end}}
+{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step" "NEval" "peakErr" "lastErr" "minimizerstop" "minimizersamples"}} {{template "entry" .}} {{end}}
 {{range .FilterName "SetSolver"}} {{template "entry" . }} {{end}}
 
 <hr/><h1> Moving simulation window </h1>

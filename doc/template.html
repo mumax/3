@@ -85,24 +85,36 @@ This example saves and prints the remanent magnetization state so we can verify 
 
 {{.Example  `
 SetGridsize(128, 32, 1)
-SetCellsize(500e-9/128, 125e-9/32, 3e-9)
+SetCellsize(4e-9, 4e-9, 30e-9)
 
 Msat  = 800e3
 Aex   = 13e-12
 
-m = uniform(-1, .1, 0)
+m = vortex(1, 1)
+minimize()         // high-energy states best minimized by relax()
 
+
+Bmax  := 100.0e-3
+Bstep :=  1.0e-3
 MinimizerStop = 1e-6
+TableAdd(B_ext)
 
-Bmin := 0.0
-Bmax := 30e-3
-Bstep := 1e-3
-
-for B:=Bmin; B<=Bmax; B+=Bstep{
+for B:=0.0; B<=Bmax; B+=Bstep{
     B_ext = vector(B, 0, 0)
-    minimize()
+    minimize()   // small changes best minimized by minimize()
     tablesave()
-    save(m)
+}
+
+for B:=Bmax; B>=-Bmax; B-=Bstep{
+    B_ext = vector(B, 0, 0)
+    minimize()   // small changes best minimized by minimize()
+    tablesave()
+}
+
+for B:=-Bmax; B<=Bmax; B+=Bstep{
+    B_ext = vector(B, 0, 0)
+    minimize()   // small changes best minimized by minimize()
+    tablesave()
 }
 
 `}}

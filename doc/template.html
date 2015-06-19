@@ -82,6 +82,7 @@ This example saves and prints the remanent magnetization state so we can verify 
 
 <hr/><h2>Hysteresis</h2>
 
+Below is an example of a hysteresis loop where we step the applied field in small increments and find the magnetization ground state after each step. Minimize() finds the ground state using the conjugate gradient method, which is very fast. However, this method might fail on very high energy initial states like a random magnetization. In that case, Relax() is more robust (albeit much slower).
 
 {{.Example  `
 SetGridsize(128, 32, 1)
@@ -90,8 +91,8 @@ SetCellsize(4e-9, 4e-9, 30e-9)
 Msat  = 800e3
 Aex   = 13e-12
 
-m = vortex(1, 1)
-minimize()         // high-energy states best minimized by relax()
+m = randomMag()
+relax()         // high-energy states best minimized by relax()
 
 
 Bmax  := 100.0e-3

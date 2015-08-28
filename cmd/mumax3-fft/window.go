@@ -17,7 +17,7 @@ type windowFunc func(n, N float32) float32
 func applyWindow(data []float32, window windowFunc) {
 	N := float32(len(data))
 	for i := range data {
-		n := float32(i) / N
+		n := float32(i)
 		data[i] *= window(n, N)
 	}
 }

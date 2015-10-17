@@ -42,6 +42,11 @@ expect("m3x", m3.Average()[0],  0.0, tol)
 expect("m3y", m3.Average()[1],  0.0, tol)
 expect("m3z", m3.Average()[2], -1.0, tol)
 
+m4 := CropRegion(m, 2)
+expect("m4x", m4.Average()[0],  0.0, tol)
+expect("m4y", m4.Average()[1],  0.0, tol)
+expect("m4z", m4.Average()[2], -1.0, tol)
+
 tableadd(m0)
 save(m0)
 tableadd(CropLayer(m.Comp(1), 2))

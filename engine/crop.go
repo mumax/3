@@ -90,15 +90,15 @@ func Crop(parent Quantity, x1, x2, y1, y2, z1, z2 int) *cropped {
 	util.Argument(x1 >= 0 && y1 >= 0 && z1 >= 0)
 	util.Argument(x2 <= n[X] && y2 <= n[Y] && z2 <= n[Z])
 
-	name := parent.Name()
+	name := parent.Name() + "_"
 	if x1 != 0 || x2 != n[X] {
-		name += "_xrange" + rangeStr(x1, x2)
+		name += "xrange" + rangeStr(x1, x2)
 	}
 	if y1 != 0 || y2 != n[Y] {
-		name += "_yrange" + rangeStr(y1, y2)
+		name += "yrange" + rangeStr(y1, y2)
 	}
 	if z1 != 0 || z2 != n[Z] {
-		name += "_zrange" + rangeStr(z1, z2)
+		name += "zrange" + rangeStr(z1, z2)
 	}
 
 	return &cropped{parent, name, x1, x2, y1, y2, z1, z2}

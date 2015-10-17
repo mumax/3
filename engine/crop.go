@@ -15,12 +15,53 @@ func init() {
 	DeclFunc("CropY", CropY, "Crops a quantity to cell ranges [y1,y2[")
 	DeclFunc("CropZ", CropZ, "Crops a quantity to cell ranges [z1,z2[")
 	DeclFunc("CropLayer", CropLayer, "Crops a quantity to a single layer")
+	DeclFunc("CropRegion", CropRegion, "Crops a quantity to a region")
 }
 
 type cropped struct {
 	parent                 Quantity
 	name                   string
 	x1, x2, y1, y2, z1, z2 int
+}
+
+func CropRegion(parent Quantity, region int) *cropped {
+	n := parent.Mesh().Size()
+	// use -1 for unset values
+	x1, y1, z1 := -1, -1, -1
+	x2, y2, z2 := -1, -1, -1
+	r := regions.HostArray()
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				if r[iz][iy][ix] == byte(region) {
+					// initialize all indices if unset
+					if x1 == -1 {
+						x1, y1, z1 = ix, iy, iz
+						x2, y2, z2 = ix, iy, iz
+					}
+					if ix < x1 {
+						x1 = ix
+					}
+					if iy < y1 {
+						y1 = iy
+					}
+					if iz < z1 {
+						z1 = iz
+					}
+					if ix > x2 {
+						x2 = ix
+					}
+					if iy > y2 {
+						y2 = iy
+					}
+					if iz > z2 {
+						z2 = iz
+					}
+				}
+			}
+		}
+	}
+	return Crop(parent, x1, x2+1, y1, y2+1, z1, z2+1)
 }
 
 func CropLayer(parent Quantity, layer int) *cropped {

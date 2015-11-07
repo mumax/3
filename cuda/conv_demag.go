@@ -22,12 +22,15 @@ type DemagConvolution struct {
 }
 
 // Initializes a convolution to evaluate the demag field for the given mesh geometry.
-func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice) *DemagConvolution {
+// Sanity-checked if test == true (slow-ish for large meshes).
+func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice, test bool) *DemagConvolution {
 	c := new(DemagConvolution)
 	c.inputSize = inputSize
 	c.realKernSize = kernel[X][X].Size()
 	c.init(kernel)
-	testConvolution(c, PBC, kernel)
+	if test {
+		testConvolution(c, PBC, kernel)
+	}
 	return c
 }
 

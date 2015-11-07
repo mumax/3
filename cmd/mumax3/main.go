@@ -27,6 +27,7 @@ var (
 	flag_memprof       = flag.Bool("memprof", false, "Recored gopprof memory profile")
 	flag_od            = flag.String("o", "", "Override output directory")
 	flag_port          = flag.String("http", ":35367", "Port to serve web gui")
+	flag_selftest      = flag.Bool("paranoid", false, "Enable convolution self-test for cuFFT sanity.")
 	flag_silent        = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	flag_sync          = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
 	flag_test          = flag.Bool("test", false, "Cuda test (internal)")
@@ -50,6 +51,8 @@ func main() {
 	if *flag_launchtimeout != 0 {
 		cuda.Synchronous = true
 	}
+
+	engine.TestDemag = *flag_selftest
 
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine

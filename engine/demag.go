@@ -21,6 +21,7 @@ var (
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 	CacheDir      = ""                   // directory for kernel cache
+	TestDemag     = false                // enable convolution self-test
 )
 
 func init() {
@@ -112,7 +113,7 @@ func demagConv() *cuda.DemagConvolution {
 		SetBusy(true)
 		defer SetBusy(false)
 		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, CacheDir)
-		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel)
+		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel, TestDemag)
 	}
 	return conv_
 }

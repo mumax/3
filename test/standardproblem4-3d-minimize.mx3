@@ -14,6 +14,6 @@
 
 // minimize
 	minimize()
-	TOL := 1e-4
-	expectv("m", m.average(), vector(0.9669952392578125, 0.12521563470363617, 0), TOL)
+	TOL := 1e-3
+	expectv("m", m.average(), vector(0.9669952, 0.12521563, 0), TOL)
 

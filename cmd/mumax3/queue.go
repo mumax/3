@@ -3,6 +3,7 @@ package main
 // File que for distributing multiple input files over GPUs.
 
 import (
+	"flag"
 	"fmt"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/engine"
@@ -107,11 +108,21 @@ func (a *atom) get() int  { return int(atomic.LoadInt32((*int32)(a))) }
 func (a *atom) inc()      { atomic.AddInt32((*int32)(a), 1) }
 
 func run(inFile string, gpu int, webAddr string) {
+	// overridden flags
 	gpuFlag := fmt.Sprint(`-gpu=`, gpu)
 	httpFlag := fmt.Sprint(`-http=`, webAddr)
-	cacheFlag := fmt.Sprint(`-cache=`, *flag_cachedir)
-	cmd := exec.Command(os.Args[0], cacheFlag, gpuFlag, httpFlag, inFile)
-	log.Println(os.Args[0], cacheFlag, gpuFlag, httpFlag, inFile)
+
+	// pass through flags
+	flags := []string{gpuFlag, httpFlag}
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name != "gpu" && f.Name != "http" {
+			flags = append(flags, fmt.Sprintf("-%v=%v", f.Name, f.Value))
+		}
+	})
+	flags = append(flags, inFile)
+
+	cmd := exec.Command(os.Args[0], flags...)
+	log.Println(os.Args[0], flags)
 	err := cmd.Run()
 	if err != nil {
 		log.Println(inFile, err)

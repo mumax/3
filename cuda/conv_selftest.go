@@ -17,7 +17,7 @@ func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice
 		util.Log("skipping convolution self-test for PBC")
 		return
 	}
-	util.Log("convolution self-test...")
+	util.Log("//convolution self-test...")
 	inhost := data.NewSlice(3, c.inputSize)
 	initConvTestInput(inhost.Vectors())
 	gpu := NewSlice(3, c.inputSize)

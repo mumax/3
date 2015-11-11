@@ -1,8 +1,6 @@
 package cuda
 
 import (
-	"unsafe"
-
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -14,8 +12,8 @@ type DemagConvolution struct {
 	inputSize        [3]int            // 3D size of the input/output data
 	realKernSize     [3]int            // Size of kernel and logical FFT size.
 	fftKernLogicSize [3]int            // logic size FFTed kernel, real parts only, we store less
-	fftRBuf          [3]*data.Slice    // FFT input buf for FFT, shares storage with fftCBuf. 2D: Z shares storage with X.
-	fftCBuf          [3]*data.Slice    // FFT output buf, shares storage with fftRBuf
+	fftRBuf          [3]*data.Slice    // FFT input buf; 2D: Z shares storage with X.
+	fftCBuf          [3]*data.Slice    // FFT output buf; 2D: Z shares storage with X.
 	kern             [3][3]*data.Slice // FFT kernel on device
 	fwPlan           fft3DR2CPlan      // Forward FFT (1 component)
 	bwPlan           fft3DC2RPlan      // Backward FFT (1 component)
@@ -119,9 +117,13 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 	} else {
 		c.fftCBuf[Z] = NewSlice(1, nc)
 	}
-	// Real buffer shares storage with Complex buffer
-	for i := 0; i < 3; i++ {
-		c.fftRBuf[i] = data.SliceFromPtrs(c.realKernSize, data.GPUMemory, []unsafe.Pointer{c.fftCBuf[i].DevPtr(0)})
+
+	c.fftRBuf[X] = NewSlice(1, c.realKernSize)
+	c.fftRBuf[Y] = NewSlice(1, c.realKernSize)
+	if c.is2D() {
+		c.fftRBuf[Z] = c.fftRBuf[X]
+	} else {
+		c.fftRBuf[Z] = NewSlice(1, c.realKernSize)
 	}
 
 	// init FFT plans
@@ -181,7 +183,8 @@ func (c *DemagConvolution) Free() {
 	c.inputSize = [3]int{}
 	c.realKernSize = [3]int{}
 	for i := 0; i < 3; i++ {
-		c.fftCBuf[i].Free() // shared with fftRbuf
+		c.fftCBuf[i].Free()
+		c.fftRBuf[i].Free()
 		c.fftCBuf[i] = nil
 		c.fftRBuf[i] = nil
 

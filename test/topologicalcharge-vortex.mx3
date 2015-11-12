@@ -11,19 +11,20 @@ setcellsize(3e-9, 1.5e-9, 4e-9)
 // aka Py
 Msat    = 800e3
 Aex     = 13e-12
+alpha   = 1
 
 m = vortex(1, 1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  0.5, tol)
 
 m = vortex(-1, 1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  0.5, tol)
 
 m = vortex(1, -1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  -0.5, tol)
 
 m = vortex(-1, -1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  -0.5, tol)

@@ -13,20 +13,20 @@ Msat    = 1000e3
 Aex     = 10e-12
 anisU   = vector(0, 0, 1)
 Ku1     = 0.65e6
-alpha   = 0.02
+alpha   = 1
 
 m = blochskyrmion(1, 1).scale(4,4,1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  1.0, tol)
 
 m = blochskyrmion(-1, 1).scale(4,4,1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  1.0, tol)
 
 m = blochskyrmion(1, -1).scale(4,4,1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  -1.0, tol)
 
 m = blochskyrmion(-1, -1).scale(4,4,1)
-relax()
+steps(500)
 expect("Skyrmion number" , ext_topologicalcharge,  -1.0, tol)

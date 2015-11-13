@@ -1,7 +1,59 @@
-mumax3 GPU micromagnetic simulator
-==================================
+mumax3 
+======
 
-  * You can download binaries from http://mumax.github.io
-  * You can fetch and compile the source with `go get -u -v github.com/mumax/3/...`
-  * If you already have the source you can rebuild with `go install github.com/mumax/3/...`
-  * If you have modified CUDA sources, rebuild with `./make.bash`
+GPU accelerated micromagnetic simulator.
+
+
+Downloads and documentation
+---------------------------
+
+http://mumax.github.io
+
+
+Paper
+-----
+
+The Design and Verification of mumax3:
+
+http://scitation.aip.org/content/aip/journal/adva/4/10/10.1063/1.4899186
+
+
+Tools
+-----
+
+https://godoc.org/github.com/mumax/3/cmd
+
+
+Building from source
+--------------------
+
+Consider downloading a pre-compiled binary. If you want to compile nevertheless:
+
+  * install the nvidia proprietary driver, if not yet present.
+   - if unsure, it's probably already there
+   - v340 recommended
+  * install Go 
+    - https://golang.org/dl/
+    - set $GOPATH
+  * install CUDA 
+    - https://developer.nvidia.com/cuda-downloads (pick default installation path)
+    - or `sudo apt-get install nvidia-cuda-toolkit`
+  * install a C compiler
+    - Ubuntu: `sudo apt-get install gcc`
+    - MacOSX: https://developer.apple.com/xcode/download/
+    - Windows: http://sourceforge.net/projects/mingw-w64/
+  * if you have git installed: 
+    - `go get github.com/mumax/3/cmd/mumax3`
+  * if you don't have git:
+    - seriously, no git?
+    - get and unzip the source from https://github.com/mumax/3/releases
+    - `cd path/to/mumax3/cmd/mumax3`
+    - `go build`
+  * optional: install gnuplot if you want pretty graphs
+    - Ubuntu: `sudo apt-get install gnuplot`
+
+To do all at once on Ubuntu:
+```
+sudo apt-get install git golang-go gcc nvidia-cuda-toolkit nvidia-cuda-dev nvidia-340 gnuplot
+export GOPATH=$HOME go get -u -v github.com/mumax/3/cmd/mumax3
+```

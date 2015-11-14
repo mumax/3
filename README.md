@@ -46,11 +46,14 @@ Consider downloading a pre-compiled binary. If you want to compile nevertheless:
     - `go get github.com/mumax/3/cmd/mumax3`
   * if you don't have git:
     - seriously, no git?
-    - get and unzip the source from https://github.com/mumax/3/releases
-    - `cd path/to/mumax3/cmd/mumax3`
-    - `go build`
+    - get the source from https://github.com/mumax/3/releases
+    - unzip the source into $GOPATH/src/github.com/mumax/3
+    - `cd $GOPATH/src/github.com/mumax/3/cmd/mumax3`
+    - `go install`
   * optional: install gnuplot if you want pretty graphs
     - Ubuntu: `sudo apt-get install gnuplot`
+
+Your binary is now at `$GOPATH/bin/mumax3`
 
 To do all at once on Ubuntu:
 ```

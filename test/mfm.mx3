@@ -18,3 +18,5 @@ m = uniform(1,0,0)
 MFMLift = 50e-9
 
 save(MFM)
+// TODO: add expect() with value form cuda w/o cufft bug.
+print(MFM.Average())

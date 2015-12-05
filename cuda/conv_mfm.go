@@ -3,8 +3,6 @@ package cuda
 // Generation of Magnetic Force Microscopy images.
 
 import (
-	"unsafe"
-
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 )
@@ -51,7 +49,7 @@ func (c *MFMConvolution) init() {
 	// init device buffers
 	nc := fftR2COutputSizeFloats(c.kernSize)
 	c.fftCBuf = NewSlice(1, nc)
-	c.fftRBuf = data.SliceFromPtrs(c.kernSize, data.GPUMemory, []unsafe.Pointer{c.fftCBuf.DevPtr(0)})
+	c.fftRBuf = NewSlice(1, c.kernSize)
 
 	c.gpuFFTKern[X] = NewSlice(1, nc)
 	c.gpuFFTKern[Y] = NewSlice(1, nc)

@@ -14,13 +14,15 @@ var (
 	AnisU, AnisC1, AnisC2     VectorParam  // unixial and cubic anis axes
 	ku1_red, ku2_red          derivedParam // K1 / Msat
 	kc1_red, kc2_red, kc3_red derivedParam
-	B_anis                    = AsVectorField(AsQuantity(3, "B_anis", "T", "Anisotropy field", AddAnisotropyField))
+	B_anis                    = AsVectorField(AsQuantity(3, "B_anis", "T", AddAnisotropyField))
 	E_anis                    *GetScalar // Anisotorpy energy
 	Edens_anis                sAdder     // Anisotropy energy density
 	zero                      inputParam // utility zero parameter
 )
 
 func init() {
+	Export(B_anis, "Anisotropy field")
+
 	Ku1.init("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
 	Ku2.init("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", []derived{&ku2_red})
 	Kc1.init("Kc1", "J/m3", "1st order cubic anisotropy constant", []derived{&kc1_red})

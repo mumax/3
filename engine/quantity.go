@@ -17,7 +17,7 @@ type Quantity interface {
 	average() []float64
 }
 
-func AsQuantity(nComp int, name, unit, doc string, f func(dst *data.Slice)) Quantity {
+func AsQuantity(nComp int, name, unit string, f func(dst *data.Slice)) Quantity {
 	return &callbackQuant{info{nComp, name, unit}, f}
 }
 

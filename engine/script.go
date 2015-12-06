@@ -60,6 +60,10 @@ func DeclROnly(name string, value interface{}, doc string) {
 	GUIAdd(name, value)
 }
 
+func Export(q Quantity, doc string) {
+	DeclROnly(q.Name(), q, cat(doc, q.Unit()))
+}
+
 // Add a (pointer to) variable to the script world
 func DeclVar(name string, value interface{}, doc string) {
 	World.Var(name, value, doc)

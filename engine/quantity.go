@@ -2,7 +2,7 @@ package engine
 
 import (
 	"fmt"
-
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 )
 
@@ -15,6 +15,26 @@ type Quantity interface {
 	Unit() string                         // Unit, e.g. "A/m" or "".
 	Mesh() *data.Mesh                     // Usually the global mesh, unless this quantity has a special size.
 	average() []float64
+}
+
+func AsQuantity(nComp int, name, unit, doc string, f func(dst *data.Slice)) Quantity {
+	return &callbackQuant{info{nComp, name, unit}, f}
+}
+
+type callbackQuant struct {
+	info
+	call func(*data.Slice)
+}
+
+func (c *callbackQuant) Mesh() *data.Mesh   { return Mesh() }
+func (c *callbackQuant) average() []float64 { return qAverageUniverse(c) }
+
+// Calculates and returns the quantity.
+// recycle is true: slice needs to be recycled.
+func (q *callbackQuant) Slice() (s *data.Slice, recycle bool) {
+	buf := cuda.Buffer(q.NComp(), q.Mesh().Size())
+	q.call(buf)
+	return buf, true
 }
 
 // ScalarField is a Quantity guaranteed to have 1 component.
@@ -48,6 +68,10 @@ func AsVectorField(q Quantity) VectorField {
 		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", q.Name(), q.NComp()))
 	}
 	return VectorField{q}
+}
+
+func NewVectorField() {
+
 }
 
 func (v VectorField) Average() data.Vector     { return unslice(v.Quantity.average()) }

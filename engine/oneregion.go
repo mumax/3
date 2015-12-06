@@ -31,6 +31,10 @@ type oneReg struct {
 	region int
 }
 
+func inRegion(q Quantity, region int) Quantity {
+	return &oneReg{q, region}
+}
+
 func (q *oneReg) NComp() int       { return q.parent.NComp() }
 func (q *oneReg) Name() string     { return fmt.Sprint(q.parent.Name(), ".region", q.region) }
 func (q *oneReg) Unit() string     { return q.parent.Unit() }

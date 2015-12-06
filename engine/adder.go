@@ -43,14 +43,3 @@ func (q *sAdder) init(name, unit, doc string, addFunc func(dst *data.Slice)) {
 }
 func (q *sAdder) Average() float64      { return q.average()[0] }
 func (q *sAdder) Region(r int) *sOneReg { return sOneRegion(q, r) }
-
-// vector adder
-type vAdder struct{ _adder }
-
-func (q *vAdder) init(name, unit, doc string, addFunc func(dst *data.Slice)) {
-	q._init(3, name, unit, doc, addFunc)
-	DeclROnly(name, q, cat(doc, unit))
-}
-func (q *vAdder) Average() data.Vector  { return unslice(q.average()) }
-func (q *vAdder) Region(r int) *vOneReg { return vOneRegion(q, r) }
-func (q *vAdder) Comp(c int) *comp      { return Comp(q, c) }

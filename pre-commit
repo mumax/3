@@ -12,7 +12,7 @@
 fail=0;
 
 if (gofmt -w -l */*.go */*/*.go | grep \.go); then exit 1; fi;
-make
+make || exit 1
 
 #if astyle --indent=tab cuda/*.cu | grep Formatted; then exit 1; fi;
 

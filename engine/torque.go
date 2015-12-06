@@ -14,9 +14,9 @@ var (
 	EpsilonPrime             ScalarParam
 	FrozenSpins              ScalarParam
 	FixedLayer               VectorParam
-	Torque                   vSetter    // total torque in T
-	LLTorque                 vSetter    // Landau-Lifshitz torque/γ0, in T
-	STTorque                 vAdder     // Spin-transfer torque/γ0, in T
+	Torque                   vSetter // total torque in T
+	LLTorque                 vSetter // Landau-Lifshitz torque/γ0, in T
+	STTorque                 = AsVectorField(AsQuantity(3, "STTorque", "T", AddSTTorque))
 	J                        excitation // Polarized electrical current density
 	MaxTorque                *GetScalar
 	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
@@ -26,6 +26,8 @@ var (
 )
 
 func init() {
+	Export(STTorque, "Spin-transfer torque/γ0")
+
 	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
 	J.init("J", "A/m2", "Electrical current density")
@@ -37,7 +39,6 @@ func init() {
 	FrozenSpins.init("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	LLTorque.init("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
-	STTorque.init("STtorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	Torque.init("torque", "T", "Total torque/γ0", SetTorque)
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")

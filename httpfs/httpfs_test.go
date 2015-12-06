@@ -12,7 +12,7 @@ const MANYFILES = 1025
 
 // start local httpfs server, and use http://address/ as WD
 func init() {
-	l, err := net.Listen("tcp", ":")
+	l, err := net.Listen("tcp", ":12345")
 	if err != nil {
 		panic(err)
 	}

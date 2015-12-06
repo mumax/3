@@ -17,8 +17,12 @@ type Quantity interface {
 	average() []float64
 }
 
-func AsQuantity(nComp int, name, unit string, f func(dst *data.Slice)) Quantity {
+func NewQuantity(nComp int, name, unit string, f func(dst *data.Slice)) Quantity {
 	return &callbackQuant{info{nComp, name, unit}, f}
+}
+
+func NewVectorField(name, unit string, f func(dst *data.Slice)) VectorField {
+	return AsVectorField(NewQuantity(3, name, unit, f))
 }
 
 type callbackQuant struct {
@@ -69,10 +73,6 @@ func AsVectorField(q Quantity) VectorField {
 		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", q.Name(), q.NComp()))
 	}
 	return VectorField{q}
-}
-
-func NewVectorField() {
-
 }
 
 func (v VectorField) Average() data.Vector     { return unslice(v.Quantity.average()) }

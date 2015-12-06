@@ -15,7 +15,7 @@ var (
 	Aex          ScalarParam // Exchange stiffness
 	Dind         ScalarParam // interfacial DMI strength
 	Dbulk        ScalarParam // bulk DMI strength
-	B_exch       = AsVectorField(AsQuantity(3, "B_exch", "T", AddExchangeField))
+	B_exch       = NewVectorField("B_exch", "T", AddExchangeField)
 	lex2         aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2         dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
 	dbulk2       dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat

@@ -16,7 +16,7 @@ var (
 	FixedLayer               VectorParam
 	Torque                   vSetter // total torque in T
 	LLTorque                 vSetter // Landau-Lifshitz torque/γ0, in T
-	STTorque                 = AsVectorField(AsQuantity(3, "STTorque", "T", AddSTTorque))
+	STTorque                 = NewVectorField("STTorque", "T", AddSTTorque)
 	J                        excitation // Polarized electrical current density
 	MaxTorque                *GetScalar
 	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts

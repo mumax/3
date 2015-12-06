@@ -15,13 +15,14 @@ var (
 	ku1_red, ku2_red          derivedParam // K1 / Msat
 	kc1_red, kc2_red, kc3_red derivedParam
 	B_anis                    = AsVectorField(AsQuantity(3, "B_anis", "T", AddAnisotropyField))
+	Edens_anis                = AsScalarField(AsQuantity(1, "Edens_anis", "J/m3", AddAnisotropyEnergyDensity))
 	E_anis                    *GetScalar // Anisotorpy energy
-	Edens_anis                sAdder     // Anisotropy energy density
 	zero                      inputParam // utility zero parameter
 )
 
 func init() {
 	Export(B_anis, "Anisotropy field")
+	Export(Edens_anis, "Anisotropy energy density")
 
 	Ku1.init("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
 	Ku2.init("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", []derived{&ku2_red})
@@ -32,8 +33,7 @@ func init() {
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", GetAnisotropyEnergy)
-	Edens_anis.init("Edens_anis", "J/m3", "Anisotropy energy density (uni+cubic)", AddAnisotropyEnergyDensity)
-	registerEnergy(GetAnisotropyEnergy, Edens_anis.AddTo)
+	registerEnergy(GetAnisotropyEnergy, AddAnisotropyEnergyDensity)
 	zero.init(1, "_zero", "", nil)
 
 	//ku1_red = Ku1 / Msat

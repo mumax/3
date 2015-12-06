@@ -33,6 +33,7 @@ func (c *callbackQuant) average() []float64 { return qAverageUniverse(c) }
 // recycle is true: slice needs to be recycled.
 func (q *callbackQuant) Slice() (s *data.Slice, recycle bool) {
 	buf := cuda.Buffer(q.NComp(), q.Mesh().Size())
+	cuda.Zero(buf)
 	q.call(buf)
 	return buf, true
 }

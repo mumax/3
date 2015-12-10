@@ -6,6 +6,9 @@ import (
 	"github.com/mumax/3/data"
 )
 
+// TODO
+// Slice() ->  EvalTo(dst)
+
 // Quantity represents a space-dependent quantity,
 // Like M, B_eff or alpha.
 type Quantity interface {
@@ -23,6 +26,10 @@ func NewQuantity(nComp int, name, unit string, f func(dst *data.Slice)) Quantity
 
 func NewVectorField(name, unit string, f func(dst *data.Slice)) VectorField {
 	return AsVectorField(NewQuantity(3, name, unit, f))
+}
+
+func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {
+	return AsScalarField(NewQuantity(1, name, unit, f))
 }
 
 type callbackQuant struct {

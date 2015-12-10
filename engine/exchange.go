@@ -12,27 +12,30 @@ import (
 )
 
 var (
-	Aex          ScalarParam // Exchange stiffness
-	Dind         ScalarParam // interfacial DMI strength
-	Dbulk        ScalarParam // bulk DMI strength
-	B_exch       = NewVectorField("B_exch", "T", AddExchangeField)
-	lex2         aexchParam // inter-cell exchange in 1e18 * Aex / Msat
-	din2         dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
-	dbulk2       dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
-	E_exch       *GetScalar // Exchange energy
-	Edens_exch   sAdder     // Exchange energy density
-	ExchCoupling sSetter    // Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	Aex        ScalarParam // Exchange stiffness
+	Dind       ScalarParam // interfacial DMI strength
+	Dbulk      ScalarParam // bulk DMI strength
+	B_exch     = NewVectorField("B_exch", "T", AddExchangeField)
+	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
+	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
+	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
+	E_exch     *GetScalar // Exchange energy
+	Edens_exch = NewScalarField("Edens_exch", "J/m3", AddExchangeEnergyDensity)
+
+	ExchCoupling sSetter // Average exchange coupling with neighbors. Useful to debug inter-region exchange
 )
+
+var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
 
 func init() {
 	Export(B_exch, "Exchange field")
+	Export(Edens_exch, "Exchange energy density (normal+DM)")
 
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dind.init("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
 	Dbulk.init("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dbulk2})
 	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
-	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", makeEdensAdder(&B_exch, -0.5))
-	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
+	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
 	din2.init(&Dind)

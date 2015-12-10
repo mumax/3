@@ -10,12 +10,13 @@ import (
 
 // Demag variables
 var (
-	Msat          ScalarParam
-	Bsat          derivedParam
-	M_full        vSetter
-	B_demag       vSetter
-	E_demag       *GetScalar
-	Edens_demag   sAdder
+	Msat        ScalarParam
+	Bsat        derivedParam
+	M_full      vSetter
+	B_demag     vSetter
+	E_demag     *GetScalar
+	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
+
 	EnableDemag   = true                 // enable/disable global demag field
 	NoDemagSpins  ScalarParam            // disable demag field per-cell
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
@@ -24,7 +25,11 @@ var (
 	TestDemag     = false                // enable convolution self-test
 )
 
+var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
+
 func init() {
+	Export(Edens_demag, "Magnetostatic energy density")
+
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
 	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
 	M_full.init("m_full", "A/m", "Unnormalized magnetization", SetMFull)
@@ -32,8 +37,7 @@ func init() {
 	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
 	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
-	Edens_demag.init("Edens_demag", "J/m3", "Magnetostatic energy density", makeEdensAdder(&B_demag, -0.5))
-	registerEnergy(GetDemagEnergy, Edens_demag.AddTo)
+	registerEnergy(GetDemagEnergy, AddEdens_demag)
 
 	//Bsat = Msat * mu0
 	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedParam) {

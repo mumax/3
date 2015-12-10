@@ -3,14 +3,17 @@ package engine
 var (
 	B_ext        excitation
 	E_Zeeman     *GetScalar
-	Edens_zeeman sAdder
+	Edens_zeeman = NewScalarField("Edens_Zeeman", "J/m3", AddEdens_zeeman)
 )
 
+var AddEdens_zeeman = makeEdensAdder(&B_ext, -1)
+
 func init() {
+	Export(Edens_zeeman, "Zeeman energy density")
+
 	B_ext.init("B_ext", "T", "Externally applied field")
 	E_Zeeman = NewGetScalar("E_Zeeman", "J", "Zeeman energy", GetZeemanEnergy)
-	Edens_zeeman.init("Edens_Zeeman", "J/m3", "Zeeman energy density", makeEdensAdder(&B_ext, -1))
-	registerEnergy(GetZeemanEnergy, Edens_zeeman.AddTo)
+	registerEnergy(GetZeemanEnergy, AddEdens_zeeman)
 }
 
 func GetZeemanEnergy() float64 {

@@ -56,8 +56,15 @@ type bufWriter struct {
 }
 
 func (w *bufWriter) Write(p []byte) (int, error) { return w.buf.Write(p) }
-func (w *bufWriter) Close() error                { return w.buf.Flush() }
-func (w *bufWriter) Flush() error                { return w.buf.Flush() }
+func (w *bufWriter) Close() error {
+	err := w.buf.Flush()
+	w.buf = nil // Dangling pointer somewhere?
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (w *bufWriter) Flush() error { return w.buf.Flush() }
 
 type appendWriter struct {
 	URL       string

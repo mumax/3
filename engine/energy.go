@@ -11,11 +11,11 @@ var (
 	energyTerms []func() float64        // all contributions to total energy
 	edensTerms  []func(dst *data.Slice) // all contributions to total energy density (add to dst)
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
-	Edens_total sSetter // Total energy density
+	Edens_total = NewScalarField("Edens_total", "J/m3", SetTotalEdens)
 )
 
 func init() {
-	Edens_total.init("Edens_total", "J/m3", "Total energy density", SetTotalEdens)
+	Export(Edens_total, "Total energy density")
 }
 
 // add energy term to global energy

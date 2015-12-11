@@ -1,0 +1,45 @@
+N := 256
+c := 4e-9
+d := 40e-9
+setgridsize(N, N, 1)
+setcellsize(c, c, d)
+
+setGeom(circle(N*c))
+
+// define grains with region number 0-255
+grainSize  := 40e-9  // m
+randomSeed := 1234567
+maxRegion  := 255
+ext_makegrains(grainSize, maxRegion, randomSeed)
+
+defregion(256, circle(N*c).inverse()) // region 256 is outside, not really needed
+
+alpha = 3
+Kc1   = 1000
+Aex   = 13e-12
+Msat  = 860e3
+
+// set random parameters per region
+for i:=0; i<maxRegion; i++{
+	// random cubic anisotropy direction
+	axis1  := vector(randNorm(), randNorm(), randNorm())
+	helper := vector(randNorm(), randNorm(), randNorm())
+	axis2  := axis1.cross(helper)  // perpendicular to axis1
+	AnisC1.SetRegion(i, axis1)     // axes need not be normalized
+	AnisC2.SetRegion(i, axis2)
+
+	// random 10% anisotropy variation
+	K := 1e5
+	Kc1.SetRegion(i, K + randNorm() * 0.1 * K)
+}
+
+// reduce exchange coupling between grains by 10%
+for i:=0; i<maxRegion; i++{
+	for j:=i+1; j<maxRegion; j++{
+		ext_ScaleExchange(i, j, 0.9)
+	}
+}
+
+m = vortex(1, 1)
+
+expect("exchangecoupling", exchCoupling.Average(), 59.83329, 0.001) // golden value mumax3.9.1 2015/12/11

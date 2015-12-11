@@ -27,15 +27,6 @@ func (q *_setter) average() []float64  { return qAverageUniverse(q) }
 func (q *_setter) Set(dst *data.Slice) { q._set(dst) }
 func (q *_setter) Mesh() *data.Mesh    { return Mesh() }
 
-type sSetter struct{ _setter }
-
-func (q *sSetter) init(name, unit, doc string, setFunc func(dst *data.Slice)) {
-	q._init(1, name, unit, doc, setFunc)
-	DeclROnly(name, q, cat(doc, unit))
-}
-func (q *sSetter) Average() float64      { return q.average()[0] }
-func (q *sSetter) Region(r int) *sOneReg { return sOneRegion(q, r) }
-
 type vSetter struct{ _setter }
 
 func (q *vSetter) init(name, unit, doc string, setFunc func(dst *data.Slice)) {

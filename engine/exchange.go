@@ -22,7 +22,8 @@ var (
 	E_exch     *GetScalar // Exchange energy
 	Edens_exch = NewScalarField("Edens_exch", "J/m3", AddExchangeEnergyDensity)
 
-	ExchCoupling sSetter // Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	ExchCoupling = NewScalarField("ExchCoupling", "arb.", exchangeDecode)
 )
 
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
@@ -30,6 +31,7 @@ var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal fun
 func init() {
 	Export(B_exch, "Exchange field")
 	Export(Edens_exch, "Exchange energy density (normal+DM)")
+	Export(ExchCoupling, "Average exchange coupling with neighbors")
 
 	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
 	Dind.init("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
@@ -40,7 +42,6 @@ func init() {
 	lex2.init()
 	din2.init(&Dind)
 	dbulk2.init(&Dbulk)
-	ExchCoupling.init("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 }
 
 // Adds the current exchange field to dst

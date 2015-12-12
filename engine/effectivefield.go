@@ -10,7 +10,7 @@ func init() { B_eff.init("B_eff", "T", "Effective field", SetEffectiveField) }
 
 // Sets dst to the current effective field (T).
 func SetEffectiveField(dst *data.Slice) {
-	B_demag.Set(dst)      // set to B_demag...
+	SetDemagField(dst)    // set to B_demag...
 	AddExchangeField(dst) // ...then add other terms
 	AddAnisotropyField(dst)
 	B_ext.AddTo(dst)

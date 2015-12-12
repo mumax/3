@@ -7,13 +7,13 @@ import (
 )
 
 var (
-	Alpha                    ScalarParam
-	Xi                       ScalarParam
-	Pol                      ScalarParam
-	Lambda                   ScalarParam
-	EpsilonPrime             ScalarParam
-	FrozenSpins              ScalarParam
-	FixedLayer               VectorParam
+	Alpha                    ScalarInput
+	Xi                       ScalarInput
+	Pol                      ScalarInput
+	Lambda                   ScalarInput
+	EpsilonPrime             ScalarInput
+	FrozenSpins              ScalarInput
+	FixedLayer               VectorInput
 	Torque                   = NewVectorOutput("torque", "T", SetTorque)
 	LLTorque                 = NewVectorOutput("LLtorque", "T", SetLLTorque)
 	STTorque                 = NewVectorOutput("STTorque", "T", AddSTTorque)

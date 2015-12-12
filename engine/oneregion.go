@@ -7,6 +7,14 @@ import (
 	"github.com/mumax/3/util"
 )
 
+func sInRegion(q OutputQuantity, r int) ScalarOutput {
+	return AsScalarOutput(inRegion(q, r))
+}
+
+func vInRegion(q OutputQuantity, r int) VectorOutput {
+	return AsVectorOutput(inRegion(q, r))
+}
+
 func sOneRegion(q OutputQuantity, r int) *sOneReg {
 	util.Argument(q.NComp() == 1)
 	return &sOneReg{oneReg{q, r}}

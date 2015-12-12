@@ -1,24 +1,24 @@
 package engine
 
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
-type derivedParam struct {
+type derivedInput struct {
 	lut                          // GPU storage
-	updater  func(*derivedParam) // called to update my value
+	updater  func(*derivedInput) // called to update my value
 	uptodate bool                // cleared if parents' value change
 	parents  []updater           // parents updated before I'm updated
 }
 
-func (p *derivedParam) init(nComp int, parents []updater, updater func(*derivedParam)) {
+func (p *derivedInput) init(nComp int, parents []updater, updater func(*derivedInput)) {
 	p.lut.init(nComp, p) // pass myself to update me if needed
 	p.updater = updater
 	p.parents = parents
 }
 
-func (p *derivedParam) invalidate() {
+func (p *derivedInput) invalidate() {
 	p.uptodate = false
 }
 
-func (p *derivedParam) update() {
+func (p *derivedInput) update() {
 	for _, par := range p.parents {
 		par.update() // may invalidate me
 	}
@@ -30,7 +30,7 @@ func (p *derivedParam) update() {
 }
 
 // Get value in region r.
-func (p *derivedParam) GetRegion(r int) []float64 {
+func (p *derivedInput) GetRegion(r int) []float64 {
 	lut := p.cpuLUT() // updates me if needed
 	v := make([]float64, p.NComp())
 	for c := range v {

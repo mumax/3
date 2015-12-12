@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	Temp        ScalarParam  // Temperature in K
-	temp_red    derivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
+	Temp        ScalarInput  // Temperature in K
+	temp_red    derivedInput // reduced temperature = (alpha * Temp) / (mu0 * Msat)
 	E_therm     *GetScalar   // Thermal energy in J
 	Edens_therm = NewScalarOutput("Edens_therm", "J/m3", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
@@ -37,7 +37,7 @@ func init() {
 	DeclROnly("B_therm", &B_therm, "Thermal field (T)")
 
 	// reduced temperature = (alpha * T) / (mu0 * Msat)
-	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedParam) {
+	temp_red.init(1, []updater{&Alpha, &Temp, &Msat}, func(p *derivedInput) {
 		dst := temp_red.cpu_buf
 		alpha := Alpha.cpuLUT()
 		T := Temp.cpuLUT()

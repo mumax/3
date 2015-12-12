@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	Aex        ScalarParam // Exchange stiffness
-	Dind       ScalarParam // interfacial DMI strength
-	Dbulk      ScalarParam // bulk DMI strength
+	Aex        ScalarInput // Exchange stiffness
+	Dind       ScalarInput // interfacial DMI strength
+	Dbulk      ScalarInput // bulk DMI strength
 	B_exch     = NewVectorOutput("B_exch", "T", AddExchangeField)
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
@@ -101,7 +101,7 @@ func (p *aexchParam) init() {
 	}
 }
 
-func (p *dexchParam) init(parent *ScalarParam) {
+func (p *dexchParam) init(parent *ScalarInput) {
 	for i := range p.scale {
 		p.scale[i] = 1 // default scaling
 	}
@@ -129,7 +129,7 @@ func (p *aexchParam) Gpu() cuda.SymmLUT {
 
 type aexchParam struct{ exchParam }
 type dexchParam struct {
-	parent *ScalarParam
+	parent *ScalarInput
 	exchParam
 }
 

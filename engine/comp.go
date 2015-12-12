@@ -9,26 +9,24 @@ import (
 	"github.com/mumax/3/util"
 )
 
-type comp struct {
+type component struct {
 	parent OutputQuantity
 	comp   int
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent OutputQuantity, c int) *comp {
+func Comp(parent OutputQuantity, c int) ScalarOutput {
 	util.Argument(c >= 0 && c < parent.NComp())
-	return &comp{parent, c}
+	return AsScalarOutput(&component{parent, c})
 }
 
-func (q *comp) NComp() int            { return 1 }
-func (q *comp) Name() string          { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
-func (q *comp) Unit() string          { return q.parent.Unit() }
-func (q *comp) Mesh() *data.Mesh      { return q.parent.Mesh() }
-func (q *comp) average() []float64    { return []float64{q.parent.average()[q.comp]} }
-func (q *comp) Average() float64      { return q.average()[0] }
-func (q *comp) Region(r int) *sOneReg { return sOneRegion(q, r) }
+func (q *component) NComp() int         { return 1 }
+func (q *component) Name() string       { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
+func (q *component) Unit() string       { return q.parent.Unit() }
+func (q *component) Mesh() *data.Mesh   { return q.parent.Mesh() }
+func (q *component) average() []float64 { return []float64{q.parent.average()[q.comp]} }
 
-func (q *comp) Slice() (*data.Slice, bool) {
+func (q *component) Slice() (*data.Slice, bool) {
 	p := q.parent
 	src, r := p.Slice()
 	if r {

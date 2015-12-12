@@ -3,7 +3,7 @@ package engine
 var (
 	B_ext        excitation
 	E_Zeeman     *GetScalar
-	Edens_zeeman = NewScalarField("Edens_Zeeman", "J/m3", AddEdens_zeeman)
+	Edens_zeeman = NewScalarOutput("Edens_Zeeman", "J/m3", AddEdens_zeeman)
 )
 
 var AddEdens_zeeman = makeEdensAdder(&B_ext, -1)

@@ -13,7 +13,7 @@ var (
 	Msat        ScalarParam
 	Bsat        derivedParam
 	M_full      = NewVectorField("m_full", "A/m", SetMFull)
-	B_demag     vSetter
+	B_demag     = NewVectorField("B_demag", "T", SetDemagField)
 	E_demag     *GetScalar
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
 
@@ -28,14 +28,14 @@ var (
 var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
 
 func init() {
+	Export(B_demag, "Magnetostatic field")
 	Export(Edens_demag, "Magnetostatic energy density")
+	Export(M_full, "Unnormalized magnetization")
 
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
 	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
-	Export(M_full, "Unnormalized magnetization")
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
-	B_demag.init("B_demag", "T", "Magnetostatic field", SetDemagField)
 	E_demag = NewGetScalar("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 	registerEnergy(GetDemagEnergy, AddEdens_demag)
 

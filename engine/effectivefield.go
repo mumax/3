@@ -4,9 +4,11 @@ package engine
 
 import "github.com/mumax/3/data"
 
-var B_eff vSetter // total effective field
+var B_eff = NewVectorField("B_eff", "T", SetEffectiveField)
 
-func init() { B_eff.init("B_eff", "T", "Effective field", SetEffectiveField) }
+func init() {
+	Export(B_eff, "Effective field")
+}
 
 // Sets dst to the current effective field (T).
 func SetEffectiveField(dst *data.Slice) {

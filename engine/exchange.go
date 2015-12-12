@@ -15,15 +15,15 @@ var (
 	Aex        ScalarParam // Exchange stiffness
 	Dind       ScalarParam // interfacial DMI strength
 	Dbulk      ScalarParam // bulk DMI strength
-	B_exch     = NewVectorField("B_exch", "T", AddExchangeField)
+	B_exch     = NewVectorOutput("B_exch", "T", AddExchangeField)
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
 	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
 	E_exch     *GetScalar // Exchange energy
-	Edens_exch = NewScalarField("Edens_exch", "J/m3", AddExchangeEnergyDensity)
+	Edens_exch = NewScalarOutput("Edens_exch", "J/m3", AddExchangeEnergyDensity)
 
 	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
-	ExchCoupling = NewScalarField("ExchCoupling", "arb.", exchangeDecode)
+	ExchCoupling = NewScalarOutput("ExchCoupling", "arb.", exchangeDecode)
 )
 
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func

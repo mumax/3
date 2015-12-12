@@ -12,7 +12,7 @@ var (
 	Temp        ScalarParam  // Temperature in K
 	temp_red    derivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
 	E_therm     *GetScalar   // Thermal energy in J
-	Edens_therm = NewScalarField("Edens_therm", "J/m3", AddThermalEnergyDensity)
+	Edens_therm = NewScalarOutput("Edens_therm", "J/m3", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
 )
 

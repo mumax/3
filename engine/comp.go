@@ -10,12 +10,12 @@ import (
 )
 
 type comp struct {
-	parent Quantity
+	parent OutputQuantity
 	comp   int
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent Quantity, c int) *comp {
+func Comp(parent OutputQuantity, c int) *comp {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return &comp{parent, c}
 }

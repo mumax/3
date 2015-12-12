@@ -10,13 +10,13 @@ func init() {
 }
 
 type dotProduct struct {
-	a, b Quantity
+	a, b OutputQuantity
 }
 
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
 // 	DotProct(&M, &B_ext)
-func DotProduct(a, b Quantity) *dotProduct {
+func DotProduct(a, b OutputQuantity) *dotProduct {
 	return &dotProduct{a, b}
 }
 

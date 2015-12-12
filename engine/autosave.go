@@ -5,8 +5,8 @@ package engine
 import "fmt"
 
 var (
-	output  = make(map[Quantity]*autosave) // when to save quantities
-	autonum = make(map[interface{}]int)    // auto number for out file
+	output  = make(map[OutputQuantity]*autosave) // when to save quantities
+	autonum = make(map[interface{}]int)          // auto number for out file
 )
 
 func init() {
@@ -29,17 +29,17 @@ func DoOutput() {
 
 // Register quant to be auto-saved every period.
 // period == 0 stops autosaving.
-func AutoSave(q Quantity, period float64) {
+func AutoSave(q OutputQuantity, period float64) {
 	autoSave(q, period, Save)
 }
 
 // Register quant to be auto-saved as image, every period.
-func AutoSnapshot(q Quantity, period float64) {
+func AutoSnapshot(q OutputQuantity, period float64) {
 	autoSave(q, period, Snapshot)
 }
 
 // register save(q) to be called every period
-func autoSave(q Quantity, period float64, save func(Quantity)) {
+func autoSave(q OutputQuantity, period float64, save func(OutputQuantity)) {
 	if period == 0 {
 		delete(output, q)
 	} else {
@@ -55,10 +55,10 @@ func autoFname(name string, format OutputFormat, num int) string {
 
 // keeps info needed to decide when a quantity needs to be periodically saved
 type autosave struct {
-	period float64        // How often to save
-	start  float64        // Starting point
-	count  int            // Number of times it has been autosaved
-	save   func(Quantity) // called to do the actual save
+	period float64              // How often to save
+	start  float64              // Starting point
+	count  int                  // Number of times it has been autosaved
+	save   func(OutputQuantity) // called to do the actual save
 }
 
 // returns true when the time is right to save.

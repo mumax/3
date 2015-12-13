@@ -10,7 +10,10 @@ import (
 // Slice() ->  EvalTo(dst)
 
 type outputValue interface {
-	get() []float64
+	average() []float64
+	Name() string // TODO: interface with Name, Unit, NComp
+	Unit() string
+	NComp() int
 }
 
 type ScalarValue struct {
@@ -26,6 +29,10 @@ func NewScalarValue(name, unit string, f func() float64) ScalarValue {
 	return ScalarValue{&getFunc{Info(1, name, unit), g}}
 }
 
+func (s ScalarValue) Get() float64 {
+	return s.average()[0]
+}
+
 // wraps a func to make it a quantity
 // unifies getScalar and getVector
 type getFunc struct {
@@ -33,8 +40,7 @@ type getFunc struct {
 	f func() []float64
 }
 
-func (g *getFunc) get() []float64 { return g.f() }
-
+func (g *getFunc) get() []float64     { return g.f() }
 func (g *getFunc) average() []float64 { return g.get() }
 
 func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFunc {

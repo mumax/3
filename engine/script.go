@@ -60,7 +60,10 @@ func DeclROnly(name string, value interface{}, doc string) {
 	GUIAdd(name, value)
 }
 
-func Export(q outputField, doc string) {
+func Export(q interface {
+	Name() string
+	Unit() string
+}, doc string) {
 	DeclROnly(q.Name(), q, cat(doc, q.Unit()))
 }
 

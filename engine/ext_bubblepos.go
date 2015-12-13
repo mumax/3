@@ -6,8 +6,8 @@ import (
 
 var (
 	BubblePos   = NewGetVector("ext_bubblepos", "m", "Bubble core position", bubblePos)
-	BubbleDist  = NewGetScalar("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
-	BubbleSpeed = NewGetScalar("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
+	BubbleDist  = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
+	BubbleSpeed = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
 )
 
 func bubblePos() []float64 {

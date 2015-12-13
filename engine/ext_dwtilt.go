@@ -5,7 +5,7 @@ import (
 )
 
 // PMA domain wall tilt assuming straight wall.
-var DWTiltPMA = NewGetScalar("ext_dwtilt", "rad", "PMA domain wall tilt", dwTiltPMA)
+var DWTiltPMA = NewScalarValue("ext_dwtilt", "rad", "PMA domain wall tilt", dwTiltPMA)
 
 func dwTiltPMA() float64 {
 	m := Download(&M)

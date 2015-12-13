@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	DWPos = NewGetScalar("ext_dwpos", "m", "Position of the simulation window while following a domain wall", GetShiftPos) // TODO: make more accurate
+	DWPos   = NewScalarValue("ext_dwpos", "m", "Position of the simulation window while following a domain wall", GetShiftPos) // TODO: make more accurate
+	DWSpeed = NewScalarValue("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
 func init() {
@@ -59,7 +60,6 @@ var (
 	lastShift float64 // shift the last time we queried speed
 	lastT     float64 // time the last time we queried speed
 	lastV     float64 // speed the last time we queried speed
-	DWSpeed   = NewGetScalar("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
 func getShiftSpeed() float64 {

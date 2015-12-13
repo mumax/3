@@ -16,13 +16,14 @@ var (
 	kc1_red, kc2_red, kc3_red derivedInput
 	B_anis                    = NewVectorField("B_anis", "T", AddAnisotropyField)
 	Edens_anis                = NewScalarField("Edens_anis", "J/m3", AddAnisotropyEnergyDensity)
-	E_anis                    *GetScalar // Anisotorpy energy
+	E_anis                    = NewScalarValue("E_anis", "J", GetAnisotropyEnergy)
 	zero                      inputParam // utility zero parameter
 )
 
 func init() {
 	Export(B_anis, "Anisotropy field")
 	Export(Edens_anis, "Anisotropy energy density")
+	Export(E_anis, "Anisotropy energy (uni+cubic)")
 
 	Ku1.init("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
 	Ku2.init("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", []derived{&ku2_red})
@@ -32,7 +33,6 @@ func init() {
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
-	E_anis = NewGetScalar("E_anis", "J", "Anisotropy energy (uni+cubic)", GetAnisotropyEnergy)
 	registerEnergy(GetAnisotropyEnergy, AddAnisotropyEnergyDensity)
 	zero.init(1, "_zero", "", nil)
 

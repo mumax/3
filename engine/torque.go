@@ -14,9 +14,9 @@ var (
 	EpsilonPrime             ScalarInput
 	FrozenSpins              ScalarInput
 	FixedLayer               VectorInput
-	Torque                   = VectorFunc("torque", "T", SetTorque)
-	LLTorque                 = VectorFunc("LLtorque", "T", SetLLTorque)
-	STTorque                 = VectorFunc("STTorque", "T", AddSTTorque)
+	Torque                   = NewVectorField("torque", "T", SetTorque)
+	LLTorque                 = NewVectorField("LLtorque", "T", SetLLTorque)
+	STTorque                 = NewVectorField("STTorque", "T", AddSTTorque)
 	J                        excitation // Polarized electrical current density
 	MaxTorque                *GetScalar
 	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts

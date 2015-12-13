@@ -4,7 +4,7 @@ package engine
 
 import "github.com/mumax/3/data"
 
-var B_eff = VectorFunc("B_eff", "T", SetEffectiveField)
+var B_eff = NewVectorField("B_eff", "T", SetEffectiveField)
 
 func init() {
 	Export(B_eff, "Effective field")

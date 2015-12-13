@@ -12,10 +12,10 @@ import (
 var (
 	Msat        ScalarInput
 	Bsat        derivedInput
-	M_full      = VectorFunc("m_full", "A/m", SetMFull)
-	B_demag     = VectorFunc("B_demag", "T", SetDemagField)
+	M_full      = NewVectorField("m_full", "A/m", SetMFull)
+	B_demag     = NewVectorField("B_demag", "T", SetDemagField)
 	E_demag     *GetScalar
-	Edens_demag = ScalarFunc("Edens_demag", "J/m3", AddEdens_demag)
+	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
 
 	EnableDemag   = true                 // enable/disable global demag field
 	NoDemagSpins  ScalarInput            // disable demag field per-cell

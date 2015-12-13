@@ -9,9 +9,9 @@ import (
 // TODO
 // Slice() ->  EvalTo(dst)
 
-// Quantity represents a space-dependent quantity,
-// Like M, B_eff or alpha.
-type OutputQuantity interface {
+// OutputQuantity represents a space-dependent quantity,
+// that can be saved, like M, B_eff or alpha.
+type outputField interface {
 	Slice() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
 	NComp() int                           // Number of components (1: scalar, 3: vector, ...)
 	Name() string                         // Human-readable identifier, e.g. "m", "alpha"
@@ -20,16 +20,12 @@ type OutputQuantity interface {
 	average() []float64
 }
 
-func NewQuantity(nComp int, name, unit string, f func(dst *data.Slice)) OutputQuantity {
-	return &callbackOutput{info{nComp, name, unit}, f}
+func VectorFunc(name, unit string, f func(dst *data.Slice)) VectorField {
+	return AsVectorField(&callbackOutput{info{3, name, unit}, f})
 }
 
-func NewVectorOutput(name, unit string, f func(dst *data.Slice)) VectorOutput {
-	return AsVectorOutput(NewQuantity(3, name, unit, f))
-}
-
-func NewScalarOutput(name, unit string, f func(dst *data.Slice)) ScalarOutput {
-	return AsScalarOutput(NewQuantity(1, name, unit, f))
+func ScalarFunc(name, unit string, f func(dst *data.Slice)) ScalarField {
+	return AsScalarField(&callbackOutput{info{1, name, unit}, f})
 }
 
 type callbackOutput struct {
@@ -51,37 +47,37 @@ func (q *callbackOutput) Slice() (s *data.Slice, recycle bool) {
 
 // ScalarField is a Quantity guaranteed to have 1 component.
 // Provides convenience methods particular to scalars.
-type ScalarOutput struct {
-	OutputQuantity
+type ScalarField struct {
+	outputField
 }
 
 // AsScalarField promotes a quantity to a ScalarField,
 // enabling convenience methods particular to scalars.
-func AsScalarOutput(q OutputQuantity) ScalarOutput {
+func AsScalarField(q outputField) ScalarField {
 	if q.NComp() != 1 {
 		panic(fmt.Errorf("ScalarField(%v): need 1 component, have: %v", q.Name(), q.NComp()))
 	}
-	return ScalarOutput{q}
+	return ScalarField{q}
 }
 
-func (s ScalarOutput) Average() float64          { return s.OutputQuantity.average()[0] }
-func (s ScalarOutput) Region(r int) ScalarOutput { return AsScalarOutput(inRegion(s.OutputQuantity, r)) }
+func (s ScalarField) Average() float64         { return s.outputField.average()[0] }
+func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.outputField, r)) }
 
 // VectorField is a Quantity guaranteed to have 3 components.
 // Provides convenience methods particular to vectors.
-type VectorOutput struct {
-	OutputQuantity
+type VectorField struct {
+	outputField
 }
 
 // AsVectorField promotes a quantity to a VectorField,
 // enabling convenience methods particular to vectors.
-func AsVectorOutput(q OutputQuantity) VectorOutput {
+func AsVectorField(q outputField) VectorField {
 	if q.NComp() != 3 {
 		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", q.Name(), q.NComp()))
 	}
-	return VectorOutput{q}
+	return VectorField{q}
 }
 
-func (v VectorOutput) Average() data.Vector      { return unslice(v.OutputQuantity.average()) }
-func (v VectorOutput) Region(r int) VectorOutput { return AsVectorOutput(inRegion(v.OutputQuantity, r)) }
-func (v VectorOutput) Comp(c int) ScalarOutput   { return AsScalarOutput(Comp(v.OutputQuantity, c)) }
+func (v VectorField) Average() data.Vector     { return unslice(v.outputField.average()) }
+func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.outputField, r)) }
+func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.outputField, c)) }

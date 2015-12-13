@@ -59,4 +59,4 @@ func (p *VectorInput) Type() reflect.Type      { return reflect.TypeOf(new(Vecto
 func (p *VectorInput) InputType() reflect.Type { return script.VectorFunction_t }
 func (p *VectorInput) Region(r int) *vOneReg   { return vOneRegion(p, r) }
 func (p *VectorInput) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
-func (p *VectorInput) Comp(c int) ScalarOutput { return Comp(p, c) }
+func (p *VectorInput) Comp(c int) ScalarField  { return Comp(p, c) }

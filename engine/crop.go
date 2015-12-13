@@ -19,12 +19,12 @@ func init() {
 }
 
 type cropped struct {
-	parent                 OutputQuantity
+	parent                 outputField
 	name                   string
 	x1, x2, y1, y2, z1, z2 int
 }
 
-func CropRegion(parent OutputQuantity, region int) *cropped {
+func CropRegion(parent outputField, region int) *cropped {
 	n := parent.Mesh().Size()
 	// use -1 for unset values
 	x1, y1, z1 := -1, -1, -1
@@ -64,27 +64,27 @@ func CropRegion(parent OutputQuantity, region int) *cropped {
 	return Crop(parent, x1, x2+1, y1, y2+1, z1, z2+1)
 }
 
-func CropLayer(parent OutputQuantity, layer int) *cropped {
+func CropLayer(parent outputField, layer int) *cropped {
 	n := parent.Mesh().Size()
 	return Crop(parent, 0, n[X], 0, n[Y], layer, layer+1)
 }
 
-func CropX(parent OutputQuantity, x1, x2 int) *cropped {
+func CropX(parent outputField, x1, x2 int) *cropped {
 	n := parent.Mesh().Size()
 	return Crop(parent, x1, x2, 0, n[Y], 0, n[Z])
 }
 
-func CropY(parent OutputQuantity, y1, y2 int) *cropped {
+func CropY(parent outputField, y1, y2 int) *cropped {
 	n := parent.Mesh().Size()
 	return Crop(parent, 0, n[X], y1, y2, 0, n[Z])
 }
 
-func CropZ(parent OutputQuantity, z1, z2 int) *cropped {
+func CropZ(parent outputField, z1, z2 int) *cropped {
 	n := parent.Mesh().Size()
 	return Crop(parent, 0, n[X], 0, n[Y], z1, z2)
 }
 
-func Crop(parent OutputQuantity, x1, x2, y1, y2, z1, z2 int) *cropped {
+func Crop(parent outputField, x1, x2, y1, y2, z1, z2 int) *cropped {
 	n := parent.Mesh().Size()
 	util.Argument(x1 < x2 && y1 < y2 && z1 < z2)
 	util.Argument(x1 >= 0 && y1 >= 0 && z1 >= 0)

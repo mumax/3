@@ -48,6 +48,7 @@ func init() {
 }
 
 // Sets dst to the current total torque
+// TODO: extensible
 func SetTorque(dst *data.Slice) {
 	SetLLTorque(dst)
 	AddSTTorque(dst)

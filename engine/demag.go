@@ -15,7 +15,7 @@ var (
 	M_full      = NewVectorField("m_full", "A/m", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
-	E_demag     = NewScalarValue("E_demag", "J", GetDemagEnergy)
+	E_demag     = NewScalarValue("E_demag", "J", "magnetostatic energy", GetDemagEnergy)
 
 	EnableDemag   = true                 // enable/disable global demag field
 	NoDemagSpins  ScalarInput            // disable demag field per-cell
@@ -29,7 +29,6 @@ var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
 
 func init() {
 	Export(B_demag, "Magnetostatic field")
-	Export(E_demag, "Magnetostatic energy")
 	Export(Edens_demag, "Magnetostatic energy density")
 	Export(M_full, "Unnormalized magnetization")
 

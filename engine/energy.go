@@ -7,15 +7,18 @@ import (
 	"github.com/mumax/3/data"
 )
 
+// TODO: Integrate(Edens)
+
 var (
 	energyTerms []func() float64        // all contributions to total energy
 	edensTerms  []func(dst *data.Slice) // all contributions to total energy density (add to dst)
-	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
 	Edens_total = NewScalarField("Edens_total", "J/m3", SetTotalEdens)
+	E_total     = NewScalarValue("E_total", "J", "total energy", GetTotalEnergy)
 )
 
 func init() {
 	Export(Edens_total, "Total energy density")
+	//Export(E_total, "Total energy")
 }
 
 // add energy term to global energy

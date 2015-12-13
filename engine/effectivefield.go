@@ -11,6 +11,7 @@ func init() {
 }
 
 // Sets dst to the current effective field (T).
+// TODO: extensible slice
 func SetEffectiveField(dst *data.Slice) {
 	SetDemagField(dst)    // set to B_demag...
 	AddExchangeField(dst) // ...then add other terms

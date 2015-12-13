@@ -11,7 +11,7 @@ var (
 	energyTerms []func() float64        // all contributions to total energy
 	edensTerms  []func(dst *data.Slice) // all contributions to total energy density (add to dst)
 	E_total     = NewGetScalar("E_total", "J", "Total energy", GetTotalEnergy)
-	Edens_total = ScalarFunc("Edens_total", "J/m3", SetTotalEdens)
+	Edens_total = NewScalarField("Edens_total", "J/m3", SetTotalEdens)
 )
 
 func init() {

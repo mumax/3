@@ -9,6 +9,63 @@ import (
 // TODO
 // Slice() ->  EvalTo(dst)
 
+type outputValue interface {
+	get() []float64
+}
+
+type ScalarValue struct {
+	outputValue
+}
+
+type VectorValue struct {
+	outputValue
+}
+
+func NewScalarValue(name, unit string, f func() float64) ScalarValue {
+	g := func() []float64 { return []float64{f()} }
+	return ScalarValue{&getFunc{Info(1, name, unit), g}}
+}
+
+// wraps a func to make it a quantity
+// unifies getScalar and getVector
+type getFunc struct {
+	info
+	f func() []float64
+}
+
+func (g *getFunc) get() []float64 { return g.f() }
+
+func (g *getFunc) average() []float64 { return g.get() }
+
+func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFunc {
+	return getFunc{Info(nComp, name, unit), get}
+}
+
+type GetScalar struct{ getFunc }
+type GetVector struct{ getFunc }
+
+func (g *GetScalar) Get() float64     { return g.get()[0] }
+func (g *GetScalar) Average() float64 { return g.Get() }
+
+func (g *GetVector) Get() data.Vector     { return unslice(g.get()) }
+func (g *GetVector) Average() data.Vector { return g.Get() }
+
+// INTERNAL
+func NewGetScalar(name, unit, doc string, get func() float64) *GetScalar {
+	g := &GetScalar{newGetfunc_(1, name, unit, doc, func() []float64 {
+		return []float64{get()}
+	})}
+	DeclROnly(name, g, cat(doc, unit))
+	return g
+}
+
+// INTERNAL
+func NewGetVector(name, unit, doc string, get func() []float64) *GetVector {
+	g := &GetVector{newGetfunc_(3, name, unit, doc, get)}
+	DeclROnly(name, g, cat(doc, unit))
+	return g
+}
+
 // OutputQuantity represents a space-dependent quantity,
 // that can be saved, like M, B_eff or alpha.
 type outputField interface {
@@ -20,11 +77,11 @@ type outputField interface {
 	average() []float64
 }
 
-func VectorFunc(name, unit string, f func(dst *data.Slice)) VectorField {
+func NewVectorField(name, unit string, f func(dst *data.Slice)) VectorField {
 	return AsVectorField(&callbackOutput{info{3, name, unit}, f})
 }
 
-func ScalarFunc(name, unit string, f func(dst *data.Slice)) ScalarField {
+func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {
 	return AsScalarField(&callbackOutput{info{1, name, unit}, f})
 }
 

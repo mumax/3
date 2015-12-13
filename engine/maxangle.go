@@ -7,7 +7,7 @@ import (
 
 var (
 	MaxAngle  *GetScalar
-	SpinAngle = ScalarFunc("spinAngle", "rad", SetSpinAngle)
+	SpinAngle = NewScalarField("spinAngle", "rad", SetSpinAngle)
 )
 
 func init() {

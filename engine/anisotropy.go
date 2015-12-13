@@ -14,8 +14,8 @@ var (
 	AnisU, AnisC1, AnisC2     VectorInput  // unixial and cubic anis axes
 	ku1_red, ku2_red          derivedInput // K1 / Msat
 	kc1_red, kc2_red, kc3_red derivedInput
-	B_anis                    = VectorFunc("B_anis", "T", AddAnisotropyField)
-	Edens_anis                = ScalarFunc("Edens_anis", "J/m3", AddAnisotropyEnergyDensity)
+	B_anis                    = NewVectorField("B_anis", "T", AddAnisotropyField)
+	Edens_anis                = NewScalarField("Edens_anis", "J/m3", AddAnisotropyEnergyDensity)
 	E_anis                    *GetScalar // Anisotorpy energy
 	zero                      inputParam // utility zero parameter
 )

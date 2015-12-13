@@ -8,12 +8,11 @@ import (
 )
 
 var (
-	Ext_TopologicalCharge        *GetScalar
+	Ext_TopologicalCharge        = NewScalarValue("ext_topologicalcharge", "", "2D topological charge", GetTopologicalCharge)
 	Ext_TopologicalChargeDensity = NewScalarField("ext_topologicalchargedensity", "1/m2", SetTopologicalChargeDensity)
 )
 
 func init() {
-	Ext_TopologicalCharge = NewGetScalar("ext_topologicalcharge", "", "2D topological charge", GetTopologicalCharge)
 	Export(Ext_TopologicalChargeDensity, "2D topological charge density m·(m/∂x ❌ ∂m/∂y)")
 }
 

@@ -15,7 +15,7 @@ import (
 
 type render struct {
 	mutex        sync.Mutex
-	quant        OutputQuantity
+	quant        outputField
 	comp         string
 	layer, scale int
 	saveCount    int         // previous max slider value of time

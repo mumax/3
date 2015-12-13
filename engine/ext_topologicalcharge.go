@@ -9,7 +9,7 @@ import (
 
 var (
 	Ext_TopologicalCharge        *GetScalar
-	Ext_TopologicalChargeDensity = NewScalarOutput("ext_topologicalchargedensity", "1/m2", SetTopologicalChargeDensity)
+	Ext_TopologicalChargeDensity = ScalarFunc("ext_topologicalchargedensity", "1/m2", SetTopologicalChargeDensity)
 )
 
 func init() {

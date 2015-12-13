@@ -10,21 +10,21 @@ import (
 )
 
 type component struct {
-	parent OutputQuantity
+	parent outputField
 	comp   int
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent OutputQuantity, c int) ScalarOutput {
+func Comp(parent outputField, c int) ScalarField {
 	util.Argument(c >= 0 && c < parent.NComp())
-	return AsScalarOutput(&component{parent, c})
+	return AsScalarField(&component{parent, c})
 }
 
 func (q *component) NComp() int         { return 1 }
 func (q *component) Name() string       { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
 func (q *component) Unit() string       { return q.parent.Unit() }
 func (q *component) Mesh() *data.Mesh   { return q.parent.Mesh() }
-func (q *component) average() []float64 { return []float64{q.parent.average()[q.comp]} }
+func (q *component) average() []float64 { return []float64{q.parent.average()[q.comp]} } // TODO
 
 func (q *component) Slice() (*data.Slice, bool) {
 	p := q.parent

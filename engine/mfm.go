@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	MFM        = NewScalarOutput("MFM", "arb.", SetMFM)
+	MFM        = ScalarFunc("MFM", "arb.", SetMFM)
 	MFMLift    numberParam
 	MFMTipSize numberParam
 	mfmconv_   *cuda.MFMConvolution

@@ -18,11 +18,11 @@ var (
 	LLTorque                 = NewVectorField("LLtorque", "T", SetLLTorque)
 	STTorque                 = NewVectorField("STTorque", "T", AddSTTorque)
 	J                        excitation // Polarized electrical current density
-	MaxTorque                *GetScalar
-	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
-	Precess                          = true
-	DisableZhangLiTorque             = false
-	DisableSlonczewskiTorque         = false
+	MaxTorque                           = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
+	GammaLL                  float64    = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
+	Precess                             = true
+	DisableZhangLiTorque                = false
+	DisableSlonczewskiTorque            = false
 )
 
 func init() {
@@ -44,7 +44,6 @@ func init() {
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")
 	DeclVar("DoPrecess", &Precess, "Enables LL precession (default=true)")
-	MaxTorque = NewGetScalar("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 }
 
 // Sets dst to the current total torque

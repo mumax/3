@@ -6,13 +6,12 @@ import (
 )
 
 var (
-	MaxAngle  *GetScalar
+	MaxAngle  = NewScalarValue("MaxAngle", "rad", "maximum angle between neighboring spins", GetMaxAngle) // TODO: Max(...)
 	SpinAngle = NewScalarField("spinAngle", "rad", SetSpinAngle)
 )
 
 func init() {
 	Export(SpinAngle, "Angle between neighboring spins")
-	MaxAngle = NewGetScalar("MaxAngle", "rad", "Maximum angle between neighboring spins", GetMaxAngle)
 }
 
 func SetSpinAngle(dst *data.Slice) {

@@ -45,8 +45,8 @@ type outputValue interface {
 	average() []float64 // TODO: rename
 }
 
-// wraps a func to make it a quantity
-// unifies getScalar and getVector
+// outputFunc is an outputValue implementation where a function provides the output value.
+// E.g.: func GetTotalEnergy() provides the value for E_total.
 type outputFunc struct {
 	info
 	f func() []float64
@@ -54,10 +54,6 @@ type outputFunc struct {
 
 func (g *outputFunc) get() []float64     { return g.f() }
 func (g *outputFunc) average() []float64 { return g.get() }
-
-func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) outputFunc {
-	return outputFunc{info{nComp, name, unit}, get}
-}
 
 // ScalarValue enhances an outputValue with methods specific to
 // a space-independent scalar quantity (e.g. total energy).
@@ -87,7 +83,7 @@ func (g *GetVector) Average() data.Vector { return g.Get() }
 
 // INTERNAL
 func NewGetVector(name, unit, doc string, get func() []float64) *GetVector {
-	g := &GetVector{newGetfunc_(3, name, unit, doc, get)}
+	g := &GetVector{outputFunc{info{3, name, unit}, get}}
 	DeclROnly(name, g, cat(doc, unit))
 	return g
 }

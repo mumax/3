@@ -19,28 +19,34 @@ import (
 // TODO
 // Slice() ->  EvalTo(dst)
 
-// TODO: remove, rename Info2 -> newInfo
-// Interface Info
-func Info(nComp int, name, unit string) info {
-	return info{nComp: nComp, name: name, unit: unit}
+// The Info interface defines the bare minimum methods a quantity must implement
+// to be accessible for scripting and I/O.
+type Info interface {
+	Name() string // number of components (scalar, vector, ...)
+	Unit() string // name used for output file (e.g. "m")
+	NComp() int   // unit, e.g. "A/m"
 }
 
+// info provides an Info implementation intended for embedding.
 type info struct {
-	nComp int // number of components (scalar, vector, ...)
+	nComp int
 	name  string
 	unit  string
-	//desc  string
+}
+
+func makeInfo(nComp int, name, unit string) info {
+	return info{nComp: nComp, name: name, unit: unit}
 }
 
 func (i *info) Name() string { return i.name }
 func (i *info) Unit() string { return i.unit }
 func (i *info) NComp() int   { return i.nComp }
 
+// an outputValue is an outputable  scalar or vector value
+// that has no space-dependence. E.g. averaged magnetization, total energy.
 type outputValue interface {
-	average() []float64
-	Name() string // TODO: interface with Name, Unit, NComp
-	Unit() string
-	NComp() int
+	Info
+	average() []float64 // TODO: rename
 }
 
 type ScalarValue struct {
@@ -53,7 +59,7 @@ type VectorValue struct {
 
 func NewScalarValue(name, unit, desc string, f func() float64) ScalarValue {
 	g := func() []float64 { return []float64{f()} }
-	v := ScalarValue{&getFunc{Info(1, name, unit), g}}
+	v := ScalarValue{&getFunc{makeInfo(1, name, unit), g}}
 	Export(v, desc)
 	return v
 }
@@ -73,7 +79,7 @@ func (g *getFunc) get() []float64     { return g.f() }
 func (g *getFunc) average() []float64 { return g.get() }
 
 func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFunc {
-	return getFunc{Info(nComp, name, unit), get}
+	return getFunc{makeInfo(nComp, name, unit), get}
 }
 
 type GetVector struct{ getFunc }
@@ -100,13 +106,13 @@ type outputField interface {
 }
 
 func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorField {
-	v := AsVectorField(&callbackOutput{Info(3, name, unit), f})
+	v := AsVectorField(&callbackOutput{makeInfo(3, name, unit), f})
 	Export(v, desc)
 	return v
 }
 
 func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {
-	return AsScalarField(&callbackOutput{Info(1, name, unit), f})
+	return AsScalarField(&callbackOutput{makeInfo(1, name, unit), f})
 }
 
 type callbackOutput struct {

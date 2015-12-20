@@ -10,7 +10,8 @@ import (
 
 // Demag variables
 var (
-	Msat        ScalarParam
+	Msat        = NewScalarParam( "Msat", "A/m", "Saturation magnetization", 
+		[]derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
 	Bsat        derivedParam
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
@@ -18,7 +19,7 @@ var (
 	E_demag     = NewScalarValue("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 
 	EnableDemag   = true                 // enable/disable global demag field
-	NoDemagSpins  ScalarParam            // disable demag field per-cell
+	NoDemagSpins  = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 	CacheDir      = ""                   // directory for kernel cache
@@ -28,18 +29,14 @@ var (
 var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
 
 func init() {
-	//Export(B_demag, "Magnetostatic field")
 	Export(Edens_demag, "Magnetostatic energy density")
-	//Export(M_full, "Unnormalized magnetization")
-
-	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
-	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)
+	
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
 	registerEnergy(GetDemagEnergy, AddEdens_demag)
 
 	//Bsat = Msat * mu0
-	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedParam) {
+	Bsat.init(SCALAR, []updater{Msat}, func(p *derivedParam) {
 		Ms := Msat.cpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms

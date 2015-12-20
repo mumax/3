@@ -34,24 +34,24 @@ func init() {
 	zero.init(1, "_zero", "", nil)
 
 	//ku1_red = Ku1 / Msat
-	ku1_red.init(SCALAR, []updater{Ku1, &Msat}, func(p *derivedParam) {
+	ku1_red.init(SCALAR, []updater{Ku1, Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
 	})
 	//ku2_red = Ku2 / Msat
-	ku2_red.init(SCALAR, []updater{Ku2, &Msat}, func(p *derivedParam) {
+	ku2_red.init(SCALAR, []updater{Ku2, Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Ku2.cpuLUT(), Msat.cpuLUT())
 	})
 
 	//kc1_red = Kc1 / Msat
-	kc1_red.init(SCALAR, []updater{Kc1, &Msat}, func(p *derivedParam) {
+	kc1_red.init(SCALAR, []updater{Kc1, Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
 	})
 	//kc2_red = Kc2 / Msat
-	kc2_red.init(SCALAR, []updater{Kc2, &Msat}, func(p *derivedParam) {
+	kc2_red.init(SCALAR, []updater{Kc2, Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc2.cpuLUT(), Msat.cpuLUT())
 	})
 	//kc3_red = Kc3 / Msat
-	kc3_red.init(SCALAR, []updater{Kc3, &Msat}, func(p *derivedParam) {
+	kc3_red.init(SCALAR, []updater{Kc3, Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc3.cpuLUT(), Msat.cpuLUT())
 	})
 }

@@ -12,9 +12,11 @@ import (
 )
 
 var (
-	Aex        ScalarParam // Exchange stiffness
-	Dind       ScalarParam // interfacial DMI strength
-	Dbulk      ScalarParam // bulk DMI strength
+	Aex        =NewScalarParam ("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
+	Dind       =NewScalarParam ("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
+	Dbulk      =NewScalarParam ("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dbulk2})
+
+
 	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
@@ -29,18 +31,14 @@ var (
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
 
 func init() {
-	//Export(B_exch, "Exchange field")
 	Export(Edens_exch, "Exchange energy density (normal+DM)")
 	Export(ExchCoupling, "Average exchange coupling with neighbors")
 
-	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dind.init("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
-	Dbulk.init("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dbulk2})
 	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()
-	din2.init(&Dind)
-	dbulk2.init(&Dbulk)
+	din2.init(Dind)
+	dbulk2.init(Dbulk)
 }
 
 // Adds the current exchange field to dst

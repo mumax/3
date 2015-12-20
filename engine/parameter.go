@@ -178,6 +178,13 @@ func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 	DeclLValue(name, p, cat(desc, unit))
 }
 
+func NewScalarParam(name, unit, desc string, children []derived) *ScalarParam {
+	p := new(ScalarParam)
+	p.param.init(SCALAR, name, unit, children)
+	DeclLValue(name, p, cat(desc, unit))
+	return p
+}
+
 func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
 	if region == -1 {
 		p.setRegionsFunc(0, NREGION, f) // uniform

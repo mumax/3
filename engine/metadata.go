@@ -46,6 +46,7 @@ type outputValue interface {
 }
 
 // outputFunc is an outputValue implementation where a function provides the output value.
+// It can be scalar or vector.
 // E.g.: func GetTotalEnergy() provides the value for E_total.
 type outputFunc struct {
 	info
@@ -61,14 +62,17 @@ type ScalarValue struct {
 	outputValue
 }
 
-func NewScalarValue(name, unit, desc string, f func() float64) ScalarValue {
+// NewScalarValue constructs an outputable space-independent scalar quantity whose
+// value is provided by function f.
+func NewScalarValue(name, unit, desc string, f func() float64) *ScalarValue {
 	g := func() []float64 { return []float64{f()} }
-	v := ScalarValue{&outputFunc{info{1, name, unit}, g}}
+	v := &ScalarValue{&outputFunc{info{1, name, unit}, g}}
 	Export(v, desc)
 	return v
 }
 
-func (s ScalarValue) Get() float64 { return s.average()[0] }
+func (s ScalarValue) Get() float64     { return s.average()[0] }
+func (s ScalarValue) Average() float64 { return s.Get() }
 
 // VectorValue enhances an outputValue with methods specific to
 // a space-independent vector quantity (e.g. averaged magnetization).
@@ -76,17 +80,14 @@ type VectorValue struct {
 	outputValue
 }
 
-type GetVector struct{ outputFunc }
-
-func (g *GetVector) Get() data.Vector     { return unslice(g.get()) }
-func (g *GetVector) Average() data.Vector { return g.Get() }
-
-// INTERNAL
-func NewGetVector(name, unit, doc string, get func() []float64) *GetVector {
-	g := &GetVector{outputFunc{info{3, name, unit}, get}}
-	DeclROnly(name, g, cat(doc, unit))
-	return g
+func NewVectorValue(name, unit, desc string, f func() []float64) *VectorValue {
+	v := &VectorValue{&outputFunc{info{3, name, unit}, f}}
+	Export(v, desc)
+	return v
 }
+
+func (v *VectorValue) Get() data.Vector     { return unslice(v.average()) }
+func (v *VectorValue) Average() data.Vector { return v.Get() }
 
 // OutputQuantity represents a space-dependent quantity,
 // that can be saved, like M, B_eff or alpha.

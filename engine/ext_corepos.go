@@ -1,6 +1,6 @@
 package engine
 
-var CorePos = NewGetVector("ext_corepos", "m", "Vortex core position (x,y) + polarization (z)", corePos)
+var CorePos = NewVectorValue("ext_corepos", "m", "Vortex core position (x,y) + polarization (z)", corePos)
 
 func corePos() []float64 {
 	m, _ := M.Slice()

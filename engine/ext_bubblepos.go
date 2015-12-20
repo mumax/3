@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	BubblePos   = NewGetVector("ext_bubblepos", "m", "Bubble core position", bubblePos)
+	BubblePos   = NewVectorValue("ext_bubblepos", "m", "Bubble core position", bubblePos)
 	BubbleDist  = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
 	BubbleSpeed = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
 )

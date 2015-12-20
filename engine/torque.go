@@ -26,7 +26,6 @@ var (
 )
 
 func init() {
-
 	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
 	J.init("J", "A/m2", "Electrical current density")

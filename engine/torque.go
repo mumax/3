@@ -7,12 +7,13 @@ import (
 )
 
 var (
-	Alpha                    ScalarParam
-	Xi                       ScalarParam
-	Pol                      ScalarParam
-	Lambda                   ScalarParam
-	EpsilonPrime             ScalarParam
-	FrozenSpins              ScalarParam
+	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
+	Xi           = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
+	Pol          = NewScalarParam("Pol", "", "Electrical current polarization", nil)
+	Lambda       = NewScalarParam("Lambda", "", "Slonczewski Λ parameter", nil)
+	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
+	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
+
 	FixedLayer               VectorParam
 	Torque                   = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                 = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
@@ -26,15 +27,9 @@ var (
 )
 
 func init() {
-	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
-	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
-	J.init("J", "A/m2", "Electrical current density")
-	Pol.init("Pol", "", "Electrical current polarization", nil)
 	Pol.setUniform([]float64{1}) // default spin polarization
-	Lambda.init("Lambda", "", "Slonczewski Λ parameter", nil)
+	J.init("J", "A/m2", "Electrical current density")
 	Lambda.Set(1) // sensible default value (?). TODO: should not be zero
-	EpsilonPrime.init("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
-	FrozenSpins.init("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")

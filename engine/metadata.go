@@ -1,5 +1,15 @@
 package engine
 
+/*
+
+The metadata layer wraps micromagnetic basis functions (e.g. func SetDemagField())
+in objects that provide:
+
+- additional information (Name, Unit, ...) used for saving output,
+- additional methods (Comp, Region, ...) handy for input scripting.
+
+*/
+
 import (
 	"fmt"
 	"github.com/mumax/3/cuda"

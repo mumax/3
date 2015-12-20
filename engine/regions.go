@@ -6,7 +6,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-var regions = Regions{info: Info(1, "regions", "")} // global regions map
+var regions = Regions{info: makeInfo(1, "regions", "")} // global regions map
 
 const NREGION = 256 // maximum number of regions, limited by size of byte.
 

@@ -67,14 +67,6 @@ func Export(q interface {
 	DeclROnly(q.Name(), q, cat(doc, q.Unit()))
 }
 
-func export(q interface {
-	Name() string
-	Unit() string
-	Desc() string
-}) {
-	DeclROnly(q.Name(), q, cat(q.Desc(), q.Unit()))
-}
-
 // Add a (pointer to) variable to the script world
 func DeclVar(name string, value interface{}, doc string) {
 	World.Var(name, value, doc)

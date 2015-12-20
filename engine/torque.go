@@ -7,13 +7,13 @@ import (
 )
 
 var (
-	Alpha                    ScalarInput
-	Xi                       ScalarInput
-	Pol                      ScalarInput
-	Lambda                   ScalarInput
-	EpsilonPrime             ScalarInput
-	FrozenSpins              ScalarInput
-	FixedLayer               VectorInput
+	Alpha                    ScalarParam
+	Xi                       ScalarParam
+	Pol                      ScalarParam
+	Lambda                   ScalarParam
+	EpsilonPrime             ScalarParam
+	FrozenSpins              ScalarParam
+	FixedLayer               VectorParam
 	Torque                   = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                 = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque                 = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)

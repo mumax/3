@@ -9,15 +9,15 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1, Ku2                  ScalarInput  // uniaxial anis constants
-	Kc1, Kc2, Kc3             ScalarInput  // cubic anis constants
-	AnisU, AnisC1, AnisC2     VectorInput  // unixial and cubic anis axes
-	ku1_red, ku2_red          derivedInput // K1 / Msat
-	kc1_red, kc2_red, kc3_red derivedInput
+	Ku1, Ku2                  ScalarParam  // uniaxial anis constants
+	Kc1, Kc2, Kc3             ScalarParam  // cubic anis constants
+	AnisU, AnisC1, AnisC2     VectorParam  // unixial and cubic anis axes
+	ku1_red, ku2_red          derivedParam // K1 / Msat
+	kc1_red, kc2_red, kc3_red derivedParam
 	B_anis                    = NewVectorField("B_anis", "T", "Anisotropy filed", AddAnisotropyField)
 	Edens_anis                = NewScalarField("Edens_anis", "J/m3", AddAnisotropyEnergyDensity)
 	E_anis                    = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
-	zero                      inputParam // utility zero parameter
+	zero                      param // utility zero parameter
 )
 
 func init() {
@@ -35,24 +35,24 @@ func init() {
 	zero.init(1, "_zero", "", nil)
 
 	//ku1_red = Ku1 / Msat
-	ku1_red.init(SCALAR, []updater{&Ku1, &Msat}, func(p *derivedInput) {
+	ku1_red.init(SCALAR, []updater{&Ku1, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
 	})
 	//ku2_red = Ku2 / Msat
-	ku2_red.init(SCALAR, []updater{&Ku2, &Msat}, func(p *derivedInput) {
+	ku2_red.init(SCALAR, []updater{&Ku2, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Ku2.cpuLUT(), Msat.cpuLUT())
 	})
 
 	//kc1_red = Kc1 / Msat
-	kc1_red.init(SCALAR, []updater{&Kc1, &Msat}, func(p *derivedInput) {
+	kc1_red.init(SCALAR, []updater{&Kc1, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
 	})
 	//kc2_red = Kc2 / Msat
-	kc2_red.init(SCALAR, []updater{&Kc2, &Msat}, func(p *derivedInput) {
+	kc2_red.init(SCALAR, []updater{&Kc2, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc2.cpuLUT(), Msat.cpuLUT())
 	})
 	//kc3_red = Kc3 / Msat
-	kc3_red.init(SCALAR, []updater{&Kc3, &Msat}, func(p *derivedInput) {
+	kc3_red.init(SCALAR, []updater{&Kc3, &Msat}, func(p *derivedParam) {
 		paramDiv(p.cpu_buf, Kc3.cpuLUT(), Msat.cpuLUT())
 	})
 }

@@ -1,4 +1,12 @@
-// engine does the simulation bookkeeping, I/O and GUI.
+/*
+engine does the simulation bookkeeping, I/O and GUI.
+
+space-dependence:
+value: space-independent
+param: region-dependent parameter (always input)
+field: fully space-dependent field
+
+*/
 package engine
 
 import (

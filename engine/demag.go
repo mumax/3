@@ -10,15 +10,15 @@ import (
 
 // Demag variables
 var (
-	Msat        ScalarInput
-	Bsat        derivedInput
+	Msat        ScalarParam
+	Bsat        derivedParam
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
 	E_demag     = NewScalarValue("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 
 	EnableDemag   = true                 // enable/disable global demag field
-	NoDemagSpins  ScalarInput            // disable demag field per-cell
+	NoDemagSpins  ScalarParam            // disable demag field per-cell
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 	CacheDir      = ""                   // directory for kernel cache
@@ -39,7 +39,7 @@ func init() {
 	registerEnergy(GetDemagEnergy, AddEdens_demag)
 
 	//Bsat = Msat * mu0
-	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedInput) {
+	Bsat.init(SCALAR, []updater{&Msat}, func(p *derivedParam) {
 		Ms := Msat.cpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms

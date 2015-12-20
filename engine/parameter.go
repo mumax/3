@@ -15,7 +15,7 @@ import (
 )
 
 // input parameter, settable by user
-type inputParam struct {
+type param struct {
 	lut
 	upd_reg    [NREGION]func() []float64 // time-dependent values
 	timestamp  float64                   // used not to double-evaluate f(t)
@@ -23,12 +23,7 @@ type inputParam struct {
 	name, unit string
 }
 
-// any parameter that depends on an inputParam
-type derived interface {
-	invalidate()
-}
-
-func (p *inputParam) init(nComp int, name, unit string, children []derived) {
+func (p *param) init(nComp int, name, unit string, children []derived) {
 	p.lut.init(nComp, p)
 	p.name = name
 	p.unit = unit
@@ -36,11 +31,11 @@ func (p *inputParam) init(nComp int, name, unit string, children []derived) {
 	p.timestamp = math.Inf(-1)
 }
 
-func (p *inputParam) Name() string     { return p.name }
-func (p *inputParam) Unit() string     { return p.unit }
-func (p *inputParam) Mesh() *data.Mesh { return Mesh() }
+func (p *param) Name() string     { return p.name }
+func (p *param) Unit() string     { return p.unit }
+func (p *param) Mesh() *data.Mesh { return Mesh() }
 
-func (p *inputParam) update() {
+func (p *param) update() {
 	if p.timestamp != Time {
 		changed := false
 		// update functions of time
@@ -59,7 +54,7 @@ func (p *inputParam) update() {
 }
 
 // set in one region
-func (p *inputParam) setRegion(region int, v []float64) {
+func (p *param) setRegion(region int, v []float64) {
 	if region == -1 {
 		p.setUniform(v)
 	} else {
@@ -68,12 +63,12 @@ func (p *inputParam) setRegion(region int, v []float64) {
 }
 
 // set in all regions
-func (p *inputParam) setUniform(v []float64) {
+func (p *param) setUniform(v []float64) {
 	p.setRegions(0, NREGION, v)
 }
 
 // set in regions r1..r2(excl)
-func (p *inputParam) setRegions(r1, r2 int, v []float64) {
+func (p *param) setRegions(r1, r2 int, v []float64) {
 	util.Argument(len(v) == len(p.cpu_buf))
 	util.Argument(r1 < r2) // exclusive upper bound
 	for r := r1; r < r2; r++ {
@@ -83,13 +78,13 @@ func (p *inputParam) setRegions(r1, r2 int, v []float64) {
 	p.invalidate()
 }
 
-func (p *inputParam) bufset_(region int, v []float64) {
+func (p *param) bufset_(region int, v []float64) {
 	for c := range p.cpu_buf {
 		p.cpu_buf[c][region] = float32(v[c])
 	}
 }
 
-func (p *inputParam) setFunc(r1, r2 int, f func() []float64) {
+func (p *param) setFunc(r1, r2 int, f func() []float64) {
 	util.Argument(r1 < r2) // exclusive upper bound
 	for r := r1; r < r2; r++ {
 		p.upd_reg[r] = f
@@ -98,14 +93,14 @@ func (p *inputParam) setFunc(r1, r2 int, f func() []float64) {
 }
 
 // mark my GPU copy and my children as invalid (need update)
-func (p *inputParam) invalidate() {
+func (p *param) invalidate() {
 	p.gpu_ok = false
 	for _, c := range p.children {
 		c.invalidate()
 	}
 }
 
-func (p *inputParam) getRegion(region int) []float64 {
+func (p *param) getRegion(region int) []float64 {
 	cpu := p.cpuLUT()
 	v := make([]float64, p.NComp())
 	for i := range v {
@@ -114,7 +109,7 @@ func (p *inputParam) getRegion(region int) []float64 {
 	return v
 }
 
-func (p *inputParam) IsUniform() bool {
+func (p *param) IsUniform() bool {
 	cpu := p.cpuLUT()
 	v1 := p.getRegion(0)
 	for r := 1; r < NREGION; r++ {
@@ -127,27 +122,32 @@ func (p *inputParam) IsUniform() bool {
 	return true
 }
 
-func (p *inputParam) average() []float64 { return qAverageUniverse(p) }
+func (p *param) average() []float64 { return qAverageUniverse(p) }
 
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
-type derivedInput struct {
+type derivedParam struct {
 	lut                          // GPU storage
-	updater  func(*derivedInput) // called to update my value
+	updater  func(*derivedParam) // called to update my value
 	uptodate bool                // cleared if parents' value change
 	parents  []updater           // parents updated before I'm updated
 }
 
-func (p *derivedInput) init(nComp int, parents []updater, updater func(*derivedInput)) {
+// any parameter that depends on an inputParam
+type derived interface {
+	invalidate()
+}
+
+func (p *derivedParam) init(nComp int, parents []updater, updater func(*derivedParam)) {
 	p.lut.init(nComp, p) // pass myself to update me if needed
 	p.updater = updater
 	p.parents = parents
 }
 
-func (p *derivedInput) invalidate() {
+func (p *derivedParam) invalidate() {
 	p.uptodate = false
 }
 
-func (p *derivedInput) update() {
+func (p *derivedParam) update() {
 	for _, par := range p.parents {
 		par.update() // may invalidate me
 	}
@@ -159,7 +159,7 @@ func (p *derivedInput) update() {
 }
 
 // Get value in region r.
-func (p *derivedInput) GetRegion(r int) []float64 {
+func (p *derivedParam) GetRegion(r int) []float64 {
 	lut := p.cpuLUT() // updates me if needed
 	v := make([]float64, p.NComp())
 	for c := range v {
@@ -168,40 +168,17 @@ func (p *derivedInput) GetRegion(r int) []float64 {
 	return v
 }
 
-type numberParam struct {
-	v          float64
-	onSet      func()
-	name, unit string
-}
-
-func numParam(v float64, name, unit string, onSet func()) numberParam {
-	return numberParam{v: v, onSet: onSet, name: name, unit: unit}
-}
-
-func (p *numberParam) NComp() int              { return 1 }
-func (p *numberParam) Name() string            { return p.name }
-func (p *numberParam) Unit() string            { return p.unit }
-func (p *numberParam) getRegion(int) []float64 { return []float64{float64(p.v)} }
-func (p *numberParam) Type() reflect.Type      { return reflect.TypeOf(float64(0)) }
-func (p *numberParam) IsUniform() bool         { return true }
-func (p *numberParam) Eval() interface{}       { return p.v }
-
-func (p *numberParam) SetValue(v interface{}) {
-	p.v = v.(float64)
-	p.onSet()
-}
-
 // specialized param with 1 component
-type ScalarInput struct {
-	inputParam
+type ScalarParam struct {
+	param
 }
 
-func (p *ScalarInput) init(name, unit, desc string, children []derived) {
-	p.inputParam.init(SCALAR, name, unit, children)
+func (p *ScalarParam) init(name, unit, desc string, children []derived) {
+	p.param.init(SCALAR, name, unit, children)
 	DeclLValue(name, p, cat(desc, unit))
 }
 
-func (p *ScalarInput) SetRegion(region int, f script.ScalarFunction) {
+func (p *ScalarParam) SetRegion(region int, f script.ScalarFunction) {
 	if region == -1 {
 		p.setRegionsFunc(0, NREGION, f) // uniform
 	} else {
@@ -209,16 +186,16 @@ func (p *ScalarInput) SetRegion(region int, f script.ScalarFunction) {
 	}
 }
 
-func (p *ScalarInput) SetValue(v interface{}) {
+func (p *ScalarParam) SetValue(v interface{}) {
 	f := v.(script.ScalarFunction)
 	p.setRegionsFunc(0, NREGION, f)
 }
 
-func (p *ScalarInput) Set(v float64) {
+func (p *ScalarParam) Set(v float64) {
 	p.setRegions(0, NREGION, []float64{v})
 }
 
-func (p *ScalarInput) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
+func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if Const(f) {
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
@@ -229,15 +206,15 @@ func (p *ScalarInput) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	}
 }
 
-func (p *ScalarInput) GetRegion(region int) float64 {
+func (p *ScalarParam) GetRegion(region int) float64 {
 	return float64(p.getRegion(region)[0])
 }
 
-func (p *ScalarInput) Eval() interface{}       { return p }
-func (p *ScalarInput) Type() reflect.Type      { return reflect.TypeOf(new(ScalarInput)) }
-func (p *ScalarInput) InputType() reflect.Type { return script.ScalarFunction_t }
-func (p *ScalarInput) Average() float64        { return qAverageUniverse(p)[0] }
-func (p *ScalarInput) Region(r int) *sOneReg   { return sOneRegion(p, r) }
+func (p *ScalarParam) Eval() interface{}       { return p }
+func (p *ScalarParam) Type() reflect.Type      { return reflect.TypeOf(new(ScalarParam)) }
+func (p *ScalarParam) InputType() reflect.Type { return script.ScalarFunction_t }
+func (p *ScalarParam) Average() float64        { return qAverageUniverse(p)[0] }
+func (p *ScalarParam) Region(r int) *sOneReg   { return sOneRegion(p, r) }
 
 // checks if a script expression contains t (time)
 func Const(e script.Expr) bool {
@@ -255,7 +232,7 @@ func cat(desc, unit string) string {
 
 // these methods should only be accesible from Go
 
-func (p *ScalarInput) SetRegionValueGo(region int, v float64) {
+func (p *ScalarParam) SetRegionValueGo(region int, v float64) {
 	if region == -1 {
 		p.setRegions(0, NREGION, []float64{v})
 	} else {
@@ -263,7 +240,7 @@ func (p *ScalarInput) SetRegionValueGo(region int, v float64) {
 	}
 }
 
-func (p *ScalarInput) SetRegionFuncGo(region int, f func() float64) {
+func (p *ScalarParam) SetRegionFuncGo(region int, f func() float64) {
 	if region == -1 {
 		p.setFunc(0, NREGION, func() []float64 {
 			return []float64{f()}
@@ -276,18 +253,18 @@ func (p *ScalarInput) SetRegionFuncGo(region int, f func() float64) {
 }
 
 // vector input parameter, settable by user
-type VectorInput struct {
-	inputParam
+type VectorParam struct {
+	param
 }
 
-func (p *VectorInput) init(name, unit, desc string) {
-	p.inputParam.init(VECTOR, name, unit, nil) // no vec param has children (yet)
-	if !strings.HasPrefix(name, "_") {         // don't export names beginning with "_" (e.g. from exciation)
+func (p *VectorParam) init(name, unit, desc string) {
+	p.param.init(VECTOR, name, unit, nil) // no vec param has children (yet)
+	if !strings.HasPrefix(name, "_") {    // don't export names beginning with "_" (e.g. from exciation)
 		DeclLValue(name, p, cat(desc, unit))
 	}
 }
 
-func (p *VectorInput) SetRegion(region int, f script.VectorFunction) {
+func (p *VectorParam) SetRegion(region int, f script.VectorFunction) {
 	if region == -1 {
 		p.setRegionsFunc(0, NREGION, f) //uniform
 	} else {
@@ -295,12 +272,12 @@ func (p *VectorInput) SetRegion(region int, f script.VectorFunction) {
 	}
 }
 
-func (p *VectorInput) SetValue(v interface{}) {
+func (p *VectorParam) SetValue(v interface{}) {
 	f := v.(script.VectorFunction)
 	p.setRegionsFunc(0, NREGION, f)
 }
 
-func (p *VectorInput) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
+func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	if Const(f) {
 		p.setRegions(r1, r2, slice(f.Float3()))
 	} else {
@@ -311,20 +288,20 @@ func (p *VectorInput) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
 	}
 }
 
-func (p *VectorInput) SetRegionFn(region int, f func() [3]float64) {
+func (p *VectorParam) SetRegionFn(region int, f func() [3]float64) {
 	p.setFunc(region, region+1, func() []float64 {
 		return slice(f())
 	})
 }
 
-func (p *VectorInput) GetRegion(region int) [3]float64 {
+func (p *VectorParam) GetRegion(region int) [3]float64 {
 	v := p.getRegion(region)
 	return unslice(v)
 }
 
-func (p *VectorInput) Eval() interface{}       { return p }
-func (p *VectorInput) Type() reflect.Type      { return reflect.TypeOf(new(VectorInput)) }
-func (p *VectorInput) InputType() reflect.Type { return script.VectorFunction_t }
-func (p *VectorInput) Region(r int) *vOneReg   { return vOneRegion(p, r) }
-func (p *VectorInput) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
-func (p *VectorInput) Comp(c int) ScalarField  { return Comp(p, c) }
+func (p *VectorParam) Eval() interface{}       { return p }
+func (p *VectorParam) Type() reflect.Type      { return reflect.TypeOf(new(VectorParam)) }
+func (p *VectorParam) InputType() reflect.Type { return script.VectorFunction_t }
+func (p *VectorParam) Region(r int) *vOneReg   { return vOneRegion(p, r) }
+func (p *VectorParam) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
+func (p *VectorParam) Comp(c int) ScalarField  { return Comp(p, c) }

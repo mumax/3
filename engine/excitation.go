@@ -13,7 +13,7 @@ import (
 // can be defined region-wise plus extra mask*multiplier terms.
 type excitation struct {
 	name       string
-	perRegion  VectorInput // Region-based excitation
+	perRegion  VectorParam // Region-based excitation
 	extraTerms []mulmask   // add extra mask*multiplier terms
 }
 

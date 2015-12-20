@@ -1,13 +1,14 @@
+// TODO
+// Slice() ->  EvalTo(dst)
+
 package engine
 
 /*
-
 The metadata layer wraps micromagnetic basis functions (e.g. func SetDemagField())
 in objects that provide:
 
 - additional information (Name, Unit, ...) used for saving output,
 - additional methods (Comp, Region, ...) handy for input scripting.
-
 */
 
 import (
@@ -15,9 +16,6 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 )
-
-// TODO
-// Slice() ->  EvalTo(dst)
 
 // The Info interface defines the bare minimum methods a quantity must implement
 // to be accessible for scripting and I/O.
@@ -27,62 +25,62 @@ type Info interface {
 	NComp() int   // unit, e.g. "A/m"
 }
 
-// info provides an Info implementation intended for embedding.
+// info provides an Info implementation intended for embedding in other types.
 type info struct {
 	nComp int
 	name  string
 	unit  string
 }
 
-func makeInfo(nComp int, name, unit string) info {
-	return info{nComp: nComp, name: name, unit: unit}
-}
-
 func (i *info) Name() string { return i.name }
 func (i *info) Unit() string { return i.unit }
 func (i *info) NComp() int   { return i.nComp }
 
-// an outputValue is an outputable  scalar or vector value
-// that has no space-dependence. E.g. averaged magnetization, total energy.
+// outputValue must be implemented by any scalar or vector quantity
+// that has no space-dependence, to make it outputable.
+// The space-dependent counterpart is outputField.
+// E.g. averaged magnetization, total energy.
 type outputValue interface {
 	Info
 	average() []float64 // TODO: rename
 }
 
-type ScalarValue struct {
-	outputValue
+// wraps a func to make it a quantity
+// unifies getScalar and getVector
+type outputFunc struct {
+	info
+	f func() []float64
 }
 
-type VectorValue struct {
+func (g *outputFunc) get() []float64     { return g.f() }
+func (g *outputFunc) average() []float64 { return g.get() }
+
+func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) outputFunc {
+	return outputFunc{info{nComp, name, unit}, get}
+}
+
+// ScalarValue enhances an outputValue with methods specific to
+// a space-independent scalar quantity (e.g. total energy).
+type ScalarValue struct {
 	outputValue
 }
 
 func NewScalarValue(name, unit, desc string, f func() float64) ScalarValue {
 	g := func() []float64 { return []float64{f()} }
-	v := ScalarValue{&getFunc{makeInfo(1, name, unit), g}}
+	v := ScalarValue{&outputFunc{info{1, name, unit}, g}}
 	Export(v, desc)
 	return v
 }
 
-func (s ScalarValue) Get() float64 {
-	return s.average()[0]
+func (s ScalarValue) Get() float64 { return s.average()[0] }
+
+// VectorValue enhances an outputValue with methods specific to
+// a space-independent vector quantity (e.g. averaged magnetization).
+type VectorValue struct {
+	outputValue
 }
 
-// wraps a func to make it a quantity
-// unifies getScalar and getVector
-type getFunc struct {
-	info
-	f func() []float64
-}
-
-func (g *getFunc) get() []float64     { return g.f() }
-func (g *getFunc) average() []float64 { return g.get() }
-
-func newGetfunc_(nComp int, name, unit, doc_ string, get func() []float64) getFunc {
-	return getFunc{makeInfo(nComp, name, unit), get}
-}
-
-type GetVector struct{ getFunc }
+type GetVector struct{ outputFunc }
 
 func (g *GetVector) Get() data.Vector     { return unslice(g.get()) }
 func (g *GetVector) Average() data.Vector { return g.Get() }
@@ -106,13 +104,13 @@ type outputField interface {
 }
 
 func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorField {
-	v := AsVectorField(&callbackOutput{makeInfo(3, name, unit), f})
+	v := AsVectorField(&callbackOutput{info{3, name, unit}, f})
 	Export(v, desc)
 	return v
 }
 
 func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {
-	return AsScalarField(&callbackOutput{makeInfo(1, name, unit), f})
+	return AsScalarField(&callbackOutput{info{1, name, unit}, f})
 }
 
 type callbackOutput struct {

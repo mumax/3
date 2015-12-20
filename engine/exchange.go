@@ -15,7 +15,7 @@ var (
 	Aex        ScalarInput // Exchange stiffness
 	Dind       ScalarInput // interfacial DMI strength
 	Dbulk      ScalarInput // bulk DMI strength
-	B_exch     = NewVectorField("B_exch", "T", AddExchangeField)
+	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
 	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
@@ -29,7 +29,7 @@ var (
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
 
 func init() {
-	Export(B_exch, "Exchange field")
+	//Export(B_exch, "Exchange field")
 	Export(Edens_exch, "Exchange energy density (normal+DM)")
 	Export(ExchCoupling, "Average exchange coupling with neighbors")
 

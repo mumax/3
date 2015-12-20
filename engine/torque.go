@@ -14,9 +14,9 @@ var (
 	EpsilonPrime             ScalarInput
 	FrozenSpins              ScalarInput
 	FixedLayer               VectorInput
-	Torque                   = NewVectorField("torque", "T", SetTorque)
-	LLTorque                 = NewVectorField("LLtorque", "T", SetLLTorque)
-	STTorque                 = NewVectorField("STTorque", "T", AddSTTorque)
+	Torque                   = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
+	LLTorque                 = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
+	STTorque                 = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	J                        excitation // Polarized electrical current density
 	MaxTorque                           = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 	GammaLL                  float64    = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
@@ -26,9 +26,6 @@ var (
 )
 
 func init() {
-	Export(LLTorque, "Landau-Lifshitz torque/γ0")
-	Export(STTorque, "Spin-transfer torque/γ0")
-	Export(Torque, "Total torque/γ0")
 
 	Alpha.init("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
 	Xi.init("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)

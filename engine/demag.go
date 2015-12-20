@@ -12,10 +12,10 @@ import (
 var (
 	Msat        ScalarInput
 	Bsat        derivedInput
-	M_full      = NewVectorField("m_full", "A/m", SetMFull)
-	B_demag     = NewVectorField("B_demag", "T", SetDemagField)
+	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
+	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", AddEdens_demag)
-	E_demag     = NewScalarValue("E_demag", "J", "magnetostatic energy", GetDemagEnergy)
+	E_demag     = NewScalarValue("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 
 	EnableDemag   = true                 // enable/disable global demag field
 	NoDemagSpins  ScalarInput            // disable demag field per-cell
@@ -28,9 +28,9 @@ var (
 var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
 
 func init() {
-	Export(B_demag, "Magnetostatic field")
+	//Export(B_demag, "Magnetostatic field")
 	Export(Edens_demag, "Magnetostatic energy density")
-	Export(M_full, "Unnormalized magnetization")
+	//Export(M_full, "Unnormalized magnetization")
 
 	Msat.init("Msat", "A/m", "Saturation magnetization", []derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
 	NoDemagSpins.init("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)", nil)

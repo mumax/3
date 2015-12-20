@@ -9,20 +9,17 @@ import (
 // TODO
 // Slice() ->  EvalTo(dst)
 
-// TODO: add doc(desc)
+// TODO: remove, rename Info2 -> newInfo
+// Interface Info
 func Info(nComp int, name, unit string) info {
 	return info{nComp: nComp, name: name, unit: unit}
-}
-
-func Info2(nComp int, name, unit, desc string) info {
-	return info{nComp: nComp, name: name, unit: unit, desc: desc}
 }
 
 type info struct {
 	nComp int // number of components (scalar, vector, ...)
 	name  string
 	unit  string
-	desc  string
+	//desc  string
 }
 
 func (i *info) Name() string { return i.name }
@@ -33,7 +30,6 @@ type outputValue interface {
 	average() []float64
 	Name() string // TODO: interface with Name, Unit, NComp
 	Unit() string
-	Desc() string
 	NComp() int
 }
 
@@ -47,8 +43,8 @@ type VectorValue struct {
 
 func NewScalarValue(name, unit, desc string, f func() float64) ScalarValue {
 	g := func() []float64 { return []float64{f()} }
-	v := ScalarValue{&getFunc{Info2(1, name, unit, desc), g}}
-	export(v)
+	v := ScalarValue{&getFunc{Info(1, name, unit), g}}
+	Export(v, desc)
 	return v
 }
 
@@ -63,7 +59,6 @@ type getFunc struct {
 	f func() []float64
 }
 
-func (g *getFunc) Desc() string       { return g.info.desc } // TODO: rm
 func (g *getFunc) get() []float64     { return g.f() }
 func (g *getFunc) average() []float64 { return g.get() }
 
@@ -94,8 +89,10 @@ type outputField interface {
 	average() []float64
 }
 
-func NewVectorField(name, unit string, f func(dst *data.Slice)) VectorField {
-	return AsVectorField(&callbackOutput{Info(3, name, unit), f})
+func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorField {
+	v := AsVectorField(&callbackOutput{Info(3, name, unit), f})
+	Export(v, desc)
+	return v
 }
 
 func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {

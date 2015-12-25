@@ -12,7 +12,7 @@ var (
 	Temp        = NewScalarParam("Temp", "K", "Temperature", []derived{&temp_red})
 	temp_red    derivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
 	E_therm     = NewScalarValue("E_therm", "J", "Thermal energy", GetThermalEnergy)
-	Edens_therm = NewScalarField("Edens_therm", "J/m3", AddThermalEnergyDensity)
+	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
 )
 
@@ -29,7 +29,6 @@ type thermField struct {
 
 func init() {
 	DeclFunc("ThermSeed", ThermSeed, "Set a random seed for thermal noise")
-	Export(Edens_therm, "Thermal energy density")
 	registerEnergy(GetThermalEnergy, AddThermalEnergyDensity)
 	B_therm.step = -1 // invalidate noise cache
 	DeclROnly("B_therm", &B_therm, "Thermal field (T)")

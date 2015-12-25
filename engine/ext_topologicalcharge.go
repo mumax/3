@@ -9,12 +9,9 @@ import (
 
 var (
 	Ext_TopologicalCharge        = NewScalarValue("ext_topologicalcharge", "", "2D topological charge", GetTopologicalCharge)
-	Ext_TopologicalChargeDensity = NewScalarField("ext_topologicalchargedensity", "1/m2", SetTopologicalChargeDensity)
+	Ext_TopologicalChargeDensity = NewScalarField("ext_topologicalchargedensity", "1/m2",
+		"2D topological charge density m·(m/∂x ❌ ∂m/∂y)", SetTopologicalChargeDensity)
 )
-
-func init() {
-	Export(Ext_TopologicalChargeDensity, "2D topological charge density m·(m/∂x ❌ ∂m/∂y)")
-}
 
 func SetTopologicalChargeDensity(dst *data.Slice) {
 	cuda.SetTopologicalCharge(dst, M.Buffer(), M.Mesh())

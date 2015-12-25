@@ -8,18 +8,14 @@ import (
 )
 
 // TODO: Integrate(Edens)
+// TODO: consistent naming SetEdensTotal, ...
 
 var (
 	energyTerms []func() float64        // all contributions to total energy
 	edensTerms  []func(dst *data.Slice) // all contributions to total energy density (add to dst)
-	Edens_total = NewScalarField("Edens_total", "J/m3", SetTotalEdens)
+	Edens_total = NewScalarField("Edens_total", "J/m3", "Total energy density", SetTotalEdens)
 	E_total     = NewScalarValue("E_total", "J", "total energy", GetTotalEnergy)
 )
-
-func init() {
-	Export(Edens_total, "Total energy density")
-	//Export(E_total, "Total energy")
-}
 
 // add energy term to global energy
 func registerEnergy(term func() float64, dens func(*data.Slice)) {

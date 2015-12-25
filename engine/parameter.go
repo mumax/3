@@ -6,6 +6,7 @@ like material parameters.
 */
 
 import (
+	"fmt"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
@@ -37,7 +38,19 @@ func (p *param) Mesh() *data.Mesh { return Mesh() }
 
 func (p *param) addChild(c derived) {
 	// TODO: no duplicates
-	p.children = append(p.children, c)
+	if !contains(p.children, c) {
+		p.children = append(p.children, c)
+		fmt.Println(p, ".addChild", c)
+	}
+}
+
+func contains(s []derived, x derived) bool {
+	for _, y := range s {
+		if y == x {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *param) update() {
@@ -157,11 +170,12 @@ func NewDerivedParam(nComp int, parents []parent, updater func(*DerivedParam)) *
 	return p
 }
 
-func (p *DerivedParam) init(nComp int, parents []parent, updater func(*DerivedParam)) {
-	p.lut.init(nComp, p) // pass myself to update me if needed
-	p.updater = updater
-	for _, P := range parents {
-		p.parents = append(p.parents, P)
+func (d *DerivedParam) init(nComp int, parents []parent, updater func(*DerivedParam)) {
+	d.lut.init(nComp, d) // pass myself to update me if needed
+	d.updater = updater
+	for _, p := range parents {
+		d.parents = append(d.parents, p)
+		p.addChild(d)
 	}
 }
 

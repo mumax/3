@@ -178,6 +178,7 @@ func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 	DeclLValue(name, p, cat(desc, unit))
 }
 
+// TODO: auto derived
 func NewScalarParam(name, unit, desc string, children []derived) *ScalarParam {
 	p := new(ScalarParam)
 	p.param.init(SCALAR, name, unit, children)
@@ -262,6 +263,13 @@ func (p *ScalarParam) SetRegionFuncGo(region int, f func() float64) {
 // vector input parameter, settable by user
 type VectorParam struct {
 	param
+}
+
+func NewVectorParam(name, unit, desc string) *VectorParam {
+	p := new(VectorParam)
+	p.param.init(VECTOR, name, unit, nil)
+	DeclLValue(name, p, cat(desc, unit))
+	return p
 }
 
 func (p *VectorParam) init(name, unit, desc string) {

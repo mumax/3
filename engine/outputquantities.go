@@ -112,8 +112,10 @@ func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorFiel
 
 // NewVectorField constructs an outputable space-dependent scalar quantity whose
 // value is provided by function f.
-func NewScalarField(name, unit string, f func(dst *data.Slice)) ScalarField {
-	return AsScalarField(&fieldFunc{info{1, name, unit}, f})
+func NewScalarField(name, unit, desc string, f func(dst *data.Slice)) ScalarField {
+	q := AsScalarField(&fieldFunc{info{1, name, unit}, f})
+	Export(q, desc)
+	return q
 }
 
 type fieldFunc struct {

@@ -6,14 +6,13 @@ import (
 )
 
 var (
-	MFM        = NewScalarField("MFM", "arb.", SetMFM)
+	MFM        = NewScalarField("MFM", "arb.", "MFM image", SetMFM)
 	MFMLift    inputValue
 	MFMTipSize inputValue
 	mfmconv_   *cuda.MFMConvolution
 )
 
 func init() {
-	Export(MFM, "MFM image")
 	MFMLift = numParam(50e-9, "MFMLift", "m", reinitmfmconv)
 	MFMTipSize = numParam(1e-3, "MFMDipole", "m", reinitmfmconv)
 	DeclLValue("MFMLift", &MFMLift, "MFM lift height")

@@ -19,14 +19,12 @@ var (
 	ku1_red, ku2_red          derivedParam // K1 / Msat
 	kc1_red, kc2_red, kc3_red derivedParam
 	B_anis                    = NewVectorField("B_anis", "T", "Anisotropy filed", AddAnisotropyField)
-	Edens_anis                = NewScalarField("Edens_anis", "J/m3", AddAnisotropyEnergyDensity)
+	Edens_anis                = NewScalarField("Edens_anis", "J/m3", "Anisotropy energy density", AddAnisotropyEnergyDensity)
 	E_anis                    = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
 	zero                      param // utility zero parameter
 )
 
 func init() {
-	Export(Edens_anis, "Anisotropy energy density")
-
 	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")

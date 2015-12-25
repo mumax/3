@@ -20,19 +20,16 @@ var (
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
 	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
 	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
-	E_exch     = NewScalarValue("E_exch", "J", "total exchange energy", GetExchangeEnergy)
-	Edens_exch = NewScalarField("Edens_exch", "J/m3", AddExchangeEnergyDensity)
+	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy", GetExchangeEnergy)
+	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density", AddExchangeEnergyDensity)
 
 	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
-	ExchCoupling = NewScalarField("ExchCoupling", "arb.", exchangeDecode)
+	ExchCoupling = NewScalarField("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 )
 
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
 
 func init() {
-	Export(Edens_exch, "Exchange energy density (normal+DM)")
-	Export(ExchCoupling, "Average exchange coupling with neighbors")
-
 	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
 	lex2.init()

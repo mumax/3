@@ -35,6 +35,11 @@ func (p *param) Name() string     { return p.name }
 func (p *param) Unit() string     { return p.unit }
 func (p *param) Mesh() *data.Mesh { return Mesh() }
 
+func (p *param) addChild(c derived) {
+	// TODO: no duplicates
+	p.children = append(p.children, c)
+}
+
 func (p *param) update() {
 	if p.timestamp != Time {
 		changed := false
@@ -125,9 +130,9 @@ func (p *param) IsUniform() bool {
 func (p *param) average() []float64 { return qAverageUniverse(p) }
 
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
-type derivedParam struct {
+type DerivedParam struct {
 	lut                          // GPU storage
-	updater  func(*derivedParam) // called to update my value
+	updater  func(*DerivedParam) // called to update my value
 	uptodate bool                // cleared if parents' value change
 	parents  []updater           // parents updated before I'm updated
 }
@@ -137,17 +142,34 @@ type derived interface {
 	invalidate()
 }
 
-func (p *derivedParam) init(nComp int, parents []updater, updater func(*derivedParam)) {
-	p.lut.init(nComp, p) // pass myself to update me if needed
-	p.updater = updater
-	p.parents = parents
+type parent interface {
+	update()
+	addChild(derived)
 }
 
-func (p *derivedParam) invalidate() {
+func NewDerivedParam(nComp int, parents []parent, updater func(*DerivedParam)) *DerivedParam {
+	p := new(DerivedParam)
+	p.lut.init(nComp, p) // pass myself to update me if needed
+	p.updater = updater
+	for _, P := range parents {
+		p.parents = append(p.parents, P)
+	}
+	return p
+}
+
+func (p *DerivedParam) init(nComp int, parents []parent, updater func(*DerivedParam)) {
+	p.lut.init(nComp, p) // pass myself to update me if needed
+	p.updater = updater
+	for _, P := range parents {
+		p.parents = append(p.parents, P)
+	}
+}
+
+func (p *DerivedParam) invalidate() {
 	p.uptodate = false
 }
 
-func (p *derivedParam) update() {
+func (p *DerivedParam) update() {
 	for _, par := range p.parents {
 		par.update() // may invalidate me
 	}
@@ -159,7 +181,7 @@ func (p *derivedParam) update() {
 }
 
 // Get value in region r.
-func (p *derivedParam) GetRegion(r int) []float64 {
+func (p *DerivedParam) GetRegion(r int) []float64 {
 	lut := p.cpuLUT() // updates me if needed
 	v := make([]float64, p.NComp())
 	for c := range v {

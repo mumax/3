@@ -27,16 +27,10 @@ type mulmask struct {
 func NewExcitation(name, unit, desc string) *Excitation {
 	e := new(Excitation)
 	e.name = name
-	e.perRegion.init("_"+name+"_perRegion", unit, "(internal)") // name starts with underscore: unexported
+	e.perRegion.init(3, "_"+name+"_perRegion", unit, nil) // name starts with underscore: unexported
 	DeclLValue(name, e, cat(desc, unit))
 	return e
 }
-
-//func (e *Excitation) init(name, unit, desc string) {
-//	e.name = name
-//	e.perRegion.init("_"+name+"_perRegion", unit, "(internal)") // name starts with underscore: unexported
-//	DeclLValue(name, e, cat(desc, unit))
-//}
 
 func (e *Excitation) AddTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {

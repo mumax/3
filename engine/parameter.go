@@ -274,14 +274,6 @@ func NewVectorParam(name, unit, desc string) *VectorParam {
 	return p
 }
 
-// TODO: rm when excitaition is refactored
-func (p *VectorParam) init(name, unit, desc string) {
-	p.param.init(VECTOR, name, unit, nil) // no vec param has children (yet)
-	if !strings.HasPrefix(name, "_") {    // don't export names beginning with "_" (e.g. from exciation)
-		DeclLValue(name, p, cat(desc, unit))
-	}
-}
-
 func (p *VectorParam) SetRegion(region int, f script.VectorFunction) {
 	if region == -1 {
 		p.setRegionsFunc(0, NREGION, f) //uniform

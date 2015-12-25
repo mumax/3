@@ -267,11 +267,14 @@ type VectorParam struct {
 
 func NewVectorParam(name, unit, desc string) *VectorParam {
 	p := new(VectorParam)
-	p.param.init(VECTOR, name, unit, nil)
-	DeclLValue(name, p, cat(desc, unit))
+	p.param.init(VECTOR, name, unit, nil) // no vec param has children (yet)
+	if !strings.HasPrefix(name, "_") {    // don't export names beginning with "_" (e.g. from exciation)
+		DeclLValue(name, p, cat(desc, unit))
+	}
 	return p
 }
 
+// TODO: rm when excitaition is refactored
 func (p *VectorParam) init(name, unit, desc string) {
 	p.param.init(VECTOR, name, unit, nil) // no vec param has children (yet)
 	if !strings.HasPrefix(name, "_") {    // don't export names beginning with "_" (e.g. from exciation)

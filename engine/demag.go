@@ -12,7 +12,7 @@ import (
 var (
 	Msat = NewScalarParam("Msat", "A/m", "Saturation magnetization",
 		[]derived{&Bsat, &lex2, &din2, &dbulk2, &ku1_red, &ku2_red, &kc1_red, &kc2_red, &kc3_red, &temp_red})
-	Bsat        derivedParam
+	Bsat        DerivedParam
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", "Magnetostatic energy density", AddEdens_demag)
@@ -35,7 +35,7 @@ func init() {
 	registerEnergy(GetDemagEnergy, AddEdens_demag)
 
 	//Bsat = Msat * mu0
-	Bsat.init(SCALAR, []updater{Msat}, func(p *derivedParam) {
+	Bsat.init(SCALAR, []parent{Msat}, func(p *DerivedParam) {
 		Ms := Msat.cpuLUT()
 		for i, ms := range Ms[0] {
 			p.cpu_buf[0][i] = mag.Mu0 * ms

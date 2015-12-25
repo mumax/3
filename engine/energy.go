@@ -41,19 +41,6 @@ func SetTotalEdens(dst *data.Slice) {
 	}
 }
 
-// vector dot product
-func dot(a, b outputField) float64 {
-	A, recyA := a.Slice()
-	if recyA {
-		defer cuda.Recycle(A)
-	}
-	B, recyB := b.Slice()
-	if recyB {
-		defer cuda.Recycle(B)
-	}
-	return float64(cuda.Dot(A, B))
-}
-
 // volume of one cell in m3
 func cellVolume() float64 {
 	c := Mesh().CellSize()
@@ -75,4 +62,17 @@ func makeEdensAdder(field outputField, prefactor float64) func(*data.Slice) {
 		factor := float32(prefactor)
 		cuda.AddDotProduct(dst, factor, B, m)
 	}
+}
+
+// vector dot product
+func dot(a, b outputField) float64 {
+	A, recyA := a.Slice()
+	if recyA {
+		defer cuda.Recycle(A)
+	}
+	B, recyB := b.Slice()
+	if recyB {
+		defer cuda.Recycle(B)
+	}
+	return float64(cuda.Dot(A, B))
 }

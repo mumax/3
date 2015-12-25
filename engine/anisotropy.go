@@ -9,22 +9,21 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1 = NewScalarParam("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
-	Ku2 = NewScalarParam("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", []derived{&ku2_red})
-	Kc1 = NewScalarParam("Kc1", "J/m3", "1st order cubic anisotropy constant", []derived{&kc1_red})
-	Kc2 = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant", []derived{&kc2_red})
-	Kc3 = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant", []derived{&kc3_red})
+	Ku1        = NewScalarParam("Ku1", "J/m3", "1st order uniaxial anisotropy constant", []derived{&ku1_red})
+	Ku2        = NewScalarParam("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", []derived{&ku2_red})
+	Kc1        = NewScalarParam("Kc1", "J/m3", "1st order cubic anisotropy constant", []derived{&kc1_red})
+	Kc2        = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant", []derived{&kc2_red})
+	Kc3        = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant", []derived{&kc3_red})
+	AnisU      = NewVectorParam("anisU", "", "Uniaxial anisotropy direction")
+	AnisC1     = NewVectorParam("anisC1", "", "Cubic anisotropy direction #1")
+	AnisC2     = NewVectorParam("anisC2", "", "Cubic anisotorpy directon #2")
+	B_anis     = NewVectorField("B_anis", "T", "Anisotropy filed", AddAnisotropyField)
+	Edens_anis = NewScalarField("Edens_anis", "J/m3", "Anisotropy energy density", AddAnisotropyEnergyDensity)
+	E_anis     = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
 
-	AnisU  = NewVectorParam("anisU", "", "Uniaxial anisotropy direction")
-	AnisC1 = NewVectorParam("anisC1", "", "Cubic anisotropy direction #1")
-	AnisC2 = NewVectorParam("anisC2", "", "Cubic anisotorpy directon #2")
-
-	B_anis                    = NewVectorField("B_anis", "T", "Anisotropy filed", AddAnisotropyField)
-	Edens_anis                = NewScalarField("Edens_anis", "J/m3", "Anisotropy energy density", AddAnisotropyEnergyDensity)
-	E_anis                    = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
-	ku1_red, ku2_red          derivedParam // K1 / Msat
-	kc1_red, kc2_red, kc3_red derivedParam
-	zero                      param // utility zero parameter
+	ku1_red, ku2_red          derivedParam // K / Msat
+	kc1_red, kc2_red, kc3_red derivedParam // K / Msat
+	zero                      param        // utility zero parameter
 )
 
 func init() {

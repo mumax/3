@@ -14,7 +14,7 @@ var (
 	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
 	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 
-	FixedLayer               VectorParam
+	FixedLayer               = NewVectorParam("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque                   = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                 = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque                 = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
@@ -30,7 +30,6 @@ func init() {
 	Pol.setUniform([]float64{1}) // default spin polarization
 	J.init("J", "A/m2", "Electrical current density")
 	Lambda.Set(1) // sensible default value (?). TODO: should not be zero
-	FixedLayer.init("FixedLayer", "", "Slonczewski fixed layer polarization")
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")

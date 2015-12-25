@@ -15,19 +15,19 @@ var (
 	Kc2 = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant", []derived{&kc2_red})
 	Kc3 = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant", []derived{&kc3_red})
 
-	AnisU, AnisC1, AnisC2     VectorParam  // unixial and cubic anis axes
-	ku1_red, ku2_red          derivedParam // K1 / Msat
-	kc1_red, kc2_red, kc3_red derivedParam
+	AnisU  = NewVectorParam("anisU", "", "Uniaxial anisotropy direction")
+	AnisC1 = NewVectorParam("anisC1", "", "Cubic anisotropy direction #1")
+	AnisC2 = NewVectorParam("anisC2", "", "Cubic anisotorpy directon #2")
+
 	B_anis                    = NewVectorField("B_anis", "T", "Anisotropy filed", AddAnisotropyField)
 	Edens_anis                = NewScalarField("Edens_anis", "J/m3", "Anisotropy energy density", AddAnisotropyEnergyDensity)
 	E_anis                    = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
+	ku1_red, ku2_red          derivedParam // K1 / Msat
+	kc1_red, kc2_red, kc3_red derivedParam
 	zero                      param // utility zero parameter
 )
 
 func init() {
-	AnisU.init("anisU", "", "Uniaxial anisotropy direction")
-	AnisC1.init("anisC1", "", "Cubic anisotropy direction #1")
-	AnisC2.init("anisC2", "", "Cubic anisotorpy directon #2")
 	registerEnergy(GetAnisotropyEnergy, AddAnisotropyEnergyDensity)
 	zero.init(1, "_zero", "", nil)
 

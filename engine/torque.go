@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant", []derived{&temp_red})
-	Xi           = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque", nil)
-	Pol          = NewScalarParam("Pol", "", "Electrical current polarization", nil)
-	Lambda       = NewScalarParam("Lambda", "", "Slonczewski Λ parameter", nil)
-	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'", nil)
-	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed", nil) // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
+	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant", &temp_red)
+	Xi           = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque")
+	Pol          = NewScalarParam("Pol", "", "Electrical current polarization")
+	Lambda       = NewScalarParam("Lambda", "", "Slonczewski Λ parameter")
+	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
+	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed") // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 
 	FixedLayer                       = NewVectorParam("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque                           = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)

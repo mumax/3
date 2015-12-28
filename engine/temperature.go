@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	Temp        = NewScalarParam("Temp", "K", "Temperature", []derived{&temp_red})
+	Temp        = NewScalarParam("Temp", "K", "Temperature", &temp_red)
 	temp_red    DerivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
 	E_therm     = NewScalarValue("E_therm", "J", "Thermal energy", GetThermalEnergy)
 	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)

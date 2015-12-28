@@ -36,11 +36,13 @@ func (p *param) Name() string     { return p.name }
 func (p *param) Unit() string     { return p.unit }
 func (p *param) Mesh() *data.Mesh { return Mesh() }
 
-func (p *param) addChild(c derived) {
-	// TODO: no duplicates
-	if !contains(p.children, c) {
-		p.children = append(p.children, c)
-		fmt.Println(p, ".addChild", c)
+func (p *param) addChild(c ...derived) {
+	for _, c := range c {
+		// TODO: no duplicates
+		if !contains(p.children, c) {
+			p.children = append(p.children, c)
+			fmt.Println(p, ".addChild", c)
+		}
 	}
 }
 
@@ -157,7 +159,7 @@ type derived interface {
 
 type parent interface {
 	update()
-	addChild(derived)
+	addChild(...derived)
 }
 
 func NewDerivedParam(nComp int, parents []parent, updater func(*DerivedParam)) *DerivedParam {
@@ -215,7 +217,7 @@ func (p *ScalarParam) init(name, unit, desc string, children []derived) {
 }
 
 // TODO: auto derived
-func NewScalarParam(name, unit, desc string, children []derived) *ScalarParam {
+func NewScalarParam(name, unit, desc string, children ...derived) *ScalarParam {
 	p := new(ScalarParam)
 	p.param.init(SCALAR, name, unit, children)
 	DeclLValue(name, p, cat(desc, unit))

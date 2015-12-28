@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	Aex   = NewScalarParam("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dind  = NewScalarParam("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
-	Dbulk = NewScalarParam("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dbulk2})
+	Aex   = NewScalarParam("Aex", "J/m", "Exchange stiffness", &lex2)
+	Dind  = NewScalarParam("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", &din2)
+	Dbulk = NewScalarParam("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", &dbulk2)
 
 	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
 	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat

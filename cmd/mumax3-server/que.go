@@ -87,7 +87,7 @@ func LoadUserJobs(dir string) string {
 	log.Println("LoadUserJobs", dir)
 	var newJobs []*Job
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if strings.HasSuffix(path, ".mx3") {
+		if strings.HasSuffix(path, ".mx3") && !strings.Contains(path, "._") {
 			ID := thisAddr + "/" + path
 			job := &Job{ID: ID}
 			job.Update()

@@ -60,3 +60,8 @@ To do all at once on Ubuntu:
 sudo apt-get install git golang-go gcc nvidia-cuda-toolkit nvidia-cuda-dev nvidia-340 gnuplot
 export GOPATH=$HOME go get -u -v github.com/mumax/3/cmd/mumax3
 ```
+
+Contributing
+------------
+
+Contributions are gratefully accepted. To contribute code, fork our repo on github and send a pull request.

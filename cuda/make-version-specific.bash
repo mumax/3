@@ -21,7 +21,7 @@ for f in *.cu; do
 	for cc in ${!CC2PATH[@]}; do
 		if [[ $f -nt $g'_'$cc.ptx ]]; then
 			echo ${CC2PATH[${cc}]}/$NVCC -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx
-			${CC2PATH[${cc}]}/$NVCC -I/usr/local/cuda/include -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx # error can be ignored
+			${CC2PATH[${cc}]}/$NVCC -I${CC2PATH[${cc}]}/include -gencode arch=compute_$cc,code=sm_$cc $f -o $g'_'$cc.ptx # error can be ignored
 		fi
 	done
 	if [[ $f -nt $g'_wrapper.go' ]]; then

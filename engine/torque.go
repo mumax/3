@@ -14,7 +14,7 @@ var (
 	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
 	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed") // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 
-	FixedLayer                       = NewVectorParam("FixedLayer", "", "Slonczewski fixed layer polarization")
+	FixedLayer                       = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque                           = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                         = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque                         = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
@@ -63,12 +63,16 @@ func AddSTTorque(dst *data.Slice) {
 	if rec {
 		defer cuda.Recycle(jspin)
 	}
+	fl, rec := FixedLayer.Slice()
+	if rec {
+		defer cuda.Recycle(fl)
+	}
 	if !DisableZhangLiTorque {
 		cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
 			Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
 	}
 	if !DisableSlonczewskiTorque && !FixedLayer.isZero() {
-		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, FixedLayer.gpuLUT(), Msat.gpuLUT1(),
+		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, fl, Msat.gpuLUT1(),
 			Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu(), Mesh())
 	}
 }

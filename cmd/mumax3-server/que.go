@@ -90,6 +90,7 @@ func LoadUserJobs(dir string) string {
 		if strings.HasSuffix(path, ".mx3") && !strings.Contains(path, "._") {
 			ID := thisAddr + "/" + path
 			log.Println("addingJob", ID)
+			log.Println("fileInfoNAME", info.Name())
 			job := &Job{ID: ID}
 			job.Update()
 			newJobs = append(newJobs, job)

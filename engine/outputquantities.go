@@ -171,3 +171,10 @@ func AsVectorField(q outputField) VectorField {
 func (v VectorField) Average() data.Vector     { return unslice(v.outputField.average()) }
 func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.outputField, r)) }
 func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.outputField, c)) }
+func (v VectorField) HostCopy() *data.Slice {
+	s, r := v.outputField.Slice()
+	if r {
+		defer cuda.Recycle(s)
+	}
+	return s.HostCopy()
+}

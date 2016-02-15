@@ -27,7 +27,7 @@ type geom struct {
 func (g *geom) init() {
 	g.buffer = nil
 	g.info = info{1, "geom", ""}
-	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
+	DeclROnly("geom", g, "Cell fill fraction (0..1)")
 }
 
 func spaceFill() float64 {

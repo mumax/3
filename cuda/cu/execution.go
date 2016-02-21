@@ -20,8 +20,8 @@ func LaunchKernel(f Function, gridDimX, gridDimY, gridDimZ int, blockDimX, block
 	defer C.free(argv)
 	defer C.free(argp)
 	for i := range kernelParams {
-		*((*unsafe.Pointer)(offset(argp, i))) = offset(argv, i)                       // argp[i] = &argv[i]
-		*((*unsafe.Pointer)(offset(argv, i))) = *((*unsafe.Pointer)(kernelParams[i])) // argv[i] = *kernelParams[i]
+		*((*unsafe.Pointer)(offset(argp, i))) = offset(argv, i)       // argp[i] = &argv[i]
+		*((*uint64)(offset(argv, i))) = *((*uint64)(kernelParams[i])) // argv[i] = *kernelParams[i]
 	}
 
 	err := Result(C.cuLaunchKernel(

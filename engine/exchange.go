@@ -167,7 +167,8 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	cuda.MemCpyHtoD(unsafe.Pointer(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
+	lut := p.lut // Copy, to work around Go 1.6 cgo pointer limitations.
+	cuda.MemCpyHtoD(unsafe.Pointer(p.gpu), unsafe.Pointer(&lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
 

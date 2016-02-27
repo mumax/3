@@ -3,7 +3,6 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"math"
 )
@@ -26,20 +25,13 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight, bsat), nil)
 }
 
-// Returns the saturation magnetization in Tesla.
-// Cannot be set. Set Msat and bsat() will automatically be updated.
-func bSat() float64 {
-	util.AssertMsg(Msat.IsUniform(), "Remove surface charge: Msat must be uniform")
-	return mag.Mu0 * Msat.GetRegion(0)
-}
-
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
 	h := data.NewSlice(3, m.Size())
 	H := h.Vectors()
 	world := m.WorldSize()
 	cell := m.CellSize()
 	size := m.Size()
-	q := cell[Z] * cell[Y]
+	q := cell[Z] * cell[Y] * bsat
 	q1 := q * mxLeft
 	q2 := q * (-mxRight)
 

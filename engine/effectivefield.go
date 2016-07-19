@@ -16,5 +16,5 @@ func SetEffectiveField(dst *data.Slice) {
 	if !relaxing {
 		B_therm.AddTo(dst)
 	}
-	B_iec.AddTo(dst)
+	AddInterlayerField(dst)
 }

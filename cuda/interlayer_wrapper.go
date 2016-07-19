@@ -5,72 +5,72 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for addinterlayerexchange kernel
 var addinterlayerexchange_code cu.Function
 
 // Stores the arguments for addinterlayerexchange kernel invocation
-type addinterlayerexchange_args_t struct{
-	 arg_Bx unsafe.Pointer
-	 arg_By unsafe.Pointer
-	 arg_Bz unsafe.Pointer
-	 arg_mx unsafe.Pointer
-	 arg_my unsafe.Pointer
-	 arg_mz unsafe.Pointer
-	 arg_J1LUT unsafe.Pointer
-	 arg_J2LUT unsafe.Pointer
-	 arg_toplayer unsafe.Pointer
-	 arg_bottomlayer unsafe.Pointer
-	 arg_uxLUT unsafe.Pointer
-	 arg_uyLUT unsafe.Pointer
-	 arg_uzLUT unsafe.Pointer
-	 arg_cx float32
-	 arg_cy float32
-	 arg_cz float32
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 arg_regions unsafe.Pointer
-	 argptr [20]unsafe.Pointer
+type addinterlayerexchange_args_t struct {
+	arg_Bx          unsafe.Pointer
+	arg_By          unsafe.Pointer
+	arg_Bz          unsafe.Pointer
+	arg_mx          unsafe.Pointer
+	arg_my          unsafe.Pointer
+	arg_mz          unsafe.Pointer
+	arg_J1LUT       unsafe.Pointer
+	arg_J2LUT       unsafe.Pointer
+	arg_toplayer    unsafe.Pointer
+	arg_bottomlayer unsafe.Pointer
+	arg_uxLUT       unsafe.Pointer
+	arg_uyLUT       unsafe.Pointer
+	arg_uzLUT       unsafe.Pointer
+	arg_cx          float32
+	arg_cy          float32
+	arg_cz          float32
+	arg_Nx          int
+	arg_Ny          int
+	arg_Nz          int
+	arg_regions     unsafe.Pointer
+	argptr          [20]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for addinterlayerexchange kernel invocation
 var addinterlayerexchange_args addinterlayerexchange_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 addinterlayerexchange_args.argptr[0] = unsafe.Pointer(&addinterlayerexchange_args.arg_Bx)
-	 addinterlayerexchange_args.argptr[1] = unsafe.Pointer(&addinterlayerexchange_args.arg_By)
-	 addinterlayerexchange_args.argptr[2] = unsafe.Pointer(&addinterlayerexchange_args.arg_Bz)
-	 addinterlayerexchange_args.argptr[3] = unsafe.Pointer(&addinterlayerexchange_args.arg_mx)
-	 addinterlayerexchange_args.argptr[4] = unsafe.Pointer(&addinterlayerexchange_args.arg_my)
-	 addinterlayerexchange_args.argptr[5] = unsafe.Pointer(&addinterlayerexchange_args.arg_mz)
-	 addinterlayerexchange_args.argptr[6] = unsafe.Pointer(&addinterlayerexchange_args.arg_J1LUT)
-	 addinterlayerexchange_args.argptr[7] = unsafe.Pointer(&addinterlayerexchange_args.arg_J2LUT)
-	 addinterlayerexchange_args.argptr[8] = unsafe.Pointer(&addinterlayerexchange_args.arg_toplayer)
-	 addinterlayerexchange_args.argptr[9] = unsafe.Pointer(&addinterlayerexchange_args.arg_bottomlayer)
-	 addinterlayerexchange_args.argptr[10] = unsafe.Pointer(&addinterlayerexchange_args.arg_uxLUT)
-	 addinterlayerexchange_args.argptr[11] = unsafe.Pointer(&addinterlayerexchange_args.arg_uyLUT)
-	 addinterlayerexchange_args.argptr[12] = unsafe.Pointer(&addinterlayerexchange_args.arg_uzLUT)
-	 addinterlayerexchange_args.argptr[13] = unsafe.Pointer(&addinterlayerexchange_args.arg_cx)
-	 addinterlayerexchange_args.argptr[14] = unsafe.Pointer(&addinterlayerexchange_args.arg_cy)
-	 addinterlayerexchange_args.argptr[15] = unsafe.Pointer(&addinterlayerexchange_args.arg_cz)
-	 addinterlayerexchange_args.argptr[16] = unsafe.Pointer(&addinterlayerexchange_args.arg_Nx)
-	 addinterlayerexchange_args.argptr[17] = unsafe.Pointer(&addinterlayerexchange_args.arg_Ny)
-	 addinterlayerexchange_args.argptr[18] = unsafe.Pointer(&addinterlayerexchange_args.arg_Nz)
-	 addinterlayerexchange_args.argptr[19] = unsafe.Pointer(&addinterlayerexchange_args.arg_regions)
-	 }
+	addinterlayerexchange_args.argptr[0] = unsafe.Pointer(&addinterlayerexchange_args.arg_Bx)
+	addinterlayerexchange_args.argptr[1] = unsafe.Pointer(&addinterlayerexchange_args.arg_By)
+	addinterlayerexchange_args.argptr[2] = unsafe.Pointer(&addinterlayerexchange_args.arg_Bz)
+	addinterlayerexchange_args.argptr[3] = unsafe.Pointer(&addinterlayerexchange_args.arg_mx)
+	addinterlayerexchange_args.argptr[4] = unsafe.Pointer(&addinterlayerexchange_args.arg_my)
+	addinterlayerexchange_args.argptr[5] = unsafe.Pointer(&addinterlayerexchange_args.arg_mz)
+	addinterlayerexchange_args.argptr[6] = unsafe.Pointer(&addinterlayerexchange_args.arg_J1LUT)
+	addinterlayerexchange_args.argptr[7] = unsafe.Pointer(&addinterlayerexchange_args.arg_J2LUT)
+	addinterlayerexchange_args.argptr[8] = unsafe.Pointer(&addinterlayerexchange_args.arg_toplayer)
+	addinterlayerexchange_args.argptr[9] = unsafe.Pointer(&addinterlayerexchange_args.arg_bottomlayer)
+	addinterlayerexchange_args.argptr[10] = unsafe.Pointer(&addinterlayerexchange_args.arg_uxLUT)
+	addinterlayerexchange_args.argptr[11] = unsafe.Pointer(&addinterlayerexchange_args.arg_uyLUT)
+	addinterlayerexchange_args.argptr[12] = unsafe.Pointer(&addinterlayerexchange_args.arg_uzLUT)
+	addinterlayerexchange_args.argptr[13] = unsafe.Pointer(&addinterlayerexchange_args.arg_cx)
+	addinterlayerexchange_args.argptr[14] = unsafe.Pointer(&addinterlayerexchange_args.arg_cy)
+	addinterlayerexchange_args.argptr[15] = unsafe.Pointer(&addinterlayerexchange_args.arg_cz)
+	addinterlayerexchange_args.argptr[16] = unsafe.Pointer(&addinterlayerexchange_args.arg_Nx)
+	addinterlayerexchange_args.argptr[17] = unsafe.Pointer(&addinterlayerexchange_args.arg_Ny)
+	addinterlayerexchange_args.argptr[18] = unsafe.Pointer(&addinterlayerexchange_args.arg_Nz)
+	addinterlayerexchange_args.argptr[19] = unsafe.Pointer(&addinterlayerexchange_args.arg_regions)
+}
 
 // Wrapper for addinterlayerexchange CUDA kernel, asynchronous.
-func k_addinterlayerexchange_async ( Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, J1LUT unsafe.Pointer, J2LUT unsafe.Pointer, toplayer unsafe.Pointer, bottomlayer unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, regions unsafe.Pointer,  cfg *config) {
-	if Synchronous{ // debug
+func k_addinterlayerexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, J1LUT unsafe.Pointer, J2LUT unsafe.Pointer, toplayer unsafe.Pointer, bottomlayer unsafe.Pointer, uxLUT unsafe.Pointer, uyLUT unsafe.Pointer, uzLUT unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, regions unsafe.Pointer, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("addinterlayerexchange")
 	}
@@ -78,53 +78,52 @@ func k_addinterlayerexchange_async ( Bx unsafe.Pointer, By unsafe.Pointer, Bz un
 	addinterlayerexchange_args.Lock()
 	defer addinterlayerexchange_args.Unlock()
 
-	if addinterlayerexchange_code == 0{
+	if addinterlayerexchange_code == 0 {
 		addinterlayerexchange_code = fatbinLoad(addinterlayerexchange_map, "addinterlayerexchange")
 	}
 
-	 addinterlayerexchange_args.arg_Bx = Bx
-	 addinterlayerexchange_args.arg_By = By
-	 addinterlayerexchange_args.arg_Bz = Bz
-	 addinterlayerexchange_args.arg_mx = mx
-	 addinterlayerexchange_args.arg_my = my
-	 addinterlayerexchange_args.arg_mz = mz
-	 addinterlayerexchange_args.arg_J1LUT = J1LUT
-	 addinterlayerexchange_args.arg_J2LUT = J2LUT
-	 addinterlayerexchange_args.arg_toplayer = toplayer
-	 addinterlayerexchange_args.arg_bottomlayer = bottomlayer
-	 addinterlayerexchange_args.arg_uxLUT = uxLUT
-	 addinterlayerexchange_args.arg_uyLUT = uyLUT
-	 addinterlayerexchange_args.arg_uzLUT = uzLUT
-	 addinterlayerexchange_args.arg_cx = cx
-	 addinterlayerexchange_args.arg_cy = cy
-	 addinterlayerexchange_args.arg_cz = cz
-	 addinterlayerexchange_args.arg_Nx = Nx
-	 addinterlayerexchange_args.arg_Ny = Ny
-	 addinterlayerexchange_args.arg_Nz = Nz
-	 addinterlayerexchange_args.arg_regions = regions
-	
+	addinterlayerexchange_args.arg_Bx = Bx
+	addinterlayerexchange_args.arg_By = By
+	addinterlayerexchange_args.arg_Bz = Bz
+	addinterlayerexchange_args.arg_mx = mx
+	addinterlayerexchange_args.arg_my = my
+	addinterlayerexchange_args.arg_mz = mz
+	addinterlayerexchange_args.arg_J1LUT = J1LUT
+	addinterlayerexchange_args.arg_J2LUT = J2LUT
+	addinterlayerexchange_args.arg_toplayer = toplayer
+	addinterlayerexchange_args.arg_bottomlayer = bottomlayer
+	addinterlayerexchange_args.arg_uxLUT = uxLUT
+	addinterlayerexchange_args.arg_uyLUT = uyLUT
+	addinterlayerexchange_args.arg_uzLUT = uzLUT
+	addinterlayerexchange_args.arg_cx = cx
+	addinterlayerexchange_args.arg_cy = cy
+	addinterlayerexchange_args.arg_cz = cz
+	addinterlayerexchange_args.arg_Nx = Nx
+	addinterlayerexchange_args.arg_Ny = Ny
+	addinterlayerexchange_args.arg_Nz = Nz
+	addinterlayerexchange_args.arg_regions = regions
 
 	args := addinterlayerexchange_args.argptr[:]
 	cu.LaunchKernel(addinterlayerexchange_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("addinterlayerexchange")
 	}
 }
 
 // maps compute capability on PTX code for addinterlayerexchange kernel.
-var addinterlayerexchange_map = map[int]string{ 0: "" ,
-20: addinterlayerexchange_ptx_20 ,
-30: addinterlayerexchange_ptx_30 ,
-35: addinterlayerexchange_ptx_35 ,
-50: addinterlayerexchange_ptx_50 ,
-52: addinterlayerexchange_ptx_52 ,
-53: addinterlayerexchange_ptx_53  }
+var addinterlayerexchange_map = map[int]string{0: "",
+	20: addinterlayerexchange_ptx_20,
+	30: addinterlayerexchange_ptx_30,
+	35: addinterlayerexchange_ptx_35,
+	50: addinterlayerexchange_ptx_50,
+	52: addinterlayerexchange_ptx_52,
+	53: addinterlayerexchange_ptx_53}
 
 // addinterlayerexchange PTX code for various compute capabilities.
-const(
-  addinterlayerexchange_ptx_20 = `
+const (
+	addinterlayerexchange_ptx_20 = `
 .version 5.0
 .target sm_20
 .address_size 64
@@ -750,7 +749,7 @@ BB0_36:
 
 
 `
-   addinterlayerexchange_ptx_30 = `
+	addinterlayerexchange_ptx_30 = `
 .version 5.0
 .target sm_30
 .address_size 64
@@ -1376,7 +1375,7 @@ BB0_36:
 
 
 `
-   addinterlayerexchange_ptx_35 = `
+	addinterlayerexchange_ptx_35 = `
 .version 5.0
 .target sm_35
 .address_size 64
@@ -1955,7 +1954,7 @@ BB0_36:
 
 
 `
-   addinterlayerexchange_ptx_50 = `
+	addinterlayerexchange_ptx_50 = `
 .version 5.0
 .target sm_50
 .address_size 64
@@ -2534,7 +2533,7 @@ BB0_36:
 
 
 `
-   addinterlayerexchange_ptx_52 = `
+	addinterlayerexchange_ptx_52 = `
 .version 5.0
 .target sm_52
 .address_size 64
@@ -3113,7 +3112,7 @@ BB0_36:
 
 
 `
-   addinterlayerexchange_ptx_53 = `
+	addinterlayerexchange_ptx_53 = `
 .version 5.0
 .target sm_53
 .address_size 64
@@ -3692,4 +3691,4 @@ BB0_36:
 
 
 `
- )
+)

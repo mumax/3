@@ -48,7 +48,7 @@ func init() {
 func (b *thermField) AddTo(dst *data.Slice) {
 	if !Temp.isZero() {
 		b.update()
-		cuda.Madd2(dst, dst, b.noise, 1, 1)
+		cuda.Add(dst, dst, b.noise)
 	}
 }
 

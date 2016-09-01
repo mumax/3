@@ -16,6 +16,11 @@ func Mul(dst, a, b *data.Slice) {
 	}
 }
 
+// Add: dst = src1 + src2.
+func Add(dst, src1, src2 *data.Slice) {
+	Madd2(dst, src1, src2, 1, 1)
+}
+
 // multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2
 func Madd2(dst, src1, src2 *data.Slice, factor1, factor2 float32) {
 	N := dst.Len()

@@ -50,7 +50,7 @@ func GetCustomEnergy() float64 {
 }
 
 func init() {
-	DeclFunc("DotProduct", DotProduct, "Dot product of two vector quantities")
+	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 }
 
 type dotProduct struct {
@@ -60,7 +60,7 @@ type dotProduct struct {
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
 // 	DotProct(&M, &B_ext)
-func DotProduct(a, b outputField) *dotProduct {
+func Dot(a, b outputField) *dotProduct {
 	return &dotProduct{a, b}
 }
 

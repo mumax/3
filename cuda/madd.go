@@ -6,6 +6,7 @@ import (
 )
 
 // multiply: dst[i] = a[i] * b[i]
+// a and b must have the same number of components
 func Mul(dst, a, b *data.Slice) {
 	N := dst.Len()
 	nComp := dst.NComp()

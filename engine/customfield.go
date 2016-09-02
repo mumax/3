@@ -17,6 +17,9 @@ var (
 
 func init() {
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
+	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
+	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
+	DeclFunc("Div", Div, "Point-wise division of two quantities")
 }
 
 func AddFieldTerm(b outputField) {
@@ -49,35 +52,34 @@ func GetCustomEnergy() float64 {
 	return cellVolume() * float64(cuda.Sum(buf))
 }
 
-func init() {
-	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
+// fieldOp holds the abstract functionality for operations
+// (like add, multiply, ...) on space-dependend quantites
+// (like M, B_sat, ...)
+type fieldOp struct {
+	a, b outputField
+	*info
+}
+
+func (o fieldOp) Mesh() *data.Mesh {
+	return o.a.Mesh()
+}
+
+func (o fieldOp) NComp() int {
+	return o.nComp
 }
 
 type dotProduct struct {
-	a, b outputField
+	fieldOp
 }
 
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
 // 	DotProct(&M, &B_ext)
-func Dot(a, b outputField) *dotProduct {
-	return &dotProduct{a, b}
-}
-
-func (d *dotProduct) Mesh() *data.Mesh {
-	return d.a.Mesh()
-}
-
-func (d *dotProduct) NComp() int {
-	return 1
-}
-
-func (d *dotProduct) Name() string {
-	return d.a.Name() + "_dot_" + d.b.Name()
-}
-
-func (d *dotProduct) Unit() string {
-	return d.a.Unit() + d.b.Unit()
+func Dot(a, b outputField) outputField {
+	return &dotProduct{fieldOp{a, b, &info{
+		nComp: 1,
+		name:  a.Name() + "_dot_" + b.Name(),
+		unit:  a.Unit() + "*" + b.Unit()}}}
 }
 
 func (d *dotProduct) Slice() (*data.Slice, bool) {
@@ -101,4 +103,65 @@ func (d *dotProduct) average() []float64 {
 
 func (d *dotProduct) Average() float64 {
 	return d.average()[0]
+}
+
+type pointwiseMul struct {
+	fieldOp
+}
+
+func Mul(a, b outputField) outputField {
+	return &pointwiseMul{fieldOp{a, b, &info{
+		nComp: a.NComp(),
+		name:  a.Name() + "_mul_" + b.Name(),
+		unit:  a.Unit() + "*" + b.Unit()}}}
+}
+
+func (d *pointwiseMul) Slice() (*data.Slice, bool) {
+	slice := cuda.Buffer(d.NComp(), d.Mesh().Size())
+	cuda.Zero(slice)
+	A, r := d.a.Slice()
+	if r {
+		defer cuda.Recycle(A)
+	}
+	B, r := d.b.Slice()
+	if r {
+		defer cuda.Recycle(B)
+	}
+	cuda.Mul(slice, A, B)
+	return slice, true
+}
+
+func (d *pointwiseMul) average() []float64 {
+	return qAverageUniverse(d)
+}
+
+
+type pointwiseDiv struct {
+	fieldOp
+}
+
+func Div(a, b outputField) outputField {
+	return &pointwiseDiv{fieldOp{a, b, &info{
+		nComp: a.NComp(),
+		name:  a.Name() + "_mul_" + b.Name(),
+		unit:  a.Unit() + "*" + b.Unit()}}}
+}
+
+func (d *pointwiseDiv) Slice() (*data.Slice, bool) {
+	slice := cuda.Buffer(d.NComp(), d.Mesh().Size())
+	cuda.Zero(slice)
+	A, r := d.a.Slice()
+	if r {
+		defer cuda.Recycle(A)
+	}
+	B, r := d.b.Slice()
+	if r {
+		defer cuda.Recycle(B)
+	}
+	cuda.Div(slice, A, B)
+	return slice, true
+}
+
+func (d *pointwiseDiv) average() []float64 {
+	return qAverageUniverse(d)
 }

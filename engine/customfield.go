@@ -3,6 +3,7 @@ package engine
 // Add arbitrary terms to H_eff
 
 import (
+	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 )
@@ -20,6 +21,8 @@ func init() {
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
+	DeclFunc("Const", Const, "Constant, uniform number")
+	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 }
 
 func AddFieldTerm(b outputField) {
@@ -50,6 +53,45 @@ func GetCustomEnergy() float64 {
 	cuda.Zero(buf)
 	AddCustomEnergyDensity(buf)
 	return cellVolume() * float64(cuda.Sum(buf))
+}
+
+type constValue struct {
+	value []float64
+	*info
+}
+
+func (c *constValue) Mesh() *data.Mesh {
+	return M.Mesh()
+}
+
+func (d *constValue) Slice() (*data.Slice, bool) {
+	buf := cuda.Buffer(d.NComp(), d.Mesh().Size())
+	for c, v := range d.value {
+		cuda.Memset(buf.Comp(c), float32(v))
+	}
+	return buf, true
+}
+
+func (d *constValue) average() []float64 {
+	return d.value
+}
+
+func Const(v float64) outputField {
+	// TODO: unit?
+	return &constValue{[]float64{v}, &info{
+		name:  fmt.Sprint(v),
+		unit:  "?", // TODO
+		nComp: 1,
+	}}
+}
+
+func ConstVector(x, y, z float64) outputField {
+	// TODO: unit?
+	return &constValue{[]float64{x, y, z}, &info{
+		name:  fmt.Sprintf("(%v,%v,%v)", x, y, z),
+		unit:  "?", // TODO
+		nComp: 3,
+	}}
 }
 
 // fieldOp holds the abstract functionality for operations
@@ -134,7 +176,6 @@ func (d *pointwiseMul) Slice() (*data.Slice, bool) {
 func (d *pointwiseMul) average() []float64 {
 	return qAverageUniverse(d)
 }
-
 
 type pointwiseDiv struct {
 	fieldOp

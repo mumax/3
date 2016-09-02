@@ -242,7 +242,7 @@ func (p *ScalarParam) Set(v float64) {
 }
 
 func (p *ScalarParam) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
-	if Const(f) {
+	if IsConst(f) {
 		p.setRegions(r1, r2, []float64{f.Float()})
 	} else {
 		f := f.Fix() // fix values of all variables except t
@@ -263,7 +263,7 @@ func (p *ScalarParam) Average() float64        { return qAverageUniverse(p)[0] }
 func (p *ScalarParam) Region(r int) *sOneReg   { return sOneRegion(p, r) }
 
 // checks if a script expression contains t (time)
-func Const(e script.Expr) bool {
+func IsConst(e script.Expr) bool {
 	t := World.Resolve("t")
 	return !script.Contains(e, t)
 }
@@ -326,7 +326,7 @@ func (p *VectorParam) SetValue(v interface{}) {
 }
 
 func (p *VectorParam) setRegionsFunc(r1, r2 int, f script.VectorFunction) {
-	if Const(f) {
+	if IsConst(f) {
 		p.setRegions(r1, r2, slice(f.Float3()))
 	} else {
 		f := f.Fix() // fix values of all variables except t

@@ -76,7 +76,7 @@ func (e *Excitation) RemoveExtraTerms() {
 func (e *Excitation) Add(mask *data.Slice, f script.ScalarFunction) {
 	var mul func() float64
 	if f != nil {
-		if Const(f) {
+		if IsConst(f) {
 			val := f.Float()
 			mul = func() float64 {
 				return val

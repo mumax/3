@@ -13,8 +13,8 @@ var (
 	B_custom       = NewVectorField("B_custom", "T", "User-defined field", AddCustomField)
 	Edens_custom   = NewScalarField("Edens_custom", "J/m3", "Energy density of user-defined field.", AddCustomEnergyDensity)
 	E_custom       = NewScalarValue("E_custom", "J", "total energy of user-defined field", GetCustomEnergy)
-	customTerms    []field // vector
-	customEnergies []field // scalar
+	customTerms    []Q // vector
+	customEnergies []Q // scalar
 )
 
 func init() {
@@ -26,13 +26,8 @@ func init() {
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 }
 
-type field interface {
-	Slice() (*data.Slice, bool)
-	NComp() int
-}
-
 // AddFieldTerm adds a function to B_eff
-func AddFieldTerm(b field) {
+func AddFieldTerm(b Q) {
 	customTerms = append(customTerms, b)
 }
 
@@ -40,11 +35,9 @@ func AddFieldTerm(b field) {
 // and adds the result to dst.
 func AddCustomField(dst *data.Slice) {
 	for _, term := range customTerms {
-		buf, recycle := term.Slice()
+		buf := ValueOf(term)
 		cuda.Add(dst, dst, buf)
-		if recycle {
-			cuda.Recycle(buf)
-		}
+		cuda.Recycle(buf)
 	}
 }
 
@@ -55,11 +48,12 @@ func AddCustomEnergyDensity(dst *data.Slice) {
 }
 
 func GetCustomEnergy() float64 {
-	buf := cuda.Buffer(1, Edens_custom.Mesh().Size())
-	defer cuda.Recycle(buf)
-	cuda.Zero(buf)
-	AddCustomEnergyDensity(buf)
-	return cellVolume() * float64(cuda.Sum(buf))
+	//buf := cuda.Buffer(1, Edens_custom.Mesh().Size())
+	//defer cuda.Recycle(buf)
+	//cuda.Zero(buf)
+	//AddCustomEnergyDensity(buf)
+	//return cellVolume() * float64(cuda.Sum(buf))
+	return 999
 }
 
 type constValue struct {
@@ -68,19 +62,17 @@ type constValue struct {
 
 func (c *constValue) NComp() int { return len(c.value) }
 
-func (d *constValue) Slice() (*data.Slice, bool) {
-	buf := cuda.Buffer(d.NComp(), Mesh().Size())
+func (d *constValue) EvalTo(dst *data.Slice) {
 	for c, v := range d.value {
-		cuda.Memset(buf.Comp(c), float32(v))
+		cuda.Memset(dst.Comp(c), float32(v))
 	}
-	return buf, true
 }
 
-func Const(v float64) field {
+func Const(v float64) Q {
 	return &constValue{[]float64{v}}
 }
 
-func ConstVector(x, y, z float64) field {
+func ConstVector(x, y, z float64) Q {
 	return &constValue{[]float64{x, y, z}}
 }
 
@@ -88,7 +80,7 @@ func ConstVector(x, y, z float64) field {
 // (like add, multiply, ...) on space-dependend quantites
 // (like M, B_sat, ...)
 type fieldOp struct {
-	a, b  field
+	a, b  Q
 	nComp int
 }
 
@@ -103,30 +95,24 @@ type dotProduct struct {
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
 // 	DotProct(&M, &B_ext)
-func Dot(a, b field) field {
+func Dot(a, b Q) Q {
 	return &dotProduct{fieldOp{a, b, 1}}
 }
 
-func (d *dotProduct) Slice() (*data.Slice, bool) {
-	slice := cuda.Buffer(d.NComp(), Mesh().Size())
-	cuda.Zero(slice)
-	A, r := d.a.Slice()
-	if r {
-		defer cuda.Recycle(A)
-	}
-	B, r := d.b.Slice()
-	if r {
-		defer cuda.Recycle(B)
-	}
-	cuda.AddDotProduct(slice, 1, A, B)
-	return slice, true
+func (d *dotProduct) EvalTo(dst *data.Slice) {
+	A := ValueOf(d.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(d.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.AddDotProduct(dst, 1, A, B)
 }
 
 type pointwiseMul struct {
 	fieldOp
 }
 
-func Mul(a, b field) field {
+func Mul(a, b Q) Q {
 	nComp := -1
 	switch {
 	case a.NComp() == b.NComp():
@@ -142,30 +128,23 @@ func Mul(a, b field) field {
 	return &pointwiseMul{fieldOp{a, b, nComp}}
 }
 
-func (d *pointwiseMul) Slice() (*data.Slice, bool) {
-	buf := cuda.Buffer(d.NComp(), Mesh().Size())
-	cuda.Zero(buf)
-	a, r := d.a.Slice()
-	if r {
-		defer cuda.Recycle(a)
-	}
-	b, r := d.b.Slice()
-	if r {
-		defer cuda.Recycle(b)
-	}
+func (d *pointwiseMul) EvalTo(dst *data.Slice) {
+	cuda.Zero(dst)
+	a := ValueOf(d.a)
+	defer cuda.Recycle(a)
+	b := ValueOf(d.b)
+	defer cuda.Recycle(b)
 
 	switch {
 	case a.NComp() == b.NComp():
-		mulNN(buf, a, b) // vector*vector, scalar*scalar
+		mulNN(dst, a, b) // vector*vector, scalar*scalar
 	case a.NComp() == 1:
-		mul1N(buf, a, b)
+		mul1N(dst, a, b)
 	case b.NComp() == 1:
-		mul1N(buf, b, a)
+		mul1N(dst, b, a)
 	default:
 		panic(fmt.Sprintf("Cannot point-wise multiply %v components by %v components", a.NComp(), b.NComp()))
 	}
-
-	return buf, true
 }
 
 // mulNN pointwise multiplies two N-component vectors,
@@ -188,7 +167,7 @@ type pointwiseDiv struct {
 	fieldOp
 }
 
-func Div(a, b field) field {
+func Div(a, b Q) Q {
 	nComp := -1
 	switch {
 	case a.NComp() == b.NComp():
@@ -201,27 +180,21 @@ func Div(a, b field) field {
 	return &pointwiseDiv{fieldOp{a, b, nComp}}
 }
 
-func (d *pointwiseDiv) Slice() (*data.Slice, bool) {
-	buf := cuda.Buffer(d.NComp(), Mesh().Size())
-	a, r := d.a.Slice()
-	if r {
-		defer cuda.Recycle(a)
-	}
-	b, r := d.b.Slice()
-	if r {
-		defer cuda.Recycle(b)
-	}
+func (d *pointwiseDiv) EvalTo(dst *data.Slice) {
+	a := ValueOf(d.a)
+	defer cuda.Recycle(a)
+	b := ValueOf(d.b)
+	defer cuda.Recycle(b)
 
 	switch {
 	case a.NComp() == b.NComp():
-		divNN(buf, a, b) // vector*vector, scalar*scalar
+		divNN(dst, a, b) // vector*vector, scalar*scalar
 	case b.NComp() == 1:
-		divN1(buf, a, b)
+		divN1(dst, a, b)
 	default:
 		panic(fmt.Sprintf("Cannot point-wise divide %v components by %v components", a.NComp(), b.NComp()))
 	}
 
-	return buf, true
 }
 
 func divNN(dst, a, b *data.Slice) {

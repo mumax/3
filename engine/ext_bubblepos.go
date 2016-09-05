@@ -11,7 +11,7 @@ var (
 )
 
 func bubblePos() []float64 {
-	m, _ := M.Slice()
+	m := M.Buffer()
 	mz := m.Comp(Z).HostCopy().Scalars()[0]
 
 	posx, posy := 0, 0

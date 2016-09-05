@@ -3,7 +3,7 @@ package engine
 var CorePos = NewVectorValue("ext_corepos", "m", "Vortex core position (x,y) + polarization (z)", corePos)
 
 func corePos() []float64 {
-	m, _ := M.Slice()
+	m := M.Buffer()
 	m_z := m.Comp(Z).HostCopy().Scalars()
 	s := m.Size()
 	Nx, Ny, Nz := s[X], s[Y], s[Z]

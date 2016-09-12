@@ -47,12 +47,17 @@ func AddUniaxialAnisotropy2(Beff, m, k1, k2, u, Msat data.MSlice) {
 
 	checkSize(Beff, m, k1, k2, u, Msat)
 
-	//	N := Beff.Len()
-	//	cfg := make1DConf(N)
+	N := Beff.Len()
+	cfg := make1DConf(N)
 
-	//	k_adduniaxialanisotropy_async(Beff.DevPtr(X), Beff.DevPtr(Y), Beff.DevPtr(Z),
-	//		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
-	//		unsafe.Pointer(k1_red), unsafe.Pointer(k2_red),
-	//		u[X], u[Y], u[Z],
-	//		regions.Ptr, N, cfg)
+	k_adduniaxialanisotropy2_async(
+		Beff.DevPtr(X), Beff.DevPtr(Y), Beff.DevPtr(Z),
+		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
+		Msat.DevPtr(0), Msat.Mul(0),
+		k1.DevPtr(0), k1.Mul(0),
+		k2.DevPtr(0), k2.Mul(0),
+		u.DevPtr(X), u.Mul(X),
+		u.DevPtr(Y), u.Mul(Y),
+		u.DevPtr(Z), u.Mul(Z),
+		N, cfg)
 }

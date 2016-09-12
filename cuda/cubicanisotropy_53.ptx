@@ -83,6 +83,23 @@
 	ret;
 }
 
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .b32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 	// .globl	addcubicanisotropy
 .visible .entry addcubicanisotropy(
 	.param .u64 addcubicanisotropy_param_0,
@@ -136,7 +153,7 @@
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB5_6;
+	@%p1 bra 	BB6_6;
 
 	cvta.to.global.u64 	%rd19, %rd18;
 	cvt.s64.s32	%rd1, %r1;
@@ -172,12 +189,12 @@
 	mov.f32 	%f16, 0f00000000;
 	setp.eq.f32	%p2, %f7, 0f00000000;
 	mov.f32 	%f139, %f16;
-	@%p2 bra 	BB5_3;
+	@%p2 bra 	BB6_3;
 
 	rcp.rn.f32 	%f8, %f7;
 	mov.f32 	%f139, %f8;
 
-BB5_3:
+BB6_3:
 	mov.f32 	%f9, %f139;
 	cvta.to.global.u64 	%rd35, %rd17;
 	cvta.to.global.u64 	%rd36, %rd15;
@@ -195,11 +212,11 @@ BB5_3:
 	sqrt.rn.f32 	%f13, %f23;
 	setp.eq.f32	%p3, %f13, 0f00000000;
 	mov.f32 	%f138, %f16;
-	@%p3 bra 	BB5_5;
+	@%p3 bra 	BB6_5;
 
 	rcp.rn.f32 	%f138, %f13;
 
-BB5_5:
+BB6_5:
 	cvta.to.global.u64 	%rd42, %rd5;
 	cvta.to.global.u64 	%rd43, %rd4;
 	cvta.to.global.u64 	%rd44, %rd3;
@@ -330,7 +347,7 @@ BB5_5:
 	add.f32 	%f136, %f135, %f130;
 	st.global.f32 	[%rd54], %f136;
 
-BB5_6:
+BB6_6:
 	ret;
 }
 

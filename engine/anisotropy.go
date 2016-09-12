@@ -62,7 +62,17 @@ func init() {
 
 func addUniaxialAnisotropyField(dst *data.Slice) {
 	if ku1_red.nonZero() || ku2_red.nonZero() {
-		cuda.AddUniaxialAnisotropy(dst, M.Buffer(), ku1_red.gpuLUT1(), ku2_red.gpuLUT1(), AnisU.gpuLUT(), regions.Gpu())
+		ms := Msat.MSlice()
+		defer ms.Recycle()
+		ku1 := Ku1.MSlice()
+		defer ku1.Recycle()
+		ku2 := Ku2.MSlice()
+		defer ku2.Recycle()
+		u := AnisU.MSlice()
+		defer u.Recycle()
+
+		cuda.AddUniaxialAnisotropy2(dst, M.Buffer(), ms, ku1, ku2, u)
+
 	}
 }
 

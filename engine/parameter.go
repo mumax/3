@@ -7,6 +7,7 @@ like material parameters.
 
 import (
 	"fmt"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
@@ -30,6 +31,12 @@ func (p *param) init(nComp int, name, unit string, children []derived) {
 	p.unit = unit
 	p.children = children
 	p.timestamp = math.Inf(-1)
+}
+
+func (p *param) MSlice() cuda.MSlice {
+	buf, r := p.Slice()
+	util.Assert(r == true)
+	return cuda.ToMSlice(buf)
 }
 
 func (p *param) Name() string     { return p.name }

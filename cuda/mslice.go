@@ -1,13 +1,21 @@
-package data
+package cuda
 
 import (
+	"github.com/mumax/3/data"
 	"unsafe"
 )
 
 // Slice + scalar multiplier.
 type MSlice struct {
-	arr *Slice
+	arr *data.Slice
 	mul []float64
+}
+
+func ToMSlice(s *data.Slice) MSlice {
+	return MSlice{
+		arr: s,
+		mul: ones(s.NComp()),
+	}
 }
 
 func (m MSlice) Size() [3]int {
@@ -24,4 +32,18 @@ func (m MSlice) DevPtr(c int) unsafe.Pointer {
 
 func (m MSlice) Mul(c int) float32 {
 	return float32(m.mul[c])
+}
+
+func (m MSlice) Recycle() {
+	if m.arr != nil {
+		Recycle(m.arr)
+		m.arr = nil
+	}
+}
+
+var _ones = [4]float64{1, 1, 1, 1}
+
+func ones(n int) []float64 {
+	return _ones[:n]
+
 }

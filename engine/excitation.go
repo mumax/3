@@ -32,6 +32,12 @@ func NewExcitation(name, unit, desc string) *Excitation {
 	return e
 }
 
+func (p *Excitation) MSlice() cuda.MSlice {
+	buf, r := p.Slice()
+	util.Assert(r == true)
+	return cuda.ToMSlice(buf)
+}
+
 func (e *Excitation) AddTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {
 		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu())

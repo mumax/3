@@ -28,7 +28,7 @@ var (
 
 func init() {
 	Pol.setUniform([]float64{1}) // default spin polarization
-	Lambda.Set(1)                // sensible default value (?). TODO: should not be zero
+	Lambda.Set(1)                // sensible default value (?).
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")
@@ -72,8 +72,29 @@ func AddSTTorque(dst *data.Slice) {
 			Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
 	}
 	if !DisableSlonczewskiTorque && !FixedLayer.isZero() {
-		cuda.AddSlonczewskiTorque(dst, M.Buffer(), jspin, fl, Msat.gpuLUT1(),
-			Alpha.gpuLUT1(), Pol.gpuLUT1(), Lambda.gpuLUT1(), EpsilonPrime.gpuLUT1(), regions.Gpu(), Mesh())
+		msat := Msat.MSlice()
+		defer msat.Recycle()
+
+		j := J.MSlice()
+		defer j.Recycle()
+
+		fixedP := FixedLayer.MSlice()
+		defer fixedP.Recycle()
+
+		alpha := Alpha.MSlice()
+		defer alpha.Recycle()
+
+		pol := Pol.MSlice()
+		defer pol.Recycle()
+
+		lambda := Lambda.MSlice()
+		defer lambda.Recycle()
+
+		epsPrime := EpsilonPrime.MSlice()
+		defer epsPrime.Recycle()
+
+		cuda.AddSlonczewskiTorque2(dst, M.Buffer(),
+			msat, j, fixedP, alpha, pol, lambda, epsPrime, Mesh())
 	}
 }
 

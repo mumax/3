@@ -34,9 +34,13 @@ func (p *param) init(nComp int, name, unit string, children []derived) {
 }
 
 func (p *param) MSlice() cuda.MSlice {
-	buf, r := p.Slice()
-	util.Assert(r == true)
-	return cuda.ToMSlice(buf)
+	if p.IsUniform() {
+		return cuda.MakeMSlice(data.NilSlice(p.NComp(), Mesh().Size()), p.getRegion(0))
+	} else {
+		buf, r := p.Slice()
+		util.Assert(r == true)
+		return cuda.ToMSlice(buf)
+	}
 }
 
 func (p *param) Name() string     { return p.name }

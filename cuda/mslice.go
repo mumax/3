@@ -18,6 +18,10 @@ func ToMSlice(s *data.Slice) MSlice {
 	}
 }
 
+func MakeMSlice(arr *data.Slice, mul []float64) MSlice {
+	return MSlice{arr, mul}
+}
+
 func (m MSlice) Size() [3]int {
 	return m.arr.Size()
 }

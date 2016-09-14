@@ -9,11 +9,11 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1        = NewScalarParam("Ku1", "J/m3", "1st order uniaxial anisotropy constant", &ku1_red)
-	Ku2        = NewScalarParam("Ku2", "J/m3", "2nd order uniaxial anisotropy constant", &ku2_red)
-	Kc1        = NewScalarParam("Kc1", "J/m3", "1st order cubic anisotropy constant", &kc1_red)
-	Kc2        = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant", &kc2_red)
-	Kc3        = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant", &kc3_red)
+	Ku1        = NewScalarParam("Ku1", "J/m3", "1st order uniaxial anisotropy constant")
+	Ku2        = NewScalarParam("Ku2", "J/m3", "2nd order uniaxial anisotropy constant")
+	Kc1        = NewScalarParam("Kc1", "J/m3", "1st order cubic anisotropy constant")
+	Kc2        = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant")
+	Kc3        = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant")
 	AnisU      = NewVectorParam("anisU", "", "Uniaxial anisotropy direction")
 	AnisC1     = NewVectorParam("anisC1", "", "Cubic anisotropy direction #1")
 	AnisC2     = NewVectorParam("anisC2", "", "Cubic anisotorpy directon #2")
@@ -23,46 +23,15 @@ var (
 )
 
 var (
-	ku1_red DerivedParam
-	ku2_red DerivedParam
-	kc1_red DerivedParam
-	kc2_red DerivedParam
-	kc3_red DerivedParam
-)
-
-var (
 	sZero = NewScalarParam("_zero", "", "utility zero parameter")
 )
 
 func init() {
-	Ku1.addChild(&ku1_red)
 	registerEnergy(GetAnisotropyEnergy, AddAnisotropyEnergyDensity)
-
-	//ku1_red = Ku1 / Msat
-	ku1_red.init(SCALAR, []parent{Ku1, Msat}, func(p *DerivedParam) {
-		paramDiv(p.cpu_buf, Ku1.cpuLUT(), Msat.cpuLUT())
-	})
-	//ku2_red = Ku2 / Msat
-	ku2_red.init(SCALAR, []parent{Ku2, Msat}, func(p *DerivedParam) {
-		paramDiv(p.cpu_buf, Ku2.cpuLUT(), Msat.cpuLUT())
-	})
-
-	//kc1_red = Kc1 / Msat
-	kc1_red.init(SCALAR, []parent{Kc1, Msat}, func(p *DerivedParam) {
-		paramDiv(p.cpu_buf, Kc1.cpuLUT(), Msat.cpuLUT())
-	})
-	//kc2_red = Kc2 / Msat
-	kc2_red.init(SCALAR, []parent{Kc2, Msat}, func(p *DerivedParam) {
-		paramDiv(p.cpu_buf, Kc2.cpuLUT(), Msat.cpuLUT())
-	})
-	//kc3_red = Kc3 / Msat
-	kc3_red.init(SCALAR, []parent{Kc3, Msat}, func(p *DerivedParam) {
-		paramDiv(p.cpu_buf, Kc3.cpuLUT(), Msat.cpuLUT())
-	})
 }
 
 func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 *ScalarParam, AnisU *VectorParam) {
-	if ku1_red.nonZero() || ku2_red.nonZero() {
+	if Ku1.nonZero() || Ku2.nonZero() {
 		ms := Msat.MSlice()
 		defer ms.Recycle()
 		ku1 := Ku1.MSlice()
@@ -77,24 +46,40 @@ func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 
 }
 
 func addUniaxialAnisotropyField(dst *data.Slice) {
-	addUniaxialAnisotropyFrom(dst, M, Msat, Ku1, Ku2, AnisU)
 }
 
-func addCubicAnisotropyField(dst *data.Slice) {
-	if kc1_red.nonZero() || kc2_red.nonZero() || kc3_red.nonZero() {
-		cuda.AddCubicAnisotropy(dst, M.Buffer(), kc1_red.gpuLUT1(), kc2_red.gpuLUT1(), kc3_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+func addCubicAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Kc1, Kc2, Kc3 *ScalarParam, AnisC1, AnisC2 *VectorParam) {
+	if Kc1.nonZero() || Kc2.nonZero() || Kc3.nonZero() {
+		ms := Msat.MSlice()
+		defer ms.Recycle()
+
+		kc1 := Kc1.MSlice()
+		defer kc1.Recycle()
+
+		kc2 := Kc2.MSlice()
+		defer kc2.Recycle()
+
+		kc3 := Kc3.MSlice()
+		defer kc3.Recycle()
+
+		c1 := AnisC1.MSlice()
+		defer c1.Recycle()
+
+		c2 := AnisC2.MSlice()
+		defer c2.Recycle()
+		cuda.AddCubicAnisotropy2(dst, M.Buffer(), ms, kc1, kc2, kc3, c1, c2)
 	}
 }
 
 // Add the anisotropy field to dst
 func AddAnisotropyField(dst *data.Slice) {
-	addUniaxialAnisotropyField(dst)
-	addCubicAnisotropyField(dst)
+	addUniaxialAnisotropyFrom(dst, M, Msat, Ku1, Ku2, AnisU)
+	addCubicAnisotropyFrom(dst, M, Msat, Kc1, Kc2, Kc3, AnisC1, AnisC2)
 }
 
 func AddAnisotropyEnergyDensity(dst *data.Slice) {
-	haveUnixial := ku1_red.nonZero() || ku2_red.nonZero()
-	haveCubic := kc1_red.nonZero() || kc2_red.nonZero() || kc3_red.nonZero()
+	haveUnixial := Ku1.nonZero() || Ku2.nonZero()
+	haveCubic := Kc1.nonZero() || Kc2.nonZero() || Kc3.nonZero()
 
 	if !haveUnixial && !haveCubic {
 		return
@@ -124,17 +109,17 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 	if haveCubic {
 		// 1st
 		cuda.Zero(buf)
-		cuda.AddCubicAnisotropy(buf, M.Buffer(), kc1_red.gpuLUT1(), sZero.gpuLUT1(), sZero.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		addCubicAnisotropyFrom(buf, M, Msat, Kc1, sZero, sZero, AnisC1, AnisC2)
 		cuda.AddDotProduct(dst, -1./4., buf, Mf)
 
 		// 2nd
 		cuda.Zero(buf)
-		cuda.AddCubicAnisotropy(buf, M.Buffer(), sZero.gpuLUT1(), kc2_red.gpuLUT1(), sZero.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		addCubicAnisotropyFrom(buf, M, Msat, sZero, Kc2, sZero, AnisC1, AnisC2)
 		cuda.AddDotProduct(dst, -1./6., buf, Mf)
 
 		// 3nd
 		cuda.Zero(buf)
-		cuda.AddCubicAnisotropy(buf, M.Buffer(), sZero.gpuLUT1(), sZero.gpuLUT1(), kc3_red.gpuLUT1(), AnisC1.gpuLUT(), AnisC2.gpuLUT(), regions.Gpu())
+		addCubicAnisotropyFrom(buf, M, Msat, sZero, sZero, Kc3, AnisC1, AnisC2)
 		cuda.AddDotProduct(dst, -1./8., buf, Mf)
 	}
 }

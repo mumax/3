@@ -5,8 +5,9 @@
 // add cubic anisotropy field to B.
 // B:      effective field in T
 // m:      reduced magnetization (unit length)
-// K1:     Kc1/Msat in T
-// K2:     Kc2/Msat in T
+// Ms:     saturation magnetization in A/m.
+// K1:     Kc1 in J/m3
+// K2:     Kc2 in T/m3
 // C1, C2: anisotropy axes
 //
 // based on http://www.southampton.ac.uk/~fangohr/software/oxs_cubic8.html

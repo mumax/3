@@ -3,7 +3,7 @@
 
 // TODO: this could act on x,y,z, so that we need to call it only once.
 extern "C" __global__ void
-settemperature2(float* __restrict__  B,      float* __restrict__ noise, float kB2_Mu0VgammaDt,
+settemperature2(float* __restrict__  B,      float* __restrict__ noise, float kB2_VgammaDt,
 				float* __restrict__ Ms_, float Ms_mul,
                 float* __restrict__ temp_, float temp_mul,
 				float* __restrict__ alpha_, float alpha_mul,
@@ -14,7 +14,7 @@ settemperature2(float* __restrict__  B,      float* __restrict__ noise, float kB
 		float invMs = inv_Msat(Ms_, Ms_mul, i);
 		float temp = amul(temp_, temp_mul, i);
 		float alpha = amul(alpha_, alpha_mul, i);
-		B[i] = noise[i] * sqrtf((kB2_Mu0VgammaDt * alpha * temp * invMs ));
+		B[i] = noise[i] * sqrtf((kB2_VgammaDt * alpha * temp * invMs ));
 	}
 }
 

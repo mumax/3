@@ -5,10 +5,10 @@
 extern "C" __global__ void
 zeromask(float* __restrict__  dst, float* maskLUT, uint8_t* regions, int N) {
 
-	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
-	if (i < N) {
-		if (maskLUT[regions[i]] != 0){
-			dst[i] = 0;
-		}
-	}
+    int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
+    if (i < N) {
+        if (maskLUT[regions[i]] != 0) {
+            dst[i] = 0;
+        }
+    }
 }

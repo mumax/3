@@ -5,6 +5,6 @@
 
 extern "C" __global__ void
 reducesum(float* __restrict__ src, float*__restrict__  dst, float initVal, int n) {
-	reduce(load, sum, atomicAdd)
+    reduce(load, sum, atomicAdd)
 }
 

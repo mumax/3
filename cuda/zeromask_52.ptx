@@ -83,6 +83,23 @@
 	ret;
 }
 
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .b32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 	// .globl	zeromask
 .visible .entry zeromask(
 	.param .u64 zeromask_param_0,
@@ -110,7 +127,7 @@
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB5_3;
+	@%p1 bra 	BB6_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
 	cvt.s64.s32	%rd1, %r1;
@@ -123,7 +140,7 @@
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
 	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB5_3;
+	@%p2 bra 	BB6_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -131,7 +148,7 @@
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB5_3:
+BB6_3:
 	ret;
 }
 

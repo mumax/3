@@ -83,6 +83,23 @@
 	ret;
 }
 
+	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
+.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
+	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
+	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
+)
+{
+	.reg .b32 	%r<2>;
+
+
+	mov.u32 	%r1, 30;
+	st.param.b32	[func_retval0+0], %r1;
+	ret;
+}
+
 	// .globl	resize
 .visible .entry resize(
 	.param .u64 resize_param_0,
@@ -124,19 +141,19 @@
 	setp.lt.s32	%p1, %r25, %r17;
 	setp.lt.s32	%p2, %r6, %r23;
 	and.pred  	%p3, %p1, %p2;
-	@!%p3 bra 	BB5_10;
-	bra.uni 	BB5_1;
+	@!%p3 bra 	BB6_10;
+	bra.uni 	BB6_1;
 
-BB5_1:
+BB6_1:
 	mov.f32 	%f20, 0f00000000;
 	mov.f32 	%f19, %f20;
 	setp.lt.s32	%p4, %r22, 1;
-	@%p4 bra 	BB5_9;
+	@%p4 bra 	BB6_9;
 
 	mov.f32 	%f20, 0f00000000;
 	mov.f32 	%f19, %f20;
 	setp.lt.s32	%p5, %r21, 1;
-	@%p5 bra 	BB5_9;
+	@%p5 bra 	BB6_9;
 
 	cvta.to.global.u64 	%rd1, %rd6;
 	mul.lo.s32 	%r7, %r6, %r22;
@@ -149,7 +166,7 @@ BB5_1:
 	mov.u32 	%r26, 0;
 	mov.u32 	%r42, %r26;
 
-BB5_4:
+BB6_4:
 	mad.lo.s32 	%r33, %r18, %r42, %r9;
 	mul.wide.s32 	%rd7, %r33, 4;
 	add.s64 	%rd11, %rd1, %rd7;
@@ -157,34 +174,34 @@ BB5_4:
 	mov.u32 	%r39, %r8;
 	mov.u32 	%r41, %r26;
 
-BB5_5:
+BB6_5:
 	mov.u32 	%r13, %r41;
 	mov.u32 	%r12, %r39;
 	setp.lt.s32	%p6, %r12, %r18;
 	setp.lt.s32	%p7, %r11, %r19;
 	and.pred  	%p8, %p7, %p6;
-	@!%p8 bra 	BB5_7;
-	bra.uni 	BB5_6;
+	@!%p8 bra 	BB6_7;
+	bra.uni 	BB6_6;
 
-BB5_6:
+BB6_6:
 	ld.global.nc.f32 	%f17, [%rd11];
 	add.f32 	%f20, %f20, %f17;
 	add.f32 	%f19, %f19, 0f3F800000;
 
-BB5_7:
+BB6_7:
 	add.s64 	%rd11, %rd11, 4;
 	add.s32 	%r14, %r12, 1;
 	add.s32 	%r15, %r13, 1;
 	setp.lt.s32	%p9, %r15, %r21;
 	mov.u32 	%r39, %r14;
 	mov.u32 	%r41, %r15;
-	@%p9 bra 	BB5_5;
+	@%p9 bra 	BB6_5;
 
 	add.s32 	%r42, %r42, 1;
 	setp.lt.s32	%p10, %r42, %r22;
-	@%p10 bra 	BB5_4;
+	@%p10 bra 	BB6_4;
 
-BB5_9:
+BB6_9:
 	mad.lo.s32 	%r38, %r6, %r17, %r25;
 	cvta.to.global.u64 	%rd8, %rd5;
 	mul.wide.s32 	%rd9, %r38, 4;
@@ -192,7 +209,7 @@ BB5_9:
 	div.rn.f32 	%f18, %f20, %f19;
 	st.global.f32 	[%rd10], %f18;
 
-BB5_10:
+BB6_10:
 	ret;
 }
 

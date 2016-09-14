@@ -1,5 +1,5 @@
 // Original implementation by Mykola Dvornik for mumax2
-// Modified for mumax3 by Arne Vansteenkiste, 2013
+// Modified for mumax3 by Arne Vansteenkiste, 2013, 2016
 
 #include <stdint.h>
 #include "float3.h"
@@ -15,10 +15,10 @@ addslonczewskitorque2(float* __restrict__ tx, float* __restrict__ ty, float* __r
                       float* __restrict__ py_,      float  py_mul,
                       float* __restrict__ pz_,      float  pz_mul,
                       float* __restrict__ alpha_,   float  alpha_mul,
-                      float* __restrict__ flt_,     float  flt_mul,
                       float* __restrict__ pol_,     float  pol_mul,
                       float* __restrict__ lambda_,  float  lambda_mul,
                       float* __restrict__ epsPrime_,float  epsPrime_mul,
+                      float* __restrict__ flt_,     float  flt_mul,
                       int N) {
 
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;

@@ -35,14 +35,14 @@ type addslonczewskitorque2_args_t struct {
 	arg_pz_mul       float32
 	arg_alpha_       unsafe.Pointer
 	arg_alpha_mul    float32
-	arg_flt_         unsafe.Pointer
-	arg_flt_mul      float32
 	arg_pol_         unsafe.Pointer
 	arg_pol_mul      float32
 	arg_lambda_      unsafe.Pointer
 	arg_lambda_mul   float32
 	arg_epsPrime_    unsafe.Pointer
 	arg_epsPrime_mul float32
+	arg_flt_         unsafe.Pointer
+	arg_flt_mul      float32
 	arg_N            int
 	argptr           [27]unsafe.Pointer
 	sync.Mutex
@@ -71,19 +71,19 @@ func init() {
 	addslonczewskitorque2_args.argptr[15] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pz_mul)
 	addslonczewskitorque2_args.argptr[16] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_)
 	addslonczewskitorque2_args.argptr[17] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_mul)
-	addslonczewskitorque2_args.argptr[18] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_)
-	addslonczewskitorque2_args.argptr[19] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_mul)
-	addslonczewskitorque2_args.argptr[20] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_)
-	addslonczewskitorque2_args.argptr[21] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_mul)
-	addslonczewskitorque2_args.argptr[22] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_)
-	addslonczewskitorque2_args.argptr[23] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_mul)
-	addslonczewskitorque2_args.argptr[24] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_)
-	addslonczewskitorque2_args.argptr[25] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_mul)
+	addslonczewskitorque2_args.argptr[18] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_)
+	addslonczewskitorque2_args.argptr[19] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_mul)
+	addslonczewskitorque2_args.argptr[20] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_)
+	addslonczewskitorque2_args.argptr[21] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_mul)
+	addslonczewskitorque2_args.argptr[22] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_)
+	addslonczewskitorque2_args.argptr[23] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_mul)
+	addslonczewskitorque2_args.argptr[24] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_)
+	addslonczewskitorque2_args.argptr[25] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_mul)
 	addslonczewskitorque2_args.argptr[26] = unsafe.Pointer(&addslonczewskitorque2_args.arg_N)
 }
 
 // Wrapper for addslonczewskitorque2 CUDA kernel, asynchronous.
-func k_addslonczewskitorque2_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, jz_ unsafe.Pointer, jz_mul float32, px_ unsafe.Pointer, px_mul float32, py_ unsafe.Pointer, py_mul float32, pz_ unsafe.Pointer, pz_mul float32, alpha_ unsafe.Pointer, alpha_mul float32, flt_ unsafe.Pointer, flt_mul float32, pol_ unsafe.Pointer, pol_mul float32, lambda_ unsafe.Pointer, lambda_mul float32, epsPrime_ unsafe.Pointer, epsPrime_mul float32, N int, cfg *config) {
+func k_addslonczewskitorque2_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, jz_ unsafe.Pointer, jz_mul float32, px_ unsafe.Pointer, px_mul float32, py_ unsafe.Pointer, py_mul float32, pz_ unsafe.Pointer, pz_mul float32, alpha_ unsafe.Pointer, alpha_mul float32, pol_ unsafe.Pointer, pol_mul float32, lambda_ unsafe.Pointer, lambda_mul float32, epsPrime_ unsafe.Pointer, epsPrime_mul float32, flt_ unsafe.Pointer, flt_mul float32, N int, cfg *config) {
 	if Synchronous { // debug
 		Sync()
 		timer.Start("addslonczewskitorque2")
@@ -114,14 +114,14 @@ func k_addslonczewskitorque2_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsa
 	addslonczewskitorque2_args.arg_pz_mul = pz_mul
 	addslonczewskitorque2_args.arg_alpha_ = alpha_
 	addslonczewskitorque2_args.arg_alpha_mul = alpha_mul
-	addslonczewskitorque2_args.arg_flt_ = flt_
-	addslonczewskitorque2_args.arg_flt_mul = flt_mul
 	addslonczewskitorque2_args.arg_pol_ = pol_
 	addslonczewskitorque2_args.arg_pol_mul = pol_mul
 	addslonczewskitorque2_args.arg_lambda_ = lambda_
 	addslonczewskitorque2_args.arg_lambda_mul = lambda_mul
 	addslonczewskitorque2_args.arg_epsPrime_ = epsPrime_
 	addslonczewskitorque2_args.arg_epsPrime_mul = epsPrime_mul
+	addslonczewskitorque2_args.arg_flt_ = flt_
+	addslonczewskitorque2_args.arg_flt_mul = flt_mul
 	addslonczewskitorque2_args.arg_N = N
 
 	args := addslonczewskitorque2_args.argptr[:]
@@ -207,13 +207,13 @@ const (
 	ld.param.u64 	%rd12, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -303,37 +303,37 @@ BB0_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB0_15:
-	setp.eq.s64	%p9, %rd13, 0;
+	setp.eq.s64	%p9, %rd16, 0;
 	@%p9 bra 	BB0_17;
 
-	cvta.to.global.u64 	%rd42, %rd13;
+	cvta.to.global.u64 	%rd42, %rd16;
 	add.s64 	%rd44, %rd42, %rd18;
 	ld.global.f32 	%f50, [%rd44];
 	mul.f32 	%f113, %f50, %f113;
 
 BB0_17:
-	setp.eq.s64	%p10, %rd14, 0;
+	setp.eq.s64	%p10, %rd13, 0;
 	@%p10 bra 	BB0_19;
 
-	cvta.to.global.u64 	%rd45, %rd14;
+	cvta.to.global.u64 	%rd45, %rd13;
 	add.s64 	%rd47, %rd45, %rd18;
 	ld.global.f32 	%f51, [%rd47];
 	mul.f32 	%f114, %f51, %f114;
 
 BB0_19:
-	setp.eq.s64	%p11, %rd15, 0;
+	setp.eq.s64	%p11, %rd14, 0;
 	@%p11 bra 	BB0_21;
 
-	cvta.to.global.u64 	%rd48, %rd15;
+	cvta.to.global.u64 	%rd48, %rd14;
 	add.s64 	%rd50, %rd48, %rd18;
 	ld.global.f32 	%f52, [%rd50];
 	mul.f32 	%f115, %f52, %f115;
 
 BB0_21:
-	setp.eq.s64	%p12, %rd16, 0;
+	setp.eq.s64	%p12, %rd15, 0;
 	@%p12 bra 	BB0_23;
 
-	cvta.to.global.u64 	%rd51, %rd16;
+	cvta.to.global.u64 	%rd51, %rd15;
 	add.s64 	%rd53, %rd51, %rd18;
 	ld.global.f32 	%f53, [%rd53];
 	mul.f32 	%f116, %f53, %f116;
@@ -477,13 +477,13 @@ BB0_25:
 	ld.param.u64 	%rd12, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -573,37 +573,37 @@ BB0_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB0_15:
-	setp.eq.s64	%p9, %rd13, 0;
+	setp.eq.s64	%p9, %rd16, 0;
 	@%p9 bra 	BB0_17;
 
-	cvta.to.global.u64 	%rd42, %rd13;
+	cvta.to.global.u64 	%rd42, %rd16;
 	add.s64 	%rd44, %rd42, %rd18;
 	ld.global.f32 	%f50, [%rd44];
 	mul.f32 	%f113, %f50, %f113;
 
 BB0_17:
-	setp.eq.s64	%p10, %rd14, 0;
+	setp.eq.s64	%p10, %rd13, 0;
 	@%p10 bra 	BB0_19;
 
-	cvta.to.global.u64 	%rd45, %rd14;
+	cvta.to.global.u64 	%rd45, %rd13;
 	add.s64 	%rd47, %rd45, %rd18;
 	ld.global.f32 	%f51, [%rd47];
 	mul.f32 	%f114, %f51, %f114;
 
 BB0_19:
-	setp.eq.s64	%p11, %rd15, 0;
+	setp.eq.s64	%p11, %rd14, 0;
 	@%p11 bra 	BB0_21;
 
-	cvta.to.global.u64 	%rd48, %rd15;
+	cvta.to.global.u64 	%rd48, %rd14;
 	add.s64 	%rd50, %rd48, %rd18;
 	ld.global.f32 	%f52, [%rd50];
 	mul.f32 	%f115, %f52, %f115;
 
 BB0_21:
-	setp.eq.s64	%p12, %rd16, 0;
+	setp.eq.s64	%p12, %rd15, 0;
 	@%p12 bra 	BB0_23;
 
-	cvta.to.global.u64 	%rd51, %rd16;
+	cvta.to.global.u64 	%rd51, %rd15;
 	add.s64 	%rd53, %rd51, %rd18;
 	ld.global.f32 	%f53, [%rd53];
 	mul.f32 	%f116, %f53, %f116;
@@ -836,13 +836,13 @@ BB0_25:
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd17, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -939,40 +939,40 @@ BB6_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB6_15:
-	setp.eq.s64	%p9, %rd14, 0;
+	setp.eq.s64	%p9, %rd17, 0;
 	@%p9 bra 	BB6_17;
 
-	cvta.to.global.u64 	%rd43, %rd14;
+	cvta.to.global.u64 	%rd43, %rd17;
 	shl.b64 	%rd44, %rd1, 2;
 	add.s64 	%rd45, %rd43, %rd44;
 	ld.global.nc.f32 	%f50, [%rd45];
 	mul.f32 	%f113, %f50, %f113;
 
 BB6_17:
-	setp.eq.s64	%p10, %rd15, 0;
+	setp.eq.s64	%p10, %rd14, 0;
 	@%p10 bra 	BB6_19;
 
-	cvta.to.global.u64 	%rd46, %rd15;
+	cvta.to.global.u64 	%rd46, %rd14;
 	shl.b64 	%rd47, %rd1, 2;
 	add.s64 	%rd48, %rd46, %rd47;
 	ld.global.nc.f32 	%f51, [%rd48];
 	mul.f32 	%f114, %f51, %f114;
 
 BB6_19:
-	setp.eq.s64	%p11, %rd16, 0;
+	setp.eq.s64	%p11, %rd15, 0;
 	@%p11 bra 	BB6_21;
 
-	cvta.to.global.u64 	%rd49, %rd16;
+	cvta.to.global.u64 	%rd49, %rd15;
 	shl.b64 	%rd50, %rd1, 2;
 	add.s64 	%rd51, %rd49, %rd50;
 	ld.global.nc.f32 	%f52, [%rd51];
 	mul.f32 	%f115, %f52, %f115;
 
 BB6_21:
-	setp.eq.s64	%p12, %rd17, 0;
+	setp.eq.s64	%p12, %rd16, 0;
 	@%p12 bra 	BB6_23;
 
-	cvta.to.global.u64 	%rd52, %rd17;
+	cvta.to.global.u64 	%rd52, %rd16;
 	shl.b64 	%rd53, %rd1, 2;
 	add.s64 	%rd54, %rd52, %rd53;
 	ld.global.nc.f32 	%f53, [%rd54];
@@ -1207,13 +1207,13 @@ BB6_25:
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd17, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -1310,40 +1310,40 @@ BB6_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB6_15:
-	setp.eq.s64	%p9, %rd14, 0;
+	setp.eq.s64	%p9, %rd17, 0;
 	@%p9 bra 	BB6_17;
 
-	cvta.to.global.u64 	%rd43, %rd14;
+	cvta.to.global.u64 	%rd43, %rd17;
 	shl.b64 	%rd44, %rd1, 2;
 	add.s64 	%rd45, %rd43, %rd44;
 	ld.global.nc.f32 	%f50, [%rd45];
 	mul.f32 	%f113, %f50, %f113;
 
 BB6_17:
-	setp.eq.s64	%p10, %rd15, 0;
+	setp.eq.s64	%p10, %rd14, 0;
 	@%p10 bra 	BB6_19;
 
-	cvta.to.global.u64 	%rd46, %rd15;
+	cvta.to.global.u64 	%rd46, %rd14;
 	shl.b64 	%rd47, %rd1, 2;
 	add.s64 	%rd48, %rd46, %rd47;
 	ld.global.nc.f32 	%f51, [%rd48];
 	mul.f32 	%f114, %f51, %f114;
 
 BB6_19:
-	setp.eq.s64	%p11, %rd16, 0;
+	setp.eq.s64	%p11, %rd15, 0;
 	@%p11 bra 	BB6_21;
 
-	cvta.to.global.u64 	%rd49, %rd16;
+	cvta.to.global.u64 	%rd49, %rd15;
 	shl.b64 	%rd50, %rd1, 2;
 	add.s64 	%rd51, %rd49, %rd50;
 	ld.global.nc.f32 	%f52, [%rd51];
 	mul.f32 	%f115, %f52, %f115;
 
 BB6_21:
-	setp.eq.s64	%p12, %rd17, 0;
+	setp.eq.s64	%p12, %rd16, 0;
 	@%p12 bra 	BB6_23;
 
-	cvta.to.global.u64 	%rd52, %rd17;
+	cvta.to.global.u64 	%rd52, %rd16;
 	shl.b64 	%rd53, %rd1, 2;
 	add.s64 	%rd54, %rd52, %rd53;
 	ld.global.nc.f32 	%f53, [%rd54];
@@ -1578,13 +1578,13 @@ BB6_25:
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd17, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -1681,40 +1681,40 @@ BB6_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB6_15:
-	setp.eq.s64	%p9, %rd14, 0;
+	setp.eq.s64	%p9, %rd17, 0;
 	@%p9 bra 	BB6_17;
 
-	cvta.to.global.u64 	%rd43, %rd14;
+	cvta.to.global.u64 	%rd43, %rd17;
 	shl.b64 	%rd44, %rd1, 2;
 	add.s64 	%rd45, %rd43, %rd44;
 	ld.global.nc.f32 	%f50, [%rd45];
 	mul.f32 	%f113, %f50, %f113;
 
 BB6_17:
-	setp.eq.s64	%p10, %rd15, 0;
+	setp.eq.s64	%p10, %rd14, 0;
 	@%p10 bra 	BB6_19;
 
-	cvta.to.global.u64 	%rd46, %rd15;
+	cvta.to.global.u64 	%rd46, %rd14;
 	shl.b64 	%rd47, %rd1, 2;
 	add.s64 	%rd48, %rd46, %rd47;
 	ld.global.nc.f32 	%f51, [%rd48];
 	mul.f32 	%f114, %f51, %f114;
 
 BB6_19:
-	setp.eq.s64	%p11, %rd16, 0;
+	setp.eq.s64	%p11, %rd15, 0;
 	@%p11 bra 	BB6_21;
 
-	cvta.to.global.u64 	%rd49, %rd16;
+	cvta.to.global.u64 	%rd49, %rd15;
 	shl.b64 	%rd50, %rd1, 2;
 	add.s64 	%rd51, %rd49, %rd50;
 	ld.global.nc.f32 	%f52, [%rd51];
 	mul.f32 	%f115, %f52, %f115;
 
 BB6_21:
-	setp.eq.s64	%p12, %rd17, 0;
+	setp.eq.s64	%p12, %rd16, 0;
 	@%p12 bra 	BB6_23;
 
-	cvta.to.global.u64 	%rd52, %rd17;
+	cvta.to.global.u64 	%rd52, %rd16;
 	shl.b64 	%rd53, %rd1, 2;
 	add.s64 	%rd54, %rd52, %rd53;
 	ld.global.nc.f32 	%f53, [%rd54];
@@ -1949,13 +1949,13 @@ BB6_25:
 	ld.param.u64 	%rd13, [addslonczewskitorque2_param_16];
 	ld.param.f32 	%f112, [addslonczewskitorque2_param_17];
 	ld.param.u64 	%rd14, [addslonczewskitorque2_param_18];
-	ld.param.f32 	%f113, [addslonczewskitorque2_param_19];
+	ld.param.f32 	%f114, [addslonczewskitorque2_param_19];
 	ld.param.u64 	%rd15, [addslonczewskitorque2_param_20];
-	ld.param.f32 	%f114, [addslonczewskitorque2_param_21];
+	ld.param.f32 	%f115, [addslonczewskitorque2_param_21];
 	ld.param.u64 	%rd16, [addslonczewskitorque2_param_22];
-	ld.param.f32 	%f115, [addslonczewskitorque2_param_23];
+	ld.param.f32 	%f116, [addslonczewskitorque2_param_23];
 	ld.param.u64 	%rd17, [addslonczewskitorque2_param_24];
-	ld.param.f32 	%f116, [addslonczewskitorque2_param_25];
+	ld.param.f32 	%f113, [addslonczewskitorque2_param_25];
 	ld.param.u32 	%r2, [addslonczewskitorque2_param_26];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -2052,40 +2052,40 @@ BB6_13:
 	mul.f32 	%f112, %f49, %f112;
 
 BB6_15:
-	setp.eq.s64	%p9, %rd14, 0;
+	setp.eq.s64	%p9, %rd17, 0;
 	@%p9 bra 	BB6_17;
 
-	cvta.to.global.u64 	%rd43, %rd14;
+	cvta.to.global.u64 	%rd43, %rd17;
 	shl.b64 	%rd44, %rd1, 2;
 	add.s64 	%rd45, %rd43, %rd44;
 	ld.global.nc.f32 	%f50, [%rd45];
 	mul.f32 	%f113, %f50, %f113;
 
 BB6_17:
-	setp.eq.s64	%p10, %rd15, 0;
+	setp.eq.s64	%p10, %rd14, 0;
 	@%p10 bra 	BB6_19;
 
-	cvta.to.global.u64 	%rd46, %rd15;
+	cvta.to.global.u64 	%rd46, %rd14;
 	shl.b64 	%rd47, %rd1, 2;
 	add.s64 	%rd48, %rd46, %rd47;
 	ld.global.nc.f32 	%f51, [%rd48];
 	mul.f32 	%f114, %f51, %f114;
 
 BB6_19:
-	setp.eq.s64	%p11, %rd16, 0;
+	setp.eq.s64	%p11, %rd15, 0;
 	@%p11 bra 	BB6_21;
 
-	cvta.to.global.u64 	%rd49, %rd16;
+	cvta.to.global.u64 	%rd49, %rd15;
 	shl.b64 	%rd50, %rd1, 2;
 	add.s64 	%rd51, %rd49, %rd50;
 	ld.global.nc.f32 	%f52, [%rd51];
 	mul.f32 	%f115, %f52, %f115;
 
 BB6_21:
-	setp.eq.s64	%p12, %rd17, 0;
+	setp.eq.s64	%p12, %rd16, 0;
 	@%p12 bra 	BB6_23;
 
-	cvta.to.global.u64 	%rd52, %rd17;
+	cvta.to.global.u64 	%rd52, %rd16;
 	shl.b64 	%rd53, %rd1, 2;
 	add.s64 	%rd54, %rd52, %rd53;
 	ld.global.nc.f32 	%f53, [%rd54];

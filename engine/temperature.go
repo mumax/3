@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	Temp        = NewScalarParam("Temp", "K", "Temperature", &temp_red)
-	temp_red    DerivedParam // reduced temperature = (alpha * Temp) / (mu0 * Msat)
+	Temp        = NewScalarParam("Temp", "K", "Temperature")
 	E_therm     = NewScalarValue("E_therm", "J", "Thermal energy", GetThermalEnergy)
 	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
@@ -32,17 +31,6 @@ func init() {
 	registerEnergy(GetThermalEnergy, AddThermalEnergyDensity)
 	B_therm.step = -1 // invalidate noise cache
 	DeclROnly("B_therm", &B_therm, "Thermal field (T)")
-
-	// reduced temperature = (alpha * T) / (mu0 * Msat)
-	temp_red.init(1, []parent{Alpha, Temp, Msat}, func(p *DerivedParam) {
-		dst := temp_red.cpu_buf
-		alpha := Alpha.cpuLUT()
-		T := Temp.cpuLUT()
-		Ms := Msat.cpuLUT()
-		for i := 0; i < NREGION; i++ { // not regions.MaxReg!
-			dst[0][i] = safediv(alpha[0][i]*T[0][i], mag.Mu0*Ms[0][i])
-		}
-	})
 }
 
 func (b *thermField) AddTo(dst *data.Slice) {

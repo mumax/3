@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant", &temp_red)
+	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant")
 	Xi           = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque")
 	Pol          = NewScalarParam("Pol", "", "Electrical current polarization")
 	Lambda       = NewScalarParam("Lambda", "", "Slonczewski Λ parameter")

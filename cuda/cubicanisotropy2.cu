@@ -33,14 +33,8 @@ addcubicanisotropy2(float* __restrict__ Bx, float* __restrict__ By, float* __res
 		float  k1 = amul(k1_, k1_mul, i) * invMs;
 		float  k2 = amul(k2_, k2_mul, i) * invMs;
 		float  k3 = amul(k3_, k3_mul, i) * invMs;
-		float  c1x = amul(c1x_, c1x_mul, i);
-		float  c1y = amul(c1y_, c1y_mul, i);
-		float  c1z = amul(c1z_, c1z_mul, i);
-		float  c2x = amul(c2x_, c2x_mul, i);
-		float  c2y = amul(c2y_, c2y_mul, i);
-		float  c2z = amul(c2z_, c2z_mul, i);
-		float3 u1 = normalized(make_float3(c1x, c1y, c1z));
-		float3 u2 = normalized(make_float3(c2x, c2y, c2z));
+		float3 u1 = normalized(vmul(c1x_, c1y_, c1z_, c1x_mul, c1y_mul, c1z_mul, i));
+		float3 u2 = normalized(vmul(c2x_, c2y_, c2z_, c2x_mul, c2y_mul, c2z_mul, i));
 		float3 u3 = cross(u1, u2); // 3rd axis perpendicular to u1,u2
 		float3 m  = make_float3(mx[i], my[i], mz[i]);
 

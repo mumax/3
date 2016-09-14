@@ -18,13 +18,10 @@ adduniaxialanisotropy2(float* __restrict__  Bx, float* __restrict__  By, float* 
 	int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
 	if (i < N) {
 
-		float  ux  = amul(ux_, ux_mul, i);
-		float  uy  = amul(uy_, uy_mul, i);
-		float  uz  = amul(uz_, uz_mul, i);
-		float3 u   = normalized(make_float3(ux, uy, uz));
-		float Msat = amul(Ms_, Ms_mul, i);
-		float  K1  = div( amul(K1_, K1_mul, i), Msat);
-		float  K2  = div( amul(K2_, K2_mul, i), Msat);
+		float3 u   = normalized(vmul(ux_, uy_, uz_, ux_mul, uy_mul, uz_mul, i));
+		float invMs = inv_Msat(Ms_, Ms_mul, i);
+		float  K1  = amul(K1_, K1_mul, i) * invMs;
+		float  K2  = amul(K2_, K2_mul, i) * invMs;
 		float3 m   = {mx[i], my[i], mz[i]};
 		float  mu  = dot(m, u);
 		float3 Ba  = 2.0f*K1*    (mu)*u+ 

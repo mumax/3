@@ -24,15 +24,12 @@ func testConvolution(c *DemagConvolution, PBC [3]int, realKern [3][3]*data.Slice
 	defer gpu.Free()
 	data.Copy(gpu, inhost)
 
-	regions := NewBytes(prod(c.inputSize))
-	defer regions.Free()
-	Bsat := NewSlice(1, [3]int{1, 1, 256})
-	defer Bsat.Free()
-	Memset(Bsat, 1)
-	BsatLUT := LUTPtr(Bsat.DevPtr(0))
+	Msat := NewSlice(1, [3]int{1, 1, 256})
+	defer Msat.Free()
+	Memset(Msat, 1)
 
 	vol := data.NilSlice(1, c.inputSize)
-	c.Exec(gpu, gpu, vol, BsatLUT, regions)
+	c.Exec(gpu, gpu, vol, ToMSlice(Msat))
 
 	output := gpu.HostCopy()
 

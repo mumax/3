@@ -45,9 +45,6 @@ func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 
 	}
 }
 
-func addUniaxialAnisotropyField(dst *data.Slice) {
-}
-
 func addCubicAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Kc1, Kc2, Kc3 *ScalarParam, AnisC1, AnisC2 *VectorParam) {
 	if Kc1.nonZero() || Kc2.nonZero() || Kc3.nonZero() {
 		ms := Msat.MSlice()

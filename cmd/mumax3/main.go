@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	flag_cachedir      = flag.String("cache", "", "Kernel cache directory")
+	flag_cachedir      = flag.String("cache", "/tmp", "Kernel cache directory (empty disables caching)")
 	flag_cpuprof       = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	flag_failfast      = flag.Bool("failfast", false, "If one simulation fails, stop entire batch immediately")
 	flag_forceclean    = flag.Bool("f", true, "Force start, clean existing output directory")

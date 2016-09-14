@@ -68,31 +68,33 @@ func AddSTTorque(dst *data.Slice) {
 		defer cuda.Recycle(fl)
 	}
 	if !DisableZhangLiTorque {
-		cuda.AddZhangLiTorque(dst, M.Buffer(), jspin, Bsat.gpuLUT1(),
-			Alpha.gpuLUT1(), Xi.gpuLUT1(), Pol.gpuLUT1(), regions.Gpu(), Mesh())
+		msat := Msat.MSlice()
+		defer msat.Recycle()
+		j := J.MSlice()
+		defer j.Recycle()
+		alpha := Alpha.MSlice()
+		defer alpha.Recycle()
+		xi := Xi.MSlice()
+		defer xi.Recycle()
+		pol := Pol.MSlice()
+		defer pol.Recycle()
+		cuda.AddZhangLiTorque(dst, M.Buffer(), msat, j, alpha, xi, pol, Mesh())
 	}
 	if !DisableSlonczewskiTorque && !FixedLayer.isZero() {
 		msat := Msat.MSlice()
 		defer msat.Recycle()
-
 		j := J.MSlice()
 		defer j.Recycle()
-
 		fixedP := FixedLayer.MSlice()
 		defer fixedP.Recycle()
-
 		alpha := Alpha.MSlice()
 		defer alpha.Recycle()
-
 		pol := Pol.MSlice()
 		defer pol.Recycle()
-
 		lambda := Lambda.MSlice()
 		defer lambda.Recycle()
-
 		epsPrime := EpsilonPrime.MSlice()
 		defer epsPrime.Recycle()
-
 		cuda.AddSlonczewskiTorque2(dst, M.Buffer(),
 			msat, j, fixedP, alpha, pol, lambda, epsPrime, Mesh())
 	}

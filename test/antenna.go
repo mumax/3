@@ -3,7 +3,6 @@
 package main
 
 import (
-	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	. "github.com/mumax/3/engine"
 	"github.com/mumax/3/oommf"
@@ -15,8 +14,7 @@ const Mu0 = 4 * math.Pi * 1e-7
 
 func main() {
 
-	cuda.Init(0)
-	defer Close()
+	defer InitAndClose()()
 
 	Nx := 512
 	Ny := 128
@@ -25,13 +23,11 @@ func main() {
 	cellsize := 5.0e-9
 	SetGridSize(Nx, Ny, Nz)
 	thickness := 40e-9
-	//width := float64(Ny) * cellsize
 	length := float64(Nx) * cellsize
 	SetCellSize(cellsize, cellsize, thickness/float64(Nz))
 
 	mask := data.NewSlice(3, Mesh().Size())
 	wireX := -length * 0.45
-	//wireY := 0.0
 	wireZ := thickness * 5.0
 
 	for h := 0; h < 10; h++ {

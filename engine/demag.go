@@ -21,8 +21,6 @@ var (
 	NoDemagSpins  = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)")
 	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
-	CacheDir      = ""                   // directory for kernel cache
-	TestDemag     = false                // enable convolution self-test
 )
 
 var AddEdens_demag = makeEdensAdder(&B_demag, -0.5)
@@ -112,8 +110,8 @@ func demagConv() *cuda.DemagConvolution {
 	if conv_ == nil {
 		SetBusy(true)
 		defer SetBusy(false)
-		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, CacheDir)
-		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel, TestDemag)
+		kernel := mag.DemagKernel(Mesh().Size(), Mesh().PBC(), Mesh().CellSize(), DemagAccuracy, *Flag_cachedir)
+		conv_ = cuda.NewDemag(Mesh().Size(), Mesh().PBC(), kernel, *Flag_selftest)
 	}
 	return conv_
 }

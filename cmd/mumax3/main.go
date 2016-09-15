@@ -7,11 +7,9 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
 	"github.com/mumax/3/script"
-	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
 	"log"
 	"os"
-	"runtime"
 	"time"
 )
 
@@ -29,13 +27,11 @@ func main() {
 	log.SetFlags(0)
 
 	cuda.Init(*engine.Flag_gpu)
-	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	cuda.Synchronous = *engine.Flag_sync
 	if *flag_version {
 		printVersion()
 	}
-
-	engine.TestDemag = *engine.Flag_selftest
 
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine
@@ -44,15 +40,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	engine.CacheDir = *engine.Flag_cachedir
-
 	defer engine.Close() // flushes pending output, if any
-
-	defer func() {
-		if *engine.Flag_sync {
-			timer.Print(os.Stdout)
-		}
-	}()
 
 	if *flag_vet {
 		vet()

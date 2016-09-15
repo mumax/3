@@ -35,11 +35,6 @@ func main() {
 		printVersion()
 	}
 
-	timer.Timeout = *engine.Flag_launchtimeout
-	if *engine.Flag_launchtimeout != 0 {
-		cuda.Synchronous = true
-	}
-
 	engine.TestDemag = *engine.Flag_selftest
 
 	// used by bootstrap launcher to test cuda

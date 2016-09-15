@@ -10,6 +10,8 @@ import (
 	"github.com/mumax/3/util"
 	"log"
 	"os"
+	"os/exec"
+	"path"
 	"time"
 )
 
@@ -80,9 +82,15 @@ func runInteractive() {
 	engine.RunInteractive()
 }
 
-// Runs a script file.
 func runFileAndServe(fname string) {
+	if path.Ext(fname) == ".go" {
+		runGoFile(fname)
+	} else {
+		runScript(fname)
+	}
+}
 
+func runScript(fname string) {
 	outDir := util.NoExt(fname) + ".out"
 	if *engine.Flag_od != "" {
 		outDir = *engine.Flag_od
@@ -114,15 +122,30 @@ func runFileAndServe(fname string) {
 	}
 }
 
-//func runRemote(fname string) {
-//	URL, err := url.Parse(fname)
-//	util.FatalErr(err)
-//	host := URL.Host
-//	engine.MountHTTPFS("http://" + host)
-//	od := util.NoExt(URL.Path) + ".out"
-//	engine.InitIO(od, *flag_force)
-//	runFileAndServe(URL.Path) // TODO proxyserve?
-//}
+func runGoFile(fname string) {
+
+	// pass through flags
+	flags := []string{"run", fname}
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name != "o" {
+			flags = append(flags, fmt.Sprintf("-%v=%v", f.Name, f.Value))
+		}
+	})
+
+	if *engine.Flag_od != "" {
+		flags = append(flags, fmt.Sprintf("-o=%v", *engine.Flag_od))
+	}
+
+	cmd := exec.Command("go", flags...)
+	log.Println("go", flags)
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		os.Exit(1)
+	}
+}
 
 // start Gui server and return server address
 func goServeGUI() string {

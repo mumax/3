@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
 var globalmesh_ data.Mesh // mesh for m and everything that has the same size
@@ -118,6 +117,6 @@ func SetPBC(nx, ny, nz int) {
 // check if mesh is set
 func checkMesh() {
 	if globalmesh_.Size() == [3]int{0, 0, 0} {
-		util.Fatal("need to set mesh first")
+		panic("need to set mesh first")
 	}
 }

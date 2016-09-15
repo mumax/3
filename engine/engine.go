@@ -51,7 +51,6 @@ func Close() {
 	if logfile != nil {
 		logfile.Close()
 	}
-	checkNaN1(M.Comp(0).Average()) // at the end of the simulation, check for NaN so that it fails with exit status.
 	if *Flag_sync {
 		timer.Print(os.Stdout)
 	}

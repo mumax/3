@@ -13,7 +13,7 @@
 
 	minimize()
 	save(m)
-	TOL := 1e-5
+	TOL := 1e-4
 	expectv("m", m.average(), vector(0.9669684171676636,  0.1252732127904892, 0), TOL)
 
 	tableautosave(10e-12)

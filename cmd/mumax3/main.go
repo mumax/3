@@ -112,6 +112,7 @@ func runFileAndServe(fname string) {
 		outDir = *engine.Flag_od
 	}
 	engine.InitIO(fname, outDir, *engine.Flag_forceclean)
+
 	fname = engine.InputFile
 
 	var code *script.BlockStmt

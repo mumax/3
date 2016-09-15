@@ -5,6 +5,9 @@ package engine
 import (
 	"flag"
 	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/util"
+	"os"
+	"path"
 )
 
 var (
@@ -20,7 +23,7 @@ var (
 	Flag_selftest      = flag.Bool("paranoid", false, "Enable convolution self-test for cuFFT sanity.")
 	Flag_silent        = flag.Bool("s", false, "Silent") // provided for backwards compatibility
 	Flag_sync          = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
-	Flag_forceclean    = flag.Bool("f", true, "Force start, clean existing output directory")
+	Flag_forceclean    = flag.Bool("f", false, "Force start, clean existing output directory")
 )
 
 // Usage: in every Go input file, write:
@@ -33,9 +36,20 @@ var (
 // This initialises the GPU, output directory, etc,
 // and makes sure pending output will get flushed.
 func InitAndClose() func() {
-	cuda.Init(0)
-	InitIO("standardproblem4.mx3", "standardproblem4.out", true)
-	GoServe(":35367")
+
+	flag.Parse()
+
+	cuda.Init(*Flag_gpu)
+
+	od := *Flag_od
+	if od == "" {
+		od = path.Base(os.Args[0]) + ".out"
+	}
+	inFile := util.NoExt(od)
+	InitIO(inFile, od, *Flag_forceclean)
+
+	GoServe(*Flag_port)
+
 	return func() {
 		Close()
 	}

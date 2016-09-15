@@ -3,16 +3,12 @@
 package main
 
 import (
-	"github.com/mumax/3/cuda"
 	. "github.com/mumax/3/engine"
 )
 
 func main() {
 
-	cuda.Init(0)
-	InitIO("standardproblem4.mx3", "standardproblem4.out", true)
-	GoServe(":35367")
-	defer Close()
+	defer InitAndClose()()
 
 	SetGridSize(128, 32, 1)
 	SetCellSize(500e-9/128, 125e-9/32, 3e-9)

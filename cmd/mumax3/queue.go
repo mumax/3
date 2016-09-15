@@ -24,7 +24,7 @@ var (
 func RunQueue(files []string) {
 	s := NewStateTab(files)
 	s.PrintTo(os.Stdout)
-	go s.ListenAndServe(*flag_port)
+	go s.ListenAndServe(*engine.Flag_port)
 	s.Run()
 	fmt.Println(numOK.get(), "OK, ", numFailed.get(), "failed")
 	os.Exit(int(exitStatus))

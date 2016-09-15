@@ -13,11 +13,9 @@ import (
 var (
 	// These flags are shared between cmd/mumax3 and Go input files.
 	Flag_cachedir      = flag.String("cache", "/tmp", "Kernel cache directory (empty disables caching)")
-	Flag_cpuprof       = flag.Bool("cpuprof", false, "Record gopprof CPU profile")
 	Flag_gpu           = flag.Int("gpu", 0, "Specify GPU")
 	Flag_interactive   = flag.Bool("i", false, "Open interactive browser session")
 	Flag_launchtimeout = flag.Duration("launchtimeout", 0, "Launch timeout for CUDA calls")
-	Flag_memprof       = flag.Bool("memprof", false, "Recored gopprof memory profile")
 	Flag_od            = flag.String("o", "", "Override output directory")
 	Flag_port          = flag.String("http", ":35367", "Port to serve web gui")
 	Flag_selftest      = flag.Bool("paranoid", false, "Enable convolution self-test for cuFFT sanity.")

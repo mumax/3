@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
-	"github.com/mumax/3/prof"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
@@ -51,13 +50,7 @@ func main() {
 	}
 
 	engine.CacheDir = *engine.Flag_cachedir
-	if *engine.Flag_cpuprof {
-		prof.InitCPU(".")
-	}
-	if *engine.Flag_memprof {
-		prof.InitMem(".")
-	}
-	defer prof.Cleanup()
+
 	defer engine.Close() // flushes pending output, if any
 
 	defer func() {

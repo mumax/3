@@ -177,7 +177,7 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	return r.gpuCache
 }
 
-var unitMap param // unit map used to output regions quantity
+var unitMap regionwise // unit map used to output regions quantity
 
 func init() {
 	unitMap.init(1, "unit", "", nil)

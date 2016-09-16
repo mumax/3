@@ -18,7 +18,7 @@ var (
 
 	EnableDemag   = true // enable/disable global demag field
 	NoDemagSpins  = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)")
-	conv_         *cuda.DemagConvolution // does the heavy lifting and provides FFTM
+	conv_         *cuda.DemagConvolution // does the heavy lifting
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 )
 

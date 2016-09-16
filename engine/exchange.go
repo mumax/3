@@ -94,7 +94,7 @@ func (p *aexchParam) init() {
 	}
 }
 
-func (p *dexchParam) init(parent *ScalarParam) {
+func (p *dexchParam) init(parent *RegionwiseScalar) {
 	for i := range p.scale {
 		p.scale[i] = 1 // default scaling
 	}
@@ -122,7 +122,7 @@ func (p *aexchParam) Gpu() cuda.SymmLUT {
 
 type aexchParam struct{ exchParam }
 type dexchParam struct {
-	parent *ScalarParam
+	parent *RegionwiseScalar
 	exchParam
 }
 

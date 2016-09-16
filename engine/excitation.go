@@ -14,8 +14,8 @@ import (
 // TODO: unify with param.
 type Excitation struct {
 	name       string
-	perRegion  VectorParam // Region-based excitation
-	extraTerms []mulmask   // add extra mask*multiplier terms
+	perRegion  RegionwiseVector // Region-based excitation
+	extraTerms []mulmask        // add extra mask*multiplier terms
 }
 
 // space-dependent mask plus time dependent multiplier

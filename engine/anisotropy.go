@@ -30,7 +30,7 @@ func init() {
 	registerEnergy(GetAnisotropyEnergy, AddAnisotropyEnergyDensity)
 }
 
-func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 *ScalarParam, AnisU *VectorParam) {
+func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 *RegionwiseScalar, AnisU *RegionwiseVector) {
 	if Ku1.nonZero() || Ku2.nonZero() {
 		ms := Msat.MSlice()
 		defer ms.Recycle()
@@ -45,7 +45,7 @@ func addUniaxialAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Ku1, Ku2 
 	}
 }
 
-func addCubicAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Kc1, Kc2, Kc3 *ScalarParam, AnisC1, AnisC2 *VectorParam) {
+func addCubicAnisotropyFrom(dst *data.Slice, M magnetization, Msat, Kc1, Kc2, Kc3 *RegionwiseScalar, AnisC1, AnisC2 *RegionwiseVector) {
 	if Kc1.nonZero() || Kc2.nonZero() || Kc3.nonZero() {
 		ms := Msat.MSlice()
 		defer ms.Recycle()

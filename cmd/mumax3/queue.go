@@ -115,7 +115,7 @@ func run(inFile string, gpu int, webAddr string) {
 	// pass through flags
 	flags := []string{gpuFlag, httpFlag}
 	flag.Visit(func(f *flag.Flag) {
-		if f.Name != "gpu" && f.Name != "http" {
+		if f.Name != "gpu" && f.Name != "http" && f.Name != "failfast" {
 			flags = append(flags, fmt.Sprintf("-%v=%v", f.Name, f.Value))
 		}
 	})

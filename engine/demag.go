@@ -10,14 +10,14 @@ import (
 
 // Demag variables
 var (
-	Msat        = NewScalarParam("Msat", "A/m", "Saturation magnetization", &lex2, &din2, &dbulk2)
+	Msat        = NewRegionwiseScalar("Msat", "A/m", "Saturation magnetization", &lex2, &din2, &dbulk2)
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", "Magnetostatic energy density", AddEdens_demag)
 	E_demag     = NewScalarValue("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 
 	EnableDemag   = true // enable/disable global demag field
-	NoDemagSpins  = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)")
+	NoDemagSpins  = NewRegionwiseScalar("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)")
 	conv_         *cuda.DemagConvolution // does the heavy lifting
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 )

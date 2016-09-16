@@ -49,7 +49,6 @@ func (p *regionwise) Mesh() *data.Mesh { return Mesh() }
 
 func (p *regionwise) addChild(c ...derived) {
 	for _, c := range c {
-		// TODO: no duplicates
 		if !contains(p.children, c) {
 			p.children = append(p.children, c)
 			fmt.Println(p, ".addChild", c)
@@ -228,7 +227,7 @@ func (p *RegionwiseScalar) init(name, unit, desc string, children []derived) {
 }
 
 // TODO: auto derived
-func NewScalarParam(name, unit, desc string, children ...derived) *RegionwiseScalar {
+func NewRegionwiseScalar(name, unit, desc string, children ...derived) *RegionwiseScalar {
 	p := new(RegionwiseScalar)
 	p.regionwise.init(SCALAR, name, unit, children)
 	DeclLValue(name, p, cat(desc, unit))
@@ -314,7 +313,7 @@ type RegionwiseVector struct {
 	regionwise
 }
 
-func NewVectorParam(name, unit, desc string) *RegionwiseVector {
+func NewRegionwiseVector(name, unit, desc string) *RegionwiseVector {
 	p := new(RegionwiseVector)
 	p.regionwise.init(VECTOR, name, unit, nil) // no vec param has children (yet)
 	if !strings.HasPrefix(name, "_") {         // don't export names beginning with "_" (e.g. from exciation)

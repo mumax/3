@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	Temp        = NewScalarParam("Temp", "K", "Temperature")
+	Temp        = NewRegionwiseScalar("Temp", "K", "Temperature")
 	E_therm     = NewScalarValue("E_therm", "J", "Thermal energy", GetThermalEnergy)
 	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)

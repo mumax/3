@@ -9,21 +9,21 @@ import (
 
 // Anisotropy variables
 var (
-	Ku1        = NewScalarParam("Ku1", "J/m3", "1st order uniaxial anisotropy constant")
-	Ku2        = NewScalarParam("Ku2", "J/m3", "2nd order uniaxial anisotropy constant")
-	Kc1        = NewScalarParam("Kc1", "J/m3", "1st order cubic anisotropy constant")
-	Kc2        = NewScalarParam("Kc2", "J/m3", "2nd order cubic anisotropy constant")
-	Kc3        = NewScalarParam("Kc3", "J/m3", "3rd order cubic anisotropy constant")
-	AnisU      = NewVectorParam("anisU", "", "Uniaxial anisotropy direction")
-	AnisC1     = NewVectorParam("anisC1", "", "Cubic anisotropy direction #1")
-	AnisC2     = NewVectorParam("anisC2", "", "Cubic anisotorpy directon #2")
+	Ku1        = NewRegionwiseScalar("Ku1", "J/m3", "1st order uniaxial anisotropy constant")
+	Ku2        = NewRegionwiseScalar("Ku2", "J/m3", "2nd order uniaxial anisotropy constant")
+	Kc1        = NewRegionwiseScalar("Kc1", "J/m3", "1st order cubic anisotropy constant")
+	Kc2        = NewRegionwiseScalar("Kc2", "J/m3", "2nd order cubic anisotropy constant")
+	Kc3        = NewRegionwiseScalar("Kc3", "J/m3", "3rd order cubic anisotropy constant")
+	AnisU      = NewRegionwiseVector("anisU", "", "Uniaxial anisotropy direction")
+	AnisC1     = NewRegionwiseVector("anisC1", "", "Cubic anisotropy direction #1")
+	AnisC2     = NewRegionwiseVector("anisC2", "", "Cubic anisotorpy directon #2")
 	B_anis     = NewVectorField("B_anis", "T", "Anisotropy field", AddAnisotropyField)
 	Edens_anis = NewScalarField("Edens_anis", "J/m3", "Anisotropy energy density", AddAnisotropyEnergyDensity)
 	E_anis     = NewScalarValue("E_anis", "J", "total anisotropy energy", GetAnisotropyEnergy)
 )
 
 var (
-	sZero = NewScalarParam("_zero", "", "utility zero parameter")
+	sZero = NewRegionwiseScalar("_zero", "", "utility zero parameter")
 )
 
 func init() {

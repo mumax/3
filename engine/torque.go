@@ -6,24 +6,52 @@ import (
 	"github.com/mumax/3/util"
 )
 
-var (
-	Alpha        = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant")
-	Xi           = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque")
-	Pol          = NewScalarParam("Pol", "", "Electrical current polarization")
-	Lambda       = NewScalarParam("Lambda", "", "Slonczewski Λ parameter")
-	EpsilonPrime = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
-	FrozenSpins  = NewScalarParam("frozenspins", "", "Defines spins that should be fixed") // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
+var _ Q = Alpha
 
-	FixedLayer                       = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
-	Torque                           = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
-	LLTorque                         = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
-	STTorque                         = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
-	J                                = NewExcitation("J", "A/m2", "Electrical current density")
-	MaxTorque                        = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
-	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
-	Precess                          = true
-	DisableZhangLiTorque             = false
-	DisableSlonczewskiTorque         = false
+//type scalar struct{
+//	Q
+//	name, unit string
+//}
+//
+//func NewScalar(name, unit, desc string)scalar{
+//	return scalar{
+//		Q: Const(0)	,
+//		name: name,
+//		unit: unit,
+//	}
+//}
+//
+//func(p*scalar) SetRegion(r int, value float64){
+//		switch p := p.Q.(type){
+//		//case Const: //OK, convert to regions
+//		case RegionwiseScalar: p.SetRegion(r, value)
+//		default: panic("%v.SetRegion: %v ")
+//	}
+//}
+//
+//func(p*param)Set(){}
+//
+//func(p*param)SetCustom(q Q){}
+
+var (
+	Alpha        = NewRegionwiseScalar("alpha", "", "Landau-Lifshitz damping constant") // TODO: -> NewScalar
+	Xi           = NewRegionwiseScalar("xi", "", "Non-adiabaticity of spin-transfer-torque")
+	Pol          = NewRegionwiseScalar("Pol", "", "Electrical current polarization")
+	Lambda       = NewRegionwiseScalar("Lambda", "", "Slonczewski Λ parameter")
+	EpsilonPrime = NewRegionwiseScalar("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
+	FrozenSpins  = NewRegionwiseScalar("frozenspins", "", "Defines spins that are fixed (=1)")
+	FixedLayer   = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
+	Torque       = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
+	LLTorque     = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
+	STTorque     = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
+	J            = NewExcitation("J", "A/m2", "Electrical current density")
+	MaxTorque    = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
+
+	Precess                  = true
+	DisableZhangLiTorque     = false
+	DisableSlonczewskiTorque = false
+
+	GammaLL float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
 )
 
 func init() {

@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
 	"math"
 )
@@ -20,7 +21,7 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	defer SetBusy(false)
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	bsat := Bsat.GetRegion(region)[0]
+	bsat := Msat.GetRegion(region) * mag.Mu0
 	util.AssertMsg(bsat != 0, "RemoveSurfaceCharges: Msat is zero in region "+fmt.Sprint(region))
 	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight, bsat), nil)
 }

@@ -10,8 +10,7 @@ import (
 
 // Demag variables
 var (
-	Msat        = NewScalarParam("Msat", "A/m", "Saturation magnetization", &Bsat, &lex2, &din2, &dbulk2)
-	Bsat        DerivedParam
+	Msat        = NewScalarParam("Msat", "A/m", "Saturation magnetization", &lex2, &din2, &dbulk2)
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", "Magnetostatic energy density", AddEdens_demag)
@@ -30,14 +29,6 @@ func init() {
 	DeclVar("EnableDemag", &EnableDemag, "Enables/disables demag (default=true)")
 	DeclVar("DemagAccuracy", &DemagAccuracy, "Controls accuracy of demag kernel")
 	registerEnergy(GetDemagEnergy, AddEdens_demag)
-
-	//Bsat = Msat * mu0
-	Bsat.init(SCALAR, []parent{Msat}, func(p *DerivedParam) {
-		Ms := Msat.cpuLUT()
-		for i, ms := range Ms[0] {
-			p.cpu_buf[0][i] = mag.Mu0 * ms
-		}
-	})
 }
 
 // Sets dst to the current demag field

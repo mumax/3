@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	Alpha        = NewRegionwiseScalar("alpha", "", "Landau-Lifshitz damping constant") // TODO: -> NewScalar
+	Alpha        = NewRegionwiseScalar("alpha", "", "Landau-Lifshitz damping constant")
 	Xi           = NewRegionwiseScalar("xi", "", "Non-adiabaticity of spin-transfer-torque")
 	Pol          = NewRegionwiseScalar("Pol", "", "Electrical current polarization")
 	Lambda       = NewRegionwiseScalar("Lambda", "", "Slonczewski Λ parameter")

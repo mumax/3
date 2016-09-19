@@ -6,33 +6,6 @@ import (
 	"github.com/mumax/3/util"
 )
 
-var _ Q = Alpha
-
-//type scalar struct{
-//	Q
-//	name, unit string
-//}
-//
-//func NewScalar(name, unit, desc string)scalar{
-//	return scalar{
-//		Q: Const(0)	,
-//		name: name,
-//		unit: unit,
-//	}
-//}
-//
-//func(p*scalar) SetRegion(r int, value float64){
-//		switch p := p.Q.(type){
-//		//case Const: //OK, convert to regions
-//		case RegionwiseScalar: p.SetRegion(r, value)
-//		default: panic("%v.SetRegion: %v ")
-//	}
-//}
-//
-//func(p*param)Set(){}
-//
-//func(p*param)SetCustom(q Q){}
-
 var (
 	Alpha        = NewRegionwiseScalar("alpha", "", "Landau-Lifshitz damping constant") // TODO: -> NewScalar
 	Xi           = NewRegionwiseScalar("xi", "", "Non-adiabaticity of spin-transfer-torque")

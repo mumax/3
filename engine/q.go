@@ -67,6 +67,21 @@ func ValueOf(q Q) *data.Slice {
 	return buf
 }
 
+func MSliceOf(q Q) cuda.MSlice {
+	if q, ok := q.(interface {
+		MSlice() cuda.MSlice
+	}); ok {
+		return q.MSlice()
+	}
+	return cuda.MakeMSlice(ValueOf(q), ones(q.NComp()))
+}
+
+var ones_ [4]float64
+
+func ones(n int) []float64 {
+	return ones_[:n]
+}
+
 func EvalTo(q Q, dst *data.Slice) {
 	util.AssertMsg(q.NComp() == dst.NComp() && SizeOf(q) == dst.Size(), "size mismatch")
 	q.EvalTo(dst)

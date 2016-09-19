@@ -86,7 +86,7 @@ func (b *thermField) update() {
 	defer ms.Recycle()
 	temp := Temp.MSlice()
 	defer temp.Recycle()
-	alpha := Alpha.MSlice()
+	alpha := MSliceOf(Alpha)
 	defer alpha.Recycle()
 	for i := 0; i < 3; i++ {
 		b.generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)

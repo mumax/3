@@ -152,8 +152,6 @@ func (p *regionwise) IsUniform() bool {
 	return true
 }
 
-func (p *regionwise) average() []float64 { return qAverageUniverse(p) }
-
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
 type DerivedParam struct {
 	lut                          // GPU storage

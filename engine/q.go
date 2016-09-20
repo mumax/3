@@ -9,7 +9,7 @@ import (
 
 type Q interface {
 	NComp() int
-	EvalTo(dst *data.Slice)
+	EvalTo(dst *data.Slice) // TODO: MSlice?
 }
 
 func MeshSize() [3]int {

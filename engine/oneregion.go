@@ -6,6 +6,10 @@ import (
 	"github.com/mumax/3/data"
 )
 
+func init() {
+	DeclFunc("CropToRegion", CropToRegion, "Restrict a quantity to a region, return zero elsewhere.")
+}
+
 // represents a new quantity equal to q in the given region, 0 outside.
 type oneReg struct {
 	parent Q
@@ -23,10 +27,6 @@ func (q *sOneReg) Average() float64 { return q.average()[0] }
 type vOneReg struct{ oneReg }
 
 func (q *vOneReg) Average() data.Vector { return unslice(q.average()) }
-
-func init() {
-	DeclFunc("CropToRegion", CropToRegion, "Restrict a quantity to a region, return zero elsewhere.")
-}
 
 func CropToRegion(q Q, region int) Q {
 	return &oneReg{q, region}

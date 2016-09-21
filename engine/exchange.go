@@ -12,32 +12,32 @@ import (
 )
 
 var (
-	Aex          ScalarParam // Exchange stiffness
-	Dind         ScalarParam // interfacial DMI strength
-	Dbulk        ScalarParam // bulk DMI strength
-	B_exch       = NewVectorField("B_exch", "T", AddExchangeField)
-	lex2         aexchParam // inter-cell exchange in 1e18 * Aex / Msat
-	din2         dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
-	dbulk2       dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
-	E_exch       *GetScalar // Exchange energy
-	Edens_exch   sAdder     // Exchange energy density
-	ExchCoupling sSetter    // Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	Aex   = NewScalarParam("Aex", "J/m", "Exchange stiffness", &lex2)
+	Dind  = NewScalarParam("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", &din2)
+	Dbulk = NewScalarParam("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", &dbulk2)
+
+	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
+	lex2       aexchParam // inter-cell exchange in 1e18 * Aex / Msat
+	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
+	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
+	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy", GetExchangeEnergy)
+	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density", AddExchangeEnergyDensity)
+
+	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
+	ExchCoupling = NewScalarField("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
+	DindCoupling = NewScalarField("DindCoupling", "arb.", "Average DMI coupling with neighbors", dindDecode)
 )
 
-func init() {
-	Export(B_exch, "Exchange field")
+var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
 
-	Aex.init("Aex", "J/m", "Exchange stiffness", []derived{&lex2})
-	Dind.init("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", []derived{&din2})
-	Dbulk.init("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", []derived{&dbulk2})
-	E_exch = NewGetScalar("E_exch", "J", "Exchange energy (normal+DM)", GetExchangeEnergy)
-	Edens_exch.init("Edens_exch", "J/m3", "Exchange energy density (normal+DM)", makeEdensAdder(&B_exch, -0.5))
-	registerEnergy(GetExchangeEnergy, Edens_exch.AddTo)
+func init() {
+	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
+	DeclFunc("ext_ScaleDind", ScaleInterDind, "Re-scales Dind coupling between two regions.")
+	DeclFunc("ext_InterDind", InterDind, "Sets Dind coupling between two regions.")
 	lex2.init()
-	din2.init(&Dind)
-	dbulk2.init(&Dbulk)
-	ExchCoupling.init("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
+	din2.init(Dind)
+	dbulk2.init(Dbulk)
 }
 
 // Adds the current exchange field to dst
@@ -48,9 +48,6 @@ func AddExchangeField(dst *data.Slice) {
 	case !inter && !bulk:
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())
 	case inter && !bulk:
-		// DMI kernel has space-dependent parameters, but
-		// correct averaging between regions not yet clear nor tested, so disallow.
-		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dind.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case bulk && !inter:
 		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
@@ -65,6 +62,11 @@ func exchangeDecode(dst *data.Slice) {
 	cuda.ExchangeDecode(dst, lex2.Gpu(), regions.Gpu(), M.Mesh())
 }
 
+// Set dst to the average dmi coupling per cell (average of din2 with all neighbors).
+func dindDecode(dst *data.Slice) {
+	cuda.ExchangeDecode(dst, din2.Gpu(), regions.Gpu(), M.Mesh())
+}
+
 // Returns the current exchange energy in Joules.
 func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
@@ -75,6 +77,19 @@ func GetExchangeEnergy() float64 {
 func ScaleInterExchange(region1, region2 int, scale float64) {
 	lex2.scale[symmidx(region1, region2)] = float32(scale)
 	lex2.invalidate()
+}
+
+// Scales the DMI interaction between region 1 and 2.
+func ScaleInterDind(region1, region2 int, scale float64) {
+	din2.scale[symmidx(region1, region2)] = float32(scale)
+	din2.invalidate()
+}
+
+// Sets the DMI interaction between region 1 and 2.
+func InterDind(region1, region2 int, value float64) {
+	din2.scale[symmidx(region1, region2)] = float32(0.)
+	din2.interdmi[symmidx(region1, region2)] = float32(value)
+	din2.invalidate()
 }
 
 // stores interregion exchange stiffness
@@ -97,7 +112,7 @@ func (p *aexchParam) init() {
 	}
 }
 
-func (p *dexchParam) init(parent *ScalarParam) {
+func (p *dexchParam) init(parent *RegionwiseScalar) {
 	for i := range p.scale {
 		p.scale[i] = 1 // default scaling
 	}
@@ -125,7 +140,8 @@ func (p *aexchParam) Gpu() cuda.SymmLUT {
 
 type aexchParam struct{ exchParam }
 type dexchParam struct {
-	parent *ScalarParam
+	interdmi [NREGION * (NREGION + 1) / 2]float32
+	parent   *RegionwiseScalar
 	exchParam
 }
 
@@ -151,13 +167,13 @@ func (p *dexchParam) update() {
 	if !p.cpu_ok {
 		msat := Msat.cpuLUT()
 		dex := p.parent.cpuLUT()
-
 		for i := 0; i < NREGION; i++ {
 			dexi := 1e9 * safediv(dex[0][i], msat[0][i])
 			for j := i; j < NREGION; j++ {
 				dexj := 1e9 * safediv(dex[0][j], msat[0][j])
 				I := symmidx(i, j)
-				p.lut[I] = p.scale[I] * 2 / (1/dexi + 1/dexj)
+				interdmi := 1e9 * safediv(p.interdmi[I], msat[0][i])
+				p.lut[I] = p.scale[I]*2/(1/dexi+1/dexj) + interdmi
 			}
 		}
 		p.gpu_ok = false
@@ -170,7 +186,8 @@ func (p *exchParam) upload() {
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
-	cuda.MemCpyHtoD(unsafe.Pointer(p.gpu), unsafe.Pointer(&p.lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
+	lut := p.lut // Copy, to work around Go 1.6 cgo pointer limitations.
+	cuda.MemCpyHtoD(unsafe.Pointer(p.gpu), unsafe.Pointer(&lut[0]), cu.SIZEOF_FLOAT32*int64(len(p.lut)))
 	p.gpu_ok = true
 }
 

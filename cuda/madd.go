@@ -6,6 +6,7 @@ import (
 )
 
 // multiply: dst[i] = a[i] * b[i]
+// a and b must have the same number of components
 func Mul(dst, a, b *data.Slice) {
 	N := dst.Len()
 	nComp := dst.NComp()
@@ -14,6 +15,23 @@ func Mul(dst, a, b *data.Slice) {
 	for c := 0; c < nComp; c++ {
 		k_mul_async(dst.DevPtr(c), a.DevPtr(c), b.DevPtr(c), N, cfg)
 	}
+}
+
+// divide: dst[i] = a[i] / b[i]
+// divide-by-zero yields zero.
+func Div(dst, a, b *data.Slice) {
+	N := dst.Len()
+	nComp := dst.NComp()
+	util.Assert(a.Len() == N && a.NComp() == nComp && b.Len() == N && b.NComp() == nComp)
+	cfg := make1DConf(N)
+	for c := 0; c < nComp; c++ {
+		k_pointwise_div_async(dst.DevPtr(c), a.DevPtr(c), b.DevPtr(c), N, cfg)
+	}
+}
+
+// Add: dst = src1 + src2.
+func Add(dst, src1, src2 *data.Slice) {
+	Madd2(dst, src1, src2, 1, 1)
 }
 
 // multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2

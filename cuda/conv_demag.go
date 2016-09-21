@@ -37,18 +37,18 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice, test bool) *Demag
 // 	vol:  unitless mask used to scale m's length, may be nil
 // 	Bsat: saturation magnetization in Tesla
 // 	B:    resulting demag field, in Tesla
-func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Msat MSlice) {
 	util.Argument(B.Size() == c.inputSize && m.Size() == c.inputSize)
 	if c.is2D() {
-		c.exec2D(B, m, vol, Bsat, regions)
+		c.exec2D(B, m, vol, Msat)
 	} else {
-		c.exec3D(B, m, vol, Bsat, regions)
+		c.exec3D(B, m, vol, Msat)
 	}
 }
 
-func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Msat MSlice) {
 	for i := 0; i < 3; i++ { // FW FFT
-		c.fwFFT(i, inp, vol, Bsat, regions)
+		c.fwFFT(i, inp, vol, Msat)
 	}
 
 	// kern mul
@@ -62,20 +62,20 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Bsat LUTPtr, regio
 	}
 }
 
-func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) exec2D(outp, inp, vol *data.Slice, Msat MSlice) {
 	// Convolution is separated into
 	// a 1D convolution for z and a 2D convolution for xy.
 	// So only 2 FFT buffers are needed at the same time.
 	Nx, Ny := c.fftKernLogicSize[X], c.fftKernLogicSize[Y]
 
 	// Z
-	c.fwFFT(Z, inp, vol, Bsat, regions)
+	c.fwFFT(Z, inp, vol, Msat)
 	kernMulRSymm2Dz_async(c.fftCBuf[Z], c.kern[Z][Z], Nx, Ny)
 	c.bwFFT(Z, outp)
 
 	// XY
-	c.fwFFT(X, inp, vol, Bsat, regions)
-	c.fwFFT(Y, inp, vol, Bsat, regions)
+	c.fwFFT(X, inp, vol, Msat)
+	c.fwFFT(Y, inp, vol, Msat)
 	kernMulRSymm2Dxy_async(c.fftCBuf[X], c.fftCBuf[Y],
 		c.kern[X][X], c.kern[Y][Y], c.kern[X][Y], Nx, Ny)
 	c.bwFFT(X, outp)
@@ -92,10 +92,10 @@ func zero1_async(dst *data.Slice) {
 }
 
 // forward FFT component i
-func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Bsat LUTPtr, regions *Bytes) {
+func (c *DemagConvolution) fwFFT(i int, inp, vol *data.Slice, Msat MSlice) {
 	zero1_async(c.fftRBuf[i])
 	in := inp.Comp(i)
-	copyPadMul(c.fftRBuf[i], in, vol, c.realKernSize, c.inputSize, Bsat, regions)
+	copyPadMul(c.fftRBuf[i], in, vol, c.realKernSize, c.inputSize, Msat)
 	c.fwPlan.ExecAsync(c.fftRBuf[i], c.fftCBuf[i])
 }
 

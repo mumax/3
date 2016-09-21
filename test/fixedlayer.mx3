@@ -1,0 +1,51 @@
+/*
+	Test for reversal driven by Slonczewski STT.
+*/
+
+randomSeed := 1234567
+
+randSeed(randomSeed) 
+
+Nx := 64
+Ny := 32
+Nz := 16
+
+sX := 128e-9
+sY := 64e-9
+sZ := 32e-9
+ 
+setgridsize(Nx, Ny, Nz)
+setcellsize(sX/Nx, sY/Ny, sZ/Nz)
+
+Msat  = 800e3
+Aex   = 13e-12
+
+m = randommagseed(randomSeed)
+
+alpha        = 0.01
+lambda       = 1
+Pol          = 0.5669
+epsilonprime = 0.02
+DisableZhangLiTorque = true
+
+Jtot := -0.008  // total current in amps
+carea := sX * sY
+jc := Jtot / carea  
+print("Current density is: " ,  jc)
+ 
+J = vector(0, 0, jc)
+
+grainSize  := 4e-9  // m
+
+maxRegion  := 255
+ext_makegrains(grainSize, maxRegion, randomSeed)
+
+for i:=0; i<maxRegion; i++{
+	FixedLayer.SetRegion(i, vector(randNorm(), randNorm(), randNorm()))
+}
+
+print(STtorque.average())
+
+TOL := 1e-7
+// testing against mumax3.9.1
+expectv("STtorque", STtorque.average(), vector(0.00020761338237207383, -6.879508873680606e-05, -0.00023736029106657952), TOL)

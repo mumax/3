@@ -20,7 +20,7 @@ alpha = 3
 // Set a initial magnetisation to C-state
 m = uniform(1, 1, 0.001)
 
-run(10e-9)
+minimize()
 
 alpha        = 0.01
 lambda       = 1

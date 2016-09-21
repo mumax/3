@@ -50,14 +50,14 @@ func (*oformat) SetValue(v interface{}) { drainOutput(); outputFormat = v.(Outpu
 func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
 
 // Save once, with auto file name
-func Save(q Quantity) {
+func Save(q outputField) {
 	fname := autoFname(q.Name(), outputFormat, autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 }
 
 // Save under given file name (transparent async I/O).
-func SaveAs(q Quantity, fname string) {
+func SaveAs(q outputField, fname string) {
 
 	if !strings.HasPrefix(fname, OD()) {
 		fname = OD() + fname // don't clean, turns http:// in http:/
@@ -76,7 +76,7 @@ func SaveAs(q Quantity, fname string) {
 }
 
 // Save image once, with auto file name
-func Snapshot(q Quantity) {
+func Snapshot(q outputField) {
 	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, q.Name(), autonum[q])
 	s, r := q.Slice()
 	if r {

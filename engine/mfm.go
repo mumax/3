@@ -6,14 +6,13 @@ import (
 )
 
 var (
-	MFM        sSetter
-	MFMLift    numberParam
-	MFMTipSize numberParam
+	MFM        = NewScalarField("MFM", "arb.", "MFM image", SetMFM)
+	MFMLift    inputValue
+	MFMTipSize inputValue
 	mfmconv_   *cuda.MFMConvolution
 )
 
 func init() {
-	MFM.init("MFM", "", "MFM image", SetMFM)
 	MFMLift = numParam(50e-9, "MFMLift", "m", reinitmfmconv)
 	MFMTipSize = numParam(1e-3, "MFMDipole", "m", reinitmfmconv)
 	DeclLValue("MFMLift", &MFMLift, "MFM lift height")
@@ -27,7 +26,10 @@ func SetMFM(dst *data.Slice) {
 		reinitmfmconv()
 	}
 
-	mfmconv_.Exec(buf, M.Buffer(), geometry.Gpu(), Bsat.gpuLUT1(), regions.Gpu())
+	msat := Msat.MSlice()
+	defer msat.Recycle()
+
+	mfmconv_.Exec(buf, M.Buffer(), geometry.Gpu(), msat)
 	cuda.Madd3(dst, buf.Comp(0), buf.Comp(1), buf.Comp(2), 1, 1, 1)
 }
 

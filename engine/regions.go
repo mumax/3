@@ -6,7 +6,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-var regions = Regions{info: Info(1, "regions", "")} // global regions map
+var regions = Regions{info: info{1, "regions", ""}} // global regions map
 
 const NREGION = 256 // maximum number of regions, limited by size of byte.
 
@@ -177,7 +177,7 @@ func (r *Regions) Gpu() *cuda.Bytes {
 	return r.gpuCache
 }
 
-var unitMap inputParam // unit map used to output regions quantity
+var unitMap regionwise // unit map used to output regions quantity
 
 func init() {
 	unitMap.init(1, "unit", "", nil)

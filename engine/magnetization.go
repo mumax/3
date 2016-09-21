@@ -23,7 +23,7 @@ func (m *magnetization) Name() string        { return "m" }
 func (m *magnetization) Unit() string        { return "" }
 func (m *magnetization) Buffer() *data.Slice { return m.buffer_ } // todo: rename Gpu()?
 
-func (m *magnetization) Comp(c int) *comp        { return Comp(m, c) }
+func (m *magnetization) Comp(c int) ScalarField  { return Comp(m, c) }
 func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(magnetization)) }
@@ -57,6 +57,10 @@ func (m *magnetization) LoadFile(fname string) {
 
 func (m *magnetization) Slice() (s *data.Slice, recycle bool) {
 	return m.Buffer(), false
+}
+
+func (m *magnetization) EvalTo(dst *data.Slice) {
+	data.Copy(dst, m.buffer_)
 }
 
 func (m *magnetization) Region(r int) *vOneReg { return vOneRegion(m, r) }

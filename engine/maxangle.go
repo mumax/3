@@ -6,14 +6,9 @@ import (
 )
 
 var (
-	MaxAngle  *GetScalar
-	SpinAngle sSetter
+	MaxAngle  = NewScalarValue("MaxAngle", "rad", "maximum angle between neighboring spins", GetMaxAngle) // TODO: Max(...)
+	SpinAngle = NewScalarField("spinAngle", "rad", "Angle between neighboring spins", SetSpinAngle)
 )
-
-func init() {
-	MaxAngle = NewGetScalar("MaxAngle", "rad", "Maximum angle between neighboring spins", GetMaxAngle)
-	SpinAngle.init("spinAngle", "rad", "Angle between neighboring spins", SetSpinAngle)
-}
 
 func SetSpinAngle(dst *data.Slice) {
 	cuda.SetMaxAngle(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())

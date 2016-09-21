@@ -1,22 +1,26 @@
 package cuda
 
 import (
-	"unsafe"
-
 	"github.com/mumax/3/data"
 )
 
 // Add Zhang-Li ST torque (Tesla) to torque.
 // see zhangli.cu
-func AddZhangLiTorque(torque, m, J *data.Slice, bsat, alpha, xi, pol LUTPtr, regions *Bytes, mesh *data.Mesh) {
+func AddZhangLiTorque(torque, m *data.Slice, Msat, J, alpha, xi, pol MSlice, mesh *data.Mesh) {
 	c := mesh.CellSize()
 	N := mesh.Size()
 	cfg := make3DConf(N)
 
-	k_addzhanglitorque_async(torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
+	k_addzhanglitorque2_async(
+		torque.DevPtr(X), torque.DevPtr(Y), torque.DevPtr(Z),
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
-		J.DevPtr(X), J.DevPtr(Y), J.DevPtr(Z),
+		Msat.DevPtr(0), Msat.Mul(0),
+		J.DevPtr(X), J.Mul(X),
+		J.DevPtr(Y), J.Mul(Y),
+		J.DevPtr(Z), J.Mul(Z),
+		alpha.DevPtr(0), alpha.Mul(0),
+		xi.DevPtr(0), xi.Mul(0),
+		pol.DevPtr(0), pol.Mul(0),
 		float32(c[X]), float32(c[Y]), float32(c[Z]),
-		unsafe.Pointer(bsat), unsafe.Pointer(alpha), unsafe.Pointer(xi), unsafe.Pointer(pol),
-		regions.Ptr, N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
+		N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
 }

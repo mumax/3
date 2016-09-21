@@ -21,16 +21,9 @@ func RemoveLRSurfaceCharge(region int, mxLeft, mxRight float64) {
 	defer SetBusy(false)
 	util.Argument(mxLeft == 1 || mxLeft == -1)
 	util.Argument(mxRight == 1 || mxRight == -1)
-	bsat := Bsat.GetRegion(region)[0]
+	bsat := Msat.GetRegion(region) * mag.Mu0
 	util.AssertMsg(bsat != 0, "RemoveSurfaceCharges: Msat is zero in region "+fmt.Sprint(region))
 	B_ext.Add(compensateLRSurfaceCharges(Mesh(), mxLeft, mxRight, bsat), nil)
-}
-
-// Returns the saturation magnetization in Tesla.
-// Cannot be set. Set Msat and bsat() will automatically be updated.
-func bSat() float64 {
-	util.AssertMsg(Msat.IsUniform(), "Remove surface charge: Msat must be uniform")
-	return mag.Mu0 * Msat.GetRegion(0)
 }
 
 func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat float64) *data.Slice {
@@ -39,7 +32,7 @@ func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat floa
 	world := m.WorldSize()
 	cell := m.CellSize()
 	size := m.Size()
-	q := cell[Z] * cell[Y]
+	q := cell[Z] * cell[Y] * bsat
 	q1 := q * mxLeft
 	q2 := q * (-mxRight)
 

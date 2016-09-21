@@ -26,7 +26,7 @@ type geom struct {
 
 func (g *geom) init() {
 	g.buffer = nil
-	g.info = Info(1, "geom", "")
+	g.info = info{1, "geom", ""}
 	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
 }
 

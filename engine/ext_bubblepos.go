@@ -5,13 +5,13 @@ import (
 )
 
 var (
-	BubblePos   = NewGetVector("ext_bubblepos", "m", "Bubble core position", bubblePos)
-	BubbleDist  = NewGetScalar("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
-	BubbleSpeed = NewGetScalar("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
+	BubblePos   = NewVectorValue("ext_bubblepos", "m", "Bubble core position", bubblePos)
+	BubbleDist  = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
+	BubbleSpeed = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
 )
 
 func bubblePos() []float64 {
-	m, _ := M.Slice()
+	m := M.Buffer()
 	mz := m.Comp(Z).HostCopy().Scalars()[0]
 
 	posx, posy := 0, 0

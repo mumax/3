@@ -1,6 +1,9 @@
 package cuda
 
-import "github.com/mumax/3/cuda/cu"
+import (
+	"fmt"
+	"github.com/mumax/3/cuda/cu"
+)
 
 // CUDA Launch parameters.
 // there might be better choices for recent hardware,
@@ -57,3 +60,16 @@ const (
 	Y = 1
 	Z = 2
 )
+
+func checkSize(a interface {
+	Size() [3]int
+}, b ...interface {
+	Size() [3]int
+}) {
+	sa := a.Size()
+	for _, b := range b {
+		if b.Size() != sa {
+			panic(fmt.Sprintf("size mismatch: %v != %v", sa, b.Size()))
+		}
+	}
+}

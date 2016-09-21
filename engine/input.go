@@ -119,9 +119,10 @@ var _ Q = VectorFunc(nil)
 func (p *VectorInput) Eval() interface{}       { return p }
 func (p *VectorInput) Type() reflect.Type      { return reflect.TypeOf(new(VectorInput)) }
 func (p *VectorInput) InputType() reflect.Type { return script.VectorFunction_t }
-func (p *VectorInput) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
-func (p *VectorInput) Comp(c int) ScalarField  { return Comp(p, c) }
-func (p *VectorInput) average() []float64      { return AverageOf(p.q) }
+
+//func (p *VectorInput) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
+//func (p *VectorInput) Comp(c int) ScalarField  { return Comp(p, c) }
+func (p *VectorInput) average() []float64 { return AverageOf(p.q) }
 
 func (p *VectorInput) SetValue(v interface{}) {
 	f := v.(script.VectorFunction)

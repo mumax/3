@@ -15,7 +15,7 @@ func init() {
 	DeclFunc("CropY", CropY, "Crops a quantity to cell ranges [y1,y2[")
 	DeclFunc("CropZ", CropZ, "Crops a quantity to cell ranges [z1,z2[")
 	DeclFunc("CropLayer", CropLayer, "Crops a quantity to a single layer")
-	DeclFunc("CropRegion", CropRegion, "Crops a quantity to a region")
+	DeclFunc("CropRegion", CropAroundRegion, "Crops a quantity to a box around a region")
 }
 
 type cropped struct {
@@ -24,7 +24,7 @@ type cropped struct {
 	x1, x2, y1, y2, z1, z2 int
 }
 
-func CropRegion(parent outputField, region int) *cropped {
+func CropAroundRegion(parent outputField, region int) *cropped {
 	n := parent.Mesh().Size()
 	// use -1 for unset values
 	x1, y1, z1 := -1, -1, -1

@@ -15,7 +15,7 @@ type component struct {
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent outputField, c int) ScalarField {
+func Comp(parent outputField, c int) Q {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return AsScalarField(&component{parent, c})
 }

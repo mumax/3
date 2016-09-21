@@ -358,4 +358,3 @@ func (p *RegionwiseVector) Eval() interface{}       { return p }
 func (p *RegionwiseVector) Type() reflect.Type      { return reflect.TypeOf(new(RegionwiseVector)) }
 func (p *RegionwiseVector) InputType() reflect.Type { return script.VectorFunction_t }
 func (p *RegionwiseVector) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
-func (p *RegionwiseVector) Comp(c int) ScalarField  { return Comp(p, c) }

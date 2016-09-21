@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	DeclFunc("CropToRegion", CropToRegion, "Restrict a quantity to a region, return zero elsewhere.")
+	DeclFunc("RestrictToRegion", RestrictToRegion, "Restrict a quantity to a region, return zero elsewhere.")
 }
 
 // represents a new quantity equal to q in the given region, 0 outside.
@@ -28,7 +28,7 @@ type vOneReg struct{ oneReg }
 
 func (q *vOneReg) Average() data.Vector { return unslice(q.average()) }
 
-func CropToRegion(q Q, region int) Q {
+func RestrictToRegion(q Q, region int) Q {
 	return &oneReg{q, region}
 }
 

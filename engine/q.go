@@ -7,6 +7,10 @@ import (
 	"reflect"
 )
 
+func init() {
+	DeclFunc("AverageOf", AverageOf, "Evaluate quantity average")
+}
+
 type Q interface {
 	NComp() int
 	EvalTo(dst *data.Slice) // TODO: MSlice?

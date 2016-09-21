@@ -63,8 +63,6 @@ func (m *magnetization) EvalTo(dst *data.Slice) {
 	data.Copy(dst, m.buffer_)
 }
 
-func (m *magnetization) Region(r int) *vOneReg { return vOneRegion(m, r) }
-
 func (m *magnetization) String() string { return util.Sprint(m.Buffer().HostCopy()) }
 
 // Set the value of one cell.

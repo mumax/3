@@ -150,8 +150,7 @@ func AsScalarField(q outputField) ScalarField {
 	return ScalarField{q}
 }
 
-func (s ScalarField) Average() float64         { return s.outputField.average()[0] }
-func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.outputField, r)) }
+func (s ScalarField) Average() float64 { return s.outputField.average()[0] }
 
 // VectorField enhances an outputField with methods specific to
 // a space-dependent vector quantity.
@@ -168,6 +167,5 @@ func AsVectorField(q outputField) VectorField {
 	return VectorField{q}
 }
 
-func (v VectorField) Average() data.Vector     { return unslice(v.outputField.average()) }
-func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.outputField, r)) }
-func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.outputField, c)) }
+func (v VectorField) Average() data.Vector   { return unslice(v.outputField.average()) }
+func (v VectorField) Comp(c int) ScalarField { return AsScalarField(Comp(v.outputField, c)) }

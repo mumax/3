@@ -308,16 +308,17 @@ func (g *guistate) prepareParam() {
 			}
 		})
 	}
+	// TODO
 	// overwrite handler for temperature
 	// do not crash when we enter bogus values (see temperature.go)
-	g.OnEvent("Temp", func() {
-		Inject <- func() {
-			if FixDt == 0 {
-				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
-			}
-			g.EvalGUI("Temp = " + g.StringValue("Temp"))
-		}
-	})
+	//g.OnEvent("Temp", func() {
+	//	Inject <- func() {
+	//		if FixDt == 0 {
+	//			g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
+	//		}
+	//		g.EvalGUI("Temp = " + g.StringValue("Temp"))
+	//	}
+	//})
 }
 
 // see prepareServer

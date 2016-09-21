@@ -1,5 +1,6 @@
 package engine
 
+/*
 import (
 	"fmt"
 	"github.com/mumax/3/data"
@@ -88,3 +89,4 @@ func hfield(charge float64, source, dest [3]float64) [3]float64 {
 	h[2] = R[2] * qr3pi4
 	return h
 }
+*/

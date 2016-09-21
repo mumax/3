@@ -40,7 +40,7 @@ func (rk *RK23) Step() {
 	}
 
 	// FSAL cannot be used with temperature
-	if !Temp.isZero() {
+	if !IsZero(Temp) {
 		torqueFn(rk.k1)
 	}
 

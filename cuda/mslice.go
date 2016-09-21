@@ -26,6 +26,10 @@ func (m MSlice) Size() [3]int {
 	return m.arr.Size()
 }
 
+func (m MSlice) NComp() int {
+	return len(m.mul)
+}
+
 func (m MSlice) Len() int {
 	return m.arr.Len()
 }

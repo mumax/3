@@ -26,6 +26,9 @@ func init() {
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 }
 
+func Evalf(q Q) float64     { return 666 }
+func Evalv(q Q) data.Vector { return Vector(666, 666, 666) }
+
 // AddFieldTerm adds a function to B_eff
 func AddFieldTerm(b Q) {
 	customTerms = append(customTerms, b)
@@ -66,6 +69,11 @@ func (d *constValue) EvalTo(dst *data.Slice) {
 	for c, v := range d.value {
 		cuda.Memset(dst.Comp(c), float32(v))
 	}
+}
+
+// custom MSlice implementation saves memory
+func (c *constValue) MSlice() cuda.MSlice {
+	return cuda.MakeMSlice(data.NilSlice(SCALAR, Mesh().Size()), c.value)
 }
 
 func Const(v float64) Q {

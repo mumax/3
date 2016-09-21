@@ -38,7 +38,7 @@ func (s *BackwardEuler) Step() {
 	Time = t0 + 0.5*Dt_si // 0.5 dt makes it implicit midpoint method
 
 	// with temperature, previous torque cannot be used as predictor
-	if Temp.isZero() {
+	if IsZero(Temp) {
 		cuda.Madd2(y, y0, dy1, 1, dt) // predictor euler step with previous torque
 		M.normalize()
 	}

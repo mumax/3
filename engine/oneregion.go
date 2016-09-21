@@ -4,25 +4,16 @@ import (
 	"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
-func sInRegion(q outputField, r int) ScalarField {
-	return AsScalarField(inRegion(q, r))
+// represents a new quantity equal to q in the given region, 0 outside.
+type oneReg struct {
+	parent Q
+	region int
 }
 
-func vInRegion(q outputField, r int) VectorField {
-	return AsVectorField(inRegion(q, r))
-}
-
-func sOneRegion(q outputField, r int) *sOneReg {
-	util.Argument(q.NComp() == 1)
-	return &sOneReg{oneReg{q, r}}
-}
-
-func vOneRegion(q outputField, r int) *vOneReg {
-	util.Argument(q.NComp() == 3)
-	return &vOneReg{oneReg{q, r}}
+func InRegion(q Q, r int) Q {
+	return &oneReg{q, r}
 }
 
 type sOneReg struct{ oneReg }
@@ -33,37 +24,25 @@ type vOneReg struct{ oneReg }
 
 func (q *vOneReg) Average() data.Vector { return unslice(q.average()) }
 
-// represents a new quantity equal to q in the given region, 0 outside.
-type oneReg struct {
-	parent outputField
-	region int
+func init() {
+	DeclFunc("CropToRegion", CropToRegion, "Restrict a quantity to a region, return zero elsewhere.")
 }
 
-func inRegion(q outputField, region int) outputField {
+func CropToRegion(q Q, region int) Q {
 	return &oneReg{q, region}
 }
 
-func (q *oneReg) NComp() int       { return q.parent.NComp() }
-func (q *oneReg) Name() string     { return fmt.Sprint(q.parent.Name(), ".region", q.region) }
-func (q *oneReg) Unit() string     { return q.parent.Unit() }
-func (q *oneReg) Mesh() *data.Mesh { return q.parent.Mesh() }
+func (q *oneReg) NComp() int   { return q.parent.NComp() }
+func (q *oneReg) Name() string { return fmt.Sprint(NameOf(q.parent), ".region", q.region) }
 
-// returns a new slice equal to q in the given region, 0 outside.
-func (q *oneReg) Slice() (*data.Slice, bool) {
-	src, r := q.parent.Slice()
-	if r {
-		defer cuda.Recycle(src)
-	}
-	out := cuda.Buffer(q.NComp(), q.Mesh().Size())
-	cuda.RegionSelect(out, src, regions.Gpu(), byte(q.region))
-	return out, true
+func (q *oneReg) EvalTo(dst *data.Slice) {
+	q.parent.EvalTo(dst)
+	cuda.RegionSelect(dst, dst, regions.Gpu(), byte(q.region))
 }
 
 func (q *oneReg) average() []float64 {
-	slice, r := q.Slice()
-	if r {
-		defer cuda.Recycle(slice)
-	}
+	slice := ValueOf(q)
+	defer cuda.Recycle(slice)
 	avg := sAverageUniverse(slice)
 	sDiv(avg, regions.volume(q.region))
 	return avg

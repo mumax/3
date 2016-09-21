@@ -13,7 +13,7 @@ func SetEffectiveField(dst *data.Slice) {
 	SetDemagField(dst)    // set to B_demag...
 	AddExchangeField(dst) // ...then add other terms
 	AddAnisotropyField(dst)
-	B_ext.AddTo(dst)
+	AddTo(dst, B_ext)
 	if !relaxing {
 		B_therm.AddTo(dst)
 	}

@@ -7,17 +7,17 @@ import (
 )
 
 var (
-	Alpha        = NewRegionwiseScalar("alpha", "", "Landau-Lifshitz damping constant")
-	Xi           = NewRegionwiseScalar("xi", "", "Non-adiabaticity of spin-transfer-torque")
-	Pol          = NewRegionwiseScalar("Pol", "", "Electrical current polarization")
-	Lambda       = NewRegionwiseScalar("Lambda", "", "Slonczewski Λ parameter")
-	EpsilonPrime = NewRegionwiseScalar("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
-	FrozenSpins  = NewRegionwiseScalar("frozenspins", "", "Defines spins that are fixed (=1)")
-	FixedLayer   = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
+	Alpha        = NewScalarInput("alpha", "", "Landau-Lifshitz damping constant")
+	Xi           = NewScalarInput("xi", "", "Non-adiabaticity of spin-transfer-torque")
+	Pol          = NewScalarInput("Pol", "", "Electrical current polarization")
+	Lambda       = NewScalarInput("Lambda", "", "Slonczewski Λ parameter")
+	EpsilonPrime = NewScalarInput("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
+	FrozenSpins  = NewScalarInput("frozenspins", "", "Defines spins that are fixed (=1)")
+	FixedLayer   = NewVectorInput("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque       = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque     = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque     = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
-	J            = NewExcitation("J", "A/m2", "Electrical current density")
+	J            = NewVectorInput("J", "A/m2", "Electrical current density")
 	MaxTorque    = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 
 	Precess                  = true
@@ -28,8 +28,8 @@ var (
 )
 
 func init() {
-	Pol.setUniform([]float64{1}) // default spin polarization
-	Lambda.Set(1)                // sensible default value (?).
+	Pol.Set(1)    // default spin polarization
+	Lambda.Set(1) // sensible default value (?).
 	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")
@@ -47,7 +47,7 @@ func SetTorque(dst *data.Slice) {
 // Sets dst to the current Landau-Lifshitz torque
 func SetLLTorque(dst *data.Slice) {
 	SetEffectiveField(dst) // calc and store B_eff
-	alpha := Alpha.MSlice()
+	alpha := MSliceOf(Alpha)
 	defer alpha.Recycle()
 	if Precess {
 		cuda.LLTorque(dst, M.Buffer(), dst, alpha) // overwrite dst with torque
@@ -58,10 +58,10 @@ func SetLLTorque(dst *data.Slice) {
 
 // Adds the current spin transfer torque to dst
 func AddSTTorque(dst *data.Slice) {
-	if J.isZero() {
+	if IsZero(J) {
 		return
 	}
-	util.AssertMsg(!Pol.isZero(), "spin polarization should not be 0")
+	util.AssertMsg(!IsZero(Pol), "spin polarization should not be 0")
 	jspin, rec := J.Slice()
 	if rec {
 		defer cuda.Recycle(jspin)
@@ -71,41 +71,43 @@ func AddSTTorque(dst *data.Slice) {
 		defer cuda.Recycle(fl)
 	}
 	if !DisableZhangLiTorque {
-		msat := Msat.MSlice()
+		msat := MSliceOf(Msat)
 		defer msat.Recycle()
-		j := J.MSlice()
+		j := MSliceOf(J)
 		defer j.Recycle()
-		alpha := Alpha.MSlice()
+		alpha := MSliceOf(Alpha)
 		defer alpha.Recycle()
-		xi := Xi.MSlice()
+		xi := MSliceOf(Xi)
 		defer xi.Recycle()
-		pol := Pol.MSlice()
+		pol := MSliceOf(Pol)
 		defer pol.Recycle()
 		cuda.AddZhangLiTorque(dst, M.Buffer(), msat, j, alpha, xi, pol, Mesh())
 	}
-	if !DisableSlonczewskiTorque && !FixedLayer.isZero() {
-		msat := Msat.MSlice()
+	if !DisableSlonczewskiTorque && !IsZero(FixedLayer) {
+		msat := MSliceOf(Msat)
 		defer msat.Recycle()
-		j := J.MSlice()
+		j := MSliceOf(J)
 		defer j.Recycle()
-		fixedP := FixedLayer.MSlice()
+		fixedP := MSliceOf(FixedLayer)
 		defer fixedP.Recycle()
-		alpha := Alpha.MSlice()
+		alpha := MSliceOf(Alpha)
 		defer alpha.Recycle()
-		pol := Pol.MSlice()
+		pol := MSliceOf(Pol)
 		defer pol.Recycle()
-		lambda := Lambda.MSlice()
+		lambda := MSliceOf(Lambda)
 		defer lambda.Recycle()
-		epsPrime := EpsilonPrime.MSlice()
+		epsPrime := MSliceOf(EpsilonPrime)
 		defer epsPrime.Recycle()
 		cuda.AddSlonczewskiTorque2(dst, M.Buffer(),
 			msat, j, fixedP, alpha, pol, lambda, epsPrime, Mesh())
 	}
 }
 
-func FreezeSpins(dst *data.Slice) {
-	if !FrozenSpins.isZero() {
-		cuda.ZeroMask(dst, FrozenSpins.gpuLUT1(), regions.Gpu())
+func FreezeSpins(torque *data.Slice) {
+	if !IsZero(FrozenSpins) {
+		mask := MSliceOf(FrozenSpins)
+		defer mask.Recycle()
+		cuda.ZeroMask(torque, mask)
 	}
 }
 

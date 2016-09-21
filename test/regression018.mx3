@@ -54,7 +54,7 @@ tableAdd(E_exch)
 tableAdd(E_Zeeman)
 tableAdd(E_demag)
 tableAdd(B_ext)
-tableAdd(FixedLayer.Region(1))
+tableAdd(CropToRegion(FixedLayer, 1))
 
 B_ext = vector(Bval,0, 0)
 timestep := 10.0e-9

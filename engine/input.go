@@ -31,12 +31,18 @@ func (p *input) SetQ(q Q) {
 	p.q = q
 }
 
-func (p *input) EvalTo(dst *data.Slice)     { p.q.EvalTo(dst) }
+func (p *input) EvalTo(dst *data.Slice) { p.q.EvalTo(dst) }
+func (p *input) MSlice() cuda.MSlice {
+	return MSliceOf(p.q) // allows passthrough of custom q.MSlice() implementation
+}
 func (p *input) Slice() (*data.Slice, bool) { return ValueOf(p), true }
 func (p *input) Name() string               { return p.name }
 func (p *input) Unit() string               { return p.unit }
 func (p *input) Mesh() *data.Mesh           { return Mesh() }
 func (p *input) NComp() int                 { return p.q.NComp() }
+func (p *input) average() []float64         { return AverageOf(p.q) }
+
+var _ outputField = Alpha
 
 func (p *input) IsUniform() bool {
 	return false // TODO
@@ -113,7 +119,6 @@ var _ Q = VectorFunc(nil)
 func (p *VectorInput) Eval() interface{}       { return p }
 func (p *VectorInput) Type() reflect.Type      { return reflect.TypeOf(new(VectorInput)) }
 func (p *VectorInput) InputType() reflect.Type { return script.VectorFunction_t }
-func (p *VectorInput) Region(r int) *vOneReg   { return vOneRegion(p, r) }
 func (p *VectorInput) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
 func (p *VectorInput) Comp(c int) ScalarField  { return Comp(p, c) }
 func (p *VectorInput) average() []float64      { return AverageOf(p.q) }

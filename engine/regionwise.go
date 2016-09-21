@@ -268,7 +268,6 @@ func (p *RegionwiseScalar) Eval() interface{}       { return p }
 func (p *RegionwiseScalar) Type() reflect.Type      { return reflect.TypeOf(new(RegionwiseScalar)) }
 func (p *RegionwiseScalar) InputType() reflect.Type { return script.ScalarFunction_t }
 func (p *RegionwiseScalar) Average() float64        { return qAverageUniverse(p)[0] }
-func (p *RegionwiseScalar) Region(r int) *sOneReg   { return sOneRegion(p, r) }
 
 // checks if a script expression contains t (time)
 func IsConst(e script.Expr) bool {
@@ -358,6 +357,5 @@ func (p *RegionwiseVector) GetRegion(region int) [3]float64 {
 func (p *RegionwiseVector) Eval() interface{}       { return p }
 func (p *RegionwiseVector) Type() reflect.Type      { return reflect.TypeOf(new(RegionwiseVector)) }
 func (p *RegionwiseVector) InputType() reflect.Type { return script.VectorFunction_t }
-func (p *RegionwiseVector) Region(r int) *vOneReg   { return vOneRegion(p, r) }
 func (p *RegionwiseVector) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
 func (p *RegionwiseVector) Comp(c int) ScalarField  { return Comp(p, c) }

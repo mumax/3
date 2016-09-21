@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	Temp        = NewRegionwiseScalar("Temp", "K", "Temperature")
+	Temp        = NewScalarInput("Temp", "K", "Temperature")
 	E_therm     = NewScalarValue("E_therm", "J", "Thermal energy", GetThermalEnergy)
 	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
@@ -34,7 +34,7 @@ func init() {
 }
 
 func (b *thermField) AddTo(dst *data.Slice) {
-	if !Temp.isZero() {
+	if !IsZero(Temp) {
 		b.update()
 		cuda.Add(dst, dst, b.noise)
 	}
@@ -58,7 +58,7 @@ func (b *thermField) update() {
 		B_therm.dt = -1
 	}
 
-	if Temp.isZero() {
+	if IsZero(Temp) {
 		cuda.Memset(b.noise, 0, 0, 0)
 		b.step = NSteps
 		b.dt = Dt_si
@@ -82,9 +82,9 @@ func (b *thermField) update() {
 	const mean = 0
 	const stddev = 1
 	dst := b.noise
-	ms := Msat.MSlice()
+	ms := MSliceOf(Msat)
 	defer ms.Recycle()
-	temp := Temp.MSlice()
+	temp := MSliceOf(Temp)
 	defer temp.Recycle()
 	alpha := MSliceOf(Alpha)
 	defer alpha.Recycle()
@@ -98,7 +98,7 @@ func (b *thermField) update() {
 }
 
 func GetThermalEnergy() float64 {
-	if Temp.isZero() || relaxing {
+	if IsZero(Temp) || relaxing {
 		return 0
 	} else {
 		return -cellVolume() * dot(&M_full, &B_therm)

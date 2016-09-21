@@ -67,6 +67,30 @@ func ValueOf(q Q) *data.Slice {
 	return buf
 }
 
+// dst += q
+func AddTo(dst *data.Slice, q Q) {
+	// TODO: check for AddTo implementation
+	v := ValueOf(q)
+	defer cuda.Recycle(v)
+	cuda.Add(dst, dst, v)
+}
+
+// IsZero checks if q's multipliers are zero.
+// Used to avoid launching cuda kernels that would not do any work.
+//
+// When returning true, q is definitely zero,
+// when returning false, q may or may not be zero,
+// and must be treated as if it's potentially non-zero.
+func IsZero(q Q) bool {
+	m := MSliceOf(q)
+	for i := 0; i < m.NComp(); i++ {
+		if m.Mul(i) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 func MSliceOf(q Q) cuda.MSlice {
 	if q, ok := q.(interface {
 		MSlice() cuda.MSlice
@@ -76,7 +100,7 @@ func MSliceOf(q Q) cuda.MSlice {
 	return cuda.MakeMSlice(ValueOf(q), ones(q.NComp()))
 }
 
-var ones_ [4]float64
+var ones_ = [4]float64{1, 1, 1, 1}
 
 func ones(n int) []float64 {
 	return ones_[:n]

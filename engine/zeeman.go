@@ -1,7 +1,7 @@
 package engine
 
 var (
-	B_ext        = NewExcitation("B_ext", "T", "Externally applied field")
+	B_ext        = NewVectorInput("B_ext", "T", "Externally applied field")
 	Edens_zeeman = NewScalarField("Edens_Zeeman", "J/m3", "Zeeman energy density", AddEdens_zeeman)
 	E_Zeeman     = NewScalarValue("E_Zeeman", "J", "Zeeman energy", GetZeemanEnergy)
 )

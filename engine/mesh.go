@@ -63,13 +63,6 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		geometry.buffer = data.NilSlice(1, Mesh().Size())
 		geometry.setGeom(geometry.shape)
 
-		// remove excitation extra terms if they don't fit anymore
-		// up to the user to add them again
-		if Mesh().Size() != prevSize {
-			B_ext.RemoveExtraTerms()
-			J.RemoveExtraTerms()
-		}
-
 		if Mesh().Size() != prevSize {
 			B_therm.noise.Free()
 			B_therm.noise = nil

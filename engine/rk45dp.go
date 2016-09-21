@@ -31,7 +31,7 @@ func (rk *RK45DP) Step() {
 	}
 
 	// FSAL cannot be used with finite temperature
-	if !Temp.isZero() {
+	if !IsZero(Temp) {
 		torqueFn(rk.k1)
 	}
 

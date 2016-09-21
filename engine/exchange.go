@@ -25,6 +25,7 @@ var (
 
 	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
 	ExchCoupling = NewScalarField("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
+	DindCoupling = NewScalarField("DindCoupling", "arb.", "Average DMI coupling with neighbors", dindDecode)
 )
 
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
@@ -32,6 +33,8 @@ var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal fun
 func init() {
 	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
+	DeclFunc("ext_ScaleDind", ScaleInterDind, "Re-scales Dind coupling between two regions.")
+	DeclFunc("ext_InterDind", InterDind, "Sets Dind coupling between two regions.")
 	lex2.init()
 	din2.init(Dind)
 	dbulk2.init(Dbulk)
@@ -45,9 +48,6 @@ func AddExchangeField(dst *data.Slice) {
 	case !inter && !bulk:
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), regions.Gpu(), M.Mesh())
 	case inter && !bulk:
-		// DMI kernel has space-dependent parameters, but
-		// correct averaging between regions not yet clear nor tested, so disallow.
-		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dind.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
 	case bulk && !inter:
 		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
@@ -62,6 +62,11 @@ func exchangeDecode(dst *data.Slice) {
 	cuda.ExchangeDecode(dst, lex2.Gpu(), regions.Gpu(), M.Mesh())
 }
 
+// Set dst to the average dmi coupling per cell (average of din2 with all neighbors).
+func dindDecode(dst *data.Slice) {
+	cuda.ExchangeDecode(dst, din2.Gpu(), regions.Gpu(), M.Mesh())
+}
+
 // Returns the current exchange energy in Joules.
 func GetExchangeEnergy() float64 {
 	return -0.5 * cellVolume() * dot(&M_full, &B_exch)
@@ -72,6 +77,19 @@ func GetExchangeEnergy() float64 {
 func ScaleInterExchange(region1, region2 int, scale float64) {
 	lex2.scale[symmidx(region1, region2)] = float32(scale)
 	lex2.invalidate()
+}
+
+// Scales the DMI interaction between region 1 and 2.
+func ScaleInterDind(region1, region2 int, scale float64) {
+	din2.scale[symmidx(region1, region2)] = float32(scale)
+	din2.invalidate()
+}
+
+// Sets the DMI interaction between region 1 and 2.
+func InterDind(region1, region2 int, value float64) {
+	din2.scale[symmidx(region1, region2)] = float32(0.)
+	din2.interdmi[symmidx(region1, region2)] = float32(value)
+	din2.invalidate()
 }
 
 // stores interregion exchange stiffness
@@ -122,7 +140,8 @@ func (p *aexchParam) Gpu() cuda.SymmLUT {
 
 type aexchParam struct{ exchParam }
 type dexchParam struct {
-	parent *RegionwiseScalar
+	interdmi [NREGION * (NREGION + 1) / 2]float32
+	parent   *RegionwiseScalar
 	exchParam
 }
 
@@ -148,13 +167,13 @@ func (p *dexchParam) update() {
 	if !p.cpu_ok {
 		msat := Msat.cpuLUT()
 		dex := p.parent.cpuLUT()
-
 		for i := 0; i < NREGION; i++ {
 			dexi := 1e9 * safediv(dex[0][i], msat[0][i])
 			for j := i; j < NREGION; j++ {
 				dexj := 1e9 * safediv(dex[0][j], msat[0][j])
 				I := symmidx(i, j)
-				p.lut[I] = p.scale[I] * 2 / (1/dexi + 1/dexj)
+				interdmi := 1e9 * safediv(p.interdmi[I], msat[0][i])
+				p.lut[I] = p.scale[I]*2/(1/dexi+1/dexj) + interdmi
 			}
 		}
 		p.gpu_ok = false

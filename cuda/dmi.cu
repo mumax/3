@@ -49,8 +49,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m1.z = m0.z + (-cx * (0.5f*D1/A1) * m0.x);
         }
         h   += (2.0f*A1/(cx*cx)) * (m1 - m0);          // exchange
-        h.x += (D1/cx)*(m0.z - m1.z);                  // DM (first 1/2 contribution, 2*D * deltaM / (2*c))
-        h.z -= (D1/cx)*(m0.x - m1.x);
+        h.x += (D1/cx)*(- m1.z);
+        h.z -= (D1/cx)*(- m1.x);
     }
 
     {
@@ -67,8 +67,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m2.z = m0.z + (cx * (0.5f*D2/A2) * m0.x);
         }
         h   += (2.0f*A2/(cx*cx)) * (m2 - m0);
-        h.x += (D2/cx)*(m2.z - m0.z);
-        h.z -= (D2/cx)*(m2.x - m0.x);
+        h.x += (D2/cx)*(m2.z);
+        h.z -= (D2/cx)*(m2.x);
     }
 
     // y derivatives (along height)
@@ -86,8 +86,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m1.z = m0.z + (-cy * (0.5f*D1/A1) * m0.y);
         }
         h   += (2.0f*A1/(cy*cy)) * (m1 - m0);
-        h.y += (D1/cy)*(m0.z - m1.z);
-        h.z -= (D1/cy)*(m0.y - m1.y);
+        h.y += (D1/cy)*(- m1.z);
+        h.z -= (D1/cy)*(- m1.y);
     }
 
     {
@@ -104,8 +104,8 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
             m2.z = m0.z + (cy * (0.5f*D2/A2) * m0.y);
         }
         h   += (2.0f*A2/(cy*cy)) * (m2 - m0);
-        h.y += (D2/cy)*(m2.z - m0.z);
-        h.z -= (D2/cy)*(m2.y - m0.y);
+        h.y += (D2/cy)*(m2.z);
+        h.z -= (D2/cy)*(m2.y);
     }
 
     // only take vertical derivative for 3D sim

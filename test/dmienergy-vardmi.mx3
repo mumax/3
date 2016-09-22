@@ -21,9 +21,9 @@ AnisU = vector(0, 0, 1)
 
 ext_enableunsafe()
 
-Dbulk.setRegion(0, 4e-3)
-Dbulk.setRegion(1, 2e-3)
-Dbulk.setRegion(2, -3e-3)
+Dind.setRegion(0, 4e-3)
+Dind.setRegion(1, 2e-3)
+Dind.setRegion(2, -3e-3)
 
 m     = uniform(1, 1, 1)
 alpha = 0.001

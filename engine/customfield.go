@@ -1,6 +1,6 @@
 package engine
 
-// Add arbitrary terms to H_eff
+// Add arbitrary terms to B_eff, Edens_total.
 
 import (
 	"fmt"
@@ -19,8 +19,10 @@ var (
 
 func init() {
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
+	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
+	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
 	DeclFunc("Const", Const, "Constant, uniform number")
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
@@ -35,7 +37,7 @@ func AddFieldTerm(b Q) {
 // AddEnergyTerm adds an energy density function (returning Joules/m³) to Edens_total.
 // Needed when AddFieldTerm was used and a correct energy is needed
 // (e.g. for Relax, Minimize, ...).
-func AddEnergyTerm(e Q) {
+func AddEdensTerm(e Q) {
 	customEnergies = append(customEnergies, e)
 }
 
@@ -49,8 +51,7 @@ func AddCustomField(dst *data.Slice) {
 	}
 }
 
-// AddCustomField evaluates the user-defined custom energy density terms
-// and adds the result to dst.
+// Adds the custom energy densities (defined with AddCustomE
 func AddCustomEnergyDensity(dst *data.Slice) {
 	for _, term := range customEnergies {
 		buf := ValueOf(term)
@@ -102,6 +103,46 @@ func (o fieldOp) NComp() int {
 
 type dotProduct struct {
 	fieldOp
+}
+
+type mulmv struct {
+	ax, ay, az, b Q
+}
+
+func MulMV(Ax, Ay, Az, b Q) Q {
+	util.Argument(Ax.NComp() == 3 &&
+		Ay.NComp() == 3 &&
+		Az.NComp() == 3 &&
+		b.NComp() == 3)
+	return &mulmv{Ax, Ay, Az, b}
+}
+
+func (q *mulmv) EvalTo(dst *data.Slice) {
+	util.Argument(dst.NComp() == 3)
+	cuda.Zero(dst)
+	b := ValueOf(q.b)
+	defer cuda.Recycle(b)
+
+	{
+		Ax := ValueOf(q.ax)
+		cuda.AddDotProduct(dst.Comp(X), 1, Ax, b)
+		cuda.Recycle(Ax)
+	}
+	{
+
+		Ay := ValueOf(q.ay)
+		cuda.AddDotProduct(dst.Comp(Y), 1, Ay, b)
+		cuda.Recycle(Ay)
+	}
+	{
+		Az := ValueOf(q.az)
+		cuda.AddDotProduct(dst.Comp(Z), 1, Az, b)
+		cuda.Recycle(Az)
+	}
+}
+
+func (q *mulmv) NComp() int {
+	return 3
 }
 
 // DotProduct creates a new quantity that is the dot product of

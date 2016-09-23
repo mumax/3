@@ -26,9 +26,17 @@ func init() {
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 }
 
-// AddFieldTerm adds a function to B_eff
+// AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
+// Be sure to also add the corresponding energy term using AddEnergyTerm.
 func AddFieldTerm(b Q) {
 	customTerms = append(customTerms, b)
+}
+
+// AddEnergyTerm adds an energy density function (returning Joules/m³) to Edens_total.
+// Needed when AddFieldTerm was used and a correct energy is needed
+// (e.g. for Relax, Minimize, ...).
+func AddEnergyTerm(e Q) {
+	customEnergies = append(customEnergies, e)
 }
 
 // AddCustomField evaluates the user-defined custom field terms
@@ -44,7 +52,11 @@ func AddCustomField(dst *data.Slice) {
 // AddCustomField evaluates the user-defined custom energy density terms
 // and adds the result to dst.
 func AddCustomEnergyDensity(dst *data.Slice) {
-
+	for _, term := range customEnergies {
+		buf := ValueOf(term)
+		cuda.Add(dst, dst, buf)
+		cuda.Recycle(buf)
+	}
 }
 
 func GetCustomEnergy() float64 {

@@ -56,6 +56,10 @@ func (g *geom) Slice() (*data.Slice, bool) {
 	}
 }
 
+func (q *geom) EvalTo(dst *data.Slice) { EvalTo(q, dst) }
+
+var _ Q = &geometry
+
 func (g *geom) average() []float64 {
 	s, r := g.Slice()
 	if r {

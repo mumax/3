@@ -153,7 +153,8 @@ func (p *regionwise) IsUniform() bool {
 	return true
 }
 
-func (p *regionwise) average() []float64 { return qAverageUniverse(p) }
+func (p *regionwise) average() []float64     { return qAverageUniverse(p) }
+func (p *regionwise) EvalTo(dst *data.Slice) { EvalTo(p, dst) }
 
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
 type DerivedParam struct {

@@ -8,11 +8,9 @@ import (
 )
 
 // average of quantity over universe
-func qAverageUniverse(q outputField) []float64 {
-	s, recycle := q.Slice()
-	if recycle {
-		defer cuda.Recycle(s)
-	}
+func qAverageUniverse(q Q) []float64 {
+	s := ValueOf(q)
+	defer cuda.Recycle(s)
 	return sAverageUniverse(s)
 }
 

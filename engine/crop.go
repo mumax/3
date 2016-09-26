@@ -113,9 +113,10 @@ func rangeStr(a, b int) string {
 	// (trailing underscore to separate from subsequent autosave number)
 }
 
-func (q *cropped) NComp() int   { return q.parent.NComp() }
-func (q *cropped) Name() string { return q.name }
-func (q *cropped) Unit() string { return q.parent.Unit() }
+func (q *cropped) NComp() int             { return q.parent.NComp() }
+func (q *cropped) Name() string           { return q.name }
+func (q *cropped) Unit() string           { return q.parent.Unit() }
+func (q *cropped) EvalTo(dst *data.Slice) { EvalTo(q, dst) }
 
 func (q *cropped) Mesh() *data.Mesh {
 	c := q.parent.Mesh().CellSize()

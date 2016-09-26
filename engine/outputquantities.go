@@ -88,17 +88,6 @@ func NewVectorValue(name, unit, desc string, f func() []float64) *VectorValue {
 func (v *VectorValue) Get() data.Vector     { return unslice(v.average()) }
 func (v *VectorValue) Average() data.Vector { return v.Get() }
 
-// outputField must be implemented by any space-dependent scalar or vector quantity
-// to make it outputable.
-// The space-independent counterpart is outputValue.
-// Used internally by ScalarField and VectorField.
-type outputField interface {
-	Info
-	Mesh() *data.Mesh                     // Usually the global mesh, unless this quantity has a special size.
-	Slice() (q *data.Slice, recycle bool) // get quantity data (GPU or CPU), indicate need to recycle
-	average() []float64
-}
-
 // NewVectorField constructs an outputable space-dependent vector quantity whose
 // value is provided by function f.
 func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorField {

@@ -33,14 +33,6 @@ func (i *info) Name() string { return i.name }
 func (i *info) Unit() string { return i.unit }
 func (i *info) NComp() int   { return i.nComp }
 
-// outputValue must be implemented by any scalar or vector quantity
-// that has no space-dependence, to make it outputable.
-// The space-dependent counterpart is outputField.
-// Used internally by ScalarValue and VectorValue.
-type outputValue interface {
-	Info
-	average() []float64 // TODO: rename
-}
 
 // outputFunc is an outputValue implementation where a function provides the output value.
 // It can be scalar or vector.
@@ -56,7 +48,7 @@ func (g *valueFunc) average() []float64 { return g.get() }
 // ScalarValue enhances an outputValue with methods specific to
 // a space-independent scalar quantity (e.g. total energy).
 type ScalarValue struct {
-	outputValue
+	Q
 }
 
 // NewScalarValue constructs an outputable space-independent scalar quantity whose
@@ -74,7 +66,7 @@ func (s ScalarValue) Average() float64 { return s.Get() }
 // VectorValue enhances an outputValue with methods specific to
 // a space-independent vector quantity (e.g. averaged magnetization).
 type VectorValue struct {
-	outputValue
+	Q
 }
 
 // NewVectorValue constructs an outputable space-independent vector quantity whose

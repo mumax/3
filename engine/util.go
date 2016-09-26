@@ -117,8 +117,8 @@ func myFmt(msg []interface{}) []interface{} {
 			msg[i] = *e
 		}
 		// Tabledata: print average
-		if m, ok := m.(TableData); ok {
-			str := fmt.Sprint(m.average())
+		if m, ok := m.(Q); ok {
+			str := fmt.Sprint(AverageOf(m))
 			msg[i] = str[1 : len(str)-1] // remove [ ]
 			continue
 		}

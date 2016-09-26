@@ -82,7 +82,7 @@ func (m *magnetization) GetCell(ix, iy, iz int) data.Vector {
 	return Vector(mx, my, mz)
 }
 
-func (m *magnetization) TableData() []float64 { return slice(m.Average()) }
+func (m *magnetization) Q() []float64 { return slice(m.Average()) }
 
 // Sets the magnetization inside the shape
 func (m *magnetization) SetInShape(region Shape, conf Config) {

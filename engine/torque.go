@@ -110,9 +110,7 @@ func FreezeSpins(dst *data.Slice) {
 
 // Gets
 func GetMaxTorque() float64 {
-	torque, recycle := Torque.Slice()
-	if recycle {
-		defer cuda.Recycle(torque)
-	}
+	torque := ValueOf(Torque)
+	defer cuda.Recycle(torque)
 	return cuda.MaxVecNorm(torque)
 }

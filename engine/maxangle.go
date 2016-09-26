@@ -15,9 +15,7 @@ func SetSpinAngle(dst *data.Slice) {
 }
 
 func GetMaxAngle() float64 {
-	s, recycle := SpinAngle.Slice()
-	if recycle {
-		defer cuda.Recycle(s)
-	}
+	s := ValueOf(SpinAngle)
+	defer cuda.Recycle(s)
 	return float64(cuda.MaxAbs(s)) // just a max would be fine, but not currently implemented
 }

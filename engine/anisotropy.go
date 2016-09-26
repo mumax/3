@@ -82,14 +82,12 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 		return
 	}
 
-	buf := cuda.Buffer(B_anis.NComp(), B_anis.Mesh().Size())
+	buf := cuda.Buffer(B_anis.NComp(), Mesh().Size())
 	defer cuda.Recycle(buf)
 
 	// unnormalized magnetization:
-	Mf, r := M_full.Slice()
-	if r {
-		defer cuda.Recycle(Mf)
-	}
+	Mf := ValueOf(M_full)
+	defer cuda.Recycle(Mf)
 
 	if haveUnixial {
 		// 1st
@@ -123,7 +121,7 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 
 // Returns anisotropy energy in joules.
 func GetAnisotropyEnergy() float64 {
-	buf := cuda.Buffer(1, Edens_anis.Mesh().Size())
+	buf := cuda.Buffer(1, Mesh().Size())
 	defer cuda.Recycle(buf)
 
 	cuda.Zero(buf)

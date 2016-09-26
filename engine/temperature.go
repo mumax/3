@@ -113,11 +113,12 @@ func ThermSeed(seed int) {
 	}
 }
 
-func (b *thermField) Mesh() *data.Mesh   { return Mesh() }
-func (b *thermField) NComp() int         { return 3 }
-func (b *thermField) Name() string       { return "Thermal field" }
-func (b *thermField) Unit() string       { return "T" }
-func (b *thermField) average() []float64 { return qAverageUniverse(b) }
+func (b *thermField) Mesh() *data.Mesh       { return Mesh() }
+func (b *thermField) NComp() int             { return 3 }
+func (b *thermField) Name() string           { return "Thermal field" }
+func (b *thermField) Unit() string           { return "T" }
+func (b *thermField) average() []float64     { return qAverageUniverse(b) }
+func (b *thermField) EvalTo(dst *data.Slice) { EvalTo(b, dst) }
 func (b *thermField) Slice() (*data.Slice, bool) {
 	b.update()
 	return b.noise, false

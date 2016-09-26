@@ -3,7 +3,6 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"reflect"
 )
 
@@ -60,6 +59,16 @@ func UnitOf(q Q) string {
 	return "?"
 }
 
+func MeshOf(q Q) *data.Mesh {
+	// quantity defines its own, custom, implementation:
+	if s, ok := q.(interface {
+		Mesh() *data.Mesh
+	}); ok {
+		return s.Mesh()
+	}
+	return Mesh()
+}
+
 func ValueOf(q Q) *data.Slice {
 	// TODO: check for Buffered() implementation
 	buf := cuda.Buffer(q.NComp(), SizeOf(q))
@@ -67,10 +76,21 @@ func ValueOf(q Q) *data.Slice {
 	return buf
 }
 
-func EvalTo(q Q, dst *data.Slice) {
-	util.AssertMsg(q.NComp() == dst.NComp() && SizeOf(q) == dst.Size(), "size mismatch")
-	q.EvalTo(dst)
+// Temporary shim to fit Slice into EvalTo
+func EvalTo(q interface {
+	Slice() (*data.Slice, bool)
+}, dst *data.Slice) {
+	v, r := q.Slice()
+	if r {
+		defer cuda.Recycle(v)
+	}
+	data.Copy(dst, v)
 }
+
+//func EvalTo(q Q, dst *data.Slice) {
+//	util.AssertMsg(q.NComp() == dst.NComp() && SizeOf(q) == dst.Size(), "size mismatch")
+//	q.EvalTo(dst)
+//}
 
 func EvalScript(q Q) (*data.Slice, bool) {
 	buf := cuda.Buffer(q.NComp(), SizeOf(q))

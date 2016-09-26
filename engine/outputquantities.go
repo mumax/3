@@ -106,7 +106,7 @@ type outputField interface {
 // value is provided by function f.
 func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorField {
 	v := AsVectorField(&fieldFunc{info{3, name, unit}, f})
-	Export(v, desc)
+	DeclROnly(name, v, cat(desc, unit))
 	return v
 }
 
@@ -114,7 +114,7 @@ func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorFiel
 // value is provided by function f.
 func NewScalarField(name, unit, desc string, f func(dst *data.Slice)) ScalarField {
 	q := AsScalarField(&fieldFunc{info{1, name, unit}, f})
-	Export(q, desc)
+	DeclROnly(name, q, cat(desc, unit))
 	return q
 }
 
@@ -123,8 +123,9 @@ type fieldFunc struct {
 	f func(*data.Slice)
 }
 
-func (c *fieldFunc) Mesh() *data.Mesh   { return Mesh() }
-func (c *fieldFunc) average() []float64 { return qAverageUniverse(c) }
+func (c *fieldFunc) Mesh() *data.Mesh       { return Mesh() }
+func (c *fieldFunc) average() []float64     { return qAverageUniverse(c) }
+func (c *fieldFunc) EvalTo(dst *data.Slice) { EvalTo(c, dst) }
 
 // Calculates and returns the quantity.
 // recycle is true: slice needs to be recycled.
@@ -138,36 +139,38 @@ func (q *fieldFunc) Slice() (s *data.Slice, recycle bool) {
 // ScalarField enhances an outputField with methods specific to
 // a space-dependent scalar quantity.
 type ScalarField struct {
-	outputField
+	Q
 }
 
 // AsScalarField promotes a quantity to a ScalarField,
 // enabling convenience methods particular to scalars.
-func AsScalarField(q outputField) ScalarField {
+func AsScalarField(q Q) ScalarField {
 	if q.NComp() != 1 {
-		panic(fmt.Errorf("ScalarField(%v): need 1 component, have: %v", q.Name(), q.NComp()))
+		panic(fmt.Errorf("ScalarField(%v): need 1 component, have: %v", NameOf(q), q.NComp()))
 	}
 	return ScalarField{q}
 }
 
-func (s ScalarField) Average() float64         { return s.outputField.average()[0] }
-func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.outputField, r)) }
+func (s ScalarField) Average() float64         { return AverageOf(s.Q)[0] }
+func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Q, r)) }
 
 // VectorField enhances an outputField with methods specific to
 // a space-dependent vector quantity.
 type VectorField struct {
-	outputField
+	Q
 }
 
 // AsVectorField promotes a quantity to a VectorField,
 // enabling convenience methods particular to vectors.
-func AsVectorField(q outputField) VectorField {
+func AsVectorField(q Q) VectorField {
 	if q.NComp() != 3 {
-		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", q.Name(), q.NComp()))
+		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", NameOf(q), q.NComp()))
 	}
 	return VectorField{q}
 }
 
-func (v VectorField) Average() data.Vector     { return unslice(v.outputField.average()) }
-func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.outputField, r)) }
-func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.outputField, c)) }
+func (v VectorField) Average() data.Vector     { return unslice(AverageOf(v.Q)) }
+func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.Q, r)) }
+func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Q, c)) }
+func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Q) }
+func (v VectorField) Name() string             { return NameOf(v.Q) }

@@ -1,6 +1,3 @@
-// TODO
-// Slice() ->  EvalTo(dst)
-
 package engine
 
 /*

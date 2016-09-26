@@ -94,11 +94,10 @@ func LoadFile(fname string) *data.Slice {
 
 // Download a quantity to host,
 // or just return its data when already on host.
-func Download(q outputField) *data.Slice {
-	buf, recycle := q.Slice()
-	if recycle {
-		defer cuda.Recycle(buf)
-	}
+func Download(q Q) *data.Slice {
+	// TODO: optimize for Buffer()
+	buf := ValueOf(q)
+	defer cuda.Recycle(buf)
 	if buf.CPUAccess() {
 		return buf
 	} else {

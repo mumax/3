@@ -19,17 +19,17 @@ import (
 
 // global GUI state stores what is currently shown in the web page.
 var (
-	gui_    = guistate{Quants: make(map[string]outputField), Params: make(map[string]Param)}
+	gui_    = guistate{Quants: make(map[string]Q), Params: make(map[string]Param)}
 	Timeout = 3 * time.Second // exit finished simulation this long after browser was closed
 )
 
 type guistate struct {
-	*gui.Page                                 // GUI elements (buttons...)
-	Quants             map[string]outputField // displayable quantities by name
-	Params             map[string]Param       // displayable parameters by name
-	render                                    // renders displayed quantity
-	mutex              sync.Mutex             // protects eventCacheBreaker and keepalive
-	_eventCacheBreaker int                    // changed on any event to make sure display is updated
+	*gui.Page                           // GUI elements (buttons...)
+	Quants             map[string]Q     // displayable quantities by name
+	Params             map[string]Param // displayable parameters by name
+	render                              // renders displayed quantity
+	mutex              sync.Mutex       // protects eventCacheBreaker and keepalive
+	_eventCacheBreaker int              // changed on any event to make sure display is updated
 	keepalive          time.Time
 }
 
@@ -88,7 +88,7 @@ func (g *guistate) Add(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		g.Params[name] = v
 	}
-	if v, ok := value.(outputField); ok {
+	if v, ok := value.(Q); ok {
 		g.Quants[name] = v
 	}
 }

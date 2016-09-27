@@ -3,8 +3,8 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
@@ -85,11 +85,11 @@ func (x *userVar) Name() string       { return x.name }
 func (x *userVar) NComp() int         { return 1 }
 func (x *userVar) Unit() string       { return x.unit }
 func (x *userVar) average() []float64 { return []float64{x.value.Float()} }
-func (x *userVar) EvalTo(dst*data.Slice)  { 
-		avg := x.average()
-		for c:=0; c<x.NComp(); c++{
-		cuda.Memset(dst.Comp(c), float32(avg[c]) )
-}
+func (x *userVar) EvalTo(dst *data.Slice) {
+	avg := x.average()
+	for c := 0; c < x.NComp(); c++ {
+		cuda.Memset(dst.Comp(c), float32(avg[c]))
+	}
 }
 
 func TableSave() {

@@ -33,7 +33,6 @@ func (i *info) Name() string { return i.name }
 func (i *info) Unit() string { return i.unit }
 func (i *info) NComp() int   { return i.nComp }
 
-
 // outputFunc is an outputValue implementation where a function provides the output value.
 // It can be scalar or vector.
 // Used internally by NewScalarValue and NewVectorValue.
@@ -44,11 +43,17 @@ type valueFunc struct {
 
 func (g *valueFunc) get() []float64     { return g.f() }
 func (g *valueFunc) average() []float64 { return g.get() }
+func (g *valueFunc) EvalTo(dst *data.Slice) {
+	v := g.get()
+	for c, v := range v {
+		cuda.Memset(dst.Comp(c), float32(v))
+	}
+}
 
 // ScalarValue enhances an outputValue with methods specific to
 // a space-independent scalar quantity (e.g. total energy).
 type ScalarValue struct {
-	Q
+	*valueFunc
 }
 
 // NewScalarValue constructs an outputable space-independent scalar quantity whose
@@ -66,7 +71,7 @@ func (s ScalarValue) Average() float64 { return s.Get() }
 // VectorValue enhances an outputValue with methods specific to
 // a space-independent vector quantity (e.g. averaged magnetization).
 type VectorValue struct {
-	Q
+	*valueFunc
 }
 
 // NewVectorValue constructs an outputable space-independent vector quantity whose

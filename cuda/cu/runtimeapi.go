@@ -4,7 +4,6 @@ package cu
 // api the rest of this package uses.
 // It might be useful to move this to a seperate package at some point.
 
-//#include <cuda.h>
 //#include <cuda_runtime.h>
 import "C"
 import "unsafe"

@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// Arbitrary physical quantity.
 type Q interface {
 	NComp() int
 	EvalTo(dst *data.Slice)
@@ -85,15 +86,4 @@ func EvalTo(q interface {
 		defer cuda.Recycle(v)
 	}
 	data.Copy(dst, v)
-}
-
-//func EvalTo(q Q, dst *data.Slice) {
-//	util.AssertMsg(q.NComp() == dst.NComp() && SizeOf(q) == dst.Size(), "size mismatch")
-//	q.EvalTo(dst)
-//}
-
-func EvalScript(q Q) (*data.Slice, bool) {
-	buf := cuda.Buffer(q.NComp(), SizeOf(q))
-	q.EvalTo(buf)
-	return buf, true
 }

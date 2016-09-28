@@ -1,12 +1,12 @@
 package engine
 
 import (
-	//"fmt"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
 )
 
+// Implicit midpoint solver.
 type BackwardEuler struct {
 	dy1 *data.Slice
 }
@@ -56,19 +56,9 @@ func (s *BackwardEuler) Step() {
 
 	err := cuda.MaxVecDiff(dy0, dy1) * float64(dt)
 
-	// adjust next time step
-	//if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
-	// step OK
 	NSteps++
 	setLastErr(err)
 	setMaxTorque(dy1)
-	//} else {
-	// undo bad step
-	//	util.Assert(FixDt == 0)
-	//	Time = t0
-	//	data.Copy(y, y0)
-	//	NUndone++
-	//}
 }
 
 func (s *BackwardEuler) Free() {

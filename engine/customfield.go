@@ -61,12 +61,11 @@ func AddCustomEnergyDensity(dst *data.Slice) {
 }
 
 func GetCustomEnergy() float64 {
-	//buf := cuda.Buffer(1, Edens_custom.Mesh().Size())
-	//defer cuda.Recycle(buf)
-	//cuda.Zero(buf)
-	//AddCustomEnergyDensity(buf)
-	//return cellVolume() * float64(cuda.Sum(buf))
-	return 999
+	buf := cuda.Buffer(1, Mesh().Size())
+	defer cuda.Recycle(buf)
+	cuda.Zero(buf)
+	AddCustomEnergyDensity(buf)
+	return cellVolume() * float64(cuda.Sum(buf))
 }
 
 type constValue struct {

@@ -11,8 +11,6 @@ import (
 	"sync"
 )
 
-//var renderer = render{img: new(image.RGBA)}
-
 type render struct {
 	mutex        sync.Mutex
 	quant        Q

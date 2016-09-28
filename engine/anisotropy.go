@@ -74,6 +74,7 @@ func AddAnisotropyField(dst *data.Slice) {
 	addCubicAnisotropyFrom(dst, M, Msat, Kc1, Kc2, Kc3, AnisC1, AnisC2)
 }
 
+// Add the anisotropy energy density to dst
 func AddAnisotropyEnergyDensity(dst *data.Slice) {
 	haveUnixial := Ku1.nonZero() || Ku2.nonZero()
 	haveCubic := Kc1.nonZero() || Kc2.nonZero() || Kc3.nonZero()

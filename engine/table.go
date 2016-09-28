@@ -184,14 +184,6 @@ func (t *DataTable) flush() {
 	t.Flush()
 }
 
-// can be saved in table
-//type TableData interface {
-//	average() []float64
-//	Name() string
-//	Unit() string
-//	NComp() int
-//}
-
 // Safe fmt.Fprint, will fail on error
 func fprint(out io.Writer, x ...interface{}) {
 	_, err := fmt.Fprint(out, x...)

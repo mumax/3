@@ -11,7 +11,6 @@ import (
 
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
-// TODO: unify with param.
 type Excitation struct {
 	name       string
 	perRegion  RegionwiseVector // Region-based excitation

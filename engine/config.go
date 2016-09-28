@@ -23,10 +23,13 @@ func init() {
 // Magnetic configuration returns m vector for position (x,y,z)
 type Config func(x, y, z float64) data.Vector
 
+// Random initial magnetization.
 func RandomMag() Config {
 	return RandomMagSeed(0)
 }
 
+// Random initial magnetization,
+// generated from random seed.
 func RandomMagSeed(seed int) Config {
 	rng := rand.New(rand.NewSource(int64(seed)))
 	return func(x, y, z float64) data.Vector {
@@ -181,16 +184,12 @@ func (c Config) RotZ(θ float64) Config {
 	}
 }
 
+// Returns a new magnetization equal to c + weight * other.
+// E.g.:
+// 	Uniform(1, 0, 0).Add(0.2, RandomMag())
+// for a uniform state with 20% random distortion.
 func (c Config) Add(weight float64, other Config) Config {
 	return func(x, y, z float64) data.Vector {
 		return c(x, y, z).MAdd(weight, other(x, y, z))
 	}
 }
-
-// Infinitely repeats the shape with given period in x, y, z.
-// A period of 0 or infinity means no repetition.
-//func (c Config) Repeat(periodX, periodY, periodZ float64) Config {
-//	return func(x, y, z float64) data.Vector {
-//		return c(fmod(x, periodX), fmod(y, periodY), fmod(z, periodZ))
-//	}
-//}

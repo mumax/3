@@ -24,6 +24,8 @@ type cropped struct {
 	x1, x2, y1, y2, z1, z2 int
 }
 
+// Crop quantity to a box enclosing the given region.
+// Used to output a region of interest, even if the region is non-rectangular.
 func CropRegion(parent Q, region int) *cropped {
 	n := MeshOf(parent).Size()
 	// use -1 for unset values

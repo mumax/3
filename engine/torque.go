@@ -36,7 +36,6 @@ func init() {
 }
 
 // Sets dst to the current total torque
-// TODO: extensible
 func SetTorque(dst *data.Slice) {
 	SetLLTorque(dst)
 	AddSTTorque(dst)
@@ -108,7 +107,6 @@ func FreezeSpins(dst *data.Slice) {
 	}
 }
 
-// Gets
 func GetMaxTorque() float64 {
 	torque := ValueOf(Torque)
 	defer cuda.Recycle(torque)

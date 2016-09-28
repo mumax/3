@@ -42,7 +42,7 @@ func init() {
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
 	DeclFunc("Exit", Exit, "Exit from the program")
 	SetSolver(DORMANDPRINCE)
-	_ = NewScalarValue("dt", "s", "Time Step", func() float64 { return Dt_si }) // TODO: fromPtr
+	_ = NewScalarValue("dt", "s", "Time Step", func() float64 { return Dt_si })
 	_ = NewScalarValue("LastErr", "", "Error of last step", func() float64 { return LastErr })
 	_ = NewScalarValue("PeakErr", "", "Overall maxium error per step", func() float64 { return PeakErr })
 	_ = NewScalarValue("NEval", "", "Total number of torque evaluations", func() float64 { return float64(NEvals) })

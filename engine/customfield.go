@@ -268,3 +268,37 @@ func divN1(dst, a, b *data.Slice) {
 		cuda.Div(dst.Comp(c), a.Comp(c), b)
 	}
 }
+
+type shifted struct {
+	orig       Quantity
+	dx, dy, dz int
+}
+
+// Shifted returns a new Quantity that evaluates to
+// the original, shifted over dx, dy, dz cells.
+func Shifted(q Quantity, dx, dy, dz int) Quantity {
+	util.Assert(dx != 0 || dy != 0 || dz != 0)
+	return &shifted{q, dx, dy, dz}
+}
+
+func (q *shifted) EvalTo(dst *data.Slice) {
+	orig := ValueOf(q.orig)
+	defer cuda.Recycle(orig)
+	for i := 0; i < q.NComp(); i++ {
+		dsti := dst.Comp(i)
+		origi := orig.Comp(i)
+		if q.dx != 0 {
+			cuda.ShiftX(dsti, origi, q.dx, 0, 0)
+		}
+		if q.dy != 0 {
+			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
+		}
+		if q.dz != 0 {
+			cuda.ShiftZ(dsti, origi, q.dy, 0, 0)
+		}
+	}
+}
+
+func (q *shifted) NComp() int {
+	return q.orig.NComp()
+}

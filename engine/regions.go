@@ -195,7 +195,7 @@ func (r *Regions) Slice() (*data.Slice, bool) {
 
 func (r *Regions) EvalTo(dst *data.Slice) { EvalTo(r, dst) }
 
-var _ Q = &regions
+var _ Quantity = &regions
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
 func reshapeBytes(array []byte, size [3]int) [][][]byte {

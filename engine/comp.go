@@ -10,12 +10,12 @@ import (
 )
 
 type component struct {
-	parent Q
+	parent Quantity
 	comp   int
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent Q, c int) ScalarField {
+func Comp(parent Quantity, c int) ScalarField {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return AsScalarField(&component{parent, c})
 }

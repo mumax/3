@@ -122,38 +122,38 @@ func (q *fieldFunc) Slice() (s *data.Slice, recycle bool) {
 // ScalarField enhances an outputField with methods specific to
 // a space-dependent scalar quantity.
 type ScalarField struct {
-	Q
+	Quantity
 }
 
 // AsScalarField promotes a quantity to a ScalarField,
 // enabling convenience methods particular to scalars.
-func AsScalarField(q Q) ScalarField {
+func AsScalarField(q Quantity) ScalarField {
 	if q.NComp() != 1 {
 		panic(fmt.Errorf("ScalarField(%v): need 1 component, have: %v", NameOf(q), q.NComp()))
 	}
 	return ScalarField{q}
 }
 
-func (s ScalarField) Average() float64         { return AverageOf(s.Q)[0] }
-func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Q, r)) }
+func (s ScalarField) Average() float64         { return AverageOf(s.Quantity)[0] }
+func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Quantity, r)) }
 
 // VectorField enhances an outputField with methods specific to
 // a space-dependent vector quantity.
 type VectorField struct {
-	Q
+	Quantity
 }
 
 // AsVectorField promotes a quantity to a VectorField,
 // enabling convenience methods particular to vectors.
-func AsVectorField(q Q) VectorField {
+func AsVectorField(q Quantity) VectorField {
 	if q.NComp() != 3 {
 		panic(fmt.Errorf("VectorField(%v): need 3 components, have: %v", NameOf(q), q.NComp()))
 	}
 	return VectorField{q}
 }
 
-func (v VectorField) Average() data.Vector     { return unslice(AverageOf(v.Q)) }
-func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.Q, r)) }
-func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Q, c)) }
-func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Q) }
-func (v VectorField) Name() string             { return NameOf(v.Q) }
+func (v VectorField) Average() data.Vector     { return unslice(AverageOf(v.Quantity)) }
+func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.Quantity, r)) }
+func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Quantity, c)) }
+func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Quantity) }
+func (v VectorField) Name() string             { return NameOf(v.Quantity) }

@@ -7,7 +7,7 @@ import (
 )
 
 // Arbitrary physical quantity.
-type Q interface {
+type Quantity interface {
 	NComp() int
 	EvalTo(dst *data.Slice)
 }
@@ -16,7 +16,7 @@ func MeshSize() [3]int {
 	return Mesh().Size()
 }
 
-func SizeOf(q Q) [3]int {
+func SizeOf(q Quantity) [3]int {
 	// quantity defines its own, custom, implementation:
 	if s, ok := q.(interface {
 		Mesh() *data.Mesh
@@ -27,7 +27,7 @@ func SizeOf(q Q) [3]int {
 	return MeshSize()
 }
 
-func AverageOf(q Q) []float64 {
+func AverageOf(q Quantity) []float64 {
 	// quantity defines its own, custom, implementation:
 	if s, ok := q.(interface {
 		average() []float64
@@ -40,7 +40,7 @@ func AverageOf(q Q) []float64 {
 	return sAverageMagnet(buf)
 }
 
-func NameOf(q Q) string {
+func NameOf(q Quantity) string {
 	// quantity defines its own, custom, implementation:
 	if s, ok := q.(interface {
 		Name() string
@@ -50,7 +50,7 @@ func NameOf(q Q) string {
 	return "unnamed." + reflect.TypeOf(q).String()
 }
 
-func UnitOf(q Q) string {
+func UnitOf(q Quantity) string {
 	// quantity defines its own, custom, implementation:
 	if s, ok := q.(interface {
 		Unit() string
@@ -60,7 +60,7 @@ func UnitOf(q Q) string {
 	return "?"
 }
 
-func MeshOf(q Q) *data.Mesh {
+func MeshOf(q Quantity) *data.Mesh {
 	// quantity defines its own, custom, implementation:
 	if s, ok := q.(interface {
 		Mesh() *data.Mesh
@@ -70,7 +70,7 @@ func MeshOf(q Q) *data.Mesh {
 	return Mesh()
 }
 
-func ValueOf(q Q) *data.Slice {
+func ValueOf(q Quantity) *data.Slice {
 	// TODO: check for Buffered() implementation
 	buf := cuda.Buffer(q.NComp(), SizeOf(q))
 	q.EvalTo(buf)

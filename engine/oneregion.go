@@ -7,20 +7,20 @@ import (
 	"github.com/mumax/3/util"
 )
 
-func sInRegion(q Q, r int) ScalarField {
+func sInRegion(q Quantity, r int) ScalarField {
 	return AsScalarField(inRegion(q, r))
 }
 
-func vInRegion(q Q, r int) VectorField {
+func vInRegion(q Quantity, r int) VectorField {
 	return AsVectorField(inRegion(q, r))
 }
 
-func sOneRegion(q Q, r int) *sOneReg {
+func sOneRegion(q Quantity, r int) *sOneReg {
 	util.Argument(q.NComp() == 1)
 	return &sOneReg{oneReg{q, r}}
 }
 
-func vOneRegion(q Q, r int) *vOneReg {
+func vOneRegion(q Quantity, r int) *vOneReg {
 	util.Argument(q.NComp() == 3)
 	return &vOneReg{oneReg{q, r}}
 }
@@ -35,11 +35,11 @@ func (q *vOneReg) Average() data.Vector { return unslice(q.average()) }
 
 // represents a new quantity equal to q in the given region, 0 outside.
 type oneReg struct {
-	parent Q
+	parent Quantity
 	region int
 }
 
-func inRegion(q Q, region int) Q {
+func inRegion(q Quantity, region int) Quantity {
 	return &oneReg{q, region}
 }
 

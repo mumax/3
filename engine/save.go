@@ -50,14 +50,14 @@ func (*oformat) SetValue(v interface{}) { drainOutput(); outputFormat = v.(Outpu
 func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
 
 // Save once, with auto file name
-func Save(q Q) {
+func Save(q Quantity) {
 	fname := autoFname(NameOf(q), outputFormat, autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 }
 
 // Save under given file name (transparent async I/O).
-func SaveAs(q Q, fname string) {
+func SaveAs(q Quantity, fname string) {
 
 	if !strings.HasPrefix(fname, OD()) {
 		fname = OD() + fname // don't clean, turns http:// in http:/
@@ -74,7 +74,7 @@ func SaveAs(q Q, fname string) {
 }
 
 // Save image once, with auto file name
-func Snapshot(q Q) {
+func Snapshot(q Quantity) {
 	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, NameOf(q), autonum[q])
 	s := ValueOf(q)
 	defer cuda.Recycle(s)

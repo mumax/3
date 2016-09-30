@@ -31,7 +31,7 @@ type DataTable struct {
 		Flush() error
 	}
 	info
-	outputs []Q
+	outputs []Quantity
 	autosave
 	flushlock sync.Mutex
 }
@@ -64,7 +64,7 @@ func newTable(name string) *DataTable {
 	return t
 }
 
-func TableAdd(col Q) {
+func TableAdd(col Quantity) {
 	Table.Add(col)
 }
 
@@ -100,7 +100,7 @@ func TableAutoSave(period float64) {
 	Table.autosave = autosave{period, Time, -1, nil} // count -1 allows output on t=0
 }
 
-func (t *DataTable) Add(output Q) {
+func (t *DataTable) Add(output Quantity) {
 	if t.inited() {
 		util.Fatal("data table add ", NameOf(output), ": need to add quantity before table is output the first time")
 	}

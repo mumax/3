@@ -19,14 +19,14 @@ func init() {
 }
 
 type cropped struct {
-	parent                 Q
+	parent                 Quantity
 	name                   string
 	x1, x2, y1, y2, z1, z2 int
 }
 
 // Crop quantity to a box enclosing the given region.
 // Used to output a region of interest, even if the region is non-rectangular.
-func CropRegion(parent Q, region int) *cropped {
+func CropRegion(parent Quantity, region int) *cropped {
 	n := MeshOf(parent).Size()
 	// use -1 for unset values
 	x1, y1, z1 := -1, -1, -1
@@ -66,27 +66,27 @@ func CropRegion(parent Q, region int) *cropped {
 	return Crop(parent, x1, x2+1, y1, y2+1, z1, z2+1)
 }
 
-func CropLayer(parent Q, layer int) *cropped {
+func CropLayer(parent Quantity, layer int) *cropped {
 	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], 0, n[Y], layer, layer+1)
 }
 
-func CropX(parent Q, x1, x2 int) *cropped {
+func CropX(parent Quantity, x1, x2 int) *cropped {
 	n := MeshOf(parent).Size()
 	return Crop(parent, x1, x2, 0, n[Y], 0, n[Z])
 }
 
-func CropY(parent Q, y1, y2 int) *cropped {
+func CropY(parent Quantity, y1, y2 int) *cropped {
 	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], y1, y2, 0, n[Z])
 }
 
-func CropZ(parent Q, z1, z2 int) *cropped {
+func CropZ(parent Quantity, z1, z2 int) *cropped {
 	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], 0, n[Y], z1, z2)
 }
 
-func Crop(parent Q, x1, x2, y1, y2, z1, z2 int) *cropped {
+func Crop(parent Quantity, x1, x2, y1, y2, z1, z2 int) *cropped {
 	n := MeshOf(parent).Size()
 	util.Argument(x1 < x2 && y1 < y2 && z1 < z2)
 	util.Argument(x1 >= 0 && y1 >= 0 && z1 >= 0)

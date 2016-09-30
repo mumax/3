@@ -13,8 +13,8 @@ var (
 	B_custom       = NewVectorField("B_custom", "T", "User-defined field", AddCustomField)
 	Edens_custom   = NewScalarField("Edens_custom", "J/m3", "Energy density of user-defined field.", AddCustomEnergyDensity)
 	E_custom       = NewScalarValue("E_custom", "J", "total energy of user-defined field", GetCustomEnergy)
-	customTerms    []Q // vector
-	customEnergies []Q // scalar
+	customTerms    []Quantity // vector
+	customEnergies []Quantity // scalar
 )
 
 func init() {
@@ -30,14 +30,14 @@ func init() {
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
 // Be sure to also add the corresponding energy term using AddEnergyTerm.
-func AddFieldTerm(b Q) {
+func AddFieldTerm(b Quantity) {
 	customTerms = append(customTerms, b)
 }
 
 // AddEnergyTerm adds an energy density function (returning Joules/m³) to Edens_total.
 // Needed when AddFieldTerm was used and a correct energy is needed
 // (e.g. for Relax, Minimize, ...).
-func AddEdensTerm(e Q) {
+func AddEdensTerm(e Quantity) {
 	customEnergies = append(customEnergies, e)
 }
 
@@ -82,13 +82,13 @@ func (d *constValue) EvalTo(dst *data.Slice) {
 
 // Const returns a constant (uniform) scalar quantity,
 // that can be used to construct custom field terms.
-func Const(v float64) Q {
+func Const(v float64) Quantity {
 	return &constValue{[]float64{v}}
 }
 
 // ConstVector returns a constant (uniform) vector quantity,
 // that can be used to construct custom field terms.
-func ConstVector(x, y, z float64) Q {
+func ConstVector(x, y, z float64) Quantity {
 	return &constValue{[]float64{x, y, z}}
 }
 
@@ -96,7 +96,7 @@ func ConstVector(x, y, z float64) Q {
 // (like add, multiply, ...) on space-dependend quantites
 // (like M, B_sat, ...)
 type fieldOp struct {
-	a, b  Q
+	a, b  Quantity
 	nComp int
 }
 
@@ -109,12 +109,12 @@ type dotProduct struct {
 }
 
 type mulmv struct {
-	ax, ay, az, b Q
+	ax, ay, az, b Quantity
 }
 
 // MulMV returns a new Quantity that evaluates to the
 // matrix-vector product (Ax·b, Ay·b, Az·b).
-func MulMV(Ax, Ay, Az, b Q) Q {
+func MulMV(Ax, Ay, Az, b Quantity) Quantity {
 	util.Argument(Ax.NComp() == 3 &&
 		Ay.NComp() == 3 &&
 		Az.NComp() == 3 &&
@@ -153,7 +153,7 @@ func (q *mulmv) NComp() int {
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
 // 	DotProct(&M, &B_ext)
-func Dot(a, b Q) Q {
+func Dot(a, b Quantity) Quantity {
 	return &dotProduct{fieldOp{a, b, 1}}
 }
 
@@ -171,7 +171,7 @@ type pointwiseMul struct {
 }
 
 // Mul returns a new quantity that evaluates to the pointwise product a and b.
-func Mul(a, b Q) Q {
+func Mul(a, b Quantity) Quantity {
 	nComp := -1
 	switch {
 	case a.NComp() == b.NComp():
@@ -227,7 +227,7 @@ type pointwiseDiv struct {
 }
 
 // Div returns a new quantity that evaluates to the pointwise product a and b.
-func Div(a, b Q) Q {
+func Div(a, b Quantity) Quantity {
 	nComp := -1
 	switch {
 	case a.NComp() == b.NComp():

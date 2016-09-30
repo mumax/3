@@ -49,7 +49,7 @@ func cellVolume() float64 {
 
 // returns a function that adds to dst the energy density:
 // 	prefactor * dot (M_full, field)
-func makeEdensAdder(field Q, prefactor float64) func(*data.Slice) {
+func makeEdensAdder(field Quantity, prefactor float64) func(*data.Slice) {
 	return func(dst *data.Slice) {
 		B := ValueOf(field)
 		defer cuda.Recycle(B)
@@ -61,7 +61,7 @@ func makeEdensAdder(field Q, prefactor float64) func(*data.Slice) {
 }
 
 // vector dot product
-func dot(a, b Q) float64 {
+func dot(a, b Quantity) float64 {
 	A := ValueOf(a)
 	defer cuda.Recycle(A)
 	B := ValueOf(b)

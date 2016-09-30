@@ -94,7 +94,7 @@ func LoadFile(fname string) *data.Slice {
 
 // Download a quantity to host,
 // or just return its data when already on host.
-func Download(q Q) *data.Slice {
+func Download(q Quantity) *data.Slice {
 	// TODO: optimize for Buffer()
 	buf := ValueOf(q)
 	defer cuda.Recycle(buf)
@@ -117,7 +117,7 @@ func myFmt(msg []interface{}) []interface{} {
 			msg[i] = *e
 		}
 		// Tabledata: print average
-		if m, ok := m.(Q); ok {
+		if m, ok := m.(Quantity); ok {
 			str := fmt.Sprint(AverageOf(m))
 			msg[i] = str[1 : len(str)-1] // remove [ ]
 			continue

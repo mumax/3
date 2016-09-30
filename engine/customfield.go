@@ -80,10 +80,14 @@ func (d *constValue) EvalTo(dst *data.Slice) {
 	}
 }
 
+// Const returns a constant (uniform) scalar quantity,
+// that can be used to construct custom field terms.
 func Const(v float64) Q {
 	return &constValue{[]float64{v}}
 }
 
+// ConstVector returns a constant (uniform) vector quantity,
+// that can be used to construct custom field terms.
 func ConstVector(x, y, z float64) Q {
 	return &constValue{[]float64{x, y, z}}
 }
@@ -108,6 +112,8 @@ type mulmv struct {
 	ax, ay, az, b Q
 }
 
+// MulMV returns a new Quantity that evaluates to the
+// matrix-vector product (Ax·b, Ay·b, Az·b).
 func MulMV(Ax, Ay, Az, b Q) Q {
 	util.Argument(Ax.NComp() == 3 &&
 		Ay.NComp() == 3 &&
@@ -164,6 +170,7 @@ type pointwiseMul struct {
 	fieldOp
 }
 
+// Mul returns a new quantity that evaluates to the pointwise product a and b.
 func Mul(a, b Q) Q {
 	nComp := -1
 	switch {
@@ -219,6 +226,7 @@ type pointwiseDiv struct {
 	fieldOp
 }
 
+// Div returns a new quantity that evaluates to the pointwise product a and b.
 func Div(a, b Q) Q {
 	nComp := -1
 	switch {

@@ -20,12 +20,14 @@ var (
 func init() {
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
 	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
+	DeclFunc("Add", Add, "Sum of two vector quantities")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
 	DeclFunc("Const", Const, "Constant, uniform number")
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
+	DeclFunc("Shifted", Shifted, "Shifted quantity")
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
@@ -166,6 +168,19 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 	cuda.AddDotProduct(dst, 1, A, B)
 }
 
+func Add(a, b Quantity) Quantity {
+	return &addition{fieldOp{a, b, 3}}
+}
+
+func (d *addition) EvalTo(dst *data.Slice) {
+	A := ValueOf(d.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(d.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.Add(dst, A, B)
+}
+
 type pointwiseMul struct {
 	fieldOp
 }
@@ -294,7 +309,7 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
 		}
 		if q.dz != 0 {
-			cuda.ShiftZ(dsti, origi, q.dy, 0, 0)
+			cuda.ShiftZ(dsti, origi, q.dx, 0, 0)
 		}
 	}
 }

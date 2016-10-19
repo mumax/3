@@ -110,6 +110,11 @@ type dotProduct struct {
 	fieldOp
 }
 
+type addition struct {
+	fieldOp
+}
+
+
 type mulmv struct {
 	ax, ay, az, b Quantity
 }

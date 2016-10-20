@@ -314,7 +314,7 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
 		}
 		if q.dz != 0 {
-			cuda.ShiftZ(dsti, origi, q.dx, 0, 0)
+			cuda.ShiftZ(dsti, origi, q.dz, 0, 0)
 		}
 	}
 }

@@ -28,6 +28,7 @@ func init() {
 	DeclFunc("Const", Const, "Constant, uniform number")
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 	DeclFunc("Shifted", Shifted, "Shifted quantity")
+	DeclFunc("Masked", Masked, "Mask quantity with shape")
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
@@ -323,4 +324,57 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 
 func (q *shifted) NComp() int {
 	return q.orig.NComp()
+}
+
+// Masks a quantity with a shape
+// The shape will be only evaluated once on the mesh,
+// and will be re-evaluated after mesh change,
+// because otherwise too slow
+func Masked(q Quantity, shape Shape) Quantity {
+	return &masked{q, shape, nil, data.Mesh{}}
+}
+
+type masked struct {
+	orig  Quantity
+	shape Shape
+	mask  *data.Slice
+	mesh  data.Mesh
+}
+
+func (q *masked) EvalTo(dst *data.Slice) {
+	if q.mesh != *Mesh() {
+		// When mesh is changed, mask needs an update
+		q.createMask()
+	}
+	orig := ValueOf(q.orig)
+	defer cuda.Recycle(orig)
+	mul1N(dst, q.mask, orig)
+}
+
+func (q *masked) NComp() int {
+	return q.orig.NComp()
+}
+
+func (q *masked) createMask() {
+	size := Mesh().Size()
+	// Prepare mask on host
+	maskhost := data.NewSlice(SCALAR, size)
+	defer maskhost.Free()
+	maskScalars := maskhost.Scalars()
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				r := Index2Coord(ix, iy, iz)
+				if q.shape(r[X], r[Y], r[Z]) {
+					maskScalars[iz][iy][ix] = 1
+				}
+			}
+		}
+	}
+	// Update mask
+	q.mask.Free()
+	q.mask = cuda.NewSlice(SCALAR, size)
+	data.Copy(q.mask, maskhost)
+	q.mesh = *Mesh()
+	// Remove mask from host
 }

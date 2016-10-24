@@ -21,6 +21,7 @@ func init() {
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
 	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
 	DeclFunc("Add", Add, "Add two quantities")
+	DeclFunc("Madd", Madd, "Weighted addition: Madd(Q1,Q2,c1,c2) = c1*Q1 + c2*Q2")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
@@ -115,6 +116,11 @@ type addition struct {
 	fieldOp
 }
 
+type mAddition struct {
+	fieldOp
+	fac1, fac2 float64
+}
+
 type mulmv struct {
 	ax, ay, az, b Quantity
 }
@@ -191,6 +197,22 @@ func (d *addition) EvalTo(dst *data.Slice) {
 
 type pointwiseMul struct {
 	fieldOp
+}
+
+func Madd(a, b Quantity, fac1, fac2 float64) *mAddition {
+	if a.NComp() != b.NComp() {
+		panic(fmt.Sprintf("Cannot point-wise add %v components by %v components", a.NComp(), b.NComp()))
+	}
+	return &mAddition{fieldOp{a, b, a.NComp()}, fac1, fac2}
+}
+
+func (o *mAddition) EvalTo(dst *data.Slice) {
+	A := ValueOf(o.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(o.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.Madd2(dst, A, B, float32(o.fac1), float32(o.fac2))
 }
 
 // Mul returns a new quantity that evaluates to the pointwise product a and b.

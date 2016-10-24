@@ -20,7 +20,7 @@ var (
 func init() {
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
 	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
-	DeclFunc("Add", Add, "Sum of two vector quantities")
+	DeclFunc("Add", Add, "Add two quantities")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
@@ -114,7 +114,6 @@ type addition struct {
 	fieldOp
 }
 
-
 type mulmv struct {
 	ax, ay, az, b Quantity
 }
@@ -174,7 +173,10 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 }
 
 func Add(a, b Quantity) Quantity {
-	return &addition{fieldOp{a, b, 3}}
+	if a.NComp() != b.NComp() {
+		panic(fmt.Sprintf("Cannot point-wise Add %v components by %v components", a.NComp(), b.NComp()))
+	}
+	return &addition{fieldOp{a, b, a.NComp()}}
 }
 
 func (d *addition) EvalTo(dst *data.Slice) {

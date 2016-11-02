@@ -157,3 +157,6 @@ func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v
 func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Quantity, c)) }
 func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Quantity) }
 func (v VectorField) Name() string             { return NameOf(v.Quantity) }
+func (v VectorField) HostCopy() *data.Slice {
+	return ValueOf(v.Quantity)
+}

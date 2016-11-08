@@ -136,6 +136,7 @@ func AsScalarField(q Quantity) ScalarField {
 
 func (s ScalarField) Average() float64         { return AverageOf(s.Quantity)[0] }
 func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Quantity, r)) }
+func (s ScalarField) Name() string             { return NameOf(s.Quantity) }
 
 // VectorField enhances an outputField with methods specific to
 // a space-dependent vector quantity.

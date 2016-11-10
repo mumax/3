@@ -39,6 +39,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -125,8 +126,16 @@ func main() {
 		log.Fatal("no output format specified (e.g.: -png)")
 	}
 
+	// expand wildcards which are not expanded by the shell
+	// (pointing a finger at cmd.exe)
+	var fnames []string
+	for _, input := range flag.Args() {
+		fmt.Println(input)
+		expanded, _ := filepath.Glob(input)
+		fnames = append(fnames, expanded...)
+	}
 	// read all input files and put them in the task que
-	for _, fname := range flag.Args() {
+	for _, fname := range fnames {
 		for _, outp := range wantOut {
 			fname := fname // closure caveats
 			outp := outp

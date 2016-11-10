@@ -18,6 +18,7 @@ var (
 )
 
 func init() {
+	registerEnergy(GetCustomEnergy, AddCustomEnergyDensity)
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
 	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
 	DeclFunc("Add", Add, "Add two quantities")

@@ -18,14 +18,19 @@ var (
 )
 
 func init() {
+	registerEnergy(GetCustomEnergy, AddCustomEnergyDensity)
 	DeclFunc("AddFieldTerm", AddFieldTerm, "Add an expression to B_eff.")
 	DeclFunc("AddEdensTerm", AddEdensTerm, "Add an expression to Edens.")
+	DeclFunc("Add", Add, "Add two quantities")
+	DeclFunc("Madd", Madd, "Weighted addition: Madd(Q1,Q2,c1,c2) = c1*Q1 + c2*Q2")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
 	DeclFunc("Const", Const, "Constant, uniform number")
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
+	DeclFunc("Shifted", Shifted, "Shifted quantity")
+	DeclFunc("Masked", Masked, "Mask quantity with shape")
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
@@ -108,6 +113,15 @@ type dotProduct struct {
 	fieldOp
 }
 
+type addition struct {
+	fieldOp
+}
+
+type mAddition struct {
+	fieldOp
+	fac1, fac2 float64
+}
+
 type mulmv struct {
 	ax, ay, az, b Quantity
 }
@@ -166,8 +180,40 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 	cuda.AddDotProduct(dst, 1, A, B)
 }
 
+func Add(a, b Quantity) Quantity {
+	if a.NComp() != b.NComp() {
+		panic(fmt.Sprintf("Cannot point-wise Add %v components by %v components", a.NComp(), b.NComp()))
+	}
+	return &addition{fieldOp{a, b, a.NComp()}}
+}
+
+func (d *addition) EvalTo(dst *data.Slice) {
+	A := ValueOf(d.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(d.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.Add(dst, A, B)
+}
+
 type pointwiseMul struct {
 	fieldOp
+}
+
+func Madd(a, b Quantity, fac1, fac2 float64) *mAddition {
+	if a.NComp() != b.NComp() {
+		panic(fmt.Sprintf("Cannot point-wise add %v components by %v components", a.NComp(), b.NComp()))
+	}
+	return &mAddition{fieldOp{a, b, a.NComp()}, fac1, fac2}
+}
+
+func (o *mAddition) EvalTo(dst *data.Slice) {
+	A := ValueOf(o.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(o.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.Madd2(dst, A, B, float32(o.fac1), float32(o.fac2))
 }
 
 // Mul returns a new quantity that evaluates to the pointwise product a and b.
@@ -294,11 +340,64 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
 		}
 		if q.dz != 0 {
-			cuda.ShiftZ(dsti, origi, q.dy, 0, 0)
+			cuda.ShiftZ(dsti, origi, q.dz, 0, 0)
 		}
 	}
 }
 
 func (q *shifted) NComp() int {
 	return q.orig.NComp()
+}
+
+// Masks a quantity with a shape
+// The shape will be only evaluated once on the mesh,
+// and will be re-evaluated after mesh change,
+// because otherwise too slow
+func Masked(q Quantity, shape Shape) Quantity {
+	return &masked{q, shape, nil, data.Mesh{}}
+}
+
+type masked struct {
+	orig  Quantity
+	shape Shape
+	mask  *data.Slice
+	mesh  data.Mesh
+}
+
+func (q *masked) EvalTo(dst *data.Slice) {
+	if q.mesh != *Mesh() {
+		// When mesh is changed, mask needs an update
+		q.createMask()
+	}
+	orig := ValueOf(q.orig)
+	defer cuda.Recycle(orig)
+	mul1N(dst, q.mask, orig)
+}
+
+func (q *masked) NComp() int {
+	return q.orig.NComp()
+}
+
+func (q *masked) createMask() {
+	size := Mesh().Size()
+	// Prepare mask on host
+	maskhost := data.NewSlice(SCALAR, size)
+	defer maskhost.Free()
+	maskScalars := maskhost.Scalars()
+	for iz := 0; iz < size[Z]; iz++ {
+		for iy := 0; iy < size[Y]; iy++ {
+			for ix := 0; ix < size[X]; ix++ {
+				r := Index2Coord(ix, iy, iz)
+				if q.shape(r[X], r[Y], r[Z]) {
+					maskScalars[iz][iy][ix] = 1
+				}
+			}
+		}
+	}
+	// Update mask
+	q.mask.Free()
+	q.mask = cuda.NewSlice(SCALAR, size)
+	data.Copy(q.mask, maskhost)
+	q.mesh = *Mesh()
+	// Remove mask from host
 }

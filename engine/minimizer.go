@@ -114,6 +114,7 @@ func (mini *Minimizer) Free() {
 }
 
 func Minimize() {
+	Refer("exl2014")
 	SanityCheck()
 	// Save the settings we are changing...
 	prevType := solvertype

@@ -56,17 +56,34 @@ func magsign(x float64) int {
 
 // used for speed
 var (
-	lastShift float64 // shift the last time we queried speed
-	lastT     float64 // time the last time we queried speed
-	lastV     float64 // speed the last time we queried speed
-	DWSpeed   = NewGetScalar("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
+	lastT   float64 // time the last time we queried speed
+	lastP   float64 // position the last time we queried speed
+	DWSpeed = NewGetScalar("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
-func getShiftSpeed() float64 {
-	if lastShift != GetShiftPos() {
-		lastV = (GetShiftPos() - lastShift) / (Time - lastT)
-		lastShift = GetShiftPos()
-		lastT = Time
+func getShiftSpeed(c int) float64 {
+	if lastP == 0 {
+		lastP = wallPos(c)
 	}
-	return lastV
+	velocity := (wallPos(c) - lastP) / (Time - lastT)
+	lastP = wallPos(c)
+	lastT = Time
+	return velocity
 }
+
+//wall x-position
+func wallPos(c int) float64 {
+	m, _ := M.Slice()
+	avg_m := sAverageMagnet(m)
+
+	s := m.Size()
+	Nc := s[c]
+	pos := -(1. - avg_m[c]) * float64(Nc) / 2.
+
+	cs := Mesh().CellSize()
+	pos *= cs[c]
+
+	pos += GetShiftPos() // add simulation window shift
+	return pos
+}
+

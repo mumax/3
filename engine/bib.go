@@ -27,7 +27,7 @@ func init() {
 
 func initBib() { // inited in engine.InitIO
 	if bibfile != nil {
-		panic("bib already inited")
+		panic("bib already initialized")
 	}
 	var err error
 	bibfile, err = httpfs.Create(OD() + "references.bib")
@@ -102,6 +102,26 @@ func buildLibrary() {
     year    = {2014},
     doi     = {10.1063/1.4862839},
     url     = {http://doi.org/10.1063/1.4862839}
+}`}
+
+	library["Lel2014"] = &bibEntry{
+		reason: "Mumax3 used function ext_makegrains",
+		bibtex: `
+@article{Lel2014,
+    author  = {Leliaert, Jonathan and 
+	       Van de Wiele, Ben and 
+	       Vansteenkiste, Arne and
+	       Laurson, Lasse and
+	       Durin, Gianfranco and 
+	       Dupr{\'e}, Luc and 
+               Van Waeyenberge, Bartel},
+    title   = {{Current-driven domain wall mobility in polycrystalline permalloy nanowires: A numerical study}},
+                descent method for micromagnetic energy minimization}},
+    number  = {23},
+    pages   = {233903},
+    year    = {2014},
+    doi     = {10.1063/1.4883297},
+    url     = {http://dx.doi.org/10.1063/1.4883297}
 }`}
 
 }

@@ -58,7 +58,7 @@ Your binary is now at `$GOPATH/bin/mumax3`
 To do all at once on Ubuntu:
 ```
 sudo apt-get install git golang-go gcc nvidia-cuda-toolkit nvidia-cuda-dev nvidia-340 gnuplot
-export GOPATH=$HOME go get -u -v github.com/mumax/3/cmd/mumax3
+GOPATH=$HOME go get -u -v github.com/mumax/3/cmd/mumax3
 ```
 
 Contributing

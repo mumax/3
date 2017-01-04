@@ -89,10 +89,10 @@ func buildLibrary() {
 @article{Exl2014,
     author  = {Exl, Lukas and
                Bance, Simon and
-	       Reichel, Franz and
-	       Schrefl, Thomas and
-	       {Peter Stimming}, Hans and
-	       Mauser, Norbert J.},
+               Reichel, Franz and
+               Schrefl, Thomas and
+               {Peter Stimming}, Hans and
+               Mauser, Norbert J.},
     title   = {{LaBonte's method revisited: An effective steepest
                 descent method for micromagnetic energy minimization}},
     journal = {Journal of Applied Physics},

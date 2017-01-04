@@ -43,4 +43,5 @@ func InitIO(inputfile, od string, force bool) {
 	_ = httpfs.Mkdir(od)
 
 	initLog()
+	initBib()
 }

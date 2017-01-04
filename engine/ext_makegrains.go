@@ -10,6 +10,7 @@ func init() {
 }
 
 func Voronoi(grainsize float64, numRegions, seed int) {
+	Refer("Lel2014")
 	SetBusy(true)
 	defer SetBusy(false)
 

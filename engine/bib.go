@@ -108,12 +108,12 @@ func buildLibrary() {
 		reason: "Mumax3 used function ext_makegrains",
 		bibtex: `
 @article{Lel2014,
-    author  = {Leliaert, Jonathan and 
-	       Van de Wiele, Ben and 
-	       Vansteenkiste, Arne and
-	       Laurson, Lasse and
-	       Durin, Gianfranco and 
-	       Dupr{\'e}, Luc and 
+    author  = {Leliaert, Jonathan and
+               Van de Wiele, Ben and
+               Vansteenkiste, Arne and
+               Laurson, Lasse and
+               Durin, Gianfranco and
+               Dupr{\'e}, Luc and
                Van Waeyenberge, Bartel},
     title   = {{Current-driven domain wall mobility in polycrystalline permalloy nanowires: A numerical study}},
                 descent method for micromagnetic energy minimization}},

@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	DWPos   = NewScalarValue("ext_dwpos", "m", "Position of the simulation window while following a domain wall", GetShiftPos) // TODO: make more accurate
+	DWPos   = NewScalarValue("ext_dwpos", "m", "Position of the simulation window while following a domain wall", GetXPos)
 	DWSpeed = NewScalarValue("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
@@ -37,6 +37,21 @@ func centerWall(c int) {
 		Shift(-sign)
 	}
 }
+
+
+
+func GetXPos() float64 {
+        c :=0
+        M := &M
+        mc := sAverageUniverse(M.Buffer().Comp(c))[0]
+        n := Mesh().Size()
+        cs := Mesh().CellSize()
+        pos := (float64(n[0])*cs[0])/2.*(mc)//+1)
+        pos += GetShiftPos()
+return float64(pos)
+}
+
+
 
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:

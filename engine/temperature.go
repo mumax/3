@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"math"
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/curand"
 	"github.com/mumax/3/data"

@@ -238,6 +238,31 @@ func (b *Regions) shift(dx int) {
 	}
 }
 
+func (b *Regions) shiftY(dy int) {
+	// TODO: return if no regions defined
+	r1 := b.Gpu()
+	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
+	defer r2.Free()
+	newreg := byte(0) // new region at edge
+	cuda.ShiftBytesY(r2, r1, b.Mesh(), dy, newreg)
+	r1.Copy(r2)
+
+	n := Mesh().Size()
+	y1, y2 := shiftDirtyRange(dy)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for ix := 0; ix < n[X]; ix++ {
+			for iy := y1; iy < y2; iy++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				reg := b.get(r)
+				if reg != 0 {
+					b.SetCell(ix, iy, iz, reg) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+}
+
 func (r *Regions) Mesh() *data.Mesh { return Mesh() }
 
 func prod(s [3]int) int {

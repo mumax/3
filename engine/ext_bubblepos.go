@@ -46,7 +46,7 @@ func bubblePos() []float64 {
 
 	c := Mesh().CellSize()
 	n := Mesh().Size()
-	return []float64{float64(posx-n[X]/2)*c[X] + GetShiftPos(), float64(posy-n[Y]/2) * c[Y], 0}
+	return []float64{float64(posx-n[X]/2)*c[X] + GetShiftPos(), float64(posy-n[Y]/2) * c[Y]+ GetShiftYPos(), 0}
 }
 
 var (

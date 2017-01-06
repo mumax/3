@@ -17,35 +17,35 @@ func bubblePos() []float64 {
 	posx, posy := 0., 0.
 
 	{
-		var sum float32
+		var magsum float32
 		var weightedsum float32
 
 		for iy := range mz {
-			for ix := range mz[iy] {
-				sum += float32(iy)
-				weightedsum += mz[iy][ix] * float32(iy)
+			for ix := range mz[0] {
+				magsum += ((mz[iy][ix] + 1.) / 2.)
+				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(iy)
 			}
 		}
-		posy = float64(weightedsum / sum)
+		posy = float64(weightedsum / magsum)
 	}
 
 	{
-		var sum float32
+		var magsum float32
 		var weightedsum float32
 
 		for ix := range mz[0] {
 			for iy := range mz {
-				sum += float32(ix)
-				weightedsum += mz[iy][ix] * float32(ix)
+				magsum += ((mz[iy][ix] + 1.) / 2.)
+				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(ix)
 			}
 		}
-		posx = float64(weightedsum / sum)
+		posx = float64(weightedsum / magsum)
 	}
 
 	c := Mesh().CellSize()
 	n := Mesh().Size()
 
-	return []float64{posx - float64(n[X]/2)*c[X] + GetShiftPos(), posy - float64(n[Y]/2)*c[Y], 0}
+	return []float64{(posx-float64(n[X]/2))*c[X] + GetShiftPos(), (posy-float64(n[Y]/2))*c[Y] + GetShiftYPos(), 0}
 }
 
 var (

@@ -234,7 +234,6 @@ func (g *geom) shift(dx int) {
 
 }
 
-
 func (g *geom) shiftY(dy int) {
 	// empty mask, nothing to do
 	if g == nil || g.buffer.IsNil() {

@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	TotalShift                      float64                        // accumulated window shift (X) in meter
-	ShiftMagL, ShiftMagR , ShiftMagU , ShiftMagD          data.Vector                    // when shifting m, put these value at the left/right edge.
-	ShiftM, ShiftGeom, ShiftRegions bool        = true, true, true // should shift act on magnetization, geometry, regions?
+	TotalShift, TotalYShift                    float64                        // accumulated window shift (X and Y) in meter
+	ShiftMagL, ShiftMagR, ShiftMagU, ShiftMagD data.Vector                    // when shifting m, put these value at the left/right edge.
+	ShiftM, ShiftGeom, ShiftRegions            bool        = true, true, true // should shift act on magnetization, geometry, regions?
 )
 
 func init() {
@@ -24,7 +24,8 @@ func init() {
 }
 
 // position of the window lab frame
-func GetShiftPos() float64 { return -TotalShift }
+func GetShiftPos() float64  { return -TotalShift }
+func GetShiftYPos() float64 { return -TotalYShift }
 
 // shift the simulation window over dx cells in X direction
 func Shift(dx int) {
@@ -51,19 +52,18 @@ func shiftMag(m *data.Slice, dx int) {
 	}
 }
 
-
 // shift the simulation window over dy cells in Y direction
-//TODO add regions and geoms
 func YShift(dy int) {
+	TotalYShift += float64(dy) * Mesh().CellSize()[Y] // needed to re-init geom, regions
 	if ShiftM {
 		shiftMagY(M.Buffer(), dy)
 	}
 	if ShiftRegions {
 		regions.shiftY(dy)
 	}
-	//if ShiftGeom {
-	//	geometry.shift(dx)
-	//}
+	if ShiftGeom {
+		geometry.shiftY(dy)
+	}
 	M.normalize()
 }
 

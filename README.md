@@ -1,5 +1,6 @@
 mumax3 
 ======
+[![Build Status](https://travis-ci.org/mumax/3.svg?branch=master)](https://travis-ci.org/mumax/3)
 
 GPU accelerated micromagnetic simulator.
 

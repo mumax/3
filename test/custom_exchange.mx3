@@ -25,7 +25,7 @@ up :=         Mul(prefactorZ,Mul(Add(Mul(Const(-1),m),Shifted(m,0,0, 1)),Shifted
 down :=       Mul(prefactorZ,Mul(Add(Mul(Const(-1),m),Shifted(m,0,0,-1)),Shifted(Const(1),0,0,-1)))
 Bc :=Add(left,Add(right,Add(forward,Add(backward,Add(up,down)))))
 AddFieldTerm(Bc)
-addEdensTerm(Mul(Const(-0.5),Dot(Bc,m)))
+addEdensTerm(Mul(Const(-0.5),Dot(Bc,M_full)))
 
 defRegion(0, xrange(-inf, 0))
 defRegion(1, xrange(0, inf))
@@ -36,4 +36,4 @@ expectv("B_custom", B_custom.Average(), vector(0, 0, 0), tol)
 
 expectv("B_custom0", B_custom.region(0).Average(), vector(0.00118888104756673, -0.00164631487528483, -0.00074591267903645), tol)
 expectv("B_custom1", B_custom.region(1).Average(), vector(-0.00118888041178385, 0.00164631512959798, 0.00074591242472330), tol)
-expect("E_total",E_total,E_custom,1e-15) // check if custom energy added to energy
+expect("E_total",E_total,E_custom,1e-22) // check if custom energy added to energy

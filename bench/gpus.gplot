@@ -1,16 +1,16 @@
 #! /usr/bin/gnuplot
 
-set term pdf size 4in, 2in;
+set term pdf size 4in, 3in;
 set output "gpus.pdf"
 set boxwidth 0.5
 set style fill solid
 set key off
 set ylabel "throughput (M cells/s)"
-set xtics rotate by -45
+set xtics rotate by -90
 #set xtics out offset 0,-1.2
 
-set yrange[0:200]
-plot "gpus.txt" u ($0+1):($2/1e6):xtic(4) w boxes, "oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF(CPU)") w boxes 
+set yrange[0:300]
+plot "gpus.txt" u ($0+1):($2/1e6):xtic(4) w boxes, "oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF(CPU)") w boxes
 
 set output
 

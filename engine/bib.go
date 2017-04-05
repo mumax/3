@@ -116,7 +116,7 @@ func buildLibrary() {
                Dupr{\'e}, Luc and
                Van Waeyenberge, Bartel},
     title   = {{Current-driven domain wall mobility in polycrystalline permalloy nanowires: A numerical study}},
-                descent method for micromagnetic energy minimization}},
+    journal = {Journal of Applied Physics},
     number  = {23},
     pages   = {233903},
     year    = {2014},
@@ -137,7 +137,7 @@ func buildLibrary() {
     number  = {14},
     pages   = {144401},
     volume  = {95},
-    year    = {2017}
+    year    = {2017},
     doi     = {10.1103/PhysRevB.95.144401},
     url     = {doi.org/10.1103/PhysRevB.95.144401},
 }`}

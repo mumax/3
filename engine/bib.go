@@ -124,4 +124,22 @@ func buildLibrary() {
     url     = {http://dx.doi.org/10.1063/1.4883297}
 }`}
 
+	library["mulkers2017"] = &bibEntry{
+		reason: "Simulated system has interfacially induced DMI",
+		bibtex: `
+@article{Mulkers2017,
+    author  = {Mulkers, Jeroen and
+               Van Waeyenberge, Bartel and
+	       Milo{\v{s}}evi{\'{c}}, Milorad V.},
+    title   = {{Effects of spatially-engineered Dzyaloshinskii-Moriya
+                interaction in ferromagnetic films}},
+    journal = {Physical Review B},
+    number  = {14},
+    pages   = {144401},
+    volume  = {95},
+    year    = {2017}
+    doi     = {10.1103/PhysRevB.95.144401},
+    url     = {doi.org/10.1103/PhysRevB.95.144401},
+}`}
+
 }

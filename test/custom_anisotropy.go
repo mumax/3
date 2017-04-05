@@ -27,7 +27,7 @@ func main() {
 	prefactor := Const((2 * K) / (Msat.Average()))
 	MyAnis := Mul(prefactor, Mul(Dot(u, &M), u))
 	AddFieldTerm(MyAnis)
-	AddEdensTerm(Mul(Const(-0.5),Dot(MyAnis,M_full)))
+	AddEdensTerm(Mul(Const(-0.5), Dot(MyAnis, M_full)))
 
 	B_ext.Set(Vector(0, 0.00, 0))
 	Relax()

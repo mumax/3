@@ -2,7 +2,7 @@ package cu
 
 // This file provides CGO flags to find CUDA libraries and headers.
 
-//#cgo LDFLAGS:-lcuda
+//#cgo LDFLAGS:-lcuda -lcudart
 //
 ////default location:
 //#cgo LDFLAGS:-L/usr/local/cuda/lib64 -L/usr/local/cuda/lib

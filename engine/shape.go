@@ -14,6 +14,7 @@ func init() {
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
 	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
+	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter")
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
@@ -59,6 +60,14 @@ func Cylinder(diam, height float64) Shape {
 	return func(x, y, z float64) bool {
 		return z <= height/2 && z >= -height/2 &&
 			sqr64(x/diam)+sqr64(y/diam) <= 0.25
+	}
+}
+
+// 3D Cone with the vertex up.
+func Cone(diam, height float64) Shape {
+	return func(x, y, z float64) bool {
+		return z <= height && z >= 0 &&
+			return sqr64(x/diam)+sqr64(y/diam)-sqr64(z/height) <= 0.25
 	}
 }
 

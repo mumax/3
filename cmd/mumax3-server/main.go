@@ -178,13 +178,13 @@ func parseIPs() []string {
 		if len(split) != 4 {
 			log.Fatal("invalid IP address range:", s)
 		}
-		var start, stop [4]byte
+		var start, stop [4]uint
 		for i, s := range split {
 			split := strings.Split(s, "-")
 			first := atobyte(split[0])
-			start[i], stop[i] = first, first
+			start[i], stop[i] = uint(first), uint(first)
 			if len(split) > 1 {
-				stop[i] = atobyte(split[1])
+				stop[i] = uint(atobyte(split[1]))
 			}
 		}
 

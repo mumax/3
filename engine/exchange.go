@@ -18,8 +18,8 @@ var (
 
 	B_exch = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
 	lex2   aexchParam // inter-cell exchange in 1e18 * Aex
-	// TODO: lex2 no longer depends on Msat -> remove child dependency
-	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
+	din2   dexchParam // inter-cell interfacial DMI in 1e9 * Dex / Msat
+	// TODO: lex2, din2 no longer depend on Msat -> remove child dependencies
 	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex / Msat
 	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy", GetExchangeEnergy)
 	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density", AddExchangeEnergyDensity)
@@ -52,7 +52,7 @@ func AddExchangeField(dst *data.Slice) {
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), ms, regions.Gpu(), M.Mesh())
 	case inter && !bulk:
 		Refer("mulkers2017")
-		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), ms, regions.Gpu(), M.Mesh()) // dmi+exchange
 	case bulk && !inter:
 		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), regions.Gpu(), M.Mesh()) // dmi+exchange
@@ -168,14 +168,13 @@ func (p *aexchParam) update() {
 
 func (p *dexchParam) update() {
 	if !p.cpu_ok {
-		msat := Msat.cpuLUT()
 		dex := p.parent.cpuLUT()
 		for i := 0; i < NREGION; i++ {
-			dexi := 1e9 * safediv(dex[0][i], msat[0][i])
+			dexi := 1e9 * dex[0][i]
 			for j := i; j < NREGION; j++ {
-				dexj := 1e9 * safediv(dex[0][j], msat[0][j])
+				dexj := 1e9 * dex[0][j]
 				I := symmidx(i, j)
-				interdmi := 1e9 * safediv(p.interdmi[I], msat[0][i])
+				interdmi := 1e9 * p.interdmi[I]
 				p.lut[I] = p.scale[I]*2/(1/dexi+1/dexj) + interdmi
 			}
 		}

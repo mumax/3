@@ -27,7 +27,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     }
 
     int I = idx(ix, iy, iz);                      // central cell index
-    float3 h = make_float3(0.0,0.0,0.0);  // add to H
+    float3 h = make_float3(0.0,0.0,0.0);          // add to H
     float3 m0 = make_float3(mx[I], my[I], mz[I]); // central m
     uint8_t r0 = regions[I];
     int i_;                                       // neighbor index

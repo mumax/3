@@ -23,7 +23,7 @@ Dind   = D0
 scale := 0.645
 ext_ScaleDind(0,1,scale)
 
-avgdmi := 1e-9*Msat.average()*dindCoupling.average()
+avgdmi := 1e-9*dindCoupling.average()
 wanted := 4*D0 + 2*(scale-1)*D0*ni/(nx*nx)
 
 expect("dmicoupling",avgdmi,wanted,1e-2)

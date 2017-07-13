@@ -42,4 +42,4 @@ for i:=0; i<maxRegion; i++{
 
 m = vortex(1, 1)
 
-expect("exchangecoupling", exchCoupling.Average()/Msat.Average(), 59.83329, 0.001) // golden value mumax3.9.1 2015/12/11
+expect("exchangecoupling", exchCoupling.Average()/Msat.Average(), 59.83329e-18, 0.001) // golden value mumax3.9.1 2015/12/11

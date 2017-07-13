@@ -19,5 +19,5 @@ func AddDMIBulk(Beff *data.Slice, m *data.Slice, Aex_red, D_red SymmLUT, Msat MS
 		m.DevPtr(X), m.DevPtr(Y), m.DevPtr(Z),
 		Msat.DevPtr(0), Msat.Mul(0),
 		unsafe.Pointer(Aex_red), unsafe.Pointer(D_red), regions.Ptr,
-		float32(cellsize[X]*1e9), float32(cellsize[Y]*1e9), float32(cellsize[Z]*1e9), N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
+		float32(cellsize[X]), float32(cellsize[Y]), float32(cellsize[Z]), N[X], N[Y], N[Z], mesh.PBC_code(), cfg)
 }

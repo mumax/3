@@ -12,14 +12,14 @@ import (
 )
 
 var (
-	Aex   = NewScalarParam("Aex", "J/m", "Exchange stiffness", &lex2)
-	Dind  = NewScalarParam("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", &din2)
-	Dbulk = NewScalarParam("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", &dbulk2)
+	Aex    = NewScalarParam("Aex", "J/m", "Exchange stiffness", &lex2)
+	Dind   = NewScalarParam("Dind", "J/m2", "Interfacial Dzyaloshinskii-Moriya strength", &din2)
+	Dbulk  = NewScalarParam("Dbulk", "J/m2", "Bulk Dzyaloshinskii-Moriya strength", &dbulk2)
+	lex2   exchParam // inter-cell Aex
+	din2   exchParam // inter-cell Dind
+	dbulk2 exchParam // inter-cell Dbulk
 
 	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
-	lex2       aexchParam // inter-cell exchange in 1e18 * Aex
-	din2       dexchParam // inter-cell interfacial DMI in 1e9 * Dex
-	dbulk2     dexchParam // inter-cell bulk DMI in 1e9 * Dex
 	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy", GetExchangeEnergy)
 	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density", AddExchangeEnergyDensity)
 
@@ -33,9 +33,10 @@ var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal fun
 func init() {
 	registerEnergy(GetExchangeEnergy, AddExchangeEnergyDensity)
 	DeclFunc("ext_ScaleExchange", ScaleInterExchange, "Re-scales exchange coupling between two regions.")
+	DeclFunc("ext_InterExchange", InterExchange, "Sets exchange coupling between two regions.")
 	DeclFunc("ext_ScaleDind", ScaleInterDind, "Re-scales Dind coupling between two regions.")
 	DeclFunc("ext_InterDind", InterDind, "Sets Dind coupling between two regions.")
-	lex2.init()
+	lex2.init(Aex)
 	din2.init(Dind)
 	dbulk2.init(Dbulk)
 }
@@ -55,6 +56,7 @@ func AddExchangeField(dst *data.Slice) {
 	case bulk && !inter:
 		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
 		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), ms, regions.Gpu(), M.Mesh()) // dmi+exchange
+		// TODO: add ScaleInterDbulk and InterDbulk when inhomo Dbulk gets fixed
 	case inter && bulk:
 		util.Fatal("Cannot have induced and interfacial DMI at the same time")
 	}
@@ -78,27 +80,31 @@ func GetExchangeEnergy() float64 {
 // Scales the heisenberg exchange interaction between region1 and 2.
 // Scale = 1 means the harmonic mean over the regions of Aex.
 func ScaleInterExchange(region1, region2 int, scale float64) {
-	lex2.scale[symmidx(region1, region2)] = float32(scale)
-	lex2.invalidate()
+	lex2.setScale(region1, region2, scale)
+}
+
+// Sets the exchange interaction between region 1 and 2.
+func InterExchange(region1, region2 int, value float64) {
+	lex2.setInter(region1, region2, value)
 }
 
 // Scales the DMI interaction between region 1 and 2.
 func ScaleInterDind(region1, region2 int, scale float64) {
-	din2.scale[symmidx(region1, region2)] = float32(scale)
-	din2.invalidate()
+	din2.setScale(region1, region2, scale)
 }
 
 // Sets the DMI interaction between region 1 and 2.
 func InterDind(region1, region2 int, value float64) {
-	din2.scale[symmidx(region1, region2)] = float32(0.)
-	din2.interdmi[symmidx(region1, region2)] = float32(value)
-	din2.invalidate()
+	din2.setInter(region1, region2, value)
 }
 
-// stores interregion exchange stiffness
+// stores interregion exchange stiffness and DMI
+// the interregion exchange/DMI by default is the harmonic mean (scale=1, inter=0)
 type exchParam struct {
-	lut            [NREGION * (NREGION + 1) / 2]float32 // 1e18 * harmonic mean of Aex in regions (i,j)
+	parent         *RegionwiseScalar
+	lut            [NREGION * (NREGION + 1) / 2]float32 // harmonic mean of regions (i,j)
 	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
+	inter          [NREGION * (NREGION + 1) / 2]float32 // extra term for lut[SymmIdx(i, j)]
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 }
@@ -109,22 +115,17 @@ func (p *exchParam) invalidate() {
 	p.gpu_ok = false
 }
 
-func (p *aexchParam) init() {
+func (p *exchParam) init(parent *RegionwiseScalar) {
 	for i := range p.scale {
 		p.scale[i] = 1 // default scaling
-	}
-}
-
-func (p *dexchParam) init(parent *RegionwiseScalar) {
-	for i := range p.scale {
-		p.scale[i] = 1 // default scaling
+		p.inter[i] = 0 // default additional interexchange term
 	}
 	p.parent = parent
 }
 
 // Get a GPU mirror of the look-up table.
 // Copies to GPU first only if needed.
-func (p *dexchParam) Gpu() cuda.SymmLUT {
+func (p *exchParam) Gpu() cuda.SymmLUT {
 	p.update()
 	if !p.gpu_ok {
 		p.upload()
@@ -132,49 +133,29 @@ func (p *dexchParam) Gpu() cuda.SymmLUT {
 	return p.gpu
 }
 
-func (p *aexchParam) Gpu() cuda.SymmLUT {
-	p.update()
-	if !p.gpu_ok {
-		p.upload()
-	}
-	return p.gpu
-	// TODO: dedup
+// sets the interregion exchange/DMI using a specified value (scale = 0)
+func (p *exchParam) setInter(region1, region2 int, value float64) {
+	p.scale[symmidx(region1, region2)] = float32(0.)
+	p.inter[symmidx(region1, region2)] = float32(value)
+	p.invalidate()
 }
 
-type aexchParam struct{ exchParam }
-type dexchParam struct {
-	interdmi [NREGION * (NREGION + 1) / 2]float32
-	parent   *RegionwiseScalar
-	exchParam
+// sets the interregion exchange/DMI by rescaling the harmonic mean (inter = 0)
+func (p *exchParam) setScale(region1, region2 int, scale float64) {
+	p.scale[symmidx(region1, region2)] = float32(scale)
+	p.inter[symmidx(region1, region2)] = float32(0.)
+	p.invalidate()
 }
 
-func (p *aexchParam) update() {
+func (p *exchParam) update() {
 	if !p.cpu_ok {
-		aex := Aex.cpuLUT()
-
+		ex := p.parent.cpuLUT()
 		for i := 0; i < NREGION; i++ {
-			lexi := 1e18 * aex[0][i]
+			exi := ex[0][i]
 			for j := i; j < NREGION; j++ {
-				lexj := 1e18 * aex[0][j]
+				exj := ex[0][j]
 				I := symmidx(i, j)
-				p.lut[I] = p.scale[I] * 2 / (1/lexi + 1/lexj)
-			}
-		}
-		p.gpu_ok = false
-		p.cpu_ok = true
-	}
-}
-
-func (p *dexchParam) update() {
-	if !p.cpu_ok {
-		dex := p.parent.cpuLUT()
-		for i := 0; i < NREGION; i++ {
-			dexi := 1e9 * dex[0][i]
-			for j := i; j < NREGION; j++ {
-				dexj := 1e9 * dex[0][j]
-				I := symmidx(i, j)
-				interdmi := 1e9 * p.interdmi[I]
-				p.lut[I] = p.scale[I]*2/(1/dexi+1/dexj) + interdmi
+				p.lut[I] = p.scale[I]*2/(1/exi+1/exj) + p.inter[I]
 			}
 		}
 		p.gpu_ok = false

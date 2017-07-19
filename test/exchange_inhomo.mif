@@ -1,0 +1,59 @@
+# MIF 2.1
+
+Specify Oxs_MultiAtlas:atlas {
+    atlas { Oxs_BoxAtlas:region1 {
+        xrange {2 4}
+        yrange {2 4}
+        zrange {0 1}
+    }   }
+    atlas { Oxs_BoxAtlas:region2 {
+        xrange {0 2}
+        yrange {2 4}
+        zrange {0 1}
+    }   }
+    atlas { Oxs_BoxAtlas:region3 {
+        xrange {0 2}
+        yrange {0 2}
+        zrange {0 1}
+    }   }
+    atlas { Oxs_BoxAtlas:region4 {
+        xrange {2 4}
+        yrange {0 2}
+        zrange {0 1}
+    }   }
+}
+
+Specify Oxs_RectangularMesh:mesh {
+    cellsize {1 1 1}
+    atlas :atlas
+}
+
+Specify Oxs_ExchangePtwise {
+    A { Oxs_AtlasScalarField {
+        atlas :atlas
+        default_value 1.
+        values {
+            region1 1.2
+            region2 1.6
+            region3 4.3
+            region4 4.3
+        }
+    }}
+}
+
+Specify Oxs_RungeKuttaEvolve:evolve {
+    alpha 0.5
+}
+
+Specify Oxs_FileVectorField:minit {
+    atlas :atlas
+    file testdata/randommag4x4x1.ovf
+}
+
+Specify Oxs_TimeDriver {
+    evolver :evolve
+    mesh :mesh
+    Ms 1.1
+    m0 minit
+}
+

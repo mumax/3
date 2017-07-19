@@ -1,0 +1,30 @@
+# OOMMF OVF 2.0
+# Segment count: 1
+# Begin: Segment
+# Begin: Header
+# Title: m
+# meshtype: rectangular
+# meshunit: m
+# xmin: 0
+# ymin: 0
+# zmin: 0
+# xmax: 4
+# ymax: 4
+# zmax: 1
+# valuedim: 3
+# valuelabels: m_x m_y m_z
+# valueunits: 1 1 1
+# Desc: Total simulation time:  0  s
+# xbase: 0.5
+# ybase: 0.5
+# zbase: 0.5
+# xnodes: 4
+# ynodes: 4
+# znodes: 1
+# xstepsize: 1
+# ystepsize: 1
+# zstepsize: 1
+# End: Header
+# Begin: Data Binary 4
+8´–I£DO?Vª”¾ð“¿ÚR¾}ÆÀ¾-d¿™^¿¨¨+?q’×¾'3¬>\—c?dŸ>š?'%æ¾…P*¿Ç¾­]?9"N?òÒ?‹º8¿kfè¾—w,¿¿šAü¾®¤%=¯—„¾Ãw¿ñQ=>­~G¿"J?$ó¿´®F?Ÿ(¾YZ¿E#a½æ¿~o>¬md?)´Å>Ž<¿U–?WÜ¾înÎ¾›h¿úØÿ½±ú<?¹?Ár¼¾# End: Data Binary 4
+# End: Segment

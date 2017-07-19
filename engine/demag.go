@@ -10,7 +10,7 @@ import (
 
 // Demag variables
 var (
-	Msat        = NewScalarParam("Msat", "A/m", "Saturation magnetization", &lex2, &din2, &dbulk2)
+	Msat        = NewScalarParam("Msat", "A/m", "Saturation magnetization")
 	M_full      = NewVectorField("m_full", "A/m", "Unnormalized magnetization", SetMFull)
 	B_demag     = NewVectorField("B_demag", "T", "Magnetostatic field", SetDemagField)
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", "Magnetostatic energy density", AddEdens_demag)

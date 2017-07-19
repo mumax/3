@@ -2,11 +2,13 @@
 #include "exchange.h"
 #include "float3.h"
 #include "stencil.h"
+#include "amul.h"
 
 // See exchange.go for more details.
 extern "C" __global__ void
 addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
             float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
+            float* __restrict__ Ms_, float Ms_mul,
             float* __restrict__ aLUT2d, uint8_t* __restrict__ regions,
             float wx, float wy, float wz, int Nx, int Ny, int Nz, uint8_t PBC) {
 
@@ -27,7 +29,7 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
     }
 
     uint8_t r0 = regions[I];
-    float3 B  = make_float3(Bx[I], By[I], Bz[I]);
+    float3 B  = make_float3(0.0,0.0,0.0);
 
     int i_;    // neighbor index
     float3 m_; // neighbor mag
@@ -78,8 +80,9 @@ addexchange(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ 
         B += wz * a__ *(m_ - m0);
     }
 
-    Bx[I] = B.x;
-    By[I] = B.y;
-    Bz[I] = B.z;
+    float invMs = inv_Msat(Ms_, Ms_mul, I);
+    Bx[I] += B.x*invMs;
+    By[I] += B.y*invMs;
+    Bz[I] += B.z*invMs;
 }
 

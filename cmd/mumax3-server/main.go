@@ -72,6 +72,10 @@ func main() {
 	go func() {
 		log.Println("serving at", thisAddr)
 
+		// Resolve the IPs for thisHost
+		thisIP, err := net.LookupHost(thisHost)
+		Fatal(err)
+
 		// try to listen and serve on all interfaces other than thisAddr
 		// this is for convenience, errors are not fatal.
 		_, p, err := net.SplitHostPort(thisAddr)
@@ -79,8 +83,9 @@ func main() {
 		ips := util.InterfaceAddrs()
 		for _, ip := range ips {
 			addr := net.JoinHostPort(ip, p)
-			if addr != thisAddr { // skip thisAddr, will start later and is fatal on error
+			if !contains(thisIP, ip) { // skip thisIP, will start later and is fatal on error
 				go func() {
+					log.Println("serving at", addr)
 					err := http.ListenAndServe(addr, nil)
 					if err != nil {
 						log.Println("info:", err, "(but still serving other interfaces)")
@@ -178,7 +183,7 @@ func parseIPs() []string {
 		if len(split) != 4 {
 			log.Fatal("invalid IP address range:", s)
 		}
-		var start, stop [4]byte
+		var start, stop [4]uint
 		for i, s := range split {
 			split := strings.Split(s, "-")
 			first := atobyte(split[0])
@@ -204,7 +209,7 @@ func parseIPs() []string {
 	return IPs
 }
 
-func atobyte(a string) byte {
+func atobyte(a string) uint {
 	i, err := strconv.Atoi(a)
 	if err != nil {
 		panic(err)
@@ -212,5 +217,5 @@ func atobyte(a string) byte {
 	if int(byte(i)) != i {
 		panic("too large")
 	}
-	return byte(i)
+	return uint(i)
 }

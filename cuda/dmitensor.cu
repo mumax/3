@@ -80,7 +80,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
     // right neighbor
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
-        int i_ = idx(lclampx(ix+1), iy, iz);
+        int i_ = idx(hclampx(ix+1), iy, iz);
         if (ix+1 <Nx || PBCx) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -99,7 +99,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
     // back neighbor
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
-        int i_ = idx(ix, lclampx(iy-1), iz);
+        int i_ = idx(ix, lclampy(iy-1), iz);
         if (iy-1 >= 0 || PBCy) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -118,7 +118,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
     // front neighbor
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
-        int i_ = idx(ix, lclampx(iy+1), iz);
+        int i_ = idx(ix, hclampy(iy+1), iz);
         if (iy+1 <Ny || PBCy) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -137,7 +137,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
     // bottom neighbor
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
-        int i_ = idx(ix, iy, lclampx(iz-1));
+        int i_ = idx(ix, iy, lclampz(iz-1));
         if (iz-1 >= 0 || PBCz) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -156,16 +156,16 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
     // top neighbor
     {
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
-        int i_ = idx(ix, iy, lclampx(iz+1));
+        int i_ = idx(ix, iy, hclampz(iz+1));
         if (iz+1 <Nz || PBCz) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
         if (!is0(m1)){
             // bulk origin
-            h.x -= ((D[ZXY]-D[ZYX])*m1.y+(D[YXZ]-D[ZZX])*m1.z)/(2*cz) ;
-            h.y -= ((D[ZYZ]-D[ZZY])*m1.z+(D[YYX]-D[ZXY])*m1.x)/(2*cz) ;
-            h.z -= ((D[ZZX]-D[ZXZ])*m1.x+(D[YZY]-D[ZYZ])*m1.y)/(2*cz) ;
-            // boundary induced (cancels out if top neighbor exists as well)
+            h.x -= ((D[ZXY]-D[ZYX])*m1.y+(D[ZXZ]-D[ZZX])*m1.z)/(2*cz) ;
+            h.y -= ((D[ZYZ]-D[ZZY])*m1.z+(D[ZYX]-D[ZXY])*m1.x)/(2*cz) ;
+            h.z -= ((D[ZZX]-D[ZXZ])*m1.x+(D[ZZY]-D[ZYZ])*m1.y)/(2*cz) ;
+            // boundary induced (cancels out if bottom neighbor exists as well)
             h.x += ((D[ZXX]+D[ZXX])*m0.x+(D[ZXY]+D[ZYX])*m0.y+(D[ZXZ]+D[ZZX])*m0.z)/(2*cx) ;
             h.y += ((D[ZYY]+D[ZYY])*m0.y+(D[ZYZ]+D[ZZY])*m0.z+(D[ZYX]+D[ZXY])*m0.x)/(2*cx) ;
             h.z += ((D[ZZZ]+D[ZZZ])*m0.z+(D[ZZX]+D[ZXZ])*m0.x+(D[ZZY]+D[ZYZ])*m0.y)/(2*cx) ;

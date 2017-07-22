@@ -183,7 +183,7 @@ func parseIPs() []string {
 		if len(split) != 4 {
 			log.Fatal("invalid IP address range:", s)
 		}
-		var start, stop [4]byte
+		var start, stop [4]uint
 		for i, s := range split {
 			split := strings.Split(s, "-")
 			first := atobyte(split[0])
@@ -209,7 +209,7 @@ func parseIPs() []string {
 	return IPs
 }
 
-func atobyte(a string) byte {
+func atobyte(a string) uint {
 	i, err := strconv.Atoi(a)
 	if err != nil {
 		panic(err)
@@ -217,5 +217,5 @@ func atobyte(a string) byte {
 	if int(byte(i)) != i {
 		panic("too large")
 	}
-	return byte(i)
+	return uint(i)
 }

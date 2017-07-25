@@ -55,13 +55,24 @@ func (d *dmitensor) upload() {
 	d.gpu_ok = true
 }
 
+func (d *dmitensor) isZero() bool {
+	for i := range d.lut {
+		if d.lut[i] != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 func SetDMItensor(i, j, k int, value float64) {
 	DMItensor.SetElement(i, j, k, float32(value))
 }
 
 // Adds the current DMI field to dst
 func AddDMIField(dst *data.Slice) {
-	cuda.AddDMItensor(dst, M.Buffer(), DMItensor.Gpu(), Msat.MSlice(), regions.Gpu(), M.Mesh())
+	if !DMItensor.isZero() {
+		cuda.AddDMItensor(dst, M.Buffer(), DMItensor.Gpu(), Msat.MSlice(), regions.Gpu(), M.Mesh())
+	}
 }
 
 // Returns the current DMI energy in Joules.

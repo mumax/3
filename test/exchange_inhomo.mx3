@@ -1,0 +1,52 @@
+/*
+        Test inhomogeneous Aex
+
+
+        We consider 4 regions with different Aex and Msat and a random magnetization
+        (./testdata/randommag4x4x1.ovf).
+
+        The harmonic mean is used by default for inter-region Aex. The exchange
+        energy is compared to the Oxc_ExchangePtwise::Energy of oommf which also
+        uses the harmonic mean by default. Furthermore, we make sure that the
+        exchange energy does not depend on Msat (it does depend on Msat in Mumax3.9.3).
+
+        WARNING: When you modify the Aex parameters in this script, you should also
+        modify the "./exchange_inhomo.mif" script accordingly and update the value
+        of 'E_exch_oomf'
+
+*/
+
+E_exch_oommf := 154.4891365
+
+setgridsize(4,4,1)
+setcellsize(1,1,1)
+m.loadfile("./testdata/randommag4x4x1.ovf")
+
+enabledemag = false
+Aex = 1.
+Msat = 1.
+
+defregion(1, rect(2,2).transl( 1, 1,0))
+defregion(2, rect(2,2).transl(-1, 1,0))
+defregion(3, rect(2,2).transl(-1,-1,0))
+defregion(4, rect(2,2).transl( 1,-1,0))
+
+Aex.setregion(1,1.2)
+Aex.setregion(2,1.6)
+Aex.setregion(3,4.3)
+Aex.setregion(4,4.3)
+
+Msat.setregion(1,3.2)
+Msat.setregion(2,4.6)
+Msat.setregion(3,3.9)
+Msat.setregion(4,7.8)
+
+expect("E_exch",E_exch,E_exch_oommf,1e-5)
+
+Msat.setregion(1,1.1)
+Msat.setregion(2,1.1)
+Msat.setregion(3,1.1)
+Msat.setregion(4,1.1)
+
+expect("E_exch",E_exch,E_exch_oommf,1e-5)
+

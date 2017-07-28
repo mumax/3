@@ -45,11 +45,11 @@ func Ellipse(diamx, diamy float64) Shape {
 
 // 3D Cone with the vertex down.
 func Cone(diam, height float64) Shape {
- 	return func(x, y, z float64) bool {
- 		return z >= 0 && sqr64(x/diam)+sqr64(y/diam)-sqr64(z/height) <= 0.25
- 	}
- }
- 
+	return func(x, y, z float64) bool {
+		return z >= 0 && sqr64(x/diam)+sqr64(y/diam)-sqr64(z/height) <= 0.25
+	}
+}
+
 func Circle(diam float64) Shape {
 	return Cylinder(diam, math.Inf(1))
 }

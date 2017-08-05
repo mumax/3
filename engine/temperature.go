@@ -70,9 +70,21 @@ func (b *thermField) update() {
 		return
 	}
 
-	if FixDt == 0 {
-		util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
-	}
+
+        // after a bad step the timestep is rescaled and the noise should be rescaled accordingly
+        if NSteps == b.step && Dt_si != b.dt {
+                for c := 0; c < 3; c++ {
+                        cuda.Madd2(b.noise.Comp(c), b.noise.Comp(c), b.noise.Comp(c), float32(math.Sqrt(b.dt/Dt_si)),0.)
+                }
+                b.dt = Dt_si
+                return
+        }
+
+        //uncomment to not allow adaptive step
+        //if FixDt == 0 {
+        //      util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
+        //}
+
 
 	N := Mesh().NCell()
 	k2_VgammaDt := 2 * mag.Kb / (GammaLL * cellVolume() * Dt_si)

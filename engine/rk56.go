@@ -121,15 +121,6 @@ func (rk *RK56) Free() {
 }
 
 // TODO: into cuda
-func madd5(dst, src1, src2, src3, src4, src5 *data.Slice, w1, w2, w3, w4, w5 float32) {
-	cuda.Madd3(dst, src1, src2, src3, w1, w2, w3)
-	cuda.Madd3(dst, dst, src4, src5, 1, w4, w5)
-}
-
-func madd6(dst, src1, src2, src3, src4, src5, src6 *data.Slice, w1, w2, w3, w4, w5, w6 float32) {
-	madd5(dst, src1, src2, src3, src4, src5, w1, w2, w3, w4, w5)
-	cuda.Madd2(dst, dst, src6, 1, w6)
-}
 
 func madd7(dst, src1, src2, src3, src4, src5, src6, src7 *data.Slice, w1, w2, w3, w4, w5, w6, w7 float32) {
 	madd5(dst, src1, src2, src3, src4, src5, w1, w2, w3, w4, w5)

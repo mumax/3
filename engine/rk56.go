@@ -93,7 +93,7 @@ func (rk *RK56) Step() {
 	// error estimate
 	Err := cuda.Buffer(3, size)
 	defer cuda.Recycle(Err)
-	madd5(Err, k2, k1, k6, k7, k8, 1, (-5./66.), (-5./66.), (5./66.), (5./66.))
+	madd4(Err, k1, k6, k7, k8, (-5./66.), (-5./66.), (5./66.), (5./66.))
 
 	// determine error
 	err := cuda.MaxVecNorm(Err) * float64(h)

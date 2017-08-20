@@ -72,7 +72,7 @@ func (b *thermField) update() {
 	}
 
 
-        // after a bad step the timestep is rescaled and the noise should be rescaled accordingly
+        // after a bad step the timestep is rescaled and the noise should be rescaled accordingly, instead of redrawing the random numbers
         if NSteps == b.step && Dt_si != b.dt {
                 for c := 0; c < 3; c++ {
                         cuda.Madd2(b.noise.Comp(c), b.noise.Comp(c), b.noise.Comp(c), float32(math.Sqrt(b.dt/Dt_si)),0.)

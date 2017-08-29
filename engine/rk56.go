@@ -83,18 +83,17 @@ func (rk *RK56) Step() {
 	M.normalize()
 	torqueFn(k8)
 
-
 	// stage 9: 6th order solution
 	Time = t0 + (1.)*Dt_si
 	//madd6(m, m0, k1, k3, k4, k5, k6, 1, (31./384.)*h, (1125./2816.)*h, (9./32.)*h, (125./768.)*h, (5./66.)*h)
-	madd7(m, m0, k1, k3, k4, k5, k7,k8, 1, (7./1408.)*h, (1125./2816.)*h, (9./32.)*h, (125./768.)*h, (5./66.)*h, (5./66.)*h)
+	madd7(m, m0, k1, k3, k4, k5, k7, k8, 1, (7./1408.)*h, (1125./2816.)*h, (9./32.)*h, (125./768.)*h, (5./66.)*h, (5./66.)*h)
 	M.normalize()
 	torqueFn(k2) // re-use k2
 
 	// error estimate
 	Err := cuda.Buffer(3, size)
 	defer cuda.Recycle(Err)
-	madd4(Err, k1, k6, k7, k8, (-5./66.), (-5./66.), (5./66.), (5./66.))
+	madd4(Err, k1, k6, k7, k8, (-5. / 66.), (-5. / 66.), (5. / 66.), (5. / 66.))
 
 	// determine error
 	err := cuda.MaxVecNorm(Err) * float64(h)
@@ -124,6 +123,6 @@ func (rk *RK56) Free() {
 // TODO: into cuda
 
 func madd7(dst, src1, src2, src3, src4, src5, src6, src7 *data.Slice, w1, w2, w3, w4, w5, w6, w7 float32) {
-	madd6(dst, src1, src2, src3, src4, src5,src6, w1, w2, w3, w4, w5,w6)
+	madd6(dst, src1, src2, src3, src4, src5, src6, w1, w2, w3, w4, w5, w6)
 	cuda.Madd2(dst, dst, src7, 1, w7)
 }

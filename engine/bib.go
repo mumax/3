@@ -142,4 +142,24 @@ func buildLibrary() {
     url     = {doi.org/10.1103/PhysRevB.95.144401},
 }`}
 
+	library["leliaert2017"] = &bibEntry{
+		reason: "Simulated nonzero temperatures with adaptive time steps",
+		bibtex: `
+@article{Leliaert2017,
+    author  = {Leliaert, Jonathan and
+               Mulkers, Jeroen and
+	       De Clercq, Jonas and
+	       Coene, Annelies and
+               Dvornik, Mykola and
+               Van Waeyenberge, Bartel},
+    title   = {{Adaptively time stepping the stochasti Landau-Lifshitz-Gilbert equation at nonzero temperature: implementation and validation in MuMax$^3$}},
+    journal = {AIP Advances},
+    number  = {},
+    pages   = {},
+    volume  = {},
+    year    = {2017},
+    doi     = {},
+    url     = {doi.org/},
+}`}
+
 }

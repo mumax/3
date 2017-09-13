@@ -132,7 +132,7 @@ func Index2Coord(ix, iy, iz int) data.Vector {
 	n := m.Size()
 	c := m.CellSize()
 	x := c[X]*(float64(ix)-0.5*float64(n[X]-1)) - TotalShift
-	y := c[Y] * (float64(iy) - 0.5*float64(n[Y]-1))
+	y := c[Y]*(float64(iy)-0.5*float64(n[Y]-1)) - TotalYShift
 	z := c[Z] * (float64(iz) - 0.5*float64(n[Z]-1))
 	return data.Vector{x, y, z}
 }

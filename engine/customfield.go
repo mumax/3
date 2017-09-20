@@ -24,6 +24,7 @@ func init() {
 	DeclFunc("Add", Add, "Add two quantities")
 	DeclFunc("Madd", Madd, "Weighted addition: Madd(Q1,Q2,c1,c2) = c1*Q1 + c2*Q2")
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
+	DeclFunc("Cross", Cross, "Cross product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
 	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
@@ -113,6 +114,10 @@ type dotProduct struct {
 	fieldOp
 }
 
+type crossProduct struct {
+	fieldOp
+}
+
 type addition struct {
 	fieldOp
 }
@@ -178,6 +183,22 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 	defer cuda.Recycle(B)
 	cuda.Zero(dst)
 	cuda.AddDotProduct(dst, 1, A, B)
+}
+
+// CrossProduct creates a new quantity that is the dot product of
+// quantities a and b. E.g.:
+// 	CrossProct(&M, &B_ext)
+func Cross(a, b Quantity) Quantity {
+	return &crossProduct{fieldOp{a, b, 1}}
+}
+
+func (d *crossProduct) EvalTo(dst *data.Slice) {
+	A := ValueOf(d.a)
+	defer cuda.Recycle(A)
+	B := ValueOf(d.b)
+	defer cuda.Recycle(B)
+	cuda.Zero(dst)
+	cuda.CrossProduct(dst, A, B)
 }
 
 func Add(a, b Quantity) Quantity {

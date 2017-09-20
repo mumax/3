@@ -185,11 +185,11 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 	cuda.AddDotProduct(dst, 1, A, B)
 }
 
-// CrossProduct creates a new quantity that is the dot product of
+// CrossProduct creates a new quantity that is the cross product of
 // quantities a and b. E.g.:
 // 	CrossProct(&M, &B_ext)
 func Cross(a, b Quantity) Quantity {
-	return &crossProduct{fieldOp{a, b, 1}}
+	return &crossProduct{fieldOp{a, b, 3}}
 }
 
 func (d *crossProduct) EvalTo(dst *data.Slice) {

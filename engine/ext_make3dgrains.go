@@ -22,7 +22,6 @@ func Voronoi3d(grainsize float64, startRegion int, numRegions int, inputShape Sh
 type tesselation3d struct {
 	grainsize   float64
 	maxRegion   int
-	seed        int64
 	rnd         *rand.Rand
 	startRegion int
 	shape       Shape			//Shape of the tesselated region
@@ -43,9 +42,7 @@ type cellLocs struct {x, y, z float64}
 func newTesselation3d(grainsize float64, nRegion int, seed int64, startRegion int, inputShape Shape) *tesselation3d {
 	t := tesselation3d{grainsize,
 		nRegion,
-		//make(map[int3d][]center3d),
-		seed,
-		rand.New(rand.NewSource(0)),
+		rand.New(rand.NewSource(seed)),
 		startRegion,
 		inputShape,
 		make([]center3d, 0)}
@@ -140,8 +137,6 @@ func (t *tesselation3d) RegionOf(x, y, z float64) int {
 	} else {
 		return -1	//When the regions are rendered, any region < 0 will not be rastered.
 	}
-
-
 }
 
 // Generate normally distributed numbers; mean = lambda, variance = lambda. If generated number < 0, return 1.

@@ -26,19 +26,18 @@ type tesselation3d struct {
 	maxRegion   int
 	rnd         *rand.Rand
 	startRegion int
-	shape       Shape			//Shape of the tesselated region
-	centers     []center3d			//List of Voronoi centers
+	shape       Shape      //Shape of the tesselated region
+	centers     []center3d //List of Voronoi centers
 }
-
 
 // Stores location of each Voronoi center
 type center3d struct {
-	x, y, z   float64 // center position (m)
-	region byte    // region for all cells near center
+	x, y, z float64 // center position (m)
+	region  byte    // region for all cells near center
 }
 
 // Stores location of each cell
-type cellLocs struct {x, y, z float64}
+type cellLocs struct{ x, y, z float64 }
 
 // nRegion exclusive
 func newTesselation3d(grainsize float64, nRegion int, seed int64, startRegion int, inputShape Shape) *tesselation3d {
@@ -64,26 +63,25 @@ func shuffleCells(src []cellLocs) []cellLocs {
 	return dest
 }
 
-
 func (t *tesselation3d) makeRandomCenters() {
 	//Make a list of all the cells in the shape.
 	cells := t.tabulateCells()
 	cells = shuffleCells(cells)
 
 	//Choose number of grains to make. Assume volume of grain is given by (4/3)*pi*r^3
-	shapeVolume := cellVolume()*float64(len(cells))
-	grainVolume := (float64(1)/6)*math.Pi*t.grainsize*t.grainsize*t.grainsize
-	nAvgGrains := shapeVolume/grainVolume
+	shapeVolume := cellVolume() * float64(len(cells))
+	grainVolume := (float64(1) / 6) * math.Pi * t.grainsize * t.grainsize * t.grainsize
+	nAvgGrains := shapeVolume / grainVolume
 	nGrains := t.truncNorm(nAvgGrains)
 
 	//TODO: same cell can be chosen twice by random chance
 	t.centers = make([]center3d, nGrains)
-	for p := 0; p<nGrains; p++ {
+	for p := 0; p < nGrains; p++ {
 		rndCell := cells[t.rnd.Intn(nGrains)]
 		t.centers[p].x = rndCell.x
 		t.centers[p].y = rndCell.y
 		t.centers[p].z = rndCell.z
-		randRegion := t.startRegion+t.rnd.Intn(t.maxRegion)
+		randRegion := t.startRegion + t.rnd.Intn(t.maxRegion)
 		t.centers[p].region = byte(randRegion)
 	}
 
@@ -99,9 +97,9 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 	meshSize := MeshSize()
 
 	//Iterate across all cells in the mesh, and append those that are inside the shape
-	for ix := 0; ix<meshSize[0]; ix++ {
-		for iy := 0; iy<meshSize[1]; iy++ {
-			for iz := 0; iz<meshSize[2]; iz++ {
+	for ix := 0; ix < meshSize[0]; ix++ {
+		for iy := 0; iy < meshSize[1]; iy++ {
+			for iz := 0; iz < meshSize[2]; iz++ {
 
 				cell := Index2Coord(ix, iy, iz)
 
@@ -137,7 +135,7 @@ func (t *tesselation3d) RegionOf(x, y, z float64) int {
 		}
 		return int(nearest.region)
 	} else {
-		return -1	//When the regions are rendered, any region < 0 will not be rastered.
+		return -1 //When the regions are rendered, any region < 0 will not be rastered.
 	}
 }
 

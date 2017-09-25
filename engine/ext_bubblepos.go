@@ -12,9 +12,12 @@ var (
 
 func bubblePos() []float64 {
 	m := M.Buffer()
+	n := Mesh().Size()
+	c := Mesh().CellSize()
 	mz := m.Comp(Z).HostCopy().Scalars()[0]
 
 	posx, posy := 0., 0.
+	sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[Z]) //TODO make more robust with temperature?
 
 	{
 		var magsum float32
@@ -22,8 +25,8 @@ func bubblePos() []float64 {
 
 		for iy := range mz {
 			for ix := range mz[0] {
-				magsum += ((mz[iy][ix] + 1.) / 2.)
-				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(iy)
+				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(iy)
 			}
 		}
 		posy = float64(weightedsum / magsum)
@@ -35,15 +38,12 @@ func bubblePos() []float64 {
 
 		for ix := range mz[0] {
 			for iy := range mz {
-				magsum += ((mz[iy][ix] + 1.) / 2.)
-				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(ix)
+				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(ix)
 			}
 		}
 		posx = float64(weightedsum / magsum)
 	}
-
-	c := Mesh().CellSize()
-	n := Mesh().Size()
 
 	return []float64{(posx-float64(n[X]/2))*c[X] + GetShiftPos(), (posy-float64(n[Y]/2))*c[Y] + GetShiftYPos(), 0}
 }

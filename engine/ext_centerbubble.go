@@ -17,6 +17,7 @@ func centerBubble() {
 	mz := m.Comp(Z).HostCopy().Scalars()[0]
 
 	posx, posy := 0., 0.
+	sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[Z]) //TODO make more robust with temperature?
 
 	{
 		var magsum float32
@@ -24,8 +25,8 @@ func centerBubble() {
 
 		for iy := range mz {
 			for ix := range mz[0] {
-				magsum += ((mz[iy][ix] + 1.) / 2.)
-				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(iy)
+				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(iy)
 			}
 		}
 		posy = float64(weightedsum / magsum)
@@ -37,8 +38,8 @@ func centerBubble() {
 
 		for ix := range mz[0] {
 			for iy := range mz {
-				magsum += ((mz[iy][ix] + 1.) / 2.)
-				weightedsum += ((mz[iy][ix] + 1.) / 2.) * float32(ix)
+				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(ix)
 			}
 		}
 		posx = float64(weightedsum / magsum)
@@ -46,7 +47,6 @@ func centerBubble() {
 
 	zero := data.Vector{0, 0, 0}
 	if ShiftMagL == zero || ShiftMagR == zero || ShiftMagD == zero || ShiftMagU == zero {
-		sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[Z]) //TODO make more robust with temperature?
 		ShiftMagL[Z] = float64(sign)
 		ShiftMagR[Z] = float64(sign)
 		ShiftMagD[Z] = float64(sign)

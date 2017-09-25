@@ -1,3 +1,5 @@
+// 3D Voronoi tessellation. Contributed by Peyton Murray.
+
 package engine
 
 import (

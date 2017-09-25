@@ -159,7 +159,7 @@ func buildLibrary() {
     volume  = {},
     year    = {2017},
     doi     = {},
-    url     = {doi.org/},
+    url     = {https://arxiv.org/abs/1709.01682},
 }`}
 
 }

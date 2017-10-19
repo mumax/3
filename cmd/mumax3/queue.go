@@ -123,9 +123,10 @@ func run(inFile string, gpu int, webAddr string) {
 
 	cmd := exec.Command(os.Args[0], flags...)
 	log.Println(os.Args[0], flags)
-	err := cmd.Run()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(inFile, err)
+		log.Printf("%s\n", output)
 		exitStatus.set(1)
 		numFailed.inc()
 		if *flag_failfast {

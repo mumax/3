@@ -152,7 +152,7 @@ func buildLibrary() {
 	       Coene, Annelies and
                Dvornik, Mykola and
                Van Waeyenberge, Bartel},
-    title   = {{Adaptively time stepping the stochasti Landau-Lifshitz-Gilbert equation at nonzero temperature: implementation and validation in MuMax$^3$}},
+    title   = {{Adaptively time stepping the stochastic Landau-Lifshitz-Gilbert equation at nonzero temperature: implementation and validation in MuMax$^3$}},
     journal = {AIP Advances},
     number  = {},
     pages   = {},

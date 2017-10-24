@@ -92,16 +92,19 @@ var crop_map = map[int]string{0: "",
 	35: crop_ptx_35,
 	50: crop_ptx_50,
 	52: crop_ptx_52,
-	53: crop_ptx_53}
+	53: crop_ptx_53,
+	60: crop_ptx_60,
+	61: crop_ptx_61,
+	62: crop_ptx_62,
+	70: crop_ptx_70}
 
 // crop PTX code for various compute capabilities.
 const (
 	crop_ptx_20 = `
-.version 4.3
+.version 3.2
 .target sm_20
 .address_size 64
 
-	// .globl	crop
 
 .visible .entry crop(
 	.param .u64 crop_param_0,
@@ -118,70 +121,79 @@ const (
 )
 {
 	.reg .pred 	%p<6>;
+	.reg .s32 	%r<28>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<28>;
-	.reg .b64 	%rd<9>;
+	.reg .s64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u64 	%rd3, [crop_param_0];
 	ld.param.u32 	%r4, [crop_param_1];
 	ld.param.u32 	%r5, [crop_param_2];
 	ld.param.u32 	%r11, [crop_param_3];
-	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u64 	%rd4, [crop_param_4];
 	ld.param.u32 	%r6, [crop_param_5];
 	ld.param.u32 	%r7, [crop_param_6];
 	ld.param.u32 	%r8, [crop_param_8];
 	ld.param.u32 	%r9, [crop_param_9];
 	ld.param.u32 	%r10, [crop_param_10];
-	mov.u32 	%r12, %ctaid.x;
-	mov.u32 	%r13, %ntid.x;
+	cvta.to.global.u64 	%rd1, %rd3;
+	cvta.to.global.u64 	%rd2, %rd4;
+	.loc 1 9 1
+	mov.u32 	%r12, %ntid.x;
+	mov.u32 	%r13, %ctaid.x;
 	mov.u32 	%r14, %tid.x;
-	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mad.lo.s32 	%r1, %r12, %r13, %r14;
+	.loc 1 10 1
 	mov.u32 	%r15, %ntid.y;
 	mov.u32 	%r16, %ctaid.y;
 	mov.u32 	%r17, %tid.y;
 	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	.loc 1 11 1
 	mov.u32 	%r18, %ntid.z;
 	mov.u32 	%r19, %ctaid.z;
 	mov.u32 	%r20, %tid.z;
 	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	.loc 1 13 1
 	setp.lt.s32	%p1, %r1, %r4;
 	setp.lt.s32	%p2, %r2, %r5;
 	and.pred  	%p3, %p1, %p2;
+	.loc 1 13 1
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
+	.loc 1 13 1
 	@!%p5 bra 	BB0_2;
 	bra.uni 	BB0_1;
 
 BB0_1:
-	cvta.to.global.u64 	%rd3, %rd2;
+	.loc 1 14 1
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
 	mad.lo.s32 	%r23, %r21, %r7, %r22;
 	add.s32 	%r24, %r1, %r8;
 	mad.lo.s32 	%r25, %r23, %r6, %r24;
-	mul.wide.s32 	%rd4, %r25, 4;
-	add.s64 	%rd5, %rd3, %rd4;
-	ld.global.f32 	%f1, [%rd5];
+	mul.wide.s32 	%rd5, %r25, 4;
+	add.s64 	%rd6, %rd2, %rd5;
+	.loc 1 14 1
 	mad.lo.s32 	%r26, %r3, %r5, %r2;
 	mad.lo.s32 	%r27, %r26, %r4, %r1;
-	cvta.to.global.u64 	%rd6, %rd1;
 	mul.wide.s32 	%rd7, %r27, 4;
-	add.s64 	%rd8, %rd6, %rd7;
+	add.s64 	%rd8, %rd1, %rd7;
+	.loc 1 14 1
+	ld.global.f32 	%f1, [%rd6];
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
+	.loc 1 16 2
 	ret;
 }
 
 
 `
 	crop_ptx_30 = `
-.version 4.3
+.version 4.0
 .target sm_30
 .address_size 64
 
-	// .globl	crop
 
 .visible .entry crop(
 	.param .u64 crop_param_0,
@@ -198,9 +210,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<6>;
+	.reg .s32 	%r<28>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<28>;
-	.reg .b64 	%rd<9>;
+	.reg .s64 	%rd<9>;
 
 
 	ld.param.u64 	%rd1, [crop_param_0];
@@ -213,10 +225,10 @@ BB0_2:
 	ld.param.u32 	%r8, [crop_param_8];
 	ld.param.u32 	%r9, [crop_param_9];
 	ld.param.u32 	%r10, [crop_param_10];
-	mov.u32 	%r12, %ctaid.x;
-	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r12, %ntid.x;
+	mov.u32 	%r13, %ctaid.x;
 	mov.u32 	%r14, %tid.x;
-	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mad.lo.s32 	%r1, %r12, %r13, %r14;
 	mov.u32 	%r15, %ntid.y;
 	mov.u32 	%r16, %ctaid.y;
 	mov.u32 	%r17, %tid.y;
@@ -234,20 +246,20 @@ BB0_2:
 	bra.uni 	BB0_1;
 
 BB0_1:
-	cvta.to.global.u64 	%rd3, %rd2;
+	cvta.to.global.u64 	%rd3, %rd1;
+	cvta.to.global.u64 	%rd4, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
 	mad.lo.s32 	%r23, %r21, %r7, %r22;
 	add.s32 	%r24, %r1, %r8;
 	mad.lo.s32 	%r25, %r23, %r6, %r24;
-	mul.wide.s32 	%rd4, %r25, 4;
-	add.s64 	%rd5, %rd3, %rd4;
-	ld.global.f32 	%f1, [%rd5];
+	mul.wide.s32 	%rd5, %r25, 4;
+	add.s64 	%rd6, %rd4, %rd5;
 	mad.lo.s32 	%r26, %r3, %r5, %r2;
 	mad.lo.s32 	%r27, %r26, %r4, %r1;
-	cvta.to.global.u64 	%rd6, %rd1;
 	mul.wide.s32 	%rd7, %r27, 4;
-	add.s64 	%rd8, %rd6, %rd7;
+	add.s64 	%rd8, %rd3, %rd7;
+	ld.global.f32 	%f1, [%rd6];
 	st.global.f32 	[%rd8], %f1;
 
 BB0_2:
@@ -257,18 +269,17 @@ BB0_2:
 
 `
 	crop_ptx_35 = `
-.version 4.3
+.version 4.1
 .target sm_35
 .address_size 64
 
-	// .weak	cudaMalloc
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
 	.param .b64 cudaMalloc_param_1
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -276,13 +287,12 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaFuncGetAttributes
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -290,14 +300,13 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaDeviceGetAttribute
 .weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
 	.param .b64 cudaDeviceGetAttribute_param_0,
 	.param .b32 cudaDeviceGetAttribute_param_1,
 	.param .b32 cudaDeviceGetAttribute_param_2
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -305,12 +314,11 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaGetDevice
 .weak .func  (.param .b32 func_retval0) cudaGetDevice(
 	.param .b64 cudaGetDevice_param_0
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -318,7 +326,6 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
 .weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
@@ -326,7 +333,7 @@ BB0_2:
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -334,24 +341,6 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .globl	crop
 .visible .entry crop(
 	.param .u64 crop_param_0,
 	.param .u32 crop_param_1,
@@ -367,9 +356,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<6>;
+	.reg .s32 	%r<28>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<28>;
-	.reg .b64 	%rd<9>;
+	.reg .s64 	%rd<9>;
 
 
 	ld.param.u64 	%rd1, [crop_param_0];
@@ -382,10 +371,10 @@ BB0_2:
 	ld.param.u32 	%r8, [crop_param_8];
 	ld.param.u32 	%r9, [crop_param_9];
 	ld.param.u32 	%r10, [crop_param_10];
-	mov.u32 	%r12, %ctaid.x;
-	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r12, %ntid.x;
+	mov.u32 	%r13, %ctaid.x;
 	mov.u32 	%r14, %tid.x;
-	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mad.lo.s32 	%r1, %r12, %r13, %r14;
 	mov.u32 	%r15, %ntid.y;
 	mov.u32 	%r16, %ctaid.y;
 	mov.u32 	%r17, %tid.y;
@@ -399,27 +388,27 @@ BB0_2:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB6_2;
-	bra.uni 	BB6_1;
+	@!%p5 bra 	BB5_2;
+	bra.uni 	BB5_1;
 
-BB6_1:
-	cvta.to.global.u64 	%rd3, %rd2;
+BB5_1:
+	cvta.to.global.u64 	%rd3, %rd1;
+	cvta.to.global.u64 	%rd4, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
 	mad.lo.s32 	%r23, %r21, %r7, %r22;
 	add.s32 	%r24, %r1, %r8;
 	mad.lo.s32 	%r25, %r23, %r6, %r24;
-	mul.wide.s32 	%rd4, %r25, 4;
-	add.s64 	%rd5, %rd3, %rd4;
-	ld.global.nc.f32 	%f1, [%rd5];
+	mul.wide.s32 	%rd5, %r25, 4;
+	add.s64 	%rd6, %rd4, %rd5;
 	mad.lo.s32 	%r26, %r3, %r5, %r2;
 	mad.lo.s32 	%r27, %r26, %r4, %r1;
-	cvta.to.global.u64 	%rd6, %rd1;
 	mul.wide.s32 	%rd7, %r27, 4;
-	add.s64 	%rd8, %rd6, %rd7;
+	add.s64 	%rd8, %rd3, %rd7;
+	ld.global.nc.f32 	%f1, [%rd6];
 	st.global.f32 	[%rd8], %f1;
 
-BB6_2:
+BB5_2:
 	ret;
 }
 
@@ -927,6 +916,326 @@ BB6_1:
 	st.global.f32 	[%rd8], %f1;
 
 BB6_2:
+	ret;
+}
+
+
+`
+	crop_ptx_60 = `
+.version 5.0
+.target sm_60
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	crop_ptx_61 = `
+.version 5.0
+.target sm_61
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	crop_ptx_62 = `
+.version 5.0
+.target sm_62
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	crop_ptx_70 = `
+.version 6.0
+.target sm_70
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
 	ret;
 }
 

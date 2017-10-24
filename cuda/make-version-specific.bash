@@ -10,6 +10,10 @@ CC2PATH=( [20]=/usr/local/cuda-5.5 \
           [50]=/usr/local/cuda-7.5 \
           [52]=/usr/local/cuda-7.5 \
           [53]=/usr/local/cuda-7.5 \
+          [60]=/usr/local/cuda-8.0 \
+          [61]=/usr/local/cuda-8.0 \
+          [62]=/usr/local/cuda-8.0 \
+          [70]=/usr/local/cuda-9.0 \
         )
 
 go build cuda2go.go || exit 1

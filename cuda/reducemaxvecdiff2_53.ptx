@@ -11,7 +11,7 @@
 .address_size 64
 
 	// .weak	cudaMalloc
-// reducemaxvecdiff2$__cuda_local_var_42901_10_non_const_sdata has been demoted
+// reducemaxvecdiff2$__cuda_local_var_42737_35_non_const_sdata has been demoted
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
@@ -119,7 +119,7 @@
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<28>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecdiff2$__cuda_local_var_42901_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecdiff2$__cuda_local_var_42737_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd9, [reducemaxvecdiff2_param_0];
 	ld.param.u64 	%rd10, [reducemaxvecdiff2_param_1];
@@ -172,7 +172,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd22, %r2, 4;
-	mov.u64 	%rd23, reducemaxvecdiff2$__cuda_local_var_42901_10_non_const_sdata;
+	mov.u64 	%rd23, reducemaxvecdiff2$__cuda_local_var_42737_35_non_const_sdata;
 	add.s64 	%rd7, %rd23, %rd22;
 	st.shared.f32 	[%rd7], %f40;
 	bar.sync 	0;
@@ -231,7 +231,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f38, [reducemaxvecdiff2$__cuda_local_var_42901_10_non_const_sdata];
+	ld.shared.f32 	%f38, [reducemaxvecdiff2$__cuda_local_var_42737_35_non_const_sdata];
 	abs.f32 	%f39, %f38;
 	mov.b32 	 %r13, %f39;
 	cvta.to.global.u64 	%rd27, %rd8;

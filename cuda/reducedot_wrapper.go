@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for reducedot kernel
 var reducedot_code cu.Function
 
 // Stores the arguments for reducedot kernel invocation
-type reducedot_args_t struct {
-	arg_x1      unsafe.Pointer
-	arg_x2      unsafe.Pointer
-	arg_dst     unsafe.Pointer
-	arg_initVal float32
-	arg_n       int
-	argptr      [5]unsafe.Pointer
+type reducedot_args_t struct{
+	 arg_x1 unsafe.Pointer
+	 arg_x2 unsafe.Pointer
+	 arg_dst unsafe.Pointer
+	 arg_initVal float32
+	 arg_n int
+	 argptr [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducedot kernel invocation
 var reducedot_args reducedot_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
-	reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
-	reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
-	reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
-	reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
-}
+	 reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
+	 reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
+	 reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
+	 reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
+	 reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
+	 }
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
-func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	if Synchronous { // debug
+func k_reducedot_async ( x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("reducedot")
 	}
@@ -48,37 +48,38 @@ func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer,
 	reducedot_args.Lock()
 	defer reducedot_args.Unlock()
 
-	if reducedot_code == 0 {
+	if reducedot_code == 0{
 		reducedot_code = fatbinLoad(reducedot_map, "reducedot")
 	}
 
-	reducedot_args.arg_x1 = x1
-	reducedot_args.arg_x2 = x2
-	reducedot_args.arg_dst = dst
-	reducedot_args.arg_initVal = initVal
-	reducedot_args.arg_n = n
+	 reducedot_args.arg_x1 = x1
+	 reducedot_args.arg_x2 = x2
+	 reducedot_args.arg_dst = dst
+	 reducedot_args.arg_initVal = initVal
+	 reducedot_args.arg_n = n
+	
 
 	args := reducedot_args.argptr[:]
 	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("reducedot")
 	}
 }
 
 // maps compute capability on PTX code for reducedot kernel.
-var reducedot_map = map[int]string{0: "",
-	20: reducedot_ptx_20,
-	30: reducedot_ptx_30,
-	35: reducedot_ptx_35,
-	50: reducedot_ptx_50,
-	52: reducedot_ptx_52,
-	53: reducedot_ptx_53}
+var reducedot_map = map[int]string{ 0: "" ,
+20: reducedot_ptx_20 ,
+30: reducedot_ptx_30 ,
+35: reducedot_ptx_35 ,
+50: reducedot_ptx_50 ,
+52: reducedot_ptx_52 ,
+53: reducedot_ptx_53  }
 
 // reducedot PTX code for various compute capabilities.
-const (
-	reducedot_ptx_20 = `
+const(
+  reducedot_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -98,7 +99,7 @@ const (
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42198_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42114_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -129,7 +130,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42198_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42114_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -189,7 +190,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42198_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42114_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB0_10:
@@ -198,7 +199,7 @@ BB0_10:
 
 
 `
-	reducedot_ptx_30 = `
+   reducedot_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -218,7 +219,7 @@ BB0_10:
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42494_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42410_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -249,7 +250,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42494_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42410_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -309,7 +310,7 @@ BB0_8:
 	@%p7 bra 	BB0_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42494_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42410_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB0_10:
@@ -318,7 +319,7 @@ BB0_10:
 
 
 `
-	reducedot_ptx_35 = `
+   reducedot_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -427,7 +428,7 @@ BB0_10:
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42751_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42667_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -458,7 +459,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42751_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42667_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -518,7 +519,7 @@ BB6_8:
 	@%p7 bra 	BB6_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42751_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42667_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB6_10:
@@ -527,7 +528,7 @@ BB6_10:
 
 
 `
-	reducedot_ptx_50 = `
+   reducedot_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -636,7 +637,7 @@ BB6_10:
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42751_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42667_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -667,7 +668,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42751_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42667_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -727,7 +728,7 @@ BB6_8:
 	@%p7 bra 	BB6_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42751_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42667_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB6_10:
@@ -736,7 +737,7 @@ BB6_10:
 
 
 `
-	reducedot_ptx_52 = `
+   reducedot_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -845,7 +846,7 @@ BB6_10:
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42751_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42667_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -876,7 +877,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42751_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42667_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -936,7 +937,7 @@ BB6_8:
 	@%p7 bra 	BB6_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42751_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42667_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB6_10:
@@ -945,7 +946,7 @@ BB6_10:
 
 
 `
-	reducedot_ptx_53 = `
+   reducedot_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -1054,7 +1055,7 @@ BB6_10:
 	.reg .b32 	%r<15>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducedot$__cuda_local_var_42751_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducedot$__cuda_local_var_42667_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducedot_param_0];
 	ld.param.u64 	%rd6, [reducedot_param_1];
@@ -1085,7 +1086,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducedot$__cuda_local_var_42751_10_non_const_sdata;
+	mov.u64 	%rd11, reducedot$__cuda_local_var_42667_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f30;
 	bar.sync 	0;
@@ -1145,7 +1146,7 @@ BB6_8:
 	@%p7 bra 	BB6_10;
 
 	cvta.to.global.u64 	%rd15, %rd4;
-	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42751_10_non_const_sdata];
+	ld.shared.f32 	%f28, [reducedot$__cuda_local_var_42667_35_non_const_sdata];
 	atom.global.add.f32 	%f29, [%rd15], %f28;
 
 BB6_10:
@@ -1154,4 +1155,4 @@ BB6_10:
 
 
 `
-)
+ )

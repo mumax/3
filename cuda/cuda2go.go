@@ -93,7 +93,7 @@ func typemap(ctype string) string {
 	panic(fmt.Errorf("unsupported cuda type: %v", ctype))
 }
 
-var tm = map[string]string{"float*": "unsafe.Pointer", "float": "float32", "int": "int", "uint8_t*": "unsafe.Pointer", "uint8_t": "byte"}
+var tm = map[string]string{"float*": "unsafe.Pointer", "float": "float32", "int": "int", "uint16_t*": "unsafe.Pointer", "uint16_t": "uint16"}
 
 // template data
 type Kernel struct {

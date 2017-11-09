@@ -19,47 +19,47 @@ type Bytes struct {
 // Construct new byte slice with given length,
 // initialised to zeros.
 func NewBytes(Len int) *Bytes {
-	ptr := cu.MemAlloc(int64(Len))
-	cu.MemsetD8(cu.DevicePtr(ptr), 0, int64(Len))
+	ptr := cu.MemAlloc(int64(2*Len))
+	cu.MemsetD16(cu.DevicePtr(ptr), 0, int64(Len))
 	return &Bytes{unsafe.Pointer(uintptr(ptr)), Len}
 }
 
 // Upload src (host) to dst (gpu).
-func (dst *Bytes) Upload(src []byte) {
+func (dst *Bytes) Upload(src []uint16) {
 	util.Argument(dst.Len == len(src))
-	MemCpyHtoD(dst.Ptr, unsafe.Pointer(&src[0]), int64(dst.Len))
+	MemCpyHtoD(dst.Ptr, unsafe.Pointer(&src[0]), int64(2*dst.Len))
 }
 
 // Copy on device: dst = src.
 func (dst *Bytes) Copy(src *Bytes) {
 	util.Argument(dst.Len == src.Len)
-	MemCpy(dst.Ptr, src.Ptr, int64(dst.Len))
+	MemCpy(dst.Ptr, src.Ptr, int64(2*dst.Len))
 }
 
 // Copy to host: dst = src.
-func (src *Bytes) Download(dst []byte) {
+func (src *Bytes) Download(dst []uint16) {
 	util.Argument(src.Len == len(dst))
-	MemCpyDtoH(unsafe.Pointer(&dst[0]), src.Ptr, int64(src.Len))
+	MemCpyDtoH(unsafe.Pointer(&dst[0]), src.Ptr, int64(2*src.Len))
 }
 
 // Set one element to value.
 // data.Index can be used to find the index for x,y,z.
-func (dst *Bytes) Set(index int, value byte) {
+func (dst *Bytes) Set(index int, value uint16) {
 	if index < 0 || index >= dst.Len {
 		log.Panic("Bytes.Set: index out of range:", index)
 	}
 	src := value
-	MemCpyHtoD(unsafe.Pointer(uintptr(dst.Ptr)+uintptr(index)), unsafe.Pointer(&src), 1)
+	MemCpyHtoD(unsafe.Pointer(uintptr(dst.Ptr)+uintptr(2*index)), unsafe.Pointer(&src), 2)
 }
 
 // Get one element.
 // data.Index can be used to find the index for x,y,z.
-func (src *Bytes) Get(index int) byte {
+func (src *Bytes) Get(index int) uint16 {
 	if index < 0 || index >= src.Len {
 		log.Panic("Bytes.Set: index out of range:", index)
 	}
-	var dst byte
-	MemCpyDtoH(unsafe.Pointer(&dst), unsafe.Pointer(uintptr(src.Ptr)+uintptr(index)), 1)
+	var dst uint16
+	MemCpyDtoH(unsafe.Pointer(&dst), unsafe.Pointer(uintptr(src.Ptr)+uintptr(2*index)), 2)
 	return dst
 }
 

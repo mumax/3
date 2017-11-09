@@ -5,48 +5,48 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for copyunpad kernel
 var copyunpad_code cu.Function
 
 // Stores the arguments for copyunpad kernel invocation
-type copyunpad_args_t struct {
-	arg_dst unsafe.Pointer
-	arg_Dx  int
-	arg_Dy  int
-	arg_Dz  int
-	arg_src unsafe.Pointer
-	arg_Sx  int
-	arg_Sy  int
-	arg_Sz  int
-	argptr  [8]unsafe.Pointer
+type copyunpad_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_Dx int
+	 arg_Dy int
+	 arg_Dz int
+	 arg_src unsafe.Pointer
+	 arg_Sx int
+	 arg_Sy int
+	 arg_Sz int
+	 argptr [8]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for copyunpad kernel invocation
 var copyunpad_args copyunpad_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	copyunpad_args.argptr[0] = unsafe.Pointer(&copyunpad_args.arg_dst)
-	copyunpad_args.argptr[1] = unsafe.Pointer(&copyunpad_args.arg_Dx)
-	copyunpad_args.argptr[2] = unsafe.Pointer(&copyunpad_args.arg_Dy)
-	copyunpad_args.argptr[3] = unsafe.Pointer(&copyunpad_args.arg_Dz)
-	copyunpad_args.argptr[4] = unsafe.Pointer(&copyunpad_args.arg_src)
-	copyunpad_args.argptr[5] = unsafe.Pointer(&copyunpad_args.arg_Sx)
-	copyunpad_args.argptr[6] = unsafe.Pointer(&copyunpad_args.arg_Sy)
-	copyunpad_args.argptr[7] = unsafe.Pointer(&copyunpad_args.arg_Sz)
-}
+	 copyunpad_args.argptr[0] = unsafe.Pointer(&copyunpad_args.arg_dst)
+	 copyunpad_args.argptr[1] = unsafe.Pointer(&copyunpad_args.arg_Dx)
+	 copyunpad_args.argptr[2] = unsafe.Pointer(&copyunpad_args.arg_Dy)
+	 copyunpad_args.argptr[3] = unsafe.Pointer(&copyunpad_args.arg_Dz)
+	 copyunpad_args.argptr[4] = unsafe.Pointer(&copyunpad_args.arg_src)
+	 copyunpad_args.argptr[5] = unsafe.Pointer(&copyunpad_args.arg_Sx)
+	 copyunpad_args.argptr[6] = unsafe.Pointer(&copyunpad_args.arg_Sy)
+	 copyunpad_args.argptr[7] = unsafe.Pointer(&copyunpad_args.arg_Sz)
+	 }
 
 // Wrapper for copyunpad CUDA kernel, asynchronous.
-func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, cfg *config) {
-	if Synchronous { // debug
+func k_copyunpad_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("copyunpad")
 	}
@@ -54,40 +54,41 @@ func k_copyunpad_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Po
 	copyunpad_args.Lock()
 	defer copyunpad_args.Unlock()
 
-	if copyunpad_code == 0 {
+	if copyunpad_code == 0{
 		copyunpad_code = fatbinLoad(copyunpad_map, "copyunpad")
 	}
 
-	copyunpad_args.arg_dst = dst
-	copyunpad_args.arg_Dx = Dx
-	copyunpad_args.arg_Dy = Dy
-	copyunpad_args.arg_Dz = Dz
-	copyunpad_args.arg_src = src
-	copyunpad_args.arg_Sx = Sx
-	copyunpad_args.arg_Sy = Sy
-	copyunpad_args.arg_Sz = Sz
+	 copyunpad_args.arg_dst = dst
+	 copyunpad_args.arg_Dx = Dx
+	 copyunpad_args.arg_Dy = Dy
+	 copyunpad_args.arg_Dz = Dz
+	 copyunpad_args.arg_src = src
+	 copyunpad_args.arg_Sx = Sx
+	 copyunpad_args.arg_Sy = Sy
+	 copyunpad_args.arg_Sz = Sz
+	
 
 	args := copyunpad_args.argptr[:]
 	cu.LaunchKernel(copyunpad_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("copyunpad")
 	}
 }
 
 // maps compute capability on PTX code for copyunpad kernel.
-var copyunpad_map = map[int]string{0: "",
-	20: copyunpad_ptx_20,
-	30: copyunpad_ptx_30,
-	35: copyunpad_ptx_35,
-	50: copyunpad_ptx_50,
-	52: copyunpad_ptx_52,
-	53: copyunpad_ptx_53}
+var copyunpad_map = map[int]string{ 0: "" ,
+20: copyunpad_ptx_20 ,
+30: copyunpad_ptx_30 ,
+35: copyunpad_ptx_35 ,
+50: copyunpad_ptx_50 ,
+52: copyunpad_ptx_52 ,
+53: copyunpad_ptx_53  }
 
 // copyunpad PTX code for various compute capabilities.
-const (
-	copyunpad_ptx_20 = `
+const(
+  copyunpad_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -158,7 +159,7 @@ BB0_2:
 
 
 `
-	copyunpad_ptx_30 = `
+   copyunpad_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -229,7 +230,7 @@ BB0_2:
 
 
 `
-	copyunpad_ptx_35 = `
+   copyunpad_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -389,7 +390,7 @@ BB6_2:
 
 
 `
-	copyunpad_ptx_50 = `
+   copyunpad_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -549,7 +550,7 @@ BB6_2:
 
 
 `
-	copyunpad_ptx_52 = `
+   copyunpad_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -709,7 +710,7 @@ BB6_2:
 
 
 `
-	copyunpad_ptx_53 = `
+   copyunpad_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -869,4 +870,4 @@ BB6_2:
 
 
 `
-)
+ )

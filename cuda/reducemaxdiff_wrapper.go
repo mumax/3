@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for reducemaxdiff kernel
 var reducemaxdiff_code cu.Function
 
 // Stores the arguments for reducemaxdiff kernel invocation
-type reducemaxdiff_args_t struct {
-	arg_src1    unsafe.Pointer
-	arg_src2    unsafe.Pointer
-	arg_dst     unsafe.Pointer
-	arg_initVal float32
-	arg_n       int
-	argptr      [5]unsafe.Pointer
+type reducemaxdiff_args_t struct{
+	 arg_src1 unsafe.Pointer
+	 arg_src2 unsafe.Pointer
+	 arg_dst unsafe.Pointer
+	 arg_initVal float32
+	 arg_n int
+	 argptr [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducemaxdiff kernel invocation
 var reducemaxdiff_args reducemaxdiff_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
-	reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
-	reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
-	reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
-	reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
-}
+	 reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
+	 reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
+	 reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
+	 reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
+	 reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
+	 }
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
-func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	if Synchronous { // debug
+func k_reducemaxdiff_async ( src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("reducemaxdiff")
 	}
@@ -48,37 +48,38 @@ func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.
 	reducemaxdiff_args.Lock()
 	defer reducemaxdiff_args.Unlock()
 
-	if reducemaxdiff_code == 0 {
+	if reducemaxdiff_code == 0{
 		reducemaxdiff_code = fatbinLoad(reducemaxdiff_map, "reducemaxdiff")
 	}
 
-	reducemaxdiff_args.arg_src1 = src1
-	reducemaxdiff_args.arg_src2 = src2
-	reducemaxdiff_args.arg_dst = dst
-	reducemaxdiff_args.arg_initVal = initVal
-	reducemaxdiff_args.arg_n = n
+	 reducemaxdiff_args.arg_src1 = src1
+	 reducemaxdiff_args.arg_src2 = src2
+	 reducemaxdiff_args.arg_dst = dst
+	 reducemaxdiff_args.arg_initVal = initVal
+	 reducemaxdiff_args.arg_n = n
+	
 
 	args := reducemaxdiff_args.argptr[:]
 	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("reducemaxdiff")
 	}
 }
 
 // maps compute capability on PTX code for reducemaxdiff kernel.
-var reducemaxdiff_map = map[int]string{0: "",
-	20: reducemaxdiff_ptx_20,
-	30: reducemaxdiff_ptx_30,
-	35: reducemaxdiff_ptx_35,
-	50: reducemaxdiff_ptx_50,
-	52: reducemaxdiff_ptx_52,
-	53: reducemaxdiff_ptx_53}
+var reducemaxdiff_map = map[int]string{ 0: "" ,
+20: reducemaxdiff_ptx_20 ,
+30: reducemaxdiff_ptx_30 ,
+35: reducemaxdiff_ptx_35 ,
+50: reducemaxdiff_ptx_50 ,
+52: reducemaxdiff_ptx_52 ,
+53: reducemaxdiff_ptx_53  }
 
 // reducemaxdiff PTX code for various compute capabilities.
-const (
-	reducemaxdiff_ptx_20 = `
+const(
+  reducemaxdiff_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -98,7 +99,7 @@ const (
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42199_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42115_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -131,7 +132,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42199_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42115_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -190,7 +191,7 @@ BB0_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42199_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42115_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -202,7 +203,7 @@ BB0_10:
 
 
 `
-	reducemaxdiff_ptx_30 = `
+   reducemaxdiff_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -222,7 +223,7 @@ BB0_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42495_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42411_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -255,7 +256,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42495_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42411_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -314,7 +315,7 @@ BB0_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42495_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42411_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -326,7 +327,7 @@ BB0_10:
 
 
 `
-	reducemaxdiff_ptx_35 = `
+   reducemaxdiff_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -435,7 +436,7 @@ BB0_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -468,7 +469,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -527,7 +528,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -539,7 +540,7 @@ BB6_10:
 
 
 `
-	reducemaxdiff_ptx_50 = `
+   reducemaxdiff_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -648,7 +649,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -681,7 +682,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -740,7 +741,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -752,7 +753,7 @@ BB6_10:
 
 
 `
-	reducemaxdiff_ptx_52 = `
+   reducemaxdiff_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -861,7 +862,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -894,7 +895,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -953,7 +954,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -965,7 +966,7 @@ BB6_10:
 
 
 `
-	reducemaxdiff_ptx_53 = `
+   reducemaxdiff_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -1074,7 +1075,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<16>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxdiff_param_0];
 	ld.param.u64 	%rd6, [reducemaxdiff_param_1];
@@ -1107,7 +1108,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd10, %r2, 4;
-	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata;
+	mov.u64 	%rd11, reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata;
 	add.s64 	%rd3, %rd11, %rd10;
 	st.shared.f32 	[%rd3], %f32;
 	bar.sync 	0;
@@ -1166,7 +1167,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42752_10_non_const_sdata];
+	ld.shared.f32 	%f30, [reducemaxdiff$__cuda_local_var_42668_35_non_const_sdata];
 	abs.f32 	%f31, %f30;
 	mov.b32 	 %r13, %f31;
 	cvta.to.global.u64 	%rd15, %rd4;
@@ -1178,4 +1179,4 @@ BB6_10:
 
 
 `
-)
+ )

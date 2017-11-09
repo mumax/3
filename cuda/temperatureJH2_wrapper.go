@@ -12,100 +12,94 @@ import(
 	"sync"
 )
 
-// CUDA handle for regionselect kernel
-var regionselect_code cu.Function
+// CUDA handle for InittemperatureJH kernel
+var InittemperatureJH_code cu.Function
 
-// Stores the arguments for regionselect kernel invocation
-type regionselect_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_src unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_region uint16
+// Stores the arguments for InittemperatureJH kernel invocation
+type InittemperatureJH_args_t struct{
+	 arg_tempJH unsafe.Pointer
+	 arg_TSubs_ unsafe.Pointer
+	 arg_TSubs_mul float32
 	 arg_N int
-	 argptr [5]unsafe.Pointer
+	 argptr [4]unsafe.Pointer
 	sync.Mutex
 }
 
-// Stores the arguments for regionselect kernel invocation
-var regionselect_args regionselect_args_t
+// Stores the arguments for InittemperatureJH kernel invocation
+var InittemperatureJH_args InittemperatureJH_args_t
 
 func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 regionselect_args.argptr[0] = unsafe.Pointer(&regionselect_args.arg_dst)
-	 regionselect_args.argptr[1] = unsafe.Pointer(&regionselect_args.arg_src)
-	 regionselect_args.argptr[2] = unsafe.Pointer(&regionselect_args.arg_regions)
-	 regionselect_args.argptr[3] = unsafe.Pointer(&regionselect_args.arg_region)
-	 regionselect_args.argptr[4] = unsafe.Pointer(&regionselect_args.arg_N)
+	 InittemperatureJH_args.argptr[0] = unsafe.Pointer(&InittemperatureJH_args.arg_tempJH)
+	 InittemperatureJH_args.argptr[1] = unsafe.Pointer(&InittemperatureJH_args.arg_TSubs_)
+	 InittemperatureJH_args.argptr[2] = unsafe.Pointer(&InittemperatureJH_args.arg_TSubs_mul)
+	 InittemperatureJH_args.argptr[3] = unsafe.Pointer(&InittemperatureJH_args.arg_N)
 	 }
 
-// Wrapper for regionselect CUDA kernel, asynchronous.
-func k_regionselect_async ( dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region uint16, N int,  cfg *config) {
+// Wrapper for InittemperatureJH CUDA kernel, asynchronous.
+func k_InittemperatureJH_async ( tempJH unsafe.Pointer, TSubs_ unsafe.Pointer, TSubs_mul float32, N int,  cfg *config) {
 	if Synchronous{ // debug
 		Sync()
-		timer.Start("regionselect")
+		timer.Start("InittemperatureJH")
 	}
 
-	regionselect_args.Lock()
-	defer regionselect_args.Unlock()
+	InittemperatureJH_args.Lock()
+	defer InittemperatureJH_args.Unlock()
 
-	if regionselect_code == 0{
-		regionselect_code = fatbinLoad(regionselect_map, "regionselect")
+	if InittemperatureJH_code == 0{
+		InittemperatureJH_code = fatbinLoad(InittemperatureJH_map, "InittemperatureJH")
 	}
 
-	 regionselect_args.arg_dst = dst
-	 regionselect_args.arg_src = src
-	 regionselect_args.arg_regions = regions
-	 regionselect_args.arg_region = region
-	 regionselect_args.arg_N = N
+	 InittemperatureJH_args.arg_tempJH = tempJH
+	 InittemperatureJH_args.arg_TSubs_ = TSubs_
+	 InittemperatureJH_args.arg_TSubs_mul = TSubs_mul
+	 InittemperatureJH_args.arg_N = N
 	
 
-	args := regionselect_args.argptr[:]
-	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
+	args := InittemperatureJH_args.argptr[:]
+	cu.LaunchKernel(InittemperatureJH_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
 	if Synchronous{ // debug
 		Sync()
-		timer.Stop("regionselect")
+		timer.Stop("InittemperatureJH")
 	}
 }
 
-// maps compute capability on PTX code for regionselect kernel.
-var regionselect_map = map[int]string{ 0: "" ,
-20: regionselect_ptx_20 ,
-30: regionselect_ptx_30 ,
-35: regionselect_ptx_35 ,
-50: regionselect_ptx_50 ,
-52: regionselect_ptx_52 ,
-53: regionselect_ptx_53  }
+// maps compute capability on PTX code for InittemperatureJH kernel.
+var InittemperatureJH_map = map[int]string{ 0: "" ,
+20: InittemperatureJH_ptx_20 ,
+30: InittemperatureJH_ptx_30 ,
+35: InittemperatureJH_ptx_35 ,
+50: InittemperatureJH_ptx_50 ,
+52: InittemperatureJH_ptx_52 ,
+53: InittemperatureJH_ptx_53  }
 
-// regionselect PTX code for various compute capabilities.
+// InittemperatureJH PTX code for various compute capabilities.
 const(
-  regionselect_ptx_20 = `
+  InittemperatureJH_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
 
-	// .globl	regionselect
+	// .globl	InittemperatureJH
 
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -116,24 +110,20 @@ const(
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB0_4:
 	ret;
@@ -141,33 +131,30 @@ BB0_4:
 
 
 `
-   regionselect_ptx_30 = `
+   InittemperatureJH_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
 
-	// .globl	regionselect
+	// .globl	InittemperatureJH
 
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -178,24 +165,20 @@ BB0_4:
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB0_4:
 	ret;
@@ -203,7 +186,7 @@ BB0_4:
 
 
 `
-   regionselect_ptx_35 = `
+   InittemperatureJH_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -298,27 +281,24 @@ BB0_4:
 	ret;
 }
 
-	// .globl	regionselect
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+	// .globl	InittemperatureJH
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -329,24 +309,20 @@ BB0_4:
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB6_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB6_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB6_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB6_4:
 	ret;
@@ -354,7 +330,7 @@ BB6_4:
 
 
 `
-   regionselect_ptx_50 = `
+   InittemperatureJH_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -449,27 +425,24 @@ BB6_4:
 	ret;
 }
 
-	// .globl	regionselect
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+	// .globl	InittemperatureJH
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -480,24 +453,20 @@ BB6_4:
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB6_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB6_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB6_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB6_4:
 	ret;
@@ -505,7 +474,7 @@ BB6_4:
 
 
 `
-   regionselect_ptx_52 = `
+   InittemperatureJH_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -600,27 +569,24 @@ BB6_4:
 	ret;
 }
 
-	// .globl	regionselect
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+	// .globl	InittemperatureJH
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -631,24 +597,20 @@ BB6_4:
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB6_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB6_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB6_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB6_4:
 	ret;
@@ -656,7 +618,7 @@ BB6_4:
 
 
 `
-   regionselect_ptx_53 = `
+   InittemperatureJH_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -751,27 +713,24 @@ BB6_4:
 	ret;
 }
 
-	// .globl	regionselect
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u16 regionselect_param_3,
-	.param .u32 regionselect_param_4
+	// .globl	InittemperatureJH
+.visible .entry InittemperatureJH(
+	.param .u64 InittemperatureJH_param_0,
+	.param .u64 InittemperatureJH_param_1,
+	.param .f32 InittemperatureJH_param_2,
+	.param .u32 InittemperatureJH_param_3
 )
 {
 	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
+	.reg .f32 	%f<6>;
 	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
+	.reg .b64 	%rd<9>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u16 	%rs1, [regionselect_param_3];
-	ld.param.u32 	%r2, [regionselect_param_4];
+	ld.param.u64 	%rd1, [InittemperatureJH_param_0];
+	ld.param.u64 	%rd2, [InittemperatureJH_param_1];
+	ld.param.f32 	%f5, [InittemperatureJH_param_2];
+	ld.param.u32 	%r2, [InittemperatureJH_param_3];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
@@ -782,24 +741,20 @@ BB6_4:
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB6_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	mul.wide.s32 	%rd5, %r1, 2;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u16 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
+	setp.eq.s64	%p2, %rd2, 0;
 	@%p2 bra 	BB6_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
+	cvta.to.global.u64 	%rd3, %rd2;
+	mul.wide.s32 	%rd4, %r1, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f4, [%rd5];
+	mul.f32 	%f5, %f4, %f5;
 
 BB6_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r1, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f5;
 
 BB6_4:
 	ret;

@@ -5,46 +5,46 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for kernmulRSymm2Dxy kernel
 var kernmulRSymm2Dxy_code cu.Function
 
 // Stores the arguments for kernmulRSymm2Dxy kernel invocation
-type kernmulRSymm2Dxy_args_t struct {
-	arg_fftMx  unsafe.Pointer
-	arg_fftMy  unsafe.Pointer
-	arg_fftKxx unsafe.Pointer
-	arg_fftKyy unsafe.Pointer
-	arg_fftKxy unsafe.Pointer
-	arg_Nx     int
-	arg_Ny     int
-	argptr     [7]unsafe.Pointer
+type kernmulRSymm2Dxy_args_t struct{
+	 arg_fftMx unsafe.Pointer
+	 arg_fftMy unsafe.Pointer
+	 arg_fftKxx unsafe.Pointer
+	 arg_fftKyy unsafe.Pointer
+	 arg_fftKxy unsafe.Pointer
+	 arg_Nx int
+	 arg_Ny int
+	 argptr [7]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for kernmulRSymm2Dxy kernel invocation
 var kernmulRSymm2Dxy_args kernmulRSymm2Dxy_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	kernmulRSymm2Dxy_args.argptr[0] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMx)
-	kernmulRSymm2Dxy_args.argptr[1] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMy)
-	kernmulRSymm2Dxy_args.argptr[2] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxx)
-	kernmulRSymm2Dxy_args.argptr[3] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKyy)
-	kernmulRSymm2Dxy_args.argptr[4] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxy)
-	kernmulRSymm2Dxy_args.argptr[5] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Nx)
-	kernmulRSymm2Dxy_args.argptr[6] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Ny)
-}
+	 kernmulRSymm2Dxy_args.argptr[0] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMx)
+	 kernmulRSymm2Dxy_args.argptr[1] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftMy)
+	 kernmulRSymm2Dxy_args.argptr[2] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxx)
+	 kernmulRSymm2Dxy_args.argptr[3] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKyy)
+	 kernmulRSymm2Dxy_args.argptr[4] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_fftKxy)
+	 kernmulRSymm2Dxy_args.argptr[5] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Nx)
+	 kernmulRSymm2Dxy_args.argptr[6] = unsafe.Pointer(&kernmulRSymm2Dxy_args.arg_Ny)
+	 }
 
 // Wrapper for kernmulRSymm2Dxy CUDA kernel, asynchronous.
-func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, cfg *config) {
-	if Synchronous { // debug
+func k_kernmulRSymm2Dxy_async ( fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("kernmulRSymm2Dxy")
 	}
@@ -52,39 +52,40 @@ func k_kernmulRSymm2Dxy_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftKxx
 	kernmulRSymm2Dxy_args.Lock()
 	defer kernmulRSymm2Dxy_args.Unlock()
 
-	if kernmulRSymm2Dxy_code == 0 {
+	if kernmulRSymm2Dxy_code == 0{
 		kernmulRSymm2Dxy_code = fatbinLoad(kernmulRSymm2Dxy_map, "kernmulRSymm2Dxy")
 	}
 
-	kernmulRSymm2Dxy_args.arg_fftMx = fftMx
-	kernmulRSymm2Dxy_args.arg_fftMy = fftMy
-	kernmulRSymm2Dxy_args.arg_fftKxx = fftKxx
-	kernmulRSymm2Dxy_args.arg_fftKyy = fftKyy
-	kernmulRSymm2Dxy_args.arg_fftKxy = fftKxy
-	kernmulRSymm2Dxy_args.arg_Nx = Nx
-	kernmulRSymm2Dxy_args.arg_Ny = Ny
+	 kernmulRSymm2Dxy_args.arg_fftMx = fftMx
+	 kernmulRSymm2Dxy_args.arg_fftMy = fftMy
+	 kernmulRSymm2Dxy_args.arg_fftKxx = fftKxx
+	 kernmulRSymm2Dxy_args.arg_fftKyy = fftKyy
+	 kernmulRSymm2Dxy_args.arg_fftKxy = fftKxy
+	 kernmulRSymm2Dxy_args.arg_Nx = Nx
+	 kernmulRSymm2Dxy_args.arg_Ny = Ny
+	
 
 	args := kernmulRSymm2Dxy_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm2Dxy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("kernmulRSymm2Dxy")
 	}
 }
 
 // maps compute capability on PTX code for kernmulRSymm2Dxy kernel.
-var kernmulRSymm2Dxy_map = map[int]string{0: "",
-	20: kernmulRSymm2Dxy_ptx_20,
-	30: kernmulRSymm2Dxy_ptx_30,
-	35: kernmulRSymm2Dxy_ptx_35,
-	50: kernmulRSymm2Dxy_ptx_50,
-	52: kernmulRSymm2Dxy_ptx_52,
-	53: kernmulRSymm2Dxy_ptx_53}
+var kernmulRSymm2Dxy_map = map[int]string{ 0: "" ,
+20: kernmulRSymm2Dxy_ptx_20 ,
+30: kernmulRSymm2Dxy_ptx_30 ,
+35: kernmulRSymm2Dxy_ptx_35 ,
+50: kernmulRSymm2Dxy_ptx_50 ,
+52: kernmulRSymm2Dxy_ptx_52 ,
+53: kernmulRSymm2Dxy_ptx_53  }
 
 // kernmulRSymm2Dxy PTX code for various compute capabilities.
-const (
-	kernmulRSymm2Dxy_ptx_20 = `
+const(
+  kernmulRSymm2Dxy_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -176,7 +177,7 @@ BB0_2:
 
 
 `
-	kernmulRSymm2Dxy_ptx_30 = `
+   kernmulRSymm2Dxy_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -268,7 +269,7 @@ BB0_2:
 
 
 `
-	kernmulRSymm2Dxy_ptx_35 = `
+   kernmulRSymm2Dxy_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -449,7 +450,7 @@ BB6_2:
 
 
 `
-	kernmulRSymm2Dxy_ptx_50 = `
+   kernmulRSymm2Dxy_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -630,7 +631,7 @@ BB6_2:
 
 
 `
-	kernmulRSymm2Dxy_ptx_52 = `
+   kernmulRSymm2Dxy_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -811,7 +812,7 @@ BB6_2:
 
 
 `
-	kernmulRSymm2Dxy_ptx_53 = `
+   kernmulRSymm2Dxy_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -992,4 +993,4 @@ BB6_2:
 
 
 `
-)
+ )

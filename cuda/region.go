@@ -24,7 +24,7 @@ func RegionDecode(dst *data.Slice, lut LUTPtr, regions *Bytes) {
 }
 
 // select the part of src within the specified region, set 0's everywhere else.
-func RegionSelect(dst, src *data.Slice, regions *Bytes, region byte) {
+func RegionSelect(dst, src *data.Slice, regions *Bytes, region uint16) {
 	util.Argument(dst.NComp() == src.NComp())
 	N := dst.Len()
 	cfg := make1DConf(N)

@@ -32,13 +32,13 @@ func ShiftZ(dst, src *data.Slice, shiftZ int, clampL, clampR float32) {
 }
 
 // Like Shift, but for bytes
-func ShiftBytes(dst, src *Bytes, m *data.Mesh, shiftX int, clamp byte) {
+func ShiftBytes(dst, src *Bytes, m *data.Mesh, shiftX int, clamp uint16) {
 	N := m.Size()
 	cfg := make3DConf(N)
 	k_shiftbytes_async(dst.Ptr, src.Ptr, N[X], N[Y], N[Z], shiftX, clamp, cfg)
 }
 
-func ShiftBytesY(dst, src *Bytes, m *data.Mesh, shiftY int, clamp byte) {
+func ShiftBytesY(dst, src *Bytes, m *data.Mesh, shiftY int, clamp uint16) {
 	N := m.Size()
 	cfg := make3DConf(N)
 	k_shiftbytesy_async(dst.Ptr, src.Ptr, N[X], N[Y], N[Z], shiftY, clamp, cfg)

@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for regiondecode kernel
 var regiondecode_code cu.Function
 
 // Stores the arguments for regiondecode kernel invocation
-type regiondecode_args_t struct {
-	arg_dst     unsafe.Pointer
-	arg_LUT     unsafe.Pointer
-	arg_regions unsafe.Pointer
-	arg_N       int
-	argptr      [4]unsafe.Pointer
+type regiondecode_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_LUT unsafe.Pointer
+	 arg_regions unsafe.Pointer
+	 arg_N int
+	 argptr [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for regiondecode kernel invocation
 var regiondecode_args regiondecode_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	regiondecode_args.argptr[0] = unsafe.Pointer(&regiondecode_args.arg_dst)
-	regiondecode_args.argptr[1] = unsafe.Pointer(&regiondecode_args.arg_LUT)
-	regiondecode_args.argptr[2] = unsafe.Pointer(&regiondecode_args.arg_regions)
-	regiondecode_args.argptr[3] = unsafe.Pointer(&regiondecode_args.arg_N)
-}
+	 regiondecode_args.argptr[0] = unsafe.Pointer(&regiondecode_args.arg_dst)
+	 regiondecode_args.argptr[1] = unsafe.Pointer(&regiondecode_args.arg_LUT)
+	 regiondecode_args.argptr[2] = unsafe.Pointer(&regiondecode_args.arg_regions)
+	 regiondecode_args.argptr[3] = unsafe.Pointer(&regiondecode_args.arg_N)
+	 }
 
 // Wrapper for regiondecode CUDA kernel, asynchronous.
-func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
-	if Synchronous { // debug
+func k_regiondecode_async ( dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("regiondecode")
 	}
@@ -46,36 +46,37 @@ func k_regiondecode_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	regiondecode_args.Lock()
 	defer regiondecode_args.Unlock()
 
-	if regiondecode_code == 0 {
+	if regiondecode_code == 0{
 		regiondecode_code = fatbinLoad(regiondecode_map, "regiondecode")
 	}
 
-	regiondecode_args.arg_dst = dst
-	regiondecode_args.arg_LUT = LUT
-	regiondecode_args.arg_regions = regions
-	regiondecode_args.arg_N = N
+	 regiondecode_args.arg_dst = dst
+	 regiondecode_args.arg_LUT = LUT
+	 regiondecode_args.arg_regions = regions
+	 regiondecode_args.arg_N = N
+	
 
 	args := regiondecode_args.argptr[:]
 	cu.LaunchKernel(regiondecode_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("regiondecode")
 	}
 }
 
 // maps compute capability on PTX code for regiondecode kernel.
-var regiondecode_map = map[int]string{0: "",
-	20: regiondecode_ptx_20,
-	30: regiondecode_ptx_30,
-	35: regiondecode_ptx_35,
-	50: regiondecode_ptx_50,
-	52: regiondecode_ptx_52,
-	53: regiondecode_ptx_53}
+var regiondecode_map = map[int]string{ 0: "" ,
+20: regiondecode_ptx_20 ,
+30: regiondecode_ptx_30 ,
+35: regiondecode_ptx_35 ,
+50: regiondecode_ptx_50 ,
+52: regiondecode_ptx_52 ,
+53: regiondecode_ptx_53  }
 
 // regiondecode PTX code for various compute capabilities.
-const (
-	regiondecode_ptx_20 = `
+const(
+  regiondecode_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -110,10 +111,10 @@ const (
 	@%p1 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
 	cvta.to.global.u64 	%rd7, %rd2;
-	ld.global.u8 	%r9, [%rd6];
+	ld.global.u16 	%r9, [%rd6];
 	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.f32 	%f1, [%rd9];
@@ -128,7 +129,7 @@ BB0_2:
 
 
 `
-	regiondecode_ptx_30 = `
+   regiondecode_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -163,10 +164,10 @@ BB0_2:
 	@%p1 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
 	cvta.to.global.u64 	%rd7, %rd2;
-	ld.global.u8 	%r9, [%rd6];
+	ld.global.u16 	%r9, [%rd6];
 	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.f32 	%f1, [%rd9];
@@ -181,7 +182,7 @@ BB0_2:
 
 
 `
-	regiondecode_ptx_35 = `
+   regiondecode_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -287,7 +288,7 @@ BB0_2:
 	.reg .pred 	%p<2>;
 	.reg .b16 	%rs<2>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<11>;
+	.reg .b32 	%r<10>;
 	.reg .b64 	%rd<13>;
 
 
@@ -306,13 +307,12 @@ BB0_2:
 	@%p1 bra 	BB6_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs1, [%rd6];
+	ld.global.nc.u16 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd2;
 	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
+	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
 	cvta.to.global.u64 	%rd10, %rd1;
@@ -326,7 +326,7 @@ BB6_2:
 
 
 `
-	regiondecode_ptx_50 = `
+   regiondecode_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -432,7 +432,7 @@ BB6_2:
 	.reg .pred 	%p<2>;
 	.reg .b16 	%rs<2>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<11>;
+	.reg .b32 	%r<10>;
 	.reg .b64 	%rd<13>;
 
 
@@ -451,13 +451,12 @@ BB6_2:
 	@%p1 bra 	BB6_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs1, [%rd6];
+	ld.global.nc.u16 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd2;
 	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
+	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
 	cvta.to.global.u64 	%rd10, %rd1;
@@ -471,7 +470,7 @@ BB6_2:
 
 
 `
-	regiondecode_ptx_52 = `
+   regiondecode_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -577,7 +576,7 @@ BB6_2:
 	.reg .pred 	%p<2>;
 	.reg .b16 	%rs<2>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<11>;
+	.reg .b32 	%r<10>;
 	.reg .b64 	%rd<13>;
 
 
@@ -596,13 +595,12 @@ BB6_2:
 	@%p1 bra 	BB6_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs1, [%rd6];
+	ld.global.nc.u16 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd2;
 	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
+	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
 	cvta.to.global.u64 	%rd10, %rd1;
@@ -616,7 +614,7 @@ BB6_2:
 
 
 `
-	regiondecode_ptx_53 = `
+   regiondecode_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -722,7 +720,7 @@ BB6_2:
 	.reg .pred 	%p<2>;
 	.reg .b16 	%rs<2>;
 	.reg .f32 	%f<2>;
-	.reg .b32 	%r<11>;
+	.reg .b32 	%r<10>;
 	.reg .b64 	%rd<13>;
 
 
@@ -741,13 +739,12 @@ BB6_2:
 	@%p1 bra 	BB6_2;
 
 	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
+	mul.wide.s32 	%rd5, %r1, 2;
 	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs1, [%rd6];
+	ld.global.nc.u16 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd2;
 	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
+	mul.wide.u32 	%rd8, %r9, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
 	cvta.to.global.u64 	%rd10, %rd1;
@@ -761,4 +758,4 @@ BB6_2:
 
 
 `
-)
+ )

@@ -5,44 +5,44 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for reducemaxvecnorm2 kernel
 var reducemaxvecnorm2_code cu.Function
 
 // Stores the arguments for reducemaxvecnorm2 kernel invocation
-type reducemaxvecnorm2_args_t struct {
-	arg_x       unsafe.Pointer
-	arg_y       unsafe.Pointer
-	arg_z       unsafe.Pointer
-	arg_dst     unsafe.Pointer
-	arg_initVal float32
-	arg_n       int
-	argptr      [6]unsafe.Pointer
+type reducemaxvecnorm2_args_t struct{
+	 arg_x unsafe.Pointer
+	 arg_y unsafe.Pointer
+	 arg_z unsafe.Pointer
+	 arg_dst unsafe.Pointer
+	 arg_initVal float32
+	 arg_n int
+	 argptr [6]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducemaxvecnorm2 kernel invocation
 var reducemaxvecnorm2_args reducemaxvecnorm2_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	reducemaxvecnorm2_args.argptr[0] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_x)
-	reducemaxvecnorm2_args.argptr[1] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_y)
-	reducemaxvecnorm2_args.argptr[2] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_z)
-	reducemaxvecnorm2_args.argptr[3] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_dst)
-	reducemaxvecnorm2_args.argptr[4] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_initVal)
-	reducemaxvecnorm2_args.argptr[5] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_n)
-}
+	 reducemaxvecnorm2_args.argptr[0] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_x)
+	 reducemaxvecnorm2_args.argptr[1] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_y)
+	 reducemaxvecnorm2_args.argptr[2] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_z)
+	 reducemaxvecnorm2_args.argptr[3] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_dst)
+	 reducemaxvecnorm2_args.argptr[4] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_initVal)
+	 reducemaxvecnorm2_args.argptr[5] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_n)
+	 }
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel, asynchronous.
-func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
-	if Synchronous { // debug
+func k_reducemaxvecnorm2_async ( x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("reducemaxvecnorm2")
 	}
@@ -50,38 +50,39 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 	reducemaxvecnorm2_args.Lock()
 	defer reducemaxvecnorm2_args.Unlock()
 
-	if reducemaxvecnorm2_code == 0 {
+	if reducemaxvecnorm2_code == 0{
 		reducemaxvecnorm2_code = fatbinLoad(reducemaxvecnorm2_map, "reducemaxvecnorm2")
 	}
 
-	reducemaxvecnorm2_args.arg_x = x
-	reducemaxvecnorm2_args.arg_y = y
-	reducemaxvecnorm2_args.arg_z = z
-	reducemaxvecnorm2_args.arg_dst = dst
-	reducemaxvecnorm2_args.arg_initVal = initVal
-	reducemaxvecnorm2_args.arg_n = n
+	 reducemaxvecnorm2_args.arg_x = x
+	 reducemaxvecnorm2_args.arg_y = y
+	 reducemaxvecnorm2_args.arg_z = z
+	 reducemaxvecnorm2_args.arg_dst = dst
+	 reducemaxvecnorm2_args.arg_initVal = initVal
+	 reducemaxvecnorm2_args.arg_n = n
+	
 
 	args := reducemaxvecnorm2_args.argptr[:]
 	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("reducemaxvecnorm2")
 	}
 }
 
 // maps compute capability on PTX code for reducemaxvecnorm2 kernel.
-var reducemaxvecnorm2_map = map[int]string{0: "",
-	20: reducemaxvecnorm2_ptx_20,
-	30: reducemaxvecnorm2_ptx_30,
-	35: reducemaxvecnorm2_ptx_35,
-	50: reducemaxvecnorm2_ptx_50,
-	52: reducemaxvecnorm2_ptx_52,
-	53: reducemaxvecnorm2_ptx_53}
+var reducemaxvecnorm2_map = map[int]string{ 0: "" ,
+20: reducemaxvecnorm2_ptx_20 ,
+30: reducemaxvecnorm2_ptx_30 ,
+35: reducemaxvecnorm2_ptx_35 ,
+50: reducemaxvecnorm2_ptx_50 ,
+52: reducemaxvecnorm2_ptx_52 ,
+53: reducemaxvecnorm2_ptx_53  }
 
 // reducemaxvecnorm2 PTX code for various compute capabilities.
-const (
-	reducemaxvecnorm2_ptx_20 = `
+const(
+  reducemaxvecnorm2_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -102,7 +103,7 @@ const (
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42344_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42200_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -140,7 +141,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42344_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42200_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -199,7 +200,7 @@ BB0_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42344_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42200_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -211,7 +212,7 @@ BB0_10:
 
 
 `
-	reducemaxvecnorm2_ptx_30 = `
+   reducemaxvecnorm2_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -232,7 +233,7 @@ BB0_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42640_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42496_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -270,7 +271,7 @@ BB0_1:
 
 BB0_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42640_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42496_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -329,7 +330,7 @@ BB0_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42640_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42496_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -341,7 +342,7 @@ BB0_10:
 
 
 `
-	reducemaxvecnorm2_ptx_35 = `
+   reducemaxvecnorm2_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -451,7 +452,7 @@ BB0_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -489,7 +490,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -548,7 +549,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -560,7 +561,7 @@ BB6_10:
 
 
 `
-	reducemaxvecnorm2_ptx_50 = `
+   reducemaxvecnorm2_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -670,7 +671,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -708,7 +709,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -767,7 +768,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -779,7 +780,7 @@ BB6_10:
 
 
 `
-	reducemaxvecnorm2_ptx_52 = `
+   reducemaxvecnorm2_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -889,7 +890,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -927,7 +928,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -986,7 +987,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -998,7 +999,7 @@ BB6_10:
 
 
 `
-	reducemaxvecnorm2_ptx_53 = `
+   reducemaxvecnorm2_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -1108,7 +1109,7 @@ BB6_10:
 	.reg .b32 	%r<17>;
 	.reg .b64 	%rd<19>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
@@ -1146,7 +1147,7 @@ BB6_1:
 
 BB6_2:
 	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata;
+	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata;
 	add.s64 	%rd4, %rd14, %rd13;
 	st.shared.f32 	[%rd4], %f34;
 	bar.sync 	0;
@@ -1205,7 +1206,7 @@ BB6_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB6_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42897_10_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42753_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r13, %f33;
 	cvta.to.global.u64 	%rd18, %rd5;
@@ -1217,4 +1218,4 @@ BB6_10:
 
 
 `
-)
+ )

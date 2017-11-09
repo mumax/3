@@ -5,48 +5,48 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for shiftz kernel
 var shiftz_code cu.Function
 
 // Stores the arguments for shiftz kernel invocation
-type shiftz_args_t struct {
-	arg_dst    unsafe.Pointer
-	arg_src    unsafe.Pointer
-	arg_Nx     int
-	arg_Ny     int
-	arg_Nz     int
-	arg_shz    int
-	arg_clampL float32
-	arg_clampR float32
-	argptr     [8]unsafe.Pointer
+type shiftz_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_src unsafe.Pointer
+	 arg_Nx int
+	 arg_Ny int
+	 arg_Nz int
+	 arg_shz int
+	 arg_clampL float32
+	 arg_clampR float32
+	 argptr [8]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for shiftz kernel invocation
 var shiftz_args shiftz_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	shiftz_args.argptr[0] = unsafe.Pointer(&shiftz_args.arg_dst)
-	shiftz_args.argptr[1] = unsafe.Pointer(&shiftz_args.arg_src)
-	shiftz_args.argptr[2] = unsafe.Pointer(&shiftz_args.arg_Nx)
-	shiftz_args.argptr[3] = unsafe.Pointer(&shiftz_args.arg_Ny)
-	shiftz_args.argptr[4] = unsafe.Pointer(&shiftz_args.arg_Nz)
-	shiftz_args.argptr[5] = unsafe.Pointer(&shiftz_args.arg_shz)
-	shiftz_args.argptr[6] = unsafe.Pointer(&shiftz_args.arg_clampL)
-	shiftz_args.argptr[7] = unsafe.Pointer(&shiftz_args.arg_clampR)
-}
+	 shiftz_args.argptr[0] = unsafe.Pointer(&shiftz_args.arg_dst)
+	 shiftz_args.argptr[1] = unsafe.Pointer(&shiftz_args.arg_src)
+	 shiftz_args.argptr[2] = unsafe.Pointer(&shiftz_args.arg_Nx)
+	 shiftz_args.argptr[3] = unsafe.Pointer(&shiftz_args.arg_Ny)
+	 shiftz_args.argptr[4] = unsafe.Pointer(&shiftz_args.arg_Nz)
+	 shiftz_args.argptr[5] = unsafe.Pointer(&shiftz_args.arg_shz)
+	 shiftz_args.argptr[6] = unsafe.Pointer(&shiftz_args.arg_clampL)
+	 shiftz_args.argptr[7] = unsafe.Pointer(&shiftz_args.arg_clampR)
+	 }
 
 // Wrapper for shiftz CUDA kernel, asynchronous.
-func k_shiftz_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shz int, clampL float32, clampR float32, cfg *config) {
-	if Synchronous { // debug
+func k_shiftz_async ( dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shz int, clampL float32, clampR float32,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("shiftz")
 	}
@@ -54,40 +54,41 @@ func k_shiftz_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz i
 	shiftz_args.Lock()
 	defer shiftz_args.Unlock()
 
-	if shiftz_code == 0 {
+	if shiftz_code == 0{
 		shiftz_code = fatbinLoad(shiftz_map, "shiftz")
 	}
 
-	shiftz_args.arg_dst = dst
-	shiftz_args.arg_src = src
-	shiftz_args.arg_Nx = Nx
-	shiftz_args.arg_Ny = Ny
-	shiftz_args.arg_Nz = Nz
-	shiftz_args.arg_shz = shz
-	shiftz_args.arg_clampL = clampL
-	shiftz_args.arg_clampR = clampR
+	 shiftz_args.arg_dst = dst
+	 shiftz_args.arg_src = src
+	 shiftz_args.arg_Nx = Nx
+	 shiftz_args.arg_Ny = Ny
+	 shiftz_args.arg_Nz = Nz
+	 shiftz_args.arg_shz = shz
+	 shiftz_args.arg_clampL = clampL
+	 shiftz_args.arg_clampR = clampR
+	
 
 	args := shiftz_args.argptr[:]
 	cu.LaunchKernel(shiftz_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("shiftz")
 	}
 }
 
 // maps compute capability on PTX code for shiftz kernel.
-var shiftz_map = map[int]string{0: "",
-	20: shiftz_ptx_20,
-	30: shiftz_ptx_30,
-	35: shiftz_ptx_35,
-	50: shiftz_ptx_50,
-	52: shiftz_ptx_52,
-	53: shiftz_ptx_53}
+var shiftz_map = map[int]string{ 0: "" ,
+20: shiftz_ptx_20 ,
+30: shiftz_ptx_30 ,
+35: shiftz_ptx_35 ,
+50: shiftz_ptx_50 ,
+52: shiftz_ptx_52 ,
+53: shiftz_ptx_53  }
 
 // shiftz PTX code for various compute capabilities.
-const (
-	shiftz_ptx_20 = `
+const(
+  shiftz_ptx_20 = `
 .version 4.3
 .target sm_20
 .address_size 64
@@ -170,7 +171,7 @@ BB0_5:
 
 
 `
-	shiftz_ptx_30 = `
+   shiftz_ptx_30 = `
 .version 4.3
 .target sm_30
 .address_size 64
@@ -253,7 +254,7 @@ BB0_5:
 
 
 `
-	shiftz_ptx_35 = `
+   shiftz_ptx_35 = `
 .version 4.3
 .target sm_35
 .address_size 64
@@ -425,7 +426,7 @@ BB6_5:
 
 
 `
-	shiftz_ptx_50 = `
+   shiftz_ptx_50 = `
 .version 4.3
 .target sm_50
 .address_size 64
@@ -597,7 +598,7 @@ BB6_5:
 
 
 `
-	shiftz_ptx_52 = `
+   shiftz_ptx_52 = `
 .version 4.3
 .target sm_52
 .address_size 64
@@ -769,7 +770,7 @@ BB6_5:
 
 
 `
-	shiftz_ptx_53 = `
+   shiftz_ptx_53 = `
 .version 4.3
 .target sm_53
 .address_size 64
@@ -941,4 +942,4 @@ BB6_5:
 
 
 `
-)
+ )

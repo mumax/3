@@ -137,8 +137,8 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
 
 
     float invMs = inv_Msat(Ms_, Ms_mul, I);
-    Hx[I] += h.x*invMs;
-    Hy[I] += h.y*invMs;
-    Hz[I] += h.z*invMs;
+    Hx[I] -= h.x*invMs;
+    Hy[I] -= h.y*invMs;
+    Hz[I] -= h.z*invMs;
 }
 

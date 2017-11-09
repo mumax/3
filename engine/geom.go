@@ -27,7 +27,7 @@ type geom struct {
 func (g *geom) init() {
 	g.buffer = nil
 	g.info = info{1, "geom", ""}
-	DeclROnly("geom", g, "Cell fill fraction (0..1)")
+	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
 }
 
 func spaceFill() float64 {
@@ -247,5 +247,55 @@ func shiftDirtyRange(dx int) (x1, x2 int) {
 	}
 	return
 }
+
+
+/// Y geom shift Victor 07/10/2016
+
+func (g *geom) shiftY(dy int) {
+	// empty mask, nothing to do
+	if g == nil || g.buffer.IsNil() {
+		return
+	}
+
+	// allocated mask: shift
+	s := g.buffer
+	s2 := cuda.Buffer(1, g.Mesh().Size())
+	defer cuda.Recycle(s2)
+	newv := float32(1) // initially fill edges with 1's
+	cuda.ShiftY(s2, s, dy, newv, newv)
+	data.Copy(s, s2)
+
+	n := Mesh().Size()
+	y1, y2 := shiftDirtyRangeY(dy)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for ix := 0; ix < n[X]; ix++ {
+			for iy := y1; iy < y2; iy++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				if !g.shape(r[X], r[Y], r[Z]) {
+					cuda.SetCell(g.buffer, 0, ix, iy, iz, 0) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+
+}
+
+// x range that needs to be refreshed after shift over dx
+func shiftDirtyRangeY(dy int) (y1, y2 int) {
+	ny := Mesh().Size()[Y]
+	util.Argument(dy != 0)
+	if dy < 0 {
+		y1 = ny + dy
+		y2 = ny
+	} else {
+		y1 = 0
+		y2 = dy
+	}
+	return
+}
+
+
+
 
 func (g *geom) Mesh() *data.Mesh { return Mesh() }

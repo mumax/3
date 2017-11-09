@@ -35,7 +35,7 @@ func CropRegion(parent Quantity, region int) *cropped {
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
-				if r[iz][iy][ix] == byte(region) {
+				if r[iz][iy][ix] == uint16(region) {
 					// initialize all indices if unset
 					if x1 == -1 {
 						x1, y1, z1 = ix, iy, iz

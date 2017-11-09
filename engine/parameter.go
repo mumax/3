@@ -253,6 +253,7 @@ func (p *RegionwiseScalar) Set(v float64) {
 	p.setRegions(0, NREGION, []float64{v})
 }
 
+
 func (p *RegionwiseScalar) setRegionsFunc(r1, r2 int, f script.ScalarFunction) {
 	if IsConst(f) {
 		p.setRegions(r1, r2, []float64{f.Float()})

@@ -8,7 +8,7 @@ import (
 
 var regions = Regions{info: info{1, "regions", ""}} // global regions map
 
-const NREGION = 256 // maximum number of regions, limited by size of byte.
+const NREGION = 256//8192 // maximum number of regions, limited by size of byte (now uint16).
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
@@ -65,7 +65,7 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 				r := Index2Coord(ix, iy, iz)
 				region := f(r[X], r[Y], r[Z])
 				if region >= 0 {
-					arr[iz][iy][ix] = byte(region)
+					arr[iz][iy][ix] = uint16(region)
 				}
 			}
 		}
@@ -87,12 +87,12 @@ func (r *Regions) get(R data.Vector) int {
 	return 0
 }
 
-func (r *Regions) HostArray() [][][]byte {
+func (r *Regions) HostArray() [][][]uint16 {
 	return reshapeBytes(r.HostList(), r.Mesh().Size())
 }
 
-func (r *Regions) HostList() []byte {
-	regionsList := make([]byte, r.Mesh().NCell())
+func (r *Regions) HostList() []uint16 {
+	regionsList := make([]uint16, r.Mesh().NCell())
 	regions.gpuCache.Download(regionsList)
 	return regionsList
 }
@@ -100,7 +100,7 @@ func (r *Regions) HostList() []byte {
 func DefRegionCell(id int, x, y, z int) {
 	defRegionId(id)
 	index := data.Index(Mesh().Size(), x, y, z)
-	regions.gpuCache.Set(index, byte(id))
+	regions.gpuCache.Set(index, uint16(id))
 }
 
 // Load regions from ovf file, use first component.
@@ -120,7 +120,7 @@ func (r *Regions) LoadFile(fname string) {
 				if val < 0 || val > 256 {
 					util.Fatal("regions.LoadFile(", fname, "): all values should be between 0 & 256, have: ", val)
 				}
-				arr[iz][iy][ix] = byte(val)
+				arr[iz][iy][ix] = uint16(val)
 			}
 		}
 	}
@@ -141,7 +141,7 @@ func (r *Regions) Average() float64 { return r.average()[0] }
 func (r *Regions) SetCell(ix, iy, iz int, region int) {
 	size := Mesh().Size()
 	i := data.Index(size, ix, iy, iz)
-	r.gpuCache.Set(i, byte(region))
+	r.gpuCache.Set(i, uint16(region))
 }
 
 func (r *Regions) GetCell(ix, iy, iz int) int {
@@ -160,7 +160,7 @@ func defRegionId(id int) {
 // normalized volume (0..1) of region.
 // TODO: a tidbit too expensive
 func (r *Regions) volume(region_ int) float64 {
-	region := byte(region_)
+	region := uint16(region_)
 	vol := 0
 	list := r.HostList()
 	for _, reg := range list {
@@ -198,12 +198,12 @@ func (r *Regions) EvalTo(dst *data.Slice) { EvalTo(r, dst) }
 var _ Quantity = &regions
 
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
-func reshapeBytes(array []byte, size [3]int) [][][]byte {
+func reshapeBytes(array []uint16, size [3]int) [][][]uint16 {
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
 	util.Argument(Nx*Ny*Nz == len(array))
-	sliced := make([][][]byte, Nz)
+	sliced := make([][][]uint16, Nz)
 	for i := range sliced {
-		sliced[i] = make([][]byte, Ny)
+		sliced[i] = make([][]uint16, Ny)
 	}
 	for i := range sliced {
 		for j := range sliced[i] {
@@ -218,7 +218,7 @@ func (b *Regions) shift(dx int) {
 	r1 := b.Gpu()
 	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
 	defer r2.Free()
-	newreg := byte(0) // new region at edge
+	newreg := uint16(0) // new region at edge
 	cuda.ShiftBytes(r2, r1, b.Mesh(), dx, newreg)
 	r1.Copy(r2)
 
@@ -237,6 +237,39 @@ func (b *Regions) shift(dx int) {
 		}
 	}
 }
+
+
+
+func (b *Regions) shifty(dy int) {
+	// TODO: return if no regions defined
+	r1 := b.Gpu()
+	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
+	defer r2.Free()
+	newreg := uint16(0) // new region at edge
+	cuda.ShiftBytesY(r2, r1, b.Mesh(), dy, newreg)
+	r1.Copy(r2)
+
+	n := Mesh().Size()
+	y1, y2 := shiftDirtyRangeY(dy)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for ix := 0; ix < n[X]; ix++ {
+			for iy := y1; iy < y2; iy++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				reg := b.get(r)
+				if reg != 0 {
+					b.SetCell(ix, iy, iz, reg) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
 
 func (r *Regions) Mesh() *data.Mesh { return Mesh() }
 

@@ -33,7 +33,7 @@ type int2 struct{ x, y int }
 // Voronoi center info
 type center struct {
 	x, y   float64 // center position (m)
-	region byte    // region for all cells near center
+	region int16    // region for all cells near center
 }
 
 // nRegion exclusive
@@ -94,7 +94,7 @@ func (t *tesselation) centersInTile(tx, ty int) []center {
 			// random position inside tile
 			c[i].x = x0 + t.rnd.Float64()*t.tilesize
 			c[i].y = y0 + t.rnd.Float64()*t.tilesize
-			c[i].region = byte(t.rnd.Intn(t.maxRegion))
+			c[i].region = int16(t.rnd.Intn(t.maxRegion))
 		}
 		t.cache[pos] = c
 		return c

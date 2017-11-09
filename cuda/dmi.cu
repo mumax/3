@@ -13,8 +13,8 @@
 extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-       float* __restrict__ aLUT2d, float* __restrict__ dLUT2d, uint8_t* __restrict__ regions,
-       float cx, float cy, float cz, int Nx, int Ny, int Nz, uint8_t PBC) {
+       float* __restrict__ aLUT2d, float* __restrict__ dLUT2d, uint16_t* __restrict__ regions,
+       float cx, float cy, float cz, int Nx, int Ny, int Nz, uint16_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -27,7 +27,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     int I = idx(ix, iy, iz);                      // central cell index
     float3 h = make_float3(Hx[I], Hy[I], Hz[I]);  // add to H
     float3 m0 = make_float3(mx[I], my[I], mz[I]); // central m
-    uint8_t r0 = regions[I];
+    uint16_t r0 = regions[I];
     int i_;                                       // neighbor index
 
     if(is0(m0)) {

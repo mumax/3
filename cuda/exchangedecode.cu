@@ -5,8 +5,8 @@
 
 // see exchange.go
 extern "C" __global__ void
-exchangedecode(float* __restrict__ dst, float* __restrict__ aLUT2d, uint8_t* __restrict__ regions,
-               float wx, float wy, float wz, int Nx, int Ny, int Nz, uint8_t PBC) {
+exchangedecode(float* __restrict__ dst, float* __restrict__ aLUT2d, uint16_t* __restrict__ regions,
+               float wx, float wy, float wz, int Nx, int Ny, int Nz, uint16_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -18,7 +18,7 @@ exchangedecode(float* __restrict__ dst, float* __restrict__ aLUT2d, uint8_t* __r
 
     // central cell
     int I = idx(ix, iy, iz);
-    uint8_t r0 = regions[I];
+    uint16_t r0 = regions[I];
 
     int i_;    // neighbor index
     float avg = 0.0f;

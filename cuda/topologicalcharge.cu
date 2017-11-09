@@ -9,7 +9,7 @@
 extern "C" __global__ void
 settopologicalcharge(float* __restrict__ s,
                      float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-                     float icxcy, int Nx, int Ny, int Nz, uint8_t PBC) {
+                     float icxcy, int Nx, int Ny, int Nz, uint16_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;

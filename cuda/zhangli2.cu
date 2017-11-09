@@ -22,7 +22,7 @@ addzhanglitorque2(float* __restrict__ tx, float* __restrict__ ty, float* __restr
                   float* __restrict__ xi_, float xi_mul,
                   float* __restrict__ pol_, float pol_mul,
                   float cx, float cy, float cz,
-                  int Nx, int Ny, int Nz, uint8_t PBC) {
+                  int Nx, int Ny, int Nz, uint16_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;

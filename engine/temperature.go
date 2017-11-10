@@ -6,6 +6,7 @@ import (
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/util"
+	"math"
 )
 
 var (
@@ -15,10 +16,8 @@ var (
 	Edens_therm = NewScalarField("Edens_therm", "J/m3", "Thermal energy density", AddThermalEnergyDensity)
 	B_therm     thermField // Thermal effective field (T)
 	//Qext		= NewScalarParam("Qext", "W/m3", "External Heating")
-	Qext		= NewExcitation("Qext", "W/m3", "External Heating")
-	//Qext		= NewScalarExcitation("Qext", "W/m3", "External Heating")
+	Qext		= NewExcitation("Qext", "W/m3", "External Heating")  // To do Derive a class ScalarExcitation
         // For Joule heating
-	//JH = false
 	TempJH      LocalTemp   // We will only use .noise for local temperature [0] and temperature dependencies
 	Kthermal    = NewScalarParam("Kthermal", "W/(m·K)", "Thermal conductivity")
 	Cthermal    = NewScalarParam("Cthermal", "J/(Kg·K)", "Specific heat capacity")
@@ -31,7 +30,7 @@ var (
 
 var AddThermalEnergyDensity = makeEdensAdder(&B_therm, -1)
 
-// thermField calculates and caches thermal noise. // Now also used for local temperature [0] and parameters [1]
+// thermField calculates and caches thermal noise.
 type thermField struct {
 	seed      int64            // seed for generator
 	generator curand.Generator //
@@ -87,12 +86,21 @@ func (b *thermField) update() {
 	}
 
 	// keep constant during time step
-	if NSteps == b.step && Dt_si == b.dt && solvertype!=6 && solvertype!=7 {
-		return
+	if NSteps == b.step && Dt_si == b.dt && solvertype!=7 && solvertype!=8 {
+		// after a bad step the timestep is rescaled and the noise should be rescaled accordingly, instead of redrawing the random numbers		
+-		if NSteps == b.step && Dt_si != b.dt {		
+-		for c := 0; c < 3; c++ {		
+-			cuda.Madd2(b.noise.Comp(c), b.noise.Comp(c), b.noise.Comp(c), float32(math.Sqrt(b.dt/Dt_si)), 0.)		
+-		}		
+-		b.dt = Dt_si		
+ 		return
+ 		}
 	}
 
 	if FixDt == 0 {
-		util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
+		Refer("leliaert2017")
+		//uncomment to not allow adaptive step
+		//util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
 	}
 
 	N := Mesh().NCell()
@@ -111,7 +119,7 @@ func (b *thermField) update() {
 	defer alpha.Recycle()
 	for i := 0; i < 3; i++ {
 		b.generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-		if (solvertype!=7) {
+		if (solvertype!=8) {
                                cuda.SetTemperature(dst.Comp(i), noise, k2_VgammaDt, ms, temp, alpha)
                                } else{
 			       TempJH.update()

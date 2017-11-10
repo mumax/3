@@ -15,7 +15,9 @@ func SetEffectiveField(dst *data.Slice) {
 	AddAnisotropyField(dst)
 	B_ext.AddTo(dst)
 	if !relaxing {
-		B_therm.AddTo(dst)
+                if (solvertype!=7){
+                  B_therm.AddTo(dst)
+                 }
 	}
 	AddCustomField(dst)
 }

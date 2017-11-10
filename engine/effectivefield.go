@@ -16,8 +16,8 @@ func SetEffectiveField(dst *data.Slice) {
 	B_ext.AddTo(dst)
 	if !relaxing {
 		if ((solvertype!=7)&&(solvertype!=8)){
-                  B_therm.AddTo(dst)
-                 }
+                	B_therm.AddTo(dst)
+                }
 	}
 	AddCustomField(dst)
 }

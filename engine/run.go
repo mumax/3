@@ -103,6 +103,15 @@ func torqueFn(dst *data.Slice) {
 	NEvals++
 }
 
+////////////////////////////////////   Added for LLB
+
+func torqueFnLLB(dst *data.Slice,hth1 *data.Slice,hth2 *data.Slice) {
+	SetTorqueLLB(dst,hth1,hth2)
+	NEvals++
+}
+
+///////////////////////////////////
+
 // returns number of torque evaluations
 func getNEval() int {
 	return NEvals

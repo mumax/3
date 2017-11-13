@@ -6,6 +6,8 @@ import (
 	"math"
 )
 
+// Equations and definitions for LLB equation + thermal equation described in Journal of Applied Physics 119, 213902 (2016)
+// doi: 10.1063/1.4953008 by S. Moretti et al. 
 
 // Heun solver for LLB equation + joule heating.
 type HeunLLBJH struct{}

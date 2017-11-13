@@ -46,6 +46,27 @@ func SetTorque(dst *data.Slice) {
 	FreezeSpins(dst)
 }
 
+// Sets dst to the current Landau-Lifshitz torque
+func SetLLTorque(dst *data.Slice) {
+	SetEffectiveField(dst) // calc and store B_eff
+	alpha := Alpha.MSlice()
+	defer alpha.Recycle()
+	if Precess {
+		cuda.LLTorque(dst, M.Buffer(), dst, alpha) // overwrite dst with torque
+	} else {
+		cuda.LLNoPrecess(dst, M.Buffer(), dst)
+	}
+}
+
+
+///////////////// For LLB the same previous two functions
+
+// Sets dst to the current total LLBtorque
+func SetTorqueLLB(dst *data.Slice,hth1 *data.Slice,hth2 *data.Slice) {
+	SetLLBTorque(dst,hth1,hth2)
+	AddSTTorque(dst)
+	FreezeSpins(dst)
+}
 
 // Sets dst to the current Landau-Lifshitz-Bloch torque
 func SetLLBTorque(dst *data.Slice,hth1 *data.Slice,hth2 *data.Slice) {
@@ -70,17 +91,9 @@ func SetLLBTorque(dst *data.Slice,hth1 *data.Slice,hth2 *data.Slice) {
 	}
 }
 
-// Sets dst to the current Landau-Lifshitz torque
-func SetLLTorque(dst *data.Slice) {
-	SetEffectiveField(dst) // calc and store B_eff
-	alpha := Alpha.MSlice()
-	defer alpha.Recycle()
-	if Precess {
-		cuda.LLTorque(dst, M.Buffer(), dst, alpha) // overwrite dst with torque
-	} else {
-		cuda.LLNoPrecess(dst, M.Buffer(), dst)
-	}
-}
+//////////////////////////////////////////////////////////
+
+
 
 // Adds the current spin transfer torque to dst
 func AddSTTorque(dst *data.Slice) {

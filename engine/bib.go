@@ -154,12 +154,12 @@ func buildLibrary() {
                Van Waeyenberge, Bartel},
     title   = {{Adaptively time stepping the stochastic Landau-Lifshitz-Gilbert equation at nonzero temperature: implementation and validation in MuMax$^3$}},
     journal = {AIP Advances},
-    number  = {},
-    pages   = {},
-    volume  = {},
+    number  = {12},
+    pages   = {125010},
+    volume  = {7},
     year    = {2017},
-    doi     = {},
-    url     = {https://arxiv.org/abs/1709.01682},
+    doi     = {doi.org/10.1063/1.5003957},
+    url     = {http://aip.scitation.org/doi/10.1063/1.5003957},
 }`}
 
 }

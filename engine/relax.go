@@ -7,12 +7,11 @@ import (
 	"math"
 )
 
-var thresholdTorque float64 = 1e-3; //to be replaced by a sane default value
+var thresholdTorque float64 = 1e-3; //in T. The user can check MaxTorque for sane values
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy")
-	DeclVar("RelaxThresholdTorque", &thresholdTorque, "Stopping maximum torque threshold for relax()")
-
+	DeclVar("RelaxTorqueThreshold", &thresholdTorque, "Torque threshold for relax()")
 }
 
 // are we relaxing?
@@ -63,19 +62,18 @@ func Relax() {
 	solver := stepper.(*RK23)
 	defer stepper.Free() // purge previous rk.k1 because FSAL will be dead wrong.
 	
-	maxTorque := func() float32 {
-		return cuda.MaxVecNorm(solver.k1) //perhaps replace by (faster?) sqrt(3)*cuda.MaxAbs(...)? 
+	maxTorque := func() float64 { //the user can see the values of MaxTorque.
+		return cuda.MaxVecNorm(solver.k1)
     	}
+
 	// run as long as the max torque is above threshold. Then increase the accuracy and step more.
 	for !pause {
-		for maxTorque() < thresholdTorque && !pause {
+		for maxTorque() > thresholdTorque && !pause {
 		    relaxSteps(N)
 		}
 		MaxErr /= math.Sqrt2
-		if MaxErr < 1e-9 { 
-			break
-		}
-    	}
+		if MaxErr < 1e-9 { break; }
+    }
 	pause = true
 }
 

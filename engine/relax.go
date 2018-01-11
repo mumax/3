@@ -7,11 +7,11 @@ import (
 	"math"
 )
 
-var thresholdTorque float64 = 1e-3; //in T. The user can check MaxTorque for sane values
+var RelaxTorqueThreshold float64 = 1e-3; //in T. The user can check MaxTorque for sane values
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy")
-	DeclVar("RelaxTorqueThreshold", &thresholdTorque, "Torque threshold for relax()")
+	DeclVar("RelaxTorqueThreshold", &RelaxTorqueThreshold, "Torque threshold for relax()")
 }
 
 // are we relaxing?
@@ -68,7 +68,7 @@ func Relax() {
 
 	// run as long as the max torque is above threshold. Then increase the accuracy and step more.
 	for !pause {
-		for maxTorque() > thresholdTorque && !pause {
+		for maxTorque() > RelaxTorqueThreshold && !pause {
 		    relaxSteps(N)
 		}
 		MaxErr /= math.Sqrt2

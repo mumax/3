@@ -51,6 +51,9 @@ func Close() {
 	if logfile != nil {
 		logfile.Close()
 	}
+	if bibfile != nil {
+		bibfile.Close()
+	}
 	if *Flag_sync {
 		timer.Print(os.Stdout)
 	}

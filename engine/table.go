@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/timer"
@@ -30,7 +31,7 @@ type DataTable struct {
 		Flush() error
 	}
 	info
-	outputs []TableData
+	outputs []Quantity
 	autosave
 	flushlock sync.Mutex
 }
@@ -63,7 +64,7 @@ func newTable(name string) *DataTable {
 	return t
 }
 
-func TableAdd(col TableData) {
+func TableAdd(col Quantity) {
 	Table.Add(col)
 }
 
@@ -84,6 +85,12 @@ func (x *userVar) Name() string       { return x.name }
 func (x *userVar) NComp() int         { return 1 }
 func (x *userVar) Unit() string       { return x.unit }
 func (x *userVar) average() []float64 { return []float64{x.value.Float()} }
+func (x *userVar) EvalTo(dst *data.Slice) {
+	avg := x.average()
+	for c := 0; c < x.NComp(); c++ {
+		cuda.Memset(dst.Comp(c), float32(avg[c]))
+	}
+}
 
 func TableSave() {
 	Table.Save()
@@ -93,9 +100,9 @@ func TableAutoSave(period float64) {
 	Table.autosave = autosave{period, Time, -1, nil} // count -1 allows output on t=0
 }
 
-func (t *DataTable) Add(output TableData) {
+func (t *DataTable) Add(output Quantity) {
 	if t.inited() {
-		util.Fatal("data table add ", output.Name(), ": need to add quantity before table is output the first time")
+		util.Fatal("data table add ", NameOf(output), ": need to add quantity before table is output the first time")
 	}
 	t.outputs = append(t.outputs, output)
 }
@@ -110,7 +117,7 @@ func (t *DataTable) Save() {
 	t.init()
 	fprint(t, Time)
 	for _, o := range t.outputs {
-		vec := o.average()
+		vec := AverageOf(o)
 		for _, v := range vec {
 			fprint(t, "\t", float32(v))
 		}
@@ -146,10 +153,10 @@ func (t *DataTable) init() {
 	fprint(t, "# t (s)")
 	for _, o := range t.outputs {
 		if o.NComp() == 1 {
-			fprint(t, "\t", o.Name(), " (", o.Unit(), ")")
+			fprint(t, "\t", NameOf(o), " (", UnitOf(o), ")")
 		} else {
 			for c := 0; c < o.NComp(); c++ {
-				fprint(t, "\t", o.Name()+string('x'+c), " (", o.Unit(), ")")
+				fprint(t, "\t", NameOf(o)+string('x'+c), " (", UnitOf(o), ")")
 			}
 		}
 	}
@@ -175,14 +182,6 @@ func (t *DataTable) flush() {
 	t.flushlock.Lock()
 	defer t.flushlock.Unlock()
 	t.Flush()
-}
-
-// can be saved in table
-type TableData interface {
-	average() []float64
-	Name() string
-	Unit() string
-	NComp() int
 }
 
 // Safe fmt.Fprint, will fail on error

@@ -11,11 +11,9 @@ import (
 	"sync"
 )
 
-//var renderer = render{img: new(image.RGBA)}
-
 type render struct {
 	mutex        sync.Mutex
-	quant        outputField
+	quant        Quantity
 	comp         string
 	layer, scale int
 	saveCount    int         // previous max slider value of time
@@ -45,7 +43,7 @@ func (ren *render) download() {
 			ren.quant = &M
 		}
 		quant := ren.quant
-		size := quant.Mesh().Size()
+		size := MeshOf(quant).Size()
 
 		// don't slice out of bounds
 		renderLayer := ren.layer
@@ -83,10 +81,8 @@ func (ren *render) download() {
 		if ren.imgBuf.Size() != size {
 			ren.imgBuf = data.NewSlice(3, size) // always 3-comp, may be re-used
 		}
-		buf, r := quant.Slice()
-		if r {
-			defer cuda.Recycle(buf)
-		}
+		buf := ValueOf(quant)
+		defer cuda.Recycle(buf)
 		if !buf.GPUAccess() {
 			ren.imgBuf = Download(quant) // fallback (no zoom)
 			return

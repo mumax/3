@@ -19,3 +19,4 @@ mumax3.*linux*cuda*
 *.*~
 tmp/
 *.out
+.idea/

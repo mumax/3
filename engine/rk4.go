@@ -8,7 +8,6 @@ import (
 )
 
 // Classical 4th order RK solver.
-
 type RK4 struct {
 }
 
@@ -69,7 +68,6 @@ func (rk *RK4) Step() {
 		setMaxTorque(k4)
 	} else {
 		// undo bad step
-		//util.Println("Bad step at t=", t0, ", err=", err)
 		util.Assert(FixDt == 0)
 		Time = t0
 		data.Copy(m, m0)

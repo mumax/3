@@ -153,7 +153,8 @@ func (p *regionwise) IsUniform() bool {
 	return true
 }
 
-func (p *regionwise) average() []float64 { return qAverageUniverse(p) }
+func (p *regionwise) average() []float64     { return qAverageUniverse(p) }
+func (p *regionwise) EvalTo(dst *data.Slice) { EvalTo(p, dst) }
 
 // parameter derived from others (not directly settable). E.g.: Bsat derived from Msat
 type DerivedParam struct {
@@ -272,6 +273,7 @@ func (p *RegionwiseScalar) Type() reflect.Type      { return reflect.TypeOf(new(
 func (p *RegionwiseScalar) InputType() reflect.Type { return script.ScalarFunction_t }
 func (p *RegionwiseScalar) Average() float64        { return qAverageUniverse(p)[0] }
 func (p *RegionwiseScalar) Region(r int) *sOneReg   { return sOneRegion(p, r) }
+func (p *RegionwiseScalar) EvalTo(dst *data.Slice)  { EvalTo(p, dst) }
 
 // checks if a script expression contains t (time)
 func IsConst(e script.Expr) bool {
@@ -364,3 +366,4 @@ func (p *RegionwiseVector) InputType() reflect.Type { return script.VectorFuncti
 func (p *RegionwiseVector) Region(r int) *vOneReg   { return vOneRegion(p, r) }
 func (p *RegionwiseVector) Average() data.Vector    { return unslice(qAverageUniverse(p)) }
 func (p *RegionwiseVector) Comp(c int) ScalarField  { return Comp(p, c) }
+func (p *RegionwiseVector) EvalTo(dst *data.Slice)  { EvalTo(p, dst) }

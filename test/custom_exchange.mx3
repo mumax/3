@@ -1,0 +1,39 @@
+cellsizeX:=2e-9
+cellsizeY:=3e-9
+cellsizeZ:=4e-9
+setgridsize(300, 200, 4)
+setcellsize(cellsizeX,cellsizeY, cellsizeZ)
+
+Aex   = 0.
+alpha = 1
+M     = uniform(1, 1, 0)
+Msat  = 800e3
+m     = twodomain(1, 2, 3,  -1, -3, 5,  3, -1, 2)
+enabledemag = false
+
+
+NewAex:=13e-12
+prefactorX := Const( (2 * NewAex) / (cellsizeX*cellsizeX*Msat.Average()))
+prefactorY := Const( (2 * NewAex) / (cellsizeY*cellsizeY*Msat.Average()))
+prefactorZ := Const( (2 * NewAex) / (cellsizeZ*cellsizeZ*Msat.Average()))
+
+left :=       Mul(prefactorX,Mul(Add(Mul(Const(-1),m),Shifted(m, 1,0,0)),Shifted(Const(1),1,0,0)))
+right :=      Mul(prefactorX,Mul(Add(Mul(Const(-1),m),Shifted(m,-1,0,0)),Shifted(Const(1),-1,0,0)))
+forward :=    Mul(prefactorY,Mul(Add(Mul(Const(-1),m),Shifted(m,0, 1,0)),Shifted(Const(1),0,1,0)))
+backward :=   Mul(prefactorY,Mul(Add(Mul(Const(-1),m),Shifted(m,0,-1,0)),Shifted(Const(1),0,-1,0)))
+up :=         Mul(prefactorZ,Mul(Add(Mul(Const(-1),m),Shifted(m,0,0, 1)),Shifted(Const(1),0,0,1)))
+down :=       Mul(prefactorZ,Mul(Add(Mul(Const(-1),m),Shifted(m,0,0,-1)),Shifted(Const(1),0,0,-1)))
+Bc :=Add(left,Add(right,Add(forward,Add(backward,Add(up,down)))))
+AddFieldTerm(Bc)
+addEdensTerm(Mul(Const(-0.5),Dot(Bc,M_full)))
+
+defRegion(0, xrange(-inf, 0))
+defRegion(1, xrange(0, inf))
+
+tol := 1e-8
+
+expectv("B_custom", B_custom.Average(), vector(0, 0, 0), tol)
+
+expectv("B_custom0", B_custom.region(0).Average(), vector(0.00118888104756673, -0.00164631487528483, -0.00074591267903645), tol)
+expectv("B_custom1", B_custom.region(1).Average(), vector(-0.00118888041178385, 0.00164631512959798, 0.00074591242472330), tol)
+expect("E_total",E_total,E_custom,1e-22) // check if custom energy added to energy

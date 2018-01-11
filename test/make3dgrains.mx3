@@ -1,0 +1,32 @@
+nxyz := 64
+cellsize := 4e-9
+SetGridsize(nxyz, nxyz, nxyz)
+SetCellsize(cellsize, cellsize, cellsize)
+
+topblock := cuboid(cellsize*16,cellsize*16,cellsize*32).transl(0,0,cellsize*16)
+bottomlayer := zrange(-0.5,0*nxyz*cellsize)
+setgeom(topblock.add(bottomlayer))
+
+
+ext_make3dgrains(20e-9, 100, 100, topblock, 123)
+
+defregion(10, bottomlayer)
+
+
+m = uniform(0.5,0.5,0)
+K := 1e5
+for i:=100; i<200; i+=1 {
+	anisU.setregion(i, vector(randNorm()*0.1,randNorm()*0.1,1+randNorm()*0.1))
+	ku1.setregion(i, K+randNorm()*0.1*K)
+}
+
+//Scale the exchange interaction between all grains
+for i:=1; i<255; i+=1 {
+	for j:=i; j<255; j+=1 {
+		ext_scaleExchange(i,j,0.9)
+	}
+}
+
+save(regions)
+save(ku1)
+save(anisU)

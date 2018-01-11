@@ -86,16 +86,19 @@ var dotproduct_map = map[int]string{0: "",
 	35: dotproduct_ptx_35,
 	50: dotproduct_ptx_50,
 	52: dotproduct_ptx_52,
-	53: dotproduct_ptx_53}
+	53: dotproduct_ptx_53,
+	60: dotproduct_ptx_60,
+	61: dotproduct_ptx_61,
+	62: dotproduct_ptx_62,
+	70: dotproduct_ptx_70}
 
 // dotproduct PTX code for various compute capabilities.
 const (
 	dotproduct_ptx_20 = `
-.version 4.3
+.version 3.2
 .target sm_20
 .address_size 64
 
-	// .globl	dotproduct
 
 .visible .entry dotproduct(
 	.param .u64 dotproduct_param_0,
@@ -110,70 +113,81 @@ const (
 )
 {
 	.reg .pred 	%p<2>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<13>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<23>;
+	.reg .s64 	%rd<23>;
 
 
-	ld.param.u64 	%rd1, [dotproduct_param_0];
+	ld.param.u64 	%rd8, [dotproduct_param_0];
 	ld.param.f32 	%f1, [dotproduct_param_1];
-	ld.param.u64 	%rd2, [dotproduct_param_2];
-	ld.param.u64 	%rd3, [dotproduct_param_3];
-	ld.param.u64 	%rd4, [dotproduct_param_4];
-	ld.param.u64 	%rd5, [dotproduct_param_5];
-	ld.param.u64 	%rd6, [dotproduct_param_6];
-	ld.param.u64 	%rd7, [dotproduct_param_7];
+	ld.param.u64 	%rd9, [dotproduct_param_2];
+	ld.param.u64 	%rd10, [dotproduct_param_3];
+	ld.param.u64 	%rd11, [dotproduct_param_4];
+	ld.param.u64 	%rd12, [dotproduct_param_5];
+	ld.param.u64 	%rd13, [dotproduct_param_6];
+	ld.param.u64 	%rd14, [dotproduct_param_7];
 	ld.param.u32 	%r2, [dotproduct_param_8];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
+	cvta.to.global.u64 	%rd1, %rd8;
+	cvta.to.global.u64 	%rd2, %rd14;
+	cvta.to.global.u64 	%rd3, %rd13;
+	cvta.to.global.u64 	%rd4, %rd12;
+	cvta.to.global.u64 	%rd5, %rd11;
+	cvta.to.global.u64 	%rd6, %rd10;
+	cvta.to.global.u64 	%rd7, %rd9;
+	.loc 1 11 1
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	.loc 1 12 1
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd8, %rd2;
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd8, %rd9;
-	cvta.to.global.u64 	%rd11, %rd3;
-	add.s64 	%rd12, %rd11, %rd9;
-	cvta.to.global.u64 	%rd13, %rd4;
-	add.s64 	%rd14, %rd13, %rd9;
-	cvta.to.global.u64 	%rd15, %rd5;
-	add.s64 	%rd16, %rd15, %rd9;
-	cvta.to.global.u64 	%rd17, %rd6;
-	add.s64 	%rd18, %rd17, %rd9;
-	cvta.to.global.u64 	%rd19, %rd7;
-	add.s64 	%rd20, %rd19, %rd9;
-	ld.global.f32 	%f2, [%rd16];
-	ld.global.f32 	%f3, [%rd10];
-	ld.global.f32 	%f4, [%rd18];
-	ld.global.f32 	%f5, [%rd12];
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd7, %rd15;
+	add.s64 	%rd17, %rd6, %rd15;
+	add.s64 	%rd18, %rd5, %rd15;
+	add.s64 	%rd19, %rd4, %rd15;
+	add.s64 	%rd20, %rd3, %rd15;
+	add.s64 	%rd21, %rd2, %rd15;
+	.loc 1 14 1
+	ld.global.f32 	%f2, [%rd19];
+	.loc 1 13 1
+	ld.global.f32 	%f3, [%rd16];
+	.loc 1 14 1
+	ld.global.f32 	%f4, [%rd20];
+	.loc 1 13 1
+	ld.global.f32 	%f5, [%rd17];
+	.loc 1 15 1
 	mul.f32 	%f6, %f5, %f4;
 	fma.rn.f32 	%f7, %f3, %f2, %f6;
-	ld.global.f32 	%f8, [%rd20];
-	ld.global.f32 	%f9, [%rd14];
+	.loc 1 14 1
+	ld.global.f32 	%f8, [%rd21];
+	.loc 1 13 1
+	ld.global.f32 	%f9, [%rd18];
+	.loc 1 15 1
 	fma.rn.f32 	%f10, %f9, %f8, %f7;
-	cvta.to.global.u64 	%rd21, %rd1;
-	add.s64 	%rd22, %rd21, %rd9;
+	add.s64 	%rd22, %rd1, %rd15;
+	.loc 1 15 1
 	ld.global.f32 	%f11, [%rd22];
 	fma.rn.f32 	%f12, %f10, %f1, %f11;
 	st.global.f32 	[%rd22], %f12;
 
 BB0_2:
+	.loc 1 17 2
 	ret;
 }
 
 
 `
 	dotproduct_ptx_30 = `
-.version 4.3
+.version 4.0
 .target sm_30
 .address_size 64
 
-	// .globl	dotproduct
 
 .visible .entry dotproduct(
 	.param .u64 dotproduct_param_0,
@@ -188,9 +202,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<13>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<23>;
+	.reg .s64 	%rd<23>;
 
 
 	ld.param.u64 	%rd1, [dotproduct_param_0];
@@ -202,40 +216,40 @@ BB0_2:
 	ld.param.u64 	%rd6, [dotproduct_param_6];
 	ld.param.u64 	%rd7, [dotproduct_param_7];
 	ld.param.u32 	%r2, [dotproduct_param_8];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
 	@%p1 bra 	BB0_2;
 
-	cvta.to.global.u64 	%rd8, %rd2;
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd8, %rd9;
-	cvta.to.global.u64 	%rd11, %rd3;
-	add.s64 	%rd12, %rd11, %rd9;
-	cvta.to.global.u64 	%rd13, %rd4;
-	add.s64 	%rd14, %rd13, %rd9;
-	cvta.to.global.u64 	%rd15, %rd5;
-	add.s64 	%rd16, %rd15, %rd9;
-	cvta.to.global.u64 	%rd17, %rd6;
-	add.s64 	%rd18, %rd17, %rd9;
-	cvta.to.global.u64 	%rd19, %rd7;
-	add.s64 	%rd20, %rd19, %rd9;
-	ld.global.f32 	%f2, [%rd16];
-	ld.global.f32 	%f3, [%rd10];
-	ld.global.f32 	%f4, [%rd18];
-	ld.global.f32 	%f5, [%rd12];
+	cvta.to.global.u64 	%rd8, %rd1;
+	cvta.to.global.u64 	%rd9, %rd7;
+	cvta.to.global.u64 	%rd10, %rd6;
+	cvta.to.global.u64 	%rd11, %rd5;
+	cvta.to.global.u64 	%rd12, %rd4;
+	cvta.to.global.u64 	%rd13, %rd3;
+	cvta.to.global.u64 	%rd14, %rd2;
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd14, %rd15;
+	add.s64 	%rd17, %rd13, %rd15;
+	add.s64 	%rd18, %rd12, %rd15;
+	add.s64 	%rd19, %rd11, %rd15;
+	add.s64 	%rd20, %rd10, %rd15;
+	add.s64 	%rd21, %rd9, %rd15;
+	ld.global.f32 	%f2, [%rd19];
+	ld.global.f32 	%f3, [%rd16];
+	ld.global.f32 	%f4, [%rd20];
+	ld.global.f32 	%f5, [%rd17];
 	mul.f32 	%f6, %f5, %f4;
 	fma.rn.f32 	%f7, %f3, %f2, %f6;
-	ld.global.f32 	%f8, [%rd20];
-	ld.global.f32 	%f9, [%rd14];
+	ld.global.f32 	%f8, [%rd21];
+	ld.global.f32 	%f9, [%rd18];
 	fma.rn.f32 	%f10, %f9, %f8, %f7;
-	cvta.to.global.u64 	%rd21, %rd1;
-	add.s64 	%rd22, %rd21, %rd9;
+	add.s64 	%rd22, %rd8, %rd15;
 	ld.global.f32 	%f11, [%rd22];
 	fma.rn.f32 	%f12, %f10, %f1, %f11;
 	st.global.f32 	[%rd22], %f12;
@@ -247,18 +261,17 @@ BB0_2:
 
 `
 	dotproduct_ptx_35 = `
-.version 4.3
+.version 4.1
 .target sm_35
 .address_size 64
 
-	// .weak	cudaMalloc
 
 .weak .func  (.param .b32 func_retval0) cudaMalloc(
 	.param .b64 cudaMalloc_param_0,
 	.param .b64 cudaMalloc_param_1
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -266,13 +279,12 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaFuncGetAttributes
 .weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
 	.param .b64 cudaFuncGetAttributes_param_0,
 	.param .b64 cudaFuncGetAttributes_param_1
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -280,14 +292,13 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaDeviceGetAttribute
 .weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
 	.param .b64 cudaDeviceGetAttribute_param_0,
 	.param .b32 cudaDeviceGetAttribute_param_1,
 	.param .b32 cudaDeviceGetAttribute_param_2
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -295,12 +306,11 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaGetDevice
 .weak .func  (.param .b32 func_retval0) cudaGetDevice(
 	.param .b64 cudaGetDevice_param_0
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -308,7 +318,6 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
 .weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
@@ -316,7 +325,7 @@ BB0_2:
 	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
 )
 {
-	.reg .b32 	%r<2>;
+	.reg .s32 	%r<2>;
 
 
 	mov.u32 	%r1, 30;
@@ -324,24 +333,6 @@ BB0_2:
 	ret;
 }
 
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .globl	dotproduct
 .visible .entry dotproduct(
 	.param .u64 dotproduct_param_0,
 	.param .f32 dotproduct_param_1,
@@ -355,9 +346,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<2>;
+	.reg .s32 	%r<9>;
 	.reg .f32 	%f<13>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<23>;
+	.reg .s64 	%rd<23>;
 
 
 	ld.param.u64 	%rd1, [dotproduct_param_0];
@@ -369,45 +360,45 @@ BB0_2:
 	ld.param.u64 	%rd6, [dotproduct_param_6];
 	ld.param.u64 	%rd7, [dotproduct_param_7];
 	ld.param.u32 	%r2, [dotproduct_param_8];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB6_2;
+	@%p1 bra 	BB5_2;
 
-	cvta.to.global.u64 	%rd8, %rd2;
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd8, %rd9;
-	cvta.to.global.u64 	%rd11, %rd3;
-	add.s64 	%rd12, %rd11, %rd9;
-	cvta.to.global.u64 	%rd13, %rd4;
-	add.s64 	%rd14, %rd13, %rd9;
-	cvta.to.global.u64 	%rd15, %rd5;
-	add.s64 	%rd16, %rd15, %rd9;
-	cvta.to.global.u64 	%rd17, %rd6;
-	add.s64 	%rd18, %rd17, %rd9;
-	cvta.to.global.u64 	%rd19, %rd7;
-	add.s64 	%rd20, %rd19, %rd9;
-	ld.global.nc.f32 	%f2, [%rd16];
-	ld.global.nc.f32 	%f3, [%rd10];
-	ld.global.nc.f32 	%f4, [%rd18];
-	ld.global.nc.f32 	%f5, [%rd12];
+	cvta.to.global.u64 	%rd8, %rd1;
+	cvta.to.global.u64 	%rd9, %rd7;
+	cvta.to.global.u64 	%rd10, %rd6;
+	cvta.to.global.u64 	%rd11, %rd5;
+	cvta.to.global.u64 	%rd12, %rd4;
+	cvta.to.global.u64 	%rd13, %rd3;
+	cvta.to.global.u64 	%rd14, %rd2;
+	mul.wide.s32 	%rd15, %r1, 4;
+	add.s64 	%rd16, %rd14, %rd15;
+	add.s64 	%rd17, %rd13, %rd15;
+	add.s64 	%rd18, %rd12, %rd15;
+	add.s64 	%rd19, %rd11, %rd15;
+	add.s64 	%rd20, %rd10, %rd15;
+	add.s64 	%rd21, %rd9, %rd15;
+	ld.global.nc.f32 	%f2, [%rd19];
+	ld.global.nc.f32 	%f3, [%rd16];
+	ld.global.nc.f32 	%f4, [%rd20];
+	ld.global.nc.f32 	%f5, [%rd17];
 	mul.f32 	%f6, %f5, %f4;
 	fma.rn.f32 	%f7, %f3, %f2, %f6;
-	ld.global.nc.f32 	%f8, [%rd20];
-	ld.global.nc.f32 	%f9, [%rd14];
+	ld.global.nc.f32 	%f8, [%rd21];
+	ld.global.nc.f32 	%f9, [%rd18];
 	fma.rn.f32 	%f10, %f9, %f8, %f7;
-	cvta.to.global.u64 	%rd21, %rd1;
-	add.s64 	%rd22, %rd21, %rd9;
+	add.s64 	%rd22, %rd8, %rd15;
 	ld.global.f32 	%f11, [%rd22];
 	fma.rn.f32 	%f12, %f10, %f1, %f11;
 	st.global.f32 	[%rd22], %f12;
 
-BB6_2:
+BB5_2:
 	ret;
 }
 
@@ -909,6 +900,318 @@ BB6_2:
 	st.global.f32 	[%rd22], %f12;
 
 BB6_2:
+	ret;
+}
+
+
+`
+	dotproduct_ptx_60 = `
+.version 5.0
+.target sm_60
+.address_size 64
+
+	// .globl	dotproduct
+
+.visible .entry dotproduct(
+	.param .u64 dotproduct_param_0,
+	.param .f32 dotproduct_param_1,
+	.param .u64 dotproduct_param_2,
+	.param .u64 dotproduct_param_3,
+	.param .u64 dotproduct_param_4,
+	.param .u64 dotproduct_param_5,
+	.param .u64 dotproduct_param_6,
+	.param .u64 dotproduct_param_7,
+	.param .u32 dotproduct_param_8
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<13>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<23>;
+
+
+	ld.param.u64 	%rd1, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd2, [dotproduct_param_2];
+	ld.param.u64 	%rd3, [dotproduct_param_3];
+	ld.param.u64 	%rd4, [dotproduct_param_4];
+	ld.param.u64 	%rd5, [dotproduct_param_5];
+	ld.param.u64 	%rd6, [dotproduct_param_6];
+	ld.param.u64 	%rd7, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd8, %rd2;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	cvta.to.global.u64 	%rd11, %rd3;
+	add.s64 	%rd12, %rd11, %rd9;
+	cvta.to.global.u64 	%rd13, %rd4;
+	add.s64 	%rd14, %rd13, %rd9;
+	cvta.to.global.u64 	%rd15, %rd5;
+	add.s64 	%rd16, %rd15, %rd9;
+	cvta.to.global.u64 	%rd17, %rd6;
+	add.s64 	%rd18, %rd17, %rd9;
+	cvta.to.global.u64 	%rd19, %rd7;
+	add.s64 	%rd20, %rd19, %rd9;
+	ld.global.nc.f32 	%f2, [%rd16];
+	ld.global.nc.f32 	%f3, [%rd10];
+	ld.global.nc.f32 	%f4, [%rd18];
+	ld.global.nc.f32 	%f5, [%rd12];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
+	ld.global.nc.f32 	%f8, [%rd20];
+	ld.global.nc.f32 	%f9, [%rd14];
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	cvta.to.global.u64 	%rd21, %rd1;
+	add.s64 	%rd22, %rd21, %rd9;
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	dotproduct_ptx_61 = `
+.version 5.0
+.target sm_61
+.address_size 64
+
+	// .globl	dotproduct
+
+.visible .entry dotproduct(
+	.param .u64 dotproduct_param_0,
+	.param .f32 dotproduct_param_1,
+	.param .u64 dotproduct_param_2,
+	.param .u64 dotproduct_param_3,
+	.param .u64 dotproduct_param_4,
+	.param .u64 dotproduct_param_5,
+	.param .u64 dotproduct_param_6,
+	.param .u64 dotproduct_param_7,
+	.param .u32 dotproduct_param_8
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<13>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<23>;
+
+
+	ld.param.u64 	%rd1, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd2, [dotproduct_param_2];
+	ld.param.u64 	%rd3, [dotproduct_param_3];
+	ld.param.u64 	%rd4, [dotproduct_param_4];
+	ld.param.u64 	%rd5, [dotproduct_param_5];
+	ld.param.u64 	%rd6, [dotproduct_param_6];
+	ld.param.u64 	%rd7, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd8, %rd2;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	cvta.to.global.u64 	%rd11, %rd3;
+	add.s64 	%rd12, %rd11, %rd9;
+	cvta.to.global.u64 	%rd13, %rd4;
+	add.s64 	%rd14, %rd13, %rd9;
+	cvta.to.global.u64 	%rd15, %rd5;
+	add.s64 	%rd16, %rd15, %rd9;
+	cvta.to.global.u64 	%rd17, %rd6;
+	add.s64 	%rd18, %rd17, %rd9;
+	cvta.to.global.u64 	%rd19, %rd7;
+	add.s64 	%rd20, %rd19, %rd9;
+	ld.global.nc.f32 	%f2, [%rd16];
+	ld.global.nc.f32 	%f3, [%rd10];
+	ld.global.nc.f32 	%f4, [%rd18];
+	ld.global.nc.f32 	%f5, [%rd12];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
+	ld.global.nc.f32 	%f8, [%rd20];
+	ld.global.nc.f32 	%f9, [%rd14];
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	cvta.to.global.u64 	%rd21, %rd1;
+	add.s64 	%rd22, %rd21, %rd9;
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	dotproduct_ptx_62 = `
+.version 5.0
+.target sm_62
+.address_size 64
+
+	// .globl	dotproduct
+
+.visible .entry dotproduct(
+	.param .u64 dotproduct_param_0,
+	.param .f32 dotproduct_param_1,
+	.param .u64 dotproduct_param_2,
+	.param .u64 dotproduct_param_3,
+	.param .u64 dotproduct_param_4,
+	.param .u64 dotproduct_param_5,
+	.param .u64 dotproduct_param_6,
+	.param .u64 dotproduct_param_7,
+	.param .u32 dotproduct_param_8
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<13>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<23>;
+
+
+	ld.param.u64 	%rd1, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd2, [dotproduct_param_2];
+	ld.param.u64 	%rd3, [dotproduct_param_3];
+	ld.param.u64 	%rd4, [dotproduct_param_4];
+	ld.param.u64 	%rd5, [dotproduct_param_5];
+	ld.param.u64 	%rd6, [dotproduct_param_6];
+	ld.param.u64 	%rd7, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd8, %rd2;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	cvta.to.global.u64 	%rd11, %rd3;
+	add.s64 	%rd12, %rd11, %rd9;
+	cvta.to.global.u64 	%rd13, %rd4;
+	add.s64 	%rd14, %rd13, %rd9;
+	cvta.to.global.u64 	%rd15, %rd5;
+	add.s64 	%rd16, %rd15, %rd9;
+	cvta.to.global.u64 	%rd17, %rd6;
+	add.s64 	%rd18, %rd17, %rd9;
+	cvta.to.global.u64 	%rd19, %rd7;
+	add.s64 	%rd20, %rd19, %rd9;
+	ld.global.nc.f32 	%f2, [%rd16];
+	ld.global.nc.f32 	%f3, [%rd10];
+	ld.global.nc.f32 	%f4, [%rd18];
+	ld.global.nc.f32 	%f5, [%rd12];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
+	ld.global.nc.f32 	%f8, [%rd20];
+	ld.global.nc.f32 	%f9, [%rd14];
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	cvta.to.global.u64 	%rd21, %rd1;
+	add.s64 	%rd22, %rd21, %rd9;
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	dotproduct_ptx_70 = `
+.version 6.0
+.target sm_70
+.address_size 64
+
+	// .globl	dotproduct
+
+.visible .entry dotproduct(
+	.param .u64 dotproduct_param_0,
+	.param .f32 dotproduct_param_1,
+	.param .u64 dotproduct_param_2,
+	.param .u64 dotproduct_param_3,
+	.param .u64 dotproduct_param_4,
+	.param .u64 dotproduct_param_5,
+	.param .u64 dotproduct_param_6,
+	.param .u64 dotproduct_param_7,
+	.param .u32 dotproduct_param_8
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<13>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<23>;
+
+
+	ld.param.u64 	%rd1, [dotproduct_param_0];
+	ld.param.f32 	%f1, [dotproduct_param_1];
+	ld.param.u64 	%rd2, [dotproduct_param_2];
+	ld.param.u64 	%rd3, [dotproduct_param_3];
+	ld.param.u64 	%rd4, [dotproduct_param_4];
+	ld.param.u64 	%rd5, [dotproduct_param_5];
+	ld.param.u64 	%rd6, [dotproduct_param_6];
+	ld.param.u64 	%rd7, [dotproduct_param_7];
+	ld.param.u32 	%r2, [dotproduct_param_8];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd8, %rd2;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	cvta.to.global.u64 	%rd11, %rd3;
+	add.s64 	%rd12, %rd11, %rd9;
+	cvta.to.global.u64 	%rd13, %rd4;
+	add.s64 	%rd14, %rd13, %rd9;
+	cvta.to.global.u64 	%rd15, %rd5;
+	add.s64 	%rd16, %rd15, %rd9;
+	cvta.to.global.u64 	%rd17, %rd6;
+	add.s64 	%rd18, %rd17, %rd9;
+	cvta.to.global.u64 	%rd19, %rd7;
+	add.s64 	%rd20, %rd19, %rd9;
+	ld.global.nc.f32 	%f2, [%rd16];
+	ld.global.nc.f32 	%f3, [%rd10];
+	ld.global.nc.f32 	%f4, [%rd18];
+	ld.global.nc.f32 	%f5, [%rd12];
+	mul.f32 	%f6, %f5, %f4;
+	fma.rn.f32 	%f7, %f3, %f2, %f6;
+	ld.global.nc.f32 	%f8, [%rd20];
+	ld.global.nc.f32 	%f9, [%rd14];
+	fma.rn.f32 	%f10, %f9, %f8, %f7;
+	cvta.to.global.u64 	%rd21, %rd1;
+	add.s64 	%rd22, %rd21, %rd9;
+	ld.global.f32 	%f11, [%rd22];
+	fma.rn.f32 	%f12, %f10, %f1, %f11;
+	st.global.f32 	[%rd22], %f12;
+
+BB0_2:
 	ret;
 }
 

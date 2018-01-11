@@ -78,18 +78,6 @@ func log2GUI(msg string) {
 	// TODO: push to web ?
 }
 
-// returns log file of input commands, opening it first if needed
-//func openlog() *httpfs.File {
-//	if logfile == nil {
-//		var err error
-//		logfile, err = fs.Create(OD + "/input.log")
-//		if err != nil {
-//			log.Println(err)
-//		}
-//	}
-//	return logfile
-//}
-
 // like fmt.Sprint but with spaces between args
 func sprint(msg ...interface{}) string {
 	str := fmt.Sprintln(msg...)

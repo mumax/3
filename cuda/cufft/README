@@ -18,10 +18,7 @@ type CompatibilityMode int
     CUFFT compatibility mode
 
 const (
-    COMPATIBILITY_NATIVE          CompatibilityMode = C.CUFFT_COMPATIBILITY_NATIVE
     COMPATIBILITY_FFTW_PADDING    CompatibilityMode = C.CUFFT_COMPATIBILITY_FFTW_PADDING
-    COMPATIBILITY_FFTW_ASYMMETRIC CompatibilityMode = C.CUFFT_COMPATIBILITY_FFTW_ASYMMETRIC
-    COMPATIBILITY_FFTW_ALL        CompatibilityMode = C.CUFFT_COMPATIBILITY_FFTW_ALL
 )
 
 func (t CompatibilityMode) String() string

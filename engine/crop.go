@@ -19,13 +19,15 @@ func init() {
 }
 
 type cropped struct {
-	parent                 outputField
+	parent                 Quantity
 	name                   string
 	x1, x2, y1, y2, z1, z2 int
 }
 
-func CropRegion(parent outputField, region int) *cropped {
-	n := parent.Mesh().Size()
+// Crop quantity to a box enclosing the given region.
+// Used to output a region of interest, even if the region is non-rectangular.
+func CropRegion(parent Quantity, region int) *cropped {
+	n := MeshOf(parent).Size()
 	// use -1 for unset values
 	x1, y1, z1 := -1, -1, -1
 	x2, y2, z2 := -1, -1, -1
@@ -64,33 +66,33 @@ func CropRegion(parent outputField, region int) *cropped {
 	return Crop(parent, x1, x2+1, y1, y2+1, z1, z2+1)
 }
 
-func CropLayer(parent outputField, layer int) *cropped {
-	n := parent.Mesh().Size()
+func CropLayer(parent Quantity, layer int) *cropped {
+	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], 0, n[Y], layer, layer+1)
 }
 
-func CropX(parent outputField, x1, x2 int) *cropped {
-	n := parent.Mesh().Size()
+func CropX(parent Quantity, x1, x2 int) *cropped {
+	n := MeshOf(parent).Size()
 	return Crop(parent, x1, x2, 0, n[Y], 0, n[Z])
 }
 
-func CropY(parent outputField, y1, y2 int) *cropped {
-	n := parent.Mesh().Size()
+func CropY(parent Quantity, y1, y2 int) *cropped {
+	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], y1, y2, 0, n[Z])
 }
 
-func CropZ(parent outputField, z1, z2 int) *cropped {
-	n := parent.Mesh().Size()
+func CropZ(parent Quantity, z1, z2 int) *cropped {
+	n := MeshOf(parent).Size()
 	return Crop(parent, 0, n[X], 0, n[Y], z1, z2)
 }
 
-func Crop(parent outputField, x1, x2, y1, y2, z1, z2 int) *cropped {
-	n := parent.Mesh().Size()
+func Crop(parent Quantity, x1, x2, y1, y2, z1, z2 int) *cropped {
+	n := MeshOf(parent).Size()
 	util.Argument(x1 < x2 && y1 < y2 && z1 < z2)
 	util.Argument(x1 >= 0 && y1 >= 0 && z1 >= 0)
 	util.Argument(x2 <= n[X] && y2 <= n[Y] && z2 <= n[Z])
 
-	name := parent.Name() + "_"
+	name := NameOf(parent) + "_"
 	if x1 != 0 || x2 != n[X] {
 		name += "xrange" + rangeStr(x1, x2)
 	}
@@ -113,12 +115,13 @@ func rangeStr(a, b int) string {
 	// (trailing underscore to separate from subsequent autosave number)
 }
 
-func (q *cropped) NComp() int   { return q.parent.NComp() }
-func (q *cropped) Name() string { return q.name }
-func (q *cropped) Unit() string { return q.parent.Unit() }
+func (q *cropped) NComp() int             { return q.parent.NComp() }
+func (q *cropped) Name() string           { return q.name }
+func (q *cropped) Unit() string           { return UnitOf(q.parent) }
+func (q *cropped) EvalTo(dst *data.Slice) { EvalTo(q, dst) }
 
 func (q *cropped) Mesh() *data.Mesh {
-	c := q.parent.Mesh().CellSize()
+	c := MeshOf(q.parent).CellSize()
 	return data.NewMesh(q.x2-q.x1, q.y2-q.y1, q.z2-q.z1, c[X], c[Y], c[Z])
 }
 
@@ -126,10 +129,8 @@ func (q *cropped) average() []float64 { return qAverageUniverse(q) } // needed f
 func (q *cropped) Average() []float64 { return q.average() }         // handy for script
 
 func (q *cropped) Slice() (*data.Slice, bool) {
-	src, r := q.parent.Slice()
-	if r {
-		defer cuda.Recycle(src)
-	}
+	src := ValueOf(q.parent)
+	defer cuda.Recycle(src)
 	dst := cuda.Buffer(q.NComp(), q.Mesh().Size())
 	cuda.Crop(dst, src, q.x1, q.y1, q.z1)
 	return dst, true

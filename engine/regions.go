@@ -193,6 +193,10 @@ func (r *Regions) Slice() (*data.Slice, bool) {
 	return buf, true
 }
 
+func (r *Regions) EvalTo(dst *data.Slice) { EvalTo(r, dst) }
+
+var _ Quantity = &regions
+
 // Re-interpret a contiguous array as a multi-dimensional array of given size.
 func reshapeBytes(array []byte, size [3]int) [][][]byte {
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
@@ -224,6 +228,31 @@ func (b *Regions) shift(dx int) {
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := x1; ix < x2; ix++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				reg := b.get(r)
+				if reg != 0 {
+					b.SetCell(ix, iy, iz, reg) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+}
+
+func (b *Regions) shiftY(dy int) {
+	// TODO: return if no regions defined
+	r1 := b.Gpu()
+	r2 := cuda.NewBytes(b.Mesh().NCell()) // TODO: somehow recycle
+	defer r2.Free()
+	newreg := byte(0) // new region at edge
+	cuda.ShiftBytesY(r2, r1, b.Mesh(), dy, newreg)
+	r1.Copy(r2)
+
+	n := Mesh().Size()
+	y1, y2 := shiftDirtyRange(dy)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for ix := 0; ix < n[X]; ix++ {
+			for iy := y1; iy < y2; iy++ {
 				r := Index2Coord(ix, iy, iz) // includes shift
 				reg := b.get(r)
 				if reg != 0 {

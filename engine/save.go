@@ -50,14 +50,14 @@ func (*oformat) SetValue(v interface{}) { drainOutput(); outputFormat = v.(Outpu
 func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
 
 // Save once, with auto file name
-func Save(q outputField) {
-	fname := autoFname(q.Name(), outputFormat, autonum[q])
+func Save(q Quantity) {
+	fname := autoFname(NameOf(q), outputFormat, autonum[q])
 	SaveAs(q, fname)
 	autonum[q]++
 }
 
 // Save under given file name (transparent async I/O).
-func SaveAs(q outputField, fname string) {
+func SaveAs(q Quantity, fname string) {
 
 	if !strings.HasPrefix(fname, OD()) {
 		fname = OD() + fname // don't clean, turns http:// in http:/
@@ -66,22 +66,18 @@ func SaveAs(q outputField, fname string) {
 	if path.Ext(fname) == "" {
 		fname += ("." + StringFromOutputFormat[outputFormat])
 	}
-	buffer, recylce := q.Slice()
-	if recylce {
-		defer cuda.Recycle(buffer)
-	}
-	info := data.Meta{Time: Time, Name: q.Name(), Unit: q.Unit(), CellSize: q.Mesh().CellSize()}
+	buffer := ValueOf(q) // TODO: check and optimize for Buffer()
+	defer cuda.Recycle(buffer)
+	info := data.Meta{Time: Time, Name: NameOf(q), Unit: UnitOf(q), CellSize: MeshOf(q).CellSize()}
 	data := buffer.HostCopy() // must be copy (async io)
 	queOutput(func() { saveAs_sync(fname, data, info, outputFormat) })
 }
 
 // Save image once, with auto file name
-func Snapshot(q outputField) {
-	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, q.Name(), autonum[q])
-	s, r := q.Slice()
-	if r {
-		defer cuda.Recycle(s)
-	}
+func Snapshot(q Quantity) {
+	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, NameOf(q), autonum[q])
+	s := ValueOf(q)
+	defer cuda.Recycle(s)
 	data := s.HostCopy() // must be copy (asyncio)
 	queOutput(func() { snapshot_sync(fname, data) })
 	autonum[q]++

@@ -1,0 +1,40 @@
+SetMesh(128, 128, 1, 1e-9,1e-9,0.4e-9, 1, 1, 0)
+
+Msat  =580e3
+Aex   = 15e-12
+enabledemag=false
+alpha = 0.1
+Ku1=0.59e6
+anisU=vector(0,0,1)
+Dind=0.0034089785
+
+shiftregions=true
+
+maxregion:=255
+seed:=17
+ext_makegrains(10e-9, maxregion, seed)
+
+for i:=0; i<maxRegion; i++{
+        for j:=i+1; j<maxRegion; j++{
+                ext_ScaleExchange(i, j, 0.5)
+        }
+}
+
+
+m =neelskyrmion(1, -1)
+run(5e-11)
+t=0.
+minimize()
+
+setsolver(5)
+maxerr=0.001
+
+ext_centerbubble()
+
+Xi=0.2
+j=vector(5e12*cos(2*pi*1e9*t),5e12*sin(2*pi*1e9*t),0)
+
+run(2e-10)
+TOL:=1e-11
+expectv("position", ext_bubblepos.average(), vector(-7.202214431762697e-08,-8.216819381713864e-08,0), TOL)
+

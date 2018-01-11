@@ -27,7 +27,7 @@ type geom struct {
 func (g *geom) init() {
 	g.buffer = nil
 	g.info = info{1, "geom", ""}
-	DeclROnly("geom", &geometry, "Cell fill fraction (0..1)")
+	DeclROnly("geom", g, "Cell fill fraction (0..1)")
 }
 
 func spaceFill() float64 {
@@ -55,6 +55,10 @@ func (g *geom) Slice() (*data.Slice, bool) {
 		return s, false
 	}
 }
+
+func (q *geom) EvalTo(dst *data.Slice) { EvalTo(q, dst) }
+
+var _ Quantity = &geometry
 
 func (g *geom) average() []float64 {
 	s, r := g.Slice()
@@ -220,6 +224,36 @@ func (g *geom) shift(dx int) {
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := x1; ix < x2; ix++ {
+				r := Index2Coord(ix, iy, iz) // includes shift
+				if !g.shape(r[X], r[Y], r[Z]) {
+					cuda.SetCell(g.buffer, 0, ix, iy, iz, 0) // a bit slowish, but hardly reached
+				}
+			}
+		}
+	}
+
+}
+
+func (g *geom) shiftY(dy int) {
+	// empty mask, nothing to do
+	if g == nil || g.buffer.IsNil() {
+		return
+	}
+
+	// allocated mask: shift
+	s := g.buffer
+	s2 := cuda.Buffer(1, g.Mesh().Size())
+	defer cuda.Recycle(s2)
+	newv := float32(1) // initially fill edges with 1's
+	cuda.ShiftY(s2, s, dy, newv, newv)
+	data.Copy(s, s2)
+
+	n := Mesh().Size()
+	y1, y2 := shiftDirtyRange(dy)
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for ix := 0; ix < n[X]; ix++ {
+			for iy := y1; iy < y2; iy++ {
 				r := Index2Coord(ix, iy, iz) // includes shift
 				if !g.shape(r[X], r[Y], r[Z]) {
 					cuda.SetCell(g.buffer, 0, ix, iy, iz, 0) // a bit slowish, but hardly reached

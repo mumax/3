@@ -5,7 +5,8 @@ import (
 	"github.com/mumax/3/cuda/curand"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/mag"
-	"github.com/mumax/3/util"
+	//"github.com/mumax/3/util"
+	"math"
 )
 
 var (
@@ -70,8 +71,19 @@ func (b *thermField) update() {
 		return
 	}
 
+	// after a bad step the timestep is rescaled and the noise should be rescaled accordingly, instead of redrawing the random numbers
+	if NSteps == b.step && Dt_si != b.dt {
+		for c := 0; c < 3; c++ {
+			cuda.Madd2(b.noise.Comp(c), b.noise.Comp(c), b.noise.Comp(c), float32(math.Sqrt(b.dt/Dt_si)), 0.)
+		}
+		b.dt = Dt_si
+		return
+	}
+
 	if FixDt == 0 {
-		util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
+		Refer("leliaert2017")
+		//uncomment to not allow adaptive step
+		//util.Fatal("Finite temperature requires fixed time step. Set FixDt != 0.")
 	}
 
 	N := Mesh().NCell()
@@ -113,11 +125,12 @@ func ThermSeed(seed int) {
 	}
 }
 
-func (b *thermField) Mesh() *data.Mesh   { return Mesh() }
-func (b *thermField) NComp() int         { return 3 }
-func (b *thermField) Name() string       { return "Thermal field" }
-func (b *thermField) Unit() string       { return "T" }
-func (b *thermField) average() []float64 { return qAverageUniverse(b) }
+func (b *thermField) Mesh() *data.Mesh       { return Mesh() }
+func (b *thermField) NComp() int             { return 3 }
+func (b *thermField) Name() string           { return "Thermal field" }
+func (b *thermField) Unit() string           { return "T" }
+func (b *thermField) average() []float64     { return qAverageUniverse(b) }
+func (b *thermField) EvalTo(dst *data.Slice) { EvalTo(b, dst) }
 func (b *thermField) Slice() (*data.Slice, bool) {
 	b.update()
 	return b.noise, false

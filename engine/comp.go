@@ -10,33 +10,33 @@ import (
 )
 
 type component struct {
-	parent outputField
+	parent Quantity
 	comp   int
 }
 
 // Comp returns vector component c of the parent Quantity
-func Comp(parent outputField, c int) ScalarField {
+func Comp(parent Quantity, c int) ScalarField {
 	util.Argument(c >= 0 && c < parent.NComp())
 	return AsScalarField(&component{parent, c})
 }
 
-func (q *component) NComp() int         { return 1 }
-func (q *component) Name() string       { return fmt.Sprint(q.parent.Name(), "_", compname[q.comp]) }
-func (q *component) Unit() string       { return q.parent.Unit() }
-func (q *component) Mesh() *data.Mesh   { return q.parent.Mesh() }
-func (q *component) average() []float64 { return []float64{q.parent.average()[q.comp]} } // TODO
+func (q *component) NComp() int       { return 1 }
+func (q *component) Name() string     { return fmt.Sprint(NameOf(q.parent), "_", compname[q.comp]) }
+func (q *component) Unit() string     { return UnitOf(q.parent) }
+func (q *component) Mesh() *data.Mesh { return MeshOf(q.parent) }
 
 func (q *component) Slice() (*data.Slice, bool) {
 	p := q.parent
-	src, r := p.Slice()
-	if r {
-		for i := 0; i < p.NComp(); i++ {
-			if i != q.comp {
-				defer cuda.Recycle(src.Comp(i))
-			}
-		}
-	}
-	return src.Comp(q.comp), r
+	src := ValueOf(p)
+	defer cuda.Recycle(src)
+	c := cuda.Buffer(1, src.Size())
+	return c, true
+}
+
+func (q *component) EvalTo(dst *data.Slice) {
+	src := ValueOf(q.parent)
+	defer cuda.Recycle(src)
+	data.Copy(dst, src.Comp(q.comp))
 }
 
 var compname = map[int]string{0: "x", 1: "y", 2: "z"}

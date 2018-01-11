@@ -11,7 +11,6 @@ import (
 
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
-// TODO: unify with param.
 type Excitation struct {
 	name       string
 	perRegion  RegionwiseVector // Region-based excitation
@@ -129,6 +128,7 @@ func (e *Excitation) Comp(c int) ScalarField  { return Comp(e, c) }
 func (e *Excitation) Eval() interface{}       { return e }
 func (e *Excitation) Type() reflect.Type      { return reflect.TypeOf(new(Excitation)) }
 func (e *Excitation) InputType() reflect.Type { return script.VectorFunction_t }
+func (e *Excitation) EvalTo(dst *data.Slice)  { EvalTo(e, dst) }
 
 func checkNaN(s *data.Slice, name string) {
 	h := s.Host()

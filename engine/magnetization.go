@@ -30,7 +30,7 @@ func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(mag
 func (m *magnetization) Eval() interface{}       { return m }
 func (m *magnetization) average() []float64      { return sAverageMagnet(M.Buffer()) }
 func (m *magnetization) Average() data.Vector    { return unslice(m.average()) }
-func (m *magnetization) normalize()              { cuda.Normalize(M.Buffer(), geometry.Gpu()) }
+func (m *magnetization) normalize()              { cuda.Normalize(m.Buffer(), geometry.Gpu()) }
 
 // allocate storage (not done by init, as mesh size may not yet be known then)
 func (m *magnetization) alloc() {
@@ -43,7 +43,7 @@ func (b *magnetization) SetArray(src *data.Slice) {
 		src = data.Resample(src, b.Mesh().Size())
 	}
 	data.Copy(b.Buffer(), src)
-	M.normalize()
+	b.normalize()
 }
 
 func (m *magnetization) Set(c Config) {
@@ -82,7 +82,7 @@ func (m *magnetization) GetCell(ix, iy, iz int) data.Vector {
 	return Vector(mx, my, mz)
 }
 
-func (m *magnetization) TableData() []float64 { return slice(m.Average()) }
+func (m *magnetization) Quantity() []float64 { return slice(m.Average()) }
 
 // Sets the magnetization inside the shape
 func (m *magnetization) SetInShape(region Shape, conf Config) {

@@ -2,6 +2,7 @@
 #include "exchange.h"
 #include "float3.h"
 #include "stencil.h"
+#include "amul.h"
 
 // Exchange + Dzyaloshinskii-Moriya interaction according to
 // Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).
@@ -13,6 +14,7 @@
 extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
+       float* __restrict__ Ms_, float Ms_mul,
        float* __restrict__ aLUT2d, float* __restrict__ dLUT2d, uint8_t* __restrict__ regions,
        float cx, float cy, float cz, int Nx, int Ny, int Nz, uint8_t PBC) {
 
@@ -25,7 +27,7 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     }
 
     int I = idx(ix, iy, iz);                      // central cell index
-    float3 h = make_float3(Hx[I], Hy[I], Hz[I]);  // add to H
+    float3 h = make_float3(0.0,0.0,0.0);          // add to H
     float3 m0 = make_float3(mx[I], my[I], mz[I]); // central m
     uint8_t r0 = regions[I];
     int i_;                                       // neighbor index
@@ -41,8 +43,9 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         if (ix-1 >= 0 || PBCx) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        float A1 = aLUT2d[symidx(r0, regions[i_])];    // inter-region Aex
-        float D1 = dLUT2d[symidx(r0, regions[i_])];    // inter-region Dex
+        int r1 = is0(m1)? r0 : regions[i_];            // don't use inter region params if m1=0
+        float A1 = aLUT2d[symidx(r0, r1)];             // inter-region Aex
+        float D1 = dLUT2d[symidx(r0, r1)];             // inter-region Dex
         if (is0(m1)) {                                 // neighbor missing
             m1.x = m0.x - (-cx * (0.5f*D1/A1) * m0.z); // extrapolate missing m from BC's
             m1.y = m0.y;
@@ -59,8 +62,9 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         if (ix+1 < Nx || PBCx) {
             m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        float A2 = aLUT2d[symidx(r0, regions[i_])];
-        float D2 = dLUT2d[symidx(r0, regions[i_])];
+        int r2 = is0(m2)? r0 : regions[i_];
+        float A2 = aLUT2d[symidx(r0, r2)];
+        float D2 = dLUT2d[symidx(r0, r2)];
         if (is0(m2)) {
             m2.x = m0.x - (cx * (0.5f*D2/A2) * m0.z);
             m2.y = m0.y;
@@ -78,8 +82,9 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         if (iy-1 >= 0 || PBCy) {
             m1 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        float A1 = aLUT2d[symidx(r0, regions[i_])];
-        float D1 = dLUT2d[symidx(r0, regions[i_])];
+        int r1 = is0(m1)? r0 : regions[i_];
+        float A1 = aLUT2d[symidx(r0, r1)];
+        float D1 = dLUT2d[symidx(r0, r1)];
         if (is0(m1)) {
             m1.x = m0.x;
             m1.y = m0.y - (-cy * (0.5f*D1/A1) * m0.z);
@@ -96,8 +101,9 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
         if  (iy+1 < Ny || PBCy) {
             m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
-        float A2 = aLUT2d[symidx(r0, regions[i_])];
-        float D2 = dLUT2d[symidx(r0, regions[i_])];
+        int r2 = is0(m2)? r0 : regions[i_];
+        float A2 = aLUT2d[symidx(r0, r2)];
+        float D2 = dLUT2d[symidx(r0, r2)];
         if (is0(m2)) {
             m2.x = m0.x;
             m2.y = m0.y - (cy * (0.5f*D2/A2) * m0.z);
@@ -130,9 +136,10 @@ adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
     }
 
     // write back, result is H + Hdmi + Hex
-    Hx[I] = h.x;
-    Hy[I] = h.y;
-    Hz[I] = h.z;
+    float invMs = inv_Msat(Ms_, Ms_mul, I);
+    Hx[I] += h.x*invMs;
+    Hy[I] += h.y*invMs;
+    Hz[I] += h.z*invMs;
 }
 
 // Note on boundary conditions.

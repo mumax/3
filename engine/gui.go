@@ -19,17 +19,17 @@ import (
 
 // global GUI state stores what is currently shown in the web page.
 var (
-	gui_    = guistate{Quants: make(map[string]outputField), Params: make(map[string]Param)}
+	gui_    = guistate{Quants: make(map[string]Quantity), Params: make(map[string]Param)}
 	Timeout = 3 * time.Second // exit finished simulation this long after browser was closed
 )
 
 type guistate struct {
-	*gui.Page                                 // GUI elements (buttons...)
-	Quants             map[string]outputField // displayable quantities by name
-	Params             map[string]Param       // displayable parameters by name
-	render                                    // renders displayed quantity
-	mutex              sync.Mutex             // protects eventCacheBreaker and keepalive
-	_eventCacheBreaker int                    // changed on any event to make sure display is updated
+	*gui.Page                              // GUI elements (buttons...)
+	Quants             map[string]Quantity // displayable quantities by name
+	Params             map[string]Param    // displayable parameters by name
+	render                                 // renders displayed quantity
+	mutex              sync.Mutex          // protects eventCacheBreaker and keepalive
+	_eventCacheBreaker int                 // changed on any event to make sure display is updated
 	keepalive          time.Time
 }
 
@@ -88,7 +88,7 @@ func (g *guistate) Add(name string, value interface{}) {
 	if v, ok := value.(Param); ok {
 		g.Params[name] = v
 	}
-	if v, ok := value.(outputField); ok {
+	if v, ok := value.(Quantity); ok {
 		g.Quants[name] = v
 	}
 }
@@ -248,8 +248,8 @@ func (g *guistate) prepareM() {
 }
 
 var (
-	solvertypes = map[string]int{"bw_euler": -1, "euler": 1, "heun": 2, "rk23": 3, "rk4": 4, "rk45": 5}
-	solvernames = map[int]string{-1: "bw_euler", 1: "euler", 2: "heun", 3: "rk23", 4: "rk4", 5: "rk45"}
+	solvertypes = map[string]int{"bw_euler": -1, "euler": 1, "heun": 2, "rk23": 3, "rk4": 4, "rk45": 5, "rkf56": 6}
+	solvernames = map[int]string{-1: "bw_euler", 1: "euler", 2: "heun", 3: "rk23", 4: "rk4", 5: "rk45", 6: "rkf56"}
 )
 
 func Break() {

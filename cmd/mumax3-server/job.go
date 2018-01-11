@@ -167,7 +167,7 @@ func (j *Job) IsQueued() bool {
 
 // is job running?
 func (j *Job) IsRunning() bool {
-	return j.Output != "" && j.ExitStatus == ""
+	return j.Output != "" && j.ExitStatus == "" && j.Host!=""
 }
 
 // Host of job with this ID (=first path element). E.g.:
@@ -203,6 +203,9 @@ func (j *Job) Status() string {
 		return QUEUED.String()
 	}
 	if j.ExitStatus == "0" {
+		return FINISHED.String()
+	}
+	if j.ExitStatus == "" && j.Host == "" {
 		return FINISHED.String()
 	}
 	if j.Host != "" && j.ExitStatus == "" {

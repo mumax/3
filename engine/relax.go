@@ -7,7 +7,7 @@ import (
 	"math"
 )
 
-var thresholdTorque := 1e-3; //to be replaced by a sane default value
+var thresholdTorque float64 = 1e-3; //to be replaced by a sane default value
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy")

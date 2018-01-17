@@ -7,11 +7,13 @@ import (
 	"math"
 )
 
-var RelaxTorqueThreshold float64 = 1e-3; //in T. The user can check MaxTorque for sane values
+//Stopping relax Maxtorque in T. The user can check MaxTorque for sane values (e.g. 1e-3). 
+// If set to 0, relax() will stop when the average torque is steady or increasing.
+var RelaxTorqueThreshold float64 = -1.; 
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy")
-	DeclVar("RelaxTorqueThreshold", &RelaxTorqueThreshold, "Torque threshold for relax()")
+	DeclVar("RelaxTorqueThreshold", &RelaxTorqueThreshold, "MaxTorque threshold for relax(). If set to -1 (default), relax() will stop when the average torque is steady or increasing.")
 }
 
 // are we relaxing?
@@ -58,22 +60,40 @@ func Relax() {
 	}
 
 	// Now we are already close to equilibrium, but energy is too noisy to be used any further.
-	// So now we minimize the maximum torque which is less noisy.
+	// So now we minimize the torque which is less noisy.
 	solver := stepper.(*RK23)
 	defer stepper.Free() // purge previous rk.k1 because FSAL will be dead wrong.
 	
-	maxTorque := func() float64 { //the user can see the values of MaxTorque.
+	maxTorque := func() float64 {
 		return cuda.MaxVecNorm(solver.k1)
-    	}
-
-	// run as long as the max torque is above threshold. Then increase the accuracy and step more.
-	for !pause {
-		for maxTorque() > RelaxTorqueThreshold && !pause {
-		    relaxSteps(N)
-		}
-		MaxErr /= math.Sqrt2
-		if MaxErr < 1e-9 { break; }
     }
+    avgTorque := func() float32 {
+		return cuda.Dot(solver.k1, solver.k1)
+	}
+	
+	if RelaxTorqueThreshold > 0 {
+		// run as long as the max torque is above threshold. Then increase the accuracy and step more.
+		for !pause {
+			for maxTorque() > RelaxTorqueThreshold && !pause {
+				relaxSteps(N)
+			}
+			MaxErr /= math.Sqrt2
+			if MaxErr < 1e-9 { break; }
+		}
+	} else {
+		// previous (<jan2018) behaviour: run as long as torque goes down. Then increase the accuracy and step more.
+		for !pause {
+			var T0, T1 float32 = 0, avgTorque();
+			relaxSteps(N);
+			T0, T1 = T1, avgTorque()
+			for T1 < T0 && !pause {
+				relaxSteps(N)
+				T0, T1 = T1, avgTorque()
+			}
+			MaxErr /= math.Sqrt2
+			if MaxErr < 1e-9 { break; }
+		}
+	}
 	pause = true
 }
 

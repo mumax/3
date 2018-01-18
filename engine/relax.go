@@ -82,16 +82,17 @@ func Relax() {
 		}
 	} else {
 		// previous (<jan2018) behaviour: run as long as torque goes down. Then increase the accuracy and step more.
-		for !pause {
-			var T0, T1 float32 = 0, avgTorque();
-			relaxSteps(N);
+		// if MaxErr < 1e-9, this code won't run.
+		var T0, T1 float32 = 0, avgTorque()
+		// Step as long as torque goes down. Then increase the accuracy and step more.
+		for MaxErr > 1e-9 && !pause {
+			MaxErr /= math.Sqrt2
+			relaxSteps(N) // TODO: Play with other values
 			T0, T1 = T1, avgTorque()
 			for T1 < T0 && !pause {
-				relaxSteps(N)
+				relaxSteps(N) // TODO: Play with other values
 				T0, T1 = T1, avgTorque()
 			}
-			MaxErr /= math.Sqrt2
-			if MaxErr < 1e-9 { break; }
 		}
 	}
 	pause = true

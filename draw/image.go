@@ -10,42 +10,57 @@ import (
 )
 
 // Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.
-func Image(f *data.Slice, fmin, fmax string, arrowSize int, colormap ...color.RGBA) *image.RGBA {
+func Image(f *data.Slice, fmin, fmax string, arrowSize int, colormap ...ColorMapSpec) *image.RGBA {
 	img := new(image.RGBA)
 	On(img, f, fmin, fmax, arrowSize, colormap...)
 	return img
 }
 
 // Render on existing image buffer. Resize it if needed
-func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colormap ...color.RGBA) {
+func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colormap ...ColorMapSpec) {
+	cm := colormap[0]
 	dim := f.NComp()
 	switch dim {
 	default:
 		log.Fatalf("unsupported number of components: %v", dim)
 	case 3:
-		drawVectors(img, f.Vectors(), arrowSize)
+		if cm.Ccomp >= 0 {
+			ff := f.Comp(cm.Ccomp)
+			min, max := parseMinMax(ff, fmin, fmax)
+			drawFloats(img, ff.Scalars(), min, max, cm.Cmap...)
+			if arrowSize > 0 {
+				drawArrows(img, f.Vectors(), arrowSize)
+			}
+		} else {
+			drawVectors(img, f.Vectors(), arrowSize)
+		}
 	case 1:
-		min, max := extrema(f.Host()[0])
-		if fmin != "auto" {
-			m, err := strconv.ParseFloat(fmin, 32)
-			if err != nil {
-				util.Fatal("draw: scale:", err)
-			}
-			min = float32(m)
-		}
-		if fmax != "auto" {
-			m, err := strconv.ParseFloat(fmax, 32)
-			if err != nil {
-				util.Fatal("draw: scale:", err)
-			}
-			max = float32(m)
-		}
-		if min == max {
-			min -= 1
-			max += 1 // make it gray instead of black
-		}
-		drawFloats(img, f.Scalars(), min, max, colormap...)
+		min, max := parseMinMax(f, fmin, fmax)
+		drawFloats(img, f.Scalars(), min, max, cm.Cmap...)
 	}
+}
+
+func parseMinMax(f *data.Slice, fmin, fmax string) (min, max float32) {
+	min, max = extrema(f.Host()[0])
+	if fmin != "auto" {
+		m, err := strconv.ParseFloat(fmin, 32)
+		if err != nil {
+			util.Fatal("draw: scale:", err)
+		}
+		min = float32(m)
+	}
+	if fmax != "auto" {
+		m, err := strconv.ParseFloat(fmax, 32)
+		if err != nil {
+			util.Fatal("draw: scale:", err)
+		}
+		max = float32(m)
+	}
+	if min == max {
+		min -= 1
+		max += 1 // make it gray instead of black
+	}
+	return
 }
 
 // Draws rank 4 tensor (3D vector field) as image

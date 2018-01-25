@@ -25,27 +25,32 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colorm
 	case 3:
 		drawVectors(img, f.Vectors(), arrowSize)
 	case 1:
-		min, max := extrema(f.Host()[0])
-		if fmin != "auto" {
-			m, err := strconv.ParseFloat(fmin, 32)
-			if err != nil {
-				util.Fatal("draw: scale:", err)
-			}
-			min = float32(m)
-		}
-		if fmax != "auto" {
-			m, err := strconv.ParseFloat(fmax, 32)
-			if err != nil {
-				util.Fatal("draw: scale:", err)
-			}
-			max = float32(m)
-		}
-		if min == max {
-			min -= 1
-			max += 1 // make it gray instead of black
-		}
+		min, max := parseMinMax(f, fmin, fmax)
 		drawFloats(img, f.Scalars(), min, max, colormap...)
 	}
+}
+
+func parseMinMax(f *data.Slice, fmin, fmax string) (min, max float32) {
+	min, max = extrema(f.Host()[0])
+	if fmin != "auto" {
+		m, err := strconv.ParseFloat(fmin, 32)
+		if err != nil {
+			util.Fatal("draw: scale:", err)
+		}
+		min = float32(m)
+	}
+	if fmax != "auto" {
+		m, err := strconv.ParseFloat(fmax, 32)
+		if err != nil {
+			util.Fatal("draw: scale:", err)
+		}
+		max = float32(m)
+	}
+	if min == max {
+		min -= 1
+		max += 1 // make it gray instead of black
+	}
+	return
 }
 
 // Draws rank 4 tensor (3D vector field) as image

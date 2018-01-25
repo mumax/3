@@ -3,6 +3,11 @@ package draw
 import "image/color"
 import "fmt"
 
+type ColorMapSpec struct {
+	Cmap  []color.RGBA
+	Ccomp int
+}
+
 func ColorMap(min, max, value float32, colormap ...color.RGBA) color.RGBA {
 	// default colormap: black-white
 	if len(colormap) < 1 {

@@ -18,25 +18,29 @@ func Image(f *data.Slice, fmin, fmax string, arrowSize int, colormap ...ColorMap
 
 // Render on existing image buffer. Resize it if needed
 func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colormap ...ColorMapSpec) {
-	cm := colormap[0]
 	dim := f.NComp()
 	switch dim {
 	default:
 		log.Fatalf("unsupported number of components: %v", dim)
 	case 3:
-		if cm.Ccomp >= 0 {
-			ff := f.Comp(cm.Ccomp)
+		if colormap == nil {
+			drawVectors(img, f.Vectors(), arrowSize)
+			break
+		}
+		if colormap[0].Ccomp >= 0 {
+			ff := f.Comp(colormap[0].Ccomp)
 			min, max := parseMinMax(ff, fmin, fmax)
-			drawFloats(img, ff.Scalars(), min, max, cm.Cmap...)
+			drawFloats(img, ff.Scalars(), min, max, colormap[0].Cmap...)
 			if arrowSize > 0 {
 				drawArrows(img, f.Vectors(), arrowSize)
 			}
 		} else {
 			drawVectors(img, f.Vectors(), arrowSize)
 		}
+
 	case 1:
 		min, max := parseMinMax(f, fmin, fmax)
-		drawFloats(img, f.Scalars(), min, max, cm.Cmap...)
+		drawFloats(img, f.Scalars(), min, max, colormap[0].Cmap...)
 	}
 }
 

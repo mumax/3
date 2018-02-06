@@ -82,7 +82,7 @@ var (
 )
 
 var (
-	colormap []color.RGBA
+	colormap []draw.ColorMapSpec
 )
 
 type task struct {
@@ -98,7 +98,8 @@ func main() {
 		log.Fatal("no input files")
 	}
 
-	colormap = parseColors(*flag_color)
+	colormap = make([]draw.ColorMapSpec, 1, 1)
+	colormap[0].Cmap = parseColors(*flag_color)
 
 	// politely try to make the output directory
 	if *flag_dir != "" {
@@ -324,8 +325,13 @@ func preprocess(f *data.Slice) {
 	if *flag_normpeak {
 		normpeak(f)
 	}
+	colormap[0].Ccomp = -1
 	if *flag_comp != "" {
-		*f = *f.Comp(parseComp(*flag_comp))
+		c := parseComp(*flag_comp)
+		colormap[0].Ccomp = c
+		if *flag_arrows == 0 {
+			*f = *f.Comp(c)
+		}
 	}
 	crop(f)
 	if *flag_resize != "" {

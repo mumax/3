@@ -167,7 +167,7 @@ func (j *Job) IsQueued() bool {
 
 // is job running?
 func (j *Job) IsRunning() bool {
-	return j.Output != "" && j.ExitStatus == "" && j.Host!=""
+	return j.Output != "" && j.ExitStatus == "" && j.Host != ""
 }
 
 // Host of job with this ID (=first path element). E.g.:

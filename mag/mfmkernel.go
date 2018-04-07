@@ -1,11 +1,11 @@
 package mag
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	d "github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"github.com/mumax/3/oommf"
+	"github.com/mumax/3/util"
 	"math"
 	"os"
 )
@@ -47,7 +47,9 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64, cacheDir string) (kernel [3]
 	kernel = CalcMFMKernel(mesh, lift, tipsize)
 
 	for i := 0; i < 3; i++ {
-		errSave = SaveKernel(fmt.Sprint(basename, i, ".ovf"), kernel[i])
+		compName := fmt.Sprint("Nmfm_", i)
+		info := d.Meta{Time: float64(0.0), Name: compName, Unit: "1", CellSize: mesh.CellSize(), MeshUnit: "m"}
+		errSave = SaveKernel(fmt.Sprint(basename, i, ".ovf"), kernel[i], info)
 		if errSave != nil {
 			break
 		}
@@ -57,7 +59,6 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64, cacheDir string) (kernel [3]
 	} else {
 		util.Log("//Cached kernel:", basename)
 	}
-
 
 	return kernel
 }
@@ -77,9 +78,6 @@ func SaveMFMKernel(fname string, kernel *d.Slice) error {
 	oommf.WriteOVF2(out, kernel, d.Meta{}, "binary 4")
 	return nil
 }
-
-
-
 
 // Kernel for the vertical derivative of the force on an MFM tip due to mx, my, mz.
 // This is the 2nd derivative of the energy w.r.t. z.

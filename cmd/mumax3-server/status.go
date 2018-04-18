@@ -68,7 +68,7 @@ const templText = `
 		.RUNNING{font-weight: bold; color:blue}
 		.QUEUED{color:black}
 		.FINISHED{color: grey}
-		.active, .collapsible:hover {font-weight: normal; background-color: #eee; width: 50%;}
+		.active, .collapsible:hover {cursor:pointer; font-weight:normal; background-color:#eee; width:50%;}
 	</style>
 	<meta http-equiv="refresh" content="60">
 </head>
@@ -152,8 +152,8 @@ Uptime: {{.Uptime}} <br/>
 		<button onclick='doEvent("WakeupWatchdog", "")'>Wake-up Watchdog</button> (re-queue dead simulations right now).
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a>
-		<h3 class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;cont.style.display=(cont.style.display==="none"?"block":"none");'>
-		{{$k}}</h3><p>
+		<h3 title="Click to show/hide" class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;cont.style.display=(cont.style.display==="none"?"block":"none");'>
+		&dtrif; {{$k}}</h3><p>
 	
 
 		<b>Jobs</b>

@@ -40,7 +40,11 @@ func On(img *image.RGBA, f *data.Slice, fmin, fmax string, arrowSize int, colorm
 
 	case 1:
 		min, max := parseMinMax(f, fmin, fmax)
-		drawFloats(img, f.Scalars(), min, max, colormap[0].Cmap...)
+		if colormap == nil {
+			drawFloats(img, f.Scalars(), min, max)
+		} else {
+			drawFloats(img, f.Scalars(), min, max, colormap[0].Cmap...)
+		}
 	}
 }
 

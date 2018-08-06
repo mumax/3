@@ -29,6 +29,7 @@ minimize()
 setsolver(5)
 maxerr=0.001
 
+ext_bubbleMz = -1.0
 ext_centerbubble()
 
 Xi=0.2

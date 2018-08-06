@@ -33,9 +33,9 @@ ext_bubbleMz = -1.0
 ext_centerbubble()
 
 Xi=0.2
-j=vector(5e12*cos(2*pi*1e9*t),5e12*sin(2*pi*1e9*t),0)
+j=vector(5e12,2e12,0)
 
-run(2e-10)
-TOL:=1e-11
-expectv("position", ext_bubblepos.average(), vector(-7.202214431762697e-08,-8.216819381713864e-08,0), TOL)
+run(1e-10)
+TOL:=1e-10
+expectv("position", ext_bubblepos.average(), vector(-5.20721817016602e-08,-4.185146331787111e-08,0), TOL)
 

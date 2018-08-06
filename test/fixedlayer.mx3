@@ -4,7 +4,7 @@
 
 randomSeed := 1234567
 
-randSeed(randomSeed) 
+randSeed(randomSeed)
 
 Nx := 64
 Ny := 32
@@ -13,7 +13,7 @@ Nz := 16
 sX := 128e-9
 sY := 64e-9
 sZ := 32e-9
- 
+
 setgridsize(Nx, Ny, Nz)
 setcellsize(sX/Nx, sY/Ny, sZ/Nz)
 
@@ -30,9 +30,9 @@ DisableZhangLiTorque = true
 
 Jtot := -0.008  // total current in amps
 carea := sX * sY
-jc := Jtot / carea  
+jc := Jtot / carea
 print("Current density is: " ,  jc)
- 
+
 J = vector(0, 0, jc)
 
 grainSize  := 4e-9  // m
@@ -47,5 +47,5 @@ for i:=0; i<maxRegion; i++{
 print(STtorque.average())
 
 TOL := 1e-7
-// testing against mumax3.9.1
-expectv("STtorque", STtorque.average(), vector(0.00020761338237207383, -6.879508873680606e-05, -0.00023736029106657952), TOL)
+// testing against mumax3.10
+expectv("STtorque", STtorque.average(), vector(0.0002079093683278188,-6.888924690429121e-05,-0.0002376949996687472), TOL)

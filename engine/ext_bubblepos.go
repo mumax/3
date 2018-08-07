@@ -8,7 +8,12 @@ var (
 	BubblePos   = NewVectorValue("ext_bubblepos", "m", "Bubble core position", bubblePos)
 	BubbleDist  = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
 	BubbleSpeed = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
+	BubbleMz    = 1.0
 )
+
+func init() {
+	DeclVar("ext_BubbleMz", &BubbleMz, "Center magnetization 1.0 or -1.0  (default = 1.0)")
+}
 
 func bubblePos() []float64 {
 	m := M.Buffer()
@@ -17,7 +22,10 @@ func bubblePos() []float64 {
 	mz := m.Comp(Z).HostCopy().Scalars()[0]
 
 	posx, posy := 0., 0.
-	sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[Z]) //TODO make more robust with temperature?
+
+	if BubbleMz != -1.0 && BubbleMz != 1.0 {
+		panic("ext_BubbleMz should be 1.0 or -1.0")
+	}
 
 	{
 		var magsum float32
@@ -25,8 +33,8 @@ func bubblePos() []float64 {
 
 		for iy := range mz {
 			for ix := range mz[0] {
-				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
-				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(iy)
+				magsum += ((mz[iy][ix]*float32(BubbleMz) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(BubbleMz) + 1.) / 2.) * float32(iy)
 			}
 		}
 		posy = float64(weightedsum / magsum)
@@ -38,8 +46,8 @@ func bubblePos() []float64 {
 
 		for ix := range mz[0] {
 			for iy := range mz {
-				magsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.)
-				weightedsum += ((mz[iy][ix]*float32(-1*sign) + 1.) / 2.) * float32(ix)
+				magsum += ((mz[iy][ix]*float32(BubbleMz) + 1.) / 2.)
+				weightedsum += ((mz[iy][ix]*float32(BubbleMz) + 1.) / 2.) * float32(ix)
 			}
 		}
 		posx = float64(weightedsum / magsum)

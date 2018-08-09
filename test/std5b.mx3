@@ -36,5 +36,6 @@ m = uniform(1,0,0)
 
 run(0.5e-9)
 TOL := 1e-5
+// TODO: validate against values obtained with OOMMF"
 expectv("m", m.average(), vector(-0.953765869140625,-0.27836909890174866,0.005288289859890938), TOL)
 

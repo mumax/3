@@ -220,7 +220,11 @@ func fmod(a, b float64) float64 {
 	if b == 0 || math.IsInf(b, 1) {
 		return a
 	}
-	return sign(a) * (math.Mod(math.Abs(a+b/2), b) - b/2)
+	if math.Abs(a) > b/2 {
+		return sign(a) * (math.Mod(math.Abs(a+b/2), b) - b/2)
+	} else {
+		return a
+	}
 }
 
 // Scale returns a scaled copy of the shape.

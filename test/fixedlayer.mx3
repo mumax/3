@@ -1,8 +1,11 @@
 /*
-	Test for reversal driven by Slonczewski STT.
+Test of Slonczewski torque implementation
+Mykola Dvornik
 */
 
 randomSeed := 1234567
+
+setsolver(4)
 
 randSeed(randomSeed)
 
@@ -17,35 +20,66 @@ sZ := 32e-9
 setgridsize(Nx, Ny, Nz)
 setcellsize(sX/Nx, sY/Ny, sZ/Nz)
 
-Msat  = 800e3
-Aex   = 13e-12
+Msat = 800e3
+Aex = 13e-12
 
 m = randommagseed(randomSeed)
 
-alpha        = 0.01
-lambda       = 1
-Pol          = 0.5669
+alpha_v := 0.01
+alpha = alpha_v
+lambda = 1
+Pol = 0.5669
 epsilonprime = 0.02
 DisableZhangLiTorque = true
+gamma_v := 2.211e5 / mu0
+gammaLL = gamma_v
 
-Jtot := -0.008  // total current in amps
+Jtot := -0.008 // total current in amps
 carea := sX * sY
 jc := Jtot / carea
-print("Current density is: " ,  jc)
+print("Current density is: ", jc)
 
 J = vector(0, 0, jc)
 
-grainSize  := 4e-9  // m
+grainSize := 4e-9 // m
 
-maxRegion  := 255
+maxRegion := 255
 ext_makegrains(grainSize, maxRegion, randomSeed)
 
-for i:=0; i<maxRegion; i++{
+for i := 0; i < maxRegion; i++ {
 	FixedLayer.SetRegion(i, vector(randNorm(), randNorm(), randNorm()))
 }
 
 print(STtorque.average())
+print(torque.average())
 
-TOL := 1e-7
-// testing against mumax3.10
-expectv("STtorque", STtorque.average(), vector(0.0002079093683278188,-6.888924690429121e-05,-0.0002376949996687472), TOL)
+save(m)
+save(fixedlayer)
+
+TOL := 1e-10
+
+// testing against oommf 2.0a0
+// It turnes out that volume averaging with avf2odt does not normalize by the number of cells in z direction
+// Hence Nz below
+
+// # ODT 1.0
+// ## Desc: Data from vector field file fixedlayer-eprime0.02-Oxs_SpinXferEvolve-evolve-Spin_torque-000000000-0000000.ovf
+// ## Active volume: (0,0,0) x (1.28e-07,6.4e-08,3.2e-08)
+// ## Cell size: 2e-09 x 2e-09 x 2e-09
+// ## Cells in active volume: 32768
+// #
+// # Table Start
+// # Title: Average across active volume
+// # Columns:\
+// #        M_x                  M_y                  M_z
+// #   Units:\
+// #       rad/s                rad/s                rad/s
+//   585292335.751551    -193932305.309290    -669142900.930218
+
+stt1_v := 585292335.751551 / gamma_v / Nz
+stt2_v := -193932305.309290 / gamma_v / Nz
+stt3_v := -669142900.930218 / gamma_v / Nz
+
+print(stt1_v, stt2_v, stt3_v)
+
+expectv("STtorque", STtorque.average(), vector(stt1_v, stt2_v, stt3_v), TOL)

@@ -68,6 +68,7 @@ const templText = `
 		.RUNNING{font-weight: bold; color:blue}
 		.QUEUED{color:black}
 		.FINISHED{color: grey}
+		.active, .collapsible:hover {cursor:pointer; font-weight:normal; background-color:#eee; width:50%;}
 	</style>
 	<meta http-equiv="refresh" content="60">
 </head>
@@ -150,8 +151,9 @@ Uptime: {{.Uptime}} <br/>
 		<button onclick='doEvent("LoadJobs", "")'>Reload all</button> (consider reloading just your own files). <br/>
 		<button onclick='doEvent("WakeupWatchdog", "")'>Wake-up Watchdog</button> (re-queue dead simulations right now).
 	{{range $k,$v := .Users}}
-		<a id="{{$k}}"></a><h3>{{$k}}</h3><p>
-	
+		<a id="{{$k}}"></a>
+		<h3 title="Click to show/hide" class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;cont.style.display=(cont.style.display==="none"?"block":"none");'>
+		&dtrif; {{$k}}</h3><p>
 
 		<b>Jobs</b>
 		<button onclick='doEvent("LoadUserJobs", "{{$k}}")'>Reload</button> (only needed when you changed your files on disk)
@@ -160,7 +162,13 @@ Uptime: {{.Uptime}} <br/>
 		</p>
 	{{end}}
 	</p>
-
+	<script>
+		var collapsibleElements = document.getElementsByClassName("collapsible");
+		for (var i = 0; i < collapsibleElements.length; i++) {
+			collapsibleElements[i].classList.toggle("active");
+			var cont = collapsibleElements[i].nextElementSibling;
+			cont.style.display=(cont.style.display==="none"?"block":"none");  }
+	</script>
 </body>
 </html>
 `

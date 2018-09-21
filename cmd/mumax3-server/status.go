@@ -154,7 +154,6 @@ Uptime: {{.Uptime}} <br/>
 		<a id="{{$k}}"></a>
 		<h3 title="Click to show/hide" class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;cont.style.display=(cont.style.display==="none"?"block":"none");'>
 		&dtrif; {{$k}}</h3><p>
-	
 
 		<b>Jobs</b>
 		<button onclick='doEvent("LoadUserJobs", "{{$k}}")'>Reload</button> (only needed when you changed your files on disk)
@@ -163,7 +162,13 @@ Uptime: {{.Uptime}} <br/>
 		</p>
 	{{end}}
 	</p>
-
+	<script>
+		var collapsibleElements = document.getElementsByClassName("collapsible");
+		for (var i = 0; i < collapsibleElements.length; i++) {
+			collapsibleElements[i].classList.toggle("active");
+			var cont = collapsibleElements[i].nextElementSibling;
+			cont.style.display=(cont.style.display==="none"?"block":"none");  }
+	</script>
 </body>
 </html>
 `

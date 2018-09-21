@@ -66,99 +66,24 @@ func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, 
 
 // maps compute capability on PTX code for kernmulC kernel.
 var kernmulC_map = map[int]string{0: "",
-	20: kernmulC_ptx_20,
 	30: kernmulC_ptx_30,
 	35: kernmulC_ptx_35,
+	37: kernmulC_ptx_37,
 	50: kernmulC_ptx_50,
 	52: kernmulC_ptx_52,
 	53: kernmulC_ptx_53,
 	60: kernmulC_ptx_60,
 	61: kernmulC_ptx_61,
-	62: kernmulC_ptx_62,
 	70: kernmulC_ptx_70}
 
 // kernmulC PTX code for various compute capabilities.
 const (
-	kernmulC_ptx_20 = `
-.version 3.2
-.target sm_20
-.address_size 64
-
-
-.visible .entry kernmulC(
-	.param .u64 kernmulC_param_0,
-	.param .u64 kernmulC_param_1,
-	.param .u32 kernmulC_param_2,
-	.param .u32 kernmulC_param_3
-)
-{
-	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
-	.reg .f32 	%f<10>;
-	.reg .s64 	%rd<8>;
-
-
-	ld.param.u64 	%rd3, [kernmulC_param_0];
-	ld.param.u64 	%rd4, [kernmulC_param_1];
-	ld.param.u32 	%r3, [kernmulC_param_2];
-	ld.param.u32 	%r4, [kernmulC_param_3];
-	cvta.to.global.u64 	%rd1, %rd4;
-	cvta.to.global.u64 	%rd2, %rd3;
-	.loc 1 4 1
-	mov.u32 	%r5, %ntid.x;
-	mov.u32 	%r6, %ctaid.x;
-	mov.u32 	%r7, %tid.x;
-	mad.lo.s32 	%r1, %r5, %r6, %r7;
-	.loc 1 5 1
-	mov.u32 	%r8, %ntid.y;
-	mov.u32 	%r9, %ctaid.y;
-	mov.u32 	%r10, %tid.y;
-	mad.lo.s32 	%r2, %r8, %r9, %r10;
-	.loc 1 7 1
-	setp.ge.s32	%p1, %r2, %r4;
-	setp.ge.s32	%p2, %r1, %r3;
-	or.pred  	%p3, %p2, %p1;
-	.loc 1 7 1
-	@%p3 bra 	BB0_2;
-
-	.loc 1 11 1
-	mad.lo.s32 	%r11, %r2, %r3, %r1;
-	.loc 1 12 1
-	shl.b32 	%r12, %r11, 1;
-	mul.wide.s32 	%rd5, %r12, 4;
-	add.s64 	%rd6, %rd2, %rd5;
-	add.s64 	%rd7, %rd1, %rd5;
-	.loc 1 16 1
-	ld.global.f32 	%f1, [%rd7];
-	.loc 1 14 1
-	ld.global.f32 	%f2, [%rd6];
-	.loc 1 19 1
-	mul.f32 	%f3, %f2, %f1;
-	.loc 1 17 1
-	ld.global.f32 	%f4, [%rd7+4];
-	.loc 1 15 1
-	ld.global.f32 	%f5, [%rd6+4];
-	.loc 1 19 1
-	mul.f32 	%f6, %f5, %f4;
-	sub.f32 	%f7, %f3, %f6;
-	st.global.f32 	[%rd6], %f7;
-	.loc 1 20 1
-	mul.f32 	%f8, %f5, %f1;
-	fma.rn.f32 	%f9, %f2, %f4, %f8;
-	st.global.f32 	[%rd6+4], %f9;
-
-BB0_2:
-	.loc 1 21 2
-	ret;
-}
-
-
-`
 	kernmulC_ptx_30 = `
-.version 4.0
+.version 6.1
 .target sm_30
 .address_size 64
 
+	// .globl	kernmulC
 
 .visible .entry kernmulC(
 	.param .u64 kernmulC_param_0,
@@ -168,9 +93,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
 	.reg .f32 	%f<10>;
-	.reg .s64 	%rd<8>;
+	.reg .b32 	%r<13>;
+	.reg .b64 	%rd<8>;
 
 
 	ld.param.u64 	%rd1, [kernmulC_param_0];
@@ -187,7 +112,7 @@ BB0_2:
 	mad.lo.s32 	%r2, %r8, %r9, %r10;
 	setp.ge.s32	%p1, %r2, %r4;
 	setp.ge.s32	%p2, %r1, %r3;
-	or.pred  	%p3, %p2, %p1;
+	or.pred  	%p3, %p1, %p2;
 	@%p3 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd3, %rd2;
@@ -205,8 +130,8 @@ BB0_2:
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
 	st.global.f32 	[%rd6], %f7;
-	mul.f32 	%f8, %f5, %f1;
-	fma.rn.f32 	%f9, %f2, %f4, %f8;
+	mul.f32 	%f8, %f2, %f4;
+	fma.rn.f32 	%f9, %f5, %f1, %f8;
 	st.global.f32 	[%rd6+4], %f9;
 
 BB0_2:
@@ -216,77 +141,11 @@ BB0_2:
 
 `
 	kernmulC_ptx_35 = `
-.version 4.1
+.version 6.1
 .target sm_35
 .address_size 64
 
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
+	// .globl	kernmulC
 
 .visible .entry kernmulC(
 	.param .u64 kernmulC_param_0,
@@ -296,9 +155,9 @@ BB0_2:
 )
 {
 	.reg .pred 	%p<4>;
-	.reg .s32 	%r<13>;
 	.reg .f32 	%f<10>;
-	.reg .s64 	%rd<8>;
+	.reg .b32 	%r<13>;
+	.reg .b64 	%rd<8>;
 
 
 	ld.param.u64 	%rd1, [kernmulC_param_0];
@@ -315,8 +174,8 @@ BB0_2:
 	mad.lo.s32 	%r2, %r8, %r9, %r10;
 	setp.ge.s32	%p1, %r2, %r4;
 	setp.ge.s32	%p2, %r1, %r3;
-	or.pred  	%p3, %p2, %p1;
-	@%p3 bra 	BB5_2;
+	or.pred  	%p3, %p1, %p2;
+	@%p3 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	cvta.to.global.u64 	%rd4, %rd1;
@@ -333,112 +192,85 @@ BB0_2:
 	mul.f32 	%f6, %f5, %f4;
 	sub.f32 	%f7, %f3, %f6;
 	st.global.f32 	[%rd6], %f7;
-	mul.f32 	%f8, %f5, %f1;
-	fma.rn.f32 	%f9, %f2, %f4, %f8;
+	mul.f32 	%f8, %f2, %f4;
+	fma.rn.f32 	%f9, %f5, %f1, %f8;
 	st.global.f32 	[%rd6+4], %f9;
 
-BB5_2:
+BB0_2:
+	ret;
+}
+
+
+`
+	kernmulC_ptx_37 = `
+.version 6.1
+.target sm_37
+.address_size 64
+
+	// .globl	kernmulC
+
+.visible .entry kernmulC(
+	.param .u64 kernmulC_param_0,
+	.param .u64 kernmulC_param_1,
+	.param .u32 kernmulC_param_2,
+	.param .u32 kernmulC_param_3
+)
+{
+	.reg .pred 	%p<4>;
+	.reg .f32 	%f<10>;
+	.reg .b32 	%r<13>;
+	.reg .b64 	%rd<8>;
+
+
+	ld.param.u64 	%rd1, [kernmulC_param_0];
+	ld.param.u64 	%rd2, [kernmulC_param_1];
+	ld.param.u32 	%r3, [kernmulC_param_2];
+	ld.param.u32 	%r4, [kernmulC_param_3];
+	mov.u32 	%r5, %ntid.x;
+	mov.u32 	%r6, %ctaid.x;
+	mov.u32 	%r7, %tid.x;
+	mad.lo.s32 	%r1, %r5, %r6, %r7;
+	mov.u32 	%r8, %ntid.y;
+	mov.u32 	%r9, %ctaid.y;
+	mov.u32 	%r10, %tid.y;
+	mad.lo.s32 	%r2, %r8, %r9, %r10;
+	setp.ge.s32	%p1, %r2, %r4;
+	setp.ge.s32	%p2, %r1, %r3;
+	or.pred  	%p3, %p1, %p2;
+	@%p3 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd3, %rd2;
+	cvta.to.global.u64 	%rd4, %rd1;
+	mad.lo.s32 	%r11, %r2, %r3, %r1;
+	shl.b32 	%r12, %r11, 1;
+	mul.wide.s32 	%rd5, %r12, 4;
+	add.s64 	%rd6, %rd4, %rd5;
+	add.s64 	%rd7, %rd3, %rd5;
+	ld.global.nc.f32 	%f1, [%rd7];
+	ld.global.f32 	%f2, [%rd6];
+	mul.f32 	%f3, %f2, %f1;
+	ld.global.nc.f32 	%f4, [%rd7+4];
+	ld.global.f32 	%f5, [%rd6+4];
+	mul.f32 	%f6, %f5, %f4;
+	sub.f32 	%f7, %f3, %f6;
+	st.global.f32 	[%rd6], %f7;
+	mul.f32 	%f8, %f2, %f4;
+	fma.rn.f32 	%f9, %f5, %f1, %f8;
+	st.global.f32 	[%rd6+4], %f9;
+
+BB0_2:
 	ret;
 }
 
 
 `
 	kernmulC_ptx_50 = `
-.version 4.3
+.version 6.1
 .target sm_50
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	kernmulC
+
 .visible .entry kernmulC(
 	.param .u64 kernmulC_param_0,
 	.param .u64 kernmulC_param_1,
@@ -467,7 +299,7 @@ BB5_2:
 	setp.ge.s32	%p1, %r2, %r4;
 	setp.ge.s32	%p2, %r1, %r3;
 	or.pred  	%p3, %p1, %p2;
-	@%p3 bra 	BB6_2;
+	@%p3 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	cvta.to.global.u64 	%rd4, %rd1;
@@ -488,108 +320,19 @@ BB5_2:
 	fma.rn.f32 	%f9, %f5, %f1, %f8;
 	st.global.f32 	[%rd6+4], %f9;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
 	kernmulC_ptx_52 = `
-.version 4.3
+.version 6.1
 .target sm_52
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	kernmulC
+
 .visible .entry kernmulC(
 	.param .u64 kernmulC_param_0,
 	.param .u64 kernmulC_param_1,
@@ -618,7 +361,7 @@ BB6_2:
 	setp.ge.s32	%p1, %r2, %r4;
 	setp.ge.s32	%p2, %r1, %r3;
 	or.pred  	%p3, %p1, %p2;
-	@%p3 bra 	BB6_2;
+	@%p3 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	cvta.to.global.u64 	%rd4, %rd1;
@@ -639,108 +382,19 @@ BB6_2:
 	fma.rn.f32 	%f9, %f5, %f1, %f8;
 	st.global.f32 	[%rd6+4], %f9;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
 	kernmulC_ptx_53 = `
-.version 4.3
+.version 6.1
 .target sm_53
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	kernmulC
+
 .visible .entry kernmulC(
 	.param .u64 kernmulC_param_0,
 	.param .u64 kernmulC_param_1,
@@ -769,7 +423,7 @@ BB6_2:
 	setp.ge.s32	%p1, %r2, %r4;
 	setp.ge.s32	%p2, %r1, %r3;
 	or.pred  	%p3, %p1, %p2;
-	@%p3 bra 	BB6_2;
+	@%p3 bra 	BB0_2;
 
 	cvta.to.global.u64 	%rd3, %rd2;
 	cvta.to.global.u64 	%rd4, %rd1;
@@ -790,14 +444,14 @@ BB6_2:
 	fma.rn.f32 	%f9, %f5, %f1, %f8;
 	st.global.f32 	[%rd6+4], %f9;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
 	kernmulC_ptx_60 = `
-.version 5.0
+.version 6.1
 .target sm_60
 .address_size 64
 
@@ -828,8 +482,8 @@ BB6_2:
 	mov.u32 	%r9, %ctaid.y;
 	mov.u32 	%r10, %tid.y;
 	mad.lo.s32 	%r2, %r8, %r9, %r10;
-	setp.ge.s32	%p1, %r1, %r3;
-	setp.ge.s32	%p2, %r2, %r4;
+	setp.ge.s32	%p1, %r2, %r4;
+	setp.ge.s32	%p2, %r1, %r3;
 	or.pred  	%p3, %p1, %p2;
 	@%p3 bra 	BB0_2;
 
@@ -859,7 +513,7 @@ BB0_2:
 
 `
 	kernmulC_ptx_61 = `
-.version 5.0
+.version 6.1
 .target sm_61
 .address_size 64
 
@@ -890,70 +544,8 @@ BB0_2:
 	mov.u32 	%r9, %ctaid.y;
 	mov.u32 	%r10, %tid.y;
 	mad.lo.s32 	%r2, %r8, %r9, %r10;
-	setp.ge.s32	%p1, %r1, %r3;
-	setp.ge.s32	%p2, %r2, %r4;
-	or.pred  	%p3, %p1, %p2;
-	@%p3 bra 	BB0_2;
-
-	cvta.to.global.u64 	%rd3, %rd2;
-	cvta.to.global.u64 	%rd4, %rd1;
-	mad.lo.s32 	%r11, %r2, %r3, %r1;
-	shl.b32 	%r12, %r11, 1;
-	mul.wide.s32 	%rd5, %r12, 4;
-	add.s64 	%rd6, %rd4, %rd5;
-	add.s64 	%rd7, %rd3, %rd5;
-	ld.global.nc.f32 	%f1, [%rd7];
-	ld.global.f32 	%f2, [%rd6];
-	mul.f32 	%f3, %f2, %f1;
-	ld.global.nc.f32 	%f4, [%rd7+4];
-	ld.global.f32 	%f5, [%rd6+4];
-	mul.f32 	%f6, %f5, %f4;
-	sub.f32 	%f7, %f3, %f6;
-	st.global.f32 	[%rd6], %f7;
-	mul.f32 	%f8, %f2, %f4;
-	fma.rn.f32 	%f9, %f5, %f1, %f8;
-	st.global.f32 	[%rd6+4], %f9;
-
-BB0_2:
-	ret;
-}
-
-
-`
-	kernmulC_ptx_62 = `
-.version 5.0
-.target sm_62
-.address_size 64
-
-	// .globl	kernmulC
-
-.visible .entry kernmulC(
-	.param .u64 kernmulC_param_0,
-	.param .u64 kernmulC_param_1,
-	.param .u32 kernmulC_param_2,
-	.param .u32 kernmulC_param_3
-)
-{
-	.reg .pred 	%p<4>;
-	.reg .f32 	%f<10>;
-	.reg .b32 	%r<13>;
-	.reg .b64 	%rd<8>;
-
-
-	ld.param.u64 	%rd1, [kernmulC_param_0];
-	ld.param.u64 	%rd2, [kernmulC_param_1];
-	ld.param.u32 	%r3, [kernmulC_param_2];
-	ld.param.u32 	%r4, [kernmulC_param_3];
-	mov.u32 	%r5, %ntid.x;
-	mov.u32 	%r6, %ctaid.x;
-	mov.u32 	%r7, %tid.x;
-	mad.lo.s32 	%r1, %r5, %r6, %r7;
-	mov.u32 	%r8, %ntid.y;
-	mov.u32 	%r9, %ctaid.y;
-	mov.u32 	%r10, %tid.y;
-	mad.lo.s32 	%r2, %r8, %r9, %r10;
-	setp.ge.s32	%p1, %r1, %r3;
-	setp.ge.s32	%p2, %r2, %r4;
+	setp.ge.s32	%p1, %r2, %r4;
+	setp.ge.s32	%p2, %r1, %r3;
 	or.pred  	%p3, %p1, %p2;
 	@%p3 bra 	BB0_2;
 
@@ -983,7 +575,7 @@ BB0_2:
 
 `
 	kernmulC_ptx_70 = `
-.version 6.0
+.version 6.1
 .target sm_70
 .address_size 64
 

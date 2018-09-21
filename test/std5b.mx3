@@ -36,5 +36,6 @@ m = uniform(1,0,0)
 
 run(0.5e-9)
 TOL := 1e-5
-expectv("m", m.average(), vector(-0.9538384675979614, -0.27802664041519165, 0.0052331965416669846), TOL)
+// TODO: validate against values obtained with OOMMF"
+expectv("m", m.average(), vector(-0.953765869140625,-0.27836909890174866,0.005288289859890938), TOL)
 

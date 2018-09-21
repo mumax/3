@@ -8,8 +8,9 @@ package cufft
 import "C"
 
 import (
-	"github.com/mumax/3/cuda/cu"
 	"unsafe"
+
+	"github.com/mumax/3/cuda/cu"
 )
 
 // FFT plan handle, reference type to a plan
@@ -183,16 +184,6 @@ func (plan Handle) SetStream(stream cu.Stream) {
 	err := Result(C.cufftSetStream(
 		C.cufftHandle(plan),
 		C.cudaStream_t(unsafe.Pointer(uintptr(stream)))))
-	if err != SUCCESS {
-		panic(err)
-	}
-}
-
-// Sets the FFTW compatibility mode
-func (plan Handle) SetCompatibilityMode(mode CompatibilityMode) {
-	err := Result(C.cufftSetCompatibilityMode(
-		C.cufftHandle(plan),
-		C.cufftCompatibility(mode)))
 	if err != SUCCESS {
 		panic(err)
 	}

@@ -37,7 +37,7 @@ func init() {
 
 //Removes all customfields
 func RemoveCustomFields() {
-        customTerms = nil
+	customTerms = nil
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.

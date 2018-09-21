@@ -7,6 +7,7 @@ import (
 
 var (
 	DWPos   = NewScalarValue("ext_dwpos", "m", "Position of the simulation window while following a domain wall", GetShiftPos) // TODO: make more accurate
+	DWxPos  = NewScalarValue("ext_dwxpos", "m", "Position of the simulation window while following a domain wall", GetDWxPos)
 	DWSpeed = NewScalarValue("ext_dwspeed", "m/s", "Speed of the simulation window while following a domain wall", getShiftSpeed)
 )
 
@@ -98,4 +99,13 @@ func getShiftSpeed() float64 {
 		lastT = Time
 	}
 	return lastV
+}
+
+func GetDWxPos() float64 {
+	M := &M
+	mx := sAverageUniverse(M.Buffer().Comp(0))[0]
+	c := Mesh().CellSize()
+	n := Mesh().Size()
+	position := mx * c[0] * float64(n[0]) / 2.
+	return GetShiftPos() + position
 }

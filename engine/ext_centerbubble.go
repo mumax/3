@@ -10,7 +10,6 @@ func init() {
 }
 
 func centerBubble() {
-	n := Mesh().Size()
 	c := Mesh().CellSize()
 
 	position := bubblePos()
@@ -18,13 +17,12 @@ func centerBubble() {
 	centerIdx[X] = int(math.Floor((position[X] - GetShiftPos()) / c[X]))
 	centerIdx[Y] = int(math.Floor((position[Y] - GetShiftYPos()) / c[Y]))
 
-	sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[Z]) //TODO make more robust with temperature?
 	zero := data.Vector{0, 0, 0}
 	if ShiftMagL == zero || ShiftMagR == zero || ShiftMagD == zero || ShiftMagU == zero {
-		ShiftMagL[Z] = float64(sign)
-		ShiftMagR[Z] = float64(sign)
-		ShiftMagD[Z] = float64(sign)
-		ShiftMagU[Z] = float64(sign)
+		ShiftMagL[Z] = -BubbleMz
+		ShiftMagR[Z] = -BubbleMz
+		ShiftMagD[Z] = -BubbleMz
+		ShiftMagU[Z] = -BubbleMz
 	}
 
 	//put bubble to center

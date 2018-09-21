@@ -72,1557 +72,21 @@ func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Poin
 
 // maps compute capability on PTX code for reducemaxvecnorm2 kernel.
 var reducemaxvecnorm2_map = map[int]string{0: "",
-	20: reducemaxvecnorm2_ptx_20,
 	30: reducemaxvecnorm2_ptx_30,
 	35: reducemaxvecnorm2_ptx_35,
+	37: reducemaxvecnorm2_ptx_37,
 	50: reducemaxvecnorm2_ptx_50,
 	52: reducemaxvecnorm2_ptx_52,
 	53: reducemaxvecnorm2_ptx_53,
 	60: reducemaxvecnorm2_ptx_60,
 	61: reducemaxvecnorm2_ptx_61,
-	62: reducemaxvecnorm2_ptx_62,
 	70: reducemaxvecnorm2_ptx_70}
 
 // reducemaxvecnorm2 PTX code for various compute capabilities.
 const (
-	reducemaxvecnorm2_ptx_20 = `
-.version 3.2
-.target sm_20
-.address_size 64
-
-.global .align 1 .b8 $str[11] = {95, 95, 67, 85, 68, 65, 95, 70, 84, 90, 0};
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .s32 	%r<17>;
-	.reg .f32 	%f<35>;
-	.reg .s64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_33946_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd9, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd9;
-	cvta.to.global.u64 	%rd2, %rd8;
-	cvta.to.global.u64 	%rd3, %rd7;
-	cvta.to.global.u64 	%rd4, %rd6;
-	.loc 1 10 1
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r16, %r11;
-	.loc 1 10 1
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB0_2;
-
-BB0_1:
-	.loc 1 10 1
-	mul.wide.s32 	%rd10, %r15, 4;
-	add.s64 	%rd11, %rd4, %rd10;
-	ld.global.f32 	%f5, [%rd11];
-	add.s64 	%rd12, %rd3, %rd10;
-	ld.global.f32 	%f6, [%rd12];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd13, %rd2, %rd10;
-	ld.global.f32 	%f9, [%rd13];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	.loc 2 2770 10
-	max.f32 	%f34, %f34, %f10;
-	.loc 1 10 1
-	add.s32 	%r15, %r15, %r4;
-	.loc 1 10 1
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB0_1;
-
-BB0_2:
-	.loc 1 10 1
-	mul.wide.s32 	%rd14, %r2, 4;
-	mov.u64 	%rd15, reducemaxvecnorm2$__cuda_local_var_33946_35_non_const_sdata;
-	add.s64 	%rd5, %rd15, %rd14;
-	st.shared.f32 	[%rd5], %f34;
-	bar.sync 	0;
-	.loc 1 10 1
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB0_6;
-
-BB0_3:
-	.loc 1 10 1
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	.loc 1 10 1
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB0_5;
-
-	.loc 1 10 1
-	ld.shared.f32 	%f11, [%rd5];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd16, %r12, 4;
-	add.s64 	%rd18, %rd15, %rd16;
-	ld.shared.f32 	%f12, [%rd18];
-	.loc 2 2770 10
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd5], %f13;
-
-BB0_5:
-	.loc 1 10 1
-	bar.sync 	0;
-	.loc 1 10 1
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB0_3;
-
-BB0_6:
-	.loc 1 10 1
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB0_8;
-
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f14, [%rd5];
-	ld.volatile.shared.f32 	%f15, [%rd5+128];
-	.loc 2 2770 10
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd5], %f16;
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f17, [%rd5+64];
-	ld.volatile.shared.f32 	%f18, [%rd5];
-	.loc 2 2770 10
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd5], %f19;
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f20, [%rd5+32];
-	ld.volatile.shared.f32 	%f21, [%rd5];
-	.loc 2 2770 10
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd5], %f22;
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f23, [%rd5+16];
-	ld.volatile.shared.f32 	%f24, [%rd5];
-	.loc 2 2770 10
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd5], %f25;
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f26, [%rd5+8];
-	ld.volatile.shared.f32 	%f27, [%rd5];
-	.loc 2 2770 10
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd5], %f28;
-	.loc 1 10 1
-	ld.volatile.shared.f32 	%f29, [%rd5+4];
-	ld.volatile.shared.f32 	%f30, [%rd5];
-	.loc 2 2770 10
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd5], %f31;
-
-BB0_8:
-	.loc 1 10 1
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB0_10;
-
-	.loc 1 10 1
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_33946_35_non_const_sdata];
-	.loc 2 2750 10
-	abs.f32 	%f33, %f32;
-	.loc 1 10 37
-	mov.b32 	 %r13, %f33;
-	.loc 2 3781 3
-	atom.global.max.s32 	%r14, [%rd1], %r13;
-
-BB0_10:
-	.loc 1 11 2
-	ret;
-}
-
-
-`
 	reducemaxvecnorm2_ptx_30 = `
-.version 4.0
+.version 6.1
 .target sm_30
-.address_size 64
-
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .s32 	%r<17>;
-	.reg .f32 	%f<35>;
-	.reg .s64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_34291_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB0_2;
-
-BB0_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB0_1;
-
-BB0_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_34291_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB0_6;
-
-BB0_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB0_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB0_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB0_3;
-
-BB0_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB0_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB0_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB0_10;
-
-	cvta.to.global.u64 	%rd18, %rd5;
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_34291_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB0_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_35 = `
-.version 4.1
-.target sm_35
-.address_size 64
-
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .s32 	%r<17>;
-	.reg .f32 	%f<35>;
-	.reg .s64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_34871_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB5_2;
-
-BB5_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB5_1;
-
-BB5_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_34871_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB5_6;
-
-BB5_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB5_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB5_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB5_3;
-
-BB5_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB5_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB5_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB5_10;
-
-	cvta.to.global.u64 	%rd18, %rd5;
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_34871_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB5_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_50 = `
-.version 4.3
-.target sm_50
-.address_size 64
-
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .globl	reducemaxvecnorm2
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB6_2;
-
-BB6_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB6_1;
-
-BB6_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB6_6;
-
-BB6_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB6_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB6_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB6_3;
-
-BB6_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB6_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB6_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB6_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB6_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_52 = `
-.version 4.3
-.target sm_52
-.address_size 64
-
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .globl	reducemaxvecnorm2
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB6_2;
-
-BB6_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB6_1;
-
-BB6_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB6_6;
-
-BB6_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB6_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB6_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB6_3;
-
-BB6_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB6_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB6_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB6_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB6_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_53 = `
-.version 4.3
-.target sm_53
-.address_size 64
-
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .globl	reducemaxvecnorm2
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB6_2;
-
-BB6_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB6_1;
-
-BB6_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB6_6;
-
-BB6_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB6_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB6_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB6_3;
-
-BB6_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB6_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB6_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB6_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_42733_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB6_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_60 = `
-.version 5.0
-.target sm_60
-.address_size 64
-
-	// .globl	reducemaxvecnorm2
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB0_2;
-
-BB0_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB0_1;
-
-BB0_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB0_6;
-
-BB0_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB0_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB0_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB0_3;
-
-BB0_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB0_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB0_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB0_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB0_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_61 = `
-.version 5.0
-.target sm_61
-.address_size 64
-
-	// .globl	reducemaxvecnorm2
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB0_2;
-
-BB0_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB0_1;
-
-BB0_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB0_6;
-
-BB0_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB0_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB0_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB0_3;
-
-BB0_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB0_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB0_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB0_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB0_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_62 = `
-.version 5.0
-.target sm_62
-.address_size 64
-
-	// .globl	reducemaxvecnorm2
-
-.visible .entry reducemaxvecnorm2(
-	.param .u64 reducemaxvecnorm2_param_0,
-	.param .u64 reducemaxvecnorm2_param_1,
-	.param .u64 reducemaxvecnorm2_param_2,
-	.param .u64 reducemaxvecnorm2_param_3,
-	.param .f32 reducemaxvecnorm2_param_4,
-	.param .u32 reducemaxvecnorm2_param_5
-)
-{
-	.reg .pred 	%p<8>;
-	.reg .f32 	%f<35>;
-	.reg .b32 	%r<17>;
-	.reg .b64 	%rd<19>;
-	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata[2048];
-
-	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_0];
-	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_1];
-	ld.param.u64 	%rd8, [reducemaxvecnorm2_param_2];
-	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_3];
-	ld.param.f32 	%f34, [reducemaxvecnorm2_param_4];
-	ld.param.u32 	%r9, [reducemaxvecnorm2_param_5];
-	cvta.to.global.u64 	%rd1, %rd8;
-	cvta.to.global.u64 	%rd2, %rd7;
-	cvta.to.global.u64 	%rd3, %rd6;
-	mov.u32 	%r16, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mov.u32 	%r2, %tid.x;
-	mad.lo.s32 	%r15, %r16, %r10, %r2;
-	mov.u32 	%r11, %nctaid.x;
-	mul.lo.s32 	%r4, %r11, %r16;
-	setp.ge.s32	%p1, %r15, %r9;
-	@%p1 bra 	BB0_2;
-
-BB0_1:
-	mul.wide.s32 	%rd9, %r15, 4;
-	add.s64 	%rd10, %rd3, %rd9;
-	ld.global.nc.f32 	%f5, [%rd10];
-	add.s64 	%rd11, %rd2, %rd9;
-	ld.global.nc.f32 	%f6, [%rd11];
-	mul.f32 	%f7, %f6, %f6;
-	fma.rn.f32 	%f8, %f5, %f5, %f7;
-	add.s64 	%rd12, %rd1, %rd9;
-	ld.global.nc.f32 	%f9, [%rd12];
-	fma.rn.f32 	%f10, %f9, %f9, %f8;
-	max.f32 	%f34, %f34, %f10;
-	add.s32 	%r15, %r15, %r4;
-	setp.lt.s32	%p2, %r15, %r9;
-	@%p2 bra 	BB0_1;
-
-BB0_2:
-	mul.wide.s32 	%rd13, %r2, 4;
-	mov.u64 	%rd14, reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata;
-	add.s64 	%rd4, %rd14, %rd13;
-	st.shared.f32 	[%rd4], %f34;
-	bar.sync 	0;
-	setp.lt.u32	%p3, %r16, 66;
-	@%p3 bra 	BB0_6;
-
-BB0_3:
-	mov.u32 	%r7, %r16;
-	shr.u32 	%r16, %r7, 1;
-	setp.ge.u32	%p4, %r2, %r16;
-	@%p4 bra 	BB0_5;
-
-	ld.shared.f32 	%f11, [%rd4];
-	add.s32 	%r12, %r16, %r2;
-	mul.wide.u32 	%rd15, %r12, 4;
-	add.s64 	%rd17, %rd14, %rd15;
-	ld.shared.f32 	%f12, [%rd17];
-	max.f32 	%f13, %f11, %f12;
-	st.shared.f32 	[%rd4], %f13;
-
-BB0_5:
-	bar.sync 	0;
-	setp.gt.u32	%p5, %r7, 131;
-	@%p5 bra 	BB0_3;
-
-BB0_6:
-	setp.gt.s32	%p6, %r2, 31;
-	@%p6 bra 	BB0_8;
-
-	ld.volatile.shared.f32 	%f14, [%rd4];
-	ld.volatile.shared.f32 	%f15, [%rd4+128];
-	max.f32 	%f16, %f14, %f15;
-	st.volatile.shared.f32 	[%rd4], %f16;
-	ld.volatile.shared.f32 	%f17, [%rd4+64];
-	ld.volatile.shared.f32 	%f18, [%rd4];
-	max.f32 	%f19, %f18, %f17;
-	st.volatile.shared.f32 	[%rd4], %f19;
-	ld.volatile.shared.f32 	%f20, [%rd4+32];
-	ld.volatile.shared.f32 	%f21, [%rd4];
-	max.f32 	%f22, %f21, %f20;
-	st.volatile.shared.f32 	[%rd4], %f22;
-	ld.volatile.shared.f32 	%f23, [%rd4+16];
-	ld.volatile.shared.f32 	%f24, [%rd4];
-	max.f32 	%f25, %f24, %f23;
-	st.volatile.shared.f32 	[%rd4], %f25;
-	ld.volatile.shared.f32 	%f26, [%rd4+8];
-	ld.volatile.shared.f32 	%f27, [%rd4];
-	max.f32 	%f28, %f27, %f26;
-	st.volatile.shared.f32 	[%rd4], %f28;
-	ld.volatile.shared.f32 	%f29, [%rd4+4];
-	ld.volatile.shared.f32 	%f30, [%rd4];
-	max.f32 	%f31, %f30, %f29;
-	st.volatile.shared.f32 	[%rd4], %f31;
-
-BB0_8:
-	setp.ne.s32	%p7, %r2, 0;
-	@%p7 bra 	BB0_10;
-
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_16945_35_non_const_sdata];
-	abs.f32 	%f33, %f32;
-	mov.b32 	 %r13, %f33;
-	cvta.to.global.u64 	%rd18, %rd5;
-	atom.global.max.s32 	%r14, [%rd18], %r13;
-
-BB0_10:
-	ret;
-}
-
-
-`
-	reducemaxvecnorm2_ptx_70 = `
-.version 6.0
-.target sm_70
 .address_size 64
 
 	// .globl	reducemaxvecnorm2
@@ -1641,7 +105,7 @@ BB0_10:
 	.reg .b32 	%r<23>;
 	.reg .b64 	%rd<13>;
 	// demoted variable
-	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_15677_35_non_const_sdata[2048];
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14004_35_non_const_sdata[2048];
 
 	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
 	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
@@ -1664,13 +128,13 @@ BB0_10:
 BB0_1:
 	mul.wide.s32 	%rd8, %r21, 4;
 	add.s64 	%rd9, %rd3, %rd8;
-	ld.global.nc.f32 	%f5, [%rd9];
+	ld.global.f32 	%f5, [%rd9];
 	add.s64 	%rd10, %rd2, %rd8;
-	ld.global.nc.f32 	%f6, [%rd10];
+	ld.global.f32 	%f6, [%rd10];
 	mul.f32 	%f7, %f6, %f6;
 	fma.rn.f32 	%f8, %f5, %f5, %f7;
 	add.s64 	%rd11, %rd1, %rd8;
-	ld.global.nc.f32 	%f9, [%rd11];
+	ld.global.f32 	%f9, [%rd11];
 	fma.rn.f32 	%f10, %f9, %f9, %f8;
 	max.f32 	%f35, %f35, %f10;
 	add.s32 	%r21, %r21, %r4;
@@ -1679,7 +143,7 @@ BB0_1:
 
 BB0_2:
 	shl.b32 	%r13, %r2, 2;
-	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_15677_35_non_const_sdata;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14004_35_non_const_sdata;
 	add.s32 	%r7, %r14, %r13;
 	st.shared.f32 	[%r7], %f35;
 	bar.sync 	0;
@@ -1738,7 +202,1047 @@ BB0_8:
 	setp.ne.s32	%p7, %r2, 0;
 	@%p7 bra 	BB0_10;
 
-	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_15677_35_non_const_sdata];
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14004_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_35 = `
+.version 6.1
+.target sm_35
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_37 = `
+.version 6.1
+.target sm_37
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_50 = `
+.version 6.1
+.target sm_50
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_52 = `
+.version 6.1
+.target sm_52
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_53 = `
+.version 6.1
+.target sm_53
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_14584_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_60 = `
+.version 6.1
+.target sm_60
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_15482_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_15482_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_15482_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_61 = `
+.version 6.1
+.target sm_61
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_15591_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_15591_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_15591_35_non_const_sdata];
+	abs.f32 	%f33, %f32;
+	mov.b32 	 %r19, %f33;
+	cvta.to.global.u64 	%rd12, %rd4;
+	atom.global.max.s32 	%r20, [%rd12], %r19;
+
+BB0_10:
+	ret;
+}
+
+
+`
+	reducemaxvecnorm2_ptx_70 = `
+.version 6.1
+.target sm_70
+.address_size 64
+
+	// .globl	reducemaxvecnorm2
+
+.visible .entry reducemaxvecnorm2(
+	.param .u64 reducemaxvecnorm2_param_0,
+	.param .u64 reducemaxvecnorm2_param_1,
+	.param .u64 reducemaxvecnorm2_param_2,
+	.param .u64 reducemaxvecnorm2_param_3,
+	.param .f32 reducemaxvecnorm2_param_4,
+	.param .u32 reducemaxvecnorm2_param_5
+)
+{
+	.reg .pred 	%p<8>;
+	.reg .f32 	%f<36>;
+	.reg .b32 	%r<23>;
+	.reg .b64 	%rd<13>;
+	// demoted variable
+	.shared .align 4 .b8 reducemaxvecnorm2$__cuda_local_var_15690_35_non_const_sdata[2048];
+
+	ld.param.u64 	%rd5, [reducemaxvecnorm2_param_0];
+	ld.param.u64 	%rd6, [reducemaxvecnorm2_param_1];
+	ld.param.u64 	%rd7, [reducemaxvecnorm2_param_2];
+	ld.param.u64 	%rd4, [reducemaxvecnorm2_param_3];
+	ld.param.f32 	%f35, [reducemaxvecnorm2_param_4];
+	ld.param.u32 	%r10, [reducemaxvecnorm2_param_5];
+	cvta.to.global.u64 	%rd1, %rd7;
+	cvta.to.global.u64 	%rd2, %rd6;
+	cvta.to.global.u64 	%rd3, %rd5;
+	mov.u32 	%r22, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mov.u32 	%r2, %tid.x;
+	mad.lo.s32 	%r21, %r22, %r11, %r2;
+	mov.u32 	%r12, %nctaid.x;
+	mul.lo.s32 	%r4, %r12, %r22;
+	setp.ge.s32	%p1, %r21, %r10;
+	@%p1 bra 	BB0_2;
+
+BB0_1:
+	mul.wide.s32 	%rd8, %r21, 4;
+	add.s64 	%rd9, %rd3, %rd8;
+	ld.global.nc.f32 	%f5, [%rd9];
+	add.s64 	%rd10, %rd2, %rd8;
+	ld.global.nc.f32 	%f6, [%rd10];
+	mul.f32 	%f7, %f6, %f6;
+	fma.rn.f32 	%f8, %f5, %f5, %f7;
+	add.s64 	%rd11, %rd1, %rd8;
+	ld.global.nc.f32 	%f9, [%rd11];
+	fma.rn.f32 	%f10, %f9, %f9, %f8;
+	max.f32 	%f35, %f35, %f10;
+	add.s32 	%r21, %r21, %r4;
+	setp.lt.s32	%p2, %r21, %r10;
+	@%p2 bra 	BB0_1;
+
+BB0_2:
+	shl.b32 	%r13, %r2, 2;
+	mov.u32 	%r14, reducemaxvecnorm2$__cuda_local_var_15690_35_non_const_sdata;
+	add.s32 	%r7, %r14, %r13;
+	st.shared.f32 	[%r7], %f35;
+	bar.sync 	0;
+	setp.lt.u32	%p3, %r22, 66;
+	@%p3 bra 	BB0_6;
+
+BB0_3:
+	shr.u32 	%r9, %r22, 1;
+	setp.ge.u32	%p4, %r2, %r9;
+	@%p4 bra 	BB0_5;
+
+	ld.shared.f32 	%f11, [%r7];
+	add.s32 	%r15, %r9, %r2;
+	shl.b32 	%r16, %r15, 2;
+	add.s32 	%r18, %r14, %r16;
+	ld.shared.f32 	%f12, [%r18];
+	max.f32 	%f13, %f11, %f12;
+	st.shared.f32 	[%r7], %f13;
+
+BB0_5:
+	bar.sync 	0;
+	setp.gt.u32	%p5, %r22, 131;
+	mov.u32 	%r22, %r9;
+	@%p5 bra 	BB0_3;
+
+BB0_6:
+	setp.gt.s32	%p6, %r2, 31;
+	@%p6 bra 	BB0_8;
+
+	ld.volatile.shared.f32 	%f14, [%r7];
+	ld.volatile.shared.f32 	%f15, [%r7+128];
+	max.f32 	%f16, %f14, %f15;
+	st.volatile.shared.f32 	[%r7], %f16;
+	ld.volatile.shared.f32 	%f17, [%r7+64];
+	ld.volatile.shared.f32 	%f18, [%r7];
+	max.f32 	%f19, %f18, %f17;
+	st.volatile.shared.f32 	[%r7], %f19;
+	ld.volatile.shared.f32 	%f20, [%r7+32];
+	ld.volatile.shared.f32 	%f21, [%r7];
+	max.f32 	%f22, %f21, %f20;
+	st.volatile.shared.f32 	[%r7], %f22;
+	ld.volatile.shared.f32 	%f23, [%r7+16];
+	ld.volatile.shared.f32 	%f24, [%r7];
+	max.f32 	%f25, %f24, %f23;
+	st.volatile.shared.f32 	[%r7], %f25;
+	ld.volatile.shared.f32 	%f26, [%r7+8];
+	ld.volatile.shared.f32 	%f27, [%r7];
+	max.f32 	%f28, %f27, %f26;
+	st.volatile.shared.f32 	[%r7], %f28;
+	ld.volatile.shared.f32 	%f29, [%r7+4];
+	ld.volatile.shared.f32 	%f30, [%r7];
+	max.f32 	%f31, %f30, %f29;
+	st.volatile.shared.f32 	[%r7], %f31;
+
+BB0_8:
+	setp.ne.s32	%p7, %r2, 0;
+	@%p7 bra 	BB0_10;
+
+	ld.shared.f32 	%f32, [reducemaxvecnorm2$__cuda_local_var_15690_35_non_const_sdata];
 	abs.f32 	%f33, %f32;
 	mov.b32 	 %r19, %f33;
 	cvta.to.global.u64 	%rd12, %rd4;

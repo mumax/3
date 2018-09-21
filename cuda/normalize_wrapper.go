@@ -69,126 +69,24 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 
 // maps compute capability on PTX code for normalize kernel.
 var normalize_map = map[int]string{0: "",
-	20: normalize_ptx_20,
 	30: normalize_ptx_30,
 	35: normalize_ptx_35,
+	37: normalize_ptx_37,
 	50: normalize_ptx_50,
 	52: normalize_ptx_52,
 	53: normalize_ptx_53,
 	60: normalize_ptx_60,
 	61: normalize_ptx_61,
-	62: normalize_ptx_62,
 	70: normalize_ptx_70}
 
 // normalize PTX code for various compute capabilities.
 const (
-	normalize_ptx_20 = `
-.version 3.2
-.target sm_20
-.address_size 64
-
-
-.visible .entry normalize(
-	.param .u64 normalize_param_0,
-	.param .u64 normalize_param_1,
-	.param .u64 normalize_param_2,
-	.param .u64 normalize_param_3,
-	.param .u32 normalize_param_4
-)
-{
-	.reg .pred 	%p<4>;
-	.reg .s32 	%r<9>;
-	.reg .f32 	%f<22>;
-	.reg .s64 	%rd<15>;
-
-
-	ld.param.u64 	%rd9, [normalize_param_0];
-	ld.param.u64 	%rd10, [normalize_param_1];
-	ld.param.u64 	%rd11, [normalize_param_2];
-	ld.param.u64 	%rd8, [normalize_param_3];
-	ld.param.u32 	%r2, [normalize_param_4];
-	cvta.to.global.u64 	%rd1, %rd11;
-	cvta.to.global.u64 	%rd2, %rd10;
-	cvta.to.global.u64 	%rd3, %rd9;
-	cvta.to.global.u64 	%rd4, %rd8;
-	.loc 1 7 1
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	.loc 1 8 1
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_8;
-
-	.loc 1 10 1
-	setp.ne.s64	%p2, %rd8, 0;
-	@%p2 bra 	BB0_3;
-
-	mov.f32 	%f20, 0f3F800000;
-	bra.uni 	BB0_4;
-
-BB0_3:
-	mul.wide.s32 	%rd12, %r1, 4;
-	add.s64 	%rd13, %rd4, %rd12;
-	.loc 1 10 1
-	ld.global.f32 	%f20, [%rd13];
-
-BB0_4:
-	mul.wide.s32 	%rd14, %r1, 4;
-	add.s64 	%rd5, %rd3, %rd14;
-	.loc 1 11 1
-	ld.global.f32 	%f10, [%rd5];
-	mul.f32 	%f3, %f20, %f10;
-	add.s64 	%rd6, %rd2, %rd14;
-	.loc 1 11 1
-	ld.global.f32 	%f11, [%rd6];
-	mul.f32 	%f4, %f20, %f11;
-	add.s64 	%rd7, %rd1, %rd14;
-	.loc 1 11 1
-	ld.global.f32 	%f12, [%rd7];
-	mul.f32 	%f5, %f20, %f12;
-	.loc 1 12 1
-	mul.f32 	%f13, %f4, %f4;
-	fma.rn.f32 	%f14, %f3, %f3, %f13;
-	fma.rn.f32 	%f15, %f5, %f5, %f14;
-	.loc 2 3055 10
-	sqrt.rn.f32 	%f6, %f15;
-	.loc 1 12 125
-	setp.neu.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB0_6;
-
-	mov.f32 	%f21, 0f00000000;
-	bra.uni 	BB0_7;
-
-BB0_6:
-	rcp.rn.f32 	%f21, %f6;
-
-BB0_7:
-	mul.f32 	%f17, %f21, %f3;
-	.loc 1 13 1
-	st.global.f32 	[%rd5], %f17;
-	mul.f32 	%f18, %f21, %f4;
-	.loc 1 14 1
-	st.global.f32 	[%rd6], %f18;
-	mul.f32 	%f19, %f21, %f5;
-	.loc 1 15 1
-	st.global.f32 	[%rd7], %f19;
-
-BB0_8:
-	.loc 1 17 2
-	ret;
-}
-
-
-`
 	normalize_ptx_30 = `
-.version 4.0
+.version 6.1
 .target sm_30
 .address_size 64
 
+	// .globl	normalize
 
 .visible .entry normalize(
 	.param .u64 normalize_param_0,
@@ -199,15 +97,15 @@ BB0_8:
 )
 {
 	.reg .pred 	%p<4>;
-	.reg .s32 	%r<9>;
 	.reg .f32 	%f<22>;
-	.reg .s64 	%rd<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<15>;
 
 
-	ld.param.u64 	%rd5, [normalize_param_0];
-	ld.param.u64 	%rd6, [normalize_param_1];
-	ld.param.u64 	%rd7, [normalize_param_2];
-	ld.param.u64 	%rd8, [normalize_param_3];
+	ld.param.u64 	%rd4, [normalize_param_0];
+	ld.param.u64 	%rd5, [normalize_param_1];
+	ld.param.u64 	%rd6, [normalize_param_2];
+	ld.param.u64 	%rd7, [normalize_param_3];
 	ld.param.u32 	%r2, [normalize_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -217,134 +115,61 @@ BB0_8:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_8;
+	@%p1 bra 	BB0_6;
 
-	cvt.s64.s32	%rd1, %r1;
-	setp.ne.s64	%p2, %rd8, 0;
+	setp.eq.s64	%p2, %rd7, 0;
+	mov.f32 	%f20, 0f3F800000;
 	@%p2 bra 	BB0_3;
 
-	mov.f32 	%f20, 0f3F800000;
-	bra.uni 	BB0_4;
+	cvta.to.global.u64 	%rd8, %rd7;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	ld.global.f32 	%f20, [%rd10];
 
 BB0_3:
-	cvta.to.global.u64 	%rd9, %rd8;
-	shl.b64 	%rd10, %rd1, 2;
-	add.s64 	%rd11, %rd9, %rd10;
-	ld.global.f32 	%f20, [%rd11];
-
-BB0_4:
-	cvta.to.global.u64 	%rd12, %rd7;
-	cvta.to.global.u64 	%rd13, %rd6;
-	cvta.to.global.u64 	%rd14, %rd5;
-	shl.b64 	%rd15, %rd1, 2;
-	add.s64 	%rd2, %rd14, %rd15;
-	ld.global.f32 	%f10, [%rd2];
-	mul.f32 	%f3, %f20, %f10;
-	add.s64 	%rd3, %rd13, %rd15;
-	ld.global.f32 	%f11, [%rd3];
-	mul.f32 	%f4, %f20, %f11;
-	add.s64 	%rd4, %rd12, %rd15;
-	ld.global.f32 	%f12, [%rd4];
-	mul.f32 	%f5, %f20, %f12;
-	mul.f32 	%f13, %f4, %f4;
-	fma.rn.f32 	%f14, %f3, %f3, %f13;
-	fma.rn.f32 	%f15, %f5, %f5, %f14;
-	sqrt.rn.f32 	%f6, %f15;
-	setp.neu.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB0_6;
-
+	cvta.to.global.u64 	%rd11, %rd6;
+	cvta.to.global.u64 	%rd12, %rd5;
+	cvta.to.global.u64 	%rd13, %rd4;
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd1, %rd13, %rd14;
+	ld.global.f32 	%f11, [%rd1];
+	mul.f32 	%f3, %f20, %f11;
+	add.s64 	%rd2, %rd12, %rd14;
+	ld.global.f32 	%f12, [%rd2];
+	mul.f32 	%f4, %f20, %f12;
+	add.s64 	%rd3, %rd11, %rd14;
+	ld.global.f32 	%f13, [%rd3];
+	mul.f32 	%f5, %f20, %f13;
+	mul.f32 	%f14, %f4, %f4;
+	fma.rn.f32 	%f15, %f3, %f3, %f14;
+	fma.rn.f32 	%f16, %f5, %f5, %f15;
+	sqrt.rn.f32 	%f6, %f16;
 	mov.f32 	%f21, 0f00000000;
-	bra.uni 	BB0_7;
+	setp.eq.f32	%p3, %f6, 0f00000000;
+	@%p3 bra 	BB0_5;
 
-BB0_6:
 	rcp.rn.f32 	%f21, %f6;
 
-BB0_7:
-	mul.f32 	%f17, %f21, %f3;
-	st.global.f32 	[%rd2], %f17;
-	mul.f32 	%f18, %f21, %f4;
-	st.global.f32 	[%rd3], %f18;
-	mul.f32 	%f19, %f21, %f5;
-	st.global.f32 	[%rd4], %f19;
+BB0_5:
+	mul.f32 	%f17, %f3, %f21;
+	st.global.f32 	[%rd1], %f17;
+	mul.f32 	%f18, %f4, %f21;
+	st.global.f32 	[%rd2], %f18;
+	mul.f32 	%f19, %f5, %f21;
+	st.global.f32 	[%rd3], %f19;
 
-BB0_8:
+BB0_6:
 	ret;
 }
 
 
 `
 	normalize_ptx_35 = `
-.version 4.1
+.version 6.1
 .target sm_35
 .address_size 64
 
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .s32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
+	// .globl	normalize
 
 .visible .entry normalize(
 	.param .u64 normalize_param_0,
@@ -355,15 +180,15 @@ BB0_8:
 )
 {
 	.reg .pred 	%p<4>;
-	.reg .s32 	%r<9>;
 	.reg .f32 	%f<22>;
-	.reg .s64 	%rd<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<15>;
 
 
-	ld.param.u64 	%rd5, [normalize_param_0];
-	ld.param.u64 	%rd6, [normalize_param_1];
-	ld.param.u64 	%rd7, [normalize_param_2];
-	ld.param.u64 	%rd8, [normalize_param_3];
+	ld.param.u64 	%rd4, [normalize_param_0];
+	ld.param.u64 	%rd5, [normalize_param_1];
+	ld.param.u64 	%rd6, [normalize_param_2];
+	ld.param.u64 	%rd7, [normalize_param_3];
 	ld.param.u32 	%r2, [normalize_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
@@ -373,158 +198,145 @@ BB0_8:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB5_8;
+	@%p1 bra 	BB0_6;
 
-	cvt.s64.s32	%rd1, %r1;
-	setp.ne.s64	%p2, %rd8, 0;
-	@%p2 bra 	BB5_3;
-
+	setp.eq.s64	%p2, %rd7, 0;
 	mov.f32 	%f20, 0f3F800000;
-	bra.uni 	BB5_4;
+	@%p2 bra 	BB0_3;
 
-BB5_3:
-	cvta.to.global.u64 	%rd9, %rd8;
-	shl.b64 	%rd10, %rd1, 2;
-	add.s64 	%rd11, %rd9, %rd10;
-	ld.global.nc.f32 	%f20, [%rd11];
+	cvta.to.global.u64 	%rd8, %rd7;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	ld.global.nc.f32 	%f20, [%rd10];
 
-BB5_4:
-	cvta.to.global.u64 	%rd12, %rd7;
-	cvta.to.global.u64 	%rd13, %rd6;
-	cvta.to.global.u64 	%rd14, %rd5;
-	shl.b64 	%rd15, %rd1, 2;
-	add.s64 	%rd2, %rd14, %rd15;
-	ld.global.f32 	%f10, [%rd2];
-	mul.f32 	%f3, %f20, %f10;
-	add.s64 	%rd3, %rd13, %rd15;
-	ld.global.f32 	%f11, [%rd3];
-	mul.f32 	%f4, %f20, %f11;
-	add.s64 	%rd4, %rd12, %rd15;
-	ld.global.f32 	%f12, [%rd4];
-	mul.f32 	%f5, %f20, %f12;
-	mul.f32 	%f13, %f4, %f4;
-	fma.rn.f32 	%f14, %f3, %f3, %f13;
-	fma.rn.f32 	%f15, %f5, %f5, %f14;
-	sqrt.rn.f32 	%f6, %f15;
-	setp.neu.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB5_6;
-
+BB0_3:
+	cvta.to.global.u64 	%rd11, %rd6;
+	cvta.to.global.u64 	%rd12, %rd5;
+	cvta.to.global.u64 	%rd13, %rd4;
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd1, %rd13, %rd14;
+	ld.global.f32 	%f11, [%rd1];
+	mul.f32 	%f3, %f20, %f11;
+	add.s64 	%rd2, %rd12, %rd14;
+	ld.global.f32 	%f12, [%rd2];
+	mul.f32 	%f4, %f20, %f12;
+	add.s64 	%rd3, %rd11, %rd14;
+	ld.global.f32 	%f13, [%rd3];
+	mul.f32 	%f5, %f20, %f13;
+	mul.f32 	%f14, %f4, %f4;
+	fma.rn.f32 	%f15, %f3, %f3, %f14;
+	fma.rn.f32 	%f16, %f5, %f5, %f15;
+	sqrt.rn.f32 	%f6, %f16;
 	mov.f32 	%f21, 0f00000000;
-	bra.uni 	BB5_7;
+	setp.eq.f32	%p3, %f6, 0f00000000;
+	@%p3 bra 	BB0_5;
 
-BB5_6:
 	rcp.rn.f32 	%f21, %f6;
 
-BB5_7:
-	mul.f32 	%f17, %f21, %f3;
-	st.global.f32 	[%rd2], %f17;
-	mul.f32 	%f18, %f21, %f4;
-	st.global.f32 	[%rd3], %f18;
-	mul.f32 	%f19, %f21, %f5;
-	st.global.f32 	[%rd4], %f19;
+BB0_5:
+	mul.f32 	%f17, %f3, %f21;
+	st.global.f32 	[%rd1], %f17;
+	mul.f32 	%f18, %f4, %f21;
+	st.global.f32 	[%rd2], %f18;
+	mul.f32 	%f19, %f5, %f21;
+	st.global.f32 	[%rd3], %f19;
 
-BB5_8:
+BB0_6:
+	ret;
+}
+
+
+`
+	normalize_ptx_37 = `
+.version 6.1
+.target sm_37
+.address_size 64
+
+	// .globl	normalize
+
+.visible .entry normalize(
+	.param .u64 normalize_param_0,
+	.param .u64 normalize_param_1,
+	.param .u64 normalize_param_2,
+	.param .u64 normalize_param_3,
+	.param .u32 normalize_param_4
+)
+{
+	.reg .pred 	%p<4>;
+	.reg .f32 	%f<22>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<15>;
+
+
+	ld.param.u64 	%rd4, [normalize_param_0];
+	ld.param.u64 	%rd5, [normalize_param_1];
+	ld.param.u64 	%rd6, [normalize_param_2];
+	ld.param.u64 	%rd7, [normalize_param_3];
+	ld.param.u32 	%r2, [normalize_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_6;
+
+	setp.eq.s64	%p2, %rd7, 0;
+	mov.f32 	%f20, 0f3F800000;
+	@%p2 bra 	BB0_3;
+
+	cvta.to.global.u64 	%rd8, %rd7;
+	mul.wide.s32 	%rd9, %r1, 4;
+	add.s64 	%rd10, %rd8, %rd9;
+	ld.global.nc.f32 	%f20, [%rd10];
+
+BB0_3:
+	cvta.to.global.u64 	%rd11, %rd6;
+	cvta.to.global.u64 	%rd12, %rd5;
+	cvta.to.global.u64 	%rd13, %rd4;
+	mul.wide.s32 	%rd14, %r1, 4;
+	add.s64 	%rd1, %rd13, %rd14;
+	ld.global.f32 	%f11, [%rd1];
+	mul.f32 	%f3, %f20, %f11;
+	add.s64 	%rd2, %rd12, %rd14;
+	ld.global.f32 	%f12, [%rd2];
+	mul.f32 	%f4, %f20, %f12;
+	add.s64 	%rd3, %rd11, %rd14;
+	ld.global.f32 	%f13, [%rd3];
+	mul.f32 	%f5, %f20, %f13;
+	mul.f32 	%f14, %f4, %f4;
+	fma.rn.f32 	%f15, %f3, %f3, %f14;
+	fma.rn.f32 	%f16, %f5, %f5, %f15;
+	sqrt.rn.f32 	%f6, %f16;
+	mov.f32 	%f21, 0f00000000;
+	setp.eq.f32	%p3, %f6, 0f00000000;
+	@%p3 bra 	BB0_5;
+
+	rcp.rn.f32 	%f21, %f6;
+
+BB0_5:
+	mul.f32 	%f17, %f3, %f21;
+	st.global.f32 	[%rd1], %f17;
+	mul.f32 	%f18, %f4, %f21;
+	st.global.f32 	[%rd2], %f18;
+	mul.f32 	%f19, %f5, %f21;
+	st.global.f32 	[%rd3], %f19;
+
+BB0_6:
 	ret;
 }
 
 
 `
 	normalize_ptx_50 = `
-.version 4.3
+.version 6.1
 .target sm_50
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	normalize
+
 .visible .entry normalize(
 	.param .u64 normalize_param_0,
 	.param .u64 normalize_param_1,
@@ -552,18 +364,18 @@ BB5_8:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB6_6;
+	@%p1 bra 	BB0_6;
 
 	setp.eq.s64	%p2, %rd7, 0;
 	mov.f32 	%f20, 0f3F800000;
-	@%p2 bra 	BB6_3;
+	@%p2 bra 	BB0_3;
 
 	cvta.to.global.u64 	%rd8, %rd7;
 	mul.wide.s32 	%rd9, %r1, 4;
 	add.s64 	%rd10, %rd8, %rd9;
 	ld.global.nc.f32 	%f20, [%rd10];
 
-BB6_3:
+BB0_3:
 	cvta.to.global.u64 	%rd11, %rd6;
 	cvta.to.global.u64 	%rd12, %rd5;
 	cvta.to.global.u64 	%rd13, %rd4;
@@ -583,11 +395,11 @@ BB6_3:
 	sqrt.rn.f32 	%f6, %f16;
 	mov.f32 	%f21, 0f00000000;
 	setp.eq.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB6_5;
+	@%p3 bra 	BB0_5;
 
 	rcp.rn.f32 	%f21, %f6;
 
-BB6_5:
+BB0_5:
 	mul.f32 	%f17, %f3, %f21;
 	st.global.f32 	[%rd1], %f17;
 	mul.f32 	%f18, %f4, %f21;
@@ -595,108 +407,19 @@ BB6_5:
 	mul.f32 	%f19, %f5, %f21;
 	st.global.f32 	[%rd3], %f19;
 
-BB6_6:
+BB0_6:
 	ret;
 }
 
 
 `
 	normalize_ptx_52 = `
-.version 4.3
+.version 6.1
 .target sm_52
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	normalize
+
 .visible .entry normalize(
 	.param .u64 normalize_param_0,
 	.param .u64 normalize_param_1,
@@ -724,18 +447,18 @@ BB6_6:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB6_6;
+	@%p1 bra 	BB0_6;
 
 	setp.eq.s64	%p2, %rd7, 0;
 	mov.f32 	%f20, 0f3F800000;
-	@%p2 bra 	BB6_3;
+	@%p2 bra 	BB0_3;
 
 	cvta.to.global.u64 	%rd8, %rd7;
 	mul.wide.s32 	%rd9, %r1, 4;
 	add.s64 	%rd10, %rd8, %rd9;
 	ld.global.nc.f32 	%f20, [%rd10];
 
-BB6_3:
+BB0_3:
 	cvta.to.global.u64 	%rd11, %rd6;
 	cvta.to.global.u64 	%rd12, %rd5;
 	cvta.to.global.u64 	%rd13, %rd4;
@@ -755,11 +478,11 @@ BB6_3:
 	sqrt.rn.f32 	%f6, %f16;
 	mov.f32 	%f21, 0f00000000;
 	setp.eq.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB6_5;
+	@%p3 bra 	BB0_5;
 
 	rcp.rn.f32 	%f21, %f6;
 
-BB6_5:
+BB0_5:
 	mul.f32 	%f17, %f3, %f21;
 	st.global.f32 	[%rd1], %f17;
 	mul.f32 	%f18, %f4, %f21;
@@ -767,108 +490,19 @@ BB6_5:
 	mul.f32 	%f19, %f5, %f21;
 	st.global.f32 	[%rd3], %f19;
 
-BB6_6:
+BB0_6:
 	ret;
 }
 
 
 `
 	normalize_ptx_53 = `
-.version 4.3
+.version 6.1
 .target sm_53
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	normalize
+
 .visible .entry normalize(
 	.param .u64 normalize_param_0,
 	.param .u64 normalize_param_1,
@@ -896,18 +530,18 @@ BB6_6:
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
 	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB6_6;
+	@%p1 bra 	BB0_6;
 
 	setp.eq.s64	%p2, %rd7, 0;
 	mov.f32 	%f20, 0f3F800000;
-	@%p2 bra 	BB6_3;
+	@%p2 bra 	BB0_3;
 
 	cvta.to.global.u64 	%rd8, %rd7;
 	mul.wide.s32 	%rd9, %r1, 4;
 	add.s64 	%rd10, %rd8, %rd9;
 	ld.global.nc.f32 	%f20, [%rd10];
 
-BB6_3:
+BB0_3:
 	cvta.to.global.u64 	%rd11, %rd6;
 	cvta.to.global.u64 	%rd12, %rd5;
 	cvta.to.global.u64 	%rd13, %rd4;
@@ -927,11 +561,11 @@ BB6_3:
 	sqrt.rn.f32 	%f6, %f16;
 	mov.f32 	%f21, 0f00000000;
 	setp.eq.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB6_5;
+	@%p3 bra 	BB0_5;
 
 	rcp.rn.f32 	%f21, %f6;
 
-BB6_5:
+BB0_5:
 	mul.f32 	%f17, %f3, %f21;
 	st.global.f32 	[%rd1], %f17;
 	mul.f32 	%f18, %f4, %f21;
@@ -939,14 +573,14 @@ BB6_5:
 	mul.f32 	%f19, %f5, %f21;
 	st.global.f32 	[%rd3], %f19;
 
-BB6_6:
+BB0_6:
 	ret;
 }
 
 
 `
 	normalize_ptx_60 = `
-.version 5.0
+.version 6.1
 .target sm_60
 .address_size 64
 
@@ -1029,7 +663,7 @@ BB0_6:
 
 `
 	normalize_ptx_61 = `
-.version 5.0
+.version 6.1
 .target sm_61
 .address_size 64
 
@@ -1111,91 +745,8 @@ BB0_6:
 
 
 `
-	normalize_ptx_62 = `
-.version 5.0
-.target sm_62
-.address_size 64
-
-	// .globl	normalize
-
-.visible .entry normalize(
-	.param .u64 normalize_param_0,
-	.param .u64 normalize_param_1,
-	.param .u64 normalize_param_2,
-	.param .u64 normalize_param_3,
-	.param .u32 normalize_param_4
-)
-{
-	.reg .pred 	%p<4>;
-	.reg .f32 	%f<22>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<15>;
-
-
-	ld.param.u64 	%rd4, [normalize_param_0];
-	ld.param.u64 	%rd5, [normalize_param_1];
-	ld.param.u64 	%rd6, [normalize_param_2];
-	ld.param.u64 	%rd7, [normalize_param_3];
-	ld.param.u32 	%r2, [normalize_param_4];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_6;
-
-	setp.eq.s64	%p2, %rd7, 0;
-	mov.f32 	%f20, 0f3F800000;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd8, %rd7;
-	mul.wide.s32 	%rd9, %r1, 4;
-	add.s64 	%rd10, %rd8, %rd9;
-	ld.global.nc.f32 	%f20, [%rd10];
-
-BB0_3:
-	cvta.to.global.u64 	%rd11, %rd6;
-	cvta.to.global.u64 	%rd12, %rd5;
-	cvta.to.global.u64 	%rd13, %rd4;
-	mul.wide.s32 	%rd14, %r1, 4;
-	add.s64 	%rd1, %rd13, %rd14;
-	ld.global.f32 	%f11, [%rd1];
-	mul.f32 	%f3, %f20, %f11;
-	add.s64 	%rd2, %rd12, %rd14;
-	ld.global.f32 	%f12, [%rd2];
-	mul.f32 	%f4, %f20, %f12;
-	add.s64 	%rd3, %rd11, %rd14;
-	ld.global.f32 	%f13, [%rd3];
-	mul.f32 	%f5, %f20, %f13;
-	mul.f32 	%f14, %f4, %f4;
-	fma.rn.f32 	%f15, %f3, %f3, %f14;
-	fma.rn.f32 	%f16, %f5, %f5, %f15;
-	sqrt.rn.f32 	%f6, %f16;
-	mov.f32 	%f21, 0f00000000;
-	setp.eq.f32	%p3, %f6, 0f00000000;
-	@%p3 bra 	BB0_5;
-
-	rcp.rn.f32 	%f21, %f6;
-
-BB0_5:
-	mul.f32 	%f17, %f3, %f21;
-	st.global.f32 	[%rd1], %f17;
-	mul.f32 	%f18, %f4, %f21;
-	st.global.f32 	[%rd2], %f18;
-	mul.f32 	%f19, %f5, %f21;
-	st.global.f32 	[%rd3], %f19;
-
-BB0_6:
-	ret;
-}
-
-
-`
 	normalize_ptx_70 = `
-.version 6.0
+.version 6.1
 .target sm_70
 .address_size 64
 

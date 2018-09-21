@@ -1,16 +1,14 @@
 language: go
-dist: trusty
+dist: xenial
 sudo: required
 install: true
 env:
   global:
     - GOARCH=amd64
 before_install:
-  - wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
-  - sudo dpkg -i cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
+  - wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.2.88-1_amd64.deb
+  - sudo dpkg -i cuda-repo-ubuntu1604_9.2.88-1_amd64.deb
   - sudo apt-get -qq update
-  - sudo apt-get install cuda -y
+  - sudo apt-get install cuda -y --allow-unauthenticated
 script:
-  - go get -u github.com/barnex/fftw 
-  - go get -u github.com/barnex/matrix
   - go build ./...

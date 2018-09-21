@@ -18,7 +18,6 @@ type fft3DC2RPlan struct {
 // 3D single-precission real-to-complex FFT plan.
 func newFFT3DC2R(Nx, Ny, Nz int) fft3DC2RPlan {
 	handle := cufft.Plan3d(Nz, Ny, Nx, cufft.C2R) // new xyz swap
-	handle.SetCompatibilityMode(cufft.COMPATIBILITY_FFTW_PADDING)
 	handle.SetStream(stream0)
 	return fft3DC2RPlan{fftplan{handle}, [3]int{Nx, Ny, Nz}}
 }

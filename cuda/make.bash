@@ -2,7 +2,7 @@
 
 go build cuda2go.go || exit 1
 
-NVCC='nvcc --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx'
+NVCC='nvcc -std c++03 --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx'
 
 for f in *.cu; do
 	g=$(echo $f | sed 's/\.cu$//') # file basename

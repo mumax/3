@@ -32,7 +32,7 @@ func (p *ScalarExcitation) MSlice() cuda.MSlice {
 
 func (e *ScalarExcitation) AddTo(dst *data.Slice) {
 	if !e.perRegion.isZero() {
-		cuda.RegionAddV(dst, e.perRegion.gpuLUT(), regions.Gpu())
+		cuda.RegionAddS(dst, e.perRegion.gpuLUT1(), regions.Gpu())
 	}
 
 	for _, t := range e.extraTerms {
@@ -98,10 +98,12 @@ func (e *ScalarExcitation) AddGo(mask *data.Slice, mul func() float64) {
 	e.extraTerms = append(e.extraTerms, mulmask{mul, mask})
 }
 
-func (e *ScalarExcitation) SetRegion(region int, f script.ScalarFunction) { e.perRegion.SetRegion(region, f) }
-func (e *ScalarExcitation) SetValue(v interface{})                        { e.perRegion.SetValue(v) }
-func (e *ScalarExcitation) Set(v float64)                             { e.perRegion.setRegions(0, NREGION, []float64{v}) }
-func (e *ScalarExcitation) getRegion(region int) []float64                { return e.perRegion.getRegion(region) } // for gui
+func (e *ScalarExcitation) SetRegion(region int, f script.ScalarFunction) {
+	e.perRegion.SetRegion(region, f)
+}
+func (e *ScalarExcitation) SetValue(v interface{})         { e.perRegion.SetValue(v) }
+func (e *ScalarExcitation) Set(v float64)                  { e.perRegion.setRegions(0, NREGION, []float64{v}) }
+func (e *ScalarExcitation) getRegion(region int) []float64 { return e.perRegion.getRegion(region) } // for gui
 
 func (e *ScalarExcitation) SetRegionFn(region int, f func() [3]float64) {
 	e.perRegion.setFunc(region, region+1, func() []float64 {
@@ -109,8 +111,8 @@ func (e *ScalarExcitation) SetRegionFn(region int, f func() [3]float64) {
 	})
 }
 
-func (e *ScalarExcitation) average() float64      { return qAverageUniverse(e)[0] }
-func (e *ScalarExcitation) Average() float64   { return e.average() }
+func (e *ScalarExcitation) average() float64        { return qAverageUniverse(e)[0] }
+func (e *ScalarExcitation) Average() float64        { return e.average() }
 func (e *ScalarExcitation) IsUniform() bool         { return e.perRegion.IsUniform() }
 func (e *ScalarExcitation) Name() string            { return e.name }
 func (e *ScalarExcitation) Unit() string            { return e.perRegion.Unit() }

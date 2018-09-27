@@ -5,66 +5,66 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for getmagnetoelasticforce kernel
 var getmagnetoelasticforce_code cu.Function
 
 // Stores the arguments for getmagnetoelasticforce kernel invocation
-type getmagnetoelasticforce_args_t struct {
-	arg_fx     unsafe.Pointer
-	arg_fy     unsafe.Pointer
-	arg_fz     unsafe.Pointer
-	arg_mx     unsafe.Pointer
-	arg_my     unsafe.Pointer
-	arg_mz     unsafe.Pointer
-	arg_B1_    unsafe.Pointer
-	arg_B1_mul float32
-	arg_B2_    unsafe.Pointer
-	arg_B2_mul float32
-	arg_rcsx   float32
-	arg_rcsy   float32
-	arg_rcsz   float32
-	arg_Nx     int
-	arg_Ny     int
-	arg_Nz     int
-	arg_PBC    byte
-	argptr     [17]unsafe.Pointer
+type getmagnetoelasticforce_args_t struct{
+	 arg_fx unsafe.Pointer
+	 arg_fy unsafe.Pointer
+	 arg_fz unsafe.Pointer
+	 arg_mx unsafe.Pointer
+	 arg_my unsafe.Pointer
+	 arg_mz unsafe.Pointer
+	 arg_B1_ unsafe.Pointer
+	 arg_B1_mul float32
+	 arg_B2_ unsafe.Pointer
+	 arg_B2_mul float32
+	 arg_rcsx float32
+	 arg_rcsy float32
+	 arg_rcsz float32
+	 arg_Nx int
+	 arg_Ny int
+	 arg_Nz int
+	 arg_PBC byte
+	 argptr [17]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for getmagnetoelasticforce kernel invocation
 var getmagnetoelasticforce_args getmagnetoelasticforce_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	getmagnetoelasticforce_args.argptr[0] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fx)
-	getmagnetoelasticforce_args.argptr[1] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fy)
-	getmagnetoelasticforce_args.argptr[2] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fz)
-	getmagnetoelasticforce_args.argptr[3] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_mx)
-	getmagnetoelasticforce_args.argptr[4] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_my)
-	getmagnetoelasticforce_args.argptr[5] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_mz)
-	getmagnetoelasticforce_args.argptr[6] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B1_)
-	getmagnetoelasticforce_args.argptr[7] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B1_mul)
-	getmagnetoelasticforce_args.argptr[8] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B2_)
-	getmagnetoelasticforce_args.argptr[9] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B2_mul)
-	getmagnetoelasticforce_args.argptr[10] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsx)
-	getmagnetoelasticforce_args.argptr[11] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsy)
-	getmagnetoelasticforce_args.argptr[12] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsz)
-	getmagnetoelasticforce_args.argptr[13] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Nx)
-	getmagnetoelasticforce_args.argptr[14] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Ny)
-	getmagnetoelasticforce_args.argptr[15] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Nz)
-	getmagnetoelasticforce_args.argptr[16] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_PBC)
-}
+	 getmagnetoelasticforce_args.argptr[0] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fx)
+	 getmagnetoelasticforce_args.argptr[1] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fy)
+	 getmagnetoelasticforce_args.argptr[2] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_fz)
+	 getmagnetoelasticforce_args.argptr[3] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_mx)
+	 getmagnetoelasticforce_args.argptr[4] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_my)
+	 getmagnetoelasticforce_args.argptr[5] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_mz)
+	 getmagnetoelasticforce_args.argptr[6] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B1_)
+	 getmagnetoelasticforce_args.argptr[7] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B1_mul)
+	 getmagnetoelasticforce_args.argptr[8] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B2_)
+	 getmagnetoelasticforce_args.argptr[9] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_B2_mul)
+	 getmagnetoelasticforce_args.argptr[10] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsx)
+	 getmagnetoelasticforce_args.argptr[11] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsy)
+	 getmagnetoelasticforce_args.argptr[12] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_rcsz)
+	 getmagnetoelasticforce_args.argptr[13] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Nx)
+	 getmagnetoelasticforce_args.argptr[14] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Ny)
+	 getmagnetoelasticforce_args.argptr[15] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_Nz)
+	 getmagnetoelasticforce_args.argptr[16] = unsafe.Pointer(&getmagnetoelasticforce_args.arg_PBC)
+	 }
 
 // Wrapper for getmagnetoelasticforce CUDA kernel, asynchronous.
-func k_getmagnetoelasticforce_async(fx unsafe.Pointer, fy unsafe.Pointer, fz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, B1_ unsafe.Pointer, B1_mul float32, B2_ unsafe.Pointer, B2_mul float32, rcsx float32, rcsy float32, rcsz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
-	if Synchronous { // debug
+func k_getmagnetoelasticforce_async ( fx unsafe.Pointer, fy unsafe.Pointer, fz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, B1_ unsafe.Pointer, B1_mul float32, B2_ unsafe.Pointer, B2_mul float32, rcsx float32, rcsy float32, rcsz float32, Nx int, Ny int, Nz int, PBC byte,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("getmagnetoelasticforce")
 	}
@@ -72,53 +72,54 @@ func k_getmagnetoelasticforce_async(fx unsafe.Pointer, fy unsafe.Pointer, fz uns
 	getmagnetoelasticforce_args.Lock()
 	defer getmagnetoelasticforce_args.Unlock()
 
-	if getmagnetoelasticforce_code == 0 {
+	if getmagnetoelasticforce_code == 0{
 		getmagnetoelasticforce_code = fatbinLoad(getmagnetoelasticforce_map, "getmagnetoelasticforce")
 	}
 
-	getmagnetoelasticforce_args.arg_fx = fx
-	getmagnetoelasticforce_args.arg_fy = fy
-	getmagnetoelasticforce_args.arg_fz = fz
-	getmagnetoelasticforce_args.arg_mx = mx
-	getmagnetoelasticforce_args.arg_my = my
-	getmagnetoelasticforce_args.arg_mz = mz
-	getmagnetoelasticforce_args.arg_B1_ = B1_
-	getmagnetoelasticforce_args.arg_B1_mul = B1_mul
-	getmagnetoelasticforce_args.arg_B2_ = B2_
-	getmagnetoelasticforce_args.arg_B2_mul = B2_mul
-	getmagnetoelasticforce_args.arg_rcsx = rcsx
-	getmagnetoelasticforce_args.arg_rcsy = rcsy
-	getmagnetoelasticforce_args.arg_rcsz = rcsz
-	getmagnetoelasticforce_args.arg_Nx = Nx
-	getmagnetoelasticforce_args.arg_Ny = Ny
-	getmagnetoelasticforce_args.arg_Nz = Nz
-	getmagnetoelasticforce_args.arg_PBC = PBC
+	 getmagnetoelasticforce_args.arg_fx = fx
+	 getmagnetoelasticforce_args.arg_fy = fy
+	 getmagnetoelasticforce_args.arg_fz = fz
+	 getmagnetoelasticforce_args.arg_mx = mx
+	 getmagnetoelasticforce_args.arg_my = my
+	 getmagnetoelasticforce_args.arg_mz = mz
+	 getmagnetoelasticforce_args.arg_B1_ = B1_
+	 getmagnetoelasticforce_args.arg_B1_mul = B1_mul
+	 getmagnetoelasticforce_args.arg_B2_ = B2_
+	 getmagnetoelasticforce_args.arg_B2_mul = B2_mul
+	 getmagnetoelasticforce_args.arg_rcsx = rcsx
+	 getmagnetoelasticforce_args.arg_rcsy = rcsy
+	 getmagnetoelasticforce_args.arg_rcsz = rcsz
+	 getmagnetoelasticforce_args.arg_Nx = Nx
+	 getmagnetoelasticforce_args.arg_Ny = Ny
+	 getmagnetoelasticforce_args.arg_Nz = Nz
+	 getmagnetoelasticforce_args.arg_PBC = PBC
+	
 
 	args := getmagnetoelasticforce_args.argptr[:]
 	cu.LaunchKernel(getmagnetoelasticforce_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("getmagnetoelasticforce")
 	}
 }
 
 // maps compute capability on PTX code for getmagnetoelasticforce kernel.
-var getmagnetoelasticforce_map = map[int]string{0: "",
-	30: getmagnetoelasticforce_ptx_30,
-	35: getmagnetoelasticforce_ptx_35,
-	37: getmagnetoelasticforce_ptx_37,
-	50: getmagnetoelasticforce_ptx_50,
-	52: getmagnetoelasticforce_ptx_52,
-	53: getmagnetoelasticforce_ptx_53,
-	60: getmagnetoelasticforce_ptx_60,
-	61: getmagnetoelasticforce_ptx_61,
-	70: getmagnetoelasticforce_ptx_70,
-	75: getmagnetoelasticforce_ptx_75}
+var getmagnetoelasticforce_map = map[int]string{ 0: "" ,
+30: getmagnetoelasticforce_ptx_30 ,
+35: getmagnetoelasticforce_ptx_35 ,
+37: getmagnetoelasticforce_ptx_37 ,
+50: getmagnetoelasticforce_ptx_50 ,
+52: getmagnetoelasticforce_ptx_52 ,
+53: getmagnetoelasticforce_ptx_53 ,
+60: getmagnetoelasticforce_ptx_60 ,
+61: getmagnetoelasticforce_ptx_61 ,
+70: getmagnetoelasticforce_ptx_70 ,
+75: getmagnetoelasticforce_ptx_75  }
 
 // getmagnetoelasticforce PTX code for various compute capabilities.
-const (
-	getmagnetoelasticforce_ptx_30 = `
+const(
+  getmagnetoelasticforce_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -1034,7 +1035,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_35 = `
+   getmagnetoelasticforce_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -1941,7 +1942,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_37 = `
+   getmagnetoelasticforce_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -2848,7 +2849,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_50 = `
+   getmagnetoelasticforce_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -3755,7 +3756,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_52 = `
+   getmagnetoelasticforce_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -4662,7 +4663,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_53 = `
+   getmagnetoelasticforce_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -5569,7 +5570,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_60 = `
+   getmagnetoelasticforce_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -6476,7 +6477,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_61 = `
+   getmagnetoelasticforce_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -7383,7 +7384,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_70 = `
+   getmagnetoelasticforce_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -8290,7 +8291,7 @@ BB0_108:
 
 
 `
-	getmagnetoelasticforce_ptx_75 = `
+   getmagnetoelasticforce_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -9197,4 +9198,4 @@ BB0_108:
 
 
 `
-)
+ )

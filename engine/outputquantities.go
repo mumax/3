@@ -159,5 +159,7 @@ func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Qua
 func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Quantity) }
 func (v VectorField) Name() string             { return NameOf(v.Quantity) }
 func (v VectorField) HostCopy() *data.Slice {
-	return ValueOf(v.Quantity)
+	s := ValueOf(v.Quantity)
+	defer cuda.Recycle(s)
+	return s.HostCopy()
 }

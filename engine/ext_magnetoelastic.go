@@ -5,6 +5,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -74,6 +75,8 @@ func GetMagnetoelasticForceDensity(dst *data.Slice) {
 	if !haveMel {
 		return
 	}
+
+	util.AssertMsg(B1.IsUniform() && B2.IsUniform(), "Magnetoelastic: B1, B2 must be uniform")
 
 	b1 := B1.MSlice()
 	defer b1.Recycle()

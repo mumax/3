@@ -5,68 +5,68 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for adddmibulk kernel
 var adddmibulk_code cu.Function
 
 // Stores the arguments for adddmibulk kernel invocation
-type adddmibulk_args_t struct {
-	arg_Hx      unsafe.Pointer
-	arg_Hy      unsafe.Pointer
-	arg_Hz      unsafe.Pointer
-	arg_mx      unsafe.Pointer
-	arg_my      unsafe.Pointer
-	arg_mz      unsafe.Pointer
-	arg_Ms_     unsafe.Pointer
-	arg_Ms_mul  float32
-	arg_aLUT2d  unsafe.Pointer
-	arg_DLUT2d  unsafe.Pointer
-	arg_regions unsafe.Pointer
-	arg_cx      float32
-	arg_cy      float32
-	arg_cz      float32
-	arg_Nx      int
-	arg_Ny      int
-	arg_Nz      int
-	arg_PBC     byte
-	argptr      [18]unsafe.Pointer
+type adddmibulk_args_t struct{
+	 arg_Hx unsafe.Pointer
+	 arg_Hy unsafe.Pointer
+	 arg_Hz unsafe.Pointer
+	 arg_mx unsafe.Pointer
+	 arg_my unsafe.Pointer
+	 arg_mz unsafe.Pointer
+	 arg_Ms_ unsafe.Pointer
+	 arg_Ms_mul float32
+	 arg_aLUT2d unsafe.Pointer
+	 arg_DLUT2d unsafe.Pointer
+	 arg_regions unsafe.Pointer
+	 arg_cx float32
+	 arg_cy float32
+	 arg_cz float32
+	 arg_Nx int
+	 arg_Ny int
+	 arg_Nz int
+	 arg_PBC byte
+	 argptr [18]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for adddmibulk kernel invocation
 var adddmibulk_args adddmibulk_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	adddmibulk_args.argptr[0] = unsafe.Pointer(&adddmibulk_args.arg_Hx)
-	adddmibulk_args.argptr[1] = unsafe.Pointer(&adddmibulk_args.arg_Hy)
-	adddmibulk_args.argptr[2] = unsafe.Pointer(&adddmibulk_args.arg_Hz)
-	adddmibulk_args.argptr[3] = unsafe.Pointer(&adddmibulk_args.arg_mx)
-	adddmibulk_args.argptr[4] = unsafe.Pointer(&adddmibulk_args.arg_my)
-	adddmibulk_args.argptr[5] = unsafe.Pointer(&adddmibulk_args.arg_mz)
-	adddmibulk_args.argptr[6] = unsafe.Pointer(&adddmibulk_args.arg_Ms_)
-	adddmibulk_args.argptr[7] = unsafe.Pointer(&adddmibulk_args.arg_Ms_mul)
-	adddmibulk_args.argptr[8] = unsafe.Pointer(&adddmibulk_args.arg_aLUT2d)
-	adddmibulk_args.argptr[9] = unsafe.Pointer(&adddmibulk_args.arg_DLUT2d)
-	adddmibulk_args.argptr[10] = unsafe.Pointer(&adddmibulk_args.arg_regions)
-	adddmibulk_args.argptr[11] = unsafe.Pointer(&adddmibulk_args.arg_cx)
-	adddmibulk_args.argptr[12] = unsafe.Pointer(&adddmibulk_args.arg_cy)
-	adddmibulk_args.argptr[13] = unsafe.Pointer(&adddmibulk_args.arg_cz)
-	adddmibulk_args.argptr[14] = unsafe.Pointer(&adddmibulk_args.arg_Nx)
-	adddmibulk_args.argptr[15] = unsafe.Pointer(&adddmibulk_args.arg_Ny)
-	adddmibulk_args.argptr[16] = unsafe.Pointer(&adddmibulk_args.arg_Nz)
-	adddmibulk_args.argptr[17] = unsafe.Pointer(&adddmibulk_args.arg_PBC)
-}
+	 adddmibulk_args.argptr[0] = unsafe.Pointer(&adddmibulk_args.arg_Hx)
+	 adddmibulk_args.argptr[1] = unsafe.Pointer(&adddmibulk_args.arg_Hy)
+	 adddmibulk_args.argptr[2] = unsafe.Pointer(&adddmibulk_args.arg_Hz)
+	 adddmibulk_args.argptr[3] = unsafe.Pointer(&adddmibulk_args.arg_mx)
+	 adddmibulk_args.argptr[4] = unsafe.Pointer(&adddmibulk_args.arg_my)
+	 adddmibulk_args.argptr[5] = unsafe.Pointer(&adddmibulk_args.arg_mz)
+	 adddmibulk_args.argptr[6] = unsafe.Pointer(&adddmibulk_args.arg_Ms_)
+	 adddmibulk_args.argptr[7] = unsafe.Pointer(&adddmibulk_args.arg_Ms_mul)
+	 adddmibulk_args.argptr[8] = unsafe.Pointer(&adddmibulk_args.arg_aLUT2d)
+	 adddmibulk_args.argptr[9] = unsafe.Pointer(&adddmibulk_args.arg_DLUT2d)
+	 adddmibulk_args.argptr[10] = unsafe.Pointer(&adddmibulk_args.arg_regions)
+	 adddmibulk_args.argptr[11] = unsafe.Pointer(&adddmibulk_args.arg_cx)
+	 adddmibulk_args.argptr[12] = unsafe.Pointer(&adddmibulk_args.arg_cy)
+	 adddmibulk_args.argptr[13] = unsafe.Pointer(&adddmibulk_args.arg_cz)
+	 adddmibulk_args.argptr[14] = unsafe.Pointer(&adddmibulk_args.arg_Nx)
+	 adddmibulk_args.argptr[15] = unsafe.Pointer(&adddmibulk_args.arg_Ny)
+	 adddmibulk_args.argptr[16] = unsafe.Pointer(&adddmibulk_args.arg_Nz)
+	 adddmibulk_args.argptr[17] = unsafe.Pointer(&adddmibulk_args.arg_PBC)
+	 }
 
 // Wrapper for adddmibulk CUDA kernel, asynchronous.
-func k_adddmibulk_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, aLUT2d unsafe.Pointer, DLUT2d unsafe.Pointer, regions unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
-	if Synchronous { // debug
+func k_adddmibulk_async ( Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, aLUT2d unsafe.Pointer, DLUT2d unsafe.Pointer, regions unsafe.Pointer, cx float32, cy float32, cz float32, Nx int, Ny int, Nz int, PBC byte,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("adddmibulk")
 	}
@@ -74,54 +74,56 @@ func k_adddmibulk_async(Hx unsafe.Pointer, Hy unsafe.Pointer, Hz unsafe.Pointer,
 	adddmibulk_args.Lock()
 	defer adddmibulk_args.Unlock()
 
-	if adddmibulk_code == 0 {
+	if adddmibulk_code == 0{
 		adddmibulk_code = fatbinLoad(adddmibulk_map, "adddmibulk")
 	}
 
-	adddmibulk_args.arg_Hx = Hx
-	adddmibulk_args.arg_Hy = Hy
-	adddmibulk_args.arg_Hz = Hz
-	adddmibulk_args.arg_mx = mx
-	adddmibulk_args.arg_my = my
-	adddmibulk_args.arg_mz = mz
-	adddmibulk_args.arg_Ms_ = Ms_
-	adddmibulk_args.arg_Ms_mul = Ms_mul
-	adddmibulk_args.arg_aLUT2d = aLUT2d
-	adddmibulk_args.arg_DLUT2d = DLUT2d
-	adddmibulk_args.arg_regions = regions
-	adddmibulk_args.arg_cx = cx
-	adddmibulk_args.arg_cy = cy
-	adddmibulk_args.arg_cz = cz
-	adddmibulk_args.arg_Nx = Nx
-	adddmibulk_args.arg_Ny = Ny
-	adddmibulk_args.arg_Nz = Nz
-	adddmibulk_args.arg_PBC = PBC
+	 adddmibulk_args.arg_Hx = Hx
+	 adddmibulk_args.arg_Hy = Hy
+	 adddmibulk_args.arg_Hz = Hz
+	 adddmibulk_args.arg_mx = mx
+	 adddmibulk_args.arg_my = my
+	 adddmibulk_args.arg_mz = mz
+	 adddmibulk_args.arg_Ms_ = Ms_
+	 adddmibulk_args.arg_Ms_mul = Ms_mul
+	 adddmibulk_args.arg_aLUT2d = aLUT2d
+	 adddmibulk_args.arg_DLUT2d = DLUT2d
+	 adddmibulk_args.arg_regions = regions
+	 adddmibulk_args.arg_cx = cx
+	 adddmibulk_args.arg_cy = cy
+	 adddmibulk_args.arg_cz = cz
+	 adddmibulk_args.arg_Nx = Nx
+	 adddmibulk_args.arg_Ny = Ny
+	 adddmibulk_args.arg_Nz = Nz
+	 adddmibulk_args.arg_PBC = PBC
+	
 
 	args := adddmibulk_args.argptr[:]
 	cu.LaunchKernel(adddmibulk_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("adddmibulk")
 	}
 }
 
 // maps compute capability on PTX code for adddmibulk kernel.
-var adddmibulk_map = map[int]string{0: "",
-	30: adddmibulk_ptx_30,
-	35: adddmibulk_ptx_35,
-	37: adddmibulk_ptx_37,
-	50: adddmibulk_ptx_50,
-	52: adddmibulk_ptx_52,
-	53: adddmibulk_ptx_53,
-	60: adddmibulk_ptx_60,
-	61: adddmibulk_ptx_61,
-	70: adddmibulk_ptx_70}
+var adddmibulk_map = map[int]string{ 0: "" ,
+30: adddmibulk_ptx_30 ,
+35: adddmibulk_ptx_35 ,
+37: adddmibulk_ptx_37 ,
+50: adddmibulk_ptx_50 ,
+52: adddmibulk_ptx_52 ,
+53: adddmibulk_ptx_53 ,
+60: adddmibulk_ptx_60 ,
+61: adddmibulk_ptx_61 ,
+70: adddmibulk_ptx_70 ,
+75: adddmibulk_ptx_75  }
 
 // adddmibulk PTX code for various compute capabilities.
-const (
-	adddmibulk_ptx_30 = `
-.version 6.1
+const(
+  adddmibulk_ptx_30 = `
+.version 6.3
 .target sm_30
 .address_size 64
 
@@ -744,8 +746,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_35 = `
-.version 6.1
+   adddmibulk_ptx_35 = `
+.version 6.3
 .target sm_35
 .address_size 64
 
@@ -1362,8 +1364,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_37 = `
-.version 6.1
+   adddmibulk_ptx_37 = `
+.version 6.3
 .target sm_37
 .address_size 64
 
@@ -1980,8 +1982,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_50 = `
-.version 6.1
+   adddmibulk_ptx_50 = `
+.version 6.3
 .target sm_50
 .address_size 64
 
@@ -2598,8 +2600,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_52 = `
-.version 6.1
+   adddmibulk_ptx_52 = `
+.version 6.3
 .target sm_52
 .address_size 64
 
@@ -3216,8 +3218,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_53 = `
-.version 6.1
+   adddmibulk_ptx_53 = `
+.version 6.3
 .target sm_53
 .address_size 64
 
@@ -3834,8 +3836,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_60 = `
-.version 6.1
+   adddmibulk_ptx_60 = `
+.version 6.3
 .target sm_60
 .address_size 64
 
@@ -4452,8 +4454,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_61 = `
-.version 6.1
+   adddmibulk_ptx_61 = `
+.version 6.3
 .target sm_61
 .address_size 64
 
@@ -5070,8 +5072,8 @@ BB0_51:
 
 
 `
-	adddmibulk_ptx_70 = `
-.version 6.1
+   adddmibulk_ptx_70 = `
+.version 6.3
 .target sm_70
 .address_size 64
 
@@ -5688,4 +5690,622 @@ BB0_51:
 
 
 `
+   adddmibulk_ptx_75 = `
+.version 6.3
+.target sm_75
+.address_size 64
+
+	// .globl	adddmibulk
+
+.visible .entry adddmibulk(
+	.param .u64 adddmibulk_param_0,
+	.param .u64 adddmibulk_param_1,
+	.param .u64 adddmibulk_param_2,
+	.param .u64 adddmibulk_param_3,
+	.param .u64 adddmibulk_param_4,
+	.param .u64 adddmibulk_param_5,
+	.param .u64 adddmibulk_param_6,
+	.param .f32 adddmibulk_param_7,
+	.param .u64 adddmibulk_param_8,
+	.param .u64 adddmibulk_param_9,
+	.param .u64 adddmibulk_param_10,
+	.param .f32 adddmibulk_param_11,
+	.param .f32 adddmibulk_param_12,
+	.param .f32 adddmibulk_param_13,
+	.param .u32 adddmibulk_param_14,
+	.param .u32 adddmibulk_param_15,
+	.param .u32 adddmibulk_param_16,
+	.param .u8 adddmibulk_param_17
 )
+{
+	.reg .pred 	%p<52>;
+	.reg .b16 	%rs<44>;
+	.reg .f32 	%f<263>;
+	.reg .b32 	%r<128>;
+	.reg .b64 	%rd<87>;
+
+
+	ld.param.u64 	%rd7, [adddmibulk_param_0];
+	ld.param.u64 	%rd8, [adddmibulk_param_1];
+	ld.param.u64 	%rd9, [adddmibulk_param_2];
+	ld.param.u64 	%rd11, [adddmibulk_param_3];
+	ld.param.u64 	%rd12, [adddmibulk_param_4];
+	ld.param.u64 	%rd13, [adddmibulk_param_5];
+	ld.param.u64 	%rd10, [adddmibulk_param_6];
+	ld.param.u64 	%rd14, [adddmibulk_param_8];
+	ld.param.u64 	%rd15, [adddmibulk_param_9];
+	ld.param.u64 	%rd16, [adddmibulk_param_10];
+	ld.param.f32 	%f84, [adddmibulk_param_11];
+	ld.param.u32 	%r38, [adddmibulk_param_14];
+	ld.param.u32 	%r39, [adddmibulk_param_15];
+	ld.param.u32 	%r40, [adddmibulk_param_16];
+	ld.param.u8 	%rs17, [adddmibulk_param_17];
+	cvta.to.global.u64 	%rd1, %rd15;
+	cvta.to.global.u64 	%rd2, %rd14;
+	cvta.to.global.u64 	%rd3, %rd16;
+	cvta.to.global.u64 	%rd4, %rd13;
+	cvta.to.global.u64 	%rd5, %rd12;
+	cvta.to.global.u64 	%rd6, %rd11;
+	mov.u32 	%r41, %ntid.x;
+	mov.u32 	%r42, %ctaid.x;
+	mov.u32 	%r43, %tid.x;
+	mad.lo.s32 	%r1, %r41, %r42, %r43;
+	mov.u32 	%r44, %ntid.y;
+	mov.u32 	%r45, %ctaid.y;
+	mov.u32 	%r46, %tid.y;
+	mad.lo.s32 	%r2, %r44, %r45, %r46;
+	mov.u32 	%r47, %ntid.z;
+	mov.u32 	%r48, %ctaid.z;
+	mov.u32 	%r49, %tid.z;
+	mad.lo.s32 	%r3, %r47, %r48, %r49;
+	setp.ge.s32	%p1, %r2, %r39;
+	setp.ge.s32	%p2, %r1, %r38;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r40;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_51;
+
+	mul.lo.s32 	%r4, %r3, %r39;
+	add.s32 	%r50, %r4, %r2;
+	mul.lo.s32 	%r5, %r50, %r38;
+	add.s32 	%r6, %r5, %r1;
+	mul.wide.s32 	%rd17, %r6, 4;
+	add.s64 	%rd18, %rd6, %rd17;
+	cvt.s64.s32	%rd19, %r6;
+	add.s64 	%rd20, %rd5, %rd17;
+	add.s64 	%rd21, %rd4, %rd17;
+	add.s64 	%rd22, %rd3, %rd19;
+	ld.global.nc.u8 	%rs1, [%rd22];
+	cvt.u32.u16	%r51, %rs1;
+	and.b32  	%r7, %r51, 255;
+	ld.global.nc.f32 	%f1, [%rd18];
+	ld.global.nc.f32 	%f2, [%rd20];
+	mul.f32 	%f87, %f2, %f2;
+	fma.rn.f32 	%f88, %f1, %f1, %f87;
+	ld.global.nc.f32 	%f3, [%rd21];
+	fma.rn.f32 	%f89, %f3, %f3, %f88;
+	setp.eq.f32	%p6, %f89, 0f00000000;
+	@%p6 bra 	BB0_51;
+
+	and.b16  	%rs2, %rs17, 1;
+	setp.eq.s16	%p7, %rs2, 0;
+	add.s32 	%r8, %r1, -1;
+	@%p7 bra 	BB0_4;
+
+	rem.s32 	%r52, %r8, %r38;
+	add.s32 	%r53, %r52, %r38;
+	rem.s32 	%r122, %r53, %r38;
+	bra.uni 	BB0_5;
+
+BB0_4:
+	mov.u32 	%r54, 0;
+	max.s32 	%r122, %r8, %r54;
+
+BB0_5:
+	add.s32 	%r12, %r122, %r5;
+	setp.lt.s32	%p9, %r8, 0;
+	mov.f32 	%f240, 0f00000000;
+	and.pred  	%p10, %p9, %p7;
+	mov.f32 	%f241, %f240;
+	mov.f32 	%f242, %f240;
+	@%p10 bra 	BB0_7;
+
+	mul.wide.s32 	%rd23, %r12, 4;
+	add.s64 	%rd24, %rd6, %rd23;
+	ld.global.nc.f32 	%f240, [%rd24];
+	add.s64 	%rd25, %rd5, %rd23;
+	ld.global.nc.f32 	%f241, [%rd25];
+	add.s64 	%rd26, %rd4, %rd23;
+	ld.global.nc.f32 	%f242, [%rd26];
+
+BB0_7:
+	mul.f32 	%f93, %f241, %f241;
+	fma.rn.f32 	%f94, %f240, %f240, %f93;
+	fma.rn.f32 	%f10, %f242, %f242, %f94;
+	setp.eq.f32	%p11, %f10, 0f00000000;
+	mov.u16 	%rs38, %rs1;
+	@%p11 bra 	BB0_9;
+
+	cvt.s64.s32	%rd27, %r12;
+	add.s64 	%rd28, %rd3, %rd27;
+	ld.global.nc.u8 	%rs38, [%rd28];
+
+BB0_9:
+	setp.gt.u16	%p12, %rs38, %rs1;
+	cvt.u32.u16	%r55, %rs38;
+	and.b32  	%r56, %r55, 255;
+	selp.b32	%r57, %r7, %r56, %p12;
+	selp.b32	%r58, %r56, %r7, %p12;
+	add.s32 	%r59, %r58, 1;
+	mul.lo.s32 	%r60, %r59, %r58;
+	shr.u32 	%r61, %r60, 1;
+	add.s32 	%r62, %r61, %r57;
+	mul.wide.s32 	%rd29, %r62, 4;
+	add.s64 	%rd30, %rd2, %rd29;
+	add.s64 	%rd31, %rd1, %rd29;
+	ld.global.nc.f32 	%f95, [%rd30];
+	add.f32 	%f96, %f95, %f95;
+	ld.global.nc.f32 	%f97, [%rd31];
+	div.rn.f32 	%f98, %f97, %f96;
+	mul.f32 	%f99, %f98, %f84;
+	fma.rn.f32 	%f100, %f3, %f99, %f2;
+	mul.f32 	%f101, %f2, %f99;
+	sub.f32 	%f102, %f3, %f101;
+	selp.f32	%f103, %f1, %f240, %p11;
+	selp.f32	%f104, %f100, %f241, %p11;
+	selp.f32	%f11, %f102, %f242, %p11;
+	mul.f32 	%f12, %f84, %f84;
+	div.rn.f32 	%f105, %f96, %f12;
+	sub.f32 	%f106, %f103, %f1;
+	sub.f32 	%f107, %f104, %f2;
+	sub.f32 	%f108, %f11, %f3;
+	fma.rn.f32 	%f13, %f106, %f105, 0f00000000;
+	fma.rn.f32 	%f14, %f105, %f107, 0f00000000;
+	fma.rn.f32 	%f109, %f105, %f108, 0f00000000;
+	div.rn.f32 	%f15, %f97, %f84;
+	fma.rn.f32 	%f16, %f15, %f104, %f109;
+	add.s32 	%r13, %r1, 1;
+	@%p7 bra 	BB0_11;
+
+	rem.s32 	%r63, %r13, %r38;
+	add.s32 	%r64, %r63, %r38;
+	rem.s32 	%r123, %r64, %r38;
+	bra.uni 	BB0_12;
+
+BB0_11:
+	add.s32 	%r65, %r38, -1;
+	min.s32 	%r123, %r13, %r65;
+
+BB0_12:
+	add.s32 	%r17, %r123, %r5;
+	setp.ge.s32	%p15, %r13, %r38;
+	mul.f32 	%f113, %f15, %f11;
+	sub.f32 	%f17, %f14, %f113;
+	mov.f32 	%f243, 0f00000000;
+	and.pred  	%p17, %p15, %p7;
+	mov.f32 	%f244, %f243;
+	mov.f32 	%f245, %f243;
+	@%p17 bra 	BB0_14;
+
+	mul.wide.s32 	%rd32, %r17, 4;
+	add.s64 	%rd33, %rd6, %rd32;
+	ld.global.nc.f32 	%f243, [%rd33];
+	add.s64 	%rd34, %rd5, %rd32;
+	ld.global.nc.f32 	%f244, [%rd34];
+	add.s64 	%rd35, %rd4, %rd32;
+	ld.global.nc.f32 	%f245, [%rd35];
+
+BB0_14:
+	mul.f32 	%f114, %f244, %f244;
+	fma.rn.f32 	%f115, %f243, %f243, %f114;
+	fma.rn.f32 	%f24, %f245, %f245, %f115;
+	setp.eq.f32	%p18, %f24, 0f00000000;
+	mov.u16 	%rs39, %rs1;
+	@%p18 bra 	BB0_16;
+
+	cvt.s64.s32	%rd36, %r17;
+	add.s64 	%rd37, %rd3, %rd36;
+	ld.global.nc.u8 	%rs39, [%rd37];
+
+BB0_16:
+	ld.param.f32 	%f233, [adddmibulk_param_11];
+	ld.param.u8 	%rs36, [adddmibulk_param_17];
+	setp.gt.u16	%p19, %rs39, %rs1;
+	cvt.u32.u16	%r66, %rs39;
+	and.b32  	%r67, %r66, 255;
+	selp.b32	%r68, %r7, %r67, %p19;
+	selp.b32	%r69, %r67, %r7, %p19;
+	add.s32 	%r70, %r69, 1;
+	mul.lo.s32 	%r71, %r70, %r69;
+	shr.u32 	%r72, %r71, 1;
+	add.s32 	%r73, %r72, %r68;
+	mul.wide.s32 	%rd38, %r73, 4;
+	add.s64 	%rd39, %rd2, %rd38;
+	add.s64 	%rd40, %rd1, %rd38;
+	ld.global.nc.f32 	%f116, [%rd39];
+	add.f32 	%f117, %f116, %f116;
+	ld.global.nc.f32 	%f118, [%rd40];
+	div.rn.f32 	%f119, %f118, %f117;
+	mul.f32 	%f120, %f119, %f233;
+	mul.f32 	%f121, %f3, %f120;
+	sub.f32 	%f122, %f2, %f121;
+	fma.rn.f32 	%f123, %f2, %f120, %f3;
+	selp.f32	%f124, %f1, %f243, %p18;
+	selp.f32	%f25, %f122, %f244, %p18;
+	selp.f32	%f125, %f123, %f245, %p18;
+	div.rn.f32 	%f126, %f117, %f12;
+	sub.f32 	%f127, %f124, %f1;
+	sub.f32 	%f128, %f25, %f2;
+	sub.f32 	%f129, %f125, %f3;
+	fma.rn.f32 	%f26, %f127, %f126, %f13;
+	fma.rn.f32 	%f130, %f126, %f128, %f17;
+	fma.rn.f32 	%f27, %f126, %f129, %f16;
+	div.rn.f32 	%f28, %f118, %f233;
+	fma.rn.f32 	%f29, %f28, %f125, %f130;
+	and.b16  	%rs7, %rs36, 2;
+	setp.eq.s16	%p21, %rs7, 0;
+	add.s32 	%r18, %r2, -1;
+	@%p21 bra 	BB0_18;
+
+	rem.s32 	%r74, %r18, %r39;
+	add.s32 	%r75, %r74, %r39;
+	rem.s32 	%r124, %r75, %r39;
+	bra.uni 	BB0_19;
+
+BB0_18:
+	mov.u32 	%r76, 0;
+	max.s32 	%r124, %r18, %r76;
+
+BB0_19:
+	add.s32 	%r77, %r124, %r4;
+	mad.lo.s32 	%r22, %r77, %r38, %r1;
+	setp.lt.s32	%p23, %r18, 0;
+	mul.f32 	%f134, %f28, %f25;
+	sub.f32 	%f30, %f27, %f134;
+	mov.f32 	%f246, 0f00000000;
+	and.pred  	%p24, %p23, %p21;
+	mov.f32 	%f247, %f246;
+	mov.f32 	%f248, %f246;
+	@%p24 bra 	BB0_21;
+
+	mul.wide.s32 	%rd41, %r22, 4;
+	add.s64 	%rd42, %rd6, %rd41;
+	ld.global.nc.f32 	%f246, [%rd42];
+	add.s64 	%rd43, %rd5, %rd41;
+	ld.global.nc.f32 	%f247, [%rd43];
+	add.s64 	%rd44, %rd4, %rd41;
+	ld.global.nc.f32 	%f248, [%rd44];
+
+BB0_21:
+	mul.f32 	%f135, %f247, %f247;
+	fma.rn.f32 	%f136, %f246, %f246, %f135;
+	fma.rn.f32 	%f37, %f248, %f248, %f136;
+	setp.eq.f32	%p25, %f37, 0f00000000;
+	mov.u16 	%rs40, %rs1;
+	@%p25 bra 	BB0_23;
+
+	cvt.s64.s32	%rd45, %r22;
+	add.s64 	%rd46, %rd3, %rd45;
+	ld.global.nc.u8 	%rs40, [%rd46];
+
+BB0_23:
+	ld.param.f32 	%f234, [adddmibulk_param_12];
+	setp.gt.u16	%p26, %rs40, %rs1;
+	cvt.u32.u16	%r78, %rs40;
+	and.b32  	%r79, %r78, 255;
+	selp.b32	%r80, %r7, %r79, %p26;
+	selp.b32	%r81, %r79, %r7, %p26;
+	add.s32 	%r82, %r81, 1;
+	mul.lo.s32 	%r83, %r82, %r81;
+	shr.u32 	%r84, %r83, 1;
+	add.s32 	%r85, %r84, %r80;
+	mul.wide.s32 	%rd47, %r85, 4;
+	add.s64 	%rd48, %rd2, %rd47;
+	add.s64 	%rd49, %rd1, %rd47;
+	ld.global.nc.f32 	%f137, [%rd48];
+	add.f32 	%f138, %f137, %f137;
+	ld.global.nc.f32 	%f139, [%rd49];
+	div.rn.f32 	%f140, %f139, %f138;
+	mul.f32 	%f141, %f140, %f234;
+	mul.f32 	%f142, %f3, %f141;
+	sub.f32 	%f143, %f1, %f142;
+	fma.rn.f32 	%f144, %f1, %f141, %f3;
+	selp.f32	%f38, %f143, %f246, %p25;
+	selp.f32	%f145, %f2, %f247, %p25;
+	selp.f32	%f146, %f144, %f248, %p25;
+	mul.f32 	%f39, %f234, %f234;
+	div.rn.f32 	%f147, %f138, %f39;
+	sub.f32 	%f148, %f38, %f1;
+	sub.f32 	%f149, %f145, %f2;
+	sub.f32 	%f150, %f146, %f3;
+	fma.rn.f32 	%f151, %f147, %f148, %f26;
+	fma.rn.f32 	%f40, %f149, %f147, %f29;
+	fma.rn.f32 	%f41, %f147, %f150, %f30;
+	div.rn.f32 	%f42, %f139, %f234;
+	fma.rn.f32 	%f43, %f42, %f146, %f151;
+	add.s32 	%r23, %r2, 1;
+	@%p21 bra 	BB0_25;
+
+	rem.s32 	%r86, %r23, %r39;
+	add.s32 	%r87, %r86, %r39;
+	rem.s32 	%r125, %r87, %r39;
+	bra.uni 	BB0_26;
+
+BB0_25:
+	add.s32 	%r88, %r39, -1;
+	min.s32 	%r125, %r23, %r88;
+
+BB0_26:
+	add.s32 	%r89, %r125, %r4;
+	mad.lo.s32 	%r27, %r89, %r38, %r1;
+	setp.ge.s32	%p29, %r23, %r39;
+	mul.f32 	%f155, %f42, %f38;
+	sub.f32 	%f44, %f41, %f155;
+	mov.f32 	%f249, 0f00000000;
+	and.pred  	%p31, %p29, %p21;
+	mov.f32 	%f250, %f249;
+	mov.f32 	%f251, %f249;
+	@%p31 bra 	BB0_28;
+
+	mul.wide.s32 	%rd50, %r27, 4;
+	add.s64 	%rd51, %rd6, %rd50;
+	ld.global.nc.f32 	%f249, [%rd51];
+	add.s64 	%rd52, %rd5, %rd50;
+	ld.global.nc.f32 	%f250, [%rd52];
+	add.s64 	%rd53, %rd4, %rd50;
+	ld.global.nc.f32 	%f251, [%rd53];
+
+BB0_28:
+	mul.f32 	%f156, %f250, %f250;
+	fma.rn.f32 	%f157, %f249, %f249, %f156;
+	fma.rn.f32 	%f51, %f251, %f251, %f157;
+	setp.eq.f32	%p32, %f51, 0f00000000;
+	mov.u16 	%rs41, %rs1;
+	@%p32 bra 	BB0_30;
+
+	cvt.s64.s32	%rd54, %r27;
+	add.s64 	%rd55, %rd3, %rd54;
+	ld.global.nc.u8 	%rs41, [%rd55];
+
+BB0_30:
+	ld.param.f32 	%f235, [adddmibulk_param_12];
+	setp.gt.u16	%p33, %rs41, %rs1;
+	cvt.u32.u16	%r90, %rs41;
+	and.b32  	%r91, %r90, 255;
+	selp.b32	%r92, %r7, %r91, %p33;
+	selp.b32	%r93, %r91, %r7, %p33;
+	add.s32 	%r94, %r93, 1;
+	mul.lo.s32 	%r95, %r94, %r93;
+	shr.u32 	%r96, %r95, 1;
+	add.s32 	%r97, %r96, %r92;
+	mul.wide.s32 	%rd56, %r97, 4;
+	add.s64 	%rd57, %rd2, %rd56;
+	add.s64 	%rd58, %rd1, %rd56;
+	ld.global.nc.f32 	%f158, [%rd57];
+	add.f32 	%f159, %f158, %f158;
+	ld.global.nc.f32 	%f160, [%rd58];
+	div.rn.f32 	%f161, %f160, %f159;
+	mul.f32 	%f162, %f161, %f235;
+	fma.rn.f32 	%f163, %f3, %f162, %f1;
+	mul.f32 	%f164, %f1, %f162;
+	sub.f32 	%f165, %f3, %f164;
+	selp.f32	%f166, %f163, %f249, %p32;
+	selp.f32	%f167, %f2, %f250, %p32;
+	selp.f32	%f168, %f165, %f251, %p32;
+	div.rn.f32 	%f169, %f159, %f39;
+	sub.f32 	%f170, %f166, %f1;
+	sub.f32 	%f171, %f167, %f2;
+	sub.f32 	%f172, %f168, %f3;
+	fma.rn.f32 	%f173, %f169, %f170, %f43;
+	fma.rn.f32 	%f259, %f171, %f169, %f40;
+	fma.rn.f32 	%f174, %f169, %f172, %f44;
+	div.rn.f32 	%f175, %f160, %f235;
+	mul.f32 	%f176, %f175, %f168;
+	sub.f32 	%f258, %f173, %f176;
+	fma.rn.f32 	%f260, %f175, %f166, %f174;
+	setp.eq.s32	%p35, %r40, 1;
+	@%p35 bra 	BB0_46;
+
+	ld.param.u8 	%rs37, [adddmibulk_param_17];
+	and.b16  	%rs12, %rs37, 4;
+	setp.eq.s16	%p36, %rs12, 0;
+	add.s32 	%r28, %r3, -1;
+	@%p36 bra 	BB0_33;
+
+	rem.s32 	%r98, %r28, %r40;
+	add.s32 	%r99, %r98, %r40;
+	rem.s32 	%r126, %r99, %r40;
+	bra.uni 	BB0_34;
+
+BB0_33:
+	mov.u32 	%r100, 0;
+	max.s32 	%r126, %r28, %r100;
+
+BB0_34:
+	mad.lo.s32 	%r101, %r126, %r39, %r2;
+	mad.lo.s32 	%r32, %r101, %r38, %r1;
+	setp.lt.s32	%p38, %r28, 0;
+	mov.f32 	%f252, 0f00000000;
+	and.pred  	%p39, %p38, %p36;
+	mov.f32 	%f253, %f252;
+	mov.f32 	%f254, %f252;
+	@%p39 bra 	BB0_36;
+
+	mul.wide.s32 	%rd59, %r32, 4;
+	add.s64 	%rd60, %rd6, %rd59;
+	ld.global.nc.f32 	%f252, [%rd60];
+	add.s64 	%rd61, %rd5, %rd59;
+	ld.global.nc.f32 	%f253, [%rd61];
+	add.s64 	%rd62, %rd4, %rd59;
+	ld.global.nc.f32 	%f254, [%rd62];
+
+BB0_36:
+	mul.f32 	%f180, %f253, %f253;
+	fma.rn.f32 	%f181, %f252, %f252, %f180;
+	fma.rn.f32 	%f61, %f254, %f254, %f181;
+	setp.eq.f32	%p40, %f61, 0f00000000;
+	mov.u16 	%rs42, %rs1;
+	@%p40 bra 	BB0_38;
+
+	cvt.s64.s32	%rd63, %r32;
+	add.s64 	%rd64, %rd3, %rd63;
+	ld.global.nc.u8 	%rs42, [%rd64];
+
+BB0_38:
+	ld.param.f32 	%f236, [adddmibulk_param_13];
+	setp.gt.u16	%p41, %rs42, %rs1;
+	cvt.u32.u16	%r102, %rs42;
+	and.b32  	%r103, %r102, 255;
+	selp.b32	%r104, %r7, %r103, %p41;
+	selp.b32	%r105, %r103, %r7, %p41;
+	add.s32 	%r106, %r105, 1;
+	mul.lo.s32 	%r107, %r106, %r105;
+	shr.u32 	%r108, %r107, 1;
+	add.s32 	%r109, %r108, %r104;
+	mul.wide.s32 	%rd65, %r109, 4;
+	add.s64 	%rd66, %rd2, %rd65;
+	add.s64 	%rd67, %rd1, %rd65;
+	ld.global.nc.f32 	%f182, [%rd66];
+	add.f32 	%f183, %f182, %f182;
+	ld.global.nc.f32 	%f184, [%rd67];
+	div.rn.f32 	%f185, %f184, %f183;
+	mul.f32 	%f186, %f185, %f236;
+	fma.rn.f32 	%f187, %f2, %f186, %f1;
+	mul.f32 	%f188, %f1, %f186;
+	sub.f32 	%f189, %f2, %f188;
+	selp.f32	%f190, %f187, %f252, %p40;
+	selp.f32	%f191, %f189, %f253, %p40;
+	selp.f32	%f192, %f3, %f254, %p40;
+	mul.f32 	%f62, %f236, %f236;
+	div.rn.f32 	%f193, %f183, %f62;
+	sub.f32 	%f194, %f190, %f1;
+	sub.f32 	%f195, %f191, %f2;
+	sub.f32 	%f196, %f192, %f3;
+	fma.rn.f32 	%f197, %f193, %f194, %f258;
+	fma.rn.f32 	%f198, %f193, %f195, %f259;
+	fma.rn.f32 	%f63, %f196, %f193, %f260;
+	div.rn.f32 	%f199, %f184, %f236;
+	mul.f32 	%f200, %f199, %f191;
+	sub.f32 	%f64, %f197, %f200;
+	fma.rn.f32 	%f65, %f199, %f190, %f198;
+	add.s32 	%r33, %r3, 1;
+	@%p36 bra 	BB0_40;
+
+	rem.s32 	%r110, %r33, %r40;
+	add.s32 	%r111, %r110, %r40;
+	rem.s32 	%r127, %r111, %r40;
+	bra.uni 	BB0_41;
+
+BB0_40:
+	add.s32 	%r112, %r40, -1;
+	min.s32 	%r127, %r33, %r112;
+
+BB0_41:
+	mad.lo.s32 	%r113, %r127, %r39, %r2;
+	mad.lo.s32 	%r37, %r113, %r38, %r1;
+	setp.ge.s32	%p44, %r33, %r40;
+	mov.f32 	%f255, 0f00000000;
+	and.pred  	%p46, %p44, %p36;
+	mov.f32 	%f256, %f255;
+	mov.f32 	%f257, %f255;
+	@%p46 bra 	BB0_43;
+
+	mul.wide.s32 	%rd68, %r37, 4;
+	add.s64 	%rd69, %rd6, %rd68;
+	ld.global.nc.f32 	%f257, [%rd69];
+	add.s64 	%rd70, %rd5, %rd68;
+	ld.global.nc.f32 	%f256, [%rd70];
+	add.s64 	%rd71, %rd4, %rd68;
+	ld.global.nc.f32 	%f255, [%rd71];
+
+BB0_43:
+	mul.f32 	%f204, %f257, %f257;
+	fma.rn.f32 	%f205, %f256, %f256, %f204;
+	fma.rn.f32 	%f72, %f255, %f255, %f205;
+	setp.eq.f32	%p47, %f72, 0f00000000;
+	mov.u16 	%rs43, %rs1;
+	@%p47 bra 	BB0_45;
+
+	cvt.s64.s32	%rd72, %r37;
+	add.s64 	%rd73, %rd3, %rd72;
+	ld.global.nc.u8 	%rs43, [%rd73];
+
+BB0_45:
+	ld.param.f32 	%f237, [adddmibulk_param_13];
+	setp.gt.u16	%p48, %rs43, %rs1;
+	cvt.u32.u16	%r114, %rs43;
+	and.b32  	%r115, %r114, 255;
+	selp.b32	%r116, %r7, %r115, %p48;
+	selp.b32	%r117, %r115, %r7, %p48;
+	add.s32 	%r118, %r117, 1;
+	mul.lo.s32 	%r119, %r118, %r117;
+	shr.u32 	%r120, %r119, 1;
+	add.s32 	%r121, %r120, %r116;
+	mul.wide.s32 	%rd74, %r121, 4;
+	add.s64 	%rd75, %rd2, %rd74;
+	add.s64 	%rd76, %rd1, %rd74;
+	ld.global.nc.f32 	%f206, [%rd75];
+	add.f32 	%f207, %f206, %f206;
+	ld.global.nc.f32 	%f208, [%rd76];
+	div.rn.f32 	%f209, %f208, %f207;
+	mul.f32 	%f210, %f209, %f237;
+	mul.f32 	%f211, %f2, %f210;
+	sub.f32 	%f212, %f1, %f211;
+	fma.rn.f32 	%f213, %f1, %f210, %f2;
+	selp.f32	%f214, %f3, %f255, %p47;
+	selp.f32	%f215, %f213, %f256, %p47;
+	selp.f32	%f216, %f212, %f257, %p47;
+	div.rn.f32 	%f217, %f207, %f62;
+	sub.f32 	%f218, %f216, %f1;
+	sub.f32 	%f219, %f215, %f2;
+	sub.f32 	%f220, %f214, %f3;
+	fma.rn.f32 	%f221, %f217, %f218, %f64;
+	fma.rn.f32 	%f222, %f217, %f219, %f65;
+	fma.rn.f32 	%f260, %f220, %f217, %f63;
+	div.rn.f32 	%f223, %f208, %f237;
+	fma.rn.f32 	%f258, %f223, %f215, %f221;
+	mul.f32 	%f224, %f223, %f216;
+	sub.f32 	%f259, %f222, %f224;
+
+BB0_46:
+	ld.param.f32 	%f261, [adddmibulk_param_7];
+	setp.eq.s64	%p50, %rd10, 0;
+	@%p50 bra 	BB0_48;
+
+	ld.param.f32 	%f239, [adddmibulk_param_7];
+	cvta.to.global.u64 	%rd77, %rd10;
+	add.s64 	%rd79, %rd77, %rd17;
+	ld.global.nc.f32 	%f225, [%rd79];
+	mul.f32 	%f261, %f225, %f239;
+
+BB0_48:
+	setp.eq.f32	%p51, %f261, 0f00000000;
+	mov.f32 	%f262, 0f00000000;
+	@%p51 bra 	BB0_50;
+
+	rcp.rn.f32 	%f262, %f261;
+
+BB0_50:
+	cvta.to.global.u64 	%rd80, %rd9;
+	cvta.to.global.u64 	%rd81, %rd8;
+	cvta.to.global.u64 	%rd82, %rd7;
+	add.s64 	%rd84, %rd82, %rd17;
+	ld.global.f32 	%f227, [%rd84];
+	fma.rn.f32 	%f228, %f258, %f262, %f227;
+	st.global.f32 	[%rd84], %f228;
+	add.s64 	%rd85, %rd81, %rd17;
+	ld.global.f32 	%f229, [%rd85];
+	fma.rn.f32 	%f230, %f259, %f262, %f229;
+	st.global.f32 	[%rd85], %f230;
+	add.s64 	%rd86, %rd80, %rd17;
+	ld.global.f32 	%f231, [%rd86];
+	fma.rn.f32 	%f232, %f260, %f262, %f231;
+	st.global.f32 	[%rd86], %f232;
+
+BB0_51:
+	ret;
+}
+
+
+`
+ )

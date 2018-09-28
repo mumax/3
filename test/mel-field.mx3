@@ -1,0 +1,50 @@
+Nx := 1
+Ny := 1
+Nz := 1
+
+csX := 0.5e-9
+csY := 1e-9
+csZ := 2e-9
+
+setgridsize(Nx, Ny, Nz)
+setcellsize(csX, csY, csZ)
+
+Msat = rand()
+
+B1 = rand()
+B2 = rand()
+
+enabledemag = false
+
+m = uniform(rand(), rand(), rand())
+
+exxpr := rand()
+eyypr := rand()
+ezzpr := rand()
+exypr := rand()
+exzpr := rand()
+eyzpr := rand()
+
+exx = exxpr
+eyy = eyypr
+ezz = ezzpr
+exy = exypr
+exz = exzpr
+eyz = eyzpr
+
+pre1 := 2.0 * B1.average() / Msat.average()
+pre2 := B2.average() / Msat.average()
+
+hmel := B_mel.average()
+
+mx := m.average()[0]
+my := m.average()[1]
+mz := m.average()[2]
+
+hmelrefx := -(pre1*mx*exx.average() + pre2*(my*exy.average()+mz*exz.average()))
+hmelrefy := -(pre1*my*eyy.average() + pre2*(mx*exy.average()+mz*eyz.average()))
+hmelrefz := -(pre1*mz*ezz.average() + pre2*(mx*exz.average()+my*eyz.average()))
+
+expect("(ΔB_mel).x", hmelrefx-hmel[0], 0.0, 7e-8)
+expect("(ΔB_mel).y", hmelrefy-hmel[1], 0.0, 4.5e-7)
+expect("(ΔB_mel).z", hmelrefz-hmel[2], 0.0, 1.5e-6)

@@ -7,13 +7,14 @@ like material parameters.
 
 import (
 	"fmt"
+	"math"
+	"reflect"
+	"strings"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/util"
-	"math"
-	"reflect"
-	"strings"
 )
 
 // input parameter, settable by user
@@ -225,14 +226,18 @@ type RegionwiseScalar struct {
 
 func (p *RegionwiseScalar) init(name, unit, desc string, children []derived) {
 	p.regionwise.init(SCALAR, name, unit, children)
-	DeclLValue(name, p, cat(desc, unit))
+	if !strings.HasPrefix(name, "_") { // don't export names beginning with "_" (e.g. from exciation)
+		DeclLValue(name, p, cat(desc, unit))
+	}
 }
 
 // TODO: auto derived
 func NewScalarParam(name, unit, desc string, children ...derived) *RegionwiseScalar {
 	p := new(RegionwiseScalar)
 	p.regionwise.init(SCALAR, name, unit, children)
-	DeclLValue(name, p, cat(desc, unit))
+	if !strings.HasPrefix(name, "_") { // don't export names beginning with "_" (e.g. from exciation)
+		DeclLValue(name, p, cat(desc, unit))
+	}
 	return p
 }
 

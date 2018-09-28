@@ -1,0 +1,57 @@
+/*
+        Test if the canting at the end of a nanowire corresponds to the 1D analytical
+        result if open boundary conditions are used. This test is similar to the
+        standard test proposed in arXiv:1803.11174
+
+        If the nanowire consists only out of one row of cells, the analytical canting
+        matches with the simulated canting if open (or periodic) boundary conditions are
+        used. The Neumann BC yields a different canting.
+
+        This does not mean that Neumann BC are wrong. To be more precise, the analytical
+        result, as well as the numerical results obtained with open and Neumann BC are
+        slightly wrong because the width of the nanowire is not taken into account
+        properly.
+*/
+
+nx := 512
+cs := 0.1
+setgridsize(nx,1,1)
+setcellsize(cs,cs,cs)
+
+DMI := 0.9 *4/pi // 90% of critical DMI strength
+Dind = DMI
+enabledemag = false
+AnisU = vector(0,0,1)
+Aex = 1.
+Ku1 = 1.
+Msat = 1.
+
+m = uniform(0,0,1)
+
+// ANALYTIC
+theta0 := asin(DMI/2)
+cant_analytic := 2*atan(exp(-cs/2)*tan(theta0/2)) // shift towards center of the cell
+
+// NEUMANN BC
+openbc = false
+minimize()
+cant_neumann := atan2( m.getcell(0,0,0)[0], m.getcell(0,0,0)[2] )
+
+// OPEN BC
+openbc = true
+minimize()
+cant_open := atan2( m.getcell(0,0,0)[0], m.getcell(0,0,0)[2] )
+
+// PERIODIC BC
+openbc = false
+setpbc(0,1,0)
+minimize()
+cant_periodic := atan2( m.getcell(0,0,0)[0], m.getcell(0,0,0)[2] )
+
+expect("edge canting", cant_open, cant_analytic, 0.01)
+
+//print(cant_neumann)
+//print(cant_open)
+//print(cant_periodic)
+//print(cant_analytic)
+

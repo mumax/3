@@ -13,10 +13,11 @@
         properly.
 */
 
-nx := 512
-cs := 0.1
-setgridsize(nx,1,1)
-setcellsize(cs,cs,cs)
+
+ncell := 1024
+cs := 0.05
+
+verbose := false
 
 DMI := 0.9 *4/pi // 90% of critical DMI strength
 Dind = DMI
@@ -25,6 +26,12 @@ AnisU = vector(0,0,1)
 Aex = 1.
 Ku1 = 1.
 Msat = 1.
+minimizerstop = 1e-7
+
+// --- Along the x direction --------------------------------------------------------
+
+setgridsize(ncell,1,1)
+setcellsize(cs,cs,cs)
 
 m = uniform(0,0,1)
 
@@ -48,10 +55,50 @@ setpbc(0,1,0)
 minimize()
 cant_periodic := atan2( m.getcell(0,0,0)[0], m.getcell(0,0,0)[2] )
 
-expect("edge canting", cant_open, cant_analytic, 0.01)
+if verbose {
+    print("Neumann:  ", cant_neumann)
+    print("Open:     ", cant_open)
+    print("Periodic: ", cant_periodic)
+    print("Analytic: ", cant_analytic)
+}
 
-//print(cant_neumann)
-//print(cant_open)
-//print(cant_periodic)
-//print(cant_analytic)
+expect("edge canting", cant_open, cant_analytic, 1e-3)
+expect("edge canting", cant_open, cant_periodic, 1e-5)
 
+// --- Along the y direction --------------------------------------------------------
+
+setgridsize(1,ncell,1)
+setcellsize(cs,cs,cs)
+setpbc(0,0,0)
+
+m = uniform(0,0,1)
+
+// ANALYTIC
+theta0 = asin(DMI/2)
+cant_analytic = 2*atan(exp(-cs/2)*tan(theta0/2)) // shift towards center of the cell
+
+// NEUMANN BC
+openbc = false
+minimize()
+cant_neumann = atan2( m.getcell(0,0,0)[1], m.getcell(0,0,0)[2] )
+
+// OPEN BC
+openbc = true
+minimize()
+cant_open = atan2( m.getcell(0,0,0)[1], m.getcell(0,0,0)[2] )
+
+// PERIODIC BC
+openbc = false
+setpbc(1,0,0)
+minimize()
+cant_periodic = atan2( m.getcell(0,0,0)[1], m.getcell(0,0,0)[2] )
+
+if verbose {
+    print("Neumann:  ", cant_neumann)
+    print("Open:     ", cant_open)
+    print("Periodic: ", cant_periodic)
+    print("Analytic: ", cant_analytic)
+}
+
+expect("edge canting", cant_open, cant_analytic, 1e-3)
+expect("edge canting", cant_open, cant_periodic, 1e-5)

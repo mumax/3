@@ -85,7 +85,7 @@ const templText = `
 
 {{.Data.Div "console"}}
 
-{{.Console "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
+{{.Console "console" 16 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
 {{.CliBox "cli" "" "onkeydown=\"clikeydown(event);\"" "placeholder=\"type commands here, or up/down\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
 

@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for regionadds kernel
 var regionadds_code cu.Function
 
 // Stores the arguments for regionadds kernel invocation
-type regionadds_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_LUT unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_N int
-	 argptr [4]unsafe.Pointer
+type regionadds_args_t struct {
+	arg_dst     unsafe.Pointer
+	arg_LUT     unsafe.Pointer
+	arg_regions unsafe.Pointer
+	arg_N       int
+	argptr      [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for regionadds kernel invocation
 var regionadds_args regionadds_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 regionadds_args.argptr[0] = unsafe.Pointer(&regionadds_args.arg_dst)
-	 regionadds_args.argptr[1] = unsafe.Pointer(&regionadds_args.arg_LUT)
-	 regionadds_args.argptr[2] = unsafe.Pointer(&regionadds_args.arg_regions)
-	 regionadds_args.argptr[3] = unsafe.Pointer(&regionadds_args.arg_N)
-	 }
+	regionadds_args.argptr[0] = unsafe.Pointer(&regionadds_args.arg_dst)
+	regionadds_args.argptr[1] = unsafe.Pointer(&regionadds_args.arg_LUT)
+	regionadds_args.argptr[2] = unsafe.Pointer(&regionadds_args.arg_regions)
+	regionadds_args.argptr[3] = unsafe.Pointer(&regionadds_args.arg_N)
+}
 
 // Wrapper for regionadds CUDA kernel, asynchronous.
-func k_regionadds_async ( dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_regionadds_async(dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("regionadds")
 	}
@@ -46,41 +46,40 @@ func k_regionadds_async ( dst unsafe.Pointer, LUT unsafe.Pointer, regions unsafe
 	regionadds_args.Lock()
 	defer regionadds_args.Unlock()
 
-	if regionadds_code == 0{
+	if regionadds_code == 0 {
 		regionadds_code = fatbinLoad(regionadds_map, "regionadds")
 	}
 
-	 regionadds_args.arg_dst = dst
-	 regionadds_args.arg_LUT = LUT
-	 regionadds_args.arg_regions = regions
-	 regionadds_args.arg_N = N
-	
+	regionadds_args.arg_dst = dst
+	regionadds_args.arg_LUT = LUT
+	regionadds_args.arg_regions = regions
+	regionadds_args.arg_N = N
 
 	args := regionadds_args.argptr[:]
 	cu.LaunchKernel(regionadds_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("regionadds")
 	}
 }
 
 // maps compute capability on PTX code for regionadds kernel.
-var regionadds_map = map[int]string{ 0: "" ,
-30: regionadds_ptx_30 ,
-35: regionadds_ptx_35 ,
-37: regionadds_ptx_37 ,
-50: regionadds_ptx_50 ,
-52: regionadds_ptx_52 ,
-53: regionadds_ptx_53 ,
-60: regionadds_ptx_60 ,
-61: regionadds_ptx_61 ,
-70: regionadds_ptx_70 ,
-75: regionadds_ptx_75  }
+var regionadds_map = map[int]string{0: "",
+	30: regionadds_ptx_30,
+	35: regionadds_ptx_35,
+	37: regionadds_ptx_37,
+	50: regionadds_ptx_50,
+	52: regionadds_ptx_52,
+	53: regionadds_ptx_53,
+	60: regionadds_ptx_60,
+	61: regionadds_ptx_61,
+	70: regionadds_ptx_70,
+	75: regionadds_ptx_75}
 
 // regionadds PTX code for various compute capabilities.
-const(
-  regionadds_ptx_30 = `
+const (
+	regionadds_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -135,7 +134,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_35 = `
+	regionadds_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -193,7 +192,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_37 = `
+	regionadds_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -251,7 +250,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_50 = `
+	regionadds_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -309,7 +308,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_52 = `
+	regionadds_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -367,7 +366,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_53 = `
+	regionadds_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -425,7 +424,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_60 = `
+	regionadds_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -483,7 +482,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_61 = `
+	regionadds_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -541,7 +540,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_70 = `
+	regionadds_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -599,7 +598,7 @@ BB0_2:
 
 
 `
-   regionadds_ptx_75 = `
+	regionadds_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -657,4 +656,4 @@ BB0_2:
 
 
 `
- )
+)

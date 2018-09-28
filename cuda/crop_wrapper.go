@@ -5,54 +5,54 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for crop kernel
 var crop_code cu.Function
 
 // Stores the arguments for crop kernel invocation
-type crop_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_Dx int
-	 arg_Dy int
-	 arg_Dz int
-	 arg_src unsafe.Pointer
-	 arg_Sx int
-	 arg_Sy int
-	 arg_Sz int
-	 arg_Offx int
-	 arg_Offy int
-	 arg_Offz int
-	 argptr [11]unsafe.Pointer
+type crop_args_t struct {
+	arg_dst  unsafe.Pointer
+	arg_Dx   int
+	arg_Dy   int
+	arg_Dz   int
+	arg_src  unsafe.Pointer
+	arg_Sx   int
+	arg_Sy   int
+	arg_Sz   int
+	arg_Offx int
+	arg_Offy int
+	arg_Offz int
+	argptr   [11]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for crop kernel invocation
 var crop_args crop_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 crop_args.argptr[0] = unsafe.Pointer(&crop_args.arg_dst)
-	 crop_args.argptr[1] = unsafe.Pointer(&crop_args.arg_Dx)
-	 crop_args.argptr[2] = unsafe.Pointer(&crop_args.arg_Dy)
-	 crop_args.argptr[3] = unsafe.Pointer(&crop_args.arg_Dz)
-	 crop_args.argptr[4] = unsafe.Pointer(&crop_args.arg_src)
-	 crop_args.argptr[5] = unsafe.Pointer(&crop_args.arg_Sx)
-	 crop_args.argptr[6] = unsafe.Pointer(&crop_args.arg_Sy)
-	 crop_args.argptr[7] = unsafe.Pointer(&crop_args.arg_Sz)
-	 crop_args.argptr[8] = unsafe.Pointer(&crop_args.arg_Offx)
-	 crop_args.argptr[9] = unsafe.Pointer(&crop_args.arg_Offy)
-	 crop_args.argptr[10] = unsafe.Pointer(&crop_args.arg_Offz)
-	 }
+	crop_args.argptr[0] = unsafe.Pointer(&crop_args.arg_dst)
+	crop_args.argptr[1] = unsafe.Pointer(&crop_args.arg_Dx)
+	crop_args.argptr[2] = unsafe.Pointer(&crop_args.arg_Dy)
+	crop_args.argptr[3] = unsafe.Pointer(&crop_args.arg_Dz)
+	crop_args.argptr[4] = unsafe.Pointer(&crop_args.arg_src)
+	crop_args.argptr[5] = unsafe.Pointer(&crop_args.arg_Sx)
+	crop_args.argptr[6] = unsafe.Pointer(&crop_args.arg_Sy)
+	crop_args.argptr[7] = unsafe.Pointer(&crop_args.arg_Sz)
+	crop_args.argptr[8] = unsafe.Pointer(&crop_args.arg_Offx)
+	crop_args.argptr[9] = unsafe.Pointer(&crop_args.arg_Offy)
+	crop_args.argptr[10] = unsafe.Pointer(&crop_args.arg_Offz)
+}
 
 // Wrapper for crop CUDA kernel, asynchronous.
-func k_crop_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Offx int, Offy int, Offz int,  cfg *config) {
-	if Synchronous{ // debug
+func k_crop_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Offx int, Offy int, Offz int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("crop")
 	}
@@ -60,48 +60,47 @@ func k_crop_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Point
 	crop_args.Lock()
 	defer crop_args.Unlock()
 
-	if crop_code == 0{
+	if crop_code == 0 {
 		crop_code = fatbinLoad(crop_map, "crop")
 	}
 
-	 crop_args.arg_dst = dst
-	 crop_args.arg_Dx = Dx
-	 crop_args.arg_Dy = Dy
-	 crop_args.arg_Dz = Dz
-	 crop_args.arg_src = src
-	 crop_args.arg_Sx = Sx
-	 crop_args.arg_Sy = Sy
-	 crop_args.arg_Sz = Sz
-	 crop_args.arg_Offx = Offx
-	 crop_args.arg_Offy = Offy
-	 crop_args.arg_Offz = Offz
-	
+	crop_args.arg_dst = dst
+	crop_args.arg_Dx = Dx
+	crop_args.arg_Dy = Dy
+	crop_args.arg_Dz = Dz
+	crop_args.arg_src = src
+	crop_args.arg_Sx = Sx
+	crop_args.arg_Sy = Sy
+	crop_args.arg_Sz = Sz
+	crop_args.arg_Offx = Offx
+	crop_args.arg_Offy = Offy
+	crop_args.arg_Offz = Offz
 
 	args := crop_args.argptr[:]
 	cu.LaunchKernel(crop_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("crop")
 	}
 }
 
 // maps compute capability on PTX code for crop kernel.
-var crop_map = map[int]string{ 0: "" ,
-30: crop_ptx_30 ,
-35: crop_ptx_35 ,
-37: crop_ptx_37 ,
-50: crop_ptx_50 ,
-52: crop_ptx_52 ,
-53: crop_ptx_53 ,
-60: crop_ptx_60 ,
-61: crop_ptx_61 ,
-70: crop_ptx_70 ,
-75: crop_ptx_75  }
+var crop_map = map[int]string{0: "",
+	30: crop_ptx_30,
+	35: crop_ptx_35,
+	37: crop_ptx_37,
+	50: crop_ptx_50,
+	52: crop_ptx_52,
+	53: crop_ptx_53,
+	60: crop_ptx_60,
+	61: crop_ptx_61,
+	70: crop_ptx_70,
+	75: crop_ptx_75}
 
 // crop PTX code for various compute capabilities.
-const(
-  crop_ptx_30 = `
+const (
+	crop_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -181,7 +180,7 @@ BB0_2:
 
 
 `
-   crop_ptx_35 = `
+	crop_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -261,7 +260,7 @@ BB0_2:
 
 
 `
-   crop_ptx_37 = `
+	crop_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -341,7 +340,7 @@ BB0_2:
 
 
 `
-   crop_ptx_50 = `
+	crop_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -421,7 +420,7 @@ BB0_2:
 
 
 `
-   crop_ptx_52 = `
+	crop_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -501,7 +500,7 @@ BB0_2:
 
 
 `
-   crop_ptx_53 = `
+	crop_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -581,7 +580,7 @@ BB0_2:
 
 
 `
-   crop_ptx_60 = `
+	crop_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -661,7 +660,7 @@ BB0_2:
 
 
 `
-   crop_ptx_61 = `
+	crop_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -741,7 +740,7 @@ BB0_2:
 
 
 `
-   crop_ptx_70 = `
+	crop_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -821,7 +820,7 @@ BB0_2:
 
 
 `
-   crop_ptx_75 = `
+	crop_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -901,4 +900,4 @@ BB0_2:
 
 
 `
- )
+)

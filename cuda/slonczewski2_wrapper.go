@@ -5,86 +5,86 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for addslonczewskitorque2 kernel
 var addslonczewskitorque2_code cu.Function
 
 // Stores the arguments for addslonczewskitorque2 kernel invocation
-type addslonczewskitorque2_args_t struct{
-	 arg_tx unsafe.Pointer
-	 arg_ty unsafe.Pointer
-	 arg_tz unsafe.Pointer
-	 arg_mx unsafe.Pointer
-	 arg_my unsafe.Pointer
-	 arg_mz unsafe.Pointer
-	 arg_Ms_ unsafe.Pointer
-	 arg_Ms_mul float32
-	 arg_jz_ unsafe.Pointer
-	 arg_jz_mul float32
-	 arg_px_ unsafe.Pointer
-	 arg_px_mul float32
-	 arg_py_ unsafe.Pointer
-	 arg_py_mul float32
-	 arg_pz_ unsafe.Pointer
-	 arg_pz_mul float32
-	 arg_alpha_ unsafe.Pointer
-	 arg_alpha_mul float32
-	 arg_pol_ unsafe.Pointer
-	 arg_pol_mul float32
-	 arg_lambda_ unsafe.Pointer
-	 arg_lambda_mul float32
-	 arg_epsPrime_ unsafe.Pointer
-	 arg_epsPrime_mul float32
-	 arg_flt_ unsafe.Pointer
-	 arg_flt_mul float32
-	 arg_N int
-	 argptr [27]unsafe.Pointer
+type addslonczewskitorque2_args_t struct {
+	arg_tx           unsafe.Pointer
+	arg_ty           unsafe.Pointer
+	arg_tz           unsafe.Pointer
+	arg_mx           unsafe.Pointer
+	arg_my           unsafe.Pointer
+	arg_mz           unsafe.Pointer
+	arg_Ms_          unsafe.Pointer
+	arg_Ms_mul       float32
+	arg_jz_          unsafe.Pointer
+	arg_jz_mul       float32
+	arg_px_          unsafe.Pointer
+	arg_px_mul       float32
+	arg_py_          unsafe.Pointer
+	arg_py_mul       float32
+	arg_pz_          unsafe.Pointer
+	arg_pz_mul       float32
+	arg_alpha_       unsafe.Pointer
+	arg_alpha_mul    float32
+	arg_pol_         unsafe.Pointer
+	arg_pol_mul      float32
+	arg_lambda_      unsafe.Pointer
+	arg_lambda_mul   float32
+	arg_epsPrime_    unsafe.Pointer
+	arg_epsPrime_mul float32
+	arg_flt_         unsafe.Pointer
+	arg_flt_mul      float32
+	arg_N            int
+	argptr           [27]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for addslonczewskitorque2 kernel invocation
 var addslonczewskitorque2_args addslonczewskitorque2_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 addslonczewskitorque2_args.argptr[0] = unsafe.Pointer(&addslonczewskitorque2_args.arg_tx)
-	 addslonczewskitorque2_args.argptr[1] = unsafe.Pointer(&addslonczewskitorque2_args.arg_ty)
-	 addslonczewskitorque2_args.argptr[2] = unsafe.Pointer(&addslonczewskitorque2_args.arg_tz)
-	 addslonczewskitorque2_args.argptr[3] = unsafe.Pointer(&addslonczewskitorque2_args.arg_mx)
-	 addslonczewskitorque2_args.argptr[4] = unsafe.Pointer(&addslonczewskitorque2_args.arg_my)
-	 addslonczewskitorque2_args.argptr[5] = unsafe.Pointer(&addslonczewskitorque2_args.arg_mz)
-	 addslonczewskitorque2_args.argptr[6] = unsafe.Pointer(&addslonczewskitorque2_args.arg_Ms_)
-	 addslonczewskitorque2_args.argptr[7] = unsafe.Pointer(&addslonczewskitorque2_args.arg_Ms_mul)
-	 addslonczewskitorque2_args.argptr[8] = unsafe.Pointer(&addslonczewskitorque2_args.arg_jz_)
-	 addslonczewskitorque2_args.argptr[9] = unsafe.Pointer(&addslonczewskitorque2_args.arg_jz_mul)
-	 addslonczewskitorque2_args.argptr[10] = unsafe.Pointer(&addslonczewskitorque2_args.arg_px_)
-	 addslonczewskitorque2_args.argptr[11] = unsafe.Pointer(&addslonczewskitorque2_args.arg_px_mul)
-	 addslonczewskitorque2_args.argptr[12] = unsafe.Pointer(&addslonczewskitorque2_args.arg_py_)
-	 addslonczewskitorque2_args.argptr[13] = unsafe.Pointer(&addslonczewskitorque2_args.arg_py_mul)
-	 addslonczewskitorque2_args.argptr[14] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pz_)
-	 addslonczewskitorque2_args.argptr[15] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pz_mul)
-	 addslonczewskitorque2_args.argptr[16] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_)
-	 addslonczewskitorque2_args.argptr[17] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_mul)
-	 addslonczewskitorque2_args.argptr[18] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_)
-	 addslonczewskitorque2_args.argptr[19] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_mul)
-	 addslonczewskitorque2_args.argptr[20] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_)
-	 addslonczewskitorque2_args.argptr[21] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_mul)
-	 addslonczewskitorque2_args.argptr[22] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_)
-	 addslonczewskitorque2_args.argptr[23] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_mul)
-	 addslonczewskitorque2_args.argptr[24] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_)
-	 addslonczewskitorque2_args.argptr[25] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_mul)
-	 addslonczewskitorque2_args.argptr[26] = unsafe.Pointer(&addslonczewskitorque2_args.arg_N)
-	 }
+	addslonczewskitorque2_args.argptr[0] = unsafe.Pointer(&addslonczewskitorque2_args.arg_tx)
+	addslonczewskitorque2_args.argptr[1] = unsafe.Pointer(&addslonczewskitorque2_args.arg_ty)
+	addslonczewskitorque2_args.argptr[2] = unsafe.Pointer(&addslonczewskitorque2_args.arg_tz)
+	addslonczewskitorque2_args.argptr[3] = unsafe.Pointer(&addslonczewskitorque2_args.arg_mx)
+	addslonczewskitorque2_args.argptr[4] = unsafe.Pointer(&addslonczewskitorque2_args.arg_my)
+	addslonczewskitorque2_args.argptr[5] = unsafe.Pointer(&addslonczewskitorque2_args.arg_mz)
+	addslonczewskitorque2_args.argptr[6] = unsafe.Pointer(&addslonczewskitorque2_args.arg_Ms_)
+	addslonczewskitorque2_args.argptr[7] = unsafe.Pointer(&addslonczewskitorque2_args.arg_Ms_mul)
+	addslonczewskitorque2_args.argptr[8] = unsafe.Pointer(&addslonczewskitorque2_args.arg_jz_)
+	addslonczewskitorque2_args.argptr[9] = unsafe.Pointer(&addslonczewskitorque2_args.arg_jz_mul)
+	addslonczewskitorque2_args.argptr[10] = unsafe.Pointer(&addslonczewskitorque2_args.arg_px_)
+	addslonczewskitorque2_args.argptr[11] = unsafe.Pointer(&addslonczewskitorque2_args.arg_px_mul)
+	addslonczewskitorque2_args.argptr[12] = unsafe.Pointer(&addslonczewskitorque2_args.arg_py_)
+	addslonczewskitorque2_args.argptr[13] = unsafe.Pointer(&addslonczewskitorque2_args.arg_py_mul)
+	addslonczewskitorque2_args.argptr[14] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pz_)
+	addslonczewskitorque2_args.argptr[15] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pz_mul)
+	addslonczewskitorque2_args.argptr[16] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_)
+	addslonczewskitorque2_args.argptr[17] = unsafe.Pointer(&addslonczewskitorque2_args.arg_alpha_mul)
+	addslonczewskitorque2_args.argptr[18] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_)
+	addslonczewskitorque2_args.argptr[19] = unsafe.Pointer(&addslonczewskitorque2_args.arg_pol_mul)
+	addslonczewskitorque2_args.argptr[20] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_)
+	addslonczewskitorque2_args.argptr[21] = unsafe.Pointer(&addslonczewskitorque2_args.arg_lambda_mul)
+	addslonczewskitorque2_args.argptr[22] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_)
+	addslonczewskitorque2_args.argptr[23] = unsafe.Pointer(&addslonczewskitorque2_args.arg_epsPrime_mul)
+	addslonczewskitorque2_args.argptr[24] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_)
+	addslonczewskitorque2_args.argptr[25] = unsafe.Pointer(&addslonczewskitorque2_args.arg_flt_mul)
+	addslonczewskitorque2_args.argptr[26] = unsafe.Pointer(&addslonczewskitorque2_args.arg_N)
+}
 
 // Wrapper for addslonczewskitorque2 CUDA kernel, asynchronous.
-func k_addslonczewskitorque2_async ( tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, jz_ unsafe.Pointer, jz_mul float32, px_ unsafe.Pointer, px_mul float32, py_ unsafe.Pointer, py_mul float32, pz_ unsafe.Pointer, pz_mul float32, alpha_ unsafe.Pointer, alpha_mul float32, pol_ unsafe.Pointer, pol_mul float32, lambda_ unsafe.Pointer, lambda_mul float32, epsPrime_ unsafe.Pointer, epsPrime_mul float32, flt_ unsafe.Pointer, flt_mul float32, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_addslonczewskitorque2_async(tx unsafe.Pointer, ty unsafe.Pointer, tz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, jz_ unsafe.Pointer, jz_mul float32, px_ unsafe.Pointer, px_mul float32, py_ unsafe.Pointer, py_mul float32, pz_ unsafe.Pointer, pz_mul float32, alpha_ unsafe.Pointer, alpha_mul float32, pol_ unsafe.Pointer, pol_mul float32, lambda_ unsafe.Pointer, lambda_mul float32, epsPrime_ unsafe.Pointer, epsPrime_mul float32, flt_ unsafe.Pointer, flt_mul float32, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("addslonczewskitorque2")
 	}
@@ -92,64 +92,63 @@ func k_addslonczewskitorque2_async ( tx unsafe.Pointer, ty unsafe.Pointer, tz un
 	addslonczewskitorque2_args.Lock()
 	defer addslonczewskitorque2_args.Unlock()
 
-	if addslonczewskitorque2_code == 0{
+	if addslonczewskitorque2_code == 0 {
 		addslonczewskitorque2_code = fatbinLoad(addslonczewskitorque2_map, "addslonczewskitorque2")
 	}
 
-	 addslonczewskitorque2_args.arg_tx = tx
-	 addslonczewskitorque2_args.arg_ty = ty
-	 addslonczewskitorque2_args.arg_tz = tz
-	 addslonczewskitorque2_args.arg_mx = mx
-	 addslonczewskitorque2_args.arg_my = my
-	 addslonczewskitorque2_args.arg_mz = mz
-	 addslonczewskitorque2_args.arg_Ms_ = Ms_
-	 addslonczewskitorque2_args.arg_Ms_mul = Ms_mul
-	 addslonczewskitorque2_args.arg_jz_ = jz_
-	 addslonczewskitorque2_args.arg_jz_mul = jz_mul
-	 addslonczewskitorque2_args.arg_px_ = px_
-	 addslonczewskitorque2_args.arg_px_mul = px_mul
-	 addslonczewskitorque2_args.arg_py_ = py_
-	 addslonczewskitorque2_args.arg_py_mul = py_mul
-	 addslonczewskitorque2_args.arg_pz_ = pz_
-	 addslonczewskitorque2_args.arg_pz_mul = pz_mul
-	 addslonczewskitorque2_args.arg_alpha_ = alpha_
-	 addslonczewskitorque2_args.arg_alpha_mul = alpha_mul
-	 addslonczewskitorque2_args.arg_pol_ = pol_
-	 addslonczewskitorque2_args.arg_pol_mul = pol_mul
-	 addslonczewskitorque2_args.arg_lambda_ = lambda_
-	 addslonczewskitorque2_args.arg_lambda_mul = lambda_mul
-	 addslonczewskitorque2_args.arg_epsPrime_ = epsPrime_
-	 addslonczewskitorque2_args.arg_epsPrime_mul = epsPrime_mul
-	 addslonczewskitorque2_args.arg_flt_ = flt_
-	 addslonczewskitorque2_args.arg_flt_mul = flt_mul
-	 addslonczewskitorque2_args.arg_N = N
-	
+	addslonczewskitorque2_args.arg_tx = tx
+	addslonczewskitorque2_args.arg_ty = ty
+	addslonczewskitorque2_args.arg_tz = tz
+	addslonczewskitorque2_args.arg_mx = mx
+	addslonczewskitorque2_args.arg_my = my
+	addslonczewskitorque2_args.arg_mz = mz
+	addslonczewskitorque2_args.arg_Ms_ = Ms_
+	addslonczewskitorque2_args.arg_Ms_mul = Ms_mul
+	addslonczewskitorque2_args.arg_jz_ = jz_
+	addslonczewskitorque2_args.arg_jz_mul = jz_mul
+	addslonczewskitorque2_args.arg_px_ = px_
+	addslonczewskitorque2_args.arg_px_mul = px_mul
+	addslonczewskitorque2_args.arg_py_ = py_
+	addslonczewskitorque2_args.arg_py_mul = py_mul
+	addslonczewskitorque2_args.arg_pz_ = pz_
+	addslonczewskitorque2_args.arg_pz_mul = pz_mul
+	addslonczewskitorque2_args.arg_alpha_ = alpha_
+	addslonczewskitorque2_args.arg_alpha_mul = alpha_mul
+	addslonczewskitorque2_args.arg_pol_ = pol_
+	addslonczewskitorque2_args.arg_pol_mul = pol_mul
+	addslonczewskitorque2_args.arg_lambda_ = lambda_
+	addslonczewskitorque2_args.arg_lambda_mul = lambda_mul
+	addslonczewskitorque2_args.arg_epsPrime_ = epsPrime_
+	addslonczewskitorque2_args.arg_epsPrime_mul = epsPrime_mul
+	addslonczewskitorque2_args.arg_flt_ = flt_
+	addslonczewskitorque2_args.arg_flt_mul = flt_mul
+	addslonczewskitorque2_args.arg_N = N
 
 	args := addslonczewskitorque2_args.argptr[:]
 	cu.LaunchKernel(addslonczewskitorque2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("addslonczewskitorque2")
 	}
 }
 
 // maps compute capability on PTX code for addslonczewskitorque2 kernel.
-var addslonczewskitorque2_map = map[int]string{ 0: "" ,
-30: addslonczewskitorque2_ptx_30 ,
-35: addslonczewskitorque2_ptx_35 ,
-37: addslonczewskitorque2_ptx_37 ,
-50: addslonczewskitorque2_ptx_50 ,
-52: addslonczewskitorque2_ptx_52 ,
-53: addslonczewskitorque2_ptx_53 ,
-60: addslonczewskitorque2_ptx_60 ,
-61: addslonczewskitorque2_ptx_61 ,
-70: addslonczewskitorque2_ptx_70 ,
-75: addslonczewskitorque2_ptx_75  }
+var addslonczewskitorque2_map = map[int]string{0: "",
+	30: addslonczewskitorque2_ptx_30,
+	35: addslonczewskitorque2_ptx_35,
+	37: addslonczewskitorque2_ptx_37,
+	50: addslonczewskitorque2_ptx_50,
+	52: addslonczewskitorque2_ptx_52,
+	53: addslonczewskitorque2_ptx_53,
+	60: addslonczewskitorque2_ptx_60,
+	61: addslonczewskitorque2_ptx_61,
+	70: addslonczewskitorque2_ptx_70,
+	75: addslonczewskitorque2_ptx_75}
 
 // addslonczewskitorque2 PTX code for various compute capabilities.
-const(
-  addslonczewskitorque2_ptx_30 = `
+const (
+	addslonczewskitorque2_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -418,7 +417,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_35 = `
+	addslonczewskitorque2_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -687,7 +686,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_37 = `
+	addslonczewskitorque2_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -956,7 +955,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_50 = `
+	addslonczewskitorque2_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -1225,7 +1224,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_52 = `
+	addslonczewskitorque2_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -1494,7 +1493,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_53 = `
+	addslonczewskitorque2_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -1763,7 +1762,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_60 = `
+	addslonczewskitorque2_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -2032,7 +2031,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_61 = `
+	addslonczewskitorque2_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -2301,7 +2300,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_70 = `
+	addslonczewskitorque2_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -2570,7 +2569,7 @@ BB0_25:
 
 
 `
-   addslonczewskitorque2_ptx_75 = `
+	addslonczewskitorque2_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -2839,4 +2838,4 @@ BB0_25:
 
 
 `
- )
+)

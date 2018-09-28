@@ -5,44 +5,44 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for madd2 kernel
 var madd2_code cu.Function
 
 // Stores the arguments for madd2 kernel invocation
-type madd2_args_t struct {
-	arg_dst  unsafe.Pointer
-	arg_src1 unsafe.Pointer
-	arg_fac1 float32
-	arg_src2 unsafe.Pointer
-	arg_fac2 float32
-	arg_N    int
-	argptr   [6]unsafe.Pointer
+type madd2_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_src1 unsafe.Pointer
+	 arg_fac1 float32
+	 arg_src2 unsafe.Pointer
+	 arg_fac2 float32
+	 arg_N int
+	 argptr [6]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for madd2 kernel invocation
 var madd2_args madd2_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	madd2_args.argptr[0] = unsafe.Pointer(&madd2_args.arg_dst)
-	madd2_args.argptr[1] = unsafe.Pointer(&madd2_args.arg_src1)
-	madd2_args.argptr[2] = unsafe.Pointer(&madd2_args.arg_fac1)
-	madd2_args.argptr[3] = unsafe.Pointer(&madd2_args.arg_src2)
-	madd2_args.argptr[4] = unsafe.Pointer(&madd2_args.arg_fac2)
-	madd2_args.argptr[5] = unsafe.Pointer(&madd2_args.arg_N)
-}
+	 madd2_args.argptr[0] = unsafe.Pointer(&madd2_args.arg_dst)
+	 madd2_args.argptr[1] = unsafe.Pointer(&madd2_args.arg_src1)
+	 madd2_args.argptr[2] = unsafe.Pointer(&madd2_args.arg_fac1)
+	 madd2_args.argptr[3] = unsafe.Pointer(&madd2_args.arg_src2)
+	 madd2_args.argptr[4] = unsafe.Pointer(&madd2_args.arg_fac2)
+	 madd2_args.argptr[5] = unsafe.Pointer(&madd2_args.arg_N)
+	 }
 
 // Wrapper for madd2 CUDA kernel, asynchronous.
-func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int, cfg *config) {
-	if Synchronous { // debug
+func k_madd2_async ( dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, N int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("madd2")
 	}
@@ -50,42 +50,43 @@ func k_madd2_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 	madd2_args.Lock()
 	defer madd2_args.Unlock()
 
-	if madd2_code == 0 {
+	if madd2_code == 0{
 		madd2_code = fatbinLoad(madd2_map, "madd2")
 	}
 
-	madd2_args.arg_dst = dst
-	madd2_args.arg_src1 = src1
-	madd2_args.arg_fac1 = fac1
-	madd2_args.arg_src2 = src2
-	madd2_args.arg_fac2 = fac2
-	madd2_args.arg_N = N
+	 madd2_args.arg_dst = dst
+	 madd2_args.arg_src1 = src1
+	 madd2_args.arg_fac1 = fac1
+	 madd2_args.arg_src2 = src2
+	 madd2_args.arg_fac2 = fac2
+	 madd2_args.arg_N = N
+	
 
 	args := madd2_args.argptr[:]
 	cu.LaunchKernel(madd2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("madd2")
 	}
 }
 
 // maps compute capability on PTX code for madd2 kernel.
-var madd2_map = map[int]string{0: "",
-	30: madd2_ptx_30,
-	35: madd2_ptx_35,
-	37: madd2_ptx_37,
-	50: madd2_ptx_50,
-	52: madd2_ptx_52,
-	53: madd2_ptx_53,
-	60: madd2_ptx_60,
-	61: madd2_ptx_61,
-	70: madd2_ptx_70,
-	75: madd2_ptx_75}
+var madd2_map = map[int]string{ 0: "" ,
+30: madd2_ptx_30 ,
+35: madd2_ptx_35 ,
+37: madd2_ptx_37 ,
+50: madd2_ptx_50 ,
+52: madd2_ptx_52 ,
+53: madd2_ptx_53 ,
+60: madd2_ptx_60 ,
+61: madd2_ptx_61 ,
+70: madd2_ptx_70 ,
+75: madd2_ptx_75  }
 
 // madd2 PTX code for various compute capabilities.
-const (
-	madd2_ptx_30 = `
+const(
+  madd2_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -142,7 +143,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_35 = `
+   madd2_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -199,7 +200,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_37 = `
+   madd2_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -256,7 +257,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_50 = `
+   madd2_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -313,7 +314,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_52 = `
+   madd2_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -370,7 +371,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_53 = `
+   madd2_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -427,7 +428,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_60 = `
+   madd2_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -484,7 +485,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_61 = `
+   madd2_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -541,7 +542,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_70 = `
+   madd2_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -598,7 +599,7 @@ BB0_2:
 
 
 `
-	madd2_ptx_75 = `
+   madd2_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -655,4 +656,4 @@ BB0_2:
 
 
 `
-)
+ )

@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for normalize kernel
 var normalize_code cu.Function
 
 // Stores the arguments for normalize kernel invocation
-type normalize_args_t struct {
-	arg_vx  unsafe.Pointer
-	arg_vy  unsafe.Pointer
-	arg_vz  unsafe.Pointer
-	arg_vol unsafe.Pointer
-	arg_N   int
-	argptr  [5]unsafe.Pointer
+type normalize_args_t struct{
+	 arg_vx unsafe.Pointer
+	 arg_vy unsafe.Pointer
+	 arg_vz unsafe.Pointer
+	 arg_vol unsafe.Pointer
+	 arg_N int
+	 argptr [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for normalize kernel invocation
 var normalize_args normalize_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	normalize_args.argptr[0] = unsafe.Pointer(&normalize_args.arg_vx)
-	normalize_args.argptr[1] = unsafe.Pointer(&normalize_args.arg_vy)
-	normalize_args.argptr[2] = unsafe.Pointer(&normalize_args.arg_vz)
-	normalize_args.argptr[3] = unsafe.Pointer(&normalize_args.arg_vol)
-	normalize_args.argptr[4] = unsafe.Pointer(&normalize_args.arg_N)
-}
+	 normalize_args.argptr[0] = unsafe.Pointer(&normalize_args.arg_vx)
+	 normalize_args.argptr[1] = unsafe.Pointer(&normalize_args.arg_vy)
+	 normalize_args.argptr[2] = unsafe.Pointer(&normalize_args.arg_vz)
+	 normalize_args.argptr[3] = unsafe.Pointer(&normalize_args.arg_vol)
+	 normalize_args.argptr[4] = unsafe.Pointer(&normalize_args.arg_N)
+	 }
 
 // Wrapper for normalize CUDA kernel, asynchronous.
-func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, vol unsafe.Pointer, N int, cfg *config) {
-	if Synchronous { // debug
+func k_normalize_async ( vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, vol unsafe.Pointer, N int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("normalize")
 	}
@@ -48,41 +48,42 @@ func k_normalize_async(vx unsafe.Pointer, vy unsafe.Pointer, vz unsafe.Pointer, 
 	normalize_args.Lock()
 	defer normalize_args.Unlock()
 
-	if normalize_code == 0 {
+	if normalize_code == 0{
 		normalize_code = fatbinLoad(normalize_map, "normalize")
 	}
 
-	normalize_args.arg_vx = vx
-	normalize_args.arg_vy = vy
-	normalize_args.arg_vz = vz
-	normalize_args.arg_vol = vol
-	normalize_args.arg_N = N
+	 normalize_args.arg_vx = vx
+	 normalize_args.arg_vy = vy
+	 normalize_args.arg_vz = vz
+	 normalize_args.arg_vol = vol
+	 normalize_args.arg_N = N
+	
 
 	args := normalize_args.argptr[:]
 	cu.LaunchKernel(normalize_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("normalize")
 	}
 }
 
 // maps compute capability on PTX code for normalize kernel.
-var normalize_map = map[int]string{0: "",
-	30: normalize_ptx_30,
-	35: normalize_ptx_35,
-	37: normalize_ptx_37,
-	50: normalize_ptx_50,
-	52: normalize_ptx_52,
-	53: normalize_ptx_53,
-	60: normalize_ptx_60,
-	61: normalize_ptx_61,
-	70: normalize_ptx_70,
-	75: normalize_ptx_75}
+var normalize_map = map[int]string{ 0: "" ,
+30: normalize_ptx_30 ,
+35: normalize_ptx_35 ,
+37: normalize_ptx_37 ,
+50: normalize_ptx_50 ,
+52: normalize_ptx_52 ,
+53: normalize_ptx_53 ,
+60: normalize_ptx_60 ,
+61: normalize_ptx_61 ,
+70: normalize_ptx_70 ,
+75: normalize_ptx_75  }
 
 // normalize PTX code for various compute capabilities.
-const (
-	normalize_ptx_30 = `
+const(
+  normalize_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -165,7 +166,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_35 = `
+   normalize_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -248,7 +249,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_37 = `
+   normalize_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -331,7 +332,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_50 = `
+   normalize_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -414,7 +415,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_52 = `
+   normalize_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -497,7 +498,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_53 = `
+   normalize_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -580,7 +581,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_60 = `
+   normalize_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -663,7 +664,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_61 = `
+   normalize_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -746,7 +747,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_70 = `
+   normalize_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -829,7 +830,7 @@ BB0_6:
 
 
 `
-	normalize_ptx_75 = `
+   normalize_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -912,4 +913,4 @@ BB0_6:
 
 
 `
-)
+ )

@@ -5,46 +5,46 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for shiftbytesy kernel
 var shiftbytesy_code cu.Function
 
 // Stores the arguments for shiftbytesy kernel invocation
-type shiftbytesy_args_t struct {
-	arg_dst   unsafe.Pointer
-	arg_src   unsafe.Pointer
-	arg_Nx    int
-	arg_Ny    int
-	arg_Nz    int
-	arg_shy   int
-	arg_clamp byte
-	argptr    [7]unsafe.Pointer
+type shiftbytesy_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_src unsafe.Pointer
+	 arg_Nx int
+	 arg_Ny int
+	 arg_Nz int
+	 arg_shy int
+	 arg_clamp byte
+	 argptr [7]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for shiftbytesy kernel invocation
 var shiftbytesy_args shiftbytesy_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	shiftbytesy_args.argptr[0] = unsafe.Pointer(&shiftbytesy_args.arg_dst)
-	shiftbytesy_args.argptr[1] = unsafe.Pointer(&shiftbytesy_args.arg_src)
-	shiftbytesy_args.argptr[2] = unsafe.Pointer(&shiftbytesy_args.arg_Nx)
-	shiftbytesy_args.argptr[3] = unsafe.Pointer(&shiftbytesy_args.arg_Ny)
-	shiftbytesy_args.argptr[4] = unsafe.Pointer(&shiftbytesy_args.arg_Nz)
-	shiftbytesy_args.argptr[5] = unsafe.Pointer(&shiftbytesy_args.arg_shy)
-	shiftbytesy_args.argptr[6] = unsafe.Pointer(&shiftbytesy_args.arg_clamp)
-}
+	 shiftbytesy_args.argptr[0] = unsafe.Pointer(&shiftbytesy_args.arg_dst)
+	 shiftbytesy_args.argptr[1] = unsafe.Pointer(&shiftbytesy_args.arg_src)
+	 shiftbytesy_args.argptr[2] = unsafe.Pointer(&shiftbytesy_args.arg_Nx)
+	 shiftbytesy_args.argptr[3] = unsafe.Pointer(&shiftbytesy_args.arg_Ny)
+	 shiftbytesy_args.argptr[4] = unsafe.Pointer(&shiftbytesy_args.arg_Nz)
+	 shiftbytesy_args.argptr[5] = unsafe.Pointer(&shiftbytesy_args.arg_shy)
+	 shiftbytesy_args.argptr[6] = unsafe.Pointer(&shiftbytesy_args.arg_clamp)
+	 }
 
 // Wrapper for shiftbytesy CUDA kernel, asynchronous.
-func k_shiftbytesy_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shy int, clamp byte, cfg *config) {
-	if Synchronous { // debug
+func k_shiftbytesy_async ( dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shy int, clamp byte,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("shiftbytesy")
 	}
@@ -52,43 +52,44 @@ func k_shiftbytesy_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int,
 	shiftbytesy_args.Lock()
 	defer shiftbytesy_args.Unlock()
 
-	if shiftbytesy_code == 0 {
+	if shiftbytesy_code == 0{
 		shiftbytesy_code = fatbinLoad(shiftbytesy_map, "shiftbytesy")
 	}
 
-	shiftbytesy_args.arg_dst = dst
-	shiftbytesy_args.arg_src = src
-	shiftbytesy_args.arg_Nx = Nx
-	shiftbytesy_args.arg_Ny = Ny
-	shiftbytesy_args.arg_Nz = Nz
-	shiftbytesy_args.arg_shy = shy
-	shiftbytesy_args.arg_clamp = clamp
+	 shiftbytesy_args.arg_dst = dst
+	 shiftbytesy_args.arg_src = src
+	 shiftbytesy_args.arg_Nx = Nx
+	 shiftbytesy_args.arg_Ny = Ny
+	 shiftbytesy_args.arg_Nz = Nz
+	 shiftbytesy_args.arg_shy = shy
+	 shiftbytesy_args.arg_clamp = clamp
+	
 
 	args := shiftbytesy_args.argptr[:]
 	cu.LaunchKernel(shiftbytesy_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("shiftbytesy")
 	}
 }
 
 // maps compute capability on PTX code for shiftbytesy kernel.
-var shiftbytesy_map = map[int]string{0: "",
-	30: shiftbytesy_ptx_30,
-	35: shiftbytesy_ptx_35,
-	37: shiftbytesy_ptx_37,
-	50: shiftbytesy_ptx_50,
-	52: shiftbytesy_ptx_52,
-	53: shiftbytesy_ptx_53,
-	60: shiftbytesy_ptx_60,
-	61: shiftbytesy_ptx_61,
-	70: shiftbytesy_ptx_70,
-	75: shiftbytesy_ptx_75}
+var shiftbytesy_map = map[int]string{ 0: "" ,
+30: shiftbytesy_ptx_30 ,
+35: shiftbytesy_ptx_35 ,
+37: shiftbytesy_ptx_37 ,
+50: shiftbytesy_ptx_50 ,
+52: shiftbytesy_ptx_52 ,
+53: shiftbytesy_ptx_53 ,
+60: shiftbytesy_ptx_60 ,
+61: shiftbytesy_ptx_61 ,
+70: shiftbytesy_ptx_70 ,
+75: shiftbytesy_ptx_75  }
 
 // shiftbytesy PTX code for various compute capabilities.
-const (
-	shiftbytesy_ptx_30 = `
+const(
+  shiftbytesy_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -167,7 +168,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_35 = `
+   shiftbytesy_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -246,7 +247,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_37 = `
+   shiftbytesy_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -325,7 +326,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_50 = `
+   shiftbytesy_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -404,7 +405,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_52 = `
+   shiftbytesy_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -483,7 +484,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_53 = `
+   shiftbytesy_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -562,7 +563,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_60 = `
+   shiftbytesy_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -641,7 +642,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_61 = `
+   shiftbytesy_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -720,7 +721,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_70 = `
+   shiftbytesy_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -799,7 +800,7 @@ BB0_4:
 
 
 `
-	shiftbytesy_ptx_75 = `
+   shiftbytesy_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -878,4 +879,4 @@ BB0_4:
 
 
 `
-)
+ )

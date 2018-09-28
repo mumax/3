@@ -5,52 +5,52 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for crossproduct kernel
 var crossproduct_code cu.Function
 
 // Stores the arguments for crossproduct kernel invocation
-type crossproduct_args_t struct {
-	arg_dstx unsafe.Pointer
-	arg_dsty unsafe.Pointer
-	arg_dstz unsafe.Pointer
-	arg_ax   unsafe.Pointer
-	arg_ay   unsafe.Pointer
-	arg_az   unsafe.Pointer
-	arg_bx   unsafe.Pointer
-	arg_by   unsafe.Pointer
-	arg_bz   unsafe.Pointer
-	arg_N    int
-	argptr   [10]unsafe.Pointer
+type crossproduct_args_t struct{
+	 arg_dstx unsafe.Pointer
+	 arg_dsty unsafe.Pointer
+	 arg_dstz unsafe.Pointer
+	 arg_ax unsafe.Pointer
+	 arg_ay unsafe.Pointer
+	 arg_az unsafe.Pointer
+	 arg_bx unsafe.Pointer
+	 arg_by unsafe.Pointer
+	 arg_bz unsafe.Pointer
+	 arg_N int
+	 argptr [10]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for crossproduct kernel invocation
 var crossproduct_args crossproduct_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	crossproduct_args.argptr[0] = unsafe.Pointer(&crossproduct_args.arg_dstx)
-	crossproduct_args.argptr[1] = unsafe.Pointer(&crossproduct_args.arg_dsty)
-	crossproduct_args.argptr[2] = unsafe.Pointer(&crossproduct_args.arg_dstz)
-	crossproduct_args.argptr[3] = unsafe.Pointer(&crossproduct_args.arg_ax)
-	crossproduct_args.argptr[4] = unsafe.Pointer(&crossproduct_args.arg_ay)
-	crossproduct_args.argptr[5] = unsafe.Pointer(&crossproduct_args.arg_az)
-	crossproduct_args.argptr[6] = unsafe.Pointer(&crossproduct_args.arg_bx)
-	crossproduct_args.argptr[7] = unsafe.Pointer(&crossproduct_args.arg_by)
-	crossproduct_args.argptr[8] = unsafe.Pointer(&crossproduct_args.arg_bz)
-	crossproduct_args.argptr[9] = unsafe.Pointer(&crossproduct_args.arg_N)
-}
+	 crossproduct_args.argptr[0] = unsafe.Pointer(&crossproduct_args.arg_dstx)
+	 crossproduct_args.argptr[1] = unsafe.Pointer(&crossproduct_args.arg_dsty)
+	 crossproduct_args.argptr[2] = unsafe.Pointer(&crossproduct_args.arg_dstz)
+	 crossproduct_args.argptr[3] = unsafe.Pointer(&crossproduct_args.arg_ax)
+	 crossproduct_args.argptr[4] = unsafe.Pointer(&crossproduct_args.arg_ay)
+	 crossproduct_args.argptr[5] = unsafe.Pointer(&crossproduct_args.arg_az)
+	 crossproduct_args.argptr[6] = unsafe.Pointer(&crossproduct_args.arg_bx)
+	 crossproduct_args.argptr[7] = unsafe.Pointer(&crossproduct_args.arg_by)
+	 crossproduct_args.argptr[8] = unsafe.Pointer(&crossproduct_args.arg_bz)
+	 crossproduct_args.argptr[9] = unsafe.Pointer(&crossproduct_args.arg_N)
+	 }
 
 // Wrapper for crossproduct CUDA kernel, asynchronous.
-func k_crossproduct_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Pointer, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int, cfg *config) {
-	if Synchronous { // debug
+func k_crossproduct_async ( dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.Pointer, ax unsafe.Pointer, ay unsafe.Pointer, az unsafe.Pointer, bx unsafe.Pointer, by unsafe.Pointer, bz unsafe.Pointer, N int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("crossproduct")
 	}
@@ -58,46 +58,47 @@ func k_crossproduct_async(dstx unsafe.Pointer, dsty unsafe.Pointer, dstz unsafe.
 	crossproduct_args.Lock()
 	defer crossproduct_args.Unlock()
 
-	if crossproduct_code == 0 {
+	if crossproduct_code == 0{
 		crossproduct_code = fatbinLoad(crossproduct_map, "crossproduct")
 	}
 
-	crossproduct_args.arg_dstx = dstx
-	crossproduct_args.arg_dsty = dsty
-	crossproduct_args.arg_dstz = dstz
-	crossproduct_args.arg_ax = ax
-	crossproduct_args.arg_ay = ay
-	crossproduct_args.arg_az = az
-	crossproduct_args.arg_bx = bx
-	crossproduct_args.arg_by = by
-	crossproduct_args.arg_bz = bz
-	crossproduct_args.arg_N = N
+	 crossproduct_args.arg_dstx = dstx
+	 crossproduct_args.arg_dsty = dsty
+	 crossproduct_args.arg_dstz = dstz
+	 crossproduct_args.arg_ax = ax
+	 crossproduct_args.arg_ay = ay
+	 crossproduct_args.arg_az = az
+	 crossproduct_args.arg_bx = bx
+	 crossproduct_args.arg_by = by
+	 crossproduct_args.arg_bz = bz
+	 crossproduct_args.arg_N = N
+	
 
 	args := crossproduct_args.argptr[:]
 	cu.LaunchKernel(crossproduct_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("crossproduct")
 	}
 }
 
 // maps compute capability on PTX code for crossproduct kernel.
-var crossproduct_map = map[int]string{0: "",
-	30: crossproduct_ptx_30,
-	35: crossproduct_ptx_35,
-	37: crossproduct_ptx_37,
-	50: crossproduct_ptx_50,
-	52: crossproduct_ptx_52,
-	53: crossproduct_ptx_53,
-	60: crossproduct_ptx_60,
-	61: crossproduct_ptx_61,
-	70: crossproduct_ptx_70,
-	75: crossproduct_ptx_75}
+var crossproduct_map = map[int]string{ 0: "" ,
+30: crossproduct_ptx_30 ,
+35: crossproduct_ptx_35 ,
+37: crossproduct_ptx_37 ,
+50: crossproduct_ptx_50 ,
+52: crossproduct_ptx_52 ,
+53: crossproduct_ptx_53 ,
+60: crossproduct_ptx_60 ,
+61: crossproduct_ptx_61 ,
+70: crossproduct_ptx_70 ,
+75: crossproduct_ptx_75  }
 
 // crossproduct PTX code for various compute capabilities.
-const (
-	crossproduct_ptx_30 = `
+const(
+  crossproduct_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -187,7 +188,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_35 = `
+   crossproduct_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -277,7 +278,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_37 = `
+   crossproduct_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -367,7 +368,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_50 = `
+   crossproduct_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -457,7 +458,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_52 = `
+   crossproduct_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -547,7 +548,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_53 = `
+   crossproduct_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -637,7 +638,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_60 = `
+   crossproduct_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -727,7 +728,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_61 = `
+   crossproduct_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -817,7 +818,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_70 = `
+   crossproduct_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -907,7 +908,7 @@ BB0_2:
 
 
 `
-	crossproduct_ptx_75 = `
+   crossproduct_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -997,4 +998,4 @@ BB0_2:
 
 
 `
-)
+ )

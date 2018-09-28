@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for kernmulC kernel
 var kernmulC_code cu.Function
 
 // Stores the arguments for kernmulC kernel invocation
-type kernmulC_args_t struct{
-	 arg_fftM unsafe.Pointer
-	 arg_fftK unsafe.Pointer
-	 arg_Nx int
-	 arg_Ny int
-	 argptr [4]unsafe.Pointer
+type kernmulC_args_t struct {
+	arg_fftM unsafe.Pointer
+	arg_fftK unsafe.Pointer
+	arg_Nx   int
+	arg_Ny   int
+	argptr   [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for kernmulC kernel invocation
 var kernmulC_args kernmulC_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 kernmulC_args.argptr[0] = unsafe.Pointer(&kernmulC_args.arg_fftM)
-	 kernmulC_args.argptr[1] = unsafe.Pointer(&kernmulC_args.arg_fftK)
-	 kernmulC_args.argptr[2] = unsafe.Pointer(&kernmulC_args.arg_Nx)
-	 kernmulC_args.argptr[3] = unsafe.Pointer(&kernmulC_args.arg_Ny)
-	 }
+	kernmulC_args.argptr[0] = unsafe.Pointer(&kernmulC_args.arg_fftM)
+	kernmulC_args.argptr[1] = unsafe.Pointer(&kernmulC_args.arg_fftK)
+	kernmulC_args.argptr[2] = unsafe.Pointer(&kernmulC_args.arg_Nx)
+	kernmulC_args.argptr[3] = unsafe.Pointer(&kernmulC_args.arg_Ny)
+}
 
 // Wrapper for kernmulC CUDA kernel, asynchronous.
-func k_kernmulC_async ( fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int,  cfg *config) {
-	if Synchronous{ // debug
+func k_kernmulC_async(fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("kernmulC")
 	}
@@ -46,41 +46,40 @@ func k_kernmulC_async ( fftM unsafe.Pointer, fftK unsafe.Pointer, Nx int, Ny int
 	kernmulC_args.Lock()
 	defer kernmulC_args.Unlock()
 
-	if kernmulC_code == 0{
+	if kernmulC_code == 0 {
 		kernmulC_code = fatbinLoad(kernmulC_map, "kernmulC")
 	}
 
-	 kernmulC_args.arg_fftM = fftM
-	 kernmulC_args.arg_fftK = fftK
-	 kernmulC_args.arg_Nx = Nx
-	 kernmulC_args.arg_Ny = Ny
-	
+	kernmulC_args.arg_fftM = fftM
+	kernmulC_args.arg_fftK = fftK
+	kernmulC_args.arg_Nx = Nx
+	kernmulC_args.arg_Ny = Ny
 
 	args := kernmulC_args.argptr[:]
 	cu.LaunchKernel(kernmulC_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("kernmulC")
 	}
 }
 
 // maps compute capability on PTX code for kernmulC kernel.
-var kernmulC_map = map[int]string{ 0: "" ,
-30: kernmulC_ptx_30 ,
-35: kernmulC_ptx_35 ,
-37: kernmulC_ptx_37 ,
-50: kernmulC_ptx_50 ,
-52: kernmulC_ptx_52 ,
-53: kernmulC_ptx_53 ,
-60: kernmulC_ptx_60 ,
-61: kernmulC_ptx_61 ,
-70: kernmulC_ptx_70 ,
-75: kernmulC_ptx_75  }
+var kernmulC_map = map[int]string{0: "",
+	30: kernmulC_ptx_30,
+	35: kernmulC_ptx_35,
+	37: kernmulC_ptx_37,
+	50: kernmulC_ptx_50,
+	52: kernmulC_ptx_52,
+	53: kernmulC_ptx_53,
+	60: kernmulC_ptx_60,
+	61: kernmulC_ptx_61,
+	70: kernmulC_ptx_70,
+	75: kernmulC_ptx_75}
 
 // kernmulC PTX code for various compute capabilities.
-const(
-  kernmulC_ptx_30 = `
+const (
+	kernmulC_ptx_30 = `
 .version 6.3
 .target sm_30
 .address_size 64
@@ -142,7 +141,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_35 = `
+	kernmulC_ptx_35 = `
 .version 6.3
 .target sm_35
 .address_size 64
@@ -204,7 +203,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_37 = `
+	kernmulC_ptx_37 = `
 .version 6.3
 .target sm_37
 .address_size 64
@@ -266,7 +265,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_50 = `
+	kernmulC_ptx_50 = `
 .version 6.3
 .target sm_50
 .address_size 64
@@ -328,7 +327,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_52 = `
+	kernmulC_ptx_52 = `
 .version 6.3
 .target sm_52
 .address_size 64
@@ -390,7 +389,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_53 = `
+	kernmulC_ptx_53 = `
 .version 6.3
 .target sm_53
 .address_size 64
@@ -452,7 +451,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_60 = `
+	kernmulC_ptx_60 = `
 .version 6.3
 .target sm_60
 .address_size 64
@@ -514,7 +513,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_61 = `
+	kernmulC_ptx_61 = `
 .version 6.3
 .target sm_61
 .address_size 64
@@ -576,7 +575,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_70 = `
+	kernmulC_ptx_70 = `
 .version 6.3
 .target sm_70
 .address_size 64
@@ -638,7 +637,7 @@ BB0_2:
 
 
 `
-   kernmulC_ptx_75 = `
+	kernmulC_ptx_75 = `
 .version 6.3
 .target sm_75
 .address_size 64
@@ -700,4 +699,4 @@ BB0_2:
 
 
 `
- )
+)

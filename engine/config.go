@@ -7,7 +7,6 @@ import (
 	"math"
 	"math/rand"
 )
-
 func init() {
 	DeclFunc("Uniform", Uniform, "Uniform magnetization in given direction")
 	DeclFunc("Vortex", Vortex, "Vortex magnetization with given circulation and core polarization")
@@ -18,6 +17,7 @@ func init() {
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
+	DeclFunc("Helical", Helical, "Helical magnetization with with q-vector along (1, 0, 0) and helical length Ld")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -154,6 +154,20 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 		return m
 	}
 }
+
+// Make a helical configuration with the q-vector along (1, 0, 0)
+// E.g.:
+//       HelicalMag(70e-9) // Creates a helix with a helical length of 70nm
+func HelicalMag(Ld float64) Config {
+     return func(x, y, z float64) data.Vector {
+     	    var m data.Vector
+	    m[X] = math.Cos(math.Sqrt(2.0)*math.Pi/Ld * x)
+	    m[Y] = math.Cos(math.Sqrt(2.0)*math.Pi/Ld * x)
+	    m[Z] = math.Sin(2*math.Pi/Ld * x)
+	    return m
+     }
+}    
+
 
 // Transl returns a translated copy of configuration c. E.g.:
 // 	M = Vortex(1, 1).Transl(100e-9, 0, 0)  // vortex with center at x=100nm

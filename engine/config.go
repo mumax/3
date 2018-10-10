@@ -162,8 +162,8 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 func HelicalMag(Ld float64) Config {
 	return func(x, y, z float64) data.Vector {
 		var m data.Vector
-		m[X] = math.Cos(math.Sqrt(2.0) * math.Pi / Ld * x)
-		m[Y] = math.Cos(math.Sqrt(2.0) * math.Pi / Ld * x)
+		m[X] = 0
+		m[Y] = math.Cos(2 * math.Pi / Ld * x)
 		m[Z] = math.Sin(2 * math.Pi / Ld * x)
 		return m
 	}

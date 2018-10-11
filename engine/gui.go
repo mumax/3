@@ -237,7 +237,7 @@ func (g *guistate) prepareM() {
 		case "VortexWall":
 			args = "(1, -1, 1, 1)"
 		case "Helical":
-		        args = "(100e-9)"
+		        args = "(100e-9, 1, 0)"
 		}
 		g.Set("margs", args)
 		g.Set("mdoc", g.Doc(ident))

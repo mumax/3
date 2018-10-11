@@ -18,7 +18,7 @@ func init() {
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
-	DeclFunc("Helical", HelicalMag, "Helical magnetization with with q-vector along (1, 0, 0) and helical length Ld")
+	DeclFunc("Helical", HelicalMag, "Helical magnetization with helical length Ld and with q-vector along (qx, qy)")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -158,13 +158,35 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 
 // Make a helical configuration with the q-vector along (1, 0, 0)
 // E.g.:
-//       HelicalMag(70e-9) // Creates a helix with a helical length of 70nm
-func HelicalMag(Ld float64) Config {
+//       HelicalMag(70e-9, 1, 0) // Creates a helix with a helical length of 70nm with the q vector along x
+//       HelicalMag(30e-9, 1, 1) // Creates a helix with a helical length of 30nm with q vector along x = y
+func HelicalMag(Ld float64, qx float64, qy float64) Config {
 	return func(x, y, z float64) data.Vector {
+	        q_norm := math.Sqrt(qx*qx + qy*qy)
+		q_x := qx / q_norm
+		// q_y := qy / q_norm
+
+		// 2-D Rotation matrix components
+		cos_theta := q_x
+		sin_theta := math.Sin(math.Acos(cos_theta))
+
+		// Construct new coordinates; w is redundant.
+		u := cos_theta*x + sin_theta*y
+		// v := -sin_theta*x + sin_theta*y
+		// w := z
+
+		// m_u := 0 - redundant
+		m_v := math.Cos(2*math.Pi*u / Ld)
+		// m_w := math.Sin(2*math.Pi*u / Ld)
+
 		var m data.Vector
-		m[X] = 0
-		m[Y] = math.Cos(2 * math.Pi / Ld * x)
-		m[Z] = math.Sin(2 * math.Pi / Ld * x)
+		m[X] = sin_theta*m_v  // + cos_theta * m_u
+		m[Y] = cos_theta*m_v  // - sin_theta * m_u
+		m[Z] = math.Sin(2*math.Pi*u / Ld)
+
+		// Clearly sqrt( m[X]**2 + m[Y]**2) = sqrt(m_v**2)
+                // and sqrt( m_v **2 + m_w ** 2 ) = 1
+                // Hence the vector is already normalised.
 		return m
 	}
 }

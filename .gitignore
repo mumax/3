@@ -20,3 +20,7 @@ mumax3.*linux*cuda*
 tmp/
 *.out
 .idea/
+.vscode/launch.json
+.vscode/
+debug/
+cmd/mumax3/debug

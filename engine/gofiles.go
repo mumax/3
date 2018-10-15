@@ -4,15 +4,17 @@ package engine
 
 import (
 	"flag"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/util"
 	"os"
 	"path"
+	"runtime"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/util"
 )
 
 var (
 	// These flags are shared between cmd/mumax3 and Go input files.
-	Flag_cachedir    = flag.String("cache", "/tmp", "Kernel cache directory (empty disables caching)")
+	Flag_cachedir    = flag.String("cache", GetTmpPath(), "Kernel cache directory (empty disables caching)")
 	Flag_gpu         = flag.Int("gpu", 0, "Specify GPU")
 	Flag_interactive = flag.Bool("i", false, "Open interactive browser session")
 	Flag_od          = flag.String("o", "", "Override output directory")
@@ -50,5 +52,13 @@ func InitAndClose() func() {
 
 	return func() {
 		Close()
+	}
+}
+
+func GetTmpPath() string {
+	if runtime.GOOS == "windows" {
+		return os.TempDir()
+	} else {
+		return "/tmp"
 	}
 }

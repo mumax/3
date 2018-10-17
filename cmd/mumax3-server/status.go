@@ -70,7 +70,6 @@ const templText = `
 		.FINISHED{color: grey}
 		.active, .collapsible:hover {cursor:pointer; font-weight:normal; background-color:#eee; width:50%;}
 	</style>
-	<meta http-equiv="refresh" content="60">
 </head>
 
 <script>
@@ -85,6 +84,11 @@ function doEvent(method, arg){
 	}
 	location.reload();
 }
+
+function refreshPage () {
+	document.location.reload(true);
+    }
+setTimeout(refreshPage, 60000);
 </script>
 
 <body>
@@ -152,7 +156,7 @@ Uptime: {{.Uptime}} <br/>
 		<button onclick='doEvent("WakeupWatchdog", "")'>Wake-up Watchdog</button> (re-queue dead simulations right now).
 	{{range $k,$v := .Users}}
 		<a id="{{$k}}"></a>
-		<h3 title="Click to show/hide" class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;cont.style.display=(cont.style.display==="none"?"block":"none");'>
+		<h3 title="Click to show/hide" class="collapsible" onclick='this.classList.toggle("active");var cont=this.nextElementSibling;if (cont.style.display==="none") {cont.style.display="block"; window.location.hash = "{{$k}}";} else cont.style.display = "none";'>
 		&dtrif; {{$k}}</h3><p>
 
 		<b>Jobs</b>
@@ -163,11 +167,16 @@ Uptime: {{.Uptime}} <br/>
 	{{end}}
 	</p>
 	<script>
+		//let's collapse all job lists.
 		var collapsibleElements = document.getElementsByClassName("collapsible");
+		var hash = self.location.hash;
 		for (var i = 0; i < collapsibleElements.length; i++) {
-			collapsibleElements[i].classList.toggle("active");
-			var cont = collapsibleElements[i].nextElementSibling;
-			cont.style.display=(cont.style.display==="none"?"block":"none");  }
+			if(hash=="" || !collapsibleElements[i].textContent.includes(hash.split("#")[1]) ) { //If there's an anchor link. Let's open that user !
+				collapsibleElements[i].classList.toggle("active");
+				var cont = collapsibleElements[i].nextElementSibling;
+				cont.style.display=(cont.style.display==="none"?"block":"none");
+			}
+		}
 	</script>
 </body>
 </html>

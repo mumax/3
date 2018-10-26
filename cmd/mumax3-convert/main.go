@@ -79,6 +79,10 @@ var (
 	flag_dir       = flag.String("o", "", "Save all output in this directory")
 	flag_arrows    = flag.Int("arrows", 0, "Arrow size for vector bitmap image output")
 	flag_color     = flag.String("color", "black,gray,white", "Colormap for scalar image output.")
+	flag_axis      = flag.String("axis", "", "Axis along wich the magnetization contrast is shown")
+	flag_blurX     = flag.Float64("blurX", 0., "Number of cells to blur over in x-direction")
+	flag_blurY     = flag.Float64("blurY", 0., "Number of cells to blur over in y-direction")
+	flag_avg       = flag.Bool("average", false, "save the average of all files")
 )
 
 var (
@@ -149,6 +153,10 @@ func main() {
 	// wait for work to finish
 	Wait()
 
+	for _, outp := range wantOut {
+		outputavg(outp)
+	}
+
 	fmt.Println(succeeded, "files converted, ", skipped, "skipped, ", failed, "failed")
 	if failed > 0 {
 		os.Exit(1)
@@ -157,7 +165,22 @@ func main() {
 
 var (
 	failed, skipped, succeeded util.Atom
+	avg_slice                  *data.Slice
+	avg_info                   data.Meta
 )
+
+func outputavg(outp output) {
+	outfname := "avg" + outp.Ext
+	if *flag_dir != "" {
+		outfname = *flag_dir + "/" + path.Base(outfname)
+	}
+
+	out, _ := httpfs.Create(outfname)
+	defer out.Close()
+
+	outp.Convert(avg_slice, avg_info, panicWriter{out})
+	succeeded.Add(1)
+}
 
 func doFile(infname string, outp output) {
 	// determine output file
@@ -226,6 +249,9 @@ func doFile(infname string, outp output) {
 		return
 	}
 	defer out.Close()
+	if *flag_avg && avg_slice == nil {
+		avg_info = info
+	}
 
 	preprocess(slice)
 	outp.Convert(slice, info, panicWriter{out})
@@ -325,6 +351,7 @@ func preprocess(f *data.Slice) {
 	if *flag_normpeak {
 		normpeak(f)
 	}
+
 	colormap[0].Ccomp = -1
 	if *flag_comp != "" {
 		c := parseComp(*flag_comp)
@@ -333,9 +360,44 @@ func preprocess(f *data.Slice) {
 			*f = *f.Comp(c)
 		}
 	}
+
+	if *flag_blurX != 0. {
+		blurX(f, *flag_blurX)
+	}
+	if *flag_blurY != 0. {
+		blurY(f, *flag_blurY)
+	}
+
+	if *flag_axis != "" {
+		axis := parseAxis(*flag_axis)
+		project(f, axis)
+	}
+
 	crop(f)
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
+	}
+	if *flag_avg {
+		if avg_slice == nil {
+			avg_slice = f.HostCopy()
+		} else {
+			add(avg_slice, f)
+		}
+	}
+
+}
+
+func add(orig, f *data.Slice) {
+	a := orig.Vectors()
+	b := f.Vectors()
+	for i := range a[0] {
+		for j := range a[0][i] {
+			for k := range a[0][i][j] {
+				a[0][i][j][k] += b[0][i][j][k]
+				a[1][i][j][k] += b[1][i][j][k]
+				a[2][i][j][k] += b[2][i][j][k]
+			}
+		}
 	}
 }
 
@@ -448,4 +510,29 @@ var colors = map[string]color.RGBA{
 	"magenta":     color.RGBA{R: 255, G: 0, B: 255, A: 255},
 	"darkmagenta": color.RGBA{R: 127, G: 0, B: 127, A: 255},
 	"gray":        color.RGBA{R: 127, G: 127, B: 127, A: 255},
+}
+
+func parseAxis(arg string) (axis [3]int) {
+	words := strings.Split(arg, ",")
+	if len(words) != 3 {
+		log.Fatal("axis: need Xcomp,Ycomp,Zcomp argument")
+	}
+	for i, w := range words {
+		v, err := strconv.Atoi(w)
+		util.FatalErr(err)
+		axis[i] = v
+	}
+	return
+}
+
+func project(f *data.Slice, axis [3]int) {
+	a := f.Vectors()
+	for i := range a[0] {
+		for j := range a[0][i] {
+			for k := range a[0][i][j] {
+				a[0][i][j][k] = a[0][i][j][k]*float32(axis[0]) + a[1][i][j][k]*float32(axis[1]) + a[2][i][j][k]*float32(axis[2])
+			}
+		}
+	}
+	*f = *f.Comp(0)
 }

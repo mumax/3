@@ -83,6 +83,7 @@ var (
 	flag_blurX     = flag.Float64("blurX", 0., "Number of cells to blur over in x-direction")
 	flag_blurY     = flag.Float64("blurY", 0., "Number of cells to blur over in y-direction")
 	flag_avg       = flag.Bool("average", false, "save the average of all files")
+	flag_sub       = flag.String("subtract", "", "subtract this file from all input files")
 )
 
 var (
@@ -131,6 +132,36 @@ func main() {
 		log.Fatal("no output format specified (e.g.: -png)")
 	}
 
+	//read in subfile into var sub_slice
+	if *flag_sub != "" {
+		var err error
+
+		infname := *flag_sub
+		msg := infname
+		in, errI := httpfs.Open(infname)
+		if errI != nil {
+			msg = fail(msg, errI)
+			return
+		}
+		defer in.Close()
+
+		switch path.Ext(infname) {
+		default:
+			msg = fail(msg, ": skipping unsupported type: "+path.Ext(infname))
+			return
+		case ".ovf", ".omf", ".ovf2":
+			sub_slice, _, err = oommf.Read(in)
+		case ".dump":
+			sub_slice, _, err = dump.Read(in)
+		}
+
+		if err != nil {
+			msg = fail(msg, err)
+			return
+		}
+
+	}
+
 	// expand wildcards which are not expanded by the shell
 	// (pointing a finger at cmd.exe)
 	var fnames []string
@@ -153,8 +184,11 @@ func main() {
 	// wait for work to finish
 	Wait()
 
-	for _, outp := range wantOut {
-		outputavg(outp)
+	if *flag_avg {
+		normalize(avg_slice, 1)
+		for _, outp := range wantOut {
+			outputavg(outp)
+		}
 	}
 
 	fmt.Println(succeeded, "files converted, ", skipped, "skipped, ", failed, "failed")
@@ -166,6 +200,7 @@ func main() {
 var (
 	failed, skipped, succeeded util.Atom
 	avg_slice                  *data.Slice
+	sub_slice                  *data.Slice
 	avg_info                   data.Meta
 )
 
@@ -377,6 +412,11 @@ func preprocess(f *data.Slice) {
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
 	}
+
+	if *flag_sub != "" {
+		sub(f, sub_slice)
+	}
+
 	if *flag_avg {
 		if avg_slice == nil {
 			avg_slice = f.HostCopy()
@@ -396,6 +436,20 @@ func add(orig, f *data.Slice) {
 				a[0][i][j][k] += b[0][i][j][k]
 				a[1][i][j][k] += b[1][i][j][k]
 				a[2][i][j][k] += b[2][i][j][k]
+			}
+		}
+	}
+}
+
+func sub(orig, f *data.Slice) {
+	a := orig.Vectors()
+	b := f.Vectors()
+	for i := range a[0] {
+		for j := range a[0][i] {
+			for k := range a[0][i][j] {
+				a[0][i][j][k] -= b[0][i][j][k]
+				a[1][i][j][k] -= b[1][i][j][k]
+				a[2][i][j][k] -= b[2][i][j][k]
 			}
 		}
 	}

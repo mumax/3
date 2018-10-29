@@ -12,7 +12,7 @@ import (
 
 var (
 	// These flags are shared between cmd/mumax3 and Go input files.
-	Flag_cachedir    = flag.String("cache", "/tmp", "Kernel cache directory (empty disables caching)")
+	Flag_cachedir    = flag.String("cache", os.TempDir(), "Kernel cache directory (empty disables caching)")
 	Flag_gpu         = flag.Int("gpu", 0, "Specify GPU")
 	Flag_interactive = flag.Bool("i", false, "Open interactive browser session")
 	Flag_od          = flag.String("o", "", "Override output directory")

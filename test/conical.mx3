@@ -1,0 +1,53 @@
+/*
+    Test for the conical magnetization configuration
+
+    Check if the correct cone properties can be read out from the
+    obtained magnetization configuration. 
+*/
+
+setgridsize(64,64,64)
+setcellsize(1,1,1)
+
+period := 16 
+
+// arbitrary cone properties
+coneAngle := 0.832 
+coneDir := vector(0.56,3.21,0.5)
+
+// an arbitrary position
+ix := 15;   
+iy := 13; 
+iz := 3;
+
+
+// X DIRECTION
+
+m = conical(vector(2*pi/period,0,0),coneDir,coneAngle)
+m0 := m.GetCell(ix,iy,iz)           
+m1 := m.GetCell(ix+period/2,iy,iz) 
+
+// m0 + m1 should be parallel to the cone direction
+expectv("Cone Direction", coneDir.Cross(m0.Add(m1)), vector(0,0,0), 1e-6)
+
+// The angle between m0 and m1 should be twice as large as the cone angle
+expect("Cone Angle", acos(m0.Dot(m1))/2, coneAngle, 1e-6)
+
+
+// Y DIRECTION
+
+m = conical(vector(0,2*pi/period,0),coneDir,coneAngle)
+m0 = m.GetCell(ix,iy,iz)
+m1 = m.GetCell(ix,iy+period/2,iz)
+
+expectv("Cone Direction", coneDir.Cross(m0.Add(m1)), vector(0,0,0), 1e-6)
+expect("Cone Angle", acos(m0.Dot(m1))/2, coneAngle, 1e-6)
+
+
+// Z DIRECTION
+
+m = conical(vector(0,0,2*pi/period),coneDir,coneAngle)
+m0 = m.GetCell(ix,iy,iz)
+m1 = m.GetCell(ix,iy,iz+period/2)
+
+expectv("Cone Direction", coneDir.Cross(m0.Add(m1)), vector(0,0,0), 1e-6)
+expect("Cone Angle", acos(m0.Dot(m1))/2, coneAngle, 1e-6)

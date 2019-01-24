@@ -18,6 +18,8 @@ func init() {
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
+	DeclFunc("Conical", Conical, "Conical state for given wave vector, cone direction, and cone angle")
+	DeclFunc("Helical", Helical, "Helical state for given wave vector")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -153,6 +155,36 @@ func TwoDomain(mx1, my1, mz1, mxwall, mywall, mzwall, mx2, my2, mz2 float64) Con
 		m[Z] = (1-gauss)*m[Z] + gauss*mzwall
 		return m
 	}
+}
+
+// Conical magnetization configuration.
+// The magnetization rotates on a cone defined by coneAngle and coneDirection.
+// q is the wave vector of the conical magnetization configuration.
+// The magnetization is
+//
+//	m = u*cos(coneAngle) + sin(coneAngle)*( ua*cos(q*r) + ub*sin(q*r) )
+//
+// with ua and ub unit vectors perpendicular to u (normalized coneDirection)
+func Conical(q, coneDirection data.Vector, coneAngle float64) Config {
+	u := coneDirection.Div(coneDirection.Len())
+	// two unit vectors perpendicular to each other and to the cone direction u
+	p := math.Sqrt(1 - u[Z]*u[Z])
+	ua := data.Vector{u[X] * u[Z], u[Y] * u[Z], u[Z]*u[Z] - 1}.Div(p)
+	ub := data.Vector{-u[Y], u[X], 0}.Div(p)
+	// cone direction along z direction? -> oops devided by zero, let's fix this
+	if u[Z]*u[Z] == 1 {
+		ua = data.Vector{1, 0, 0}
+		ub = data.Vector{0, 1, 0}
+	}
+	sina, cosa := math.Sincos(coneAngle)
+	return func(x, y, z float64) data.Vector {
+		sinqr, cosqr := math.Sincos(q[X]*x + q[Y]*y + q[Z]*z)
+		return u.Mul(cosa).MAdd(sina*cosqr, ua).MAdd(sina*sinqr, ub)
+	}
+}
+
+func Helical(q data.Vector) Config {
+	return Conical(q, q, math.Pi/2)
 }
 
 // Transl returns a translated copy of configuration c. E.g.:

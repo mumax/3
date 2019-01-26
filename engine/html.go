@@ -50,6 +50,7 @@ const templText = `
 		var img, loupe;
 		img = document.getElementById(imgID);
 		loupe = img.parentElement.getElementsByClassName("img-loupe")[0];
+		loupe.style.backgroundImage = "url('" + img.src + "')";
 		loupe.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
 		}
 

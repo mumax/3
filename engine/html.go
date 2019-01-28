@@ -94,7 +94,7 @@ const templText = `
 		    /* Display what the magnifier loupe "sees": */
 		    w = loupe.offsetWidth / 2;
 			h = loupe.offsetHeight / 2;
-		    loupe.style.backgroundPosition = "-" + ((x * zoom) - w) + "px -" + ((y * zoom) - h) + "px";
+		    loupe.style.backgroundPosition = " " + (-(x * zoom) + w) + "px " + (-(y * zoom) + h) + "px";
 		  }
 		}
 	</script>

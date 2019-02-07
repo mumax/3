@@ -41,6 +41,7 @@ const templText = `
 		  cursor: crosshair;
 		  width: 150px;
 		  height: 150px;
+		  image-rendering: pixelated;
 		  display: none;
 		}
 	</style>

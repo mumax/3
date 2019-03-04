@@ -73,6 +73,7 @@ const templText = `
 		  /* Execute a function when someone moves the magnifier loupe over the image: */
 		  loupe.addEventListener("mousemove", moveMagnifier);
 		  img.addEventListener("mousemove", moveMagnifier);
+		  img.addEventListener("mouseout", function(e){loupe.style.display='none';});
 
 		  function moveMagnifier(e) {
 		    var pos, a, x = 0, y = 0;

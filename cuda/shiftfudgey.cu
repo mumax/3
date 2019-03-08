@@ -1,7 +1,7 @@
 #include "stencil.h"
 
 // shift dst by shy cells (positive or negative) along Y-axis.
-// new edge value is clampL at left edge or clampR at right edge.
+// new edge value is the current edge value.
 extern "C" __global__ void
 shiftfudgey(float* __restrict__  dst, float* __restrict__  src,
        int Nx,  int Ny,  int Nz, int shy) {

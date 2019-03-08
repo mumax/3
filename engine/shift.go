@@ -44,8 +44,6 @@ func Shift(dx int) {
 	M.normalize()
 }
 
-// ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32)
-// ShiftFudgeX(dst, src *data.Slice, shiftX int)
 func shiftMag(m *data.Slice, dx int) {
 	m2 := cuda.Buffer(1, m.Size())
 	defer cuda.Recycle(m2)

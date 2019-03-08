@@ -8,7 +8,7 @@ import (
 var (
 	TotalShift, TotalYShift                    float64                        // accumulated window shift (X and Y) in meter
 	ShiftMagL, ShiftMagR, ShiftMagU, ShiftMagD data.Vector                    // when shifting m, put these value at the left/right edge.
-	ShiftM, ShiftGeom, ShiftRegions            bool        =  true, true, true // should shift act on magnetization, geometry, regions?
+	ShiftM, ShiftGeom, ShiftRegions            bool        = true, true, true // should shift act on magnetization, geometry, regions?
 	FudgeShift																	bool			=false //should we use the values of M at the border for the new cells?
 )
 

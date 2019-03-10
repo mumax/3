@@ -13,7 +13,6 @@ var (
 
 func init() {
 	DeclFunc("ext_centerWall", CenterWall, "centerWall(c) shifts m after each step to keep m_c close to zero")
-	DeclFunc("ext_centerWallInRegion", CenterWallInRegion, "centerWallInRegion(R, c) shifts m after each step to keep m_c in region R close to zero")
 }
 
 func centerWall(c int) {
@@ -46,34 +45,6 @@ func centerWall(c int) {
 func CenterWall(magComp int) {
 	PostStep(func() { centerWall(magComp) })
 }
-
-// The same functions as above, now for just one region
-func centerWallInRegionProc(region, c int) {
-	M := &M
-	mc := M.Region(region).Average()[c]
-	n := Mesh().Size()
-	tolerance := 4 / float64(n[X]) // x*2 * expected <m> change for 1 cell shift
-
-	zero := data.Vector{0, 0, 0}
-	if ShiftMagL == zero || ShiftMagR == zero {
-		sign := magsign(M.GetCell(0, n[Y]/2, n[Z]/2)[c])
-		ShiftMagL[c] = float64(sign)
-		ShiftMagR[c] = -float64(sign)
-	}
-	
-	sign := magsign(ShiftMagL[c])
-	
-	if mc < -tolerance {
-		Shift(sign)
-	} else if mc > tolerance {
-		Shift(-sign)
-	}
-}
-
-func CenterWallInRegion(region, magComp int) {
-	PostStep(func() { centerWallInRegionProc(region, magComp) })
-}
-
 
 func magsign(x float64) int {
 	if x > 0.1 {

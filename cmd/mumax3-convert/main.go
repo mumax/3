@@ -67,6 +67,7 @@ var (
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
 	flag_csv       = flag.Bool("csv", false, `output in CSV format`)
+	flag_numpy     = flag.Bool("numpy", false, "Numpy output")
 	flag_json      = flag.Bool("json", false, `output in JSON format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
@@ -266,6 +267,7 @@ var outputs = map[*bool]output{
 	flag_gnuplot: {".gplot", dumpGnuplot},
 	flag_dump:    {".dump", outputDUMP},
 	flag_csv:     {".csv", dumpCSV},
+	flag_numpy:   {".npy", dumpNUMPY},
 	flag_json:    {".json", dumpJSON},
 	flag_show:    {"", show},
 }

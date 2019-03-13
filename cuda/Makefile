@@ -70,7 +70,7 @@ fatbin:
 	$(MAKE) CUDA_CC="30 32 35 37 50 52 53 60 61 62 70 72 75"
 
 clean:
-	rm -f *.ptx
+	rm -vf *.ptx
 
 realclean:
-	rm -f *_wrapper.go *.ptx cuda2go
+	rm -vf *_wrapper.go *.ptx cuda2go

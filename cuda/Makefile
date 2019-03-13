@@ -46,7 +46,7 @@ WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)
 
 
 
-.PHONY: all wrappers cuda2g0 clean realclean
+.PHONY: all wrappers cuda2go fatbin clean realclean
 
 all: wrappers
 	go install -v
@@ -64,6 +64,10 @@ wrappers: $(WRAPPERS)
 
 cuda2go:
 	go build cuda2go.go
+
+fatbin:
+	$(MAKE) realclean
+	$(MAKE) CUDA_CC="30 32 35 37 50 52 53 60 61 62 70 72 75"
 
 clean:
 	rm -f *.ptx

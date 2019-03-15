@@ -46,7 +46,7 @@ WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)
 
 
 
-.PHONY: all wrappers cuda2go fatbin clean realclean
+.PHONY: all wrappers fatbin clean realclean
 
 all: wrappers
 	go install -v
@@ -62,8 +62,8 @@ wrappers: $(WRAPPERS)
 	@ ./cuda2go $< > /dev/null
 	@ gofmt -w -s -l $@ > /dev/null
 
-cuda2go:
-	go build cuda2go.go
+cuda2go: cuda2go.go
+	go build $<
 
 fatbin:
 	$(MAKE) realclean

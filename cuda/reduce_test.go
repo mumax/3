@@ -12,7 +12,6 @@ import (
 var in1, in2, in3 *data.Slice
 
 func initTest() {
-	Init(0)
 	if in1 != nil {
 		return
 	}

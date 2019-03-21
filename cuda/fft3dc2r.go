@@ -46,7 +46,7 @@ func (p *fft3DC2RPlan) ExecAsync(src, dst *data.Slice) {
 
 // 3D size of the input array.
 func (p *fft3DC2RPlan) InputSizeFloats() (Nx, Ny, Nz int) {
-	return p.size[X] + 2, p.size[Y], p.size[Z]
+	return 2 * (p.size[X]/2 + 1), p.size[Y], p.size[Z]
 }
 
 // 3D size of the output array.

@@ -24,6 +24,32 @@
 	expect("kzy", B_demag.Average()[1], 0, 1e-9)
 	expect("kzz", B_demag.Average()[2], -1, 2e-2) // not perfectly -1, finite film
 
+/*
+ 	Repeat the above with an odd number of cells along x.
+        This led to a fft size mismatch panic in mumax3.10 and before.
+*/
+
+	SetPBC(32, 0, 0)
+	SetGridSize(3, 128, 1)
+	SetCellSize(1e-9, 1e-9, 0.5e-9)
+
+	Msat = 1 / mu0
+
+	m = uniform(1, 0, 0)
+	expect("kxx", B_demag.Average()[0], 0, 1e-2) // not perfectly 0, finite film
+	expect("kxy", B_demag.Average()[1], 0, 1e-9)
+	expect("kxz", B_demag.Average()[2], 0, 1e-9)
+
+	m = uniform(0, 1, 0)
+	expect("kyx", B_demag.Average()[0], 0, 1e-9)
+	expect("kyy", B_demag.Average()[1], 0, 1e-2) // not perfectly 0, finite film
+	expect("kyz", B_demag.Average()[2], 0, 1e-9)
+
+	m = uniform(0, 0, 1)
+	expect("kzx", B_demag.Average()[0], 0, 1e-9)
+	expect("kzy", B_demag.Average()[1], 0, 1e-9)
+	expect("kzz", B_demag.Average()[2], -1, 2e-2) // not perfectly -1, finite film
+
 
 
 

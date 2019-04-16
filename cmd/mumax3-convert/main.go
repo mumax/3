@@ -84,6 +84,7 @@ var (
 	flag_blurY     = flag.Float64("blurY", 0., "Number of cells to blur over in y-direction")
 	flag_avg       = flag.Bool("average", false, "save the average of all files")
 	flag_sub       = flag.String("subtract", "", "subtract this file from all input files")
+	flag_threshold = flag.String("threshold", "1", "put all values lower than the threshold to 0")
 )
 
 var (
@@ -403,11 +404,6 @@ func preprocess(f *data.Slice) {
 		blurY(f, *flag_blurY)
 	}
 
-	if *flag_axis != "" {
-		axis := parseAxis(*flag_axis)
-		project(f, axis)
-	}
-
 	crop(f)
 	if *flag_resize != "" {
 		resize(f, *flag_resize)
@@ -424,7 +420,15 @@ func preprocess(f *data.Slice) {
 			add(avg_slice, f)
 		}
 	}
+	if *flag_axis != "" {
+		axis := parseAxis(*flag_axis)
+		project(f, axis)
+	}
 
+	if *flag_threshold != "1" {
+		value := parseValue(*flag_threshold)
+		threshold(f, value)
+	}
 }
 
 func add(orig, f *data.Slice) {
@@ -575,6 +579,19 @@ func parseAxis(arg string) (axis [3]int) {
 		v, err := strconv.Atoi(w)
 		util.FatalErr(err)
 		axis[i] = v
+	}
+	return
+}
+
+func parseValue(arg string) (value float32) {
+	words := strings.Split(arg, ",")
+	if len(words) != 1 {
+		log.Fatal("threshold: need one value as argument")
+	}
+	for _, w := range words {
+		val, err := strconv.ParseFloat(w, 32)
+		util.FatalErr(err)
+		value = float32(val)
 	}
 	return
 }

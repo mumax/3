@@ -27,6 +27,20 @@ func normalize(f *data.Slice, length float64) {
 	}
 }
 
+
+func threshold(f *data.Slice, value float32) {
+	a := f.Scalars()
+	for i := range a {
+		for j := range a[i] {
+			for k := range a[i][j] {
+				if float32(math.Abs(float64(a[i][j][k]))) < value {
+					a[i][j][k] =0
+				}
+			}
+		}
+	}
+}
+
 func normpeak(f *data.Slice) {
 	a := f.Vectors()
 	maxnorm := 0.

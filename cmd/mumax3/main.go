@@ -52,7 +52,9 @@ func main() {
 
 	switch flag.NArg() {
 	case 0:
-		runInteractive()
+		if *engine.Flag_interactive {
+			runInteractive()
+		}
 	case 1:
 		runFileAndServe(flag.Arg(0))
 	default:

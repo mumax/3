@@ -72,7 +72,10 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
 				continue // element not needed in 2D
 			}
-			errSave = SaveKernel(fmt.Sprint(basename, i, j, ".ovf"), kernel[i][j])
+			compName := fmt.Sprint("N_", i, j)
+
+			info := data.Meta{Time: float64(0.0), Name: compName, Unit: "1", CellSize: cellsize, MeshUnit: "m"}
+			errSave = SaveKernel(fmt.Sprint(basename, i, j, ".ovf"), kernel[i][j], info)
 			if errSave != nil {
 				break
 			}
@@ -95,14 +98,14 @@ func LoadKernel(fname string) (kernel *data.Slice, err error) {
 	return
 }
 
-func SaveKernel(fname string, kernel *data.Slice) error {
+func SaveKernel(fname string, kernel *data.Slice, info data.Meta) error {
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
 	out := bufio.NewWriter(f)
 	defer out.Flush()
-	oommf.WriteOVF2(out, kernel, data.Meta{}, "binary 4")
+	oommf.WriteOVF2(out, kernel, info, "binary 4")
 	return nil
 }
 

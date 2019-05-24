@@ -81,10 +81,15 @@ func (b *lut) NComp() int { return len(b.cpu_buf) }
 
 // uncompress the table to a full array with parameter values per cell.
 func (p *lut) Slice() (*data.Slice, bool) {
-	gpu := p.gpuLUT()
 	b := cuda.Buffer(p.NComp(), Mesh().Size())
-	for c := 0; c < p.NComp(); c++ {
-		cuda.RegionDecode(b.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
-	}
+	p.EvalTo(b)
 	return b, true
+}
+
+// uncompress the table to a full array in the dst Slice with parameter values per cell.
+func (p *lut) EvalTo(dst *data.Slice) {
+	gpu := p.gpuLUT()
+	for c := 0; c < p.NComp(); c++ {
+		cuda.RegionDecode(dst.Comp(c), cuda.LUTPtr(gpu[c]), regions.Gpu())
+	}
 }

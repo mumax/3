@@ -19,7 +19,6 @@ type fft3DR2CPlan struct {
 // 3D single-precission real-to-complex FFT plan.
 func newFFT3DR2C(Nx, Ny, Nz int) fft3DR2CPlan {
 	handle := cufft.Plan3d(Nz, Ny, Nx, cufft.R2C) // new xyz swap
-	handle.SetCompatibilityMode(cufft.COMPATIBILITY_FFTW_PADDING)
 	handle.SetStream(stream0)
 	return fft3DR2CPlan{fftplan{handle}, [3]int{Nx, Ny, Nz}}
 }
@@ -54,7 +53,7 @@ func (p *fft3DR2CPlan) InputSizeFloats() (Nx, Ny, Nz int) {
 
 // 3D size of the output array.
 func (p *fft3DR2CPlan) OutputSizeFloats() (Nx, Ny, Nz int) {
-	return p.size[X] + 2, p.size[Y], p.size[Z]
+	return 2 * (p.size[X]/2 + 1), p.size[Y], p.size[Z]
 }
 
 // Required length of the (1D) input array.

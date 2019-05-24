@@ -28,6 +28,7 @@ func init() {
 	DeclROnly("OVF2_TEXT", OVF2_TEXT, "OutputFormat = OVF2_TEXT sets text OVF2 output")
 	DeclROnly("DUMP", DUMP, "OutputFormat = DUMP sets text DUMP output")
 	DeclFunc("Snapshot", Snapshot, "Save image of quantity")
+	DeclFunc("SnapshotAs", SnapshotAs, "Save image of quantity with custom filename")
 	DeclVar("SnapshotFormat", &SnapshotFormat, "Image format for snapshots: jpg, png or gif.")
 }
 
@@ -81,6 +82,20 @@ func Snapshot(q Quantity) {
 	data := s.HostCopy() // must be copy (asyncio)
 	queOutput(func() { snapshot_sync(fname, data) })
 	autonum[q]++
+}
+
+func SnapshotAs(q Quantity, fname string) {
+	if !strings.HasPrefix(fname, OD()) {
+		fname = OD() + fname // don't clean, turns http:// in http:/
+	}
+
+	if path.Ext(fname) == "" {
+		fname += ("." + StringFromOutputFormat[outputFormat])
+	}
+	s := ValueOf(q)
+	defer cuda.Recycle(s)
+	data := s.HostCopy() // must be copy (asyncio)
+	queOutput(func() { snapshot_sync(fname, data) })
 }
 
 // synchronous snapshot

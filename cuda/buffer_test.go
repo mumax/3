@@ -4,7 +4,6 @@ import "testing"
 
 // In case of memory leak, this will crash
 func TestBuffer(t *testing.T) {
-	Init(0)
 	m1 := [3]int{2, 1024, 2048}
 	m2 := [3]int{4, 1024, 2048}
 	a := Buffer(3, m1)
@@ -24,7 +23,6 @@ func TestBuffer(t *testing.T) {
 }
 
 func BenchmarkBuffer(b *testing.B) {
-	Init(0)
 	b.StopTimer()
 	m := [3]int{2, 1024, 2048}
 	a := Buffer(3, m)

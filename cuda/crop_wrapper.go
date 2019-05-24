@@ -5,54 +5,54 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import (
+import(
+	"unsafe"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
-	"unsafe"
 )
 
 // CUDA handle for crop kernel
 var crop_code cu.Function
 
 // Stores the arguments for crop kernel invocation
-type crop_args_t struct {
-	arg_dst  unsafe.Pointer
-	arg_Dx   int
-	arg_Dy   int
-	arg_Dz   int
-	arg_src  unsafe.Pointer
-	arg_Sx   int
-	arg_Sy   int
-	arg_Sz   int
-	arg_Offx int
-	arg_Offy int
-	arg_Offz int
-	argptr   [11]unsafe.Pointer
+type crop_args_t struct{
+	 arg_dst unsafe.Pointer
+	 arg_Dx int
+	 arg_Dy int
+	 arg_Dz int
+	 arg_src unsafe.Pointer
+	 arg_Sx int
+	 arg_Sy int
+	 arg_Sz int
+	 arg_Offx int
+	 arg_Offy int
+	 arg_Offz int
+	 argptr [11]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for crop kernel invocation
 var crop_args crop_args_t
 
-func init() {
+func init(){
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	crop_args.argptr[0] = unsafe.Pointer(&crop_args.arg_dst)
-	crop_args.argptr[1] = unsafe.Pointer(&crop_args.arg_Dx)
-	crop_args.argptr[2] = unsafe.Pointer(&crop_args.arg_Dy)
-	crop_args.argptr[3] = unsafe.Pointer(&crop_args.arg_Dz)
-	crop_args.argptr[4] = unsafe.Pointer(&crop_args.arg_src)
-	crop_args.argptr[5] = unsafe.Pointer(&crop_args.arg_Sx)
-	crop_args.argptr[6] = unsafe.Pointer(&crop_args.arg_Sy)
-	crop_args.argptr[7] = unsafe.Pointer(&crop_args.arg_Sz)
-	crop_args.argptr[8] = unsafe.Pointer(&crop_args.arg_Offx)
-	crop_args.argptr[9] = unsafe.Pointer(&crop_args.arg_Offy)
-	crop_args.argptr[10] = unsafe.Pointer(&crop_args.arg_Offz)
-}
+	 crop_args.argptr[0] = unsafe.Pointer(&crop_args.arg_dst)
+	 crop_args.argptr[1] = unsafe.Pointer(&crop_args.arg_Dx)
+	 crop_args.argptr[2] = unsafe.Pointer(&crop_args.arg_Dy)
+	 crop_args.argptr[3] = unsafe.Pointer(&crop_args.arg_Dz)
+	 crop_args.argptr[4] = unsafe.Pointer(&crop_args.arg_src)
+	 crop_args.argptr[5] = unsafe.Pointer(&crop_args.arg_Sx)
+	 crop_args.argptr[6] = unsafe.Pointer(&crop_args.arg_Sy)
+	 crop_args.argptr[7] = unsafe.Pointer(&crop_args.arg_Sz)
+	 crop_args.argptr[8] = unsafe.Pointer(&crop_args.arg_Offx)
+	 crop_args.argptr[9] = unsafe.Pointer(&crop_args.arg_Offy)
+	 crop_args.argptr[10] = unsafe.Pointer(&crop_args.arg_Offz)
+	 }
 
 // Wrapper for crop CUDA kernel, asynchronous.
-func k_crop_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Offx int, Offy int, Offz int, cfg *config) {
-	if Synchronous { // debug
+func k_crop_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Offx int, Offy int, Offz int,  cfg *config) {
+	if Synchronous{ // debug
 		Sync()
 		timer.Start("crop")
 	}
@@ -60,124 +60,49 @@ func k_crop_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer
 	crop_args.Lock()
 	defer crop_args.Unlock()
 
-	if crop_code == 0 {
+	if crop_code == 0{
 		crop_code = fatbinLoad(crop_map, "crop")
 	}
 
-	crop_args.arg_dst = dst
-	crop_args.arg_Dx = Dx
-	crop_args.arg_Dy = Dy
-	crop_args.arg_Dz = Dz
-	crop_args.arg_src = src
-	crop_args.arg_Sx = Sx
-	crop_args.arg_Sy = Sy
-	crop_args.arg_Sz = Sz
-	crop_args.arg_Offx = Offx
-	crop_args.arg_Offy = Offy
-	crop_args.arg_Offz = Offz
+	 crop_args.arg_dst = dst
+	 crop_args.arg_Dx = Dx
+	 crop_args.arg_Dy = Dy
+	 crop_args.arg_Dz = Dz
+	 crop_args.arg_src = src
+	 crop_args.arg_Sx = Sx
+	 crop_args.arg_Sy = Sy
+	 crop_args.arg_Sz = Sz
+	 crop_args.arg_Offx = Offx
+	 crop_args.arg_Offy = Offy
+	 crop_args.arg_Offz = Offz
+	
 
 	args := crop_args.argptr[:]
 	cu.LaunchKernel(crop_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous { // debug
+	if Synchronous{ // debug
 		Sync()
 		timer.Stop("crop")
 	}
 }
 
 // maps compute capability on PTX code for crop kernel.
-var crop_map = map[int]string{0: "",
-	20: crop_ptx_20,
-	30: crop_ptx_30,
-	35: crop_ptx_35,
-	50: crop_ptx_50,
-	52: crop_ptx_52,
-	53: crop_ptx_53}
+var crop_map = map[int]string{ 0: "" ,
+30: crop_ptx_30 ,
+35: crop_ptx_35 ,
+37: crop_ptx_37 ,
+50: crop_ptx_50 ,
+52: crop_ptx_52 ,
+53: crop_ptx_53 ,
+60: crop_ptx_60 ,
+61: crop_ptx_61 ,
+70: crop_ptx_70 ,
+75: crop_ptx_75  }
 
 // crop PTX code for various compute capabilities.
-const (
-	crop_ptx_20 = `
-.version 4.3
-.target sm_20
-.address_size 64
-
-	// .globl	crop
-
-.visible .entry crop(
-	.param .u64 crop_param_0,
-	.param .u32 crop_param_1,
-	.param .u32 crop_param_2,
-	.param .u32 crop_param_3,
-	.param .u64 crop_param_4,
-	.param .u32 crop_param_5,
-	.param .u32 crop_param_6,
-	.param .u32 crop_param_7,
-	.param .u32 crop_param_8,
-	.param .u32 crop_param_9,
-	.param .u32 crop_param_10
-)
-{
-	.reg .pred 	%p<6>;
-	.reg .f32 	%f<2>;
-	.reg .b32 	%r<28>;
-	.reg .b64 	%rd<9>;
-
-
-	ld.param.u64 	%rd1, [crop_param_0];
-	ld.param.u32 	%r4, [crop_param_1];
-	ld.param.u32 	%r5, [crop_param_2];
-	ld.param.u32 	%r11, [crop_param_3];
-	ld.param.u64 	%rd2, [crop_param_4];
-	ld.param.u32 	%r6, [crop_param_5];
-	ld.param.u32 	%r7, [crop_param_6];
-	ld.param.u32 	%r8, [crop_param_8];
-	ld.param.u32 	%r9, [crop_param_9];
-	ld.param.u32 	%r10, [crop_param_10];
-	mov.u32 	%r12, %ctaid.x;
-	mov.u32 	%r13, %ntid.x;
-	mov.u32 	%r14, %tid.x;
-	mad.lo.s32 	%r1, %r13, %r12, %r14;
-	mov.u32 	%r15, %ntid.y;
-	mov.u32 	%r16, %ctaid.y;
-	mov.u32 	%r17, %tid.y;
-	mad.lo.s32 	%r2, %r15, %r16, %r17;
-	mov.u32 	%r18, %ntid.z;
-	mov.u32 	%r19, %ctaid.z;
-	mov.u32 	%r20, %tid.z;
-	mad.lo.s32 	%r3, %r18, %r19, %r20;
-	setp.lt.s32	%p1, %r1, %r4;
-	setp.lt.s32	%p2, %r2, %r5;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r11;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_2;
-	bra.uni 	BB0_1;
-
-BB0_1:
-	cvta.to.global.u64 	%rd3, %rd2;
-	add.s32 	%r21, %r3, %r10;
-	add.s32 	%r22, %r2, %r9;
-	mad.lo.s32 	%r23, %r21, %r7, %r22;
-	add.s32 	%r24, %r1, %r8;
-	mad.lo.s32 	%r25, %r23, %r6, %r24;
-	mul.wide.s32 	%rd4, %r25, 4;
-	add.s64 	%rd5, %rd3, %rd4;
-	ld.global.f32 	%f1, [%rd5];
-	mad.lo.s32 	%r26, %r3, %r5, %r2;
-	mad.lo.s32 	%r27, %r26, %r4, %r1;
-	cvta.to.global.u64 	%rd6, %rd1;
-	mul.wide.s32 	%rd7, %r27, 4;
-	add.s64 	%rd8, %rd6, %rd7;
-	st.global.f32 	[%rd8], %f1;
-
-BB0_2:
-	ret;
-}
-
-
-`
-	crop_ptx_30 = `
-.version 4.3
+const(
+  crop_ptx_30 = `
+.version 6.3
 .target sm_30
 .address_size 64
 
@@ -256,102 +181,13 @@ BB0_2:
 
 
 `
-	crop_ptx_35 = `
-.version 4.3
+   crop_ptx_35 = `
+.version 6.3
 .target sm_35
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	crop
+
 .visible .entry crop(
 	.param .u64 crop_param_0,
 	.param .u32 crop_param_1,
@@ -399,10 +235,10 @@ BB0_2:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB6_2;
-	bra.uni 	BB6_1;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-BB6_1:
+BB0_1:
 	cvta.to.global.u64 	%rd3, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
@@ -419,108 +255,99 @@ BB6_1:
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.f32 	[%rd8], %f1;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
-	crop_ptx_50 = `
-.version 4.3
+   crop_ptx_37 = `
+.version 6.3
+.target sm_37
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+   crop_ptx_50 = `
+.version 6.3
 .target sm_50
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	crop
+
 .visible .entry crop(
 	.param .u64 crop_param_0,
 	.param .u32 crop_param_1,
@@ -568,10 +395,10 @@ BB6_2:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB6_2;
-	bra.uni 	BB6_1;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-BB6_1:
+BB0_1:
 	cvta.to.global.u64 	%rd3, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
@@ -588,108 +415,19 @@ BB6_1:
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.f32 	[%rd8], %f1;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
-	crop_ptx_52 = `
-.version 4.3
+   crop_ptx_52 = `
+.version 6.3
 .target sm_52
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	crop
+
 .visible .entry crop(
 	.param .u64 crop_param_0,
 	.param .u32 crop_param_1,
@@ -737,10 +475,10 @@ BB6_2:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB6_2;
-	bra.uni 	BB6_1;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-BB6_1:
+BB0_1:
 	cvta.to.global.u64 	%rd3, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
@@ -757,108 +495,19 @@ BB6_1:
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.f32 	[%rd8], %f1;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
-	crop_ptx_53 = `
-.version 4.3
+   crop_ptx_53 = `
+.version 6.3
 .target sm_53
 .address_size 64
 
-	// .weak	cudaMalloc
-
-.weak .func  (.param .b32 func_retval0) cudaMalloc(
-	.param .b64 cudaMalloc_param_0,
-	.param .b64 cudaMalloc_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaFuncGetAttributes
-.weak .func  (.param .b32 func_retval0) cudaFuncGetAttributes(
-	.param .b64 cudaFuncGetAttributes_param_0,
-	.param .b64 cudaFuncGetAttributes_param_1
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaDeviceGetAttribute
-.weak .func  (.param .b32 func_retval0) cudaDeviceGetAttribute(
-	.param .b64 cudaDeviceGetAttribute_param_0,
-	.param .b32 cudaDeviceGetAttribute_param_1,
-	.param .b32 cudaDeviceGetAttribute_param_2
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaGetDevice
-.weak .func  (.param .b32 func_retval0) cudaGetDevice(
-	.param .b64 cudaGetDevice_param_0
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessor
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessor_param_3
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
-	// .weak	cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags
-.weak .func  (.param .b32 func_retval0) cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_0,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_1,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_2,
-	.param .b64 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_3,
-	.param .b32 cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_param_4
-)
-{
-	.reg .b32 	%r<2>;
-
-
-	mov.u32 	%r1, 30;
-	st.param.b32	[func_retval0+0], %r1;
-	ret;
-}
-
 	// .globl	crop
+
 .visible .entry crop(
 	.param .u64 crop_param_0,
 	.param .u32 crop_param_1,
@@ -906,10 +555,10 @@ BB6_2:
 	and.pred  	%p3, %p1, %p2;
 	setp.lt.s32	%p4, %r3, %r11;
 	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB6_2;
-	bra.uni 	BB6_1;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
 
-BB6_1:
+BB0_1:
 	cvta.to.global.u64 	%rd3, %rd2;
 	add.s32 	%r21, %r3, %r10;
 	add.s32 	%r22, %r2, %r9;
@@ -926,10 +575,330 @@ BB6_1:
 	add.s64 	%rd8, %rd6, %rd7;
 	st.global.f32 	[%rd8], %f1;
 
-BB6_2:
+BB0_2:
 	ret;
 }
 
 
 `
+   crop_ptx_60 = `
+.version 6.3
+.target sm_60
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
 )
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+   crop_ptx_61 = `
+.version 6.3
+.target sm_61
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+   crop_ptx_70 = `
+.version 6.3
+.target sm_70
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+   crop_ptx_75 = `
+.version 6.3
+.target sm_75
+.address_size 64
+
+	// .globl	crop
+
+.visible .entry crop(
+	.param .u64 crop_param_0,
+	.param .u32 crop_param_1,
+	.param .u32 crop_param_2,
+	.param .u32 crop_param_3,
+	.param .u64 crop_param_4,
+	.param .u32 crop_param_5,
+	.param .u32 crop_param_6,
+	.param .u32 crop_param_7,
+	.param .u32 crop_param_8,
+	.param .u32 crop_param_9,
+	.param .u32 crop_param_10
+)
+{
+	.reg .pred 	%p<6>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<28>;
+	.reg .b64 	%rd<9>;
+
+
+	ld.param.u64 	%rd1, [crop_param_0];
+	ld.param.u32 	%r4, [crop_param_1];
+	ld.param.u32 	%r5, [crop_param_2];
+	ld.param.u32 	%r11, [crop_param_3];
+	ld.param.u64 	%rd2, [crop_param_4];
+	ld.param.u32 	%r6, [crop_param_5];
+	ld.param.u32 	%r7, [crop_param_6];
+	ld.param.u32 	%r8, [crop_param_8];
+	ld.param.u32 	%r9, [crop_param_9];
+	ld.param.u32 	%r10, [crop_param_10];
+	mov.u32 	%r12, %ctaid.x;
+	mov.u32 	%r13, %ntid.x;
+	mov.u32 	%r14, %tid.x;
+	mad.lo.s32 	%r1, %r13, %r12, %r14;
+	mov.u32 	%r15, %ntid.y;
+	mov.u32 	%r16, %ctaid.y;
+	mov.u32 	%r17, %tid.y;
+	mad.lo.s32 	%r2, %r15, %r16, %r17;
+	mov.u32 	%r18, %ntid.z;
+	mov.u32 	%r19, %ctaid.z;
+	mov.u32 	%r20, %tid.z;
+	mad.lo.s32 	%r3, %r18, %r19, %r20;
+	setp.lt.s32	%p1, %r1, %r4;
+	setp.lt.s32	%p2, %r2, %r5;
+	and.pred  	%p3, %p1, %p2;
+	setp.lt.s32	%p4, %r3, %r11;
+	and.pred  	%p5, %p3, %p4;
+	@!%p5 bra 	BB0_2;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	cvta.to.global.u64 	%rd3, %rd2;
+	add.s32 	%r21, %r3, %r10;
+	add.s32 	%r22, %r2, %r9;
+	mad.lo.s32 	%r23, %r21, %r7, %r22;
+	add.s32 	%r24, %r1, %r8;
+	mad.lo.s32 	%r25, %r23, %r6, %r24;
+	mul.wide.s32 	%rd4, %r25, 4;
+	add.s64 	%rd5, %rd3, %rd4;
+	ld.global.nc.f32 	%f1, [%rd5];
+	mad.lo.s32 	%r26, %r3, %r5, %r2;
+	mad.lo.s32 	%r27, %r26, %r4, %r1;
+	cvta.to.global.u64 	%rd6, %rd1;
+	mul.wide.s32 	%rd7, %r27, 4;
+	add.s64 	%rd8, %rd6, %rd7;
+	st.global.f32 	[%rd8], %f1;
+
+BB0_2:
+	ret;
+}
+
+
+`
+ )

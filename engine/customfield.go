@@ -32,6 +32,12 @@ func init() {
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 	DeclFunc("Shifted", Shifted, "Shifted quantity")
 	DeclFunc("Masked", Masked, "Mask quantity with shape")
+	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
+}
+
+//Removes all customfields
+func RemoveCustomFields() {
+	customTerms = nil
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.

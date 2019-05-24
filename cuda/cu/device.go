@@ -5,20 +5,13 @@ package cu
 //#include <cuda.h>
 import "C"
 
-import ()
-
 // CUDA Device number.
 type Device int
 
 // Returns the compute capability of the device.
 func DeviceComputeCapability(device Device) (major, minor int) {
-	var maj, min C.int
-	err := Result(C.cuDeviceComputeCapability(&maj, &min, C.CUdevice(device)))
-	if err != SUCCESS {
-		panic(err)
-	}
-	major = int(maj)
-	minor = int(min)
+	major = device.Attribute(COMPUTE_CAPABILITY_MAJOR)
+	minor = device.Attribute(COMPUTE_CAPABILITY_MINOR)
 	return
 }
 
@@ -93,27 +86,22 @@ type DevProp struct {
 	TextureAlign        int
 }
 
-// Returns the device's properties.
+// Returns the dev's properties.
 func DeviceGetProperties(dev Device) (prop DevProp) {
-	var cprop C.CUdevprop
-	err := Result(C.cuDeviceGetProperties(&cprop, C.CUdevice(dev)))
-	if err != SUCCESS {
-		panic(err)
-	}
-	prop.MaxThreadsPerBlock = int(cprop.maxThreadsPerBlock)
-	prop.MaxThreadsDim[0] = int(cprop.maxThreadsDim[0])
-	prop.MaxThreadsDim[1] = int(cprop.maxThreadsDim[1])
-	prop.MaxThreadsDim[2] = int(cprop.maxThreadsDim[2])
-	prop.MaxGridSize[0] = int(cprop.maxGridSize[0])
-	prop.MaxGridSize[1] = int(cprop.maxGridSize[1])
-	prop.MaxGridSize[2] = int(cprop.maxGridSize[2])
-	prop.SharedMemPerBlock = int(cprop.sharedMemPerBlock)
-	prop.TotalConstantMemory = int(cprop.totalConstantMemory)
-	prop.SIMDWidth = int(cprop.SIMDWidth)
-	prop.MemPitch = int(cprop.memPitch)
-	prop.RegsPerBlock = int(cprop.regsPerBlock)
-	prop.ClockRate = int(cprop.clockRate)
-	prop.TextureAlign = int(cprop.textureAlign)
+	prop.MaxThreadsPerBlock = dev.Attribute(MAX_THREADS_PER_BLOCK)
+	prop.MaxThreadsDim[0] = dev.Attribute(MAX_BLOCK_DIM_X)
+	prop.MaxThreadsDim[1] = dev.Attribute(MAX_BLOCK_DIM_Y)
+	prop.MaxThreadsDim[2] = dev.Attribute(MAX_BLOCK_DIM_Z)
+	prop.MaxGridSize[0] = dev.Attribute(MAX_GRID_DIM_X)
+	prop.MaxGridSize[1] = dev.Attribute(MAX_GRID_DIM_Y)
+	prop.MaxGridSize[2] = dev.Attribute(MAX_GRID_DIM_Z)
+	prop.SharedMemPerBlock = dev.Attribute(MAX_SHARED_MEMORY_PER_BLOCK)
+	prop.TotalConstantMemory = dev.Attribute(TOTAL_CONSTANT_MEMORY)
+	prop.SIMDWidth = dev.Attribute(WARP_SIZE)
+	prop.MemPitch = dev.Attribute(MAX_PITCH)
+	prop.RegsPerBlock = dev.Attribute(MAX_REGISTERS_PER_BLOCK)
+	prop.ClockRate = dev.Attribute(CLOCK_RATE)
+	prop.TextureAlign = dev.Attribute(TEXTURE_ALIGNMENT)
 	return
 }
 
@@ -182,4 +170,6 @@ const (
 	UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host
 	MAXIMUM_TEXTURE1D_LAYERED_WIDTH  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH  // Maximum 1D layered texture width
 	MAXIMUM_TEXTURE1D_LAYERED_LAYERS DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS // Maximum layers in a 1D layered texture
+	COMPUTE_CAPABILITY_MAJOR         DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR         // Major compute capability version number
+	COMPUTE_CAPABILITY_MINOR         DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR         // Minor compute capability version number
 )

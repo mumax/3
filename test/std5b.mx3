@@ -1,28 +1,32 @@
 /*
 	Test for Slonczewski STT with nonzero epsilonprime.
-	Standard solution was verified against oommf 1.2a5bis
+	Standard solution was verified against oommf 2.0a0
 */
+
+setsolver(5)
+DemagAccuracy = 29
 
 total_current := -0.006 // Current in amps
 
-Msat   = 800e3
-Aex    = 13e-12
-Pol    = 0.5669
+Msat = 800e3
+Aex = 13e-12
+Pol = 0.5669
 Lambda = 2
-EpsilonPrime = 1
+EpsilonPrime = 1.0
+gammaLL = 2.211e5 / mu0
 
-mp_theta := pi*20/180 // Direction of mp
+mp_theta := pi * 20.0 / 180 // Direction of mp
 
 length := 160e-9
-width  :=  80e-9
-thick  :=  5e-9
+width := 80e-9
+thick := 5e-9
 
 Nx := 64
 Ny := 32
 Nz := 1
 
-current_area := length*width
-current_density := total_current/current_area
+current_area := length * width
+current_density := total_current / current_area
 J = vector(0, 0, current_density)
 
 SetGridSize(Nx, Ny, Nz)
@@ -31,10 +35,37 @@ SetCellSize(length/Nx, width/Ny, thick/Nz)
 alpha = 0.01
 FixedLayer = vector(cos(mp_theta), sin(mp_theta), 0)
 
+m = uniform(1, .1, 0)
 
-m = uniform(1,0,0)
+minDt = 1e-18
+maxDt = 1e-12
+maxErr = 1e-6
 
-run(0.5e-9)
+run(1e-9)
+
+save(m)
+
 TOL := 1e-5
-expectv("m", m.average(), vector(-0.9538384675979614, -0.27802664041519165, 0.0052331965416669846), TOL)
+print(m.average())
+
+// # ODT 1.0
+// ## Desc: Data from vector field file std5b-eprime1-Oxs_TimeDriver-Spin-00-0002233.omf
+// ## Active volume: (0,0,0) x (1.6e-07,8e-08,5e-09)
+// ## Cell size: 2.5e-09 x 2.5e-09 x 5e-09
+// ## Cells in active volume: 2048
+// #
+// # Table Start
+// # Title: Average across active volume
+// # Columns:\
+// #        m_x                  m_y                  m_z
+// #   Units:\
+// #         {}                   {}                   {}
+//  -0.953323544827031   -0.279948071263437    0.00528093273512820
+// # Table End
+
+m1 := -0.953323544827031
+m2 := -0.279948071263437
+m3 := 0.00528093273512820
+
+expectv("m", m.average(), vector(m1, m2, m3), TOL)
 

@@ -67,6 +67,7 @@ var (
 	flag_vtk       = flag.String("vtk", "", `"ascii" or "binary" VTK output`)
 	flag_dump      = flag.Bool("dump", false, `output in dump format`)
 	flag_csv       = flag.Bool("csv", false, `output in CSV format`)
+	flag_numpy     = flag.Bool("numpy", false, "Numpy output")
 	flag_json      = flag.Bool("json", false, `output in JSON format`)
 	flag_min       = flag.String("min", "auto", `Minimum of color scale: "auto" or value.`)
 	flag_max       = flag.String("max", "auto", `Maximum of color scale: "auto" or value.`)
@@ -82,7 +83,7 @@ var (
 )
 
 var (
-	colormap []color.RGBA
+	colormap []draw.ColorMapSpec
 )
 
 type task struct {
@@ -98,7 +99,8 @@ func main() {
 		log.Fatal("no input files")
 	}
 
-	colormap = parseColors(*flag_color)
+	colormap = make([]draw.ColorMapSpec, 1, 1)
+	colormap[0].Cmap = parseColors(*flag_color)
 
 	// politely try to make the output directory
 	if *flag_dir != "" {
@@ -265,6 +267,7 @@ var outputs = map[*bool]output{
 	flag_gnuplot: {".gplot", dumpGnuplot},
 	flag_dump:    {".dump", outputDUMP},
 	flag_csv:     {".csv", dumpCSV},
+	flag_numpy:   {".npy", dumpNUMPY},
 	flag_json:    {".json", dumpJSON},
 	flag_show:    {"", show},
 }
@@ -324,8 +327,13 @@ func preprocess(f *data.Slice) {
 	if *flag_normpeak {
 		normpeak(f)
 	}
+	colormap[0].Ccomp = -1
 	if *flag_comp != "" {
-		*f = *f.Comp(parseComp(*flag_comp))
+		c := parseComp(*flag_comp)
+		colormap[0].Ccomp = c
+		if *flag_arrows == 0 {
+			*f = *f.Comp(c)
+		}
 	}
 	crop(f)
 	if *flag_resize != "" {

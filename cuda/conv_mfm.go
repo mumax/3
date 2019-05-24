@@ -86,14 +86,14 @@ func (c *MFMConvolution) Exec(outp, inp, vol *data.Slice, Msat MSlice) {
 	}
 }
 
-func (c *MFMConvolution) Reinit(lift, tipsize float64) {
-	c.kern = mag.MFMKernel(c.mesh, lift, tipsize)
+func (c *MFMConvolution) Reinit(lift, tipsize float64, cachedir string) {
+	c.kern = mag.MFMKernel(c.mesh, lift, tipsize, cachedir)
 	c.initFFTKern3D()
 }
 
 // Initializes a convolution to evaluate the demag field for the given mesh geometry.
-func NewMFM(mesh *data.Mesh, lift, tipsize float64) *MFMConvolution {
-	k := mag.MFMKernel(mesh, lift, tipsize)
+func NewMFM(mesh *data.Mesh, lift, tipsize float64, cachedir string) *MFMConvolution {
+	k := mag.MFMKernel(mesh, lift, tipsize, cachedir)
 	size := mesh.Size()
 	c := new(MFMConvolution)
 	c.size = size

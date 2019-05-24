@@ -7,7 +7,6 @@ import (
 )
 
 func TestSlice(t *testing.T) {
-	Init(0)
 	N0, N1, N2 := 2, 4, 8
 	m := [3]int{N0, N1, N2}
 	N := N0 * N1 * N2
@@ -42,7 +41,6 @@ func TestSlice(t *testing.T) {
 }
 
 func TestCpy(t *testing.T) {
-	Init(0)
 	N0, N1, N2 := 2, 4, 32
 	N := N0 * N1 * N2
 	mesh := [3]int{N0, N1, N2}

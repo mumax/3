@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/mumax/3/data"
 	"image"
-	"image/color"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -15,7 +14,7 @@ import (
 	"strings"
 )
 
-func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int, colormap ...color.RGBA) error {
+func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int, colormap ...ColorMapSpec) error {
 	out, err := os.Create(fname)
 	if err != nil {
 		return err
@@ -24,7 +23,7 @@ func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int, col
 	return RenderFormat(out, f, min, max, arrowSize, fname, colormap...)
 }
 
-func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, format string, colormap ...color.RGBA) error {
+func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, format string, colormap ...ColorMapSpec) error {
 	var codecs = map[string]codec{".png": PNG, ".jpg": JPEG100, ".gif": GIF256}
 	ext := strings.ToLower(path.Ext(format))
 	enc := codecs[ext]
@@ -38,7 +37,7 @@ func RenderFormat(out io.Writer, f *data.Slice, min, max string, arrowSize int, 
 type codec func(io.Writer, image.Image) error
 
 // Render data and encode with arbitrary codec.
-func Render(out io.Writer, f *data.Slice, min, max string, arrowSize int, encode codec, colormap ...color.RGBA) error {
+func Render(out io.Writer, f *data.Slice, min, max string, arrowSize int, encode codec, colormap ...ColorMapSpec) error {
 	img := Image(f, min, max, arrowSize, colormap...)
 	buf := bufio.NewWriter(out)
 	defer buf.Flush()

@@ -134,7 +134,8 @@ func AsScalarField(q Quantity) ScalarField {
 	return ScalarField{q}
 }
 
-func (s ScalarField) Average() float64         { return AverageOf(s.Quantity)[0] }
+func (s ScalarField) average() []float64       { return AverageOf(s.Quantity) }
+func (s ScalarField) Average() float64         { return s.average()[0] }
 func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Quantity, r)) }
 func (s ScalarField) Name() string             { return NameOf(s.Quantity) }
 
@@ -153,11 +154,14 @@ func AsVectorField(q Quantity) VectorField {
 	return VectorField{q}
 }
 
-func (v VectorField) Average() data.Vector     { return unslice(AverageOf(v.Quantity)) }
+func (v VectorField) average() []float64       { return AverageOf(v.Quantity) }
+func (v VectorField) Average() data.Vector     { return unslice(v.average()) }
 func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v.Quantity, r)) }
 func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Quantity, c)) }
 func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Quantity) }
 func (v VectorField) Name() string             { return NameOf(v.Quantity) }
 func (v VectorField) HostCopy() *data.Slice {
-	return ValueOf(v.Quantity)
+	s := ValueOf(v.Quantity)
+	defer cuda.Recycle(s)
+	return s.HostCopy()
 }

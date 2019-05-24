@@ -26,6 +26,8 @@ var (
 	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
 	ExchCoupling = NewScalarField("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
 	DindCoupling = NewScalarField("DindCoupling", "arb.", "Average DMI coupling with neighbors", dindDecode)
+
+	OpenBC = false
 )
 
 var AddExchangeEnergyDensity = makeEdensAdder(&B_exch, -0.5) // TODO: normal func
@@ -36,6 +38,7 @@ func init() {
 	DeclFunc("ext_InterExchange", InterExchange, "Sets exchange coupling between two regions.")
 	DeclFunc("ext_ScaleDind", ScaleInterDind, "Re-scales Dind coupling between two regions.")
 	DeclFunc("ext_InterDind", InterDind, "Sets Dind coupling between two regions.")
+	DeclVar("OpenBC", &OpenBC, "Use open boundary conditions (default=false)")
 	lex2.init(Aex)
 	din2.init(Dind)
 	dbulk2.init(Dbulk)
@@ -52,13 +55,12 @@ func AddExchangeField(dst *data.Slice) {
 		cuda.AddExchange(dst, M.Buffer(), lex2.Gpu(), ms, regions.Gpu(), M.Mesh())
 	case inter && !bulk:
 		Refer("mulkers2017")
-		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), ms, regions.Gpu(), M.Mesh()) // dmi+exchange
+		cuda.AddDMI(dst, M.Buffer(), lex2.Gpu(), din2.Gpu(), ms, regions.Gpu(), M.Mesh(), OpenBC) // dmi+exchange
 	case bulk && !inter:
-		util.AssertMsg(allowUnsafe || (Msat.IsUniform() && Aex.IsUniform() && Dbulk.IsUniform()), "DMI: Msat, Aex, Dex must be uniform")
-		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), ms, regions.Gpu(), M.Mesh()) // dmi+exchange
-		// TODO: add ScaleInterDbulk and InterDbulk when inhomo Dbulk gets fixed
+		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), ms, regions.Gpu(), M.Mesh(), OpenBC) // dmi+exchange
+		// TODO: add ScaleInterDbulk and InterDbulk
 	case inter && bulk:
-		util.Fatal("Cannot have induced and interfacial DMI at the same time")
+		util.Fatal("Cannot have interfacial-induced DMI and bulk DMI at the same time")
 	}
 }
 

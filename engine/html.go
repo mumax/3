@@ -28,6 +28,78 @@ const templText = `
 	    }
 	</script>
 
+
+
+	<style type="text/css">
+		* {box-sizing: border-box;}
+		.img-loupe-div { position: relative; }
+		.img-loupe {
+		  position: absolute;
+		  border: 1px solid #000;
+		  border-radius: 2% 50% 50%;
+		  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4) ;
+		  cursor: crosshair;
+		  width: 150px;
+		  height: 150px;
+		  image-rendering: pixelated;
+		  display: none;
+		}
+	</style>
+	<script type="text/javascript">
+		// image Loupe
+		function updateLoupe(imgID, zoom) {
+		var img, loupe;
+		img = document.getElementById(imgID);
+		loupe = img.parentElement.getElementsByClassName("img-loupe")[0];
+		loupe.style.backgroundImage = "url('" + img.src + "')";
+		loupe.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
+		}
+
+		function magnify(imgID, zoom) {
+		  var img, loupe, w, h;
+		  img = document.getElementById(imgID);
+
+		  /* Create loupe: */
+		  loupe = document.createElement("DIV");
+		  loupe.setAttribute("class", "img-loupe");
+		  img.parentElement.insertBefore(loupe, img);
+		  img.style.cursor="crosshair";
+
+		  /* Set background for loupe: */
+		  loupe.style.backgroundImage = "url('" + img.src + "')";
+		  loupe.style.backgroundRepeat = "no-repeat";
+		  loupe.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
+
+		  /* Execute a function when someone moves the magnifier loupe over the image: */
+		  img.parentElement.addEventListener("mousemove", moveMagnifier);
+		  img.parentElement.addEventListener("mouseleave", function(e){loupe.style.display='none';});
+
+		  function moveMagnifier(e) {
+		    var pos, a, x = 0, y = 0;
+		    /* Prevent any other actions that may occur when moving over the image */
+		    e.preventDefault();
+		    /* Calculate the cursor coordinates relative to the image: */
+		    e = e || window.event;
+		    a = img.getBoundingClientRect();
+		    x = e.pageX - a.left - window.pageXOffset;
+		    y = e.pageY - a.top - window.pageYOffset;
+
+		    /* Prevent the magnifier loupe from being positioned outside the image: */
+		    loupe.style.display='block';
+		    if (x > img.width || x < 0 || y > img.height || y < 0) {loupe.style.display='none';}
+
+		    /* Set the position of the magnifier loupe: */
+		    loupe.style.left = (x-10+2) + "px";
+		    loupe.style.top = (y+5+2) + "px";
+
+		    /* Display what the magnifier loupe "sees": */
+		    w = loupe.offsetWidth / 2;
+			h = loupe.offsetHeight / 2;
+		    loupe.style.backgroundPosition = " " + (-(x * zoom) + w) + "px " + (-(y * zoom) + h) + "px";
+		  }
+		}
+	</script>
+
 </head>
 
 
@@ -85,7 +157,7 @@ const templText = `
 
 {{.Data.Div "console"}}
 
-{{.Console "console" 8 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
+{{.Console "console" 16 84 "" "onfocus=\"console_focus=true\"" "onblur=\"console_focus=false\"" "onmouseover=\"console_focus=true\"" "onmouseout=\"console_focus=false\"" "readonly" "style=\"font-family:monospace; font-size:0.8em;\"" }}	<br/>
 
 {{.CliBox "cli" "" "onkeydown=\"clikeydown(event);\"" "placeholder=\"type commands here, or up/down\"" "size=86" "style=\"font-family:monospace; font-size:0.8em;\""  }}
 
@@ -125,7 +197,7 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 
 {{.Data.Div "solver"}}
 
-	Type: {{.Select "solvertype" "rk45" "bw_euler" "euler" "heun" "rk4" "rk23" "rk45"}}
+	Type: {{.Select "solvertype" "rk45" "bw_euler" "euler" "heun" "rk4" "rk23" "rk45" "rkf56"}}
 	<table>
 		<tr> <td>
 
@@ -178,7 +250,14 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 </p>
 
 <p> 
+<div class="img-loupe-div" style="margin: 0">
 {{.Img "display" "/render/m" "alt=\"display\""}}
+<script>
+	/* Set loupe and update it as the image can change... */
+	magnify("display", 5);
+	setInterval(function () { updateLoupe("display", 5); }, tick*2);
+</script>
+</div>
 </p>
 
 

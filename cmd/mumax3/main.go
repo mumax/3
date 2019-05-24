@@ -4,15 +4,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/engine"
-	"github.com/mumax/3/script"
-	"github.com/mumax/3/util"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"time"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/engine"
+	"github.com/mumax/3/script"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -51,7 +52,9 @@ func main() {
 
 	switch flag.NArg() {
 	case 0:
-		runInteractive()
+		if *engine.Flag_interactive {
+			runInteractive()
+		}
 	case 1:
 		runFileAndServe(flag.Arg(0))
 	default:
@@ -160,10 +163,12 @@ func goServeGUI() string {
 
 // print version to stdout
 func printVersion() {
-	fmt.Print("//", engine.UNAME, "\n")
-	fmt.Print("//", cuda.GPUInfo, ", using CC", cuda.UseCC, " PTX \n")
-	fmt.Print("//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium", "\n")
-	fmt.Print("//This is free software without any warranty. See license.txt", "\n")
-	fmt.Print("//If you use mumax in any work or publication,", "\n")
-	fmt.Print("//we kindly ask you to cite the references in references.bib", "\n")
+	engine.LogOut(engine.UNAME)
+	engine.LogOut(cuda.GPUInfo, ", using CC", cuda.UseCC, " PTX")
+	engine.LogOut("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium")
+	engine.LogOut("This is free software without any warranty. See license.txt")
+	engine.LogOut("********************************************************************//")
+	engine.LogOut("  If you use mumax in any work or publication,                      //")
+	engine.LogOut("  we kindly ask you to cite the references in references.bib        //")
+	engine.LogOut("********************************************************************//")
 }

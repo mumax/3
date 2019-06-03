@@ -13,10 +13,10 @@ Msat = 1
 Ku1 = 1
 DMI := 1.1
 
-ext_DMItensor(0,0,2,-DMI)
-ext_DMItensor(0,2,0, DMI)
-ext_DMItensor(1,1,2,-DMI)
-ext_DMItensor(1,2,1, DMI)
+ext_DMItensor(0,0,2, DMI)
+ext_DMItensor(0,2,0,-DMI)
+ext_DMItensor(1,1,2, DMI)
+ext_DMItensor(1,2,1,-DMI)
 m = neelskyrmion(1,-1)
 relax()
 minimize()

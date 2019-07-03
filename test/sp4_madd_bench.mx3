@@ -1,0 +1,50 @@
+/*
+	Micromagnetic standard problem 4 (a) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+setgridsize(256, 64, 1)
+setcellsize(1e-9, 1e-9, 3e-9)
+
+// material
+Msat  = 1600e3
+Aex   = 13e-12
+Msat  = 800e3
+alpha = 0.02
+B_ext = vector(-24.6E-3, 4.3E-3, 0)
+
+// RK23BS
+SetSolver(3)
+m  = uniform(1, .1, 0)
+relax()
+t0 := now()
+run(10e-9)
+t1 := now()
+
+// RK4
+SetSolver(4)
+m  = uniform(1, .1, 0)
+relax()
+t2 := now()
+run(10e-9)
+t3 := now()
+
+// RK45DP
+SetSolver(5)
+m  = uniform(1, .1, 0)
+relax()
+t4 := now()
+run(10e-9)
+t5 := now()
+
+// RK56
+SetSolver(6)
+m  = uniform(1, .1, 0)
+relax()
+t6 := now()
+run(10e-9)
+t7 := now()
+
+print(sprintf("Run time: RK23BS %6.6E, RK4 %6.6E, RK45DP %6.6E, RK56 %6.6E", t1.sub(t0).Seconds(), t3.sub(t2).Seconds(), t5.sub(t4).Seconds(), t7.sub(t6).Seconds()))
+

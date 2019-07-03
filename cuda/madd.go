@@ -110,3 +110,22 @@ func Madd6(dst, src1, src2, src3, src4, src5, src6 *data.Slice, factor1, factor2
 			src6.DevPtr(c), factor6, N, cfg)
 	}
 }
+
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+func Madd7(dst, src1, src2, src3, src4, src5, src6, src7 *data.Slice, factor1, factor2, factor3, factor4, factor5, factor6, factor7 float32) {
+	N := dst.Len()
+	nComp := dst.NComp()
+	util.Assert(src1.Len() == N && src2.Len() == N && src3.Len() == N && src4.Len() == N && src5.Len() == N && src6.Len() == N && src7.Len() == N)
+	util.Assert(src1.NComp() == nComp && src2.NComp() == nComp && src3.NComp() == nComp && src4.NComp() == nComp && src5.NComp() == nComp && src6.NComp() == nComp && src7.NComp() == nComp)
+	cfg := make1DConf(N)
+	for c := 0; c < nComp; c++ {
+		k_madd7_async(dst.DevPtr(c),
+			src1.DevPtr(c), factor1,
+			src2.DevPtr(c), factor2,
+			src3.DevPtr(c), factor3,
+			src4.DevPtr(c), factor4,
+			src5.DevPtr(c), factor5,
+			src6.DevPtr(c), factor6,
+			src7.DevPtr(c), factor7, N, cfg)
+	}
+}

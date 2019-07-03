@@ -1,5 +1,5 @@
 
-// dst[i] = fac1 * src1[i] + fac2 * src2[i] + fac3 * src3[i]
+// dst[i] = src1[i] * fac1 + src2[i] * fac2 + src3[i] * fac3 + src4[i] * fac4 + src5[i] * fac5 + src6[i] * fac6
 extern "C" __global__ void
 madd6(float* __restrict__ dst,
       float* __restrict__ src1, float fac1,

@@ -47,7 +47,7 @@ func Madd2(dst, src1, src2 *data.Slice, factor1, factor2 float32) {
 	}
 }
 
-// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3[i] * factor3
 func Madd3(dst, src1, src2, src3 *data.Slice, factor1, factor2, factor3 float32) {
 	N := dst.Len()
 	nComp := dst.NComp()
@@ -60,7 +60,7 @@ func Madd3(dst, src1, src2, src3 *data.Slice, factor1, factor2, factor3 float32)
 	}
 }
 
-// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3[i] * factor3 + src4[i] * factor4
 func Madd4(dst, src1, src2, src3, src4 *data.Slice, factor1, factor2, factor3, factor4 float32) {
 	N := dst.Len()
 	nComp := dst.NComp()
@@ -76,7 +76,7 @@ func Madd4(dst, src1, src2, src3, src4 *data.Slice, factor1, factor2, factor3, f
 	}
 }
 
-// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3[i] * factor3 + src4[i] * factor4 + src5[i] * factor5
 func Madd5(dst, src1, src2, src3, src4, src5 *data.Slice, factor1, factor2, factor3, factor4, factor5 float32) {
 	N := dst.Len()
 	nComp := dst.NComp()
@@ -93,7 +93,7 @@ func Madd5(dst, src1, src2, src3, src4, src5 *data.Slice, factor1, factor2, fact
 	}
 }
 
-// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3[i] * factor3 + src4[i] * factor4 + src5[i] * factor5 + src6[i] * factor6
 func Madd6(dst, src1, src2, src3, src4, src5, src6 *data.Slice, factor1, factor2, factor3, factor4, factor5, factor6 float32) {
 	N := dst.Len()
 	nComp := dst.NComp()
@@ -111,7 +111,7 @@ func Madd6(dst, src1, src2, src3, src4, src5, src6 *data.Slice, factor1, factor2
 	}
 }
 
-// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3 * factor3
+// multiply-add: dst[i] = src1[i] * factor1 + src2[i] * factor2 + src3[i] * factor3 + src4[i] * factor4 + src5[i] * factor5 + src6[i] * factor6 + src7[i] * factor7
 func Madd7(dst, src1, src2, src3, src4, src5, src6, src7 *data.Slice, factor1, factor2, factor3, factor4, factor5, factor6, factor7 float32) {
 	N := dst.Len()
 	nComp := dst.NComp()

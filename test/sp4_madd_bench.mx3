@@ -47,4 +47,3 @@ run(10e-9)
 t7 := now()
 
 print(sprintf("Run time: RK23BS %6.6E, RK4 %6.6E, RK45DP %6.6E, RK56 %6.6E", t1.sub(t0).Seconds(), t3.sub(t2).Seconds(), t5.sub(t4).Seconds(), t7.sub(t6).Seconds()))
-

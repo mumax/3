@@ -138,6 +138,7 @@ func (s ScalarField) average() []float64       { return AverageOf(s.Quantity) }
 func (s ScalarField) Average() float64         { return s.average()[0] }
 func (s ScalarField) Region(r int) ScalarField { return AsScalarField(inRegion(s.Quantity, r)) }
 func (s ScalarField) Name() string             { return NameOf(s.Quantity) }
+func (s ScalarField) Unit() string             { return UnitOf(s.Quantity) }
 
 // VectorField enhances an outputField with methods specific to
 // a space-dependent vector quantity.
@@ -160,6 +161,7 @@ func (v VectorField) Region(r int) VectorField { return AsVectorField(inRegion(v
 func (v VectorField) Comp(c int) ScalarField   { return AsScalarField(Comp(v.Quantity, c)) }
 func (v VectorField) Mesh() *data.Mesh         { return MeshOf(v.Quantity) }
 func (v VectorField) Name() string             { return NameOf(v.Quantity) }
+func (v VectorField) Unit() string             { return UnitOf(v.Quantity) }
 func (v VectorField) HostCopy() *data.Slice {
 	s := ValueOf(v.Quantity)
 	defer cuda.Recycle(s)

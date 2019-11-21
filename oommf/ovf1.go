@@ -11,6 +11,9 @@ import (
 )
 
 func WriteOVF1(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) {
+	if q.NComp() != 3 {
+		log.Fatal("Cannot save the quantity: the OVF1 format only supports 3D-vector fields.")
+	}
 	writeOVF1Header(out, q, meta)
 	writeOVF1Data(out, q, dataformat)
 	hdr(out, "End", "Segment")

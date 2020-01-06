@@ -131,6 +131,33 @@ func (s *State) Output() string {
 	return out
 }
 
+// State.output gives a nice otuput for all examples except for the
+// hysteresis example. State.OutputHysteresis is the custom output function
+// for the hysteresis example.
+func (s *State) OutputHysteresis() string {
+	tableName := fmt.Sprintf(`%s/table.txt`, s.outfile())
+	figureName := fmt.Sprintf(`%s/hysteresis.svg`, s.outfile())
+
+	gnuplotCmd := `set term svg noenhanced size 400 300 font 'Arial,10';`
+	gnuplotCmd += fmt.Sprintf(`set output "%s";`, figureName)
+	gnuplotCmd += `set xlabel "B_ext(T)";`
+	gnuplotCmd += `set ylabel "m_x";`
+	gnuplotCmd += fmt.Sprintf(`plot "%s" u 5:2 w lp notitle;`, tableName)
+	gnuplotCmd += "set output;"
+
+	gnuplotOut, err := exec.Command("gnuplot", "-e", gnuplotCmd).CombinedOutput()
+	os.Stderr.Write(gnuplotOut)
+	check(err)
+
+	out := fmt.Sprintf(`
+<h3>output</h3>
+<figure>
+	<img src="%v"/>
+</figure>`, figureName)
+
+	return out
+}
+
 func (s *State) infile() string {
 	return fmt.Sprintf("example%v.mx3", s.count)
 }

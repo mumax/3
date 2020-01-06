@@ -133,6 +133,15 @@ func (a *api) remaining() []*entry {
 	return E
 }
 
+// list of all entries (touched and not touched)
+func (a *api) All() []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		E = append(E, e)
+	}
+	return E
+}
+
 // return all entries, unused so far, which have given type.
 func (a *api) FilterType(typ ...string) []*entry {
 	var E []*entry

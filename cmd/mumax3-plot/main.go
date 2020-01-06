@@ -61,7 +61,7 @@ func plotFile(fname string) {
 func makePlot(fname string, q *Q) {
 	term := "svg"
 	outf := path.Dir(fname) + "/" + q.vecname()
-	cmd := fmt.Sprintf(`set term %v size 400 300 fsize 10; set output "%v.%v";`, term, outf, term)
+	cmd := fmt.Sprintf(`set term %v noenhanced size 400 300 font 'Arial,10'; set output "%v.%v";`, term, outf, term)
 	cmd += fmt.Sprintf(`set xlabel "t(ns)";`)
 
 	cmd += fmt.Sprintf(`set ylabel "%v %v";`, q.vecname(), q.unit)

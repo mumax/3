@@ -2,15 +2,17 @@
 package main
 
 import (
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/engine"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"reflect"
 	"sort"
 	"strings"
 	"text/template"
 	"unicode"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/engine"
 )
 
 var (
@@ -32,6 +34,9 @@ func buildAPI() {
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
 	for K, v := range doc {
+		if v == "" { // check if we a docstring in the documantation of the Math package
+			v = getGoDocString("math", K)
+		}
 		k := strings.ToLower(K)
 		t := ident[k].Type()
 		entr := entry{K, t, v, false}
@@ -40,6 +45,16 @@ func buildAPI() {
 	}
 	sort.Sort(&e)
 	api_entries = e
+}
+
+func getGoDocString(packageName, identifier string) string {
+	docString := ""
+	cmd := exec.Command("go", "doc", packageName, identifier)
+	stdout, err := cmd.Output()
+	if err == nil && string(stdout)[:4] == "func" { // we only look for doc strings of functions
+		docString = strings.SplitAfterN(string(stdout), "\n", 3)[1] // the doc string of a function is on the second line
+	}
+	return docString
 }
 
 func (e *entry) Name() string {

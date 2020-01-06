@@ -1,6 +1,5 @@
 *.mx3
 *.out
-*.in
 examples.html
 api.html
 doc

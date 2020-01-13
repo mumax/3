@@ -5,46 +5,46 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for shiftbytes kernel
 var shiftbytes_code cu.Function
 
 // Stores the arguments for shiftbytes kernel invocation
-type shiftbytes_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_src unsafe.Pointer
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 arg_shx int
-	 arg_clamp byte
-	 argptr [7]unsafe.Pointer
+type shiftbytes_args_t struct {
+	arg_dst   unsafe.Pointer
+	arg_src   unsafe.Pointer
+	arg_Nx    int
+	arg_Ny    int
+	arg_Nz    int
+	arg_shx   int
+	arg_clamp byte
+	argptr    [7]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for shiftbytes kernel invocation
 var shiftbytes_args shiftbytes_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 shiftbytes_args.argptr[0] = unsafe.Pointer(&shiftbytes_args.arg_dst)
-	 shiftbytes_args.argptr[1] = unsafe.Pointer(&shiftbytes_args.arg_src)
-	 shiftbytes_args.argptr[2] = unsafe.Pointer(&shiftbytes_args.arg_Nx)
-	 shiftbytes_args.argptr[3] = unsafe.Pointer(&shiftbytes_args.arg_Ny)
-	 shiftbytes_args.argptr[4] = unsafe.Pointer(&shiftbytes_args.arg_Nz)
-	 shiftbytes_args.argptr[5] = unsafe.Pointer(&shiftbytes_args.arg_shx)
-	 shiftbytes_args.argptr[6] = unsafe.Pointer(&shiftbytes_args.arg_clamp)
-	 }
+	shiftbytes_args.argptr[0] = unsafe.Pointer(&shiftbytes_args.arg_dst)
+	shiftbytes_args.argptr[1] = unsafe.Pointer(&shiftbytes_args.arg_src)
+	shiftbytes_args.argptr[2] = unsafe.Pointer(&shiftbytes_args.arg_Nx)
+	shiftbytes_args.argptr[3] = unsafe.Pointer(&shiftbytes_args.arg_Ny)
+	shiftbytes_args.argptr[4] = unsafe.Pointer(&shiftbytes_args.arg_Nz)
+	shiftbytes_args.argptr[5] = unsafe.Pointer(&shiftbytes_args.arg_shx)
+	shiftbytes_args.argptr[6] = unsafe.Pointer(&shiftbytes_args.arg_clamp)
+}
 
 // Wrapper for shiftbytes CUDA kernel, asynchronous.
-func k_shiftbytes_async ( dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clamp byte,  cfg *config) {
-	if Synchronous{ // debug
+func k_shiftbytes_async(dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int, Nz int, shx int, clamp byte, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("shiftbytes")
 	}
@@ -52,45 +52,44 @@ func k_shiftbytes_async ( dst unsafe.Pointer, src unsafe.Pointer, Nx int, Ny int
 	shiftbytes_args.Lock()
 	defer shiftbytes_args.Unlock()
 
-	if shiftbytes_code == 0{
+	if shiftbytes_code == 0 {
 		shiftbytes_code = fatbinLoad(shiftbytes_map, "shiftbytes")
 	}
 
-	 shiftbytes_args.arg_dst = dst
-	 shiftbytes_args.arg_src = src
-	 shiftbytes_args.arg_Nx = Nx
-	 shiftbytes_args.arg_Ny = Ny
-	 shiftbytes_args.arg_Nz = Nz
-	 shiftbytes_args.arg_shx = shx
-	 shiftbytes_args.arg_clamp = clamp
-	
+	shiftbytes_args.arg_dst = dst
+	shiftbytes_args.arg_src = src
+	shiftbytes_args.arg_Nx = Nx
+	shiftbytes_args.arg_Ny = Ny
+	shiftbytes_args.arg_Nz = Nz
+	shiftbytes_args.arg_shx = shx
+	shiftbytes_args.arg_clamp = clamp
 
 	args := shiftbytes_args.argptr[:]
 	cu.LaunchKernel(shiftbytes_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("shiftbytes")
 	}
 }
 
 // maps compute capability on PTX code for shiftbytes kernel.
-var shiftbytes_map = map[int]string{ 0: "" ,
-30: shiftbytes_ptx_30 ,
-35: shiftbytes_ptx_35 ,
-37: shiftbytes_ptx_37 ,
-50: shiftbytes_ptx_50 ,
-52: shiftbytes_ptx_52 ,
-53: shiftbytes_ptx_53 ,
-60: shiftbytes_ptx_60 ,
-61: shiftbytes_ptx_61 ,
-70: shiftbytes_ptx_70 ,
-75: shiftbytes_ptx_75  }
+var shiftbytes_map = map[int]string{0: "",
+	30: shiftbytes_ptx_30,
+	35: shiftbytes_ptx_35,
+	37: shiftbytes_ptx_37,
+	50: shiftbytes_ptx_50,
+	52: shiftbytes_ptx_52,
+	53: shiftbytes_ptx_53,
+	60: shiftbytes_ptx_60,
+	61: shiftbytes_ptx_61,
+	70: shiftbytes_ptx_70,
+	75: shiftbytes_ptx_75}
 
 // shiftbytes PTX code for various compute capabilities.
-const(
-  shiftbytes_ptx_30 = `
-.version 6.3
+const (
+	shiftbytes_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -131,15 +130,13 @@ const(
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -167,8 +164,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_35 = `
-.version 6.3
+	shiftbytes_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -209,15 +206,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -245,8 +240,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_37 = `
-.version 6.3
+	shiftbytes_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -287,15 +282,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -323,8 +316,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_50 = `
-.version 6.3
+	shiftbytes_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -365,15 +358,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -401,8 +392,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_52 = `
-.version 6.3
+	shiftbytes_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -443,15 +434,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -479,8 +468,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_53 = `
-.version 6.3
+	shiftbytes_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -521,15 +510,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -557,8 +544,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_60 = `
-.version 6.3
+	shiftbytes_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -599,15 +586,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -635,8 +620,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_61 = `
-.version 6.3
+	shiftbytes_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -677,15 +662,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -713,8 +696,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_70 = `
-.version 6.3
+	shiftbytes_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -755,15 +738,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -791,8 +772,8 @@ BB0_4:
 
 
 `
-   shiftbytes_ptx_75 = `
-.version 6.3
+	shiftbytes_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -833,15 +814,13 @@ BB0_4:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r6;
-	setp.lt.s32	%p2, %r2, %r7;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_4;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r6;
+	setp.ge.s32	%p2, %r2, %r7;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_4;
 
-BB0_1:
 	sub.s32 	%r4, %r1, %r8;
 	setp.lt.s32	%p6, %r4, 0;
 	setp.ge.s32	%p7, %r4, %r6;
@@ -869,4 +848,4 @@ BB0_4:
 
 
 `
- )
+)

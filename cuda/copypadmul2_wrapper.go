@@ -5,54 +5,54 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for copypadmul2 kernel
 var copypadmul2_code cu.Function
 
 // Stores the arguments for copypadmul2 kernel invocation
-type copypadmul2_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_Dx int
-	 arg_Dy int
-	 arg_Dz int
-	 arg_src unsafe.Pointer
-	 arg_Sx int
-	 arg_Sy int
-	 arg_Sz int
-	 arg_Ms_ unsafe.Pointer
-	 arg_Ms_mul float32
-	 arg_vol unsafe.Pointer
-	 argptr [11]unsafe.Pointer
+type copypadmul2_args_t struct {
+	arg_dst    unsafe.Pointer
+	arg_Dx     int
+	arg_Dy     int
+	arg_Dz     int
+	arg_src    unsafe.Pointer
+	arg_Sx     int
+	arg_Sy     int
+	arg_Sz     int
+	arg_Ms_    unsafe.Pointer
+	arg_Ms_mul float32
+	arg_vol    unsafe.Pointer
+	argptr     [11]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for copypadmul2 kernel invocation
 var copypadmul2_args copypadmul2_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 copypadmul2_args.argptr[0] = unsafe.Pointer(&copypadmul2_args.arg_dst)
-	 copypadmul2_args.argptr[1] = unsafe.Pointer(&copypadmul2_args.arg_Dx)
-	 copypadmul2_args.argptr[2] = unsafe.Pointer(&copypadmul2_args.arg_Dy)
-	 copypadmul2_args.argptr[3] = unsafe.Pointer(&copypadmul2_args.arg_Dz)
-	 copypadmul2_args.argptr[4] = unsafe.Pointer(&copypadmul2_args.arg_src)
-	 copypadmul2_args.argptr[5] = unsafe.Pointer(&copypadmul2_args.arg_Sx)
-	 copypadmul2_args.argptr[6] = unsafe.Pointer(&copypadmul2_args.arg_Sy)
-	 copypadmul2_args.argptr[7] = unsafe.Pointer(&copypadmul2_args.arg_Sz)
-	 copypadmul2_args.argptr[8] = unsafe.Pointer(&copypadmul2_args.arg_Ms_)
-	 copypadmul2_args.argptr[9] = unsafe.Pointer(&copypadmul2_args.arg_Ms_mul)
-	 copypadmul2_args.argptr[10] = unsafe.Pointer(&copypadmul2_args.arg_vol)
-	 }
+	copypadmul2_args.argptr[0] = unsafe.Pointer(&copypadmul2_args.arg_dst)
+	copypadmul2_args.argptr[1] = unsafe.Pointer(&copypadmul2_args.arg_Dx)
+	copypadmul2_args.argptr[2] = unsafe.Pointer(&copypadmul2_args.arg_Dy)
+	copypadmul2_args.argptr[3] = unsafe.Pointer(&copypadmul2_args.arg_Dz)
+	copypadmul2_args.argptr[4] = unsafe.Pointer(&copypadmul2_args.arg_src)
+	copypadmul2_args.argptr[5] = unsafe.Pointer(&copypadmul2_args.arg_Sx)
+	copypadmul2_args.argptr[6] = unsafe.Pointer(&copypadmul2_args.arg_Sy)
+	copypadmul2_args.argptr[7] = unsafe.Pointer(&copypadmul2_args.arg_Sz)
+	copypadmul2_args.argptr[8] = unsafe.Pointer(&copypadmul2_args.arg_Ms_)
+	copypadmul2_args.argptr[9] = unsafe.Pointer(&copypadmul2_args.arg_Ms_mul)
+	copypadmul2_args.argptr[10] = unsafe.Pointer(&copypadmul2_args.arg_vol)
+}
 
 // Wrapper for copypadmul2 CUDA kernel, asynchronous.
-func k_copypadmul2_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Ms_ unsafe.Pointer, Ms_mul float32, vol unsafe.Pointer,  cfg *config) {
-	if Synchronous{ // debug
+func k_copypadmul2_async(dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsafe.Pointer, Sx int, Sy int, Sz int, Ms_ unsafe.Pointer, Ms_mul float32, vol unsafe.Pointer, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("copypadmul2")
 	}
@@ -60,49 +60,48 @@ func k_copypadmul2_async ( dst unsafe.Pointer, Dx int, Dy int, Dz int, src unsaf
 	copypadmul2_args.Lock()
 	defer copypadmul2_args.Unlock()
 
-	if copypadmul2_code == 0{
+	if copypadmul2_code == 0 {
 		copypadmul2_code = fatbinLoad(copypadmul2_map, "copypadmul2")
 	}
 
-	 copypadmul2_args.arg_dst = dst
-	 copypadmul2_args.arg_Dx = Dx
-	 copypadmul2_args.arg_Dy = Dy
-	 copypadmul2_args.arg_Dz = Dz
-	 copypadmul2_args.arg_src = src
-	 copypadmul2_args.arg_Sx = Sx
-	 copypadmul2_args.arg_Sy = Sy
-	 copypadmul2_args.arg_Sz = Sz
-	 copypadmul2_args.arg_Ms_ = Ms_
-	 copypadmul2_args.arg_Ms_mul = Ms_mul
-	 copypadmul2_args.arg_vol = vol
-	
+	copypadmul2_args.arg_dst = dst
+	copypadmul2_args.arg_Dx = Dx
+	copypadmul2_args.arg_Dy = Dy
+	copypadmul2_args.arg_Dz = Dz
+	copypadmul2_args.arg_src = src
+	copypadmul2_args.arg_Sx = Sx
+	copypadmul2_args.arg_Sy = Sy
+	copypadmul2_args.arg_Sz = Sz
+	copypadmul2_args.arg_Ms_ = Ms_
+	copypadmul2_args.arg_Ms_mul = Ms_mul
+	copypadmul2_args.arg_vol = vol
 
 	args := copypadmul2_args.argptr[:]
 	cu.LaunchKernel(copypadmul2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("copypadmul2")
 	}
 }
 
 // maps compute capability on PTX code for copypadmul2 kernel.
-var copypadmul2_map = map[int]string{ 0: "" ,
-30: copypadmul2_ptx_30 ,
-35: copypadmul2_ptx_35 ,
-37: copypadmul2_ptx_37 ,
-50: copypadmul2_ptx_50 ,
-52: copypadmul2_ptx_52 ,
-53: copypadmul2_ptx_53 ,
-60: copypadmul2_ptx_60 ,
-61: copypadmul2_ptx_61 ,
-70: copypadmul2_ptx_70 ,
-75: copypadmul2_ptx_75  }
+var copypadmul2_map = map[int]string{0: "",
+	30: copypadmul2_ptx_30,
+	35: copypadmul2_ptx_35,
+	37: copypadmul2_ptx_37,
+	50: copypadmul2_ptx_50,
+	52: copypadmul2_ptx_52,
+	53: copypadmul2_ptx_53,
+	60: copypadmul2_ptx_60,
+	61: copypadmul2_ptx_61,
+	70: copypadmul2_ptx_70,
+	75: copypadmul2_ptx_75}
 
 // copypadmul2 PTX code for various compute capabilities.
-const(
-  copypadmul2_ptx_30 = `
-.version 6.3
+const (
+	copypadmul2_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -151,15 +150,13 @@ const(
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -204,8 +201,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_35 = `
-.version 6.3
+	copypadmul2_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -254,15 +251,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -307,8 +302,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_37 = `
-.version 6.3
+	copypadmul2_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -357,15 +352,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -410,8 +403,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_50 = `
-.version 6.3
+	copypadmul2_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -460,15 +453,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -513,8 +504,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_52 = `
-.version 6.3
+	copypadmul2_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -563,15 +554,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -616,8 +605,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_53 = `
-.version 6.3
+	copypadmul2_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -666,15 +655,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -719,8 +706,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_60 = `
-.version 6.3
+	copypadmul2_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -769,15 +756,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -822,8 +807,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_61 = `
-.version 6.3
+	copypadmul2_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -872,15 +857,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -925,8 +908,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_70 = `
-.version 6.3
+	copypadmul2_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -975,15 +958,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -1028,8 +1009,8 @@ BB0_6:
 
 
 `
-   copypadmul2_ptx_75 = `
-.version 6.3
+	copypadmul2_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1078,15 +1059,13 @@ BB0_6:
 	mov.u32 	%r17, %ctaid.z;
 	mov.u32 	%r18, %tid.z;
 	mad.lo.s32 	%r3, %r16, %r17, %r18;
-	setp.lt.s32	%p1, %r1, %r7;
-	setp.lt.s32	%p2, %r2, %r8;
-	and.pred  	%p3, %p1, %p2;
-	setp.lt.s32	%p4, %r3, %r9;
-	and.pred  	%p5, %p3, %p4;
-	@!%p5 bra 	BB0_6;
-	bra.uni 	BB0_1;
+	setp.ge.s32	%p1, %r1, %r7;
+	setp.ge.s32	%p2, %r2, %r8;
+	or.pred  	%p3, %p1, %p2;
+	setp.ge.s32	%p4, %r3, %r9;
+	or.pred  	%p5, %p3, %p4;
+	@%p5 bra 	BB0_6;
 
-BB0_1:
 	mad.lo.s32 	%r19, %r3, %r8, %r2;
 	mad.lo.s32 	%r4, %r19, %r7, %r1;
 	setp.eq.s64	%p6, %rd3, 0;
@@ -1131,4 +1110,4 @@ BB0_6:
 
 
 `
- )
+)

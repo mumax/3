@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for reducemaxabs kernel
 var reducemaxabs_code cu.Function
 
 // Stores the arguments for reducemaxabs kernel invocation
-type reducemaxabs_args_t struct{
-	 arg_src unsafe.Pointer
-	 arg_dst unsafe.Pointer
-	 arg_initVal float32
-	 arg_n int
-	 argptr [4]unsafe.Pointer
+type reducemaxabs_args_t struct {
+	arg_src     unsafe.Pointer
+	arg_dst     unsafe.Pointer
+	arg_initVal float32
+	arg_n       int
+	argptr      [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducemaxabs kernel invocation
 var reducemaxabs_args reducemaxabs_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 reducemaxabs_args.argptr[0] = unsafe.Pointer(&reducemaxabs_args.arg_src)
-	 reducemaxabs_args.argptr[1] = unsafe.Pointer(&reducemaxabs_args.arg_dst)
-	 reducemaxabs_args.argptr[2] = unsafe.Pointer(&reducemaxabs_args.arg_initVal)
-	 reducemaxabs_args.argptr[3] = unsafe.Pointer(&reducemaxabs_args.arg_n)
-	 }
+	reducemaxabs_args.argptr[0] = unsafe.Pointer(&reducemaxabs_args.arg_src)
+	reducemaxabs_args.argptr[1] = unsafe.Pointer(&reducemaxabs_args.arg_dst)
+	reducemaxabs_args.argptr[2] = unsafe.Pointer(&reducemaxabs_args.arg_initVal)
+	reducemaxabs_args.argptr[3] = unsafe.Pointer(&reducemaxabs_args.arg_n)
+}
 
 // Wrapper for reducemaxabs CUDA kernel, asynchronous.
-func k_reducemaxabs_async ( src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
-	if Synchronous{ // debug
+func k_reducemaxabs_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("reducemaxabs")
 	}
@@ -46,42 +46,41 @@ func k_reducemaxabs_async ( src unsafe.Pointer, dst unsafe.Pointer, initVal floa
 	reducemaxabs_args.Lock()
 	defer reducemaxabs_args.Unlock()
 
-	if reducemaxabs_code == 0{
+	if reducemaxabs_code == 0 {
 		reducemaxabs_code = fatbinLoad(reducemaxabs_map, "reducemaxabs")
 	}
 
-	 reducemaxabs_args.arg_src = src
-	 reducemaxabs_args.arg_dst = dst
-	 reducemaxabs_args.arg_initVal = initVal
-	 reducemaxabs_args.arg_n = n
-	
+	reducemaxabs_args.arg_src = src
+	reducemaxabs_args.arg_dst = dst
+	reducemaxabs_args.arg_initVal = initVal
+	reducemaxabs_args.arg_n = n
 
 	args := reducemaxabs_args.argptr[:]
 	cu.LaunchKernel(reducemaxabs_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("reducemaxabs")
 	}
 }
 
 // maps compute capability on PTX code for reducemaxabs kernel.
-var reducemaxabs_map = map[int]string{ 0: "" ,
-30: reducemaxabs_ptx_30 ,
-35: reducemaxabs_ptx_35 ,
-37: reducemaxabs_ptx_37 ,
-50: reducemaxabs_ptx_50 ,
-52: reducemaxabs_ptx_52 ,
-53: reducemaxabs_ptx_53 ,
-60: reducemaxabs_ptx_60 ,
-61: reducemaxabs_ptx_61 ,
-70: reducemaxabs_ptx_70 ,
-75: reducemaxabs_ptx_75  }
+var reducemaxabs_map = map[int]string{0: "",
+	30: reducemaxabs_ptx_30,
+	35: reducemaxabs_ptx_35,
+	37: reducemaxabs_ptx_37,
+	50: reducemaxabs_ptx_50,
+	52: reducemaxabs_ptx_52,
+	53: reducemaxabs_ptx_53,
+	60: reducemaxabs_ptx_60,
+	61: reducemaxabs_ptx_61,
+	70: reducemaxabs_ptx_70,
+	75: reducemaxabs_ptx_75}
 
 // reducemaxabs PTX code for various compute capabilities.
-const(
-  reducemaxabs_ptx_30 = `
-.version 6.3
+const (
+	reducemaxabs_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -198,8 +197,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_35 = `
-.version 6.3
+	reducemaxabs_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -316,8 +315,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_37 = `
-.version 6.3
+	reducemaxabs_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -434,8 +433,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_50 = `
-.version 6.3
+	reducemaxabs_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -552,8 +551,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_52 = `
-.version 6.3
+	reducemaxabs_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -670,8 +669,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_53 = `
-.version 6.3
+	reducemaxabs_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -788,8 +787,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_60 = `
-.version 6.3
+	reducemaxabs_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -906,8 +905,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_61 = `
-.version 6.3
+	reducemaxabs_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1024,8 +1023,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_70 = `
-.version 6.3
+	reducemaxabs_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1142,8 +1141,8 @@ BB0_10:
 
 
 `
-   reducemaxabs_ptx_75 = `
-.version 6.3
+	reducemaxabs_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1260,4 +1259,4 @@ BB0_10:
 
 
 `
- )
+)

@@ -5,66 +5,66 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for addexchange kernel
 var addexchange_code cu.Function
 
 // Stores the arguments for addexchange kernel invocation
-type addexchange_args_t struct{
-	 arg_Bx unsafe.Pointer
-	 arg_By unsafe.Pointer
-	 arg_Bz unsafe.Pointer
-	 arg_mx unsafe.Pointer
-	 arg_my unsafe.Pointer
-	 arg_mz unsafe.Pointer
-	 arg_Ms_ unsafe.Pointer
-	 arg_Ms_mul float32
-	 arg_aLUT2d unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_wx float32
-	 arg_wy float32
-	 arg_wz float32
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 arg_PBC byte
-	 argptr [17]unsafe.Pointer
+type addexchange_args_t struct {
+	arg_Bx      unsafe.Pointer
+	arg_By      unsafe.Pointer
+	arg_Bz      unsafe.Pointer
+	arg_mx      unsafe.Pointer
+	arg_my      unsafe.Pointer
+	arg_mz      unsafe.Pointer
+	arg_Ms_     unsafe.Pointer
+	arg_Ms_mul  float32
+	arg_aLUT2d  unsafe.Pointer
+	arg_regions unsafe.Pointer
+	arg_wx      float32
+	arg_wy      float32
+	arg_wz      float32
+	arg_Nx      int
+	arg_Ny      int
+	arg_Nz      int
+	arg_PBC     byte
+	argptr      [17]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for addexchange kernel invocation
 var addexchange_args addexchange_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 addexchange_args.argptr[0] = unsafe.Pointer(&addexchange_args.arg_Bx)
-	 addexchange_args.argptr[1] = unsafe.Pointer(&addexchange_args.arg_By)
-	 addexchange_args.argptr[2] = unsafe.Pointer(&addexchange_args.arg_Bz)
-	 addexchange_args.argptr[3] = unsafe.Pointer(&addexchange_args.arg_mx)
-	 addexchange_args.argptr[4] = unsafe.Pointer(&addexchange_args.arg_my)
-	 addexchange_args.argptr[5] = unsafe.Pointer(&addexchange_args.arg_mz)
-	 addexchange_args.argptr[6] = unsafe.Pointer(&addexchange_args.arg_Ms_)
-	 addexchange_args.argptr[7] = unsafe.Pointer(&addexchange_args.arg_Ms_mul)
-	 addexchange_args.argptr[8] = unsafe.Pointer(&addexchange_args.arg_aLUT2d)
-	 addexchange_args.argptr[9] = unsafe.Pointer(&addexchange_args.arg_regions)
-	 addexchange_args.argptr[10] = unsafe.Pointer(&addexchange_args.arg_wx)
-	 addexchange_args.argptr[11] = unsafe.Pointer(&addexchange_args.arg_wy)
-	 addexchange_args.argptr[12] = unsafe.Pointer(&addexchange_args.arg_wz)
-	 addexchange_args.argptr[13] = unsafe.Pointer(&addexchange_args.arg_Nx)
-	 addexchange_args.argptr[14] = unsafe.Pointer(&addexchange_args.arg_Ny)
-	 addexchange_args.argptr[15] = unsafe.Pointer(&addexchange_args.arg_Nz)
-	 addexchange_args.argptr[16] = unsafe.Pointer(&addexchange_args.arg_PBC)
-	 }
+	addexchange_args.argptr[0] = unsafe.Pointer(&addexchange_args.arg_Bx)
+	addexchange_args.argptr[1] = unsafe.Pointer(&addexchange_args.arg_By)
+	addexchange_args.argptr[2] = unsafe.Pointer(&addexchange_args.arg_Bz)
+	addexchange_args.argptr[3] = unsafe.Pointer(&addexchange_args.arg_mx)
+	addexchange_args.argptr[4] = unsafe.Pointer(&addexchange_args.arg_my)
+	addexchange_args.argptr[5] = unsafe.Pointer(&addexchange_args.arg_mz)
+	addexchange_args.argptr[6] = unsafe.Pointer(&addexchange_args.arg_Ms_)
+	addexchange_args.argptr[7] = unsafe.Pointer(&addexchange_args.arg_Ms_mul)
+	addexchange_args.argptr[8] = unsafe.Pointer(&addexchange_args.arg_aLUT2d)
+	addexchange_args.argptr[9] = unsafe.Pointer(&addexchange_args.arg_regions)
+	addexchange_args.argptr[10] = unsafe.Pointer(&addexchange_args.arg_wx)
+	addexchange_args.argptr[11] = unsafe.Pointer(&addexchange_args.arg_wy)
+	addexchange_args.argptr[12] = unsafe.Pointer(&addexchange_args.arg_wz)
+	addexchange_args.argptr[13] = unsafe.Pointer(&addexchange_args.arg_Nx)
+	addexchange_args.argptr[14] = unsafe.Pointer(&addexchange_args.arg_Ny)
+	addexchange_args.argptr[15] = unsafe.Pointer(&addexchange_args.arg_Nz)
+	addexchange_args.argptr[16] = unsafe.Pointer(&addexchange_args.arg_PBC)
+}
 
 // Wrapper for addexchange CUDA kernel, asynchronous.
-func k_addexchange_async ( Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte,  cfg *config) {
-	if Synchronous{ // debug
+func k_addexchange_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Pointer, mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, Ms_ unsafe.Pointer, Ms_mul float32, aLUT2d unsafe.Pointer, regions unsafe.Pointer, wx float32, wy float32, wz float32, Nx int, Ny int, Nz int, PBC byte, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("addexchange")
 	}
@@ -72,55 +72,54 @@ func k_addexchange_async ( Bx unsafe.Pointer, By unsafe.Pointer, Bz unsafe.Point
 	addexchange_args.Lock()
 	defer addexchange_args.Unlock()
 
-	if addexchange_code == 0{
+	if addexchange_code == 0 {
 		addexchange_code = fatbinLoad(addexchange_map, "addexchange")
 	}
 
-	 addexchange_args.arg_Bx = Bx
-	 addexchange_args.arg_By = By
-	 addexchange_args.arg_Bz = Bz
-	 addexchange_args.arg_mx = mx
-	 addexchange_args.arg_my = my
-	 addexchange_args.arg_mz = mz
-	 addexchange_args.arg_Ms_ = Ms_
-	 addexchange_args.arg_Ms_mul = Ms_mul
-	 addexchange_args.arg_aLUT2d = aLUT2d
-	 addexchange_args.arg_regions = regions
-	 addexchange_args.arg_wx = wx
-	 addexchange_args.arg_wy = wy
-	 addexchange_args.arg_wz = wz
-	 addexchange_args.arg_Nx = Nx
-	 addexchange_args.arg_Ny = Ny
-	 addexchange_args.arg_Nz = Nz
-	 addexchange_args.arg_PBC = PBC
-	
+	addexchange_args.arg_Bx = Bx
+	addexchange_args.arg_By = By
+	addexchange_args.arg_Bz = Bz
+	addexchange_args.arg_mx = mx
+	addexchange_args.arg_my = my
+	addexchange_args.arg_mz = mz
+	addexchange_args.arg_Ms_ = Ms_
+	addexchange_args.arg_Ms_mul = Ms_mul
+	addexchange_args.arg_aLUT2d = aLUT2d
+	addexchange_args.arg_regions = regions
+	addexchange_args.arg_wx = wx
+	addexchange_args.arg_wy = wy
+	addexchange_args.arg_wz = wz
+	addexchange_args.arg_Nx = Nx
+	addexchange_args.arg_Ny = Ny
+	addexchange_args.arg_Nz = Nz
+	addexchange_args.arg_PBC = PBC
 
 	args := addexchange_args.argptr[:]
 	cu.LaunchKernel(addexchange_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("addexchange")
 	}
 }
 
 // maps compute capability on PTX code for addexchange kernel.
-var addexchange_map = map[int]string{ 0: "" ,
-30: addexchange_ptx_30 ,
-35: addexchange_ptx_35 ,
-37: addexchange_ptx_37 ,
-50: addexchange_ptx_50 ,
-52: addexchange_ptx_52 ,
-53: addexchange_ptx_53 ,
-60: addexchange_ptx_60 ,
-61: addexchange_ptx_61 ,
-70: addexchange_ptx_70 ,
-75: addexchange_ptx_75  }
+var addexchange_map = map[int]string{0: "",
+	30: addexchange_ptx_30,
+	35: addexchange_ptx_35,
+	37: addexchange_ptx_37,
+	50: addexchange_ptx_50,
+	52: addexchange_ptx_52,
+	53: addexchange_ptx_53,
+	60: addexchange_ptx_60,
+	61: addexchange_ptx_61,
+	70: addexchange_ptx_70,
+	75: addexchange_ptx_75}
 
 // addexchange PTX code for various compute capabilities.
-const(
-  addexchange_ptx_30 = `
-.version 6.3
+const (
+	addexchange_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -568,8 +567,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_35 = `
-.version 6.3
+	addexchange_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -1018,8 +1017,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_37 = `
-.version 6.3
+	addexchange_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -1468,8 +1467,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_50 = `
-.version 6.3
+	addexchange_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -1918,8 +1917,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_52 = `
-.version 6.3
+	addexchange_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -2368,8 +2367,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_53 = `
-.version 6.3
+	addexchange_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -2818,8 +2817,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_60 = `
-.version 6.3
+	addexchange_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -3268,8 +3267,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_61 = `
-.version 6.3
+	addexchange_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -3718,8 +3717,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_70 = `
-.version 6.3
+	addexchange_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -4168,8 +4167,8 @@ BB0_27:
 
 
 `
-   addexchange_ptx_75 = `
-.version 6.3
+	addexchange_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -4618,4 +4617,4 @@ BB0_27:
 
 
 `
- )
+)

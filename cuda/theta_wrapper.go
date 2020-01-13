@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for setTheta kernel
 var setTheta_code cu.Function
 
 // Stores the arguments for setTheta kernel invocation
-type setTheta_args_t struct{
-	 arg_theta unsafe.Pointer
-	 arg_mz unsafe.Pointer
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 argptr [5]unsafe.Pointer
+type setTheta_args_t struct {
+	arg_theta unsafe.Pointer
+	arg_mz    unsafe.Pointer
+	arg_Nx    int
+	arg_Ny    int
+	arg_Nz    int
+	argptr    [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for setTheta kernel invocation
 var setTheta_args setTheta_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 setTheta_args.argptr[0] = unsafe.Pointer(&setTheta_args.arg_theta)
-	 setTheta_args.argptr[1] = unsafe.Pointer(&setTheta_args.arg_mz)
-	 setTheta_args.argptr[2] = unsafe.Pointer(&setTheta_args.arg_Nx)
-	 setTheta_args.argptr[3] = unsafe.Pointer(&setTheta_args.arg_Ny)
-	 setTheta_args.argptr[4] = unsafe.Pointer(&setTheta_args.arg_Nz)
-	 }
+	setTheta_args.argptr[0] = unsafe.Pointer(&setTheta_args.arg_theta)
+	setTheta_args.argptr[1] = unsafe.Pointer(&setTheta_args.arg_mz)
+	setTheta_args.argptr[2] = unsafe.Pointer(&setTheta_args.arg_Nx)
+	setTheta_args.argptr[3] = unsafe.Pointer(&setTheta_args.arg_Ny)
+	setTheta_args.argptr[4] = unsafe.Pointer(&setTheta_args.arg_Nz)
+}
 
 // Wrapper for setTheta CUDA kernel, asynchronous.
-func k_setTheta_async ( theta unsafe.Pointer, mz unsafe.Pointer, Nx int, Ny int, Nz int,  cfg *config) {
-	if Synchronous{ // debug
+func k_setTheta_async(theta unsafe.Pointer, mz unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("setTheta")
 	}
@@ -48,43 +48,42 @@ func k_setTheta_async ( theta unsafe.Pointer, mz unsafe.Pointer, Nx int, Ny int,
 	setTheta_args.Lock()
 	defer setTheta_args.Unlock()
 
-	if setTheta_code == 0{
+	if setTheta_code == 0 {
 		setTheta_code = fatbinLoad(setTheta_map, "setTheta")
 	}
 
-	 setTheta_args.arg_theta = theta
-	 setTheta_args.arg_mz = mz
-	 setTheta_args.arg_Nx = Nx
-	 setTheta_args.arg_Ny = Ny
-	 setTheta_args.arg_Nz = Nz
-	
+	setTheta_args.arg_theta = theta
+	setTheta_args.arg_mz = mz
+	setTheta_args.arg_Nx = Nx
+	setTheta_args.arg_Ny = Ny
+	setTheta_args.arg_Nz = Nz
 
 	args := setTheta_args.argptr[:]
 	cu.LaunchKernel(setTheta_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("setTheta")
 	}
 }
 
 // maps compute capability on PTX code for setTheta kernel.
-var setTheta_map = map[int]string{ 0: "" ,
-30: setTheta_ptx_30 ,
-35: setTheta_ptx_35 ,
-37: setTheta_ptx_37 ,
-50: setTheta_ptx_50 ,
-52: setTheta_ptx_52 ,
-53: setTheta_ptx_53 ,
-60: setTheta_ptx_60 ,
-61: setTheta_ptx_61 ,
-70: setTheta_ptx_70 ,
-75: setTheta_ptx_75  }
+var setTheta_map = map[int]string{0: "",
+	30: setTheta_ptx_30,
+	35: setTheta_ptx_35,
+	37: setTheta_ptx_37,
+	50: setTheta_ptx_50,
+	52: setTheta_ptx_52,
+	53: setTheta_ptx_53,
+	60: setTheta_ptx_60,
+	61: setTheta_ptx_61,
+	70: setTheta_ptx_70,
+	75: setTheta_ptx_75}
 
 // setTheta PTX code for various compute capabilities.
-const(
-  setTheta_ptx_30 = `
-.version 6.4
+const (
+	setTheta_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -171,8 +170,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_35 = `
-.version 6.4
+	setTheta_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -259,8 +258,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_37 = `
-.version 6.4
+	setTheta_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -347,8 +346,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_50 = `
-.version 6.4
+	setTheta_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -435,8 +434,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_52 = `
-.version 6.4
+	setTheta_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -523,8 +522,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_53 = `
-.version 6.4
+	setTheta_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -611,8 +610,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_60 = `
-.version 6.4
+	setTheta_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -699,8 +698,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_61 = `
-.version 6.4
+	setTheta_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -787,8 +786,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_70 = `
-.version 6.4
+	setTheta_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -875,8 +874,8 @@ BB0_2:
 
 
 `
-   setTheta_ptx_75 = `
-.version 6.4
+	setTheta_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -963,4 +962,4 @@ BB0_2:
 
 
 `
- )
+)

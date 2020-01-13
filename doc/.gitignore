@@ -1,5 +1,2 @@
-*.mx3
-*.out
-examples.html
-api.html
+build
 doc

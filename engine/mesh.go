@@ -10,8 +10,9 @@ var globalmesh_ data.Mesh // mesh for m and everything that has the same size
 func init() {
 	DeclFunc("SetGridSize", SetGridSize, `Sets the number of cells for X,Y,Z`)
 	DeclFunc("SetCellSize", SetCellSize, `Sets the X,Y,Z cell size in meters`)
-	DeclFunc("SetPBC", SetPBC, `Sets number of repetitions in X,Y,Z`)
-	DeclFunc("SetMesh", SetMesh, `Sets GridSize, CellSize and PBC in once`)
+	DeclFunc("SetMesh", SetMesh, `Sets GridSize, CellSize and PBC at the same time`)
+	DeclFunc("SetPBC", SetPBC, "Sets the number of repetitions in X,Y,Z to create periodic boundary "+
+		"conditions. The number of repetitions determines the cutoff range for the demagnetization.")
 }
 
 func Mesh() *data.Mesh {

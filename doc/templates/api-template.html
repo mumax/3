@@ -1,12 +1,12 @@
 
 {{define "entry"}}
-	<div class="api-entry" style="display:inline; margin: 0px">
-	<p><span style="color:#000088; font-size:1.3em"> <b class="api-identifier">{{.Name}}</b>{{.Ins}} </span> 
+	<div class="api-entry">
+	<p><span style="color:#000088; font-size:1.5em; font-family: monospace"> <b class="api-identifier">{{.Name}}</b>{{.Ins}} </span> 
 	{{with .Doc}} <p style="margin-left:40px" class="api-docstring"> {{.}} </p> {{end}}
 
 	{{with .Methods}} 
 		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
-		{{range .}} {{.}} &nbsp;{{end}} 
+			{{range .}} {{.}} &nbsp;{{end}}
 		</span> </p> 
 	{{end}}
 
@@ -21,43 +21,57 @@
 	</div>
 {{end}}
 
-
+<!DOCTYPE html>
+<html>
 {{.Include "head.html"}}
 
-<h1> mumax 3.10 API </h1>
+<body>
+{{.Include "header.html"}}
+
+<div class="api-container">
+<div class="api-menu">
+
+  <div style="margin: 0px; margin-bottom: 5ex;">
+  	<h2 style="text-align: center; margin: 5px;">mumax3.10 API</h2>
+  	<input style="text-align: center; margin: auto; width 50px; display: block" type="text" id="searchInput" onclick="onSearch()" onkeyup="onSearch()" placeholder="Enter a search term" title="Type in a name" size=15>
+  </div>
+
+  <h3>Basics</h3>
+  <ul class="pure-menu-list">
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'syntax')" id="default-open">Syntax</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'mesh')">Mesh size and geometry</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'shapes')">Shapes</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'regions')">Material regions</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'initial')">Initial Magnetization</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'parameters')">Material parameters</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'excitation')">Excitation</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'outputquantities')">Output quantities</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'output')">Scheduling output</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'running')">Running</a></li>
+  </ul>
+  <h3>Advanced Features</h3>
+  <ul class="pure-menu-list">
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'currents')">Spin currents</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'mfm')">Magnetic Force Microscopy</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'slicing')">Slicing and dicing output</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'movingwindow')">Moving window</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'extensions')">Extensions</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customquantities')">Custom quantities</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customfields')">Custom effective field terms</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'misc')">Misc</a></li>
+  </ul>
+
+  <p style="font-size:8px; margin-top: 4em"><a href="api39c.html"> Go to mumax3.9c API</a></p>
+</div>
+
+<div class="api-content">
 
 
 
-This is a complete overview of all available functions for writing an input script.
 
+<div id="syntax" class="api-section" >
 
-<ul class="sectionlist">
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'syntax')">Syntax</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'mesh')">Setting the mesh size</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'geometry')">Defining shapes and setting a geometry</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'regions')">Defining material regions</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'initial')">Initial Magnetization</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'parameters')">Material parameters</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'excitation')">Excitation</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'mfm')">Magnetic Force Microscopy</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'outputquantities')">Output quantities</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'slicing')">Slicing and dicing output</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'output')">Scheduling output</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'running')">Running</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'movingwindow')">Moving window</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'extensions')">Extensions</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'customquantities')">Custom quantities</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'customfields')">Custom effective field terms</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'misc')">Misc</a></li>
-	<li><a href="#" class="sectionlinks" onclick="openSection(event, 'api-full')" id="defaultOpen" >Search API</a></li>
-</ul>
-
-
-
-
-<div id="syntax" class="section" >
-
-	<hr/><h1> Syntax </h1>
+	<h1> Syntax </h1>
 	
 	<p>
 	The mumax<sup>3</sup> input syntax is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
@@ -81,7 +95,7 @@ str := "hello" // defines str, type automatically is string
 x = pow(x, 3)
 x++
 y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
-</code></pre>
+</pre></code>
 	
 	<h3>Control structures</h3>
 	Loops are possible as well:
@@ -101,14 +115,21 @@ Msat = value        // time-independent Msat
 <pre><code>Msat = sin(pi*t)    // RHS converted to function, re-evaluted every time
 </code></pre>
 
+	<h3>Methods</h3>
+
+	Some of the API instances have methods defined on them. You can call methods on an instance by using '.' as in most object oriented programming languages. 
+	E.g.: a material parameter such as <code>Msat</code> has the method <code>SetRegion(int, float)</code> to set the value of the material parameter in a certain region:
+
+	<pre><code>Msat.SetRegion(1, 800e3) // Set Msat=520e3 in region 1 </code></pre>
+
 </div>
 
 
 
 
-<div id="mesh" class="section" >
+<div id="mesh" class="api-section" >
 
-	<hr/><h1> Setting  the mesh size</h1>
+	<h1> Mesh size and geometry </h1>
 
 	The simulation mesh defines the size of the box around your magnet. It should be set at the beginning of the script. The number of cells should preferably be powers of two, or at least have small prime factors (2,3,5,7). E.g.:
 <pre><code>Nx := 128
@@ -132,24 +153,36 @@ SetCellSize(5e-9, 5e-9, 5e-9)
 	<h2> Resizing the mesh </h2>
 	
 	The mesh can be changed at any later time in the simulation. This will cause the magnetization to be stretched onto the new mesh if needed, and the geometry and regions to be re-calculated. After resize some cells which had zero magnetization may now fall inside the magnet geometry, they will be initialized to random magnetization.
+
+	<h2> Setting the geometry </h2>
+
+	Optionally a magnet Shape other than the full simulation box can be specified. In order to set the geometry, you first need to <a href="#" onclick="openSection(event, 'geometry')">define a shape</a>.
+<pre><code> geometryShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0)
+SetGeom(geometryShape)
+</code></pre>
+
+	<hr>
 	
-	{{range .FilterName "setgridsize" "setcellsize" "setpbc" "setmesh"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "setgeom" "setgridsize" "setcellsize" "setpbc" "setmesh"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "edgesmooth"}} {{template "entry" .}} {{end}}
 
 </div>
 
 
 
 
-<div id="geometry" class="section" >
+<div id="shapes" class="api-section" >
 
-	<hr/><h1> Defining shapes and setting a geometry </h1>
-	
-	Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. All positions are specified in meters and the origin lies in the center of the simulation box. E.g.:
-<pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
+	<h1> Shapes </h1>
+
+	A shape is an abstract object which outlines an area in a 3D universe. Shapes are useful for different tasks, e.g.: to define the geometry of a magnet, to define material regions, or to set locally a specific initial magnetization configuration.
+	One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. All positions are specified in meters and the origin lies in the center of the simulation box. E.g.:
+<pre><code>myShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
+anotherShape := Circle(400e-9).sub(Circle(200e-9))
 </code></pre>
-	
-	{{range .FilterName "setgeom"}} {{template "entry" .}} {{end}}
-	{{range .FilterName "edgesmooth"}} {{template "entry" .}} {{end}}
+
+	<hr/>
+
 	{{range .FilterReturn "Shape"}} {{template "entry" .}} {{end}}
 
 </div>
@@ -157,9 +190,9 @@ SetCellSize(5e-9, 5e-9, 5e-9)
 
 
 
-<div id="regions" class="section" >
+<div id="regions" class="api-section" >
 
-	<hr/><h1> Defining material regions </h1>
+	<h1> Material regions </h1>
 	Optionally, up to 256 material regions can be defined. Since each cell is made from one material, it is associated with exactly one region. So <em>regions can not overlap</em>. Each cell is assigned material region 0 by default. It's a good idea to output <code>regions</code> to verify whether each cell is assigned to the intended region. Each region can have its own material parameters, and we can output averages over each region. E.g.:
 <pre><code>DefRegion(1, circle(1e-6))
 DefRegion(0, circle(1e-6).Inverse()) // redundant
@@ -167,6 +200,8 @@ save(regions)
 Msat.SetRegion(1, 800e6)
 tableAdd(m.Region(1))    // add average m over region 1 to table
 </code></pre>
+
+	<hr/>
 	
 	{{range .FilterName "DefRegion" "DefRegionCell" "regions"}} {{template "entry" .}} {{end}}
 
@@ -175,15 +210,18 @@ tableAdd(m.Region(1))    // add average m over region 1 to table
 
 
 
-<div id="initial" class="section" >
+<div id="initial" class="api-section" >
 
-	<hr/><h1> Initial magnetization </h1>
+	<h1> Initial magnetization </h1>
 	
 	The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
 <pre><code>m = uniform(1, 0, 0)
 m.SetRegion(1, vortex(1, 1))
 m.LoadFile("config.ovf")
+m.SetInShape(circle(50e-9), uniform(0,0,1))
 </code></pre>
+
+	<hr/>
 	
 	{{range .FilterName "m"}} {{template "entry" .}} {{end}}
 	{{range .FilterReturn "Config"}} {{template "entry" .}} {{end}}
@@ -193,9 +231,9 @@ m.LoadFile("config.ovf")
 
 
 
-<div id="parameters" class="section" >
+<div id="parameters" class="api-section" >
 
-	<hr/><h1> Material parameters </h1>
+	<h1> Material parameters </h1>
 	
 	Assigning to a material parameter sets a value in all regions. E.g.:
 <pre><code>Msat  = 800e3
@@ -211,6 +249,8 @@ Msat.SetRegion(1, 540e3)
 <pre><code>f := 500e6
 Ku1 = 500 * sin(2*pi*f*t)
 </code></pre>
+
+	<hr/>
 	
 	{{range .FilterType "*engine.RegionwiseScalar" "*engine.RegionwiseVector"}} {{template "entry" .}} {{end}}
 
@@ -219,9 +259,9 @@ Ku1 = 500 * sin(2*pi*f*t)
 
 
 
-<div id="excitation" class="section" >
+<div id="excitation" class="api-section" >
 
-	<hr/><h1> Excitation </h1>
+	<h1> Excitation </h1>
 	
 	Field or current excitations can be set in the same way as material parameters:
 <pre><code>B_ext = vector(0.01, 1e-6*sin(2*pi*f*t), 0)
@@ -229,20 +269,61 @@ B_ext.SetRegion(1, vector(0, 0, 0.1))
 </code></pre>
 	Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(x,y,z) * f(t) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
 <pre><code>B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*f*t))
-JPol.Add(LoadFile("current.ovf"), 1)
+J.Add(LoadFile("current.ovf"), 1)
 </code></pre>
+
+	<hr/>
 	
 	{{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
-	{{range .FilterName "fixedlayerposition" "fixedlayer_top" "fixedlayer_bottom" "DisableSlonczewskiTorque" "DisableZhangLiTorque" }} {{template "entry" .}} {{end}}
 
 </div>
 
 
 
 
-<div id="mfm" class="section" >
+<div id="currents" class="api-section" >
 
-	<hr/><h1> Magnetic Force Microscopy </h1>
+	<h1> Spin currents </h1>
+
+	The effect of spin-polarized currents on the magnetization dynamics can be modelled in different ways. 
+	In Mumax3 you can use the Zhang-Li model or the Slonczewski model.
+	For both models, a spin-polarized current field needs to be defined. This is done by setting the current density field <code>J</code>
+	and the polarization <code>Pol</code>.
+	
+	<h2>Zhang-Li model</h2>
+	When using the the Zhang-Li model, it is possible to set the non-adiabaticity through the material parameter <code>xi</code>:
+
+<pre><code>J = vector(1e12, 0, 0)
+Pol = 1
+xi = 0.1
+</code></pre>
+
+	<h2>Slonczewski model</h2>
+	To use the Slonczewski model, you need to define the magnetization configuration of the fixed layer. 
+	This fixed layer can be placed above or below the sample. The Slonczewski parameter and the prefactor of the secondary spin transfer torque term
+	of the Slonczewski model can be set through the material parameters <code>Lambda</code> and <code>EpsilonPrime</code> respectively:
+
+<pre><code>DisableZhangLiTorque = true
+J = vector(1e12, 0, 0)
+Pol = 0.6
+FixedLayer = vector(1,0,0)
+FixedLayerPosition = FIXEDLAYER_TOP
+EpsilonPrime = 0.02
+Lambda = 1
+</code></pre>
+	
+	<hr/>
+	
+	{{range .FilterName "epsilonprime" "Lambda" "Pol" "xi" "J" "fixedlayer" "fixedlayerposition" "fixedlayer_top" "fixedlayer_bottom" "DisableSlonczewskiTorque" "DisableZhangLiTorque" }} {{template "entry" .}} {{end}}
+
+</div>
+
+
+
+
+<div id="mfm" class="api-section" >
+
+	<h1> Magnetic Force Microscopy </h1>
 	
 	<p>Mumax3 has built-in generation of MFM images from a 2D magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
 	
@@ -255,9 +336,9 @@ JPol.Add(LoadFile("current.ovf"), 1)
 
 
 
-<div id="outputquantities" class="section" >
+<div id="outputquantities" class="api-section" >
 
-	<hr/><h1> Output quantities </h1>
+	<h1> Output quantities </h1>
 	
 	The quantities listed below can be output. Also, derived quantities can be produced: the quantity restricted to a certain region or a single component. E.g.:
 	
@@ -266,6 +347,8 @@ m.Comp(0)   // x-component
 m.Region(1) // magnetization in region 1 (0 elsewhere)
 </pre></code>
 	
+	<hr/>
+
 	{{range .FilterType "engine.ScalarField" "engine.VectorField" "*engine.geom" "*engine.thermField" "*engine.ScalarValue" "*engine.VectorValue"}} {{template "entry" .}} {{end}}
 
 </div>
@@ -273,9 +356,9 @@ m.Region(1) // magnetization in region 1 (0 elsewhere)
 
 
 
-<div id="slicing" class="section" >
+<div id="slicing" class="api-section" >
 
-	<hr/><h1>Slicing and dicing output</h1>
+	<h1>Slicing and dicing output</h1>
 	
 	To save storage space, it's possible to save only the part of the output we're interested in. This works on all output quantities (not only m)
 	
@@ -293,6 +376,8 @@ mx13 := CropLayer(mx, 13)
 save(mx13)
 tableAdd(mx13)
 </pre></code>
+
+	<hr/>
 	
 	{{range .FilterName "Crop" "CropX" "CropY" "CropZ" "CropLayer" "CropRegion"}} {{template "entry" .}} {{end}}
 
@@ -301,9 +386,9 @@ tableAdd(mx13)
 
 
 
-<div id="output" class="section" >
+<div id="output" class="api-section" >
 
-	<hr/><h1> Scheduling output </h1>
+	<h1> Scheduling output </h1>
 	
 	All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More columns can be added with <code>TableAdd()</code>. 
 <pre><code>save(B_ext)
@@ -321,6 +406,8 @@ TableAdd(m.Region(1))
 TableAddVar(myField, "B_extra", "T")
 myField = ...
 </code></pre>
+
+	<hr/>
 	
 	{{range .FilterName "dump" "tableadd" "tableaddvar" "tablesave" "tableautosave" "save" "saveas" "autosave" "snapshot" "snapshotas" "snapshotformat" "autosnapshot" "filenameformat" "outputformat" "ovf1_text" "ovf1_binary" "ovf2_text" "ovf2_binary" "TablePrint" "FPrintln" "Sprint" "Sprintf" "Print" "Flush"}} {{template "entry" .}} {{end}}
 	
@@ -329,9 +416,9 @@ myField = ...
 
 
 
-<div id="running" class="section" >
+<div id="running" class="api-section" >
 
-	<hr/><h1> Running </h1>
+	<h1> Running </h1>
 	
 	<code>Run(time)</code> runs the simulation for a given time in seconds, using sensible error settings. 
 <pre><code>Run(1e-9)
@@ -348,6 +435,7 @@ MaxErr = 1e-6
 	
 	Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
 	<ul>
+		<li> <code>6</code>: RK56 (Fehlberg) solver. This is the highest order solver available, but which is typically not faster than the RK45 solver.</li> 
 		<li> <code>5</code>: RK45 (Dormand-Prince) solver (the default). An accurate solver, very fast for magnetization dynamics at the cost of some memory usage. </li> 
 		<li> <code>4</code>: Classical 4th-order Runge-Kutta method. Intended for simulations where a fixed, relatively large time step is desired.</li> 
 		<li> <code>3</code>: RK23 (Bogacki-Shampine) solver. A robust and reasonably fast solver with low memory requirements. Typically outperforms RK45 when relaxing the magnetization with little dynamics, so it used internally by <code>Relax()</code>. </li> 
@@ -367,6 +455,8 @@ FixDt = 1e-15
 	
 	<h2>Minimize</h2>
 	<p><code>Minimize()</code> is like Relax, but uses the conjugate gradient method to find the energy minimum. It is usually much faster than Relax, but is a bit less robust against divergence. E.g., a random starting configuration can be Relaxed, but may fail with Minimize. Minimize is very well suited for hysteresis calculations, where we are never far away from the ground state.</p> 
+
+	<hr/>
 	
 	{{range .FilterName "run" "steps" "runwhile" "relax" "minimize"}} {{template "entry" .}} {{end}}
 	{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step" "NEval" "peakErr" "lastErr" "minimizerstop" "minimizersamples" "relaxtorquethreshold"}} {{template "entry" .}} {{end}}
@@ -377,9 +467,9 @@ FixDt = 1e-15
 
 
 
-<div id="movingwindow" class="section" >
+<div id="movingwindow" class="api-section" >
 
-	<hr/><h1> Moving simulation window </h1>
+	<h1> Moving simulation window </h1>
 	
 	Mumax<sup>3</sup> can automatically shift the magnetization so that the simulation "window" stays centered on a region of interest. Shifting is done to keep a freely chosen magnetization component nearly zero. E.g.
 	
@@ -389,6 +479,8 @@ TableAdd(TotalShift)
 </code></pre>
 	
 	will try to keep <code>mx</code> (component 0, counting from 0) close to zero. If desired, one can override which "new" magnetization is inserted from the sides by setting <code>ShiftMagL</code> and <code>ShiftMagR</code>, though the default behaviour is usually OK.
+
+	<hr/>
 	
 	{{range .FilterName "ext_centerwall" "ext_rmSurfaceCharge" "shift" "shiftgeom" "shiftm" "shiftregions" "shiftmagl" "shiftmagr" "shiftmagd" "shiftmagu" "totalshift"}} {{template "entry" .}} {{end}}
 
@@ -397,23 +489,49 @@ TableAdd(TotalShift)
 
 
 
-<div id="extensions" class="section" >
+<div id="extensions" class="api-section" >
 
-	<hr/><h1> Extensions </h1>
+	<h1> Extensions </h1>
 
 	Extensions are extra functionalities that are not officially supported. They are aimed at rather specific problems and may not work as expected for your particular situation. Their API and functionality may change in future releases.
+
+	<hr/>
 	
 	{{range .FilterPrefix "ext_"}} {{template "entry" .}} {{end}}
-	{{range .FilterName "enabledemag" "average" "fprintln" "setexlen" "expect" "expectv" "PostStep"}} {{template "entry" .}} {{end}}
 
 </div>
 
 
 
 
-<div id="customquantities" class="section" >
+<div id="customquantities" class="api-section" >
 
-	<hr/><h1> Custom quantities </h1>
+	<h1> Custom quantities </h1>
+	Using existing quantities, it is possible to define new custom quantities. 
+	E.g.: instead of using the pre-defined <code>ext_topologicalchargedensity</code> quantity,
+	it is possible to define this quantity yourselves inside an input script:
+
+<pre><code>cs := 1e-9
+setcellsize(cs,cs,cs)
+setgridsize(64,64,1)
+
+// Use central finite differences to approximate the spatial derivatives of m
+mL := Shifted(m,-1,0,0) // shift left
+mR := Shifted(m,1,0,0)  // shift right
+mD := Shifted(m,0,-1,0) // shift up
+mU := Shifted(m,0,1,0)  // shift down
+dmdx := Mul( Const(1/(2*cs)), Madd(mR,mL,1,-1) )
+dmdy := Mul( Const(1/(2*cs)), Madd(mU,mD,1,-1) ) 
+
+// Define the topological charge density
+chargeDensity := Mul( Const(1/(4*pi)), Dot(m, Cross(dmdx,dmdy)))
+
+// Save the topological charge density of a skyrmion
+m = neelskyrmion(1,-1)
+saveas(chargeDensity, "chargeDensity.ovf")
+</code></pre>
+
+	<hr/>
 
 	{{range .FilterName "Add" "Const" "ConstVector" "Cross" "Div" "Dot" "MAdd" "Masked" "Mul" "MulMV" "Shifted"}} {{template "entry" .}} {{end}}
 
@@ -422,22 +540,44 @@ TableAdd(TotalShift)
 
 
 
-<div id="customfields" class="section" >
+<div id="customfields" class="api-section" >
 
-	<hr/><h1> Custom effective field terms </h1>
+	<h1> Custom effective field terms </h1>
+	It is possible to define additional effective field terms by promoting a custom quantity to an effective field term. 
+	The corresponding energy density term can also be added by promoting a custom quantity. 
+	E.g.: instead of using the existing anistropy field in mumax3, you could define the uniaxial anisotropy field 
+	(and the corresponding energy density) yourselves:
 
-	{{range .FilterName "AddFieldTerm" "AddEdensTerm" "RemoveCustomFields" }} {{template "entry" .}} {{end}}
+<pre><code>
+Ms := 1100e3
+K  := 0.5e6
+u  := ConstVector(1, 0, 0)
+anisField := Mul( Const(2*K/Ms)  , Mul( Dot(u, m), u))
+anisEdens := Mul( Const(-0.5*Ms) , Dot( anisField, m))
+
+AddFieldTerm(anisField) // promote anisField to an effective field term
+AddEdensTerm(anisEdens) // promote anisEdens to an energy density term
+
+tableAdd(E_custom)  // Add a column with the energy related to the custom field
+</code></pre>
+
+	<hr/>
+
+	{{range .FilterName "AddFieldTerm" "AddEdensTerm" "RemoveCustomFields" "B_custom" "E_custom" "Edens_custom" }} {{template "entry" .}} {{end}}
 
 </div>
 
 
 
 
-<div id="misc" class="section" >
+<div id="misc" class="api-section" >
 
-	<hr/><h1> Misc </h1>
+	<h1> Misc </h1>
 
 	Other available functions.
+
+	<hr/>
+
 	{{range .FilterLeftovers}} {{template "entry" .}} {{end}}
 
 </div>
@@ -445,24 +585,20 @@ TableAdd(TotalShift)
 
 
 
-<div id="api-full" class="section" >
-
-	<hr/><h1> Full API </h1>
-
-	Filter: <input type="text" id="searchInput" onkeyup="onSearch()" placeholder="Enter a search term" title="Type in a name">
-
-	<br><br>
-
+<div id="api-full" class="api-section" >
 	{{range .All }} {{template "entry" .}} {{end}}
-
 </div>
 
 
+
+</div> <!-- api content -->
+</div> <!-- api container -->
 
 
 <script>
 	function onSearch() {
 		var filter, entries, entry;
+		openSection(null,"api-full");
     	filter = document.getElementById("searchInput").value.toUpperCase();
     	entries = document.getElementById("api-full").getElementsByClassName("api-entry");
     	for (i = 0; i < entries.length; i++) {
@@ -477,16 +613,21 @@ TableAdd(TotalShift)
 
 	function openSection(evt, sectionName) {
 	  var i, content;
-	  content = document.getElementsByClassName("section");
+	  if (sectionName != "api-full") {
+	  	document.getElementById("searchInput").value = "";
+	  }
+	  content = document.getElementsByClassName("api-section");
 	  for (i = 0; i < content.length; i++) {
 		content[i].style.display = "none";
 	  }
-	  document.getElementById(sectionName).style.display = "inline";
+	  document.getElementById(sectionName).style.display = "block";
 	}
-	
-	// Get the section with id="defaultOpen" and click on it
-	document.getElementById("defaultOpen").click();
-	document.getElementById("searchInput").value = "";
+
+	window.onload = function() {
+		document.getElementById("searchInput").value = "";
+		document.getElementById("searchInput").click();
+		document.getElementById("searchInput").focus();
+	}	
 </script>
 
 

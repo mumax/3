@@ -16,8 +16,9 @@ var (
 	Edens_demag = NewScalarField("Edens_demag", "J/m3", "Magnetostatic energy density", AddEdens_demag)
 	E_demag     = NewScalarValue("E_demag", "J", "Magnetostatic energy", GetDemagEnergy)
 
-	EnableDemag   = true // enable/disable global demag field
-	NoDemagSpins  = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per-spin (set to 1 to disable)")
+	EnableDemag  = true // enable/disable global demag field
+	NoDemagSpins = NewScalarParam("NoDemagSpins", "", "Disable magnetostatic interaction per region (default=0, set to 1 to disable). "+
+		"E.g.: NoDemagSpins.SetRegion(5, 1) disables the magnetostatic interaction in region 5.")
 	conv_         *cuda.DemagConvolution // does the heavy lifting
 	DemagAccuracy = 6.0                  // Demag accuracy (divide cubes in at most N^3 points)
 )

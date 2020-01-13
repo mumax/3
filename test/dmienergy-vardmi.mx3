@@ -19,8 +19,6 @@ Ku1   = 5.9e5
 Msat  = 6e5
 AnisU = vector(0, 0, 1)
 
-ext_enableunsafe()
-
 Dind.setRegion(0, 4e-3)
 Dind.setRegion(1, 2e-3)
 Dind.setRegion(2, -3e-3)

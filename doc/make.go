@@ -15,30 +15,51 @@ import (
 )
 
 var flag_vet = flag.Bool("vet", false, "only vet source files, don't run them")
-var flag_api = flag.Bool("api", false, "only generate API")
+var flag_examples = flag.Bool("examples", false, "run mumax3 examples")
+var flag_forced = flag.Bool("forced", false, "force to re-run mumax3 examples")
+var flag_builddir = flag.String("builddir", "build", "build directory")
+
+var buildDir string
+
+const templateDir = "templates"
 
 func main() {
+
 	flag.Parse()
+	buildDir = *flag_builddir + "/"
 
 	buildAPI()
 
 	// read template
-	b, err := ioutil.ReadFile("template.html")
+	b, err := ioutil.ReadFile(path.Join(templateDir, "examples-template.html"))
 	check(err)
 	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
 	templ := template.Must(template.New("guide").Parse(string(b)))
 
 	// output file
-	f, err2 := os.OpenFile("examples.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	f, err2 := os.OpenFile(path.Join(buildDir, "examples.html"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	check(err2)
 
 	// execute!
-	if !*flag_api {
+	if *flag_examples {
 		state := &State{}
 		check(templ.Execute(f, state))
 	}
 
 	renderAPI()
+
+	createIndexPage()
+}
+
+func createIndexPage() {
+	b, err := ioutil.ReadFile(path.Join(templateDir, "index-template.html"))
+	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
+	check(err)
+	templ := template.Must(template.New("guid").Parse(string(b)))
+	f, err2 := os.OpenFile(path.Join(buildDir, "index.html"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	check(err2)
+	state := &State{}
+	check(templ.Execute(f, state))
 }
 
 type State struct {
@@ -58,7 +79,10 @@ func (s *State) Example(in string) string {
 	if *flag_vet {
 		arg = "-vet"
 	}
-	cmd("mumax3", "-cache", "/tmp", arg, s.infile())
+
+	if _, err := os.Stat(s.outfile()); os.IsNotExist(err) || *flag_forced {
+		cmd("mumax3", "-cache", "/tmp", arg, s.infile())
+	}
 
 	recordExamples(in, s.count)
 
@@ -77,8 +101,8 @@ func recordExamples(input string, num int) {
 }
 
 func (s *State) Img(fname string) string {
-	cmd("mumax3-convert", "-png", "-arrows", "16", s.outfile()+"/"+fname+".ovf")
-	pngfile := s.outfile() + "/" + fname + ".png"
+	cmd("mumax3-convert", "-png", "-arrows", "16", path.Join(s.outfile(), fname+".ovf"))
+	pngfile := path.Join(s.relativeOutfile(), fname+".png")
 	return fmt.Sprintf(`
 <figure style="float:left">
 	<img src="%v"/>
@@ -87,7 +111,7 @@ func (s *State) Img(fname string) string {
 }
 
 func (s *State) Include(fname string) string {
-	b, err := ioutil.ReadFile(fname)
+	b, err := ioutil.ReadFile(path.Join(templateDir, fname))
 	check(err)
 	return string(b)
 }
@@ -109,7 +133,7 @@ func (s *State) Output() string {
 
 	for _, f := range files {
 		if f == "table.txt" {
-			cmd("mumax3-plot", s.outfile()+"/"+f)
+			cmd("mumax3-plot", path.Join(s.outfile(), f))
 		}
 	}
 
@@ -120,7 +144,7 @@ func (s *State) Output() string {
 	sort.Strings(files)
 	for _, f := range files {
 		if path.Ext(f) == ".svg" {
-			src := s.outfile() + "/" + f
+			src := path.Join(s.relativeOutfile(), f)
 			out += fmt.Sprintf(`
 <figure>
 	<img src="%v"/>
@@ -135,8 +159,9 @@ func (s *State) Output() string {
 // hysteresis example. State.OutputHysteresis is the custom output function
 // for the hysteresis example.
 func (s *State) OutputHysteresis() string {
-	tableName := fmt.Sprintf(`%s/table.txt`, s.outfile())
-	figureName := fmt.Sprintf(`%s/hysteresis.svg`, s.outfile())
+	tableName := path.Join(s.outfile(), "table.txt")
+	figureName := path.Join(s.outfile(), "hysteresis.svg")
+	relFigureName := path.Join(s.relativeOutfile(), "hysteresis.svg")
 
 	gnuplotCmd := `set term svg noenhanced size 400 300 font 'Arial,10';`
 	gnuplotCmd += fmt.Sprintf(`set output "%s";`, figureName)
@@ -153,16 +178,21 @@ func (s *State) OutputHysteresis() string {
 <h3>output</h3>
 <figure>
 	<img src="%v"/>
-</figure>`, figureName)
+</figure>`, relFigureName)
 
 	return out
 }
 
 func (s *State) infile() string {
-	return fmt.Sprintf("example%v.mx3", s.count)
+	return path.Join(buildDir, fmt.Sprintf("example%v.mx3", s.count))
 }
 
 func (s *State) outfile() string {
+	return path.Join(buildDir, fmt.Sprintf("example%v.out", s.count))
+}
+
+// Relative output directory path from the build directory
+func (s *State) relativeOutfile() string {
 	return fmt.Sprintf("example%v.out", s.count)
 }
 

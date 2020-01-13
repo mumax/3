@@ -12,8 +12,9 @@ const NREGION = 256 // maximum number of regions, limited by size of byte.
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
-	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region in one cell by index")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
+	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region (first argument) in one cell "+
+		"by the index of the cell (last three arguments)")
 }
 
 // stores the region index for each cell

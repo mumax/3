@@ -2,11 +2,12 @@ package engine
 
 import (
 	"fmt"
+	"math"
+	"os"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
-	"os"
 )
 
 // Solver globals
@@ -32,14 +33,14 @@ func init() {
 	DeclFunc("Run", Run, "Run the simulation for a time in seconds")
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
-	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun")
+	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun, 3:Bogaki-Shampine, 4: Runge-Kutta (RK45), 5: Dormand-Prince, 6: Fehlberg, -1: Backward Euler")
 	DeclTVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
-	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate")
-	DeclVar("Headroom", &Headroom, "Solver headroom")
-	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step")
+	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate (default = 1e-5)")
+	DeclVar("Headroom", &Headroom, "Solver headroom (default = 0.8)")
+	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step (which is the default)")
 	DeclFunc("Exit", Exit, "Exit from the program")
 	SetSolver(DORMANDPRINCE)
 	_ = NewScalarValue("dt", "s", "Time Step", func() float64 { return Dt_si })

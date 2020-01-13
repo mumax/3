@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for reducemaxdiff kernel
 var reducemaxdiff_code cu.Function
 
 // Stores the arguments for reducemaxdiff kernel invocation
-type reducemaxdiff_args_t struct{
-	 arg_src1 unsafe.Pointer
-	 arg_src2 unsafe.Pointer
-	 arg_dst unsafe.Pointer
-	 arg_initVal float32
-	 arg_n int
-	 argptr [5]unsafe.Pointer
+type reducemaxdiff_args_t struct {
+	arg_src1    unsafe.Pointer
+	arg_src2    unsafe.Pointer
+	arg_dst     unsafe.Pointer
+	arg_initVal float32
+	arg_n       int
+	argptr      [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducemaxdiff kernel invocation
 var reducemaxdiff_args reducemaxdiff_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
-	 reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
-	 reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
-	 reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
-	 reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
-	 }
+	reducemaxdiff_args.argptr[0] = unsafe.Pointer(&reducemaxdiff_args.arg_src1)
+	reducemaxdiff_args.argptr[1] = unsafe.Pointer(&reducemaxdiff_args.arg_src2)
+	reducemaxdiff_args.argptr[2] = unsafe.Pointer(&reducemaxdiff_args.arg_dst)
+	reducemaxdiff_args.argptr[3] = unsafe.Pointer(&reducemaxdiff_args.arg_initVal)
+	reducemaxdiff_args.argptr[4] = unsafe.Pointer(&reducemaxdiff_args.arg_n)
+}
 
 // Wrapper for reducemaxdiff CUDA kernel, asynchronous.
-func k_reducemaxdiff_async ( src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
-	if Synchronous{ // debug
+func k_reducemaxdiff_async(src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("reducemaxdiff")
 	}
@@ -48,43 +48,42 @@ func k_reducemaxdiff_async ( src1 unsafe.Pointer, src2 unsafe.Pointer, dst unsaf
 	reducemaxdiff_args.Lock()
 	defer reducemaxdiff_args.Unlock()
 
-	if reducemaxdiff_code == 0{
+	if reducemaxdiff_code == 0 {
 		reducemaxdiff_code = fatbinLoad(reducemaxdiff_map, "reducemaxdiff")
 	}
 
-	 reducemaxdiff_args.arg_src1 = src1
-	 reducemaxdiff_args.arg_src2 = src2
-	 reducemaxdiff_args.arg_dst = dst
-	 reducemaxdiff_args.arg_initVal = initVal
-	 reducemaxdiff_args.arg_n = n
-	
+	reducemaxdiff_args.arg_src1 = src1
+	reducemaxdiff_args.arg_src2 = src2
+	reducemaxdiff_args.arg_dst = dst
+	reducemaxdiff_args.arg_initVal = initVal
+	reducemaxdiff_args.arg_n = n
 
 	args := reducemaxdiff_args.argptr[:]
 	cu.LaunchKernel(reducemaxdiff_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("reducemaxdiff")
 	}
 }
 
 // maps compute capability on PTX code for reducemaxdiff kernel.
-var reducemaxdiff_map = map[int]string{ 0: "" ,
-30: reducemaxdiff_ptx_30 ,
-35: reducemaxdiff_ptx_35 ,
-37: reducemaxdiff_ptx_37 ,
-50: reducemaxdiff_ptx_50 ,
-52: reducemaxdiff_ptx_52 ,
-53: reducemaxdiff_ptx_53 ,
-60: reducemaxdiff_ptx_60 ,
-61: reducemaxdiff_ptx_61 ,
-70: reducemaxdiff_ptx_70 ,
-75: reducemaxdiff_ptx_75  }
+var reducemaxdiff_map = map[int]string{0: "",
+	30: reducemaxdiff_ptx_30,
+	35: reducemaxdiff_ptx_35,
+	37: reducemaxdiff_ptx_37,
+	50: reducemaxdiff_ptx_50,
+	52: reducemaxdiff_ptx_52,
+	53: reducemaxdiff_ptx_53,
+	60: reducemaxdiff_ptx_60,
+	61: reducemaxdiff_ptx_61,
+	70: reducemaxdiff_ptx_70,
+	75: reducemaxdiff_ptx_75}
 
 // reducemaxdiff PTX code for various compute capabilities.
-const(
-  reducemaxdiff_ptx_30 = `
-.version 6.3
+const (
+	reducemaxdiff_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -207,8 +206,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_35 = `
-.version 6.3
+	reducemaxdiff_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -331,8 +330,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_37 = `
-.version 6.3
+	reducemaxdiff_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -455,8 +454,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_50 = `
-.version 6.3
+	reducemaxdiff_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -579,8 +578,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_52 = `
-.version 6.3
+	reducemaxdiff_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -703,8 +702,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_53 = `
-.version 6.3
+	reducemaxdiff_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -827,8 +826,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_60 = `
-.version 6.3
+	reducemaxdiff_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -951,8 +950,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_61 = `
-.version 6.3
+	reducemaxdiff_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1075,8 +1074,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_70 = `
-.version 6.3
+	reducemaxdiff_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1199,8 +1198,8 @@ BB0_10:
 
 
 `
-   reducemaxdiff_ptx_75 = `
-.version 6.3
+	reducemaxdiff_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1323,4 +1322,4 @@ BB0_10:
 
 
 `
- )
+)

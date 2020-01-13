@@ -5,56 +5,56 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for kernmulRSymm3D kernel
 var kernmulRSymm3D_code cu.Function
 
 // Stores the arguments for kernmulRSymm3D kernel invocation
-type kernmulRSymm3D_args_t struct{
-	 arg_fftMx unsafe.Pointer
-	 arg_fftMy unsafe.Pointer
-	 arg_fftMz unsafe.Pointer
-	 arg_fftKxx unsafe.Pointer
-	 arg_fftKyy unsafe.Pointer
-	 arg_fftKzz unsafe.Pointer
-	 arg_fftKyz unsafe.Pointer
-	 arg_fftKxz unsafe.Pointer
-	 arg_fftKxy unsafe.Pointer
-	 arg_Nx int
-	 arg_Ny int
-	 arg_Nz int
-	 argptr [12]unsafe.Pointer
+type kernmulRSymm3D_args_t struct {
+	arg_fftMx  unsafe.Pointer
+	arg_fftMy  unsafe.Pointer
+	arg_fftMz  unsafe.Pointer
+	arg_fftKxx unsafe.Pointer
+	arg_fftKyy unsafe.Pointer
+	arg_fftKzz unsafe.Pointer
+	arg_fftKyz unsafe.Pointer
+	arg_fftKxz unsafe.Pointer
+	arg_fftKxy unsafe.Pointer
+	arg_Nx     int
+	arg_Ny     int
+	arg_Nz     int
+	argptr     [12]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for kernmulRSymm3D kernel invocation
 var kernmulRSymm3D_args kernmulRSymm3D_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
-	 kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
-	 kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
-	 kernmulRSymm3D_args.argptr[3] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxx)
-	 kernmulRSymm3D_args.argptr[4] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyy)
-	 kernmulRSymm3D_args.argptr[5] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKzz)
-	 kernmulRSymm3D_args.argptr[6] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyz)
-	 kernmulRSymm3D_args.argptr[7] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxz)
-	 kernmulRSymm3D_args.argptr[8] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxy)
-	 kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
-	 kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
-	 kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
-	 }
+	kernmulRSymm3D_args.argptr[0] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMx)
+	kernmulRSymm3D_args.argptr[1] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMy)
+	kernmulRSymm3D_args.argptr[2] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftMz)
+	kernmulRSymm3D_args.argptr[3] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxx)
+	kernmulRSymm3D_args.argptr[4] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyy)
+	kernmulRSymm3D_args.argptr[5] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKzz)
+	kernmulRSymm3D_args.argptr[6] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKyz)
+	kernmulRSymm3D_args.argptr[7] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxz)
+	kernmulRSymm3D_args.argptr[8] = unsafe.Pointer(&kernmulRSymm3D_args.arg_fftKxy)
+	kernmulRSymm3D_args.argptr[9] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nx)
+	kernmulRSymm3D_args.argptr[10] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Ny)
+	kernmulRSymm3D_args.argptr[11] = unsafe.Pointer(&kernmulRSymm3D_args.arg_Nz)
+}
 
 // Wrapper for kernmulRSymm3D CUDA kernel, asynchronous.
-func k_kernmulRSymm3D_async ( fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int,  cfg *config) {
-	if Synchronous{ // debug
+func k_kernmulRSymm3D_async(fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz unsafe.Pointer, fftKxx unsafe.Pointer, fftKyy unsafe.Pointer, fftKzz unsafe.Pointer, fftKyz unsafe.Pointer, fftKxz unsafe.Pointer, fftKxy unsafe.Pointer, Nx int, Ny int, Nz int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("kernmulRSymm3D")
 	}
@@ -62,50 +62,49 @@ func k_kernmulRSymm3D_async ( fftMx unsafe.Pointer, fftMy unsafe.Pointer, fftMz 
 	kernmulRSymm3D_args.Lock()
 	defer kernmulRSymm3D_args.Unlock()
 
-	if kernmulRSymm3D_code == 0{
+	if kernmulRSymm3D_code == 0 {
 		kernmulRSymm3D_code = fatbinLoad(kernmulRSymm3D_map, "kernmulRSymm3D")
 	}
 
-	 kernmulRSymm3D_args.arg_fftMx = fftMx
-	 kernmulRSymm3D_args.arg_fftMy = fftMy
-	 kernmulRSymm3D_args.arg_fftMz = fftMz
-	 kernmulRSymm3D_args.arg_fftKxx = fftKxx
-	 kernmulRSymm3D_args.arg_fftKyy = fftKyy
-	 kernmulRSymm3D_args.arg_fftKzz = fftKzz
-	 kernmulRSymm3D_args.arg_fftKyz = fftKyz
-	 kernmulRSymm3D_args.arg_fftKxz = fftKxz
-	 kernmulRSymm3D_args.arg_fftKxy = fftKxy
-	 kernmulRSymm3D_args.arg_Nx = Nx
-	 kernmulRSymm3D_args.arg_Ny = Ny
-	 kernmulRSymm3D_args.arg_Nz = Nz
-	
+	kernmulRSymm3D_args.arg_fftMx = fftMx
+	kernmulRSymm3D_args.arg_fftMy = fftMy
+	kernmulRSymm3D_args.arg_fftMz = fftMz
+	kernmulRSymm3D_args.arg_fftKxx = fftKxx
+	kernmulRSymm3D_args.arg_fftKyy = fftKyy
+	kernmulRSymm3D_args.arg_fftKzz = fftKzz
+	kernmulRSymm3D_args.arg_fftKyz = fftKyz
+	kernmulRSymm3D_args.arg_fftKxz = fftKxz
+	kernmulRSymm3D_args.arg_fftKxy = fftKxy
+	kernmulRSymm3D_args.arg_Nx = Nx
+	kernmulRSymm3D_args.arg_Ny = Ny
+	kernmulRSymm3D_args.arg_Nz = Nz
 
 	args := kernmulRSymm3D_args.argptr[:]
 	cu.LaunchKernel(kernmulRSymm3D_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("kernmulRSymm3D")
 	}
 }
 
 // maps compute capability on PTX code for kernmulRSymm3D kernel.
-var kernmulRSymm3D_map = map[int]string{ 0: "" ,
-30: kernmulRSymm3D_ptx_30 ,
-35: kernmulRSymm3D_ptx_35 ,
-37: kernmulRSymm3D_ptx_37 ,
-50: kernmulRSymm3D_ptx_50 ,
-52: kernmulRSymm3D_ptx_52 ,
-53: kernmulRSymm3D_ptx_53 ,
-60: kernmulRSymm3D_ptx_60 ,
-61: kernmulRSymm3D_ptx_61 ,
-70: kernmulRSymm3D_ptx_70 ,
-75: kernmulRSymm3D_ptx_75  }
+var kernmulRSymm3D_map = map[int]string{0: "",
+	30: kernmulRSymm3D_ptx_30,
+	35: kernmulRSymm3D_ptx_35,
+	37: kernmulRSymm3D_ptx_37,
+	50: kernmulRSymm3D_ptx_50,
+	52: kernmulRSymm3D_ptx_52,
+	53: kernmulRSymm3D_ptx_53,
+	60: kernmulRSymm3D_ptx_60,
+	61: kernmulRSymm3D_ptx_61,
+	70: kernmulRSymm3D_ptx_70,
+	75: kernmulRSymm3D_ptx_75}
 
 // kernmulRSymm3D PTX code for various compute capabilities.
-const(
-  kernmulRSymm3D_ptx_30 = `
-.version 6.3
+const (
+	kernmulRSymm3D_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -251,8 +250,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_35 = `
-.version 6.3
+	kernmulRSymm3D_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -398,8 +397,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_37 = `
-.version 6.3
+	kernmulRSymm3D_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -545,8 +544,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_50 = `
-.version 6.3
+	kernmulRSymm3D_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -692,8 +691,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_52 = `
-.version 6.3
+	kernmulRSymm3D_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -839,8 +838,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_53 = `
-.version 6.3
+	kernmulRSymm3D_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -986,8 +985,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_60 = `
-.version 6.3
+	kernmulRSymm3D_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -1133,8 +1132,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_61 = `
-.version 6.3
+	kernmulRSymm3D_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1280,8 +1279,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_70 = `
-.version 6.3
+	kernmulRSymm3D_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1427,8 +1426,8 @@ BB0_2:
 
 
 `
-   kernmulRSymm3D_ptx_75 = `
-.version 6.3
+	kernmulRSymm3D_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1574,4 +1573,4 @@ BB0_2:
 
 
 `
- )
+)

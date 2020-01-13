@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for reducesum kernel
 var reducesum_code cu.Function
 
 // Stores the arguments for reducesum kernel invocation
-type reducesum_args_t struct{
-	 arg_src unsafe.Pointer
-	 arg_dst unsafe.Pointer
-	 arg_initVal float32
-	 arg_n int
-	 argptr [4]unsafe.Pointer
+type reducesum_args_t struct {
+	arg_src     unsafe.Pointer
+	arg_dst     unsafe.Pointer
+	arg_initVal float32
+	arg_n       int
+	argptr      [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducesum kernel invocation
 var reducesum_args reducesum_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 reducesum_args.argptr[0] = unsafe.Pointer(&reducesum_args.arg_src)
-	 reducesum_args.argptr[1] = unsafe.Pointer(&reducesum_args.arg_dst)
-	 reducesum_args.argptr[2] = unsafe.Pointer(&reducesum_args.arg_initVal)
-	 reducesum_args.argptr[3] = unsafe.Pointer(&reducesum_args.arg_n)
-	 }
+	reducesum_args.argptr[0] = unsafe.Pointer(&reducesum_args.arg_src)
+	reducesum_args.argptr[1] = unsafe.Pointer(&reducesum_args.arg_dst)
+	reducesum_args.argptr[2] = unsafe.Pointer(&reducesum_args.arg_initVal)
+	reducesum_args.argptr[3] = unsafe.Pointer(&reducesum_args.arg_n)
+}
 
 // Wrapper for reducesum CUDA kernel, asynchronous.
-func k_reducesum_async ( src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
-	if Synchronous{ // debug
+func k_reducesum_async(src unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("reducesum")
 	}
@@ -46,42 +46,41 @@ func k_reducesum_async ( src unsafe.Pointer, dst unsafe.Pointer, initVal float32
 	reducesum_args.Lock()
 	defer reducesum_args.Unlock()
 
-	if reducesum_code == 0{
+	if reducesum_code == 0 {
 		reducesum_code = fatbinLoad(reducesum_map, "reducesum")
 	}
 
-	 reducesum_args.arg_src = src
-	 reducesum_args.arg_dst = dst
-	 reducesum_args.arg_initVal = initVal
-	 reducesum_args.arg_n = n
-	
+	reducesum_args.arg_src = src
+	reducesum_args.arg_dst = dst
+	reducesum_args.arg_initVal = initVal
+	reducesum_args.arg_n = n
 
 	args := reducesum_args.argptr[:]
 	cu.LaunchKernel(reducesum_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("reducesum")
 	}
 }
 
 // maps compute capability on PTX code for reducesum kernel.
-var reducesum_map = map[int]string{ 0: "" ,
-30: reducesum_ptx_30 ,
-35: reducesum_ptx_35 ,
-37: reducesum_ptx_37 ,
-50: reducesum_ptx_50 ,
-52: reducesum_ptx_52 ,
-53: reducesum_ptx_53 ,
-60: reducesum_ptx_60 ,
-61: reducesum_ptx_61 ,
-70: reducesum_ptx_70 ,
-75: reducesum_ptx_75  }
+var reducesum_map = map[int]string{0: "",
+	30: reducesum_ptx_30,
+	35: reducesum_ptx_35,
+	37: reducesum_ptx_37,
+	50: reducesum_ptx_50,
+	52: reducesum_ptx_52,
+	53: reducesum_ptx_53,
+	60: reducesum_ptx_60,
+	61: reducesum_ptx_61,
+	70: reducesum_ptx_70,
+	75: reducesum_ptx_75}
 
 // reducesum PTX code for various compute capabilities.
-const(
-  reducesum_ptx_30 = `
-.version 6.3
+const (
+	reducesum_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -195,8 +194,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_35 = `
-.version 6.3
+	reducesum_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -310,8 +309,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_37 = `
-.version 6.3
+	reducesum_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -425,8 +424,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_50 = `
-.version 6.3
+	reducesum_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -540,8 +539,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_52 = `
-.version 6.3
+	reducesum_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -655,8 +654,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_53 = `
-.version 6.3
+	reducesum_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -770,8 +769,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_60 = `
-.version 6.3
+	reducesum_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -885,8 +884,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_61 = `
-.version 6.3
+	reducesum_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1000,8 +999,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_70 = `
-.version 6.3
+	reducesum_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1115,8 +1114,8 @@ BB0_10:
 
 
 `
-   reducesum_ptx_75 = `
-.version 6.3
+	reducesum_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1230,4 +1229,4 @@ BB0_10:
 
 
 `
- )
+)

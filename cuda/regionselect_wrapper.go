@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for regionselect kernel
 var regionselect_code cu.Function
 
 // Stores the arguments for regionselect kernel invocation
-type regionselect_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_src unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_region byte
-	 arg_N int
-	 argptr [5]unsafe.Pointer
+type regionselect_args_t struct {
+	arg_dst     unsafe.Pointer
+	arg_src     unsafe.Pointer
+	arg_regions unsafe.Pointer
+	arg_region  byte
+	arg_N       int
+	argptr      [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for regionselect kernel invocation
 var regionselect_args regionselect_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 regionselect_args.argptr[0] = unsafe.Pointer(&regionselect_args.arg_dst)
-	 regionselect_args.argptr[1] = unsafe.Pointer(&regionselect_args.arg_src)
-	 regionselect_args.argptr[2] = unsafe.Pointer(&regionselect_args.arg_regions)
-	 regionselect_args.argptr[3] = unsafe.Pointer(&regionselect_args.arg_region)
-	 regionselect_args.argptr[4] = unsafe.Pointer(&regionselect_args.arg_N)
-	 }
+	regionselect_args.argptr[0] = unsafe.Pointer(&regionselect_args.arg_dst)
+	regionselect_args.argptr[1] = unsafe.Pointer(&regionselect_args.arg_src)
+	regionselect_args.argptr[2] = unsafe.Pointer(&regionselect_args.arg_regions)
+	regionselect_args.argptr[3] = unsafe.Pointer(&regionselect_args.arg_region)
+	regionselect_args.argptr[4] = unsafe.Pointer(&regionselect_args.arg_N)
+}
 
 // Wrapper for regionselect CUDA kernel, asynchronous.
-func k_regionselect_async ( dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe.Pointer, region byte, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("regionselect")
 	}
@@ -48,43 +48,42 @@ func k_regionselect_async ( dst unsafe.Pointer, src unsafe.Pointer, regions unsa
 	regionselect_args.Lock()
 	defer regionselect_args.Unlock()
 
-	if regionselect_code == 0{
+	if regionselect_code == 0 {
 		regionselect_code = fatbinLoad(regionselect_map, "regionselect")
 	}
 
-	 regionselect_args.arg_dst = dst
-	 regionselect_args.arg_src = src
-	 regionselect_args.arg_regions = regions
-	 regionselect_args.arg_region = region
-	 regionselect_args.arg_N = N
-	
+	regionselect_args.arg_dst = dst
+	regionselect_args.arg_src = src
+	regionselect_args.arg_regions = regions
+	regionselect_args.arg_region = region
+	regionselect_args.arg_N = N
 
 	args := regionselect_args.argptr[:]
 	cu.LaunchKernel(regionselect_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("regionselect")
 	}
 }
 
 // maps compute capability on PTX code for regionselect kernel.
-var regionselect_map = map[int]string{ 0: "" ,
-30: regionselect_ptx_30 ,
-35: regionselect_ptx_35 ,
-37: regionselect_ptx_37 ,
-50: regionselect_ptx_50 ,
-52: regionselect_ptx_52 ,
-53: regionselect_ptx_53 ,
-60: regionselect_ptx_60 ,
-61: regionselect_ptx_61 ,
-70: regionselect_ptx_70 ,
-75: regionselect_ptx_75  }
+var regionselect_map = map[int]string{0: "",
+	30: regionselect_ptx_30,
+	35: regionselect_ptx_35,
+	37: regionselect_ptx_37,
+	50: regionselect_ptx_50,
+	52: regionselect_ptx_52,
+	53: regionselect_ptx_53,
+	60: regionselect_ptx_60,
+	61: regionselect_ptx_61,
+	70: regionselect_ptx_70,
+	75: regionselect_ptx_75}
 
 // regionselect PTX code for various compute capabilities.
-const(
-  regionselect_ptx_30 = `
-.version 6.3
+const (
+	regionselect_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -145,8 +144,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_35 = `
-.version 6.3
+	regionselect_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -207,8 +206,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_37 = `
-.version 6.3
+	regionselect_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -269,8 +268,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_50 = `
-.version 6.3
+	regionselect_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -331,8 +330,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_52 = `
-.version 6.3
+	regionselect_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -393,8 +392,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_53 = `
-.version 6.3
+	regionselect_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -455,8 +454,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_60 = `
-.version 6.3
+	regionselect_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -517,8 +516,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_61 = `
-.version 6.3
+	regionselect_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -579,8 +578,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_70 = `
-.version 6.3
+	regionselect_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -641,8 +640,8 @@ BB0_4:
 
 
 `
-   regionselect_ptx_75 = `
-.version 6.3
+	regionselect_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -703,4 +702,4 @@ BB0_4:
 
 
 `
- )
+)

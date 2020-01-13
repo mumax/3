@@ -5,44 +5,44 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for reducemaxvecnorm2 kernel
 var reducemaxvecnorm2_code cu.Function
 
 // Stores the arguments for reducemaxvecnorm2 kernel invocation
-type reducemaxvecnorm2_args_t struct{
-	 arg_x unsafe.Pointer
-	 arg_y unsafe.Pointer
-	 arg_z unsafe.Pointer
-	 arg_dst unsafe.Pointer
-	 arg_initVal float32
-	 arg_n int
-	 argptr [6]unsafe.Pointer
+type reducemaxvecnorm2_args_t struct {
+	arg_x       unsafe.Pointer
+	arg_y       unsafe.Pointer
+	arg_z       unsafe.Pointer
+	arg_dst     unsafe.Pointer
+	arg_initVal float32
+	arg_n       int
+	argptr      [6]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducemaxvecnorm2 kernel invocation
 var reducemaxvecnorm2_args reducemaxvecnorm2_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 reducemaxvecnorm2_args.argptr[0] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_x)
-	 reducemaxvecnorm2_args.argptr[1] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_y)
-	 reducemaxvecnorm2_args.argptr[2] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_z)
-	 reducemaxvecnorm2_args.argptr[3] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_dst)
-	 reducemaxvecnorm2_args.argptr[4] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_initVal)
-	 reducemaxvecnorm2_args.argptr[5] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_n)
-	 }
+	reducemaxvecnorm2_args.argptr[0] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_x)
+	reducemaxvecnorm2_args.argptr[1] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_y)
+	reducemaxvecnorm2_args.argptr[2] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_z)
+	reducemaxvecnorm2_args.argptr[3] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_dst)
+	reducemaxvecnorm2_args.argptr[4] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_initVal)
+	reducemaxvecnorm2_args.argptr[5] = unsafe.Pointer(&reducemaxvecnorm2_args.arg_n)
+}
 
 // Wrapper for reducemaxvecnorm2 CUDA kernel, asynchronous.
-func k_reducemaxvecnorm2_async ( x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
-	if Synchronous{ // debug
+func k_reducemaxvecnorm2_async(x unsafe.Pointer, y unsafe.Pointer, z unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("reducemaxvecnorm2")
 	}
@@ -50,44 +50,43 @@ func k_reducemaxvecnorm2_async ( x unsafe.Pointer, y unsafe.Pointer, z unsafe.Po
 	reducemaxvecnorm2_args.Lock()
 	defer reducemaxvecnorm2_args.Unlock()
 
-	if reducemaxvecnorm2_code == 0{
+	if reducemaxvecnorm2_code == 0 {
 		reducemaxvecnorm2_code = fatbinLoad(reducemaxvecnorm2_map, "reducemaxvecnorm2")
 	}
 
-	 reducemaxvecnorm2_args.arg_x = x
-	 reducemaxvecnorm2_args.arg_y = y
-	 reducemaxvecnorm2_args.arg_z = z
-	 reducemaxvecnorm2_args.arg_dst = dst
-	 reducemaxvecnorm2_args.arg_initVal = initVal
-	 reducemaxvecnorm2_args.arg_n = n
-	
+	reducemaxvecnorm2_args.arg_x = x
+	reducemaxvecnorm2_args.arg_y = y
+	reducemaxvecnorm2_args.arg_z = z
+	reducemaxvecnorm2_args.arg_dst = dst
+	reducemaxvecnorm2_args.arg_initVal = initVal
+	reducemaxvecnorm2_args.arg_n = n
 
 	args := reducemaxvecnorm2_args.argptr[:]
 	cu.LaunchKernel(reducemaxvecnorm2_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("reducemaxvecnorm2")
 	}
 }
 
 // maps compute capability on PTX code for reducemaxvecnorm2 kernel.
-var reducemaxvecnorm2_map = map[int]string{ 0: "" ,
-30: reducemaxvecnorm2_ptx_30 ,
-35: reducemaxvecnorm2_ptx_35 ,
-37: reducemaxvecnorm2_ptx_37 ,
-50: reducemaxvecnorm2_ptx_50 ,
-52: reducemaxvecnorm2_ptx_52 ,
-53: reducemaxvecnorm2_ptx_53 ,
-60: reducemaxvecnorm2_ptx_60 ,
-61: reducemaxvecnorm2_ptx_61 ,
-70: reducemaxvecnorm2_ptx_70 ,
-75: reducemaxvecnorm2_ptx_75  }
+var reducemaxvecnorm2_map = map[int]string{0: "",
+	30: reducemaxvecnorm2_ptx_30,
+	35: reducemaxvecnorm2_ptx_35,
+	37: reducemaxvecnorm2_ptx_37,
+	50: reducemaxvecnorm2_ptx_50,
+	52: reducemaxvecnorm2_ptx_52,
+	53: reducemaxvecnorm2_ptx_53,
+	60: reducemaxvecnorm2_ptx_60,
+	61: reducemaxvecnorm2_ptx_61,
+	70: reducemaxvecnorm2_ptx_70,
+	75: reducemaxvecnorm2_ptx_75}
 
 // reducemaxvecnorm2 PTX code for various compute capabilities.
-const(
-  reducemaxvecnorm2_ptx_30 = `
-.version 6.3
+const (
+	reducemaxvecnorm2_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -216,8 +215,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_35 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -346,8 +345,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_37 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -476,8 +475,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_50 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -606,8 +605,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_52 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -736,8 +735,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_53 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -866,8 +865,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_60 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -996,8 +995,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_61 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1126,8 +1125,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_70 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1256,8 +1255,8 @@ BB0_10:
 
 
 `
-   reducemaxvecnorm2_ptx_75 = `
-.version 6.3
+	reducemaxvecnorm2_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1386,4 +1385,4 @@ BB0_10:
 
 
 `
- )
+)

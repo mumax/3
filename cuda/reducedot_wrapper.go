@@ -5,42 +5,42 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for reducedot kernel
 var reducedot_code cu.Function
 
 // Stores the arguments for reducedot kernel invocation
-type reducedot_args_t struct{
-	 arg_x1 unsafe.Pointer
-	 arg_x2 unsafe.Pointer
-	 arg_dst unsafe.Pointer
-	 arg_initVal float32
-	 arg_n int
-	 argptr [5]unsafe.Pointer
+type reducedot_args_t struct {
+	arg_x1      unsafe.Pointer
+	arg_x2      unsafe.Pointer
+	arg_dst     unsafe.Pointer
+	arg_initVal float32
+	arg_n       int
+	argptr      [5]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for reducedot kernel invocation
 var reducedot_args reducedot_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
-	 reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
-	 reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
-	 reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
-	 reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
-	 }
+	reducedot_args.argptr[0] = unsafe.Pointer(&reducedot_args.arg_x1)
+	reducedot_args.argptr[1] = unsafe.Pointer(&reducedot_args.arg_x2)
+	reducedot_args.argptr[2] = unsafe.Pointer(&reducedot_args.arg_dst)
+	reducedot_args.argptr[3] = unsafe.Pointer(&reducedot_args.arg_initVal)
+	reducedot_args.argptr[4] = unsafe.Pointer(&reducedot_args.arg_n)
+}
 
 // Wrapper for reducedot CUDA kernel, asynchronous.
-func k_reducedot_async ( x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int,  cfg *config) {
-	if Synchronous{ // debug
+func k_reducedot_async(x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointer, initVal float32, n int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("reducedot")
 	}
@@ -48,43 +48,42 @@ func k_reducedot_async ( x1 unsafe.Pointer, x2 unsafe.Pointer, dst unsafe.Pointe
 	reducedot_args.Lock()
 	defer reducedot_args.Unlock()
 
-	if reducedot_code == 0{
+	if reducedot_code == 0 {
 		reducedot_code = fatbinLoad(reducedot_map, "reducedot")
 	}
 
-	 reducedot_args.arg_x1 = x1
-	 reducedot_args.arg_x2 = x2
-	 reducedot_args.arg_dst = dst
-	 reducedot_args.arg_initVal = initVal
-	 reducedot_args.arg_n = n
-	
+	reducedot_args.arg_x1 = x1
+	reducedot_args.arg_x2 = x2
+	reducedot_args.arg_dst = dst
+	reducedot_args.arg_initVal = initVal
+	reducedot_args.arg_n = n
 
 	args := reducedot_args.argptr[:]
 	cu.LaunchKernel(reducedot_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("reducedot")
 	}
 }
 
 // maps compute capability on PTX code for reducedot kernel.
-var reducedot_map = map[int]string{ 0: "" ,
-30: reducedot_ptx_30 ,
-35: reducedot_ptx_35 ,
-37: reducedot_ptx_37 ,
-50: reducedot_ptx_50 ,
-52: reducedot_ptx_52 ,
-53: reducedot_ptx_53 ,
-60: reducedot_ptx_60 ,
-61: reducedot_ptx_61 ,
-70: reducedot_ptx_70 ,
-75: reducedot_ptx_75  }
+var reducedot_map = map[int]string{0: "",
+	30: reducedot_ptx_30,
+	35: reducedot_ptx_35,
+	37: reducedot_ptx_37,
+	50: reducedot_ptx_50,
+	52: reducedot_ptx_52,
+	53: reducedot_ptx_53,
+	60: reducedot_ptx_60,
+	61: reducedot_ptx_61,
+	70: reducedot_ptx_70,
+	75: reducedot_ptx_75}
 
 // reducedot PTX code for various compute capabilities.
-const(
-  reducedot_ptx_30 = `
-.version 6.3
+const (
+	reducedot_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -203,8 +202,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_35 = `
-.version 6.3
+	reducedot_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -323,8 +322,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_37 = `
-.version 6.3
+	reducedot_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -443,8 +442,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_50 = `
-.version 6.3
+	reducedot_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -563,8 +562,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_52 = `
-.version 6.3
+	reducedot_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -683,8 +682,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_53 = `
-.version 6.3
+	reducedot_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -803,8 +802,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_60 = `
-.version 6.3
+	reducedot_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -923,8 +922,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_61 = `
-.version 6.3
+	reducedot_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -1043,8 +1042,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_70 = `
-.version 6.3
+	reducedot_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -1163,8 +1162,8 @@ BB0_10:
 
 
 `
-   reducedot_ptx_75 = `
-.version 6.3
+	reducedot_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -1283,4 +1282,4 @@ BB0_10:
 
 
 `
- )
+)

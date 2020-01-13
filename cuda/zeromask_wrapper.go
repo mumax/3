@@ -5,40 +5,40 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for zeromask kernel
 var zeromask_code cu.Function
 
 // Stores the arguments for zeromask kernel invocation
-type zeromask_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_maskLUT unsafe.Pointer
-	 arg_regions unsafe.Pointer
-	 arg_N int
-	 argptr [4]unsafe.Pointer
+type zeromask_args_t struct {
+	arg_dst     unsafe.Pointer
+	arg_maskLUT unsafe.Pointer
+	arg_regions unsafe.Pointer
+	arg_N       int
+	argptr      [4]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for zeromask kernel invocation
 var zeromask_args zeromask_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 zeromask_args.argptr[0] = unsafe.Pointer(&zeromask_args.arg_dst)
-	 zeromask_args.argptr[1] = unsafe.Pointer(&zeromask_args.arg_maskLUT)
-	 zeromask_args.argptr[2] = unsafe.Pointer(&zeromask_args.arg_regions)
-	 zeromask_args.argptr[3] = unsafe.Pointer(&zeromask_args.arg_N)
-	 }
+	zeromask_args.argptr[0] = unsafe.Pointer(&zeromask_args.arg_dst)
+	zeromask_args.argptr[1] = unsafe.Pointer(&zeromask_args.arg_maskLUT)
+	zeromask_args.argptr[2] = unsafe.Pointer(&zeromask_args.arg_regions)
+	zeromask_args.argptr[3] = unsafe.Pointer(&zeromask_args.arg_N)
+}
 
 // Wrapper for zeromask CUDA kernel, asynchronous.
-func k_zeromask_async ( dst unsafe.Pointer, maskLUT unsafe.Pointer, regions unsafe.Pointer, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_zeromask_async(dst unsafe.Pointer, maskLUT unsafe.Pointer, regions unsafe.Pointer, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("zeromask")
 	}
@@ -46,42 +46,41 @@ func k_zeromask_async ( dst unsafe.Pointer, maskLUT unsafe.Pointer, regions unsa
 	zeromask_args.Lock()
 	defer zeromask_args.Unlock()
 
-	if zeromask_code == 0{
+	if zeromask_code == 0 {
 		zeromask_code = fatbinLoad(zeromask_map, "zeromask")
 	}
 
-	 zeromask_args.arg_dst = dst
-	 zeromask_args.arg_maskLUT = maskLUT
-	 zeromask_args.arg_regions = regions
-	 zeromask_args.arg_N = N
-	
+	zeromask_args.arg_dst = dst
+	zeromask_args.arg_maskLUT = maskLUT
+	zeromask_args.arg_regions = regions
+	zeromask_args.arg_N = N
 
 	args := zeromask_args.argptr[:]
 	cu.LaunchKernel(zeromask_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("zeromask")
 	}
 }
 
 // maps compute capability on PTX code for zeromask kernel.
-var zeromask_map = map[int]string{ 0: "" ,
-30: zeromask_ptx_30 ,
-35: zeromask_ptx_35 ,
-37: zeromask_ptx_37 ,
-50: zeromask_ptx_50 ,
-52: zeromask_ptx_52 ,
-53: zeromask_ptx_53 ,
-60: zeromask_ptx_60 ,
-61: zeromask_ptx_61 ,
-70: zeromask_ptx_70 ,
-75: zeromask_ptx_75  }
+var zeromask_map = map[int]string{0: "",
+	30: zeromask_ptx_30,
+	35: zeromask_ptx_35,
+	37: zeromask_ptx_37,
+	50: zeromask_ptx_50,
+	52: zeromask_ptx_52,
+	53: zeromask_ptx_53,
+	60: zeromask_ptx_60,
+	61: zeromask_ptx_61,
+	70: zeromask_ptx_70,
+	75: zeromask_ptx_75}
 
 // zeromask PTX code for various compute capabilities.
-const(
-  zeromask_ptx_30 = `
-.version 6.3
+const (
+	zeromask_ptx_30 = `
+.version 6.5
 .target sm_30
 .address_size 64
 
@@ -137,8 +136,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_35 = `
-.version 6.3
+	zeromask_ptx_35 = `
+.version 6.5
 .target sm_35
 .address_size 64
 
@@ -197,8 +196,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_37 = `
-.version 6.3
+	zeromask_ptx_37 = `
+.version 6.5
 .target sm_37
 .address_size 64
 
@@ -257,8 +256,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_50 = `
-.version 6.3
+	zeromask_ptx_50 = `
+.version 6.5
 .target sm_50
 .address_size 64
 
@@ -317,8 +316,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_52 = `
-.version 6.3
+	zeromask_ptx_52 = `
+.version 6.5
 .target sm_52
 .address_size 64
 
@@ -377,8 +376,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_53 = `
-.version 6.3
+	zeromask_ptx_53 = `
+.version 6.5
 .target sm_53
 .address_size 64
 
@@ -437,8 +436,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_60 = `
-.version 6.3
+	zeromask_ptx_60 = `
+.version 6.5
 .target sm_60
 .address_size 64
 
@@ -497,8 +496,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_61 = `
-.version 6.3
+	zeromask_ptx_61 = `
+.version 6.5
 .target sm_61
 .address_size 64
 
@@ -557,8 +556,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_70 = `
-.version 6.3
+	zeromask_ptx_70 = `
+.version 6.5
 .target sm_70
 .address_size 64
 
@@ -617,8 +616,8 @@ BB0_3:
 
 
 `
-   zeromask_ptx_75 = `
-.version 6.3
+	zeromask_ptx_75 = `
+.version 6.5
 .target sm_75
 .address_size 64
 
@@ -677,4 +676,4 @@ BB0_3:
 
 
 `
- )
+)

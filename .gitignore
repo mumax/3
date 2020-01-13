@@ -5,12 +5,9 @@
 *.8
 *.o
 *.a
-*.svg
 *.log
 *.dump
 *.table
-*.png
-*.jpg
 *.gplot
 *.pprof
 mx3

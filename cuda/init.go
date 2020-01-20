@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	Version     int        // cuda version
-	DevName     string     // GPU name
-	TotalMem    int64      // total GPU memory
-	GPUInfo     string     // Human-readable GPU description
-	Synchronous bool       // for debug: synchronize stream0 at every kernel launch
-	cudaCtx     cu.Context // global CUDA context
-	cudaCC      int        // compute capablity (used for fatbin)
+	DriverVersion int        // cuda driver version
+	DevName       string     // GPU name
+	TotalMem      int64      // total GPU memory
+	GPUInfo       string     // Human-readable GPU description
+	Synchronous   bool       // for debug: synchronize stream0 at every kernel launch
+	cudaCtx       cu.Context // global CUDA context
+	cudaCC        int        // compute capablity (used for fatbin)
 )
 
 // Locks to an OS thread and initializes CUDA for that thread.
@@ -34,10 +34,11 @@ func Init(gpu int) {
 
 	M, m := dev.ComputeCapability()
 	cudaCC = 10*M + m
-	Version = cu.Version()
+	DriverVersion = cu.Version()
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()
-	GPUInfo = fmt.Sprint("CUDA ", Version, " ", DevName, "(", (TotalMem)/(1024*1024), "MB) ", "cc", M, ".", m)
+	GPUInfo = fmt.Sprintf("%s(%dMB), CUDA Driver %d.%d, cc=%d.%d",
+		DevName, (TotalMem)/(1024*1024), DriverVersion/1000, (DriverVersion%1000)/10, M, m)
 
 	if M < 2 {
 		log.Fatalln("GPU has insufficient compute capability, need 2.0 or higher.")

@@ -1,9 +1,10 @@
 package engine
 
 import (
+	"io"
+
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
-	"io"
 )
 
 const separationline = `
@@ -60,9 +61,21 @@ func Refer(tag string) {
 	}
 }
 
+func areRefsUsed() bool {
+	for _, bibentry := range library {
+		if bibentry.used {
+			return true
+		}
+	}
+	return false
+}
+
 func LogUsedRefs() {
+	if !areRefsUsed() {
+		return
+	}
 	LogOut("********************************************************************//")
-	LogOut("Please cite the following references, relevant for your simulation: //")
+	LogOut("Please cite the following references, relevant for your simulation. //")
 	LogOut("See bibtex file in output folder for justification.                 //")
 	LogOut("********************************************************************//")
 	for _, bibentry := range library {

@@ -10,7 +10,7 @@
 # Run all unit tests
 echo Running unit tests in background
 rm test.log -rf
-(if (./test.bash >> test.log 2>> test.log); then
+(if (make test >> test.log 2>> test.log); then
 	notify-send "Unit tests passed" 2> /dev/null
 	exit 0;
 else

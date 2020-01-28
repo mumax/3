@@ -88,6 +88,7 @@ func k_minimize_async(mx unsafe.Pointer, my unsafe.Pointer, mz unsafe.Pointer, m
 // maps compute capability on PTX code for minimize kernel.
 var minimize_map = map[int]string{0: "",
 	30: minimize_ptx_30,
+	32: minimize_ptx_32,
 	35: minimize_ptx_35,
 	37: minimize_ptx_37,
 	50: minimize_ptx_50,
@@ -95,7 +96,9 @@ var minimize_map = map[int]string{0: "",
 	53: minimize_ptx_53,
 	60: minimize_ptx_60,
 	61: minimize_ptx_61,
+	62: minimize_ptx_62,
 	70: minimize_ptx_70,
+	72: minimize_ptx_72,
 	75: minimize_ptx_75}
 
 // minimize PTX code for various compute capabilities.
@@ -176,6 +179,107 @@ const (
 	ld.global.f32 	%f14, [%rd14];
 	mul.f32 	%f15, %f14, %f11;
 	ld.global.f32 	%f16, [%rd16];
+	mul.f32 	%f17, %f16, %f11;
+	mul.f32 	%f18, %f1, 0f40800000;
+	fma.rn.f32 	%f19, %f18, %f2, %f13;
+	fma.rn.f32 	%f20, %f18, %f3, %f15;
+	fma.rn.f32 	%f21, %f18, %f6, %f17;
+	add.f32 	%f22, %f9, 0f40800000;
+	div.rn.f32 	%f23, %f19, %f22;
+	cvta.to.global.u64 	%rd23, %rd1;
+	add.s64 	%rd24, %rd23, %rd11;
+	st.global.f32 	[%rd24], %f23;
+	div.rn.f32 	%f24, %f20, %f22;
+	cvta.to.global.u64 	%rd25, %rd2;
+	add.s64 	%rd26, %rd25, %rd11;
+	st.global.f32 	[%rd26], %f24;
+	div.rn.f32 	%f25, %f21, %f22;
+	cvta.to.global.u64 	%rd27, %rd3;
+	add.s64 	%rd28, %rd27, %rd11;
+	st.global.f32 	[%rd28], %f25;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	minimize_ptx_32 = `
+.version 6.5
+.target sm_32
+.address_size 64
+
+	// .globl	minimize
+
+.visible .entry minimize(
+	.param .u64 minimize_param_0,
+	.param .u64 minimize_param_1,
+	.param .u64 minimize_param_2,
+	.param .u64 minimize_param_3,
+	.param .u64 minimize_param_4,
+	.param .u64 minimize_param_5,
+	.param .u64 minimize_param_6,
+	.param .u64 minimize_param_7,
+	.param .u64 minimize_param_8,
+	.param .f32 minimize_param_9,
+	.param .u32 minimize_param_10
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<26>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<29>;
+
+
+	ld.param.u64 	%rd1, [minimize_param_0];
+	ld.param.u64 	%rd2, [minimize_param_1];
+	ld.param.u64 	%rd3, [minimize_param_2];
+	ld.param.u64 	%rd4, [minimize_param_3];
+	ld.param.u64 	%rd5, [minimize_param_4];
+	ld.param.u64 	%rd6, [minimize_param_5];
+	ld.param.u64 	%rd7, [minimize_param_6];
+	ld.param.u64 	%rd8, [minimize_param_7];
+	ld.param.u64 	%rd9, [minimize_param_8];
+	ld.param.f32 	%f1, [minimize_param_9];
+	ld.param.u32 	%r2, [minimize_param_10];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd10, %rd4;
+	mul.wide.s32 	%rd11, %r1, 4;
+	add.s64 	%rd12, %rd10, %rd11;
+	cvta.to.global.u64 	%rd13, %rd5;
+	add.s64 	%rd14, %rd13, %rd11;
+	cvta.to.global.u64 	%rd15, %rd6;
+	add.s64 	%rd16, %rd15, %rd11;
+	cvta.to.global.u64 	%rd17, %rd7;
+	add.s64 	%rd18, %rd17, %rd11;
+	cvta.to.global.u64 	%rd19, %rd8;
+	add.s64 	%rd20, %rd19, %rd11;
+	cvta.to.global.u64 	%rd21, %rd9;
+	add.s64 	%rd22, %rd21, %rd11;
+	ld.global.nc.f32 	%f2, [%rd18];
+	ld.global.nc.f32 	%f3, [%rd20];
+	mul.f32 	%f4, %f3, %f3;
+	fma.rn.f32 	%f5, %f2, %f2, %f4;
+	ld.global.nc.f32 	%f6, [%rd22];
+	fma.rn.f32 	%f7, %f6, %f6, %f5;
+	mul.f32 	%f8, %f1, %f1;
+	mul.f32 	%f9, %f8, %f7;
+	mov.f32 	%f10, 0f40800000;
+	sub.f32 	%f11, %f10, %f9;
+	ld.global.nc.f32 	%f12, [%rd12];
+	mul.f32 	%f13, %f12, %f11;
+	ld.global.nc.f32 	%f14, [%rd14];
+	mul.f32 	%f15, %f14, %f11;
+	ld.global.nc.f32 	%f16, [%rd16];
 	mul.f32 	%f17, %f16, %f11;
 	mul.f32 	%f18, %f1, 0f40800000;
 	fma.rn.f32 	%f19, %f18, %f2, %f13;
@@ -908,9 +1012,211 @@ BB0_2:
 
 
 `
+	minimize_ptx_62 = `
+.version 6.5
+.target sm_62
+.address_size 64
+
+	// .globl	minimize
+
+.visible .entry minimize(
+	.param .u64 minimize_param_0,
+	.param .u64 minimize_param_1,
+	.param .u64 minimize_param_2,
+	.param .u64 minimize_param_3,
+	.param .u64 minimize_param_4,
+	.param .u64 minimize_param_5,
+	.param .u64 minimize_param_6,
+	.param .u64 minimize_param_7,
+	.param .u64 minimize_param_8,
+	.param .f32 minimize_param_9,
+	.param .u32 minimize_param_10
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<26>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<29>;
+
+
+	ld.param.u64 	%rd1, [minimize_param_0];
+	ld.param.u64 	%rd2, [minimize_param_1];
+	ld.param.u64 	%rd3, [minimize_param_2];
+	ld.param.u64 	%rd4, [minimize_param_3];
+	ld.param.u64 	%rd5, [minimize_param_4];
+	ld.param.u64 	%rd6, [minimize_param_5];
+	ld.param.u64 	%rd7, [minimize_param_6];
+	ld.param.u64 	%rd8, [minimize_param_7];
+	ld.param.u64 	%rd9, [minimize_param_8];
+	ld.param.f32 	%f1, [minimize_param_9];
+	ld.param.u32 	%r2, [minimize_param_10];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd10, %rd4;
+	mul.wide.s32 	%rd11, %r1, 4;
+	add.s64 	%rd12, %rd10, %rd11;
+	cvta.to.global.u64 	%rd13, %rd5;
+	add.s64 	%rd14, %rd13, %rd11;
+	cvta.to.global.u64 	%rd15, %rd6;
+	add.s64 	%rd16, %rd15, %rd11;
+	cvta.to.global.u64 	%rd17, %rd7;
+	add.s64 	%rd18, %rd17, %rd11;
+	cvta.to.global.u64 	%rd19, %rd8;
+	add.s64 	%rd20, %rd19, %rd11;
+	cvta.to.global.u64 	%rd21, %rd9;
+	add.s64 	%rd22, %rd21, %rd11;
+	ld.global.nc.f32 	%f2, [%rd18];
+	ld.global.nc.f32 	%f3, [%rd20];
+	mul.f32 	%f4, %f3, %f3;
+	fma.rn.f32 	%f5, %f2, %f2, %f4;
+	ld.global.nc.f32 	%f6, [%rd22];
+	fma.rn.f32 	%f7, %f6, %f6, %f5;
+	mul.f32 	%f8, %f1, %f1;
+	mul.f32 	%f9, %f8, %f7;
+	mov.f32 	%f10, 0f40800000;
+	sub.f32 	%f11, %f10, %f9;
+	ld.global.nc.f32 	%f12, [%rd12];
+	mul.f32 	%f13, %f12, %f11;
+	ld.global.nc.f32 	%f14, [%rd14];
+	mul.f32 	%f15, %f14, %f11;
+	ld.global.nc.f32 	%f16, [%rd16];
+	mul.f32 	%f17, %f16, %f11;
+	mul.f32 	%f18, %f1, 0f40800000;
+	fma.rn.f32 	%f19, %f18, %f2, %f13;
+	fma.rn.f32 	%f20, %f18, %f3, %f15;
+	fma.rn.f32 	%f21, %f18, %f6, %f17;
+	add.f32 	%f22, %f9, 0f40800000;
+	div.rn.f32 	%f23, %f19, %f22;
+	cvta.to.global.u64 	%rd23, %rd1;
+	add.s64 	%rd24, %rd23, %rd11;
+	st.global.f32 	[%rd24], %f23;
+	div.rn.f32 	%f24, %f20, %f22;
+	cvta.to.global.u64 	%rd25, %rd2;
+	add.s64 	%rd26, %rd25, %rd11;
+	st.global.f32 	[%rd26], %f24;
+	div.rn.f32 	%f25, %f21, %f22;
+	cvta.to.global.u64 	%rd27, %rd3;
+	add.s64 	%rd28, %rd27, %rd11;
+	st.global.f32 	[%rd28], %f25;
+
+BB0_2:
+	ret;
+}
+
+
+`
 	minimize_ptx_70 = `
 .version 6.5
 .target sm_70
+.address_size 64
+
+	// .globl	minimize
+
+.visible .entry minimize(
+	.param .u64 minimize_param_0,
+	.param .u64 minimize_param_1,
+	.param .u64 minimize_param_2,
+	.param .u64 minimize_param_3,
+	.param .u64 minimize_param_4,
+	.param .u64 minimize_param_5,
+	.param .u64 minimize_param_6,
+	.param .u64 minimize_param_7,
+	.param .u64 minimize_param_8,
+	.param .f32 minimize_param_9,
+	.param .u32 minimize_param_10
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<26>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<29>;
+
+
+	ld.param.u64 	%rd1, [minimize_param_0];
+	ld.param.u64 	%rd2, [minimize_param_1];
+	ld.param.u64 	%rd3, [minimize_param_2];
+	ld.param.u64 	%rd4, [minimize_param_3];
+	ld.param.u64 	%rd5, [minimize_param_4];
+	ld.param.u64 	%rd6, [minimize_param_5];
+	ld.param.u64 	%rd7, [minimize_param_6];
+	ld.param.u64 	%rd8, [minimize_param_7];
+	ld.param.u64 	%rd9, [minimize_param_8];
+	ld.param.f32 	%f1, [minimize_param_9];
+	ld.param.u32 	%r2, [minimize_param_10];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32	%p1, %r1, %r2;
+	@%p1 bra 	BB0_2;
+
+	cvta.to.global.u64 	%rd10, %rd4;
+	mul.wide.s32 	%rd11, %r1, 4;
+	add.s64 	%rd12, %rd10, %rd11;
+	cvta.to.global.u64 	%rd13, %rd5;
+	add.s64 	%rd14, %rd13, %rd11;
+	cvta.to.global.u64 	%rd15, %rd6;
+	add.s64 	%rd16, %rd15, %rd11;
+	cvta.to.global.u64 	%rd17, %rd7;
+	add.s64 	%rd18, %rd17, %rd11;
+	cvta.to.global.u64 	%rd19, %rd8;
+	add.s64 	%rd20, %rd19, %rd11;
+	cvta.to.global.u64 	%rd21, %rd9;
+	add.s64 	%rd22, %rd21, %rd11;
+	ld.global.nc.f32 	%f2, [%rd18];
+	ld.global.nc.f32 	%f3, [%rd20];
+	mul.f32 	%f4, %f3, %f3;
+	fma.rn.f32 	%f5, %f2, %f2, %f4;
+	ld.global.nc.f32 	%f6, [%rd22];
+	fma.rn.f32 	%f7, %f6, %f6, %f5;
+	mul.f32 	%f8, %f1, %f1;
+	mul.f32 	%f9, %f8, %f7;
+	mov.f32 	%f10, 0f40800000;
+	sub.f32 	%f11, %f10, %f9;
+	ld.global.nc.f32 	%f12, [%rd12];
+	mul.f32 	%f13, %f12, %f11;
+	ld.global.nc.f32 	%f14, [%rd14];
+	mul.f32 	%f15, %f14, %f11;
+	ld.global.nc.f32 	%f16, [%rd16];
+	mul.f32 	%f17, %f16, %f11;
+	mul.f32 	%f18, %f1, 0f40800000;
+	fma.rn.f32 	%f19, %f18, %f2, %f13;
+	fma.rn.f32 	%f20, %f18, %f3, %f15;
+	fma.rn.f32 	%f21, %f18, %f6, %f17;
+	add.f32 	%f22, %f9, 0f40800000;
+	div.rn.f32 	%f23, %f19, %f22;
+	cvta.to.global.u64 	%rd23, %rd1;
+	add.s64 	%rd24, %rd23, %rd11;
+	st.global.f32 	[%rd24], %f23;
+	div.rn.f32 	%f24, %f20, %f22;
+	cvta.to.global.u64 	%rd25, %rd2;
+	add.s64 	%rd26, %rd25, %rd11;
+	st.global.f32 	[%rd26], %f24;
+	div.rn.f32 	%f25, %f21, %f22;
+	cvta.to.global.u64 	%rd27, %rd3;
+	add.s64 	%rd28, %rd27, %rd11;
+	st.global.f32 	[%rd28], %f25;
+
+BB0_2:
+	ret;
+}
+
+
+`
+	minimize_ptx_72 = `
+.version 6.5
+.target sm_72
 .address_size 64
 
 	// .globl	minimize

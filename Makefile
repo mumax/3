@@ -3,7 +3,7 @@
 GO_BUILDFLAGS=-compiler gc
 # Or uncomment the line below to use the gccgo compiler, which may 
 # or may not be faster than gc and which may or may not compile...
-#export GO_BUILDFLAGS=-compiler gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
+# GO_BUILDFLAGS=-compiler gccgo -gccgoflags '-static-libgcc -O4 -Ofast -march=native'
 
 CGO_CFLAGS_ALLOW='(-fno-schedule-insns|-malign-double|-ffast-math)'
 
@@ -35,8 +35,8 @@ hooks: .git/hooks/post-commit .git/hooks/pre-commit
 	ln -sf $(CURDIR)/$< $@
 
 clean:
-	rm -frv $GOPATH/pkg/*/github.com/mumax/3/*
-	rm -frv $GOPATH/bin/mumax3*
+	rm -frv $(GOPATH)/pkg/*/github.com/mumax/3/*
+	rm -frv $(GOPATH)/bin/mumax3*
 	cd cuda && $(MAKE) clean
 
 realclean: clean

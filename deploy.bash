@@ -3,9 +3,6 @@ rm -rf build
 # The cuda versions against which we will compile mumax3
 for CUDAVERSION in 9.2 10.0 10.1 10.2; do
 
-    # Make sure that we take a fresh start
-    ./clean.bash
-    
     # The final location of the mumax3 executables and libs
     BUILDDIR=./build/mumax3.10_cuda-${CUDAVERSION}
     mkdir -p $BUILDDIR
@@ -15,6 +12,7 @@ for CUDAVERSION in 9.2 10.0 10.1 10.2; do
     export CUDA_HOME=/usr/local/cuda-${CUDAVERSION}
     
     # All supported compute capabilities of this cuda version
+    #   We export CUDA_CC so that cuda/Makefile knows what to include in the fat wrappers
     case $CUDAVERSION in
         "9.2")  export CUDA_CC="30 32 35 37 50 52 53 60 61 62 70 72";;
         "10.0") export CUDA_CC="30 32 35 37 50 52 53 60 61 62 70 72 75";;
@@ -22,22 +20,18 @@ for CUDAVERSION in 9.2 10.0 10.1 10.2; do
         "10.2") export CUDA_CC="30 32 35 37 50 52 53 60 61 62 70 72 75";;
     esac
 
-    # Build the go wrappers for the cuda kernels 
-    #   using the $CUDA_HOME/bin/nvcc compiler
-    #   for all compute capabilities listed in $CUDA_CC
-    (cd cuda && make realclean && make -j 4)  || exit 1
-
     # The path for shared libraries (relative to the build directory)
     RPATH=lib 
     mkdir -p $BUILDDIR/$RPATH
     
-    # Build all go packages
-    #   We overwrite the CGO Flags to make sure that it is compiled against $CUDAVERSION
+    # We overwrite the CGO Flags to make sure that it is compiled against $CUDAVERSION
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
     export CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib64 -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
     export CGO_CFLAGS="-I${CUDA_HOME}/include -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
-    export CGO_CFLAGS_ALLOW='(-fno-schedule-insns|-malign-double|-ffast-math)'
-    go install -v github.com/mumax/3/... || exit 1
+
+    # (Re)build everything
+    make realclean
+    make -j 4 || exit 1
     
     # Copy the executable and the cuda libraries to the output directory
     cp $GOPATH/bin/mumax3* $BUILDDIR 

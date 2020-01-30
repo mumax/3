@@ -1,10 +1,9 @@
-rm -rf build
-
 # The cuda versions against which we will compile mumax3
 for CUDAVERSION in 9.2 10.0 10.1 10.2; do
 
     # The final location of the mumax3 executables and libs
-    BUILDDIR=./build/mumax3.10_cuda-${CUDAVERSION}
+    BUILDDIR=./build/mumax3.10_linux_cuda${CUDAVERSION}
+    rm -rf $BUILDDIR
     mkdir -p $BUILDDIR
     
     # The location of the home dirctory of this cuda version
@@ -30,8 +29,7 @@ for CUDAVERSION in 9.2 10.0 10.1 10.2; do
     export CGO_CFLAGS="-I${CUDA_HOME}/include -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
 
     # (Re)build everything
-    make realclean
-    make -j 4 || exit 1
+    (cd .. && make realclean && make -j 4 || exit 1)
     
     # Copy the executable and the cuda libraries to the output directory
     cp $GOPATH/bin/mumax3* $BUILDDIR 

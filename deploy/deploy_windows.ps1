@@ -33,43 +33,45 @@ switch ( $CUDA_VERSION ) {
 
 # The NVIDIA compiler which will be used to compile the cuda kernels
 $NVCC = "${CUDA_HOME}/bin/nvcc.exe"
-$CCBIN = 'C:/Program Files (x86)\Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x64'
+$CCBIN = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
 if ( -not ( Test-Path $CCBIN ) ) {
     Write-Output "CCBIN for nvcc not found at $CCBIN"
     exit
 }
 
-# overwrite the CGO flags to make sure that mumax3 is compiled against to
+# overwrite the CGO flags to make sure that mumax3 is compiled against the
 # specified cuda version.
 $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib/x64"
 $env:CGO_CFLAGS="-I${CUDA_HOME}/include -w"
 
 # Enter the cuda directory to (re)compile the cuda kernels
-Set-Location .\cuda
+Set-Location ../cuda
     Remove-Item *.ptx
     Remove-Item *_wrapper.go
     go build .\cuda2go.go
     $cudafiles = Get-ChildItem -filter "*.cu"
     foreach ($cudafile in $cudafiles) {
+        $kernelname = $cudafile.basename
         foreach ($cc in $CUDA_CC) {
-            $kernel = $cudafile.basename
-            & $NVCC  -ccbin ${CCBIN} -Xptxas -O3 -ptx `
+            & $NVCC -ccbin ${CCBIN} -Xptxas -O3 -ptx `
                 -gencode="arch=compute_${cc},code=sm_${cc}" `
-                "${cudafile}" -o "${kernel}_${cc}.ptx"
-            
+                "${cudafile}" -o "${kernelname}_${cc}.ptx"
         }    
         & .\cuda2go $cudafile
+        gofmt -w "${kernelname}_wrapper.go"
     }
-Set-Location ..
+Set-Location ../deploy
 
 # Compile all mumax3 packages and executables
 go install -v "github.com/mumax/3/..."
 
 # Copy the mumax3 executables and the used cuda libraries to the build directory
-Remove-Item -Force -Recurse $builddir
-New-Item -Force $builddir -ItemType "directory"
-foreach ($app in "mumax3.exe","mumax3-convert.exe","mumax3-server.exe") {
-    Copy-Item ${env:GOPATH}/bin/${app} -Destination ${builddir}
+if ( Test-Path $builddir ) {
+    Remove-Item -Force -Recurse $builddir
 }
+New-Item -ItemType "directory" $builddir 
+Copy-Item ${env:GOPATH}/bin/mumax3.exe -Destination ${builddir}
+Copy-Item ${env:GOPATH}/bin/mumax3-convert.exe -Destination ${builddir}
+Copy-Item ${env:GOPATH}/bin/mumax3-server.exe -Destination ${builddir}
 Copy-Item ${CUDA_HOME}/bin/cufft64*.dll -Destination ${builddir}
 Copy-Item ${CUDA_HOME}/bin/curand64*.dll -Destination ${builddir}

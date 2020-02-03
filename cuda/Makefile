@@ -26,7 +26,7 @@ SHELL = /bin/bash
 ifeq ($(CUDA_HOME),)
 	NVCC=nvcc
 else 
-	NVCC=${CUDA_HOME}/bin/nvcc
+	NVCC=${CUDA_HOME}/bin/nvcc 
 endif
 
 # When CUDA_CC is not an environment variable and is not set on the command line, use compute capability 3.0
@@ -34,8 +34,12 @@ ifeq ($(CUDA_CC),)
     CUDA_CC = 30
 endif
 
+# The gcc host compiler for nvcc
+ifeq ($(NVCC_CCBIN),)
+	NVCC_CCBIN=/usr/bin/gcc
+endif
 
-NVCCFLAGS = -std c++03 --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
+NVCCFLAGS = -ccbin=$(NVCC_CCBIN) --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
 
 CUDAFILES := $(wildcard *.cu)
 WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)

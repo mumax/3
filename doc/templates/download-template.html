@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+{{.Include "head.html"}}
+
+<body>
+
+{{.Include "header.html"}}
+
+<h2> Prerequisites </h2>
+
+To run mumax3.10 you need
+
+<ul>
+    <li> An NVIDIA GPU with at least a compute capability 3.0</li>
+    <li> An up to date NVIDIA driver (compatible versions given below)</li>
+    <li> Optional: <a href="http://www.gnuplot.info/">gnuplot</a> for plots in the web GUI</li>
+</ul>
+
+<h2> Download and installation </h2>
+
+<p>
+Select the platform and the NVIDIA driver for which you want to download mumax3. 
+</p>
+
+<div>
+        <select id="platform" onchange="selectPlatform()">
+            <option disabled selected value> -- Select platform -- </option>
+            <option value="linux">Linux</option>
+            <option value="windows">Windows</option>
+        </select>
+        <select id="driver" onchange="selectDriver()">
+            <option disabled selected value> -- Select NVIDIA driver -- </option>
+        </select>
+
+        <a id="downloadLink" href="" >
+        <button id="downloadButton" class="pure-button pure-button-primary">Download</button>
+        </a>
+    </fieldset>
+</div>
+
+<p>
+After downloading and unpacking the tar ball, you will have a mumax3 executable which is ready to be used. 
+Note that mumax3 is a command line application, so it is a good idea to add the directory containing 
+the mumax3 executable to the PATH environment variable.
+</p>
+
+<script>
+
+var driverOptions = {
+    "linux" :[
+        {'driverVersion':'≥440.33 (recommended)' , 'cudaVersion': '10.2' },
+        {'driverVersion':'≥418.39'               , 'cudaVersion': '10.1' },
+        {'driverVersion':'≥410.48'               , 'cudaVersion': '10.0' },
+        {'driverVersion':'≥396.37'               , 'cudaVersion':  '9.2' },
+        {'driverVersion':'≥390.46'               , 'cudaVersion':  '9.1' },
+        {'driverVersion':'≥384.81'               , 'cudaVersion':  '9.0' },
+        {'driverVersion':'≥375.26'               , 'cudaVersion':  '8.0' },
+        {'driverVersion':'≥352.31'               , 'cudaVersion':  '7.5' },
+        {'driverVersion':'≥346.46'               , 'cudaVersion':  '7.0' },
+    ],
+    "windows" :[
+        {'driverVersion':"≥441.22 (recommended)" , 'cudaVersion': '10.2' },
+        {'driverVersion':"≥418.96"               , 'cudaVersion': '10.1' },
+        {'driverVersion':"≥411.31"               , 'cudaVersion': '10.0' },
+        {'driverVersion':"≥398.26"               , 'cudaVersion':  '9.2' },
+    ]
+} 
+
+function selectPlatform() {
+    var driverSelector = document.getElementById("driver");
+    var platformSelector = document.getElementById("platform");
+
+    var platform = platformSelector.options[platformSelector.selectedIndex].value;
+
+    // remove any driver options
+    while (driverSelector.length > 1) {
+        driverSelector.remove(1);
+    }
+
+    // Populate the driver selection box
+    driverOptions[platform].forEach(function(driver,idx) {
+        var option = document.createElement("option");
+        option.text = driver.driverVersion;
+        option.value = driver.cudaVersion; 
+        driverSelector.add(option);
+    })
+
+    // Select the first driver option (the most recent one)
+    driverSelector.selectedIndex = 0;
+    document.getElementById("downloadButton").disabled = true;
+    document.getElementById("downloadLink").removeAttribute("href");
+
+}
+
+function selectDriver() {
+    var driverSelector = document.getElementById("driver");
+    var platformSelector = document.getElementById("platform");
+    var platform = platformSelector.options[platformSelector.selectedIndex].value;
+    var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
+
+    document.getElementById("downloadButton").disabled = false;
+    document.getElementById("downloadLink").href = "http://dynamag.ugent.be/mumax3download/mumax3.10_" + platform + "_cuda" + cudaVersion + ".tar.gz";
+}
+
+window.onload = function() {
+    document.getElementById("driver").selectedIndex = 0;
+    document.getElementById("platform"). selectedIndex = 0;
+    document.getElementById("downloadButton").disabled = true;
+    document.getElementById("downloadLink").removeAttribute("href");
+}
+
+</script>
+
+</body>
+</html>

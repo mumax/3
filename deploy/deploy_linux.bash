@@ -9,7 +9,8 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2; do
     fi
 
     # The final location of the mumax3 executables and libs
-    BUILDDIR=./build/mumax3.10_linux_cuda${CUDAVERSION}
+    MUMAX3UNAME=mumax3.10_linux_cuda${CUDAVERSION}
+    BUILDDIR=./build/${MUMAX3UNAME}
     rm -rf $BUILDDIR
     mkdir -p $BUILDDIR
     
@@ -47,5 +48,7 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2; do
     cp $GOPATH/bin/mumax3* $BUILDDIR 
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcufft | awk '{print $3}' ) ${BUILDDIR}/${RPATH}
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcurand | awk '{print $3}' ) ${BUILDDIR}/${RPATH}
+
+    (cd build && tar -czf ${MUMAX3UNAME}.tar.gz ${MUMAX3UNAME})
 
 done

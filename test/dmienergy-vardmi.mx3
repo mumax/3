@@ -40,5 +40,5 @@ run(10e-12)
 E2 := E_total.Get()
 print("E2", E2, "J")
 
-expect("delta1", E1-E0, -5.4119e-20, 0.01e-20)
-expect("delta2", E2-E0, -6.8447e-20, 0.01e-20)
+expect("delta1", Sign(E1-E0), -1, 0)
+expect("delta2", Sign(E2-E0), -1, 0)

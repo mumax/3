@@ -40,7 +40,7 @@ Select the platform and the NVIDIA driver for which you want to download mumax3.
 </div>
 
 <p>
-After downloading and unpacking the tar ball, you will have a mumax3 executable which is ready to be used. 
+After downloading and unpacking the archive, you will have a mumax3 executable which is ready to be used. 
 Note that mumax3 is a command line application, so it is a good idea to add the directory containing 
 the mumax3 executable to the PATH environment variable.
 </p>
@@ -98,9 +98,18 @@ function selectDriver() {
     var platformSelector = document.getElementById("platform");
     var platform = platformSelector.options[platformSelector.selectedIndex].value;
     var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
+    var link;
+
+    if (platform == "windows") {
+        link = "http://dynamag.ugent.be/mumax3download/mumax3.10_windows_cuda" + cudaVersion + ".zip";
+    } else if (platform == "linux") {
+        link = "http://dynamag.ugent.be/mumax3download/mumax3.10_windows_cuda" + cudaVersion + ".tar.gz";
+    } else {
+        link = "#";
+    }
 
     document.getElementById("downloadButton").disabled = false;
-    document.getElementById("downloadLink").href = "http://dynamag.ugent.be/mumax3download/mumax3.10_" + platform + "_cuda" + cudaVersion + ".tar.gz";
+    document.getElementById("downloadLink").href = link
 }
 
 window.onload = function() {

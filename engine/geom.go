@@ -4,6 +4,8 @@ import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
+        "github.com/mumax/3/oommf"
+        "github.com/mumax/3/httpfs"
 	"math/rand"
 )
 
@@ -72,6 +74,45 @@ func (g *geom) Average() float64 { return g.average()[0] }
 
 func SetGeom(s Shape) {
 	geometry.setGeom(s)
+}
+
+func InitializeGeometryFromOVF(fname string) {
+    SetBusy(true)
+    defer SetBusy(false)
+
+    in, err := httpfs.Open(fname)
+    util.FatalErr(err)
+    slice, meta, _ := oommf.Read(in)
+
+    if slice.NComp() != 1{
+        util.Log("Geometry initialization file should have point dimension of 1!")
+        return
+    }
+
+    //set mesh from imported file, should refresh it by itself
+    arrDim := slice.Size()
+    step := meta.CellSize
+    SetMesh( arrDim[0], arrDim[1], arrDim[2], step[0], step[1], step[2], 0, 0, 0 )
+
+    //copy data into geometry array
+    data.Copy(geometry.buffer, slice)
+
+    //make a makeshift function to represent imported geometry
+    geometry.shape = func(x, y, z float64) bool {
+        arr := slice.Host()[0]
+
+        //then calculate the index from coordinate
+        var index[3]int
+        r := [3]float64{x, y, z}
+        for i := 0; i < 3; i++ {
+            index[i] = int(r[i]/step[i])
+            if r[i] < 0 || index[i] > (arrDim[i]-1)  {
+                return false
+            }
+        }
+        //calculate if point is inside the figure in OVF
+        return arr[ arrDim[0] * arrDim[1] * index[2] + arrDim[0] * index[1] + index[0] ] > 0.5
+    }
 }
 
 func (geometry *geom) setGeom(s Shape) {

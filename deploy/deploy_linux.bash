@@ -39,13 +39,16 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2; do
     # We overwrite the CGO Flags to make sure that it is compiled against $CUDAVERSION
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
     export CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib64 -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
-    export CGO_CFLAGS="-I${CUDA_HOME}/include -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
+    export CGO_CFLAGS="-I${CUDA_HOME}/include"
 
     # (Re)build everything
     (cd .. && make realclean && make -j 4 || exit 1)
     
     # Copy the executable and the cuda libraries to the output directory
-    cp $GOPATH/bin/mumax3* $BUILDDIR 
+    cp $GOPATH/bin/mumax3 $BUILDDIR 
+    cp $GOPATH/bin/mumax3-convert $BUILDDIR 
+    cp $GOPATH/bin/mumax3-server $BUILDDIR 
+    cp ../LICENSE $BUILDDIR
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcufft | awk '{print $3}' ) ${BUILDDIR}/${RPATH}
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcurand | awk '{print $3}' ) ${BUILDDIR}/${RPATH}
 

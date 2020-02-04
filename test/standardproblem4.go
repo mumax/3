@@ -25,7 +25,7 @@ func main() {
 	Relax()
 
 	// reversal
-	B_ext.Set(Vector(-24.6E-3, 4.3E-3, 0))
+	B_ext.Set(Vector(-24.6e-3, 4.3e-3, 0))
 	Run(1e-9)
 	TOL := 1e-3
 	ExpectV("m", M.Average(), Vector(-0.9846124053001404, 0.12604089081287384, 0.04327124357223511), TOL)

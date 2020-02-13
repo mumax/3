@@ -11,6 +11,7 @@ import (
 
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
+        DeclFunc("InitGeomFromOVF", InitGeomFromOVF, "Initialize geometry, cell count and cell size given a pattern from OVF")
 	DeclVar("EdgeSmooth", &edgeSmooth, "Geometry edge smoothing with edgeSmooth^3 samples per cell, 0=staircase, ~8=very smooth")
 	geometry.init()
 }
@@ -76,7 +77,7 @@ func SetGeom(s Shape) {
 	geometry.setGeom(s)
 }
 
-func InitializeGeometryFromOVF(fname string) {
+func InitGeomFromOVF(fname string) {
     SetBusy(true)
     defer SetBusy(false)
 

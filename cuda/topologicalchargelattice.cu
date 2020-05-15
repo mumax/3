@@ -47,7 +47,7 @@ settopologicalchargelattice(float* __restrict__ s,
     float numer, denom;
 
     {
-        float3 m1 = make_float3(0.0f, 0.0f, 0.0f);      // load neighbor m if inside grid, keep 0 otherwise
+        float3 m1 = make_float3(0.0f, 0.0f, 0.0f);      // load neighbour m if inside grid, keep 0 otherwise
         i_ = idx(hclampx(ix+1), iy, iz);
         if (ix+1 < Nx || PBCx)
         {
@@ -75,7 +75,7 @@ settopologicalchargelattice(float* __restrict__ s,
             m4 = make_float3(mx[i_], my[i_], mz[i_]);
         }
 
-        // We don't care whether the neighbours exist or not, since the dot or cross product will be zero
+        // We don't care whether the neighbours exist or not, since the dot and cross products will be zero
         // 012
         axb     = cross(m0, m1);
         numer   = dot(m2, axb);
@@ -101,6 +101,6 @@ settopologicalchargelattice(float* __restrict__ s,
         trig041 = 2.0f * atan2(numer, denom);
     }
 
-    // The on-site value of is the sum of these 4 triangles divided by 2
+    // The on-site value of s is the sum of these 4 triangles divided by 2
     s[I] = 0.5f * ( trig012 + trig023 + trig034 + trig041 );
 }

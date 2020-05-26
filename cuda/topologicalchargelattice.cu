@@ -7,7 +7,7 @@
 
 // Set s to the toplogogical charge density for lattices
 // Based on the solid angle subtended by triangle associated with three spins: a,b,c
-// 	  s = 2 atan(a . b x c /(1 + a.b + a.c + b.c) )
+// 	  s = 2 atan[(a . b x c /(1 + a.b + a.c + b.c)] / (dx dy)
 // After M Boettcher et al, New J Phys 20, 103014 (2018), adapted from
 // B. Berg and M. Luescher, Nucl. Phys. B 190, 412 (1981).
 // A unit cell comprises two triangles, but s is a site-dependent quantity so we
@@ -16,7 +16,7 @@
 extern "C" __global__ void
 settopologicalchargelattice(float* __restrict__ s,
                      float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,
-                     int Nx, int Ny, int Nz, uint8_t PBC) {
+                     float icxcy, int Nx, int Ny, int Nz, uint8_t PBC) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -107,5 +107,6 @@ settopologicalchargelattice(float* __restrict__ s,
     }
 
     // The on-site value of s is the sum of these 4 triangles divided by 2
-    s[I] = 0.5f * ( trig012 + trig023 + trig034 + trig041 );
+    // Normalize by cell area icxcy = 1/(dx dy) to obtain a true density
+    s[I] = 0.5f * icxcy * ( trig012 + trig023 + trig034 + trig041 );
 }

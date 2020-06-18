@@ -39,7 +39,7 @@ ifeq ($(NVCC_CCBIN),)
 	NVCC_CCBIN=/usr/bin/gcc
 endif
 
-NVCCFLAGS = -ccbin=$(NVCC_CCBIN) --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
+NVCCFLAGS = -std=c++03 -ccbin=$(NVCC_CCBIN) --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
 
 CUDAFILES := $(wildcard *.cu)
 WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)

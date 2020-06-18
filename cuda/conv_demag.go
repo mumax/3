@@ -194,5 +194,7 @@ func (c *DemagConvolution) Free() {
 		}
 		c.fwPlan.Free()
 		c.bwPlan.Free()
+
+		cudaCtx.SetCurrent()
 	}
 }

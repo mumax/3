@@ -1,5 +1,5 @@
 # The cuda versions against which we will compile mumax3
-for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2; do
+for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2 11.0; do
 
     # downgrade host compiler for nvcc for old cuda versions
     if [ 1 -eq "$(echo "${CUDAVERSION} < 9.2" | bc)" ]; then
@@ -30,6 +30,7 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2; do
         "10.0") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
         "10.1") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
         "10.2") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
+        "11.0") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75 80";;
     esac
 
     # The path for shared libraries (relative to the build directory)

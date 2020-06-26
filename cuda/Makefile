@@ -18,6 +18,7 @@
 # CUDA SDK 10.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.1 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.2 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
+# CUDA SDK 11.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75 80
 
 SHELL = /bin/bash
 

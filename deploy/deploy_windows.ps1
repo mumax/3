@@ -1,7 +1,7 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
 # The cuda version against which we will compile mumax3
-foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2") {
+foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
 
     # The final location of executables and libraries ready to be shipped to the user.
     $builddir = "build/mumax3.10_windows_cuda$CUDA_VERSION"
@@ -15,6 +15,7 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2") {
         "10.0" { $CUDA_HOME = $env:CUDA_PATH_V10_0 }
         "10.1" { $CUDA_HOME = $env:CUDA_PATH_V10_1 }
         "10.2" { $CUDA_HOME = $env:CUDA_PATH_V10_2 }
+        "11.0" { $CUDA_HOME = $env:CUDA_PATH_V11_0 }
         default {}
     } 
     if ( -not $CUDA_HOME -or (-not ( Test-Path $CUDA_HOME )) ) {
@@ -28,6 +29,7 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2") {
         "10.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
         "10.1" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
         "10.2" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
+        "11.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75,80 }
         default {exit}
     } 
 

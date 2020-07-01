@@ -34,6 +34,7 @@ func init() {
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 	DeclFunc("Shifted", Shifted, "Shifted quantity")
 	DeclFunc("Masked", Masked, "Mask quantity with shape")
+	DeclFunc("Normalized", Normalized, "Normalize quantity")
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
 }
 
@@ -429,4 +430,23 @@ func (q *masked) createMask() {
 	data.Copy(q.mask, maskhost)
 	q.mesh = *Mesh()
 	// Remove mask from host
+}
+
+// Normalized returns a quantity that evaluates to the unit vector of q
+func Normalized(q Quantity) Quantity {
+	return &normalized{q}
+}
+
+type normalized struct {
+	orig Quantity
+}
+
+func (q *normalized) NComp() int {
+	return 3
+}
+
+func (q *normalized) EvalTo(dst *data.Slice) {
+	util.Assert(dst.NComp() == q.NComp())
+	q.orig.EvalTo(dst)
+	cuda.Normalize(dst, nil)
 }

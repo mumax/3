@@ -40,7 +40,14 @@ ifeq ($(NVCC_CCBIN),)
 	NVCC_CCBIN=/usr/bin/gcc
 endif
 
-NVCCFLAGS = -std=c++03 -ccbin=$(NVCC_CCBIN) --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
+CUDA_VERSION := $(shell $(NVCC) --version | grep "Cuda compilation" | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -n 1)
+
+NVCC_COMPATIBILITY_FLAGS := -std=c++03
+ifneq (,$(filter 7.0 7.5 8.0,$(CUDA_VERSION)))
+	NVCC_COMPATIBILITY_FLAGS :=
+endif
+
+NVCCFLAGS = $(NVCC_COMPATIBILITY_FLAGS) -ccbin=$(NVCC_CCBIN) --compiler-options -Werror --compiler-options -Wall -Xptxas -O3 -ptx
 
 CUDAFILES := $(wildcard *.cu)
 WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)
@@ -50,6 +57,7 @@ WRAPPERS := $(CUDAFILES:.cu=_wrapper.go)
 
 
 all: wrappers
+	@echo "Built with CUDA version ${CUDA_VERSION}"
 	go install -v
 
 

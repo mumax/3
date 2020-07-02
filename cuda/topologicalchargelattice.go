@@ -16,7 +16,7 @@ import (
 // workable definition of the local charge density.
 // See topologicalchargelattice.cu
 func SetTopologicalChargeLattice(s *data.Slice, m *data.Slice, mesh *data.Mesh) {
-  cellsize := mesh.CellSize()
+	cellsize := mesh.CellSize()
 	N := s.Size()
 	util.Argument(m.Size() == N)
 	cfg := make3DConf(N)

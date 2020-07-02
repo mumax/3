@@ -16,9 +16,13 @@ __device__ inline float triangleCharge(float3 mi, float3 mj, float3 mk) {
 
 // Set s to the toplogogical charge density for lattices based on the solid angle 
 // subtended by triangle associated with three spins: a,b,c
+//
 // 	  s = 2 atan[(a . b x c /(1 + a.b + a.c + b.c)] / (dx dy)
+//
 // After M Boettcher et al, New J Phys 20, 103014 (2018), adapted from
-// B. Berg and M. Luescher, Nucl. Phys. B 190, 412 (1981).
+// B. Berg and M. Luescher, Nucl. Phys. B 190, 412 (1981), and implemented by
+// Joo-Von Kim.
+//
 // A unit cell comprises two triangles, but s is a site-dependent quantity so we
 // double-count and average over four triangles.
 extern "C" __global__ void

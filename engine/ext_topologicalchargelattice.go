@@ -8,12 +8,13 @@ import (
 )
 
 var (
-	Ext_TopologicalChargeLattice        = NewScalarValue("ext_topologicalchargelattice", "", "2D topological charge", GetTopologicalChargeLattice)
+	Ext_TopologicalChargeLattice        = NewScalarValue("ext_topologicalchargelattice", "", "2D topological charge according to Berg and Lüscher", GetTopologicalChargeLattice)
 	Ext_TopologicalChargeDensityLattice = NewScalarField("ext_topologicalchargedensitylattice", "1/m2",
-		"2D topological charge density", SetTopologicalChargeDensityLattice)
+		"2D topological charge density according to Berg and Lüscher", SetTopologicalChargeDensityLattice)
 )
 
 func SetTopologicalChargeDensityLattice(dst *data.Slice) {
+	Refer("Berg1981")
 	cuda.SetTopologicalChargeLattice(dst, M.Buffer(), M.Mesh())
 }
 

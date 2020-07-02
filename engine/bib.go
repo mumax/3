@@ -194,4 +194,20 @@ func buildLibrary() {
     url     = {http://aip.scitation.org/doi/10.1063/1.5003957},
 }`}
 
+	library["Berg1981"] = &bibEntry{
+		reason:   "Computed the topological charge using the formula of Berg and Lüscher",
+		shortref: "Berg et al., Nucl. Phys. B 190, 412–24 (1981)",
+		bibtex: `
+@article{Berg1981,
+    author  = {Berg, Bernd A
+               Lüscher, Martin},
+    title   = {{Definition and statistical distributions of a topological number in the lattice O(3) $\sigma$-model}},
+    journal = {Nuclear Physics B},
+    pages   = {412-424},
+    volume  = {190},
+    year    = {1981},
+    doi     = {doi.org/10.1016/0550-3213(81)90568-X},
+    url     = {https://doi.org/10.1016/0550-3213(81)90568-X},
+}`}
+
 }

@@ -52,9 +52,10 @@ func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF
 
 // Save once, with auto file name
 func Save(q Quantity) {
-	fname := autoFname(NameOf(q), outputFormat, autonum[q])
+	qname := NameOf(q)
+	fname := autoFname(NameOf(q), outputFormat, autonum[qname])
 	SaveAs(q, fname)
-	autonum[q]++
+	autonum[qname]++
 }
 
 // Save under given file name (transparent async I/O).
@@ -76,12 +77,13 @@ func SaveAs(q Quantity, fname string) {
 
 // Save image once, with auto file name
 func Snapshot(q Quantity) {
-	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, NameOf(q), autonum[q])
+	qname := NameOf(q)
+	fname := fmt.Sprintf(OD()+FilenameFormat+"."+SnapshotFormat, qname, autonum[qname])
 	s := ValueOf(q)
 	defer cuda.Recycle(s)
 	data := s.HostCopy() // must be copy (asyncio)
 	queOutput(func() { snapshot_sync(fname, data) })
-	autonum[q]++
+	autonum[qname]++
 }
 
 func SnapshotAs(q Quantity, fname string) {

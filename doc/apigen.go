@@ -52,10 +52,11 @@ func getGoDocString(packageName, identifier string) string {
 	docString := ""
 	cmd := exec.Command("go", "doc", packageName, identifier)
 	stdout, err := cmd.Output()
-	if err == nil && string(stdout)[:4] == "func" { // we only look for doc strings of functions
-		// the doc string of a function is on the second line
-		// (and possible continued on the third line, if not, then the third line is empty)
-		docString = strings.Join(strings.SplitAfterN(string(stdout), "\n", 4)[1:3], " ")
+	outputLines := strings.Split(string(stdout), "\n")
+	if err == nil && outputLines[2][:4] == "func" { // we only look for doc strings of functions
+		// the doc string of a function is on the fourth line
+		// (and possible continued on the fifth line, if not, then the fifth line is empty)
+		docString = strings.Join(outputLines[3:5], " ")
 	}
 	return docString
 }

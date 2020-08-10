@@ -5,60 +5,60 @@ package cuda
  EDITING IS FUTILE.
 */
 
-import(
-	"unsafe"
+import (
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/timer"
 	"sync"
+	"unsafe"
 )
 
 // CUDA handle for madd6 kernel
 var madd6_code cu.Function
 
 // Stores the arguments for madd6 kernel invocation
-type madd6_args_t struct{
-	 arg_dst unsafe.Pointer
-	 arg_src1 unsafe.Pointer
-	 arg_fac1 float32
-	 arg_src2 unsafe.Pointer
-	 arg_fac2 float32
-	 arg_src3 unsafe.Pointer
-	 arg_fac3 float32
-	 arg_src4 unsafe.Pointer
-	 arg_fac4 float32
-	 arg_src5 unsafe.Pointer
-	 arg_fac5 float32
-	 arg_src6 unsafe.Pointer
-	 arg_fac6 float32
-	 arg_N int
-	 argptr [14]unsafe.Pointer
+type madd6_args_t struct {
+	arg_dst  unsafe.Pointer
+	arg_src1 unsafe.Pointer
+	arg_fac1 float32
+	arg_src2 unsafe.Pointer
+	arg_fac2 float32
+	arg_src3 unsafe.Pointer
+	arg_fac3 float32
+	arg_src4 unsafe.Pointer
+	arg_fac4 float32
+	arg_src5 unsafe.Pointer
+	arg_fac5 float32
+	arg_src6 unsafe.Pointer
+	arg_fac6 float32
+	arg_N    int
+	argptr   [14]unsafe.Pointer
 	sync.Mutex
 }
 
 // Stores the arguments for madd6 kernel invocation
 var madd6_args madd6_args_t
 
-func init(){
+func init() {
 	// CUDA driver kernel call wants pointers to arguments, set them up once.
-	 madd6_args.argptr[0] = unsafe.Pointer(&madd6_args.arg_dst)
-	 madd6_args.argptr[1] = unsafe.Pointer(&madd6_args.arg_src1)
-	 madd6_args.argptr[2] = unsafe.Pointer(&madd6_args.arg_fac1)
-	 madd6_args.argptr[3] = unsafe.Pointer(&madd6_args.arg_src2)
-	 madd6_args.argptr[4] = unsafe.Pointer(&madd6_args.arg_fac2)
-	 madd6_args.argptr[5] = unsafe.Pointer(&madd6_args.arg_src3)
-	 madd6_args.argptr[6] = unsafe.Pointer(&madd6_args.arg_fac3)
-	 madd6_args.argptr[7] = unsafe.Pointer(&madd6_args.arg_src4)
-	 madd6_args.argptr[8] = unsafe.Pointer(&madd6_args.arg_fac4)
-	 madd6_args.argptr[9] = unsafe.Pointer(&madd6_args.arg_src5)
-	 madd6_args.argptr[10] = unsafe.Pointer(&madd6_args.arg_fac5)
-	 madd6_args.argptr[11] = unsafe.Pointer(&madd6_args.arg_src6)
-	 madd6_args.argptr[12] = unsafe.Pointer(&madd6_args.arg_fac6)
-	 madd6_args.argptr[13] = unsafe.Pointer(&madd6_args.arg_N)
-	 }
+	madd6_args.argptr[0] = unsafe.Pointer(&madd6_args.arg_dst)
+	madd6_args.argptr[1] = unsafe.Pointer(&madd6_args.arg_src1)
+	madd6_args.argptr[2] = unsafe.Pointer(&madd6_args.arg_fac1)
+	madd6_args.argptr[3] = unsafe.Pointer(&madd6_args.arg_src2)
+	madd6_args.argptr[4] = unsafe.Pointer(&madd6_args.arg_fac2)
+	madd6_args.argptr[5] = unsafe.Pointer(&madd6_args.arg_src3)
+	madd6_args.argptr[6] = unsafe.Pointer(&madd6_args.arg_fac3)
+	madd6_args.argptr[7] = unsafe.Pointer(&madd6_args.arg_src4)
+	madd6_args.argptr[8] = unsafe.Pointer(&madd6_args.arg_fac4)
+	madd6_args.argptr[9] = unsafe.Pointer(&madd6_args.arg_src5)
+	madd6_args.argptr[10] = unsafe.Pointer(&madd6_args.arg_fac5)
+	madd6_args.argptr[11] = unsafe.Pointer(&madd6_args.arg_src6)
+	madd6_args.argptr[12] = unsafe.Pointer(&madd6_args.arg_fac6)
+	madd6_args.argptr[13] = unsafe.Pointer(&madd6_args.arg_N)
+}
 
 // Wrapper for madd6 CUDA kernel, asynchronous.
-func k_madd6_async ( dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, src4 unsafe.Pointer, fac4 float32, src5 unsafe.Pointer, fac5 float32, src6 unsafe.Pointer, fac6 float32, N int,  cfg *config) {
-	if Synchronous{ // debug
+func k_madd6_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 unsafe.Pointer, fac2 float32, src3 unsafe.Pointer, fac3 float32, src4 unsafe.Pointer, fac4 float32, src5 unsafe.Pointer, fac5 float32, src6 unsafe.Pointer, fac6 float32, N int, cfg *config) {
+	if Synchronous { // debug
 		Sync()
 		timer.Start("madd6")
 	}
@@ -66,51 +66,50 @@ func k_madd6_async ( dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2
 	madd6_args.Lock()
 	defer madd6_args.Unlock()
 
-	if madd6_code == 0{
+	if madd6_code == 0 {
 		madd6_code = fatbinLoad(madd6_map, "madd6")
 	}
 
-	 madd6_args.arg_dst = dst
-	 madd6_args.arg_src1 = src1
-	 madd6_args.arg_fac1 = fac1
-	 madd6_args.arg_src2 = src2
-	 madd6_args.arg_fac2 = fac2
-	 madd6_args.arg_src3 = src3
-	 madd6_args.arg_fac3 = fac3
-	 madd6_args.arg_src4 = src4
-	 madd6_args.arg_fac4 = fac4
-	 madd6_args.arg_src5 = src5
-	 madd6_args.arg_fac5 = fac5
-	 madd6_args.arg_src6 = src6
-	 madd6_args.arg_fac6 = fac6
-	 madd6_args.arg_N = N
-	
+	madd6_args.arg_dst = dst
+	madd6_args.arg_src1 = src1
+	madd6_args.arg_fac1 = fac1
+	madd6_args.arg_src2 = src2
+	madd6_args.arg_fac2 = fac2
+	madd6_args.arg_src3 = src3
+	madd6_args.arg_fac3 = fac3
+	madd6_args.arg_src4 = src4
+	madd6_args.arg_fac4 = fac4
+	madd6_args.arg_src5 = src5
+	madd6_args.arg_fac5 = fac5
+	madd6_args.arg_src6 = src6
+	madd6_args.arg_fac6 = fac6
+	madd6_args.arg_N = N
 
 	args := madd6_args.argptr[:]
 	cu.LaunchKernel(madd6_code, cfg.Grid.X, cfg.Grid.Y, cfg.Grid.Z, cfg.Block.X, cfg.Block.Y, cfg.Block.Z, 0, stream0, args)
 
-	if Synchronous{ // debug
+	if Synchronous { // debug
 		Sync()
 		timer.Stop("madd6")
 	}
 }
 
 // maps compute capability on PTX code for madd6 kernel.
-var madd6_map = map[int]string{ 0: "" ,
-30: madd6_ptx_30 ,
-35: madd6_ptx_35 ,
-37: madd6_ptx_37 ,
-50: madd6_ptx_50 ,
-52: madd6_ptx_52 ,
-53: madd6_ptx_53 ,
-60: madd6_ptx_60 ,
-61: madd6_ptx_61 ,
-70: madd6_ptx_70 ,
-75: madd6_ptx_75  }
+var madd6_map = map[int]string{0: "",
+	30: madd6_ptx_30,
+	35: madd6_ptx_35,
+	37: madd6_ptx_37,
+	50: madd6_ptx_50,
+	52: madd6_ptx_52,
+	53: madd6_ptx_53,
+	60: madd6_ptx_60,
+	61: madd6_ptx_61,
+	70: madd6_ptx_70,
+	75: madd6_ptx_75}
 
 // madd6 PTX code for various compute capabilities.
-const(
-  madd6_ptx_30 = `
+const (
+	madd6_ptx_30 = `
 .version 6.4
 .target sm_30
 .address_size 64
@@ -199,7 +198,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_35 = `
+	madd6_ptx_35 = `
 .version 6.4
 .target sm_35
 .address_size 64
@@ -288,7 +287,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_37 = `
+	madd6_ptx_37 = `
 .version 6.4
 .target sm_37
 .address_size 64
@@ -377,7 +376,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_50 = `
+	madd6_ptx_50 = `
 .version 6.4
 .target sm_50
 .address_size 64
@@ -466,7 +465,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_52 = `
+	madd6_ptx_52 = `
 .version 6.4
 .target sm_52
 .address_size 64
@@ -555,7 +554,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_53 = `
+	madd6_ptx_53 = `
 .version 6.4
 .target sm_53
 .address_size 64
@@ -644,7 +643,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_60 = `
+	madd6_ptx_60 = `
 .version 6.4
 .target sm_60
 .address_size 64
@@ -733,7 +732,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_61 = `
+	madd6_ptx_61 = `
 .version 6.4
 .target sm_61
 .address_size 64
@@ -822,7 +821,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_70 = `
+	madd6_ptx_70 = `
 .version 6.4
 .target sm_70
 .address_size 64
@@ -911,7 +910,7 @@ BB0_2:
 
 
 `
-   madd6_ptx_75 = `
+	madd6_ptx_75 = `
 .version 6.4
 .target sm_75
 .address_size 64
@@ -1000,4 +999,4 @@ BB0_2:
 
 
 `
- )
+)

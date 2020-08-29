@@ -50,6 +50,7 @@ func main() {
 
 	createIndexPage()
 	createDownloadPage()
+	createHeaderPage()
 }
 
 func createIndexPage() {
@@ -69,6 +70,17 @@ func createDownloadPage() {
 	check(err)
 	templ := template.Must(template.New("download").Parse(string(b)))
 	f, err2 := os.OpenFile(path.Join(buildDir, "download.html"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	check(err2)
+	state := &State{}
+	check(templ.Execute(f, state))
+}
+
+func createHeaderPage() {
+	b, err := ioutil.ReadFile(path.Join(templateDir, "headerpage-template.html"))
+	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
+	check(err)
+	templ := template.Must(template.New("headerpage").Parse(string(b)))
+	f, err2 := os.OpenFile(path.Join(buildDir, "header.html"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	check(err2)
 	state := &State{}
 	check(templ.Execute(f, state))

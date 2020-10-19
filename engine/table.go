@@ -1,16 +1,22 @@
 package engine
 
 import (
+	"bytes"
+	"encoding/csv"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
-	"io"
-	"sync"
-	"time"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)
@@ -107,6 +113,39 @@ func (t *DataTable) Add(output Quantity) {
 	t.outputs = append(t.outputs, output)
 }
 
+type ColumnHeader struct {
+	name string
+	unit string
+}
+
+func (c ColumnHeader) String() string {
+	return c.name + " (" + c.unit + ")"
+}
+
+func (c ColumnHeader) Name() string {
+	return c.name
+}
+
+func (c ColumnHeader) Unit() string {
+	return c.unit
+}
+
+func (t *DataTable) Header() (headers []ColumnHeader) {
+	headers = make([]ColumnHeader, 0)
+	headers = append(headers, ColumnHeader{"t", "s"})
+	for _, o := range t.outputs {
+		if o.NComp() == 1 {
+			headers = append(headers, ColumnHeader{NameOf(o), UnitOf(o)})
+		} else {
+			for c := 0; c < o.NComp(); c++ {
+				name := NameOf(o) + string('x'+c)
+				headers = append(headers, ColumnHeader{name, UnitOf(o)})
+			}
+		}
+	}
+	return
+}
+
 func (t *DataTable) Save() {
 	t.flushlock.Lock() // flush during write gives errShortWrite
 	defer t.flushlock.Unlock()
@@ -131,6 +170,49 @@ func (t *DataTable) Save() {
 	}
 }
 
+func (t *DataTable) Read() (data [][]float64, err error) {
+	if !t.inited() {
+		return nil, errors.New("Table is not initialized")
+	}
+
+	t.flush()
+	t.flushlock.Lock()
+	defer t.flushlock.Unlock()
+
+	rawdata, err := httpfs.Read(fmt.Sprintf(`%v%s.txt`, OD(), t.name))
+	if err != nil {
+		return
+	}
+
+	csvReader := csv.NewReader(bytes.NewReader(rawdata))
+	csvReader.Comma = '\t'
+	csvReader.Comment = '#'
+
+	nCols := len(t.Header())
+	data = make([][]float64, 0)
+
+	for {
+		line, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+
+		record := make([]float64, nCols)
+		for c, _ := range record {
+			record[c], err = strconv.ParseFloat(strings.TrimSpace(line[c]), 64)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		data = append(data, record)
+	}
+
+	return data, nil
+}
+
 func (t *DataTable) Println(msg ...interface{}) {
 	t.init()
 	fprintln(t, msg...)
@@ -150,15 +232,10 @@ func (t *DataTable) init() {
 	t.output = f
 
 	// write header
-	fprint(t, "# t (s)")
-	for _, o := range t.outputs {
-		if o.NComp() == 1 {
-			fprint(t, "\t", NameOf(o), " (", UnitOf(o), ")")
-		} else {
-			for c := 0; c < o.NComp(); c++ {
-				fprint(t, "\t", NameOf(o)+string('x'+c), " (", UnitOf(o), ")")
-			}
-		}
+	header := t.Header()
+	fprint(t, "# ", header[0])
+	for col := 1; col < len(header); col++ {
+		fprint(t, "\t", header[col])
 	}
 	fprintln(t)
 	t.Flush()

@@ -54,8 +54,17 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	header := Table.Header()
-	p.X.Label.Text = header[xColIdx].String()
-	p.Y.Label.Text = header[yColIdx].String()
+
+	p.X.Label.Text = header[xColIdx].Name()
+	if unit := header[xColIdx].Unit(); unit != "" {
+		p.X.Label.Text += " (" + unit + ")"
+	}
+
+	p.Y.Label.Text = header[yColIdx].Name()
+	if unit := header[yColIdx].Unit(); unit != "" {
+		p.Y.Label.Text += " (" + unit + ")"
+	}
+
 	p.X.Label.Padding = 0.2 * vg.Inch
 	p.Y.Label.Padding = 0.2 * vg.Inch
 

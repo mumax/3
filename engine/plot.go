@@ -6,9 +6,12 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -16,100 +19,172 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
+const DefaultCacheLifetime = 1 * time.Second
 
-	out := []byte{}
+var guiplot *TablePlot
 
-	// handle error and return wheter err != nil.
-	handle := func(err error) bool {
-		if err != nil {
-			w.Write(emptyIMG())
-			g.Set("plotErr", "Plot error: "+err.Error()+string(out))
-			return true
-		} else {
-			return false
-		}
+// TablePlot is a WriterTo which writes a (cached) plot image of table data.
+// The internally cached image will be updated when the column indices have been changed,
+// or when the cache lifetime is exceeded.
+// If another GO routine is updating the image, the cached image will be written.
+type TablePlot struct {
+	lock     sync.Mutex
+	updating bool
+
+	table      *DataTable
+	xcol, ycol int
+
+	cache struct {
+		img        []byte        // cached output
+		err        error         // cached error
+		expirytime time.Time     // expiration time of the cache
+		lifetime   time.Duration // maximum lifetime of the cache
 	}
+}
 
-	data, err := Table.Read()
-	if handle(err) {
-		return
-	}
-
-	xColIdx, err := strconv.Atoi(strings.TrimSpace(g.StringValue("usingx")))
-	if err != nil || xColIdx < 0 || xColIdx >= len(data[0]) {
-		handle(errors.New("Invalid column index"))
-		return
-	}
-
-	yColIdx, err := strconv.Atoi(strings.TrimSpace(g.StringValue("usingy")))
-	if err != nil || yColIdx < 0 || yColIdx >= len(data[0]) {
-		handle(errors.New("Invalid column index"))
-		return
-	}
-
-	p, err := plot.New()
-	if handle(err) {
-		return
-	}
-
-	header := Table.Header()
-
-	p.X.Label.Text = header[xColIdx].Name()
-	if unit := header[xColIdx].Unit(); unit != "" {
-		p.X.Label.Text += " (" + unit + ")"
-	}
-
-	p.Y.Label.Text = header[yColIdx].Name()
-	if unit := header[yColIdx].Unit(); unit != "" {
-		p.Y.Label.Text += " (" + unit + ")"
-	}
-
-	p.X.Label.Padding = 0.2 * vg.Inch
-	p.Y.Label.Padding = 0.2 * vg.Inch
-
-	nPoints := len(data)
-	points := make(plotter.XYs, nPoints)
-	for i := 0; i < nPoints; i++ {
-		points[i].X = data[i][xColIdx]
-		points[i].Y = data[i][yColIdx]
-	}
-
-	lpLine, lpPoints, err := plotter.NewLinePoints(points)
-	if handle(err) {
-		return
-	}
-	lpLine.Color = color.RGBA{R: 255, G: 150, B: 150, A: 255}
-	lpLine.Width = 2
-	lpPoints.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	lpPoints.Shape = draw.CircleGlyph{}
-	lpPoints.Radius = 2
-
-	p.Add(lpLine, lpPoints)
-
-	wr, err := p.WriterTo(6*vg.Inch, 4*vg.Inch, "svg")
-	if handle(err) {
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/svg+xml")
-	_, err = wr.WriteTo(w)
-	if handle(err) {
-		return
-	}
-
-	g.Set("plotErr", "")
+func NewPlot(table *DataTable) (p *TablePlot) {
+	p = &TablePlot{table: table, xcol: 0, ycol: 1}
+	p.cache.lifetime = DefaultCacheLifetime
 	return
 }
 
-var empty_img []byte
-
-// empty image to show if there's no plot...
-func emptyIMG() []byte {
-	if empty_img == nil {
-		o := bytes.NewBuffer(nil)
-		png.Encode(o, image.NewNRGBA(image.Rect(0, 0, 4, 4)))
-		empty_img = o.Bytes()
+func (p *TablePlot) SelectDataColumns(xcolidx, ycolidx int) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	if xcolidx != p.xcol || ycolidx != p.ycol {
+		p.xcol, p.ycol = xcolidx, ycolidx
+		p.cache.expirytime = time.Time{} // this will trigger an update at the next write
 	}
-	return empty_img
+}
+
+func (p *TablePlot) WriteTo(w io.Writer) (int64, error) {
+	p.update()
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	if p.cache.err != nil {
+		return 0, p.cache.err
+	}
+	nBytes, err := w.Write(p.cache.img)
+	return int64(nBytes), err
+}
+
+// Updates the cached image if the cache is expired
+// Does nothing if the image is already being updated by another GO process
+func (p *TablePlot) update() {
+	p.lock.Lock()
+	xcol, ycol := p.xcol, p.ycol
+	needupdate := !p.updating && time.Now().After(p.cache.expirytime)
+	p.updating = p.updating || needupdate
+	p.lock.Unlock()
+
+	if !needupdate {
+		return
+	}
+
+	// create plot without the TablePlot being locked!
+	img, err := CreatePlot(p.table, xcol, ycol)
+
+	p.lock.Lock()
+	p.cache.img, p.cache.err = img, err
+	p.updating = false
+	if p.xcol == xcol && p.ycol == ycol {
+		p.cache.expirytime = time.Now().Add(p.cache.lifetime)
+	} else { // column indices have been changed during the update
+		p.cache.expirytime = time.Time{}
+	}
+	p.lock.Unlock()
+}
+
+// Returns a png image plot of table data
+func CreatePlot(table *DataTable, xcol, ycol int) (img []byte, err error) {
+	if table == nil {
+		err = errors.New("DataTable pointer is nil")
+		return
+	}
+
+	data, err := table.Read()
+	if err != nil {
+		return
+	}
+
+	header := table.Header()
+
+	if !(xcol >= 0 && xcol < len(header) && ycol >= 0 && ycol < len(header)) {
+		err = errors.New("Invalid column index")
+		return
+	}
+
+	pl, err := plot.New()
+	if err != nil {
+		return
+	}
+
+	pl.X.Label.Text = header[xcol].Name()
+	if unit := header[xcol].Unit(); unit != "" {
+		pl.X.Label.Text += " (" + unit + ")"
+	}
+	pl.Y.Label.Text = header[ycol].Name()
+	if unit := header[ycol].Unit(); unit != "" {
+		pl.Y.Label.Text += " (" + unit + ")"
+	}
+
+	pl.X.Label.Font.SetName("Helvetica")
+	pl.Y.Label.Font.SetName("Helvetica")
+	pl.X.Label.Padding = 0.2 * vg.Inch
+	pl.Y.Label.Padding = 0.2 * vg.Inch
+
+	points := make(plotter.XYs, len(data))
+	for i := 0; i < len(data); i++ {
+		points[i].X = data[i][xcol]
+		points[i].Y = data[i][ycol]
+	}
+
+	scatter, err := plotter.NewScatter(points)
+	if err != nil {
+		return
+	}
+	scatter.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	scatter.Shape = draw.CircleGlyph{}
+	scatter.Radius = 1
+	pl.Add(scatter)
+
+	wr, err := pl.WriterTo(8*vg.Inch, 4*vg.Inch, "png")
+	if err != nil {
+		return
+	}
+
+	buf := bytes.NewBuffer(nil)
+	_, err = wr.WriteTo(buf)
+
+	if err != nil {
+		return nil, err
+	} else {
+		return buf.Bytes(), nil
+	}
+}
+
+func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
+	if guiplot == nil {
+		guiplot = NewPlot(&Table)
+	}
+
+	xcol, errx := strconv.Atoi(strings.TrimSpace(g.StringValue("usingx")))
+	ycol, erry := strconv.Atoi(strings.TrimSpace(g.StringValue("usingy")))
+	if errx != nil || erry != nil {
+		guiplot.SelectDataColumns(-1, -1) // set explicitly invalid column indices
+	} else {
+		guiplot.SelectDataColumns(xcol, ycol)
+	}
+
+	w.Header().Set("Content-Type", "image/png")
+	_, err := guiplot.WriteTo(w)
+
+	if err != nil {
+		png.Encode(w, image.NewNRGBA(image.Rect(0, 0, 4, 4)))
+		g.Set("plotErr", "Plot Error: "+err.Error())
+	} else {
+		g.Set("plotErr", "")
+	}
 }

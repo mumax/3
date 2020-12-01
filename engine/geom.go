@@ -77,29 +77,56 @@ func SetGeom(s Shape) {
 	geometry.setGeom(s)
 }
 
-func InitGeomFromOVF(fname string) {
-	SetBusy(true)
-	defer SetBusy(false)
+func isNonEmpty(geomSlice *data.Slice) bool {
+	arrDim := geomSlice.Size()
 
+	for z := 0; z < arrDim[Z]; z++ {
+		for y := 0; y < arrDim[Y]; y++ {
+			for x := 0; x < arrDim[X]; x++ {
+				//optimal empty volume check, quit first time you see non-zero value
+				if geomSlice.Get(0, x, y, z) != 0 {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func InitGeomFromOVF(fname string) {
 	in, err := httpfs.Open(fname)
 	util.FatalErr(err)
-	slice, meta, _ := oommf.Read(in)
+	geomSlice, meta, _ := oommf.Read(in)
+	arrDim := geomSlice.Size()
+	step := meta.CellSize
 
-	if slice.NComp() != 1{
+	//check the geometry file for sanity
+	if geomSlice.NComp() != 1{
 		util.Fatal("Geometry initialization file should have point dimension of 1!")
+	}
+	if !isNonEmpty( geomSlice ) {
+		util.Fatal("InitGeomFromOVF: provided geometry is completely empty!")
 	}
 
 	//set mesh from imported file, should refresh it by itself
-	arrDim := slice.Size()
-	step := meta.CellSize
-	SetMesh( arrDim[0], arrDim[1], arrDim[2], step[0], step[1], step[2], 0, 0, 0 )
+	SetMesh( arrDim[X], arrDim[Y], arrDim[Z],
+			 step[X], step[Y], step[Z],
+			 0, 0, 0 )
+
+	SetBusy(true)
+	defer SetBusy(false)
+	//first time initialization if needed
+	if geometry.Gpu().IsNil() {
+		geometry.buffer = cuda.NewSlice(1, geomSlice.Size())
+	}
 
 	//copy data into geometry array
-	data.Copy(geometry.buffer, slice)
+	data.Copy(geometry.buffer, geomSlice)
 
 	//make a makeshift function to represent imported geometry
 	geometry.shape = func(x, y, z float64) bool {
-		arr := slice.Host()[0]
+		arr := geomSlice.Host()[0]
 
 		//then calculate the index from coordinate
 		var index[3]int
@@ -111,8 +138,30 @@ func InitGeomFromOVF(fname string) {
 			}
 		}
 		//calculate if point is inside the figure in OVF
-		return arr[ arrDim[0] * arrDim[1] * index[2] + arrDim[0] * index[1] + index[0] ] > 0.5
+		return arr[ arrDim[X] * arrDim[Y] * index[Z] + arrDim[X] * index[Y] + index[X] ] > 0.5
 	}
+	
+	// M inside geom but previously outside needs to be re-inited
+	needupload := false
+	geomlist := geomSlice.Host()[0]
+	mhost := M.Buffer().HostCopy()
+	m := mhost.Host()
+	rng := rand.New(rand.NewSource(0))
+	for i := range m[0] {
+		if geomlist[i] != 0 {
+			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
+			if mx == 0 && my == 0 && mz == 0 {
+				needupload = true
+				rnd := randomDir(rng)
+				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
+			}
+		}
+	}
+	if needupload {
+		data.Copy(M.Buffer(), mhost)
+	}
+
+	M.normalize() // removes m outside vol
 }
 
 func (geometry *geom) setGeom(s Shape) {

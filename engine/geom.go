@@ -86,8 +86,7 @@ func InitGeomFromOVF(fname string) {
 	slice, meta, _ := oommf.Read(in)
 
 	if slice.NComp() != 1{
-		util.Log("Geometry initialization file should have point dimension of 1!")
-		return
+		util.Fatal("Geometry initialization file should have point dimension of 1!")
 	}
 
 	//set mesh from imported file, should refresh it by itself

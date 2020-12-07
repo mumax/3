@@ -174,7 +174,15 @@ func readHeader(in io.Reader) *Info {
 // INTERNAL: Splits "# key: value" into "key", "value".
 // Both may be empty
 func parseHeaderLine(str string) (key, value string) {
-	strs := strings.SplitN(str, ":", 2)
+	//remove the comment first
+	uncomLine := str[:strings.Index(str, "##")]
+	//if line doesn't begin with # just propagate it to generate proper error messages
+	if( !strings.HasPrefix(uncomLine, "#") ) {
+		return uncomLine, ""
+	}
+	//otherwise proceed to crunch line as normal
+	//TODO: check about implementing proper white space character culling instead of just looking for spaces
+	strs := strings.SplitN(uncomLine, ":", 2)
 	key = strings.Trim(strs[0], "# ")
 	if len(strs) != 2 {
 		return key, ""

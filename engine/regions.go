@@ -42,6 +42,8 @@ func (r *Regions) resize() {
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
+	regions.clear(id)
+
 	f := func(x, y, z float64) int {
 		if s(x, y, z) {
 			return id
@@ -60,18 +62,38 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 	l := r.HostList() // need to start from previous state
 	arr := reshapeBytes(l, r.Mesh().Size())
 
+	// Loop through the system, getting the region of each cell
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)
-				region := f(r[X], r[Y], r[Z])
+				region := f(r[X], r[Y], r[Z])  // f is a function that returns the region, given the cell coordinates
 				if region >= 0 {
-					arr[iz][iy][ix] = byte(region)
+					arr[iz][iy][ix] = byte(region)  // Here, we get the region of the cell
 				}
 			}
 		}
 	}
 	//log.Print("regions.upload")
+	r.gpuCache.Upload(l)
+}
+
+
+func (r *Regions) clear(id int) {
+	n := Mesh().Size()
+	l := r.HostList() // need to start from previous state
+	arr := reshapeBytes(l, r.Mesh().Size())
+
+	// Loop through the system, getting the region of each cell
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				if arr[iz][iy][ix] == byte(id) {
+					arr[iz][iy][ix] = byte(0)
+				}
+			}
+		}
+	}
 	r.gpuCache.Upload(l)
 }
 

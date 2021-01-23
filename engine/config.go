@@ -20,6 +20,8 @@ func init() {
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
 	DeclFunc("Conical", Conical, "Conical state for given wave vector, cone direction, and cone angle")
 	DeclFunc("Helical", Helical, "Helical state for given wave vector")
+	DeclFunc("NeelSkyrmionInPlane", NeelSkyrmionInPlane, "Like the normal Neel skyrmion but combined over to be in-plane")
+	DeclFunc("NeelMeron", NeelMeron, "Half-skyrmion texture")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -185,6 +187,39 @@ func Conical(q, coneDirection data.Vector, coneAngle float64) Config {
 
 func Helical(q data.Vector) Config {
 	return Conical(q, q, math.Pi/2)
+}
+
+func NeelSkyrmionInPlane(charge, pol int) Config {
+	w := 8 * Mesh().CellSize()[X]
+	w2 := w * w
+	return func(x, y, z float64) data.Vector {
+		r2 := x*x + y*y
+		r := math.Sqrt(r2)
+		mz := 2 * float64(pol) * (math.Exp(-r2/w2) - 0.5)
+		mx := (x * float64(charge) / r) * (1 - math.Abs(mz))
+		my := (y * float64(charge) / r) * (1 - math.Abs(mz))
+		return noNaN(data.Vector{mx, -mz, my}, pol)
+	}
+}
+
+func NeelMeron(charge, pol, direction int) Config {
+	w := 8 * Mesh().CellSize()[X]
+	w2 := w * w
+	return func(x, y, z float64) data.Vector {
+		r2 := x*x + y*y
+		r := math.Sqrt(r2)
+		if float64(direction) * x > 0 {
+			mz := 2 * float64(pol) * (math.Exp(-r2/w2) - 0.5)
+			mx := (x * float64(charge) / r) * (1 - math.Abs(mz))
+			my := (y * float64(charge) / r) * (1 - math.Abs(mz))
+			return noNaN(data.Vector{mx, my, mz}, pol)
+		} else {
+			mz := 2 * float64(pol) * (math.Exp(-y*y/w2) - 0.5)
+			mx := float64(0)
+			my := (y/math.Abs(y)) * float64(charge) * (1 - math.Abs(mz))
+			return noNaN(data.Vector{mx, my, mz}, pol)
+		}
+	}
 }
 
 // Transl returns a translated copy of configuration c. E.g.:

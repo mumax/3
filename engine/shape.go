@@ -19,6 +19,7 @@ func init() {
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
 	DeclFunc("Square", Square, "2D square with size in meter")
+	DeclFunc("Torus", Torus, "Torus with centre-to-tube (major) radius R and rube (minor) radius r")
 	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 (inclusive) and z2 (exclusive), in meter")
@@ -84,6 +85,12 @@ func Rect(sidex, sidey float64) Shape {
 // 2D square with given side.
 func Square(side float64) Shape {
 	return Rect(side, side)
+}
+
+func Torus(R, r float64) Shape {
+	return func(x, y, z float64) bool {
+			return sqr64(math.Sqrt(sqr64(x) + sqr64(y)) - R) + sqr64(z) <= sqr64(r)
+	}
 }
 
 // All cells with x-coordinate between a and b

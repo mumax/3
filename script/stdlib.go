@@ -64,7 +64,7 @@ func (w *World) LoadStdlib() {
 	w.Func("isNaN", math.IsNaN)
 	w.Func("norm", norm, "Standard normal distribution")
 	w.Func("heaviside", heaviside, "Returns 1 if x>0, 0 if x<0, and 0.5 if x==0")
-	w.Func("sinc", sinc, "Sinc returns sin(x)/x. If x=0, then Sinc(x) returns 0.")
+	w.Func("sinc", sinc, "Sinc returns sin(x)/x. If x=0, then Sinc(x) returns 1.")
 	w.Func("randSeed", intseed, "Sets the random number seed")
 	w.Func("rand", rng.Float64, "Random number between 0 and 1")
 	w.Func("randExp", rng.ExpFloat64, "Exponentially distributed random number between 0 and +inf, mean=1")

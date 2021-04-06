@@ -12,8 +12,6 @@ import (
 
 var (
 	B_custom       = NewVectorField("B_custom", "T", "User-defined field", AddCustomField)
-	PosLocal       = NewVectorField("PosLocal", "n/a", "LocalMeshPosition", SetPosLocal)
-	PosReal        = NewVectorField("PosReal", "m", "RealMeshPosition", SetPosReal)
 	Edens_custom   = NewScalarField("Edens_custom", "J/m3", "Energy density of user-defined field.", AddCustomEnergyDensity)
 	E_custom       = NewScalarValue("E_custom", "J", "total energy of user-defined field", GetCustomEnergy)
 	customTerms    []Quantity // vector
@@ -107,27 +105,6 @@ func Const(v float64) Quantity {
 // that can be used to construct custom field terms.
 func ConstVector(x, y, z float64) Quantity {
 	return &constValue{[]float64{x, y, z}}
-}
-
-func SetPosLocal(dst *data.Slice) {
-	dims := Mesh().Size()
-
-	Sx := 1.0 / float64(dims[X])
-	Sy := 1.0 / float64(dims[Y])
-	Sz := 1.0 / float64(dims[Z])
-
-	cuda.PosScaled(dst, Sx, Sy, Sz)
-}
-
-func SetPosReal(dst *data.Slice) {
-	dims := Mesh().Size()
-	cellsize := Mesh().CellSize()
-
-	Sx := cellsize[X] / float64(dims[X])
-	Sy := cellsize[Y] / float64(dims[Y])
-	Sz := cellsize[Z] / float64(dims[Z])
-
-	cuda.PosScaled(dst, Sx, Sy, Sz)
 }
 
 // fieldOp holds the abstract functionality for operations

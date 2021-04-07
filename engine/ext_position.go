@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	PosLocal = NewVectorField("PositionLocal", "None", "Vector field containing position of each cell normalised from -1 to +1 across each dimension.", PositionLocal)
+	PosLocal = NewVectorField("PositionLocal", "None", "Vector field containing position of each cell normalised from -0.5 to +0.5 across each dimension.", PositionLocal)
 	PosWorld = NewVectorField("PositionWorld", "m", "Vector field containing real world position of each cell. The Origin is at the center of the mesh", PositionWorld)
 )
 

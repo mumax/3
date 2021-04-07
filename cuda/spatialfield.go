@@ -4,6 +4,7 @@ import (
 	"github.com/mumax/3/data"
 )
 
+// set dst such that its elements are evenly spaced by sx, sy, sz along each axis x, y, z and centered around 0, 0, 0
 func SpatialField(dst *data.Slice, sx, sy, sz float32) {
 
 	N := dst.Len()

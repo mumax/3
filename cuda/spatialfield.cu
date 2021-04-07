@@ -1,6 +1,6 @@
 #include "float3.h"
 
-// set dst such that its elements are uniform from -Sd/2 to Sd/2 along each axis
+// set dst such that its elements are evenly spaced by sx, sy, sz along each axis x, y, z and centered around 0, 0, 0
 extern "C" __global__ void
 spatialfield(
         float* __restrict__  dstx,
@@ -19,8 +19,8 @@ spatialfield(
 
     if (i < N) {
         float idx_i = fmodf(i, nx) - offsetx;
-        float idx_j = floorf(fmodf(i, nx*ny) / nx) - offsety;
-        float idx_k = floorf(fmodf(i, N) / (nx*ny)) - offsetz;
+        float idx_j = floorf(fmodf(i / nx, ny)) - offsety;
+        float idx_k = floorf(i / (nx*ny)) - offsetz;
 
         dstx[i] = idx_i * sx;
         dsty[i] = idx_j * sy;

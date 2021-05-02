@@ -94,6 +94,30 @@ func isNonEmpty(geomSlice *data.Slice) bool {
 	return false
 }
 
+func cleanMagnetization(geomSlice *data.Slice) {
+	// M inside geom but previously outside needs to be re-inited
+	needupload := false
+	geomlist := geomSlice.Host()[0]
+	mhost := M.Buffer().HostCopy()
+	m := mhost.Host()
+	rng := rand.New(rand.NewSource(0))
+	for i := range m[0] {
+		if geomlist[i] != 0 {
+			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
+			if mx == 0 && my == 0 && mz == 0 {
+				needupload = true
+				rnd := randomDir(rng)
+				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
+			}
+		}
+	}
+	if needupload {
+		data.Copy(M.Buffer(), mhost)
+	}
+
+	M.normalize() // removes m outside vol
+}
+
 func InitGeomFromOVF(fname string) {
 	in, err := httpfs.Open(fname)
 	util.FatalErr(err)
@@ -125,43 +149,17 @@ func InitGeomFromOVF(fname string) {
 	data.Copy(geometry.buffer, geomSlice)
 
 	//make a makeshift function to represent imported geometry
+        isInterpd := false
+        pred := VoxelShape(geomSlice, step[0], step[1], step[2])
 	geometry.shape = func(x, y, z float64) bool {
-		arr := geomSlice.Host()[0]
-
-		//then calculate the index from coordinate
-		var index[3]int
-		r := [3]float64{x, y, z}
-		for i := 0; i < 3; i++ {
-			index[i] = int(r[i]/step[i])
-			if r[i] < 0 || index[i] > (arrDim[i]-1)  {
-				return false
-			}
-		}
-		//calculate if point is inside the figure in OVF
-		return arr[ arrDim[X] * arrDim[Y] * index[Z] + arrDim[X] * index[Y] + index[X] ] > 0.5
-	}
-	
-	// M inside geom but previously outside needs to be re-inited
-	needupload := false
-	geomlist := geomSlice.Host()[0]
-	mhost := M.Buffer().HostCopy()
-	m := mhost.Host()
-	rng := rand.New(rand.NewSource(0))
-	for i := range m[0] {
-		if geomlist[i] != 0 {
-			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
-			if mx == 0 && my == 0 && mz == 0 {
-				needupload = true
-				rnd := randomDir(rng)
-				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
-			}
-		}
-	}
-	if needupload {
-		data.Copy(M.Buffer(), mhost)
+            if !isInterpd {
+                util.Log("Warning! Geometry imported through InitGeomFromOVF is about to be reinterpolated! Possible changes in geometry!")
+                isInterpd = true
+            }
+            return pred(x, y, z)
 	}
 
-	M.normalize() // removes m outside vol
+        cleanMagnetization(geomSlice)
 }
 
 func (geometry *geom) setGeom(s Shape) {
@@ -242,27 +240,7 @@ func (geometry *geom) setGeom(s Shape) {
 
 	data.Copy(geometry.buffer, V)
 
-	// M inside geom but previously outside needs to be re-inited
-	needupload := false
-	geomlist := host.Host()[0]
-	mhost := M.Buffer().HostCopy()
-	m := mhost.Host()
-	rng := rand.New(rand.NewSource(0))
-	for i := range m[0] {
-		if geomlist[i] != 0 {
-			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
-			if mx == 0 && my == 0 && mz == 0 {
-				needupload = true
-				rnd := randomDir(rng)
-				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
-			}
-		}
-	}
-	if needupload {
-		data.Copy(M.Buffer(), mhost)
-	}
-
-	M.normalize() // removes m outside vol
+        cleanMagnetization(host)
 }
 
 // Sample edgeSmooth^3 points inside the cell to estimate its volume.

@@ -37,7 +37,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 	arg("CellSize", cellSizeX > 0 && cellSizeY > 0 && cellSizeZ > 0)
 	arg("PBC", pbcx >= 0 && pbcy >= 0 && pbcz >= 0)
 
-	prevSize := globalmesh_.Size()
+	sizeChanged := globalmesh_.Size() != [3]int{Nx, Ny, Nz}
+        cellSizeChanged := globalmesh_.CellSize() != [3]float64{cellSizeX, cellSizeY, cellSizeZ}
 	pbc := []int{pbcx, pbcy, pbcz}
 
 	if globalmesh_.Size() == [3]int{0, 0, 0} {
@@ -49,7 +50,7 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 		// here be dragons
 		LogOut("resizing...")
 
-		// free everything
+		// free everything to trigger kernel recalculation, etc
 		conv_.Free()
 		conv_ = nil
 		mfmconv_.Free()
@@ -58,23 +59,21 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 
 		// resize everything
 		globalmesh_ = *data.NewMesh(Nx, Ny, Nz, cellSizeX, cellSizeY, cellSizeZ, pbc...)
-		M.resize()
-		regions.resize()
-		geometry.buffer.Free()
-		geometry.buffer = data.NilSlice(1, Mesh().Size())
-		geometry.setGeom(geometry.shape)
+                if sizeChanged || cellSizeChanged {
+                    M.resize()
+                    regions.resize()
+                    geometry.buffer.Free()
+                    geometry.buffer = data.NilSlice(1, Mesh().Size())
+                    geometry.setGeom(geometry.shape)
 
-		// remove excitation extra terms if they don't fit anymore
-		// up to the user to add them again
-		if Mesh().Size() != prevSize {
-			B_ext.RemoveExtraTerms()
-			J.RemoveExtraTerms()
-		}
+                    // remove excitation extra terms if they don't fit anymore
+                    // up to the user to add them again
+                    B_ext.RemoveExtraTerms()
+                    J.RemoveExtraTerms()
 
-		if Mesh().Size() != prevSize {
-			B_therm.noise.Free()
-			B_therm.noise = nil
-		}
+                    B_therm.noise.Free()
+                    B_therm.noise = nil
+                }
 	}
 	lazy_gridsize = []int{Nx, Ny, Nz}
 	lazy_cellsize = []float64{cellSizeX, cellSizeY, cellSizeZ}

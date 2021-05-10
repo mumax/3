@@ -12,6 +12,7 @@ const NREGION = 256 // maximum number of regions, limited by size of byte.
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
+	DeclFunc("RedefRegion", RedefRegion, "Reassign all cells with a given region (first argument) to a new region (second argument)")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region (first argument) in one cell "+
 		"by the index of the cell (last three arguments)")
@@ -42,8 +43,6 @@ func (r *Regions) resize() {
 // Define a region with id (0-255) to be inside the Shape.
 func DefRegion(id int, s Shape) {
 	defRegionId(id)
-	regions.clear(id)
-
 	f := func(x, y, z float64) int {
 		if s(x, y, z) {
 			return id
@@ -55,6 +54,14 @@ func DefRegion(id int, s Shape) {
 	regions.hist = append(regions.hist, f)
 }
 
+// Redefine a region with a given ID to a new ID
+func RedefRegion(startId, endId int) {
+	// Checks validity of input region IDs
+	defRegionId(startId)
+	defRegionId(endId)
+	regions.redefine(startId, endId)
+}
+
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
 // TODO: a tidbit expensive
 func (r *Regions) render(f func(x, y, z float64) int) {
@@ -62,14 +69,13 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 	l := r.HostList() // need to start from previous state
 	arr := reshapeBytes(l, r.Mesh().Size())
 
-	// Loop through the system, getting the region of each cell
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
 				r := Index2Coord(ix, iy, iz)
-				region := f(r[X], r[Y], r[Z])  // f is a function that returns the region, given the cell coordinates
+				region := f(r[X], r[Y], r[Z])
 				if region >= 0 {
-					arr[iz][iy][ix] = byte(region)  // Here, we get the region of the cell
+					arr[iz][iy][ix] = byte(region)
 				}
 			}
 		}
@@ -78,18 +84,17 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 	r.gpuCache.Upload(l)
 }
 
-
-func (r *Regions) clear(id int) {
+func (r *Regions) redefine(startId, endId int) {
+	// Loop through all cells, if their region ID matches startId, change it to endId
 	n := Mesh().Size()
 	l := r.HostList() // need to start from previous state
 	arr := reshapeBytes(l, r.Mesh().Size())
 
-	// Loop through the system, getting the region of each cell
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
-				if arr[iz][iy][ix] == byte(id) {
-					arr[iz][iy][ix] = byte(0)
+				if arr[iz][iy][ix] == byte(startId) {
+					arr[iz][iy][ix] = byte(endId)
 				}
 			}
 		}

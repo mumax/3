@@ -365,9 +365,11 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 		origi := orig.Comp(i)
 		if q.dx != 0 {
 			cuda.ShiftX(dsti, origi, q.dx, 0, 0)
+			data.Copy(origi, dsti)
 		}
 		if q.dy != 0 {
 			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
+			data.Copy(origi, dsti)
 		}
 		if q.dz != 0 {
 			cuda.ShiftZ(dsti, origi, q.dz, 0, 0)

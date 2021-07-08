@@ -87,13 +87,44 @@ func (rk *RK23) Step() {
 
 	// adjust next time step
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
-		// step OK
-		setLastErr(err)
-		setMaxTorque(k4)
-		NSteps++
-		Time = t0 + Dt_si
-		adaptDt(math.Pow(MaxErr/err, 1./3.))
-		data.Copy(rk.k1, k4) // FSAL
+		// Passed absolute error. Check relative error...
+		errnorm := cuda.Buffer(1, size)
+		defer cuda.Recycle(errnorm)
+		cuda.VecNorm(errnorm, Err)
+		ddtnorm := cuda.Buffer(1, size)
+		defer cuda.Recycle(ddtnorm)
+		cuda.VecNorm(ddtnorm, k4)
+		maxdm := cuda.MaxVecNorm(k4)
+		fail := 0
+		rlerr := float64(0.0)
+		if maxdm < MinSlope { // Only step using relerr if dmdt is big enough. Overcomes equilibrium problem
+			fail = 0
+		} else {
+			cuda.Div(errnorm, errnorm, ddtnorm) //re-use errnorm
+			rlerr = float64(cuda.MaxAbs(errnorm))
+			fail = 1
+		}
+		if fail == 0 || RelErr <= 0.0 || rlerr < RelErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
+			// step OK
+			setLastErr(err)
+			setMaxTorque(k4)
+			NSteps++
+			Time = t0 + Dt_si
+			if fail == 0 {
+				adaptDt(math.Pow(MaxErr/err, 1./3.))
+			} else {
+				adaptDt(math.Pow(RelErr/rlerr, 1./3.))
+			}
+			data.Copy(rk.k1, k4) // FSAL
+		} else {
+			// undo bad step
+			//util.Println("Bad step at t=", t0, ", err=", err)
+			util.Assert(FixDt == 0)
+			Time = t0
+			data.Copy(m, m0)
+			NUndone++
+			adaptDt(math.Pow(RelErr/rlerr, 1./4.))
+		}
 	} else {
 		// undo bad step
 		//util.Println("Bad step at t=", t0, ", err=", err)

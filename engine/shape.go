@@ -18,6 +18,7 @@ func init() {
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
+	DeclFunc("Triangle", Triangle, "Equilateral triangle with side in meter")
 	DeclFunc("Square", Square, "2D square with size in meter")
 	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
@@ -78,6 +79,14 @@ func Rect(sidex, sidey float64) Shape {
 	return func(x, y, z float64) bool {
 		rx, ry := sidex/2, sidey/2
 		return x < rx && x > -rx && y < ry && y > -ry
+	}
+}
+
+// Equilateral triangle with given sides.
+func Triangle(side float64) Shape {
+	return func(x, y, z float64) bool {
+		c := math.Sqrt(3)
+		return y > -side/(2*c) && y < x*c+side/c && y < -x*c+side/c
 	}
 }
 

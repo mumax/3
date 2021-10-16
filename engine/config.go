@@ -3,9 +3,10 @@ package engine
 // Utilities for setting magnetic configurations.
 
 import (
-	"github.com/mumax/3/data"
 	"math"
 	"math/rand"
+
+	"github.com/mumax/3/data"
 )
 
 func init() {
@@ -18,10 +19,8 @@ func init() {
 	DeclFunc("VortexWall", VortexWall, "Vortex wall magnetization with given mx in left and right domain and core circulation and polarization")
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
-	DeclFunc("Conical", Conical, "Conical state for given wave vector, cone direction, and cone angle")
-	DeclFunc("Helical", Helical, "Helical state for given wave vector")
-	DeclFunc("NeelSkyrmionInPlane", NeelSkyrmionInPlane, "Like the normal Neel skyrmion but combined over to be in-plane")
-	DeclFunc("NeelMeron", NeelMeron, "Half-skyrmion texture")
+	DeclFunc("Conical", Conical, "Conical state 11ion texture")
+	DeclFunc("Hopfion", Hopfion, "Hopfion texture of given Hopf index.")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -208,7 +207,7 @@ func NeelMeron(charge, pol, direction int) Config {
 	return func(x, y, z float64) data.Vector {
 		r2 := x*x + y*y
 		r := math.Sqrt(r2)
-		if float64(direction) * x > 0 {
+		if float64(direction)*x > 0 {
 			mz := 2 * float64(pol) * (math.Exp(-r2/w2) - 0.5)
 			mx := (x * float64(charge) / r) * (1 - math.Abs(mz))
 			my := (y * float64(charge) / r) * (1 - math.Abs(mz))
@@ -216,9 +215,39 @@ func NeelMeron(charge, pol, direction int) Config {
 		} else {
 			mz := 2 * float64(pol) * (math.Exp(-y*y/w2) - 0.5)
 			mx := float64(0)
-			my := (y/math.Abs(y)) * float64(charge) * (1 - math.Abs(mz))
+			my := (y / math.Abs(y)) * float64(charge) * (1 - math.Abs(mz))
 			return noNaN(data.Vector{mx, my, mz}, pol)
 		}
+	}
+}
+
+func Hopfion(hopfIndex, L, R, w, eta float64) Config {
+	return func(x, y, z float64) data.Vector {
+
+		// For a given skyrmion slice, first transform to the origin, which makes it simpler to create the skyrmion texture
+		psi := math.Atan2(y, x) // The angle around the "doughnut" when viewed from above, i.e. to the global x-axis
+
+		// We translate the skyrmion from the ring to the origin (xPrime, yPrime), then rotate it so that the texture lies in the x-z plane (xDoublePrime)
+		xPrime := x - L*math.Cos(psi)
+		yPrime := y - L*math.Sin(psi)
+		xDoublePrime := xPrime*math.Cos(psi) + yPrime*math.Sin(psi)
+
+		rho := math.Sqrt(xDoublePrime*xDoublePrime + z*z) // Radius from the centre of the skyrmion texture now at the origin
+		phi := math.Atan2(z, xDoublePrime)                // Polar angle in the skyrmion texture
+		helicity := eta + hopfIndex*psi
+		Phi := phi + helicity // Spin angle in the x-z plane
+		Theta := 2 * math.Atan2(math.Sinh(R/w), math.Sinh(rho/w))
+
+		// The magnetization components in the transformed system
+		mxRotated := math.Cos(Phi) * math.Sin(Theta)
+		myRotated := math.Cos(Theta)
+		mz := math.Sin(Phi) * math.Sin(Theta)
+
+		// Transform back from the origin to original position on the "doughnut"
+		mx := mxRotated*math.Cos(psi) - myRotated*math.Sin(psi)
+		my := mxRotated*math.Sin(psi) + myRotated*math.Cos(psi)
+
+		return data.Vector{mx, my, mz}
 	}
 }
 

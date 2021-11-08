@@ -20,6 +20,9 @@ func init() {
 	DeclFunc("RandomMag", RandomMag, "Random magnetization")
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
 	DeclFunc("Conical", Conical, "Conical state 11ion texture")
+	DeclFunc("Helical", Helical, "Helical state for given wave vector")
+	DeclFunc("NeelSkyrmionInPlane", NeelSkyrmionInPlane, "Like the normal Neel skyrmion but combined over to be in-plane")
+	DeclFunc("NeelMeron", NeelMeron, "Half-skyrmion texture")
 	DeclFunc("Hopfion", Hopfion, "Hopfion texture of given Hopf index.")
 }
 

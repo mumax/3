@@ -36,11 +36,17 @@ func init() {
 	DeclFunc("Masked", Masked, "Mask quantity with shape")
 	DeclFunc("Normalized", Normalized, "Normalize quantity")
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
+	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
 }
 
 //Removes all customfields
 func RemoveCustomFields() {
 	customTerms = nil
+}
+
+//Removes all customenergies
+func RemoveCustomEnergies() {
+	customEnergies = nil
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.

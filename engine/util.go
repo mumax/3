@@ -23,7 +23,7 @@ func init() {
 	DeclFunc("Fprintln", Fprintln, "Print to file")
 	DeclFunc("Sign", sign, "Signum function")
 	DeclFunc("Vector", Vector, "Constructs a vector with given components")
-	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
+	DeclConst("Mu0", mag.Mu0, "Vacuum permeability (Tm/A)")
 	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a data file (ovf or dump)")
 	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")

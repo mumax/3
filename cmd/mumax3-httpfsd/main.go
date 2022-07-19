@@ -24,7 +24,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/v3/httpfs"
 )
 
 var (

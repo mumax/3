@@ -5,7 +5,7 @@ package data
 import (
 	"bytes"
 	"fmt"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/util"
 	"log"
 	"reflect"
 	"unsafe"

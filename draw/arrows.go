@@ -1,8 +1,8 @@
 package draw
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/freetype/raster"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/freetype/raster"
 	"image"
 	"image/color"
 	"math"

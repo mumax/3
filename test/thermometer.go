@@ -24,8 +24,8 @@ Due to this difference, we need to add the following constant value to the divis
 package main
 
 import (
-	"github.com/mumax/3/cuda"
-	. "github.com/mumax/3/engine"
+	"github.com/mumax/3/v3/cuda"
+	. "github.com/mumax/3/v3/engine"
 )
 
 const kB = 1.38064852e-23 // Boltzmann constant

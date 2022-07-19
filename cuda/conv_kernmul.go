@@ -4,8 +4,8 @@ package cuda
 // Launch configs range over all complex elements of fft input. This could be optimized: range only over kernel.
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 )
 
 // kernel multiplication for 3D demag convolution, exploiting full kernel symmetry.

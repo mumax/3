@@ -6,13 +6,13 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/draw"
-	"github.com/mumax/3/dump"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/oommf"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/cuda"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/draw"
+	"github.com/mumax/3/v3/dump"
+	"github.com/mumax/3/v3/httpfs"
+	"github.com/mumax/3/v3/oommf"
+	"github.com/mumax/3/v3/util"
 )
 
 func init() {

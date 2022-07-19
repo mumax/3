@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/httpfs"
+	"github.com/mumax/3/v3/util"
 )
 
 const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued to many times

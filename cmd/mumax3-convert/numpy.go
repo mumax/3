@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/mumax/3/data"
+	"github.com/mumax/3/v3/data"
 	"io"
 )
 

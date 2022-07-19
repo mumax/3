@@ -2,11 +2,11 @@ package engine
 
 import (
 	"fmt"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/gui"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/cuda"
+	"github.com/mumax/3/v3/cuda/cu"
+	"github.com/mumax/3/v3/gui"
+	"github.com/mumax/3/v3/httpfs"
+	"github.com/mumax/3/v3/util"
 	"math/rand"
 	"net"
 	"net/http"

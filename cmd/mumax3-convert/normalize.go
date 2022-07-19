@@ -3,7 +3,7 @@ package main
 import (
 	"math"
 
-	"github.com/mumax/3/data"
+	"github.com/mumax/3/v3/data"
 )
 
 // normalize vector data to given length

@@ -4,8 +4,8 @@ package oommf
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 	"io"
 	"os"
 	"strconv"

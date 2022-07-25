@@ -1,5 +1,5 @@
 # Builds mumax3 cuda kernels and create GO wrappers for the compute capabilities listed in $CUDA_CC. 
-# If $CUDA_CC is not defined, then $CUDA_CC is set to "30".
+# If $CUDA_CC is not defined, then $CUDA_CC is set to "50".
 #
 # The ${CUDA_HOME}/bin/nvcc compiler is used to compile the cuda kernels. If CUDA_HOME is not defined
 # it will look for an nvidia compiler in $PATH instead.
@@ -18,7 +18,7 @@
 # CUDA SDK 10.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.1 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.2 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
-# CUDA SDK 11.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75 80
+# CUDA SDK 11.0 support for compute capability       50 52 53 60 61 62 70 72 75 80
 
 SHELL = /bin/bash
 
@@ -32,7 +32,9 @@ endif
 
 # When CUDA_CC is not an environment variable and is not set on the command line, use compute capability 3.0
 ifeq ($(CUDA_CC),)
-    CUDA_CC = 30
+#    CUDA_CC = 30
+# The "compute_30" was for the Kepler architecture, which has been deprecated in CUDA 11.
+	CUDA_CC = 50
 endif
 
 # The gcc host compiler for nvcc

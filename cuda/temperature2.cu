@@ -7,6 +7,7 @@ settemperature2(float* __restrict__  B,      float* __restrict__ noise, float kB
                 float* __restrict__ Ms_, float Ms_mul,
                 float* __restrict__ temp_, float temp_mul,
                 float* __restrict__ alpha_, float alpha_mul,
+                float* __restrict__ g_, float g_mul,
                 int N) {
 
     int i =  ( blockIdx.y*gridDim.x + blockIdx.x ) * blockDim.x + threadIdx.x;
@@ -14,7 +15,7 @@ settemperature2(float* __restrict__  B,      float* __restrict__ noise, float kB
         float invMs = inv_Msat(Ms_, Ms_mul, i);
         float temp = amul(temp_, temp_mul, i);
         float alpha = amul(alpha_, alpha_mul, i);
-        B[i] = noise[i] * sqrtf((kB2_VgammaDt * alpha * temp * invMs ));
+        float g = amul(g_, g_mul, i);
+        B[i] = noise[i] * sqrtf((kB2_VgammaDt * alpha * temp * invMs / g));
     }
 }
-

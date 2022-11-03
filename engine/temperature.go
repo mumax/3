@@ -100,9 +100,11 @@ func (b *thermField) update() {
 	defer temp.Recycle()
 	alpha := Alpha.MSlice()
 	defer alpha.Recycle()
+	g := GFactor.MSlice()
+	defer g.Recycle()
 	for i := 0; i < 3; i++ {
 		b.generator.GenerateNormal(uintptr(noise.DevPtr(0)), int64(N), mean, stddev)
-		cuda.SetTemperature(dst.Comp(i), noise, k2_VgammaDt, ms, temp, alpha)
+		cuda.SetTemperature(dst.Comp(i), noise, k2_VgammaDt, ms, temp, alpha, g)
 	}
 
 	b.step = NSteps

@@ -15,6 +15,16 @@ func ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32) {
 	k_shiftx_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg)
 }
 
+// shift dst by shx cells (positive or negative) along X-axis.
+ // new edge value is the current value at the border.
+ func ShiftFudgeX(dst, src *data.Slice, shiftX int) {
+ 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+ 	util.Assert(dst.Len() == src.Len())
+ 	N := dst.Size()
+ 	cfg := make3DConf(N)
+ 	k_shiftfudgex_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, cfg)
+ }
+
 func ShiftY(dst, src *data.Slice, shiftY int, clampL, clampR float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
@@ -22,6 +32,14 @@ func ShiftY(dst, src *data.Slice, shiftY int, clampL, clampR float32) {
 	cfg := make3DConf(N)
 	k_shifty_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, clampL, clampR, cfg)
 }
+
+func ShiftFudgeY(dst, src *data.Slice, shiftY int) {
+ 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+ 	util.Assert(dst.Len() == src.Len())
+ 	N := dst.Size()
+ 	cfg := make3DConf(N)
+ 	k_shiftfudgey_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, cfg)
+ }
 
 func ShiftZ(dst, src *data.Slice, shiftZ int, clampL, clampR float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)

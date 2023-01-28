@@ -1,0 +1,28 @@
+SetMesh(128, 128, 1, 1e-9,1e-9,0.4e-9, 1, 0, 0)
+
+Msat  =580e3
+Aex   = 15e-12
+enabledemag=true
+alpha = 0.1
+Ku1=0.59e6+4*pi*1e-7*0.5*580e3*580e3
+anisU=vector(0,0,1)
+Dind=0.0034089785
+
+shiftregions=false
+
+m =neelskyrmion(1, -1).transl(-30e-9,0e-9,0)
+minimize()
+
+
+ext_bubbleMz = -1.0
+//without compensating for in-plane tilts of the background this fails (corresponds to ext_backgroundtilt=0)
+ext_backgroundtilt=0.25 //default value
+
+TOL:=1e-9
+expectv("position", ext_bubblepos.average(), vector(-3e-08,0,0), TOL)
+
+
+SetMesh(128, 128, 1, 1e-9,1e-9,0.4e-9, 0, 1, 0)
+m =neelskyrmion(1, -1).transl(0e-9,-30e-9,0)
+minimize()
+expectv("position", ext_bubblepos.average(), vector(0,-3e-08,0), TOL)

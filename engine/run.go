@@ -20,6 +20,8 @@ var (
 	Dt_si                   float64  = 1e-15             // time step = dt_si (seconds) *dt_mul, which should be nice float32
 	MinDt, MaxDt            float64                      // minimum and maximum time step
 	MaxErr                  float64  = 1e-5              // maximum error/step
+	RelErr                  float64  = 1e-4              // maximum relative error/step
+	MinSlope                float64  = 1e8               // minimum delta per unit time before using relative error to step
 	Headroom                float64  = 0.8               // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
 	LastErr, PeakErr        float64                      // error of last step, highest error ever
 	LastTorque              float64                      // maxTorque of last time step
@@ -39,6 +41,7 @@ func init() {
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")
 	DeclVar("MaxDt", &MaxDt, "Maximum time step the solver can take (s)")
 	DeclVar("MaxErr", &MaxErr, "Maximum error per step the solver can tolerate (default = 1e-5)")
+	DeclVar("RelErr", &RelErr, "Maximum relative error per step the solver can tolerate (default = 1e-4)")
 	DeclVar("Headroom", &Headroom, "Solver headroom (default = 0.8)")
 	DeclVar("FixDt", &FixDt, "Set a fixed time step, 0 disables fixed step (which is the default)")
 	DeclFunc("Exit", Exit, "Exit from the program")

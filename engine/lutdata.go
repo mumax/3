@@ -1,10 +1,10 @@
 package engine
 
 import (
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/cuda"
+	"github.com/mumax/3/v3/cuda/cu"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 	"unsafe"
 )
 

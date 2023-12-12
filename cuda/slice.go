@@ -4,10 +4,10 @@ import (
 	"math"
 	"unsafe"
 
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/timer"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/cuda/cu"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/timer"
+	"github.com/mumax/3/v3/util"
 )
 
 // Make a GPU Slice with nComp components each of size length.

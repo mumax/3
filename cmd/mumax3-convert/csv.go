@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/mumax/3/data"
+	"github.com/mumax/3/v3/data"
 )
 
 // comma-separated values

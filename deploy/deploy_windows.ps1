@@ -6,9 +6,9 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
     # The final location of executables and libraries ready to be shipped to the user.
     $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION"
 
-    # The nvidia toolkit installer for cuda 10.2 shoud have set the environment 
+    # The nvidia toolkit installer for CUDA 10.2 should have set the environment 
     # variable CUDA_PATH_V10_2 which points to the root directory of the 
-    # cuda toolbox. (or similar for other cuda versions)
+    # CUDA toolbox (or similar for other CUDA versions).
     # This script might not work if this path contains spaces!
     switch ( $CUDA_VERSION ) {
         "9.2"  { $CUDA_HOME = $env:CUDA_PATH_V9_2  }
@@ -24,6 +24,8 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
     }
 
     # We will compile the kernels for all supported architectures
+    # See https://stackoverflow.com/a/28933055 for CUDA version to CC table
+    # See https://docs.nvidia.com/deploy/cuda-compatibility/ for min. driver version for given CUDA version
     switch ( $CUDA_VERSION ) {
         "9.2"  { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72 }
         "10.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
@@ -35,7 +37,7 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
 
     # The NVIDIA compiler which will be used to compile the cuda kernels
     $NVCC = "${CUDA_HOME}/bin/nvcc.exe"
-    $CCBIN = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
+    $CCBIN = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64" #! SUBSTITUTE YOUR OWN PATH TO cl.exe HERE
     if ( -not ( Test-Path $CCBIN ) ) {
         Write-Output "CCBIN for nvcc not found at $CCBIN"
         exit
@@ -43,8 +45,8 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
 
     # overwrite the CGO flags to make sure that mumax3 is compiled against the
     # specified cuda version.
-    $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib/x64"
-    $env:CGO_CFLAGS="-I${CUDA_HOME}/include -w"
+    $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L `"$CUDA_HOME/lib/x64`""
+    $env:CGO_CFLAGS="-I `"$CUDA_HOME/include`" -w"
 
     # Enter the cuda directory to (re)compile the cuda kernels
     Set-Location ../cuda
@@ -55,10 +57,10 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
         foreach ($cudafile in $cudafiles) {
             $kernelname = $cudafile.basename
             foreach ($cc in $CUDA_CC) {
-                & $NVCC -ccbin ${CCBIN} -Xptxas -O3 -ptx `
+                & $NVCC -ccbin "`"${CCBIN}`"" -Xptxas -O3 -ptx `
                     -gencode="arch=compute_${cc},code=sm_${cc}" `
                     "${cudafile}" -o "${kernelname}_${cc}.ptx"
-            }    
+            }
             & .\cuda2go $cudafile
             gofmt -w "${kernelname}_wrapper.go"
         }

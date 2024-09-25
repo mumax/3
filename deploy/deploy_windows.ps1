@@ -4,7 +4,7 @@
 foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
 
     # The final location of executables and libraries ready to be shipped to the user.
-    $builddir = "build/mumax3.10_windows_cuda$CUDA_VERSION"
+    $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION"
 
     # The nvidia toolkit installer for cuda 10.2 shoud have set the environment 
     # variable CUDA_PATH_V10_2 which points to the root directory of the 

@@ -9,7 +9,7 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2 11.0; do
     fi
 
     # The final location of the mumax3 executables and libs
-    MUMAX3UNAME=mumax3.10_linux_cuda${CUDAVERSION}
+    MUMAX3UNAME=mumax3.11_linux_cuda${CUDAVERSION}
     BUILDDIR=./build/${MUMAX3UNAME}
     rm -rf $BUILDDIR
     mkdir -p $BUILDDIR

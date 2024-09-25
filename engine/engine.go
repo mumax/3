@@ -7,7 +7,6 @@ param: region-dependent parameter (always input)
 field: fully space-dependent field
 
 TODO: godoc everything
-
 */
 package engine
 

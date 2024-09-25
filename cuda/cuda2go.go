@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 // This program generates Go wrappers for cuda sources.

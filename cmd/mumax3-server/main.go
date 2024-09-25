@@ -147,7 +147,8 @@ func contains(arr []string, x string) bool {
 }
 
 // Parse port range flag. E.g.:
-// 	1234-1237 -> 1234, 1237
+//
+//	1234-1237 -> 1234, 1237
 func parsePorts() (minPort, maxPort int) {
 	p := *flag_ports
 	split := strings.Split(p, "-")

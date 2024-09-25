@@ -23,7 +23,8 @@ func (w *World) MustEval(src string) interface{} {
 }
 
 // Eval compiles and evaluates src, which must be an expression, and returns the result(s). E.g.:
-// 	world.Eval("1+1")      // returns 2, nil
+//
+//	world.Eval("1+1")      // returns 2, nil
 func (w *World) Eval(src string) (ret interface{}, err error) {
 	Expr, err := w.CompileExpr(src)
 	if err != nil {

@@ -8,9 +8,10 @@ import (
 )
 
 // BaseDir returns the first path element, without slashes and ignoring http:// . E.g.:
-// 	/home/user/file -> home
-// 	user/file -> user
-// 	http://home/user/file -> home
+//
+//	/home/user/file -> home
+//	user/file -> user
+//	http://home/user/file -> home
 func BaseDir(dir string) string {
 	if strings.HasPrefix(dir, "http://") {
 		return BaseDir(dir[len("http://"):])

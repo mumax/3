@@ -1,5 +1,5 @@
 /*
-	Toy interpreter executes scripts or stdin.
+Toy interpreter executes scripts or stdin.
 */
 package main
 

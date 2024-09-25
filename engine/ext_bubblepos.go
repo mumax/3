@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	BubblePos   = NewVectorValue("ext_bubblepos", "m", "Bubble core position", bubblePos)
-	BubbleDist  = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
-	BubbleSpeed = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
-	BubbleMz    = 1.0
-	BackGroundTilt    = 0.25
+	BubblePos      = NewVectorValue("ext_bubblepos", "m", "Bubble core position", bubblePos)
+	BubbleDist     = NewScalarValue("ext_bubbledist", "m", "Bubble traveled distance", bubbleDist)
+	BubbleSpeed    = NewScalarValue("ext_bubblespeed", "m/s", "Bubble velocity", bubbleSpeed)
+	BubbleMz       = 1.0
+	BackGroundTilt = 0.25
 )
 
 func init() {
@@ -35,8 +35,8 @@ func bubblePos() []float64 {
 
 		for iy := range mz {
 			for ix := range mz[0] {
-				magsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz) + 1.) / 2.)
-				weightedsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz) + 1.) / 2.) * float64(iy)
+				magsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz)+1.) / 2.)
+				weightedsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz)+1.) / 2.) * float64(iy)
 			}
 		}
 		posy = float64(weightedsum / magsum)
@@ -48,8 +48,8 @@ func bubblePos() []float64 {
 
 		for ix := range mz[0] {
 			for iy := range mz {
-				magsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz) + 1.) / 2.)
-				weightedsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz) + 1.) / 2.) * float64(ix)
+				magsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz)+1.) / 2.)
+				weightedsum += (backgroundAdjust(mz[iy][ix]*float32(BubbleMz)+1.) / 2.) * float64(ix)
 			}
 		}
 		posx = float64(weightedsum / magsum)
@@ -115,7 +115,9 @@ func bubbleSpeed() float64 {
 	return v
 }
 
-func backgroundAdjust(arg float32) float64{
-if float64(arg)< BackGroundTilt{
-return float64(0)}
-return float64(arg)}
+func backgroundAdjust(arg float32) float64 {
+	if float64(arg) < BackGroundTilt {
+		return float64(0)
+	}
+	return float64(arg)
+}

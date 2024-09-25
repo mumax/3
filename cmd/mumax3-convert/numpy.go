@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
+
+	"github.com/mumax/3/data"
 )
 
 func dumpNUMPY(f *data.Slice, info data.Meta, out io.Writer) {

@@ -2,28 +2,46 @@
 mumax3-convert converts mumax3 output files to various formats and images.
 It also provides basic manipulations like data rescale etc.
 
-
-Usage
+# Usage
 
 Command-line flags must always preceed the input files:
+
 	mumax3-convert [flags] files
+
 For a overview of flags, run:
+
 	mumax3-convert -help
+
 Example: convert all .ovf files to PNG:
+
 	mumax3-convert -png *.ovf
+
 For scalar data, the color scale is automatically stretched to cover the all values. The values corresponding to minimum and maximum color can be overridden by the -min and -max flags. Values falling outside of this range will be clipped. E.g.:
- 	mumax3-convert -png -min=0 -max=1 file.ovf.
+
+	mumax3-convert -png -min=0 -max=1 file.ovf.
+
 The default scalar color map is black,gray,white (minimum value maps to black, maximum to white). This can be overridden by -color. E.g., a rather colorful map:
+
 	mumax3-convert -png -color black,blue,cyan,green,yellow,red,white file.ovf
+
 Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
+
 	mumax3-convert -resize 32x32x1 -normalize -ovf binary file.ovf
+
 Example: convert all .ovf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
+
 	mumax3-convert -comp 0 -vtk binary -jpg *.ovf
+
 Example: convert legacy .dump files to .ovf:
+
 	mumax3-convert -ovf2 *.dump
+
 Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
+
 	mumax3-convert -xrange 50:100 -yrange :100 file.ovf
+
 Example: select the bottom layer
+
 	mumax3-convert -zrange :1 file.ovf
 
 Output file names are automatically assigned.

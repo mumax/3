@@ -53,7 +53,8 @@ func (m *Mesh) SetPBC(nx, ny, nz int) {
 }
 
 // Total number of cells, not taking into account PBCs.
-// 	N0 * N1 * N2
+//
+//	N0 * N1 * N2
 func (m *Mesh) NCell() int {
 	return m.gridSize[0] * m.gridSize[1] * m.gridSize[2]
 }

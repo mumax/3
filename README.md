@@ -100,7 +100,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <details><summary><b><i>Install CUDA</i></b> - ⚠️Install in a directory without spaces⚠️</summary>
 
 * **Windows**: Download an installer from [the CUDA website](https://developer.nvidia.com/cuda-downloads).
-  * ⚠️ **The installation directory should not contain spaces, if possible install in `C:\CUDA`.**
+  * ⚠️ **The installation directory should not contain spaces, if possible install in `C:\cuda`.**
     <details><summary><i>Click here if CUDA was installed elsewhere.</i></summary>
 
     You can define these two environment variables to help the compiler find CUDA (replace `%CUDA_PATH%` below by your CUDA installation directory, e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`).
@@ -151,10 +151,10 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 
 <details><summary><b><i>Install a C compiler</i></b></summary>
 
-* **Windows:** Download and install from [w64devkit](https://github.com/skeeto/w64devkit/releases).
 * **Linux:** `sudo apt-get install gcc`
+* **Windows:** Download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. `gcc` can not be used since CUDA does not support it on Windows. If your installation is successful, you should have the executable `cl.exe`.
 
-👉 *Check C installation with: `gcc --version`*
+👉 *Check C installation with: `gcc --version` on Linux and `which cl.exe` on Windows.*
 
 </details>
 
@@ -170,7 +170,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 
 </details>
 
-<details><summary> (Optional: <b><i>install gnuplot</i></b> for pretty graphs)</summary>
+<details><summary>(Optional: <b><i>install gnuplot</i></b> for pretty graphs)</summary>
 
 * **Windows:** [Download]((http://www.gnuplot.info/download.html)) and install.
 * **Linux:** `sudo apt-get install gnuplot`
@@ -186,16 +186,28 @@ With these tools installed, you can build mumax³ yourself.
   * If you don't have git, you can manually fetch the source [here](https://github.com/mumax/3/releases) and unzip it into `$GOPATH/src/github.com/mumax/3`.
 * Initialize a Go module by moving to the newly created folder with `cd 3/` and running `go mod init github.com/mumax/3`, followed by `go mod tidy`.
 * Query the compute capability of your GPU using the command `nvidia-smi --query-gpu=compute_cap --format=csv`. Based on this, set the environment variable `CUDA_CC`: if your compute capability is e.g., 8.9, then set the value `CUDA_CC=89`.
-* You can now compile mumax³ with
+* You can now compile mumax³ ...
+  * ... **on Linux:**
 
-  ```bash
-  make realclean
-  cd cmd/mumax3
-  make
-  ```
-  <!-- If this doesn't work, run these commands in the `cmd/mumax3` subdirectory. -->
-  <!-- (Note: instead of `make`, you can also run `go install`, but then `mumax3 -test` won't print the commit hash.) -->
-  Your binary is now at `$GOPATH/bin/mumax3`.
+    ```bash
+    make realclean && make
+    ```
+
+    Your binary is now at `$GOPATH/bin/mumax3`.
+
+  * ... **on Windows:**
+    The `Makefile`s can not be run directly on Windows due to issues with whitespaces. Use the `deploy/deploy_windows.ps1` script instead: it is meant to generate the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build mumax³ for yourself with some small adjustments:
+    1) At the top of the file: change the list of CUDA versions to only contain the CUDA version you have installed.<br>NOTE: if your CUDA version was not in that list, add it to the `switch ( $CUDA_VERSION )` blocks a bit further.
+    2) In the second `switch ( $CUDA_VERSION )` block, keep only the compute capability of your own GPU. Otherwise, compilation will take unnecessarily long to account for all other compute capabilities.
+    3) Near the middle of the file, change the path `$CCBIN` to your Visual Studio executable, which you can find with `which cl.exe`. Example: if `which cl.exe` returns `foo\bar\cl.exe`, then set `$CCBIN = "foo\bar"`.
+
+    Now you can compile by opening Powershell in the `/deploy` directory and running
+
+    ```bat
+    ./deploy_windows.ps1
+    ```
+
+    Your executable will be created in the `deploy/build` directory.
 
 * *Check installation with: `which mumax3` and `mumax3 -test`.* <details><summary>Troubleshooting &rarr;click here&larr;</summary>
   If the `cuda.h` and `curand.h` headers can not be found on Windows, read the "Install CUDA" section of this README to set the correct path and environment variables.

@@ -13,7 +13,7 @@ import (
 func init() {
 	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
-	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The top of the cone points in the +z direction.")
+	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The base is at z=0. If the height is positive, the tip points in the +z direction.")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
@@ -46,10 +46,10 @@ func Ellipse(diamx, diamy float64) Shape {
 	return Ellipsoid(diamx, diamy, math.Inf(1))
 }
 
-// 3D Cone with the vertex down.
+// 3D Cone with base at z=0 and vertex at z=height.
 func Cone(diam, height float64) Shape {
 	return func(x, y, z float64) bool {
-		return z >= 0 && sqr64(x/diam)+sqr64(y/diam)+0.25*sqr64(z/height) <= 0.25
+		return (height-z)*z >= 0 && sqr64(x/diam)+sqr64(y/diam) <= 0.25*sqr64(1-z/height)
 	}
 }
 

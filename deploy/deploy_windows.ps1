@@ -66,8 +66,13 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
         }
     Set-Location ../deploy
 
-    # Compile all mumax3 packages and executables
-    go install -v "github.com/mumax/3/..."
+    # Compile all mumax3 packages and executables. Determine the commit hash and pass it along.
+    $COMMIT_HASH = git rev-parse --short HEAD 2>$null
+    if (-not $COMMIT_HASH) {
+        $COMMIT_HASH = "unknown"
+        Write-Host "Warning: Could not determine Git commit hash. Using 'unknown'."
+    }
+    go install -ldflags "-X main.commitHash=$COMMIT_HASH" -v "github.com/mumax/3/..."
 
     # Copy the mumax3 executables and the used cuda libraries to the build directory
     Remove-Item -ErrorAction Ignore -Recurse ${builddir}

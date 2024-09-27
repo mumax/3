@@ -59,7 +59,26 @@ func RedefRegion(startId, endId int) {
 	// Checks validity of input region IDs
 	defRegionId(startId)
 	defRegionId(endId)
+
+	hist_len := len(regions.hist) // Only consider hist before this Redef to avoid recursion
+	f := func(x, y, z float64) int {
+		value := -1
+		for i := hist_len - 1; i >= 0; i-- {
+			f_other := regions.hist[i]
+			region := f_other(x, y, z)
+			if region >= 0 {
+				value = region
+				break
+			}
+		}
+		if value == startId {
+			return endId
+		} else {
+			return value
+		}
+	}
 	regions.redefine(startId, endId)
+	regions.hist = append(regions.hist, f)
 }
 
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2

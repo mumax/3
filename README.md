@@ -100,19 +100,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <details><summary><b><i>Install CUDA</i></b> - ⚠️Install in a directory without spaces⚠️</summary>
 
 * **Windows**: Download an installer from [the CUDA website](https://developer.nvidia.com/cuda-downloads).
-  * ⚠️ **The installation directory should not contain spaces, if possible install in `C:\cuda`.**
-    <details><summary><i>Click here if CUDA was installed elsewhere.</i></summary>
-
-    You can define these two environment variables to help the compiler find CUDA (replace `%CUDA_PATH%` below by your CUDA installation directory, e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`).
-
-    ```bash
-    CGO_CFLAGS = '-I "%CUDA_PATH%\include"'
-    CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"
-    ```
-
-     Alternatively, every time before you run the `make` command to build mumax³, you can run the two lines above (but both prepended with `$env:`) in Powershell (NOT cmd).
-    </details>
-
+  * ⚠️ **To avoid common issues, the installation directory should not contain spaces. If possible, install in `C:\cuda`.** Spaces should not cause issues when running `deploy_windows.ps1`, but this is not guaranteed.
 * **Linux**: Use `sudo apt-get install nvidia-cuda-toolkit`, or [download an installer](https://developer.nvidia.com/cuda-downloads).
   * Pick the default installation path. **If this is not `usr/local/cuda/`, create a symlink to that path.**
   * Match the version shown in your driver (see top right in `nvidia-smi` output).
@@ -134,7 +122,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 
 * Download and install from [the Go website](https://go.dev/doc/install).
 * The `GOPATH` environment variable should have been set automatically (note: the folder it points to probably doesn't exist yet).<br>*Check with `go env GOPATH`.* <details><summary><i>Click here to set `GOPATH` manually if it does not exist.</i></summary>
-  * On **Windows:** `%USERPROFILE%/go` is often used, e.g. `C:/Users/<name>/go`.
+  * On **Windows:** `%USERPROFILE%/go` is often used, e.g. `C:/Users/<name>/go`. See [this guide](https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows) if you are unfamiliar with environment variables.
   * On **Linux:** `~/go` is often used. Open or create the `~/.bashrc` file and add the following lines.
 
     ```bash
@@ -152,9 +140,9 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <details><summary><b><i>Install a C compiler</i></b></summary>
 
 * **Linux:** `sudo apt-get install gcc`
-* **Windows:** Download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. `gcc` can not be used since CUDA does not support it on Windows. If your installation is successful, you should have the executable `cl.exe`.
+* **Windows:** Download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. (Unlike Linux, `gcc` can not be used since CUDA does not support it on Windows.) After installing, check if the path to `cl.exe` was added to your `PATH` environment variable. Otherwise, add it manually, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`.
 
-👉 *Check C installation with: `gcc --version` on Linux and `which cl.exe` on Windows.*
+👉 *Check C installation with: `gcc --version` on Linux and `where.exe cl.exe` on Windows.*
 
 </details>
 
@@ -196,10 +184,10 @@ With these tools installed, you can build mumax³ yourself.
     Your binary is now at `$GOPATH/bin/mumax3`.
 
   * ... **on Windows:**
-    The `Makefile`s can not be run directly on Windows due to issues with whitespaces. Use the `deploy/deploy_windows.ps1` script instead: it is meant to generate the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build mumax³ for yourself with some small adjustments:
-    1) At the top of the file: change the list of CUDA versions to only contain the CUDA version you have installed.<br>NOTE: if your CUDA version was not in that list, add it to the `switch ( $CUDA_VERSION )` blocks a bit further.
-    2) In the second `switch ( $CUDA_VERSION )` block, keep only the compute capability of your own GPU. Otherwise, compilation will take unnecessarily long to account for all other compute capabilities.
-    3) Near the middle of the file, change the path `$CCBIN` to your Visual Studio executable, which you can find with `which cl.exe`. Example: if `which cl.exe` returns `foo\bar\cl.exe`, then set `$CCBIN = "foo\bar"`.
+    The `Makefile`s may experience issues with whitespaces. Instead, we recommend using the `deploy/deploy_windows.ps1` script: it is meant to generate the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build a single mumax³ executable for yourself by making the following adjustments:
+    1) At the top of the file: change the list of CUDA versions to only contain the CUDA version you have installed.<br>NOTE: if your CUDA version was not in that list, add it to the `switch ( $CUDA_VERSION )` blocks as well.
+    2) In the second `switch ( $CUDA_VERSION )` block, keep only the compute capability of your own GPU. Otherwise, otherwise compilation will take unnecessarily long to account for all other compute capabilities.
+    3) Near the middle of the file, change the path `$CCBIN` to your Visual Studio executable. Example: if `where.exe cl.exe` returns `foo\bar\cl.exe`, then set `$CCBIN = "foo\bar"`.
 
     Now you can compile by opening Powershell in the `/deploy` directory and running
 
@@ -209,7 +197,13 @@ With these tools installed, you can build mumax³ yourself.
 
     Your executable will be created in the `deploy/build` directory.
 
-* *Check installation with: `which mumax3` and `mumax3 -test`.* <details><summary>Troubleshooting &rarr;click here&larr;</summary>
-  If the `cuda.h` and `curand.h` headers can not be found on Windows, read the "Install CUDA" section of this README to set the correct path and environment variables.
+* *Check installation with: `which mumax3` on **Linux** or `where.exe mumax3.exe` on **Windows**, followed by `mumax3 -test`.* <details><summary>Troubleshooting: if `cuda.h` or `curand.h` not found: &rarr;click here&larr;</summary>
+  This usually means that the `CGO_CFLAGS` and `CGO_LDFLAGS` environment variables are not found or point to the wrong path. To fix this, either define them in the script you are using to build mumax³, or define them in the terminal before running the script.
+  * On **Windows:** say your CUDA is installed in `%CUDA_PATH%` (e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`), then run these two lines in Powershell before running `deploy_windows.ps1`:
+
+    ```powershell
+    $env:CGO_CFLAGS = '-I "%CUDA_PATH%\include"'
+    $env:CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"
+    ```
 
 </details>

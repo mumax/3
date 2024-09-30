@@ -1,6 +1,16 @@
 <div style="float:left">
-	<img src="nimble-cubes128.png"/>
+	<img id="header_img" src="nimble-cubes128.png"/>
 </div>
+<script>
+	function xmas() {
+		var now = new Date();
+		isChristmas = now.getMonth() == 11 && now.getDate() >= 24 && now.getDate() <= 26
+		xmas_img_file = isChristmas ? "nimble-cubes128-xmas.png" : "nimble-cubes128.png"
+		document.getElementById("header_img").setAttribute("src", xmas_img_file)
+	}
+	xmas()
+	setInterval(xmas, 5*60*1000) // Repeat every 5 minutes to update icon if page is left open
+</script>
 
 <div style="float:left">
 <span style="font-size:48px"><b>mumax</b><sup>3</sup><br/></span>

@@ -140,7 +140,9 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <details><summary><b><i>Install a C compiler</i></b></summary>
 
 * **Linux:** `sudo apt-get install gcc`
-* **Windows:** Download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. (Unlike Linux, `gcc` can not be used since CUDA does not support it on Windows.) After installing, check if the path to `cl.exe` was added to your `PATH` environment variable. Otherwise, add it manually, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`.
+* **Windows:**
+  * CUDA does not support the `gcc` compiler on Windows, so download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. After installing, check if the path to `cl.exe` was added to your `PATH` environment variable. If not, add it manually, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`.
+  * To compile Go, on the other hand, `gcc` is needed. Usually this is included in the Go installation, but if not it can be downloaded and installed from [w64devkit](https://github.com/skeeto/w64devkit/releases).
 
 👉 *Check C installation with: `gcc --version` on Linux and `where.exe cl.exe` on Windows.*
 
@@ -197,7 +199,7 @@ With these tools installed, you can build mumax³ yourself.
 
     Your executable will be created in the `deploy/build` directory.
 
-* *Check installation with: `which mumax3` on **Linux** or `where.exe mumax3.exe` on **Windows**, followed by `mumax3 -test`.* <details><summary>Troubleshooting: if `cuda.h` or `curand.h` not found: &rarr;click here&larr;</summary>
+* *Check installation with: `which mumax3` on **Linux** or `where.exe mumax3.exe` on **Windows**, followed by `mumax3 -test`.* <details><summary>Troubleshooting: `cuda.h` or `curand.h` not found: &rarr;click here&larr;</summary>
   This usually means that the `CGO_CFLAGS` and `CGO_LDFLAGS` environment variables are not found or point to the wrong path. To fix this, either define them in the script you are using to build mumax³, or define them in the terminal before running the script.
   * On **Windows:** say your CUDA is installed in `%CUDA_PATH%` (e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`), then run these two lines in Powershell before running `deploy_windows.ps1`:
 
@@ -206,4 +208,9 @@ With these tools installed, you can build mumax³ yourself.
     $env:CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"
     ```
 
-</details>
+  </details>
+  <details><summary>Troubleshooting: `mumax3.exe` is not generated: &rarr;click here&larr;</summary>
+
+  If, during the build process of mumax³, everything runs smoothly until you get the error that the `mumax3.exe` executable can not be found, try setting the `CGO_ENABLED` environment variable to `1` in your build script.
+
+  </details>

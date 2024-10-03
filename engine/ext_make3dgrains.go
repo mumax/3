@@ -7,11 +7,11 @@ import (
 	"math/rand"
 )
 
-var CompleteGrainsAtShapeEdge  = false // complete the voronoi grains  instead of cutting them off at the shape edge
+var GrainCutShape  = false // complete all voronoi grains whose centre lies within the shape. Warning, this also cuts away parts of the shape whose closest voronoi centre lies outside the shape
 
 func init() {
 	DeclFunc("ext_make3dgrains", Voronoi3d, "3D Voronoi tesselation over shape (grain size, starting region number, num regions, shape, seed)")
-	DeclVar("CompleteGrainsAtShapeEdge", &CompleteGrainsAtShapeEdge, "Enables completion of grains beyond shape edge (default=false)")
+	DeclVar("GrainCutShape", &GrainCutShape, "Adds the complete voronoi grain, if its centre lies within the shape  (default=false)")
 }
 
 func Voronoi3d(grainsize float64, startRegion int, numRegions int, inputShape Shape, seed int) {
@@ -110,7 +110,7 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 				y := cell.Y()
 				z := cell.Z()
 
-				if (t.shape(x, y, z)|| CompleteGrainsAtShapeEdge) {
+				if (t.shape(x, y, z)|| GrainCutShape) {
 					cells = append(cells, cellLocs{x, y, z})
 				}
 			}
@@ -125,8 +125,8 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 
 
 func (t *tesselation3d) RegionOf(x, y, z float64) int {
-    // Check if the point is within the shape or edge grains should be completed
-    if !(t.shape(x, y, z) || CompleteGrainsAtShapeEdge) {
+    // Check if the point is within the shape or if we're cutting the shape along the grains 
+    if !(t.shape(x, y, z) || GrainCutShape) {
         return -1 // Regions < 0 won't be rastered
     }
 
@@ -142,7 +142,7 @@ func (t *tesselation3d) RegionOf(x, y, z float64) int {
     }
 
     // Check if the nearest point's region should be returned
-    if t.shape(x, y, z) || (t.shape(nearest.x, nearest.y, nearest.z) && CompleteGrainsAtShapeEdge) {
+    if t.shape(x, y, z) || (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape) {
         return int(nearest.region)
     }
 

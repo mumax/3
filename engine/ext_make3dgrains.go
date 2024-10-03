@@ -142,7 +142,7 @@ func (t *tesselation3d) RegionOf(x, y, z float64) int {
     }
 
     // Check if the nearest point's region should be returned
-    if t.shape(x, y, z) || (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape) {
+    if ((t.shape(x, y, z) && GrainCutShape==false)|| (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape)) {
         return int(nearest.region)
     }
 

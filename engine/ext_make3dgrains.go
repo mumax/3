@@ -57,9 +57,9 @@ func newTesselation3d(grainsize float64, nRegion int, seed int64, startRegion in
 
 // Permutes the slice of cell locations. I don't understand why this needs to be done if we're choosing
 // random (Intn()) cells out of the slice of cell locations, but hey, it seems to do the trick.
-func shuffleCells(src []cellLocs) []cellLocs {
+func (t *tesselation3d) shuffleCells(src []cellLocs) []cellLocs {
 	dest := make([]cellLocs, len(src))
-	perm := rand.Perm(len(src))
+	perm := t.rnd.Perm(len(src))
 	for i, v := range perm {
 		dest[v] = src[i]
 	}
@@ -69,7 +69,7 @@ func shuffleCells(src []cellLocs) []cellLocs {
 func (t *tesselation3d) makeRandomCenters() {
 	//Make a list of all the cells in the shape.
 	cells := t.tabulateCells()
-	cells = shuffleCells(cells)
+	cells = t.shuffleCells(cells)
 
 	//Choose number of grains to make. Assume volume of grain is given by (4/3)*pi*r^3
 	shapeVolume := cellVolume() * float64(len(cells))

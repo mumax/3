@@ -7,8 +7,11 @@ import (
 	"math/rand"
 )
 
+var CompleteGrainsAtShapeEdge  = false // complete the voronoi grains  instead of cutting them off at the shape edge
+
 func init() {
 	DeclFunc("ext_make3dgrains", Voronoi3d, "3D Voronoi tesselation over shape (grain size, starting region number, num regions, shape, seed)")
+	DeclVar("CompleteGrainsAtShapeEdge", &CompleteGrainsAtShapeEdge, "Enables completion of grains beyond shape edge (default=false)")
 }
 
 func Voronoi3d(grainsize float64, startRegion int, numRegions int, inputShape Shape, seed int) {
@@ -107,7 +110,7 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 				y := cell.Y()
 				z := cell.Z()
 
-				if t.shape(x, y, z) {
+				if (t.shape(x, y, z)|| CompleteGrainsAtShapeEdge) {
 					cells = append(cells, cellLocs{x, y, z})
 				}
 			}
@@ -120,23 +123,30 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 	return cells
 }
 
-// Find the nearest Voronoi center to the point (x, y, z). Only points inside the given shape will be
-// assigned a region.
+
 func (t *tesselation3d) RegionOf(x, y, z float64) int {
-	if t.shape(x, y, z) {
-		nearest := center3d{x, y, z, 0}
-		mindist := math.Inf(1)
-		for _, c := range t.centers {
-			dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
-			if dist < mindist {
-				nearest = c
-				mindist = dist
-			}
-		}
-		return int(nearest.region)
-	} else {
-		return -1 //When the regions are rendered, any region < 0 will not be rastered.
-	}
+    // Check if the point is within the shape or edge grains should be completed
+    if !(t.shape(x, y, z) || CompleteGrainsAtShapeEdge) {
+        return -1 // Regions < 0 won't be rastered
+    }
+
+    // Find the nearest center point to the (x, y, z) position
+    nearest := center3d{x, y, z, 0}
+    mindist := math.Inf(1)
+    for _, c := range t.centers {
+        dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
+        if dist < mindist {
+            nearest = c
+            mindist = dist
+        }
+    }
+
+    // Check if the nearest point's region should be returned
+    if t.shape(x, y, z) || (t.shape(nearest.x, nearest.y, nearest.z) && CompleteGrainsAtShapeEdge) {
+        return int(nearest.region)
+    }
+
+    return -1
 }
 
 // Generate normally distributed numbers; mean = lambda, variance = lambda. If generated number < 0, return 1.

@@ -1,0 +1,27 @@
+/*
+	Checks if MFM images can be saved for all thicknesses with and without PBC.
+	There was once a bug (#93) where Nz=2,3,4,5 could not generate an MFM image.
+*/
+
+Nx := 64
+Ny := 64
+c := 4e-9
+
+Msat = 1/mu0
+Aex = 10e-12
+
+for Nz := 1; Nz < 12; Nz++ {
+	SetGridSize(Nx, Ny, Nz)
+	SetCellSize(c, c, c)
+	SetGeom(Zrange(-NZ*c/2, c/2).Intersect(Circle(Nx*c)))
+	m  = vortex(1, 1);
+	SetPBC(0, 0, 0)
+
+	SaveAs(m, sprintf("m_%d.ovf", Nz))
+	
+	MFMLift = 40e-9 // forces the calculation of the MFM kernel.
+	SnapshotAs(MFM, sprintf("MFM_%d.jpg", Nz))
+	SetPBC(2, 0, 0)
+	MFMLift = 40e-9 // forces the calculation of the MFM kernel.
+	SnapshotAs(MFM, sprintf("MFM_%d_PBC.jpg", Nz))
+}

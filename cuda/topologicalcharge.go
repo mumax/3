@@ -1,8 +1,8 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 )
 
 // Set s to the toplogogical charge density s = m · (∂m/∂x ❌ ∂m/∂y)

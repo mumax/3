@@ -1,8 +1,8 @@
 package draw
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 	"image"
 	"image/color"
 	"log"

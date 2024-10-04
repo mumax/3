@@ -1,8 +1,8 @@
 package cuda
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 )
 
 // Add magneto-elasticit coupling field to the effective field.

@@ -3,7 +3,7 @@ package cuda
 import (
 	"unsafe"
 
-	"github.com/mumax/3/data"
+	"github.com/mumax/3/v3/data"
 )
 
 // SetMaxAngle sets dst to the maximum angle of each cells magnetization with all of its neighbors,

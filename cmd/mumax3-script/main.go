@@ -7,7 +7,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/mumax/3/script"
+	"github.com/mumax/3/v3/script"
 	"io"
 	"log"
 	"os"

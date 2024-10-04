@@ -4,8 +4,8 @@ package oommf
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
+	"github.com/mumax/3/v3/data"
+	"github.com/mumax/3/v3/util"
 	"io"
 	"os"
 	"strconv"
@@ -174,6 +174,18 @@ func readHeader(in io.Reader) *Info {
 // INTERNAL: Splits "# key: value" into "key", "value".
 // Both may be empty
 func parseHeaderLine(str string) (key, value string) {
+	//remove the comment first, I *hate* go for having slices like python
+	//AND not allowing negative indexes
+	comPos := strings.Index(str, "##")
+	if comPos != -1 {
+		str = str[:comPos]
+	}
+	//if line doesn't begin with # just propagate it to generate proper error messages
+	if !strings.HasPrefix(str, "#") {
+		return str, ""
+	}
+	//otherwise proceed to crunch line as normal
+	//TODO: check about implementing proper white space character culling instead of just looking for spaces
 	strs := strings.SplitN(str, ":", 2)
 	key = strings.Trim(strs[0], "# ")
 	if len(strs) != 2 {

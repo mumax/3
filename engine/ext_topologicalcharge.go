@@ -3,8 +3,8 @@ package engine
 import (
 	"math"
 
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
+	"github.com/mumax/3/v3/cuda"
+	"github.com/mumax/3/v3/data"
 )
 
 var (

@@ -14,7 +14,7 @@ defregion(1, sphere)
 
 seed:=238948790
 randSeed(seed) 
-GrainCutShape=true
+ext_grainCutShape=true
 ext_make3Dgrains(8e-9, 2, 250, sphere, seed)
 
 for i:=2; i<254; i+=1 {

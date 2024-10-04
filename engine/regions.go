@@ -12,6 +12,7 @@ const NREGION = 256 // maximum number of regions, limited by size of byte.
 
 func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
+	DeclFunc("RedefRegion", RedefRegion, "Reassign all cells with a given region (first argument) to a new region (second argument)")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region (first argument) in one cell "+
 		"by the index of the cell (last three arguments)")
@@ -53,6 +54,33 @@ func DefRegion(id int, s Shape) {
 	regions.hist = append(regions.hist, f)
 }
 
+// Redefine a region with a given ID to a new ID
+func RedefRegion(startId, endId int) {
+	// Checks validity of input region IDs
+	defRegionId(startId)
+	defRegionId(endId)
+
+	hist_len := len(regions.hist) // Only consider hist before this Redef to avoid recursion
+	f := func(x, y, z float64) int {
+		value := -1
+		for i := hist_len - 1; i >= 0; i-- {
+			f_other := regions.hist[i]
+			region := f_other(x, y, z)
+			if region >= 0 {
+				value = region
+				break
+			}
+		}
+		if value == startId {
+			return endId
+		} else {
+			return value
+		}
+	}
+	regions.redefine(startId, endId)
+	regions.hist = append(regions.hist, f)
+}
+
 // renders (rasterizes) shape, filling it with region number #id, between x1 and x2
 // TODO: a tidbit expensive
 func (r *Regions) render(f func(x, y, z float64) int) {
@@ -72,6 +100,24 @@ func (r *Regions) render(f func(x, y, z float64) int) {
 		}
 	}
 	//log.Print("regions.upload")
+	r.gpuCache.Upload(l)
+}
+
+func (r *Regions) redefine(startId, endId int) {
+	// Loop through all cells, if their region ID matches startId, change it to endId
+	n := Mesh().Size()
+	l := r.HostList() // need to start from previous state
+	arr := reshapeBytes(l, r.Mesh().Size())
+
+	for iz := 0; iz < n[Z]; iz++ {
+		for iy := 0; iy < n[Y]; iy++ {
+			for ix := 0; ix < n[X]; ix++ {
+				if arr[iz][iy][ix] == byte(startId) {
+					arr[iz][iy][ix] = byte(endId)
+				}
+			}
+		}
+	}
 	r.gpuCache.Upload(l)
 }
 

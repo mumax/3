@@ -7,7 +7,7 @@ import (
 	"math/rand"
 )
 
-var GrainCutShape  = false // complete all voronoi grains whose centre lies within the shape. Warning, this also cuts away parts of the shape whose closest voronoi centre lies outside the shape
+var GrainCutShape = false // complete all voronoi grains whose centre lies within the shape. Warning, this also cuts away parts of the shape whose closest voronoi centre lies outside the shape
 
 func init() {
 	DeclFunc("ext_make3dgrains", Voronoi3d, "3D Voronoi tesselation over shape (grain size, starting region number, num regions, shape, seed)")
@@ -87,8 +87,6 @@ func (t *tesselation3d) makeRandomCenters() {
 		randRegion := t.startRegion + t.rnd.Intn(t.maxRegion)
 		t.centers[p].region = byte(randRegion)
 	}
-
-	return
 }
 
 // Creates a slice of all cells which fall in the shape specified in the constructor.
@@ -110,7 +108,7 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 				y := cell.Y()
 				z := cell.Z()
 
-				if (t.shape(x, y, z)|| GrainCutShape) {
+				if t.shape(x, y, z) || GrainCutShape {
 					cells = append(cells, cellLocs{x, y, z})
 				}
 			}
@@ -123,30 +121,29 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 	return cells
 }
 
-
 func (t *tesselation3d) RegionOf(x, y, z float64) int {
-    // Check if the point is within the shape or if we're cutting the shape along the grains 
-    if !(t.shape(x, y, z) || GrainCutShape) {
-        return -1 // Regions < 0 won't be rastered
-    }
+	// Check if the point is within the shape or if we're cutting the shape along the grains
+	if !(t.shape(x, y, z) || GrainCutShape) {
+		return -1 // Regions < 0 won't be rastered
+	}
 
-    // Find the nearest center point to the (x, y, z) position
-    nearest := center3d{x, y, z, 0}
-    mindist := math.Inf(1)
-    for _, c := range t.centers {
-        dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
-        if dist < mindist {
-            nearest = c
-            mindist = dist
-        }
-    }
+	// Find the nearest center point to the (x, y, z) position
+	nearest := center3d{x, y, z, 0}
+	mindist := math.Inf(1)
+	for _, c := range t.centers {
+		dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
+		if dist < mindist {
+			nearest = c
+			mindist = dist
+		}
+	}
 
-    // Check if the nearest point's region should be returned
-    if ((t.shape(x, y, z) && GrainCutShape==false)|| (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape)) {
-        return int(nearest.region)
-    }
+	// Check if the nearest point's region should be returned
+	if (t.shape(x, y, z) && !GrainCutShape) || (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape) {
+		return int(nearest.region)
+	}
 
-    return -1
+	return -1
 }
 
 // Generate normally distributed numbers; mean = lambda, variance = lambda. If generated number < 0, return 1.
@@ -159,5 +156,4 @@ func (t *tesselation3d) truncNorm(lambda float64) int {
 	} else {
 		return int(ret + 0.5)
 	}
-
 }

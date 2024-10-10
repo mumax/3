@@ -186,16 +186,17 @@ With these tools installed, you can build mumax³ yourself.
     Your binary is now at `$GOPATH/bin/mumax3`.
 
   * ... **on Windows:**
-    The `Makefile`s may experience issues with whitespaces. Instead, we recommend using the `deploy/deploy_windows.ps1` script: it is meant to generate the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build a single mumax³ executable for yourself by making the following adjustments:
-    1) At the top of the file: change the list of CUDA versions to only contain the CUDA version you have installed.<br>NOTE: if your CUDA version was not in that list, add it to the `switch ( $CUDA_VERSION )` blocks as well.
-    2) In the second `switch ( $CUDA_VERSION )` block, keep only the compute capability of your own GPU. Otherwise, otherwise compilation will take unnecessarily long to account for all other compute capabilities.
-    3) Near the middle of the file, change the path `$CCBIN` to your Visual Studio executable. Example: if `where.exe cl.exe` returns `foo\bar\cl.exe`, then set `$CCBIN = "foo\bar"`.
+    The `Makefile`s may experience issues with whitespaces. Instead, we recommend to use the `deploy/deploy_windows.ps1` script: this generates the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build a single mumax³ executable for yourself by making the following adjustments:
+    1) Change the `$VS2022` variable to point to your Visual Studio executable. If you wish to compile for CUDA versions below v11.6, also set `$VS2017`. Example: if `where.exe cl.exe` returns `foo\bar\cl.exe`, then set `$VS2022 = "foo\bar"`.
+    2) (Not strictly necessary, but check this anyway) Throughout the file there are several `switch ( $CUDA_VERSION )` blocks. If these do not address your installed CUDA version, add your version. Consult nearby comments when in doubt.
 
-    Now you can compile by opening Powershell in the `/deploy` directory and running
+    Now you can compile mumax³ by opening Powershell in the `/deploy` directory and running
 
     ```bat
-    ./deploy_windows.ps1
+    ./deploy_windows.ps1 -CUDA_VERSIONS <your_cuda_version> -CUDA_CC <your_compute_capability>
     ```
+
+    where e.g. `<your_cuda_version>` is `12.6` and `<your_compute_capability>` is `86`, if you have installed CUDA v12.6 and your GPU's compute capability is 8.6.
 
     Your executable will be created in the `deploy/build` directory.
 

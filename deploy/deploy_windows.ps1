@@ -1,8 +1,11 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
-# The cuda versions against which we will compile mumax3
-foreach ($CUDA_VERSION in "10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6") {
+param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
+    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6"), # The cuda versions against which we will compile mumax3
+    [Int[]]$CUDA_CC
+)
 
+foreach ($CUDA_VERSION in $CUDA_VERSIONS ) {
     # The final location of executables and libraries ready to be shipped to the user.
     $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION"
 
@@ -41,18 +44,20 @@ foreach ($CUDA_VERSION in "10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6
     }
 
     # We will compile the kernels for all supported architectures
-    # See https://stackoverflow.com/a/28933055 for CUDA version to CC table
-    # See https://docs.nvidia.com/deploy/cuda-compatibility/ for min. driver version for given CUDA version
-    switch ( $CUDA_VERSION ) {
-        "10.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=411.31
-        "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
-        "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
-        "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
-        "11.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86 } # Min. Windows driver: >=452.39 (Same CC for 11.1-11.7)
-        "11.8" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89 } # Min. Windows driver: >=452.39
-        "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
-        "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
-        default {exit}
+    # See supported CC for each CUDA version at https://stackoverflow.com/a/28933055
+    # See min. driver version for each CUDA version at https://docs.nvidia.com/deploy/cuda-compatibility/#minor-version-compatibility
+    if ( -not $CUDA_CC ) {
+        switch ( $CUDA_VERSION ) {
+            "10.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=411.31
+            "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
+            "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
+            "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
+            "11.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86 } # Min. Windows driver: >=452.39 (Same CC for 11.1-11.7)
+            "11.8" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89 } # Min. Windows driver: >=452.39
+            "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
+            "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
+            default {exit}
+        }
     }
 
     # The NVIDIA compiler which will be used to compile the cuda kernels

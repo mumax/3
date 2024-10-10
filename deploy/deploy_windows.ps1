@@ -25,6 +25,21 @@ foreach ($CUDA_VERSION in "10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6
         exit
     }
 
+    #! SUBSTITUTE YOUR OWN PATH TO cl.exe BELOW
+    # Not every CUDA version is compatible with any Visual C/C++ version: compiling for CUDA <11.6 requires VS <=2017.
+    # See VS/CUDA compatibility matrix at https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html (with old VS downloads available).
+    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
+    $VS2017 = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64" # Supported by CUDA v8.0-v12.*
+    switch ( [Version]::Parse($CUDA_VERSION) ) { # Convert to Version type for easy comparison
+        {$_ -lt [Version]::new(11.6)} { $CCBIN = $VS2017 }
+        {$_ -ge [Version]::new(11.6)} { $CCBIN = if ($VS2022) {$VS2022} else {$VS2017} } # Use VS2017 if 2022 not installed
+        default { Write-Output "Failed to parse CUDA version $CUDA_VERSION" }
+    }
+    if ( -not ( Test-Path $CCBIN ) ) {
+        Write-Output "CCBIN for nvcc not found at $CCBIN"
+        exit
+    }
+
     # We will compile the kernels for all supported architectures
     # See https://stackoverflow.com/a/28933055 for CUDA version to CC table
     # See https://docs.nvidia.com/deploy/cuda-compatibility/ for min. driver version for given CUDA version
@@ -42,12 +57,7 @@ foreach ($CUDA_VERSION in "10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6
 
     # The NVIDIA compiler which will be used to compile the cuda kernels
     $NVCC = "${CUDA_HOME}/bin/nvcc.exe"
-    $CCBIN = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64" #! SUBSTITUTE YOUR OWN PATH TO cl.exe HERE
-    if ( -not ( Test-Path $CCBIN ) ) {
-        Write-Output "CCBIN for nvcc not found at $CCBIN"
-        exit
-    }
-
+    
     # overwrite the CGO flags to make sure that mumax3 is compiled against the
     # specified cuda version.
     $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L `"$CUDA_HOME/lib/x64`""

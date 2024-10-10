@@ -14,9 +14,10 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     # CUDA toolbox (or similar for other CUDA versions).
     $CUDA_VERSION = [Version]::Parse($CUDA_VERSION_STR) # Convert to Version type for easy handling and comparison
     $CUDA_ENV_VAR_NAME = "CUDA_PATH_V$($CUDA_VERSION.Major)_$($CUDA_VERSION.Minor)"
-    $CUDA_HOME = [Environment]::GetEnvironmentVariable($CUDA_ENV_VAR_NAME, "Machine")
+    $CUDA_HOME = [Environment]::GetEnvironmentVariable($CUDA_ENV_VAR_NAME, "Machine") # "Machine" for system-wide environment variables
     if ( -not $CUDA_HOME -or (-not ( Test-Path $CUDA_HOME )) ) {
-        Write-Output "CUDA version $CUDA_VERSION_STR does not seem to be installed (env:$CUDA_ENV_VAR_NAME does not exist)."
+        Write-Output "CUDA version $CUDA_VERSION_STR does not seem to be installed"
+        Write-Output "(system-wide environment variable $CUDA_ENV_VAR_NAME does not exist or points to nonexistent directory)"
         exit
     }
 

@@ -153,6 +153,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <sub><sup>If you don't have a GitHub profile yet, make one [here](https://github.com/join).</sup></sub>
 
 * **Windows:** [Download](https://git-scm.com/downloads) and install.
+  <!-- If Git shows many changed .go files, but the files do not have any visible changes, this is likely due to a different line ending being used. Run `git config core.autocrlf input` in the `mumax/3` directory to avoid changing the line ending. -->
 * **Linux:** `sudo apt install git`
 * [Set up your username in Git](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git) and [setup an SSH key for your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 

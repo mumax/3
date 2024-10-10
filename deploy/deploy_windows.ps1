@@ -1,23 +1,25 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
-# The cuda version against which we will compile mumax3
-foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
+# The cuda versions against which we will compile mumax3
+foreach ($CUDA_VERSION in "10.0","10.1","10.2","11.0","11.1","11.8","12.0","12.6") {
 
     # The final location of executables and libraries ready to be shipped to the user.
     $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION"
 
-    # The nvidia toolkit installer for CUDA 10.2 should have set the environment 
-    # variable CUDA_PATH_V10_2 which points to the root directory of the 
+    # The nvidia toolkit installer for CUDA 12.6 should have set the environment 
+    # variable CUDA_PATH_V12_6 which points to the root directory of the 
     # CUDA toolbox (or similar for other CUDA versions).
-    # This script might not work if this path contains spaces!
     switch ( $CUDA_VERSION ) {
-        "9.2"  { $CUDA_HOME = $env:CUDA_PATH_V9_2  }
         "10.0" { $CUDA_HOME = $env:CUDA_PATH_V10_0 }
         "10.1" { $CUDA_HOME = $env:CUDA_PATH_V10_1 }
         "10.2" { $CUDA_HOME = $env:CUDA_PATH_V10_2 }
         "11.0" { $CUDA_HOME = $env:CUDA_PATH_V11_0 }
+        "11.1" { $CUDA_HOME = $env:CUDA_PATH_V11_1 }
+        "11.8" { $CUDA_HOME = $env:CUDA_PATH_V11_8 }
+        "12.0" { $CUDA_HOME = $env:CUDA_PATH_V12_0 }
+        "12.6" { $CUDA_HOME = $env:CUDA_PATH_V12_6 }
         default {}
-    } 
+    }
     if ( -not $CUDA_HOME -or (-not ( Test-Path $CUDA_HOME )) ) {
         Write-Output "CUDA version $CUDA_VERSION does not seem to be installed"
         exit
@@ -27,13 +29,16 @@ foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
     # See https://stackoverflow.com/a/28933055 for CUDA version to CC table
     # See https://docs.nvidia.com/deploy/cuda-compatibility/ for min. driver version for given CUDA version
     switch ( $CUDA_VERSION ) {
-        "9.2"  { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72 }
-        "10.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "10.1" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "10.2" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "11.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75,80 }
+        "10.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=411.31
+        "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
+        "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
+        "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
+        "11.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86 } # Min. Windows driver: >=452.39 (Same CC for 11.1-11.7)
+        "11.8" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89 } # Min. Windows driver: >=452.39
+        "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
+        "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
         default {exit}
-    } 
+    }
 
     # The NVIDIA compiler which will be used to compile the cuda kernels
     $NVCC = "${CUDA_HOME}/bin/nvcc.exe"

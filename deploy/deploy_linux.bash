@@ -1,5 +1,5 @@
 # The cuda versions against which we will compile mumax3
-for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2 11.0; do
+for CUDAVERSION in 10.0 10.1 10.2 11.0 11.1 11.8 12.0 12.6; do
 
     # downgrade host compiler for nvcc for old cuda versions
     if [ 1 -eq "$(echo "${CUDAVERSION} < 9.2" | bc)" ]; then
@@ -21,16 +21,14 @@ for CUDAVERSION in 7.0 7.5 8.0 9.0 9.1 9.2 10.0 10.1 10.2 11.0; do
     # All supported compute capabilities of this cuda version
     #   We export CUDA_CC so that cuda/Makefile knows what to include in the fat wrappers
     case $CUDAVERSION in
-        "7.0")  export CUDA_CC="20 30 32 35 37 50 52 53";;
-        "7.5")  export CUDA_CC="20 30 32 35 37 50 52 53";;
-        "8.0")  export CUDA_CC="20 30 32 35 37 50 52 53 60 61 62";;
-        "9.0")  export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70";;
-        "9.1")  export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72";;
-        "9.2")  export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72";;
-        "10.0") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
-        "10.1") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
-        "10.2") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75";;
-        "11.0") export CUDA_CC="   30 32 35 37 50 52 53 60 61 62 70 72 75 80";;
+        "10.0") export CUDA_CC="50 52 53 60 61 62 70 72 75";; # Min. Linux driver: >=410.48
+        "10.1") export CUDA_CC="50 52 53 60 61 62 70 72 75";; # Min. Linux driver: >=418.39
+        "10.2") export CUDA_CC="50 52 53 60 61 62 70 72 75";; # Min. Linux driver: >=440.33
+        "11.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80";; # Min. Linux driver: >=450.80.02
+        "11.1") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86";; # Min. Linux driver: >=450.80.02 (Same CC for 11.1-11.7)
+        "11.8") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89";; # Min. Linux driver: >=450.80.02
+        "12.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Min. Linux driver: >=525.60.13 (Same CC for all 12.x.)
+        "12.6") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Min. Linux driver: >=525.60.13 (Same CC for all 12.x.)
     esac
 
     # The path for shared libraries (relative to the build directory)

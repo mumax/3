@@ -9,7 +9,7 @@ var (
 	TotalShift, TotalYShift                    float64                        // accumulated window shift (X and Y) in meter
 	ShiftMagL, ShiftMagR, ShiftMagU, ShiftMagD data.Vector                    // when shifting m, put these value at the left/right edge.
 	ShiftM, ShiftGeom, ShiftRegions            bool        = true, true, true // should shift act on magnetization, geometry, regions?
-	FudgeShift				   bool	       = false		// Use the values of M at the border for the new cells
+	FudgeShift                                 bool        = false            // Use the values of M at the border for the new cells
 )
 
 func init() {
@@ -50,10 +50,10 @@ func shiftMag(m *data.Slice, dx int) {
 	for c := 0; c < m.NComp(); c++ {
 		comp := m.Comp(c)
 		if FudgeShift {
- 			cuda.ShiftFudgeX(m2, comp, dx);
- 		}	else 	{
- 			cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
- 		}
+			cuda.ShiftFudgeX(m2, comp, dx)
+		} else {
+			cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
+		}
 		data.Copy(comp, m2) // str0 ?
 	}
 }
@@ -79,10 +79,10 @@ func shiftMagY(m *data.Slice, dy int) {
 	for c := 0; c < m.NComp(); c++ {
 		comp := m.Comp(c)
 		if FudgeShift {
- 			cuda.ShiftFudgeY(m2, comp, dy);
- 		}	else 	{
- 			cuda.ShiftY(m2, comp, dy, float32(ShiftMagU[c]), float32(ShiftMagD[c]))
- 		}
+			cuda.ShiftFudgeY(m2, comp, dy)
+		} else {
+			cuda.ShiftY(m2, comp, dy, float32(ShiftMagU[c]), float32(ShiftMagD[c]))
+		}
 		data.Copy(comp, m2) // str0 ?
 	}
 }

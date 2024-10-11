@@ -28,7 +28,6 @@ func init() {
 	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 	DeclFunc("ImageShape", ImageShape, "Use black/white image as shape")
-	DeclFunc("VoxelShape", VoxelShape, "Use array of rectangular cells (with size defined by second argument) as a 3D object")
 	DeclFunc("GrainRoughness", GrainRoughness, "Grainy surface with different heights per grain "+
 		"with a typical grain size (first argument), minimal height (second argument), and maximal "+
 		"height (third argument). The last argument is a seed for the random number generator.")

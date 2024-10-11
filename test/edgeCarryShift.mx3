@@ -1,16 +1,16 @@
-SetGridSize(128, 64, 1);
-SetCellSize(4e-9, 4e-9, 4e-9);
-Msat = 1e6;
-Aex = 10e-12;
-alpha = 1;
-m = RandomMag();
-steps(300);
+SetGridSize(128, 64, 1)
+SetCellSize(4e-9, 4e-9, 4e-9)
+Msat = 1e6
+Aex = 10e-12
+alpha = 1
+m = RandomMag()
+steps(300)
 
-edgeCarryShift = true;
-shift(32);
-ExpectV("edgeCarryShift = true; The added cells during shift are the same as the old border?", m.getCell(0, 20, 0), m.getCell(32, 20, 0), 1e-6);
+edgeCarryShift = true
+shift(32)
+ExpectV("edgeCarryShift = true; The added cells during shift are the same as the old border?", m.getCell(0, 20, 0), m.getCell(32, 20, 0), 1e-6)
 
-edgeCarryShift = false;
-ShiftMagL = vector(0, 0, 1);
-shift(32);
-ExpectV("edgeCarryShift = false; The added cells during shift are ShiftMagL?", m.getCell(0, 20, 0), ShiftMagL, 1e-6);
+edgeCarryShift = false
+ShiftMagL = vector(0, 0, 1)
+shift(32)
+ExpectV("edgeCarryShift = false; The added cells during shift are ShiftMagL?", m.getCell(0, 20, 0), ShiftMagL, 1e-6)

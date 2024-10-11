@@ -6,7 +6,7 @@ import (
 )
 
 // shift dst by shx cells (positive or negative) along X-axis.
-// new edge value is clampL at left edge or clampR at right edge.
+// new edge value is clampL at left edge (-X) or clampR at right edge (+X).
 func ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
@@ -25,14 +25,18 @@ func ShiftEdgeCarryX(dst, src *data.Slice, shiftX int) {
 	k_shiftedgecarryX_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, cfg)
 }
 
-func ShiftY(dst, src *data.Slice, shiftY int, clampL, clampR float32) {
+// shift dst by shy cells (positive or negative) along Y-axis.
+// new edge value is clampD at bottom edge (-Y) or clampU at top edge (+Y)
+func ShiftY(dst, src *data.Slice, shiftY int, clampD, clampU float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
 	N := dst.Size()
 	cfg := make3DConf(N)
-	k_shifty_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, clampL, clampR, cfg)
+	k_shifty_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, clampD, clampU, cfg)
 }
 
+// shift dst by shy cells (positive or negative) along Y-axis.
+// new edge value is the current value at the border.
 func ShiftEdgeCarryY(dst, src *data.Slice, shiftY int) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
@@ -41,12 +45,14 @@ func ShiftEdgeCarryY(dst, src *data.Slice, shiftY int) {
 	k_shiftedgecarryY_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, cfg)
 }
 
-func ShiftZ(dst, src *data.Slice, shiftZ int, clampL, clampR float32) {
+// shift dst by shz cells (positive or negative) along Z-axis.
+// new edge value is clampB at back edge (-Z) or clampF at front edge (+Z).
+func ShiftZ(dst, src *data.Slice, shiftZ int, clampB, clampF float32) {
 	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
 	N := dst.Size()
 	cfg := make3DConf(N)
-	k_shiftz_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftZ, clampL, clampR, cfg)
+	k_shiftz_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftZ, clampB, clampF, cfg)
 }
 
 // Like Shift, but for bytes

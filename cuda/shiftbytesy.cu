@@ -2,6 +2,7 @@
 #include "stencil.h"
 
 // shift dst by shy cells (positive or negative) along Y-axis.
+// new edge value is clamp.
 extern "C" __global__ void
 shiftbytesy(uint8_t* __restrict__  dst, uint8_t* __restrict__  src,
             int Nx,  int Ny,  int Nz, int shy, uint8_t clamp) {

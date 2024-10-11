@@ -1,7 +1,7 @@
 #include "stencil.h"
 
 // shift dst by shx cells (positive or negative) along X-axis.
-// new edge value is clampL at left edge or clampR at right edge.
+// new edge value is clampL at left edge (-X) or clampR at right edge (+X).
 extern "C" __global__ void
 shiftx(float* __restrict__  dst, float* __restrict__  src,
        int Nx,  int Ny,  int Nz, int shx, float clampL, float clampR) {

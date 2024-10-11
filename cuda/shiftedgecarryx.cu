@@ -3,7 +3,7 @@
 // shift dst by shx cells (positive or negative) along X-axis.
 // new edge value is the current edge value.
 extern "C" __global__ void
-shiftfudgex(float* __restrict__  dst, float* __restrict__  src,
+shiftedgecarryX(float* __restrict__  dst, float* __restrict__  src,
     int Nx,  int Ny,  int Nz, int shx) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;

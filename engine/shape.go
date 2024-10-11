@@ -6,7 +6,7 @@ import (
 	_ "image/png"
 	"math"
 
-        "github.com/mumax/3/data"
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 )
@@ -200,20 +200,18 @@ func VoxelShape(voxels *data.Slice, a, b, c float64) Shape {
 
 	//cut FP array into bool array
 	arrSize := voxels.Size()
-	voxelArr:= make([]bool, arrSize[0]*arrSize[1]*arrSize[2])
+	voxelArr := make([]bool, arrSize[0]*arrSize[1]*arrSize[2])
 	for ix := 0; ix < arrSize[0]; ix++ {
 		for iy := 0; iy < arrSize[1]; iy++ {
 			for iz := 0; iz < arrSize[2]; iz++ {
-				voxelArr[
-					iz * arrSize[0] * arrSize[1] +
-					iy * arrSize[0] + ix ] = voxels.Get(0, ix, iy, iz) > 0.5;
+				voxelArr[iz*arrSize[0]*arrSize[1]+iy*arrSize[0]+ix] = voxels.Get(0, ix, iy, iz) > 0.5
 			}
 		}
 	}
 
 	//the predicate
 	voxelSize := [3]float64{a, b, c}
-	return func (x, y, z float64) bool {
+	return func(x, y, z float64) bool {
 		var ind [3]int
 		coord := [3]float64{x, y, z}
 		for c := 0; c < 3; c++ {
@@ -226,9 +224,7 @@ func VoxelShape(voxels *data.Slice, a, b, c float64) Shape {
 		}
 
 		//if not fallen through check against the previous array
-		return voxelArr[
-			ind[2] * arrSize[0] * arrSize[1] +
-			ind[1] * arrSize[0] + ind[0] ]
+		return voxelArr[ind[2]*arrSize[0]*arrSize[1]+ind[1]*arrSize[0]+ind[0]]
 	}
 }
 

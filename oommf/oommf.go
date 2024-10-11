@@ -4,12 +4,13 @@ package oommf
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 // Read any OOMMF file, autodetect OVF1/OVF2 format

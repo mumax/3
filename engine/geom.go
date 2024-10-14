@@ -12,7 +12,7 @@ import (
 
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
-	DeclFunc("InitGeomFromOVF", InitGeomFromOVF, "Initialize geometry, cell count and cell size given a pattern from OVF")
+	DeclFunc("ext_InitGeomFromOVF", InitGeomFromOVF, "Initialize geometry, cell count and cell size given a pattern from OVF")
 	DeclVar("EdgeSmooth", &edgeSmooth, "Geometry edge smoothing with edgeSmooth^3 samples per cell, 0=staircase, ~8=very smooth")
 	geometry.init()
 }
@@ -131,7 +131,7 @@ func InitGeomFromOVF(fname string) {
 		util.Fatal("Geometry initialization file should have point dimension of 1!")
 	}
 	if !isNonEmpty(geomSlice) {
-		util.Fatal("InitGeomFromOVF: provided geometry is completely empty!")
+		util.Fatal("ext_InitGeomFromOVF: provided geometry is completely empty!")
 	}
 
 	//set mesh from imported file, should refresh it by itself
@@ -154,7 +154,7 @@ func InitGeomFromOVF(fname string) {
 	pred := VoxelShape(geomSlice, step[0], step[1], step[2])
 	geometry.shape = func(x, y, z float64) bool {
 		if !isInterpd {
-			util.Log("Warning! Geometry imported through InitGeomFromOVF is about to be reinterpolated! Possible changes in geometry!")
+			util.Log("Warning! Geometry imported through ext_InitGeomFromOVF is about to be reinterpolated! Possible changes in geometry!")
 			isInterpd = true
 		}
 		return pred(x, y, z)

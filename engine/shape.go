@@ -216,7 +216,7 @@ func VoxelShape(voxels *data.Slice, a, b, c float64) Shape {
 		for c := 0; c < 3; c++ {
 			//truncation applies floor by default
 			ind[c] = int(coord[c]/voxelSize[c] + float64(arrSize[c])/2)
-			if ind[c] < 0 || ind[c] > arrSize[c] {
+			if ind[c] < 0 || ind[c] >= arrSize[c] {
 				//there is no geometry outside of the imported array
 				return false
 			}

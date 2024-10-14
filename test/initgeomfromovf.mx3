@@ -1,0 +1,40 @@
+/* 
+	Test if the extension to initialize geometry
+    from an OVF file works as expected.
+*/
+
+//// Load OVF geometry
+ext_InitGeomFromOVF("initgeomfromovf_teapot.ovf")
+
+// Check if correct fill factor
+expect("geom", geom.average(), 0.3413500, 1e-6)
+
+// Check some specific cells
+m.Set(Uniform(1, 0, 0))
+expectv("m", m.getcell(32,14,10), Vector(1, 0, 0), 0)
+expectv("m", m.getcell(10,16,13), Vector(1, 0, 0), 0)
+expectv("m", m.getcell(31,10,7), Vector(1, 0, 0), 0)
+expectv("m", m.getcell(10,2,6), Vector(1, 0, 0), 0)
+expectv("m", m.getcell(20,12,0), Vector(1, 0, 0), 0) // Bottom face of pot
+expectv("m", m.getcell(23,16,17), Vector(0, 0, 0), 0)
+expectv("m", m.getcell(36,8,0), Vector(0, 0, 0), 0)
+expectv("m", m.getcell(0,11,18), Vector(0, 0, 0), 0)
+expectv("m", m.getcell(2,15,7), Vector(0, 0, 0), 0)
+expectv("m", m.getcell(20,12,19), Vector(0, 0, 0), 0) // Above top of pot
+
+//// Can OVF-based geometry relax correctly?
+Msat = 800e3
+Aex = 13e-12
+relax() // Test if geometry works as intended
+save(m) // Can visualise with mumax-view
+save(geom)
+snapshot(geom) // test crash on snapshot of scalar
+
+//// Can OVF-based grid be changed?
+SetGridSize(80, 50, 40) // Original is 40x25x20
+save(m)
+snapshot(geom)
+
+//// Can the underlying shape be moved?
+Shift(20)
+snapshot(geom)

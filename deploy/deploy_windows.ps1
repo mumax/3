@@ -63,12 +63,12 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
 
     # Enter the cuda directory to (re)compile the cuda kernels
     Set-Location ../cuda
-        Remove-Item *.ptx
-        Remove-Item *_wrapper.go
         go build .\cuda2go.go
         $cudafiles = Get-ChildItem -filter "*.cu"
         foreach ($cudafile in $cudafiles) {
             $kernelname = $cudafile.basename
+            Remove-Item "${kernelname}_*.ptx"
+            Remove-Item "${kernelname}_wrapper.go"
             foreach ($cc in $CUDA_CC) {
                 & $NVCC -ccbin "`"${CCBIN}`"" -Xptxas -O3 -ptx `
                     -gencode="arch=compute_${cc},code=sm_${cc}" `

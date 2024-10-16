@@ -273,6 +273,10 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	return vol / float32(N*N*N)
 }
 
+func (g *geom) GetCell(ix, iy, iz int) float64 {
+	return float64(cuda.GetCell(g.Gpu(), 0, ix, iy, iz))
+}
+
 func (g *geom) shift(dx int) {
 	// empty mask, nothing to do
 	if g == nil || g.buffer.IsNil() {

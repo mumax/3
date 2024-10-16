@@ -15,14 +15,19 @@ func ShiftX(dst, src *data.Slice, shiftX int, clampL, clampR float32) {
 	k_shiftx_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg)
 }
 
-// shift dst by shx cells (positive or negative) along X-axis.
-// new edge value is the current value at the border.
-func ShiftEdgeCarryX(dst, src *data.Slice, shiftX int) {
-	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+// Shifts a component `src` of a vector field by `shiftX` cells along the X-axis.
+// Unlike the normal `shift()`, the new edge value is the current edge value.
+//
+// To avoid the situation where the magnetization could be set to (0,0,0) within the geometry, it is
+// also required to pass the two other vector components `othercomp` and `anothercomp` to this function.
+// In cells where the vector (`src`, `othercomp`, `anothercomp`) is the zero-vector,
+// `clampL` or `clampR` is used for the component `src` instead.
+func ShiftEdgeCarryX(dst, src, othercomp, anothercomp *data.Slice, shiftX int, clampL, clampR float32) {
+	util.Argument(dst.NComp() == 1 && src.NComp() == 1 && othercomp.NComp() == 1 && anothercomp.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
 	N := dst.Size()
 	cfg := make3DConf(N)
-	k_shiftedgecarryX_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftX, cfg)
+	k_shiftedgecarryX_async(dst.DevPtr(0), src.DevPtr(0), othercomp.DevPtr(0), anothercomp.DevPtr(0), N[X], N[Y], N[Z], shiftX, clampL, clampR, cfg)
 }
 
 // shift dst by shy cells (positive or negative) along Y-axis.
@@ -35,14 +40,19 @@ func ShiftY(dst, src *data.Slice, shiftY int, clampD, clampU float32) {
 	k_shifty_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, clampD, clampU, cfg)
 }
 
-// shift dst by shy cells (positive or negative) along Y-axis.
-// new edge value is the current value at the border.
-func ShiftEdgeCarryY(dst, src *data.Slice, shiftY int) {
-	util.Argument(dst.NComp() == 1 && src.NComp() == 1)
+// Shifts a component `src` of a vector field by `shiftY` cells along the Y-axis.
+// Unlike the normal `shift()`, the new edge value is the current edge value.
+//
+// To avoid the situation where the magnetization could be set to (0,0,0) within the geometry, it is
+// also required to pass the two other vector components `othercomp` and `anothercomp` to this function.
+// In cells where the vector (`src`, `othercomp`, `anothercomp`) is the zero-vector,
+// `clampD` or `clampU` is used for the component `src` instead.
+func ShiftEdgeCarryY(dst, src, othercomp, anothercomp *data.Slice, shiftY int, clampD, clampU float32) {
+	util.Argument(dst.NComp() == 1 && src.NComp() == 1 && othercomp.NComp() == 1 && anothercomp.NComp() == 1)
 	util.Assert(dst.Len() == src.Len())
 	N := dst.Size()
 	cfg := make3DConf(N)
-	k_shiftedgecarryY_async(dst.DevPtr(0), src.DevPtr(0), N[X], N[Y], N[Z], shiftY, cfg)
+	k_shiftedgecarryY_async(dst.DevPtr(0), src.DevPtr(0), othercomp.DevPtr(0), anothercomp.DevPtr(0), N[X], N[Y], N[Z], shiftY, clampD, clampU, cfg)
 }
 
 // shift dst by shz cells (positive or negative) along Z-axis.

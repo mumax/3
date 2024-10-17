@@ -68,7 +68,7 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
         foreach ($cudafile in $cudafiles) {
             $kernelname = $cudafile.basename
             Remove-Item "${kernelname}_*.ptx"
-            Remove-Item "${kernelname}_wrapper.go"
+            Remove-Item "${kernelname}_*wrapper.go"
             foreach ($cc in $CUDA_CC) {
                 & $NVCC -ccbin "`"${CCBIN}`"" -Xptxas -O3 -ptx `
                     -gencode="arch=compute_${cc},code=sm_${cc}" `

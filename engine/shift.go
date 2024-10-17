@@ -50,7 +50,7 @@ func shiftMag(m *data.Slice, dx int) {
 	for c := 0; c < m.NComp(); c++ {
 		comp := m.Comp(c)
 		if EdgeCarryShift {
-			cuda.ShiftEdgeCarryX(m2, comp, dx)
+			cuda.ShiftEdgeCarryX(m2, comp, m.Comp((c+1)%3), m.Comp((c+2)%3), dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
 		} else {
 			cuda.ShiftX(m2, comp, dx, float32(ShiftMagL[c]), float32(ShiftMagR[c]))
 		}
@@ -79,7 +79,7 @@ func shiftMagY(m *data.Slice, dy int) {
 	for c := 0; c < m.NComp(); c++ {
 		comp := m.Comp(c)
 		if EdgeCarryShift {
-			cuda.ShiftEdgeCarryY(m2, comp, dy)
+			cuda.ShiftEdgeCarryY(m2, comp, m.Comp((c+1)%3), m.Comp((c+2)%3), dy, float32(ShiftMagU[c]), float32(ShiftMagD[c]))
 		} else {
 			cuda.ShiftY(m2, comp, dy, float32(ShiftMagU[c]), float32(ShiftMagD[c]))
 		}

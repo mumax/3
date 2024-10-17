@@ -1,16 +1,30 @@
-SetGridSize(128, 64, 1)
+//// Create world
+SetGridSize(64, 128, 1)
 SetCellSize(4e-9, 4e-9, 4e-9)
 Msat = 1e6
 Aex = 10e-12
 alpha = 1
 m = RandomMag()
-steps(300)
+SetGeom(Yrange(-100e-9, 100e-9).RotZ(0.3))
+snapshot(m)
 
-edgeCarryShift = true
+//// Use EdgeCarryShift
+EdgeCarryShift = true
+ShiftMagL = Vector(-1, 0, 0) // Set ShiftMagL to avoid empty magnetization inside geom
+Expect("[geom sanity check]", geom.GetCell(0, 32, 0), 1, 0) // Edge cell inside geometry
+Expect("[geom sanity check]", geom.GetCell(0, 22, 0), 0, 0) // Edge cell outside geometry
 shift(32)
-ExpectV("edgeCarryShift = true; The added cells during shift are the same as the old border?", m.getCell(0, 20, 0), m.getCell(32, 20, 0), 1e-6)
+snapshot(m)
+Expect("[geom sanity check]", geom.GetCell(0, 22, 0), 1, 0) // Edge cell now inside geometry
+ExpectV("edgeCarryShift = true; The added cells are the same as the old border?", m.getCell(0, 32, 0), m.getCell(32, 32, 0), 1e-6) // geom sanity checks ensure 32 is inside geom. Similar for subsequent ExpectV's
+ExpectV("edgeCarryShift = true; The added cells use ShiftMagL where border was out of geometry before shift?", m.getCell(0, 22, 0), ShiftMagL, 1e-6)
 
-edgeCarryShift = false
-ShiftMagL = vector(0, 0, 1)
+//// Use normal Shift
+EdgeCarryShift = false
+ShiftMagL = vector(0, 0, 1) // Change ShiftMagL again to distinguish newly shifted cells
+Expect("[geom sanity check]", geom.GetCell(0, 12, 0), 0, 0) // Edge cell still outside geometry
 shift(32)
-ExpectV("edgeCarryShift = false; The added cells during shift are ShiftMagL?", m.getCell(0, 20, 0), ShiftMagL, 1e-6)
+snapshot(m)
+Expect("[geom sanity check]", geom.GetCell(0, 12, 0), 1, 0) // Edge cell now inside geometry
+ExpectV("edgeCarryShift = false; The added cells during shift are ShiftMagL?", m.getCell(0, 22, 0), ShiftMagL, 1e-6) // Cell that was inside geom before shift
+ExpectV("edgeCarryShift = false; The added cells during shift are ShiftMagL?", m.getCell(0, 12, 0), ShiftMagL, 1e-6) // Cell that was outside geom before shift

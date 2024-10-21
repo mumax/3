@@ -3,11 +3,12 @@ package mag
 import (
 	"bufio"
 	"fmt"
+	"math"
+	"os"
+
 	d "github.com/mumax/3/data"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"math"
-	"os"
 )
 
 func MFMKernel(mesh *d.Mesh, lift, tipsize float64, cacheDir string) (kernel [3]*d.Slice) {
@@ -105,10 +106,10 @@ func CalcMFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 	{
 		util.Assert(size[Z] >= 1 && size[Y] >= 2 && size[X] >= 2)
 		util.Assert(cellsize[X] > 0 && cellsize[Y] > 0 && cellsize[Z] > 0)
-		util.AssertMsg(size[X]%2 == 0 && size[Y]%2 == 0, "Even kernel size needed")
-		if size[Z] > 1 {
-			util.AssertMsg(size[Z]%2 == 0, "Even kernel size needed")
-		}
+		// util.AssertMsg(size[X]%2 == 0 && size[Y]%2 == 0, "Even kernel size needed")
+		// if size[Z] > 1 {
+		// util.AssertMsg(size[Z]%2 == 0, "Even kernel size needed")
+		// }
 	}
 
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.

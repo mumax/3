@@ -4,45 +4,71 @@ It also provides basic manipulations like data rescale etc.
 
 # Usage
 
-Command-line flags must always preceed the input files:
+Command-line flags must always precede the input files:
 
 	mumax3-convert [flags] files
 
-For a overview of flags, run:
+For an overview of flags, run:
 
 	mumax3-convert -help
+
+## Converting file formats
+
+In any mumax3-convert command, the output format must be specified. Multiple output formats can be provided at the same time.
+
+Use -show to print the output in the console (optional: format with -f).
+Saving to file supports file types -csv, -dump, -gif, -gplot, -jpg, -json, -numpy, -omf, -ovf, -ovf2, -png, -svg, -svgz and -vtk.
+Converting to OVF or OVF2 requires specifying "text" or "binary", VTK requires "ascii" or "binary".
 
 Example: convert all .ovf files to PNG:
 
 	mumax3-convert -png *.ovf
 
-For scalar data, the color scale is automatically stretched to cover the all values. The values corresponding to minimum and maximum color can be overridden by the -min and -max flags. Values falling outside of this range will be clipped. E.g.:
+Example: convert legacy .dump files to binary .ovf:
 
-	mumax3-convert -png -min=0 -max=1 file.ovf.
+	mumax3-convert -ovf2 binary *.dump
 
-The default scalar color map is black,gray,white (minimum value maps to black, maximum to white). This can be overridden by -color. E.g., a rather colorful map:
+Example: show file contents in the console to two decimal places, meanwhile convert to JPEG:
+
+	mumax3-convert -show -f "%.2f" -jpg file.ovf
+
+## Converting to image
+
+For scalar data, the color scale is automatically stretched to cover all values. The values corresponding to minimum and maximum color can be overridden by the -min and -max flags. Values falling outside of this range will be clipped. E.g. unit range:
+
+	mumax3-convert -png -min=0 -max=1 file.ovf
+
+The default scalar color map is black,gray,white (minimum value maps to black, maximum to white). This can be overridden by -color. Valid colors are white, gray, black, transparent, (light)red, (light)green, (light)blue, (dark)yellow, (dark)cyan and (dark)magenta. E.g., a rather colorful map:
 
 	mumax3-convert -png -color black,blue,cyan,green,yellow,red,white file.ovf
 
-Example: resize data to a 32 x 32 x 1 mesh, normalize vectors to unit length and convert the result to OOMMF binary output:
+For vector data, arrows can be shown in the image using -arrows. E.g. place arrows 16 pixels apart:
 
-	mumax3-convert -resize 32x32x1 -normalize -ovf binary file.ovf
+	mumax3-convert -png -arrows 16 file.ovf
 
-Example: convert all .ovf files to VTK binary saving only the X component. Also output to JPEG in the meanwhile:
+## Manipulating data
 
-	mumax3-convert -comp 0 -vtk binary -jpg *.ovf
+NOTE: when the output format is the same as the input file, you must specify an output directory using -o, which avoids overwriting the original file.
 
-Example: convert legacy .dump files to .ovf:
+Vector data can be normalized (-normalize) or rescaled such that the largest vector has unit length (-normpeak), e.g.:
 
-	mumax3-convert -ovf2 *.dump
+	mumax3-convert -normalize -ovf binary -o "normalized" file.ovf
 
-Example: cut out a piece of the data between min:max. max is exclusive bound. bounds can be omitted, default to 0 lower bound or maximum upper bound
+A single component of a vector field can be selected (-comp), e.g. save only the X component when converting all .ovf files to VTK binary:
 
-	mumax3-convert -xrange 50:100 -yrange :100 file.ovf
+	mumax3-convert -comp 0 -vtk binary *.ovf
+
+The grid can be resized (-resize), e.g. resize data to a 32 x 32 x 1 mesh and convert the result to OOMMF binary output:
+
+	mumax3-convert -resize 32x32x1 -ovf2 binary -o "resized" file.ovf
+
+A subset of the data can be cut out (-xrange, -yrange, -zrange) between min:max. NOTE: max is an exclusive bound, and bounds can be omitted (default: 0 lower bound, maximum upper bound). E.g.:
+
+	mumax3-convert -xrange 50:100 -yrange :100 -png file.ovf
 
 Example: select the bottom layer
 
-	mumax3-convert -zrange :1 file.ovf
+	mumax3-convert -zrange :1 -ovf2 binary -o "bottom" file.ovf
 
 Output file names are automatically assigned.
 */
@@ -339,6 +365,7 @@ func show(f *data.Slice, info data.Meta, out io.Writer) {
 }
 
 func preprocess(f *data.Slice) {
+	fmt.Println("hi")
 	if *flag_normalize {
 		normalize(f, 1)
 	}

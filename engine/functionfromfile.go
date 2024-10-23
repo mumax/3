@@ -13,7 +13,7 @@ import (
 func init() {
 	DeclFunc("FunctionFromDatafile", FunctionFromDatafile,
 		"Creates an interpolation function using data from two columns in a csv file. "+
-			"Arguments: filename, xColumnIdx, yColumnIdx, method (\"linear\" or \"nearest\").")
+			"Arguments: filename, xColumnIdx, yColumnIdx, method (\"linear\", \"nearest\" or \"step\").")
 }
 
 func isStrictlyIncreasing(x []float64) bool {

@@ -1,10 +1,11 @@
 package engine
 
 import (
+	"math"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"math"
 )
 
 type RK56 struct {
@@ -34,7 +35,6 @@ func (rk *RK56) Step() {
 	defer cuda.Recycle(k6)
 	defer cuda.Recycle(k7)
 	defer cuda.Recycle(k8)
-	//k2 will be recyled as k9
 
 	h := float32(Dt_si * GammaLL) // internal time step = Dt * gammaLL
 
@@ -88,7 +88,7 @@ func (rk *RK56) Step() {
 	//madd6(m, m0, k1, k3, k4, k5, k6, 1, (31./384.)*h, (1125./2816.)*h, (9./32.)*h, (125./768.)*h, (5./66.)*h)
 	cuda.Madd7(m, m0, k1, k3, k4, k5, k7, k8, 1, (7./1408.)*h, (1125./2816.)*h, (9./32.)*h, (125./768.)*h, (5./66.)*h, (5./66.)*h)
 	M.normalize()
-	torqueFn(k2) // re-use k2
+	// No need for torqueFn(k9) as k9 wouldn't be used (except in setMaxTorque, which is irrelevant)
 
 	// error estimate
 	Err := cuda.Buffer(3, size)
@@ -102,7 +102,7 @@ func (rk *RK56) Step() {
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
 		setLastErr(err)
-		setMaxTorque(k2)
+		setMaxTorque(k8)
 		NSteps++
 		Time = t0 + Dt_si
 		adaptDt(math.Pow(MaxErr/err, 1./6.))

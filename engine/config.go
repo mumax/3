@@ -221,11 +221,11 @@ func (c Config) RotX(θ float64) Config {
 	cos := math.Cos(θ)
 	sin := math.Sin(θ)
 	return func(x, y, z float64) data.Vector {
-		y_ := y*cos - z*sin
-		z_ := -1.*y*sin + z*cos
+		y_ := y*cos + z*sin
+		z_ := -y*sin + z*cos
 		m := c(x, y_, z_)
 		my_ := m[Y]*cos - m[Z]*sin
-		mz_ := -1*m[Y]*sin + m[Z]*cos
+		mz_ := m[Y]*sin + m[Z]*cos
 		return data.Vector{m[X], my_, mz_}
 	}
 }

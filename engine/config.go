@@ -234,6 +234,20 @@ func (c Config) RotX(θ float64) Config {
 	}
 }
 
+// Rotates the configuration around the X-axis, over θ radians.
+func (c Config) RotY(θ float64) Config {
+	cos := math.Cos(θ)
+	sin := math.Sin(θ)
+	return func(x, y, z float64) data.Vector {
+		z_ := z*cos + x*sin
+		x_ := -z*sin + x*cos
+		m := c(x_, y, z_)
+		mz_ := m[Z]*cos - m[X]*sin
+		mx_ := m[Z]*sin + m[X]*cos
+		return data.Vector{mx_, m[Y], mz_}
+	}
+}
+
 // Returns a new magnetization equal to c + weight * other.
 // E.g.:
 //

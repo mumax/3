@@ -10,6 +10,8 @@ import (
 
 var (
 	Alpha                            = NewScalarParam("alpha", "", "Landau-Lifshitz damping constant")
+	GFactor			 	 = NewScalarParam("GFactor","","Region-wise scaling factor for GammaLL (default: 1.00). If GammaLL is set to µB/hbar (8.7941e10), GFactor is the material's g-factor.")
+	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
 	Xi                               = NewScalarParam("xi", "", "Non-adiabaticity of spin-transfer-torque")
 	Pol                              = NewScalarParam("Pol", "", "Electrical current polarization")
 	Lambda                           = NewScalarParam("Lambda", "", "Slonczewski Λ parameter")
@@ -22,17 +24,26 @@ var (
 	STTorque                         = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
 	J                                = NewExcitation("J", "A/m2", "Electrical current density")
 	MaxTorque                        = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
-	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
 	Precess                          = true
 	DisableZhangLiTorque             = false
 	DisableSlonczewskiTorque         = false
 	fixedLayerPosition               = FIXEDLAYER_TOP // instructs mumax3 how free and fixed layers are stacked along +z direction
 )
 
+// Before, GammaLL was a user-settable parameter that was global (the same in all regions).
+// Now, we divide it in two:
+//     GammaLL is a user-settable global constant,
+//     GFactor is a regionwise parameter.
+// The torques will be calculated throughout mumax using GammaLL. Then, the torques will be multiplied regionwise by GFactor.
+// For the sake of backward compatibility,  gammaLL=1.7595e11 and GFactor=1.0. However, the user may want to set GammaLL=mu_B/hbar=0.879e11.
+// In this case, GFactor will be the material's g-factor (i.e., ~~2.0 for most transition metal ferromagnets).
+//Beware, gammaLL is defined in two places (!): here and in cuda/constants.h. Before, only this version was changed (leading to false results??)
+//GammaLL is also used to scale the timestep in the integration algorithms.
 func init() {
 	Pol.setUniform([]float64{1}) // default spin polarization
 	Lambda.Set(1)                // sensible default value (?).
-	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio in rad/Ts")
+	DeclVar("GammaLL", &GammaLL, "Gyromagnetic ratio [rad/Ts], that will be multiplied by GFactor (Default 1.7595e11)")
+	GFactor.Set(1.00)
 	DeclVar("DisableZhangLiTorque", &DisableZhangLiTorque, "Disables Zhang-Li torque (default=false)")
 	DeclVar("DisableSlonczewskiTorque", &DisableSlonczewskiTorque, "Disables Slonczewski torque (default=false)")
 	DeclVar("DoPrecess", &Precess, "Enables LL precession (default=true)")
@@ -45,6 +56,7 @@ func init() {
 func SetTorque(dst *data.Slice) {
 	SetLLTorque(dst)
 	AddSTTorque(dst)
+	ScaleGamma(dst)
 	FreezeSpins(dst)
 }
 
@@ -58,6 +70,13 @@ func SetLLTorque(dst *data.Slice) {
 	} else {
 		cuda.LLNoPrecess(dst, M.Buffer(), dst)
 	}
+}
+
+//scales the torque/g by 'GFactor' : a region-wise scalar parameter.
+func ScaleGamma(dst *data.Slice) {
+	gfact := GFactor.MSlice()
+	defer gfact.Recycle()
+	cuda.ScaleGamma(dst,gfact)
 }
 
 // Adds the current spin transfer torque to dst
@@ -85,7 +104,9 @@ func AddSTTorque(dst *data.Slice) {
 		defer xi.Recycle()
 		pol := Pol.MSlice()
 		defer pol.Recycle()
-		cuda.AddZhangLiTorque(dst, M.Buffer(), msat, j, alpha, xi, pol, Mesh())
+		g := GFactor.MSlice()
+		defer g.Recycle()
+		cuda.AddZhangLiTorque(dst, M.Buffer(), msat, j, alpha, xi, pol, g, float32(GammaLL), Mesh())
 	}
 	if !DisableSlonczewskiTorque && !FixedLayer.isZero() {
 		msat := Msat.MSlice()

@@ -234,7 +234,7 @@ func (c Config) RotX(θ float64) Config {
 	}
 }
 
-// Rotates the configuration around the X-axis, over θ radians.
+// Rotates the configuration around the Y-axis, over θ radians.
 func (c Config) RotY(θ float64) Config {
 	cos := math.Cos(θ)
 	sin := math.Sin(θ)

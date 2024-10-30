@@ -4,8 +4,8 @@
 #include "stencil.h"
 #include "amul.h"
 
-// The elements of the 3x3x3 DMI tensor is stored in an array with 27 elements
-// The following directives for the indices are used to avoid apparant magic numbers
+// The elements of the 3x3x3 DMI tensor are stored in an array with 27 elements
+// The following directives for the indices are used to avoid apparent magic numbers
 #define XXX 0
 #define XXY 1
 #define XXZ 2
@@ -63,12 +63,12 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
         // left neighbor
         float3 m1 = make_float3(0.0f, 0.0f, 0.0f);
         if (ix-1 >= 0 || PBCx) {                      // check if neighbor is in simulation box
-            int i_ = idx(lclampx(ix-1), iy, iz);          // index of neighbor
+            int i_ = idx(lclampx(ix-1), iy, iz);      // index of neighbor
             m1 = make_float3(mx[i_], my[i_], mz[i_]); // magnetization of neighbor
         }
         // right neighbor
         float3 m2 = make_float3(0.0f, 0.0f, 0.0f);
-        if (ix+1 <Nx || PBCx) {
+        if (ix+1 < Nx || PBCx) {
             int i_ = idx(hclampx(ix+1), iy, iz);
             m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -94,7 +94,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
         }
         // front neighbor
         float3 m2 = make_float3(0.0f, 0.0f, 0.0f);
-        if (iy+1 <Ny || PBCy) {
+        if (iy+1 < Ny || PBCy) {
             int i_ = idx(ix, hclampy(iy+1), iz);
             m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }
@@ -120,7 +120,7 @@ adddmitensor(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__
         }
         // top neighbor
         float3 m2 = make_float3(0.0f, 0.0f, 0.0f);
-        if (iz+1 <Nz || PBCz) {
+        if (iz+1 < Nz || PBCz) {
             int i_ = idx(ix, iy, hclampz(iz+1));
             m2 = make_float3(mx[i_], my[i_], mz[i_]);
         }

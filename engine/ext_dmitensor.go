@@ -1,16 +1,17 @@
 package engine
 
 import (
+	"unsafe"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
-	"unsafe"
 )
 
 var (
 	B_dmi     = NewVectorField("B_dmi", "T", "DMI field", AddDMIField)
-	E_dmi     = NewScalarValue("E_dmi", "J", "Total dmi energy", GetDMIEnergy)
-	Edens_dmi = NewScalarField("Edens_dmi", "J/m3", "Total dmi energy density", AddDMIEnergyDensity)
+	E_dmi     = NewScalarValue("E_dmi", "J", "Total DMI energy", GetDMIEnergy)
+	Edens_dmi = NewScalarField("Edens_dmi", "J/m3", "Total DMI energy density", AddDMIEnergyDensity)
 	DMItensor = new(dmitensor)
 )
 
@@ -18,7 +19,7 @@ var AddDMIEnergyDensity = makeEdensAdder(&B_dmi, -0.5)
 
 func init() {
 	registerEnergy(GetDMIEnergy, AddDMIEnergyDensity)
-	DeclFunc("ext_DMItensor", SetDMItensor, "Sets DMItensor element (i,j,k)")
+	DeclFunc("ext_DMItensor", SetDMItensor, "Sets DMI tensor element (i,j,k)")
 }
 
 type dmitensor struct {
@@ -37,7 +38,7 @@ func (d *dmitensor) Gpu() cuda.LUTPtr {
 // D_ijk m_j \partial_i m_k
 func (d *dmitensor) SetElement(i, j, k int, value float32) {
 	if i > 3 || i < 0 || j > 3 || j < 0 || k > 3 || k < 0 {
-		panic(UserErr("invalid DMI tenser index"))
+		panic(UserErr("invalid DMI tensor index"))
 	}
 
 	I := 9*i + 3*j + k
@@ -46,7 +47,7 @@ func (d *dmitensor) SetElement(i, j, k int, value float32) {
 }
 
 func (d *dmitensor) upload() {
-	// alloc if  needed
+	// alloc if needed
 	if d.gpu == nil {
 		d.gpu = cuda.LUTPtr(cuda.MemAlloc(int64(len(d.lut)) * cu.SIZEOF_FLOAT32))
 	}

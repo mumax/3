@@ -1,37 +1,49 @@
 /*
-        Test if DMI tensor can be used to define a interfacially induced DMI
+   Test if DMI tensor can be used to define an interfacially induced DMI
 */
 
-setgridsize(64,64,1)
-setcellsize(0.1,0.1,0.1)
-setpbc(1,1,0)
+setgridsize(64, 64, 1)
+setcellsize(0.1, 0.1, 0.1)
 
 enabledemag = false
-AnisU = vector(0,0,1)
+AnisU = vector(0, 0, 1)
 Aex = 1
 Msat = 1
 Ku1 = 1
 DMI := 1.1
 
-ext_DMItensor(0,0,2, DMI)
-ext_DMItensor(0,2,0,-DMI)
-ext_DMItensor(1,1,2, DMI)
-ext_DMItensor(1,2,1,-DMI)
-m = neelskyrmion(1,-1)
-relax()
-minimize()
-Etot_dmitensor := E_total.get()
+for BCtype := 0; BCtype < 3; BCtype++ {
+	if BCtype == 0 {
+		print("Open BC...")
+		openbc = true
+	} else if BCtype == 1 {
+		print("Neumann BC...")
+		openbc = false
+	} else if BCtype == 2 {
+		print("Periodic BC...")
+		SetPBC(1, 1, 0)
+	}
+	m = neelskyrmion(1, -1)
 
-ext_DMItensor(0,0,2,0.0)
-ext_DMItensor(0,2,0,0.0)
-ext_DMItensor(1,1,2,0.0)
-ext_DMItensor(1,2,1,0.0)
-Dind = DMI
-minimize()
-Etot_dind := E_total.get()
+	// Use DMI tensor...
+	ext_DMItensor(0, 0, 2, DMI)
+	ext_DMItensor(0, 2, 0, -DMI)
+	ext_DMItensor(1, 1, 2, DMI)
+	ext_DMItensor(1, 2, 1, -DMI)
+	Dind = 0
+	relax()
+	minimize()
+	Etot_dmitensor := E_total.get()
 
-print(Etot_dmitensor)
-print(Etot_dind)
+	// Use Dind...
+	ext_DMItensor(0, 0, 2, 0.0)
+	ext_DMItensor(0, 2, 0, 0.0)
+	ext_DMItensor(1, 1, 2, 0.0)
+	ext_DMItensor(1, 2, 1, 0.0)
+	Dind = DMI
+	minimize()
+	Etot_dind := E_total.get()
 
-expect("Etot",Etot_dmitensor,Etot_dind,1e-5*abs(Etot_dind))
-
+	// Are their results equal?
+	expect("Etot DMI tensor vs. Dind", Etot_dmitensor, Etot_dind, 1e-5*abs(Etot_dind))
+}

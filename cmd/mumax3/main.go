@@ -45,7 +45,6 @@ func main() {
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine
 	if *flag_test {
-		fmt.Println(cuda.GPUInfo)
 		os.Exit(0)
 	}
 

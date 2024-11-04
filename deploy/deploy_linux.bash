@@ -1,7 +1,8 @@
 # The cuda versions against which we will compile mumax3
 for CUDAVERSION in 10.0 10.1 10.2 11.0 11.1 11.8 12.0 12.6; do
 
-    # downgrade host compiler for nvcc for old cuda versions
+    #! NOTE: each CUDA version has a MAXIMUM GCC version: https://stackoverflow.com/a/46380601
+    #! EDIT IF-ELSE BELOW TO REFER TO YOUR INSTALLED GCC VERSION(S)!
     if [ 1 -eq "$(echo "${CUDAVERSION} < 9.2" | bc)" ]; then
         export NVCC_CCBIN=/usr/bin/gcc-4.8
     else

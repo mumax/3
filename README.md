@@ -140,6 +140,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 <details><summary><b><i>Install a C compiler</i></b></summary>
 
 * **Linux:** `sudo apt-get install gcc`
+  * ⚠️ each CUDA version has a maximum supported `gcc` version. [This StackOverflow answer](https://stackoverflow.com/a/46380601) lists the maximum supported `gcc` version for each CUDA version. If necessary, use `sudo apt-get install gcc-<min_version>` instead, with the appropriate `<min_version>`.
 * **Windows:**
   * CUDA does not support the `gcc` compiler on Windows, so download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. After installing, check if the path to `cl.exe` was added to your `PATH` environment variable. If not, add it manually, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`.
   * To compile Go, on the other hand, `gcc` is needed. Usually this is included in the Go installation, but if not it can be downloaded and installed from [w64devkit](https://github.com/skeeto/w64devkit/releases).
@@ -181,10 +182,13 @@ With these tools installed, you can build mumax³ yourself.
   * ... **on Linux:**
 
     ```bash
-    make realclean && make
+    make realclean
+    make
     ```
 
     Your binary is now at `$GOPATH/bin/mumax3`.
+
+    Note: each CUDA version has a maximum supported GCC version. If your default GCC compiler is too recent, you can use a different GCC compiler by instead running `make NVCC_CCBIN=<path_to_gcc>` where `<path_to_gcc>` is a less recent GCC. Check the version compatibility [here](https://stackoverflow.com/a/46380601).
 
   * ... **on Windows:**
     The `Makefile`s may experience issues with whitespaces. Instead, we recommend to use the `deploy/deploy_windows.ps1` script: this generates the Windows executables for the [mumax³ download page](https://mumax.github.io/download.html), but can also be used to build a single mumax³ executable for yourself by making the following adjustments:

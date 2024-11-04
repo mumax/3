@@ -15,7 +15,7 @@ all: cudakernels hooks
 	go install -v $(GO_BUILDFLAGS) github.com/mumax/3/...
 
 cudakernels:
-	cd cuda && $(MAKE)
+	cd cuda && $(MAKE) NVCC_CCBIN=$(NVCC_CCBIN)
 
 doc:
 	cd doc && $(MAKE)

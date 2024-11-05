@@ -43,7 +43,8 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 
 	warnStr := "// WARNING: %s-axis is not 7-smooth. It has %d cells, with prime\n" +
 		"//          factors %v, at least one of which is greater than 7.\n" +
-		"//          This may reduce performance or cause a CUDA_ERROR_INVALID_VALUE error." // Error is likely when the largest factor is >127
+		"//          Prime factors >7 may reduce performance significantly, and\n" +
+		"//          prime factors >127 may cause a CUDA_ERROR_INVALID_VALUE error."
 	if factorsx := primeFactors(Nx); slices.Max(factorsx) > 7 {
 		util.Log(fmt.Sprintf(warnStr, "x", Nx, factorsx))
 	}

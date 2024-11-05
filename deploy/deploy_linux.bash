@@ -48,6 +48,7 @@ for CUDAVERSION in 10.0 10.1 10.2 11.0 11.1 11.8 12.0 12.6; do
     cp $GOPATH/bin/mumax3 $BUILDDIR 
     cp $GOPATH/bin/mumax3-convert $BUILDDIR 
     cp $GOPATH/bin/mumax3-server $BUILDDIR 
+    cp $GOPATH/bin/mumax3-format $BUILDDIR 
     cp ../LICENSE $BUILDDIR
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcufft | awk '{print $3}' ) ${BUILDDIR}/${RPATH}
     cp $( ldd ${BUILDDIR}/mumax3 | grep libcurand | awk '{print $3}' ) ${BUILDDIR}/${RPATH}

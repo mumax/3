@@ -94,6 +94,7 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     Copy-Item ${env:GOPATH}/bin/mumax3.exe -Destination ${builddir}
     Copy-Item ${env:GOPATH}/bin/mumax3-convert.exe -Destination ${builddir}
     Copy-Item ${env:GOPATH}/bin/mumax3-server.exe -Destination ${builddir}
+    Copy-Item ${env:GOPATH}/bin/mumax3-format.exe -Destination ${builddir}
     Copy-Item ../LICENSE -Destination ${builddir}
     Copy-Item ${CUDA_HOME}/bin/cufft64*.dll -Destination ${builddir}
     Copy-Item ${CUDA_HOME}/bin/curand64*.dll -Destination ${builddir}

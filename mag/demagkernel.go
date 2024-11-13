@@ -21,7 +21,7 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	timer.Start("kernel_init")
 	defer timer.Stop("kernel_init")
 
-	sanityCheck(cellsize, pbc)
+	sanityCheck(cellsize)
 	// Cache disabled
 	if cacheDir == "" {
 		util.Log(`//Not using kernel cache (-cache="")`)
@@ -387,7 +387,8 @@ func wrap(number, max int) int {
 
 const maxAspect = 100.0 // maximum sane cell aspect ratio
 
-func sanityCheck(cellsize [3]float64, pbc [3]int) {
+// Checks if the cell aspect ratio is realistic.
+func sanityCheck(cellsize [3]float64) {
 	a3 := cellsize[X] / cellsize[Y]
 	a2 := cellsize[Y] / cellsize[Z]
 	a1 := cellsize[Z] / cellsize[X]

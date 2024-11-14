@@ -1,7 +1,7 @@
 #! /usr/bin/gnuplot
 
 # Width for decent spacing: 100 + 10*NUM_GPU_BENCHMARKS
-set term svg size 740, 500 font "DejaVu Sans,11"
+set term svg size 600, 470 font "DejaVu Sans,11"
 set output "gpus.svg"
 set boxwidth 0.5
 set style fill solid

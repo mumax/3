@@ -2,7 +2,7 @@
 #include "stencil.h"
 
 // shift dst by shx cells (positive or negative) along X-axis.
-// new edge value is clampL at left edge or clampR at right edge.
+// new edge value is clamp.
 extern "C" __global__ void
 shiftbytes(uint8_t* __restrict__  dst, uint8_t* __restrict__  src,
            int Nx,  int Ny,  int Nz, int shx, uint8_t clamp) {

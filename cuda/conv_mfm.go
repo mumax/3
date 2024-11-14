@@ -38,6 +38,8 @@ func (c *MFMConvolution) Free() {
 	}
 	c.fwPlan.Free()
 	c.bwPlan.Free()
+
+	cudaCtx.SetCurrent()
 }
 
 func (c *MFMConvolution) init() {

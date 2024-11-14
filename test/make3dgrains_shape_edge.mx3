@@ -1,0 +1,32 @@
+N:=32
+SetMesh(N, N, N, 1e-9,1e-9,1e-9, 0, 0, 0)
+
+//set material params
+alpha=1.
+Msat=350e3
+Aex=10e-12
+Ku1=1.0e6
+
+//define a spherical shape 
+diam:=16e-9
+sphere := Ellipsoid(diam,diam,diam)
+defregion(1, sphere)
+
+seed:=238948790
+randSeed(seed) 
+ext_grainCutShape=true
+ext_make3Dgrains(8e-9, 2, 250, sphere, seed)
+
+for i:=2; i<254; i+=1 {
+	anisU.setregion(i, vector(randNorm(),randNorm(),randNorm()))
+}
+
+
+//a cell in the sphere for which the nearest voronoi centre also lies in the sphere:  nonzero region nr expected
+expect("region", regions.getcell(15,15,15), 191, 0)
+
+//a cell in the sphere for which the nearest voronoi centre lies outside the sphere: region nr 1 expected as it is not affected by make3Dgrains
+expect("region", regions.getcell(9,15,15), 1, 0)
+
+//a cell outside of the sphere for which the nearest voronoi centre lies inside the sphere: nonzero region nr expected as it was completed by make3Dgrains
+expect("region", regions.getcell(16,4,15), 64, 0)

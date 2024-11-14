@@ -1,20 +1,19 @@
 /*
-	httpfs server, useful for debugging mumax3-server.
+httpfs server, useful for debugging mumax3-server.
 
+# Usage
 
-	Usage
+Start mumax3-httpfsd in a certain working directory.
 
-	Start mumax3-httpfsd in a certain working directory.
+	$ ls
+	file.mx3
 
-		$ ls
-		file.mx3
+	$ mumax3-server -l :35362
 
-		$ mumax3-server -l :35362
+Then you can remotely run mumax3 input files:
 
-	Then you can remotely run mumax3 input files:
-
-		$ cd elsewhere
-		$ mumax3 http://localhost:35362/file.mx3
+	$ cd elsewhere
+	$ mumax3 http://localhost:35362/file.mx3
 */
 package main
 

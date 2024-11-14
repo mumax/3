@@ -5,12 +5,9 @@
 *.8
 *.o
 *.a
-*.svg
 *.log
 *.dump
 *.table
-*.png
-*.jpg
 *.gplot
 *.pprof
 mx3
@@ -20,3 +17,5 @@ mumax3.*linux*cuda*
 tmp/
 *.out
 .idea/
+.vscode/
+doc/doc.exe

@@ -7,21 +7,25 @@ param: region-dependent parameter (always input)
 field: fully space-dependent field
 
 TODO: godoc everything
-
 */
 package engine
 
 import (
-	"github.com/mumax/3/timer"
+	"fmt"
 	"os"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/timer"
 )
 
-const VERSION = "mumax 3.10"
+const VERSION = "mumax 3.11"
 
-var UNAME = VERSION + " " + runtime.GOOS + "_" + runtime.GOARCH + " " + runtime.Version() + " (" + runtime.Compiler + ")"
+var UNAME = fmt.Sprintf("%s [%s_%s %s(%s) CUDA-%d.%d]",
+	VERSION, runtime.GOOS, runtime.GOARCH, runtime.Version(), runtime.Compiler,
+	cu.CUDA_VERSION/1000, (cu.CUDA_VERSION%1000)/10)
 
 var StartTime = time.Now()
 

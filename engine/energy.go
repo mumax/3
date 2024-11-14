@@ -48,7 +48,8 @@ func cellVolume() float64 {
 }
 
 // returns a function that adds to dst the energy density:
-// 	prefactor * dot (M_full, field)
+//
+//	prefactor * dot (M_full, field)
 func makeEdensAdder(field Quantity, prefactor float64) func(*data.Slice) {
 	return func(dst *data.Slice) {
 		B := ValueOf(field)

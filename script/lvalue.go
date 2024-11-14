@@ -30,8 +30,9 @@ type reflectLvalue struct {
 
 // general lvalue implementation using reflect.
 // lhs must be settable, e.g. address of something:
-// 	var x float64
-// 	newReflectLValue(&x)
+//
+//	var x float64
+//	newReflectLValue(&x)
 func newReflectLvalue(addr interface{}) LValue {
 	elem := reflect.ValueOf(addr).Elem()
 	if elem.Kind() == 0 {

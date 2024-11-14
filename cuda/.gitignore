@@ -1,3 +1,4 @@
 *.ptx
 cuda2go
+cuda2go.exe
 *.orig

@@ -20,9 +20,10 @@ var wd = "" // working directory, see SetWD
 // prefixed to all relative local paths passed to client functions (Mkdir, Touch, Remove, ...).
 // dir may start with "http://", turning local relative client paths into remote paths.
 // E.g.:
-// 	http://path -> http://path
-// 	path/file   -> wd/path/file
-//  /path/file  -> /path/file
+//
+//		http://path -> http://path
+//		path/file   -> wd/path/file
+//	 /path/file  -> /path/file
 func SetWD(dir string) {
 	if dir != "" && !strings.HasSuffix(dir, "/") {
 		dir = dir + "/"

@@ -2,11 +2,13 @@ package cufft
 
 import (
 	"fmt"
-	"github.com/mumax/3/cuda/cu"
+	"testing"
 	"unsafe"
+
+	"github.com/mumax/3/cuda/cu"
 )
 
-func ExampleFFT1D() {
+func TestExampleFFT1D(t *testing.T) {
 	N := 8
 
 	hostIn := make([]float32, N)
@@ -29,7 +31,10 @@ func ExampleFFT1D() {
 	fmt.Println("hostIn:", hostIn)
 	fmt.Println("hostOut:", hostOut)
 
-	// Output:
-	// hostIn: [1 0 0 0 0 0 0 0]
-	// hostOut: [(1+0i) (1+0i) (1+0i) (1-0i) (1+0i)]
+	for i := 0; i < N; i++ {
+		if hostOut[0] != 1+0i {
+			t.Errorf("hostOut[%d]: got %f, want %f", i, hostOut[0], 1+0i)
+		}
+	}
+
 }

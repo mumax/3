@@ -4,11 +4,13 @@ package engine
 // See also cuda/exchange.cu and cuda/dmi.cu
 
 import (
+	"math"
+	"unsafe"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"unsafe"
 )
 
 var (
@@ -20,8 +22,8 @@ var (
 	dbulk2 exchParam // inter-cell Dbulk
 
 	B_exch     = NewVectorField("B_exch", "T", "Exchange field", AddExchangeField)
-	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy", GetExchangeEnergy)
-	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density", AddExchangeEnergyDensity)
+	E_exch     = NewScalarValue("E_exch", "J", "Total exchange energy (including the DMI energy)", GetExchangeEnergy)
+	Edens_exch = NewScalarField("Edens_exch", "J/m3", "Total exchange energy density (including the DMI energy density)", AddExchangeEnergyDensity)
 
 	// Average exchange coupling with neighbors. Useful to debug inter-region exchange
 	ExchCoupling = NewScalarField("ExchCoupling", "arb.", "Average exchange coupling with neighbors", exchangeDecode)
@@ -60,7 +62,7 @@ func AddExchangeField(dst *data.Slice) {
 		cuda.AddDMIBulk(dst, M.Buffer(), lex2.Gpu(), dbulk2.Gpu(), ms, regions.Gpu(), M.Mesh(), OpenBC) // dmi+exchange
 		// TODO: add ScaleInterDbulk and InterDbulk
 	case inter && bulk:
-		util.Fatal("Cannot have induced and interfacial DMI at the same time")
+		util.Fatal("Cannot have interfacial-induced DMI and bulk DMI at the same time")
 	}
 }
 
@@ -157,7 +159,7 @@ func (p *exchParam) update() {
 			for j := i; j < NREGION; j++ {
 				exj := ex[0][j]
 				I := symmidx(i, j)
-				p.lut[I] = p.scale[I]*2/(1/exi+1/exj) + p.inter[I]
+				p.lut[I] = p.scale[I]*exchAverage(exi, exj) + p.inter[I]
 			}
 		}
 		p.gpu_ok = false
@@ -182,5 +184,20 @@ func symmidx(i, j int) int {
 		return i*(i+1)/2 + j
 	} else {
 		return j*(j+1)/2 + i
+	}
+}
+
+// Returns the intermediate value of two exchange/dmi strengths.
+// If both arguments have the same sign, the average mean is returned. If the arguments differ in sign
+// (which is possible in the case of DMI), the geometric mean of the geometric and arithmetic mean is
+// used. This average is continuous everywhere, monotonic increasing, and bounded by the argument values.
+func exchAverage(exi, exj float32) float32 {
+	if exi*exj >= 0.0 {
+		return 2 / (1/exi + 1/exj)
+	} else {
+		exi_, exj_ := float64(exi), float64(exj)
+		sign := math.Copysign(1, exi_+exj_)
+		magn := math.Sqrt(math.Sqrt(-exi_*exj_) * math.Abs(exi_+exj_) / 2)
+		return float32(sign * magn)
 	}
 }

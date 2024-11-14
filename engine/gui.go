@@ -445,7 +445,8 @@ func (g *guistate) prepareOnUpdate() {
 }
 
 // Returns documentation string for quantity name. E.g.:
-// 	"m" -> "Reduced magnetization"
+//
+//	"m" -> "Reduced magnetization"
 func (g *guistate) Doc(quant string) string {
 	doc, ok := World.Doc[quant]
 	if !ok {
@@ -455,7 +456,8 @@ func (g *guistate) Doc(quant string) string {
 }
 
 // Returns unit for quantity name. E.g.:
-// 	"Msat" -> "A/m"
+//
+//	"Msat" -> "A/m"
 func (g *guistate) UnitOf(quant string) string {
 	p := g.Params[quant]
 	if p != nil {

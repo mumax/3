@@ -89,7 +89,7 @@ var (
 func PrintProgress(prog, total int, msg string) {
 	pct := (prog * 100) / total
 	if pct != lastPct { // only print percentage if changed
-		if (time.Since(lastProgT) > time.Second) || pct == 100 { // only print percentage once/second unless finished
+		if (time.Since(lastProgT) > time.Second) || pct == 100 || prog == 0 { // only print percentage once/second unless finished
 			fmt.Println("//", msg, pct, "%")
 			lastPct = pct
 			lastProgT = time.Now()

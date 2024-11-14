@@ -1,0 +1,23 @@
+/*
+	Test angle output.
+*/
+
+// geometry
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+// material
+Msat = 800e3
+TOL := 1e-5
+m = uniform(1, 0, 0)
+expect("ext_phi", ext_phi.average(), 0, TOL)
+expect("ext_theta", ext_theta.average(), pi/2.0, TOL)
+m = uniform(0, 1, 0)
+expect("ext_phi", ext_phi.average(), pi/2.0, TOL)
+expect("ext_theta", ext_theta.average(), pi/2.0, TOL)
+m = uniform(1, 1, 0)
+expect("ext_phi", ext_phi.average(), pi/4.0, TOL)
+expect("ext_theta", ext_theta.average(), pi/2.0, TOL)
+m = uniform(1, 0, 1)
+expect("ext_phi", ext_phi.average(), 0, TOL)
+expect("ext_theta", ext_theta.average(), pi/4.0, TOL)

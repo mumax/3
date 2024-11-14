@@ -6,7 +6,7 @@ import "fmt"
 
 var (
 	output  = make(map[Quantity]*autosave) // when to save quantities
-	autonum = make(map[interface{}]int)    // auto number for out file
+	autonum = make(map[string]int)         // auto number for out file
 )
 
 func init() {
@@ -48,7 +48,8 @@ func autoSave(q Quantity, period float64, save func(Quantity)) {
 }
 
 // generate auto file name based on save count and FilenameFormat. E.g.:
-// 	m000001.ovf
+//
+//	m000001.ovf
 func autoFname(name string, format OutputFormat, num int) string {
 	return fmt.Sprintf(OD()+FilenameFormat+"."+StringFromOutputFormat[format], name, num)
 }

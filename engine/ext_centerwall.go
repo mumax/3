@@ -43,7 +43,8 @@ func centerWall(c int) {
 
 // This post-step function centers the simulation window on a domain wall
 // between up-down (or down-up) domains (like in perpendicular media). E.g.:
-// 	PostStep(CenterPMAWall)
+//
+//	PostStep(CenterPMAWall)
 func CenterWall(magComp int) {
 	PostStep(func() { centerWall(magComp) })
 }

@@ -1,10 +1,11 @@
 package engine
 
 import (
+	"reflect"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
-	"reflect"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 	Lambda                           = NewScalarParam("Lambda", "", "Slonczewski Λ parameter")
 	EpsilonPrime                     = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
 	FrozenSpins                      = NewScalarParam("frozenspins", "", "Defines spins that should be fixed") // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
+	FreeLayerThickness               = NewScalarParam("FreeLayerThickness", "m", "Slonczewski free layer thickness (if set to zero (default), then the thickness will be deduced from the mesh size)")
 	FixedLayer                       = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque                           = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                         = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
@@ -100,8 +102,11 @@ func AddSTTorque(dst *data.Slice) {
 		defer lambda.Recycle()
 		epsPrime := EpsilonPrime.MSlice()
 		defer epsPrime.Recycle()
+		thickness := FreeLayerThickness.MSlice()
+		defer thickness.Recycle()
 		cuda.AddSlonczewskiTorque2(dst, M.Buffer(),
 			msat, j, fixedP, alpha, pol, lambda, epsPrime,
+			thickness,
 			CurrentSignFromFixedLayerPosition[fixedLayerPosition],
 			Mesh())
 	}
@@ -135,6 +140,9 @@ var (
 
 type flposition struct{}
 
-func (*flposition) Eval() interface{}      { return fixedLayerPosition }
-func (*flposition) SetValue(v interface{}) { drainOutput(); fixedLayerPosition = v.(FixedLayerPosition) }
-func (*flposition) Type() reflect.Type     { return reflect.TypeOf(FixedLayerPosition(FIXEDLAYER_TOP)) }
+func (*flposition) Eval() interface{} { return fixedLayerPosition }
+func (*flposition) SetValue(v interface{}) {
+	drainOutput()
+	fixedLayerPosition = v.(FixedLayerPosition)
+}
+func (*flposition) Type() reflect.Type { return reflect.TypeOf(FixedLayerPosition(FIXEDLAYER_TOP)) }

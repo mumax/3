@@ -69,8 +69,13 @@ func (m *magnetization) String() string { return util.Sprint(m.Buffer().HostCopy
 
 // Set the value of one cell.
 func (m *magnetization) SetCell(ix, iy, iz int, v data.Vector) {
+	r := Index2Coord(ix, iy, iz)
+	if geometry.shape != nil && !geometry.shape(r[X], r[Y], r[Z]) {
+		return
+	}
+	vNorm := v.Len()
 	for c := 0; c < 3; c++ {
-		cuda.SetCell(m.Buffer(), c, ix, iy, iz, float32(v[c]))
+		cuda.SetCell(m.Buffer(), c, ix, iy, iz, float32(v[c]/vNorm))
 	}
 }
 

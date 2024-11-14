@@ -7,8 +7,9 @@ import (
 )
 
 // Compiles an expression, which can then be evaluated. E.g.:
-// 	expr, err := world.CompileExpr("1+1")
-// 	expr.Eval()   // returns 2
+//
+//	expr, err := world.CompileExpr("1+1")
+//	expr.Eval()   // returns 2
 func (w *World) CompileExpr(src string) (code Expr, e error) {
 	// parse
 	tree, err := parser.ParseExpr(src)
@@ -47,9 +48,10 @@ func (w *World) MustCompileExpr(src string) Expr {
 }
 
 // compiles source consisting of a number of statements. E.g.:
-// 	src = "a = 1; b = sin(x)"
-// 	code, err := world.Compile(src)
-// 	code.Eval()
+//
+//	src = "a = 1; b = sin(x)"
+//	code, err := world.Compile(src)
+//	code.Eval()
 func (w *World) Compile(src string) (code *BlockStmt, e error) {
 	// parse
 	exprSrc := "func(){\n" + src + "\n}" // wrap in func to turn into expression

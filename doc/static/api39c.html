@@ -1,0 +1,3751 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>mumax3</title>
+	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<p style="font-size: 16; color: red"><b>Warning! This is the API for mumax3.9c, which is no longer supported. If you like to use mumax3, we strongly recommend to use <a href="index.html">mumax3.11</a>.</b></p>
+
+<h1> mumax 3.9c API </h1>
+
+This is a complete overview of all available functions for writing an input script.
+
+<hr/><h1> Syntax </h1>
+
+<p>
+The mumax<sup>3</sup> input syntax is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
+
+<h3>Defining variables</h3>
+
+New variables are declared using <code>:=</code>. Variables have a fixed type, inferred from the declaration's right-hand-side. Assigning to existing variables is done using <code>=</code>. E.g.:
+
+<pre><code>i := 7         // defines a new variable i, type automatically detected to be int
+print(i)       // now we can use i
+i = 5          // assign new value, don't use ':=' (attempt to re-declare)
+
+str := "hello" // defines str, type automatically is string
+//str = 1      // would fail, cannot assign int to string
+</code></pre>
+
+<h3>Arithmetic</h3>
+Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
+
+<pre><code>x := pi*(3+4)/5
+x = pow(x, 3)
+x++
+y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
+</code></pre>
+
+<h3>Control structures</h3>
+Loops are possible as well:
+<pre><code>for i:=0; i<10; i++{
+	print(i)
+}
+</code></pre>
+
+<h3>Implicit functions</h3>
+
+Some of the API features accept a function as argument (e.g.: <code>RunWhile(func()bool)</code>, or all input parameters). In that case, and <i>only</i> in this case, the argument is implicitly converted to a function, which is re-evaluated each time it's needed. E.g.:
+
+<pre><code>value := sin(pi*t)  // value is a float64, RHS evaluated only once
+Msat = value        // time-independent Msat
+</code></pre>
+versus:
+<pre><code>Msat = sin(pi*t)    // RHS converted to function, re-evaluted every time
+</code></pre>
+
+
+<hr/><h1> Setting  the mesh size</h1>
+The simulation mesh defines the size of the box around your magnet. It should be set at the beginning of the script. The number of cells should preferably be powers of two, or at least have small prime factors (2,3,5,7). E.g.:
+<pre><code>Nx := 128
+Ny := 64
+Nz := 2
+sizeX := 500e-9
+sizeY := 250e-9
+sizeZ := 10e-9
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(sizeX/Nx, sizeY/Ny, sizeZ/Nz)
+</code></pre>
+
+<h2> Periodic boundary conditions </h2>
+Optionally, periodic boundary conditions can be enabled:
+<pre><code>SetPBC(5, 0, 0)        // 5 extra images on left and right sides.
+SetGridSize(128, 64, 1)
+SetCellSize(5e-9, 5e-9, 5e-9)
+</code></pre>
+Setting a nonzero PBC value in a direction enables wrap-around in that direction. The precise value passed determines how many repetitions are seen by the demag field. E.g., in the above example the demag field behaves as if 5 repetitions are present to the left and to the right side. Choosing a large number may cause long initialization time.
+
+<h2> Resizing the mesh </h2>
+
+The mesh can be changed at any later time in the simulation. This will cause the magnetization to be stretched onto the new mesh if needed, and the geometry and regions to be re-calculated. After resize some cells which had zero magnetization may now fall inside the magnet geometry, they will be initialized to random magnetization.
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetCellSize</b>(float64, float64, float64) </span> 
+	 <p style="margin-left:40px"> Sets the X,Y,Z cell size in meters </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetGridSize</b>(int, int, int) </span> 
+	 <p style="margin-left:40px"> Sets the number of cells for X,Y,Z </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetMesh</b>(int, int, int, float64, float64, float64, int, int, int) </span> 
+	 <p style="margin-left:40px"> Sets GridSize, CellSize and PBC in once </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetPBC</b>(int, int, int) </span> 
+	 <p style="margin-left:40px"> Sets number of repetitions in X,Y,Z </p> 
+
+	
+
+	
+
+	</p>
+ 
+
+
+
+<hr/><h1> Setting a geometry </h1>
+
+Optionally a magnet Shape other than the full simulation box can be specified. One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. All positions are specified in meters and the origin lies in the center of the simulation box. E.g.:
+<pre><code> SetGeom(cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetGeom</b>(Shape) </span> 
+	 <p style="margin-left:40px"> Sets the geometry to a given shape </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>EdgeSmooth</b> </span> 
+	 <p style="margin-left:40px"> Geometry edge smoothing with edgeSmooth^3 samples per cell, 0=staircase, ~8=very smooth </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Cell</b>(int, int, int) Shape </span> 
+	 <p style="margin-left:40px"> Single cell with given integer index (i, j, k) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Circle</b>(float64) Shape </span> 
+	 <p style="margin-left:40px"> 2D Circle with diameter in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Cuboid</b>(float64, float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> Cuboid with sides in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Cylinder</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> 3D Cylinder with diameter and height in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Ellipse</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> 2D Ellipse with axes in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Ellipsoid</b>(float64, float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> 3D Ellipsoid with axes in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>GrainRoughness</b>(float64, float64, float64, int) Shape </span> 
+	 <p style="margin-left:40px"> Grainy surface with different heights per grain </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ImageShape</b>(string) Shape </span> 
+	 <p style="margin-left:40px"> Use black/white image as shape </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Layer</b>(int) Shape </span> 
+	 <p style="margin-left:40px"> Single layer (along z), by integer index starting from 0 </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Layers</b>(int, int) Shape </span> 
+	 <p style="margin-left:40px"> Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Rect</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> 2D rectangle with size in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Square</b>(float64) Shape </span> 
+	 <p style="margin-left:40px"> 2D square with size in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Universe</b>() Shape </span> 
+	 <p style="margin-left:40px"> Entire space </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>XRange</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> Part of space between x1 and x2, in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>YRange</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> Part of space between y1 and y2, in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ZRange</b>(float64, float64) Shape </span> 
+	 <p style="margin-left:40px"> Part of space between z1 and z2, in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Shape ) &nbsp; Intersect( Shape ) &nbsp; Inverse( ) &nbsp; Repeat( float64 float64 float64 ) &nbsp; RotX( float64 ) &nbsp; RotY( float64 ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Sub( Shape ) &nbsp; Transl( float64 float64 float64 ) &nbsp; Xor( Shape ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Defining material regions </h1>
+Optionally, up to 256 material regions can be defined. Since each cell is made from one material, it is associated with exactly one region. So <em>regions can not overlap</em>. Each cell is assigned material region 0 by default. It's a good idea to output <code>regions</code> to verify whether each cell is assigned to the intended region. Each region can have its own material parameters, and we can output averages over each region. E.g.:
+<pre><code>DefRegion(1, circle(1e-6))
+DefRegion(0, circle(1e-6).Inverse()) // redundant
+save(regions)
+Msat.SetRegion(1, 800e6)
+tableAdd(m.Region(1))    // add average m over region 1 to table
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>DefRegion</b>(int, Shape) </span> 
+	 <p style="margin-left:40px"> Define a material region with given index (0-255) and shape </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DefRegionCell</b>(int, int, int, int) </span> 
+	 <p style="margin-left:40px"> Set a material region in one cell by index </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>regions</b> </span> 
+	 <p style="margin-left:40px"> Outputs the region index for each cell </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetCell( int int int ) &nbsp; Gpu( ) &nbsp; HostArray( ) &nbsp; HostList( ) &nbsp; LoadFile( string ) &nbsp; SetCell( int int int int ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Initial magnetization </h1>
+
+The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
+<pre><code>m = uniform(1, 0, 0)
+m.SetRegion(1, vortex(1, 1))
+m.LoadFile("config.ovf")
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>m</b> </span> 
+	 <p style="margin-left:40px"> Reduced magnetization (unit length) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Buffer( ) &nbsp; Comp( int ) &nbsp; GetCell( int int int ) &nbsp; LoadFile( string ) &nbsp; Region( int ) &nbsp; Set( Config ) &nbsp; SetArray( Slice ) &nbsp; SetCell( int int int data.Vector ) &nbsp; SetInShape( Shape Config ) &nbsp; SetRegion( int Config ) &nbsp; TableData( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Antivortex</b>(int, int) Config </span> 
+	 <p style="margin-left:40px"> Antivortex magnetization with given circulation and core polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>BlochSkyrmion</b>(int, int) Config </span> 
+	 <p style="margin-left:40px"> Bloch skyrmion magnetization with given chirality and core polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NeelSkyrmion</b>(int, int) Config </span> 
+	 <p style="margin-left:40px"> Néél skyrmion magnetization with given charge and core polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>RandomMag</b>() Config </span> 
+	 <p style="margin-left:40px"> Random magnetization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>RandomMagSeed</b>(int) Config </span> 
+	 <p style="margin-left:40px"> Random magnetization with given seed </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TwoDomain</b>(float64, float64, float64, float64, float64, float64, float64, float64, float64) Config </span> 
+	 <p style="margin-left:40px"> Twodomain magnetization with with given magnetization in left domain, wall, and right domain </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Uniform</b>(float64, float64, float64) Config </span> 
+	 <p style="margin-left:40px"> Uniform magnetization in given direction </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Vortex</b>(int, int) Config </span> 
+	 <p style="margin-left:40px"> Vortex magnetization with given circulation and core polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>VortexWall</b>(float64, float64, int, int) Config </span> 
+	 <p style="margin-left:40px"> Vortex wall magnetization with given mx in left and right domain and core circulation and polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( float64 Config ) &nbsp; RotZ( float64 ) &nbsp; Scale( float64 float64 float64 ) &nbsp; Transl( float64 float64 float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Material parameters </h1>
+
+Assigning to a material parameter sets a value in all regions. E.g.:
+<pre><code>Msat  = 800e3
+AnisU = vector(1, 0, 0)
+</code></pre>
+
+When regions are defined, they can also be set region-wise:
+<pre><code>Msat.SetRegion(0, 800e3)
+Msat.SetRegion(1, 540e3)
+</code></pre>
+
+Material parameters can be functions of time as well. E.g.:
+<pre><code>f := 500e6
+Ku1 = 500 * sin(2*pi*f*t)
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Aex</b> </span> 
+	 <p style="margin-left:40px"> Exchange stiffness (J/m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>alpha</b> </span> 
+	 <p style="margin-left:40px"> Landau-Lifshitz damping constant </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>anisC1</b> </span> 
+	 <p style="margin-left:40px"> Cubic anisotropy direction #1 </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>anisC2</b> </span> 
+	 <p style="margin-left:40px"> Cubic anisotorpy directon #2 </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>anisU</b> </span> 
+	 <p style="margin-left:40px"> Uniaxial anisotropy direction </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Dbulk</b> </span> 
+	 <p style="margin-left:40px"> Bulk Dzyaloshinskii-Moriya strength (J/m2) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Dind</b> </span> 
+	 <p style="margin-left:40px"> Interfacial Dzyaloshinskii-Moriya strength (J/m2) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>EpsilonPrime</b> </span> 
+	 <p style="margin-left:40px"> Slonczewski secondairy STT term ε' </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>FixedLayer</b> </span> 
+	 <p style="margin-left:40px"> Slonczewski fixed layer polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>frozenspins</b> </span> 
+	 <p style="margin-left:40px"> Defines spins that should be fixed </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Kc1</b> </span> 
+	 <p style="margin-left:40px"> 1st order cubic anisotropy constant (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Kc2</b> </span> 
+	 <p style="margin-left:40px"> 2nd order cubic anisotropy constant (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Kc3</b> </span> 
+	 <p style="margin-left:40px"> 3rd order cubic anisotropy constant (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Ku1</b> </span> 
+	 <p style="margin-left:40px"> 1st order uniaxial anisotropy constant (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Ku2</b> </span> 
+	 <p style="margin-left:40px"> 2nd order uniaxial anisotropy constant (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Lambda</b> </span> 
+	 <p style="margin-left:40px"> Slonczewski Λ parameter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Msat</b> </span> 
+	 <p style="margin-left:40px"> Saturation magnetization (A/m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NoDemagSpins</b> </span> 
+	 <p style="margin-left:40px"> Disable magnetostatic interaction per-spin (set to 1 to disable) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Pol</b> </span> 
+	 <p style="margin-left:40px"> Electrical current polarization </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Temp</b> </span> 
+	 <p style="margin-left:40px"> Temperature (K) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>xi</b> </span> 
+	 <p style="margin-left:40px"> Non-adiabaticity of spin-transfer-torque </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; GetRegion( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; Set( float64 ) &nbsp; SetRegion( int ScalarFunction ) &nbsp; SetRegionFuncGo( int func() float64 ) &nbsp; SetRegionValueGo( int float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Excitation </h1>
+
+Field or current excitations can be set in the same way as material parameters:
+<pre><code>B_ext = vector(0.01, 1e-6*sin(2*pi*f*t), 0)
+B_ext.SetRegion(1, vector(0, 0, 0.1))
+</code></pre>
+Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(x,y,z) * f(t) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
+<pre><code>B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*f*t))
+JPol.Add(LoadFile("current.ovf"), 1)
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_ext</b> </span> 
+	 <p style="margin-left:40px"> Externally applied field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Slice ScalarFunction ) &nbsp; AddGo( Slice func() float64 ) &nbsp; AddTo( Slice ) &nbsp; Average( ) &nbsp; Comp( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; RemoveExtraTerms( ) &nbsp; Set( data.Vector ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>J</b> </span> 
+	 <p style="margin-left:40px"> Electrical current density (A/m2) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( Slice ScalarFunction ) &nbsp; AddGo( Slice func() float64 ) &nbsp; AddTo( Slice ) &nbsp; Average( ) &nbsp; Comp( int ) &nbsp; IsUniform( ) &nbsp; Region( int ) &nbsp; RemoveExtraTerms( ) &nbsp; Set( data.Vector ) &nbsp; SetRegion( int VectorFunction ) &nbsp; SetRegionFn( int func() [3]float64 ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Index2Coord</b>(int, int, int) data.Vector </span> 
+	 <p style="margin-left:40px"> Convert cell index to x,y,z coordinate in meter </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( data.Vector ) &nbsp; Cross( data.Vector ) &nbsp; Div( float64 ) &nbsp; Dot( data.Vector ) &nbsp; Len( ) &nbsp; MAdd( float64 data.Vector ) &nbsp; Mul( float64 ) &nbsp; Sub( data.Vector ) &nbsp; X( ) &nbsp; Y( ) &nbsp; Z( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>LoadFile</b>(string) Slice </span> 
+	 <p style="margin-left:40px"> Load a data file (ovf or dump) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 CPUAccess( ) &nbsp; Comp( int ) &nbsp; DevPtr( int ) &nbsp; Disable( ) &nbsp; Free( ) &nbsp; GPUAccess( ) &nbsp; Get( int int int int ) &nbsp; Host( ) &nbsp; HostCopy( ) &nbsp; Index( int int int ) &nbsp; IsNil( ) &nbsp; Len( ) &nbsp; MemType( ) &nbsp; Scalars( ) &nbsp; Set( int int int int float64 ) &nbsp; SetScalar( int int int float64 ) &nbsp; SetVector( int int int data.Vector ) &nbsp; Size( ) &nbsp; Tensors( ) &nbsp; Vectors( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NewSlice</b>(int, int, int, int) Slice </span> 
+	 <p style="margin-left:40px"> Makes a 4D array of scalars with given ncomp,x,y,z size </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 CPUAccess( ) &nbsp; Comp( int ) &nbsp; DevPtr( int ) &nbsp; Disable( ) &nbsp; Free( ) &nbsp; GPUAccess( ) &nbsp; Get( int int int int ) &nbsp; Host( ) &nbsp; HostCopy( ) &nbsp; Index( int int int ) &nbsp; IsNil( ) &nbsp; Len( ) &nbsp; MemType( ) &nbsp; Scalars( ) &nbsp; Set( int int int int float64 ) &nbsp; SetScalar( int int int float64 ) &nbsp; SetVector( int int int data.Vector ) &nbsp; Size( ) &nbsp; Tensors( ) &nbsp; Vectors( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Magnetic Force Microscopy </h1>
+
+<p>Mumax3 has built-in generation of MFM images from a 2D magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
+
+<p><img width=400px src="mfm.svg" /></p>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>MFM</b> </span> 
+	 <p style="margin-left:40px"> MFM image </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MFMDipole</b> </span> 
+	 <p style="margin-left:40px"> Height of vertically magnetized part of MFM tip </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MFMLift</b> </span> 
+	 <p style="margin-left:40px"> MFM lift height </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Output quantities </h1>
+
+The quantities listed below can be output. Also, derived quantities can be produced: the quantity restricted to a certain region or a single component. E.g.:
+
+<code><pre>m           // magnetization quantity
+m.Comp(0)   // x-component
+m.Region(1) // magnetization in region 1 (0 elsewhere)
+</pre></code>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_anis</b> </span> 
+	 <p style="margin-left:40px"> Anisotropy field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_demag</b> </span> 
+	 <p style="margin-left:40px"> Magnetostatic field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_eff</b> </span> 
+	 <p style="margin-left:40px"> Effective field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_exch</b> </span> 
+	 <p style="margin-left:40px"> Exchange field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>B_therm</b> </span> 
+	 <p style="margin-left:40px"> Thermal field (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>dt</b> </span> 
+	 <p style="margin-left:40px"> Time Step (s) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_anis</b> </span> 
+	 <p style="margin-left:40px"> Anisotropy energy (uni+cubic) (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_demag</b> </span> 
+	 <p style="margin-left:40px"> Magnetostatic energy (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_exch</b> </span> 
+	 <p style="margin-left:40px"> Exchange energy (normal+DM) (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_therm</b> </span> 
+	 <p style="margin-left:40px"> Thermal energy (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_total</b> </span> 
+	 <p style="margin-left:40px"> Total energy (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>E_Zeeman</b> </span> 
+	 <p style="margin-left:40px"> Zeeman energy (J) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_anis</b> </span> 
+	 <p style="margin-left:40px"> Anisotropy energy density (uni+cubic) (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_demag</b> </span> 
+	 <p style="margin-left:40px"> Magnetostatic energy density (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_exch</b> </span> 
+	 <p style="margin-left:40px"> Exchange energy density (normal+DM) (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_therm</b> </span> 
+	 <p style="margin-left:40px"> Thermal energy density (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_total</b> </span> 
+	 <p style="margin-left:40px"> Total energy density (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Edens_Zeeman</b> </span> 
+	 <p style="margin-left:40px"> Zeeman energy density (J/m3) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ExchCoupling</b> </span> 
+	 <p style="margin-left:40px"> Average exchange coupling with neighbors (arb.) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>geom</b> </span> 
+	 <p style="margin-left:40px"> Cell fill fraction (0..1) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Gpu( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>LastErr</b> </span> 
+	 <p style="margin-left:40px"> Error of last step </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>LLtorque</b> </span> 
+	 <p style="margin-left:40px"> Landau-Lifshitz torque/γ0 (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>m_full</b> </span> 
+	 <p style="margin-left:40px"> Unnormalized magnetization (A/m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MaxAngle</b> </span> 
+	 <p style="margin-left:40px"> Maximum angle between neighboring spins (rad) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>maxTorque</b> </span> 
+	 <p style="margin-left:40px"> Maximum torque/γ0, over all cells (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NEval</b> </span> 
+	 <p style="margin-left:40px"> Total number of torque evaluations </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>PeakErr</b> </span> 
+	 <p style="margin-left:40px"> Overall maxium error per step </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>spinAngle</b> </span> 
+	 <p style="margin-left:40px"> Angle between neighboring spins (rad) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>STtorque</b> </span> 
+	 <p style="margin-left:40px"> Spin-transfer torque/γ0 (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 AddTo( Slice ) &nbsp; Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>torque</b> </span> 
+	 <p style="margin-left:40px"> Total torque/γ0 (T) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Comp( int ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+ 
+
+
+<hr/><h1>Slicing and dicing output</h1>
+
+To save storage space, it's possible to save only the part of the output we're interested in. This works on all output quantities (not only m)
+
+<code><pre>
+save(m)                         // save full magnetization
+save(m.Comp(0))                 // save only x-component
+save(CropLayer(m, 13))          // save only layer 13
+save(CropLayer(m.Comp(0), 13))  // save only x-component of layer 13
+</pre></code>
+
+Or even:
+<code><pre>
+mx   := m.Comp(0)
+mx13 := CropLayer(mx, 13) 
+save(mx13)
+tableAdd(mx13)
+</pre></code>
+
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Crop</b>(Quantity, int, int, int, int, int, int) *cropped </span> 
+	 <p style="margin-left:40px"> Crops a quantity to cell ranges [x1,x2[, [y1,y2[, [z1,z2[ </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>CropLayer</b>(Quantity, int) *cropped </span> 
+	 <p style="margin-left:40px"> Crops a quantity to a single layer </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>CropX</b>(Quantity, int, int) *cropped </span> 
+	 <p style="margin-left:40px"> Crops a quantity to cell ranges [x1,x2[ </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>CropY</b>(Quantity, int, int) *cropped </span> 
+	 <p style="margin-left:40px"> Crops a quantity to cell ranges [y1,y2[ </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>CropZ</b>(Quantity, int, int) *cropped </span> 
+	 <p style="margin-left:40px"> Crops a quantity to cell ranges [z1,z2[ </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+ 
+
+
+<hr/><h1> Scheduling output </h1>
+
+All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More columns can be added with <code>TableAdd()</code>. 
+<pre><code>save(B_ext)
+
+tableadd(B_ext)
+tablesave()
+</code></pre>
+Optionally, the output/averaging can be done over a single region:
+<pre><code>save(m.Region(1))
+TableAdd(m.Region(1)) 
+</code></pre>
+
+User-defined variables can be added to the table with <code>TableAddVar()</code>.
+<pre><code>myField := 0.42
+TableAddVar(myField, "B_extra", "T")
+myField = ...
+</code></pre>
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>AutoSave</b>(Quantity, float64) </span> 
+	 <p style="margin-left:40px"> Auto save space-dependent quantity every period (s). </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>AutoSnapshot</b>(Quantity, float64) </span> 
+	 <p style="margin-left:40px"> Auto save image of quantity every period (s). </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>FilenameFormat</b> </span> 
+	 <p style="margin-left:40px"> printf formatting string for output filenames. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Fprintln</b>(string, ...interface {}) </span> 
+	 <p style="margin-left:40px"> Print to file </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>OutputFormat</b> </span> 
+	 <p style="margin-left:40px"> Format for data files: OVF1_TEXT, OVF1_BINARY, OVF2_TEXT or OVF2_BINARY </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>OVF1_BINARY</b> </span> 
+	 <p style="margin-left:40px"> OutputFormat = OVF1_BINARY sets binary OVF1 output </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>OVF1_TEXT</b> </span> 
+	 <p style="margin-left:40px"> OutputFormat = OVF1_TEXT sets text OVF1 output </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>OVF2_BINARY</b> </span> 
+	 <p style="margin-left:40px"> OutputFormat = OVF2_BINARY sets binary OVF2 output </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>OVF2_TEXT</b> </span> 
+	 <p style="margin-left:40px"> OutputFormat = OVF2_TEXT sets text OVF2 output </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Print</b>(...interface {}) </span> 
+	 <p style="margin-left:40px"> Print to standard output </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Save</b>(Quantity) </span> 
+	 <p style="margin-left:40px"> Save space-dependent quantity once, with auto filename </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>SaveAs</b>(Quantity, string) </span> 
+	 <p style="margin-left:40px"> Save space-dependent with custom filename </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Snapshot</b>(Quantity) </span> 
+	 <p style="margin-left:40px"> Save image of quantity </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>SnapshotFormat</b> </span> 
+	 <p style="margin-left:40px"> Image format for snapshots: jpg, png or gif. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sprint</b>(...interface {}) string </span> 
+	 <p style="margin-left:40px"> Print all arguments to string with automatic formatting </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sprintf</b>(string, ...interface {}) string </span> 
+	 <p style="margin-left:40px"> Print to string with C-style formatting. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TableAdd</b>(TableData) </span> 
+	 <p style="margin-left:40px"> Add quantity as a column to the data table. </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TableAddVar</b>(ScalarFunction, string, string) </span> 
+	 <p style="margin-left:40px"> Add user-defined variable + name + unit to data table. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TableAutoSave</b>(float64) </span> 
+	 <p style="margin-left:40px"> Auto-save the data table every period (s). Zero disables save. </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TablePrint</b>(...interface {}) </span> 
+	 <p style="margin-left:40px"> Print anyting in the data table </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TableSave</b>() </span> 
+	 <p style="margin-left:40px"> Save the data table right now (appends one line). </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+
+<hr/><h1> Running </h1>
+
+<code>Run(time)</code> runs the simulation for a given time in seconds, using sensible error settings. 
+<pre><code>Run(1e-9)
+</code></pre>
+More fine-grained control is provided by <code>RunWhile(<i>condition</i>)</code>, which runs as long as an arbitrary condition is met. E.g.: 
+<pre><code>mx := m.comp(0)
+RunWhile(mx.average() &lt; 0)   // search for switching field during reversal
+</code></pre>
+Optionally, the solver accuracy may be fine-tuned. E.g.:
+<pre><code>MaxDt = 1e-12
+MinDt = 1e-15
+MaxErr = 1e-6
+</code></pre>
+
+Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
+<ul>
+	<li> <code>5</code>: RK45 (Dormand-Prince) solver (the default). An accurate solver, very fast for magnetization dynamics at the cost of some memory usage. </li> 
+	<li> <code>4</code>: Classical 4th-order Runge-Kutta method. Intended for simulations where a fixed, relatively large time step is desired.</li> 
+	<li> <code>3</code>: RK23 (Bogacki-Shampine) solver. A robust and reasonably fast solver with low memory requirements. Typically outperforms RK45 when relaxing the magnetization with little dynamics, so it used internally by <code>Relax()</code>. </li> 
+	<li> <code>2</code>: Adaptive Heun solver. Robust and uses very little memory but takes smaller time steps than the higher-order solvers. Also suited when a fixed, relatively small time step is desired. </li> 
+	<li> <code>1</code>: Euler solver (requires <code>FixDt = ...</code>, ignores other settings). Only useful in exceptional situations or for debugging. </li>
+</ul>
+E.g.:
+<pre><code>SetSolver(2) // Heun
+FixDt = 1e-15
+</code></pre>
+
+<h2>Relax</h2>
+
+<p><code>Relax()</code> tries to evolve the magnetization as closely as possible to the minimum energy state. This function assumes all excitations have been turned off (temperature, electrical current, time-dependent magnetic fields). During relax precession is disabled and the time <code>t</code> does not increase. There is no need to set high damping.</p> 
+
+<p>In general it is difficult to be sure the minimum energy state has been truly reached. Hence, relax may occasionally return after the energy has reached a local minimum, a saddle point, or a rather flat valley in the energy landscape.</p>
+
+<h2>Minimize</h2>
+<p><code>Minimize()</code> is like Relax, but uses the conjugate gradient method to find the energy minimum. It is usually much faster than Relax, but is a bit less robust against divergence. E.g., a random starting configuration can be Relaxed, but may fail with Minimize. Minimize is very well suited for hysteresis calculations, where we are never far away from the ground state.</p> 
+
+
+
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Minimize</b>() </span> 
+	 <p style="margin-left:40px"> Use steepest conjugate gradient method to minimize the total energy </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Relax</b>() </span> 
+	 <p style="margin-left:40px"> Try to minimize the total energy </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Run</b>(float64) </span> 
+	 <p style="margin-left:40px"> Run the simulation for a time in seconds </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>RunWhile</b>(func() bool) </span> 
+	 <p style="margin-left:40px"> Run while condition function is true </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Steps</b>(int) </span> 
+	 <p style="margin-left:40px"> Run the simulation for a number of time steps </p> 
+
+	
+
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>FixDt</b> </span> 
+	 <p style="margin-left:40px"> Set a fixed time step, 0 disables fixed step </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Headroom</b> </span> 
+	 <p style="margin-left:40px"> Solver headroom </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MaxDt</b> </span> 
+	 <p style="margin-left:40px"> Maximum time step the solver can take (s) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MaxErr</b> </span> 
+	 <p style="margin-left:40px"> Maximum error per step the solver can tolerate </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MinDt</b> </span> 
+	 <p style="margin-left:40px"> Minimum time step the solver can take (s) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MinimizerSamples</b> </span> 
+	 <p style="margin-left:40px"> Number of max dM to collect for Minimize convergence check. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>MinimizerStop</b> </span> 
+	 <p style="margin-left:40px"> Stopping max dM for Minimize </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>step</b> </span> 
+	 <p style="margin-left:40px"> Total number of time steps taken </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>t</b> </span> 
+	 <p style="margin-left:40px"> Total simulated time (s) </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example8">[8]</a> 
+		 
+			<a href="examples.html#example9">[9]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>SetSolver</b>(int) </span> 
+	 <p style="margin-left:40px"> Set solver type. 1:Euler, 2:Heun </p> 
+
+	
+
+	
+
+	</p>
+ 
+
+<hr/><h1> Moving simulation window </h1>
+
+Mumax<sup>3</sup> can automatically shift the magnetization so that the simulation "window" stays centered on a region of interest. Shifting is done to keep a freely chosen magnetization component nearly zero. E.g.
+
+<pre><code>ext_centerwall(0)
+ext_rmSurfaceCharge(0, -1, 1)
+TableAdd(TotalShift)
+</code></pre>
+
+will try to keep <code>mx</code> (component 0, counting from 0) close to zero. If desired, one can override which "new" magnetization is inserted from the sides by setting <code>ShiftMagL</code> and <code>ShiftMagR</code>, though the default behaviour is usually OK.
+
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>Shift</b>(int) </span> 
+	 <p style="margin-left:40px"> Shifts the simulation by +1/-1 cells along X </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ShiftGeom</b> </span> 
+	 <p style="margin-left:40px"> Whether Shift() acts on geometry </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ShiftM</b> </span> 
+	 <p style="margin-left:40px"> Whether Shift() acts on magnetization </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ShiftMagL</b> </span> 
+	 <p style="margin-left:40px"> Upon shift, insert this magnetization from the left </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( data.Vector ) &nbsp; Cross( data.Vector ) &nbsp; Div( float64 ) &nbsp; Dot( data.Vector ) &nbsp; Len( ) &nbsp; MAdd( float64 data.Vector ) &nbsp; Mul( float64 ) &nbsp; Sub( data.Vector ) &nbsp; X( ) &nbsp; Y( ) &nbsp; Z( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ShiftMagR</b> </span> 
+	 <p style="margin-left:40px"> Upon shift, insert this magnetization from the right </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( data.Vector ) &nbsp; Cross( data.Vector ) &nbsp; Div( float64 ) &nbsp; Dot( data.Vector ) &nbsp; Len( ) &nbsp; MAdd( float64 data.Vector ) &nbsp; Mul( float64 ) &nbsp; Sub( data.Vector ) &nbsp; X( ) &nbsp; Y( ) &nbsp; Z( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ShiftRegions</b> </span> 
+	 <p style="margin-left:40px"> Whether Shift() acts on regions </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>TotalShift</b> </span> 
+	 <p style="margin-left:40px"> Amount by which the simulation has been shifted (m). </p> 
+
+	
+
+	
+
+	</p>
+ 
+
+
+
+<hr/><h1> Extensions </h1>
+
+Extensions are extra functionalities that are not officially supported. They are aimed at rather specific problems and may not work as expected for your particular situation. Their API and functionality may change in future releases.
+
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_bubbledist</b> </span> 
+	 <p style="margin-left:40px"> Bubble traveled distance (m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_bubblepos</b> </span> 
+	 <p style="margin-left:40px"> Bubble core position (m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_bubblespeed</b> </span> 
+	 <p style="margin-left:40px"> Bubble velocity (m/s) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_centerWall</b>(int) </span> 
+	 <p style="margin-left:40px"> centerWall(c) shifts m after each step to keep m_c close to zero </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_corepos</b> </span> 
+	 <p style="margin-left:40px"> Vortex core position (x,y) + polarization (z) (m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_dwpos</b> </span> 
+	 <p style="margin-left:40px"> Position of the simulation window while following a domain wall (m) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_dwspeed</b> </span> 
+	 <p style="margin-left:40px"> Speed of the simulation window while following a domain wall (m/s) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_dwtilt</b> </span> 
+	 <p style="margin-left:40px"> PMA domain wall tilt (rad) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_EnableUnsafe</b>() </span> 
+	 <p style="margin-left:40px"> Allow potentially unsafe features, at your own risk. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_makegrains</b>(float64, int, int) </span> 
+	 <p style="margin-left:40px"> Voronoi tesselation (grain size, num regions) </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_rmSurfaceCharge</b>(int, float64, float64) </span> 
+	 <p style="margin-left:40px"> Compensate magnetic charges on the left and right sides of an in-plane magnetized wire. Arguments: region, mx on left and right side, resp. </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_ScaleExchange</b>(int, int, float64) </span> 
+	 <p style="margin-left:40px"> Re-scales exchange coupling between two regions. </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_topologicalcharge</b> </span> 
+	 <p style="margin-left:40px"> 2D topological charge </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Get( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ext_topologicalchargedensity</b> </span> 
+	 <p style="margin-left:40px"> 2D topological charge density m·(m/∂x ❌ ∂m/∂y) (1/m2) </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; Region( int ) &nbsp; Set( Slice ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+ 
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>EnableDemag</b> </span> 
+	 <p style="margin-left:40px"> Enables/disables demag (default=true) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Expect</b>(string, float64, float64, float64) </span> 
+	 <p style="margin-left:40px"> Used for automated tests: checks if a value is close enough to the expected value </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ExpectV</b>(string, data.Vector, data.Vector, float64) </span> 
+	 <p style="margin-left:40px"> Used for automated tests: checks if a vector is close enough to the expected value </p> 
+
+	
+
+	
+
+	</p>
+ 
+
+<hr/><h1> Misc </h1>
+Other available functions.
+ 
+	<p><span style="color:#000088; font-size:1.3em"> <b>abs</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>acos</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>acosh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>asin</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>asinh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>atan</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>atan2</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>atanh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>cbrt</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ceil</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>cos</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>cosh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DemagAccuracy</b> </span> 
+	 <p style="margin-left:40px"> Controls accuracy of demag kernel </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DisableSlonczewskiTorque</b> </span> 
+	 <p style="margin-left:40px"> Disables Slonczewski torque (default=false) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DisableZhangLiTorque</b> </span> 
+	 <p style="margin-left:40px"> Disables Zhang-Li torque (default=false) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DoPrecess</b> </span> 
+	 <p style="margin-left:40px"> Enables LL precession (default=true) </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DotProduct</b>(Quantity, Quantity) *dotProduct </span> 
+	 <p style="margin-left:40px"> Dot product of two vector quantities </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Average( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>DUMP</b> </span> 
+	 <p style="margin-left:40px"> OutputFormat = DUMP sets text DUMP output </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>erf</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>erfc</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Exit</b>() </span> 
+	 <p style="margin-left:40px"> Exit from the program </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>exp</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>exp2</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>expm1</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>false</b> </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>floor</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Flush</b>() </span> 
+	 <p style="margin-left:40px"> Flush all pending output to disk. </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>gamma</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>GammaLL</b> </span> 
+	 <p style="margin-left:40px"> Gyromagnetic ratio in rad/Ts </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>heaviside</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>hypot</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ilogb</b>(float64) int </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>inf</b> </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>isInf</b>(float64, int) bool </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>isNaN</b>(float64) bool </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>j0</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>j1</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>jn</b>(int, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ldexp</b>(float64, int) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>log</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>log10</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>log1p</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>log2</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>logb</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>max</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>min</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>mod</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Mu0</b> </span> 
+	 <p style="margin-left:40px"> Permittivity of vaccum (Tm/A) </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NewScalarMask</b>(int, int, int) Slice </span> 
+	 <p style="margin-left:40px"> Makes a 3D array of scalars </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 CPUAccess( ) &nbsp; Comp( int ) &nbsp; DevPtr( int ) &nbsp; Disable( ) &nbsp; Free( ) &nbsp; GPUAccess( ) &nbsp; Get( int int int int ) &nbsp; Host( ) &nbsp; HostCopy( ) &nbsp; Index( int int int ) &nbsp; IsNil( ) &nbsp; Len( ) &nbsp; MemType( ) &nbsp; Scalars( ) &nbsp; Set( int int int int float64 ) &nbsp; SetScalar( int int int float64 ) &nbsp; SetVector( int int int data.Vector ) &nbsp; Size( ) &nbsp; Tensors( ) &nbsp; Vectors( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>NewVectorMask</b>(int, int, int) Slice </span> 
+	 <p style="margin-left:40px"> Makes a 3D array of vectors </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 CPUAccess( ) &nbsp; Comp( int ) &nbsp; DevPtr( int ) &nbsp; Disable( ) &nbsp; Free( ) &nbsp; GPUAccess( ) &nbsp; Get( int int int int ) &nbsp; Host( ) &nbsp; HostCopy( ) &nbsp; Index( int int int ) &nbsp; IsNil( ) &nbsp; Len( ) &nbsp; MemType( ) &nbsp; Scalars( ) &nbsp; Set( int int int int float64 ) &nbsp; SetScalar( int int int float64 ) &nbsp; SetVector( int int int data.Vector ) &nbsp; Size( ) &nbsp; Tensors( ) &nbsp; Vectors( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>norm</b>(float64) float64 </span> 
+	 <p style="margin-left:40px"> Standard normal distribution </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>now</b>() time.Time </span> 
+	 <p style="margin-left:40px"> Returns the current time </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( time.Duration ) &nbsp; AddDate( int int int ) &nbsp; After( time.Time ) &nbsp; Before( time.Time ) &nbsp; Clock( ) &nbsp; Date( ) &nbsp; Day( ) &nbsp; Equal( time.Time ) &nbsp; Format( string ) &nbsp; GobEncode( ) &nbsp; Hour( ) &nbsp; ISOWeek( ) &nbsp; In( *time.Location ) &nbsp; IsZero( ) &nbsp; Local( ) &nbsp; Location( ) &nbsp; MarshalBinary( ) &nbsp; MarshalJSON( ) &nbsp; MarshalText( ) &nbsp; Minute( ) &nbsp; Month( ) &nbsp; Nanosecond( ) &nbsp; Round( time.Duration ) &nbsp; Second( ) &nbsp; Sub( time.Time ) &nbsp; Truncate( time.Duration ) &nbsp; UTC( ) &nbsp; Unix( ) &nbsp; UnixNano( ) &nbsp; Weekday( ) &nbsp; Year( ) &nbsp; YearDay( ) &nbsp; Zone( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>pi</b> </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example4">[4]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>pow</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>pow10</b>(int) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>rand</b>() float64 </span> 
+	 <p style="margin-left:40px"> Random number between 0 and 1 </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>randExp</b>() float64 </span> 
+	 <p style="margin-left:40px"> Exponentially distributed random number between 0 and +inf, mean=1 </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>randInt</b>(int) int </span> 
+	 <p style="margin-left:40px"> Random non-negative integer </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>randNorm</b>() float64 </span> 
+	 <p style="margin-left:40px"> Standard normal random number </p> 
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>randSeed</b>(int) </span> 
+	 <p style="margin-left:40px"> Sets the random number seed </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>remainder</b>(float64, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Sign</b>(float64) float64 </span> 
+	 <p style="margin-left:40px"> Signum function </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sin</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example6">[6]</a> 
+		 
+			<a href="examples.html#example13">[13]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sinc</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>since</b>(time.Time) time.Duration </span> 
+	 <p style="margin-left:40px"> Returns the time elapsed since argument </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Hours( ) &nbsp; Minutes( ) &nbsp; Nanoseconds( ) &nbsp; Seconds( ) &nbsp; 
+		</span> </p> 
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sinh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>sqrt</b>(float64) float64 </span> 
+	
+
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example2">[2]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>tan</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>tanh</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>ThermSeed</b>(int) </span> 
+	 <p style="margin-left:40px"> Set a random seed for thermal noise </p> 
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>true</b> </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>trunc</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>Vector</b>(float64, float64, float64) data.Vector </span> 
+	 <p style="margin-left:40px"> Constructs a vector with given components </p> 
+
+	 
+		<p style="margin-left:40px"> <span style="color:grey"> <b>methods:</b> 
+		 Add( data.Vector ) &nbsp; Cross( data.Vector ) &nbsp; Div( float64 ) &nbsp; Dot( data.Vector ) &nbsp; Len( ) &nbsp; MAdd( float64 data.Vector ) &nbsp; Mul( float64 ) &nbsp; Sub( data.Vector ) &nbsp; X( ) &nbsp; Y( ) &nbsp; Z( ) &nbsp; 
+		</span> </p> 
+	
+
+	 <p style="margin-left:40px; color:grey"> examples: 
+		 
+			<a href="examples.html#example1">[1]</a> 
+		 
+			<a href="examples.html#example3">[3]</a> 
+		 
+			<a href="examples.html#example5">[5]</a> 
+		 
+			<a href="examples.html#example7">[7]</a> 
+		 
+			<a href="examples.html#example10">[10]</a> 
+		 
+			<a href="examples.html#example11">[11]</a> 
+		 
+			<a href="examples.html#example12">[12]</a> 
+		 
+			<a href="examples.html#example14">[14]</a> 
+		 
+			<a href="examples.html#example15">[15]</a> 
+		 
+		</p> 
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>y0</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>y1</b>(float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+  
+	<p><span style="color:#000088; font-size:1.3em"> <b>yn</b>(int, float64) float64 </span> 
+	
+
+	
+
+	
+
+	</p>
+ 
+
+</body>
+

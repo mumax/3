@@ -71,8 +71,8 @@ const templText = `
 		  loupe.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
 
 		  /* Execute a function when someone moves the magnifier loupe over the image: */
-		  loupe.addEventListener("mousemove", moveMagnifier);
-		  img.addEventListener("mousemove", moveMagnifier);
+		  img.parentElement.addEventListener("mousemove", moveMagnifier);
+		  img.parentElement.addEventListener("mouseleave", function(e){loupe.style.display='none';});
 
 		  function moveMagnifier(e) {
 		    var pos, a, x = 0, y = 0;
@@ -89,8 +89,8 @@ const templText = `
 		    if (x > img.width || x < 0 || y > img.height || y < 0) {loupe.style.display='none';}
 
 		    /* Set the position of the magnifier loupe: */
-		    loupe.style.left = (x-10) + "px";
-		    loupe.style.top = (y+5) + "px";
+		    loupe.style.left = (x-10+2) + "px";
+		    loupe.style.top = (y+5+2) + "px";
 
 		    /* Display what the magnifier loupe "sees": */
 		    w = loupe.offsetWidth / 2;
@@ -250,7 +250,7 @@ m = {{.Data.Configs | .SelectArray "mselect" "Uniform"}} {{.TextBox "margs" "(1,
 </p>
 
 <p> 
-<div class="img-loupe-div">
+<div class="img-loupe-div" style="margin: 0">
 {{.Img "display" "/render/m" "alt=\"display\""}}
 <script>
 	/* Set loupe and update it as the image can change... */

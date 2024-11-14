@@ -43,7 +43,7 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	b := g.StringValue("usingy")
 
 	cmd := "gnuplot"
-	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 fsize 10; plot "-" u %v:%v w li; set output;exit;`, a, b)}
+	args := []string{"-e", fmt.Sprintf(`set format x "%%g"; set key off; set format y "%%g"; set term svg size 480,320 font 'Arial,10'; plot "-" u %v:%v w li; set output;exit;`, a, b)}
 	excmd := exec.Command(cmd, args...)
 
 	stdin, err := excmd.StdinPipe()

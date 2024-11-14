@@ -33,10 +33,11 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice, test bool) *Demag
 }
 
 // Calculate the demag field of m * vol * Bsat, store result in B.
-// 	m:    magnetization normalized to unit length
-// 	vol:  unitless mask used to scale m's length, may be nil
-// 	Bsat: saturation magnetization in Tesla
-// 	B:    resulting demag field, in Tesla
+//
+//	m:    magnetization normalized to unit length
+//	vol:  unitless mask used to scale m's length, may be nil
+//	Bsat: saturation magnetization in Tesla
+//	B:    resulting demag field, in Tesla
 func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Msat MSlice) {
 	util.Argument(B.Size() == c.inputSize && m.Size() == c.inputSize)
 	if c.is2D() {
@@ -194,5 +195,7 @@ func (c *DemagConvolution) Free() {
 		}
 		c.fwPlan.Free()
 		c.bwPlan.Free()
+
+		cudaCtx.SetCurrent()
 	}
 }

@@ -1,0 +1,51 @@
+/* 
+	Test if the extension to initialize geometry
+    from an OVF file works as expected.
+*/
+
+//// Load OVF geometry
+ext_InitGeomFromOVF("initgeomfromovf_teapot.ovf")
+save(geom)
+snapshot(geom) // test crash on snapshot of scalar
+
+// Check if correct fill factor
+expect("geom", geom.average(), 0.3413500, 1e-6)
+
+// Check some specific cells
+expect("geom", geom.GetCell(32,14,10), 1, 0)
+expect("geom", geom.GetCell(10,16,13), 1, 0)
+expect("geom", geom.GetCell(31,10,7), 1, 0)
+expect("geom", geom.GetCell(10,2,6), 1, 0)
+expect("geom", geom.GetCell(20,12,0), 1, 0) // Bottom face of pot
+expect("geom", geom.GetCell(23,16,17), 0, 0)
+expect("geom", geom.GetCell(36,8,0), 0, 0)
+expect("geom", geom.GetCell(0,11,18), 0, 0)
+expect("geom", geom.GetCell(2,15,7), 0, 0)
+expect("geom", geom.GetCell(20,12,19), 0, 0) // Above top of pot
+
+//// Can OVF-based geometry relax correctly?
+Msat = 800e3
+Aex = 13e-12
+m.Set(Uniform(1, 0, 0))
+relax() // Test if geometry works as intended
+save(m) // Can visualise with mumax-view
+
+//// Can OVF-based grid be changed?
+SetGridSize(80, 50, 40) // Original is 40x25x20
+save(m)
+snapshot(geom)
+// Pot should just stay in the center, so these checks are the same as before but at coordinates +(20,12,10).
+expect("geom", geom.GetCell(52,26,20), 1, 0)
+expect("geom", geom.GetCell(30,28,23), 1, 0)
+expect("geom", geom.GetCell(51,22,17), 1, 0)
+expect("geom", geom.GetCell(30,14,16), 1, 0)
+expect("geom", geom.GetCell(40,24,10), 1, 0) // Bottom face of pot
+expect("geom", geom.GetCell(43,28,27), 0, 0)
+expect("geom", geom.GetCell(56,20,10), 0, 0)
+expect("geom", geom.GetCell(20,23,28), 0, 0)
+expect("geom", geom.GetCell(22,27,17), 0, 0)
+expect("geom", geom.GetCell(40,24,29), 0, 0) // Above top of pot
+
+//// Can the underlying shape be moved?
+Shift(20)
+snapshot(geom)

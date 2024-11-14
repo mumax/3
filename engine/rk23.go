@@ -8,14 +8,15 @@ import (
 )
 
 // Bogacki-Shampine solver. 3rd order, 3 evaluations per step, adaptive step.
-// 	http://en.wikipedia.org/wiki/Bogacki-Shampine_method
 //
-// 	k1 = f(tn, yn)
-// 	k2 = f(tn + 1/2 h, yn + 1/2 h k1)
-// 	k3 = f(tn + 3/4 h, yn + 3/4 h k2)
-// 	y{n+1}  = yn + 2/9 h k1 + 1/3 h k2 + 4/9 h k3            // 3rd order
-// 	k4 = f(tn + h, y{n+1})
-// 	z{n+1} = yn + 7/24 h k1 + 1/4 h k2 + 1/3 h k3 + 1/8 h k4 // 2nd order
+//	http://en.wikipedia.org/wiki/Bogacki-Shampine_method
+//
+//	k1 = f(tn, yn)
+//	k2 = f(tn + 1/2 h, yn + 1/2 h k1)
+//	k3 = f(tn + 3/4 h, yn + 3/4 h k2)
+//	y{n+1}  = yn + 2/9 h k1 + 1/3 h k2 + 4/9 h k3            // 3rd order
+//	k4 = f(tn + h, y{n+1})
+//	z{n+1} = yn + 7/24 h k1 + 1/4 h k2 + 1/3 h k3 + 1/8 h k4 // 2nd order
 type RK23 struct {
 	k1 *data.Slice // torque at end of step is kept for beginning of next step
 }
@@ -72,7 +73,7 @@ func (rk *RK23) Step() {
 	torqueFn(k3)
 
 	// 3rd order solution
-	madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
+	cuda.Madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
 	M.normalize()
 
 	// error estimate
@@ -80,7 +81,7 @@ func (rk *RK23) Step() {
 	torqueFn(k4)
 	Err := k2 // re-use k2 as error
 	// difference of 3rd and 2nd order torque without explicitly storing them first
-	madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
+	cuda.Madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
 
 	// determine error
 	err := cuda.MaxVecNorm(Err) * float64(h)
@@ -108,10 +109,4 @@ func (rk *RK23) Step() {
 func (rk *RK23) Free() {
 	rk.k1.Free()
 	rk.k1 = nil
-}
-
-// TODO: into cuda
-func madd4(dst, src1, src2, src3, src4 *data.Slice, w1, w2, w3, w4 float32) {
-	cuda.Madd3(dst, src1, src2, src3, w1, w2, w3)
-	cuda.Madd2(dst, dst, src4, 1, w4)
 }

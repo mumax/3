@@ -1,0 +1,38 @@
+/*
+    Test the FreeLayerThickness for the Slonczewski torque
+*/
+
+SetGridSize(1,1,2)
+SetCellSize(1e-9,1e-9,1e-9)
+
+// Arbitrary material parameters which result in a non zero Slonczewski Torque
+Msat = 4.3
+J = vector(0,0,5.4)
+Pol = 0.6
+FixedLayer = vector(1,0,1)
+
+// If the freeLayerThickness is zero (the default), then the thickness of the free
+// layer will be deduced from the mesh thickness (1e-9m in this case)
+FreeLayerThickness = 0
+
+// Computation of the Slonczewski torque in the bottom cell
+torqueWanted := Vector(
+    STTorque.hostCopy().Get(0,0,0,0),
+    STTorque.hostCopy().Get(1,0,0,0),
+    STTorque.hostCopy().Get(2,0,0,0))
+
+
+
+// Adding empty layers to the system should not change the result 
+// if we set the freeLayerThickness by hand.
+Setgridsize(1,1,4)
+SetGeom(Layers(0,2))
+FreeLayerThickness = 1e-9
+
+// Computation of the Slonczewski torque in the bottom cell
+torqueResult:= Vector(
+    STTorque.hostCopy().Get(0,0,0,0),
+    STTorque.hostCopy().Get(1,0,0,0),
+    STTorque.hostCopy().Get(2,0,0,0))
+
+expectv("sttorque",torqueResult,torqueWanted,1e-5 )

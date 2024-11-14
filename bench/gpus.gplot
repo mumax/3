@@ -1,18 +1,18 @@
 #! /usr/bin/gnuplot
 
-# Width for decent spacing: 1in + 0.1in*NUM_GPU_BENCHMARKS
-set term pdf size 7.4in, 5in;
-set output "gpus.pdf"
+# Width for decent spacing: 100 + 10*NUM_GPU_BENCHMARKS
+set term svg size 740, 500 font "DejaVu Sans,11"
+set output "gpus.svg"
 set boxwidth 0.5
 set style fill solid
 set key off
 set ylabel "throughput (M cells/s)"
 set xtics rotate by -90
+set xtics scale 0
 #set xtics out offset 0,-1.2
 #set title "Mumax3 GPU performance for 2D simulations containing 4 million cells" font ",12" textcolor "#888888"
 
 set yrange[0:1250]
-plot "gpus.txt" u ($0+1):($2/1e6):xtic(4) w boxes, "oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF(CPU)") w boxes
+plot "gpus.txt" u ($0+1):($2/1e6):xtic(4) w boxes, "oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF (CPU)") w boxes
 
 set output
-

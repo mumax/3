@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/data"
 )
 
@@ -32,8 +33,6 @@ func centerWall(c int) {
 
 	sign := magsign(ShiftMagL[c])
 
-	//log.Println("mc", mc, "tol", tolerance)
-
 	if mc < -tolerance {
 		Shift(sign)
 	} else if mc > tolerance {
@@ -52,7 +51,7 @@ func CenterWall(magComp int) {
 // The same functions as above, now for just one layer
 func centerWallInLayerProc(layer, c int) {
 	M := &M
-	mc := CropLayer(M,layer).average()[c]
+	mc := CropLayer(M, layer).average()[c]
 	n := Mesh().Size()
 	tolerance := 4 / float64(n[X]) // x*2 * expected <m> change for 1 cell shift
 

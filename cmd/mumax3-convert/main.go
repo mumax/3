@@ -471,7 +471,7 @@ func parseColor(s string) color.RGBA {
 		return c
 	}
 	str := fmt.Sprintln("Refusing to use ugly color '" + s + "', options are:")
-	for k, _ := range colors {
+	for k := range colors {
 		str += fmt.Sprintf("%s,", k)
 	}
 	util.Fatal(strings.Trim(str, ","))
@@ -479,20 +479,20 @@ func parseColor(s string) color.RGBA {
 }
 
 var colors = map[string]color.RGBA{
-	"white":       color.RGBA{R: 255, G: 255, B: 255, A: 255},
-	"black":       color.RGBA{R: 0, G: 0, B: 0, A: 255},
-	"transparent": color.RGBA{R: 0, G: 0, B: 0, A: 0},
-	"red":         color.RGBA{R: 255, G: 0, B: 0, A: 255},
-	"green":       color.RGBA{R: 0, G: 255, B: 0, A: 255},
-	"blue":        color.RGBA{R: 0, G: 0, B: 255, A: 255},
-	"lightred":    color.RGBA{R: 255, G: 127, B: 127, A: 255},
-	"lightgreen":  color.RGBA{R: 127, G: 255, B: 127, A: 255},
-	"lightblue":   color.RGBA{R: 127, G: 127, B: 255, A: 255},
-	"yellow":      color.RGBA{R: 255, G: 255, B: 0, A: 255},
-	"darkyellow":  color.RGBA{R: 127, G: 127, B: 0, A: 255},
-	"cyan":        color.RGBA{R: 0, G: 255, B: 255, A: 255},
-	"darkcyan":    color.RGBA{R: 0, G: 127, B: 127, A: 255},
-	"magenta":     color.RGBA{R: 255, G: 0, B: 255, A: 255},
-	"darkmagenta": color.RGBA{R: 127, G: 0, B: 127, A: 255},
-	"gray":        color.RGBA{R: 127, G: 127, B: 127, A: 255},
+	"white":       {R: 255, G: 255, B: 255, A: 255},
+	"black":       {R: 0, G: 0, B: 0, A: 255},
+	"transparent": {R: 0, G: 0, B: 0, A: 0},
+	"red":         {R: 255, G: 0, B: 0, A: 255},
+	"green":       {R: 0, G: 255, B: 0, A: 255},
+	"blue":        {R: 0, G: 0, B: 255, A: 255},
+	"lightred":    {R: 255, G: 127, B: 127, A: 255},
+	"lightgreen":  {R: 127, G: 255, B: 127, A: 255},
+	"lightblue":   {R: 127, G: 127, B: 255, A: 255},
+	"yellow":      {R: 255, G: 255, B: 0, A: 255},
+	"darkyellow":  {R: 127, G: 127, B: 0, A: 255},
+	"cyan":        {R: 0, G: 255, B: 255, A: 255},
+	"darkcyan":    {R: 0, G: 127, B: 127, A: 255},
+	"magenta":     {R: 255, G: 0, B: 255, A: 255},
+	"darkmagenta": {R: 127, G: 0, B: 127, A: 255},
+	"gray":        {R: 127, G: 127, B: 127, A: 255},
 }

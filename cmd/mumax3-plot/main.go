@@ -32,7 +32,7 @@ func plotFile(fname string) {
 	hdr := readHeader(fname)
 
 	// quantities grouped by vector
-	Qs := []*Q{&Q{[]string{"t"}, "s", []int{1}}}
+	Qs := []*Q{{[]string{"t"}, "s", []int{1}}}
 	prev := Qs[0]
 
 	quants := strings.Split(hdr, "\t")

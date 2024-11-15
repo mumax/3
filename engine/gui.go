@@ -2,11 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/gui"
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"math/rand"
 	"net"
 	"net/http"
@@ -15,6 +10,12 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/gui"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 // global GUI state stores what is currently shown in the web page.
@@ -486,7 +487,7 @@ func (g *guistate) cacheBreaker() int {
 
 func (g *guistate) QuantNames() []string {
 	names := make([]string, 0, len(g.Quants))
-	for k, _ := range g.Quants {
+	for k := range g.Quants {
 		names = append(names, k)
 	}
 	sortNoCase(names)
@@ -500,7 +501,7 @@ func (g *guistate) Configs() []string { return g.apifilter("Config") }
 // List all api functions that return outputtype (Shape, Config, ...)
 func (g *guistate) apifilter(outputtype string) []string {
 	var match []string
-	for k, _ := range World.Doc {
+	for k := range World.Doc {
 		v := World.Resolve(k)
 		t := v.Type()
 		if t.Kind() == reflect.Func && t.NumOut() == 1 && t.Out(0).Name() == outputtype {

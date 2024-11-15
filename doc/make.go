@@ -116,7 +116,7 @@ var api_examples = make(map[string][]int)
 
 func recordExamples(input string, num int) {
 	in := strings.ToLower(input)
-	for k, _ := range api_ident {
+	for k := range api_ident {
 		if ok, _ := regexp.MatchString(k, in); ok {
 			api_examples[k] = append(api_examples[k], num)
 		}

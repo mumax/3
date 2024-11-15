@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mumax/3/httpfs"
 	"image"
 	"image/png"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os/exec"
 	"sync/atomic"
+
+	"github.com/mumax/3/httpfs"
 )
 
 var nPlots int32       // counts number of active gnuplot processes
@@ -76,7 +77,7 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, err = ioutil.ReadAll(stdout)
+	out, err = io.ReadAll(stdout)
 	if handle(err) {
 		return
 	}

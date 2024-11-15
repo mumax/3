@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -31,7 +30,7 @@ func main() {
 	buildAPI()
 
 	// read template
-	b, err := ioutil.ReadFile(path.Join(templateDir, "examples-template.html"))
+	b, err := os.ReadFile(path.Join(templateDir, "examples-template.html"))
 	check(err)
 	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
 	templ := template.Must(template.New("guide").Parse(string(b)))
@@ -54,7 +53,7 @@ func main() {
 }
 
 func createIndexPage() {
-	b, err := ioutil.ReadFile(path.Join(templateDir, "index-template.html"))
+	b, err := os.ReadFile(path.Join(templateDir, "index-template.html"))
 	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
 	check(err)
 	templ := template.Must(template.New("guid").Parse(string(b)))
@@ -65,7 +64,7 @@ func createIndexPage() {
 }
 
 func createDownloadPage() {
-	b, err := ioutil.ReadFile(path.Join(templateDir, "download-template.html"))
+	b, err := os.ReadFile(path.Join(templateDir, "download-template.html"))
 	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
 	check(err)
 	templ := template.Must(template.New("download").Parse(string(b)))
@@ -76,7 +75,7 @@ func createDownloadPage() {
 }
 
 func createHeaderPage() {
-	b, err := ioutil.ReadFile(path.Join(templateDir, "headerpage-template.html"))
+	b, err := os.ReadFile(path.Join(templateDir, "headerpage-template.html"))
 	replaceInRaw(b, '\n', '@') // hack to allow raw strings spanning multi lines
 	check(err)
 	templ := template.Must(template.New("headerpage").Parse(string(b)))
@@ -98,7 +97,7 @@ func (s *State) Example(in string) string {
 	in = strings.Trim(in, "\n")
 
 	// exec input file
-	check(ioutil.WriteFile(s.infile(), []byte(in), 0666))
+	check(os.WriteFile(s.infile(), []byte(in), 0666))
 	arg := "-v"
 	if *flag_vet {
 		arg = "-vet"
@@ -135,7 +134,7 @@ func (s *State) Img(fname string) string {
 }
 
 func (s *State) Include(fname string) string {
-	b, err := ioutil.ReadFile(path.Join(templateDir, fname))
+	b, err := os.ReadFile(path.Join(templateDir, fname))
 	check(err)
 	return string(b)
 }

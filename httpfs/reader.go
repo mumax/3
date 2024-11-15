@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"io/ioutil"
 )
 
 const BUFSIZE = 16 * 1024 * 1024 // bufio buffer size
@@ -40,7 +39,7 @@ func Open(URL string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.NopCloser(bytes.NewReader(data)), nil
+	return io.NopCloser(bytes.NewReader(data)), nil
 }
 
 func MustOpen(URL string) io.ReadCloser {

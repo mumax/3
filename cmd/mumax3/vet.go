@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/mumax/3/engine"
@@ -14,7 +13,7 @@ import (
 func vet() {
 	status := 0
 	for _, f := range flag.Args() {
-		src, ioerr := ioutil.ReadFile(f)
+		src, ioerr := os.ReadFile(f)
 		util.FatalErr(ioerr)
 		engine.World.EnterScope() // avoid name collisions between separate files
 		_, err := engine.World.Compile(string(src))

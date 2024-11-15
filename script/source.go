@@ -3,7 +3,7 @@ package script
 import (
 	"go/ast"
 	"go/token"
-	"io/ioutil"
+	"os"
 )
 
 func (w *World) compileSource(n *ast.CallExpr) Expr {
@@ -13,7 +13,7 @@ func (w *World) compileSource(n *ast.CallExpr) Expr {
 	arg := n.Args[0]
 	if lit, ok := arg.(*ast.BasicLit); ok && lit.Kind == token.STRING {
 
-		code, err1 := ioutil.ReadFile(lit.Value[1 : len(lit.Value)-1])
+		code, err1 := os.ReadFile(lit.Value[1 : len(lit.Value)-1])
 		if err1 != nil {
 			panic(err(n.Pos(), err1))
 		}

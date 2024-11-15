@@ -5,7 +5,6 @@ package httpfs
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -51,7 +50,7 @@ func newHandler(prefix action, f handlerFunc) http.HandlerFunc {
 
 		fname := r.URL.Path[len(prefix)+2:] // strip "/prefix/"
 		query := r.URL.Query()
-		data, err := ioutil.ReadAll(r.Body)
+		data, err := io.ReadAll(r.Body)
 
 		Log("httpfs req:", prefix, fname, query.Encode(), len(data), "B payload")
 

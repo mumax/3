@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -184,7 +184,7 @@ func do(a action, URL string, body []byte, query url.Values) (resp []byte, err e
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New("do " + u.String() + ":" + response.Status + ":" + readBody(response.Body))
 	}
-	resp, err = ioutil.ReadAll(response.Body)
+	resp, err = io.ReadAll(response.Body)
 	err = mkErr(a, URL, err)
 	return
 }

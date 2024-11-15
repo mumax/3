@@ -2,7 +2,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -136,7 +135,7 @@ type api struct {
 
 // include file
 func (e *api) Include(fname string) string {
-	b, err := ioutil.ReadFile(path.Join(templateDir, fname))
+	b, err := os.ReadFile(path.Join(templateDir, fname))
 	check(err)
 	return string(b)
 }
@@ -242,7 +241,7 @@ func renderAPI() {
 var templ = read(path.Join(templateDir, "api-template.html"))
 
 func read(fname string) string {
-	b, err := ioutil.ReadFile(fname)
+	b, err := os.ReadFile(fname)
 	check(err)
 	return string(b)
 }

@@ -18,7 +18,7 @@ func (w *World) compileSource(n *ast.CallExpr) Expr {
 			panic(err(n.Pos(), err1))
 		}
 		block, err2 := w.Compile(string(code))
-		if err1 != nil {
+		if err2 != nil {
 			panic(err(n.Pos(), err2))
 		}
 		return block

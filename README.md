@@ -25,14 +25,14 @@ Tools
 https://godoc.org/github.com/mumax/3/cmd
 
 
-Building from source
+Building from source (for linux)
 --------------------
 
 Consider downloading a pre-compiled binary. If you want to compile nevertheless:
 
   * install the nvidia proprietary driver, if not yet present.
    - if unsure, it's probably already there
-   - v340 recommended
+   - version 440.44 recommended
   * install Go 
     - https://golang.org/dl/
     - set $GOPATH
@@ -40,9 +40,7 @@ Consider downloading a pre-compiled binary. If you want to compile nevertheless:
     - https://developer.nvidia.com/cuda-downloads (pick default installation path)
     - or `sudo apt-get install nvidia-cuda-toolkit`
   * install a C compiler
-    - Ubuntu: `sudo apt-get install gcc`
-    - MacOSX: https://developer.apple.com/xcode/download/
-    - Windows: http://sourceforge.net/projects/mingw-w64/
+    - on Ubuntu: `sudo apt-get install gcc`
   * if you have git installed: 
     - `go get github.com/mumax/3/cmd/mumax3`
   * if you don't have git:
@@ -52,15 +50,11 @@ Consider downloading a pre-compiled binary. If you want to compile nevertheless:
     - `cd $GOPATH/src/github.com/mumax/3/cmd/mumax3`
     - `go install`
   * optional: install gnuplot if you want pretty graphs
-    - Ubuntu: `sudo apt-get install gnuplot`
+    - on ubuntu: `sudo apt-get install gnuplot`
+  * use the Makefile if there is a need to recompile the cuda kernels
+    - `make realclean && make`
 
 Your binary is now at `$GOPATH/bin/mumax3`
-
-To do all at once on Ubuntu:
-```
-sudo apt-get install git golang-go gcc nvidia-cuda-toolkit nvidia-cuda-dev nvidia-340 gnuplot
-GOPATH=$HOME go get -u -v github.com/mumax/3/cmd/mumax3
-```
 
 Contributing
 ------------

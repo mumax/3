@@ -5,7 +5,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Set s to the toplogogical charge density s = m · (m/∂x ❌ ∂m/∂y)
+// Set s to the toplogogical charge density s = m · (∂m/∂x ❌ ∂m/∂y)
 // See topologicalcharge.cu
 func SetTopologicalCharge(s *data.Slice, m *data.Slice, mesh *data.Mesh) {
 	cellsize := mesh.CellSize()

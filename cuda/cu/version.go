@@ -2,10 +2,17 @@ package cu
 
 // This file implements CUDA driver version management
 
-//#include <cuda_runtime_api.h>
+//#include <cuda.h>
 import "C"
+
+const CUDA_VERSION = C.CUDA_VERSION
 
 // Returns the CUDA driver version.
 func Version() int {
-	return int(C.CUDART_VERSION)
+	var version C.int
+	err := Result(C.cuDriverGetVersion(&version))
+	if err != SUCCESS {
+		panic(err)
+	}
+	return int(version)
 }

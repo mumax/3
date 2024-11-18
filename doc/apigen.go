@@ -2,15 +2,18 @@
 package main
 
 import (
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/engine"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"path"
 	"reflect"
 	"sort"
 	"strings"
 	"text/template"
 	"unicode"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/engine"
 )
 
 var (
@@ -32,6 +35,9 @@ func buildAPI() {
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
 	for K, v := range doc {
+		if v == "" { // check if we a docstring in the documantation of the Math package
+			v = getGoDocString("math", K)
+		}
 		k := strings.ToLower(K)
 		t := ident[k].Type()
 		entr := entry{K, t, v, false}
@@ -40,6 +46,19 @@ func buildAPI() {
 	}
 	sort.Sort(&e)
 	api_entries = e
+}
+
+func getGoDocString(packageName, identifier string) string {
+	docString := ""
+	cmd := exec.Command("go", "doc", packageName, identifier)
+	stdout, err := cmd.Output()
+	outputLines := strings.Split(string(stdout), "\n")
+	if err == nil && outputLines[2][:4] == "func" { // we only look for doc strings of functions
+		// the doc string of a function is on the fourth line
+		// (and possible continued on the fifth line, if not, then the fifth line is empty)
+		docString = strings.Join(outputLines[3:5], " ")
+	}
+	return docString
 }
 
 func (e *entry) Name() string {
@@ -117,7 +136,7 @@ type api struct {
 
 // include file
 func (e *api) Include(fname string) string {
-	b, err := ioutil.ReadFile(fname)
+	b, err := ioutil.ReadFile(path.Join(templateDir, fname))
 	check(err)
 	return string(b)
 }
@@ -133,10 +152,19 @@ func (a *api) remaining() []*entry {
 	return E
 }
 
+// list of all entries (touched and not touched)
+func (a *api) All() []*entry {
+	var E []*entry
+	for _, e := range a.Entries {
+		E = append(E, e)
+	}
+	return E
+}
+
 // return all entries, unused so far, which have given type.
 func (a *api) FilterType(typ ...string) []*entry {
 	var E []*entry
-	for _, e := range a.remaining() {
+	for _, e := range a.Entries {
 		for _, t := range typ {
 			if match(t, e.Type.String()) &&
 				!strings.HasPrefix(e.name, "ext_") {
@@ -151,7 +179,7 @@ func (a *api) FilterType(typ ...string) []*entry {
 // return all entries, unused so far, which have given return type.
 func (a *api) FilterReturn(typ ...string) []*entry {
 	var E []*entry
-	for _, e := range a.remaining() {
+	for _, e := range a.Entries {
 		for _, t := range typ {
 			if match(t, e.Ret()) &&
 				!strings.HasPrefix(e.name, "ext_") {
@@ -166,7 +194,7 @@ func (a *api) FilterReturn(typ ...string) []*entry {
 // return all entries, unused so far, which have given name.
 func (a *api) FilterName(typ ...string) []*entry {
 	var E []*entry
-	for _, e := range a.remaining() {
+	for _, e := range a.Entries {
 		for _, t := range typ {
 			if match(t, e.name) &&
 				!strings.HasPrefix(e.name, "ext_") {
@@ -181,7 +209,7 @@ func (a *api) FilterName(typ ...string) []*entry {
 // return all entries, unused so far, whose name starts with prefix.
 func (a *api) FilterPrefix(pre string) []*entry {
 	var E []*entry
-	for _, e := range a.remaining() {
+	for _, e := range a.Entries {
 		if strings.HasPrefix(e.name, pre) {
 			e.touched = true
 			E = append(E, e)
@@ -206,12 +234,12 @@ func match(a, b string) bool {
 func renderAPI() {
 	e := api_entries
 	t := template.Must(template.New("api").Parse(templ))
-	f, err2 := os.OpenFile("api.html", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	f, err2 := os.OpenFile(path.Join(buildDir, "api.html"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	check(err2)
 	check(t.Execute(f, &api{e}))
 }
 
-var templ = read("api-template.html")
+var templ = read(path.Join(templateDir, "api-template.html"))
 
 func read(fname string) string {
 	b, err := ioutil.ReadFile(fname)

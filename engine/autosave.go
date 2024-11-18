@@ -6,7 +6,7 @@ import "fmt"
 
 var (
 	output  = make(map[Quantity]*autosave) // when to save quantities
-	autonum = make(map[interface{}]int)    // auto number for out file
+	autonum = make(map[string]int)         // auto number for out file
 )
 
 func init() {

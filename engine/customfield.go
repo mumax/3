@@ -4,6 +4,7 @@ package engine
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/util"
@@ -26,18 +27,26 @@ func init() {
 	DeclFunc("Dot", Dot, "Dot product of two vector quantities")
 	DeclFunc("Cross", Cross, "Cross product of two vector quantities")
 	DeclFunc("Mul", Mul, "Point-wise product of two quantities")
-	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m)")
+	DeclFunc("MulMV", MulMV, "Matrix-Vector product: MulMV(AX, AY, AZ, m) = (AX·m, AY·m, AZ·m). "+
+		"The arguments Ax, Ay, Az and m are quantities with 3 componets.")
 	DeclFunc("Div", Div, "Point-wise division of two quantities")
 	DeclFunc("Const", Const, "Constant, uniform number")
 	DeclFunc("ConstVector", ConstVector, "Constant, uniform vector")
 	DeclFunc("Shifted", Shifted, "Shifted quantity")
 	DeclFunc("Masked", Masked, "Mask quantity with shape")
+	DeclFunc("Normalized", Normalized, "Normalize quantity")
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
+	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
 }
 
 //Removes all customfields
 func RemoveCustomFields() {
 	customTerms = nil
+}
+
+//Removes all customenergies
+func RemoveCustomEnergies() {
+	customEnergies = nil
 }
 
 // AddFieldTerm adds an effective field function (returning Teslas) to B_eff.
@@ -427,4 +436,23 @@ func (q *masked) createMask() {
 	data.Copy(q.mask, maskhost)
 	q.mesh = *Mesh()
 	// Remove mask from host
+}
+
+// Normalized returns a quantity that evaluates to the unit vector of q
+func Normalized(q Quantity) Quantity {
+	return &normalized{q}
+}
+
+type normalized struct {
+	orig Quantity
+}
+
+func (q *normalized) NComp() int {
+	return 3
+}
+
+func (q *normalized) EvalTo(dst *data.Slice) {
+	util.Assert(dst.NComp() == q.NComp())
+	q.orig.EvalTo(dst)
+	cuda.Normalize(dst, nil)
 }

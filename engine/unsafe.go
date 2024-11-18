@@ -1,14 +1,9 @@
 package engine
 
-import "github.com/mumax/3/util"
-
-var allowUnsafe = false // allow unsafe features?
-
 func init() {
-	DeclFunc("ext_EnableUnsafe", EnableUnsafe, "Allow potentially unsafe features, at your own risk.")
+	// There are no unsafe features since version 3.10, but we want maximal backwards compatibility
+	DeclFunc("ext_EnableUnsafe", EnableUnsafe, "Deprecated. Only here to ensure maximal backwards compatibility with mumax3.9c.")
 }
 
 func EnableUnsafe() {
-	util.Log("Allowing unsafe features")
-	allowUnsafe = true
 }

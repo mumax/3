@@ -1,32 +1,35 @@
 package engine
 
 import (
-	"github.com/mumax/3/httpfs"
-	"github.com/mumax/3/util"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"math"
+
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/util"
 )
 
 func init() {
 	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
-	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter")
+	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The top of the cone points in the +z direction.")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
 	DeclFunc("Square", Square, "2D square with size in meter")
-	DeclFunc("XRange", XRange, "Part of space between x1 and x2, in meter")
-	DeclFunc("YRange", YRange, "Part of space between y1 and y2, in meter")
-	DeclFunc("ZRange", ZRange, "Part of space between z1 and z2, in meter")
+	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
+	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
+	DeclFunc("ZRange", ZRange, "Part of space between z1 (inclusive) and z2 (exclusive), in meter")
 	DeclFunc("Layers", Layers, "Part of space between cell layer1 (inclusive) and layer2 (exclusive), in integer indices")
 	DeclFunc("Layer", Layer, "Single layer (along z), by integer index starting from 0")
 	DeclFunc("Universe", Universe, "Entire space")
 	DeclFunc("Cell", Cell, "Single cell with given integer index (i, j, k)")
 	DeclFunc("ImageShape", ImageShape, "Use black/white image as shape")
-	DeclFunc("GrainRoughness", GrainRoughness, "Grainy surface with different heights per grain")
+	DeclFunc("GrainRoughness", GrainRoughness, "Grainy surface with different heights per grain "+
+		"with a typical grain size (first argument), minimal height (second argument), and maximal "+
+		"height (third argument). The last argument is a seed for the random number generator.")
 }
 
 // geometrical shape for setting sample geometry

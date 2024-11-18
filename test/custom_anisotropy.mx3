@@ -13,7 +13,7 @@ M     = uniform(1, 1, 0)
 // Custom anisotropy, easy, in-plane
 Msat  = 1100e3
 K := 0.5e6
-u := ConstVector(1, 0, 0)
+u := Normalized(ConstVector(1000, 0, 0))
 
 prefactor := Const( (2 * K) / (Msat.Average()))
 MyAnis := Mul(prefactor, Mul( Dot(u, m), u))

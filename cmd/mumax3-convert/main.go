@@ -164,7 +164,7 @@ func doFile(infname string, outp output) {
 	// determine output file
 	outfname := util.NoExt(infname) + outp.Ext
 	if *flag_dir != "" {
-		outfname = *flag_dir + "/" + path.Base(outfname)
+		outfname = filepath.Join(*flag_dir, filepath.Base(outfname))
 	}
 
 	msg := infname + "\t-> " + outfname

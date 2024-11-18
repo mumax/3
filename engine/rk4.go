@@ -60,7 +60,7 @@ func (rk *RK4) Step() {
 	if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
 		// step OK
 		// 4th order solution
-		madd5(m, m0, k1, k2, k3, k4, 1, (1./6.)*h, (1./3.)*h, (1./3.)*h, (1./6.)*h)
+		cuda.Madd5(m, m0, k1, k2, k3, k4, 1, (1./6.)*h, (1./3.)*h, (1./3.)*h, (1./6.)*h)
 		M.normalize()
 		NSteps++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))

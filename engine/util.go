@@ -2,6 +2,12 @@ package engine
 
 import (
 	"fmt"
+	"math"
+	"os"
+	"path"
+	"sort"
+	"strings"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/dump"
@@ -9,11 +15,6 @@ import (
 	"github.com/mumax/3/mag"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"math"
-	"os"
-	"path"
-	"sort"
-	"strings"
 )
 
 func init() {
@@ -22,11 +23,12 @@ func init() {
 	DeclFunc("Fprintln", Fprintln, "Print to file")
 	DeclFunc("Sign", sign, "Signum function")
 	DeclFunc("Vector", Vector, "Constructs a vector with given components")
-	DeclConst("Mu0", mag.Mu0, "Permittivity of vaccum (Tm/A)")
+	DeclConst("Mu0", mag.Mu0, "Vacuum permeability (Tm/A)")
 	DeclFunc("Print", myprint, "Print to standard output")
 	DeclFunc("LoadFile", LoadFile, "Load a data file (ovf or dump)")
 	DeclFunc("Index2Coord", Index2Coord, "Convert cell index to x,y,z coordinate in meter")
-	DeclFunc("NewSlice", NewSlice, "Makes a 4D array of scalars with given ncomp,x,y,z size")
+	DeclFunc("NewSlice", NewSlice, "Makes a 4D array with a specified number of components (first argument) "+
+		"and a specified size nx,ny,nz (remaining arguments)")
 	DeclFunc("NewVectorMask", NewVectorMask, "Makes a 3D array of vectors")
 	DeclFunc("NewScalarMask", NewScalarMask, "Makes a 3D array of scalars")
 }

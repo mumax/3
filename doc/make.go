@@ -47,6 +47,7 @@ func main() {
 
 	renderAPI()
 
+	postProcessGPUsSVG()
 	createIndexPage()
 	createDownloadPage()
 	createHeaderPage()

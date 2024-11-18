@@ -1,1138 +1,425 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   viewBox="0 0 576 432"
-   height="432"
-   width="576"
-   xml:space="preserve"
-   id="svg2"
-   version="1.1"><metadata
-     id="metadata8"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs6" /><g
-     transform="matrix(1.3333333,0,0,1.3333333,0,1.08e-5)"
-     id="g10"><g
-       id="g12"><g
-         id="g14"><path
-           id="path16"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,213.199 h 3.699" /></g><g
-         id="g18"><path
-           id="path20"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,213.199 h -3.699" /></g><text
-         id="text24"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(32.753188,216.22578)"><tspan
-           id="tspan22"
-           y="0"
-           x="0">0</tspan></text>
-<g
-         id="g26"><path
-           id="path28"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,189.301 h 3.699" /></g><g
-         id="g30"><path
-           id="path32"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,189.301 h -3.699" /></g><text
-         id="text36"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,192.32578)"><tspan
-           id="tspan34"
-           y="0"
-           x="0 5.0879998 10.176">100</tspan></text>
-<g
-         id="g38"><path
-           id="path40"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,165.352 h 3.699" /></g><g
-         id="g42"><path
-           id="path44"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,165.352 h -3.699" /></g><text
-         id="text48"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,168.37578)"><tspan
-           id="tspan46"
-           y="0"
-           x="0 5.0879998 10.176">200</tspan></text>
-<g
-         id="g50"><path
-           id="path52"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,141.449 h 3.699" /></g><g
-         id="g54"><path
-           id="path56"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,141.449 h -3.699" /></g><text
-         id="text60"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,144.47578)"><tspan
-           id="tspan58"
-           y="0"
-           x="0 5.0879998 10.176">300</tspan></text>
-<g
-         id="g62"><path
-           id="path64"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,117.5 h 3.699" /></g><g
-         id="g66"><path
-           id="path68"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,117.5 h -3.699" /></g><text
-         id="text72"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,120.52578)"><tspan
-           id="tspan70"
-           y="0"
-           x="0 5.0879998 10.176">400</tspan></text>
-<g
-         id="g74"><path
-           id="path76"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,93.602 h 3.699" /></g><g
-         id="g78"><path
-           id="path80"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,93.602 h -3.699" /></g><text
-         id="text84"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,96.625781)"><tspan
-           id="tspan82"
-           y="0"
-           x="0 5.0879998 10.176">500</tspan></text>
-<g
-         id="g86"><path
-           id="path88"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,69.648 h 3.699" /></g><g
-         id="g90"><path
-           id="path92"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,69.648 h -3.699" /></g><text
-         id="text96"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,72.675781)"><tspan
-           id="tspan94"
-           y="0"
-           x="0 5.0879998 10.176">600</tspan></text>
-<g
-         id="g98"><path
-           id="path100"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,45.75 h 3.699" /></g><g
-         id="g102"><path
-           id="path104"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,45.75 h -3.699" /></g><text
-         id="text108"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,48.775781)"><tspan
-           id="tspan106"
-           y="0"
-           x="0 5.0879998 10.176">700</tspan></text>
-<g
-         id="g110"><path
-           id="path112"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 42.949,21.801 h 3.699" /></g><g
-         id="g114"><path
-           id="path116"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 417.148,21.801 h -3.699" /></g><text
-         id="text120"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="translate(22.5735,24.825781)"><tspan
-           id="tspan118"
-           y="0"
-           x="0 5.0879998 10.176">800</tspan></text>
-<g
-         id="g122"><path
-           id="path124"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 45.102,213.199 V 209.5" /></g><g
-         id="g126"><path
-           id="path128"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 45.102,9.852 v 3.699" /></g><text
-         id="text132"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-88.112891,130.18711)"><tspan
-           id="tspan130"
-           y="0"
-           x="0 6.296 12.592 19.488001 26.384001 30.983999 34.104 39.688 44.512001 50.360001">OOMMF(CPU)</tspan></text>
-<g
-         id="g134"><path
-           id="path136"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 53.648,213.199 V 209.5" /></g><g
-         id="g138"><path
-           id="path140"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 53.648,9.852 v 3.699" /></g><text
-         id="text144"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-83.83789,134.46211)"><tspan
-           id="tspan142"
-           y="0"
-           x="0 5.9039998 10.784 13.32 18.408001 23.496 28.584">GT 650M</tspan></text>
-<g
-         id="g146"><path
-           id="path148"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 62.199,213.199 V 209.5" /></g><g
-         id="g150"><path
-           id="path152"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 62.199,9.852 v 3.699" /></g><text
-         id="text156"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-79.562891,138.73711)"><tspan
-           id="tspan154"
-           y="0"
-           x="0 5.0879998 10.176 15.264 22.16">940MX</tspan></text>
-<g
-         id="g158"><path
-           id="path160"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 70.75,213.199 V 209.5" /></g><g
-         id="g162"><path
-           id="path164"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 70.75,9.852 v 3.699" /></g><text
-         id="text168"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-75.287891,143.01211)"><tspan
-           id="tspan166"
-           y="0"
-           x="0 6.8959999 12.376 17.464001 22.552">MX150</tspan></text>
-<g
-         id="g170"><path
-           id="path172"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 79.301,213.199 V 209.5" /></g><g
-         id="g174"><path
-           id="path176"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 79.301,9.852 v 3.699" /></g><text
-         id="text180"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-71.01289,147.28711)"><tspan
-           id="tspan178"
-           y="0"
-           x="0 5.9039998 10.784 13.32 18.408001 23.496 28.584 35.48 38.015999 41.136002 43.352001 50.248001 55.144001 59.535999 62.071999 67.160004 72.248001 77.335999 82.424004">GT 755M (iMac 2013)</tspan></text>
-<g
-         id="g182"><path
-           id="path184"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 87.852,213.199 V 209.5" /></g><g
-         id="g186"><path
-           id="path188"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 87.852,9.852 v 3.699" /></g><text
-         id="text192"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-66.73789,151.56211)"><tspan
-           id="tspan190"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999">GTX 860M</tspan></text>
-<g
-         id="g194"><path
-           id="path196"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 96.398,213.199 V 209.5" /></g><g
-         id="g198"><path
-           id="path200"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 96.398,9.852 v 3.699" /></g><text
-         id="text204"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-62.46289,155.83711)"><tspan
-           id="tspan202"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 29.143999 34.231998 39.32 44.408001">Tesla M2070</tspan></text>
-<g
-         id="g206"><path
-           id="path208"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 104.949,213.199 V 209.5" /></g><g
-         id="g210"><path
-           id="path212"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 104.949,9.852 v 3.699" /></g><text
-         id="text216"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-58.18789,160.11211)"><tspan
-           id="tspan214"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 27.336 32.424 37.512001">Tesla 2050</tspan></text>
-<g
-         id="g218"><path
-           id="path220"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 113.5,213.199 V 209.5" /></g><g
-         id="g222"><path
-           id="path224"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 113.5,9.852 v 3.699" /></g><text
-         id="text228"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-53.91289,164.38711)"><tspan
-           id="tspan226"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 660</tspan></text>
-<g
-         id="g230"><path
-           id="path232"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 122.051,213.199 V 209.5" /></g><g
-         id="g234"><path
-           id="path236"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 122.051,9.852 v 3.699" /></g><text
-         id="text240"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-49.63789,168.66211)"><tspan
-           id="tspan238"
-           y="0"
-           x="0 6.296 11.36 16.256001 21.327999 24.440001 29.327999 31.864 37.104 42.192001 47.279999 52.368">Quadro K4200</tspan></text>
-<g
-         id="g242"><path
-           id="path244"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 130.602,213.199 V 209.5" /></g><g
-         id="g246"><path
-           id="path248"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 130.602,9.852 v 3.699" /></g><text
-         id="text252"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-45.36289,172.93711)"><tspan
-           id="tspan250"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999 39.152 41.688 44.807999 52.599998 57.487999 62.560001 64.776001 66.991997 71.912003">GTX 1650 (mobile)</tspan></text>
-<g
-         id="g254"><path
-           id="path256"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 139.148,213.199 V 209.5" /></g><g
-         id="g258"><path
-           id="path260"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 139.148,9.852 v 3.699" /></g><text
-         id="text264"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-41.08789,177.21211)"><tspan
-           id="tspan262"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 480</tspan></text>
-<g
-         id="g266"><path
-           id="path268"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 147.75,213.199 V 209.5" /></g><g
-         id="g270"><path
-           id="path272"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 147.75,9.852 v 3.699" /></g><text
-         id="text276"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-36.787891,181.51211)"><tspan
-           id="tspan274"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 680</tspan></text>
-<g
-         id="g278"><path
-           id="path280"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 156.301,213.199 V 209.5" /></g><g
-         id="g282"><path
-           id="path284"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 156.301,9.852 v 3.699" /></g><text
-         id="text288"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-32.512891,185.78711)"><tspan
-           id="tspan286"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 970</tspan></text>
-<g
-         id="g290"><path
-           id="path292"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 164.852,213.199 V 209.5" /></g><g
-         id="g294"><path
-           id="path296"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 164.852,9.852 v 3.699" /></g><text
-         id="text300"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-28.23789,190.06211)"><tspan
-           id="tspan298"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999">GTX 1060</tspan></text>
-<g
-         id="g302"><path
-           id="path304"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 173.398,213.199 V 209.5" /></g><g
-         id="g306"><path
-           id="path308"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 173.398,9.852 v 3.699" /></g><text
-         id="text312"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-23.96289,194.33711)"><tspan
-           id="tspan310"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 580</tspan></text>
-<g
-         id="g314"><path
-           id="path316"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 181.949,213.199 V 209.5" /></g><g
-         id="g318"><path
-           id="path320"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 181.949,9.852 v 3.699" /></g><text
-         id="text324"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-19.68789,198.61211)"><tspan
-           id="tspan322"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999 39.152 41.688 44.807999 52.599998 57.487999 62.560001 64.776001 66.991997 71.912003">GTX 1060 (mobile)</tspan></text>
-<g
-         id="g326"><path
-           id="path328"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 190.5,213.199 V 209.5" /></g><g
-         id="g330"><path
-           id="path332"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 190.5,9.852 v 3.699" /></g><text
-         id="text336"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-15.412891,202.88711)"><tspan
-           id="tspan334"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 27.488001 32.576 37.664001 43.144001">Tesla K20XM</tspan></text>
-<g
-         id="g338"><path
-           id="path340"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 199.051,213.199 V 209.5" /></g><g
-         id="g342"><path
-           id="path344"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 199.051,9.852 v 3.699" /></g><text
-         id="text348"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-11.13789,207.16211)"><tspan
-           id="tspan346"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976">GTX 980</tspan></text>
-<g
-         id="g350"><path
-           id="path352"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 207.602,213.199 V 209.5" /></g><g
-         id="g354"><path
-           id="path356"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 207.602,9.852 v 3.699" /></g><text
-         id="text360"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-6.8628905,211.43711)"><tspan
-           id="tspan358"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999">GTX 1660</tspan></text>
-<g
-         id="g362"><path
-           id="path364"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 216.148,213.199 V 209.5" /></g><g
-         id="g366"><path
-           id="path368"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 216.148,9.852 v 3.699" /></g><text
-         id="text372"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,-2.5878905,215.71211)"><tspan
-           id="tspan370"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999">GTX 1070</tspan></text>
-<g
-         id="g374"><path
-           id="path376"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 224.699,213.199 V 209.5" /></g><g
-         id="g378"><path
-           id="path380"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 224.699,9.852 v 3.699" /></g><text
-         id="text384"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,1.6871095,219.98711)"><tspan
-           id="tspan382"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.68 26.032 30.296 35.768002 41.751999 44.287998 49.776001 54.416 59.743999 65.328003 70.568001 73.103996 77.704002">GTX TITAN BLACK FE</tspan></text>
-<g
-         id="g386"><path
-           id="path388"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 233.25,213.199 V 209.5" /></g><g
-         id="g390"><path
-           id="path392"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 233.25,9.852 v 3.699" /></g><text
-         id="text396"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,5.9621095,224.26211)"><tspan
-           id="tspan394"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.68 26.032 30.296 35.768002">GTX TITAN</tspan></text>
-<g
-         id="g398"><path
-           id="path400"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 241.801,213.199 V 209.5" /></g><g
-         id="g402"><path
-           id="path404"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 241.801,9.852 v 3.699" /></g><text
-         id="text408"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,10.237109,228.53711)"><tspan
-           id="tspan406"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999">GTX 1080</tspan></text>
-<g
-         id="g410"><path
-           id="path412"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 250.352,213.199 V 209.5" /></g><g
-         id="g414"><path
-           id="path416"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 250.352,9.852 v 3.699" /></g><text
-         id="text420"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,14.51211,232.81211)"><tspan
-           id="tspan418"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 29.143999 34.231998">Tesla M40</tspan></text>
-<g
-         id="g422"><path
-           id="path424"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 258.898,213.199 V 209.5" /></g><g
-         id="g426"><path
-           id="path428"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 258.898,9.852 v 3.699" /></g><text
-         id="text432"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,18.787109,237.08711)"><tspan
-           id="tspan430"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999 36.599998 41.240002">GTX 980 Ti</tspan></text>
-<g
-         id="g434"><path
-           id="path436"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 267.449,213.199 V 209.5" /></g><g
-         id="g438"><path
-           id="path440"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 267.449,9.852 v 3.699" /></g><text
-         id="text444"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,23.062109,241.36211)"><tspan
-           id="tspan442"
-           y="0"
-           x="0 6.296 11.36 16.256001 21.327999 24.440001 29.327999 31.864 36.688 41.776001 46.863998 51.952">Quadro P5000</tspan></text>
-<g
-         id="g446"><path
-           id="path448"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 276,213.199 V 209.5" /></g><g
-         id="g450"><path
-           id="path452"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 276,9.852 v 3.699" /></g><text
-         id="text456"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,27.337109,245.63711)"><tspan
-           id="tspan454"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 27.072001 32.16">Tesla P40</tspan></text>
-<g
-         id="g458"><path
-           id="path460"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 284.602,213.199 V 209.5" /></g><g
-         id="g462"><path
-           id="path464"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 284.602,9.852 v 3.699" /></g><text
-         id="text468"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,31.637109,249.93711)"><tspan
-           id="tspan466"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 24.712 29.591999 35.071999 37.608002 42.695999 47.784 52.872002 57.959999 60.495998 65.127998">GTX GTX 1660 Ti</tspan></text>
-<g
-         id="g470"><path
-           id="path472"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 293.148,213.199 V 209.5" /></g><g
-         id="g474"><path
-           id="path476"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 293.148,9.852 v 3.699" /></g><text
-         id="text480"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,35.912109,254.21211)"><tspan
-           id="tspan478"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.68 26.032 30.296 35.768002 41.751999 44.287998 49.768002 52.304001 55.424 59.888 64.783997 68.944 73.335999 78.232002 80.447998">GTX TITAN X (Pascal)</tspan></text>
-<g
-         id="g482"><path
-           id="path484"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 301.699,213.199 V 209.5" /></g><g
-         id="g486"><path
-           id="path488"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 301.699,9.852 v 3.699" /></g><text
-         id="text492"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,40.187109,258.48711)"><tspan
-           id="tspan490"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998">RTX 2060</tspan></text>
-<g
-         id="g494"><path
-           id="path496"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 310.25,213.199 V 209.5" /></g><g
-         id="g498"><path
-           id="path500"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 310.25,9.852 v 3.699" /></g><text
-         id="text504"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,44.462109,262.76211)"><tspan
-           id="tspan502"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.888 28.976 34.063999 39.152 41.688 46.327999">GTX 1080 Ti</tspan></text>
-<g
-         id="g506"><path
-           id="path508"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 318.801,213.199 V 209.5" /></g><g
-         id="g510"><path
-           id="path512"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 318.801,9.852 v 3.699" /></g><text
-         id="text516"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,48.737109,267.03711)"><tspan
-           id="tspan514"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998">RTX 2070</tspan></text>
-<g
-         id="g518"><path
-           id="path520"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 327.352,213.199 V 209.5" /></g><g
-         id="g522"><path
-           id="path524"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 327.352,9.852 v 3.699" /></g><text
-         id="text528"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,53.012109,271.31211)"><tspan
-           id="tspan526"
-           y="0"
-           x="0 5.9039998 10.784 16.264 18.799999 23.68 26.032 30.296 35.768002 41.751999 44.287998 49.768002">GTX TITAN Xp</tspan></text>
-<g
-         id="g530"><path
-           id="path532"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 335.898,213.199 V 209.5" /></g><g
-         id="g534"><path
-           id="path536"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 335.898,9.852 v 3.699" /></g><text
-         id="text540"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,57.287109,275.58711)"><tspan
-           id="tspan538"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 27.072001 32.16 37.248001">Tesla P100</tspan></text>
-<g
-         id="g542"><path
-           id="path544"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 344.449,213.199 V 209.5" /></g><g
-         id="g546"><path
-           id="path548"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 344.449,9.852 v 3.699" /></g><text
-         id="text552"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,61.562109,279.86211)"><tspan
-           id="tspan550"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998 38.216 40.751999 45.824001 51.672001 56.495998 61.543999">RTX 2060 SUPER</tspan></text>
-<g
-         id="g554"><path
-           id="path556"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 353,213.199 V 209.5" /></g><g
-         id="g558"><path
-           id="path560"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 353,9.852 v 3.699" /></g><text
-         id="text564"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,65.837109,284.13711)"><tspan
-           id="tspan562"
-           y="0"
-           x="0 3.52 8.4399996 12.6 14.816 19.712 22.247999 27.072001 32.16 37.248001 42.335999 44.872002 49.944 55.424 62.32">Tesla P100 SXM2</tspan></text>
-<g
-         id="g566"><path
-           id="path568"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 361.551,213.199 V 209.5" /></g><g
-         id="g570"><path
-           id="path572"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 361.551,9.852 v 3.699" /></g><text
-         id="text576"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,70.112109,288.41211)"><tspan
-           id="tspan574"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998 38.216 40.751999 45.383999">RTX 2080 Ti</tspan></text>
-<g
-         id="g578"><path
-           id="path580"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 370.102,213.199 V 209.5" /></g><g
-         id="g582"><path
-           id="path584"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 370.102,9.852 v 3.699" /></g><text
-         id="text588"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,74.387109,292.68711)"><tspan
-           id="tspan586"
-           y="0"
-           x="0 4.8800001 7.2319999 11.488 16.959999 22.944 25.48">TITAN V</tspan></text>
-<g
-         id="g590"><path
-           id="path592"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 378.648,213.199 V 209.5" /></g><g
-         id="g594"><path
-           id="path596"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 378.648,9.852 v 3.699" /></g><text
-         id="text600"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,78.662109,296.96211)"><tspan
-           id="tspan598"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998 38.216 40.751999 45.383999 47.599998 50.136002 56.431999">RTX 2080 Ti OC</tspan></text>
-<g
-         id="g602"><path
-           id="path604"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 387.199,213.199 V 209.5" /></g><g
-         id="g606"><path
-           id="path608"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 387.199,9.852 v 3.699" /></g><text
-         id="text612"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,82.937109,301.23711)"><tspan
-           id="tspan610"
-           y="0"
-           x="0 4.8800001 7.2319999 11.488 16.959999 22.944 25.48 30.455999 35.335999">TITAN RTX</tspan></text>
-<g
-         id="g614"><path
-           id="path616"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 395.75,213.199 V 209.5" /></g><g
-         id="g618"><path
-           id="path620"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 395.75,9.852 v 3.699" /></g><text
-         id="text624"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,87.212109,305.51211)"><tspan
-           id="tspan622"
-           y="0"
-           x="0 5.4720001 10.56 15.648 20.736 23.615999 28.688 34.167999 41.063999 46.152 49.032001 54.119999 59.208 65.400002">V100-SXM2-32GB</tspan></text>
-<g
-         id="g626"><path
-           id="path628"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 404.301,213.199 V 209.5" /></g><g
-         id="g630"><path
-           id="path632"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 404.301,9.852 v 3.699" /></g><text
-         id="text636"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,91.487109,309.78711)"><tspan
-           id="tspan634"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998">RTX 3080</tspan></text>
-<g
-         id="g638"><path
-           id="path640"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 412.852,213.199 V 209.5" /></g><g
-         id="g642"><path
-           id="path644"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 412.852,9.852 v 3.699" /></g><text
-         id="text648"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(90,95.762109,314.06211)"><tspan
-           id="tspan646"
-           y="0"
-           x="0 4.9679999 9.8479996 15.328 17.864 22.952 28.040001 33.127998">RTX 3090</tspan></text>
-<g
-         id="g650"><path
-           id="path652"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 42.949,9.852 H 417.148 V 213.2 H 42.949 Z" /></g><text
-         id="text656"
-         style="font-variant:normal;font-weight:normal;font-size:8px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         transform="rotate(-90,83.299414,72.123633)"><tspan
-           id="tspan654"
-           y="0"
-           x="0 3.1359999 8.1999998 11.312 16.200001 21.264 26.336 31.4 36.472 41.535999 44.672001 47.208 50.327999 57.223999 59.759998 64.152 69.071999 71.288002 73.503998 77.664001 80.351997 84.512001">throughput (M cells/s)</tspan></text>
-<path
-         id="path658"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 51.5,208.148 h 4.352 v 5.051 H 51.5 Z" /><g
-         id="g660"><path
-           id="path662"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 51.5,208.199 h 4.301 v 5 H 51.5 Z" /></g><path
-         id="path664"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 60.051,206.801 h 4.352 v 6.398 h -4.352 z" /><g
-         id="g666"><path
-           id="path668"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 60.051,206.852 h 4.301 v 6.348 h -4.301 z" /></g><path
-         id="path670"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 68.602,204.801 h 4.352 v 8.398 h -4.352 z" /><g
-         id="g672"><path
-           id="path674"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 68.602,204.852 h 4.297 v 8.348 h -4.297 z" /></g><path
-         id="path676"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="M 77.148,203.5 H 81.5 v 9.699 h -4.352 z" /><g
-         id="g678"><path
-           id="path680"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 77.148,203.551 h 4.301 v 9.648 h -4.301 z" /></g><path
-         id="path682"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 85.699,199.949 h 4.352 v 13.25 h -4.352 z" /><g
-         id="g684"><path
-           id="path686"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 85.699,200 H 90 v 13.199 h -4.301 z" /></g><path
-         id="path688"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 94.25,197.148 h 4.352 v 16.051 H 94.25 Z" /><g
-         id="g690"><path
-           id="path692"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 94.25,197.199 h 4.301 v 16 H 94.25 Z" /></g><path
-         id="path694"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 102.801,196.551 h 4.352 v 16.648 h -4.352 z" /><g
-         id="g696"><path
-           id="path698"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 102.801,196.602 h 4.301 V 213.2 h -4.301 z" /></g><path
-         id="path700"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 111.398,192.148 h 4.301 v 21.051 h -4.301 z" /><g
-         id="g702"><path
-           id="path704"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 111.398,192.199 h 4.25 v 21 h -4.25 z" /></g><path
-         id="path706"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 119.949,189.949 h 4.301 v 23.25 h -4.301 z" /><g
-         id="g708"><path
-           id="path710"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 119.949,190 h 4.25 v 23.199 h -4.25 z" /></g><path
-         id="path712"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 128.5,189.801 h 4.301 v 23.398 H 128.5 Z" /><g
-         id="g714"><path
-           id="path716"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 128.5,189.852 h 4.25 V 213.2 h -4.25 z" /></g><path
-         id="path718"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 137.051,186.25 h 4.301 v 26.949 h -4.301 z" /><g
-         id="g720"><path
-           id="path722"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 137.051,186.301 h 4.25 v 26.898 h -4.25 z" /></g><path
-         id="path724"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 145.602,185.801 h 4.301 v 27.398 h -4.301 z" /><g
-         id="g726"><path
-           id="path728"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 145.602,185.852 h 4.25 V 213.2 h -4.25 z" /></g><path
-         id="path730"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 154.148,184.301 h 4.301 v 28.898 h -4.301 z" /><g
-         id="g732"><path
-           id="path734"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 154.148,184.352 h 4.25 V 213.2 h -4.25 z" /></g><path
-         id="path736"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="M 162.699,183.398 H 167 v 29.801 h -4.301 z" /><g
-         id="g738"><path
-           id="path740"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 162.699,183.449 h 4.25 v 29.75 h -4.25 z" /></g><path
-         id="path742"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 171.25,182.598 h 4.301 V 213.2 h -4.301 z" /><g
-         id="g744"><path
-           id="path746"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 171.25,182.648 h 4.25 v 30.551 h -4.25 z" /></g><path
-         id="path748"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 179.801,182.449 h 4.352 v 30.75 h -4.352 z" /><g
-         id="g750"><path
-           id="path752"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 179.801,182.5 h 4.301 v 30.699 h -4.301 z" /></g><path
-         id="path754"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 188.352,181.898 h 4.352 v 31.301 h -4.352 z" /><g
-         id="g756"><path
-           id="path758"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 188.352,181.949 h 4.297 v 31.25 h -4.297 z" /></g><path
-         id="path760"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 196.898,181.5 h 4.352 v 31.699 h -4.352 z" /><g
-         id="g762"><path
-           id="path764"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 196.898,181.551 h 4.301 v 31.648 h -4.301 z" /></g><path
-         id="path766"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 205.449,173.898 h 4.352 v 39.301 h -4.352 z" /><g
-         id="g768"><path
-           id="path770"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 205.449,173.949 h 4.301 v 39.25 h -4.301 z" /></g><path
-         id="path772"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 214,172.398 h 4.352 v 40.801 H 214 Z" /><g
-         id="g774"><path
-           id="path776"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 214,172.449 h 4.301 v 40.75 H 214 Z" /></g><path
-         id="path778"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 222.551,171.199 h 4.352 v 42 h -4.352 z" /><g
-         id="g780"><path
-           id="path782"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 222.551,171.25 h 4.301 v 41.949 h -4.301 z" /></g><path
-         id="path784"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 231.102,170.148 h 4.352 v 43.051 h -4.352 z" /><g
-         id="g786"><path
-           id="path788"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 231.102,170.199 h 4.297 v 43 h -4.297 z" /></g><path
-         id="path790"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="M 239.648,167.75 H 244 v 45.449 h -4.352 z" /><g
-         id="g792"><path
-           id="path794"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 239.648,167.801 h 4.301 v 45.398 h -4.301 z" /></g><path
-         id="path796"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 248.25,165.898 h 4.301 v 47.301 h -4.301 z" /><g
-         id="g798"><path
-           id="path800"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 248.25,165.949 h 4.25 v 47.25 h -4.25 z" /></g><path
-         id="path802"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 256.801,165.398 h 4.301 v 47.801 h -4.301 z" /><g
-         id="g804"><path
-           id="path806"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 256.801,165.449 h 4.25 v 47.75 h -4.25 z" /></g><path
-         id="path808"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 265.352,164.25 h 4.301 v 48.949 h -4.301 z" /><g
-         id="g810"><path
-           id="path812"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 265.352,164.301 h 4.25 v 48.898 h -4.25 z" /></g><path
-         id="path814"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 273.898,155.848 h 4.301 V 213.2 h -4.301 z" /><g
-         id="g816"><path
-           id="path818"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 273.898,155.898 h 4.25 v 57.301 h -4.25 z" /></g><path
-         id="path820"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 282.449,153.949 h 4.301 v 59.25 h -4.301 z" /><g
-         id="g822"><path
-           id="path824"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 282.449,154 h 4.25 v 59.199 h -4.25 z" /></g><path
-         id="path826"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 291,147.398 h 4.301 v 65.801 H 291 Z" /><g
-         id="g828"><path
-           id="path830"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 291,147.449 h 4.25 v 65.75 H 291 Z" /></g><path
-         id="path832"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 299.551,145.051 h 4.301 v 68.148 h -4.301 z" /><g
-         id="g834"><path
-           id="path836"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 299.551,145.102 h 4.25 V 213.2 h -4.25 z" /></g><path
-         id="path838"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 308.102,147.301 h 4.301 v 65.898 h -4.301 z" /><g
-         id="g840"><path
-           id="path842"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 308.102,147.352 h 4.25 V 213.2 h -4.25 z" /></g><path
-         id="path844"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="M 316.648,141.898 H 321 v 71.301 h -4.352 z" /><g
-         id="g846"><path
-           id="path848"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 316.648,141.949 h 4.301 v 71.25 h -4.301 z" /></g><path
-         id="path850"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 325.199,131.5 h 4.352 v 81.699 h -4.352 z" /><g
-         id="g852"><path
-           id="path854"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 325.199,131.551 h 4.301 v 81.648 h -4.301 z" /></g><path
-         id="path856"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 333.75,126.551 h 4.352 v 86.648 h -4.352 z" /><g
-         id="g858"><path
-           id="path860"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 333.75,126.602 h 4.301 V 213.2 h -4.301 z" /></g><path
-         id="path862"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 342.301,124.25 h 4.352 v 88.949 h -4.352 z" /><g
-         id="g864"><path
-           id="path866"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 342.301,124.301 h 4.301 v 88.898 h -4.301 z" /></g><path
-         id="path868"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 350.852,117.75 h 4.352 v 95.449 h -4.352 z" /><g
-         id="g870"><path
-           id="path872"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 350.852,117.801 h 4.297 v 95.398 h -4.297 z" /></g><path
-         id="path874"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 359.398,110.648 h 4.352 v 102.551 h -4.352 z" /><g
-         id="g876"><path
-           id="path878"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 359.398,110.699 h 4.301 v 102.5 h -4.301 z" /></g><path
-         id="path880"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 367.949,101 h 4.352 v 112.199 h -4.352 z" /><g
-         id="g882"><path
-           id="path884"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 367.949,101.051 h 4.301 v 112.148 h -4.301 z" /></g><path
-         id="path886"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 376.5,91.801 h 4.352 V 213.199 H 376.5 Z" /><g
-         id="g888"><path
-           id="path890"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 376.5,91.852 h 4.301 V 213.2 H 376.5 Z" /></g><path
-         id="path892"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 385.102,86.449 h 4.301 v 126.75 h -4.301 z" /><g
-         id="g894"><path
-           id="path896"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 385.102,86.5 h 4.25 v 126.699 h -4.25 z" /></g><path
-         id="path898"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 393.648,66.75 h 4.301 v 146.449 h -4.301 z" /><g
-         id="g900"><path
-           id="path902"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 393.648,66.801 h 4.25 v 146.398 h -4.25 z" /></g><path
-         id="path904"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="M 402.199,48.598 H 406.5 V 213.2 h -4.301 z" /><g
-         id="g906"><path
-           id="path908"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="m 402.199,48.648 h 4.25 v 164.551 h -4.25 z" /></g><path
-         id="path910"
-         style="fill:#9400d3;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 410.75,13.148 h 4.301 v 200.051 h -4.301 z" /><g
-         id="g912"><path
-           id="path914"
-           style="fill:none;stroke:#9400d3;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 410.75,13.199 H 415 v 200 h -4.25 z" /></g><path
-         id="path916"
-         style="fill:#009e73;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 42.949,212.801 h 4.352 v 0.398 h -4.352 z" /><g
-         id="g918"><path
-           id="path920"
-           style="fill:none;stroke:#009e73;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 42.949,212.852 H 47.25 V 213.2 H 42.949 Z" /></g><g
-         id="g922"><path
-           id="path924"
-           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.79999995;stroke-dasharray:none;stroke-opacity:1"
-           d="M 42.949,9.852 H 417.148 V 213.2 H 42.949 Z" /></g></g></g></svg>
+<?xml version="1.0" encoding="utf-8"  standalone="no"?>
+
+<svg width="600" height="470" viewBox="0 0 600 470" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<style type="text/css">
+	polygon {
+		transition: fill 0.3s linear;
+	}
+	polygon:hover {
+		fill:rgb(37,0,53);
+		transition: fill 0s;
+	}
+</style>
+
+<title>Gnuplot</title>
+<desc>Produced by GNUPLOT 5.4 patchlevel 8 </desc>
+
+<g id="gnuplot_canvas">
+
+<rect x="0" y="0" width="600" height="470" fill="none"></rect>
+<defs>
+
+	<circle id="gpDot" r="0.5" stroke-width="0.5" stroke="currentColor"></circle>
+	<path id="gpPt0" stroke-width="0.242" stroke="currentColor" d="M-1,0 h2 M0,-1 v2"></path>
+	<path id="gpPt1" stroke-width="0.242" stroke="currentColor" d="M-1,-1 L1,1 M1,-1 L-1,1"></path>
+	<path id="gpPt2" stroke-width="0.242" stroke="currentColor" d="M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1"></path>
+	<rect id="gpPt3" stroke-width="0.242" stroke="currentColor" x="-1" y="-1" width="2" height="2"></rect>
+	<rect id="gpPt4" stroke-width="0.242" stroke="currentColor" fill="currentColor" x="-1" y="-1" width="2" height="2"></rect>
+	<circle id="gpPt5" stroke-width="0.242" stroke="currentColor" cx="0" cy="0" r="1"></circle>
+	<use href="#gpPt5" id="gpPt6" fill="currentColor" stroke="none"></use>
+	<path id="gpPt7" stroke-width="0.242" stroke="currentColor" d="M0,-1.33 L-1.33,0.67 L1.33,0.67 z"></path>
+	<use href="#gpPt7" id="gpPt8" fill="currentColor" stroke="none"></use>
+	<use href="#gpPt7" id="gpPt9" stroke="currentColor" transform="rotate(180)"></use>
+	<use href="#gpPt9" id="gpPt10" fill="currentColor" stroke="none"></use>
+	<use href="#gpPt3" id="gpPt11" stroke="currentColor" transform="rotate(45)"></use>
+	<use href="#gpPt11" id="gpPt12" fill="currentColor" stroke="none"></use>
+	<path id="gpPt13" stroke-width="0.242" stroke="currentColor" d="M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z"></path>
+	<use href="#gpPt13" id="gpPt14" fill="currentColor" stroke="none"></use>
+	<filter id="textbox" filterUnits="objectBoundingBox" x="0" y="0" height="1" width="1">
+	  <feFlood flood-color="white" flood-opacity="1" result="bgnd"></feFlood>
+	  <feComposite in="SourceGraphic" in2="bgnd" operator="atop"></feComposite>
+	</filter>
+	<filter id="greybox" filterUnits="objectBoundingBox" x="0" y="0" height="1" width="1">
+	  <feFlood flood-color="lightgrey" flood-opacity="1" result="grey"></feFlood>
+	  <feComposite in="SourceGraphic" in2="grey" operator="atop"></feComposite>
+	</filter>
+</defs>
+<g fill="none" color="white" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,253.56 L82.42,253.56 M576.92,253.56 L568.67,253.56  "></path>	<g transform="translate(66.48,257.14)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 0</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,215.63 L82.42,215.63 M576.92,215.63 L568.67,215.63  "></path>	<g transform="translate(66.48,219.21)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 200</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,177.70 L82.42,177.70 M576.92,177.70 L568.67,177.70  "></path>	<g transform="translate(66.48,181.28)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 400</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,139.78 L82.42,139.78 M576.92,139.78 L568.67,139.78  "></path>	<g transform="translate(66.48,143.36)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 600</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,101.85 L82.42,101.85 M576.92,101.85 L568.67,101.85  "></path>	<g transform="translate(66.48,105.43)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 800</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,63.92 L82.42,63.92 M576.92,63.92 L568.67,63.92  "></path>	<g transform="translate(66.48,67.50)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 1000</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,25.99 L82.42,25.99 M576.92,25.99 L568.67,25.99  "></path>	<g transform="translate(66.48,29.57)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+		<text><tspan font-family="DejaVu Sans"> 1200</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M77.13,253.56 M77.13,16.51  "></path>	<g transform="translate(73.55,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">OOMMF (CPU)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M87.01,253.56 M87.01,16.51  "></path>	<g transform="translate(83.43,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">940MX</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M96.89,253.56 M96.89,16.51  "></path>	<g transform="translate(93.31,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">MX250</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M106.76,253.56 M106.76,16.51  "></path>	<g transform="translate(103.18,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">MX150</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M116.64,253.56 M116.64,16.51  "></path>	<g transform="translate(113.06,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 860M</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M126.52,253.56 M126.52,16.51  "></path>	<g transform="translate(122.94,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1050 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M136.40,253.56 M136.40,16.51  "></path>	<g transform="translate(132.82,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1050Ti (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M146.27,253.56 M146.27,16.51  "></path>	<g transform="translate(142.69,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2050 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M156.15,253.56 M156.15,16.51  "></path>	<g transform="translate(152.57,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1650 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M166.03,253.56 M166.03,16.51  "></path>	<g transform="translate(162.45,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 970</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M175.91,253.56 M175.91,16.51  "></path>	<g transform="translate(172.33,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1060</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M185.78,253.56 M185.78,16.51  "></path>	<g transform="translate(182.20,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1060 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M195.66,253.56 M195.66,16.51  "></path>	<g transform="translate(192.08,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 980</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M205.54,253.56 M205.54,16.51  "></path>	<g transform="translate(201.96,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Quadro M5000</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M215.41,253.56 M215.41,16.51  "></path>	<g transform="translate(211.83,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1660</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M225.29,253.56 M225.29,16.51  "></path>	<g transform="translate(221.71,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1070</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M235.17,253.56 M235.17,16.51  "></path>	<g transform="translate(231.59,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1080</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M245.05,253.56 M245.05,16.51  "></path>	<g transform="translate(241.47,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Tesla M40</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M254.92,253.56 M254.92,16.51  "></path>	<g transform="translate(251.34,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 980 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M264.80,253.56 M264.80,16.51  "></path>	<g transform="translate(261.22,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2000 Ada</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M274.68,253.56 M274.68,16.51  "></path>	<g transform="translate(271.10,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Quadro P5000</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M284.55,253.56 M284.55,16.51  "></path>	<g transform="translate(280.97,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Tesla P40</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M294.43,253.56 M294.43,16.51  "></path>	<g transform="translate(290.85,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1660 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M304.31,253.56 M304.31,16.51  "></path>	<g transform="translate(300.73,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX TITAN X (Pascal)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M314.19,253.56 M314.19,16.51  "></path>	<g transform="translate(310.61,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX 1080 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M324.06,253.56 M324.06,16.51  "></path>	<g transform="translate(320.48,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2060</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M333.94,253.56 M333.94,16.51  "></path>	<g transform="translate(330.36,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2070</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M343.82,253.56 M343.82,16.51  "></path>	<g transform="translate(340.24,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 4060 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M353.70,253.56 M353.70,16.51  "></path>	<g transform="translate(350.12,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX A4000 (ECC On)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M363.57,253.56 M363.57,16.51  "></path>	<g transform="translate(359.99,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">GTX TITAN Xp</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M373.45,253.56 M373.45,16.51  "></path>	<g transform="translate(369.87,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Tesla P100</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M383.33,253.56 M383.33,16.51  "></path>	<g transform="translate(379.75,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2060 SUPER</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M393.20,253.56 M393.20,16.51  "></path>	<g transform="translate(389.62,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2080</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M403.08,253.56 M403.08,16.51  "></path>	<g transform="translate(399.50,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">Tesla P100 SXM2</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M412.96,253.56 M412.96,16.51  "></path>	<g transform="translate(409.38,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3080 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M422.84,253.56 M422.84,16.51  "></path>	<g transform="translate(419.26,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2080 SUPER</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M432.71,253.56 M432.71,16.51  "></path>	<g transform="translate(429.13,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2080 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M442.59,253.56 M442.59,16.51  "></path>	<g transform="translate(439.01,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3060 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M452.47,253.56 M452.47,16.51  "></path>	<g transform="translate(448.89,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">TITAN V</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M462.34,253.56 M462.34,16.51  "></path>	<g transform="translate(458.76,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 4070</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M472.22,253.56 M472.22,16.51  "></path>	<g transform="translate(468.64,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 2080 Ti OC</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M482.10,253.56 M482.10,16.51  "></path>	<g transform="translate(478.52,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">TITAN RTX</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M491.98,253.56 M491.98,16.51  "></path>	<g transform="translate(488.40,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3070 Ti Lite Hash Rate</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M501.85,253.56 M501.85,16.51  "></path>	<g transform="translate(498.27,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX A6000 (ECC On)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M511.73,253.56 M511.73,16.51  "></path>	<g transform="translate(508.15,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">V100-SXM2-32GB</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M521.61,253.56 M521.61,16.51  "></path>	<g transform="translate(518.03,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3080</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M531.48,253.56 M531.48,16.51  "></path>	<g transform="translate(527.90,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX A6000 (ECC Off)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M541.36,253.56 M541.36,16.51  "></path>	<g transform="translate(537.78,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3080 (12Gb)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M551.24,253.56 M551.24,16.51  "></path>	<g transform="translate(547.66,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 3090</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M561.12,253.56 M561.12,16.51  "></path>	<g transform="translate(557.54,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">A100</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M570.99,253.56 M570.99,16.51  "></path>	<g transform="translate(567.41,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 4090</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,16.51 L74.17,253.56 L576.92,253.56 L576.92,16.51 L74.17,16.51 Z  "></path></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g transform="translate(17.58,135.04) rotate(270)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="middle">
+		<text><tspan font-family="DejaVu Sans">throughput (M cells/s)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+	<g id="gnuplot_plot_1"><title> </title>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g stroke="none" shape-rendering="crispEdges">
+		<polygon fill="rgb(148,   0, 211)" points="84.05,253.56 89.98,253.56 89.98,248.51 84.05,248.51 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="93.92,253.56 99.86,253.56 99.86,246.94 93.92,246.94 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="103.80,253.56 109.74,253.56 109.74,246.92 103.80,246.92 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="113.68,253.56 119.62,253.56 119.62,243.07 113.68,243.07 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="123.56,253.56 129.49,253.56 129.49,239.78 123.56,239.78 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="133.43,253.56 139.37,253.56 139.37,238.02 133.43,238.02 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="143.31,253.56 149.25,253.56 149.25,237.45 143.31,237.45 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="153.19,253.56 159.12,253.56 159.12,235.05 153.19,235.05 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="163.06,253.56 169.00,253.56 169.00,230.68 163.06,230.68 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="172.94,253.56 178.88,253.56 178.88,229.27 172.94,229.27 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="182.82,253.56 188.76,253.56 188.76,229.22 182.82,229.22 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="192.70,253.56 198.63,253.56 198.63,228.48 192.70,228.48 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="202.57,253.56 208.51,253.56 208.51,226.60 202.57,226.60 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="212.45,253.56 218.39,253.56 218.39,222.43 212.45,222.43 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="222.33,253.56 228.26,253.56 228.26,221.25 222.33,221.25 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="232.21,253.56 238.14,253.56 238.14,217.58 232.21,217.58 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="242.08,253.56 248.02,253.56 248.02,216.10 242.08,216.10 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="251.96,253.56 257.90,253.56 257.90,215.69 251.96,215.69 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="261.84,253.56 267.77,253.56 267.77,214.85 261.84,214.85 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="271.71,253.56 277.65,253.56 277.65,214.78 271.71,214.78 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="281.59,253.56 287.53,253.56 287.53,208.14 281.59,208.14 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="291.47,253.56 297.40,253.56 297.40,206.62 291.47,206.62 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="301.35,253.56 307.28,253.56 307.28,201.44 301.35,201.44 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="311.22,253.56 317.16,253.56 317.16,201.37 311.22,201.37 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="321.10,253.56 327.04,253.56 327.04,199.56 321.10,199.56 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="330.98,253.56 336.91,253.56 336.91,197.08 330.98,197.08 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="340.85,253.56 346.79,253.56 346.79,196.68 340.85,196.68 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="350.73,253.56 356.67,253.56 356.67,192.29 350.73,192.29 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="360.61,253.56 366.55,253.56 366.55,188.81 360.61,188.81 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="370.49,253.56 376.42,253.56 376.42,184.90 370.49,184.90 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="380.36,253.56 386.30,253.56 386.30,183.10 380.36,183.10 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="390.24,253.56 396.18,253.56 396.18,181.52 390.24,181.52 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="400.12,253.56 406.05,253.56 406.05,177.92 400.12,177.92 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="410.00,253.56 415.93,253.56 415.93,177.54 410.00,177.54 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="419.87,253.56 425.81,253.56 425.81,173.05 419.87,173.05 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="429.75,253.56 435.69,253.56 435.69,172.31 429.75,172.31 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="439.63,253.56 445.56,253.56 445.56,170.99 439.63,170.99 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="449.50,253.56 455.44,253.56 455.44,164.65 449.50,164.65 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="459.38,253.56 465.32,253.56 465.32,158.97 459.38,158.97 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="469.26,253.56 475.19,253.56 475.19,157.37 469.26,157.37 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="479.14,253.56 485.07,253.56 485.07,153.12 479.14,153.12 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="489.01,253.56 494.95,253.56 494.95,149.81 489.01,149.81 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="498.89,253.56 504.83,253.56 504.83,147.70 498.89,147.70 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="508.77,253.56 514.70,253.56 514.70,137.51 508.77,137.51 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="518.64,253.56 524.58,253.56 524.58,123.10 518.64,123.10 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="528.52,253.56 534.46,253.56 534.46,119.32 528.52,119.32 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="538.40,253.56 544.34,253.56 544.34,110.23 538.40,110.23 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="548.28,253.56 554.21,253.56 554.21,95.03 548.28,95.03 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="558.15,253.56 564.09,253.56 564.09,73.11 558.15,73.11 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="568.03,253.56 573.97,253.56 573.97,20.68 568.03,20.68 "></polygon>
+	</g>
+</g>
+	</g>
+	<g id="gnuplot_plot_2"><title>"oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF (CPU)")</title>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<g stroke="none" shape-rendering="crispEdges">
+		<polygon fill="rgb(  0, 158, 115)" points="74.17,253.56 80.11,253.56 80.11,253.28 74.17,253.28 "></polygon>
+	</g>
+</g>
+	</g>
+<g fill="none" color="white" stroke="rgb(  0, 158, 115)" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="black" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M74.17,16.51 L74.17,253.56 L576.92,253.56 L576.92,16.51 L74.17,16.51 Z  "></path></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+</g>
+</g>
+</svg>
+

@@ -23,7 +23,6 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 		print("Periodic BC...")
 		SetPBC(1, 1, 0)
 	}
-	m = neelskyrmion(1, -1)
 
 	// Use DMI tensor...
 	ext_DMItensor(0, 0, 2, DMI)
@@ -31,6 +30,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	ext_DMItensor(1, 1, 2, DMI)
 	ext_DMItensor(1, 2, 1, -DMI)
 	Dind = 0
+	m = neelskyrmion(1, -1)
 	relax()
 	minimize()
 	Etot_dmitensor := E_total.get()
@@ -41,6 +41,8 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	ext_DMItensor(1, 1, 2, 0.0)
 	ext_DMItensor(1, 2, 1, 0.0)
 	Dind = DMI
+	m = neelskyrmion(1, -1)
+	relax()
 	minimize()
 	Etot_dind := E_total.get()
 

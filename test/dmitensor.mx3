@@ -38,6 +38,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	relax()
 	minimize()
 	Etot_dmitensor_ind := E_total.get()
+	m_dmitensor_ind := m.getCell(40, 36, 0)
 
 	// Use Dind...
 	ext_DMItensor(0, 0, 2, 0.0)
@@ -49,9 +50,11 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	relax()
 	minimize()
 	Etot_dind := E_total.get()
+	m_dind := m.getCell(40, 36, 0)
 
 	// Are their results equal?
 	Expect("DMI tensor vs. Dind | Etot", Etot_dmitensor_ind, Etot_dind, 1e-5*abs(Etot_dind))
+	ExpectV("DMI tensor vs. Dind | m", m_dmitensor_ind, m_dind, 1e-3)
 
 	//// Dbulk
 	Dind = 0
@@ -68,6 +71,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	relax()
 	minimize()
 	Etot_dmitensor_bulk := E_total.get()
+	m_dmitensor_bulk := m.getCell(40, 36, 0)
 
 	// Use Dind...
 	ext_DMItensor(1, 0, 2, 0.0)
@@ -81,7 +85,9 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	relax()
 	minimize()
 	Etot_dbulk := E_total.get()
+	m_dbulk := m.getCell(40, 36, 0)
 
 	// Are their results equal?
 	Expect("DMI tensor vs. Dbulk | Etot", Etot_dmitensor_bulk, Etot_dbulk, 1e-5*abs(Etot_dbulk))
+	ExpectV("DMI tensor vs. Dbulk | m", m_dmitensor_bulk, m_dbulk, 1e-3)
 }

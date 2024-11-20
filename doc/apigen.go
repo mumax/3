@@ -53,9 +53,15 @@ func getGoDocString(packageName, identifier string) string {
 	stdout, err := cmd.Output()
 	outputLines := strings.Split(string(stdout), "\n")
 	if err == nil && outputLines[2][:4] == "func" { // we only look for doc strings of functions
-		// the doc string of a function is on the fourth line
-		// (and possible continued on the fifth line, if not, then the fifth line is empty)
-		docString = strings.Join(outputLines[3:5], " ")
+		// the doc string of a function is the paragraph starting on the fourth line
+		var docLines []string
+		for i := 3; i < len(outputLines); i++ {
+			if strings.TrimSpace(outputLines[i]) == "" { // Stop at the first empty line
+				break
+			}
+			docLines = append(docLines, outputLines[i])
+		}
+		docString = strings.Join(docLines, " ")
 	}
 	return docString
 }

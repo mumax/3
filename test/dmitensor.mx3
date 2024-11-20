@@ -14,15 +14,19 @@ DMI := 1.1
 
 for BCtype := 0; BCtype < 3; BCtype++ {
 	if BCtype == 0 {
-		print("Open BC...")
+		print("// Open BC...")
 		openbc = true
 	} else if BCtype == 1 {
-		print("Neumann BC...")
+		print("// Neumann BC...")
 		openbc = false
 	} else if BCtype == 2 {
-		print("Periodic BC...")
+		print("// Periodic BC...")
 		SetPBC(1, 1, 0)
 	}
+
+	//// Dind
+	Dbulk = 0
+	print("Dind...")
 
 	// Use DMI tensor...
 	ext_DMItensor(0, 0, 2, DMI)
@@ -33,7 +37,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	m = neelskyrmion(1, -1)
 	relax()
 	minimize()
-	Etot_dmitensor := E_total.get()
+	Etot_dmitensor_ind := E_total.get()
 
 	// Use Dind...
 	ext_DMItensor(0, 0, 2, 0.0)
@@ -47,5 +51,37 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	Etot_dind := E_total.get()
 
 	// Are their results equal?
-	expect("Etot DMI tensor vs. Dind", Etot_dmitensor, Etot_dind, 1e-5*abs(Etot_dind))
+	Expect("DMI tensor vs. Dind | Etot", Etot_dmitensor_ind, Etot_dind, 1e-5*abs(Etot_dind))
+
+	//// Dbulk
+	Dind = 0
+	print("Dbulk...")
+	// Use DMI tensor...
+	ext_DMItensor(1, 0, 2, -DMI)
+	ext_DMItensor(1, 2, 0, DMI)
+	ext_DMItensor(0, 1, 2, DMI)
+	ext_DMItensor(0, 2, 1, -DMI)
+	ext_DMItensor(2, 1, 0, -DMI)
+	ext_DMItensor(2, 0, 1, DMI)
+	Dbulk = 0
+	m = neelskyrmion(1, -1)
+	relax()
+	minimize()
+	Etot_dmitensor_bulk := E_total.get()
+
+	// Use Dind...
+	ext_DMItensor(1, 0, 2, 0.0)
+	ext_DMItensor(1, 2, 0, 0.0)
+	ext_DMItensor(0, 1, 2, 0.0)
+	ext_DMItensor(0, 2, 1, 0.0)
+	ext_DMItensor(2, 1, 0, 0.0)
+	ext_DMItensor(2, 0, 1, 0.0)
+	Dbulk = DMI
+	m = neelskyrmion(1, -1)
+	relax()
+	minimize()
+	Etot_dbulk := E_total.get()
+
+	// Are their results equal?
+	Expect("DMI tensor vs. Dbulk | Etot", Etot_dmitensor_bulk, Etot_dbulk, 1e-5*abs(Etot_dbulk))
 }

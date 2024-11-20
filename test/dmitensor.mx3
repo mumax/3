@@ -29,10 +29,8 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	print("Dind...")
 
 	// Use DMI tensor...
-	ext_DMItensor(0, 0, 2, DMI)
-	ext_DMItensor(0, 2, 0, -DMI)
-	ext_DMItensor(1, 1, 2, DMI)
-	ext_DMItensor(1, 2, 1, -DMI)
+	ext_DMItensor(DMI, "xxz,yyz")
+	ext_DMItensor(-DMI, "xzx,yzy")
 	Dind = 0
 	m = neelskyrmion(1, -1)
 	relax()
@@ -41,10 +39,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	m_dmitensor_ind := m.getCell(40, 36, 0)
 
 	// Use Dind...
-	ext_DMItensor(0, 0, 2, 0.0)
-	ext_DMItensor(0, 2, 0, 0.0)
-	ext_DMItensor(1, 1, 2, 0.0)
-	ext_DMItensor(1, 2, 1, 0.0)
+	ext_DMItensor(0, "xxz,yyz,xzx,yzy")
 	Dind = DMI
 	m = neelskyrmion(1, -1)
 	relax()
@@ -60,12 +55,8 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	Dind = 0
 	print("Dbulk...")
 	// Use DMI tensor...
-	ext_DMItensor(1, 0, 2, -DMI)
-	ext_DMItensor(1, 2, 0, DMI)
-	ext_DMItensor(0, 1, 2, DMI)
-	ext_DMItensor(0, 2, 1, -DMI)
-	ext_DMItensor(2, 1, 0, -DMI)
-	ext_DMItensor(2, 0, 1, DMI)
+	ext_DMItensor(-DMI, "xzy,yxz,zyx")
+	ext_DMItensor(DMI, "xyz,yzx,zxy")
 	Dbulk = 0
 	m = neelskyrmion(1, -1)
 	relax()
@@ -74,12 +65,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	m_dmitensor_bulk := m.getCell(40, 36, 0)
 
 	// Use Dind...
-	ext_DMItensor(1, 0, 2, 0.0)
-	ext_DMItensor(1, 2, 0, 0.0)
-	ext_DMItensor(0, 1, 2, 0.0)
-	ext_DMItensor(0, 2, 1, 0.0)
-	ext_DMItensor(2, 1, 0, 0.0)
-	ext_DMItensor(2, 0, 1, 0.0)
+	ext_DMItensor(0, "xzy,yxz,zyx,xyz,yzx,zxy")
 	Dbulk = DMI
 	m = neelskyrmion(1, -1)
 	relax()

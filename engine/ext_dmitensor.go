@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"fmt"
+	"strings"
 	"unsafe"
 
 	"github.com/mumax/3/cuda"
@@ -19,7 +21,9 @@ var AddDMIEnergyDensity = makeEdensAdder(&B_dmi, -0.5)
 
 func init() {
 	registerEnergy(GetDMIEnergy, AddDMIEnergyDensity)
-	DeclFunc("ext_DMItensor", SetDMItensor, "Sets DMI tensor element (i,j,k)")
+	DeclFunc("ext_DMItensor", SetDMItensor, "Sets one or more DMI tensor elements D<sub>ijk</sub> "+
+		"using a comma-separated string of components ijk (e.g., \"xyx,xxy,yyx\"). Order of components "+
+		"ijk is such that the energy density is D<sub>ijk</sub> m<sub>j</sub> ∂m<sub>k</sub>/∂i.")
 }
 
 type dmitensor struct {
@@ -65,7 +69,29 @@ func (d *dmitensor) isZero() bool {
 	return true
 }
 
-func SetDMItensor(i, j, k int, value float64) {
+// Sets the value of one or multiple DMI tensor components.
+// The components string is a comma-separated list of 3 indices, e.g.:
+//
+//	SetDMItensor(value, "xzy,yxz,zyx")
+func SetDMItensor(value float64, components string) {
+	components = strings.ReplaceAll(components, " ", "") // Remove whitespace
+	components = strings.ToLower(components)             // Lowercase
+	compList := strings.Split(components, ",")           // Split at commas
+	indices := map[string]int{"x": 0, "y": 1, "z": 2}
+	for _, comp := range compList {
+		if len(comp) != 3 {
+			panic(UserErr(fmt.Sprintf("invalid tensor component (%s), expecting 3 characters", comp)))
+		}
+		i := indices[string(comp[0])]
+		j := indices[string(comp[1])]
+		k := indices[string(comp[2])]
+
+		// Set the tensor element
+		SetDMItensorElement(i, j, k, value)
+	}
+}
+
+func SetDMItensorElement(i, j, k int, value float64) {
 	DMItensor.SetElement(i, j, k, float32(value))
 }
 

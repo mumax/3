@@ -29,6 +29,7 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	print("Dind...")
 
 	// Use DMI tensor...
+	t0 := now()
 	ext_DMItensor(DMI, "xxz,yyz")
 	ext_DMItensor(-DMI, "xzx,yzy")
 	Dind = 0
@@ -36,14 +37,17 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	minimize()
 	Etot_dmitensor_ind := E_total.get()
 	m_dmitensor_ind := m.getCell(40, 36, 0)
+	print(sprintf("-> tensor: %s", Since(t0)))
 
 	// Use Dind...
+	t0 = now()
 	ext_DMItensor(0, "xxz,yyz,xzx,yzy")
 	Dind = DMI
 	m = neelskyrmion(1, -1)
 	minimize()
 	Etot_dind := E_total.get()
 	m_dind := m.getCell(40, 36, 0)
+	print(sprintf("-> Dind: %s", Since(t0)))
 
 	// Are their results equal?
 	Expect("DMI tensor vs. Dind | Etot", Etot_dmitensor_ind, Etot_dind, 1e-5*abs(Etot_dind))
@@ -52,7 +56,9 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	//// Dbulk
 	Dind = 0
 	print("Dbulk...")
+
 	// Use DMI tensor...
+	t0 = now()
 	ext_DMItensor(-DMI, "xzy,yxz,zyx")
 	ext_DMItensor(DMI, "xyz,yzx,zxy")
 	Dbulk = 0
@@ -60,14 +66,17 @@ for BCtype := 0; BCtype < 3; BCtype++ {
 	minimize()
 	Etot_dmitensor_bulk := E_total.get()
 	m_dmitensor_bulk := m.getCell(40, 36, 0)
+	print(sprintf("-> tensor: %s", Since(t0)))
 
 	// Use Dind...
+	t0 = now()
 	ext_DMItensor(0, "xzy,yxz,zyx,xyz,yzx,zxy")
 	Dbulk = DMI
 	m = neelskyrmion(1, -1)
 	minimize()
 	Etot_dbulk := E_total.get()
 	m_dbulk := m.getCell(40, 36, 0)
+	print(sprintf("-> Dbulk: %s", Since(t0)))
 
 	// Are their results equal?
 	Expect("DMI tensor vs. Dbulk | Etot", Etot_dmitensor_bulk, Etot_dbulk, 1e-5*abs(Etot_dbulk))

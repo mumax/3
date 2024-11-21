@@ -64,6 +64,8 @@
 
   <p style="font-size:8px; margin-top: 4em"><a href="api310.html"> Go to mumax3.10 API</a></p>
   <p style="font-size:8px"><a href="api39c.html"> Go to mumax3.9c API</a></p>
+
+  <p id="api-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><sup><b>&uarr;</b></sup>&nbsp; Back to top &nbsp;<sup><b>&uarr;</b></sup></p>
 </div>
 
 <div class="api-content">
@@ -654,7 +656,23 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 		document.getElementById("searchInput").value = "";
 		document.getElementById("searchInput").click();
 		document.getElementById("searchInput").focus();
-	}	
+	}
+
+	document.addEventListener("DOMContentLoaded", () => {
+		const toTop = document.getElementById("api-to-top");
+
+		window.addEventListener('scroll', function(e){
+			var buttonTop = toTop.getBoundingClientRect().top;
+			var visible = toTop.classList.contains("visible")
+			console.log(buttonTop, visible)
+			if (buttonTop <= 0 && !visible) {
+				toTop.classList.add("visible");
+			}
+			else if (buttonTop > 0 && visible) {
+				toTop.classList.remove("visible")
+			}
+		});
+	});
 </script>
 
 

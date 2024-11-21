@@ -88,6 +88,22 @@ figcaption {
     margin: 0px;
 }
 
+#api-to-top {
+    margin-bottom: auto;
+    position: sticky;
+    top: 0; /* Sticks to the top of the viewport when scrolling */
+    background-color: #fff;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    border-radius: 0 0 10px 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+#api-to-top.visible {
+    opacity: 1;
+}
+
 .api-content {
     float: left;
     flex: 1;

@@ -58,6 +58,7 @@
     <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'extensions')">Extensions</a></li>
     <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customquantities')">Custom quantities</a></li>
     <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'customfields')">Custom effective field terms</a></li>
+    <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'math')">Math</a></li>
     <li class="pure-menu-item"><a href="#" class="pure-menu-link api-section-link" onclick="openSection(event, 'misc')">Misc</a></li>
   </ul>
 
@@ -568,6 +569,23 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 	<hr/>
 
 	{{range .FilterName "AddFieldTerm" "AddEdensTerm" "RemoveCustomFields" "B_custom" "E_custom" "Edens_custom" }} {{template "entry" .}} {{end}}
+
+</div>
+
+
+
+
+<div id="math" class="api-section" >
+
+	<h1> Math </h1>
+
+	Mathematical functions from the Go standard library.
+
+	<hr/>
+
+	{{range .FilterReturn "float64" "int" "bool"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "pi" "inf"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "true" "false"}} {{template "entry" .}} {{end}}
 
 </div>
 

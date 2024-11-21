@@ -20,6 +20,8 @@ for CUDAVERSION in 10.0 10.1 10.2 11.0 11.1 11.8 12.0 12.6; do
     export CUDA_HOME=/usr/local/cuda-${CUDAVERSION}
     
     # All supported compute capabilities of this cuda version
+    # See supported CC for each CUDA version at https://stackoverflow.com/a/28933055
+    # See min. driver version for each CUDA version at https://docs.nvidia.com/deploy/cuda-compatibility/#minor-version-compatibility
     #   We export CUDA_CC so that cuda/Makefile knows what to include in the fat wrappers
     case $CUDAVERSION in
         "10.0") export CUDA_CC="50 52 53 60 61 62 70 72 75";; # Min. Linux driver: >=410.48

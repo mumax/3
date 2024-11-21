@@ -85,8 +85,6 @@ func (g *guistate) servePlot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 	w.Write(out)
 	g.Set("plotErr", "")
-	return
-
 }
 
 var empty_img []byte

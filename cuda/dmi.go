@@ -8,7 +8,7 @@ import (
 )
 
 // Add effective field of Dzyaloshinskii-Moriya interaction to Beff (Tesla).
-// According to Bagdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).
+// According to Bogdanov and Röβler, PRL 87, 3, 2001. eq.8 (out-of-plane symmetry breaking).
 // See dmi.cu
 func AddDMI(Beff *data.Slice, m *data.Slice, Aex_red, Dex_red SymmLUT, Msat MSlice, regions *Bytes, mesh *data.Mesh, OpenBC bool) {
 	cellsize := mesh.CellSize()

@@ -205,7 +205,7 @@ tableAdd(m.Region(1))    // add average m over region 1 to table
 
 	<hr/>
 	
-	{{range .FilterName "DefRegion" "DefRegionCell" "regions"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "DefRegion" "DefRegionCell" "ReDefRegion" "regions"}} {{template "entry" .}} {{end}}
 
 </div>
 
@@ -273,10 +273,15 @@ B_ext.SetRegion(1, vector(0, 0, 0.1))
 <pre><code>B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*f*t))
 J.Add(LoadFile("current.ovf"), 1)
 </code></pre>
+	Excitations can be defined using standard mathematical functions, or loaded from a <code>.csv</code> file with <code>FunctionFromDatafile</code>.
 
 	<hr/>
 	
 	{{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
+
+	<hr/>
+
+	{{range .FilterName "FunctionFromDatafile"}} {{template "entry" .}} {{end}}
 
 </div>
 
@@ -568,7 +573,7 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 
 	<hr/>
 
-	{{range .FilterName "AddFieldTerm" "AddEdensTerm" "RemoveCustomFields" "B_custom" "E_custom" "Edens_custom" }} {{template "entry" .}} {{end}}
+	{{range .FilterName "AddFieldTerm" "AddEdensTerm" "RemoveCustomFields" "RemoveCustomEnergies" "B_custom" "E_custom" "Edens_custom" }} {{template "entry" .}} {{end}}
 
 </div>
 

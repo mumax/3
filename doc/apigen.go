@@ -201,8 +201,7 @@ func (a *api) FilterName(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.Entries {
 		for _, t := range typ {
-			if match(t, e.name) &&
-				!strings.HasPrefix(e.name, "ext_") {
+			if match(t, e.name) {
 				e.touched = true
 				E = append(E, e)
 			}

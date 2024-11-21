@@ -483,7 +483,10 @@ TableAdd(TotalShift)
 
 	<hr/>
 	
-	{{range .FilterName "ext_centerwall" "ext_rmSurfaceCharge" "shift" "shiftgeom" "shiftm" "shiftregions" "shiftmagl" "shiftmagr" "shiftmagd" "shiftmagu" "totalshift"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "shift" "totalshift"}} {{template "entry" .}} {{end}}
+	{{range .FilterName "ext_centerwall" "ext_rmSurfaceCharge" "ext_centerbubble" "ext_centerwallinlayer" "ext_centerwallinregion"}} {{template "entry" .}} {{end}}
+	<hr/>
+	{{range .FilterName "shiftgeom" "shiftm" "shiftregions" "shiftmagl" "shiftmagr" "shiftmagd" "shiftmagu" "edgecarryshift"}} {{template "entry" .}} {{end}}
 
 </div>
 

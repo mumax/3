@@ -14,7 +14,7 @@ var (
 
 func init() {
 	DeclFunc("Shift", Shift, "Shifts the simulation by +1/-1 cells along X")
-	DeclVar("EdgeCarryShift", &EdgeCarryShift, "Whether to use the current magnetization at the border for the cells inserted by Shift")
+	DeclVar("EdgeCarryShift", &EdgeCarryShift, "Whether to use the current magnetization at the border for the cells inserted by Shift (default=false)")
 	DeclVar("ShiftMagL", &ShiftMagL, "Upon shift, insert this magnetization from the left")
 	DeclVar("ShiftMagR", &ShiftMagR, "Upon shift, insert this magnetization from the right")
 	DeclVar("ShiftMagU", &ShiftMagU, "Upon shift, insert this magnetization from the top")
@@ -22,7 +22,7 @@ func init() {
 	DeclVar("ShiftM", &ShiftM, "Whether Shift() acts on magnetization")
 	DeclVar("ShiftGeom", &ShiftGeom, "Whether Shift() acts on geometry")
 	DeclVar("ShiftRegions", &ShiftRegions, "Whether Shift() acts on regions")
-	DeclVar("TotalShift", &TotalShift, "Amount by which the simulation has been shifted (m).")
+	DeclVar("TotalShift", &TotalShift, "Amount by which the simulation has been shifted along the x-axis (m).")
 }
 
 // position of the window lab frame

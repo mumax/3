@@ -59,7 +59,10 @@ type entry struct {
 }
 
 func (e *entry) String() string {
-	perOp := time.Duration(int64(e.total) / int64(e.invocations))
+	perOp := time.Duration(0)
+	if int64(e.invocations) != 0 {
+		perOp = time.Duration(int64(e.total) / int64(e.invocations))
+	}
 	return fmt.Sprint(pad(e.name), pad(fmt.Sprint(e.invocations, "x")), perOp, "/op\t", e.pct, " %\t", e.total, " total")
 }
 

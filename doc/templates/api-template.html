@@ -349,16 +349,26 @@ Lambda = 1
 
 	<h1> Output quantities </h1>
 	
-	The quantities listed below can be output. Also, derived quantities can be produced: the quantity restricted to a certain region or a single component. E.g.:
+	The quantities listed below can be output.<br>
+	Also, derived quantities can be produced: the quantity restricted to a certain region or a single component. E.g.:
 	
 <code><pre>m           // magnetization quantity
 m.Comp(0)   // x-component
 m.Region(1) // magnetization in region 1 (0 elsewhere)
 </pre></code>
-	
+
+	<h2> Averaging behavior </h2>
+	<code>.Average()</code> yields the average over the entire simulation grid, except for <code>m</code> which is always averaged over the geometry.<br>
+	For vector quantities, an average over the magnet geometry can still be obtained with the <code>.Comp()</code> method. E.g.:
+
+<code><pre>B_demag.Average()          // Average vector over entire simulation grid
+B_demag.Comp(1).Average()  // Average y-component over geometry
+m.Average()                // Average magnetization over geometry
+</pre></code>
+
 	<hr/>
 
-	{{range .FilterType "engine.ScalarField" "engine.VectorField" "*engine.geom" "*engine.thermField" "*engine.ScalarValue" "*engine.VectorValue"}} {{template "entry" .}} {{end}}
+	{{range .FilterType "engine.ScalarField" "engine.VectorField" "*engine.geom" "*engine.thermField" "*engine.ScalarValue" "*engine.VectorValue" "*engine.magnetization"}} {{template "entry" .}} {{end}}
 
 </div>
 

@@ -100,8 +100,16 @@ figcaption {
     border-radius: 0 0 10px 10px;
     transition: opacity 0.3s ease-in-out;
 }
+
 #api-to-top.visible {
     opacity: 1;
+}
+
+.api-to-top-arrow {
+    font-size: 20px; /* Make the arrow slightly larger than text */
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0 5px; /* Add spacing around the arrow */
 }
 
 .api-content {

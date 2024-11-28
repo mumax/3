@@ -1,0 +1,75 @@
+/*
+	Test RunningAverage() and RunningSum() of a (custom) Quantity (implemented in
+    engine/customfield.go), by doing the same physical test as in thermometer.go.
+
+    ================
+
+    Checks if the measured temperature in a ferromagnetic PMA film is equal to the input temperature.
+    We measure the temperature with the thermometer derived in PHYSICAL REVIEW E 82, 031111 (2010):
+
+        T = (Vcell*Msat)/(2*kB) * <Σ||m x h||^2> / <Σ m.h >     [1]
+
+    The expectation values <...> are calculated by taking time averages.
+    The sums Σ... are taken over the different cells.
+
+    The input temperature is chosen to be 177K.
+    We allow an error smaller than 5K.
+
+    NOTE:
+
+    The exchange energy in MuMax3 is shifted by a constant with respect to atomistic simulations.
+    Due to this difference, we need to add the following constant value to the divisor of [1]:
+
+        shift = 2 * (Aex/Msat) * NCell * ( 2/Δx² + 2/Δy² )
+
+*/
+
+//// Create system
+c := 4e-9
+Nxy := 128
+SetGridSize(Nxy, Nxy, 1)
+SetCellSize(c, c, c)
+SetPBC(1, 1, 0)
+
+//// Set material parameters and initial state
+Msat = 580e3
+Aex = 15e-12
+AnisU = Vector(0, 0, 1)
+Ku1 = 0.6e6
+Alpha = 0.1
+Temp = 177
+M = Uniform(0, 0, -1)
+Run(1e-10)
+
+//// Create average/sum trackers
+h := Add(Add(B_demag, B_exch), B_anis)
+mxh := Cross(m, h)
+dmh := Dot(m, h)
+dmxh := Dot(mxh, mxh)
+divisor := RunningAverage(dmh)
+divisor_sum := RunningSum(dmh)
+numerator := RunningAverage(dmxh)
+numerator_sum := RunningSum(dmxh)
+
+//// Run while tracking average/sum
+Nsteps := step
+Run(1e-10)
+Nsteps = step - Nsteps
+
+//// Check results
+// Temperature as expected? (using RunningAverage)
+Vcell := c * c * c
+kB := 1.38064852e-23 // Boltzmann constant
+N := Nxy * Nxy
+offset := 2 * Aex.GetRegion(0) / Msat.Average() * N * (2/(c*c) + 2/(c*c))
+temperature := (Vcell * Msat.Average() / (2 * kB)) * Sum(numerator) / (Sum(divisor) + offset)
+Expect("temperature", temperature, Temp.GetRegion(0), 5)
+
+// Temperature as expected? (using RunningSum/Nsteps)
+numerator_sum_avg := Sum(numerator_sum) / Nsteps
+divisor_sum_avg := Sum(divisor_sum) / Nsteps
+temperature_sum := (Vcell * Msat.Average() / (2 * kB)) * numerator_sum_avg / (divisor_sum_avg + offset)
+Expect("temperature_sum", temperature_sum, Temp.GetRegion(0), 5)
+
+// Temperatures similar?
+Expect("temperatures", temperature, temperature_sum, 1e-2) // Only up to 1e-2 because they use different averaging method

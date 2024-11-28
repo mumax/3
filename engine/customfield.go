@@ -37,6 +37,8 @@ func init() {
 	DeclFunc("Normalized", Normalized, "Normalize quantity")
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
 	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
+	DeclFunc("RunningAverage", RunningAverage, "Records the time-average of a quantity from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
+	DeclFunc("RunningSum", RunningSum, "Records the cumulative sum of a quantity after every step from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
 }
 
 // Removes all customfields
@@ -459,4 +461,70 @@ func (q *normalized) EvalTo(dst *data.Slice) {
 	util.Assert(dst.NComp() == q.NComp())
 	q.orig.EvalTo(dst)
 	cuda.Normalize(dst, nil)
+}
+
+// RunningSum returns the cumulative sum of a quantity,
+// starting from the moment RunningAverage() is called.
+// This value is updated after every Step().
+func RunningSum(q Quantity) Quantity {
+	rs := runningSum{q, nil}
+	rs.sum = cuda.Buffer(q.NComp(), SizeOf(q))
+	cuda.Zero(rs.sum)
+	PostStep(func() {
+		val := ValueOf(q)
+		defer cuda.Recycle(val)
+		cuda.Add(rs.sum, rs.sum, val)
+	})
+	return &rs
+}
+
+type runningSum struct {
+	orig Quantity
+	sum  *data.Slice
+}
+
+func (rs *runningSum) EvalTo(dst *data.Slice) {
+	util.Assert(dst.NComp() == rs.NComp())
+	data.Copy(dst, rs.sum)
+}
+
+func (rs *runningSum) NComp() int {
+	return rs.orig.NComp()
+}
+
+// RunningAverage returns the running average of a quantity
+// over time, starting at the moment RunningAverage() is called.
+// This value is updated after every Step() and depends on the time step.
+func RunningAverage(q Quantity) Quantity {
+	ra := runningAverage{q, nil, Time, 0}
+	ra.avg = cuda.Buffer(q.NComp(), SizeOf(q))
+	cuda.Zero(ra.avg)
+	PostStep(func() {
+		dt := Time - ra.prev_t
+		if dt < 0 { // Don't update the time average if we went back in time since the last step
+			return
+		}
+		ra.prev_t = Time
+		ra.total_t += dt
+		val := ValueOf(q)
+		defer cuda.Recycle(val)
+		cuda.Madd2(ra.avg, ra.avg, val, float32((ra.total_t-dt)/ra.total_t), float32(dt/ra.total_t))
+	})
+	return &ra
+}
+
+type runningAverage struct {
+	orig    Quantity
+	avg     *data.Slice
+	prev_t  float64
+	total_t float64
+}
+
+func (ra *runningAverage) EvalTo(dst *data.Slice) {
+	util.Assert(dst.NComp() == ra.NComp())
+	data.Copy(dst, ra.avg)
+}
+
+func (ra *runningAverage) NComp() int {
+	return ra.orig.NComp()
 }

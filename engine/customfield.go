@@ -76,7 +76,7 @@ func AddCustomField(dst *data.Slice) {
 	}
 }
 
-// Adds the custom energy densities (defined with AddCustomE
+// Adds the custom energy densities (defined with AddEdensTerm)
 func AddCustomEnergyDensity(dst *data.Slice) {
 	for _, term := range customEnergies {
 		buf := ValueOf(term)
@@ -118,7 +118,7 @@ func ConstVector(x, y, z float64) Quantity {
 }
 
 // fieldOp holds the abstract functionality for operations
-// (like add, multiply, ...) on space-dependend quantites
+// (like add, multiply, ...) on space-dependent quantites
 // (like M, B_sat, ...)
 type fieldOp struct {
 	a, b  Quantity
@@ -394,7 +394,7 @@ func (q *shifted) NComp() int {
 }
 
 // Masks a quantity with a shape
-// The shape will be only evaluated once on the mesh,
+// The shape will only be evaluated once on the mesh,
 // and will be re-evaluated after mesh change,
 // because otherwise too slow
 func Masked(q Quantity, shape Shape) Quantity {

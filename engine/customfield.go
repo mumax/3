@@ -39,6 +39,8 @@ func init() {
 	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
 	DeclFunc("RunningAverage", RunningAverage, "Records the time-average of a quantity from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
 	DeclFunc("RunningSum", RunningSum, "Records the cumulative sum of a quantity after every step from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
+	DeclFunc("Sum", Sum, "Sum of Quantity over all cells in the grid. For a vector Quantity, all components are added together.")
+	DeclFunc("SumVector", SumVector, "Sum of vector Quantity over all cells in the grid.")
 }
 
 // Removes all customfields
@@ -527,4 +529,28 @@ func (ra *runningAverage) EvalTo(dst *data.Slice) {
 
 func (ra *runningAverage) NComp() int {
 	return ra.orig.NComp()
+}
+
+// Sum of Quantity over all cells in the grid.
+// For a vector Quantity, all components are added together.
+func Sum(q Quantity) float64 {
+	val := ValueOf(q)
+	defer cuda.Recycle(val)
+	total := 0.
+	for i := 0; i < q.NComp(); i++ {
+		total += float64(cuda.Sum(val.Comp(i)))
+	}
+	return total
+}
+
+// Sum of vector Quantity over all cells in the grid.
+func SumVector(q Quantity) data.Vector {
+	util.Assert(q.NComp() == 3)
+	val := ValueOf(q)
+	defer cuda.Recycle(val)
+	var v [3]float64
+	for i := 0; i < 3; i++ {
+		v[i] = float64(cuda.Sum(val.Comp(i)))
+	}
+	return Vector(v[0], v[1], v[2])
 }

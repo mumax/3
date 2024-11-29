@@ -67,6 +67,11 @@ figcaption {
     color: #555555
 }
 
+option {
+    font-family: monospace;
+    white-space: pre;
+}
+
 .api-section-link {
     padding-top: 0.2ex;
     padding-bottom: 0.2ex;

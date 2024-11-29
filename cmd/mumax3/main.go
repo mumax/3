@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -12,8 +13,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
-	"golang.org/x/sys/windows/registry"
 
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/engine"
@@ -243,23 +242,35 @@ func getCPUInfo() string {
 }
 
 func getWindowsCPUInfo() string {
-	key, err := registry.OpenKey(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\CentralProcessor\0`, registry.QUERY_VALUE)
-	if err != nil {
+	// Get CPU model name
+	cmd := exec.Command("wmic", "cpu", "get", "Name")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
 		return fmt.Sprintf("CPU info: Unknown, Error: %s", err.Error())
 	}
-	defer key.Close()
-
-	cpuModel, _, err := key.GetStringValue("ProcessorNameString")
-	if err != nil {
-		cpuModel = "Unknown model"
+	output := strings.Split(out.String(), "\n")
+	cpuModel := "Unknown model"
+	if len(output) > 1 {
+		cpuModel = strings.TrimSpace(output[1])
 	}
+
+	// Get CPU number of cores
 	cpuCores := runtime.NumCPU()
-	cpuMHz, _, err := key.GetIntegerValue("~MHz")
-	if err != nil {
-		cpuMHz = 0
+
+	// Get CPU speed
+	cmd = exec.Command("wmic", "cpu", "get", "MaxClockSpeed")
+	out.Reset()
+	cmd.Stdout = &out
+	cpuMHz := "Unknown clock frequency"
+	if err := cmd.Run(); err == nil {
+		output = strings.Split(out.String(), "\n")
+		if len(output) > 1 {
+			cpuMHz = strings.TrimSpace(output[1]) + " MHz"
+		}
 	}
 
-	return fmt.Sprintf("CPU info: %s, Cores: %d, MHz: %d", cpuModel, cpuCores, cpuMHz)
+	return fmt.Sprintf("CPU info: %s, Cores: %d, %s", cpuModel, cpuCores, cpuMHz)
 }
 
 func getLinuxCPUInfo() string {

@@ -37,7 +37,7 @@ endif
 
 # The gcc host compiler for nvcc
 ifeq ($(NVCC_CCBIN),)
-	NVCC_CCBIN=/usr/bin/gcc
+	override NVCC_CCBIN:=/usr/bin/gcc
 endif
 
 CUDA_VERSION := $(shell $(NVCC) --version | grep "Cuda compilation" | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -n 1)

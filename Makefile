@@ -13,6 +13,7 @@ CGO_CFLAGS_ALLOW='(-fno-schedule-insns|-malign-double|-ffast-math)'
 
 all: cudakernels hooks
 	go install -v $(GO_BUILDFLAGS) github.com/mumax/3/...
+	cd cmd/mumax3/ && $(MAKE)
 
 cudakernels:
 	cd cuda && $(MAKE) NVCC_CCBIN=$(NVCC_CCBIN)

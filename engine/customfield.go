@@ -38,7 +38,6 @@ func init() {
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
 	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
 	DeclFunc("RunningAverage", RunningAverage, "Records the time-average of a quantity from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
-	DeclFunc("RunningSum", RunningSum, "Records the cumulative sum of a quantity after every step from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
 	DeclFunc("Sum", Sum, "Sum of Quantity over all cells in the grid. For a vector Quantity, all components are added together.")
 	DeclFunc("SumVector", SumVector, "Sum of vector Quantity over all cells in the grid.")
 }
@@ -463,35 +462,6 @@ func (q *normalized) EvalTo(dst *data.Slice) {
 	util.Assert(dst.NComp() == q.NComp())
 	q.orig.EvalTo(dst)
 	cuda.Normalize(dst, nil)
-}
-
-// RunningSum returns the cumulative sum of a quantity,
-// starting from the moment RunningAverage() is called.
-// This value is updated after every Step().
-func RunningSum(q Quantity) Quantity {
-	rs := runningSum{q, nil}
-	rs.sum = cuda.Buffer(q.NComp(), SizeOf(q))
-	cuda.Zero(rs.sum)
-	PostStep(func() {
-		val := ValueOf(q)
-		defer cuda.Recycle(val)
-		cuda.Add(rs.sum, rs.sum, val)
-	})
-	return &rs
-}
-
-type runningSum struct {
-	orig Quantity
-	sum  *data.Slice
-}
-
-func (rs *runningSum) EvalTo(dst *data.Slice) {
-	util.Assert(dst.NComp() == rs.NComp())
-	data.Copy(dst, rs.sum)
-}
-
-func (rs *runningSum) NComp() int {
-	return rs.orig.NComp()
 }
 
 // RunningAverage returns the running average of a quantity

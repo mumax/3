@@ -1,6 +1,6 @@
 /*
-	Test RunningAverage() and RunningSum() of a (custom) Quantity (implemented in
-    engine/customfield.go), by doing the same physical test as in thermometer.go.
+	Test RunningAverage() of a (custom) Quantity (implemented in engine/customfield.go),
+    by performing the same physical test as in thermometer.go
 
     ================
 
@@ -41,35 +41,19 @@ Temp = 177
 M = Uniform(0, 0, -1)
 Run(1e-10)
 
-//// Create average/sum trackers
+//// Track average over 0.1ns
 h := Add(Add(B_demag, B_exch), B_anis)
 mxh := Cross(m, h)
 dmh := Dot(m, h)
 dmxh := Dot(mxh, mxh)
 divisor := RunningAverage(dmh)
-divisor_sum := RunningSum(dmh)
 numerator := RunningAverage(dmxh)
-numerator_sum := RunningSum(dmxh)
-
-//// Run while tracking average/sum
-Nsteps := step
 Run(1e-10)
-Nsteps = step - Nsteps
 
-//// Check results
-// Temperature as expected? (using RunningAverage)
+//// Check results: is temperature as expected?
 Vcell := c * c * c
 kB := 1.38064852e-23 // Boltzmann constant
 N := Nxy * Nxy
 offset := 2 * Aex.GetRegion(0) / Msat.Average() * N * (2/(c*c) + 2/(c*c))
 temperature := (Vcell * Msat.Average() / (2 * kB)) * Sum(numerator) / (Sum(divisor) + offset)
 Expect("temperature", temperature, Temp.GetRegion(0), 5)
-
-// Temperature as expected? (using RunningSum/Nsteps)
-numerator_sum_avg := Sum(numerator_sum) / Nsteps
-divisor_sum_avg := Sum(divisor_sum) / Nsteps
-temperature_sum := (Vcell * Msat.Average() / (2 * kB)) * numerator_sum_avg / (divisor_sum_avg + offset)
-Expect("temperature_sum", temperature_sum, Temp.GetRegion(0), 5)
-
-// Temperatures similar?
-Expect("temperatures", temperature, temperature_sum, 1e-2) // Only up to 1e-2 because they use different averaging method

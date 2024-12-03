@@ -67,9 +67,10 @@ figcaption {
     color: #555555
 }
 
-option {
+select {
     font-family: monospace;
     white-space: pre;
+    font-size: 1.2em;
 }
 
 .api-section-link {

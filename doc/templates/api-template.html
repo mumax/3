@@ -82,7 +82,7 @@
 	<h1> Syntax </h1>
 	
 	<p>
-	The mumax<sup>3</sup> input syntax is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so msat is the same as Msat or MSAT.</p>
+	The mumax<sup>3</sup> input syntax is a subset of <a href=http://golang.org>Go</a>'s syntax, somewhat similar to C. It is case-independent however, so <code>msat</code> is the same as <code>Msat</code> or <code>MSAT</code>.</p>
 	
 	<h3>Defining variables</h3>
 	
@@ -97,7 +97,7 @@ str := "hello" // defines str, type automatically is string
 </code></pre>
 	
 	<h3>Arithmetic</h3>
-	Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, pow(x,y) should be used.
+	Most common arithmetic operations are possible. Also Go's <a href=http://golang.org/pkg/math>math</a> library and some common constants are available. For raise-to-the-power, <code>pow(<i>x</i>,<i>y</i>)</code> should be used.
 	
 <pre><code>x := pi*(3+4)/5
 x = pow(x, 3)
@@ -114,7 +114,7 @@ y := abs(cbrt(cosh(erf(erfc(gamma(J0(Y0(2))))))))
 	
 	<h3>Implicit functions</h3>
 	
-	Some of the API features accept a function as argument (e.g.: <code>RunWhile(func()bool)</code>, or all input parameters). In that case, and <i>only</i> in this case, the argument is implicitly converted to a function, which is re-evaluated each time it's needed. E.g.:
+	Some of the API features accept a function as argument (e.g.: <code>RunWhile(<i>func()bool</i>)</code>, or all input parameters). In that case, and <i>only</i> in this case, the argument is implicitly converted to a function, which is re-evaluated each time it's needed. E.g.:
 	
 <pre><code>value := sin(pi*t)  // value is a float64, RHS evaluated only once
 Msat = value        // time-independent Msat
@@ -125,8 +125,8 @@ Msat = value        // time-independent Msat
 
 	<h3>Methods</h3>
 
-	Some of the API instances have methods defined on them. You can call methods on an instance by using '.' as in most object oriented programming languages. 
-	E.g.: a material parameter such as <code>Msat</code> has the method <code>SetRegion(int, float)</code> to set the value of the material parameter in a certain region:
+	Some of the API instances have methods defined on them. You can call methods on an instance by using '<code>.</code>' as in most object oriented programming languages. 
+	E.g.: a material parameter such as <code>Msat</code> has the method <code>SetRegion(<i>int</i>, <i>float</i>)</code> to set the value of the material parameter in a certain region:
 
 	<pre><code>Msat.SetRegion(1, 800e3) // Set Msat=520e3 in region 1 </code></pre>
 
@@ -164,8 +164,8 @@ SetCellSize(5e-9, 5e-9, 5e-9)
 
 	<h2> Setting the geometry </h2>
 
-	Optionally a magnet Shape other than the full simulation box can be specified. In order to set the geometry, you first need to <a href="#" onclick="openSection(event, 'geometry')">define a shape</a>.
-<pre><code> geometryShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0)
+	Optionally a magnet <code>Shape</code> other than the full simulation box can be specified. In order to set the geometry, you first need to <a href="#" onclick="openSection(event, 'geometry')">define a shape</a>.
+<pre><code>geometryShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0)
 SetGeom(geometryShape)
 </code></pre>
 
@@ -185,7 +185,7 @@ SetGeom(geometryShape)
 
 	A shape is an abstract object which outlines an area in a 3D universe. Shapes are useful for different tasks, e.g.: to define the geometry of a magnet, to define material regions, or to set locally a specific initial magnetization configuration.
 	One can specify primitive shapes, constructed at the origin (box center), and translate/rotate them if needed. All positions are specified in meters and the origin lies in the center of the simulation box. E.g.:
-<pre><code>myShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0))
+<pre><code>myShape := cylinder(400e-9, 20e-9).RotX(45*pi/180).Transl(1e-6,0,0)
 anotherShape := Circle(400e-9).sub(Circle(200e-9))
 </code></pre>
 
@@ -222,7 +222,7 @@ tableAdd(m.Region(1))    // add average m over region 1 to table
 
 	<h1> Initial magnetization </h1>
 	
-	The initial magnetization is set by assigning a <code>Config</code> to m, setting it in separate regions, or by loading a file directly.
+	The initial magnetization is set by assigning a <code>Config</code> to <code>m</code>, setting it in separate regions, or by loading a file directly.
 <pre><code>m = uniform(1, 0, 0)
 m.SetRegion(1, vortex(1, 1))
 m.LoadFile("config.ovf")
@@ -275,7 +275,7 @@ Ku1 = 500 * sin(2*pi*f*t)
 <pre><code>B_ext = vector(0.01, 1e-6*sin(2*pi*f*t), 0)
 B_ext.SetRegion(1, vector(0, 0, 0.1))
 </code></pre>
-	Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(x,y,z) * f(t) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
+	Additionally, an arbitrary number of time- and space-dependent vector fields of the form <code> g(<i>x</i>,<i>y</i>,<i>z</i>) * f(<i>t</i>) </code> may be added. (E.g., to simulate the field of an antenna or an arbitrary current running through the magnet)
 <pre><code>B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*f*t))
 J.Add(LoadFile("current.ovf"), 1)
 </code></pre>
@@ -338,7 +338,7 @@ Lambda = 1
 
 	<h1> Magnetic Force Microscopy </h1>
 	
-	<p>Mumax<sup>3</sup> has built-in generation of MFM images from a 2D magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
+	<p>mumax<sup>3</sup> has built-in generation of MFM images from a 2D magnetization. The MFM tip lift can be freely chosen. By default, the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting <code>MFMDipole</code> to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set <code>MFMDipole=20e-9</code>.</p>
 	
 	<p><img width=400px src="mfm.svg" /></p>
 
@@ -385,7 +385,7 @@ m.Average()                // Average magnetization over geometry
 
 	<h1>Slicing and dicing output</h1>
 	
-	To save storage space, it's possible to save only the part of the output we're interested in. This works on all output quantities (not only m)
+	To save storage space, it's possible to save only the part of the output we're interested in. This works on all output quantities (not only <code>m</code>).
 	
 <code><pre>
 save(m)                         // save full magnetization
@@ -415,7 +415,7 @@ tableAdd(mx13)
 
 	<h1> Scheduling output </h1>
 	
-	All input and output quantities (as described above) can be saved in a space-dependent way (".ovf" file), or as spatial averages (table output). The data table ("table.txt") contains by default the time and average magnetization. More columns can be added with <code>TableAdd()</code>. 
+	All input and output quantities (as described above) can be saved in a space-dependent way (<code>.ovf</code> file), or as spatial averages (table output). The data table (<code>table.txt</code>) contains by default the time and average magnetization. More columns can be added with <code>TableAdd()</code>. 
 <pre><code>save(B_ext)
 
 tableadd(B_ext)
@@ -445,7 +445,7 @@ myField = ...
 
 	<h1> Running </h1>
 	
-	<code>Run(time)</code> runs the simulation for a given time in seconds, using sensible error settings. 
+	<code>Run(<i>time</i>)</code> runs the simulation for a given time in seconds, using sensible error settings. 
 <pre><code>Run(1e-9)
 </code></pre>
 	More fine-grained control is provided by <code>RunWhile(<i>condition</i>)</code>, which runs as long as an arbitrary condition is met. E.g.: 
@@ -458,7 +458,7 @@ MinDt = 1e-15
 MaxErr = 1e-6
 </code></pre>
 	
-	Optionally, a different solver may be chosen (at any point) with <code>SetSolver(int)</code>. Currently available solver types:
+	Optionally, a different solver may be chosen (at any point) with <code>SetSolver(<i>int</i>)</code>. Currently available solver types:
 	<ul>
 		<li> <code>6</code>: RK56 (Fehlberg) solver. This is the highest order solver available, but which is typically not faster than the RK45 solver.</li> 
 		<li> <code>5</code>: RK45 (Dormand-Prince) solver (the default). An accurate solver, very fast for magnetization dynamics at the cost of some memory usage. </li> 
@@ -496,7 +496,7 @@ FixDt = 1e-15
 
 	<h1> Moving simulation window </h1>
 	
-	Mumax<sup>3</sup> can automatically shift the magnetization so that the simulation "window" stays centered on a region of interest. Shifting is done to keep a freely chosen magnetization component nearly zero. E.g.
+	mumax<sup>3</sup> can automatically shift the magnetization so that the simulation "window" stays centered on a region of interest. Shifting is done to keep a freely chosen magnetization component nearly zero. E.g.
 	
 <pre><code>ext_centerwall(0)
 ext_rmSurfaceCharge(0, -1, 1)

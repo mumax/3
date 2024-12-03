@@ -5,30 +5,30 @@
 
 <body>
 
-{{.Include "header.html"}}
+    {{.Include "header.html"}}
 
-<h2> Prerequisites </h2>
+    <h2> Prerequisites </h2>
 
-To run <b>mumax3.11</b>, you need:
+    To run <b>mumax3.11</b>, you need:
 
-<ul>
-    <li> An <b>NVIDIA GPU</b> with at least a compute capability <b>5.0</b>.</li>
-    <li> An up-to-date <b>NVIDIA driver</b> (compatible driver versions are listed below).</li>
-    <li> <b>Optional:</b> <a href="http://www.gnuplot.info/">gnuplot</a> for plots in the web GUI.</li>
-</ul>
+    <ul>
+        <li> An <b>NVIDIA GPU</b> with at least a compute capability <b>5.0</b>.</li>
+        <li> An up-to-date <b>NVIDIA driver</b> (compatible driver versions are listed below).</li>
+        <li> <b>Optional:</b> <a href="http://www.gnuplot.info/">gnuplot</a> for plots in the web GUI.</li>
+    </ul>
 
-To check your installed driver version and GPU compute capability, run the following command in your terminal:
-<pre><code>nvidia-smi --query-gpu="driver_version,compute_cap" --format="csv"</code></pre>
+    To check your installed driver version and GPU compute capability, run the following command in your terminal:
+    <pre><code>nvidia-smi --query-gpu="driver_version,compute_cap" --format="csv"</code></pre>
 
-<h2> Download and installation </h2>
+    <h2> Download and installation </h2>
 
-<p>
-Select the platform and the NVIDIA driver for which you want to download mumax<sup>3</sup>.<br>
-<small>Note: the CUDA versions shown in parentheses are informative. If you can not run the mumax<sup>3</sup> executable,
-    check if your GPU is supported by that CUDA version and downgrade if necessary.</small>
-</p>
+    <p>
+        Select the platform and the NVIDIA driver for which you want to download mumax<sup>3</sup>.<br>
+        <small>Note: the CUDA versions shown in parentheses are informative. If you can not run the mumax<sup>3</sup> executable,
+            check if your GPU is supported by that CUDA version and downgrade if necessary.</small>
+    </p>
 
-<div>
+    <div>
         <select id="platform" onchange="selectPlatform()">
             <option disabled selected value> -- Select platform -- </option>
             <option value="linux">Linux</option>
@@ -38,94 +38,95 @@ Select the platform and the NVIDIA driver for which you want to download mumax<s
             <option disabled selected value> -- Select NVIDIA driver -- </option>
         </select>
 
-        <a id="downloadLink" href="" >
-        <button id="downloadButton" class="pure-button pure-button-primary">Download</button>
+        <a id="downloadLink" href="">
+            <button id="downloadButton" class="pure-button pure-button-primary">Download</button>
         </a>
-    </fieldset>
-</div>
+        </fieldset>
+    </div>
 
-<p>
-After downloading and unpacking the archive, you will have a mumax<sup>3</sup> executable which is ready to be used. 
-Note that mumax<sup>3</sup> is a command line application, so it is a good idea to add the directory containing 
-the mumax<sup>3</sup> executable to the PATH environment variable.
-</p>
+    <p>
+        After downloading and unpacking the archive, you will have a mumax<sup>3</sup> executable which is ready to be used.
+        Note that mumax<sup>3</sup> is a command line application, so it is a good idea to add the directory containing
+        the mumax<sup>3</sup> executable to the PATH environment variable.
+    </p>
 
-<script>
+    <script>
 
-var driverOptions = {
-    "linux" :[
-        //                 -- Select NVIDIA driver --
-        {'driverVersion': "≥525.60.13     (CUDA 12.6)", 'cudaVersion': '12.6'},
-        {'driverVersion': "≥525.60.13     (CUDA 12.0)", 'cudaVersion': '12.0'},
-        {'driverVersion': "≥450.80.02     (CUDA 11.0)", 'cudaVersion': '11.0'},
-        {'driverVersion': "≥440.33        (CUDA 10.2)", 'cudaVersion': '10.2'},
-        {'driverVersion': "≥418.39        (CUDA 10.1)", 'cudaVersion': '10.1'},
-        {'driverVersion': "≥410.48        (CUDA 10.0)", 'cudaVersion': '10.0'}
-    ],
-    "windows" :[
-        //                 -- Select NVIDIA driver --
-        {'driverVersion': "≥527.41        (CUDA 12.6)", 'cudaVersion': '12.6'},
-        {'driverVersion': "≥527.41        (CUDA 12.0)", 'cudaVersion': '12.0'},
-        {'driverVersion': "≥452.39        (CUDA 11.0)", 'cudaVersion': '11.0'},
-        {'driverVersion': "≥441.22        (CUDA 10.2)", 'cudaVersion': '10.2'},
-        {'driverVersion': "≥418.96        (CUDA 10.1)", 'cudaVersion': '10.1'},
-        {'driverVersion': "≥411.31        (CUDA 10.0)", 'cudaVersion': '10.0'}
-    ]
-} 
+        var driverOptions = {
+            "linux": [
+                //                 -- Select NVIDIA driver --
+                { 'driverVersion': "≥525.60.13     (CUDA 12.6)", 'cudaVersion': '12.6' },
+                { 'driverVersion': "≥525.60.13     (CUDA 12.0)", 'cudaVersion': '12.0' },
+                { 'driverVersion': "≥450.80.02     (CUDA 11.0)", 'cudaVersion': '11.0' },
+                { 'driverVersion': "≥440.33        (CUDA 10.2)", 'cudaVersion': '10.2' },
+                { 'driverVersion': "≥418.39        (CUDA 10.1)", 'cudaVersion': '10.1' },
+                { 'driverVersion': "≥410.48        (CUDA 10.0)", 'cudaVersion': '10.0' }
+            ],
+            "windows": [
+                //                 -- Select NVIDIA driver --
+                { 'driverVersion': "≥527.41        (CUDA 12.6)", 'cudaVersion': '12.6' },
+                { 'driverVersion': "≥527.41        (CUDA 12.0)", 'cudaVersion': '12.0' },
+                { 'driverVersion': "≥452.39        (CUDA 11.0)", 'cudaVersion': '11.0' },
+                { 'driverVersion': "≥441.22        (CUDA 10.2)", 'cudaVersion': '10.2' },
+                { 'driverVersion': "≥418.96        (CUDA 10.1)", 'cudaVersion': '10.1' },
+                { 'driverVersion': "≥411.31        (CUDA 10.0)", 'cudaVersion': '10.0' }
+            ]
+        }
 
-function selectPlatform() {
-    var driverSelector = document.getElementById("driver");
-    var platformSelector = document.getElementById("platform");
+        function selectPlatform() {
+            var driverSelector = document.getElementById("driver");
+            var platformSelector = document.getElementById("platform");
 
-    var platform = platformSelector.options[platformSelector.selectedIndex].value;
+            var platform = platformSelector.options[platformSelector.selectedIndex].value;
 
-    // remove any driver options
-    while (driverSelector.length > 1) {
-        driverSelector.remove(1);
-    }
+            // remove any driver options
+            while (driverSelector.length > 1) {
+                driverSelector.remove(1);
+            }
 
-    // Populate the driver selection box
-    driverOptions[platform].forEach(function(driver,idx) {
-        var option = document.createElement("option");
-        option.innerHTML = driver.driverVersion.replaceAll(" ", "&nbsp;");
-        option.value = driver.cudaVersion; 
-        driverSelector.add(option);
-    })
+            // Populate the driver selection box
+            driverOptions[platform].forEach(function (driver, idx) {
+                var option = document.createElement("option");
+                option.innerHTML = driver.driverVersion.replaceAll(" ", "&nbsp;");
+                option.value = driver.cudaVersion;
+                driverSelector.add(option);
+            })
 
-    // Select the first driver option (the most recent one)
-    driverSelector.selectedIndex = 0;
-    document.getElementById("downloadButton").disabled = true;
-    document.getElementById("downloadLink").removeAttribute("href");
+            // Select the first driver option (the most recent one)
+            driverSelector.selectedIndex = 0;
+            document.getElementById("downloadButton").disabled = true;
+            document.getElementById("downloadLink").removeAttribute("href");
 
-}
+        }
 
-function selectDriver() {
-    var driverSelector = document.getElementById("driver");
-    var platformSelector = document.getElementById("platform");
-    var platform = platformSelector.options[platformSelector.selectedIndex].value;
-    var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
-    var link;
+        function selectDriver() {
+            var driverSelector = document.getElementById("driver");
+            var platformSelector = document.getElementById("platform");
+            var platform = platformSelector.options[platformSelector.selectedIndex].value;
+            var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
+            var link;
 
-    if (platform == "windows") {
-        link = "https://mumax.ugent.be/mumax3-binaries/mumax3.11_windows_cuda" + cudaVersion + ".zip";
-    } else if (platform == "linux") {
-        link = "https://mumax.ugent.be/mumax3-binaries/mumax3.11_linux_cuda" + cudaVersion + ".tar.gz";
-    } else {
-        link = "#";
-    }
+            if (platform == "windows") {
+                link = "https://mumax.ugent.be/mumax3-binaries/mumax3.11_windows_cuda" + cudaVersion + ".zip";
+            } else if (platform == "linux") {
+                link = "https://mumax.ugent.be/mumax3-binaries/mumax3.11_linux_cuda" + cudaVersion + ".tar.gz";
+            } else {
+                link = "#";
+            }
 
-    document.getElementById("downloadButton").disabled = false;
-    document.getElementById("downloadLink").href = link
-}
+            document.getElementById("downloadButton").disabled = false;
+            document.getElementById("downloadLink").href = link
+        }
 
-window.onload = function() {
-    document.getElementById("driver").selectedIndex = 0;
-    document.getElementById("platform"). selectedIndex = 0;
-    document.getElementById("downloadButton").disabled = true;
-    document.getElementById("downloadLink").removeAttribute("href");
-}
+        window.onload = function () {
+            document.getElementById("driver").selectedIndex = 0;
+            document.getElementById("platform").selectedIndex = 0;
+            document.getElementById("downloadButton").disabled = true;
+            document.getElementById("downloadLink").removeAttribute("href");
+        }
 
-</script>
+    </script>
 
 </body>
+
 </html>

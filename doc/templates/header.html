@@ -12,6 +12,7 @@
 		var its_xmas = now >= xmasBegin || now <= xmasEnd;
 		var xmas_img_file = its_xmas ? "nimble-cubes128-xmas.png" : "nimble-cubes128.png";
 		document.getElementById("header_img").setAttribute("src", xmas_img_file);
+		document.querySelector("link[rel~='icon']").href = xmas_img_file;
 	}
 	xmas()
 	setInterval(xmas, 5 * 60 * 1000) // Repeat every 5 minutes to update icon if page is left open

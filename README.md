@@ -174,7 +174,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 With these tools installed, you can build mumax³ yourself.
 
 * Within your `GOPATH` folder, create the subfolders `src/github.com/mumax`.
-* Clone the GitHub repository by running `git clone git@github.com:mumax/3.git` in that newly created `mumax` folder.
+* Clone the GitHub repository by running `git clone https://github.com/mumax/3.git` in that newly created `mumax` folder.
   * If you don't have git, you can manually fetch the source [here](https://github.com/mumax/3/releases) and unzip it into `$GOPATH/src/github.com/mumax/3`.
 * Initialize a Go module by moving to the newly created folder with `cd 3/` and running `go mod init github.com/mumax/3`, followed by `go mod tidy`.
 * Query the compute capability of your GPU using the command `nvidia-smi --query-gpu=compute_cap --format=csv`. Based on this, set the environment variable `CUDA_CC`: if your compute capability is e.g., 8.9, then set the value `CUDA_CC=89`.

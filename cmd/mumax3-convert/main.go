@@ -365,7 +365,6 @@ func show(f *data.Slice, info data.Meta, out io.Writer) {
 }
 
 func preprocess(f *data.Slice) {
-	fmt.Println("hi")
 	if *flag_normalize {
 		normalize(f, 1)
 	}

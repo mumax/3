@@ -9,6 +9,7 @@ const templText = `
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 	<title> mumax3 </title>
+	<link rel="icon" type="image/x-icon" href="https://mumax.github.io/nimble-cubes128.png">
 
 ` + CSS + `
 

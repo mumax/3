@@ -67,6 +67,10 @@ figcaption {
     color: #555555
 }
 
+#header_img:hover {
+    transform:scale(1.05);
+}
+
 select {
     font-family: monospace;
     white-space: pre;

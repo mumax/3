@@ -14,7 +14,7 @@ var (
 
 func init() {
 	DeclVar("ext_BubbleMz", &BubbleMz, "Center magnetization 1.0 or -1.0  (default = 1.0)")
-	DeclVar("ext_BackGroundTilt", &BackGroundTilt, "Size of in-plane component of background magnetization. All values below this one are rounded down to perfectly out-pf-plane to improve position calculation  (default = 0.25)")
+	DeclVar("ext_BackGroundTilt", &BackGroundTilt, "Size of in-plane component of background magnetization. All values below this one are rounded down to perfectly out-of-plane to improve position calculation  (default = 0.25)")
 }
 
 func bubblePos() []float64 {

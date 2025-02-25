@@ -292,7 +292,7 @@ func (g *geom) shift(dx int) {
 	data.Copy(s, s2)
 
 	n := Mesh().Size()
-	x1, x2 := shiftDirtyRange(dx)
+	x1, x2 := shiftDirtyRange(dx, X)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
@@ -322,7 +322,7 @@ func (g *geom) shiftY(dy int) {
 	data.Copy(s, s2)
 
 	n := Mesh().Size()
-	y1, y2 := shiftDirtyRange(dy)
+	y1, y2 := shiftDirtyRange(dy, Y)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for ix := 0; ix < n[X]; ix++ {
@@ -337,16 +337,16 @@ func (g *geom) shiftY(dy int) {
 
 }
 
-// x range that needs to be refreshed after shift over dx
-func shiftDirtyRange(dx int) (x1, x2 int) {
-	nx := Mesh().Size()[X]
-	util.Argument(dx != 0)
-	if dx < 0 {
-		x1 = nx + dx
-		x2 = nx
+// range along component that needs to be refreshed after shift over d
+func shiftDirtyRange(d, comp int) (p1, p2 int) {
+	n := Mesh().Size()[comp]
+	util.Argument(d != 0)
+	if d < 0 {
+		p1 = n + d
+		p2 = n
 	} else {
-		x1 = 0
-		x2 = dx
+		p1 = 0
+		p2 = d
 	}
 	return
 }

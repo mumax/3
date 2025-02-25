@@ -34,7 +34,7 @@ func buildAPI() {
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
 	for K, v := range doc {
-		if v == "" { // check if we a docstring in the documantation of the Math package
+		if v == "" { // check if we a docstring in the documentation of the Math package
 			v = getGoDocString("math", K)
 		}
 		k := strings.ToLower(K)

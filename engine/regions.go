@@ -270,7 +270,7 @@ func (b *Regions) shift(dx int) {
 	r1.Copy(r2)
 
 	n := Mesh().Size()
-	x1, x2 := shiftDirtyRange(dx)
+	x1, x2 := shiftDirtyRange(dx, X)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
@@ -295,7 +295,7 @@ func (b *Regions) shiftY(dy int) {
 	r1.Copy(r2)
 
 	n := Mesh().Size()
-	y1, y2 := shiftDirtyRange(dy)
+	y1, y2 := shiftDirtyRange(dy, Y)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for ix := 0; ix < n[X]; ix++ {

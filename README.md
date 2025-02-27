@@ -211,12 +211,18 @@ With these tools installed, you can build mumax³ yourself.
 
     ```powershell
     $env:CGO_CFLAGS = '-I "%CUDA_PATH%\include"'
-    $env:CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"
+    $env:CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"'
     ```
 
   </details>
   <details><summary>Troubleshooting: `mumax3.exe` is not generated: &rarr;click here&larr;</summary>
 
   If, during the build process of mumax³, everything runs smoothly until you get the error that the `mumax3.exe` executable can not be found, try setting the `CGO_ENABLED` environment variable to `1` in your build script.
+
+  </details>
+  <details><summary>Troubleshooting: `vcvars64.bat` not found or could not initialise VC environment: &rarr;click here&larr;</summary>
+
+  CUDA requires Visual Studio to compile, which tries to set various environment variables.
+  If Visual Studio fails to do so automatically, you can open a new shell, manually run the `vcvars64.bat` file there (the error message should contain the path to this Batch file), and then compile mumax using that shell.
 
   </details>

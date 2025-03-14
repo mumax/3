@@ -1,12 +1,20 @@
 package engine
 
 import (
-	"github.com/mumax/3/data"
 	"math"
+
+	"github.com/mumax/3/data"
+)
+
+var (
+	ext_enableCenterBubbleX = true
+	ext_enableCenterBubbleY = true
 )
 
 func init() {
 	DeclFunc("ext_centerBubble", CenterBubble, "centerBubble shifts m after each step to keep the bubble position close to the center of the window")
+	DeclVar("ext_enableCenterBubbleX", &ext_enableCenterBubbleX, "Enables centering along the X-axis during ext_centerBubble (default=true)")
+	DeclVar("ext_enableCenterBubbleY", &ext_enableCenterBubbleY, "Enables centering along the Y-axis during ext_centerBubble (default=true)")
 }
 
 func centerBubble() {
@@ -26,10 +34,10 @@ func centerBubble() {
 	}
 
 	//put bubble to center
-	if centerIdx[X] != 0 {
+	if ext_enableCenterBubbleX && (centerIdx[X] != 0) {
 		Shift(-centerIdx[X])
 	}
-	if centerIdx[Y] != 0 {
+	if ext_enableCenterBubbleY && (centerIdx[Y] != 0) {
 		YShift(-centerIdx[Y])
 	}
 

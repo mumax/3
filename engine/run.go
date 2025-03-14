@@ -34,7 +34,7 @@ func init() {
 	DeclFunc("Steps", Steps, "Run the simulation for a number of time steps")
 	DeclFunc("RunWhile", RunWhile, "Run while condition function is true")
 	DeclFunc("SetSolver", SetSolver, "Set solver type. 1:Euler, 2:Heun, 3:Bogaki-Shampine, 4: Runge-Kutta (RK4), 5: Dormand-Prince, 6: Fehlberg, -1: Backward Euler")
-	DeclFunc("ClearPostSteps", func() { postStep = nil }, "Clear the postStep array of all functions")
+	DeclFunc("ClearPostSteps", func() { postStep = nil }, "Clear the postStep array, which contains functions that are executed after each solver step. This includes running averages, centering routines to track skyrmions and domain walls etc.")
 	DeclTVar("t", &Time, "Total simulated time (s)")
 	DeclVar("step", &NSteps, "Total number of time steps taken")
 	DeclVar("MinDt", &MinDt, "Minimum time step the solver can take (s)")

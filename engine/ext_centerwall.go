@@ -15,7 +15,7 @@ var (
 func init() {
 	DeclFunc("ext_centerWall", CenterWall, "centerWall(c) shifts m after each step to keep m_c close to zero")
 	DeclFunc("ext_centerWallInRegion", CenterWallInRegion, "centerWallInRegion(R, c) shifts m after each step to keep m_c in region R close to zero")
-	DeclFunc("ext_CenterWallInLayer", CenterWallInLayer, "centerWallInLayer(L, c) shifts m after each step to keep m_c in layer L close to zero")
+	DeclFunc("ext_centerWallInLayer", CenterWallInLayer, "centerWallInLayer(L, c) shifts m after each step to keep m_c in layer L close to zero")
 }
 
 func centerWall(c int) {

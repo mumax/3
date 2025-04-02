@@ -90,6 +90,12 @@ func Square(side float64) Shape {
 
 // 2D triangle with given vertices.
 func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
+	denom := x0*(y1-y2) + x1*(y2-y0) + x2*(y0-y1) // 2 * area
+	if denom == 0 {
+		return func(x, y, z float64) bool { return false }
+	}
+	A2m1 := 1 / denom
+
 	Sc := y0*x2 - x0*y2
 	Sx := y2 - y0
 	Sy := x0 - x2
@@ -97,8 +103,6 @@ func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
 	Tc := x0*y1 - y0*x1
 	Tx := y0 - y1
 	Ty := x1 - x0
-
-	A2m1 := 1 / (-y1*x2 + y0*(-x1+x2) + x0*(y1-y2) + x1*y2) // 1 / (2 * area)
 
 	return func(x, y, z float64) bool {
 		// barycentric coordinates

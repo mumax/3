@@ -1,7 +1,7 @@
 /*
-	Symmetry test for bulk DMI in a 1D magnet with Neumann BC.
-	Rotating the entire system by 90° should give symmetric result.
-    This test is based on the proposed 1D standard problem of bulk BMI:
+    Symmetry test for bulk DMI in a 1D magnet with Neumann BC.
+    Rotating the entire system by 90° should give symmetric result.
+    This test is based on the proposed 1D standard problem of bulk DMI:
     https://doi.org/10.1088/1367-2630/aaea1c
 */
 

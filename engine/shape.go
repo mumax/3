@@ -20,6 +20,7 @@ func init() {
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
 	DeclFunc("Square", Square, "2D square with size in meter")
+	DeclFunc("Triangle", Triangle, "2D triangle with vertices (x0, y0), (x1, y1) and (x2, y2)")
 	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 (inclusive) and z2 (exclusive), in meter")
@@ -85,6 +86,30 @@ func Rect(sidex, sidey float64) Shape {
 // 2D square with given side.
 func Square(side float64) Shape {
 	return Rect(side, side)
+}
+
+// 2D triangle with given vertices.
+func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
+	denom := x0*(y1-y2) + x1*(y2-y0) + x2*(y0-y1) // 2 * area
+	if denom == 0 {
+		return func(x, y, z float64) bool { return false }
+	}
+	A2m1 := 1 / denom
+
+	Sc := A2m1 * (y0*x2 - x0*y2)
+	Sx := A2m1 * (y2 - y0)
+	Sy := A2m1 * (x0 - x2)
+
+	Tc := A2m1 * (x0*y1 - y0*x1)
+	Tx := A2m1 * (y0 - y1)
+	Ty := A2m1 * (x1 - x0)
+
+	return func(x, y, z float64) bool {
+		// barycentric coordinates
+		s := Sc + Sx*x + Sy*y
+		t := Tc + Tx*x + Ty*y
+		return ((0 <= s) && (0 <= t) && (s+t <= 1))
+	}
 }
 
 // All cells with x-coordinate between a and b

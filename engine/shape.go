@@ -96,18 +96,18 @@ func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
 	}
 	A2m1 := 1 / denom
 
-	Sc := y0*x2 - x0*y2
-	Sx := y2 - y0
-	Sy := x0 - x2
+	Sc := A2m1 * (y0*x2 - x0*y2)
+	Sx := A2m1 * (y2 - y0)
+	Sy := A2m1 * (x0 - x2)
 
-	Tc := x0*y1 - y0*x1
-	Tx := y0 - y1
-	Ty := x1 - x0
+	Tc := A2m1 * (x0*y1 - y0*x1)
+	Tx := A2m1 * (y0 - y1)
+	Ty := A2m1 * (x1 - x0)
 
 	return func(x, y, z float64) bool {
 		// barycentric coordinates
-		s := A2m1 * (Sc + Sx*x + Sy*y)
-		t := A2m1 * (Tc + Tx*x + Ty*y)
+		s := Sc + Sx*x + Sy*y
+		t := Tc + Tx*x + Ty*y
 		return ((0 <= s) && (0 <= t) && (s+t <= 1))
 	}
 }

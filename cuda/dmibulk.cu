@@ -146,8 +146,8 @@ adddmibulk(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ H
         }
     }
 
-    // only take vertical derivative for 3D sim
-    if (Nz != 1) {
+    // only take vertical derivative for 3D sim or for Neumann BC
+    if ((Nz != 1) || (!OpenBC)) {
         // bottom neighbor
         {
             float3 m1 = make_float3(0.0f, 0.0f, 0.0f);

@@ -20,6 +20,7 @@ func init() {
 	DeclFunc("RandomMagSeed", RandomMagSeed, "Random magnetization with given seed")
 	DeclFunc("Conical", Conical, "Conical state for given wave vector, cone direction, and cone angle")
 	DeclFunc("Helical", Helical, "Helical state for given wave vector")
+	DeclFunc("HopfionCompactSupport", HopfionCompactSupport, "Hopfion texture from skyrmion, with compact support (smooth and magnetization exactly along z-axis outside of finite region)")
 }
 
 // Magnetic configuration returns m vector for position (x,y,z)
@@ -187,6 +188,29 @@ func Conical(q, coneDirection data.Vector, coneAngle float64) Config {
 
 func Helical(q data.Vector) Config {
 	return Conical(q, q, math.Pi/2)
+}
+
+func HopfionCompactSupport(major_radius, minor_radius float64) Config {
+	return func(x, y, z float64) data.Vector {
+
+		psi := math.Atan2(y, x)
+		rho := math.Sqrt(math.Pow(z, 2) + math.Pow(x*math.Cos(psi) + y*math.Sin(psi) - major_radius, 2))
+
+		Theta := 0.0
+		Phi   := 0.0
+
+		if (rho < minor_radius) {
+			phi  := math.Atan2(z, x*math.Cos(psi) + y*math.Sin(psi) - major_radius)
+			Phi   = -phi + psi
+			Theta = math.Pi * math.Exp(1.0 - 1.0 / (1.0 - math.Pow(rho / minor_radius, 2)))
+		}
+
+		mx := math.Cos(Phi) * math.Sin(Theta)
+		my := math.Sin(Phi) * math.Sin(Theta)	
+		mz := math.Cos(Theta)
+
+		return data.Vector{mx, my, mz}
+	}
 }
 
 // Transl returns a translated copy of configuration c. E.g.:

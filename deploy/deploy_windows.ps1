@@ -1,7 +1,7 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
 param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
-    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6"), # The cuda versions against which we will compile mumax3
+    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
     [Int[]]$CUDA_CC
 )
 
@@ -24,8 +24,8 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     #! SUBSTITUTE YOUR OWN PATH TO cl.exe BELOW
     # Not every CUDA version is compatible with any Visual C/C++ version: compiling for CUDA <11.6 requires VS <=2017.
     # See VS/CUDA compatibility matrix at https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html (with old VS downloads available).
-    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
-    $VS2017 = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64" # Supported by CUDA v8.0-v12.*
+    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
+    $VS2017 = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64" # Supported by CUDA v8.0-v12.4
     switch ( $CUDA_VERSION ) {
         {$_ -lt [Version]::new(11.6)} { $CCBIN = $VS2017 }
         {$_ -ge [Version]::new(11.6)} { $CCBIN = if ($VS2022) {$VS2022} else {$VS2017} } # Use VS2017 if 2022 not installed
@@ -45,8 +45,9 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
             "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
             "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
             "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
-            "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
-            "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same CC for all 12.x.)
+            "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same for all 12.x)
+            "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Highest CUDA version supporting CC < 7.5
+            "12.9" { $CUDA_CC =                         75,80,86,87,89,90,100,120 }
             default {exit}
         }
     }

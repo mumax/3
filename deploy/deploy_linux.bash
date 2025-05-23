@@ -30,7 +30,7 @@ for CUDAVERSION in 10.0 10.1 10.2 11.0 12.0 12.6 12.9; do
         "11.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80";; # Min. Linux driver: >=450.80.02
         "12.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Min. Linux driver: >=525.60.13 (same for all 12.x)
         "12.6") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Highest CUDA version supporting CC < 7.5
-        "12.9") export CUDA_CC=                        "75 80 86 87 89 90 100 120";;
+        "12.9") export CUDA_CC="                        75 80 86 87 89 90 100 120";;
     esac
 
     # The path for shared libraries (relative to the build directory)

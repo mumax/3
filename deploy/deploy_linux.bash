@@ -3,8 +3,8 @@ for CUDAVERSION in 10.0 10.1 10.2 11.0 12.0 12.6 12.9; do
 
     #! NOTE: each CUDA version has a MAXIMUM GCC version: https://stackoverflow.com/a/46380601
     #! EDIT IF-ELSE BELOW TO REFER TO YOUR INSTALLED GCC VERSION(S)!
-    if [ 1 -eq "$(echo "${CUDAVERSION} < 9.2" | bc)" ]; then
-        export NVCC_CCBIN=/usr/bin/gcc-4.8
+    if [ 1 -eq "$(echo "${CUDAVERSION} < 11.0" | bc)" ]; then
+        export NVCC_CCBIN=/usr/bin/gcc-7
     else
         export NVCC_CCBIN=/usr/bin/gcc
     fi

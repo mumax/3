@@ -2,7 +2,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -35,7 +34,7 @@ func buildAPI() {
 	doc := engine.World.Doc
 	e := make(entries, 0, len(ident))
 	for K, v := range doc {
-		if v == "" { // check if we a docstring in the documantation of the Math package
+		if v == "" { // check if we a docstring in the documentation of the Math package
 			v = getGoDocString("math", K)
 		}
 		k := strings.ToLower(K)
@@ -54,9 +53,15 @@ func getGoDocString(packageName, identifier string) string {
 	stdout, err := cmd.Output()
 	outputLines := strings.Split(string(stdout), "\n")
 	if err == nil && outputLines[2][:4] == "func" { // we only look for doc strings of functions
-		// the doc string of a function is on the fourth line
-		// (and possible continued on the fifth line, if not, then the fifth line is empty)
-		docString = strings.Join(outputLines[3:5], " ")
+		// the doc string of a function is the paragraph starting on the fourth line
+		var docLines []string
+		for i := 3; i < len(outputLines); i++ {
+			if strings.TrimSpace(outputLines[i]) == "" { // Stop at the first empty line
+				break
+			}
+			docLines = append(docLines, outputLines[i])
+		}
+		docString = strings.Join(docLines, " ")
 	}
 	return docString
 }
@@ -136,7 +141,7 @@ type api struct {
 
 // include file
 func (e *api) Include(fname string) string {
-	b, err := ioutil.ReadFile(path.Join(templateDir, fname))
+	b, err := os.ReadFile(path.Join(templateDir, fname))
 	check(err)
 	return string(b)
 }
@@ -196,8 +201,7 @@ func (a *api) FilterName(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.Entries {
 		for _, t := range typ {
-			if match(t, e.name) &&
-				!strings.HasPrefix(e.name, "ext_") {
+			if match(t, e.name) {
 				e.touched = true
 				E = append(E, e)
 			}
@@ -242,7 +246,7 @@ func renderAPI() {
 var templ = read(path.Join(templateDir, "api-template.html"))
 
 func read(fname string) string {
-	b, err := ioutil.ReadFile(fname)
+	b, err := os.ReadFile(fname)
 	check(err)
 	return string(b)
 }

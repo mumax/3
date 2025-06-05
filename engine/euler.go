@@ -8,7 +8,7 @@ import (
 type Euler struct{}
 
 // Euler method, can be used as solver.Step.
-func (_ *Euler) Step() {
+func (*Euler) Step() {
 	y := M.Buffer()
 	dy0 := cuda.Buffer(VECTOR, y.Size())
 	defer cuda.Recycle(dy0)
@@ -35,4 +35,4 @@ func (_ *Euler) Step() {
 	NSteps++
 }
 
-func (_ *Euler) Free() {}
+func (*Euler) Free() {}

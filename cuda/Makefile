@@ -8,17 +8,17 @@
 #
 #    make
 #    make CUDA_CC=70
-#    make CUDA_CC="30 32 35 37 50 52 53 60 61 62 70"
-#    make CUDA_HOME="/usr/local/cuda-9.0" CUDA_CC="30 32 35 37 50 52 53 60 61 62 70"
+#    make CUDA_CC="50 52 53 60 61 62 70 72 75 80 86"
+#    make CUDA_HOME="/usr/local/cuda-12.6" CUDA_CC="50 52 53 60 61 62 70 72 75 80 86"
 #
-# Different CUDA versions support different compute capabilities, as shown in the list below.
-# CUDA SDK  9.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70
-# CUDA SDK  9.1 support for compute capability       30 32 35 37 50 52 53 60 61 62 70
-# CUDA SDK  9.2 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72
+# Different CUDA versions support different compute capabilities, as shown in the list below. See https://stackoverflow.com/a/28933055.
 # CUDA SDK 10.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.1 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 10.2 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
-# CUDA SDK 11.0 support for compute capability       50 52 53 60 61 62 70 72 75 80
+# CUDA SDK 11.0 support for compute capability             35 37 50 52 53 60 61 62 70 72 75 80
+# CUDA SDK 11.1-11.7 support for compute capability        35 37 50 52 53 60 61 62 70 72 75 80 86
+# CUDA SDK 11.8 support for compute capability             35 37 50 52 53 60 61 62 70 72 75 80 86 87 89
+# CUDA SDK 12.0+ support for compute capability                  50 52 53 60 61 62 70 72 75 80 86 87 89 90
 
 SHELL = /bin/bash
 
@@ -32,14 +32,12 @@ endif
 
 # When CUDA_CC is not an environment variable and is not set on the command line, use compute capability 3.0
 ifeq ($(CUDA_CC),)
-#    CUDA_CC = 30
-# The "compute_30" was for the Kepler architecture, which has been deprecated in CUDA 11.
-	CUDA_CC = 50
+	CUDA_CC = 50 # Lowest supported CC for mumax3.11
 endif
 
 # The gcc host compiler for nvcc
 ifeq ($(NVCC_CCBIN),)
-	NVCC_CCBIN=/usr/bin/gcc
+	override NVCC_CCBIN:=/usr/bin/gcc
 endif
 
 CUDA_VERSION := $(shell $(NVCC) --version | grep "Cuda compilation" | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -n 1)

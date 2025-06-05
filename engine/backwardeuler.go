@@ -34,12 +34,12 @@ func (s *BackwardEuler) Step() {
 	dt := float32(Dt_si * GammaLL)
 	util.AssertMsg(dt > 0, "Backward Euler solver requires fixed time step > 0")
 
-	// Fist guess
+	// First guess
 	Time = t0 + 0.5*Dt_si // 0.5 dt makes it implicit midpoint method
 
-	// with temperature, previous torque cannot be used as predictor
+	// With temperature, previous torque cannot be used as predictor
 	if Temp.isZero() {
-		cuda.Madd2(y, y0, dy1, 1, dt) // predictor euler step with previous torque
+		cuda.Madd2(y, y0, dy1, 1, dt) // predictor Euler step with previous torque
 		M.normalize()
 	}
 

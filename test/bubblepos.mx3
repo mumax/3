@@ -21,8 +21,19 @@ ext_backgroundtilt=0.25 //default value
 TOL:=1e-9
 expectv("position", ext_bubblepos.average(), vector(-3e-08,0,0), TOL)
 
+// add non-trivial geometry
+SetGeom(Square(30e-9).transl(30e-9,0e-9,0).inverse())
+// no minimization to save time
+expectv("position", ext_bubblepos.average(), vector(-3e-08,0,0), TOL)
+SetGeom(Universe())  // reset to trivial
+
 
 SetMesh(128, 128, 1, 1e-9,1e-9,0.4e-9, 0, 1, 0)
 m =neelskyrmion(1, -1).transl(0e-9,-30e-9,0)
 minimize()
+expectv("position", ext_bubblepos.average(), vector(0,-3e-08,0), TOL)
+
+// add non-trivial geometry
+SetGeom(Square(30e-9).transl(0e-9,30e-9,0).inverse())
+// no minimization to save time
 expectv("position", ext_bubblepos.average(), vector(0,-3e-08,0), TOL)

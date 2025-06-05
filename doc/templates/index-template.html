@@ -5,103 +5,103 @@
 
 <body>
 
-{{.Include "header.html"}}
+	{{.Include "header.html"}}
 
-<div style="max-width:50em; margin-left:5%">
+	<div style="max-width:50em; margin-left:5%;">
 
-	<p><b>mumax<sup>3</sup></b> is a GPU-accelerated micromagnetic simulation program developed at the <a href="http://dynamat.ugent.be">DyNaMat</a> group of Prof. Van Waeyenberge at <a href="http://www.ugent.be">Ghent University</a>. The code is written and maintained by <a href="http://plus.google.com/+ArneVansteenkiste">Arne Vansteenkiste</a>.</p>
-
-	
-	<p>A speed-up of the order of 100x compared to CPU-based simulations can easily be reached, even with relatively inexpensive gaming GPUs. Additionally, the software is optimized for low memory use and can handle about 16 million FD cells with 2GB of GPU RAM. </p>
-	
-<h2> Citations and licence </h2>
-	If you use mumax in any work or publication, we kindly ask you to cite:<br/> <a href="http://scitation.aip.org/content/aip/journal/adva/4/10/10.1063/1.4899186">"The design and verification of mumax3", AIP Advances 4, 107133 (2014)</a>.
-	<p>mumax<sup>3</sup> is open-source software. You are free to modify and distribute the source code under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3 licence</a>. 
-</div>
-
-<div style="float:left">
-	<figure>
-		<a href="web1.png"><img src="web1.png" width=447 /></a>
-		<figcaption> Web interface showing the spatial magnetization.</figcaption>
-	</figure>
-</div>
-
-<div style="float:left; max-width:40em;">
-	<h2>Features</h2>
-	<ul>
-		<li>Landau-Lifshitz micromagnetic formalism</li>
-		<li>Magnetostatic field </li>
-		<li>Heisenberg exchange</li>
-		<li>Arbitrary inter-region exchange like RKKY coupling</li>
-		<li>Dzyaloshinskii-Moriya interaction</li>
-		<li>Spin-transfer torque (Zhang-Li and Slonczewski)</li>
-		<li>Uniaxial and cubic magnetocrystalline anisotropy</li>
-		<li>Thermal fluctuations (Brown)</li>
-		<li>Voronoi tessellation</li>
-		<li>Time- and space dependent material parameters</li>
-		<li>Arbitrary complex excitation (field, current)</li>
-		<li>Simulation window can automatically follow a moving domain wall</li>
-		<li>Edge charges can be removed to simulate an infinitely long geometry</li>
-		<li>Optional 1D, 2D or 3D periodic boundary conditions</li>
-	</ul>
-
-</div>
-<br style="clear:both;"/> 
+		<p><b>mumax<sup>3</sup></b> is a GPU-accelerated micromagnetic simulation program developed and maintained at the <a href="http://dynamat.ugent.be">DyNaMat</a> group at <a href="http://www.ugent.be/en">Ghent University</a>.</p>
 
 
-<div style="float:left; width:40%">
-	<h2>web GUI</h2>
-	<p>mumax<sup>3</sup> includes a browser-based user interface that lets you follow a running simulation or modify it on-the-fly, be it on your local machine or remotely.</p>
+		<p>A speed-up of the order of 100x compared to CPU-based simulations can easily be reached, even with relatively inexpensive gaming GPUs. Additionally, the software is optimized for low memory use and can handle about 16 million FD cells with 2GB of GPU RAM. </p>
 
-	<h2>simple scripting</h2>
-	<p>mumax3 provides simple yet powerful input scripting. E.g., the example applies a time-dependent external field to a uniform magnet (FMR experiment).</p>
+		<h2> Citations and licence </h2>
+		If you use mumax<sup>3</sup> in any work or publication, we kindly ask you to cite the references suggested for your specific simulation in the terminal window and in the "references.bib" file found in the outputfolder.
+		<p>mumax<sup>3</sup> is <a href="https://github.com/mumax/3">open-source</a> software. You are free to modify and distribute the source code under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3 licence</a>.
+	</div>
 
-<pre><code>
-setgridsize(128, 32, 4)
-setcellsize(5e-9, 5e-9, 5e-9)
-Msat = 860e3
-Aex  = 13e-12
-alpha= 0.2
-m=uniform(1, 1, 0)
+	<div style="float:left;">
+		<figure>
+			<a href="web1.png"><img src="web1.png" width=447 /></a>
+			<figcaption> Web interface showing the spatial magnetization.</figcaption>
+		</figure>
+	</div>
+
+	<div style="float:left; max-width:40em;">
+		<h2>Features</h2>
+		<ul>
+			<li>Landau-Lifshitz micromagnetic formalism</li>
+			<li>Magnetostatic field </li>
+			<li>Heisenberg exchange</li>
+			<li>Arbitrary inter-region exchange like RKKY coupling</li>
+			<li>Dzyaloshinskii-Moriya interaction</li>
+			<li>Spin-transfer torque (Zhang-Li and Slonczewski)</li>
+			<li>Uniaxial and cubic magnetocrystalline anisotropy</li>
+			<li>Thermal fluctuations (Brown)</li>
+			<li>Voronoi tessellation</li>
+			<li>Time- and space-dependent material parameters</li>
+			<li>Arbitrary complex excitation (field, current)</li>
+			<li>Simulation window can automatically follow a moving domain wall</li>
+			<li>Edge charges can be removed to simulate an infinitely long geometry</li>
+			<li>Optional 1D, 2D or 3D periodic boundary conditions</li>
+		</ul>
+
+	</div>
+	<br style="clear:both;" />
+
+
+	<div style="float:left; width:40%">
+		<h2>Web GUI</h2>
+		<p>mumax<sup>3</sup> includes a browser-based user interface that lets you follow a running simulation or modify it on-the-fly, be it on your local machine or remotely.</p>
+
+		<h2>Simple scripting</h2>
+		<p>mumax<sup>3</sup> provides simple yet powerful input scripting.<br>E.g., the following example applies a time-dependent external field to a uniform magnet (FMR experiment).</p>
+
+		<pre><code>SetGridSize(128, 32, 4)
+SetCellSize(5e-9, 5e-9, 5e-9)
+Msat  = 860e3
+Aex   = 13e-12
+alpha = 0.2
+m = Uniform(1, 1, 0)
 
 f := 1e9  // 1GHz
 A := 0.01 // 10mT
-B_ext = vector(0.1, A*sin(2*pi*f*t), 0)
+B_ext = Vector(0.1, A*sin(2*pi*f*t), 0)
 
 run(10e-9)
 </code></pre>
 
-</div>
+	</div>
 
-<div style="float:left; ">
-	<figure>
-	<a href="web2.png"><img src="web2.png" width=407 /></a>
-	<figcaption> Web interface can view and set parameters on-the-fly.</figcaption>
-	</figure>
-</div>
-<br style="clear:both"/> 
-
-
-
-<div style="width:60%;">
-
-	<h2>GPU/driver requirements</h2>
-	<p>Mumax<sup>3</sup> is cross-platform and runs on Linux, Windows and Mac platforms. You need an nVIDIA GPU with compute capability 2.0 or higher, as listed <a href="http://developer.nvidia.com/cuda-gpus">here</a>.
-	You also need to use nVIDIA's proprietary graphics driver, which may already be installed on your system. The benchmark below may guide your GPU choice.</p>
-	<figure>
-	<img src="gpus.svg"  width=600/>
-	<figcaption> Mumax3 GPU perfomance for 2D simulations containing 4 million cells. </figcaption>
-	</figure>
-	
-</div>
+	<div style="float:left;">
+		<figure>
+			<a href="web2.png"><img src="web2.png" width=407 /></a>
+			<figcaption> Web interface can view and set parameters on-the-fly.</figcaption>
+		</figure>
+	</div>
+	<br style="clear:both;" />
 
 
 
-<hr/>
+	<div style="width:60%;">
 
-<div id=footer>
-mumax3 is written and maintained by Arne Vansteenkiste, DyNaMat group (<a href="http://dynamat.ugent.be">http://dynamat.ugent.be</a>), Ghent University, Belgium. Questions are welcome on the <a href="https://groups.google.com/forum/#!forum/mumax2">mumax mailing list</a>.
-</div>
+		<h2>GPU/driver requirements</h2>
+		<p>mumax<sup>3</sup> is cross-platform and runs on Linux, Windows and Mac platforms. You need an NVIDIA GPU with compute capability 5.0 or higher, as listed <a href="http://developer.nvidia.com/cuda-gpus">here</a>.
+			You also need to use NVIDIA's proprietary graphics driver, which may already be installed on your system. The benchmark below may guide your GPU choice.</p>
+		<figure>
+			<embed type="image/svg+xml" src="gpus.svg" width=900 />
+			<figcaption> mumax<sup>3</sup> GPU perfomance for 2D simulations containing 4 million cells. </figcaption>
+		</figure>
+
+	</div>
+
+
+
+	<hr />
+
+	<div id=footer>
+		mumax<sup>3</sup> is written and maintained by the DyNaMat group (<a href="http://dynamat.ugent.be">http://dynamat.ugent.be</a>), Ghent University, Belgium. Questions are welcome on the <a href="https://groups.google.com/forum/#!forum/mumax2">mumax mailing list</a>.
+	</div>
 
 </body>
+
 </html>

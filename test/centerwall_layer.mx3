@@ -1,0 +1,43 @@
+/*
+	Tests CenterWallInLayer using a synthetic antiferromagnet (two Z-layers).
+
+    In one Z layer, the magnetization is ↑|↓, in the other it is ↓|↑. Because
+    the average magnetization of the universe is 0, ext_centerWall() can't be
+    used. By using ext_CenterWallInLayer, the domain wall can remain centered.
+
+    (inspired by João Sampaio's example script in PR #222)
+    (this script is nearly identical to test/centerwall_region.mx3)
+*/
+
+SetGridSize(256, 32, 2)
+c := 4e-9
+SetCellSize(c, c, c)
+
+//// Create synthetic antiferromagnet with 2 layers
+Msat = 1e6
+Aex = 10e-12
+RKKY := -1e-3
+scale := (RKKY * c) / (2 * Aex.Average())
+ext_scaleExchange(0, 1, scale)
+anisU = vector(0, 0, 1)
+Ku1 = 700000
+alpha = 0.1
+xi = 1
+
+//// Put domain wall in the center
+defRegion(0, layer(0))
+defRegion(1, layer(1))
+m.setRegion(0, TwoDomain(0, 0, 1, 1, 0, 0, 0, 0, -1))
+m.setRegion(1, TwoDomain(0, 0, -1, -1, 0, 0, 0, 0, 1))
+
+//// Setup shift
+ext_centerWallInLayer(0, 2)
+ShiftMagL = vector(0, 0, 1)
+ShiftMagR = vector(0, 0, -1)
+J = vector(1e11, 0, 0) // The driving force to move the domain wall
+
+//// Expect certain shift after 3ns
+Run(3e-09)
+tol := 1e-16
+Expect("Total shift", totalshift, 5.2e-8, tol)
+Expect("DW position", ext_dwpos, -5.2e-8, tol)

@@ -18,3 +18,4 @@ tmp/
 *.out
 .idea/
 .vscode/
+doc/doc.exe

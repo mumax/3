@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"math"
 
+	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/util"
 )
@@ -13,12 +14,13 @@ import (
 func init() {
 	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
-	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The top of the cone points in the +z direction.")
+	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The base is at z=0. If the height is positive, the tip points in the +z direction.")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")
 	DeclFunc("Rect", Rect, "2D rectangle with size in meter")
 	DeclFunc("Square", Square, "2D square with size in meter")
+	DeclFunc("Triangle", Triangle, "2D triangle with vertices (x0, y0), (x1, y1) and (x2, y2)")
 	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
 	DeclFunc("ZRange", ZRange, "Part of space between z1 (inclusive) and z2 (exclusive), in meter")
@@ -46,10 +48,10 @@ func Ellipse(diamx, diamy float64) Shape {
 	return Ellipsoid(diamx, diamy, math.Inf(1))
 }
 
-// 3D Cone with the vertex down.
+// 3D Cone with base at z=0 and vertex at z=height.
 func Cone(diam, height float64) Shape {
 	return func(x, y, z float64) bool {
-		return z >= 0 && sqr64(x/diam)+sqr64(y/diam)+0.25*sqr64(z/height) <= 0.25
+		return (height-z)*z >= 0 && sqr64(x/diam)+sqr64(y/diam) <= 0.25*sqr64(1-z/height)
 	}
 }
 
@@ -84,6 +86,30 @@ func Rect(sidex, sidey float64) Shape {
 // 2D square with given side.
 func Square(side float64) Shape {
 	return Rect(side, side)
+}
+
+// 2D triangle with given vertices.
+func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
+	denom := x0*(y1-y2) + x1*(y2-y0) + x2*(y0-y1) // 2 * area
+	if denom == 0 {
+		return func(x, y, z float64) bool { return false }
+	}
+	A2m1 := 1 / denom
+
+	Sc := A2m1 * (y0*x2 - x0*y2)
+	Sx := A2m1 * (y2 - y0)
+	Sy := A2m1 * (x0 - x2)
+
+	Tc := A2m1 * (x0*y1 - y0*x1)
+	Tx := A2m1 * (y0 - y1)
+	Ty := A2m1 * (x1 - x0)
+
+	return func(x, y, z float64) bool {
+		// barycentric coordinates
+		s := Sc + Sx*x + Sy*y
+		t := Tc + Tx*x + Ty*y
+		return ((0 <= s) && (0 <= t) && (s+t <= 1))
+	}
 }
 
 // All cells with x-coordinate between a and b
@@ -187,6 +213,42 @@ func ImageShape(fname string) Shape {
 		} else {
 			return inside[iy][ix]
 		}
+	}
+}
+
+func VoxelShape(voxels *data.Slice, a, b, c float64) Shape {
+	//component dimension check, expect 1D points
+	if voxels.NComp() != 1 {
+		util.Fatal("Voxel array fed has a wrong value dimension: ", voxels.NComp(), ", Aborting!")
+	}
+
+	//cut FP array into bool array
+	arrSize := voxels.Size()
+	voxelArr := make([]bool, arrSize[0]*arrSize[1]*arrSize[2])
+	for ix := 0; ix < arrSize[0]; ix++ {
+		for iy := 0; iy < arrSize[1]; iy++ {
+			for iz := 0; iz < arrSize[2]; iz++ {
+				voxelArr[iz*arrSize[0]*arrSize[1]+iy*arrSize[0]+ix] = voxels.Get(0, ix, iy, iz) > 0.5
+			}
+		}
+	}
+
+	//the predicate
+	voxelSize := [3]float64{a, b, c}
+	return func(x, y, z float64) bool {
+		var ind [3]int
+		coord := [3]float64{x, y, z}
+		for c := 0; c < 3; c++ {
+			//truncation applies floor by default
+			ind[c] = int(coord[c]/voxelSize[c] + float64(arrSize[c])/2)
+			if ind[c] < 0 || ind[c] >= arrSize[c] {
+				//there is no geometry outside of the imported array
+				return false
+			}
+		}
+
+		//if not fallen through check against the previous array
+		return voxelArr[ind[2]*arrSize[0]*arrSize[1]+ind[1]*arrSize[0]+ind[0]]
 	}
 }
 

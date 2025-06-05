@@ -101,7 +101,7 @@ func FindJob() string {
 	// quickly list peers first
 	RLock()
 	p := make([]string, 0, len(peers))
-	for addr, _ := range peers {
+	for addr := range peers {
 		p = append(p, addr)
 	}
 	RUnlock()

@@ -210,4 +210,25 @@ func buildLibrary() {
     url     = {https://doi.org/10.1016/0550-3213(81)90568-X},
 }`}
 
+	library["Knapman2025"] = &bibEntry{
+		reason:   "Computed the Hopf index",
+		shortref: "Knapman et al., Phys. Rev. B 111, 134408 (2025)",
+		bibtex: `
+@article{Knapman2025,
+    author  = {Knapman, R. and
+               Azhar, M. and
+               Pignedoli, A. and
+               Gallard, L. and
+               Hertel, R. and
+               Leliaert, J. and
+               Everschor-Sitte, K.},
+    title   = {{Numerical calculation of the Hopf index for three-dimensional magnetic textures}},
+    journal = {Phys. Rev. B},
+    pages   = {134408},
+    volume  = {111},
+    year    = {2025},
+    doi     = {10.1103/PhysRevB.111.134408},
+    url     = {https://link.aps.org/doi/10.1103/PhysRevB.111.134408},
+}`}
+
 }

@@ -1,14 +1,18 @@
 package engine
 
 import (
+	"math/rand"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/httpfs"
+	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/util"
-	"math/rand"
 )
 
 func init() {
 	DeclFunc("SetGeom", SetGeom, "Sets the geometry to a given shape")
+	DeclFunc("ext_InitGeomFromOVF", InitGeomFromOVF, "Initialize geometry, cell count and cell size given a pattern from OVF")
 	DeclVar("EdgeSmooth", &edgeSmooth, "Geometry edge smoothing with edgeSmooth^3 samples per cell, 0=staircase, ~8=very smooth")
 	geometry.init()
 }
@@ -72,6 +76,91 @@ func (g *geom) Average() float64 { return g.average()[0] }
 
 func SetGeom(s Shape) {
 	geometry.setGeom(s)
+}
+
+func isNonEmpty(geomSlice *data.Slice) bool {
+	arrDim := geomSlice.Size()
+
+	for z := 0; z < arrDim[Z]; z++ {
+		for y := 0; y < arrDim[Y]; y++ {
+			for x := 0; x < arrDim[X]; x++ {
+				//optimal empty volume check, quit first time you see non-zero value
+				if geomSlice.Get(0, x, y, z) != 0 {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func cleanMagnetization(geomSlice *data.Slice) {
+	// M inside geom but previously outside needs to be re-inited
+	needupload := false
+	geomlist := geomSlice.Host()[0]
+	mhost := M.Buffer().HostCopy()
+	m := mhost.Host()
+	rng := rand.New(rand.NewSource(0))
+	for i := range m[0] {
+		if geomlist[i] != 0 {
+			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
+			if mx == 0 && my == 0 && mz == 0 {
+				needupload = true
+				rnd := randomDir(rng)
+				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
+			}
+		}
+	}
+	if needupload {
+		data.Copy(M.Buffer(), mhost)
+	}
+
+	M.normalize() // removes m outside vol
+}
+
+func InitGeomFromOVF(fname string) {
+	in, err := httpfs.Open(fname)
+	util.FatalErr(err)
+	geomSlice, meta, _ := oommf.Read(in)
+	arrDim := geomSlice.Size()
+	step := meta.CellSize
+
+	//check the geometry file for sanity
+	if geomSlice.NComp() != 1 {
+		util.Fatal("Geometry initialization file should have point dimension of 1!")
+	}
+	if !isNonEmpty(geomSlice) {
+		util.Fatal("ext_InitGeomFromOVF: provided geometry is completely empty!")
+	}
+
+	//set mesh from imported file, should refresh it by itself
+	SetMesh(arrDim[X], arrDim[Y], arrDim[Z],
+		step[X], step[Y], step[Z],
+		0, 0, 0)
+
+	SetBusy(true)
+	defer SetBusy(false)
+	//first time initialization if needed
+	if geometry.Gpu().IsNil() {
+		geometry.buffer = cuda.NewSlice(1, geomSlice.Size())
+	}
+
+	//copy data into geometry array
+	data.Copy(geometry.buffer, geomSlice)
+
+	//make a makeshift function to represent imported geometry
+	isInterpd := false
+	pred := VoxelShape(geomSlice, step[0], step[1], step[2])
+	geometry.shape = func(x, y, z float64) bool {
+		if !isInterpd {
+			util.Log("Warning! Geometry imported through ext_InitGeomFromOVF is about to be reinterpolated! Possible changes in geometry!")
+			isInterpd = true
+		}
+		return pred(x, y, z)
+	}
+
+	cleanMagnetization(geomSlice)
 }
 
 func (geometry *geom) setGeom(s Shape) {
@@ -152,27 +241,7 @@ func (geometry *geom) setGeom(s Shape) {
 
 	data.Copy(geometry.buffer, V)
 
-	// M inside geom but previously outside needs to be re-inited
-	needupload := false
-	geomlist := host.Host()[0]
-	mhost := M.Buffer().HostCopy()
-	m := mhost.Host()
-	rng := rand.New(rand.NewSource(0))
-	for i := range m[0] {
-		if geomlist[i] != 0 {
-			mx, my, mz := m[X][i], m[Y][i], m[Z][i]
-			if mx == 0 && my == 0 && mz == 0 {
-				needupload = true
-				rnd := randomDir(rng)
-				m[X][i], m[Y][i], m[Z][i] = float32(rnd[X]), float32(rnd[Y]), float32(rnd[Z])
-			}
-		}
-	}
-	if needupload {
-		data.Copy(M.Buffer(), mhost)
-	}
-
-	M.normalize() // removes m outside vol
+	cleanMagnetization(host)
 }
 
 // Sample edgeSmooth^3 points inside the cell to estimate its volume.
@@ -204,6 +273,10 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	return vol / float32(N*N*N)
 }
 
+func (g *geom) GetCell(ix, iy, iz int) float64 {
+	return float64(cuda.GetCell(g.Gpu(), 0, ix, iy, iz))
+}
+
 func (g *geom) shift(dx int) {
 	// empty mask, nothing to do
 	if g == nil || g.buffer.IsNil() {
@@ -219,7 +292,7 @@ func (g *geom) shift(dx int) {
 	data.Copy(s, s2)
 
 	n := Mesh().Size()
-	x1, x2 := shiftDirtyRange(dx)
+	x1, x2 := shiftDirtyRange(dx, X)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for iy := 0; iy < n[Y]; iy++ {
@@ -249,7 +322,7 @@ func (g *geom) shiftY(dy int) {
 	data.Copy(s, s2)
 
 	n := Mesh().Size()
-	y1, y2 := shiftDirtyRange(dy)
+	y1, y2 := shiftDirtyRange(dy, Y)
 
 	for iz := 0; iz < n[Z]; iz++ {
 		for ix := 0; ix < n[X]; ix++ {
@@ -264,16 +337,16 @@ func (g *geom) shiftY(dy int) {
 
 }
 
-// x range that needs to be refreshed after shift over dx
-func shiftDirtyRange(dx int) (x1, x2 int) {
-	nx := Mesh().Size()[X]
-	util.Argument(dx != 0)
-	if dx < 0 {
-		x1 = nx + dx
-		x2 = nx
+// range along component that needs to be refreshed after shift over d
+func shiftDirtyRange(d, comp int) (p1, p2 int) {
+	n := Mesh().Size()[comp]
+	util.Argument(d != 0)
+	if d < 0 {
+		p1 = n + d
+		p2 = n
 	} else {
-		x1 = 0
-		x2 = dx
+		p1 = 0
+		p2 = d
 	}
 	return
 }

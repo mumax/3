@@ -5,9 +5,12 @@
 <body>
 {{.Include "header.html"}}
 
-<h1>mumax 3.10 examples</h1>
+<h1>mumax 3.11 examples</h1>
 
-<p>These are example input scripts, the full API can be found <a href="http://mumax.github.io/api.html">here</a>.</p>
+<p>
+	These are example input scripts, the full API can be found <a href="http://mumax.github.io/api.html">here</a>.<br>
+	A more in-depth tutorial with video recordings can be found <a href="https://mumax.ugent.be/mumax3-workshop/">here</a>.
+</p>
 
 mumax<sup>3</sup> input files are run with the command
 
@@ -16,7 +19,26 @@ mumax<sup>3</sup> input files are run with the command
 Output is automatically stored in the "myfile.out" directory. Additionally, a web interface provides live output. Default is <code><a href="http://127.0.0.1:35367">http://localhost:35367</a></code>.<br/>
 For more details, run <code>mumax3 -help</code> which will show the available command-line flags (e.g. to select a certain GPU).
 
-<hr/><h2>Getting started with Standard Problem #4</h2>
+<hr/>
+
+<ol id="contents"></ol>
+<script>
+	window.addEventListener("load", function() { // Create contents from h2 and their ID's
+		let ol = document.getElementById("contents");
+		for (const item of document.getElementsByTagName("h2")) {
+			let li = document.createElement("li");
+			let a = document.createElement("a");
+			a.textContent=item.textContent;
+			a.href=`#${item.id}`;
+			li.appendChild(a);
+			ol.appendChild(li);
+		}
+	});
+</script>
+
+<hr/>
+
+<h2 id="ex_SP4">Getting started with Standard Problem #4</h2>
 
 Let's start with the classic mumag standard problem 4, as defined <a href="http://www.ctcms.nist.gov/~rdm/mumag.org.html">here</a>.
 
@@ -48,7 +70,7 @@ run(1e-9)
 {{.Output }}
 
 
-<hr/><h2>Standard Problem #2</h2>
+<hr/><h2 id="ex_SP2">Standard Problem #2</h2>
 
 Using the scripting language explained above, relatively complex input files can be easily defined. E.g. <a href="http://www.ctcms.nist.gov/~rdm/std2/spec2.html">micromagnetic standard problem #2</a> specifies the simulation size in exchange lengths. The script below calculates the exchange length and chooses cells not larger than 0.75 exchange lengths so that the number of cells is a power of two (for best performance).
 
@@ -85,7 +107,7 @@ This example saves and prints the remanent magnetization state so we can verify 
 
 
 
-<hr/><h2>Hysteresis</h2>
+<hr/><h2 id="ex_Hysteresis">Hysteresis</h2>
 
 Below is an example of a hysteresis loop where we step the applied field in small increments and find the magnetization ground state after each step. Minimize() finds the ground state using the conjugate gradient method, which is very fast. However, this method might fail on very high energy initial states like a random magnetization. In that case, Relax() is more robust (albeit much slower).
 
@@ -130,7 +152,7 @@ for B:=-Bmax; B<=Bmax; B+=Bstep{
 
 
 
-<hr/><h2>Geometry</h2>
+<hr/><h2 id="ex_geom">Geometry</h2>
 
 mumax3 has powerful API to programatically define geometries. A number of primitive shapes are defined, like ellipses, rectangles, etc. They can be transformed (rotated, translated) and combined using boolean logic (add, sub, inverse). All positions are specified in meters and the origin lies in the center of the simulation box. See the full <a href="http://mumax.github.io/api.html">API</a>.
 
@@ -200,7 +222,7 @@ saveas(geom, "imageShape")
 
 Note: these are 3D geometries seen from above. The displayed cell filling is averaged along the thickness (notable in ellipse and layers example). Black means empty space, white is filled.
 
-<hr/><h2>Initial Magnetization</h2>
+<hr/><h2 id="ex_initmag">Initial Magnetization</h2>
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://mumax.github.io/api.html">API</a>.
 
 {{.Example `
@@ -258,7 +280,7 @@ These initial states are approximate, after setting them it is a good idea to re
 The magnetization can also be set in separate regions, see below.
 
 
-<hr/><h2>Interlude: Rotating Cheese</h2>
+<hr/><h2 id="ex_cheese">Interlude: Rotating Cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
 
@@ -295,7 +317,7 @@ for i:=0; i<=90; i=i+30{
 {{.Output}}
 
 
-<hr/><h2>Regions: Space-dependent Parameters</h2>
+<hr/><h2 id="ex_regions">Regions: Space-dependent Parameters</h2>
 
 <p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Each cell can belong to only one region. At the start of a simulation all cells have region number 0.</p>
 
@@ -345,7 +367,7 @@ saveas(m, "m_final")
 {{.Output}}
 
 
-<hr/><h2>Slicing and dicing output</h2>
+<hr/><h2 id="ex_slicing">Slicing and dicing output</h2>
 
 The example below illustrates how to save only the part of the output you're interested in.
 
@@ -378,7 +400,7 @@ save(mx_center)
 
 
 
-<a id=MFM><hr/><h2>Magnetic Force Microscopy</h2></a>
+<a id=MFM><hr/><h2 id="ex_MFM">Magnetic Force Microscopy</h2></a>
 
 <p>Mumax3 has built-in generation of MFM images from the magnetization. The MFM tip lift can be freely chosen. By default the tip magnetization is modeled as a point monopole at the apex. This is sufficient for most situations. Nevertheless, it is also possible to model partially magnetized tips by setting MFMDipole to the magnetized portion of the tip, in meters. E.g., if only the first 20nm of the tip is (vertically) magnetized, set MFMDipole=20e-9.</p>
 
@@ -407,7 +429,7 @@ saveas(MFM, "lift_90nm")
 {{.Output}}
 
 
-<hr/><h2>PMA Racetrack</h2>
+<hr/><h2 id="ex_PMA">PMA Racetrack</h2>
 In this example we drive a domain wall in PMA material by spin-transfer torque.  We set up a post-step function that makes the simulation box "follow" the domain wall. Like this, only a small number of cells is needed to simulate an infinitely long magnetic wire.
 
 {{.Example `
@@ -441,7 +463,7 @@ run(.5e-9)
 Since we center on the domain wall we can not see that it is actually moving, but the domain wall breakdown is visible.
 
 
-<hr/><h2>Py Racetrack</h2>
+<hr/><h2 id="ex_Py">Py Racetrack</h2>
 
 In this example we drive a vortex wall in Permalloy by spin-transfer torque. The simulation box "follows" the domain wall. By removing surface charges at the left and right ends, we mimic an infintely long wire.
 
@@ -484,7 +506,7 @@ Run(0.5e-9)
 Since we center on the domain wall we can not really see the motion, despite the vortex wall moving pretty fast. Note the absence of closure domains at the edges due to the surface charges being removed there.
 
 
-<hr/><h2>Voronoi tessellation</h2>
+<hr/><h2 id="ex_Voronoi">Voronoi tessellation</h2>
 
 In this example we use regions to specify grains in a material. The built-in extension <code>ext_makegrains</code> is used to define grain-like regions using Voronoi tessellation. We vary the material parameters in each grain.
 
@@ -545,7 +567,7 @@ save(exchCoupling)
 {{.Output}}
 
 
-<hr/><h2>RKKY</h2>
+<hr/><h2 id="ex_RKKY">RKKY</h2>
 
 Scaling the exchange coupling between regions can be used to obtain antiferromagnetic coupling like the RKKY interaction. In that case we only model the magnetic layers and do not explicitly add a spacer layer (which is negligibly thin). We scale the exchange coupling to get the desired RKKY strength: <code>scale = (RKKY * cellsize_z) / (2 * Aex)</code>.
 
@@ -582,7 +604,7 @@ for ang:=0; ang<360; ang++{
 {{.Output}}
 
 
-<hr/><h2>Slonczewski STT</h2>
+<hr/><h2 id="ex_Slonczewski">Slonczewski STT</h2>
 
 Example of a spin-torque MRAM stack consisting of a fixed layer, spacer and free layer. Only the free layer magnetization is explicitly modeled, so we use a 2D grid. The fixed layer polarization is set with <code>FixedLayer = ...</code>, which can be space-dependent. The spacer layer properties are modeled by setting the parameters <code>Lambda</code> and <code>EpsilonPrime</code>. Finally <code>Pol</code> sets the current polarization and <code>J</code> the current density, which should be along z in this case.
 
@@ -633,7 +655,7 @@ run(1e-9)
 {{.Output}}
 
 
-<hr/><h2>Spinning hard disk</h2>
+<hr/><h2 id="ex_harddisk">Spinning hard disk</h2>
 
 Using the <code>Shift</code> function, we can shift the system (magnetization, regions and geometry) by a given number of cells. Here we use this feature to simulate a moving hard disk platter. A time-dependent gaussian field profile mimics the write field.
 

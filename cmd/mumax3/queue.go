@@ -5,8 +5,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/mumax/3/cuda/cu"
-	"github.com/mumax/3/engine"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +12,9 @@ import (
 	"os/exec"
 	"sync"
 	"sync/atomic"
+
+	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/engine"
 )
 
 var (

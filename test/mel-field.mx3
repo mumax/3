@@ -1,3 +1,7 @@
+/*
+	Test magnetoelastic effective field.
+    Expected behavior: Equation 4 in https://doi.org/10.12688/openreseurope.13302.1
+*/
 Nx := 1
 Ny := 1
 Nz := 1
@@ -32,7 +36,7 @@ exy = exypr
 exz = exzpr
 eyz = eyzpr
 
-pre1 := 2.0 * B1.average() / Msat.average()
+pre1 := B1.average() / Msat.average()
 pre2 := B2.average() / Msat.average()
 
 hmel := B_mel.average()
@@ -41,9 +45,9 @@ mx := m.average()[0]
 my := m.average()[1]
 mz := m.average()[2]
 
-hmelrefx := -(pre1*mx*exx.average() + pre2*(my*exy.average()+mz*exz.average()))
-hmelrefy := -(pre1*my*eyy.average() + pre2*(mx*exy.average()+mz*eyz.average()))
-hmelrefz := -(pre1*mz*ezz.average() + pre2*(mx*exz.average()+my*eyz.average()))
+hmelrefx := -2.0 * (pre1*mx*exx.average() + pre2*(my*exy.average()+mz*exz.average()))
+hmelrefy := -2.0 * (pre1*my*eyy.average() + pre2*(mx*exy.average()+mz*eyz.average()))
+hmelrefz := -2.0 * (pre1*mz*ezz.average() + pre2*(mx*exz.average()+my*eyz.average()))
 
 expect("(ΔB_mel).x", hmelrefx-hmel[0], 0.0, 7e-8)
 expect("(ΔB_mel).y", hmelrefy-hmel[1], 0.0, 4.5e-7)

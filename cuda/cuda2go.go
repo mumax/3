@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 // This program generates Go wrappers for cuda sources.
@@ -121,10 +122,11 @@ func wrapgen(filename, funcname string, argt, argn []string) {
 
 	basename := util.NoExt(filename)
 	for _, f := range ls {
-		match, e := regexp.MatchString("^"+basename+"_*[0-9]..ptx", f)
+		match, e := regexp.MatchString(`^`+basename+`_[0-9]+\.ptx`, f)
 		util.PanicErr(e)
 		if match {
-			cc, ei := strconv.Atoi(f[len(f)-len("00.ptx") : len(f)-len(".ptx")])
+			loc := regexp.MustCompile(`_[0-9]+\.ptx`).FindStringIndex(f) // Start and end indices of "_CC.ptx"
+			cc, ei := strconv.Atoi(f[loc[0]+1 : loc[1]-len(".ptx")])
 			util.PanicErr(ei)
 			fmt.Println(basename, cc)
 			kernel.PTX[cc] = filterptx(f)

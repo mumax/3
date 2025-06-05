@@ -10,6 +10,7 @@ in objects that provide:
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 )
@@ -93,7 +94,7 @@ func NewVectorField(name, unit, desc string, f func(dst *data.Slice)) VectorFiel
 	return v
 }
 
-// NewVectorField constructs an outputable space-dependent scalar quantity whose
+// NewScalarField constructs an outputable space-dependent scalar quantity whose
 // value is provided by function f.
 func NewScalarField(name, unit, desc string, f func(dst *data.Slice)) ScalarField {
 	q := AsScalarField(&fieldFunc{info{1, name, unit}, f})

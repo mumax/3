@@ -8,14 +8,15 @@ import (
 )
 
 // Bogacki-Shampine solver. 3rd order, 3 evaluations per step, adaptive step.
-// 	http://en.wikipedia.org/wiki/Bogacki-Shampine_method
 //
-// 	k1 = f(tn, yn)
-// 	k2 = f(tn + 1/2 h, yn + 1/2 h k1)
-// 	k3 = f(tn + 3/4 h, yn + 3/4 h k2)
-// 	y{n+1}  = yn + 2/9 h k1 + 1/3 h k2 + 4/9 h k3            // 3rd order
-// 	k4 = f(tn + h, y{n+1})
-// 	z{n+1} = yn + 7/24 h k1 + 1/4 h k2 + 1/3 h k3 + 1/8 h k4 // 2nd order
+//	http://en.wikipedia.org/wiki/Bogacki-Shampine_method
+//
+//	k1 = f(tn, yn)
+//	k2 = f(tn + 1/2 h, yn + 1/2 h k1)
+//	k3 = f(tn + 3/4 h, yn + 3/4 h k2)
+//	y{n+1}  = yn + 2/9 h k1 + 1/3 h k2 + 4/9 h k3            // 3rd order
+//	k4 = f(tn + h, y{n+1})
+//	z{n+1} = yn + 7/24 h k1 + 1/4 h k2 + 1/3 h k3 + 1/8 h k4 // 2nd order
 type RK23 struct {
 	k1 *data.Slice // torque at end of step is kept for beginning of next step
 }

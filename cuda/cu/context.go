@@ -19,7 +19,7 @@ func CtxCreate(flags uint, dev Device) Context {
 	return Context(uintptr(unsafe.Pointer(ctx)))
 }
 
-//Destroys the CUDA context specified by ctx. If the context usage count is not equal to 1, or the context is current to any CPU thread other than the current one, this function fails. Floating contexts (detached from a CPU thread via cuCtxPopCurrent()) may be destroyed by this function.
+// Destroys the CUDA context specified by ctx. If the context usage count is not equal to 1, or the context is current to any CPU thread other than the current one, this function fails. Floating contexts (detached from a CPU thread via cuCtxPopCurrent()) may be destroyed by this function.
 func CtxDestroy(ctx *Context) {
 	err := Result(C.cuCtxDestroy(C.CUcontext(unsafe.Pointer(uintptr(*ctx)))))
 	*ctx = 0
@@ -28,7 +28,7 @@ func CtxDestroy(ctx *Context) {
 	}
 }
 
-//Destroys the CUDA context.
+// Destroys the CUDA context.
 func (ctx *Context) Destroy() {
 	CtxDestroy(ctx)
 }

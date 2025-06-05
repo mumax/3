@@ -3,12 +3,13 @@ package mag
 import (
 	"bufio"
 	"fmt"
+	"math"
+	"os"
+
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/oommf"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
-	"math"
-	"os"
 )
 
 // Obtains the demag kernel either from cacheDir/ or by calculating (and then storing in cacheDir for next time).
@@ -20,7 +21,7 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	timer.Start("kernel_init")
 	defer timer.Stop("kernel_init")
 
-	sanityCheck(cellsize, pbc)
+	sanityCheck(cellsize)
 	// Cache disabled
 	if cacheDir == "" {
 		util.Log(`//Not using kernel cache (-cache="")`)
@@ -147,8 +148,9 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 		}
 	}
 
-	progress, progmax := 0, (1+(r2[Y]-r1[Y]))*(1+(r2[Z]-r1[Z])) // progress bar
-	done := make(chan struct{}, 3)                              // parallel calculation of one component done?
+	progress, progmax := 0, (1+(r2[Y]-r1[Y]))*(1+(r2[Z]-r1[Z]))  // progress bar
+	util.Progress(progress, progmax, "Calculating demag kernel") // To make sure 0% is printed
+	done := make(chan struct{}, 3)                               // parallel calculation of one component done?
 
 	// Start brute integration
 	// 9 nested loops, does that stress you out?
@@ -168,25 +170,29 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 				// skip one half, reconstruct from symmetry later
 				// check on wrapped index instead of loop range so it also works for PBC
 				if zw > size[Z]/2 {
-					if s == 0 {
-						progress += (1 + (r2[Y] - r1[Y]))
+					if s == 2 { // Choose s == 2: most commonly, dz is smallest cell dimension, resulting in largest nv, nw etc. for s=2
+						progmax -= (1 + (r2[Y] - r1[Y]))
+						util.Progress(progress, progmax, "Calculating demag kernel")
 					}
 					continue
 				}
 				R[Z] = float64(z) * cellsize[Z]
 
 				for y := r1[Y]; y <= r2[Y]; y++ {
-
-					if s == 0 { // show progress of only one component
-						progress++
-						util.Progress(progress, progmax, "Calculating demag kernel")
-					}
-
 					yw := wrap(y, size[Y])
 					if yw > size[Y]/2 {
+						if s == 2 {
+							progmax--
+							util.Progress(progress, progmax, "Calculating demag kernel")
+						}
 						continue
 					}
 					R[Y] = float64(y) * cellsize[Y]
+
+					if s == 2 { // show progress of only one component
+						progress++
+						util.Progress(progress, progmax, "Calculating demag kernel")
+					}
 
 					for x := r1[X]; x <= r2[X]; x++ {
 						xw := wrap(x, size[X])
@@ -381,7 +387,8 @@ func wrap(number, max int) int {
 
 const maxAspect = 100.0 // maximum sane cell aspect ratio
 
-func sanityCheck(cellsize [3]float64, pbc [3]int) {
+// Checks if the cell aspect ratio is realistic.
+func sanityCheck(cellsize [3]float64) {
 	a3 := cellsize[X] / cellsize[Y]
 	a2 := cellsize[Y] / cellsize[Z]
 	a1 := cellsize[Z] / cellsize[X]

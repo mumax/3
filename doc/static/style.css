@@ -67,6 +67,38 @@ figcaption {
     color: #555555
 }
 
+#header_img:hover {
+    transform:scale(1.05);
+}
+
+select {
+    font-family: monospace;
+    white-space: pre;
+    font-size: 1.2em;
+}
+
+.oldlink {
+    font-size: 8px;
+}
+
+#deprecated-page {
+    font-size: 16px;
+    color: red;
+    font-weight: bold;
+}
+
+#download-old {
+    display: block;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    width: 10%;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
 .api-section-link {
     padding-top: 0.2ex;
     padding-bottom: 0.2ex;
@@ -86,6 +118,30 @@ figcaption {
     background-color: #E0E0E0;
     padding: 20px;
     margin: 0px;
+}
+
+#api-to-top {
+    margin-bottom: auto;
+    position: sticky;
+    top: 0; /* Sticks to the top of the viewport when scrolling */
+    background-color: #fff;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    border-radius: 0 0 10px 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#api-to-top.visible {
+    opacity: 1;
+}
+
+.api-to-top-arrow {
+    font-size: 20px; /* Make the arrow slightly larger than text */
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0 5px; /* Add spacing around the arrow */
 }
 
 .api-content {

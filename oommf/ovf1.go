@@ -3,16 +3,17 @@ package oommf
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
 	"log"
 	"strings"
 	"unsafe"
+
+	"github.com/mumax/3/data"
 )
 
 func WriteOVF1(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) {
 	if q.NComp() != 3 {
-		log.Fatal("Cannot save the quantity: the OVF1 format only supports 3D-vector fields.")
+		log.Fatal("Cannot save the quantity: the OVF1 format only supports 3D-vector fields. Use OVF2 instead.")
 	}
 	writeOVF1Header(out, q, meta)
 	writeOVF1Data(out, q, dataformat)

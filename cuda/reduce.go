@@ -44,7 +44,8 @@ func MaxAbs(in *data.Slice) float32 {
 }
 
 // Maximum of the norms of all vectors (x[i], y[i], z[i]).
-// 	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
+//
+//	max_i sqrt( x[i]*x[i] + y[i]*y[i] + z[i]*z[i] )
 func MaxVecNorm(v *data.Slice) float64 {
 	out := reduceBuf(0)
 	k_reducemaxvecnorm2_async(v.DevPtr(0), v.DevPtr(1), v.DevPtr(2), out, 0, v.Len(), reducecfg)
@@ -52,8 +53,9 @@ func MaxVecNorm(v *data.Slice) float64 {
 }
 
 // Maximum of the norms of the difference between all vectors (x1,y1,z1) and (x2,y2,z2)
-// 	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
-// 	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
+//
+//	(dx, dy, dz) = (x1, y1, z1) - (x2, y2, z2)
+//	max_i sqrt( dx[i]*dx[i] + dy[i]*dy[i] + dz[i]*dz[i] )
 func MaxVecDiff(x, y *data.Slice) float64 {
 	util.Argument(x.Len() == y.Len())
 	out := reduceBuf(0)

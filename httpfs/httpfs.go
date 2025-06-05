@@ -5,14 +5,12 @@ httpfs is used by mumax3-server to proved file system access to the compute node
 The API is similar to go's os package, but both local file names and URLs may be passed.
 When the file "name" starts with "http://", it is treated as a remote file, otherwise
 it is local. Hence, the same API is used for local and remote file access.
-
 */
 package httpfs
 
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -27,7 +25,7 @@ const (
 
 func readBody(r io.ReadCloser) string {
 	defer r.Close()
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		log.Println("readbody:", err)
 		return ""
@@ -106,7 +104,7 @@ func localPut(fname string, data []byte) error {
 }
 
 func localRead(fname string) ([]byte, error) {
-	return ioutil.ReadFile(fname)
+	return os.ReadFile(fname)
 }
 
 func localRemove(fname string) error {

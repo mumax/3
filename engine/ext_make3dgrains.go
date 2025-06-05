@@ -7,8 +7,11 @@ import (
 	"math/rand"
 )
 
+var GrainCutShape = false // complete all voronoi grains whose centre lies within the shape. Warning, this also cuts away parts of the shape whose closest voronoi centre lies outside the shape
+
 func init() {
 	DeclFunc("ext_make3dgrains", Voronoi3d, "3D Voronoi tesselation over shape (grain size, starting region number, num regions, shape, seed)")
+	DeclVar("ext_grainCutShape", &GrainCutShape, "Whether to add the complete (3D) voronoi grain, if its centre lies within the shape (default=false)")
 }
 
 func Voronoi3d(grainsize float64, startRegion int, numRegions int, inputShape Shape, seed int) {
@@ -54,9 +57,9 @@ func newTesselation3d(grainsize float64, nRegion int, seed int64, startRegion in
 
 // Permutes the slice of cell locations. I don't understand why this needs to be done if we're choosing
 // random (Intn()) cells out of the slice of cell locations, but hey, it seems to do the trick.
-func shuffleCells(src []cellLocs) []cellLocs {
+func (t *tesselation3d) shuffleCells(src []cellLocs) []cellLocs {
 	dest := make([]cellLocs, len(src))
-	perm := rand.Perm(len(src))
+	perm := t.rnd.Perm(len(src))
 	for i, v := range perm {
 		dest[v] = src[i]
 	}
@@ -66,7 +69,7 @@ func shuffleCells(src []cellLocs) []cellLocs {
 func (t *tesselation3d) makeRandomCenters() {
 	//Make a list of all the cells in the shape.
 	cells := t.tabulateCells()
-	cells = shuffleCells(cells)
+	cells = t.shuffleCells(cells)
 
 	//Choose number of grains to make. Assume volume of grain is given by (4/3)*pi*r^3
 	shapeVolume := cellVolume() * float64(len(cells))
@@ -84,8 +87,6 @@ func (t *tesselation3d) makeRandomCenters() {
 		randRegion := t.startRegion + t.rnd.Intn(t.maxRegion)
 		t.centers[p].region = byte(randRegion)
 	}
-
-	return
 }
 
 // Creates a slice of all cells which fall in the shape specified in the constructor.
@@ -107,7 +108,7 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 				y := cell.Y()
 				z := cell.Z()
 
-				if t.shape(x, y, z) {
+				if t.shape(x, y, z) || GrainCutShape {
 					cells = append(cells, cellLocs{x, y, z})
 				}
 			}
@@ -120,23 +121,29 @@ func (t *tesselation3d) tabulateCells() []cellLocs {
 	return cells
 }
 
-// Find the nearest Voronoi center to the point (x, y, z). Only points inside the given shape will be
-// assigned a region.
 func (t *tesselation3d) RegionOf(x, y, z float64) int {
-	if t.shape(x, y, z) {
-		nearest := center3d{x, y, z, 0}
-		mindist := math.Inf(1)
-		for _, c := range t.centers {
-			dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
-			if dist < mindist {
-				nearest = c
-				mindist = dist
-			}
-		}
-		return int(nearest.region)
-	} else {
-		return -1 //When the regions are rendered, any region < 0 will not be rastered.
+	// Check if the point is within the shape or if we're cutting the shape along the grains
+	if !(t.shape(x, y, z) || GrainCutShape) {
+		return -1 // Regions < 0 won't be rastered
 	}
+
+	// Find the nearest center point to the (x, y, z) position
+	nearest := center3d{x, y, z, 0}
+	mindist := math.Inf(1)
+	for _, c := range t.centers {
+		dist := sqr(x-c.x) + sqr(y-c.y) + sqr(z-c.z)
+		if dist < mindist {
+			nearest = c
+			mindist = dist
+		}
+	}
+
+	// Check if the nearest point's region should be returned
+	if (t.shape(x, y, z) && !GrainCutShape) || (t.shape(nearest.x, nearest.y, nearest.z) && GrainCutShape) {
+		return int(nearest.region)
+	}
+
+	return -1
 }
 
 // Generate normally distributed numbers; mean = lambda, variance = lambda. If generated number < 0, return 1.
@@ -149,5 +156,4 @@ func (t *tesselation3d) truncNorm(lambda float64) int {
 	} else {
 		return int(ret + 0.5)
 	}
-
 }

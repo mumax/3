@@ -37,14 +37,17 @@ func init() {
 	DeclFunc("Normalized", Normalized, "Normalize quantity")
 	DeclFunc("RemoveCustomFields", RemoveCustomFields, "Removes all custom fields again")
 	DeclFunc("RemoveCustomEnergies", RemoveCustomEnergies, "Removes all custom energies")
+	DeclFunc("RunningAverage", RunningAverage, "Records the time-average of a quantity from the moment this function is called.<br>Note: this may impact performance since the Quantity will be evaluated after every step.")
+	DeclFunc("Sum", Sum, "Sum of Quantity over all cells in the grid. For a vector Quantity, all components are added together.")
+	DeclFunc("SumVector", SumVector, "Sum of vector Quantity over all cells in the grid.")
 }
 
-//Removes all customfields
+// Removes all customfields
 func RemoveCustomFields() {
 	customTerms = nil
 }
 
-//Removes all customenergies
+// Removes all customenergies
 func RemoveCustomEnergies() {
 	customEnergies = nil
 }
@@ -72,7 +75,7 @@ func AddCustomField(dst *data.Slice) {
 	}
 }
 
-// Adds the custom energy densities (defined with AddCustomE
+// Adds the custom energy densities (defined with AddEdensTerm)
 func AddCustomEnergyDensity(dst *data.Slice) {
 	for _, term := range customEnergies {
 		buf := ValueOf(term)
@@ -114,7 +117,7 @@ func ConstVector(x, y, z float64) Quantity {
 }
 
 // fieldOp holds the abstract functionality for operations
-// (like add, multiply, ...) on space-dependend quantites
+// (like add, multiply, ...) on space-dependent quantites
 // (like M, B_sat, ...)
 type fieldOp struct {
 	a, b  Quantity
@@ -186,7 +189,8 @@ func (q *mulmv) NComp() int {
 
 // DotProduct creates a new quantity that is the dot product of
 // quantities a and b. E.g.:
-// 	DotProct(&M, &B_ext)
+//
+//	DotProct(&M, &B_ext)
 func Dot(a, b Quantity) Quantity {
 	return &dotProduct{fieldOp{a, b, 1}}
 }
@@ -202,7 +206,8 @@ func (d *dotProduct) EvalTo(dst *data.Slice) {
 
 // CrossProduct creates a new quantity that is the cross product of
 // quantities a and b. E.g.:
-// 	CrossProct(&M, &B_ext)
+//
+//	CrossProct(&M, &B_ext)
 func Cross(a, b Quantity) Quantity {
 	return &crossProduct{fieldOp{a, b, 3}}
 }
@@ -371,9 +376,11 @@ func (q *shifted) EvalTo(dst *data.Slice) {
 		origi := orig.Comp(i)
 		if q.dx != 0 {
 			cuda.ShiftX(dsti, origi, q.dx, 0, 0)
+			data.Copy(origi, dsti)
 		}
 		if q.dy != 0 {
 			cuda.ShiftY(dsti, origi, q.dy, 0, 0)
+			data.Copy(origi, dsti)
 		}
 		if q.dz != 0 {
 			cuda.ShiftZ(dsti, origi, q.dz, 0, 0)
@@ -386,7 +393,7 @@ func (q *shifted) NComp() int {
 }
 
 // Masks a quantity with a shape
-// The shape will be only evaluated once on the mesh,
+// The shape will only be evaluated once on the mesh,
 // and will be re-evaluated after mesh change,
 // because otherwise too slow
 func Masked(q Quantity, shape Shape) Quantity {
@@ -455,4 +462,65 @@ func (q *normalized) EvalTo(dst *data.Slice) {
 	util.Assert(dst.NComp() == q.NComp())
 	q.orig.EvalTo(dst)
 	cuda.Normalize(dst, nil)
+}
+
+// RunningAverage returns the running average of a quantity
+// over time, starting at the moment RunningAverage() is called.
+// This value is updated after every Step() and depends on the time step.
+func RunningAverage(q Quantity) Quantity {
+	ra := runningAverage{q, nil, Time, 0}
+	ra.avg = cuda.Buffer(q.NComp(), SizeOf(q))
+	cuda.Zero(ra.avg)
+	PostStep(func() {
+		dt := Time - ra.prev_t
+		if dt < 0 { // Don't update the time average if we went back in time since the last step
+			return
+		}
+		ra.prev_t = Time
+		ra.total_t += dt
+		val := ValueOf(q)
+		defer cuda.Recycle(val)
+		cuda.Madd2(ra.avg, ra.avg, val, float32((ra.total_t-dt)/ra.total_t), float32(dt/ra.total_t))
+	})
+	return &ra
+}
+
+type runningAverage struct {
+	orig    Quantity
+	avg     *data.Slice
+	prev_t  float64
+	total_t float64
+}
+
+func (ra *runningAverage) EvalTo(dst *data.Slice) {
+	util.Assert(dst.NComp() == ra.NComp())
+	data.Copy(dst, ra.avg)
+}
+
+func (ra *runningAverage) NComp() int {
+	return ra.orig.NComp()
+}
+
+// Sum of Quantity over all cells in the grid.
+// For a vector Quantity, all components are added together.
+func Sum(q Quantity) float64 {
+	val := ValueOf(q)
+	defer cuda.Recycle(val)
+	total := 0.
+	for i := 0; i < q.NComp(); i++ {
+		total += float64(cuda.Sum(val.Comp(i)))
+	}
+	return total
+}
+
+// Sum of vector Quantity over all cells in the grid.
+func SumVector(q Quantity) data.Vector {
+	util.Assert(q.NComp() == 3)
+	val := ValueOf(q)
+	defer cuda.Recycle(val)
+	var v [3]float64
+	for i := 0; i < 3; i++ {
+		v[i] = float64(cuda.Sum(val.Comp(i)))
+	}
+	return Vector(v[0], v[1], v[2])
 }

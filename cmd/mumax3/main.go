@@ -2,12 +2,16 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/mumax/3/cuda"
@@ -22,6 +26,7 @@ var (
 	flag_version  = flag.Bool("v", true, "Print version")
 	flag_vet      = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	// more flags in engine/gofiles.go
+	commitHash string
 )
 
 func main() {
@@ -39,7 +44,6 @@ func main() {
 	// used by bootstrap launcher to test cuda
 	// successful exit means cuda was initialized fine
 	if *flag_test {
-		fmt.Println(cuda.GPUInfo)
 		os.Exit(0)
 	}
 
@@ -164,11 +168,141 @@ func goServeGUI() string {
 // print version to stdout
 func printVersion() {
 	engine.LogOut(engine.UNAME)
+	engine.LogOut(fmt.Sprintf("commit hash: %s", commitHash))
+	engine.LogOut(getCPUInfo())
 	engine.LogOut(fmt.Sprintf("GPU info: %s, using cc=%d PTX", cuda.GPUInfo, cuda.UseCC))
+	osInfo := fmt.Sprintf("OS  info: %s, Hostname: %s", getOSInfo(), getHostname())
+	engine.LogOut(osInfo)
+	engine.LogOut(fmt.Sprintf("Timestamp: %s", time.Now().Format("2006-01-02 15:04:05")))
 	engine.LogOut("(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium")
 	engine.LogOut("This is free software without any warranty. See license.txt")
 	engine.LogOut("********************************************************************//")
 	engine.LogOut("  If you use mumax in any work or publication,                      //")
 	engine.LogOut("  we kindly ask you to cite the references in references.bib        //")
 	engine.LogOut("********************************************************************//")
+}
+
+func getHostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "Unknown"
+	}
+	return hostname
+}
+
+func getOSInfo() string {
+	// Check the runtime operating system
+	switch runtime.GOOS {
+	case "windows":
+		return "Windows OS"
+	case "linux":
+		return getLinuxOSInfo()
+	// Add more cases for other operating systems if needed
+	default:
+		return fmt.Sprintf("Unknown OS: %s", runtime.GOOS)
+	}
+}
+
+func getLinuxOSInfo() string {
+	// Check if the file exists
+	file, err := os.Open("/etc/os-release")
+	if err != nil {
+		return fmt.Sprintf("Unknown OS, Error: %s", err.Error())
+	}
+	defer file.Close()
+
+	// Scan the file line by line
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 && parts[0] == "PRETTY_NAME" {
+			// Remove surrounding quotes and return
+			return strings.Trim(parts[1], `"`)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return fmt.Sprintf("Unknown OS, Error: %s", err.Error())
+	}
+
+	return "Unknown OS"
+}
+
+func getCPUInfo() string {
+	// Check the runtime operating system
+	switch runtime.GOOS {
+	case "windows":
+		return getWindowsCPUInfo()
+	case "linux":
+		return getLinuxCPUInfo()
+	// Add more cases for other operating systems if needed
+	default:
+		return fmt.Sprintf("CPU info: Unknown OS: %s", runtime.GOOS)
+	}
+}
+
+func getWindowsCPUInfo() string {
+	// Get CPU model name
+	cmd := exec.Command("wmic", "cpu", "get", "Name")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
+		return fmt.Sprintf("CPU info: Unknown, Error: %s", err.Error())
+	}
+	output := strings.Split(out.String(), "\n")
+	cpuModel := "Unknown model"
+	if len(output) > 1 {
+		cpuModel = strings.TrimSpace(output[1])
+	}
+
+	// Get CPU number of cores
+	cpuCores := runtime.NumCPU()
+
+	// Get CPU speed
+	cmd = exec.Command("wmic", "cpu", "get", "MaxClockSpeed")
+	out.Reset()
+	cmd.Stdout = &out
+	cpuMHz := "Unknown clock frequency"
+	if err := cmd.Run(); err == nil {
+		output = strings.Split(out.String(), "\n")
+		if len(output) > 1 {
+			cpuMHz = strings.TrimSpace(output[1]) + " MHz"
+		}
+	}
+
+	return fmt.Sprintf("CPU info: %s, Cores: %d, %s", cpuModel, cpuCores, cpuMHz)
+}
+
+func getLinuxCPUInfo() string {
+	file, err := os.Open("/proc/cpuinfo")
+	if err != nil {
+		return fmt.Sprintf("CPU info: Unknown, Error: %s", err.Error())
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var cpuDetails []string
+	var cpuModel, cpuCores, cpuMHz string
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Split(line, ":")
+		if len(fields) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(fields[0])
+		value := strings.TrimSpace(fields[1])
+		switch key {
+		case "model name":
+			cpuModel = value
+		case "cpu cores":
+			cpuCores = value
+		case "cpu MHz":
+			cpuMHz = value
+		}
+	}
+	if cpuModel != "" && cpuCores != "" && cpuMHz != "" {
+		cpuDetails = append(cpuDetails, fmt.Sprintf("CPU info: %s, Cores: %s, MHz: %s", cpuModel, cpuCores, cpuMHz))
+	}
+
+	return strings.Join(cpuDetails, "; ")
 }

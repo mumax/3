@@ -58,9 +58,10 @@ const CONV_TOLERANCE = 1e-6
 // Input better be sparse.
 // A nil kernel element is interpreted as all 0s.
 // Kernel indices are destination index, source index.
-// 	(O0)   (K01 K02 K03)   (I0)
-// 	(O1) = (K11 K12 K13) * (I1)
-// 	(O2)   (K21 K22 K23)   (I2)
+//
+//	(O0)   (K01 K02 K03)   (I0)
+//	(O1) = (K11 K12 K13) * (I1)
+//	(O2)   (K21 K22 K23)   (I2)
 func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 
 	var kern [3][3][][][]float32

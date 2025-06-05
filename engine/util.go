@@ -167,6 +167,25 @@ func paramDiv(dst, a, b [][NREGION]float32) {
 	}
 }
 
+// returns an array with the prime factors of n (n >= 1)
+func primeFactors(n int) (factors []int) {
+	util.AssertMsg(n >= 1, "Can only determine prime factors of a positive integer.")
+	for n%2 == 0 { // First, get all factors 2
+		factors = append(factors, 2)
+		n = n / 2
+	}
+	for i := 3; i*i <= n; i = i + 2 { // Since n is odd now, we can skip even divisors
+		for n%i == 0 { // while i divides n, append i and divide n
+			factors = append(factors, i)
+			n = n / i
+		}
+	}
+	if n > 1 || len(factors) == 0 { // Add any remaining factor
+		factors = append(factors, n)
+	}
+	return
+}
+
 // shortcut for slicing unaddressable_vector()[:]
 func slice(v [3]float64) []float64 {
 	return v[:]

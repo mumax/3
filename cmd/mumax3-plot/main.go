@@ -1,6 +1,8 @@
 /*
 The mumax3-plot utility uses gnuplot to automatically plot mumax3 data tables.
+
 	mumax3-plot table.txt
+
 Creates graphs of all columns as .svg files.
 */
 package main
@@ -30,7 +32,7 @@ func plotFile(fname string) {
 	hdr := readHeader(fname)
 
 	// quantities grouped by vector
-	Qs := []*Q{&Q{[]string{"t"}, "s", []int{1}}}
+	Qs := []*Q{{[]string{"t"}, "s", []int{1}}}
 	prev := Qs[0]
 
 	quants := strings.Split(hdr, "\t")

@@ -1,71 +1,90 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
-# The cuda version against which we will compile mumax3
-foreach ($CUDA_VERSION in "9.2","10.0","10.1","10.2","11.0") {
+param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
+    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
+    [Int[]]$CUDA_CC
+)
 
+foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     # The final location of executables and libraries ready to be shipped to the user.
-    $builddir = "build/mumax3.10_windows_cuda$CUDA_VERSION"
+    $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION_STR"
 
-    # The nvidia toolkit installer for cuda 10.2 shoud have set the environment 
-    # variable CUDA_PATH_V10_2 which points to the root directory of the 
-    # cuda toolbox. (or similar for other cuda versions)
-    # This script might not work if this path contains spaces!
-    switch ( $CUDA_VERSION ) {
-        "9.2"  { $CUDA_HOME = $env:CUDA_PATH_V9_2  }
-        "10.0" { $CUDA_HOME = $env:CUDA_PATH_V10_0 }
-        "10.1" { $CUDA_HOME = $env:CUDA_PATH_V10_1 }
-        "10.2" { $CUDA_HOME = $env:CUDA_PATH_V10_2 }
-        "11.0" { $CUDA_HOME = $env:CUDA_PATH_V11_0 }
-        default {}
-    } 
+    # The nvidia toolkit installer for CUDA 12.6 should have set the environment 
+    # variable CUDA_PATH_V12_6 which points to the root directory of the 
+    # CUDA toolbox (or similar for other CUDA versions).
+    $CUDA_VERSION = [Version]::Parse($CUDA_VERSION_STR) # Convert to Version type for easy handling and comparison
+    $CUDA_ENV_VAR_NAME = "CUDA_PATH_V$($CUDA_VERSION.Major)_$($CUDA_VERSION.Minor)"
+    $CUDA_HOME = [Environment]::GetEnvironmentVariable($CUDA_ENV_VAR_NAME, "Machine") # "Machine" for system-wide environment variables
     if ( -not $CUDA_HOME -or (-not ( Test-Path $CUDA_HOME )) ) {
-        Write-Output "CUDA version $CUDA_VERSION does not seem to be installed"
+        Write-Output "CUDA version $CUDA_VERSION_STR does not seem to be installed"
+        Write-Output "(system-wide environment variable $CUDA_ENV_VAR_NAME does not exist or points to nonexistent directory)"
         exit
     }
 
-    # We will compile the kernels for all supported architectures
+    #! SUBSTITUTE YOUR OWN PATH TO cl.exe BELOW
+    # Not every CUDA version is compatible with any Visual C/C++ version: compiling for CUDA <11.6 requires VS <=2017.
+    # See VS/CUDA compatibility matrix at https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html (with old VS downloads available).
+    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
+    $VS2017 = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64" # Supported by CUDA v8.0-v12.4
     switch ( $CUDA_VERSION ) {
-        "9.2"  { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72 }
-        "10.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "10.1" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "10.2" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75 }
-        "11.0" { $CUDA_CC = 30,32,35,37,50,52,53,60,61,62,70,72,75,80 }
-        default {exit}
-    } 
-
-    # The NVIDIA compiler which will be used to compile the cuda kernels
-    $NVCC = "${CUDA_HOME}/bin/nvcc.exe"
-    $CCBIN = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
+        {$_ -lt [Version]::new(11.6)} { $CCBIN = $VS2017 }
+        {$_ -ge [Version]::new(11.6)} { $CCBIN = if ($VS2022) {$VS2022} else {$VS2017} } # Use VS2017 if 2022 not installed
+        default { Write-Output "Failed to parse CUDA version $CUDA_VERSION_STR" }
+    }
     if ( -not ( Test-Path $CCBIN ) ) {
         Write-Output "CCBIN for nvcc not found at $CCBIN"
         exit
     }
 
+    # We will compile the kernels for all supported architectures
+    # See supported CC for each CUDA version at https://stackoverflow.com/a/28933055
+    # See min. driver version for each CUDA version at https://docs.nvidia.com/deploy/cuda-compatibility/#minor-version-compatibility
+    if ( -not $CUDA_CC ) {
+        switch ( $CUDA_VERSION_STR ) {
+            "10.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=411.31
+            "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
+            "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
+            "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
+            "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same for all 12.x)
+            "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Highest CUDA version supporting CC < 7.5
+            "12.9" { $CUDA_CC =                         75,80,86,87,89,90,100,120 }
+            default {exit}
+        }
+    }
+
+    # The NVIDIA compiler which will be used to compile the cuda kernels
+    $NVCC = "${CUDA_HOME}/bin/nvcc.exe"
+    
     # overwrite the CGO flags to make sure that mumax3 is compiled against the
     # specified cuda version.
-    $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib/x64"
-    $env:CGO_CFLAGS="-I${CUDA_HOME}/include -w"
+    $env:CGO_LDFLAGS="-lcufft -lcurand -lcuda -L `"$CUDA_HOME/lib/x64`""
+    $env:CGO_CFLAGS="-I `"$CUDA_HOME/include`" -w"
 
     # Enter the cuda directory to (re)compile the cuda kernels
     Set-Location ../cuda
-        Remove-Item *.ptx
-        Remove-Item *_wrapper.go
         go build .\cuda2go.go
         $cudafiles = Get-ChildItem -filter "*.cu"
         foreach ($cudafile in $cudafiles) {
             $kernelname = $cudafile.basename
+            Remove-Item "${kernelname}_*.ptx"
+            Remove-Item "${kernelname}_*wrapper.go"
             foreach ($cc in $CUDA_CC) {
-                & $NVCC -ccbin ${CCBIN} -Xptxas -O3 -ptx `
+                & $NVCC -ccbin "`"${CCBIN}`"" -Xptxas -O3 -ptx `
                     -gencode="arch=compute_${cc},code=sm_${cc}" `
                     "${cudafile}" -o "${kernelname}_${cc}.ptx"
-            }    
+            }
             & .\cuda2go $cudafile
             gofmt -w "${kernelname}_wrapper.go"
         }
     Set-Location ../deploy
 
-    # Compile all mumax3 packages and executables
-    go install -v "github.com/mumax/3/..."
+    # Compile all mumax3 packages and executables. Determine the commit hash and pass it along.
+    $COMMIT_HASH = git rev-parse --short HEAD 2>$null
+    if (-not $COMMIT_HASH) {
+        $COMMIT_HASH = "unknown"
+        Write-Host "Warning: Could not determine Git commit hash. Using 'unknown'."
+    }
+    go install -ldflags "-X main.commitHash=$COMMIT_HASH" -v "github.com/mumax/3/..."
 
     # Copy the mumax3 executables and the used cuda libraries to the build directory
     Remove-Item -ErrorAction Ignore -Recurse ${builddir}

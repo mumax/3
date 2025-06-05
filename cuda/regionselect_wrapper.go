@@ -69,10 +69,6 @@ func k_regionselect_async(dst unsafe.Pointer, src unsafe.Pointer, regions unsafe
 
 // maps compute capability on PTX code for regionselect kernel.
 var regionselect_map = map[int]string{0: "",
-	30: regionselect_ptx_30,
-	32: regionselect_ptx_32,
-	35: regionselect_ptx_35,
-	37: regionselect_ptx_37,
 	50: regionselect_ptx_50,
 	52: regionselect_ptx_52,
 	53: regionselect_ptx_53,
@@ -81,260 +77,17 @@ var regionselect_map = map[int]string{0: "",
 	62: regionselect_ptx_62,
 	70: regionselect_ptx_70,
 	72: regionselect_ptx_72,
-	75: regionselect_ptx_75}
+	75: regionselect_ptx_75,
+	80: regionselect_ptx_80,
+	86: regionselect_ptx_86,
+	87: regionselect_ptx_87,
+	89: regionselect_ptx_89,
+	90: regionselect_ptx_90}
 
 // regionselect PTX code for various compute capabilities.
 const (
-	regionselect_ptx_30 = `
-.version 6.5
-.target sm_30
-.address_size 64
-
-	// .globl	regionselect
-
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u8 regionselect_param_3,
-	.param .u32 regionselect_param_4
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<3>;
-	.reg .f32 	%f<5>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
-
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.u8 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.f32 	%f4, [%rd9];
-
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
-
-BB0_4:
-	ret;
-}
-
-
-`
-	regionselect_ptx_32 = `
-.version 6.5
-.target sm_32
-.address_size 64
-
-	// .globl	regionselect
-
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u8 regionselect_param_3,
-	.param .u32 regionselect_param_4
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<4>;
-	.reg .f32 	%f<5>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
-
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
-
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
-
-BB0_4:
-	ret;
-}
-
-
-`
-	regionselect_ptx_35 = `
-.version 6.5
-.target sm_35
-.address_size 64
-
-	// .globl	regionselect
-
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u8 regionselect_param_3,
-	.param .u32 regionselect_param_4
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<4>;
-	.reg .f32 	%f<5>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
-
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
-
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
-
-BB0_4:
-	ret;
-}
-
-
-`
-	regionselect_ptx_37 = `
-.version 6.5
-.target sm_37
-.address_size 64
-
-	// .globl	regionselect
-
-.visible .entry regionselect(
-	.param .u64 regionselect_param_0,
-	.param .u64 regionselect_param_1,
-	.param .u64 regionselect_param_2,
-	.param .u8 regionselect_param_3,
-	.param .u32 regionselect_param_4
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<4>;
-	.reg .f32 	%f<5>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
-	ld.param.u8 	%rs1, [regionselect_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
-
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
-	ld.global.nc.u8 	%rs2, [%rd6];
-	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f4, [%rd9];
-
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
-	add.s64 	%rd12, %rd10, %rd11;
-	st.global.f32 	[%rd12], %f4;
-
-BB0_4:
-	ret;
-}
-
-
-`
 	regionselect_ptx_50 = `
-.version 6.5
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -355,48 +108,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_52 = `
-.version 6.5
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -417,48 +170,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_53 = `
-.version 6.5
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -479,48 +232,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_60 = `
-.version 6.5
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -541,48 +294,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_61 = `
-.version 6.5
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -603,48 +356,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_62 = `
-.version 6.5
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -665,48 +418,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_70 = `
-.version 6.5
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -727,48 +480,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_72 = `
-.version 6.5
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -789,48 +542,48 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
-}
 
+}
 
 `
 	regionselect_ptx_75 = `
-.version 6.5
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -851,44 +604,354 @@ BB0_4:
 	.reg .b64 	%rd<13>;
 
 
-	ld.param.u64 	%rd1, [regionselect_param_0];
-	ld.param.u64 	%rd2, [regionselect_param_1];
-	ld.param.u64 	%rd3, [regionselect_param_2];
-	ld.param.u32 	%r2, [regionselect_param_4];
 	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_4;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd4, %rd3;
-	cvt.s64.s32	%rd5, %r1;
-	add.s64 	%rd6, %rd4, %rd5;
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
 	mov.f32 	%f4, 0f00000000;
-	setp.ne.s16	%p2, %rs2, %rs1;
-	@%p2 bra 	BB0_3;
+	@%p2 bra 	$L__BB0_3;
 
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f4, [%rd9];
 
-BB0_3:
-	cvta.to.global.u64 	%rd10, %rd1;
-	mul.wide.s32 	%rd11, %r1, 4;
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
 	add.s64 	%rd12, %rd10, %rd11;
 	st.global.f32 	[%rd12], %f4;
 
-BB0_4:
+$L__BB0_4:
 	ret;
+
 }
 
+`
+	regionselect_ptx_80 = `
+.version 8.5
+.target sm_80
+.address_size 64
+
+	// .globl	regionselect
+
+.visible .entry regionselect(
+	.param .u64 regionselect_param_0,
+	.param .u64 regionselect_param_1,
+	.param .u64 regionselect_param_2,
+	.param .u8 regionselect_param_3,
+	.param .u32 regionselect_param_4
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<4>;
+	.reg .f32 	%f<5>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
+	mov.f32 	%f4, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
+
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	st.global.f32 	[%rd12], %f4;
+
+$L__BB0_4:
+	ret;
+
+}
+
+`
+	regionselect_ptx_86 = `
+.version 8.5
+.target sm_86
+.address_size 64
+
+	// .globl	regionselect
+
+.visible .entry regionselect(
+	.param .u64 regionselect_param_0,
+	.param .u64 regionselect_param_1,
+	.param .u64 regionselect_param_2,
+	.param .u8 regionselect_param_3,
+	.param .u32 regionselect_param_4
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<4>;
+	.reg .f32 	%f<5>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
+	mov.f32 	%f4, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
+
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	st.global.f32 	[%rd12], %f4;
+
+$L__BB0_4:
+	ret;
+
+}
+
+`
+	regionselect_ptx_87 = `
+.version 8.5
+.target sm_87
+.address_size 64
+
+	// .globl	regionselect
+
+.visible .entry regionselect(
+	.param .u64 regionselect_param_0,
+	.param .u64 regionselect_param_1,
+	.param .u64 regionselect_param_2,
+	.param .u8 regionselect_param_3,
+	.param .u32 regionselect_param_4
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<4>;
+	.reg .f32 	%f<5>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
+	mov.f32 	%f4, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
+
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	st.global.f32 	[%rd12], %f4;
+
+$L__BB0_4:
+	ret;
+
+}
+
+`
+	regionselect_ptx_89 = `
+.version 8.5
+.target sm_89
+.address_size 64
+
+	// .globl	regionselect
+
+.visible .entry regionselect(
+	.param .u64 regionselect_param_0,
+	.param .u64 regionselect_param_1,
+	.param .u64 regionselect_param_2,
+	.param .u8 regionselect_param_3,
+	.param .u32 regionselect_param_4
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<4>;
+	.reg .f32 	%f<5>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
+	mov.f32 	%f4, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
+
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	st.global.f32 	[%rd12], %f4;
+
+$L__BB0_4:
+	ret;
+
+}
+
+`
+	regionselect_ptx_90 = `
+.version 8.5
+.target sm_90
+.address_size 64
+
+	// .globl	regionselect
+
+.visible .entry regionselect(
+	.param .u64 regionselect_param_0,
+	.param .u64 regionselect_param_1,
+	.param .u64 regionselect_param_2,
+	.param .u8 regionselect_param_3,
+	.param .u32 regionselect_param_4
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<4>;
+	.reg .f32 	%f<5>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u8 	%rs1, [regionselect_param_3];
+	ld.param.u64 	%rd2, [regionselect_param_0];
+	ld.param.u64 	%rd3, [regionselect_param_1];
+	ld.param.u64 	%rd4, [regionselect_param_2];
+	ld.param.u32 	%r2, [regionselect_param_4];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_4;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs2, [%rd6];
+	setp.ne.s16 	%p2, %rs2, %rs1;
+	mov.f32 	%f4, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd7, %rd3;
+	shl.b64 	%rd8, %rd1, 2;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f4, [%rd9];
+
+$L__BB0_3:
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	st.global.f32 	[%rd12], %f4;
+
+$L__BB0_4:
+	ret;
+
+}
 
 `
 )

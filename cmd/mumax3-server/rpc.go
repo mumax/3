@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -76,7 +76,7 @@ func RPCCall(addr, method, arg string) (ret string, err error) {
 		return "", fmt.Errorf("http status %v", resp.Status)
 	}
 
-	if b, err := ioutil.ReadAll(resp.Body); err != nil {
+	if b, err := io.ReadAll(resp.Body); err != nil {
 		log.Println("*** RPC  read error: ", err)
 		return "", err
 	} else {

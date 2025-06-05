@@ -90,264 +90,25 @@ func k_madd5_async(dst unsafe.Pointer, src1 unsafe.Pointer, fac1 float32, src2 u
 
 // maps compute capability on PTX code for madd5 kernel.
 var madd5_map = map[int]string{0: "",
-	30: madd5_ptx_30,
-	35: madd5_ptx_35,
-	37: madd5_ptx_37,
 	50: madd5_ptx_50,
 	52: madd5_ptx_52,
 	53: madd5_ptx_53,
 	60: madd5_ptx_60,
 	61: madd5_ptx_61,
+	62: madd5_ptx_62,
 	70: madd5_ptx_70,
-	75: madd5_ptx_75}
+	72: madd5_ptx_72,
+	75: madd5_ptx_75,
+	80: madd5_ptx_80,
+	86: madd5_ptx_86,
+	87: madd5_ptx_87,
+	89: madd5_ptx_89,
+	90: madd5_ptx_90}
 
 // madd5 PTX code for various compute capabilities.
 const (
-	madd5_ptx_30 = `
-.version 6.4
-.target sm_30
-.address_size 64
-
-	// .globl	madd5
-
-.visible .entry madd5(
-	.param .u64 madd5_param_0,
-	.param .u64 madd5_param_1,
-	.param .f32 madd5_param_2,
-	.param .u64 madd5_param_3,
-	.param .f32 madd5_param_4,
-	.param .u64 madd5_param_5,
-	.param .f32 madd5_param_6,
-	.param .u64 madd5_param_7,
-	.param .f32 madd5_param_8,
-	.param .u64 madd5_param_9,
-	.param .f32 madd5_param_10,
-	.param .u32 madd5_param_11
-)
-{
-	.reg .pred 	%p<2>;
-	.reg .f32 	%f<16>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<20>;
-
-
-	ld.param.u64 	%rd1, [madd5_param_0];
-	ld.param.u64 	%rd2, [madd5_param_1];
-	ld.param.f32 	%f1, [madd5_param_2];
-	ld.param.u64 	%rd3, [madd5_param_3];
-	ld.param.f32 	%f2, [madd5_param_4];
-	ld.param.u64 	%rd4, [madd5_param_5];
-	ld.param.f32 	%f3, [madd5_param_6];
-	ld.param.u64 	%rd5, [madd5_param_7];
-	ld.param.f32 	%f4, [madd5_param_8];
-	ld.param.u64 	%rd6, [madd5_param_9];
-	ld.param.f32 	%f5, [madd5_param_10];
-	ld.param.u32 	%r2, [madd5_param_11];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.f32 	%f6, [%rd9];
-	cvta.to.global.u64 	%rd10, %rd3;
-	add.s64 	%rd11, %rd10, %rd8;
-	ld.global.f32 	%f7, [%rd11];
-	mul.f32 	%f8, %f7, %f2;
-	fma.rn.f32 	%f9, %f6, %f1, %f8;
-	cvta.to.global.u64 	%rd12, %rd4;
-	add.s64 	%rd13, %rd12, %rd8;
-	ld.global.f32 	%f10, [%rd13];
-	fma.rn.f32 	%f11, %f10, %f3, %f9;
-	cvta.to.global.u64 	%rd14, %rd5;
-	add.s64 	%rd15, %rd14, %rd8;
-	ld.global.f32 	%f12, [%rd15];
-	fma.rn.f32 	%f13, %f12, %f4, %f11;
-	cvta.to.global.u64 	%rd16, %rd6;
-	add.s64 	%rd17, %rd16, %rd8;
-	ld.global.f32 	%f14, [%rd17];
-	fma.rn.f32 	%f15, %f14, %f5, %f13;
-	cvta.to.global.u64 	%rd18, %rd1;
-	add.s64 	%rd19, %rd18, %rd8;
-	st.global.f32 	[%rd19], %f15;
-
-BB0_2:
-	ret;
-}
-
-
-`
-	madd5_ptx_35 = `
-.version 6.4
-.target sm_35
-.address_size 64
-
-	// .globl	madd5
-
-.visible .entry madd5(
-	.param .u64 madd5_param_0,
-	.param .u64 madd5_param_1,
-	.param .f32 madd5_param_2,
-	.param .u64 madd5_param_3,
-	.param .f32 madd5_param_4,
-	.param .u64 madd5_param_5,
-	.param .f32 madd5_param_6,
-	.param .u64 madd5_param_7,
-	.param .f32 madd5_param_8,
-	.param .u64 madd5_param_9,
-	.param .f32 madd5_param_10,
-	.param .u32 madd5_param_11
-)
-{
-	.reg .pred 	%p<2>;
-	.reg .f32 	%f<16>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<20>;
-
-
-	ld.param.u64 	%rd1, [madd5_param_0];
-	ld.param.u64 	%rd2, [madd5_param_1];
-	ld.param.f32 	%f1, [madd5_param_2];
-	ld.param.u64 	%rd3, [madd5_param_3];
-	ld.param.f32 	%f2, [madd5_param_4];
-	ld.param.u64 	%rd4, [madd5_param_5];
-	ld.param.f32 	%f3, [madd5_param_6];
-	ld.param.u64 	%rd5, [madd5_param_7];
-	ld.param.f32 	%f4, [madd5_param_8];
-	ld.param.u64 	%rd6, [madd5_param_9];
-	ld.param.f32 	%f5, [madd5_param_10];
-	ld.param.u32 	%r2, [madd5_param_11];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f6, [%rd9];
-	cvta.to.global.u64 	%rd10, %rd3;
-	add.s64 	%rd11, %rd10, %rd8;
-	ld.global.nc.f32 	%f7, [%rd11];
-	mul.f32 	%f8, %f7, %f2;
-	fma.rn.f32 	%f9, %f6, %f1, %f8;
-	cvta.to.global.u64 	%rd12, %rd4;
-	add.s64 	%rd13, %rd12, %rd8;
-	ld.global.nc.f32 	%f10, [%rd13];
-	fma.rn.f32 	%f11, %f10, %f3, %f9;
-	cvta.to.global.u64 	%rd14, %rd5;
-	add.s64 	%rd15, %rd14, %rd8;
-	ld.global.nc.f32 	%f12, [%rd15];
-	fma.rn.f32 	%f13, %f12, %f4, %f11;
-	cvta.to.global.u64 	%rd16, %rd6;
-	add.s64 	%rd17, %rd16, %rd8;
-	ld.global.nc.f32 	%f14, [%rd17];
-	fma.rn.f32 	%f15, %f14, %f5, %f13;
-	cvta.to.global.u64 	%rd18, %rd1;
-	add.s64 	%rd19, %rd18, %rd8;
-	st.global.f32 	[%rd19], %f15;
-
-BB0_2:
-	ret;
-}
-
-
-`
-	madd5_ptx_37 = `
-.version 6.4
-.target sm_37
-.address_size 64
-
-	// .globl	madd5
-
-.visible .entry madd5(
-	.param .u64 madd5_param_0,
-	.param .u64 madd5_param_1,
-	.param .f32 madd5_param_2,
-	.param .u64 madd5_param_3,
-	.param .f32 madd5_param_4,
-	.param .u64 madd5_param_5,
-	.param .f32 madd5_param_6,
-	.param .u64 madd5_param_7,
-	.param .f32 madd5_param_8,
-	.param .u64 madd5_param_9,
-	.param .f32 madd5_param_10,
-	.param .u32 madd5_param_11
-)
-{
-	.reg .pred 	%p<2>;
-	.reg .f32 	%f<16>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<20>;
-
-
-	ld.param.u64 	%rd1, [madd5_param_0];
-	ld.param.u64 	%rd2, [madd5_param_1];
-	ld.param.f32 	%f1, [madd5_param_2];
-	ld.param.u64 	%rd3, [madd5_param_3];
-	ld.param.f32 	%f2, [madd5_param_4];
-	ld.param.u64 	%rd4, [madd5_param_5];
-	ld.param.f32 	%f3, [madd5_param_6];
-	ld.param.u64 	%rd5, [madd5_param_7];
-	ld.param.f32 	%f4, [madd5_param_8];
-	ld.param.u64 	%rd6, [madd5_param_9];
-	ld.param.f32 	%f5, [madd5_param_10];
-	ld.param.u32 	%r2, [madd5_param_11];
-	mov.u32 	%r3, %ctaid.y;
-	mov.u32 	%r4, %nctaid.x;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
-
-	cvta.to.global.u64 	%rd7, %rd2;
-	mul.wide.s32 	%rd8, %r1, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f6, [%rd9];
-	cvta.to.global.u64 	%rd10, %rd3;
-	add.s64 	%rd11, %rd10, %rd8;
-	ld.global.nc.f32 	%f7, [%rd11];
-	mul.f32 	%f8, %f7, %f2;
-	fma.rn.f32 	%f9, %f6, %f1, %f8;
-	cvta.to.global.u64 	%rd12, %rd4;
-	add.s64 	%rd13, %rd12, %rd8;
-	ld.global.nc.f32 	%f10, [%rd13];
-	fma.rn.f32 	%f11, %f10, %f3, %f9;
-	cvta.to.global.u64 	%rd14, %rd5;
-	add.s64 	%rd15, %rd14, %rd8;
-	ld.global.nc.f32 	%f12, [%rd15];
-	fma.rn.f32 	%f13, %f12, %f4, %f11;
-	cvta.to.global.u64 	%rd16, %rd6;
-	add.s64 	%rd17, %rd16, %rd8;
-	ld.global.nc.f32 	%f14, [%rd17];
-	fma.rn.f32 	%f15, %f14, %f5, %f13;
-	cvta.to.global.u64 	%rd18, %rd1;
-	add.s64 	%rd19, %rd18, %rd8;
-	st.global.f32 	[%rd19], %f15;
-
-BB0_2:
-	ret;
-}
-
-
-`
 	madd5_ptx_50 = `
-.version 6.4
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -389,12 +150,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -421,14 +182,14 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
-}
 
+}
 
 `
 	madd5_ptx_52 = `
-.version 6.4
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -470,12 +231,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -502,14 +263,14 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
-}
 
+}
 
 `
 	madd5_ptx_53 = `
-.version 6.4
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -551,12 +312,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -583,14 +344,14 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
-}
 
+}
 
 `
 	madd5_ptx_60 = `
-.version 6.4
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -632,12 +393,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -664,14 +425,14 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
-}
 
+}
 
 `
 	madd5_ptx_61 = `
-.version 6.4
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -713,12 +474,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -745,14 +506,95 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
+
 }
 
+`
+	madd5_ptx_62 = `
+.version 8.5
+.target sm_62
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
 
 `
 	madd5_ptx_70 = `
-.version 6.4
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -794,12 +636,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -826,14 +668,95 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
+
 }
 
+`
+	madd5_ptx_72 = `
+.version 8.5
+.target sm_72
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
 
 `
 	madd5_ptx_75 = `
-.version 6.4
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -875,12 +798,12 @@ BB0_2:
 	mov.u32 	%r3, %ctaid.y;
 	mov.u32 	%r4, %nctaid.x;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_2;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
 
 	cvta.to.global.u64 	%rd7, %rd2;
 	mul.wide.s32 	%rd8, %r1, 4;
@@ -907,10 +830,415 @@ BB0_2:
 	add.s64 	%rd19, %rd18, %rd8;
 	st.global.f32 	[%rd19], %f15;
 
-BB0_2:
+$L__BB0_2:
 	ret;
+
 }
 
+`
+	madd5_ptx_80 = `
+.version 8.5
+.target sm_80
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
+
+`
+	madd5_ptx_86 = `
+.version 8.5
+.target sm_86
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
+
+`
+	madd5_ptx_87 = `
+.version 8.5
+.target sm_87
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
+
+`
+	madd5_ptx_89 = `
+.version 8.5
+.target sm_89
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
+
+`
+	madd5_ptx_90 = `
+.version 8.5
+.target sm_90
+.address_size 64
+
+	// .globl	madd5
+
+.visible .entry madd5(
+	.param .u64 madd5_param_0,
+	.param .u64 madd5_param_1,
+	.param .f32 madd5_param_2,
+	.param .u64 madd5_param_3,
+	.param .f32 madd5_param_4,
+	.param .u64 madd5_param_5,
+	.param .f32 madd5_param_6,
+	.param .u64 madd5_param_7,
+	.param .f32 madd5_param_8,
+	.param .u64 madd5_param_9,
+	.param .f32 madd5_param_10,
+	.param .u32 madd5_param_11
+)
+{
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<16>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<20>;
+
+
+	ld.param.u64 	%rd1, [madd5_param_0];
+	ld.param.u64 	%rd2, [madd5_param_1];
+	ld.param.f32 	%f1, [madd5_param_2];
+	ld.param.u64 	%rd3, [madd5_param_3];
+	ld.param.f32 	%f2, [madd5_param_4];
+	ld.param.u64 	%rd4, [madd5_param_5];
+	ld.param.f32 	%f3, [madd5_param_6];
+	ld.param.u64 	%rd5, [madd5_param_7];
+	ld.param.f32 	%f4, [madd5_param_8];
+	ld.param.u64 	%rd6, [madd5_param_9];
+	ld.param.f32 	%f5, [madd5_param_10];
+	ld.param.u32 	%r2, [madd5_param_11];
+	mov.u32 	%r3, %ctaid.y;
+	mov.u32 	%r4, %nctaid.x;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_2;
+
+	cvta.to.global.u64 	%rd7, %rd2;
+	mul.wide.s32 	%rd8, %r1, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f6, [%rd9];
+	cvta.to.global.u64 	%rd10, %rd3;
+	add.s64 	%rd11, %rd10, %rd8;
+	ld.global.nc.f32 	%f7, [%rd11];
+	mul.f32 	%f8, %f7, %f2;
+	fma.rn.f32 	%f9, %f6, %f1, %f8;
+	cvta.to.global.u64 	%rd12, %rd4;
+	add.s64 	%rd13, %rd12, %rd8;
+	ld.global.nc.f32 	%f10, [%rd13];
+	fma.rn.f32 	%f11, %f10, %f3, %f9;
+	cvta.to.global.u64 	%rd14, %rd5;
+	add.s64 	%rd15, %rd14, %rd8;
+	ld.global.nc.f32 	%f12, [%rd15];
+	fma.rn.f32 	%f13, %f12, %f4, %f11;
+	cvta.to.global.u64 	%rd16, %rd6;
+	add.s64 	%rd17, %rd16, %rd8;
+	ld.global.nc.f32 	%f14, [%rd17];
+	fma.rn.f32 	%f15, %f14, %f5, %f13;
+	cvta.to.global.u64 	%rd18, %rd1;
+	add.s64 	%rd19, %rd18, %rd8;
+	st.global.f32 	[%rd19], %f15;
+
+$L__BB0_2:
+	ret;
+
+}
 
 `
 )

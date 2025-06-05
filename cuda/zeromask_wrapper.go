@@ -66,10 +66,6 @@ func k_zeromask_async(dst unsafe.Pointer, maskLUT unsafe.Pointer, regions unsafe
 
 // maps compute capability on PTX code for zeromask kernel.
 var zeromask_map = map[int]string{0: "",
-	30: zeromask_ptx_30,
-	32: zeromask_ptx_32,
-	35: zeromask_ptx_35,
-	37: zeromask_ptx_37,
 	50: zeromask_ptx_50,
 	52: zeromask_ptx_52,
 	53: zeromask_ptx_53,
@@ -78,249 +74,17 @@ var zeromask_map = map[int]string{0: "",
 	62: zeromask_ptx_62,
 	70: zeromask_ptx_70,
 	72: zeromask_ptx_72,
-	75: zeromask_ptx_75}
+	75: zeromask_ptx_75,
+	80: zeromask_ptx_80,
+	86: zeromask_ptx_86,
+	87: zeromask_ptx_87,
+	89: zeromask_ptx_89,
+	90: zeromask_ptx_90}
 
 // zeromask PTX code for various compute capabilities.
 const (
-	zeromask_ptx_30 = `
-.version 6.5
-.target sm_30
-.address_size 64
-
-	// .globl	zeromask
-
-.visible .entry zeromask(
-	.param .u64 zeromask_param_0,
-	.param .u64 zeromask_param_1,
-	.param .u64 zeromask_param_2,
-	.param .u32 zeromask_param_3
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .f32 	%f<2>;
-	.reg .b32 	%r<11>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd2, [zeromask_param_0];
-	ld.param.u64 	%rd3, [zeromask_param_1];
-	ld.param.u64 	%rd4, [zeromask_param_2];
-	ld.param.u32 	%r2, [zeromask_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
-	add.s64 	%rd6, %rd5, %rd1;
-	cvta.to.global.u64 	%rd7, %rd3;
-	ld.global.u8 	%r9, [%rd6];
-	mul.wide.u32 	%rd8, %r9, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd10, %rd2;
-	shl.b64 	%rd11, %rd1, 2;
-	add.s64 	%rd12, %rd10, %rd11;
-	mov.u32 	%r10, 0;
-	st.global.u32 	[%rd12], %r10;
-
-BB0_3:
-	ret;
-}
-
-
-`
-	zeromask_ptx_32 = `
-.version 6.5
-.target sm_32
-.address_size 64
-
-	// .globl	zeromask
-
-.visible .entry zeromask(
-	.param .u64 zeromask_param_0,
-	.param .u64 zeromask_param_1,
-	.param .u64 zeromask_param_2,
-	.param .u32 zeromask_param_3
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<2>;
-	.reg .f32 	%f<2>;
-	.reg .b32 	%r<12>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd2, [zeromask_param_0];
-	ld.param.u64 	%rd3, [zeromask_param_1];
-	ld.param.u64 	%rd4, [zeromask_param_2];
-	ld.param.u32 	%r2, [zeromask_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
-	add.s64 	%rd6, %rd5, %rd1;
-	ld.global.nc.u8 	%rs1, [%rd6];
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd10, %rd2;
-	shl.b64 	%rd11, %rd1, 2;
-	add.s64 	%rd12, %rd10, %rd11;
-	mov.u32 	%r11, 0;
-	st.global.u32 	[%rd12], %r11;
-
-BB0_3:
-	ret;
-}
-
-
-`
-	zeromask_ptx_35 = `
-.version 6.5
-.target sm_35
-.address_size 64
-
-	// .globl	zeromask
-
-.visible .entry zeromask(
-	.param .u64 zeromask_param_0,
-	.param .u64 zeromask_param_1,
-	.param .u64 zeromask_param_2,
-	.param .u32 zeromask_param_3
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<2>;
-	.reg .f32 	%f<2>;
-	.reg .b32 	%r<12>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd2, [zeromask_param_0];
-	ld.param.u64 	%rd3, [zeromask_param_1];
-	ld.param.u64 	%rd4, [zeromask_param_2];
-	ld.param.u32 	%r2, [zeromask_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
-	add.s64 	%rd6, %rd5, %rd1;
-	ld.global.nc.u8 	%rs1, [%rd6];
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd10, %rd2;
-	shl.b64 	%rd11, %rd1, 2;
-	add.s64 	%rd12, %rd10, %rd11;
-	mov.u32 	%r11, 0;
-	st.global.u32 	[%rd12], %r11;
-
-BB0_3:
-	ret;
-}
-
-
-`
-	zeromask_ptx_37 = `
-.version 6.5
-.target sm_37
-.address_size 64
-
-	// .globl	zeromask
-
-.visible .entry zeromask(
-	.param .u64 zeromask_param_0,
-	.param .u64 zeromask_param_1,
-	.param .u64 zeromask_param_2,
-	.param .u32 zeromask_param_3
-)
-{
-	.reg .pred 	%p<3>;
-	.reg .b16 	%rs<2>;
-	.reg .f32 	%f<2>;
-	.reg .b32 	%r<12>;
-	.reg .b64 	%rd<13>;
-
-
-	ld.param.u64 	%rd2, [zeromask_param_0];
-	ld.param.u64 	%rd3, [zeromask_param_1];
-	ld.param.u64 	%rd4, [zeromask_param_2];
-	ld.param.u32 	%r2, [zeromask_param_3];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
-	add.s64 	%rd6, %rd5, %rd1;
-	ld.global.nc.u8 	%rs1, [%rd6];
-	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
-	and.b32  	%r10, %r9, 255;
-	mul.wide.u32 	%rd8, %r10, 4;
-	add.s64 	%rd9, %rd7, %rd8;
-	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd10, %rd2;
-	shl.b64 	%rd11, %rd1, 2;
-	add.s64 	%rd12, %rd10, %rd11;
-	mov.u32 	%r11, 0;
-	st.global.u32 	[%rd12], %r11;
-
-BB0_3:
-	ret;
-}
-
-
-`
 	zeromask_ptx_50 = `
-.version 6.5
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -347,25 +111,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -373,14 +137,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_52 = `
-.version 6.5
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -407,25 +171,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -433,14 +197,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_53 = `
-.version 6.5
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -467,25 +231,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -493,14 +257,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_60 = `
-.version 6.5
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -527,25 +291,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -553,14 +317,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_61 = `
-.version 6.5
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -587,25 +351,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -613,14 +377,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_62 = `
-.version 6.5
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -647,25 +411,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -673,14 +437,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_70 = `
-.version 6.5
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -707,25 +471,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -733,14 +497,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_72 = `
-.version 6.5
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -767,25 +531,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -793,14 +557,14 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
-}
 
+}
 
 `
 	zeromask_ptx_75 = `
-.version 6.5
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -827,25 +591,25 @@ BB0_3:
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_3;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd5, %rd4;
-	cvt.s64.s32	%rd1, %r1;
+	cvt.s64.s32 	%rd1, %r1;
 	add.s64 	%rd6, %rd5, %rd1;
 	ld.global.nc.u8 	%rs1, [%rd6];
 	cvta.to.global.u64 	%rd7, %rd3;
-	cvt.u32.u16	%r9, %rs1;
+	cvt.u32.u16 	%r9, %rs1;
 	and.b32  	%r10, %r9, 255;
 	mul.wide.u32 	%rd8, %r10, 4;
 	add.s64 	%rd9, %rd7, %rd8;
 	ld.global.nc.f32 	%f1, [%rd9];
-	setp.eq.f32	%p2, %f1, 0f00000000;
-	@%p2 bra 	BB0_3;
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd10, %rd2;
 	shl.b64 	%rd11, %rd1, 2;
@@ -853,10 +617,310 @@ BB0_3:
 	mov.u32 	%r11, 0;
 	st.global.u32 	[%rd12], %r11;
 
-BB0_3:
+$L__BB0_3:
 	ret;
+
 }
 
+`
+	zeromask_ptx_80 = `
+.version 8.5
+.target sm_80
+.address_size 64
+
+	// .globl	zeromask
+
+.visible .entry zeromask(
+	.param .u64 zeromask_param_0,
+	.param .u64 zeromask_param_1,
+	.param .u64 zeromask_param_2,
+	.param .u32 zeromask_param_3
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<2>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<12>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u64 	%rd2, [zeromask_param_0];
+	ld.param.u64 	%rd3, [zeromask_param_1];
+	ld.param.u64 	%rd4, [zeromask_param_2];
+	ld.param.u32 	%r2, [zeromask_param_3];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd6];
+	cvta.to.global.u64 	%rd7, %rd3;
+	cvt.u32.u16 	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd8, %r10, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	mov.u32 	%r11, 0;
+	st.global.u32 	[%rd12], %r11;
+
+$L__BB0_3:
+	ret;
+
+}
+
+`
+	zeromask_ptx_86 = `
+.version 8.5
+.target sm_86
+.address_size 64
+
+	// .globl	zeromask
+
+.visible .entry zeromask(
+	.param .u64 zeromask_param_0,
+	.param .u64 zeromask_param_1,
+	.param .u64 zeromask_param_2,
+	.param .u32 zeromask_param_3
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<2>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<12>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u64 	%rd2, [zeromask_param_0];
+	ld.param.u64 	%rd3, [zeromask_param_1];
+	ld.param.u64 	%rd4, [zeromask_param_2];
+	ld.param.u32 	%r2, [zeromask_param_3];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd6];
+	cvta.to.global.u64 	%rd7, %rd3;
+	cvt.u32.u16 	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd8, %r10, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	mov.u32 	%r11, 0;
+	st.global.u32 	[%rd12], %r11;
+
+$L__BB0_3:
+	ret;
+
+}
+
+`
+	zeromask_ptx_87 = `
+.version 8.5
+.target sm_87
+.address_size 64
+
+	// .globl	zeromask
+
+.visible .entry zeromask(
+	.param .u64 zeromask_param_0,
+	.param .u64 zeromask_param_1,
+	.param .u64 zeromask_param_2,
+	.param .u32 zeromask_param_3
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<2>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<12>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u64 	%rd2, [zeromask_param_0];
+	ld.param.u64 	%rd3, [zeromask_param_1];
+	ld.param.u64 	%rd4, [zeromask_param_2];
+	ld.param.u32 	%r2, [zeromask_param_3];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd6];
+	cvta.to.global.u64 	%rd7, %rd3;
+	cvt.u32.u16 	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd8, %r10, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	mov.u32 	%r11, 0;
+	st.global.u32 	[%rd12], %r11;
+
+$L__BB0_3:
+	ret;
+
+}
+
+`
+	zeromask_ptx_89 = `
+.version 8.5
+.target sm_89
+.address_size 64
+
+	// .globl	zeromask
+
+.visible .entry zeromask(
+	.param .u64 zeromask_param_0,
+	.param .u64 zeromask_param_1,
+	.param .u64 zeromask_param_2,
+	.param .u32 zeromask_param_3
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<2>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<12>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u64 	%rd2, [zeromask_param_0];
+	ld.param.u64 	%rd3, [zeromask_param_1];
+	ld.param.u64 	%rd4, [zeromask_param_2];
+	ld.param.u32 	%r2, [zeromask_param_3];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd6];
+	cvta.to.global.u64 	%rd7, %rd3;
+	cvt.u32.u16 	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd8, %r10, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	mov.u32 	%r11, 0;
+	st.global.u32 	[%rd12], %r11;
+
+$L__BB0_3:
+	ret;
+
+}
+
+`
+	zeromask_ptx_90 = `
+.version 8.5
+.target sm_90
+.address_size 64
+
+	// .globl	zeromask
+
+.visible .entry zeromask(
+	.param .u64 zeromask_param_0,
+	.param .u64 zeromask_param_1,
+	.param .u64 zeromask_param_2,
+	.param .u32 zeromask_param_3
+)
+{
+	.reg .pred 	%p<3>;
+	.reg .b16 	%rs<2>;
+	.reg .f32 	%f<2>;
+	.reg .b32 	%r<12>;
+	.reg .b64 	%rd<13>;
+
+
+	ld.param.u64 	%rd2, [zeromask_param_0];
+	ld.param.u64 	%rd3, [zeromask_param_1];
+	ld.param.u64 	%rd4, [zeromask_param_2];
+	ld.param.u32 	%r2, [zeromask_param_3];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd5, %rd4;
+	cvt.s64.s32 	%rd1, %r1;
+	add.s64 	%rd6, %rd5, %rd1;
+	ld.global.nc.u8 	%rs1, [%rd6];
+	cvta.to.global.u64 	%rd7, %rd3;
+	cvt.u32.u16 	%r9, %rs1;
+	and.b32  	%r10, %r9, 255;
+	mul.wide.u32 	%rd8, %r10, 4;
+	add.s64 	%rd9, %rd7, %rd8;
+	ld.global.nc.f32 	%f1, [%rd9];
+	setp.eq.f32 	%p2, %f1, 0f00000000;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd10, %rd2;
+	shl.b64 	%rd11, %rd1, 2;
+	add.s64 	%rd12, %rd10, %rd11;
+	mov.u32 	%r11, 0;
+	st.global.u32 	[%rd12], %r11;
+
+$L__BB0_3:
+	ret;
+
+}
 
 `
 )

@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -20,9 +20,10 @@ var wd = "" // working directory, see SetWD
 // prefixed to all relative local paths passed to client functions (Mkdir, Touch, Remove, ...).
 // dir may start with "http://", turning local relative client paths into remote paths.
 // E.g.:
-// 	http://path -> http://path
-// 	path/file   -> wd/path/file
-//  /path/file  -> /path/file
+//
+//		http://path -> http://path
+//		path/file   -> wd/path/file
+//	 /path/file  -> /path/file
 func SetWD(dir string) {
 	if dir != "" && !strings.HasSuffix(dir, "/") {
 		dir = dir + "/"
@@ -183,7 +184,7 @@ func do(a action, URL string, body []byte, query url.Values) (resp []byte, err e
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New("do " + u.String() + ":" + response.Status + ":" + readBody(response.Body))
 	}
-	resp, err = ioutil.ReadAll(response.Body)
+	resp, err = io.ReadAll(response.Body)
 	err = mkErr(a, URL, err)
 	return
 }

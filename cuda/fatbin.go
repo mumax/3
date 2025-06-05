@@ -19,7 +19,7 @@ func determineCC() int {
 		return UseCC
 	}
 
-	for k, _ := range madd2_map {
+	for k := range madd2_map {
 		if k > UseCC && ccIsOK(k) {
 			UseCC = k
 		}

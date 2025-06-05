@@ -93,7 +93,7 @@ var solidanglefouriersummand_map = map[int]string{0: "",
 // solidanglefouriersummand PTX code for various compute capabilities.
 const (
 	solidanglefouriersummand_ptx_50 = `
-.version 7.8
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -142,10 +142,9 @@ const (
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -176,6 +175,7 @@ const (
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -265,7 +265,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_52 = `
-.version 7.8
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -314,10 +314,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -348,6 +347,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -437,7 +437,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_53 = `
-.version 7.8
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -486,10 +486,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -520,6 +519,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -609,7 +609,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_60 = `
-.version 7.8
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -658,10 +658,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -692,6 +691,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -781,7 +781,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_61 = `
-.version 7.8
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -830,10 +830,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -864,6 +863,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -953,7 +953,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_62 = `
-.version 7.8
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -1002,10 +1002,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1036,6 +1035,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1125,7 +1125,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_70 = `
-.version 7.8
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -1174,10 +1174,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1208,6 +1207,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1297,7 +1297,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_72 = `
-.version 7.8
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -1346,10 +1346,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1380,6 +1379,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1469,7 +1469,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_75 = `
-.version 7.8
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -1518,10 +1518,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1552,6 +1551,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1641,7 +1641,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_80 = `
-.version 7.8
+.version 8.5
 .target sm_80
 .address_size 64
 
@@ -1690,10 +1690,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1724,6 +1723,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1813,7 +1813,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_86 = `
-.version 7.8
+.version 8.5
 .target sm_86
 .address_size 64
 
@@ -1862,10 +1862,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -1896,6 +1895,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -1985,7 +1985,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_87 = `
-.version 7.8
+.version 8.5
 .target sm_87
 .address_size 64
 
@@ -2034,10 +2034,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -2068,6 +2067,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -2157,7 +2157,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_89 = `
-.version 7.8
+.version 8.5
 .target sm_89
 .address_size 64
 
@@ -2206,10 +2206,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -2240,6 +2239,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;
@@ -2329,7 +2329,7 @@ $L__BB0_4:
 
 `
 	solidanglefouriersummand_ptx_90 = `
-.version 7.8
+.version 8.5
 .target sm_90
 .address_size 64
 
@@ -2378,10 +2378,9 @@ $L__BB0_4:
 	or.pred  	%p5, %p3, %p4;
 	@%p5 bra 	$L__BB0_4;
 
-	cvta.to.global.u64 	%rd6, %rd2;
-	cvt.rn.f32.s32 	%f5, %r5;
-	cvt.rn.f32.s32 	%f6, %r1;
-	div.rn.f32 	%f7, %f6, %f5;
+	cvt.rn.f32.s32 	%f5, %r1;
+	cvt.rn.f32.s32 	%f6, %r5;
+	div.rn.f32 	%f7, %f5, %f6;
 	cvt.rn.f32.s32 	%f8, %r6;
 	cvt.rn.f32.s32 	%f9, %r2;
 	div.rn.f32 	%f10, %f9, %f8;
@@ -2412,6 +2411,7 @@ $L__BB0_4:
 	mad.lo.s32 	%r26, %r3, %r6, %r2;
 	mad.lo.s32 	%r4, %r26, %r5, %r1;
 	setp.eq.f32 	%p9, %f4, 0f00000000;
+	cvta.to.global.u64 	%rd6, %rd2;
 	mul.wide.s32 	%rd7, %r4, 4;
 	add.s64 	%rd1, %rd6, %rd7;
 	@%p9 bra 	$L__BB0_3;

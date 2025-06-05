@@ -129,10 +129,6 @@ func k_addmagnetoelasticfield_async(Bx unsafe.Pointer, By unsafe.Pointer, Bz uns
 
 // maps compute capability on PTX code for addmagnetoelasticfield kernel.
 var addmagnetoelasticfield_map = map[int]string{0: "",
-	30: addmagnetoelasticfield_ptx_30,
-	32: addmagnetoelasticfield_ptx_32,
-	35: addmagnetoelasticfield_ptx_35,
-	37: addmagnetoelasticfield_ptx_37,
 	50: addmagnetoelasticfield_ptx_50,
 	52: addmagnetoelasticfield_ptx_52,
 	53: addmagnetoelasticfield_ptx_53,
@@ -141,904 +137,17 @@ var addmagnetoelasticfield_map = map[int]string{0: "",
 	62: addmagnetoelasticfield_ptx_62,
 	70: addmagnetoelasticfield_ptx_70,
 	72: addmagnetoelasticfield_ptx_72,
-	75: addmagnetoelasticfield_ptx_75}
+	75: addmagnetoelasticfield_ptx_75,
+	80: addmagnetoelasticfield_ptx_80,
+	86: addmagnetoelasticfield_ptx_86,
+	87: addmagnetoelasticfield_ptx_87,
+	89: addmagnetoelasticfield_ptx_89,
+	90: addmagnetoelasticfield_ptx_90}
 
 // addmagnetoelasticfield PTX code for various compute capabilities.
 const (
-	addmagnetoelasticfield_ptx_30 = `
-.version 6.5
-.target sm_30
-.address_size 64
-
-	// .globl	addmagnetoelasticfield
-
-.visible .entry addmagnetoelasticfield(
-	.param .u64 addmagnetoelasticfield_param_0,
-	.param .u64 addmagnetoelasticfield_param_1,
-	.param .u64 addmagnetoelasticfield_param_2,
-	.param .u64 addmagnetoelasticfield_param_3,
-	.param .u64 addmagnetoelasticfield_param_4,
-	.param .u64 addmagnetoelasticfield_param_5,
-	.param .u64 addmagnetoelasticfield_param_6,
-	.param .f32 addmagnetoelasticfield_param_7,
-	.param .u64 addmagnetoelasticfield_param_8,
-	.param .f32 addmagnetoelasticfield_param_9,
-	.param .u64 addmagnetoelasticfield_param_10,
-	.param .f32 addmagnetoelasticfield_param_11,
-	.param .u64 addmagnetoelasticfield_param_12,
-	.param .f32 addmagnetoelasticfield_param_13,
-	.param .u64 addmagnetoelasticfield_param_14,
-	.param .f32 addmagnetoelasticfield_param_15,
-	.param .u64 addmagnetoelasticfield_param_16,
-	.param .f32 addmagnetoelasticfield_param_17,
-	.param .u64 addmagnetoelasticfield_param_18,
-	.param .f32 addmagnetoelasticfield_param_19,
-	.param .u64 addmagnetoelasticfield_param_20,
-	.param .f32 addmagnetoelasticfield_param_21,
-	.param .u64 addmagnetoelasticfield_param_22,
-	.param .f32 addmagnetoelasticfield_param_23,
-	.param .u32 addmagnetoelasticfield_param_24
-)
-{
-	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<56>;
-
-
-	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
-	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
-	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
-	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
-	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
-	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
-	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
-	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
-	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
-	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
-	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
-	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
-	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
-	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
-	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
-	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
-
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd16, %rd7;
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd16, %rd17;
-	ld.global.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
-
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
-
-	cvta.to.global.u64 	%rd19, %rd8;
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd19, %rd20;
-	ld.global.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
-
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
-
-	cvta.to.global.u64 	%rd22, %rd9;
-	mul.wide.s32 	%rd23, %r1, 4;
-	add.s64 	%rd24, %rd22, %rd23;
-	ld.global.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
-
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
-
-	cvta.to.global.u64 	%rd25, %rd10;
-	mul.wide.s32 	%rd26, %r1, 4;
-	add.s64 	%rd27, %rd25, %rd26;
-	ld.global.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
-
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
-
-	cvta.to.global.u64 	%rd28, %rd11;
-	mul.wide.s32 	%rd29, %r1, 4;
-	add.s64 	%rd30, %rd28, %rd29;
-	ld.global.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
-
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
-
-	cvta.to.global.u64 	%rd31, %rd12;
-	mul.wide.s32 	%rd32, %r1, 4;
-	add.s64 	%rd33, %rd31, %rd32;
-	ld.global.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
-
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
-
-	cvta.to.global.u64 	%rd34, %rd15;
-	mul.wide.s32 	%rd35, %r1, 4;
-	add.s64 	%rd36, %rd34, %rd35;
-	ld.global.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
-
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
-
-	rcp.rn.f32 	%f74, %f73;
-
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
-
-	cvta.to.global.u64 	%rd37, %rd13;
-	mul.wide.s32 	%rd38, %r1, 4;
-	add.s64 	%rd39, %rd37, %rd38;
-	ld.global.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
-
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
-
-	cvta.to.global.u64 	%rd40, %rd14;
-	mul.wide.s32 	%rd41, %r1, 4;
-	add.s64 	%rd42, %rd40, %rd41;
-	ld.global.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
-
-BB0_21:
-	cvta.to.global.u64 	%rd43, %rd4;
-	mul.wide.s32 	%rd44, %r1, 4;
-	add.s64 	%rd45, %rd43, %rd44;
-	cvta.to.global.u64 	%rd46, %rd5;
-	add.s64 	%rd47, %rd46, %rd44;
-	cvta.to.global.u64 	%rd48, %rd6;
-	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.f32 	%f44, [%rd47];
-	ld.global.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
-	cvta.to.global.u64 	%rd50, %rd1;
-	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
-	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
-	cvta.to.global.u64 	%rd52, %rd2;
-	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
-	cvta.to.global.u64 	%rd54, %rd3;
-	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
-
-BB0_22:
-	ret;
-}
-
-
-`
-	addmagnetoelasticfield_ptx_32 = `
-.version 6.5
-.target sm_32
-.address_size 64
-
-	// .globl	addmagnetoelasticfield
-
-.visible .entry addmagnetoelasticfield(
-	.param .u64 addmagnetoelasticfield_param_0,
-	.param .u64 addmagnetoelasticfield_param_1,
-	.param .u64 addmagnetoelasticfield_param_2,
-	.param .u64 addmagnetoelasticfield_param_3,
-	.param .u64 addmagnetoelasticfield_param_4,
-	.param .u64 addmagnetoelasticfield_param_5,
-	.param .u64 addmagnetoelasticfield_param_6,
-	.param .f32 addmagnetoelasticfield_param_7,
-	.param .u64 addmagnetoelasticfield_param_8,
-	.param .f32 addmagnetoelasticfield_param_9,
-	.param .u64 addmagnetoelasticfield_param_10,
-	.param .f32 addmagnetoelasticfield_param_11,
-	.param .u64 addmagnetoelasticfield_param_12,
-	.param .f32 addmagnetoelasticfield_param_13,
-	.param .u64 addmagnetoelasticfield_param_14,
-	.param .f32 addmagnetoelasticfield_param_15,
-	.param .u64 addmagnetoelasticfield_param_16,
-	.param .f32 addmagnetoelasticfield_param_17,
-	.param .u64 addmagnetoelasticfield_param_18,
-	.param .f32 addmagnetoelasticfield_param_19,
-	.param .u64 addmagnetoelasticfield_param_20,
-	.param .f32 addmagnetoelasticfield_param_21,
-	.param .u64 addmagnetoelasticfield_param_22,
-	.param .f32 addmagnetoelasticfield_param_23,
-	.param .u32 addmagnetoelasticfield_param_24
-)
-{
-	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<56>;
-
-
-	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
-	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
-	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
-	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
-	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
-	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
-	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
-	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
-	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
-	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
-	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
-	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
-	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
-	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
-	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
-	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
-
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd16, %rd7;
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd16, %rd17;
-	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
-
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
-
-	cvta.to.global.u64 	%rd19, %rd8;
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd19, %rd20;
-	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
-
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
-
-	cvta.to.global.u64 	%rd22, %rd9;
-	mul.wide.s32 	%rd23, %r1, 4;
-	add.s64 	%rd24, %rd22, %rd23;
-	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
-
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
-
-	cvta.to.global.u64 	%rd25, %rd10;
-	mul.wide.s32 	%rd26, %r1, 4;
-	add.s64 	%rd27, %rd25, %rd26;
-	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
-
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
-
-	cvta.to.global.u64 	%rd28, %rd11;
-	mul.wide.s32 	%rd29, %r1, 4;
-	add.s64 	%rd30, %rd28, %rd29;
-	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
-
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
-
-	cvta.to.global.u64 	%rd31, %rd12;
-	mul.wide.s32 	%rd32, %r1, 4;
-	add.s64 	%rd33, %rd31, %rd32;
-	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
-
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
-
-	cvta.to.global.u64 	%rd34, %rd15;
-	mul.wide.s32 	%rd35, %r1, 4;
-	add.s64 	%rd36, %rd34, %rd35;
-	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
-
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
-
-	rcp.rn.f32 	%f74, %f73;
-
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
-
-	cvta.to.global.u64 	%rd37, %rd13;
-	mul.wide.s32 	%rd38, %r1, 4;
-	add.s64 	%rd39, %rd37, %rd38;
-	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
-
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
-
-	cvta.to.global.u64 	%rd40, %rd14;
-	mul.wide.s32 	%rd41, %r1, 4;
-	add.s64 	%rd42, %rd40, %rd41;
-	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
-
-BB0_21:
-	cvta.to.global.u64 	%rd43, %rd4;
-	mul.wide.s32 	%rd44, %r1, 4;
-	add.s64 	%rd45, %rd43, %rd44;
-	cvta.to.global.u64 	%rd46, %rd5;
-	add.s64 	%rd47, %rd46, %rd44;
-	cvta.to.global.u64 	%rd48, %rd6;
-	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
-	cvta.to.global.u64 	%rd50, %rd1;
-	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
-	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
-	cvta.to.global.u64 	%rd52, %rd2;
-	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
-	cvta.to.global.u64 	%rd54, %rd3;
-	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
-
-BB0_22:
-	ret;
-}
-
-
-`
-	addmagnetoelasticfield_ptx_35 = `
-.version 6.5
-.target sm_35
-.address_size 64
-
-	// .globl	addmagnetoelasticfield
-
-.visible .entry addmagnetoelasticfield(
-	.param .u64 addmagnetoelasticfield_param_0,
-	.param .u64 addmagnetoelasticfield_param_1,
-	.param .u64 addmagnetoelasticfield_param_2,
-	.param .u64 addmagnetoelasticfield_param_3,
-	.param .u64 addmagnetoelasticfield_param_4,
-	.param .u64 addmagnetoelasticfield_param_5,
-	.param .u64 addmagnetoelasticfield_param_6,
-	.param .f32 addmagnetoelasticfield_param_7,
-	.param .u64 addmagnetoelasticfield_param_8,
-	.param .f32 addmagnetoelasticfield_param_9,
-	.param .u64 addmagnetoelasticfield_param_10,
-	.param .f32 addmagnetoelasticfield_param_11,
-	.param .u64 addmagnetoelasticfield_param_12,
-	.param .f32 addmagnetoelasticfield_param_13,
-	.param .u64 addmagnetoelasticfield_param_14,
-	.param .f32 addmagnetoelasticfield_param_15,
-	.param .u64 addmagnetoelasticfield_param_16,
-	.param .f32 addmagnetoelasticfield_param_17,
-	.param .u64 addmagnetoelasticfield_param_18,
-	.param .f32 addmagnetoelasticfield_param_19,
-	.param .u64 addmagnetoelasticfield_param_20,
-	.param .f32 addmagnetoelasticfield_param_21,
-	.param .u64 addmagnetoelasticfield_param_22,
-	.param .f32 addmagnetoelasticfield_param_23,
-	.param .u32 addmagnetoelasticfield_param_24
-)
-{
-	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<56>;
-
-
-	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
-	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
-	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
-	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
-	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
-	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
-	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
-	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
-	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
-	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
-	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
-	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
-	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
-	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
-	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
-	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
-
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd16, %rd7;
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd16, %rd17;
-	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
-
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
-
-	cvta.to.global.u64 	%rd19, %rd8;
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd19, %rd20;
-	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
-
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
-
-	cvta.to.global.u64 	%rd22, %rd9;
-	mul.wide.s32 	%rd23, %r1, 4;
-	add.s64 	%rd24, %rd22, %rd23;
-	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
-
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
-
-	cvta.to.global.u64 	%rd25, %rd10;
-	mul.wide.s32 	%rd26, %r1, 4;
-	add.s64 	%rd27, %rd25, %rd26;
-	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
-
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
-
-	cvta.to.global.u64 	%rd28, %rd11;
-	mul.wide.s32 	%rd29, %r1, 4;
-	add.s64 	%rd30, %rd28, %rd29;
-	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
-
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
-
-	cvta.to.global.u64 	%rd31, %rd12;
-	mul.wide.s32 	%rd32, %r1, 4;
-	add.s64 	%rd33, %rd31, %rd32;
-	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
-
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
-
-	cvta.to.global.u64 	%rd34, %rd15;
-	mul.wide.s32 	%rd35, %r1, 4;
-	add.s64 	%rd36, %rd34, %rd35;
-	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
-
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
-
-	rcp.rn.f32 	%f74, %f73;
-
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
-
-	cvta.to.global.u64 	%rd37, %rd13;
-	mul.wide.s32 	%rd38, %r1, 4;
-	add.s64 	%rd39, %rd37, %rd38;
-	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
-
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
-
-	cvta.to.global.u64 	%rd40, %rd14;
-	mul.wide.s32 	%rd41, %r1, 4;
-	add.s64 	%rd42, %rd40, %rd41;
-	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
-
-BB0_21:
-	cvta.to.global.u64 	%rd43, %rd4;
-	mul.wide.s32 	%rd44, %r1, 4;
-	add.s64 	%rd45, %rd43, %rd44;
-	cvta.to.global.u64 	%rd46, %rd5;
-	add.s64 	%rd47, %rd46, %rd44;
-	cvta.to.global.u64 	%rd48, %rd6;
-	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
-	cvta.to.global.u64 	%rd50, %rd1;
-	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
-	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
-	cvta.to.global.u64 	%rd52, %rd2;
-	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
-	cvta.to.global.u64 	%rd54, %rd3;
-	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
-
-BB0_22:
-	ret;
-}
-
-
-`
-	addmagnetoelasticfield_ptx_37 = `
-.version 6.5
-.target sm_37
-.address_size 64
-
-	// .globl	addmagnetoelasticfield
-
-.visible .entry addmagnetoelasticfield(
-	.param .u64 addmagnetoelasticfield_param_0,
-	.param .u64 addmagnetoelasticfield_param_1,
-	.param .u64 addmagnetoelasticfield_param_2,
-	.param .u64 addmagnetoelasticfield_param_3,
-	.param .u64 addmagnetoelasticfield_param_4,
-	.param .u64 addmagnetoelasticfield_param_5,
-	.param .u64 addmagnetoelasticfield_param_6,
-	.param .f32 addmagnetoelasticfield_param_7,
-	.param .u64 addmagnetoelasticfield_param_8,
-	.param .f32 addmagnetoelasticfield_param_9,
-	.param .u64 addmagnetoelasticfield_param_10,
-	.param .f32 addmagnetoelasticfield_param_11,
-	.param .u64 addmagnetoelasticfield_param_12,
-	.param .f32 addmagnetoelasticfield_param_13,
-	.param .u64 addmagnetoelasticfield_param_14,
-	.param .f32 addmagnetoelasticfield_param_15,
-	.param .u64 addmagnetoelasticfield_param_16,
-	.param .f32 addmagnetoelasticfield_param_17,
-	.param .u64 addmagnetoelasticfield_param_18,
-	.param .f32 addmagnetoelasticfield_param_19,
-	.param .u64 addmagnetoelasticfield_param_20,
-	.param .f32 addmagnetoelasticfield_param_21,
-	.param .u64 addmagnetoelasticfield_param_22,
-	.param .f32 addmagnetoelasticfield_param_23,
-	.param .u32 addmagnetoelasticfield_param_24
-)
-{
-	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
-	.reg .b32 	%r<9>;
-	.reg .b64 	%rd<56>;
-
-
-	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
-	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
-	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
-	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
-	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
-	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
-	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
-	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
-	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
-	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
-	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
-	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
-	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
-	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
-	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
-	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
-	mov.u32 	%r3, %nctaid.x;
-	mov.u32 	%r4, %ctaid.y;
-	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
-	mov.u32 	%r7, %ntid.x;
-	mov.u32 	%r8, %tid.x;
-	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
-
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
-
-	cvta.to.global.u64 	%rd16, %rd7;
-	mul.wide.s32 	%rd17, %r1, 4;
-	add.s64 	%rd18, %rd16, %rd17;
-	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
-
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
-
-	cvta.to.global.u64 	%rd19, %rd8;
-	mul.wide.s32 	%rd20, %r1, 4;
-	add.s64 	%rd21, %rd19, %rd20;
-	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
-
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
-
-	cvta.to.global.u64 	%rd22, %rd9;
-	mul.wide.s32 	%rd23, %r1, 4;
-	add.s64 	%rd24, %rd22, %rd23;
-	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
-
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
-
-	cvta.to.global.u64 	%rd25, %rd10;
-	mul.wide.s32 	%rd26, %r1, 4;
-	add.s64 	%rd27, %rd25, %rd26;
-	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
-
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
-
-	cvta.to.global.u64 	%rd28, %rd11;
-	mul.wide.s32 	%rd29, %r1, 4;
-	add.s64 	%rd30, %rd28, %rd29;
-	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
-
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
-
-	cvta.to.global.u64 	%rd31, %rd12;
-	mul.wide.s32 	%rd32, %r1, 4;
-	add.s64 	%rd33, %rd31, %rd32;
-	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
-
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
-
-	cvta.to.global.u64 	%rd34, %rd15;
-	mul.wide.s32 	%rd35, %r1, 4;
-	add.s64 	%rd36, %rd34, %rd35;
-	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
-
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
-
-	rcp.rn.f32 	%f74, %f73;
-
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
-
-	cvta.to.global.u64 	%rd37, %rd13;
-	mul.wide.s32 	%rd38, %r1, 4;
-	add.s64 	%rd39, %rd37, %rd38;
-	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
-
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
-
-	cvta.to.global.u64 	%rd40, %rd14;
-	mul.wide.s32 	%rd41, %r1, 4;
-	add.s64 	%rd42, %rd40, %rd41;
-	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
-
-BB0_21:
-	cvta.to.global.u64 	%rd43, %rd4;
-	mul.wide.s32 	%rd44, %r1, 4;
-	add.s64 	%rd45, %rd43, %rd44;
-	cvta.to.global.u64 	%rd46, %rd5;
-	add.s64 	%rd47, %rd46, %rd44;
-	cvta.to.global.u64 	%rd48, %rd6;
-	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
-	cvta.to.global.u64 	%rd50, %rd1;
-	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
-	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
-	cvta.to.global.u64 	%rd52, %rd2;
-	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
-	cvta.to.global.u64 	%rd54, %rd3;
-	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
-
-BB0_22:
-	ret;
-}
-
-
-`
 	addmagnetoelasticfield_ptx_50 = `
-.version 6.5
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -1073,7 +182,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -1085,131 +194,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -1217,51 +327,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_52 = `
-.version 6.5
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -1296,7 +407,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -1308,131 +419,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -1440,51 +552,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_53 = `
-.version 6.5
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -1519,7 +632,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -1531,131 +644,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -1663,51 +777,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_60 = `
-.version 6.5
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -1742,7 +857,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -1754,131 +869,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -1886,51 +1002,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_61 = `
-.version 6.5
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -1965,7 +1082,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -1977,131 +1094,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -2109,51 +1227,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_62 = `
-.version 6.5
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -2188,7 +1307,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -2200,131 +1319,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -2332,51 +1452,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_70 = `
-.version 6.5
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -2411,7 +1532,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -2423,131 +1544,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -2555,51 +1677,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_72 = `
-.version 6.5
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -2634,7 +1757,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -2646,131 +1769,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -2778,51 +1902,52 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
-}
 
+}
 
 `
 	addmagnetoelasticfield_ptx_75 = `
-.version 6.5
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -2857,7 +1982,7 @@ BB0_22:
 )
 {
 	.reg .pred 	%p<12>;
-	.reg .f32 	%f<77>;
+	.reg .f32 	%f<79>;
 	.reg .b32 	%r<9>;
 	.reg .b64 	%rd<56>;
 
@@ -2869,131 +1994,132 @@ BB0_22:
 	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
 	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
 	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
-	ld.param.f32 	%f67, [addmagnetoelasticfield_param_7];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
 	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
-	ld.param.f32 	%f68, [addmagnetoelasticfield_param_9];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
 	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
-	ld.param.f32 	%f69, [addmagnetoelasticfield_param_11];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
 	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
-	ld.param.f32 	%f70, [addmagnetoelasticfield_param_13];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
 	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
-	ld.param.f32 	%f71, [addmagnetoelasticfield_param_15];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
 	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
-	ld.param.f32 	%f72, [addmagnetoelasticfield_param_17];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
 	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
-	ld.param.f32 	%f75, [addmagnetoelasticfield_param_19];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
 	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
-	ld.param.f32 	%f76, [addmagnetoelasticfield_param_21];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
 	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
-	ld.param.f32 	%f73, [addmagnetoelasticfield_param_23];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
 	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
 	mov.u32 	%r3, %nctaid.x;
 	mov.u32 	%r4, %ctaid.y;
 	mov.u32 	%r5, %ctaid.x;
-	mad.lo.s32 	%r6, %r3, %r4, %r5;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
 	mov.u32 	%r7, %ntid.x;
 	mov.u32 	%r8, %tid.x;
 	mad.lo.s32 	%r1, %r6, %r7, %r8;
-	setp.ge.s32	%p1, %r1, %r2;
-	@%p1 bra 	BB0_22;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
 
-	setp.eq.s64	%p2, %rd7, 0;
-	@%p2 bra 	BB0_3;
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
 
 	cvta.to.global.u64 	%rd16, %rd7;
 	mul.wide.s32 	%rd17, %r1, 4;
 	add.s64 	%rd18, %rd16, %rd17;
 	ld.global.nc.f32 	%f30, [%rd18];
-	mul.f32 	%f67, %f30, %f67;
+	mul.f32 	%f69, %f30, %f69;
 
-BB0_3:
-	setp.eq.s64	%p3, %rd8, 0;
-	@%p3 bra 	BB0_5;
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
 
 	cvta.to.global.u64 	%rd19, %rd8;
 	mul.wide.s32 	%rd20, %r1, 4;
 	add.s64 	%rd21, %rd19, %rd20;
 	ld.global.nc.f32 	%f31, [%rd21];
-	mul.f32 	%f68, %f31, %f68;
+	mul.f32 	%f70, %f31, %f70;
 
-BB0_5:
-	setp.eq.s64	%p4, %rd9, 0;
-	@%p4 bra 	BB0_7;
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
 
 	cvta.to.global.u64 	%rd22, %rd9;
 	mul.wide.s32 	%rd23, %r1, 4;
 	add.s64 	%rd24, %rd22, %rd23;
 	ld.global.nc.f32 	%f32, [%rd24];
-	mul.f32 	%f69, %f32, %f69;
+	mul.f32 	%f71, %f32, %f71;
 
-BB0_7:
-	setp.eq.s64	%p5, %rd10, 0;
-	@%p5 bra 	BB0_9;
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
 
 	cvta.to.global.u64 	%rd25, %rd10;
 	mul.wide.s32 	%rd26, %r1, 4;
 	add.s64 	%rd27, %rd25, %rd26;
 	ld.global.nc.f32 	%f33, [%rd27];
-	mul.f32 	%f70, %f33, %f70;
+	mul.f32 	%f72, %f33, %f72;
 
-BB0_9:
-	setp.eq.s64	%p6, %rd11, 0;
-	@%p6 bra 	BB0_11;
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
 
 	cvta.to.global.u64 	%rd28, %rd11;
 	mul.wide.s32 	%rd29, %r1, 4;
 	add.s64 	%rd30, %rd28, %rd29;
 	ld.global.nc.f32 	%f34, [%rd30];
-	mul.f32 	%f71, %f34, %f71;
+	mul.f32 	%f73, %f34, %f73;
 
-BB0_11:
-	setp.eq.s64	%p7, %rd12, 0;
-	@%p7 bra 	BB0_13;
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
 
 	cvta.to.global.u64 	%rd31, %rd12;
 	mul.wide.s32 	%rd32, %r1, 4;
 	add.s64 	%rd33, %rd31, %rd32;
 	ld.global.nc.f32 	%f35, [%rd33];
-	mul.f32 	%f72, %f35, %f72;
+	mul.f32 	%f74, %f35, %f74;
 
-BB0_13:
-	setp.eq.s64	%p8, %rd15, 0;
-	@%p8 bra 	BB0_15;
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
 
 	cvta.to.global.u64 	%rd34, %rd15;
 	mul.wide.s32 	%rd35, %r1, 4;
 	add.s64 	%rd36, %rd34, %rd35;
 	ld.global.nc.f32 	%f36, [%rd36];
-	mul.f32 	%f73, %f36, %f73;
+	mul.f32 	%f75, %f36, %f75;
 
-BB0_15:
-	setp.eq.f32	%p9, %f73, 0f00000000;
-	mov.f32 	%f74, 0f00000000;
-	@%p9 bra 	BB0_17;
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
 
-	rcp.rn.f32 	%f74, %f73;
+	rcp.rn.f32 	%f76, %f75;
 
-BB0_17:
-	setp.eq.s64	%p10, %rd13, 0;
-	@%p10 bra 	BB0_19;
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
 
 	cvta.to.global.u64 	%rd37, %rd13;
 	mul.wide.s32 	%rd38, %r1, 4;
 	add.s64 	%rd39, %rd37, %rd38;
 	ld.global.nc.f32 	%f38, [%rd39];
-	mul.f32 	%f75, %f38, %f75;
+	mul.f32 	%f77, %f38, %f77;
 
-BB0_19:
-	setp.eq.s64	%p11, %rd14, 0;
-	@%p11 bra 	BB0_21;
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
 
 	cvta.to.global.u64 	%rd40, %rd14;
 	mul.wide.s32 	%rd41, %r1, 4;
 	add.s64 	%rd42, %rd40, %rd41;
 	ld.global.nc.f32 	%f39, [%rd42];
-	mul.f32 	%f76, %f39, %f76;
+	mul.f32 	%f78, %f39, %f78;
 
-BB0_21:
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
 	cvta.to.global.u64 	%rd43, %rd4;
 	mul.wide.s32 	%rd44, %r1, 4;
 	add.s64 	%rd45, %rd43, %rd44;
@@ -3001,47 +2127,1173 @@ BB0_21:
 	add.s64 	%rd47, %rd46, %rd44;
 	cvta.to.global.u64 	%rd48, %rd6;
 	add.s64 	%rd49, %rd48, %rd44;
-	mul.f32 	%f40, %f74, %f75;
-	fma.rn.f32 	%f41, %f74, %f75, %f40;
-	ld.global.nc.f32 	%f42, [%rd45];
-	mul.f32 	%f43, %f41, %f42;
-	ld.global.nc.f32 	%f44, [%rd47];
-	ld.global.nc.f32 	%f45, [%rd49];
-	mul.f32 	%f46, %f71, %f45;
-	fma.rn.f32 	%f47, %f70, %f44, %f46;
-	mul.f32 	%f48, %f74, %f76;
-	mul.f32 	%f49, %f48, %f47;
-	fma.rn.f32 	%f50, %f67, %f43, %f49;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
 	cvta.to.global.u64 	%rd50, %rd1;
 	add.s64 	%rd51, %rd50, %rd44;
-	ld.global.f32 	%f51, [%rd51];
-	sub.f32 	%f52, %f51, %f50;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
 	st.global.f32 	[%rd51], %f52;
-	mul.f32 	%f53, %f41, %f44;
-	mul.f32 	%f54, %f72, %f45;
-	fma.rn.f32 	%f55, %f70, %f42, %f54;
-	mul.f32 	%f56, %f48, %f55;
-	fma.rn.f32 	%f57, %f68, %f53, %f56;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
 	cvta.to.global.u64 	%rd52, %rd2;
 	add.s64 	%rd53, %rd52, %rd44;
-	ld.global.f32 	%f58, [%rd53];
-	sub.f32 	%f59, %f58, %f57;
-	st.global.f32 	[%rd53], %f59;
-	mul.f32 	%f60, %f41, %f45;
-	mul.f32 	%f61, %f72, %f44;
-	fma.rn.f32 	%f62, %f71, %f42, %f61;
-	mul.f32 	%f63, %f48, %f62;
-	fma.rn.f32 	%f64, %f69, %f60, %f63;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
 	cvta.to.global.u64 	%rd54, %rd3;
 	add.s64 	%rd55, %rd54, %rd44;
-	ld.global.f32 	%f65, [%rd55];
-	sub.f32 	%f66, %f65, %f64;
-	st.global.f32 	[%rd55], %f66;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
 
-BB0_22:
+$L__BB0_22:
 	ret;
+
 }
 
+`
+	addmagnetoelasticfield_ptx_80 = `
+.version 8.5
+.target sm_80
+.address_size 64
+
+	// .globl	addmagnetoelasticfield
+
+.visible .entry addmagnetoelasticfield(
+	.param .u64 addmagnetoelasticfield_param_0,
+	.param .u64 addmagnetoelasticfield_param_1,
+	.param .u64 addmagnetoelasticfield_param_2,
+	.param .u64 addmagnetoelasticfield_param_3,
+	.param .u64 addmagnetoelasticfield_param_4,
+	.param .u64 addmagnetoelasticfield_param_5,
+	.param .u64 addmagnetoelasticfield_param_6,
+	.param .f32 addmagnetoelasticfield_param_7,
+	.param .u64 addmagnetoelasticfield_param_8,
+	.param .f32 addmagnetoelasticfield_param_9,
+	.param .u64 addmagnetoelasticfield_param_10,
+	.param .f32 addmagnetoelasticfield_param_11,
+	.param .u64 addmagnetoelasticfield_param_12,
+	.param .f32 addmagnetoelasticfield_param_13,
+	.param .u64 addmagnetoelasticfield_param_14,
+	.param .f32 addmagnetoelasticfield_param_15,
+	.param .u64 addmagnetoelasticfield_param_16,
+	.param .f32 addmagnetoelasticfield_param_17,
+	.param .u64 addmagnetoelasticfield_param_18,
+	.param .f32 addmagnetoelasticfield_param_19,
+	.param .u64 addmagnetoelasticfield_param_20,
+	.param .f32 addmagnetoelasticfield_param_21,
+	.param .u64 addmagnetoelasticfield_param_22,
+	.param .f32 addmagnetoelasticfield_param_23,
+	.param .u32 addmagnetoelasticfield_param_24
+)
+{
+	.reg .pred 	%p<12>;
+	.reg .f32 	%f<79>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<56>;
+
+
+	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
+	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
+	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
+	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
+	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
+	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
+	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
+	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
+	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
+	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
+	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
+	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
+	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
+	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
+	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
+	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
+
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd16, %rd7;
+	mul.wide.s32 	%rd17, %r1, 4;
+	add.s64 	%rd18, %rd16, %rd17;
+	ld.global.nc.f32 	%f30, [%rd18];
+	mul.f32 	%f69, %f30, %f69;
+
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
+
+	cvta.to.global.u64 	%rd19, %rd8;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f31, [%rd21];
+	mul.f32 	%f70, %f31, %f70;
+
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
+
+	cvta.to.global.u64 	%rd22, %rd9;
+	mul.wide.s32 	%rd23, %r1, 4;
+	add.s64 	%rd24, %rd22, %rd23;
+	ld.global.nc.f32 	%f32, [%rd24];
+	mul.f32 	%f71, %f32, %f71;
+
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
+
+	cvta.to.global.u64 	%rd25, %rd10;
+	mul.wide.s32 	%rd26, %r1, 4;
+	add.s64 	%rd27, %rd25, %rd26;
+	ld.global.nc.f32 	%f33, [%rd27];
+	mul.f32 	%f72, %f33, %f72;
+
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
+
+	cvta.to.global.u64 	%rd28, %rd11;
+	mul.wide.s32 	%rd29, %r1, 4;
+	add.s64 	%rd30, %rd28, %rd29;
+	ld.global.nc.f32 	%f34, [%rd30];
+	mul.f32 	%f73, %f34, %f73;
+
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
+
+	cvta.to.global.u64 	%rd31, %rd12;
+	mul.wide.s32 	%rd32, %r1, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	ld.global.nc.f32 	%f35, [%rd33];
+	mul.f32 	%f74, %f35, %f74;
+
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
+
+	cvta.to.global.u64 	%rd34, %rd15;
+	mul.wide.s32 	%rd35, %r1, 4;
+	add.s64 	%rd36, %rd34, %rd35;
+	ld.global.nc.f32 	%f36, [%rd36];
+	mul.f32 	%f75, %f36, %f75;
+
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
+
+	rcp.rn.f32 	%f76, %f75;
+
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
+
+	cvta.to.global.u64 	%rd37, %rd13;
+	mul.wide.s32 	%rd38, %r1, 4;
+	add.s64 	%rd39, %rd37, %rd38;
+	ld.global.nc.f32 	%f38, [%rd39];
+	mul.f32 	%f77, %f38, %f77;
+
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
+
+	cvta.to.global.u64 	%rd40, %rd14;
+	mul.wide.s32 	%rd41, %r1, 4;
+	add.s64 	%rd42, %rd40, %rd41;
+	ld.global.nc.f32 	%f39, [%rd42];
+	mul.f32 	%f78, %f39, %f78;
+
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
+	cvta.to.global.u64 	%rd43, %rd4;
+	mul.wide.s32 	%rd44, %r1, 4;
+	add.s64 	%rd45, %rd43, %rd44;
+	cvta.to.global.u64 	%rd46, %rd5;
+	add.s64 	%rd47, %rd46, %rd44;
+	cvta.to.global.u64 	%rd48, %rd6;
+	add.s64 	%rd49, %rd48, %rd44;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
+	cvta.to.global.u64 	%rd50, %rd1;
+	add.s64 	%rd51, %rd50, %rd44;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
+	st.global.f32 	[%rd51], %f52;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
+	cvta.to.global.u64 	%rd52, %rd2;
+	add.s64 	%rd53, %rd52, %rd44;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
+	cvta.to.global.u64 	%rd54, %rd3;
+	add.s64 	%rd55, %rd54, %rd44;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
+
+$L__BB0_22:
+	ret;
+
+}
+
+`
+	addmagnetoelasticfield_ptx_86 = `
+.version 8.5
+.target sm_86
+.address_size 64
+
+	// .globl	addmagnetoelasticfield
+
+.visible .entry addmagnetoelasticfield(
+	.param .u64 addmagnetoelasticfield_param_0,
+	.param .u64 addmagnetoelasticfield_param_1,
+	.param .u64 addmagnetoelasticfield_param_2,
+	.param .u64 addmagnetoelasticfield_param_3,
+	.param .u64 addmagnetoelasticfield_param_4,
+	.param .u64 addmagnetoelasticfield_param_5,
+	.param .u64 addmagnetoelasticfield_param_6,
+	.param .f32 addmagnetoelasticfield_param_7,
+	.param .u64 addmagnetoelasticfield_param_8,
+	.param .f32 addmagnetoelasticfield_param_9,
+	.param .u64 addmagnetoelasticfield_param_10,
+	.param .f32 addmagnetoelasticfield_param_11,
+	.param .u64 addmagnetoelasticfield_param_12,
+	.param .f32 addmagnetoelasticfield_param_13,
+	.param .u64 addmagnetoelasticfield_param_14,
+	.param .f32 addmagnetoelasticfield_param_15,
+	.param .u64 addmagnetoelasticfield_param_16,
+	.param .f32 addmagnetoelasticfield_param_17,
+	.param .u64 addmagnetoelasticfield_param_18,
+	.param .f32 addmagnetoelasticfield_param_19,
+	.param .u64 addmagnetoelasticfield_param_20,
+	.param .f32 addmagnetoelasticfield_param_21,
+	.param .u64 addmagnetoelasticfield_param_22,
+	.param .f32 addmagnetoelasticfield_param_23,
+	.param .u32 addmagnetoelasticfield_param_24
+)
+{
+	.reg .pred 	%p<12>;
+	.reg .f32 	%f<79>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<56>;
+
+
+	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
+	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
+	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
+	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
+	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
+	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
+	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
+	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
+	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
+	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
+	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
+	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
+	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
+	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
+	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
+	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
+
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd16, %rd7;
+	mul.wide.s32 	%rd17, %r1, 4;
+	add.s64 	%rd18, %rd16, %rd17;
+	ld.global.nc.f32 	%f30, [%rd18];
+	mul.f32 	%f69, %f30, %f69;
+
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
+
+	cvta.to.global.u64 	%rd19, %rd8;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f31, [%rd21];
+	mul.f32 	%f70, %f31, %f70;
+
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
+
+	cvta.to.global.u64 	%rd22, %rd9;
+	mul.wide.s32 	%rd23, %r1, 4;
+	add.s64 	%rd24, %rd22, %rd23;
+	ld.global.nc.f32 	%f32, [%rd24];
+	mul.f32 	%f71, %f32, %f71;
+
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
+
+	cvta.to.global.u64 	%rd25, %rd10;
+	mul.wide.s32 	%rd26, %r1, 4;
+	add.s64 	%rd27, %rd25, %rd26;
+	ld.global.nc.f32 	%f33, [%rd27];
+	mul.f32 	%f72, %f33, %f72;
+
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
+
+	cvta.to.global.u64 	%rd28, %rd11;
+	mul.wide.s32 	%rd29, %r1, 4;
+	add.s64 	%rd30, %rd28, %rd29;
+	ld.global.nc.f32 	%f34, [%rd30];
+	mul.f32 	%f73, %f34, %f73;
+
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
+
+	cvta.to.global.u64 	%rd31, %rd12;
+	mul.wide.s32 	%rd32, %r1, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	ld.global.nc.f32 	%f35, [%rd33];
+	mul.f32 	%f74, %f35, %f74;
+
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
+
+	cvta.to.global.u64 	%rd34, %rd15;
+	mul.wide.s32 	%rd35, %r1, 4;
+	add.s64 	%rd36, %rd34, %rd35;
+	ld.global.nc.f32 	%f36, [%rd36];
+	mul.f32 	%f75, %f36, %f75;
+
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
+
+	rcp.rn.f32 	%f76, %f75;
+
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
+
+	cvta.to.global.u64 	%rd37, %rd13;
+	mul.wide.s32 	%rd38, %r1, 4;
+	add.s64 	%rd39, %rd37, %rd38;
+	ld.global.nc.f32 	%f38, [%rd39];
+	mul.f32 	%f77, %f38, %f77;
+
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
+
+	cvta.to.global.u64 	%rd40, %rd14;
+	mul.wide.s32 	%rd41, %r1, 4;
+	add.s64 	%rd42, %rd40, %rd41;
+	ld.global.nc.f32 	%f39, [%rd42];
+	mul.f32 	%f78, %f39, %f78;
+
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
+	cvta.to.global.u64 	%rd43, %rd4;
+	mul.wide.s32 	%rd44, %r1, 4;
+	add.s64 	%rd45, %rd43, %rd44;
+	cvta.to.global.u64 	%rd46, %rd5;
+	add.s64 	%rd47, %rd46, %rd44;
+	cvta.to.global.u64 	%rd48, %rd6;
+	add.s64 	%rd49, %rd48, %rd44;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
+	cvta.to.global.u64 	%rd50, %rd1;
+	add.s64 	%rd51, %rd50, %rd44;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
+	st.global.f32 	[%rd51], %f52;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
+	cvta.to.global.u64 	%rd52, %rd2;
+	add.s64 	%rd53, %rd52, %rd44;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
+	cvta.to.global.u64 	%rd54, %rd3;
+	add.s64 	%rd55, %rd54, %rd44;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
+
+$L__BB0_22:
+	ret;
+
+}
+
+`
+	addmagnetoelasticfield_ptx_87 = `
+.version 8.5
+.target sm_87
+.address_size 64
+
+	// .globl	addmagnetoelasticfield
+
+.visible .entry addmagnetoelasticfield(
+	.param .u64 addmagnetoelasticfield_param_0,
+	.param .u64 addmagnetoelasticfield_param_1,
+	.param .u64 addmagnetoelasticfield_param_2,
+	.param .u64 addmagnetoelasticfield_param_3,
+	.param .u64 addmagnetoelasticfield_param_4,
+	.param .u64 addmagnetoelasticfield_param_5,
+	.param .u64 addmagnetoelasticfield_param_6,
+	.param .f32 addmagnetoelasticfield_param_7,
+	.param .u64 addmagnetoelasticfield_param_8,
+	.param .f32 addmagnetoelasticfield_param_9,
+	.param .u64 addmagnetoelasticfield_param_10,
+	.param .f32 addmagnetoelasticfield_param_11,
+	.param .u64 addmagnetoelasticfield_param_12,
+	.param .f32 addmagnetoelasticfield_param_13,
+	.param .u64 addmagnetoelasticfield_param_14,
+	.param .f32 addmagnetoelasticfield_param_15,
+	.param .u64 addmagnetoelasticfield_param_16,
+	.param .f32 addmagnetoelasticfield_param_17,
+	.param .u64 addmagnetoelasticfield_param_18,
+	.param .f32 addmagnetoelasticfield_param_19,
+	.param .u64 addmagnetoelasticfield_param_20,
+	.param .f32 addmagnetoelasticfield_param_21,
+	.param .u64 addmagnetoelasticfield_param_22,
+	.param .f32 addmagnetoelasticfield_param_23,
+	.param .u32 addmagnetoelasticfield_param_24
+)
+{
+	.reg .pred 	%p<12>;
+	.reg .f32 	%f<79>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<56>;
+
+
+	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
+	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
+	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
+	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
+	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
+	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
+	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
+	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
+	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
+	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
+	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
+	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
+	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
+	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
+	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
+	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
+
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd16, %rd7;
+	mul.wide.s32 	%rd17, %r1, 4;
+	add.s64 	%rd18, %rd16, %rd17;
+	ld.global.nc.f32 	%f30, [%rd18];
+	mul.f32 	%f69, %f30, %f69;
+
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
+
+	cvta.to.global.u64 	%rd19, %rd8;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f31, [%rd21];
+	mul.f32 	%f70, %f31, %f70;
+
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
+
+	cvta.to.global.u64 	%rd22, %rd9;
+	mul.wide.s32 	%rd23, %r1, 4;
+	add.s64 	%rd24, %rd22, %rd23;
+	ld.global.nc.f32 	%f32, [%rd24];
+	mul.f32 	%f71, %f32, %f71;
+
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
+
+	cvta.to.global.u64 	%rd25, %rd10;
+	mul.wide.s32 	%rd26, %r1, 4;
+	add.s64 	%rd27, %rd25, %rd26;
+	ld.global.nc.f32 	%f33, [%rd27];
+	mul.f32 	%f72, %f33, %f72;
+
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
+
+	cvta.to.global.u64 	%rd28, %rd11;
+	mul.wide.s32 	%rd29, %r1, 4;
+	add.s64 	%rd30, %rd28, %rd29;
+	ld.global.nc.f32 	%f34, [%rd30];
+	mul.f32 	%f73, %f34, %f73;
+
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
+
+	cvta.to.global.u64 	%rd31, %rd12;
+	mul.wide.s32 	%rd32, %r1, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	ld.global.nc.f32 	%f35, [%rd33];
+	mul.f32 	%f74, %f35, %f74;
+
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
+
+	cvta.to.global.u64 	%rd34, %rd15;
+	mul.wide.s32 	%rd35, %r1, 4;
+	add.s64 	%rd36, %rd34, %rd35;
+	ld.global.nc.f32 	%f36, [%rd36];
+	mul.f32 	%f75, %f36, %f75;
+
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
+
+	rcp.rn.f32 	%f76, %f75;
+
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
+
+	cvta.to.global.u64 	%rd37, %rd13;
+	mul.wide.s32 	%rd38, %r1, 4;
+	add.s64 	%rd39, %rd37, %rd38;
+	ld.global.nc.f32 	%f38, [%rd39];
+	mul.f32 	%f77, %f38, %f77;
+
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
+
+	cvta.to.global.u64 	%rd40, %rd14;
+	mul.wide.s32 	%rd41, %r1, 4;
+	add.s64 	%rd42, %rd40, %rd41;
+	ld.global.nc.f32 	%f39, [%rd42];
+	mul.f32 	%f78, %f39, %f78;
+
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
+	cvta.to.global.u64 	%rd43, %rd4;
+	mul.wide.s32 	%rd44, %r1, 4;
+	add.s64 	%rd45, %rd43, %rd44;
+	cvta.to.global.u64 	%rd46, %rd5;
+	add.s64 	%rd47, %rd46, %rd44;
+	cvta.to.global.u64 	%rd48, %rd6;
+	add.s64 	%rd49, %rd48, %rd44;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
+	cvta.to.global.u64 	%rd50, %rd1;
+	add.s64 	%rd51, %rd50, %rd44;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
+	st.global.f32 	[%rd51], %f52;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
+	cvta.to.global.u64 	%rd52, %rd2;
+	add.s64 	%rd53, %rd52, %rd44;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
+	cvta.to.global.u64 	%rd54, %rd3;
+	add.s64 	%rd55, %rd54, %rd44;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
+
+$L__BB0_22:
+	ret;
+
+}
+
+`
+	addmagnetoelasticfield_ptx_89 = `
+.version 8.5
+.target sm_89
+.address_size 64
+
+	// .globl	addmagnetoelasticfield
+
+.visible .entry addmagnetoelasticfield(
+	.param .u64 addmagnetoelasticfield_param_0,
+	.param .u64 addmagnetoelasticfield_param_1,
+	.param .u64 addmagnetoelasticfield_param_2,
+	.param .u64 addmagnetoelasticfield_param_3,
+	.param .u64 addmagnetoelasticfield_param_4,
+	.param .u64 addmagnetoelasticfield_param_5,
+	.param .u64 addmagnetoelasticfield_param_6,
+	.param .f32 addmagnetoelasticfield_param_7,
+	.param .u64 addmagnetoelasticfield_param_8,
+	.param .f32 addmagnetoelasticfield_param_9,
+	.param .u64 addmagnetoelasticfield_param_10,
+	.param .f32 addmagnetoelasticfield_param_11,
+	.param .u64 addmagnetoelasticfield_param_12,
+	.param .f32 addmagnetoelasticfield_param_13,
+	.param .u64 addmagnetoelasticfield_param_14,
+	.param .f32 addmagnetoelasticfield_param_15,
+	.param .u64 addmagnetoelasticfield_param_16,
+	.param .f32 addmagnetoelasticfield_param_17,
+	.param .u64 addmagnetoelasticfield_param_18,
+	.param .f32 addmagnetoelasticfield_param_19,
+	.param .u64 addmagnetoelasticfield_param_20,
+	.param .f32 addmagnetoelasticfield_param_21,
+	.param .u64 addmagnetoelasticfield_param_22,
+	.param .f32 addmagnetoelasticfield_param_23,
+	.param .u32 addmagnetoelasticfield_param_24
+)
+{
+	.reg .pred 	%p<12>;
+	.reg .f32 	%f<79>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<56>;
+
+
+	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
+	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
+	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
+	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
+	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
+	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
+	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
+	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
+	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
+	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
+	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
+	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
+	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
+	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
+	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
+	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
+
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd16, %rd7;
+	mul.wide.s32 	%rd17, %r1, 4;
+	add.s64 	%rd18, %rd16, %rd17;
+	ld.global.nc.f32 	%f30, [%rd18];
+	mul.f32 	%f69, %f30, %f69;
+
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
+
+	cvta.to.global.u64 	%rd19, %rd8;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f31, [%rd21];
+	mul.f32 	%f70, %f31, %f70;
+
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
+
+	cvta.to.global.u64 	%rd22, %rd9;
+	mul.wide.s32 	%rd23, %r1, 4;
+	add.s64 	%rd24, %rd22, %rd23;
+	ld.global.nc.f32 	%f32, [%rd24];
+	mul.f32 	%f71, %f32, %f71;
+
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
+
+	cvta.to.global.u64 	%rd25, %rd10;
+	mul.wide.s32 	%rd26, %r1, 4;
+	add.s64 	%rd27, %rd25, %rd26;
+	ld.global.nc.f32 	%f33, [%rd27];
+	mul.f32 	%f72, %f33, %f72;
+
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
+
+	cvta.to.global.u64 	%rd28, %rd11;
+	mul.wide.s32 	%rd29, %r1, 4;
+	add.s64 	%rd30, %rd28, %rd29;
+	ld.global.nc.f32 	%f34, [%rd30];
+	mul.f32 	%f73, %f34, %f73;
+
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
+
+	cvta.to.global.u64 	%rd31, %rd12;
+	mul.wide.s32 	%rd32, %r1, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	ld.global.nc.f32 	%f35, [%rd33];
+	mul.f32 	%f74, %f35, %f74;
+
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
+
+	cvta.to.global.u64 	%rd34, %rd15;
+	mul.wide.s32 	%rd35, %r1, 4;
+	add.s64 	%rd36, %rd34, %rd35;
+	ld.global.nc.f32 	%f36, [%rd36];
+	mul.f32 	%f75, %f36, %f75;
+
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
+
+	rcp.rn.f32 	%f76, %f75;
+
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
+
+	cvta.to.global.u64 	%rd37, %rd13;
+	mul.wide.s32 	%rd38, %r1, 4;
+	add.s64 	%rd39, %rd37, %rd38;
+	ld.global.nc.f32 	%f38, [%rd39];
+	mul.f32 	%f77, %f38, %f77;
+
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
+
+	cvta.to.global.u64 	%rd40, %rd14;
+	mul.wide.s32 	%rd41, %r1, 4;
+	add.s64 	%rd42, %rd40, %rd41;
+	ld.global.nc.f32 	%f39, [%rd42];
+	mul.f32 	%f78, %f39, %f78;
+
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
+	cvta.to.global.u64 	%rd43, %rd4;
+	mul.wide.s32 	%rd44, %r1, 4;
+	add.s64 	%rd45, %rd43, %rd44;
+	cvta.to.global.u64 	%rd46, %rd5;
+	add.s64 	%rd47, %rd46, %rd44;
+	cvta.to.global.u64 	%rd48, %rd6;
+	add.s64 	%rd49, %rd48, %rd44;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
+	cvta.to.global.u64 	%rd50, %rd1;
+	add.s64 	%rd51, %rd50, %rd44;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
+	st.global.f32 	[%rd51], %f52;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
+	cvta.to.global.u64 	%rd52, %rd2;
+	add.s64 	%rd53, %rd52, %rd44;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
+	cvta.to.global.u64 	%rd54, %rd3;
+	add.s64 	%rd55, %rd54, %rd44;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
+
+$L__BB0_22:
+	ret;
+
+}
+
+`
+	addmagnetoelasticfield_ptx_90 = `
+.version 8.5
+.target sm_90
+.address_size 64
+
+	// .globl	addmagnetoelasticfield
+
+.visible .entry addmagnetoelasticfield(
+	.param .u64 addmagnetoelasticfield_param_0,
+	.param .u64 addmagnetoelasticfield_param_1,
+	.param .u64 addmagnetoelasticfield_param_2,
+	.param .u64 addmagnetoelasticfield_param_3,
+	.param .u64 addmagnetoelasticfield_param_4,
+	.param .u64 addmagnetoelasticfield_param_5,
+	.param .u64 addmagnetoelasticfield_param_6,
+	.param .f32 addmagnetoelasticfield_param_7,
+	.param .u64 addmagnetoelasticfield_param_8,
+	.param .f32 addmagnetoelasticfield_param_9,
+	.param .u64 addmagnetoelasticfield_param_10,
+	.param .f32 addmagnetoelasticfield_param_11,
+	.param .u64 addmagnetoelasticfield_param_12,
+	.param .f32 addmagnetoelasticfield_param_13,
+	.param .u64 addmagnetoelasticfield_param_14,
+	.param .f32 addmagnetoelasticfield_param_15,
+	.param .u64 addmagnetoelasticfield_param_16,
+	.param .f32 addmagnetoelasticfield_param_17,
+	.param .u64 addmagnetoelasticfield_param_18,
+	.param .f32 addmagnetoelasticfield_param_19,
+	.param .u64 addmagnetoelasticfield_param_20,
+	.param .f32 addmagnetoelasticfield_param_21,
+	.param .u64 addmagnetoelasticfield_param_22,
+	.param .f32 addmagnetoelasticfield_param_23,
+	.param .u32 addmagnetoelasticfield_param_24
+)
+{
+	.reg .pred 	%p<12>;
+	.reg .f32 	%f<79>;
+	.reg .b32 	%r<9>;
+	.reg .b64 	%rd<56>;
+
+
+	ld.param.u64 	%rd1, [addmagnetoelasticfield_param_0];
+	ld.param.u64 	%rd2, [addmagnetoelasticfield_param_1];
+	ld.param.u64 	%rd3, [addmagnetoelasticfield_param_2];
+	ld.param.u64 	%rd4, [addmagnetoelasticfield_param_3];
+	ld.param.u64 	%rd5, [addmagnetoelasticfield_param_4];
+	ld.param.u64 	%rd6, [addmagnetoelasticfield_param_5];
+	ld.param.u64 	%rd7, [addmagnetoelasticfield_param_6];
+	ld.param.f32 	%f69, [addmagnetoelasticfield_param_7];
+	ld.param.u64 	%rd8, [addmagnetoelasticfield_param_8];
+	ld.param.f32 	%f70, [addmagnetoelasticfield_param_9];
+	ld.param.u64 	%rd9, [addmagnetoelasticfield_param_10];
+	ld.param.f32 	%f71, [addmagnetoelasticfield_param_11];
+	ld.param.u64 	%rd10, [addmagnetoelasticfield_param_12];
+	ld.param.f32 	%f72, [addmagnetoelasticfield_param_13];
+	ld.param.u64 	%rd11, [addmagnetoelasticfield_param_14];
+	ld.param.f32 	%f73, [addmagnetoelasticfield_param_15];
+	ld.param.u64 	%rd12, [addmagnetoelasticfield_param_16];
+	ld.param.f32 	%f74, [addmagnetoelasticfield_param_17];
+	ld.param.u64 	%rd13, [addmagnetoelasticfield_param_18];
+	ld.param.f32 	%f77, [addmagnetoelasticfield_param_19];
+	ld.param.u64 	%rd14, [addmagnetoelasticfield_param_20];
+	ld.param.f32 	%f78, [addmagnetoelasticfield_param_21];
+	ld.param.u64 	%rd15, [addmagnetoelasticfield_param_22];
+	ld.param.f32 	%f75, [addmagnetoelasticfield_param_23];
+	ld.param.u32 	%r2, [addmagnetoelasticfield_param_24];
+	mov.u32 	%r3, %nctaid.x;
+	mov.u32 	%r4, %ctaid.y;
+	mov.u32 	%r5, %ctaid.x;
+	mad.lo.s32 	%r6, %r4, %r3, %r5;
+	mov.u32 	%r7, %ntid.x;
+	mov.u32 	%r8, %tid.x;
+	mad.lo.s32 	%r1, %r6, %r7, %r8;
+	setp.ge.s32 	%p1, %r1, %r2;
+	@%p1 bra 	$L__BB0_22;
+
+	setp.eq.s64 	%p2, %rd7, 0;
+	@%p2 bra 	$L__BB0_3;
+
+	cvta.to.global.u64 	%rd16, %rd7;
+	mul.wide.s32 	%rd17, %r1, 4;
+	add.s64 	%rd18, %rd16, %rd17;
+	ld.global.nc.f32 	%f30, [%rd18];
+	mul.f32 	%f69, %f30, %f69;
+
+$L__BB0_3:
+	setp.eq.s64 	%p3, %rd8, 0;
+	@%p3 bra 	$L__BB0_5;
+
+	cvta.to.global.u64 	%rd19, %rd8;
+	mul.wide.s32 	%rd20, %r1, 4;
+	add.s64 	%rd21, %rd19, %rd20;
+	ld.global.nc.f32 	%f31, [%rd21];
+	mul.f32 	%f70, %f31, %f70;
+
+$L__BB0_5:
+	setp.eq.s64 	%p4, %rd9, 0;
+	@%p4 bra 	$L__BB0_7;
+
+	cvta.to.global.u64 	%rd22, %rd9;
+	mul.wide.s32 	%rd23, %r1, 4;
+	add.s64 	%rd24, %rd22, %rd23;
+	ld.global.nc.f32 	%f32, [%rd24];
+	mul.f32 	%f71, %f32, %f71;
+
+$L__BB0_7:
+	setp.eq.s64 	%p5, %rd10, 0;
+	@%p5 bra 	$L__BB0_9;
+
+	cvta.to.global.u64 	%rd25, %rd10;
+	mul.wide.s32 	%rd26, %r1, 4;
+	add.s64 	%rd27, %rd25, %rd26;
+	ld.global.nc.f32 	%f33, [%rd27];
+	mul.f32 	%f72, %f33, %f72;
+
+$L__BB0_9:
+	setp.eq.s64 	%p6, %rd11, 0;
+	@%p6 bra 	$L__BB0_11;
+
+	cvta.to.global.u64 	%rd28, %rd11;
+	mul.wide.s32 	%rd29, %r1, 4;
+	add.s64 	%rd30, %rd28, %rd29;
+	ld.global.nc.f32 	%f34, [%rd30];
+	mul.f32 	%f73, %f34, %f73;
+
+$L__BB0_11:
+	setp.eq.s64 	%p7, %rd12, 0;
+	@%p7 bra 	$L__BB0_13;
+
+	cvta.to.global.u64 	%rd31, %rd12;
+	mul.wide.s32 	%rd32, %r1, 4;
+	add.s64 	%rd33, %rd31, %rd32;
+	ld.global.nc.f32 	%f35, [%rd33];
+	mul.f32 	%f74, %f35, %f74;
+
+$L__BB0_13:
+	setp.eq.s64 	%p8, %rd15, 0;
+	@%p8 bra 	$L__BB0_15;
+
+	cvta.to.global.u64 	%rd34, %rd15;
+	mul.wide.s32 	%rd35, %r1, 4;
+	add.s64 	%rd36, %rd34, %rd35;
+	ld.global.nc.f32 	%f36, [%rd36];
+	mul.f32 	%f75, %f36, %f75;
+
+$L__BB0_15:
+	setp.eq.f32 	%p9, %f75, 0f00000000;
+	mov.f32 	%f76, 0f00000000;
+	@%p9 bra 	$L__BB0_17;
+
+	rcp.rn.f32 	%f76, %f75;
+
+$L__BB0_17:
+	setp.eq.s64 	%p10, %rd13, 0;
+	@%p10 bra 	$L__BB0_19;
+
+	cvta.to.global.u64 	%rd37, %rd13;
+	mul.wide.s32 	%rd38, %r1, 4;
+	add.s64 	%rd39, %rd37, %rd38;
+	ld.global.nc.f32 	%f38, [%rd39];
+	mul.f32 	%f77, %f38, %f77;
+
+$L__BB0_19:
+	setp.eq.s64 	%p11, %rd14, 0;
+	@%p11 bra 	$L__BB0_21;
+
+	cvta.to.global.u64 	%rd40, %rd14;
+	mul.wide.s32 	%rd41, %r1, 4;
+	add.s64 	%rd42, %rd40, %rd41;
+	ld.global.nc.f32 	%f39, [%rd42];
+	mul.f32 	%f78, %f39, %f78;
+
+$L__BB0_21:
+	mul.f32 	%f40, %f76, %f77;
+	cvta.to.global.u64 	%rd43, %rd4;
+	mul.wide.s32 	%rd44, %r1, 4;
+	add.s64 	%rd45, %rd43, %rd44;
+	cvta.to.global.u64 	%rd46, %rd5;
+	add.s64 	%rd47, %rd46, %rd44;
+	cvta.to.global.u64 	%rd48, %rd6;
+	add.s64 	%rd49, %rd48, %rd44;
+	ld.global.nc.f32 	%f41, [%rd45];
+	mul.f32 	%f42, %f40, %f41;
+	ld.global.nc.f32 	%f43, [%rd47];
+	ld.global.nc.f32 	%f44, [%rd49];
+	mul.f32 	%f45, %f73, %f44;
+	fma.rn.f32 	%f46, %f72, %f43, %f45;
+	mul.f32 	%f47, %f76, %f78;
+	mul.f32 	%f48, %f47, %f46;
+	fma.rn.f32 	%f49, %f69, %f42, %f48;
+	cvta.to.global.u64 	%rd50, %rd1;
+	add.s64 	%rd51, %rd50, %rd44;
+	ld.global.f32 	%f50, [%rd51];
+	add.f32 	%f51, %f49, %f49;
+	sub.f32 	%f52, %f50, %f51;
+	st.global.f32 	[%rd51], %f52;
+	mul.f32 	%f53, %f40, %f43;
+	mul.f32 	%f54, %f74, %f44;
+	fma.rn.f32 	%f55, %f72, %f41, %f54;
+	mul.f32 	%f56, %f47, %f55;
+	fma.rn.f32 	%f57, %f70, %f53, %f56;
+	add.f32 	%f58, %f57, %f57;
+	cvta.to.global.u64 	%rd52, %rd2;
+	add.s64 	%rd53, %rd52, %rd44;
+	ld.global.f32 	%f59, [%rd53];
+	sub.f32 	%f60, %f59, %f58;
+	st.global.f32 	[%rd53], %f60;
+	mul.f32 	%f61, %f40, %f44;
+	mul.f32 	%f62, %f74, %f43;
+	fma.rn.f32 	%f63, %f73, %f41, %f62;
+	mul.f32 	%f64, %f47, %f63;
+	fma.rn.f32 	%f65, %f71, %f61, %f64;
+	add.f32 	%f66, %f65, %f65;
+	cvta.to.global.u64 	%rd54, %rd3;
+	add.s64 	%rd55, %rd54, %rd44;
+	ld.global.f32 	%f67, [%rd55];
+	sub.f32 	%f68, %f67, %f66;
+	st.global.f32 	[%rd55], %f68;
+
+$L__BB0_22:
+	ret;
+
+}
 
 `
 )

@@ -105,7 +105,7 @@ var setvectorpotential_map = map[int]string{0: "",
 // setvectorpotential PTX code for various compute capabilities.
 const (
 	setvectorpotential_ptx_50 = `
-.version 7.8
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -188,6 +188,8 @@ const (
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -271,7 +273,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_52 = `
-.version 7.8
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -354,6 +356,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -437,7 +441,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_53 = `
-.version 7.8
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -520,6 +524,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -603,7 +609,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_60 = `
-.version 7.8
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -686,6 +692,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -769,7 +777,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_61 = `
-.version 7.8
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -852,6 +860,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -935,7 +945,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_62 = `
-.version 7.8
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -1018,6 +1028,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1101,7 +1113,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_70 = `
-.version 7.8
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -1184,6 +1196,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1267,7 +1281,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_72 = `
-.version 7.8
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -1350,6 +1364,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1433,7 +1449,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_75 = `
-.version 7.8
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -1516,6 +1532,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1599,7 +1617,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_80 = `
-.version 7.8
+.version 8.5
 .target sm_80
 .address_size 64
 
@@ -1682,6 +1700,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1765,7 +1785,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_86 = `
-.version 7.8
+.version 8.5
 .target sm_86
 .address_size 64
 
@@ -1848,6 +1868,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -1931,7 +1953,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_87 = `
-.version 7.8
+.version 8.5
 .target sm_87
 .address_size 64
 
@@ -2014,6 +2036,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -2097,7 +2121,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_89 = `
-.version 7.8
+.version 8.5
 .target sm_89
 .address_size 64
 
@@ -2180,6 +2204,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];
@@ -2263,7 +2289,7 @@ $L__BB0_9:
 
 `
 	setvectorpotential_ptx_90 = `
-.version 7.8
+.version 8.5
 .target sm_90
 .address_size 64
 
@@ -2346,6 +2372,8 @@ $L__BB0_9:
 	mul.wide.s32 	%rd4, %r10, 4;
 	add.s64 	%rd39, %rd2, %rd23;
 	mul.wide.s32 	%rd6, %r20, 4;
+	mov.f32 	%f53, 0f00000000;
+	mov.u32 	%r46, 0;
 
 $L__BB0_4:
 	ld.global.nc.f32 	%f23, [%rd39];

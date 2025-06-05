@@ -108,7 +108,7 @@ var scaleemergentfield_map = map[int]string{0: "",
 // scaleemergentfield PTX code for various compute capabilities.
 const (
 	scaleemergentfield_ptx_50 = `
-.version 7.8
+.version 8.5
 .target sm_50
 .address_size 64
 
@@ -201,7 +201,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_52 = `
-.version 7.8
+.version 8.5
 .target sm_52
 .address_size 64
 
@@ -294,7 +294,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_53 = `
-.version 7.8
+.version 8.5
 .target sm_53
 .address_size 64
 
@@ -387,7 +387,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_60 = `
-.version 7.8
+.version 8.5
 .target sm_60
 .address_size 64
 
@@ -480,7 +480,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_61 = `
-.version 7.8
+.version 8.5
 .target sm_61
 .address_size 64
 
@@ -573,7 +573,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_62 = `
-.version 7.8
+.version 8.5
 .target sm_62
 .address_size 64
 
@@ -666,7 +666,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_70 = `
-.version 7.8
+.version 8.5
 .target sm_70
 .address_size 64
 
@@ -759,7 +759,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_72 = `
-.version 7.8
+.version 8.5
 .target sm_72
 .address_size 64
 
@@ -852,7 +852,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_75 = `
-.version 7.8
+.version 8.5
 .target sm_75
 .address_size 64
 
@@ -945,7 +945,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_80 = `
-.version 7.8
+.version 8.5
 .target sm_80
 .address_size 64
 
@@ -1038,7 +1038,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_86 = `
-.version 7.8
+.version 8.5
 .target sm_86
 .address_size 64
 
@@ -1131,7 +1131,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_87 = `
-.version 7.8
+.version 8.5
 .target sm_87
 .address_size 64
 
@@ -1224,7 +1224,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_89 = `
-.version 7.8
+.version 8.5
 .target sm_89
 .address_size 64
 
@@ -1317,7 +1317,7 @@ $L__BB0_2:
 
 `
 	scaleemergentfield_ptx_90 = `
-.version 7.8
+.version 8.5
 .target sm_90
 .address_size 64
 

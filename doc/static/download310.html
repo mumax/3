@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>mumax3</title>
+	<link rel="icon" type="image/x-icon" href="nimble-cubes128.png">
+	<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-50169601-1', 'mumax.github.io');
+		ga('send', 'pageview');
+	</script>
+</head>
+
+<body>
+<p style="font-size: 16; color: red"><b>Warning! These are downloads for mumax3.10, which is no longer supported. If you like to use mumax3, we strongly recommend to use <a href="download.html">mumax3.11</a>.</b></p>
+
+    <div style="float:left">
+	<a href="index.html"><img id="header_img" src="nimble-cubes128.png" href="index.html" /></a>
+</div>
+<script src="header.js"></script>
+
+<div style="float:left">
+	<a href="index.html" style="color:black"><span style="font-size:48px"><b>mumax</b><sup>3</sup><br /></span>
+		GPU-accelerated micromagnetism <br /><br /></a>
+	<a class="pure-button pure-button-primary" href="index.html">Home</a>
+	<a class="pure-button pure-button-primary" href="download.html">Download</a>
+	<a class="pure-button pure-button-primary" href="examples.html">Examples</a>
+	<a class="pure-button pure-button-primary" href="https://mumax.ugent.be/mumax3-workshop/">Tutorial</a>
+	<a class="pure-button pure-button-primary" href="api.html">API</a>
+	<a class="pure-button pure-button-primary" href="https://groups.google.com/forum/#!forum/mumax2">Forum</a>
+</div>
+<br style="clear:both" />
+
+<hr />
+
+<h2> Prerequisites </h2>
+
+To run mumax3.10 you need
+
+<ul>
+    <li> An NVIDIA GPU with at least a compute capability 3.0</li>
+    <li> An up to date NVIDIA driver (compatible versions given below)</li>
+    <li> Optional: <a href="http://www.gnuplot.info/">gnuplot</a> for plots in the web GUI</li>
+</ul>
+
+<h2> Download and installation </h2>
+
+<p>
+Select the platform and the NVIDIA driver for which you want to download mumax3. 
+</p>
+
+<div>
+        <select id="platform" onchange="selectPlatform()">
+            <option disabled selected value> -- Select platform -- </option>
+            <option value="linux">Linux</option>
+            <option value="windows">Windows</option>
+        </select>
+        <select id="driver" onchange="selectDriver()">
+            <option disabled selected value> -- Select NVIDIA driver -- </option>
+        </select>
+
+        <a id="downloadLink" href="" >
+        <button id="downloadButton" class="pure-button pure-button-primary">Download</button>
+        </a>
+    </fieldset>
+</div>
+
+<p>
+After downloading and unpacking the archive, you will have a mumax3 executable which is ready to be used. 
+Note that mumax3 is a command line application, so it is a good idea to add the directory containing 
+the mumax3 executable to the PATH environment variable.
+</p>
+
+<h2> Building mumax3.10 from the source </h2>
+
+The source code of mumax3.10 as well as the build instructions for linux can be found on <a href="https://www.github.com/mumax/3">github</a>.
+
+<script>
+
+var driverOptions = {
+    "linux" :[
+        {'driverVersion':'≥450.36.06' , 'cudaVersion': '11.0' },
+        {'driverVersion':'≥440.33'    , 'cudaVersion': '10.2' },
+        {'driverVersion':'≥418.39'    , 'cudaVersion': '10.1' },
+        {'driverVersion':'≥410.48'    , 'cudaVersion': '10.0' },
+        {'driverVersion':'≥396.37'    , 'cudaVersion':  '9.2' },
+        {'driverVersion':'≥390.46'    , 'cudaVersion':  '9.1' },
+        {'driverVersion':'≥384.81'    , 'cudaVersion':  '9.0' },
+        {'driverVersion':'≥375.26'    , 'cudaVersion':  '8.0' },
+        {'driverVersion':'≥352.31'    , 'cudaVersion':  '7.5' },
+        {'driverVersion':'≥346.46'    , 'cudaVersion':  '7.0' },
+    ],
+    "windows" :[
+        {'driverVersion':"≥451.21" , 'cudaVersion': '11.0' },
+        {'driverVersion':"≥441.22" , 'cudaVersion': '10.2' },
+        {'driverVersion':"≥418.96" , 'cudaVersion': '10.1' },
+        {'driverVersion':"≥411.31" , 'cudaVersion': '10.0' },
+        {'driverVersion':"≥398.26" , 'cudaVersion':  '9.2' },
+    ]
+} 
+
+function selectPlatform() {
+    var driverSelector = document.getElementById("driver");
+    var platformSelector = document.getElementById("platform");
+
+    var platform = platformSelector.options[platformSelector.selectedIndex].value;
+
+    // remove any driver options
+    while (driverSelector.length > 1) {
+        driverSelector.remove(1);
+    }
+
+    // Populate the driver selection box
+    driverOptions[platform].forEach(function(driver,idx) {
+        var option = document.createElement("option");
+        option.text = driver.driverVersion;
+        option.value = driver.cudaVersion; 
+        driverSelector.add(option);
+    })
+
+    // Select the first driver option (the most recent one)
+    driverSelector.selectedIndex = 0;
+    document.getElementById("downloadButton").disabled = true;
+    document.getElementById("downloadLink").removeAttribute("href");
+
+}
+
+function selectDriver() {
+    var driverSelector = document.getElementById("driver");
+    var platformSelector = document.getElementById("platform");
+    var platform = platformSelector.options[platformSelector.selectedIndex].value;
+    var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
+    var link;
+
+    if (platform == "windows") {
+        link = "https://mumax.ugent.be/mumax3-binaries/mumax3.10_windows_cuda" + cudaVersion + ".zip";
+    } else if (platform == "linux") {
+        link = "https://mumax.ugent.be/mumax3-binaries/mumax3.10_linux_cuda" + cudaVersion + ".tar.gz";
+    } else {
+        link = "#";
+    }
+
+    document.getElementById("downloadButton").disabled = false;
+    document.getElementById("downloadLink").href = link
+}
+
+window.onload = function() {
+    document.getElementById("driver").selectedIndex = 0;
+    document.getElementById("platform"). selectedIndex = 0;
+    document.getElementById("downloadButton").disabled = true;
+    document.getElementById("downloadLink").removeAttribute("href");
+}
+
+</script>
+
+</body>
+</html>

@@ -77,6 +77,22 @@ select {
     font-size: 1.2em;
 }
 
+.oldlink {
+    font-size:8px;
+}
+
+#download-old {
+    display: block;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    width: 10%;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
 .api-section-link {
     padding-top: 0.2ex;
     padding-bottom: 0.2ex;

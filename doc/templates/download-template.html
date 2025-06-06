@@ -127,14 +127,31 @@
             }
 
             document.getElementById("downloadButton").disabled = false;
-            document.getElementById("downloadLink").href = link
+            document.getElementById("downloadLink").href = link;
         }
 
         window.onload = function () {
-            document.getElementById("driver").selectedIndex = 0;
-            document.getElementById("platform").selectedIndex = 0;
-            document.getElementById("downloadButton").disabled = true;
-            document.getElementById("downloadLink").removeAttribute("href");
+            var platformSelector = document.getElementById("platform");
+            var driverSelector = document.getElementById("driver");
+            var downloadButton = document.getElementById("downloadButton");
+            var downloadLink = document.getElementById("downloadLink");
+
+            driverSelector.selectedIndex = 0;
+            platformSelector.selectedIndex = 0;
+            downloadButton.disabled = true;
+            downloadLink.removeAttribute("href");
+
+            downloadLink.addEventListener("click", function() {
+                var platform = platformSelector.options[platformSelector.selectedIndex].value;
+                var cudaVersion = driverSelector.options[driverSelector.selectedIndex].value;
+                var file = downloadLink.href.split("/").pop();
+                gtag('event', 'download', {
+                    'file': file,
+                    'platform': platform,
+                    'cuda_version': cudaVersion,
+                    'mumax_version': "3.11"
+                });
+            });
         }
 
     </script>

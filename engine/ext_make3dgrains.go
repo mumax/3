@@ -11,7 +11,7 @@ var GrainCutShape = false // complete all voronoi grains whose centre lies withi
 
 func init() {
 	DeclFunc("ext_make3dgrains", Voronoi3d, "3D Voronoi tesselation over shape (grain size, starting region number, num regions, shape, seed)")
-	DeclVar("ext_grainCutShape", &GrainCutShape, "Whether to add the complete (3D) voronoi grain, if its centre lies within the shape (default=false)")
+	DeclVar("ext_grainCutShape", &GrainCutShape, "Whether to add the complete (3D) voronoi grain, only if its centre lies within the shape (default=false)")
 }
 
 func Voronoi3d(grainsize float64, startRegion int, numRegions int, inputShape Shape, seed int) {

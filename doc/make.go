@@ -179,7 +179,7 @@ func (s *State) Output() string {
 	return out
 }
 
-// State.output gives a nice otuput for all examples except for the
+// State.output gives a nice output for all examples except for the
 // hysteresis example. State.OutputHysteresis is the custom output function
 // for the hysteresis example.
 func (s *State) OutputHysteresis() string {

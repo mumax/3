@@ -5,7 +5,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Add magneto-elasticit coupling field to the effective field.
+// Add magneto-elastic coupling field to the effective field.
 // see magnetoelasticfield.cu
 func AddMagnetoelasticField(Beff, m *data.Slice, exx, eyy, ezz, exy, exz, eyz, B1, B2, Msat MSlice) {
 	util.Argument(Beff.Size() == m.Size())
@@ -28,7 +28,7 @@ func AddMagnetoelasticField(Beff, m *data.Slice, exx, eyy, ezz, exy, exz, eyz, B
 		N, cfg)
 }
 
-// Calculate magneto-elasticit force density
+// Calculate magneto-elastic force density
 // see magnetoelasticforce.cu
 func GetMagnetoelasticForceDensity(out, m *data.Slice, B1, B2 MSlice, mesh *data.Mesh) {
 	util.Argument(out.Size() == m.Size())

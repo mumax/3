@@ -150,6 +150,17 @@ func sign(x float64) float64 {
 	}
 }
 
+func sign32(x float32) float32 {
+	switch {
+	case x > 0:
+		return 1
+	case x < 0:
+		return -1
+	default:
+		return 0
+	}
+}
+
 // returns a/b, or 0 when b == 0
 func safediv(a, b float32) float32 {
 	if b == 0 {

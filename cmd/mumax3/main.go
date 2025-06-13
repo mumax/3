@@ -115,10 +115,10 @@ func runScript(fname string) {
 	}
 
 	// now the parser is not used anymore so it can handle web requests
-	goServeGUI()
+	addr := goServeGUI()
 
 	if *engine.Flag_interactive {
-		openbrowser("http://127.0.0.1" + *engine.Flag_port)
+		openbrowser("http://127.0.0.1" + addr)
 	}
 
 	// start executing the tree, possibly injecting commands from web gui

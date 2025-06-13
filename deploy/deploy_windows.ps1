@@ -2,7 +2,8 @@
 
 param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
     [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
-    [Int[]]$CUDA_CC
+    [Int[]]$CUDA_CC, # The compute capabilities for which PTX will be compiled. Default: all CC supported by the CUDA version.
+    [String[]]$CUDA_KERNELS # List of which CUDA kernels in ../cuda should be (re)compiled. Default: all of them.
 )
 
 foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
@@ -63,7 +64,11 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     # Enter the cuda directory to (re)compile the cuda kernels
     Set-Location ../cuda
         go build .\cuda2go.go
-        $cudafiles = Get-ChildItem -filter "*.cu"
+        if ($CUDA_KERNELS.Length -eq 0) {
+            $cudafiles = Get-ChildItem -filter "*.cu"
+        } else {
+            $cudafiles = Get-ChildItem -Filter "*.cu" | Where-Object {$CUDA_KERNELS -contains $_.BaseName}
+        }
         foreach ($cudafile in $cudafiles) {
             $kernelname = $cudafile.basename
             Remove-Item "${kernelname}_*.ptx"

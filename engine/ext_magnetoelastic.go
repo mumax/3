@@ -139,7 +139,7 @@ func AddMagnetoelasticEnergyDensity(dst *data.Slice) {
 		b1, zeromel, ms)
 	cuda.AddDotProduct(dst, -1./2., buf, Mf)
 
-	// 1nd
+	// 2nd
 	cuda.Zero(buf)
 	cuda.AddMagnetoelasticField(buf, M.Buffer(),
 		Exx, Eyy, Ezz,

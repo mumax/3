@@ -3,12 +3,13 @@ package engine
 // Relax tries to find the minimum energy state.
 
 import (
-	"github.com/mumax/3/cuda"
 	"math"
+
+	"github.com/mumax/3/cuda"
 )
 
 // Stopping relax Maxtorque in T. The user can check MaxTorque for sane values (e.g. 1e-3).
-// If set to 0, relax() will stop when the average torque is steady or increasing.
+// If set to <=0, relax() will stop when the average torque is steady or increasing.
 var RelaxTorqueThreshold float64 = -1.
 
 func init() {

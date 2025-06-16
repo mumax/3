@@ -23,7 +23,7 @@ var wd = "" // working directory, see SetWD
 //
 //		http://path -> http://path
 //		path/file   -> wd/path/file
-//	 /path/file  -> /path/file
+//	    /path/file  -> /path/file
 func SetWD(dir string) {
 	if dir != "" && !strings.HasSuffix(dir, "/") {
 		dir = dir + "/"

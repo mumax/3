@@ -180,7 +180,7 @@ func main() {
 		expanded, _ := filepath.Glob(input)
 		fnames = append(fnames, expanded...)
 	}
-	// read all input files and put them in the task que
+	// read all input files and put them in the task queue
 	for _, fname := range fnames {
 		for _, outp := range wantOut {
 			fname := fname // closure caveats

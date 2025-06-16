@@ -5,7 +5,7 @@
 // |Mz|   |Kxz Kyz Kzz|   |Mz|
 //
 // ~kernel has mirror symmetry along Y and Z-axis,
-// apart form first row,
+// apart from first row,
 // and is only stored (roughly) half:
 //
 // K11, K22, K02:

@@ -5,8 +5,8 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Add uniaxial magnetocrystalline anisotropy field to Beff.
-// see uniaxialanisotropy.cu
+// Add cubic magnetocrystalline anisotropy field to Beff.
+// see cubicanisotropy2.cu
 func AddCubicAnisotropy2(Beff, m *data.Slice, Msat, k1, k2, k3, c1, c2 MSlice) {
 	util.Argument(Beff.Size() == m.Size())
 
@@ -29,7 +29,7 @@ func AddCubicAnisotropy2(Beff, m *data.Slice, Msat, k1, k2, k3, c1, c2 MSlice) {
 }
 
 // Add uniaxial magnetocrystalline anisotropy field to Beff.
-// see uniaxialanisotropy.cu
+// see uniaxialanisotropy2.cu
 func AddUniaxialAnisotropy2(Beff, m *data.Slice, Msat, k1, k2, u MSlice) {
 	util.Argument(Beff.Size() == m.Size())
 

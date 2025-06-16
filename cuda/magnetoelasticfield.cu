@@ -5,7 +5,7 @@
 
 // Add magneto-elastic coupling field to B.
 // H = - δUmel / δM, 
-// where Umel is magneto-elastic energy denstiy given by the eq. (12.18) of Gurevich&Melkov "Magnetization Oscillations and Waves", CRC Press, 1996
+// where Umel is magneto-elastic energy density given by the eq. (12.18) of Gurevich&Melkov "Magnetization Oscillations and Waves", CRC Press, 1996
 extern "C" __global__ void
 addmagnetoelasticfield(float* __restrict__  Bx, float* __restrict__  By, float* __restrict__  Bz,
                       float* __restrict__  mx, float* __restrict__  my, float* __restrict__  mz,

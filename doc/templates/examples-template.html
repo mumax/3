@@ -268,7 +268,7 @@ m.setInShape(cylinder(400e-9, 100e-9), vortex(1, -1))
 m.setCell(20, 10, 0, vector(0.1, 0.1, -0.9)) // set in cell index  [20,10,0]
 saveas(m, "setInShape_setCell")
 
-//Read m form .ovf file.
+//Read m from .ovf file.
 m.loadfile("myfile.ovf")
 saveas(m, "loadfile")
 
@@ -700,7 +700,7 @@ for i:=0; i<Nx; i++{
 	}
 }
 
-// 500Mbit/s oscillting write field
+// 500Mbit/s oscillating write field
 f := 0.5e9
 A := 1.5
 B_ext.add(mask, -A*sin(2*pi*f*t))

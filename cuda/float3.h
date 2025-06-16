@@ -52,7 +52,7 @@ inline __device__ float3 cross(float3 a, float3 b) {
 	return make_float3( a.y*b.z - a.z*b.y,  a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x); 
 }
 
-// lenght of the 3-components vector
+// length of the 3-components vector
 inline __device__ float len(float3 a) {
 	return sqrtf(dot(a,a));
 }

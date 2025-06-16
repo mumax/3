@@ -136,7 +136,7 @@ func UpdateJob(jobURL string) string {
 }
 
 // Periodically updates user's usedShare so they decay
-// exponentially according to flag_haflife
+// exponentially according to flag_halflife
 func RunShareDecay() {
 	halflife := *flag_halflife
 	quantum := halflife / 100 // several updates per half-life gives smooth decay

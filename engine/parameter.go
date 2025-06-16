@@ -160,7 +160,7 @@ func (p *regionwise) average() []float64 { return qAverageUniverse(p) }
 type DerivedParam struct {
 	lut                          // GPU storage
 	updater  func(*DerivedParam) // called to update my value
-	uptodate bool                // cleared if parents' value change
+	uptodate bool                // cleared if parents' value changes
 	parents  []updater           // parents updated before I'm updated
 }
 

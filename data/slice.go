@@ -5,10 +5,11 @@ package data
 import (
 	"bytes"
 	"fmt"
-	"github.com/mumax/3/util"
 	"log"
 	"reflect"
 	"unsafe"
+
+	"github.com/mumax/3/util"
 )
 
 // Slice is like a [][]float32, but may be stored in GPU or host memory.
@@ -20,7 +21,7 @@ type Slice struct {
 
 // this package must not depend on CUDA. If CUDA is
 // loaded, these functions are set to cu.MemFree, ...
-// NOTE: cpyDtoH and cpuHtoD are only needed to support 32-bit builds,
+// NOTE: cpyDtoH and cpyHtoD are only needed to support 32-bit builds,
 // otherwise, it could be removed in favor of memCpy only.
 var (
 	memFree, memFreeHost           func(unsafe.Pointer)

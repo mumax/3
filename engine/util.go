@@ -33,7 +33,7 @@ func init() {
 	DeclFunc("NewScalarMask", NewScalarMask, "Makes a 3D array of scalars")
 }
 
-// Returns a new new slice (3D array) with given number of components and size.
+// Returns a new slice (3D array) with given number of components and size.
 func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
 	return data.NewSlice(ncomp, [3]int{Nx, Ny, Nz})
 }

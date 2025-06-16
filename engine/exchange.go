@@ -110,7 +110,7 @@ type exchParam struct {
 	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
 	inter          [NREGION * (NREGION + 1) / 2]float32 // extra term for lut[SymmIdx(i, j)]
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
-	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
+	gpu_ok, cpu_ok bool                                 // gpu cache up-to-date with lut source
 }
 
 // to be called after Aex or scaling changed
@@ -168,7 +168,7 @@ func (p *exchParam) update() {
 }
 
 func (p *exchParam) upload() {
-	// alloc if  needed
+	// alloc if needed
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
@@ -178,7 +178,7 @@ func (p *exchParam) upload() {
 }
 
 // Index in symmetric matrix where only one half is stored.
-// (!) Code duplicated in exchange.cu
+// (!) Code duplicated in exchange.h
 func symmidx(i, j int) int {
 	if j <= i {
 		return i*(i+1)/2 + j

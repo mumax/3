@@ -61,7 +61,7 @@ func MustReadFile(fname string) (*data.Slice, data.Meta) {
 	return s, t
 }
 
-// omf.Info represents the header part of an omf file.
+// oommf.Info represents the header part of an ovf file.
 // TODO: add Err to return error status
 // Perhaps CheckErr() func
 type Info struct {
@@ -203,7 +203,7 @@ func isHeaderEnd(str string) bool {
 	return strings.HasPrefix(str, "begin:data")
 }
 
-const OVF_CONTROL_NUMBER_4 = 1234567.0 // The omf format requires the first encoded number in the binary data section to be this control number
+const OVF_CONTROL_NUMBER_4 = 1234567.0 // The ovf format requires the first encoded number in the binary data section to be this control number
 const OVF_CONTROL_NUMBER_8 = 123456789012345.0
 
 // read data block in text format, for OVF1 and OVF2

@@ -36,7 +36,7 @@ func Ping(peerAddr string) string {
 	defer WUnlock()
 
 	// Somebody just called my status,
-	// and him as a peer (if not yet so).
+	// add him as a peer (if not yet so).
 	if _, ok := peers[peerAddr]; !ok {
 		peers[peerAddr] = NewPeer()
 	}

@@ -1,6 +1,6 @@
 package main
 
-// File que for distributing multiple input files over GPUs.
+// File queue for distributing multiple input files over GPUs.
 
 import (
 	"flag"

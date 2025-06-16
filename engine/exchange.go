@@ -113,7 +113,7 @@ type exchParam struct {
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
 }
 
-// to be called after Aex or scaling changed
+// to be called after Aex, Dind, Msat or scaling changed
 func (p *exchParam) invalidate() {
 	p.cpu_ok = false
 	p.gpu_ok = false

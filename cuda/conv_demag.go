@@ -32,11 +32,11 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice, test bool) *Demag
 	return c
 }
 
-// Calculate the demag field of m * vol * Bsat, store result in B.
+// Calculate the demag field of m * vol * Msat, store result in B.
 //
 //	m:    magnetization normalized to unit length
 //	vol:  unitless mask used to scale m's length, may be nil
-//	Bsat: saturation magnetization in Tesla
+//	Msat: saturation magnetization in A/m
 //	B:    resulting demag field, in Tesla
 func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Msat MSlice) {
 	util.Argument(B.Size() == c.inputSize && m.Size() == c.inputSize)

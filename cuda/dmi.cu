@@ -9,8 +9,8 @@
 // Taking into account proper boundary conditions.
 // m: normalized magnetization
 // H: effective field in Tesla
-// D: dmi strength / Msat, in Tesla*m
-// A: Aex/Msat
+// D: dmi strength, in Tesla*m
+// A: Aex
 extern "C" __global__ void
 adddmi(float* __restrict__ Hx, float* __restrict__ Hy, float* __restrict__ Hz,
        float* __restrict__ mx, float* __restrict__ my, float* __restrict__ mz,

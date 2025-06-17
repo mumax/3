@@ -113,7 +113,7 @@ type exchParam struct {
 	gpu_ok, cpu_ok bool                                 // gpu cache up-to-date with lut source
 }
 
-// to be called after Aex or scaling changed
+// to be called after Aex, Dind, Msat or scaling changed
 func (p *exchParam) invalidate() {
 	p.cpu_ok = false
 	p.gpu_ok = false
@@ -154,10 +154,11 @@ func (p *exchParam) setScale(region1, region2 int, scale float64) {
 func (p *exchParam) update() {
 	if !p.cpu_ok {
 		ex := p.parent.cpuLUT()
+		msat := Msat.cpuLUT()
 		for i := 0; i < NREGION; i++ {
-			exi := ex[0][i]
+			exi := ex[0][i] * sign32(msat[0][i])
 			for j := i; j < NREGION; j++ {
-				exj := ex[0][j]
+				exj := ex[0][j] * sign32(msat[0][j])
 				I := symmidx(i, j)
 				p.lut[I] = p.scale[I]*exchAverage(exi, exj) + p.inter[I]
 			}

@@ -8,7 +8,7 @@ param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS
 
 foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     # The final location of executables and libraries ready to be shipped to the user.
-    $builddir = "build/mumax3.11_windows_cuda$CUDA_VERSION_STR"
+    $builddir = "build/mumax3.11.1_windows_cuda$CUDA_VERSION_STR"
 
     # The nvidia toolkit installer for CUDA 12.6 should have set the environment 
     # variable CUDA_PATH_V12_6 which points to the root directory of the 

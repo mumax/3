@@ -4,10 +4,11 @@ package engine
 
 import (
 	"flag"
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/util"
 	"os"
 	"path"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -22,6 +23,16 @@ var (
 	Flag_sync        = flag.Bool("sync", false, "Synchronize all CUDA calls (debug)")
 	Flag_forceclean  = flag.Bool("f", false, "Force start, clean existing output directory")
 )
+
+func FlagPassed(name string) bool {
+	passed := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			passed = true
+		}
+	})
+	return passed
+}
 
 // Usage: in every Go input file, write:
 //

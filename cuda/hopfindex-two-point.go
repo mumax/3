@@ -9,7 +9,7 @@ import (
 
 func SetHopfIndexDensity_TwoPointStencil(h, m *data.Slice, mesh *data.Mesh) {
 	N := m.Size()
-	
+
 	// Create buffers to store emergent field F and vector potential A
 	F := Buffer(3, N)
 	defer Recycle(F)
@@ -28,7 +28,7 @@ func SetEmergentMagneticField_TwoPointStencil(F, m *data.Slice, mesh *data.Mesh)
 	cellsize := mesh.CellSize()
 	N := F.Size()
 	util.Argument(m.Size() == N)
-	cfg   := make3DConf(N)
+	cfg := make3DConf(N)
 	icycz := float32(1.0 / (cellsize[Y] * cellsize[Z]))
 	iczcx := float32(1.0 / (cellsize[Z] * cellsize[X]))
 	icxcy := float32(1.0 / (cellsize[X] * cellsize[Y]))

@@ -52,7 +52,7 @@ func GetHopfIndex_SolidAngleFourier(m *data.Slice, mesh *data.Mesh) float64 {
 	fftPlan.ExecAsync(fftRBufZ, fftCBufZ)
 
 	// Reconstruct full array using Hermitian symmetry F(-k_x, -k_y, -k_z) = F(k_x, k_y, k_z)^*
-	full_array_N := [3]int{2 * N[X], N[Y], N[Z]}  // 2 as real + complex part
+	full_array_N := [3]int{2 * N[X], N[Y], N[Z]} // 2 as real + complex part
 	Fx_k := NewSlice(1, full_array_N)
 	Fy_k := NewSlice(1, full_array_N)
 	Fz_k := NewSlice(1, full_array_N)

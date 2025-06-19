@@ -26,9 +26,9 @@ func SetHopfIndexDensity_SolidAngle(h, m *data.Slice, mesh *data.Mesh) {
 // See hopf-emergentmagneticfield-solidangle.cu
 func SetEmergentMagneticField_SolidAngle(F, m *data.Slice, mesh *data.Mesh) {
 	cellsize := mesh.CellSize()
-	N        := F.Size()
+	N := F.Size()
 	util.Argument(m.Size() == N)
-	cfg   := make3DConf(N)
+	cfg := make3DConf(N)
 	icycz := float32(1.0 / (cellsize[Y] * cellsize[Z]))
 	iczcx := float32(1.0 / (cellsize[Z] * cellsize[X]))
 	icxcy := float32(1.0 / (cellsize[X] * cellsize[Y]))

@@ -112,6 +112,7 @@ func setLastErr(err float64) {
 	}
 }
 
+// Set LastTorque based on largest vector in τ
 func setMaxTorque(τ *data.Slice) {
 	LastTorque = cuda.MaxVecNorm(τ)
 }

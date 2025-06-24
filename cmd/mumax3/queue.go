@@ -26,6 +26,7 @@ func RunQueue(files []string) {
 	s := NewStateTab(files)
 	s.PrintTo(os.Stdout)
 	go s.ListenAndServe(*engine.Flag_port)
+	fmt.Print("//Realtime queue overview available at http://127.0.0.1", *engine.Flag_port, "\n")
 	s.Run()
 	fmt.Println(numOK.get(), "OK, ", numFailed.get(), "failed")
 	os.Exit(int(exitStatus))

@@ -14,7 +14,7 @@ import (
 var (
 	// These flags are shared between cmd/mumax3 and Go input files.
 	Flag_cachedir    = flag.String("cache", os.TempDir(), "Kernel cache directory (empty disables caching)")
-	Flag_gpu         = flag.Int("gpu", 0, "Specify GPU")
+	Flag_gpu         = flag.Int("gpu", 0, "Specify a single GPU (use CUDA_AVAILABLE_DEVICES environment variable for advanced selection)")
 	Flag_interactive = flag.Bool("i", false, "Open interactive browser session")
 	Flag_od          = flag.String("o", "", "Override output directory")
 	Flag_port        = flag.String("http", ":35367", "Port to serve web gui")

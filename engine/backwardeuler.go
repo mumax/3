@@ -6,62 +6,98 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Implicit midpoint solver.
+// Implicit Euler solver.
 type BackwardEuler struct {
-	dy1 *data.Slice
+	D *data.Slice // Diagonal approximation of the Jacobian for Newton-Raphson
 }
 
 // Euler method, can be used as solver.Step.
+// Solution of the Newton-Raphson iterations follows the treatment in:
+//
+//	Leong, W. J., Hassan, M. A., & Yusuf, M. W. (2011).
+//	"A matrix-free quasi-Newton method for solving large-scale nonlinear systems".
+//	Computers & Mathematics with Applications, 62(5), 2354-2363.
 func (s *BackwardEuler) Step() {
-	util.AssertMsg(MaxErr > 0, "Backward euler solver requires MaxErr > 0")
+	util.AssertMsg(MaxErr > 0, "Backward Euler solver requires MaxErr > 0")
 
-	t0 := Time
+	// Determine time step
+	Dt_si = FixDt                                                                // 0 if adaptive time step. SI time otherwise
+	dt := float32(Dt_si * GammaLL)                                               // Measure for fraction of precession [rad/T] to be stepped
+	util.AssertMsg(dt > 0, "Backward Euler solver requires fixed time step > 0") // TODO: untrue, implement adaptive time stepping
+	Time += Dt_si                                                                // All calculations in backward Euler use evaluations at t0 + dt
 
-	y := M.Buffer()
+	// Backup original magnetization
+	m := M.Buffer()
+	m0 := cuda.Buffer(VECTOR, m.Size())
+	defer cuda.Recycle(m0)
+	data.Copy(m0, m)
 
-	y0 := cuda.Buffer(VECTOR, y.Size())
-	defer cuda.Recycle(y0)
-	data.Copy(y0, y)
-
-	dy0 := cuda.Buffer(VECTOR, y.Size())
-	defer cuda.Recycle(dy0)
-	if s.dy1 == nil {
-		s.dy1 = cuda.Buffer(VECTOR, y.Size())
+	// Initialise diagonal Jacobian as identity
+	if s.D == nil {
+		c := ConstVector(1, 1, 1)
+		s.D = ValueOf(c)
 	}
-	dy1 := s.dy1
 
-	Dt_si = FixDt
-	dt := float32(Dt_si * GammaLL)
-	util.AssertMsg(dt > 0, "Backward Euler solver requires fixed time step > 0")
+	// Create buffers
+	S, Ssq := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()) // Ssq is temporary buffer
+	defer cuda.Recycle(S)
+	defer cuda.Recycle(Ssq)
+	dy, dy_prev := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
+	defer cuda.Recycle(dy)
+	defer cuda.Recycle(dy_prev)
+	cuda.Zero(dy)
+	g, g_prev_neg := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
+	defer cuda.Recycle(g)
+	defer cuda.Recycle(g_prev_neg)
+	tempBuf := cuda.Buffer(3, m.Size())
+	defer cuda.Recycle(tempBuf)
 
-	// First guess
-	Time = t0 + 0.5*Dt_si // 0.5 dt makes it implicit midpoint method
+	// 1st evaluation
+	torqueFn(dy)
 
-	// With temperature, previous torque cannot be used as predictor
-	if Temp.isZero() {
-		cuda.Madd2(y, y0, dy1, 1, dt) // predictor Euler step with previous torque
+	// Iterate (quasi-Newton)
+	err := MaxErr * 2 // Make sure that at least one iteration occurs
+	N := 0
+	for err > MaxErr { // TODO: optimise loop and number of cuda calls
+		data.Copy(dy_prev, dy)
+
+		// Determine g_prev_neg = -g_k(y_i)
+		cuda.Madd3(g_prev_neg, m, m0, dy_prev, -1, 1, dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
+
+		// Determine S = s_i = -(D_i)^{-1}*g_k(y_i)
+		cuda.Div(S, g_prev_neg, s.D)
+
+		// Update magnetization estimate m_{i+1} = m_{i} + S = m_{i} - (D_i)^{-1}*g_k(y_i)
+		cuda.Add(m, m, S)
 		M.normalize()
+
+		// Determine g = g_k(y_{i+1})
+		torqueFn(dy)
+		cuda.Madd3(g, m, m0, dy, 1, -1, -dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
+
+		// Update diagonal Jacobian approximation:
+		//  D_{i+1} = D_i + prefactor*diag(S[i]*S[i])
+		//  with prefactor = (S^T*(g_now - g_prev) - s^T*D*s) / sum(S[i]^4)
+		cuda.Add(tempBuf, g, g_prev_neg)
+		prefactor := cuda.Dot(S, tempBuf)
+		cuda.Mul(tempBuf, s.D, S)
+		prefactor -= cuda.Dot(S, tempBuf)
+		cuda.Mul(Ssq, S, S)
+		cuda.Mul(tempBuf, Ssq, Ssq)
+		prefactor /= cuda.Sum(tempBuf.Comp(0)) + cuda.Sum(tempBuf.Comp(1)) + cuda.Sum(tempBuf.Comp(2))
+		cuda.Madd2(s.D, s.D, Ssq, 1, prefactor)
+
+		// Error estimate: difference between torques in this and previous Newton iteration
+		err = cuda.MaxVecDiff(dy, dy_prev) * float64(dt) // TODO: use err to avoid infinite loops
+		N += 1
 	}
-
-	torqueFn(dy0)
-	cuda.Madd2(y, y0, dy0, 1, dt) // y = y0 + dt * dy
-	M.normalize()
-
-	// One iteration
-	torqueFn(dy1)
-	cuda.Madd2(y, y0, dy1, 1, dt) // y = y0 + dt * dy1
-	M.normalize()
-
-	Time = t0 + Dt_si
-
-	err := cuda.MaxVecDiff(dy0, dy1) * float64(dt)
 
 	NSteps++
 	setLastErr(err)
-	setMaxTorque(dy1)
+	setMaxTorque(dy)
 }
 
 func (s *BackwardEuler) Free() {
-	s.dy1.Free()
-	s.dy1 = nil
+	s.D.Free()
+	s.D = nil
 }

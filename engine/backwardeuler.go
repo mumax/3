@@ -63,7 +63,8 @@ func (s *BackwardEuler) Step() {
 	// Iterate (quasi-Newton)
 	err := MaxErr * 2 // Make sure that at least one iteration occurs
 	N := 0
-	for err > MaxErr { // TODO: optimise loop and number of cuda calls
+	for err > MaxErr {
+		N += 1
 		data.Copy(dy_prev, s.dy)
 
 		// Determine g_prev_neg = -g_k(y_i)
@@ -78,11 +79,17 @@ func (s *BackwardEuler) Step() {
 
 		// Determine g = g_k(y_{i+1})
 		torqueFn(s.dy)
-		cuda.Madd3(g, m, m0, s.dy, 1, -1, -dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
+
+		// Error estimate: difference between torques in this and previous Newton iteration
+		err = cuda.MaxVecDiff(s.dy, dy_prev) * float64(dt) // TODO: use err to avoid infinite loops
+		if err <= MaxErr {
+			break
+		}
 
 		// Update diagonal Jacobian approximation:
 		//  D_{i+1} = D_i + prefactor*diag(S[i]*S[i])
 		//  with prefactor = (S^T*(g_now - g_prev) - s^T*D*s) / sum(S[i]^4)
+		cuda.Madd3(g, m, m0, s.dy, 1, -1, -dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
 		cuda.Add(tempBuf, g, g_prev_neg)
 		prefactor := cuda.Dot(S, tempBuf)
 		cuda.Mul(tempBuf, s.D, S)
@@ -91,10 +98,6 @@ func (s *BackwardEuler) Step() {
 		cuda.Mul(tempBuf, Ssq, Ssq)
 		prefactor /= cuda.Sum(tempBuf.Comp(0)) + cuda.Sum(tempBuf.Comp(1)) + cuda.Sum(tempBuf.Comp(2))
 		cuda.Madd2(s.D, s.D, Ssq, 1, prefactor)
-
-		// Error estimate: difference between torques in this and previous Newton iteration
-		err = cuda.MaxVecDiff(s.dy, dy_prev) * float64(dt) // TODO: use err to avoid infinite loops
-		N += 1
 	}
 
 	NSteps++

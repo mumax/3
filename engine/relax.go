@@ -43,7 +43,7 @@ func Relax() {
 	}()
 
 	// Set good solver for relax
-	SetSolver(BOGAKISHAMPINE)
+	SetSolver(BOGACKISHAMPINE)
 	FixDt = 0
 	Precess = false
 	relaxing = true

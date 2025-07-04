@@ -8,11 +8,12 @@ import (
 
 // Implicit Euler solver.
 type BackwardEuler struct {
-	D *data.Slice // Diagonal approximation of the Jacobian for Newton-Raphson
+	D  *data.Slice // Diagonal approximation of the Jacobian for Newton-Raphson
+	dy *data.Slice // Most recent accepted dy
 }
 
 // Euler method, can be used as solver.Step.
-// Solution of the Newton-Raphson iterations follows the treatment in:
+// Solution of the Newton-Raphson iterations follows the quasi-Newton treatment in:
 //
 //	Leong, W. J., Hassan, M. A., & Yusuf, M. W. (2011).
 //	"A matrix-free quasi-Newton method for solving large-scale nonlinear systems".
@@ -32,34 +33,35 @@ func (s *BackwardEuler) Step() {
 	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
 
-	// Initialise diagonal Jacobian as identity
-	if s.D == nil {
+	// Initialise struct attributes
+	if s.D == nil { // Diagonal Jacobian starts as identity
 		c := ConstVector(1, 1, 1)
 		s.D = ValueOf(c)
+	}
+	if s.dy == nil { // Last torque
+		s.dy = cuda.NewSlice(VECTOR, m.Size())
+		torqueFn(s.dy)
+	} else if !Temp.isZero() { // Can not re-use last torque with temperature
+		torqueFn(s.dy)
 	}
 
 	// Create buffers
 	S, Ssq := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()) // Ssq is temporary buffer
 	defer cuda.Recycle(S)
 	defer cuda.Recycle(Ssq)
-	dy, dy_prev := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
-	defer cuda.Recycle(dy)
+	dy_prev := cuda.Buffer(VECTOR, m.Size())
 	defer cuda.Recycle(dy_prev)
-	cuda.Zero(dy)
 	g, g_prev_neg := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
 	defer cuda.Recycle(g)
 	defer cuda.Recycle(g_prev_neg)
 	tempBuf := cuda.Buffer(3, m.Size())
 	defer cuda.Recycle(tempBuf)
 
-	// 1st evaluation
-	torqueFn(dy)
-
 	// Iterate (quasi-Newton)
 	err := MaxErr * 2 // Make sure that at least one iteration occurs
 	N := 0
 	for err > MaxErr { // TODO: optimise loop and number of cuda calls
-		data.Copy(dy_prev, dy)
+		data.Copy(dy_prev, s.dy)
 
 		// Determine g_prev_neg = -g_k(y_i)
 		cuda.Madd3(g_prev_neg, m, m0, dy_prev, -1, 1, dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
@@ -72,8 +74,8 @@ func (s *BackwardEuler) Step() {
 		M.normalize()
 
 		// Determine g = g_k(y_{i+1})
-		torqueFn(dy)
-		cuda.Madd3(g, m, m0, dy, 1, -1, -dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
+		torqueFn(s.dy)
+		cuda.Madd3(g, m, m0, s.dy, 1, -1, -dt) // BW Euler: g_k(m_{k+1}) = m_{k+1} - m_k - h*torqueFn(t_{k+1}, m_{k+1})
 
 		// Update diagonal Jacobian approximation:
 		//  D_{i+1} = D_i + prefactor*diag(S[i]*S[i])
@@ -88,16 +90,18 @@ func (s *BackwardEuler) Step() {
 		cuda.Madd2(s.D, s.D, Ssq, 1, prefactor)
 
 		// Error estimate: difference between torques in this and previous Newton iteration
-		err = cuda.MaxVecDiff(dy, dy_prev) * float64(dt) // TODO: use err to avoid infinite loops
+		err = cuda.MaxVecDiff(s.dy, dy_prev) * float64(dt) // TODO: use err to avoid infinite loops
 		N += 1
 	}
 
 	NSteps++
 	setLastErr(err)
-	setMaxTorque(dy)
+	setMaxTorque(s.dy)
 }
 
 func (s *BackwardEuler) Free() {
 	s.D.Free()
 	s.D = nil
+	s.dy.Free()
+	s.dy = nil
 }

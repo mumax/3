@@ -29,12 +29,13 @@ func (s *BackwardEuler) Step() {
 
 	// Backup original magnetization
 	m := M.Buffer()
-	m0 := cuda.Buffer(VECTOR, m.Size())
+	size := m.Size()
+	m0 := cuda.Buffer(VECTOR, size)
 	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
 
 	// Upon resize: remove wrongly sized D and dy
-	if s.D.Size() != m.Size() || s.dy.Size() != m.Size() {
+	if s.D.Size() != size || s.dy.Size() != size {
 		s.Free()
 	}
 
@@ -44,14 +45,14 @@ func (s *BackwardEuler) Step() {
 		s.D = ValueOf(c)
 	}
 	if s.dy == nil { // Last torque
-		s.dy = cuda.NewSlice(VECTOR, m.Size())
+		s.dy = cuda.NewSlice(VECTOR, size)
 		torqueFn(s.dy)
 	} else if !Temp.isZero() { // Can not re-use last torque with temperature
 		torqueFn(s.dy)
 	}
 
 	// Create buffers
-	S, Ssq, dy_prev, g, g_prev_neg, tempBuf := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
+	S, Ssq, dy_prev, g, g_prev_neg, tempBuf := cuda.Buffer(VECTOR, size), cuda.Buffer(VECTOR, size), cuda.Buffer(VECTOR, size), cuda.Buffer(VECTOR, size), cuda.Buffer(VECTOR, size), cuda.Buffer(VECTOR, size)
 	defer cuda.Recycle(S)          // Change of m in each Newton-Raphson (NR) iteration
 	defer cuda.Recycle(Ssq)        // Temporary buffer to avoid re-calculating S²
 	defer cuda.Recycle(dy_prev)    // Torque of previous magnetisation state (either previous Solver or NR step)

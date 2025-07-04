@@ -51,16 +51,13 @@ func (s *BackwardEuler) Step() {
 	}
 
 	// Create buffers
-	S, Ssq := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()) // Ssq is temporary buffer
-	defer cuda.Recycle(S)
-	defer cuda.Recycle(Ssq)
-	dy_prev := cuda.Buffer(VECTOR, m.Size())
-	defer cuda.Recycle(dy_prev)
-	g, g_prev_neg := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
-	defer cuda.Recycle(g)
-	defer cuda.Recycle(g_prev_neg)
-	tempBuf := cuda.Buffer(3, m.Size())
-	defer cuda.Recycle(tempBuf)
+	S, Ssq, dy_prev, g, g_prev_neg, tempBuf := cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size()), cuda.Buffer(VECTOR, m.Size())
+	defer cuda.Recycle(S)          // Change of m in each Newton-Raphson (NR) iteration
+	defer cuda.Recycle(Ssq)        // Temporary buffer to avoid re-calculating S²
+	defer cuda.Recycle(dy_prev)    // Torque of previous magnetisation state (either previous Solver or NR step)
+	defer cuda.Recycle(g)          // Function evaluated by NR
+	defer cuda.Recycle(g_prev_neg) // Value of NR function in previous NR iteration
+	defer cuda.Recycle(tempBuf)    // CUDA array used in intermediate calculation steps
 
 	// Iterate (quasi-Newton)
 	err := MaxErr * 2 // Make sure that at least one iteration occurs

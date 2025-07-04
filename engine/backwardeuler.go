@@ -33,6 +33,11 @@ func (s *BackwardEuler) Step() {
 	defer cuda.Recycle(m0)
 	data.Copy(m0, m)
 
+	// Upon resize: remove wrongly sized D and dy
+	if s.D.Size() != m.Size() || s.dy.Size() != m.Size() {
+		s.Free()
+	}
+
 	// Initialise struct attributes
 	if s.D == nil { // Diagonal Jacobian starts as identity
 		c := ConstVector(1, 1, 1)

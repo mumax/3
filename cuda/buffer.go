@@ -3,7 +3,7 @@ package cuda
 // Pool of re-usable GPU buffers.
 // Synchronization subtlety:
 // async kernel launches mean a buffer may already be recycled when still in use.
-// That should be fine since the next launch run in the same stream (0), and will
+// That should be fine since the next launch runs in the same stream (0), and will
 // effectively wait for the previous operation on the buffer.
 
 import (

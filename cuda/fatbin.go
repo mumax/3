@@ -30,7 +30,7 @@ func determineCC() int {
 	return UseCC
 }
 
-// check wheter compute capability cc works
+// check whether compute capability cc works
 func ccIsOK(cc int) (ok bool) {
 	defer func() {
 		if err := recover(); err == cu.ERROR_NO_BINARY_FOR_GPU {

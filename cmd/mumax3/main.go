@@ -70,7 +70,7 @@ func runInteractive() {
 	fmt.Println("//no input files: starting interactive session")
 	//initEngine()
 
-	// setup outut dir
+	// setup output dir
 	now := time.Now()
 	outdir := fmt.Sprintf("mumax-%v-%02d-%02d_%02dh%02d.out", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
 	engine.InitIO(outdir, outdir, *engine.Flag_forceclean)
@@ -115,10 +115,10 @@ func runScript(fname string) {
 	}
 
 	// now the parser is not used anymore so it can handle web requests
-	goServeGUI()
+	addr := goServeGUI()
 
 	if *engine.Flag_interactive {
-		openbrowser("http://127.0.0.1" + *engine.Flag_port)
+		openbrowser("http://127.0.0.1" + addr)
 	}
 
 	// start executing the tree, possibly injecting commands from web gui
@@ -130,7 +130,6 @@ func runScript(fname string) {
 }
 
 func runGoFile(fname string) {
-
 	// pass through flags
 	flags := []string{"run", fname}
 	flag.Visit(func(f *flag.Flag) {
@@ -154,7 +153,7 @@ func runGoFile(fname string) {
 	}
 }
 
-// start Gui server and return server address
+// start GUI server and return server address
 func goServeGUI() string {
 	if *engine.Flag_port == "" {
 		log.Println(`//not starting GUI (-http="")`)

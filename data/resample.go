@@ -32,7 +32,7 @@ func Resample(in *Slice, N [3]int) *Slice {
 
 // Downsample returns a slice of new size N, smaller than in.Size().
 // Averaging interpolation over the input slice.
-// in is returned untouched if the sizes are equal.
+// In is returned untouched if the sizes are equal.
 func Downsample(In [][][][]float32, N [3]int) [][][][]float32 {
 	if SizeOf(In[0]) == N {
 		return In // nothing to do

@@ -15,3 +15,13 @@ func ZeroMask(dst *data.Slice, mask LUTPtr, regions *Bytes) {
 		k_zeromask_async(dst.DevPtr(c), unsafe.Pointer(mask), regions.Ptr, N, cfg)
 	}
 }
+
+// Sets vector dst to zero where mask == 0.
+func ZeroMaskInv(dst *data.Slice, mask LUTPtr, regions *Bytes) {
+	N := dst.Len()
+	cfg := make1DConf(N)
+
+	for c := 0; c < dst.NComp(); c++ {
+		k_zeromaskinv_async(dst.DevPtr(c), unsafe.Pointer(mask), regions.Ptr, N, cfg)
+	}
+}

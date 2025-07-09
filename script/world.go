@@ -46,7 +46,7 @@ func (w *scope) Var(name string, addr interface{}, doc ...string) {
 }
 
 // Hack for fixing the closure caveat:
-// Decleare the time variable, the only variable closures close over.
+// Declare the time variable, the only variable closures close over.
 func (w *scope) TVar(name string, addr interface{}, doc ...string) {
 	w.declare(name, &TVar{newReflectLvalue(addr)}, doc...)
 }

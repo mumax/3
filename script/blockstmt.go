@@ -16,7 +16,7 @@ type BlockStmt struct {
 	Node     []ast.Node
 }
 
-// does not enter scope because it does not necessarily needs to (e.g. for, if).
+// does not enter scope because it does not necessarily need to (e.g. for, if).
 func (w *World) compileBlockStmt_noScope(n *ast.BlockStmt) *BlockStmt {
 	b := &BlockStmt{}
 	for _, s := range n.List {

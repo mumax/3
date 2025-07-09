@@ -34,7 +34,7 @@ func (i *info) Name() string { return i.name }
 func (i *info) Unit() string { return i.unit }
 func (i *info) NComp() int   { return i.nComp }
 
-// outputFunc is an outputValue implementation where a function provides the output value.
+// valueFunc is an outputValue implementation where a function provides the output value.
 // It can be scalar or vector.
 // Used internally by NewScalarValue and NewVectorValue.
 type valueFunc struct {

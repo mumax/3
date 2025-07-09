@@ -2,14 +2,15 @@ package dump
 
 import (
 	"bufio"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"hash"
 	"hash/crc64"
 	"io"
 	"math"
 	"os"
 	"unsafe"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 // Write the slice to out in binary format. Add time stamp.
@@ -32,7 +33,7 @@ func Write(out io.Writer, s *data.Slice, info data.Meta) error {
 	w.writeString("s") // time unit
 	w.writeString(info.Name)
 	w.writeString(info.Unit)
-	w.writeUInt64(4) // precission
+	w.writeUInt64(4) // precision
 
 	// return header write error before writing data
 	if w.err != nil {

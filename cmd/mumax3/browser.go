@@ -10,7 +10,7 @@ func openbrowser(url string) {
 	for _, cmd := range browsers {
 		err := exec.Command(cmd, url).Start()
 		if err == nil {
-			fmt.Println("//openend web interface in", cmd)
+			fmt.Println("//opened web interface in", cmd)
 			return
 		}
 	}

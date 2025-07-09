@@ -33,7 +33,7 @@ func init() {
 	DeclFunc("NewScalarMask", NewScalarMask, "Makes a 3D array of scalars")
 }
 
-// Returns a new new slice (3D array) with given number of components and size.
+// Returns a new slice (3D array) with given number of components and size.
 func NewSlice(ncomp, Nx, Ny, Nz int) *data.Slice {
 	return data.NewSlice(ncomp, [3]int{Nx, Ny, Nz})
 }
@@ -140,6 +140,17 @@ func Index2Coord(ix, iy, iz int) data.Vector {
 }
 
 func sign(x float64) float64 {
+	switch {
+	case x > 0:
+		return 1
+	case x < 0:
+		return -1
+	default:
+		return 0
+	}
+}
+
+func sign32(x float32) float32 {
 	switch {
 	case x > 0:
 		return 1

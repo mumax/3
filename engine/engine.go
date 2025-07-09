@@ -21,7 +21,7 @@ import (
 	"github.com/mumax/3/timer"
 )
 
-const VERSION = "mumax 3.11"
+const VERSION = "mumax 3.11.1"
 
 var UNAME = fmt.Sprintf("%s [%s_%s %s(%s) CUDA-%d.%d]",
 	VERSION, runtime.GOOS, runtime.GOARCH, runtime.Version(), runtime.Compiler,
@@ -34,7 +34,7 @@ var (
 	busy     bool // are we so busy we can't respond from run loop? (e.g. calc kernel)
 )
 
-// We set SetBusy(true) when the simulation is too busy too accept GUI input on Inject channel.
+// We set SetBusy(true) when the simulation is too busy to accept GUI input on Inject channel.
 // E.g. during kernel init.
 func SetBusy(b bool) {
 	busyLock.Lock()

@@ -110,10 +110,10 @@ type exchParam struct {
 	scale          [NREGION * (NREGION + 1) / 2]float32 // extra scale factor for lut[SymmIdx(i, j)]
 	inter          [NREGION * (NREGION + 1) / 2]float32 // extra term for lut[SymmIdx(i, j)]
 	gpu            cuda.SymmLUT                         // gpu copy of lut, lazily transferred when needed
-	gpu_ok, cpu_ok bool                                 // gpu cache up-to date with lut source
+	gpu_ok, cpu_ok bool                                 // gpu cache up-to-date with lut source
 }
 
-// to be called after Aex or scaling changed
+// to be called after Aex, Dind, Msat or scaling changed
 func (p *exchParam) invalidate() {
 	p.cpu_ok = false
 	p.gpu_ok = false
@@ -154,10 +154,11 @@ func (p *exchParam) setScale(region1, region2 int, scale float64) {
 func (p *exchParam) update() {
 	if !p.cpu_ok {
 		ex := p.parent.cpuLUT()
+		msat := Msat.cpuLUT()
 		for i := 0; i < NREGION; i++ {
-			exi := ex[0][i]
+			exi := ex[0][i] * sign32(msat[0][i])
 			for j := i; j < NREGION; j++ {
-				exj := ex[0][j]
+				exj := ex[0][j] * sign32(msat[0][j])
 				I := symmidx(i, j)
 				p.lut[I] = p.scale[I]*exchAverage(exi, exj) + p.inter[I]
 			}
@@ -168,7 +169,7 @@ func (p *exchParam) update() {
 }
 
 func (p *exchParam) upload() {
-	// alloc if  needed
+	// alloc if needed
 	if p.gpu == nil {
 		p.gpu = cuda.SymmLUT(cuda.MemAlloc(int64(len(p.lut)) * cu.SIZEOF_FLOAT32))
 	}
@@ -178,7 +179,7 @@ func (p *exchParam) upload() {
 }
 
 // Index in symmetric matrix where only one half is stored.
-// (!) Code duplicated in exchange.cu
+// (!) Code duplicated in exchange.h
 func symmidx(i, j int) int {
 	if j <= i {
 		return i*(i+1)/2 + j

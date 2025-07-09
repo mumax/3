@@ -9,13 +9,13 @@ import (
 	"github.com/mumax/3/timer"
 )
 
-// 3D single-precission real-to-complex FFT plan.
+// 3D single-precision complex-to-real FFT plan.
 type fft3DC2RPlan struct {
 	fftplan
 	size [3]int
 }
 
-// 3D single-precission real-to-complex FFT plan.
+// 3D single-precision complex-to-real FFT plan.
 func newFFT3DC2R(Nx, Ny, Nz int) fft3DC2RPlan {
 	handle := cufft.Plan3d(Nz, Ny, Nx, cufft.C2R) // new xyz swap
 	handle.SetStream(stream0)

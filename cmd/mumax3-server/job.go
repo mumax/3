@@ -10,7 +10,7 @@ import (
 	"github.com/mumax/3/util"
 )
 
-const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued to many times
+const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued too many times
 
 // compute Job
 type Job struct {

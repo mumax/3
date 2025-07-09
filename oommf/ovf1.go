@@ -37,7 +37,7 @@ func writeOVF1Data(out io.Writer, q *data.Slice, dataformat string) {
 	hdr(out, "End", "Data "+canonicalFormat)
 }
 
-// Writes the OMF header
+// Writes the OVF header
 func writeOVF1Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	gridsize := q.Size()
 	cellsize := meta.CellSize
@@ -75,7 +75,7 @@ func writeOVF1Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	hdr(out, "End", "Header")
 }
 
-// Writes data in OMF Binary 4 format
+// Writes data in OVF Binary 4 format
 func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 	data := array.Tensors()
 	gridsize := array.Size()
@@ -84,10 +84,10 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 
 	// OOMMF requires this number to be first to check the format
 	var controlnumber float32 = OVF_CONTROL_NUMBER_4
-	// Conversion form float32 [4]byte in big-endian
+	// Conversion from float32 [4]byte in big-endian
 	// Inlined for performance, terabytes of data will pass here...
 	bytes = (*[4]byte)(unsafe.Pointer(&controlnumber))[:]
-	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianess
+	bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0] // swap endianness
 	_, err = out.Write(bytes)
 
 	ncomp := array.NComp()

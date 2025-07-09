@@ -2,11 +2,12 @@ package oommf
 
 import (
 	"fmt"
-	"github.com/mumax/3/data"
 	"io"
 	"log"
 	"strings"
 	"unsafe"
+
+	"github.com/mumax/3/data"
 )
 
 func WriteOVF2(out io.Writer, q *data.Slice, meta data.Meta, dataformat string) {
@@ -148,7 +149,7 @@ func readFull(in io.Reader, buf []byte) {
 	return
 }
 
-// read float32 in machine endianess, panic on error
+// read float32 in machine endianness, panic on error
 func readFloat32(in io.Reader) float32 {
 	var bytes4 [4]byte
 	bytes := bytes4[:]
@@ -156,7 +157,7 @@ func readFloat32(in io.Reader) float32 {
 	return *((*float32)(unsafe.Pointer(&bytes4)))
 }
 
-// read float64 in machine endianess, panic on error
+// read float64 in machine endianness, panic on error
 func readFloat64(in io.Reader) float64 {
 	var bytes8 [8]byte
 	bytes := bytes8[:]

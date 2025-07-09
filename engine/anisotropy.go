@@ -113,7 +113,7 @@ func AddAnisotropyEnergyDensity(dst *data.Slice) {
 		addCubicAnisotropyFrom(buf, M, Msat, sZero, Kc2, sZero, AnisC1, AnisC2)
 		cuda.AddDotProduct(dst, -1./6., buf, Mf)
 
-		// 3nd
+		// 3rd
 		cuda.Zero(buf)
 		addCubicAnisotropyFrom(buf, M, Msat, sZero, sZero, Kc3, AnisC1, AnisC2)
 		cuda.AddDotProduct(dst, -1./8., buf, Mf)

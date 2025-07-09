@@ -101,7 +101,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 		for k := 0; k < gridsize[2]; k++ {
 			for j := 0; j < gridsize[1]; j++ {
 				for i := 0; i < gridsize[0]; i++ {
-					// if symmetric tensor manage it appart to write the full 9 components
+					// if symmetric tensor manage it separately to write the full 9 components
 					if N == 6 {
 						fmt.Fprint(out, data[0][k][j][i], " ")
 						fmt.Fprint(out, data[1][k][j][i], " ")
@@ -126,7 +126,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 		for k := 0; k < gridsize[2]; k++ {
 			for j := 0; j < gridsize[1]; j++ {
 				for i := 0; i < gridsize[0]; i++ {
-					// if symmetric tensor manage it appart to write the full 9 components
+					// if symmetric tensor manage it separately to write the full 9 components
 					if N == 6 {
 						binary.Write(buffer, binary.LittleEndian, data[0][k][j][i])
 						binary.Write(buffer, binary.LittleEndian, data[1][k][j][i])

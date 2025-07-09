@@ -69,7 +69,7 @@ func (e *E) value() interface{} {
 }
 
 // atomically set the dirty flag w/o changing value.
-// called, e.g., when a second brower window opens
+// called, e.g., when a second browser window opens
 func (e *E) setDirty() {
 	e._m.Lock()
 	defer e._m.Unlock()

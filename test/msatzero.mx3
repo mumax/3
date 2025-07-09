@@ -1,0 +1,23 @@
+/*
+    This verifies that cells with Msat=0 do not
+        - interact with neighbouring Msat≠0 cells through the exchange interaction.
+        - react to the demagnetising field of nearby magnets.
+*/
+
+Msat = 0.48e6
+Aex = 7e-12
+size := 5e-9 // Well within exchange length of 7nm
+SetGridSize(16, 32, 1)
+SetCellSize(size, size, size)
+
+// Set region with Msat=0
+DefRegion(1, XRange(0, inf))
+Msat.SetRegion(1,0)
+
+// Relax from controlled random state
+m = RandomMagSeed(3) // Set reproducible seed
+relax()
+
+// Check whether...
+ExpectV("Normal mag", m.Region(0).Average(), Vector(0,-1,0), 1e-3) // ... no exchange exists between Msat≠0 and Msat=0
+ExpectV("Random mag", m.Region(1).Average(), Vector(0,0,0),  3e-2) // ... Msat=0 cells do not experience demag

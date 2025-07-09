@@ -5,7 +5,7 @@ import (
 )
 
 // Add Zhang-Li ST torque (Tesla) to torque.
-// see zhangli.cu
+// see zhangli2.cu
 func AddZhangLiTorque(torque, m *data.Slice, Msat, J, alpha, xi, pol MSlice, mesh *data.Mesh) {
 	c := mesh.CellSize()
 	N := mesh.Size()

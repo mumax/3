@@ -155,3 +155,18 @@ select {
     display:inline; 
     margin: 0px;
 }
+
+#mumaxplusbutton {
+    float:right;
+    background:linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    margin-top:-18px;
+}
+#mumaxplusbutton:hover{
+    background:black;
+}
+#mumaxplusbutton img {
+    width:45px;
+    margin:-5px;
+    margin-left:10px;
+    float:right;
+}

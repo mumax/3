@@ -56,6 +56,9 @@ func Ellipsoid(diamx, diamy, diamz float64) Shape {
 // for consistency with other shapes, diameter (2r) is used as parameter instead of radius
 
 func Superball(diameter, p float64) Shape {
+	if p <= 0 { // Yields empty shape
+		return func(x, y, z float64) bool { return false }
+	}
 	return func(x, y, z float64) bool {
 		norm := math.Pow(math.Abs(2*x/diameter), 2*p) +
 			math.Pow(math.Abs(2*y/diameter), 2*p) +

@@ -13,6 +13,7 @@ import (
 
 func init() {
 	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
+	DeclFunc("Superball", Superball, "3D Superball with diameter in meter and shape parameter p. Interpolates between a cube (p=+∞), sphere (p=1), octahedron (p=0.5) and empty space (p≤0).")
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
 	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The base is at z=0. If the height is positive, the tip points in the +z direction.")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
@@ -41,6 +42,30 @@ type Shape func(x, y, z float64) bool
 func Ellipsoid(diamx, diamy, diamz float64) Shape {
 	return func(x, y, z float64) bool {
 		return sqr64(x/diamx)+sqr64(y/diamy)+sqr64(z/diamz) <= 0.25
+	}
+}
+
+// Superball with given diameter and shape parameter p
+// A superball is defined by the inequality:
+//
+//	|x/r|^(2p) + |y/r|^(2p) + |z/r|^(2p) ≤ 1
+//
+// where r is the radius and p controls the shape:
+//   - p > 1 gives a rounded cube
+//   - p = 1 gives a sphere
+//   - p = 0.5 gives an octahedron
+//   - p <= 0 gives empty space
+//
+// for consistency with other shapes, diameter (2r) is used as parameter instead of radius
+func Superball(diameter, p float64) Shape {
+	if p <= 0 { // Yields empty shape
+		return func(x, y, z float64) bool { return false }
+	}
+	return func(x, y, z float64) bool {
+		norm := math.Pow(math.Abs(2*x/diameter), 2*p) +
+			math.Pow(math.Abs(2*y/diameter), 2*p) +
+			math.Pow(math.Abs(2*z/diameter), 2*p)
+		return norm <= 1
 	}
 }
 

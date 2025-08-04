@@ -48,6 +48,10 @@ exchangedecode(float* __restrict__ dst, float* __restrict__ aLUT2d, uint8_t* __r
         // top neighbor
         i_  = idx(ix, iy, hclampz(iz+1));
         avg += aLUT2d[symidx(r0, regions[i_])];
+        
+        avg /= 6;
+    } else {
+        avg /= 4;
     }
 
     dst[I] = avg;

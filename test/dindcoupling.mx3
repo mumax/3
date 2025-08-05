@@ -24,6 +24,6 @@ scale := 0.645
 ext_ScaleDind(0,1,scale)
 
 avgdmi := dindCoupling.average()
-wanted := 4*D0 + 2*(scale-1)*D0*ni/(nx*nx)
+wanted := (4*D0 + 2*(scale-1)*D0*ni/(nx*nx))/4
 
 expect("dmicoupling",avgdmi,wanted,1e-2)

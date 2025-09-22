@@ -142,7 +142,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 * **Linux:** `sudo apt-get install gcc`
   * ⚠️ each CUDA version has a maximum supported `gcc` version. [This StackOverflow answer](https://stackoverflow.com/a/46380601) lists the maximum supported `gcc` version for each CUDA version. If necessary, use `sudo apt-get install gcc-<min_version>` instead, with the appropriate `<min_version>`.
 * **Windows:**
-  * CUDA does not support the `gcc` compiler on Windows, so download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the C/C++ extension pack. After installing, check if the path to `cl.exe` was added to your `PATH` environment variable. If not, add it manually, e.g. `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`.
+  * CUDA does not support the `gcc` compiler on Windows, so download and install [Visual Studio](https://visualstudio.microsoft.com/downloads/) with the "Desktop development with C++" workload.  After installing, check if the path to `cl.exe` was added to your `PATH` environment variable (i.e., check whether `where cl.exe` returns an appropriate path like `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64`). If not, add it manually.
   * To compile Go, on the other hand, `gcc` is needed. Usually this is included in the Go installation, but if not it can be downloaded and installed from [w64devkit](https://github.com/skeeto/w64devkit/releases).
 
 👉 *Check C installation with: `gcc --version` on Linux and `where.exe cl.exe` on Windows.*
@@ -158,7 +158,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 * **Linux:** `sudo apt install git`
 * [Set up your username in Git](https://docs.github.com/en/get-started/getting-started-with-git/setting-your-username-in-git) and [setup an SSH key for your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 
-👉 *Check Git installation with: `git –version`*
+👉 *Check Git installation with: `git –-version`*
 
 </details>
 

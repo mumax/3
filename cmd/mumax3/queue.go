@@ -85,7 +85,10 @@ func (s *stateTab) Run() {
 	idle, nGPU := initGPUs()
 	for {
 		gpu := <-idle
-		addr := fmt.Sprint(":", 35368+gpu)
+		addr := ""
+		if *engine.Flag_port != "" {
+			addr = fmt.Sprint(":", 35368+gpu)
+		}
 		j, ok := s.StartNext(addr)
 		if !ok {
 			break

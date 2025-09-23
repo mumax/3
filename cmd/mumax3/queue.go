@@ -7,14 +7,17 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"sync"
 	"sync/atomic"
 
 	"github.com/mumax/3/cuda/cu"
 	"github.com/mumax/3/engine"
+	"github.com/mumax/3/util"
 )
 
 var (
@@ -87,7 +90,8 @@ func (s *stateTab) Run() {
 		gpu := <-idle
 		addr := ""
 		if *engine.Flag_port != "" {
-			addr = fmt.Sprint(":", 35368+gpu)
+			_, p, _ := net.SplitHostPort(*engine.Flag_port)
+			addr = fmt.Sprint(":", atoi(p)+1+gpu) // +1 because Flag_port hosts overview of queue
 		}
 		j, ok := s.StartNext(addr)
 		if !ok {
@@ -103,6 +107,12 @@ func (s *stateTab) Run() {
 	for i := 1; i < nGPU; i++ {
 		<-idle
 	}
+}
+
+func atoi(a string) int {
+	i, err := strconv.Atoi(a)
+	util.PanicErr(err)
+	return i
 }
 
 type atom int32

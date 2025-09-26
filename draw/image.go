@@ -53,14 +53,14 @@ func parseMinMax(f *data.Slice, fmin, fmax string) (min, max float32) {
 	if fmin != "auto" {
 		m, err := strconv.ParseFloat(fmin, 32)
 		if err != nil {
-			util.Fatal("draw: scale:", err)
+			util.Fatal("draw: scale: ", err)
 		}
 		min = float32(m)
 	}
 	if fmax != "auto" {
 		m, err := strconv.ParseFloat(fmax, 32)
 		if err != nil {
-			util.Fatal("draw: scale:", err)
+			util.Fatal("draw: scale: ", err)
 		}
 		max = float32(m)
 	}

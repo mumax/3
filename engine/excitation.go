@@ -135,7 +135,7 @@ func checkNaN(s *data.Slice, name string) {
 	for _, h := range h {
 		for _, v := range h {
 			if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) {
-				util.Fatal("NaN or Inf in", name)
+				util.Fatalf("NaN or Inf in %s", name)
 			}
 		}
 	}

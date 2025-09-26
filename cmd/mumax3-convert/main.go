@@ -391,7 +391,7 @@ func parseComp(c string) int {
 	}
 	switch c {
 	default:
-		log.Fatal("illegal component:", c, "(need x, y or z)")
+		log.Fatalf("illegal component: %s (need x, y or z)", c)
 		panic(0)
 	case "x", "X":
 		return 0

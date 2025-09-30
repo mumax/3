@@ -57,7 +57,9 @@ func InitAndClose() func() {
 	inFile := util.NoExt(od)
 	InitIO(inFile, od, *Flag_forceclean)
 
-	GoServe(*Flag_port)
+	if *Flag_port != "" {
+		GoServe(*Flag_port)
+	}
 
 	return func() {
 		Close()

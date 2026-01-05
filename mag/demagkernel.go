@@ -395,9 +395,10 @@ func sanityCheck(cellsize [3]float64) {
 
 	aMax := math.Max(a1, math.Max(a2, a3))
 	aMin := math.Min(a1, math.Min(a2, a3))
+	a := math.Max(aMax, 1./aMin)
 
-	if aMax > maxAspect || aMin < 1./maxAspect {
-		util.Log(fmt.Sprintf("// Unrealistic cell aspect ratio: %v", cellsize))
+	if a > maxAspect {
+		util.Log(fmt.Sprintf("// WARNING: Unrealistic cell aspect ratio of %v (cell size %v)", a, cellsize))
 	}
 }
 

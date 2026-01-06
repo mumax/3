@@ -22,7 +22,7 @@ Contributions are gratefully accepted. To contribute code, fork our GitHub repo 
 
 Consider downloading a [pre-compiled mumax³ binary](https://mumax.github.io/download.html).
 
-If you want to compile nevertheless, 4 essential components will be required to build mumax³: an ***NVIDIA driver***, ***Go***, ***CUDA*** and ***C***.
+If you want to compile nevertheless, 4 essential components will be required to build mumax³: an ***NVIDIA driver***, ***Go***, ***CUDA*** (&leq;12.9) and ***C***.
 
 * *If they are not yet present on your system*: install them as detailed below.
 * *If they are already installed*: check if they work correctly by running the *check* for each component written below.
@@ -97,7 +97,7 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 
 </details>
 
-<details><summary><b><i>Install CUDA</i></b></summary>
+<details><summary><b><i>Install CUDA</i></b> &leq;12.9</summary>
 
 * **Windows**: Download an installer from [the CUDA website](https://developer.nvidia.com/cuda-downloads).
   * ⚠️ **To be on the safe side, it is recommended to install CUDA in a directory without spaces, like `C:\cuda`.** Spaces should not cause issues when running `deploy_windows.ps1`, but this is not guaranteed.

@@ -226,3 +226,8 @@ With these tools installed, you can build mumax³ yourself.
   If Visual Studio fails to do so automatically, you can open a new shell, manually run the `vcvars64.bat` file there (the error message should contain the path to this Batch file), and then compile mumax using that shell.
 
   </details>
+  <details><summary>Troubleshooting: Windows errors not mentioned above: &rarr;click here&larr;</summary>
+
+  If you encounter an error during compilation on Windows, other than those mentioned above, you may try to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. Sometimes this special shell solves conflicts between MSVC and CUDA, sometimes not.
+
+  </details>

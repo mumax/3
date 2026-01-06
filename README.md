@@ -97,10 +97,10 @@ Click on the arrows below to expand the installation instructions:<br><sub><sup>
 
 </details>
 
-<details><summary><b><i>Install CUDA</i></b> - ⚠️Install in a directory without spaces⚠️</summary>
+<details><summary><b><i>Install CUDA</i></b></summary>
 
 * **Windows**: Download an installer from [the CUDA website](https://developer.nvidia.com/cuda-downloads).
-  * ⚠️ **To avoid common issues, the installation directory should not contain spaces. If possible, install in `C:\cuda`.** Spaces should not cause issues when running `deploy_windows.ps1`, but this is not guaranteed.
+  * ⚠️ **To be on the safe side, it is recommended to install CUDA in a directory without spaces, like `C:\cuda`.** Spaces should not cause issues when running `deploy_windows.ps1`, but this is not guaranteed.
 * **Linux**: Use `sudo apt-get install nvidia-cuda-toolkit`, or [download an installer](https://developer.nvidia.com/cuda-downloads).
   * Pick the default installation path. **If this is not `usr/local/cuda/`, create a symlink to that path.**
   * Match the version shown in your driver (see top right in `nvidia-smi` output).

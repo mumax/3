@@ -1,7 +1,13 @@
 #! /usr/bin/gnuplot
 
-# Width for decent spacing: 100 + 10*NUM_GPU_BENCHMARKS
-set term svg size 650, 470 font "DejaVu Sans,11"
+# Determine appropriate figure width given number of GPUs
+stats "gpus.txt" using 0 nooutput
+NUM_GPU_BENCHMARKS = STATS_records
+WIDTH = 100 + 10 * NUM_GPU_BENCHMARKS # Empirically determined to look good for approx. 50 GPUs
+HEIGHT = WIDTH*0.72
+set term svg size WIDTH, HEIGHT font "DejaVu Sans,11"
+
+# Load and display data
 set output "gpus.svg"
 set encoding utf8
 set boxwidth 0.6

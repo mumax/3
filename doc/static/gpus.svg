@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"  standalone="no"?>
 
-<svg width="650" height="470" viewBox="0 0 650 470" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="680" height="489" viewBox="0 0 680 489" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
 <style type="text/css">
 	polygon {
 		transition: fill 0.3s linear;
@@ -16,7 +16,7 @@
 
 <g id="gnuplot_canvas">
 
-<rect x="0" y="0" width="650" height="470" fill="none"></rect>
+<rect x="0" y="0" width="680" height="489" fill="none"></rect>
 <defs>
 
 	<circle id="gpDot" r="0.5" stroke-width="0.5" stroke="currentColor"></circle>
@@ -47,346 +47,361 @@
 <g fill="none" color="white" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,253.68 L82.42,253.68 M626.92,253.68 L618.67,253.68  "></path>	<g transform="translate(66.48,257.26)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,273.29 L82.42,273.29 M656.92,273.29 L648.67,273.29  "></path>	<g transform="translate(66.48,276.87)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 0</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,229.96 L82.42,229.96 M626.92,229.96 L618.67,229.96  "></path>	<g transform="translate(66.48,233.54)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,247.61 L82.42,247.61 M656.92,247.61 L648.67,247.61  "></path>	<g transform="translate(66.48,251.19)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 200</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,206.24 L82.42,206.24 M626.92,206.24 L618.67,206.24  "></path>	<g transform="translate(66.48,209.82)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,221.93 L82.42,221.93 M656.92,221.93 L648.67,221.93  "></path>	<g transform="translate(66.48,225.51)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 400</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,182.53 L82.42,182.53 M626.92,182.53 L618.67,182.53  "></path>	<g transform="translate(66.48,186.11)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,196.25 L82.42,196.25 M656.92,196.25 L648.67,196.25  "></path>	<g transform="translate(66.48,199.83)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 600</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,158.81 L82.42,158.81 M626.92,158.81 L618.67,158.81  "></path>	<g transform="translate(66.48,162.39)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,170.58 L82.42,170.58 M656.92,170.58 L648.67,170.58  "></path>	<g transform="translate(66.48,174.16)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 800</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,135.09 L82.42,135.09 M626.92,135.09 L618.67,135.09  "></path>	<g transform="translate(66.48,138.67)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,144.90 L82.42,144.90 M656.92,144.90 L648.67,144.90  "></path>	<g transform="translate(66.48,148.48)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 1000</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,111.38 L82.42,111.38 M626.92,111.38 L618.67,111.38  "></path>	<g transform="translate(66.48,114.96)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,119.22 L82.42,119.22 M656.92,119.22 L648.67,119.22  "></path>	<g transform="translate(66.48,122.80)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 1200</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,87.66 L82.42,87.66 M626.92,87.66 L618.67,87.66  "></path>	<g transform="translate(66.48,91.24)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,93.54 L82.42,93.54 M656.92,93.54 L648.67,93.54  "></path>	<g transform="translate(66.48,97.12)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 1400</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,63.94 L82.42,63.94 M626.92,63.94 L618.67,63.94  "></path>	<g transform="translate(66.48,67.52)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,67.87 L82.42,67.87 M656.92,67.87 L648.67,67.87  "></path>	<g transform="translate(66.48,71.45)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 1600</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,40.23 L82.42,40.23 M626.92,40.23 L618.67,40.23  "></path>	<g transform="translate(66.48,43.81)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,42.19 L82.42,42.19 M656.92,42.19 L648.67,42.19  "></path>	<g transform="translate(66.48,45.77)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 1800</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,16.51 L82.42,16.51 M626.92,16.51 L618.67,16.51  "></path>	<g transform="translate(66.48,20.09)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
+	<path stroke="black" d="M74.17,16.51 L82.42,16.51 M656.92,16.51 L648.67,16.51  "></path>	<g transform="translate(66.48,20.09)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="end">
 		<text><tspan font-family="DejaVu Sans"> 2000</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M77.14,253.56 M77.14,16.51  "></path>	<g transform="translate(73.56,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M77.14,273.16 M77.14,16.51  "></path>	<g transform="translate(73.56,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">OOMMF (CPU)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M87.02,253.56 M87.02,16.51  "></path>	<g transform="translate(83.44,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M87.03,273.16 M87.03,16.51  "></path>	<g transform="translate(83.45,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">940MX</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M96.91,253.56 M96.91,16.51  "></path>	<g transform="translate(93.33,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M96.93,273.16 M96.93,16.51  "></path>	<g transform="translate(93.35,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">MX250</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M106.80,253.56 M106.80,16.51  "></path>	<g transform="translate(103.22,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M106.82,273.16 M106.82,16.51  "></path>	<g transform="translate(103.24,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">MX150</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M116.69,253.56 M116.69,16.51  "></path>	<g transform="translate(113.11,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M116.71,273.16 M116.71,16.51  "></path>	<g transform="translate(113.13,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 860M</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M126.58,253.56 M126.58,16.51  "></path>	<g transform="translate(123.00,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M126.61,273.16 M126.61,16.51  "></path>	<g transform="translate(123.03,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1050 (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M136.47,253.56 M136.47,16.51  "></path>	<g transform="translate(132.89,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M136.50,273.16 M136.50,16.51  "></path>	<g transform="translate(132.92,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1050Ti (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M146.35,253.56 M146.35,16.51  "></path>	<g transform="translate(142.77,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M146.40,273.16 M146.40,16.51  "></path>	<g transform="translate(142.82,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2050 (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M156.24,253.56 M156.24,16.51  "></path>	<g transform="translate(152.66,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M156.29,273.16 M156.29,16.51  "></path>	<g transform="translate(152.71,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1650 (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M166.13,253.56 M166.13,16.51  "></path>	<g transform="translate(162.55,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M166.18,273.16 M166.18,16.51  "></path>	<g transform="translate(162.60,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 970</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M176.02,253.56 M176.02,16.51  "></path>	<g transform="translate(172.44,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M176.08,273.16 M176.08,16.51  "></path>	<g transform="translate(172.50,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1060</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M185.91,253.56 M185.91,16.51  "></path>	<g transform="translate(182.33,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M185.97,273.16 M185.97,16.51  "></path>	<g transform="translate(182.39,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1060 (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M195.79,253.56 M195.79,16.51  "></path>	<g transform="translate(192.21,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M195.86,273.16 M195.86,16.51  "></path>	<g transform="translate(192.28,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 980</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M205.68,253.56 M205.68,16.51  "></path>	<g transform="translate(202.10,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M205.76,273.16 M205.76,16.51  "></path>	<g transform="translate(202.18,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Quadro M5000</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M215.57,253.56 M215.57,16.51  "></path>	<g transform="translate(211.99,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M215.65,273.16 M215.65,16.51  "></path>	<g transform="translate(212.07,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1660</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M225.46,253.56 M225.46,16.51  "></path>	<g transform="translate(221.88,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M225.55,273.16 M225.55,16.51  "></path>	<g transform="translate(221.97,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1070</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M235.35,253.56 M235.35,16.51  "></path>	<g transform="translate(231.77,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M235.44,273.16 M235.44,16.51  "></path>	<g transform="translate(231.86,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 4050 (mobile)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M245.33,273.16 M245.33,16.51  "></path>	<g transform="translate(241.75,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1080</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M245.24,253.56 M245.24,16.51  "></path>	<g transform="translate(241.66,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M255.23,273.16 M255.23,16.51  "></path>	<g transform="translate(251.65,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Tesla T4</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M255.12,253.56 M255.12,16.51  "></path>	<g transform="translate(251.54,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M265.12,273.16 M265.12,16.51  "></path>	<g transform="translate(261.54,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Tesla M40</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M265.01,253.56 M265.01,16.51  "></path>	<g transform="translate(261.43,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M275.02,273.16 M275.02,16.51  "></path>	<g transform="translate(271.44,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 980 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M274.90,253.56 M274.90,16.51  "></path>	<g transform="translate(271.32,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M284.91,273.16 M284.91,16.51  "></path>	<g transform="translate(281.33,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2000 Ada</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M284.79,253.56 M284.79,16.51  "></path>	<g transform="translate(281.21,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M294.80,273.16 M294.80,16.51  "></path>	<g transform="translate(291.22,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3050 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M294.68,253.56 M294.68,16.51  "></path>	<g transform="translate(291.10,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M304.70,273.16 M304.70,16.51  "></path>	<g transform="translate(301.12,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Quadro P5000</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M304.56,253.56 M304.56,16.51  "></path>	<g transform="translate(300.98,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M314.59,273.16 M314.59,16.51  "></path>	<g transform="translate(311.01,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Tesla P40</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M314.45,253.56 M314.45,16.51  "></path>	<g transform="translate(310.87,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M324.49,273.16 M324.49,16.51  "></path>	<g transform="translate(320.91,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1660 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M324.34,253.56 M324.34,16.51  "></path>	<g transform="translate(320.76,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M334.38,273.16 M334.38,16.51  "></path>	<g transform="translate(330.80,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX TITAN X (Pascal)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M334.23,253.56 M334.23,16.51  "></path>	<g transform="translate(330.65,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M344.27,273.16 M344.27,16.51  "></path>	<g transform="translate(340.69,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX 1080 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M344.12,253.56 M344.12,16.51  "></path>	<g transform="translate(340.54,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M354.17,273.16 M354.17,16.51  "></path>	<g transform="translate(350.59,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2060</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M354.01,253.56 M354.01,16.51  "></path>	<g transform="translate(350.43,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M364.06,273.16 M364.06,16.51  "></path>	<g transform="translate(360.48,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2070</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M363.89,253.56 M363.89,16.51  "></path>	<g transform="translate(360.31,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M373.95,273.16 M373.95,16.51  "></path>	<g transform="translate(370.37,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 4060 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M373.78,253.56 M373.78,16.51  "></path>	<g transform="translate(370.20,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M383.85,273.16 M383.85,16.51  "></path>	<g transform="translate(380.27,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX A4000 (ECC On)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M383.67,253.56 M383.67,16.51  "></path>	<g transform="translate(380.09,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M393.74,273.16 M393.74,16.51  "></path>	<g transform="translate(390.16,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">GTX TITAN Xp</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M393.56,253.56 M393.56,16.51  "></path>	<g transform="translate(389.98,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M403.64,273.16 M403.64,16.51  "></path>	<g transform="translate(400.06,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Tesla P100</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M403.45,253.56 M403.45,16.51  "></path>	<g transform="translate(399.87,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M413.53,273.16 M413.53,16.51  "></path>	<g transform="translate(409.95,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2060 SUPER</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M413.34,253.56 M413.34,16.51  "></path>	<g transform="translate(409.76,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M423.42,273.16 M423.42,16.51  "></path>	<g transform="translate(419.84,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2080</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M423.22,253.56 M423.22,16.51  "></path>	<g transform="translate(419.64,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M433.32,273.16 M433.32,16.51  "></path>	<g transform="translate(429.74,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">Tesla P100 SXM2</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M433.11,253.56 M433.11,16.51  "></path>	<g transform="translate(429.53,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M443.21,273.16 M443.21,16.51  "></path>	<g transform="translate(439.63,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3080 (mobile)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M443.00,253.56 M443.00,16.51  "></path>	<g transform="translate(439.42,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M453.11,273.16 M453.11,16.51  "></path>	<g transform="translate(449.53,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2080 SUPER</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M452.89,253.56 M452.89,16.51  "></path>	<g transform="translate(449.31,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M463.00,273.16 M463.00,16.51  "></path>	<g transform="translate(459.42,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2080 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M462.78,253.56 M462.78,16.51  "></path>	<g transform="translate(459.20,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M472.89,273.16 M472.89,16.51  "></path>	<g transform="translate(469.31,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3060 Ti</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M472.66,253.56 M472.66,16.51  "></path>	<g transform="translate(469.08,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M482.79,273.16 M482.79,16.51  "></path>	<g transform="translate(479.21,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">TITAN V</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M482.55,253.56 M482.55,16.51  "></path>	<g transform="translate(478.97,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M492.68,273.16 M492.68,16.51  "></path>	<g transform="translate(489.10,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 4070</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M492.44,253.56 M492.44,16.51  "></path>	<g transform="translate(488.86,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M502.58,273.16 M502.58,16.51  "></path>	<g transform="translate(499.00,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 2080 Ti OC</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M502.33,253.56 M502.33,16.51  "></path>	<g transform="translate(498.75,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M512.47,273.16 M512.47,16.51  "></path>	<g transform="translate(508.89,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">TITAN RTX</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M512.22,253.56 M512.22,16.51  "></path>	<g transform="translate(508.64,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M522.36,273.16 M522.36,16.51  "></path>	<g transform="translate(518.78,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3070 Ti Lite Hash Rate</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M522.11,253.56 M522.11,16.51  "></path>	<g transform="translate(518.53,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M532.26,273.16 M532.26,16.51  "></path>	<g transform="translate(528.68,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX A6000 (ECC On)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M531.99,253.56 M531.99,16.51  "></path>	<g transform="translate(528.41,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M542.15,273.16 M542.15,16.51  "></path>	<g transform="translate(538.57,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">A40</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M541.88,253.56 M541.88,16.51  "></path>	<g transform="translate(538.30,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M552.04,273.16 M552.04,16.51  "></path>	<g transform="translate(548.46,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">V100-SXM2-32GB</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M551.77,253.56 M551.77,16.51  "></path>	<g transform="translate(548.19,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M561.94,273.16 M561.94,16.51  "></path>	<g transform="translate(558.36,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3080</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M561.66,253.56 M561.66,16.51  "></path>	<g transform="translate(558.08,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M571.83,273.16 M571.83,16.51  "></path>	<g transform="translate(568.25,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX A6000 (ECC Off)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M571.55,253.56 M571.55,16.51  "></path>	<g transform="translate(567.97,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M581.73,273.16 M581.73,16.51  "></path>	<g transform="translate(578.15,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3080 (12Gb)</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M581.43,253.56 M581.43,16.51  "></path>	<g transform="translate(577.85,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M591.62,273.16 M591.62,16.51  "></path>	<g transform="translate(588.04,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 5070 Ti</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M601.51,273.16 M601.51,16.51  "></path>	<g transform="translate(597.93,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 3090</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M591.32,253.56 M591.32,16.51  "></path>	<g transform="translate(587.74,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M611.41,273.16 M611.41,16.51  "></path>	<g transform="translate(607.83,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+		<text><tspan font-family="DejaVu Sans">RTX 5080</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
+	<path stroke="black" d="M621.30,273.16 M621.30,16.51  "></path>	<g transform="translate(617.72,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">A100</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M601.21,253.56 M601.21,16.51  "></path>	<g transform="translate(597.63,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M631.20,273.16 M631.20,16.51  "></path>	<g transform="translate(627.62,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 4090</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M611.10,253.56 M611.10,16.51  "></path>	<g transform="translate(607.52,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M641.09,273.16 M641.09,16.51  "></path>	<g transform="translate(637.51,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">RTX 5090</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M620.99,253.56 M620.99,16.51  "></path>	<g transform="translate(617.41,261.25) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
+	<path stroke="black" d="M650.98,273.16 M650.98,16.51  "></path>	<g transform="translate(647.40,280.85) rotate(90)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="start">
 		<text><tspan font-family="DejaVu Sans">H100</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,16.51 L74.17,253.56 L626.92,253.56 L626.92,16.51 L74.17,16.51 Z  "></path></g>
+	<path stroke="black" d="M74.17,16.51 L74.17,273.16 L656.92,273.16 L656.92,16.51 L74.17,16.51 Z  "></path></g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<g transform="translate(17.58,135.04) rotate(270)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="middle">
+	<g transform="translate(17.58,144.84) rotate(270)" stroke="none" fill="black" font-family="DejaVu Sans" font-size="11.00" text-anchor="middle">
 		<text><tspan font-family="DejaVu Sans">throughput (M cells/s)</tspan></text>
 	</g>
 </g>
@@ -395,68 +410,71 @@
 	<g id="gnuplot_plot_1"><title> </title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g stroke="none" shape-rendering="crispEdges">
-		<polygon fill="rgb(148,   0, 211)" points="84.06,253.56 90.00,253.56 90.00,250.52 84.06,250.52 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="93.95,253.56 99.89,253.56 99.89,249.53 93.95,249.53 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="103.83,253.56 109.78,253.56 109.78,249.52 103.83,249.52 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="113.72,253.56 119.67,253.56 119.67,247.11 113.72,247.11 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="123.61,253.56 129.55,253.56 129.55,245.06 123.61,245.06 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="133.50,253.56 139.44,253.56 139.44,243.95 133.50,243.95 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="143.39,253.56 149.33,253.56 149.33,243.60 143.39,243.60 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="153.28,253.56 159.22,253.56 159.22,242.10 153.28,242.10 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="163.16,253.56 169.11,253.56 169.11,239.37 163.16,239.37 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="173.05,253.56 178.99,253.56 178.99,238.49 173.05,238.49 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="182.94,253.56 188.88,253.56 188.88,238.46 182.94,238.46 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="192.83,253.56 198.77,253.56 198.77,237.99 192.83,237.99 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="202.72,253.56 208.66,253.56 208.66,236.81 202.72,236.81 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="212.60,253.56 218.55,253.56 218.55,234.21 212.60,234.21 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="222.49,253.56 228.44,253.56 228.44,233.47 222.49,233.47 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="232.38,253.56 238.32,253.56 238.32,231.18 232.38,231.18 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="242.27,253.56 248.21,253.56 248.21,231.09 242.27,231.09 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="252.16,253.56 258.10,253.56 258.10,230.25 252.16,230.25 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="262.05,253.56 267.99,253.56 267.99,230.00 262.05,230.00 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="271.93,253.56 277.88,253.56 277.88,229.47 271.93,229.47 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="281.82,253.56 287.76,253.56 287.76,229.20 281.82,229.20 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="291.71,253.56 297.65,253.56 297.65,229.42 291.71,229.42 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="301.60,253.56 307.54,253.56 307.54,225.27 301.60,225.27 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="311.49,253.56 317.43,253.56 317.43,224.32 311.49,224.32 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="321.37,253.56 327.32,253.56 327.32,221.08 321.37,221.08 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="331.26,253.56 337.21,253.56 337.21,221.04 331.26,221.04 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="341.15,253.56 347.09,253.56 347.09,219.91 341.15,219.91 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="351.04,253.56 356.98,253.56 356.98,218.36 351.04,218.36 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="360.93,253.56 366.87,253.56 366.87,218.11 360.93,218.11 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="370.82,253.56 376.76,253.56 376.76,215.36 370.82,215.36 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="380.70,253.56 386.65,253.56 386.65,213.19 380.70,213.19 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="390.59,253.56 396.54,253.56 396.54,210.74 390.59,210.74 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="400.48,253.56 406.42,253.56 406.42,209.61 400.48,209.61 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="410.37,253.56 416.31,253.56 416.31,208.63 410.37,208.63 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="420.26,253.56 426.20,253.56 426.20,206.38 420.26,206.38 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="430.14,253.56 436.09,253.56 436.09,206.14 430.14,206.14 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="440.03,253.56 445.98,253.56 445.98,203.33 440.03,203.33 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="449.92,253.56 455.86,253.56 455.86,202.87 449.92,202.87 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="459.81,253.56 465.75,253.56 465.75,202.04 459.81,202.04 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="469.70,253.56 475.64,253.56 475.64,198.08 469.70,198.08 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="479.59,253.56 485.53,253.56 485.53,194.52 479.59,194.52 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="489.47,253.56 495.42,253.56 495.42,193.52 489.47,193.52 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="499.36,253.56 505.31,253.56 505.31,190.87 499.36,190.87 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="509.25,253.56 515.19,253.56 515.19,188.80 509.25,188.80 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="519.14,253.56 525.08,253.56 525.08,187.48 519.14,187.48 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="529.03,253.56 534.97,253.56 534.97,185.53 529.03,185.53 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="538.92,253.56 544.86,253.56 544.86,181.11 538.92,181.11 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="548.80,253.56 554.75,253.56 554.75,172.10 548.80,172.10 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="558.69,253.56 564.63,253.56 564.63,169.73 558.69,169.73 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="568.58,253.56 574.52,253.56 574.52,164.05 568.58,164.05 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="578.47,253.56 584.41,253.56 584.41,154.54 578.47,154.54 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="588.36,253.56 594.30,253.56 594.30,140.84 588.36,140.84 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="598.24,253.56 604.19,253.56 604.19,108.05 598.24,108.05 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="608.13,253.56 614.08,253.56 614.08,26.34 608.13,26.34 "></polygon>
-		<polygon fill="rgb(148,   0, 211)" points="618.02,253.56 623.96,253.56 623.96,18.87 618.02,18.87 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="84.06,273.16 90.01,273.16 90.01,269.87 84.06,269.87 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="93.96,273.16 99.90,273.16 99.90,268.80 93.96,268.80 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="103.85,273.16 109.80,273.16 109.80,268.79 103.85,268.79 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="113.75,273.16 119.69,273.16 119.69,266.18 113.75,266.18 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="123.64,273.16 129.59,273.16 129.59,263.96 123.64,263.96 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="133.53,273.16 139.48,273.16 139.48,262.76 133.53,262.76 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="143.43,273.16 149.37,273.16 149.37,262.38 143.43,262.38 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="153.32,273.16 159.27,273.16 159.27,260.76 153.32,260.76 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="163.21,273.16 169.16,273.16 169.16,257.80 163.21,257.80 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="173.11,273.16 179.06,273.16 179.06,256.84 173.11,256.84 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="183.00,273.16 188.95,273.16 188.95,256.81 183.00,256.81 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="192.90,273.16 198.84,273.16 198.84,256.30 192.90,256.30 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="202.79,273.16 208.74,273.16 208.74,255.03 202.79,255.03 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="212.68,273.16 218.63,273.16 218.63,252.21 212.68,252.21 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="222.58,273.16 228.52,273.16 228.52,251.41 222.58,251.41 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="232.47,273.16 238.42,273.16 238.42,250.69 232.47,250.69 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="242.37,273.16 248.31,273.16 248.31,248.93 242.37,248.93 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="252.26,273.16 258.21,273.16 258.21,248.84 252.26,248.84 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="262.15,273.16 268.10,273.16 268.10,247.92 262.15,247.92 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="272.05,273.16 277.99,273.16 277.99,247.65 272.05,247.65 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="281.94,273.16 287.89,273.16 287.89,247.08 281.94,247.08 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="291.84,273.16 297.78,273.16 297.78,246.79 291.84,246.79 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="301.73,273.16 307.68,273.16 307.68,247.03 301.73,247.03 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="311.62,273.16 317.57,273.16 317.57,242.54 311.62,242.54 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="321.52,273.16 327.46,273.16 327.46,241.51 321.52,241.51 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="331.41,273.16 337.36,273.16 337.36,238.00 331.41,238.00 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="341.30,273.16 347.25,273.16 347.25,237.95 341.30,237.95 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="351.20,273.16 357.15,273.16 357.15,236.73 351.20,236.73 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="361.09,273.16 367.04,273.16 367.04,235.05 361.09,235.05 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="370.99,273.16 376.93,273.16 376.93,234.78 370.99,234.78 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="380.88,273.16 386.83,273.16 386.83,231.81 380.88,231.81 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="390.77,273.16 396.72,273.16 396.72,229.45 390.77,229.45 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="400.67,273.16 406.61,273.16 406.61,226.80 400.67,226.80 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="410.56,273.16 416.51,273.16 416.51,225.58 410.56,225.58 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="420.46,273.16 426.40,273.16 426.40,224.51 420.46,224.51 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="430.35,273.16 436.30,273.16 436.30,222.08 430.35,222.08 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="440.24,273.16 446.19,273.16 446.19,221.82 440.24,221.82 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="450.14,273.16 456.08,273.16 456.08,218.78 450.14,218.78 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="460.03,273.16 465.98,273.16 465.98,218.28 460.03,218.28 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="469.93,273.16 475.87,273.16 475.87,217.39 469.93,217.39 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="479.82,273.16 485.77,273.16 485.77,213.09 479.82,213.09 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="489.71,273.16 495.66,273.16 495.66,209.24 489.71,209.24 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="499.61,273.16 505.55,273.16 505.55,208.16 499.61,208.16 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="509.50,273.16 515.45,273.16 515.45,205.29 509.50,205.29 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="519.39,273.16 525.34,273.16 525.34,203.05 519.39,203.05 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="529.29,273.16 535.24,273.16 535.24,201.62 529.29,201.62 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="539.18,273.16 545.13,273.16 545.13,199.51 539.18,199.51 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="549.08,273.16 555.02,273.16 555.02,194.72 549.08,194.72 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="558.97,273.16 564.92,273.16 564.92,184.96 558.97,184.96 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="568.86,273.16 574.81,273.16 574.81,182.40 568.86,182.40 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="578.76,273.16 584.70,273.16 584.70,176.25 578.76,176.25 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="588.65,273.16 594.60,273.16 594.60,173.66 588.65,173.66 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="598.55,273.16 604.49,273.16 604.49,165.95 598.55,165.95 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="608.44,273.16 614.39,273.16 614.39,154.37 608.44,154.37 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="618.33,273.16 624.28,273.16 624.28,151.12 618.33,151.12 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="628.23,273.16 634.17,273.16 634.17,115.62 628.23,115.62 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="638.12,273.16 644.07,273.16 644.07,27.15 638.12,27.15 "></polygon>
+		<polygon fill="rgb(148,   0, 211)" points="648.02,273.16 653.96,273.16 653.96,19.06 648.02,19.06 "></polygon>
 	</g>
 </g>
 	</g>
 	<g id="gnuplot_plot_2"><title>"oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF (CPU)")</title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g stroke="none" shape-rendering="crispEdges">
-		<polygon fill="rgb(  0, 158, 115)" points="74.17,253.56 80.11,253.56 80.11,253.50 74.17,253.50 "></polygon>
+		<polygon fill="rgb(  0, 158, 115)" points="74.17,273.16 80.12,273.16 80.12,273.09 74.17,273.09 "></polygon>
 	</g>
 </g>
 	</g>
@@ -467,7 +485,7 @@
 <g fill="none" color="black" stroke="black" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke="black" d="M74.17,16.51 L74.17,253.56 L626.92,253.56 L626.92,16.51 L74.17,16.51 Z  "></path></g>
+	<path stroke="black" d="M74.17,16.51 L74.17,273.16 L656.92,273.16 L656.92,16.51 L74.17,16.51 Z  "></path></g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 </g>

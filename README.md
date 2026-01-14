@@ -207,11 +207,11 @@ With these tools installed, you can build mumax³ yourself.
 
 * *Check installation with: `which mumax3` on **Linux** or `where.exe mumax3.exe` on **Windows**, followed by `mumax3 -test`.* <details><summary>Troubleshooting: `cuda.h` or `curand.h` not found: &rarr;click here&larr;</summary>
   This usually means that the `CGO_CFLAGS` and `CGO_LDFLAGS` environment variables are not found or point to the wrong path. To fix this, either define them in the script you are using to build mumax³, or define them in the terminal before running the script.
-  * On **Windows:** say your CUDA is installed in `%CUDA_PATH%` (e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`), then run these two lines in Powershell before running `deploy_windows.ps1`:
+  * On **Windows:** set the environment variable `CUDA_PATH` to point to your CUDA folder (e.g. `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9`), then run these two lines in Powershell before running `deploy_windows.ps1`:
 
     ```powershell
-    $env:CGO_CFLAGS = '-I "%CUDA_PATH%\include"'
-    $env:CGO_LDFLAGS = '-L "%CUDA_PATH%\lib\x64"'
+    $env:CGO_CFLAGS = "-I `"$($env:CUDA_PATH)\include`""
+    $env:CGO_LDFLAGS = "-L `"$($env:CUDA_PATH)\lib\x64`""
     ```
 
   </details>

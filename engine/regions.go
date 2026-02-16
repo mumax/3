@@ -164,7 +164,7 @@ func (r *Regions) LoadFile(fname string) {
 		for iy := 0; iy < n[Y]; iy++ {
 			for ix := 0; ix < n[X]; ix++ {
 				val := inArr[iz][iy][ix]
-				if val < 0 || val > 256 {
+				if val < 0 || val >= NREGION {
 					util.Fatal("regions.LoadFile(", fname, "): all values should be between 0 & 256, have: ", val)
 				}
 				arr[iz][iy][ix] = byte(val)
@@ -198,7 +198,7 @@ func (r *Regions) GetCell(ix, iy, iz int) int {
 }
 
 func defRegionId(id int) {
-	if id < 0 || id > NREGION {
+	if id < 0 || id >= NREGION {
 		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
 	}
 	checkMesh()

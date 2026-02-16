@@ -16,8 +16,6 @@ func init() {
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
 	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region (first argument) in one cell "+
 		"by the index of the cell (last three arguments)")
-	DeclFunc("Region2Shape", Region2Shape, "Shape containing all cells belonging to the given region")
-	DeclFunc("AllRegionShapes", AllRegionShapes, "Returns a function that gives the shape of each region")
 }
 
 // stores the region index for each cell
@@ -316,24 +314,4 @@ func (r *Regions) Mesh() *data.Mesh { return Mesh() }
 
 func prod(s [3]int) int {
 	return s[0] * s[1] * s[2]
-}
-
-func Region2Shape(region int) Shape {
-	defRegionId(region)
-
-	return func(x, y, z float64) bool {
-		R := data.Vector{x, y, z}
-		return regions.get(R) == region
-	}
-}
-
-func AllRegionShapes() func(int) Shape {
-	return func(region int) Shape {
-		defRegionId(region)
-
-		return func(x, y, z float64) bool {
-			R := data.Vector{x, y, z}
-			return regions.get(R) == region
-		}
-	}
 }

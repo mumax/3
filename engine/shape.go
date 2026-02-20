@@ -13,9 +13,11 @@ import (
 
 func init() {
 	DeclFunc("Ellipsoid", Ellipsoid, "3D Ellipsoid with axes in meter")
-	DeclFunc("Superball", Superball, "3D Superball with diameter in meter and shape parameter p. Interpolates between a cube (p=+∞), sphere (p=1), octahedron (p=0.5) and empty space (p≤0).")
+	DeclFunc("Superball", Superball, "3D Superball with diameter in meter and shape parameter p."+
+		"<br>Interpolates between a cube (p=+∞), sphere (p=1), octahedron (p=0.5) and empty space (p≤0).")
 	DeclFunc("Ellipse", Ellipse, "2D Ellipse with axes in meter")
-	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The base is at z=0. If the height is positive, the tip points in the +z direction.")
+	DeclFunc("Cone", Cone, "3D Cone with diameter and height in meter. The base is at z=0."+
+		"<br>If the height is positive, the tip points in the +z direction.")
 	DeclFunc("Cylinder", Cylinder, "3D Cylinder with diameter and height in meter")
 	DeclFunc("Circle", Circle, "2D Circle with diameter in meter")
 	DeclFunc("Cuboid", Cuboid, "Cuboid with sides in meter")

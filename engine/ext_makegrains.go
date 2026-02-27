@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	DeclFunc("ext_makegrains", Voronoi, "Voronoi tesselation (grain size, num regions)")
+	DeclFunc("ext_makegrains", Voronoi, "Voronoi tesselation (grain size, num regions, seed)")
 }
 
 func Voronoi(grainsize float64, numRegions, seed int) {

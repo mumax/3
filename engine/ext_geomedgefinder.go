@@ -1,6 +1,10 @@
 package engine
 
-import "github.com/mumax/3/cuda"
+import (
+	"math"
+
+	"github.com/mumax/3/cuda"
+)
 
 func init() {
 	DeclFunc("GeometryEdgePlusX", GeometryEdgePlusX, "Returns the +X edge of the geometry as a Shape")
@@ -10,8 +14,6 @@ func init() {
 	DeclFunc("GeometryEdgePlusZ", GeometryEdgePlusZ, "Returns the +Z edge of the geometry as a Shape")
 	DeclFunc("GeometryEdgeMinusZ", GeometryEdgeMinusZ, "Returns the -Z edge of the geometry as a Shape")
 }
-
-// Each of these calls GeometryEdges once and returns the corresponding Shape
 
 func GeometryEdgePlusX() Shape {
 	plusX, _, _, _, _, _ := GeometryEdges()
@@ -44,49 +46,59 @@ func GeometryEdgeMinusZ() Shape {
 }
 
 func GeometryEdges() (plusX, minusX, plusY, minusY, plusZ, minusZ Shape) {
-	// Get GPU slice
-	slice, recycle := geometry.Slice()
-	if recycle {
-		defer cuda.Recycle(slice)
+
+	s, r := geometry.Slice()
+	if r {
+		defer cuda.Recycle(s)
 	}
 
-	// Single CPU copy
-	host := slice.HostCopy()
-	arr3d := host.Scalars() // [Nz][Ny][Nx]
+	arr3d := s.HostCopy().Scalars()
 
-	n := geometry.Mesh().Size()
+	n := Mesh().Size()
 	Nx, Ny, Nz := n[X], n[Y], n[Z]
 
-	// Preallocate all 6 edge masks
 	edgeMasks := make([][]bool, 6)
 	for i := range edgeMasks {
 		edgeMasks[i] = make([]bool, Nx*Ny*Nz)
 	}
 
-	// Directions as dx, dy, dz
-	directions := [6][3]int{
-		{1, 0, 0},  // +X
-		{-1, 0, 0}, // -X
-		{0, 1, 0},  // +Y
-		{0, -1, 0}, // -Y
-		{0, 0, 1},  // +Z
-		{0, 0, -1}, // -Z
-	}
-
-	// Compute all edge masks
-	for iz := 0; iz < Nz; iz++ {
-		for iy := 0; iy < Ny; iy++ {
-			for ix := 0; ix < Nx; ix++ {
-				if arr3d[iz][iy][ix] == 0 {
-					continue // skip empty
+	for k := 0; k < Nz; k++ {
+		for j := 0; j < Ny; j++ {
+			for i := 0; i < Nx; i++ {
+				if arr3d[k][j][i] == 0 {
+					continue
 				}
 
-				for dirIdx, dir := range directions {
-					nx, ny, nz := ix+dir[0], iy+dir[1], iz+dir[2]
-					if nx < 0 || nx >= Nx || ny < 0 || ny >= Ny || nz < 0 || nz >= Nz || arr3d[nz][ny][nx] == 0 {
-						edgeMasks[dirIdx][(iz*Ny+iy)*Nx+ix] = true
-					}
+				neighborX, neighborY, neighborZ := i+1, j, k
+				if neighborX < 0 || neighborX >= Nx || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[0][(k*Ny+j)*Nx+i] = true
 				}
+
+				neighborX, neighborY, neighborZ = i-1, j, k
+				if neighborX < 0 || neighborX >= Nx || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[1][(k*Ny+j)*Nx+i] = true
+				}
+
+				neighborX, neighborY, neighborZ = i, j+1, k
+				if neighborY < 0 || neighborY >= Ny || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[2][(k*Ny+j)*Nx+i] = true
+				}
+
+				neighborX, neighborY, neighborZ = i, j-1, k
+				if neighborY < 0 || neighborY >= Ny || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[3][(k*Ny+j)*Nx+i] = true
+				}
+
+				neighborX, neighborY, neighborZ = i, j, k+1
+				if neighborZ < 0 || neighborZ >= Nz || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[4][(k*Ny+j)*Nx+i] = true
+				}
+
+				neighborX, neighborY, neighborZ = i, j, k-1
+				if neighborZ < 0 || neighborZ >= Nz || arr3d[neighborZ][neighborY][neighborX] == 0 {
+					edgeMasks[5][(k*Ny+j)*Nx+i] = true
+				}
+
 			}
 		}
 	}
@@ -96,17 +108,17 @@ func GeometryEdges() (plusX, minusX, plusY, minusY, plusZ, minusZ Shape) {
 		maskToShape(edgeMasks[4], Nx, Ny, Nz), maskToShape(edgeMasks[5], Nx, Ny, Nz)
 }
 
-// Helper to wrap mask into a Shape
+// Helper function to wrap bool mask into a Shape
 func maskToShape(mask []bool, Nx, Ny, Nz int) Shape {
 	return func(x, y, z float64) bool {
-		d := geometry.Mesh().CellSize()
+		d := Mesh().CellSize()
 		Lx := float64(Nx) * d[X]
 		Ly := float64(Ny) * d[Y]
 		Lz := float64(Nz) * d[Z]
 
-		ix := int((x + 0.5*Lx) / d[X])
-		iy := int((y + 0.5*Ly) / d[Y])
-		iz := int((z + 0.5*Lz) / d[Z])
+		ix := int(math.Floor((x + 0.5*Lx) / d[X]))
+		iy := int(math.Floor((y + 0.5*Ly) / d[Y]))
+		iz := int(math.Floor((z + 0.5*Lz) / d[Z]))
 
 		if ix < 0 || ix >= Nx || iy < 0 || iy >= Ny || iz < 0 || iz >= Nz {
 			return false

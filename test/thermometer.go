@@ -1,5 +1,4 @@
 //go:build ignore
-// +build ignore
 
 /*
 Checks if the measured temperature in a ferromagnetic PMA film is equal to the input temperature.

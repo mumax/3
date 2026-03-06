@@ -1,5 +1,4 @@
 //go:build ignore
-// +build ignore
 
 // This program generates Go wrappers for cuda sources.
 // The cuda file should contain exactly one __global__ void.

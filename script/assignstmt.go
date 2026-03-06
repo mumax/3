@@ -54,7 +54,7 @@ type assignStmt struct {
 	void
 }
 
-func (a *assignStmt) Eval() interface{} {
+func (a *assignStmt) Eval() any {
 	a.lhs.SetValue(a.rhs.Eval())
 	return nil
 }

@@ -168,7 +168,7 @@ func BenchmarkEval2_native(bench *testing.B) {
 
 type T struct {
 	in  string
-	out interface{}
+	out any
 }
 
 func TestMany(test *testing.T) {

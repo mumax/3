@@ -41,13 +41,13 @@ func (w *scope) init() {
 //	var x = 3.14
 //	world.Var("x", &x)
 //	world.MustEval("x") // returns 3.14
-func (w *scope) Var(name string, addr interface{}, doc ...string) {
+func (w *scope) Var(name string, addr any, doc ...string) {
 	w.declare(name, newReflectLvalue(addr), doc...)
 }
 
 // Hack for fixing the closure caveat:
 // Declare the time variable, the only variable closures close over.
-func (w *scope) TVar(name string, addr interface{}, doc ...string) {
+func (w *scope) TVar(name string, addr any, doc ...string) {
 	w.declare(name, &TVar{newReflectLvalue(addr)}, doc...)
 }
 
@@ -57,12 +57,12 @@ func (w *scope) TVar(name string, addr interface{}, doc ...string) {
 //	world.ROnly("x", &x)
 //	world.MustEval("x")   // returns 3.14
 //	world.MustExec("x=2") // fails: cannot assign to x
-func (w *scope) ROnly(name string, addr interface{}, doc ...string) {
+func (w *scope) ROnly(name string, addr any, doc ...string) {
 	w.declare(name, newReflectROnly(addr), doc...)
 }
 
 // adds a constant. Cannot be changed in any way.
-func (w *scope) Const(name string, val interface{}, doc ...string) {
+func (w *scope) Const(name string, val any, doc ...string) {
 	switch v := val.(type) {
 	default:
 		panic(fmt.Errorf("const of type %v not handled", typ(v))) // todo: const using reflection
@@ -83,7 +83,7 @@ func (w *scope) LValue(name string, v LValue, doc ...string) {
 //
 //	world.Func("sin", math.Sin)
 //	world.MustEval("sin(0)") // returns 0
-func (w *scope) Func(name string, f interface{}, doc ...string) {
+func (w *scope) Func(name string, f any, doc ...string) {
 	w.declare(name, newFunction(f), doc...)
 }
 

@@ -27,7 +27,7 @@ func Eval(code string) {
 	tree.Eval()
 }
 
-func Eval1Line(code string) interface{} {
+func Eval1Line(code string) any {
 	tree, err := World.Compile(code)
 	if err != nil {
 		LogErr(err.Error())
@@ -44,7 +44,7 @@ func Eval1Line(code string) interface{} {
 var World = script.NewWorld()
 
 // Add a function to the script world
-func DeclFunc(name string, f interface{}, doc string) {
+func DeclFunc(name string, f any, doc string) {
 	World.Func(name, f, doc)
 }
 
@@ -55,7 +55,7 @@ func DeclConst(name string, value float64, doc string) {
 
 // Add a read-only variable to the script world.
 // It can be changed, but not by the user.
-func DeclROnly(name string, value interface{}, doc string) {
+func DeclROnly(name string, value any, doc string) {
 	World.ROnly(name, value, doc)
 	GUIAdd(name, value)
 }
@@ -68,14 +68,14 @@ func Export(q interface {
 }
 
 // Add a (pointer to) variable to the script world
-func DeclVar(name string, value interface{}, doc string) {
+func DeclVar(name string, value any, doc string) {
 	World.Var(name, value, doc)
 	GUIAdd(name, value)
 }
 
 // Hack for fixing the closure caveat:
 // Defines "t", the time variable, handled specially by Fix()
-func DeclTVar(name string, value interface{}, doc string) {
+func DeclTVar(name string, value any, doc string) {
 	World.TVar(name, value, doc)
 	GUIAdd(name, value)
 }
@@ -89,9 +89,9 @@ func DeclLValue(name string, value LValue, doc string) {
 
 // LValue is settable
 type LValue interface {
-	SetValue(interface{}) // assigns a new value
-	Eval() interface{}    // evaluate and return result (nil for void)
-	Type() reflect.Type   // type that can be assigned and will be returned by Eval
+	SetValue(any)       // assigns a new value
+	Eval() any          // evaluate and return result (nil for void)
+	Type() reflect.Type // type that can be assigned and will be returned by Eval
 }
 
 // evaluate code, exit on error (behavior for input files)

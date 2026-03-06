@@ -21,14 +21,14 @@ func (c *compileErr) Error() string {
 }
 
 // constructs a compileErr
-func err(pos token.Pos, msg ...interface{}) *compileErr {
+func err(pos token.Pos, msg ...any) *compileErr {
 	str := fmt.Sprintln(msg...) // use Sprintln to insert spaces
 	str = str[:len(str)-1]      // strip final \n
 	return &compileErr{pos, str}
 }
 
 // type string for value i
-func typ(i interface{}) string {
+func typ(i any) string {
 	typ := reflect.TypeOf(reflect.ValueOf(i).Interface()).String()
 	if strings.HasPrefix(typ, "*ast.") {
 		typ = typ[len("*ast."):]

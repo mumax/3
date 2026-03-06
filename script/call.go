@@ -47,7 +47,7 @@ func (w *World) compileCallExpr(n *ast.CallExpr) Expr {
 	return &call{f, args}
 }
 
-func (c *call) Eval() interface{} {
+func (c *call) Eval() any {
 	// evaluate and pack arguments
 	argv := make([]reflect.Value, len(c.args))
 	for i := range c.args {

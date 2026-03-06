@@ -1,8 +1,8 @@
 package gui
 
 type data struct {
-	val interface{}
+	val any
 }
 
-func (d *data) set(v interface{})  { d.val = v }
-func (d *data) value() interface{} { return d.val }
+func (d *data) set(v any)  { d.val = v }
+func (d *data) value() any { return d.val }

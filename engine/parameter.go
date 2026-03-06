@@ -248,7 +248,7 @@ func (p *RegionwiseScalar) SetRegion(region int, f script.ScalarFunction) {
 	}
 }
 
-func (p *RegionwiseScalar) SetValue(v interface{}) {
+func (p *RegionwiseScalar) SetValue(v any) {
 	f := v.(script.ScalarFunction)
 	p.setRegionsFunc(0, NREGION, f)
 }
@@ -272,7 +272,7 @@ func (p *RegionwiseScalar) GetRegion(region int) float64 {
 	return float64(p.getRegion(region)[0])
 }
 
-func (p *RegionwiseScalar) Eval() interface{}       { return p }
+func (p *RegionwiseScalar) Eval() any               { return p }
 func (p *RegionwiseScalar) Type() reflect.Type      { return reflect.TypeOf(new(RegionwiseScalar)) }
 func (p *RegionwiseScalar) InputType() reflect.Type { return script.ScalarFunction_t }
 func (p *RegionwiseScalar) Average() float64        { return qAverageUniverse(p)[0] }
@@ -336,7 +336,7 @@ func (p *RegionwiseVector) SetRegion(region int, f script.VectorFunction) {
 	}
 }
 
-func (p *RegionwiseVector) SetValue(v interface{}) {
+func (p *RegionwiseVector) SetValue(v any) {
 	f := v.(script.VectorFunction)
 	p.setRegionsFunc(0, NREGION, f)
 }
@@ -363,7 +363,7 @@ func (p *RegionwiseVector) GetRegion(region int) [3]float64 {
 	return unslice(v)
 }
 
-func (p *RegionwiseVector) Eval() interface{}       { return p }
+func (p *RegionwiseVector) Eval() any               { return p }
 func (p *RegionwiseVector) Type() reflect.Type      { return reflect.TypeOf(new(RegionwiseVector)) }
 func (p *RegionwiseVector) InputType() reflect.Type { return script.VectorFunction_t }
 func (p *RegionwiseVector) Region(r int) *vOneReg   { return vOneRegion(p, r) }

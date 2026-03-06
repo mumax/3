@@ -10,7 +10,7 @@ type ifStmt struct {
 	void
 }
 
-func (b *ifStmt) Eval() interface{} {
+func (b *ifStmt) Eval() any {
 	if b.cond.Eval().(bool) {
 		b.body.Eval()
 	} else {

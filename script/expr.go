@@ -7,7 +7,7 @@ import (
 
 // an expression can be evaluated
 type Expr interface {
-	Eval() interface{}  // evaluate and return result (nil for void)
+	Eval() any          // evaluate and return result (nil for void)
 	Type() reflect.Type // return type, nil for void
 	Child() []Expr
 	Fix() Expr // replace all variables by their current value, except for the time "t".

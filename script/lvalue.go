@@ -8,7 +8,7 @@ import (
 // left-hand value in (single) assign statement
 type LValue interface {
 	Expr
-	SetValue(interface{}) // assigns a new value
+	SetValue(any) // assigns a new value
 }
 
 func (w *World) compileLvalue(lhs ast.Node) LValue {
@@ -33,7 +33,7 @@ type reflectLvalue struct {
 //
 //	var x float64
 //	newReflectLValue(&x)
-func newReflectLvalue(addr interface{}) LValue {
+func newReflectLvalue(addr any) LValue {
 	elem := reflect.ValueOf(addr).Elem()
 	if elem.Kind() == 0 {
 		panic("variable/constant needs to be passed as pointer to addressable value")
@@ -41,7 +41,7 @@ func newReflectLvalue(addr interface{}) LValue {
 	return &reflectLvalue{elem}
 }
 
-func (l *reflectLvalue) Eval() interface{} {
+func (l *reflectLvalue) Eval() any {
 	return l.elem.Interface()
 }
 
@@ -49,7 +49,7 @@ func (l *reflectLvalue) Type() reflect.Type {
 	return l.elem.Type()
 }
 
-func (l *reflectLvalue) SetValue(rvalue interface{}) {
+func (l *reflectLvalue) SetValue(rvalue any) {
 	l.elem.Set(reflect.ValueOf(rvalue))
 }
 

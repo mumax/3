@@ -279,7 +279,7 @@ func doFile(infname string, outp output) {
 
 }
 
-func fail(msg string, x ...interface{}) string {
+func fail(msg string, x ...any) string {
 	failed.Add(1)
 	return "[fail] " + msg + ": " + fmt.Sprint(x...)
 }

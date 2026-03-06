@@ -9,7 +9,7 @@ type function struct {
 	reflect.Value
 }
 
-func newFunction(fn interface{}) *function {
+func newFunction(fn any) *function {
 	val := reflect.ValueOf(fn)
 	if val.Type().Kind() != reflect.Func {
 		panic(fmt.Errorf("not a function: %v", val.Type()))
@@ -24,6 +24,6 @@ func newFunction(fn interface{}) *function {
 func (f *function) Type() reflect.Type    { return f.Value.Type() }
 func (f *function) NumIn() int            { return f.Type().NumIn() }
 func (f *function) In(i int) reflect.Type { return f.Type().In(i) }
-func (f *function) Eval() interface{}     { return f.Value.Interface() }
+func (f *function) Eval() any             { return f.Value.Interface() }
 func (f *function) Child() []Expr         { return nil }
 func (f *function) Fix() Expr             { return f }

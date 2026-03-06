@@ -7,7 +7,7 @@ type number struct {
 }
 
 func (e *number) update(id string) []jsCall {
-	return []jsCall{{F: "setAttr", Args: []interface{}{id, "value", e.value()}}}
+	return []jsCall{{F: "setAttr", Args: []any{id, "value", e.value()}}}
 }
 
 func (d *Page) Number(id string, min, max, value int, extra ...string) string {

@@ -23,9 +23,9 @@ func (p *inputValue) Unit() string            { return p.unit }
 func (p *inputValue) getRegion(int) []float64 { return []float64{float64(p.v)} }
 func (p *inputValue) Type() reflect.Type      { return reflect.TypeOf(float64(0)) }
 func (p *inputValue) IsUniform() bool         { return true }
-func (p *inputValue) Eval() interface{}       { return p.v }
+func (p *inputValue) Eval() any               { return p.v }
 
-func (p *inputValue) SetValue(v interface{}) {
+func (p *inputValue) SetValue(v any) {
 	p.v = v.(float64)
 	p.onSet()
 }

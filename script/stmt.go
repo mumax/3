@@ -49,7 +49,7 @@ func (v *void) Fix() Expr          { panic(invalid_closure) }
 
 type emptyStmt struct{ void }
 
-func (*emptyStmt) Child() []Expr     { return nil }
-func (*emptyStmt) Eval() interface{} { return nil }
+func (*emptyStmt) Child() []Expr { return nil }
+func (*emptyStmt) Eval() any     { return nil }
 
 const invalid_closure = "illegal statement in closure"

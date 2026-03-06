@@ -140,8 +140,8 @@ var (
 
 type flposition struct{}
 
-func (*flposition) Eval() interface{} { return fixedLayerPosition }
-func (*flposition) SetValue(v interface{}) {
+func (*flposition) Eval() any { return fixedLayerPosition }
+func (*flposition) SetValue(v any) {
 	drainOutput()
 	fixedLayerPosition = v.(FixedLayerPosition)
 }

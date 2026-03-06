@@ -7,7 +7,7 @@ type checkbox struct {
 }
 
 func (e *checkbox) update(id string) []jsCall {
-	return []jsCall{{F: "setAttr", Args: []interface{}{id, "checked", e.value()}}}
+	return []jsCall{{F: "setAttr", Args: []any{id, "checked", e.value()}}}
 }
 
 func (d *Page) Checkbox(id, text string, value bool, extra ...string) string {

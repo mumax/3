@@ -111,7 +111,7 @@ func localRemove(fname string) error {
 	return os.RemoveAll(fname)
 }
 
-func Log(msg ...interface{}) {
+func Log(msg ...any) {
 	if Logging {
 		log.Println(msg...)
 	}

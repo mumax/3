@@ -106,7 +106,7 @@ func (e *Excitation) AddGo(mask *data.Slice, mul func() float64) {
 }
 
 func (e *Excitation) SetRegion(region int, f script.VectorFunction) { e.perRegion.SetRegion(region, f) }
-func (e *Excitation) SetValue(v interface{})                        { e.perRegion.SetValue(v) }
+func (e *Excitation) SetValue(v any)                                { e.perRegion.SetValue(v) }
 func (e *Excitation) Set(v data.Vector)                             { e.perRegion.setRegions(0, NREGION, slice(v)) }
 func (e *Excitation) getRegion(region int) []float64                { return e.perRegion.getRegion(region) } // for gui
 
@@ -125,7 +125,7 @@ func (e *Excitation) NComp() int              { return e.perRegion.NComp() }
 func (e *Excitation) Mesh() *data.Mesh        { return Mesh() }
 func (e *Excitation) Region(r int) *vOneReg   { return vOneRegion(e, r) }
 func (e *Excitation) Comp(c int) ScalarField  { return Comp(e, c) }
-func (e *Excitation) Eval() interface{}       { return e }
+func (e *Excitation) Eval() any               { return e }
 func (e *Excitation) Type() reflect.Type      { return reflect.TypeOf(new(Excitation)) }
 func (e *Excitation) InputType() reflect.Type { return script.VectorFunction_t }
 func (e *Excitation) EvalTo(dst *data.Slice)  { EvalTo(e, dst) }

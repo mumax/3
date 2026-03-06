@@ -55,10 +55,10 @@ type sub struct{ binaryExpr }
 type mul struct{ binaryExpr }
 type quo struct{ binaryExpr }
 
-func (b *add) Eval() interface{} { return b.x.Eval().(float64) + b.y.Eval().(float64) }
-func (b *sub) Eval() interface{} { return b.x.Eval().(float64) - b.y.Eval().(float64) }
-func (b *mul) Eval() interface{} { return b.x.Eval().(float64) * b.y.Eval().(float64) }
-func (b *quo) Eval() interface{} { return b.x.Eval().(float64) / b.y.Eval().(float64) }
+func (b *add) Eval() any { return b.x.Eval().(float64) + b.y.Eval().(float64) }
+func (b *sub) Eval() any { return b.x.Eval().(float64) - b.y.Eval().(float64) }
+func (b *mul) Eval() any { return b.x.Eval().(float64) * b.y.Eval().(float64) }
+func (b *quo) Eval() any { return b.x.Eval().(float64) / b.y.Eval().(float64) }
 
 func (b *add) Fix() Expr { return &add{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
 func (b *sub) Fix() Expr { return &sub{binaryExpr{x: b.x.Fix(), y: b.y.Fix()}} }
@@ -81,12 +81,12 @@ type geq struct{ comp }
 type eql struct{ comp }
 type neq struct{ comp }
 
-func (b *lss) Eval() interface{} { return b.x.Eval().(float64) < b.y.Eval().(float64) }
-func (b *gtr) Eval() interface{} { return b.x.Eval().(float64) > b.y.Eval().(float64) }
-func (b *leq) Eval() interface{} { return b.x.Eval().(float64) <= b.y.Eval().(float64) }
-func (b *geq) Eval() interface{} { return b.x.Eval().(float64) >= b.y.Eval().(float64) }
-func (b *eql) Eval() interface{} { return b.x.Eval().(float64) == b.y.Eval().(float64) }
-func (b *neq) Eval() interface{} { return b.x.Eval().(float64) != b.y.Eval().(float64) }
+func (b *lss) Eval() any { return b.x.Eval().(float64) < b.y.Eval().(float64) }
+func (b *gtr) Eval() any { return b.x.Eval().(float64) > b.y.Eval().(float64) }
+func (b *leq) Eval() any { return b.x.Eval().(float64) <= b.y.Eval().(float64) }
+func (b *geq) Eval() any { return b.x.Eval().(float64) >= b.y.Eval().(float64) }
+func (b *eql) Eval() any { return b.x.Eval().(float64) == b.y.Eval().(float64) }
+func (b *neq) Eval() any { return b.x.Eval().(float64) != b.y.Eval().(float64) }
 
 func (b *lss) Fix() Expr { return &lss{comp{x: b.x.Fix(), y: b.y.Fix()}} }
 func (b *gtr) Fix() Expr { return &gtr{comp{x: b.x.Fix(), y: b.y.Fix()}} }
@@ -109,8 +109,8 @@ func (b *boolOp) Type() reflect.Type { return bool_t }
 type and struct{ boolOp }
 type or struct{ boolOp }
 
-func (b *and) Eval() interface{} { return b.x.Eval().(bool) && b.y.Eval().(bool) }
-func (b *or) Eval() interface{}  { return b.x.Eval().(bool) || b.y.Eval().(bool) }
+func (b *and) Eval() any { return b.x.Eval().(bool) && b.y.Eval().(bool) }
+func (b *or) Eval() any  { return b.x.Eval().(bool) || b.y.Eval().(bool) }
 
 func (b *and) Fix() Expr { return &and{boolOp{x: b.x.Fix(), y: b.y.Fix()}} }
 func (b *or) Fix() Expr  { return &or{boolOp{x: b.x.Fix(), y: b.y.Fix()}} }

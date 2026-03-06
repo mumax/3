@@ -29,5 +29,5 @@ func (e *incdec) Fix() Expr          { panic(invalid_closure) }
 type addone struct{ incdec }
 type subone struct{ incdec }
 
-func (s *addone) Eval() interface{} { return s.x.Eval().(float64) + 1 }
-func (s *subone) Eval() interface{} { return s.x.Eval().(float64) - 1 }
+func (s *addone) Eval() any { return s.x.Eval().(float64) + 1 }
+func (s *subone) Eval() any { return s.x.Eval().(float64) - 1 }

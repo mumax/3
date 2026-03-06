@@ -24,10 +24,10 @@ func (m *magnetization) Unit() string        { return "" }
 func (m *magnetization) Buffer() *data.Slice { return m.buffer_ } // todo: rename Gpu()?
 
 func (m *magnetization) Comp(c int) ScalarField  { return Comp(m, c) }
-func (m *magnetization) SetValue(v interface{})  { m.SetInShape(nil, v.(Config)) }
+func (m *magnetization) SetValue(v any)          { m.SetInShape(nil, v.(Config)) }
 func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
 func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(magnetization)) }
-func (m *magnetization) Eval() interface{}       { return m }
+func (m *magnetization) Eval() any               { return m }
 func (m *magnetization) average() []float64      { return sAverageMagnet(M.Buffer()) }
 func (m *magnetization) Average() data.Vector    { return unslice(m.average()) }
 func (m *magnetization) normalize()              { cuda.Normalize(m.Buffer(), geometry.Gpu()) }

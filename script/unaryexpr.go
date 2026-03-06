@@ -21,13 +21,13 @@ func (w *World) compileUnaryExpr(n *ast.UnaryExpr) Expr {
 type minus struct{ x Expr }
 
 func (m *minus) Type() reflect.Type { return float64_t }
-func (m *minus) Eval() interface{}  { return -m.x.Eval().(float64) }
+func (m *minus) Eval() any          { return -m.x.Eval().(float64) }
 func (m *minus) Child() []Expr      { return []Expr{m.x} }
 func (m *minus) Fix() Expr          { return &minus{m.x.Fix()} }
 
 type not struct{ x Expr }
 
 func (m *not) Type() reflect.Type { return bool_t }
-func (m *not) Eval() interface{}  { return !m.x.Eval().(bool) }
+func (m *not) Eval() any          { return !m.x.Eval().(bool) }
 func (m *not) Child() []Expr      { return []Expr{m.x} }
 func (m *not) Fix() Expr          { return &not{m.x.Fix()} }

@@ -7,7 +7,7 @@ type sel struct {
 }
 
 func (e *sel) update(id string) []jsCall {
-	return []jsCall{{F: "setSelect", Args: []interface{}{id, e.value()}}}
+	return []jsCall{{F: "setSelect", Args: []any{id, e.value()}}}
 }
 
 func (d *Page) SelectArray(id string, value string, options []string) string {

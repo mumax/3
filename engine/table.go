@@ -131,12 +131,12 @@ func (t *DataTable) Save() {
 	}
 }
 
-func (t *DataTable) Println(msg ...interface{}) {
+func (t *DataTable) Println(msg ...any) {
 	t.init()
 	fprintln(t, msg...)
 }
 
-func TablePrint(msg ...interface{}) {
+func TablePrint(msg ...any) {
 	Table.Println(msg...)
 }
 
@@ -185,13 +185,13 @@ func (t *DataTable) flush() {
 }
 
 // Safe fmt.Fprint, will fail on error
-func fprint(out io.Writer, x ...interface{}) {
+func fprint(out io.Writer, x ...any) {
 	_, err := fmt.Fprint(out, x...)
 	util.FatalErr(err)
 }
 
 // Safe fmt.Fprintln, will fail on error
-func fprintln(out io.Writer, x ...interface{}) {
+func fprintln(out io.Writer, x ...any) {
 	_, err := fmt.Fprintln(out, x...)
 	util.FatalErr(err)
 

@@ -25,21 +25,21 @@ func CheckRecoverable(err error) {
 	}
 }
 
-func LogIn(msg ...interface{}) {
+func LogIn(msg ...any) {
 	str := sprint(msg...)
 	log2GUI(str)
 	log2File(str)
 	fmt.Println(str)
 }
 
-func LogOut(msg ...interface{}) {
+func LogOut(msg ...any) {
 	str := "//" + sprint(msg...)
 	log2GUI(str)
 	log2File(str)
 	fmt.Println(str)
 }
 
-func LogErr(msg ...interface{}) {
+func LogErr(msg ...any) {
 	str := "//" + sprint(msg...)
 	log2GUI(str)
 	log2File(str)
@@ -79,7 +79,7 @@ func log2GUI(msg string) {
 }
 
 // like fmt.Sprint but with spaces between args
-func sprint(msg ...interface{}) string {
+func sprint(msg ...any) string {
 	str := fmt.Sprintln(msg...)
 	str = str[:len(str)-1] // strip newline
 	return str

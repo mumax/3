@@ -30,7 +30,7 @@ func (b *BlockStmt) append(s Expr, n ast.Node) {
 	b.Node = append(b.Node, n)
 }
 
-func (b *BlockStmt) Eval() interface{} {
+func (b *BlockStmt) Eval() any {
 	for _, s := range b.Children {
 		s.Eval()
 	}

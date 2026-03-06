@@ -11,7 +11,7 @@ func (e *clibox) update(id string) []jsCall {
 }
 
 // Command-line interface textbox where user types commands.
-func (d *Page) CliBox(id string, value interface{}, extra ...string) string {
+func (d *Page) CliBox(id string, value any, extra ...string) string {
 	e := &clibox{data: data{value}}
 	d.addElem(id, e)
 	return fmt.Sprintf(`<input type=%v class=TextBox id=%v  %v />`, "text", id, cat(extra))

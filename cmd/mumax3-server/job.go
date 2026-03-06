@@ -16,8 +16,8 @@ const MaxRequeue = 10 // maximum number of re-queues, don't run job if re-queued
 type Job struct {
 	ID string // host/path of the input file, e.g., hostname:port/user/inputfile.mx3
 	// in-memory properties:
-	RequeCount int         // how many times requeued.
-	Error      interface{} // error that cannot be consolidated to disk
+	RequeCount int // how many times requeued.
+	Error      any // error that cannot be consolidated to disk
 	// all of this is cache:
 	Output     string    // if exists, points to output ID
 	Host       string    // node address in host file (=last host who started this job)
@@ -89,7 +89,7 @@ func (j *Job) Reque() {
 	j.Update()
 }
 
-func SetJobError(ID string, err interface{}) {
+func SetJobError(ID string, err any) {
 	log.Println("SetJobErr", ID, err)
 	WLock()
 	defer WUnlock()

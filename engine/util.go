@@ -71,7 +71,7 @@ func ExpectV(msg string, have, want data.Vector, maxErr float64) {
 }
 
 // Append msg to file. Used to write aggregated output of many simulations in one file.
-func Fprintln(filename string, msg ...interface{}) {
+func Fprintln(filename string, msg ...any) {
 	if !path.IsAbs(filename) {
 		filename = OD() + filename
 	}
@@ -108,12 +108,12 @@ func Download(q Quantity) *data.Slice {
 }
 
 // print with special formatting for some known types
-func myprint(msg ...interface{}) {
+func myprint(msg ...any) {
 	LogOut(myFmt(msg)...)
 }
 
 // mumax specific formatting (Slice -> average, etc).
-func myFmt(msg []interface{}) []interface{} {
+func myFmt(msg []any) []any {
 	for i, m := range msg {
 		if e, ok := m.(*float64); ok {
 			msg[i] = *e

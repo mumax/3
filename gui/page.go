@@ -15,9 +15,9 @@ var Debug = false
 // Page holds the state to serve a single GUI page to the browser
 type Page struct {
 	elems      map[string]*E
-	htmlCache  []byte      // static html content, rendered only once
-	haveJS     bool        // have called JS()?
-	data       interface{} // any additional data to be passed to template
+	htmlCache  []byte // static html content, rendered only once
+	haveJS     bool   // have called JS()?
+	data       any    // any additional data to be passed to template
 	onUpdate   func()
 	onAnyEvent func()
 	httpLock   sync.Mutex
@@ -27,7 +27,7 @@ type Page struct {
 // NewPage constructs a Page based on an HTML template containing
 // element tags like {{.Button}}, {{.Textbox}}, etc. data is fed
 // to the template as additional arbitrary data, available as {{.Data}}.
-func NewPage(htmlTemplate string, data interface{}) *Page {
+func NewPage(htmlTemplate string, data any) *Page {
 	d := &Page{elems: make(map[string]*E), data: data}
 
 	// exec template (once)
@@ -45,7 +45,7 @@ func NewPage(htmlTemplate string, data interface{}) *Page {
 
 // Value returns the value of the HTML element with given id.
 // E.g.: the text in a textbox, the checked value of a checkbox, etc.
-func (d *Page) Value(id string) interface{} {
+func (d *Page) Value(id string) any {
 	return d.elem(id).value()
 }
 
@@ -60,11 +60,11 @@ func (d *Page) StringValue(id string) string {
 	}
 }
 
-func (d *Page) Set(id string, v interface{}) {
+func (d *Page) Set(id string, v any) {
 	d.elem(id).set(v)
 }
 
-func (d *Page) Attr(id string, k string, v interface{}) {
+func (d *Page) Attr(id string, k string, v any) {
 	d.elem(id).attr(k, v)
 }
 
@@ -116,7 +116,7 @@ func (t *Page) UpdateBox(text string) string {
 }
 
 // {{.Data}} returns the extra data that was passed to NewPage
-func (t *Page) Data() interface{} {
+func (t *Page) Data() any {
 	return t.data
 }
 
@@ -178,7 +178,7 @@ func (d *Page) serveEvent(w http.ResponseWriter, r *http.Request) {
 
 type event struct {
 	ID  string
-	Arg interface{}
+	Arg any
 }
 
 // HTTP handler for updating the dynamic elements
@@ -210,8 +210,8 @@ func (d *Page) serveUpdate(w http.ResponseWriter, r *http.Request) {
 
 // javascript call
 type jsCall struct {
-	F    string        // function to call
-	Args []interface{} // function arguments
+	F    string // function to call
+	Args []any  // function arguments
 }
 
 func check(err error) {

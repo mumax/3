@@ -39,7 +39,7 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 	return &selector{x, N}
 }
 
-func (e *selector) Eval() interface{} {
+func (e *selector) Eval() any {
 	obj := reflect.ValueOf(e.x.Eval())
 	meth := obj.MethodByName(e.method)
 	if meth.Kind() == 0 {

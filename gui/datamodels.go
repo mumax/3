@@ -7,20 +7,20 @@ import (
 )
 
 type interfaceData struct {
-	v interface{}
+	v any
 }
 
-func (d *interfaceData) setValue(v interface{}) {
+func (d *interfaceData) setValue(v any) {
 	d.v = v
 }
 
-func (d *interfaceData) value() interface{} {
+func (d *interfaceData) value() any {
 	return d.v
 }
 
 type boolData struct{ interfaceData }
 
-func (d *boolData) setValue(v interface{}) {
+func (d *boolData) setValue(v any) {
 	d.v = v.(bool)
 }
 
@@ -34,7 +34,7 @@ func IntData(v int) *intData {
 	return &intData{interfaceData{v}}
 }
 
-func (d *intData) setValue(v interface{}) {
+func (d *intData) setValue(v any) {
 	switch v := v.(type) {
 	case int:
 		d.v = v
@@ -54,7 +54,7 @@ func FloatData(v float64) *floatData {
 	return &floatData{interfaceData{v}}
 }
 
-func (d *floatData) setValue(v interface{}) {
+func (d *floatData) setValue(v any) {
 	switch v := v.(type) {
 	case float64:
 		d.v = v

@@ -22,7 +22,7 @@ type index struct {
 func (e *index) Type() reflect.Type {
 	return e.x.Type().Elem()
 }
-func (e *index) Eval() interface{} {
+func (e *index) Eval() any {
 	x := reflect.ValueOf(e.x.Eval())
 	i := e.index.Eval().(int)
 	return x.Index(i).Interface()

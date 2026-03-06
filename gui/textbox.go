@@ -7,10 +7,10 @@ type textbox struct {
 }
 
 func (e *textbox) update(id string) []jsCall {
-	return []jsCall{{F: "setTextbox", Args: []interface{}{id, e.value()}}}
+	return []jsCall{{F: "setTextbox", Args: []any{id, e.value()}}}
 }
 
-func (d *Page) TextBox(id string, value interface{}, extra ...string) string {
+func (d *Page) TextBox(id string, value any, extra ...string) string {
 	e := &textbox{data: data{value}}
 	d.addElem(id, e)
 	return fmt.Sprintf(`<input type=%v class=TextBox id=%v  onchange="notifyel('%v', 'value')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')" onkeydown="makered('%v', event)" %v />`, "text", id, id, id, id, id, cat(extra))

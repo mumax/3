@@ -6,10 +6,10 @@ import "sync"
 // stores the dirty flag, extra attributes, lock event handler, ...
 type E struct {
 	_m      sync.Mutex
-	_dirty  bool                   // dirty means the value/attributes need updating in browser
-	_attr   map[string]interface{} // extra html attributes (e.g. style, onclick, ...)
-	_elem   El                     // the wrapped gui element
-	onevent func()                 // called upon value change by user (not by Go code)
+	_dirty  bool           // dirty means the value/attributes need updating in browser
+	_attr   map[string]any // extra html attributes (e.g. style, onclick, ...)
+	_elem   El             // the wrapped gui element
+	onevent func()         // called upon value change by user (not by Go code)
 }
 
 func newE(elem El) *E {
@@ -17,7 +17,7 @@ func newE(elem El) *E {
 }
 
 // atomically pass a new value to the underlying element and mark it dirty.
-func (e *E) set(v interface{}) {
+func (e *E) set(v any) {
 	e._m.Lock()
 	defer e._m.Unlock()
 
@@ -29,12 +29,12 @@ func (e *E) set(v interface{}) {
 }
 
 // atomically set an html attribute for the underlying element and mark it dirty
-func (e *E) attr(key string, v interface{}) {
+func (e *E) attr(key string, v any) {
 	e._m.Lock()
 	defer e._m.Unlock()
 
 	if e._attr == nil {
-		e._attr = make(map[string]interface{})
+		e._attr = make(map[string]any)
 	}
 	old := e._attr[key]
 	if v != old {
@@ -53,7 +53,7 @@ func (e *E) update(id string) []jsCall {
 	}
 	upd := e._elem.update(id)
 	for k, v := range e._attr {
-		upd = append(upd, jsCall{F: "setAttr", Args: []interface{}{id, k, v}})
+		upd = append(upd, jsCall{F: "setAttr", Args: []any{id, k, v}})
 	}
 	e._dirty = false
 	return upd
@@ -61,7 +61,7 @@ func (e *E) update(id string) []jsCall {
 
 // atomically returns the underlying element's value
 // depending its implementation (e.g. textBox's text, checkBox's checked value, etc.)
-func (e *E) value() interface{} {
+func (e *E) value() any {
 	e._m.Lock()
 	defer e._m.Unlock()
 
@@ -88,6 +88,6 @@ func (e *E) OnEvent(f func()) {
 // Underlying html element like Span, TextBox, etc.
 type El interface {
 	update(id string) []jsCall
-	set(v interface{})
-	value() interface{}
+	set(v any)
+	value() any
 }

@@ -79,13 +79,13 @@ type Param interface {
 	IsUniform() bool
 }
 
-func GUIAdd(name string, value interface{}) {
+func GUIAdd(name string, value any) {
 	gui_.Add(name, value)
 }
 
 // Internal:add a quantity to the GUI, will be visible in web interface.
 // Automatically called by Decl*(), still before PrepareServer()
-func (g *guistate) Add(name string, value interface{}) {
+func (g *guistate) Add(name string, value any) {
 	if v, ok := value.(Param); ok {
 		g.Params[name] = v
 	}

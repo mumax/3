@@ -7,7 +7,7 @@ type progress struct {
 }
 
 func (e *progress) update(id string) []jsCall {
-	return []jsCall{{F: "setAttr", Args: []interface{}{id, "value", e.value()}}}
+	return []jsCall{{F: "setAttr", Args: []any{id, "value", e.value()}}}
 }
 
 func (d *Page) Progress(id string, max, value int, extra ...string) string {

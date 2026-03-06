@@ -40,15 +40,15 @@ var (
 
 type fformat struct{}
 
-func (*fformat) Eval() interface{}      { return FilenameFormat }
-func (*fformat) SetValue(v interface{}) { drainOutput(); FilenameFormat = v.(string) }
-func (*fformat) Type() reflect.Type     { return reflect.TypeOf("") }
+func (*fformat) Eval() any          { return FilenameFormat }
+func (*fformat) SetValue(v any)     { drainOutput(); FilenameFormat = v.(string) }
+func (*fformat) Type() reflect.Type { return reflect.TypeOf("") }
 
 type oformat struct{}
 
-func (*oformat) Eval() interface{}      { return outputFormat }
-func (*oformat) SetValue(v interface{}) { drainOutput(); outputFormat = v.(OutputFormat) }
-func (*oformat) Type() reflect.Type     { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
+func (*oformat) Eval() any          { return outputFormat }
+func (*oformat) SetValue(v any)     { drainOutput(); outputFormat = v.(OutputFormat) }
+func (*oformat) Type() reflect.Type { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
 
 // Save once, with auto file name
 func Save(q Quantity) {

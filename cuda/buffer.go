@@ -32,7 +32,7 @@ func Buffer(nComp int, size [3]int) *data.Slice {
 	// re-use as many buffers as possible form our stack
 	N := prod(size)
 	pool := buf_pool[N]
-	nFromPool := iMin(nComp, len(pool))
+	nFromPool := min(nComp, len(pool))
 	for i := 0; i < nFromPool; i++ {
 		ptrs[i] = pool[len(pool)-i-1]
 	}

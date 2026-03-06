@@ -13,8 +13,8 @@ func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {
 
 	Na := data.SizeOf(arr[0]) // number of arrows
 	h := Na[Y]                // orignal image height
-	Na[X] = imax(Na[X]/sub, 1)
-	Na[Y] = imax(Na[Y]/sub, 1)
+	Na[X] = max(Na[X]/sub, 1)
+	Na[Y] = max(Na[Y]/sub, 1)
 	Na[Z] = 1
 	small := data.Downsample(arr[:], Na)
 	S := float32(sub)
@@ -91,12 +91,4 @@ func pt(x, y float32) raster.Point {
 
 func fix32(x float32) raster.Fix32 {
 	return raster.Fix32(int(x * (1 << 8)))
-}
-
-func imax(a, b int) int {
-	if a > b {
-		return a
-	} else {
-		return b
-	}
 }

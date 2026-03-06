@@ -59,9 +59,6 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 }
 
 func hex(i uint8) string {
-	j := int(i) - 32 // make it a bit darker
-	if j < 0 {
-		j = 0
-	}
+	j := max(int(i)-32, 0) // make it a bit darker
 	return fmt.Sprintf("%02X", j)
 }

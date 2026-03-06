@@ -42,14 +42,6 @@ func make3DConf(N [3]int) *config {
 	return &config{gr, bl}
 }
 
-// integer minimum
-func iMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 // Integer division rounded up.
 func divUp(x, y int) int {
 	return ((x - 1) / y) + 1

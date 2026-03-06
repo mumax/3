@@ -113,7 +113,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 						fmt.Fprint(out, data[4][k][j][i], " ")
 						fmt.Fprint(out, data[5][k][j][i], " ")
 					} else {
-						for c := 0; c < N; c++ {
+						for c := range N {
 							fmt.Fprint(out, data[c][k][j][i], " ")
 						}
 					}
@@ -138,7 +138,7 @@ func writeVTKCellData(out io.Writer, q *data.Slice, meta data.Meta, dataformat s
 						binary.Write(buffer, binary.LittleEndian, data[4][k][j][i])
 						binary.Write(buffer, binary.LittleEndian, data[5][k][j][i])
 					} else {
-						for c := 0; c < N; c++ {
+						for c := range N {
 							binary.Write(buffer, binary.LittleEndian, data[c][k][j][i])
 						}
 					}

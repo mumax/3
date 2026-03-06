@@ -30,7 +30,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64, cacheDir string) (kernel [3]
 	// Try to load kernel
 	basename := fmt.Sprint(cacheDir, "/", "mumax3MFMkernel_", mesh.Size(), "_", mesh.PBC(), "_", mesh.CellSize(), "_", lift, "_", tipsize, "_")
 	var errLoad error
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		kernel[i], errLoad = LoadKernel(fmt.Sprint(basename, i, ".ovf"))
 		if errLoad != nil {
 			break
@@ -47,7 +47,7 @@ func MFMKernel(mesh *d.Mesh, lift, tipsize float64, cacheDir string) (kernel [3]
 	var errSave error
 	kernel = CalcMFMKernel(mesh, lift, tipsize)
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		compName := fmt.Sprint("Nmfm_", i)
 		info := d.Meta{Time: float64(0.0), Name: compName, Unit: "1", CellSize: mesh.CellSize(), MeshUnit: "m"}
 		errSave = SaveKernel(fmt.Sprint(basename, i, ".ovf"), kernel[i], info)
@@ -114,7 +114,7 @@ func CalcMFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
 	var K [3][][][]float32
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		kernel[i] = d.NewSlice(1, mesh.Size())
 		K[i] = kernel[i].Scalars()
 	}
@@ -136,7 +136,7 @@ func CalcMFMKernel(mesh *d.Mesh, lift, tipsize float64) (kernel [3]*d.Slice) {
 				x := float64(ix) * cellsize[X]
 				xw := wrap(ix, size[X])
 
-				for s := 0; s < 3; s++ { // source index Ksxyz
+				for s := range 3 { // source index Ksxyz
 					m := d.Vector{0, 0, 0}
 					m[s] = 1
 

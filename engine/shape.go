@@ -215,8 +215,8 @@ func ImageShape(fname string) Shape {
 	for iy := range inside {
 		inside[iy] = make([]bool, width)
 	}
-	for iy := 0; iy < height; iy++ {
-		for ix := 0; ix < width; ix++ {
+	for iy := range height {
+		for ix := range width {
 			r, g, b, a := img.At(ix, height-1-iy).RGBA()
 			if a > 128 && r+g+b < (0xFFFF*3)/2 {
 				inside[iy][ix] = true
@@ -263,7 +263,7 @@ func VoxelShape(voxels *data.Slice, a, b, c float64) Shape {
 	return func(x, y, z float64) bool {
 		var ind [3]int
 		coord := [3]float64{x, y, z}
-		for c := 0; c < 3; c++ {
+		for c := range 3 {
 			//truncation applies floor by default
 			ind[c] = int(coord[c]/voxelSize[c] + float64(arrSize[c])/2)
 			if ind[c] < 0 || ind[c] >= arrSize[c] {

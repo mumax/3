@@ -228,7 +228,7 @@ var unitMap regionwise // unit map used to output regions quantity
 
 func init() {
 	unitMap.init(1, "unit", "", nil)
-	for r := 0; r < NREGION; r++ {
+	for r := range NREGION {
 		unitMap.setRegion(r, []float64{float64(r)})
 	}
 }

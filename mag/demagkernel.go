@@ -39,7 +39,7 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	// Try to load kernel
 	basename := fmt.Sprint(cacheDir, "/", "mumax3kernel_", inputSize, "_", pbc, "_", cellsize, "_", accuracy, "_")
 	var errLoad error
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		for j := i; j < 3; j++ {
 			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
 				continue // element not needed in 2D
@@ -68,7 +68,7 @@ func DemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float64, c
 	// Could not load kernel: calculate it and save
 	var errSave error
 	kernel = CalcDemagKernel(inputSize, pbc, cellsize, accuracy)
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		for j := i; j < 3; j++ {
 			if inputSize[Z] == 1 && ((i == X && j == Z) || (i == Y && j == Z)) {
 				continue // element not needed in 2D
@@ -127,7 +127,7 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 
 	// Allocate only upper diagonal part. The rest is symmetric due to reciprocity.
 	var array [3][3][][][]float32
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		for j := i; j < 3; j++ {
 			kernel[i][j] = data.NewSlice(1, size)
 			array[i][j] = kernel[i][j].Scalars()
@@ -156,7 +156,7 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 	// 9 nested loops, does that stress you out?
 	// Fortunately, the 5 inner ones usually loop over just one element.
 
-	for s := 0; s < 3; s++ { // source index Ksdxyz (parallelized over)
+	for s := range 3 { // source index Ksdxyz (parallelized over)
 		go func(s int) {
 			u, v, w := s, (s+1)%3, (s+2)%3 // u = direction of source (s), v & w are the orthogonal directions
 			var (
@@ -237,13 +237,13 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 								pole[w] = pw
 
 								// Do volume integral over destination cell
-								for α := 0; α < nx; α++ {
+								for α := range nx {
 									rx := R[X] - cellsize[X]/2 + cellsize[X]/float64(2*nx) + (cellsize[X]/float64(nx))*float64(α)
 
-									for β := 0; β < ny; β++ {
+									for β := range ny {
 										ry := R[Y] - cellsize[Y]/2 + cellsize[Y]/float64(2*ny) + (cellsize[Y]/float64(ny))*float64(β)
 
-										for γ := 0; γ < nz; γ++ {
+										for γ := range nz {
 											rz := R[Z] - cellsize[Z]/2 + cellsize[Z]/float64(2*nz) + (cellsize[Z]/float64(nz))*float64(γ)
 											points++
 
@@ -342,7 +342,7 @@ func CalcDemagKernel(inputSize, pbc [3]int, cellsize [3]float64, accuracy float6
 
 // integration ranges for kernel. size=kernelsize, so padded for no PBC, not padded for PBC
 func kernelRanges(size, pbc [3]int) (r1, r2 [3]int) {
-	for c := 0; c < 3; c++ {
+	for c := range 3 {
 		if pbc[c] == 0 {
 			r1[c], r2[c] = -(size[c]-1)/2, (size[c]-1)/2
 		} else {

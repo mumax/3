@@ -96,7 +96,7 @@ func (e *entry) Methods() []string {
 	}
 	nm := t.NumMethod()
 	M := make([]string, 0, nm)
-	for i := 0; i < nm; i++ {
+	for i := range nm {
 		m := t.Method(i)
 		n := m.Name
 		if unicode.IsUpper(rune(n[0])) && !hidden(n) {

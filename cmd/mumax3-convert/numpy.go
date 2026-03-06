@@ -27,7 +27,7 @@ func dumpNUMPY(f *data.Slice, info data.Meta, out io.Writer) {
 	for _, a := range a {
 		for _, a := range a {
 			for _, a := range a {
-				for i := 0; i < len(a); i++ {
+				for i := range a {
 					binary.Write(out, binary.LittleEndian, a[i])
 				}
 			}

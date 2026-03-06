@@ -38,7 +38,7 @@ func TestMkdirRemove(t *testing.T) {
 	mustFail(t, Mkdir("testdata"))
 
 	// test for closing files (internally)
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, Remove("testdata"))
 		mustPass(t, Mkdir("testdata"))
 	}
@@ -63,7 +63,7 @@ func TestTouch(t *testing.T) {
 	mustPass(t, Touch("testdata/file"))
 
 	// test for closing files (internally)
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, Touch("testdata/file"))
 	}
 }
@@ -77,7 +77,7 @@ func TestReaddir(t *testing.T) {
 	mustFail(t, s(ReadDir("testdata")))
 
 	// test for closing files (internally)
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustFail(t, s(ReadDir("testdata")))
 	}
 
@@ -95,7 +95,7 @@ func TestReaddir(t *testing.T) {
 	}
 
 	// test for closing files (internally)
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, s(ReadDir("testdata")))
 	}
 }
@@ -107,7 +107,7 @@ func TestRemove(t *testing.T) {
 	mustPass(t, Remove("testdata"))
 
 	// test for closing files (internally)
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, Remove("testdata"))
 	}
 }
@@ -121,7 +121,7 @@ func TestAppendRead(t *testing.T) {
 	mustFail(t, Append("testdata/file", data)) // file does not exist yet
 
 	mustPass(t, Touch("testdata/file"))
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, Append("testdata/file", data))
 	}
 
@@ -149,7 +149,7 @@ func TestConcurrentWrite(t *testing.T) {
 	fmt.Fprintln(f2, "a")
 	mustFail(t, f2.Flush())
 
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		fmt.Fprintln(f1, "a")
 		mustPass(t, f1.Flush())
 
@@ -170,7 +170,7 @@ func TestAppendSize(t *testing.T) {
 	mustFail(t, AppendSize("testdata/file", data, 1)) // file does not exist yet
 
 	mustPass(t, Touch("testdata/file"))
-	for i := 0; i < MANYFILES; i++ {
+	for i := range MANYFILES {
 		mustPass(t, AppendSize("testdata/file", data, int64(i)*int64(len(data))))
 	}
 
@@ -191,7 +191,7 @@ func TestAppendSizeBad(t *testing.T) {
 	mustPass(t, Touch("testdata/file"))
 
 	data := []byte("hello httpfs\n")
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustFail(t, AppendSize("testdata/file", data, 3)) // bad size
 	}
 }
@@ -205,7 +205,7 @@ func TestPutRead(t *testing.T) {
 	data := []byte("hello httpfs\n")
 
 	// must pass if file does not yet exist
-	for i := 0; i < MANYFILES; i++ {
+	for range MANYFILES {
 		mustPass(t, Put("testdata/file", data))
 	}
 
@@ -235,7 +235,7 @@ func TestReaderWriter(t *testing.T) {
 		}
 	}
 
-	for i := 0; i < MANYFILES; i++ {
+	for i := range MANYFILES {
 
 		// create and write to file
 		{

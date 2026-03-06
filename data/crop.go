@@ -14,10 +14,10 @@ func Crop(in *Slice, x1, x2, y1, y2, z1, z2 int) *Slice {
 	a := in.Tensors()
 	b := out.Tensors()
 
-	for c := 0; c < ncomp; c++ {
-		for z := 0; z < Nz; z++ {
-			for y := 0; y < Ny; y++ {
-				for x := 0; x < Nx; x++ {
+	for c := range ncomp {
+		for z := range Nz {
+			for y := range Ny {
+				for x := range Nx {
 					b[c][z][y][x] = a[c][z+z1][y+y1][x+x1]
 				}
 			}

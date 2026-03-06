@@ -155,7 +155,7 @@ func (p *exchParam) update() {
 	if !p.cpu_ok {
 		ex := p.parent.cpuLUT()
 		msat := Msat.cpuLUT()
-		for i := 0; i < NREGION; i++ {
+		for i := range NREGION {
 			exi := ex[0][i] * sign32(msat[0][i])
 			for j := i; j < NREGION; j++ {
 				exj := ex[0][j] * sign32(msat[0][j])

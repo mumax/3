@@ -11,7 +11,7 @@ func corePos() []float64 {
 	max := float32(-1.0)
 	var maxX, maxY, maxZ int
 
-	for z := 0; z < Nz; z++ {
+	for z := range Nz {
 		// Avoid the boundaries so the neighbor interpolation can't go out of bounds.
 		for y := 1; y < Ny-1; y++ {
 			for x := 1; x < Nx-1; x++ {

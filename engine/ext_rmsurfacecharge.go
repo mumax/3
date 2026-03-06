@@ -63,7 +63,7 @@ func compensateLRSurfaceCharges(m *data.Mesh, mxLeft, mxRight float64, bsat floa
 						h2 := hfield(q2, source2, dst)
 
 						// add this surface charges' field to grand total
-						for c := 0; c < 3; c++ {
+						for c := range 3 {
 							H[c][iz][iy][ix] += float32(h1[c] + h2[c])
 						}
 					}

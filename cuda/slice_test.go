@@ -73,7 +73,7 @@ func TestSliceFree(t *testing.T) {
 	m := [3]int{N0, N1, N2}
 	N := 17
 	// not freeing would attempt to allocate 17GB.
-	for i := 0; i < N; i++ {
+	for range N {
 		a := NewSlice(2, m)
 		a.Free()
 	}

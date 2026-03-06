@@ -59,7 +59,7 @@ func (p *lut) gpuLUT1() cuda.LUTPtr {
 func (p *lut) isZero() bool {
 	v := p.cpuLUT()
 	for c := range v {
-		for i := 0; i < NREGION; i++ {
+		for i := range NREGION {
 			if v[c][i] != 0 {
 				return false
 			}
@@ -74,7 +74,7 @@ func (p *lut) nonZero() bool { return !p.isZero() }
 func (p *lut) hasZero() bool {
 	v := p.cpuLUT()
 	for c := range v {
-		for i := 0; i < NREGION; i++ {
+		for i := range NREGION {
 			if v[c][i] == 0 {
 				return true
 			}

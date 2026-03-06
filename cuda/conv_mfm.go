@@ -31,7 +31,7 @@ func (c *MFMConvolution) Free() {
 	c.fftCBuf = nil
 	c.fftRBuf = nil
 
-	for j := 0; j < 3; j++ {
+	for j := range 3 {
 		c.gpuFFTKern[j].Free()
 		c.gpuFFTKern[j] = nil
 		c.kern[j] = nil
@@ -63,7 +63,7 @@ func (c *MFMConvolution) init() {
 func (c *MFMConvolution) initFFTKern3D() {
 	c.fftKernSize = fftR2COutputSizeFloats(c.kernSize)
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		zero1_async(c.fftRBuf)
 		data.Copy(c.fftRBuf, c.kern[i])
 		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)
@@ -75,7 +75,7 @@ func (c *MFMConvolution) initFFTKern3D() {
 
 // store MFM image in output, based on magnetization in inp.
 func (c *MFMConvolution) Exec(outp, inp, vol *data.Slice, Msat MSlice) {
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		zero1_async(c.fftRBuf)
 		copyPadMul(c.fftRBuf, inp.Comp(i), vol, c.kernSize, c.size, Msat)
 		c.fwPlan.ExecAsync(c.fftRBuf, c.fftCBuf)

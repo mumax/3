@@ -25,9 +25,9 @@ func SVG(out io.Writer, arr [3][][][]float32) {
 		My := arr[Y][slice]
 		Mz := arr[Z][slice]
 
-		for i := 0; i < h; i++ {
+		for i := range h {
 			y := float64(h) - (float64(i) + 1./2.)
-			for j := 0; j < w; j++ {
+			for j := range w {
 				x := float64(j) + 1./2.
 
 				mx := Mx[i][j]

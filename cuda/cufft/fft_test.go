@@ -31,7 +31,7 @@ func TestExampleFFT1D(t *testing.T) {
 	fmt.Println("hostIn:", hostIn)
 	fmt.Println("hostOut:", hostOut)
 
-	for i := 0; i < N; i++ {
+	for i := range N {
 		if hostOut[0] != 1+0i {
 			t.Errorf("hostOut[%d]: got %f, want %f", i, hostOut[0], 1+0i)
 		}

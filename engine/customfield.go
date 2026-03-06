@@ -519,7 +519,7 @@ func SumVector(q Quantity) data.Vector {
 	val := ValueOf(q)
 	defer cuda.Recycle(val)
 	var v [3]float64
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		v[i] = float64(cuda.Sum(val.Comp(i)))
 	}
 	return Vector(v[0], v[1], v[2])

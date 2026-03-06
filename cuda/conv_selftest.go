@@ -76,7 +76,7 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 	size := sizeOf(in[0])
 	ksize := sizeOf(kern[0][0])
 	// Zero output first
-	for c := 0; c < 3; c++ {
+	for c := range 3 {
 		for iz := 0; iz < size[Z]; iz++ {
 			for iy := 0; iy < size[Y]; iy++ {
 				for ix := 0; ix < size[X]; ix++ {
@@ -86,7 +86,7 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 		}
 	}
 
-	for sc := 0; sc < 3; sc++ {
+	for sc := range 3 {
 
 		for sz := 0; sz < size[Z]; sz++ {
 			for sy := 0; sy < size[Y]; sy++ {
@@ -95,7 +95,7 @@ func bruteConv(in, out [3][][][]float32, kernel [3][3]*data.Slice) {
 					if in[sc][sz][sy][sx] == 0 {
 						continue // skip zero source
 					}
-					for dc := 0; dc < 3; dc++ { // dest component
+					for dc := range 3 { // dest component
 						if kern[dc][sc] == nil {
 							continue // skip zero kernel
 						}

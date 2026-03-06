@@ -78,10 +78,10 @@ func drawVectors(img *image.RGBA, arr [3][][][]float32, arrowSize int) {
 	d := len(arr[X])
 	norm := float32(d)
 	*img = *recycle(img, w, h)
-	for iy := 0; iy < h; iy++ {
-		for ix := 0; ix < w; ix++ {
+	for iy := range h {
+		for ix := range w {
 			var x, y, z float32 = 0., 0., 0.
-			for iz := 0; iz < d; iz++ {
+			for iz := range d {
 				x += arr[0][iz][iy][ix]
 				y += arr[1][iz][iy][ix]
 				z += arr[2][iz][iy][ix]
@@ -119,10 +119,10 @@ func drawFloats(img *image.RGBA, arr [][][]float32, min, max float32, colormap .
 	d := len(arr)
 	*img = *recycle(img, w, h)
 
-	for iy := 0; iy < h; iy++ {
-		for ix := 0; ix < w; ix++ {
+	for iy := range h {
+		for ix := range w {
 			var v float32 = 0.
-			for iz := 0; iz < d; iz++ {
+			for iz := range d {
 				v += arr[iz][iy][ix]
 
 			}

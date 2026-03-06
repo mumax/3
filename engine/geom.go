@@ -257,11 +257,11 @@ func (g *geom) cellVolume(ix, iy, iz int) float32 {
 	N := edgeSmooth
 	S := float64(edgeSmooth)
 
-	for dx := 0; dx < N; dx++ {
+	for dx := range N {
 		Δx := -cx/2 + (cx / (2 * S)) + (cx/S)*float64(dx)
-		for dy := 0; dy < N; dy++ {
+		for dy := range N {
 			Δy := -cy/2 + (cy / (2 * S)) + (cy/S)*float64(dy)
-			for dz := 0; dz < N; dz++ {
+			for dz := range N {
 				Δz := -cz/2 + (cz / (2 * S)) + (cz/S)*float64(dz)
 
 				if s(x0+Δx, y0+Δy, z0+Δz) { // inside

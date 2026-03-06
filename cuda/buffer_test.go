@@ -16,7 +16,7 @@ func TestBuffer(t *testing.T) {
 	Recycle(c)
 	Recycle(d)
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		b := Buffer(3, m2)
 		Recycle(b)
 	}

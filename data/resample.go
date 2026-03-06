@@ -58,16 +58,16 @@ func Downsample(In [][][][]float32, N [3]int) [][][][]float32 {
 
 	for c := range Out {
 
-		for iz := 0; iz < Dz; iz++ {
-			for iy := 0; iy < Dy; iy++ {
-				for ix := 0; ix < Dx; ix++ {
+		for iz := range Dz {
+			for iy := range Dy {
+				for ix := range Dx {
 					sum, n := 0.0, 0.0
 
-					for I := 0; I < scalez; I++ {
+					for I := range scalez {
 						i2 := iz*scalez + I
-						for J := 0; J < scaley; J++ {
+						for J := range scaley {
 							j2 := iy*scaley + J
-							for K := 0; K < scalex; K++ {
+							for K := range scalex {
 								k2 := ix*scalex + K
 
 								if i2 < Sz && j2 < Sy && k2 < Sx {

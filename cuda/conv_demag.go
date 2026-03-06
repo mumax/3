@@ -48,7 +48,7 @@ func (c *DemagConvolution) Exec(B, m, vol *data.Slice, Msat MSlice) {
 }
 
 func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Msat MSlice) {
-	for i := 0; i < 3; i++ { // FW FFT
+	for i := range 3 { // FW FFT
 		c.fwFFT(i, inp, vol, Msat)
 	}
 
@@ -58,7 +58,7 @@ func (c *DemagConvolution) exec3D(outp, inp, vol *data.Slice, Msat MSlice) {
 		c.kern[Y][Z], c.kern[X][Z], c.kern[X][Y],
 		c.fftKernLogicSize[X], c.fftKernLogicSize[Y], c.fftKernLogicSize[Z])
 
-	for i := 0; i < 3; i++ { // BW FFT
+	for i := range 3 { // BW FFT
 		c.bwFFT(i, outp)
 	}
 }
@@ -152,7 +152,7 @@ func (c *DemagConvolution) init(realKern [3][3]*data.Slice) {
 	kCmplx := data.NewSlice(1, kCSize) // not yet exploiting X symmetry
 	kc := kCmplx.Scalars()
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		for j := i; j < 3; j++ { // upper triangular part
 			if realKern[i][j] != nil { // ignore 0's
 				// FW FFT
@@ -183,13 +183,13 @@ func (c *DemagConvolution) Free() {
 	}
 	c.inputSize = [3]int{}
 	c.realKernSize = [3]int{}
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		c.fftCBuf[i].Free()
 		c.fftRBuf[i].Free()
 		c.fftCBuf[i] = nil
 		c.fftRBuf[i] = nil
 
-		for j := 0; j < 3; j++ {
+		for j := range 3 {
 			c.kern[i][j].Free()
 			c.kern[i][j] = nil
 		}

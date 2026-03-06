@@ -74,7 +74,7 @@ func (m *magnetization) SetCell(ix, iy, iz int, v data.Vector) {
 		return
 	}
 	vNorm := v.Len()
-	for c := 0; c < 3; c++ {
+	for c := range 3 {
 		cuda.SetCell(m.Buffer(), c, ix, iy, iz, float32(v[c]/vNorm))
 	}
 }

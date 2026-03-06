@@ -79,7 +79,7 @@ func (t *tesselation3d) makeRandomCenters() {
 
 	//TODO: same cell can be chosen twice by random chance
 	t.centers = make([]center3d, nGrains)
-	for p := 0; p < nGrains; p++ {
+	for p := range nGrains {
 		rndCell := cells[t.rnd.Intn(nGrains)]
 		t.centers[p].x = rndCell.x
 		t.centers[p].y = rndCell.y

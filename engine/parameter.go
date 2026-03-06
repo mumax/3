@@ -63,7 +63,7 @@ func (p *regionwise) update() {
 	if p.timestamp != Time {
 		changed := false
 		// update functions of time
-		for r := 0; r < NREGION; r++ {
+		for r := range NREGION {
 			updFunc := p.upd_reg[r]
 			if updFunc != nil {
 				p.bufset_(r, updFunc())

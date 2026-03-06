@@ -82,7 +82,7 @@ func SetMFull(dst *data.Slice) {
 	if rM {
 		defer cuda.Recycle(msat)
 	}
-	for c := 0; c < 3; c++ {
+	for c := range 3 {
 		cuda.Mul(dst.Comp(c), M.Buffer().Comp(c), msat)
 	}
 
@@ -92,7 +92,7 @@ func SetMFull(dst *data.Slice) {
 		defer cuda.Recycle(vol)
 	}
 	if !vol.IsNil() {
-		for c := 0; c < 3; c++ {
+		for c := range 3 {
 			cuda.Mul(dst.Comp(c), dst.Comp(c), vol)
 		}
 	}

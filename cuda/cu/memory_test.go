@@ -8,11 +8,11 @@ import (
 )
 
 func TestMalloc(t *testing.T) {
-	for i := 0; i < 1024; i++ {
+	for range 1024 {
 		pointer := MemAlloc(16 * 1024 * 1024)
 		pointer.Free()
 	}
-	for i := 0; i < 1024; i++ {
+	for range 1024 {
 		pointer := MemAlloc(16 * 1024 * 1024)
 		MemFree(pointer)
 	}

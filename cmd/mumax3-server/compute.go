@@ -249,7 +249,7 @@ func DetectGPUs() {
 		panic("multiple DetectGPUs() calls")
 	}
 
-	for i := 0; i < MAXGPU; i++ {
+	for i := range MAXGPU {
 		gpuflag := fmt.Sprint("-gpu=", i)
 		out, err := exec.Command(*flag_mumax, "-test", gpuflag).Output()
 		if err == nil {

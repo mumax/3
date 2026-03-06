@@ -58,7 +58,7 @@ func FindPeers(IPs []string, minPort, maxPort int) {
 
 	scanners := make(chan func())
 
-	for i := 0; i < N_SCANNERS; i++ {
+	for range N_SCANNERS {
 		go func() {
 			for f := range scanners {
 				f()

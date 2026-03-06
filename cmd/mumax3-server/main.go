@@ -8,6 +8,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -83,7 +84,7 @@ func main() {
 		ips := util.InterfaceAddrs()
 		for _, ip := range ips {
 			addr := net.JoinHostPort(ip, p)
-			if !contains(thisIP, ip) { // skip thisIP, will start later and is fatal on error
+			if !slices.Contains(thisIP, ip) { // skip thisIP, will start later and is fatal on error
 				go func() {
 					log.Println("serving at", addr)
 					err := http.ListenAndServe(addr, nil)
@@ -128,22 +129,13 @@ func canonicalAddr(laddr string, IPs []string) string {
 
 	ips := util.InterfaceAddrs()
 	for _, ip := range ips {
-		if contains(IPs, ip) {
+		if slices.Contains(IPs, ip) {
 			return net.JoinHostPort(ip, p)
 
 		}
 	}
 
 	return name
-}
-
-func contains(arr []string, x string) bool {
-	for _, s := range arr {
-		if x == s {
-			return true
-		}
-	}
-	return false
 }
 
 // Parse port range flag. E.g.:

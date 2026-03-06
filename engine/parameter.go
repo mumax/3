@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/mumax/3/cuda"
@@ -51,20 +52,11 @@ func (p *regionwise) Mesh() *data.Mesh { return Mesh() }
 func (p *regionwise) addChild(c ...derived) {
 	for _, c := range c {
 		// TODO: no duplicates
-		if !contains(p.children, c) {
+		if !slices.Contains(p.children, c) {
 			p.children = append(p.children, c)
 			fmt.Println(p, ".addChild", c)
 		}
 	}
-}
-
-func contains(s []derived, x derived) bool {
-	for _, y := range s {
-		if y == x {
-			return true
-		}
-	}
-	return false
 }
 
 func (p *regionwise) update() {

@@ -63,18 +63,19 @@ func plotFile(fname string) {
 func makePlot(fname string, q *Q) {
 	term := "svg"
 	outf := path.Dir(fname) + "/" + q.vecname()
-	cmd := fmt.Sprintf(`set term %v noenhanced size 400 300 font 'Arial,10'; set output "%v.%v";`, term, outf, term)
-	cmd += fmt.Sprintf(`set xlabel "t(ns)";`)
+	var cmd strings.Builder
+	cmd.WriteString(fmt.Sprintf(`set term %v noenhanced size 400 300 font 'Arial,10'; set output "%v.%v";`, term, outf, term))
+	cmd.WriteString(fmt.Sprintf(`set xlabel "t(ns)";`))
 
-	cmd += fmt.Sprintf(`set ylabel "%v %v";`, q.vecname(), q.unit)
-	cmd += fmt.Sprint(`set format y "%g";`)
-	cmd += fmt.Sprint(`plot "`, fname, `" u ($1*1e9):`, q.cols[0], ` w li title "`, q.name[0], `"`)
+	cmd.WriteString(fmt.Sprintf(`set ylabel "%v %v";`, q.vecname(), q.unit))
+	cmd.WriteString(fmt.Sprint(`set format y "%g";`))
+	cmd.WriteString(fmt.Sprint(`plot "`, fname, `" u ($1*1e9):`, q.cols[0], ` w li title "`, q.name[0], `"`))
 	for i := 1; i < len(q.cols); i++ {
-		cmd += fmt.Sprint(`, "`, fname, `" u ($1*1e9):`, q.cols[i], ` w li title "`, q.name[i], `"`)
+		cmd.WriteString(fmt.Sprint(`, "`, fname, `" u ($1*1e9):`, q.cols[i], ` w li title "`, q.name[i], `"`))
 	}
-	cmd += "; set output;"
+	cmd.WriteString("; set output;")
 
-	out, err := exec.Command("gnuplot", "-e", cmd).CombinedOutput()
+	out, err := exec.Command("gnuplot", "-e", cmd.String()).CombinedOutput()
 	os.Stderr.Write(out)
 	check(err)
 }

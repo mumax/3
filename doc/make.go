@@ -141,7 +141,8 @@ func (s *State) Include(fname string) string {
 }
 
 func (s *State) Output() string {
-	out := `<h3>output</h3> `
+	var out strings.Builder
+	out.WriteString(`<h3>output</h3> `)
 
 	dir, err := os.Open(s.outfile())
 	check(err)
@@ -150,10 +151,10 @@ func (s *State) Output() string {
 	sort.Strings(files)
 	for _, f := range files {
 		if path.Ext(f) == ".ovf" {
-			out += s.Img(f[:len(f)-len(".ovf")])
+			out.WriteString(s.Img(f[:len(f)-len(".ovf")]))
 		}
 	}
-	out += `<br style="clear:both"/> `
+	out.WriteString(`<br style="clear:both"/> `)
 
 	for _, f := range files {
 		if f == "table.txt" {
@@ -169,14 +170,14 @@ func (s *State) Output() string {
 	for _, f := range files {
 		if path.Ext(f) == ".svg" {
 			src := path.Join(s.relativeOutfile(), f)
-			out += fmt.Sprintf(`
+			out.WriteString(fmt.Sprintf(`
 <figure>
 	<img src="%v"/>
 	<figcaption> %v </figcaption>
-</figure>`, src, f)
+</figure>`, src, f))
 		}
 	}
-	return out
+	return out.String()
 }
 
 // State.output gives a nice output for all examples except for the

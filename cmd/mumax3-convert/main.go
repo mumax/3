@@ -469,11 +469,12 @@ func parseColor(s string) color.RGBA {
 	if c, ok := colors[s]; ok {
 		return c
 	}
-	str := fmt.Sprintln("Refusing to use ugly color '" + s + "', options are:")
+	var str strings.Builder
+	str.WriteString(fmt.Sprintln("Refusing to use ugly color '" + s + "', options are:"))
 	for k := range colors {
-		str += fmt.Sprintf("%s,", k)
+		str.WriteString(fmt.Sprintf("%s,", k))
 	}
-	util.Fatal(strings.Trim(str, ","))
+	util.Fatal(strings.Trim(str.String(), ","))
 	return color.RGBA{}
 }
 

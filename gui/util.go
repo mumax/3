@@ -1,10 +1,12 @@
 package gui
 
+import "strings"
+
 // concatenate elements
 func cat(s []string) string {
-	str := ""
+	var str strings.Builder
 	for _, s := range s {
-		str += s + " "
+		str.WriteString(s + " ")
 	}
-	return str
+	return str.String()
 }

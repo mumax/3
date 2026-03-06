@@ -100,11 +100,11 @@ func (e *entry) Methods() []string {
 		m := t.Method(i)
 		n := m.Name
 		if unicode.IsUpper(rune(n[0])) && !hidden(n) {
-			var args string
+			var args strings.Builder
 			for i := 1; i < m.Type.NumIn(); i++ {
-				args += cleanType(m.Type.In(i).String()) + " "
+				args.WriteString(cleanType(m.Type.In(i).String()) + " ")
 			}
-			M = append(M, n+"( "+args+")")
+			M = append(M, n+"( "+args.String()+")")
 		}
 	}
 	return M

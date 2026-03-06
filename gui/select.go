@@ -17,11 +17,12 @@ func (d *Page) SelectArray(id string, value string, options []string) string {
 func (d *Page) Select(id string, value string, options ...string) string {
 	e := &sel{data: data{value}}
 	d.addElem(id, e)
-	html := fmt.Sprintf(`<select id=%v onchange="notifyselect('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"> `, id, id, id, id) + "\n"
+	var html strings.Builder
+	html.WriteString(fmt.Sprintf(`<select id=%v onchange="notifyselect('%v')" onfocus="notifyfocus('%v')" onblur="notifyblur('%v')"> `, id, id, id, id) + "\n")
 
 	for _, o := range options {
-		html += fmt.Sprintf(`<option value=%v> %v </option>`, o, o) + "\n"
+		html.WriteString(fmt.Sprintf(`<option value=%v> %v </option>`, o, o) + "\n")
 	}
-	html += `</select>`
-	return html
+	html.WriteString(`</select>`)
+	return html.String()
 }

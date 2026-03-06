@@ -33,7 +33,7 @@ func Fatal(err error) {
 	}
 }
 
-// rounded up to 1s precission
+// rounded up to 1s precision
 func Since(a, b time.Time) time.Duration {
 	d := a.Sub(b)
 	return (d/1e9)*1e9 + 1e9

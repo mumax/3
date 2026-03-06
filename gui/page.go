@@ -75,7 +75,7 @@ func (d *Page) OnEvent(id string, handler func()) {
 	d.elem(id).onevent = handler
 }
 
-// OnEvent sets a handler to be called when an event happens
+// OnAnyEvent sets a handler to be called when an event happens
 // to any of the page's HTML elements.
 func (d *Page) OnAnyEvent(handler func()) {
 	d.onAnyEvent = handler

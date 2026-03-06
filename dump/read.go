@@ -76,8 +76,8 @@ func (r *reader) readSlice() (s *data.Slice, info data.Meta, err error) {
 
 	info.Name = r.readString()
 	info.Unit = r.readString()
-	precission := r.readUint64()
-	util.AssertMsg(precission == 4, "only single precission supported")
+	precision := r.readUint64()
+	util.AssertMsg(precision == 4, "only single precision supported")
 
 	if r.err != nil {
 		return

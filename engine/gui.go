@@ -287,7 +287,6 @@ func (g *guistate) prepareSolver() {
 // see prepareServer
 func (g *guistate) prepareParam() {
 	for _, p := range g.Params {
-		p := p
 		n := p.Name()
 		g.OnEvent(n, func() {
 			cmd := p.Name()

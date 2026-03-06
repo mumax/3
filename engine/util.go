@@ -76,7 +76,7 @@ func Fprintln(filename string, msg ...any) {
 		filename = OD() + filename
 	}
 	httpfs.Touch(filename)
-	err := httpfs.Append(filename, []byte(fmt.Sprintln(myFmt(msg)...)))
+	err := httpfs.Append(filename, fmt.Appendln(nil, myFmt(msg)...))
 	util.FatalErr(err)
 }
 

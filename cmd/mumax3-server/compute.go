@@ -225,12 +225,12 @@ func (p *Process) Run() {
 	if p.Killed {
 		httpfs.Put(p.OutputURL+"killed", []byte(time.Now().Format(time.UnixDate)))
 	} else {
-		httpfs.Put(p.OutputURL+"exitstatus", []byte(fmt.Sprint(status)))
+		httpfs.Put(p.OutputURL+"exitstatus", fmt.Append(nil, status))
 	}
 
 	stopTime := AskTime(p.Host())
 	nanos := stopTime.Sub(startTime).Nanoseconds()
-	httpfs.Put(p.OutputURL+"duration", []byte(fmt.Sprint(nanos)))
+	httpfs.Put(p.OutputURL+"duration", fmt.Append(nil, nanos))
 
 	if status == 0 {
 		ret, err := RPCCall(p.Host(), "AddFairShare", JobUser(p.ID)+"/"+fmt.Sprint(nanos/1e9))

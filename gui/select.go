@@ -1,6 +1,9 @@
 package gui
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type sel struct {
 	data

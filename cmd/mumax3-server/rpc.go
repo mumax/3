@@ -41,9 +41,7 @@ func HandleRPC(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	request := r.URL.Path[len("/do/"):]
-	slashPos := strings.Index(request, "/")
-	method := request[:slashPos]
-	arg := request[slashPos+1:]
+	method, arg, _ := strings.Cut(request, "/")
 
 	m, ok := methods[method]
 	if !ok {

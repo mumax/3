@@ -190,7 +190,6 @@ func CurrentMag() Config {
 		iy := int(math.Floor((y + 0.5*Ly) / d[Y]))
 		iz := int(math.Floor((z + 0.5*Lz) / d[Z]))
 
-		// silent clamping
 		if ix < 0 {
 			ix = 0
 		}

@@ -7,10 +7,9 @@ import (
 )
 
 func init() {
-	DeclFunc("CustomQuantity", CustomQuantity, "Creates a custom quantity from the provided data slice.")
+	DeclFunc("CustomQuantity", CustomQuantity, "Creates a custom Quantity from the user provided (scalar or vector) slice.")
 }
 
-// CustomQuantity creates a custom quantity from the provided data slice.
 func CustomQuantity(inSlice *data.Slice) Quantity {
 	util.Assert(inSlice.NComp() == 1 || inSlice.NComp() == 3)
 	size := Mesh().Size()

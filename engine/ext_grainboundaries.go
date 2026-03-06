@@ -1,45 +1,46 @@
 package engine
 
+import (
+	"math"
+
+	"github.com/mumax/3/util"
+)
+
 func init() {
-	DeclFunc("ext_grainboundaries", ext_grainboundaries, "Mark grain boundary cells as a separate region")
+	DeclFunc("ext_grainboundaries", ext_grainboundaries, "(startregion, numgrains, offset, boundarythickness, zeroflag). Given existing regions, reassigns grain boundaries of boundarythickness to new region values, starting at offset. Zeroflag: 1 = region0 is normal, 0 = region0 acts as edge but no boundary itself, -1 = ignore region0 entirely.")
 }
 
-// Precompute offsets within a radius (for expanding boundary zone)
-func precomputeOffsetsArray(borderSize int) [][3]int {
-	var offsets [][3]int
-	radiusSq := borderSize * borderSize
-	for kk := -borderSize + 1; kk < borderSize; kk++ {
-		for jj := -borderSize + 1; jj < borderSize; jj++ {
-			for ii := -borderSize + 1; ii < borderSize; ii++ {
-				if ii*ii+jj*jj+kk*kk <= radiusSq {
-					offsets = append(offsets, [3]int{kk, jj, ii})
-				}
-			}
-		}
-	}
-	return offsets
-}
-
-func ext_grainboundaries(numgrains, boundarythickness, zeroflag int) {
+func ext_grainboundaries(startregion, numgrains, offset, boundarythickness, zeroflag int) {
 	r := &regions
 
-	host := r.HostList()
 	size := r.Mesh().Size()
-	arr := reshapeBytes(host, size)
-
 	Nx, Ny, Nz := size[X], size[Y], size[Z]
 
-	// Snapshot original regions
+	host := r.HostList()
+
 	orig := make([]byte, len(host))
 	copy(orig, host)
 	origArr := reshapeBytes(orig, size)
 
-	// Precompute Chebyshev offsets for boundary growth
-	var offsets [][3]int
-	for dz := -boundarythickness + 1; dz <= boundarythickness-1; dz++ {
-		for dy := -boundarythickness + 1; dy <= boundarythickness-1; dy++ {
-			for dx := -boundarythickness + 1; dx <= boundarythickness-1; dx++ {
-				offsets = append(offsets, [3]int{dz, dy, dx})
+	if boundarythickness < 1 {
+		util.Log("boundarythickness must be >= 1")
+		return
+	}
+
+	R := boundarythickness
+
+	dx := make([]int, 0, (2*R+1)*(2*R+1)*(2*R+1))
+	dy := make([]int, 0, (2*R+1)*(2*R+1)*(2*R+1))
+	dz := make([]int, 0, (2*R+1)*(2*R+1)*(2*R+1))
+
+	for k := -R; k <= R; k++ {
+		for j := -R; j <= R; j++ {
+			for i := -R; i <= R; i++ {
+				if i*i+j*j+k*k <= R*R {
+					dx = append(dx, i)
+					dy = append(dy, j)
+					dz = append(dz, k)
+				}
 			}
 		}
 	}
@@ -47,72 +48,50 @@ func ext_grainboundaries(numgrains, boundarythickness, zeroflag int) {
 	for iz := 0; iz < Nz; iz++ {
 		for iy := 0; iy < Ny; iy++ {
 			for ix := 0; ix < Nx; ix++ {
+				reg := int(origArr[iz][iy][ix])
 
-				region := origArr[iz][iy][ix]
+				if (zeroflag == -1 && reg == 0) || (zeroflag == 0 && reg == 0) {
+					continue
+				}
 
-				// Skip region 0 if zeroflag == 0 or -1
-				if region == 0 && (zeroflag == 0 || zeroflag == -1) {
+				if reg < startregion || reg > startregion+numgrains {
 					continue
 				}
 
 				isBoundary := false
+				for i := 0; i < len(dx); i++ {
+					nx := ix + dx[i]
+					ny := iy + dy[i]
+					nz := iz + dz[i]
 
-				checkNeighbor := func(nz, ny, nx int) bool {
-					neighbor := origArr[nz][ny][nx]
-
-					// If zeroflag == 0, ignore zero neighbors
-					if zeroflag == 0 && neighbor == 0 {
-						return false
+					if nx < 0 || nx >= Nx || ny < 0 || ny >= Ny || nz < 0 || nz >= Nz {
+						continue
 					}
 
-					// Otherwise, any neighbor not equal to region counts
-					return neighbor != region
-				}
+					neighbor := int(origArr[nz][ny][nx])
 
-				// 6-neighbor boundary check
-				if iz > 0 && checkNeighbor(iz-1, iy, ix) {
-					isBoundary = true
-				}
-				if !isBoundary && iz < Nz-1 && checkNeighbor(iz+1, iy, ix) {
-					isBoundary = true
-				}
-				if !isBoundary && iy > 0 && checkNeighbor(iz, iy-1, ix) {
-					isBoundary = true
-				}
-				if !isBoundary && iy < Ny-1 && checkNeighbor(iz, iy+1, ix) {
-					isBoundary = true
-				}
-				if !isBoundary && ix > 0 && checkNeighbor(iz, iy, ix-1) {
-					isBoundary = true
-				}
-				if !isBoundary && ix < Nx-1 && checkNeighbor(iz, iy, ix+1) {
-					isBoundary = true
+					if zeroflag == -1 && neighbor == 0 {
+						continue
+					}
+
+					if neighbor != reg {
+						isBoundary = true
+						break
+					}
 				}
 
 				if isBoundary {
-					// Grow boundary cube only inside the same original region
-					for _, off := range offsets {
-						nz := iz + off[0]
-						ny := iy + off[1]
-						nx := ix + off[2]
-
-						if nz < 0 || nz >= Nz || ny < 0 || ny >= Ny || nx < 0 || nx >= Nx {
-							continue
-						}
-
-						// Only update cells belonging to the original region
-						if origArr[nz][ny][nx] == region {
-							host[nz*Nx*Ny+ny*Nx+nx] = byte(int(region) + numgrains)
-						}
-					}
+					host[iz*Ny*Nx+iy*Nx+ix] = byte(reg + offset)
 				}
 			}
 		}
 	}
 
+	// Upload updated host array to GPU
 	r.gpuCache.Upload(host)
 
-	// Save history
+	arr := reshapeBytes(host, size)
+
 	f := func(x, y, z float64) int {
 		ix := floatToIndex(x, Nx)
 		iy := floatToIndex(y, Ny)
@@ -123,7 +102,7 @@ func ext_grainboundaries(numgrains, boundarythickness, zeroflag int) {
 }
 
 func floatToIndex(x float64, N int) int {
-	ix := int(x + 0.5) // round to nearest voxel
+	ix := int(math.Round(x))
 	if ix < 0 {
 		ix = 0
 	}

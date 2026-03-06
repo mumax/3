@@ -1,12 +1,13 @@
 package draw
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"image"
 	"image/color"
 	"log"
 	"strconv"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 // Renders an image of slice. fmin, fmax = "auto" or a number to set the min/max color scale.

@@ -2,15 +2,16 @@ package engine
 
 import (
 	"fmt"
+	"io"
+	"sync"
+	"time"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
 	"github.com/mumax/3/httpfs"
 	"github.com/mumax/3/script"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
-	"io"
-	"sync"
-	"time"
 )
 
 var Table = *newTable("table") // output handle for tabular data (average magnetization etc.)

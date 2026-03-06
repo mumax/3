@@ -3,7 +3,6 @@ package draw
 import (
 	"bufio"
 	"fmt"
-	"github.com/mumax/3/data"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -12,6 +11,8 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/mumax/3/data"
 )
 
 func RenderFile(fname string, f *data.Slice, min, max string, arrowSize int, colormap ...ColorMapSpec) error {

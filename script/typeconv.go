@@ -2,9 +2,10 @@ package script
 
 import (
 	"fmt"
-	"github.com/mumax/3/data"
 	"go/token"
 	"reflect"
+
+	"github.com/mumax/3/data"
 )
 
 // converts in to an expression of type OutT.

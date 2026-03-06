@@ -3,8 +3,9 @@ package script
 // Here be dragons
 
 import (
-	"github.com/mumax/3/data"
 	"reflect"
+
+	"github.com/mumax/3/data"
 )
 
 type ScalarFunction interface {

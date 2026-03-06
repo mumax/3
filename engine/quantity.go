@@ -1,9 +1,10 @@
 package engine
 
 import (
+	"reflect"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"reflect"
 )
 
 // Arbitrary physical quantity.

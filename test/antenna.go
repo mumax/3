@@ -3,11 +3,12 @@
 package main
 
 import (
+	"math"
+	"os"
+
 	"github.com/mumax/3/data"
 	. "github.com/mumax/3/engine"
 	"github.com/mumax/3/oommf"
-	"math"
-	"os"
 )
 
 const Mu0 = 4 * math.Pi * 1e-7

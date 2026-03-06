@@ -1,11 +1,12 @@
 package draw
 
 import (
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/freetype/raster"
 	"image"
 	"image/color"
 	"math"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/freetype/raster"
 )
 
 func drawArrows(img *image.RGBA, arr [3][][][]float32, sub int) {

@@ -1,7 +1,9 @@
 package draw
 
-import "image/color"
-import "fmt"
+import (
+	"fmt"
+	"image/color"
+)
 
 type ColorMapSpec struct {
 	Cmap  []color.RGBA

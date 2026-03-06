@@ -11,9 +11,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/mumax/3/data"
 	. "github.com/mumax/3/engine"
-	"os"
 )
 
 func main() {

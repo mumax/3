@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/cuda/cu"
 )
 

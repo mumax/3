@@ -3,9 +3,10 @@ package engine
 // Utilities for setting magnetic configurations.
 
 import (
-	"github.com/mumax/3/data"
 	"math"
 	"math/rand"
+
+	"github.com/mumax/3/data"
 )
 
 func init() {

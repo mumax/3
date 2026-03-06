@@ -1,10 +1,11 @@
 package engine
 
 import (
+	"time"
+
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/timer"
 	"github.com/mumax/3/util"
-	"time"
 )
 
 // Asynchronous I/O queue flushes data to disk while simulation keeps running.

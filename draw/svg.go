@@ -2,9 +2,10 @@ package draw
 
 import (
 	"fmt"
-	"github.com/mumax/3/svgo"
 	"io"
 	"math"
+
+	svg "github.com/mumax/3/svgo"
 )
 
 // Renders svg image of vector data.

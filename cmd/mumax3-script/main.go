@@ -7,10 +7,11 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/mumax/3/script"
 	"io"
 	"log"
 	"os"
+
+	"github.com/mumax/3/script"
 )
 
 var debug = flag.Bool("g", false, "print debug output")

@@ -3,14 +3,15 @@ package dump
 
 import (
 	"fmt"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 	"hash"
 	"hash/crc64"
 	"io"
 	"math"
 	"os"
 	"unsafe"
+
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 func Read(in io.Reader) (*data.Slice, data.Meta, error) {

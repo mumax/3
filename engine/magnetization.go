@@ -25,8 +25,8 @@ func (m *magnetization) Buffer() *data.Slice { return m.buffer_ } // todo: renam
 
 func (m *magnetization) Comp(c int) ScalarField  { return Comp(m, c) }
 func (m *magnetization) SetValue(v any)          { m.SetInShape(nil, v.(Config)) }
-func (m *magnetization) InputType() reflect.Type { return reflect.TypeOf(Config(nil)) }
-func (m *magnetization) Type() reflect.Type      { return reflect.TypeOf(new(magnetization)) }
+func (m *magnetization) InputType() reflect.Type { return reflect.TypeFor[Config]() }
+func (m *magnetization) Type() reflect.Type      { return reflect.TypeFor[*magnetization]() }
 func (m *magnetization) Eval() any               { return m }
 func (m *magnetization) average() []float64      { return sAverageMagnet(M.Buffer()) }
 func (m *magnetization) Average() data.Vector    { return unslice(m.average()) }

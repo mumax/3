@@ -126,7 +126,7 @@ func (e *Excitation) Mesh() *data.Mesh        { return Mesh() }
 func (e *Excitation) Region(r int) *vOneReg   { return vOneRegion(e, r) }
 func (e *Excitation) Comp(c int) ScalarField  { return Comp(e, c) }
 func (e *Excitation) Eval() any               { return e }
-func (e *Excitation) Type() reflect.Type      { return reflect.TypeOf(new(Excitation)) }
+func (e *Excitation) Type() reflect.Type      { return reflect.TypeFor[*Excitation]() }
 func (e *Excitation) InputType() reflect.Type { return script.VectorFunction_t }
 func (e *Excitation) EvalTo(dst *data.Slice)  { EvalTo(e, dst) }
 

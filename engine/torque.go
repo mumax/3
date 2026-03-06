@@ -145,4 +145,4 @@ func (*flposition) SetValue(v any) {
 	drainOutput()
 	fixedLayerPosition = v.(FixedLayerPosition)
 }
-func (*flposition) Type() reflect.Type { return reflect.TypeOf(FixedLayerPosition(FIXEDLAYER_TOP)) }
+func (*flposition) Type() reflect.Type { return reflect.TypeFor[FixedLayerPosition]() }

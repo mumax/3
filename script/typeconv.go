@@ -67,25 +67,19 @@ func inputType(e Expr) reflect.Type {
 
 // common type definitions
 var (
-	float64_t        = reflect.TypeOf(float64(0))
-	bool_t           = reflect.TypeOf(false)
-	func_float64_t   = reflect.TypeOf(func() float64 { panic(0) })
-	func_bool_t      = reflect.TypeOf(func() bool { panic(0) })
-	int_t            = reflect.TypeOf(int(0))
-	string_t         = reflect.TypeOf("")
-	vector_t         = reflect.TypeOf(data.Vector{})
-	func_vector_t    = reflect.TypeOf(func() data.Vector { panic(0) })
-	ScalarFunction_t = reflect.TypeOf(dummy_f).In(0)
-	VectorFunction_t = reflect.TypeOf(dummy_f3).In(0)
-	ScalarIf_t       = reflect.TypeOf(dummy_scalarif).In(0)
-	VectorIf_t       = reflect.TypeOf(dummy_vectorif).In(0)
+	float64_t        = reflect.TypeFor[float64]()
+	bool_t           = reflect.TypeFor[bool]()
+	func_float64_t   = reflect.TypeFor[func() float64]()
+	func_bool_t      = reflect.TypeFor[func() bool]()
+	int_t            = reflect.TypeFor[int]()
+	string_t         = reflect.TypeFor[string]()
+	vector_t         = reflect.TypeFor[data.Vector]()
+	func_vector_t    = reflect.TypeFor[func() data.Vector]()
+	ScalarFunction_t = reflect.TypeFor[func(ScalarFunction)]().In(0)
+	VectorFunction_t = reflect.TypeFor[func(VectorFunction)]().In(0)
+	ScalarIf_t       = reflect.TypeFor[func(ScalarIf)]().In(0)
+	VectorIf_t       = reflect.TypeFor[func(VectorIf)]().In(0)
 )
-
-// maneuvers to get interface type of Func (simpler way?)
-func dummy_f(ScalarFunction)  {}
-func dummy_f3(VectorFunction) {}
-func dummy_scalarif(ScalarIf) {}
-func dummy_vectorif(VectorIf) {}
 
 // converts int to float64
 type intToFloat64 struct{ in Expr }

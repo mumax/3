@@ -42,13 +42,13 @@ type fformat struct{}
 
 func (*fformat) Eval() any          { return FilenameFormat }
 func (*fformat) SetValue(v any)     { drainOutput(); FilenameFormat = v.(string) }
-func (*fformat) Type() reflect.Type { return reflect.TypeOf("") }
+func (*fformat) Type() reflect.Type { return reflect.TypeFor[string]() }
 
 type oformat struct{}
 
 func (*oformat) Eval() any          { return outputFormat }
 func (*oformat) SetValue(v any)     { drainOutput(); outputFormat = v.(OutputFormat) }
-func (*oformat) Type() reflect.Type { return reflect.TypeOf(OutputFormat(OVF2_BINARY)) }
+func (*oformat) Type() reflect.Type { return reflect.TypeFor[OutputFormat]() }
 
 // Save once, with auto file name
 func Save(q Quantity) {

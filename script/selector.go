@@ -26,10 +26,10 @@ func (w *World) compileSelectorStmt(n *ast.SelectorExpr) Expr {
 
 	sel := strings.ToLower(n.Sel.Name)
 	N := ""
-	for i := 0; i < t.NumMethod(); i++ {
-		name := t.Method(i).Name
+	for method := range t.Methods() {
+		name := method.Name
 		if strings.ToLower(name) == sel && unicode.IsUpper(rune(name[0])) && !strings.HasSuffix(name, GoExclusiveMethodSuffix) {
-			N = t.Method(i).Name
+			N = method.Name
 			break
 		}
 	}

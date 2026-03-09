@@ -64,15 +64,15 @@ const (
 // New is the SVG constructor, specifying the io.Writer where the generated SVG is written.
 func New(w io.Writer) *SVG { return &SVG{w} }
 
-func (svg *SVG) print(a ...interface{}) (n int, errno error) {
+func (svg *SVG) print(a ...any) (n int, errno error) {
 	return fmt.Fprint(svg.Writer, a...)
 }
 
-func (svg *SVG) println(a ...interface{}) (n int, error error) {
+func (svg *SVG) println(a ...any) (n int, error error) {
 	return fmt.Fprintln(svg.Writer, a...)
 }
 
-func (svg *SVG) printf(format string, a ...interface{}) (n int, errno error) {
+func (svg *SVG) printf(format string, a ...any) (n int, errno error) {
 	return fmt.Fprintf(svg.Writer, format, a...)
 }
 
@@ -275,7 +275,7 @@ func (svg *SVG) Polygon(x []float64, y []float64, s ...string) {
 
 // Rect draws a rectangle with upper left-hand corner at x,y, with width w, and height h, with optional style
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#RectElement
-func (svg *SVG) Rect(x, y, w, h interface{}, s ...string) {
+func (svg *SVG) Rect(x, y, w, h any, s ...string) {
 	svg.printf(`<rect %s %s`, dim(x, y, w, h), endstyle(s, emptyclose))
 }
 
@@ -345,7 +345,7 @@ func (svg *SVG) Qbezier(sx int, sy int, cx int, cy int, ex int, ey int, tx int, 
 
 // Line draws a straight line between two points, with optional style.
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#LineElement
-func (svg *SVG) Line(x1, y1, x2, y2 interface{}, s ...string) {
+func (svg *SVG) Line(x1, y1, x2, y2 any, s ...string) {
 	svg.printf(`<line x1="%v" y1="%v" x2="%v" y2="%v" %s`, x1, y1, x2, y2, endstyle(s, emptyclose))
 }
 
@@ -893,7 +893,7 @@ func rotate(r float64) string { return fmt.Sprintf(`rotate(%g)`, r) }
 func translate(x, y int) string { return fmt.Sprintf(`translate(%d,%d)`, x, y) }
 
 // coord returns a coordinate string
-func coord(x interface{}, y interface{}) string { return fmt.Sprintf(`%v,%v`, x, y) }
+func coord(x any, y any) string { return fmt.Sprintf(`%v,%v`, x, y) }
 
 // ptag returns the beginning of the path element
 func ptag(x int, y int) string { return fmt.Sprintf(`<path d="M%s`, coord(x, y)) }
@@ -905,7 +905,7 @@ func loc(x int, y int) string { return fmt.Sprintf(`x="%d" y="%d"`, x, y) }
 func href(s string) string { return fmt.Sprintf(`xlink:href="%s"`, s) }
 
 // dim returns the dimension string (x, y coordinates and width, height)
-func dim(x, y, w, h interface{}) string {
+func dim(x, y, w, h any) string {
 	return fmt.Sprintf(`x="%v" y="%v" width="%v" height="%v"`, x, y, w, h)
 }
 

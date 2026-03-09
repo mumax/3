@@ -8,34 +8,34 @@ import (
 )
 
 // Produces nicely formatted output for multi-dimensional arrays.
-func Println(array ...interface{}) {
+func Println(array ...any) {
 	Fprint(os.Stdout, array...)
 	fmt.Fprintln(os.Stdout)
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.
-func Print(array ...interface{}) {
+func Print(array ...any) {
 	Fprint(os.Stdout, array...)
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.
-func Printf(format string, array ...interface{}) {
+func Printf(format string, array ...any) {
 	Fprintf(os.Stdout, format, array...)
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.
-func Fprint(out io.Writer, array ...interface{}) {
+func Fprint(out io.Writer, array ...any) {
 	Fprintf(out, "%v", array...)
 }
 
-func Sprint(array ...interface{}) string {
+func Sprint(array ...any) string {
 	var buf bytes.Buffer
 	Fprint(&buf, array...)
 	return buf.String()
 }
 
 // Produces nicely formatted output for multi-dimensional arrays.
-func Fprintf(out io.Writer, format string, array ...interface{}) {
+func Fprintf(out io.Writer, format string, array ...any) {
 	for _, arr := range array {
 		switch a := arr.(type) {
 		case [][][]float32:

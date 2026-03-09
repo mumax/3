@@ -38,9 +38,9 @@ func writeOVF2Header(out io.Writer, q *data.Slice, meta data.Meta) {
 	hdr(out, "zmax", cellsize[Z]*float64(gridsize[Z]))
 
 	name := meta.Name
-	var labels []interface{}
+	var labels []any
 	if q.NComp() == 1 {
-		labels = []interface{}{name}
+		labels = []any{name}
 	} else {
 		for i := 0; i < q.NComp(); i++ {
 			labels = append(labels, name+"_"+string('x'+i))

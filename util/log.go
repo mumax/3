@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-func Fatal(msg ...interface{}) {
+func Fatal(msg ...any) {
 	log.Fatal(msg...)
 }
 
-func Fatalf(format string, msg ...interface{}) {
+func Fatalf(format string, msg ...any) {
 	log.Fatalf(format, msg...)
 }
 
 // If err != nil, trigger log.Fatal(msg, err)
-func FatalErr(err interface{}) {
+func FatalErr(err any) {
 	_, file, line, _ := runtime.Caller(1)
 	if err != nil {
 		log.Fatal(file, ":", line, err)
@@ -34,13 +34,13 @@ func PanicErr(err error) {
 }
 
 // Logs the error of non-nil, plus message
-func LogErr(err error, msg ...interface{}) {
+func LogErr(err error, msg ...any) {
 	if err != nil {
 		log.Println(append(msg, err)...)
 	}
 }
 
-func Log(msg ...interface{}) {
+func Log(msg ...any) {
 	log.Println(msg...)
 }
 
@@ -52,7 +52,7 @@ func Argument(test bool) {
 }
 
 // Panics with msg if test is false
-func AssertMsg(test bool, msg interface{}) {
+func AssertMsg(test bool, msg any) {
 	if !test {
 		log.Panic(msg)
 	}

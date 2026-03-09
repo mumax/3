@@ -170,8 +170,8 @@ func parseIPs() []string {
 	}()
 
 	p := *flag_scan
-	split := strings.Split(p, ",")
-	for _, s := range split {
+	split := strings.SplitSeq(p, ",")
+	for s := range split {
 		split := strings.Split(s, ".")
 		if len(split) != 4 {
 			log.Fatal("invalid IP address range:", s)

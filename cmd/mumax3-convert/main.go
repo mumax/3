@@ -458,8 +458,8 @@ const (
 )
 
 func parseColors(s string) (m []color.RGBA) {
-	words := strings.Split(s, ",")
-	for _, w := range words {
+	words := strings.SplitSeq(s, ",")
+	for w := range words {
 		m = append(m, parseColor(w))
 	}
 	return

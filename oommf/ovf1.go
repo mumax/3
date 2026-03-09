@@ -94,7 +94,7 @@ func writeOVF1Binary4(out io.Writer, array *data.Slice) (err error) {
 	for iz := 0; iz < gridsize[Z]; iz++ {
 		for iy := 0; iy < gridsize[Y]; iy++ {
 			for ix := 0; ix < gridsize[X]; ix++ {
-				for c := 0; c < ncomp; c++ {
+				for c := range ncomp {
 					// dirty conversion from float32 to [4]byte
 					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					bytes[0], bytes[1], bytes[2], bytes[3] = bytes[3], bytes[2], bytes[1], bytes[0]
@@ -122,7 +122,7 @@ func readOVF1DataBinary4(in io.Reader, t *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < 3; c++ {
+				for c := range 3 {
 					err := binary.Read(in, binary.BigEndian, &tmp)
 					if err != nil {
 						panic(err)
@@ -151,7 +151,7 @@ func readOVF1DataBinary8(in io.Reader, t *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < 3; c++ {
+				for c := range 3 {
 					err := binary.Read(in, binary.BigEndian, &tmp)
 					if err != nil {
 						panic(err)

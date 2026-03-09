@@ -276,7 +276,7 @@ func (g *GammaCorrectionPainter) SetGamma(gamma float64) {
 		return
 	}
 	g.gammaIsOne = false
-	for i := 0; i < 256; i++ {
+	for i := range 256 {
 		a := float64(i) / 0xff
 		a = math.Pow(a, gamma)
 		g.a[i] = uint16(0xffff * a)

@@ -109,7 +109,7 @@ func writeOVF2DataBinary4(out io.Writer, array *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < ncomp; c++ {
+				for c := range ncomp {
 					bytes = (*[4]byte)(unsafe.Pointer(&data[c][iz][iy][ix]))[:]
 					out.Write(bytes)
 				}
@@ -132,7 +132,7 @@ func readOVF2DataBinary4(in io.Reader, array *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < ncomp; c++ {
+				for c := range ncomp {
 					data[c][iz][iy][ix] = readFloat32(in)
 				}
 			}
@@ -179,7 +179,7 @@ func readOVF2DataBinary8(in io.Reader, array *data.Slice) {
 	for iz := 0; iz < size[Z]; iz++ {
 		for iy := 0; iy < size[Y]; iy++ {
 			for ix := 0; ix < size[X]; ix++ {
-				for c := 0; c < ncomp; c++ {
+				for c := range ncomp {
 					data[c][iz][iy][ix] = float32(readFloat64(in))
 				}
 			}

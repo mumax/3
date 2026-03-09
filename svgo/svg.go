@@ -812,7 +812,7 @@ func (svg *SVG) pp(x []float64, y []float64, tag string) {
 		return
 	}
 	lx := len(x) - 1
-	for i := 0; i < lx; i++ {
+	for i := range lx {
 		svg.print(coord(x[i], y[i]) + " ")
 	}
 	svg.print(coord(x[lx], y[lx]))
@@ -823,7 +823,7 @@ func (svg *SVG) pp(x []float64, y []float64, tag string) {
 func endstyle(s []string, endtag string) string {
 	if len(s) > 0 {
 		nv := ""
-		for i := 0; i < len(s); i++ {
+		for i := range s {
 			if strings.Index(s[i], "=") > 0 {
 				nv += (s[i]) + " "
 			} else {

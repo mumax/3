@@ -235,7 +235,7 @@ func writeOVFText(out io.Writer, tens *data.Slice) (err error) {
 	for iz := 0; iz < gridsize[Z]; iz++ {
 		for iy := 0; iy < gridsize[Y]; iy++ {
 			for ix := 0; ix < gridsize[X]; ix++ {
-				for c := 0; c < ncomp; c++ {
+				for c := range ncomp {
 					_, err = fmt.Fprint(out, data[c][iz][iy][ix], " ")
 				}
 				_, err = fmt.Fprint(out, "\n")

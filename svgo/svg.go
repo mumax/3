@@ -822,15 +822,15 @@ func (svg *SVG) pp(x []float64, y []float64, tag string) {
 // or a single string containing a style
 func endstyle(s []string, endtag string) string {
 	if len(s) > 0 {
-		nv := ""
+		var nv strings.Builder
 		for i := range s {
 			if strings.Index(s[i], "=") > 0 {
-				nv += (s[i]) + " "
+				nv.WriteString((s[i]) + " ")
 			} else {
-				nv += style(s[i])
+				nv.WriteString(style(s[i]))
 			}
 		}
-		return nv + endtag
+		return nv.String() + endtag
 	}
 	return endtag
 

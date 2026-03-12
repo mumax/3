@@ -51,6 +51,9 @@ func SetTorque(dst *data.Slice) {
 // Sets dst to the current Landau-Lifshitz torque
 func SetLLTorque(dst *data.Slice) {
 	SetEffectiveField(dst) // calc and store B_eff
+	if Msat.hasZero() {    // Apply no torque to Msat==0 cells
+		cuda.ZeroMaskInv(dst, Msat.gpuLUT1(), regions.Gpu())
+	}
 	alpha := Alpha.MSlice()
 	defer alpha.Recycle()
 	if Precess {

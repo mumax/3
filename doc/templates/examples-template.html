@@ -222,7 +222,7 @@ saveas(geom, "imageShape")
 
 Note: these are 3D geometries seen from above. The displayed cell filling is averaged along the thickness (notable in ellipse and layers example). Black means empty space, white is filled.
 
-<hr/><h2 id="ex_initmag">Initial Magnetization</h2>
+<hr/><h2 id="ex_initmag">Initial magnetization</h2>
 Some initial magnetization functions are provided, as well as transformations similar to those on Shapes. See the Config <a href="http://mumax.github.io/api.html">API</a>.
 
 {{.Example `
@@ -280,7 +280,7 @@ These initial states are approximate, after setting them it is a good idea to re
 The magnetization can also be set in separate regions, see below.
 
 
-<hr/><h2 id="ex_cheese">Interlude: Rotating Cheese</h2>
+<hr/><h2 id="ex_cheese">Interlude: rotating cheese</h2>
 
 In this example we define a geometry that looks like a slice of cheese and have it rotate in time.
 
@@ -317,7 +317,7 @@ for i:=0; i<=90; i=i+30{
 {{.Output}}
 
 
-<hr/><h2 id="ex_regions">Regions: Space-dependent Parameters</h2>
+<hr/><h2 id="ex_regions">Regions: space-dependent parameters</h2>
 
 <p>Space-dependent parameters are defined using material <i>regions</i>. Regions are numbered 0-255 and represent different materials. Each cell can belong to only one region. At the start of a simulation all cells have region number 0.</p>
 
@@ -429,7 +429,7 @@ saveas(MFM, "lift_90nm")
 {{.Output}}
 
 
-<hr/><h2 id="ex_PMA">PMA Racetrack</h2>
+<hr/><h2 id="ex_PMA">PMA racetrack</h2>
 In this example we drive a domain wall in PMA material by spin-transfer torque.  We set up a post-step function that makes the simulation box "follow" the domain wall. Like this, only a small number of cells is needed to simulate an infinitely long magnetic wire.
 
 {{.Example `
@@ -463,7 +463,7 @@ run(.5e-9)
 Since we center on the domain wall we can not see that it is actually moving, but the domain wall breakdown is visible.
 
 
-<hr/><h2 id="ex_Py">Py Racetrack</h2>
+<hr/><h2 id="ex_Py">Py racetrack</h2>
 
 In this example we drive a vortex wall in Permalloy by spin-transfer torque. The simulation box "follows" the domain wall. By removing surface charges at the left and right ends, we mimic an infintely long wire.
 

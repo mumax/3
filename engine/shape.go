@@ -25,8 +25,8 @@ func init() {
 	DeclFunc("Square", Square, "2D square with size in meter")
 	DeclFunc("Triangle", Triangle, "2D triangle with vertices (x0, y0), (x1, y1) and (x2, y2)")
 	DeclFunc("Line", Line, "3D line segment between (x1, y1, z1) and (x2, y2, z2), with given diameter, in meter."+
-		"<br>Last element specifies the line cap, which can be 'infinite' or 'round'."+
-		"<br>Using zero diameter creates a minimally connected geometry, unless it is scaled or rotated.")
+		"<br>Last element specifies the line cap, which can be 'infinite', 'round' or 'flat'."+
+		"<br>Using zero diameter creates a minimally connected geometry, unless it is later scaled/rotated.")
 	DeclFunc("Line2D", Line2D, "2D equivalent of Line(), resulting in a uniform fill along the z-axis")
 	DeclFunc("XRange", XRange, "Part of space between x1 (inclusive) and x2 (exclusive), in meter")
 	DeclFunc("YRange", YRange, "Part of space between y1 (inclusive) and y2 (exclusive), in meter")
@@ -147,6 +147,7 @@ func Triangle(x0, y0, x1, y1, x2, y2 float64) Shape {
 // Line capping modes are
 //   - "infinite": line extends indefinitely beyond the two specified points.
 //   - "round": the line segment ends in circles at the two specified points.
+//   - "flat": the line segment ends in a flat plane at the two specified points.
 func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 	if diam == 0 { // Special case: shape consists of all cells that line intersects
 		return LineIntersectsCell([3]float64{x1, y1, 0}, [3]float64{x2, y2, 0}, 2, linecap)

@@ -159,7 +159,7 @@ func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 		return func(x, y, z float64) bool {
 			return diam*diam >= math.Pow((x-x1)*(y-y2)-(x-x2)*(y-y1), 2)/denom
 		}
-	case "round":
+	case "round", "flat":
 		return func(x, y, z float64) bool {
 			a, b := x2-x1, y2-y1
 			lenSq := a*a + b*b
@@ -167,6 +167,10 @@ func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 			param := -1.0
 			if lenSq != 0 {
 				param = ((x-x1)*a + (y-y1)*b) / lenSq
+			}
+
+			if linecap == "flat" && (param < 0 || param > 1) { // If param is not in [0,1], then point is beyond line segment
+				return false
 			}
 
 			xx, yy := 0., 0.
@@ -202,7 +206,7 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 			cross1, cross2, cross3 := dy1*dz2-dy2*dz1, dx1*dz2-dx2*dz1, dx1*dy2-dx2*dy1
 			return diam*diam >= (cross1*cross1+cross2*cross2+cross3*cross3)/denom
 		}
-	case "round":
+	case "round", "flat":
 		a, b, c := x2-x1, y2-y1, z2-z1
 		lenSq := a*a + b*b + c*c
 
@@ -210,6 +214,10 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 			param := -1.0
 			if lenSq != 0 {
 				param = ((x-x1)*a + (y-y1)*b + (z-z1)*c) / lenSq
+			}
+
+			if linecap == "flat" && (param < 0 || param > 1) { // If param is not in [0,1], then point is beyond line segment
+				return false
 			}
 
 			xx, yy, zz := 0., 0., 0.

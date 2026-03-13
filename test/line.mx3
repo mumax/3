@@ -39,6 +39,16 @@ for z := 0; z < 2*N2 + 1; z++ {
 	expect("geom", geom.GetCell(N2-23, N2-1, z), 0, 0) // Beyond line segment, but within "round"
 }
 
+shape = Line2D(-20*c, 0, 10*c, 5*c, 0, "infinite")
+SetGeom(shape)
+m = Uniform(1, 0, 0)
+SaveAs(m, "Line2D_infinite_d=0.ovf")
+for z := 0; z < 2*N2 + 1; z++ {
+	expect("geom", geom.GetCell(N2-5, N2+2, z), 1, 0) // Inside line segment
+	expect("geom", geom.GetCell(N2-5, N2+1, z), 0, 0) // Next to line segment
+	expect("geom", geom.GetCell(N2-26, N2-1, z), 1, 0) // Beyond line segment, but "infinite"
+}
+
 shape = Line(-20, 0, 0, 10, 5, 7, 4, "infinite").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)

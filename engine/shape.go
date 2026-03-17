@@ -260,7 +260,7 @@ func LineIntersectsCell(p1, p2 [3]float64, Ndim int, linecap string) Shape {
 				}
 				tmin = math.Max(tmin, t1)
 				tmax = math.Min(tmax, t2)
-				if tmax < tmin {
+				if tmax < tmin-1e-15 {
 					return false
 				}
 			}

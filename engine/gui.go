@@ -200,15 +200,19 @@ func (g *guistate) prepareGeom() {
 		}
 		args += ")"
 		// overwrite args for special cases
-		switch {
-		case ident == "Cell":
+		switch ident {
+		case "Cell":
 			args = "(0, 0, 0)"
-		case ident == "XRange" || ident == "YRange" || ident == "ZRange":
+		case "XRange", "YRange", "ZRange":
 			args = "(0, inf)"
-		case ident == "Layers":
+		case "Layers":
 			args = "(0, 1)"
-		case ident == "ImageShape":
+		case "ImageShape":
 			args = `("filename.png")`
+		case "Line":
+			args = `(-1, 0, 0, 1, 0, 0, 0, "infinite")`
+		case "Line2D":
+			args = `(-1, 0, 1, 0, 0, "infinite")`
 		}
 		g.Set("geomargs", args)
 		g.Set("geomdoc", g.Doc(ident))

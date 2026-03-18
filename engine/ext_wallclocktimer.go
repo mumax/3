@@ -9,7 +9,6 @@ import (
 	"github.com/mumax/3/util"
 )
 
-// Expose to user scripts
 func init() {
 	DeclFunc("MinimizeForSeconds", MinimizeForSeconds, "Minimize for a fixed wall-clock time (int seconds)")
 	DeclFunc("RelaxForSeconds", RelaxForSeconds, "Relax for a fixed wall-clock time (int seconds)")

@@ -44,7 +44,7 @@ Ku1.setregion(i,0.5e6*(1-(i/Nx)))
 
 
 
-// Gaussian external field profile
+
 mask := newScalarMask(Nx, Ny, Nz)
 for i:=0; i<Nx; i++{
 	for j:=0; j<Ny; j++{

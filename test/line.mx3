@@ -92,7 +92,7 @@ m = Uniform(1, 0, 0)
 SaveAs(m, "Line_infinite_d=0.ovf")
 expect("geom", geom.GetCell(N2-5, N2+2, N2+3), 1, 0) // Inside line segment
 expect("geom", geom.GetCell(N2-5, N2+1, N2+3), 0, 0) // Next to line segment
-expect("geom", geom.GetCell(N2-5, N2+3, N2+3), 0, 0) // Next to line segment
+expect("geom", geom.GetCell(N2-5, N2+3, N2+3), 1, 0) // Next to line segment, but inside 1e-15 safety check
 expect("geom", geom.GetCell(N2-26, N2-1, N2-2), 1, 0) // Beyond line segment, but "infinite"
 
 shape = Line(-20*c, 0, 0, 10*c, 5*c, 7*c, 0, "round")

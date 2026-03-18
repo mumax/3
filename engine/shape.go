@@ -158,7 +158,7 @@ func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 		dx, dy := x2-x1, y2-y1
 		denom := dx*dx + dy*dy
 		return func(x, y, z float64) bool {
-			return diam*diam >= math.Pow((x-x1)*(y-y2)-(x-x2)*(y-y1), 2)/denom
+			return diam*diam/4 >= math.Pow((x-x1)*(y-y2)-(x-x2)*(y-y1), 2)/lenSq
 		}
 	case "round", "flat":
 		return func(x, y, z float64) bool {
@@ -183,7 +183,7 @@ func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 				xx, yy = x1+param*a, y1+param*b
 			}
 			dx, dy := x-xx, y-yy
-			return math.Sqrt(dx*dx+dy*dy) <= diam
+			return math.Sqrt(dx*dx+dy*dy) <= diam/2
 		}
 	default:
 		util.Fatal("Line capping method \"" + linecap + "\" is not implemented")
@@ -205,7 +205,7 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 			dx1, dy1, dz1 := x-x1, y-y1, z-z1
 			dx2, dy2, dz2 := x-x2, y-y2, z-z2
 			cross1, cross2, cross3 := dy1*dz2-dy2*dz1, dx1*dz2-dx2*dz1, dx1*dy2-dx2*dy1
-			return diam*diam >= (cross1*cross1+cross2*cross2+cross3*cross3)/denom
+			return diam*diam/4 >= (cross1*cross1+cross2*cross2+cross3*cross3)/lenSq
 		}
 	case "round", "flat":
 		a, b, c := x2-x1, y2-y1, z2-z1
@@ -230,7 +230,7 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 				xx, yy, zz = x1+param*a, y1+param*b, z1+param*c
 			}
 			dx, dy, dz := x-xx, y-yy, z-zz
-			return math.Sqrt(dx*dx+dy*dy+dz*dz) <= diam
+			return math.Sqrt(dx*dx+dy*dy+dz*dz) <= diam/2
 		}
 	default:
 		util.Fatal("Line capping method \"" + linecap + "\" is not implemented")

@@ -10,7 +10,7 @@ SetGridSize(2*N2 + 1, 2*N2 + 1, 2*N2 + 1)
 Msat = 800e3
 Aex = 13e-12
 
-shape := Line2D(-20, 0, 10, 5, 4, "infinite").Scale(c, c, c)
+shape := Line2D(-20, 0, 10, 5, 8, "infinite").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line2D_infinite.ovf")
@@ -19,7 +19,7 @@ for z := 0; z < 2*N2 + 1; z++ {
 	expect("geom", geom.GetCell(N2-26, N2-1, z), 1, 0) // Beyond line segment, but "infinite"
 }
 
-shape = Line2D(-20, 0, 10, 5, 4, "round").Scale(c, c, c)
+shape = Line2D(-20, 0, 10, 5, 8, "round").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line2D_round.ovf")
@@ -29,7 +29,7 @@ for z := 0; z < 2*N2 + 1; z++ {
 	expect("geom", geom.GetCell(N2-23, N2-1, z), 1, 0) // Beyond line segment, but within "round"
 }
 
-shape = Line2D(-20, 0, 10, 5, 4, "flat").Scale(c, c, c)
+shape = Line2D(-20, 0, 10, 5, 8, "flat").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line2D_flat.ovf")
@@ -49,7 +49,7 @@ for z := 0; z < 2*N2 + 1; z++ {
 	expect("geom", geom.GetCell(N2-26, N2-1, z), 1, 0) // Beyond line segment, but "infinite"
 }
 
-shape = Line(-20, 0, 0, 10, 5, 7, 4, "infinite").Scale(c, c, c)
+shape = Line(-20, 0, 0, 10, 5, 7, 8, "infinite").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line_infinite.ovf")
@@ -57,7 +57,7 @@ expect("geom", geom.GetCell(N2-5, N2+3, N2+4), 1, 0) // Inside line segment
 expect("geom", geom.GetCell(N2-5, N2+3, N2+10), 0, 0) // Above line segment
 expect("geom", geom.GetCell(N2-26, N2-1, N2-2), 1, 0) // Beyond line segment, but "infinite"
 
-shape = Line(-20, 0, 0, 10, 5, 7, 4, "round").Scale(c, c, c)
+shape = Line(-20, 0, 0, 10, 5, 7, 8, "round").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line_round.ovf")
@@ -70,7 +70,7 @@ expect("geom", geom.GetCell(N2-20, N2+0, N2+5), 0, 0) // Just barely outside seg
 expect("geom", geom.GetCell(N2-21, N2+0, N2+4), 0, 0) // Just barely outside "round"
 expect("geom", geom.GetCell(N2-21, N2+0, N2+3), 1, 0) // Just barely within "round"
 
-shape = Line(-20, 0, 0, 10, 5, 7, 4, "flat").Scale(c, c, c)
+shape = Line(-20, 0, 0, 10, 5, 7, 8, "flat").Scale(c, c, c)
 SetGeom(shape)
 m = Uniform(1, 0, 0)
 SaveAs(m, "Line_flat.ovf")

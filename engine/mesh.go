@@ -6,7 +6,6 @@ import (
 
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
-	"github.com/mumax/3/util"
 )
 
 var globalmesh_ data.Mesh // mesh for m and everything that has the same size
@@ -46,25 +45,25 @@ func SetMesh(Nx, Ny, Nz int, cellSizeX, cellSizeY, cellSizeZ float64, pbcx, pbcy
 	pbc := []int{pbcx, pbcy, pbcz}
 
 	if sizeChanged {
-		warnStr := "// WARNING: %s-axis is not 7-smooth. It has %d cells, with prime\n" +
+		warnStr := " WARNING: %s-axis is not 7-smooth. It has %d cells, with prime\n" + // First "//" gets added by LogOut()
 			"//          factors %v, at least one of which is greater than 7.\n" +
 			"//          Prime factors >7 may reduce performance significantly, and\n" +
 			"//          prime factors >127 may cause a CUDA_ERROR_INVALID_VALUE error."
 		if factorsx := primeFactors(Nx); slices.Max(factorsx) > 7 {
-			util.Log(fmt.Sprintf(warnStr, "x", Nx, factorsx))
+			LogOut(fmt.Sprintf(warnStr, "x", Nx, factorsx))
 		}
 		if factorsy := primeFactors(Ny); slices.Max(factorsy) > 7 {
-			util.Log(fmt.Sprintf(warnStr, "y", Ny, factorsy))
+			LogOut(fmt.Sprintf(warnStr, "y", Ny, factorsy))
 		}
 		if factorsz := primeFactors(Nz); slices.Max(factorsz) > 7 {
-			util.Log(fmt.Sprintf(warnStr, "z", Nz, factorsz))
+			LogOut(fmt.Sprintf(warnStr, "z", Nz, factorsz))
 		}
 	}
 	if cellSizeChanged {
-		warnStr := "// WARNING: cell size was set to a high aspect ratio.\n" +
+		warnStr := " WARNING: cell size was set to a high aspect ratio.\n" + // First "//" gets added by LogOut()
 			"//          Calculation of demag kernel may take longer than usual."
 		if min(cellSizeX, cellSizeY, cellSizeZ) < max(cellSizeX, cellSizeY, cellSizeZ)/4 {
-			util.Log(warnStr)
+			LogOut(warnStr)
 		}
 	}
 

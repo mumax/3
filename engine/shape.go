@@ -239,7 +239,7 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 }
 
 func LineIntersectsCell(p1, p2 [3]float64, Ndim int, linecap string) Shape {
-	eps := 1e-12
+	eps := 1e-6
 	return func(x, y, z float64) bool {
 		p := [3]float64{x, y, z}
 		tmin, tmax := math.Inf(-1), math.Inf(1)
@@ -248,7 +248,7 @@ func LineIntersectsCell(p1, p2 [3]float64, Ndim int, linecap string) Shape {
 			axmin, axmax := p[c]-cs/2, p[c]+cs/2
 			dax := p2[c] - p1[c]
 
-			if math.Abs(dax) < eps {
+			if math.Abs(dax) < eps*cs { // If along an axis: use faster check
 				if p1[c] < axmin || p1[c] > axmax {
 					return false
 				}

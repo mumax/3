@@ -153,18 +153,15 @@ func Line2D(x1, y1, x2, y2, diam float64, linecap string) Shape {
 		return LineIntersectsCell([3]float64{x1, y1, 0}, [3]float64{x2, y2, 0}, 2, linecap)
 	}
 
+	a, b := x2-x1, y2-y1
+	lenSq := a*a + b*b
 	switch linecap {
 	case "infinite":
-		dx, dy := x2-x1, y2-y1
-		denom := dx*dx + dy*dy
 		return func(x, y, z float64) bool {
 			return diam*diam/4 >= math.Pow((x-x1)*(y-y2)-(x-x2)*(y-y1), 2)/lenSq
 		}
 	case "round", "flat":
 		return func(x, y, z float64) bool {
-			a, b := x2-x1, y2-y1
-			lenSq := a*a + b*b
-
 			param := -1.0
 			if lenSq != 0 {
 				param = ((x-x1)*a + (y-y1)*b) / lenSq
@@ -197,10 +194,10 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 		return LineIntersectsCell([3]float64{x1, y1, z1}, [3]float64{x2, y2, z2}, 3, linecap)
 	}
 
+	a, b, c := x2-x1, y2-y1, z2-z1
+	lenSq := a*a + b*b + c*c
 	switch linecap {
 	case "infinite":
-		dx, dy, dz := x2-x1, y2-y1, z2-z1
-		denom := dx*dx + dy*dy + dz*dz
 		return func(x, y, z float64) bool {
 			dx1, dy1, dz1 := x-x1, y-y1, z-z1
 			dx2, dy2, dz2 := x-x2, y-y2, z-z2
@@ -208,9 +205,6 @@ func Line(x1, y1, z1, x2, y2, z2, diam float64, linecap string) Shape {
 			return diam*diam/4 >= (cross1*cross1+cross2*cross2+cross3*cross3)/lenSq
 		}
 	case "round", "flat":
-		a, b, c := x2-x1, y2-y1, z2-z1
-		lenSq := a*a + b*b + c*c
-
 		return func(x, y, z float64) bool {
 			param := -1.0
 			if lenSq != 0 {

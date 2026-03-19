@@ -14,7 +14,7 @@ m.setRegion(2, uniform(0, 1, 0))
 saveAs(regions, "regions.ovf")
 
 // overwrite regions
-defregion(256, universe())
+defregion(0, universe())
 
 // re-load previous state from disk
 regions.loadFile("testdata/regions.ovf")

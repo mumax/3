@@ -1,0 +1,109 @@
+/*
+	Test custom quantity implementation.
+	Like custom_anisotropy.mx3. We compare to mumax's built-in uniaxial anisotropy.
+*/
+
+Nx := 128
+Ny := 64
+Nz :=2
+c := 1e-9
+setgridsize(Nx, Ny, Nz)
+setcellsize(c, c, c)
+Aex   = 10e-12
+Msat  = 600e3
+Ms:=600e3
+m = uniform(1, 1, 0)
+
+for i:=0; i<Nx; i++{
+defregion(i,xrange(-(Nx*c/2)+i*c,-(Nx*c/2)+(i+1)*c).intersect(layer(0)))
+Ku1.setregion(i,1e6*(1-(i/Nx)))
+anisu.setregion(i, vector(1-1*(1-(i/Nx)), 1*(1-(i/Nx)), 0))
+}
+
+defregion(255,layer(1))
+Ku1.setregion(255,0)
+
+B_ext = vector(0, 0.10, 0)
+relax()
+originalmy1:= m.average()[1]
+originalEanis1:=E_anis
+print(originalmy1)
+print(originalEanis1)
+
+B_ext = vector(0, 0.30, 0)
+relax()
+originalmy2:= m.average()[1]
+originalEanis2:=E_anis
+print(originalmy2)
+print(originalEanis2)
+
+
+for i:=0; i<Nx; i++{
+Ku1.setregion(i,0.5e6*(1-(i/Nx)))
+}
+
+
+
+
+mask := newScalarMask(Nx, Ny, Nz)
+for i:=0; i<Nx; i++{
+	for j:=0; j<Ny; j++{
+		for k:=0; k<Nz; k++{
+		r := index2coord(i, j, k)
+		x := r.X()
+		y := r.Y()
+		z := r.Z()
+		Ku_custom := 0.5e6*(1-(i/Nx))
+		mask.setscalar(i, j, k, Ku_custom)
+		}
+	}
+}
+
+vecmask := newVectorMask(Nx, Ny, Nz)
+for i:=0; i<Nx; i++{
+	for j:=0; j<Ny; j++{
+		for k:=0; k<Nz; k++{
+		r := index2coord(i, j, k)
+		x := r.X()
+		y := r.Y()
+		z := r.Z()
+		
+		firstterm:=pow(  (1-1*(1-(i/Nx))),2)
+		secondterm:= pow(1*(1-(i/Nx)),2)
+		normalizedenom:=pow(firstterm+secondterm,0.5)
+		vecmask.setVector(i, j, k, vector( (1-1*(1-(i/Nx)))/normalizedenom, 1*(1-(i/Nx))/normalizedenom, 0))
+		}
+	}
+}
+
+
+smaskasq:=CustomQuantity(mask)
+vmaskasq:=CustomQuantity(vecmask)
+
+mask2:= Mul(Const(2/Ms),smaskasq)
+anisField := Mul( mask2  , Mul( Dot(vmaskasq, m), vmaskasq))
+anisFieldMasked := Masked(anisField, layer(0))
+
+AddFieldTerm(anisfieldMasked)
+AddEdensTerm(Mul(Const(-0.5),Dot(anisFieldMasked,M_full)))
+
+m = uniform(1, 1, 0)
+B_ext = vector(0, 0.10, 0)
+relax()
+expect("my", m.average()[1],   originalmy1, 1e-3)
+print(E_custom)
+print(E_anis)
+expect("E_custom", E_custom, E_anis, 1e-22)
+
+
+B_ext = vector(0, 0.30, 0)
+relax()
+expect("my", m.average()[1], originalmy2, 1e-3)
+print(E_custom)
+print(E_anis)
+expect("E_custom", E_custom, E_anis, 1e-22)
+
+
+//OutputFormat = OVF2_TEXT
+//save(B_anis)
+//saveas(B_custom, "bcustom.ovf")

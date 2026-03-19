@@ -21,8 +21,9 @@ for i:=100; i<200; i+=1 {
 }
 
 //Scale the exchange interaction between all grains
-for i:=1; i<255; i+=1 {
-	for j:=i; j<255; j+=1 {
+maxRegion := NREGION - 1
+for i:=1; i<maxRegion; i+=1 {
+	for j:=i; j<maxRegion; j+=1 {
 		ext_scaleExchange(i,j,0.9)
 	}
 }

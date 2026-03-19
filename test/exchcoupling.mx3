@@ -9,7 +9,7 @@ setGeom(circle(N*c))
 // define grains with region number 0-255
 grainSize  := 40e-9  // m
 randomSeed := 1234567
-maxRegion  := 255
+maxRegion  := NREGION - 1
 ext_makegrains(grainSize, maxRegion, randomSeed)
 
 defregion(0, circle(N*c).inverse()) // region 0 is outside, not really needed

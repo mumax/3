@@ -14,6 +14,7 @@ func init() {
 	DeclFunc("DefRegion", DefRegion, "Define a material region with given index (0-255) and shape")
 	DeclFunc("RedefRegion", RedefRegion, "Reassign all cells with a given region (first argument) to a new region (second argument)")
 	DeclROnly("regions", &regions, "Outputs the region index for each cell")
+	DeclROnly("NREGION", NREGION, "Maximum number of regions (256)")
 	DeclFunc("DefRegionCell", DefRegionCell, "Set a material region (first argument) in one cell "+
 		"by the index of the cell (last three arguments)")
 }
@@ -165,7 +166,7 @@ func (r *Regions) LoadFile(fname string) {
 			for ix := 0; ix < n[X]; ix++ {
 				val := inArr[iz][iy][ix]
 				if val < 0 || val >= NREGION {
-					util.Fatal("regions.LoadFile(", fname, "): all values should be between 0 & 256, have: ", val)
+					util.Fatal("regions.LoadFile(", fname, "): all values should be between 0 & ", NREGION-1, ", have: ", val)
 				}
 				arr[iz][iy][ix] = byte(val)
 			}
@@ -199,7 +200,7 @@ func (r *Regions) GetCell(ix, iy, iz int) int {
 
 func defRegionId(id int) {
 	if id < 0 || id >= NREGION {
-		util.Fatalf("region id should be 0 -%v, have: %v", NREGION, id)
+		util.Fatalf("region id should be 0 - %v, have: %v", NREGION-1, id)
 	}
 	checkMesh()
 }

@@ -10,7 +10,7 @@ Dind=0.0034089785
 
 shiftregions=true
 
-maxregion:=255
+maxregion:=NREGION - 1
 seed:=17
 ext_makegrains(10e-9, maxregion, seed)
 

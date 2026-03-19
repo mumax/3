@@ -43,7 +43,7 @@ J = vector(0, 0, jc)
 
 grainSize := 4e-9 // m
 
-maxRegion := 255
+maxRegion := NREGION - 1
 ext_makegrains(grainSize, maxRegion, randomSeed)
 
 for i := 0; i < maxRegion; i++ {

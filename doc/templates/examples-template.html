@@ -522,10 +522,10 @@ setGeom(circle(N*c))
 // define grains with region number 0-255
 grainSize  := 40e-9  // m
 randomSeed := 1234567
-maxRegion  := 255
+maxRegion  := NREGION - 1
 ext_makegrains(grainSize, maxRegion, randomSeed)
 
-defregion(256, circle(N*c).inverse()) // region 256 is outside, not really needed
+defregion(0, circle(N*c).inverse()) // region 0 is outside, not really needed
 
 alpha = 3
 Kc1   = 1000
@@ -666,7 +666,7 @@ c := 5e-9
 setgridsize(Nx, Ny, 1)
 setcellsize(c, c, c)
 
-ext_makegrains(30e-9, 256, 0)
+ext_makegrains(30e-9, NREGION, 0)
 
 // PMA material
 Ku1   = 0.4e6
@@ -676,12 +676,12 @@ alpha = 1
 
 delta := 0.2 // anisotropy variation
 
-for i:=0; i<256; i++{
+for i:=0; i<NREGION; i++{
 	// random cubic anisotropy direction
 	AnisU.SetRegion(i, vector(delta*(rand()-0.5), delta*(rand()-0.5), 1))
 
 	// strongly reduce exchange coupling between grains
-	for j:=i+1; j<256; j++{
+	for j:=i+1; j<NREGION; j++{
 		ext_scaleExchange(i, j, 0.1)
 	}
 }

@@ -1,3 +1,5 @@
+//go:build !hip
+
 package cu
 
 // This file implements execution of CUDA kernels

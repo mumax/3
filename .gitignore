@@ -20,3 +20,5 @@ tmp/
 .idea/
 .vscode/
 doc/doc.exe
+bench/bench.exe
+bench/gpus_*.txt

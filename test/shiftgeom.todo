@@ -1,0 +1,44 @@
+
+Nx := 128
+Ny := 64
+Nz := 1
+c := 3e-9
+setgridsize(Nx, Ny, Nz)
+setcellsize(c, c, 10e-9)
+wx := Nx * c
+wy := Ny * c
+
+Msat    = 860e3
+Aex     = 13e-12
+Xi      = 0.1
+m       = twodomain(1,0,0,  0,1,0,  -1,0,0)
+
+notch := rect(25e-9, 25e-9).RotZ(45*pi/180).transl(0, wy/2, 0).inverse()
+setGeom(notch.Repeat(wx/2, 0, 0))
+save(geom)
+
+
+// Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
+ext_rmSurfaceCharge(0, 1, -1)
+
+
+// Relax
+Alpha = 3    // high damping for fast relax
+RunWhile(MaxTorque > 1e-3)    // relax
+Alpha = 0.02 // restore normal damping
+
+// Set post-step function that centers simulation window on domain wall.
+ext_centerWall(0) // keep m[0] (= m_x) close to zero
+
+// Schedule output
+autosave(m, 100e-12)
+tableadd(ext_dwpos)   // domain wall position
+tableadd(ext_dwspeed) // domain wall speed
+tableautosave(10e-12)
+
+// Run the simulation with current through the sample
+pol = 0.56
+J   = vector(-10e12, 0, 0)
+Run(0.4e-9)
+
+expectv("m", m.average(), vector(0.0256580703, 0.3362270342, 0.0306527231), 1e-5)

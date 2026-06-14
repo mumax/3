@@ -1,0 +1,35 @@
+/*
+    This is not (yet?) a real test, but rather serves as a visual check of the grainboundaries extension.
+*/
+
+Nx := 512
+Ny := 256
+SetGridSize(Nx, Ny, 1)
+cs := 5e-9
+cy := cs/3
+SetCellSize(cs, cy, cs) // Non-cubic cells
+SetPBC(0, 0, 0)
+
+Msat = 800e3
+Aex = 13e-12
+
+shape := ellipsoid(cs*Nx, cy*Ny, cs*100)
+
+//// 50 regions inside shape
+ext_make3dgrains(50e-9, 1, 50, shape, 12345678)
+snapshotas(regions, "regions50.png")
+
+// Two boundary layers, each with thickness of 3 cells:
+ext_grainboundaries(0, 50, 51, 3*cs, 1)
+ext_grainboundaries(0, 50, 102, 3*cs, 1)
+snapshotas(regions, "regions50_boundaries.png")
+
+//// Two regions inside shape
+DefRegion(0, Universe())
+ext_make3dgrains(50e-9, 1, 2, shape, 12345678)
+snapshotas(regions, "regions2.png")
+
+// Two boundary layers, each with thickness of 3 cells:
+ext_grainboundaries(0, 2, 51, 3*cs, 1)
+ext_grainboundaries(0, 2, 102, 3*cs, 1)
+snapshotas(regions, "regions2_boundaries.png")

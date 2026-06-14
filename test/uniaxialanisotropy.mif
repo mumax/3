@@ -1,0 +1,27 @@
+# MIF 1.1
+Ms:1100E3
+A:13E-12
+K1:0.5E6
+Damp Coef:0.25
+Anisotropy Type:uniaxial
+Anisotropy Init:constant
+Anisotropy Dir1:1 0 0
+Anisotropy Dir2:0 1 0
+Demag Type:constmag
+Part Height:256E-9
+Part Width:256E-9
+Part Thickness:2e-9
+Part Shape:ellipse
+Cell Size:4e-9
+Init Mag:uniform 45 45
+Base Output Filename:anis-test
+Magnetization Output Format:binary 4
+Total Field Output Format:binary 4
+Data Table Output Format:%.15g
+Converge |mxh| Value:1.0E-5
+Randomizer Seed:0
+Field Range: 0 0 0 0 0 0 0 -time 1E-9
+Field Range: 0 10e-3 0 0 10e-3 0 0 -time 1E-9
+Field Range: 0 30e-3 0 0 30e-3 0 0 -time 1E-9
+Field Range: 0 100e-3 0 0 100e-3 0 0 -time 1E-9
+Field Range: 0 300e-3 0 0 300e-3 0 0 -time 1E-9

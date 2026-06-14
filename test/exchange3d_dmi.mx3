@@ -1,0 +1,21 @@
+/* 
+	Test that tiny DMI does not break 3D exchange.
+	As soon as we have nonzero DMI, we use the DMI+Exchange kernel.
+	For vanishingly small DMI, this should give the same result as exchange only.
+*/
+
+d := 100e-9                
+N := 32                   
+setgridsize(N, N, N/4)
+setcellsize(d/N, d/N, d/N)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 3
+m     = vortex(1, 1)
+Dind  = 1e-20 // should have no physical effect, but calls different kernel.
+
+relax()
+expect("mz", m.comp(2).average(), 0.027852356433868408, 1e-6)
+
+

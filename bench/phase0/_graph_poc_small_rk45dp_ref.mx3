@@ -1,0 +1,23 @@
+// Phase 1 item 3, priority 2 (RK45DP extension) verification: adaptive-dt
+// default solver (RK45DP, no setsolver() call) baseline path using steps().
+// Compare against _graph_poc_small_rk45dp_graph.mx3 via ovfdiff.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+steps(500)
+
+save(m)
+save(B_demag)
+print("m_avg:", m.average())
+print("step_count:", step)
+print("t_final:", t)

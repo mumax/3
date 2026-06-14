@@ -1,0 +1,38 @@
+/*
+	Regression test for buggy intergrain exchange reported by Jonathan Leliaert
+*/
+
+setgridsize(256, 64, 1)
+setcellsize(3.125e-9, 3.125e-9, 15e-9)
+
+Msat    = 860e3
+Aex     = 13e-12
+Xi      = 0.0
+m       = vortexwall(1,-1,1,1).scale(1.5, 1, 1)
+
+
+// Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
+ext_rmSurfaceCharge(0, 1, -1)
+
+// Relax
+Alpha = 3    // high damping for fast relax
+RunWhile(MaxTorque > 1e-3)    // relax
+Alpha = 0.02 // restore normal damping
+
+// Set post-step function that centers simulation window on domain wall.
+ext_centerwall(0)
+ext_makegrains(4e-8, 10, 0) 
+
+for i :=0; i<10;i+=1{
+        for j :=i+1; j<10;j+=1{
+                ext_ScaleExchange(i, j, 0.5) 
+        }
+}
+
+// Run the simulation with current through the sample
+Pol =0.56
+J    = vector(-10e12 , 0, 0)
+Run(0.5e-9)
+
+expectv("m", m.average(), vector(0.013319221, 0.018588585, 0.00010564699186943471), 1e-4)
+

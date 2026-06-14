@@ -1,0 +1,19 @@
+/* 
+	Test exchange-demag competition by relaxing a vortex.
+	Use elongated cells to stress the implementation.
+*/
+
+d := 100e-9
+N := 32
+setgridsize(N, 2*N, N/4)
+setcellsize(d/N, d/(2*N), 2*d/N)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 3
+m     = vortex(1, 1)
+
+relax()
+expect("mz", m.comp(2).average(), 0.016988324001431, 1e-3)
+
+

@@ -1,0 +1,29 @@
+// Phase 1 item 3, priority 3 (BackwardEuler extension) verification:
+// BackwardEuler (solver(-1)) baseline path using steps(). BackwardEuler
+// requires FixDt != 0. n=10 (< 20) stays below graphMinSteps, so the
+// transparent Steps() graph dispatch is not attempted and this exercises the
+// plain BackwardEuler.Step() path.
+// Compare against _graph_poc_small_backwardeuler_graph.mx3 via ovfdiff.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+setsolver(-1)
+FixDt = 2e-13
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+steps(10)
+
+save(m)
+save(B_demag)
+print("m_avg:", m.average())
+print("step_count:", step)
+print("t_final:", t)

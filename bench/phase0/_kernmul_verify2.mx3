@@ -1,0 +1,12 @@
+// Static (no time-stepping) verification of kernmulRSymm2Dxy/2Dz:
+// vortex state exercises Kxy and Kzz; single B_demag evaluation, no solver involved.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat = 800e3
+aex  = 13e-12
+
+m = vortex(1, 1)
+save(m)
+save(B_demag)

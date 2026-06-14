@@ -1,0 +1,45 @@
+/*
+	Test isotropic energy in sphere: energy should be the same for all m directions.
+*/
+
+Nx := 32
+Ny := 32
+Nz := 32
+c  := 2e-9
+setgridsize(Nx, Ny, Nz)
+setcellsize(c, c, c)
+
+Msat = 860e3
+Aex  = 13e-12
+alpha = 1e-5
+
+//EdgeSmooth=4
+setGeom(ellipsoid(Nx*c, Ny*c, Nz*c))
+
+//defregion(1, ellipsoid(Nx*c, Ny*c, Nz*c))
+//defregion(2, ellipsoid((Nx-0.3)*c, (Ny-0.5)*c, (Nz-0.3)*c))
+//defregion(3, ellipsoid((Nx-0.6)*c, (Ny-0.5)*c, (Nz-0.6)*c))
+
+//Aex.SetRegion(1, 3*12e-12)
+//Aex.SetRegion(2, 2*12e-12)
+//Aex.SetRegion(3, 1*12e-12)
+
+//Msat.SetRegion(1, 1*860e3/3)
+//Msat.SetRegion(2, 2*860e3/3)
+//Msat.SetRegion(3, 3*860e3/3)
+
+
+m = uniform(1,0,0)
+E0 := E_total.Get()
+
+tol := 1e-6
+for phi:=0.; phi<4*pi; phi+=0.1{
+	theta := phi*1.234 // spin wickedly
+
+	m = uniform(sin(phi)*cos(theta), cos(phi)*cos(theta), sin(theta))
+	E1 := E_total.Get()
+	expect("deltaE", (E1-E0)/E0, 0, tol)
+}
+
+
+

@@ -1,0 +1,54 @@
+
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat  = 800e3
+Aex   = 13e-12
+m  = uniform(1, 1, 1)
+
+LEFT  := 0
+RIGHT := 1
+AIR   := 2
+
+defregion(LEFT,  xrange(-inf, 0))
+defregion(RIGHT, xrange(0, inf))
+
+TOL := 1e-4
+
+expectv("L", B_demag.Region(LEFT).Average(), vector(-0.005299, -0.022127, -0.552248), TOL)
+expectv("R", B_demag.Region(RIGHT).Average(), vector(-0.005299, -0.022127, -0.552248), TOL)
+
+NoDemagSpins.SetRegion(LEFT, 0)
+NoDemagSpins.SetRegion(RIGHT, 1)
+
+
+expectv("L", B_demag.Region(LEFT).Average(), vector(-0.0103589, -0.02122757, -0.5480939), TOL)
+expectv("R", B_demag.Region(RIGHT).Average(), vector(0, 0, 0), 0)
+
+NoDemagSpins.SetRegion(LEFT, 1)
+
+expectv("L", B_demag.Region(LEFT).Average(), vector(0, 0, 0), 0)
+expectv("R", B_demag.Region(RIGHT).Average(), vector(0, 0, 0), 0)
+
+FixDt = 1e-14
+steps(1000) // test for memleaks
+
+airgap := yrange(0, inf)
+SetGeom(airgap.inverse())
+defregion(AIR, airgap)
+
+expectv("L", B_demag.Region(LEFT).Average(), vector(0, 0, 0), 0)
+expectv("R", B_demag.Region(RIGHT).Average(), vector(0, 0, 0), 0)
+expectv("A", B_demag.Region(AIR).Average(), vector(0, 0, 0), 0)
+
+
+NoDemagSpins.SetRegion(LEFT, 0)
+NoDemagSpins.SetRegion(RIGHT, 0)
+
+expectv("L", B_demag.Region(LEFT).Average(), vector(-0.0046074, -0.0391400, -0.53594726), TOL)
+expectv("R", B_demag.Region(RIGHT).Average(), vector(-0.0046074, -0.0391400, -0.53594726), TOL)
+expectv("A", B_demag.Region(AIR).Average(), vector(-0.000692, 0.0170129, -0.01630170), TOL)
+
+NoDemagSpins.SetRegion(LEFT, 1)
+
+steps(1000) // test for memleaks

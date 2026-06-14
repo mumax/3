@@ -1,0 +1,14 @@
+
+setgridsize(30, 20, 2)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+for x:=0; x<30; x++{
+	for y:=0; y<20; y++{
+		randRegion := randInt(256)
+		for z:=0; z<2; z++{
+			defRegionCell(randRegion, x, y, z)
+		}
+	}
+}
+
+save(regions)

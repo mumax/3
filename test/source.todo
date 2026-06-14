@@ -1,0 +1,6 @@
+/*
+	Test source("inputfile").
+*/
+
+source("sourcetest") // defines a variable
+expect("variable", variable, 2, 0)

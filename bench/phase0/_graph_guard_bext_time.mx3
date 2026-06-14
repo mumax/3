@@ -1,0 +1,19 @@
+// Phase 1 item 3 safety guard verification: RunGraph must reject
+// time-dependent B_ext -- see CLAUDE.md section 2.12 (assertGraphCompatible).
+// Expected: util.AssertMsg panic ("RunGraph: B_ext must be time-independent
+// (no extraTerms or time-dependent per-region value)"), non-zero exit.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01*sin(t), 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up
+
+m = uniform(1, 0, 0)
+RunGraph(5)

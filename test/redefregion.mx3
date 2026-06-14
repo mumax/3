@@ -1,0 +1,64 @@
+/*
+    Test the RedefRegion function.
+*/
+
+Nx := 128
+Ny := 64
+Nz := 1
+c := 1e-9
+
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(c, c, c)
+
+m = Uniform(0, 0, 1)
+
+// Assign the left-hand half of the sample region id 1, and set the magnetization within it along +x
+DefRegion(1, Rect(Nx*c/2, Ny*c).Transl(-Nx*c/4, 0, 0))
+m.SetRegion(1, Uniform(1, 0, 0))
+
+// Left-hand-side region id reset to zero
+SnapshotAs(regions, "regions_1_before.png")
+RedefRegion(1, 0)
+SnapshotAs(regions, "regions_1_redefined.png")
+
+// "Reset" the system to its initial state
+m = Uniform(0, 0, 1)
+
+// Now the right-hand-side of the system ONLY should have id 1
+DefRegion(1, Rect(Nx*c/2, Ny*c).Transl(Nx*c/4, 0, 0))
+m.SetRegion(1, Uniform(1, 0, 0))
+
+// Ensure that RHS now has id 1 and LHS is back to zero
+Expect("Region", regions.GetCell(Nx/4, 0, 0), 0, 0.1)
+Expect("Region", regions.GetCell(3*Nx/4, 0, 0), 1, 0.1)
+ExpectV("m", m.GetCell(Nx/4, Ny/2, 0), Vector(0, 0, 1), 1e-5)
+ExpectV("m", m.GetCell(3*Nx/4, Ny/2, 0), Vector(1, 0, 0), 1e-5)
+
+// Reset the system to initial state, then set the (now undefined) region 1 to have m along +y, and ensure that this does not affect average magnetization
+SnapshotAs(regions, "regions_2_before.png")
+RedefRegion(1, 0)
+SnapshotAs(regions, "regions_2_redefined.png")
+m = Uniform(0, 0, 1)
+m.SetRegion(1, Uniform(0, 1, 0))
+Expect("m", m.comp(2).average(), 1, 1e-5)
+
+// Test with several regions: start with different magnetizations; add first region to second, set them both to a single direction, and check both regions now have this
+RedefRegion(1, 0)
+SnapshotAs(regions, "regions_2_redefinedagain.png")
+DefRegion(1, Rect(Nx*c/2, Ny*c/2).Transl(Nx*c/4, Ny*c/4, 0))
+m.SetRegion(1, Uniform(0, 1, 0))
+DefRegion(2, Rect(Nx*c/2, Ny*c/2).Transl(Nx*c/4, -Ny*c/4, 0))
+m.SetRegion(2, Uniform(0, -1, 0))
+SnapshotAs(regions, "regions_3_before.png")
+RedefRegion(1, 2)
+SnapshotAs(regions, "regions_3_redefined.png")
+m.SetRegion(2, Uniform(1, 0, 0))
+ExpectV("m", m.GetCell(3*Nx/4, 3*Ny/4, 0), Vector(1, 0, 0), 1e-5)
+ExpectV("m", m.GetCell(3*Nx/4, Ny/4, 0), Vector(1, 0, 0), 1e-5)
+
+// Test with resized grid: start from previous situation. If regions.hist is not tracked correctly in the Go source, this will not give the correct result.
+SetGridSize(2*Nx, 2*Ny, Nz)
+SnapshotAs(regions, "regions_3_resized.png")
+Expect("Region", regions.GetCell(3*Nx/4, Ny/2, 0), 0, 0.1)
+Expect("Region", regions.GetCell(5*Nx/4, 3*Ny/2-1, 0), 2, 0.1)
+Expect("Region", regions.GetCell(5*Nx/4, Ny/2, 0), 2, 0.1)

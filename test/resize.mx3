@@ -1,0 +1,27 @@
+/*
+	Test magnetization stretch upon resize.
+*/
+
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, .1, 0)
+
+alpha = 3
+//MaxErr = 1e-4
+RunWhile(MaxTorque > 1e-4)
+run(1e-9)
+
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+
+setgridsize(128*2, 32*2, 2)
+setcellsize(500e-9/(128*2), 125e-9/(32*2), 3e-9/2)
+
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+
+run(1e-9)
+
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+

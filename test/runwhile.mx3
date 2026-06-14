@@ -1,0 +1,24 @@
+/*
+	Test for runwhile().
+*/
+
+N := 20
+c := 4e-9
+
+SetGridSize(N, N, 1)
+SetCellSize(c, c, c)
+SetGeom(circle(N*c))
+
+m = uniform(1, 0, 0)
+
+Msat = 800e3
+Aex  = 13e-12
+alpha= 1
+
+RunWhile(MaxTorque > 1e-3)
+
+B_ext = vector(0, 0.01, 1)
+
+RunWhile(m.comp(1).average() < 0.5)
+expect("my", m.comp(1).average(), 0.53, 0.02) // unavoidable overshoot because of large time steps
+

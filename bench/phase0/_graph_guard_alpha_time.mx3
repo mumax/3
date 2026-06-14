@@ -1,0 +1,24 @@
+// Phase 1 item 3 safety guard verification: RunGraph must reject a
+// region-wise time-dependent torque parameter (alpha set as a function of t)
+// -- see CLAUDE.md section 2.14 (assertGraphCompatible extension). alpha
+// feeds the captured torqueFn (LLtorque) kernels directly, so this checks
+// the torque-parameter half of the new guard, not just the effective-field
+// half (covered by _graph_guard_aex_time.mx3).
+// Expected: util.AssertMsg panic ("RunGraph: alpha must be time-independent
+// (SetRegion/SetRegionFn with a function of t is not supported)"), non-zero
+// exit.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01 + 0.001*sin(t)
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up
+
+m = uniform(1, 0, 0)
+RunGraph(5)

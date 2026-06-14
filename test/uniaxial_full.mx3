@@ -1,0 +1,46 @@
+/*
+	Test uniaxial anistorpy energy
+	based on: The design and verification of MuMax3 AIP Advances 4, 107133 (2014); http://dx.doi.org/10.1063/1.4899186
+	Test for one random-ish angle.
+*/
+
+setGridSize(1, 1, 1)
+setCellSize(1e-9, 1e-9, 1e-9)
+V := pow(1e-9, 3)
+
+// 
+Msat  = 100e3
+AnisU = vector(1, 0, 0)
+
+theta := 17*pi/180
+m = uniform(cos(theta), sin(theta), 0)
+
+TOL := 1
+
+Msat  = 100e3
+Ku1 = 0; Ku2 = 1e6
+
+// try to trigger bad ku_red update
+steps(1)
+m = uniform(cos(theta), sin(theta), 0)
+
+Msat  = 1000e3
+expect("easy2", E_anis.get()/V, -836344.9375, TOL)
+
+Ku1 = 0; Ku2 = -1e6
+expect("hard2", E_anis.get()/V,  836344.9375, TOL)
+
+
+Msat  = 100e3
+Ku1 = 1e6; Ku2 = 0
+Msat  = 1000e3
+expect("easy1", E_anis.get()/V, -914519, TOL)
+
+Msat  = 1e3
+Ku1 = -10e6; Ku2 = 0
+E_total.get()
+
+Msat  = 1000e3
+Ku1 = -1e6; Ku2 = 0
+expect("hard1", E_anis.get()/V, 914519, TOL)
+

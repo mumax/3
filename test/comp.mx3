@@ -1,0 +1,34 @@
+/* 
+	Test quantity components
+*/
+
+setgridsize(100, 50, 2)
+setcellsize(5e-9, 4e-9, 3e-9)
+setgeom(xrange(0, inf))
+
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, 2, 0)
+
+// Magnetization components should be automatically normalized.
+tol := 1e-6
+expect("mx", m.comp(0).average(), 1/sqrt(5), tol)
+expect("my", m.comp(1).average(), 2/sqrt(5), tol)
+expect("mz", m.comp(2).average(), 0/sqrt(5), tol)
+
+// Test components of external field
+B_ext = vector(1, 2, 3)
+expect("B_ext", B_ext.comp(0).average(), 1., tol)
+expect("B_ext", B_ext.comp(1).average(), 2., tol)
+expect("B_ext", B_ext.comp(2).average(), 3., tol)
+
+// Test that we can save components
+save(m)
+save(m.comp(0))
+save(m.comp(1))
+save(m.comp(2))
+save(B_eff.Comp(0))
+save(B_exch.Comp(0))
+save(B_demag.Comp(0))
+save(anisU.Comp(0))
+

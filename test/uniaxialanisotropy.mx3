@@ -1,0 +1,76 @@
+/*
+	Test uniaxial anisotropy.
+	We let the anisotropy compete with an external field
+	and verify the relaxed my against OOMMF values.
+*/
+
+setgridsize(64, 64, 1)
+setcellsize(4e-9, 4e-9, 2e-9)
+
+Aex   = 13e-12
+alpha = 1
+M     = uniform(1, 1, 0)
+
+// define some regions to make sure anisotropy is applied everywhere
+// (when using Ku1 = ... syntax)
+defregion(2, ellipse(100e-9, 100e-9))
+defregion(3, rect(100e-9, 20e-9))
+
+// Test output
+save(Ku1)
+save(AnisU)
+save(B_anis)
+
+// Easy, in-plane
+AnisU = vector(1, 0, 0)
+Ku1   = 0.5e6
+
+Msat  = 1100e3
+
+B_ext = vector(0, 0.00, 0)
+relax()
+expect("my", m.average()[1], 0.000, 1e-3)
+
+B_ext = vector(0, 0.01, 0)
+relax()
+expect("my", m.average()[1], 0.011, 1e-3)
+
+B_ext = vector(0, 0.03, 0)
+relax()
+expect("my", m.average()[1], 0.033, 1e-3)
+
+B_ext = vector(0, 0.10, 0)
+relax()
+expect("my", m.average()[1], 0.110, 1e-3)
+
+B_ext = vector(0, 0.30, 0)
+relax()
+expect("my", m.average()[1], 0.331, 1e-3)
+
+// Hard, in-plane
+Ku1   = -0.5e6
+B_ext = vector(0, 0.00, 0)
+relax()
+expect("my", m.average()[1], 1.000, 1e-3)
+
+B_ext = vector(0.01, 0, 0)
+relax()
+expect("mx", m.average()[0], 0.011, 1e-3)
+
+B_ext = vector(0.10, 0, 0)
+relax()
+expect("mx", m.average()[0], 0.110, 1e-3)
+
+AnisU = vector(100, 0, 0)                // Test unnormalized U vector
+relax()
+expect("mx", m.average()[0], 0.110, 1e-3) // should not make a difference (normalized internally)
+
+AnisU = vector(0, 0, 1)
+B_ext = vector(0, 0, 0)
+
+// Hard, perpendicular
+Ku1   = -1e6
+relax()
+expect("mz", m.average()[2], 0, 1e-3)
+
+

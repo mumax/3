@@ -1,0 +1,30 @@
+Nx := 64
+Nz := 1
+c := 1e-9
+setgridsize(Nx, Nx, Nz)
+setcellsize(c, c, c)
+setpbc(1,1,0)
+
+Msat  = 1000e3
+Aex   = 10e-12
+
+
+m=vortex(1,1)
+relax()
+
+Dbulk = 1e-3
+
+alpha = 1
+run(1e-12) // relax a bit
+alpha = 1e-5
+
+E0 := E_total.Get()
+
+tableadd(E_total)
+tableautosave(1e-12)
+
+run(1e-9)
+
+E1 := E_total.Get()
+
+expect("deltaE", (E1-E0)/E0, 0, 1e-6)

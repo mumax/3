@@ -1,0 +1,32 @@
+/* 
+	Test if smoothed geometry is handled correctly by demag calculation and Mfull.
+*/
+
+Nx := 100
+Ny := 50
+setgridsize(Nx, Ny, 2)
+c := 1e-9
+setcellsize(c, c , c)
+
+// reference demag field for full slab
+msat = 1/mu0
+m = uniform(1, 0, 0)
+expectv("B_demag", b_demag.average(), vector(-0.02648, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(1/mu0, 0, 0), 1)
+
+edgesmooth = 8
+
+slab := cuboid(Nx*c, Ny*c, c)
+
+// Only one layer: should give about half the demag field
+setgeom(slab.transl(0, 0, -c/2))
+m = uniform(1, 0, 0)
+expectv("B_demag", b_demag.average(), vector(-0.02648 / 2, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(0.5/mu0, 0, 0), 1)
+
+// Same magnet, but halfway between the two layers.
+// Without smoothed geometry, this fails miserably.
+setgeom(slab.transl(0, 0, 0))
+m = uniform(1, 0, 0)
+expectv("B_demag", b_demag.average(), vector(-0.02648 / 2, 0, 0), 1e-3)
+expectv("M_full", m_full.average(), vector(0.5/mu0, 0, 0), 1)

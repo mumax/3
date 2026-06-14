@@ -1,0 +1,32 @@
+// Regression test for Jonathan's pinning simulations
+
+d := 3.125e-9
+h := 5e-9
+
+SetGridsize(64, 64, 2)
+SetCellsize(d, d, h)
+
+setgeom( cylinder(190e-9, 190e-9).transl(0.5*d,0.5*d,0) )
+
+Msat  = 860e3
+Aex   = 13e-12
+
+defregion(2, cuboid(3*d,3*d,h).transl(0.5*d,0.5*d,0.5*h))
+
+
+Msat.setregion(2, 0.0)
+
+les := sqrt(2*13e-12/860e3)
+overrideLex(1,2, les)
+
+alpha = 0.8
+
+m = vortex(1, -1).transl(5e-9, 0, 0)
+
+run(1e-9)
+
+
+m_ := average(m)
+expect("mx", m_[0],  1.043081283569336e-07, 1e-6)
+expect("my", m_[1], -3.903551260009408e-09, 1e-6)
+expect("mz", m_[2], -0.0037489673122763634, 1e-6)

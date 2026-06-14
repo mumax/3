@@ -1,0 +1,22 @@
+N := 32
+SetGridSize(N, N, N)
+SetCellSize(5e-9, 5e-9, 5e-9)
+
+Msat = 800e3
+Aex = 13e-12
+
+//// Create custom quantity of cell indices
+// Slice
+s := CellIndices()
+B_ext.Add(s, 1)
+SaveAs(B_ext, "B_ext.ovf")
+ExpectV("B_ext.Average()", B_ext.Average(), Vector((N-1)/2, (N-1)/2, (N-1)/2), 0)
+
+// Custom quantity
+sq := CustomQuantity(s)
+SaveAs(sq, "sq.ovf")
+Expect("Sum(sq)", Sum(sq), 3*N*N*(N*(N-1)/2), 0)
+
+sqcenter := Add(sq, ConstVector(-(N-1)/2, -(N-1)/2, -(N-1)/2))
+SaveAs(sqcenter, "sqcenter.ovf")
+Expect("Sum(sqcenter)", Sum(sqcenter), 0, 0)

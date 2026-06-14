@@ -1,0 +1,29 @@
+// Phase 1 item 3, priority 3 (RK56 extension) verification: adaptive-dt
+// RK56 (Fehlberg, solver(6)) CUDA Graph replay path (runGraphRK56: split
+// graphs execK1..execK8 for torqueFn(k1..k8); Madd2..Madd7/error-estimate/
+// MaxVecNorm/normalize/adaptDt run uncaptured each step).
+// n=10 (< 20) is below graphMinSteps, but RunGraph(n) bypasses that gate and
+// dispatches directly via assertGraphCompatible().
+// Compare against _graph_poc_small_rk56_ref.mx3 via ovfdiff.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+setsolver(6)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+RunGraph(10)
+
+save(m)
+save(B_demag)
+print("m_avg:", m.average())
+print("step_count:", step)
+print("t_final:", t)

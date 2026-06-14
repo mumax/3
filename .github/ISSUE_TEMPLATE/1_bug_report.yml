@@ -1,0 +1,11 @@
+name: Bug report or feature request
+description: For issues concerning the mumax³ source code.
+body:
+  - type: textarea
+    id: body
+    attributes:
+      label: "Issue details"
+      description: "Describe your issue below."
+      value: |
+        <!-- Note that the issue tracker is for issues only! -->
+        <!-- You can use the mumax mailing list (https://groups.google.com/g/mumax2) for general usage questions. On this mailing list the whole mumax3 community can help you by answering your questions and/or learn from the given answers. -->

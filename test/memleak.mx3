@@ -1,0 +1,20 @@
+/*
+	Test for memory leaks when resizing.
+*/
+
+c := 5e-9
+
+SetGridSize(1024, 1024, 2)
+SetCellSize(c, c, c)
+
+m = uniform(1,1,1)
+Aex = 13e-12
+Msat = 800e3
+
+for i:=0; i<30; i++{
+	SetGridSize(128, 128+2*i, 1)
+	SetCellSize(c, c, c)
+	Steps(100)
+}
+
+

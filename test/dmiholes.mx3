@@ -1,0 +1,38 @@
+/*
+	DMI test with empty cells, sensitive to boundary conditions.
+*/
+
+N := 64
+setgridsize(N, N + 4, 1)
+c := 1.15e-9 * 2
+d := 1.15e-9
+setcellsize(c, c, d)
+setgeom(yrange((-N/2+1)*c, (N/2-1)*c)) // cut of top and bottom strips
+
+Aex   = 20e-12
+Ku1   = 5.9e5
+Msat  = 6e5
+AnisU = vector(0, 0, 1)
+Dind   = 1e-3
+
+// relax
+alpha = 3
+m = twodomain(0,0,1, 1,1,0, 0,0,-1)
+run(.1e-9)
+
+// output
+tableadd(ext_dwpos)  
+tableadd(ext_dwspeed)
+tableadd(ext_dwtilt)
+
+alpha=0.05
+xi=0.4
+ext_centerWall(2)
+
+Pol = 1
+J = vector(-1e9, 0, 0)
+run(.1e-9)
+
+expect("dwtilt", ext_dwtilt, 0.15, 0.3)
+save(m)
+//expect("dwpos", ext_dwpos, 3.68e-08, c)

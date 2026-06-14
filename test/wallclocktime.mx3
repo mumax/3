@@ -1,0 +1,32 @@
+// All benchmarks mentioned in comments were run on RTX 3080 (mobile).
+// ! Timings must have sufficient margin such that very weak and very strong GPUs still pass this test !
+
+SetGridSize(256, 256, 1)
+SetCellSize(5e-9, 5e-9, 3e-9)
+Aex   = 13e-12
+Msat  = 800e3
+alpha = 0.02
+
+
+//// Fully run relax/minimize (use a situation that relaxes very quickly)
+m = Uniform(1, 0, 0)
+B_ext = Vector(1, 0, 0)
+ExpectB("Relax converged", Relax(), true) // Takes 0.25s to converge
+ExpectB("Minimize converged", Minimize(), true) // Takes an additional 0.003s to converge
+
+
+//// Interrupt relax/minimize
+B_ext = Vector(0, 0, 0)
+t_range := 0.01
+
+m = RandomMag()
+RelaxWallclockTime = 0.1 // Takes 49s to converge
+t0 := now()
+ExpectB("Relax not converged", Relax(), false)
+Expect("Relax stopped in time", since(t0).Seconds(), RelaxWallclockTime + t_range/2, t_range/2)
+
+m = RandomMag()
+MinimizeWallclockTime = 0.1 // Takes 5.5s to converge
+t0 = now()
+ExpectB("Minimize not converged", Minimize(), false)
+Expect("Minimize stopped in time", since(t0).Seconds(), MinimizeWallclockTime + t_range/2, t_range/2)

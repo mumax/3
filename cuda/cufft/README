@@ -1,0 +1,105 @@
+PACKAGE DOCUMENTATION
+
+package cufft
+    import "github.com/barnex/cuda5/cufft"
+
+    Go bindings for the CUDA CUFFT API.
+
+CONSTANTS
+
+const (
+    FORWARD = -1 // Forward FFT
+    INVERSE = 1  // Inverse FFT
+)
+
+TYPES
+
+type CompatibilityMode int
+    CUFFT compatibility mode
+
+const (
+    COMPATIBILITY_FFTW_PADDING    CompatibilityMode = C.CUFFT_COMPATIBILITY_FFTW_PADDING
+)
+
+func (t CompatibilityMode) String() string
+
+type Handle uintptr
+    FFT plan handle, reference type to a plan
+
+func Plan1d(nx int, typ Type, batch int) Handle
+    1D FFT plan
+
+func Plan2d(nx, ny int, typ Type) Handle
+    2D FFT plan
+
+func Plan3d(nx, ny, nz int, typ Type) Handle
+    3D FFT plan
+
+func PlanMany(n []int, inembed []int, istride int, oembed []int, ostride int, typ Type, batch int) Handle
+    1D,2D or 3D FFT plan
+
+func (plan *Handle) Destroy()
+    Destroys the plan.
+
+func (plan Handle) ExecC2C(idata, odata cu.DevicePtr, direction int)
+    Execute Complex-to-Complex plan
+
+func (plan Handle) ExecC2R(idata, odata cu.DevicePtr)
+    Execute Complex-to-Real plan
+
+func (plan Handle) ExecD2Z(idata, odata cu.DevicePtr)
+    Execute Double Real-to-Complex plan
+
+func (plan Handle) ExecR2C(idata, odata cu.DevicePtr)
+    Execute Real-to-Complex plan
+
+func (plan Handle) ExecZ2D(idata, odata cu.DevicePtr)
+    Execute Double Complex-to-Real plan
+
+func (plan Handle) ExecZ2Z(idata, odata cu.DevicePtr, direction int)
+    Execute Double Complex-to-Complex plan
+
+func (plan Handle) SetCompatibilityMode(mode CompatibilityMode)
+    Sets the FFTW compatibility mode
+
+func (plan Handle) SetStream(stream cu.Stream)
+    Sets the cuda stream for this plan
+
+type Result int
+    FFT result
+
+const (
+    SUCCESS                   Result = C.CUFFT_SUCCESS
+    INVALID_PLAN              Result = C.CUFFT_INVALID_PLAN
+    ALLOC_FAILED              Result = C.CUFFT_ALLOC_FAILED
+    INVALID_TYPE              Result = C.CUFFT_INVALID_TYPE
+    INVALID_VALUE             Result = C.CUFFT_INVALID_VALUE
+    INTERNAL_ERROR            Result = C.CUFFT_INTERNAL_ERROR
+    EXEC_FAILED               Result = C.CUFFT_EXEC_FAILED
+    SETUP_FAILED              Result = C.CUFFT_SETUP_FAILED
+    INVALID_SIZE              Result = C.CUFFT_INVALID_SIZE
+    UNALIGNED_DATA            Result = C.CUFFT_UNALIGNED_DATA
+    INCOMPLETE_PARAMETER_LIST Result = 0xA // cuda6 values copied to avoid dependency on cuda6/cufft.h
+    INVALID_DEVICE            Result = 0xB
+    PARSE_ERROR               Result = 0xC
+    NO_WORKSPACE              Result = 0xD
+)
+    FFT result value
+
+func (r Result) String() string
+
+type Type int
+    FFT type
+
+const (
+    R2C Type = C.CUFFT_R2C // Real to Complex (interleaved)
+    C2R Type = C.CUFFT_C2R // Complex (interleaved) to Real
+    C2C Type = C.CUFFT_C2C // Complex to Complex, interleaved
+    D2Z Type = C.CUFFT_D2Z // Double to Double-Complex
+    Z2D Type = C.CUFFT_Z2D // Double-Complex to Double
+    Z2Z Type = C.CUFFT_Z2Z // Double-Complex to Double-Complex
+)
+
+func (t Type) String() string
+
+

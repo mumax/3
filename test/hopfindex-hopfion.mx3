@@ -1,0 +1,15 @@
+/*
+    Test Hopf index calculation for an analytic hopfion texture
+*/
+
+tol := 0.01
+
+setgridsize(128, 128, 128)
+setcellsize(1, 1, 1)
+
+m = HopfionCompactSupport(30, 20)
+
+expect("Hopf index" , ext_hopfindex_fivepointstencil, 1.0, tol)
+expect("Hopf index" , ext_hopfindex_solidangle, 1.0, tol)
+expect("Hopf index" , ext_hopfindex_solidanglefourier, 1.0, tol)
+expect("Hopf index" , ext_hopfindex_twopointstencil, 1.0, 0.05)  // We expect the two-point stencil calculation to be less accurate

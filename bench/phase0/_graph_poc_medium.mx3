@@ -1,0 +1,30 @@
+// Phase 1 item 3 PoC (option A): medium grid (256x256x1), CUDA Graph capture+replay.
+// Same config as medium.mx3, but with a fixed time step (required by
+// RunGraph) and RunGraph instead of steps() for the measured run.
+SetGridSize(256, 256, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+FixDt = 2e-13
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+RunGraph(200)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 256, "x", 256)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 256*256*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

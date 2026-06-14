@@ -1,0 +1,46 @@
+/* 
+	Test energy densities:
+	integral of energy density should give energy
+*/
+
+setgridsize(200, 50, 2)
+setcellsize(5e-9, 4e-9, 3e-9)
+
+setgeom(ellipse(1e-6, 200e-9))
+
+volume := 1e-6 * 200e-9 * 6e-9
+
+defregion(1, xrange(-inf, 0))
+defregion(2, xrange(0, inf))
+
+Aex.setRegion(1, 10e-12)
+Aex.setRegion(2, 13e-12)
+Msat.setRegion(1, 1e6)
+Msat.setRegion(2, 0.8e6)
+Ku1.setRegion(1, 1e5)
+Ku1.setRegion(2, -2e5)
+AnisU = vector(1,2,3)
+Kc1 = 2e5
+anisC1 = vector(1, 0, 0)
+anisC2 = vector(0, 1, 0)
+B_ext = vector(0, 0, 1e-3)
+
+alpha = 1
+
+m = vortex(1,1)
+
+run(0.1e-9)
+
+avg_total  := Edens_total.average()
+avg_anis   := Edens_anis.average()
+avg_demag  := Edens_demag.average()
+avg_exch   := Edens_exch.average()
+avg_zeeman := Edens_Zeeman.average()
+
+// check if energy density gives same result as energy
+tol := 1e-3
+expect("demag" , volume*avg_demag  / E_demag.Get(),  1, tol)
+expect("exch"  , volume*avg_exch   / E_exch.Get(),   1, tol)
+expect("zeeman", volume*avg_zeeman / E_zeeman.Get(), 1, tol)
+expect("anis"  , volume*avg_anis   / E_anis.Get(),   1, tol)
+expect("total" , volume*avg_total  / E_total.Get(),  1, tol)

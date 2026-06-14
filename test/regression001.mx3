@@ -1,0 +1,97 @@
+/* 
+	Regression test for bug reported by Ezio Iacocca <ezio.iacocca@physics.gu.se> okt 2013
+	failed on GTX TITAN, presumably because of race conditions. Fixed since xyz branch.
+*/
+
+Nx := 256
+Ny := 256
+Nz := 1
+SetGridsize(Nx, Ny, Nz)
+CellX := 1500e-9/Nx
+CellY := 1500e-9/Ny
+CellZ := 5e-9
+SetCellsize(CellX, CellY, CellZ)
+
+// DEFINE CONTACT
+posX := 0.e-9
+posY := 0.e-9
+Rc := 35.e-9
+I := -30e-3
+
+// DEFINE BOUNDARY
+ABC := 200e-9
+factor := 100
+
+// DEFINE APPLIED FIELD
+Happ :=  0 // 0.965
+Angle := 70 * pi / 180
+
+// SET MATERIAL PARAMETERS
+alpha_v := 0.01
+Msat_v  := 700e3
+MsatP   := 1200e3
+Aex_v   := 10e-12
+
+// ADJUST SOLVER
+MaxDt = 1e-12
+MinDt = 1e-18
+//MaxErr = 1e-5
+
+// SET GEOMETRY AND REGIONS
+defregion(1, Ellipse(Rc, Rc).transl(posX,posY,0))
+defregion(2, Ellipse(Rc, Rc).transl(posX,posY,0).inverse())
+alpha_reg := ceil(ABC/CellX)
+for i:=0; i<alpha_reg; i++{
+    r_newX := CellX*Nx - ABC + i*CellX
+    r_newY := CellY*Ny - ABC + i*CellY
+    defregion(i+3, Ellipse(r_newX, r_newY).inverse())
+}
+setgeom(Ellipse(CellX*Nx, CellY*Ny))
+defregion(0, Ellipse(CellX*Nx, CellY*Ny).inverse())
+
+// ALLOCATE VARIABLES
+alpha = 1.
+Msat = Msat_v
+Aex = Aex_v 
+
+// INITIALIZE MAGNETIZATION
+for i:=0; i<alpha_reg+2; i++{
+    m.setRegion(i+1,uniform(cos(Angle), 0., sin(Angle)))
+}
+
+// APPLY FIELDS
+B_ext = vector(Happ * cos(Angle), 0., Happ * sin(Angle))
+
+// SCHEDULE OUTPUTS
+tableadd(m.Region(1))
+tableautosave(5e-12)
+
+//  // OERSTED FIELD CALCULATION
+  mask := newSlice(3, Nx, Ny, Nz)
+  current := vector(0., 0., I)
+  for i:=0; i<Nx; i++{
+      for j:=0; j<Ny; j++{
+          r := index2coord(i, j, 0)
+          r = r.sub(vector(posX, posY, 0))
+          b := vector(0, 0, 0)
+          if r.len() >= Rc{
+              b = r.cross(current).mul(mu0 / (2*pi*pow(r.len(),2)) )
+          }else{
+              b = r.cross(current).mul(mu0 / (2*pi*pow(Rc,2)) )
+          }
+          for k:=0; k<Nz; k++{
+              mask.set(0, i, j, k, b.X())
+              mask.set(1, i, j, k, b.Y())
+              mask.set(2, i, j, k, b.Z())
+          }
+      }
+  }
+  B_ext.add(mask, 1)
+  save(B_ext)
+
+// RUN
+run(1e-9)
+
+tol := 1e-3
+expectv("m", m.average(), vector(-0.02892563,  -0.418475056, -0.00015423), tol)
+

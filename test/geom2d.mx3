@@ -1,0 +1,21 @@
+/*
+	2D Geometry test: average m should use volume of geometry, not box
+*/
+
+N := 128
+setgridsize(2*N, N, 1)
+setcellsize(1e-9, 1e-9, 5e-9)
+d := 1e-9 * N  
+
+m = uniform(1, 0, 0)
+expect("m", m.comp(0).average(), 1, 1e-7)
+
+setgeom(circle(d))
+expect("m", m.comp(0).average(), 1, 1e-2)
+
+m = uniform(-1, 0, 0)
+expect("m", m.comp(0).average(), -1, 1e-2) 
+
+setgeom(cylinder(d, d).inverse())
+m = uniform(0, 1, 0)
+expect("m", m.comp(1).average(), 1, 1e-2) 

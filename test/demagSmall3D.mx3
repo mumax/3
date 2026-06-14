@@ -1,0 +1,28 @@
+/*
+	Regression test for demag of a small 3D magnet.
+	This is sensitive to minor range mistakes in the convolution which
+	may not show up clearly for large geometries.
+	Values from mumax3, we test that they don't silently change.
+*/
+
+SetGridSize(3, 4, 2)
+SetCellSize(1e-9, 2e-9, 3e-9)
+
+Msat = 1/mu0
+tol := 1e-6
+
+m = uniform(1, 0, 0)
+expect("kxx", B_demag.Average()[0],-0.52710835138, tol)
+expect("kxy", B_demag.Average()[1],  0, tol)
+expect("kxz", B_demag.Average()[2],  0, tol)
+
+m = uniform(0, 1, 0)
+expect("kyx", B_demag.Average()[0], 0, tol)
+expect("kyy", B_demag.Average()[1],-0.20121671756 , tol) 
+expect("kyz", B_demag.Average()[2], 0, tol)
+
+m = uniform(0, 0, 1)
+expect("kzx", B_demag.Average()[0], 0, tol)
+expect("kzy", B_demag.Average()[1], 0, tol)
+expect("kzz", B_demag.Average()[2],-0.27112555503, tol) 
+

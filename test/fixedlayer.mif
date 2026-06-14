@@ -1,0 +1,112 @@
+# MIF 2.1
+# !!! Please run mumax3 -f fixedlayer.mx3 first !!!
+
+set pi [expr 4*atan(1.0)]
+set mu0 [expr 4*$pi*1e-7]
+
+set basename fixedlayer
+
+Parameter total_current -0.008 ;# Current in amps
+
+Parameter Ms 800e3
+Parameter A  13e-12
+
+Parameter Happ 0.0 ;# Field in kOe
+set Happ [expr {$Happ*1e6/(4*$pi)}]  ;# Convert to A/m
+
+Parameter Happ_angle 180.  ;# Direction of applied field, in degrees
+set Happ_angle [expr {$Happ_angle*$pi/180.}]
+
+Parameter Polarization  0.5669
+
+Parameter Lambda 1.0
+
+Parameter eps_prime 0.02
+
+set length 128e-9
+set width   64e-9
+set thick   32e-9
+
+set Nx 64
+set Ny 32
+set Nz 16
+
+set current_area [expr {$length*$width}]
+set current_density [expr {$total_current/$current_area}]
+
+set xcellsize [expr {$length/$Nx}]
+set ycellsize [expr {$width/$Ny}]
+set zcellsize [expr {$thick/$Nz}]
+
+Specify Oxs_BoxAtlas:atlas [subst {
+  xrange {0 $length}
+  yrange {0 $width}
+  zrange {0 $thick}
+}]
+
+
+Specify Oxs_RectangularMesh:mesh [subst {
+  cellsize {$xcellsize $ycellsize $zcellsize}
+  atlas :atlas
+}]
+
+# Exchange
+Specify Oxs_UniformExchange [subst {
+  A   $A
+}]
+
+# Applied field
+Specify Oxs_FixedZeeman:Happ [subst {
+    field {[expr {cos($Happ_angle)}] [expr {sin($Happ_angle)}] 0.0}
+    multiplier $Happ
+}]
+
+# Demag
+Specify Oxs_Demag {}
+
+
+# Fixed Layer with grains from mumax3 test
+
+Specify Oxs_FileVectorField:fixedlayer {
+    atlas :atlas
+    file  fixedlayer.out/FixedLayer000000.ovf
+}
+
+# Evolver
+Specify Oxs_SpinXferEvolve:evolve [subst {
+ alpha 0.01
+ start_dm 0.000001
+ min_timestep 1e-18
+ max_timestep 1e-12
+ mp :fixedlayer
+ J $current_density
+ P $Polarization
+ Lambda $Lambda
+ eps_prime $eps_prime
+ method rk4
+}]
+
+
+
+# Driver
+Specify Oxs_TimeDriver [subst {
+ basename [list ${basename}-eprime0.02]
+ evolver :evolve
+ stopping_time 1e-12
+ stage_count 5000
+ mesh :mesh
+ Ms $Ms
+ m0 { Oxs_FileVectorField {
+    atlas :atlas
+    file fixedlayer.out/m000000.ovf
+    norm 1.0
+ }}
+
+}]
+
+
+
+
+Destination archive mmArchive
+Schedule Oxs_TimeDriver::Magnetization archive Stage 1
+Schedule DataTable archive Stage 1

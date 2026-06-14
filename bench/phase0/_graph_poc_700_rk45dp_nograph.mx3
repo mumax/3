@@ -1,0 +1,47 @@
+// Phase 1 item 3, 3순위 prep (graphMaxCells re-tuning, see CLAUDE.md section
+// 2.16(a)/2.17): 700x700x1 grid (490,000 cells, just below graphMaxCells=
+// 500000), adaptive dt (FixDt unset), default solver (RK45DP, no setsolver()
+// call), baseline (no CUDA Graph). Same config as _graph_poc_700_rk45dp.mx3,
+// but using steps() for the measured run.
+//
+// IMPORTANT: 490,000 cells is below graphMaxCells=500000, so since the
+// "Run()/Steps() transparent integration" (CLAUDE.md 2.16(a)), a plain
+// steps(100) here would ALSO be silently routed through tryRunGraph() and
+// give the same (graph) throughput as _graph_poc_700_rk45dp.mx3 -- making
+// this script useless as a "nograph" baseline. To force the genuine
+// non-graph RunWhile() path regardless of graphMaxCells, we add a no-op
+// custom field term (zero vector, contributes nothing to B_eff/m) via
+// AddFieldTerm(ConstVector(0,0,0)): this makes len(customTerms)!=0, so
+// graphIncompatibilityReason() rejects it and Steps() falls back to
+// RunWhile(). This adds one extra (cheap) custom-field kernel call per
+// torqueFn evaluation -- a small, constant overhead applied identically to
+// all _nograph variants in this 3순위-prep batch, so graph/nograph ratios
+// remain valid even if absolute S_PER_STEP differs slightly from the
+// customTerms-free baselines in section 2.15.
+AddFieldTerm(ConstVector(0, 0, 0))
+
+SetGridSize(700, 700, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+steps(100)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 700, "x", 700, "x", 1)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 700*700*1*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

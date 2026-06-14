@@ -1,0 +1,54 @@
+/*
+	Test cubic anisotropy.
+	We let the anisotropy compete with an external field
+	and verify the relaxed my against OOMMF values (see cubicanisotropy.mif).
+*/
+
+setgridsize(64, 64, 1)
+setcellsize(4e-9, 4e-9, 2e-9)
+
+Aex   = 13e-12
+Msat  = 1100e3
+alpha = 1
+M     = uniform(1, 0, 0)
+
+// define some regions to make sure anisotropy is applied everywhere
+// (when using Ku1 = ... syntax)
+defregion(2, cylinder(100e-9, 100e-9))
+defregion(3, rect(100e-9, 20e-9))
+setgeom(cylinder(64*4e-9, 64*4e-9))
+
+// Test output
+save(Kc1)
+save(AnisC1)
+save(AnisC2)
+save(B_anis)
+
+// Easy, in-plane
+AnisC1 = vector(100, 0, 0)                // Test unnormalized U vector
+AnisC2 = vector(0, 1, 0)
+Kc1    = 0.2e6
+
+tol := 1e-3
+
+B_ext = vector(0.00, 0.00, 0)
+relax()
+expectv("m", m.average(), vector(1, 0, 0), tol)
+
+B_ext = vector(0.01, 0.01, 0)
+relax()
+expectv("m", m.average(), vector(0.9994, 0.0270, 0), tol)
+
+B_ext = vector(0.03, 0.03, 0)
+relax()
+expectv("m", m.average(), vector(0.9967, 0.0776, 0), tol)
+
+B_ext = vector(0.10, 0.10, 0)
+relax()
+expectv("m", m.average(), vector(0.9711, 0.2367, 0), tol)
+
+B_ext = vector(0.30, 0.30, 0)
+relax()
+expectv("m", m.average(), vector(0.7040, 0.7040, 0), tol)
+
+

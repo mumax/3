@@ -1,0 +1,30 @@
+# MIF 1.1
+ms:1100E3
+a:13E-12
+k1:0.5E6
+damp coef:0.25
+anisotropy type:cubic
+anisotropy init:constant
+anisotropy dir1:1 0 0
+anisotropy dir2:0 1 0
+demag type:constmag
+part height:256E-9
+part width:256E-9
+part thickness:2e-9
+part shape:ellipse
+cell size:4e-9
+init mag:uniform 90 0
+base output filename:anis-test
+magnetization output format:binary 4
+total field output format:binary 4
+data table output format:%.15g
+randomizer seed:0
+randomizer seed:0
+field range: 0 0 0 0 0 0 0 -time 1E-9
+field range: 10e-3  10e-3 0 0 10e-3 0 0 -time 1E-9
+field range: 30e-3  30e-3 0 0 30e-3 0 0 -time 1E-9
+field range: 100e-3 100e-3 0 0 100e-3 0 0 -time 1E-9
+field range: 300e-3 300e-3 0 0 300e-3 0 0 -time 1E-9
+
+# Input file entries unrecognized by mmProbEd ---
+converge |mxh| value : 1.0E-5

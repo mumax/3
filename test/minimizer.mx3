@@ -1,0 +1,22 @@
+/*
+	
+*/
+
+	setgridsize(128, 32, 1)
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+	Msat  = 1600e3
+	Aex   = 13e-12
+	E_total.get()  // try to trigger bad lex2
+
+	Msat  = 800e3
+	alpha = 0.02
+	m  = uniform(1, .1, 0)
+
+	minimize()
+	save(m)
+
+	// Minimize is non-deterministic: see issue #354 for the reason behind these tolerances
+	expect("mx", m.comp(0).average(), 0.966962, 1e-5)
+	expect("my", m.comp(1).average(), 0.12529,  3e-5)
+	expect("mz", m.comp(2).average(), 0.,       0.)

@@ -1,0 +1,59 @@
+/*
+	Test for reversal driven by Slonczewski STT.
+*/
+
+Nx := 64
+Ny := 32
+Nz := 1
+
+sX := 160e-9
+sY := 80e-9
+sZ := 5e-9
+ 
+setgridsize(Nx, Ny, Nz)
+setcellsize(sX/Nx, sY/Ny, sZ/Nz)
+
+Msat  = 800e3
+Aex   = 13e-12
+alpha = 3
+
+// Set a initial magnetisation to C-state
+m = uniform(1, 1, 0.001)
+
+minimize()
+
+alpha        = 0.01
+lambda       = 1
+Pol          = 0.5669
+epsilonprime = 0
+
+pdeg := 1    
+prad := pdeg * pi / 180.0
+px := cos(prad)
+py := sin(prad)
+fixedlayer = vector(px, py, 0)
+
+Jtot := -0.008  // total current in amps
+carea := sX * sY
+jc := Jtot / carea  
+print("Current density is: " ,  jc)
+ 
+J = vector(0, 0, jc)
+
+//autosave(m, 1e-12)
+tableautosave(10e-12)
+
+save(sttorque)
+TOL := 1e-3
+
+m0 := m.average()
+expectv("m", m0, vector(0.9586266279220581, 0.20391345024108887, 0), TOL)
+
+run(1e-9)
+m1 := m.average()
+expectv("m", m1, vector(0.6440994739532471, 0.5131782293319702, -0.1569230705499649), TOL)
+
+run(1e-9)
+m2 := m.average()
+expectv("m", m2, vector(-0.957406222820282, 0.20698121190071106, 0.009677470661699772), TOL)
+

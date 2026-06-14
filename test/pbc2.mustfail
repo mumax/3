@@ -1,0 +1,40 @@
+// test correct wrapping for DMI
+
+setpbc(1, 0, 0)
+Nx := 128
+Ny := Nx/2
+setgridsize(Nx, Ny, 1)
+c := 5e-9
+setcellsize(c, c, c)
+
+Msat  = 1000e3
+Aex   = 10e-12
+alpha = 1
+
+defregion(1, yrange(-inf, 0))
+
+r := rect(Nx/2*c, Ny/2*c)
+dx := Nx/2*c
+dy := Ny/2*c
+
+m = vortex(1, 1)
+save(m)
+run(1e-9)
+save(m)
+
+m1 := average(m.region(1))
+expect("mx", m1[0],  0.8146139383, 1e-5)
+expect("my", m1[1], -0.0001059844, 1e-5)
+expect("mz", m1[2], -0.0003330991, 1e-5)
+
+
+m = vortex(1, 1)
+Dex = 1e-20 // should not make a difference
+save(m)
+run(1e-9)
+save(m)
+
+m1 = average(m.region(1))
+expect("mx", m1[0],  0.8146139383, 1e-5)
+expect("my", m1[1], -0.0001059844, 1e-5)
+expect("mz", m1[2], -0.0003330991, 1e-5)

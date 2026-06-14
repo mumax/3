@@ -1,0 +1,33 @@
+/*
+    Check if energy is constant after minimisation in case of region dependent Dbulk
+    This failed before commit e30a37c0c4bc6a4b8697b202b9e95322763e84aa
+*/
+
+setgridsize(64,64,1)
+setcellsize(0.1,0.1,0.1)
+setpbc(1,1,0)
+
+anisU = vector(0,0,1)
+Ku1 = 1.0
+Msat = 1.0
+Aex = 1.0
+alpha = 0.1
+
+defregion(1,rect(1.,inf))
+defregion(2,rect(inf,1))
+
+Dbulk.setregion(0,0.7)
+Dbulk.setregion(1,0.8)
+Dbulk.setregion(2,1.1)
+
+m = blochskyrmion(-1,1)
+minimize()
+
+tableadd(E_total)
+tableautosave(1e-12)
+
+E0 := E_total.get()
+run(1e-10)
+E1 := E_total.get()
+
+expect("deltaE", (E1-E0)/E0, 0, 1e-6)

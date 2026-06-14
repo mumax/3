@@ -1,0 +1,9 @@
+/*
+	Print somthing to a file
+*/
+
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
+fprintln("out.log", "hello", "world")
+fprintln("out.log", t)

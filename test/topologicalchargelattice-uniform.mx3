@@ -1,0 +1,50 @@
+/* 
+	Test topological charge calculation:
+	for uniform state S = 0
+	Based on topologicalcharge-uniform.mx3
+*/
+
+setgridsize(64, 128, 8)
+setcellsize(3e-9, 1.5e-9, 4e-9)
+
+// aka CoPt
+Msat    = 1000e3
+Aex     = 10e-12
+anisU   = vector(0, 0, 1)
+Ku1     = 0.65e6
+alpha   = 1
+
+tol := 0.002
+
+m = uniform(0.0, 0.0, 1.0)
+b_ext = vector(0.0, 0.0, 2.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)
+
+m = uniform(0.0, 0.0, -1.0)
+b_ext = vector(0.0, 0.0, -2.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)
+
+Ku1     = 0.0
+tol = 5e-10  // changed by Arne, 5e-11 failed on GTX480
+
+b_ext = vector(2.0, 0.0, 0.0)
+m = uniform(1.0, 0.0, 0.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)
+
+b_ext = vector(-2.0, 0.0, 0.0)
+m = uniform(-1.0, 0.0, 0.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)
+
+b_ext = vector(0.0, 2.0, 0.0)
+m = uniform(0.0, 1.0, 0.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)
+
+b_ext = vector(0.0, -2.0, 0.0)
+m = uniform(0.0, -1.0, 0.0)
+steps(50)
+expect("Skyrmion number" , ext_topologicalchargelattice,  0.0, tol)

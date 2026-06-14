@@ -1,0 +1,23 @@
+/*
+	Test ScaleExchange by a factor of 1
+	in standardproblem4.
+*/
+
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat = 800e3
+Aex = 13e-12
+alpha = 0.02
+m  = uniform(1, .1, 0)
+
+defregion(1, Yrange(0, inf))
+defregion(2, Yrange(-inf, 0))
+ext_ScaleExchange(1, 2, 1.0)   // make sure scale by one works
+
+relax()
+expectv("m", m.average(), vector(0.96696, 0.12528, 0), 1e-3)
+
+B_ext = vector(-24.6E-3, 4.3E-3, 0)
+run(1e-9)
+expectv("m", m.average(), vector(-0.9845, 0.1268, 0.0432), 1e-3)

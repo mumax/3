@@ -1,0 +1,66 @@
+SetGridSize(100, 50, 2)
+SetCellSize(5e-9, 4e-9, 3e-9)
+
+Msat = 800e3
+Aex = 13e-12
+alpha = 1 // Enormous damping to get to the saturated state ASAP
+
+//// Interpolation LINEAR
+m = Uniform(1, 0, 0)
+t = 0
+y := FunctionFromDatafile("functionfromfile.csv", 0, 1, "linear") // y(x) is column1(column0), representing B_ext(t)
+B_ext = Vector(0, 0, y(t))
+
+ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)
+ExpectV("0.00ns:   0T", m.average(), Vector(1, 0, 0), 0)
+run(0.5e-10)
+ExpectV("0.05ns:   0T", B_ext.average(), Vector(0, 0, -10), 0) // Linear, so -10T already
+ExpectV("0.05ns:   0T", m.average(), Vector(0, 0, -1), 1e-5) // Linear, so field has been negative for a while now
+run(0.5e-10)
+ExpectV("0.10ns: -20T", B_ext.average(), Vector(0, 0, -20), 0)
+ExpectV("0.10ns: -20T", m.average(), Vector(0, 0, -1), 1e-6)
+run(1e-10)
+ExpectV("0.20ns:  20T", B_ext.average(), Vector(0, 0, 20), 0)
+ExpectV("0.20ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
+run(3e-10)
+ExpectV("0.50ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
+
+//// Interpolation NEAREST
+m = Uniform(1, 0, 0)
+t = 0
+y = FunctionFromDatafile("functionfromfile.csv", 0, 1, "nearest") // y(x) is column1(column0), representing B_ext(t)
+B_ext = Vector(0, 0, y(t))
+
+ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)
+ExpectV("0.00ns:   0T", m.average(), Vector(1, 0, 0), 0)
+run(0.5e-10)
+ExpectV("0.05ns:   0T", B_ext.average(), Vector(0, 0, -20), 0) // Nearest, so -20T from this moment onwards on
+ExpectV("0.05ns:   0T", m.average(), Vector(1, 0, 0), 1e-3) // Nearest, so m still in relaxed state since field has only just turned on
+run(0.5e-10)
+ExpectV("0.10ns: -20T", B_ext.average(), Vector(0, 0, -20), 0)
+ExpectV("0.10ns: -20T", m.average(), Vector(0, 0, -1), 1e-6)
+run(1e-10)
+ExpectV("0.20ns:  20T", B_ext.average(), Vector(0, 0, 20), 0)
+ExpectV("0.20ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
+run(3e-10)
+ExpectV("0.50ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
+
+//// Interpolation STEP
+m = Uniform(1, 0, 0)
+t = 0
+y = FunctionFromDatafile("functionfromfile.csv", 0, 1, "step") // y(x) is column1(column0), representing B_ext(t)
+B_ext = Vector(0, 0, y(t))
+
+ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)
+ExpectV("0.00ns:   0T", m.average(), Vector(1, 0, 0), 0)
+run(0.5e-10)
+ExpectV("0.05ns:   0T", B_ext.average(), Vector(0, 0, 0), 0) // Step, so no field yet
+ExpectV("0.05ns:   0T", m.average(), Vector(1, 0, 0), 1e-3) // Step, so m still in ground state
+run(0.5e-10)
+ExpectV("0.10ns: -20T", B_ext.average(), Vector(0, 0, -20), 0)
+ExpectV("0.10ns: -20T", m.average(), Vector(1, 0, 0), 1e-2)
+run(1e-10)
+ExpectV("0.20ns:  20T", B_ext.average(), Vector(0, 0, 20), 0)
+ExpectV("0.20ns:  20T", m.average(), Vector(0, 0, -1), 1e-6)
+run(3e-10)
+ExpectV("0.50ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)

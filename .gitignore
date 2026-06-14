@@ -1,0 +1,33 @@
+*.swp
+*.swo
+*.5
+*.6
+*.8
+*.o
+*.a
+*.log
+*.dump
+*.table
+*.gplot
+*.pprof
+mx3
+*.tar.gz
+mumax3.*linux*cuda*
+*.*~
+tmp/
+*.tmp
+*.out
+.idea/
+.vscode/
+doc/doc.exe
+
+# local build artifacts (this fork)
+/mumax3.exe
+test/mumax3.exe
+bench/phase0/ovfdiff/ovfdiff.exe
+
+# regression-test run output (test/run_regression.ps1, bench/phase0/run_regression.ps1)
+test/_results/
+test/_retest/
+test/_retest2/
+test/_retest3/

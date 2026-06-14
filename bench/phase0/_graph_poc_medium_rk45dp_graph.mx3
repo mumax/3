@@ -1,0 +1,26 @@
+// Phase 1 item 3, priority 2 (RK45DP extension) verification: medium grid
+// (256x256x1), adaptive-dt default solver (RK45DP, no setsolver() call) CUDA
+// Graph replay path (runGraphRK45DP: split graphs execK2..execK6 for
+// torqueFn(k2..k6), k7 reuses execK2; Madd2..Madd6/error-estimate/MaxVecNorm/
+// normalize/adaptDt/FSAL run uncaptured each step).
+// Compare against _graph_poc_medium_rk45dp_ref.mx3 via ovfdiff.
+SetGridSize(256, 256, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+RunGraph(200)
+
+save(m)
+save(B_demag)
+print("m_avg:", m.average())
+print("step_count:", step)
+print("t_final:", t)

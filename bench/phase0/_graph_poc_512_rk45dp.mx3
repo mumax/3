@@ -1,0 +1,30 @@
+// Phase 1 item 3, 1순위 (large-grid generalization, see CLAUDE.md section
+// 2.15): 512x512x1 grid, adaptive dt (FixDt unset), default solver (RK45DP,
+// no setsolver() call), CUDA Graph split-graph replay (runGraphRK45DP). Same
+// config as _graph_poc_512_rk45dp_nograph.mx3, but with RunGraph() instead of
+// steps() for the measured run.
+SetGridSize(512, 512, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+RunGraph(100)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 512, "x", 512, "x", 1)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 512*512*1*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

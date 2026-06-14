@@ -1,0 +1,27 @@
+// Phase 0 measurement: large grid (2048x2048x1, official benchmark scale)
+SetGridSize(2048, 2048, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(3) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+steps(20)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 2048, "x", 2048)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 2048*2048*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

@@ -1,0 +1,22 @@
+/*
+	Test exchange field
+*/
+
+setgridsize(300, 200, 4)
+setcellsize(2e-9, 3e-9, 4e-9)
+
+msat  = 800e3
+aex   = 13e-12
+m     = twodomain(1, 2, 3,  -1, -3, 5,  3, -1, 2)
+enabledemag = false
+
+defRegion(0, xrange(-inf, 0))
+defRegion(1, xrange(0, inf))
+
+tol := 1e-8
+
+expectv("B_exch", B_exch.Average(), vector(0, 0, 0), tol)
+
+expectv("B_exch0", B_exch.region(0).Average(), vector(0.00118888104756673, -0.00164631487528483, -0.00074591267903645), tol)
+expectv("B_exch1", B_exch.region(1).Average(), vector(-0.00118888041178385, 0.00164631512959798, 0.00074591242472330), tol)
+

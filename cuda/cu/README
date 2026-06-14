@@ -1,0 +1,454 @@
+PACKAGE DOCUMENTATION
+
+package cu
+    import "github.com/barnex/cuda5/cu"
+
+    Go bindings for the CUDA driver API.
+
+CONSTANTS
+
+const (
+    // If  the number of contexts > number of CPUs, yield to other OS threads when waiting for the GPU, otherwise CUDA spin on the processor.
+    CTX_SCHED_AUTO = C.CU_CTX_SCHED_AUTO
+    // Spin when waiting for results from the GPU.
+    CTX_SCHED_SPIN = C.CU_CTX_SCHED_SPIN
+    // Yield its thread when waiting for results from the GPU.
+    CTX_SCHED_YIELD = C.CU_CTX_SCHED_YIELD
+    // Bock the CPU thread on a synchronization primitive when waiting for the GPU to finish work.
+    CTX_BLOCKING_SYNC
+    // Support mapped pinned allocations. This flag must be set in order to allocate pinned host memory that is accessible to the GPU.
+    CTX_MAP_HOST = C.CU_CTX_MAP_HOST
+    //Do not reduce local memory after resizing local memory for a kernel.
+    CTX_LMEM_RESIZE_TO_MAX = C.CU_CTX_LMEM_RESIZE_TO_MAX
+)
+    Flags for CtxCreate
+
+const (
+    SIZEOF_FLOAT32    = 4
+    SIZEOF_FLOAT64    = 8
+    SIZEOF_COMPLEX64  = 8
+    SIZEOF_COMPLEX128 = 16
+)
+    Type size in bytes
+
+FUNCTIONS
+
+func CtxDestroy(ctx *Context)
+    Destroys the CUDA context specified by ctx. If the context usage count
+    is not equal to 1, or the context is current to any CPU thread other
+    than the current one, this function fails. Floating contexts (detached
+    from a CPU thread via cuCtxPopCurrent()) may be destroyed by this
+    function.
+
+func CtxDisablePeerAccess(peer Context)
+    Reverses CtxEnablePeerAccess().
+
+func CtxEnablePeerAccess(peer Context)
+    Make allocations from the peer Context available to the current context.
+
+func CtxGetApiVersion(ctx Context) (version int)
+    Returns the API version to create the context.
+
+func CtxSetCurrent(ctx Context)
+    Sets the current active context.
+
+func CtxSynchronize()
+    Blocks until the device has completed all preceding requested tasks, if
+    the context was created with the CU_CTX_SCHED_BLOCKING_SYNC flag.
+
+func DeviceCanAccessPeer(dev, peer Device) bool
+    Returns true if CtxEnablePeerAccess can be called on a context for dev
+    and peerDev.
+
+func DeviceComputeCapability(device Device) (major, minor int)
+    Returns the compute capability of the device.
+
+func DeviceGetAttribute(attrib DeviceAttribute, dev Device) int
+    Gets the value of a device attribute.
+
+func DeviceGetCount() int
+    Returns the number of devices with compute capability greater than or
+    equal to 1.0 that are available for execution.
+
+func DeviceGetName(dev Device) string
+    Gets the name of the device.
+
+func DeviceTotalMem(device Device) int64
+    Returns the total amount of memory available on the device in bytes.
+
+func FuncGetAttribute(attrib FunctionAttribute, function Function) int
+
+func Init(flags int)
+    Initialize the CUDA driver API. Currently, flags must be 0. If Init()
+    has not been called, any function from the driver API will panic with
+    ERROR_NOT_INITIALIZED.
+
+func LaunchKernel(f Function, gridDimX, gridDimY, gridDimZ int, blockDimX, blockDimY, blockDimZ int, sharedMemBytes int, stream Stream, kernelParams []unsafe.Pointer)
+
+func MemAllocHost(bytes int64) unsafe.Pointer
+
+func MemFree(p DevicePtr)
+    Frees device memory allocated by MemAlloc(). It is safe to double-free.
+
+func MemFreeHost(ptr unsafe.Pointer)
+
+func MemGetAddressRange(ptr DevicePtr) (bytes int64, base DevicePtr)
+    Returns the base address and size of the allocation (by MemAlloc) that
+    contains the input pointer ptr.
+
+func MemGetInfo() (free, total int64)
+    Returns the free and total amount of memroy in the current Context (in
+    bytes).
+
+func MemHostRegister(ptr unsafe.Pointer, bytes int64, flags MemHostRegisterFlag)
+    Page-locks memory specified by the pointer and bytes. The pointer and
+    byte size must be aligned to the host page size (4KB) See also:
+    MemHostUnregister()
+
+func MemHostUnregister(ptr unsafe.Pointer)
+    Unmaps memory locked by MemHostRegister().
+
+func Memcpy(dst, src DevicePtr, bytes int64)
+    Copies a number of bytes on the current device. Requires unified
+    addressing to be supported. See also: MemcpyDtoD(). TODO(a): is actually
+    an auto copy for device and/or host memory
+
+func MemcpyAsync(dst, src DevicePtr, bytes int64, stream Stream)
+    Asynchronously copies a number of bytes on the current device.
+
+func MemcpyDtoD(dst, src DevicePtr, bytes int64)
+    Copies a number of bytes from host to device.
+
+func MemcpyDtoDAsync(dst, src DevicePtr, bytes int64, stream Stream)
+    Asynchronously copies a number of bytes from host to device.
+
+func MemcpyDtoH(dst unsafe.Pointer, src DevicePtr, bytes int64)
+    Copies a number of bytes from device to host.
+
+func MemcpyDtoHAsync(dst unsafe.Pointer, src DevicePtr, bytes int64, stream Stream)
+    Asynchronously copies a number of bytes device host to host. The host
+    memory must be page-locked (see MemRegister)
+
+func MemcpyHtoD(dst DevicePtr, src unsafe.Pointer, bytes int64)
+    Copies a number of bytes from host to device.
+
+func MemcpyHtoDAsync(dst DevicePtr, src unsafe.Pointer, bytes int64, stream Stream)
+    Asynchronously copies a number of bytes from host to device. The host
+    memory must be page-locked (see MemRegister)
+
+func MemcpyPeer(dst DevicePtr, dstCtx Context, src DevicePtr, srcCtx Context, bytes int64)
+    Copies from device memory in one context (device) to another.
+
+func MemcpyPeerAsync(dst DevicePtr, dstCtx Context, src DevicePtr, srcCtx Context, bytes int64, stream Stream)
+    Asynchronously copies from device memory in one context (device) to
+    another.
+
+func MemsetD32(deviceptr DevicePtr, value uint32, N int64)
+    Sets the first N 32-bit values of dst array to value. Asynchronous.
+
+func MemsetD32Async(deviceptr DevicePtr, value uint32, N int64, stream Stream)
+    Asynchronously sets the first N 32-bit values of dst array to value.
+
+func MemsetD8(deviceptr DevicePtr, value uint8, N int64)
+    Sets the first N 8-bit values of dst array to value. Asynchronous.
+
+func MemsetD8Async(deviceptr DevicePtr, value uint8, N int64, stream Stream)
+    Asynchronously sets the first N 32-bit values of dst array to value.
+
+func StreamDestroy(stream *Stream)
+    Destroys an asynchronous stream
+
+func StreamSynchronize(stream Stream)
+    Blocks until the stream has completed.
+
+func Version() int
+    Returns the CUDA driver version.
+
+TYPES
+
+type Context uintptr
+    CUDA context.
+
+func CtxCreate(flags uint, dev Device) Context
+    Create a CUDA context.
+
+func CtxGetCurrent() Context
+    Gets the current active context.
+
+func (ctx Context) ApiVersion() (version int)
+    Returns the API version to create the context.
+
+func (ctx *Context) Destroy()
+    Destroys the CUDA context.
+
+func (peer Context) DisablePeerAccess()
+    Reverses EnablePeerAccess().
+
+func (peer Context) EnablePeerAccess()
+    Make allocations from the peer Context available to the current context.
+
+func (ctx Context) SetCurrent()
+    Sets the current active context.
+
+type DevProp struct {
+    MaxThreadsPerBlock  int
+    MaxThreadsDim       [3]int
+    MaxGridSize         [3]int
+    SharedMemPerBlock   int
+    TotalConstantMemory int
+    SIMDWidth           int
+    MemPitch            int
+    RegsPerBlock        int
+    ClockRate           int
+    TextureAlign        int
+}
+    Device properties
+
+func DeviceGetProperties(dev Device) (prop DevProp)
+    Returns the device's properties.
+
+type Device int
+    CUDA Device number.
+
+func CtxGetDevice() Device
+    Returns the ordinal of the current context's device.
+
+func DeviceGet(ordinal int) Device
+    Returns in a device handle given an ordinal in the range [0,
+    DeviceGetCount()-1].
+
+func (dev Device) Attribute(attrib DeviceAttribute) int
+    Gets the value of a device attribute.
+
+func (dev Device) CanAccessPeer(peer Device) bool
+    Returns true if CtxEnablePeerAccess can be called on a context for dev
+    and peerDev.
+
+func (device Device) ComputeCapability() (major, minor int)
+    Returns the compute capability of the device.
+
+func (dev Device) Name() string
+    Gets the name of the device.
+
+func (dev Device) Properties() DevProp
+    Returns the device's properties.
+
+func (device Device) TotalMem() int64
+    Returns the total amount of memory available on the device in bytes.
+
+type DeviceAttribute int
+
+const (
+    MAX_THREADS_PER_BLOCK            DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK            // Maximum number of threads per block
+    MAX_BLOCK_DIM_X                  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X                  // Maximum block dimension X
+    MAX_BLOCK_DIM_Y                  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y                  // Maximum block dimension Y
+    MAX_BLOCK_DIM_Z                  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Z                  // Maximum block dimension Z
+    MAX_GRID_DIM_X                   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X                   // Maximum grid dimension X
+    MAX_GRID_DIM_Y                   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y                   // Maximum grid dimension Y
+    MAX_GRID_DIM_Z                   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z                   // Maximum grid dimension Z
+    MAX_SHARED_MEMORY_PER_BLOCK      DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK      // Maximum shared memory available per block in bytes
+    TOTAL_CONSTANT_MEMORY            DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_TOTAL_CONSTANT_MEMORY            // Memory available on device for __constant__ variables in a CUDA C kernel in bytes
+    WARP_SIZE                        DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_WARP_SIZE                        // Warp size in threads
+    MAX_PITCH                        DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_PITCH                        // Maximum pitch in bytes allowed by memory copies
+    MAX_REGISTERS_PER_BLOCK          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK          // Maximum number of 32-bit registers available per block
+    CLOCK_RATE                       DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_CLOCK_RATE                       // Peak clock frequency in kilohertz
+    TEXTURE_ALIGNMENT                DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT                // Alignment requirement for textures
+    MULTIPROCESSOR_COUNT             DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT             // Number of multiprocessors on device
+    KERNEL_EXEC_TIMEOUT              DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT              // Specifies whether there is a run time limit on kernels
+    INTEGRATED                       DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_INTEGRATED                       // Device is integrated with host memory
+    CAN_MAP_HOST_MEMORY              DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_CAN_MAP_HOST_MEMORY              // Device can map host memory into CUDA address space
+    COMPUTE_MODE                     DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_COMPUTE_MODE                     // Compute mode (See ::CUcomputemode for details)
+    MAXIMUM_TEXTURE1D_WIDTH          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_WIDTH          // Maximum 1D texture width
+    MAXIMUM_TEXTURE2D_WIDTH          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_WIDTH          // Maximum 2D texture width
+    MAXIMUM_TEXTURE2D_HEIGHT         DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_HEIGHT         // Maximum 2D texture height
+    MAXIMUM_TEXTURE3D_WIDTH          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_WIDTH          // Maximum 3D texture width
+    MAXIMUM_TEXTURE3D_HEIGHT         DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_HEIGHT         // Maximum 3D texture height
+    MAXIMUM_TEXTURE3D_DEPTH          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_DEPTH          // Maximum 3D texture depth
+    MAXIMUM_TEXTURE2D_LAYERED_WIDTH  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_WIDTH  // Maximum 2D layered texture width
+    MAXIMUM_TEXTURE2D_LAYERED_HEIGHT DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_HEIGHT // Maximum 2D layered texture height
+    MAXIMUM_TEXTURE2D_LAYERED_LAYERS DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_LAYERS // Maximum layers in a 2D layered texture
+    SURFACE_ALIGNMENT                DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_SURFACE_ALIGNMENT                // Alignment requirement for surfaces
+    CONCURRENT_KERNELS               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_CONCURRENT_KERNELS               // Device can possibly execute multiple kernels concurrently
+    ECC_ENABLED                      DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_ECC_ENABLED                      // Device has ECC support enabled
+    PCI_BUS_ID                       DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_PCI_BUS_ID                       // PCI bus ID of the device
+    PCI_DEVICE_ID                    DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_PCI_DEVICE_ID                    // PCI device ID of the device
+    TCC_DRIVER                       DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_TCC_DRIVER                       // Device is using TCC driver model
+    MEMORY_CLOCK_RATE                DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE                // Peak memory clock frequency in kilohertz
+    GLOBAL_MEMORY_BUS_WIDTH          DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH          // Global memory bus width in bits
+    L2_CACHE_SIZE                    DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE                    // Size of L2 cache in bytes
+    MAX_THREADS_PER_MULTIPROCESSOR   DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR   // Maximum resident threads per multiprocessor
+    ASYNC_ENGINE_COUNT               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT               // Number of asynchronous engines
+    UNIFIED_ADDRESSING               DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING               // Device uses shares a unified address space with the host
+    MAXIMUM_TEXTURE1D_LAYERED_WIDTH  DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH  // Maximum 1D layered texture width
+    MAXIMUM_TEXTURE1D_LAYERED_LAYERS DeviceAttribute = C.CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS // Maximum layers in a 1D layered texture
+)
+
+type DevicePtr uintptr
+
+func MemAlloc(bytes int64) DevicePtr
+    Allocates a number of bytes of device memory.
+
+func (ptr DevicePtr) Bytes() (bytes int64)
+    Returns the size of the allocation (by MemAlloc) that contains the input
+    pointer ptr.
+
+func (ptr DevicePtr) Free()
+    Frees device memory allocated by MemAlloc(). Overwrites the pointer with
+    NULL. It is safe to double-free.
+
+func (ptr DevicePtr) GetAddressRange() (bytes int64, base DevicePtr)
+    Returns the base address and size of the allocation (by MemAlloc) that
+    contains the input pointer ptr.
+
+func (ptr DevicePtr) MemoryType() MemoryType
+    Returns the physical memory type that ptr addresses.
+
+func (p DevicePtr) String() string
+
+type Dim3 struct {
+    X, Y, Z int
+}
+
+type Function uintptr
+    Represents a CUDA CUfunction, a reference to a function within a module.
+
+func ModuleGetFunction(module Module, name string) Function
+    Returns a Function handle.
+
+func (f Function) GetAttribute(attrib FunctionAttribute) int
+
+type FunctionAttribute int
+
+const (
+    FUNC_A_MAX_THREADS_PER_BLOCK FunctionAttribute = C.CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK // The maximum number of threads per block, beyond which a launch of the function would fail.
+    FUNC_A_SHARED_SIZE_BYTES     FunctionAttribute = C.CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES     // The size in bytes of statically-allocated shared memory required by this function.
+    FUNC_A_CONST_SIZE_BYTES      FunctionAttribute = C.CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES      // The size in bytes of user-allocated constant memory required by this function.
+    FUNC_A_LOCAL_SIZE_BYTES      FunctionAttribute = C.CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES      // The size in bytes of local memory used by each thread of this function.
+    FUNC_A_NUM_REGS              FunctionAttribute = C.CU_FUNC_ATTRIBUTE_NUM_REGS              // The number of registers used by each thread of this function.
+    FUNC_A_PTX_VERSION           FunctionAttribute = C.CU_FUNC_ATTRIBUTE_PTX_VERSION           // The PTX virtual architecture version for which the function was compiled.
+    FUNC_A_BINARY_VERSION        FunctionAttribute = C.CU_FUNC_ATTRIBUTE_BINARY_VERSION        // The binary architecture version for which the function was compiled.
+)
+
+type MemHostRegisterFlag int
+
+const (
+    // Memory is pinned in all CUDA contexts.
+    MEMHOSTREGISTER_PORTABLE MemHostRegisterFlag = C.CU_MEMHOSTREGISTER_PORTABLE
+    // Maps the allocation in CUDA address space. TODO(a): cuMemHostGetDevicePointer()
+    MEMHOSTREGISTER_DEVICEMAP MemHostRegisterFlag = C.CU_MEMHOSTREGISTER_DEVICEMAP
+)
+    Flag for MemHostRegister
+
+type MemoryType uint
+    Physical memory type of device pointer.
+
+const (
+    MemoryTypeHost    MemoryType = C.CU_MEMORYTYPE_HOST
+    MemoryTypeDevice  MemoryType = C.CU_MEMORYTYPE_DEVICE
+    MemoryTypeArray   MemoryType = C.CU_MEMORYTYPE_ARRAY
+    MemoryTypeUnified MemoryType = C.CU_MEMORYTYPE_UNIFIED
+)
+
+func PointerGetAttributeMemoryType(ptr DevicePtr) (t MemoryType, err Result)
+    Returns the physical memory type that ptr addresses.
+
+func (t MemoryType) String() string
+
+type Module uintptr
+    Represents a CUDA CUmodule, a reference to executable device code.
+
+func ModuleLoad(fname string) Module
+    Loads a compute module from file
+
+func ModuleLoadData(image string) Module
+    Loads a compute module from string
+
+func (m Module) GetFunction(name string) Function
+    Returns a Function handle.
+
+type Result int
+    CUDA error status. CUDA error statuses are not returned by functions but
+    checked and passed to panic() when not successful. If desired, they can
+    be caught by recover().
+
+const (
+    SUCCESS                              Result = C.CUDA_SUCCESS
+    ERROR_INVALID_VALUE                  Result = C.CUDA_ERROR_INVALID_VALUE
+    ERROR_OUT_OF_MEMORY                  Result = C.CUDA_ERROR_OUT_OF_MEMORY
+    ERROR_NOT_INITIALIZED                Result = C.CUDA_ERROR_NOT_INITIALIZED
+    ERROR_DEINITIALIZED                  Result = C.CUDA_ERROR_DEINITIALIZED
+    ERROR_PROFILER_DISABLED              Result = C.CUDA_ERROR_PROFILER_DISABLED
+    ERROR_PROFILER_NOT_INITIALIZED       Result = C.CUDA_ERROR_PROFILER_NOT_INITIALIZED
+    ERROR_PROFILER_ALREADY_STARTED       Result = C.CUDA_ERROR_PROFILER_ALREADY_STARTED
+    ERROR_PROFILER_ALREADY_STOPPED       Result = C.CUDA_ERROR_PROFILER_ALREADY_STOPPED
+    ERROR_NO_DEVICE                      Result = C.CUDA_ERROR_NO_DEVICE
+    ERROR_INVALID_DEVICE                 Result = C.CUDA_ERROR_INVALID_DEVICE
+    ERROR_INVALID_IMAGE                  Result = C.CUDA_ERROR_INVALID_IMAGE
+    ERROR_INVALID_CONTEXT                Result = C.CUDA_ERROR_INVALID_CONTEXT
+    ERROR_CONTEXT_ALREADY_CURRENT        Result = C.CUDA_ERROR_CONTEXT_ALREADY_CURRENT
+    ERROR_MAP_FAILED                     Result = C.CUDA_ERROR_MAP_FAILED
+    ERROR_UNMAP_FAILED                   Result = C.CUDA_ERROR_UNMAP_FAILED
+    ERROR_ARRAY_IS_MAPPED                Result = C.CUDA_ERROR_ARRAY_IS_MAPPED
+    ERROR_ALREADY_MAPPED                 Result = C.CUDA_ERROR_ALREADY_MAPPED
+    ERROR_NO_BINARY_FOR_GPU              Result = C.CUDA_ERROR_NO_BINARY_FOR_GPU
+    ERROR_ALREADY_ACQUIRED               Result = C.CUDA_ERROR_ALREADY_ACQUIRED
+    ERROR_NOT_MAPPED                     Result = C.CUDA_ERROR_NOT_MAPPED
+    ERROR_NOT_MAPPED_AS_ARRAY            Result = C.CUDA_ERROR_NOT_MAPPED_AS_ARRAY
+    ERROR_NOT_MAPPED_AS_POINTER          Result = C.CUDA_ERROR_NOT_MAPPED_AS_POINTER
+    ERROR_ECC_UNCORRECTABLE              Result = C.CUDA_ERROR_ECC_UNCORRECTABLE
+    ERROR_UNSUPPORTED_LIMIT              Result = C.CUDA_ERROR_UNSUPPORTED_LIMIT
+    ERROR_CONTEXT_ALREADY_IN_USE         Result = C.CUDA_ERROR_CONTEXT_ALREADY_IN_USE
+    ERROR_INVALID_SOURCE                 Result = C.CUDA_ERROR_INVALID_SOURCE
+    ERROR_FILE_NOT_FOUND                 Result = C.CUDA_ERROR_FILE_NOT_FOUND
+    ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND Result = C.CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND
+    ERROR_SHARED_OBJECT_INIT_FAILED      Result = C.CUDA_ERROR_SHARED_OBJECT_INIT_FAILED
+    ERROR_OPERATING_SYSTEM               Result = C.CUDA_ERROR_OPERATING_SYSTEM
+    ERROR_INVALID_HANDLE                 Result = C.CUDA_ERROR_INVALID_HANDLE
+    ERROR_NOT_FOUND                      Result = C.CUDA_ERROR_NOT_FOUND
+    ERROR_NOT_READY                      Result = C.CUDA_ERROR_NOT_READY
+    ERROR_LAUNCH_FAILED                  Result = C.CUDA_ERROR_LAUNCH_FAILED
+    ERROR_LAUNCH_OUT_OF_RESOURCES        Result = C.CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES
+    ERROR_LAUNCH_TIMEOUT                 Result = C.CUDA_ERROR_LAUNCH_TIMEOUT
+    ERROR_LAUNCH_INCOMPATIBLE_TEXTURING  Result = C.CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING
+    ERROR_PEER_ACCESS_ALREADY_ENABLED    Result = C.CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED
+    ERROR_PEER_ACCESS_NOT_ENABLED        Result = C.CUDA_ERROR_PEER_ACCESS_NOT_ENABLED
+    ERROR_PRIMARY_CONTEXT_ACTIVE         Result = C.CUDA_ERROR_PRIMARY_CONTEXT_ACTIVE
+    ERROR_CONTEXT_IS_DESTROYED           Result = C.CUDA_ERROR_CONTEXT_IS_DESTROYED
+    ERROR_ASSERT                         Result = C.CUDA_ERROR_ASSERT
+    ERROR_TOO_MANY_PEERS                 Result = C.CUDA_ERROR_TOO_MANY_PEERS
+    ERROR_HOST_MEMORY_ALREADY_REGISTERED Result = C.CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED
+    ERROR_HOST_MEMORY_NOT_REGISTERED     Result = C.CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED
+    ERROR_HARDWARE_STACK_ERROR           Result = 714 //C.CUDA_ERROR_HARDWARE_STACK_ERROR
+    ERROR_ILLEGAL_INSTRUCTION            Result = 715 //C.CUDA_ERROR_ILLEGAL_INSTRUCTION
+    ERROR_MISALIGNED_ADDRESS             Result = 716 //C.CUDA_ERROR_MISALIGNED_ADDRESS
+    ERROR_INVALID_ADDRESS_SPACE          Result = 717 //C.CUDA_ERROR_INVALID_ADDRESS_SPACE
+    ERROR_INVALID_PC                     Result = 718 //C.CUDA_ERROR_INVALID_PC
+    ERROR_NOT_PERMITTED                  Result = 800 //C.CUDA_ERROR_NOT_PERMITTED
+    ERROR_NOT_SUPPORTED                  Result = 801 //C.CUDA_ERROR_NOT_SUPPORTED
+    ERROR_UNKNOWN                        Result = C.CUDA_ERROR_UNKNOWN
+)
+
+func StreamQuery(stream Stream) Result
+    Returns Success if all operations have completed, ErrorNotReady
+    otherwise
+
+func (err Result) String() string
+    Message string for the error
+
+type Stream uintptr
+    CUDA stream.
+
+func StreamCreate() Stream
+    Creates an asynchronous stream
+
+func (stream *Stream) Destroy()
+    Destroys the asynchronous stream
+
+func (stream Stream) Query() Result
+    Returns Success if all operations have completed, ErrorNotReady
+    otherwise
+
+func (stream Stream) Synchronize()
+    Blocks until the stream has completed.
+
+

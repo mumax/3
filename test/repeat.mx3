@@ -1,0 +1,24 @@
+/*
+	Test Shape.repeat()
+*/
+
+N := 128
+c := 5e-9
+
+SetGridSize(N, N, 1)
+SetCellSize(c, c, c)
+
+d := 20*c
+
+SetGeom(circle(d).repeat(2*d, d, 0))
+
+m = uniform(1, 0, 0)
+
+Msat = 800e3
+Aex  = 13e-12
+alpha = 1
+
+steps(1000)
+
+expectv("m", m.average(), vector(0.525,  0, 0),  1e-2)
+

@@ -1,0 +1,63 @@
+/*
+	Construct an external field mask on-the fly and add to B_ext.
+	Test that it actually gets added.
+*/
+
+Nx := 128
+Ny := 64
+setgridsize(Nx, Ny, 1)
+c := 5e-9
+setcellsize(c, c, c)
+
+Msat = 800e3
+Aex  = 13e-12
+m    = uniform(1, 0, 0)
+
+// External field mask corresponding to Oersted field of a long perpendicular wire
+mask := newSlice(3, Nx, Ny, 1)
+
+// wire position, diameter and current direction
+wireX := 0e-9
+wireY := 0e-9
+wireDiam := 50e-9
+current := vector(0, 0, 1)
+
+// construct mask
+for i:=0; i<Nx; i++{
+	for j:=0; j<Ny; j++{
+
+		r := index2coord(i, j, 0)
+		r = r.sub(vector(wireX, wireY, 0)) // relative position to wire
+	
+		curr := vector(0, 0, 0)
+		B := vector(0, 0, 0)
+
+		if r.len() >= wireDiam{
+			// outside wire
+			b = r.cross(current).mul(mu0 / (2*pi*pow(r.len(), 2)))
+		}else{
+			// inside wire
+			relDist := r.len() / wireDiam
+			innerCurrent := current.mul(relDist * relDist)
+			b = r.cross(innerCurrent).mul(mu0 / (2*pi*pow(r.len(), 2)))
+		}
+		mask.set(0, i, j, 0, b[0])
+		mask.set(1, i, j, 0, b[1])
+		mask.set(2, i, j, 0, b[2])
+	}
+}
+
+// Add mask with multiplier
+B_ext=vector(0,0,-1e-4)
+B_ext.add(mask, 0.1)
+save(B_ext)
+
+relax()
+//alpha = 3
+//RunWhile(MaxTorque > 1e-4)
+//steps(1000)
+
+// Check whether m has become a vortex.
+// Not adding mask results in uniform state.
+tol := 1e-3
+expectv("m", m.average(), vector(0, 0, -0.001), tol) 

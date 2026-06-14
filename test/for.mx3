@@ -1,0 +1,15 @@
+/*
+	Test for loop with missing cond, post.
+	Should not crash script.
+*/
+
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
+i:=0
+
+for i < 10{
+	i++
+}
+
+;; // test empty statement as well

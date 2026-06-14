@@ -1,0 +1,37 @@
+// Phase 1 item 3, 3순위 prep (graphMaxCells re-tuning, see CLAUDE.md section
+// 2.16(a)/2.17): 800x800x1 grid (640,000 cells, above graphMaxCells=500000),
+// adaptive dt (FixDt unset), default solver (RK45DP, no setsolver() call),
+// baseline (no CUDA Graph). Same config as _graph_poc_800_rk45dp.mx3, but
+// using steps() for the measured run.
+//
+// Unlike _graph_poc_700_rk45dp_nograph.mx3, no AddFieldTerm() trick is needed
+// here: 640,000 cells > graphMaxCells=500000, so graphWorthwhile() already
+// returns false and Steps(100) genuinely falls back to RunWhile() via the
+// transparent dispatch (CLAUDE.md 2.16(a)). This keeps the physics identical
+// to _graph_poc_800_rk45dp.mx3 (RunGraph bypasses graphWorthwhile via
+// assertGraphCompatible() only) for a clean before/after comparison.
+SetGridSize(800, 800, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+steps(100)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 800, "x", 800, "x", 1)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 800*800*1*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

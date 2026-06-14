@@ -1,0 +1,180 @@
+body {
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 2em;
+    font-family: sans-serif;
+}
+
+h1 {
+    color: #000088
+}
+
+h2 {
+    font-size: 18px;
+    color: #000088
+}
+
+h3 {
+    font-size: 15px;
+    font-weight: normal;
+    color: #000088
+}
+
+table {
+    border: "10";
+}
+
+hr {
+    border-style: none;
+    border-top: 1px solid #CCCCCC;
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+a {
+    color: #375EAB;
+    text-decoration: none;
+}
+
+div {
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+div#footer {
+    color: #555555
+}
+
+pre {
+    margin-left: 50px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    color: #000044;
+    font-size: 12px;
+    background-color: #EEEEFF;
+    padding: 10px;
+}
+
+figure {
+    margin-left: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 2px;
+}
+
+figcaption {
+    color: #555555
+}
+
+#header_img:hover {
+    transform:scale(1.05);
+}
+
+select {
+    font-family: monospace;
+    white-space: pre;
+    font-size: 1.2em;
+}
+
+.oldlink {
+    font-size: 8px;
+}
+
+#deprecated-page {
+    font-size: 16px;
+    color: red;
+    font-weight: bold;
+}
+
+#download-old {
+    display: block;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    width: 10%;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
+.api-section-link {
+    padding-top: 0.2ex;
+    padding-bottom: 0.2ex;
+    padding-left: 10px
+}
+
+.api-container {
+    display: flex;
+    margin: 0px;
+    padding: 0px;
+}
+
+.api-menu {
+    float: left;
+    display: block;
+    width: 250px;
+    background-color: #E0E0E0;
+    padding: 20px;
+    margin: 0px;
+}
+
+#api-to-top {
+    margin-bottom: auto;
+    position: sticky;
+    top: 0; /* Sticks to the top of the viewport when scrolling */
+    background-color: #fff;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    border-radius: 0 0 10px 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#api-to-top.visible {
+    opacity: 1;
+}
+
+.api-to-top-arrow {
+    font-size: 20px; /* Make the arrow slightly larger than text */
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0 5px; /* Add spacing around the arrow */
+}
+
+.api-content {
+    float: left;
+    flex: 1;
+    min-width: 400px"
+
+}
+
+.api-entry {
+    display:inline; 
+    margin: 0px;
+}
+
+.pure-button {
+    margin-bottom: 5px;
+}
+
+#mumaxplusbutton {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-top:0px;
+    background:linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border-radius:20px 0 0 20px;
+    transition: 0.2s;
+}
+#mumaxplusbutton:hover{
+    transform:scale(1.05) translateX(-2.5%);
+}
+#mumaxplusbutton img {
+    width:45px;
+    margin:-5px;
+    margin-left:10px;
+    float:right;
+}

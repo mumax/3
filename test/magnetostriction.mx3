@@ -1,0 +1,28 @@
+N := 128
+c := 3e-9
+setgridsize(N, N, 1)
+setcellsize(c, c, c)
+
+Msat  = 800e3
+Aex   = 13e-12
+alpha = 0.01
+m  = uniform(1, .1, 0)
+
+K := 1e4
+prefactor := Const( (2 * K) / (Msat.Average()))
+
+Axx := 0.0
+Ayy := 0.0
+Azz := 0.0
+Axy := 1.0; Ayx := Axy
+Azx := 0.0; Axz := Azx
+Azy := 0.0; Ayz := Azy
+Ax := ConstVector(Axx, Axy, Axz)
+Ay := ConstVector(Ayx, Ayy, Ayz)
+Az := ConstVector(Azx, Azy, Azz)
+
+MyAnis := Mul(prefactor, MulMV(Ax, Ay, Az, m))
+AddFieldTerm(MyAnis)
+
+
+Relax()

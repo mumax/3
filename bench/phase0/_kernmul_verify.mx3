@@ -1,0 +1,18 @@
+// Verification: compare modified kernmulRSymm2Dxy/2Dz against original.
+// Vortex state exercises both in-plane (Kxy) and out-of-plane (Kzz) demag kernel mult.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.5
+setsolver(2)
+
+m = vortex(1, 1)
+steps(10)
+
+save(m)
+save(B_demag)
+print("E_total:", E_total.get())
+print("m_avg:", m.average())

@@ -1,0 +1,22 @@
+/*
+	Test DMI + exchange for 3D simulation.
+	Reference solution from the same geometry with 2D discretization.
+*/
+
+SetGridSize(64, 64, 2)
+c := 0.6e-9
+SetCellSize(c, c, c/2)
+
+Msat  = 1100e3
+Aex   = 16e-12
+alpha = 3
+AnisU = vector(0, 0, 1)
+Ku1   = 1.27E6
+Dind   = 0.1e-3 // J/m2.
+
+m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1) // down-up domains with wall between Bloch and Néél type
+
+run(0.5e-9)
+
+expectv("m", m.getcell(32, 32, 0), vector(0.8979, 0.3989, 0.1859), 0.001)
+

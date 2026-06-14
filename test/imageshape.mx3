@@ -1,0 +1,19 @@
+/* 
+	Regression test for imageshape offset by 1 cell.
+	Reported by Aurelio Hierro.
+*/
+
+SetGridSize(32, 16, 1)
+c := 1e-9
+SetCellSize(c, c, c)
+
+SetGeom(ImageShape("frame.png"))
+
+TOL := 1e-6
+expect("geom", geom.average(), 0.26171875, TOL)
+
+SetGeom(ImageShape("framex2.png"))  // 2x larger image should get scaled
+
+snapshot(geom) // test crash on snapshot of scalar
+expect("geom", geom.average(), 0.26171875, TOL)
+

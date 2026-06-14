@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# A hook script to verify what is about to be committed.
+# Called by git-commit with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+# 
+# Add this file to .git/hooks
+
+# Run all unit tests
+echo Running unit tests in background
+rm test.log -rf
+(if (make test >> test.log 2>> test.log); then
+	notify-send "Unit tests passed" 2> /dev/null
+	exit 0;
+else
+	notify-send "Unit tests failed" 2> /dev/null
+	cat test.log;
+	rm test.log;
+	exit 2;
+fi;)&

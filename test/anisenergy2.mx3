@@ -1,0 +1,41 @@
+/*
+	Test conservation of energy with anisotropy.
+*/
+
+SetGridSize(32, 10, 2)
+c := 1e-9
+SetCellSize(c, 2*c, 3*c)
+
+EnableDemag = false
+Aex = 10e-12
+
+AnisU = vector(0, 0, 1)
+Ku2   = 1e6
+Msat  = 1000e3
+
+m = uniform(1, 0, 0.1)
+
+tableadd(E_total)
+tableautosave(1e-12)
+
+// Get idea of energy scale
+E0 := E_total.get()
+alpha = 1
+run(1e-9)
+E1 := E_total.get()
+Delta1 := E1-E0
+print("DeltaE, damped:", Delta1)
+
+m = uniform(1, 0, 0.1)
+E0 = E_total.get()
+alpha = 0
+run(1e-9)
+E1 = E_total.get()
+Delta2 := E1-E0
+print("DeltaE, undamped:", Delta2)
+
+ratio := abs(Delta2/Delta1)
+print("ratio:", ratio)
+
+// test relative energy non-conservation up to 1ppm.
+expect("Relative energy non-conservation:", ratio, 0, 1e-6)

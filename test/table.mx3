@@ -1,0 +1,14 @@
+/*
+	Test adding user-defined variable to table.
+*/
+
+setmesh(2, 1, 1, 1, 1, 1, 0, 0, 0)
+
+f := 0
+tableAddVar(f, "f", "Hz")
+
+tableSave()
+f = 1
+tableSave()
+f = 2
+tableSave()

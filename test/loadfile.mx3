@@ -1,0 +1,68 @@
+/*
+	Test loading external data files.
+*/
+
+Nx := 128
+Ny := 64
+setgridsize(Nx, Ny, 1)
+
+c := 5e-9
+setcellsize(c, c, c)
+
+Msat = 800e3
+Aex  = 13e-12
+m    = uniform(1, 0, 0)
+
+s := loadfile("testdata/binary4.dump")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 100, 0)
+expect("size", s.size()[1],  25, 0)
+expect("size", s.size()[2],   1, 0)
+expect("elem", s.get(2, 99, 24, 0), -2.052794059181906e-07, 0)
+
+s = loadfile("testdata/binary4.ovf")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 100, 0)
+expect("size", s.size()[1],  25, 0)
+expect("size", s.size()[2],   1, 0)
+expect("elem", s.get(2, 99, 24, 0), -2.052794059181906e-07, 0)
+
+s = loadfile("testdata/binary8.ovf")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 100, 0)
+expect("size", s.size()[1],  25, 0)
+expect("size", s.size()[2],   1, 0)
+expect("elem", s.get(2, 99, 24, 0), -17100.58203125, 0)
+
+s = loadfile("testdata/oommf_ovf1_binary8.omf")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 100, 0)
+expect("size", s.size()[1],  25, 0)
+expect("size", s.size()[2],   1, 0)
+expect("elem", s.get(2, 99, 24, 0), -17100.58203125, 0)
+
+s = loadfile("testdata/m2.dump")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 128, 0)
+expect("size", s.size()[1],  64, 0)
+expect("size", s.size()[2],   1, 0)
+expect("elem", s.get(2, 99, 24, 0), -0.002278769388794899, 0)
+
+s = loadfile("testdata/movf2.ovf")
+expect("ncomp", s.ncomp(), 3, 0)
+expect("size", s.size()[0], 64, 0)
+expect("size", s.size()[1], 68, 0)
+expect("size", s.size()[2],  1, 0)
+print(s.size())
+expect("elem", s.get(1, 2, 3, 0),  0.1468590646982193, 0)
+
+s = loadfile("testdata/scalarovf2.ovf")
+expect("ncomp", s.ncomp(), 1, 0)
+expect("size", s.size()[0], 64, 0)
+expect("size", s.size()[1], 64, 0)
+expect("size", s.size()[2],  1, 0)
+print(s.size())
+expect("elem", s.get(0, 2, 3, 0),  0, 0)
+
+
+

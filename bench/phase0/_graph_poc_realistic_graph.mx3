@@ -1,0 +1,31 @@
+// Phase 1 item 3, 1순위 (realistic field-config generalization) verification:
+// 256x256x1 grid with uniaxial anisotropy (Ku1, AnisU) + interfacial DMI
+// (Dind) added on top of demag+exchange+Zeeman -- a field configuration not
+// previously exercised through RunGraph (sections 2.9-2.14 only used
+// demag+exchange+Zeeman: AddAnisotropyField/AddDMI are now also part of the
+// captured torqueFn kernel sequence). adaptive-dt default solver (RK45DP, no
+// setsolver() call), CUDA Graph replay path (runGraphRK45DP).
+// Compare against _graph_poc_realistic_ref.mx3 via ovfdiff.
+SetGridSize(256, 256, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+ku1   = 0.5e6
+anisU = vector(0, 0, 1)
+dind  = 0.5e-3
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+RunGraph(200)
+
+save(m)
+save(B_demag)
+print("m_avg:", m.average())
+print("step_count:", step)
+print("t_final:", t)

@@ -1,0 +1,33 @@
+/* 
+	Test topological charge calculation:
+	for bubble/skyrmion S = -1,1,2...
+	Based on topologicalcharge-skyrmion.mx3
+*/
+
+tol := 0.005
+
+setgridsize(64, 128, 8)
+setcellsize(3e-9, 1.5e-9, 8e-9)
+
+// aka CoPt
+Msat    = 1000e3
+Aex     = 10e-12
+anisU   = vector(0, 0, 1)
+Ku1     = 0.65e6
+alpha   = 1
+
+m = blochskyrmion(1, 1).scale(4,4,1)
+steps(500)
+expect("Skyrmion number" , ext_topologicalchargelattice,  1.0, tol)
+
+m = blochskyrmion(-1, 1).scale(4,4,1)
+steps(500)
+expect("Skyrmion number" , ext_topologicalchargelattice,  1.0, tol)
+
+m = blochskyrmion(1, -1).scale(4,4,1)
+steps(500)
+expect("Skyrmion number" , ext_topologicalchargelattice,  -1.0, tol)
+
+m = blochskyrmion(-1, -1).scale(4,4,1)
+steps(500)
+expect("Skyrmion number" , ext_topologicalchargelattice,  -1.0, tol)

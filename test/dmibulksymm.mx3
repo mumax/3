@@ -1,0 +1,48 @@
+/*
+	Basic symmetry test for bulk DMI. 
+	Rotating the entire system by 90° should give symmetric result.
+	Sensitive to changing signs in boundary conditions.
+*/
+N := 16
+c := 2e-9
+
+setgridsize(N, N, N)
+setcellsize(c, c, c)
+
+Aex   = 10e-12
+Msat  = 1e6
+alpha = 1
+
+runtime := 1e-10
+TOL := 1e-4
+Dbulk = 1e-3
+
+m = uniform(1, 0, 0)
+run(runtime)
+print(m)
+m0 := m.Average()
+
+m = uniform(0, 1, 0)
+run(runtime)
+print(m)
+expect("rotateY", m.Average().Y(), m0.X(), TOL)
+
+m = uniform(0, 0, 1)
+run(runtime)
+print(m)
+expect("rotateZ", m.Average().Z(), m0.X(), TOL)
+
+m = uniform(0, 1, 1)
+run(runtime)
+print(m)
+m0 = m.Average()
+
+m = uniform(1, 0, 1)
+run(runtime)
+print(m)
+expect("rotateY", m.Average().Y(), m0.X(), TOL)
+
+m = uniform(1, 1, 0)
+run(runtime)
+print(m)
+expect("rotateZ", m.Average().Z(), m0.X(), TOL)

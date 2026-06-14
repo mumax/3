@@ -1,0 +1,72 @@
+/*
+    This test primarily serves as a visual verification of the ext_geomEdge() functionality,
+    but also performs two automated tests for particular analytically describable cases with PBC along X and Z.
+*/
+
+N := 21
+c := 5e-9
+d := 115e-9
+
+SetCellSize(c, c, c)
+SetGridSize(N, N, N)
+SetPBC(1,0,1) // Mix of PBC and OBC to simultaneously check behavior for both cases
+
+m = Uniform(-1, 0, 0)
+shape := SuperBall(d, 1.5) // Shape with analytical expression available
+SetGeom(shape)
+SaveAs(m, "m_orig.ovf")
+
+PlusX := ext_GeomEdge("+X")
+PlusY := ext_GeomEdge("+Y")
+MinZ := ext_GeomEdge("-Z")
+
+SetGeom(PlusX)
+SaveAs(m, "m_+X.ovf")
+SetGeom(PlusY)
+SaveAs(m, "m_+Y.ovf")
+SetGeom(MinZ)
+SaveAs(m, "m_-Z.ovf")
+
+//// Double grid size to see effect of PBC
+SetGridSize(2*N+1, 2*N+1, 2*N+1)
+
+SetGeom(PlusX)
+SaveAs(m, "m_+X_PBC.ovf")
+for iz := 0; iz < 2*N-1; iz++ {
+    for iy := 0; iy < 2*N-1; iy++ {
+        totalCells := 0
+        for ix := 0; ix < 2*N-1; ix++ {
+            totalCells += geom.GetCell(ix, iy, iz)
+        }
+        v := Index2Coord(0, iy, iz)
+        r := Pow(2*Abs(v.Y())/d, 3) + Pow(Abs(2*(Mod(Abs(v.Z()) + N*c/2, N*c) - N*c/2))/d, 3)
+        if ((r <= 1) && (r >= (1 - Pow((N-1)*c/d, 3))) && iy > N/2 && iy < 3*N/2) { // Superball shape in YZ-plane
+            Expect("+X_PBC: One cell thick along X", totalCells, 2, 0)
+        } else {
+            Expect("+X_PBC: No cells along X", totalCells, 0, 0)
+        }
+    }
+}
+
+SetGeom(PlusX.Add(PlusY))
+SaveAs(m, "m_+X+Y.ovf")
+for iz := 0; iz < 2*N-1; iz++ {
+    for ix := 0; ix < 2*N-1; ix++ {
+        totalCells := 0
+        for iy := 0; iy < 2*N-1; iy++ {
+            totalCells += geom.GetCell(ix, iy, iz)
+        }
+        v := Index2Coord(ix, 0, iz)
+        r := Pow(Abs(2*(Mod(Abs(v.X()) + N*c/2, N*c) - N*c/2))/d, 3) + Pow(Abs(2*(Mod(Abs(v.Z()) + N*c/2, N*c) - N*c/2))/d, 3)
+        if (r <= 1 - Pow((N+1)*c/d, 3)) { // Superball shape in XZ-plane
+            Expect("+X+Y_PBC: One cell thick along X", totalCells, 1, 0)
+        } else if (r <= 1) {
+            Expect("+X+Y_PBC: Area with possibly multiple cells along X", sign(totalCells), 1, 0)
+        } else {
+            Expect("+X+Y_PBC: No cells along X", totalCells, 0, 0)
+        }
+    }
+}
+
+SetGeom(PlusX.Add(PlusY.Intersect(MinZ)))
+SaveAs(m, "m_+X+Y-Z.ovf")

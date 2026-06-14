@@ -1,0 +1,32 @@
+// Phase 1 item 3, 1순위 (large-grid generalization, see CLAUDE.md section
+// 2.15): true 3D grid (64x64x16, Nz>1 forces the 3D demag FFT path, unlike
+// the 2D-film PoCs at 64/256/512/1024), adaptive dt (FixDt unset), Heun
+// solver, CUDA Graph split-graph replay (runGraphAdaptive). Same config as
+// _graph_poc_3d_adaptive_nograph.mx3, but with RunGraph() instead of steps()
+// for the measured run.
+SetGridSize(64, 64, 16)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+RunGraph(200)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 64, "x", 64, "x", 16)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 64*64*16*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

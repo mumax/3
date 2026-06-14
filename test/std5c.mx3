@@ -1,0 +1,40 @@
+/*
+	Test for Slonczewski STT with zero epsilonprime.
+	Standard solution was verified against oommf 1.2a5bis
+*/
+
+total_current := -0.006 // Current in amps
+
+Msat   = 800e3
+Aex    = 13e-12
+Pol    = 0.5669
+Lambda = 2
+EpsilonPrime = 0
+
+mp_theta := pi*20/180 // Direction of mp
+
+length := 160e-9
+width  :=  80e-9
+thick  :=  5e-9
+
+Nx := 64
+Ny := 32
+Nz := 1
+
+current_area := length*width
+current_density := total_current/current_area
+J = vector(0, 0, current_density)
+
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(length/Nx, width/Ny, thick/Nz)
+
+alpha = 0.01
+FixedLayer = vector(cos(mp_theta), sin(mp_theta), 0)
+
+
+m = uniform(1,0,0)
+
+tableautosave(10e-12)
+run(0.5e-9)
+TOL := 1e-5
+expectv("m", m.average(), vector(0.905612587928772, -0.2860856354236603, -0.011005667969584465), TOL)

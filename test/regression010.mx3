@@ -1,0 +1,58 @@
+/* 
+	Regression test for crash after resize when adding to exciations.
+*/
+
+Nx := 32
+Ny := 16
+setgridsize(Nx, Ny, 1)
+
+c := 5e-9
+setcellsize(c, c, c)
+
+Msat = 800e3
+Aex  = 13e-12
+m    = uniform(1, 0, 0)
+
+mask := newSlice(3, Nx, Ny, 1)
+
+wireX := 0e-9
+wireY := 0e-9
+wireDiam := 50e-9
+current := vector(0, 0, 1)
+
+
+for i:=0; i<Nx; i++{
+	for j:=0; j<Ny; j++{
+
+		r := index2coord(i, j, 0)
+		r = r.sub(vector(wireX, wireY, 0)) // relative position to wire
+	
+		curr := vector(0, 0, 0)
+		B := vector(0, 0, 0)
+
+		if r.len() >= wireDiam{
+			b = r.cross(current).mul(mu0 / (2*pi*pow(r.len(), 2)))
+		}else{
+			relDist := r.len() / wireDiam
+			innerCurrent := current.mul(relDist * relDist)
+			b = r.cross(innerCurrent).mul(mu0 / (2*pi*pow(r.len(), 2)))
+		}
+
+		mask.set(0, i, j, 0, b[0])
+		mask.set(1, i, j, 0, b[1])
+		mask.set(2, i, j, 0, b[2])
+	}
+}
+
+
+B_ext.add(mask, 0.1)
+alpha = 3
+
+steps(1)
+
+setgridsize(Nx*2, Ny, 1)
+setcellsize(2*c, 2*c, 2*c)
+
+steps(1)
+
+

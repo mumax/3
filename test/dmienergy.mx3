@@ -1,0 +1,33 @@
+/*
+	Test energy dissipation in presence of DMI.
+	Wrong boundary conditions can give huge non-preservation of energy.
+*/
+
+N := 64
+setgridsize(N, N, 1)
+c := 1.15e-9 / 2
+d := 1.15e-9
+setcellsize(c, c, d)
+//maxerr = 1e-5
+
+Aex   = 20e-12
+Ku1   = 5.9e5
+Msat  = 6e5
+AnisU = vector(0, 0, 1)
+Dind   = 3e-3
+m     = uniform(1, 1, 1)
+alpha = 0.01
+
+E0 := E_total.Get()
+print("E0", E0, "J")
+
+run(10e-12)
+E1 := E_total.Get()
+print("E1", E1, "J")
+
+run(10e-12)
+E2 := E_total.Get()
+print("E2", E2, "J")
+
+expect("delta1", E1-E0, -2.62692723e-20, 0.001e-20)
+expect("delta2", E2-E0, -4.93337113e-20, 0.001e-20)

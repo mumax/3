@@ -1,0 +1,26 @@
+# MIF 1.1
+# material name:Permalloy
+ms:860E3
+a:13E-12
+k1:50
+damp coef:0.5
+anisotropy type:uniaxial
+anisotropy init:constant
+anisotropy dir1:1 0 0
+anisotropy dir2:0 1 0
+demag type:constmag
+part height:256E-9
+part width:512e-9
+part thickness:40e-9
+part shape:ellipse
+cell size:4e-9
+init mag:vortex
+base output filename:test
+magnetization output format:binary 4
+total field output format:binary 4
+data table output format:%.15g
+randomizer seed:0
+converge mxh value:1.0E-5
+randomizer seed:0
+field range: 0 0 0 0 0 0 0 -time 1e-9
+field range: 100e-3 0 0 100e-3 0 0 0 -time 1e-9

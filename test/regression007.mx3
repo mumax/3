@@ -1,0 +1,32 @@
+/* 
+	Reported by Jonathan Lelieart
+	Zhang-Li used to give NaN's because of division by Bsat
+*/
+
+setgridsize(128, 32, 1)
+setcellsize(3.125e-9, 3.125e-9, 10e-9)
+
+Msat    = 860e3
+Aex     = 13e-12
+Xi      = 0.0
+m       = twodomain(1,0,0,0,1,0,-1,0,0)
+
+// Remove surface charges from left (mx=1) and right (mx=-1) sides to mimic infinitely long wire. We have to specify the region (0) at the boundaries.
+ext_rmSurfaceCharge(0, 1, -1)
+
+ext_makegrains(1e-9,25,0)
+msat.setregion(12, 0)
+
+// Set post-step function that centers simulation window on domain wall.
+ext_centerwall(0)
+
+tableadd(ext_dwpos)   // domain wall position
+tableautosave(10e-12)
+autosave(m, 2e-10)
+autosave(regions, 2e-10)
+
+// Run the simulation with current through the sample
+Pol =0.56
+J    = vector(-8e12 , 0, 0)
+Steps(10)
+expectv("m", m.average(), vector(0.00035, 0.032942, 0), 1e-3)

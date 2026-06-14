@@ -1,0 +1,36 @@
+/*
+	Not really a test. Makes a snapshot showing the orientation of our axes.
+*/
+
+setgridsize(400, 300, 1)
+c := 1e-9
+setcellsize(c, c, c)
+
+S := 8 * c
+
+I := rect(S, 5*S)
+X := I.rotz(35*pi/180).add(I.rotz(-35*pi/180))
+X = X.transl(12*S, -2*S, 0)
+
+I = rect(S, 2.5*S)
+
+Y := I.transl(0, 1.2*S, 0).rotz(35*pi/180)
+Y = Y.add(I.transl(0, 1.2*S, 0).rotz(-35*pi/180))
+Y = Y.add(I.transl(0, -1.2*S, 0))
+Y = Y.transl(-2*S, 13*S, 0)
+
+head := rect(2*S, 2*S).rotz(pi/4).intersect(yrange(0, inf))
+I = rect(S, 8*S).transl(0, 4*S, 0).add(head.transl(0, 8*S, 0))
+
+O := circle(2*S)
+
+axes := X.add(Y).add(I).add(I.rotz(-pi/2)).add(O)
+
+disk := circle(12*S).transl(10*S, 10*S, 0)
+
+m = uniform(0, 0, 1)
+m.SetInShape(disk,vortex(1, 1).transl(10*S, 10*S, 0))
+
+setgeom(axes.add(disk))
+
+snapshot(m)

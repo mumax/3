@@ -1,0 +1,25 @@
+/*
+	Micromagnetic standard problem 4 (b) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+	setgridsize(128, 32, 1)
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+// material
+	Msat  = 800e3
+	Aex   = 13e-12
+	alpha = 0.02
+	m     = uniform(1, .1, 0)
+
+// relax
+	relax()
+	TOL := 1e-3
+	expectv("m", m.average(), vector(0.9669684171676636, 0.1252732276916504, 0), TOL)
+
+// reversal
+	B_ext = vector(-35.5E-3, -6.3E-3, 0)
+	run(1e-9)
+	expectv("m", m.average(), vector(-0.9692331552505493, -0.12039542198181152,  -0.0053076110780239105), TOL)
+

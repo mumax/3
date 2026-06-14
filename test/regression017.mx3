@@ -1,0 +1,19 @@
+/* 
+	Test for tripping the solver with an instable equilibrium start magnetization.
+	Reported by Mykola Dvornik, Feb. 2015.
+*/
+
+setgridsize(5, 1, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+
+Msat    = 1000e3
+Aex     = 10e-12
+anisU   = vector(0, 0, 1)
+Ku1     = 1.3e6
+alpha   = 0.02
+
+m = uniform(0.0, 0.0, 1.0)
+relax()
+
+m = uniform(0.0, 0.0, -1.0)
+relax() // used to fail here.

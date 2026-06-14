@@ -1,0 +1,23 @@
+/*
+	Test time-dependent vector parameter with regions.
+*/
+
+c:=4e-9
+setgridsize(32, 32, 1)
+setcellsize(c, c, c)
+
+Msat=860e3
+Aex=13e-12
+alpha=0.2
+m=uniform(1, 1, 0)
+setgeom(circle(32*4e-9))
+
+f := 1e9
+A := 0.01
+B_ext = vector(A*sin(2*pi*f*t), A*cos(2*pi*f*t), 0)
+tableadd(B_ext)
+
+run(0.2e-9)
+
+TOL := 1e-5
+expectv("m", m.average(), vector(0.6773565132629695, 0.7201919931496306, 0.02121575360227688), TOL)

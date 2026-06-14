@@ -1,0 +1,20 @@
+/*
+	Test basic vector math.
+*/
+
+setgridsize(1,1,1)
+setcellsize(1,1,1)
+
+x := vector(1, 0, 0)
+y := vector(0, 1, 0)
+z := vector(0, 0, 1)
+
+a := vector(1, 2, 3)
+b := vector(4, 5, 6)
+
+tol := 0
+
+expect("dot", a.dot(b), 4 + 10 + 18, tol)
+expect("cross", x.cross(y).x(), 0, tol)
+expect("cross", x.cross(y).y(), 0, tol)
+expect("cross", x.cross(y).z(), 1, tol)

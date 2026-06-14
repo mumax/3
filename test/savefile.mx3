@@ -1,0 +1,63 @@
+/*
+	Test loading external data files.
+*/
+
+randommagseed(666)
+
+Nx := 128
+Ny := 64
+Nz := 32
+setgridsize(Nx, Ny, Nz)
+
+c := 5e-9
+setcellsize(c, c, c)
+
+Msat = 800e3
+Aex  = 13e-12
+m    = randommag()
+
+mref := m.GetCell(99, 50, 24)
+
+outputformat = OVF1_TEXT
+saveas(m, sprintf("ovf1t"))
+
+outputformat = OVF1_BINARY
+saveas(m, sprintf("ovf1b"))
+
+outputformat = OVF2_TEXT
+saveas(m, sprintf("ovf2t"))
+
+outputformat = OVF2_BINARY
+saveas(m, sprintf("ovf2b"))
+
+outputformat = DUMP
+saveas(m, sprintf("dump"))
+
+flush() // make sure output is saved before loading
+
+s := loadfile("savefile.out/ovf1t.ovf")
+expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
+expect("elem", s.get(1, 99, 50, 24), mref[1], 0)
+expect("elem", s.get(2, 99, 50, 24), mref[2], 0)
+
+s = loadfile("savefile.out/ovf1b.ovf")
+expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
+expect("elem", s.get(1, 99, 50, 24), mref[1], 0)
+expect("elem", s.get(2, 99, 50, 24), mref[2], 0)
+
+s = loadfile("savefile.out/ovf2t.ovf")
+expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
+expect("elem", s.get(1, 99, 50, 24), mref[1], 0)
+expect("elem", s.get(2, 99, 50, 24), mref[2], 0)
+
+s = loadfile("savefile.out/ovf2b.ovf")
+expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
+expect("elem", s.get(1, 99, 50, 24), mref[1], 0)
+expect("elem", s.get(2, 99, 50, 24), mref[2], 0)
+
+s = loadfile("savefile.out/dump.dump")
+expect("elem", s.get(0, 99, 50, 24), mref[0], 0)
+expect("elem", s.get(1, 99, 50, 24), mref[1], 0)
+expect("elem", s.get(2, 99, 50, 24), mref[2], 0)
+
+

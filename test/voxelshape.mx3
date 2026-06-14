@@ -1,0 +1,42 @@
+Nx := 64
+Ny := 64
+Nz := 32
+cs := 5e-9
+
+SetGridSize(Nx, Ny, Nz)
+SetCellSize(cs, cs, cs)
+
+d := 100e-9
+mask := NewScalarMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+	for j := 0; j < Ny; j++ {
+		for k := 0; k < Nz; k++ {
+			r := index2coord(i, j, k)
+			x2 := pow(r.X(), 2)
+			y2 := pow(r.Y(), 2)
+			z2 := pow(r.Z(), 2)
+			if pow((x2+y2+z2), 0.5) < d/2 {
+				mask.Set(0, i, j, k, 1)
+			}
+		}
+	}
+}
+
+geomfrommask := VoxelShape(mask, 5e-9, 5e-9, 5e-9)
+SetGeom(geomfrommask)
+
+m.setInShape(geomfrommask, Uniform(1, 0, 0)) // Setup for checks: set m in VoxelShape
+
+// Sphere shape should equal the created VoxelShape 
+SetGeom(Ellipsoid(d, d, d))
+ExpectV("Same shape m_avg", m.Average(), Vector(1, 0, 0), 0)
+
+// Bigger than VoxelShape: random magnetization gets included
+SetGeom(Ellipsoid(d, d, 3*d/2))
+ExpectV("Too large m_avg", m.Average(), Vector(0.6658, -0.00345, 0.00593), 1e-5)
+print(m.Average())
+
+// Change cell size to see if voxels scale along
+SetCellSize(cs/2, cs/2, cs)
+SetGeom(geomfrommask)
+ExpectV("New cellsize m_avg", m.Average(), Vector(0.25808, -0.00174, 0.00508), 1e-5)

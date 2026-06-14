@@ -1,0 +1,17 @@
+/*
+	Binary boolean operations were missing (reported by Gabriel Chaves).
+	Unary ! was missing (reported by Raffaele Pellicelli)
+*/
+
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
+t0 := 0
+timestep := 1
+Tq := 1e-3
+b := (((t-t0) < timestep ) && ( (Tq > 1e-4) || ( t < 1.0e-13)))
+
+if !true{
+	expect("should_not_happen", 0, 1, 0)
+}
+

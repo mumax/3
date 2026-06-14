@@ -1,0 +1,36 @@
+/*
+	Regression test for crash on if w/o else
+*/
+
+setgridsize(1, 1, 1)
+setcellsize(1, 1, 1)
+
+a := 0.0
+
+
+if true{
+	a = 1
+}else{
+	a = 2
+}
+expect("a", a, 1, 0)
+
+
+if false{
+	a = 1
+}else{
+	a = 2
+}
+expect("a", a, 2, 0)
+
+
+if true{
+	a = 3
+}
+expect("a", a, 3, 0)
+
+
+if false{
+	a = 4
+}
+expect("a", a, 3, 0)

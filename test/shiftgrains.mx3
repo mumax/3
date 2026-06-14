@@ -1,0 +1,33 @@
+/* 
+	Test shift of voronoi cells:
+	new ones should enter from the side.
+*/
+
+setgridsize(512, 64, 1)
+c := 4e-9
+setcellsize(c, c, c)
+
+m = twodomain(1,0,0, 0,1,0, -1,0,0)
+
+
+Aex = 13e-12
+Msat = 800e3
+
+ext_makegrains(40e-9, NREGION-1, 0)
+ext_rmsurfacecharge(0, 1, -1)
+ext_centerwall(0)
+
+alpha = 1
+
+for i:=0; i<NREGION-1; i++{
+	Aex.SetRegion(i, 13e-12 + randNorm()*1.3e-12)
+	Msat.SetRegion(i, 800e3 + randNorm()*80e3)
+}
+
+for i:=0; i< 56; i++{
+	shift(-1)
+}
+
+
+expect("aex", Aex.Average(), 1.298444e-11, 1e-16)
+expect("msat", MSat.Average(), 797898, 1)

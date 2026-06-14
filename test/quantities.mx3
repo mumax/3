@@ -1,0 +1,28 @@
+/*
+	Test quantity averages.
+*/
+
+Nx := 200
+Ny := 100
+setgridsize(Nx, Ny, 1)
+
+c := 5e-9
+setcellsize(c, c, c)
+
+setGeom(circle(Nx*c))
+
+defRegion(0, rect(Nx*c, Nx*c))
+defRegion(1, rect(Nx*c, Nx*c/4))
+
+Msat = 1e6
+expect("Msat", Msat.Average(), 1e6, 1)
+
+Aex = 20e-12
+expect("Aex", Aex.Average(), 20e-12, 1e-16)
+
+alpha = 1
+expect("alpha", alpha.Average(), 1, 1e-5)
+
+anisC1 = vector(1, 2, 3)
+expectV("anisC1", anisC1.Average(), vector(1, 2, 3), 1e-5)
+

@@ -1,0 +1,31 @@
+/*
+	Test determination of vortex core position.
+*/
+
+setgridsize(128, 64, 2)
+setcellsize(1e-9, 2e-9, 1e-9)
+
+Msat = 800e3
+Aex = 13e-12
+alpha = 3
+
+m  = vortex(-1, -1).transl(20e-9, 30e-9, 0)
+
+pos := ext_corepos.get()
+expect("coreX", pos[0], 20e-9, 0.1e-9)
+expect("coreY", pos[1], 30e-9, 0.1e-9)
+expect("polarization", pos[2], -0.5, 0.3)  // position_z is actually polarization
+
+// Test opposite polarization as well
+m  = vortex(1, 1)
+
+// Relax a bit
+alpha = 3
+tableadd(ext_corepos)                     // check that we can save
+steps(100)
+
+pos = ext_corepos.get()
+expect("coreX", pos[0], 0e-9, 0.1e-9)
+expect("coreY", pos[1], 0e-9, 0.1e-9)
+expect("polarization", pos[2], 0.7, 0.3)  // position_z is actually polarization
+

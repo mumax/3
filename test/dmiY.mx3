@@ -1,0 +1,24 @@
+/*
+	Test for the DMI interaction, inspired by Thiaville et al. EPL 100 2012.
+	In this simulation, the DMI interaction converts a Bloch wall to a Néel wall.
+	Same as dmi.txt but rotated over 90° to test for Y derivatives as well.
+*/
+
+SetGridSize(128, 128, 1)
+SetCellSize(250e-9/128, 250e-9/128, 0.6e-9)
+
+Msat  = 1100e3
+Aex   = 16e-12
+alpha = 3
+AnisU = vector(0, 0, 1)
+Ku1   = 1.27E6
+Dind   = 0.1e-3 // J/m2.
+
+m = TwoDomain(0, 0, -1, 1, 1, 0, 0, 0, 1).RotZ(pi/2)
+
+//MaxErr = 1e-4
+Maxdt = 5e-13
+Run(5e-9)
+expect("mx", m.Average()[0], -0.035, 0.01)
+expect("my", m.Average()[1],  0.059, 0.01)
+

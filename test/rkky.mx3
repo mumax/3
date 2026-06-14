@@ -1,0 +1,31 @@
+/*
+	Test setting an absolute RKKY coupling.
+*/
+
+N := 10
+setgridsize(N, N, 2)
+
+c := 1e-9
+setcellsize(c, c, c)
+
+defRegion(0, layer(0))
+defRegion(1, layer(1))
+
+Msat = 1e6
+
+Aex  = 10e-12
+RKKY := -1e-3 // 1mJ/m2
+
+scale := (RKKY * c) / (2 * Aex.Average())
+print("scale:", scale)
+
+ext_scaleExchange(0, 1, scale)
+
+m = uniform(1, 0, 0)
+
+E0 := E_total.Get()
+
+m.setRegion(0, uniform(0, 1, 0))
+E1 := E_total.Get()
+
+expect("delta E", E1 - E0,  RKKY * N*N*c*c, 1e-20)

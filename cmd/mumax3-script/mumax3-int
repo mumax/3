@@ -1,0 +1,2 @@
+#! /bin/bash
+rlwrap -m -S '> ' mumax3-script

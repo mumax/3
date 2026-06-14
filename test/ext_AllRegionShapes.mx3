@@ -1,0 +1,53 @@
+/*
+	Test the ext_AllRegionShapes extension, by comparing Shapes to Regions
+*/
+
+//This example uses Voronoi Tesselation regions, but ext_AllRegionShapes works with any other types of regions
+//Set arbitrary initial conditions
+N := 256
+c := 4e-9
+d := 40e-9
+setgridsize(N, N, 1)
+setcellsize(c, c, d)
+setGeom(circle(N*c))
+alpha = 3
+Kc1   = 1000
+Aex   = 13e-12
+Msat  = 860e3
+m=randommag()
+
+// define grains with region number 0-255
+grainSize  := 40e-9  // m
+randomSeed := 1234567
+maxRegion  := 254
+ext_makegrains(grainSize, maxRegion, randomSeed)
+
+//Zero out only half the regions, and save the average remaining magnetization
+for i:=0; i<maxRegion/2; i++{
+m.setregion(i,uniform(0,0,0))
+}
+
+mregionsavg:=m.average()
+
+//Reset so we can compare to Shapes equivalent
+m=randommag()
+
+// If we would like to add up several grains, we can initialize a shape with nothing in it, and then add to it in a loop.
+a:=circle(0e-9)
+
+//Initialize ext_Allregionshapes. By itself, ext_AllRegionShapes() is not yet a Shape, but still a func()
+//We can access the ith region using allregions(i). mx3 scripts do not allow double parentheses ext_AllRegionShapes()(i) on one line
+allregions:= ext_AllRegionShapes()
+
+//We can also add these Shapes in a loop. Here, add each Shape corresponding with the previous maxRegion/2 grains to compare
+for i:=0; i<maxRegion/2; i++{
+a=a.add(allregions(i))
+}
+//zero them out, as before
+m.setinshape(a,uniform(0,0,0))
+
+mshapesavg:=m.average()
+
+
+expectv("Average Magnetization",mregionsavg,mregionsavg,1e-8)
+

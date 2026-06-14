@@ -1,0 +1,22 @@
+/* 
+	Test rk4 solver with temperature
+*/
+
+c := 10e-9
+setcellsize(c, c, c)
+setgridsize(256, 256, 1)
+
+Msat  = 1e6 
+Aex   = 0 
+alpha = 0.1 
+AnisU = vector(0, 0, 1)
+m     = uniform(0, 0, 1)
+fixdt = 2e-12
+Temp  = 100              
+Ku1   = 1e4/4
+enabledemag = false
+setsolver(4)
+
+run(5e-9) 
+print(m.average())
+expectv("m", m.average(), vector(-0.000, -0.000, 0.8366), 1e-3)

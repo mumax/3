@@ -1,0 +1,29 @@
+/*
+	Regions test
+*/
+
+N := 128
+setgridsize(N, N, 1)
+setcellsize(1e-9, 1e-9, 1e-9)
+d := 1e-9 * N  
+
+defregion(0, circle(d).inverse())
+defregion(1, circle(d))
+defregion(2, circle(d/2))
+defregion(3, circle(d/2).transl(d/3, 0, 0))
+save(regions)
+
+Ku1.setregion(1, 500)
+Ku1.setregion(2, 0)
+Ku1.setregion(3, -500)
+save(Ku1)
+
+Msat = 800e-3 // sets it everywhere
+Msat.setregion(2, 500e3)
+save(Msat)
+
+m = uniform(1, 0, 0)
+save(m)
+
+regions.setcell(5, 6, 0, 123)
+expect("getcell", regions.getcell(5, 6, 0), 123, 0)

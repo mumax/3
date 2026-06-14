@@ -1,0 +1,29 @@
+/*
+	Test demag field of cube
+	demag tensor should be -1/3, -1/3, -1/3
+*/
+
+N := 2
+c := 1e-9
+
+setgridsize(N, N, N)
+setcellsize(c, c, c)
+
+Msat = 1 / mu0
+tol := 5e-4
+
+m = uniform(1, 0, 0)
+expect("kxx", B_demag.Average()[0], -1./3., tol) 
+expect("kxy", B_demag.Average()[1],      0, tol)
+expect("kxz", B_demag.Average()[2],      0, tol)
+
+m = uniform(0, 1, 0)
+expect("kyx", B_demag.Average()[0],      0, tol)
+expect("kyy", B_demag.Average()[1], -1./3., tol) 
+expect("kyz", B_demag.Average()[2],      0, tol)
+
+m = uniform(0, 0, 1)
+expect("kzx", B_demag.Average()[0],      0, tol)
+expect("kzy", B_demag.Average()[1],      0, tol)
+expect("kzz", B_demag.Average()[2], -1./3., tol) 
+

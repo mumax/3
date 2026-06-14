@@ -1,0 +1,21 @@
+// Phase 1 item 3 safety guard verification: RunGraph must reject region-wise
+// time-dependent material parameters (e.g. aex set as a function of t) --
+// see CLAUDE.md section 2.14 (assertGraphCompatible extension).
+// Expected: util.AssertMsg panic ("RunGraph: Aex must be time-independent
+// (SetRegion/SetRegionFn with a function of t is not supported)"), non-zero
+// exit.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12 + 1e-12*sin(t)
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up
+
+m = uniform(1, 0, 0)
+RunGraph(5)

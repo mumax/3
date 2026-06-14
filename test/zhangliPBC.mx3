@@ -1,0 +1,29 @@
+/*
+	Test Zhang-li torque with PBCs.
+*/
+
+setPBC(1, 0, 0)
+setGridSize(256, 32, 1)
+c := 5e-9
+setCellSize(c, c, c)
+
+Msat  = 800e3
+Aex   = 13e-12
+alpha = 3
+
+m = twodomain(1,0,0,  0,1,0,  -1,0,0)
+m.setInShape(xrange(-inf, -120*c), uniform(0,-1,0))
+
+run(1e-9)
+
+
+alpha = 0.01
+xi    = 0.1
+J     = vector(1e12, 0, 0)
+Pol   = 1
+
+run(1e-9)
+m1 := m.average()
+expect("mx", m1[0], -0.081425920, 1e-4)
+expect("my", m1[1], -0.003434650, 1e-4)
+expect("mz", m1[2], -0.015030215, 1e-4)

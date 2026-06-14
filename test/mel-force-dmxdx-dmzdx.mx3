@@ -1,0 +1,94 @@
+Nx := 1024
+Ny := 16
+Nz := 16
+
+csX := 0.5e-9
+csY := 1e-9
+csZ := 2e-9
+
+setgridsize(Nx, Ny, Nz)
+setcellsize(csX, csY, csZ)
+
+Msat = 1000e3
+B1 = 1000e3
+B2 = 1000e3
+enabledemag = false
+m = uniform(1.0, 1.0, 1.0)
+
+mask := newVectorMask(Nx, Ny, Nz)
+
+Period := 32e-9
+kx := 2 * pi / Period
+
+pre := 1.0 / (2.0 * B1.Average() * kx)
+pre2 := 1.0 / (B2.Average() * kx)
+
+for ii := 0; ii < Nx; ii++ {
+	for jj := 0; jj < Ny; jj++ {
+		for kk := 0; kk < Nz; kk++ {
+			r := index2coord(ii, jj, kk)
+			x := r.X()
+			mx := sin(kx * x)
+			mz := cos(kx * x)
+			mask.setVector(ii, jj, kk, vector(mx, 0.0, mz))
+		}
+	}
+}
+
+m.setarray(mask)
+
+save(m)
+save(F_mel)
+
+Fmel := F_mel.HostCopy()
+
+errx := -inf
+erry := -inf
+
+for ii := 0; ii < Nx; ii++ {
+	for jj := 0; jj < Ny; jj++ {
+		for kk := 0; kk < Nz; kk++ {
+			r := index2coord(ii, jj, kk)
+			x := r.X()
+
+			ref := sin(kx*x) * cos(kx*x)
+			ref2 := (cos(kx*x)*cos(kx*x) - sin(kx*x)*sin(kx*x))
+
+			val := Fmel.get(0, ii, jj, kk)
+			val2 := Fmel.get(2, ii, jj, kk)
+
+			ex := abs(val*pre - ref)
+			ey := abs(val2*pre2 - ref2)
+
+			if ex > errx {
+				errx = ex
+			}
+			if ey > erry {
+				erry = ey
+			}
+		}
+	}
+}
+
+ii := Nx / 2
+jj := Ny / 2
+kk := Nz / 2
+
+r := index2coord(ii, jj, kk)
+x := r.X()
+
+ref := sin(kx*x) * cos(kx*x)
+ref2 := (cos(kx*x)*cos(kx*x) - sin(kx*x)*sin(kx*x))
+
+val := Fmel.get(0, ii, jj, kk)
+val2 := Fmel.get(2, ii, jj, kk)
+
+ex := abs(val*pre - ref)
+ey := abs(val2*pre2 - ref2)
+
+ERRMAX := 0.004
+ERRMIN := 3e-6
+expect("max(Fmel,x)", errx, 0., ERRMAX)
+expect("max(Fmel,y)", erry, 0., ERRMAX)
+expect("min(Fmel,x)", ex, 0., ERRMIN)
+expect("min(Fmel,y)", ey, 0., ERRMIN)

@@ -1,0 +1,32 @@
+// Phase 1 item 3, 3순위 prep (graphMaxCells re-tuning, see CLAUDE.md section
+// 2.16(a)/2.17): 700x700x1 grid (490,000 cells, just below graphMaxCells=
+// 500000), adaptive dt (FixDt unset), default solver (RK45DP, no setsolver()
+// call), explicit CUDA Graph split-graph replay (RunGraph, bypasses the
+// graphWorthwhile() cell-count gate via assertGraphCompatible() only). Compare
+// against _graph_poc_700_rk45dp_nograph.mx3 for a genuine graph-vs-nograph
+// throughput ratio at this grid size.
+SetGridSize(700, 700, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+RunGraph(100)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 700, "x", 700, "x", 1)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 700*700*1*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

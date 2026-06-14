@@ -1,0 +1,21 @@
+/*
+	Test antiferromagnetic exchange between two regions
+*/
+
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat = 800e3
+m  = uniform(1, .1, 0)
+
+defregion(1, Yrange(0, inf))
+defregion(2, Yrange(-inf, 0))
+ext_ScaleExchange(1, 2, -1.0)   // AFM exchange
+
+Aex = 13e-12
+
+alpha = 3
+run(10e-9) 
+expectv("m", m.average(), vector(0,  0.114170685410499, 0), 1e-5)
+
+

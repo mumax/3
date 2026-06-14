@@ -1,0 +1,30 @@
+// Phase 1 item 3 PoC (Option B): small grid (64x64x1), adaptive dt (FixDt unset),
+// baseline (no CUDA Graph). Same config as _graph_poc_small_adaptive.mx3, but
+// using steps() instead of RunGraph() for a fair before/after throughput
+// comparison with adaptive step size.
+SetGridSize(64, 64, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+setsolver(2)
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+steps(500)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 64, "x", 64)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 64*64*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

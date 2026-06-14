@@ -1,0 +1,37 @@
+/*
+	Test demag field with regions
+*/
+
+	SetGridSize(64, 64, 2)
+	SetCellSize(1e-9, 1e-9, 0.5e-9)
+
+	defregion(1, xrange(0, inf))
+	defregion(2, xrange(-inf, 0))
+	defregion(3, ellipse(10e-9, 20e-9))
+
+	B := 2/mu0 
+	msat.setregion(1, B)
+	msat.setregion(2, B)
+	msat.setregion(3, B)
+
+	m = uniform(1, 0, 0)
+	expect("kxx", B_demag.Average()[0], 0, 0.1) // not perfectly 0, finite film
+	expect("kxy", B_demag.Average()[1], 0, 1e-8)
+	expect("kxz", B_demag.Average()[2], 0, 1e-8)
+
+	m = uniform(0, 1, 0)
+	expect("kyx", B_demag.Average()[0], 0, 1e-8)
+	expect("kyy", B_demag.Average()[1], 0, 0.1) // not perfectly 0, finite film
+	expect("kyz", B_demag.Average()[2], 0, 1e-8)
+
+	m = uniform(0, 0, 1)
+	expect("kzx", B_demag.Average()[0], 0, 1e-8)
+	expect("kzy", B_demag.Average()[1], 0, 1e-8)
+	expect("kzz", B_demag.Average()[2], -2, 0.1) // not perfectly -1, finite film
+
+	Msat = 1/mu0
+	expect("kzz", B_demag.Average()[2], -1, 0.1) 
+
+
+
+

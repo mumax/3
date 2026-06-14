@@ -1,0 +1,32 @@
+/*
+	Shift should not act on regions if ShiftRegios == false
+	Reported by Ben Van de Wiele.
+*/
+
+Ny := 64
+Nx := 16*Ny
+c := 3.125e-9
+setgridsize(Nx, Ny, 1)
+setcellsize(c, c, 15e-9)
+
+Msat    = 1.7e6
+Aex     = 21e-12
+Alpha   = 0.015
+Ku1      = 25e4
+
+DefRegion( 1, XRange(-inf, 0) )          
+DefRegion( 2, XRange(0, inf) )
+anisU.SetRegion(1, vector(1, 1, 0))
+anisU.SetRegion(2, vector(1, -1, 0))
+
+m = uniform(1, 0, 0)
+
+// shift the magnetization every 1e-10 sec
+shiftM = True                   
+shiftRegions = False
+for i:=0; i<320; i++{           
+   shift(-1)
+}
+
+expect("regions", regions.Average(), 1.5, 0)
+

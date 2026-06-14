@@ -1,0 +1,49 @@
+/*
+	Test cubic anistorpy energy
+	based on: The design and verification of MuMax3 AIP Advances 4, 107133 (2014); http://dx.doi.org/10.1063/1.4899186
+	Test for one random-ish angle.
+*/
+
+
+setGridSize(1, 1, 1)
+setCellSize(1e-9, 1e-9, 1e-9)
+V := pow(1e-9, 3)
+
+AnisC1 = vector(1, 0, 0)
+AnisC2 = vector(0, 1, 0)
+
+theta := 23*pi/180
+phi := 11*pi/180
+m = uniform(sin(phi)*cos(theta), sin(phi)*sin(theta), cos(phi))
+
+TOL := 1e-2
+
+// try to trigger bad XXX_red update:
+Msat   = 1e3
+Kc1 = 1e6; Kc2 = 0; Kc3 = 0
+E_total.get() 
+Msat   = 1000e3
+
+expect("easy1", E_anis.get()/V, 35254.015625, TOL)
+
+Kc1 = -1e6; Kc2 = 0; Kc3 = 0
+expect("hard1", E_anis.get()/V, -35254.015625, TOL)
+
+Kc1 = 0; Kc2 = 1e6; Kc3 = 0
+expect("easy2", E_anis.get()/V, 165.23309326171875, TOL)
+
+Kc1 = 0; Kc2 = -1e6; Kc3 = 0
+expect("hard2", E_anis.get()/V, -165.23309326171875, TOL)
+
+Kc1 = 0; Kc2 = 0; Kc3 = 1e6
+expect("easy3", E_anis.get()/V, 912.3794555664062, TOL)
+
+
+// try to trigger bad XXX_red update:
+Kc1 = 0; Kc2 = 0; Kc3 = -1e6
+Msat   = 1e3
+E_total.get() 
+Msat   = 1000e3
+
+expect("hard3", E_anis.get()/V, -912.3794555664062, TOL)
+

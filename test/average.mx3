@@ -1,0 +1,68 @@
+/*
+	Test for averages with a non-universe geometry.
+	Magnetization should be averaged over the geometry,
+	while others should average over the box (parameters, external excitations).
+	Finally, test averages over a region (ignores geometry).
+*/
+
+N := 512
+c := 1e-9
+
+setgridsize(N, N, 1)
+setcellsize(c, c, c)
+
+setgeom(circle(N*c))
+tol := 1e-4                    // tolerance limited by FD circle approximation
+
+defregion(1, xrange(-inf, 0))
+defregion(2, xrange( 0, inf))
+
+
+m = uniform(0, 1, 0)
+
+// Magnetization should average over the geometry
+expectv("m", m.average(), vector(0, 1, 0), tol)
+expect("mx", m.comp(0).average(), 0, tol)
+expect("my", m.comp(1).average(), 1, tol)
+expect("mz", m.comp(2).average(), 0, tol)
+
+// Average over region ignores geometry, 
+// so here average m feels the surface of the disk
+expectv("m1", m.region(1).average(), vector(0, pi/4, 0), tol)
+expect("m1x", m.region(1).average()[0],      0,    tol)
+expect("m1y", m.region(1).average()[1],      pi/4, tol)
+expect("m1z", m.region(1).average()[2],      0,    tol)
+expect("m1x", m.comp(0).region(1).average(), 0,    tol)
+expect("m1y", m.comp(1).region(1).average(), pi/4, tol)
+expect("m1z", m.comp(2).region(1).average(), 0,    tol)
+
+
+// Material parameter is set everywhere and averaged over the box
+alpha = 2
+expect("alpha", alpha.average(), 2, tol)
+expect("alpha", alpha.region(1).average(), 2, tol)
+expect("alpha", alpha.region(2).average(), 2, tol)
+
+alpha.setRegion(1, 3)
+expect("alpha", alpha.average(), (2.+3.)/2., tol)  // average of 2 and 3
+expect("alpha", alpha.region(1).average(), 3, tol)
+expect("alpha", alpha.region(2).average(), 2, tol)
+
+
+// Excitation is set everywhere and averaged everywhere
+B_ext = vector(1, 2, 3)
+
+expectv("B_ext", B_ext.average(), vector(1, 2, 3), tol)
+expect("B_ext_x", B_ext.comp(0).average(), 1, tol)
+expect("B_ext_y", B_ext.comp(1).average(), 2, tol)
+expect("B_ext_z", B_ext.comp(2).average(), 3, tol)
+
+expectv("B_ext_1", B_ext.region(1).average(), vector(1, 2, 3), tol)
+expect("B_ext_1x", B_ext.region(1).average()[0], 1, tol)
+expect("B_ext_1y", B_ext.region(1).average()[1], 2, tol)
+expect("B_ext_1z", B_ext.region(1).average()[2], 3, tol)
+
+expect("B_ext_1x", B_ext.comp(0).region(1).average(), 1, tol)
+expect("B_ext_1y", B_ext.comp(1).region(1).average(), 2, tol)
+expect("B_ext_1z", B_ext.comp(2).region(1).average(), 3, tol)
+

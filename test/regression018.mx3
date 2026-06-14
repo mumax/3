@@ -1,0 +1,75 @@
+/*
+	Problem reported by Gabriel Chaves: CURAND error
+	+ httpfs touch did not close file
+*/
+
+SetSolver(2)
+FixDt = 1e-14
+Bval := 0.0
+mos := -1.0
+kval := 278607
+fwidth := 6.000000e-08
+fellipseaxis := 2.400000e-07
+flength := 2.400000e-07
+ThermSeed(128)
+Temp =300.000000
+fthickness := 1.7e-9
+sr := fellipseaxis/fwidth
+
+xcellsize := 2.00e-9
+ycellsize := 2.00e-9
+zcellsize := 1.70e-9
+
+nx := floor(flength/xcellsize)
+ny := floor(fwidth/ycellsize)
+print("grid:", nx, ny)
+setgridsize(128, 32, 1)
+setcellsize(xcellsize, ycellsize, zcellsize)
+
+/* Input parameters */
+Msat  = 817647
+Aex   = 13e-12
+alpha = 0.01          // Gilbert damping constant
+B_ext = vector(0.0,0,0) // Applied field in T
+
+a := cylinder(fellipseaxis,zcellsize).scale(1.0,1.0/sr,1.0).transl((fellipseaxis-flength)/2.0,0e-9, 0 )
+b := cylinder(fellipseaxis,zcellsize).scale(1.0,1.0/sr,1.0).transl((-fellipseaxis+flength)/2.0,0e-9, 0 )
+c := cuboid(flength-fellipseaxis,fwidth,zcellsize).scale(1.0,1.0,1.0).transl(0e-9,0e-9, 0 )
+
+setgeom( a.add(b).add(c))
+
+defregion(1,a.add(b).add(c))
+
+m.setRegion(1, uniform(-1, 1e-3, 1e-3))
+
+FixedLayer.setRegion(1,vector (1,0,0))
+
+anisU = vector (0,0,1)
+
+tableAdd(Ku1)
+tableAdd(m) 
+tableAdd(E_total)
+tableAdd(E_anis)
+tableAdd(E_exch)
+tableAdd(E_Zeeman)
+tableAdd(E_demag)
+tableAdd(B_ext)
+tableAdd(FixedLayer.Region(1))
+
+B_ext = vector(Bval,0, 0)
+timestep := 10.0e-9
+
+//autosave(m, 1e-12)
+//tableadd(dt)
+//tableautosave(1e-15)
+for i:=0; i<1000; i++ {
+	steps(1)
+	fprintln("dt.txt", Neval.get(), dt)
+}
+
+Ku1 = kval
+//m.loadfile("initialmstate.out/m000000.ovf")
+m.set(uniform(1,1,1))
+B_ext = vector (Bval,0.0,0.0)
+count := 0
+//run(timestep)

@@ -1,0 +1,26 @@
+/*
+	Test Euler solver and changing solvers on the fly.
+*/
+
+	setgridsize(128, 32, 1)
+	setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+	Msat = 800e3
+	Aex = 13e-12
+	m  = uniform(1, .1, 0)
+
+// relax (heun)
+	setsolver(2)
+	alpha = 3
+	run(1e-9) 
+
+// reversal (euler)
+	setSolver(1)
+	FixDt = 1e-14
+
+	alpha = 0.02
+	B_ext = vector(-24.6E-3, 4.3E-3, 0)
+	run(0.1e-9)
+
+	expectv("m", m.average(), vector(0.59293, 0.63278, -0.08152), 1e-3)
+

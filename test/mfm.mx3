@@ -1,0 +1,21 @@
+/*
+	Save an mfm image
+*/
+
+Nx := 400
+Ny := 400
+c := 2e-9
+
+setpbc(2, 0, 0)
+setgridsize(Nx, Ny, 1)
+setcellsize(c, c, c)
+
+Msat = 1/mu0
+
+setgeom(rect(400e-9, 400e-9).transl(-400e-9, 0, 0))
+m = uniform(1,0,0.1)
+
+MFMLift = 50e-9
+
+save(MFM)
+expect("mfm", MFM.Average(), -3.28009e7, 1e5) // golden value with mumax3.9.1 2015-12-05

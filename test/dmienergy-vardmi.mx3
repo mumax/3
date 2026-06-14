@@ -1,0 +1,44 @@
+/*
+	Test energy dissipation in presence of DMI with variable D.
+	This failed before commit 4ee9bfa710758113b357d62edd26d4494048d07e (fix region dependent dind)
+*/
+
+N := 64
+setgridsize(N, N, 1)
+c := 1.15e-9 / 2
+d := 1.15e-9
+setcellsize(c, c, d)
+//maxerr = 1e-5
+
+defregion(0, xrange(0, inf))
+defregion(1, xrange(-inf, 0))
+defregion(2, yrange(-inf, 0))
+
+Aex   = 20e-12
+Ku1   = 5.9e5
+Msat  = 6e5
+AnisU = vector(0, 0, 1)
+
+Dind.setRegion(0, 4e-3)
+Dind.setRegion(1, 2e-3)
+Dind.setRegion(2, -3e-3)
+
+m     = uniform(1, 1, 1)
+alpha = 0.001
+
+tableAdd(E_total)
+tableAutosave(1e-12)
+
+E0 := E_total.Get()
+print("E0", E0, "J")
+
+run(10e-12)
+E1 := E_total.Get()
+print("E1", E1, "J")
+
+run(10e-12)
+E2 := E_total.Get()
+print("E2", E2, "J")
+
+expect("delta1", Sign(E1-E0), -1, 0)
+expect("delta2", Sign(E2-E0), -1, 0)

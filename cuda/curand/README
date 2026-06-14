@@ -1,0 +1,54 @@
+PACKAGE DOCUMENTATION
+
+package curand
+    import "github.com/barnex/cuda5/curand"
+
+
+
+TYPES
+
+type Generator uintptr
+
+
+func CreateGenerator(rngType RngType) Generator
+
+
+func (g Generator) GenerateNormal(output uintptr, n int64, mean, stddev float32)
+
+func (g Generator) SetSeed(seed int64)
+
+
+type RngType int
+
+const (
+    PSEUDO_DEFAULT          RngType = C.CURAND_RNG_PSEUDO_DEFAULT          // Default pseudorandom generator
+    PSEUDO_XORWOW           RngType = C.CURAND_RNG_PSEUDO_XORWOW           // XORWOW pseudorandom generator
+    QUASI_DEFAULT           RngType = C.CURAND_RNG_QUASI_DEFAULT           // Default quasirandom generator
+    QUASI_SOBOL32           RngType = C.CURAND_RNG_QUASI_SOBOL32           // Sobol32 quasirandom generator
+    QUASI_SCRAMBLED_SOBOL32 RngType = C.CURAND_RNG_QUASI_SCRAMBLED_SOBOL32 // Scrambled Sobol32 quasirandom generator
+    QUASI_SOBOL64           RngType = C.CURAND_RNG_QUASI_SOBOL64           // Sobol64 quasirandom generator
+    QUASI_SCRAMBLED_SOBOL64 RngType = C.CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 // Scrambled Sobol64 quasirandom generator
+)
+
+
+
+type Status int
+
+const (
+    SUCCESS               Status = C.CURAND_STATUS_SUCCESS               // No errors
+    VERSION_MISMATCH      Status = C.CURAND_STATUS_VERSION_MISMATCH      // Header file and linked library version do not match
+    NOT_INITIALIZED       Status = C.CURAND_STATUS_NOT_INITIALIZED       // Generator not initialized
+    ALLOCATION_FAILED     Status = C.CURAND_STATUS_ALLOCATION_FAILED     // Memory allocation failed
+    TYPE_ERROR            Status = C.CURAND_STATUS_TYPE_ERROR            // Generator is wrong type
+    OUT_OF_RANGE          Status = C.CURAND_STATUS_OUT_OF_RANGE          // Argument out of range
+    LENGTH_NOT_MULTIPLE   Status = C.CURAND_STATUS_LENGTH_NOT_MULTIPLE   // Length requested is not a multple of dimension
+    LAUNCH_FAILURE        Status = C.CURAND_STATUS_LAUNCH_FAILURE        // Kernel launch failure
+    PREEXISTING_FAILURE   Status = C.CURAND_STATUS_PREEXISTING_FAILURE   // Preexisting failure on library entry
+    INITIALIZATION_FAILED Status = C.CURAND_STATUS_INITIALIZATION_FAILED // Initialization of CUDA failed
+    ARCH_MISMATCH         Status = C.CURAND_STATUS_ARCH_MISMATCH         // Architecture mismatch, GPU does not support requested feature
+    INTERNAL_ERROR        Status = C.CURAND_STATUS_INTERNAL_ERROR        // Internal library error
+)
+
+
+
+

@@ -1,0 +1,27 @@
+/*
+	Test that shifting introduces the correct geometry from the sides.
+*/
+
+setgridsize(512, 64, 1)
+c := 2e-9
+setcellsize(c, c, c)
+m = twodomain(0,0,1, 0,1,0, 0,0,-1)
+
+ext_centerwall(2)
+
+Msat  = 1100e3
+Aex   = 16e-12
+AnisU = vector(0, 0, 1)
+Ku1   = 1.27E6
+alpha = 1
+
+setgeom(circle(80*c).repeat(64*c,0,0))
+
+ShiftMagL = vector(0,0,1)
+ShiftMagR = vector(0,0,-1)
+for i:=0; i<100; i++{
+	shift(1)
+}
+
+tol := 1e-5
+expectv("m", m.average(), vector(0, 0.008466859, 0.38830321), tol)

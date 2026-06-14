@@ -1,0 +1,17 @@
+/*
+	Test saving snapshots on-the-fly.
+*/
+
+setgridsize(128, 32, 1)
+setcellsize(500e-9/128, 125e-9/32, 3e-9)
+
+Msat = 800e3
+Aex = 13e-12
+m  = uniform(1, .1, 0)
+
+snapshot(m)
+snapshotformat = "png"
+snapshot(m)
+snapshotformat = "gif"
+snapshot(m)
+

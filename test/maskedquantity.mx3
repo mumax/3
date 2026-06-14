@@ -1,0 +1,15 @@
+/*
+	Test masking of quantity (implemented in engine/customfield.go)
+*/
+
+nx := 64
+cs := 1e-9
+setgridsize(Nx,Nx,1)
+setcellsize(cs,cs,cs)
+
+d := cs*nx
+mask := Masked(ConstVector(0,0,1),Circle(d))
+AddFieldTerm(mask)
+
+ratio := pi/4 // surface area circle / square
+expect("mask",B_custom.Comp(2).average(),ratio,0.1)

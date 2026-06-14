@@ -1,0 +1,24 @@
+/*
+	Test time dependent parameter with regions.
+*/
+
+c:=4e-9
+setgridsize(32, 32, 1)
+setcellsize(c, c, c)
+
+Msat=860e3
+Aex=13e-12
+alpha=0.2
+m=uniform(1, 1, 0)
+anisU = vector(0, 1, 0)
+
+defRegion(1, xrange(-inf, inf))
+f := 1e9
+Ku1.setRegion(1, 1e5 * sin(2 * pi * f * t))
+
+run(0.5e-9)
+
+m_ := m.average()
+expect("mx", m_[0],  0,       1e-4)
+expect("my", m_[1],  0.99090, 1e-4)
+expect("mz", m_[2],  0,       1e-4)

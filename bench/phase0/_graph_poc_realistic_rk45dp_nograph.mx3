@@ -1,0 +1,36 @@
+// Phase 1 item 3, 1순위 (realistic field-config generalization, see CLAUDE.md
+// section 2.15): 256x256x1 grid with uniaxial anisotropy (Ku1, AnisU) +
+// interfacial DMI (Dind) added on top of demag+exchange+Zeeman (constant
+// region-wise parameters, within the assertGraphCompatible guard envelope).
+// adaptive dt (FixDt unset), default solver (RK45DP, no setsolver() call),
+// baseline (no CUDA Graph). Same config as _graph_poc_realistic_rk45dp.mx3,
+// but using steps() instead of RunGraph() for a fair before/after throughput
+// comparison.
+SetGridSize(256, 256, 1)
+c := 4e-9
+SetCellSize(c, c, c)
+
+msat  = 800e3
+aex   = 13e-12
+alpha = 0.01
+ku1   = 0.5e6
+anisU = vector(0, 0, 1)
+dind  = 0.5e-3
+b_ext = vector(0, 0.01, 0)
+
+m = uniform(1, 0, 0)
+steps(5) // warm-up: kernel JIT load, FFT plan creation, buffer allocation
+
+m = uniform(1, 0, 0)
+t = 0
+neval0 := Neval.get()
+start := now()
+steps(200)
+wall := since(start).Seconds()
+nevl := Neval.get() - neval0
+
+print("GRIDSIZE:", 256, "x", 256, "x", 1)
+print("STEPS:", nevl)
+print("WALLTIME_S:", wall)
+print("CELLS_PER_S:", 256*256*1*nevl/wall)
+print("S_PER_STEP:", wall/nevl)

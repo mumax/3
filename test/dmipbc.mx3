@@ -1,0 +1,30 @@
+/*
+	Regression test for DMI with PBC.
+*/
+
+N := 64
+setPBC(1, 0, 0)
+setgridsize(2 * N, N, 1)
+c := 1.15e-9 * 2
+d := 1.15e-9
+setcellsize(c, c, d)
+
+Aex   = 20e-12
+Ku1   = 5.9e5
+Msat  = 6e5
+AnisU = vector(0, 0, 1)
+Dind   = 1e-3
+
+// relax
+alpha = 3
+m = twodomain(0,0,1, 0,0,0, 0,0,-1)
+run(.1e-9)
+
+alpha=0.05
+xi=0.4
+
+Pol = 1
+J = vector(-1e12, 0, 0)
+run(0.7e-9)
+
+expectv("m", m.average(), vector(0, -0.1537975966930, 0), 1e-4)

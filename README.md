@@ -1,4 +1,4 @@
-# mumax3-cuda-graph
+# mumax3-CO
 
 **CUDA Graph–accelerated fork of [mumax³](https://mumax.github.io) — transparent step-time speedup for small-to-medium micromagnetic simulations.**
 
@@ -57,7 +57,7 @@ The graph path is automatically skipped (falling back silently to the original p
 
 ### Pre-built Windows binary (CUDA 13.2, sm_75 – sm_120)
 
-👉 **[Download the latest release](https://github.com/mirryou-maker/mumax3-cuda-graph/releases/latest)**
+👉 **[Download the latest release](https://github.com/mirryou-maker/mumax3-CO/releases/latest)**
 
 The binary was compiled on Windows 11 with CUDA Toolkit 13.2 and supports Turing (sm_75) and later GPUs (Ampere, Ada, Hopper, Blackwell). For Maxwell / Pascal / Volta GPUs, build from source (see below).
 

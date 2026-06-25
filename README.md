@@ -2,6 +2,8 @@
 
 **CUDA Graph–accelerated fork of [mumax³](https://mumax.github.io) — transparent step-time speedup for small-to-medium micromagnetic simulations.**
 
+🌐 **Project page**: [sites.google.com/view/spinlab/research/mumax-co](https://sites.google.com/view/spinlab/research/mumax-co)
+
 This fork adds a CUDA Graph capture/replay path on top of mumax³ (based on commit [`3fe3d41`](https://github.com/mumax/3/commit/3fe3d41)) that transparently accelerates `Steps()` / `Run()` calls without requiring any changes to existing `.mx3` scripts.
 
 ---
@@ -132,6 +134,13 @@ All source modifications relative to `mumax/3@3fe3d41`:
 - All 176 mumax³ regression tests pass (`test/` directory, `cwd=test/`).
 - Results are **bit-identical** to upstream mumax³ on the same inputs whenever the graph path is active.
 - The graph path silently falls back to the standard path for any unsupported configuration.
+
+---
+
+## Project page
+
+Spin Dynamics Laboratory — mumax3-CO:  
+<https://sites.google.com/view/spinlab/research/mumax-co>
 
 ---
 

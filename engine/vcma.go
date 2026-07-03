@@ -29,12 +29,9 @@ func init() {
 	DeclFunc("EnableVCMA", EnableVCMA, "Enable voltage-controlled magnetic anisotropy (perpendicular easy axis).")
 }
 
-// EnableVCMA registers the VCMA field term.
+// EnableVCMA enables the VCMA effective-field term.
 func EnableVCMA() {
-	if !vcmaEnabled {
-		AddFieldTerm(B_vcma)
-		vcmaEnabled = true
-	}
+	vcmaEnabled = true
 }
 
 // AddVCMAField adds the VCMA effective field to dst.

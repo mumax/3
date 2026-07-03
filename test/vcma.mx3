@@ -1,0 +1,14 @@
+// Voltage-controlled magnetic anisotropy: B_z = 2*(xi*E)*mz/(Msat*t).
+// xi = 100e-15 J/(V m), E = 1e9 V/m, Msat = 1e6, t = 1e-9, m = +z.
+//   dK = xi*E = 100e-15*1e9 = 1e-4 J/m^2
+//   B_z = 2*dK*mz/(Msat*t) = 2*1e-4*1/(1e6*1e-9) = 0.2 T.
+SetGridSize(16, 16, 1)
+SetCellSize(2e-9, 2e-9, 1e-9)
+Msat = 1e6
+VCMA_xi = 100e-15
+VCMA_E = 1e9
+VCMA_thickness = 1e-9
+EnableVCMA()
+m = uniform(0, 0, 1)
+Run(0)
+ExpectV("B_vcma at m=+z", B_vcma.Average(), vector(0, 0, 0.2), 1e-3)

@@ -1,0 +1,16 @@
+// Native RKKY couples across a nonmagnetic spacer gap (z-column scan).
+// Magnetic layers at z=0 (region 100) and z=2 (region 101); the cell at z=1
+// is empty (Msat=0). ext_InterExchange would give zero coupling here because
+// it only couples immediately-adjacent cells and treats an empty neighbour as
+// self; ext_RKKY finds the partner across the gap.
+SetGridSize(16, 16, 3)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+setgeom(layer(0).add(layer(2)))
+Msat = 1.0e6
+defregion(100, layer(0))
+defregion(101, layer(2))
+ext_RKKY(100, 101, -2e-3)
+m.setRegion(100, uniform(0, 0, 1))
+m.setRegion(101, uniform(1, 0, 0))
+Run(0)
+ExpectV("B_rkky across spacer", B_rkky.Region(100).Average(), vector(-2.22222, 0, 0), 1e-3)

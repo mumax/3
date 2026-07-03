@@ -1,0 +1,15 @@
+// Native RKKY interlayer coupling (ext_RKKY): adjacent layers.
+// Field convention  B = J / (Msat * dz) * m_partner.
+// J = -2e-3 J/m2, Msat = 1e6 A/m, dz = 0.9e-9 m  ->  |B| = 2.22222 T.
+// Layer 0 (region 100) is +z, layer 1 (region 101) is +x, so the field in
+// region 100 points along +x scaled by J/(Msat*dz).
+SetGridSize(16, 16, 2)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(100, layer(0))
+defregion(101, layer(1))
+ext_RKKY(100, 101, -2e-3)
+m.setRegion(100, uniform(0, 0, 1))
+m.setRegion(101, uniform(1, 0, 0))
+Run(0)
+ExpectV("B_rkky adjacent", B_rkky.Region(100).Average(), vector(-2.22222, 0, 0), 1e-3)

@@ -24,9 +24,8 @@ type rkkyPair struct {
 }
 
 var (
-	rkkyPairs      []rkkyPair
-	rkkyRegistered bool
-	B_rkky         = NewVectorField("B_rkky", "T", "RKKY interlayer coupling field", AddRKKYField)
+	rkkyPairs []rkkyPair
+	B_rkky    = NewVectorField("B_rkky", "T", "RKKY interlayer coupling field", AddRKKYField)
 )
 
 func init() {
@@ -38,10 +37,6 @@ func init() {
 // called multiple times to couple several region pairs.
 func RKKY(region1, region2 int, J float64) {
 	rkkyPairs = append(rkkyPairs, rkkyPair{region1, region2, J})
-	if !rkkyRegistered {
-		AddFieldTerm(B_rkky)
-		rkkyRegistered = true
-	}
 }
 
 // AddRKKYField adds the RKKY field of every defined region pair to dst.

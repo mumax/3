@@ -48,19 +48,25 @@ addrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
         return;
     }
 
-    // locate the nearest partner-region cell in the same (x,y) column along z
+    // locate the nearest partner-region cell in the same (x,y) column along z,
+    // scanning outward from iz and stopping at the first hit (O(distance),
+    // checking the lower side first to keep a deterministic tie-break)
     int P = -1;
-    int best = Nz + 1;
-    for (int jz = 0; jz < Nz; jz++) {
-        if (jz == iz) {
-            continue;
-        }
-        int Q = idx(ix, iy, jz);
-        if (regions[Q] == partner) {
-            int d = (jz > iz) ? (jz - iz) : (iz - jz);
-            if (d < best) {
-                best = d;
+    for (int d = 1; d < Nz; d++) {
+        int lo = iz - d;
+        if (lo >= 0) {
+            int Q = idx(ix, iy, lo);
+            if (regions[Q] == partner) {
                 P = Q;
+                break;
+            }
+        }
+        int hi = iz + d;
+        if (hi < Nz) {
+            int Q = idx(ix, iy, hi);
+            if (regions[Q] == partner) {
+                P = Q;
+                break;
             }
         }
     }

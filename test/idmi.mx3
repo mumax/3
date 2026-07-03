@@ -1,0 +1,22 @@
+// Native interlayer DMI (ext_InterlayerDMI): adjacent layers.
+// Field convention  B = s * D / (Msat * dz) * (zhat x m_partner),  with s = +1
+// when the partner cell is above (higher z) and s = -1 when below. This
+// antisymmetry makes B1,B2 the exact variational derivative of
+// E = D * zhat.(m1 x m2) * A.
+// D = -2e-3 J/m2, Msat = 1e6 A/m, dz = 0.9e-9 m  ->  |D/(Msat*dz)| = 2.22222 T.
+// Layer 0 (region 100, lower) is +x; layer 1 (region 101, upper) is +y.
+//   region 100: partner 101 (+y) is above (s=+1),  zhat x (+y) = -x, D<0
+//        B = (+1)*(-2.22222)*(-x) = (2.22222, 0, 0)
+//   region 101: partner 100 (+x) is below (s=-1),  zhat x (+x) = +y
+//        B = (-1)*(-2.22222)*(+y) = (0, 2.22222, 0)
+SetGridSize(16, 16, 2)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(100, layer(0))
+defregion(101, layer(1))
+ext_InterlayerDMI(100, 101, -2e-3)
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(0, 1, 0))
+Run(0)
+ExpectV("B_idmi adjacent (region 100)", B_idmi.Region(100).Average(), vector(2.22222, 0, 0), 1e-3)
+ExpectV("B_idmi adjacent (region 101)", B_idmi.Region(101).Average(), vector(0, 2.22222, 0), 1e-3)

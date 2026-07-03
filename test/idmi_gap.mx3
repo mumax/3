@@ -1,0 +1,18 @@
+// Native interlayer DMI couples across a nonmagnetic spacer gap (z-column scan).
+// Magnetic layers at z=0 (region 100) and z=2 (region 101); the cell at z=1 is
+// empty (Msat=0). The partner is found across the gap, and the antisymmetric
+// stacking sign is preserved (region 100 sees its partner above, region 101
+// below), so the fields match the adjacent case.
+// D = -2e-3 J/m2, Msat = 1e6 A/m, dz = 0.9e-9 m  ->  |D/(Msat*dz)| = 2.22222 T.
+SetGridSize(16, 16, 3)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+setgeom(layer(0).add(layer(2)))
+Msat = 1.0e6
+defregion(100, layer(0))
+defregion(101, layer(2))
+ext_InterlayerDMI(100, 101, -2e-3)
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(0, 1, 0))
+Run(0)
+ExpectV("B_idmi across spacer (region 100)", B_idmi.Region(100).Average(), vector(2.22222, 0, 0), 1e-3)
+ExpectV("B_idmi across spacer (region 101)", B_idmi.Region(101).Average(), vector(0, 2.22222, 0), 1e-3)

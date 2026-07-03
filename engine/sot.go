@@ -32,12 +32,9 @@ func init() {
 	DeclFunc("EnableSOT", EnableSOT, "Enable spin-orbit (spin-Hall) torque: current along +x, spin polarization +y.")
 }
 
-// EnableSOT registers the spin-orbit torque field term.
+// EnableSOT enables the spin-orbit torque effective-field term.
 func EnableSOT() {
-	if !sotEnabled {
-		AddFieldTerm(B_sot)
-		sotEnabled = true
-	}
+	sotEnabled = true
 }
 
 // AddSOTField adds the spin-orbit torque effective field to dst.

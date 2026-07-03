@@ -1,0 +1,20 @@
+// Spin-orbit (spin-Hall) torque as a compensated effective field.
+// Current along +x, spin polarization sigma = +y.
+//   pref = hbar/(2 e Msat t) = 1.054571817e-34/(2*1.602176634e-19*1e6*1e-9) = 3.290936e-13
+//   H_DL = SOT_thetaSH*Jc*pref = 0.5*1e12*3.290936e-13 = 0.1645468
+//   H_FL = SOT_thetaFL*Jc*pref = 0.1*1e12*3.290936e-13 = 0.03290936
+//   A  = alpha*H_DL - H_FL      = 0.02*0.1645468 - 0.03290936 = -0.02961843
+//   Bc = H_DL + alpha*H_FL      = 0.1645468 + 0.02*0.03290936 = 0.16520499
+// At m = +z:  B_sot = (Bc*(-mz), A, Bc*mx) = (-0.165205, -0.0296184, 0).
+SetGridSize(16, 16, 1)
+SetCellSize(2e-9, 2e-9, 1e-9)
+Msat = 1.0e6
+alpha = 0.02
+SOT_thetaSH = 0.5
+SOT_thetaFL = 0.1
+SOT_Jc = 1e12
+SOT_thickness = 1e-9
+EnableSOT()
+m = uniform(0, 0, 1)
+Run(0)
+ExpectV("B_sot at m=+z", B_sot.Average(), vector(-0.165205, -0.0296184, 0), 1e-3)

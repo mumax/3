@@ -10,8 +10,8 @@ package engine
 //	H_FL = SOT_thetaFL * (hbar * SOT_Jc) / (2 e Msat t)
 //
 // Charge current SOT_Jc flows along +x with spin polarization sigma = +y (the
-// standard spin-Hall geometry). SOT_thickness is the ferromagnet thickness (0
-// uses the cell size along z). Use region-wise SOT_Jc to localize the current.
+// standard spin-Hall geometry). SOT_thickness is the ferromagnet thickness. All
+// parameters may be set per region; use region-wise SOT_Jc to localize the current.
 
 import (
 	"github.com/mumax/3/cuda"
@@ -22,7 +22,7 @@ var (
 	SOTthetaSH = NewScalarParam("SOT_thetaSH", "", "SOT damping-like spin-Hall angle")
 	SOTthetaFL = NewScalarParam("SOT_thetaFL", "", "SOT field-like spin-Hall angle")
 	SOTJc      = NewScalarParam("SOT_Jc", "A/m2", "SOT charge current density (along +x)")
-	SOTthick   = NewScalarParam("SOT_thickness", "m", "Ferromagnet thickness for SOT (0 = cell size dz)")
+	SOTthick   = NewScalarParam("SOT_thickness", "m", "Ferromagnet thickness for SOT")
 
 	sotEnabled bool
 	B_sot      = NewVectorField("B_sot", "T", "Spin-orbit torque effective field", AddSOTField)
@@ -45,14 +45,12 @@ func AddSOTField(dst *data.Slice) {
 	if !sotEnabled {
 		return
 	}
-	thSH := float32(SOTthetaSH.GetRegion(0))
-	thFL := float32(SOTthetaFL.GetRegion(0))
-	if thSH == 0 && thFL == 0 {
+	// nothing to do if there is no SOT strength or no current anywhere
+	if SOTthetaSH.isZero() && SOTthetaFL.isZero() {
 		return
 	}
-	thick := float32(SOTthick.GetRegion(0))
-	if thick == 0 {
-		thick = float32(Mesh().CellSize()[2]) // z cell size
+	if SOTJc.isZero() {
+		return
 	}
 	ms := Msat.MSlice()
 	defer ms.Recycle()
@@ -60,5 +58,11 @@ func AddSOTField(dst *data.Slice) {
 	defer jc.Recycle()
 	al := Alpha.MSlice()
 	defer al.Recycle()
-	cuda.AddSOT(dst, M.Buffer(), ms, jc, al, thSH, thFL, thick, Mesh())
+	thSH := SOTthetaSH.MSlice()
+	defer thSH.Recycle()
+	thFL := SOTthetaFL.MSlice()
+	defer thFL.Recycle()
+	th := SOTthick.MSlice()
+	defer th.Recycle()
+	cuda.AddSOT(dst, M.Buffer(), ms, jc, al, thSH, thFL, th, Mesh())
 }

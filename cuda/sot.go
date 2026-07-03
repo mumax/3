@@ -13,7 +13,7 @@ import (
 //
 // Delivered as a compensated field so the LLG yields the DL+FL torque; spin
 // polarization sigma = +y. See sot.cu.
-func AddSOT(B, m *data.Slice, Msat, Jc, alpha MSlice, thetaSH, thetaFL, thickness float32, mesh *data.Mesh) {
+func AddSOT(B, m *data.Slice, Msat, Jc, alpha, thetaSH, thetaFL, thickness MSlice, mesh *data.Mesh) {
 	N := mesh.Size()
 	cfg := make3DConf(N)
 	k_addsot_async(B.DevPtr(X), B.DevPtr(Y), B.DevPtr(Z),
@@ -21,5 +21,8 @@ func AddSOT(B, m *data.Slice, Msat, Jc, alpha MSlice, thetaSH, thetaFL, thicknes
 		Msat.DevPtr(0), Msat.Mul(0),
 		Jc.DevPtr(0), Jc.Mul(0),
 		alpha.DevPtr(0), alpha.Mul(0),
-		thetaSH, thetaFL, thickness, N[X], N[Y], N[Z], cfg)
+		thetaSH.DevPtr(0), thetaSH.Mul(0),
+		thetaFL.DevPtr(0), thetaFL.Mul(0),
+		thickness.DevPtr(0), thickness.Mul(0),
+		N[X], N[Y], N[Z], cfg)
 }

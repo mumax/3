@@ -1,10 +1,7 @@
 #include <stdint.h>
 #include "stencil.h"
 #include "amul.h"
-
-// Reduced Planck constant and elementary charge (SI units).
-#define HBAR 1.054571817e-34f
-#define QE   1.602176634e-19f
+#include "constants.h"
 
 // Spin-orbit (spin-Hall) torque, delivered as a compensated effective field.
 //
@@ -27,7 +24,9 @@ addsot(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
        float* __restrict__ Ms_, float Ms_mul,
        float* __restrict__ Jc_, float Jc_mul,
        float* __restrict__ alpha_, float alpha_mul,
-       float thetaSH, float thetaFL, float thickness,
+       float* __restrict__ thetaSH_, float thetaSH_mul,
+       float* __restrict__ thetaFL_, float thetaFL_mul,
+       float* __restrict__ thickness_, float thickness_mul,
        int Nx, int Ny, int Nz) {
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
@@ -41,12 +40,15 @@ addsot(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
 
     float ms = amul(Ms_, Ms_mul, i);
     float jc = amul(Jc_, Jc_mul, i);
-    if (ms == 0.0f || jc == 0.0f || thickness <= 0.0f) {
+    float t  = amul(thickness_, thickness_mul, i);
+    if (ms == 0.0f || jc == 0.0f || t <= 0.0f) {
         return;
     }
-    float alpha = amul(alpha_, alpha_mul, i);
+    float alpha   = amul(alpha_, alpha_mul, i);
+    float thetaSH = amul(thetaSH_, thetaSH_mul, i);
+    float thetaFL = amul(thetaFL_, thetaFL_mul, i);
 
-    float pref = HBAR / (2.0f * QE * ms * thickness);
+    float pref = HBAR / (2.0f * QE * ms * t);
     float H_DL = thetaSH * jc * pref;
     float H_FL = thetaFL * jc * pref;
 

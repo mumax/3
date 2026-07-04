@@ -86,6 +86,14 @@ addidmi(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
         return;
     }
 
+    // Apply the areal coupling only at the interface cell (see rationale in
+    // rkky.cu): skip if the neighbour toward the partner is the same region,
+    // so the coupling stays independent of layer thickness (D is areal, J/m^2).
+    int inb = iz + (int)s;
+    if (inb >= 0 && inb < Nz && regions[idx(ix, iy, inb)] == r) {
+        return;
+    }
+
     float pref = s * D * inv_Msat(Ms_, Ms_mul, I) / dz;
     // zhat x m_partner = (-m_partner.y, m_partner.x, 0)
     Bx[I] += pref * (-my[P]);

@@ -1,0 +1,21 @@
+// Interface-only coupling regression (thick layers).
+// Interlayer DMI is an areal effect, so thickening the layers must NOT increase
+// the coupling. Each layer is 2 cells thick; only the interface cell carries the
+// field, so the layer-averaged field is HALF the single-cell value and the
+// total energy is independent of layer thickness.
+//   |D/(Msat*dz)| = 2e-3/(1e6*0.9e-9) = 2.22222 T  (interface cell)
+//   layer average (2 cells) = 1.11111 T
+// m1=+x, m2=+y -> E = D A zhat.(m1 x m2) = D A (since m1 x m2 = zhat),
+//   A = (8*2e-9)^2 = 2.56e-16 -> E = -2e-3 * 2.56e-16 = -5.12e-19 J.
+SetGridSize(8, 8, 4)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(100, layer(0).add(layer(1)))
+defregion(101, layer(2).add(layer(3)))
+ext_InterlayerDMI(100, 101, -2e-3)
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(0, 1, 0))
+Run(0)
+ExpectV("B_idmi thick (region 100)", B_idmi.Region(100).Average(), vector(1.11111, 0, 0), 1e-3)
+ExpectV("B_idmi thick (region 101)", B_idmi.Region(101).Average(), vector(0, 1.11111, 0), 1e-3)
+Expect("E_idmi thick (thickness-independent)", E_idmi.Get(), -5.12e-19, 1e-22)

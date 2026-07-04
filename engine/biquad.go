@@ -29,19 +29,33 @@ type biquadPair struct {
 }
 
 var (
-	biquadPairs  []biquadPair
-	B_rkkybiquad = NewVectorField("B_rkkybiquad", "T", "Biquadratic RKKY interlayer coupling field", AddBiquadraticRKKYField)
+	biquadPairs      []biquadPair
+	B_rkkybiquad     = NewVectorField("B_rkkybiquad", "T", "Biquadratic RKKY interlayer coupling field", AddBiquadraticRKKYField)
+	E_rkkybiquad     = NewScalarValue("E_rkkybiquad", "J", "Biquadratic RKKY interlayer coupling energy", GetBiquadraticRKKYEnergy)
+	Edens_rkkybiquad = NewScalarField("Edens_rkkybiquad", "J/m3", "Biquadratic RKKY interlayer coupling energy density", AddBiquadraticRKKYEdens)
 )
 
 func init() {
 	DeclFunc("ext_RKKYBiquadratic", RKKYBiquadratic, "Adds native bilinear+biquadratic RKKY coupling J1,J2 (J/m2) between region1 and region2 (J2<0 favours 90 deg; spans a spacer gap).")
+	registerEnergy(GetBiquadraticRKKYEnergy, AddBiquadraticRKKYEdens)
 }
 
 // RKKYBiquadratic adds a bilinear + biquadratic interlayer RKKY coupling of
 // areal strengths J1, J2 (J/m^2) between region1 and region2. J1 < 0 is
 // antiferromagnetic; J2 < 0 favours the 90-degree state. It may be called
-// multiple times to couple several region pairs.
+// multiple times; calling it again for the same region pair overwrites the
+// coupling instead of adding a duplicate.
 func RKKYBiquadratic(region1, region2 int, J1, J2 float64) {
+	defRegionId(region1)
+	defRegionId(region2)
+	for i := range biquadPairs {
+		if (biquadPairs[i].region1 == region1 && biquadPairs[i].region2 == region2) ||
+			(biquadPairs[i].region1 == region2 && biquadPairs[i].region2 == region1) {
+			biquadPairs[i].J1 = J1
+			biquadPairs[i].J2 = J2
+			return
+		}
+	}
 	biquadPairs = append(biquadPairs, biquadPair{region1, region2, J1, J2})
 }
 
@@ -59,4 +73,31 @@ func AddBiquadraticRKKYField(dst *data.Slice) {
 	for _, p := range biquadPairs {
 		cuda.AddBiquadraticRKKY(dst, m, ms, reg, float32(p.J1), float32(p.J2), p.region1, p.region2, mesh)
 	}
+}
+
+// AddBiquadraticRKKYEdens adds the biquadratic RKKY energy density of every
+// defined region pair to dst (J/m^3).
+func AddBiquadraticRKKYEdens(dst *data.Slice) {
+	if len(biquadPairs) == 0 {
+		return
+	}
+	m := M.Buffer()
+	mesh := M.Mesh()
+	reg := regions.Gpu()
+	for _, p := range biquadPairs {
+		cuda.AddBiquadraticRKKYEnergyDensity(dst, m, reg, float32(p.J1), float32(p.J2), p.region1, p.region2, mesh)
+	}
+}
+
+// GetBiquadraticRKKYEnergy returns the total biquadratic RKKY interlayer
+// coupling energy, in J.
+func GetBiquadraticRKKYEnergy() float64 {
+	if len(biquadPairs) == 0 {
+		return 0
+	}
+	edens := cuda.Buffer(1, M.Mesh().Size())
+	defer cuda.Recycle(edens)
+	cuda.Zero(edens)
+	AddBiquadraticRKKYEdens(edens)
+	return cellVolume() * float64(cuda.Sum(edens))
 }

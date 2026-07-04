@@ -58,12 +58,14 @@ addbiquadrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict_
     // scanning outward from iz and stopping at the first hit (checking the
     // lower side first for a deterministic tie-break).
     int P = -1;
+    int dir = 0;
     for (int d = 1; d < Nz; d++) {
         int lo = iz - d;
         if (lo >= 0) {
             int Q = idx(ix, iy, lo);
             if (regions[Q] == partner) {
                 P = Q;
+                dir = -1;
                 break;
             }
         }
@@ -72,11 +74,19 @@ addbiquadrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict_
             int Q = idx(ix, iy, hi);
             if (regions[Q] == partner) {
                 P = Q;
+                dir = 1;
                 break;
             }
         }
     }
     if (P < 0) {
+        return;
+    }
+
+    // Apply the areal coupling only at the interface cell (see rationale in
+    // rkky.cu), so the coupling stays independent of layer thickness.
+    int inb = iz + dir;
+    if (inb >= 0 && inb < Nz && regions[idx(ix, iy, inb)] == r) {
         return;
     }
 

@@ -1,0 +1,22 @@
+// Interface-only coupling + correct quartic energy regression (thick layers).
+// Biquadratic RKKY is areal, so thicker layers must NOT increase the coupling;
+// and the biquadratic (quartic-in-m) energy must NOT be double-counted (which a
+// naive -1/2 M.B energy density would do).
+// Parallel layers (m.m_partner = 1), 2 cells thick each:
+//   interface pref = (J1 + 2*J2)/(Msat*dz) = (-2e-3-2e-3)/(9e-4) = -4.44444 T
+//   layer average (2 cells) = -2.22222 T
+//   E = -J1 A (m1.m2) - J2 A (m1.m2)^2 = -(J1+J2) A
+//     = 3e-3 * (8*2e-9)^2 = 3e-3 * 2.56e-16 = 7.68e-19 J   (NOT 1.024e-18,
+//     which is what double-counting the biquadratic term would give).
+SetGridSize(8, 8, 4)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(100, layer(0).add(layer(1)))
+defregion(101, layer(2).add(layer(3)))
+ext_RKKYBiquadratic(100, 101, -2e-3, -1e-3)
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(1, 0, 0))
+Run(0)
+ExpectV("B_rkkybiquad thick (region 100)", B_rkkybiquad.Region(100).Average(), vector(-2.22222, 0, 0), 1e-3)
+ExpectV("B_rkkybiquad thick (region 101)", B_rkkybiquad.Region(101).Average(), vector(-2.22222, 0, 0), 1e-3)
+Expect("E_rkkybiquad thick (correct quartic, thickness-independent)", E_rkkybiquad.Get(), 7.68e-19, 1e-22)

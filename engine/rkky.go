@@ -24,19 +24,41 @@ type rkkyPair struct {
 }
 
 var (
-	rkkyPairs []rkkyPair
-	B_rkky    = NewVectorField("B_rkky", "T", "RKKY interlayer coupling field", AddRKKYField)
+	rkkyPairs  []rkkyPair
+	B_rkky     = NewVectorField("B_rkky", "T", "RKKY interlayer coupling field", AddRKKYField)
+	E_rkky     = NewScalarValue("E_rkky", "J", "RKKY interlayer coupling energy", GetRKKYEnergy)
+	Edens_rkky = NewScalarField("Edens_rkky", "J/m3", "RKKY interlayer coupling energy density", AddEdens_rkky)
 )
+
+// The RKKY field is linear in m, so the standard -1/2 M.B self-energy density
+// is exact (the two coupled interface cells each carry half of E = -J A m1.m2).
+var AddEdens_rkky = makeEdensAdder(&B_rkky, -0.5)
 
 func init() {
 	DeclFunc("ext_RKKY", RKKY, "Adds native RKKY interlayer coupling J (J/m2) between region1 and region2 (J<0: antiferromagnetic; spans a spacer gap).")
+	registerEnergy(GetRKKYEnergy, AddEdens_rkky)
 }
 
 // RKKY adds a bilinear interlayer RKKY coupling of areal strength J (J/m^2)
 // between region1 and region2. J < 0 is antiferromagnetic (SAF). It may be
-// called multiple times to couple several region pairs.
+// called multiple times; calling it again for the same region pair overwrites
+// the coupling instead of adding a duplicate.
 func RKKY(region1, region2 int, J float64) {
+	defRegionId(region1)
+	defRegionId(region2)
+	for i := range rkkyPairs {
+		if (rkkyPairs[i].region1 == region1 && rkkyPairs[i].region2 == region2) ||
+			(rkkyPairs[i].region1 == region2 && rkkyPairs[i].region2 == region1) {
+			rkkyPairs[i].J = J
+			return
+		}
+	}
 	rkkyPairs = append(rkkyPairs, rkkyPair{region1, region2, J})
+}
+
+// GetRKKYEnergy returns the total RKKY interlayer coupling energy, in J.
+func GetRKKYEnergy() float64 {
+	return -0.5 * cellVolume() * dot(&M_full, &B_rkky)
 }
 
 // AddRKKYField adds the RKKY field of every defined region pair to dst.

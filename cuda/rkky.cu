@@ -50,14 +50,17 @@ addrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
 
     // locate the nearest partner-region cell in the same (x,y) column along z,
     // scanning outward from iz and stopping at the first hit (O(distance),
-    // checking the lower side first to keep a deterministic tie-break)
+    // checking the lower side first to keep a deterministic tie-break). dir
+    // records whether the partner is below (-1) or above (+1).
     int P = -1;
+    int dir = 0;
     for (int d = 1; d < Nz; d++) {
         int lo = iz - d;
         if (lo >= 0) {
             int Q = idx(ix, iy, lo);
             if (regions[Q] == partner) {
                 P = Q;
+                dir = -1;
                 break;
             }
         }
@@ -66,11 +69,21 @@ addrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
             int Q = idx(ix, iy, hi);
             if (regions[Q] == partner) {
                 P = Q;
+                dir = 1;
                 break;
             }
         }
     }
     if (P < 0) {
+        return;
+    }
+
+    // Apply the areal coupling only at the interface cell. If the neighbour
+    // toward the partner belongs to the same region, a cell closer to the
+    // partner exists and this one is not on the interface; skipping it keeps
+    // the coupling independent of layer thickness (J is areal, J/m^2).
+    int inb = iz + dir;
+    if (inb >= 0 && inb < Nz && regions[idx(ix, iy, inb)] == r) {
         return;
     }
 

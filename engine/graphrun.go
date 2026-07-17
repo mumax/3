@@ -732,7 +732,7 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 		NEvals++
 		Err := k2 // re-use k2 as error
 		// difference of 3rd and 2nd order torque without explicitly storing them first
-		cuda.Madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1./8.))
+		cuda.Madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
 
 		// determine error
 		err := cuda.MaxVecNorm(Err) * float64(h)
@@ -909,7 +909,7 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 		// No need for torqueFn(k9) as k9 wouldn't be used (except in setMaxTorque, which is irrelevant)
 
 		// error estimate
-		cuda.Madd4(Err, k1, k6, k7, k8, (-5./66.), (-5./66.), (5./66.), (5./66.))
+		cuda.Madd4(Err, k1, k6, k7, k8, (-5. / 66.), (-5. / 66.), (5. / 66.), (5. / 66.))
 		err := cuda.MaxVecNorm(Err) * float64(h)
 
 		// adjust next time step

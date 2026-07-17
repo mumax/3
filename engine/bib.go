@@ -223,7 +223,7 @@ func buildLibrary() {
                Leliaert, J. and
                Everschor-Sitte, K.},
     title   = {{Numerical calculation of the Hopf index for three-dimensional magnetic textures}},
-    journal = {Phys. Rev. B},
+    journal = {Physical Review B},
     pages   = {134408},
     volume  = {111},
     year    = {2025},

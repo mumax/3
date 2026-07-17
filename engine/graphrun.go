@@ -17,9 +17,12 @@ import (
 	"github.com/mumax/3/util"
 )
 
+var EnableCUDAgraphs = true
+
 func init() {
 	DeclFunc("RunGraph", RunGraph, "Like Steps, but captures the torque-evaluation kernels as CUDA Graphs and "+
 		"replays them for the remaining steps. Supports Heun, RK23, RK45DP (default), RK56 and BackwardEuler.")
+	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Enables CUDA Graphs, greatly improving performance of Run() and Steps() on small grids (default=true)<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields are defined.")
 }
 
 // RunGraph runs n further steps, capturing the GPU work of the torque
@@ -84,7 +87,7 @@ func RunGraph(n int) {
 // the current solver has no graph runner -- in which case the caller (Run/
 // Steps) should fall back to RunWhile(condition).
 func tryRunGraph(condition func() bool) bool {
-	if !graphCompatible() || !graphWorthwhile() {
+	if !graphCompatible() || !graphWorthwhile() || !EnableCUDAgraphs {
 		return false
 	}
 

@@ -231,4 +231,20 @@ func buildLibrary() {
     url     = {https://link.aps.org/doi/10.1103/PhysRevB.111.134408},
 }`}
 
+	library["You2026"] = &bibEntry{
+		reason:   "CUDA Graph optimization for small systems",
+		shortref: "You, C.-Y., J. Magn. 31, 204-213 (2026)",
+		bibtex: `
+@article{You2026,
+    author  = {You, Chun-Yeol},
+    title   = {{Optimization of MuMax3 by using Claude Code: A CUDA-graph-based case study in AI-assisted performance engineering}},
+    journal = {Journal of Magnetics},
+    number  = {2},
+    pages   = {204-213},
+    volume  = {31},
+    year    = {2026},
+    doi     = {10.4283/JMAG.2026.31.2.204},
+    url     = {https://doi.org/10.4283/JMAG.2026.31.2.204},
+}`}
+
 }

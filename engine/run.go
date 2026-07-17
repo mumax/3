@@ -162,6 +162,7 @@ func Run(seconds float64) {
 	alarm = stop // don't have dt adapt to go over alarm
 	condition := func() bool { return Time < stop }
 	if Dt_si > 0 && seconds/Dt_si >= float64(graphMinSteps) && tryRunGraph(condition) {
+		Refer("You2026")
 		return
 	}
 	RunWhile(condition)
@@ -172,6 +173,7 @@ func Steps(n int) {
 	stop := NSteps + n
 	condition := func() bool { return NSteps < stop }
 	if n >= graphMinSteps && tryRunGraph(condition) {
+		Refer("You2026")
 		return
 	}
 	RunWhile(condition)

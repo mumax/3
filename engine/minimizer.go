@@ -84,7 +84,6 @@ func (mini *Minimizer) Step() {
 	defer cuda.Recycle(k0)
 	data.Copy(k0, k)
 	torqueFn(k)
-	setMaxTorque(k) // report to user
 
 	// just to make the following readable
 	dm := m0

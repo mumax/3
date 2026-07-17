@@ -55,3 +55,38 @@ func (*Heun) Step() {
 }
 
 func (*Heun) Free() {}
+
+// StepCaptureBody performs the GPU-side work of one fixed-step Heun step
+// (FixDt != 0), suitable for recording into a CUDA Graph (see RunGraph).
+//
+// Compared to Step, it omits:
+//   - Time/NSteps bookkeeping, which RunGraph's replay loop does itself
+//     once per graph launch instead;
+//   - err := cuda.MaxVecDiff(...), adaptDt and setLastErr, which are
+//     non-load-bearing when FixDt != 0 (the accept branch is always taken,
+//     adaptDt is a no-op, and setLastErr only affects the reported LastErr).
+//
+// The MaxVecDiff omission is not just an optimization: cuda.MaxVecDiff reads
+// its result back to the host synchronously, which is unsupported while a
+// stream is being captured and would abort the capture outright.
+func (*Heun) StepCaptureBody() {
+	util.Assert(FixDt != 0)
+	y := M.Buffer()
+	dy0 := cuda.Buffer(VECTOR, y.Size())
+	defer cuda.Recycle(dy0)
+
+	dt := float32(FixDt * GammaLL)
+	util.Assert(dt > 0)
+
+	// stage 1
+	torqueFn(dy0)
+	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
+
+	// stage 2
+	dy := cuda.Buffer(3, y.Size())
+	defer cuda.Recycle(dy)
+	torqueFn(dy)
+
+	cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
+	M.normalize()
+}

@@ -160,13 +160,21 @@ func adaptDt(corr float64) {
 func Run(seconds float64) {
 	stop := Time + seconds
 	alarm = stop // don't have dt adapt to go over alarm
-	RunWhile(func() bool { return Time < stop })
+	condition := func() bool { return Time < stop }
+	if Dt_si > 0 && seconds/Dt_si >= float64(graphMinSteps) && tryRunGraph(condition) {
+		return
+	}
+	RunWhile(condition)
 }
 
 // Run the simulation for a number of steps.
 func Steps(n int) {
 	stop := NSteps + n
-	RunWhile(func() bool { return NSteps < stop })
+	condition := func() bool { return NSteps < stop }
+	if n >= graphMinSteps && tryRunGraph(condition) {
+		return
+	}
+	RunWhile(condition)
 }
 
 // Runs as long as condition returns true, saves output.

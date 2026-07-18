@@ -1,0 +1,34 @@
+// Native biquadratic RKKY interlayer coupling (ext_RKKYBiquadratic).
+// Field convention  B = (J1 + 2*J2*(m.m_partner)) / (Msat*dz) * m_partner.
+// J1 = -2e-3, J2 = -1e-3 J/m2, Msat = 1e6 A/m, dz = 0.9e-9 m.
+//   J1/(Msat*dz)        = -2.22222 T
+//   (J1+2*J2)/(Msat*dz) = -4.44444 T
+//
+// Two adjacent layers, region 100 (layer 0) and region 101 (layer 1).
+//
+// Case A - parallel (m.m_partner = 1): both layers +x.
+//   pref = (J1 + 2*J2*1)/(Msat*dz) = -4.44444, B = pref * m_partner = (-4.44444,0,0).
+// Case B - perpendicular (m.m_partner = 0): region 100 = +x, region 101 = +y.
+//   the biquadratic term vanishes, leaving only J1:
+//   B(100) = (J1/(Msat*dz)) * (+y) = (0, -2.22222, 0)
+//   B(101) = (J1/(Msat*dz)) * (+x) = (-2.22222, 0, 0)
+SetGridSize(16, 16, 2)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(100, layer(0))
+defregion(101, layer(1))
+ext_RKKYBiquadratic(100, 101, -2e-3, -1e-3)
+
+// Case A: parallel -> bilinear + biquadratic both act
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(1, 0, 0))
+Run(0)
+ExpectV("B_rkkybiquad parallel (region 100)", B_rkkybiquad.Region(100).Average(), vector(-4.44444, 0, 0), 1e-3)
+ExpectV("B_rkkybiquad parallel (region 101)", B_rkkybiquad.Region(101).Average(), vector(-4.44444, 0, 0), 1e-3)
+
+// Case B: perpendicular -> biquadratic term vanishes, only J1 remains
+m.setRegion(100, uniform(1, 0, 0))
+m.setRegion(101, uniform(0, 1, 0))
+Run(0)
+ExpectV("B_rkkybiquad perpendicular (region 100)", B_rkkybiquad.Region(100).Average(), vector(0, -2.22222, 0), 1e-3)
+ExpectV("B_rkkybiquad perpendicular (region 101)", B_rkkybiquad.Region(101).Average(), vector(-2.22222, 0, 0), 1e-3)

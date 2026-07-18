@@ -16,6 +16,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 type rkkyPair struct {
@@ -46,9 +47,14 @@ func init() {
 func RKKY(region1, region2 int, J float64) {
 	defRegionId(region1)
 	defRegionId(region2)
+	if region1 == region2 {
+		util.Fatal("ext_RKKY: region1 and region2 must be different regions")
+	}
+	if region1 > region2 {
+		region1, region2 = region2, region1
+	}
 	for i := range rkkyPairs {
-		if (rkkyPairs[i].region1 == region1 && rkkyPairs[i].region2 == region2) ||
-			(rkkyPairs[i].region1 == region2 && rkkyPairs[i].region2 == region1) {
+		if rkkyPairs[i].region1 == region1 && rkkyPairs[i].region2 == region2 {
 			rkkyPairs[i].J = J
 			return
 		}
@@ -65,6 +71,9 @@ func GetRKKYEnergy() float64 {
 func AddRKKYField(dst *data.Slice) {
 	if len(rkkyPairs) == 0 {
 		return
+	}
+	if M.Mesh().PBC()[2] != 0 {
+		util.Fatal("ext_RKKY: interlayer coupling does not support periodic boundary conditions along z (SetPBC z != 0)")
 	}
 	ms := Msat.MSlice()
 	defer ms.Recycle()

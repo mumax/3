@@ -6,15 +6,23 @@
 // Native RKKY interlayer exchange coupling.
 //
 // For every cell belonging to region1 or region2, the bilinear RKKY field of
-// its nearest partner-region cell in the same (x,y) column is added:
+// its nearest partner-region cell on EACH side along z is added:
 //
 //     B += ( J / (Msat * dz) ) * m_partner
 //
 // with J the areal coupling strength (J/m^2) and dz the cell size along z.
-// The partner cell is located by scanning the z-column, so the coupling spans
-// a (nonmagnetic) spacer gap between the layers, unlike the nearest-neighbour
+// The partner is located by walking outward along z, so the coupling spans a
+// (nonmagnetic) spacer gap between the layers, unlike the nearest-neighbour
 // exchange field. J < 0 yields antiferromagnetic (synthetic-antiferromagnet,
 // SAF) coupling.
+//
+// Interface selection: in each z-direction the walk stops at the first cell
+// that is either (a) the partner region -> couple to it (this cell is the
+// interface on that side), or (b) the same region as this cell -> stop without
+// coupling (a closer same-region cell is the interface, so this cell is buried
+// on that side). Coupling to the nearest partner on BOTH sides lets a layer
+// sandwiched between two partner layers (a superlattice) couple to both, while
+// the same-region stop keeps the areal coupling independent of layer thickness.
 //
 // See rkky.go for the host-side wrapper.
 extern "C" __global__ void
@@ -48,47 +56,21 @@ addrkky(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
         return;
     }
 
-    // locate the nearest partner-region cell in the same (x,y) column along z,
-    // scanning outward from iz and stopping at the first hit (O(distance),
-    // checking the lower side first to keep a deterministic tie-break). dir
-    // records whether the partner is below (-1) or above (+1).
-    int P = -1;
-    int dir = 0;
-    for (int d = 1; d < Nz; d++) {
-        int lo = iz - d;
-        if (lo >= 0) {
-            int Q = idx(ix, iy, lo);
-            if (regions[Q] == partner) {
-                P = Q;
-                dir = -1;
-                break;
-            }
-        }
-        int hi = iz + d;
-        if (hi < Nz) {
-            int Q = idx(ix, iy, hi);
-            if (regions[Q] == partner) {
-                P = Q;
-                dir = 1;
-                break;
-            }
-        }
-    }
-    if (P < 0) {
-        return;
-    }
-
-    // Apply the areal coupling only at the interface cell. If the neighbour
-    // toward the partner belongs to the same region, a cell closer to the
-    // partner exists and this one is not on the interface; skipping it keeps
-    // the coupling independent of layer thickness (J is areal, J/m^2).
-    int inb = iz + dir;
-    if (inb >= 0 && inb < Nz && regions[idx(ix, iy, inb)] == r) {
-        return;
-    }
-
     float pref = J * inv_Msat(Ms_, Ms_mul, I) / dz;
-    Bx[I] += pref * mx[P];
-    By[I] += pref * my[P];
-    Bz[I] += pref * mz[P];
+
+    for (int dir = -1; dir <= 1; dir += 2) {
+        for (int j = iz + dir; j >= 0 && j < Nz; j += dir) {
+            int rj = regions[idx(ix, iy, j)];
+            if (rj == r) {
+                break;  // buried on this side: a closer same-region cell exists
+            }
+            if (rj == partner) {
+                int P = idx(ix, iy, j);
+                Bx[I] += pref * mx[P];
+                By[I] += pref * my[P];
+                Bz[I] += pref * mz[P];
+                break;  // nearest partner on this side
+            }
+        }
+    }
 }

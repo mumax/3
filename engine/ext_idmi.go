@@ -19,6 +19,7 @@ package engine
 import (
 	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/data"
+	"github.com/mumax/3/util"
 )
 
 type idmiPair struct {
@@ -50,9 +51,14 @@ func init() {
 func InterlayerDMI(region1, region2 int, D float64) {
 	defRegionId(region1)
 	defRegionId(region2)
+	if region1 == region2 {
+		util.Fatal("ext_InterlayerDMI: region1 and region2 must be different regions")
+	}
+	if region1 > region2 {
+		region1, region2 = region2, region1
+	}
 	for i := range idmiPairs {
-		if (idmiPairs[i].region1 == region1 && idmiPairs[i].region2 == region2) ||
-			(idmiPairs[i].region1 == region2 && idmiPairs[i].region2 == region1) {
+		if idmiPairs[i].region1 == region1 && idmiPairs[i].region2 == region2 {
 			idmiPairs[i].D = D
 			return
 		}
@@ -70,6 +76,9 @@ func GetInterlayerDMIEnergy() float64 {
 func AddInterlayerDMIField(dst *data.Slice) {
 	if len(idmiPairs) == 0 {
 		return
+	}
+	if M.Mesh().PBC()[2] != 0 {
+		util.Fatal("ext_InterlayerDMI: interlayer coupling does not support periodic boundary conditions along z (SetPBC z != 0)")
 	}
 	ms := Msat.MSlice()
 	defer ms.Recycle()

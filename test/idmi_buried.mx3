@@ -1,0 +1,26 @@
+// Buried same-region cell must not carry interlayer DMI (nearest-pair only).
+// Stack (bottom -> top): region2 | region1 | spacer | region1(buried).
+//   |D/(Msat*dz)| = 2e-3/(1e6*0.9e-9) = 2.22222 T
+//   m1 = +x, m2 = +y:
+//     interface (iz=1, partner below, s=-1): B = +2.22222*(-m2.y, m2.x, 0) = (-2.22222, 0, 0)
+//     region-1 average (interface + buried)/2 = (-1.11111, 0, 0)
+//     region-2 (iz=0, partner above, s=+1):  B = -2.22222*(-m1.y, m1.x, 0) = (0, -2.22222, 0)
+//   Energy (one pair): |E| = |D| A = 2e-3 * 6.4e-17 = 1.28e-19 J
+//   (a buried-coupled bug gives 1.5x the pair energy)
+SetGridSize(4, 4, 4)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(2, layer(0))
+defregion(1, layer(1).add(layer(3)))
+ext_InterlayerDMI(1, 2, -2e-3)
+m.setRegion(1, uniform(1, 0, 0))
+m.setRegion(2, uniform(0, 1, 0))
+m.setRegion(0, uniform(0, 0, 1))
+Run(0)
+print("  B_idmi region1 avg :", B_idmi.Region(1).Average())
+print("  B_idmi region2 avg :", B_idmi.Region(2).Average())
+print("  B_idmi iz=3 buried  :", CropLayer(B_idmi, 3).Average())
+print("  E_idmi          :", E_idmi.Get())
+ExpectV("B_idmi region1 avg (buried cell zero)", B_idmi.Region(1).Average(), vector(-1.11111, 0, 0), 1e-3)
+ExpectV("B_idmi region2 (single nearest pair)", B_idmi.Region(2).Average(), vector(0, -2.22222, 0), 1e-3)
+Expect("E_idmi (one pair only)", E_idmi.Get(), 1.28e-19, 1e-21)

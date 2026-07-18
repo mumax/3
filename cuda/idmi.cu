@@ -6,7 +6,7 @@
 // Native interlayer Dzyaloshinskii-Moriya interaction (chiral interlayer coupling).
 //
 // For every cell belonging to region1 or region2, the interlayer-DMI field of
-// its nearest partner-region cell in the same (x,y) column is added:
+// its nearest partner-region cell on EACH side along z is added:
 //
 //     B += s * ( D / (Msat * dz) ) * ( zhat x m_partner )
 //
@@ -19,9 +19,14 @@
 //
 // i.e. B1 = +(D/(Msat*dz)) (zhat x m2) and B2 = -(D/(Msat*dz)) (zhat x m1),
 // which is the interlayer analogue of interfacial DMI. The partner cell is
-// located by scanning the z-column, so the coupling spans a (nonmagnetic)
+// located by walking outward along z, so the coupling spans a (nonmagnetic)
 // spacer gap between the layers, unlike the nearest-neighbour exchange field.
 // Note  zhat x m = (-m.y, m.x, 0).
+//
+// Interface selection matches rkky.cu: in each z-direction the walk stops at
+// the first partner cell (couple, with its own sign s = dir) or the first
+// same-region cell (buried on that side, no coupling). Coupling on both sides
+// lets a layer between two partners get both chiral contributions.
 //
 // See idmi.go for the host-side wrapper.
 extern "C" __global__ void
@@ -55,48 +60,23 @@ addidmi(float* __restrict__ Bx, float* __restrict__ By, float* __restrict__ Bz,
         return;
     }
 
-    // locate the nearest partner-region cell in the same (x,y) column along z,
-    // scanning outward from iz and stopping at the first hit (checking the
-    // lower side first for a deterministic tie-break). s records whether that
-    // partner sits below (-1) or above (+1) this cell, giving the required
-    // antisymmetry of the interlayer-DMI field.
-    int P = -1;
-    float s = 0.0f;
-    for (int d = 1; d < Nz; d++) {
-        int lo = iz - d;
-        if (lo >= 0) {
-            int Q = idx(ix, iy, lo);
-            if (regions[Q] == partner) {
-                P = Q;
-                s = -1.0f;
-                break;
+    float base = D * inv_Msat(Ms_, Ms_mul, I) / dz;
+
+    for (int dir = -1; dir <= 1; dir += 2) {
+        for (int j = iz + dir; j >= 0 && j < Nz; j += dir) {
+            int rj = regions[idx(ix, iy, j)];
+            if (rj == r) {
+                break;  // buried on this side
             }
-        }
-        int hi = iz + d;
-        if (hi < Nz) {
-            int Q = idx(ix, iy, hi);
-            if (regions[Q] == partner) {
-                P = Q;
-                s = 1.0f;
-                break;
+            if (rj == partner) {
+                int P = idx(ix, iy, j);
+                float pref = (float)dir * base;  // s = dir (+1 above, -1 below)
+                // zhat x m_partner = (-m_partner.y, m_partner.x, 0)
+                Bx[I] += pref * (-my[P]);
+                By[I] += pref * (mx[P]);
+                // Bz unchanged: (zhat x m)_z = 0
+                break;  // nearest partner on this side
             }
         }
     }
-    if (P < 0) {
-        return;
-    }
-
-    // Apply the areal coupling only at the interface cell (see rationale in
-    // rkky.cu): skip if the neighbour toward the partner is the same region,
-    // so the coupling stays independent of layer thickness (D is areal, J/m^2).
-    int inb = iz + (int)s;
-    if (inb >= 0 && inb < Nz && regions[idx(ix, iy, inb)] == r) {
-        return;
-    }
-
-    float pref = s * D * inv_Msat(Ms_, Ms_mul, I) / dz;
-    // zhat x m_partner = (-m_partner.y, m_partner.x, 0)
-    Bx[I] += pref * (-my[P]);
-    By[I] += pref * (mx[P]);
-    // Bz unchanged: (zhat x m)_z = 0
 }

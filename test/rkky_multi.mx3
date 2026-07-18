@@ -1,0 +1,25 @@
+// Multi-interface (superlattice) regression: a layer between two partners must
+// couple to BOTH. stack z: iz0=region2(+x), iz1=region1(-x), iz2=region2(+x).
+// RKKY(1,2), J=-2e-3.  pref = J/(Msat*dz) = -2.22222 T.
+//   region1 (iz1) couples to region2 below AND above:
+//     B = pref*(m(iz0)+m(iz2)) = -2.22222*((1,0,0)+(1,0,0)) = (-4.44444,0,0)
+//     (nearest-partner-ONLY would give only (-2.22222,0,0))
+//   region2 (iz0 and iz2) each couple to region1: B = pref*(-1,0,0) = (2.22222,0,0)
+//   E = two interfaces, each -J*A*(m1.m2) with m1.m2=-1, A=6.4e-17:
+//     E = 2 * (-1.28e-19) = -2.56e-19 J
+SetGridSize(4, 4, 3)
+SetCellSize(2e-9, 2e-9, 0.9e-9)
+Msat = 1.0e6
+defregion(2, layer(0).add(layer(2)))
+defregion(1, layer(1))
+ext_RKKY(1, 2, -2e-3)
+m.setRegion(2, uniform(1, 0, 0))
+m.setRegion(1, uniform(-1, 0, 0))
+Run(0)
+print("  region1 middle (iz1) :", CropLayer(B_rkky, 1).Average())
+print("  region2 lower  (iz0) :", CropLayer(B_rkky, 0).Average())
+print("  region2 upper  (iz2) :", CropLayer(B_rkky, 2).Average())
+print("  E_rkky               :", E_rkky.Get())
+ExpectV("region1 middle couples BOTH sides (2x)", B_rkky.Region(1).Average(), vector(-4.44444, 0, 0), 1e-3)
+ExpectV("region2 both couple to region1", B_rkky.Region(2).Average(), vector(2.22222, 0, 0), 1e-3)
+Expect("E_rkky two interfaces", E_rkky.Get(), -2.56e-19, 1e-21)

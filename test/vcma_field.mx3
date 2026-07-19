@@ -1,0 +1,41 @@
+// VCMA effective-field regression test.
+// B_z = 2 * (VCMA_xi * VCMA_E) * m_z / (Msat * VCMA_thickness), perpendicular (z) easy axis.
+// Chosen so the prefactor is exactly 1 T per unit m_z:
+//   2 * (VCMA_xi * VCMA_E) / (Msat * VCMA_thickness)
+//   = 2 * (5e-13 * 1e9) / (1e6 * 1e-9) = 2 * 5e-4 / 1e-3 = 1.0
+// so B_vcma = (0, 0, m_z).
+SetGridSize(4, 4, 1)
+SetCellSize(2e-9, 2e-9, 1e-9)
+Msat = 1e6
+VCMA_xi = 5e-13
+VCMA_thickness = 1e-9
+EnableVCMA()
+
+// perpendicular m: field is (0, 0, 1)
+m = uniform(0, 0, 1)
+VCMA_E = 1e9
+Run(0)
+print("  B_vcma m||z, +E   :", B_vcma.Average())
+ExpectV("VCMA field, m||z, +E", B_vcma.Average(), vector(0, 0, 1.0), 1e-4)
+
+// reversed electric field flips the sign
+VCMA_E = -1e9
+Run(0)
+ExpectV("VCMA field, m||z, -E", B_vcma.Average(), vector(0, 0, -1.0), 1e-4)
+
+// in-plane m (m_z = 0): no VCMA field
+m = uniform(1, 0, 0)
+VCMA_E = 1e9
+Run(0)
+ExpectV("VCMA field, m in plane", B_vcma.Average(), vector(0, 0, 0), 1e-4)
+
+// canted state m_z = 0.8: field scales linearly with m_z
+m = uniform(0.6, 0, 0.8)
+Run(0)
+print("  B_vcma m_z=0.8    :", B_vcma.Average())
+ExpectV("VCMA field, m_z=0.8", B_vcma.Average(), vector(0, 0, 0.8), 1e-4)
+
+// zero electric field: no VCMA field
+VCMA_E = 0
+Run(0)
+ExpectV("VCMA field, E=0", B_vcma.Average(), vector(0, 0, 0), 1e-4)

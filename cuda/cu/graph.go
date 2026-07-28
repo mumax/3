@@ -9,7 +9,23 @@ package cu
 // the legacy default stream (Stream(0)). Use a stream created with
 // StreamCreate for capture and replay.
 
-//#include <cuda.h>
+/*
+#include <cuda.h>
+
+// CUDA 12.x redefines cuGraphInstantiate with different arguments.
+// The old pattern is renamed to cuGraphInstantiate_v2, but that did not yet
+// exist before CUDA 12.0. Hence, we need the following if-statement, in which
+// we define a custom C.mumaxGraphInstantiate that covers both cases.
+#if CUDA_VERSION >= 12000
+	static CUresult mumaxGraphInstantiate(CUgraphExec *exec, CUgraph graph) {
+	    return cuGraphInstantiate(exec, graph, 0);
+	}
+#else
+	static CUresult mumaxGraphInstantiate(CUgraphExec *exec, CUgraph graph) {
+	    return cuGraphInstantiate(exec, graph, NULL, NULL, 0);
+	}
+#endif
+*/
 import "C"
 
 import (
@@ -216,7 +232,7 @@ func (node GraphNode) KernelNodeSetParams(p KernelNodeParams) {
 // GraphExecKernelNodeSetParams without re-instantiating).
 func GraphInstantiate(graph Graph) GraphExec {
 	var exec C.CUgraphExec
-	err := Result(C.cuGraphInstantiate(&exec, C.CUgraph(unsafe.Pointer(uintptr(graph))), C.ulonglong(0)))
+	err := Result(C.mumaxGraphInstantiate(&exec, C.CUgraph(unsafe.Pointer(uintptr(graph)))))
 	if err != SUCCESS {
 		panic(err)
 	}

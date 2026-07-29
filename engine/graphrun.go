@@ -491,6 +491,7 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	var execs [5]cu.GraphExec
 	for i, dst := range dsts {
 		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		M.normalize()
 		torqueFn(dst)
 		graphs[i] = cu.StreamEndCapture(captureStream)
 		execs[i] = graphs[i].Instantiate()
@@ -524,42 +525,36 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 		// stage 2
 		Time = t0 + (1./5.)*Dt_si
 		cuda.Madd2(m, m, rk.k1, 1, (1./5.)*h)
-		M.normalize()
 		execK2.Launch(captureStream)
 		NEvals++
 
 		// stage 3
 		Time = t0 + (3./10.)*Dt_si
 		cuda.Madd3(m, m0, rk.k1, k2, 1, (3./40.)*h, (9./40.)*h)
-		M.normalize()
 		execK3.Launch(captureStream)
 		NEvals++
 
 		// stage 4
 		Time = t0 + (4./5.)*Dt_si
 		cuda.Madd4(m, m0, rk.k1, k2, k3, 1, (44./45.)*h, (-56./15.)*h, (32./9.)*h)
-		M.normalize()
 		execK4.Launch(captureStream)
 		NEvals++
 
 		// stage 5
 		Time = t0 + (8./9.)*Dt_si
 		cuda.Madd5(m, m0, rk.k1, k2, k3, k4, 1, (19372./6561.)*h, (-25360./2187.)*h, (64448./6561.)*h, (-212./729.)*h)
-		M.normalize()
 		execK5.Launch(captureStream)
 		NEvals++
 
 		// stage 6
 		Time = t0 + (1.)*Dt_si
 		cuda.Madd6(m, m0, rk.k1, k2, k3, k4, k5, 1, (9017./3168.)*h, (-355./33.)*h, (46732./5247.)*h, (49./176.)*h, (-5103./18656.)*h)
-		M.normalize()
 		execK6.Launch(captureStream)
 		NEvals++
 
 		// stage 7: 5th order solution
 		Time = t0 + (1.)*Dt_si
 		cuda.Madd6(m, m0, rk.k1, k3, k4, k5, k6, 1, (35./384.)*h, (500./1113.)*h, (125./192.)*h, (-2187./6784.)*h, (11./84.)*h)
-		M.normalize()
 		execK2.Launch(captureStream) // torqueFn(k7); k7 == k2, so execK2 applies
 		NEvals++
 
@@ -644,6 +639,7 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 	var execs [3]cu.GraphExec
 	for i, dst := range dsts {
 		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		M.normalize()
 		torqueFn(dst)
 		graphs[i] = cu.StreamEndCapture(captureStream)
 		execs[i] = graphs[i].Instantiate()
@@ -679,20 +675,17 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 		// stage 2
 		Time = t0 + (1./2.)*Dt_si
 		cuda.Madd2(m, m, rk.k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
-		M.normalize()
 		execK2.Launch(captureStream)
 		NEvals++
 
 		// stage 3
 		Time = t0 + (3./4.)*Dt_si
 		cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
-		M.normalize()
 		execK3.Launch(captureStream)
 		NEvals++
 
 		// 3rd order solution
 		cuda.Madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
-		M.normalize()
 
 		// error estimate
 		Time = t0 + Dt_si
@@ -779,6 +772,9 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 	var execs [8]cu.GraphExec
 	for i, dst := range dsts {
 		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		if i > 0 {
+			M.normalize()
+		}
 		torqueFn(dst)
 		graphs[i] = cu.StreamEndCapture(captureStream)
 		execs[i] = graphs[i].Instantiate()
@@ -816,49 +812,42 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 		// stage 2
 		Time = t0 + (1./6.)*Dt_si
 		cuda.Madd2(m, m, k1, 1, (1./6.)*h) // m = m*1 + k1*h/6
-		M.normalize()
 		execK2.Launch(captureStream)
 		NEvals++
 
 		// stage 3
 		Time = t0 + (4./15.)*Dt_si
 		cuda.Madd3(m, m0, k1, k2, 1, (4./75.)*h, (16./75.)*h)
-		M.normalize()
 		execK3.Launch(captureStream)
 		NEvals++
 
 		// stage 4
 		Time = t0 + (2./3.)*Dt_si
 		cuda.Madd4(m, m0, k1, k2, k3, 1, (5./6.)*h, (-8./3.)*h, (5./2.)*h)
-		M.normalize()
 		execK4.Launch(captureStream)
 		NEvals++
 
 		// stage 5
 		Time = t0 + (4./5.)*Dt_si
 		cuda.Madd5(m, m0, k1, k2, k3, k4, 1, (-8./5.)*h, (144./25.)*h, (-4.)*h, (16./25.)*h)
-		M.normalize()
 		execK5.Launch(captureStream)
 		NEvals++
 
 		// stage 6
 		Time = t0 + (1.)*Dt_si
 		cuda.Madd6(m, m0, k1, k2, k3, k4, k5, 1, (361./320.)*h, (-18./5.)*h, (407./128.)*h, (-11./80.)*h, (55./128.)*h)
-		M.normalize()
 		execK6.Launch(captureStream)
 		NEvals++
 
 		// stage 7
 		Time = t0
 		cuda.Madd5(m, m0, k1, k3, k4, k5, 1, (-11./640.)*h, (11./256.)*h, (-11/160.)*h, (11./256.)*h)
-		M.normalize()
 		execK7.Launch(captureStream)
 		NEvals++
 
 		// stage 8
 		Time = t0 + (1.)*Dt_si
 		cuda.Madd7(m, m0, k1, k2, k3, k4, k5, k7, 1, (93./640.)*h, (-18./5.)*h, (803./256.)*h, (-11./160.)*h, (99./256.)*h, (1.)*h)
-		M.normalize()
 		execK8.Launch(captureStream)
 		NEvals++
 

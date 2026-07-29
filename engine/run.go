@@ -47,7 +47,7 @@ func init() {
 	_ = NewScalarValue("dt", "s", "Time Step", func() float64 { return Dt_si })
 	_ = NewScalarValue("LastErr", "", "Error of last step", func() float64 { return LastErr })
 	_ = NewScalarValue("PeakErr", "", "Overall maxium error per step", func() float64 { return PeakErr })
-	_ = NewScalarValue("NEval", "", "Total number of torque evaluations", func() float64 { return float64(NEvals) })
+	_ = NewScalarValue("NEval", "", "Total number of torque evaluations", func() float64 { return float64(getNEval()) })
 }
 
 // Time stepper like Euler, Heun, RK23

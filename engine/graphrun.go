@@ -286,6 +286,17 @@ func runGraphHeunFixedDt(heun *Heun, condition func() bool) bool {
 	SanityCheck()
 	pause = false
 
+	util.Assert(FixDt != 0)
+	dt := float32(FixDt * GammaLL)
+	util.Assert(dt > 0)
+
+	y := M.Buffer()
+
+	dy0 := cuda.Buffer(VECTOR, y.Size())
+	defer cuda.Recycle(dy0)
+	dy := cuda.Buffer(3, y.Size())
+	defer cuda.Recycle(dy)
+
 	warmupTorque(M.Buffer())
 
 	captureStream := cuda.EnterCaptureMode()
@@ -296,7 +307,11 @@ func runGraphHeunFixedDt(heun *Heun, condition func() bool) bool {
 	}()
 
 	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
-	heun.StepCaptureBody()
+	torqueFn(dy0)                // stage 1
+	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
+	torqueFn(dy)                 // stage 2
+	cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
+	M.normalize()
 	graph := cu.StreamEndCapture(captureStream)
 	defer graph.Destroy()
 

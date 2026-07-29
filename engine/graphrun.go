@@ -1,12 +1,13 @@
 package engine
 
-// CUDA Graph capture PoC (see CLAUDE.md Phase 1 item 3 / sections 2.7-2.10).
+// CUDA Graph capture, based on paper C.-Y. You, J. Magn. 31, 204-213 (2026).
 //
 // nsys profiling showed that for small/medium grids, 75~79% of step time is
 // spent in cuLaunchKernel driver calls (~27 per step), not in the kernels
 // themselves. RunGraph captures the torque-evaluation kernel sequences as
 // CUDA Graphs and replays them with a single cuGraphLaunch each, instead of
-// ~13 individual cuLaunchKernel calls per evaluation.
+// ~13 individual cuLaunchKernel calls per evaluation, resulting in a 3-5x
+// speedup on small grids (depending on the solver used).
 
 import (
 	"math"
@@ -25,24 +26,19 @@ func init() {
 	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Enables CUDA Graphs, greatly improving performance of Run() and Steps() on small grids (default=true)<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields are defined.")
 }
 
-// RunGraph runs n further steps, capturing the GPU work of the torque
+// RunGraph performs n further steps, capturing the GPU work of the torque
 // evaluation(s) into one or more CUDA Graphs and replaying them for the
 // remaining steps. Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the
 // default), RK56 (solver(6)) and BackwardEuler (solver(-1)) are supported.
 //
-//   - Heun with FixDt != 0: every kernel's scalar arguments (dt, region LUTs,
-//     ...) are constant from step to step (see CLAUDE.md section 2.8(d)), so
-//     the whole step can be captured as a single graph and replayed unchanged
-//     with GraphLaunch (runGraphFixedDt).
-//   - Heun with FixDt == 0, and the other solvers (any FixDt): dt and/or the
-//     accept/reject decision change every step and depend on a blocking host
-//     readback (MaxVecDiff/MaxVecNorm) that stream capture cannot record (see
-//     CLAUDE.md section 2.8(c)). In these cases only the dt-independent
-//     torque evaluations are captured as separate small graphs ("split
-//     graph"), and the dt-dependent Madd*/error-estimate/normalize/adaptDt/
-//     accept-reject/FSAL steps run as ordinary (uncaptured) calls in the
-//     replay loop, exactly as in the corresponding Step() (runGraphAdaptive,
-//     runGraphRK45DP, runGraphRK23, runGraphRK56, runGraphBackwardEuler).
+// In all solvers (except Heun with FixDt != 0), dt and/or the accept/reject
+// decision change every step and depend on a blocking host readback (e.g.,
+// MaxVecDiff/MaxVecNorm) that stream capture cannot record (see Sec. 4.1 of
+// You2026). In these cases, only the dt-independent torque evaluations are
+// captured as separate small graphs ("split graph"), while the dt-dependent
+// Madd*/error-estimate/normalize/adaptDt/accept-reject/FSAL steps run as
+// ordinary (uncaptured) calls in the replay loop, exactly as in the
+// corresponding Step().
 func RunGraph(n int) {
 	if n <= 0 {
 		return
@@ -80,12 +76,12 @@ func RunGraph(n int) {
 	}
 }
 
-// tryRunGraph attempts to run the simulation using the CUDA Graph
-// capture/replay path instead of RunWhile, returning true if it did so. It
-// returns false (without side effects) if the current configuration is not
-// graphCompatible(), the mesh is too large to benefit (graphWorthwhile()), or
-// the current solver has no graph runner -- in which case the caller (Run/
-// Steps) should fall back to RunWhile(condition).
+// Attempt to run the simulation using the CUDA Graph capture/replay path
+// instead of RunWhile, returning true if it did so. It returns false (without
+// side effects) if the current configuration is not graphCompatible(), the
+// mesh is too large to benefit (graphWorthwhile()), or the current solver has
+// no graph runner. If false is returned, the caller (Run/Steps) should fall
+// back to RunWhile(condition).
 func tryRunGraph(condition func() bool) bool {
 	if !graphCompatible() || !graphWorthwhile() || !EnableCUDAgraphs {
 		return false
@@ -119,30 +115,29 @@ func tryRunGraph(condition func() bool) bool {
 	return true
 }
 
-// assertGraphCompatible panics (via util.AssertMsg) if the current
-// configuration is outside the envelope RunGraph has been verified for:
-// constant excitation, Temp == 0, no custom field terms, and no region-wise
-// time-dependent material parameters (see CLAUDE.md section 2.11(f) and
-// 2.14). Outside this envelope, a captured graph would replay a stale kernel
-// sequence (fixed Time/RNG state/LUTs/etc.) every step, silently producing
-// wrong results instead of erroring out.
+// Panics if the current configuration is outside the envelope RunGraph has
+// been verified for: constant excitation, Temp == 0, no custom field terms,
+// and no region-wise time-dependent material parameters (see Sec. 6.3 of
+// You2026). Outside this envelope, a captured graph would replay a stale
+// kernel sequence (fixed Time/RNG state/LUTs/etc.) every step, silently
+// producing wrong results instead of erroring out.
 func assertGraphCompatible() {
 	if reason := graphIncompatibilityReason(); reason != "" {
 		util.AssertMsg(false, "RunGraph: "+reason)
 	}
 }
 
-// graphCompatible reports whether the current configuration is within the
-// envelope assertGraphCompatible requires, without panicking. Used by the
-// transparent Run()/Steps() graph dispatch (tryRunGraph in run.go) to decide,
+// Returns true if the current configuration is within the envelope
+// assertGraphCompatible requires, without panicking. Used by the transparent
+// Run()/Steps() graph dispatch (tryRunGraph in run.go) to decide,
 // side-effect-free, whether the graph path may be used.
 func graphCompatible() bool {
 	return graphIncompatibilityReason() == ""
 }
 
-// graphIncompatibilityReason returns a human-readable reason why RunGraph (or
-// the transparent Run()/Steps() graph path) cannot be used with the current
-// configuration, or "" if it can.
+// Returns a human-readable reason why RunGraph (or the transparent
+// Run()/Steps() graph path) cannot be used with the current configuration,
+// or the empty string "" if it can.
 func graphIncompatibilityReason() string {
 	if !Temp.isZero() {
 		return "Temp != 0 is not supported (thermal field)"
@@ -159,7 +154,7 @@ func graphIncompatibilityReason() string {
 		// cuda.MemCpy, which calls cuda.Sync() (a blocking cuStreamSynchronize)
 		// -- not permitted during stream capture (CUresult 900,
 		// CUDA_ERROR_STREAM_CAPTURE_UNSUPPORTED), same class of issue as the
-		// blocking MemCpyDtoH in MaxVecDiff/MaxVecNorm (CLAUDE.md section 2.8(c)).
+		// blocking MemCpyDtoH in MaxVecDiff/MaxVecNorm (see Box 1.3 of You2026).
 		return "NoDemagSpins != 0 is not supported (masked demag field)"
 	}
 
@@ -187,17 +182,17 @@ func graphIncompatibilityReason() string {
 }
 
 // graphMaxCells is the cell-count threshold above which the transparent
-// Run()/Steps() graph path is not used, even if graphCompatible(). Based on
-// CLAUDE.md section 2.15(c)/2.18(c)(i): at 512x512x1 (262,144 cells) RunGraph
-// gives ~1.3-1.5x, at 700x700x1 (490,000 cells) ~1.14x, at 800x800x1
-// (640,000 cells) ~1.06x, and at 1024x1024x1 (1,048,576 cells) only ~1.0-1.04x
-// (no longer worthwhile). 800,000 includes the 800x800x1 case (~6% gain,
-// "apply down to ~5% improvement" policy) while still excluding
-// 1024x1024x1.
+// Run()/Steps() graph path is not used, even if graphCompatible(). This value
+// is chosen for CUDA Graph Capture to yield a >5% performance increase, based
+// on the RunGraph speedups reported in Fig. 3 of You2026:
+//   - 512x512x1 (262,144 cells): ~1.3-1.5x
+//   - 700x700x1 (490,000 cells): ~1.14x
+//   - 800x800x1 (640,000 cells): ~1.06x
+//   - 1024x1024x1 (1,048,576 cells): ~1.0-1.04x (no longer worthwhile).
 const graphMaxCells = 800000
 
-// graphWorthwhile reports whether the current mesh is small enough for the
-// transparent graph path to give a meaningful speedup (see graphMaxCells).
+// Returns true if the current mesh is small enough for CUDA Graph capture to
+// result in a meaningful speedup (see graphMaxCells).
 func graphWorthwhile() bool {
 	size := Mesh().Size()
 	return size[0]*size[1]*size[2] <= graphMaxCells
@@ -211,9 +206,7 @@ func graphWorthwhile() bool {
 // correctness (RunGraph itself has no such threshold).
 const graphMinSteps = 20
 
-// hasTimeDependentRegion reports whether p has been set, in any region, to a
-// per-region time-dependent function via SetRegion/SetRegionFn with an
-// expression containing t (see regionwise.upd_reg in engine/parameter.go).
+// Returns true if p has been set to a time-dependent function in any region.
 func hasTimeDependentRegion(p *regionwise) bool {
 	for r := 0; r < NREGION; r++ {
 		if p.upd_reg[r] != nil {
@@ -223,9 +216,7 @@ func hasTimeDependentRegion(p *regionwise) bool {
 	return false
 }
 
-// isTimeIndependent reports whether excitation e is constant in time: no
-// extra mask*multiplier terms (added via Add/AddGo) and no per-region
-// time-dependent value functions (e.g. set via e.SetRegion(r, vector(0, sin(t), 0))).
+// Returns true if the excitation e is constant in time in all regions.
 func isTimeIndependent(e *Excitation) bool {
 	if len(e.extraTerms) > 0 {
 		return false
@@ -238,62 +229,45 @@ func isTimeIndependent(e *Excitation) bool {
 	return true
 }
 
-// warmupTorque performs one full torque evaluation on the normal
-// (non-capturing) stream, before any CUDA Graph capture begins. SetTorque
-// (via SetEffectiveField) lazily uploads region-wise material parameter LUTs
-// (engine/parameter.go), computes/uploads the demag kernel on first use
-// (cuda/conv_demag.go), and grows the cuda.Buffer pool to whatever scratch
-// sizes the active field terms need -- all via cuMemAlloc. cuMemAlloc is not
-// permitted during CUDA stream capture and crashes with Exception 0xc0000005
-// if it first happens inside a captured torqueFn (CLAUDE.md section 2.16).
-// This call forces all of that to happen here instead. NSteps/NEvals/Time are
-// not advanced -- this calls SetTorque directly, not torqueFn.
+// Perform one full torque evaluation on the default stream. This must be run
+// once before any CUDA Graph capture begins, but after all cuda.Buffers that
+// will be held for the lifetime of the capture/replay loop (e.g., m0, Err,
+// k2..k8, dy0, dy...) have already been allocated.
 //
-// Must be called after all buffers that will be held (checked out from the
-// cuda.Buffer pool) for the lifetime of the capture/replay loop (m0, Err,
-// k2..k6, dy0/dy, etc.) have already been allocated -- not before. The
-// cuda.Buffer pool (cuda/buffer.go) is a single stack per element count N,
-// shared across all call sites; cuMemAlloc only grows it, on demand, to the
-// high-water mark of buffers checked out so far. If warmupTorque ran before
-// those buffers were checked out, it would only grow the pool to cover its
-// own scratch + SetTorque's internal temporaries -- not enough headroom once
-// m0/Err/k2..k6/etc. are ALSO checked out during the capture loop's
-// torqueFn(dst) calls, so the internal temporaries would trigger a second,
-// this time in-capture, cuMemAlloc and crash (CLAUDE.md section 2.16).
-// Calling it last, with everything else already checked out, establishes a
-// high-water mark that covers both at once.
+// The reason for this is twofold.
+// Firstly, cuMemAlloc is not allowed during CUDA stream capture (throws error
+// 0xc0000005 Access Violation), but is used in the first call of SetTorque to
+// lazily upload region-wise material parameter LUTs, compute/upload the demag
+// kernel, and grow the cuda.Buffer pool to whatever scratch sizes the active
+// field terms need.
+// Secondly, as explained in Box 1.2 of You2026, cuMemAlloc only grows the
+// cuda.Buffer pool to the high-water mark of buffers checked out so far.
+// Hence, running warmupTorque before the solver buffers have been checked out
+// would not allocate enough memory to store those solver buffers in addition
+// to all buffers used in torqueFn(). Consequently, the internal temporaries
+// would trigger a second cuMemAlloc, this time in-capture, causing a crash.
 func warmupTorque(m *data.Slice) {
 	scratch := cuda.Buffer(VECTOR, m.Size())
 	defer cuda.Recycle(scratch)
 	SetTorque(scratch)
 }
 
-// checkInject non-blockingly checks Inject for a pending GUI/script function
-// and, if present, runs it. It returns true if a function was received.
+// Non-blockingly check Inject for a pending GUI/script function. If this is
+// the case, checkInject() runs the injected function and returns true.
 //
-// All runGraph* replay loops call this once per iteration and, if it returns
-// true, stop replaying captured graphs immediately (see each runGraph*'s use
-// of fellBack below) instead of proceeding to that iteration's
-// exec.Launch/captureStream as before. The injected function f may change
-// global state the already-captured graphs depend on -- e.g. resize the mesh,
-// switch solvers (stepper), or set Temp/B_ext/a material parameter to
-// something graphIncompatibilityReason() would now reject -- in ways that
-// graphIncompatibilityReason() does not even cover (mesh/solver changes).
-// Continuing to replay the (possibly now-stale or dangling) captured graphs
-// after such a change could silently produce wrong results or crash.
+// Since the injected function f may change the global state that the already-
+// captured CUDA graphs depend on, in ways that graphIncompatibilityReason()
+// may not even cover (e.g., resizing mesh, changing solver...), continuing
+// to replay the graph may silently produce wrong results or cause a crash.
+// Therefore, all runGraph* replay loops should call checkInject() once per
+// iteration and stop replaying captured graphs immediately at any injection.
 //
-// If f left pause == true (e.g. it called Break()), the loop exits normally,
-// matching runWhile's own pause handling -- no special action needed. If
-// pause is still false, fellBack is set to true so the caller (RunGraph/
-// tryRunGraph) finishes the remaining steps via RunWhile(condition), which
-// re-derives everything from the (possibly changed) global state and is
-// correct regardless of what f changed.
-//
-// Inject is only ever sent to from GUI-connected runs (engine/gui.go) or
-// InjectAndWait (engine/render.go); RunInteractive's keepalive injector only
-// runs after EvalFile returns (cmd/mumax3/main.go). So for headless runs --
-// including all 176 regression tests -- checkInject always returns false and
-// this entire mechanism is a no-op.
+// Note that f may affect the solver global variable "pause". If pause==true,
+// the runGraph* replay loop should exit normally (just like runWhile would).
+// If pause==false, runGraph* should return true after interrupting its loop,
+// such that its caller (RunGraph/tryRunGraph) then finishes the remaining
+// steps via RunWhile, which re-derives everything from the (possibly changed)
+// global state and is correct regardless of what f changed.
 func checkInject() bool {
 	select {
 	case f := <-Inject:
@@ -304,18 +278,16 @@ func checkInject() bool {
 	}
 }
 
-// runGraphFixedDt implements RunGraph for FixDt != 0: the entire step
-// (StepCaptureBody) is captured once into a single graph and replayed
-// unchanged for n steps.
+// Implements RunGraph/tryRunGraph for Heun (solver 2) FixDt != 0.
+// Since every kernel's scalar arguments (dt, region LUTs, ...) are constant
+// from step to step, the entire step can be captured once into a single graph
+// and replayed unchanged for n steps.
 func runGraphFixedDt(heun *Heun, condition func() bool) bool {
 	SanityCheck()
 	pause = false
 
 	warmupTorque(M.Buffer())
 
-	// Redirect stream0 (normally the NULL stream, which does not support
-	// capture) to a dedicated capture/replay stream, and rebind the demag
-	// FFT plans (bound to a stream once at creation time) to follow it.
 	captureStream := cuda.EnterCaptureMode()
 	demagConv().SetStream(captureStream)
 	defer func() {
@@ -345,7 +317,7 @@ func runGraphFixedDt(heun *Heun, condition func() bool) bool {
 
 		Time += FixDt
 		NSteps++
-		NEvals += 2 // each replayed step performs the same 2 torque evaluations as Heun.Step
+		NEvals += 2 // each graph replay performs 2 torque evaluations
 		for _, f := range postStep {
 			f()
 		}
@@ -355,17 +327,16 @@ func runGraphFixedDt(heun *Heun, condition func() bool) bool {
 	return fellBack
 }
 
-// runGraphAdaptive implements RunGraph for FixDt == 0 (adaptive Heun).
+// Implements RunGraph/tryRunGraph for Heun (solver 2) for FixDt == 0,
+// using the "split graph" approach (see Sec. 4.1 in You2026).
 //
-// torqueFn(dy0) and torqueFn(dy) are each captured once, before the loop, as
-// small graphs execT0/execT1 (the kernel sequence computing the torque from
-// M is independent of dt and of M's data values -- only the addresses dy0,
-// dy and M's buffer matter, and those stay fixed for the whole call). The
-// loop body then mirrors Heun.Step exactly, replacing the two torqueFn calls
-// with execT0.Launch/execT1.Launch and running Madd2/Madd3/MaxVecDiff/
-// normalize/adaptDt as ordinary calls on the capture stream (capture has
-// already ended by this point, so the blocking MemCpyDtoH inside MaxVecDiff
-// is allowed).
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the dy0, dy and M buffers matter, which are fixed),
+// it suffices to capture torqueFn(dy0) and torqueFn(dy) once before the loop,
+// as small graphs execT0/execT1. The loop body then mirrors Heun.Step exactly
+// but with torqueFn calls replaced by GraphExec.Launch calls. Other functions
+// that can not be captured by graphs (e.g., Madd2, Madd3, MaxVecDiff...)
+// remain interspersed between graph launches.
 func runGraphAdaptive(heun *Heun, condition func() bool) bool {
 	SanityCheck()
 	pause = false
@@ -449,27 +420,16 @@ func runGraphAdaptive(heun *Heun, condition func() bool) bool {
 	return fellBack
 }
 
-// runGraphRK45DP implements RunGraph for the default solver (RK45DP).
+// Implements RunGraph/tryRunGraph for Dormand-Prince (solver 5),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
 //
-// RK45DP.Step() (engine/rk45dp.go) performs 6 torque evaluations per step:
-// torqueFn(k2)..torqueFn(k6) (stages 2-6) and torqueFn(k7) (stage 7, the
-// 5th-order solution), where k7 reuses k2's buffer (k7 := k2). Each
-// torqueFn(kN) depends only on the addresses of M's buffer (read) and kN
-// (written) -- both fixed for the lifetime of this call, and unaffected by
-// dt or Time since assertGraphCompatible() guarantees a time-independent
-// excitation. So each is captured once, before the loop, as a small graph
-// (execK2..execK6, the "split graph" design of CLAUDE.md section 2.11(a)).
-// Stage 7's torqueFn(k7) replays execK2 again, since k7 and k2 are the same
-// buffer -- 5 graphs total for 6 torque evaluations.
-//
-// The dt-dependent Madd2..Madd6/normalize calls between torque evaluations,
-// the error estimate (Madd6 into Err + MaxVecNorm, which performs the
-// blocking MemCpyDtoH that stream capture cannot record, see CLAUDE.md
-// section 2.8(c)), adaptDt, accept/reject, and the FSAL update
-// (data.Copy(rk.k1, k7)) all run as ordinary (uncaptured) calls in the replay
-// loop, mirroring RK45DP.Step() exactly. This is unchanged for FixDt == 0
-// (adaptive) and FixDt != 0 alike, just as in RK45DP.Step()'s accept
-// condition.
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k2)..torqueFn(k6) once before the loop, as small graphs
+// execK2..execK6. The loop body then mirrors RK45DP.Step exactly but with
+// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
+// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
+// between graph launches.
 func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	SanityCheck()
 	pause = false
@@ -479,7 +439,7 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	m := M.Buffer()
 	size := m.Size()
 
-	// upon resize: remove wrongly sized k1 (mirrors RK45DP.Step())
+	// upon resize: remove wrongly sized k1
 	if rk.k1.Size() != m.Size() {
 		rk.Free()
 	}
@@ -618,23 +578,16 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	return fellBack
 }
 
-// runGraphRK23 implements RunGraph for RK23 (Bogacki-Shampine, solver(3)).
+// Implements RunGraph/tryRunGraph for Bogacki-Shampine (solver 3),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
 //
-// RK23.Step() (engine/rk23.go) performs 3 torque evaluations per step:
-// torqueFn(k2) (stage 2), torqueFn(k3) (stage 3) and torqueFn(k4) (error
-// estimate / next step's k1). Each depends only on the addresses of M's
-// buffer (read) and kN (written) -- both fixed for the lifetime of this call,
-// and unaffected by dt or Time since assertGraphCompatible() guarantees a
-// time-independent excitation -- so each is captured once, before the loop,
-// as a small graph (execK2, execK3, execK4, the "split graph" design of
-// CLAUDE.md section 2.11(a)).
-//
-// The dt-dependent Madd2/Madd4/normalize calls between torque evaluations,
-// the error estimate (Madd4 into Err + MaxVecNorm, which performs the
-// blocking MemCpyDtoH that stream capture cannot record, see CLAUDE.md
-// section 2.8(c)), adaptDt, accept/reject, and the FSAL update
-// (data.Copy(rk.k1, k4)) all run as ordinary (uncaptured) calls in the replay
-// loop, mirroring RK23.Step() exactly.
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k2)..torqueFn(k4) once before the loop, as small graphs
+// execK2..execK4. The loop body then mirrors RK23.Step exactly but with
+// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
+// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
+// between graph launches.
 func runGraphRK23(rk *RK23, condition func() bool) bool {
 	SanityCheck()
 	pause = false
@@ -644,7 +597,7 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 	m := M.Buffer()
 	size := m.Size()
 
-	// upon resize: remove wrongly sized k1 (mirrors RK23.Step())
+	// upon resize: remove wrongly sized k1
 	if rk.k1.Size() != m.Size() {
 		rk.Free()
 	}
@@ -763,29 +716,21 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 	return fellBack
 }
 
-// runGraphRK56 implements RunGraph for RK56 (Fehlberg, solver(6)).
+// Implements RunGraph/tryRunGraph for Runge-Kutta-Fehlberg (solver 6),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
 //
-// RK56.Step() (engine/rk56.go) performs 8 torque evaluations per step:
-// torqueFn(k1)..torqueFn(k8) (stages 1-8; stage 9, the 6th-order solution,
-// needs no torque evaluation). Each depends only on the addresses of M's
-// buffer (read) and kN (written) -- both fixed for the lifetime of this call,
-// and unaffected by dt or Time since assertGraphCompatible() guarantees a
-// time-independent excitation -- so each is captured once, before the loop,
-// as a small graph (execK1..execK8, the "split graph" design of CLAUDE.md
-// section 2.11(a)).
-//
-// The dt-dependent Madd2..Madd7/normalize calls between torque evaluations,
-// the error estimate (Madd4 into Err + MaxVecNorm, which performs the
-// blocking MemCpyDtoH that stream capture cannot record, see CLAUDE.md
-// section 2.8(c)), adaptDt and accept/reject all run as ordinary (uncaptured)
-// calls in the replay loop, mirroring RK56.Step() exactly. Stage 7's
-// torqueFn(k7)/execK7.Launch occurs before stage 8's Madd7, which reads k7,
-// exactly as in Step().
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k2)..torqueFn(k8) once before the loop, as small graphs
+// execK2..execK8. The loop body then mirrors RK56.Step exactly but with
+// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
+// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
+// between graph launches.
 func runGraphRK56(rk *RK56, condition func() bool) bool {
 	SanityCheck()
 	pause = false
 
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state (no-op for RK56)
+	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
 
 	m := M.Buffer()
 	size := m.Size()
@@ -937,23 +882,18 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 	return fellBack
 }
 
-// runGraphBackwardEuler implements RunGraph for BackwardEuler (solver(-1)).
+// Implements RunGraph/tryRunGraph for backward Euler (solver -1),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
 //
-// BackwardEuler.Step() (engine/backwardeuler.go) performs 2 torque
-// evaluations per step: torqueFn(dy0) and torqueFn(dy1). Each depends only on
-// the addresses of M's buffer (read) and dyN (written) -- both fixed for the
-// lifetime of this call -- so each is captured once, before the loop, as a
-// small graph (execDy0, execDy1, the "split graph" design of CLAUDE.md
-// section 2.11(a)).
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(dy0) & torqueFn(dy1) once before the loop, as small graphs
+// execDy0 and execDy1. The loop body then mirrors BackwardEuler.Step exactly
+// but with torqueFn calls replaced by GraphExec.Launch calls. Other functions
+// that can not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain
+// interspersed between graph launches.
 //
-// BackwardEuler requires FixDt != 0 (Dt_si = FixDt is unconditional in
-// Step()), so dt is constant for the whole call. The dt-dependent
-// Madd2/normalize calls, the error estimate (MaxVecDiff, which performs the
-// blocking MemCpyDtoH that stream capture cannot record, see CLAUDE.md
-// section 2.8(c)) and NSteps++/setLastErr all run as ordinary (uncaptured)
-// calls in the replay loop, mirroring Step() exactly. The predictor step
-// (Madd2(y, y0, dy1, 1, dt); M.normalize()) is unconditional here because
-// assertGraphCompatible() guarantees Temp.isZero().
+// Note: BackwardEuler requires FixDt != 0, so dt remains constant throughout.
 func runGraphBackwardEuler(s *BackwardEuler, condition func() bool) bool {
 	util.AssertMsg(MaxErr > 0, "Backward euler solver requires MaxErr > 0")
 	SanityCheck()

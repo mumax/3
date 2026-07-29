@@ -63,11 +63,9 @@ func tryCuInit() {
 	cu.Init(0)
 }
 
-// Global stream used for everything. Normally the NULL/legacy default
-// stream (cu.Stream(0)), which all generated *_wrapper.go kernel launches
-// reference directly via this package-level variable. CUDA Graph capture is
-// not supported on the NULL stream, so capture/replay temporarily
-// redirects stream0 to a dedicated stream (see EnterCaptureMode).
+// Global stream used by all *_wrapper.go kernel launches. However, the NULL
+// stream does not support CUDA Graph capture, so during capture/replay this
+// is temporarily redirected to a dedicated stream (see EnterCaptureMode).
 var stream0 = cu.Stream(0)
 
 // Synchronize the global stream
@@ -78,13 +76,11 @@ func Sync() {
 
 // Redirects stream0 to a freshly created stream suitable for CUDA Graph
 // capture (cuStreamBeginCapture is not supported on the NULL stream), and
-// returns that stream. Since every kernel launch references stream0
-// directly, this single reassignment is enough to route all subsequent
-// launches to the capture stream.
+// returns that stream.
 //
-// FFT plans (e.g. the demag convolution's fwPlan/bwPlan) are bound to a
-// stream once at creation time and do not follow this reassignment; callers
-// must rebind those separately (see DemagConvolution.SetStream).
+// All kernel launches reference stream0 directly and are hereby appropriately
+// redirected. However, FFT plans are bound to a stream at creation time, and
+// must therefore be rebound separately (see DemagConvolution.SetStream).
 //
 // Must be paired with a call to ExitCaptureMode.
 func EnterCaptureMode() cu.Stream {
@@ -93,8 +89,8 @@ func EnterCaptureMode() cu.Stream {
 	return captureStream
 }
 
-// Restores stream0 to the NULL/legacy default stream and destroys the
-// stream created by EnterCaptureMode.
+// Restores stream0 to the NULL/legacy default stream and
+// destroys the stream created by EnterCaptureMode.
 func ExitCaptureMode(captureStream cu.Stream) {
 	stream0 = cu.Stream(0)
 	captureStream.Destroy()

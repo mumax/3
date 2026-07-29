@@ -32,10 +32,10 @@ func NewDemag(inputSize, PBC [3]int, kernel [3][3]*data.Slice, test bool) *Demag
 	return c
 }
 
-// Rebinds the demag FFT plans to the given stream. cufftSetStream binds a
-// plan to a stream once, at creation time, and does not follow later
-// reassignments of that stream variable — so callers that redirect stream0
-// (e.g. for CUDA Graph capture on a dedicated stream) must call this to keep
+// Rebind the demag FFT plans to the given stream.
+// When a plan is created, cufftSetStream binds it to a stream, but does not
+// follow later reassignments of that stream variable. Hence, callers that
+// redirect stream0 (e.g. CUDA Graph capture) must call SetStream to keep
 // fwPlan/bwPlan executing on the same stream as the rest of the step.
 func (c *DemagConvolution) SetStream(s cu.Stream) {
 	c.fwPlan.setStream(s)

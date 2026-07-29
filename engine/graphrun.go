@@ -208,7 +208,7 @@ const graphMinSteps = 20
 
 // Returns true if p has been set to a time-dependent function in any region.
 func hasTimeDependentRegion(p *regionwise) bool {
-	for r := 0; r < NREGION; r++ {
+	for r := range NREGION {
 		if p.upd_reg[r] != nil {
 			return true
 		}
@@ -221,7 +221,7 @@ func isTimeIndependent(e *Excitation) bool {
 	if len(e.extraTerms) > 0 {
 		return false
 	}
-	for r := 0; r < NREGION; r++ {
+	for r := range NREGION {
 		if e.perRegion.upd_reg[r] != nil {
 			return false
 		}

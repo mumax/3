@@ -1,3 +1,6 @@
+//go:build !darwin || !arm64
+// +build !darwin !arm64
+
 package cufft
 
 // This file provides CGO flags to find CUDA libraries and headers.

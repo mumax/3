@@ -22,7 +22,7 @@ import (
 
 var (
 	flag_failfast = flag.Bool("failfast", false, "If one simulation fails, stop entire batch immediately")
-	flag_test     = flag.Bool("test", false, "Cuda test (internal)")
+	flag_test     = flag.Bool("test", false, "GPU backend test (internal)")
 	flag_version  = flag.Bool("v", true, "Print version")
 	flag_vet      = flag.Bool("vet", false, "Check input files for errors, but don't run them")
 	// more flags in engine/gofiles.go
@@ -41,8 +41,8 @@ func main() {
 		printVersion()
 	}
 
-	// used by bootstrap launcher to test cuda
-	// successful exit means cuda was initialized fine
+	// Used by bootstrap launchers and CI to test the active GPU backend.
+	// A successful exit means GPU initialization completed.
 	if *flag_test {
 		os.Exit(0)
 	}
@@ -169,7 +169,11 @@ func printVersion() {
 	engine.LogOut(engine.UNAME)
 	engine.LogOut(fmt.Sprintf("commit hash: %s", commitHash))
 	engine.LogOut(getCPUInfo())
-	engine.LogOut(fmt.Sprintf("GPU info: %s, using cc=%d PTX", cuda.GPUInfo, cuda.UseCC))
+	if cuda.Backend == "CUDA" {
+		engine.LogOut(fmt.Sprintf("GPU info: %s, using cc=%d PTX", cuda.GPUInfo, cuda.UseCC))
+	} else {
+		engine.LogOut(fmt.Sprintf("GPU info: %s, backend=%s", cuda.GPUInfo, cuda.Backend))
+	}
 	osInfo := fmt.Sprintf("OS  info: %s, Hostname: %s", getOSInfo(), getHostname())
 	engine.LogOut(osInfo)
 	engine.LogOut(fmt.Sprintf("Timestamp: %s", time.Now().Format("2006-01-02 15:04:05")))

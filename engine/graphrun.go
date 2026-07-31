@@ -57,10 +57,10 @@ func StepsGraph(n int) {
 		} else {
 			fellBack = runGraphHeunAdaptive(s, condition)
 		}
-	case *RK45DP:
-		fellBack = runGraphRK45DP(s, condition)
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
+	case *RK45DP:
+		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
 	default:
@@ -93,10 +93,10 @@ func tryRunGraph(condition func() bool) bool {
 		} else {
 			fellBack = runGraphHeunAdaptive(s, condition)
 		}
-	case *RK45DP:
-		fellBack = runGraphRK45DP(s, condition)
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
+	case *RK45DP:
+		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
 	default:
@@ -434,6 +434,142 @@ func runGraphHeunAdaptive(heun *Heun, condition func() bool) bool {
 	return fellBack
 }
 
+// Implements StepsGraph/tryRunGraph for Bogacki-Shampine (solver 3),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
+//
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k2)..torqueFn(k4) once before the loop, as small graphs
+// execK2..execK4. The loop body then mirrors RK23.Step exactly but with
+// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
+// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
+// between graph launches.
+func runGraphRK23(rk *RK23, condition func() bool) bool {
+	SanityCheck()
+	pause = false
+
+	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+
+	m := M.Buffer()
+	size := m.Size()
+
+	// upon resize: remove wrongly sized k1
+	if rk.k1.Size() != m.Size() {
+		rk.Free()
+	}
+	// first step ever: one-time k1 init and eval
+	if rk.k1 == nil {
+		rk.k1 = cuda.NewSlice(3, size)
+		torqueFn(rk.k1)
+	}
+
+	m0 := cuda.Buffer(3, size)
+	defer cuda.Recycle(m0)
+
+	k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
+	defer cuda.Recycle(k2)
+	defer cuda.Recycle(k3)
+	defer cuda.Recycle(k4)
+
+	warmupTorque(m)
+
+	captureStream := cuda.EnterCaptureMode()
+	demagConv().SetStream(captureStream)
+	defer func() {
+		demagConv().SetStream(cu.Stream(0))
+		cuda.ExitCaptureMode(captureStream)
+	}()
+
+	dsts := [3]*data.Slice{k2, k3, k4}
+	var graphs [3]cu.Graph
+	var execs [3]cu.GraphExec
+	for i, dst := range dsts {
+		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		M.normalize()
+		torqueFn(dst)
+		graphs[i] = captureStream.EndCapture()
+		execs[i] = graphs[i].Instantiate()
+	}
+	defer func() {
+		for i := range execs {
+			execs[i].Destroy()
+			graphs[i].Destroy()
+		}
+	}()
+	execK2, execK3, execK4 := execs[0], execs[1], execs[2]
+
+	fellBack := false
+	for condition() && !pause {
+		if checkInject() {
+			if !pause {
+				fellBack = true
+			}
+			break
+		}
+
+		if FixDt != 0 {
+			Dt_si = FixDt
+		}
+
+		t0 := Time
+		data.Copy(m0, m)
+
+		h := float32(Dt_si * GammaLL)
+
+		// there is no explicit stage 1: k1 from previous step
+
+		// stage 2
+		Time = t0 + (1./2.)*Dt_si
+		cuda.Madd2(m, m, rk.k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
+		execK2.Launch(captureStream)
+		NEvals++
+
+		// stage 3
+		Time = t0 + (3./4.)*Dt_si
+		cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
+		execK3.Launch(captureStream)
+		NEvals++
+
+		// 3rd order solution
+		cuda.Madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
+
+		// error estimate
+		Time = t0 + Dt_si
+		execK4.Launch(captureStream)
+		NEvals++
+		Err := k2 // re-use k2 as error
+		// difference of 3rd and 2nd order torque without explicitly storing them first
+		cuda.Madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
+
+		// determine error
+		err := cuda.MaxVecNorm(Err) * float64(h)
+
+		// adjust next time step
+		if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
+			// step OK
+			setLastErr(err)
+			NSteps++
+			Time = t0 + Dt_si
+			adaptDt(math.Pow(MaxErr/err, 1./3.))
+			data.Copy(rk.k1, k4) // FSAL
+		} else {
+			// undo bad step
+			util.Assert(FixDt == 0)
+			Time = t0
+			data.Copy(m, m0)
+			NUndone++
+			adaptDt(math.Pow(MaxErr/err, 1./4.))
+		}
+
+		for _, f := range postStep {
+			f()
+		}
+		DoOutput()
+	}
+	pause = true
+	return fellBack
+}
+
 // Implements StepsGraph/tryRunGraph for Dormand-Prince (solver 5),
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
@@ -576,142 +712,6 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 			data.Copy(m, m0)
 			NUndone++
 			adaptDt(math.Pow(MaxErr/err, 1./6.))
-		}
-
-		for _, f := range postStep {
-			f()
-		}
-		DoOutput()
-	}
-	pause = true
-	return fellBack
-}
-
-// Implements StepsGraph/tryRunGraph for Bogacki-Shampine (solver 3),
-// using the "split graph" approach (see Sec. 4.1 in You2026).
-//
-// Since the kernel sequence computing the torque is independent of dt and M
-// (only the addresses of the buffers matter, which are fixed), it suffices to
-// capture torqueFn(k2)..torqueFn(k4) once before the loop, as small graphs
-// execK2..execK4. The loop body then mirrors RK23.Step exactly but with
-// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
-// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
-// between graph launches.
-func runGraphRK23(rk *RK23, condition func() bool) bool {
-	SanityCheck()
-	pause = false
-
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
-
-	m := M.Buffer()
-	size := m.Size()
-
-	// upon resize: remove wrongly sized k1
-	if rk.k1.Size() != m.Size() {
-		rk.Free()
-	}
-	// first step ever: one-time k1 init and eval
-	if rk.k1 == nil {
-		rk.k1 = cuda.NewSlice(3, size)
-		torqueFn(rk.k1)
-	}
-
-	m0 := cuda.Buffer(3, size)
-	defer cuda.Recycle(m0)
-
-	k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
-	defer cuda.Recycle(k2)
-	defer cuda.Recycle(k3)
-	defer cuda.Recycle(k4)
-
-	warmupTorque(m)
-
-	captureStream := cuda.EnterCaptureMode()
-	demagConv().SetStream(captureStream)
-	defer func() {
-		demagConv().SetStream(cu.Stream(0))
-		cuda.ExitCaptureMode(captureStream)
-	}()
-
-	dsts := [3]*data.Slice{k2, k3, k4}
-	var graphs [3]cu.Graph
-	var execs [3]cu.GraphExec
-	for i, dst := range dsts {
-		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
-		M.normalize()
-		torqueFn(dst)
-		graphs[i] = captureStream.EndCapture()
-		execs[i] = graphs[i].Instantiate()
-	}
-	defer func() {
-		for i := range execs {
-			execs[i].Destroy()
-			graphs[i].Destroy()
-		}
-	}()
-	execK2, execK3, execK4 := execs[0], execs[1], execs[2]
-
-	fellBack := false
-	for condition() && !pause {
-		if checkInject() {
-			if !pause {
-				fellBack = true
-			}
-			break
-		}
-
-		if FixDt != 0 {
-			Dt_si = FixDt
-		}
-
-		t0 := Time
-		data.Copy(m0, m)
-
-		h := float32(Dt_si * GammaLL)
-
-		// there is no explicit stage 1: k1 from previous step
-
-		// stage 2
-		Time = t0 + (1./2.)*Dt_si
-		cuda.Madd2(m, m, rk.k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
-		execK2.Launch(captureStream)
-		NEvals++
-
-		// stage 3
-		Time = t0 + (3./4.)*Dt_si
-		cuda.Madd2(m, m0, k2, 1, (3./4.)*h) // m = m0*1 + k2*3/4
-		execK3.Launch(captureStream)
-		NEvals++
-
-		// 3rd order solution
-		cuda.Madd4(m, m0, rk.k1, k2, k3, 1, (2./9.)*h, (1./3.)*h, (4./9.)*h)
-
-		// error estimate
-		Time = t0 + Dt_si
-		execK4.Launch(captureStream)
-		NEvals++
-		Err := k2 // re-use k2 as error
-		// difference of 3rd and 2nd order torque without explicitly storing them first
-		cuda.Madd4(Err, rk.k1, k2, k3, k4, (7./24.)-(2./9.), (1./4.)-(1./3.), (1./3.)-(4./9.), (1. / 8.))
-
-		// determine error
-		err := cuda.MaxVecNorm(Err) * float64(h)
-
-		// adjust next time step
-		if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
-			// step OK
-			setLastErr(err)
-			NSteps++
-			Time = t0 + Dt_si
-			adaptDt(math.Pow(MaxErr/err, 1./3.))
-			data.Copy(rk.k1, k4) // FSAL
-		} else {
-			// undo bad step
-			util.Assert(FixDt == 0)
-			Time = t0
-			data.Copy(m, m0)
-			NUndone++
-			adaptDt(math.Pow(MaxErr/err, 1./4.))
 		}
 
 		for _, f := range postStep {

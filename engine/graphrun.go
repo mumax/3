@@ -53,9 +53,9 @@ func StepsGraph(n int) {
 	switch s := stepper.(type) {
 	case *Heun:
 		if FixDt != 0 {
-			fellBack = runGraphHeunFixedDt(s, condition)
+			fellBack = runGraphHeunFixedDt(condition)
 		} else {
-			fellBack = runGraphHeunAdaptive(s, condition)
+			fellBack = runGraphHeunAdaptive(condition)
 		}
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
@@ -89,9 +89,9 @@ func tryRunGraph(condition func() bool) bool {
 	switch s := stepper.(type) {
 	case *Heun:
 		if FixDt != 0 {
-			fellBack = runGraphHeunFixedDt(s, condition)
+			fellBack = runGraphHeunFixedDt(condition)
 		} else {
-			fellBack = runGraphHeunAdaptive(s, condition)
+			fellBack = runGraphHeunAdaptive(condition)
 		}
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
@@ -281,7 +281,7 @@ func checkInject() bool {
 // Since every kernel's scalar arguments (dt, region LUTs, ...) are constant
 // from step to step, the entire step can be captured once into a single graph
 // and replayed unchanged for n steps.
-func runGraphHeunFixedDt(heun *Heun, condition func() bool) bool {
+func runGraphHeunFixedDt(condition func() bool) bool {
 	SanityCheck()
 	pause = false
 
@@ -351,7 +351,7 @@ func runGraphHeunFixedDt(heun *Heun, condition func() bool) bool {
 // but with torqueFn calls replaced by GraphExec.Launch calls. Other functions
 // that can not be captured by graphs (e.g., Madd2, Madd3, MaxVecDiff...)
 // remain interspersed between graph launches.
-func runGraphHeunAdaptive(heun *Heun, condition func() bool) bool {
+func runGraphHeunAdaptive(condition func() bool) bool {
 	SanityCheck()
 	pause = false
 

@@ -349,9 +349,6 @@ func (g *guistate) prepareParam() {
 	// do not crash when we enter bogus values (see temperature.go)
 	g.OnEvent("Temp", func() {
 		Inject <- Injection{f: func() {
-			if FixDt == 0 {
-				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
-			}
 			g.EvalGUI("Temp = " + g.StringValue("Temp"))
 		}, graphCompatible: false} // CUDA Graphs assume Temp==0
 	})

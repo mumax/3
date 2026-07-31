@@ -162,6 +162,7 @@ func graphIncompatibilityReason() string {
 	// into the captured graph would be frozen at capture-time Time and
 	// replayed unchanged forever.
 	materialParams := []*regionwise{
+		&Temp.regionwise, &NoDemagSpins.regionwise, // Zero at t=0 (checked earlier) doesn't imply time-independence
 		&Msat.regionwise, &Aex.regionwise, &Dind.regionwise, &Dbulk.regionwise,
 		&Ku1.regionwise, &Ku2.regionwise, &Kc1.regionwise, &Kc2.regionwise, &Kc3.regionwise,
 		&AnisU.regionwise, &AnisC1.regionwise, &AnisC2.regionwise,

@@ -195,7 +195,7 @@ func runWhile(condition func() bool, output bool) {
 		select {
 		default:
 			step(output)
-		// accept tasks form Inject channel
+		// accept tasks from Inject channel
 		case f := <-Inject:
 			f()
 		}

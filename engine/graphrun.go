@@ -22,14 +22,14 @@ var EnableCUDAgraphs = true
 
 func init() {
 	DeclFunc("StepsGraph", StepsGraph, "Like Steps, but captures the torque-evaluation kernels as CUDA Graphs and "+
-		"replays them for the remaining steps. Supports Heun, RK23, RK45DP (default), RK56 and BackwardEuler.")
+		"replays them for the remaining steps. Supports Heun, RK23, RK45DP (default) and RK56.")
 	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run() and Steps() on small grids (default=true)<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields are defined.")
 }
 
 // StepsGraph performs n further steps, capturing the GPU work of the torque
 // evaluation(s) into one or more CUDA Graphs and replaying them for the
 // remaining steps. Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the
-// default), RK56 (solver(6)) and BackwardEuler (solver(-1)) are supported.
+// default) and RK56 (solver(6)) are supported.
 //
 // In all solvers (except Heun with FixDt != 0), dt and/or the accept/reject
 // decision change every step and depend on a blocking host readback (e.g.,
@@ -63,10 +63,8 @@ func StepsGraph(n int) {
 		fellBack = runGraphRK23(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
-	case *BackwardEuler:
-		fellBack = runGraphBackwardEuler(s, condition)
 	default:
-		util.AssertMsg(false, "StepsGraph: requires Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the default), RK56 (solver(6)), or BackwardEuler (solver(-1))")
+		util.AssertMsg(false, "StepsGraph: requires Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the default) or RK56 (solver(6))")
 	}
 	// An Inject (GUI/script) call mid-replay may have changed state the
 	// captured graphs depend on; see checkInject. Finish the remaining steps
@@ -101,8 +99,6 @@ func tryRunGraph(condition func() bool) bool {
 		fellBack = runGraphRK23(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
-	case *BackwardEuler:
-		fellBack = runGraphBackwardEuler(s, condition)
 	default:
 		return false
 	}
@@ -879,111 +875,6 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 			NUndone++
 			adaptDt(math.Pow(MaxErr/err, 1./7.))
 		}
-
-		for _, f := range postStep {
-			f()
-		}
-		DoOutput()
-	}
-	pause = true
-	return fellBack
-}
-
-// Implements StepsGraph/tryRunGraph for backward Euler (solver -1),
-// using the "split graph" approach (see Sec. 4.1 in You2026).
-//
-// Since the kernel sequence computing the torque is independent of dt and M
-// (only the addresses of the buffers matter, which are fixed), it suffices to
-// capture torqueFn(dy0) & torqueFn(dy1) once before the loop, as small graphs
-// execDy0 and execDy1. The loop body then mirrors BackwardEuler.Step exactly
-// but with torqueFn calls replaced by GraphExec.Launch calls. Other functions
-// that can not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain
-// interspersed between graph launches.
-//
-// Note: BackwardEuler requires FixDt != 0, so dt remains constant throughout.
-func runGraphBackwardEuler(s *BackwardEuler, condition func() bool) bool {
-	util.AssertMsg(MaxErr > 0, "Backward euler solver requires MaxErr > 0")
-	SanityCheck()
-	pause = false
-
-	s.Free() // mirror RunWhile's stepper.Free(): start from a clean state
-
-	y := M.Buffer()
-
-	y0 := cuda.Buffer(VECTOR, y.Size())
-	defer cuda.Recycle(y0)
-
-	dy0 := cuda.Buffer(VECTOR, y.Size())
-	defer cuda.Recycle(dy0)
-
-	if s.dy1 == nil {
-		s.dy1 = cuda.Buffer(VECTOR, y.Size())
-	}
-	dy1 := s.dy1
-
-	warmupTorque(y)
-
-	Dt_si = FixDt
-	dt := float32(Dt_si * GammaLL)
-	util.AssertMsg(dt > 0, "Backward Euler solver requires fixed time step > 0")
-
-	captureStream := cuda.EnterCaptureMode()
-	demagConv().SetStream(captureStream)
-	defer func() {
-		demagConv().SetStream(cu.Stream(0))
-		cuda.ExitCaptureMode(captureStream)
-	}()
-
-	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
-	torqueFn(dy0)
-	graphDy0 := captureStream.EndCapture()
-	defer graphDy0.Destroy()
-	execDy0 := graphDy0.Instantiate()
-	defer execDy0.Destroy()
-
-	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
-	torqueFn(dy1)
-	graphDy1 := captureStream.EndCapture()
-	defer graphDy1.Destroy()
-	execDy1 := graphDy1.Instantiate()
-	defer execDy1.Destroy()
-
-	fellBack := false
-	for condition() && !pause {
-		if checkInject() {
-			if !pause {
-				fellBack = true
-			}
-			break
-		}
-
-		t0 := Time
-		data.Copy(y0, y)
-
-		// First guess
-		Time = t0 + 0.5*Dt_si // 0.5 dt makes it implicit midpoint method
-
-		// predictor Euler step with previous torque (Temp.isZero() guaranteed)
-		cuda.Madd2(y, y0, dy1, 1, dt)
-		M.normalize()
-
-		execDy0.Launch(captureStream)
-		NEvals++
-		cuda.Madd2(y, y0, dy0, 1, dt) // y = y0 + dt * dy
-		M.normalize()
-
-		// One iteration
-		execDy1.Launch(captureStream)
-		NEvals++
-		cuda.Madd2(y, y0, dy1, 1, dt) // y = y0 + dt * dy1
-		M.normalize()
-
-		Time = t0 + Dt_si
-
-		err := cuda.MaxVecDiff(dy0, dy1) * float64(dt)
-
-		NSteps++
-		setLastErr(err)
 
 		for _, f := range postStep {
 			f()

@@ -1,6 +1,9 @@
 //go:build darwin && arm64 && cgo
 // +build darwin,arm64,cgo
 
+// Philox-derived portions: Copyright 2010-2012, D. E. Shaw Research.
+// BSD-3-Clause; see the Random123 notice in the repository LICENSE.
+
 package rng
 
 import (

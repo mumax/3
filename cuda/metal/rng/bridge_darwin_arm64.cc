@@ -1,3 +1,6 @@
+// Philox-derived portions: Copyright 2010-2012, D. E. Shaw Research.
+// BSD-3-Clause; see the Random123 notice in the repository LICENSE.
+
 #include "bridge.h"
 #include "../metal_runtime.h"
 

@@ -306,13 +306,13 @@ func runGraphHeunFixedDt(heun *Heun, condition func() bool) bool {
 		cuda.ExitCaptureMode(captureStream)
 	}()
 
-	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 	torqueFn(dy0)                // stage 1
 	cuda.Madd2(y, y, dy0, 1, dt) // y = y + dt * dy
 	torqueFn(dy)                 // stage 2
 	cuda.Madd3(y, y, dy, dy0, 1, 0.5*dt, -0.5*dt)
 	M.normalize()
-	graph := cu.StreamEndCapture(captureStream)
+	graph := captureStream.EndCapture()
 	defer graph.Destroy()
 
 	exec := graph.Instantiate()
@@ -372,16 +372,16 @@ func runGraphHeunAdaptive(heun *Heun, condition func() bool) bool {
 		cuda.ExitCaptureMode(captureStream)
 	}()
 
-	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 	torqueFn(dy0)
-	graphT0 := cu.StreamEndCapture(captureStream)
+	graphT0 := captureStream.EndCapture()
 	defer graphT0.Destroy()
 	execT0 := graphT0.Instantiate()
 	defer execT0.Destroy()
 
-	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 	torqueFn(dy)
-	graphT1 := cu.StreamEndCapture(captureStream)
+	graphT1 := captureStream.EndCapture()
 	defer graphT1.Destroy()
 	execT1 := graphT1.Instantiate()
 	defer execT1.Destroy()
@@ -490,10 +490,10 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	var graphs [5]cu.Graph
 	var execs [5]cu.GraphExec
 	for i, dst := range dsts {
-		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 		M.normalize()
 		torqueFn(dst)
-		graphs[i] = cu.StreamEndCapture(captureStream)
+		graphs[i] = captureStream.EndCapture()
 		execs[i] = graphs[i].Instantiate()
 	}
 	defer func() {
@@ -638,10 +638,10 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 	var graphs [3]cu.Graph
 	var execs [3]cu.GraphExec
 	for i, dst := range dsts {
-		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 		M.normalize()
 		torqueFn(dst)
-		graphs[i] = cu.StreamEndCapture(captureStream)
+		graphs[i] = captureStream.EndCapture()
 		execs[i] = graphs[i].Instantiate()
 	}
 	defer func() {
@@ -771,12 +771,12 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 	var graphs [8]cu.Graph
 	var execs [8]cu.GraphExec
 	for i, dst := range dsts {
-		cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 		if i > 0 {
 			M.normalize()
 		}
 		torqueFn(dst)
-		graphs[i] = cu.StreamEndCapture(captureStream)
+		graphs[i] = captureStream.EndCapture()
 		execs[i] = graphs[i].Instantiate()
 	}
 	defer func() {
@@ -931,16 +931,16 @@ func runGraphBackwardEuler(s *BackwardEuler, condition func() bool) bool {
 		cuda.ExitCaptureMode(captureStream)
 	}()
 
-	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 	torqueFn(dy0)
-	graphDy0 := cu.StreamEndCapture(captureStream)
+	graphDy0 := captureStream.EndCapture()
 	defer graphDy0.Destroy()
 	execDy0 := graphDy0.Instantiate()
 	defer execDy0.Destroy()
 
-	cu.StreamBeginCapture(captureStream, cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
 	torqueFn(dy1)
-	graphDy1 := cu.StreamEndCapture(captureStream)
+	graphDy1 := captureStream.EndCapture()
 	defer graphDy1.Destroy()
 	execDy1 := graphDy1.Instantiate()
 	defer execDy1.Destroy()

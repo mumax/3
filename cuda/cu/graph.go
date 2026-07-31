@@ -7,7 +7,7 @@ package cu
 // replaying it with a single driver call (cuGraphLaunch) instead of one
 // cuLaunchKernel per operation.
 //
-// Note: graph capture (StreamBeginCapture/EndCapture) is not supported on
+// Note: graph capture (Stream.BeginCapture/EndCapture) is not supported on
 // the legacy default stream (Stream(0)). Use a stream created with
 // StreamCreate for capture and replay.
 

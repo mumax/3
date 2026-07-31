@@ -138,8 +138,8 @@ func graphIncompatibilityReason() string {
 	if !Temp.isZero() {
 		return "Temp != 0 is not supported (thermal field)"
 	}
-	if !isTimeIndependent(B_ext) {
-		return "B_ext must be time-independent (no extraTerms or time-dependent per-region value)"
+	if !isTimeIndependent(B_ext) || !isTimeIndependent(J) || !isTimeIndependent(FixedLayer) {
+		return "Time-dependent excitations (B_ext, J, FixedLayer) are not supported (no extraTerms or time-dependent per-region value)"
 	}
 	if len(customTerms) != 0 {
 		return "custom field terms (AddFieldTerm) are not supported"

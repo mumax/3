@@ -4,110 +4,80 @@
 
 **GPU-accelerated micromagnetism.**
 
-> [!IMPORTANT]
-> **This fork adds a native Apple Silicon / Metal backend.** Unlike upstream
-> mumax³, it can run simulations directly on the integrated GPU in an
-> Apple-silicon MacBook, iMac, Mac mini, or Mac Studio—without an NVIDIA GPU,
-> CUDA, a virtual machine, or a remote Linux host. Existing Linux/Windows CUDA
-> builds remain available and use the original CUDA implementation.
-
-The macOS backend keeps the `.mx3` language and mumax³'s high-level Go API
-unchanged. CUDA-driver-specific `cuda/cu` module and raw-launch APIs remain
-available only on the CUDA backend.
-At build time, `darwin/arm64` selects Metal compute kernels, an MPSGraph
-real-to-complex FFT compatible with the cuFFT layout used by the demagnetizing
-field convolution, and a Philox thermal-noise generator. GPU allocations use
-Apple's unified memory, commands are batched on one ordered Metal queue, and
-32-wide X-contiguous SIMD tiles are sized for Apple GPUs.
-
-| Host | GPU backend | Extra GPU toolkit |
-|---|---|---|
-| Apple Silicon + macOS 14 or newer | Metal / MPSGraph | None (shaders compile through Metal at runtime) |
-| Linux or Windows + NVIDIA GPU | CUDA / cuFFT / cuRAND | NVIDIA driver and CUDA toolkit |
-| Intel Mac | Not supported by the Metal backend | — |
-
 Paper on the design and verification of MuMax3: <http://scitation.aip.org/content/aip/journal/adva/4/10/10.1063/1.4899186>
 
 <!-- [![Build Status](https://travis-ci.org/mumax/3.svg?branch=master)](https://travis-ci.org/mumax/3) -->
 
-## Apple Silicon one-command install
+## Apple Silicon macOS
 
-The installer supports an M1 or newer Apple-silicon Mac running macOS 14
-Sonoma or newer. On a fresh Mac, open Terminal and run:
+On an M1 or newer Mac running macOS 14 or later, mumax³ uses Metal compute
+shaders, Apple unified memory, an MPSGraph FFT with the packed R2C/C2R layout
+used by cuFFT, and a Philox thermal-noise generator. The `.mx3` language,
+high-level Go solver, physical terms, integration methods, and output formats
+are shared with the CUDA build. Intel Macs are not supported.
 
-```bash
-/bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/TaewoooPark/mumax3-for-mac/master/install-macos.sh)"
-```
+### Automated installation
 
-This single entry point:
-
-1. Rejects Intel Macs, Rosetta terminals, and unsupported macOS versions.
-2. Opens the Apple Command Line Tools installer when `clang`, `git`, or `make`
-   is missing, then waits for it to finish.
-3. Installs native Apple-silicon Homebrew and Go 1.22.4 or newer when needed.
-4. Clones the repository to `~/mumax3-for-mac`, or reuses the checkout when the
-   script is run locally.
-5. Builds the Metal backend, adds the Go binary directory to `~/.zprofile`, and
-   runs `mumax3 -test`.
-
-The Command Line Tools installer opens a macOS window, and Homebrew may request
-an administrator password. The script is safe to run again: completed
-dependencies are reused, and an existing unrelated source directory is never
-overwritten. Run `./install-macos.sh --help` for source-directory and shell
-profile options.
-
-To inspect the installer before running it:
+On a fresh Mac, open Terminal and run:
 
 ```bash
-/usr/bin/curl -fsSLo /tmp/mumax3-install-macos.sh \
-  https://raw.githubusercontent.com/TaewoooPark/mumax3-for-mac/master/install-macos.sh
-less /tmp/mumax3-install-macos.sh
-/bin/bash /tmp/mumax3-install-macos.sh
+/bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/mumax/3/master/install-macos.sh)"
 ```
 
-When installing from an existing checkout, use:
+The installer verifies the host, opens the Apple Command Line Tools installer
+when required, installs native Homebrew and Go 1.22.4 or later when missing,
+clones mumax³ into `~/mumax3`, builds the Metal backend, adds the binary path to
+`~/.zprofile`, and runs `mumax3 -test`. It can be run again after an
+interruption. Use `./install-macos.sh --help` when installing from an existing
+checkout or choosing another source directory.
+
+### Manual installation
+
+Install each dependency and build the source separately.
+
+1. Start the Apple Command Line Tools installer and finish the installation
+   window before continuing.
 
 ```bash
-./install-macos.sh
+xcode-select --install
 ```
 
-After installation, open a new Terminal or run `source ~/.zprofile`. An
-ordinary mumax³ input file can then be started with:
+2. Install native Homebrew and Go.
 
 ```bash
-mumax3 -http="" example.mx3
+/bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew install go
 ```
 
-The startup banner identifies `Metal` and the selected Apple GPU. `-gpu` is
-accepted for CLI compatibility but Apple Silicon exposes one system-default
-Metal device. Use `-sync` only for debugging; it forces synchronization after
-each GPU call and substantially reduces performance. Do not install CUDA on a
-Mac. The full Xcode application and the offline `metal`/`metallib` commands are
-not required because the generated shaders can compile at runtime.
-
-For a repeatable developer check, run:
+3. Clone and build mumax³. The Makefile selects Metal automatically on
+   `darwin/arm64`.
 
 ```bash
-make check-metal
+git clone https://github.com/mumax/3.git
+cd 3
+MACOSX_DEPLOYMENT_TARGET=14.0 CGO_ENABLED=1 make
 ```
 
-This verifies all generated Metal wrappers, statically compiles the complete
-shader library when the offline Metal compiler is present, runs the Go and GPU
-numerical tests (including FFT round trips and Philox statistics), and builds
-the command-line tools. With Command Line Tools alone, shader compilation is
-verified through the same runtime path used by mumax³.
+4. Save the installed binary directory in the shell profile and verify the
+   Metal backend.
 
-### Numerical compatibility
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+printf '\nexport PATH="%s:$PATH"\n' "$(go env GOPATH)/bin" >> ~/.zprofile
+mumax3 -test
+```
 
-The Metal path preserves mumax³'s single-precision model and cuFFT-compatible
-packed R2C/C2R layout. Parallel reductions can differ in their last few bits
-because GPU accumulation order is not deterministic. Thermal simulations use
-Philox rather than cuRAND's default XORWOW sequence, so equal seeds are
-reproducible on Metal but do not produce the same samples as CUDA; unlike
-cuRAND normal generation, the Metal path also accepts odd cell counts. One Hopf
-summand that used double-complex intermediates in CUDA uses `float2` on Apple
-GPUs, which do not provide native FP64; its output is checked with an explicit
-floating-point tolerance rather than bit-for-bit comparison.
+The full Xcode application and CUDA are not required. Generated Metal shaders
+compile through the system runtime when the offline Metal compiler is absent.
+Run a simulation with the live Web UI using `mumax3 example.mx3`, or use
+`mumax3 -http="" example.mx3` for headless execution. `make check-metal` runs
+the generator, shader, FFT, random-number, GPU, and build checks.
+
+The Metal backend preserves mumax³'s single-precision numerical model. Parallel
+reductions may differ in their last floating-point bits. Thermal simulations
+use Philox rather than cuRAND's XORWOW sequence, so a seed is reproducible on
+Metal but does not select the same sample sequence as CUDA.
 
 ## Downloads and documentation
 
@@ -119,23 +89,11 @@ Documentation of several tools, like `mumax3-convert`, is available [here](https
 
 Contributions are gratefully accepted. To contribute code, fork our GitHub repo and send a pull request.
 
-## Existing CUDA users
-
-The original NVIDIA CUDA backend remains available on supported Linux and
-Windows hosts. Its upstream installation guide is retained below for existing
-CUDA users.
-
-<details>
-<summary><strong>Show the original Linux/Windows CUDA installation guide</strong></summary>
-
-### Building the CUDA backend from source
+## Building from source
 
 Consider downloading a [pre-compiled mumax³ binary](https://mumax.github.io/download.html).
 
-The instructions below apply to the original NVIDIA CUDA backend on Linux and
-Windows. For a Mac, use the Apple Silicon one-command install above.
-
-If you want to compile the CUDA backend, 4 essential components will be required to build mumax³: an ***NVIDIA driver***, ***Go***, ***CUDA*** (&leq;12.9) and ***C***.
+If you want to compile nevertheless, 4 essential components will be required to build mumax³: an ***NVIDIA driver***, ***Go***, ***CUDA*** (&leq;12.9) and ***C***.
 
 * *If they are not yet present on your system*: install them as detailed below.
 * *If they are already installed*: check if they work correctly by running the *check* for each component written below.
@@ -344,5 +302,3 @@ With these tools installed, you can build mumax³ yourself.
   If you encounter an error during compilation on Windows, other than those mentioned above, you may try to run the compilation commands in the "Developer Powershell for VS 20XX" that should have been automatically installed alongside MSVC. Sometimes this special shell solves conflicts between MSVC and CUDA, sometimes not.
 
   </details>
-
-</details>

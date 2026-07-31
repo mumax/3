@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Bootstrap mumax3-for-mac on a fresh Apple-silicon Mac.
+# Bootstrap mumax3 on a fresh Apple-silicon Mac.
 # Compatible with the Bash 3.2 shipped by macOS.
 
 set -Eeuo pipefail
 
-PROGRAM_NAME="mumax3-for-mac installer"
-REPOSITORY_URL="${MUMAX3_REPOSITORY_URL:-https://github.com/TaewoooPark/mumax3-for-mac.git}"
+PROGRAM_NAME="mumax3 macOS installer"
+REPOSITORY_URL="${MUMAX3_REPOSITORY_URL:-https://github.com/mumax/3.git}"
 MINIMUM_MACOS_MAJOR=14
 MINIMUM_GO_VERSION="1.22.4"
 CURRENT_STEP="initialization"
@@ -54,11 +54,11 @@ usage() {
 	cat <<'EOF'
 Usage: install-macos.sh [options]
 
-Install and verify mumax3-for-mac on Apple Silicon.
+Install and verify mumax3 on Apple Silicon.
 
 Options:
   --source-dir DIR  Clone into or build from DIR.
-                    Default: ~/mumax3-for-mac
+                    Default: ~/mumax3
   --no-profile      Do not add Homebrew or mumax3 to ~/.zprofile.
   -h, --help        Show this help.
 
@@ -138,7 +138,7 @@ ensure_profile_line() {
 	[[ -e "$profile_path" ]] || /usr/bin/touch "$profile_path"
 	if ! /usr/bin/grep -Fqx "$line" "$profile_path"; then
 		{
-			printf '\n# Added by the mumax3-for-mac installer: %s\n' "$description"
+			printf '\n# Added by the mumax3 macOS installer: %s\n' "$description"
 			printf '%s\n' "$line"
 		} >>"$profile_path"
 		note "Updated $profile_path ($description)"
@@ -291,7 +291,7 @@ prepare_source() {
 		if local_checkout=$(detect_local_checkout); then
 			SOURCE_DIR=$local_checkout
 		else
-			SOURCE_DIR="${USER_HOME_DIR%/}/mumax3-for-mac"
+			SOURCE_DIR="${USER_HOME_DIR%/}/mumax3"
 		fi
 	fi
 
@@ -301,13 +301,13 @@ prepare_source() {
 	esac
 
 	if [[ ! -e "$SOURCE_DIR" ]]; then
-		CURRENT_STEP="cloning mumax3-for-mac"
-		log "Cloning mumax3-for-mac"
+		CURRENT_STEP="cloning mumax3"
+		log "Cloning mumax3"
 		/usr/bin/git clone --depth 1 "$REPOSITORY_URL" "$SOURCE_DIR"
 	elif is_metal_source_tree "$SOURCE_DIR"; then
 		note "Using existing source directory: $SOURCE_DIR"
 	else
-		fail "$SOURCE_DIR already exists and is not a mumax3-for-mac source tree. Choose another location with --source-dir."
+		fail "$SOURCE_DIR already exists and is not a mumax3 source tree. Choose another location with --source-dir."
 	fi
 
 	is_metal_source_tree "$SOURCE_DIR" ||

@@ -189,9 +189,11 @@ static BOOL mrg_ensure_pipeline(MRGGenerator *generator,
     NSString *source = [[NSString alloc] initWithBytes:mrgSourceText
                                                 length:sizeof(mrgSourceText) - 1
                                               encoding:NSUTF8StringEncoding];
+    MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
+    options.fastMathEnabled = NO;
     NSError *libraryError = nil;
     id<MTLLibrary> library = [device newLibraryWithSource:source
-                                                  options:nil
+                                                  options:options
                                                     error:&libraryError];
     if (library == nil) {
         if (errorMessage != nullptr) {

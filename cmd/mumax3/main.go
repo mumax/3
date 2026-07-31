@@ -200,10 +200,29 @@ func getOSInfo() string {
 		return "Windows OS"
 	case "linux":
 		return getLinuxOSInfo()
-	// Add more cases for other operating systems if needed
+	case "darwin":
+		return getDarwinOSInfo()
 	default:
 		return fmt.Sprintf("Unknown OS: %s", runtime.GOOS)
 	}
+}
+
+func getDarwinOSInfo() string {
+	productName, err := commandOutput("sw_vers", "-productName")
+	if err != nil || productName == "" {
+		productName = "macOS"
+	}
+	productVersion, _ := commandOutput("sw_vers", "-productVersion")
+	buildVersion, _ := commandOutput("sw_vers", "-buildVersion")
+
+	version := productVersion
+	if buildVersion != "" {
+		version += fmt.Sprintf(" (%s)", buildVersion)
+	}
+	if version == "" {
+		return productName
+	}
+	return productName + " " + version
 }
 
 func getLinuxOSInfo() string {
@@ -238,10 +257,24 @@ func getCPUInfo() string {
 		return getWindowsCPUInfo()
 	case "linux":
 		return getLinuxCPUInfo()
-	// Add more cases for other operating systems if needed
+	case "darwin":
+		return getDarwinCPUInfo()
 	default:
 		return fmt.Sprintf("CPU info: Unknown OS: %s", runtime.GOOS)
 	}
+}
+
+func getDarwinCPUInfo() string {
+	cpuModel, err := commandOutput("sysctl", "-n", "machdep.cpu.brand_string")
+	if err != nil || cpuModel == "" {
+		cpuModel = runtime.GOARCH
+	}
+	return fmt.Sprintf("CPU info: %s, Cores: %d", cpuModel, runtime.NumCPU())
+}
+
+func commandOutput(name string, args ...string) (string, error) {
+	output, err := exec.Command(name, args...).Output()
+	return strings.TrimSpace(string(output)), err
 }
 
 func getWindowsCPUInfo() string {

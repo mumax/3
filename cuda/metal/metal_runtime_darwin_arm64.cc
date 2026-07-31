@@ -238,7 +238,7 @@ int operationEncodedUnlocked(std::string &error) {
 
 int resolveBufferUnlocked(const void *pointer,
                           size_t minimum_bytes,
-                          id<MTLBuffer> &buffer,
+                          __strong id<MTLBuffer> &buffer,
                           size_t &offset,
                           size_t &available,
                           std::string &error) {

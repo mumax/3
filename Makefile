@@ -11,6 +11,8 @@ HOST_OS := $(shell go env GOOS)
 HOST_ARCH := $(shell go env GOARCH)
 ifeq ($(HOST_OS)-$(HOST_ARCH),darwin-arm64)
 	GPU_KERNELS := metalkernels
+	MACOSX_DEPLOYMENT_TARGET ?= 14.0
+	export MACOSX_DEPLOYMENT_TARGET
 else
 	GPU_KERNELS := cudakernels
 endif

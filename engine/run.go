@@ -12,20 +12,20 @@ import (
 
 // Solver globals
 var (
-	Time                    float64                      // time in seconds
-	alarm                   float64                      // alarm clock marks end time of run, dt adaptation must not cross it!
-	pause                   = true                       // set pause at any time to stop running after the current step
-	postStep                []func()                     // called on after every full time step
-	Inject                           = make(chan func()) // injects code in between time steps. Used by web interface.
-	Dt_si                   float64  = 1e-15             // time step = dt_si (seconds) *dt_mul, which should be nice float32
-	MinDt, MaxDt            float64                      // minimum and maximum time step
-	MaxErr                  float64  = 1e-5              // maximum error/step
-	Headroom                float64  = 0.8               // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
-	LastErr, PeakErr        float64                      // error of last step, highest error ever
-	LastTorque              float64                      // maxTorque of last time step
-	NSteps, NUndone, NEvals int                          // number of good steps, undone steps
-	FixDt                   float64                      // fixed time step?
-	stepper                 Stepper                      // generic step, can be EulerStep, HeunStep, etc
+	Time                    float64                         // time in seconds
+	alarm                   float64                         // alarm clock marks end time of run, dt adaptation must not cross it!
+	pause                   = true                          // set pause at any time to stop running after the current step
+	postStep                []func()                        // called on after every full time step
+	Inject                           = make(chan Injection) // injects code in between time steps. Used by web interface.
+	Dt_si                   float64  = 1e-15                // time step = dt_si (seconds) *dt_mul, which should be nice float32
+	MinDt, MaxDt            float64                         // minimum and maximum time step
+	MaxErr                  float64  = 1e-5                 // maximum error/step
+	Headroom                float64  = 0.8                  // solver headroom, (Gustafsson, 1992, Control of Error and Convergence in ODE Solvers)
+	LastErr, PeakErr        float64                         // error of last step, highest error ever
+	LastTorque              float64                         // maxTorque of last time step
+	NSteps, NUndone, NEvals int                             // number of good steps, undone steps
+	FixDt                   float64                         // fixed time step?
+	stepper                 Stepper                         // generic step, can be EulerStep, HeunStep, etc
 	solvertype              int
 )
 
@@ -196,8 +196,8 @@ func runWhile(condition func() bool, output bool) {
 		default:
 			step(output)
 		// accept tasks from Inject channel
-		case f := <-Inject:
-			f()
+		case i := <-Inject:
+			i.f()
 		}
 	}
 }
@@ -224,10 +224,15 @@ func PostStep(f func()) {
 	postStep = append(postStep, f)
 }
 
+type Injection struct {
+	f               func()
+	graphCompatible bool
+}
+
 // inject code into engine and wait for it to complete.
-func InjectAndWait(task func()) {
+func InjectAndWait(task Injection) {
 	ready := make(chan int)
-	Inject <- func() { task(); ready <- 1 }
+	Inject <- Injection{f: func() { task.f(); ready <- 1 }, graphCompatible: true}
 	<-ready
 }
 

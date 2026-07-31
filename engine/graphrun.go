@@ -270,8 +270,11 @@ func warmupTorque(m *data.Slice) {
 // global state and is correct regardless of what f changed.
 func checkInject() bool {
 	select {
-	case f := <-Inject:
-		f()
+	case i := <-Inject:
+		i.f()
+		if i.graphCompatible {
+			return false
+		}
 		return true
 	default:
 		return false

@@ -1,14 +1,15 @@
 package engine
 
 import (
-	"github.com/mumax/3/cuda"
-	"github.com/mumax/3/data"
-	"github.com/mumax/3/draw"
 	"image"
 	"image/jpeg"
 	"math"
 	"net/http"
 	"sync"
+
+	"github.com/mumax/3/cuda"
+	"github.com/mumax/3/data"
+	"github.com/mumax/3/draw"
 )
 
 type render struct {
@@ -38,7 +39,7 @@ func (g *guistate) ServeRender(w http.ResponseWriter, r *http.Request) {
 
 // rescale and download quantity, save in rescaleBuf
 func (ren *render) download() {
-	InjectAndWait(func() {
+	InjectAndWait(Injection{f: func() {
 		if ren.quant == nil { // not yet set, default = m
 			ren.quant = &M
 		}
@@ -96,7 +97,7 @@ func (ren *render) download() {
 			cuda.Resize(ren.rescaleBuf, buf.Comp(c), renderLayer)
 			data.Copy(ren.imgBuf.Comp(c), ren.rescaleBuf)
 		}
-	})
+	}, graphCompatible: true}) // This function just renders m, so need graphCompatible=true to use GUI with CUDA Graphs
 }
 
 var arrowSize = 16

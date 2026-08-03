@@ -285,6 +285,7 @@ func checkInject() bool {
 func runGraphHeunFixedDt(condition func() bool) bool {
 	SanityCheck()
 	pause = false
+	DoOutput()
 
 	util.Assert(FixDt != 0)
 	dt := float32(FixDt * GammaLL)
@@ -355,6 +356,7 @@ func runGraphHeunFixedDt(condition func() bool) bool {
 func runGraphHeunAdaptive(condition func() bool) bool {
 	SanityCheck()
 	pause = false
+	DoOutput()
 
 	y := M.Buffer()
 
@@ -448,8 +450,8 @@ func runGraphHeunAdaptive(condition func() bool) bool {
 func runGraphRK23(rk *RK23, condition func() bool) bool {
 	SanityCheck()
 	pause = false
-
 	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	DoOutput()
 
 	m := M.Buffer()
 	size := m.Size()
@@ -584,8 +586,8 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	SanityCheck()
 	pause = false
-
 	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	DoOutput()
 
 	m := M.Buffer()
 	size := m.Size()
@@ -737,8 +739,8 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 func runGraphRK56(rk *RK56, condition func() bool) bool {
 	SanityCheck()
 	pause = false
-
 	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	DoOutput()
 
 	m := M.Buffer()
 	size := m.Size()

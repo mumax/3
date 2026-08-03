@@ -23,7 +23,8 @@ var EnableCUDAgraphs = true
 func init() {
 	DeclFunc("StepsGraph", StepsGraph, "Like Steps, but captures the torque-evaluation kernels as CUDA Graphs and "+
 		"replays them for the remaining steps. Supports Heun, RK23, RK45DP (default) and RK56.")
-	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run() and Steps() on small grids (default=true)<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields are defined.")
+	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run() and Steps() on small grids (default=true)"+
+		"<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields/excitations are defined.")
 }
 
 // StepsGraph performs n further steps, capturing the GPU work of the torque

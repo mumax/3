@@ -131,7 +131,11 @@ func runScript(fname string) {
 
 func runGoFile(fname string) {
 	// pass through flags
-	flags := []string{"run", fname}
+	flags := []string{"run"}
+	if goBuildTags != "" {
+		flags = append(flags, "-tags", goBuildTags)
+	}
+	flags = append(flags, fname)
 	flag.Visit(func(f *flag.Flag) {
 		if f.Name != "o" {
 			flags = append(flags, fmt.Sprintf("-%v=%v", f.Name, f.Value))
@@ -169,7 +173,7 @@ func printVersion() {
 	engine.LogOut(engine.UNAME)
 	engine.LogOut(fmt.Sprintf("commit hash: %s", commitHash))
 	engine.LogOut(getCPUInfo())
-	engine.LogOut(fmt.Sprintf("GPU info: %s, using cc=%d PTX", cuda.GPUInfo, cuda.UseCC))
+	engine.LogOut(gpuInfoLine())
 	osInfo := fmt.Sprintf("OS  info: %s, Hostname: %s", getOSInfo(), getHostname())
 	engine.LogOut(osInfo)
 	engine.LogOut(fmt.Sprintf("Timestamp: %s", time.Now().Format("2006-01-02 15:04:05")))

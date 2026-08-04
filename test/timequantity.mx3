@@ -1,0 +1,121 @@
+/*
+	Compare the TimeQuantity implementation to the existing B_ext.Add() functionality
+*/
+
+Nx := 128
+Ny := 64
+Nz := 2
+c := 5e-9
+setgridsize(Nx, Ny, Nz)
+setcellsize(c, c, c)
+Aex = 10e-12
+Msat = 600e3
+m = uniform(1, 0, 0)
+
+ff := 5e9
+omega := 2*pi*ff
+lambdacus := 137e-9
+kk := (2*pi) / lambdacus
+
+// ===================================================
+// variant 1: timeQ_v
+// ===================================================
+mask := newVectorMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+    for j := 0; j < Ny; j++ {
+        for k := 0; k < Nz; k++ {
+            r := index2coord(i, j, k)
+            x := r.X()
+            mask.setVector(i, j, k, vector(0, 0, x))
+        }
+    }
+}
+xmask := CustomQuantity(mask)
+
+innertterm := Mul(Const(-2*pi*ff), timeQ_v)
+innterxterm := Mul(Const(kk), xmask)
+innertotal := Add(innterxterm , innertimeterm)
+sinwave := Qsin(innertotal)
+v1term := Mul(Constvector(0.00, 0.00, 0.01), sinwave)
+AddFieldTerm(v1term)
+
+run(1e-12)
+ref := B_custom.Comp(2).Average()
+print("variant 1 (timeQ_v) B_custom.z average:", ref)
+
+RemoveCustomFields()
+t = 0
+m = uniform(1, 0, 0)
+
+// ===================================================
+// variant 2: VectorFuncQ
+// ===================================================
+mask_sin := newVectorMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+    for j := 0; j < Ny; j++ {
+        for k := 0; k < Nz; k++ {
+            r := index2coord(i, j, k)
+            x := r.X()
+            mask_sin.setVector(i, j, k, vector(0, 0, sin(kk*x)))
+        }
+    }
+}
+xmask_sin := CustomQuantity(mask_sin)
+
+mask_cos := newVectorMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+    for j := 0; j < Ny; j++ {
+        for k := 0; k < Nz; k++ {
+            r := index2coord(i, j, k)
+            x := r.X()
+            mask_cos.setVector(i, j, k, vector(0, 0, cos(kk*x)))
+        }
+    }
+}
+xmask_cos := CustomQuantity(mask_cos)
+
+sinTerm := Mul(xmask_sin, VectorFuncQ(0, 0, cos(omega*t)))
+cosTerm := Mul(xmask_cos, VectorFuncQ(0, 0, -sin(omega*t)))
+AddFieldTerm(Mul(Const(0.01), Add(sinTerm, cosTerm)))
+
+run(1e-12)
+v2 := B_custom.Comp(2).Average()
+print("variant 2 (VectorFuncQ) B_custom.z average:", v2)
+Expect("VectorFuncQ vs timeQ_v z", v2, ref, 1e-7)
+
+RemoveCustomFields()
+t = 0
+m = uniform(1, 0, 0)
+
+// ===================================================
+// variant 3: classical B_ext.add
+// ===================================================
+mask2 := newVectorMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+    for j := 0; j < Ny; j++ {
+        for k := 0; k < Nz; k++ {
+            r := index2coord(i, j, k)
+            x := r.X()
+            mask2.setVector(i, j, k, vector(0, 0, sin(kk*x)))
+        }
+    }
+}
+B_ext.add(mask2, 0.01*cos(omega*t))
+
+mask3 := newVectorMask(Nx, Ny, Nz)
+for i := 0; i < Nx; i++ {
+    for j := 0; j < Ny; j++ {
+        for k := 0; k < Nz; k++ {
+            r := index2coord(i, j, k)
+            x := r.X()
+            mask3.setVector(i, j, k, vector(0, 0, cos(kk*x)))
+        }
+    }
+}
+B_ext.add(mask3, -0.01*sin(omega*t))
+
+run(1e-12)
+v3 := B_ext.Comp(2).Average()
+print("variant 3 (B_ext.add) B_ext.z average:", v3)
+Expect("B_ext.add vs timeQ_v z", v3, ref, 1e-7)
+

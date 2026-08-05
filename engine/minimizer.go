@@ -182,7 +182,11 @@ func Minimize() bool {
 		return (mini.lastDm.count < DmSamples || mini.lastDm.Max() > StopMaxDm) && WallclockTimer(TimerStart, MinimizeWallClockTime)
 	}
 
-	RunWhile(cond)
+	if tryRunGraph(cond) {
+		Refer("You2026")
+	} else {
+		RunWhile(cond)
+	}
 	pause = true
 	// if the loop ended because of convergence, then MinimizeConverged is true. If the loop ended because of wall-clock time, then MinimizeConverged is false.
 	MinimizeConverged = !(mini.lastDm.count < DmSamples || mini.lastDm.Max() > StopMaxDm)

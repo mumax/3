@@ -64,6 +64,8 @@ func StepsGraph(n int) {
 		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
+	case *Minimizer:
+		fellBack = runGraphMinimizer(s, condition)
 	default:
 		util.AssertMsg(false, "StepsGraph: requires Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the default) or RK56 (solver(6))")
 	}
@@ -100,6 +102,8 @@ func tryRunGraph(condition func() bool) bool {
 		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
 		fellBack = runGraphRK56(s, condition)
+	case *Minimizer:
+		fellBack = runGraphMinimizer(s, condition)
 	default:
 		return false
 	}
@@ -879,6 +883,105 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 			NUndone++
 			adaptDt(math.Pow(MaxErr/err, 1./7.))
 		}
+
+		for _, f := range postStep {
+			f()
+		}
+		DoOutput()
+	}
+	pause = true
+	return fellBack
+}
+
+// Implements StepsGraph/tryRunGraph for Minimize,
+// using the "split graph" approach (see Sec. 4.1 in You2026).
+//
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k) once before the loop, alongside several other non-
+// blocking CUDA calls, as a small graph exec. The loop body then mirrors
+// Minimizer.Step exactly but with torqueFn calls replaced by GraphExec.Launch
+// calls. Other functions that can not be captured by graphs (e.g., Dot,
+// MaxVecDiff...) remain outside the graph launch.
+func runGraphMinimizer(mini *Minimizer, condition func() bool) bool {
+	SanityCheck()
+	pause = false
+	mini.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	DoOutput()
+
+	m := M.Buffer()
+	size := m.Size()
+
+	if mini.k == nil {
+		mini.k = cuda.Buffer(3, size)
+		torqueFn(mini.k)
+	}
+
+	m0 := cuda.Buffer(3, size)
+	defer cuda.Recycle(m0)
+	k0 := cuda.Buffer(3, size)
+	defer cuda.Recycle(k0)
+	k := mini.k
+	dm, dk := m0, k0
+
+	warmupTorque(m)
+
+	captureStream := cuda.EnterCaptureMode()
+	demagConv().SetStream(captureStream)
+	defer func() {
+		demagConv().SetStream(cu.Stream(0))
+		cuda.ExitCaptureMode(captureStream)
+	}()
+
+	captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+	torqueFn(k)                    // calculate new torque for next step
+	cuda.Madd2(dm, m, m0, 1., -1.) // calculate step difference of m and k
+	cuda.Madd2(dk, k, k0, -1., 1.) // reversed due to LLNoPrecess sign
+	M.normalize()
+	graph := captureStream.EndCapture()
+	defer graph.Destroy()
+	exec := graph.Instantiate()
+	defer exec.Destroy()
+
+	fellBack := false
+	for condition() && !pause {
+		if checkInject() {
+			if !pause {
+				fellBack = true
+			}
+			break
+		}
+		data.Copy(m0, m)
+		data.Copy(k0, k)
+		dm, dk = m0, k0
+
+		// make descent
+		cuda.Minimize(m, m0, k, mini.h) // Depends on h so can't be in GraphExec
+		exec.Launch(captureStream)
+		NEvals++
+
+		// get maxdiff and add to list
+		max_dm := cuda.MaxVecNorm(dm)
+		mini.lastDm.Add(max_dm)
+		setLastErr(mini.lastDm.Max()) // report maxDm to user as LastErr
+
+		// adjust next time step
+		var nom, div float32
+		if NSteps%2 == 0 {
+			nom = cuda.Dot(dm, dm)
+			div = cuda.Dot(dm, dk)
+		} else {
+			nom = cuda.Dot(dm, dk)
+			div = cuda.Dot(dk, dk)
+		}
+		if div != 0. {
+			mini.h = nom / div
+		} else { // in case of division by zero
+			mini.h = 1e-4
+		}
+
+		// as a convention, time does not advance during relax
+		NSteps++
 
 		for _, f := range postStep {
 			f()

@@ -66,7 +66,6 @@ func (rk *RK4) Step() {
 		NSteps++
 		adaptDt(math.Pow(MaxErr/err, 1./4.))
 		setLastErr(err)
-		setMaxTorque(k4)
 	} else {
 		// undo bad step
 		util.Assert(FixDt == 0)

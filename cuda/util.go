@@ -2,6 +2,7 @@ package cuda
 
 import (
 	"fmt"
+
 	"github.com/mumax/3/cuda/cu"
 )
 
@@ -17,6 +18,11 @@ const (
 // cuda launch configuration
 type config struct {
 	Grid, Block cu.Dim3
+}
+
+// Number of blocks in the CUDA launch grid.
+func (c config) nBlocks() int64 {
+	return int64(c.Grid.X) * int64(c.Grid.Y) * int64(c.Grid.Z)
 }
 
 // Make a 1D kernel launch configuration suited for N threads.

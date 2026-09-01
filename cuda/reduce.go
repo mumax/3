@@ -18,21 +18,35 @@ const REDUCE_BLOCKSIZE = C.REDUCE_BLOCKSIZE
 // Sum of all elements.
 func Sum(in *data.Slice) float32 {
 	util.Argument(in.NComp() == 1)
-	out := reduceBuf(0)
-	k_reducesum_async(in.DevPtr(0), out, 0, in.Len(), reducecfg)
-	return copyback(out)
+	partials := reduceBufN(reducecfg.nBlocks(), 0)
+	k_reducesum_async(in.DevPtr(0), partials, 0, in.Len(), reducecfg)
+	host := copybackSlice(partials, reducecfg.nBlocks())
+
+	// Add elements of partials on CPU
+	var result float32
+	for _, v := range host {
+		result += v
+	}
+	return result
 }
 
 // Dot product.
 func Dot(a, b *data.Slice) float32 {
 	nComp := a.NComp()
 	util.Argument(nComp == b.NComp())
-	out := reduceBuf(0)
+	partials := reduceBufN(reducecfg.nBlocks(), 0)
 	// not async over components
 	for c := 0; c < nComp; c++ {
-		k_reducedot_async(a.DevPtr(c), b.DevPtr(c), out, 0, a.Len(), reducecfg) // all components add to out
+		k_reducedot_async(a.DevPtr(c), b.DevPtr(c), partials, 0, a.Len(), reducecfg) // all components add to out
 	}
-	return copyback(out)
+	host := copybackSlice(partials, reducecfg.nBlocks())
+
+	// Add elements of partials on CPU
+	var result float32
+	for _, v := range host {
+		result += v
+	}
+	return result
 }
 
 // Maximum of absolute values of all elements.
@@ -65,7 +79,8 @@ func MaxVecDiff(x, y *data.Slice) float64 {
 	return math.Sqrt(float64(copyback(out)))
 }
 
-var reduceBuffers chan unsafe.Pointer // pool of 1-float CUDA buffers for reduce
+var reduceBuffers chan unsafe.Pointer                // pool of 1-float CUDA buffers for reduce
+var reduceBuffersN = map[int64]chan unsafe.Pointer{} // pool of N-float CUDA buffers for reduce
 
 // return a 1-float CUDA reduction buffer from a pool
 // initialized to initVal
@@ -78,6 +93,24 @@ func reduceBuf(initVal float32) unsafe.Pointer {
 	return buf
 }
 
+// return an N-float CUDA reduction buffer from a pool
+// initialized to initVal
+func reduceBufN(N int64, initVal float32) unsafe.Pointer {
+	const Nbufs = 128
+	q, ok := reduceBuffersN[N]
+	if !ok { // Create buffer channel for this N if it doesn't exist
+		q = make(chan unsafe.Pointer, Nbufs)
+		for i := 0; i < Nbufs; i++ {
+			q <- MemAlloc(N * cu.SIZEOF_FLOAT32)
+		}
+		reduceBuffersN[N] = q
+	}
+
+	buf := <-q
+	cu.MemsetD32Async(cu.DevicePtr(uintptr(buf)), math.Float32bits(initVal), N, stream0)
+	return buf
+}
+
 // copy back single float result from GPU and recycle buffer
 func copyback(buf unsafe.Pointer) float32 {
 	var result float32
@@ -86,16 +119,23 @@ func copyback(buf unsafe.Pointer) float32 {
 	return result
 }
 
+// copy back a slice of length N from GPU
+func copybackSlice(buf unsafe.Pointer, N int64) []float32 {
+	result := make([]float32, N)
+	MemCpyDtoH(unsafe.Pointer(&result[0]), buf, N*cu.SIZEOF_FLOAT32)
+	reduceBuffersN[N] <- buf
+	return result
+}
+
 // initialize pool of 1-float CUDA reduction buffers
 func initReduceBuf() {
-	const N = 128
-	reduceBuffers = make(chan unsafe.Pointer, N)
-	for i := 0; i < N; i++ {
+	const Nbufs = 128
+	reduceBuffers = make(chan unsafe.Pointer, Nbufs)
+	for i := 0; i < Nbufs; i++ {
 		reduceBuffers <- MemAlloc(1 * cu.SIZEOF_FLOAT32)
 	}
 }
 
 // launch configuration for reduce kernels
-// 8 is typ. number of multiprocessors.
-// could be improved but takes hardly ~1% of execution time
-var reducecfg = &config{Grid: cu.Dim3{X: 8, Y: 1, Z: 1}, Block: cu.Dim3{X: REDUCE_BLOCKSIZE, Y: 1, Z: 1}}
+// Grid size is set during cuda.Init to equal the number of multiprocessors.
+var reducecfg *config

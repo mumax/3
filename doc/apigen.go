@@ -186,8 +186,7 @@ func (a *api) FilterReturn(typ ...string) []*entry {
 	var E []*entry
 	for _, e := range a.Entries {
 		for _, t := range typ {
-			if match(t, e.Ret()) &&
-				!strings.HasPrefix(e.name, "ext_") {
+			if match(t, e.Ret()) && !strings.HasPrefix(e.name, "ext_") && !e.touched {
 				e.touched = true
 				E = append(E, e)
 			}

@@ -143,8 +143,11 @@ func graphIncompatibilityReason() string {
 	if !Temp.isZero() {
 		return "Temp != 0 is not supported (thermal field)"
 	}
-	if !isTimeIndependent(B_ext) || !isTimeIndependent(J) || !isTimeIndependent(FixedLayer) {
-		return "Time-dependent excitations (B_ext, J, FixedLayer) are not supported (no extraTerms or time-dependent per-region value)"
+	excitations := []Excitation{B_ext, J, FixedLayer, exx, exy, exz, eyy, eyz, ezz}
+	for _, e := range excitations {
+		if !e.guaranteedTimeIndependent() {
+			return "Time-dependent excitations (B_ext, J, FixedLayer, strain) are not supported (no extraTerms or time-dependent per-region value)"
+		}
 	}
 	if len(customTerms) != 0 {
 		return "custom field terms (AddFieldTerm) are not supported"
@@ -216,19 +219,6 @@ func hasTimeDependentRegion(p *regionwise) bool {
 		}
 	}
 	return false
-}
-
-// Returns true if the excitation e is constant in time in all regions.
-func isTimeIndependent(e *VectorExcitation) bool {
-	if len(e.extraTerms) > 0 {
-		return false
-	}
-	for r := range NREGION {
-		if e.perRegion.upd_reg[r] != nil {
-			return false
-		}
-	}
-	return true
 }
 
 // Perform one full torque evaluation on the default stream. This must be run

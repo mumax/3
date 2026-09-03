@@ -16,6 +16,10 @@ type mulmask struct {
 	mask *data.Slice
 }
 
+type Excitation interface {
+	guaranteedTimeIndependent() bool
+}
+
 // An excitation, typically field or current,
 // can be defined region-wise plus extra mask*multiplier terms.
 type VectorExcitation struct {
@@ -76,6 +80,20 @@ func (e *VectorExcitation) RemoveExtraTerms() {
 		m.mask.Free()
 	}
 	e.extraTerms = nil
+}
+
+// Returns true if the excitation e is guaranteed to be constant in time in all regions.
+// Conversely, returning false does not necessarily mean the excitation is time-dependent.
+func (e *VectorExcitation) guaranteedTimeIndependent() bool {
+	if len(e.extraTerms) > 0 {
+		return false
+	}
+	for r := range NREGION {
+		if e.perRegion.upd_reg[r] != nil {
+			return false
+		}
+	}
+	return true
 }
 
 // Add an extra mask*multiplier term to the excitation.
@@ -193,6 +211,20 @@ func (e *ScalarExcitation) RemoveExtraTerms() {
 		m.mask.Free()
 	}
 	e.extraTerms = nil
+}
+
+// Returns true if the excitation e is guaranteed to be constant in time in all regions.
+// Conversely, returning false does not necessarily mean the excitation is time-dependent.
+func (e *ScalarExcitation) guaranteedTimeIndependent() bool {
+	if len(e.extraTerms) > 0 {
+		return false
+	}
+	for r := range NREGION {
+		if e.perRegion.upd_reg[r] != nil {
+			return false
+		}
+	}
+	return true
 }
 
 // Add an extra mask*multiplier term to the excitation.

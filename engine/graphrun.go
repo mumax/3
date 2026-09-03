@@ -219,7 +219,7 @@ func hasTimeDependentRegion(p *regionwise) bool {
 }
 
 // Returns true if the excitation e is constant in time in all regions.
-func isTimeIndependent(e *Excitation) bool {
+func isTimeIndependent(e *VectorExcitation) bool {
 	if len(e.extraTerms) > 0 {
 		return false
 	}

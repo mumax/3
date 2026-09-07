@@ -160,7 +160,7 @@ func graphIncompatibilityReason() string {
 		}
 		excitations := []Excitation{B_ext, J, FixedLayer, exx, exy, exz, eyy, eyz, ezz}
 		for _, e := range excitations {
-			if !e.guaranteedTimeIndependent() {
+			if !e.assuredTimeIndependent() {
 				return "Time-dependent excitations (B_ext, J, FixedLayer, strain) are not supported (no extraTerms or time-dependent per-region value)"
 			}
 		}

@@ -17,7 +17,7 @@ type mulmask struct {
 }
 
 type Excitation interface {
-	guaranteedTimeIndependent() bool
+	assuredTimeIndependent() bool
 }
 
 // An excitation, typically field or current,
@@ -84,7 +84,7 @@ func (e *VectorExcitation) RemoveExtraTerms() {
 
 // Returns true if the excitation e is guaranteed to be constant in time in all regions.
 // Conversely, returning false does not necessarily mean the excitation is time-dependent.
-func (e *VectorExcitation) guaranteedTimeIndependent() bool {
+func (e *VectorExcitation) assuredTimeIndependent() bool {
 	if len(e.extraTerms) > 0 {
 		return false
 	}
@@ -215,7 +215,7 @@ func (e *ScalarExcitation) RemoveExtraTerms() {
 
 // Returns true if the excitation e is guaranteed to be constant in time in all regions.
 // Conversely, returning false does not necessarily mean the excitation is time-dependent.
-func (e *ScalarExcitation) guaranteedTimeIndependent() bool {
+func (e *ScalarExcitation) assuredTimeIndependent() bool {
 	if len(e.extraTerms) > 0 {
 		return false
 	}

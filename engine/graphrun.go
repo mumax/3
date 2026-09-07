@@ -144,18 +144,53 @@ func graphCompatible() bool {
 // Run()/Steps() graph path) cannot be used with the current configuration,
 // or the empty string "" if it can.
 func graphIncompatibilityReason() string {
-	if !Temp.isZero() {
-		return "Temp != 0 is not supported (thermal field)"
-	}
-	excitations := []Excitation{B_ext, J, FixedLayer, exx, exy, exz, eyy, eyz, ezz}
-	for _, e := range excitations {
-		if !e.guaranteedTimeIndependent() {
-			return "Time-dependent excitations (B_ext, J, FixedLayer, strain) are not supported (no extraTerms or time-dependent per-region value)"
+	// Is time frozen?
+	_, ok := stepper.(*Minimizer) // type assertion: "ok" is true if stepper is a Minimizer
+	timeFrozen := ok              // Of all steppers, only Minimizer does not advance time.
+	// NOTE: While relax() resets Time after each Step(), its Bogacki-Shampine solver does
+	// 		 increment Time within a Step(). Hence, relax() uses timeFrozen==false since
+	//       it is not entirely oblivious to time-dependent fields and material parameters.
+
+	if !timeFrozen {
+		// Disallow time-varying fields or material parameters.
+		// Their initial values at capture-time Time would get baked into the graph,
+		// resulting in them incorrectly being replayed unchanged, forever.
+		if !Temp.isZero() {
+			return "Temp != 0 is not supported (thermal field)"
+		}
+		excitations := []Excitation{B_ext, J, FixedLayer, exx, exy, exz, eyy, eyz, ezz}
+		for _, e := range excitations {
+			if !e.guaranteedTimeIndependent() {
+				return "Time-dependent excitations (B_ext, J, FixedLayer, strain) are not supported (no extraTerms or time-dependent per-region value)"
+			}
+		}
+		if len(customTerms) != 0 {
+			return "custom field terms (AddFieldTerm) are not supported"
+		}
+
+		// Material parameters feeding the captured effective-field
+		// (AddExchangeField/AddAnisotropyField/AddMagnetoelasticField/
+		// SetDemagField) and torque (torqueFn) kernels. If any of these is set
+		// to a per-region time-dependent function (SetRegion/SetRegionFn with
+		// an expression containing t), the LUT/scalar kernel argument baked
+		// into the captured graph would be frozen at capture-time Time and
+		// replayed unchanged forever.
+		materialParams := []*regionwise{
+			&Temp.regionwise, &NoDemagSpins.regionwise, // Zero at t=0 (checked earlier) doesn't imply time-independence
+			&Msat.regionwise, &Aex.regionwise, &Dind.regionwise, &Dbulk.regionwise,
+			&Ku1.regionwise, &Ku2.regionwise, &Kc1.regionwise, &Kc2.regionwise, &Kc3.regionwise,
+			&AnisU.regionwise, &AnisC1.regionwise, &AnisC2.regionwise,
+			&B1.regionwise, &B2.regionwise,
+			&Alpha.regionwise, &Xi.regionwise, &Pol.regionwise, &Lambda.regionwise,
+			&EpsilonPrime.regionwise, &FrozenSpins.regionwise, &FreeLayerThickness.regionwise,
+		}
+		for _, p := range materialParams {
+			if hasTimeDependentRegion(p) {
+				return p.name + " must be time-independent (SetRegion/SetRegionFn with a function of t is not supported)"
+			}
 		}
 	}
-	if len(customTerms) != 0 {
-		return "custom field terms (AddFieldTerm) are not supported"
-	}
+
 	if !NoDemagSpins.isZero() {
 		// SetDemagField takes the setMaskedDemagField path (engine/demag.go),
 		// which calls data.Copy on the geometry mask. data.Copy goes through
@@ -164,28 +199,6 @@ func graphIncompatibilityReason() string {
 		// CUDA_ERROR_STREAM_CAPTURE_UNSUPPORTED), same class of issue as the
 		// blocking MemCpyDtoH in MaxVecDiff/MaxVecNorm (see Box 1.3 of You2026).
 		return "NoDemagSpins != 0 is not supported (masked demag field)"
-	}
-
-	// Material parameters feeding the captured effective-field
-	// (AddExchangeField/AddAnisotropyField/AddMagnetoelasticField/
-	// SetDemagField) and torque (torqueFn) kernels. If any of these is set
-	// to a per-region time-dependent function (SetRegion/SetRegionFn with
-	// an expression containing t), the LUT/scalar kernel argument baked
-	// into the captured graph would be frozen at capture-time Time and
-	// replayed unchanged forever.
-	materialParams := []*regionwise{
-		&Temp.regionwise, &NoDemagSpins.regionwise, // Zero at t=0 (checked earlier) doesn't imply time-independence
-		&Msat.regionwise, &Aex.regionwise, &Dind.regionwise, &Dbulk.regionwise,
-		&Ku1.regionwise, &Ku2.regionwise, &Kc1.regionwise, &Kc2.regionwise, &Kc3.regionwise,
-		&AnisU.regionwise, &AnisC1.regionwise, &AnisC2.regionwise,
-		&B1.regionwise, &B2.regionwise,
-		&Alpha.regionwise, &Xi.regionwise, &Pol.regionwise, &Lambda.regionwise,
-		&EpsilonPrime.regionwise, &FrozenSpins.regionwise, &FreeLayerThickness.regionwise,
-	}
-	for _, p := range materialParams {
-		if hasTimeDependentRegion(p) {
-			return p.name + " must be time-independent (SetRegion/SetRegionFn with a function of t is not supported)"
-		}
 	}
 	return ""
 }

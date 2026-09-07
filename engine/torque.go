@@ -16,11 +16,11 @@ var (
 	EpsilonPrime                     = NewScalarParam("EpsilonPrime", "", "Slonczewski secondairy STT term ε'")
 	FrozenSpins                      = NewScalarParam("frozenspins", "", "Defines spins that should be fixed") // 1 - frozen, 0 - free. TODO: check if it only contains 0/1 values
 	FreeLayerThickness               = NewScalarParam("FreeLayerThickness", "m", "Slonczewski free layer thickness (if set to zero (default), then the thickness will be deduced from the mesh size)")
-	FixedLayer                       = NewExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
+	FixedLayer                       = NewVectorExcitation("FixedLayer", "", "Slonczewski fixed layer polarization")
 	Torque                           = NewVectorField("torque", "T", "Total torque/γ0", SetTorque)
 	LLTorque                         = NewVectorField("LLtorque", "T", "Landau-Lifshitz torque/γ0", SetLLTorque)
 	STTorque                         = NewVectorField("STTorque", "T", "Spin-transfer torque/γ0", AddSTTorque)
-	J                                = NewExcitation("J", "A/m2", "Electrical current density")
+	J                                = NewVectorExcitation("J", "A/m2", "Electrical current density")
 	MaxTorque                        = NewScalarValue("maxTorque", "T", "Maximum torque/γ0, over all cells", GetMaxTorque)
 	GammaLL                  float64 = 1.7595e11 // Gyromagnetic ratio of spins, in rad/Ts
 	Precess                          = true

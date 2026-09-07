@@ -65,11 +65,35 @@ func tryCuInit() {
 	cu.Init(0)
 }
 
-// Global stream used for everything
-const stream0 = cu.Stream(0)
+// Global stream used by all *_wrapper.go kernel launches. However, the NULL
+// stream does not support CUDA Graph capture, so during capture/replay this
+// is temporarily redirected to a dedicated stream (see EnterCaptureMode).
+var stream0 = cu.Stream(0)
 
 // Synchronize the global stream
 // This is called before and after all memcopy operations between host and device.
 func Sync() {
 	stream0.Synchronize()
+}
+
+// Redirects stream0 to a freshly created stream suitable for CUDA Graph
+// capture (cuStreamBeginCapture is not supported on the NULL stream), and
+// returns that stream.
+//
+// All kernel launches reference stream0 directly and are hereby appropriately
+// redirected. However, FFT plans are bound to a stream at creation time, and
+// must therefore be rebound separately (see DemagConvolution.SetStream).
+//
+// Must be paired with a call to ExitCaptureMode.
+func EnterCaptureMode() cu.Stream {
+	captureStream := cu.StreamCreate()
+	stream0 = captureStream
+	return captureStream
+}
+
+// Restores stream0 to the NULL/legacy default stream and
+// destroys the stream created by EnterCaptureMode.
+func ExitCaptureMode(captureStream cu.Stream) {
+	stream0 = cu.Stream(0)
+	captureStream.Destroy()
 }

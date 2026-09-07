@@ -282,8 +282,10 @@ func checkInject() bool {
 // from step to step, the entire step can be captured once into a single graph
 // and replayed unchanged for n steps.
 func runGraphHeunFixedDt(condition func() bool) bool {
-	SanityCheck()
-	pause = false
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+	}
 	DoOutput()
 
 	util.Assert(FixDt != 0)
@@ -336,9 +338,13 @@ func runGraphHeunFixedDt(condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing {
+		pause = true
+	}
 	return fellBack
 }
 
@@ -353,8 +359,10 @@ func runGraphHeunFixedDt(condition func() bool) bool {
 // that can not be captured by graphs (e.g., Madd2, Madd3, MaxVecDiff...)
 // remain interspersed between graph launches.
 func runGraphHeunAdaptive(condition func() bool) bool {
-	SanityCheck()
-	pause = false
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+	}
 	DoOutput()
 
 	y := M.Buffer()
@@ -430,9 +438,13 @@ func runGraphHeunAdaptive(condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing {
+		pause = true
+	}
 	return fellBack
 }
 
@@ -447,9 +459,11 @@ func runGraphHeunAdaptive(condition func() bool) bool {
 // not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
 // between graph launches.
 func runGraphRK23(rk *RK23, condition func() bool) bool {
-	SanityCheck()
-	pause = false
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+		rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	}
 	DoOutput()
 
 	m := M.Buffer()
@@ -566,9 +580,13 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing {
+		pause = true
+	}
 	return fellBack
 }
 
@@ -583,9 +601,11 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 // not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
 // between graph launches.
 func runGraphRK4(rk *RK4, condition func() bool) bool {
-	SanityCheck()
-	pause = false
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+		rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	}
 	DoOutput()
 
 	m := M.Buffer()
@@ -691,9 +711,13 @@ func runGraphRK4(rk *RK4, condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing {
+		pause = true
+	}
 	return fellBack
 }
 
@@ -708,9 +732,11 @@ func runGraphRK4(rk *RK4, condition func() bool) bool {
 // not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
 // between graph launches.
 func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
-	SanityCheck()
-	pause = false
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+		rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	}
 	DoOutput()
 
 	m := M.Buffer()
@@ -844,9 +870,13 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing { // Relax() sets this afterwards (Relax() calls this function multiple times)
+		pause = true
+	}
 	return fellBack
 }
 
@@ -861,9 +891,11 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 // not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
 // between graph launches.
 func runGraphRK56(rk *RK56, condition func() bool) bool {
-	SanityCheck()
-	pause = false
-	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	if !relaxing { // Relax() already calls these explicitly
+		SanityCheck()
+		pause = false
+		rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	}
 	DoOutput()
 
 	m := M.Buffer()
@@ -1006,9 +1038,13 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 		for _, f := range postStep {
 			f()
 		}
-		DoOutput()
+		if !relaxing { // Don't save output during Relax()
+			DoOutput()
+		}
 	}
-	pause = true
+	if !relaxing {
+		pause = true
+	}
 	return fellBack
 }
 

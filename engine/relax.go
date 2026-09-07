@@ -126,6 +126,10 @@ func relaxSteps(n int) {
 	stop := NSteps + n
 	cond := func() bool { return NSteps < stop }
 	const output = false
-	runWhile(cond, output)
+	if tryRunGraph(cond) {
+		Refer("You2026")
+	} else {
+		runWhile(cond, output)
+	}
 	Time = t0
 }

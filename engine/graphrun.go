@@ -60,6 +60,8 @@ func StepsGraph(n int) {
 		}
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
+	case *RK4:
+		fellBack = runGraphRK4(s, condition)
 	case *RK45DP:
 		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
@@ -98,6 +100,8 @@ func tryRunGraph(condition func() bool) bool {
 		}
 	case *RK23:
 		fellBack = runGraphRK23(s, condition)
+	case *RK4:
+		fellBack = runGraphRK4(s, condition)
 	case *RK45DP:
 		fellBack = runGraphRK45DP(s, condition)
 	case *RK56:
@@ -557,6 +561,131 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 			data.Copy(m, m0)
 			NUndone++
 			adaptDt(math.Pow(MaxErr/err, 1./4.))
+		}
+
+		for _, f := range postStep {
+			f()
+		}
+		DoOutput()
+	}
+	pause = true
+	return fellBack
+}
+
+// Implements StepsGraph/tryRunGraph for Runge-Kutta (solver 4),
+// using the "split graph" approach (see Sec. 4.1 in You2026).
+//
+// Since the kernel sequence computing the torque is independent of dt and M
+// (only the addresses of the buffers matter, which are fixed), it suffices to
+// capture torqueFn(k1)..torqueFn(k4) once before the loop, as small graphs
+// execK1..execK4. The loop body then mirrors RK4.Step exactly but with
+// torqueFn calls replaced by GraphExec.Launch calls. Other functions that can
+// not be captured by graphs (e.g., Madd2, MaxVecDiff...) remain interspersed
+// between graph launches.
+func runGraphRK4(rk *RK4, condition func() bool) bool {
+	SanityCheck()
+	pause = false
+	rk.Free() // mirror RunWhile's stepper.Free(): start from a clean state
+	DoOutput()
+
+	m := M.Buffer()
+	size := m.Size()
+
+	m0 := cuda.Buffer(3, size)
+	defer cuda.Recycle(m0)
+
+	k1, k2, k3, k4 := cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size), cuda.Buffer(3, size)
+	defer cuda.Recycle(k1)
+	defer cuda.Recycle(k2)
+	defer cuda.Recycle(k3)
+	defer cuda.Recycle(k4)
+
+	warmupTorque(m)
+
+	captureStream := cuda.EnterCaptureMode()
+	demagConv().SetStream(captureStream)
+	defer func() {
+		demagConv().SetStream(cu.Stream(0))
+		cuda.ExitCaptureMode(captureStream)
+	}()
+
+	dsts := [4]*data.Slice{k1, k2, k3, k4}
+	var graphs [4]cu.Graph
+	var execs [4]cu.GraphExec
+	for i, dst := range dsts {
+		captureStream.BeginCapture(cu.STREAM_CAPTURE_MODE_THREAD_LOCAL)
+		if i > 0 {
+			M.normalize()
+		}
+		torqueFn(dst)
+		graphs[i] = captureStream.EndCapture()
+		execs[i] = graphs[i].Instantiate()
+	}
+	defer func() {
+		for i := range execs {
+			execs[i].Destroy()
+			graphs[i].Destroy()
+		}
+	}()
+	execK1, execK2, execK3, execK4 := execs[0], execs[1], execs[2], execs[3]
+
+	fellBack := false
+	for condition() && !pause {
+		if checkInject() {
+			if !pause {
+				fellBack = true
+			}
+			break
+		}
+
+		if FixDt != 0 {
+			Dt_si = FixDt
+		}
+
+		t0 := Time
+		data.Copy(m0, m)
+
+		h := float32(Dt_si * GammaLL)
+
+		// stage 1
+		execK1.Launch(captureStream)
+		NEvals++
+
+		// stage 2
+		Time = t0 + (1./2.)*Dt_si
+		cuda.Madd2(m, m, k1, 1, (1./2.)*h) // m = m*1 + k1*h/2
+		execK2.Launch(captureStream)
+		NEvals++
+
+		// stage 3
+		cuda.Madd2(m, m0, k2, 1, (1./2.)*h) // m = m0*1 + k2*1/2
+		execK3.Launch(captureStream)
+		NEvals++
+
+		// stage 4
+		Time = t0 + Dt_si
+		cuda.Madd2(m, m0, k3, 1, 1.*h) // m = m0*1 + k3*1
+		execK4.Launch(captureStream)
+		NEvals++
+
+		err := cuda.MaxVecDiff(k1, k4) * float64(h)
+
+		// adjust next time step
+		if err < MaxErr || Dt_si <= MinDt || FixDt != 0 { // mindt check to avoid infinite loop
+			// step OK
+			// 4th order solution
+			cuda.Madd5(m, m0, k1, k2, k3, k4, 1, (1./6.)*h, (1./3.)*h, (1./3.)*h, (1./6.)*h)
+			M.normalize()
+			NSteps++
+			adaptDt(math.Pow(MaxErr/err, 1./4.))
+			setLastErr(err)
+		} else {
+			// undo bad step
+			util.Assert(FixDt == 0)
+			Time = t0
+			data.Copy(m, m0)
+			NUndone++
+			adaptDt(math.Pow(MaxErr/err, 1./5.))
 		}
 
 		for _, f := range postStep {

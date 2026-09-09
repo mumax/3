@@ -20,7 +20,7 @@ set xtics scale 0
 #set title "Mumax3 GPU performance for 2D simulations containing 4 million cells" font ",12" textcolor "#888888"
 #set logscale y 10
 
-set yrange[1:2000]
+set yrange[1:2600]
 plot "gpus.txt" u ($0+1):($2/1e6):xtic(4) w boxes title " ", "oommf4M.txt" u (0):(4*$1**2 * $2 /$3/1e6):xtic("OOMMF (CPU)") w boxes
 
 set output

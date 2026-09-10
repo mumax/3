@@ -9,11 +9,8 @@ import (
 	"github.com/mumax/3/util"
 )
 
-//#include "reduce.h"
-import "C"
-
 // Block size for reduce kernels.
-const REDUCE_BLOCKSIZE = C.REDUCE_BLOCKSIZE
+const REDUCE_BLOCKSIZE = 512
 
 // Sum of all elements.
 func Sum(in *data.Slice) float32 {

@@ -8,6 +8,77 @@ Paper on the design and verification of MuMax3: <http://scitation.aip.org/conten
 
 <!-- [![Build Status](https://travis-ci.org/mumax/3.svg?branch=master)](https://travis-ci.org/mumax/3) -->
 
+## Apple Silicon macOS
+
+On an M1 or newer Mac running macOS 14 or later, mumax³ uses Metal compute
+shaders, Apple unified memory, an MPSGraph FFT with the packed R2C/C2R layout
+used by cuFFT, and a Philox thermal-noise generator. The `.mx3` language,
+high-level Go solver, physical terms, integration methods, and output formats
+are shared with the CUDA build. Intel Macs are not supported.
+
+### Automated installation
+
+On a fresh Mac, open Terminal and run:
+
+```bash
+/bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/mumax/3/master/install-macos.sh)"
+```
+
+The installer verifies the host, opens the Apple Command Line Tools installer
+when required, installs native Homebrew and Go 1.22.4 or later when missing,
+clones mumax³ into `~/mumax3`, builds the Metal backend, adds the binary path to
+`~/.zprofile`, and runs `mumax3 -test`. It can be run again after an
+interruption. Use `./install-macos.sh --help` when installing from an existing
+checkout or choosing another source directory.
+
+### Manual installation
+
+Install each dependency and build the source separately.
+
+1. Start the Apple Command Line Tools installer and finish the installation
+   window before continuing.
+
+```bash
+xcode-select --install
+```
+
+2. Install native Homebrew and Go.
+
+```bash
+/bin/bash -c "$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew install go
+```
+
+3. Clone and build mumax³. The Makefile selects Metal automatically on
+   `darwin/arm64`.
+
+```bash
+git clone https://github.com/mumax/3.git
+cd 3
+MACOSX_DEPLOYMENT_TARGET=14.0 CGO_ENABLED=1 make
+```
+
+4. Save the installed binary directory in the shell profile and verify the
+   Metal backend.
+
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+printf '\nexport PATH="%s:$PATH"\n' "$(go env GOPATH)/bin" >> ~/.zprofile
+mumax3 -test
+```
+
+The full Xcode application and CUDA are not required. Generated Metal shaders
+compile through the system runtime when the offline Metal compiler is absent.
+Run a simulation with the live Web UI using `mumax3 example.mx3`, or use
+`mumax3 -http="" example.mx3` for headless execution. `make check-metal` runs
+the generator, shader, FFT, random-number, GPU, and build checks.
+
+The Metal backend preserves mumax³'s single-precision numerical model. Parallel
+reductions may differ in their last floating-point bits. Thermal simulations
+use Philox rather than cuRAND's XORWOW sequence, so a seed is reproducible on
+Metal but does not select the same sample sequence as CUDA.
+
 ## Downloads and documentation
 
 👉 Pre-compiled binaries, examples, and documentation are available on the [mumax³ homepage](https://mumax.github.io).

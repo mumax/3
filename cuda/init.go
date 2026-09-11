@@ -51,6 +51,9 @@ func Init(gpu int) {
 
 	// test PTX load so that we can catch CUDA_ERROR_NO_BINARY_FOR_GPU early
 	fatbinLoad(madd2_map, "madd2")
+
+	// Set CUDA Graph capture stream
+	captureStream = cu.StreamCreate()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.
@@ -76,7 +79,11 @@ func Sync() {
 	stream0.Synchronize()
 }
 
-// Redirects stream0 to a freshly created stream suitable for CUDA Graph
+// Global asynchronous stream used during CUDA Graph capture
+// (cuStreamBeginCapture is not supported on the NULL stream).
+var captureStream cu.Stream
+
+// Redirects stream0 to captureStream, which is suitable for CUDA Graph
 // capture (cuStreamBeginCapture is not supported on the NULL stream), and
 // returns that stream.
 //
@@ -86,7 +93,6 @@ func Sync() {
 //
 // Must be paired with a call to ExitCaptureMode.
 func EnterCaptureMode() cu.Stream {
-	captureStream := cu.StreamCreate()
 	stream0 = captureStream
 	return captureStream
 }
@@ -95,5 +101,4 @@ func EnterCaptureMode() cu.Stream {
 // destroys the stream created by EnterCaptureMode.
 func ExitCaptureMode(captureStream cu.Stream) {
 	stream0 = cu.Stream(0)
-	captureStream.Destroy()
 }

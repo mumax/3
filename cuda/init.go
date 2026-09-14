@@ -17,7 +17,7 @@ var (
 	GPUInfo       string     // Human-readable GPU description
 	Synchronous   bool       // for debug: synchronize stream0 at every kernel launch
 	cudaCtx       cu.Context // global CUDA context
-	cudaCC        int        // compute capablity (used for fatbin)
+	CudaCC        int        // compute capablity (used for fatbin)
 )
 
 // Locks to an OS thread and initializes CUDA for that thread.
@@ -33,7 +33,7 @@ func Init(gpu int) {
 	cudaCtx.SetCurrent()
 
 	M, m := dev.ComputeCapability()
-	cudaCC = 10*M + m
+	CudaCC = 10*M + m
 	DriverVersion = cu.Version()
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()

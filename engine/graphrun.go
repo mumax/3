@@ -27,6 +27,18 @@ func init() {
 		"<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields/excitations are defined.")
 }
 
+// CUDA Graphs have been supported from CUDA 10.0 onwards.
+// CUDA 10.0 added support for Compute Capability 7.2 and 7.5.
+// Hence, GPUs with CC <= 7.0 may not benefit from CUDA Graphs or, at worst,
+// suffer performance loss by using Graphs (this can occur during relax()).
+//
+// Once CudaCC is set, this function should be called to optimize performance.
+func CheckGraphsCC() {
+	if cuda.CudaCC > 0 && cuda.CudaCC <= 70 { // CUDA 10.0 added support for both CUDA Graphs and for CC 7.2 & 7.5.
+		EnableCUDAgraphs = false // On older GPUs, using graphs can actually harm performance.
+	}
+}
+
 // StepsGraph performs n further steps, capturing the GPU work of the torque
 // evaluation(s) into one or more CUDA Graphs and replaying them for the
 // remaining steps. Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the

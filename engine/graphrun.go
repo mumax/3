@@ -4,7 +4,7 @@ package engine
 //
 // nsys profiling showed that for small/medium grids, 75~79% of step time is
 // spent in cuLaunchKernel driver calls (~27 per step), not in the kernels
-// themselves. StepsGraph captures the torque-evaluation kernel sequences as
+// themselves. tryRunGraph captures the torque-evaluation kernel sequences as
 // CUDA Graphs and replays them with a single cuGraphLaunch each, instead of
 // ~13 individual cuLaunchKernel calls per evaluation, resulting in a 3-5x
 // speedup on small grids (depending on the solver used).
@@ -21,8 +21,6 @@ import (
 var EnableCUDAgraphs = true
 
 func init() {
-	DeclFunc("StepsGraph", StepsGraph, "Like Steps, but captures the torque-evaluation kernels as CUDA Graphs and "+
-		"replays them for the remaining steps. Supports Heun, RK23, RK45DP (default) and RK56.")
 	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run() and Steps() on small grids (default=true)"+
 		"<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields/excitations are defined.")
 }
@@ -39,10 +37,12 @@ func CheckGraphsCC() {
 	}
 }
 
-// StepsGraph performs n further steps, capturing the GPU work of the torque
-// evaluation(s) into one or more CUDA Graphs and replaying them for the
-// remaining steps. Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the
-// default) and RK56 (solver(6)) are supported.
+// Attempt to run the simulation using the CUDA Graph capture/replay path
+// instead of RunWhile, returning true if it did so. It returns false (without
+// side effects) if the current configuration is not graphCompatible(), the
+// mesh is too large to benefit (graphWorthwhile()), or the current solver has
+// no graph runner. If false is returned, the caller (Run/Steps) should fall
+// back to RunWhile(condition).
 //
 // In all solvers (except Heun with FixDt != 0), dt and/or the accept/reject
 // decision change every step and depend on a blocking host readback (e.g.,
@@ -52,51 +52,6 @@ func CheckGraphsCC() {
 // Madd*/error-estimate/normalize/adaptDt/accept-reject/FSAL steps run as
 // ordinary (uncaptured) calls in the replay loop, exactly as in the
 // corresponding Step().
-func StepsGraph(n int) {
-	if n <= 0 {
-		return
-	}
-
-	assertGraphCompatible()
-
-	stop := NSteps + n
-	condition := func() bool { return NSteps < stop }
-
-	var fellBack bool
-	switch s := stepper.(type) {
-	case *Heun:
-		if FixDt != 0 {
-			fellBack = runGraphHeunFixedDt(condition)
-		} else {
-			fellBack = runGraphHeunAdaptive(condition)
-		}
-	case *RK23:
-		fellBack = runGraphRK23(s, condition)
-	case *RK4:
-		fellBack = runGraphRK4(s, condition)
-	case *RK45DP:
-		fellBack = runGraphRK45DP(s, condition)
-	case *RK56:
-		fellBack = runGraphRK56(s, condition)
-	case *Minimizer:
-		fellBack = runGraphMinimizer(s, condition)
-	default:
-		util.AssertMsg(false, "StepsGraph: requires Heun (solver(2)), RK23 (solver(3)), RK45DP (solver(5), the default) or RK56 (solver(6))")
-	}
-	// An Inject (GUI/script) call mid-replay may have changed state the
-	// captured graphs depend on; see checkInject. Finish the remaining steps
-	// the safe (non-graph) way.
-	if fellBack {
-		RunWhile(condition)
-	}
-}
-
-// Attempt to run the simulation using the CUDA Graph capture/replay path
-// instead of RunWhile, returning true if it did so. It returns false (without
-// side effects) if the current configuration is not graphCompatible(), the
-// mesh is too large to benefit (graphWorthwhile()), or the current solver has
-// no graph runner. If false is returned, the caller (Run/Steps) should fall
-// back to RunWhile(condition).
 func tryRunGraph(condition func() bool) bool {
 	if !graphCompatible() || !graphWorthwhile() || !EnableCUDAgraphs {
 		return false
@@ -132,19 +87,12 @@ func tryRunGraph(condition func() bool) bool {
 	return true
 }
 
-// Panics if the current configuration is outside the envelope StepsGraph has
+// Returns true if the current configuration is within the envelope graphs have
 // been verified for: constant excitation, Temp == 0, no custom field terms,
 // and no region-wise time-dependent material parameters (see Sec. 6.3 of
 // You2026). Outside this envelope, a captured graph would replay a stale
 // kernel sequence (fixed Time/RNG state/LUTs/etc.) every step, silently
 // producing wrong results instead of erroring out.
-func assertGraphCompatible() {
-	if reason := graphIncompatibilityReason(); reason != "" {
-		util.AssertMsg(false, "StepsGraph: "+reason)
-	}
-}
-
-// Returns true if the current configuration is within the envelope
 // assertGraphCompatible requires, without panicking. Used by the transparent
 // Run()/Steps() graph dispatch (tryRunGraph in run.go) to decide,
 // side-effect-free, whether the graph path may be used.
@@ -152,9 +100,8 @@ func graphCompatible() bool {
 	return graphIncompatibilityReason() == ""
 }
 
-// Returns a human-readable reason why StepsGraph (or the transparent
-// Run()/Steps() graph path) cannot be used with the current configuration,
-// or the empty string "" if it can.
+// Returns a human-readable reason why CUDA Graphs cannot be used with the
+// current configuration, or the empty string "" if it can.
 func graphIncompatibilityReason() string {
 	// Is time frozen?
 	_, ok := stepper.(*Minimizer) // type assertion: "ok" is true if stepper is a Minimizer
@@ -218,7 +165,7 @@ func graphIncompatibilityReason() string {
 // graphMaxCells is the cell-count threshold above which the transparent
 // Run()/Steps() graph path is not used, even if graphCompatible(). This value
 // is chosen for CUDA Graph Capture to yield a >5% performance increase, based
-// on the StepsGraph speedups reported in Fig. 3 of You2026:
+// on the speedups reported in Fig. 3 of You2026:
 //   - 512x512x1 (262,144 cells): ~1.3-1.5x
 //   - 700x700x1 (490,000 cells): ~1.14x
 //   - 800x800x1 (640,000 cells): ~1.06x
@@ -237,7 +184,7 @@ func graphWorthwhile() bool {
 // instantiating the split-graph(s) has a fixed one-time cost (stream capture
 // + cuGraphInstantiate per graph); this heuristic ensures it is amortized
 // over enough replayed steps to be worthwhile. Tunable; not load-bearing for
-// correctness (StepsGraph itself has no such threshold).
+// correctness.
 const graphMinSteps = 20
 
 // Returns true if p has been set to a time-dependent function in any region.
@@ -286,9 +233,9 @@ func warmupTorque(m *data.Slice) {
 // Note that f may affect the solver global variable "pause". If pause==true,
 // the runGraph* replay loop should exit normally (just like runWhile would).
 // If pause==false, runGraph* should return true after interrupting its loop,
-// such that its caller (StepsGraph/tryRunGraph) then finishes the remaining
-// steps via RunWhile, which re-derives everything from the (possibly changed)
-// global state and is correct regardless of what f changed.
+// such that tryRunGraph then finishes the remaining steps via RunWhile, which
+// re-derives everything from the (possibly changed) global state and is
+// correct regardless of what f changed.
 func checkInject() bool {
 	select {
 	case i := <-Inject:
@@ -302,7 +249,7 @@ func checkInject() bool {
 	}
 }
 
-// Implements StepsGraph/tryRunGraph for Heun (solver 2) FixDt != 0.
+// Implements tryRunGraph for Heun (solver 2) FixDt != 0.
 // Since every kernel's scalar arguments (dt, region LUTs, ...) are constant
 // from step to step, the entire step can be captured once into a single graph
 // and replayed unchanged for n steps.
@@ -373,7 +320,7 @@ func runGraphHeunFixedDt(condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Heun (solver 2) for FixDt == 0,
+// Implements tryRunGraph for Heun (solver 2) for FixDt == 0,
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M
@@ -473,7 +420,7 @@ func runGraphHeunAdaptive(condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Bogacki-Shampine (solver 3),
+// Implements tryRunGraph for Bogacki-Shampine (solver 3),
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M
@@ -615,7 +562,7 @@ func runGraphRK23(rk *RK23, condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Runge-Kutta (solver 4),
+// Implements tryRunGraph for Runge-Kutta (solver 4),
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M
@@ -746,7 +693,7 @@ func runGraphRK4(rk *RK4, condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Dormand-Prince (solver 5),
+// Implements tryRunGraph for Dormand-Prince (solver 5),
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M
@@ -905,7 +852,7 @@ func runGraphRK45DP(rk *RK45DP, condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Runge-Kutta-Fehlberg (solver 6),
+// Implements tryRunGraph for Runge-Kutta-Fehlberg (solver 6),
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M
@@ -1073,7 +1020,7 @@ func runGraphRK56(rk *RK56, condition func() bool) bool {
 	return fellBack
 }
 
-// Implements StepsGraph/tryRunGraph for Minimize,
+// Implements tryRunGraph for Minimize,
 // using the "split graph" approach (see Sec. 4.1 in You2026).
 //
 // Since the kernel sequence computing the torque is independent of dt and M

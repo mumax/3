@@ -26,6 +26,13 @@ func init() {
 // are we relaxing?
 var relaxing = false
 
+// On grids larger than approx. graphMaxStepsRelax, two effects happen:
+//   - CUDA Graphs hinder performance rather than improving it
+//   - The optimal value of N in Relax() changes to 1
+//
+// Value benchmarked on RTX 3080 mobile (other GPUs may differ).
+var graphMaxStepsRelax = 250000
+
 func Relax() bool {
 
 	// if wall-clock time is zero, skip Relaxing entirely (zero steps), and don't change any settings
@@ -63,9 +70,15 @@ func Relax() bool {
 	Precess = false
 	relaxing = true
 
+	// Evaluate energy (expensive) every N steps
+	N := 7 // At this N, performance starts to saturate when using CUDA Graphs (without graphs, this starts at lower N)
+	size := Mesh().Size()
+	if size[0]*size[1]*size[2] > graphMaxStepsRelax {
+		N = 1 // For large grids, taking multiple steps at once often hurts performance.
+	}
+
 	// Minimize energy: take steps as long as energy goes down.
 	// This stops when energy reaches the numerical noise floor.
-	const N = 3 // evaluate energy (expensive) every N steps
 	relaxSteps(N)
 	E0 := GetTotalEnergy()
 	relaxSteps(N)
@@ -126,6 +139,11 @@ func relaxSteps(n int) {
 	stop := NSteps + n
 	cond := func() bool { return NSteps < stop }
 	const output = false
-	runWhile(cond, output)
+	size := Mesh().Size()
+	if size[0]*size[1]*size[2] <= graphMaxStepsRelax && tryRunGraph(cond) {
+		Refer("You2026")
+	} else {
+		runWhile(cond, output)
+	}
 	Time = t0
 }

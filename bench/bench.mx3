@@ -1,3 +1,5 @@
+EnableCUDAgraphs = false
+
 msat  = 800e3
 aex   = 13e-12
 alpha = 0.01

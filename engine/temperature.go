@@ -91,7 +91,7 @@ func (b *thermField) update() {
 	}
 
 	N := Mesh().NCell()
-	if !PrintedWarningTempOddGrid && N%2 > 0 { // T is nonzero if we have gotten this far. As noted in issue #314, this means the grid size must be even.
+	if cuda.Backend == "CUDA" && !PrintedWarningTempOddGrid && N%2 > 0 { // cuRAND requires an even sample count; Metal's Philox path accepts odd counts.
 		PrintedWarningTempOddGrid = true
 		warnStr := "// WARNING: nonzero temperature requires an even amount of grid cells,\n" +
 			"//          but all axes have an odd number of cells: %v.\n" +

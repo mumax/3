@@ -17,15 +17,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mumax/3/cuda/cu"
+	"github.com/mumax/3/cuda"
 	"github.com/mumax/3/timer"
 )
 
 const VERSION = "mumax 3.12"
 
-var UNAME = fmt.Sprintf("%s [%s_%s %s(%s) CUDA-%d.%d]",
+var UNAME = fmt.Sprintf("%s [%s_%s %s(%s) %s-%s]",
 	VERSION, runtime.GOOS, runtime.GOARCH, runtime.Version(), runtime.Compiler,
-	cu.CUDA_VERSION/1000, (cu.CUDA_VERSION%1000)/10)
+	cuda.Backend, cuda.BackendVersion)
 
 var StartTime = time.Now()
 

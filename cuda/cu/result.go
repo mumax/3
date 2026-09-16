@@ -1,3 +1,6 @@
+//go:build !darwin || !arm64
+// +build !darwin !arm64
+
 package cu
 
 // This file provides access to CUDA driver error statuses (type CUresult).

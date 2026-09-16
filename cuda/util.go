@@ -8,11 +8,7 @@ import (
 // CUDA Launch parameters.
 // there might be better choices for recent hardware,
 // but it barely makes a difference in the end.
-const (
-	BlockSize    = 512
-	TileX, TileY = 32, 32
-	MaxGridSize  = 65535
-)
+const MaxGridSize = 65535
 
 // cuda launch configuration
 type config struct {

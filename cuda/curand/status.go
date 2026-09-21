@@ -1,3 +1,5 @@
+//go:build !hip
+
 package curand
 
 //#include <curand.h>

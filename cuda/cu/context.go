@@ -2,7 +2,14 @@ package cu
 
 // This file implements CUDA driver context management
 
-//#include <cuda.h>
+/*
+#include <cuda.h>
+
+// CUDA 13.x redefines cuCtxCreate as cuCtxCreate_v4, which takes an extra
+// CUctxCreateParams* argument. cuCtxCreate_v2 keeps the old 3-argument ABI
+// and remains a valid exported driver symbol.
+CUresult cuCtxCreate_v2(CUcontext *pctx, unsigned int flags, CUdevice dev);
+*/
 import "C"
 import "unsafe"
 
@@ -12,7 +19,7 @@ type Context uintptr
 // Create a CUDA context.
 func CtxCreate(flags uint, dev Device) Context {
 	var ctx C.CUcontext
-	err := Result(C.cuCtxCreate(&ctx, C.uint(flags), C.CUdevice(dev)))
+	err := Result(C.cuCtxCreate_v2(&ctx, C.uint(flags), C.CUdevice(dev)))
 	if err != SUCCESS {
 		panic(err)
 	}

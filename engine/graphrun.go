@@ -105,6 +105,10 @@ func graphCompatible() bool {
 // Returns a human-readable reason why CUDA Graphs cannot be used with the
 // current configuration, or the empty string "" if it can.
 func graphIncompatibilityReason() string {
+	if *Flag_sync { // Graphs are incompatible with synchronizing calls
+		return "'-sync' command-line flag prevents the use of graphs"
+	}
+
 	// Is time frozen?
 	_, ok := stepper.(*Minimizer) // type assertion: "ok" is true if stepper is a Minimizer
 	timeFrozen := ok              // Of all steppers, only Minimizer does not advance time.
@@ -126,7 +130,7 @@ func graphIncompatibilityReason() string {
 			}
 		}
 		if len(customTerms) != 0 {
-			return "custom field terms (AddFieldTerm) are not supported"
+			return "Custom field terms (AddFieldTerm) are not supported"
 		}
 
 		// Material parameters feeding the captured effective-field

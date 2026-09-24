@@ -15,12 +15,14 @@ var (
 	RelaxTorqueThreshold float64 = -1.
 	RelaxWallClockTime   float64 = -1.0 // wall-clock time limit for Relax
 	RelaxConverged       bool           // true if Relax converged, and false if the maximum wall-clock time is reached
+	RelaxNSteps          int     = 3
 )
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy. Returns true if convergence is reached, or false if the wall-clock time limit is exceeded. The wall-clock time limit is disabled by default.")
 	DeclVar("RelaxTorqueThreshold", &RelaxTorqueThreshold, "MaxTorque threshold for relax(). If set to -1 (default), relax() will stop when the average torque is steady or increasing.")
 	DeclVar("RelaxWallClockTime", &RelaxWallClockTime, "Wall-clock time limit (seconds) for Relax that will interrupt the relaxation if exceeded. Set to -1 (default) to disable.")
+	DeclVar("RelaxNSteps", &RelaxNSteps, "Technical parameter: number of steps relax() takes before re-evaluating energy (default: 7 with CUDA graphs, otherwise 1). Affects performance, not correctness.")
 }
 
 // are we relaxing?
@@ -70,11 +72,14 @@ func Relax() bool {
 	Precess = false
 	relaxing = true
 
-	// Evaluate energy (expensive) every N steps
-	N := 7 // At this N, performance starts to saturate when using CUDA Graphs (without graphs, this starts at lower N)
-	size := Mesh().Size()
-	if size[0]*size[1]*size[2] > graphMaxStepsRelax {
-		N = 1 // For large grids, taking multiple steps at once often hurts performance.
+	N := RelaxNSteps
+	if RelaxNSteps <= 0 {
+		// Evaluate energy (expensive) every N steps
+		N = 7 // At this N, performance starts to saturate when using CUDA Graphs (without graphs, this starts at lower N)
+		size := Mesh().Size()
+		if size[0]*size[1]*size[2] > graphMaxStepsRelax {
+			N = 1 // For large grids, the number of simultaneous steps does not matter much, if not too high.
+		}
 	}
 
 	// Minimize energy: take steps as long as energy goes down.

@@ -15,7 +15,7 @@ var (
 	RelaxTorqueThreshold float64 = -1.
 	RelaxWallClockTime   float64 = -1.0 // wall-clock time limit for Relax
 	RelaxConverged       bool           // true if Relax converged, and false if the maximum wall-clock time is reached
-	RelaxNSteps          int     = 3
+	RelaxNSteps          int     = 0
 )
 
 func init() {

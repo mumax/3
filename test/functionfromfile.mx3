@@ -8,7 +8,7 @@ alpha = 1 // Enormous damping to get to the saturated state ASAP
 //// Interpolation LINEAR
 m = Uniform(1, 0, 0)
 t = 0
-y := FunctionFromDatafile("functionfromfile.csv", 0, 1, "linear") // y(x) is column1(column0), representing B_ext(t)
+y := FunctionFromDatafile("testdata/functionfromfile.csv", 0, 1, "linear") // y(x) is column1(column0), representing B_ext(t)
 B_ext = Vector(0, 0, y(t))
 
 ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)
@@ -28,7 +28,7 @@ ExpectV("0.50ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
 //// Interpolation NEAREST
 m = Uniform(1, 0, 0)
 t = 0
-y = FunctionFromDatafile("functionfromfile.csv", 0, 1, "nearest") // y(x) is column1(column0), representing B_ext(t)
+y = FunctionFromDatafile("testdata/functionfromfile.csv", 0, 1, "nearest") // y(x) is column1(column0), representing B_ext(t)
 B_ext = Vector(0, 0, y(t))
 
 ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)
@@ -48,7 +48,7 @@ ExpectV("0.50ns:  20T", m.average(), Vector(0, 0, 1), 1e-6)
 //// Interpolation STEP
 m = Uniform(1, 0, 0)
 t = 0
-y = FunctionFromDatafile("functionfromfile.csv", 0, 1, "step") // y(x) is column1(column0), representing B_ext(t)
+y = FunctionFromDatafile("testdata/functionfromfile.csv", 0, 1, "step") // y(x) is column1(column0), representing B_ext(t)
 B_ext = Vector(0, 0, y(t))
 
 ExpectV("0.00ns:   0T", B_ext.average(), Vector(0, 0, 0), 0)

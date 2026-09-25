@@ -4,7 +4,7 @@
 */
 
 //// Load OVF geometry
-ext_InitGeomFromOVF("initgeomfromovf_teapot.ovf")
+ext_InitGeomFromOVF("testdata/teapot.ovf")
 save(geom)
 snapshot(geom) // test crash on snapshot of scalar
 

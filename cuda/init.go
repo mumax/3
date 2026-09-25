@@ -17,7 +17,7 @@ var (
 	GPUInfo       string     // Human-readable GPU description
 	Synchronous   bool       // for debug: synchronize stream0 at every kernel launch
 	cudaCtx       cu.Context // global CUDA context
-	cudaCC        int        // compute capablity (used for fatbin)
+	CudaCC        int        // compute capablity (used for fatbin)
 )
 
 // Locks to an OS thread and initializes CUDA for that thread.
@@ -33,7 +33,7 @@ func Init(gpu int) {
 	cudaCtx.SetCurrent()
 
 	M, m := dev.ComputeCapability()
-	cudaCC = 10*M + m
+	CudaCC = 10*M + m
 	DriverVersion = cu.Version()
 	DevName = dev.Name()
 	TotalMem = dev.TotalMem()
@@ -51,6 +51,9 @@ func Init(gpu int) {
 
 	// test PTX load so that we can catch CUDA_ERROR_NO_BINARY_FOR_GPU early
 	fatbinLoad(madd2_map, "madd2")
+
+	// Set CUDA Graph capture stream
+	captureStream = cu.StreamCreate()
 }
 
 // cu.Init(), but error is fatal and does not dump stack.
@@ -65,11 +68,37 @@ func tryCuInit() {
 	cu.Init(0)
 }
 
-// Global stream used for everything
-const stream0 = cu.Stream(0)
+// Global stream used by all *_wrapper.go kernel launches. However, the NULL
+// stream does not support CUDA Graph capture, so during capture/replay this
+// is temporarily redirected to a dedicated stream (see EnterCaptureMode).
+var stream0 = cu.Stream(0)
 
 // Synchronize the global stream
 // This is called before and after all memcopy operations between host and device.
 func Sync() {
 	stream0.Synchronize()
+}
+
+// Global asynchronous stream used during CUDA Graph capture
+// (cuStreamBeginCapture is not supported on the NULL stream).
+var captureStream cu.Stream
+
+// Redirects stream0 to captureStream, which is suitable for CUDA Graph
+// capture (cuStreamBeginCapture is not supported on the NULL stream), and
+// returns that stream.
+//
+// All kernel launches reference stream0 directly and are hereby appropriately
+// redirected. However, FFT plans are bound to a stream at creation time, and
+// must therefore be rebound separately (see DemagConvolution.SetStream).
+//
+// Must be paired with a call to ExitCaptureMode.
+func EnterCaptureMode() cu.Stream {
+	stream0 = captureStream
+	return captureStream
+}
+
+// Restores stream0 to the NULL/legacy default stream and
+// destroys the stream created by EnterCaptureMode.
+func ExitCaptureMode(captureStream cu.Stream) {
+	stream0 = cu.Stream(0)
 }

@@ -1,7 +1,7 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
 param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
-    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
+    [String[]]$CUDA_VERSIONS = ("11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
     [Int[]]$CUDA_CC, # The compute capabilities for which PTX will be compiled. Default: all CC supported by the CUDA version.
     [String[]]$CUDA_KERNELS, # List of which CUDA kernels in ../cuda should be (re)compiled. Default: all of them.
     [switch]$REUSE_WRAPPERS # Whether to use files like "zhangli2_wrapper.go_win_cuda12.9.tmp" as wrappers without recompiling. Linux wrappers are prioritized if present.
@@ -45,9 +45,6 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     # See min. driver version for each CUDA version at https://docs.nvidia.com/deploy/cuda-compatibility/#minor-version-compatibility
     if ( -not $CUDA_CC ) {
         switch ( $CUDA_VERSION_STR ) {
-            "10.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=411.31
-            "10.1" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=418.96
-            "10.2" { $CUDA_CC = 50,52,53,60,61,62,70,72,75 } # Min. Windows driver: >=441.22
             "11.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80 } # Min. Windows driver: >=452.39
             "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same for all 12.x)
             "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Highest CUDA version supporting CC < 7.5

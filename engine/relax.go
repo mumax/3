@@ -15,16 +15,25 @@ var (
 	RelaxTorqueThreshold float64 = -1.
 	RelaxWallClockTime   float64 = -1.0 // wall-clock time limit for Relax
 	RelaxConverged       bool           // true if Relax converged, and false if the maximum wall-clock time is reached
+	RelaxNSteps          int     = 0
 )
 
 func init() {
 	DeclFunc("Relax", Relax, "Try to minimize the total energy. Returns true if convergence is reached, or false if the wall-clock time limit is exceeded. The wall-clock time limit is disabled by default.")
 	DeclVar("RelaxTorqueThreshold", &RelaxTorqueThreshold, "MaxTorque threshold for relax(). If set to -1 (default), relax() will stop when the average torque is steady or increasing.")
 	DeclVar("RelaxWallClockTime", &RelaxWallClockTime, "Wall-clock time limit (seconds) for Relax that will interrupt the relaxation if exceeded. Set to -1 (default) to disable.")
+	DeclVar("RelaxNSteps", &RelaxNSteps, "Technical parameter: number of steps relax() takes before re-evaluating energy (default: 7 with CUDA graphs, otherwise 1). Affects performance, not correctness.")
 }
 
 // are we relaxing?
 var relaxing = false
+
+// On grids larger than approx. graphMaxStepsRelax, two effects happen:
+//   - CUDA Graphs hinder performance rather than improving it
+//   - The optimal value of N in Relax() changes to 1
+//
+// Value benchmarked on RTX 3080 mobile (other GPUs may differ).
+var graphMaxStepsRelax = 250000
 
 func Relax() bool {
 
@@ -63,9 +72,18 @@ func Relax() bool {
 	Precess = false
 	relaxing = true
 
+	N := RelaxNSteps
+	if RelaxNSteps <= 0 {
+		// Evaluate energy (expensive) every N steps
+		N = 7 // At this N, performance starts to saturate when using CUDA Graphs (without graphs, this starts at lower N)
+		size := Mesh().Size()
+		if size[0]*size[1]*size[2] > graphMaxStepsRelax {
+			N = 1 // For large grids, the number of simultaneous steps does not matter much, if not too high.
+		}
+	}
+
 	// Minimize energy: take steps as long as energy goes down.
 	// This stops when energy reaches the numerical noise floor.
-	const N = 3 // evaluate energy (expensive) every N steps
 	relaxSteps(N)
 	E0 := GetTotalEnergy()
 	relaxSteps(N)
@@ -126,6 +144,11 @@ func relaxSteps(n int) {
 	stop := NSteps + n
 	cond := func() bool { return NSteps < stop }
 	const output = false
-	runWhile(cond, output)
+	size := Mesh().Size()
+	if size[0]*size[1]*size[2] <= graphMaxStepsRelax && tryRunGraph(cond) {
+		Refer("You2026")
+	} else {
+		runWhile(cond, output)
+	}
 	Time = t0
 }

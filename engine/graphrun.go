@@ -21,7 +21,7 @@ import (
 var EnableCUDAgraphs = true
 
 func init() {
-	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run() and Steps() on small grids (default=true)"+
+	DeclVar("EnableCUDAgraphs", &EnableCUDAgraphs, "Toggles CUDA Graphs, which greatly improve performance of Run(), Steps(), Relax() and Minimize() on small grids (default=true)"+
 		"<br>NOTE: graphs are only used if Temp=0, NoDemagSpins=0 and no custom/time-varying fields/excitations are defined."+
 		"<br>To check whether graphs will actually be used (or why they wouldn't), see GraphIncompatibilityReason().")
 	DeclFunc("GraphIncompatibilityReason", graphIncompatibilityReason, "If CUDA Graphs can not be used, the returned string explains why. Otherwise, an empty string is returned.")

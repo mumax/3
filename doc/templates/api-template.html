@@ -285,6 +285,7 @@ J.Add(LoadFile("current.ovf"), 1)
 	<hr/>
 	
 	{{range .FilterType "*engine.VectorExcitation"}} {{template "entry" .}} {{end}}
+	{{range .FilterType "*engine.ScalarExcitation"}} {{template "entry" .}} {{end}}
 
 	<hr/>
 

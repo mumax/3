@@ -123,10 +123,10 @@ func Relax() bool {
 		// Step as long as torque goes down. Then increase the accuracy and step more.
 		for (MaxErr > 1e-9 && !pause) && WallclockTimer(TimerStart, RelaxWallClockTime) {
 			MaxErr /= math.Sqrt2
-			relaxSteps(N) // TODO: Play with other values
+			relaxSteps(N)
 			T0, T1 = T1, avgTorque()
 			for T1 < T0 && !pause {
-				relaxSteps(N) // TODO: Play with other values
+				relaxSteps(N)
 				T0, T1 = T1, avgTorque()
 			}
 		}

@@ -1,0 +1,37 @@
+// Check equality between CUDA graph and graphless implementations
+
+N := 64
+c := 5e-9
+
+SetCellSize(c, c, c)
+SetGridSize(N, N, 1)
+Msat = 800e3
+Aex = 13e-12
+
+//// Minimize without CUDA Graphs
+EnableCUDAgraphs = false
+m = Uniform(-1, 0.1, 0.1)
+ThermReseed(0)
+t = 0
+t0 := now()
+minimize()
+tt := since(t0)
+expectedval := m.GetCell(0, 0, 0)
+
+//// Minimize with CUDA Graphs
+EnableCUDAgraphs = true
+m = Uniform(-1, 0.1, 0.1)
+ThermReseed(0)
+t = 0
+t0 = now()
+minimize()
+ttgraph := since(t0)
+
+// Equality between CUDA Graphs and graphless implementations
+ExpectV("m in bottom-left cell", m.GetCell(0, 0, 0), expectedval, 0)
+
+// If equal, are both values pretty much as expected?
+ExpectV("m in bottom-left cell", m.GetCell(0, 0, 0), Vector(-0.745517, 0.666486, 0), 1e-6) // mumax3.12 value
+
+// Report performance increase due to graphs
+print(sprintf("10k Minimize() steps took %d (%d) ms with(out) graphs", ttgraph.MilliSeconds(), tt.MilliSeconds()))

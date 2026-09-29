@@ -1,0 +1,26 @@
+// Time-dependent magneto-elastics to check safety guard of CUDA graphs
+// for a type of simulation for which no tests previously existed
+
+EnableCUDAgraphs = true
+
+N := 64
+c := 5e-9
+
+SetCellSize(c, c, c)
+SetGridSize(N, N, 1)
+Msat = 800e3
+Aex = 13e-12
+alpha = 0.001
+FixDt = 1e-14
+runtime := 1e-11
+
+B1 = 1e6
+exx = t/runtime
+
+SetSolver(5) // RK45DP
+m = RandomMagSeed(0)
+run(runtime)
+
+// Correctvec determined on mumax3.12 (before graphs were introduced)
+correctvec := Vector(0.1918793022632599, -0.9625332951545715, 0.19160374999046326)
+ExpectV("m in bottom-left cell", m.GetCell(0, 0, 0), correctvec, 1e-6) // 1e-6 = variation due to CUDA versions

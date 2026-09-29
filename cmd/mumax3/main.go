@@ -35,6 +35,7 @@ func main() {
 	log.SetFlags(0)
 
 	cuda.Init(*engine.Flag_gpu)
+	engine.CheckGraphsCC()
 
 	cuda.Synchronous = *engine.Flag_sync
 	if *flag_version {

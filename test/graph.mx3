@@ -1,0 +1,42 @@
+// Check equality between CUDA graph and graphless implementations
+
+N := 32
+c := 5e-9
+
+SetCellSize(c, c, c)
+SetGridSize(N, N, 1)
+Msat = 800e3
+Aex = 13e-12
+alpha = 0.001
+FixDt = 1e-14
+runtime := 1e-11
+
+expectedval := Vector(0, 0, 0)
+t0 := now()
+tt := since(t0)
+ttgraph := since(t0)
+for solver := 2; solver <= 6; solver++ {
+    //// Run without CUDA Graphs
+    EnableCUDAgraphs = false
+    SetSolver(solver)
+    m = RandomMagSeed(0)
+    ThermReseed(0)
+    t = 0
+    t0 = now()
+    run(runtime)
+    tt = since(t0)
+    expectedval = m.GetCell(0, 0, 0)
+    
+    //// Run with CUDA Graphs
+    EnableCUDAgraphs = true
+    SetSolver(solver)
+    m = RandomMagSeed(0)
+    ThermReseed(0)
+    t = 0
+    t0 = now()
+    run(runtime)
+    ttgraph = since(t0)
+    ExpectV("m in bottom-left cell", m.GetCell(0, 0, 0), expectedval, 0)
+
+    print(sprintf("10k fixed-dt Solver(%d) steps took %d (%d) ms with(out) graphs", solver, ttgraph.MilliSeconds(), tt.MilliSeconds()))
+}

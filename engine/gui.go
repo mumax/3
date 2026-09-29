@@ -56,7 +56,7 @@ func (g *guistate) RunInteractive() {
 	// periodically wake up Run so it may exit on timeout
 	go func() {
 		for {
-			Inject <- nop
+			Inject <- Injection{f: nop, graphCompatible: true}
 			time.Sleep(1 * time.Second)
 		}
 	}()
@@ -64,8 +64,8 @@ func (g *guistate) RunInteractive() {
 	fmt.Println("//entering interactive mode")
 	g.UpdateKeepAlive()
 	for time.Since(g.KeepAlive()) < Timeout {
-		f := <-Inject
-		f()
+		i := <-Inject
+		i.f()
 	}
 	fmt.Println("//browser disconnected, exiting")
 }
@@ -122,7 +122,7 @@ func (g *guistate) PrepareServer() {
 func (g *guistate) prepareConsole() {
 	g.OnEvent("cli", func() {
 		cmd := g.StringValue("cli")
-		Inject <- func() { g.EvalGUI(cmd) }
+		Inject <- Injection{f: func() { g.EvalGUI(cmd) }, graphCompatible: false}
 		g.Set("cli", "")
 	})
 }
@@ -137,19 +137,37 @@ func (g *guistate) prepareMesh() {
 		g.Set("setmeshwarn", MESHWARN)
 	}
 
-	g.OnEvent("nx", func() { Inject <- func() { lazy_gridsize[X] = g.IntValue("nx"); warnmesh() } })
-	g.OnEvent("ny", func() { Inject <- func() { lazy_gridsize[Y] = g.IntValue("ny"); warnmesh() } })
-	g.OnEvent("nz", func() { Inject <- func() { lazy_gridsize[Z] = g.IntValue("nz"); warnmesh() } })
-	g.OnEvent("cx", func() { Inject <- func() { lazy_cellsize[X] = g.FloatValue("cx"); warnmesh() } })
-	g.OnEvent("cy", func() { Inject <- func() { lazy_cellsize[Y] = g.FloatValue("cy"); warnmesh() } })
-	g.OnEvent("cz", func() { Inject <- func() { lazy_cellsize[Z] = g.FloatValue("cz"); warnmesh() } })
-	g.OnEvent("px", func() { Inject <- func() { lazy_pbc[X] = g.IntValue("px"); warnmesh() } })
-	g.OnEvent("py", func() { Inject <- func() { lazy_pbc[Y] = g.IntValue("py"); warnmesh() } })
-	g.OnEvent("pz", func() { Inject <- func() { lazy_pbc[Z] = g.IntValue("pz"); warnmesh() } })
+	g.OnEvent("nx", func() {
+		Inject <- Injection{f: func() { lazy_gridsize[X] = g.IntValue("nx"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("ny", func() {
+		Inject <- Injection{f: func() { lazy_gridsize[Y] = g.IntValue("ny"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("nz", func() {
+		Inject <- Injection{f: func() { lazy_gridsize[Z] = g.IntValue("nz"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("cx", func() {
+		Inject <- Injection{f: func() { lazy_cellsize[X] = g.FloatValue("cx"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("cy", func() {
+		Inject <- Injection{f: func() { lazy_cellsize[Y] = g.FloatValue("cy"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("cz", func() {
+		Inject <- Injection{f: func() { lazy_cellsize[Z] = g.FloatValue("cz"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("px", func() {
+		Inject <- Injection{f: func() { lazy_pbc[X] = g.IntValue("px"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("py", func() {
+		Inject <- Injection{f: func() { lazy_pbc[Y] = g.IntValue("py"); warnmesh() }, graphCompatible: true}
+	})
+	g.OnEvent("pz", func() {
+		Inject <- Injection{f: func() { lazy_pbc[Z] = g.IntValue("pz"); warnmesh() }, graphCompatible: true}
+	})
 
 	g.OnEvent("setmesh", func() {
 		//g.Disable("setmesh", true)
-		Inject <- (func() {
+		Inject <- Injection{f: func() {
 			g.EvalGUI(fmt.Sprintf("SetMesh(%v, %v, %v, %v, %v, %v, %v, %v, %v)",
 				g.Value("nx"), g.Value("ny"), g.Value("nz"),
 				g.Value("cx"), g.Value("cy"), g.Value("cz"),
@@ -162,7 +180,7 @@ func (g *guistate) prepareMesh() {
 			lazy_cellsize = []float64{c[X], c[Y], c[Z]}
 			lazy_pbc = []int{p[X], p[Y], p[Z]}
 
-		})
+		}, graphCompatible: false} // Can absolutely not resize the mesh when using CUDA Graphs
 		g.Set("setmeshwarn", "mesh up to date")
 	})
 }
@@ -218,9 +236,9 @@ func (g *guistate) prepareGeom() {
 		g.Set("geomdoc", g.Doc(ident))
 	})
 	g.OnEvent("setgeom", func() {
-		Inject <- (func() {
+		Inject <- Injection{f: func() {
 			g.EvalGUI(fmt.Sprint("SetGeom(", g.StringValue("geomselect"), g.StringValue("geomargs"), ")"))
-		})
+		}, graphCompatible: false}
 	})
 }
 
@@ -246,9 +264,9 @@ func (g *guistate) prepareM() {
 		g.Set("mdoc", g.Doc(ident))
 	})
 	g.OnEvent("setm", func() {
-		Inject <- (func() {
+		Inject <- Injection{f: func() {
 			g.EvalGUI(fmt.Sprint("m = ", g.StringValue("mselect"), g.StringValue("margs")))
-		})
+		}, graphCompatible: true}
 	})
 }
 
@@ -258,21 +276,35 @@ var (
 )
 
 func Break() {
-	Inject <- func() { pause = true }
+	Inject <- Injection{f: func() { pause = true }}
 }
 
 // see prepareServer
 func (g *guistate) prepareSolver() {
-	g.OnEvent("run", func() { Break(); Inject <- func() { g.EvalGUI(sprint("Run(", g.StringValue("runtime"), ")")) } })
-	g.OnEvent("steps", func() { Break(); Inject <- func() { g.EvalGUI(sprint("Steps(", g.StringValue("runsteps"), ")")) } })
+	g.OnEvent("run", func() {
+		Break()
+		Inject <- Injection{f: func() { g.EvalGUI(sprint("Run(", g.StringValue("runtime"), ")")) }}
+	})
+	g.OnEvent("steps", func() {
+		Break()
+		Inject <- Injection{f: func() { g.EvalGUI(sprint("Steps(", g.StringValue("runsteps"), ")")) }}
+	})
 	g.OnEvent("break", Break)
-	g.OnEvent("relax", func() { Break(); Inject <- func() { g.EvalGUI("relax()") } })
-	g.OnEvent("mindt", func() { Inject <- func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) } })
-	g.OnEvent("maxdt", func() { Inject <- func() { g.EvalGUI("MaxDt=" + g.StringValue("maxdt")) } })
-	g.OnEvent("fixdt", func() { Inject <- func() { g.EvalGUI("FixDt=" + g.StringValue("fixdt")) } })
-	g.OnEvent("maxerr", func() { Inject <- func() { g.EvalGUI("MaxErr=" + g.StringValue("maxerr")) } })
+	g.OnEvent("relax", func() { Break(); Inject <- Injection{f: func() { g.EvalGUI("relax()") }} })
+	g.OnEvent("mindt", func() {
+		Inject <- Injection{f: func() { g.EvalGUI("MinDt=" + g.StringValue("mindt")) }, graphCompatible: true}
+	})
+	g.OnEvent("maxdt", func() {
+		Inject <- Injection{f: func() { g.EvalGUI("MaxDt=" + g.StringValue("maxdt")) }, graphCompatible: true}
+	})
+	g.OnEvent("fixdt", func() { // CUDA Graph incompatible: Heun optimized fixed-dt case assumes constant dt
+		Inject <- Injection{f: func() { g.EvalGUI("FixDt=" + g.StringValue("fixdt")) }, graphCompatible: false}
+	})
+	g.OnEvent("maxerr", func() {
+		Inject <- Injection{f: func() { g.EvalGUI("MaxErr=" + g.StringValue("maxerr")) }, graphCompatible: true}
+	})
 	g.OnEvent("solvertype", func() {
-		Inject <- func() {
+		Inject <- Injection{f: func() {
 			typ := solvertypes[g.StringValue("solvertype")]
 
 			// euler must have fixed time step
@@ -284,7 +316,7 @@ func (g *guistate) prepareSolver() {
 			}
 
 			g.EvalGUI(fmt.Sprint("SetSolver(", typ, ")"))
-		}
+		}, graphCompatible: false}
 	})
 }
 
@@ -308,20 +340,17 @@ func (g *guistate) prepareParam() {
 			if r != -1 {
 				cmd += ")"
 			}
-			Inject <- func() {
+			Inject <- Injection{f: func() {
 				g.EvalGUI(cmd)
-			}
+			}, graphCompatible: false} // CUDA graphs assume time-independent material parameters
 		})
 	}
 	// overwrite handler for temperature
 	// do not crash when we enter bogus values (see temperature.go)
 	g.OnEvent("Temp", func() {
-		Inject <- func() {
-			if FixDt == 0 {
-				g.EvalGUI("FixDt = 10e-14") // finite temperature requires fixed time step
-			}
+		Inject <- Injection{f: func() {
 			g.EvalGUI("Temp = " + g.StringValue("Temp"))
-		}
+		}, graphCompatible: false} // CUDA Graphs assume Temp==0
 	})
 }
 
@@ -329,9 +358,9 @@ func (g *guistate) prepareParam() {
 func (g *guistate) prepareDisplay() {
 	// plot
 	g.OnEvent("tableAutoSave", func() {
-		Inject <- func() {
+		Inject <- Injection{f: func() {
 			g.EvalGUI("TableAutosave(" + g.StringValue("tableAutoSave") + ")")
-		}
+		}, graphCompatible: true}
 	})
 
 	// render
@@ -376,7 +405,7 @@ func (g *guistate) prepareOnUpdate() {
 			return
 		}
 
-		Inject <- (func() { // sends to run loop to be executed in between time steps
+		Inject <- Injection{f: (func() { // sends to run loop to be executed in between time steps
 			g.Set("console", hist)
 
 			// mesh
@@ -445,7 +474,7 @@ func (g *guistate) prepareOnUpdate() {
 			memfree, _ := cu.MemGetInfo()
 			memfree /= (1024 * 1024)
 			g.Set("memfree", memfree)
-		})
+		}), graphCompatible: true} // This function just renders the GUI, so need graphCompatible=true to use GUI with CUDA Graphs
 	})
 }
 

@@ -58,7 +58,6 @@ func (s *BackwardEuler) Step() {
 
 	NSteps++
 	setLastErr(err)
-	setMaxTorque(dy1)
 }
 
 func (s *BackwardEuler) Free() {

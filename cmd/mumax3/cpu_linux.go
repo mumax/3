@@ -1,5 +1,7 @@
 //go:build !windows
 
+// This file must provide the getCPUInfo() function for non-Windows systems.
+
 package main
 
 import (

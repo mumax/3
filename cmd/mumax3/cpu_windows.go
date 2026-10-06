@@ -1,5 +1,8 @@
 //go:build windows
 
+// This file must only be built on Windows systems, since it relies on registry
+// functions in the syscall package, which do not exist on a non-Windows system.
+
 package main
 
 import (

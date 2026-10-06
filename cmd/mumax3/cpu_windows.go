@@ -1,3 +1,5 @@
+//go:build windows
+
 package main
 
 import (
@@ -15,7 +17,7 @@ import (
 // are far less preferable for a feature as minor as retrieving some CPU info:
 //   - Calling the PowerShell replacement for wmic: starting a PowerShell takes several seconds
 //   - Supplemental or third-party Go packages: mumax³ currently has zero external dependencies
-func getWindowsCPUInfo() string {
+func getCPUInfo() string {
 	var info strings.Builder
 	info.WriteString("CPU info: ")
 

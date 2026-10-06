@@ -3,7 +3,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -238,38 +237,6 @@ func getCPUInfo() string {
 	default:
 		return fmt.Sprintf("CPU info: Unknown OS: %s", runtime.GOOS)
 	}
-}
-
-func getWindowsCPUInfo() string {
-	// Get CPU model name
-	cmd := exec.Command("wmic", "cpu", "get", "Name")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	if err := cmd.Run(); err != nil {
-		return fmt.Sprintf("CPU info: Unknown, Error: %s", err.Error())
-	}
-	output := strings.Split(out.String(), "\n")
-	cpuModel := "Unknown model"
-	if len(output) > 1 {
-		cpuModel = strings.TrimSpace(output[1])
-	}
-
-	// Get CPU number of cores
-	cpuCores := runtime.NumCPU()
-
-	// Get CPU speed
-	cmd = exec.Command("wmic", "cpu", "get", "MaxClockSpeed")
-	out.Reset()
-	cmd.Stdout = &out
-	cpuMHz := "Unknown clock frequency"
-	if err := cmd.Run(); err == nil {
-		output = strings.Split(out.String(), "\n")
-		if len(output) > 1 {
-			cpuMHz = strings.TrimSpace(output[1]) + " MHz"
-		}
-	}
-
-	return fmt.Sprintf("CPU info: %s, Cores: %d, %s", cpuModel, cpuCores, cpuMHz)
 }
 
 func getLinuxCPUInfo() string {

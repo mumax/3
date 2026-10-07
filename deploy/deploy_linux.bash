@@ -55,7 +55,7 @@ for CUDAVERSION in "${INPUT_CUDA_VERSIONS[@]}"; do
     
     # We overwrite the CGO Flags to make sure that it is compiled against $CUDAVERSION
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
-    export CGO_LDFLAGS="-lcufft -lcurand -lcuda -L${CUDA_HOME}/lib64 -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
+    export CGO_LDFLAGS="-L${CUDA_HOME}/lib64 -lcufft -lcurand -L/usr/lib/x86_64-linux-gnu -lcuda -Wl,-rpath -Wl,\$ORIGIN/$RPATH"
     export CGO_CFLAGS="-I${CUDA_HOME}/include"
 
     # (Re)build everything

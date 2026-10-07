@@ -1,0 +1,54 @@
+/*  Since cuRAND can only generate an even number of random values in parallel,
+    simulations with an odd number of cells N generate N+1 random thermal noise
+    values per vector component. Hence, in every step, the last generated value
+    for each componoent is discared in simulations wiht an odd number of cells.
+
+    This test compares the thermal noise of a 3x3x3 and 3x3x2 system, to check
+    whether the thermal noise follows the expected order for such trunction.
+    This also implicitly tests whether ThermSeed() fully resets the generated
+    sequence, as well as checking whether the absolute values of the generated
+    elements remain the same across GPUs and into future mumax³ versions.
+*/
+
+SEED := 42
+
+
+//// ODD NUMBER OF CELLS
+Nz := 3
+SetGridSize(3, 3, Nz) // N = 27, all axes odd
+s := NewVectorMask(3, 3, Nz)
+
+SetCellSize(5e-9, 5e-9, 5e-9)
+Msat = 8e5
+Aex = 11e-12
+Alpha = 0.02
+Temp = 300
+FixDt = 1e-13
+
+ThermReseed(SEED)
+steps(1)
+B_therm.EvalTo(s)
+
+VAL1 := s.Get(0, 0, 0, 0) // 3x3x3 idx=0 X-comp after 1 step --> 28*3 = 84 numbers previously generated
+VAL2 := s.Get(1, 0, 0, 0) // 3x3x3 idx=0 Y-comp after 1 step --> 28*4 = 112 numbers previously generated
+VAL3 := s.Get(2, 0, 0, 0) // 3x3x3 idx=0 Z-comp after 1 step --> 28*5 = 140 numbers previously generated
+
+Expect(sprintf("Seed %d: 85th thermal noise element", SEED), VAL1, 0.160713791847229, 0)
+Expect(sprintf("Seed %d: 113th thermal noise element", SEED), VAL2, 0.11215255409479141, 0)
+Expect(sprintf("Seed %d: 141st thermal noise element", SEED), VAL3, 0.3278733491897583, 0)
+
+
+//// EVEN NUMBER OF CELLS
+Nz = 2
+SetGridSize(3, 3, Nz) // N = 18, one axis even
+s = NewVectorMask(3, 3, Nz)
+
+ThermReseed(SEED)
+steps(1)
+B_therm.EvalTo(s)
+
+Expect("Thermal noise Y idx 12 after 1 step", s.Get(1, 0, 1, 1), VAL1, 0) // 84 numbers previously generated = 3*18 (1 step) + 18 (1 comp) + 9 (Z=1) + 3 (Y=1)
+steps(1)
+B_therm.EvalTo(s)
+Expect("Thermal noise X idx 4 after 2 steps", s.Get(0, 1, 1, 0), VAL2, 0) // 112 numbers previously generated = 6*18 (2 steps) + 3 (Y=1) + 1 (X=1)
+Expect("Thermal noise Y idx 14 after 2 steps", s.Get(1, 2, 1, 1), VAL3, 0) // 140 numbers previously generated = 6*18 (2 steps) + 18 (1 comp) + 9 (Z=1) + 3 (Y=1) + 2 (X=2)

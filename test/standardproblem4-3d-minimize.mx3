@@ -15,5 +15,6 @@
 // minimize
 	minimize()
 	TOL := 1e-3
-	expectv("m", m.average(), vector(0.9669952, 0.12521563, 0), TOL)
-
+	expect("mx", m.average().X(), 0.9669952, TOL)
+	expect("abs(my)", abs(m.average().Y()), 0.12521563, TOL)
+	expect("mz", m.average().Z(), 0, TOL)

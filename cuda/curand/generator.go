@@ -49,4 +49,11 @@ func (g Generator) SetSeed(seed int64) {
 	}
 }
 
+func (g Generator) SetOffset(offset int64) {
+	err := Status(C.curandSetGeneratorOffset(C.curandGenerator_t(unsafe.Pointer(uintptr(g))), C.ulonglong(offset)))
+	if err != SUCCESS {
+		panic(err)
+	}
+}
+
 // Documentation was taken from the curand headers.

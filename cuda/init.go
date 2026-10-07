@@ -47,6 +47,8 @@ func Init(gpu int) {
 		log.Println("DEBUG: synchronized CUDA calls")
 	}
 
+	reducecfg = &config{Grid: cu.Dim3{X: cu.DeviceGetAttribute(cu.MULTIPROCESSOR_COUNT, dev), Y: 1, Z: 1}, Block: cu.Dim3{X: REDUCE_BLOCKSIZE, Y: 1, Z: 1}}
+
 	// test PTX load so that we can catch CUDA_ERROR_NO_BINARY_FOR_GPU early
 	fatbinLoad(madd2_map, "madd2")
 }

@@ -26,7 +26,7 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
     #! SUBSTITUTE YOUR OWN PATH TO cl.exe BELOW
     # Not every CUDA version is compatible with any Visual C/C++ version: compiling for CUDA <11.6 requires VS <=2017.
     # See VS/CUDA compatibility matrix at https://quasar.ugent.be/files/doc/cuda-msvc-compatibility.html (with old VS downloads available).
-    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
+    $VS2022 = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\bin\Hostx64\x64" # Supported by CUDA v11.6-v12.*
     $VS2017 = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64" # Supported by CUDA v8.0-v12.4
     switch ( $CUDA_VERSION ) {
         {$_ -lt [Version]::new(11.6)} { $CCBIN = $VS2017 }
@@ -98,6 +98,8 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
             if (-not $wrappercopied) {
                 foreach ($cc in $CUDA_CC) {
                     & $NVCC -ccbin "`"${CCBIN}`"" -Xptxas -O3 -ptx `
+                        -allow-unsupported-compiler `
+                        -D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH `
                         -gencode="arch=compute_${cc},code=sm_${cc}" `
                         "${cudafile}" -o "${kernelname}_${cc}.ptx"
                 }

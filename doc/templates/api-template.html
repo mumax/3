@@ -284,7 +284,8 @@ J.Add(LoadFile("current.ovf"), 1)
 
 	<hr/>
 	
-	{{range .FilterType "*engine.Excitation"}} {{template "entry" .}} {{end}}
+	{{range .FilterType "*engine.VectorExcitation"}} {{template "entry" .}} {{end}}
+	{{range .FilterType "*engine.ScalarExcitation"}} {{template "entry" .}} {{end}}
 
 	<hr/>
 
@@ -485,7 +486,8 @@ FixDt = 1e-15
 	<hr/>
 	
 	{{range .FilterName "run" "steps" "runwhile" "relax" "minimize"}} {{template "entry" .}} {{end}}
-	{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step" "NEval" "peakErr" "lastErr" "minimizerstop" "minimizersamples" "MinimizeWallClockTime" "relaxtorquethreshold" "RelaxWallClockTime"}} {{template "entry" .}} {{end}}
+	<hr/>
+	{{range .FilterName "t" "dt" "MinDt" "MaxDt" "FixDt" "HeadRoom" "MaxErr" "step" "NEval" "peakErr" "lastErr" "minimizerstop" "minimizersamples" "MinimizeWallClockTime" "relaxtorquethreshold" "RelaxWallClockTime" "RelaxNSteps" "EnableCUDAgraphs"}} {{template "entry" .}} {{end}}
 	{{range .FilterName "SetSolver"}} {{template "entry" . }} {{end}}
 
 </div>

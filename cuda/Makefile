@@ -12,13 +12,12 @@
 #    make CUDA_HOME="/usr/local/cuda-12.6" CUDA_CC="50 52 53 60 61 62 70 72 75 80 86"
 #
 # Different CUDA versions support different compute capabilities, as shown in the list below. See https://stackoverflow.com/a/28933055.
-# CUDA SDK 10.0 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
-# CUDA SDK 10.1 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
-# CUDA SDK 10.2 support for compute capability       30 32 35 37 50 52 53 60 61 62 70 72 75
 # CUDA SDK 11.0 support for compute capability             35 37 50 52 53 60 61 62 70 72 75 80
 # CUDA SDK 11.1-11.7 support for compute capability        35 37 50 52 53 60 61 62 70 72 75 80 86
 # CUDA SDK 11.8 support for compute capability             35 37 50 52 53 60 61 62 70 72 75 80 86 87 89
-# CUDA SDK 12.0+ support for compute capability                  50 52 53 60 61 62 70 72 75 80 86 87 89 90
+# CUDA SDK 12.0-12.6 support for compute capability              50 52 53 60 61 62 70 72 75 80 86 87 89 90
+# CUDA SDK 12.8-13.0 support for compute capability                                      75 80 86 87 89 90 100 103 110 120
+# CUDA SDK 13.1+ support for compute capability                                          75 80 86 87 89 90 100 103 110 120 121
 
 SHELL = /bin/bash
 

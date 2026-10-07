@@ -48,6 +48,7 @@ func InitAndClose() func() {
 	flag.Parse()
 
 	cuda.Init(*Flag_gpu)
+	CheckGraphsCC()
 	cuda.Synchronous = *Flag_sync
 
 	od := *Flag_od

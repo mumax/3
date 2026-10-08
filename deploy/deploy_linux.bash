@@ -2,7 +2,7 @@
 
 # Optional arguments. CUDA_VERSIONS must be supplied if CUDA_CC is specified.
 # Example usage: ./deploy_linux.bash "12.6" "86 87 89"
-DEFAULT_CUDA_VERSIONS=("10.0" "10.1" "10.2" "11.0" "12.0" "12.6" "12.9")
+DEFAULT_CUDA_VERSIONS=("10.0" "10.1" "10.2" "11.0" "12.0" "12.6" "12.9" "13.0")
 INPUT_CUDA_VERSIONS=(${1:-${DEFAULT_CUDA_VERSIONS[@]}})
 INPUT_CUDA_CC="$2"  # Optional string: "86 87 89"
 
@@ -38,7 +38,8 @@ for CUDAVERSION in "${INPUT_CUDA_VERSIONS[@]}"; do
             "11.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80";; # Min. Linux driver: >=450.80.02
             "12.0") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Min. Linux driver: >=525.60.13 (same for all 12.x)
             "12.6") export CUDA_CC="50 52 53 60 61 62 70 72 75 80 86 87 89 90";; # Highest CUDA version supporting CC < 7.5
-            "12.9") export CUDA_CC="                        75 80 86 87 89 90 100 120";;
+            "12.9") export CUDA_CC="                        75 80 86 87 89 90 100 103 110 120 121";;
+            "13.0") export CUDA_CC="                        75 80 86 87 89 90 100 103 110 120 121";;
         esac
     else
         export CUDA_CC="$INPUT_CUDA_CC"

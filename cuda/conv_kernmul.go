@@ -19,20 +19,24 @@ func kernMulRSymm3D_async(fftM [3]*data.Slice, Kxx, Kyy, Kzz, Kyz, Kxz, Kxy *dat
 }
 
 // kernel multiplication for 2D demag convolution on X and Y, exploiting full kernel symmetry.
+// Launch grid covers only the non-redundant rows iy in [0, Ny/2]; each thread
+// also writes the mirrored row Ny-iy when distinct (see kernmulrsymm2dxy.cu).
 func kernMulRSymm2Dxy_async(fftMx, fftMy, Kxx, Kyy, Kxy *data.Slice, Nx, Ny int) {
 	util.Argument(fftMy.NComp() == 1 && Kxx.NComp() == 1)
 
-	cfg := make3DConf([3]int{Nx, Ny, 1})
+	cfg := make3DConf([3]int{Nx, Ny/2 + 1, 1})
 	k_kernmulRSymm2Dxy_async(fftMx.DevPtr(0), fftMy.DevPtr(0),
 		Kxx.DevPtr(0), Kyy.DevPtr(0), Kxy.DevPtr(0),
 		Nx, Ny, cfg)
 }
 
 // kernel multiplication for 2D demag convolution on Z, exploiting full kernel symmetry.
+// Launch grid covers only the non-redundant rows iy in [0, Ny/2]; each thread
+// also writes the mirrored row Ny-iy when distinct (see kernmulrsymm2dz.cu).
 func kernMulRSymm2Dz_async(fftMz, Kzz *data.Slice, Nx, Ny int) {
 	util.Argument(fftMz.NComp() == 1 && Kzz.NComp() == 1)
 
-	cfg := make3DConf([3]int{Nx, Ny, 1})
+	cfg := make3DConf([3]int{Nx, Ny/2 + 1, 1})
 	k_kernmulRSymm2Dz_async(fftMz.DevPtr(0), Kzz.DevPtr(0), Nx, Ny, cfg)
 }
 

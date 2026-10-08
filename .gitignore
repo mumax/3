@@ -1,5 +1,13 @@
 *.swp
 *.swo
+# PTX (CUDA backend) and HIP code objects (HIP backend) are build artifacts
+# whose bytes are embedded into the generated *_wrapper.go / *_wrapper_hip.go
+# files; do not track them, except the small fixtures the cu module test loads.
+*.ptx
+!cuda/cu/testdata/*.ptx
+cuda/*.co
+!cuda/cu/testdata/*.co
+cuda/cuda2go
 *.5
 *.6
 *.8

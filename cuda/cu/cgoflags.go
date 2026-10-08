@@ -1,3 +1,5 @@
+//go:build !hip
+
 package cu
 
 // This file provides CGO flags to find CUDA libraries and headers.

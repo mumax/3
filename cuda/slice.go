@@ -37,10 +37,11 @@ func newSlice(nComp int, size [3]int, alloc func(int64) unsafe.Pointer, memType 
 func memFree(ptr unsafe.Pointer) { cu.MemFree(cu.DevicePtr(uintptr(ptr))) }
 
 func MemCpyDtoH(dst, src unsafe.Pointer, bytes int64) {
-	Sync() // sync previous kernels
+	// cu.MemcpyDtoH (non-async) is already a blocking, stream-ordered call on
+	// stream0: it waits for prior work to finish and only returns once the
+	// copy has landed, so the extra Sync()s here just duplicated that wait.
 	timer.Start("memcpyDtoH")
 	cu.MemcpyDtoH(dst, cu.DevicePtr(uintptr(src)), bytes)
-	Sync() // sync copy
 	timer.Stop("memcpyDtoH")
 }
 

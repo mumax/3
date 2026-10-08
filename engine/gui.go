@@ -408,7 +408,7 @@ func (g *guistate) prepareOnUpdate() {
 			} else {
 				g.Set("busy", "Running")
 				// Don't re-evaluate all the time if not running
-				g.Set("maxtorque", fmt.Sprintf("%1.3e T", LastTorque))
+				g.Set("maxtorque", fmt.Sprintf("%1.3e T", GetMaxTorque()))
 			}
 
 			// display

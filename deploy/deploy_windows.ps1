@@ -1,7 +1,7 @@
 # This script compiles mumax3 for windows 10 against multiple cuda versions.
 
 param ( # Optional arguments. Example usage: ./deploy_windows.ps1 -CUDA_VERSIONS 12.6 -CUDA_CC 86
-    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9"), # The cuda versions against which we will compile mumax3
+    [String[]]$CUDA_VERSIONS = ("10.0","10.1","10.2","11.0","12.0","12.6","12.9","13.0"), # The cuda versions against which we will compile mumax3
     [Int[]]$CUDA_CC, # The compute capabilities for which PTX will be compiled. Default: all CC supported by the CUDA version.
     [String[]]$CUDA_KERNELS, # List of which CUDA kernels in ../cuda should be (re)compiled. Default: all of them.
     [switch]$REUSE_WRAPPERS # Whether to use files like "zhangli2_wrapper.go_win_cuda12.9.tmp" as wrappers without recompiling. Linux wrappers are prioritized if present.

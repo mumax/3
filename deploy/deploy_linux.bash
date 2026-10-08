@@ -2,7 +2,7 @@
 
 # Optional arguments. CUDA_VERSIONS must be supplied if CUDA_CC is specified.
 # Example usage: ./deploy_linux.bash "12.6" "86 87 89"
-DEFAULT_CUDA_VERSIONS=("10.0" "10.1" "10.2" "11.0" "12.0" "12.6" "12.9")
+DEFAULT_CUDA_VERSIONS=("10.0" "10.1" "10.2" "11.0" "12.0" "12.6" "12.9" "13.0")
 INPUT_CUDA_VERSIONS=(${1:-${DEFAULT_CUDA_VERSIONS[@]}})
 INPUT_CUDA_CC="$2"  # Optional string: "86 87 89"
 

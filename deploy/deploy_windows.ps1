@@ -52,6 +52,7 @@ foreach ($CUDA_VERSION_STR in $CUDA_VERSIONS ) {
             "12.0" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Min. Windows driver: >=527.41 (Same for all 12.x)
             "12.6" { $CUDA_CC = 50,52,53,60,61,62,70,72,75,80,86,87,89,90 } # Highest CUDA version supporting CC < 7.5
             "12.9" { $CUDA_CC =                         75,80,86,87,89,90,100,120 }
+            "13.0" { $CUDA_CC =                         75,80,86,87,89,90,100,120,121 }
             default {exit}
         }
     }

@@ -57,3 +57,12 @@ func (g Generator) SetOffset(offset int64) {
 }
 
 // Documentation was taken from the curand headers.
+func (g Generator) GenerateUniform(output uintptr, n int64) {
+	err := Status(C.curandGenerateUniform(
+		C.curandGenerator_t(unsafe.Pointer(uintptr(g))),
+		(*C.float)(unsafe.Pointer(output)),
+		C.size_t(n)))
+	if err != SUCCESS {
+		panic(err)
+	}
+}

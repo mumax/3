@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"os"
 	"path"
 	"sort"
@@ -32,6 +33,9 @@ func init() {
 		"and a specified size nx,ny,nz (remaining arguments)")
 	DeclFunc("NewVectorMask", NewVectorMask, "Makes a 3D array of vectors")
 	DeclFunc("NewScalarMask", NewScalarMask, "Makes a 3D array of scalars")
+	DeclFunc("NewRandomScalarField", NewRandomScalarField, "Makes a 3D array of scalars, uniformly distributed in [0,1]. Seeded by RandomFieldSeed()")
+	DeclFunc("NewRandomVectorField", NewRandomVectorField, "Makes a 3D array of unit vectors, uniformly distributed on the sphere. Seeded by RandomFieldSeed()")
+	DeclFunc("RandomFieldSeed", RandomFieldSeed, "Sets the random seed for NewRandomScalarField() and NewRandomVectorField()")
 }
 
 // Returns a new slice (3D array) with given number of components and size.
@@ -45,6 +49,46 @@ func NewVectorMask(Nx, Ny, Nz int) *data.Slice {
 
 func NewScalarMask(Nx, Ny, Nz int) *data.Slice {
 	return data.NewSlice(1, [3]int{Nx, Ny, Nz})
+}
+
+// Generator for NewRandomScalarField and NewRandomVectorField.
+// Separate from the script's rand() stream, so fields do not depend on other random calls.
+var randomFieldRNG = rand.New(rand.NewSource(0))
+
+// Seeds the generator used by NewRandomScalarField and NewRandomVectorField.
+func RandomFieldSeed(seed int) {
+	randomFieldRNG.Seed(int64(seed))
+}
+
+// Returns a scalar mask filled with values uniformly distributed in [0,1].
+func NewRandomScalarField(Nx, Ny, Nz int) *data.Slice {
+	s := NewScalarMask(Nx, Ny, Nz)
+	a := s.Scalars()
+	for iz := range a {
+		for iy := range a[iz] {
+			for ix := range a[iz][iy] {
+				a[iz][iy][ix] = float32(randomFieldRNG.Float64())
+			}
+		}
+	}
+	return s
+}
+
+// Returns a vector mask filled with unit vectors uniformly distributed on the sphere.
+func NewRandomVectorField(Nx, Ny, Nz int) *data.Slice {
+	s := NewVectorMask(Nx, Ny, Nz)
+	v := s.Vectors()
+	for iz := 0; iz < Nz; iz++ {
+		for iy := 0; iy < Ny; iy++ {
+			for ix := 0; ix < Nx; ix++ {
+				d := randomDir(randomFieldRNG) // same sampler as RandomMag
+				for c := range v {
+					v[c][iz][iy][ix] = float32(d[c])
+				}
+			}
+		}
+	}
+	return s
 }
 
 // Constructs a vector

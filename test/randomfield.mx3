@@ -1,0 +1,37 @@
+/*
+	NewRandomScalarField / NewRandomVectorField:
+	reproducible via RandomFieldSeed, independent of randSeed/rand(),
+	scalars in [0,1], vectors of unit length.
+*/
+
+Nx := 8
+Ny := 4
+Nz := 2
+
+RandomFieldSeed(7)
+s1 := NewRandomScalarField(Nx, Ny, Nz)
+v1 := NewRandomVectorField(Nx, Ny, Nz)
+
+RandomFieldSeed(7)
+randSeed(123)
+r := rand() // must not disturb the random-field stream
+Expect("rand", r, 0.5, 0.5)
+s2 := NewRandomScalarField(Nx, Ny, Nz)
+v2 := NewRandomVectorField(Nx, Ny, Nz)
+
+for i:=0; i<Nx; i++{
+	for j:=0; j<Ny; j++{
+		for k:=0; k<Nz; k++{
+			s := s1.Get(0, i, j, k)
+			Expect("scalar reproducible", s2.Get(0, i, j, k), s, 0)
+			Expect("scalar in [0,1]", s, 0.5, 0.5)
+			x := v1.Get(0, i, j, k)
+			y := v1.Get(1, i, j, k)
+			z := v1.Get(2, i, j, k)
+			Expect("vector reproducible x", v2.Get(0, i, j, k), x, 0)
+			Expect("vector reproducible y", v2.Get(1, i, j, k), y, 0)
+			Expect("vector reproducible z", v2.Get(2, i, j, k), z, 0)
+			Expect("unit norm", sqrt(x*x+y*y+z*z), 1, 1e-6)
+		}
+	}
+}

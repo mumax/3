@@ -9,6 +9,13 @@ html: doc mumax3libs gpus
 	./doc -examples -builddir ${BUILDDIR}
 	cp ${STATIC}/* build
 
+# fast build for editing: examples are shown but not run, no GPU needed
+.PHONY: fast
+fast: doc
+	mkdir -p ${BUILDDIR}
+	./doc -examples -noexec -builddir ${BUILDDIR}
+	cp ${STATIC}/* ${BUILDDIR}
+
 .PHONY: doc
 doc:
 	go build -v

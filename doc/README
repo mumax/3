@@ -1,3 +1,4 @@
 This directory contains everything needed to build the mumax3 website (Home page, API, and examples)
 
 "make html" builds the complete website in ${BUILDDIR}.
+"make fast" builds it without running the examples (no simulation output, no GPU needed).

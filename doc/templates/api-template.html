@@ -213,13 +213,7 @@ anotherShape := Circle(400e-9).sub(Circle(200e-9))
 
 	<hr/>
 
-	{{template "typehead" .Type "Shape"}}
-	<p>All functions above return a <code>Shape</code>. Shapes are immutable: the methods below do not modify the shape, but return a new, transformed shape. Hence, they can be chained:</p>
-<pre><code>ring := circle(400e-9).sub(circle(200e-9))
-ring2 := ring.transl(1e-6, 0, 0).add(ring.transl(-1e-6, 0, 0))
-</code></pre>
-	<p>Rotation angles are in radians, distances in meters.</p>
-	{{template "methods" .Type "Shape"}}
+	<p>All functions above return a <a href="#type-Shape" onclick="openType(event, 'type-Shape')">Shape</a>. See its methods for transforming and combining shapes.</p>
 
 </div>
 
@@ -638,7 +632,6 @@ tableAdd(E_custom)  // Add a column with the energy related to the custom field
 	<p>The methods of a type are called with '<code>.</code>' and can be chained, e.g.:</p>
 <pre><code>m.Comp(0).Region(1).Average()   // magnetization → x-component → in region 1 → average
 </code></pre>
-	<p>Shapes are described on the <a href="#" onclick="openSection(event, 'shapes')">Shapes</a> page.</p>
 
 	<hr/>
 
@@ -705,6 +698,14 @@ B_ext.Add(LoadFile("antenna.ovf"), sin(2*pi*1e9*t))
 	{{template "typehead" .Type "ScalarExcitation"}}
 	<p>A scalar excitation, e.g. the strain components <code>exx</code>, <code>exy</code>, ... Like <code>Excitation</code>, but with one component.</p>
 	{{template "methods" .Type "ScalarExcitation"}}
+
+	{{template "typehead" .Type "Shape"}}
+	<p>A geometrical shape, returned by the functions on the <a href="#" onclick="openSection(event, 'shapes')">Shapes</a> page and used by e.g. <code>SetGeom</code>, <code>DefRegion</code> and <code>m.SetInShape</code>. Shapes are immutable: the methods below do not modify the shape, but return a new, transformed shape. Hence, they can be chained:</p>
+<pre><code>ring := circle(400e-9).sub(circle(200e-9))
+ring2 := ring.transl(1e-6, 0, 0).add(ring.transl(-1e-6, 0, 0))
+</code></pre>
+	<p>Rotation angles are in radians, distances in meters.</p>
+	{{template "methods" .Type "Shape"}}
 
 	{{template "typehead" .Type "Regions"}}
 	<p>The type of <code>regions</code>, which stores the material region index (0-255) of each cell. See <a href="#" onclick="openSection(event, 'regions')">Material regions</a>.</p>

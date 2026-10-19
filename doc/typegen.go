@@ -97,8 +97,8 @@ func derefType(t reflect.Type) reflect.Type {
 
 // Methods hidden from the data type documentation, in addition to hidden():
 // internal (Go/GPU-level) methods that are of no use in an input script.
-// Methods with a name ending in "Go", or with func/unsafe.Pointer arguments
-// or return values, are hidden as well.
+// Methods with a name ending in "Go", or with unnamed func (Go callback) or
+// unsafe.Pointer arguments or return values, are hidden as well.
 var typeHidden = map[string]bool{
 	"EvalTo": true, "AddTo": true, "Child": true, "Fix": true, "Quantity": true,
 	"MSlice": true, "Buffer": true, "SetArray": true, "Gpu": true, "Free": true,
@@ -113,16 +113,22 @@ func internalMethod(m reflect.Method) bool {
 	}
 	t := m.Type
 	for i := 0; i < t.NumIn(); i++ {
-		if k := t.In(i).Kind(); k == reflect.Func || k == reflect.UnsafePointer {
+		if goOnly(t.In(i)) {
 			return true
 		}
 	}
 	for i := 0; i < t.NumOut(); i++ {
-		if k := t.Out(i).Kind(); k == reflect.Func || k == reflect.UnsafePointer {
+		if goOnly(t.Out(i)) {
 			return true
 		}
 	}
 	return false
+}
+
+// goOnly reports whether t cannot be used in a script: an unnamed func type
+// (named ones like Shape and Config are fine) or unsafe.Pointer.
+func goOnly(t reflect.Type) bool {
+	return (t.Kind() == reflect.Func && t.Name() == "") || t.Kind() == reflect.UnsafePointer
 }
 
 // Docstrings for methods that have no Go doc comment in the source.

@@ -718,8 +718,8 @@ print(avg.X(), avg.Len())
 	{{template "methods" .Type "Vector"}}
 
 	{{template "typehead" .Type "Slice"}}
-	<p>Raw space-dependent data with one or more components, e.g. loaded from an <code>.ovf</code> file with <code>LoadFile</code> or created with <code>NewSlice</code>. Slices are used as masks for <code>Excitation.Add</code>, and can be edited cell by cell.</p>
-<pre><code>mask := NewSlice(3, Nx, Ny, Nz)
+	<p>Raw space-dependent data with one or more components, e.g. loaded from an <code>.ovf</code> file with <code>LoadFile</code> or created with <code>NewVectorMask</code>. Slices are used as masks for <code>Excitation.Add</code>, and can be edited cell by cell.</p>
+<pre><code>mask := NewVectorMask(Nx, Ny, Nz)
 mask.SetVector(0, 0, 0, vector(1, 0, 0))
 B_ext.Add(mask, sin(2*pi*1e9*t))
 </code></pre>
